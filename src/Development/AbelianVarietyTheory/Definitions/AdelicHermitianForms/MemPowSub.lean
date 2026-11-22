@@ -31,15 +31,17 @@ def dif {A : Type} [CommGroup A] (σ : A →* A) : A →* A where
 
 def fix {A : Type} [CommGroup A] (σ : A →* A) : Subgroup A := σ.eqLocus (MonoidHom.id A)
 
-theorem nrm_apply {A : Type} [CommGroup A] (σ : A →* A) (n : ℕ) (a : A) :
-    nrm σ n a = ∏ i ∈ Finset.range n, σ^[i] a := rfl
+theorem nrm_apply {A : Type} [CommGroup A] (σ : A →* A) (n : ℕ) (a : A)
+    : nrm σ n a = ∏ i ∈ Finset.range n, σ^[i] a :=
+  rfl
 
 theorem dif_apply {A : Type} [CommGroup A] (σ : A →* A) (a : A) : dif σ a = σ a / a := rfl
 
 open NumberField IsDedekindDomain Polynomial in
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.CNorm.mem_fix {A : Type} [CommGroup A] (σ : A →* A) (a : A) :
-    a ∈ _root_.GlobalTheory.CNorm.fix σ ↔ σ a = a := Iff.rfl
+theorem _root_.GlobalTheory.CNorm.mem_fix {A : Type} [CommGroup A] (σ : A →* A) (a : A)
+    : a ∈ _root_.GlobalTheory.CNorm.fix σ ↔ σ a = a :=
+  Iff.rfl
 
 def oneUnits {O : Type} [CommRing O] (t : O) : Subgroup Oˣ :=
   (Units.map (Ideal.Quotient.mk (Ideal.span {t}) : O →* O ⧸ Ideal.span {t})).ker
@@ -56,8 +58,10 @@ def powSub (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L) : Subgrou
 
 open NumberField IsDedekindDomain Polynomial in
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.CNorm.mem_powSub (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L)
-    (x : Fˣ) : x ∈ _root_.GlobalTheory.CNorm.powSub p φ ↔ ∃ r : L, r ^ p = φ (x : F) := Iff.rfl
+theorem _root_.GlobalTheory.CNorm.mem_powSub
+    (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L) (x : Fˣ)
+    : x ∈ _root_.GlobalTheory.CNorm.powSub p φ ↔ ∃ r : L, r ^ p = φ (x : F) :=
+  Iff.rfl
 
 def kNorm (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L) (δ : F) : Subgroup Fˣ :=
   (Units.map (Algebra.norm L : AdjoinRoot (X ^ p - C (φ δ) : L[X]) →* L)).range.comap
@@ -65,18 +69,20 @@ def kNorm (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L) (δ : F) :
 
 open NumberField IsDedekindDomain Polynomial in
 open scoped TensorProduct in
-theorem _root_.GlobalTheory.CNorm.mem_kNorm (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L)
-    (δ : F) (x : Fˣ) :
-    x ∈ _root_.GlobalTheory.CNorm.kNorm p φ δ ↔ ∃ y : (AdjoinRoot (X ^ p - C (φ δ) : L[X]))ˣ,
-      Algebra.norm L (y : AdjoinRoot (X ^ p - C (φ δ) : L[X])) = φ (x : F) := by
+theorem _root_.GlobalTheory.CNorm.mem_kNorm
+    (p : ℕ) {F L : Type} [Field F] [Field L] (φ : F →+* L) (δ : F) (x : Fˣ)
+    : x ∈ _root_.GlobalTheory.CNorm.kNorm p φ δ
+      ↔ ∃ y : (AdjoinRoot (X ^ p - C (φ δ) : L[X]))ˣ,
+        Algebra.norm L (y : AdjoinRoot (X ^ p - C (φ δ) : L[X])) = φ (x : F) := by
   constructor
   · rintro ⟨y, hy⟩
     exact ⟨y, by simpa using congrArg Units.val hy⟩
   · rintro ⟨y, hy⟩
     exact ⟨y, Units.ext (by simpa using hy)⟩
 
-structure IsKum (p : ℕ) {F E : Type} [Field F] [Field E] [Algebra F E] (ζ δ : F) (θ : E)
-    (σ : E ≃ₐ[F] E) : Prop where
+structure IsKum
+    (p : ℕ) {F E : Type} [Field F] [Field E] [Algebra F E] (ζ δ : F) (θ : E) (σ : E ≃ₐ[F] E)
+    : Prop where
   prime : p.Prime
   root : IsPrimitiveRoot ζ p
   nonpow : ∀ r : F, r ^ p ≠ δ
@@ -97,8 +103,9 @@ def finNorm (δ : F) (S : Finset (HeightOneSpectrum (𝓞 F))) : Subgroup Fˣ :=
   ⨅ v ∈ S, kNorm p (algebraMap F (v.adicCompletion F)) δ
 
 def tNon (δ : F) (S : Finset (HeightOneSpectrum (𝓞 F))) : ℕ :=
-  Set.ncard {v : HeightOneSpectrum (𝓞 F) |
-    v ∈ S ∧ ∀ r : v.adicCompletion F, r ^ p ≠ algebraMap F (v.adicCompletion F) δ}
+  Set.ncard
+    {v : HeightOneSpectrum (𝓞 F) |
+      v ∈ S ∧ ∀ r : v.adicCompletion F, r ^ p ≠ algebraMap F (v.adicCompletion F) δ}
 
 def AdmP (S : Finset (HeightOneSpectrum (𝓞 F))) : Prop :=
   GlobalTheory.QNorm.admitted F S ∧ ∀ v : HeightOneSpectrum (𝓞 F), v ∉ S → v.valuation F (p : F) = 1
@@ -106,8 +113,8 @@ def AdmP (S : Finset (HeightOneSpectrum (𝓞 F))) : Prop :=
 end
 
 def LocNorm (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] (x : F) : Prop :=
-  (∀ v : HeightOneSpectrum (𝓞 F), TNorm F E (v.adicCompletion F) x) ∧
-    ∀ a : Algebra F ℝ, @TNorm F E ℝ _ _ _ _ a x
+  (∀ v : HeightOneSpectrum (𝓞 F), TNorm F E (v.adicCompletion F) x)
+    ∧ ∀ a : Algebra F ℝ, @TNorm F E ℝ _ _ _ _ a x
 
 def NP (F E : Type) [Field F] [NumberField F] [Field E] [Algebra F E] : Prop :=
   ∀ x : F, x ≠ 0 → LocNorm F E x → ∃ y : E, Algebra.norm F y = x

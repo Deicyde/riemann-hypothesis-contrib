@@ -16,13 +16,17 @@ universe u v w
 
 section
 
-variable {S : Type u} [CommRing S] {Ω : Type w} [Field Ω] [Algebra S Ω] {N : ℕ}
-  {x : Fin (N + 1) → Ω} {E : Type v} [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
-
+variable
+  {S : Type u} [CommRing S]
+  {Ω : Type w} [Field Ω] [Algebra S Ω]
+  {N : ℕ} {x : Fin (N + 1) → Ω} {E : Type v}
+  [AddCommGroup E] [Module Ω E] [Module S E] [IsScalarTower S Ω E]
 
 omit [Module S E] [IsScalarTower S Ω E] in
-theorem SubSystem.twist_sub_fg (F : SubSystem S x E) (Q : SubSystem S x Ω) (I : Chart x)
-    (hF : (F.sub I).FG) (hQ : (Q.sub I).FG) : ((F.twist Q).sub I).FG := by
+theorem SubSystem.twist_sub_fg
+    (F : SubSystem S x E) (Q : SubSystem S x Ω) (I : Chart x)
+    (hF : (F.sub I).FG) (hQ : (Q.sub I).FG)
+    : ((F.twist Q).sub I).FG := by
   obtain ⟨sF, hsF⟩ := hF
   obtain ⟨sQ, hsQ⟩ := hQ
   classical
@@ -32,17 +36,24 @@ theorem SubSystem.twist_sub_fg (F : SubSystem S x E) (Q : SubSystem S x Ω) (I :
     intro z hz
     rw [Finset.coe_image₂] at hz
     obtain ⟨q, hq, y, hy, rfl⟩ := hz
-    exact Submodule.subset_span ⟨q, hsQ ▸ Submodule.subset_span hq, y, hsF ▸ Submodule.subset_span hy, rfl⟩
+    exact Submodule.subset_span
+      ⟨q, hsQ ▸ Submodule.subset_span hq, y, hsF ▸ Submodule.subset_span hy, rfl⟩
   · change Submodule.span _ _ ≤ _
     rw [Submodule.span_le]
     rintro _ ⟨q, hq, y, hy, rfl⟩
     rw [← hsQ] at hq
     rw [← hsF] at hy
-    refine Submodule.span_induction (p := fun q _ => q • y ∈
-      Submodule.span (chartRing S x I) ((Finset.image₂ (fun q y => q • y) sQ sF : Finset E) : Set E)) ?_ ?_ ?_ ?_ hq
+    refine Submodule.span_induction
+      (p := fun q _ =>
+        q • y ∈ Submodule.span (chartRing S x I)
+          ((Finset.image₂ (fun q y => q • y) sQ sF : Finset E) : Set E))
+      ?_ ?_ ?_ ?_ hq
     · intro q hq
-      refine Submodule.span_induction (p := fun y _ => q • y ∈
-        Submodule.span (chartRing S x I) ((Finset.image₂ (fun q y => q • y) sQ sF : Finset E) : Set E)) ?_ ?_ ?_ ?_ hy
+      refine Submodule.span_induction
+        (p := fun y _ =>
+          q • y ∈ Submodule.span (chartRing S x I)
+            ((Finset.image₂ (fun q y => q • y) sQ sF : Finset E) : Set E))
+        ?_ ?_ ?_ ?_ hy
       · intro y hy
         exact Submodule.subset_span (by rw [Finset.coe_image₂]; exact ⟨q, hq, y, hy, rfl⟩)
       · rw [smul_zero]; exact Submodule.zero_mem _
@@ -60,8 +71,11 @@ end
 
 theorem SubFamilyTwist.proof : SubFamilyTwist.Statement.{u, v, w} := by
   intro S _ Ω _ _ N x E _ _ _ _ F Q hF
-  exact ⟨F.twistFam Q.toSubFamily, rfl, fun I =>
-    SubSystem.twist_sub_fg F.toSubSystem Q.toSubSystem I (hF I) (Q.fg I)⟩
+  exact ⟨
+    F.twistFam Q.toSubFamily,
+    rfl,
+    fun I => SubSystem.twist_sub_fg F.toSubSystem Q.toSubSystem I (hF I) (Q.fg I)
+  ⟩
 
 end
 

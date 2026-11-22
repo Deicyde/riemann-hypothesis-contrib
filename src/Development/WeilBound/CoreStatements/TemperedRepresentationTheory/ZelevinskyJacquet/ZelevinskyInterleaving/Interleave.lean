@@ -17,11 +17,12 @@ variable {T : Type u}
 
 def ASeg.carrier (s : T → T) (Δ : ASeg T) : Set T := {t | ∃ i < Δ.len, s^[i] Δ.start = t}
 
-def ASeg.dec (s : T → T) (Δ : ASeg T) : List T := (List.range Δ.len).reverse.map fun i => s^[i] Δ.start
+def ASeg.dec (s : T → T) (Δ : ASeg T) : List T :=
+  (List.range Δ.len).reverse.map fun i => s^[i] Δ.start
 
 def ALinked (s : T → T) (Δ Δ' : ASeg T) : Prop :=
-  (∃ Γ : ASeg T, Γ.carrier s = Δ.carrier s ∪ Δ'.carrier s) ∧ ¬ Δ.carrier s ⊆ Δ'.carrier s ∧
-    ¬ Δ'.carrier s ⊆ Δ.carrier s
+  (∃ Γ : ASeg T, Γ.carrier s = Δ.carrier s ∪ Δ'.carrier s) ∧ ¬ Δ.carrier s ⊆ Δ'.carrier s
+    ∧ ¬ Δ'.carrier s ⊆ Δ.carrier s
 
 def APrecedes (s : T → T) (Δ Δ' : ASeg T) : Prop :=
   ALinked s Δ Δ' ∧ ∃ j : ℕ, 0 < j ∧ Δ'.start = s^[j] Δ.start
@@ -37,7 +38,8 @@ inductive Interleave : List T → List T → List T → Prop
 
 inductive Shuffle : List (List T) → List T → Prop
   | nil : Shuffle [] []
-  | cons {u : List T} {us : List (List T)} {v w : List T} : Shuffle us v → Interleave u v w → Shuffle (u :: us) w
+  | cons {u : List T} {us : List (List T)} {v w : List T}
+    : Shuffle us v → Interleave u v w → Shuffle (u :: us) w
 
 def InSh (s : T → T) (m : Multiset (ASeg T)) (w : List T) : Prop :=
   ∃ L : List (ASeg T), (L : Multiset (ASeg T)) = m ∧ Shuffle (L.map (ASeg.dec s)) w

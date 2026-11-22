@@ -9,19 +9,18 @@ open PowerSeries GlobalTheory.CycFr
 
 namespace GlobalTheory.CycFr
 
-
 open PowerSeries in
-theorem _root_.GlobalTheory.CycFr.eq_act_of_comm {l : ℕ} [Fact l.Prime] {O : Type}
-    [CommRing O] [IsDomain O] [CharZero O]
-    [Algebra ℤ_[l] O] (φ₀ g : O⟦X⟧ →ₐ[O] O⟦X⟧) (c : ℤ_[l]) (hφ : φ₀ X = (1 + X) ^ l - 1)
-    (hc : ∀ a, φ₀ (g a) = g (φ₀ a)) (h0 : constantCoeff (g X) = 0)
-    (h1 : coeff 1 (g X) = algebraMap ℤ_[l] O c) :
-    g = _root_.GlobalTheory.CycFr.act O c := by
+theorem _root_.GlobalTheory.CycFr.eq_act_of_comm
+    {l : ℕ} [Fact l.Prime]
+    {O : Type} [CommRing O] [IsDomain O] [CharZero O] [Algebra ℤ_[l] O]
+    (φ₀ g : O⟦X⟧ →ₐ[O] O⟦X⟧) (c : ℤ_[l])
+    (hφ : φ₀ X = (1 + X) ^ l - 1) (hc : ∀ a, φ₀ (g a) = g (φ₀ a)) (h0 : constantCoeff (g X) = 0)
+    (h1 : coeff 1 (g X) = algebraMap ℤ_[l] O c)
+    : g = _root_.GlobalTheory.CycFr.act O c := by
   set A := _root_.GlobalTheory.CycFr.act O c X with hAdef
   set G := g X with hGdef
   set P : O⟦X⟧ := ∑ i ∈ Finset.range l, (1 + X) ^ i with hPdef
-  have hP : (1 + X : O⟦X⟧) ^ l - 1 = X * P := by
-    rw [← geom_sum_mul, add_sub_cancel_left, mul_comm]
+  have hP : (1 + X : O⟦X⟧) ^ l - 1 = X * P := by rw [← geom_sum_mul, add_sub_cancel_left, mul_comm]
   have hPc : constantCoeff P = (l : O) := by simp [P]
   have hXφ : X ∣ φ₀ X := by rw [hφ, hP]; exact dvd_mul_right _ _
   have hφact : φ₀ = _root_.GlobalTheory.CycFr.act O (l : ℤ_[l]) := by
@@ -41,12 +40,14 @@ theorem _root_.GlobalTheory.CycFr.eq_act_of_comm {l : ℕ} [Fact l.Prime] {O : T
     have hD : φ₀ (G - A) = (G - A) * S := by
       have hgs := geom_sum₂_mul (1 + G) (1 + A) l
       rw [add_sub_add_left_eq_sub] at hgs
-      rw [map_sub, hG, hA, mul_comm, hgs]; ring
+      rw [map_sub, hG, hA, mul_comm, hgs]
+      ring
     rw [hE, map_mul, map_pow, hφ, hP, mul_pow, mul_assoc, mul_assoc] at hD
     have hcancel := mul_left_cancel₀ (pow_ne_zero n PowerSeries.X_ne_zero) hD
     have hcc := congrArg constantCoeff hcancel
     rw [map_mul, map_mul, map_pow, hPc, hSc,
-      _root_.GlobalTheory.CycFr.constantCoeff_algHom φ₀ hXφ E] at hcc
+        _root_.GlobalTheory.CycFr.constantCoeff_algHom φ₀ hXφ E]
+      at hcc
     have hne : ((l : O) ^ n) ≠ (l : O) := by
       rw [← Nat.cast_pow, Ne, Nat.cast_inj]
       intro h

@@ -18,10 +18,16 @@ namespace PositivityTheory.RgJS
 theorem cauchy_variation_inequality : Cauchy := by
   have hg := complete_homogeneous_generating
   have hs := homogeneous_sum_bound hg
-  have hj := schur_jacobi_trudi_of_alternating (alternating_jacobi_trudi_of_relation (elementary_relation_of_generating hg))
-  exact cauchy_of_beta_bounds (beta_all_of_generating (beta_generating_of_sum_bound hg hs hj) hs hj) hs hj jacobi_trudi_padding
+  have hj :=
+    schur_jacobi_trudi_of_alternating (alternating_jacobi_trudi_of_relation
+      (elementary_relation_of_generating hg))
+  exact cauchy_of_beta_bounds (beta_all_of_generating (beta_generating_of_sum_bound hg hs hj) hs hj)
+    hs hj jacobi_trudi_padding
 
 theorem cauchy_local_inequality : CauchyLoc :=
-  cauchy_local_of_cauchy cauchy_variation_inequality (schur_jacobi_trudi_of_alternating (alternating_jacobi_trudi_of_relation (elementary_relation_of_generating complete_homogeneous_generating))) jacobi_trudi_padding
+  cauchy_local_of_cauchy cauchy_variation_inequality
+    (schur_jacobi_trudi_of_alternating (alternating_jacobi_trudi_of_relation
+      (elementary_relation_of_generating complete_homogeneous_generating)))
+    jacobi_trudi_padding
 
 end PositivityTheory.RgJS

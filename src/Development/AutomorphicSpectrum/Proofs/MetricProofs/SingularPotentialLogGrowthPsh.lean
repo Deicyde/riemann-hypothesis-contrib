@@ -16,42 +16,51 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
 
-theorem pshPull {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (hψ : IsCompatChart A ψ) {O : Set X} (hO : IsOpen O)
+theorem pshPull
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (hψ : IsCompatChart A ψ)
+    {O : Set X} (hO : IsOpen O)
     {f : X → ℝ} (hf : A.SmoothOn O f)
     (hl : ∀ j, ∀ y ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' O, ∀ w : Fin e → ℂ,
       0 ≤ levi (f ∘ (A.chart j).symm) y w)
-    (a : Fin e → ℂ) (c : ℂ) {V : Set (Fin e → ℂ)} (hV : IsOpen V)
-    (hVT : ∀ z ∈ V, a + c • z ∈ ψ.target ∧ ψ.symm (a + c • z) ∈ O) :
-    ContinuousOn (fun z => f (ψ.symm (a + c • z))) V ∧
-      ReciprocityTheory.AnForm.A.IsPsh V (fun z => f (ψ.symm (a + c • z))) := by
-  have key : ∀ z ∈ V, ContDiffAt ℝ 2 (fun z => f (ψ.symm (a + c • z))) z ∧
-      ∀ w, 0 ≤ levi (fun z => f (ψ.symm (a + c • z))) z w := by
+    (a : Fin e → ℂ) (c : ℂ)
+    {V : Set (Fin e → ℂ)}
+    (hV : IsOpen V) (hVT : ∀ z ∈ V, a + c • z ∈ ψ.target ∧ ψ.symm (a + c • z) ∈ O)
+    : ContinuousOn (fun z => f (ψ.symm (a + c • z))) V
+      ∧ ReciprocityTheory.AnForm.A.IsPsh V (fun z => f (ψ.symm (a + c • z))) := by
+  have key
+      : ∀ z ∈ V,
+        ContDiffAt ℝ 2 (fun z => f (ψ.symm (a + c • z))) z
+          ∧ ∀ w, 0 ≤ levi (fun z => f (ψ.symm (a + c • z))) z w := by
     intro z hz
     obtain ⟨h1, h2⟩ := hVT z hz
-    have hTa : AnalyticAt ℂ (fun z : Fin e → ℂ => a + c • z) z :=
-      by
+    have hTa : AnalyticAt ℂ (fun z : Fin e → ℂ => a + c • z) z := by
       have h : AnalyticAt ℂ (fun z : Fin e → ℂ => (c • ContinuousLinearMap.id ℂ (Fin e → ℂ)) z) z :=
         ContinuousLinearMap.analyticAt _ z
       exact analyticAt_const.add (by simpa using h)
     obtain ⟨j, hj⟩ := A.cover (ψ.symm (a + c • z))
     have hτa : AnalyticAt ℂ ((A.chart j ∘ ψ.symm) ∘ fun z : Fin e → ℂ => a + c • z) z :=
       AnalyticAt.comp ((hψ j).2 (a + c • z) ⟨h1, hj⟩) hTa
-    have hmem : ((A.chart j ∘ ψ.symm) ∘ fun z : Fin e → ℂ => a + c • z) z ∈
-        (A.chart j).target ∩ (A.chart j).symm ⁻¹' O :=
-      ⟨(A.chart j).map_source hj, by
-        simpa [Set.mem_preimage, (A.chart j).left_inv hj] using h2⟩
+    have hmem
+        : ((A.chart j ∘ ψ.symm) ∘ fun z : Fin e → ℂ => a + c • z) z
+          ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' O :=
+      ⟨(A.chart j).map_source hj, by simpa [Set.mem_preimage, (A.chart j).left_inv hj] using h2⟩
     have hOo := (A.chart j).isOpen_inter_preimage_symm hO
     have hφ : ContDiffAt ℝ 2 (f ∘ (A.chart j).symm)
         (((A.chart j ∘ ψ.symm) ∘ fun z : Fin e → ℂ => a + c • z) z) :=
       ((hf j).contDiffAt (hOo.mem_nhds hmem)).of_le (WithTop.coe_le_coe.mpr le_top)
-    have hev : (fun z => f (ψ.symm (a + c • z))) =ᶠ[𝓝 z]
-        (f ∘ (A.chart j).symm) ∘ ((A.chart j ∘ ψ.symm) ∘ fun z : Fin e → ℂ => a + c • z) := by
+    have hev
+        : (fun z => f (ψ.symm (a + c • z))) =ᶠ[𝓝 z]
+          (f ∘ (A.chart j).symm) ∘ ((A.chart j ∘ ψ.symm) ∘ fun z : Fin e → ℂ => a + c • z) := by
       have hcT : ContinuousAt (fun z => ψ.symm (a + c • z)) z :=
-        ContinuousAt.comp (f := fun z : Fin e → ℂ => a + c • z) (ψ.continuousAt_symm h1) hTa.continuousAt
+        ContinuousAt.comp
+          (f := fun z : Fin e → ℂ => a + c • z)
+          (ψ.continuousAt_symm h1) hTa.continuousAt
       filter_upwards [hcT.eventually ((A.chart j).open_source.mem_nhds hj)] with z' hz'
       simp [(A.chart j).left_inv hz']
     refine ⟨?_, fun w => ?_⟩
@@ -62,16 +71,15 @@ theorem pshPull {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
       exact hl j _ hmem _
   refine ⟨fun z hz => (key z hz).1.continuousAt.continuousWithinAt, ?_⟩
   exact (ReciprocityTheory.AnForm.A.isPsh_iff_isLeviPsh_thm e V _ hV
-    (fun z hz => (key z hz).1.contDiffWithinAt)).2
-      ⟨fun z hz => (key z hz).1.contDiffWithinAt, fun z hz w => (key z hz).2 w⟩
+      (fun z hz => (key z hz).1.contDiffWithinAt)).2
+    ⟨fun z hz => (key z hz).1.contDiffWithinAt, fun z hz w => (key z hz).2 w⟩
 
-theorem log_le_growth {r Q D l : ℝ} (hr : 0 < r) (h : r ≤ Q + D * l) (hl : 0 ≤ l) :
-    Real.log r ≤ (|Real.log (|Q| + |D| + 1)| + 1) * Real.log (Real.exp 1 + l) := by
+theorem log_le_growth {r Q D l : ℝ} (hr : 0 < r) (h : r ≤ Q + D * l) (hl : 0 ≤ l)
+    : Real.log r ≤ (|Real.log (|Q| + |D| + 1)| + 1) * Real.log (Real.exp 1 + l) := by
   set K : ℝ := |Q| + |D| + 1 with hK
   have hK1 : 1 ≤ K := by have := abs_nonneg Q; have := abs_nonneg D; linarith
   have hK0 : 0 < K := by linarith
-  have he1 : 1 ≤ Real.exp 1 := by
-    have := Real.add_one_le_exp (1 : ℝ); linarith
+  have he1 : 1 ≤ Real.exp 1 := by have := Real.add_one_le_exp (1 : ℝ); linarith
   have hpos : 0 < Real.exp 1 + l := by linarith
   have hle : r ≤ K * (Real.exp 1 + l) := by
     have h1 : Q ≤ K := by have := le_abs_self Q; have := abs_nonneg D; linarith
@@ -88,50 +96,65 @@ theorem log_le_growth {r Q D l : ℝ} (hr : 0 < r) (h : r ≤ Q + D * l) (hl : 0
     (le_abs_self _).trans (le_mul_of_one_le_right (abs_nonneg _) hL)
   nlinarith
 
-theorem localBound {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X)
-    (s : X → X → ℂ) {nb : ℕ} (m : Fin nb → ℕ) (W : Fin nb → Set X) (hL : IsPotential A L)
-    (hS : IsSection A L s) (hSNC : IsSNC A L s m W) (hn : ∀ y, logNormSec L s y ≤ 0)
-    (th : LocPot X) (u : X → ℝ) (C₁ : ℝ) (hth : IsPotential A th) (hu : A.SmoothOn (bdry s)ᶜ u)
+theorem localBound
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ)
+    {nb : ℕ} (m : Fin nb → ℕ) (W : Fin nb → Set X)
+    (hL : IsPotential A L) (hS : IsSection A L s) (hSNC : IsSNC A L s m W)
+    (hn : ∀ y, logNormSec L s y ≤ 0)
+    (th : LocPot X) (u : X → ℝ) (C₁ : ℝ)
+    (hth : IsPotential A th) (hu : A.SmoothOn (bdry s)ᶜ u)
     (hpsh : IsPshOn A (bdry s)ᶜ (th + LocPot.ofFun u))
-    (hC : ∀ y ∉ bdry s, |u y| ≤ C₁ * Real.log (rW L s y)) (x : X) :
-    ∃ V : Set X, IsOpen V ∧ x ∈ V ∧ ∃ B : ℝ, ∀ y ∈ V, y ∉ bdry s → u y ≤ B := by
+    (hC : ∀ y ∉ bdry s, |u y| ≤ C₁ * Real.log (rW L s y)) (x : X)
+    : ∃ V : Set X, IsOpen V ∧ x ∈ V ∧ ∃ B : ℝ, ∀ y ∈ V, y ∉ bdry s → u y ≤ B := by
   classical
   obtain ⟨ψ, hcompat, hxψ, hψU, σ, -, -, g, hg, hg0, hprod⟩ := hSNC x
   set a : Fin e → ℂ := ψ x with ha
-  let tm : Fin nb → (Fin e → ℂ) → ℂ := fun k w => match σ k with
+  let tm : Fin nb → (Fin e → ℂ) → ℂ := fun k w =>
+    match σ k with
     | some i => w i ^ m k
     | none => 1
   have hprod' : ∀ y ∈ ψ.source, s x y = g y * ∏ k, tm k (ψ y) := hprod
   let S' : Finset (Fin e) := Finset.univ.filter fun i => a i = 0 ∧ ∃ k, σ k = some i ∧ m k ≠ 0
   have hat : a ∈ ψ.target := ψ.map_source hxψ
   have hsa : ψ.symm a = x := ψ.left_inv hxψ
-  have hnb : ∀ᶠ w in 𝓝 a, (w ∈ ψ.target ∧ ψ.symm w ∈ th.U x) ∧
-      ∀ i, a i ≠ 0 → ‖a i‖ / 2 < ‖w i‖ := by
+  have hnb
+      : ∀ᶠ w in 𝓝 a, (w ∈ ψ.target ∧ ψ.symm w ∈ th.U x) ∧
+        ∀ i, a i ≠ 0 → ‖a i‖ / 2 < ‖w i‖ := by
     refine Filter.Eventually.and ?_ (eventually_all.2 fun i => ?_)
     · exact (ψ.isOpen_inter_preimage_symm (th.isOpen_U x)).mem_nhds
         ⟨hat, by simpa [Set.mem_preimage, hsa] using th.mem_U x⟩
     · by_cases hi : a i = 0
       · exact Eventually.of_forall fun w h => absurd hi h
-      · have hc : ContinuousAt (fun w : Fin e → ℂ => ‖w i‖) a := (continuous_apply i).norm.continuousAt
+      · have hc : ContinuousAt (fun w : Fin e → ℂ => ‖w i‖) a :=
+          (continuous_apply i).norm.continuousAt
         have h2 : ‖a i‖ / 2 < ‖a i‖ := half_lt_self (norm_pos_iff.2 hi)
         filter_upwards [hc.eventually (lt_mem_nhds h2)] with w hw _ using hw
   obtain ⟨ρ, hρ, hball⟩ := Metric.nhds_basis_closedBall.mem_iff.1 hnb
   have hst : ∀ w ∈ Metric.closedBall a ρ, ψ.symm w ∈ ψ.source := fun w hw =>
     ψ.map_target (hball hw).1.1
-  have bd : ∀ f : X → ℝ, (∀ w ∈ Metric.closedBall a ρ, ContinuousAt f (ψ.symm w)) →
-      ∃ M, ∀ w ∈ Metric.closedBall a ρ, |f (ψ.symm w)| ≤ M := by
+  have bd
+      : ∀ f : X → ℝ,
+        (∀ w ∈ Metric.closedBall a ρ, ContinuousAt f (ψ.symm w))
+          → ∃ M, ∀ w ∈ Metric.closedBall a ρ, |f (ψ.symm w)| ≤ M := by
     intro f hf
     have hc : ContinuousOn (fun w => f (ψ.symm w)) (Metric.closedBall a ρ) := fun w hw =>
-      (ContinuousAt.comp (f := ψ.symm) (hf w hw) (ψ.continuousAt_symm (hball hw).1.1)).continuousWithinAt
+      (ContinuousAt.comp (f := ψ.symm) (hf w hw)
+        (ψ.continuousAt_symm (hball hw).1.1)).continuousWithinAt
     obtain ⟨M, hM⟩ := (isCompact_closedBall a ρ).exists_bound_of_continuousOn hc
     exact ⟨M, fun w hw => by simpa [Real.norm_eq_abs] using hM w hw⟩
-  obtain ⟨M₁, hM₁⟩ := bd (th.φ x) fun w hw =>
-    LeviFormBoundaryTopology.continuousAt_of_smoothOn A (th.isOpen_U x) (hth.1 x) (hball hw).1.2
-  obtain ⟨M₂, hM₂⟩ := bd (L.φ x) fun w hw =>
-    LeviFormBoundaryTopology.continuousAt_of_smoothOn A (L.isOpen_U x) (hL.1 x) (hψU (hst w hw))
-  obtain ⟨M₃, hM₃⟩ := bd (fun y => Real.log ‖g y‖) fun w hw =>
-    (LeviFormBoundaryTopology.continuousAt_of_holoOn A hg (hst w hw)).norm.log
-      (norm_ne_zero_iff.2 (hg0 _ (hst w hw)))
+  obtain ⟨M₁, hM₁⟩ :=
+    bd (th.φ x) fun w hw =>
+      LeviFormBoundaryTopology.continuousAt_of_smoothOn A (th.isOpen_U x) (hth.1 x) (hball hw).1.2
+  obtain ⟨M₂, hM₂⟩ :=
+    bd (L.φ x) fun w hw =>
+      LeviFormBoundaryTopology.continuousAt_of_smoothOn A (L.isOpen_U x) (hL.1 x) (hψU (hst w hw))
+  obtain ⟨M₃, hM₃⟩ :=
+    bd
+      (fun y => Real.log ‖g y‖)
+      fun w hw =>
+        (LeviFormBoundaryTopology.continuousAt_of_holoOn A hg (hst w hw)).norm.log
+          (norm_ne_zero_iff.2 (hg0 _ (hst w hw)))
   have hρc : (ρ : ℂ) ≠ 0 := Complex.ofReal_ne_zero.2 hρ.ne'
   have hwz : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1, a + (ρ : ℂ) • z ∈ Metric.closedBall a ρ := by
     intro z hz
@@ -146,9 +169,10 @@ theorem localBound {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     exact neg_nonneg.2 (Real.log_nonpos (norm_nonneg _) ((norm_le_pi_norm z i).trans hz1.le))
   have hl1 : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1, 0 ≤ ∑ i ∈ S', Real.log ‖z i‖⁻¹ := fun z hz =>
     Finset.sum_nonneg fun i _ => hl0 z hz i
-  have hk : ∀ k, ∃ B : ℝ, ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
-      tm k (a + (ρ : ℂ) • z) ≠ 0 ∧
-        -B - m k * ∑ i ∈ S', Real.log ‖z i‖⁻¹ ≤ Real.log ‖tm k (a + (ρ : ℂ) • z)‖ := by
+  have hk
+      : ∀ k, ∃ B : ℝ, ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
+        tm k (a + (ρ : ℂ) • z) ≠ 0
+          ∧ -B - m k * ∑ i ∈ S', Real.log ‖z i‖⁻¹ ≤ Real.log ‖tm k (a + (ρ : ℂ) • z)‖ := by
     intro k
     have hmn : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1, 0 ≤ (m k : ℝ) * ∑ i ∈ S', Real.log ‖z i‖⁻¹ :=
       fun z hz => mul_nonneg (Nat.cast_nonneg _) (hl1 z hz)
@@ -191,36 +215,43 @@ theorem localBound {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
         have h6 := hmn z hz.1
         linarith
   choose Bk hBk using hk
-  have hD : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
-      ψ.symm (a + (ρ : ℂ) • z) ∈ ψ.source ∧ s x (ψ.symm (a + (ρ : ℂ) • z)) ≠ 0 ∧
-      ‖s x (ψ.symm (a + (ρ : ℂ) • z))‖ =
-        ‖g (ψ.symm (a + (ρ : ℂ) • z))‖ * ∏ k, ‖tm k (a + (ρ : ℂ) • z)‖ := by
+  have hD
+      : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
+        ψ.symm (a + (ρ : ℂ) • z) ∈ ψ.source ∧ s x (ψ.symm (a + (ρ : ℂ) • z)) ≠ 0
+          ∧ ‖s x (ψ.symm (a + (ρ : ℂ) • z))‖
+            = ‖g (ψ.symm (a + (ρ : ℂ) • z))‖ * ∏ k, ‖tm k (a + (ρ : ℂ) • z)‖ := by
     intro z hz
     have h1 := hst _ (hwz z hz.1)
-    have h2 : s x (ψ.symm (a + (ρ : ℂ) • z)) = g (ψ.symm (a + (ρ : ℂ) • z)) *
-        ∏ k, tm k (a + (ρ : ℂ) • z) := by
+    have h2
+        : s x (ψ.symm (a + (ρ : ℂ) • z))
+          = g (ψ.symm (a + (ρ : ℂ) • z)) * ∏ k, tm k (a + (ρ : ℂ) • z) := by
       rw [hprod' _ h1, ψ.right_inv (hball (hwz z hz.1)).1.1]
     refine ⟨h1, ?_, ?_⟩
     · rw [h2]
       exact mul_ne_zero (hg0 _ h1) (Finset.prod_ne_zero_iff.2 fun k _ => (hBk k z hz).1)
     · rw [h2, norm_mul, norm_prod]
-  have hoff : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
-      ψ.symm (a + (ρ : ℂ) • z) ∉ bdry s := fun z hz h =>
+  have hoff
+      : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
+        ψ.symm (a + (ρ : ℂ) • z) ∉ bdry s := fun z hz h =>
     (hD z hz).2.1 ((LeviFormBoundaryTopology.bdry_iff hS (hψU (hD z hz).1)).1 h)
-  have hr : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
-      rW L s (ψ.symm (a + (ρ : ℂ) • z)) ≤ (Real.exp 1 + 2 * M₃ + 2 * M₂ + 2 * ∑ k, Bk k) +
-        (2 * ∑ k, (m k : ℝ)) * ∑ i ∈ S', Real.log ‖z i‖⁻¹ := by
+  have hr
+      : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
+        rW L s (ψ.symm (a + (ρ : ℂ) • z))
+          ≤ (Real.exp 1 + 2 * M₃ + 2 * M₂ + 2 * ∑ k, Bk k)
+            + (2 * ∑ k, (m k : ℝ)) * ∑ i ∈ S', Real.log ‖z i‖⁻¹ := by
     intro z hz
     obtain ⟨h1, h2, h3⟩ := hD z hz
     have hw := hwz z hz.1
     have hgz : ‖g (ψ.symm (a + (ρ : ℂ) • z))‖ ≠ 0 := norm_ne_zero_iff.2 (hg0 _ h1)
     have htz : ∀ k ∈ Finset.univ, ‖tm k (a + (ρ : ℂ) • z)‖ ≠ 0 := fun k _ =>
       norm_ne_zero_iff.2 (hBk k z hz).1
-    have hlog : Real.log ‖s x (ψ.symm (a + (ρ : ℂ) • z))‖ =
-        Real.log ‖g (ψ.symm (a + (ρ : ℂ) • z))‖ + ∑ k, Real.log ‖tm k (a + (ρ : ℂ) • z)‖ := by
+    have hlog
+        : Real.log ‖s x (ψ.symm (a + (ρ : ℂ) • z))‖
+          = Real.log ‖g (ψ.symm (a + (ρ : ℂ) • z))‖ + ∑ k, Real.log ‖tm k (a + (ρ : ℂ) • z)‖ := by
       rw [h3, Real.log_mul hgz (Finset.prod_ne_zero_iff.2 htz), Real.log_prod htz]
-    have hsum : ∑ k, (-Bk k - m k * ∑ i ∈ S', Real.log ‖z i‖⁻¹) ≤
-        ∑ k, Real.log ‖tm k (a + (ρ : ℂ) • z)‖ :=
+    have hsum
+        : ∑ k, (-Bk k - m k * ∑ i ∈ S', Real.log ‖z i‖⁻¹)
+          ≤ ∑ k, Real.log ‖tm k (a + (ρ : ℂ) • z)‖ :=
       Finset.sum_le_sum fun k _ => (hBk k z hz).2
     rw [Finset.sum_sub_distrib, Finset.sum_neg_distrib, ← Finset.sum_mul] at hsum
     have b2 := (abs_le.1 (hM₂ _ hw)).2
@@ -230,29 +261,27 @@ theorem localBound {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     linarith
   set Cc : ℝ := |M₁| + |C₁| * (|Real.log (|Real.exp 1 + 2 * M₃ + 2 * M₂ + 2 * ∑ k, Bk k| +
     |2 * ∑ k, (m k : ℝ)| + 1)| + 1) with hCc
-  have hFb : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
-      (fun y => th.φ x y + u y) (ψ.symm (a + (ρ : ℂ) • z)) ≤
-        Cc * Real.log (Real.exp 1 + ∑ i ∈ S', Real.log ‖z i‖⁻¹) := by
+  have hFb
+      : ∀ z ∈ Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S',
+        (fun y => th.φ x y + u y) (ψ.symm (a + (ρ : ℂ) • z))
+          ≤ Cc * Real.log (Real.exp 1 + ∑ i ∈ S', Real.log ‖z i‖⁻¹) := by
     intro z hz
     have hy := hoff z hz
-    have he1 : 1 ≤ Real.exp 1 := by
-      have := Real.add_one_le_exp (1 : ℝ); linarith
+    have he1 : 1 ≤ Real.exp 1 := by have := Real.add_one_le_exp (1 : ℝ); linarith
     have hrge := rW_ge L s hn (ψ.symm (a + (ρ : ℂ) • z))
     have hrpos : 0 < rW L s (ψ.symm (a + (ρ : ℂ) • z)) := by linarith
-    have hlogr : 0 ≤ Real.log (rW L s (ψ.symm (a + (ρ : ℂ) • z))) :=
-      Real.log_nonneg (by linarith)
+    have hlogr : 0 ≤ Real.log (rW L s (ψ.symm (a + (ρ : ℂ) • z))) := Real.log_nonneg (by linarith)
     have hg1 := log_le_growth hrpos (hr z hz) (hl1 z hz.1)
     have hL1 : 1 ≤ Real.log (Real.exp 1 + ∑ i ∈ S', Real.log ‖z i‖⁻¹) := by
-      have := Real.log_le_log (Real.exp_pos 1)
-        (le_add_of_nonneg_right (hl1 z hz.1) (a := Real.exp 1))
+      have :=
+        Real.log_le_log (Real.exp_pos 1) (le_add_of_nonneg_right (hl1 z hz.1) (a := Real.exp 1))
       rwa [Real.log_exp] at this
-    have hu1 : u (ψ.symm (a + (ρ : ℂ) • z)) ≤
-        |C₁| * Real.log (rW L s (ψ.symm (a + (ρ : ℂ) • z))) :=
-      (le_abs_self _).trans ((hC _ hy).trans
-        (mul_le_mul_of_nonneg_right (le_abs_self C₁) hlogr))
+    have hu1 : u (ψ.symm (a + (ρ : ℂ) • z)) ≤ |C₁| * Real.log (rW L s (ψ.symm (a + (ρ : ℂ) • z))) :=
+      (le_abs_self _).trans ((hC _ hy).trans (mul_le_mul_of_nonneg_right (le_abs_self C₁) hlogr))
     have hu2 := hu1.trans (mul_le_mul_of_nonneg_left hg1 (abs_nonneg C₁))
-    have hth1 : th.φ x (ψ.symm (a + (ρ : ℂ) • z)) ≤
-        |M₁| * Real.log (Real.exp 1 + ∑ i ∈ S', Real.log ‖z i‖⁻¹) :=
+    have hth1
+        : th.φ x (ψ.symm (a + (ρ : ℂ) • z))
+          ≤ |M₁| * Real.log (Real.exp 1 + ∑ i ∈ S', Real.log ‖z i‖⁻¹) :=
       ((le_abs_self _).trans ((hM₁ _ (hwz z hz.1)).trans (le_abs_self _))).trans
         (le_mul_of_one_le_right (abs_nonneg _) hL1)
     show th.φ x _ + u _ ≤ _
@@ -266,20 +295,27 @@ theorem localBound {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     exact isClosed_biUnion_finset fun i _ => isClosed_eq (continuous_apply i) continuous_const
   have hVo : IsOpen (Metric.ball (0 : Fin e → ℂ) 1 \ ReciprocityTheory.AnForm.A.coordDiv S') :=
     Metric.isOpen_ball.sdiff hclosed
-  have hpull := pshPull A ψ hcompat (O := th.U x ∩ (bdry s)ᶜ)
-    ((th.isOpen_U x).inter (LeviFormBoundaryTopology.isClosed_bdry hS).isOpen_compl)
-    (f := fun y => th.φ x y + u y)
-    (fun j => ((hth.1 x j).mono (by exact fun y hy => ⟨hy.1, hy.2.1⟩)).add
-      ((hu j).mono fun y hy => ⟨hy.1, hy.2.2⟩))
-    (fun j y hy w => hpsh x j y ⟨hy.1, ⟨hy.2.1, trivial⟩, hy.2.2⟩ w)
-    a (ρ : ℂ) hVo
-    (fun z hz => ⟨(hball (hwz z hz.1)).1.1, (hball (hwz z hz.1)).1.2, hoff z hz⟩)
-  obtain ⟨Bm, hBm⟩ := ReciprocityTheory.AnForm.A.PlurisubharmonicExtension.part_a
-    Metric.isOpen_ball subset_rfl hpull.1 hpull.2 hFb
-    (Metric.closedBall 0 (1 / 2)) (isCompact_closedBall _ _)
-    (Metric.closedBall_subset_ball (by norm_num))
-  refine ⟨ψ.source ∩ ψ ⁻¹' Metric.ball a (ρ / 2), ψ.isOpen_inter_preimage Metric.isOpen_ball,
-    ⟨hxψ, Set.mem_preimage.mpr (Metric.mem_ball_self (half_pos hρ))⟩, Bm + M₁, ?_⟩
+  have hpull :=
+    pshPull A ψ hcompat (O := th.U x ∩ (bdry s)ᶜ)
+      ((th.isOpen_U x).inter (LeviFormBoundaryTopology.isClosed_bdry hS).isOpen_compl)
+      (f := fun y => th.φ x y + u y)
+      (fun j =>
+        ((hth.1 x j).mono (by exact fun y hy => ⟨hy.1, hy.2.1⟩)).add
+          ((hu j).mono fun y hy => ⟨hy.1, hy.2.2⟩))
+      (fun j y hy w => hpsh x j y ⟨hy.1, ⟨hy.2.1, trivial⟩, hy.2.2⟩ w)
+      a (ρ : ℂ) hVo
+      (fun z hz => ⟨(hball (hwz z hz.1)).1.1, (hball (hwz z hz.1)).1.2, hoff z hz⟩)
+  obtain ⟨Bm, hBm⟩ :=
+    ReciprocityTheory.AnForm.A.PlurisubharmonicExtension.part_a Metric.isOpen_ball subset_rfl
+      hpull.1 hpull.2 hFb (Metric.closedBall 0 (1 / 2)) (isCompact_closedBall _ _)
+      (Metric.closedBall_subset_ball (by norm_num))
+  refine ⟨
+    ψ.source ∩ ψ ⁻¹' Metric.ball a (ρ / 2),
+    ψ.isOpen_inter_preimage Metric.isOpen_ball,
+    ⟨hxψ, Set.mem_preimage.mpr (Metric.mem_ball_self (half_pos hρ))⟩,
+    Bm + M₁,
+    ?_
+  ⟩
   rintro y ⟨hy1, hy2⟩ hyb
   have hy2' : ‖ψ y - a‖ < ρ / 2 := by
     have : dist (ψ y) a < ρ / 2 := hy2
@@ -305,19 +341,24 @@ theorem localBound {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e 
     simp [tm, hσ, hyi, hm]
   have h1 := hBm ⟨_, ⟨Metric.mem_closedBall.2 (by simpa using hzn), hzc⟩, rfl⟩
   simp only [hwy, ψ.left_inv hy1] at h1
-  have h2 := hM₁ (ψ y) (Metric.mem_closedBall.2 (by
-    rw [dist_eq_norm]; linarith))
+  have h2 := hM₁ (ψ y) (Metric.mem_closedBall.2 (by rw [dist_eq_norm]; linarith))
   rw [ψ.left_inv hy1] at h2
   linarith [neg_abs_le (th.φ x y), (abs_le.1 h2).1]
 
-theorem isSingWeight_of_logGrowth : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ) (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X), IsPotential A L → IsSection A L s → IsSNC A L s m W → (∀ y, logNormSec L s y ≤ 0) → ∀ (th : LocPot X) (u : X → ℝ) (C₁ : ℝ), IsPotential A th → A.SmoothOn (bdry s)ᶜ u → IsPshOn A (bdry s)ᶜ (th + LocPot.ofFun u) → (∀ y ∉ bdry s, |u y| ≤ C₁ * Real.log (rW L s y)) → ∃ C₅, IsSingWeight A L s th u C₅ := by
+theorem isSingWeight_of_logGrowth
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
+        (L : LocPot X) (s : X → X → ℂ) (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X),
+      IsPotential A L → IsSection A L s → IsSNC A L s m W → (∀ y, logNormSec L s y ≤ 0)
+        → ∀ (th : LocPot X) (u : X → ℝ) (C₁ : ℝ),
+          IsPotential A th → A.SmoothOn (bdry s)ᶜ u → IsPshOn A (bdry s)ᶜ (th + LocPot.ofFun u)
+            → (∀ y ∉ bdry s, |u y| ≤ C₁ * Real.log (rW L s y))
+            → ∃ C₅, IsSingWeight A L s th u C₅ := by
   intro e X _ _ _ A L s nb m W hL hS hSNC hn th u C₁ hth hu hpsh hC
   choose V hVo hxV B hB using localBound A L s m W hL hS hSNC hn th u C₁ hth hu hpsh hC
   obtain ⟨t, ht⟩ := CompactSpace.elim_nhds_subcover V fun x => (hVo x).mem_nhds (hxV x)
   refine ⟨|C₁| + ∑ x ∈ t, |B x|, hth, hu, hpsh, fun y hy => ?_⟩
   have hS0 : 0 ≤ ∑ x ∈ t, |B x| := Finset.sum_nonneg fun _ _ => abs_nonneg _
-  have he1 : 1 ≤ Real.exp 1 := by
-    have := Real.add_one_le_exp (1 : ℝ); linarith
+  have he1 : 1 ≤ Real.exp 1 := by have := Real.add_one_le_exp (1 : ℝ); linarith
   have hlogr : 0 ≤ Real.log (rW L s y) := Real.log_nonneg (by linarith [rW_ge L s hn y])
   constructor
   · have h1 := hC y hy

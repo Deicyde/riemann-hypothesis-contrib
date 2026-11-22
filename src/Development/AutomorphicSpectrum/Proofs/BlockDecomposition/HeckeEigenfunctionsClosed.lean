@@ -7,27 +7,36 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.SmoothVecto
 
 noncomputable section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.LFun Formalism.UG Formalism.L2.Host PositivityTheory.jumpWindows
+open NumberField IsDedekindDomain GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.LFun
+  Formalism.UG Formalism.L2.Host PositivityTheory.jumpWindows
 
 namespace GlobalTheory.CompanionTheory.HeckeEigenspaces
 
-theorem exists_closed_common_ker {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X] (𝒯 : Set (X →L[ℂ] X)) :
-    ∃ Y : Submodule ℂ X, IsClosed (Y : Set X) ∧ ∀ φ, φ ∈ Y ↔ ∀ T ∈ 𝒯, T φ = 0 := by
-  refine ⟨{ carrier := {φ | ∀ T ∈ 𝒯, T φ = 0}
-            add_mem' := fun {x y} hx hy T hT => by rw [map_add (f := _), hx T hT, hy T hT, add_zero]
-            zero_mem' := fun T _ => map_zero T
-            smul_mem' := fun c x hx T hT => by rw [map_smul, hx T hT, smul_zero] }, ?_, fun _ => Iff.rfl⟩
-  have e : ({φ | ∀ T ∈ 𝒯, T φ = 0} : Set X) = ⋂ T ∈ 𝒯, T ⁻¹' {0} := by
-    ext φ; simp
+theorem exists_closed_common_ker
+    {X : Type} [NormedAddCommGroup X] [NormedSpace ℂ X] (𝒯 : Set (X →L[ℂ] X))
+    : ∃ Y : Submodule ℂ X, IsClosed (Y : Set X) ∧ ∀ φ, φ ∈ Y ↔ ∀ T ∈ 𝒯, T φ = 0 := by
+  refine ⟨
+    {
+      carrier := {φ | ∀ T ∈ 𝒯, T φ = 0}
+      add_mem' := fun {x y} hx hy T hT => by rw [map_add (f := _), hx T hT, hy T hT, add_zero]
+      zero_mem' := fun T _ => map_zero T
+      smul_mem' := fun c x hx T hT => by rw [map_smul, hx T hT, smul_zero]
+    },
+    ?_,
+    fun _ => Iff.rfl
+  ⟩
+  have e : ({φ | ∀ T ∈ 𝒯, T φ = 0} : Set X) = ⋂ T ∈ 𝒯, T ⁻¹' {0} := by ext φ; simp
   change IsClosed ({φ | ∀ T ∈ 𝒯, T φ = 0} : Set X)
   rw [e]
   exact isClosed_biInter fun T _ => isClosed_singleton.preimage T.continuous
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-theorem exists_heckeOp (w : Pl E) {h : GL (Fin a) (w.adicCompletion E) → ℂ} (hh : h ∈ Hecke ℂ (KGL w (n := a))) :
-    ∃ T : XB E a →L[ℂ] XB E a, (∀ x, heckeVec (repW a w) (KGL w (n := a)) h x = T x) ∧
-      ∀ A : XB E a →L[ℂ] XB E a, (∀ u, Commute A (Rt E a (fl a w u))) → Commute A T := by
+theorem exists_heckeOp
+    (w : Pl E) {h : GL (Fin a) (w.adicCompletion E) → ℂ} (hh : h ∈ Hecke ℂ (KGL w (n := a)))
+    : ∃ T : XB E a →L[ℂ] XB E a,
+      (∀ x, heckeVec (repW a w) (KGL w (n := a)) h x = T x)
+        ∧ ∀ A : XB E a →L[ℂ] XB E a, (∀ u, Commute A (Rt E a (fl a w u))) → Commute A T := by
   classical
   have hs := Formalism.UG.P.finite_support_cosets (Final.GLintComm E w a) hh.2
   refine ⟨∑ c ∈ hs.toFinset, h c.out • Rt E a (fl a w c.out), fun x => ?_, fun A hA => ?_⟩
@@ -39,16 +48,18 @@ theorem exists_heckeOp (w : Pl E) {h : GL (Fin a) (w.adicCompletion E) → ℂ} 
 
 theorem hecke_eigenfunctions_closed : G0 → G2c := by
   intro h0 E _ _ _ a w B hB
-  have hcomm : ∀ g : GA E a, cLoc w g = 1 → ∀ u, Commute (Rt E a g) (Rt E a (fl a w u)) := fun g hg u => by
+  have hcomm
+      : ∀ g : GA E a, cLoc w g = 1 → ∀ u, Commute (Rt E a g) (Rt E a (fl a w u)) := fun g hg u => by
     have e := (h0 E a).2.2.2.2.2.2.2.1 w g hg u
     change Rt E a g * Rt E a (fl a w u) = Rt E a (fl a w u) * Rt E a g
     rw [← map_mul, ← map_mul, e]
   choose T hT hC using fun (p : {ϖ // IsUnifV E w ϖ}) (j : ℕ) =>
     exists_heckeOp (a := a) w (Tj_mem_hecke (n := a) p.2 j)
-  obtain ⟨Y, hcl, hY⟩ := exists_closed_common_ker
-    ({R | (∃ k ∈ KGL w (n := a), R = Rt E a (fl a w k) - 1) ∨
-      ∃ (p : {ϖ // IsUnifV E w ϖ}) (j : ℕ), j ≤ a ∧ R = T p j - satEig (qV E w) a B j • 1} :
-      Set (XB E a →L[ℂ] XB E a))
+  obtain ⟨Y, hcl, hY⟩ :=
+    exists_closed_common_ker
+      ({R | (∃ k ∈ KGL w (n := a), R = Rt E a (fl a w k) - 1) ∨
+        ∃ (p : {ϖ // IsUnifV E w ϖ}) (j : ℕ), j ≤ a ∧ R = T p j - satEig (qV E w) a B j • 1}
+        : Set (XB E a →L[ℂ] XB E a))
   refine ⟨Y, hcl, fun g hg φ hφ => ?_, fun φ => ?_⟩
   · rw [hY] at hφ ⊢
     intro R hR

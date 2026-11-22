@@ -161,7 +161,8 @@ private lemma core2 (hv : ∀ a b, v (a * b) = v a + v b) {α β : κˣ} (h : v 
   simp only [ch, Pi.add_apply, Pi.smul_apply, smul_eq_mul, Units.val_mul, mul_pow]
   ring
 
-private def disc3 (a b c : κ) : κ := a ^ 2 * b ^ 2 - 4 * b ^ 3 - 4 * a ^ 3 * c + 18 * a * b * c - 27 * c ^ 2
+private def disc3 (a b c : κ) : κ :=
+  a ^ 2 * b ^ 2 - 4 * b ^ 3 - 4 * a ^ 3 * c + 18 * a * b * c - 27 * c ^ 2
 
 private lemma core3 (hv : ∀ a b, v (a * b) = v a + v b) {α β γ : κˣ} (h : v β < v α) (h' : v γ < v β)
     (a b c p q r d : κ) (ha : a ≠ 0) (hp : p ≠ 0) :
@@ -314,12 +315,13 @@ end
 end UpperTheory.V.Pr
 
 open Matrix Polynomial in
-theorem UpperTheory.V.Pr.sepOfMinors :
-    UpperTheory.V.Pr.SepOfMinors := by
+theorem UpperTheory.V.Pr.sepOfMinors : UpperTheory.V.Pr.SepOfMinors := by
   intro κ _ n hn y α hα hy
   obtain ⟨v, hv, hvne⟩ := weights α hα
-  have hM : ∀ m : ℕ, y * (Matrix.diagonal fun i => (α i : κ)) ^ m =
-      Matrix.of fun i j => y i j * (α j : κ) ^ m := by
+  have hM
+      : ∀ m : ℕ,
+        y * (Matrix.diagonal fun i => (α i : κ)) ^ m
+          = Matrix.of fun i j => y i j * (α j : κ) ^ m := by
     intro m
     ext i j
     rw [Matrix.diagonal_pow, Matrix.mul_diagonal]
@@ -337,8 +339,11 @@ theorem UpperTheory.V.Pr.sepOfMinors :
   · refine ⟨0, ?_⟩
     rw [Matrix.charpoly, Matrix.det_fin_one, Matrix.charmatrix_apply_eq]
     exact separable_X_sub_C
-  · have key : ∃ m : ℕ, (y 0 0 * (α 0 : κ) ^ m + y 1 1 * (α 1 : κ) ^ m) ^ 2 -
-        4 * (y.det * (α 0 : κ) ^ m * (α 1 : κ) ^ m) ≠ 0 := by
+  · have key
+        : ∃ m : ℕ,
+          (y 0 0 * (α 0 : κ) ^ m + y 1 1 * (α 1 : κ) ^ m) ^ 2
+              - 4 * (y.det * (α 0 : κ) ^ m * (α 1 : κ) ^ m)
+            ≠ 0 := by
       rcases lt_or_gt_of_ne (hvne 0 1 (by decide)) with h | h
       · obtain ⟨m, hm⟩ := core2 hv h (y 1 1) (y 0 0) y.det (h1 1)
         exact ⟨m, by convert hm using 1; ring⟩
@@ -363,8 +368,9 @@ theorem UpperTheory.V.Pr.sepOfMinors :
       have h := minor_ne y hy ![(1 : Fin 3), 2] (by decide)
       rw [Matrix.det_fin_two] at h
       simpa using h
-    obtain ⟨m, hm⟩ := core3' hv (hvne 0 1 (by decide)) (hvne 0 2 (by decide)) (hvne 1 2 (by decide))
-      (y 0 0) (y 1 1) (y 2 2) _ _ _ y.det (h1 0) (h1 1) (h1 2) hp01 hp02 hp12
+    obtain ⟨m, hm⟩ :=
+      core3' hv (hvne 0 1 (by decide)) (hvne 0 2 (by decide)) (hvne 1 2 (by decide)) (y 0 0) (y 1 1)
+        (y 2 2) _ _ _ y.det (h1 0) (h1 1) (h1 2) hp01 hp02 hp12
     refine ⟨m, ?_⟩
     rw [hM, charpoly3]
     apply sep3

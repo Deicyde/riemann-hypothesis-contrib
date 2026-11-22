@@ -10,16 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DotConjTrans
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.LKDef
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx GlobalTheory.LKDef
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.RootSumWeights
 
-theorem exists_root_enum {F : Type} [Field F] (τ : F →+* ℂ) (n : ℕ) :
-    ∃ sel : Fin n → Polynomial F → ℂ, ∀ P : Polynomial F, P.Monic → P.natDegree = n →
-      (P.map τ).roots = Finset.univ.val.map fun i => sel i P := by
-  have key : ∀ P : Polynomial F, ∃ g : Fin n → ℂ, P.Monic → P.natDegree = n →
-      (P.map τ).roots = Finset.univ.val.map g := by
+theorem exists_root_enum {F : Type} [Field F] (τ : F →+* ℂ) (n : ℕ)
+    : ∃ sel : Fin n → Polynomial F → ℂ, ∀ P : Polynomial F,
+      P.Monic → P.natDegree = n → (P.map τ).roots = Finset.univ.val.map fun i => sel i P := by
+  have key
+      : ∀ P : Polynomial F, ∃ g : Fin n → ℂ,
+        P.Monic → P.natDegree = n → (P.map τ).roots = Finset.univ.val.map g := by
     intro P
     by_cases h : P.Monic ∧ P.natDegree = n
     · have hc : (P.map τ).roots.toList.length = n := by
@@ -33,15 +35,21 @@ theorem exists_root_enum {F : Type} [Field F] (τ : F →+* ℂ) (n : ℕ) :
   choose g hg using key
   exact ⟨fun i P => g P i, hg⟩
 
-theorem markWeightedFixedPoint_definitePair_odd_of_counts : GlobalTheory.LKDef.MoveDefInv → GlobalTheory.RootSumWeights.CxCountRegMark → GlobalTheory.RootSumWeights.FinitelyManyMarkedClassesTermDegreeOne → GlobalTheory.RootSumWeights.MarkWeightedFixedPointEqDefinitePairOdd := by
+theorem markWeightedFixedPoint_definitePair_odd_of_counts
+    : GlobalTheory.LKDef.MoveDefInv → GlobalTheory.RootSumWeights.CxCountRegMark
+      → GlobalTheory.RootSumWeights.FinitelyManyMarkedClassesTermDegreeOne
+      → GlobalTheory.RootSumWeights.MarkWeightedFixedPointEqDefinitePairOdd := by
   intro hmove hcount hfin p _ G ha hn v hv c L f hf hreg K' f' hf' h0
   rw [hcount p G ha v hv c L f hf hreg K' f' hf']
   obtain ⟨sel, hsel⟩ := exists_root_enum v.embedding G.n
-  have hmon : ∀ x : G.C, (minpoly G.F x).Monic := fun x => minpoly.monic (Algebra.IsIntegral.isIntegral x)
-  have hmem : ∀ P : Polynomial G.F, P.Monic → P.natDegree = G.n → ∀ μ : ℂ,
-      P.eval₂ v.embedding μ = 0 ↔ ∃ i, sel i P = μ := by
+  have hmon : ∀ x : G.C, (minpoly G.F x).Monic := fun x =>
+    minpoly.monic (Algebra.IsIntegral.isIntegral x)
+  have hmem
+      : ∀ P : Polynomial G.F,
+        P.Monic → P.natDegree = G.n → ∀ μ : ℂ, P.eval₂ v.embedding μ = 0 ↔ ∃ i, sel i P = μ := by
     intro P hm hd μ
-    rw [← Polynomial.eval_map, ← Polynomial.IsRoot.def, ← Polynomial.mem_roots (hm.map _).ne_zero, hsel P hm hd]
+    rw [← Polynomial.eval_map, ← Polynomial.IsRoot.def, ← Polynomial.mem_roots (hm.map _).ne_zero,
+      hsel P hm hd]
     simp
   have hIs : ∀ i, IsSel G (sel i) := by
     intro i w hw P hm hd
@@ -52,8 +60,9 @@ theorem markWeightedFixedPoint_definitePair_odd_of_counts : GlobalTheory.LKDef.M
     exact (hmem P hm hd _).2 ⟨i, rfl⟩
   have hF := hfin p G ha L f K' f' hf hf'
 
-  have hL : markSumC G c L.K.toSubgroup f K' f' =
-      ∑ i, markedSumIrr G (fun P => c P (sel i P)) (sel i) L.K.toSubgroup f 1 K' f' := by
+  have hL
+      : markSumC G c L.K.toSubgroup f K' f'
+        = ∑ i, markedSumIrr G (fun P => c P (sel i P)) (sel i) L.K.toSubgroup f 1 K' f' := by
     unfold markSumC markedSumIrr
     rw [← finsum_sum_comm]
     · refine finsum_congr fun q => ?_
@@ -88,16 +97,24 @@ theorem markWeightedFixedPoint_definitePair_odd_of_counts : GlobalTheory.LKDef.M
       · exact ⟨⟨_, h.2⟩, right_ne_zero_of_mul hq⟩
       · exact absurd rfl hq
 
-  have hD : {q : DCls G | Irreducible (Quot.out q).pol ∧ (Quot.out q).term L.K.toSubgroup f 1 K' f' ≠ 0}.Finite := by
-    obtain ⟨e, he⟩ := cls_equiv_dcls_irr p G ha hn _ (hIs ⟨0, G.n_pos⟩)
-    have h1 := (hF.preimage (f := fun q : {q : Cls G // Irreducible (Quot.out q).pol ∧
-      (Quot.out q).Mark (sel ⟨0, G.n_pos⟩ (Quot.out q).pol)} => q.1) Subtype.val_injective.injOn).image
-      fun q => (e q).1
-    refine h1.subset fun d hd => ⟨e.symm ⟨d, hd.1⟩, ⟨⟨_, (e.symm ⟨d, hd.1⟩).2.2⟩, ?_⟩, by simp⟩
-    rw [← (he _).2 L.K.toSubgroup f 1 K' f' one_pos hf.2.2.1 hf'.2.2.1, Equiv.apply_symm_apply]
-    exact hd.2
-  rw [hL, Finset.sum_congr rfl fun i _ =>
-    hmove p G ha hn _ _ (hIs i) L.K.toSubgroup f 1 K' f' one_pos hf.2.2.1 hf'.2.2.1]
+  have hD
+      : {q : DCls G | Irreducible (Quot.out q).pol ∧ (Quot.out q).term L.K.toSubgroup f 1 K' f' ≠ 0}.Finite :=
+    by
+      obtain ⟨e, he⟩ := cls_equiv_dcls_irr p G ha hn _ (hIs ⟨0, G.n_pos⟩)
+      have h1 :=
+        (hF.preimage
+          (f :=
+            fun q
+                : {q : Cls G // Irreducible (Quot.out q).pol
+                  ∧ (Quot.out q).Mark (sel ⟨0, G.n_pos⟩ (Quot.out q).pol)} =>
+              q.1)
+          Subtype.val_injective.injOn).image fun q => (e q).1
+      refine h1.subset fun d hd => ⟨e.symm ⟨d, hd.1⟩, ⟨⟨_, (e.symm ⟨d, hd.1⟩).2.2⟩, ?_⟩, by simp⟩
+      rw [← (he _).2 L.K.toSubgroup f 1 K' f' one_pos hf.2.2.1 hf'.2.2.1, Equiv.apply_symm_apply]
+      exact hd.2
+  rw [hL,
+    Finset.sum_congr rfl fun i _ =>
+      hmove p G ha hn _ _ (hIs i) L.K.toSubgroup f 1 K' f' one_pos hf.2.2.1 hf'.2.2.1]
   unfold dSumIrr
   rw [← finsum_sum_comm]
   · refine finsum_congr fun q => ?_

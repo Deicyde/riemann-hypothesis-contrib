@@ -17,8 +17,8 @@ noncomputable section
 
 variable {e : ℕ} {X Y : Type} [TopologicalSpace X] [TopologicalSpace Y]
 
-theorem isClosed_of_isAnalyticSubset' (A : FinHolAtlas e X) {S : Set X}
-    (hS : A.IsAnalyticSubset S) : IsClosed S := by
+theorem isClosed_of_isAnalyticSubset' (A : FinHolAtlas e X) {S : Set X} (hS : A.IsAnalyticSubset S)
+    : IsClosed S := by
   unfold FinHolAtlas.IsAnalyticSubset at hS
   rw [← isOpen_compl_iff, isOpen_iff_mem_nhds]
   intro x hx
@@ -34,8 +34,11 @@ theorem isClosed_of_isAnalyticSubset' (A : FinHolAtlas e X) {S : Set X}
   obtain ⟨i, hi⟩ := hne
   have hca : ContinuousAt (f i) x := by
     obtain ⟨j, hxj⟩ := A.cover x
-    have h : ∀ k, AnalyticOnNhd ℂ ((f i) ∘ (A.chart k).symm)
-        ((A.chart k).target ∩ (A.chart k).symm ⁻¹' W) := hf i
+    have h
+        : ∀ k,
+          AnalyticOnNhd ℂ ((f i) ∘ (A.chart k).symm)
+            ((A.chart k).target ∩ (A.chart k).symm ⁻¹' W) :=
+      hf i
     have hmem : (A.chart j) x ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' W := by
       refine ⟨(A.chart j).map_source hxj, ?_⟩
       show (A.chart j).symm ((A.chart j) x) ∈ W
@@ -51,21 +54,24 @@ theorem isClosed_of_isAnalyticSubset' (A : FinHolAtlas e X) {S : Set X}
   rw [hSW] at hy
   exact hyi (hy.2 i)
 
-theorem exists_localHomeomorph_of_isDegreeOff {A : FinHolAtlas e X} {B : FinHolAtlas e Y}
-    {h : Y → X} (hh : HoloMap B A h) {d : ℕ} {S : Set X} (hd : IsDegreeOff A B h d S) (y : Y)
-    (hy : h y ∉ S) :
-    ∃ E : OpenPartialHomeomorph Y X, y ∈ E.source ∧ Set.EqOn h E E.source ∧
-      ∃ j : Fin B.n, E.source ⊆ (B.chart j).source := by
+theorem exists_localHomeomorph_of_isDegreeOff
+    {A : FinHolAtlas e X} {B : FinHolAtlas e Y} {h : Y → X} (hh : HoloMap B A h)
+    {d : ℕ} {S : Set X} (hd : IsDegreeOff A B h d S)
+    (y : Y) (hy : h y ∉ S)
+    : ∃ E : OpenPartialHomeomorph Y X,
+      y ∈ E.source ∧ Set.EqOn h E E.source ∧ ∃ j : Fin B.n, E.source ⊆ (B.chart j).source := by
   obtain ⟨j, hyj⟩ := B.cover y
   obtain ⟨k, hk⟩ := A.cover (h y)
-  have hb : (B.chart j) y ∈ (B.chart j).target ∩ (B.chart j).symm ⁻¹' (h ⁻¹' (A.chart k).source) := by
+  have hb
+      : (B.chart j) y ∈ (B.chart j).target ∩ (B.chart j).symm ⁻¹' (h ⁻¹' (A.chart k).source) := by
     refine ⟨(B.chart j).map_source hyj, ?_⟩
     show h ((B.chart j).symm ((B.chart j) y)) ∈ (A.chart k).source
     rw [(B.chart j).left_inv hyj]
     exact hk
   have han := hh.2 j k ((B.chart j) y) hb
-  have hdet := hd.2.2.2.2.2 j k ((B.chart j) y) ((B.chart j).map_source hyj)
-    (by rw [(B.chart j).left_inv hyj]; exact hy) (by rw [(B.chart j).left_inv hyj]; exact hk)
+  have hdet :=
+    hd.2.2.2.2.2 j k ((B.chart j) y) ((B.chart j).map_source hyj)
+      (by rw [(B.chart j).left_inv hyj]; exact hy) (by rw [(B.chart j).left_inv hyj]; exact hk)
   set L := (LinearMap.equivOfDetNeZero _ hdet).toContinuousLinearEquiv with hL
   have hstrict : HasStrictFDerivAt ((A.chart k) ∘ h ∘ (B.chart j).symm)
       (L : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) ((B.chart j) y) :=
@@ -86,7 +92,8 @@ theorem exists_localHomeomorph_of_isDegreeOff {A : FinHolAtlas e X} {B : FinHolA
     exact (A.chart k).map_source hk
   · intro y' hy'
     rw [OpenPartialHomeomorph.restrOpen_source, OpenPartialHomeomorph.trans_source,
-      OpenPartialHomeomorph.trans_source] at hy'
+        OpenPartialHomeomorph.trans_source]
+      at hy'
     obtain ⟨⟨⟨hy1, -⟩, -⟩, hy4⟩ := hy'
     show h y' = (A.chart k).symm (Φ ((B.chart j) y'))
     rw [hcoe]
@@ -94,7 +101,8 @@ theorem exists_localHomeomorph_of_isDegreeOff {A : FinHolAtlas e X} {B : FinHolA
     rw [(B.chart j).left_inv hy1, (A.chart k).left_inv hy4]
   · intro y' hy'
     rw [OpenPartialHomeomorph.restrOpen_source, OpenPartialHomeomorph.trans_source,
-      OpenPartialHomeomorph.trans_source] at hy'
+        OpenPartialHomeomorph.trans_source]
+      at hy'
     exact hy'.1.1.1
 
 end

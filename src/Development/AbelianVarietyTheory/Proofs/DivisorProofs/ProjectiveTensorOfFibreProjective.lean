@@ -15,8 +15,12 @@ open scoped TensorProduct
 
 namespace GlobalTheory.HTSummand
 
-theorem isNilpotent_matrix_of_entries_mem {R : Type*} [CommRing R] {n : ℕ} (I : Ideal R) (N : ℕ)
-    (hN : I ^ N = ⊥) (M : Matrix (Fin n) (Fin n) R) (hM : ∀ i j, M i j ∈ I) : IsNilpotent M := by
+theorem isNilpotent_matrix_of_entries_mem
+    {R : Type*} [CommRing R]
+    {n : ℕ}
+    (I : Ideal R) (N : ℕ) (hN : I ^ N = ⊥)
+    (M : Matrix (Fin n) (Fin n) R) (hM : ∀ i j, M i j ∈ I)
+    : IsNilpotent M := by
   have key : ∀ j : ℕ, ∀ a b, (M ^ j) a b ∈ I ^ j := by
     intro j
     induction j with
@@ -31,8 +35,11 @@ theorem isNilpotent_matrix_of_entries_mem {R : Type*} [CommRing R] {n : ℕ} (I 
   rw [hN, Ideal.mem_bot] at this
   simpa using this
 
-theorem le_pow_smul_of_le_smul {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M] (I : Ideal R)
-    (K : Submodule R M) (hK : K ≤ I • K) (j : ℕ) : K ≤ (I ^ j) • K := by
+theorem le_pow_smul_of_le_smul
+    {R M : Type*} [CommRing R] [AddCommGroup M] [Module R M]
+    (I : Ideal R) (K : Submodule R M) (hK : K ≤ I • K)
+    (j : ℕ)
+    : K ≤ (I ^ j) • K := by
   induction j with
   | zero => rw [pow_zero, Ideal.one_eq_top, Submodule.top_smul]
   | succ j ih =>
@@ -43,14 +50,17 @@ end GlobalTheory.HTSummand
 
 namespace GlobalTheory.HTSummand
 
-theorem projective_tensor_of_fibre_projective :
-    ∀ (C k B : Type) [CommRing C] [IsLocalRing C] [IsArtinianRing C] [Field k] [CommRing B] (σ : C →+* k),
-      Function.Surjective σ → ∀ (H V : Type 1) [AddCommGroup H] [Module C H] [AddCommGroup V] [Module k V]
-      (ρ : B →+* Module.End C H) (ρ' : B →+* Module.End k V) (f : H →ₛₗ[σ] V), Module.Finite C H →
-      Module.Projective C H → Function.Surjective f →
-      (∀ h, f h = 0 → h ∈ RingHom.ker σ • (⊤ : Submodule C H)) → (∀ x h, f (ρ x h) = ρ' x (f h)) →
-      (letI := GlobalTheory.HTSummand.tensorModOf ρ'; Module.Projective (k ⊗[ℤ] B) V) →
-      letI := GlobalTheory.HTSummand.tensorModOf ρ; Module.Projective (C ⊗[ℤ] B) H := by
+theorem projective_tensor_of_fibre_projective
+    : ∀ (C k B : Type) [CommRing C] [IsLocalRing C] [IsArtinianRing C] [Field k] [CommRing B]
+        (σ : C →+* k),
+      Function.Surjective σ
+        → ∀ (H V : Type 1) [AddCommGroup H] [Module C H] [AddCommGroup V] [Module k V]
+            (ρ : B →+* Module.End C H) (ρ' : B →+* Module.End k V) (f : H →ₛₗ[σ] V),
+          Module.Finite C H → Module.Projective C H → Function.Surjective f
+            → (∀ h, f h = 0 → h ∈ RingHom.ker σ • (⊤ : Submodule C H))
+            → (∀ x h, f (ρ x h) = ρ' x (f h))
+            → (letI := GlobalTheory.HTSummand.tensorModOf ρ'; Module.Projective (k ⊗[ℤ] B) V)
+            → letI := GlobalTheory.HTSummand.tensorModOf ρ; Module.Projective (C ⊗[ℤ] B) H := by
   intro C k B _ _ _ _ _ σ hσ H V _ _ _ _ ρ ρ' f hfin hproj hf hker hcomm hV
   letI mH : Module (C ⊗[ℤ] B) H := tensorModOf ρ
   letI mV : Module (k ⊗[ℤ] B) V := tensorModOf ρ'
@@ -91,16 +101,16 @@ theorem projective_tensor_of_fibre_projective :
     rw [tensorModOf_tmul, map_one]
     rfl
   letI mRV : Module (C ⊗[ℤ] B) V := Module.compHom V τ
-  let fR : H →ₗ[C ⊗[ℤ] B] V :=
-    { toFun := f
-      map_add' := f.map_add
-      map_smul' := fun r h => by
-        show f (r • h) = τ r • f h
-        induction r using TensorProduct.induction_on with
-        | zero => rw [zero_smul, map_zero, map_zero, zero_smul]
-        | tmul c b =>
-          rw [hτtmul, tensorModOf_tmul, tensorModOf_tmul, f.map_smulₛₗ, hcomm]
-        | add x y hx hy => rw [add_smul, map_add (f := _), hx, hy, map_add (f := _), add_smul] }
+  let fR : H →ₗ[C ⊗[ℤ] B] V := {
+    toFun := f
+    map_add' := f.map_add
+    map_smul' := fun r h => by
+      show f (r • h) = τ r • f h
+      induction r using TensorProduct.induction_on with
+      | zero => rw [zero_smul, map_zero, map_zero, zero_smul]
+      | tmul c b => rw [hτtmul, tensorModOf_tmul, tensorModOf_tmul, f.map_smulₛₗ, hcomm]
+      | add x y hx hy => rw [add_smul, map_add (f := _), hx, hy, map_add (f := _), add_smul]
+  }
   have hfR : Function.Surjective fR := hf
   haveI : Module.Finite (C ⊗[ℤ] B) H := Module.Finite.of_restrictScalars_finite C (C ⊗[ℤ] B) H
   haveI : Module.Finite (C ⊗[ℤ] B) V := Module.Finite.of_surjective fR hfR
@@ -123,15 +133,15 @@ theorem projective_tensor_of_fibre_projective :
   have heb_apply : ∀ y, eb.mulVec y = sb (pb y) := fun y => by
     rw [heb, ← Matrix.toLin'_apply, Matrix.toLin'_toMatrix']
     rfl
-  obtain ⟨E, hE, hEeb⟩ := exists_isIdempotentElem_eq_of_ker_isNilpotent (τ.mapMatrix :
-      Matrix (Fin n) (Fin n) (C ⊗[ℤ] B) →+* Matrix (Fin n) (Fin n) (k ⊗[ℤ] B))
-    (fun x hx => by
-      refine isNilpotent_matrix_of_entries_mem (RingHom.ker τ) N hJN x fun i j => ?_
-      rw [RingHom.mem_ker] at hx ⊢
-      exact congrFun (congrFun hx i) j)
-    eb ⟨eb.map (Function.surjInv hτ), by ext i j; simp [Function.surjInv_eq hτ]⟩ heb_idem
-  have hEE : ∀ w, E.mulVec (E.mulVec w) = E.mulVec w := fun w => by
-    rw [Matrix.mulVec_mulVec, hE.eq]
+  obtain ⟨E, hE, hEeb⟩ :=
+    exists_isIdempotentElem_eq_of_ker_isNilpotent
+      (τ.mapMatrix : Matrix (Fin n) (Fin n) (C ⊗[ℤ] B) →+* Matrix (Fin n) (Fin n) (k ⊗[ℤ] B))
+      (fun x hx => by
+        refine isNilpotent_matrix_of_entries_mem (RingHom.ker τ) N hJN x fun i j => ?_
+        rw [RingHom.mem_ker] at hx ⊢
+        exact congrFun (congrFun hx i) j)
+      eb ⟨eb.map (Function.surjInv hτ), by ext i j; simp [Function.surjInv_eq hτ]⟩ heb_idem
+  have hEE : ∀ w, E.mulVec (E.mulVec w) = E.mulVec w := fun w => by rw [Matrix.mulVec_mulVec, hE.eq]
   have hτE : ∀ w : Fin n → C ⊗[ℤ] B, (fun i => τ (E.mulVec w i)) = sb (pb (fun i => τ (w i))) := by
     intro w
     rw [← heb_apply, ← hEeb]
@@ -145,24 +155,26 @@ theorem projective_tensor_of_fibre_projective :
     rw [Matrix.toLin'_apply, hEE]
   let sQ : (Fin n → C ⊗[ℤ] B) →ₗ[C ⊗[ℤ] B] Q :=
     (Matrix.toLin' E).codRestrict Q fun w => LinearMap.mem_range_self _ w
-  have hsQ : ∀ q : Q, sQ q = q := fun q => Subtype.ext (by
-    show Matrix.toLin' E (q : Fin n → C ⊗[ℤ] B) = q
-    rw [Matrix.toLin'_apply, hQE])
+  have hsQ : ∀ q : Q, sQ q = q := fun q =>
+    Subtype.ext (by
+      show Matrix.toLin' E (q : Fin n → C ⊗[ℤ] B) = q
+      rw [Matrix.toLin'_apply, hQE])
   haveI hQproj : Module.Projective (C ⊗[ℤ] B) Q :=
     Module.Projective.of_split Q.subtype sQ (LinearMap.ext hsQ)
-  let φ : Q →ₗ[C ⊗[ℤ] B] V :=
-    { toFun := fun q => pb (fun i => τ ((q : Fin n → C ⊗[ℤ] B) i))
-      map_add' := fun x y => by
-        rw [← map_add (f := _)]
-        congr 1
-        funext i
-        simp
-      map_smul' := fun r x => by
-        show pb _ = τ r • pb _
-        rw [← map_smul]
-        congr 1
-        funext i
-        simp }
+  let φ : Q →ₗ[C ⊗[ℤ] B] V := {
+    toFun := fun q => pb (fun i => τ ((q : Fin n → C ⊗[ℤ] B) i))
+    map_add' := fun x y => by
+      rw [← map_add (f := _)]
+      congr 1
+      funext i
+      simp
+    map_smul' := fun r x => by
+      show pb _ = τ r • pb _
+      rw [← map_smul]
+      congr 1
+      funext i
+      simp
+  }
   have hφ : Function.Surjective φ := by
     intro v
     let w : Fin n → C ⊗[ℤ] B := fun i => Function.surjInv hτ (sb v i)
@@ -224,9 +236,11 @@ theorem projective_tensor_of_fibre_projective :
       rw [LinearMap.mem_ker.1 hx, map_zero, sub_zero]
     have := Submodule.mem_map_of_mem (f := P) (hKm x hx)
     rw [Submodule.map_smul'', hPx] at this
-    exact Submodule.smul_mono le_rfl (fun y hy => by
-      obtain ⟨z, _, rfl⟩ := hy
-      exact hPK z) this
+    exact Submodule.smul_mono le_rfl
+      (fun y hy => by
+        obtain ⟨z, _, rfl⟩ := hy
+        exact hPK z)
+      this
   have hK0 : LinearMap.ker g' = ⊥ := by
     have := le_pow_smul_of_le_smul m _ hK N
     rw [hN, Submodule.bot_smul] at this

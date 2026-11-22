@@ -10,8 +10,9 @@ open GlobalTheory GlobalTheory.LogDR
 
 namespace GlobalTheory
 
-theorem dK_eq_zero_imp_pow : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (f : K),
-    dK f = 0 → ∃ g : K, f = g ^ p := by
+theorem dK_eq_zero_imp_pow
+    : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p] (f : K),
+      dK f = 0 → ∃ g : K, f = g ^ p := by
   intro K _ p _ _ f hf
   by_contra hne
   push_neg at hne

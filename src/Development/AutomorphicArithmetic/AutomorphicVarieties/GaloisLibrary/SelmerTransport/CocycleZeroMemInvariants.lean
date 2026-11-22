@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-private theorem exists_inj_of_ker_eq {R A B C : Type} [CommRing R] [AddCommGroup A] [Module R A]
-    [AddCommGroup B] [Module R B] [AddCommGroup C] [Module R C] (p : A →ₗ[R] B) (q : A →ₗ[R] C)
-    (hp : Function.Surjective p) (hk : ∀ a, p a = 0 ↔ q a = 0) :
-    ∃ φ : B →ₗ[R] C, Function.Injective φ := by
+private theorem exists_inj_of_ker_eq
+    {R A B C : Type} [CommRing R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
+    [AddCommGroup C] [Module R C]
+    (p : A →ₗ[R] B) (q : A →ₗ[R] C) (hp : Function.Surjective p) (hk : ∀ a, p a = 0 ↔ q a = 0)
+    : ∃ φ : B →ₗ[R] C, Function.Injective φ := by
   have hle : LinearMap.ker p ≤ LinearMap.ker q := fun a ha => (hk a).1 ha
   have hle' : LinearMap.ker q ≤ LinearMap.ker p := fun a ha => (hk a).2 ha
   refine ⟨(LinearMap.ker p).liftQ q hle ∘ₗ (p.quotKerEquivOfSurjective hp).symm.toLinearMap, ?_⟩
@@ -19,28 +20,35 @@ private theorem exists_inj_of_ker_eq {R A B C : Type} [CommRing R] [AddCommGroup
 
 section
 
-variable {R G M : Type} [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M]
-  [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [DiscreteTopology M]
+variable
+  {R G M : Type}
+  [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]
+  [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [DiscreteTopology M]
 
-private theorem cocycle_eq_zero (ρ : Representation R G M) {U' U : Subgroup G} (h : U' ≤ U) {γ : G} (hγ : γ ∈ U)
-    (hU : U ≤ (Subgroup.zpowers γ ⊔ U').topologicalClosure) (z : Z1U ρ U)
-    (h1 : ∀ u : U, u.1 ∈ U' → z.1 u = 0) (h2 : z.1 ⟨γ, hγ⟩ = 0) (u : U) : z.1 u = 0 := by
+private theorem cocycle_eq_zero
+    (ρ : Representation R G M)
+    {U' U : Subgroup G} (h : U' ≤ U)
+    {γ : G} (hγ : γ ∈ U) (hU : U ≤ (Subgroup.zpowers γ ⊔ U').topologicalClosure)
+    (z : Z1U ρ U) (h1 : ∀ u : U, u.1 ∈ U' → z.1 u = 0) (h2 : z.1 ⟨γ, hγ⟩ = 0)
+    (u : U)
+    : z.1 u = 0 := by
   obtain ⟨hcont, hcoc⟩ := (mem_Z1_iff_cocycle _ _).1 z.2
   have hone : z.1 1 = 0 := by
     have e := hcoc 1 1
     simp only [mul_one, map_one, Module.End.one_apply] at e
     simpa using e
-  let K : Subgroup U :=
-    { carrier := {x | z.1 x = 0}
-      mul_mem' := fun {a b} ha hb => by
-        show z.1 (a * b) = 0
-        rw [hcoc, ha, hb, map_zero, add_zero]
-      one_mem' := hone
-      inv_mem' := fun {a} ha => by
-        show z.1 a⁻¹ = 0
-        have e := hcoc a⁻¹ a
-        rw [inv_mul_cancel, hone, ha, map_zero, add_zero] at e
-        exact e.symm }
+  let K : Subgroup U := {
+    carrier := {x | z.1 x = 0}
+    mul_mem' := fun {a b} ha hb => by
+      show z.1 (a * b) = 0
+      rw [hcoc, ha, hb, map_zero, add_zero]
+    one_mem' := hone
+    inv_mem' := fun {a} ha => by
+      show z.1 a⁻¹ = 0
+      have e := hcoc a⁻¹ a
+      rw [inv_mul_cancel, hone, ha, map_zero, add_zero] at e
+      exact e.symm
+  }
   have hS : Subgroup.zpowers γ ⊔ U' ≤ K.map U.subtype := by
     refine sup_le ?_ ?_
     · rw [Subgroup.zpowers_le]
@@ -62,9 +70,13 @@ private theorem cocycle_eq_zero (ρ : Representation R G M) {U' U : Subgroup G} 
   rw [← e]
   exact hzs
 
-private noncomputable def cob (ρ : Representation R G M) (hρ : ContAction ρ) (U : Subgroup G) (m : M) : Z1U ρ U :=
-  ⟨d0 (ρ.comp U.subtype : Representation R U M) m, coboundaries_le_cocycles (ρ.comp U.subtype : Representation R U M)
-    (Continuous.comp (f := fun p : U × M => ((p.1.1, p.2) : G × M)) hρ (by fun_prop)) ⟨m, rfl⟩⟩
+private noncomputable def cob
+    (ρ : Representation R G M) (hρ : ContAction ρ) (U : Subgroup G) (m : M)
+    : Z1U ρ U := ⟨
+  d0 (ρ.comp U.subtype : Representation R U M) m,
+  coboundaries_le_cocycles (ρ.comp U.subtype : Representation R U M)
+    (Continuous.comp (f := fun p : U × M => ((p.1.1, p.2) : G × M)) hρ (by fun_prop)) ⟨m, rfl⟩
+⟩
 
 private def Z0 (ρ : Representation R G M) (U' U : Subgroup G) : Submodule R (Z1U ρ U) where
   carrier := {z | ∀ u : U, u.1 ∈ U' → z.1 u = 0}
@@ -76,8 +88,11 @@ private def Z0 (ρ : Representation R G M) (U' U : Subgroup G) : Submodule R (Z1
     show c • a.1 u = 0
     rw [ha u hu, smul_zero]
 
-private theorem cocycle_zero_mem_invariants (ρ : Representation R G M) {U' U : Subgroup G} (h : U' ≤ U) [hN : (U'.subgroupOf U).Normal]
-    (g : U) (z : Z0 ρ U' U) : z.1.1 g ∈ H0U ρ U' := by
+private theorem cocycle_zero_mem_invariants
+    (ρ : Representation R G M)
+    {U' U : Subgroup G} (h : U' ≤ U) [hN : (U'.subgroupOf U).Normal]
+    (g : U) (z : Z0 ρ U' U)
+    : z.1.1 g ∈ H0U ρ U' := by
   obtain ⟨hcont, hcoc⟩ := (mem_Z1_iff_cocycle _ _).1 z.1.2
   rw [mem_riemannRochSpace_iff_regularAt_everywhere]
   intro v
@@ -96,17 +111,24 @@ private theorem cocycle_zero_mem_invariants (ρ : Representation R G M) {U' U : 
 
 end
 
-theorem UpperTheory.V.Base.kerResGen1 :
-    ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]
-      [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [DiscreteTopology M] (ρ : Representation R G M), ContAction ρ → ∀ (U' U : Subgroup G) (h : U' ≤ U) [(U'.subgroupOf U).Normal] (γ : G), γ ∈ U →
-      U ≤ (Subgroup.zpowers γ ⊔ U').topologicalClosure → ∀ T : H0U ρ U' →ₗ[R] H0U ρ U', (∀ m, (T m : M) = ρ γ m - m) →
-      ∃ φ : LinearMap.ker (resU ρ h) →ₗ[R] (H0U ρ U' ⧸ LinearMap.range T), Function.Injective φ := by
+theorem UpperTheory.V.Base.kerResGen1
+    : ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+        [ContinuousConstSMul R M] [DiscreteTopology M] (ρ : Representation R G M),
+      ContAction ρ
+        → ∀ (U' U : Subgroup G) (h : U' ≤ U) [(U'.subgroupOf U).Normal] (γ : G),
+          γ ∈ U → U ≤ (Subgroup.zpowers γ ⊔ U').topologicalClosure
+            → ∀ T : H0U ρ U' →ₗ[R] H0U ρ U',
+              (∀ m, (T m : M) = ρ γ m - m)
+                → ∃ φ : LinearMap.ker (resU ρ h) →ₗ[R] (H0U ρ U' ⧸ LinearMap.range T),
+                  Function.Injective φ := by
   intro R G M _ _ _ _ _ _ _ _ _ _ ρ hρ U' U h hN γ hγ hU T hT
   have hcobv : ∀ (m : M) (u : U), (cob ρ hρ U m).1 u = ρ u m - m := fun m u => rfl
-  let ev : Z0 ρ U' U →ₗ[R] H0U ρ U' :=
-    { toFun := fun a => ⟨a.1.1 ⟨γ, hγ⟩, cocycle_zero_mem_invariants ρ h ⟨γ, hγ⟩ a⟩
-      map_add' := fun a b => rfl
-      map_smul' := fun c a => rfl }
+  let ev : Z0 ρ U' U →ₗ[R] H0U ρ U' := {
+    toFun := fun a => ⟨a.1.1 ⟨γ, hγ⟩, cocycle_zero_mem_invariants ρ h ⟨γ, hγ⟩ a⟩
+    map_add' := fun a b => rfl
+    map_smul' := fun c a => rfl
+  }
   let q : Z0 ρ U' U →ₗ[R] (H0U ρ U' ⧸ LinearMap.range T) := (LinearMap.range T).mkQ ∘ₗ ev
   let p0 : Z0 ρ U' U →ₗ[R] H1U ρ U :=
     (Submodule.comap (Z1U ρ U).subtype (B1 (MonoidHom.comp ρ U.subtype))).mkQ ∘ₗ (Z0 ρ U' U).subtype

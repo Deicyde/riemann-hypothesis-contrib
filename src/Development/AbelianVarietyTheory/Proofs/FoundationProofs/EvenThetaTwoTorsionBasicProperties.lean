@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Different
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.EvenTheta
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.EvenTheta
 open scoped BigOperators
 
 namespace GlobalTheory.EvenTheta
@@ -51,30 +53,57 @@ private lemma mul_mul_exp_eq_of_mul_exp_eq_one {ε k a s q : ℂ} (h : ε * Comp
   rw [hs, Complex.exp_add]
   linear_combination (a * Complex.exp q) * h
 
-
 open NumberField Classical in
 open scoped BigOperators in
 variable {Λ : AddSubgroup ℂ} in
-theorem _root_.GlobalTheory.EvenTheta.evenThetaTwoTorsion_basic_properties : ∀ Λ : AddSubgroup ℂ, _root_.GlobalTheory.EvenTheta.IsLat Λ →
-    ∀ t₀ : ℂ, t₀ ∉ Λ → 2 * t₀ ∈ Λ → Differentiable ℂ (_root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀) ∧ _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ 0 = 1 ∧
-    (∀ z, _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ (-z) = _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z) ∧
-    (∀ z, _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z ^ 2 = _root_.GlobalTheory.EvenTheta.sqTh Λ t₀ z) ∧
-    (∀ z, _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z = 0 ↔ z + t₀ ∈ Λ) ∧
-    ∀ ω ∈ Λ, ω / 2 + t₀ ∉ Λ → ∀ z, _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ ω (_root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀) z = _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z := by
+theorem _root_.GlobalTheory.EvenTheta.evenThetaTwoTorsion_basic_properties
+    : ∀ Λ : AddSubgroup ℂ,
+      _root_.GlobalTheory.EvenTheta.IsLat Λ
+        → ∀ t₀ : ℂ,
+          t₀ ∉ Λ → 2 * t₀ ∈ Λ
+            → Differentiable ℂ (_root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀)
+              ∧ _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ 0 = 1
+              ∧ (∀ z,
+                _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ (-z)
+                  = _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z)
+              ∧ (∀ z,
+                _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z ^ 2
+                  = _root_.GlobalTheory.EvenTheta.sqTh Λ t₀ z)
+              ∧ (∀ z, _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z = 0 ↔ z + t₀ ∈ Λ)
+              ∧ ∀ ω ∈ Λ,
+                ω / 2 + t₀ ∉ Λ
+                  → ∀ z,
+                    _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ ω
+                        (_root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀) z
+                      = _root_.Formalism.MainNotions.GL3Theta.th0 Λ t₀ z := by
   intro Λ hΛ t ht h2t
-  have hσt : _root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ t ≠ 0 := fun h => ht ((hΛ.sg_eq_zero t).1 h)
-  have hhalf : ¬ (2 * t / 2 ∈ Λ) := by rwa [mul_div_cancel_left₀ t two_ne_zero]
-  have hU0 : _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) 0 ≠ 0 := by
+  have hσt : _root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ t ≠ 0 := fun h =>
+    ht ((hΛ.sg_eq_zero t).1 h)
+  have hhalf : ¬(2 * t / 2 ∈ Λ) := by rwa [mul_div_cancel_left₀ t two_ne_zero]
+  have hU0
+      : _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t
+          (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) 0
+        ≠ 0 := by
     unfold _root_.Formalism.MainNotions.TaylorLogMetric.U1
     rw [zero_add]
     exact mul_ne_zero hσt (Complex.exp_ne_zero _)
-  have hopp : ∀ y, _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ (-t) (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) y = -_root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) y := by
+  have hopp
+      : ∀ y,
+        _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ (-t)
+            (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) y
+          = - _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t
+            (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) y := by
     intro y
     unfold _root_.Formalism.MainNotions.TaylorLogMetric.U1
     rw [show y + t = y + -t + 2 * t by ring, sgStar_add_lattice_eq_mul_exp hΛ h2t, if_neg hhalf]
     simp only [mul_assoc, ← Complex.exp_add, map_neg, map_mul, map_ofNat]
     ring_nf
-  have heven : ∀ z, _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) (-z) = _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) z := by
+  have heven
+      : ∀ z,
+        _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t
+            (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) (-z)
+          = _root_.Formalism.MainNotions.TaylorLogMetric.U1 Λ t
+            (_root_.Formalism.MainNotions.TaylorLogMetric.sgStar Λ) z := by
     intro z
     have h := hopp z
     unfold _root_.Formalism.MainNotions.TaylorLogMetric.U1 at h ⊢
@@ -103,17 +132,19 @@ theorem _root_.GlobalTheory.EvenTheta.evenThetaTwoTorsion_basic_properties : ∀
     unfold _root_.Formalism.MainNotions.TaylorLogMetric.U1
     rw [mul_eq_zero, or_iff_left (Complex.exp_ne_zero _), hΛ.sg_eq_zero]
   · intro ω hω hωt z
-    have hsum : ¬ ((ω + 2 * t) / 2 ∈ Λ) := by
-      rwa [show (ω + 2 * t) / 2 = ω / 2 + t by ring]
+    have hsum : ¬((ω + 2 * t) / 2 ∈ Λ) := by rwa [show (ω + 2 * t) / 2 = ω / 2 + t by ring]
     have h1 := sgStar_add_lattice_eq_mul_exp hΛ (add_mem hω h2t) t
     have h2 := sgStar_add_lattice_eq_mul_exp hΛ hω (t + 2 * t)
     have h3 := sgStar_add_lattice_eq_mul_exp hΛ h2t t
     rw [if_neg hsum] at h1
     rw [if_neg hhalf] at h3
     rw [show t + 2 * t + ω = t + (ω + 2 * t) by ring, h1, h3] at h2
-    have hε := mul_exp_eq_one_of_exp_relation
-      (k := (↑Real.pi * t * (starRingEnd ℂ) ω - ↑Real.pi * ω * (starRingEnd ℂ) t) /
-        ↑(_root_.Formalism.MainNotions.TaylorLogMetric.area Λ)) hσt h2 (by simp only [map_add (f := _), map_mul, map_ofNat]; ring)
+    have hε :=
+      mul_exp_eq_one_of_exp_relation
+        (k :=
+          (↑Real.pi * t * (starRingEnd ℂ) ω - ↑Real.pi * ω * (starRingEnd ℂ) t)
+            / ↑(_root_.Formalism.MainNotions.TaylorLogMetric.area Λ))
+        hσt h2 (by simp only [map_add (f := _), map_mul, map_ofNat]; ring)
     unfold _root_.Formalism.MainNotions.GL3Theta.th0 _root_.Formalism.MainNotions.TaylorLogMetric.U1
     beta_reduce
     rw [show z + ω + t = z + t + ω by ring, sgStar_add_lattice_eq_mul_exp hΛ hω, div_mul_eq_mul_div]

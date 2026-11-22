@@ -8,13 +8,15 @@ public import Development.AutomorphicSpectrum.Proofs.GlobalProofs.LocPrincipalSp
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+  GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
 
-theorem cartAt_of_locPrincipal : ∀ {X : Scheme.{0}} [IsIntegral X] (Z : X.IdealSheafData)
-    (U : X.affineOpens) (q : PrimeSpectrum Γ(X, U.1)),
-    LocPrincipal (Z.ideal U) q.asIdeal → CartAt Z (U.2.fromSpec q) := by
+theorem cartAt_of_locPrincipal
+    : ∀ {X : Scheme.{0}} [IsIntegral X] (Z : X.IdealSheafData) (U : X.affineOpens)
+        (q : PrimeSpectrum Γ(X, U.1)),
+      LocPrincipal (Z.ideal U) q.asIdeal → CartAt Z (U.2.fromSpec q) := by
   intro X _ Z U q h
   obtain ⟨t, f, ht, hfI, hf0, hg⟩ := h
   have hx : U.2.fromSpec q ∈ X.basicOpen t := by
@@ -24,10 +26,8 @@ theorem cartAt_of_locPrincipal : ∀ {X : Scheme.{0}} [IsIntegral X] (Z : X.Idea
     exact h1
   have hxU : U.2.fromSpec q ∈ U.1 := X.basicOpen_le t hx
   have inst := U.2.isLocalization_basicOpen t
-  let ρ : Γ(X, U.1) →+* Γ(X, X.basicOpen t) :=
-    (X.presheaf.map (homOfLE (X.basicOpen_le t)).op).hom
-  have hu : IsUnit (ρ t) :=
-    IsLocalization.Away.algebraMap_isUnit (S := Γ(X, X.basicOpen t)) t
+  let ρ : Γ(X, U.1) →+* Γ(X, X.basicOpen t) := (X.presheaf.map (homOfLE (X.basicOpen_le t)).op).hom
+  have hu : IsUnit (ρ t) := IsLocalization.Away.algebraMap_isUnit (S := Γ(X, X.basicOpen t)) t
   have hZ : Z.ideal (X.affineBasicOpen t) = Ideal.map ρ (Z.ideal U) :=
     (Z.map_ideal_basicOpen U t).symm
   have hne : Nonempty (X.basicOpen t : X.Opens) := ⟨⟨_, hx⟩⟩
@@ -50,8 +50,7 @@ theorem cartAt_of_locPrincipal : ∀ {X : Scheme.{0}} [IsIntegral X] (Z : X.Idea
     rw [Ideal.mem_comap, Ideal.mem_span_singleton']
     obtain ⟨u, hu'⟩ := hu.pow n
     refine ⟨(↑u⁻¹ : Γ(X, X.basicOpen t)) * ρ c, ?_⟩
-    have h3 : ρ c * ρ f = ρ t ^ n * ρ g := by
-      rw [← map_mul, hc, map_mul, map_pow]
+    have h3 : ρ c * ρ f = ρ t ^ n * ρ g := by rw [← map_mul, hc, map_mul, map_pow]
     rw [mul_assoc, h3, ← hu', Units.inv_mul_cancel_left]
   · rw [Ideal.span_singleton_le_iff_mem]
     exact Ideal.mem_map_of_mem ρ hfI

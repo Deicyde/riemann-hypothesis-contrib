@@ -56,34 +56,51 @@ theorem decomposition_of_injective : DecOfInj := by
     rw [zero_smul, zero_add] at h1
     exact hp0 t ((smul_eq_zero.1 h1).resolve_left (hab.resolve_left (not_not.2 rfl)))
   have h2 := LinearMap.congr_fun h1 (x - (∑ s, i s ∘ₗ p s) x)
-  rw [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.smul_apply, h0, smul_zero, add_zero] at h2
+  rw [LinearMap.add_apply, LinearMap.smul_apply, LinearMap.smul_apply, h0, smul_zero, add_zero]
+    at h2
   exact (smul_eq_zero.1 h2).resolve_left hα
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem trivial_rep_admissible : OKTriv := fun _ _ =>
-  ⟨rfl, fun _ _ _ _ => (Matrix.one_mul _).symm,
-    fun _ _ _ _ => ⟨Set.univ, _, isOpen_univ, trivial, contDiffOn_const, fun _ _ _ => rfl⟩,
-    ⟨1, fun _ _ _ _ => by simp⟩⟩
+theorem trivial_rep_admissible : OKTriv := fun _ _ => ⟨
+  rfl,
+  fun _ _ _ _ => (Matrix.one_mul _).symm,
+  fun _ _ _ _ => ⟨Set.univ, _, isOpen_univ, trivial, contDiffOn_const, fun _ _ _ => rfl⟩,
+  ⟨1, fun _ _ _ _ => by simp⟩
+⟩
 
 theorem vector_rep_admissible : OKVr := by
   intro k r b
   cases b
   · refine ⟨rfl, fun _ _ _ _ => rfl, fun c d _ _ => ?_, ⟨1, fun g _ c d => ?_⟩⟩
-    · exact ⟨Set.univ, fun g => g c d, isOpen_univ, trivial,
-        (LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ c d)).contDiff.contDiffOn, fun _ _ _ => rfl⟩
+    · exact ⟨
+        Set.univ,
+        fun g => g c d,
+        isOpen_univ,
+        trivial,
+        (LinearMap.toContinuousLinearMap (Matrix.entryLinearMap ℝ ℂ c d)).contDiff.contDiffOn,
+        fun _ _ _ => rfl
+      ⟩
     · simpa using GlobalTheory.DualFRep.entry_le g c d
   · obtain ⟨-, -, h1, h2, -, -, h3, -⟩ := GlobalTheory.isFRep_dualM k r
     refine ⟨h1, h2, fun c d _ _ => ?_, h3⟩
-    let A : Mx k r →ₗ[ℝ] ℂ :=
-      { toFun := fun x => (PI.UpqRep.Hpk k r * xᴴ * PI.UpqRep.Hpk k r) d c
-        map_add' := fun a b => by rw [Matrix.conjTranspose_add, Matrix.mul_add, Matrix.add_mul]; rfl
-        map_smul' := fun t a => by
-          rw [Matrix.conjTranspose_smul, Matrix.mul_smul, Matrix.smul_mul, star_trivial]; rfl }
-    refine ⟨Set.univ, A, isOpen_univ, trivial, (LinearMap.toContinuousLinearMap A).contDiff.contDiffOn,
-      fun g _ hg => ?_⟩
+    let A : Mx k r →ₗ[ℝ] ℂ := {
+      toFun := fun x => (PI.UpqRep.Hpk k r * xᴴ * PI.UpqRep.Hpk k r) d c
+      map_add' := fun a b => by rw [Matrix.conjTranspose_add, Matrix.mul_add, Matrix.add_mul]; rfl
+      map_smul' := fun t a => by
+        rw [Matrix.conjTranspose_smul, Matrix.mul_smul, Matrix.smul_mul, star_trivial]; rfl
+    }
+    refine ⟨
+      Set.univ,
+      A,
+      isOpen_univ,
+      trivial,
+      (LinearMap.toContinuousLinearMap A).contDiff.contDiffOn,
+      fun g _ hg => ?_
+    ⟩
     show g⁻¹ d c = _
-    rw [PI.HwUniqW.inv_eq_UH hg]; rfl
+    rw [PI.HwUniqW.inv_eq_UH hg]
+    rfl
 
 end CompanionTheory.Zuck
 

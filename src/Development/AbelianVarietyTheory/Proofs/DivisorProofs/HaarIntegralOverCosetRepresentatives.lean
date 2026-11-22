@@ -5,17 +5,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.OmAOneApply
 
 @[expose] public section
 
-open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
+open Matrix MeasureTheory ValuativeRel GlobalTheory.SplitFlip GlobalTheory.SmGL GlobalTheory.WeilM
+  GlobalTheory.RankFibre GlobalTheory.SplitWeil GlobalTheory.RankFibreKer
 open scoped Pointwise
 
 namespace GlobalTheory.HaarCosetSum
 
-theorem integral_eq_vol_mul_sum_of_cosets :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (a : ℕ) (K : Subgroup (GL (Fin a) k)),
-    IsOpen (K : Set (GL (Fin a) k)) → K ≤ KO k (Fin a) → ∀ F : GL (Fin a) k → ℂ,
-    (∀ g x, x ∈ K → F (g * x) = F g) → ∀ R : Finset (GL (Fin a) k),
-    (∀ r ∈ R, ∀ r' ∈ R, r⁻¹ * r' ∈ K → r = r') → (∀ g, F g ≠ 0 → ∃ r ∈ R, r⁻¹ * g ∈ K) →
-    ∫ g, F g ∂(haarVol (KO k (Fin a))) = ((haarVol (KO k (Fin a))).real (K : Set (GL (Fin a) k)) : ℂ) * ∑ r ∈ R, F r := by
+theorem integral_eq_vol_mul_sum_of_cosets
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (a : ℕ) (K : Subgroup (GL (Fin a) k)),
+      IsOpen (K : Set (GL (Fin a) k)) → K ≤ KO k (Fin a)
+        → ∀ F : GL (Fin a) k → ℂ,
+          (∀ g x, x ∈ K → F (g * x) = F g)
+            → ∀ R : Finset (GL (Fin a) k),
+              (∀ r ∈ R, ∀ r' ∈ R, r⁻¹ * r' ∈ K → r = r') → (∀ g, F g ≠ 0 → ∃ r ∈ R, r⁻¹ * g ∈ K)
+                → ∫ g, F g ∂(haarVol (KO k (Fin a)))
+                  = ((haarVol (KO k (Fin a))).real (K : Set (GL (Fin a) k)) : ℂ)
+                    * ∑ r ∈ R, F r := by
   intro k _ _ _ _ _ _ a K hKo hKle F hF R hR hsupp
   set μ := haarVol (KO k (Fin a)) with hμ
   have hKm : MeasurableSet (K : Set (GL (Fin a) k)) := hKo.measurableSet
@@ -47,19 +53,21 @@ theorem integral_eq_vol_mul_sum_of_cosets :
       · intro h; exact absurd hr₀ h
   have hfin : μ (K : Set (GL (Fin a) k)) ≠ ⊤ :=
     ((measure_mono hKle).trans_lt isCompact_KO.measure_lt_top).ne
-  have hcos : ∀ r : GL (Fin a) k, μ (r • (K : Set (GL (Fin a) k))) = μ K := fun r => measure_smul μ r _
+  have hcos : ∀ r : GL (Fin a) k, μ (r • (K : Set (GL (Fin a) k))) = μ K := fun r =>
+    measure_smul μ r _
   have hint : ∀ r ∈ R, Integrable ((r • (K : Set (GL (Fin a) k))).indicator (fun _ => F r)) μ := by
     intro r _
     rw [integrable_indicator_iff (hKm.const_smul r)]
     exact integrableOn_const (by rw [hcos]; exact hfin)
-  calc ∫ g, F g ∂μ = ∫ g, ∑ r ∈ R, ((r • (K : Set (GL (Fin a) k))).indicator (fun _ => F r) g) ∂μ := by
-          congr 1; funext g; exact hpt g
+  calc
+    ∫ g, F g ∂μ = ∫ g, ∑ r ∈ R, ((r • (K : Set (GL (Fin a) k))).indicator (fun _ => F r) g) ∂μ := by
+      congr 1; funext g; exact hpt g
     _ = ∑ r ∈ R, ∫ g, ((r • (K : Set (GL (Fin a) k))).indicator (fun _ => F r) g) ∂μ :=
-          MeasureTheory.integral_finsetSum R hint
+      MeasureTheory.integral_finsetSum R hint
     _ = ∑ r ∈ R, (μ.real (K : Set (GL (Fin a) k)) : ℂ) * F r := by
-          refine Finset.sum_congr rfl fun r _ => ?_
-          rw [integral_indicator_const _ (hKm.const_smul r), Measure.real, hcos, ← Measure.real,
-            Complex.real_smul]
+      refine Finset.sum_congr rfl fun r _ => ?_
+      rw [integral_indicator_const _ (hKm.const_smul r), Measure.real, hcos, ← Measure.real,
+        Complex.real_smul]
     _ = _ := by rw [Finset.mul_sum]
 
 end GlobalTheory.HaarCosetSum

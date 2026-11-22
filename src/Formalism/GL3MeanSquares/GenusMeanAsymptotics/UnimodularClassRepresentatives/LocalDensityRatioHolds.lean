@@ -15,19 +15,24 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3.D2
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem relIndex_sSub_inf (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsFullLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {B₀ : Submodule (𝓞 K) V}
-    (hB₀ : Submodule.IsFullLattice K B₀) (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    ∃ c₀ : ℕ, ∀ c ≥ c₀, ∃ k₀ : ℕ, ∀ k ≥ k₀,
-      sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀) ≤ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) ∧
-      (sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)).relIndex
-          (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)) *
-          Ideal.absNorm 𝔭 ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭) =
-        Ideal.absNorm 𝔭 ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
+theorem relIndex_sSub_inf
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
+    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {B₀ : Submodule (𝓞 K) V} (hB₀ : Submodule.IsFullLattice K B₀)
+    (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ c₀ : ℕ, ∀ c ≥ c₀, ∃ k₀ : ℕ, ∀ k ≥ k₀,
+      sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀) ≤ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)
+        ∧ (sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)).relIndex
+              (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀))
+            * Ideal.absNorm 𝔭 ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭)
+          = Ideal.absNorm 𝔭 ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
   obtain ⟨c₀, hc₀⟩ := relIndex_sSub_inf_eq hK hF hs hd hA₀ hA₀i hB₀ hB₀i h𝔭
   refine ⟨c₀, fun c hc => ?_⟩
   obtain ⟨k₀, hk₀⟩ := hc₀ c hc
@@ -44,34 +49,36 @@ namespace Formalism.HermitianLattices.Ext.L3
 
 open D2
 
-theorem local_density_ratio_holds :
-    ∀ (K F : Type) [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K],
-      Formalism.HermitianLatticesTheory.IsCMUnram K → IsFixF K F →
-      ∀ (V : Type) [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-        [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (A₀ B₀ : Submodule (𝓞 K) V)
-        (𝔭 : Ideal (𝓞 F)),
-        h.IsSymm → IsTotPosDef h → 𝔭.IsMaximal → Submodule.IsFullLattice K A₀ →
-        Submodule.IsFullLattice K B₀ → Formalism.HermitianLatticesTheory.IsIntegralLat h A₀ →
-        Formalism.HermitianLatticesTheory.IsIntegralLat h B₀ →
-        alphaL h (locF 𝔭 A₀) 𝔭 * (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭) *
-            orbCount h (locF 𝔭 B₀) (locF 𝔭 A₀) =
-          alphaL h (locF 𝔭 B₀) 𝔭 * (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V * vd h (locF 𝔭 A₀) 𝔭) *
-            orbCount h (locF 𝔭 A₀) (locF 𝔭 B₀) := by
+theorem local_density_ratio_holds
+    : ∀ (K F : Type) [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K],
+      Formalism.HermitianLatticesTheory.IsCMUnram K → IsFixF K F
+        → ∀ (V : Type) [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
+            [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K) (A₀ B₀ : Submodule (𝓞 K) V)
+            (𝔭 : Ideal (𝓞 F)),
+          h.IsSymm → IsTotPosDef h → 𝔭.IsMaximal → Submodule.IsFullLattice K A₀
+            → Submodule.IsFullLattice K B₀ → Formalism.HermitianLatticesTheory.IsIntegralLat h A₀
+            → Formalism.HermitianLatticesTheory.IsIntegralLat h B₀
+            → alphaL h (locF 𝔭 A₀) 𝔭 * (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭)
+                * orbCount h (locF 𝔭 B₀) (locF 𝔭 A₀)
+              = alphaL h (locF 𝔭 B₀) 𝔭 * (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V * vd h (locF 𝔭 A₀) 𝔭)
+                * orbCount h (locF 𝔭 A₀) (locF 𝔭 B₀) := by
   intro K F _ _ _ _ _ _ hK hF V _ _ _ _ _ h A₀ B₀ 𝔭 hs hd h𝔭 hA₀ hB₀ hA₀i hB₀i
   obtain ⟨c₁, hc₁⟩ := D2.relIndex_sSub_inf hK hF hs hd hA₀ hA₀i hB₀ hB₀i h𝔭
   obtain ⟨c₂, hc₂⟩ := D2.relIndex_nSub hK hF hA₀ hB₀ h𝔭
   set c := c₁ + c₂ with hc
   obtain ⟨k₁, hk₁⟩ := hc₁ c (by omega)
   obtain ⟨k₂, hk₂⟩ := hc₂ c (by omega)
-  obtain ⟨k₃, hk₃⟩ := D2.akCount_eq_relIndex hK hF hs hd (by first | exact hA₀ | exact hA₀.toIsLattice) hA₀i h𝔭
-  obtain ⟨k₄, hk₄⟩ := D2.akCount_eq_relIndex hK hF hs hd (by first | exact hB₀ | exact hB₀.toIsLattice) hB₀i h𝔭
+  obtain ⟨k₃, hk₃⟩ :=
+    D2.akCount_eq_relIndex hK hF hs hd (by first | exact hA₀ | exact hA₀.toIsLattice) hA₀i h𝔭
+  obtain ⟨k₄, hk₄⟩ :=
+    D2.akCount_eq_relIndex hK hF hs hd (by first | exact hB₀ | exact hB₀.toIsLattice) hB₀i h𝔭
   obtain ⟨k₅, hk₅⟩ := D2.relIndex_inf_glSub hK hF hs hd hA₀ hA₀i hB₀ h𝔭
   obtain ⟨k₆, hk₆⟩ := D2.relIndex_inf_glSub hK hF hs hd hB₀ hB₀i hA₀ h𝔭
   obtain ⟨k₇, hk₇⟩ := D2.nSub_le_glSub hB₀ hA₀ h𝔭
-  obtain ⟨k₈, hk₈⟩ := D2.alphaL_eq hK hF hs hd
-    (by first | exact hA₀ | exact hA₀.toIsLattice) hA₀i h𝔭
-  obtain ⟨k₉, hk₉⟩ := D2.alphaL_eq hK hF hs hd
-    (by first | exact hB₀ | exact hB₀.toIsLattice) hB₀i h𝔭
+  obtain ⟨k₈, hk₈⟩ :=
+    D2.alphaL_eq hK hF hs hd (by first | exact hA₀ | exact hA₀.toIsLattice) hA₀i h𝔭
+  obtain ⟨k₉, hk₉⟩ :=
+    D2.alphaL_eq hK hF hs hd (by first | exact hB₀ | exact hB₀.toIsLattice) hB₀i h𝔭
   set k := k₁ + k₂ + k₃ + k₄ + k₅ + k₆ + k₇ + k₈ + k₉ with hk
   obtain ⟨hJI, hIJ⟩ := hk₁ k (by omega)
   obtain ⟨hNN, hNNi⟩ := hk₂ k (by omega)
@@ -93,28 +100,32 @@ theorem local_density_ratio_holds :
   have e2 := Subgroup.relIndex_mul_relIndex (hHK := hNJ) (hKL := hJI)
   have e3 := Subgroup.relIndex_mul_relIndex (hHK := hNJ.trans hJI) (hKL := hIS)
   have e4 := Subgroup.relIndex_mul_relIndex (hHK := hNJ) (hKL := hJS)
-  have e5 : (nSub (locF 𝔭 A₀) 𝔭 k).relIndex (sSub h (locF 𝔭 A₀) 𝔭 k) *
-      (nSub (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (nSub (locF 𝔭 A₀) 𝔭 k) =
-      (nSub (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)) *
-        ((sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)).relIndex
-            (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)) *
-          (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)).relIndex (sSub h (locF 𝔭 A₀) 𝔭 k)) := by
+  have e5
+      : (nSub (locF 𝔭 A₀) 𝔭 k).relIndex (sSub h (locF 𝔭 A₀) 𝔭 k)
+          * (nSub (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (nSub (locF 𝔭 A₀) 𝔭 k)
+        = (nSub (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀))
+          * ((sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)).relIndex
+              (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀))
+            * (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)).relIndex (sSub h (locF 𝔭 A₀) 𝔭 k)) := by
     rw [mul_comm, e1, ← e3, ← e2, mul_assoc]
-  have E : akCount h (locF 𝔭 A₀) 𝔭 k * Ideal.absNorm 𝔭 ^ (2 * finrank K V ^ 2 * c) *
-      Ideal.absNorm 𝔭 ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭) * orbCount h (locF 𝔭 B₀) (locF 𝔭 A₀) =
-      akCount h (locF 𝔭 B₀) 𝔭 (k + c) * orbCount h (locF 𝔭 A₀) (locF 𝔭 B₀) *
-        Ideal.absNorm 𝔭 ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
+  have E
+      : akCount h (locF 𝔭 A₀) 𝔭 k * Ideal.absNorm 𝔭 ^ (2 * finrank K V ^ 2 * c)
+          * Ideal.absNorm 𝔭 ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭)
+          * orbCount h (locF 𝔭 B₀) (locF 𝔭 A₀)
+        = akCount h (locF 𝔭 B₀) 𝔭 (k + c) * orbCount h (locF 𝔭 A₀) (locF 𝔭 B₀)
+          * Ideal.absNorm 𝔭 ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
     rw [hakA, hakB, ← horbAB, ← horbBA, ← hNNi, ← hIJ, ← e4, e5]
     ring
   have hQ : (Ideal.absNorm 𝔭 : ℝ) ≠ 0 := by
     have hb : 𝔭 ≠ ⊥ :=
       Ring.ne_bot_of_isMaximal_of_not_isField h𝔭 (NumberField.RingOfIntegers.not_isField F)
     exact_mod_cast fun h0 => hb (Ideal.absNorm_eq_zero_iff.mp h0)
-  have Er : (akCount h (locF 𝔭 A₀) 𝔭 k : ℝ) * (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V ^ 2 * c) *
-      (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭) *
-        (orbCount h (locF 𝔭 B₀) (locF 𝔭 A₀) : ℝ) =
-      (akCount h (locF 𝔭 B₀) 𝔭 (k + c) : ℝ) * (orbCount h (locF 𝔭 A₀) (locF 𝔭 B₀) : ℝ) *
-        (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
+  have Er
+      : (akCount h (locF 𝔭 A₀) 𝔭 k : ℝ) * (Ideal.absNorm 𝔭 : ℝ) ^ (2 * finrank K V ^ 2 * c)
+          * (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V * vd h (locF 𝔭 B₀) 𝔭)
+          * (orbCount h (locF 𝔭 B₀) (locF 𝔭 A₀) : ℝ)
+        = (akCount h (locF 𝔭 B₀) 𝔭 (k + c) : ℝ) * (orbCount h (locF 𝔭 A₀) (locF 𝔭 B₀) : ℝ)
+          * (Ideal.absNorm 𝔭 : ℝ) ^ (finrank K V ^ 2 * c + finrank K V * vd h (locF 𝔭 A₀) 𝔭) := by
     exact_mod_cast E
   rw [hαA, hαB, div_mul_eq_mul_div, div_mul_eq_mul_div, div_mul_eq_mul_div, div_mul_eq_mul_div,
     div_eq_div_iff (pow_ne_zero _ hQ) (pow_ne_zero _ hQ)]

@@ -23,7 +23,6 @@ section Act
 variable {S : Scheme.{0}} (A : Over S) [GrpObj A] [IsCommMonObj A]
 
 structure RingAct (O : Type) [Ring O] where
-
   act : O → (A ⟶ A)
   hom : ∀ a, IsMonHom (act a)
   map_one : act 1 = 𝟙 A
@@ -37,9 +36,11 @@ def rosatiφ (f g : A ⟶ A) : Fin 6 → ((A ⊗ A).left ⟶ A.left) :=
 def rosatiε : Fin 6 → ℤ := ![1, -1, -1, -1, 1, 1]
 
 def RosatiAdj (L : LB A.left) (f g : A ⟶ A) : Prop :=
-  ∀ s : S, ∃ U : S.Opens, s ∈ U ∧
-    ∃ t : LB.Gen (LB.LinComb L (K := Fin 6)
-        (fun i => ((A ⊗ A).hom ⁻¹ᵁ U).ι ≫ rosatiφ A f g i) rosatiε), t.IsGen
+  ∀ s : S, ∃ U : S.Opens,
+    s ∈ U
+      ∧ ∃ t : LB.Gen
+          (LB.LinComb L (K := Fin 6) (fun i => ((A ⊗ A).hom ⁻¹ᵁ U).ι ≫ rosatiφ A f g i) rosatiε),
+        t.IsGen
 
 abbrev zero2 : (𝟙_ (Over S)).left ⟶ (A ⊗ A).left := (lift η[A] η[A]).left
 
@@ -57,11 +58,12 @@ def pt2 (D : DegPre R) (y y' : D.X) : (TK R).left ⟶ (D.P.A ⊗ D.P.A).left :=
   (lift (toUnit (TK R) ≫ D.c y) (toUnit (TK R) ≫ D.c y')).left
 
 def TauBal (D : DegPre R) (f g : D.P.A ⟶ D.P.A) (a a' : D.X → D.X) : Prop :=
-  ∀ (u : LB.Gen (LB.LinComb D.P.L (rosatiφ D.P.A f g) rosatiε)), u.IsGen →
-    LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ u (zero2 D.P.A)) (LB.oneGen D.P.L) →
-    ∀ y y' : D.X, LB.Gen.Corr D.P.L _ _ _ _
-      (LB.mulGen D.P.L _ _ _ _ (D.tau (a y) y') (LB.pullGen D.P.L _ _ u (D.pt2 y y')))
-      (D.tau y (a' y'))
+  ∀ (u : LB.Gen (LB.LinComb D.P.L (rosatiφ D.P.A f g) rosatiε)),
+    u.IsGen → LB.Gen.Corr D.P.L _ _ _ _ (LB.pullGen D.P.L _ _ u (zero2 D.P.A)) (LB.oneGen D.P.L)
+      → ∀ y y' : D.X,
+        LB.Gen.Corr D.P.L _ _ _ _
+          (LB.mulGen D.P.L _ _ _ _ (D.tau (a y) y') (LB.pullGen D.P.L _ _ u (D.pt2 y y')))
+          (D.tau y (a' y'))
 
 structure OAct (O : Type) [Ring O] [StarRing O] (D : DegPre R) [Module O D.X] where
   onB : D.P.OAct O
@@ -70,8 +72,11 @@ structure OAct (O : Type) [Ring O] [StarRing O] (D : DegPre R) [Module O D.X] wh
 
 end DegPre
 
-abbrev DegData.OAct (O : Type) [Ring O] [StarRing O] {R : Type} [CommRing R] [IsDomain R]
-    {I : Ideal R} (D : DegData R I) [Module O D.toPre.X] := D.toPre.OAct O
+abbrev DegData.OAct
+    (O : Type) [Ring O] [StarRing O]
+    {R : Type} [CommRing R] [IsDomain R]
+    {I : Ideal R} (D : DegData R I) [Module O D.toPre.X] :=
+  D.toPre.OAct O
 
 namespace Inh
 
@@ -81,8 +86,12 @@ def zeroOAct (O : Type) [Ring O] [StarRing O] (S : Scheme.{0}) : (zeroPolAV S).O
   map_one := rfl
   map_mul := fun _ _ => (Category.id_comp _).symm
   map_add := fun _ _ => toUnit_unique _ _
-  rosati := fun _ _ => ⟨⊤, trivial, ⟨fun _ => 1⟩, by
-    intro i j; erw [linComb_triv_g, _root_.one_mul]; dsimp only; repeat erw [map_one]⟩
+  rosati := fun _ _ => ⟨
+    ⊤,
+    trivial,
+    ⟨fun _ => 1⟩,
+    by intro i j; erw [linComb_triv_g, _root_.one_mul]; dsimp only; repeat erw [map_one]
+  ⟩
 
 end Inh
 

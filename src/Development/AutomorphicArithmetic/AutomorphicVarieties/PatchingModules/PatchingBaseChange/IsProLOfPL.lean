@@ -10,8 +10,11 @@ open IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 open scoped TensorProduct
 
 open UpperTheory.V.AlgebraTools in
-private theorem isProL_of_PL (l : ℕ) (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (H : Subgroup Γ) (hH : IsOpen (H : Set Γ)) (h : PL l H = ⊥) : IsProL l H := by
+private theorem isProL_of_PL
+    (l : ℕ)
+    (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (H : Subgroup Γ) (hH : IsOpen (H : Set Γ)) (h : PL l H = ⊥)
+    : IsProL l H := by
   classical
   rw [isProL_iff]
   intro N g
@@ -34,7 +37,9 @@ private theorem isProL_of_PL (l : ℕ) (Γ : Type) [Group Γ] [TopologicalSpace 
     rw [h, Subgroup.mem_bot] at hxPL
     subst hxPL
     exact hx1 ⟨1, N.toOpenSubgroup.one_mem, rfl⟩
-  obtain ⟨u, hu⟩ := (hKc.elim_finite_subfamily_closed t htc (Set.disjoint_iff_inter_eq_empty.2 hempty)).imp (fun _ => Disjoint.inter_eq)
+  obtain ⟨u, hu⟩ :=
+    (hKc.elim_finite_subfamily_closed t htc (Set.disjoint_iff_inter_eq_empty.2 hempty)).imp
+      (fun _ => Disjoint.inter_eq)
   choose e he using fun (i : ι) => i.2 (g : Γ) g.2
   refine ⟨∑ i ∈ u, e i, ?_⟩
   have hin : ((g : Γ) ^ l ^ (∑ i ∈ u, e i)) ∈ ⋂ i ∈ u, t i := by
@@ -58,9 +63,10 @@ private theorem isProL_of_PL (l : ℕ) (Γ : Type) [Group Γ] [TopologicalSpace 
   exact hn
 
 open UpperTheory.V.AlgebraTools in
-private theorem fg_of_open (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
-    (H : Subgroup Γ) (hH : IsOpen (H : Set Γ)) (s : Set H) (hs : s.Finite) (h : TopGen s) :
-    ∃ s : Finset Γ, (Subgroup.closure (s : Set Γ)).topologicalClosure = ⊤ := by
+private theorem fg_of_open
+    (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    (H : Subgroup Γ) (hH : IsOpen (H : Set Γ)) (s : Set H) (hs : s.Finite) (h : TopGen s)
+    : ∃ s : Finset Γ, (Subgroup.closure (s : Set Γ)).topologicalClosure = ⊤ := by
   classical
   haveI : Finite (Γ ⧸ H) := Subgroup.quotient_finite_of_isOpen H hH
   have hS : ((Subtype.val '' s) ∪ Set.range (Quotient.out : Γ ⧸ H → Γ)).Finite :=
@@ -79,21 +85,22 @@ private theorem fg_of_open (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopol
   have hHK : ∀ y ∈ H, y ∈ K := by
     intro y hy
     have hd : Dense ((Subgroup.closure s : Subgroup H) : Set H) := h
-    have h1 := image_closure_subset_closure_image (f := (Subtype.val : H → Γ)) continuous_subtype_val
-      ⟨⟨y, hy⟩, hd ⟨y, hy⟩, rfl⟩
+    have h1 :=
+      image_closure_subset_closure_image (f := (Subtype.val : H → Γ)) continuous_subtype_val
+        ⟨⟨y, hy⟩, hd ⟨y, hy⟩, rfl⟩
     exact closure_minimal himg hKc h1
   rw [eq_top_iff]
   intro g _
   obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul H g
   have hr : (QuotientGroup.mk g : Γ ⧸ H).out ∈ K :=
     Subgroup.le_topologicalClosure _ (Subgroup.subset_closure (Set.mem_union_right _ ⟨_, rfl⟩))
-  have hg : g = (QuotientGroup.mk g : Γ ⧸ H).out * (k : Γ)⁻¹ := by
-    rw [hk]; group
+  have hg : g = (QuotientGroup.mk g : Γ ⧸ H).out * (k : Γ)⁻¹ := by rw [hk]; group
   rw [hg]
   exact K.mul_mem hr (K.inv_mem (hHK _ k.2))
 
-theorem UpperTheory.V.Pa.BC.phi0 :
-    ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0), T.ProL → PhiCond G0.G₀ l := by
+theorem UpperTheory.V.Pa.BC.phi0
+    : ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0),
+      T.ProL → PhiCond G0.G₀ l := by
   intro l _ L G0 T hT
   classical
   apply phi_fg G0.frame
@@ -104,5 +111,7 @@ theorem UpperTheory.V.Pa.BC.phi0 :
   have hpro : UpperTheory.V.AlgebraTools.IsProL l HΓ := isProL_of_PL l G0.Γ HΓ hHΓo hT.1
   have hfin : {f : HΓ →* Multiplicative (ZMod l) | IsOpen (f.ker : Set HΓ)}.Finite :=
     Set.finite_coe_iff.mp T.fin0
-  obtain ⟨x, hx⟩ := (UpperTheory.V.AlgebraTools.topGen_of_hom l HΓ hpro).2 _ hfin (Nat.lt_pow_self (Fact.out : l.Prime).one_lt).le
+  obtain ⟨x, hx⟩ :=
+    (UpperTheory.V.AlgebraTools.topGen_of_hom l HΓ hpro).2 _ hfin
+      (Nat.lt_pow_self (Fact.out : l.Prime).one_lt).le
   exact fg_of_open G0.Γ HΓ hHΓo (Set.range x) (Set.finite_range _) hx

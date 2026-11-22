@@ -11,8 +11,8 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRe
 
 namespace GlobalTheory.FormalLog
 
-theorem eq_zero_or_single_of_degree_le_one {σ : Type} (μ : σ →₀ ℕ) (h : μ.degree ≤ 1) :
-    μ = 0 ∨ ∃ s, μ = Finsupp.single s 1 := by
+theorem eq_zero_or_single_of_degree_le_one {σ : Type} (μ : σ →₀ ℕ) (h : μ.degree ≤ 1)
+    : μ = 0 ∨ ∃ s, μ = Finsupp.single s 1 := by
   classical
   by_cases h0 : μ = 0
   · exact Or.inl h0
@@ -25,8 +25,17 @@ theorem eq_zero_or_single_of_degree_le_one {σ : Type} (μ : σ →₀ ℕ) (h :
     have : ν = 0 := (Finsupp.degree_eq_zero_iff ν).1 (by omega)
     exact ⟨s, by rw [this, add_zero]⟩
 
-theorem exists_log_exp :
-    ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (G : FGLaw k d), ∃ lg ex : Pt k 1 d, (∀ i (μ : Fin 1 × Fin d →₀ ℕ), μ.degree ≤ 1 → MvPowerSeries.coeff μ (lg i) = MvPowerSeries.coeff μ (MvPowerSeries.X ((0 : Fin 1), i) : PS k 1 d)) ∧ (∀ i, ev (n := 2) ![addOf G.F (pt k d 0) (pt k d 1)] (lg i) = ev (n := 2) ![pt k d 0] (lg i) + ev (n := 2) ![pt k d 1] (lg i)) ∧ (∀ i, MvPowerSeries.constantCoeff (ex i) = 0) ∧ comp1 lg ex = pt k d 0 ∧ comp1 ex lg = pt k d 0 := by
+theorem exists_log_exp
+    : ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (G : FGLaw k d), ∃ lg ex : Pt k 1 d,
+      (∀ i (μ : Fin 1 × Fin d →₀ ℕ),
+          μ.degree ≤ 1
+            → MvPowerSeries.coeff μ (lg i)
+              = MvPowerSeries.coeff μ (MvPowerSeries.X ((0 : Fin 1), i) : PS k 1 d))
+        ∧ (∀ i,
+          ev (n := 2) ![addOf G.F (pt k d 0) (pt k d 1)] (lg i)
+            = ev (n := 2) ![pt k d 0] (lg i) + ev (n := 2) ![pt k d 1] (lg i))
+        ∧ (∀ i, MvPowerSeries.constantCoeff (ex i) = 0) ∧ comp1 lg ex = pt k d 0
+        ∧ comp1 ex lg = pt k d 0 := by
   intro k _ _ d G
   obtain ⟨lg, h0, h1, hadd⟩ := logSt_and_logDerivSt.1 k d G
   obtain ⟨ex, -, he, ha, hb⟩ := GlobalTheory.ChartInv.exists_isInvPair k d lg h0 (by rw [h1]; simp)

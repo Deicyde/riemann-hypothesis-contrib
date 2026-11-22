@@ -14,16 +14,19 @@ noncomputable section
 
 namespace PI.OmFibreUniq.W
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField IsDedekindDomain Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain Topology
 open PI.OmFibreUniq PI.VolStabSW PI.VolStabSW.TensAllW
 open scoped TensorProduct
 
-theorem td_of_inj {α β : Type} [TopologicalSpace α] [TopologicalSpace β]
-    [TotallyDisconnectedSpace α] (e : β → α) (he : Continuous e) (hi : Function.Injective e) :
-    TotallyDisconnectedSpace β :=
+theorem td_of_inj
+    {α β : Type} [TopologicalSpace α] [TopologicalSpace β] [TotallyDisconnectedSpace α]
+    (e : β → α) (he : Continuous e) (hi : Function.Injective e)
+    : TotallyDisconnectedSpace β :=
   ⟨fun t _ ht x hx y hy =>
     hi ((isTotallyDisconnected_of_totallyDisconnectedSpace _ _ (Set.subset_univ _)
-      (ht.image e he.continuousOn)) ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩)⟩
+        (ht.image e he.continuousOn))
+      ⟨x, hx, rfl⟩ ⟨y, hy, rfl⟩)⟩
 
 theorem gram_map_fibre_uniqueness : FibUniq := by
   intro F E _ _ _ _ _ σ n J v a μ ν hν fib fib' h h'
@@ -44,10 +47,11 @@ theorem gram_map_fibre_uniqueness : FibUniq := by
     Topology.IsInducing.subtypeVal.secondCountableTopology
   have := hν
   have hfree : IsOpen (IndepV (E := E) (n := n) v a) :=
-    isOpen_linIndep (Module.finBasis F E) (Fv F v) (isOpen_units_Fv F v) (lip_field _)
-      (a := a) (M := n)
-  have hA : ∀ S : Set (HermR (Fv F v) σ a), MeasurableSet S →
-      MeasurableSet (gramR (Fv F v) σ J ⁻¹' (Subtype.val '' S)) := by
+    isOpen_linIndep (Module.finBasis F E) (Fv F v) (isOpen_units_Fv F v) (lip_field _) (a := a)
+      (M := n)
+  have hA
+      : ∀ S : Set (HermR (Fv F v) σ a),
+        MeasurableSet S → MeasurableSet (gramR (Fv F v) σ J ⁻¹' (Subtype.val '' S)) := by
     intro S hS
     letI : MeasurableSpace (Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) := borel _
     haveI : BorelSpace (Matrix (Fin a) (Fin a) (Fv F v ⊗[F] E)) := ⟨rfl⟩
@@ -61,9 +65,13 @@ theorem gram_map_fibre_uniqueness : FibUniq := by
   exact fib_unique μ ν (gramR (Fv F v) σ J) Subtype.val (IndepV (E := E) (n := n) v a) hA
     Subtype.val_injective hfree fib fib' h h'
 
-theorem omUnique_of_sdEx (h0 : SdEx) {F E : Type} [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
-    (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (a : ℕ) : OmUnique σ J ψ v a :=
+theorem omUnique_of_sdEx
+    (h0 : SdEx)
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+    (ψ : AddChar (AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) (a : ℕ)
+    : OmUnique σ J ψ v a :=
   omUnique_of σ J ψ v a h0 gram_map_fibre_existence gram_map_fibre_uniqueness
 
 end PI.OmFibreUniq.W

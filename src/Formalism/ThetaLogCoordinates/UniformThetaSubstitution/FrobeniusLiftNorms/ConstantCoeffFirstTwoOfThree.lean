@@ -23,10 +23,11 @@ section Cob
 
 variable {K : Type} [Field K]
 
-theorem has_subst_first_pair : HasSubst ![(X 0 : MvPowerSeries (Fin 3) K), X 1] := MvPowerSeries.hasSubst_of_constantCoeff_zero (by intro s; fin_cases s <;> simp)
+theorem has_subst_first_pair : HasSubst ![(X 0 : MvPowerSeries (Fin 3) K), X 1] :=
+  MvPowerSeries.hasSubst_of_constantCoeff_zero (by intro s; fin_cases s <;> simp)
 
-theorem constantCoeff_first_two_of_three {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) :
-    constantCoeff (in3 F) = 0 := by
+theorem constantCoeff_first_two_of_three {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0)
+    : constantCoeff (in3 F) = 0 := by
   unfold in3
   rw [MvPowerSeries.constantCoeff_subst has_subst_first_pair]
   refine finsum_eq_zero_of_forall_eq_zero fun d => ?_
@@ -38,44 +39,62 @@ theorem constantCoeff_first_two_of_three {F : MvPowerSeries (Fin 2) K} (hF : con
       push_neg at h
       exact hd (Finsupp.ext h)
     rw [Finsupp.prod, map_prod, Finset.prod_eq_zero (Finsupp.mem_support_iff.2 hs), smul_zero]
-    have h0 : constantCoeff ((![(X 0 : MvPowerSeries (Fin 3) K), X 1] : Fin 2 → MvPowerSeries (Fin 3) K) s) = 0 := by
+    have h0
+        : constantCoeff
+            ((![(X 0 : MvPowerSeries (Fin 3) K), X 1] : Fin 2 → MvPowerSeries (Fin 3) K) s)
+          = 0 := by
       fin_cases s <;> simp
     rw [map_pow, h0, zero_pow hs]
 
-theorem has_subst_coboundary_first {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) :
-    HasSubst ![in3 F, (X 2 : MvPowerSeries (Fin 3) K)] := MvPowerSeries.hasSubst_of_constantCoeff_zero (by intro s; fin_cases s <;> simp [constantCoeff_first_two_of_three hF])
+theorem has_subst_coboundary_first {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0)
+    : HasSubst ![in3 F, (X 2 : MvPowerSeries (Fin 3) K)] :=
+  MvPowerSeries.hasSubst_of_constantCoeff_zero (by
+    intro s; fin_cases s <;> simp [constantCoeff_first_two_of_three hF])
 
-theorem has_subst_last_pair (x : Fin 3) : HasSubst ![(X x : MvPowerSeries (Fin 3) K), X 2] := MvPowerSeries.hasSubst_of_constantCoeff_zero (by intro s; fin_cases s <;> simp)
+theorem has_subst_last_pair (x : Fin 3) : HasSubst ![(X x : MvPowerSeries (Fin 3) K), X 2] :=
+  MvPowerSeries.hasSubst_of_constantCoeff_zero (by intro s; fin_cases s <;> simp)
 
-theorem partial_coboundary_sub {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0)
-    (H H' : MvPowerSeries (Fin 2) K) : d1 F (H - H') = d1 F H - d1 F H' := by
+theorem partial_coboundary_sub
+    {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (H H' : MvPowerSeries (Fin 2) K)
+    : d1 F (H - H') = d1 F H - d1 F H' := by
   unfold d1
-  rw [MvPowerSeries.subst_sub (has_subst_coboundary_first hF), MvPowerSeries.subst_sub (has_subst_last_pair 0), MvPowerSeries.subst_sub (has_subst_last_pair 1)]
+  rw [MvPowerSeries.subst_sub (has_subst_coboundary_first hF),
+    MvPowerSeries.subst_sub (has_subst_last_pair 0),
+    MvPowerSeries.subst_sub (has_subst_last_pair 1)]
   abel
 
-theorem partial_coboundary_C_mul {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (a : K)
-    (H : MvPowerSeries (Fin 2) K) : d1 F (C a * H) = C a * d1 F H := by
-  have key : ∀ (b : Fin 2 → MvPowerSeries (Fin 3) K), HasSubst b →
-      subst b (C a * H) = C a * subst b H := by
+theorem partial_coboundary_C_mul
+    {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (a : K) (H : MvPowerSeries (Fin 2) K)
+    : d1 F (C a * H) = C a * d1 F H := by
+  have key
+      : ∀ (b : Fin 2 → MvPowerSeries (Fin 3) K),
+        HasSubst b → subst b (C a * H) = C a * subst b H := by
     intro b hb
     rw [← MvPowerSeries.smul_eq_C_mul, ← MvPowerSeries.smul_eq_C_mul, MvPowerSeries.subst_smul hb]
   unfold d1
-  rw [key _ (has_subst_coboundary_first hF), key _ (has_subst_last_pair 0), key _ (has_subst_last_pair 1)]
+  rw [key _ (has_subst_coboundary_first hF), key _ (has_subst_last_pair 0),
+    key _ (has_subst_last_pair 1)]
   ring
 
-theorem subst_subst {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : HasSubst b)
-    {a : MvPowerSeries ι K} (ha : PowerSeries.HasSubst a) (f : PowerSeries K) :
-    subst b (PowerSeries.subst a f) = PowerSeries.subst (subst b a) f := MvPowerSeries.subst_comp_subst_apply ha.const hb f
+theorem subst_subst
+    {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : HasSubst b)
+    {a : MvPowerSeries ι K} (ha : PowerSeries.HasSubst a)
+    (f : PowerSeries K)
+    : subst b (PowerSeries.subst a f) = PowerSeries.subst (subst b a) f :=
+  MvPowerSeries.subst_comp_subst_apply ha.const hb f
 
-theorem subst_single_var {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : HasSubst b)
-    (x : ι) (f : PowerSeries K) : subst b (at1 x f) = PowerSeries.subst (b x) f := by
+theorem subst_single_var
+    {ι κ : Type} {b : ι → MvPowerSeries κ K} (hb : HasSubst b) (x : ι) (f : PowerSeries K)
+    : subst b (at1 x f) = PowerSeries.subst (b x) f := by
   unfold at1
   rw [subst_subst hb (PowerSeries.HasSubst.X x), MvPowerSeries.subst_X hb]
 
-theorem include_three_coboundary {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (f : PowerSeries K) :
-    in3 (cob F f) = PowerSeries.subst (in3 F) f - at1 0 f - at1 1 f := by
+theorem include_three_coboundary
+    {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (f : PowerSeries K)
+    : in3 (cob F f) = PowerSeries.subst (in3 F) f - at1 0 f - at1 1 f := by
   have hF' : PowerSeries.HasSubst F := PowerSeries.HasSubst.of_constantCoeff_zero hF
-  have h1 : in3 (PowerSeries.subst F f) = PowerSeries.subst (in3 F) f := subst_subst has_subst_first_pair hF' f
+  have h1 : in3 (PowerSeries.subst F f) = PowerSeries.subst (in3 F) f :=
+    subst_subst has_subst_first_pair hF' f
   have h2 : in3 (at1 (0 : Fin 2) f) = at1 0 f := by
     unfold in3
     rw [subst_single_var has_subst_first_pair]
@@ -89,27 +108,38 @@ theorem include_three_coboundary {F : MvPowerSeries (Fin 2) K} (hF : constantCoe
   rw [MvPowerSeries.subst_sub has_subst_first_pair, MvPowerSeries.subst_sub has_subst_first_pair]
   exact congr_arg₂ (· - ·) (congr_arg₂ (· - ·) h1 h2) h3
 
-theorem partial_coboundary_product {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0)
-    (f g : PowerSeries K) : d1 F (at1 0 f * at1 1 g) = in3 (cob F f) * at1 2 g := by
+theorem partial_coboundary_product
+    {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (f g : PowerSeries K)
+    : d1 F (at1 0 f * at1 1 g) = in3 (cob F f) * at1 2 g := by
   unfold d1
-  rw [MvPowerSeries.subst_mul (has_subst_coboundary_first hF), MvPowerSeries.subst_mul (has_subst_last_pair 0), MvPowerSeries.subst_mul (has_subst_last_pair 1),
-    subst_single_var (has_subst_coboundary_first hF), subst_single_var (has_subst_coboundary_first hF), subst_single_var (has_subst_last_pair 0), subst_single_var (has_subst_last_pair 0),
-    subst_single_var (has_subst_last_pair 1), subst_single_var (has_subst_last_pair 1), include_three_coboundary hF]
+  rw [MvPowerSeries.subst_mul (has_subst_coboundary_first hF),
+    MvPowerSeries.subst_mul (has_subst_last_pair 0),
+    MvPowerSeries.subst_mul (has_subst_last_pair 1),
+    subst_single_var (has_subst_coboundary_first hF),
+    subst_single_var (has_subst_coboundary_first hF), subst_single_var (has_subst_last_pair 0),
+    subst_single_var (has_subst_last_pair 0), subst_single_var (has_subst_last_pair 1),
+    subst_single_var (has_subst_last_pair 1), include_three_coboundary hF]
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
   unfold at1
   ring
 
 theorem include_three_zero : in3 (0 : MvPowerSeries (Fin 2) K) = 0 := by
-  have h := MvPowerSeries.subst_sub (R := K) (has_subst_first_pair (K := K)) (0 : MvPowerSeries (Fin 2) K) 0
+  have h :=
+    MvPowerSeries.subst_sub (R := K) (has_subst_first_pair (K := K)) (0 : MvPowerSeries (Fin 2) K) 0
   rw [sub_self, sub_self] at h
   exact h
 
-theorem partial_coboundary_h_series {p : ℕ} (σ : K →+* K) {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0)
-    (hl : cob F (lgF K p) = 0) (G : MvPowerSeries (Fin 2) K) (γ γ' : K) :
-    d1 F (Hser p σ G γ γ') =
-      d1 F (DeS p σ G) - C γ * (in3 (cob F (g0F K p)) * at1 2 (lgF K p)) := by
+theorem partial_coboundary_h_series
+    {p : ℕ}
+    (σ : K →+* K)
+    {F : MvPowerSeries (Fin 2) K} (hF : constantCoeff F = 0) (hl : cob F (lgF K p) = 0)
+    (G : MvPowerSeries (Fin 2) K) (γ γ' : K)
+    : d1 F (Hser p σ G γ γ')
+      = d1 F (DeS p σ G) - C γ * (in3 (cob F (g0F K p)) * at1 2 (lgF K p)) := by
   unfold Hser
-  rw [partial_coboundary_sub hF, partial_coboundary_sub hF, partial_coboundary_C_mul hF, partial_coboundary_C_mul hF, partial_coboundary_product hF, partial_coboundary_product hF, hl, include_three_zero]
+  rw [partial_coboundary_sub hF, partial_coboundary_sub hF, partial_coboundary_C_mul hF,
+    partial_coboundary_C_mul hF, partial_coboundary_product hF, partial_coboundary_product hF, hl,
+    include_three_zero]
   ring
 
 end Cob
@@ -122,8 +152,8 @@ theorem powq_modEq_one {p : ℕ} (hp : 2 ≤ p) (x : ℕ) : (p ^ 2) ^ x ≡ 1 [M
   have h : p ^ 2 ≡ 1 [MOD p ^ 2 - 1] := Nat.modEq_sub (Nat.one_le_pow _ _ (by omega))
   simpa using h.pow x
 
-theorem suppOK_sub {p : ℕ} {f g : MvPowerSeries (Fin 2) K} (hf : SuppOK p f) (hg : SuppOK p g) :
-    SuppOK p (f - g) := by
+theorem suppOK_sub {p : ℕ} {f g : MvPowerSeries (Fin 2) K} (hf : SuppOK p f) (hg : SuppOK p g)
+    : SuppOK p (f - g) := by
   intro n hn
   rw [map_sub] at hn
   by_cases h : MvPowerSeries.coeff n f = 0
@@ -133,14 +163,15 @@ theorem suppOK_sub {p : ℕ} {f g : MvPowerSeries (Fin 2) K} (hf : SuppOK p f) (
     rw [h, h', sub_zero]
   · exact hf n h
 
-theorem suppOK_C_mul {p : ℕ} (a : K) {f : MvPowerSeries (Fin 2) K} (hf : SuppOK p f) :
-    SuppOK p (C a * f) := by
+theorem suppOK_C_mul {p : ℕ} (a : K) {f : MvPowerSeries (Fin 2) K} (hf : SuppOK p f)
+    : SuppOK p (C a * f) := by
   intro n hn
   rw [MvPowerSeries.coeff_C_mul] at hn
   exact hf n (right_ne_zero_of_mul hn)
 
-theorem suppOK_frob {p : ℕ} (hp : 2 ≤ p) (σ : K →+* K) {G : MvPowerSeries (Fin 2) K}
-    (hG : SuppOK p G) : SuppOK p (frobVar p (map σ G)) := by
+theorem suppOK_frob
+    {p : ℕ} (hp : 2 ≤ p) (σ : K →+* K) {G : MvPowerSeries (Fin 2) K} (hG : SuppOK p G)
+    : SuppOK p (frobVar p (map σ G)) := by
   intro n hn
   obtain ⟨m, rfl, hm⟩ := coeff_frobVar_ne_zero (by omega) hn
   rw [MvPowerSeries.coeff_map] at hm
@@ -149,23 +180,24 @@ theorem suppOK_frob {p : ℕ} (hp : 2 ≤ p) (σ : K →+* K) {G : MvPowerSeries
   simp only [Finsupp.smul_apply, smul_eq_mul]
   exact ⟨Nat.mul_pos (by omega) h0, Nat.mul_pos (by omega) h1, h2.mul_left p⟩
 
-private theorem coeff_g0F_ne_lemma {p n : ℕ} (h : PowerSeries.coeff n (g0F K p) ≠ 0) :
-    ∃ j, n = p * (p ^ 2) ^ j := by
+private theorem coeff_g0F_ne_lemma {p n : ℕ} (h : PowerSeries.coeff n (g0F K p) ≠ 0)
+    : ∃ j, n = p * (p ^ 2) ^ j := by
   rw [g0F, PowerSeries.coeff_mk] at h
   obtain ⟨j, -, hj⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
   by_cases hn : n = p * (p ^ 2) ^ j
   · exact ⟨j, hn⟩
   · exact absurd (if_neg hn) hj
 
-private theorem coeff_lgF_ne_lemma_2 {p n : ℕ} (h : PowerSeries.coeff n (lgF K p) ≠ 0) :
-    ∃ j, n = (p ^ 2) ^ j := by
+private theorem coeff_lgF_ne_lemma_2 {p n : ℕ} (h : PowerSeries.coeff n (lgF K p) ≠ 0)
+    : ∃ j, n = (p ^ 2) ^ j := by
   rw [lgF, PowerSeries.coeff_mk] at h
   obtain ⟨j, -, hj⟩ := Finset.exists_ne_zero_of_sum_ne_zero h
   by_cases hn : n = (p ^ 2) ^ j
   · exact ⟨j, hn⟩
   · exact absurd (if_neg hn) hj
 
-theorem support_ok_g_zero_log {p : ℕ} (hp : 2 ≤ p) : SuppOK p (at1 0 (g0F K p) * at1 1 (lgF K p)) := by
+theorem support_ok_g_zero_log {p : ℕ} (hp : 2 ≤ p)
+    : SuppOK p (at1 0 (g0F K p) * at1 1 (lgF K p)) := by
   intro n hn
   rw [coeff_product_single_variables (by decide) (fun z => by fin_cases z <;> simp)] at hn
   obtain ⟨j, hj⟩ := coeff_g0F_ne_lemma (left_ne_zero_of_mul hn)
@@ -178,7 +210,8 @@ theorem support_ok_g_zero_log {p : ℕ} (hp : 2 ≤ p) : SuppOK p (at1 0 (g0F K 
   · rw [hj, hi]
     exact ((powq_modEq_one hp j).mul_left p).trans ((powq_modEq_one hp i).mul_left p).symm
 
-theorem support_ok_log_g_zero {p : ℕ} (hp : 2 ≤ p) : SuppOK p (at1 0 (lgF K p) * at1 1 (g0F K p)) := by
+theorem support_ok_log_g_zero {p : ℕ} (hp : 2 ≤ p)
+    : SuppOK p (at1 0 (lgF K p) * at1 1 (g0F K p)) := by
   intro n hn
   rw [coeff_product_single_variables (by decide) (fun z => by fin_cases z <;> simp)] at hn
   obtain ⟨i, hi⟩ := coeff_lgF_ne_lemma_2 (left_ne_zero_of_mul hn)
@@ -193,15 +226,18 @@ theorem support_ok_log_g_zero {p : ℕ} (hp : 2 ≤ p) : SuppOK p (at1 0 (lgF K 
     rw [h]
     exact (powq_modEq_one hp i).trans (powq_modEq_one hp (j + 1)).symm
 
-theorem suppOK_Hser {p : ℕ} (hp : 2 ≤ p) (σ : K →+* K) {G : MvPowerSeries (Fin 2) K}
-    (hG : SuppOK p G) (γ γ' : K) : SuppOK p (Hser p σ G γ γ') := by
+theorem suppOK_Hser
+    {p : ℕ} (hp : 2 ≤ p) (σ : K →+* K) {G : MvPowerSeries (Fin 2) K} (hG : SuppOK p G) (γ γ' : K)
+    : SuppOK p (Hser p σ G γ γ') := by
   unfold Hser DeS
-  exact suppOK_sub (suppOK_sub (suppOK_C_mul _ (suppOK_sub (suppOK_frob hp σ hG) (suppOK_C_mul _ hG)))
-    (suppOK_C_mul _ (support_ok_g_zero_log hp))) (suppOK_C_mul _ (support_ok_log_g_zero hp))
+  exact suppOK_sub
+    (suppOK_sub (suppOK_C_mul _ (suppOK_sub (suppOK_frob hp σ hG) (suppOK_C_mul _ hG)))
+      (suppOK_C_mul _ (support_ok_g_zero_log hp)))
+    (suppOK_C_mul _ (support_ok_log_g_zero hp))
 
-theorem coeff_lg_lg_eq_zero {p : ℕ} (hp : 2 ≤ p) {n : Fin 2 →₀ ℕ}
-    (hn : n 0 ≡ p * n 1 [MOD p ^ 2 - 1]) :
-    coeff n (at1 0 (lgF K p) * at1 1 (lgF K p)) = 0 := by
+theorem coeff_lg_lg_eq_zero
+    {p : ℕ} (hp : 2 ≤ p) {n : Fin 2 →₀ ℕ} (hn : n 0 ≡ p * n 1 [MOD p ^ 2 - 1])
+    : coeff n (at1 0 (lgF K p) * at1 1 (lgF K p)) = 0 := by
   rw [coeff_product_single_variables (by decide) (fun z => by fin_cases z <;> simp)]
   by_contra h
   obtain ⟨i, hi⟩ := coeff_lgF_ne_lemma_2 (left_ne_zero_of_mul h)
@@ -222,10 +258,13 @@ section Norm
 
 variable {K : Type} [NormedField K] [IsUltrametricDist K]
 
-theorem norm_add_le_one {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) : ‖x + y‖ ≤ 1 := (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
+theorem norm_add_le_one {x y : K} (hx : ‖x‖ ≤ 1) (hy : ‖y‖ ≤ 1) : ‖x + y‖ ≤ 1 :=
+  (IsUltrametricDist.norm_add_le_max x y).trans (max_le hx hy)
 
-theorem eq_zero_of_div {p : ℕ} (hp : 2 ≤ p) (hnp : ‖(p : K)‖ = (p : ℝ)⁻¹) {x : K}
-    (h : ∀ i : ℕ, ‖x * ((p : K) ^ (i + 1))⁻¹‖ ≤ 1) : x = 0 := by
+theorem eq_zero_of_div
+    {p : ℕ} (hp : 2 ≤ p) (hnp : ‖(p : K)‖ = (p : ℝ)⁻¹)
+    {x : K} (h : ∀ i : ℕ, ‖x * ((p : K) ^ (i + 1))⁻¹‖ ≤ 1)
+    : x = 0 := by
   by_contra hx
   have hx0 : 0 < ‖x‖ := norm_pos_iff.2 hx
   have hp1 : (1 : ℝ) < p := by exact_mod_cast (by omega : 1 < p)
@@ -245,20 +284,19 @@ section MapG
 
 variable {K : Type} [Field K]
 
-theorem map_Gser (σ : K →+* K) (p : ℕ) (c c' : K) :
-    map σ (Gser p c c') = Gser p (σ c) (σ c') := by
+theorem map_Gser (σ : K →+* K) (p : ℕ) (c c' : K) : map σ (Gser p c c') = Gser p (σ c) (σ c') := by
   have hA : MvPowerSeries.map σ (Aser K p) = Aser K p := by
     ext n
     rw [MvPowerSeries.coeff_map]
     change σ (Aser K p n) = Aser K p n
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Aser, map_sum, apply_ite σ, map_inv₀, map_pow, map_natCast, map_zero]
+    simp only [Aser, map_sum, apply_ite σ, map_inv₀, map_pow, map_natCast, map_zero]
   have hA' : MvPowerSeries.map σ (Aser' K p) = Aser' K p := by
     ext n
     rw [MvPowerSeries.coeff_map]
     change σ (Aser' K p n) = Aser' K p n
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Aser', map_sum, apply_ite σ, map_inv₀, map_pow, map_natCast, map_zero]
+    simp only [Aser', map_sum, apply_ite σ, map_inv₀, map_pow, map_natCast, map_zero]
   unfold Gser
   rw [map_sub, map_mul, map_mul, MvPowerSeries.map_C, MvPowerSeries.map_C, hA, hA']
 
@@ -305,8 +343,8 @@ theorem StepH_of (h2 : LemmaTwo) (hSw : SwapRules) (_hL : LawSymm) : StepH := by
     rw [hHR, map_add (f := _), MvPowerSeries.coeff_C_mul, hll, mul_zero, zero_add]
     exact hR n
 
-private theorem coeff_lgF_one_lemma {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p) :
-    PowerSeries.coeff 1 (lgF K p) = 1 := by
+private theorem coeff_lgF_one_lemma {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p)
+    : PowerSeries.coeff 1 (lgF K p) = 1 := by
   have h4 : 1 < p ^ 2 := by
     have := Nat.pow_le_pow_left hp 2
     norm_num at this
@@ -314,8 +352,8 @@ private theorem coeff_lgF_one_lemma {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p
   rw [lgF, PowerSeries.coeff_mk, Finset.sum_range_succ, Finset.sum_range_one]
   simp [h4.ne]
 
-private theorem coeff_g0F_at_lemma_2 {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p) (i : ℕ) :
-    PowerSeries.coeff (p * (p ^ 2) ^ i) (g0F K p) = ((p : K) ^ (i + 1))⁻¹ := by
+private theorem coeff_g0F_at_lemma_2 {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p) (i : ℕ)
+    : PowerSeries.coeff (p * (p ^ 2) ^ i) (g0F K p) = ((p : K) ^ (i + 1))⁻¹ := by
   have hp2 : 2 ≤ p ^ 2 := by nlinarith
   have hinj : ∀ j, (p * (p ^ 2) ^ i = p * (p ^ 2) ^ j) ↔ j = i := by
     intro j
@@ -333,8 +371,8 @@ private theorem coeff_g0F_at_lemma_2 {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ 
   simp_rw [hinj]
   simp [hi]
 
-private theorem coeff_g0F_one_lemma_3 {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p) :
-    PowerSeries.coeff 1 (g0F K p) = 0 := by
+private theorem coeff_g0F_one_lemma_3 {K : Type} [Field K] {p : ℕ} (hp : 2 ≤ p)
+    : PowerSeries.coeff 1 (g0F K p) = 0 := by
   rw [g0F, PowerSeries.coeff_mk]
   refine Finset.sum_eq_zero fun j _ => if_neg ?_
   intro h
@@ -357,27 +395,33 @@ theorem c_add_sigma_c_eq_zero : StepIII := by
   apply eq_zero_of_div hp hnp
   intro i
   obtain ⟨m, hm⟩ : ∃ m, m = p * (p ^ 2) ^ i := ⟨_, rfl⟩
-  have hg0m : PowerSeries.coeff m (g0F K p) = ((p : K) ^ (i + 1))⁻¹ := hm ▸ coeff_g0F_at_lemma_2 hp i
+  have hg0m : PowerSeries.coeff m (g0F K p) = ((p : K) ^ (i + 1))⁻¹ :=
+    hm ▸ coeff_g0F_at_lemma_2 hp i
   obtain ⟨n, hn⟩ : ∃ n : Fin 2 →₀ ℕ, n = Finsupp.single 1 m + Finsupp.single 0 1 := ⟨_, rfl⟩
 
-  have hcoefD : MvPowerSeries.coeff (Finsupp.single 1 m) (MvPowerSeries.pderiv (R := K) 0 G -
-      MvPowerSeries.C c * (at1 0 (PowerSeries.derivative (R := K) (lgF K p)) * at1 1 (g0F K p))) =
-      MvPowerSeries.coeff n G - c * ((p : K) ^ (i + 1))⁻¹ := by
+  have hcoefD
+      : MvPowerSeries.coeff (Finsupp.single 1 m)
+          (MvPowerSeries.pderiv (R := K) 0 G
+            - MvPowerSeries.C c
+              * (at1 0 (PowerSeries.derivative (R := K) (lgF K p)) * at1 1 (g0F K p)))
+        = MvPowerSeries.coeff n G - c * ((p : K) ^ (i + 1))⁻¹ := by
     have hs0 : (Finsupp.single (1 : Fin 2) m) 0 = 0 := by simp
     have hs1 : (Finsupp.single (1 : Fin 2) m) 1 = m := by simp
-    rw [map_sub, MvPowerSeries.coeff_pderiv, MvPowerSeries.coeff_C_mul, coeff_product_single_variables h01 hall, hs0, hs1,
-      PowerSeries.coeff_derivative, hg0m, ← hn]
+    rw [map_sub, MvPowerSeries.coeff_pderiv, MvPowerSeries.coeff_C_mul,
+      coeff_product_single_variables h01 hall, hs0, hs1, PowerSeries.coeff_derivative, hg0m, ← hn]
     simp [hlg1]
 
-  have hcoefH : MvPowerSeries.coeff n (Hser p σ G (σ c) (σ c')) =
-      -(MvPowerSeries.coeff n G) - σ c' * ((p : K) ^ (i + 1))⁻¹ := by
+  have hcoefH
+      : MvPowerSeries.coeff n (Hser p σ G (σ c) (σ c'))
+        = -(MvPowerSeries.coeff n G) - σ c' * ((p : K) ^ (i + 1))⁻¹ := by
     have hn0 : n 0 = 1 := by simp [hn]
     have hn1 : n 1 = m := by simp [hn]
     have hfr : MvPowerSeries.coeff n (frobVar p (MvPowerSeries.map σ G)) = 0 :=
       coeff_frobVar_of_not_dvd hp0 _ (i := 0) (by rw [hn0]; exact hnd1)
     unfold Hser DeS
     simp only [map_sub, MvPowerSeries.coeff_C_mul]
-    rw [hfr, coeff_product_single_variables h01 hall, coeff_product_single_variables h01 hall, hn0, hn1, hg01, hlg1, hg0m]
+    rw [hfr, coeff_product_single_variables h01 hall, coeff_product_single_variables h01 hall, hn0,
+      hn1, hg01, hlg1, hg0m]
     field_simp
     ring
   have hA : ‖MvPowerSeries.coeff n G - c * ((p : K) ^ (i + 1))⁻¹‖ ≤ 1 := by
@@ -386,9 +430,11 @@ theorem c_add_sigma_c_eq_zero : StepIII := by
   have hB : ‖-(MvPowerSeries.coeff n G) - σ c' * ((p : K) ^ (i + 1))⁻¹‖ ≤ 1 := by
     rw [← hcoefH]
     exact hI n
-  have key : (c + σ c') * ((p : K) ^ (i + 1))⁻¹ =
-      -((MvPowerSeries.coeff n G - c * ((p : K) ^ (i + 1))⁻¹) +
-        (-(MvPowerSeries.coeff n G) - σ c' * ((p : K) ^ (i + 1))⁻¹)) := by ring
+  have key
+      : (c + σ c') * ((p : K) ^ (i + 1))⁻¹
+        = -((MvPowerSeries.coeff n G - c * ((p : K) ^ (i + 1))⁻¹)
+          + (-(MvPowerSeries.coeff n G) - σ c' * ((p : K) ^ (i + 1))⁻¹)) := by
+    ring
   rw [key, norm_neg]
   exact norm_add_le_one hA hB
 
@@ -408,12 +454,15 @@ theorem StepIV_of (hW : DworkMv) : StepIV := by
     simp only [frobVar_eq_expand hp0, map_sub]
   have hmapG : MvPowerSeries.map σ (Gser p c (σ c)) = Gser p (σ c) c := by rw [map_Gser, hσc]
   have hfr := frobenius_expression_g K p c (σ c) hp hpK
-  have hDeS : frobVar p (MvPowerSeries.map σ G) - MvPowerSeries.C (p : K) * G =
-      MvPowerSeries.C (p : K) * DeS p σ G := by
+  have hDeS
+      : frobVar p (MvPowerSeries.map σ G) - MvPowerSeries.C (p : K) * G
+        = MvPowerSeries.C (p : K) * DeS p σ G := by
     unfold DeS
     rw [← mul_assoc, ← map_mul, mul_inv_cancel₀ hpK, map_one, one_mul]
-  have key : frobVar p (MvPowerSeries.map σ (G - Gser p c (σ c))) -
-      MvPowerSeries.C (p : K) * (G - Gser p c (σ c)) = MvPowerSeries.C (p : K) * Hser p σ G (σ c) (-c) := by
+  have key
+      : frobVar p (MvPowerSeries.map σ (G - Gser p c (σ c)))
+          - MvPowerSeries.C (p : K) * (G - Gser p c (σ c))
+        = MvPowerSeries.C (p : K) * Hser p σ G (σ c) (-c) := by
     rw [map_sub, hmapG, hfs]
     unfold Hser
     rw [map_neg]

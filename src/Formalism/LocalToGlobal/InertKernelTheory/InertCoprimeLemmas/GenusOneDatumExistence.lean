@@ -19,10 +19,14 @@ section Gen
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem mem_Wp_of_kur {x : ℂ_[p]} (hx : x ∈ Formalism.L2.Th1.CM.MaximalUnramifiedExtension p) (h1 : ‖x‖ ≤ 1) : x ∈ Wp p := by
+theorem mem_Wp_of_kur
+    {x : ℂ_[p]} (hx : x ∈ Formalism.L2.Th1.CM.MaximalUnramifiedExtension p) (h1 : ‖x‖ ≤ 1)
+    : x ∈ Wp p := by
   have hp : p.Prime := Fact.out
   have hB := ((Formalism.L2.Th1.D.kurIntegers p).1 x).2 ⟨hx, h1⟩
-  have hS : Formalism.L2.Th1.D.muPrime p = {ζ : ℂ_[p] | ∃ n : ℕ, 0 < n ∧ Nat.Coprime n p ∧ ζ ^ n = 1} := by
+  have hS
+      : Formalism.L2.Th1.D.muPrime p
+        = {ζ : ℂ_[p] | ∃ n : ℕ, 0 < n ∧ Nat.Coprime n p ∧ ζ ^ n = 1} := by
     ext ζ
     simp only [Formalism.L2.Th1.D.muPrime, Set.mem_ofPred_eq]
     constructor
@@ -65,7 +69,8 @@ theorem logF_eq : logF p = Formalism.L2.Th1.CM.ltLog ℂ_[p] p := by
     intro h'
     exact h ⟨j, by rw [h', pow_mul]⟩
 
-theorem isWq_wU (W : WeierstrassCurve ℂ_[p]) : Formalism.MainNotions.TaylorLogMetric.IsWq W (Formalism.L2.Th1.A.wU W) := by
+theorem isWq_wU (W : WeierstrassCurve ℂ_[p])
+    : Formalism.MainNotions.TaylorLogMetric.IsWq W (Formalism.L2.Th1.A.wU W) := by
   have hF := (Formalism.L2.Th1.A.CurveSer.wSer_fixed W).2
   rw [Formalism.L2.Th1.A.CurveSer.wSer_eq] at hF
   unfold Formalism.MainNotions.TaylorLogMetric.IsWq
@@ -75,11 +80,13 @@ theorem isWq_wU (W : WeierstrassCurve ℂ_[p]) : Formalism.MainNotions.TaylorLog
 
 theorem norm_four (h5 : 5 ≤ p) : ‖(4 : ℂ_[p])‖ = 1 := by
   have hp : p.Prime := Fact.out
-  have h := Formalism.DworkPowerSeriesWeights.norm_natCast_eq_one_of_not_dvd (K := ℂ_[p]) (m := 4) hp
-    (Formalism.L2.Th1.D.UnramifiedCompletion.normL_lt_one p) (by
-      intro hd
-      have := Nat.le_of_dvd (by norm_num) hd
-      omega)
+  have h :=
+    Formalism.DworkPowerSeriesWeights.norm_natCast_eq_one_of_not_dvd (K := ℂ_[p]) (m := 4) hp
+      (Formalism.L2.Th1.D.UnramifiedCompletion.normL_lt_one p)
+      (by
+        intro hd
+        have := Nat.le_of_dvd (by norm_num) hd
+        omega)
   exact_mod_cast h
 
 theorem datum_of_short (h5 : 5 ≤ p) (lam : Formalism.MainNotions.TaylorLogMetric.Qbar →+* ℂ_[p]) (Λ : AddSubgroup ℂ)
@@ -144,9 +151,9 @@ end Gen
 
 open NumberField Formalism.BasicNotions
 
-
 variable [Fact _root_.Formalism.L2.Th1.CM.CM2] in
-theorem genus_one_datum_exists (hInv : Formalism.L2.KerInert.Sigma.InvAlg) : Formalism.L2.KerInert.GenusOneModelExists := by
+theorem genus_one_datum_exists (hInv : Formalism.L2.KerInert.Sigma.InvAlg)
+    : Formalism.L2.KerInert.GenusOneModelExists := by
   intro D cc δ hcurve hδ12 p _ hcop h5 hIn lam
   have hp : p.Prime := Fact.out
   have hcc : cc ≠ ⊥ := hcurve.1
@@ -154,36 +161,48 @@ theorem genus_one_datum_exists (hInv : Formalism.L2.KerInert.Sigma.InvAlg) : For
   have hδ : δ ≠ 0 := by
     intro h0
     obtain ⟨⟨L1, hL1⟩, -⟩ := Formalism.L2.Th1.F2.lamOfLat D cc 1 hcc one_ne_zero
-    obtain ⟨e2, e3⟩ := Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.g2_g3_eq_periodPair _ L1 (congrArg (fun A : AddSubgroup ℂ => (A : Set ℂ)) hL1)
+    obtain ⟨e2, e3⟩ :=
+      Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.g2_g3_eq_periodPair _ L1
+        (congrArg (fun A : AddSubgroup ℂ => (A : Set ℂ)) hL1)
     have hd := Formalism.L2.Th1.F.discNeZero L1
     apply hd
     have h12 := hδ12
-    unfold Formalism.MainNotions.TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice Formalism.MainNotions.TaylorLogMetric.discr at h12
+    unfold Formalism.MainNotions.TaylorLogMetric.IsDiscriminantTwelfthRootOfIdealLattice
+        Formalism.MainNotions.TaylorLogMetric.discr
+      at h12
     rw [h0, e2, e3] at h12
-    rw [← h12]; norm_num
+    rw [← h12]
+    norm_num
 
   obtain ⟨⟨L, hL⟩, hCM⟩ := Formalism.L2.Th1.F2.lamOfLat D cc δ hcc hδ
   obtain ⟨hg2, hg3⟩ := hInv D cc δ hcurve hδ12 L hL
-  obtain ⟨e2, e3⟩ := Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.g2_g3_eq_periodPair _ L (congrArg (fun A : AddSubgroup ℂ => (A : Set ℂ)) hL)
+  obtain ⟨e2, e3⟩ :=
+    Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.B5.g2_g3_eq_periodPair _ L
+      (congrArg (fun A : AddSubgroup ℂ => (A : Set ℂ)) hL)
   set a2 : Formalism.MainNotions.TaylorLogMetric.Qbar := ⟨L.g₂, hg2⟩ with ha2
   set a3 : Formalism.MainNotions.TaylorLogMetric.Qbar := ⟨L.g₃, hg3⟩ with ha3
   obtain ⟨ι, hι⟩ := Formalism.L2.KerInert.lamExt p lam
 
   have hdp : D.host.d.Prime := D.host.hyp.2.1
   have hd4 : D.host.d % 4 = 3 := by have := D.host.hyp.2.2.2.1; omega
-  have hns : ¬ IsSquare ((-(D.host.d : ℤ) : ℤ) : ZMod p) := ZMod.nonsquare_of_jacobiSym_eq_neg_one hIn
+  have hns : ¬ IsSquare ((-(D.host.d : ℤ) : ℤ) : ZMod p) :=
+    ZMod.nonsquare_of_jacobiSym_eq_neg_one hIn
   have hsq' : ¬ ∃ a : ZMod p, a ^ 2 = -(D.host.d : ZMod p) := by
     rintro ⟨a, ha⟩; apply hns; exact ⟨a, by push_cast; rw [← ha]; ring⟩
   have hpd : ¬ p ∣ D.host.d := by
-    intro h; apply hsq'; refine ⟨0, ?_⟩
-    rw [(ZMod.natCast_eq_zero_iff _ _).2 h]; ring
+    intro h
+    apply hsq'
+    refine ⟨0, ?_⟩
+    rw [(ZMod.natCast_eq_zero_iff _ _).2 h]
+    ring
   have hcmby : Formalism.L2.Th1.CM.HasCMBy D.host.d L := by
     intro ω hω
     have h1 := hCM ω (by rw [← hL]; exact hω)
     rw [← hL] at h1
     have e : Formalism.L2.Th1.CM.omegaK D.host.d = Formalism.L2.Th1.F.cmTheta 1 D.host.d := by
       unfold Formalism.L2.Th1.CM.omegaK Formalism.L2.Th1.F.cmTheta; push_cast; ring
-    rw [e]; exact h1
+    rw [e]
+    exact h1
 
   obtain ⟨g2', g3', hGood⟩ := Formalism.L2.Th1.CM.cm2 D.host.d L hdp.squarefree hd4 hcmby p h5 hpd ι
   obtain ⟨ε, -, hε1, hεint⟩ :=
@@ -191,24 +210,48 @@ theorem genus_one_datum_exists (hInv : Formalism.L2.KerInert.Sigma.InvAlg) : For
   obtain ⟨k2, k3, n2, n3, nd, μ, hμ, hg2', hg3'⟩ := hGood
 
   let C : WeierstrassCurve.VariableChange ℂ_[p] := ⟨(Units.mk0 μ hμ)⁻¹, 0, 0, 0⟩
-  have ea4 : Formalism.MainNotions.TaylorLogMetric.lamC lam (-(Formalism.MainNotions.TaylorLogMetric.g2 (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)) / 4) = -(ι L.g₂) / 4 := by
-    have : -(Formalism.MainNotions.TaylorLogMetric.g2 (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)) / 4 = ((-a2 / 4 : Formalism.MainNotions.TaylorLogMetric.Qbar) : ℂ) := by
+  have ea4
+      : Formalism.MainNotions.TaylorLogMetric.lamC lam
+          (-(Formalism.MainNotions.TaylorLogMetric.g2 (Formalism.MainNotions.TaylorLogMetric.lamOf D
+              cc δ))
+            / 4)
+        = -(ι L.g₂) / 4 := by
+    have : -(Formalism.MainNotions.TaylorLogMetric.g2 (Formalism.MainNotions.TaylorLogMetric.lamOf D
+            cc δ))
+          / 4
+        = ((-a2 / 4 : Formalism.MainNotions.TaylorLogMetric.Qbar) : ℂ) := by
       rw [e2]; push_cast; rfl
     rw [this, Formalism.L2.KerInert.Sigma.lamC_coe, map_div₀, map_neg, map_ofNat, ← hι a2]
-  have ea6 : Formalism.MainNotions.TaylorLogMetric.lamC lam (-(Formalism.MainNotions.TaylorLogMetric.g3 (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)) / 4) = -(ι L.g₃) / 4 := by
-    have : -(Formalism.MainNotions.TaylorLogMetric.g3 (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)) / 4 = ((-a3 / 4 : Formalism.MainNotions.TaylorLogMetric.Qbar) : ℂ) := by
+  have ea6
+      : Formalism.MainNotions.TaylorLogMetric.lamC lam
+          (-(Formalism.MainNotions.TaylorLogMetric.g3 (Formalism.MainNotions.TaylorLogMetric.lamOf D
+              cc δ))
+            / 4)
+        = -(ι L.g₃) / 4 := by
+    have : -(Formalism.MainNotions.TaylorLogMetric.g3 (Formalism.MainNotions.TaylorLogMetric.lamOf D
+            cc δ))
+          / 4
+        = ((-a3 / 4 : Formalism.MainNotions.TaylorLogMetric.Qbar) : ℂ) := by
       rw [e3]; push_cast; rfl
     rw [this, Formalism.L2.KerInert.Sigma.lamC_coe, map_div₀, map_neg, map_ofNat, ← hι a3]
-  have hW : C • Formalism.MainNotions.TaylorLogMetric.wModel lam (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) = Formalism.L2.Th1.A.shortW g2' g3' := by
-    have hw : Formalism.MainNotions.TaylorLogMetric.wModel lam (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) = ⟨0, 0, 0, -(ι L.g₂) / 4, -(ι L.g₃) / 4⟩ := by
+  have hW
+      : C • Formalism.MainNotions.TaylorLogMetric.wModel lam
+          (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)
+        = Formalism.L2.Th1.A.shortW g2' g3' := by
+    have hw
+        : Formalism.MainNotions.TaylorLogMetric.wModel lam
+            (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ)
+          = ⟨0, 0, 0, -(ι L.g₂) / 4, -(ι L.g₃) / 4⟩ := by
       simp only [Formalism.MainNotions.TaylorLogMetric.wModel, ea4, ea6]
     rw [hw]
-    ext <;> simp [C, Formalism.L2.Th1.A.shortW, hg2', hg3', WeierstrassCurve.variableChange_a₁,
-      WeierstrassCurve.variableChange_a₂, WeierstrassCurve.variableChange_a₃, WeierstrassCurve.variableChange_a₄,
-      WeierstrassCurve.variableChange_a₆] <;> ring
+    ext
+      <;> simp [C, Formalism.L2.Th1.A.shortW, hg2', hg3', WeierstrassCurve.variableChange_a₁,
+        WeierstrassCurve.variableChange_a₂, WeierstrassCurve.variableChange_a₃,
+        WeierstrassCurve.variableChange_a₄, WeierstrassCurve.variableChange_a₆]
+      <;> ring
   obtain ⟨g, hgl, hgL, -, hOk, hM, hLT⟩ :=
-    datum_of_short h5 lam (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) C g2' g3' hW k2 k3 n2 n3 nd ε hε1 hεint
+    datum_of_short h5 lam (Formalism.MainNotions.TaylorLogMetric.lamOf D cc δ) C g2' g3' hW k2 k3 n2
+      n3 nd ε hε1 hεint
   exact ⟨g, hgl, ⟨hcurve, hcop, hδ12, hgL, hOk⟩, hM, hLT⟩
-
 
 end Formalism.L2.KerInert.GenusOneDatumExistence

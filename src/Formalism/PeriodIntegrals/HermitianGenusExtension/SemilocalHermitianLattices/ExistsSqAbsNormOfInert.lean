@@ -21,8 +21,8 @@ theorem conjO_conjO (x : 𝓞 K) : conjO K (conjO K x) = x := by
   apply RingOfIntegers.ext
   simp only [conjO_coe, star_star]
 
-theorem conjIdeal_eq_comap (P : Ideal (𝓞 K)) :
-    Formalism.HermitianLatticesTheory.conjIdeal (K := K) P = P.comap (conjO K) := by
+theorem conjIdeal_eq_comap (P : Ideal (𝓞 K))
+    : Formalism.HermitianLatticesTheory.conjIdeal (K := K) P = P.comap (conjO K) := by
   apply le_antisymm
   · rw [Formalism.HermitianLatticesTheory.conjIdeal, Ideal.span_le]
     rintro r ⟨s, hs, h⟩
@@ -40,8 +40,9 @@ theorem conjIdeal_eq_comap (P : Ideal (𝓞 K)) :
     show (r : K) = star ((conjO K r : 𝓞 K) : K)
     rw [conjO_coe, star_star]
 
-theorem exists_sub_conjO_notMem (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {P : Ideal (𝓞 K)} (hP : P.IsMaximal) :
-    ∃ θ : 𝓞 K, θ - conjO K θ ∉ P := by
+theorem exists_sub_conjO_notMem
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) {P : Ideal (𝓞 K)} (hP : P.IsMaximal)
+    : ∃ θ : 𝓞 K, θ - conjO K θ ∉ P := by
   obtain ⟨-, -, h3⟩ := hK
   obtain ⟨θ, t, ht, hθ⟩ := h3 P hP
   refine ⟨θ, ?_⟩

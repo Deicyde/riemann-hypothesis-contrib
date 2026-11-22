@@ -8,8 +8,10 @@ open TensorProduct nonZeroDivisors
 
 namespace GlobalTheory.SepIdem
 
-theorem formallyUnramified_of_isReduced (K A : Type) [Field K] [PerfectField K] [CommRing A]
-    [Algebra K A] [Module.Finite K A] [IsReduced A] : Algebra.FormallyUnramified K A := by
+theorem formallyUnramified_of_isReduced
+    (K A : Type)
+    [Field K] [PerfectField K] [CommRing A] [Algebra K A] [Module.Finite K A] [IsReduced A]
+    : Algebra.FormallyUnramified K A := by
   have : IsArtinianRing A := IsArtinianRing.of_finite K A
   have : Finite (MaximalSpectrum A) := inferInstance
   have h : Algebra.FormallyUnramified K (∀ I : MaximalSpectrum A, A ⧸ I.asIdeal) := by
@@ -20,13 +22,13 @@ theorem formallyUnramified_of_isReduced (K A : Type) [Field K] [PerfectField K] 
     exact Algebra.FormallyUnramified.of_isSeparable K _
   exact Algebra.FormallyUnramified.of_equiv ((IsArtinianRing.equivPi A).restrictScalars K).symm
 
-theorem exists_smul_kaehler_eq_zero (O : Type) [CommRing O] [Module.Finite ℤ O] [IsReduced O] :
-    ∃ N : ℕ, 0 < N ∧ ∀ ω : Ω[O⁄ℤ], (N : O) • ω = 0 := by
+theorem exists_smul_kaehler_eq_zero (O : Type) [CommRing O] [Module.Finite ℤ O] [IsReduced O]
+    : ∃ N : ℕ, 0 < N ∧ ∀ ω : Ω[O⁄ℤ], (N : O) • ω = 0 := by
   let A := ℚ ⊗[ℤ] O
   letI : Algebra O A := Algebra.TensorProduct.rightAlgebra
-  have hloc : IsLocalization (Algebra.algebraMapSubmonoid O ℤ⁰) A :=
-    IsLocalization.tensorRight ℚ ℤ⁰
-  have : IsReduced A := isReduced_localizationPreserves (Algebra.algebraMapSubmonoid O ℤ⁰) A inferInstance
+  have hloc : IsLocalization (Algebra.algebraMapSubmonoid O ℤ⁰) A := IsLocalization.tensorRight ℚ ℤ⁰
+  have : IsReduced A :=
+    isReduced_localizationPreserves (Algebra.algebraMapSubmonoid O ℤ⁰) A inferInstance
   have : Algebra.FormallyUnramified ℚ A := formallyUnramified_of_isReduced ℚ A
   have : Algebra.FormallyUnramified ℤ ℚ := Algebra.FormallyUnramified.of_isLocalization ℤ⁰
   have hA : Algebra.FormallyUnramified ℤ A := Algebra.FormallyUnramified.comp ℤ ℚ A
@@ -55,10 +57,11 @@ theorem exists_smul_kaehler_eq_zero (O : Type) [CommRing O] [Module.Finite ℤ O
   | add x y _ _ hx hy => rw [smul_add, hx, hy, add_zero]
   | smul a x _ hx => rw [smul_comm, hx, smul_zero]
 
-theorem exists_separability_element (O : Type) [CommRing O] [Module.Free ℤ O] [Module.Finite ℤ O]
-    [IsReduced O] :
-    ∃ (N : ℕ) (e : TensorProduct ℤ O O), 0 < N ∧ Algebra.TensorProduct.lmul' ℤ e = (N : O) ∧
-      ∀ c : O, (TensorProduct.tmul ℤ c (1 : O) - TensorProduct.tmul ℤ (1 : O) c) * e = 0 := by
+theorem exists_separability_element
+    (O : Type) [CommRing O] [Module.Free ℤ O] [Module.Finite ℤ O] [IsReduced O]
+    : ∃ (N : ℕ) (e : TensorProduct ℤ O O),
+      0 < N ∧ Algebra.TensorProduct.lmul' ℤ e = (N : O)
+        ∧ ∀ c : O, (TensorProduct.tmul ℤ c (1 : O) - TensorProduct.tmul ℤ (1 : O) c) * e = 0 := by
   obtain ⟨N, hN, hΩ⟩ := exists_smul_kaehler_eq_zero O
   set I := KaehlerDifferential.ideal ℤ O with hI
   have hfg : I.FG := KaehlerDifferential.ideal_fg ℤ O
@@ -72,15 +75,18 @@ theorem exists_separability_element (O : Type) [CommRing O] [Module.Free ℤ O] 
     exact (Ideal.toCotangent_eq_zero I _).1 h2
   obtain ⟨p, hp, -, hc, h0⟩ :=
     LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero (O ⊗[ℤ] O)
-      (algebraMap (O ⊗[ℤ] O) (Module.End (O ⊗[ℤ] O) I) (N : O ⊗[ℤ] O)) I (by
+      (algebraMap (O ⊗[ℤ] O) (Module.End (O ⊗[ℤ] O) I) (N : O ⊗[ℤ] O)) I
+      (by
         rintro _ ⟨⟨x, hx⟩, rfl⟩
         rw [Submodule.mem_smul_top_iff, smul_eq_mul, ← pow_two]
         exact hsq x hx)
   rw [Polynomial.aeval_algebraMap_apply] at h0
   refine ⟨N ^ p.natDegree, Polynomial.aeval (N : O ⊗[ℤ] O) p, pow_pos hN _, ?_, fun c => ?_⟩
   set_option synthInstance.maxHeartbeats 100000 in
-    · have hz : ∑ k ∈ Finset.range p.natDegree,
-          Algebra.TensorProduct.lmul' ℤ (p.coeff k • (N : O ⊗[ℤ] O) ^ k) = 0 := by
+    · have hz
+          : ∑ k ∈ Finset.range p.natDegree,
+              Algebra.TensorProduct.lmul' ℤ (p.coeff k • (N : O ⊗[ℤ] O) ^ k)
+            = 0 := by
         apply Finset.sum_eq_zero
         intro k hk
         have : p.coeff k ∈ I :=

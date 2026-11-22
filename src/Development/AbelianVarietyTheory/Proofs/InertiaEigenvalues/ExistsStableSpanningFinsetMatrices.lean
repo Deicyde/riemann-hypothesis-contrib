@@ -10,11 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlSpanI
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 namespace GlobalTheory
 
-theorem exists_stable_spanning_finset : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ] (a : ℕ) (ρ : Γ →* GL (Fin a) (Om l)) (L : FinExt l), Continuous ρ → (∀ g i j, (ρ g).val i j ∈ L.1) → ∃ t : Finset (Matrix (Fin a) (Fin a) (Om l)), (∀ x ∈ t, ∀ i j, x i j ∈ L.1) ∧ (∀ x : Matrix (Fin a) (Fin a) (Om l), (∀ i j, x i j ∈ L.1) → x ∈ Submodule.span ℚ_[l] (t : Set (Matrix (Fin a) (Fin a) (Om l)))) ∧ (∃ c : Matrix (Fin a) (Fin a) (Om l) → ℤ_[l], ∑ y ∈ t, zOm l (c y) • y = 1) ∧ ∀ g, ∀ x ∈ t, ∃ c : Matrix (Fin a) (Fin a) (Om l) → ℤ_[l], (ρ g).val * x = ∑ y ∈ t, zOm l (c y) • y := by
+theorem exists_stable_spanning_finset
+    : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+        [CompactSpace Γ] (a : ℕ) (ρ : Γ →* GL (Fin a) (Om l)) (L : FinExt l),
+      Continuous ρ → (∀ g i j, (ρ g).val i j ∈ L.1)
+        → ∃ t : Finset (Matrix (Fin a) (Fin a) (Om l)),
+          (∀ x ∈ t, ∀ i j, x i j ∈ L.1)
+            ∧ (∀ x : Matrix (Fin a) (Fin a) (Om l),
+              (∀ i j, x i j ∈ L.1)
+                → x ∈ Submodule.span ℚ_[l] (t : Set (Matrix (Fin a) (Fin a) (Om l))))
+            ∧ (∃ c : Matrix (Fin a) (Fin a) (Om l) → ℤ_[l], ∑ y ∈ t, zOm l (c y) • y = 1)
+            ∧ ∀ g, ∀ x ∈ t, ∃ c : Matrix (Fin a) (Fin a) (Om l) → ℤ_[l],
+              (ρ g).val * x = ∑ y ∈ t, zOm l (c y) • y := by
   intro l _ Γ _ _ _ _ a ρ L hρ hL
   classical
   obtain ⟨t₀, ht₀⟩ := zl_span_image_finite l Γ a ρ hρ
@@ -63,26 +77,31 @@ theorem exists_stable_spanning_finset : ∀ (l : ℕ) [Fact l.Prime] (Γ : Type)
     obtain ⟨⟨h, b⟩, hp, rfl⟩ := Finset.mem_image.mp hx
     have hb := (Finset.mem_product.mp hp).2
     obtain ⟨f', hf'sup, hf'⟩ := ht₀ (Finsupp.single (g * h) 1)
-    have hgh : ((ρ (g * h) : GL (Fin a) (Om l)) : Matrix (Fin a) (Fin a) (Om l)) =
-        f'.sum fun k c => ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l])) •
-          ((ρ k : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) := by
+    have hgh
+        : ((ρ (g * h) : GL (Fin a) (Om l)) : Matrix (Fin a) (Fin a) (Om l))
+          = f'.sum fun k c =>
+            ((algebraMap ℚ_[l] (PadicAlgCl l)) (c : ℚ_[l]))
+              • ((ρ k : GL (Fin a) (PadicAlgCl l)) : Matrix (Fin a) (Fin a) (PadicAlgCl l)) := by
       rw [← hf', Finsupp.sum_single_index (by simp)]
       simp
     refine ⟨fun y => ∑ k ∈ f'.support with (ρ k).val * b = y, f' k, ?_⟩
     have hmaps : ∀ k ∈ f'.support, (ρ k).val * b ∈ t := fun k hk =>
       hmemt k (Finset.mem_insert_of_mem (hf'sup hk)) b hb
-    calc (ρ g).val * ((ρ h).val * b) = (ρ (g * h)).val * b := by rw [map_mul, Units.val_mul, Matrix.mul_assoc]
+    calc
+      (ρ g).val * ((ρ h).val * b)
+        = (ρ (g * h)).val * b := by rw [map_mul, Units.val_mul, Matrix.mul_assoc]
       _ = ∑ k ∈ f'.support, zOm l (f' k) • ((ρ k).val * b) := by
-          rw [hgh, Finsupp.sum, Finset.sum_mul]
-          refine Finset.sum_congr rfl fun k _ => ?_
-          rw [Matrix.smul_mul]; rfl
+        rw [hgh, Finsupp.sum, Finset.sum_mul]
+        refine Finset.sum_congr rfl fun k _ => ?_
+        rw [Matrix.smul_mul]
+        rfl
       _ = ∑ y ∈ t, ∑ k ∈ f'.support with (ρ k).val * b = y, zOm l (f' k) • ((ρ k).val * b) :=
-          (Finset.sum_fiberwise_of_maps_to hmaps _).symm
+        (Finset.sum_fiberwise_of_maps_to hmaps _).symm
       _ = ∑ y ∈ t, zOm l (∑ k ∈ f'.support with (ρ k).val * b = y, f' k) • y := by
-          refine Finset.sum_congr rfl fun y _ => ?_
-          set_option synthInstance.maxHeartbeats 100000 in
-            rw [map_sum, Finset.sum_smul]
-          refine Finset.sum_congr rfl fun k hk => ?_
-          rw [(Finset.mem_filter.mp hk).2]
+        refine Finset.sum_congr rfl fun y _ => ?_
+        set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum, Finset.sum_smul]
+        refine Finset.sum_congr rfl fun k hk => ?_
+        rw [(Finset.mem_filter.mp hk).2]
 
 end GlobalTheory

@@ -67,9 +67,12 @@ theorem Orient_holds : Orient := pOrient TraceType_holds HdSign_holds
 theorem RealIso_holds : RealIso := pRealIso TraceType_holds
 theorem SigSt_holds : SigSt := pSigSt HdSign_holds
 theorem AtPEx_holds : AtPEx := pAtPEx KqEx_holds UEx_holds OrbEx_holds LiftEx_holds
-theorem DomSt_holds : DomSt := pDomSt TraceType_holds RealIso_holds FormCoord_holds HdSign_holds DiagTrace_holds
+theorem DomSt_holds : DomSt :=
+  pDomSt TraceType_holds RealIso_holds FormCoord_holds HdSign_holds DiagTrace_holds
 theorem PosGen_holds : PosGen := pPosGen CodiffUnit_holds
 theorem RealGen_holds : RealGen := pRealGen CodiffGen_holds CodiffUnit_holds
-theorem SetupEx_holds : SetupEx := pSetupEx FormOKSt_holds FormPerfSt_holds SigSt_holds DomSt_holds AtPEx_holds RepEx_holds RepLaws_holds RepAdj_holds Orient_holds
+theorem SetupEx_holds : SetupEx :=
+  pSetupEx FormOKSt_holds FormPerfSt_holds SigSt_holds DomSt_holds AtPEx_holds RepEx_holds
+    RepLaws_holds RepAdj_holds Orient_holds
 
 end UpperTheory.Gal.W2.Seed

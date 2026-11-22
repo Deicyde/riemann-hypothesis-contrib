@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ChiOnto
 
 @[expose] public section
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc
 
 namespace GlobalTheory.TorsionCard
 
@@ -19,22 +20,20 @@ noncomputable def red (l : ℕ) [Fact l.Prime] : ℤ_[l]ˣ →* (ZMod l)ˣ :=
 
 theorem red_val (x : ℤ_[l]ˣ) : (red l x : ZMod l) = PadicInt.toZMod (x : ℤ_[l]) := rfl
 
-theorem eq_one_of_red (h2 : l ≠ 2) (x : ℤ_[l]ˣ) (hx : IsOfFinOrder x) (h1 : red l x = 1) :
-    x = 1 := by
+theorem eq_one_of_red (h2 : l ≠ 2) (x : ℤ_[l]ˣ) (hx : IsOfFinOrder x) (h1 : red l x = 1)
+    : x = 1 := by
   have hpos : 0 < orderOf x := hx.orderOf_pos
   have hpow : ((x : ℤ_[l])) ^ orderOf x = 1 := by
     rw [← Units.val_pow_eq_pow_val, pow_orderOf_eq_one, Units.val_one]
-  have hred : PadicInt.toZMod (x : ℤ_[l]) = 1 := by
-    rw [← red_val, h1, Units.val_one]
-  exact Units.ext (GlobalTheory.padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one h2 _ hpos.ne' hpow hred)
+  have hred : PadicInt.toZMod (x : ℤ_[l]) = 1 := by rw [← red_val, h1, Units.val_one]
+  exact Units.ext (GlobalTheory.padicInt_eq_one_of_pow_eq_one_of_toZMod_eq_one h2 _ hpos.ne' hpow
+    hred)
 
-theorem exists_lift (h2 : l ≠ 2) (u : (ZMod l)ˣ) :
-    ∃ x : ℤ_[l]ˣ, IsOfFinOrder x ∧ red l x = u := by
+theorem exists_lift (h2 : l ≠ 2) (u : (ZMod l)ˣ) : ∃ x : ℤ_[l]ˣ, IsOfFinOrder x ∧ red l x = u := by
   classical
   have hl3 : 2 < l := lt_of_le_of_ne hl.out.two_le (Ne.symm h2)
   set a : ℤ_[l] := ((u : ZMod l).val : ℤ_[l]) with ha
-  have hred_a : PadicInt.toZMod a = (u : ZMod l) := by
-    rw [ha, map_natCast, ZMod.natCast_zmod_val]
+  have hred_a : PadicInt.toZMod a = (u : ZMod l) := by rw [ha, map_natCast, ZMod.natCast_zmod_val]
   have norm_of : ∀ y : ℤ_[l], PadicInt.toZMod y ≠ 0 → ‖y‖ = 1 := by
     intro y hy
     by_contra hne
@@ -78,9 +77,11 @@ theorem exists_lift (h2 : l ≠ 2) (u : (ZMod l)ˣ) :
     change ‖z - a‖ < 1 at hza
     linarith
 
-theorem card_torsion (h2 : l ≠ 2) {Γ : Type} [Group Γ] (χ : Γ →* ℤ_[l]ˣ)
-    (hχ : Function.Injective χ) (hk : ∀ x, red l x = 1 → x ∈ χ.range) :
-    Nat.card {g : Γ // IsOfFinOrder g} = Nat.card ((red l).comp χ).range := by
+theorem card_torsion
+    (h2 : l ≠ 2)
+    {Γ : Type} [Group Γ]
+    (χ : Γ →* ℤ_[l]ˣ) (hχ : Function.Injective χ) (hk : ∀ x, red l x = 1 → x ∈ χ.range)
+    : Nat.card {g : Γ // IsOfFinOrder g} = Nat.card ((red l).comp χ).range := by
   classical
   have hcomm : ∀ a b : Γ, a * b = b * a := fun a b => hχ (by rw [map_mul, map_mul, mul_comm])
   have hfin : ∀ g : Γ, IsOfFinOrder (χ g) ↔ IsOfFinOrder g := fun g => by
@@ -106,21 +107,28 @@ theorem card_torsion (h2 : l ≠ 2) {Γ : Type} [Group Γ] (χ : Γ →* ℤ_[l]
     change red l (χ (g * k⁻¹)) = red l (χ g)
     rw [hgk, hxu]
 
-theorem exists_chi (P : LocPrime l) :
-    ∃ χ : GQ l →* ℤ_[l]ˣ, ∀ g, ((χ g : ℤ_[l]) : ℚ_[l]) = (P.χQ g : ℚ_[l]) := by
+theorem exists_chi (P : LocPrime l)
+    : ∃ χ : GQ l →* ℤ_[l]ˣ, ∀ g, ((χ g : ℤ_[l]) : ℚ_[l]) = (P.χQ g : ℚ_[l]) := by
   have hn := GlobalTheory.Cyc.IsCyc.norm_eq_one P.χQ_cyc
-  refine ⟨{ toFun := fun g => PadicInt.mkUnits (hn g), map_one' := ?_, map_mul' := ?_ },
-    fun g => PadicInt.mkUnits_eq (hn g)⟩
-  · apply Units.ext; apply PadicInt.ext
+  refine ⟨
+    { toFun := fun g => PadicInt.mkUnits (hn g), map_one' := ?_, map_mul' := ?_ },
+    fun g => PadicInt.mkUnits_eq (hn g)
+  ⟩
+  · apply Units.ext
+    apply PadicInt.ext
     simp
-  · intro a b; apply Units.ext; apply PadicInt.ext
+  · intro a b
+    apply Units.ext
+    apply PadicInt.ext
     simp only [Units.val_mul, PadicInt.coe_mul, PadicInt.mkUnits_eq, map_mul]
 
-theorem finrank_eq_relIndex (K : FinExt l) :
-    Module.finrank ↥(K0 K) ↥K.1 = (GK K).relIndex (K0 K).fixingSubgroup := by
+theorem finrank_eq_relIndex (K : FinExt l)
+    : Module.finrank ↥(K0 K) ↥K.1 = (GK K).relIndex (K0 K).fixingSubgroup := by
   have hle : K0 K ≤ K.1 := inf_le_left
   have : FiniteDimensional ℚ_[l] K.1 := K.2
-  have : FiniteDimensional ℚ_[l] (K0 K) := FiniteDimensional.of_injective (IntermediateField.inclusion hle).toLinearMap (IntermediateField.inclusion_injective hle)
+  have : FiniteDimensional ℚ_[l] (K0 K) :=
+    FiniteDimensional.of_injective (IntermediateField.inclusion hle).toLinearMap
+      (IntermediateField.inclusion_injective hle)
   have h1 := IntermediateField.finrank_eq_fixingSubgroup_index (E' := Om l) K.1
   have h2 := IntermediateField.finrank_eq_fixingSubgroup_index (E' := Om l) (K0 K)
   have h3 := Subgroup.relIndex_mul_index (IntermediateField.fixingSubgroup_le hle)
@@ -131,9 +139,11 @@ theorem finrank_eq_relIndex (K : FinExt l) :
   rw [← h4, mul_comm] at h3
   exact (Nat.eq_of_mul_eq_mul_left hpos h3).symm
 
-
 set_option maxHeartbeats 800000 in
-theorem card_torsion_mul_finrank : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) {n : ℕ} (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) n), l ≠ 2 → K.1 ≤ Ks K 1 → W.DelF.card * Module.finrank ↥(K0 K) ↥K.1 = l - 1 := by
+theorem card_torsion_mul_finrank
+    : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (K LL : FinExt l) {n : ℕ}
+        (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) n),
+      l ≠ 2 → K.1 ≤ Ks K 1 → W.DelF.card * Module.finrank ↥(K0 K) ↥K.1 = l - 1 := by
   intro l _ P K LL n W h2 hK
   classical
   obtain ⟨χ, hχ⟩ := exists_chi P

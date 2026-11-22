@@ -9,21 +9,26 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.MemPadi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
-local notation "OO" p:max => (Valuation.valuationSubring (Valued.v : Valuation (PadicAlgCl p) NNReal))
+local notation "OO" p:max =>
+  (Valuation.valuationSubring (Valued.v : Valuation (PadicAlgCl p) NNReal))
 local notation "cPt" p:max => (IsLocalRing.closedPoint (OO p) : Sp (OO p))
 local notation "gPt" p:max => spMap (ValuationSubring.subtype (OO p))
 
 namespace GlobalTheory
 
-theorem exists_ringHom_extend_of_isIntegral_of_injective {R B Ω : Type*} [CommRing R] [CommRing B]
-    [Algebra R B] [Algebra.IsIntegral R B] [FaithfulSMul R B] [Field Ω] [IsAlgClosed Ω]
-    (φ : R →+* Ω) : ∃ ψ : B →+* Ω, ψ.comp (algebraMap R B) = φ := by
+theorem exists_ringHom_extend_of_isIntegral_of_injective
+    {R B Ω : Type*} [CommRing R] [CommRing B] [Algebra R B] [Algebra.IsIntegral R B]
+    [FaithfulSMul R B] [Field Ω] [IsAlgClosed Ω]
+    (φ : R →+* Ω)
+    : ∃ ψ : B →+* Ω, ψ.comp (algebraMap R B) = φ := by
   haveI := RingHom.ker_isPrime φ
-  obtain ⟨Q, -, hQ, hQP⟩ := Ideal.exists_ideal_over_prime_of_isIntegral (S := B)
-    (RingHom.ker φ) ⊥ (by
-      rw [(show Ideal.under _ ⊥ = ⊥ from Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective R B))]
+  obtain ⟨Q, -, hQ, hQP⟩ :=
+    Ideal.exists_ideal_over_prime_of_isIntegral (S := B) (RingHom.ker φ) ⊥ (by
+      rw [(show Ideal.under _ ⊥ = ⊥ from
+        Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective R B))]
       exact bot_le)
   haveI : Q.LiesOver (RingHom.ker φ) := ⟨hQP.symm⟩
   letI : Algebra (R ⧸ RingHom.ker φ) Ω := (RingHom.kerLift φ).toAlgebra
@@ -36,19 +41,18 @@ theorem exists_ringHom_extend_of_isIntegral_of_injective {R B Ω : Type*} [CommR
   haveI : Algebra.IsAlgebraic (R ⧸ RingHom.ker φ) (B ⧸ Q) := Algebra.IsIntegral.isAlgebraic
   let σ : (B ⧸ Q) →ₐ[R ⧸ RingHom.ker φ] Ω := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   refine ⟨σ.toRingHom.comp (Ideal.Quotient.mk Q), RingHom.ext fun r => ?_⟩
   exact (σ.commutes (Ideal.Quotient.mk _ r)).trans (RingHom.kerLift_mk φ r)
 
-theorem bijective_algebraMap_of_subsingleton_algHom {R A : Type*} [CommRing R] [IsDomain R]
-    [IsIntegrallyClosed R] [CharZero R] [CommRing A] [IsReduced A] [Nontrivial A] [Algebra R A]
-    [Algebra.IsIntegral R A]
-    (hgen : ∀ P : Ideal A, P.IsPrime → ∃ Q : Ideal A, Q.IsPrime ∧ Q ≤ P ∧
-      Q.comap (algebraMap R A) = ⊥)
-    (huniq : ∀ σ τ : A →ₐ[R] AlgebraicClosure (FractionRing R), σ = τ) :
-    Function.Bijective (algebraMap R A) := by
+theorem bijective_algebraMap_of_subsingleton_algHom
+    {R A : Type*} [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [CharZero R] [CommRing A]
+    [IsReduced A] [Nontrivial A] [Algebra R A] [Algebra.IsIntegral R A]
+    (hgen
+      : ∀ P : Ideal A, P.IsPrime → ∃ Q : Ideal A, Q.IsPrime ∧ Q ≤ P ∧ Q.comap (algebraMap R A) = ⊥)
+    (huniq : ∀ σ τ : A →ₐ[R] AlgebraicClosure (FractionRing R), σ = τ)
+    : Function.Bijective (algebraMap R A) := by
   let K := FractionRing R
   let L := AlgebraicClosure K
   have hRL : Function.Injective (algebraMap R L) := by
@@ -56,11 +60,13 @@ theorem bijective_algebraMap_of_subsingleton_algHom {R A : Type*} [CommRing R] [
     exact (algebraMap K L).injective.comp (IsFractionRing.injective R K)
   haveI : FaithfulSMul R L := (faithfulSMul_iff_algebraMap_injective _ _).mpr hRL
   haveI : Module.IsTorsionFree R L := FaithfulSMul.to_isTorsionFree _ _
-  have hex : ∀ Q : Ideal A, Q.IsPrime → Q.comap (algebraMap R A) = ⊥ →
-      ∃ σ : A →ₐ[R] L, RingHom.ker σ = Q := by
+  have hex
+      : ∀ Q : Ideal A,
+        Q.IsPrime → Q.comap (algebraMap R A) = ⊥ → ∃ σ : A →ₐ[R] L, RingHom.ker σ = Q := by
     intro Q hQ hQ0
     have hinj : Function.Injective (algebraMap R (A ⧸ Q)) := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro r hr
       have : r ∈ Q.comap (algebraMap R A) := by
         rw [Ideal.mem_comap, ← Ideal.Quotient.eq_zero_iff_mem]
@@ -70,15 +76,16 @@ theorem bijective_algebraMap_of_subsingleton_algHom {R A : Type*} [CommRing R] [
     haveI : Module.IsTorsionFree R (A ⧸ Q) := FaithfulSMul.to_isTorsionFree R _
     let σ₀ : (A ⧸ Q) →ₐ[R] L := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     have h₀ : Function.Injective σ₀ := by
-      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+      set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+        rw [injective_iff_map_eq_zero]
       intro a ha
       by_contra h
-      obtain ⟨r, hr, c, hc⟩ := (Algebra.IsIntegral.isIntegral (R := R) a).isAlgebraic.exists_nonzero_dvd
-        (mem_nonZeroDivisors_of_ne_zero h)
+      obtain ⟨r, hr, c, hc⟩ :=
+        (Algebra.IsIntegral.isIntegral (R := R) a).isAlgebraic.exists_nonzero_dvd
+          (mem_nonZeroDivisors_of_ne_zero h)
       apply hr
       apply hRL
       rw [map_zero, ← σ₀.commutes, hc, map_mul, ha, zero_mul]
@@ -90,7 +97,8 @@ theorem bijective_algebraMap_of_subsingleton_algHom {R A : Type*} [CommRing R] [
   obtain ⟨Q₀, hQ₀, -, hQ₀0⟩ := hgen M hM.isPrime
   obtain ⟨σ, -⟩ := hex Q₀ hQ₀ hQ₀0
   have hσ : Function.Injective σ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro a ha
     apply IsNilpotent.eq_zero
     rw [← mem_nilradical, nilradical_eq_sInf, Submodule.mem_sInf]
@@ -105,8 +113,9 @@ theorem bijective_algebraMap_of_subsingleton_algHom {R A : Type*} [CommRing R] [
     apply hRL
     rw [← σ.commutes, ← σ.commutes, h]
   · intro a
-    obtain ⟨k, hk⟩ := (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := K) (σ a)).2 fun g =>
-      DFunLike.congr_fun (huniq ((g.toAlgHom.restrictScalars R).comp σ) σ) a
+    obtain ⟨k, hk⟩ :=
+      (InfiniteGalois.mem_range_algebraMap_iff_fixed (k := K) (σ a)).2 fun g =>
+        DFunLike.congr_fun (huniq ((g.toAlgHom.restrictScalars R).comp σ) σ) a
     have hint : IsIntegral R k := by
       rw [← isIntegral_algebraMap_iff (B := L), hk]
       exact (Algebra.IsIntegral.isIntegral (R := R) a).map σ
@@ -114,12 +123,15 @@ theorem bijective_algebraMap_of_subsingleton_algHom {R A : Type*} [CommRing R] [
     refine ⟨r, hσ ?_⟩
     rw [σ.commutes, ← hk, ← hr, ← IsScalarTower.algebraMap_apply]
 
-theorem exists_ne_zero_forall_exists_two_lifts {R A : Type*} [CommRing R] [IsDomain R]
-    [CommRing A] [Algebra R A] [Algebra.IsIntegral R A]
-    (σ τ : A →ₐ[R] AlgebraicClosure (FractionRing R)) (hne : σ ≠ τ) :
-    ∃ r : R, r ≠ 0 ∧ ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (O : ValuationSubring Ω)
-      (φ : R →+* O), φ r ≠ 0 → ∃ ψ ψ' : A →+* O, ψ.comp (algebraMap R A) = φ ∧
-        ψ'.comp (algebraMap R A) = φ ∧ ψ ≠ ψ' := by
+theorem exists_ne_zero_forall_exists_two_lifts
+    {R A : Type*} [CommRing R] [IsDomain R] [CommRing A] [Algebra R A] [Algebra.IsIntegral R A]
+    (σ τ : A →ₐ[R] AlgebraicClosure (FractionRing R)) (hne : σ ≠ τ)
+    : ∃ r : R,
+      r ≠ 0
+        ∧ ∀ (Ω : Type) [Field Ω] [IsAlgClosed Ω] (O : ValuationSubring Ω) (φ : R →+* O),
+          φ r ≠ 0
+            → ∃ ψ ψ' : A →+* O,
+              ψ.comp (algebraMap R A) = φ ∧ ψ'.comp (algebraMap R A) = φ ∧ ψ ≠ ψ' := by
   let K := FractionRing R
   let L := AlgebraicClosure K
   have hRL : Function.Injective (algebraMap R L) := by
@@ -152,16 +164,19 @@ theorem exists_ne_zero_forall_exists_two_lifts {R A : Type*} [CommRing R] [IsDom
   change (φ r : Ω) = 0
   rw [← hχ', hd, χ.map_mul, χ.map_sub, h₂, sub_self, zero_mul]
 
-theorem exists_mem_genericPoints_specializes {T : Type*} [TopologicalSpace T] [QuasiSober T]
-    (w : T) : ∃ w₀ ∈ genericPoints T, w₀ ⤳ w :=
-  ⟨_, (genericPoints.ofComponent ⟨_, irreducibleComponent_mem_irreducibleComponents w⟩).2,
-    (genericPoints.isGenericPoint_ofComponent
-      ⟨_, irreducibleComponent_mem_irreducibleComponents w⟩).specializes mem_irreducibleComponent⟩
+theorem exists_mem_genericPoints_specializes {T : Type*} [TopologicalSpace T] [QuasiSober T] (w : T)
+    : ∃ w₀ ∈ genericPoints T, w₀ ⤳ w := ⟨
+  _,
+  (genericPoints.ofComponent ⟨_, irreducibleComponent_mem_irreducibleComponents w⟩).2,
+  (genericPoints.isGenericPoint_ofComponent
+    ⟨_, irreducibleComponent_mem_irreducibleComponents w⟩).specializes mem_irreducibleComponent
+⟩
 
-theorem exists_factor_of_isLocalRing_of_mem_affineOpen {R : CommRingCat.{0}} [IsLocalRing R]
-    {X : Scheme.{0}} (y : Spec R ⟶ X) {V : X.Opens} (hV : IsAffineOpen V)
-    (hz : y (IsLocalRing.closedPoint R) ∈ V) :
-    ∃ φ : Γ(X, V) ⟶ R, Spec.map φ ≫ hV.fromSpec = y := by
+theorem exists_factor_of_isLocalRing_of_mem_affineOpen
+    {R : CommRingCat.{0}} [IsLocalRing R]
+    {X : Scheme.{0}} (y : Spec R ⟶ X)
+    {V : X.Opens} (hV : IsAffineOpen V) (hz : y (IsLocalRing.closedPoint R) ∈ V)
+    : ∃ φ : Γ(X, V) ⟶ R, Spec.map φ ≫ hV.fromSpec = y := by
   have hr : Set.range y ⊆ Set.range hV.fromSpec := by
     rw [hV.range_fromSpec]
     rintro _ ⟨x, rfl⟩
@@ -170,13 +185,16 @@ theorem exists_factor_of_isLocalRing_of_mem_affineOpen {R : CommRingCat.{0}} [Is
   refine ⟨Spec.preimage (IsOpenImmersion.lift hV.fromSpec y hr), ?_⟩
   rw [Spec.map_preimage, IsOpenImmersion.lift_fac]
 
-theorem isIso_of_isFinite_of_unique_lift_of_classical_points :
-    ∀ (X : Scheme.{0}) [IsIntegral X] (π : X ⟶ Sp ℤ) [Flat π] [LocallyOfFiniteType π],
-      IsNormalScheme X → ∀ (W : Scheme.{0}) [IsReduced W] [Nonempty W] (f : W ⟶ X) [IsFinite f],
-        (∀ w ∈ genericPoints W, f w = genericPoint X) → ∀ (x : X) (U : X.Opens),
-          IsClosed ({x} : Set X) → (U : Set X).Nonempty →
-            (∀ (p : ℕ) [Fact p.Prime] (a a' : Sp (OO p) ⟶ W), a ≫ f = a' ≫ f →
-              (a ≫ f) (cPt p) = x → Set.range (gPt p ≫ a ≫ f) ⊆ U → a = a') → IsIso f := by
+theorem isIso_of_isFinite_of_unique_lift_of_classical_points
+    : ∀ (X : Scheme.{0}) [IsIntegral X] (π : X ⟶ Sp ℤ) [Flat π] [LocallyOfFiniteType π],
+      IsNormalScheme X
+        → ∀ (W : Scheme.{0}) [IsReduced W] [Nonempty W] (f : W ⟶ X) [IsFinite f],
+          (∀ w ∈ genericPoints W, f w = genericPoint X)
+            → ∀ (x : X) (U : X.Opens),
+              IsClosed ({x} : Set X) → (U : Set X).Nonempty
+                → (∀ (p : ℕ) [Fact p.Prime] (a a' : Sp (OO p) ⟶ W),
+                  a ≫ f = a' ≫ f → (a ≫ f) (cPt p) = x → Set.range (gPt p ≫ a ≫ f) ⊆ U → a = a')
+                → IsIso f := by
   intro X _ π _ _ hN W _ hW f _ hgen x U hx hU huniq
   have hN' : ∀ y : X, IsIntegrallyClosed (X.presheaf.stalk y) := fun y => (hN y).2
   obtain ⟨V, hV, hxV, -⟩ := exists_isAffineOpen_mem_and_subset (U := ⊤) (x := x) trivial
@@ -197,24 +215,29 @@ theorem isIso_of_isFinite_of_unique_lift_of_classical_points :
     rw [Scheme.Hom.app_eq_appLE]
     exact IsAffineOpen.SpecMap_appLE_fromSpec f hV hV' le_rfl
 
-  have hpt : ∀ r : Γ(X, V), r ≠ 0 → ∃ (p : ℕ) (_ : Fact p.Prime)
-      (φ : Γ(X, V) ⟶ CommRingCat.of (OO p)), φ.hom r ≠ 0 ∧
-        (Spec.map φ ≫ hV.fromSpec) (cPt p) = x ∧
-          Set.range (gPt p ≫ Spec.map φ ≫ hV.fromSpec) ⊆ U := by
+  have hpt
+      : ∀ r : Γ(X, V),
+        r ≠ 0
+          → ∃ (p : ℕ) (_ : Fact p.Prime) (φ : Γ(X, V) ⟶ CommRingCat.of (OO p)),
+            φ.hom r ≠ 0 ∧ (Spec.map φ ≫ hV.fromSpec) (cPt p) = x
+              ∧ Set.range (gPt p ≫ Spec.map φ ≫ hV.fromSpec) ⊆ U := by
     intro r hr
     have hb : (X.basicOpen r : Set X).Nonempty := by
       rw [Set.nonempty_iff_ne_empty]
       intro h
       exact hr ((basicOpen_eq_bot_iff r).mp (TopologicalSpace.Opens.ext h))
-    obtain ⟨p, hp, y, hy, hyU⟩ := padicAlgCl_integral_points.1 X π x hx (U ⊓ X.basicOpen r)
-      (nonempty_preirreducible_inter U.isOpen (X.basicOpen r).isOpen hU hb)
-    obtain ⟨φ, rfl⟩ := exists_factor_of_isLocalRing_of_mem_affineOpen
-      (R := CommRingCat.of (OO p)) y hV (hy.symm ▸ hxV)
+    obtain ⟨p, hp, y, hy, hyU⟩ :=
+      padicAlgCl_integral_points.1 X π x hx (U ⊓ X.basicOpen r)
+        (nonempty_preirreducible_inter U.isOpen (X.basicOpen r).isOpen hU hb)
+    obtain ⟨φ, rfl⟩ :=
+      exists_factor_of_isLocalRing_of_mem_affineOpen (R := CommRingCat.of (OO p)) y hV
+        (hy.symm ▸ hxV)
     refine ⟨p, hp, φ, fun h0 => ?_, hy, fun z hz => (hyU hz).1⟩
     let t : Sp (PadicAlgCl p) := IsLocalRing.closedPoint (PadicAlgCl p)
     have h₁ := (hyU ⟨t, rfl⟩).2
     rw [Scheme.Hom.comp_apply, Scheme.Hom.comp_apply, SetLike.mem_coe, ← Scheme.Hom.mem_preimage,
-      hV.fromSpec_preimage_basicOpen] at h₁
+        hV.fromSpec_preimage_basicOpen]
+      at h₁
     apply h₁
     change φ.hom r ∈ ((gPt p) t).asIdeal
     rw [h0]
@@ -227,28 +250,36 @@ theorem isIso_of_isFinite_of_unique_lift_of_classical_points :
     · let P' : Spec Γ(W, f ⁻¹ᵁ V) := ⟨P, hP⟩
       obtain ⟨w, hw, hwP⟩ := exists_mem_genericPoints_specializes (hV'.fromSpec P')
       obtain ⟨Q, rfl⟩ : w ∈ Set.range hV'.fromSpec := hV'.range_fromSpec.ge (hgenV w hw)
-      refine ⟨Q.asIdeal, Q.isPrime, (PrimeSpectrum.le_iff_specializes Q P').mpr
-        (hV'.fromSpec.isOpenEmbedding.isInducing.specializes_iff.mp hwP), ?_⟩
+      refine ⟨
+        Q.asIdeal,
+        Q.isPrime,
+        (PrimeSpectrum.le_iff_specializes Q P').mpr
+          (hV'.fromSpec.isOpenEmbedding.isInducing.specializes_iff.mp hwP),
+        ?_
+      ⟩
       have h₁ : hV.fromSpec (Spec.map (f.app V) Q) = genericPoint X := by
         rw [← Scheme.Hom.comp_apply, hsq, Scheme.Hom.comp_apply]
         exact hgen _ hw
-      have h₂ : hV.fromSpec (Spec.map (f.app V) Q) ⤳
-          hV.fromSpec (⊥ : PrimeSpectrum Γ(X, V)) := h₁ ▸ genericPoint_specializes _
+      have h₂ : hV.fromSpec (Spec.map (f.app V) Q) ⤳ hV.fromSpec (⊥ : PrimeSpectrum Γ(X, V)) :=
+        h₁ ▸ genericPoint_specializes _
       exact le_bot_iff.mp ((PrimeSpectrum.le_iff_specializes _ _).mpr
         (hV.fromSpec.isOpenEmbedding.isInducing.specializes_iff.mp h₂))
     · by_contra hne
       obtain ⟨r, hr, H⟩ := exists_ne_zero_forall_exists_two_lifts σ τ hne
       obtain ⟨p, _, φ, hφ, hc, hg⟩ := hpt r hr
       obtain ⟨ψ, ψ', hψ, hψ', hne'⟩ := H (PadicAlgCl p) (OO p) φ.hom hφ
-      have key : ∀ ρ : Γ(W, f ⁻¹ᵁ V) →+* OO p, ρ.comp (algebraMap Γ(X, V) Γ(W, f ⁻¹ᵁ V)) = φ.hom →
-          (Spec.map (CommRingCat.ofHom ρ) ≫ hV'.fromSpec) ≫ f = Spec.map φ ≫ hV.fromSpec := by
+      have key
+          : ∀ ρ : Γ(W, f ⁻¹ᵁ V) →+* OO p,
+            ρ.comp (algebraMap Γ(X, V) Γ(W, f ⁻¹ᵁ V)) = φ.hom
+              → (Spec.map (CommRingCat.ofHom ρ) ≫ hV'.fromSpec) ≫ f = Spec.map φ ≫ hV.fromSpec := by
         intro ρ hρ
         rw [Category.assoc, ← hsq, ← Spec.map_comp_assoc]
         congr 2
         exact CommRingCat.hom_ext hρ
-      have h := huniq p (Spec.map (CommRingCat.ofHom ψ) ≫ hV'.fromSpec)
-        (Spec.map (CommRingCat.ofHom ψ') ≫ hV'.fromSpec) ((key ψ hψ).trans (key ψ' hψ').symm)
-        (key ψ hψ ▸ hc) (key ψ hψ ▸ hg)
+      have h :=
+        huniq p (Spec.map (CommRingCat.ofHom ψ) ≫ hV'.fromSpec)
+          (Spec.map (CommRingCat.ofHom ψ') ≫ hV'.fromSpec) ((key ψ hψ).trans (key ψ' hψ').symm)
+          (key ψ hψ ▸ hc) (key ψ hψ ▸ hg)
       exact hne' congr(($(Spec.map_injective ((cancel_mono hV'.fromSpec).mp h))).hom)
   haveI : IsIso (f ∣_ V) := (isIso_morphismRestrict_iff_isIso_app f hV).mpr
     ((ConcreteCategory.isIso_iff_bijective _).mpr hbij)
@@ -257,8 +288,9 @@ theorem isIso_of_isFinite_of_unique_lift_of_classical_points :
     have hinj : Function.Injective (f ∣_ V) := (f ∣_ V).isOpenEmbedding.injective
     refine congrArg Subtype.val (hinj (a₁ := ⟨w, hgenV w hw⟩) (a₂ := ⟨w₁, hgenV w₁ hw₁⟩) ?_)
     apply Subtype.ext
-    exact (morphismRestrict_base_coe f V _).trans (((hgen w hw).trans (hgen w₁ hw₁).symm).trans
-      (morphismRestrict_base_coe f V ⟨w₁, hgenV w₁ hw₁⟩).symm)
+    exact (morphismRestrict_base_coe f V _).trans
+      (((hgen w hw).trans (hgen w₁ hw₁).symm).trans
+        (morphismRestrict_base_coe f V ⟨w₁, hgenV w₁ hw₁⟩).symm)
   haveI : IrreducibleSpace W := by
     rw [irreducibleSpace_def]
     have h : closure ({w₁} : Set W) = ⊤ := by

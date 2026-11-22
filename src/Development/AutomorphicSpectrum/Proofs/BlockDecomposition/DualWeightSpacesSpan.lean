@@ -18,8 +18,8 @@ open PositivityTheory.RgBcC Module.End
 
 variable {n : ℕ}
 
-theorem diag_mem (t : Fin n → Circle) :
-    diagonal (fun a => (t a : ℂ)) ∈ Matrix.unitaryGroup (Fin n) ℂ := by
+theorem diag_mem (t : Fin n → Circle)
+    : diagonal (fun a => (t a : ℂ)) ∈ Matrix.unitaryGroup (Fin n) ℂ := by
   rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, diagonal_conjTranspose,
     diagonal_mul_diagonal, ← diagonal_one]
   congr 1
@@ -38,14 +38,16 @@ theorem continuous_torus : Continuous (torus (n := n)) := by
 
 variable (E : KMod n)
 
-theorem inner_rho (k : Matrix.unitaryGroup (Fin n) ℂ) (x y : E.V) : ⟪E.ρ k x, E.ρ k y⟫_ℂ = ⟪x, y⟫_ℂ :=
+theorem inner_rho (k : Matrix.unitaryGroup (Fin n) ℂ) (x y : E.V)
+    : ⟪E.ρ k x, E.ρ k y⟫_ℂ = ⟪x, y⟫_ℂ :=
   (⟨(E.ρ k : E.V →ₗ[ℂ] E.V), E.iso k⟩ : E.V →ₗᵢ[ℂ] E.V).inner_map_map x y
 
 theorem rho_inv_apply (k : Matrix.unitaryGroup (Fin n) ℂ) (y : E.V) : E.ρ k (E.ρ k⁻¹ y) = y := by
-  rw [← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel, map_one, ContinuousLinearMap.one_apply]
+  rw [← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel, map_one,
+    ContinuousLinearMap.one_apply]
 
-theorem inner_rho_left (k : Matrix.unitaryGroup (Fin n) ℂ) (x y : E.V) :
-    ⟪E.ρ k x, y⟫_ℂ = ⟪x, E.ρ k⁻¹ y⟫_ℂ := by
+theorem inner_rho_left (k : Matrix.unitaryGroup (Fin n) ℂ) (x y : E.V)
+    : ⟪E.ρ k x, y⟫_ℂ = ⟪x, E.ρ k⁻¹ y⟫_ℂ := by
   conv_lhs => rw [← rho_inv_apply E k y]
   exact inner_rho E k x _
 
@@ -55,20 +57,22 @@ namespace GlobalTheory.CompanionTheory.RealCount.TorusSpan
 
 open PositivityTheory.RgBcC Module.End
 
-theorem jointEig_top {V I : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
-    (T : I → V →ₗ[ℂ] V) (hc : ∀ i k, Commute (T i) (T k))
-    (hadj : ∀ i, ∃ k, ∀ x y, ⟪T i x, y⟫_ℂ = ⟪x, T k y⟫_ℂ) :
-    ⨆ χ : I → ℂ, ⨅ i, eigenspace (T i) (χ i) = ⊤ := by
+theorem jointEig_top
+    {V I : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+    (T : I → V →ₗ[ℂ] V)
+    (hc : ∀ i k, Commute (T i) (T k)) (hadj : ∀ i, ∃ k, ∀ x y, ⟪T i x, y⟫_ℂ = ⟪x, T k y⟫_ℂ)
+    : ⨆ χ : I → ℂ, ⨅ i, eigenspace (T i) (χ i) = ⊤ := by
   choose s hs using hadj
   have hs' : ∀ i x y, ⟪T (s i) x, y⟫_ℂ = ⟪x, T i y⟫_ℂ := fun i x y => by
     rw [← inner_conj_symm, ← hs, inner_conj_symm]
-  let H : I ⊕ I → V →ₗ[ℂ] V := Sum.elim (fun i => T i + T (s i)) (fun i => Complex.I • (T i - T (s i)))
+  let H : I ⊕ I → V →ₗ[ℂ] V :=
+    Sum.elim (fun i => T i + T (s i)) (fun i => Complex.I • (T i - T (s i)))
   have hH : ∀ i, (H i).IsSymmetric := by
     rintro (i | i) x y
     · simp only [H, Sum.elim_inl, LinearMap.add_apply, inner_add_left, inner_add_right, hs i, hs' i]
       ring
-    · simp only [H, Sum.elim_inr, LinearMap.smul_apply, LinearMap.sub_apply, inner_smul_left, inner_smul_right,
-        inner_sub_left, inner_sub_right, hs i, hs' i, Complex.conj_I]
+    · simp only [H, Sum.elim_inr, LinearMap.smul_apply, LinearMap.sub_apply, inner_smul_left,
+        inner_smul_right, inner_sub_left, inner_sub_right, hs i, hs' i, Complex.conj_I]
       ring
   have hT : ∀ i k, Commute (H i) (T k) := by
     rintro (i | i) k
@@ -80,7 +84,8 @@ theorem jointEig_top {V I : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ 
     · exact ((hT _ _).sub_right (hT _ _)).smul_right _
   have h := LinearMap.IsSymmetric.iSup_iInf_eq_top_of_commute hH (fun i k _ => hHc i k)
   rw [eq_top_iff, ← h]
-  refine iSup_le fun χ => le_iSup_of_le (fun i => (χ (.inl i) - Complex.I * χ (.inr i)) / 2) fun x hx => ?_
+  refine iSup_le fun χ =>
+    le_iSup_of_le (fun i => (χ (.inl i) - Complex.I * χ (.inr i)) / 2) fun x hx => ?_
   simp only [Submodule.mem_iInf, mem_eigenspace_iff] at hx ⊢
   intro i
   have h1 : T i x + T (s i) x = χ (.inl i) • x := hx (.inl i)
@@ -89,7 +94,8 @@ theorem jointEig_top {V I : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ 
     rw [neg_smul, mul_smul, ← h2, smul_smul, Complex.I_mul_I]; simp
   have h4 : (2 : ℂ) • T i x = (χ (.inl i) - Complex.I * χ (.inr i)) • x := by
     rw [sub_eq_add_neg, add_smul, ← h1, ← h3, two_smul]; abel
-  rw [div_eq_inv_mul, mul_smul, ← h4, smul_smul]; simp
+  rw [div_eq_inv_mul, mul_smul, ← h4, smul_smul]
+  simp
 
 variable {n : ℕ} (E : KMod n)
 
@@ -107,9 +113,9 @@ theorem span_V : ⨆ χ : (Fin n → Circle) → ℂ, ⨅ t, eigenspace (rhoT E 
     simp only [rhoT, ContinuousLinearMap.coe_coe]
     rw [inner_rho_left, map_inv torus t]
 
-theorem exists_weight {χ : (Fin n → Circle) → ℂ} {v : E.V}
-    (hv : v ∈ ⨅ t, eigenspace (rhoT E t) (χ t)) (hv0 : v ≠ 0) :
-    ∃ μ : Fin n → ℤ, ∀ t, E.ρ (torus t) v = (∏ a, (t a : ℂ) ^ μ a) • v := by
+theorem exists_weight
+    {χ : (Fin n → Circle) → ℂ} {v : E.V} (hv : v ∈ ⨅ t, eigenspace (rhoT E t) (χ t)) (hv0 : v ≠ 0)
+    : ∃ μ : Fin n → ℤ, ∀ t, E.ρ (torus t) v = (∏ a, (t a : ℂ) ^ μ a) • v := by
   have hχ : ∀ t, E.ρ (torus t) v = χ t • v := fun t =>
     mem_eigenspace_iff.1 ((Submodule.mem_iInf _).1 hv t)
   have hmul : ∀ s t, χ (s * t) = χ s * χ t := by
@@ -128,7 +134,9 @@ theorem exists_weight {χ : (Fin n → Circle) → ℂ} {v : E.V}
   have hcont : Continuous χ := by
     have : χ = fun t => ⟪v, E.ρ (torus t) v⟫_ℂ / ⟪v, v⟫_ℂ := funext hform
     rw [this]
-    exact (continuous_const.inner ((E.cont.comp continuous_torus).clm_apply continuous_const)).div_const _
+    exact
+      (continuous_const.inner ((E.cont.comp continuous_torus).clm_apply continuous_const)).div_const
+        _
   let χM : (Fin n → Circle) →* ℂ := ⟨⟨χ, hone⟩, hmul⟩
   have hc : ∀ a, ∃ m : ℤ, ∀ z : Circle, χ (Pi.mulSingle a z) = (z : ℂ) ^ m := by
     intro a
@@ -144,7 +152,8 @@ theorem exists_weight {χ : (Fin n → Circle) → ℂ} {v : E.V}
         exact hcont.comp hs
       have : (fun z => (((f z)⁻¹ : ℂˣ) : ℂ)) = fun z => χ (Pi.mulSingle a z⁻¹) := by
         funext z; rw [← map_inv]; rfl
-      rw [this]; exact hcont.comp (hs.comp continuous_inv)
+      rw [this]
+      exact hcont.comp (hs.comp continuous_inv)
     obtain ⟨m, hm, -⟩ := GroundTheory.Global.existsUnique_circle_zpow ⟨f, hf⟩
     exact ⟨m, hm⟩
   choose μ hμ using hc
@@ -164,8 +173,8 @@ open PositivityTheory.RgBcC Module.End
 
 variable {n : ℕ}
 
-theorem exists_torus (k : Matrix.unitaryGroup (Fin n) ℂ) (z : Fin n → ℂ) (hk : k.1 = diagonal z) :
-    ∃ t : Fin n → Circle, torus t = k ∧ ∀ a, (t a : ℂ) = z a := by
+theorem exists_torus (k : Matrix.unitaryGroup (Fin n) ℂ) (z : Fin n → ℂ) (hk : k.1 = diagonal z)
+    : ∃ t : Fin n → Circle, torus t = k ∧ ∀ a, (t a : ℂ) = z a := by
   have hn : ∀ a, ‖z a‖ = 1 := by
     intro a
     have h1 := congrFun (congrFun (Matrix.mem_unitaryGroup_iff'.1 k.2) a) a
@@ -191,8 +200,9 @@ theorem iSup_wtDual_eq_top {n : ℕ} (E : KMod n) : (⨆ μ, wtDual E μ) = ⊤ 
   obtain ⟨v, rfl⟩ := (InnerProductSpace.toDual ℂ E.V).surjective ξ
   have hv : v ∈ (⊤ : Submodule ℂ E.V) := trivial
   rw [← span_V E] at hv
-  refine Submodule.iSup_induction _ (motive := fun v => InnerProductSpace.toDual ℂ E.V v ∈ ⨆ μ, wtDual E μ) hv
-    ?_ ?_ ?_
+  refine Submodule.iSup_induction _
+    (motive := fun v => InnerProductSpace.toDual ℂ E.V v ∈ ⨆ μ, wtDual E μ)
+    hv ?_ ?_ ?_
   · intro χ v hv
     by_cases hv0 : v = 0
     · subst hv0; simp
@@ -201,12 +211,14 @@ theorem iSup_wtDual_eq_top {n : ℕ} (E : KMod n) : (⨆ μ, wtDual E μ) = ⊤ 
     intro k z hk
     obtain ⟨t, rfl, htz⟩ := exists_torus k z hk
     ext w
-    rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.smul_apply, InnerProductSpace.toDual_apply_apply,
-      InnerProductSpace.toDual_apply_apply, ← inner_rho_left, hμ, inner_smul_left, smul_eq_mul]
+    rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.smul_apply,
+      InnerProductSpace.toDual_apply_apply, InnerProductSpace.toDual_apply_apply, ← inner_rho_left,
+      hμ, inner_smul_left, smul_eq_mul]
     congr 1
     rw [map_prod]
     refine Finset.prod_congr rfl fun a _ => ?_
-    rw [← htz, map_zpow₀, ← Circle.coe_inv_eq_conj, ← Circle.coe_zpow, ← Circle.coe_zpow, _root_.inv_zpow', Pi.neg_apply]
+    rw [← htz, map_zpow₀, ← Circle.coe_inv_eq_conj, ← Circle.coe_zpow, ← Circle.coe_zpow,
+      _root_.inv_zpow', Pi.neg_apply]
   · simp
   · intro x y hx hy
     rw [map_add (f := _)]

@@ -25,8 +25,8 @@ def permWt (t : GU σ n) (π : Equiv.Perm (Fin n)) : ℤ :=
 
 end U
 
-def aOp {G : Type} [Group G] (R : Finset G) (t : G) (φ : G → ℂ) : G → ℂ :=
-  fun g => ∑ r ∈ R, φ (g * r * t)
+def aOp {G : Type} [Group G] (R : Finset G) (t : G) (φ : G → ℂ) : G → ℂ := fun g =>
+  ∑ r ∈ R, φ (g * r * t)
 
 end GlobalTheory.CompanionTheory.SatPow
 

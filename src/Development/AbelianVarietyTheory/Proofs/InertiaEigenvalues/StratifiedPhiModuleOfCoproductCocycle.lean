@@ -5,20 +5,43 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
 namespace GlobalTheory.BSP
 
-theorem strat_of_envCocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (En : Env bk bk.prism (bk.toP bk.E) (bk.toP X)) (d a b : ℕ) (A A' : Matrix (Fin d) (Fin d) bk.S), A * A' = bk.E ^ b • (1 : Matrix (Fin d) (Fin d) bk.S) → ∀ ε : Matrix (Fin d) (Fin d) En.Q.A, BK.hf En.inr bk.E ^ a • (A.map (BK.hf En.inl) * ε.map En.Q.D.φ) = BK.hf En.inl bk.E ^ a • (ε * A.map (BK.hf En.inr)) → (∀ (B : Obj l ↥(OL K)), (∀ k : Hom En.Q B, k.comp En.inl = k.comp En.inr → ε.map k.f = 1) ∧ ∀ k₁ k₂ k₃ : Hom En.Q B, k₁.comp En.inr = k₂.comp En.inl → k₁.comp En.inl = k₃.comp En.inl → k₂.comp En.inr = k₃.comp En.inr → ε.map k₁.f * ε.map k₂.f = ε.map k₃.f) → ∃ S : Strat bk d, S.a = a ∧ S.A = A ∧ ∀ (B : Obj l ↥(OL K)) (k : Hom En.Q B), S.ε (k.comp En.inl) (k.comp En.inr) = ε.map k.f := by
+theorem strat_of_envCocycle
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K)
+        (En : Env bk bk.prism (bk.toP bk.E) (bk.toP X)) (d a b : ℕ)
+        (A A' : Matrix (Fin d) (Fin d) bk.S),
+      A * A' = bk.E ^ b • (1 : Matrix (Fin d) (Fin d) bk.S)
+        → ∀ ε : Matrix (Fin d) (Fin d) En.Q.A,
+          BK.hf En.inr bk.E ^ a • (A.map (BK.hf En.inl) * ε.map En.Q.D.φ)
+              = BK.hf En.inl bk.E ^ a • (ε * A.map (BK.hf En.inr))
+            → (∀ (B : Obj l ↥(OL K)),
+              (∀ k : Hom En.Q B, k.comp En.inl = k.comp En.inr → ε.map k.f = 1)
+                ∧ ∀ k₁ k₂ k₃ : Hom En.Q B,
+                  k₁.comp En.inr = k₂.comp En.inl → k₁.comp En.inl = k₃.comp En.inl
+                    → k₂.comp En.inr = k₃.comp En.inr
+                    → ε.map k₁.f * ε.map k₂.f = ε.map k₃.f)
+            → ∃ S : Strat bk d,
+              S.a = a ∧ S.A = A
+                ∧ ∀ (B : Obj l ↥(OL K)) (k : Hom En.Q B),
+                  S.ε (k.comp En.inl) (k.comp En.inr) = ε.map k.f := by
   intro l _ K bk En d a b A A' hA ε hφ hε
-  have comp_assoc : ∀ {P P' P'' P''' : Obj l ↥(OL K)} (h : Hom P'' P''') (g : Hom P' P'') (f : Hom P P'),
-      (h.comp g).comp f = h.comp (g.comp f) := fun _ _ _ => Hom.ext' rfl
-  let c : ∀ {B : Obj l ↥(OL K)}, Hom bk.prism B → Hom bk.prism B → Hom En.Q B :=
-    fun {B} f g => (En.univ B f g).choose
-  have hc : ∀ {B : Obj l ↥(OL K)} (f g : Hom bk.prism B), (c f g).comp En.inl = f ∧ (c f g).comp En.inr = g :=
-    fun {B} f g => (En.univ B f g).choose_spec.1
+  have comp_assoc
+      : ∀ {P P' P'' P''' : Obj l ↥(OL K)} (h : Hom P'' P''') (g : Hom P' P'') (f : Hom P P'),
+        (h.comp g).comp f = h.comp (g.comp f) := fun _ _ _ =>
+    Hom.ext' rfl
+  let c : ∀ {B : Obj l ↥(OL K)}, Hom bk.prism B → Hom bk.prism B → Hom En.Q B := fun {B} f g =>
+    (En.univ B f g).choose
+  have hc
+      : ∀ {B : Obj l ↥(OL K)} (f g : Hom bk.prism B),
+        (c f g).comp En.inl = f ∧ (c f g).comp En.inr = g := fun {B} f g =>
+    (En.univ B f g).choose_spec.1
   have hu : ∀ {B : Obj l ↥(OL K)} (k : Hom En.Q B), c (k.comp En.inl) (k.comp En.inr) = k :=
     fun {B} k => ((En.univ B _ _).choose_spec.2 k ⟨rfl, rfl⟩).symm
   clear_value c
@@ -44,8 +67,9 @@ theorem strat_of_envCocycle : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : 
     ext i j
     have h := congrArg (fun M => (c f g).f (M i j)) hφ
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply, map_mul, map_pow, map_sum, Matrix.map_apply,
-      e1, e2, e3] at h
+      simp only [Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply, map_mul, map_pow, map_sum,
+          Matrix.map_apply, e1, e2, e3]
+        at h
     simpa only [Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply, Matrix.map_apply] using h
   · intro B k
     exact congrArg (fun k' : Hom En.Q B => ε.map k'.f) (hu k)

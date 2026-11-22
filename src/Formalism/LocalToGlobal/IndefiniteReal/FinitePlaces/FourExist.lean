@@ -28,8 +28,13 @@ theorem IsSB.add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') : Is
     push_neg at hc
     apply ht
     simp [hc.1, hc.2]
-  refine ⟨fun t ht => (hor t ht).elim (hs t) (hs' t), k * k', Nat.mul_pos hk hk', fun u hu t => ?_,
-    fun t ht => ?_⟩
+  refine ⟨
+    fun t ht => (hor t ht).elim (hs t) (hs' t),
+    k * k',
+    Nat.mul_pos hk hk',
+    fun u hu t => ?_,
+    fun t ht => ?_
+  ⟩
   · have h1 : (k * k') • u = k • (k' • u) := (smul_smul k k' u).symm
     have h2 : (k * k') • u = k' • (k • u) := by rw [mul_comm]; exact (smul_smul k' k u).symm
     simp only [Pi.add_apply]
@@ -43,11 +48,17 @@ theorem IsSB.add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') : Is
 theorem IsSB.smul {Φ : W → ℂ} (h : IsSB L X Φ) (c : ℂ) : IsSB L X (c • Φ) := by
   obtain ⟨hs, k, hk, hi, hl⟩ := h
   have hne : ∀ t, (c • Φ) t ≠ 0 → Φ t ≠ 0 := fun t ht h0 => ht (by simp [h0])
-  exact ⟨fun t ht => hs t (hne t ht), k, hk, fun u hu t => by simp [hi u hu t],
-    fun t ht => hl t (hne t ht)⟩
+  exact ⟨
+    fun t ht => hs t (hne t ht),
+    k,
+    hk,
+    fun u hu t => by simp [hi u hu t],
+    fun t ht => hl t (hne t ht)
+  ⟩
 
-theorem IsSB.trans (hoX : ∀ x ∈ X, ∃ k : ℕ, 0 < k ∧ k • x ∈ L) {Φ : W → ℂ} (h : IsSB L X Φ) {x : W}
-    (hx : x ∈ X) : IsSB L X (fun t => Φ (t + x)) := by
+theorem IsSB.trans
+    (hoX : ∀ x ∈ X, ∃ k : ℕ, 0 < k ∧ k • x ∈ L) {Φ : W → ℂ} (h : IsSB L X Φ) {x : W} (hx : x ∈ X)
+    : IsSB L X (fun t => Φ (t + x)) := by
   obtain ⟨hs, k, hk, hi, hl⟩ := h
   obtain ⟨k2, hk2, hx2⟩ := hoX x hx
   refine ⟨fun t ht => ?_, k * k2, Nat.mul_pos hk hk2, fun u hu t => ?_, fun t ht => ?_⟩
@@ -64,10 +75,13 @@ theorem IsSB.trans (hoX : ∀ x ∈ X, ∃ k : ℕ, 0 < k ∧ k • x ∈ L) {Φ
     rw [h2]
     exact L.sub_mem (L.nsmul_mem h1 k2) (L.nsmul_mem hx2 k)
 
-theorem IsSB.modul {Y : AddSubgroup W} {χ : W → W → ℂ} (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y)
+theorem IsSB.modul
+    {Y : AddSubgroup W} {χ : W → W → ℂ} (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y)
     (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y') (hχ0 : ∀ t y, χ t y ≠ 0)
     (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1) (hoY : ∀ y ∈ Y, ∃ k : ℕ, 0 < k ∧ k • y ∈ L)
-    {Φ : W → ℂ} (h : IsSB L X Φ) {y : W} (hy : y ∈ Y) : IsSB L X (fun t => χ t y * Φ t) := by
+    {Φ : W → ℂ} (h : IsSB L X Φ)
+    {y : W} (hy : y ∈ Y)
+    : IsSB L X (fun t => χ t y * Φ t) := by
   obtain ⟨hs, k, hk, hi, hl⟩ := h
   obtain ⟨k3, hk3, hy3⟩ := hoY y hy
   have h0 : ∀ b, χ 0 b = 1 := by
@@ -90,8 +104,13 @@ theorem IsSB.modul {Y : AddSubgroup W} {χ : W → W → ℂ} (hχl : ∀ t t' y
     induction n with
     | zero => rw [zero_smul, pow_zero, h0']
     | succ n ih => rw [succ_nsmul, hχr, ih, pow_succ]
-  refine ⟨fun t ht => hs t (fun h0t => ht (by show χ t y * Φ t = 0; rw [h0t, mul_zero])),
-    k * k3, Nat.mul_pos hk hk3, fun u hu t => ?_, fun t ht => ?_⟩
+  refine ⟨
+    fun t ht => hs t (fun h0t => ht (by show χ t y * Φ t = 0; rw [h0t, mul_zero])),
+    k * k3,
+    Nat.mul_pos hk hk3,
+    fun u hu t => ?_,
+    fun t ht => ?_
+  ⟩
   · show χ (t + (k * k3) • u) y * Φ (t + (k * k3) • u) = χ t y * Φ t
     have hΦ : Φ (t + (k * k3) • u) = Φ t := by
       rw [← smul_smul]; exact hi _ ((L ⊓ X).nsmul_mem hu k3) t
@@ -114,11 +133,17 @@ theorem isSB_ind : IsSB L X (fun t => if t ∈ L ∧ t ∈ X then (1 : ℂ) else
     apply ht
     simp [h]
 
-theorem finite_nsmul_out (H : AddSubgroup W) {k : ℕ} [Finite (Qt k H)]
-    (htf : ∀ t : W, k • t = 0 → t = 0) : {q : W ⧸ H | k • q.out ∈ H}.Finite := by
+theorem finite_nsmul_out
+    (H : AddSubgroup W) {k : ℕ} [Finite (Qt k H)] (htf : ∀ t : W, k • t = 0 → t = 0)
+    : {q : W ⧸ H | k • q.out ∈ H}.Finite := by
   classical
-  refine Set.Finite.of_finite_image (f := fun q : W ⧸ H => if hq : k • q.out ∈ H then
-      (QuotientAddGroup.mk (⟨k • q.out, hq⟩ : H) : Qt k H) else 0) (Set.toFinite _) ?_
+  refine Set.Finite.of_finite_image
+    (f := fun q : W ⧸ H =>
+      if hq : k • q.out ∈ H then
+        (QuotientAddGroup.mk (⟨k • q.out, hq⟩ : H) : Qt k H)
+      else
+        0)
+    (Set.toFinite _) ?_
   intro q hq q' hq' heq
   have hq1 : k • q.out ∈ H := hq
   have hq2 : k • q'.out ∈ H := hq'
@@ -140,22 +165,22 @@ end SB
 
 section Main
 
-variable {ρ : W → Module.End ℂ V} {χ : W → W → ℂ} {L X Y : AddSubgroup W} {f₀ : V}
+variable
+  {ρ : W → Module.End ℂ V} {χ : W → W → ℂ} {L X Y : AddSubgroup W} {f₀ : V}
   (hX : ∀ x ∈ X, ∀ x' ∈ X, ρ (x + x') = ρ x * ρ x')
   (hY : ∀ y ∈ Y, ∀ y' ∈ Y, ρ (y + y') = ρ y * ρ y')
   (hXY : ∀ x ∈ X, ∀ y ∈ Y, ρ x * ρ y = χ x y • (ρ y * ρ x))
-  (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y)
-  (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y') (hχ0 : ∀ t y, χ t y ≠ 0)
-  (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1)
-  (hdY : ∀ y ∈ Y, (∀ x ∈ L ⊓ X, χ x y = 1) → y ∈ L)
-  (hfinX : ∀ k, 0 < k → Finite (Qt k (L ⊓ X))) (hfinY : ∀ k, 0 < k → Finite (Qt k (L ⊓ Y)))
-  (htf : ∀ k : ℕ, 0 < k → ∀ t : W, k • t = 0 → t = 0)
-  (hoX : ∀ x ∈ X, ∃ k : ℕ, 0 < k ∧ k • x ∈ L) (hoY : ∀ y ∈ Y, ∃ k : ℕ, 0 < k ∧ k • y ∈ L)
-  (hfX : ∀ u ∈ L ⊓ X, ρ u f₀ = f₀) (hfY : ∀ u ∈ L ⊓ Y, ρ u f₀ = f₀)
+  (hχl : ∀ t t' y, χ (t + t') y = χ t y * χ t' y) (hχr : ∀ t y y', χ t (y + y') = χ t y * χ t y')
+  (hχ0 : ∀ t y, χ t y ≠ 0) (hLL : ∀ x ∈ L ⊓ X, ∀ y ∈ L ⊓ Y, χ x y = 1)
+  (hdY : ∀ y ∈ Y, (∀ x ∈ L ⊓ X, χ x y = 1) → y ∈ L) (hfinX : ∀ k, 0 < k → Finite (Qt k (L ⊓ X)))
+  (hfinY : ∀ k, 0 < k → Finite (Qt k (L ⊓ Y)))
+  (htf : ∀ k : ℕ, 0 < k → ∀ t : W, k • t = 0 → t = 0) (hoX : ∀ x ∈ X, ∃ k : ℕ, 0 < k ∧ k • x ∈ L)
+  (hoY : ∀ y ∈ Y, ∃ k : ℕ, 0 < k ∧ k • y ∈ L) (hfX : ∀ u ∈ L ⊓ X, ρ u f₀ = f₀)
+  (hfY : ∀ u ∈ L ⊓ Y, ρ u f₀ = f₀)
 
 include hχl hχr hχ0 hLL hoY in
-theorem coef_inv {Φ : W → ℂ} (h : IsSB L X Φ) (a : W) {y : W} (hy : y ∈ Y) :
-    ∃ k, 0 < k ∧ IsInv k (L ⊓ X) (fun t => Φ (a + t) * (χ t y)⁻¹) := by
+theorem coef_inv {Φ : W → ℂ} (h : IsSB L X Φ) (a : W) {y : W} (hy : y ∈ Y)
+    : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) (fun t => Φ (a + t) * (χ t y)⁻¹) := by
   obtain ⟨hs, k, hk, hi, hl⟩ := h
   obtain ⟨k3, hk3, hy3⟩ := hoY y hy
   have h0 : ∀ b, χ 0 b = 1 := by
@@ -187,14 +212,15 @@ theorem coef_inv {Φ : W → ℂ} (h : IsSB L X Φ) (a : W) {y : W} (hy : y ∈ 
   rw [← add_assoc, hΦ, hχl, hχu, mul_one]
 
 include hχl hχr hχ0 hLL hoY hfinX in
-theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a : W) {y : W} (hy : y ∈ Y) :
-    coef χ L X (Φ + Φ') a y = coef χ L X Φ a y + coef χ L X Φ' a y := by
+theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a : W) {y : W} (hy : y ∈ Y)
+    : coef χ L X (Φ + Φ') a y = coef χ L X Φ a y + coef χ L X Φ' a y := by
   have inv_mul : ∀ (H : AddSubgroup W) (g : W → ℂ) (k m : ℕ), IsInv k H g → IsInv (k * m) H g := by
     intro H g k m h t ht u hu
     rw [← smul_smul]
     exact h t ht _ (H.nsmul_mem hu m)
-  have avg_mul : ∀ (H : AddSubgroup W) (g : W → ℂ) (k m : ℕ), Finite (Qt k H) → Finite (Qt (k * m) H) →
-      IsInv k H g → avg (k * m) H g = avg k H g := by
+  have avg_mul
+      : ∀ (H : AddSubgroup W) (g : W → ℂ) (k m : ℕ),
+        Finite (Qt k H) → Finite (Qt (k * m) H) → IsInv k H g → avg (k * m) H g = avg k H g := by
     intro H g k m hfk hfkm hg
     classical
     haveI := Fintype.ofFinite (Qt k H)
@@ -205,7 +231,8 @@ theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a :
       simp only [smulSub, AddSubgroup.mem_map, nsmulAddMonoidHom_apply] at hh ⊢
       obtain ⟨v, hv, hv'⟩ := hh
       exact ⟨m • v, H.nsmul_mem hv m, by rw [← hv', smul_smul]⟩
-    let π : Qt (k * m) H →+ Qt k H := QuotientAddGroup.map _ _ (AddMonoidHom.id H) (fun x hx => hle hx)
+    let π : Qt (k * m) H →+ Qt k H :=
+      QuotientAddGroup.map _ _ (AddMonoidHom.id H) (fun x hx => hle hx)
     have hπ : ∀ x : H, π (QuotientAddGroup.mk x) = QuotientAddGroup.mk x := fun x => rfl
     have hsurj : Function.Surjective π := by
       intro r
@@ -232,14 +259,16 @@ theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a :
     have hN0 : N ≠ 0 := by
       rw [hN]
       exact (Finset.card_pos.2 ⟨0, by simp⟩).ne'
-    have hsum : ∑ q : Qt (k * m) H, g ((q.out : H) : W) = N * ∑ r : Qt k H, g ((r.out : H) : W) := by
+    have hsum
+        : ∑ q : Qt (k * m) H, g ((q.out : H) : W) = N * ∑ r : Qt k H, g ((r.out : H) : W) := by
       rw [Fintype.sum_congr _ _ hval, Finset.sum_comp (fun r : Qt k H => g ((r.out : H) : W)) π,
         Finset.image_univ_of_surjective hsurj]
       simp_rw [hfib]
       rw [← Finset.smul_sum, nsmul_eq_mul]
     have hcard : Fintype.card (Qt (k * m) H) = N * Fintype.card (Qt k H) := by
-      rw [← Finset.card_univ, Finset.card_eq_sum_card_fiberwise (f := π) (t := Finset.univ)
-        (fun _ _ => Finset.mem_univ _)]
+      rw [← Finset.card_univ,
+        Finset.card_eq_sum_card_fiberwise (f := π) (t := Finset.univ)
+          (fun _ _ => Finset.mem_univ _)]
       simp_rw [hfib]
       simp [mul_comm]
     unfold avg
@@ -248,8 +277,10 @@ theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a :
     have hN0' : (N : ℂ) ≠ 0 := by exact_mod_cast hN0
     push_cast
     field_simp
-  obtain ⟨k1, hk1, hi1⟩ := coef_inv (hχl := hχl) (hχr := hχr) (hχ0 := hχ0) (hLL := hLL) (hoY := hoY) h a hy
-  obtain ⟨k2, hk2, hi2⟩ := coef_inv (hχl := hχl) (hχr := hχr) (hχ0 := hχ0) (hLL := hLL) (hoY := hoY) h' a hy
+  obtain ⟨k1, hk1, hi1⟩ :=
+    coef_inv (hχl := hχl) (hχr := hχr) (hχ0 := hχ0) (hLL := hLL) (hoY := hoY) h a hy
+  obtain ⟨k2, hk2, hi2⟩ :=
+    coef_inv (hχl := hχl) (hχr := hχr) (hχ0 := hχ0) (hLL := hLL) (hoY := hoY) h' a hy
   unfold coef
   obtain ⟨g1, hg1⟩ : ∃ g : W → ℂ, g = fun t => Φ (a + t) * (χ t y)⁻¹ := ⟨_, rfl⟩
   obtain ⟨g2, hg2⟩ : ∃ g : W → ℂ, g = fun t => Φ' (a + t) * (χ t y)⁻¹ := ⟨_, rfl⟩
@@ -268,7 +299,8 @@ theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a :
     rw [e1, e2]
   have hex1 : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) g1 := ⟨k1, hk1, hi1⟩
   have hex2 : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) g2 := ⟨k2, hk2, hi2⟩
-  have hex3 : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) (fun t => g1 t + g2 t) := ⟨k1 * k2, Nat.mul_pos hk1 hk2, hi3⟩
+  have hex3 : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) (fun t => g1 t + g2 t) :=
+    ⟨k1 * k2, Nat.mul_pos hk1 hk2, hi3⟩
   unfold integ
   rw [dif_pos hex1, dif_pos hex2, dif_pos hex3]
   have hK1 := hex1.choose_spec.1
@@ -279,12 +311,16 @@ theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a :
   have hI3 := hex3.choose_spec.2
   have hpos : 0 < hex1.choose * (hex2.choose * hex3.choose) := by positivity
   have f1 := avg_mul _ _ hex1.choose (hex2.choose * hex3.choose) (hfinX _ hK1) (hfinX _ hpos) hI1
-  have f2 := avg_mul _ _ hex2.choose (hex1.choose * hex3.choose) (hfinX _ hK2)
-    (hfinX _ (by positivity)) hI2
-  have f3 := avg_mul _ _ hex3.choose (hex1.choose * hex2.choose) (hfinX _ hK3)
-    (hfinX _ (by positivity)) hI3
-  have e2 : hex2.choose * (hex1.choose * hex3.choose) = hex1.choose * (hex2.choose * hex3.choose) := by ring
-  have e3 : hex3.choose * (hex1.choose * hex2.choose) = hex1.choose * (hex2.choose * hex3.choose) := by ring
+  have f2 :=
+    avg_mul _ _ hex2.choose (hex1.choose * hex3.choose) (hfinX _ hK2) (hfinX _ (by positivity)) hI2
+  have f3 :=
+    avg_mul _ _ hex3.choose (hex1.choose * hex2.choose) (hfinX _ hK3) (hfinX _ (by positivity)) hI3
+  have e2
+      : hex2.choose * (hex1.choose * hex3.choose) = hex1.choose * (hex2.choose * hex3.choose) := by
+    ring
+  have e3
+      : hex3.choose * (hex1.choose * hex2.choose) = hex1.choose * (hex2.choose * hex3.choose) := by
+    ring
   rw [e2] at f2
   rw [e3] at f3
   rw [← f1, ← f2, ← f3]
@@ -293,7 +329,8 @@ theorem coef_add {Φ Φ' : W → ℂ} (h : IsSB L X Φ) (h' : IsSB L X Φ') (a :
   rw [finsum_add_distrib (Set.toFinite _) (Set.toFinite _), mul_add]
 
 include hfinX in
-theorem coef_smul (Φ : W → ℂ) (c : ℂ) (a y : W) : coef χ L X (c • Φ) a y = c * coef χ L X Φ a y := by
+theorem coef_smul (Φ : W → ℂ) (c : ℂ) (a y : W)
+    : coef χ L X (c • Φ) a y = c * coef χ L X Φ a y := by
   unfold coef
   obtain ⟨g, hg⟩ : ∃ g : W → ℂ, g = fun t => Φ (a + t) * (χ t y)⁻¹ := ⟨_, rfl⟩
   have hg' : (fun t => (c • Φ) (a + t) * (χ t y)⁻¹) = fun t => c * g t := by
@@ -312,10 +349,12 @@ theorem coef_smul (Φ : W → ℂ) (c : ℂ) (a y : W) : coef χ L X (c • Φ) 
       constructor
       · intro h t ht u hu; exact mul_left_cancel₀ hc (h t ht u hu)
       · intro h t ht u hu; show c * g (t + k • u) = c * g t; rw [h t ht u hu]
-    have hpred : (fun k => 0 < k ∧ IsInv k (L ⊓ X) (fun t => c * g t)) =
-        (fun k => 0 < k ∧ IsInv k (L ⊓ X) g) :=
+    have hpred
+        : (fun k => 0 < k ∧ IsInv k (L ⊓ X) (fun t => c * g t))
+          = (fun k => 0 < k ∧ IsInv k (L ⊓ X) g) :=
       funext fun k => propext (and_congr_right' (hiff k))
-    have key : ∀ (p q : ℕ → Prop) (hp : ∃ k, p k) (hq : ∃ k, q k), p = q → hp.choose = hq.choose := by
+    have key
+        : ∀ (p q : ℕ → Prop) (hp : ∃ k, p k) (hq : ∃ k, q k), p = q → hp.choose = hq.choose := by
       intro p q hp hq h; subst h; rfl
     by_cases hex : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) g
     · have hex' : ∃ k, 0 < k ∧ IsInv k (L ⊓ X) (fun t => c * g t) := by rw [hpred]; exact hex
@@ -328,8 +367,11 @@ theorem coef_smul (Φ : W → ℂ) (c : ℂ) (a y : W) : coef χ L X (c • Φ) 
       rw [dite_eq_right hex', dite_eq_right hex, mul_zero]
 
 include hχl hχr hχ0 hLL hdY hoY hfinX in
-theorem coef_ne_zero {Φ : W → ℂ} (h : IsSB L X Φ) {k : ℕ} (hk : 0 < k) (hi : ∀ u ∈ L ⊓ X, ∀ t, Φ (t + k • u) = Φ t)
-    {a y : W} (hy : y ∈ Y) (hc : coef χ L X Φ a y ≠ 0) : (∃ t ∈ L ⊓ X, Φ (a + t) ≠ 0) ∧ k • y ∈ L := by
+theorem coef_ne_zero
+    {Φ : W → ℂ} (h : IsSB L X Φ)
+    {k : ℕ} (hk : 0 < k) (hi : ∀ u ∈ L ⊓ X, ∀ t, Φ (t + k • u) = Φ t)
+    {a y : W} (hy : y ∈ Y) (hc : coef χ L X Φ a y ≠ 0)
+    : (∃ t ∈ L ⊓ X, Φ (a + t) ≠ 0) ∧ k • y ∈ L := by
   unfold coef at hc
   obtain ⟨G, hG⟩ : ∃ G : W → ℂ, G = fun t => Φ (a + t) * (χ t y)⁻¹ := ⟨_, rfl⟩
   rw [← hG] at hc
@@ -382,33 +424,38 @@ theorem coef_ne_zero {Φ : W → ℂ} (h : IsSB L X Φ) {k : ℕ} (hk : 0 < k) (
       rw [← add_assoc, hi x hx (a + t), hχl, hpow, ← hpow', mul_inv]
       ring
     obtain ⟨z, hz⟩ : ∃ z : ↥(L ⊓ X), (z : W) = k • x := ⟨⟨k • x, (L ⊓ X).nsmul_mem hx k⟩, rfl⟩
-    have hshift : ∀ q : Qt hex.choose (L ⊓ X), G (((q.out : ↥(L ⊓ X)) : W) + k • x) =
-        G (((q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))).out : ↥(L ⊓ X)) : W) := by
+    have hshift
+        : ∀ q : Qt hex.choose (L ⊓ X),
+          G (((q.out : ↥(L ⊓ X)) : W) + k • x)
+            = G (((q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))).out : ↥(L ⊓ X)) : W) := by
       intro q
-      have hq : (q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))) =
-          QuotientAddGroup.mk (q.out + z) := by
+      have hq
+          : (q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X)))
+            = QuotientAddGroup.mk (q.out + z) := by
         rw [QuotientAddGroup.mk_add, QuotientAddGroup.out_eq']
-      have h1 := (QuotientAddGroup.out_eq' (q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X)))).trans hq
+      have h1 :=
+        (QuotientAddGroup.out_eq' (q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X)))).trans hq
       rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf] at h1
       simp only [smulSub, AddSubgroup.mem_map, nsmulAddMonoidHom_apply] at h1
       obtain ⟨v, hv, hv'⟩ := h1
-      have h2 : ((q.out : ↥(L ⊓ X)) : W) + k • x =
-          ((q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))).out : ↥(L ⊓ X)) + hex.choose • v := by
+      have h2
+          : ((q.out : ↥(L ⊓ X)) : W) + k • x
+            = ((q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))).out : ↥(L ⊓ X))
+              + hex.choose • v := by
         rw [hv', ← hz]
         push_cast
-        first
-          | exact (add_neg_cancel_left _ _).symm
-          | simp
-          | abel
+        first | exact (add_neg_cancel_left _ _).symm | simp | abel
       rw [h2]
       exact hI _ ((q + (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X))).out).2 v hv
-    have hshift_sum : ∑ q : Qt hex.choose (L ⊓ X), G (((q.out : ↥(L ⊓ X)) : W) + k • x) =
-        ∑ q : Qt hex.choose (L ⊓ X), G ((q.out : ↥(L ⊓ X)) : W) := by
+    have hshift_sum
+        : ∑ q : Qt hex.choose (L ⊓ X), G (((q.out : ↥(L ⊓ X)) : W) + k • x)
+          = ∑ q : Qt hex.choose (L ⊓ X), G ((q.out : ↥(L ⊓ X)) : W) := by
       rw [Fintype.sum_congr _ _ hshift]
       exact Equiv.sum_comp (Equiv.addRight (QuotientAddGroup.mk z : Qt hex.choose (L ⊓ X)))
         (fun q => G ((q.out : ↥(L ⊓ X)) : W))
-    have hmul : (χ x (k • y))⁻¹ * ∑ q : Qt hex.choose (L ⊓ X), G ((q.out : ↥(L ⊓ X)) : W) =
-        ∑ q : Qt hex.choose (L ⊓ X), G ((q.out : ↥(L ⊓ X)) : W) := by
+    have hmul
+        : (χ x (k • y))⁻¹ * ∑ q : Qt hex.choose (L ⊓ X), G ((q.out : ↥(L ⊓ X)) : W)
+          = ∑ q : Qt hex.choose (L ⊓ X), G ((q.out : ↥(L ⊓ X)) : W) := by
       rw [Finset.mul_sum]
       simp_rw [← hGshift]
       exact hshift_sum
@@ -417,8 +464,8 @@ theorem coef_ne_zero {Φ : W → ℂ} (h : IsSB L X Φ) {k : ℕ} (hk : 0 < k) (
 
 include hχl hχr hχ0 hLL hdY hoY hfinX hfinY htf in
 open Classical in
-theorem term_support_finite {Φ : W → ℂ} (h : IsSB L X Φ) :
-    (Function.support fun q : QX L X × QY L Y =>
+theorem term_support_finite {Φ : W → ℂ} (h : IsSB L X Φ)
+    : (Function.support fun q : QX L X × QY L Y =>
       if q.2.out ∈ Y then term ρ χ L X f₀ Φ q.1.out q.2.out else 0).Finite := by
   obtain ⟨hs, k, hk, hi, hl⟩ := id h
   haveI := hfinX k hk
@@ -430,8 +477,9 @@ theorem term_support_finite {Φ : W → ℂ} (h : IsSB L X Φ) :
   rw [Function.mem_support] at hq
   split_ifs at hq with hy
   · have hc : coef χ L X Φ q1.out q2.out ≠ 0 := fun h0 => hq (by simp [term, h0])
-    obtain ⟨⟨t, ht, hΦ⟩, hky⟩ := coef_ne_zero (hχl := hχl) (hχr := hχr) (hχ0 := hχ0) (hLL := hLL)
-      (hdY := hdY) (hoY := hoY) (hfinX := hfinX) h hk hi hy hc
+    obtain ⟨⟨t, ht, hΦ⟩, hky⟩ :=
+      coef_ne_zero (hχl := hχl) (hχr := hχr) (hχ0 := hχ0) (hLL := hLL) (hdY := hdY) (hoY := hoY)
+        (hfinX := hfinX) h hk hi hy hc
     refine ⟨?_, ?_⟩
     · show k • q1.out ∈ L ⊓ X
       have hX : q1.out + t ∈ X := hs _ hΦ

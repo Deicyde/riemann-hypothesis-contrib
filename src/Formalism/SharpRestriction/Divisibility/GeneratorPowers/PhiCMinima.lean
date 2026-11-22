@@ -14,17 +14,16 @@ namespace Formalism.MainNotions.ModuliIntegralCharts.H1
 
 open NumberField Module Formalism.MainNotions.ModuliIntegralCharts Matrix PhiCMin
 
-theorem const_eq (E : Type) [Field E] [NumberField E] :
-    ((((discr E).natAbs : ℝ) ^ 2)⁻¹) ^ ((1 : ℝ) / finrank ℚ E) *
-      |(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E) = 1 := by
+theorem const_eq (E : Type) [Field E] [NumberField E]
+    : ((((discr E).natAbs : ℝ) ^ 2)⁻¹) ^ ((1 : ℝ) / finrank ℚ E)
+        * |(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E)
+      = 1 := by
   have hd : (discr E : ℝ) ≠ 0 := by exact_mod_cast NumberField.discr_ne_zero E
-  have ha : (((discr E).natAbs : ℝ)) = |(discr E : ℝ)| := by
-    rw [Nat.cast_natAbs, Int.cast_abs]
+  have ha : (((discr E).natAbs : ℝ)) = |(discr E : ℝ)| := by rw [Nat.cast_natAbs, Int.cast_abs]
   rw [ha]
   have ha0 : 0 < |(discr E : ℝ)| := abs_pos.mpr hd
   rw [Real.inv_rpow (by positivity), ← Real.rpow_natCast, ← Real.rpow_mul ha0.le]
-  have h2 : ((2 : ℕ) : ℝ) * (1 / (finrank ℚ E : ℝ)) = 2 / (finrank ℚ E : ℝ) := by
-    push_cast; ring
+  have h2 : ((2 : ℕ) : ℝ) * (1 / (finrank ℚ E : ℝ)) = 2 / (finrank ℚ E : ℝ) := by push_cast; ring
   rw [h2]
   exact inv_mul_cancel₀ (Real.rpow_pos_of_pos ha0 _).ne'
 
@@ -46,12 +45,13 @@ theorem phiCMinima_holds : PhiCMinimaStatement := by
   set G := Matrix.of fun a c => (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (b a) (b c) with hGdef
 
   have hcjO : ∀ c : 𝓞 E, ∃ c' : 𝓞 E, (c' : E) = cj c := cj_integral hcj
-  let l0 : SymB cj Y →ₗ[ℝ] ℝ :=
-    { toFun := fun γ => ∑ a, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (w₀ • b a) (b a)
-      map_add' := fun γ γ' => by simp [Finset.sum_add_distrib]
-      map_smul' := fun t γ => by simp [Finset.mul_sum] }
-  have hl0int : ∀ γ : SymB cj Y, (∀ a c, ∃ z : ℤ, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z) →
-      ∃ z : ℤ, l0 γ = z := by
+  let l0 : SymB cj Y →ₗ[ℝ] ℝ := {
+    toFun := fun γ => ∑ a, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (w₀ • b a) (b a)
+    map_add' := fun γ γ' => by simp [Finset.sum_add_distrib]
+    map_smul' := fun t γ => by simp [Finset.mul_sum]
+  }
+  have hl0int
+      : ∀ γ : SymB cj Y, (∀ a c, ∃ z : ℤ, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z) → ∃ z : ℤ, l0 γ = z := by
     intro γ hγ
     choose f hf using hγ
     refine ⟨∑ a, f (w₀ • b a) (b a), ?_⟩
@@ -60,8 +60,9 @@ theorem phiCMinima_holds : PhiCMinimaStatement := by
     exact Finset.sum_congr rfl fun a _ => hf _ _
   have hl0pos : ∀ γ : SymB cj Y, (∀ a, 0 ≤ (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a a) → γ ≠ 0 → 0 < l0 γ := by
     intro γ hγ hne0
-    have h2 : ∀ a, 2 * (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (w₀ • b a) (b a) =
-        (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (b a) (b a) := fun a => two_mul_form_half_unit hcjO w₀ hw γ (b a)
+    have h2
+        : ∀ a, 2 * (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (w₀ • b a) (b a) = (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (b a) (b a) :=
+      fun a => two_mul_form_half_unit hcjO w₀ hw γ (b a)
     have hnn : ∀ a, 0 ≤ (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (w₀ • b a) (b a) := fun a => by
       linarith [h2 a, hγ (b a)]
     show 0 < ∑ a, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (w₀ • b a) (b a)
@@ -84,17 +85,19 @@ theorem phiCMinima_holds : PhiCMinimaStatement := by
   let B0 : ℝ := (1 / 2) * l0 β * ((d : ℝ) / muC E + 1) ^ 2
   let T : Set (Fin d → Fin d → ℤ) := {c | LinearIndependent ℤ c ∧ ∀ j, Q (c j) ≤ B0}
   have hTfin : T.Finite := by
-    refine (Set.Finite.pi (t := fun _ : Fin d => {c : Fin d → ℤ | Q c ≤ B0})
+    refine (Set.Finite.pi
+      (t := fun _ : Fin d => {c : Fin d → ℤ | Q c ≤ B0})
       fun _ => finiteShort_holds d G hG B0).subset ?_
     intro c hc j _
     exact hc.2 j
   obtain ⟨c1, hc1li, hc1⟩ := main_ineq hcj hne hdpos b β hG l0 hl0int hl0pos 1 one_pos
   have hTne : T.Nonempty := ⟨c1, hc1li, hc1⟩
   obtain ⟨cs, hcsT, hcsmin⟩ := Set.exists_min_image T F hTfin hTne
-  have hclaim : ∀ l : SymB cj Y →ₗ[ℝ] ℝ,
-      (∀ γ : SymB cj Y, (∀ a c, ∃ z : ℤ, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z) → ∃ z : ℤ, l γ = z) →
-      (∀ γ : SymB cj Y, (∀ a, 0 ≤ (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a a) → γ ≠ 0 → 0 < l γ) →
-      F cs ≤ (1 / 2) * l β * ((d : ℝ) / muC E) ^ 2 := by
+  have hclaim
+      : ∀ l : SymB cj Y →ₗ[ℝ] ℝ,
+        (∀ γ : SymB cj Y, (∀ a c, ∃ z : ℤ, (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a c = z) → ∃ z : ℤ, l γ = z)
+          → (∀ γ : SymB cj Y, (∀ a, 0 ≤ (γ : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) a a) → γ ≠ 0 → 0 < l γ)
+          → F cs ≤ (1 / 2) * l β * ((d : ℝ) / muC E) ^ 2 := by
     intro l hlint hlpos
     have hev : ∀ δ : ℝ, 0 < δ → F cs ≤ (1 / 2) * l β * ((d : ℝ) / muC E + δ) ^ 2 := by
       intro δ hδ
@@ -112,10 +115,10 @@ theorem phiCMinima_holds : PhiCMinimaStatement := by
   have hn : (0 : ℝ) < finrank ℚ E := by exact_mod_cast Module.finrank_pos
   have hD : (0 : ℝ) < ((discr E).natAbs : ℝ) := by
     exact_mod_cast Int.natAbs_pos.mpr (discr_ne_zero E)
-  have hXpos : (0 : ℝ) < ((((discr E).natAbs : ℝ) ^ 2)⁻¹) ^ ((1 : ℝ) / finrank ℚ E) := by
-    positivity
-  have hP : |(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E) =
-      (((((discr E).natAbs : ℝ) ^ 2)⁻¹) ^ ((1 : ℝ) / finrank ℚ E))⁻¹ :=
+  have hXpos : (0 : ℝ) < ((((discr E).natAbs : ℝ) ^ 2)⁻¹) ^ ((1 : ℝ) / finrank ℚ E) := by positivity
+  have hP
+      : |(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E)
+        = (((((discr E).natAbs : ℝ) ^ 2)⁻¹) ^ ((1 : ℝ) / finrank ℚ E))⁻¹ :=
     eq_inv_of_mul_eq_one_right (const_eq E)
   have hdpos' : (0 : ℝ) < d := by exact_mod_cast hdpos
   set κ : ℝ := |(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E) / (finrank ℚ E) * (d : ℝ) ^ 2 with hκdef
@@ -139,15 +142,18 @@ theorem phiCMinima_holds : PhiCMinimaStatement := by
       rw [PhiCMin.bs_apply]
       congr 1
       rw [← Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
-    have hq : (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (b.equivFun.symm (cs j)) (b.equivFun.symm (cs j)) =
-        Q (cs j) := by
+    have hq
+        : (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (b.equivFun.symm (cs j)) (b.equivFun.symm (cs j)) = Q (cs j) := by
       rw [← gram_expand b _ (b.equivFun.symm (cs j)) (b.equivFun.symm (cs j))]
       simp only [hr, Q, dotProduct, Matrix.mulVec, hGdef, Matrix.of_apply, Finset.mul_sum]
       exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun c _ => by ring
     have hle : Q (cs j) ≤ F cs := Finset.le_sup' (fun j => Q (cs j)) (Finset.mem_univ j)
     rw [hq]
-    have hk : κ * phiC cj β = 2 * (|(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E) /
-        (2 * finrank ℚ E) * (d : ℝ) ^ 2 * phiC cj β) := by
+    have hk
+        : κ * phiC cj β
+          = 2
+            * (|(discr E : ℝ)| ^ ((2 : ℝ) / finrank ℚ E) / (2 * finrank ℚ E) * (d : ℝ) ^ 2
+              * phiC cj β) := by
       rw [hκdef]; field_simp
     linarith
 

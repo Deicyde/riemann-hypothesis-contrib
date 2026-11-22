@@ -51,7 +51,11 @@ open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GaloisFromTrace
 namespace UpperTheory.V.Z.Mult
 
 theorem stableBlockSA : StableBlockSA :=
-  stableSA (enlarge Th.stUnit hecke_eigenvalues_unitary_one_factor unitary_one_characters_separated_by_eigenvalues Asm.places) Asm.places
-    (stableGA Pi.piFin_holds Pi.piAdm_pf Pi.growthPiJ_holds (UpperTheory.Zero.ConvolutionTheory.EB.cmbPiA piTermA Pi.twTrSum_pf) cuspReadI)
+  stableSA
+    (enlarge Th.stUnit hecke_eigenvalues_unitary_one_factor
+      unitary_one_characters_separated_by_eigenvalues Asm.places)
+    Asm.places
+    (stableGA Pi.piFin_holds Pi.piAdm_pf Pi.growthPiJ_holds
+      (UpperTheory.Zero.ConvolutionTheory.EB.cmbPiA piTermA Pi.twTrSum_pf) cuspReadI)
 
 end UpperTheory.V.Z.Mult

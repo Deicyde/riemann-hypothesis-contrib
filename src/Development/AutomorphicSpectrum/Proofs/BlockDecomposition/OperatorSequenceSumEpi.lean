@@ -8,13 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.CoherentCohomologyProofs.R
 
 set_option autoImplicit false
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 namespace GlobalTheory.CompanionTheory.GE.KerSeq
 
-theorem epi_sumMap_of_opSeq {X : Scheme.{0}} {k : ℕ} {M : ℕ → X.Modules}
-    {T : Fin k → ∀ e, M e ⟶ M (e + 1)} {d : ℕ} (h : OpSeq k M T d) (e : ℕ) :
-    Epi (KerSeq.sumMap T d e) := by
+theorem epi_sumMap_of_opSeq
+    {X : Scheme.{0}} {k : ℕ} {M : ℕ → X.Modules} {T : Fin k → ∀ e, M e ⟶ M (e + 1)} {d : ℕ}
+    (h : OpSeq k M T d)
+    (e : ℕ)
+    : Epi (KerSeq.sumMap T d e) := by
   haveI : ∀ n, (M n).IsQuasicoherent := fun n => (h.coherent n).1
   haveI : (KerSeq.sumN M k d e).IsQuasicoherent := by
     unfold KerSeq.sumN

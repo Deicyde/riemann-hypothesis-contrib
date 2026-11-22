@@ -23,14 +23,16 @@ theorem logDerOne_holds : GlobalTheory.Mem.An.LogDerOne := by
     omega
   have hL : LFunction χ 1 ≠ 0 := LFunction_ne_zero_of_one_le_re χ (Or.inl hne) (by simp)
   obtain ⟨hfin, hcount, hmain⟩ := H q χ hne 1 (by norm_num) (by norm_num) hL
-  simp only [Complex.one_im, abs_zero, zero_add, Complex.ofReal_zero, zero_mul, add_zero] at hfin hcount hmain
+  simp only [Complex.one_im, abs_zero, zero_add, Complex.ofReal_zero, zero_mul, add_zero]
+    at hfin hcount hmain
   set D : Set ℂ := {w : ℂ | ‖w - 2‖ ≤ 7 / 2 ∧ LFunction χ w = 0} with hD
   set Z : Set ℂ := GlobalTheory.Mem.An.zerosIn χ 0 1 with hZ
   have hsub : Z ⊆ D := by
     rintro w ⟨h0, h1, h2, h3⟩
     refine ⟨?_, h3⟩
     have h4 := Complex.norm_le_abs_re_add_abs_im (w - 2)
-    simp only [Complex.sub_re, Complex.sub_im, Complex.re_ofNat, Complex.im_ofNat, sub_zero] at h4 h2
+    simp only [Complex.sub_re, Complex.sub_im, Complex.re_ofNat, Complex.im_ofNat, sub_zero]
+      at h4 h2
     have h5 : |w.re - 2| ≤ 2 := abs_le.2 ⟨by linarith, by linarith⟩
     linarith
   have hZfin : Z.Finite := hfin.subset hsub
@@ -39,8 +41,9 @@ theorem logDerOne_holds : GlobalTheory.Mem.An.LogDerOne := by
     simp only [Set.Finite.mem_toFinset] at hw ⊢
     exact hsub hw
   rw [finsum_mem_eq_finite_toFinset_sum _ hfin] at hcount hmain
-  have hz : GlobalTheory.Mem.An.zsum χ 0 1 (fun ρ => 1 / (1 - ρ)) =
-      ∑ w ∈ hZfin.toFinset, (analyticOrderNatAt (LFunction χ) w : ℂ) / (1 - w) := by
+  have hz
+      : GlobalTheory.Mem.An.zsum χ 0 1 (fun ρ => 1 / (1 - ρ))
+        = ∑ w ∈ hZfin.toFinset, (analyticOrderNatAt (LFunction χ) w : ℂ) / (1 - w) := by
     unfold GlobalTheory.Mem.An.zsum
     rw [← hZ, finsum_mem_eq_finite_toFinset_sum _ hZfin]
     refine Finset.sum_congr rfl fun w _ => ?_
@@ -48,10 +51,12 @@ theorem logDerOne_holds : GlobalTheory.Mem.An.LogDerOne := by
     ring
   rw [hz]
   rw [← Finset.sum_sdiff hsub'] at hmain
-  have hrest : ‖∑ w ∈ hfin.toFinset \ hZfin.toFinset, (analyticOrderNatAt (LFunction χ) w : ℂ) / (1 - w)‖ ≤
-      ∑ w ∈ hfin.toFinset, (analyticOrderNatAt (LFunction χ) w : ℝ) := by
-    refine (norm_sum_le _ _).trans (le_trans (Finset.sum_le_sum fun w hw => ?_)
-      (Finset.sum_le_sum_of_subset_of_nonneg Finset.sdiff_subset fun _ _ _ => Nat.cast_nonneg _))
+  have hrest
+      : ‖∑ w ∈ hfin.toFinset \ hZfin.toFinset, (analyticOrderNatAt (LFunction χ) w : ℂ) / (1 - w)‖
+        ≤ ∑ w ∈ hfin.toFinset, (analyticOrderNatAt (LFunction χ) w : ℝ) := by
+    refine (norm_sum_le _ _).trans
+      (le_trans (Finset.sum_le_sum fun w hw => ?_)
+        (Finset.sum_le_sum_of_subset_of_nonneg Finset.sdiff_subset fun _ _ _ => Nat.cast_nonneg _))
     simp only [Finset.mem_sdiff, Set.Finite.mem_toFinset] at hw
     obtain ⟨⟨_, hw0⟩, hwn⟩ := hw
     have hre : w.re < 1 := by

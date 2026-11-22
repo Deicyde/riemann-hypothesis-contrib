@@ -12,12 +12,15 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.IsIntegra
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-private theorem psBase_equiv {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A]
-    [IsLocalRing B] (e : A ≃+* B) (h : IsBase A) : IsBase B := by
+private theorem psBase_equiv
+    {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B]
+    (e : A ≃+* B) (h : IsBase A)
+    : IsBase B := by
   have hd : IsDomain A := h.dom
   have hn : IsIntegrallyClosed A := h.normal
   have hc : IsAdicComplete (maximalIdeal A) A := h.complete
-  refine ⟨MulEquiv.isDomain A e.symm.toMulEquiv, IsIntegrallyClosed.of_equiv e, h.cm.of_ringEquiv e, ?_⟩
+  refine
+    ⟨MulEquiv.isDomain A e.symm.toMulEquiv, IsIntegrallyClosed.of_equiv e, h.cm.of_ringEquiv e, ?_⟩
   have hm : Ideal.map e (maximalIdeal A) = maximalIdeal B := by
     ext x
     rw [Ideal.mem_map_of_equiv]
@@ -36,15 +39,17 @@ private theorem psBase_equiv {A B : Type} [CommRing A] [CommRing B] [IsLocalRing
   rw [← hm]
   exact (IsAdicComplete.congr_ringEquiv _ e).2 hc
 
-private theorem psBase_cm (R : Type) [CommRing R] [IsLocalRing R] [IsDomain R]
-    (h : ReciprocityTheory.CA.IsCM R) : ReciprocityTheory.CA.IsCM (PowerSeries R) := by
+private theorem psBase_cm
+    (R : Type) [CommRing R] [IsLocalRing R] [IsDomain R] (h : ReciprocityTheory.CA.IsCM R)
+    : ReciprocityTheory.CA.IsCM (PowerSeries R) := by
   haveI := h.1
-  have hker : Ideal.span {(PowerSeries.X : PowerSeries R)} =
-      RingHom.ker (PowerSeries.constantCoeff : PowerSeries R →+* R) := by
+  have hker
+      : Ideal.span {(PowerSeries.X : PowerSeries R)}
+        = RingHom.ker (PowerSeries.constantCoeff : PowerSeries R →+* R) := by
     ext f
     rw [Ideal.mem_span_singleton, RingHom.mem_ker, PowerSeries.X_dvd_iff]
-  have hsurj : Function.Surjective (PowerSeries.constantCoeff : PowerSeries R →+* R) :=
-    fun a => ⟨PowerSeries.C a, by simp⟩
+  have hsurj : Function.Surjective (PowerSeries.constantCoeff : PowerSeries R →+* R) := fun a =>
+    ⟨PowerSeries.C a, by simp⟩
   let e : (PowerSeries R ⧸ Ideal.span {(PowerSeries.X : PowerSeries R)}) ≃+* R :=
     (Ideal.quotEquivOfEq hker).trans (RingHom.quotientKerEquivOfSurjective hsurj)
   haveI : IsLocalRing (PowerSeries R ⧸ Ideal.span {(PowerSeries.X : PowerSeries R)}) :=
@@ -54,22 +59,26 @@ private theorem psBase_cm (R : Type) [CommRing R] [IsLocalRing R] [IsDomain R]
   rw [mem_maximalIdeal, mem_nonunits_iff, PowerSeries.isUnit_iff_constantCoeff]
   simp
 
-private theorem psBase_one (R : Type) [CommRing R] [IsLocalRing R] (h : IsBase R) :
-    IsBase (PowerSeries R) := by
+private theorem psBase_one (R : Type) [CommRing R] [IsLocalRing R] (h : IsBase R)
+    : IsBase (PowerSeries R) := by
   haveI := h.dom
   haveI := h.normal
   haveI := h.cm.1
   haveI := h.complete
-  exact ⟨inferInstance, GlobalTheory.PowerSeriesNormal.isIntegrallyClosed_powerSeries R,
-    psBase_cm R h.cm, UpperTheory.V.abelian₂.adicComplete R⟩
+  exact ⟨
+    inferInstance,
+    GlobalTheory.PowerSeriesNormal.isIntegrallyClosed_powerSeries R,
+    psBase_cm R h.cm,
+    UpperTheory.V.abelian₂.adicComplete R
+  ⟩
 
-theorem UpperTheory.V.AlgebraTools.Conn.psBase :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O], IsBase O → ∀ n : ℕ, IsBase (MvPowerSeries (Fin n) O) := by
+theorem UpperTheory.V.AlgebraTools.Conn.psBase
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O],
+      IsBase O → ∀ n : ℕ, IsBase (MvPowerSeries (Fin n) O) := by
   intro O _ _ hO n
   induction n with
   | zero =>
-    have hbij : Function.Bijective
-        (MvPowerSeries.constantCoeff (σ := Fin 0) (R := O)) := by
+    have hbij : Function.Bijective (MvPowerSeries.constantCoeff (σ := Fin 0) (R := O)) := by
       refine ⟨fun f g hfg => ?_, fun a => ⟨MvPowerSeries.C a, by simp⟩⟩
       ext d
       have hd : d = 0 := Subsingleton.elim _ _

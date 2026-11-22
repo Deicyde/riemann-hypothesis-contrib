@@ -7,13 +7,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Continuo
 @[expose] public section
 
 open MeasureTheory Matrix
-open GlobalTheory.CompanionTheory.SiegelND.Integ.Arch GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.HuaInt
+open GlobalTheory.CompanionTheory.SiegelND.Integ.Arch
+  GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.HuaInt
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Arch.HuaInt
 
-theorem lintegral_one_add_normSq_rpow_ne_top :
-    ∀ (n : ℕ) (t : ℝ), (n : ℝ) < t →
-    ∫⁻ v : Fin n → ℂ, ENNReal.ofReal ((1 + ∑ i, Complex.normSq (v i)) ^ (-t)) ≠ ⊤ := by
+theorem lintegral_one_add_normSq_rpow_ne_top
+    : ∀ (n : ℕ) (t : ℝ),
+      (n : ℝ) < t
+        → ∫⁻ v : Fin n → ℂ, ENNReal.ofReal ((1 + ∑ i, Complex.normSq (v i)) ^ (-t)) ≠ ⊤ := by
   intro n t ht
   have ht0 : 0 < t := lt_of_le_of_lt n.cast_nonneg ht
   have hdim : (Module.finrank ℝ (Fin n → ℂ) : ℝ) < 2 * t := by

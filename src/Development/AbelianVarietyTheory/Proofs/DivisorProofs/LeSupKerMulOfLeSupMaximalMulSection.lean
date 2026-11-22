@@ -8,7 +8,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem nakayama_at_section : ∀ (O P : Type) [CommRing O] [IsLocalRing O] [CommRing P] [Algebra O P] (η : P →ₐ[O] O) (J S : Ideal P), J.FG → J ≤ S ⊔ (IsLocalRing.maximalIdeal O).comap η * J → J ≤ S ⊔ RingHom.ker η * J := by
+theorem nakayama_at_section
+    : ∀ (O P : Type) [CommRing O] [IsLocalRing O] [CommRing P] [Algebra O P] (η : P →ₐ[O] O)
+        (J S : Ideal P),
+      J.FG → J ≤ S ⊔ (IsLocalRing.maximalIdeal O).comap η * J → J ≤ S ⊔ RingHom.ker η * J := by
   intro O P _ _ _ _ η J S hJ h
   set S' : Ideal P := S ⊔ RingHom.ker η * J with hS'
   set n : Ideal P := (IsLocalRing.maximalIdeal O).comap η with hn
@@ -35,7 +38,7 @@ theorem nakayama_at_section : ∀ (O P : Type) [CommRing O] [IsLocalRing O] [Com
     have b : η r - 1 ∈ IsLocalRing.maximalIdeal O := by
       have := Ideal.mem_comap.mp hr1
       simpa [map_sub] using this
-    have c : (1:O) ∈ IsLocalRing.maximalIdeal O := by
+    have c : (1 : O) ∈ IsLocalRing.maximalIdeal O := by
       have := sub_mem a b
       simpa using this
     exact (IsLocalRing.maximalIdeal.isMaximal O).ne_top ((Ideal.eq_top_iff_one _).mpr c)

@@ -11,11 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Host Formalism.L2.Rows GlobalTheory.Published GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Fld GlobalTheory.Mem.HD NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Host Formalism.L2.Rows
+  GlobalTheory.Published GlobalTheory.Mem GlobalTheory.Mem.Top GlobalTheory.Mem.Fld
+  GlobalTheory.Mem.HD NumberField IsDedekindDomain
 
 namespace GlobalTheory.Mem.CyclotomicFieldContainment
 
-theorem natCard_codeWordStages_finiteGroup_eq (X : Stages) : Nat.card (G0g X.toD7.nd) = X.B.restRowsFiniteGroupCard := by
+theorem natCard_codeWordStages_finiteGroup_eq (X : Stages)
+    : Nat.card (G0g X.toD7.nd) = X.B.restRowsFiniteGroupCard := by
   have : ∀ k, NeZero (X.toD7.host.g k) := fun k => ⟨(X.toD7.host.g_prime k).ne_zero⟩
   rw [Nat.card_pi, Fintype.prod_sigma]
   refine Finset.prod_congr rfl fun k _ => ?_
@@ -23,34 +26,38 @@ theorem natCard_codeWordStages_finiteGroup_eq (X : Stages) : Nat.card (G0g X.toD
   rw [Finset.prod_const, Finset.card_univ, X.toD7.nd.card_PlG k]
   rfl
 
-theorem rootsField_le_iff (X : Stages) {N : IntermediateField ℚ ℂ} :
-    rootsField X.B.toPre ≤ N ↔ ∀ n ∈ rootOrders X.toD7, cycField n ≤ N := by
-  simp only [rootsField, rootOrders, natCard_codeWordStages_finiteGroup_eq, sup_le_iff, List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp,
-    forall_eq, and_assoc]
+theorem rootsField_le_iff (X : Stages) {N : IntermediateField ℚ ℂ}
+    : rootsField X.B.toPre ≤ N ↔ ∀ n ∈ rootOrders X.toD7, cycField n ≤ N := by
+  simp only [rootsField, rootOrders, natCard_codeWordStages_finiteGroup_eq, sup_le_iff,
+    List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq, and_assoc]
   rfl
 
 theorem rootOrders_ne_zero (X : Stages) : ∀ n ∈ rootOrders X.toD7, n ≠ 0 := by
   have hg : ∀ k, X.toD7.host.g k * (X.toD7.host.g k - 1) ≠ 0 := fun k => by
     have hp := X.toD7.host.g_prime k
     exact mul_ne_zero hp.ne_zero (by have := hp.two_le; omega)
-  simp only [rootOrders, natCard_codeWordStages_finiteGroup_eq, List.mem_cons, List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
+  simp only [rootOrders, natCard_codeWordStages_finiteGroup_eq, List.mem_cons, List.not_mem_nil,
+    or_false, forall_eq_or_imp, forall_eq]
   exact ⟨X.B.restRowsFiniteGroupCard_pos.ne', hg 0, hg 1, by norm_num, by norm_num⟩
 
 variable (ι : Qb →+* ℂ)
 
-theorem le_map_of_qb_le {A : IntermediateField ℚ ℂ} {Y : Fld} (hA : ∀ z ∈ A, ∃ x, ι x = z) (h : qb ι A ≤ Y) :
-    A ≤ Y.map ι.toRatAlgHom := fun z hz => by
+theorem le_map_of_qb_le
+    {A : IntermediateField ℚ ℂ} {Y : Fld} (hA : ∀ z ∈ A, ∃ x, ι x = z) (h : qb ι A ≤ Y)
+    : A ≤ Y.map ι.toRatAlgHom := fun z hz => by
   obtain ⟨x, rfl⟩ := hA z hz
   exact ⟨x, h (mem_qb.2 hz), rfl⟩
 
-theorem muFld_le_qb {n : ℕ} (hn : n ≠ 0) {N : IntermediateField ℚ ℂ} (h : cycField n ≤ N) : muFld n ≤ qb ι N := by
+theorem muFld_le_qb {n : ℕ} (hn : n ≠ 0) {N : IntermediateField ℚ ℂ} (h : cycField n ≤ N)
+    : muFld n ≤ qb ι N := by
   rw [muFld, IntermediateField.adjoin_le_iff]
   intro x hx
   refine mem_qb.2 (h (mem_cycField hn ?_))
   rw [← map_pow, show x ^ n = 1 from hx, map_one]
 
-theorem cycField_le_map {n : ℕ} (hn : n ≠ 0) {Y : Fld} (hY : muFld n ≤ Y) (hz : ∃ x, ι x = rootOne n) :
-    cycField n ≤ Y.map ι.toRatAlgHom := by
+theorem cycField_le_map
+    {n : ℕ} (hn : n ≠ 0) {Y : Fld} (hY : muFld n ≤ Y) (hz : ∃ x, ι x = rootOne n)
+    : cycField n ≤ Y.map ι.toRatAlgHom := by
   obtain ⟨x, hx⟩ := hz
   refine cycField_le_iff.2 ⟨x, hY (IntermediateField.subset_adjoin ℚ _ ?_), hx⟩
   apply ι.injective
@@ -59,21 +66,25 @@ theorem cycField_le_map {n : ℕ} (hn : n ≠ 0) {Y : Fld} (hY : muFld n ≤ Y) 
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem valsOf_subset_qb {χ : HChar E} {s : ℝ} {N : IntermediateField ℚ ℂ} (h : valueField χ s ≤ N) :
-    valsOf ι s χ ⊆ qb ι N := fun _ ⟨v, hv, e⟩ =>
+theorem valsOf_subset_qb {χ : HChar E} {s : ℝ} {N : IntermediateField ℚ ℂ} (h : valueField χ s ≤ N)
+    : valsOf ι s χ ⊆ qb ι N := fun _ ⟨v, hv, e⟩ =>
   mem_qb.2 (h (IntermediateField.subset_adjoin ℚ _ ⟨v, hv, e⟩))
 
-theorem valueField_le_map {χ : HChar E} {s : ℝ} {Y : Fld} (hY : valsOf ι s χ ⊆ Y)
-    (hz : ∀ z ∈ valueField χ s, ∃ x, ι x = z) : valueField χ s ≤ Y.map ι.toRatAlgHom := by
+theorem valueField_le_map
+    {χ : HChar E} {s : ℝ} {Y : Fld}
+    (hY : valsOf ι s χ ⊆ Y) (hz : ∀ z ∈ valueField χ s, ∃ x, ι x = z)
+    : valueField χ s ≤ Y.map ι.toRatAlgHom := by
   rw [valueField, IntermediateField.adjoin_le_iff]
   rintro z ⟨v, hv, rfl⟩
   obtain ⟨x, hx⟩ := hz _ (IntermediateField.subset_adjoin ℚ _ ⟨v, hv, rfl⟩)
   exact ⟨x, hY ⟨v, hv, hx⟩, hx⟩
 
-theorem ksQ_eq (X : Stages) (f : Fr X.B.toPre) (δ : FieldDat X.B.toPre) (hx : X.B.KsExact δ f) (T : HostTied X.toD7)
-    (P : KsPieces X.toD7 T) (hR : P.rcf = qb T.fr.ι δ.ray) (hM : P.M = qb T.fr.ι δ.M) (hD : P.MDel = qb T.fr.ι δ.M')
-    (hK : P.KPs = qb T.fr.ι (⨆ j ∈ Set.Icc 1 X.B.R.m, δ.KPsi j)) :
-    KsQ X.toD7 T (Fr.at X f) P = qb T.fr.ι (listField δ f) := by
+theorem ksQ_eq
+    (X : Stages) (f : Fr X.B.toPre) (δ : FieldDat X.B.toPre) (hx : X.B.KsExact δ f)
+    (T : HostTied X.toD7) (P : KsPieces X.toD7 T)
+    (hR : P.rcf = qb T.fr.ι δ.ray) (hM : P.M = qb T.fr.ι δ.M) (hD : P.MDel = qb T.fr.ι δ.M')
+    (hK : P.KPs = qb T.fr.ι (⨆ j ∈ Set.Icc 1 X.B.R.m, δ.KPsi j))
+    : KsQ X.toD7 T (Fr.at X f) P = qb T.fr.ι (listField δ f) := by
   have hran : ∀ z ∈ listField δ f, ∃ x, T.fr.ι x = z := by
     intro z hz
     have hz' : z ∈ X.B.KsC := by rw [show X.B.KsC = listField δ f from hx]; exact hz
@@ -113,11 +124,15 @@ theorem ksQ_eq (X : Stages) (f : Fr X.B.toPre) (δ : FieldDat X.B.toPre) (hx : X
     simp only [KsQ, sup_le_iff, iSup_le_iff] at hY
     obtain ⟨⟨⟨⟨⟨⟨a1, a2⟩, a3⟩, a4⟩, -⟩, a6⟩, a7⟩ := hY
     have ha3 : ∀ {A : Set Qb}, A ⊆ valsFld X.toD7 T (Fr.at X f) → A ⊆ Y := fun h _ hx => a3 (h hx)
-    have hv : (⋃ j, valsOf T.fr.ι 0 ((Fr.at X f).mu0 j)) ∪ valsOf T.fr.ι (1 / 2) (Fr.at X f).eta ∪
-        valsOf T.fr.ι 0 (Fr.at X f).del ∪ valsOf T.fr.ι 0 (Fr.at X f).del' ⊆ Y :=
+    have hv
+        : (⋃ j, valsOf T.fr.ι 0 ((Fr.at X f).mu0 j)) ∪ valsOf T.fr.ι (1 / 2) (Fr.at X f).eta
+            ∪ valsOf T.fr.ι 0 (Fr.at X f).del ∪ valsOf T.fr.ι 0 (Fr.at X f).del'
+          ⊆ Y :=
       ha3 (IntermediateField.subset_adjoin ℚ _)
-    have hr : rootsField X.B.toPre ≤ Y.map T.fr.ι.toRatAlgHom := (rootsField_le_iff X).2 fun n hn =>
-      cycField_le_map _ (hne n hn) (a2 n hn) (hran _ (hroots n hn (IntermediateField.mem_adjoin_simple_self ℚ _)))
+    have hr : rootsField X.B.toPre ≤ Y.map T.fr.ι.toRatAlgHom :=
+      (rootsField_le_iff X).2 fun n hn =>
+        cycField_le_map _ (hne n hn) (a2 n hn)
+          (hran _ (hroots n hn (IntermediateField.mem_adjoin_simple_self ℚ _)))
     have hmap : listField δ f ≤ Y.map T.fr.ι.toRatAlgHom := by
       refine (listField_le_iff δ f).2 ⟨?_, ?_, ?_, hr, ?_, fun j hj hj' => ?_⟩
       · rintro _ ⟨a, rfl⟩
@@ -126,7 +141,9 @@ theorem ksQ_eq (X : Stages) (f : Fr X.B.toPre) (δ : FieldDat X.B.toPre) (hx : X
       · exact le_map_of_qb_le _ (hle h3) (hR ▸ a4)
       · simp only [charField, sup_le_iff, iSup_le_iff]
         refine ⟨⟨⟨⟨fun j => ?_, ?_⟩, ?_⟩, ?_⟩, ?_⟩
-        · exact valueField_le_map _ (fun x hx => hv (Or.inl (Or.inl (Or.inl (Set.mem_iUnion.2 ⟨j, hx⟩))))) (hle (hmu j))
+        · exact valueField_le_map _
+            (fun x hx => hv (Or.inl (Or.inl (Or.inl (Set.mem_iUnion.2 ⟨j, hx⟩)))))
+            (hle (hmu j))
         · exact valueField_le_map _ (fun x hx => hv (Or.inl (Or.inl (Or.inr hx)))) (hle heta)
         · exact valueField_le_map _ (fun x hx => hv (Or.inl (Or.inr hx))) (hle hdel)
         · exact valueField_le_map _ (fun x hx => hv (Or.inr hx)) (hle hdel')
@@ -135,15 +152,19 @@ theorem ksQ_eq (X : Stages) (f : Fr X.B.toPre) (δ : FieldDat X.B.toPre) (hx : X
           exact hr (om_mem_rootsField f k a)
       · refine le_map_of_qb_le _ (hle (h6 j hj hj')) fun x hx => a7 ?_
         rw [hK]
-        exact mem_qb.2 ((le_iSup₂_of_le j ⟨hj, hj'⟩ le_rfl : δ.KPsi j ≤ ⨆ j ∈ Set.Icc 1 X.B.R.m, δ.KPsi j) hx)
+        exact mem_qb.2
+          ((le_iSup₂_of_le j ⟨hj, hj'⟩ le_rfl : δ.KPsi j ≤ ⨆ j ∈ Set.Icc 1 X.B.R.m, δ.KPsi j) hx)
     intro x hx
     obtain ⟨y, hy, e⟩ := hmap hx
     have hyx : y = x := T.fr.ι.injective e
     exact hyx ▸ hy
 
-theorem oTied_of_ksExact : GlobalArtinReciprocity → WeberRayFieldSt → ∀ (X : Stages) (f : Fr X.B.toPre)
-    (δ : FieldDat X.B.toPre), X.B.KsExact δ f → ∀ T : HostTied X.toD7, ∃ O : OTied X.toD7 T (Fr.at X f),
-      O.pieces.rcf = qb T.fr.ι δ.ray ∧ O.pieces.MDel = qb T.fr.ι δ.M' := by
+theorem oTied_of_ksExact
+    : GlobalArtinReciprocity → WeberRayFieldSt
+      → ∀ (X : Stages) (f : Fr X.B.toPre) (δ : FieldDat X.B.toPre),
+        X.B.KsExact δ f
+          → ∀ T : HostTied X.toD7, ∃ O : OTied X.toD7 T (Fr.at X f),
+            O.pieces.rcf = qb T.fr.ι δ.ray ∧ O.pieces.MDel = qb T.fr.ι δ.M' := by
   intro hA hW X f δ hx T
   obtain ⟨P, -, hR, hM, hD, hK⟩ := GlobalTheory.T.exists_smallField_classFieldPieces hA hW X f δ T
   have hq := ksQ_eq X f δ hx T P hR hM hD hK

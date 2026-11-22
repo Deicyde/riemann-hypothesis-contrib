@@ -10,8 +10,9 @@ open WittVector Ideal Matrix
 
 namespace GlobalTheory.Sandwich
 
-variable (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O]
+variable
+  (p : ℕ) [Fact p.Prime]
+  (O : Type) [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
 
 abbrev Ainf : Type := WittVector p (PreTilt O p)
 
@@ -19,7 +20,8 @@ def phiInv : Ainf p O →+* Ainf p O :=
   WittVector.map ((_root_.frobeniusEquiv (PreTilt O p) p).symm : PreTilt O p →+* PreTilt O p)
 
 def ofPadic : ℤ_[p] →+* Ainf p O :=
-  (WittVector.map (ZMod.castHom (dvd_refl p) (PreTilt O p))).comp (WittVector.equiv p).symm.toRingHom
+  (WittVector.map (ZMod.castHom (dvd_refl p) (PreTilt O p))).comp
+    (WittVector.equiv p).symm.toRingHom
 
 def padicToO : ℤ_[p] →+* O := (fontaineTheta O p).comp (ofPadic p O)
 
@@ -34,39 +36,39 @@ def nu (ε : PreTilt O p) : Ainf p O := teichmuller p (root ε) - 1
 def xi (ε : PreTilt O p) : Ainf p O := ∑ i ∈ Finset.range p, teichmuller p (root ε) ^ i
 
 open WittVector Ideal Matrix in
-variable (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O] in
+variable
+  (p : ℕ) [Fact p.Prime]
+  (O : Type) [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O] in
 variable {p O} in
-theorem _root_.GlobalTheory.Sandwich.xi_mul_nu (ε : PreTilt O p) :
-    _root_.GlobalTheory.Sandwich.xi ε * _root_.GlobalTheory.Sandwich.nu ε = _root_.GlobalTheory.Sandwich.mu ε := by
-  unfold _root_.GlobalTheory.Sandwich.xi _root_.GlobalTheory.Sandwich.nu _root_.GlobalTheory.Sandwich.mu
+theorem _root_.GlobalTheory.Sandwich.xi_mul_nu (ε : PreTilt O p)
+    : _root_.GlobalTheory.Sandwich.xi ε * _root_.GlobalTheory.Sandwich.nu ε
+      = _root_.GlobalTheory.Sandwich.mu ε := by
+  unfold _root_.GlobalTheory.Sandwich.xi _root_.GlobalTheory.Sandwich.nu
+    _root_.GlobalTheory.Sandwich.mu
   rw [geom_sum_mul, ← map_pow]
   congr 2
   unfold _root_.GlobalTheory.Sandwich.root
   rw [← frobenius_def, frobenius_apply_frobeniusEquiv_symm]
 
 open WittVector Ideal Matrix in
-variable (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] [Fact ¬IsUnit (p : O)]
-  [IsAdicComplete (span {(p : O)}) O] in
+variable
+  (p : ℕ) [Fact p.Prime]
+  (O : Type) [CommRing O] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O] in
 variable {p O} in
-theorem _root_.GlobalTheory.Sandwich.phiInv_mu (ε : PreTilt O p) :
-    _root_.GlobalTheory.Sandwich.phiInv p O (_root_.GlobalTheory.Sandwich.mu ε) = _root_.GlobalTheory.Sandwich.nu ε := by
-  unfold _root_.GlobalTheory.Sandwich.phiInv _root_.GlobalTheory.Sandwich.mu _root_.GlobalTheory.Sandwich.nu
+theorem _root_.GlobalTheory.Sandwich.phiInv_mu (ε : PreTilt O p)
+    : _root_.GlobalTheory.Sandwich.phiInv p O (_root_.GlobalTheory.Sandwich.mu ε)
+      = _root_.GlobalTheory.Sandwich.nu ε := by
+  unfold _root_.GlobalTheory.Sandwich.phiInv _root_.GlobalTheory.Sandwich.mu
+    _root_.GlobalTheory.Sandwich.nu
   rw [map_sub, map_one, WittVector.map_teichmuller]
   rfl
 
 structure Datum (ε : PreTilt O p) (h : ℕ) (Λ : Type) [CommRing Λ] [Algebra ℤ_[p] Λ] where
-
   F : Matrix (Fin h) (Fin h) (Ainf p O)
-
   G : Matrix (Fin h) (Fin h) (Ainf p O)
-
   Ψ : Matrix (Fin h) (Fin h) (Ainf p O)
-
   Ψ' : Matrix (Fin h) (Fin h) (Ainf p O)
-
   ρT : Λ →ₐ[ℤ_[p]] Matrix (Fin h) (Fin h) ℤ_[p]
-
   ρM : Λ →+* Matrix (Fin h) (Fin h) (Ainf p O)
   G_mul_F : G * F = mu ε • (1 : Matrix (Fin h) (Fin h) (Ainf p O))
   F_eq : F = Ψ * F.map (phiInv p O)

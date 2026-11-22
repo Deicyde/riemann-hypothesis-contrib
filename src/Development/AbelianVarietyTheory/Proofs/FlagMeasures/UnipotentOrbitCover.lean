@@ -12,27 +12,34 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SmallSizeCano
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.Deep Formalism.HN
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.Deep Formalism.HN
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.DeepCover
 
-theorem isIsot_span (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.E) (Fin I.n → I.E)) (h0 : R ≠ ⊥)
-    (h : R ≤ perpIn I x R) : I.IsIsot (Submodule.span I.E (R : Set (Fin I.n → I.E))) := by
-  have hspan : Submodule.span I.E (R : Set (Fin I.n → I.E)) ≤
-      Submodule.span I.E (perpIn I x R : Set (Fin I.n → I.E)) :=
+theorem isIsot_span
+    (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.E) (Fin I.n → I.E))
+    (h0 : R ≠ ⊥) (h : R ≤ perpIn I x R)
+    : I.IsIsot (Submodule.span I.E (R : Set (Fin I.n → I.E))) := by
+  have hspan
+      : Submodule.span I.E (R : Set (Fin I.n → I.E))
+        ≤ Submodule.span I.E (perpIn I x R : Set (Fin I.n → I.E)) :=
     Submodule.span_mono h
 
-  have h1 : ∀ s ∈ R, ∀ y ∈ Submodule.span I.E (R : Set (Fin I.n → I.E)),
-      Formalism.UG.hform (starRingEnd I.E) I.J s y = 0 :=
-    fun s hs y hy => GlobalTheory.FlagIso.hform_span I x R (hspan hy) hs
+  have h1
+      : ∀ s ∈ R, ∀ y ∈ Submodule.span I.E (R : Set (Fin I.n → I.E)),
+        Formalism.UG.hform (starRingEnd I.E) I.J s y = 0 := fun s hs y hy =>
+    GlobalTheory.FlagIso.hform_span I x R (hspan hy) hs
 
-  have h2 : ∀ y ∈ Submodule.span I.E (R : Set (Fin I.n → I.E)),
-      ∀ z ∈ Submodule.span I.E (R : Set (Fin I.n → I.E)),
-        Formalism.UG.hform (starRingEnd I.E) I.J y z = 0 := by
+  have h2
+      : ∀ y ∈ Submodule.span I.E (R : Set (Fin I.n → I.E)),
+        ∀ z ∈ Submodule.span I.E (R : Set (Fin I.n → I.E)),
+          Formalism.UG.hform (starRingEnd I.E) I.J y z = 0 := by
     intro y hy z hz
-    have hker : Submodule.span I.E (R : Set (Fin I.n → I.E)) ≤
-        LinearMap.ker (GlobalTheory.FlagIso.hR I.J y) := by
+    have hker
+        : Submodule.span I.E (R : Set (Fin I.n → I.E))
+          ≤ LinearMap.ker (GlobalTheory.FlagIso.hR I.J y) := by
       rw [Submodule.span_le]
       intro s hs
       rw [SetLike.mem_coe, LinearMap.mem_ker, GlobalTheory.FlagIso.hR_apply,
@@ -48,7 +55,19 @@ theorem isIsot_span (I : AutInst) (x : I.GA) (R : Submodule (𝓞 I.E) (Fin I.n 
   rw [hbot] at hr'
   exact (Submodule.mem_bot _).2 ((Submodule.mem_bot _).1 hr')
 
-theorem unipotent_orbit_cover : ∀ (I : AutInst) (x : I.GA) (g q : ℕ), 1 ≤ g → 1 ≤ I.n → (∀ v, rkR (I.ε v) ≤ q) → least I x < 1 / 2 → ∃ W : Submodule I.E (Fin I.n → I.E), I.IsIsot W ∧ ∀ ν : I.Ginf, ((ν, 1) : I.GA) ∈ I.NA W → ∃ γ ∈ I.GFset, ∃ k ∈ I.Kg g, ∃ y ∈ omega I x W ((I.n : ℝ) ^ 2 * Real.sqrt I.f * g * I.rd * (2 * least I x) ^ ((1 : ℝ) / q) / 4), ((ν, 1) : I.GA) * x = γ * y * (1, k) := by
+theorem unipotent_orbit_cover
+    : ∀ (I : AutInst) (x : I.GA) (g q : ℕ),
+      1 ≤ g → 1 ≤ I.n → (∀ v, rkR (I.ε v) ≤ q) → least I x < 1 / 2
+        → ∃ W : Submodule I.E (Fin I.n → I.E),
+          I.IsIsot W
+            ∧ ∀ ν : I.Ginf,
+              ((ν, 1) : I.GA) ∈ I.NA W
+                → ∃ γ ∈ I.GFset, ∃ k ∈ I.Kg g,
+                  ∃ y
+                      ∈ omega I x W
+                        ((I.n : ℝ) ^ 2 * Real.sqrt I.f * g * I.rd * (2 * least I x) ^ ((1 : ℝ) / q)
+                          / 4),
+                    ((ν, 1) : I.GA) * x = γ * y * (1, k) := by
   intro I x g q hg hn hq hlt
 
   obtain ⟨⟨a, S, τ, hF⟩, -, hspec⟩ := GlobalTheory.PointFlag.flag_spec I x
@@ -62,10 +81,8 @@ theorem unipotent_orbit_cover : ∀ (I : AutInst) (x : I.GA) (g q : ℕ), 1 ≤ 
   obtain ⟨-, -, hSlast, hτmono, hτ, -⟩ := hF
 
   obtain ⟨τ', hτ'⟩ : ∃ f : ℕ → ℝ, f = fun i => if h : i < a then τ ⟨i, h⟩ else 1 / 2 := ⟨_, rfl⟩
-  have hτ'lt : ∀ i (h : i < a), τ' i = τ ⟨i, h⟩ := by
-    intro i h; rw [hτ']; exact dif_pos h
-  have hτ'ge : ∀ i, a ≤ i → τ' i = 1 / 2 := by
-    intro i h; rw [hτ']; exact dif_neg (not_lt.2 h)
+  have hτ'lt : ∀ i (h : i < a), τ' i = τ ⟨i, h⟩ := by intro i h; rw [hτ']; exact dif_pos h
+  have hτ'ge : ∀ i, a ≤ i → τ' i = 1 / 2 := by intro i h; rw [hτ']; exact dif_neg (not_lt.2 h)
   have hpos : ∀ i ≤ a, 0 < τ' i := by
     intro i _
     rcases lt_or_ge i a with h | h
@@ -97,29 +114,38 @@ theorem unipotent_orbit_cover : ∀ (I : AutInst) (x : I.GA) (g q : ℕ), 1 ≤ 
     rw [hSlast] at h1
     exact h1.trans ((hrkR v).trans (hq v))
 
-  obtain ⟨b, hb, hratio, hsq⟩ := GlobalTheory.exists_consecutive_ratio_le_rpow a q τ' ha haq hpos hinc hlast
+  obtain ⟨b, hb, hratio, hsq⟩ :=
+    GlobalTheory.exists_consecutive_ratio_le_rpow a q τ' ha haq hpos hinc hlast
   rw [hτ'lt 0 ha, hτ0 ha, hτ'lt b hb] at hratio hsq
   have hi_pos : 0 < τ ⟨b, hb⟩ := (hτ ⟨b, hb⟩).1
   have hlo_pos : 0 < τ' (b + 1) := hpos (b + 1) hb
   obtain ⟨-, -, -, hne, hlarge, hgeL⟩ := hstep ⟨b, hb⟩
   have hRperp : S (Fin.succ ⟨b, hb⟩) ≤ perpIn I x (S (Fin.succ ⟨b, hb⟩)) :=
     le_trans (hall _).2.2.1 (hall _).2.2.2.1
-  have hsat : IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x) (S (Fin.succ ⟨b, hb⟩)) :=
+  have hsat : IsSat (Formalism.HermitianLatticesTheory.realize (bas I) (frm I x)) (lamX I x)
+      (S (Fin.succ ⟨b, hb⟩)) :=
     (hall _).1
-  have hlo : ∀ N, S (Fin.succ ⟨b, hb⟩) < N → N ≤ lamX I x →
-      τ' (b + 1) ≤ sizeQ (bas I) (frm I x) N (S (Fin.succ ⟨b, hb⟩)) := by
+  have hlo
+      : ∀ N,
+        S (Fin.succ ⟨b, hb⟩) < N → N ≤ lamX I x
+          → τ' (b + 1) ≤ sizeQ (bas I) (frm I x) N (S (Fin.succ ⟨b, hb⟩)) := by
     rw [hτ']; exact hgeL
-  refine ⟨Submodule.span I.E (S (Fin.succ ⟨b, hb⟩) : Set (Fin I.n → I.E)),
-    isIsot_span I x _ hne hRperp, ?_⟩
+  refine ⟨
+    Submodule.span I.E (S (Fin.succ ⟨b, hb⟩) : Set (Fin I.n → I.E)),
+    isIsot_span I x _ hne hRperp,
+    ?_
+  ⟩
   intro ν hν
   obtain ⟨γ, ⟨hγF, -⟩, hk, A, Z, hAZ, heq, hbound, hst⟩ :=
-    GlobalTheory.T.small_fundamental_set_real_unipotent I x g (S (Fin.succ ⟨b, hb⟩)) (τ' (b + 1)) (τ ⟨b, hb⟩)
-      ((2 * least I x) ^ ((1 : ℝ) / q)) hg hsat hne hRperp hi_pos hlarge hlo
+    GlobalTheory.T.small_fundamental_set_real_unipotent I x g (S (Fin.succ ⟨b, hb⟩)) (τ' (b + 1))
+      (τ ⟨b, hb⟩) ((2 * least I x) ^ ((1 : ℝ) / q)) hg hsat hne hRperp hi_pos hlarge hlo
       ((div_le_iff₀ hlo_pos).1 hratio) hsq ν hν
 
   obtain ⟨m, -, hm⟩ := hst 1 1
-  have hm' : ∀ v, uMat (m v) * uMat (x.1 v) =
-      uMat (x.1 v) * NormedSpace.exp (A v) * NormedSpace.exp (Z v) := by
+  have hm'
+      : ∀ v,
+        uMat (m v) * uMat (x.1 v)
+          = uMat (x.1 v) * NormedSpace.exp (A v) * NormedSpace.exp (Z v) := by
     intro v; simpa only [Complex.ofReal_one, one_smul] using hm v
 
   obtain ⟨-, -, -, -, -, -, hKg⟩ := GlobalTheory.CongTop.adelic_topology I

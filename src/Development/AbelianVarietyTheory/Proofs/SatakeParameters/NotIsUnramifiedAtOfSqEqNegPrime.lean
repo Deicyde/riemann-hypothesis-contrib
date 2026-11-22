@@ -9,10 +9,13 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.SqrtNegRam
 
-theorem not_isUnramifiedAt_of_sq_eq_neg :
-    ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K] (p : ℕ), p.Prime →
-      ¬ (p : ℤ) ∣ discr E → ∀ δ : K, δ ^ 2 = -(p : K) → ∀ w : HeightOneSpectrum (𝓞 K),
-        (p : 𝓞 K) ∈ w.asIdeal → ¬ Algebra.IsUnramifiedAt (𝓞 E) w.asIdeal := by
+theorem not_isUnramifiedAt_of_sq_eq_neg
+    : ∀ (E K : Type) [Field E] [NumberField E] [Field K] [NumberField K] [Algebra E K] (p : ℕ),
+      p.Prime → ¬ (p : ℤ) ∣ discr E
+        → ∀ δ : K,
+          δ ^ 2 = -(p : K)
+            → ∀ w : HeightOneSpectrum (𝓞 K),
+              (p : 𝓞 K) ∈ w.asIdeal → ¬ Algebra.IsUnramifiedAt (𝓞 E) w.asIdeal := by
   intro E K _ _ _ _ _ p hp hd δ hδ w hpw hunr
   have hmax := w.isMaximal
   have hpz : Prime (p : ℤ) := Nat.prime_iff_prime_int.1 hp
@@ -37,7 +40,8 @@ theorem not_isUnramifiedAt_of_sq_eq_neg :
     change algebraMap (𝓞 K) K (y ^ 2) = algebraMap (𝓞 K) K ((p : 𝓞 K) * (-1))
     rw [map_pow, map_mul, map_neg, map_one, map_natCast]
     change δ ^ 2 = _
-    rw [hδ]; ring
+    rw [hδ]
+    ring
   have hu : (-1 : 𝓞 K) ∉ w.asIdeal := by
     intro h
     exact hmax.ne_top ((Ideal.eq_top_iff_one _).2 (by simpa using w.asIdeal.neg_mem h))

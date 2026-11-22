@@ -40,14 +40,16 @@ public import Lean
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.RowEx
 
 namespace GlobalTheory
-
 
 set_option maxHeartbeats 4000000 in
 open GlobalTheory.FunObj GlobalTheory.FunObj.SqNum GlobalTheory.BigTop.Fun in
@@ -57,7 +59,8 @@ theorem Mem.LiteralAutomorphy.trSq_holds : GlobalTheory.Mem.LiteralAutomorphy.Tr
   clear S S' W W'
   obtain ⟨B, C₁, W₁, V₁, S₁, N₁, G₁⟩ := X
   obtain ⟨B', C₂, W₂, V₂, S₂, N₂, G₂⟩ := X'
-  cases B; cases B'
+  cases B
+  cases B'
   dsimp only at hpre
   subst hpre
   obtain rfl := eq_of_heq hff
@@ -86,25 +89,143 @@ theorem Mem.LiteralAutomorphy.trSq_holds : GlobalTheory.Mem.LiteralAutomorphy.Tr
   have eT : ∀ i j s χ x, IsTor G' i j s χ x ↔ IsTor G i j s χ x := by
     intro i j s χ x; unfold IsTor; rw [e_condF]; exact (Iff.refl (IsTor G i j s χ x))
 
-  let hk1 : ∀ {N : ℕ}, Formalism.MainNotions.StandardLatticesGL3.HeckeU (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) N → Formalism.MainNotions.StandardLatticesGL3.HeckeU (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) N :=
-    fun h => { f := ((h.f)), n := ((h.n)), unitary := ((h.unitary)), cont := ((h.cont)), aut := ((h.aut)), norm := ((h.norm)), par := ((h.par)), unr := ((h.unr)) }
-  let wt1 : ∀ {δ : ℂ} {a d : ℕ} {e0 : Formalism.MainNotions.TaylorLogMetric.VC (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) a d → ℂ}, Formalism.MainNotions.StandardLatticesGL3.WeilO (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ a d e0 →
-      Formalism.MainNotions.StandardLatticesGL3.WeilO (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ a d ((e0)) :=
-    fun w => { chV := hk1 w.chV, chV' := hk1 w.chV', ep := w.ep, ep' := w.ep', ep_pm := w.ep_pm, nz := ((w.nz)), Om := ((w.Om)), maps := ((w.maps)), add := ((w.add)), smul := ((w.smul)), one := ((w.one)), mul := ((w.mul)), lift := ((w.lift)), inert := ((w.inert)), split := ((w.split)) }
-  let pt1 : ∀ {δ t0 : ℂ} {Q : ℕ}, GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ t0 Q → GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ t0 Q :=
-    fun P => { a := P.a, d := P.d, a_le := P.a_le, d_even := P.d_even, W := wt1 P.W, crv := ((P.crv)), pt0 := ((P.pt0)), e0 := ((P.e0)), vac := ((P.vac)), n := ((P.n)), wt := ((P.wt)), F := ((P.F)), pres := ((P.pres)), fix := ((P.fix)), J := ((P.J)), J_le := ((P.J_le)), idx_ne := ((P.idx_ne)), idx_le := ((P.idx_le)), eig := ((P.eig)) }
+  let hk1
+      : ∀ {N : ℕ},
+        Formalism.MainNotions.StandardLatticesGL3.HeckeU
+            (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) N
+          → Formalism.MainNotions.StandardLatticesGL3.HeckeU
+            (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) N := fun h => {
+    f := ((h.f))
+    n := ((h.n))
+    unitary := ((h.unitary))
+    cont := ((h.cont))
+    aut := ((h.aut))
+    norm := ((h.norm))
+    par := ((h.par))
+    unr := ((h.unr))
+  }
+  let wt1
+      : ∀ {δ : ℂ} {a d : ℕ}
+          {e0 : Formalism.MainNotions.TaylorLogMetric.VC
+              (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) a d
+            → ℂ},
+        Formalism.MainNotions.StandardLatticesGL3.WeilO
+            (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ a d e0
+          → Formalism.MainNotions.StandardLatticesGL3.WeilO
+            (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ a d ((e0)) := fun w => {
+    chV := hk1 w.chV
+    chV' := hk1 w.chV'
+    ep := w.ep
+    ep' := w.ep'
+    ep_pm := w.ep_pm
+    nz := ((w.nz))
+    Om := ((w.Om))
+    maps := ((w.maps))
+    add := ((w.add))
+    smul := ((w.smul))
+    one := ((w.one))
+    mul := ((w.mul))
+    lift := ((w.lift))
+    inert := ((w.inert))
+    split := ((w.split))
+  }
+  let pt1
+      : ∀ {δ t0 : ℂ} {Q : ℕ},
+        GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ t0 Q
+          → GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ t0
+            Q := fun P => {
+    a := P.a
+    d := P.d
+    a_le := P.a_le
+    d_even := P.d_even
+    W := wt1 P.W
+    crv := ((P.crv))
+    pt0 := ((P.pt0))
+    e0 := ((P.e0))
+    vac := ((P.vac))
+    n := ((P.n))
+    wt := ((P.wt))
+    F := ((P.F))
+    pres := ((P.pres))
+    fix := ((P.fix))
+    J := ((P.J))
+    J_le := ((P.J_le))
+    idx_ne := ((P.idx_ne))
+    idx_le := ((P.idx_le))
+    eig := ((P.eig))
+  }
 
-  let hk2 : ∀ {N : ℕ}, Formalism.MainNotions.StandardLatticesGL3.HeckeU (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) N → Formalism.MainNotions.StandardLatticesGL3.HeckeU (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) N :=
-    fun h => { f := ((h.f)), n := ((h.n)), unitary := ((h.unitary)), cont := ((h.cont)), aut := ((h.aut)), norm := ((h.norm)), par := ((h.par)), unr := ((h.unr)) }
-  let wt2 : ∀ {δ : ℂ} {a d : ℕ} {e0 : Formalism.MainNotions.TaylorLogMetric.VC (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) a d → ℂ}, Formalism.MainNotions.StandardLatticesGL3.WeilO (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ a d e0 →
-      Formalism.MainNotions.StandardLatticesGL3.WeilO (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ a d ((e0)) :=
-    fun w => { chV := hk2 w.chV, chV' := hk2 w.chV', ep := w.ep, ep' := w.ep', ep_pm := w.ep_pm, nz := ((w.nz)), Om := ((w.Om)), maps := ((w.maps)), add := ((w.add)), smul := ((w.smul)), one := ((w.one)), mul := ((w.mul)), lift := ((w.lift)), inert := ((w.inert)), split := ((w.split)) }
-  let pt2 : ∀ {δ t0 : ℂ} {Q : ℕ}, GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ t0 Q → GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ t0 Q :=
-    fun P => { a := P.a, d := P.d, a_le := P.a_le, d_even := P.d_even, W := wt2 P.W, crv := ((P.crv)), pt0 := ((P.pt0)), e0 := ((P.e0)), vac := ((P.vac)), n := ((P.n)), wt := ((P.wt)), F := ((P.F)), pres := ((P.pres)), fix := ((P.fix)), J := ((P.J)), J_le := ((P.J_le)), idx_ne := ((P.idx_ne)), idx_le := ((P.idx_le)), eig := ((P.eig)) }
+  let hk2
+      : ∀ {N : ℕ},
+        Formalism.MainNotions.StandardLatticesGL3.HeckeU
+            (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) N
+          → Formalism.MainNotions.StandardLatticesGL3.HeckeU
+            (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) N := fun h => {
+    f := ((h.f))
+    n := ((h.n))
+    unitary := ((h.unitary))
+    cont := ((h.cont))
+    aut := ((h.aut))
+    norm := ((h.norm))
+    par := ((h.par))
+    unr := ((h.unr))
+  }
+  let wt2
+      : ∀ {δ : ℂ} {a d : ℕ}
+          {e0 : Formalism.MainNotions.TaylorLogMetric.VC
+              (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) a d
+            → ℂ},
+        Formalism.MainNotions.StandardLatticesGL3.WeilO
+            (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ a d e0
+          → Formalism.MainNotions.StandardLatticesGL3.WeilO
+            (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ a d ((e0)) := fun w => {
+    chV := hk2 w.chV
+    chV' := hk2 w.chV'
+    ep := w.ep
+    ep' := w.ep'
+    ep_pm := w.ep_pm
+    nz := ((w.nz))
+    Om := ((w.Om))
+    maps := ((w.maps))
+    add := ((w.add))
+    smul := ((w.smul))
+    one := ((w.one))
+    mul := ((w.mul))
+    lift := ((w.lift))
+    inert := ((w.inert))
+    split := ((w.split))
+  }
+  let pt2
+      : ∀ {δ t0 : ℂ} {Q : ℕ},
+        GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ t0 Q
+          → GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ t0
+            Q := fun P => {
+    a := P.a
+    d := P.d
+    a_le := P.a_le
+    d_even := P.d_even
+    W := wt2 P.W
+    crv := ((P.crv))
+    pt0 := ((P.pt0))
+    e0 := ((P.e0))
+    vac := ((P.vac))
+    n := ((P.n))
+    wt := ((P.wt))
+    F := ((P.F))
+    pres := ((P.pres))
+    fix := ((P.fix))
+    J := ((P.J))
+    J_le := ((P.J_le))
+    idx_ne := ((P.idx_ne))
+    idx_le := ((P.idx_le))
+    eig := ((P.eig))
+  }
 
-  have btr1 : ∀ {δ t0 : ℂ} {Q : ℕ} (i j : Fin (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩).R.m)
-      (P P' : GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ t0 Q), IsBottom G μ₀ i j (SqNum.condE G.pl) P P' →
-        IsBottom G' μ₀' i j (SqNum.condE G'.pl) (pt1 P) (pt1 P') := by
+  have btr1
+      : ∀ {δ t0 : ℂ} {Q : ℕ} (i j : Fin (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩).R.m)
+          (P P' : GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₁, W₁, V₁, S₁, N₁, G₁⟩) ⊤ δ t0 Q),
+        IsBottom G μ₀ i j (SqNum.condE G.pl) P P'
+          → IsBottom G' μ₀' i j (SqNum.condE G'.pl) (pt1 P) (pt1 P') := by
     intro δ t0 Q i j P P' h
     obtain ⟨h1, h2, h3, h4, h5, h6⟩ := h
     refine ⟨(h1), ?_, ?_, ?_, ?_, ?_⟩
@@ -114,9 +235,11 @@ theorem Mem.LiteralAutomorphy.trSq_holds : GlobalTheory.Mem.LiteralAutomorphy.Tr
     · rw [e_condE]; exact (h5)
     · rw [e_condE]; exact (h6)
 
-  have btr2 : ∀ {δ t0 : ℂ} {Q : ℕ} (i j : Fin (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩).R.m)
-      (P P' : GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ t0 Q), IsBottom G' μ₀' i j (SqNum.condE G'.pl) P P' →
-        IsBottom G μ₀ i j (SqNum.condE G.pl) (pt2 P) (pt2 P') := by
+  have btr2
+      : ∀ {δ t0 : ℂ} {Q : ℕ} (i j : Fin (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩).R.m)
+          (P P' : GlobalTheory.NormSum.Pair (Mem.Stages.toD7 ⟨_, C₂, W₂, V₂, S₂, N₂, G₂⟩) ⊤ δ t0 Q),
+        IsBottom G' μ₀' i j (SqNum.condE G'.pl) P P'
+          → IsBottom G μ₀ i j (SqNum.condE G.pl) (pt2 P) (pt2 P') := by
     intro δ t0 Q i j P P' h
     obtain ⟨h1, h2, h3, h4, h5, h6⟩ := h
     rw [e_beta, e_nu] at h2
@@ -126,9 +249,14 @@ theorem Mem.LiteralAutomorphy.trSq_holds : GlobalTheory.Mem.LiteralAutomorphy.Tr
   refine ⟨fun hb => ?_, fun i j s c x y h1 h2 h3 h4 => ?_⟩
   · obtain ⟨δ, t0, hb⟩ := hb
     rw [e_levQ] at hb
-    obtain ⟨δ', t0', hb'⟩ := hs.norms ⟨δ, t0, fun ij => by
-      obtain ⟨P, P', hP, -, -⟩ := hb ((ij))
-      exact ⟨pt2 P, pt2 P', btr2 ((ij.1)) ((ij.2)) P P' hP, trivial, trivial⟩⟩
+    obtain ⟨δ', t0', hb'⟩ :=
+      hs.norms ⟨
+        δ,
+        t0,
+        fun ij => by
+          obtain ⟨P, P', hP, -, -⟩ := hb ((ij))
+          exact ⟨pt2 P, pt2 P', btr2 ((ij.1)) ((ij.2)) P P' hP, trivial, trivial⟩
+      ⟩
     refine ⟨δ', t0', fun ij => ?_⟩
     rw [e_levQ]
     obtain ⟨P, P', hP, n1, n2⟩ := hb' ((ij))

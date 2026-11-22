@@ -12,9 +12,11 @@ namespace PI.SlopeSteps
 
 open MvPolynomial Formalism.GradedWeylDivisibility Formalism.L2.DIV Matrix
 
-theorem det_mul_rect' {R : Type*} [CommRing R] {k : ℕ} {n : Type*} [Fintype n]
-    (A : Matrix (Fin k) n R) (B : Matrix n (Fin k) R) :
-    (A * B).det = ∑ f : Fin k → n, (∏ i, B (f i) i) * (A.submatrix id f).det := by
+theorem det_mul_rect'
+    {R : Type*} [CommRing R]
+    {k : ℕ} {n : Type*} [Fintype n]
+    (A : Matrix (Fin k) n R) (B : Matrix n (Fin k) R)
+    : (A * B).det = ∑ f : Fin k → n, (∏ i, B (f i) i) * (A.submatrix id f).det := by
   simp only [det_apply, Matrix.mul_apply, Fintype.prod_sum, Finset.smul_sum, submatrix_apply, id]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun f _ => ?_
@@ -23,25 +25,33 @@ theorem det_mul_rect' {R : Type*} [CommRing R] {k : ℕ} {n : Type*} [Fintype n]
   simp only [Units.smul_def, zsmul_eq_mul, Finset.prod_mul_distrib]
   ring
 
-theorem sum_comp_perm' {M : Type*} [AddCommMonoid M] {k : ℕ} {n : Type*} [Fintype n] [DecidableEq n]
-    (F : (Fin k → n) → M) (τ : Equiv.Perm (Fin k)) : ∑ f : Fin k → n, F (fun i => f (τ i)) = ∑ f, F f :=
+theorem sum_comp_perm'
+    {M : Type*} [AddCommMonoid M]
+    {k : ℕ} {n : Type*} [Fintype n] [DecidableEq n]
+    (F : (Fin k → n) → M) (τ : Equiv.Perm (Fin k))
+    : ∑ f : Fin k → n, F (fun i => f (τ i)) = ∑ f, F f :=
   Equiv.sum_comp (Equiv.arrowCongr τ.symm (Equiv.refl n)) F
 
-theorem factorial_mul_det_gram_cauchy_binet {R : Type*} [CommRing R] (k : ℕ) {n : Type*} [Fintype n] [DecidableEq n]
-    (q : n → R) (V : Matrix n (Fin k) R) :
-    (k.factorial : R) * (Vᵀ * diagonal q * V).det =
-      ∑ f : Fin k → n, (∏ i, q (f i)) * ((V.submatrix f id).det * (Vᵀ.submatrix id f).det) := by
-  have hexp : (Vᵀ * diagonal q * V).det = ∑ f : Fin k → n, (∏ i, q (f i)) *
-      ((∏ i, V (f i) i) * (Vᵀ.submatrix id f).det) := by
+theorem factorial_mul_det_gram_cauchy_binet
+    {R : Type*} [CommRing R]
+    (k : ℕ)
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (q : n → R) (V : Matrix n (Fin k) R)
+    : (k.factorial : R) * (Vᵀ * diagonal q * V).det
+      = ∑ f : Fin k → n, (∏ i, q (f i)) * ((V.submatrix f id).det * (Vᵀ.submatrix id f).det) := by
+  have hexp
+      : (Vᵀ * diagonal q * V).det
+        = ∑ f : Fin k → n, (∏ i, q (f i)) *
+          ((∏ i, V (f i) i) * (Vᵀ.submatrix id f).det) := by
     rw [Matrix.mul_assoc, det_mul_rect']
     refine Finset.sum_congr rfl fun f _ => ?_
     simp only [diagonal_mul, Finset.prod_mul_distrib, mul_assoc]
-  have hk : (k.factorial : R) = ∑ _τ : Equiv.Perm (Fin k), (1 : R) := by
-    simp [Fintype.card_perm]
-  have step : ∀ τ : Equiv.Perm (Fin k),
-      (1 : R) * ∑ f : Fin k → n, (∏ i, q (f i)) * ((∏ i, V (f i) i) * (Vᵀ.submatrix id f).det)
-        = ∑ f : Fin k → n, (∏ i, q (f i)) *
-            ((∏ i, V (f (τ i)) i) * ((Vᵀ.submatrix id f).submatrix id τ).det) := by
+  have hk : (k.factorial : R) = ∑ _τ : Equiv.Perm (Fin k), (1 : R) := by simp [Fintype.card_perm]
+  have step
+      : ∀ τ : Equiv.Perm (Fin k),
+        (1 : R) * ∑ f : Fin k → n, (∏ i, q (f i)) * ((∏ i, V (f i) i) * (Vᵀ.submatrix id f).det)
+          = ∑ f : Fin k → n, (∏ i, q (f i)) *
+              ((∏ i, V (f (τ i)) i) * ((Vᵀ.submatrix id f).submatrix id τ).det) := by
     intro τ
     rw [one_mul, ← sum_comp_perm' _ τ]
     refine Finset.sum_congr rfl fun f _ => ?_
@@ -57,16 +67,20 @@ theorem factorial_mul_det_gram_cauchy_binet {R : Type*} [CommRing R] (k : ℕ) {
   simp only [submatrix_apply, id, Units.smul_def, zsmul_eq_mul]
   ring
 
-theorem factorial_mul_det_sq {R : Type*} [CommRing R] (k : ℕ) {n : Type*} [Fintype n] [DecidableEq n]
-    (q : n → R) (V : Matrix n (Fin k) R) :
-    (k.factorial : R) * (Vᵀ * diagonal q * V).det =
-      ∑ f : Fin k → n, (∏ i, q (f i)) * ((V.submatrix f id).det * (V.submatrix f id).det) := by
+theorem factorial_mul_det_sq
+    {R : Type*} [CommRing R]
+    (k : ℕ)
+    {n : Type*} [Fintype n] [DecidableEq n]
+    (q : n → R) (V : Matrix n (Fin k) R)
+    : (k.factorial : R) * (Vᵀ * diagonal q * V).det
+      = ∑ f : Fin k → n, (∏ i, q (f i)) * ((V.submatrix f id).det * (V.submatrix f id).det) := by
   rw [factorial_mul_det_gram_cauchy_binet]
   refine Finset.sum_congr rfl fun f _ => ?_
   rw [← transpose_submatrix, det_transpose]
 
-theorem fockQ_eq_sum {σ : Type} (P Q : MvPolynomial σ ℚ) (S : Finset (σ →₀ ℕ)) (hS : P.support ⊆ S) :
-    fockQ P Q = ∑ m ∈ S, P.coeff m * Q.coeff m * ((∏ k ∈ m.support, (m k).factorial : ℕ) : ℚ) := by
+theorem fockQ_eq_sum {σ : Type} (P Q : MvPolynomial σ ℚ) (S : Finset (σ →₀ ℕ)) (hS : P.support ⊆ S)
+    : fockQ P Q
+      = ∑ m ∈ S, P.coeff m * Q.coeff m * ((∏ k ∈ m.support, (m k).factorial : ℕ) : ℚ) := by
   unfold fockQ
   refine Finset.sum_subset hS fun m _ hm => ?_
   rw [MvPolynomial.mem_support_iff, not_not] at hm
@@ -92,12 +106,14 @@ theorem nabla_gram_lower_bound : NablaGramLow := by
     have hsub : (map (Int.castRingHom ℚ) (e i : MvPolynomial (Fin N × Fin N) ℤ)).support ⊆ S :=
       (MvPolynomial.support_map_subset _ _).trans (by
         rw [hS]
-        exact Finset.subset_biUnion_of_mem (fun i => (e i : MvPolynomial (Fin N × Fin N) ℤ).support)
+        exact Finset.subset_biUnion_of_mem
+          (fun i => (e i : MvPolynomial (Fin N × Fin N) ℤ).support)
           (Finset.mem_univ i))
     simp only [gramOf, Matrix.of_apply]
     rw [fockQ_eq_sum _ _ S hsub, Finset.sum_div, ← Finset.sum_coe_sort S]
     rw [Matrix.mul_apply]
-    simp only [mul_diagonal, transpose_apply, hV, hVz, map_apply, of_apply, hq, coeff_map, eq_intCast]
+    simp only [mul_diagonal, transpose_apply, hV, hVz, map_apply, of_apply, hq, coeff_map,
+      eq_intCast]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [← hh]
     ring
@@ -107,14 +123,16 @@ theorem nabla_gram_lower_bound : NablaGramLow := by
     obtain ⟨i, -, hm⟩ := Finset.mem_biUnion.mp m.2
     have hcol := colSums ℤ N N ν _ (e i).2 m.1 hm
     have hT1 := monomial_factorization_lower N ν m.1 hcol
-    have hT1q : ((∏ s, (ν s).factorial : ℕ) : ℚ) ≤
-        (N : ℚ) ^ (∑ s, ν s) * ((∏ k ∈ m.1.support, (m.1 k).factorial : ℕ) : ℚ) := by
+    have hT1q
+        : ((∏ s, (ν s).factorial : ℕ) : ℚ)
+          ≤ (N : ℚ) ^ (∑ s, ν s) * ((∏ k ∈ m.1.support, (m.1 k).factorial : ℕ) : ℚ) := by
       exact_mod_cast hT1
     rw [hA, hq]
     rw [div_le_div_iff₀ (mul_pos hNpow hpos) hpos]
-    calc ((∏ s, (ν s).factorial : ℕ) : ℚ) * h
-        ≤ (N : ℚ) ^ (∑ s, ν s) * ((∏ k ∈ m.1.support, (m.1 k).factorial : ℕ) : ℚ) * h :=
-          mul_le_mul_of_nonneg_right hT1q hpos.le
+    calc
+      ((∏ s, (ν s).factorial : ℕ) : ℚ) * h
+          ≤ (N : ℚ) ^ (∑ s, ν s) * ((∏ k ∈ m.1.support, (m.1 k).factorial : ℕ) : ℚ) * h :=
+        mul_le_mul_of_nonneg_right hT1q hpos.le
       _ = ((∏ k ∈ m.1.support, (m.1 k).factorial : ℕ) : ℚ) * ((N : ℚ) ^ (∑ s, ν s) * h) := by ring
 
   have hid1 := factorial_mul_det_sq r (fun _ => (1 : ℚ)) V
@@ -135,22 +153,26 @@ theorem nabla_gram_lower_bound : NablaGramLow := by
       rwa [← mulVec_mulVec, dotProduct_mulVec, vecMul_transpose] at h1'
     have h2 : V *ᵥ v = 0 := by
       funext m
-      have h3 := (Finset.sum_eq_zero_iff_of_nonneg (fun m _ => mul_self_nonneg ((V *ᵥ v) m))).mp h1 m
-        (Finset.mem_univ _)
+      have h3 :=
+        (Finset.sum_eq_zero_iff_of_nonneg (fun m _ => mul_self_nonneg ((V *ᵥ v) m))).mp h1 m
+          (Finset.mem_univ _)
       exact mul_self_eq_zero.mp h3
     have h3 : ∑ i, v i • intQ N N (e i : MvPolynomial (Fin N × Fin N) ℤ) = 0 := by
       ext m
       rw [MvPolynomial.coeff_sum, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
-      simp only [MvPolynomial.coeff_smul, smul_eq_mul, we_intQ_apply, MvPolynomial.coeff_map, eq_intCast]
+      simp only [MvPolynomial.coeff_smul, smul_eq_mul, we_intQ_apply, MvPolynomial.coeff_map,
+        eq_intCast]
       by_cases hm : m ∈ S
       · have h4 := congrFun h2 ⟨m, hm⟩
-        simp only [mulVec, dotProduct, hV, hVz, map_apply, of_apply, Pi.zero_apply, eq_intCast] at h4
+        simp only [mulVec, dotProduct, hV, hVz, map_apply, of_apply, Pi.zero_apply, eq_intCast]
+          at h4
         rw [← h4]
         exact Finset.sum_congr rfl fun i _ => mul_comm _ _
       · refine Finset.sum_eq_zero fun i _ => ?_
         have h5 : (e i : MvPolynomial (Fin N × Fin N) ℤ).coeff m = 0 := by
           by_contra hc
-          exact hm (Finset.mem_biUnion.mpr ⟨i, Finset.mem_univ _, MvPolynomial.mem_support_iff.mpr hc⟩)
+          exact hm (Finset.mem_biUnion.mpr
+            ⟨i, Finset.mem_univ _, MvPolynomial.mem_support_iff.mpr hc⟩)
         rw [h5, Int.cast_zero, mul_zero]
     exact hv0 (funext (Fintype.linearIndependent_iff.mp hind v h3))
   have hVVint : (Vᵀ * V).det = (((Vzᵀ * Vz).det : ℤ) : ℚ) := by
@@ -167,10 +189,13 @@ theorem nabla_gram_lower_bound : NablaGramLow := by
   have hid := factorial_mul_det_sq r q V
   have hprod : ∀ f : Fin r → S, A ^ r ≤ ∏ i, q (f i) := by
     intro f
-    calc A ^ r = ∏ _i : Fin r, A := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+    calc
+      A ^ r
+        = ∏ _i : Fin r, A := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
       _ ≤ ∏ i, q (f i) := Finset.prod_le_prod₀ (fun _ _ => hA0) (fun i _ => hqA (f i))
-  have hmain : A ^ r * ((r.factorial : ℚ) * (Vᵀ * V).det) ≤
-      (r.factorial : ℚ) * (Vᵀ * diagonal q * V).det := by
+  have hmain
+      : A ^ r * ((r.factorial : ℚ) * (Vᵀ * V).det)
+        ≤ (r.factorial : ℚ) * (Vᵀ * diagonal q * V).det := by
     rw [hid1, hid, Finset.mul_sum]
     exact Finset.sum_le_sum fun f _ => mul_le_mul_of_nonneg_right (hprod f) (mul_self_nonneg _)
   rw [hG]

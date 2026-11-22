@@ -22,7 +22,35 @@ open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_compatible : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G], ∀ (G' : Over (Spec (CommRingCat.of R))) [GrpObj G'] [IsCommMonObj G'], ∀ (T : TorsRep G p) (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N] (pt : N → (sp (R₀ := R) R ⟶ G)), IsTorsPts G p pt → ∀ (T' : TorsRep G' p) (N' : Type) [AddCommGroup N'] [Fintype N'] [DecidableEq N'] (pt' : N' → (sp (R₀ := R) R ⟶ G')), IsTorsPts G' p pt' → ∀ j : G ⟶ G', IsMonHom j → ∀ K : AddSubgroup N, (∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ G), z ≫ j = 1 ↔ ∃ φ : (T.A ⧸ vanIdeal T pt K) →ₐ[R] S, spMap φ ≫ (spMap (Ideal.Quotient.mkₐ R (vanIdeal T pt K)) ≫ T.y) = z) → ∀ jN : N →+ N', (∀ x, pt' (jN x) = pt x ≫ j) → jN.ker = K ∧ ∀ g ∈ torsFun C T pt, (∀ k ∈ jN.ker, g k = 0) → g ∈ (augIdeal (torsFun C T' pt')).map (LinearMap.funLeft R C (jN : N → N')) * torsFun C T pt := by
+theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_compatible
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G],
+          ∀ (G' : Over (Spec (CommRingCat.of R))) [GrpObj G'] [IsCommMonObj G'],
+            ∀ (T : TorsRep G p) (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N]
+                (pt : N → (sp (R₀ := R) R ⟶ G)),
+              IsTorsPts G p pt
+                → ∀ (T' : TorsRep G' p) (N' : Type) [AddCommGroup N'] [Fintype N'] [DecidableEq N']
+                    (pt' : N' → (sp (R₀ := R) R ⟶ G')),
+                  IsTorsPts G' p pt'
+                    → ∀ j : G ⟶ G',
+                      IsMonHom j
+                        → ∀ K : AddSubgroup N,
+                          (∀ (S : Type) [CommRing S] [Algebra R S] (z : sp (R₀ := R) S ⟶ G),
+                              z ≫ j = 1
+                                ↔ ∃ φ : (T.A ⧸ vanIdeal T pt K) →ₐ[R] S,
+                                  spMap φ ≫ (spMap (Ideal.Quotient.mkₐ R (vanIdeal T pt K)) ≫ T.y)
+                                    = z)
+                            → ∀ jN : N →+ N',
+                              (∀ x, pt' (jN x) = pt x ≫ j)
+                                → jN.ker = K
+                                  ∧ ∀ g ∈ torsFun C T pt,
+                                    (∀ k ∈ jN.ker, g k = 0)
+                                      → g
+                                        ∈ (augIdeal (torsFun C T' pt')).map
+                                            (LinearMap.funLeft R C (jN : N → N'))
+                                          * torsFun C T pt := by
   intro p _ C _ _ _ v R _ _ hv _ G _ _ G' _ _ T N _ _ _ pt hpt T' N' _ _ _ pt' hpt' j hj K hK jN hjN
   haveI := hj
   classical
@@ -35,8 +63,7 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_co
     have h := hpt'.add 0 0
     rw [add_zero] at h
     simpa using h.symm
-  have hyp : (T.y ≫ j) ^ p = 1 := by
-    rw [← MonObj.pow_comp, T.y_p, MonObj.one_comp]
+  have hyp : (T.y ≫ j) ^ p = 1 := by rw [← MonObj.pow_comp, T.y_p, MonObj.one_comp]
   obtain ⟨ψ, hψ, -⟩ := T'.univ T.A (T.y ≫ j) hyp
   have hcomp : ∀ x, (φ x).comp ψ = φ' (jN x) := by
     intro x
@@ -55,7 +82,8 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_co
         apply hφu
         rw [← Chart.spMap_comp, Category.assoc]
         exact hχ
-      rw [← e, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem.mpr ha, map_zero]
+      rw [← e, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem.mpr ha,
+        map_zero]
     · intro h
       refine ⟨Ideal.Quotient.liftₐ _ (φ x) h, ?_⟩
       rw [← Category.assoc, Chart.spMap_comp, Ideal.Quotient.liftₐ_comp]
@@ -107,13 +135,13 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_co
     have hqψ : (Ideal.Quotient.mkₐ R J).comp ψ = (Algebra.ofId R (T.A ⧸ J)).comp (φ' 0) := by
       apply AlgHom.ext
       intro b
-      have hb : b - algebraMap R T'.A (φ' 0 b) ∈ RingHom.ker (φ' 0) := by
-        simp [RingHom.mem_ker]
+      have hb : b - algebraMap R T'.A (φ' 0 b) ∈ RingHom.ker (φ' 0) := by simp [RingHom.mem_ker]
       rw [AlgHom.comp_apply, AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Algebra.ofId_apply,
         ← Ideal.Quotient.mk_algebraMap, Ideal.Quotient.eq, ← AlgHom.commutes ψ, ← map_sub, hJ]
       exact Ideal.mem_map_of_mem _ hb
     have hz1 : (spMap (Ideal.Quotient.mkₐ R J) ≫ T.y) ≫ j = 1 := by
-      calc (spMap (Ideal.Quotient.mkₐ R J) ≫ T.y) ≫ j
+      calc
+        (spMap (Ideal.Quotient.mkₐ R J) ≫ T.y) ≫ j
           = spMap (Ideal.Quotient.mkₐ R J) ≫ spMap ψ ≫ T'.y := by rw [Category.assoc, hψ]
         _ = spMap ((Ideal.Quotient.mkₐ R J).comp ψ) ≫ T'.y := by
           rw [← Category.assoc, Chart.spMap_comp]
@@ -123,7 +151,8 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_co
         _ = 1 := by rw [h0', MonObj.comp_one]
     obtain ⟨χ, hχ⟩ := (hK (T.A ⧸ J) (spMap (Ideal.Quotient.mkₐ R J) ≫ T.y)).1 hz1
     obtain ⟨w, -, hu⟩ := T.univ (T.A ⧸ J) (spMap (Ideal.Quotient.mkₐ R J) ≫ T.y) hzp
-    have e : χ.comp (Ideal.Quotient.mkₐ R (vanIdeal T pt (K : Set N))) = Ideal.Quotient.mkₐ R J := by
+    have e
+        : χ.comp (Ideal.Quotient.mkₐ R (vanIdeal T pt (K : Set N))) = Ideal.Quotient.mkₐ R J := by
       rw [hu _ rfl]
       apply hu
       rw [← Chart.spMap_comp, Category.assoc]
@@ -137,16 +166,20 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.torsion_points_homomorphism_co
   rw [hJ] at ha
   change a ∈ Submodule.span T.A (⇑ψ '' (RingHom.ker (φ' 0) : Set T'.A)) at ha
   clear hgK haI hIJ hJ
-  suffices H : ∀ c : T.A, (fun x => algebraMap R C (φ x (c * a))) ∈
-      (augIdeal (torsFun C T' pt')).map (LinearMap.funLeft R C (jN : N → N')) * torsFun C T pt by
+  suffices H
+      : ∀ c : T.A,
+        (fun x => algebraMap R C (φ x (c * a)))
+          ∈ (augIdeal (torsFun C T' pt')).map (LinearMap.funLeft R C (jN : N → N'))
+            * torsFun C T pt by
     have H1 := H 1
     rwa [_root_.one_mul] at H1
   induction ha using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨b, hb, rfl⟩ := hx
     intro c
-    have e : (fun y => algebraMap R C (φ y (c * ψ b))) =
-        (fun y => algebraMap R C (φ y (ψ b))) * (fun y => algebraMap R C (φ y c)) := by
+    have e
+        : (fun y => algebraMap R C (φ y (c * ψ b)))
+          = (fun y => algebraMap R C (φ y (ψ b))) * (fun y => algebraMap R C (φ y c)) := by
       funext y
       simp [map_mul, mul_comm]
     rw [e]

@@ -10,8 +10,8 @@ noncomputable section
 namespace PI.VolStabS
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW
-  IsLocalRing IdxHW
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes PI.VolFromSW IsLocalRing IdxHW
 
 theorem idxH_holds : IdxH := by
   unfold IdxH
@@ -67,17 +67,20 @@ theorem idxH_holds : IdxH := by
     simp [mul_comm]
   obtain ⟨k0, k1, hk, hk0, ρ, hρfix⟩ := fix2 (IdxHW.Cmat b σ) hC1 _ hu0 hCu
 
-  have hev : ∀ᶠ v in cofinite,
-      (∀ k l, algebraMap F (Fv F v) (IdxHW.Cmat b σ k l) ∈ v.adicCompletionIntegers F) ∧
-      algebraMap F (Fv F v) ρ ∈ v.adicCompletionIntegers F ∧
-      ∀ k, algebraMap F (Fv F v) (b.repr 1 k / b.repr 1 k0) ∈ v.adicCompletionIntegers F :=
+  have hev
+      : ∀ᶠ v in cofinite,
+        (∀ k l, algebraMap F (Fv F v) (IdxHW.Cmat b σ k l) ∈ v.adicCompletionIntegers F) ∧
+        algebraMap F (Fv F v) ρ ∈ v.adicCompletionIntegers F ∧
+        ∀ k, algebraMap F (Fv F v) (b.repr 1 k / b.repr 1 k0) ∈ v.adicCompletionIntegers F :=
     (Filter.eventually_all.2 fun k => Filter.eventually_all.2 fun l => IdxHW.eventually_int _).and
       ((IdxHW.eventually_int ρ).and (Filter.eventually_all.2 fun k => IdxHW.eventually_int _))
   filter_upwards [hev] with v hv
   obtain ⟨hC, hρ, hu⟩ := hv
-  have hfix : ∀ x : Fin 2 → Fv F v,
-      Matrix.mulVec ((IdxHW.Cmat b σ).map (algebraMap F (Fv F v))) x = x →
-        x k1 = algebraMap F (Fv F v) ρ * x k0 := hρfix (Fv F v)
+  have hfix
+      : ∀ x : Fin 2 → Fv F v,
+        Matrix.mulVec ((IdxHW.Cmat b σ).map (algebraMap F (Fv F v))) x = x
+          → x k1 = algebraMap F (Fv F v) ρ * x k0 :=
+    hρfix (Fv F v)
   rw [AddSubgroup.relIndex, IdxHW.comap_eq b v σ a k0 k1 hk ρ hC hρ hfix,
     AddSubgroup.index_comap_of_surjective _ (IdxHW.psi_surj b v σ a k0 hσ hC hu hk0),
     AddSubgroup.index_pi, Finset.prod_const, IdxHW.index_max v]

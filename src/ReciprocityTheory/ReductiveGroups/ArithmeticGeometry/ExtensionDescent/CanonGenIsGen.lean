@@ -131,16 +131,19 @@ lemma lcle (φ : K → (Y ⟶ X)) (ε : K → ℤ) (j : (LB.LinComb L φ ε).ι)
     (LB.LinComb L φ ε).U j ≤ φ k ⁻¹ᵁ L.U (j k) :=
   LB.wchart_le L φ j k
 
-def R (φ' : K' → (Y ⟶ X)) (j' : K' → L.ι) (ψ : Y ⟶ X) (h : ∃ k', φ' k' = ψ) : L.ι :=
-  j' h.choose
+def R (φ' : K' → (Y ⟶ X)) (j' : K' → L.ι) (ψ : Y ⟶ X) (h : ∃ k', φ' k' = ψ) : L.ι := j' h.choose
 
 lemma lcle_R (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ) (j' : (LB.LinComb L φ' ε').ι) (ψ : Y ⟶ X)
     (h : ∃ k', φ' k' = ψ) : (LB.LinComb L φ' ε').U j' ≤ ψ ⁻¹ᵁ L.U (R φ' j' ψ h) :=
   wchart_le_of φ' j' h.choose_spec
 
-def jhat (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (hsub : ∀ k, ∃ k', φ' k' = φ k)
-    (j' : K' → L.ι) : (LB.LinComb L φ ε).ι :=
-  fun k => R φ' j' (φ k) (hsub k)
+def jhat
+    (φ : K → (Y ⟶ X))
+    (ε : K → ℤ)
+    (φ' : K' → (Y ⟶ X)) (hsub : ∀ k, ∃ k', φ' k' = φ k)
+    (j' : K' → L.ι)
+    : (LB.LinComb L φ ε).ι := fun k =>
+  R φ' j' (φ k) (hsub k)
 
 lemma wchart_le_jhat (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
     (hsub : ∀ k, ∃ k', φ' k' = φ k) (j' : (LB.LinComb L φ' ε').ι) :
@@ -148,8 +151,8 @@ lemma wchart_le_jhat (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y �
   intro y hy
   exact Set.mem_iInter.2 fun k => lcle_R φ' ε' j' (φ k) (hsub k) hy
 
-def corrU (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ) (j' : (LB.LinComb L φ' ε').ι) :
-    Γ(Y, (LB.LinComb L φ' ε').U j')ˣ :=
+def corrU (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ) (j' : (LB.LinComb L φ' ε').ι)
+    : Γ(Y, (LB.LinComb L φ' ε').U j')ˣ :=
   ∏ k', gW L (φ' k') (j' k') (R φ' j' (φ' k') ⟨k', rfl⟩)
     (lePI (lcle φ' ε' j' k') (lcle_R φ' ε' j' _ _)) ^ ε' k'
 
@@ -163,114 +166,142 @@ lemma res_corrU (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ) (j' : (LB.LinComb L 
 
 variable (L)
 
-def canonGen (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ)
-    (hsub : ∀ k, ∃ k', φ' k' = φ k) (t : LB.Gen (LB.LinComb L φ ε)) :
-    LB.Gen (LB.LinComb L φ' ε') where
+def canonGen
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X))
+    (ε' : K' → ℤ) (hsub : ∀ k, ∃ k', φ' k' = φ k) (t : LB.Gen (LB.LinComb L φ ε))
+    : LB.Gen (LB.LinComb L φ' ε') where
   s j' := res (wchart_le_jhat φ ε φ' ε' hsub j') (t.s (jhat φ ε φ' hsub j')) * corrU φ' ε' j'
 
 variable {L}
 
-theorem canonGen_corr (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X))
-    (ε' : K' → ℤ) (hsub : ∀ k, ∃ k', φ' k' = φ k) (t : LB.Gen (LB.LinComb L φ ε)) :
-    LB.Gen.Corr L φ ε φ' ε' t (canonGen L φ ε φ' ε' hsub t) := by
+theorem canonGen_corr
+    (hL : L.IsLB)
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X))
+    (ε' : K' → ℤ) (hsub : ∀ k, ∃ k', φ' k' = φ k) (t : LB.Gen (LB.LinComb L φ ε))
+    : LB.Gen.Corr L φ ε φ' ε' t (canonGen L φ ε φ' ε' hsub t) := by
   intro j j' _ hj' hjj'
-  have hj : jhat φ ε φ' hsub j' = j :=
-    funext fun k => (hjj' k _ (hsub k).choose_spec.symm).symm
+  have hj : jhat φ ε φ' hsub j' = j := funext fun k => (hjj' k _ (hsub k).choose_spec.symm).symm
   have hc : corrU (L := L) φ' ε' j' = 1 := by
     refine Finset.prod_eq_one fun k' _ => ?_
     have hR : R φ' j' (φ' k') ⟨k', rfl⟩ = j' k' :=
       hj' _ _ (⟨k', rfl⟩ : ∃ c, φ' c = φ' k').choose_spec
-    refine (congrArg (· ^ ε' k') ((gW_congr rfl rfl hR _
-      (lePI (lcle φ' ε' j' k') (lcle φ' ε' j' k'))).trans (gW_self hL _ _ _))).trans ?_
+    refine (congrArg (· ^ ε' k')
+      ((gW_congr rfl rfl hR _ (lePI (lcle φ' ε' j' k') (lcle φ' ε' j' k'))).trans
+        (gW_self hL _ _ _))).trans ?_
     exact one_zpow _
   subst hj
-  exact (res_res' _ _ _).symm.trans (congrArg (res _) ((mul_one _).symm.trans
-    (congrArg (fun c => res (wchart_le_jhat φ ε φ' ε' hsub j') (t.s (jhat φ ε φ' hsub j')) * c)
-      hc.symm)))
+  exact (res_res' _ _ _).symm.trans
+    (congrArg (res _)
+      ((mul_one _).symm.trans
+        (congrArg
+          (fun c => res (wchart_le_jhat φ ε φ' ε' hsub j') (t.s (jhat φ ε φ' hsub j')) * c)
+          hc.symm)))
 
-theorem canon_key (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X))
-    (ε' : K' → ℤ) (hs : LB.SameSum φ ε φ' ε') (hsub : ∀ k, ∃ k', φ' k' = φ k)
-    (j1 j2 : (LB.LinComb L φ' ε').ι)
-    (hW : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤
-      (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j1) ⊓ (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j2)) :
-    res hW ((LB.LinComb L φ ε).g (jhat φ ε φ' hsub j1) (jhat φ ε φ' hsub j2)) *
-        res inf_le_left (corrU φ' ε' j1) =
-      (LB.LinComb L φ' ε').g j1 j2 * res inf_le_right (corrU φ' ε' j2) := by
+theorem canon_key
+    (hL : L.IsLB)
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ) (hs : LB.SameSum φ ε φ' ε')
+    (hsub : ∀ k, ∃ k', φ' k' = φ k) (j1 j2 : (LB.LinComb L φ' ε').ι)
+    (hW : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2
+      ≤ (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j1) ⊓ (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j2))
+    : res hW ((LB.LinComb L φ ε).g (jhat φ ε φ' hsub j1) (jhat φ ε φ' hsub j2))
+        * res inf_le_left (corrU φ' ε' j1)
+      = (LB.LinComb L φ' ε').g j1 j2 * res inf_le_right (corrU φ' ε' j2) := by
   classical
-  have eg : (LB.LinComb L φ' ε').g j1 j2 = ∏ k', gW L (φ' k') (j1 k') (j2 k')
-      (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_right.trans (lcle φ' ε' j2 k')))
-        ^ ε' k' :=
+  have eg
+      : (LB.LinComb L φ' ε').g j1 j2
+        = ∏ k', gW L (φ' k') (j1 k') (j2 k')
+          (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_right.trans (lcle φ' ε' j2 k')))
+            ^ ε' k' :=
     (res_refl le_rfl _).symm.trans (res_g φ' ε' j1 j2 le_rfl)
   let F : (Y ⟶ X) → Γ(Y, (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2)ˣ := fun ψ =>
     if h : ∃ k', φ' k' = ψ then
       gW L ψ (R φ' j1 ψ h) (R φ' j2 ψ h)
-        (lePI (inf_le_left.trans (lcle_R φ' ε' j1 ψ h))
-          (inf_le_right.trans (lcle_R φ' ε' j2 ψ h)))
-    else 1
-  have hP : (∏ k, gW L (φ k) (jhat φ ε φ' hsub j1 k) (jhat φ ε φ' hsub j2 k)
-      (lePI (hW.trans (inf_le_left.trans (LB.wchart_le L φ _ k)))
-        (hW.trans (inf_le_right.trans (LB.wchart_le L φ _ k)))) ^ ε k) =
-      ∏ k', F (φ' k') ^ ε' k' := by
+        (lePI (inf_le_left.trans (lcle_R φ' ε' j1 ψ h)) (inf_le_right.trans (lcle_R φ' ε' j2 ψ h)))
+    else
+      1
+  have hP
+      : (∏ k, gW L (φ k) (jhat φ ε φ' hsub j1 k) (jhat φ ε φ' hsub j2 k)
+          (lePI (hW.trans (inf_le_left.trans (LB.wchart_le L φ _ k)))
+            (hW.trans (inf_le_right.trans (LB.wchart_le L φ _ k)))) ^ ε k)
+        = ∏ k', F (φ' k') ^ ε' k' := by
     rw [← prod_sameSum φ ε φ' ε' hs F]
     refine Finset.prod_congr rfl fun k _ => ?_
     simp only [F, dif_pos (hsub k)]
     rfl
-  have key : ∀ k', F (φ' k') * gW L (φ' k') (j1 k') (R φ' j1 (φ' k') ⟨k', rfl⟩)
-      (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_left.trans (lcle_R φ' ε' j1 _ _))) =
-      gW L (φ' k') (j1 k') (j2 k')
-        (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_right.trans (lcle φ' ε' j2 k'))) *
-      gW L (φ' k') (j2 k') (R φ' j2 (φ' k') ⟨k', rfl⟩)
-        (lePI (inf_le_right.trans (lcle φ' ε' j2 k')) (inf_le_right.trans (lcle_R φ' ε' j2 _ _))) := by
+  have key
+      : ∀ k',
+        F (φ' k') * gW L (φ' k') (j1 k') (R φ' j1 (φ' k') ⟨k', rfl⟩)
+            (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_left.trans (lcle_R φ' ε' j1 _ _)))
+          = gW L (φ' k') (j1 k') (j2 k')
+              (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_right.trans (lcle φ' ε' j2 k')))
+            * gW L (φ' k') (j2 k') (R φ' j2 (φ' k') ⟨k', rfl⟩)
+              (lePI (inf_le_right.trans (lcle φ' ε' j2 k'))
+                (inf_le_right.trans (lcle_R φ' ε' j2 _ _))) := by
     intro k'
     simp only [F, dif_pos (⟨k', rfl⟩ : ∃ c, φ' c = φ' k')]
     have h1 : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤ φ' k' ⁻¹ᵁ L.U (j1 k') :=
       inf_le_left.trans (lcle φ' ε' j1 k')
     have h2 : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤ φ' k' ⁻¹ᵁ L.U (j2 k') :=
       inf_le_right.trans (lcle φ' ε' j2 k')
-    have r1 : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤
-        φ' k' ⁻¹ᵁ L.U (R φ' j1 (φ' k') ⟨k', rfl⟩) :=
+    have r1
+        : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2
+          ≤ φ' k' ⁻¹ᵁ L.U (R φ' j1 (φ' k') ⟨k', rfl⟩) :=
       inf_le_left.trans (lcle_R φ' ε' j1 _ _)
-    have r2 : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤
-        φ' k' ⁻¹ᵁ L.U (R φ' j2 (φ' k') ⟨k', rfl⟩) :=
+    have r2
+        : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2
+          ≤ φ' k' ⁻¹ᵁ L.U (R φ' j2 (φ' k') ⟨k', rfl⟩) :=
       inf_le_right.trans (lcle_R φ' ε' j2 _ _)
     rw [gW_mul' hL _ _ _ _ h1 h2 r2, mul_comm, gW_mul' hL _ _ _ _ h1 r1 r2]
-  have hprod : (∏ k', F (φ' k') ^ ε' k') * (∏ k', gW L (φ' k') (j1 k') (R φ' j1 (φ' k') ⟨k', rfl⟩)
-      (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_left.trans (lcle_R φ' ε' j1 _ _)))
-        ^ ε' k') =
-      (∏ k', gW L (φ' k') (j1 k') (j2 k')
-        (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_right.trans (lcle φ' ε' j2 k')))
-          ^ ε' k') *
-      ∏ k', gW L (φ' k') (j2 k') (R φ' j2 (φ' k') ⟨k', rfl⟩)
-        (lePI (inf_le_right.trans (lcle φ' ε' j2 k')) (inf_le_right.trans (lcle_R φ' ε' j2 _ _)))
-          ^ ε' k' := by
+  have hprod
+      : (∏ k', F (φ' k') ^ ε' k')
+          * (∏ k', gW L (φ' k') (j1 k') (R φ' j1 (φ' k') ⟨k', rfl⟩)
+              (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_left.trans (lcle_R φ' ε' j1 _ _)))
+                ^ ε' k')
+        = (∏ k', gW L (φ' k') (j1 k') (j2 k')
+            (lePI (inf_le_left.trans (lcle φ' ε' j1 k')) (inf_le_right.trans (lcle φ' ε' j2 k')))
+              ^ ε' k')
+          * ∏ k', gW L (φ' k') (j2 k') (R φ' j2 (φ' k') ⟨k', rfl⟩)
+              (lePI (inf_le_right.trans (lcle φ' ε' j2 k')) (inf_le_right.trans (lcle_R φ' ε' j2 _ _)))
+                ^ ε' k' := by
     rw [← Finset.prod_mul_distrib, ← Finset.prod_mul_distrib]
     refine Finset.prod_congr rfl fun k' _ => ?_
     rw [← mul_zpow, ← mul_zpow, key]
   exact (congrArg₂ (· * ·) ((res_g φ ε _ _ hW).trans hP) (res_corrU φ' ε' j1 _)).trans
     (hprod.trans (congrArg₂ (· * ·) eg (res_corrU φ' ε' j2 _)).symm)
 
-theorem canonGen_isGen (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X))
-    (ε' : K' → ℤ) (hs : LB.SameSum φ ε φ' ε') (hsub : ∀ k, ∃ k', φ' k' = φ k)
-    (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen) : (canonGen L φ ε φ' ε' hsub t).IsGen := by
+theorem canonGen_isGen
+    (hL : L.IsLB)
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (φ' : K' → (Y ⟶ X)) (ε' : K' → ℤ) (hs : LB.SameSum φ ε φ' ε')
+    (hsub : ∀ k, ∃ k', φ' k' = φ k)
+    (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
+    : (canonGen L φ ε φ' ε' hsub t).IsGen := by
   intro j1 j2
-  have hW : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤
-      (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j1) ⊓ (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j2) :=
+  have hW
+      : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2
+        ≤ (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j1) ⊓ (LB.LinComb L φ ε).U (jhat φ ε φ' hsub j2) :=
     inf_le_inf (wchart_le_jhat φ ε φ' ε' hsub j1) (wchart_le_jhat φ ε φ' ε' hsub j2)
-  have ht' : res (hW.trans inf_le_left) (t.s (jhat φ ε φ' hsub j1)) =
-      res hW ((LB.LinComb L φ ε).g (jhat φ ε φ' hsub j1) (jhat φ ε φ' hsub j2)) *
-      res (hW.trans inf_le_right) (t.s (jhat φ ε φ' hsub j2)) := by
+  have ht'
+      : res (hW.trans inf_le_left) (t.s (jhat φ ε φ' hsub j1))
+        = res hW ((LB.LinComb L φ ε).g (jhat φ ε φ' hsub j1) (jhat φ ε φ' hsub j2))
+          * res (hW.trans inf_le_right) (t.s (jhat φ ε φ' hsub j2)) := by
     have e := congrArg (res hW) (ht (jhat φ ε φ' hsub j1) (jhat φ ε φ' hsub j2))
-    exact (res_res' _ _ _).symm.trans (e.trans ((map_mul _ _ _).trans
-      (congrArg₂ (· * ·) rfl (res_res' _ _ _))))
-  have e1 : res (inf_le_left : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤
-        (LB.LinComb L φ' ε').U j1) ((canonGen L φ ε φ' ε' hsub t).s j1) =
-      res (hW.trans inf_le_left) (t.s (jhat φ ε φ' hsub j1)) *
-        res inf_le_left (corrU φ' ε' j1) :=
+    exact (res_res' _ _ _).symm.trans
+      (e.trans ((map_mul _ _ _).trans (congrArg₂ (· * ·) rfl (res_res' _ _ _))))
+  have e1
+      : res
+          (inf_le_left
+            : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤ (LB.LinComb L φ' ε').U j1)
+          ((canonGen L φ ε φ' ε' hsub t).s j1)
+        = res (hW.trans inf_le_left) (t.s (jhat φ ε φ' hsub j1))
+          * res inf_le_left (corrU φ' ε' j1) :=
     (map_mul _ _ _).trans (congrArg₂ (· * ·) (res_res' _ _ _) rfl)
-  have e2 : res (inf_le_right : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤
-        (LB.LinComb L φ' ε').U j2) ((canonGen L φ ε φ' ε' hsub t).s j2) =
-      res (hW.trans inf_le_right) (t.s (jhat φ ε φ' hsub j2)) *
-        res inf_le_right (corrU φ' ε' j2) :=
+  have e2
+      : res
+          (inf_le_right
+            : (LB.LinComb L φ' ε').U j1 ⊓ (LB.LinComb L φ' ε').U j2 ≤ (LB.LinComb L φ' ε').U j2)
+          ((canonGen L φ ε φ' ε' hsub t).s j2)
+        = res (hW.trans inf_le_right) (t.s (jhat φ ε φ' hsub j2))
+          * res inf_le_right (corrU φ' ε' j2) :=
     (map_mul _ _ _).trans (congrArg₂ (· * ·) (res_res' _ _ _) rfl)
   rw [e1, e2, ht', mul_right_comm, canon_key hL φ ε φ' ε' hs hsub j1 j2 hW, mul_right_comm,
     mul_assoc]

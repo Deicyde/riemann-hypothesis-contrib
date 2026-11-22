@@ -14,19 +14,22 @@ open scoped Classical
 
 namespace Formalism.MainNotions.BridgeLemma₂
 
-open NumberField Module Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt
+open NumberField Module Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Gen
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ}
 
 theorem c3eqv_mem_orth (U : Submodule E S.V) (x : S.V) : x ∈ orth S U ↔ ∀ v ∈ U, S.hT v x = 0 := by
   simp only [orth, Submodule.mem_iInf, LinearMap.mem_ker]
 
-theorem c3eqv_gmap_iff (n : S.V ≃ₗ[E] S.V) (Λ : Submodule (𝓞 E) S.V) :
-    Formalism.HermitianLatticesTheory.gmap n Λ = Λ ↔ (∀ y ∈ Λ, n y ∈ Λ) ∧ ∀ y ∈ Λ, n.symm y ∈ Λ := by
+theorem c3eqv_gmap_iff (n : S.V ≃ₗ[E] S.V) (Λ : Submodule (𝓞 E) S.V)
+    : Formalism.HermitianLatticesTheory.gmap n Λ = Λ
+      ↔ (∀ y ∈ Λ, n y ∈ Λ) ∧ ∀ y ∈ Λ, n.symm y ∈ Λ := by
   unfold Formalism.HermitianLatticesTheory.gmap
   constructor
   · intro h
@@ -43,8 +46,8 @@ theorem c3eqv_gmap_iff (n : S.V ≃ₗ[E] S.V) (Λ : Submodule (𝓞 E) S.V) :
     · intro y hy
       exact ⟨n.symm y, h2 y hy, by simp⟩
 
-theorem c3eqv_symm_mem (n : S.V ≃ₗ[E] S.V) (U : Submodule E S.V) (h : ∀ x ∈ U, n x ∈ U) :
-    ∀ x ∈ U, n.symm x ∈ U := by
+theorem c3eqv_symm_mem (n : S.V ≃ₗ[E] S.V) (U : Submodule E S.V) (h : ∀ x ∈ U, n x ∈ U)
+    : ∀ x ∈ U, n.symm x ∈ U := by
   have hle : U.map (n : S.V →ₗ[E] S.V) ≤ U := by
     rintro _ ⟨y, hy, rfl⟩
     exact h y hy
@@ -55,7 +58,8 @@ theorem c3eqv_symm_mem (n : S.V ≃ₗ[E] S.V) (U : Submodule E S.V) (h : ∀ x 
   obtain ⟨y, hy, rfl⟩ := hx'
   simpa using hy
 
-theorem c3eqv_isom_symm {n : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLatticesTheory.isom S.hT) : n.symm ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
+theorem c3eqv_isom_symm {n : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    : n.symm ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
   have hiso : ∀ x y, S.hT (n x) (n y) = S.hT x y := h
   show ∀ x y, S.hT (n.symm x) (n.symm y) = S.hT x y
   intro x y
@@ -63,16 +67,21 @@ theorem c3eqv_isom_symm {n : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLa
   simp only [LinearEquiv.apply_symm_apply] at this
   exact this.symm
 
-theorem c3eqv_isom_trans {n m : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLatticesTheory.isom S.hT) (h' : m ∈ Formalism.HermitianLatticesTheory.isom S.hT) :
-    n.trans m ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
+theorem c3eqv_isom_trans
+    {n m : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (h' : m ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    : n.trans m ∈ Formalism.HermitianLatticesTheory.isom S.hT := by
   have hiso : ∀ x y, S.hT (n x) (n y) = S.hT x y := h
   have hiso' : ∀ x y, S.hT (m x) (m y) = S.hT x y := h'
   show ∀ x y, S.hT ((n.trans m) x) ((n.trans m) y) = S.hT x y
   intro x y
   simp only [LinearEquiv.trans_apply, hiso', hiso]
 
-theorem c3eqv_orth_map {n : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLatticesTheory.isom S.hT) (U₁ U₂ : Submodule E S.V)
-    (hU : ∀ v ∈ U₂, n.symm v ∈ U₁) {x : S.V} (hx : x ∈ orth S U₁) : n x ∈ orth S U₂ := by
+theorem c3eqv_orth_map
+    {n : S.V ≃ₗ[E] S.V} (h : n ∈ Formalism.HermitianLatticesTheory.isom S.hT)
+    (U₁ U₂ : Submodule E S.V) (hU : ∀ v ∈ U₂, n.symm v ∈ U₁)
+    {x : S.V} (hx : x ∈ orth S U₁)
+    : n x ∈ orth S U₂ := by
   rw [c3eqv_mem_orth] at hx ⊢
   intro v hv
   have hiso : ∀ x y, S.hT (n x) (n y) = S.hT x y := h
@@ -99,7 +108,8 @@ theorem c3eqv_Xsp_eq : Xsp F = Xflag F r := by
 
 variable {F} {Λ : Submodule (𝓞 E) S.V}
 
-theorem c3eqv_N_flag {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (j : ℕ) : ∀ x ∈ Xflag F j, n x ∈ Xflag F j := by
+theorem c3eqv_N_flag {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (j : ℕ)
+    : ∀ x ∈ Xflag F j, n x ∈ Xflag F j := by
   unfold NLam at hn
   simp only [Set.mem_setOf_eq] at hn
   obtain ⟨_, h1, _⟩ := hn
@@ -119,7 +129,8 @@ theorem c3eqv_N_X {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) : ∀ x ∈ Xsp
   rw [c3eqv_Xsp_eq]
   exact c3eqv_N_flag hn r
 
-theorem c3eqv_N_orth {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) : ∀ x ∈ orth S (Xsp F), n x ∈ orth S (Xsp F) := by
+theorem c3eqv_N_orth {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F)
+    : ∀ x ∈ orth S (Xsp F), n x ∈ orth S (Xsp F) := by
   have hX := c3eqv_N_X hn
   have h' := hn
   unfold NLam at h'
@@ -127,7 +138,8 @@ theorem c3eqv_N_orth {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) : ∀ x ∈ 
   unfold IsAutLam at h'
   exact fun x hx => c3eqv_orth_map h'.1.1 _ _ (c3eqv_symm_mem n _ hX) hx
 
-theorem c3eqv_NLam_trans {n m : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (hm : m ∈ NLam Λ F) : n.trans m ∈ NLam Λ F := by
+theorem c3eqv_NLam_trans {n m : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) (hm : m ∈ NLam Λ F)
+    : n.trans m ∈ NLam Λ F := by
   have hnf := c3eqv_N_flag hn
   have hno := c3eqv_N_orth hn
   have hn' := hn
@@ -169,14 +181,12 @@ theorem c3eqv_NLam_symm {n : S.V ≃ₗ[E] S.V} (hn : n ∈ NLam Λ F) : n.symm 
     exact ⟨hng.2, hng.1⟩
   · intro j x hx
     have hy := c3eqv_symm_mem n _ (hnf (j + 1)) x hx
-    have e : n.symm x - x = -(n (n.symm x) - n.symm x) := by
-      rw [LinearEquiv.apply_symm_apply]; abel
+    have e : n.symm x - x = -(n (n.symm x) - n.symm x) := by rw [LinearEquiv.apply_symm_apply]; abel
     rw [e]
     exact Submodule.neg_mem _ (hn1 j _ hy)
   · intro x hx
     have hy := c3eqv_symm_mem n _ hno x hx
-    have e : n.symm x - x = -(n (n.symm x) - n.symm x) := by
-      rw [LinearEquiv.apply_symm_apply]; abel
+    have e : n.symm x - x = -(n (n.symm x) - n.symm x) := by rw [LinearEquiv.apply_symm_apply]; abel
     rw [e]
     exact Submodule.neg_mem _ (hn2 _ hy)
 

@@ -15,7 +15,8 @@ open Formalism.GradedWeylDivisibility Formalism.L2.G.Model.TS Formalism.L2.G.Mod
 
 section dual
 
-variable {O K : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K]
+variable
+  {O K : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] [Field K] [Algebra O K]
   [IsFractionRing O K] [CharZero K]
 
 lemma toK_eq_map {σ : Type} (f : MvPolynomial σ O) : toK O K f = map (algebraMap O K) f := rfl
@@ -92,9 +93,13 @@ theorem dual_bases_holds : DualBases := by
   let bW : Module.Basis (Fin N) K W := Module.Basis.span hli
   have hbW : ∀ i, (bW i : MvPolynomial (Fin n × Fin n) K) = e i := fun i =>
     congrArg Subtype.val (Module.Basis.span_apply hli i)
-  let Bf : LinearMap.BilinForm K W := LinearMap.mk₂ K (fun x y : W => fockR (x : MvPolynomial (Fin n × Fin n) K) y)
-    (fun x x' y => by simp [fockR_add_left]) (fun a x y => by simp [fockR_smul_left])
-    (fun x y y' => by simp [fockR_add_right]) (fun a x y => by simp [fockR_smul_right])
+  let Bf : LinearMap.BilinForm K W :=
+    LinearMap.mk₂ K
+      (fun x y : W => fockR (x : MvPolynomial (Fin n × Fin n) K) y)
+      (fun x x' y => by simp [fockR_add_left])
+      (fun a x y => by simp [fockR_smul_left])
+      (fun x y y' => by simp [fockR_add_right])
+      (fun a x y => by simp [fockR_smul_right])
   have hBf : ∀ x y : W, Bf x y = fockR (x : MvPolynomial (Fin n × Fin n) K) y := fun _ _ => rfl
   have hnd : Bf.Nondegenerate := by
     constructor
@@ -112,8 +117,17 @@ theorem dual_bases_holds : DualBases := by
     have h := LinearMap.BilinForm.apply_dualBasis_left hnd bW k i
     rw [hBf, hbW, fockR_symm] at h
     exact h
-  refine ⟨Fin N, inferInstance, inferInstance, e, fun k => c • (d k : MvPolynomial (Fin n × Fin n) K),
-    he, ?_, ?_, hspan⟩
+  refine ⟨
+    Fin N,
+    inferInstance,
+    inferInstance,
+    e,
+    fun k => c • (d k : MvPolynomial (Fin n × Fin n) K),
+    he,
+    ?_,
+    ?_,
+    hspan
+  ⟩
   · intro k
     have hkV : c • (d k : MvPolynomial (Fin n × Fin n) K) ∈ dualWeyl K n n ν :=
       Submodule.smul_mem _ _ (hWV ▸ (d k).2)

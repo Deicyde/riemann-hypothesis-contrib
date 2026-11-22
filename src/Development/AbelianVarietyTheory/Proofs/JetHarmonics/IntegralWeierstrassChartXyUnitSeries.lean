@@ -141,109 +141,149 @@ lemma hat_homog (ι : ℂ ≃+* ℂ_[q]) {ℓ : ℂ_[q]⟦X⟧} (hℓ : constant
   calc _ = C (ι (D.coeff i)) * X ^ i * (v * ys) ^ i * (hat ι ℓ w * ys) ^ m := by ring
     _ = _ := by rw [hW]; ring
 
-theorem chart_xy : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ℓ : ℂ_[q]⟦X⟧), M.Chart ℓ → coeff 1 ℓ ≠ 0 ∧ ∃ v xs ys : ℂ_[q]⟦X⟧, Bd 1 v ∧ Bd 1 xs ∧ Bd 1 ys ∧ ‖constantCoeff v‖ = 1 ∧ ‖constantCoeff xs‖ = 1 ∧ ‖constantCoeff ys‖ = 1 ∧ hat M.ι ℓ M.u = X * v ∧ hat M.ι ℓ M.w * ys = -X ^ 3 ∧ xs = -v * ys ∧ ∀ (F : ℂ → ℂ) (A B : Polynomial ℂ) (k : ℕ), AnalyticAt ℂ F 0 → A.natDegree ≤ k → B.natDegree ≤ k → ∀ G : ℂ → ℂ, AnalyticAt ℂ G 0 → ∀ (D : Polynomial ℂ) (j : ℕ), D.natDegree ≤ j → (∀ᶠ z in 𝓝[≠] (0 : ℂ), F z * D.eval (M.x z) = G z * (A.eval (M.x z) + B.eval (M.x z) * M.y z)) → hat M.ι ℓ F * X ^ (2 * k + 3) * (∑ i ∈ Finset.range (j + 1), C (M.ι (D.coeff i)) * X ^ (2 * (j - i)) * xs ^ i) = hat M.ι ℓ G * X ^ (2 * j) * ∑ i ∈ Finset.range (k + 1), (C (M.ι (A.coeff i)) * X ^ (2 * (k - i) + 3) * xs ^ i + C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * xs ^ i * ys) := by
-  rintro q _ M ℓ ⟨hok, hℓ, hU, hU1⟩
-  obtain ⟨-, -, -, -, hu0, hw0, -, -, hs⟩ := GlobalTheory.MomOne.uw_elliptic_flow q M hok
-  obtain ⟨hu, hw, -, -, hxy, heq⟩ := hs 0 (Or.inl (zero_mem _))
-  obtain ⟨-, h₁, h₂, h₃, h₄, h₆, -⟩ := hok
-  obtain ⟨-, -, -, hc0, hder, -⟩ := GlobalTheory.MomOne.TaylorRead.hat_laws q M.ι ℓ hℓ
-  obtain ⟨hring, -, hinv, -⟩ := GlobalTheory.MomOne.sup_norm_laws q
-  have hU0 : constantCoeff (hat M.ι ℓ M.u) = 0 := by rw [hc0, hu0, map_zero]
-  have hW0 : constantCoeff (hat M.ι ℓ M.w) = 0 := by rw [hc0, hw0, map_zero]
-  refine ⟨?_, ?_⟩
-  · intro h0
-    have := congrArg (coeff 0) (hder M.u hu)
-    rw [coeff_derivative, coeff_zero_eq_constantCoeff_apply, map_mul, ← coeff_zero_eq_constantCoeff_apply,
-      coeff_derivative] at this
-    simp only [zero_add, h0, Nat.cast_zero, mul_one, zero_mul] at this
-    rw [this] at hU1
-    simp at hU1
-  obtain ⟨v, hv⟩ := X_dvd_iff.mpr hU0
-  have hvc : ∀ n, coeff n v = coeff (n + 1) (hat M.ι ℓ M.u) := fun n => by rw [hv, coeff_succ_X_mul]
-  have hvB : Bd 1 v := fun n => by rw [hvc]; exact hU _
-  have hv0 : ‖constantCoeff v‖ = 1 := by
-    rw [← coeff_zero_eq_constantCoeff_apply, hvc]; exact hU1
-  have hv0' : constantCoeff v ≠ 0 := by
-    intro h; rw [h] at hv0; simp at hv0
-  have hvi : v * v⁻¹ = 1 := PowerSeries.mul_inv_cancel v hv0'
-  have hviB : Bd 1 v⁻¹ := hinv v _ hvB hv0 hvi
-  have hWeq : hat M.ι ℓ M.w = hat M.ι ℓ M.u * hat M.ι ℓ M.u * hat M.ι ℓ M.u + hat M.ι ℓ M.w *
-      (C M.W.a₁ * hat M.ι ℓ M.u + C M.W.a₂ * hat M.ι ℓ M.u * hat M.ι ℓ M.u + C M.W.a₃ * hat M.ι ℓ M.w
-        + C M.W.a₄ * hat M.ι ℓ M.u * hat M.ι ℓ M.w + C M.W.a₆ * hat M.ι ℓ M.w * hat M.ι ℓ M.w) := by
-    have hc : ∀ a : ℂ_[q], C a = hat M.ι ℓ (fun _ => M.ι.symm a) := fun a => by
-      rw [hat_const M.ι hℓ, RingEquiv.apply_symm_apply]
-    simp only [hc]
-    simp (disch := fun_prop) only [← hat_mul M.ι hℓ, ← hat_add M.ι hℓ]
-    refine hat_congr M.ι hℓ hw (by fun_prop) ?_
-    filter_upwards [nhdsWithin_le_nhds heq] with z hz
-    linear_combination hz.1
-  have hWB : Bd 1 (hat M.ι ℓ M.w) := bd_w h₁ h₂ h₃ h₄ h₆ hU hU0 hW0 hWeq
-  set Q := C M.W.a₁ * hat M.ι ℓ M.u + C M.W.a₂ * hat M.ι ℓ M.u * hat M.ι ℓ M.u + C M.W.a₃ * hat M.ι ℓ M.w
-        + C M.W.a₄ * hat M.ι ℓ M.u * hat M.ι ℓ M.w + C M.W.a₆ * hat M.ι ℓ M.w * hat M.ι ℓ M.w with hQ
-  have hQ0 : constantCoeff Q = 0 := by simp [hQ, hU0, hW0]
-  have hQB : Bd 1 Q := by
-    rw [bd_iff] at hU hWB ⊢
-    intro n
-    exact (((((intLt_C h₁).mul (hU _)).add (((intLt_C h₂).mul (hU _)).mul (hU _))).add
-      ((intLt_C h₃).mul (hWB _))).add (((intLt_C h₄).mul (hU _)).mul (hWB _))).add
-      (((intLt_C h₆).mul (hWB _)).mul (hWB _))
-  set ys := (C 1 + C (-1) * Q) * (v⁻¹ * v⁻¹ * v⁻¹) with hys
-  have hysB : Bd 1 ys := by
-    rw [bd_iff] at hQB hviB ⊢
-    intro n
-    exact ((intLt_C (by simp)).add ((intLt_C (by simp)).mul (hQB _))).mul
-      (((hviB _).mul (hviB _)).mul (hviB _))
-  have hys0 : ‖constantCoeff ys‖ = 1 := by
-    simp [hys, hQ0, hv0]
-  have hWys : hat M.ι ℓ M.w * ys = X ^ 3 := by
-    have h1 : hat M.ι ℓ M.w * (1 - Q) = (X * v) ^ 3 := by
-      rw [← hv]; linear_combination hWeq
-    calc hat M.ι ℓ M.w * ys = hat M.ι ℓ M.w * (1 - Q) * v⁻¹ ^ 3 := by
-          rw [hys, map_neg, map_one]; ring
-      _ = X ^ 3 * (v * v⁻¹) ^ 3 := by rw [h1]; ring
-      _ = X ^ 3 := by rw [hvi]; ring
-  refine ⟨v, v * ys, -ys, hvB, ?_, fun n => by simpa using hysB n, hv0, ?_, by simpa using hys0, hv,
-    by rw [mul_neg, hWys], by ring, ?_⟩
-  · rw [bd_iff] at hvB hysB ⊢
-    exact fun n => (hvB n).mul (hysB n)
-  · rw [map_mul, norm_mul, hv0, hys0, mul_one]
-  intro F A B k hF hA hB G hG D j hD h
-  clear_value ys Q
-  clear hs heq hder hring hinv
-  have hAa := homog_analytic A k hu hw
-  have hBa := homog_analytic B k hu hw
-  have hDa := homog_analytic D j hu hw
-  have key : hat M.ι ℓ F * hat M.ι ℓ (homog D j M.u M.w) * hat M.ι ℓ M.w ^ (k + 1)
-      + hat M.ι ℓ G * hat M.ι ℓ M.w ^ j * hat M.ι ℓ (homog B k M.u M.w)
-      = hat M.ι ℓ G * hat M.ι ℓ M.w ^ j * (hat M.ι ℓ (homog A k M.u M.w) * hat M.ι ℓ M.w) := by
-    rw [← hat_pow M.ι hℓ hw, ← hat_pow M.ι hℓ hw]
-    simp (disch := fun_prop) only [← hat_mul M.ι hℓ, ← hat_add M.ι hℓ]
-    refine hat_congr M.ι hℓ (by fun_prop) (by fun_prop) ?_
-    filter_upwards [h, hxy] with z hz ⟨_, _, hx, hy⟩
-    rw [homog_eq hA hx, homog_eq hB hx, homog_eq hD hx]
-    linear_combination M.w z ^ (j + k + 1) * hz
-      + G z * M.w z ^ j * (B.eval (M.x z)) * M.w z ^ k * hy
-  have eA := hat_homog M.ι hℓ A k hu hw hv hWys
-  have eB := hat_homog M.ι hℓ B k hu hw hv hWys
-  have eD := hat_homog M.ι hℓ D j hu hw hv hWys
-  have hsum : ∑ i ∈ Finset.range (k + 1), (C (M.ι (A.coeff i)) * X ^ (2 * (k - i) + 3) * (v * ys) ^ i
-      + C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i * -ys) =
-      (∑ i ∈ Finset.range (k + 1), C (M.ι (A.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i) * X ^ 3
-      - (∑ i ∈ Finset.range (k + 1), C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i) * ys := by
-    rw [Finset.sum_mul, Finset.sum_mul, ← Finset.sum_sub_distrib]
-    exact Finset.sum_congr rfl fun i _ => by ring
-  rw [hsum]
-  set SA := ∑ i ∈ Finset.range (k + 1), C (M.ι (A.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i
-  set SB := ∑ i ∈ Finset.range (k + 1), C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i
-  set SD := ∑ i ∈ Finset.range (j + 1), C (M.ι (D.coeff i)) * X ^ (2 * (j - i)) * (v * ys) ^ i
-  have hX : (X : ℂ_[q]⟦X⟧) ^ (j + k) ≠ 0 := pow_ne_zero _ X_ne_zero
-  apply mul_left_cancel₀ hX
-  have key2 : hat M.ι ℓ F * (hat M.ι ℓ (homog D j M.u M.w) * ys ^ j) * (hat M.ι ℓ M.w * ys) ^ (k + 1)
-      + hat M.ι ℓ G * (hat M.ι ℓ M.w * ys) ^ j * (hat M.ι ℓ (homog B k M.u M.w) * ys ^ k) * ys
-      = hat M.ι ℓ G * (hat M.ι ℓ M.w * ys) ^ j * ((hat M.ι ℓ (homog A k M.u M.w) * ys ^ k)
-        * (hat M.ι ℓ M.w * ys)) := by
-    linear_combination ys ^ (j + k + 1) * key
-  rw [eA, eB, eD, hWys] at key2
-  linear_combination key2
+theorem chart_xy
+    : ∀ (q : ℕ) [Fact q.Prime] (M : Mdl q) (ℓ : ℂ_[q]⟦X⟧),
+      M.Chart ℓ
+        → coeff 1 ℓ ≠ 0
+          ∧ ∃ v xs ys : ℂ_[q]⟦X⟧,
+            Bd 1 v ∧ Bd 1 xs ∧ Bd 1 ys ∧ ‖constantCoeff v‖ = 1 ∧ ‖constantCoeff xs‖ = 1
+              ∧ ‖constantCoeff ys‖ = 1 ∧ hat M.ι ℓ M.u = X * v ∧ hat M.ι ℓ M.w * ys = - X ^ 3
+              ∧ xs = -v * ys
+              ∧ ∀ (F : ℂ → ℂ) (A B : Polynomial ℂ) (k : ℕ),
+                AnalyticAt ℂ F 0 → A.natDegree ≤ k → B.natDegree ≤ k
+                  → ∀ G : ℂ → ℂ,
+                    AnalyticAt ℂ G 0
+                      → ∀ (D : Polynomial ℂ) (j : ℕ),
+                        D.natDegree ≤ j
+                          → (∀ᶠ z in 𝓝[≠] (0 : ℂ), F z * D.eval (M.x z) = G z * (A.eval (M.x z) + B.eval (M.x z) * M.y z))
+                          → hat M.ι ℓ F * X ^ (2 * k + 3)
+                              * (∑ i ∈ Finset.range (j + 1), C (M.ι (D.coeff i)) * X ^ (2 * (j - i)) * xs ^ i)
+                            = hat M.ι ℓ G * X ^ (2 * j)
+                              * ∑ i ∈ Finset.range (k + 1), (C (M.ι (A.coeff i)) * X ^ (2 * (k - i) + 3) * xs ^ i + C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * xs ^ i * ys) :=
+  by
+    rintro q _ M ℓ ⟨hok, hℓ, hU, hU1⟩
+    obtain ⟨-, -, -, -, hu0, hw0, -, -, hs⟩ := GlobalTheory.MomOne.uw_elliptic_flow q M hok
+    obtain ⟨hu, hw, -, -, hxy, heq⟩ := hs 0 (Or.inl (zero_mem _))
+    obtain ⟨-, h₁, h₂, h₃, h₄, h₆, -⟩ := hok
+    obtain ⟨-, -, -, hc0, hder, -⟩ := GlobalTheory.MomOne.TaylorRead.hat_laws q M.ι ℓ hℓ
+    obtain ⟨hring, -, hinv, -⟩ := GlobalTheory.MomOne.sup_norm_laws q
+    have hU0 : constantCoeff (hat M.ι ℓ M.u) = 0 := by rw [hc0, hu0, map_zero]
+    have hW0 : constantCoeff (hat M.ι ℓ M.w) = 0 := by rw [hc0, hw0, map_zero]
+    refine ⟨?_, ?_⟩
+    · intro h0
+      have := congrArg (coeff 0) (hder M.u hu)
+      rw [coeff_derivative, coeff_zero_eq_constantCoeff_apply, map_mul,
+          ← coeff_zero_eq_constantCoeff_apply, coeff_derivative]
+        at this
+      simp only [zero_add, h0, Nat.cast_zero, mul_one, zero_mul] at this
+      rw [this] at hU1
+      simp at hU1
+    obtain ⟨v, hv⟩ := X_dvd_iff.mpr hU0
+    have hvc : ∀ n, coeff n v = coeff (n + 1) (hat M.ι ℓ M.u) := fun n => by
+      rw [hv, coeff_succ_X_mul]
+    have hvB : Bd 1 v := fun n => by rw [hvc]; exact hU _
+    have hv0 : ‖constantCoeff v‖ = 1 := by rw [← coeff_zero_eq_constantCoeff_apply, hvc]; exact hU1
+    have hv0' : constantCoeff v ≠ 0 := by intro h; rw [h] at hv0; simp at hv0
+    have hvi : v * v⁻¹ = 1 := PowerSeries.mul_inv_cancel v hv0'
+    have hviB : Bd 1 v⁻¹ := hinv v _ hvB hv0 hvi
+    have hWeq
+        : hat M.ι ℓ M.w
+          = hat M.ι ℓ M.u * hat M.ι ℓ M.u * hat M.ι ℓ M.u
+            + hat M.ι ℓ M.w
+              * (C M.W.a₁ * hat M.ι ℓ M.u + C M.W.a₂ * hat M.ι ℓ M.u * hat M.ι ℓ M.u
+                + C M.W.a₃ * hat M.ι ℓ M.w + C M.W.a₄ * hat M.ι ℓ M.u * hat M.ι ℓ M.w
+                + C M.W.a₆ * hat M.ι ℓ M.w * hat M.ι ℓ M.w) := by
+      have hc : ∀ a : ℂ_[q], C a = hat M.ι ℓ (fun _ => M.ι.symm a) := fun a => by
+        rw [hat_const M.ι hℓ, RingEquiv.apply_symm_apply]
+      simp only [hc]
+      simp (disch := fun_prop) only [← hat_mul M.ι hℓ, ← hat_add M.ι hℓ]
+      refine hat_congr M.ι hℓ hw (by fun_prop) ?_
+      filter_upwards [nhdsWithin_le_nhds heq] with z hz
+      linear_combination hz.1
+    have hWB : Bd 1 (hat M.ι ℓ M.w) := bd_w h₁ h₂ h₃ h₄ h₆ hU hU0 hW0 hWeq
+    set Q := C M.W.a₁ * hat M.ι ℓ M.u + C M.W.a₂ * hat M.ι ℓ M.u * hat M.ι ℓ M.u + C M.W.a₃ * hat M.ι ℓ M.w
+          + C M.W.a₄ * hat M.ι ℓ M.u * hat M.ι ℓ M.w + C M.W.a₆ * hat M.ι ℓ M.w * hat M.ι ℓ M.w with hQ
+    have hQ0 : constantCoeff Q = 0 := by simp [hQ, hU0, hW0]
+    have hQB : Bd 1 Q := by
+      rw [bd_iff] at hU hWB ⊢
+      intro n
+      exact (((((intLt_C h₁).mul (hU _)).add (((intLt_C h₂).mul (hU _)).mul (hU _))).add
+          ((intLt_C h₃).mul (hWB _))).add (((intLt_C h₄).mul (hU _)).mul (hWB _))).add
+        (((intLt_C h₆).mul (hWB _)).mul (hWB _))
+    set ys := (C 1 + C (-1) * Q) * (v⁻¹ * v⁻¹ * v⁻¹) with hys
+    have hysB : Bd 1 ys := by
+      rw [bd_iff] at hQB hviB ⊢
+      intro n
+      exact ((intLt_C (by simp)).add ((intLt_C (by simp)).mul (hQB _))).mul
+        (((hviB _).mul (hviB _)).mul (hviB _))
+    have hys0 : ‖constantCoeff ys‖ = 1 := by simp [hys, hQ0, hv0]
+    have hWys : hat M.ι ℓ M.w * ys = X ^ 3 := by
+      have h1 : hat M.ι ℓ M.w * (1 - Q) = (X * v) ^ 3 := by rw [← hv]; linear_combination hWeq
+      calc
+        hat M.ι ℓ M.w * ys
+          = hat M.ι ℓ M.w * (1 - Q) * v⁻¹ ^ 3 := by rw [hys, map_neg, map_one]; ring
+        _ = X ^ 3 * (v * v⁻¹) ^ 3 := by rw [h1]; ring
+        _ = X ^ 3 := by rw [hvi]; ring
+    refine ⟨
+      v,
+      v * ys,
+      -ys,
+      hvB,
+      ?_,
+      fun n => by simpa using hysB n,
+      hv0,
+      ?_,
+      by simpa using hys0,
+      hv,
+      by rw [mul_neg, hWys],
+      by ring,
+      ?_
+    ⟩
+    · rw [bd_iff] at hvB hysB ⊢
+      exact fun n => (hvB n).mul (hysB n)
+    · rw [map_mul, norm_mul, hv0, hys0, mul_one]
+    intro F A B k hF hA hB G hG D j hD h
+    clear_value ys Q
+    clear hs heq hder hring hinv
+    have hAa := homog_analytic A k hu hw
+    have hBa := homog_analytic B k hu hw
+    have hDa := homog_analytic D j hu hw
+    have key
+        : hat M.ι ℓ F * hat M.ι ℓ (homog D j M.u M.w) * hat M.ι ℓ M.w ^ (k + 1)
+            + hat M.ι ℓ G * hat M.ι ℓ M.w ^ j * hat M.ι ℓ (homog B k M.u M.w)
+          = hat M.ι ℓ G * hat M.ι ℓ M.w ^ j * (hat M.ι ℓ (homog A k M.u M.w) * hat M.ι ℓ M.w) := by
+      rw [← hat_pow M.ι hℓ hw, ← hat_pow M.ι hℓ hw]
+      simp (disch := fun_prop) only [← hat_mul M.ι hℓ, ← hat_add M.ι hℓ]
+      refine hat_congr M.ι hℓ (by fun_prop) (by fun_prop) ?_
+      filter_upwards [h, hxy] with z hz ⟨_, _, hx, hy⟩
+      rw [homog_eq hA hx, homog_eq hB hx, homog_eq hD hx]
+      linear_combination M.w z ^ (j + k + 1) * hz
+        + G z * M.w z ^ j * (B.eval (M.x z)) * M.w z ^ k * hy
+    have eA := hat_homog M.ι hℓ A k hu hw hv hWys
+    have eB := hat_homog M.ι hℓ B k hu hw hv hWys
+    have eD := hat_homog M.ι hℓ D j hu hw hv hWys
+    have hsum
+        : ∑ i ∈ Finset.range (k + 1), (C (M.ι (A.coeff i)) * X ^ (2 * (k - i) + 3) * (v * ys) ^ i
+            + C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i * -ys)
+          = (∑ i ∈ Finset.range (k + 1), C (M.ι (A.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i)
+              * X ^ 3
+            - (∑ i ∈ Finset.range (k + 1), C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i)
+              * ys := by
+      rw [Finset.sum_mul, Finset.sum_mul, ← Finset.sum_sub_distrib]
+      exact Finset.sum_congr rfl fun i _ => by ring
+    rw [hsum]
+    set SA := ∑ i ∈ Finset.range (k + 1), C (M.ι (A.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i
+    set SB := ∑ i ∈ Finset.range (k + 1), C (M.ι (B.coeff i)) * X ^ (2 * (k - i)) * (v * ys) ^ i
+    set SD := ∑ i ∈ Finset.range (j + 1), C (M.ι (D.coeff i)) * X ^ (2 * (j - i)) * (v * ys) ^ i
+    have hX : (X : ℂ_[q]⟦X⟧) ^ (j + k) ≠ 0 := pow_ne_zero _ X_ne_zero
+    apply mul_left_cancel₀ hX
+    have key2
+        : hat M.ι ℓ F * (hat M.ι ℓ (homog D j M.u M.w) * ys ^ j) * (hat M.ι ℓ M.w * ys) ^ (k + 1)
+            + hat M.ι ℓ G * (hat M.ι ℓ M.w * ys) ^ j * (hat M.ι ℓ (homog B k M.u M.w) * ys ^ k) * ys
+          = hat M.ι ℓ G * (hat M.ι ℓ M.w * ys) ^ j
+            * ((hat M.ι ℓ (homog A k M.u M.w) * ys ^ k) * (hat M.ι ℓ M.w * ys)) := by
+      linear_combination ys ^ (j + k + 1) * key
+    rw [eA, eB, eD, hWys] at key2
+    linear_combination key2
 
 end GlobalTheory.MomOne.ChartXY

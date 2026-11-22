@@ -5,13 +5,23 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BsLApply
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry MvPolynomial MeasureTheory Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.L2DbarEstimates (V)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm GlobalTheory.LineForm GlobalTheory.ChernCalc GlobalTheory.FlagCell2
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.FlagBundle GlobalTheory.HermFrame GlobalTheory.GoodMetric GlobalTheory.CxForm
+  GlobalTheory.LineForm GlobalTheory.ChernCalc GlobalTheory.FlagCell2
 open GlobalTheory.FlagFibre (Low)
 open scoped Matrix ContDiff ComplexOrder ENNReal Classical
 
-theorem GlobalTheory.FlagCell2.univ_eq_of_local_preimage_eq : ∀ (M N : Type) [TopologicalSpace M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] [MeasurableSpace N] (π : N → M), Measurable π → ∀ (μ : Measure N) (ν : Measure M), (∀ x : M, ∃ U : Set M, IsOpen U ∧ x ∈ U ∧ ∀ T, MeasurableSet T → T ⊆ U → μ (π ⁻¹' T) = ν T) → μ Set.univ = ν Set.univ := by
+theorem GlobalTheory.FlagCell2.univ_eq_of_local_preimage_eq
+    : ∀ (M N : Type) [TopologicalSpace M] [SecondCountableTopology M] [MeasurableSpace M]
+        [BorelSpace M] [MeasurableSpace N] (π : N → M),
+      Measurable π
+        → ∀ (μ : Measure N) (ν : Measure M),
+          (∀ x : M, ∃ U : Set M,
+              IsOpen U ∧ x ∈ U ∧ ∀ T, MeasurableSet T → T ⊆ U → μ (π ⁻¹' T) = ν T)
+            → μ Set.univ = ν Set.univ := by
   intro M N _ _ _ _ _ π hπ μ ν h
   choose U hUo hxU hU using h
   obtain ⟨S, hSc, hS⟩ := TopologicalSpace.isOpen_iUnion_countable U hUo

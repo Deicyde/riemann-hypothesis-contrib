@@ -12,8 +12,12 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.LemmasChr
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
@@ -32,7 +36,8 @@ theorem rapidDec_star {V : HSp D} {f : GA D V → ℂ} (h : RapidDec V f) : Rapi
 theorem rung0 (hF : FockTot) : Rung0 := by
   intro D hq T L μ0 hL sc G W M hM v F ΓL hE hG Ψ hΨ u hu hper h
   have hm : 0 < D.R.m := by omega
-  obtain ⟨hom, homC, -, hev, hdep, hdn, hpart, -, -, -⟩ := GlobalTheory.T.gridConjugation_weilData_inverseCharacter D hq T L μ0 hL sc G W M hM 0 hm
+  obtain ⟨hom, homC, -, hev, hdep, hdn, hpart, -, -, -⟩ :=
+    GlobalTheory.T.gridConjugation_weilData_inverseCharacter D hq T L μ0 hL sc G W M hM 0 hm
   obtain ⟨hchT, hchS⟩ := hev ⟨0, rfl⟩
   obtain ⟨hrap, hch⟩ := hΨ
   obtain ⟨f, hf, hΨ0⟩ := hch 0 hm
@@ -50,7 +55,9 @@ theorem rung0 (hF : FockTot) : Rung0 := by
   have homX : IsWeilDatumO W.ψ _ _ a⁻¹ (a⁻¹ * L.eta * L.eta⁻¹) (omCore W 0) := by
     rw [mul_inv_cancel_right]; exact homC
   have hHeta : IsHeckeChar D L.eta := by
-    have := GlobalTheory.HeckeCharsOfSquare.isHeckeChar_mul (GlobalTheory.HeckeCharsOfSquare.isHeckeChar_inv homR.hecS) homR.hecT
+    have :=
+      GlobalTheory.HeckeCharsOfSquare.isHeckeChar_mul
+        (GlobalTheory.HeckeCharsOfSquare.isHeckeChar_inv homR.hecS) homR.hecT
     rwa [inv_inv, mul_inv_cancel_left] at this
   have hReta : ResEta D L.eta (negSp F.Lz).rank := by
     have h1 := Formalism.L2.Theta.resEta_mul (Formalism.L2.Theta.resEta_inv homC.resT) homR.resT
@@ -61,34 +68,48 @@ theorem rung0 (hF : FockTot) : Rung0 := by
     show _ = F.Lz.rank % 2
     rw [F.rk]
     omega
-  obtain ⟨omz, homz⟩ := GlobalTheory.WeilDatumExistence.weilDatumExists D (G.V (.core 1)) (negSp F.Lz) W.ψ a⁻¹⁻¹ L.eta W.ψ_std
-    (GlobalTheory.HeckeCharsOfSquare.isHeckeChar_inv homX.hecS) hHeta (Formalism.L2.Theta.resEta_inv homX.resS) hReta
+  obtain ⟨omz, homz⟩ :=
+    GlobalTheory.WeilDatumExistence.weilDatumExists D (G.V (.core 1)) (negSp F.Lz) W.ψ a⁻¹⁻¹ L.eta
+      W.ψ_std (GlobalTheory.HeckeCharsOfSquare.isHeckeChar_inv homX.hecS) hHeta
+      (Formalism.L2.Theta.resEta_inv homX.resS) hReta
 
   have hΞ : VacG W.ψ _ _ (latCore G 0) (star f) := (hdep f).1 hf
   have hlift : liftT (omCore W 0) (v 1).μ (v 1).𝓕 (star (Ψ 1)) (star f) = star (Ψ 0) := by
     rw [hΨ0]; exact (hdn v f (Ψ 1)).symm
-  have hint : (∫ x in vT.𝓕, liftT (omCore W 0) (F.jac v 0 h).v0.μ (F.jac v 0 h).v0.𝓕 (star (Ψ 1)) (star f) (F.oz.emb (x, 1)) *
-      star u x ∂vT.μ) ≠ 0 := by
-    have e : (fun x : GA D (Yc D 0) => liftT (omCore W 0) (F.jac v 0 h).v0.μ (F.jac v 0 h).v0.𝓕 (star (Ψ 1)) (star f)
-        (F.oz.emb (x, 1)) * star u x) = fun x => (starRingEnd ℂ) (Ψ 0 (stabilizerEmbedding G.sp.dec0 x) * u x) := by
+  have hint
+      : (∫ x in vT.𝓕, liftT (omCore W 0) (F.jac v 0 h).v0.μ (F.jac v 0 h).v0.𝓕 (star (Ψ 1)) (star f) (F.oz.emb (x, 1)) *
+          star u x ∂vT.μ)
+        ≠ 0 := by
+    have e
+        : (fun x : GA D (Yc D 0) =>
+            liftT (omCore W 0) (F.jac v 0 h).v0.μ (F.jac v 0 h).v0.𝓕 (star (Ψ 1)) (star f)
+                (F.oz.emb (x, 1))
+              * star u x)
+          = fun x => (starRingEnd ℂ) (Ψ 0 (stabilizerEmbedding G.sp.dec0 x) * u x) := by
       funext x
-      have hl : liftT (omCore W 0) (F.jac v 0 h).v0.μ (F.jac v 0 h).v0.𝓕 (star (Ψ 1)) (star f) = star (Ψ 0) := hlift
-      rw [hl, hE.bot x, map_mul]; rfl
+      have hl
+          : liftT (omCore W 0) (F.jac v 0 h).v0.μ (F.jac v 0 h).v0.𝓕 (star (Ψ 1)) (star f)
+            = star (Ψ 0) :=
+        hlift
+      rw [hl, hE.bot x, map_mul]
+      rfl
     rw [e, integral_conj]
     intro h0
     apply hper
     have := congrArg (starRingEnd ℂ) h0
     rw [Complex.conj_conj, map_zero] at this
     exact this
-  obtain ⟨Φ', Φz, hΦ', hΦz, hne⟩ := GlobalTheory.T.lastSeesaw_periodNonvanishing D W.ψ (F.jac v 0 h) (G.V (.core 0)) (Yc D 0) F.Lz F.oz (latRow G 0) (ΓL 0)
-    (latCore G 0) F.rk (hG.last h) (F.ζ 0) a⁻¹ (a⁻¹ * L.eta) L.eta (omRow W 0) (omCore W 0) omz homR homX homz vT
-    (star (Ψ 1)) (star u) hφ hu' (star f) hΞ hint
+  obtain ⟨Φ', Φz, hΦ', hΦz, hne⟩ :=
+    GlobalTheory.T.lastSeesaw_periodNonvanishing D W.ψ (F.jac v 0 h) (G.V (.core 0)) (Yc D 0) F.Lz
+      F.oz (latRow G 0) (ΓL 0) (latCore G 0) F.rk (hG.last h) (F.ζ 0) a⁻¹ (a⁻¹ * L.eta) L.eta
+      (omRow W 0) (omCore W 0) omz homR homX homz vT (star (Ψ 1)) (star u) hφ hu' (star f) hΞ hint
 
   let ℓ : (WO (G.V (.grid 1 0)) (G.V (.grid 0 0)) → ℂ) → ℂ := fun Φ =>
     (F.jac v 0 h).per W.ψ (F.ζ 0) omz (star (Ψ 1)) (liftS (omRow W 0) vT.μ vT.𝓕 (star u) Φ) Φz
   have hT : Tame W.ψ _ _ ℓ :=
-    (GlobalTheory.T.thetaLift_periods_isTameThetaFunctional D W.ψ (Yc D 0) vT (star u) hu').2 0 (F.jac v 0 h) a⁻¹ (a⁻¹ * L.eta) (omRow W 0) homR (negSp F.Lz)
-      (F.ζ 0) a⁻¹⁻¹ L.eta omz homz (star (Ψ 1)) Φz hφ hΦz.1
+    (GlobalTheory.T.thetaLift_periods_isTameThetaFunctional D W.ψ (Yc D 0) vT (star u) hu').2 0
+      (F.jac v 0 h) a⁻¹ (a⁻¹ * L.eta) (omRow W 0) homR (negSp F.Lz) (F.ζ 0) a⁻¹⁻¹ L.eta omz homz
+      (star (Ψ 1)) Φz hφ hΦz.1
   have hK : ∃ κ P, ℓ (star (W.fock (.chi 0 0) (W.cosVec 0 κ) P)) ≠ 0 := by
     by_contra hno
     push_neg at hno

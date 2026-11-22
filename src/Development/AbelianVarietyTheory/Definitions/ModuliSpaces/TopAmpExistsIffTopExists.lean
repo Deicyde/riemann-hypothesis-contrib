@@ -45,8 +45,10 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.AddXYZOr
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 noncomputable section
@@ -57,8 +59,8 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
 section Model
 
-theorem isProjOver_powObj {R : Type} [CommRing R] (A : Over (Sp R)) (h : IsProjOver A.hom) :
-    ∀ n, IsProjOver (Out.powObj A n).hom
+theorem isProjOver_powObj {R : Type} [CommRing R] (A : Over (Sp R)) (h : IsProjOver A.hom)
+    : ∀ n, IsProjOver (Out.powObj A n).hom
   | 0 => Inhab.isProjOver_id R
   | n + 1 => ProjSpace.isProjOver_pullback h (isProjOver_powObj A h n)
 

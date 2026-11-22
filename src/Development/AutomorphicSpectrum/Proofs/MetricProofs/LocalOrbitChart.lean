@@ -11,10 +11,13 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 
-theorem exists_injective_linear {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] {n : ℕ}
-    (h : Module.finrank ℂ W ≤ n) : ∃ j : W →ₗ[ℂ] (Fin n → ℂ), Function.Injective j := by
+theorem exists_injective_linear
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    {n : ℕ} (h : Module.finrank ℂ W ≤ n)
+    : ∃ j : W →ₗ[ℂ] (Fin n → ℂ), Function.Injective j := by
   let e : W ≃ₗ[ℂ] (Fin (Module.finrank ℂ W) → ℂ) := LinearEquiv.ofFinrankEq _ _ (by simp)
   let s : Fin (Module.finrank ℂ W) → Fin n := Fin.castLE h
   have hs : Function.Injective s := Fin.castLE_injective h
@@ -24,12 +27,12 @@ theorem exists_injective_linear {W : Type} [AddCommGroup W] [Module ℂ W] [Fini
   change Function.extend s (e a) 0 (s i) = Function.extend s (e b) 0 (s i) at this
   rwa [hs.extend_apply, hs.extend_apply] at this
 
-theorem exists_injOn_of_strict {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E]
-    [NormedAddCommGroup F] [NormedSpace ℂ F] {Φ : E → F} {L : E →L[ℂ] F} {w : E}
-    (hΦ : HasStrictFDerivAt Φ L w) (hL : Function.Injective L) :
-    ∃ B : Set E, IsOpen B ∧ w ∈ B ∧ Set.InjOn Φ B := by
-  obtain ⟨N, hN, hanti⟩ := (L : E →ₗ[ℂ] F).exists_antilipschitzWith
-    (LinearMap.ker_eq_bot.2 hL)
+theorem exists_injOn_of_strict
+    {E F : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E]
+    [NormedAddCommGroup F] [NormedSpace ℂ F]
+    {Φ : E → F} {L : E →L[ℂ] F} {w : E} (hΦ : HasStrictFDerivAt Φ L w) (hL : Function.Injective L)
+    : ∃ B : Set E, IsOpen B ∧ w ∈ B ∧ Set.InjOn Φ B := by
+  obtain ⟨N, hN, hanti⟩ := (L : E →ₗ[ℂ] F).exists_antilipschitzWith (LinearMap.ker_eq_bot.2 hL)
   have hc : (0 : NNReal) < (2 * N)⁻¹ := by positivity
   obtain ⟨s, hs, hap⟩ := hΦ.approximates_deriv_on_nhds (c := (2 * N)⁻¹) (Or.inr hc)
   obtain ⟨B, hBs, hB, hwB⟩ := mem_nhds_iff.1 hs
@@ -50,10 +53,14 @@ theorem exists_injOn_of_strict {E F : Type} [NormedAddCommGroup E] [NormedSpace 
   rw [h4] at h3
   linarith
 
-theorem exists_linear_separation {σ : Type} [Fintype σ] (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ) (n : ℕ)
-    (hcard : Fintype.card σ ≤ Module.finrank ℂ (ReciprocityTheory.AnForm.R.jacSpanAt I w) + n) :
-    ∃ (π : (σ → ℂ) →L[ℂ] (Fin n → ℂ)) (B : Set (σ → ℂ)), IsOpen B ∧ w ∈ B ∧
-      ∀ u ∈ B, ∀ v ∈ B, (∀ h ∈ I, eval u h = 0) → (∀ h ∈ I, eval v h = 0) → π u = π v → u = v := by
+theorem exists_linear_separation
+    {σ : Type} [Fintype σ]
+    (I : Ideal (MvPolynomial σ ℂ)) (w : σ → ℂ) (n : ℕ)
+    (hcard : Fintype.card σ ≤ Module.finrank ℂ (ReciprocityTheory.AnForm.R.jacSpanAt I w) + n)
+    : ∃ (π : (σ → ℂ) →L[ℂ] (Fin n → ℂ)) (B : Set (σ → ℂ)),
+      IsOpen B ∧ w ∈ B
+        ∧ ∀ u ∈ B, ∀ v ∈ B,
+          (∀ h ∈ I, eval u h = 0) → (∀ h ∈ I, eval v h = 0) → π u = π v → u = v := by
   classical
   set S : Set (σ → ℂ) := (fun h : MvPolynomial σ ℂ => fun j => eval w (pderiv j h)) '' (I : Set _) with hS
   obtain ⟨b, hbS, hspan, hli⟩ := exists_linearIndependent ℂ S
@@ -129,19 +136,22 @@ theorem localOrbitChart : LocalOrbitChart.Statement := by
     have h1 := hz₀.2 _ hX
     rw [map_X, eval_X] at h1
     exact hp k h1
-  have hzero : ∀ z ∈ mcPts (mCoordIdeal y), (∀ k, z ⟨k, p k⟩ ≠ 0) →
-      ∀ h ∈ ReciprocityTheory.AnForm.R.chartIdeal (pC (mCoordIdeal y)) p,
-        eval (ReciprocityTheory.AnForm.R.affCoord p z) h = 0 := fun z hz hzp =>
-    (ReciprocityTheory.AnForm.R.mem_conePts_iff_chartIdeal hPh p z hzp).1 ((mem_mcPts_iff_conePts_pC _ _).1 hz)
-  have hrank := GlobalTheory.CompanionTheory.Ar.PB.SmoothMan.card_le_finrank_jacSpanAt K ι Ω y n hP hsm p hy
-    (ReciprocityTheory.AnForm.R.affCoord p z₀) (hzero z₀ hz₀ hp)
+  have hzero
+      : ∀ z ∈ mcPts (mCoordIdeal y),
+        (∀ k, z ⟨k, p k⟩ ≠ 0)
+          → ∀ h ∈ ReciprocityTheory.AnForm.R.chartIdeal (pC (mCoordIdeal y)) p,
+            eval (ReciprocityTheory.AnForm.R.affCoord p z) h = 0 := fun z hz hzp =>
+    (ReciprocityTheory.AnForm.R.mem_conePts_iff_chartIdeal hPh p z hzp).1
+      ((mem_mcPts_iff_conePts_pC _ _).1 hz)
+  have hrank :=
+    GlobalTheory.CompanionTheory.Ar.PB.SmoothMan.card_le_finrank_jacSpanAt K ι Ω y n hP hsm p hy
+      (ReciprocityTheory.AnForm.R.affCoord p z₀) (hzero z₀ hz₀ hp)
   obtain ⟨π, B, hB, hwB, hsep⟩ := exists_linear_separation _ _ n hrank
   let D : Set ((Σ k, ι k) → ℂ) := {z | ∀ k, z ⟨k, p k⟩ ≠ 0}
   have hDopen : IsOpen D := by
     have : D = ⋂ k, {z | z ⟨k, p k⟩ ≠ 0} := by ext z; simp [D]
     rw [this]
-    exact isOpen_iInter_of_finite fun k =>
-      isOpen_ne_fun (continuous_apply _) continuous_const
+    exact isOpen_iInter_of_finite fun k => isOpen_ne_fun (continuous_apply _) continuous_const
   have han : ∀ z ∈ D, AnalyticAt ℂ (ReciprocityTheory.AnForm.R.affCoord p) z := by
     intro z hz
     refine analyticAt_pi_iff.2 fun q => ?_
@@ -150,12 +160,21 @@ theorem localOrbitChart : LocalOrbitChart.Statement := by
     exact (hc q).div (hc ⟨q.1, p q.1⟩) (hz q.1)
   have hcont : ContinuousOn (ReciprocityTheory.AnForm.R.affCoord p) D := fun z hz =>
     (han z hz).continuousAt.continuousWithinAt
-  refine ⟨D ∩ ReciprocityTheory.AnForm.R.affCoord p ⁻¹' B, hcont.isOpen_inter_preimage hDopen hB, ⟨hp, hwB⟩,
-    fun z => π (ReciprocityTheory.AnForm.R.affCoord p z), ?_, ?_, ?_⟩
+  refine ⟨
+    D ∩ ReciprocityTheory.AnForm.R.affCoord p ⁻¹' B,
+    hcont.isOpen_inter_preimage hDopen hB,
+    ⟨hp, hwB⟩,
+    fun z => π (ReciprocityTheory.AnForm.R.affCoord p z),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro z hz
     exact (π.analyticAt _).comp (han z hz.1)
   · intro z hz c hc
-    have hA : ReciprocityTheory.AnForm.R.affCoord p (torusSmul c z) = ReciprocityTheory.AnForm.R.affCoord p z :=
+    have hA
+        : ReciprocityTheory.AnForm.R.affCoord p (torusSmul c z)
+          = ReciprocityTheory.AnForm.R.affCoord p z :=
       ReciprocityTheory.AnForm.R.affCoord_eq_of_sameOrbit p ⟨c, hc, rfl⟩
     refine ⟨⟨fun k => mul_ne_zero (hc k) (hz.1 k), ?_⟩, ?_⟩
     · show ReciprocityTheory.AnForm.R.affCoord p (torusSmul c z) ∈ B

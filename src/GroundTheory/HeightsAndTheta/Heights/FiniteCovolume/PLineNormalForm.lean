@@ -21,18 +21,16 @@ section Denominators
 
 variable {E : Type*} [Field E] [NumberField E]
 
-
 omit [NumberField E] in
-theorem isIntegral_natCast_mul {n : ℕ} {x : E} (hx : IsIntegral ℤ x) :
-    IsIntegral ℤ ((n : E) * x) := by
+theorem isIntegral_natCast_mul {n : ℕ} {x : E} (hx : IsIntegral ℤ x)
+    : IsIntegral ℤ ((n : E) * x) := by
   have : IsIntegral ℤ (n : E) := by
     simpa using isIntegral_algebraMap (R := ℤ) (A := E) (x := (n : ℤ))
   exact this.mul hx
 
-
 omit [NumberField E] in
-theorem isIntegral_mul_of_dvd {a b : ℕ} {x : E} (hx : IsIntegral ℤ ((a : E) * x)) (hab : a ∣ b) :
-    IsIntegral ℤ ((b : E) * x) := by
+theorem isIntegral_mul_of_dvd {a b : ℕ} {x : E} (hx : IsIntegral ℤ ((a : E) * x)) (hab : a ∣ b)
+    : IsIntegral ℤ ((b : E) * x) := by
   obtain ⟨k, rfl⟩ := hab
   have : ((a * k : ℕ) : E) * x = (k : E) * ((a : E) * x) := by push_cast; ring
   rw [this]
@@ -51,25 +49,27 @@ theorem exists_nat_mul_isIntegral (x : E) : ∃ n : ℕ, 0 < n ∧ IsIntegral �
     rw [h', Int.cast_neg, neg_mul]
     exact hyx.neg
 
-
 omit [Field E] [NumberField E] in
-theorem exists_common_multiple {ι : Type*} (s : Finset ι) (P : ι → ℕ → Prop)
-    (hP : ∀ i a b, P i a → a ∣ b → P i b) (hex : ∀ i ∈ s, ∃ a, 0 < a ∧ P i a) :
-    ∃ d, 0 < d ∧ ∀ i ∈ s, P i d :=
+theorem exists_common_multiple
+    {ι : Type*} (s : Finset ι) (P : ι → ℕ → Prop) (hP : ∀ i a b, P i a → a ∣ b → P i b)
+    (hex : ∀ i ∈ s, ∃ a, 0 < a ∧ P i a)
+    : ∃ d, 0 < d ∧ ∀ i ∈ s, P i d :=
   _root_.UpperTheory.Reformulated.B.Qm7.exists_common_multiple s P hP hex
 
-theorem exists_den_of_fg {J : AddSubgroup E} (hJ : J.FG) :
-    ∃ d : ℕ, 0 < d ∧ ∀ j ∈ J, IsIntegral ℤ ((d : E) * j) := by
+theorem exists_den_of_fg {J : AddSubgroup E} (hJ : J.FG)
+    : ∃ d : ℕ, 0 < d ∧ ∀ j ∈ J, IsIntegral ℤ ((d : E) * j) := by
   obtain ⟨S, rfl⟩ := AddSubgroup.isAddFG_iff.mp hJ
-  obtain ⟨d, hd, hS⟩ := exists_common_multiple S (fun s n => IsIntegral ℤ ((n : E) * s))
-    (fun _ _ _ h hab => isIntegral_mul_of_dvd h hab) (fun s _ => exists_nat_mul_isIntegral s)
+  obtain ⟨d, hd, hS⟩ :=
+    exists_common_multiple S
+      (fun s n => IsIntegral ℤ ((n : E) * s))
+      (fun _ _ _ h hab => isIntegral_mul_of_dvd h hab)
+      (fun s _ => exists_nat_mul_isIntegral s)
   refine ⟨d, hd, fun j hj => ?_⟩
   induction hj using AddSubgroup.closure_induction with
   | mem x hx => exact hS x hx
   | zero => rw [mul_zero]; exact isIntegral_zero
   | add x y _ _ hx hy => rw [mul_add]; exact hx.add hy
   | neg x _ hx => rw [mul_neg]; exact hx.neg
-
 
 variable (E) in
 def intMultiples (N : ℕ) : AddSubgroup E :=
@@ -87,8 +87,8 @@ open LineNormalForm
 
 section NormalForm
 
-variable {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E]
-  [Algebra.IsQuadraticExtension F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W]
 
 theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statement h := by
@@ -97,8 +97,8 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
   set B := h.toSesq
 
   have cc : ∀ a : E, conjHom F E (conjHom F E a) = a := fun a => conj_conj (F := F) a
-  have ci : ∀ a : E, IsIntegral ℤ a → IsIntegral ℤ (conjHom F E a) :=
-    fun a ha => ha.map (conjHom F E).toIntAlgHom
+  have ci : ∀ a : E, IsIntegral ℤ a → IsIntegral ℤ (conjHom F E a) := fun a ha =>
+    ha.map (conjHom F E).toIntAlgHom
   have cn : ∀ N : ℕ, conjHom F E (N : E) = N := fun N => map_natCast _ N
   have hsym : ∀ x y, conjHom F E (B x y) = B y x := fun x y => h.isSymm.eq x y
   have hsmul : ∀ (a : E) x y, B (a • x) y = conjHom F E a * B x y := by
@@ -106,27 +106,43 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     rw [LinearMap.map_smulₛₗ₂, smul_eq_mul]
 
   obtain ⟨T, hT, hTJ⟩ := IdealClassesFinite.proof E
-  obtain ⟨d, hd, hdT⟩ := exists_common_multiple hT.toFinset
-    (fun J n => J.FG → J ≠ ⊥ → (∀ j ∈ J, IsIntegral ℤ ((n : E) * j)) ∧
-        ∃ j₀ ∈ J, j₀ ≠ 0 ∧ IsIntegral ℤ ((n : E) * j₀⁻¹))
-    (fun J a b hJ hab hfg hne => by
-      obtain ⟨h1, j₀, hj₀, hj₀0, h2⟩ := hJ hfg hne
-      exact ⟨fun j hj => isIntegral_mul_of_dvd (h1 j hj) hab, j₀, hj₀, hj₀0,
-        isIntegral_mul_of_dvd h2 hab⟩)
-    (fun J _ => by
-      by_cases hfg : J.FG
-      · by_cases hne : J = ⊥
-        · exact ⟨1, one_pos, fun _ h => absurd hne h⟩
-        · obtain ⟨a, ha, haJ⟩ := exists_den_of_fg hfg
-          obtain ⟨j₀, hj₀, hj₀0⟩ : ∃ j₀ ∈ J, j₀ ≠ 0 := by
-            by_contra hc
-            push Not at hc
-            exact hne ((AddSubgroup.eq_bot_iff_forall J).2 hc)
-          obtain ⟨b, hb, hbj⟩ := exists_nat_mul_isIntegral j₀⁻¹
-          exact ⟨a * b, Nat.mul_pos ha hb, fun _ _ =>
-            ⟨fun j hj => isIntegral_mul_of_dvd (haJ j hj) (dvd_mul_right a b), j₀, hj₀, hj₀0,
-              isIntegral_mul_of_dvd hbj (dvd_mul_left b a)⟩⟩
-      · exact ⟨1, one_pos, fun h _ => absurd h hfg⟩)
+  obtain ⟨d, hd, hdT⟩ :=
+    exists_common_multiple hT.toFinset
+      (fun J n =>
+        J.FG → J ≠ ⊥
+          → (∀ j ∈ J, IsIntegral ℤ ((n : E) * j))
+            ∧ ∃ j₀ ∈ J, j₀ ≠ 0 ∧ IsIntegral ℤ ((n : E) * j₀⁻¹))
+      (fun J a b hJ hab hfg hne => by
+        obtain ⟨h1, j₀, hj₀, hj₀0, h2⟩ := hJ hfg hne
+        exact ⟨
+          fun j hj => isIntegral_mul_of_dvd (h1 j hj) hab,
+          j₀,
+          hj₀,
+          hj₀0,
+          isIntegral_mul_of_dvd h2 hab
+        ⟩)
+      (fun J _ => by
+        by_cases hfg : J.FG
+        · by_cases hne : J = ⊥
+          · exact ⟨1, one_pos, fun _ h => absurd hne h⟩
+          · obtain ⟨a, ha, haJ⟩ := exists_den_of_fg hfg
+            obtain ⟨j₀, hj₀, hj₀0⟩ : ∃ j₀ ∈ J, j₀ ≠ 0 := by
+              by_contra hc
+              push Not at hc
+              exact hne ((AddSubgroup.eq_bot_iff_forall J).2 hc)
+            obtain ⟨b, hb, hbj⟩ := exists_nat_mul_isIntegral j₀⁻¹
+            exact ⟨
+              a * b,
+              Nat.mul_pos ha hb,
+              fun _ _ => ⟨
+                fun j hj => isIntegral_mul_of_dvd (haJ j hj) (dvd_mul_right a b),
+                j₀,
+                hj₀,
+                hj₀0,
+                isIntegral_mul_of_dvd hbj (dvd_mul_left b a)
+              ⟩
+            ⟩
+        · exact ⟨1, one_pos, fun h _ => absurd h hfg⟩)
   set m := D.factorial with hm_def
   have hm : 0 < m := Nat.factorial_pos D
   have hmd : 0 < m * d := Nat.mul_pos hm hd
@@ -135,21 +151,27 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
   have hm0 : (m : E) ≠ 0 := Nat.cast_ne_zero.2 hm.ne'
   have hd0 : (d : E) ≠ 0 := Nat.cast_ne_zero.2 hd.ne'
   have hk0 : (k : E) ≠ 0 := Nat.cast_ne_zero.2 hk.ne'
-  refine ⟨{A | intMultiples E (m * d) ≤ A ∧ (∀ x ∈ A, (m * d * d) • x ∈ intMultiples E (m * d)) ∧
-      A.FG} ×ˢ {A | intMultiples E k ≤ A ∧ (∀ x ∈ A, (k * d) • x ∈ intMultiples E k) ∧ A.FG},
-    (finite_sandwich _ (by positivity)).prod (finite_sandwich _ (by positivity)), k * d,
-    Nat.mul_pos hk hd, ?_⟩
+  refine ⟨
+    {A | intMultiples E (m * d) ≤ A ∧ (∀ x ∈ A, (m * d * d) • x ∈ intMultiples E (m * d)) ∧
+        A.FG}
+      ×ˢ {A | intMultiples E k ≤ A ∧ (∀ x ∈ A, (k * d) • x ∈ intMultiples E k) ∧ A.FG},
+    (finite_sandwich _ (by positivity)).prod (finite_sandwich _ (by positivity)),
+    k * d,
+    Nat.mul_pos hk hd,
+    ?_
+  ⟩
   intro La l hD hl
   have hLat := hD.isLattice
   have hint : ∀ x ∈ La, ∀ y ∈ La, IsIntegral ℤ (B x y) := fun x hx y hy =>
     (mem_integralClosure_iff ℤ E).1 (hD.integral x hx y hy)
-  have hsm : ∀ {a : E}, IsIntegral ℤ a → ∀ {x}, x ∈ La → a • x ∈ La :=
-    fun ha _ hx => hLat.smul_mem ⟨_, ha⟩ _ hx
+  have hsm : ∀ {a : E}, IsIntegral ℤ a → ∀ {x}, x ∈ La → a • x ∈ La := fun ha _ hx =>
+    hLat.smul_mem ⟨_, ha⟩ _ hx
 
   have hdual : ∀ y, (∀ x ∈ La, IsIntegral ℤ (B y x)) → (m : E) • y ∈ La := by
     intro y hy
     have hy' : y ∈ dualLattice h La := fun x hx => (mem_integralClosure_iff ℤ E).2 (hy x hx)
-    obtain ⟨t, ht⟩ : La.relIndex (dualLattice h La) ∣ m := Nat.dvd_factorial (Nat.pos_of_ne_zero hD.index_ne_zero) hD.index_le
+    obtain ⟨t, ht⟩ : La.relIndex (dualLattice h La) ∣ m :=
+      Nat.dvd_factorial (Nat.pos_of_ne_zero hD.index_ne_zero) hD.index_le
     rw [Nat.cast_smul_eq_nsmul, ht, mul_nsmul]
     exact La.nsmul_mem (La.nsmul_relIndex_mem hy') t
 
@@ -183,8 +205,7 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     exact hJ₁ne (by rw [hJ₁, h0, AddSubgroup.map_bot])
   obtain ⟨hdJ, j₀, hj₀J, hj₀0, hdj₀⟩ := hdT J (hT.mem_toFinset.2 hJT) hJfg hJne
   set v := conjHom F E c⁻¹ • v₁ with hv_def
-  have hBv : ∀ x, B v x = c⁻¹ * B v₁ x := by
-    intro x; rw [hv_def, hsmul, cc]
+  have hBv : ∀ x, B v x = c⁻¹ * B v₁ x := by intro x; rw [hv_def, hsmul, cc]
   have hvJ : ∀ x ∈ La, B v x ∈ J := by
     intro x hx
     have : B v₁ x ∈ J₁ := ⟨x, hx, rfl⟩
@@ -211,8 +232,7 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     intro x hx
     rw [mem_intMultiples] at hx
     generalize ho : ((m * d : ℕ) : E)⁻¹ * x = o at hx
-    have hxo : x = (m : E) * ((d : E) * o) := by
-      rw [← ho]; push_cast; field_simp
+    have hxo : x = (m : E) * ((d : E) * o) := by rw [← ho]; push_cast; field_simp
     change x • v ∈ La
     rw [hxo, ← smul_smul]
     refine hdual _ fun z hz => ?_
@@ -230,8 +250,7 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     rwa [← h2, cc] at this
 
   set q := B x₁ x₁ / (conjHom F E j₀ * j₀) with hq_def
-  have hq : conjHom F E q = q := by
-    rw [hq_def, map_div₀, hsym, map_mul, cc, mul_comm j₀]
+  have hq : conjHom F E q = q := by rw [hq_def, map_div₀, hsym, map_mul, cc, mul_comm j₀]
   have hq2 : conjHom F E (q / 2) = q / 2 := by rw [map_div₀, hq, map_ofNat]
   have hqi : IsIntegral ℤ ((d : E) ^ 2 * q) := by
     have e1 : (d : E) ^ 2 * q = B x₁ x₁ * ((d : E) * j₀⁻¹) * conjHom F E ((d : E) * j₀⁻¹) := by
@@ -243,8 +262,8 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     intro x
     rw [hw_def, LinearMap.map_sub₂, hsmul, hsmul, hq2]
   have hvw : B v w = 1 := by
-    rw [hw_def, (B v).map_sub, (B v).map_smul, (B v).map_smul, smul_eq_mul, smul_eq_mul, hx₁j, hvv, mul_zero,
-      sub_zero, inv_mul_cancel₀ hj₀0]
+    rw [hw_def, (B v).map_sub, (B v).map_smul, (B v).map_smul, smul_eq_mul, smul_eq_mul, hx₁j, hvv,
+      mul_zero, sub_zero, inv_mul_cancel₀ hj₀0]
   have hww : B w w = 0 := by
     rw [hBw, hvw]
     have hx₁v : B x₁ v = conjHom F E j₀ := by rw [← hsym, hx₁j]
@@ -280,21 +299,31 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     have hb' : b • w ∈ La := hb
     have := hdvx _ hb'
     rwa [map_smul, smul_eq_mul, hvw, mul_one] at this
-  refine ⟨v, w, hvl, ⟨hvv, hww, hvw⟩, ⟨⟨hIlo, fun a ha => ?_, LineCoeffsFG.proof W La v hLat.fg hv0⟩,
-    ⟨hKlo, fun b hb => ?_, LineCoeffsFG.proof W La w hLat.fg hw0⟩⟩, fun x hx => ⟨?_, ?_⟩⟩
+  refine ⟨
+    v,
+    w,
+    hvl,
+    ⟨hvv, hww, hvw⟩,
+    ⟨
+      ⟨hIlo, fun a ha => ?_, LineCoeffsFG.proof W La v hLat.fg hv0⟩,
+      ⟨hKlo, fun b hb => ?_, LineCoeffsFG.proof W La w hLat.fg hw0⟩
+    ⟩,
+    fun x hx => ⟨?_, ?_⟩
+  ⟩
   · rw [nsmul_eq_mul, mem_intMultiples]
-    have : ((m * d : ℕ) : E)⁻¹ * ((m * d * d : ℕ) * a) = (d : E) * a := by
-      push_cast; field_simp
-    rw [this]; exact hIup a ha
+    have : ((m * d : ℕ) : E)⁻¹ * ((m * d * d : ℕ) * a) = (d : E) * a := by push_cast; field_simp
+    rw [this]
+    exact hIup a ha
   · rw [nsmul_eq_mul, mem_intMultiples]
-    have : ((k : ℕ) : E)⁻¹ * ((k * d : ℕ) * b) = (d : E) * b := by
-      push_cast; field_simp
-    rw [this]; exact hKup b hb
+    have : ((k : ℕ) : E)⁻¹ * ((k * d : ℕ) * b) = (d : E) * b := by push_cast; field_simp
+    rw [this]
+    exact hKup b hb
 
   · apply hIlo
     rw [mem_intMultiples]
-    have : ((m * d : ℕ) : E)⁻¹ * (((k * d : ℕ) : E) * B w x) =
-        2 * (d : E) ^ 2 * conjHom F E ((d : E) * j₀⁻¹) * B x₁ x - (d : E) ^ 2 * q * ((d : E) * B v x) := by
+    have : ((m * d : ℕ) : E)⁻¹ * (((k * d : ℕ) : E) * B w x)
+        = 2 * (d : E) ^ 2 * conjHom F E ((d : E) * j₀⁻¹) * B x₁ x
+          - (d : E) ^ 2 * q * ((d : E) * B v x) := by
       rw [hBw, hk_def, map_mul, cn]; push_cast; field_simp
     rw [this]
     refine IsIntegral.sub ?_ (hqi.mul (hdvx x hx))
@@ -306,7 +335,8 @@ theorem LineNormalForm.proof (h : HermitianForm F E W) : LineNormalForm.Statemen
     rw [mem_intMultiples]
     have : ((k : ℕ) : E)⁻¹ * (((k * d : ℕ) : E) * B v x) = (d : E) * B v x := by
       push_cast; field_simp
-    rw [this]; exact hdvx x hx
+    rw [this]
+    exact hdvx x hx
 
 end NormalForm
 

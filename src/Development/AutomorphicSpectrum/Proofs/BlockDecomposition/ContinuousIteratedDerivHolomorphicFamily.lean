@@ -8,11 +8,11 @@ open Topology Filter
 
 namespace GlobalTheory.CompanionTheory.HolFamily
 
-theorem continuous_iteratedDeriv_family :
-    ∀ {G : Type} [TopologicalSpace G] (U : Set ℂ) (Ê : ℂ → G → ℂ), IsOpen U →
-      (∀ g, DifferentiableOn ℂ (Ê · g) U) →
-      ContinuousOn (fun y : ℂ × G => Ê y.1 y.2) (U ×ˢ Set.univ) →
-      ∀ z ∈ U, ∀ j : ℕ, Continuous fun g => iteratedDeriv j (Ê · g) z := by
+theorem continuous_iteratedDeriv_family
+    : ∀ {G : Type} [TopologicalSpace G] (U : Set ℂ) (Ê : ℂ → G → ℂ),
+      IsOpen U → (∀ g, DifferentiableOn ℂ (Ê · g) U)
+        → ContinuousOn (fun y : ℂ × G => Ê y.1 y.2) (U ×ˢ Set.univ)
+        → ∀ z ∈ U, ∀ j : ℕ, Continuous fun g => iteratedDeriv j (Ê · g) z := by
   intro G _ U E hU hd hc z hz j
   obtain ⟨R, hR, hball⟩ := Metric.isOpen_iff.1 hU z hz
   have hr : 0 < R / 2 := by positivity
@@ -28,17 +28,22 @@ theorem continuous_iteratedDeriv_family :
   have hδ : 0 < δ := by rw [hδdef]; positivity
   have htube : ∀ᶠ g in 𝓝 g0, ∀ w ∈ Metric.sphere z (R / 2), ‖E w g - E w g0‖ < δ := by
     refine (isCompact_sphere z (R / 2)).eventually_forall_of_forall_eventually
-      (P := fun g w => ‖E w g - E w g0‖ < δ) ?_
+      (P := fun g w => ‖E w g - E w g0‖ < δ)
+      ?_
     intro w hw
     have hwU : w ∈ U := hcl (Metric.sphere_subset_closedBall hw)
     have hcont : ContinuousAt (fun y : ℂ × G => E y.1 y.2) (w, g0) :=
       hc.continuousAt ((hU.prod isOpen_univ).mem_nhds ⟨hwU, trivial⟩)
     have hA : ContinuousAt (fun p : G × ℂ => E p.2 p.1) (g0, w) :=
-      ContinuousAt.comp (f := fun p : G × ℂ => (p.2, p.1))
-        (g := fun y : ℂ × G => E y.1 y.2) hcont continuous_swap.continuousAt
+      ContinuousAt.comp
+        (f := fun p : G × ℂ => (p.2, p.1))
+        (g := fun y : ℂ × G => E y.1 y.2)
+        hcont continuous_swap.continuousAt
     have hB : ContinuousAt (fun p : G × ℂ => E p.2 g0) (g0, w) :=
-      ContinuousAt.comp (f := fun p : G × ℂ => (p.2, g0))
-        (g := fun y : ℂ × G => E y.1 y.2) hcont (by fun_prop)
+      ContinuousAt.comp
+        (f := fun p : G × ℂ => (p.2, g0))
+        (g := fun y : ℂ × G => E y.1 y.2)
+        hcont (by fun_prop)
     have hN : ContinuousAt (fun p : G × ℂ => ‖E p.2 p.1 - E p.2 g0‖) (g0, w) := (hA.sub hB).norm
     have hlt : ‖E w g0 - E w g0‖ < δ := by simpa using hδ
     exact hN.eventually_lt continuousAt_const hlt
@@ -49,11 +54,11 @@ theorem continuous_iteratedDeriv_family :
   rw [dist_eq_norm, ← iteratedDeriv_fun_sub h1 h2]
   have hdc : DiffContOnCl ℂ (fun x => E x g - E x g0) (Metric.ball z (R / 2)) :=
     ((hd g).sub (hd g0)).diffContOnCl_ball hcl
-  have hb := Complex.norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le (C := δ) j hr hdc
-    (fun w hw => (hg w hw).le)
+  have hb :=
+    Complex.norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le (C := δ) j hr hdc
+      (fun w hw => (hg w hw).le)
   refine hb.trans_lt ?_
-  have : (j.factorial : ℝ) * δ / (R / 2) ^ j = ε / 2 := by
-    rw [hδdef]; field_simp
+  have : (j.factorial : ℝ) * δ / (R / 2) ^ j = ε / 2 := by rw [hδdef]; field_simp
   rw [this]
   linarith
 

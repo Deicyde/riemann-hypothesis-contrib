@@ -17,20 +17,20 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 variable {k r : ℕ}
 
-theorem gb_entry {i j : Fin (2 * r + k + 1)} (hj : r ≤ j.val) (hj' : j.val ≤ r + k) :
-    Hpk k r i j = if i = j then (if j.val = r + k then -1 else 1) else 0 := by
+theorem gb_entry {i j : Fin (2 * r + k + 1)} (hj : r ≤ j.val) (hj' : j.val ≤ r + k)
+    : Hpk k r i j = if i = j then (if j.val = r + k then -1 else 1) else 0 := by
   simp only [Hpk]
   by_cases h : i = j
   · subst h
-    have h1 : ¬ (i.val < r ∧ i.val + i.val = 2 * r + k) := by omega
+    have h1 : ¬(i.val < r ∧ i.val + i.val = 2 * r + k) := by omega
     rw [if_neg h1, if_neg h1, if_pos ⟨hj, hj', rfl⟩, if_pos rfl]
-  · have h1 : ¬ (i.val < r ∧ i.val + j.val = 2 * r + k) := by omega
-    have h2 : ¬ (j.val < r ∧ i.val + j.val = 2 * r + k) := by omega
-    have h3 : ¬ (r ≤ i.val ∧ i.val ≤ r + k ∧ i = j) := fun hh => h hh.2.2
+  · have h1 : ¬(i.val < r ∧ i.val + j.val = 2 * r + k) := by omega
+    have h2 : ¬(j.val < r ∧ i.val + j.val = 2 * r + k) := by omega
+    have h3 : ¬(r ≤ i.val ∧ i.val ≤ r + k ∧ i = j) := fun hh => h hh.2.2
     rw [if_neg h1, if_neg h2, if_neg h3, if_neg h]
 
-theorem gb_mulVec {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) :
-    Hpk k r *ᵥ v = fun i => (if i.val = r + k then -1 else 1) * v i := by
+theorem gb_mulVec {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v)
+    : Hpk k r *ᵥ v = fun i => (if i.val = r + k then -1 else 1) * v i := by
   funext i
   simp only [Matrix.mulVec, dotProduct]
   rw [Finset.sum_eq_single i]
@@ -43,66 +43,77 @@ theorem gb_mulVec {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) :
     · rw [hv b (by omega)]; ring
   · intro h; exact absurd (Finset.mem_univ i) h
 
-theorem gb_herm {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (w : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) v w = ∑ i, star (w i) * ((if i.val = r + k then -1 else 1) * v i) := by
+theorem gb_herm {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (w : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) v w = ∑ i, star (w i) * ((if i.val = r + k then -1 else 1) * v i) := by
   unfold herm
   rw [gb_mulVec hv]
   simp only [dotProduct, Pi.star_apply]
 
-theorem gb_symm {v w : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (hw : inWb k r w) :
-    herm (Hpk k r) v w = star (herm (Hpk k r) w v) := by
+theorem gb_symm {v w : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (hw : inWb k r w)
+    : herm (Hpk k r) v w = star (herm (Hpk k r) w v) := by
   rw [gb_herm hv, gb_herm hw, star_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   split_ifs <;> simp only [star_mul', star_star, star_neg, star_one] <;> ring
 
-theorem gb_add_left (v v' w : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (v + v') w = herm (Hpk k r) v w + herm (Hpk k r) v' w := by
+theorem gb_add_left (v v' w : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (v + v') w = herm (Hpk k r) v w + herm (Hpk k r) v' w := by
   simp only [herm, Matrix.mulVec_add, dotProduct_add]
 
-theorem gb_smul_left (c : ℂ) (v w : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (c • v) w = c * herm (Hpk k r) v w := by
+theorem gb_smul_left (c : ℂ) (v w : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (c • v) w = c * herm (Hpk k r) v w := by
   simp only [herm, Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
 
-theorem gb_sub_left (v v' w : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) (v - v') w = herm (Hpk k r) v w - herm (Hpk k r) v' w := by
+theorem gb_sub_left (v v' w : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) (v - v') w = herm (Hpk k r) v w - herm (Hpk k r) v' w := by
   simp only [herm, Matrix.mulVec_sub, dotProduct_sub]
 
-theorem gb_smul_right (c : ℂ) (v w : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) v (c • w) = star c * herm (Hpk k r) v w := by
+theorem gb_smul_right (c : ℂ) (v w : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) v (c • w) = star c * herm (Hpk k r) v w := by
   simp only [herm, star_smul, smul_dotProduct, smul_eq_mul]
 
-theorem gb_sub_right (v w w' : Fin (2 * r + k + 1) → ℂ) :
-    herm (Hpk k r) v (w - w') = herm (Hpk k r) v w - herm (Hpk k r) v w' := by
+theorem gb_sub_right (v w w' : Fin (2 * r + k + 1) → ℂ)
+    : herm (Hpk k r) v (w - w') = herm (Hpk k r) v w - herm (Hpk k r) v w' := by
   simp only [herm, star_sub, sub_dotProduct]
 
 theorem gb_wb_smul {v : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (c : ℂ) : inWb k r (c • v) := by
   intro i hi
   simp [hv i hi]
 
-theorem gb_wb_sub {v w : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (hw : inWb k r w) : inWb k r (v - w) := by
+theorem gb_wb_sub {v w : Fin (2 * r + k + 1) → ℂ} (hv : inWb k r v) (hw : inWb k r w)
+    : inWb k r (v - w) := by
   intro i hi
   simp [hv i hi, hw i hi]
 
-theorem gb_pos {z v : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (hv : inWb k r v)
-    (hvz : herm (Hpk k r) v z = 0) (hv0 : v ≠ 0) : 0 < (herm (Hpk k r) v v).re := by
+theorem gb_pos
+    {z v : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (hv : inWb k r v)
+    (hvz : herm (Hpk k r) v z = 0) (hv0 : v ≠ 0)
+    : 0 < (herm (Hpk k r) v v).re := by
   classical
   obtain ⟨t, htv⟩ : ∃ t : Fin (2 * r + k + 1), t.val = r + k := ⟨⟨r + k, by omega⟩, rfl⟩
-  have key : ∀ a b : Fin (2 * r + k + 1) → ℂ, inWb k r a →
-      herm (Hpk k r) a b = -(star (b t) * a t) + ∑ i ∈ Finset.univ.erase t, star (b i) * a i := by
+  have key
+      : ∀ a b : Fin (2 * r + k + 1) → ℂ,
+        inWb k r a
+          → herm (Hpk k r) a b
+            = -(star (b t) * a t) + ∑ i ∈ Finset.univ.erase t, star (b i) * a i := by
     intro a b ha
     rw [gb_herm ha, ← Finset.add_sum_erase _ _ (Finset.mem_univ t)]
     congr 1
     · rw [if_pos htv]; ring
     · refine Finset.sum_congr rfl fun i hi => ?_
-      have hne : i.val ≠ r + k := fun h => Finset.ne_of_mem_erase hi (Fin.ext (by rw [htv]; exact h))
-      rw [if_neg hne]; ring
+      have hne : i.val ≠ r + k := fun h =>
+        Finset.ne_of_mem_erase hi (Fin.ext (by rw [htv]; exact h))
+      rw [if_neg hne]
+      ring
   have nsq : ∀ x : ℂ, (star x * x).re = ‖x‖ ^ 2 := by
     intro x
     rw [← Complex.normSq_eq_norm_sq]
-    simp only [Complex.star_def, Complex.mul_re, Complex.conj_re, Complex.conj_im, Complex.normSq_apply]
+    simp only [Complex.star_def, Complex.mul_re, Complex.conj_re, Complex.conj_im,
+      Complex.normSq_apply]
     ring
-  have hre : ∀ a : Fin (2 * r + k + 1) → ℂ, inWb k r a →
-      (herm (Hpk k r) a a).re = (∑ i ∈ Finset.univ.erase t, ‖a i‖ ^ 2) - ‖a t‖ ^ 2 := by
+  have hre
+      : ∀ a : Fin (2 * r + k + 1) → ℂ,
+        inWb k r a
+          → (herm (Hpk k r) a a).re = (∑ i ∈ Finset.univ.erase t, ‖a i‖ ^ 2) - ‖a t‖ ^ 2 := by
     intro a ha
     rw [key a a ha, Complex.add_re, Complex.neg_re, nsq, Complex.re_sum]
     simp only [nsq]
@@ -121,12 +132,14 @@ theorem gb_pos {z v : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < T
     rw [e]
     refine (norm_sum_le _ _).trans (le_of_eq (Finset.sum_congr rfl fun i _ => ?_))
     rw [norm_mul, norm_star]
-  have cs2 : (∑ i ∈ Finset.univ.erase t, ‖z i‖ * ‖v i‖) ^ 2 ≤
-      (∑ i ∈ Finset.univ.erase t, ‖z i‖ ^ 2) * ∑ i ∈ Finset.univ.erase t, ‖v i‖ ^ 2 :=
+  have cs2
+      : (∑ i ∈ Finset.univ.erase t, ‖z i‖ * ‖v i‖) ^ 2
+        ≤ (∑ i ∈ Finset.univ.erase t, ‖z i‖ ^ 2) * ∑ i ∈ Finset.univ.erase t, ‖v i‖ ^ 2 :=
     Finset.sum_mul_sq_le_sq_mul_sq _ _ _
   have hS0 : 0 ≤ ‖z t‖ * ‖v t‖ := by positivity
-  have hab : (‖z t‖ * ‖v t‖) ^ 2 ≤
-      (∑ i ∈ Finset.univ.erase t, ‖z i‖ ^ 2) * ∑ i ∈ Finset.univ.erase t, ‖v i‖ ^ 2 := by
+  have hab
+      : (‖z t‖ * ‖v t‖) ^ 2
+        ≤ (∑ i ∈ Finset.univ.erase t, ‖z i‖ ^ 2) * ∑ i ∈ Finset.univ.erase t, ‖v i‖ ^ 2 := by
     nlinarith [mul_le_mul cs1 cs1 hS0 (hS0.trans cs1)]
   have hNz : 0 ≤ ∑ i ∈ Finset.univ.erase t, ‖z i‖ ^ 2 := Finset.sum_nonneg fun i _ => by positivity
   have hNv : 0 ≤ ∑ i ∈ Finset.univ.erase t, ‖v i‖ ^ 2 := Finset.sum_nonneg fun i _ => by positivity
@@ -134,8 +147,7 @@ theorem gb_pos {z v : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < T
   by_contra hneg
   push_neg at hneg
   have hle : (∑ i ∈ Finset.univ.erase t, ‖v i‖ ^ 2) ≤ ‖v t‖ ^ 2 := by linarith
-  have hb : ‖v t‖ ^ 2 ≤ 0 := by
-    nlinarith [mul_nonneg hNz (sub_nonneg.2 hle), sq_nonneg ‖v t‖]
+  have hb : ‖v t‖ ^ 2 ≤ 0 := by nlinarith [mul_nonneg hNz (sub_nonneg.2 hle), sq_nonneg ‖v t‖]
   have hvt : v t = 0 := by
     have h2 : ‖v t‖ ^ 2 = 0 := le_antisymm hb (sq_nonneg _)
     simpa using h2
@@ -150,8 +162,10 @@ theorem gb_pos {z v : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < T
   · subst hi; simpa using hvt
   · simpa using hvE i (Finset.mem_erase.2 ⟨hi, Finset.mem_univ _⟩)
 
-theorem gb_normalize {b v : Fin (2 * r + k + 1) → ℂ} (hb : inWb k r b) (hT : 0 < Tz k r b) (hv : inWb k r v)
-    (hvb : herm (Hpk k r) v b = 0) (hv0 : v ≠ 0) : ∃ s : ℂ, herm (Hpk k r) (s • v) (s • v) = 1 := by
+theorem gb_normalize
+    {b v : Fin (2 * r + k + 1) → ℂ} (hb : inWb k r b) (hT : 0 < Tz k r b) (hv : inWb k r v)
+    (hvb : herm (Hpk k r) v b = 0) (hv0 : v ≠ 0)
+    : ∃ s : ℂ, herm (Hpk k r) (s • v) (s • v) = 1 := by
   have hp := gb_pos hb hT hv hvb hv0
   have him : (herm (Hpk k r) v v).im = 0 := by
     have h := congrArg Complex.im (gb_symm hv hv)
@@ -174,19 +188,24 @@ def gbL (c : Fin (2 * r + k + 1) → ℂ) : (Fin (2 * r + k + 1) → ℂ) →ₗ
   map_add' v w := gb_add_left v w c
   map_smul' a v := by simp only [gb_smul_left, smul_eq_mul, RingHom.id_apply]
 
-theorem gb_perp {m : ℕ} (hm : m + 2 < k + 1) (cs : Fin m → Fin (2 * r + k + 1) → ℂ)
-    (a b : Fin (2 * r + k + 1) → ℂ) :
-    ∃ v, v ≠ 0 ∧ inWb k r v ∧ herm (Hpk k r) v a = 0 ∧ herm (Hpk k r) v b = 0 ∧
-      ∀ j, herm (Hpk k r) v (cs j) = 0 := by
+theorem gb_perp
+    {m : ℕ} (hm : m + 2 < k + 1) (cs : Fin m → Fin (2 * r + k + 1) → ℂ)
+    (a b : Fin (2 * r + k + 1) → ℂ)
+    : ∃ v,
+      v ≠ 0 ∧ inWb k r v ∧ herm (Hpk k r) v a = 0 ∧ herm (Hpk k r) v b = 0
+        ∧ ∀ j, herm (Hpk k r) v (cs j) = 0 := by
   classical
-  obtain ⟨c, hca, hcb, hcs⟩ : ∃ c : Fin (m + 2) → Fin (2 * r + k + 1) → ℂ,
-      c 0 = a ∧ c (Fin.succ 0) = b ∧ ∀ j : Fin m, c j.succ.succ = cs j :=
+  obtain ⟨c, hca, hcb, hcs⟩
+      : ∃ c : Fin (m + 2) → Fin (2 * r + k + 1) → ℂ,
+        c 0 = a ∧ c (Fin.succ 0) = b ∧ ∀ j : Fin m, c j.succ.succ = cs j :=
     ⟨Fin.cons a (Fin.cons b cs), by simp, by simp, fun j => by simp⟩
-  obtain ⟨emb, hemb⟩ : ∃ emb : (Fin (k + 1) → ℂ) →ₗ[ℂ] (Fin (2 * r + k + 1) → ℂ),
-      ∀ x, emb x = Function.extend (wI k r) x 0 :=
+  obtain ⟨emb, hemb⟩
+      : ∃ emb : (Fin (k + 1) → ℂ) →ₗ[ℂ] (Fin (2 * r + k + 1) → ℂ), ∀ x,
+        emb x = Function.extend (wI k r) x 0 :=
     ⟨Function.ExtendByZero.linearMap ℂ ℂ (wI k r), fun x => rfl⟩
-  obtain ⟨L, hL⟩ : ∃ L : (Fin (k + 1) → ℂ) →ₗ[ℂ] (Fin (m + 2) → ℂ),
-      ∀ x j, L x j = herm (Hpk k r) (emb x) (c j) :=
+  obtain ⟨L, hL⟩
+      : ∃ L : (Fin (k + 1) → ℂ) →ₗ[ℂ] (Fin (m + 2) → ℂ), ∀ x j,
+        L x j = herm (Hpk k r) (emb x) (c j) :=
     ⟨(LinearMap.pi fun j => gbL (c j)) ∘ₗ emb, fun x j => rfl⟩
   have hrk := LinearMap.finrank_range_add_finrank_ker L
   have hle : Module.finrank ℂ (LinearMap.range L) ≤ m + 2 := by
@@ -213,7 +232,7 @@ theorem gb_perp {m : ℕ} (hm : m + 2 < k + 1) (cs : Fin m → Fin (2 * r + k + 
     rw [hemb, hinj.extend_apply] at h1
     simpa using h1
   · intro i hi
-    have hni : ¬∃ p, wI k r p = i := by
+    have hni : ¬ ∃ p, wI k r p = i := by
       rintro ⟨p, rfl⟩
       have := p.isLt
       simp only [wI, Fin.val_mk] at hi
@@ -227,8 +246,9 @@ theorem gb_perp {m : ℕ} (hm : m + 2 < k + 1) (cs : Fin m → Fin (2 * r + k + 
     have h1 := hL0 j.succ.succ
     rwa [hcs] at h1
 
-theorem exists_frame_of_positive_vector {a b : Fin (2 * r + k + 1) → ℂ} (hb : inWb k r b) (hT : 0 < Tz k r b) :
-    ∀ m, m ≤ k - 1 → ∃ Bs : Fin m → Fin (2 * r + k + 1) → ℂ, IsFrameOf k r [a, b] Bs := by
+theorem exists_frame_of_positive_vector
+    {a b : Fin (2 * r + k + 1) → ℂ} (hb : inWb k r b) (hT : 0 < Tz k r b)
+    : ∀ m, m ≤ k - 1 → ∃ Bs : Fin m → Fin (2 * r + k + 1) → ℂ, IsFrameOf k r [a, b] Bs := by
   intro m
   induction m with
   | zero =>
@@ -274,13 +294,17 @@ theorem exists_frame_of_positive_vector {a b : Fin (2 * r + k + 1) → ℂ} (hb 
         · rw [gb_smul_left, hvb, mul_zero]
       · rw [Fin.snoc_castSucc]; exact hB3 j w hw
 
-theorem exists_frame {a b : Fin (2 * r + k + 1) → ℂ} (ha : inWb k r a) (hb : inWb k r b) (hT : 0 < Tz k r b) :
-    ∃ Bs : Fin (k - 1) → Fin (2 * r + k + 1) → ℂ, IsFrameOf k r [a, b] Bs := exists_frame_of_positive_vector hb hT (k - 1) le_rfl
+theorem exists_frame
+    {a b : Fin (2 * r + k + 1) → ℂ} (ha : inWb k r a) (hb : inWb k r b) (hT : 0 < Tz k r b)
+    : ∃ Bs : Fin (k - 1) → Fin (2 * r + k + 1) → ℂ, IsFrameOf k r [a, b] Bs :=
+  exists_frame_of_positive_vector hb hT (k - 1) le_rfl
 
-theorem exists_unit {z a : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z) (ha : inWb k r a)
-    (hind : ∀ c : ℂ, a ≠ c • z) :
-    ∃ e : Fin (2 * r + k + 1) → ℂ, inWb k r e ∧ herm (Hpk k r) e z = 0 ∧ herm (Hpk k r) e e = 1 ∧
-      ∀ v, herm (Hpk k r) v a = 0 → herm (Hpk k r) v z = 0 → herm (Hpk k r) v e = 0 := by
+theorem exists_unit
+    {z a : Fin (2 * r + k + 1) → ℂ}
+    (hz : inWb k r z) (hT : 0 < Tz k r z) (ha : inWb k r a) (hind : ∀ c : ℂ, a ≠ c • z)
+    : ∃ e : Fin (2 * r + k + 1) → ℂ,
+      inWb k r e ∧ herm (Hpk k r) e z = 0 ∧ herm (Hpk k r) e e = 1
+        ∧ ∀ v, herm (Hpk k r) v a = 0 → herm (Hpk k r) v z = 0 → herm (Hpk k r) v e = 0 := by
   have hzz : herm (Hpk k r) z z ≠ 0 := by
     intro h
     unfold Tz at hT
@@ -301,13 +325,14 @@ theorem exists_unit {z a : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 
     rw [gb_smul_right, gb_sub_right, gb_smul_right, hva, hvz]
     ring
 
-theorem geom_package {z z' : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hz' : inWb k r z') (hT : 0 < Tz k r z)
-    (hT' : 0 < Tz k r z') {g : Mx k r} (hg : g ∈ Glev k r (Fin.last r)) (hGG : GGl k r z z' g ≠ 0) :
-    ∃ (Bs : Fin (k - 1) → Fin (2 * r + k + 1) → ℂ) (e' e : Fin (2 * r + k + 1) → ℂ),
-      IsFrameOf k r [g⁻¹ *ᵥ z, z'] Bs ∧
-      inWb k r e' ∧ herm (Hpk k r) e' z' = 0 ∧ herm (Hpk k r) e' e' = 1 ∧ IsFrameOf k r [z', e'] Bs ∧
-      inWb k r e ∧ herm (Hpk k r) e z = 0 ∧ herm (Hpk k r) e e = 1 ∧
-      IsFrameOf k r [z, e] (fun a => g *ᵥ Bs a) := by
+theorem geom_package
+    {z z' : Fin (2 * r + k + 1) → ℂ}
+    (hz : inWb k r z) (hz' : inWb k r z') (hT : 0 < Tz k r z) (hT' : 0 < Tz k r z')
+    {g : Mx k r} (hg : g ∈ Glev k r (Fin.last r)) (hGG : GGl k r z z' g ≠ 0)
+    : ∃ (Bs : Fin (k - 1) → Fin (2 * r + k + 1) → ℂ) (e' e : Fin (2 * r + k + 1) → ℂ),
+      IsFrameOf k r [g⁻¹ *ᵥ z, z'] Bs ∧ inWb k r e' ∧ herm (Hpk k r) e' z' = 0
+        ∧ herm (Hpk k r) e' e' = 1 ∧ IsFrameOf k r [z', e'] Bs ∧ inWb k r e ∧ herm (Hpk k r) e z = 0
+        ∧ herm (Hpk k r) e e = 1 ∧ IsFrameOf k r [z, e] (fun a => g *ᵥ Bs a) := by
   have hgi := glev_inWb hg hz
   have hgi' := glev_inWb hg hz'
   obtain ⟨hnp1, hnp2⟩ := not_prop_of_GG hz hz' hg hGG

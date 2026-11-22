@@ -6,14 +6,15 @@ public import CompanionTheory.EightfoldTheory.VariationTheory.AutomorphicForms.N
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 noncomputable section
 
 namespace GlobalTheory.EisM.ConjForm
 
-def refl (τ : ℍ) : ℍ := ⟨-conj (τ : ℂ), by simpa using τ.im_pos⟩
+def refl (τ : ℍ) : ℍ := ⟨- conj (τ : ℂ), by simpa using τ.im_pos⟩
 
 @[simp] lemma coe_refl (τ : ℍ) : ((refl τ : ℍ) : ℂ) = -conj (τ : ℂ) := rfl
 
@@ -30,12 +31,14 @@ lemma qs_conj (g : ℕ → ℂ) (τ : ℍ) : qs (fun n => conj (g n)) τ = conj 
   congr 2
   simp [coe_refl, map_mul, map_ofNat, Complex.conj_ofReal, Complex.conj_I, Complex.conj_natCast]
 
-def twist (γ : SL(2, ℤ)) : SL(2, ℤ) :=
-  ⟨!![γ 0 0, -γ 0 1; -γ 1 0, γ 1 1], by
+def twist (γ : SL(2, ℤ)) : SL(2, ℤ) := ⟨
+  !![γ 0 0, -γ 0 1; -γ 1 0, γ 1 1],
+  by
     have h := γ.2
     rw [Matrix.det_fin_two] at h
     rw [Matrix.det_fin_two_of]
-    linarith⟩
+    linarith
+⟩
 
 lemma refl_smul (γ : SL(2, ℤ)) (τ : ℍ) : refl (γ • τ) = twist γ • refl τ := by
   apply UpperHalfPlane.ext
@@ -82,9 +85,10 @@ lemma cf_conj {k N : ℕ} {χ : DirichletCharacter ℂ N} {g : ℕ → ℂ} (h :
   rw [im_refl] at this
   rwa [qs_conj, Complex.norm_conj]
 
-theorem conj_form : ∀ (k N : ℕ) (χ : DirichletCharacter ℂ N) (g : ℕ → ℂ),
-    (CF k N (ch χ) g → CF k N (ch χ⁻¹) (fun n => conj (g n))) ∧
-    (Prim k N χ g → Prim k N χ⁻¹ (fun n => conj (g n))) := by
+theorem conj_form
+    : ∀ (k N : ℕ) (χ : DirichletCharacter ℂ N) (g : ℕ → ℂ),
+      (CF k N (ch χ) g → CF k N (ch χ⁻¹) (fun n => conj (g n)))
+        ∧ (Prim k N χ g → Prim k N χ⁻¹ (fun n => conj (g n))) := by
   intro k N χ g
   refine ⟨cf_conj, fun h => ⟨cf_conj h.cf, by simp [h.one], fun n hn => by simp [h.zero n hn], ?_⟩⟩
   intro q hq hqN

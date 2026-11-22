@@ -20,13 +20,13 @@ theorem changeVar_holds : ChangeVar := by
   let T := ContinuousLinearEquiv.equivOfRightInverse A B hRI
   have hT1 : ∀ x, (T x).1 = A x := fun x => rfl
   let Θ : (Fin n → ℝ) → (Fin n → ℝ) := fun x => T.symm (f x, (T x).2)
-  have hΘc : ContDiff ℝ 1 Θ :=
-    T.symm.contDiff.comp (hf.prodMk (contDiff_snd.comp T.contDiff))
+  have hΘc : ContDiff ℝ 1 Θ := T.symm.contDiff.comp (hf.prodMk (contDiff_snd.comp T.contDiff))
   have hfA : ∀ x, A (Θ x) = f x := by
     intro x
-    rw [← hT1]; simp [Θ]
-  have hd : ∀ x, HasFDerivAt Θ (fderiv ℝ Θ x) x :=
-    fun x => ((hΘc.differentiable one_ne_zero) x).hasFDerivAt
+    rw [← hT1]
+    simp [Θ]
+  have hd : ∀ x, HasFDerivAt Θ (fderiv ℝ Θ x) x := fun x =>
+    ((hΘc.differentiable one_ne_zero) x).hasFDerivAt
   have hid : fderiv ℝ Θ x0 = ContinuousLinearMap.id ℝ (Fin n → ℝ) := by
     let P := (ContinuousLinearMap.snd ℝ (Fin m → ℝ) A.ker).comp T.toContinuousLinearMap
     have hP : HasFDerivAt (fun x => (T x).2) P x0 := P.hasFDerivAt
@@ -40,8 +40,9 @@ theorem changeVar_holds : ChangeVar := by
     have : ((fderiv ℝ f x0) y, (T y).2) = T y := Prod.ext (hT1 y).symm rfl
     rw [this, ContinuousLinearEquiv.symm_apply_apply]
   have hs : HasStrictFDerivAt Θ
-      ((ContinuousLinearEquiv.refl ℝ (Fin n → ℝ) : (Fin n → ℝ) ≃L[ℝ] (Fin n → ℝ)) :
-        (Fin n → ℝ) →L[ℝ] (Fin n → ℝ)) x0 := by
+      ((ContinuousLinearEquiv.refl ℝ (Fin n → ℝ) : (Fin n → ℝ) ≃L[ℝ] (Fin n → ℝ))
+        : (Fin n → ℝ) →L[ℝ] (Fin n → ℝ))
+      x0 := by
     have := hΘc.contDiffAt.hasStrictFDerivAt_fderiv (x := x0) one_ne_zero
     rw [hid] at this
     exact this
@@ -52,15 +53,17 @@ theorem changeVar_holds : ChangeVar := by
     ContinuousLinearMap.continuous_det.comp (hΘc.continuous_fderiv one_ne_zero)
   let N := PH.source ∩ {x | D x ≠ 0}
   have hNo : IsOpen N := PH.open_source.inter (isOpen_ne_fun hDc continuous_const)
-  have hx0N : x0 ∈ N := ⟨hs.mem_toOpenPartialHomeomorph_source, by
-    show (fderiv ℝ Θ x0).det ≠ 0
-    rw [hid, ContinuousLinearMap.det, ContinuousLinearMap.coe_id, LinearMap.det_id]
-    norm_num⟩
+  have hx0N : x0 ∈ N := ⟨
+    hs.mem_toOpenPartialHomeomorph_source,
+    by
+      show (fderiv ℝ Θ x0).det ≠ 0
+      rw [hid, ContinuousLinearMap.det, ContinuousLinearMap.coe_id, LinearMap.det_id]
+      norm_num
+  ⟩
   refine ⟨N, hNo, hx0N, A, hx0, fun φ hc hsφ hφN => ?_⟩
   let C := PH '' tsupport φ
   have hNsrc : N ⊆ PH.source := Set.inter_subset_left
-  have hCc : IsCompact C :=
-    hsφ.image_of_continuousOn (PH.continuousOn.mono (hφN.trans hNsrc))
+  have hCc : IsCompact C := hsφ.image_of_continuousOn (PH.continuousOn.mono (hφN.trans hNsrc))
   let G : (Fin n → ℝ) → ℝ := PH.target.indicator fun z => φ (PH.symm z) / |D (PH.symm z)|
   have hGC : ∀ z, z ∉ C → G z = 0 := by
     intro z hz
@@ -86,8 +89,7 @@ theorem changeVar_holds : ChangeVar := by
       have hsymm : ContinuousAt PH.symm (PH x) := PH.continuousAt_symm (PH.map_source hxs)
       have hD0 : D (PH.symm (PH x)) ≠ 0 := by rw [PH.left_inv hxs]; exact hxN.2
       exact (hc.continuousAt.comp hsymm).div
-        ((continuous_abs.continuousAt).comp (hDc.continuousAt.comp hsymm))
-        (abs_ne_zero.2 hD0)
+        ((continuous_abs.continuousAt).comp (hDc.continuousAt.comp hsymm)) (abs_ne_zero.2 hD0)
     · have hzC : z ∉ C := fun h => hz (hCN h)
       have hev : G =ᶠ[𝓝 z] fun _ => 0 := by
         filter_upwards [hCc.isClosed.isOpen_compl.mem_nhds hzC] with w hw
@@ -97,21 +99,24 @@ theorem changeVar_holds : ChangeVar := by
   refine ⟨G, hGcont, hGs, fun S hS => ?_⟩
   have hSm : MeasurableSet S := hS.isClosed.measurableSet
   have hNm : MeasurableSet N := hNo.measurableSet
-  have hJ := integral_image_eq_integral_abs_det_fderiv_smul μ hNm
-    (fun x _ => (hd x).hasFDerivWithinAt) (PH.injOn.mono hNsrc)
-    ((A ⁻¹' S).indicator G)
+  have hJ :=
+    integral_image_eq_integral_abs_det_fderiv_smul μ hNm
+      (fun x _ => (hd x).hasFDerivWithinAt)
+      (PH.injOn.mono hNsrc) ((A ⁻¹' S).indicator G)
 
   have hL : ∫ x in Θ '' N, (A ⁻¹' S).indicator G x ∂μ = ∫ v in A ⁻¹' S, G v ∂μ := by
-    rw [setIntegral_eq_integral_of_forall_compl_eq_zero, integral_indicator
-      (hSm.preimage A.continuous.measurable)]
+    rw [setIntegral_eq_integral_of_forall_compl_eq_zero,
+      integral_indicator (hSm.preimage A.continuous.measurable)]
     intro z hz
     have : G z = 0 := hGC z fun h => hz (hCN h)
     simp [Set.indicator, this]
 
-  have hR : ∫ x in N, |(fderiv ℝ Θ x).det| • (A ⁻¹' S).indicator G (Θ x) ∂μ =
-      ∫ v in f ⁻¹' S, φ v ∂μ := by
-    have e1 : ∀ x ∈ N, |(fderiv ℝ Θ x).det| • (A ⁻¹' S).indicator G (Θ x) =
-        (f ⁻¹' S).indicator φ x := by
+  have hR
+      : ∫ x in N, |(fderiv ℝ Θ x).det| • (A ⁻¹' S).indicator G (Θ x) ∂μ
+        = ∫ v in f ⁻¹' S, φ v ∂μ := by
+    have e1
+        : ∀ x ∈ N,
+          |(fderiv ℝ Θ x).det| • (A ⁻¹' S).indicator G (Θ x) = (f ⁻¹' S).indicator φ x := by
       intro x hxN
       have hxs : x ∈ PH.source := hNsrc hxN
       have ht : Θ x ∈ PH.target := PH.map_source hxs

@@ -16,15 +16,19 @@ open ReciprocityTheory.ChartRestriction.G.AI.I1 GroundTheory.Heights₂.Heights.
 
 universe u v w
 
-theorem ExistsUnique.of_found (hN : IntNumIsFieldIntersection.Statement.{u})
-    (hUq : FieldNumbers.IntNumUnique.Statement.{u}) (hBase : FieldNumbers.IntNumBase.Statement.{u})
-    (F : Type u) [Field F] {K : Type} [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] :
-    ExistsUniqueStatement F ι := by
+theorem ExistsUnique.of_found
+    (hN : IntNumIsFieldIntersection.Statement.{u}) (hUq : FieldNumbers.IntNumUnique.Statement.{u})
+    (hBase : FieldNumbers.IntNumBase.Statement.{u})
+    (F : Type u) [Field F]
+    {K : Type} [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    : ExistsUniqueStatement F ι := by
   classical
   exact Numbers.existsUnique hN hUq (IntNumPoint.proof hBase) hBase
 
-theorem ExistsUnique.full (F : Type u) [Field F] {K : Type} [Fintype K] (ι : K → Type)
-    [∀ k, Fintype (ι k)] : ExistsUniqueStatement F ι :=
+theorem ExistsUnique.full
+    (F : Type u) [Field F] {K : Type} [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
+    : ExistsUniqueStatement F ι :=
   ExistsUnique.of_found IntNumIsFieldIntersection.full FieldNumbers.IntNumUnique.full
     FieldNumbers.IntNumBase.full F ι
 

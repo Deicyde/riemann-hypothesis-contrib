@@ -7,7 +7,9 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements
 
 noncomputable section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.Theta
 open scoped TensorProduct Matrix
 
 namespace Formalism.IndefR.Eqv
@@ -19,14 +21,15 @@ variable {D : D7} {V : HSp D} (fr : UI.Frames D V)
 def kf (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) : Set (UI.instV fr).Gf :=
   {y | (y.1 : GL (Fin V.rank) (Lev.EAf D)) ∈ K}
 
-theorem brg_mem_levA (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (x : (UI.instV fr).GA) :
-    UI.brg fr x ∈ Lev.levA V K ↔ x.1 = 1 ∧ x.2 ∈ kf fr K := by
+theorem brg_mem_levA (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (x : (UI.instV fr).GA)
+    : UI.brg fr x ∈ Lev.levA V K ↔ x.1 = 1 ∧ x.2 ∈ kf fr K := by
   show UI.brg fr x ∈ GfC V ⊓ K.comap (Lev.finE V) ↔ _
   rw [Subgroup.mem_inf, Subgroup.mem_comap, brg_mem_GfC, finE_brg]
   rfl
 
-theorem kf_isCompact_isOpen_of_levelA (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (hK : IsLevelA V K) :
-    IsCompact (kf fr K) ∧ IsOpen (kf fr K) := by
+theorem kf_isCompact_isOpen_of_levelA
+    (K : Subgroup (GL (Fin V.rank) (Lev.EAf D))) (hK : IsLevelA V K)
+    : IsCompact (kf fr K) ∧ IsOpen (kf fr K) := by
   have hpre : kf fr K = jf fr ⁻¹' (Lev.levA V K : Set (GA D V)) := by
     ext y
     show y ∈ kf fr K ↔ UI.brg fr (1, y) ∈ Lev.levA V K
@@ -44,7 +47,6 @@ theorem kf_isCompact_isOpen_of_levelA (K : Subgroup (GL (Fin V.rank) (Lev.EAf D)
       simp only [Set.mem_preimage, SetLike.mem_coe, Subgroup.mem_subgroupOf, jc]
     rw [e]
     exact hK.2.preimage hjc
-
 
 end Formalism.IndefR.Eqv
 

@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.IndexRang
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 
 namespace GlobalTheory.ValMul
@@ -28,7 +30,6 @@ private lemma det_gram_mul_right_re {n ι : Type*} [Fintype n] [DecidableEq n] [
     rw [Complex.normSq_eq_conj_mul_self, Complex.star_def]
     ring
   rw [h, Complex.re_ofReal_mul]
-
 
 open NumberField MeasureTheory Topology in
 open scoped ComplexOrder ENNReal Matrix in

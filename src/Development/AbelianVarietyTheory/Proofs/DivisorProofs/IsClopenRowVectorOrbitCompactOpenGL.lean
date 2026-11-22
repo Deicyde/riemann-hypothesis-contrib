@@ -11,13 +11,18 @@ open Matrix Topology
 
 namespace GlobalTheory.JSW.Orbit
 
-theorem isClopen_orbit : ∀ {F : Type} [NormedField F] {n : ℕ} (B : Subgroup (GL (Fin n) F)),
-    IsCompact (B : Set (GL (Fin n) F)) → IsOpen (B : Set (GL (Fin n) F)) → ∀ r₀ : Fin n → F, r₀ ≠ 0 →
-    IsClopen {r : Fin n → F | ∃ b ∈ B, r = r₀ ᵥ* (b : Matrix (Fin n) (Fin n) F)} := by
+theorem isClopen_orbit
+    : ∀ {F : Type} [NormedField F] {n : ℕ} (B : Subgroup (GL (Fin n) F)),
+      IsCompact (B : Set (GL (Fin n) F)) → IsOpen (B : Set (GL (Fin n) F))
+        → ∀ r₀ : Fin n → F,
+          r₀ ≠ 0
+            → IsClopen {r : Fin n → F | ∃ b ∈ B, r = r₀ ᵥ* (b : Matrix (Fin n) (Fin n) F)} := by
   intro F _ n B hBc hBo r₀ hr₀
   classical
-  have hset : {r : Fin n → F | ∃ b ∈ B, r = r₀ ᵥ* (b : Matrix (Fin n) (Fin n) F)} =
-      (fun b : GL (Fin n) F => r₀ ᵥ* (b : Matrix (Fin n) (Fin n) F)) '' (B : Set (GL (Fin n) F)) := by
+  have hset
+      : {r : Fin n → F | ∃ b ∈ B, r = r₀ ᵥ* (b : Matrix (Fin n) (Fin n) F)}
+        = (fun b : GL (Fin n) F => r₀ ᵥ* (b : Matrix (Fin n) (Fin n) F))
+          '' (B : Set (GL (Fin n) F)) := by
     ext r
     constructor
     · rintro ⟨b, hb, rfl⟩; exact ⟨b, hb, rfl⟩
@@ -48,7 +53,8 @@ theorem isClopen_orbit : ∀ {F : Type} [NormedField F] {n : ℕ} (B : Subgroup 
       have : (1 : GL (Fin n) F) ∈ (B : Set (GL (Fin n) F)) := B.one_mem
       rw [← hOB] at this
       exact this
-    have e1 : ∀ᶠ y in 𝓝 r, s y ∈ O := hs.continuousAt.eventually_mem (hO.mem_nhds (by rw [hs1]; exact h1O))
+    have e1 : ∀ᶠ y in 𝓝 r, s y ∈ O :=
+      hs.continuousAt.eventually_mem (hO.mem_nhds (by rw [hs1]; exact h1O))
     have e2 : ∀ᶠ y in 𝓝 r, (s y).det ≠ 0 := hs.matrix_det.continuousAt.eventually_ne (by simp [hs1])
     filter_upwards [e1, e2] with y hy1 hy2
     let u : GL (Fin n) F := GeneralLinearGroup.mkOfDetNeZero _ hy2

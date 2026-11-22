@@ -54,8 +54,9 @@ lemma iD_pM_mul {k : Type} [Field k] (a d : GL (Fin n) k) (b : Matrix (Fin n) (F
 
 section Height
 
-variable {O L : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field L] [Algebra O L]
-  [IsFractionRing O L]
+variable
+  {O L : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field L] [Algebra O L] [IsFractionRing O L]
 
 lemma h_pM_mul (hIw : JpIw) {nv : Lˣ →* ℝ≥0} {h : GL (Ix n) L → ℝ≥0} (hh : IsHgt (O := O) nv h)
     (a d : GL (Fin n) L) (b : Matrix (Fin n) (Fin n) L) (x : GL (Ix n) L) :
@@ -256,8 +257,8 @@ def Wz (ψ₀ : AddChar k ℂ) (β : Matrix (Fin n) (Fin n) k) (z : ℂ) (g : GL
     (Fintype.card k : ℂ) ^ (((iD (g * nU Y) : ℂ) - iD g) * (2 * z + n))
 
 def cZ (ψ₀ : AddChar k ℂ) (β : Matrix (Fin n) (Fin n) k) (z : ℂ) : ℂ :=
-  sumG (fun g => (Fintype.card k : ℂ) ^ (2 * n * iD g) * Wz ψ₀ β z g) /
-    sumG (fun g : GL (Ix n) k => (Fintype.card k : ℂ) ^ (2 * n * iD g))
+  sumG (fun g => (Fintype.card k : ℂ) ^ (2 * n * iD g) * Wz ψ₀ β z g)
+    / sumG (fun g : GL (Ix n) k => (Fintype.card k : ℂ) ^ (2 * n * iD g))
 
 lemma Wz_left (ψ₀ : AddChar k ℂ) (β : Matrix (Fin n) (Fin n) k) (z : ℂ) (a d : GL (Fin n) k)
     (b : Matrix (Fin n) (Fin n) k) (g : GL (Ix n) k) : Wz ψ₀ β z (pM a d b * g) = Wz ψ₀ β z g := by
@@ -327,7 +328,6 @@ end Residue
 
 end AltPf
 
-
 open AltPf in
 theorem jpAlt_of_steps : JpIw → JpHgt → JpUnif → JpCmp → JpPos → JpCondition := by
   intro hIw hHgt hUnif hCmp hPos
@@ -339,32 +339,38 @@ theorem jpAlt_of_steps : JpIw → JpHgt → JpUnif → JpCmp → JpPos → JpCon
     obtain ⟨a, d, b, κ', e⟩ := hIw O L n (inL κ * tauM w)
     exact ⟨resK κ', a, d, b, κ', e, rfl⟩
   choose T hTr using hT
-  have hF : ∀ (κ : GL (Ix n) O) (Y : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O)),
-      (((h (inL κ * nU ((w⁻¹ : Lˣ).1 • liftM (L := L) ℓ Y)) : ℝ≥0) : ℝ) : ℂ) ^ (z + (n : ℂ) / 2) =
-        (Fintype.card (IsLocalRing.ResidueField O) : ℂ) ^
-          (((iD (T κ * nU Y) : ℂ) - iD (T κ)) * (2 * z + n)) := by
+  have hF
+      : ∀ (κ : GL (Ix n) O) (Y : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O)),
+        (((h (inL κ * nU ((w⁻¹ : Lˣ).1 • liftM (L := L) ℓ Y)) : ℝ≥0) : ℝ) : ℂ) ^ (z + (n : ℂ) / 2)
+          = (Fintype.card (IsLocalRing.ResidueField O) : ℂ)
+            ^ (((iD (T κ * nU Y) : ℂ) - iD (T κ)) * (2 * z + n)) := by
     intro κ Y
     rw [cpow_key Fintype.card_pos _ _ _ (z + (n : ℂ) / 2)
       (h_red hIw hHgt hϖ hw hnv hh hℓ κ (T κ) (hTr κ) Y)]
     congr 2
     ring
-  have hW : ∀ κ : GL (Ix n) O, Wz ψ₀ β z (T κ) =
-      ∑ Y : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O), coY ψ₀ β Y *
-        (((h (inL κ * nU ((w⁻¹ : Lˣ).1 • liftM (L := L) ℓ Y)) : ℝ≥0) : ℝ) : ℂ) ^ (z + (n : ℂ) / 2) := by
-    intro κ
-    unfold Wz
-    exact Finset.sum_congr rfl (fun Y _ => by rw [hF])
-  have hinv : ∀ κ : GL (Ix n) O, ∀ γ ∈ Gam2 (n := n) ϖ,
-      Wz ψ₀ β z (T (κ * γ)) = Wz ψ₀ β z (T κ) := by
+  have hW
+      : ∀ κ : GL (Ix n) O,
+        Wz ψ₀ β z (T κ)
+          = ∑ Y : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O), coY ψ₀ β Y *
+              (((h (inL κ * nU ((w⁻¹ : Lˣ).1 • liftM (L := L) ℓ Y)) : ℝ≥0) : ℝ) : ℂ) ^ (z + (n : ℂ) / 2) :=
+    by
+      intro κ
+      unfold Wz
+      exact Finset.sum_congr rfl (fun Y _ => by rw [hF])
+  have hinv
+      : ∀ κ : GL (Ix n) O, ∀ γ ∈ Gam2 (n := n) ϖ, Wz ψ₀ β z (T (κ * γ)) = Wz ψ₀ β z (T κ) := by
     intro κ γ hγ
     rw [hW, hW]
     refine Finset.sum_congr rfl (fun Y _ => ?_)
     have := h_gam (L := L) hIw hw hh (Y.map ℓ) κ γ hγ
     unfold liftM
     rw [this]
-  have hint : (fun x : X => ∑ Y : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O), coY ψ₀ β Y *
-      (((h (inL (ρ x) * nU ((w⁻¹ : Lˣ).1 • liftM (L := L) ℓ Y)) : ℝ≥0) : ℝ) : ℂ) ^ (z + (n : ℂ) / 2)) =
-      fun x => (fun κ => Wz ψ₀ β z (T κ)) (ρ x) := by
+  have hint
+      : (fun x : X =>
+          ∑ Y : Matrix (Fin n) (Fin n) (IsLocalRing.ResidueField O), coY ψ₀ β Y *
+            (((h (inL (ρ x) * nU ((w⁻¹ : Lˣ).1 • liftM (L := L) ℓ Y)) : ℝ≥0) : ℝ) : ℂ) ^ (z + (n : ℂ) / 2))
+        = fun x => (fun κ => Wz ψ₀ β z (T κ)) (ρ x) := by
     funext x
     exact (hW (ρ x)).symm
   have h1 := hUnif O n ϖ hϖ X ν ρ hρ hmeas (fun κ => Wz ψ₀ β z (T κ)) hinv

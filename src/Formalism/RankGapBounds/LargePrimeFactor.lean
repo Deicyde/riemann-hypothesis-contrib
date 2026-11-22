@@ -13,9 +13,7 @@ noncomputable section
 def primesUpTo (X : ℕ) : Finset ℕ := (Finset.range (X + 1)).filter Nat.Prime
 
 structure Data (ι : Type) where
-
   T2 : Finset ι
-
   Nr : ℕ
   k : ℕ
   t : ℕ
@@ -45,8 +43,7 @@ namespace Data
 
 end Data
 
-def ChebyshevTheta : Prop :=
-  ∀ n : ℕ, ∑ p ∈ primesUpTo n, Real.log (p : ℝ) ≤ Real.log 4 * (n : ℝ)
+def ChebyshevTheta : Prop := ∀ n : ℕ, ∑ p ∈ primesUpTo n, Real.log (p : ℝ) ≤ Real.log 4 * (n : ℝ)
 
 end
 

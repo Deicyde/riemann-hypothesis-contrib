@@ -24,10 +24,11 @@ theorem mem_intPol_iff (x : MvPolynomial σ ℚ_[p]) : x ∈ IntPol p σ ↔ ∀
       obtain ⟨m, _, rfl⟩ := ha
       exact ⟨⟨x.coeff m, h m⟩, rfl⟩
     rw [← mem_range_map_iff_coeffs_subset] at this
-    simpa [IntPol, LinearMap.mem_range, AlgHom.toLinearMap_apply, mapAlgHom_apply, Set.mem_range] using this
+    simpa [IntPol, LinearMap.mem_range, AlgHom.toLinearMap_apply, mapAlgHom_apply, Set.mem_range]
+      using this
 
-theorem exists_unit_coeff (U : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) (hU : U ≠ ⊥) :
-    ∃ x₀ ∈ U, ∃ m, x₀.coeff m = 1 ∧ x₀ ∈ IntPol p σ := by
+theorem exists_unit_coeff (U : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) (hU : U ≠ ⊥)
+    : ∃ x₀ ∈ U, ∃ m, x₀.coeff m = 1 ∧ x₀ ∈ IntPol p σ := by
   obtain ⟨x, hxU, hx0⟩ := (Submodule.ne_bot_iff U).mp hU
   have hne : x.support.Nonempty := by
     rw [Finset.nonempty_iff_ne_empty]
@@ -47,11 +48,14 @@ theorem exists_unit_coeff (U : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])) (hU 
     · rw [notMem_support_iff.mp hn, norm_zero]
       exact hpos.le
 
-theorem exists_family (d : ℕ) : ∀ (U : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])), FiniteDimensional ℚ_[p] U →
-    Module.finrank ℚ_[p] U = d →
-    ∃ (k : ℕ) (b : Fin k → MvPolynomial σ ℚ_[p]), LinearIndependent ℚ_[p] b ∧
-      Submodule.span ℚ_[p] (Set.range b) = U ∧ (∀ i, b i ∈ IntPol p σ) ∧
-      ∀ x ∈ U, x ∈ IntPol p σ → ∃ c : Fin k → ℚ_[p], (∀ i, ‖c i‖ ≤ 1) ∧ x = ∑ i, c i • b i := by
+theorem exists_family (d : ℕ)
+    : ∀ (U : Submodule ℚ_[p] (MvPolynomial σ ℚ_[p])),
+      FiniteDimensional ℚ_[p] U → Module.finrank ℚ_[p] U = d
+        → ∃ (k : ℕ) (b : Fin k → MvPolynomial σ ℚ_[p]),
+          LinearIndependent ℚ_[p] b ∧ Submodule.span ℚ_[p] (Set.range b) = U
+            ∧ (∀ i, b i ∈ IntPol p σ)
+            ∧ ∀ x ∈ U,
+              x ∈ IntPol p σ → ∃ c : Fin k → ℚ_[p], (∀ i, ‖c i‖ ≤ 1) ∧ x = ∑ i, c i • b i := by
   induction d using Nat.strong_induction_on with
   | _ d ih =>
     intro U hfd hd
@@ -85,7 +89,8 @@ theorem exists_family (d : ℕ) : ∀ (U : Submodule ℚ_[p] (MvPolynomial σ �
         · intro x hx
           have : x = x.coeff m • x₀ + (x - x.coeff m • x₀) := by abel
           rw [this]
-          exact Submodule.add_mem_sup (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _)) (hsplit x hx)
+          exact Submodule.add_mem_sup (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self _))
+            (hsplit x hx)
       · intro i
         refine Fin.cases ?_ (fun j => ?_) i
         · simpa using hx₀I

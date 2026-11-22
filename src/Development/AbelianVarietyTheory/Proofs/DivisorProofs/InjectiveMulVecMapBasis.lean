@@ -6,16 +6,18 @@ public import Mathlib
 
 namespace GlobalTheory.BasisLeftInverse
 
-theorem exists_left_inv {E : Type} [Field E] {n d : ℕ} (B : Matrix (Fin n) (Fin d) E)
-    (h : LinearIndependent E B.col) : ∃ C : Matrix (Fin d) (Fin n) E, C * B = 1 := by
+theorem exists_left_inv
+    {E : Type} [Field E] {n d : ℕ} (B : Matrix (Fin n) (Fin d) E) (h : LinearIndependent E B.col)
+    : ∃ C : Matrix (Fin d) (Fin n) E, C * B = 1 := by
   have hinj : Function.Injective B.mulVec := Matrix.mulVec_injective_iff.2 h
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (Matrix.toLin' B) (LinearMap.ker_eq_bot.2 hinj)
+  obtain ⟨g, hg⟩ :=
+    LinearMap.exists_leftInverse_of_injective (Matrix.toLin' B) (LinearMap.ker_eq_bot.2 hinj)
   refine ⟨LinearMap.toMatrix' g, ?_⟩
   rw [← LinearMap.toMatrix'_toLin' B, ← LinearMap.toMatrix'_comp, hg, LinearMap.toMatrix'_id]
 
-theorem injective_mulVec_map_basis {E : Type} [Field E] {n : ℕ} (V : Submodule E (Fin n → E))
-    (τ : E →+* ℂ) :
-    Function.Injective (Matrix.mulVec (Matrix.of fun (k : Fin n) (i : Fin (Module.finrank E V)) =>
+theorem injective_mulVec_map_basis
+    {E : Type} [Field E] {n : ℕ} (V : Submodule E (Fin n → E)) (τ : E →+* ℂ)
+    : Function.Injective (Matrix.mulVec (Matrix.of fun (k : Fin n) (i : Fin (Module.finrank E V)) =>
       τ (((Module.finBasis E V i : V) : Fin n → E) k))) := by
   let B : Matrix (Fin n) (Fin (Module.finrank E V)) E :=
     Matrix.of fun k i => ((Module.finBasis E V i : V) : Fin n → E) k

@@ -15,7 +15,9 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Comple
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 noncomputable section
 
@@ -23,16 +25,28 @@ namespace GlobalTheory.LocBasisBasR
 
 open Matrix
 
-theorem norm_det_le_one {K : Type*} [NormedField K] [IsUltrametricDist K] {N : ℕ}
-    (g : Matrix (Fin N) (Fin N) K) (hg : ∀ a b, ‖g a b‖ ≤ 1) : ‖g.det‖ ≤ 1 := by
+theorem norm_det_le_one
+    {K : Type*} [NormedField K] [IsUltrametricDist K]
+    {N : ℕ} (g : Matrix (Fin N) (Fin N) K) (hg : ∀ a b, ‖g a b‖ ≤ 1)
+    : ‖g.det‖ ≤ 1 := by
   rw [Matrix.det_apply']
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun σ _ => ?_
   have hs : ‖(((Equiv.Perm.sign σ : ℤˣ) : ℤ) : K)‖ ≤ 1 := by
     rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;> simp [h]
   rw [norm_mul, norm_prod]
-  exact mul_le_one₀ hs (Finset.prod_nonneg fun _ _ => norm_nonneg _) (Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun i _ => hg _ _)
+  exact mul_le_one₀ hs (Finset.prod_nonneg fun _ _ => norm_nonneg _)
+    (Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun i _ => hg _ _)
 
-theorem main : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar →+* ℂ_[p]) (τ : D.what₂.Tau) {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) (Bm : GL (Fin N) D.host.E) (M : Matrix (Fin N) (Fin N) ℂ_[p]), Formalism.L2.Forms.IsLocBasis p (L : Set (Fin N → D.host.E)) Bm → GL3Columns.BasR D lam τ L M → ∃ g : Matrix (Fin N) (Fin N) ℂ_[p], (∀ a b, ‖g a b‖ ≤ 1) ∧ ‖g.det‖ = 1 ∧ M = (Bm : Matrix (Fin N) (Fin N) D.host.E).map (TaylorLogMetric.tauEmb D lam τ) * g := by
+theorem main
+    : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar →+* ℂ_[p]) (τ : D.what₂.Tau)
+        {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) (Bm : GL (Fin N) D.host.E)
+        (M : Matrix (Fin N) (Fin N) ℂ_[p]),
+      Formalism.L2.Forms.IsLocBasis p (L : Set (Fin N → D.host.E)) Bm → GL3Columns.BasR D lam τ L M
+        → ∃ g : Matrix (Fin N) (Fin N) ℂ_[p],
+          (∀ a b, ‖g a b‖ ≤ 1) ∧ ‖g.det‖ = 1
+            ∧ M
+              = (Bm : Matrix (Fin N) (Fin N) D.host.E).map (TaylorLogMetric.tauEmb D lam τ)
+                * g := by
   intro D p _ lam τ N L Bm M hL hM
   obtain ⟨ρ, hρ⟩ := GlobalTheory.JetTieCompare.exists_tauHom D lam τ
   have hp : p.Prime := Fact.out
@@ -50,12 +64,15 @@ theorem main : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar
     intro x hx a
     obtain ⟨s, hs, hint⟩ := (hL x).1 ⟨1, hp.not_dvd_one, by simpa using hx⟩
     obtain ⟨c, hc⟩ := hint a
-    have e : (Ai *ᵥ fun i => ρ (x i)) a = ρ ((((Bm⁻¹ : GL (Fin N) D.host.E) : Matrix (Fin N) (Fin N) D.host.E) *ᵥ x) a) := by
+    have e
+        : (Ai *ᵥ fun i => ρ (x i)) a
+          = ρ ((((Bm⁻¹ : GL (Fin N) D.host.E) : Matrix (Fin N) (Fin N) D.host.E) *ᵥ x) a) := by
       rw [RingHom.map_mulVec]; rfl
     have hs1 := hns s hs
     have hs0 : ρ (s : D.host.E) ≠ 0 := by intro h; rw [h, norm_zero] at hs1; exact zero_ne_one hs1
-    have e2 : ρ ((((Bm⁻¹ : GL (Fin N) D.host.E) : Matrix (Fin N) (Fin N) D.host.E) *ᵥ x) a) =
-        (ρ (s : D.host.E))⁻¹ * ρ (algebraMap (𝓞 D.host.E) D.host.E c) := by
+    have e2
+        : ρ ((((Bm⁻¹ : GL (Fin N) D.host.E) : Matrix (Fin N) (Fin N) D.host.E) *ᵥ x) a)
+          = (ρ (s : D.host.E))⁻¹ * ρ (algebraMap (𝓞 D.host.E) D.host.E c) := by
       rw [hc, map_mul]; field_simp
     rw [e, e2, norm_mul, norm_inv, hs1, inv_one, one_mul]
     exact GlobalTheory.JetTieCompare.norm_int_le ρ c
@@ -76,11 +93,16 @@ theorem main : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar
       let x : Fin N → D.host.E := fun j => (Bm : Matrix (Fin N) (Fin N) D.host.E) j a
       have hxe : x = (Bm : Matrix (Fin N) (Fin N) D.host.E) *ᵥ Pi.single a 1 := by
         funext j; simp [x, Matrix.mulVec_single]
-      have hrhs : ∃ s : ℕ, ¬ p ∣ s ∧ ∀ c, (s : D.host.E) *
-          (((Bm⁻¹ : GL (Fin N) D.host.E) : Matrix (Fin N) (Fin N) D.host.E) *ᵥ x) c ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
+      have hrhs
+          : ∃ s : ℕ,
+            ¬ p ∣ s
+              ∧ ∀ c,
+                (s : D.host.E)
+                    * (((Bm⁻¹ : GL (Fin N) D.host.E) : Matrix (Fin N) (Fin N) D.host.E) *ᵥ x) c
+                  ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
         refine ⟨1, hp.not_dvd_one, fun c => ?_⟩
-        rw [hxe, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one, Matrix.one_mulVec,
-          Nat.cast_one, one_mul, Pi.single_apply]
+        rw [hxe, Matrix.mulVec_mulVec, ← Units.val_mul, inv_mul_cancel, Units.val_one,
+          Matrix.one_mulVec, Nat.cast_one, one_mul, Pi.single_apply]
         split_ifs
         · exact ⟨1, map_one _⟩
         · exact ⟨0, map_zero _⟩
@@ -95,7 +117,8 @@ theorem main : ∀ (D : D7) {p : ℕ} [Fact p.Prime] (lam : TaylorLogMetric.Qbar
       convert h using 2
       simp [A, x, Matrix.mul_apply, Matrix.mulVec, dotProduct]
     have hprod : (Ai * M) * (M⁻¹ * A) = 1 := by
-      rw [Matrix.mul_assoc, ← Matrix.mul_assoc M, Matrix.mul_nonsing_inv _ hMu, Matrix.one_mul, hAiA]
+      rw [Matrix.mul_assoc, ← Matrix.mul_assoc M, Matrix.mul_nonsing_inv _ hMu, Matrix.one_mul,
+        hAiA]
     have hd := congrArg Matrix.det hprod
     rw [Matrix.det_mul, Matrix.det_one] at hd
     have hn := congrArg norm hd

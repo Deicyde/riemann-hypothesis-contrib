@@ -14,8 +14,11 @@ section General
 
 variable {R : Type*} [CommRing R] {M : Type*} [AddCommGroup M] [Module R M]
 
-theorem exists_eq_smul_of_baer (hB : Module.Baer R M) {a b : R}
-    (hab : ∀ r, b * r = 0 → ∃ s, r = a * s) {m : M} (hm : a • m = 0) : ∃ m' : M, m = b • m' := by
+theorem exists_eq_smul_of_baer
+    (hB : Module.Baer R M)
+    {a b : R} (hab : ∀ r, b * r = 0 → ∃ s, r = a * s)
+    {m : M} (hm : a • m = 0)
+    : ∃ m' : M, m = b • m' := by
   let f : R →ₗ[R] R := LinearMap.toSpanSingleton R R b
   have hker : LinearMap.ker f ≤ LinearMap.ker (LinearMap.toSpanSingleton R M m) := by
     intro x hx
@@ -23,23 +26,26 @@ theorem exists_eq_smul_of_baer (hB : Module.Baer R M) {a b : R}
     obtain ⟨s, rfl⟩ := hab x (by rw [mul_comm]; exact hx)
     rw [mul_comm, mul_smul, hm, smul_zero]
   let g : LinearMap.range f →ₗ[R] M :=
-    (LinearMap.ker f).liftQ (LinearMap.toSpanSingleton R M m) hker ∘ₗ f.quotKerEquivRange.symm.toLinearMap
+    (LinearMap.ker f).liftQ (LinearMap.toSpanSingleton R M m) hker
+      ∘ₗ f.quotKerEquivRange.symm.toLinearMap
   obtain ⟨g', hg'⟩ := hB (LinearMap.range f) g
   refine ⟨g' 1, ?_⟩
   have h1 : f 1 = b := by simp [f]
   have hmem : b ∈ LinearMap.range f := ⟨1, h1⟩
   have := hg' b hmem
   have hg : g ⟨b, hmem⟩ = m := by
-    have e : (⟨b, hmem⟩ : LinearMap.range f) = ⟨f 1, LinearMap.mem_range_self f 1⟩ := Subtype.ext h1.symm
+    have e : (⟨b, hmem⟩ : LinearMap.range f) = ⟨f 1, LinearMap.mem_range_self f 1⟩ :=
+      Subtype.ext h1.symm
     rw [e]
     simp only [g, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
       LinearMap.quotKerEquivRange_symm_apply_image]
     rw [Submodule.mkQ_apply, Submodule.liftQ_apply, LinearMap.toSpanSingleton_apply, one_smul]
   rw [← hg, ← this, ← map_smul, smul_eq_mul, mul_one]
 
-theorem flat_of_baer [IsPrincipalIdealRing R]
-    (hA : ∀ a : R, ∃ b, a * b = 0 ∧ ∀ r, b * r = 0 → ∃ s, r = a * s) (hB : Module.Baer R M) :
-    Module.Flat R M := by
+theorem flat_of_baer
+    [IsPrincipalIdealRing R]
+    (hA : ∀ a : R, ∃ b, a * b = 0 ∧ ∀ r, b * r = 0 → ∃ s, r = a * s) (hB : Module.Baer R M)
+    : Module.Flat R M := by
   rw [Module.Flat.iff_lift_lsmul_comp_subtype_injective]
   intro I _
   obtain ⟨a, ha⟩ := Submodule.IsPrincipal.principal I
@@ -58,11 +64,13 @@ theorem flat_of_baer [IsPrincipalIdealRing R]
       obtain ⟨m1, rfl⟩ := hx
       obtain ⟨m2, rfl⟩ := hy
       exact ⟨m1 + m2, by rw [tmul_add]⟩
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨m, rfl⟩ := pure x
   simp only [lift.tmul, LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype,
-    LinearMap.lsmul_apply] at hx
+      LinearMap.lsmul_apply]
+    at hx
   obtain ⟨b, hab, hb⟩ := hA a
   obtain ⟨m', rfl⟩ := exists_eq_smul_of_baer hB hb hx
   rw [← smul_tmul]
@@ -73,8 +81,8 @@ end General
 
 section ZModPart
 
-theorem zmod_ann (q : ℕ) [NeZero q] (a : ZMod q) :
-    ∃ b : ZMod q, a * b = 0 ∧ ∀ r : ZMod q, b * r = 0 → ∃ s, r = a * s := by
+theorem zmod_ann (q : ℕ) [NeZero q] (a : ZMod q)
+    : ∃ b : ZMod q, a * b = 0 ∧ ∀ r : ZMod q, b * r = 0 → ∃ s, r = a * s := by
   obtain ⟨n, hn⟩ : ∃ n, n = a.val := ⟨_, rfl⟩
   obtain ⟨g, hg⟩ : ∃ g, g = Nat.gcd n q := ⟨_, rfl⟩
   have hq : 0 < q := NeZero.pos q

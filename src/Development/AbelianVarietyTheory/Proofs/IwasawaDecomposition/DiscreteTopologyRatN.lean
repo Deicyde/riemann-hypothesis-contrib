@@ -32,18 +32,19 @@ theorem discreteTopology_ratN : DiscreteTopology (ratN E a r) := by
     subst hx
     exact Subtype.ext (map_zero _)
 
-theorem exists_compact_ratN : ∃ K : Set (BlockIx a r → Ad E), IsCompact K ∧
-    ∀ x, ∃ γ ∈ ratN E a r, γ + x ∈ K := by
+theorem exists_compact_ratN
+    : ∃ K : Set (BlockIx a r → Ad E), IsCompact K ∧ ∀ x, ∃ γ ∈ ratN E a r, γ + x ∈ K := by
   obtain ⟨K, hK, h⟩ := GlobalTheory.AdeleCocompact.exists_compact_adele E
   refine ⟨Set.pi Set.univ fun _ => K, isCompact_univ_pi fun _ => hK, fun x => ?_⟩
   choose y hy using fun p => h (x p)
-  refine ⟨_, ⟨fun p => -y p, rfl⟩, fun p _ => ?_⟩
-  change algebraMap E (Ad E) (-y p) + x p ∈ K
+  refine ⟨_, ⟨fun p => - y p, rfl⟩, fun p _ => ?_⟩
+  change algebraMap E (Ad E) (- y p) + x p ∈ K
   rw [map_neg, neg_add_eq_sub]
   exact hy p
 
-theorem not_isCuspidal_oneFn : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
-    2 ≤ a → ¬ IsCuspidal (oneFn E a).1 := by
+theorem not_isCuspidal_oneFn
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ),
+      2 ≤ a → ¬ IsCuspidal (oneFn E a).1 := by
   intro E _ _ _ a ha h
   haveI : LocallyCompactSpace (Ad E) := GlobalTheory.AdelicUnitaryTop.locallyCompact_adele E
   haveI : SecondCountableTopology (Ad E) := GlobalTheory.AdelicUnitaryTop.secondCountable_adele E

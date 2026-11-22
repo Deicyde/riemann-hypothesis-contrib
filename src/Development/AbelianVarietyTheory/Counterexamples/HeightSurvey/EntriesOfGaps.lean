@@ -77,16 +77,25 @@ private lemma mul_toNat_fdiv_le_of_le_of_nonneg {T K : ℕ} (hK : T + 2 ≤ K) {
   · rw [Int.toNat_of_nonpos (by omega)]
     simpa using ha
 
-
 set_option autoImplicit false in
 variable {D : _root_.Formalism.BasicNotions.D7} {j : ℕ} in
-theorem _root_.GlobalTheory.RunWeightTest.isF'_fWt (ka : _root_.Formalism.MainNotions.WeightFamilies.Wt D j) (T nW nP : ℕ) (hW : Even nW)
-    (hP : Even nP) :
-    _root_.Formalism.MainNotions.WeightAlgebra.IsF' ka (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW) (_root_.Formalism.MainNotions.DIV.Cons.fWt D ka (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW) T nP hP) T nP := by
-  have hK : T + 2 ≤ _root_.Formalism.MainNotions.WeightAlgebra.Tp D j T := by unfold _root_.Formalism.MainNotions.WeightAlgebra.Tp; omega
+theorem _root_.GlobalTheory.RunWeightTest.isF'_fWt
+    (ka : _root_.Formalism.MainNotions.WeightFamilies.Wt D j)
+    (T nW nP : ℕ) (hW : Even nW) (hP : Even nP)
+    : _root_.Formalism.MainNotions.WeightAlgebra.IsF' ka
+      (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW)
+      (_root_.Formalism.MainNotions.DIV.Cons.fWt D ka
+        (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW) T nP hP)
+      T nP := by
+  have hK : T + 2 ≤ _root_.Formalism.MainNotions.WeightAlgebra.Tp D j T := by
+    unfold _root_.Formalism.MainNotions.WeightAlgebra.Tp; omega
   unfold _root_.Formalism.MainNotions.WeightAlgebra.IsF'
   refine ⟨rfl, fun τ i => ?_, fun τ i => ?_⟩
-  · have hl : (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW).aP τ = _root_.Formalism.MainNotions.DIV.Cons.ofGaps (_root_.Formalism.MainNotions.DIV.Cons.lGapP D ka T nW τ) := rfl
+  · have hl
+        : (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW).aP τ
+          = _root_.Formalism.MainNotions.DIV.Cons.ofGaps
+            (_root_.Formalism.MainNotions.DIV.Cons.lGapP D ka T nW τ) :=
+      rfl
     show (_root_.Formalism.MainNotions.DIV.Cons.ofGaps (_root_.Formalism.MainNotions.DIV.Cons.fGapP D ka (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW) T τ) i : ℤ) = _
     refine ofGaps_eq_sub_mul _ _ _ T (fun k => ?_) i
     unfold _root_.Formalism.MainNotions.DIV.Cons.fGapP
@@ -95,7 +104,9 @@ theorem _root_.GlobalTheory.RunWeightTest.isF'_fWt (ka : _root_.Formalism.MainNo
       rw [hl, _root_.Formalism.MainNotions.DIV.Cons.gapZ_ofGaps]
       unfold _root_.Formalism.MainNotions.DIV.Cons.lGapP
       rw [if_pos h]
-      have := mul_toNat_fdiv_add_two_le_of_add_two_le hK (gapZ_nonneg_of_antitone' _ (ka.aPlus_antitone τ) k)
+      have :=
+        mul_toNat_fdiv_add_two_le_of_add_two_le hK
+          (gapZ_nonneg_of_antitone' _ (ka.aPlus_antitone τ) k)
       linarith
     · refine Int.toNat_of_nonneg ?_
       rw [hl, _root_.Formalism.MainNotions.DIV.Cons.ofGaps_last _ k h]
@@ -103,7 +114,11 @@ theorem _root_.GlobalTheory.RunWeightTest.isF'_fWt (ka : _root_.Formalism.MainNo
       rw [if_neg h]
       refine sub_nonneg.mpr (mul_toNat_fdiv_le_of_le_of_nonneg hK ?_ (by positivity))
       refine (sub_le_self _ ?_).trans (sub_le_self _ ?_) <;> positivity
-  · have hl : (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW).aM τ = _root_.Formalism.MainNotions.DIV.Cons.ofGaps (_root_.Formalism.MainNotions.DIV.Cons.lGapM D ka T τ) := rfl
+  · have hl
+        : (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW).aM τ
+          = _root_.Formalism.MainNotions.DIV.Cons.ofGaps
+            (_root_.Formalism.MainNotions.DIV.Cons.lGapM D ka T τ) :=
+      rfl
     show (_root_.Formalism.MainNotions.DIV.Cons.ofGaps (_root_.Formalism.MainNotions.DIV.Cons.fGapM D ka (_root_.Formalism.MainNotions.DIV.Cons.lWt D ka T nW hW) T τ) i : ℤ) = _
     refine ofGaps_eq_sub_mul _ _ _ T (fun k => ?_) i
     unfold _root_.Formalism.MainNotions.DIV.Cons.fGapM
@@ -112,7 +127,8 @@ theorem _root_.GlobalTheory.RunWeightTest.isF'_fWt (ka : _root_.Formalism.MainNo
       rw [hl, _root_.Formalism.MainNotions.DIV.Cons.gapZ_ofGaps]
       unfold _root_.Formalism.MainNotions.DIV.Cons.lGapM
       rw [if_pos h]
-      have := mul_toNat_fdiv_add_two_le_of_add_two_le hK (gapZ_nonneg_of_antitone' _ (ka.aM_anti τ) k)
+      have :=
+        mul_toNat_fdiv_add_two_le_of_add_two_le hK (gapZ_nonneg_of_antitone' _ (ka.aM_anti τ) k)
       linarith
     · refine Int.toNat_of_nonneg ?_
       rw [hl, _root_.Formalism.MainNotions.DIV.Cons.ofGaps_last _ k h]

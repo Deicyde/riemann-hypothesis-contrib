@@ -17,8 +17,10 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.AutLzFinite
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
-  Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2 Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf Formalism.L2.SG.LoopsCut
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.PackageTie2
+  Formalism.L2.SG.TermTieOf Formalism.L2.SG.LoopTieOf Formalism.L2.SG.LoopsCut
   Formalism.L2.SG.LoopsFinal Formalism.L2.SG.LoopsEv Formalism.FourierDecayAlt
 
 namespace Formalism.L2.SG.LoopsTies
@@ -36,24 +38,34 @@ structure ConcAt0 (D : D7) (T : TermTie D) where
 
 section TransportedAlt
 
-theorem loop_evaluation_threshold_zero (hLC : PN.LoopCores) (hSub : PB.SubFamily) (hS : Formalism.HermitianLatticesTheory.SiegelMassRatio)
-    (Cg cb Cw cT CT C0 A C₀ : ℝ) :
-    ∃ C'₀ Cl₀ : ℝ, ∀ {eps : ℝ} (Fm : FamP eps) (C1 : ℝ) (At : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i))
-      (Yt : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
-        LoopTie (Fm.D x i) (Fm.L x i) (At x hx i) u u' C1)
-      (Cc : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), ConcAt0 (Fm.D x i) (At x hx i)),
-      (∀ C : ℝ, C₀ ≤ C → OwnEv Fm fun C' Cl x i => ∀ (hx : Fm.x1 < x) (u u' : (Fm.D x i).what₂.Word),
-        Cnt.Hyp (Fm.D x i) (Fm.L x i) u u' C' Cl Cg cb Cw cT CT C0 A →
-          Formalism.MainNotions.BridgeLemma.RowsND (At x hx i) (Yt x hx i u u') C ∧ Formalism.MainNotions.BridgeLemma.RowsDeg (At x hx i) (Yt x hx i u u') C ∧
-            Formalism.MainNotions.BridgeLemma.RowsOne (At x hx i) (Yt x hx i u u') C) →
-      (OwnEv Fm fun C' Cl x i =>
-        Hyp0 (Fm.D x i) (Fm.L x i) C' Cl Cg cb Cw cT CT C0 → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u) →
-      OwnEv Fm fun C' Cl x i => C'₀ ≤ C' → Cl₀ ≤ Cl →
-        ∀ (hx : Fm.x1 < x) (u u' : (Fm.D x i).what₂.Word),
-          Cnt.Hyp (Fm.D x i) (Fm.L x i) u u' C' Cl Cg cb Cw cT CT C0 A → ConcTie (Cc x hx i).X (Cc x hx i).Y →
-          ((Cc x hx i).Y.tO u u').AbsConv →
-          ((Cc x hx i).Y.tO u u').RowBig (epsL (Fm.D x i)) (ddC (Cc x hx i).X (Cc x hx i).Y u u') ∧
-          ((Cc x hx i).Y.tO u u').RowNotScalar (epsL (Fm.D x i)) (ddC (Cc x hx i).X (Cc x hx i).Y u u') := by
+theorem loop_evaluation_threshold_zero
+    (hLC : PN.LoopCores) (hSub : PB.SubFamily)
+    (hS : Formalism.HermitianLatticesTheory.SiegelMassRatio) (Cg cb Cw cT CT C0 A C₀ : ℝ)
+    : ∃ C'₀ Cl₀ : ℝ,
+      ∀ {eps : ℝ} (Fm : FamP eps) (C1 : ℝ) (At : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, TermTie (Fm.D x i))
+          (Yt : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x) (u u' : (Fm.D x i).what₂.Word),
+            LoopTie (Fm.D x i) (Fm.L x i) (At x hx i) u u' C1)
+          (Cc : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), ConcAt0 (Fm.D x i) (At x hx i)),
+        (∀ C : ℝ,
+            C₀ ≤ C
+              → OwnEv Fm fun C' Cl x i =>
+                ∀ (hx : Fm.x1 < x) (u u' : (Fm.D x i).what₂.Word),
+                  Cnt.Hyp (Fm.D x i) (Fm.L x i) u u' C' Cl Cg cb Cw cT CT C0 A
+                    → Formalism.MainNotions.BridgeLemma.RowsND (At x hx i) (Yt x hx i u u') C
+                      ∧ Formalism.MainNotions.BridgeLemma.RowsDeg (At x hx i) (Yt x hx i u u') C
+                      ∧ Formalism.MainNotions.BridgeLemma.RowsOne (At x hx i) (Yt x hx i u u') C)
+          → (OwnEv Fm fun C' Cl x i =>
+            Hyp0 (Fm.D x i) (Fm.L x i) C' Cl Cg cb Cw cT CT C0
+              → ∀ u, UnitaryVolumeMass.FormAt (Fm.D x i) u)
+          → OwnEv Fm fun C' Cl x i =>
+            C'₀ ≤ C' → Cl₀ ≤ Cl
+              → ∀ (hx : Fm.x1 < x) (u u' : (Fm.D x i).what₂.Word),
+                Cnt.Hyp (Fm.D x i) (Fm.L x i) u u' C' Cl Cg cb Cw cT CT C0 A
+                  → ConcTie (Cc x hx i).X (Cc x hx i).Y → ((Cc x hx i).Y.tO u u').AbsConv
+                  → ((Cc x hx i).Y.tO u u').RowBig (epsL (Fm.D x i))
+                      (ddC (Cc x hx i).X (Cc x hx i).Y u u')
+                    ∧ ((Cc x hx i).Y.tO u u').RowNotScalar (epsL (Fm.D x i))
+                      (ddC (Cc x hx i).X (Cc x hx i).Y u u') := by
   obtain ⟨C₃, _, HX⟩ := xiSizesC_of hS Cg cb Cw cT CT C0 A
   obtain ⟨C, hCdef⟩ : ∃ C : ℝ, C = max (max C₀ C₃) (max CT 1) := ⟨_, rfl⟩
   have hCC₀ : C₀ ≤ C := by rw [hCdef]; exact le_max_of_le_left (le_max_left _ _)
@@ -90,40 +102,49 @@ theorem loop_evaluation_threshold_zero (hLC : PN.LoopCores) (hSub : PB.SubFamily
   have hv : 0 ≤ (Fm.D x i).host.v := by linarith [hP.2.2.2.2.2.2.1]
   have hC0' : (0 : ℝ) ≤ C := by linarith
   have hGam : 0 ≤ GamS (Fm.D x i) (Fm.L x i) := by unfold GamS; exact (Real.exp_pos _).le
-  have HS : ∀ s, 2 ≤ s → s ≤ (Fm.D x i).R.k →
-      ClassLe ((Cc x hx i).Y.tO u u') (bigS ((Cc x hx i).Y.tO u u') s)
-        (A₀ * rowS C (Fm.D x i).R.k (Fm.D x i).R.rS (Fm.D x i).R.f s (Fm.L x i).sc.b ((Cc x hx i).X.B.g : ℝ)
-          (Fm.D x i).host.v (GamS (Fm.D x i) (Fm.L x i)) (Formalism.MainNotions.BridgeLemma.XiB (Fm.D x i) (Fm.L x i) u C) *
-          ddC (Cc x hx i).X (Cc x hx i).Y u u') := by
+  have HS
+      : ∀ s,
+        2 ≤ s → s ≤ (Fm.D x i).R.k
+          → ClassLe ((Cc x hx i).Y.tO u u') (bigS ((Cc x hx i).Y.tO u u') s)
+            (A₀
+              * rowS C (Fm.D x i).R.k (Fm.D x i).R.rS (Fm.D x i).R.f s (Fm.L x i).sc.b
+                ((Cc x hx i).X.B.g : ℝ) (Fm.D x i).host.v (GamS (Fm.D x i) (Fm.L x i))
+                (Formalism.MainNotions.BridgeLemma.XiB (Fm.D x i) (Fm.L x i) u C)
+              * ddC (Cc x hx i).X (Cc x hx i).Y u u') := by
     intro s h2 hk
     have hX0 := xi_nonneg hXiH s h2 hk
     rw [hA₀]
-    exact rowsSC_at (At x hx i) (Cc x hx i).jt (Cc x hx i).wr (Cc x hx i).fc hGP (Yt x hx i u u') hFo' hT
-      hH C hn hd s h2 hk (ndRow_nonneg hC0' hb0 hg hv hGam hX0) (degRow_nonneg hC0' hb0 hg hv hGam hX0)
-  have H1' : ClassLe ((Cc x hx i).Y.tO u u') (((Cc x hx i).Y.tO u u').nsc ((Cc x hx i).Y.tO u u').genSet)
-      (A₀ * oneT C (Fm.D x i).R.k (Fm.D x i).R.rS (Fm.D x i).R.f (Fm.L x i).sc.b ((Cc x hx i).X.B.g : ℝ)
-        (GamS (Fm.D x i) (Fm.L x i)) * ddC (Cc x hx i).X (Cc x hx i).Y u u') := by
+    exact rowsSC_at (At x hx i) (Cc x hx i).jt (Cc x hx i).wr (Cc x hx i).fc hGP (Yt x hx i u u')
+      hFo' hT hH C hn hd s h2 hk (ndRow_nonneg hC0' hb0 hg hv hGam hX0)
+      (degRow_nonneg hC0' hb0 hg hv hGam hX0)
+  have H1'
+      : ClassLe ((Cc x hx i).Y.tO u u') (((Cc x hx i).Y.tO u u').nsc ((Cc x hx i).Y.tO u u').genSet)
+        (A₀
+          * oneT C (Fm.D x i).R.k (Fm.D x i).R.rS (Fm.D x i).R.f (Fm.L x i).sc.b
+            ((Cc x hx i).X.B.g : ℝ) (GamS (Fm.D x i) (Fm.L x i))
+          * ddC (Cc x hx i).X (Cc x hx i).Y u u') := by
     rw [hA₀]
-    exact oneSC_at (At x hx i) (Cc x hx i).jt (Cc x hx i).wr (Cc x hx i).fc hGP (Yt x hx i u u') hFo' hT
-      C0 C hC0' h1
+    exact oneSC_at (At x hx i) (Cc x hx i).jt (Cc x hx i).wr (Cc x hx i).fc hGP (Yt x hx i u u')
+      hFo' hT C0 C hC0' h1
   obtain ⟨Al, NT', Gam, Xi, hAl, hP', hX', h6, hAmp⟩ :=
     loopsAmp_at hH hT hA hC hCT hK₀ hA₀1 hCl4 hClA hXiH HS H1'
-  exact hJ _ _ _ _ _ ((Cc x hx i).Y.tO u u') (Fm.D x i).R.k (Fm.D x i).R.rS (Fm.D x i).R.f Al (Fm.L x i).sc.b
-    ((Cc x hx i).X.B.g : ℝ) (Fm.D x i).host.v NT' Gam Xi (ddC (Cc x hx i).X (Cc x hx i).Y u u')
-    hAl hP' hX' h6 (dd_nonneg hT u u') hA
+  exact hJ _ _ _ _ _ ((Cc x hx i).Y.tO u u') (Fm.D x i).R.k (Fm.D x i).R.rS (Fm.D x i).R.f Al
+    (Fm.L x i).sc.b ((Cc x hx i).X.B.g : ℝ) (Fm.D x i).host.v NT' Gam Xi
+    (ddC (Cc x hx i).X (Cc x hx i).Y u u') hAl hP' hX' h6 (dd_nonneg hT u u') hA
     (Formalism.L2.SG.RowsOther.loopsInput_of_amp _ hA.2.2.le _ _ _ _ _ _ _ _ _ _ _ hAmp)
 
 end TransportedAlt
 
 section Fam5
 
-variable {eps : ℝ} (Fm : FamP eps) (C1 : ℝ)
+variable
+  {eps : ℝ} (Fm : FamP eps)
+  (C1 : ℝ)
   (X : ∀ x, Fm.x1 < x → ∀ i : Fm.Ix x, HidaSetting (Fm.D x i))
   (Y : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), Full (X x hx i))
   (hF : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), FinX (Y x hx i))
   (hI : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), SIso (Fm.D x i).s (sOf (hF x hx i)))
   (hCT : ∀ x (hx : Fm.x1 < x) (i : Fm.Ix x), ConcTie (X x hx i) (Y x hx i))
-
 
 end Fam5
 

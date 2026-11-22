@@ -11,18 +11,25 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ContinuousGau
 
 @[expose] public section
 
-open MeasureTheory Matrix Filter Topology Formalism.BasicNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot GlobalTheory.GaugeQuot GlobalTheory.Mem.Vol.Scale
+open MeasureTheory Matrix Filter Topology Formalism.BasicNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.PerpendicularEmbedding GlobalTheory.CompactDualQuot
+  GlobalTheory.GaugeQuot GlobalTheory.Mem.Vol.Scale
 open scoped ENNReal NNReal
 
 noncomputable section
 
 namespace GlobalTheory.GaugeQuot
 
-theorem hsDist_equiv_symm {n P Q : ℕ} {ε : Fin n → Bool} {f : Fin P ⊕ Fin Q ≃ Fin n} (hf : Sorts ε f)
-    (k : Formalism.REAL.UJ ε) : hsDist (hf.equiv.symm k) = Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) := by
+theorem hsDist_equiv_symm
+    {n P Q : ℕ} {ε : Fin n → Bool} {f : Fin P ⊕ Fin Q ≃ Fin n}
+    (hf : Sorts ε f) (k : Formalism.REAL.UJ ε)
+    : hsDist (hf.equiv.symm k) = Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) := by
   have h := hf.umat_equiv (hf.equiv.symm k)
   rw [ContinuousMulEquiv.apply_symm_apply] at h
-  have h' : Formalism.MainNotions.S.uMat k - 1 = Matrix.reindex f f (UpqT.mat (hf.equiv.symm k) - 1) := by
+  have h'
+      : Formalism.MainNotions.S.uMat k - 1
+        = Matrix.reindex f f (UpqT.mat (hf.equiv.symm k) - 1) := by
     rw [show Formalism.MainNotions.S.uMat k = Formalism.MainNotions.S.umat k from rfl, h]
     ext i j
     simp [Matrix.reindex_apply, Matrix.submatrix_apply, Matrix.one_apply]
@@ -35,26 +42,31 @@ theorem hsDist_equiv_symm {n P Q : ℕ} {ε : Fin n → Bool} {f : Fin P ⊕ Fin
   rw [← f.sum_comp]
   simp
 
-private theorem pos_of_isGauge' {n : ℕ} {ε : Fin n → Bool} {c : ℝ} (hc : GlobalTheory.Count.IsGauge ε c) :
-    0 < c := by
+private theorem pos_of_isGauge'
+    {n : ℕ} {ε : Fin n → Bool} {c : ℝ} (hc : GlobalTheory.Count.IsGauge ε c)
+    : 0 < c := by
   have hV : 0 < (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (n ^ 2))) 1)).toReal :=
     ENNReal.toReal_pos (Metric.measure_ball_pos _ _ one_pos).ne' measure_ball_lt_top.ne
   by_contra hneg'
   have hneg : c ≤ 0 := not_lt.1 hneg'
-  have hle : ∀ᶠ r in 𝓝[>] (0 : ℝ),
-      c * (Formalism.REAL.muG ε {g | Real.sqrt (Formalism.REAL.hs (Formalism.MainNotions.S.uMat g - 1)) ≤ r}).toReal / r ^ (n ^ 2)
-        ≤ 0 := by
+  have hle
+      : ∀ᶠ r in 𝓝[>] (0 : ℝ),
+        c * (Formalism.REAL.muG ε {g | Real.sqrt (Formalism.REAL.hs (Formalism.MainNotions.S.uMat g - 1)) ≤ r}).toReal / r ^ (n ^ 2)
+          ≤ 0 := by
     filter_upwards [self_mem_nhdsWithin] with r hr
     have hr' : (0 : ℝ) < r := hr
-    exact div_nonpos_iff.2 (Or.inr ⟨mul_nonpos_iff.2 (Or.inr ⟨hneg, ENNReal.toReal_nonneg⟩),
-      (pow_pos hr' _).le⟩)
+    exact div_nonpos_iff.2 (Or.inr
+      ⟨mul_nonpos_iff.2 (Or.inr ⟨hneg, ENNReal.toReal_nonneg⟩), (pow_pos hr' _).le⟩)
   have := le_of_tendsto hc hle
   linarith
 
-private theorem tendsto_gauge_ratio_volume_ball {n : ℕ} {ε : Fin n → Bool} {c : ℝ} (hc : GlobalTheory.Count.IsGauge ε c)
-    (hc0 : 0 < c) :
-    Tendsto (fun r : ℝ =>
-        c * (Formalism.REAL.muG ε {g | Formalism.REAL.hs (Formalism.MainNotions.S.uMat g - 1) < r ^ 2}).toReal / r ^ (n ^ 2))
+private theorem tendsto_gauge_ratio_volume_ball
+    {n : ℕ} {ε : Fin n → Bool} {c : ℝ} (hc : GlobalTheory.Count.IsGauge ε c) (hc0 : 0 < c)
+    : Tendsto
+      (fun r : ℝ =>
+        c * (Formalism.REAL.muG ε
+            {g | Formalism.REAL.hs (Formalism.MainNotions.S.uMat g - 1) < r ^ 2}).toReal
+          / r ^ (n ^ 2))
       (𝓝[>] 0) (𝓝 (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (n ^ 2))) 1)).toReal) := by
   set V := (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (n ^ 2))) 1)).toReal with hVdef
   set A : ℝ → ℝ≥0∞ := fun r =>
@@ -90,8 +102,9 @@ private theorem tendsto_gauge_ratio_volume_ball {n : ℕ} {ε : Fin n → Bool} 
       simpa using this.mono_left nhdsWithin_le_nhds
     · filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num)] with r hr
       exact mul_pos (by linarith [hr.2]) hr.1
-  have hlow : Tendsto (fun r : ℝ => (1 - r) ^ (n ^ 2) *
-      (c * (A ((1 - r) * r)).toReal / ((1 - r) * r) ^ (n ^ 2))) (𝓝[>] 0) (𝓝 V) := by
+  have hlow : Tendsto
+      (fun r : ℝ => (1 - r) ^ (n ^ 2) * (c * (A ((1 - r) * r)).toReal / ((1 - r) * r) ^ (n ^ 2)))
+      (𝓝[>] 0) (𝓝 V) := by
     simpa using h1.mul (hc'.comp h2)
   refine tendsto_of_tendsto_of_tendsto_of_le_of_le' hlow hc' ?_ ?_
   · filter_upwards [Ioo_mem_nhdsGT (show (0 : ℝ) < 1 by norm_num), hfin] with r hr hAr
@@ -102,8 +115,9 @@ private theorem tendsto_gauge_ratio_volume_ball {n : ℕ} {ε : Fin n → Bool} 
       ENNReal.toReal_mono hBfin (hAB r _ hr0 (by nlinarith))
     have hne1 : (1 - r) ^ (n ^ 2) ≠ 0 := pow_ne_zero _ h1r.ne'
     have hne2 : r ^ (n ^ 2) ≠ 0 := pow_ne_zero _ hr0.ne'
-    have heq : (1 - r) ^ (n ^ 2) * (c * (A ((1 - r) * r)).toReal / ((1 - r) * r) ^ (n ^ 2)) =
-        c * (A ((1 - r) * r)).toReal / r ^ (n ^ 2) := by
+    have heq
+        : (1 - r) ^ (n ^ 2) * (c * (A ((1 - r) * r)).toReal / ((1 - r) * r) ^ (n ^ 2))
+          = c * (A ((1 - r) * r)).toReal / r ^ (n ^ 2) := by
       rw [mul_pow]
       field_simp
     rw [heq]
@@ -113,7 +127,10 @@ private theorem tendsto_gauge_ratio_volume_ball {n : ℕ} {ε : Fin n → Bool} 
     exact div_le_div_of_nonneg_right
       (mul_le_mul_of_nonneg_left (ENNReal.toReal_mono hAr (hBA r hr0)) hc0.le) (pow_pos hr0 _).le
 
-theorem gauge_transport : ∀ (n : ℕ) (ε : Fin n → Bool) (c : ℝ) (P Q : ℕ) (f : Fin P ⊕ Fin Q ≃ Fin n) (hf : Sorts ε f), GlobalTheory.Count.IsGauge ε c → 0 < c ∧ HasEuclDensity ((ENNReal.ofReal c • Formalism.REAL.muG ε).map hf.equiv.symm) := by
+theorem gauge_transport
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (c : ℝ) (P Q : ℕ) (f : Fin P ⊕ Fin Q ≃ Fin n) (hf : Sorts ε f),
+      GlobalTheory.Count.IsGauge ε c
+        → 0 < c ∧ HasEuclDensity ((ENNReal.ofReal c • Formalism.REAL.muG ε).map hf.equiv.symm) := by
   intro n ε c P Q f hf hc
   have hc0 : 0 < c := pos_of_isGauge' hc
   refine ⟨hc0, ?_⟩
@@ -122,25 +139,36 @@ theorem gauge_transport : ∀ (n : ℕ) (ε : Fin n → Bool) (c : ℝ) (P Q : �
   have hVfin : volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (n ^ 2))) 1) ≠ ⊤ :=
     measure_ball_lt_top.ne
   set V := (volume (Metric.ball (0 : EuclideanSpace ℝ (Fin (n ^ 2))) 1)).toReal with hVdef
-  have hV : 0 < V :=
-    ENNReal.toReal_pos (Metric.measure_ball_pos _ _ one_pos).ne' hVfin
+  have hV : 0 < V := ENNReal.toReal_pos (Metric.measure_ball_pos _ _ one_pos).ne' hVfin
   have hlim := tendsto_gauge_ratio_volume_ball hc hc0
-  have key : ∀ r : ℝ, ((ENNReal.ofReal c • Formalism.REAL.muG ε).map hf.equiv.symm) {g | hsDist g < r ^ 2} =
-      ENNReal.ofReal c * Formalism.REAL.muG ε {k | Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) < r ^ 2} := by
+  have key
+      : ∀ r : ℝ,
+        ((ENNReal.ofReal c • Formalism.REAL.muG ε).map hf.equiv.symm) {g | hsDist g < r ^ 2}
+          = ENNReal.ofReal c * Formalism.REAL.muG ε
+            {k | Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) < r ^ 2} := by
     intro r
-    rw [Measure.map_apply (show Measurable (hf.equiv.symm : Formalism.REAL.UJ ε → UpqT P Q) from
-        hf.equiv.symm.continuous.measurable)
-      (measurableSet_lt continuous_hsDist.measurable measurable_const), Measure.smul_apply, smul_eq_mul]
+    rw [Measure.map_apply
+        (show Measurable (hf.equiv.symm : Formalism.REAL.UJ ε → UpqT P Q) from
+          hf.equiv.symm.continuous.measurable)
+        (measurableSet_lt continuous_hsDist.measurable measurable_const),
+      Measure.smul_apply, smul_eq_mul]
     congr 2
     ext k
     simp [hsDist_equiv_symm hf k]
-  have hBfin : ∀ᶠ r in 𝓝[>] (0 : ℝ),
-      Formalism.REAL.muG ε {k | Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) < r ^ 2} ≠ ⊤ := by
-    filter_upwards [hlim.eventually (lt_mem_nhds hV)] with r hr htop
-    rw [htop] at hr
-    simp at hr
-  have hlim' : Tendsto (fun r : ℝ => ENNReal.ofReal
-      (c * (Formalism.REAL.muG ε {k | Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) < r ^ 2}).toReal / r ^ (n ^ 2) / V))
+  have hBfin
+      : ∀ᶠ r in 𝓝[>] (0 : ℝ),
+        Formalism.REAL.muG ε {k | Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) < r ^ 2} ≠ ⊤ :=
+    by
+      filter_upwards [hlim.eventually (lt_mem_nhds hV)] with r hr htop
+      rw [htop] at hr
+      simp at hr
+  have hlim' : Tendsto
+      (fun r : ℝ =>
+        ENNReal.ofReal
+          (c
+            * (Formalism.REAL.muG ε
+              {k | Formalism.REAL.hs (Formalism.MainNotions.S.uMat k - 1) < r ^ 2}).toReal
+            / r ^ (n ^ 2) / V))
       (𝓝[>] 0) (𝓝 1) := by
     have := ENNReal.tendsto_ofReal (hlim.div_const V)
     rwa [div_self hV.ne', ENNReal.ofReal_one] at this

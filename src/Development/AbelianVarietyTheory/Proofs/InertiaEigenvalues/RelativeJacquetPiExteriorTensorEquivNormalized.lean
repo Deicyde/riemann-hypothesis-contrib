@@ -13,8 +13,11 @@ namespace GlobalTheory.JacPiTensor
 
 section Gen
 
-variable {ι : Type} [Fintype ι] [dec0 : DecidableEq ι] {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
-  {N : Type} [AddCommGroup N] [Module ℂ N] (p : ∀ i, Submodule ℂ (M i))
+variable
+  {ι : Type} [Fintype ι] [dec0 : DecidableEq ι]
+  {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)]
+  {N : Type} [AddCommGroup N] [Module ℂ N]
+  (p : ∀ i, Submodule ℂ (M i))
 
 def qlift (i : ι) (q : M i ⧸ p i) : M i := (Submodule.Quotient.mk_surjective (p i) q).choose
 
@@ -23,45 +26,55 @@ theorem mk_qlift (i : ι) (q : M i ⧸ p i) : Submodule.Quotient.mk (qlift p i q
 
 variable {p}
 
-theorem position_eq (f : (∀ i, M i) →ₘₗ[ℂ] N) (hf : ∀ v i, ∀ w ∈ p i, f (Function.update v i w) = 0)
-    (v : ∀ i, M i) (i : ι) {u u' : M i} (h : u - u' ∈ p i) :
-    f (Function.update v i u) = f (Function.update v i u') := by
+theorem position_eq
+    (f : (∀ i, M i) →ₘₗ[ℂ] N) (hf : ∀ v i, ∀ w ∈ p i, f (Function.update v i w) = 0)
+    (v : ∀ i, M i)
+    (i : ι)
+    {u u' : M i} (h : u - u' ∈ p i)
+    : f (Function.update v i u) = f (Function.update v i u') := by
   rw [← sub_eq_zero, ← f.map_update_sub]
   exact hf v i _ h
 
-def descend (f : (∀ i, M i) →ₘₗ[ℂ] N) (hf : ∀ v i, ∀ w ∈ p i, f (Function.update v i w) = 0) :
-    (∀ i, M i ⧸ p i) →ₘₗ[ℂ] N where
+def descend (f : (∀ i, M i) →ₘₗ[ℂ] N) (hf : ∀ v i, ∀ w ∈ p i, f (Function.update v i w) = 0)
+    : (∀ i, M i ⧸ p i) →ₘₗ[ℂ] N where
   toFun q := f fun i => qlift p i (q i)
   map_update_add' {dec} q i a b := by
     obtain rfl : dec = dec0 := Subsingleton.elim _ _
-    have e : ∀ c : M i ⧸ p i, (fun j => qlift p j (Function.update q i c j)) =
-        Function.update (fun j => qlift p j (q j)) i (qlift p i c) := fun c =>
+    have e
+        : ∀ c : M i ⧸ p i,
+          (fun j => qlift p j (Function.update q i c j))
+            = Function.update (fun j => qlift p j (q j)) i (qlift p i c) := fun c =>
       funext fun j => Function.apply_update (fun j => qlift p j) q i c j
     simp only [e]
     rw [position_eq f hf _ i (u' := qlift p i a + qlift p i b), f.map_update_add]
     rw [← Submodule.Quotient.eq, Submodule.Quotient.mk_add, mk_qlift, mk_qlift, mk_qlift]
   map_update_smul' {dec} q i c a := by
     obtain rfl : dec = dec0 := Subsingleton.elim _ _
-    have e : ∀ c : M i ⧸ p i, (fun j => qlift p j (Function.update q i c j)) =
-        Function.update (fun j => qlift p j (q j)) i (qlift p i c) := fun c =>
+    have e
+        : ∀ c : M i ⧸ p i,
+          (fun j => qlift p j (Function.update q i c j))
+            = Function.update (fun j => qlift p j (q j)) i (qlift p i c) := fun c =>
       funext fun j => Function.apply_update (fun j => qlift p j) q i c j
     simp only [e]
     rw [position_eq f hf _ i (u' := c • qlift p i a), f.map_update_smul]
     rw [← Submodule.Quotient.eq, Submodule.Quotient.mk_smul, mk_qlift, mk_qlift]
 
-theorem descend_mk (f : (∀ i, M i) →ₘₗ[ℂ] N) (hf : ∀ v i, ∀ w ∈ p i, f (Function.update v i w) = 0)
-    (x : ∀ i, M i) : descend f hf (fun i => Submodule.Quotient.mk (x i)) = f x := by
+theorem descend_mk
+    (f : (∀ i, M i) →ₘₗ[ℂ] N) (hf : ∀ v i, ∀ w ∈ p i, f (Function.update v i w) = 0) (x : ∀ i, M i)
+    : descend f hf (fun i => Submodule.Quotient.mk (x i)) = f x := by
   show f (fun i => qlift p i (Submodule.Quotient.mk (x i))) = f x
-  have key : ∀ s : Finset ι,
-      f (fun i => if i ∈ s then qlift p i (Submodule.Quotient.mk (x i)) else x i) = f x := by
+  have key
+      : ∀ s : Finset ι,
+        f (fun i => if i ∈ s then qlift p i (Submodule.Quotient.mk (x i)) else x i) = f x := by
     intro s
     induction s using Finset.induction_on with
     | empty => simp
     | insert a s ha ih =>
       rw [← ih]
       set F : ∀ i, M i := fun i => if i ∈ s then qlift p i (Submodule.Quotient.mk (x i)) else x i
-      have h1 : (fun i => if i ∈ insert a s then qlift p i (Submodule.Quotient.mk (x i)) else x i) =
-          Function.update F a (qlift p a (Submodule.Quotient.mk (x a))) := by
+      have h1
+          : (fun i => if i ∈ insert a s then qlift p i (Submodule.Quotient.mk (x i)) else x i)
+            = Function.update F a (qlift p a (Submodule.Quotient.mk (x a))) := by
         funext i
         by_cases hi : i = a
         · subst hi; simp
@@ -89,14 +102,16 @@ open scoped TensorProduct
 
 section Spec
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {s : ℕ} {d : Fin s → ℕ} {t : Fin s → ℕ} {d' : ∀ a, Fin (t a) → ℕ}
-  (e' : ∀ a, (Σ b, Fin (d' a b)) ≃ Fin (d a)) {X : Fin s → Type} [∀ a, AddCommGroup (X a)]
-  [∀ a, Module ℂ (X a)] (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a))
+  (e' : ∀ a, (Σ b, Fin (d' a b)) ≃ Fin (d a))
+  {X : Fin s → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+  (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a))
 
-theorem piTensor_mulSingle (a : Fin s) (g : GL (Fin (d a)) k) (x : ∀ j, X j) :
-    piTensor ρ (Pi.mulSingle a g) (PiTensorProduct.tprod ℂ x) =
-      PiTensorProduct.tprod ℂ (Function.update x a (ρ a g (x a))) := by
+theorem piTensor_mulSingle (a : Fin s) (g : GL (Fin (d a)) k) (x : ∀ j, X j)
+    : piTensor ρ (Pi.mulSingle a g) (PiTensorProduct.tprod ℂ x)
+      = PiTensorProduct.tprod ℂ (Function.update x a (ρ a g (x a))) := by
   rw [piTensor_tprod]
   congr 1
   funext j
@@ -107,13 +122,16 @@ theorem piTensor_mulSingle (a : Fin s) (g : GL (Fin (d a)) k) (x : ∀ j, X j) :
 def qf : (∀ a, X a) →ₘₗ[ℂ] Jacquet (piTensor ρ) (relUnipD k e') :=
   (twKer (piTensor ρ) (relUnipD k e') 1).mkQ.compMultilinearMap (PiTensorProduct.tprod ℂ)
 
-theorem qf_update (v : ∀ a, X a) (i : Fin s) (w : X i)
-    (hw : w ∈ twKer (ρ i) (unipRad k (e' i)) 1) : qf e' ρ (Function.update v i w) = 0 := by
-  have hle : twKer (ρ i) (unipRad k (e' i)) 1 ≤
-      (twKer (piTensor ρ) (relUnipD k e') 1).comap ((PiTensorProduct.tprod ℂ).toLinearMap v i) := by
+theorem qf_update (v : ∀ a, X a) (i : Fin s) (w : X i) (hw : w ∈ twKer (ρ i) (unipRad k (e' i)) 1)
+    : qf e' ρ (Function.update v i w) = 0 := by
+  have hle
+      : twKer (ρ i) (unipRad k (e' i)) 1
+        ≤ (twKer (piTensor ρ) (relUnipD k e') 1).comap
+          ((PiTensorProduct.tprod ℂ).toLinearMap v i) := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨n, y, rfl⟩
-    have hmem : (Pi.mulSingle i (n : GL (Fin (d i)) k) : ∀ a, GL (Fin (d a)) k) ∈ relUnipD k e' := by
+    have hmem
+        : (Pi.mulSingle i (n : GL (Fin (d i)) k) : ∀ a, GL (Fin (d a)) k) ∈ relUnipD k e' := by
       refine (Subgroup.mem_pi _).2 fun j _ => ?_
       by_cases h : j = i
       · subst h; simpa using n.2
@@ -140,32 +158,37 @@ open scoped TensorProduct
 
 section Spec2
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {s : ℕ} {d : Fin s → ℕ} {t : Fin s → ℕ} {d' : ∀ a, Fin (t a) → ℕ}
-  (e' : ∀ a, (Σ b, Fin (d' a b)) ≃ Fin (d a)) {X : Fin s → Type} [∀ a, AddCommGroup (X a)]
-  [∀ a, Module ℂ (X a)] (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a))
+  (e' : ∀ a, (Σ b, Fin (d' a b)) ≃ Fin (d a))
+  {X : Fin s → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+  (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a))
 
 def qmap : (⨂[ℂ] a, X a) →ₗ[ℂ] ⨂[ℂ] a, Jacquet (ρ a) (unipRad k (e' a)) :=
   PiTensorProduct.map fun a => (twKer (ρ a) (unipRad k (e' a)) 1).mkQ
 
-theorem qmap_tprod (x : ∀ a, X a) :
-    qmap e' ρ (PiTensorProduct.tprod ℂ x) =
-      PiTensorProduct.tprod ℂ fun a => (Submodule.Quotient.mk (x a) : Jacquet (ρ a) (unipRad k (e' a))) := by
+theorem qmap_tprod (x : ∀ a, X a)
+    : qmap e' ρ (PiTensorProduct.tprod ℂ x)
+      = PiTensorProduct.tprod ℂ fun a =>
+        (Submodule.Quotient.mk (x a) : Jacquet (ρ a) (unipRad k (e' a))) := by
   simp [qmap, PiTensorProduct.map_tprod]
 
-theorem qmap_comp (u : ∀ a, GL (Fin (d a)) k) (hu : u ∈ relUnipD k e') :
-    qmap e' ρ ∘ₗ piTensor ρ u = qmap e' ρ := by
+theorem qmap_comp (u : ∀ a, GL (Fin (d a)) k) (hu : u ∈ relUnipD k e')
+    : qmap e' ρ ∘ₗ piTensor ρ u = qmap e' ρ := by
   refine PiTensorProduct.ext (MultilinearMap.ext fun x => ?_)
   simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, piTensor_tprod, qmap_tprod]
   congr 1
   funext a
-  refine (Submodule.Quotient.eq _).2 (Submodule.subset_span ⟨⟨u a, (Subgroup.mem_pi _).1 hu a trivial⟩, x a, ?_⟩)
+  refine (Submodule.Quotient.eq _).2
+    (Submodule.subset_span ⟨⟨u a, (Subgroup.mem_pi _).1 hu a trivial⟩, x a, ?_⟩)
   simp
 
 theorem twKer_le_ker : twKer (piTensor ρ) (relUnipD k e') 1 ≤ LinearMap.ker (qmap e' ρ) := by
   refine Submodule.span_le.2 ?_
   rintro _ ⟨u, z, rfl⟩
-  simp only [SetLike.mem_coe, LinearMap.mem_ker, MonoidHom.one_apply, Units.val_one, one_smul, map_sub]
+  simp only [SetLike.mem_coe, LinearMap.mem_ker, MonoidHom.one_apply, Units.val_one, one_smul,
+    map_sub]
   rw [← LinearMap.comp_apply, qmap_comp e' ρ u u.2, sub_self]
 
 def fwd : Jacquet (piTensor ρ) (relUnipD k e') →ₗ[ℂ] ⨂[ℂ] a, Jacquet (ρ a) (unipRad k (e' a)) :=
@@ -174,24 +197,29 @@ def fwd : Jacquet (piTensor ρ) (relUnipD k e') →ₗ[ℂ] ⨂[ℂ] a, Jacquet 
 def bwd : (⨂[ℂ] a, Jacquet (ρ a) (unipRad k (e' a))) →ₗ[ℂ] Jacquet (piTensor ρ) (relUnipD k e') :=
   PiTensorProduct.lift (descend (qf e' ρ) (qf_update e' ρ))
 
-theorem bwd_tprod (q : ∀ a, Jacquet (ρ a) (unipRad k (e' a))) :
-    bwd e' ρ (PiTensorProduct.tprod ℂ q) = Submodule.Quotient.mk (PiTensorProduct.tprod ℂ
-      fun i => qlift (fun a => twKer (ρ a) (unipRad k (e' a)) 1) i (q i)) := by
+theorem bwd_tprod (q : ∀ a, Jacquet (ρ a) (unipRad k (e' a)))
+    : bwd e' ρ (PiTensorProduct.tprod ℂ q)
+      = Submodule.Quotient.mk (PiTensorProduct.tprod ℂ fun i =>
+        qlift (fun a => twKer (ρ a) (unipRad k (e' a)) 1) i (q i)) := by
   rw [bwd, PiTensorProduct.lift.tprod]
   rfl
 
-theorem bwd_tprod_mk (x : ∀ a, X a) :
-    bwd e' ρ (PiTensorProduct.tprod ℂ fun a => (Submodule.Quotient.mk (x a) : Jacquet (ρ a) (unipRad k (e' a)))) =
-      Submodule.Quotient.mk (PiTensorProduct.tprod ℂ x) := by
+theorem bwd_tprod_mk (x : ∀ a, X a)
+    : bwd e' ρ
+        (PiTensorProduct.tprod ℂ fun a =>
+          (Submodule.Quotient.mk (x a) : Jacquet (ρ a) (unipRad k (e' a))))
+      = Submodule.Quotient.mk (PiTensorProduct.tprod ℂ x) := by
   rw [bwd, PiTensorProduct.lift.tprod, descend_mk]
   rfl
 
-theorem fwd_mk_tprod' (x : ∀ a, X a) :
-    fwd e' ρ (Submodule.Quotient.mk (PiTensorProduct.tprod ℂ x)) =
-      PiTensorProduct.tprod ℂ fun a => (Submodule.Quotient.mk (x a) : Jacquet (ρ a) (unipRad k (e' a))) := by
+theorem fwd_mk_tprod' (x : ∀ a, X a)
+    : fwd e' ρ (Submodule.Quotient.mk (PiTensorProduct.tprod ℂ x))
+      = PiTensorProduct.tprod ℂ fun a =>
+        (Submodule.Quotient.mk (x a) : Jacquet (ρ a) (unipRad k (e' a))) := by
   simp only [fwd, Submodule.liftQ_apply, qmap_tprod]
 
-def jacEquiv : Jacquet (piTensor ρ) (relUnipD k e') ≃ₗ[ℂ] ⨂[ℂ] a, Jacquet (ρ a) (unipRad k (e' a)) :=
+def jacEquiv
+    : Jacquet (piTensor ρ) (relUnipD k e') ≃ₗ[ℂ] ⨂[ℂ] a, Jacquet (ρ a) (unipRad k (e' a)) :=
   LinearEquiv.ofLinear (fwd e' ρ) (bwd e' ρ)
     (by
       refine PiTensorProduct.ext (MultilinearMap.ext fun q => ?_)
@@ -199,12 +227,12 @@ def jacEquiv : Jacquet (piTensor ρ) (relUnipD k e') ≃ₗ[ℂ] ⨂[ℂ] a, Jac
       simp only [mk_qlift, LinearMap.compMultilinearMap_apply, LinearMap.id_apply])
     (by
       refine Submodule.linearMap_qext _ (PiTensorProduct.ext (MultilinearMap.ext fun x => ?_))
-      rw [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, LinearMap.comp_apply, Submodule.mkQ_apply,
-        fwd_mk_tprod', bwd_tprod_mk, LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, LinearMap.id_apply,
-        Submodule.mkQ_apply])
+      rw [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, LinearMap.comp_apply,
+        Submodule.mkQ_apply, fwd_mk_tprod', bwd_tprod_mk, LinearMap.compMultilinearMap_apply,
+        LinearMap.comp_apply, LinearMap.id_apply, Submodule.mkQ_apply])
 
-theorem relJacD_piTensor :
-    Nonempty ((relJacD e' (piTensor ρ)).Equiv (piTensor fun a => jac (e' a) (ρ a))) := by
+theorem relJacD_piTensor
+    : Nonempty ((relJacD e' (piTensor ρ)).Equiv (piTensor fun a => jac (e' a) (ρ a))) := by
   refine ⟨Representation.Equiv.mk (jacEquiv e' ρ) fun g => ?_⟩
   refine Submodule.linearMap_qext _ (PiTensorProduct.ext (MultilinearMap.ext fun x => ?_))
   simp only [LinearMap.compMultilinearMap_apply, LinearMap.comp_apply, Submodule.mkQ_apply]
@@ -222,11 +250,12 @@ end GlobalTheory.JacPiTensor
 
 namespace GlobalTheory.JacStages
 
-theorem relJacD_piTensor_equiv : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (s : ℕ) (d : Fin s → ℕ) (t : Fin s → ℕ) (d' : ∀ a, Fin (t a) → ℕ)
-    (e' : ∀ a, (Σ b, Fin (d' a b)) ≃ Fin (d a)) (X : Fin s → Type) [∀ a, AddCommGroup (X a)]
-    [∀ a, Module ℂ (X a)] (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a)),
-    Nonempty ((relJacD e' (piTensor ρ)).Equiv (piTensor fun a => jac (e' a) (ρ a))) :=
+theorem relJacD_piTensor_equiv
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (s : ℕ) (d : Fin s → ℕ) (t : Fin s → ℕ) (d' : ∀ a, Fin (t a) → ℕ)
+        (e' : ∀ a, (Σ b, Fin (d' a b)) ≃ Fin (d a)) (X : Fin s → Type) [∀ a, AddCommGroup (X a)]
+        [∀ a, Module ℂ (X a)] (ρ : ∀ a, Representation ℂ (GL (Fin (d a)) k) (X a)),
+      Nonempty ((relJacD e' (piTensor ρ)).Equiv (piTensor fun a => jac (e' a) (ρ a))) :=
   fun _ _ _ _ _ _ _ _ _ e' _ _ _ ρ => GlobalTheory.JacPiTensor.relJacD_piTensor e' ρ
 
 end GlobalTheory.JacStages

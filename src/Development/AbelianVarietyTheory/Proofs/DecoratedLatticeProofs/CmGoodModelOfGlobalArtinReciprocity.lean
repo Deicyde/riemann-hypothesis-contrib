@@ -11,7 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Che
 
 namespace GlobalTheory.Corev.CmTwoClosing
 
-theorem cmGoodModel_of_globalArtinReciprocity (hA : GlobalTheory.Published.GlobalArtinReciprocity) : Formalism.L2.Th1.CM.CM2 :=
-  GlobalTheory.T.cmLattice_good_model_unramified (GlobalTheory.T.exists_idealClass_artinSymbol_of_globalArtin hA) GlobalTheory.T.chebotarev_degreeOne_valuationSubrings
+theorem cmGoodModel_of_globalArtinReciprocity (hA : GlobalTheory.Published.GlobalArtinReciprocity)
+    : Formalism.L2.Th1.CM.CM2 :=
+  GlobalTheory.T.cmLattice_good_model_unramified
+    (GlobalTheory.T.exists_idealClass_artinSymbol_of_globalArtin hA)
+    GlobalTheory.T.chebotarev_degreeOne_valuationSubrings
 
 end GlobalTheory.Corev.CmTwoClosing

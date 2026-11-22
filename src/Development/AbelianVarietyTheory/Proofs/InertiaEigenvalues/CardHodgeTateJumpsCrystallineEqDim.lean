@@ -16,20 +16,26 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.QuotientImageDivisi
 
 @[expose] public section
 
-open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
 set_option synthInstance.maxHeartbeats 400000
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
 
 namespace GlobalTheory.Per.LetterJumps
 
-theorem card_jumps_letter : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P), Nonempty (LocTied l P AI) →
-    ∀ (H : LocHW l P) (K LL : FinExt l) (hA : CaseA K LL) (V : Type) [AddCommGroup V] [Module ↥LL.1 V]
-      [Module ℚ_[l] V] [IsScalarTower ℚ_[l] ↥LL.1 V] [FiniteDimensional ↥LL.1 V]
-      (ρ : Representation ↥LL.1 ↥(GK K) V) (U : ZMod (Module.finrank ℚ_[l] ↥(K0 K)) → Multiset ℤ),
-      IsCrys (P.PD K) ρ →
-      (∀ i τ, tableLineDegreeTwo.Over (H.W K 1 LL hA.2.2).emb i τ → ∀ a, multV (P.PD K) ρ τ a = (U i).count a) →
-      ∀ i, Multiset.card (U i) = Module.finrank ↥LL.1 V := by
+theorem card_jumps_letter
+    : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      Nonempty (LocTied l P AI)
+        → ∀ (H : LocHW l P) (K LL : FinExt l) (hA : CaseA K LL) (V : Type) [AddCommGroup V]
+            [Module ↥LL.1 V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] ↥LL.1 V]
+            [FiniteDimensional ↥LL.1 V] (ρ : Representation ↥LL.1 ↥(GK K) V)
+            (U : ZMod (Module.finrank ℚ_[l] ↥(K0 K)) → Multiset ℤ),
+          IsCrys (P.PD K) ρ
+            → (∀ i τ,
+              tableLineDegreeTwo.Over (H.W K 1 LL hA.2.2).emb i τ
+                → ∀ a, multV (P.PD K) ρ τ a = (U i).count a)
+            → ∀ i, Multiset.card (U i) = Module.finrank ↥LL.1 V := by
   intro l _ P AI hT H K LL hA V _ _ _ _ _ ρ U hC hU i
   classical
   obtain ⟨T⟩ := hT
@@ -43,11 +49,13 @@ theorem card_jumps_letter : ∀ {l : ℕ} [Fact l.Prime] (P : LocPrime l) (AI : 
     show (H.W K 1 LL hA.2.2).emb i (eK (algebraMap ↥(K0 K) ↥K.1 x)) = (H.W K 1 LL hA.2.2).emb i x
     congr 1
   have hc : Nat.card (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) = Module.finrank ℚ_[l] ↥K.1 := by
-    rw [← Nat.card_congr ((IntermediateField.equivOfEq e).arrowCongr (AlgEquiv.refl : ↥LL.1 ≃ₐ[ℚ_[l]] ↥LL.1)),
+    rw [← Nat.card_congr ((IntermediateField.equivOfEq e).arrowCongr
+        (AlgEquiv.refl : ↥LL.1 ≃ₐ[ℚ_[l]] ↥LL.1)),
       ← Nat.card_congr (Equiv.ofBijective _ (H.W K 1 LL hA.2.2).emb_bij), Nat.card_zmod]
     exact (IntermediateField.equivOfEq e).toLinearEquiv.finrank_eq
-  have hdim := (GlobalTheory.Per.LetterDim.tied_letter_component_finrank l P AI T K LL V ρ).2 hc
-    (GlobalTheory.TopSteps.CrysRules.isDR T K LL ρ hC) τ
+  have hdim :=
+    (GlobalTheory.Per.LetterDim.tied_letter_component_finrank l P AI T K LL V ρ).2 hc
+      (GlobalTheory.TopSteps.CrysRules.isDR T K LL ρ hC) τ
   haveI := (GlobalTheory.Per.FontaineBound.ddR_finite_le (P.PD K) (GlobalTheory.RegularRing.isField_of_tied T) ρ).1
   haveI : FiniteDimensional ↥LL.1 ↥(DdRE (P.PD K) ρ τ) :=
     Submodule.finiteDimensional_of_le (S₂ := DdR (P.PD K) ρ) inf_le_left

@@ -7,14 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.ScaledBas
 
 open MeasureTheory ValuativeRel Matrix
 open scoped Pointwise
-open GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
+open GlobalTheory.SplitWeil GlobalTheory.RootEx
+  GlobalTheory.IndefiniteRowSideFullHecke.ExponentTerms GlobalTheory.RootEx.UnfoldShape
 
 namespace GlobalTheory.RootEx.UnfoldShape
 
-theorem exists_isReps_of_fg (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ι : Type) [Fintype ι] [DecidableEq ι] (ϖ : 𝒪[k])
-    (hϖ : Irreducible ϖ) (M : Submodule 𝒪[k] (ι → k)) (hM : M.FG) :
-    ∃ T : Finset (ι → k), IsReps ϖ M T := by
+theorem exists_isReps_of_fg
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (ϖ : 𝒪[k]) (hϖ : Irreducible ϖ)
+    (M : Submodule 𝒪[k] (ι → k)) (hM : M.FG)
+    : ∃ T : Finset (ι → k), IsReps ϖ M T := by
   classical
   have h1 : Finite (𝒪[k] ⧸ Ideal.span {ϖ}) := by
     rw [← hϖ.maximalIdeal_eq]
@@ -47,8 +50,11 @@ theorem exists_isReps_of_fg (k : Type) [Field k] [ValuativeRel k] [TopologicalSp
       intro q
       conv_rhs => rw [← hs q, Submodule.Quotient.eq, hmem]
       rfl
-    refine ⟨s (Submodule.Quotient.mk ⟨v, hv⟩), ⟨Finset.mem_image.mpr ⟨_, Finset.mem_univ _, rfl⟩,
-      (key _).mpr rfl⟩, ?_⟩
+    refine ⟨
+      s (Submodule.Quotient.mk ⟨v, hv⟩),
+      ⟨Finset.mem_image.mpr ⟨_, Finset.mem_univ _, rfl⟩, (key _).mpr rfl⟩,
+      ?_
+    ⟩
     rintro t ⟨ht, h⟩
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.mp ht
     rw [(key q).mp h]

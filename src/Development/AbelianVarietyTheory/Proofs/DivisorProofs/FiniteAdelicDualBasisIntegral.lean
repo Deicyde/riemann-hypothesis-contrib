@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AdeleJoinZer
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
 open IsDedekindDomain NumberField
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Matrix
 open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model Chr incM)
@@ -23,8 +24,8 @@ namespace GlobalTheory.WeilL2Words
 
 open MeasureTheory
 
-theorem enorm_sum_mul_sq_le {m : ℕ} (a b : Fin m → ℂ) :
-    ‖∑ i, a i * b i‖ₑ ^ 2 ≤ (∑ i, ‖b i‖ₑ ^ 2) * ∑ i, ‖a i‖ₑ ^ 2 := by
+theorem enorm_sum_mul_sq_le {m : ℕ} (a b : Fin m → ℂ)
+    : ‖∑ i, a i * b i‖ₑ ^ 2 ≤ (∑ i, ‖b i‖ₑ ^ 2) * ∑ i, ‖a i‖ₑ ^ 2 := by
   have h1 : ‖∑ i, a i * b i‖₊ ≤ ∑ i, ‖b i‖₊ * ‖a i‖₊ := by
     refine (nnnorm_sum_le _ _).trans (le_of_eq ?_)
     simp [nnnorm_mul, mul_comm]
@@ -33,24 +34,34 @@ theorem enorm_sum_mul_sq_le {m : ℕ} (a b : Fin m → ℂ) :
   simp only [enorm_eq_nnnorm]
   exact_mod_cast h2
 
-theorem slice_le_l2A (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype κ] (m : ℕ)
-    (g : Fin m → (κ → FiniteAdeleRing (𝓞 F) F) → ℂ) (yy : Fin m → (κ → FiniteAdeleRing (𝓞 F) F))
-    (hg : ∀ i, g i ∈ GlobalTheory.WeilM.SB (κ → FiniteAdeleRing (𝓞 F) F)) (hyy : ∀ i j, g i (yy j) = if i = j then 1 else 0)
+theorem slice_le_l2A
+    (F : Type) [Field F] [NumberField F]
+    (κ : Type) [Fintype κ]
+    (m : ℕ) (g : Fin m → (κ → FiniteAdeleRing (𝓞 F) F) → ℂ)
+    (yy : Fin m → (κ → FiniteAdeleRing (𝓞 F) F))
+    (hg : ∀ i, g i ∈ GlobalTheory.WeilM.SB (κ → FiniteAdeleRing (𝓞 F) F))
+    (hyy : ∀ i j, g i (yy j) = if i = j then 1 else 0)
     (μ : @MeasureTheory.Measure (κ → FiniteAdeleRing (𝓞 F) F) (borel _))
     (hμ : @MeasureTheory.Measure.IsAddHaarMeasure _ _ _ (borel _) μ)
-    (y : κ → FiniteAdeleRing (𝓞 F) F) : ∃ C : ENNReal, C ≠ ⊤ ∧
-      ∀ f : Fin m → SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ,
-      ∫⁻ x, ‖(∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y)‖ₑ ^ 2 ≤
-        C * GlobalTheory.WeilL2Words.l2A F μ (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) := by
-  have hmeas : ∀ f : SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ, Measurable fun x => ‖f x‖ₑ ^ 2 :=
-    fun f => by
-      haveI : OpensMeasurableSpace (κ → mixedEmbedding.mixedSpace F) := inferInstance
-      exact (f.continuous.measurable.enorm).pow_const 2
+    (y : κ → FiniteAdeleRing (𝓞 F) F)
+    : ∃ C : ENNReal,
+      C ≠ ⊤
+        ∧ ∀ f : Fin m → SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ,
+          ∫⁻ x, ‖(∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y)‖ₑ ^ 2
+            ≤ C
+              * GlobalTheory.WeilL2Words.l2A F μ (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) := by
+  have hmeas
+      : ∀ f : SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ,
+        Measurable fun x => ‖f x‖ₑ ^ 2 := fun f => by
+    haveI : OpensMeasurableSpace (κ → mixedEmbedding.mixedSpace F) := inferInstance
+    exact (f.continuous.measurable.enorm).pow_const 2
   letI : MeasurableSpace (κ → FiniteAdeleRing (𝓞 F) F) := borel _
   haveI : BorelSpace (κ → FiniteAdeleRing (𝓞 F) F) := ⟨rfl⟩
   haveI := hμ
-  have hev : ∀ (f : Fin m → SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ) x y',
-      (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y') = ∑ i, f i x * g i y' := by
+  have hev
+      : ∀ (f : Fin m → SchwartzMap (κ → mixedEmbedding.mixedSpace F) ℂ) x y',
+        (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y')
+          = ∑ i, f i x * g i y' := by
     intro f x y'
     rw [Finset.sum_apply]
     exact Finset.sum_congr rfl fun i _ => GlobalTheory.WeilCont.pureA_adeleJoin F _ _ x y'
@@ -68,15 +79,24 @@ theorem slice_le_l2A (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype �
     apply subset_tsupport
     rw [Function.mem_support, hUv j y' hy' j, if_pos rfl]
     exact one_ne_zero
-  have hB : (∑ i, ‖g i y‖ₑ ^ 2) ≠ ⊤ := ENNReal.sum_ne_top.2 fun i _ => ENNReal.pow_ne_top enorm_ne_top
-  refine ⟨(∑ i, ‖g i y‖ₑ ^ 2) * ∑ j, (μ (U j))⁻¹, ENNReal.mul_ne_top hB
-    (ENNReal.sum_ne_top.2 fun j _ => ENNReal.inv_ne_top.2 (hU0 j)), ?_⟩
+  have hB : (∑ i, ‖g i y‖ₑ ^ 2) ≠ ⊤ :=
+    ENNReal.sum_ne_top.2 fun i _ => ENNReal.pow_ne_top enorm_ne_top
+  refine ⟨
+    (∑ i, ‖g i y‖ₑ ^ 2) * ∑ j, (μ (U j))⁻¹,
+    ENNReal.mul_ne_top hB (ENNReal.sum_ne_top.2 fun j _ => ENNReal.inv_ne_top.2 (hU0 j)),
+    ?_
+  ⟩
   intro f
-  have hA : ∀ j, ∫⁻ x, ‖f j x‖ₑ ^ 2 ≤ (μ (U j))⁻¹ * GlobalTheory.WeilL2Words.l2A F μ (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) := by
+  have hA
+      : ∀ j,
+        ∫⁻ x, ‖f j x‖ₑ ^ 2
+          ≤ (μ (U j))⁻¹
+            * GlobalTheory.WeilL2Words.l2A F μ (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) := by
     intro j
     rw [← ENNReal.div_eq_inv_mul, ENNReal.le_div_iff_mul_le (Or.inl (hU0 j)) (Or.inl (hUt j))]
-    have e : ∫⁻ y' in U j, (∫⁻ x, ‖(∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y')‖ₑ ^ 2) ∂μ
-        = ∫⁻ y' in U j, (∫⁻ x, ‖f j x‖ₑ ^ 2) ∂μ := by
+    have e
+        : ∫⁻ y' in U j, (∫⁻ x, ‖(∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y')‖ₑ ^ 2) ∂μ
+          = ∫⁻ y' in U j, (∫⁻ x, ‖f j x‖ₑ ^ 2) ∂μ := by
       refine setLIntegral_congr_fun (hUo j).measurableSet (fun y' hy' => ?_)
       refine lintegral_congr fun x => ?_
       rw [hev, Finset.sum_eq_single j]
@@ -88,16 +108,19 @@ theorem slice_le_l2A (F : Type) [Field F] [NumberField F] (κ : Type) [Fintype �
     rw [setLIntegral_const] at e
     rw [← e]
     exact setLIntegral_le_lintegral _ _
-  calc ∫⁻ x, ‖(∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y)‖ₑ ^ 2
-      ≤ ∫⁻ x, (∑ i, ‖g i y‖ₑ ^ 2) * ∑ i, ‖f i x‖ₑ ^ 2 := by
-        refine lintegral_mono fun x => ?_
-        rw [hev]
-        exact enorm_sum_mul_sq_le _ _
+  calc
+    ∫⁻ x, ‖(∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) (GlobalTheory.WeilCont.adeleJoin F x y)‖ₑ ^ 2
+        ≤ ∫⁻ x, (∑ i, ‖g i y‖ₑ ^ 2) * ∑ i, ‖f i x‖ₑ ^ 2 := by
+      refine lintegral_mono fun x => ?_
+      rw [hev]
+      exact enorm_sum_mul_sq_le _ _
     _ = (∑ i, ‖g i y‖ₑ ^ 2) * ∑ i, ∫⁻ x, ‖f i x‖ₑ ^ 2 := by
-        rw [lintegral_const_mul' _ _ hB, lintegral_finsetSum]
-        intro i _
-        exact hmeas (f i)
-    _ ≤ (∑ i, ‖g i y‖ₑ ^ 2) * ∑ j, (μ (U j))⁻¹ * GlobalTheory.WeilL2Words.l2A F μ (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) := by
+      rw [lintegral_const_mul' _ _ hB, lintegral_finsetSum]
+      intro i _
+      exact hmeas (f i)
+    _ ≤ (∑ i, ‖g i y‖ₑ ^ 2)
+        * ∑ j, (μ (U j))⁻¹ * GlobalTheory.WeilL2Words.l2A F μ (∑ i, GlobalTheory.WeilM.pureA F (f i) (g i)) :=
+      by
         gcongr with j
         exact hA j
     _ = _ := by rw [← Finset.sum_mul, mul_assoc]

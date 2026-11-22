@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,15 +22,17 @@ section
 
 variable {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] {L : LB A.left}
 
-theorem memKL_mul_inv_of_eq (hL : L.IsLB) {Z : Over S} (x x' : Z ⟶ A)
+theorem memKL_mul_inv_of_eq
+    (hL : L.IsLB)
+    {Z : Over S} (x x' : Z ⟶ A)
     (h : ∀ (W : Over S) (a : W ⟶ A) (z : W ⟶ Z),
-      CechPic.pull (a * (z ≫ x)).left (cls L hL) - CechPic.pull (z ≫ x).left (cls L hL) =
-        CechPic.pull (a * (z ≫ x')).left (cls L hL) - CechPic.pull (z ≫ x').left (cls L hL)) :
-    GlobalTheory.MemKL A L (x * x'⁻¹) := by
+      CechPic.pull (a * (z ≫ x)).left (cls L hL) - CechPic.pull (z ≫ x).left (cls L hL)
+        = CechPic.pull (a * (z ≫ x')).left (cls L hL) - CechPic.pull (z ≫ x').left (cls L hL))
+    : GlobalTheory.MemKL A L (x * x'⁻¹) := by
   intro p
   have hD : (Out.translDiff A L (x * x'⁻¹)).IsLB := LB.isLB_linComb hL _ _
-  obtain ⟨V, hV, hc⟩ := exists_pull_eq_zero
-    (CechPic.pull x.left (cls L hL) - CechPic.pull x'.left (cls L hL)) p
+  obtain ⟨V, hV, hc⟩ :=
+    exists_pull_eq_zero (CechPic.pull x.left (cls L hL) - CechPic.pull x'.left (cls L hL)) p
   refine ⟨V, hV, (cls_eq_zero_iff (pull_isLB hD _)).1 ?_⟩
   have e₁ := pull_translDiff hL (x * x'⁻¹) hD (fst Z A) (snd Z A)
   rw [lift_fst_snd, Over.id_left, pull_id] at e₁
@@ -38,8 +43,10 @@ theorem memKL_mul_inv_of_eq (hL : L.IsLB) {Z : Over S} (x x' : Z ⟶ A)
     rw [mul_comm, mul_inv_cancel_left]
   have e₃ := h (Z ⊗ A) ((fst Z A ≫ x')⁻¹ * snd Z A) (fst Z A)
   rw [k₁, k₂] at e₃
-  have e₂ : cls _ hD = CechPic.pull (fst Z A).left
-      (CechPic.pull x.left (cls L hL) - CechPic.pull x'.left (cls L hL)) := by
+  have e₂
+      : cls _ hD
+        = CechPic.pull (fst Z A).left
+          (CechPic.pull x.left (cls L hL) - CechPic.pull x'.left (cls L hL)) := by
     rw [e₁, map_sub, ← pull_comp, ← pull_comp, ← Over.comp_left, ← Over.comp_left]
     exact sub_eq_sub_iff_sub_eq_sub.1 e₃
   rw [cls_pull hD, e₂, ← pull_comp]
@@ -47,7 +54,22 @@ theorem memKL_mul_inv_of_eq (hL : L.IsLB) {Z : Over S} (x x' : Z ⟶ A)
 
 end
 
-theorem inj_of_quotient : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ), IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → ∀ (L : LB A.left) (hL : L.IsLB), Out.RelAmple A L → ∀ (B : Over (Sp R)) (P : LB (A ⊗ B).left) (q : A ⟶ B) (hP : Fam A P), IsFinite q.left → Flat q.left → Surjective q.left → (∀ (Y : Over (Sp R)) (a x : Y ⟶ A), evc hP.isLB a (x ≫ q) = GlobalTheory.CechPic.pull (a * x).left (cls L hL) - GlobalTheory.CechPic.pull a.left (cls L hL) - GlobalTheory.CechPic.pull x.left (cls L hL) + GlobalTheory.CechPic.pull (1 : Y ⟶ A).left (cls L hL)) → (∀ (Y : Over (Sp R)) (x y : Y ⟶ A), x ≫ q = y ≫ q ↔ GlobalTheory.MemKL A L (x * y⁻¹)) → Inj A P := by
+theorem inj_of_quotient
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ),
+      IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
+        → ∀ (L : LB A.left) (hL : L.IsLB),
+          Out.RelAmple A L
+            → ∀ (B : Over (Sp R)) (P : LB (A ⊗ B).left) (q : A ⟶ B) (hP : Fam A P),
+              IsFinite q.left → Flat q.left → Surjective q.left
+                → (∀ (Y : Over (Sp R)) (a x : Y ⟶ A),
+                  evc hP.isLB a (x ≫ q)
+                    = GlobalTheory.CechPic.pull (a * x).left (cls L hL)
+                      - GlobalTheory.CechPic.pull a.left (cls L hL)
+                      - GlobalTheory.CechPic.pull x.left (cls L hL)
+                      + GlobalTheory.CechPic.pull (1 : Y ⟶ A).left (cls L hL))
+                → (∀ (Y : Over (Sp R)) (x y : Y ⟶ A),
+                  x ≫ q = y ≫ q ↔ GlobalTheory.MemKL A L (x * y⁻¹))
+                → Inj A P := by
   intro R _ _ A _ g hA _ L hL _ B P q hP _ hflat hsurj hev hKL
   haveI : IsCommMonObj A := hA.comm
   haveI : Flat q.left := hflat
@@ -60,8 +82,7 @@ theorem inj_of_quotient : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (A : 
   let f₂ := pullback.fst q.left (s₁ ≫ u'.left)
   let Z : Over (Sp R) := Over.mk (s₂ ≫ s₁ ≫ Y.hom)
   let c : Z ⟶ Y := Over.homMk (s₂ ≫ s₁) (by simp [Z])
-  have w₁ : f₁ ≫ A.hom = s₁ ≫ Y.hom := by
-    rw [← Over.w q, pullback.condition_assoc, Over.w u]
+  have w₁ : f₁ ≫ A.hom = s₁ ≫ Y.hom := by rw [← Over.w q, pullback.condition_assoc, Over.w u]
   have w₂ : f₂ ≫ A.hom = s₂ ≫ s₁ ≫ Y.hom := by
     rw [← Over.w q, pullback.condition_assoc, Category.assoc, Over.w u']
   let x : Z ⟶ A := Over.homMk (s₂ ≫ f₁) (by simp [Z, w₁])

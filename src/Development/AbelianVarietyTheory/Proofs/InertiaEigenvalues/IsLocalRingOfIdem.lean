@@ -11,11 +11,15 @@ noncomputable section
 
 namespace GlobalTheory.UnitLemma.Orbit
 
-open GlobalTheory.UnitLemma Polynomial IsLocalRing ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion
+open GlobalTheory.UnitLemma Polynomial IsLocalRing
+  ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion
 
-theorem isLocalRing_of_idem {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
-    [IsAdicComplete (maximalIdeal R) R] (S : Type*) [CommRing S] [Nontrivial S] [Algebra R S]
-    [Module.Finite R S] (hid : ∀ e : S, e * e = e → e = 0 ∨ e = 1) : IsLocalRing S := by
+theorem isLocalRing_of_idem
+    {R : Type*}
+    [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R]
+    (S : Type*) [CommRing S] [Nontrivial S] [Algebra R S] [Module.Finite R S]
+    (hid : ∀ e : S, e * e = e → e = 0 ∨ e = 1)
+    : IsLocalRing S := by
   classical
   by_contra hloc
   obtain ⟨M1, hM1⟩ := Ideal.exists_maximal S
@@ -31,8 +35,7 @@ theorem isLocalRing_of_idem {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetheri
     exact ⟨hN, hN1⟩
   have hcop : M1 ⊔ F.inf id = ⊤ := by
     by_contra hne
-    have hle : F.inf id ≤ M1 := by
-      rw [hM1.eq_of_le hne le_sup_left]; exact le_sup_right
+    have hle : F.inf id ≤ M1 := by rw [hM1.eq_of_le hne le_sup_left]; exact le_sup_right
     obtain ⟨N, hN, hNle⟩ := (hM1.isPrime.inf_le').1 hle
     rw [hF, Finset.mem_filter, Set.Finite.mem_toFinset] at hN
     exact hN.2 ((hN.1 : N.IsMaximal).eq_of_le hM1.ne_top hNle)
@@ -42,18 +45,21 @@ theorem isLocalRing_of_idem {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetheri
     intro N hN hN1
     have : y ∈ N := Finset.inf_le (f := id) (hmemF N hN hN1) hy
     have : x - 1 = -y := by rw [← hxy]; ring
-    rw [this]; exact N.neg_mem (by assumption)
+    rw [this]
+    exact N.neg_mem (by assumption)
   have hall : ∀ N : Ideal S, N.IsMaximal → x * x - x ∈ N := by
     intro N hN
     by_cases hN1 : N = M1
     · subst hN1; exact Ideal.sub_mem _ (Ideal.mul_mem_left _ _ hx) hx
     · have := hx1 N hN hN1
       have e : x * x - x = x * (x - 1) := by ring
-      rw [e]; exact Ideal.mul_mem_left _ _ this
+      rw [e]
+      exact Ideal.mul_mem_left _ _ this
   obtain ⟨k, hk, hkJ⟩ := exists_pow_mem_map_maximalIdeal (R := R) S _ hall
   have : IsAdicComplete ((maximalIdeal R).map (algebraMap R S)) S := isAdicComplete_finite_algebra S
   obtain ⟨k', rfl⟩ := Nat.exists_eq_succ_of_ne_zero hk.ne'
-  obtain ⟨e, s, hee, hes⟩ := exists_idempotent_henselian ((maximalIdeal R).map (algebraMap R S)) x k' hkJ
+  obtain ⟨e, s, hee, hes⟩ :=
+    exists_idempotent_henselian ((maximalIdeal R).map (algebraMap R S)) x k' hkJ
   have hxx1 : x * x - x ∈ M1 := hall M1 hM1
   have hxx2 : x * x - x ∈ M2 := hall M2 hM2
   rcases hid e hee with h0 | h0
@@ -61,14 +67,17 @@ theorem isLocalRing_of_idem {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetheri
     rw [Ideal.eq_top_iff_one]
     have ha : -x ∈ M2 := by
       have : -x = s * (x * x - x) := by rw [← hes, h0]; ring
-      rw [this]; exact Ideal.mul_mem_left _ _ hxx2
+      rw [this]
+      exact Ideal.mul_mem_left _ _ hxx2
     have hb := hx1 M2 hM2 h12
     have : (1 : S) = -(x - 1) + -(-x) := by ring
-    rw [this]; exact M2.add_mem (M2.neg_mem hb) (M2.neg_mem ha)
+    rw [this]
+    exact M2.add_mem (M2.neg_mem hb) (M2.neg_mem ha)
   · apply hM1.ne_top
     rw [Ideal.eq_top_iff_one]
     have : (1 : S) = s * (x * x - x) + x := by rw [← hes, h0]; ring
-    rw [this]; exact M1.add_mem (Ideal.mul_mem_left _ _ hxx1) hx
+    rw [this]
+    exact M1.add_mem (Ideal.mul_mem_left _ _ hxx1) hx
 
 variable {K : UQ}
 
@@ -77,10 +86,12 @@ theorem val_unit (u : K.O) (hu : IsUnit u) : val K.O (algebraMap K.O K.E u) = 0 
   have : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (algebraMap K.O K.E u) = 1 := by
     rw [IsDedekindDomain.HeightOneSpectrum.valuation_eq_one_iff_notMem]
     exact fun h => (mem_maximalIdeal u).1 h hu
-  rw [this]; simp
+  rw [this]
+  simp
 
-theorem charpoly_dvd_map_of_aeval_eq_zero (B : InvAlg K) (hs : B.P.Separable) (f : K.O[X]) (hf : aeval B.g f = 0) :
-    B.P ∣ f.map (algebraMap K.O K.E) := by
+theorem charpoly_dvd_map_of_aeval_eq_zero
+    (B : InvAlg K) (hs : B.P.Separable) (f : K.O[X]) (hf : aeval B.g f = 0)
+    : B.P ∣ f.map (algebraMap K.O K.E) := by
   have h0 : aeval (LinearMap.mulLeft K.E B.g) (f.map (algebraMap K.O K.E)) = 0 := by
     have := Polynomial.aeval_algHom_apply (Algebra.lmul K.E B.A) B.g (f.map (algebraMap K.O K.E))
     rw [aeval_map_algebraMap K.E B.g f, hf, map_zero] at this
@@ -90,33 +101,43 @@ theorem charpoly_dvd_map_of_aeval_eq_zero (B : InvAlg K) (hs : B.P.Separable) (f
   classical
   have hP : B.P ≠ 0 := hs.ne_zero
   rw [UniqueFactorizationMonoid.dvd_iff_normalizedFactors_le_normalizedFactors hP hz,
-    Multiset.le_iff_subset ((UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hP).1 hs.squarefree)]
+    Multiset.le_iff_subset ((UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hP).1
+      hs.squarefree)]
   intro p hp
   rw [Polynomial.mem_normalizedFactors_iff hP] at hp
   rw [Polynomial.mem_normalizedFactors_iff hz]
-  exact ⟨hp.1, hp.2.1, GlobalTheory.CuspGL.irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero _ _ _ hp.1 hp.2.2 h0⟩
+  exact ⟨
+    hp.1,
+    hp.2.1,
+    GlobalTheory.CuspGL.irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero _ _ _ hp.1 hp.2.2 h0
+  ⟩
 
-theorem exists_monic_map_eq_charpoly₂ (B : InvAlg K) (hs : B.P.Separable) (hi : IsIntegral K.O B.g) :
-    ∃ p : K.O[X], p.Monic ∧ p.map (algebraMap K.O K.E) = B.P := by
+theorem exists_monic_map_eq_charpoly₂ (B : InvAlg K) (hs : B.P.Separable) (hi : IsIntegral K.O B.g)
+    : ∃ p : K.O[X], p.Monic ∧ p.map (algebraMap K.O K.E) = B.P := by
   obtain ⟨m, hm, hm0⟩ := hi
   have hP : B.P.Monic := LinearMap.charpoly_monic _
-  obtain ⟨p, hp⟩ := IsIntegrallyClosed.eq_map_mul_C_of_dvd K.E hm (charpoly_dvd_map_of_aeval_eq_zero B hs m hm0)
+  obtain ⟨p, hp⟩ :=
+    IsIntegrallyClosed.eq_map_mul_C_of_dvd K.E hm (charpoly_dvd_map_of_aeval_eq_zero B hs m hm0)
   rw [hP.leadingCoeff, C_1, mul_one] at hp
   exact ⟨p, monic_of_injective (IsFractionRing.injective K.O K.E) (hp ▸ hP), hp⟩
 
-theorem val_resultant (B C : InvAlg K) (hB : B.P.Separable) (hC : C.P.Separable) (iB : IsIntegral K.O B.g)
-    (iC : IsIntegral K.O C.g) (f : K.O[X]) (h0 : aeval B.g f = 0) (h1 : aeval C.g f = 1) :
-    val K.O (resultant B.P C.P) = 0 := by
+theorem val_resultant
+    (B C : InvAlg K)
+    (hB : B.P.Separable) (hC : C.P.Separable) (iB : IsIntegral K.O B.g) (iC : IsIntegral K.O C.g)
+    (f : K.O[X]) (h0 : aeval B.g f = 0) (h1 : aeval C.g f = 1)
+    : val K.O (resultant B.P C.P) = 0 := by
   obtain ⟨p, hp, ep⟩ := exists_monic_map_eq_charpoly₂ B hB iB
   obtain ⟨q, hq, eq⟩ := exists_monic_map_eq_charpoly₂ C hC iC
   have hinj := IsFractionRing.injective K.O K.E
   have d1 : p ∣ f := (map_dvd_map _ hinj hp).1 (ep ▸ charpoly_dvd_map_of_aeval_eq_zero B hB f h0)
-  have d2 : q ∣ 1 - f := (map_dvd_map _ hinj hq).1 (eq ▸ charpoly_dvd_map_of_aeval_eq_zero C hC (1 - f) (by simp [h1]))
+  have d2 : q ∣ 1 - f :=
+    (map_dvd_map _ hinj hq).1 (eq ▸ charpoly_dvd_map_of_aeval_eq_zero C hC (1 - f) (by simp [h1]))
   have hc : IsCoprime p q := by
     obtain ⟨a, ha⟩ := d1
     obtain ⟨b, hb⟩ := d2
     exact ⟨a, b, by linear_combination -ha - hb⟩
-  rw [← ep, ← eq, resultant_map_map, natDegree_map_eq_of_injective hinj, natDegree_map_eq_of_injective hinj]
+  rw [← ep, ← eq, resultant_map_map, natDegree_map_eq_of_injective hinj,
+    natDegree_map_eq_of_injective hinj]
   exact val_unit _ ((isUnit_resultant_iff_isCoprime hp).2 hc)
 
 def cut (B : InvAlg K) (e : B.A) (he : B.σ e = e) : InvAlg K where
@@ -126,24 +147,25 @@ def cut (B : InvAlg K) (e : B.A) (he : B.σ e = e) : InvAlg K where
     obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective y
     simp [B.σ_σ]
   σ_alg := fun a => by
-    rw [← Ideal.Quotient.mk_algebraMap, ← Ideal.Quotient.mk_algebraMap, Ideal.quotientEquiv_mk, B.σ_alg]
+    rw [← Ideal.Quotient.mk_algebraMap, ← Ideal.Quotient.mk_algebraMap, Ideal.quotientEquiv_mk,
+      B.σ_alg]
   g := Ideal.Quotient.mk _ B.g
 
-theorem val_conj_le (x : K.E) (h : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x ≤ 1) :
-    (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (K.c x) ≤ 1 := by
+theorem val_conj_le (x : K.E) (h : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x ≤ 1)
+    : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (K.c x) ≤ 1 := by
   obtain ⟨a, rfl⟩ := IsDiscreteValuationRing.exists_lift_of_le_one h
   obtain ⟨b, hb⟩ := K.c_int a
   rw [hb]
   exact IsDedekindDomain.HeightOneSpectrum.valuation_le_one _ _
 
-theorem valuation_conj (x : K.E) : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (K.c x) =
-    (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x := by
+theorem valuation_conj (x : K.E)
+    : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E (K.c x)
+      = (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x := by
   set v := (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E with hv
   have hc : ∀ y : K.E, y ≠ 0 → K.c y ≠ 0 := fun y hy => by simpa using hy
   have hmono : ∀ a b : K.E, b ≠ 0 → v a ≤ v b → v (K.c a) ≤ v (K.c b) := by
     intro a b hb h
-    have h1 : v (a / b) ≤ 1 := by
-      rw [map_div₀]; exact div_le_one_of_le₀ h zero_le
+    have h1 : v (a / b) ≤ 1 := by rw [map_div₀]; exact div_le_one_of_le₀ h zero_le
     have h2 := val_conj_le _ h1
     rw [map_div₀, map_div₀, div_le_one₀ (zero_lt_iff.2 (by simpa using hb))] at h2
     exact h2
@@ -169,7 +191,7 @@ theorem valuation_conj (x : K.E) : (IsDiscreteValuationRing.maximalIdeal K.O).va
   by_cases hx : x = 0
   · simp [hx]
   have h0 : v x ≠ 0 := by simpa using hx
-  have h4 : v x = v (π ^ (-WithZero.log (v x))) := by
+  have h4 : v x = v (π ^ (- WithZero.log (v x))) := by
     rw [map_zpow₀, hπ, ← WithZero.exp_zsmul]
     simp [WithZero.exp_log h0]
   have h5 := le_antisymm (hmono _ _ (zpow_ne_zero _ hπ0) h4.le) (hmono _ _ hx h4.ge)
@@ -181,19 +203,22 @@ theorem eta_norm_mul (d x : K.E) (hd : d ≠ 0) : K.eta (d * x * K.c d) = K.eta 
   unfold UQ.eta val
   have hd' : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E d ≠ 0 := by simpa using hd
   have hx' : (IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x ≠ 0 := by simpa using hx
-  rw [map_mul, map_mul, valuation_conj, WithZero.log_mul (mul_ne_zero hd' hx') hd', WithZero.log_mul hd' hx']
+  rw [map_mul, map_mul, valuation_conj, WithZero.log_mul (mul_ne_zero hd' hx') hd',
+    WithZero.log_mul hd' hx']
   generalize WithZero.log ((IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E d) = a
   generalize WithZero.log ((IsDiscreteValuationRing.maximalIdeal K.O).valuation K.E x) = b
   rw [show -(a + b + a) = -b + 2 * (-a) by ring, zpow_add₀ (by norm_num), zpow_mul]
   norm_num
 
-theorem eta_gram (B : InvAlg K) (x : B.A) (b : Module.Basis (Fin (Module.finrank K.E B.A)) K.E B.A) :
-    K.eta (Matrix.of fun i j => B.herm x (b i) (b j)).det = K.eta (B.gramDet x) := by
+theorem eta_gram (B : InvAlg K) (x : B.A) (b : Module.Basis (Fin (Module.finrank K.E B.A)) K.E B.A)
+    : K.eta (Matrix.of fun i j => B.herm x (b i) (b j)).det = K.eta (B.gramDet x) := by
   set c := Module.finBasis K.E B.A
   set M := c.toMatrix b with hM
   have hb : ∀ i, b i = ∑ k, M k i • c k := fun i => (c.sum_toMatrix_smul_self b i).symm
-  have e : (Matrix.of fun i j => B.herm x (b i) (b j)) =
-      M.transpose * (Matrix.of fun i j => B.herm x (c i) (c j)) * (K.c : K.E →+* K.E).mapMatrix M := by
+  have e
+      : (Matrix.of fun i j => B.herm x (b i) (b j))
+        = M.transpose * (Matrix.of fun i j => B.herm x (c i) (c j))
+          * (K.c : K.E →+* K.E).mapMatrix M := by
     ext i j
     simp only [Matrix.mul_apply, Matrix.of_apply, Matrix.transpose_apply, RingHom.mapMatrix_apply,
       Matrix.map_apply, InvAlg.herm, RingHom.coe_coe]
@@ -203,8 +228,8 @@ theorem eta_gram (B : InvAlg K) (x : B.A) (b : Module.Basis (Fin (Module.finrank
     set_option synthInstance.maxHeartbeats 100000 in
       rw [Finset.mul_sum, Finset.sum_mul, map_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
-    rw [Algebra.smul_def (M l j), map_mul B.σ, B.σ_alg, ← Algebra.smul_def, mul_smul_comm, mul_smul_comm,
-      smul_mul_assoc, map_smul, map_smul]
+    rw [Algebra.smul_def (M l j), map_mul B.σ, B.σ_alg, ← Algebra.smul_def, mul_smul_comm,
+      mul_smul_comm, smul_mul_assoc, map_smul, map_smul]
     simp only [smul_eq_mul]
     ring
   rw [e, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, ← RingHom.map_det]
@@ -212,9 +237,11 @@ theorem eta_gram (B : InvAlg K) (x : B.A) (b : Module.Basis (Fin (Module.finrank
 
 section Orb
 
-variable {O : Type} [CommRing O] {A A' : Type} [CommRing A] [Algebra O A] [CommRing A'] [Algebra O A']
+variable
+  {O : Type} [CommRing O] {A A' : Type} [CommRing A] [Algebra O A] [CommRing A'] [Algebra O A']
 
-theorem mem_mulLat (t : Aˣ) (L : Submodule O A) (y : A) : y ∈ mulLat O (t : A) L ↔ ((t⁻¹ : Aˣ) : A) * y ∈ L := by
+theorem mem_mulLat (t : Aˣ) (L : Submodule O A) (y : A)
+    : y ∈ mulLat O (t : A) L ↔ ((t⁻¹ : Aˣ) : A) * y ∈ L := by
   unfold mulLat
   rw [Submodule.mem_map]
   constructor
@@ -223,9 +250,11 @@ theorem mem_mulLat (t : Aˣ) (L : Submodule O A) (y : A) : y ∈ mulLat O (t : A
   · intro h
     exact ⟨_, h, by simp⟩
 
-theorem stabLat_mulLat (t : Aˣ) (L : Submodule O A) : stabLat O (mulLat O (t : A) L) = stabLat O L := by
+theorem stabLat_mulLat (t : Aˣ) (L : Submodule O A)
+    : stabLat O (mulLat O (t : A) L) = stabLat O L := by
   ext s
-  change (∀ y, y ∈ mulLat O (t : A) L ↔ (s : A) * y ∈ mulLat O (t : A) L) ↔ ∀ y, y ∈ L ↔ (s : A) * y ∈ L
+  change (∀ y, y ∈ mulLat O (t : A) L ↔ (s : A) * y ∈ mulLat O (t : A) L)
+    ↔ ∀ y, y ∈ L ↔ (s : A) * y ∈ L
   simp only [mem_mulLat]
   constructor
   · intro h y
@@ -240,19 +269,20 @@ def orbWt (G : Subgroup Aˣ) (X : Set (Submodule O A)) : Orb O G X → ℚ :=
     rintro L M ⟨t, -, h⟩
     simp only [h, stabLat_mulLat])
 
-theorem orbSum_eq (G : Subgroup Aˣ) (X : Set (Submodule O A)) :
-    orbSum O G X (fun _ => 1) = ∑ᶠ o, orbWt G X o := by
+theorem orbSum_eq (G : Subgroup Aˣ) (X : Set (Submodule O A))
+    : orbSum O G X (fun _ => 1) = ∑ᶠ o, orbWt G X o := by
   unfold orbSum
   refine finsum_congr fun o => ?_
   conv_rhs => rw [← Quot.out_eq o]
   rw [one_mul]
   rfl
 
-theorem orbSum_equiv (φ : A ≃ₐ[O] A') (G : Subgroup Aˣ) (G' : Subgroup A'ˣ)
+theorem orbSum_equiv
+    (φ : A ≃ₐ[O] A') (G : Subgroup Aˣ) (G' : Subgroup A'ˣ)
     (hG : ∀ t : Aˣ, t ∈ G ↔ Units.mapEquiv φ.toMulEquiv t ∈ G')
     (X : Set (Submodule O A)) (X' : Set (Submodule O A'))
-    (hX : ∀ L, L ∈ X ↔ L.map φ.toLinearEquiv.toLinearMap ∈ X') :
-    orbSum O G' X' (fun _ => 1) = orbSum O G X (fun _ => 1) := by
+    (hX : ∀ L, L ∈ X ↔ L.map φ.toLinearEquiv.toLinearMap ∈ X')
+    : orbSum O G' X' (fun _ => 1) = orbSum O G X (fun _ => 1) := by
   rw [orbSum_eq, orbSum_eq]
   set ψ := Units.mapEquiv φ.toMulEquiv with hψ
   have hv : ∀ t : Aˣ, ((ψ t : A'ˣ) : A') = φ t := fun t => rfl
@@ -262,28 +292,31 @@ theorem orbSum_equiv (φ : A ≃ₐ[O] A') (G : Subgroup Aˣ) (G' : Subgroup A'�
     simp
   let e : X ≃ X' := (Submodule.orderIsoMapComap φ.toLinearEquiv).toEquiv.subtypeEquiv hX
   have he : ∀ L : X, (e L).1 = L.1.map φ.toLinearEquiv.toLinearMap := fun L => rfl
-  have hml : ∀ (t : Aˣ) (L : Submodule O A), (mulLat O (t : A) L).map φ.toLinearEquiv.toLinearMap =
-      mulLat O ((ψ t : A'ˣ) : A') (L.map φ.toLinearEquiv.toLinearMap) := by
+  have hml
+      : ∀ (t : Aˣ) (L : Submodule O A),
+        (mulLat O (t : A) L).map φ.toLinearEquiv.toLinearMap
+          = mulLat O ((ψ t : A'ˣ) : A') (L.map φ.toLinearEquiv.toLinearMap) := by
     intro t L
     ext y
     obtain ⟨y, rfl⟩ := φ.surjective y
     rw [hm, mem_mulLat, mem_mulLat, ← map_inv, hv, ← map_mul, hm]
-  let q : Orb O G X ≃ Orb O G' X' := Quot.congr e (by
-    intro L M
-    constructor
-    · rintro ⟨t, ht, h⟩
-      exact ⟨ψ t, (hG t).1 ht, by rw [he, he, h, hml]⟩
-    · rintro ⟨t, ht, h⟩
-      obtain ⟨t, rfl⟩ := ψ.surjective t
-      refine ⟨t, (hG t).2 ht, ?_⟩
-      rw [he, he, ← hml] at h
-      exact Submodule.map_injective_of_injective φ.injective h)
+  let q : Orb O G X ≃ Orb O G' X' :=
+    Quot.congr e (by
+      intro L M
+      constructor
+      · rintro ⟨t, ht, h⟩
+        exact ⟨ψ t, (hG t).1 ht, by rw [he, he, h, hml]⟩
+      · rintro ⟨t, ht, h⟩
+        obtain ⟨t, rfl⟩ := ψ.surjective t
+        refine ⟨t, (hG t).2 ht, ?_⟩
+        rw [he, he, ← hml] at h
+        exact Submodule.map_injective_of_injective φ.injective h)
   rw [← finsum_comp_equiv q]
   refine finsum_congr fun o => ?_
   induction o using Quot.ind with
   | mk L =>
-    change (((stabLat O (e L).1 ⊓ G').relIndex (intUnits O A' ⊓ G') : ℕ) : ℚ) =
-      (((stabLat O L.1 ⊓ G).relIndex (intUnits O A ⊓ G) : ℕ) : ℚ)
+    change (((stabLat O (e L).1 ⊓ G').relIndex (intUnits O A' ⊓ G') : ℕ) : ℚ)
+      = (((stabLat O L.1 ⊓ G).relIndex (intUnits O A ⊓ G) : ℕ) : ℚ)
     have h1 : stabLat O L.1 ⊓ G = (stabLat O (e L).1 ⊓ G').comap ψ.toMonoidHom := by
       ext t
       rw [Subgroup.mem_comap, Subgroup.mem_inf, Subgroup.mem_inf, hG]
@@ -295,10 +328,11 @@ theorem orbSum_equiv (φ : A ≃ₐ[O] A') (G : Subgroup Aˣ) (G' : Subgroup A'�
       ext t
       rw [Subgroup.mem_comap, Subgroup.mem_inf, Subgroup.mem_inf, hG]
       refine and_congr_left' ?_
-      change (IsIntegral O (t : A) ∧ IsIntegral O ((t⁻¹ : Aˣ) : A)) ↔
-        (IsIntegral O (φ t) ∧ IsIntegral O (φ ((t⁻¹ : Aˣ) : A)))
+      change (IsIntegral O (t : A) ∧ IsIntegral O ((t⁻¹ : Aˣ) : A))
+        ↔ (IsIntegral O (φ t) ∧ IsIntegral O (φ ((t⁻¹ : Aˣ) : A)))
       simp only [isIntegral_algEquiv]
-    rw [h1, h2, Subgroup.relIndex_comap, Subgroup.map_comap_eq_self_of_surjective (f := ψ.toMonoidHom) ψ.surjective]
+    rw [h1, h2, Subgroup.relIndex_comap,
+      Subgroup.map_comap_eq_self_of_surjective (f := ψ.toMonoidHom) ψ.surjective]
 
 end Orb
 
@@ -331,8 +365,9 @@ theorem eta_eq (h : IsIso φ) (x : B.A) : K.eta (C.gramDet (φ x)) = K.eta (B.gr
   simp [h.herm_eq]
 
 theorem N_eq (h : IsIso φ) (x : B.A) : C.N (φ x) = B.N x := by
-  have hm : ∀ (L : Submodule K.O B.A) (y : B.A),
-      φ y ∈ L.map (φ.restrictScalars K.O).toLinearEquiv.toLinearMap ↔ y ∈ L := by
+  have hm
+      : ∀ (L : Submodule K.O B.A) (y : B.A),
+        φ y ∈ L.map (φ.restrictScalars K.O).toLinearEquiv.toLinearMap ↔ y ∈ L := by
     intro L y
     rw [Submodule.mem_map_equiv]
     simp
@@ -351,12 +386,13 @@ theorem N_eq (h : IsIso φ) (x : B.A) : C.N (φ x) = B.N x := by
       rw [φ.surjective.forall]
       simp only [hm, h.herm_eq]
 
-theorem prod {B₂ C₂ : InvAlg K} {φ₂ : B₂.A ≃ₐ[K.E] C₂.A} (h : IsIso φ) (h₂ : IsIso φ₂) :
-    IsIso (B := B.prod B₂) (C := C.prod C₂) (φ.prodCongr φ₂) :=
+theorem prod {B₂ C₂ : InvAlg K} {φ₂ : B₂.A ≃ₐ[K.E] C₂.A} (h : IsIso φ) (h₂ : IsIso φ₂)
+    : IsIso (B := B.prod B₂) (C := C.prod C₂) (φ.prodCongr φ₂) :=
   ⟨fun y => Prod.ext (h.1 y.1) (h₂.1 y.2), Prod.ext h.2 h₂.2⟩
 
-theorem finsum_eq (h : IsIso φ) (F : C.A → ℚ) (hF : ∀ (x : C.A) (u : C.Aˣ), F (x * (u * C.σ (u : C.A))) = F x) :
-    ∑ᶠ k : C.Cl, F k.rep = ∑ᶠ k : B.Cl, F (φ k.rep) := by
+theorem finsum_eq
+    (h : IsIso φ) (F : C.A → ℚ) (hF : ∀ (x : C.A) (u : C.Aˣ), F (x * (u * C.σ (u : C.A))) = F x)
+    : ∑ᶠ k : C.Cl, F k.rep = ∑ᶠ k : B.Cl, F (φ k.rep) := by
   set ψ := Units.mapEquiv φ.toMulEquiv with hψ
   have hv : ∀ t : B.Aˣ, ((ψ t : C.Aˣ) : C.A) = φ t := fun t => rfl
   let e : {x : B.Aˣ // B.σ (x : B.A) = x} ≃ {x : C.Aˣ // C.σ (x : C.A) = x} :=
@@ -364,13 +400,15 @@ theorem finsum_eq (h : IsIso φ) (F : C.A → ℚ) (hF : ∀ (x : C.A) (u : C.A�
       change _ ↔ C.σ (φ t) = φ t
       rw [← h.1, φ.injective.eq_iff]
   have he : ∀ x, (((e x).1 : C.Aˣ) : C.A) = φ x.1 := fun x => rfl
-  let q : B.Cl ≃ C.Cl := Quot.congr e (by
-    intro x y
-    rw [ψ.surjective.exists]
-    simp only [he, hv, ← h.1, ← map_mul, φ.injective.eq_iff])
-  let W : C.Cl → ℚ := Quot.lift (fun x => F x.1) (by
-    rintro x y ⟨u, hu⟩
-    simp only [hu, hF])
+  let q : B.Cl ≃ C.Cl :=
+    Quot.congr e (by
+      intro x y
+      rw [ψ.surjective.exists]
+      simp only [he, hv, ← h.1, ← map_mul, φ.injective.eq_iff])
+  let W : C.Cl → ℚ :=
+    Quot.lift (fun x => F x.1) (by
+      rintro x y ⟨u, hu⟩
+      simp only [hu, hF])
   have hW : ∀ k : C.Cl, F k.rep = W k := fun k => by
     conv_rhs => rw [← Quot.out_eq k]
     rfl
@@ -383,8 +421,8 @@ theorem finsum_eq (h : IsIso φ) (F : C.A → ℚ) (hF : ∀ (x : C.A) (u : C.A�
 end IsIso
 
 theorem prod_P (B₁ B₂ : InvAlg K) : (B₁.prod B₂).P = B₁.P * B₂.P := by
-  have : LinearMap.mulLeft K.E ((B₁.g, B₂.g) : B₁.A × B₂.A) =
-      (LinearMap.mulLeft K.E B₁.g).prodMap (LinearMap.mulLeft K.E B₂.g) := by
+  have : LinearMap.mulLeft K.E ((B₁.g, B₂.g) : B₁.A × B₂.A)
+      = (LinearMap.mulLeft K.E B₁.g).prodMap (LinearMap.mulLeft K.E B₂.g) := by
     ext <;> simp
   have h2 := LinearMap.charpoly_prodMap (LinearMap.mulLeft K.E B₁.g) (LinearMap.mulLeft K.E B₂.g)
   rw [← this] at h2
@@ -393,45 +431,54 @@ theorem prod_P (B₁ B₂ : InvAlg K) : (B₁.prod B₂).P = B₁.P * B₂.P := 
 theorem one_sub_fixed (B : InvAlg K) {e : B.A} (he : B.σ e = e) : B.σ (1 - e) = 1 - e := by
   rw [map_sub, map_one, he]
 
-theorem isIso_cut (B : InvAlg K) {e : B.A} (hi : IsIdempotentElem e) (he : B.σ e = e) :
-    IsIso (B := B) (C := (cut B e he).prod (cut B (1 - e) (one_sub_fixed B he)))
+theorem isIso_cut (B : InvAlg K) {e : B.A} (hi : IsIdempotentElem e) (he : B.σ e = e)
+    : IsIso (B := B) (C := (cut B e he).prod (cut B (1 - e) (one_sub_fixed B he)))
       (AlgEquiv.prodQuotientOfIsIdempotentElem K.E hi hi.one_sub (by simp) (by simp [hi])) :=
   ⟨fun _ => rfl, rfl⟩
 
-theorem cut_unitary (B : InvAlg K) (e : B.A) (he : B.σ e = e) (h : B.g * B.σ B.g = 1) :
-    (cut B e he).g * (cut B e he).σ (cut B e he).g = 1 :=
+theorem cut_unitary (B : InvAlg K) (e : B.A) (he : B.σ e = e) (h : B.g * B.σ B.g = 1)
+    : (cut B e he).g * (cut B e he).σ (cut B e he).g = 1 :=
   congrArg (Ideal.Quotient.mk (Ideal.span {e})) h
 
-theorem cut_aeval (B : InvAlg K) (e : B.A) (he : B.σ e = e) (f : K.O[X]) :
-    aeval (cut B e he).g f = Ideal.Quotient.mk (Ideal.span {e}) (aeval B.g f) :=
+theorem cut_aeval (B : InvAlg K) (e : B.A) (he : B.σ e = e) (f : K.O[X])
+    : aeval (cut B e he).g f = Ideal.Quotient.mk (Ideal.span {e}) (aeval B.g f) :=
   aeval_algHom_apply (Ideal.Quotient.mkₐ K.O (Ideal.span {e})) B.g f
 
-theorem cut_integral (B : InvAlg K) (e : B.A) (he : B.σ e = e) (h : IsIntegral K.O B.g) :
-    IsIntegral K.O (cut B e he).g := by
+theorem cut_integral (B : InvAlg K) (e : B.A) (he : B.σ e = e) (h : IsIntegral K.O B.g)
+    : IsIntegral K.O (cut B e he).g := by
   obtain ⟨p, hp, h0⟩ := h
   refine ⟨p, hp, ?_⟩
   rw [← aeval_def, cut_aeval, aeval_def, h0, map_zero]
   rfl
 
-theorem adjoin_stable (B : InvAlg K) (hu : B.g * B.σ B.g = 1) (hi : IsIntegral K.O B.g) {y : B.A}
-    (hy : y ∈ Algebra.adjoin K.O ({B.g} : Set B.A)) : B.σ y ∈ Algebra.adjoin K.O ({B.g} : Set B.A) := by
+theorem adjoin_stable
+    (B : InvAlg K) (hu : B.g * B.σ B.g = 1) (hi : IsIntegral K.O B.g)
+    {y : B.A} (hy : y ∈ Algebra.adjoin K.O ({B.g} : Set B.A))
+    : B.σ y ∈ Algebra.adjoin K.O ({B.g} : Set B.A) := by
   have hO : ∀ a : K.O, ∃ b : K.O, B.σ (algebraMap K.O B.A a) = algebraMap K.O B.A b := by
     intro a
     obtain ⟨b, hb⟩ := K.c_int a
-    exact ⟨b, by rw [IsScalarTower.algebraMap_apply K.O K.E B.A, B.σ_alg, hb, ← IsScalarTower.algebraMap_apply]⟩
+    exact ⟨
+      b,
+      by
+        rw [IsScalarTower.algebraMap_apply K.O K.E B.A, B.σ_alg, hb,
+          ← IsScalarTower.algebraMap_apply]
+    ⟩
   have hσi : IsIntegral K.O (B.σ B.g) := by
     have hinj : Function.Injective (algebraMap K.O K.E) := IsFractionRing.injective _ _
     choose τ' hτ' using K.c_int
-    let cO : K.O →+* K.O :=
-      { toFun := τ'
-        map_one' := hinj (by rw [← hτ']; simp)
-        map_mul' := fun a b => hinj (by simp [← hτ'])
-        map_zero' := hinj (by rw [← hτ']; simp)
-        map_add' := fun a b => hinj (by simp [← hτ']) }
+    let cO : K.O →+* K.O := {
+      toFun := τ'
+      map_one' := hinj (by rw [← hτ']; simp)
+      map_mul' := fun a b => hinj (by simp [← hτ'])
+      map_zero' := hinj (by rw [← hτ']; simp)
+      map_add' := fun a b => hinj (by simp [← hτ'])
+    }
     refine IsIntegral.map_of_comp_eq cO (B.σ : B.A →+* B.A) ?_ hi
     ext a
     change algebraMap K.O B.A (τ' a) = B.σ (algebraMap K.O B.A a)
-    rw [IsScalarTower.algebraMap_apply K.O K.E B.A a, B.σ_alg, hτ', ← IsScalarTower.algebraMap_apply]
+    rw [IsScalarTower.algebraMap_apply K.O K.E B.A a, B.σ_alg, hτ',
+      ← IsScalarTower.algebraMap_apply]
   have hg : B.σ B.g ∈ Algebra.adjoin K.O ({B.g} : Set B.A) := by
     obtain ⟨p, hp, h0⟩ := hσi
     let i : Invertible (B.σ B.g) := ⟨B.g, hu, by rw [mul_comm, hu]⟩
@@ -439,7 +486,7 @@ theorem adjoin_stable (B : InvAlg K) (hu : B.g * B.σ B.g = 1) (hi : IsIntegral 
       (eval₂_reverse_eq_zero_iff (algebraMap K.O B.A) (B.σ B.g) p).2 h0
     rw [← X_mul_divX_add p.reverse, coeff_zero_reverse, hp.leadingCoeff, ← aeval_def] at h1
     simp only [map_add (f := _), map_mul, aeval_X, map_one] at h1
-    have h2 : B.σ B.g = -aeval B.g p.reverse.divX := by
+    have h2 : B.σ B.g = - aeval B.g p.reverse.divX := by
       linear_combination B.σ B.g * h1 - aeval B.g p.reverse.divX * hu
     rw [h2]
     exact neg_mem (aeval_mem_adjoin_singleton _ _)

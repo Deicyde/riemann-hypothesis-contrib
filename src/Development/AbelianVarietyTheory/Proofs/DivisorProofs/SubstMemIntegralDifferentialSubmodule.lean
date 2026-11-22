@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.FormalCoboun
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 set_option autoImplicit false
 
@@ -16,9 +17,10 @@ namespace GlobalTheory
 
 namespace Katz
 
-theorem derivation_prod_erase {R A ι : Type} [CommRing R] [CommRing A] [Algebra R A]
-    [DecidableEq ι] (D : Derivation R A A) (f : ι → A) (S : Finset ι) :
-    D (∏ s ∈ S, f s) = ∑ i ∈ S, (∏ s ∈ S.erase i, f s) * D (f i) := by
+theorem derivation_prod_erase
+    {R A ι : Type} [CommRing R] [CommRing A] [Algebra R A] [DecidableEq ι]
+    (D : Derivation R A A) (f : ι → A) (S : Finset ι)
+    : D (∏ s ∈ S, f s) = ∑ i ∈ S, (∏ s ∈ S.erase i, f s) * D (f i) := by
   induction S using Finset.induction_on with
   | empty => simp
   | insert a S ha ih =>
@@ -27,18 +29,24 @@ theorem derivation_prod_erase {R A ι : Type} [CommRing R] [CommRing A] [Algebra
     congr 1
     refine Finset.sum_congr rfl fun i hi => ?_
     have hai : a ≠ i := by rintro rfl; exact ha hi
-    rw [Finset.erase_insert_of_ne hai,
-      Finset.prod_insert (fun h => ha (Finset.mem_of_mem_erase h)), mul_assoc]
+    rw [Finset.erase_insert_of_ne hai, Finset.prod_insert (fun h => ha (Finset.mem_of_mem_erase h)),
+      mul_assoc]
 
-theorem pderiv_prod_pow {R τ σ : Type} [CommRing R] [Fintype σ] [DecidableEq σ]
-    (u : σ → MvPowerSeries τ R) (a : σ → ℕ) (j : τ) :
-    pderiv j (∏ s, u s ^ a s) =
-      ∑ i, a i • ((∏ s ∈ Finset.univ.erase i, u s ^ a s) * (u i ^ (a i - 1) * pderiv j (u i))) := by
-  rw [derivation_prod_erase]
-  refine Finset.sum_congr rfl fun i _ => ?_
-  rw [pderiv_pow, nsmul_eq_mul, mul_assoc, mul_left_comm]
+theorem pderiv_prod_pow
+    {R τ σ : Type} [CommRing R] [Fintype σ] [DecidableEq σ]
+    (u : σ → MvPowerSeries τ R) (a : σ → ℕ) (j : τ)
+    : pderiv j (∏ s, u s ^ a s)
+      = ∑ i, a i • ((∏ s ∈ Finset.univ.erase i, u s ^ a s) * (u i ^ (a i - 1) * pderiv j (u i))) :=
+  by
+    rw [derivation_prod_erase]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [pderiv_pow, nsmul_eq_mul, mul_assoc, mul_left_comm]
 
-theorem subst_mem_quasiInt : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (σ τ : Type) [Finite σ] (u : σ → MvPowerSeries (τ) (Fr p k)) (f : MvPowerSeries (σ) (Fr p k)), (∀ i, constantCoeff (u i) = 0) → (∀ i, u i ∈ intBy p k τ 1) → f ∈ quasiInt p k σ → subst u f ∈ quasiInt p k τ := by
+theorem subst_mem_quasiInt
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p] (σ τ : Type)
+        [Finite σ] (u : σ → MvPowerSeries (τ) (Fr p k)) (f : MvPowerSeries (σ) (Fr p k)),
+      (∀ i, constantCoeff (u i) = 0) → (∀ i, u i ∈ intBy p k τ 1) → f ∈ quasiInt p k σ
+        → subst u f ∈ quasiInt p k τ := by
   intro p _ k _ _ _ σ τ _ u f hu0 hu hf
   classical
   have : Fintype σ := Fintype.ofFinite σ
@@ -55,13 +63,13 @@ theorem subst_mem_quasiInt : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [
   choose v hv using hlift
   intro γ j
   rw [coeff_subst ha]
-  have hP : ∀ α : σ →₀ ℕ, (α.prod fun s e => u s ^ e) =
-      MvPowerSeries.map φ (∏ s, v s ^ α s) := by
+  have hP : ∀ α : σ →₀ ℕ, (α.prod fun s e => u s ^ e) = MvPowerSeries.map φ (∏ s, v s ^ α s) := by
     intro α
     rw [Finsupp.prod_fintype _ _ (fun _ => pow_zero _), map_prod]
     exact Finset.prod_congr rfl fun s _ => by rw [map_pow, hv]
-  have hterm : ∀ α : σ →₀ ℕ,
-      (γ j : Fr p k) * (coeff α f • coeff γ (α.prod fun s e => u s ^ e)) ∈ φ.range := by
+  have hterm
+      : ∀ α : σ →₀ ℕ,
+        (γ j : Fr p k) * (coeff α f • coeff γ (α.prod fun s e => u s ^ e)) ∈ φ.range := by
     intro α
     rw [hP, coeff_map, smul_eq_mul]
     by_cases hγ : γ j = 0
@@ -78,22 +86,25 @@ theorem subst_mem_quasiInt : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [
     have key := coeff_pderiv (R := WittVector p k) (i := j) (∏ s, v s ^ α s) δ
     set_option synthInstance.maxHeartbeats 100000 in
       rw [hδγ, pderiv_prod_pow, map_sum] at key
-    have hk : (γ j : Fr p k) * φ (coeff γ (∏ s, v s ^ α s)) =
-        φ (∑ i, coeff δ (α i • ((∏ s ∈ Finset.univ.erase i, v s ^ α s) *
-          (v i ^ (α i - 1) * pderiv j (v i))))) := by
+    have hk
+        : (γ j : Fr p k) * φ (coeff γ (∏ s, v s ^ α s))
+          = φ
+            (∑ i, coeff δ (α i • ((∏ s ∈ Finset.univ.erase i, v s ^ α s) *
+              (v i ^ (α i - 1) * pderiv j (v i))))) := by
       rw [key, map_mul, map_add (f := _), map_natCast, map_one, ← hδj]
       ring
     set_option synthInstance.maxHeartbeats 100000 in
       rw [mul_left_comm, hk, map_sum, Finset.mul_sum]
     refine Subring.sum_mem _ fun i _ => ?_
-    obtain ⟨w, hw⟩ := (hf : ∀ (α : σ →₀ ℕ) (i : σ), ∃ w : WittVector p k,
-      (α i : Fr p k) * coeff α f = φ w) α i
+    obtain ⟨w, hw⟩ :=
+      (hf : ∀ (α : σ →₀ ℕ) (i : σ), ∃ w : WittVector p k, (α i : Fr p k) * coeff α f = φ w) α i
     rw [map_nsmul, map_nsmul, nsmul_eq_mul, ← mul_assoc, mul_comm (coeff α f), hw, ← map_mul]
     exact ⟨_, rfl⟩
   have hfin := coeff_subst_finite ha f γ
   rw [finsum_eq_sum _ hfin, Finset.mul_sum]
-  have hmem : (γ j : Fr p k) * ∑ α ∈ hfin.toFinset, coeff α f • coeff γ (α.prod fun s e => u s ^ e)
-      ∈ φ.range := by
+  have hmem
+      : (γ j : Fr p k) * ∑ α ∈ hfin.toFinset, coeff α f • coeff γ (α.prod fun s e => u s ^ e)
+        ∈ φ.range := by
     rw [Finset.mul_sum]; exact Subring.sum_mem _ fun α _ => hterm α
   rw [← Finset.mul_sum]
   obtain ⟨w, hw⟩ := hmem

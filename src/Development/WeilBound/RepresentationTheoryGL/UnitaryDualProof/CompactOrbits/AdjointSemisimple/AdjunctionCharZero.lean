@@ -8,9 +8,12 @@ namespace PositivityTheory.RgUd.T.AdjPf
 
 open Module PositivityTheory.RgUd.T
 
-theorem dc {k : Type} [Field k] {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
-    (hc : ∀ a ∈ Z, ∀ b ∈ Z, a * b = b * a) (hr : IsReduced Z) (x : Matrix (Fin n) (Fin n) k)
-    (hx : ∀ y ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)), x * y = y * x) : x ∈ Z := by
+theorem dc
+    {k : Type} [Field k]
+    {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hc : ∀ a ∈ Z, ∀ b ∈ Z, a * b = b * a)
+    (hr : IsReduced Z) (x : Matrix (Fin n) (Fin n) k)
+    (hx : ∀ y ∈ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)), x * y = y * x)
+    : x ∈ Z := by
   classical
   haveI : IsReduced Z := hr
   letI : CommRing Z := { (inferInstance : Ring Z) with
@@ -18,8 +21,9 @@ theorem dc {k : Type} [Field k] {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin
   haveI : IsArtinianRing Z := IsArtinianRing.of_finite k Z
   haveI : IsSemisimpleRing Z := IsArtinianRing.isSemisimpleRing_of_isReduced Z
   haveI : IsSemisimpleModule Z (Fin n → k) := inferInstance
-  have key : ∀ g : Module.End Z (Fin n → k), ∀ v : Fin n → k,
-      Matrix.mulVec x (g v) = g (Matrix.mulVec x v) := by
+  have key
+      : ∀ g : Module.End Z (Fin n → k), ∀ v : Fin n → k,
+        Matrix.mulVec x (g v) = g (Matrix.mulVec x v) := by
     intro g v
     set y := LinearMap.toMatrix' (g.restrictScalars k) with hydef
     have hyv : ∀ w, Matrix.mulVec y w = g w := fun w => by
@@ -35,12 +39,14 @@ theorem dc {k : Type} [Field k] {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin
         hyv, hyv]
       exact (g.map_smul ⟨a, ha⟩ w).symm
     rw [← hyv, ← hyv, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hx y hy]
-  let f : Module.End (Module.End Z (Fin n → k)) (Fin n → k) :=
-    { toFun := fun v => Matrix.mulVec x v
-      map_add' := Matrix.mulVec_add x
-      map_smul' := fun g v => key g v }
-  obtain ⟨r, hr'⟩ := jacobson_density (R := Z) f
-    (Finset.univ.image (fun i : Fin n => (Pi.single i (1 : k) : Fin n → k)))
+  let f : Module.End (Module.End Z (Fin n → k)) (Fin n → k) := {
+    toFun := fun v => Matrix.mulVec x v
+    map_add' := Matrix.mulVec_add x
+    map_smul' := fun g v => key g v
+  }
+  obtain ⟨r, hr'⟩ :=
+    jacobson_density (R := Z) f
+      (Finset.univ.image (fun i : Fin n => (Pi.single i (1 : k) : Fin n → k)))
   have hxr : x = (r : Matrix (Fin n) (Fin n) k) := by
     apply Matrix.toLin'.injective
     refine LinearMap.pi_ext' fun i => LinearMap.ext_ring ?_
@@ -49,9 +55,11 @@ theorem dc {k : Type} [Field k] {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin
   rw [hxr]
   exact r.2
 
-theorem isSemisimple_of_mem {k : Type} [Field k] {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k))
-    (hr : IsReduced Z) (z : Matrix (Fin n) (Fin n) k) (hz : z ∈ Z) :
-    Module.End.IsSemisimple (Matrix.toLin' z) := by
+theorem isSemisimple_of_mem
+    {k : Type} [Field k]
+    {n : ℕ} (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hr : IsReduced Z)
+    (z : Matrix (Fin n) (Fin n) k) (hz : z ∈ Z)
+    : Module.End.IsSemisimple (Matrix.toLin' z) := by
   set w : Z := ⟨z, hz⟩ with hw
   have hint : IsIntegral k w := IsIntegral.of_finite k w
   have hm0 : minpoly k w ≠ 0 := minpoly.ne_zero hint
@@ -75,8 +83,9 @@ theorem isSemisimple_of_mem {k : Type} [Field k] {n : ℕ} (Z : Subalgebra k (Ma
   · have h0 : Polynomial.aeval z (minpoly k w) = 0 := by
       have h := congrArg Z.val (minpoly.aeval k w)
       rwa [map_zero, ← Polynomial.aeval_algHom_apply] at h
-    have h4 := Polynomial.aeval_algHom_apply
-      (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom z (minpoly k w)
+    have h4 :=
+      Polynomial.aeval_algHom_apply (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).toAlgHom z
+        (minpoly k w)
     rw [h0, map_zero] at h4
     exact h4
 
@@ -103,7 +112,9 @@ theorem adjunction_char_zero [CharZero k] : Adj (k := k) := by
   have hcomm : ∀ a ∈ adj Z s, ∀ b ∈ adj Z s, a * b = b * a := by
     intro a ha b hb
     have ha' : a ∈ Subalgebra.centralizer k S := Algebra.adjoin_le hSc ha
-    have hb' : b ∈ Subalgebra.centralizer k (Subalgebra.centralizer k S : Set (Matrix (Fin n) (Fin n) k)) :=
+    have hb'
+        : b ∈ Subalgebra.centralizer k
+          (Subalgebra.centralizer k S : Set (Matrix (Fin n) (Fin n) k)) :=
       Algebra.adjoin_le_centralizer_centralizer k S hb
     exact (Subalgebra.mem_centralizer_iff k).mp hb' a ha'
   have hsemi : ∀ x ∈ adj Z s, Module.End.IsSemisimple (Matrix.toLin' x) := by
@@ -146,16 +157,20 @@ theorem adjunction_char_zero [CharZero k] : Adj (k := k) := by
   · have hsub : (Z : Set (Matrix (Fin n) (Fin n) k)) ⊆ (adj Z s : Set (Matrix (Fin n) (Fin n) k)) :=
       fun z hz => Algebra.subset_adjoin (Set.mem_insert_of_mem _ hz)
     have hle := Subalgebra.centralizer_le k _ _ hsub
-    have hne : Subalgebra.centralizer k (adj Z s : Set (Matrix (Fin n) (Fin n) k)) ≠
-        Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)) := by
+    have hne
+        : Subalgebra.centralizer k (adj Z s : Set (Matrix (Fin n) (Fin n) k))
+          ≠ Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k)) := by
       intro h
       apply hsZ
       apply AdjPf.dc Z hc hr s
       intro y hy
       rw [← h] at hy
       exact (Subalgebra.mem_centralizer_iff k).mp hy s (Algebra.subset_adjoin (Set.mem_insert _ _))
-    have hlt : Subalgebra.toSubmodule (Subalgebra.centralizer k (adj Z s : Set (Matrix (Fin n) (Fin n) k))) <
-        Subalgebra.toSubmodule (Subalgebra.centralizer k (Z : Set (Matrix (Fin n) (Fin n) k))) :=
+    have hlt
+        : Subalgebra.toSubmodule (Subalgebra.centralizer k
+            (adj Z s : Set (Matrix (Fin n) (Fin n) k)))
+          < Subalgebra.toSubmodule (Subalgebra.centralizer k
+            (Z : Set (Matrix (Fin n) (Fin n) k))) :=
       lt_of_le_of_ne (Subalgebra.toSubmodule.monotone hle)
         (fun h => hne (Subalgebra.toSubmodule_injective h))
     exact Submodule.finrank_lt_finrank_of_lt hlt

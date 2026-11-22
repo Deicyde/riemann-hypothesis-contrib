@@ -16,9 +16,12 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.AdIsom.Unglue
 
-theorem ideal_eq_top {E : Type} [Field E] [NumberField E] (I : Ideal (𝓞 E)) (hI : I ≠ ⊥)
-    (h : ∀ a : E, (∀ i ∈ I, a * (i : E) ∈ (algebraMap (𝓞 E) E).range) → a ∈ (algebraMap (𝓞 E) E).range) :
-    I = ⊤ := by
+theorem ideal_eq_top
+    {E : Type} [Field E] [NumberField E]
+    (I : Ideal (𝓞 E)) (hI : I ≠ ⊥)
+    (h : ∀ a : E,
+      (∀ i ∈ I, a * (i : E) ∈ (algebraMap (𝓞 E) E).range) → a ∈ (algebraMap (𝓞 E) E).range)
+    : I = ⊤ := by
   have h0 : (I : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := FractionalIdeal.coeIdeal_ne_zero.2 hI
   have h1 : (I : FractionalIdeal (𝓞 E)⁰ E)⁻¹ ≤ 1 := by
     intro a ha
@@ -26,36 +29,50 @@ theorem ideal_eq_top {E : Type} [Field E] [NumberField E] (I : Ideal (𝓞 E)) (
     refine (FractionalIdeal.mem_one_iff _).2 (h a fun i hi => ?_)
     exact (FractionalIdeal.mem_one_iff _).1 (ha' _ (FractionalIdeal.mem_coeIdeal_of_mem _ hi))
   have h2 : (1 : FractionalIdeal (𝓞 E)⁰ E) ≤ I := by
-    calc (1 : FractionalIdeal (𝓞 E)⁰ E) = I * (I : FractionalIdeal (𝓞 E)⁰ E)⁻¹ := (mul_inv_cancel₀ h0).symm
+    calc
+      (1 : FractionalIdeal (𝓞 E)⁰ E)
+        = I * (I : FractionalIdeal (𝓞 E)⁰ E)⁻¹ := (mul_inv_cancel₀ h0).symm
       _ ≤ I * 1 := by gcongr
       _ = I := mul_one _
   rw [← FractionalIdeal.coeIdeal_top, FractionalIdeal.coeIdeal_le_coeIdeal] at h2
   exact top_le_iff.1 h2
 
-theorem star_mem {E : Type} [Field E] [NumberField E] [StarRing E] {a : E}
-    (h : a ∈ (algebraMap (𝓞 E) E).range) : star a ∈ (algebraMap (𝓞 E) E).range := by
+theorem star_mem
+    {E : Type} [Field E] [NumberField E] [StarRing E] {a : E} (h : a ∈ (algebraMap (𝓞 E) E).range)
+    : star a ∈ (algebraMap (𝓞 E) E).range := by
   obtain ⟨b, rfl⟩ := h
   exact ⟨RingOfIntegers.mapRingEquiv starRingAut b, rfl⟩
 
-theorem exists_smul_mem {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-    [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] (L : Submodule (𝓞 E) V) {y : V}
-    (hy : y ∈ Submodule.span E (L : Set V)) : ∃ c : 𝓞 E, c ≠ 0 ∧ c • y ∈ L := by
+theorem exists_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (L : Submodule (𝓞 E) V)
+    {y : V} (hy : y ∈ Submodule.span E (L : Set V))
+    : ∃ c : 𝓞 E, c ≠ 0 ∧ c • y ∈ L := by
   first
   | exact @_root_.GlobalTheory.TargetStatementSixOneSixtyEight.target
   | exact _root_.GlobalTheory.TargetStatementSixOneSixtyEight.target
   | (apply _root_.GlobalTheory.TargetStatementSixOneSixtyEight.target <;> assumption)
   | (intros; apply _root_.GlobalTheory.TargetStatementSixOneSixtyEight.target <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.TargetStatementSixOneSixtyEight.target <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.TargetStatementSixOneSixtyEight.target
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.TargetStatementSixOneSixtyEight.target ..)
 
-theorem isLattice_capX_and_exists_glue (D : D7) (u : D.what₂.Word) (Y X : HSp D) (ι : X.V →ₗ[D.host.E] Y.V) (z : Y.V)
-    (hl : IsLine Y X ι z u) (L : Submodule (𝓞 D.host.E) Y.V) (hL : IsSDIn Y (flatSp Y X ι z) L) (hp : IsPrim Y z L) :
-    Submodule.IsFullLattice D.host.E (capX Y X ι L) ∧ ∃ x₀ : X.V, L = glueLat Y X ι z u (capX Y X ι L) x₀ := by
+theorem isLattice_capX_and_exists_glue
+    (D : D7) (u : D.what₂.Word) (Y X : HSp D) (ι : X.V →ₗ[D.host.E] Y.V) (z : Y.V)
+    (hl : IsLine Y X ι z u) (L : Submodule (𝓞 D.host.E) Y.V)
+    (hL : IsSDIn Y (flatSp Y X ι z) L) (hp : IsPrim Y z L)
+    : Submodule.IsFullLattice D.host.E (capX Y X ι L)
+      ∧ ∃ x₀ : X.V, L = glueLat Y X ι z u (capX Y X ι L) x₀ := by
   obtain ⟨hi, ho, hz⟩ := hl
   obtain ⟨hfg, hsp, hsd⟩ := hL
   have hT := Tu_ne_zero u
   have hinj : Function.Injective ι := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     refine X.nondeg.1 x fun y => ?_
     rw [← hi, hx, map_zero, LinearMap.zero_apply]
@@ -73,7 +90,8 @@ theorem isLattice_capX_and_exists_glue (D : D7) (u : D.what₂.Word) (Y X : HSp 
     have : Y.hD (ι x + s • z) z = -(s * Tu D u) := by
       have h1 := ho x
       simp only [HSpace.hD] at h1 hz ⊢
-      rw [map_add (f := _), map_smul, h1, hz, smul_eq_mul]; ring
+      rw [map_add (f := _), map_smul, h1, hz, smul_eq_mul]
+      ring
     rw [this]
     congr 2
     field_simp
@@ -100,11 +118,14 @@ theorem isLattice_capX_and_exists_glue (D : D7) (u : D.what₂.Word) (Y X : HSp 
     have hcy' : c • y ∈ Submodule.span D.host.E (capX Y X ι L : Set (Fin X.rank → D.host.E)) :=
       Submodule.subset_span hcy
     rw [← algebraMap_smul D.host.E c] at hcy'
-    have := (Submodule.span D.host.E (capX Y X ι L : Set (Fin X.rank → D.host.E))).smul_mem
-      (c : D.host.E)⁻¹ hcy'
-    simpa only [smul_smul, inv_mul_cancel₀ (RingOfIntegers.coe_ne_zero_iff.2 hc), one_smul] using this
+    have :=
+      (Submodule.span D.host.E (capX Y X ι L : Set (Fin X.rank → D.host.E))).smul_mem
+        (c : D.host.E)⁻¹ hcy'
+    simpa only [smul_smul, inv_mul_cancel₀ (RingOfIntegers.coe_ne_zero_iff.2 hc), one_smul] using
+      this
   · let I : Ideal (𝓞 D.host.E) :=
-      (L.map ((Y.hT z).restrictScalars (𝓞 D.host.E))).comap (Algebra.linearMap (𝓞 D.host.E) D.host.E)
+      (L.map ((Y.hT z).restrictScalars (𝓞 D.host.E))).comap
+        (Algebra.linearMap (𝓞 D.host.E) D.host.E)
     have hI : ∀ i : 𝓞 D.host.E, i ∈ I ↔ ∃ y ∈ L, Y.hD y z = (i : D.host.E) := fun i => Iff.rfl
     have hI0 : I ≠ ⊥ := by
       obtain ⟨i, hi'⟩ := hint z hzL
@@ -132,18 +153,22 @@ theorem isLattice_capX_and_exists_glue (D : D7) (u : D.what₂.Word) (Y X : HSp 
     have hl2 : l = (Tu D u)⁻¹ • z + ι x₀ := by
       rw [hx₀, hl1, add_comm]
       simp
-    have hc : (capX Y X ι L).comap ((Formalism.L2.Herm.crd X).toLinearMap.restrictScalars (𝓞 D.host.E)) =
-        L.comap (ι.restrictScalars (𝓞 D.host.E)) :=
-      Submodule.comap_map_eq_of_injective (f := (Formalism.L2.Herm.crd X).toLinearMap.restrictScalars (𝓞 D.host.E))
+    have hc
+        : (capX Y X ι L).comap ((Formalism.L2.Herm.crd X).toLinearMap.restrictScalars (𝓞 D.host.E))
+          = L.comap (ι.restrictScalars (𝓞 D.host.E)) :=
+      Submodule.comap_map_eq_of_injective
+        (f := (Formalism.L2.Herm.crd X).toLinearMap.restrictScalars (𝓞 D.host.E))
         (Formalism.L2.Herm.crd X).injective _
     refine ⟨x₀, ?_⟩
     rw [glueLat, hc, ← hl2]
-    refine le_antisymm (fun y hy => ?_)
+    refine le_antisymm
+      (fun y hy => ?_)
       (sup_le (Submodule.map_comap_le _ _) ((Submodule.span_singleton_le_iff_mem _ _).2 hlL))
     obtain ⟨x, hx⟩ := hdec y hy
     obtain ⟨b, hb⟩ := hint y hy
     have e : y + b • l = ι (x + b • x₀) := by
-      rw [← algebraMap_smul D.host.E b, ← algebraMap_smul D.host.E b x₀, hb, map_add (f := _), map_smul, hl2]
+      rw [← algebraMap_smul D.host.E b, ← algebraMap_smul D.host.E b x₀, hb, map_add (f := _),
+        map_smul, hl2]
       generalize Y.hD y z = t at hx ⊢
       rw [hx]
       module

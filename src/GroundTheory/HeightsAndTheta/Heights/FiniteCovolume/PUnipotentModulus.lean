@@ -12,7 +12,8 @@ open NumberField GroundTheory.Automorphic Module Matrix Topology MeasureTheory
 
 noncomputable section
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
@@ -20,10 +21,12 @@ section Form
 
 variable {h : HermitianForm F E W} {v : Basis ι E W} {x₀ w₀ : W}
 
-def heisForm (h : HermitianForm F E W) (v : Basis ι E W) (x₀ w₀ : W) :
-    LinearMap.BilinForm ℝ (heisY h v x₀ w₀) :=
-  LinearMap.mk₂ ℝ (fun y z => ∑ w, (hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w)
-      ((z : InfinitePlace E → ι → ℂ) w)).re)
+def heisForm (h : HermitianForm F E W) (v : Basis ι E W) (x₀ w₀ : W)
+    : LinearMap.BilinForm ℝ (heisY h v x₀ w₀) :=
+  LinearMap.mk₂ ℝ
+    (fun y z =>
+      ∑ w, (hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w)
+        ((z : InfinitePlace E → ι → ℂ) w)).re)
     (fun y y' z => by
       simp only [Submodule.coe_add, Pi.add_apply, hForm_add_left, Complex.add_re,
         Finset.sum_add_distrib])
@@ -38,19 +41,21 @@ def heisForm (h : HermitianForm F E W) (v : Basis ι E W) (x₀ w₀ : W) :
         Complex.re_ofReal_mul, smul_eq_mul, Finset.mul_sum])
 
 omit [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] [DecidableEq ι] in
-theorem heisForm_apply (y z : heisY h v x₀ w₀) :
-    heisForm h v x₀ w₀ y z = ∑ w, (hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w)
-      ((z : InfinitePlace E → ι → ℂ) w)).re := rfl
+theorem heisForm_apply (y z : heisY h v x₀ w₀)
+    : heisForm h v x₀ w₀ y z
+      = ∑ w, (hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w)
+        ((z : InfinitePlace E → ι → ℂ) w)).re :=
+  rfl
 
-theorem heisForm_comm (hp : IsHyperbolicPair h x₀ w₀) (y z : heisY h v x₀ w₀) :
-    heisForm h v x₀ w₀ y z = heisForm h v x₀ w₀ z y := by
+theorem heisForm_comm (hp : IsHyperbolicPair h x₀ w₀) (y z : heisY h v x₀ w₀)
+    : heisForm h v x₀ w₀ y z = heisForm h v x₀ w₀ z y := by
   rw [heisForm_apply, heisForm_apply]
   refine Finset.sum_congr rfl fun w _ => ?_
   obtain ⟨hH, -⟩ := hyperbolic_at_place h v hp w
   rw [← hForm_conj hH, Complex.conj_re]
 
-theorem heisForm_nondegenerate (hp : IsHyperbolicPair h x₀ w₀) :
-    (heisForm h v x₀ w₀).Nondegenerate := by
+theorem heisForm_nondegenerate (hp : IsHyperbolicPair h x₀ w₀)
+    : (heisForm h v x₀ w₀).Nondegenerate := by
   classical
   have left : ∀ y : heisY h v x₀ w₀, (∀ z, heisForm h v x₀ w₀ y z = 0) → y = 0 := by
     intro y hy
@@ -72,7 +77,8 @@ theorem heisForm_nondegenerate (hp : IsHyperbolicPair h x₀ w₀) :
       rw [hq]
       simp only [hForm_sub_right, hForm_smul_right, hb, hba]
       ring
-    have key : ∀ c : ℂ, (hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w) (c • q)).re = 0 := by
+    have key
+        : ∀ c : ℂ, (hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w) (c • q)).re = 0 := by
       intro c
       have hmem : (Pi.single w (c • q) : InfinitePlace E → ι → ℂ) ∈ heisY h v x₀ w₀ := by
         intro w'
@@ -95,25 +101,27 @@ theorem heisForm_nondegenerate (hp : IsHyperbolicPair h x₀ w₀) :
       rw [← hForm_conj hH, (y.2 w).1, map_zero]
     have hyb : hForm (gramAt h v w) ((y : InfinitePlace E → ι → ℂ) w) (vecAt v w₀ w) = 0 := by
       rw [← hForm_conj hH, (y.2 w).2, map_zero]
-    have hz : z = q + hForm (gramAt h v w) (vecAt v w₀ w) z • vecAt v x₀ w +
-        hForm (gramAt h v w) (vecAt v x₀ w) z • vecAt v w₀ w := by
+    have hz
+        : z
+          = q + hForm (gramAt h v w) (vecAt v w₀ w) z • vecAt v x₀ w
+            + hForm (gramAt h v w) (vecAt v x₀ w) z • vecAt v w₀ w := by
       rw [hq]
       abel
     rw [hz, hForm_add_right, hForm_add_right, hForm_smul_right, hForm_smul_right, hyq, hya, hyb]
     ring
   exact ⟨left, fun y hy => left y fun z => by rw [heisForm_comm hp]; exact hy z⟩
 
-theorem heisForm_heisConjLin (g : archUnitary h v)
-    (hg : g ∈ vecFixGroup h v x₀ ⊓ vecFixGroup h v w₀) (y z : heisY h v x₀ w₀) :
-    heisForm h v x₀ w₀ (heisConjLin g hg y) (heisConjLin g hg z) = heisForm h v x₀ w₀ y z := by
+theorem heisForm_heisConjLin
+    (g : archUnitary h v) (hg : g ∈ vecFixGroup h v x₀ ⊓ vecFixGroup h v w₀) (y z : heisY h v x₀ w₀)
+    : heisForm h v x₀ w₀ (heisConjLin g hg y) (heisConjLin g hg z) = heisForm h v x₀ w₀ y z := by
   rw [heisForm_apply, heisForm_apply]
   refine Finset.sum_congr rfl fun w _ => ?_
   rw [heisConjLin_apply, heisConjLin_apply, hForm_mulVec_of_unitary _ (archUnitary_at_place g w)]
 
 end Form
 
-theorem UnipotentModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
-    UnipotentModulus.Statement h v := by
+theorem UnipotentModulus.proof (h : HermitianForm F E W) (v : Basis ι E W)
+    : UnipotentModulus.Statement h v := by
   intro x₀ w₀ hp μ _ g hg
   have : BorelSpace (unipRadical h v x₀) :=
     Subtype.borelSpace (fun x' => x' ∈ (unipRadical h v x₀ : Set (archUnitary h v)))
@@ -131,8 +139,8 @@ theorem UnipotentModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
   have hcm : Measurable c :=
     (φ.continuous.comp ((hGc.comp (continuous_fst.comp φ.symm.continuous)).prodMk
       (continuous_snd.comp φ.symm.continuous))).measurable
-  have hmap : (fun n : unipRadical h v x₀ => g * (n : archUnitary h v) * g⁻¹) =
-      Subtype.val ∘ c := by
+  have hmap
+      : (fun n : unipRadical h v x₀ => g * (n : archUnitary h v) * g⁻¹) = Subtype.val ∘ c := by
     funext n
     exact (hc n).symm
   have hGm : MeasurePreserving G Measure.addHaar Measure.addHaar :=
@@ -158,10 +166,14 @@ theorem UnipotentModulus.proof (h : HermitianForm F E W) (v : Basis ι E W) :
       simp only [hf]
       abel
     rw [e]
-    have hfc : Continuous f := continuous_pi fun w => Complex.continuous_im.comp
-      (continuous_hForm_right _ _ ((continuous_apply w).comp continuous_subtype_val))
-    refine MeasurePreserving.skew_product (f := fun y => p.1 + y)
-      (g := fun y t => (p.2 - f y) + t) (measurePreserving_add_left _ p.1) ?_
+    have hfc : Continuous f :=
+      continuous_pi fun w =>
+        Complex.continuous_im.comp (continuous_hForm_right _ _
+          ((continuous_apply w).comp continuous_subtype_val))
+    refine MeasurePreserving.skew_product
+      (f := fun y => p.1 + y)
+      (g := fun y t => (p.2 - f y) + t)
+      (measurePreserving_add_left _ p.1) ?_
       (Filter.Eventually.of_forall fun y => (measurePreserving_add_left volume _).map_eq)
     exact ((continuous_const.sub (hfc.comp continuous_fst)).add continuous_snd).measurable
   rw [hmap, ← Measure.map_map continuous_subtype_val.measurable hcm,

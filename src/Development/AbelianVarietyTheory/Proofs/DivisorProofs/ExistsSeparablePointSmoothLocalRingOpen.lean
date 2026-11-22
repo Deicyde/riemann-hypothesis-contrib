@@ -6,22 +6,30 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsCom
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
 namespace GlobalTheory.Mum
 
-theorem exists_separable_point_of_smooth : ∀ (R : Type) [CommRing R] [IsLocalRing R] (U : Over (Sp R)), Smooth U.hom →
-    ∀ O : U.left.Opens, (∃ u ∈ O, U.hom u = closedPoint R) →
-    ∃ (k' : Type) (_ : Field k') (_ : Algebra (ResidueField R) k') (_ : Module.Finite (ResidueField R) k')
-      (_ : Algebra.IsSeparable (ResidueField R) k') (x : Sp k' ⟶ U.left),
-      x ≫ U.hom = spMap ((algebraMap (ResidueField R) k').comp (residue R)) ∧ Set.range x ⊆ O := by
+theorem exists_separable_point_of_smooth
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] (U : Over (Sp R)),
+      Smooth U.hom
+        → ∀ O : U.left.Opens,
+          (∃ u ∈ O, U.hom u = closedPoint R)
+            → ∃ (k' : Type) (_ : Field k') (_ : Algebra (ResidueField R) k')
+                (_ : Module.Finite (ResidueField R) k')
+                (_ : Algebra.IsSeparable (ResidueField R) k') (x : Sp k' ⟶ U.left),
+              x ≫ U.hom = spMap ((algebraMap (ResidueField R) k').comp (residue R))
+                ∧ Set.range x ⊆ O := by
   intro R _ _ U hU O hO
-  obtain ⟨W, _, _, _, ε, y, hy, hyO⟩ := GlobalTheory.exists_etale_point_of_smooth U.hom R
-    (SeparableClosure (ResidueField R)) (𝟙 _) O (by obtain ⟨u, hu, e⟩ := hO; exact ⟨u, hu, e⟩)
+  obtain ⟨W, _, _, _, ε, y, hy, hyO⟩ :=
+    GlobalTheory.exists_etale_point_of_smooth U.hom R (SeparableClosure (ResidueField R)) (𝟙 _) O
+      (by obtain ⟨u, hu, e⟩ := hO; exact ⟨u, hu, e⟩)
   obtain ⟨s, hs⟩ := (Algebra.FiniteType.out : (⊤ : Subalgebra R W).FG)
   let k' : IntermediateField (ResidueField R) (SeparableClosure (ResidueField R)) :=
     IntermediateField.adjoin (ResidueField R) (ε '' (s : Set W))
@@ -33,7 +41,8 @@ theorem exists_separable_point_of_smooth : ∀ (R : Type) [CommRing R] [IsLocalR
   have hmem : ∀ w, ε w ∈ k' := fun w => hle (hs ▸ Algebra.mem_top)
   let g : W →+* k' := ε.toRingHom.codRestrict k' hmem
   set_option synthInstance.maxHeartbeats 200000 in
-    refine ⟨k', inferInstance, inferInstance, hfin, hsep, Spec.map (CommRingCat.ofHom g) ≫ y, ?_, ?_⟩
+    refine
+      ⟨k', inferInstance, inferInstance, hfin, hsep, Spec.map (CommRingCat.ofHom g) ≫ y, ?_, ?_⟩
   · rw [Category.assoc, hy, Category.comp_id, ← Spec.map_comp]
     congr 2
     ext r

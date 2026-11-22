@@ -11,58 +11,77 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.
 noncomputable section
 
 open scoped Classical InnerProductSpace TensorProduct ComplexOrder
-open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
-  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.TermOp Formalism.L2.SG.ColDict
+open MeasureTheory NumberField IsDedekindDomain Matrix Formalism.BasicNotions
+  Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.ColDict
 
 namespace Formalism.L2.SG.Pf.ColDictPf
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-abbrev unitaryGroupFiniteAdeles (D : D7) : Subgroup (GL (Fin (D.R.N 0)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F)) :=
-  Formalism.UG.UPts (Formalism.L2.Forms.sigD D) (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _)) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)
+abbrev unitaryGroupFiniteAdeles (D : D7)
+    : Subgroup (GL (Fin (D.R.N 0)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F)) :=
+  Formalism.UG.UPts (Formalism.L2.Forms.sigD D) (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
+    (FiniteAdeleRing (𝓞 D.host.F) D.host.F)
 
 abbrev unitaryGroupRational (D : D7) : Subgroup (GL (Fin (D.R.N 0)) D.host.E) :=
-  Formalism.UG.UJ (Formalism.L2.Forms.sigD D : D.host.E →+* D.host.E) (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
+  Formalism.UG.UJ (Formalism.L2.Forms.sigD D : D.host.E →+* D.host.E)
+    (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
 
-abbrev bcA (D : D7) :
-    GL (Fin (D.R.N 0)) D.host.E →* GL (Fin (D.R.N 0)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F) :=
+abbrev bcA (D : D7)
+    : GL (Fin (D.R.N 0)) D.host.E
+      →* GL (Fin (D.R.N 0)) (D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F) :=
   Formalism.UG.bc (Formalism.UG.inclE (F := D.host.F) (FiniteAdeleRing (𝓞 D.host.F) D.host.F))
 
 abbrev G0 (D : D7) : D.what₂.Tau → Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) ℂ :=
-  Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _)) (Formalism.L2.Forms.embT D)
+  Formalism.L2.Forms.gramC (Formalism.L2.Forms.gramN D 0 (Nat.zero_le _))
+    (Formalism.L2.Forms.embT D)
 
 instance instGroupUP0 (D : D7) : Group (unitaryGroupFiniteAdeles D) := Subgroup.toGroup _
 
 set_option synthInstance.maxHeartbeats 200000
 
-structure TrFacts {D : D7} (X : HidaSetting D) {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
-    (Tr : Transport X u F) : Prop where
+structure TrFacts
+    {D : D7} (X : HidaSetting D)
+    {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} (Tr : Transport X u F)
+    : Prop where
   tot : ∀ h : Hfin X u, ∃ y : unitaryGroupFiniteAdeles D, RepF X Tr.wt Tr.ιA (h : X.B.I.Gf) y
   onto : ∀ y : unitaryGroupFiniteAdeles D, ∃ h : Hfin X u, RepF X Tr.wt Tr.ιA (h : X.B.I.Gf) y
-  uniq : ∀ (h : X.B.I.Gf) (y y' : unitaryGroupFiniteAdeles D), RepF X Tr.wt Tr.ιA h y → RepF X Tr.wt Tr.ιA h y' → y = y'
-  inj : ∀ (h h' : Hfin X u) (y : unitaryGroupFiniteAdeles D), RepF X Tr.wt Tr.ιA (h : X.B.I.Gf) y →
-    RepF X Tr.wt Tr.ιA (h' : X.B.I.Gf) y → h = h'
-  ratF : ∀ γ : Gam X u, ∃ γ' ∈ unitaryGroupRational D, ∃ y : unitaryGroupFiniteAdeles D, (y : GL _ _) = bcA D γ' ∧
-      RepF X Tr.wt Tr.ιA (iotaF X u γ : X.B.I.Gf) y
-  ratB : ∀ γ' ∈ unitaryGroupRational D, ∃ γ : Gam X u, (∃ y : unitaryGroupFiniteAdeles D, (y : GL _ _) = bcA D γ' ∧
-      RepF X Tr.wt Tr.ιA (iotaF X u γ : X.B.I.Gf) y) ∧
-      ∀ τ, sTil X Tr.wt (iotaI X u γ : X.B.I.Ginf) τ =
-        Formalism.L2.Forms.atInf (Formalism.L2.Forms.embT D) (γ' : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E) τ
-  infOnto : ∀ g : D.what₂.Tau → Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) ℂ, (∀ τ, (g τ)ᴴ * G0 D τ * g τ = G0 D τ) →
-    ∃ s ∈ Hinf X u, ∀ τ, sTil X Tr.wt s τ * g τ = 1
+  uniq
+    : ∀ (h : X.B.I.Gf) (y y' : unitaryGroupFiniteAdeles D),
+      RepF X Tr.wt Tr.ιA h y → RepF X Tr.wt Tr.ιA h y' → y = y'
+  inj
+    : ∀ (h h' : Hfin X u) (y : unitaryGroupFiniteAdeles D),
+      RepF X Tr.wt Tr.ιA (h : X.B.I.Gf) y → RepF X Tr.wt Tr.ιA (h' : X.B.I.Gf) y → h = h'
+  ratF
+    : ∀ γ : Gam X u, ∃ γ' ∈ unitaryGroupRational D, ∃ y : unitaryGroupFiniteAdeles D,
+      (y : GL _ _) = bcA D γ' ∧ RepF X Tr.wt Tr.ιA (iotaF X u γ : X.B.I.Gf) y
+  ratB
+    : ∀ γ' ∈ unitaryGroupRational D, ∃ γ : Gam X u,
+      (∃ y : unitaryGroupFiniteAdeles D,
+          (y : GL _ _) = bcA D γ' ∧ RepF X Tr.wt Tr.ιA (iotaF X u γ : X.B.I.Gf) y)
+        ∧ ∀ τ,
+          sTil X Tr.wt (iotaI X u γ : X.B.I.Ginf) τ
+            = Formalism.L2.Forms.atInf (Formalism.L2.Forms.embT D)
+              (γ' : Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) D.host.E) τ
+  infOnto
+    : ∀ g : D.what₂.Tau → Matrix (Fin (D.R.N 0)) (Fin (D.R.N 0)) ℂ,
+      (∀ τ, (g τ)ᴴ * G0 D τ * g τ = G0 D τ) → ∃ s ∈ Hinf X u, ∀ τ, sTil X Tr.wt s τ * g τ = 1
 
 section RepAlg
 
-variable {D : D7} (X : HidaSetting D) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V)
-  (ιA : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F ≃+* D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F)
-
+variable
+  {D : D7} (X : HidaSetting D) (wt : (VS D).V ≃ₗ[D.host.E] (VS D).V)
+  (ιA
+    : X.B.I.E ⊗[X.B.I.F] Af X.B.I.F ≃+* D.host.E ⊗[D.host.F] FiniteAdeleRing (𝓞 D.host.F) D.host.F)
 
 end RepAlg
 
 section Phi
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {Tr : Transport X u F}
-  (G : TrFacts X Tr)
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
+  {Tr : Transport X u F} (G : TrFacts X Tr)
 
 end Phi
 
@@ -70,11 +89,12 @@ section Sharp
 
 variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter)
 
-theorem piU_inner (s : Hinf X u) (a b : X.Vpi u) :
-    ⟪X.piU u (s : X.B.I.Ginf) a, X.piU u (s : X.B.I.Ginf) b⟫_ℂ = ⟪a, b⟫_ℂ := (X.piU_rep u).2.2.1 _ (hinf_le_sinf X u _ s.2) a b
+theorem piU_inner (s : Hinf X u) (a b : X.Vpi u)
+    : ⟪X.piU u (s : X.B.I.Ginf) a, X.piU u (s : X.B.I.Ginf) b⟫_ℂ = ⟪a, b⟫_ℂ :=
+  (X.piU_rep u).2.2.1 _ (hinf_le_sinf X u _ s.2) a b
 
-theorem piU_adj (s : Hinf X u) (a b : X.Vpi u) :
-    ⟪X.piU u (s : X.B.I.Ginf) a, b⟫_ℂ = ⟪a, X.piU u ((s⁻¹ : Hinf X u) : X.B.I.Ginf) b⟫_ℂ := by
+theorem piU_adj (s : Hinf X u) (a b : X.Vpi u)
+    : ⟪X.piU u (s : X.B.I.Ginf) a, b⟫_ℂ = ⟪a, X.piU u ((s⁻¹ : Hinf X u) : X.B.I.Ginf) b⟫_ℂ := by
   have hs := hinf_le_sinf X u _ s.2
   have hs' := hinf_le_sinf X u _ (s⁻¹ : Hinf X u).2
   have hm := (X.piU_rep u).2.1 _ hs _ hs'
@@ -88,9 +108,10 @@ theorem norm_psiK (κ : Ku X u hK) : ‖((psiK X u hK κ : ℂˣ) : ℂ)‖ = 1 
   show ‖X.chi2 ((X.xu u)⁻¹ * ((κ : Hfin X u) : X.B.I.Gf) * X.xu u)‖ = 1
   exact hK.2.2.2.2 _ κ.2
 
-theorem rieszVector_rat (T : Cu X u hK) (γ : Gam X u) (h : Hfin X u) (κ : Ku X u hK) :
-    shP X u T.1 (iotaF X u γ * h * (κ : Hfin X u)) =
-      starRingEnd ℂ ((psiK X u hK κ : ℂˣ) : ℂ) • X.piU u (iotaI X u γ : X.B.I.Ginf) (shP X u T.1 h) := by
+theorem rieszVector_rat (T : Cu X u hK) (γ : Gam X u) (h : Hfin X u) (κ : Ku X u hK)
+    : shP X u T.1 (iotaF X u γ * h * (κ : Hfin X u))
+      = starRingEnd ℂ ((psiK X u hK κ : ℂˣ) : ℂ)
+        • X.piU u (iotaI X u γ : X.B.I.Ginf) (shP X u T.1 h) := by
   obtain ⟨hT1, hT2⟩ := T.2
   have hsh : ∀ (g : Hfin X u) (ξ : X.Vpi u), ⟪shP X u T.1 g, ξ⟫_ℂ = T.1 ξ (1, g) := by
     intro g ξ
@@ -99,35 +120,44 @@ theorem rieszVector_rat (T : Cu X u hK) (γ : Gam X u) (h : Hfin X u) (κ : Ku X
   intro ξ
   obtain ⟨hf1, hf2⟩ := hT1 ξ
   rw [hsh, inner_smul_left, Complex.conj_conj, piU_adj X u (iotaI X u γ), hsh]
-  have e1 : ((1 : Hinf X u), iotaF X u γ * h * (κ : Hfin X u)) =
-      ((1 : Hinf X u), iotaF X u γ * h) * (1, (κ : Hfin X u)) := by simp
-  have e2 : ((1 : Hinf X u), iotaF X u γ * h) = (iotaI X u γ, iotaF X u γ) * ((iotaI X u γ)⁻¹, h) := by simp
+  have e1
+      : ((1 : Hinf X u), iotaF X u γ * h * (κ : Hfin X u))
+        = ((1 : Hinf X u), iotaF X u γ * h) * (1, (κ : Hfin X u)) := by
+    simp
+  have e2
+      : ((1 : Hinf X u), iotaF X u γ * h) = (iotaI X u γ, iotaF X u γ) * ((iotaI X u γ)⁻¹, h) := by
+    simp
   rw [e1, hf2, e2, hf1]
-  rw [show T.1 (X.piU u (((iotaI X u γ)⁻¹ : Hinf X u) : X.B.I.Ginf) ξ) (1, h) =
-      T.1 ξ ((1, h) * ((iotaI X u γ)⁻¹, 1)) from hT2 _ ξ _]
+  rw [show T.1 (X.piU u (((iotaI X u γ)⁻¹ : Hinf X u) : X.B.I.Ginf) ξ) (1, h)
+      = T.1 ξ ((1, h) * ((iotaI X u γ)⁻¹, 1)) from
+    hT2 _ ξ _]
   simp
 
-theorem rieszVector_rightTranslate (T : X.Vpi u →ₗ[ℂ] (Hinf X u × Hfin X u → ℂ)) (δ h : Hfin X u) :
-    shP X u (rtr X δ T) h = shP X u T (h * δ) := by
+theorem rieszVector_rightTranslate (T : X.Vpi u →ₗ[ℂ] (Hinf X u × Hfin X u → ℂ)) (δ h : Hfin X u)
+    : shP X u (rtr X δ T) h = shP X u T (h * δ) := by
   unfold shP
   congr 1
   ext ξ
   simp [rtr]
 
-theorem reps_equiv {ι ι' : Type} (s : ι → Hfin X u) (s' : ι' → Hfin X u) (K : Subgroup (Hfin X u))
+theorem reps_equiv
+    {ι ι' : Type} (s : ι → Hfin X u) (s' : ι' → Hfin X u)
+    (K : Subgroup (Hfin X u))
     (hs : ∀ h, ∃! i, ∃ (γ : Gam X u) (κ : K), h = iotaF X u γ * s i * (κ : Hfin X u))
-    (hs' : ∀ h, ∃! i, ∃ (γ : Gam X u) (κ : K), h = iotaF X u γ * s' i * (κ : Hfin X u)) :
-    ∃ e : ι ≃ ι', ∀ i, ∃ (γ : Gam X u) (κ : K), s i = iotaF X u γ * s' (e i) * (κ : Hfin X u) := by
+    (hs' : ∀ h, ∃! i, ∃ (γ : Gam X u) (κ : K), h = iotaF X u γ * s' i * (κ : Hfin X u))
+    : ∃ e : ι ≃ ι', ∀ i, ∃ (γ : Gam X u) (κ : K),
+      s i = iotaF X u γ * s' (e i) * (κ : Hfin X u) := by
   classical
-  have inv_rel : ∀ (a b : Hfin X u) (γ : Gam X u) (κ : K), a = iotaF X u γ * b * (κ : Hfin X u) →
-      b = iotaF X u γ⁻¹ * a * ((κ⁻¹ : K) : Hfin X u) := by
+  have inv_rel
+      : ∀ (a b : Hfin X u) (γ : Gam X u) (κ : K),
+        a = iotaF X u γ * b * (κ : Hfin X u) → b = iotaF X u γ⁻¹ * a * ((κ⁻¹ : K) : Hfin X u) := by
     intro a b γ κ h
     subst h
     simp [mul_assoc]
   let f : ι → ι' := fun i => (hs' (s i)).exists.choose
   let g : ι' → ι := fun i' => (hs (s' i')).exists.choose
-  have hf : ∀ i, ∃ (γ : Gam X u) (κ : K), s i = iotaF X u γ * s' (f i) * (κ : Hfin X u) :=
-    fun i => (hs' (s i)).exists.choose_spec
+  have hf : ∀ i, ∃ (γ : Gam X u) (κ : K), s i = iotaF X u γ * s' (f i) * (κ : Hfin X u) := fun i =>
+    (hs' (s i)).exists.choose_spec
   have hg : ∀ i', ∃ (γ : Gam X u) (κ : K), s' i' = iotaF X u γ * s (g i') * (κ : Hfin X u) :=
     fun i' => (hs (s' i')).exists.choose_spec
   refine ⟨⟨f, g, fun i => ?_, fun i' => ?_⟩, hf⟩
@@ -136,23 +166,27 @@ theorem reps_equiv {ι ι' : Type} (s : ι → Hfin X u) (s' : ι' → Hfin X u)
   · obtain ⟨γ, κ, h⟩ := hg i'
     exact (hs' (s (g i'))).unique (hf (g i')) ⟨γ⁻¹, κ⁻¹, inv_rel _ _ _ _ h⟩
 
-theorem sum_reps {ι ι' : Type} [Fintype ι] [Fintype ι'] (s : ι → Hfin X u) (s' : ι' → Hfin X u)
-    (K : Subgroup (Hfin X u))
+theorem sum_reps
+    {ι ι' : Type} [Fintype ι] [Fintype ι']
+    (s : ι → Hfin X u) (s' : ι' → Hfin X u) (K : Subgroup (Hfin X u))
     (hs : ∀ h, ∃! i, ∃ (γ : Gam X u) (κ : K), h = iotaF X u γ * s i * (κ : Hfin X u))
     (hs' : ∀ h, ∃! i, ∃ (γ : Gam X u) (κ : K), h = iotaF X u γ * s' i * (κ : Hfin X u))
-    (Q : Hfin X u → ℂ) (hQ : ∀ (γ : Gam X u) (h : Hfin X u) (κ : K), Q (iotaF X u γ * h * (κ : Hfin X u)) = Q h) :
-    ∑ i, Q (s i) = ∑ i', Q (s' i') := by
+    (Q : Hfin X u → ℂ)
+    (hQ : ∀ (γ : Gam X u) (h : Hfin X u) (κ : K), Q (iotaF X u γ * h * (κ : Hfin X u)) = Q h)
+    : ∑ i, Q (s i) = ∑ i', Q (s' i') := by
   obtain ⟨e, he⟩ := reps_equiv X u s s' K hs hs'
-  calc ∑ i, Q (s i) = ∑ i, Q (s' (e i)) := Finset.sum_congr rfl fun i _ => by
-          obtain ⟨γ, κ, h⟩ := he i
-          rw [h, hQ]
+  calc
+    ∑ i, Q (s i) = ∑ i, Q (s' (e i)) :=
+      Finset.sum_congr rfl fun i _ => by
+        obtain ⟨γ, κ, h⟩ := he i
+        rw [h, hQ]
     _ = ∑ i', Q (s' i') := Equiv.sum_comp e (fun i' => Q (s' i'))
 
-theorem inner_shP_rat (T T' : Cu X u hK) (γ : Gam X u) (h : Hfin X u) (κ : Ku X u hK) :
-    ⟪shP X u T'.1 (iotaF X u γ * h * (κ : Hfin X u)), shP X u T.1 (iotaF X u γ * h * (κ : Hfin X u))⟫_ℂ =
-      ⟪shP X u T'.1 h, shP X u T.1 h⟫_ℂ := by
-  rw [rieszVector_rat X u hK T γ h κ, rieszVector_rat X u hK T' γ h κ, inner_smul_left, inner_smul_right,
-    piU_inner X u (iotaI X u γ), Complex.conj_conj, ← mul_assoc, Complex.mul_conj,
+theorem inner_shP_rat (T T' : Cu X u hK) (γ : Gam X u) (h : Hfin X u) (κ : Ku X u hK)
+    : ⟪shP X u T'.1 (iotaF X u γ * h * (κ : Hfin X u)), shP X u T.1 (iotaF X u γ * h * (κ : Hfin X u))⟫_ℂ
+      = ⟪shP X u T'.1 h, shP X u T.1 h⟫_ℂ := by
+  rw [rieszVector_rat X u hK T γ h κ, rieszVector_rat X u hK T' γ h κ, inner_smul_left,
+    inner_smul_right, piU_inner X u (iotaI X u γ), Complex.conj_conj, ← mul_assoc, Complex.mul_conj,
     Complex.normSq_eq_norm_sq, norm_psiK X u hK κ]
   simp
 
@@ -160,22 +194,27 @@ end Sharp
 
 section Adelic
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {Tr : Transport X u F}
-  (G : TrFacts X Tr) {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
+  {Tr : Transport X u F} (G : TrFacts X Tr)
+  {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
 
 end Adelic
 
 section Adelic2
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {Tr : Transport X u F}
-  (G : TrFacts X Tr) {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
+  {Tr : Transport X u F} (G : TrFacts X Tr)
+  {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
 
 end Adelic2
 
 section Onto
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {Tr : Transport X u F}
-  (G : TrFacts X Tr)
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
+  {Tr : Transport X u F} (G : TrFacts X Tr)
 
 theorem vpi_nontrivial (X : HidaSetting D) (u : D.what₂.Word) : Nontrivial (X.Vpi u) := by
   have hloc : ∀ v, ∃ x : X.Vloc u v, x ≠ 0 := fun v => by
@@ -191,21 +230,27 @@ end Onto
 
 section Bij
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {Tr : Transport X u F}
-  (G : TrFacts X Tr) {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
+  {Tr : Transport X u F} (G : TrFacts X Tr)
+  {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
 
 end Bij
 
 section Isom
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {Tr : Transport X u F}
-  (G : TrFacts X Tr) {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u}
+  {Tr : Transport X u F} (G : TrFacts X Tr)
+  {hK : X.LevelSubgroupCharacter} (hL : LevelMatch X Tr hK)
 
 end Isom
 
 section Assembly
 
-variable {D : D7} {X : HidaSetting D} {u : D.what₂.Word} {F : Formalism.L2.Forms.Forms0 D u} {hK : X.LevelSubgroupCharacter}
+variable
+  {D : D7} {X : HidaSetting D} {u : D.what₂.Word}
+  {F : Formalism.L2.Forms.Forms0 D u} {hK : X.LevelSubgroupCharacter}
 
 end Assembly
 

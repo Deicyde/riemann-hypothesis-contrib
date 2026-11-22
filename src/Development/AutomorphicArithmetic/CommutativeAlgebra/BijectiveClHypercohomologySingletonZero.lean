@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BigEtaleModu
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Bc
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Bc
 
 private lemma sec_comp {A B C : Shv ℤ} (p : A ⟶ B) (q : B ⟶ C) {V : Scheme.{0}} (x : Sec A V) :
     Sec.map (p ≫ q) x = Sec.map q (Sec.map p x) := rfl
@@ -64,8 +65,8 @@ private lemma sgl_f {M F : Shv ℤ} (f : M ⟶ F) :
   rw [h, Category.assoc, (GlobalTheory.T.chosenInjectiveResolution_etaleSheaf_properties ℤ F).2.2.2.2.1]
 
 set_option backward.isDefEq.respectTransparency false in
-theorem UpperTheory.bijective_cl_hypercohomology_singleton_zero :
-    ∀ (M F : Shv ℤ), Function.Bijective (cl : (M ⟶ F) → HK ℤ (sgl M) F 0) := by
+theorem UpperTheory.bijective_cl_hypercohomology_singleton_zero
+    : ∀ (M F : Shv ℤ), Function.Bijective (cl : (M ⟶ F) → HK ℤ (sgl M) F 0) := by
   intro M F
   have hz : ∀ p : ℤ, p ≠ 0 → IsZero ((sgl M).X p) := fun p hp =>
     HomologicalComplex.isZero_single_obj_X _ _ _ _ hp
@@ -86,31 +87,41 @@ theorem UpperTheory.bijective_cl_hypercohomology_singleton_zero :
     apply Cocycle.ext
     rw [← hβ, hβ0 β, δ_zero]
     rfl
-  have hmono : Mono (resι ℤ F) := (GlobalTheory.T.chosenInjectiveResolution_etaleSheaf_properties ℤ F).2.2.2.2.2.1
+  have hmono : Mono (resι ℤ F) :=
+    (GlobalTheory.T.chosenInjectiveResolution_etaleSheaf_properties ℤ F).2.2.2.2.2.1
   have hsg : IsIso (sglι M) := by
     dsimp [sglι]
     infer_instance
   constructor
   · intro f f' h
-    have h1 : Cocycle.ofHom ((CochainComplex.singleFunctor (Shv ℤ) 0).map f ≫ resAug F)
-        = Cocycle.ofHom ((CochainComplex.singleFunctor (Shv ℤ) 0).map f' ≫ resAug F) := by
-      have := hcob _ ((CohomologyClass.mk_eq_zero_iff _).1
-        (by rw [CohomologyClass.mk_sub]; exact sub_eq_zero.2 h))
+    have h1
+        : Cocycle.ofHom ((CochainComplex.singleFunctor (Shv ℤ) 0).map f ≫ resAug F)
+          = Cocycle.ofHom ((CochainComplex.singleFunctor (Shv ℤ) 0).map f' ≫ resAug F) := by
+      have :=
+        hcob _
+          ((CohomologyClass.mk_eq_zero_iff _).1
+            (by rw [CohomologyClass.mk_sub]; exact sub_eq_zero.2 h))
       exact sub_eq_zero.1 this
-    have h2 := congrArg (fun x : Cocycle (sgl M) (res ℤ F) 0 =>
-      (x : Cochain (sgl M) (res ℤ F) 0).v 0 0 (add_zero 0)) h1
+    have h2 :=
+      congrArg
+        (fun x : Cocycle (sgl M) (res ℤ F) 0 =>
+          (x : Cochain (sgl M) (res ℤ F) 0).v 0 0 (add_zero 0))
+        h1
     simp only [Cocycle.ofHom_coe, Cochain.ofHom_v] at h2
     apply (cancel_mono (resι ℤ F)).1
     rw [← sgl_f, ← sgl_f, h2]
   · intro c
     obtain ⟨z, rfl⟩ := CohomologyClass.mk_surjective c
     have hz1 : (z : Cochain (sgl M) (res ℤ F) 0).v 0 0 (add_zero 0) ≫ (res ℤ F).d 0 1 = 0 := by
-      have e := congrArg (fun w : Cochain (sgl M) (res ℤ F) 1 => w.v 0 1 (zero_add 1))
-        ((Cocycle.mem_iff 0 1 (zero_add 1) _).1 z.2)
+      have e :=
+        congrArg
+          (fun w : Cochain (sgl M) (res ℤ F) 1 => w.v 0 1 (zero_add 1))
+          ((Cocycle.mem_iff 0 1 (zero_add 1) _).1 z.2)
       simp only [δ_zero_cochain_v, Cochain.zero_v] at e
       rwa [(hz 1 one_ne_zero).eq_of_tgt ((sgl M).d 0 1) 0, zero_comp, sub_zero] at e
-    obtain ⟨f, hf⟩ := exists_lift (sglι M ≫ (z : Cochain (sgl M) (res ℤ F) 0).v 0 0 (add_zero 0))
-      (by rw [Category.assoc, hz1, comp_zero])
+    obtain ⟨f, hf⟩ :=
+      exists_lift (sglι M ≫ (z : Cochain (sgl M) (res ℤ F) 0).v 0 0 (add_zero 0))
+        (by rw [Category.assoc, hz1, comp_zero])
     refine ⟨f, ?_⟩
     show CohomologyClass.mk _ = CohomologyClass.mk z
     congr 1

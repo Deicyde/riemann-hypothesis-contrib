@@ -15,8 +15,8 @@ variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 def pC (P : Ideal (MRing ι)) : Ideal (MRingOver ℂ ι) :=
   Ideal.span (map (Int.castRingHom ℂ) '' (P : Set (MRing ι)))
 
-theorem mcPts_eq_pC (P : Ideal (MRing ι)) :
-    mcPts P = {z | (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) ∧ ∀ f ∈ pC P, eval z f = 0} := by
+theorem mcPts_eq_pC (P : Ideal (MRing ι))
+    : mcPts P = {z | (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) ∧ ∀ f ∈ pC P, eval z f = 0} := by
   ext z
   simp only [mcPts, Set.mem_setOf_eq]
   constructor
@@ -34,8 +34,9 @@ def PCRadicalStatement : Prop :=
 
 def PCEquidimStatement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ),
-    IsArithVar P (e + 1) → ∀ Q ∈ (pC P).minimalPrimes,
-      ringKrullDim (MRingOver ℂ ι ⧸ Q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞)
+    IsArithVar P (e + 1)
+      → ∀ Q ∈ (pC P).minimalPrimes,
+        ringKrullDim (MRingOver ℂ ι ⧸ Q) = ((e + Fintype.card K : ℕ) : WithBot ℕ∞)
 
 def PCContractStatement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ),
@@ -51,8 +52,9 @@ def jacMinors {s : ℕ} (G : Fin s → MRing ι) (c : ℕ) : Set (MRing ι) :=
 
 def JacNotInPStatement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (e : ℕ),
-    IsArithVar P (e + 1) → ∃ (s : ℕ) (G : Fin s → MRing ι), (∀ i, ∃ a, IsMultiHomog (G i) a) ∧
-      Ideal.span (Set.range G) = P ∧
-      ¬ Ideal.span (jacMinors G (Fintype.card (Σ k, ι k) - (e + Fintype.card K))) ≤ P
+    IsArithVar P (e + 1)
+      → ∃ (s : ℕ) (G : Fin s → MRing ι),
+        (∀ i, ∃ a, IsMultiHomog (G i) a) ∧ Ideal.span (Set.range G) = P
+          ∧ ¬ Ideal.span (jacMinors G (Fintype.card (Σ k, ι k) - (e + Fintype.card K))) ≤ P
 
 end ReciprocityTheory.ChartRestriction.G.Geo

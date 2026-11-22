@@ -7,9 +7,13 @@ public import Development.AutomorphicArithmetic.PrimeDiscriminants.SmallRam
 
 open NumberField IsDedekindDomain
 
-theorem UpperTheory.Ram.not_dvd_QS_of_notMem_sq :
-    ∀ {φ : Formalism.HC.Frame} (H : Formalism.HC.HostAx φ), H.toHostRaw.Exact → ∀ (E' : Type) [Field E'] [NumberField E'] (_ : E' ≃+* H.E) (P : HeightOneSpectrum (𝓞 E')) (p : ℕ), p.Prime →
-      (p : 𝓞 E') ∈ P.asIdeal → (p : 𝓞 E') ∉ P.asIdeal ^ 2 → ¬ p ∣ H.QS ∧ (H.QS : 𝓞 E') ∉ P.asIdeal := by
+theorem UpperTheory.Ram.not_dvd_QS_of_notMem_sq
+    : ∀ {φ : Formalism.HC.Frame} (H : Formalism.HC.HostAx φ),
+      H.toHostRaw.Exact
+        → ∀ (E' : Type) [Field E'] [NumberField E'] (_ : E' ≃+* H.E) (P : HeightOneSpectrum (𝓞 E'))
+            (p : ℕ),
+          p.Prime → (p : 𝓞 E') ∈ P.asIdeal → (p : 𝓞 E') ∉ P.asIdeal ^ 2
+            → ¬ p ∣ H.QS ∧ (H.QS : 𝓞 E') ∉ P.asIdeal := by
   intro φ H hex E' _ _ f P p hp hpP hpP2
   haveI hPp : P.asIdeal.IsPrime := P.isPrime
   let g : 𝓞 H.E ≃+* 𝓞 E' := (NumberField.RingOfIntegers.mapRingEquiv f).symm

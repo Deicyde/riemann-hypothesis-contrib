@@ -9,14 +9,18 @@ open CategoryTheory Limits AlgebraicGeometry LateralTheory.E.t_E2Cut
 
 namespace LateralTheory.E.NormPf
 
-def OpenNbhdIC : Prop := ∀ {Z : Scheme.{0}} (U : Z.Opens), AICSch Z → (U : Set Z).Nonempty → AICSch U.toScheme
+def OpenNbhdIC : Prop :=
+  ∀ {Z : Scheme.{0}} (U : Z.Opens), AICSch Z → (U : Set Z).Nonempty → AICSch U.toScheme
 
 def FFAlg : Prop := ∀ {Z : Scheme.{0}} [IsIntegral Z], AICSch Z → IsAlgClosed Z.functionField
 
-def NormAIC : Prop := ∀ (K : Type) [Field K] [IsAlgClosed K] {W : Scheme.{0}} (g : Spec (CommRingCat.of K) ⟶ W)
-  [QuasiCompact g] [QuasiSeparated g], AICSch g.normalization
+def NormAIC : Prop :=
+  ∀ (K : Type) [Field K] [IsAlgClosed K] {W : Scheme.{0}} (g : Spec (CommRingCat.of K) ⟶ W)
+      [QuasiCompact g] [QuasiSeparated g],
+    AICSch g.normalization
 
-theorem spec_field_qc (K : Type) [Field K] {W : Scheme.{0}} (g : Spec (CommRingCat.of K) ⟶ W) : QuasiCompact g := by
+theorem spec_field_qc (K : Type) [Field K] {W : Scheme.{0}} (g : Spec (CommRingCat.of K) ⟶ W)
+    : QuasiCompact g := by
   rw [quasiCompact_iff_forall_isAffineOpen]
   intro U _
   exact (Set.toFinite _).isCompact
@@ -34,7 +38,9 @@ theorem Norm_of (h0 : OpenNbhdIC) (h1 : FFAlg) (h2 : NormAIC) : LateralTheory.E.
   have hg0 : IsDominant g0 := by
     constructor
     rw [denseRange_iff_closure_range, Scheme.range_fromSpecStalk]
-    exact Set.eq_univ_of_univ_subset ((genericPoint_spec U.toScheme).def ▸ closure_mono (Set.singleton_subset_iff.mpr (specializes_refl _)))
+    exact Set.eq_univ_of_univ_subset
+      ((genericPoint_spec U.toScheme).def
+        ▸ closure_mono (Set.singleton_subset_iff.mpr (specializes_refl _)))
   have hU' : IsDominant U.ι := by
     constructor
     rw [denseRange_iff_closure_range, Scheme.Opens.range_ι]

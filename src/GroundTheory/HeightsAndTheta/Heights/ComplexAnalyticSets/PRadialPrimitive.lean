@@ -14,8 +14,8 @@ open scoped ContDiff
 
 noncomputable section
 
-theorem RadialPrimitive.primitive_contDiff (f : ℝ → ℝ) (hf : ContDiff ℝ ∞ f) (c : ℝ) :
-    ContDiff ℝ ∞ (fun t => ∫ τ in c..t, f τ) ∧ deriv (fun t => ∫ τ in c..t, f τ) = f := by
+theorem RadialPrimitive.primitive_contDiff (f : ℝ → ℝ) (hf : ContDiff ℝ ∞ f) (c : ℝ)
+    : ContDiff ℝ ∞ (fun t => ∫ τ in c..t, f τ) ∧ deriv (fun t => ∫ τ in c..t, f τ) = f := by
   have hd : deriv (fun t => ∫ τ in c..t, f τ) = f :=
     funext fun t => hf.continuous.deriv_integral f c t
   refine ⟨contDiff_infty_iff_deriv.2 ⟨fun t => ?_, by rw [hd]; exact hf⟩, hd⟩
@@ -52,8 +52,8 @@ theorem RadialPrimitive.proof : RadialPrimitive.Statement := by
     by_cases hx : x < t₀
     · exact contDiffAt_const.congr_of_eventuallyEq (hlowE x hx)
     · have hx0 : 0 < x := lt_of_lt_of_le ht₀ (not_lt.1 hx)
-      exact (hPs.contDiffAt.div (contDiff_id.pow _).contDiffAt (pow_ne_zero _ hx0.ne')).congr_of_eventuallyEq
-        (hposE x hx0)
+      exact (hPs.contDiffAt.div (contDiff_id.pow _).contDiffAt
+        (pow_ne_zero _ hx0.ne')).congr_of_eventuallyEq (hposE x hx0)
 
   set R : ℝ := max T t₀ with hR
   have hPz : ∀ t, R ≤ t → P t = 0 := by
@@ -67,8 +67,9 @@ theorem RadialPrimitive.proof : RadialPrimitive.Statement := by
           simp [hg, hzero τ hτ.1]
       rw [hcg]
       simp
-    have := intervalIntegral.integral_add_adjacent_intervals (μ := volume) (a := 0) (b := T) (c := t)
-      (hgc.intervalIntegrable _ _) (hgc.intervalIntegrable _ _)
+    have :=
+      intervalIntegral.integral_add_adjacent_intervals (μ := volume) (a := 0) (b := T) (c := t)
+        (hgc.intervalIntegrable _ _) (hgc.intervalIntegrable _ _)
     simp only [hP]
     rw [← this, htail, add_zero]
     exact hint
@@ -93,7 +94,8 @@ theorem RadialPrimitive.proof : RadialPrimitive.Statement := by
     ring
   · rw [hQd, (hposE t ht).deriv_eq, hrt]
     have hPt : HasDerivAt P (g t) t := (hgs.continuous.integral_hasStrictDerivAt 0 t).hasDerivAt
-    have hq : HasDerivAt (fun s => P s / s ^ (e + 1))
+    have hq : HasDerivAt
+        (fun s => P s / s ^ (e + 1))
         ((g t * t ^ (e + 1) - P t * (((e + 1 : ℕ) : ℝ) * t ^ (e + 1 - 1))) / (t ^ (e + 1)) ^ 2) t :=
       hPt.div (hasDerivAt_pow (e + 1) t) (pow_ne_zero _ ht.ne')
     rw [hq.deriv]

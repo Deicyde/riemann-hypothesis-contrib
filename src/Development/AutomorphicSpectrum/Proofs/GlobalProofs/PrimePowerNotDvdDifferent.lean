@@ -9,10 +9,12 @@ open NumberField IsDedekindDomain nonZeroDivisors
 
 namespace GlobalTheory.CompanionTheory.Glob
 
-theorem not_pow_dvd_different (E : Type) [Field E] [NumberField E] (P J : Ideal (𝓞 E)) [P.IsPrime]
-    (p k : ℕ) (hp : p.Prime) (hpP : (p : 𝓞 E) ∈ P) (hPJ : ¬ P ∣ J)
-    (hspan : Ideal.span {((p : 𝓞 E)) ^ (Module.finrank ℚ E)} = P ^ k * J) :
-    ¬ P ^ k ∣ differentIdeal ℤ (𝓞 E) := by
+theorem not_pow_dvd_different
+    (E : Type) [Field E] [NumberField E]
+    (P J : Ideal (𝓞 E)) [P.IsPrime]
+    (p k : ℕ) (hp : p.Prime) (hpP : (p : 𝓞 E) ∈ P)
+    (hPJ : ¬ P ∣ J) (hspan : Ideal.span {((p : 𝓞 E)) ^ (Module.finrank ℚ E)} = P ^ k * J)
+    : ¬ P ^ k ∣ differentIdeal ℤ (𝓞 E) := by
   intro hdiv
   set d := Module.finrank ℚ E with hd
   have hdpos : 0 < d := Module.finrank_pos
@@ -41,7 +43,8 @@ theorem not_pow_dvd_different (E : Type) [Field E] [NumberField E] (P J : Ideal 
   have hidem : x * x - x ∈ Ideal.span {((p : 𝓞 E)) ^ d} := by
     have : x * x - x = -(x * y) := by
       have : x = 1 - y := by rw [← hyx]; ring
-      rw [this]; ring
+      rw [this]
+      ring
     rw [this]
     exact neg_mem hxy
   have hnot : x ∉ Ideal.span {((p : 𝓞 E)) ^ d} := by
@@ -59,8 +62,9 @@ theorem not_pow_dvd_different (E : Type) [Field E] [NumberField E] (P J : Ideal 
     rw [Ne, FractionalIdeal.coeIdeal_eq_zero]
     exact differentIdeal_ne_bot
   have hz : (x : E) / ((p : E)) ^ d ∈ FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) := by
-    have hdual : FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E) =
-        ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E)⁻¹ := by
+    have hdual
+        : FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 E)⁰ E)
+          = ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E)⁻¹ := by
       rw [coeIdeal_differentIdeal ℤ ℚ E (𝓞 E), inv_inv]
     rw [hdual, FractionalIdeal.mem_inv_iff hD0]
     intro w hw
@@ -79,7 +83,8 @@ theorem not_pow_dvd_different (E : Type) [Field E] [NumberField E] (P J : Ideal 
     rw [h2]
     ring
   have h10 : (1 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := one_ne_zero
-  have htr := (FractionalIdeal.mem_dual (A := ℤ) (K := ℚ) h10).1 hz 1 (FractionalIdeal.one_mem_one _)
+  have htr :=
+    (FractionalIdeal.mem_dual (A := ℤ) (K := ℚ) h10).1 hz 1 (FractionalIdeal.one_mem_one _)
   obtain ⟨n, hn⟩ := htr
   rw [Algebra.traceForm_apply, mul_one] at hn
   have hzs : (x : E) / ((p : E)) ^ d = (((p : ℚ) ^ d)⁻¹) • (x : E) := by

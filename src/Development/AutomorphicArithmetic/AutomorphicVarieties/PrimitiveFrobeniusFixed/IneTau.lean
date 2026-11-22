@@ -6,11 +6,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.CyclotomicI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick UpperTheory.V.ML
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.Stick
+  UpperTheory.V.ML
 open scoped nonZeroDivisors Pointwise
 
-theorem UpperTheory.V.ML.ineTau :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (q : ℕ), q.Prime → (∀ A : ValuationSubring Ω, Over A q → ∀ b : (ZMod q)ˣ, ∃ t ∈ Ine (F := ℚ) A, Lifts q b t) ∧ ∃ τ : G ℚ Ω, IsTau q τ := by
+theorem UpperTheory.V.ML.ineTau
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (q : ℕ),
+      q.Prime
+        → (∀ A : ValuationSubring Ω, Over A q → ∀ b : (ZMod q)ˣ, ∃ t ∈ Ine (F := ℚ) A, Lifts q b t)
+          ∧ ∃ τ : G ℚ Ω, IsTau q τ := by
   intro Ω _ _ _ q hq
   haveI : Fact q.Prime := ⟨hq⟩
   haveI : NeZero q := ⟨hq.ne_zero⟩
@@ -24,8 +29,9 @@ theorem UpperTheory.V.ML.ineTau :
       rw [h]
       infer_instance
     exact Subsingleton.elim _ _
-  have part1 : ∀ A : ValuationSubring Ω, Over A q → ∀ b : (ZMod q)ˣ,
-      ∃ t ∈ Ine (F := ℚ) A, Lifts q b t := by
+  have part1
+      : ∀ A : ValuationSubring Ω,
+        Over A q → ∀ b : (ZMod q)ˣ, ∃ t ∈ Ine (F := ℚ) A, Lifts q b t := by
     intro A hA b
     have hA' : A.valuation (q : Ω) < 1 := by
       unfold Over at hA

@@ -14,11 +14,13 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
@@ -29,22 +31,29 @@ theorem logNorm_nonneg (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) : 0 �
   unfold logNorm
   exact Real.log_natCast_nonneg _
 
-theorem NlaG_nonneg (hd : d.AxH 𝒜) (h : d.S1) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) :
-    0 ≤ d.NlaG h (d.n1 • d.wde) d.et la :=
-  Finset.sum_nonneg fun c _ => finsum_nonneg fun w => finsum_nonneg fun hw =>
-    mul_nonneg (Nat.cast_nonneg _) (by exact_mod_cast hd.ord_nonneg_et c _ (d.admissible_over_prime hd h la c w hw).1)
+theorem NlaG_nonneg (hd : d.AxH 𝒜) (h : d.S1) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : 0 ≤ d.NlaG h (d.n1 • d.wde) d.et la :=
+  Finset.sum_nonneg fun c _ =>
+    finsum_nonneg fun w =>
+      finsum_nonneg fun hw =>
+        mul_nonneg (Nat.cast_nonneg _)
+          (by exact_mod_cast hd.ord_nonneg_et c _ (d.admissible_over_prime hd h la c w hw).1)
 
-theorem Nla_le (hd : d.AxH 𝒜) (h : d.S1) (hH1 : d.FinitePlaceHyp) (f : ∀ c, A c)
-    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) :
-    d.NlaG h d.wL f la ≤ d.NlaMM h f la + d.del * d.nu la +
-      d.cc / d.i * d.NlaG h (d.n1 • d.wde) d.et la := by
+theorem Nla_le
+    (hd : d.AxH 𝒜) (h : d.S1) (hH1 : d.FinitePlaceHyp) (f : ∀ c, A c)
+    (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : d.NlaG h d.wL f la
+      ≤ d.NlaMM h f la + d.del * d.nu la + d.cc / d.i * d.NlaG h (d.n1 • d.wde) d.et la := by
   have hnn := d.NlaG_nonneg hd h la
   have hi : (0 : ℝ) ≤ d.cc / d.i := div_nonneg hd.cc_nonneg (Nat.cast_nonneg _)
-  suffices key : d.NlaG h d.wL f la ≤ d.NlaMM h f la + d.del * d.nu la +
-      d.cc / (2 * d.i) * d.NlaG h (d.n1 • d.wde) d.et la by
-    have : d.cc / (2 * d.i) * d.NlaG h (d.n1 • d.wde) d.et la ≤ d.cc / d.i * d.NlaG h (d.n1 • d.wde) d.et la := by
+  suffices key
+      : d.NlaG h d.wL f la
+        ≤ d.NlaMM h f la + d.del * d.nu la + d.cc / (2 * d.i) * d.NlaG h (d.n1 • d.wde) d.et la by
+    have : d.cc / (2 * d.i) * d.NlaG h (d.n1 • d.wde) d.et la
+        ≤ d.cc / d.i * d.NlaG h (d.n1 • d.wde) d.et la := by
       have : d.cc / (2 * d.i) = (d.cc / d.i) / 2 := by ring
-      rw [this]; nlinarith
+      rw [this]
+      nlinarith
     linarith
   unfold NlaG NlaMM del
   push_cast
@@ -54,7 +63,9 @@ theorem Nla_le (hd : d.AxH 𝒜) (h : d.S1) (hH1 : d.FinitePlaceHyp) (f : ∀ c,
   have hsum := (d.places_over_la hd h la c).2
   rw [finsum_mem_eq_finite_toFinset_sum _ hfin] at hsum ⊢
   rw [finsum_mem_eq_finite_toFinset_sum _ hfin, finsum_mem_eq_finite_toFinset_sum _ hfin]
-  have hsumR : (d.delc c : ℝ) = ∑ w ∈ hfin.toFinset, (d.fze h c w : ℝ) * (ramIdx (K := K) (d.Wres c w) la : ℝ) := by
+  have hsumR
+      : (d.delc c : ℝ)
+        = ∑ w ∈ hfin.toFinset, (d.fze h c w : ℝ) * (ramIdx (K := K) (d.Wres c w) la : ℝ) := by
     have e := congrArg (fun z : ℤ => (z : ℝ)) hsum
     push_cast at e
     linarith
@@ -66,8 +77,10 @@ theorem Nla_le (hd : d.AxH 𝒜) (h : d.S1) (hH1 : d.FinitePlaceHyp) (f : ∀ c,
   have hf : (0 : ℝ) ≤ d.fze h c w := Nat.cast_nonneg _
   unfold ordMM
   push_cast
-  have e : ((⨅ j : {j // d.w j c ≠ 0}, d.ord c (d.Wres c w) d.wL (d.w j c) : ℤ) : ℝ) =
-    (d.Emin c (d.Wres c w) : ℝ) := rfl
+  have e
+      : ((⨅ j : {j // d.w j c ≠ 0}, d.ord c (d.Wres c w) d.wL (d.w j c) : ℤ) : ℝ)
+        = (d.Emin c (d.Wres c w) : ℝ) :=
+    rfl
   rw [e] at h3 ⊢
   nlinarith [mul_le_mul_of_nonneg_left h3 hf]
 

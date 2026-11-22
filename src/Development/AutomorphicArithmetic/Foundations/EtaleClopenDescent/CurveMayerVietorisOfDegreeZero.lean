@@ -9,8 +9,8 @@ public import Development.EtaleCohomology.EtaleTrace.LocalSplitting.Cover2
 
 open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC
 
-theorem UpperTheory.Cb.curve_mayer_vietoris_of_degree_zero :
-    LateralTheory.E.E4.H0TwistOverClosedField → LateralTheory.E.E4.CurveCut.LeafMV := by
+theorem UpperTheory.Cb.curve_mayer_vietoris_of_degree_zero
+    : LateralTheory.E.E4.H0TwistOverClosedField → LateralTheory.E.E4.CurveCut.LeafMV := by
   intro _ _ R _ F X U V hUV n
   obtain ⟨d, hd, -⟩ := mayerVietoris R F
   have hc := LateralTheory.EtaleTrace.LSplitPf.Sch.cover2 R U V hUV

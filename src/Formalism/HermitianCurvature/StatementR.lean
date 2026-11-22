@@ -24,10 +24,10 @@ structure LevelData (A : Type) [Ring A] [Algebra ℂ A] (r : ℕ) where
   nab : A
   nabs : A
   TT : ℂ
-
-  fns_comm : ∀ x ∈ Set.range c ∪ Set.range ci ∪ Set.range cb ∪ Set.range cbi ∪ {ζ, ζi, ζb, ζbi, GG, GGi},
-    ∀ y ∈ Set.range c ∪ Set.range ci ∪ Set.range cb ∪ Set.range cbi ∪ {ζ, ζi, ζb, ζbi, GG, GGi},
-    x * y = y * x
+  fns_comm
+    : ∀ x ∈ Set.range c ∪ Set.range ci ∪ Set.range cb ∪ Set.range cbi ∪ {ζ, ζi, ζb, ζbi, GG, GGi},
+      ∀ y ∈ Set.range c ∪ Set.range ci ∪ Set.range cb ∪ Set.range cbi ∪ {ζ, ζi, ζb, ζbi, GG, GGi},
+        x * y = y * x
   c_ci : ∀ l, c l * ci l = 1
   ci_c : ∀ l, ci l * c l = 1
   cb_cbi : ∀ l, cb l * cbi l = 1
@@ -96,7 +96,8 @@ noncomputable section
 variable (L : LevelData A r)
 
 def fns : Set A :=
-  Set.range L.c ∪ Set.range L.ci ∪ Set.range L.cb ∪ Set.range L.cbi ∪ {L.ζ, L.ζi, L.ζb, L.ζbi, L.GG, L.GGi}
+  Set.range L.c ∪ Set.range L.ci ∪ Set.range L.cb ∪ Set.range L.cbi
+    ∪ {L.ζ, L.ζi, L.ζb, L.ζbi, L.GG, L.GGi}
 
 def Tl (Y : ℂ) (l : Fin r) : Matrix (Fin 2) (Fin 2) A :=
   !![algebraMap ℂ A Y + L.p l, -L.c l; L.ci l, 0]
@@ -118,8 +119,8 @@ def Drb : A := (List.ofFn L.cb).prod
 def Dri : A := (List.ofFn L.ci).prod
 def Drbi : A := (List.ofFn L.cbi).prod
 
-def l0 (Y : ℂ) : A := -L.nab - algebraMap ℂ A (Y + 1/2) * (L.ζb * L.GGi)
-def m0 (Y : ℂ) : A := -L.nabs - algebraMap ℂ A (Y - 1/2) * (L.ζ * L.GGi)
+def l0 (Y : ℂ) : A := -L.nab - algebraMap ℂ A (Y + 1 / 2) * (L.ζb * L.GGi)
+def m0 (Y : ℂ) : A := -L.nabs - algebraMap ℂ A (Y - 1 / 2) * (L.ζ * L.GGi)
 
 def Ahat (Y : ℂ) : A := L.Dr * L.Ar Y
 def R0 (Y : ℂ) : A := L.Drb * L.GG * (L.l0 Y * L.Ar Y + L.Br Y)
@@ -140,51 +141,52 @@ open LevelData
 
 def RuleG : Prop :=
   ∀ (A : Type) [Ring A] [Algebra ℂ A] (r : ℕ) (L : LevelData A r) (s : ℂ) (Gs Gsi : A),
-    Gs * Gsi = 1 → Gsi * Gs = 1 → (∀ x ∈ L.fns, x * Gs = Gs * x) →
-    (∀ l, L.p l * Gs = Gs * L.p l + algebraMap ℂ A s * Gs) →
-    (∀ l, L.pb l * Gs = Gs * L.pb l + algebraMap ℂ A s * Gs) →
-    L.nab * Gs = Gs * L.nab + algebraMap ℂ A s * (L.ζb * L.GGi * Gs) →
-    L.nabs * Gs = Gs * L.nabs - algebraMap ℂ A s * (L.ζ * L.GGi * Gs) →
-    ∀ Y : ℂ, Gsi * L.Ahat Y * Gs = L.Ahat (Y + s) ∧ Gsi * L.R0 Y * Gs = L.R0 (Y + s) ∧
-      Gsi * L.Ahatv Y * Gs = L.Ahatv (Y - s) ∧ Gsi * L.R0v Y * Gs = L.R0v (Y - s)
+    Gs * Gsi = 1 → Gsi * Gs = 1 → (∀ x ∈ L.fns, x * Gs = Gs * x)
+      → (∀ l, L.p l * Gs = Gs * L.p l + algebraMap ℂ A s * Gs)
+      → (∀ l, L.pb l * Gs = Gs * L.pb l + algebraMap ℂ A s * Gs)
+      → L.nab * Gs = Gs * L.nab + algebraMap ℂ A s * (L.ζb * L.GGi * Gs)
+      → L.nabs * Gs = Gs * L.nabs - algebraMap ℂ A s * (L.ζ * L.GGi * Gs)
+      → ∀ Y : ℂ,
+        Gsi * L.Ahat Y * Gs = L.Ahat (Y + s) ∧ Gsi * L.R0 Y * Gs = L.R0 (Y + s)
+          ∧ Gsi * L.Ahatv Y * Gs = L.Ahatv (Y - s) ∧ Gsi * L.R0v Y * Gs = L.R0v (Y - s)
 
 def RuleD : Prop :=
   ∀ (A : Type) [Ring A] [Algebra ℂ A] (r : ℕ) (L : LevelData A r) (Y : ℂ),
-    L.Di * L.Ahat Y * L.D = L.Ahat (Y + 1) ∧
-    L.Di * L.R0 Y * L.D = L.R0 (Y + 1) + algebraMap ℂ A L.TT * (L.Drb * L.Di * L.Ahat (Y + 1)) ∧
-    L.Dbi * L.Ahatv Y * L.Db = L.Ahatv (Y - 1) ∧
-    L.Dbi * L.R0v Y * L.Db = L.R0v (Y - 1) - algebraMap ℂ A L.TT * (L.Dr * L.Dbi * L.Ahatv (Y - 1)) ∧
-    (∀ x ∈ Set.range L.cb ∪ Set.range L.cbi ∪ {L.ζb, L.ζbi},
-      x * L.Ahat Y = L.Ahat Y * x ∧ x * L.R0 Y = L.R0 Y * x) ∧
-    (∀ x ∈ Set.range L.c ∪ Set.range L.ci ∪ {L.ζ, L.ζi},
-      x * L.Ahatv Y = L.Ahatv Y * x ∧ x * L.R0v Y = L.R0v Y * x)
+    L.Di * L.Ahat Y * L.D = L.Ahat (Y + 1)
+      ∧ L.Di * L.R0 Y * L.D = L.R0 (Y + 1) + algebraMap ℂ A L.TT * (L.Drb * L.Di * L.Ahat (Y + 1))
+      ∧ L.Dbi * L.Ahatv Y * L.Db = L.Ahatv (Y - 1)
+      ∧ L.Dbi * L.R0v Y * L.Db
+        = L.R0v (Y - 1) - algebraMap ℂ A L.TT * (L.Dr * L.Dbi * L.Ahatv (Y - 1))
+      ∧ (∀ x ∈ Set.range L.cb ∪ Set.range L.cbi ∪ {L.ζb, L.ζbi},
+        x * L.Ahat Y = L.Ahat Y * x ∧ x * L.R0 Y = L.R0 Y * x)
+      ∧ (∀ x ∈ Set.range L.c ∪ Set.range L.ci ∪ {L.ζ, L.ζi},
+        x * L.Ahatv Y = L.Ahatv Y * x ∧ x * L.R0v Y = L.R0v Y * x)
 
 def RuleSS : Prop :=
   ∀ (A : Type) [Ring A] [Algebra ℂ A] (r : ℕ) (L : LevelData A r) (SS SSs : A),
-    (∀ x ∈ L.fns, x * SS = SS * x) → (∀ l, L.p l * SS = SS * L.p l) →
-    (∀ l, L.pb l * SS = SS * L.pb l) →
-    L.nab * SS = SS * L.nab - L.ζb * L.GGi * SS → L.nabs * SS = SS * L.nabs - L.ζ * L.GGi * SS →
-    (∀ x ∈ L.fns, x * SSs = SSs * x) → (∀ l, L.p l * SSs = SSs * L.p l) →
-    (∀ l, L.pb l * SSs = SSs * L.pb l) →
-    L.nab * SSs = SSs * L.nab + L.ζb * L.GGi * SSs →
-    L.nabs * SSs = SSs * L.nabs + L.ζ * L.GGi * SSs →
-    ∀ Y : ℂ,
-      L.Ahat Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.Ahat (Y - 1) ∧
-      L.R0 Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.R0 (Y - 1) ∧
-      L.Ahatv Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.Ahatv (Y - 1) ∧
-      L.R0v Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.R0v (Y - 1) ∧
-      L.Ahat Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.Ahat (Y + 1) ∧
-      L.R0 Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.R0 (Y + 1) ∧
-      L.Ahatv Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.Ahatv (Y + 1) ∧
-      L.R0v Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.R0v (Y + 1)
+    (∀ x ∈ L.fns, x * SS = SS * x) → (∀ l, L.p l * SS = SS * L.p l)
+      → (∀ l, L.pb l * SS = SS * L.pb l) → L.nab * SS = SS * L.nab - L.ζb * L.GGi * SS
+      → L.nabs * SS = SS * L.nabs - L.ζ * L.GGi * SS → (∀ x ∈ L.fns, x * SSs = SSs * x)
+      → (∀ l, L.p l * SSs = SSs * L.p l) → (∀ l, L.pb l * SSs = SSs * L.pb l)
+      → L.nab * SSs = SSs * L.nab + L.ζb * L.GGi * SSs
+      → L.nabs * SSs = SSs * L.nabs + L.ζ * L.GGi * SSs
+      → ∀ Y : ℂ,
+        L.Ahat Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.Ahat (Y - 1)
+          ∧ L.R0 Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.R0 (Y - 1)
+          ∧ L.Ahatv Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.Ahatv (Y - 1)
+          ∧ L.R0v Y * (L.Drb * L.Dri * SS) = (L.Drb * L.Dri * SS) * L.R0v (Y - 1)
+          ∧ L.Ahat Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.Ahat (Y + 1)
+          ∧ L.R0 Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.R0 (Y + 1)
+          ∧ L.Ahatv Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.Ahatv (Y + 1)
+          ∧ L.R0v Y * (SSs * (L.Dr * L.Drbi)) = (SSs * (L.Dr * L.Drbi)) * L.R0v (Y + 1)
 
 def RuleInv : Prop :=
   ∀ (A : Type) [Ring A] [Algebra ℂ A] (r : ℕ) (L : LevelData A r) (Y : ℂ),
-    L.ζbi * L.Ahat Y = L.Ahat Y * L.ζbi ∧ L.ζbi * L.R0 Y = L.R0 Y * L.ζbi ∧
-    L.ζbi * L.Ahatv Y = L.Ahatv Y * L.ζbi ∧
-    L.R0v Y * L.ζbi - L.ζbi * L.R0v Y = -(L.G * L.Dbi * L.Dbi * L.Ahatv Y) ∧
-    L.ζi * L.Ahat Y = L.Ahat Y * L.ζi ∧ L.ζi * L.Ahatv Y = L.Ahatv Y * L.ζi ∧
-    L.ζi * L.R0v Y = L.R0v Y * L.ζi ∧
-    L.R0 Y * L.ζi - L.ζi * L.R0 Y = L.G * L.Di * L.Di * L.Ahat Y
+    L.ζbi * L.Ahat Y = L.Ahat Y * L.ζbi ∧ L.ζbi * L.R0 Y = L.R0 Y * L.ζbi
+      ∧ L.ζbi * L.Ahatv Y = L.Ahatv Y * L.ζbi
+      ∧ L.R0v Y * L.ζbi - L.ζbi * L.R0v Y = -(L.G * L.Dbi * L.Dbi * L.Ahatv Y)
+      ∧ L.ζi * L.Ahat Y = L.Ahat Y * L.ζi ∧ L.ζi * L.Ahatv Y = L.Ahatv Y * L.ζi
+      ∧ L.ζi * L.R0v Y = L.R0v Y * L.ζi
+      ∧ L.R0 Y * L.ζi - L.ζi * L.R0 Y = L.G * L.Di * L.Di * L.Ahat Y
 
 end Formalism.FourierDecayAlt.R

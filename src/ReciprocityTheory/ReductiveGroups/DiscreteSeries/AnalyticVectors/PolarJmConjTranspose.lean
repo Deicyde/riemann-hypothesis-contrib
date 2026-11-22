@@ -215,8 +215,8 @@ lemma eq_mul_exp_neg_polar_L_mul_exp_polar_L {g : Matrix (Fin n) (Fin n) ℂ} :
 end PolarDecomposition
 
 open PolarDecomposition in
-theorem polar_UJ {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε) :
-    ∃ k ∈ Kset ε, ∃ Y, inP ε Y ∧ g = k * NormedSpace.exp Y :=
+theorem polar_UJ {ε : Fin n → Bool} {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
+    : ∃ k ∈ Kset ε, ∃ Y, inP ε Y ∧ g = k * NormedSpace.exp Y :=
   ⟨_, polar_k_mem hg, polar_L g, polar_L_inP hg, eq_mul_exp_neg_polar_L_mul_exp_polar_L⟩
 
 end ReciprocityTheory.ChartRestriction.DS

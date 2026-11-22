@@ -56,9 +56,10 @@ def expC : ℕ := sInf {c : ℕ | bigR D ^ 8 * degStar D L ^ 2 ≤ (3 : ℝ) ^ c
 def levDeep : ℕ := D.host.g 0 * D.host.g 1 * (3 ^ expC D L * 5 ^ expC D L)
 
 def shareW (g : ℕ) : ℝ :=
-  3 * (D.R.f : ℝ) / g + 23 * D.R.f * Real.log g * (g : ℝ) ^ (-(1 : ℝ) / 2) +
-    2 * D.R.f * D.R.m * (1 / (4 * ((min D.host.q D.host.d : ℕ) : ℝ)) + (1 + Real.log D.R.r) / ((g : ℝ) - 1)) +
-    (D.R.r : ℝ) / 2 * (7 / 8 : ℝ) ^ D.R.f + Real.exp (-(D.R.f : ℝ) / (5 * Real.log D.R.r))
+  3 * (D.R.f : ℝ) / g + 23 * D.R.f * Real.log g * (g : ℝ) ^ (-(1 : ℝ) / 2)
+    + 2 * D.R.f * D.R.m
+      * (1 / (4 * ((min D.host.q D.host.d : ℕ) : ℝ)) + (1 + Real.log D.R.r) / ((g : ℝ) - 1))
+    + (D.R.r : ℝ) / 2 * (7 / 8 : ℝ) ^ D.R.f + Real.exp (-(D.R.f : ℝ) / (5 * Real.log D.R.r))
 
 def del : ℝ := shareW D (D.host.g 0) + shareW D (D.host.g 1)
 
@@ -75,7 +76,10 @@ def nKap (j : ℕ) : ℝ := ∑ τ, nrm D (kap D j τ)
 def deW (j i : ℕ) : ℤ := if i < pp D j then 0 else -1
 
 def canW (j i : ℕ) : ℤ :=
-  if i < pp D j then (qq D j : ℤ) - pp D j + 1 + 2 * i else -(pp D j : ℤ) - qq D j + 1 + 2 * ((i : ℤ) - pp D j)
+  if i < pp D j then
+    (qq D j : ℤ) - pp D j + 1 + 2 * i
+  else
+    -(pp D j : ℤ) - qq D j + 1 + 2 * ((i : ℤ) - pp D j)
 
 def aW (j : ℕ) (τ : D.what₂.Tau) (i : ℕ) : ℤ := uAn D j τ i - (cTw D j : ℤ) * deW D j i - canW D j i
 

@@ -30,11 +30,12 @@ theorem pairMeas_bad (L : LocBessel k r) : pairMeas L {x | ¬ Good L x} = 0 := b
     rw [LocBessel.μN, hform, Measure.smul_apply, h1, smul_zero]
   have hW : L.μW {x | Matrix.of x ∉ UWset k r L.z} = 0 := L.hμW.1.2.2.1
   have hW' : L.μW' {x | Matrix.of x ∉ UWset k r L.z'} = 0 := L.hμW'.1.2.2.1
-  have hsub : {x : PairSp k r | ¬ Good L x} ⊆
-      ((Set.univ ×ˢ {x | Matrix.of x ∉ Nset k r}) ×ˢ Set.univ ∪
-        Set.univ ×ˢ (Set.univ ×ˢ {x | Matrix.of x ∉ Nset k r})) ∪
-      (({x | Matrix.of x ∉ UWset k r L.z} ×ˢ Set.univ) ×ˢ Set.univ ∪
-        Set.univ ×ˢ ({x | Matrix.of x ∉ UWset k r L.z'} ×ˢ Set.univ)) := by
+  have hsub
+      : {x : PairSp k r | ¬ Good L x}
+        ⊆ ((Set.univ ×ˢ {x | Matrix.of x ∉ Nset k r}) ×ˢ Set.univ
+            ∪ Set.univ ×ˢ (Set.univ ×ˢ {x | Matrix.of x ∉ Nset k r}))
+          ∪ (({x | Matrix.of x ∉ UWset k r L.z} ×ˢ Set.univ) ×ˢ Set.univ
+            ∪ Set.univ ×ˢ ({x | Matrix.of x ∉ UWset k r L.z'} ×ˢ Set.univ)) := by
     intro x hx
     simp only [Set.mem_union, Set.mem_prod, Set.mem_univ, Set.mem_setOf_eq, true_and, and_true]
     by_contra hc
@@ -42,23 +43,29 @@ theorem pairMeas_bad (L : LocBessel k r) : pairMeas L {x | ¬ Good L x} = 0 := b
     exact hx (by unfold Good; exact ⟨hc.1.1, hc.1.2, hc.2.1, hc.2.2⟩)
   refine measure_mono_null hsub ?_
   unfold pairMeas
-  refine measure_union_null (measure_union_null ?_ ?_) (measure_union_null ?_ ?_) <;>
-    simp only [Measure.prod_prod, hN, hW, hW', mul_zero, zero_mul]
+  refine measure_union_null (measure_union_null ?_ ?_) (measure_union_null ?_ ?_)
+    <;> simp only [Measure.prod_prod, hN, hW, hW', mul_zero, zero_mul]
 
-theorem nu_bad (L : LocBessel k r) {γ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
-    {μR : Measure (Mt k r)} (hR0 : μR ≠ 0) (hRc : μR {x | Matrix.of x ∉ RStab k r γ} = 0)
-    {ν : Measure (PairSp k r)} (hQ : IsOrbQuot L γ μR ν) : ν {x | ¬ Good L x} = 0 := by
+theorem nu_bad
+    (L : LocBessel k r)
+    {γ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} {μR : Measure (Mt k r)}
+    (hR0 : μR ≠ 0) (hRc : μR {x | Matrix.of x ∉ RStab k r γ} = 0)
+    {ν : Measure (PairSp k r)} (hQ : IsOrbQuot L γ μR ν)
+    : ν {x | ¬ Good L x} = 0 := by
   have hm : MeasurableSet {x : PairSp k r | ¬ Good L x} := (good_mset L).compl
   have h := hQ ({x : PairSp k r | ¬ Good L x}.indicator 1) (measurable_one.indicator hm)
   rw [lintegral_indicator_one hm, pairMeas_bad] at h
-  have hin : ∀ x, ∫⁻ a, {x : PairSp k r | ¬ Good L x}.indicator 1 (stabAct γ (Matrix.of a) x) ∂μR =
-      μR Set.univ * {x : PairSp k r | ¬ Good L x}.indicator 1 x := by
+  have hin
+      : ∀ x,
+        ∫⁻ a, {x : PairSp k r | ¬ Good L x}.indicator 1 (stabAct γ (Matrix.of a) x) ∂μR
+          = μR Set.univ * {x : PairSp k r | ¬ Good L x}.indicator 1 x := by
     intro x
     have hst : ∀ᵐ a ∂μR, Matrix.of a ∈ RStab k r γ := by
       rw [ae_iff]
       exact hRc
-    have hae : ∀ᵐ a ∂μR, {x : PairSp k r | ¬ Good L x}.indicator (1 : PairSp k r → ℝ≥0∞)
-        (stabAct γ (Matrix.of a) x) = {x : PairSp k r | ¬ Good L x}.indicator 1 x := by
+    have hae
+        : ∀ᵐ a ∂μR, {x : PairSp k r | ¬ Good L x}.indicator (1 : PairSp k r → ℝ≥0∞)
+          (stabAct γ (Matrix.of a) x) = {x : PairSp k r | ¬ Good L x}.indicator 1 x := by
       filter_upwards [hst] with a ha
       classical
       simp only [Set.indicator_apply, Set.mem_setOf_eq, Pi.one_apply, good_stabAct L ha x]

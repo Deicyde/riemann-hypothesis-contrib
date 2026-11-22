@@ -17,8 +17,8 @@ open ReciprocityTheory.ChartRestriction.G.Semi
 variable {X Y Z : Scheme.{0}} (L : LB X)
 
 def HasGen (F : (Y ⟶ X) →₀ ℤ) : Prop :=
-  ∃ (K : Type) (_ : Fintype K) (φ : K → (Y ⟶ X)) (ε : K → ℤ), fsum φ ε = F ∧
-    ∃ g : LB.Gen (LB.LinComb L φ ε), g.IsGen
+  ∃ (K : Type) (_ : Fintype K) (φ : K → (Y ⟶ X)) (ε : K → ℤ),
+    fsum φ ε = F ∧ ∃ g : LB.Gen (LB.LinComb L φ ε), g.IsGen
 
 variable {L}
 

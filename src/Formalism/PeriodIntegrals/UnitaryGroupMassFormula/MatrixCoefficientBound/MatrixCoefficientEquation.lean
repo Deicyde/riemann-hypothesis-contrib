@@ -23,18 +23,24 @@ section General
 
 variable {G : Type} [Group G] {X : Type} [MulAction Gᵐᵒᵖ X]
 
-theorem eq_of_smul_eq_of_free (hfree : ∀ (x : Gᵐᵒᵖ) (j : X), x • j = j → x = 1) {a b : Gᵐᵒᵖ} {j : X}
-    (h : a • j = b • j) : a = b := by
+theorem eq_of_smul_eq_of_free
+    (hfree : ∀ (x : Gᵐᵒᵖ) (j : X), x • j = j → x = 1) {a b : Gᵐᵒᵖ} {j : X} (h : a • j = b • j)
+    : a = b := by
   have h1 : (b⁻¹ * a) • j = j := by rw [mul_smul, h, inv_smul_smul]
   exact (inv_mul_eq_one.mp (hfree _ _ h1)).symm
 
-theorem exists_smul_comm (i j : X) : (∃ x : Gᵐᵒᵖ, x • j = i) ↔ ∃ x : Gᵐᵒᵖ, x • i = j :=
-  ⟨fun ⟨x, hx⟩ => ⟨x⁻¹, by rw [← hx, inv_smul_smul]⟩, fun ⟨x, hx⟩ => ⟨x⁻¹, by rw [← hx, inv_smul_smul]⟩⟩
+theorem exists_smul_comm (i j : X) : (∃ x : Gᵐᵒᵖ, x • j = i) ↔ ∃ x : Gᵐᵒᵖ, x • i = j := ⟨
+  fun ⟨x, hx⟩ => ⟨x⁻¹, by rw [← hx, inv_smul_smul]⟩,
+  fun ⟨x, hx⟩ => ⟨x⁻¹, by rw [← hx, inv_smul_smul]⟩
+⟩
 
-theorem sum_orbit [Fintype G] (hfree : ∀ (x : Gᵐᵒᵖ) (j : X), x • j = j → x = 1) (d : X → X → G)
-    (hd : ∀ i j, (∃ x : Gᵐᵒᵖ, x • j = i) → MulOpposite.op (d i j) • j = i) (f : G → ℂ) (i j : X) :
-    (∑ x : G, if MulOpposite.op x • j = i then f x else 0) =
-      if ∃ x : Gᵐᵒᵖ, x • j = i then f (d i j) else 0 := by
+theorem sum_orbit
+    [Fintype G]
+    (hfree : ∀ (x : Gᵐᵒᵖ) (j : X), x • j = j → x = 1)
+    (d : X → X → G) (hd : ∀ i j, (∃ x : Gᵐᵒᵖ, x • j = i) → MulOpposite.op (d i j) • j = i)
+    (f : G → ℂ) (i j : X)
+    : (∑ x : G, if MulOpposite.op x • j = i then f x else 0)
+      = if ∃ x : Gᵐᵒᵖ, x • j = i then f (d i j) else 0 := by
   by_cases h : ∃ x : Gᵐᵒᵖ, x • j = i
   · rw [if_pos h]
     have hdij := hd i j h
@@ -58,8 +64,9 @@ section Prod
 
 variable {ι : Type} [Fintype ι] {Fq : ι → Type} [∀ v, Field (Fq v)] [∀ v, Fintype (Fq v)] {k : ℕ}
 
-private theorem gam_inv_eq_conj {F : Type} [Field F] [Fintype F] {k : ℕ} (ψ₀ : AddChar F ℂ)
-    (x : GL (Fin k) F) : gam ψ₀ x⁻¹ = conj (gam ψ₀ x) := by
+private theorem gam_inv_eq_conj
+    {F : Type} [Field F] [Fintype F] {k : ℕ} (ψ₀ : AddChar F ℂ) (x : GL (Fin k) F)
+    : gam ψ₀ x⁻¹ = conj (gam ψ₀ x) := by
   unfold gam
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_mul, map_inv₀, map_natCast, map_sum]
@@ -69,17 +76,19 @@ private theorem gam_inv_eq_conj {F : Type} [Field F] [Fintype F] {k : ℕ} (ψ�
   congr 1
   group
 
-theorem gamProd_inv (ψ : ∀ v, AddChar (Fq v) ℂ) (x : ∀ v, GL (Fin k) (Fq v)) :
-    gamProd ψ x⁻¹ = conj (gamProd ψ x) := by
+theorem gamProd_inv (ψ : ∀ v, AddChar (Fq v) ℂ) (x : ∀ v, GL (Fin k) (Fq v))
+    : gamProd ψ x⁻¹ = conj (gamProd ψ x) := by
   unfold gamProd
   rw [map_prod]
   refine Finset.prod_congr rfl fun v _ => ?_
   rw [Pi.inv_apply, gam_inv_eq_conj]
 
-theorem toMatrix'_totOp_apply (ψ : ∀ v, AddChar (Fq v) ℂ) (X : Type) [Fintype X]
-    [MulAction (∀ v, GL (Fin k) (Fq v))ᵐᵒᵖ X] (i j : X) :
-    LinearMap.toMatrix' (totOp ψ (permRep (∀ v, GL (Fin k) (Fq v)) X)) i j =
-      ∑ x : (∀ v, GL (Fin k) (Fq v)), if MulOpposite.op x • i = j then gamProd ψ x else 0 := by
+theorem toMatrix'_totOp_apply
+    (ψ : ∀ v, AddChar (Fq v) ℂ)
+    (X : Type) [Fintype X] [MulAction (∀ v, GL (Fin k) (Fq v))ᵐᵒᵖ X]
+    (i j : X)
+    : LinearMap.toMatrix' (totOp ψ (permRep (∀ v, GL (Fin k) (Fq v)) X)) i j
+      = ∑ x : (∀ v, GL (Fin k) (Fq v)), if MulOpposite.op x • i = j then gamProd ψ x else 0 := by
   rw [LinearMap.toMatrix'_apply]
   simp [totOp, permRep, LinearMap.funLeft, Finset.sum_apply, Pi.single_apply, mul_ite]
 

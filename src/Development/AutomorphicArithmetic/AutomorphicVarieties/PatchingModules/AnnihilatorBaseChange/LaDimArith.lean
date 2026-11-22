@@ -10,11 +10,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.Pa UpperTheory.V.Pa.Core
+open IsLocalRing Matrix Filter UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.Pa UpperTheory.V.Pa.Core
 open scoped TensorProduct
 
-private theorem laDim_co (O : Type) [CommRing O] [IsLocalRing O] (K : Type) [Field K] [Algebra O K]
-    (h : Function.Surjective (algebraMap O K)) : IsCO O K := by
+private theorem laDim_co
+    (O : Type) [CommRing O] [IsLocalRing O]
+    (K : Type) [Field K] [Algebra O K]
+    (h : Function.Surjective (algebraMap O K))
+    : IsCO O K := by
   refine { complete := ?_, isLocalHom := IsLocalHom.of_surjective _ h, res_surj := ?_ }
   · rw [IsLocalRing.maximalIdeal_eq_bot]
     infer_instance
@@ -22,10 +26,13 @@ private theorem laDim_co (O : Type) [CommRing O] [IsLocalRing O] (K : Type) [Fie
     obtain ⟨a, rfl⟩ := h x
     exact ⟨a, by simp⟩
 
-private theorem laDim_surj (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
-    [IsAdicComplete (maximalIdeal O) O] (K : Type) [Field K] [Algebra O K] (σ : Type) [Finite σ] (s : σ)
-    (g : MvPowerSeries σ O →ₐ[O] PowerSeries K) (h : Function.Surjective (algebraMap O K))
-    (hg : g (MvPowerSeries.X s) = PowerSeries.X) : Function.Surjective g := by
+private theorem laDim_surj
+    (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O]
+    (K : Type) [Field K] [Algebra O K]
+    (σ : Type) [Finite σ]
+    (s : σ) (g : MvPowerSeries σ O →ₐ[O] PowerSeries K)
+    (h : Function.Surjective (algebraMap O K)) (hg : g (MvPowerSeries.X s) = PowerSeries.X)
+    : Function.Surjective g := by
   haveI : IsCO O K := laDim_co O K h
   haveI : IsCO O (MvPowerSeries σ O) := co_mvps O O σ
   haveI : IsCO O (PowerSeries K) := co_mvps O K Unit
@@ -35,19 +42,22 @@ private theorem laDim_surj (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherian
   have := MvPowerSeries.isUnit_constantCoeff _ hu
   simp at this
 
-private theorem laDim_arith (x : WithBot ℕ∞) (n : ℕ) (h : x + 1 = ((n + 1 : ℕ) : WithBot ℕ∞)) :
-    x = (n : WithBot ℕ∞) := by
+private theorem laDim_arith (x : WithBot ℕ∞) (n : ℕ) (h : x + 1 = ((n + 1 : ℕ) : WithBot ℕ∞))
+    : x = (n : WithBot ℕ∞) := by
   induction x using WithBot.recBotCoe with
   | bot => exact absurd h (by rw [WithBot.bot_add]; exact (WithBot.natCast_ne_bot _).symm)
   | coe y =>
     have h' : y + 1 = ((n : ℕ∞) + 1) := by exact_mod_cast h
     have : y = (n : ℕ∞) := WithTop.add_right_cancel ENat.one_ne_top h'
-    rw [this]; rfl
+    rw [this]
+    rfl
 
-private theorem laDim_gen (R : Type) [CommRing R] [IsRegularLocalRing R] (S : Type) [CommRing S] [IsDomain S]
-    [IsDiscreteValuationRing S] (p : Ideal R) (e : (R ⧸ p) ≃+* S) (n : ℕ)
-    (hdim : ringKrullDim R = ((n + 1 : ℕ) : WithBot ℕ∞)) :
-    ∃ (La : Type) (_ : CommRing La) (_ : IsLocalRing La) (_ : Algebra R La),
+private theorem laDim_gen
+    (R : Type) [CommRing R] [IsRegularLocalRing R]
+    (S : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S]
+    (p : Ideal R) (e : (R ⧸ p) ≃+* S)
+    (n : ℕ) (hdim : ringKrullDim R = ((n + 1 : ℕ) : WithBot ℕ∞))
+    : ∃ (La : Type) (_ : CommRing La) (_ : IsLocalRing La) (_ : Algebra R La),
       IsCplAt R p La ∧ IsRegularLocalRing La ∧ ringKrullDim La = (n : WithBot ℕ∞) := by
   haveI : IsDomain (R ⧸ p) := e.toMulEquiv.isDomain _
   haveI hp : p.IsPrime := (Ideal.Quotient.isDomain_iff_prime p).1 inferInstance
@@ -63,8 +73,14 @@ private theorem laDim_gen (R : Type) [CommRing R] [IsRegularLocalRing R] (S : Ty
   rw [hq] at h2
   rw [h2, hdim]
 
-theorem UpperTheory.V.Pa.Core.laDim :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] (K : Type) [Field K] [Finite K] [Algebra O K] (D : ℕ) (g : abelian₂ O Unit D →ₐ[O] PowerSeries K), Function.Surjective (algebraMap O K) → g (MvPowerSeries.X (.inl ())) = PowerSeries.X → ∃ (La : Type) (_ : CommRing La) (_ : IsLocalRing La) (_ : Algebra (abelian₂ O Unit D) La), IsCplAt (abelian₂ O Unit D) (RingHom.ker g) La ∧ IsRegularLocalRing La ∧ ringKrullDim La = ((1 + D : ℕ) : WithBot ℕ∞) := by
+theorem UpperTheory.V.Pa.Core.laDim
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] (K : Type) [Field K] [Finite K] [Algebra O K] (D : ℕ)
+        (g : abelian₂ O Unit D →ₐ[O] PowerSeries K),
+      Function.Surjective (algebraMap O K) → g (MvPowerSeries.X (.inl ())) = PowerSeries.X
+        → ∃ (La : Type) (_ : CommRing La) (_ : IsLocalRing La) (_ : Algebra (abelian₂ O Unit D) La),
+          IsCplAt (abelian₂ O Unit D) (RingHom.ker g) La ∧ IsRegularLocalRing La
+            ∧ ringKrullDim La = ((1 + D : ℕ) : WithBot ℕ∞) := by
   intro O _ _ _ _ K _ _ _ D g h hg
   have hs : Function.Surjective g := laDim_surj O K _ _ g h hg
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O

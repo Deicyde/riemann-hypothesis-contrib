@@ -11,13 +11,16 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3.PinA
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
 omit [FiniteDimensional K V] in
-theorem isIntegralLat_smul {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) (c : 𝓞 F) :
-    Formalism.HermitianLatticesTheory.IsIntegralLat (algebraMap F K (c : F) • h) L := by
+theorem isIntegralLat_smul
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    (c : 𝓞 F)
+    : Formalism.HermitianLatticesTheory.IsIntegralLat (algebraMap F K (c : F) • h) L := by
   intro x hx y hy
   have h1 : algebraMap F K (c : F) ∈ (1 : Submodule (𝓞 K) K) :=
     Submodule.mem_one.2 ⟨algebraMap (𝓞 F) (𝓞 K) c, rfl⟩
@@ -25,43 +28,57 @@ theorem isIntegralLat_smul {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (�
   rw [one_mul] at h2
   exact h2
 
-theorem akCount_smul (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F} (hc : c ≠ 0) {k : ℕ} (hk : vF 𝔭 c ≤ k) :
-    akCount (algebraMap F K (c : F) • h) L 𝔭 k =
-      Ideal.absNorm 𝔭 ^ (2 * vF 𝔭 c * finrank K V ^ 2) * akCount h L 𝔭 (k - vF 𝔭 c) := by
+theorem akCount_smul
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {c : 𝓞 F} (hc : c ≠ 0)
+    {k : ℕ} (hk : vF 𝔭 c ≤ k)
+    : akCount (algebraMap F K (c : F) • h) L 𝔭 k
+      = Ideal.absNorm 𝔭 ^ (2 * vF 𝔭 c * finrank K V ^ 2) * akCount h L 𝔭 (k - vF 𝔭 c) := by
   have : Fact (IsFixF K F) := ⟨hF⟩
   obtain ⟨b, hbL, hb⟩ := LocalSpans.exists_basis_locF hL h𝔭
   obtain ⟨H, hH, _⟩ := LocF.exists_gram hLi b hbL
-  have hH' : ∀ i j, algebraMap (𝓞 K) K ((algebraMap (𝓞 F) (𝓞 K) c • H) i j) =
-      (algebraMap F K (c : F) • h) (b i) (b j) := by
+  have hH'
+      : ∀ i j,
+        algebraMap (𝓞 K) K ((algebraMap (𝓞 F) (𝓞 K) c • H) i j)
+          = (algebraMap F K (c : F) • h) (b i) (b j) := by
     intro i j
     rw [Matrix.smul_apply, smul_eq_mul, map_mul, hH, MeanB.algebraMap_comp]
     rfl
-  rw [integralBasisSpans.akCount_eq _ h𝔭 b hb hH', integralBasisSpans.akCount_eq h h𝔭 b hb hH, PinAA.akM_smul hK h𝔭 hc hk,
-    Fintype.card_fin]
+  rw [integralBasisSpans.akCount_eq _ h𝔭 b hb hH', integralBasisSpans.akCount_eq h h𝔭 b hb hH,
+    PinAA.akM_smul hK h𝔭 hc hk, Fintype.card_fin]
 
-theorem nkCount_smul (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F} (hc : c ≠ 0) (n : 𝓞 F) {k : ℕ} (hk : vF 𝔭 c ≤ k) :
-    nkCount (algebraMap F K (c : F) • h) L 𝔭 k (c * n) =
-      Ideal.absNorm 𝔭 ^ (2 * vF 𝔭 c * finrank K V) * nkCount h L 𝔭 (k - vF 𝔭 c) n := by
+theorem nkCount_smul
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {c : 𝓞 F} (hc : c ≠ 0)
+    (n : 𝓞 F)
+    {k : ℕ} (hk : vF 𝔭 c ≤ k)
+    : nkCount (algebraMap F K (c : F) • h) L 𝔭 k (c * n)
+      = Ideal.absNorm 𝔭 ^ (2 * vF 𝔭 c * finrank K V) * nkCount h L 𝔭 (k - vF 𝔭 c) n := by
   have : Fact (IsFixF K F) := ⟨hF⟩
   obtain ⟨b, hbL, hb⟩ := LocalSpans.exists_basis_locF hL h𝔭
   obtain ⟨H, hH, _⟩ := LocF.exists_gram hLi b hbL
-  have hH' : ∀ i j, algebraMap (𝓞 K) K ((algebraMap (𝓞 F) (𝓞 K) c • H) i j) =
-      (algebraMap F K (c : F) • h) (b i) (b j) := by
+  have hH'
+      : ∀ i j,
+        algebraMap (𝓞 K) K ((algebraMap (𝓞 F) (𝓞 K) c • H) i j)
+          = (algebraMap F K (c : F) • h) (b i) (b j) := by
     intro i j
     rw [Matrix.smul_apply, smul_eq_mul, map_mul, hH, MeanB.algebraMap_comp]
     rfl
-  rw [integralBasisSpans.nkCount_eq _ h𝔭 b hb hH', integralBasisSpans.nkCount_eq h h𝔭 b hb hH, PinAA.nkM_smul hK h𝔭 hc n hk,
-    Fintype.card_fin]
+  rw [integralBasisSpans.nkCount_eq _ h𝔭 b hb hH', integralBasisSpans.nkCount_eq h h𝔭 b hb hH,
+    PinAA.nkM_smul hK h𝔭 hc n hk, Fintype.card_fin]
 
 omit [NumberField K] [StarRing K] [Algebra F K] in
-theorem pow_notMem {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F} {j : ℕ} (hc : c ∉ 𝔭 ^ (j + 1))
-    (m : ℕ) : c ^ m ∉ 𝔭 ^ (m * j + 1) := by
+theorem pow_notMem
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F} {j : ℕ} (hc : c ∉ 𝔭 ^ (j + 1)) (m : ℕ)
+    : c ^ m ∉ 𝔭 ^ (m * j + 1) := by
   induction m with
   | zero =>
     rw [pow_zero, zero_mul, zero_add, pow_one]
@@ -70,12 +87,13 @@ theorem pow_notMem {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F}
     rw [show (m + 1) * j + 1 = m * j + j + 1 by ring, pow_succ c]
     exact idealPowerSpanBounds.mul_notMem h𝔭.isPrime (idealPowerSpanBounds.ne_bot h𝔭) ih hc
 
-theorem gram_smul (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 F) (x : Fin (finrank K V) → V) :
-    (Matrix.of fun i j => (algebraMap F K (c : F) • h) (x i) (x j)).det =
-      algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) (c ^ finrank K V)) *
-        (Matrix.of fun i j => h (x i) (x j)).det := by
-  have e : (Matrix.of fun i j => (algebraMap F K (c : F) • h) (x i) (x j)) =
-      algebraMap F K (c : F) • Matrix.of fun i j => h (x i) (x j) := by
+theorem gram_smul (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 F) (x : Fin (finrank K V) → V)
+    : (Matrix.of fun i j => (algebraMap F K (c : F) • h) (x i) (x j)).det
+      = algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) (c ^ finrank K V))
+        * (Matrix.of fun i j => h (x i) (x j)).det := by
+  have e
+      : (Matrix.of fun i j => (algebraMap F K (c : F) • h) (x i) (x j))
+        = algebraMap F K (c : F) • Matrix.of fun i j => h (x i) (x j) := by
     ext i j
     rfl
   rw [e, Matrix.det_smul, Fintype.card_fin]
@@ -83,11 +101,14 @@ theorem gram_smul (h : V →ₗ⋆[K] V →ₗ[K] K) (c : 𝓞 F) (x : Fin (finr
   simp only [map_pow]
   rfl
 
-theorem discrIdeal_smul_le_iff {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
-    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F} (hc : c ≠ 0)
-    (e : ℕ) :
-    discrIdeal (algebraMap F K (c : F) • h) L ≤ extP K 𝔭 ^ (finrank K V * vF 𝔭 c + e) ↔
-      discrIdeal h L ≤ extP K 𝔭 ^ e := by
+theorem discrIdeal_smul_le_iff
+    {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
+    (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {c : 𝓞 F} (hc : c ≠ 0)
+    (e : ℕ)
+    : discrIdeal (algebraMap F K (c : F) • h) L ≤ extP K 𝔭 ^ (finrank K V * vF 𝔭 c + e)
+      ↔ discrIdeal h L ≤ extP K 𝔭 ^ e := by
   constructor
   · intro hle
     unfold discrIdeal
@@ -100,9 +121,9 @@ theorem discrIdeal_smul_le_iff {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule
     have hz : algebraMap (𝓞 F) (𝓞 K) d * z ∈ extP K 𝔭 ^ (v + e) := by
       apply hle
       exact Ideal.subset_span ⟨x, hx, by rw [gram_smul, map_mul, ez]⟩
-    have hspan : extP K 𝔭 ^ v ≤
-        Ideal.span {algebraMap (𝓞 F) (𝓞 K) d} ⊔ extP K 𝔭 ^ (v + e) := by
-      have h := idealPowerSpanBounds.pow_le_span_sup h𝔭.isPrime (idealPowerSpanBounds.ne_bot h𝔭) hd (v + e)
+    have hspan : extP K 𝔭 ^ v ≤ Ideal.span {algebraMap (𝓞 F) (𝓞 K) d} ⊔ extP K 𝔭 ^ (v + e) := by
+      have h :=
+        idealPowerSpanBounds.pow_le_span_sup h𝔭.isPrime (idealPowerSpanBounds.ne_bot h𝔭) hd (v + e)
       simpa only [extP, Ideal.map_pow, Ideal.map_sup, Ideal.map_span, Set.image_singleton] using
         (Ideal.map_mono (f := algebraMap (𝓞 F) (𝓞 K)) h)
     have hmul : extP K 𝔭 ^ v * Ideal.span {z} ≤ extP K 𝔭 ^ (v + e) := by
@@ -134,11 +155,14 @@ theorem discrIdeal_smul_le_iff {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule
     rw [hz, pow_add]
     exact Ideal.mul_mem_mul h2 h1
 
-theorem vd_smul (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {L : Submodule (𝓞 K) V}
-    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L) {𝔭 : Ideal (𝓞 F)}
-    (h𝔭 : 𝔭.IsMaximal) {c : 𝓞 F} (hc : c ≠ 0) :
-    vd (algebraMap F K (c : F) • h) L 𝔭 = vd h L 𝔭 + finrank K V * vF 𝔭 c := by
+theorem vd_smul
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {L : Submodule (𝓞 K) V}
+    (hL : Submodule.IsFullLattice K L) (hLi : Formalism.HermitianLatticesTheory.IsIntegralLat h L)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {c : 𝓞 F} (hc : c ≠ 0)
+    : vd (algebraMap F K (c : F) • h) L 𝔭 = vd h L 𝔭 + finrank K V * vF 𝔭 c := by
   have hD : discrIdeal h L ≠ ⊥ := by
     obtain ⟨b, hbL, _⟩ := LocalSpans.exists_basis_locF hL h𝔭
     obtain ⟨g, _, hdet⟩ := LocF.exists_gram hLi b hbL
@@ -162,8 +186,7 @@ theorem vd_smul (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFix
     refine le_iInf fun k => ?_
     obtain ⟨e, he, hke⟩ := hnb k
     exact he.trans (Ideal.pow_le_pow_right hke.le)
-  have hmem : vd h L 𝔭 ∈ {e : ℕ | discrIdeal h L ≤ extP K 𝔭 ^ e} :=
-    Nat.sSup_mem ⟨0, by simp⟩ hb
+  have hmem : vd h L 𝔭 ∈ {e : ℕ | discrIdeal h L ≤ extP K 𝔭 ^ e} := Nat.sSup_mem ⟨0, by simp⟩ hb
   have hg : IsGreatest {e : ℕ | discrIdeal (algebraMap F K (c : F) • h) L ≤ extP K 𝔭 ^ e}
       (vd h L 𝔭 + finrank K V * vF 𝔭 c) := by
     constructor
@@ -172,7 +195,8 @@ theorem vd_smul (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFix
     · intro e' he'
       by_cases hlt : e' ≤ finrank K V * vF 𝔭 c
       · omega
-      · obtain ⟨e, rfl⟩ : ∃ e, e' = finrank K V * vF 𝔭 c + e := ⟨e' - finrank K V * vF 𝔭 c, by omega⟩
+      · obtain ⟨e, rfl⟩ : ∃ e, e' = finrank K V * vF 𝔭 c + e :=
+          ⟨e' - finrank K V * vF 𝔭 c, by omega⟩
         have h1 : e ≤ vd h L 𝔭 := le_csSup hb ((discrIdeal_smul_le_iff hLi h𝔭 hc e).1 he')
         omega
   exact hg.csSup_eq

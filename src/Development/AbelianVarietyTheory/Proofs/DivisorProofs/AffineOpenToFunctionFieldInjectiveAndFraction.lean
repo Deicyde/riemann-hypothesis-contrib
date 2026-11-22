@@ -6,9 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FlatFrameApp
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+  GlobalTheory.CovTop GlobalTheory.HSApp GlobalTheory.Cartier
 open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW secZ ptF LiesOn)
 open GlobalTheory.FlagMod (FlagCover)
 open GlobalTheory.CompHt (hodgeWt)
@@ -18,14 +20,25 @@ open GlobalTheory.OrbitSep
 
 namespace GlobalTheory.GenFrac
 
-theorem injective_and_frac : ∀ (X : Scheme.{0}) (V : X.Opens) [IsIntegral V.toScheme] (W : X.affineOpens), W.1 ≤ V → ∀ (ρW : Γ(X, W.1) →+* V.toScheme.functionField), spMap ρW ≫ GlobalTheory.LogKS.chart W = V.toScheme.fromSpecStalk (genericPoint V.toScheme) ≫ V.ι → Function.Injective ρW ∧ ∀ x : V.toScheme.functionField, ∃ a b : Γ(X, W.1), ρW b ≠ 0 ∧ x * ρW b = ρW a := by
+theorem injective_and_frac
+    : ∀ (X : Scheme.{0}) (V : X.Opens) [IsIntegral V.toScheme] (W : X.affineOpens),
+      W.1 ≤ V
+        → ∀ (ρW : Γ(X, W.1) →+* V.toScheme.functionField),
+          spMap ρW ≫ GlobalTheory.LogKS.chart W
+              = V.toScheme.fromSpecStalk (genericPoint V.toScheme) ≫ V.ι
+            → Function.Injective ρW
+              ∧ ∀ x : V.toScheme.functionField, ∃ a b : Γ(X, W.1), ρW b ≠ 0 ∧ x * ρW b = ρW a := by
   intro X V _ W hWV ρW h
   set η := genericPoint V.toScheme with hη
   have hx : V.ι η ∈ W.1 := by
-    have h1 := congrArg (fun f : Spec (V.toScheme.presheaf.stalk η) ⟶ X =>
-      f (IsLocalRing.closedPoint (V.toScheme.presheaf.stalk η))) h
-    have h3 : (V.toScheme.fromSpecStalk η ≫ V.ι)
-        (IsLocalRing.closedPoint (V.toScheme.presheaf.stalk η)) = V.ι η :=
+    have h1 :=
+      congrArg
+        (fun f : Spec (V.toScheme.presheaf.stalk η) ⟶ X =>
+          f (IsLocalRing.closedPoint (V.toScheme.presheaf.stalk η)))
+        h
+    have h3
+        : (V.toScheme.fromSpecStalk η ≫ V.ι) (IsLocalRing.closedPoint (V.toScheme.presheaf.stalk η))
+          = V.ι η :=
       congrArg V.ι (Scheme.fromSpecStalk_closedPoint (x := η))
     rw [← h1.trans h3]
     have h2 : Set.range (W.2.fromSpec) = (W.1 : Set X) := W.2.range_fromSpec
@@ -54,8 +67,7 @@ theorem injective_and_frac : ∀ (X : Scheme.{0}) (V : X.Opens) [IsIntegral V.to
       (X.presheaf.germ W.1 (V.ι η) hx).hom.toAlgebra
     haveI : IsLocalization.AtPrime (X.presheaf.stalk (V.ι η))
         (W.2.primeIdealOf ⟨V.ι η, hx⟩).asIdeal := W.2.isLocalization_stalk ⟨V.ι η, hx⟩
-    obtain ⟨⟨a, b⟩, hab⟩ := IsLocalization.surj
-      (W.2.primeIdealOf ⟨V.ι η, hx⟩).asIdeal.primeCompl y
+    obtain ⟨⟨a, b⟩, hab⟩ := IsLocalization.surj (W.2.primeIdealOf ⟨V.ι η, hx⟩).asIdeal.primeCompl y
     have hu := IsLocalization.map_units (X.presheaf.stalk (V.ι η)) b
     refine ⟨a, b, ?_, ?_⟩
     · rw [he']

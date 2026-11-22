@@ -6,12 +6,12 @@ public import Mathlib
 
 namespace Bl.general_b_fact_second_alt
 
-theorem goal1 :
-  ∀ {K : Type} [inst : Field.{0} K] [NumberField.{0} K] {r : Nat}
-  (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} K) (Fin r → K)) (v : Fin r → K),
-  Membership.mem.{0, 0} (Submodule.span.{0, 0} K (SetLike.coe.{0, 0} L)) v →
-    Exists.{1} fun (a : NumberField.RingOfIntegers.{0} K) ↦
-      And (Ne.{1} a 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} a v)) := by
+theorem goal1
+    : ∀ {K : Type} [inst : Field.{0} K] [NumberField.{0} K] {r : Nat}
+        (L : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} K) (Fin r → K)) (v : Fin r → K),
+      Membership.mem.{0, 0} (Submodule.span.{0, 0} K (SetLike.coe.{0, 0} L)) v
+        → Exists.{1} fun (a : NumberField.RingOfIntegers.{0} K) ↦
+          And (Ne.{1} a 0) (Membership.mem.{0, 0} L (HSMul.hSMul.{0, 0, 0} a v)) := by
   intro K _ _ r L v hv
   induction hv using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hx⟩
@@ -27,7 +27,8 @@ theorem goal1 :
   | smul c x _ hx =>
     obtain ⟨a, ha, hax⟩ := hx
     obtain ⟨⟨n, d⟩, hnd⟩ := IsLocalization.surj (nonZeroDivisors (NumberField.RingOfIntegers K)) c
-    refine ⟨(d : NumberField.RingOfIntegers K) * a, mul_ne_zero (nonZeroDivisors.coe_ne_zero d) ha, ?_⟩
+    refine
+      ⟨(d : NumberField.RingOfIntegers K) * a, mul_ne_zero (nonZeroDivisors.coe_ne_zero d) ha, ?_⟩
     have key : ((d : NumberField.RingOfIntegers K) * a) • (c • x) = n • (a • x) := by
       rw [← algebraMap_smul K ((d : NumberField.RingOfIntegers K) * a), ← algebraMap_smul K a,
         ← algebraMap_smul K n, smul_smul, smul_smul]

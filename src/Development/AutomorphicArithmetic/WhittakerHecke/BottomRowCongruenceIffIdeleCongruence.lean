@@ -5,27 +5,50 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.SplitEig
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.RankTwoDescent
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.G (FS2 Rw nE row)
 open UpperTheory.V.Af.Smo (EigAt)
 open scoped ComplexOrder
 
-theorem UpperTheory.bottomRow_congruence_iff_idele_congruence :
-    ∀ N : ℕ, 0 < N → ∀ k ∈ KK ℚ, k ∈ SS N → ∀ ζ : (A ℚ)ˣ, ζ ∈ UU → (∀ v : H.P ℚ, (Bad N v → Dv N v ((ζ : A ℚ) * k 1 1 - 1)) ∧ (¬ Bad N v → H.cp v (ζ : A ℚ) = 1)) → ∀ y : (A ℚ)ˣ, (∀ v, Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 0) ∧ Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 1 - 1)) ↔ ((∀ v, Bad N v → Dv N v (((y : (A ℚ)ˣ) : A ℚ) - 1)) ∧ ∀ v : H.P ℚ, Valued.v (H.cp v ((y : (A ℚ)ˣ) : A ℚ)) ≤ 1) := by
+theorem UpperTheory.bottomRow_congruence_iff_idele_congruence
+    : ∀ N : ℕ,
+      0 < N
+        → ∀ k ∈ KK ℚ,
+          k ∈ SS N
+            → ∀ ζ : (A ℚ)ˣ,
+              ζ ∈ UU
+                → (∀ v : H.P ℚ,
+                  (Bad N v → Dv N v ((ζ : A ℚ) * k 1 1 - 1)) ∧ (¬ Bad N v → H.cp v (ζ : A ℚ) = 1))
+                → ∀ y : (A ℚ)ˣ,
+                  (∀ v,
+                      Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 0)
+                        ∧ Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 1 - 1))
+                    ↔ ((∀ v, Bad N v → Dv N v (((y : (A ℚ)ˣ) : A ℚ) - 1))
+                      ∧ ∀ v : H.P ℚ, Valued.v (H.cp v ((y : (A ℚ)ˣ) : A ℚ)) ≤ 1) := by
   intro N hN k hk hS ζ hζ hz y
   have hi : ∀ v i j, Valued.v (H.cp v (k i j)) ≤ 1 := fun v i j => hk.2 v i j
   have hN1 : ∀ v : H.P ℚ, Valued.v (N : H.Kv v) ≤ 1 := fun v =>
     show (N : H.Kv v) ∈ v.adicCompletionIntegers ℚ from natCast_mem _ N
-  have hv : ∀ v : H.P ℚ, (Bad N v → Valued.v (N : H.Kv v) < 1) ∧ (¬ Bad N v → Valued.v (N : H.Kv v) = 1) := fun v => by
+  have hv
+      : ∀ v : H.P ℚ,
+        (Bad N v → Valued.v (N : H.Kv v) < 1)
+          ∧ (¬ Bad N v → Valued.v (N : H.Kv v) = 1) := fun v => by
     have h1 := HeightOneSpectrum.valuedAdicCompletion_eq_valuation (K := ℚ) v (N : 𝓞 ℚ)
     rw [HeightOneSpectrum.valuation_of_algebraMap] at h1
     have h2 : Valued.v (N : H.Kv v) = v.intValuation (N : 𝓞 ℚ) := by simpa using h1
     rw [h2]
-    exact ⟨fun h => (v.intValuation_lt_one_iff_mem _).2 h, fun h => HeightOneSpectrum.intValuation_eq_one_iff.2 h⟩
-  have key : ∀ v : H.P ℚ, (Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 0) ∧ Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 1 - 1)) ↔
-      ((Bad N v → Dv N v ((y : A ℚ) - 1)) ∧ Valued.v (H.cp v (y : A ℚ)) ≤ 1) := fun v => by
+    exact ⟨
+      fun h => (v.intValuation_lt_one_iff_mem _).2 h,
+      fun h => HeightOneSpectrum.intValuation_eq_one_iff.2 h
+    ⟩
+  have key
+      : ∀ v : H.P ℚ,
+        (Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 0) ∧ Dv N v ((y : A ℚ) * (ζ : A ℚ) * k 1 1 - 1))
+          ↔ ((Bad N v → Dv N v ((y : A ℚ) - 1)) ∧ Valued.v (H.cp v (y : A ℚ)) ≤ 1) := fun v => by
     have hd : H.cp v (k 0 0) * H.cp v (k 1 1) - H.cp v (k 0 1) * H.cp v (k 1 0) = 1 := by
       have := congrArg (H.cp v) ((Matrix.det_fin_two k.1).symm.trans k.2)
       simpa using this
@@ -57,7 +80,8 @@ theorem UpperTheory.bottomRow_congruence_iff_idele_congruence :
           exact this.le
         refine ⟨fun _ => ?_, h4⟩
         rw [show x - 1 = (x * z * d - 1) - x * (z * d - 1) by ring]
-        exact Valuation.map_sub_le _ h3 (by rw [map_mul]; exact (mul_le_mul' h4 h1).trans_eq (one_mul _))
+        exact Valuation.map_sub_le _ h3
+          (by rw [map_mul]; exact (mul_le_mul' h4 h1).trans_eq (one_mul _))
       · rintro ⟨h3, h4⟩
         refine ⟨by rw [hu, mul_one]; exact (mul_le_mul' h4 hs).trans_eq (one_mul _), ?_⟩
         rw [show x * z * d - 1 = (x - 1) * (z * d) + (z * d - 1) by ring]
@@ -75,5 +99,8 @@ theorem UpperTheory.bottomRow_congruence_iff_idele_congruence :
         · rw [map_mul, map_mul]
           exact mul_le_one' i01 h3
       · rintro ⟨-, h4⟩
-        exact ⟨mul_le_one' h4 i10, Valuation.map_sub_le _ (by rw [map_mul]; exact mul_le_one' h4 i11) (map_one _).le⟩
+        exact ⟨
+          mul_le_one' h4 i10,
+          Valuation.map_sub_le _ (by rw [map_mul]; exact mul_le_one' h4 i11) (map_one _).le
+        ⟩
   simp only [key, forall_and]

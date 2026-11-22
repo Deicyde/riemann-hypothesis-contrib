@@ -14,8 +14,10 @@ namespace GlobalTheory.Proof.quotientMeasure_normalised_by_haar_unique
 
 theorem normaliseQuotientClause : NormaliseQuotientClause := by
   intro G _ _ _ _ _ _ _ _ H _ _ hH hG hH' dg _ ν _
-  obtain ⟨⟨μ₀, hμ₀⟩, huniq⟩ := GlobalTheory.T.quotientInvariantMeasure_exists_unique_unimodular G H hH hG hH'
-  obtain ⟨dg₀, ⟨hdg₀, hF₀⟩, -⟩ := GlobalTheory.T.existsUnique_haar_of_invariantRadonOnCosets G H hH ν μ₀ hμ₀
+  obtain ⟨⟨μ₀, hμ₀⟩, huniq⟩ :=
+    GlobalTheory.T.quotientInvariantMeasure_exists_unique_unimodular G H hH hG hH'
+  obtain ⟨dg₀, ⟨hdg₀, hF₀⟩, -⟩ :=
+    GlobalTheory.T.existsUnique_haar_of_invariantRadonOnCosets G H hH ν μ₀ hμ₀
   set c : ℝ≥0 := haarScalarFactor dg dg₀ with hc
   have hcpos : 0 < c := haarScalarFactor_pos_of_isHaarMeasure dg dg₀
   have hdg : dg = c • dg₀ := isMulLeftInvariant_eq_smul dg dg₀
@@ -25,8 +27,7 @@ theorem normaliseQuotientClause : NormaliseQuotientClause := by
     refine ⟨?_, inferInstance, ⟨fun g s hs => ?_⟩⟩
     · intro h
       apply hμ₀.ne_zero
-      have : c⁻¹ • (c • μ₀) = μ₀ := by
-        rw [smul_smul, inv_mul_cancel₀ hcpos.ne', one_smul]
+      have : c⁻¹ • (c • μ₀) = μ₀ := by rw [smul_smul, inv_mul_cancel₀ hcpos.ne', one_smul]
       rw [← this, h, smul_zero]
     · simp only [Measure.coe_nnreal_smul_apply]
       rw [SMulInvariantMeasure.measure_preimage_smul g hs]
@@ -48,8 +49,7 @@ theorem normaliseQuotientClause : NormaliseQuotientClause := by
   have hpos : dg K ≠ 0 := (measure_pos_of_nonempty_interior dg K.interior_nonempty).ne'
   have hfin : dg K ≠ ∞ := K.isCompact.measure_lt_top.ne
   have hd1 : d = 1 := by
-    have : (d : ℝ≥0∞) * dg K = 1 * dg K := by
-      rw [one_mul]; exact e2.symm
+    have : (d : ℝ≥0∞) * dg K = 1 * dg K := by rw [one_mul]; exact e2.symm
     exact_mod_cast (ENNReal.mul_left_inj hpos hfin).mp this
   rw [hd, hd1, one_smul]
 

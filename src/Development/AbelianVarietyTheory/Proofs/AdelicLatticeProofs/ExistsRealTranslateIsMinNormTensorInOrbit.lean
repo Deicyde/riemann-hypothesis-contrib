@@ -148,20 +148,29 @@ private lemma nsq_act_eq_of_gram_eq {ι : Type} [Fintype ι] [DecidableEq ι] {m
   have hb : b = a * (a⁻¹ * b) := by rw [← Matrix.mul_assoc, mul_nonsing_inv _ ha, Matrix.one_mul]
   rw [hb, hactmul, (_root_.GlobalTheory.ClassFin.ActNorm.act_norm_continuity ι m d).1 _ _ hk]
 
-
 open Matrix in
 open scoped Kronecker ComplexOrder TensorProduct MatrixOrder in
-theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ) (t : _root_.GlobalTheory.ClassFin.TIdx ι d → ℝ), (∃ w ∈ _root_.GlobalTheory.ClassFin.orb d (fun k => (t k : ℂ)), _root_.GlobalTheory.ClassFin.IsMinVec d w) → ∃ g : Matrix ι ι ℝ, g.det = 1 ∧ _root_.GlobalTheory.ClassFin.IsMinVec d (_root_.GlobalTheory.ClassFin.act d (fun k => (t k : ℂ)) (g.map (fun r : ℝ => (r : ℂ)))) := by
+theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (m : ℕ) (d : Fin m → ℕ)
+        (t : _root_.GlobalTheory.ClassFin.TIdx ι d → ℝ),
+      (∃ w ∈ _root_.GlobalTheory.ClassFin.orb d (fun k => (t k : ℂ)),
+          _root_.GlobalTheory.ClassFin.IsMinVec d w)
+        → ∃ g : Matrix ι ι ℝ,
+          g.det = 1 ∧ _root_.GlobalTheory.ClassFin.IsMinVec d
+            (_root_.GlobalTheory.ClassFin.act d
+              (fun k => (t k : ℂ))
+              (g.map (fun r : ℝ => (r : ℂ)))) := by
   intro ι _ _ m d t ⟨w, hwo, hw⟩
   obtain ⟨g₀, hg₀, rfl⟩ := hwo
   set tc : _root_.GlobalTheory.ClassFin.TIdx ι d → ℂ := fun k => (t k : ℂ) with htc
-  obtain ⟨-, hactmul, -, -, -, hactmap⟩ := (_root_.GlobalTheory.ClassFin.tpow_act_algebra ι ℂ).2 m d tc
+  obtain ⟨-, hactmul, -, -, -, hactmap⟩ :=
+    (_root_.GlobalTheory.ClassFin.tpow_act_algebra ι ℂ).2 m d tc
   set w := _root_.GlobalTheory.ClassFin.act d tc g₀ with hwdef
   have hg₀u : IsUnit g₀.det := by rw [hg₀]; exact isUnit_one
-  have hmapH : ∀ M : Matrix ι ι ℂ, Mᴴ.map (starRingEnd ℂ) = (M.map (starRingEnd ℂ))ᴴ :=
-    fun M => by ext i j; simp
-  have hmapmap : ∀ M : Matrix ι ι ℂ, (M.map (starRingEnd ℂ)).map (starRingEnd ℂ) = M :=
-    fun M => by ext i j; simp
+  have hmapH : ∀ M : Matrix ι ι ℂ, Mᴴ.map (starRingEnd ℂ) = (M.map (starRingEnd ℂ))ᴴ := fun M => by
+    ext i j; simp
+  have hmapmap : ∀ M : Matrix ι ι ℂ, (M.map (starRingEnd ℂ)).map (starRingEnd ℂ) = M := fun M => by
+    ext i j; simp
   obtain ⟨gb, hgb⟩ : ∃ x : Matrix ι ι ℂ, x = g₀.map (starRingEnd ℂ) := ⟨_, rfl⟩
   have hgbdet : gb.det = 1 := by
     have := RingHom.map_det (starRingEnd ℂ) g₀
@@ -177,23 +186,32 @@ theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : 
   obtain ⟨c, hc⟩ : ∃ x : Matrix ι ι ℂ, x = g₀⁻¹ * gb := ⟨_, rfl⟩
   have hcdet : c.det = 1 := by simp [hc, hgbdet, hg₀]
   have hg₀c : g₀ * c = gb := by rw [hc, ← Matrix.mul_assoc, mul_nonsing_inv _ hg₀u, Matrix.one_mul]
-  have hn : _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d w c) = _root_.GlobalTheory.ClassFin.nsq w := by
+  have hn
+      : _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d w c)
+        = _root_.GlobalTheory.ClassFin.nsq w := by
     rw [hwdef, ← hactmul, hg₀c, hact_gb]
     unfold _root_.GlobalTheory.ClassFin.nsq
     simp [hwdef]
   obtain ⟨U, δ, hU, hδ, hcQ, hfix⟩ := exists_unitary_exp_diagonal_fixing_of_nsq_eq d w hw c hcdet hn
-  obtain ⟨Q, hQ⟩ : ∃ Q : ℝ → Matrix ι ι ℂ,
-      ∀ s, Q s = (U * diagonal fun i => ((Real.exp (s * δ i) : ℝ) : ℂ)) * Uᴴ := ⟨_, fun _ => rfl⟩
+  obtain ⟨Q, hQ⟩
+      : ∃ Q : ℝ → Matrix ι ι ℂ, ∀ s,
+        Q s = (U * diagonal fun i => ((Real.exp (s * δ i) : ℝ) : ℂ)) * Uᴴ :=
+    ⟨_, fun _ => rfl⟩
   have hQmul : ∀ s s', Q s * Q s' = Q (s + s') := fun s s' => by
     rw [hQ, hQ, hQ]; exact unitary_conj_exp_diagonal_mul hU δ s s'
   have hQH : ∀ s, (Q s)ᴴ = Q s := fun s => by
     rw [hQ]; exact unitary_conj_exp_diagonal_conjTranspose U δ s
   have hcQ' : c * cᴴ = Q 2 := by rw [hQ]; exact hcQ
-  have hfix' : ∀ s, _root_.GlobalTheory.ClassFin.act d w (Q s) = w := fun s => by rw [hQ]; exact hfix s
-  have hUb1 : U.map (starRingEnd ℂ) * (U.map (starRingEnd ℂ))ᴴ = 1 := map_conj_mul_conjTranspose_eq_one hU
-  obtain ⟨Qb, hQb⟩ : ∃ Qb : ℝ → Matrix ι ι ℂ, ∀ s, Qb s =
-      (U.map (starRingEnd ℂ) * diagonal fun i => ((Real.exp (s * δ i) : ℝ) : ℂ)) *
-        (U.map (starRingEnd ℂ))ᴴ := ⟨_, fun _ => rfl⟩
+  have hfix' : ∀ s, _root_.GlobalTheory.ClassFin.act d w (Q s) = w := fun s => by
+    rw [hQ]; exact hfix s
+  have hUb1 : U.map (starRingEnd ℂ) * (U.map (starRingEnd ℂ))ᴴ = 1 :=
+    map_conj_mul_conjTranspose_eq_one hU
+  obtain ⟨Qb, hQb⟩
+      : ∃ Qb : ℝ → Matrix ι ι ℂ, ∀ s,
+        Qb s
+          = (U.map (starRingEnd ℂ) * diagonal fun i => ((Real.exp (s * δ i) : ℝ) : ℂ))
+            * (U.map (starRingEnd ℂ))ᴴ :=
+    ⟨_, fun _ => rfl⟩
   have hQbmap : ∀ s, (Q s).map (starRingEnd ℂ) = Qb s := fun s => by
     rw [hQ, hQb]; exact unitary_conj_exp_diagonal_map_conj U δ s
   have hQbmul : ∀ s s', Qb s * Qb s' = Qb (s + s') := fun s s' => by
@@ -217,16 +235,18 @@ theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : 
     rw [← hQb2, Matrix.mul_assoc, ← Matrix.mul_assoc c, hccb, Matrix.one_mul, ← conjTranspose_mul,
       hcbc, conjTranspose_one]
   have hcHc : cᴴ * c = Qb (-2) := by
-    calc cᴴ * c = cᴴ * c * (Qb 2 * Qb (-2)) := by
-          rw [hQbmul, show (2 : ℝ) + -2 = 0 by norm_num, hQb0, Matrix.mul_one]
+    calc
+      cᴴ * c = cᴴ * c * (Qb 2 * Qb (-2)) := by
+        rw [hQbmul, show (2 : ℝ) + -2 = 0 by norm_num, hQb0, Matrix.mul_one]
       _ = Qb (-2) := by rw [← Matrix.mul_assoc, e, Matrix.one_mul]
   have hZZ : (c * Qb 1 * cᴴ) * (c * Qb 1 * cᴴ) = Q 1 * Q 1 := by
-    calc (c * Qb 1 * cᴴ) * (c * Qb 1 * cᴴ) = c * (Qb 1 * (cᴴ * c) * Qb 1) * cᴴ := by
-          simp only [Matrix.mul_assoc]
+    calc
+      (c * Qb 1 * cᴴ) * (c * Qb 1 * cᴴ)
+        = c * (Qb 1 * (cᴴ * c) * Qb 1) * cᴴ := by simp only [Matrix.mul_assoc]
       _ = Q 1 * Q 1 := by
-          rw [hcHc, hQbmul, hQbmul, show (1 : ℝ) + -2 + 1 = 0 by norm_num, hQb0, Matrix.mul_one,
-            hQmul, hcQ']
-          norm_num
+        rw [hcHc, hQbmul, hQbmul, show (1 : ℝ) + -2 + 1 = 0 by norm_num, hQb0, Matrix.mul_one,
+          hQmul, hcQ']
+        norm_num
   have hZpsd : (c * Qb 1 * cᴴ).PosSemidef := by
     have : c * Qb 1 * cᴴ = (c * Qb (1 / 2)) * (c * Qb (1 / 2))ᴴ := by
       rw [conjTranspose_mul, hQbH]
@@ -241,11 +261,12 @@ theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : 
     exact posSemidef_self_mul_conjTranspose _
   have hZQ : c * Qb 1 * cᴴ = Q 1 := posSemidef_eq_of_mul_self_eq _ _ hZpsd hQ1psd hZZ
   have hPreal : (g₀ * Q 1 * g₀ᴴ).map (starRingEnd ℂ) = g₀ * Q 1 * g₀ᴴ := by
-    calc (g₀ * Q 1 * g₀ᴴ).map (starRingEnd ℂ) = gb * Qb 1 * gbᴴ := by
-          rw [Matrix.map_mul, Matrix.map_mul, hQbmap, hmapH, hgb]
+    calc
+      (g₀ * Q 1 * g₀ᴴ).map (starRingEnd ℂ)
+        = gb * Qb 1 * gbᴴ := by rw [Matrix.map_mul, Matrix.map_mul, hQbmap, hmapH, hgb]
       _ = g₀ * (c * Qb 1 * cᴴ) * g₀ᴴ := by
-          rw [← hg₀c, conjTranspose_mul]
-          simp only [Matrix.mul_assoc]
+        rw [← hg₀c, conjTranspose_mul]
+        simp only [Matrix.mul_assoc]
       _ = g₀ * Q 1 * g₀ᴴ := by rw [hZQ]
   have hdetQ : ∀ s, (Q s).det = 1 := fun s => by
     rw [hQ, det_mul, det_mul, det_diagonal]
@@ -272,7 +293,8 @@ theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : 
     have := congrFun (congrFun hPreal i) j
     simp only [Matrix.map_apply] at this
     simpa [hR] using Complex.conj_eq_iff_re.mp this
-  have hRAB : R = h.map Complex.re * (h.map Complex.re)ᴴ + h.map Complex.im * (h.map Complex.im)ᴴ := by
+  have hRAB
+      : R = h.map Complex.re * (h.map Complex.re)ᴴ + h.map Complex.im * (h.map Complex.im)ᴴ := by
     rw [hR, ← hP_h]
     ext i j
     simp only [Matrix.map_apply, Matrix.add_apply, Matrix.mul_apply, conjTranspose_apply,
@@ -302,8 +324,9 @@ theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : 
     have := hrpsd.1.apply i j
     simp only [star_trivial] at this
     simp [this]
-  have hrcsq : (r * r).map (fun x : ℝ => (x : ℂ)) =
-      r.map (fun x : ℝ => (x : ℂ)) * r.map (fun x : ℝ => (x : ℂ)) := by
+  have hrcsq
+      : (r * r).map (fun x : ℝ => (x : ℂ))
+        = r.map (fun x : ℝ => (x : ℂ)) * r.map (fun x : ℝ => (x : ℂ)) := by
     ext i j
     simp [Matrix.mul_apply]
   have hrcrc : r.map (fun x : ℝ => (x : ℂ)) * (r.map (fun x : ℝ => (x : ℂ)))ᴴ = h * hᴴ := by
@@ -312,8 +335,10 @@ theorem _root_.GlobalTheory.ClassFin.exists_real_translate_isMinVec : ∀ (ι : 
     have e : (r.map (fun x : ℝ => (x : ℂ))).det = ((r.det : ℝ) : ℂ) :=
       (RingHom.map_det Complex.ofRealHom r).symm
     rw [e, hrdet, Complex.ofReal_one]
-  have hnorm : _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d tc (r.map (fun x : ℝ => (x : ℂ)))) =
-      _root_.GlobalTheory.ClassFin.nsq w := by
+  have hnorm
+      : _root_.GlobalTheory.ClassFin.nsq (_root_.GlobalTheory.ClassFin.act d tc
+          (r.map (fun x : ℝ => (x : ℂ))))
+        = _root_.GlobalTheory.ClassFin.nsq w := by
     rw [nsq_act_eq_of_gram_eq d tc h _ (by rw [hhdet]; exact isUnit_one) hrcrc, hacth]
   unfold _root_.GlobalTheory.ClassFin.IsMinVec at hw ⊢
   unfold _root_.GlobalTheory.ClassFin.orb at hw

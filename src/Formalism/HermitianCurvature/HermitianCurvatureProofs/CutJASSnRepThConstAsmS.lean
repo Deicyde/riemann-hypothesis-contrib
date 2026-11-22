@@ -15,13 +15,16 @@ noncomputable section
 theorem theta_constancy_assembly_scalar : ThConstOfCutS := by
   intro hPR hMC hLN hPF
   intro Wp Wq _ _ _ _ _ _ P Bs hk X d hAct l hl S hS Pr hPr Bw Bw' hBw hBw'
-  have main : ∀ π ρ : M.Ty P, M.Up P l π ρ → ∃ c : ℂ, ∀ ζ ∈ Gauge.GC.Ann P,
-      ∀ Xf ∈ NF.Fib P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' ζ,
-        (Pr π (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)).comp Xf = Xf →
-        (Pr ρ (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)).comp (S ζ Xf) =
-          c • (Pr ρ (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)).comp
-            (tht P.k P.r Bs.z Bs.z' Bs.π Bs.π' Bw Bw' (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)
-              (SSn.nu0' P.k P.r Bs.z Bs.z' Bs.μsec ζ) (SSn.io0 P.k P.r Bs.z Bs.z' Bs.μsec ζ) Xf) := by
+  have main
+      : ∀ π ρ : M.Ty P,
+        M.Up P l π ρ
+          → ∃ c : ℂ, ∀ ζ ∈ Gauge.GC.Ann P, ∀ Xf ∈ NF.Fib P.k P.r Bs.z Bs.z' Bs.μsec Bs.π Bs.π' ζ,
+            (Pr π (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)).comp Xf = Xf
+              → (Pr ρ (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)).comp (S ζ Xf)
+                = c • (Pr ρ (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)).comp
+                  (tht P.k P.r Bs.z Bs.z' Bs.π Bs.π' Bw Bw' (SSn.nu0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)
+                    (SSn.nu0' P.k P.r Bs.z Bs.z' Bs.μsec ζ) (SSn.io0 P.k P.r Bs.z Bs.z' Bs.μsec ζ)
+                    Xf) := by
     intro π ρ hup
     obtain ⟨n, q, hq⟩ := hPR Wp Wq P Bs hk X d hAct l hl S hS Pr hPr Bw Bw' hBw hBw' π ρ hup
     obtain ⟨c₁, c₂, hc⟩ := hMC Wp Wq P Bs hk X d hAct l hl S hS Pr hPr Bw Bw' hBw hBw' π ρ hup
@@ -39,11 +42,12 @@ theorem theta_constancy_assembly_scalar : ThConstOfCutS := by
       rw [hB0', smul_zero] at h1
       rw [zero_smul]
       exact (smul_eq_zero.1 h1).resolve_left (hGG ζ hζ)
-    ·
-      have hTT : 0 ≤ P.TT := by
+    · have hTT : 0 ≤ P.TT := by
         have := hAct.1.1
         exact mul_nonneg this.T_pos.le this.T'_pos.le
-      have hmod : ∀ x : ℝ, 0 < x → Complex.normSq (q.eval (x : ℂ)) = (c₁ / c₂) * (x - 0) ^ (2 * (2 * n)) := by
+      have hmod
+          : ∀ x : ℝ,
+            0 < x → Complex.normSq (q.eval (x : ℂ)) = (c₁ / c₂) * (x - 0) ^ (2 * (2 * n)) := by
         intro x hx
         have hxx : 0 ≤ x ^ 2 + P.TT := by positivity
         set ζ : ℂ := ((Real.sqrt (x ^ 2 + P.TT) : ℝ) : ℂ) with hζdef
@@ -51,7 +55,8 @@ theorem theta_constancy_assembly_scalar : ThConstOfCutS := by
           rw [hζdef, Complex.normSq_ofReal, ← sq, Real.sq_sqrt hxx]
         have hζ : ζ ∈ Gauge.GC.Ann P := by
           show P.TT < Complex.normSq ζ
-          rw [hnz]; nlinarith
+          rw [hnz]
+          nlinarith
         have hgg : Complex.normSq ζ - P.TT = x ^ 2 := by rw [hnz]; ring
         have hsq : Real.sqrt (Complex.normSq ζ - P.TT) = x := by rw [hgg, Real.sqrt_sq hx.le]
         obtain ⟨Xf, hXf, hfix, hne⟩ := hLN Wp Wq P Bs hAct.1 hk Pr hPr π ζ hζ
@@ -65,11 +70,13 @@ theorem theta_constancy_assembly_scalar : ThConstOfCutS := by
         have hnq : ‖q.eval ((x : ℝ) : ℂ)‖ ^ 2 = Complex.normSq (q.eval (x : ℂ)) := by
           rw [Complex.normSq_eq_norm_sq]
         have hng : ‖((x ^ 2 : ℝ) : ℂ) ^ n‖ ^ 2 = (x - 0) ^ (2 * (2 * n)) := by
-          rw [norm_pow, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (by positivity : (0 : ℝ) < x ^ 2), ← pow_mul,
-            ← pow_mul, sub_zero]
+          rw [norm_pow, Complex.norm_real, Real.norm_eq_abs,
+            abs_of_pos (by positivity : (0 : ℝ) < x ^ 2), ← pow_mul, ← pow_mul, sub_zero]
           ring_nf
         rw [hng] at h1
-        have h2 : (‖q.eval ((x : ℝ) : ℂ)‖ ^ 2 * c₂ - (x - 0) ^ (2 * (2 * n)) * c₁) * ‖B.hsVec Xf‖ ^ 2 = 0 := by
+        have h2
+            : (‖q.eval ((x : ℝ) : ℂ)‖ ^ 2 * c₂ - (x - 0) ^ (2 * (2 * n)) * c₁) * ‖B.hsVec Xf‖ ^ 2
+              = 0 := by
           linear_combination (-1 : ℝ) * h1
         have h3 := sub_eq_zero.1 ((mul_eq_zero.1 h2).resolve_right hX.ne')
         rw [← hnq, div_mul_eq_mul_div, eq_div_iff hc2]
@@ -79,11 +86,12 @@ theorem theta_constancy_assembly_scalar : ThConstOfCutS := by
       have h1 := hq ζ hζ Xf hXf hfix
       have hpos : 0 ≤ Complex.normSq ζ - P.TT := by
         have := hζ; simp only [Gauge.GC.Ann, Set.mem_ofPred_eq] at this; linarith
-      have hev : q.eval ((Real.sqrt (Complex.normSq ζ - P.TT) : ℝ) : ℂ) =
-          c * (((Complex.normSq ζ - P.TT : ℝ) : ℂ) ^ n) := by
+      have hev
+          : q.eval ((Real.sqrt (Complex.normSq ζ - P.TT) : ℝ) : ℂ)
+            = c * (((Complex.normSq ζ - P.TT : ℝ) : ℂ) ^ n) := by
         rw [hcq]
-        simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_sub, Polynomial.eval_X,
-          Complex.ofReal_zero, sub_zero]
+        simp only [Polynomial.eval_mul, Polynomial.eval_C, Polynomial.eval_pow, Polynomial.eval_sub,
+          Polynomial.eval_X, Complex.ofReal_zero, sub_zero]
         rw [pow_mul, ← Complex.ofReal_pow, Real.sq_sqrt hpos]
       rw [hev, mul_comm, mul_smul] at h1
       exact smul_right_injective _ (hGG ζ hζ) h1

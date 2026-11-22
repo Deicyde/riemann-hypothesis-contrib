@@ -11,19 +11,22 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 
 noncomputable section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.S.Pv.ConvG
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocWSOf Formalism.L2.S.Pv.ConvG
 open scoped InnerProductSpace ENNReal Pointwise
 
 namespace Formalism.L2.SG.RealObj.EnergyConvJ
 
 section Gen
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-  [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem fin_of_weil (μ μS ν : Measure G) [IsFiniteMeasureOnCompacts μ] (hμ : μ ≠ 0)
-    (hW : ∀ f : G → ℝ≥0∞, Measurable f → ∫⁻ x, f x ∂μ = ∫⁻ x, ∫⁻ s, f (s * x) ∂μS ∂ν) :
-    IsFiniteMeasureOnCompacts μS := by
+theorem fin_of_weil
+    (μ μS ν : Measure G) [IsFiniteMeasureOnCompacts μ]
+    (hμ : μ ≠ 0) (hW : ∀ f : G → ℝ≥0∞, Measurable f → ∫⁻ x, f x ∂μ = ∫⁻ x, ∫⁻ s, f (s * x) ∂μS ∂ν)
+    : IsFiniteMeasureOnCompacts μS := by
   refine ⟨fun K hK => ?_⟩
   have hν : ν ≠ 0 := by
     rintro rfl
@@ -64,8 +67,11 @@ end Gen
 
 variable {D : D7}
 
-theorem sloc_sub_NH (X : HidaSetting D) (u : D.what₂.Word) (v : InfinitePlace X.B.I.F) {x : Formalism.REAL.UJ (X.B.I.ε v)}
-    (hx : x ∈ Formalism.L2.SG.Pf.WuDec.Sloc X u v) : x ∈ Formalism.L2.SG.Pf.WuDec.NHloc X u v := by
+theorem sloc_sub_NH
+    (X : HidaSetting D)
+    (u : D.what₂.Word) (v : InfinitePlace X.B.I.F)
+    {x : Formalism.REAL.UJ (X.B.I.ε v)} (hx : x ∈ Formalism.L2.SG.Pf.WuDec.Sloc X u v)
+    : x ∈ Formalism.L2.SG.Pf.WuDec.NHloc X u v := by
   classical
   set s : X.B.I.Ginf := Function.update 1 v x with hsdef
   have hs : s ∈ X.SinfU u := by
@@ -76,7 +82,8 @@ theorem sloc_sub_NH (X : HidaSetting D) (u : D.what₂.Word) (v : InfinitePlace 
       exact hx
     · rw [hsdef, Function.update_of_ne hw]
       exact Formalism.L2.SG.Pf.WuDec.one_mem_Sloc X u w
-  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, hdec⟩ := Formalism.L2.S.Pv.HaarSubS.sDecomp_holds D X u
+  obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, -, hdec⟩ :=
+    Formalism.L2.S.Pv.HaarSubS.sDecomp_holds D X u
   obtain ⟨n, hn, h, hh, he⟩ := hdec s hs
   have hxv : x = n v * h v := by
     have := congrFun he v

@@ -8,10 +8,13 @@ namespace GlobalTheory.TargetStatementSixOneSixtyEight
 
 open NumberField
 
-theorem main {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-    [Module (RingOfIntegers E) V] [IsScalarTower (RingOfIntegers E) E V]
-    (L : Submodule (RingOfIntegers E) V) {y : V} (hy : y ∈ Submodule.span E (L : Set V)) :
-    ∃ c : RingOfIntegers E, c ≠ 0 ∧ c • y ∈ L := by
+theorem main
+    {E : Type} [Field E] [NumberField E]
+    {V : Type} [AddCommGroup V] [Module E V] [Module (RingOfIntegers E) V]
+    [IsScalarTower (RingOfIntegers E) E V]
+    (L : Submodule (RingOfIntegers E) V)
+    {y : V} (hy : y ∈ Submodule.span E (L : Set V))
+    : ∃ c : RingOfIntegers E, c ≠ 0 ∧ c • y ∈ L := by
   induction hy using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_ne_zero, by simpa using hx⟩
   | zero => exact ⟨1, one_ne_zero, by simp⟩
@@ -30,12 +33,14 @@ theorem main {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [M
     rw [mul_smul, key, smul_comm c0 b x]
     exact L.smul_mem b h0
 
-theorem target : ∀ {E : Type} [inst : Field E] [NumberField E] {V : Type} [inst_2 : AddCommGroup V]
-    [inst_3 : Module E V] [inst_4 : Module (NumberField.RingOfIntegers E) V]
-    [IsScalarTower (NumberField.RingOfIntegers E) E V]
-    (L : Submodule (NumberField.RingOfIntegers E) V) {y : V},
-    y ∈ Submodule.span E (↑L : Set V) →
-      ∃ (c : NumberField.RingOfIntegers E), c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • y ∈ L :=
-  fun L _ hy => main L hy
+theorem target
+    : ∀ {E : Type} [inst : Field E] [NumberField E] {V : Type} [inst_2 : AddCommGroup V]
+        [inst_3 : Module E V] [inst_4 : Module (NumberField.RingOfIntegers E) V]
+        [IsScalarTower (NumberField.RingOfIntegers E) E V]
+        (L : Submodule (NumberField.RingOfIntegers E) V) {y : V},
+      y ∈ Submodule.span E (↑L : Set V)
+        → ∃ (c : NumberField.RingOfIntegers E),
+          c ≠ (0 : NumberField.RingOfIntegers E) ∧ c • y ∈ L := fun L _ hy =>
+  main L hy
 
 end GlobalTheory.TargetStatementSixOneSixtyEight

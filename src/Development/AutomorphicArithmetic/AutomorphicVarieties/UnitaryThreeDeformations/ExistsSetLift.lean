@@ -10,37 +10,46 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThre
 
 noncomputable section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia
 
 namespace UpperTheory.V.UnitaryThreeInertia.Obs
 
-variable {O R N : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [AddCommGroup N] [Module O N]
+variable
+  {O R N : Type}
+  [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [AddCommGroup N] [Module O N]
   {D : Type} [Group D]
 
 structure Sm (ε : N →ₗ[O] R) : Prop where
   mem : ∀ y, ε y ∈ maximalIdeal R
   kill : ∀ x ∈ maximalIdeal R, ∀ y, x * ε y = 0
 
-def act (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (Y : Matrix (Fin 3) (Fin 3) N) : Matrix (Fin 3) (Fin 3) N :=
-  fun a b => ((Ψ g ^ wt a b : Oˣ) : O) • (if η g = 1 then Y a b else -Y b.rev a.rev)
+def act (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (Y : Matrix (Fin 3) (Fin 3) N)
+    : Matrix (Fin 3) (Fin 3) N := fun a b =>
+  ((Ψ g ^ wt a b : Oˣ) : O) • (if η g = 1 then Y a b else - Y b.rev a.rev)
 
-theorem act_map {N' : Type} [AddCommGroup N'] [Module O N'] (φ : N →ₗ[O] N') (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D)
-    (Y : Matrix (Fin 3) (Fin 3) N) : (act η Ψ g Y).map φ = act η Ψ g (Y.map φ) := by
+theorem act_map
+    {N' : Type} [AddCommGroup N'] [Module O N']
+    (φ : N →ₗ[O] N') (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (Y : Matrix (Fin 3) (Fin 3) N)
+    : (act η Ψ g Y).map φ = act η Ψ g (Y.map φ) := by
   ext a b
   simp only [act, Matrix.map_apply]
   split_ifs <;> simp [map_smul, map_neg]
 
-theorem act_neg (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D)
-    (Y : Matrix (Fin 3) (Fin 3) N) : act η Ψ g (-Y) = -act η Ψ g Y := by
+theorem act_neg (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (Y : Matrix (Fin 3) (Fin 3) N)
+    : act η Ψ g (-Y) = - act η Ψ g Y := by
   ext a b
   simp only [act, Matrix.neg_apply]
   split_ifs <;> simp
 
-theorem act_val [IsLocalRing O] (η : D →* ℤˣ) (Ψ : D →* Oˣ) (j : ℤ) (g : D) (y : Gb (k := ResidueField O) j) :
-    (gRep η ((Units.map (residue O).toMonoidHom).comp Ψ) j g y).val = act η Ψ g y.val := by
+theorem act_val
+    [IsLocalRing O] (η : D →* ℤˣ) (Ψ : D →* Oˣ) (j : ℤ) (g : D) (y : Gb (k := ResidueField O) j)
+    : (gRep η ((Units.map (residue O).toMonoidHom).comp Ψ) j g y).val = act η Ψ g y.val := by
   have key : ∀ (u : Oˣ) (n : ℤ), residue O ↑(u ^ n) = (residue O ↑u) ^ n := by
     intro u n
-    calc residue O ↑(u ^ n) = ↑(Units.map (residue O).toMonoidHom (u ^ n)) := rfl
+    calc
+      residue O ↑(u ^ n)
+        = ↑(Units.map (residue O).toMonoidHom (u ^ n)) := rfl
       _ = ↑((Units.map (residue O).toMonoidHom u) ^ n) := by rw [map_zpow]
       _ = (residue O ↑u) ^ n := by rw [Units.val_zpow_eq_zpow_val]; rfl
   ext a b
@@ -50,13 +59,19 @@ theorem act_val [IsLocalRing O] (η : D →* ℤˣ) (Ψ : D →* Oˣ) (j : ℤ) 
 
 variable {ε : N →ₗ[O] R}
 
-theorem Sm.mul_zero (h : Sm ε) {X : Matrix (Fin 3) (Fin 3) R} (hX : EntIn (maximalIdeal R) X)
-    (Y : Matrix (Fin 3) (Fin 3) N) : X * Y.map ε = 0 := by
+theorem Sm.mul_zero
+    (h : Sm ε)
+    {X : Matrix (Fin 3) (Fin 3) R} (hX : EntIn (maximalIdeal R) X)
+    (Y : Matrix (Fin 3) (Fin 3) N)
+    : X * Y.map ε = 0 := by
   ext a b
   simp [Matrix.mul_apply, h.kill _ (hX _ _)]
 
-theorem Sm.zero_mul (h : Sm ε) {X : Matrix (Fin 3) (Fin 3) R} (hX : EntIn (maximalIdeal R) X)
-    (Y : Matrix (Fin 3) (Fin 3) N) : Y.map ε * X = 0 := by
+theorem Sm.zero_mul
+    (h : Sm ε)
+    {X : Matrix (Fin 3) (Fin 3) R} (hX : EntIn (maximalIdeal R) X)
+    (Y : Matrix (Fin 3) (Fin 3) N)
+    : Y.map ε * X = 0 := by
   ext a b
   simp [Matrix.mul_apply, mul_comm, h.kill _ (hX _ _)]
 
@@ -74,12 +89,12 @@ def Sm.ex (h : Sm ε) (Y : Matrix (Fin 3) (Fin 3) N) : GG (m := 3) (R := R) := G
 
 theorem Sm.ex_mat (h : Sm ε) (Y : Matrix (Fin 3) (Fin 3) N) : (h.ex Y).mat = 1 + Y.map ε := rfl
 
-theorem Sm.ex_mul_mat (h : Sm ε) (Y : Matrix (Fin 3) (Fin 3) N) (x : GG (m := 3) (R := R)) :
-    (h.ex Y * x).mat = (1 + Y.map ε) * x.mat := by
+theorem Sm.ex_mul_mat (h : Sm ε) (Y : Matrix (Fin 3) (Fin 3) N) (x : GG (m := 3) (R := R))
+    : (h.ex Y * x).mat = (1 + Y.map ε) * x.mat := by
   simp [GG.mat, Sm.ex, Sm.exGL]
 
-theorem Sm.ex_mul_right (h : Sm ε) (Y : Matrix (Fin 3) (Fin 3) N) (x : GG (m := 3) (R := R)) :
-    (h.ex Y * x).right = x.right := by
+theorem Sm.ex_mul_right (h : Sm ε) (Y : Matrix (Fin 3) (Fin 3) N) (x : GG (m := 3) (R := R))
+    : (h.ex Y * x).right = x.right := by
   simp [Sm.ex]
 
 theorem Sm.ex_add (h : Sm ε) (X Y : Matrix (Fin 3) (Fin 3) N) : h.ex (X + Y) = h.ex X * h.ex Y := by
@@ -89,44 +104,58 @@ theorem Sm.ex_add (h : Sm ε) (X Y : Matrix (Fin 3) (Fin 3) N) : h.ex (X + Y) = 
     simp [Sm.ex, Sm.exGL, hadd, Matrix.add_mul, Matrix.mul_add, h.sq, sgnAct_one, add_assoc]
   · simp [Sm.ex]
 
-theorem Sm.ex_inj (h : Sm ε) (hε : Function.Injective ε) {X Y : Matrix (Fin 3) (Fin 3) N}
-    (e : h.ex X = h.ex Y) : X = Y := by
+theorem Sm.ex_inj
+    (h : Sm ε) (hε : Function.Injective ε) {X Y : Matrix (Fin 3) (Fin 3) N} (e : h.ex X = h.ex Y)
+    : X = Y := by
   have hm := congrArg GG.mat e
   rw [h.ex_mat, h.ex_mat] at hm
   have hm' : X.map ε = Y.map ε := add_left_cancel hm
   ext a b
   exact hε (congrFun (congrFun hm' a) b)
 
-theorem Sm.eq_ex (h : Sm ε) {x : GG (m := 3) (R := R)} {Y : Matrix (Fin 3) (Fin 3) N} (h1 : x.right = 1)
-    (h2 : x.mat = 1 + Y.map ε) : x = h.ex Y := by
+theorem Sm.eq_ex
+    (h : Sm ε)
+    {x : GG (m := 3) (R := R)} {Y : Matrix (Fin 3) (Fin 3) N}
+    (h1 : x.right = 1) (h2 : x.mat = 1 + Y.map ε)
+    : x = h.ex Y := by
   apply SemidirectProduct.ext
   · apply Units.ext
     exact h2
   · simpa [Sm.ex] using h1
 
-theorem Sm.conj (h : Sm ε) (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (z : GG (m := 3) (R := R)) (hz : z.right = η g)
-    (hr : EntIn (maximalIdeal R) (z.mat - ((r0 η Ψ g).mat).map (algebraMap O R))) (Y : Matrix (Fin 3) (Fin 3) N) :
-    z * h.ex Y = h.ex (act η Ψ g Y) * z := by
-  have hD : ∀ Y' : Matrix (Fin 3) (Fin 3) N, ((r0 η Ψ g).mat).map (algebraMap O R) * Y'.map ε =
-      (Matrix.of fun a b => ((Ψ g ^ wt a b : Oˣ) : O) • Y' a b).map ε *
-        ((r0 η Ψ g).mat).map (algebraMap O R) := by
+theorem Sm.conj
+    (h : Sm ε)
+    (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (z : GG (m := 3) (R := R)) (hz : z.right = η g)
+    (hr : EntIn (maximalIdeal R) (z.mat - ((r0 η Ψ g).mat).map (algebraMap O R)))
+    (Y : Matrix (Fin 3) (Fin 3) N)
+    : z * h.ex Y = h.ex (act η Ψ g Y) * z := by
+  have hD
+      : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
+        ((r0 η Ψ g).mat).map (algebraMap O R) * Y'.map ε
+          = (Matrix.of fun a b => ((Ψ g ^ wt a b : Oˣ) : O) • Y' a b).map ε
+            * ((r0 η Ψ g).mat).map (algebraMap O R) := by
     intro Y'
     ext a b
-    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_map (map_zero _), Matrix.diagonal_mul,
-      Matrix.mul_diagonal, Matrix.map_apply, Matrix.of_apply, LinearMap.map_smul, Algebra.smul_def]
+    simp only [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_map (map_zero _),
+      Matrix.diagonal_mul, Matrix.mul_diagonal, Matrix.map_apply, Matrix.of_apply,
+      LinearMap.map_smul, Algebra.smul_def]
     rw [mul_right_comm, ← map_mul, ← Units.val_mul, ← _root_.zpow_add, wt, sub_add_cancel]
-  have hT : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
-      z.mat * Y'.map ε = ((r0 η Ψ g).mat).map (algebraMap O R) * Y'.map ε := by
+  have hT
+      : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
+        z.mat * Y'.map ε = ((r0 η Ψ g).mat).map (algebraMap O R) * Y'.map ε := by
     intro Y'
     have hE := h.mul_zero hr Y'
     rwa [Matrix.sub_mul, sub_eq_zero] at hE
-  have hT' : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
-      Y'.map ε * z.mat = Y'.map ε * ((r0 η Ψ g).mat).map (algebraMap O R) := by
+  have hT'
+      : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
+        Y'.map ε * z.mat = Y'.map ε * ((r0 η Ψ g).mat).map (algebraMap O R) := by
     intro Y'
     have hE := h.zero_mul hr Y'
     rwa [Matrix.mul_sub, sub_eq_zero] at hE
-  have key : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
-      z.mat * Y'.map ε = (Matrix.of fun a b => ((Ψ g ^ wt a b : Oˣ) : O) • Y' a b).map ε * z.mat := by
+  have key
+      : ∀ Y' : Matrix (Fin 3) (Fin 3) N,
+        z.mat * Y'.map ε
+          = (Matrix.of fun a b => ((Ψ g ^ wt a b : Oˣ) : O) • Y' a b).map ε * z.mat := by
     intro Y'
     rw [hT, hD, hT']
   apply SemidirectProduct.ext
@@ -144,25 +173,31 @@ theorem Sm.conj (h : Sm ε) (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (z : G
     · rw [he, sgnAct_neg_one, theta_val]
       have hrev : ∀ b j : Fin 3, (b = j.rev) ↔ (j = b.rev) := fun b j => by
         constructor <;> rintro rfl <;> simp
-      have hJ : ∀ M : Matrix (Fin 3) (Fin 3) R,
-          Jmat (R := R) 3 * M * Jmat (R := R) 3 = Matrix.of fun a b => M a.rev b.rev := by
+      have hJ
+          : ∀ M : Matrix (Fin 3) (Fin 3) R,
+            Jmat (R := R) 3 * M * Jmat (R := R) 3 = Matrix.of fun a b => M a.rev b.rev := by
         intro M
         ext a b
         simp [Jmat, Matrix.mul_apply, hrev]
       have hinv : (((h.exGL Y)⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) = 1 - Y.map ε := rfl
-      have h1 : (Matrix.of fun (a b : Fin 3) => (1 : Matrix (Fin 3) (Fin 3) R) a.rev b.rev) = 1 := by
+      have h1
+          : (Matrix.of fun (a b : Fin 3) => (1 : Matrix (Fin 3) (Fin 3) R) a.rev b.rev) = 1 := by
         ext a b
         simp [Matrix.one_apply]
-      have h2 : (Matrix.of fun (a b : Fin 3) => (Y.map ε)ᵀ a.rev b.rev) =
-          (Matrix.of fun (a b : Fin 3) => Y b.rev a.rev).map ε := by
+      have h2
+          : (Matrix.of fun (a b : Fin 3) => (Y.map ε)ᵀ a.rev b.rev)
+            = (Matrix.of fun (a b : Fin 3) => Y b.rev a.rev).map ε := by
         ext a b
         simp
-      have ha : (act η Ψ g Y).map ε =
-          -(Matrix.of fun a b => ((Ψ g ^ wt a b : Oˣ) : O) •
-            (Matrix.of fun (a b : Fin 3) => Y b.rev a.rev) a b).map ε := by
+      have ha
+          : (act η Ψ g Y).map ε
+            = - (Matrix.of fun a b =>
+                ((Ψ g ^ wt a b : Oˣ) : O) • (Matrix.of fun (a b : Fin 3) => Y b.rev a.rev) a b).map
+              ε := by
         ext a b
         simp [act, he]
-      rw [hinv, Matrix.transpose_sub, Matrix.transpose_one, Matrix.mul_sub, Matrix.sub_mul, hJ, hJ, h1, h2]
+      rw [hinv, Matrix.transpose_sub, Matrix.transpose_one, Matrix.mul_sub, Matrix.sub_mul, hJ, hJ,
+        h1, h2]
       change _ = (1 + (act η Ψ g Y).map ε) * z.mat
       rw [ha, mul_sub, mul_one, key, add_mul, one_mul, Matrix.neg_mul, ← sub_eq_add_neg]
   · simp [Sm.ex, GG.ofGL]
@@ -171,26 +206,36 @@ section Coc
 
 variable (h : Sm ε) (η : D →* ℤˣ) (Ψ : D →* Oˣ)
 
-theorem Sm.coc (hε : Function.Injective ε) (s : D → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = η g)
+theorem Sm.coc
+    (hε : Function.Injective ε)
+    (s : D → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = η g)
     (hr : ∀ g, EntIn (maximalIdeal R) ((s g).mat - ((r0 η Ψ g).mat).map (algebraMap O R)))
-    (K : D × D → Matrix (Fin 3) (Fin 3) N) (hK : ∀ g g', s g * s g' = h.ex (K (g, g')) * s (g * g')) (g g' k : D) :
-    act η Ψ g (K (g', k)) - K (g * g', k) + K (g, g' * k) - K (g, g') = 0 := by
+    (K : D × D → Matrix (Fin 3) (Fin 3) N) (hK : ∀ g g', s g * s g' = h.ex (K (g, g')) * s (g * g'))
+    (g g' k : D)
+    : act η Ψ g (K (g', k)) - K (g * g', k) + K (g, g' * k) - K (g, g') = 0 := by
   have e1 : s g * s g' * s k = h.ex (K (g, g') + K (g * g', k)) * s (g * (g' * k)) := by
     rw [hK g g', mul_assoc, hK (g * g') k, ← mul_assoc, ← h.ex_add, mul_assoc g g' k]
-  have e2 : s g * (s g' * s k) = h.ex (act η Ψ g (K (g', k)) + K (g, g' * k)) * s (g * (g' * k)) := by
-    rw [hK g' k, ← mul_assoc, h.conj η Ψ g (s g) (hs g) (hr g), mul_assoc, hK g (g' * k), ← mul_assoc,
-      ← h.ex_add]
+  have e2
+      : s g * (s g' * s k) = h.ex (act η Ψ g (K (g', k)) + K (g, g' * k)) * s (g * (g' * k)) := by
+    rw [hK g' k, ← mul_assoc, h.conj η Ψ g (s g) (hs g) (hr g), mul_assoc, hK g (g' * k),
+      ← mul_assoc, ← h.ex_add]
   have e3 : h.ex (K (g, g') + K (g * g', k)) = h.ex (act η Ψ g (K (g', k)) + K (g, g' * k)) := by
     apply mul_right_cancel (b := s (g * (g' * k)))
     rw [← e1, ← e2, mul_assoc]
   have e4 := h.ex_inj hε e3
-  rw [show act η Ψ g (K (g', k)) - K (g * g', k) + K (g, g' * k) - K (g, g') =
-      act η Ψ g (K (g', k)) + K (g, g' * k) - (K (g, g') + K (g * g', k)) by abel, ← e4, sub_self]
+  rw [show act η Ψ g (K (g', k)) - K (g * g', k) + K (g, g' * k) - K (g, g')
+        = act η Ψ g (K (g', k)) + K (g, g' * k) - (K (g, g') + K (g * g', k)) by
+      abel,
+    ← e4, sub_self]
 
-theorem Sm.cob (hε : Function.Injective ε) (s : D → GG (m := 3) (R := R)) (ρ : D →* GG (m := 3) (R := R)) (hρ : Red η Ψ ρ)
+theorem Sm.cob
+    (hε : Function.Injective ε)
+    (s : D → GG (m := 3) (R := R))
+    (ρ : D →* GG (m := 3) (R := R)) (hρ : Red η Ψ ρ)
     (K : D × D → Matrix (Fin 3) (Fin 3) N) (hK : ∀ g g', s g * s g' = h.ex (K (g, g')) * s (g * g'))
-    (A : D → Matrix (Fin 3) (Fin 3) N) (hA : ∀ g, s g = h.ex (A g) * ρ g) (g g' : D) :
-    act η Ψ g (A g') - A (g * g') + A g = K (g, g') := by
+    (A : D → Matrix (Fin 3) (Fin 3) N) (hA : ∀ g, s g = h.ex (A g) * ρ g)
+    (g g' : D)
+    : act η Ψ g (A g') - A (g * g') + A g = K (g, g') := by
   have e1 : s g * s g' = h.ex (A g + act η Ψ g (A g')) * ρ (g * g') := by
     rw [hA g, hA g', mul_assoc, ← mul_assoc (ρ g), h.conj η Ψ g (ρ g) (hρ.mult g) (hρ.red g),
       mul_assoc, ← map_mul, ← mul_assoc, ← h.ex_add]
@@ -200,11 +245,12 @@ theorem Sm.cob (hε : Function.Injective ε) (s : D → GG (m := 3) (R := R)) (�
   rw [show act η Ψ g (A g') - A (g * g') + A g = A g + act η Ψ g (A g') - A (g * g') by abel, e3,
     add_sub_cancel_right]
 
-theorem Sm.hom (s : D → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = η g)
+theorem Sm.hom
+    (s : D → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = η g)
     (hr : ∀ g, EntIn (maximalIdeal R) ((s g).mat - ((r0 η Ψ g).mat).map (algebraMap O R)))
     (b : D → Matrix (Fin 3) (Fin 3) N)
-    (hK : ∀ g g', s g * s g' = h.ex (act η Ψ g (b g') - b (g * g') + b g) * s (g * g')) :
-    ∃ r : D →* GG (m := 3) (R := R), ∀ g, r g = h.ex (-b g) * s g := by
+    (hK : ∀ g g', s g * s g' = h.ex (act η Ψ g (b g') - b (g * g') + b g) * s (g * g'))
+    : ∃ r : D →* GG (m := 3) (R := R), ∀ g, r g = h.ex (- b g) * s g := by
   have h0 : h.ex 0 = 1 := by
     have e := h.ex_add 0 0
     rw [add_zero] at e
@@ -213,7 +259,7 @@ theorem Sm.hom (s : D → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = η g)
     intro Y
     ext a b
     simp [act]
-  refine ⟨{ toFun := fun g => h.ex (-b g) * s g, map_one' := ?_, map_mul' := ?_ }, fun g => rfl⟩
+  refine ⟨{ toFun := fun g => h.ex (- b g) * s g, map_one' := ?_, map_mul' := ?_ }, fun g => rfl⟩
   · have e := hK 1 1
     rw [mul_one, hact1, sub_add_cancel] at e
     have e' : s 1 = h.ex (b 1) := mul_right_cancel e
@@ -221,26 +267,33 @@ theorem Sm.hom (s : D → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = η g)
     rw [e', ← h.ex_add, neg_add_cancel, h0]
   · intro g g'
     show h.ex (-b (g * g')) * s (g * g') = h.ex (-b g) * s g * (h.ex (-b g') * s g')
-    rw [mul_assoc, ← mul_assoc (s g), h.conj η Ψ g (s g) (hs g) (hr g), mul_assoc, hK g g', ← mul_assoc,
-      ← mul_assoc, ← h.ex_add, ← h.ex_add, act_neg]
+    rw [mul_assoc, ← mul_assoc (s g), h.conj η Ψ g (s g) (hs g) (hr g), mul_assoc, hK g g',
+      ← mul_assoc, ← mul_assoc, ← h.ex_add, ← h.ex_add, act_neg]
     congr 2
     abel
 
 end Coc
 
-theorem unobs {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
-    [CharZero O] [Finite (ResidueField O)] {G Γ ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
-    [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] [Finite ι] (F : Frame O G Γ ι) (hF : F.Ok)
-    (hV : F.LocVan) {R : Type} [CommRing R] [Algebra O R] [IsCO O R] {ε : ResidueField O →ₗ[O] R} (h : Sm ε) (j : ℤ)
+theorem unobs
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [IsAdicComplete (maximalIdeal O) O] [CharZero O] [Finite (ResidueField O)]
+    {G Γ ι : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+    [T2Space G] [TotallyDisconnectedSpace G] [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+    [CompactSpace Γ] [T2Space Γ] [TotallyDisconnectedSpace Γ] [Finite ι]
+    (F : Frame O G Γ ι) (hF : F.Ok) (hV : F.LocVan)
+    {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
+    {ε : ResidueField O →ₗ[O] R} (h : Sm ε)
+    (j : ℤ)
     (s : Γ → GG (m := 3) (R := R)) (hs : ∀ g, (s g).right = F.η g)
     (hr : ∀ g, EntIn (maximalIdeal R) ((s g).mat - ((r0 F.η F.Ψ g).mat).map (algebraMap O R)))
     (hc : IsLocallyConstant fun g => (s g).mat)
-    (ρ : ∀ v, F.D v →* GG (m := 3) (R := R)) (hρ : ∀ v, Red (F.ηv v) (F.Ψv v) (ρ v)) (hl : ∀ v, F.LocAt v (ρ v))
+    (ρ : ∀ v, F.D v →* GG (m := 3) (R := R))
+    (hρ : ∀ v, Red (F.ηv v) (F.Ψv v) (ρ v)) (hl : ∀ v, F.LocAt v (ρ v))
     (κ : Γ × Γ → Gb (k := ResidueField O) j) (a : ∀ v, F.D v → Gb (k := ResidueField O) j)
     (hK : ∀ g g', s g * s g' = h.ex (κ (g, g')).val * s (g * g'))
-    (hA : ∀ v g, s (F.loc v g) = h.ex (a v g).val * ρ v g) (hB : (κ, a) ∈ F.framedTwoCoboundaries j) :
-    ∃ r : Γ →* GG (m := 3) (R := R), F.Cond r ∧ IsLocallyConstant (mats r) ∧ ∀ g, ∃ Y, r g = h.ex Y * s g := by
+    (hA : ∀ v g, s (F.loc v g) = h.ex (a v g).val * ρ v g) (hB : (κ, a) ∈ F.framedTwoCoboundaries j)
+    : ∃ r : Γ →* GG (m := 3) (R := R),
+      F.Cond r ∧ IsLocallyConstant (mats r) ∧ ∀ g, ∃ Y, r g = h.ex Y * s g := by
   classical
   obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.1 hB
   obtain ⟨f, hf, rfl⟩ := Submodule.mem_map.1 hy
@@ -281,8 +334,9 @@ theorem unobs {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [
         abel
       rw [e1]
       exact ⟨h.ex_mul_right _ _, h.ex_mul_mat _ _⟩
-    have hcoef : ∀ (g : F.D v) (p q : Fin 3), ∃ o, residue O o = (w v g).val p q ∧
-        (fun g => ((w v g).val).map ε) g p q = o • ε 1 := by
+    have hcoef
+        : ∀ (g : F.D v) (p q : Fin 3), ∃ o,
+          residue O o = (w v g).val p q ∧ (fun g => ((w v g).val).map ε) g p q = o • ε 1 := by
       intro g p q
       obtain ⟨o, ho⟩ := IsLocalRing.residue_surjective ((w v g).val p q)
       refine ⟨o, ho, ?_⟩
@@ -290,27 +344,35 @@ theorem unobs {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [
       rw [← ho, ← map_smul, Algebra.smul_def, mul_one]
       rfl
     by_cases hv : v = F.vl
-    · exact triangular_condition_at_l_of_first_order_deformation F hF hV (ε 1) hk0 hf0 j v hv (ρ v) _ (w v) _ (hρ v) (hl v) (hwv v) hcoef hdef
+    · exact triangular_condition_at_l_of_first_order_deformation F hF hV (ε 1) hk0 hf0 j v hv (ρ v)
+        _ (w v) _ (hρ v) (hl v) (hwv v) hcoef hdef
     · by_cases hS : v ∈ F.Sb
-      · exact locAt_deform_d F hF hV (ε 1) hk0 hf0 j v hS (ρ v) _ (w v) _ (hρ v) (hl v) (hwv v) hcoef hdef
+      · exact locAt_deform_d F hF hV (ε 1) hk0 hf0 j v hS (ρ v) _ (w v) _ (hρ v) (hl v) (hwv v)
+          hcoef hdef
       · have hT : v ∉ F.Tb := by simp [Frame.Tb, hv, hS]
-        exact locAt_deform_u F hF hV (ε 1) hk0 hf0 j v hT (ρ v) _ (w v) _ (hρ v) (hl v) (hwv v) hcoef hdef
+        exact locAt_deform_u F hF hV (ε 1) hk0 hf0 j v hT (ρ v) _ (w v) _ (hρ v) (hl v) (hwv v)
+          hcoef hdef
   have hbl : IsLocallyConstant f := (IsLocallyConstant.iff_continuous f).2 hf
-  refine ⟨r, ⟨hred, hloc⟩, ?_, fun g => ⟨-b g, hrg g⟩⟩
-  have e2 : mats r = fun g => (1 + (-(f g).val).map ε) * (s g).mat := funext fun g => by
-    simp only [mats]
-    rw [hrg, h.ex_mul_mat]
+  refine ⟨r, ⟨hred, hloc⟩, ?_, fun g => ⟨- b g, hrg g⟩⟩
+  have e2 : mats r = fun g => (1 + (-(f g).val).map ε) * (s g).mat :=
+    funext fun g => by
+      simp only [mats]
+      rw [hrg, h.ex_mul_mat]
   rw [e2]
   exact IsLocallyConstant.comp₂ hbl hc (fun x y => (1 + (-x.val).map ε) * y)
 
 section Lift
 
-variable {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [CommRing R'] [IsLocalRing R']
-  [Algebra O R']
+variable
+  {O R R' : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] [CommRing R']
+  [IsLocalRing R'] [Algebra O R']
 
-theorem red_of_map {D : Type} [Group D] (p : R →ₐ[O] R') (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (x : GG (m := 3) (R := R))
-    (hx : EntIn (maximalIdeal R') ((GG.map (p : R →+* R') x).mat - ((r0 η Ψ g).mat).map (algebraMap O R'))) :
-    EntIn (maximalIdeal R) (x.mat - ((r0 η Ψ g).mat).map (algebraMap O R)) := by
+theorem red_of_map
+    {D : Type} [Group D]
+    (p : R →ₐ[O] R') (η : D →* ℤˣ) (Ψ : D →* Oˣ) (g : D) (x : GG (m := 3) (R := R))
+    (hx : EntIn (maximalIdeal R')
+      ((GG.map (p : R →+* R') x).mat - ((r0 η Ψ g).mat).map (algebraMap O R')))
+    : EntIn (maximalIdeal R) (x.mat - ((r0 η Ψ g).mat).map (algebraMap O R)) := by
   intro a b
   have h := hx a b
   rw [GG.map_mat] at h
@@ -322,21 +384,26 @@ theorem red_of_map {D : Type} [Group D] (p : R →ₐ[O] R') (η : D →* ℤˣ)
   rw [map_sub, RingHom.coe_coe, AlgHom.commutes] at hu'
   exact (IsLocalRing.notMem_maximalIdeal).2 hu' h
 
-theorem lc_of_mat {D : Type} [TopologicalSpace D] (s : D → GG (m := 3) (R := R)) (h1 : IsLocallyConstant fun g => (s g).mat)
-    (h2 : IsLocallyConstant fun g => (s g).right) : IsLocallyConstant s := by
+theorem lc_of_mat
+    {D : Type} [TopologicalSpace D]
+    (s : D → GG (m := 3) (R := R))
+    (h1 : IsLocallyConstant fun g => (s g).mat) (h2 : IsLocallyConstant fun g => (s g).right)
+    : IsLocallyConstant s := by
   rw [IsLocallyConstant.iff_eventually_eq] at h1 h2 ⊢
   intro x
   filter_upwards [h1 x, h2 x] with y hy1 hy2
   exact SemidirectProduct.ext (Units.ext hy1) hy2
 
-theorem lc_mats {D : Type} [Group D] [TopologicalSpace D] [Finite R'] (r : D →* GG (m := 3) (R := R'))
-    (h : UnitaryThreeInertia.AdicCont (maximalIdeal R') r) : IsLocallyConstant (mats r) := by
+theorem lc_mats
+    {D : Type} [Group D] [TopologicalSpace D] [Finite R']
+    (r : D →* GG (m := 3) (R := R')) (h : UnitaryThreeInertia.AdicCont (maximalIdeal R') r)
+    : IsLocallyConstant (mats r) := by
   have hnil : IsNilpotent (maximalIdeal R') := by
     have := IsArtinianRing.isNilpotent_jacobson_bot (R := R')
     rwa [IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top] at this
   obtain ⟨n, hn⟩ := hnil
-  have hinj : Function.Injective
-      (fun X : Matrix (Fin 3) (Fin 3) R' => X.map (Ideal.Quotient.mk (maximalIdeal R' ^ n))) := by
+  have hinj : Function.Injective (fun X : Matrix (Fin 3) (Fin 3) R' =>
+      X.map (Ideal.Quotient.mk (maximalIdeal R' ^ n))) := by
     intro X Y hXY
     ext a b
     have hab := congrFun (congrFun hXY a) b
@@ -344,13 +411,18 @@ theorem lc_mats {D : Type} [Group D] [TopologicalSpace D] [Finite R'] (r : D →
     rw [Ideal.Quotient.eq, hn, Submodule.zero_eq_bot, Ideal.mem_bot, sub_eq_zero] at hab
     exact hab
   exact IsLocallyConstant.desc (mats r)
-    (fun X : Matrix (Fin 3) (Fin 3) R' => X.map (Ideal.Quotient.mk (maximalIdeal R' ^ n))) (h n) hinj
+    (fun X : Matrix (Fin 3) (Fin 3) R' => X.map (Ideal.Quotient.mk (maximalIdeal R' ^ n)))
+    (h n) hinj
 
-theorem exists_setLift {D : Type} [Group D] [TopologicalSpace D] (𝒜 : ℤ → Submodule O R) (p : R →ₐ[O] R')
-    (hp : Function.Surjective p) (r : D →* GG (m := 3) (R := R')) (hc : IsLocallyConstant (mats r))
-    (hg : ∀ g, ∃ X, GrMat 𝒜 X ∧ X.map p = (r g).mat) :
-    ∃ s : D → GG (m := 3) (R := R), (∀ g, GG.map (p : R →+* R') (s g) = r g) ∧ (IsLocallyConstant fun g => (s g).mat) ∧
-      ∀ g, GrMat 𝒜 (s g).mat := by
+theorem exists_setLift
+    {D : Type} [Group D] [TopologicalSpace D]
+    (𝒜 : ℤ → Submodule O R)
+    (p : R →ₐ[O] R') (hp : Function.Surjective p)
+    (r : D →* GG (m := 3) (R := R'))
+    (hc : IsLocallyConstant (mats r)) (hg : ∀ g, ∃ X, GrMat 𝒜 X ∧ X.map p = (r g).mat)
+    : ∃ s : D → GG (m := 3) (R := R),
+      (∀ g, GG.map (p : R →+* R') (s g) = r g) ∧ (IsLocallyConstant fun g => (s g).mat)
+        ∧ ∀ g, GrMat 𝒜 (s g).mat := by
   classical
   have hloc : IsLocalHom (p : R →+* R') := IsLocalHom.of_surjective _ hp
   let X : Matrix (Fin 3) (Fin 3) R' → Matrix (Fin 3) (Fin 3) R := fun M =>
@@ -376,16 +448,20 @@ theorem exists_setLift {D : Type} [Group D] [TopologicalSpace D] (𝒜 : ℤ →
     · simp [s, GG.map]
   · exact hc.comp X
 
-abbrev incl (O : Type) [CommRing O] [Algebra O R] (I : Ideal R) : I →ₗ[O] R := I.subtype.restrictScalars O
+abbrev incl (O : Type) [CommRing O] [Algebra O R] (I : Ideal R) : I →ₗ[O] R :=
+  I.subtype.restrictScalars O
 
-theorem exists_ex (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (p : R →ₐ[O] R') (j : ℤ)
-    (hw : ∀ x ∈ RingHom.ker p, x ∈ 𝒜 j) (h : Sm (incl O (RingHom.ker p))) (x y : GG (m := 3) (R := R))
-    (e : GG.map (p : R →+* R') x = GG.map (p : R →+* R') y) (hg : GrMat 𝒜 (x * y⁻¹).mat) :
-    ∃ Y : Matrix (Fin 3) (Fin 3) (RingHom.ker p), x = h.ex Y * y ∧ ∀ a b, wt a b ≠ j → Y a b = 0 := by
+theorem exists_ex
+    (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜]
+    (p : R →ₐ[O] R') (j : ℤ) (hw : ∀ x ∈ RingHom.ker p, x ∈ 𝒜 j)
+    (h : Sm (incl O (RingHom.ker p)))
+    (x y : GG (m := 3) (R := R))
+    (e : GG.map (p : R →+* R') x = GG.map (p : R →+* R') y) (hg : GrMat 𝒜 (x * y⁻¹).mat)
+    : ∃ Y : Matrix (Fin 3) (Fin 3) (RingHom.ker p),
+      x = h.ex Y * y ∧ ∀ a b, wt a b ≠ j → Y a b = 0 := by
   classical
   set z := x * y⁻¹ with hz
-  have hz1 : GG.map (p : R →+* R') z = 1 := by
-    rw [hz, map_mul, map_inv, e, mul_inv_cancel]
+  have hz1 : GG.map (p : R →+* R') z = 1 := by rw [hz, map_mul, map_inv, e, mul_inv_cancel]
   have hright : z.right = 1 := by
     have := congrArg SemidirectProduct.right hz1
     simpa [GG.map] using this
@@ -405,7 +481,8 @@ theorem exists_ex (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (p : R →
   let Y : Matrix (Fin 3) (Fin 3) (RingHom.ker p) := fun a b => ⟨(z.mat - 1) a b, hker a b⟩
   have hY : z.mat = 1 + Y.map (incl O (RingHom.ker p)) := by
     ext a b
-    change z.mat a b = (1 : Matrix (Fin 3) (Fin 3) R) a b + (z.mat a b - (1 : Matrix (Fin 3) (Fin 3) R) a b)
+    change z.mat a b
+      = (1 : Matrix (Fin 3) (Fin 3) R) a b + (z.mat a b - (1 : Matrix (Fin 3) (Fin 3) R) a b)
     abel
   refine ⟨Y, ?_, ?_⟩
   · rw [← h.eq_ex hright hY, hz, inv_mul_cancel_right]
@@ -424,9 +501,12 @@ theorem exists_ex (𝒜 : ℤ → Submodule O R) [GradedAlgebra 𝒜] (p : R →
     rw [← DirectSum.decompose_of_mem_same 𝒜 h1]
     exact DirectSum.decompose_of_mem_ne 𝒜 h2 hab
 
-theorem map_ex {N N' : Type} [AddCommGroup N] [Module O N] [AddCommGroup N'] [Module O N'] {ε : N →ₗ[O] R}
-    {ε' : N' →ₗ[O] R'} (h : Sm ε) (h' : Sm ε') (p : R →ₐ[O] R') (φ : N →ₗ[O] N') (e : ∀ y, p (ε y) = ε' (φ y))
-    (Y : Matrix (Fin 3) (Fin 3) N) : GG.map (p : R →+* R') (h.ex Y) = h'.ex (Y.map φ) := by
+theorem map_ex
+    {N N' : Type} [AddCommGroup N] [Module O N] [AddCommGroup N'] [Module O N']
+    {ε : N →ₗ[O] R} {ε' : N' →ₗ[O] R'} (h : Sm ε) (h' : Sm ε')
+    (p : R →ₐ[O] R') (φ : N →ₗ[O] N') (e : ∀ y, p (ε y) = ε' (φ y))
+    (Y : Matrix (Fin 3) (Fin 3) N)
+    : GG.map (p : R →+* R') (h.ex Y) = h'.ex (Y.map φ) := by
   apply SemidirectProduct.ext
   · apply Units.ext
     change (GG.map (p : R →+* R') (h.ex Y)).mat = (h'.ex (Y.map φ)).mat
@@ -437,9 +517,12 @@ theorem map_ex {N N' : Type} [AddCommGroup N] [Module O N] [AddCommGroup N'] [Mo
     simp [e]
   · simp [Sm.ex, GG.map]
 
-theorem map_ex_one {N : Type} [AddCommGroup N] [Module O N] {ε : N →ₗ[O] R}
-    (h : Sm ε) (p : R →ₐ[O] R') (e : ∀ y, p (ε y) = 0)
-    (Y : Matrix (Fin 3) (Fin 3) N) : GG.map (p : R →+* R') (h.ex Y) = 1 := by
+theorem map_ex_one
+    {N : Type} [AddCommGroup N] [Module O N]
+    {ε : N →ₗ[O] R} (h : Sm ε)
+    (p : R →ₐ[O] R') (e : ∀ y, p (ε y) = 0)
+    (Y : Matrix (Fin 3) (Fin 3) N)
+    : GG.map (p : R →+* R') (h.ex Y) = 1 := by
   apply SemidirectProduct.ext
   · apply Units.ext
     change (GG.map (p : R →+* R') (h.ex Y)).mat = (1 : GG (m := 3) (R := R')).mat

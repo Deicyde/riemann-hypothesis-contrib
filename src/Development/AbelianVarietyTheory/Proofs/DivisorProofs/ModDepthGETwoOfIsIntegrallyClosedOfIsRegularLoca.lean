@@ -12,9 +12,9 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-theorem exists_isPrime_ne_bot_lt_maximalIdeal_of_two_le_ringKrullDim (R : Type) [CommRing R]
-    [IsLocalRing R] (h : 2 ≤ ringKrullDim R) :
-    ∃ q : Ideal R, q.IsPrime ∧ q ≠ ⊥ ∧ q < maximalIdeal R := by
+theorem exists_isPrime_ne_bot_lt_maximalIdeal_of_two_le_ringKrullDim
+    (R : Type) [CommRing R] [IsLocalRing R] (h : 2 ≤ ringKrullDim R)
+    : ∃ q : Ideal R, q.IsPrime ∧ q ≠ ⊥ ∧ q < maximalIdeal R := by
   obtain ⟨l, hl⟩ : ∃ l : LTSeries (PrimeSpectrum R), l.length = 2 :=
     Order.le_krullDim_iff.mp (by exact_mod_cast h)
   let i0 : Fin l.length := ⟨0, by omega⟩
@@ -37,9 +37,9 @@ namespace GlobalTheory
 
 open Pointwise
 
-theorem modDepthGE_two_of_isIntegrallyClosed_of_isRegularLocalRing :
-    ∀ (R A : Type) [CommRing R] [IsRegularLocalRing R] [CommRing A] [IsDomain A]
-      [IsIntegrallyClosed A] [Algebra R A] [Module.Finite R A] [FaithfulSMul R A],
+theorem modDepthGE_two_of_isIntegrallyClosed_of_isRegularLocalRing
+    : ∀ (R A : Type) [CommRing R] [IsRegularLocalRing R] [CommRing A] [IsDomain A]
+        [IsIntegrallyClosed A] [Algebra R A] [Module.Finite R A] [FaithfulSMul R A],
       2 ≤ ringKrullDim R → ReciprocityTheory.CA.ModDepthGE R A 2 := by
   intro R A _ _ _ _ _ _ _ _ hdim
   obtain ⟨hRd, hRic⟩ := isDomain_and_isIntegrallyClosed_of_isRegularLocalRing R
@@ -67,23 +67,24 @@ theorem modDepthGE_two_of_isIntegrallyClosed_of_isRegularLocalRing :
     by_contra hno
     push_neg at hno
     have hfin := associatedPrimes.finite R (QuotSMulTop x A)
-    have hsub : (maximalIdeal R : Set R) ⊆
-        ⋃ p ∈ associatedPrimes R (QuotSMulTop x A), (p : Set R) := by
+    have hsub
+        : (maximalIdeal R : Set R) ⊆ ⋃ p ∈ associatedPrimes R (QuotSMulTop x A), (p : Set R) := by
       intro y hy
       rw [biUnion_associatedPrimes_eq_compl_regular]
       exact hno y hy
-    obtain ⟨p, hp, hmp⟩ := (Ideal.subset_union_prime (s := hfin.toFinset) (f := id) ⊥ ⊥
-      (fun p hp _ _ => (hfin.mem_toFinset.mp hp).isPrime)).mp (by simpa using hsub)
+    obtain ⟨p, hp, hmp⟩ :=
+      (Ideal.subset_union_prime (s := hfin.toFinset) (f := id) ⊥ ⊥
+        (fun p hp _ _ => (hfin.mem_toFinset.mp hp).isPrime)).mp (by simpa using hsub)
     rw [hfin.mem_toFinset] at hp
-    have hpm : p = maximalIdeal R :=
-      (le_antisymm (le_maximalIdeal (hp.isPrime.ne_top)) hmp)
+    have hpm : p = maximalIdeal R := (le_antisymm (le_maximalIdeal (hp.isPrime.ne_top)) hmp)
     rw [hpm] at hp
     obtain ⟨-, w, hw⟩ := isAssociatedPrime_iff.mp hp
     obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ w
     have hmz : ∀ a ∈ maximalIdeal R, algebraMap R A a * z ∈ Ideal.span {algebraMap R A x} := by
       intro a ha
       rw [hw, Submodule.mem_colon_singleton, Submodule.mem_bot, ← Submodule.Quotient.mk_smul,
-        Submodule.Quotient.mk_eq_zero, hmemx] at ha
+          Submodule.Quotient.mk_eq_zero, hmemx]
+        at ha
       simpa [Algebra.smul_def] using ha
     have hz : z ∉ Ideal.span {algebraMap R A x} := by
       intro hz
@@ -92,8 +93,7 @@ theorem modDepthGE_two_of_isIntegrallyClosed_of_isRegularLocalRing :
         Submodule.Quotient.mk_eq_zero, hmemx]
       exact hz
     set I := Ideal.span {algebraMap R A x}
-    have hzq : (Ideal.Quotient.mk I z : A ⧸ I) ≠ 0 := by
-      rwa [ne_eq, Ideal.Quotient.eq_zero_iff_mem]
+    have hzq : (Ideal.Quotient.mk I z : A ⧸ I) ≠ 0 := by rwa [ne_eq, Ideal.Quotient.eq_zero_iff_mem]
     obtain ⟨P, hP, hle⟩ := exists_le_isAssociatedPrime_of_isNoetherianRing A _ hzq
     haveI hPp : P.IsPrime := hP.isPrime
     have hmP : maximalIdeal R ≤ P.comap (algebraMap R A) := by
@@ -112,13 +112,17 @@ theorem modDepthGE_two_of_isIntegrallyClosed_of_isRegularLocalRing :
     apply hq0
     rw [hQq.over, hlt]
     exact Ideal.comap_bot_of_injective _ hinj
-  refine ⟨[x, y], rfl, (fun r hr => by
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hr
-    rcases hr with rfl | rfl <;> assumption), ?_⟩
-  rw [IsLocalRing.isRegular_iff_isWeaklyRegular_of_subset_maximalIdeal
+  refine ⟨
+    [x, y],
+    rfl,
     (fun r hr => by
-    simp only [List.mem_cons, List.not_mem_nil, or_false] at hr
-    rcases hr with rfl | rfl <;> assumption),
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hr
+      rcases hr with rfl | rfl <;> assumption),
+    ?_
+  ⟩
+  rw [IsLocalRing.isRegular_iff_isWeaklyRegular_of_subset_maximalIdeal (fun r hr => by
+      simp only [List.mem_cons, List.not_mem_nil, or_false] at hr
+      rcases hr with rfl | rfl <;> assumption),
     RingTheory.Sequence.isWeaklyRegular_cons_iff, RingTheory.Sequence.isWeaklyRegular_cons_iff]
   exact ⟨hreg, hyreg, RingTheory.Sequence.IsWeaklyRegular.nil _ _⟩
 

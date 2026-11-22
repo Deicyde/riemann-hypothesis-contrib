@@ -49,16 +49,27 @@ private lemma norm_le_one_of_monic_root_lemma {R F : Type*} [CommRing R] [Normed
   have h2 : ‖y‖ ^ k < ‖y‖ ^ (k + 1) := pow_lt_pow_right₀ h (Nat.lt_succ_self k)
   linarith
 
-
 open IsLocalRing Topology in
 variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] in
-theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [TopologicalSpace O] [IsTopologicalRing O], IsAdic (IsLocalRing.maximalIdeal O) → ∀ κ : FractionRing O →+* PadicAlgCl l, (∀ z : ℤ_[l], κ (algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z)) = algebraMap ℚ_[l] (PadicAlgCl l) (z : ℚ_[l])) → Topology.IsEmbedding (fun x : O => κ (algebraMap O (FractionRing O) x)) ∧ IsClosed (Set.range κ) ∧ (∀ x : FractionRing O, ‖κ x‖ ≤ 1 → ∃ y : O, algebraMap O (FractionRing O) y = x) ∧ ((l : ℕ) : O) ∈ IsLocalRing.maximalIdeal O := by
+theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [TopologicalSpace O] [IsTopologicalRing O],
+      IsAdic (IsLocalRing.maximalIdeal O)
+        → ∀ κ : FractionRing O →+* PadicAlgCl l,
+          (∀ z : ℤ_[l],
+              κ (algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z))
+                = algebraMap ℚ_[l] (PadicAlgCl l) (z : ℚ_[l]))
+            → Topology.IsEmbedding (fun x : O => κ (algebraMap O (FractionRing O) x))
+              ∧ IsClosed (Set.range κ)
+              ∧ (∀ x : FractionRing O, ‖κ x‖ ≤ 1 → ∃ y : O, algebraMap O (FractionRing O) y = x)
+              ∧ ((l : ℕ) : O) ∈ IsLocalRing.maximalIdeal O := by
   intro l _ O _ _ _ _ _ _ _ hO κ hκ
   set g : O →+* PadicAlgCl l := κ.comp (algebraMap O (FractionRing O)) with hg
   have hgz : ∀ z : ℤ_[l], g (algebraMap ℤ_[l] O z) = algebraMap ℚ_[l] (PadicAlgCl l) (z : ℚ_[l]) :=
     hκ
   have hgnat : g ((l : ℕ) : O) = ((l : ℕ) : PadicAlgCl l) := map_natCast g l
-  have hl_lt : ‖g ((l : ℕ) : O)‖ < 1 := hgnat ▸ _root_.GlobalTheory.CoefEmbed.norm_prime_lt_one (l := l)
+  have hl_lt : ‖g ((l : ℕ) : O)‖ < 1 :=
+    hgnat ▸ _root_.GlobalTheory.CoefEmbed.norm_prime_lt_one (l := l)
   have hl_pos : 0 < ‖g ((l : ℕ) : O)‖ := by
     have h : ((l : ℕ) : PadicAlgCl l) = algebraMap ℚ_[l] (PadicAlgCl l) (l : ℚ_[l]) := by simp
     rw [hgnat, h, norm_algebraMap', Padic.norm_p]
@@ -110,7 +121,9 @@ theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) 
     rw [hϖ.maximalIdeal_eq, Ideal.mem_span_singleton] at hy
     obtain ⟨c, rfl⟩ := hy
     rw [map_mul, norm_mul]
-    calc ‖g ϖ‖ * ‖g c‖ ≤ ‖g ϖ‖ * 1 := mul_le_mul_of_nonneg_left (hint c) (norm_nonneg _)
+    calc
+      ‖g ϖ‖ * ‖g c‖
+        ≤ ‖g ϖ‖ * 1 := mul_le_mul_of_nonneg_left (hint c) (norm_nonneg _)
       _ = ‖g ϖ‖ := mul_one _
   have hintc : ∀ x : FractionRing O, ‖κ x‖ ≤ 1 → ∃ y : O, algebraMap O (FractionRing O) y = x := by
     intro x hx
@@ -168,8 +181,9 @@ theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) 
         intro h
         apply hln
         rw [← hc, map_mul, h, mul_zero]
-      have key : κ (algebraMap O (FractionRing O) a / algebraMap O (FractionRing O) b) =
-          ((l : ℚ_[l]) ^ n)⁻¹ • g (a * c) := by
+      have key
+          : κ (algebraMap O (FractionRing O) a / algebraMap O (FractionRing O) b)
+            = ((l : ℚ_[l]) ^ n)⁻¹ • g (a * c) := by
         rw [map_div₀, Algebra.smul_def, map_inv₀, map_pow, map_natCast]
         change g a / g b = _
         rw [← map_natCast g, ← map_pow, ← hc, map_mul, map_mul]
@@ -181,7 +195,8 @@ theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) 
       | mem y hy =>
         obtain ⟨x, _, rfl⟩ := hy
         exact ⟨_, rfl⟩
-      | zero => exact ⟨0, map_zero κ⟩
+      | zero =>
+        exact ⟨0, map_zero κ⟩
       | add y z _ _ hy hz =>
         obtain ⟨a, rfl⟩ := hy
         obtain ⟨b, rfl⟩ := hz
@@ -189,8 +204,11 @@ theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) 
       | smul q y _ hy =>
         obtain ⟨x, rfl⟩ := hy
         obtain ⟨z1, z2, -, rfl⟩ := IsFractionRing.div_surjective ℤ_[l] q
-        refine ⟨algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z1) /
-          algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z2) * x, ?_⟩
+        refine ⟨
+          algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z1)
+            / algebraMap O (FractionRing O) (algebraMap ℤ_[l] O z2) * x,
+          ?_
+        ⟩
         rw [map_mul, map_div₀, hκ, hκ, Algebra.smul_def, map_div₀]
         rfl
   have hclosed : IsClosed (Set.range κ) := by
@@ -205,15 +223,17 @@ theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) 
     · rw [(Metric.nhds_basis_ball.comap g).ge_iff]
       intro ε hε
       obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one hε hϖlt
-      refine Filter.mem_of_superset ((hopen n).mem_nhds (IsLocalRing.maximalIdeal O ^ n).zero_mem) ?_
+      refine Filter.mem_of_superset ((hopen n).mem_nhds (IsLocalRing.maximalIdeal O ^ n).zero_mem)
+        ?_
       intro x hx
       simp only [Set.mem_preimage, mem_ball_zero_iff]
-      rw [SetLike.mem_coe, hϖ.maximalIdeal_eq, Ideal.span_singleton_pow,
-        Ideal.mem_span_singleton] at hx
+      rw [SetLike.mem_coe, hϖ.maximalIdeal_eq, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
+        at hx
       obtain ⟨c, rfl⟩ := hx
       rw [map_mul, norm_mul, map_pow, norm_pow]
-      calc ‖g ϖ‖ ^ n * ‖g c‖ ≤ ‖g ϖ‖ ^ n * 1 :=
-            mul_le_mul_of_nonneg_left (hint c) (by positivity)
+      calc
+        ‖g ϖ‖ ^ n * ‖g c‖
+          ≤ ‖g ϖ‖ ^ n * 1 := mul_le_mul_of_nonneg_left (hint c) (by positivity)
         _ < ε := by rw [mul_one]; exact hn
     · intro t ht
       obtain ⟨n, hn⟩ := hsmall t ht
@@ -227,8 +247,8 @@ theorem _root_.GlobalTheory.CoefEmbed.embedding_closed_integral : ∀ (l : ℕ) 
         (map_ne_zero_iff _ (IsFractionRing.injective O (FractionRing O))).mpr (pow_ne_zero _ hϖ0)
       have hgϖn : 0 < ‖g (ϖ ^ n)‖ :=
         norm_pos_iff.mpr ((map_ne_zero_iff g hginj).mpr (pow_ne_zero _ hϖ0))
-      obtain ⟨y, hy⟩ := hintc (algebraMap O (FractionRing O) x / algebraMap O (FractionRing O) (ϖ ^ n))
-        (by
+      obtain ⟨y, hy⟩ :=
+        hintc (algebraMap O (FractionRing O) x / algebraMap O (FractionRing O) (ϖ ^ n)) (by
           rw [map_div₀, norm_div]
           change ‖g x‖ / ‖g (ϖ ^ n)‖ ≤ 1
           rw [div_le_one hgϖn, map_pow, norm_pow]

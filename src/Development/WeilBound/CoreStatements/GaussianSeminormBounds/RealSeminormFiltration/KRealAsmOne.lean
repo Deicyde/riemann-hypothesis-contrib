@@ -8,7 +8,8 @@ public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSe
 
 noncomputable section
 
-open Formalism.BasicNotions.TH GlobalTheory.RealLift GlobalTheory.FockQuot ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real
+open Formalism.BasicNotions.TH GlobalTheory.RealLift GlobalTheory.FockQuot
+  ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real
 
 namespace PositivityTheory.KRealA
 
@@ -17,17 +18,21 @@ theorem linePos_eq {P Q R S : ℕ} : @FockH1Action.linePos P Q R S = @linePos P 
   rcases l with ⟨_ | _, _ | _⟩ <;> rfl
 
 theorem omAct_eq (P Q R S : ℕ) : FockH1Action.omAct P Q R S = omAct P Q R S := by
-  simp only [FockH1Action.omAct, omAct, FockH1Action.omE, omE, FockH1Action.raiB, raiB, FockH1Action.lowB, lowB, linePos_eq]
+  simp only [FockH1Action.omAct, omAct, FockH1Action.omE, omE, FockH1Action.raiB, raiB,
+    FockH1Action.lowB, lowB, linePos_eq]
 
 theorem fockAction_first_eq (P Q R S : ℕ) : FockH1Action.fockAct1 P Q R S = fockAct1 P Q R S := by
   rw [FockH1Action.fockAct1, fockAct1, omAct_eq]
 
-theorem fock_second_action_eq_derivation (P Q R S : ℕ) : FockH1Action.fockAct2 P Q R S = fockAct2 P Q R S := by
+theorem fock_second_action_eq_derivation (P Q R S : ℕ)
+    : FockH1Action.fockAct2 P Q R S = fockAct2 P Q R S := by
   rw [FockH1Action.fockAct2, fockAct2, omAct_eq]
 
 section Image
 
-variable {P Q R S : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (p : Pol P Q R S →ₗ[ℂ] V) (hp : Function.Surjective p)
+variable
+  {P Q R S : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V]
+  (p : Pol P Q R S →ₗ[ℂ] V) (hp : Function.Surjective p)
   (act : Mat R S → Module.End ℂ V) (h : ∀ W f, act W (p f) = p (fockAct2 P Q R S W f))
 
 def actL : Mat R S →ₗ[ℂ] Module.End ℂ V where
@@ -43,8 +48,8 @@ def actL : Mat R S →ₗ[ℂ] Module.End ℂ V where
 
 theorem actL_apply (W : Mat R S) : actL p hp act h W = act W := rfl
 
-theorem actL_wt (μ : Ix R S → ℚ) (g : Pol P Q R S) (hg : g ∈ wtSub (fockAct2 P Q R S) μ) :
-    p g ∈ wtSub (actL p hp act h) μ := by
+theorem actL_wt (μ : Ix R S → ℚ) (g : Pol P Q R S) (hg : g ∈ wtSub (fockAct2 P Q R S) μ)
+    : p g ∈ wtSub (actL p hp act h) μ := by
   simp only [wtSub, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero] at hg ⊢
   intro a
   rw [actL_apply, h, hg a]
@@ -68,8 +73,10 @@ def gkImage : GKMod R S where
   wts v := by
     obtain ⟨f, rfl⟩ := hp v
     have hf := ((GlobalTheory.FockPolGK.pol_locFin_weights P Q R S).2 f).2
-    refine Submodule.iSup_induction (fun μ => wtSub (fockAct2 P Q R S) μ)
-      (motive := fun g => p g ∈ ⨆ μ : Ix R S → ℚ, wtSub (actL p hp act h) μ) hf ?_ ?_ ?_
+    refine Submodule.iSup_induction
+      (fun μ => wtSub (fockAct2 P Q R S) μ)
+      (motive := fun g => p g ∈ ⨆ μ : Ix R S → ℚ, wtSub (actL p hp act h) μ)
+      hf ?_ ?_ ?_
     · intro μ g hg
       exact Submodule.mem_iSup_of_mem _ (actL_wt p hp act h μ g hg)
     · simp
@@ -79,8 +86,10 @@ def gkImage : GKMod R S where
 
 end Image
 
-theorem scalarEnd_of {R S : ℕ} (M : GKMod R S) (hi : Formalism.MainNotions.SchurIrreducible.IrrGK M) (hr : Module.rank ℂ M.V ≤ Cardinal.aleph0) :
-    ScalarEnd M := by
+theorem scalarEnd_of
+    {R S : ℕ} (M : GKMod R S) (hi : Formalism.MainNotions.SchurIrreducible.IrrGK M)
+    (hr : Module.rank ℂ M.V ≤ Cardinal.aleph0)
+    : ScalarEnd M := by
   intro T hT
   have := hi.1
   let B : Subalgebra ℂ (Module.End ℂ M.V) := Subalgebra.centralizer ℂ {T}
@@ -89,13 +98,15 @@ theorem scalarEnd_of {R S : ℕ} (M : GKMod R S) (hi : Formalism.MainNotions.Sch
   have hs : IsSimpleModule B M.V := by
     rw [isSimpleModule_iff]
     refine { eq_bot_or_eq_top := fun N => ?_ }
-    rcases hi.2 (N.restrictScalars ℂ) (fun Z x hx => N.smul_mem (⟨M.act Z, (hB _).2 (hT Z)⟩ : B) hx) with h1 | h1
+    rcases hi.2 (N.restrictScalars ℂ) (fun Z x hx => N.smul_mem (⟨M.act Z, (hB _).2 (hT Z)⟩ : B) hx)
+      with h1 | h1
     · exact Or.inl ((Submodule.restrictScalars_eq_bot_iff ℂ B M.V).1 h1)
     · exact Or.inr ((Submodule.restrictScalars_eq_top_iff ℂ B M.V).1 h1)
-  let g : Module.End B M.V :=
-    { toFun := T
-      map_add' := T.map_add
-      map_smul' := fun b x => LinearMap.congr_fun ((hB b).1 b.2) x }
+  let g : Module.End B M.V := {
+    toFun := T
+    map_add' := T.map_add
+    map_smul' := fun b x => LinearMap.congr_fun ((hB b).1 b.2) x
+  }
   obtain ⟨c, hc⟩ := PositivityTheory.KReal.schur_countable hr g
   refine ⟨c, LinearMap.ext fun x => ?_⟩
   have e : g x = T x := rfl
@@ -106,15 +117,17 @@ theorem rank_pol (P Q R S : ℕ) : Module.rank ℂ (Pol P Q R S) ≤ Cardinal.al
   rw [MvPolynomial.rank_eq_lift]
   exact (Cardinal.lift_id _).le.trans Cardinal.mk_le_aleph0
 
-theorem thetaMk_first_action_trace {P Q R S : ℕ} (c : ℂ) (X : Mat P Q) (f : Pol P Q R S) :
-    thMkC P Q R S c (fockAct1 P Q R S X f) = (c * X.trace) • thMkC P Q R S c f := by
+theorem thetaMk_first_action_trace {P Q R S : ℕ} (c : ℂ) (X : Mat P Q) (f : Pol P Q R S)
+    : thMkC P Q R S c (fockAct1 P Q R S X f) = (c * X.trace) • thMkC P Q R S c f := by
   rw [← map_smul, ← sub_eq_zero, ← map_sub]
   refine (Submodule.Quotient.mk_eq_zero _).2 (Submodule.mem_iSup_of_mem X ⟨f, ?_⟩)
   simp [act1, chiTr, fockAction_first_eq]
 
-theorem onePlaceD (D : RealData) (h : D.Hyp) :
-    ∃ (N : GKMod D.R D.S) (p : Pol D.P D.Q D.R D.S →ₗ[ℂ] N.V) (p' : Pol D.P' D.Q' D.R D.S →ₗ[ℂ] N.V),
-      IsLift ((D.κ : ℚ) / 2) 0 N p ∧ IsLift (-((D.κ : ℚ) / 2)) ((D.κ : ℚ) / 2) N p' ∧ Formalism.MainNotions.SchurIrreducible.IrrGK N ∧ ScalarEnd N := by
+theorem onePlaceD (D : RealData) (h : D.Hyp)
+    : ∃ (N : GKMod D.R D.S) (p : Pol D.P D.Q D.R D.S →ₗ[ℂ] N.V)
+        (p' : Pol D.P' D.Q' D.R D.S →ₗ[ℂ] N.V),
+      IsLift ((D.κ : ℚ) / 2) 0 N p ∧ IsLift (-((D.κ : ℚ) / 2)) ((D.κ : ℚ) / 2) N p'
+        ∧ Formalism.MainNotions.SchurIrreducible.IrrGK N ∧ ScalarEnd N := by
   obtain ⟨Pi, _, _, act, π, π', hπ, hπ', h1, h2, hn, hirr⟩ := PositivityTheory.KReal.coreLM D h
   have c1 : (((D.κ : ℚ) / 2 : ℚ) : ℂ) = (D.κ : ℂ) / 2 := by push_cast; rfl
   have c2 : ((-((D.κ : ℚ) / 2) : ℚ) : ℂ) = -((D.κ : ℂ) / 2) := by push_cast; rfl
@@ -125,16 +138,28 @@ theorem onePlaceD (D : RealData) (h : D.Hyp) :
   have ha : ∀ W f, act W (p f) = p (fockAct2 _ _ _ _ W f) := fun W f => by
     rw [← fock_second_action_eq_derivation]
     exact (h1 W _).symm
-  have ha' : ∀ W f, act W (p' f) = p' (fockAct2 _ _ _ _ W f) + ((D.κ : ℂ) / 2 * W.trace) • p' f := fun W f => by
+  have ha'
+      : ∀ W f,
+        act W (p' f) = p' (fockAct2 _ _ _ _ W f) + ((D.κ : ℂ) / 2 * W.trace) • p' f := fun W f => by
     rw [← fock_second_action_eq_derivation]
     refine (h2 W _).symm.trans ?_
-    have e : PositivityTheory.KReal.opV' D W (thMkC _ _ _ _ _ f) =
-        thMkC _ _ _ _ _ (FockH1Action.fockAct2 _ _ _ _ W f) + ((D.κ : ℂ) / 2 * W.trace) • thMkC _ _ _ _ _ f := rfl
+    have e
+        : PositivityTheory.KReal.opV' D W (thMkC _ _ _ _ _ f)
+          = thMkC _ _ _ _ _ (FockH1Action.fockAct2 _ _ _ _ W f)
+            + ((D.κ : ℂ) / 2 * W.trace) • thMkC _ _ _ _ _ f :=
+      rfl
     rw [e, map_add (f := _), map_smul]
     rfl
   have hI : Formalism.MainNotions.SchurIrreducible.IrrGK (gkImage p hp act ha) := ⟨hn, hirr⟩
-  refine ⟨gkImage p hp act ha, p, p', ⟨hp, fun X f => ?_, fun Y f => ?_⟩, ⟨hp', fun X f => ?_, fun Y f => ?_⟩, hI,
-    scalarEnd_of _ hI ((LinearMap.rank_le_of_surjective p hp).trans (rank_pol _ _ _ _))⟩
+  refine ⟨
+    gkImage p hp act ha,
+    p,
+    p',
+    ⟨hp, fun X f => ?_, fun Y f => ?_⟩,
+    ⟨hp', fun X f => ?_, fun Y f => ?_⟩,
+    hI,
+    scalarEnd_of _ hI ((LinearMap.rank_le_of_surjective p hp).trans (rank_pol _ _ _ _))
+  ⟩
   · rw [c1]
     exact (congrArg π (thetaMk_first_action_trace _ X f)).trans (map_smul π _ _)
   · rw [Rat.cast_zero, zero_mul, zero_smul, add_zero]
@@ -144,16 +169,18 @@ theorem onePlaceD (D : RealData) (h : D.Hyp) :
   · rw [c1]
     exact ha' Y f
 
-theorem onePlace (a a' p q : ℕ) (κ : ℤ) (he : Even (a + a')) (hκ : ((a + a' : ℕ) : ℤ) < κ) (hκe : Even κ)
-    (hE : 2 * (p + q) + 1 < (a - a') / 2) (hA : 2 * (p + q) + 1 < a') :
-    ∃ (N : GKMod (a + a' - (p + q)) (p + q)) (π : Pol (a - p) p (a + a' - (p + q)) (p + q) →ₗ[ℂ] N.V)
-      (π' : Pol q (a' - q) (a + a' - (p + q)) (p + q) →ₗ[ℂ] N.V),
-      IsLift ((κ : ℚ) / 2) 0 N π ∧ IsLift (-((κ : ℚ) / 2)) ((κ : ℚ) / 2) N π' ∧ Formalism.MainNotions.SchurIrreducible.IrrGK N ∧ ScalarEnd N := by
+theorem onePlace
+    (a a' p q : ℕ) (κ : ℤ) (he : Even (a + a')) (hκ : ((a + a' : ℕ) : ℤ) < κ) (hκe : Even κ)
+    (hE : 2 * (p + q) + 1 < (a - a') / 2) (hA : 2 * (p + q) + 1 < a')
+    : ∃ (N : GKMod (a + a' - (p + q)) (p + q))
+        (π : Pol (a - p) p (a + a' - (p + q)) (p + q) →ₗ[ℂ] N.V)
+        (π' : Pol q (a' - q) (a + a' - (p + q)) (p + q) →ₗ[ℂ] N.V),
+      IsLift ((κ : ℚ) / 2) 0 N π ∧ IsLift (-((κ : ℚ) / 2)) ((κ : ℚ) / 2) N π'
+        ∧ Formalism.MainNotions.SchurIrreducible.IrrGK N ∧ ScalarEnd N := by
   obtain ⟨k, rfl⟩ := Int.eq_ofNat_of_zero_le (show 0 ≤ κ by omega)
   obtain ⟨m, hm⟩ := he
   obtain ⟨n, hn⟩ := hκe
-  have hD : RealData.Hyp ⟨a, a', p, q, k⟩ := by
-    constructor <;> dsimp only <;> omega
+  have hD : RealData.Hyp ⟨a, a', p, q, k⟩ := by constructor <;> dsimp only <;> omega
   rw [Int.cast_natCast]
   exact onePlaceD ⟨a, a', p, q, k⟩ hD
 

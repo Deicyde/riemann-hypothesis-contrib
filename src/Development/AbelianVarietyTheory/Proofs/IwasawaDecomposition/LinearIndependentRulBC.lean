@@ -18,20 +18,26 @@ set_option synthInstance.maxHeartbeats 200000
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam
+open AlgebraicGeometry CategoryTheory Limits NumberField ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.L2.Pj
+  GlobalTheory.Toroidal GlobalTheory.Cartier GlobalTheory.ShFam
 
 namespace GlobalTheory.CuspFieldChange
 
 open GlobalTheory.FieldBC GlobalTheory.SecFieldChange
 open GlobalTheory.CoefChangeCompare (ValueWD HasBC hasBC_of evR_of_map)
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l}
 
 variable {c c₀ : Coeff l} (hle : c₀.F ≤ c.F)
 
-theorem eq_sum_of_isBC {m : ℕ} {f' : Rul Xo c} {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} (hf' : f' ∈ sec Xo c a n)
-    {as : Fin m → c.F} {fs : Fin m → Rul Xo c₀} (h : IsBC hle f' as fs) : f' = ∑ i, as i • rulBC hle (fs i) := by
+theorem eq_sum_of_isBC
+    {m : ℕ} {f' : Rul Xo c} {a : (E →+* ℂ) × ℕ → ℕ} {n : ℕ} (hf' : f' ∈ sec Xo c a n)
+    {as : Fin m → c.F} {fs : Fin m → Rul Xo c₀} (h : IsBC hle f' as fs)
+    : f' = ∑ i, as i • rulBC hle (fs i) := by
   funext q y
   letI := resAlg hle q.R
   rw [val_of_isBC hle hf'.1 h q (fun _ => rfl) y, Finset.sum_apply, Finset.sum_apply]
@@ -39,18 +45,22 @@ theorem eq_sum_of_isBC {m : ℕ} {f' : Rul Xo c} {a : (E →+* ℂ) × ℕ → �
   rw [← Algebra.smul_def]
   rfl
 
-theorem cusp_unfBC_eq_span {r : ℕ} (U : ∀ σ : c₀.F →+* ℂ, Unf Xo c₀ σ r) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) :
-    cusp Xo c (unfBC hle U) a n = Submodule.span c.F (rulBC hle '' (cusp Xo c₀ U a n : Set (Rul Xo c₀))) := by
+theorem cusp_unfBC_eq_span
+    {r : ℕ} (U : ∀ σ : c₀.F →+* ℂ, Unf Xo c₀ σ r) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ)
+    : cusp Xo c (unfBC hle U) a n
+      = Submodule.span c.F (rulBC hle '' (cusp Xo c₀ U a n : Set (Rul Xo c₀))) := by
   refine le_antisymm (fun f' hf' => ?_) (Submodule.span_le.2 ?_)
   · obtain ⟨m, as, fs, hfs, h⟩ := cuspBC_holds hle U a n f' hf'
     rw [eq_sum_of_isBC hle (cusp_le_sec _ _ _ _ _ hf') h]
-    exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, hfs i, rfl⟩)
+    exact Submodule.sum_mem _ fun i _ =>
+      Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, hfs i, rfl⟩)
   · rintro _ ⟨f, hf, rfl⟩
     exact (rulBC_cusp E H Dw l Xo c₀ c hle r U a n f (cusp_le_sec _ _ _ _ _ hf)).2.2 hf
 
-theorem linearIndependent_rulBC {a : (E →+* ℂ) × ℕ → ℕ} {n m : ℕ} {v : Fin m → Rul Xo c₀}
-    (hv : ∀ i, v i ∈ sec Xo c₀ a n) (hi : LinearIndependent c₀.F v) :
-    LinearIndependent c.F (fun i => rulBC hle (v i)) := by
+theorem linearIndependent_rulBC
+    {a : (E →+* ℂ) × ℕ → ℕ} {n m : ℕ} {v : Fin m → Rul Xo c₀}
+    (hv : ∀ i, v i ∈ sec Xo c₀ a n) (hi : LinearIndependent c₀.F v)
+    : LinearIndependent c.F (fun i => rulBC hle (v i)) := by
   have hS := GlobalTheory.abelianSchemeLaws_all.1.secBaseChange
   have hWD : ValueWD Xo c₀ :=
     evalWD_fr (frChartF_of (GlobalTheory.Frames.chartCoverF_of_secBaseChange hS E H Dw l Xo c₀))
@@ -70,8 +80,10 @@ theorem linearIndependent_rulBC {a : (E →+* ℂ) × ℕ → ℕ} {n m : ℕ} {
     rw [((rulBC_sec_val_linear E H Dw l Xo c₀ c hle).1 a n _ (hv j)).2 _ hov, FrPt.res_ext,
       evR_of_map hWD (hv j).1 hz]
   simp only [h2] at h1
-  have h3 : ∀ j, algebraMap c.F (Ext c₀.F c.F p.R) (g j) * inR c.F p.R (v j p y) =
-      (TensorProduct.tmul c₀.F (g j) (v j p y) : TensorProduct c₀.F c.F p.R) := fun j => by
+  have h3
+      : ∀ j,
+        algebraMap c.F (Ext c₀.F c.F p.R) (g j) * inR c.F p.R (v j p y)
+          = (TensorProduct.tmul c₀.F (g j) (v j p y) : TensorProduct c₀.F c.F p.R) := fun j => by
     show (TensorProduct.tmul c₀.F (g j) (1 : p.R) * TensorProduct.tmul c₀.F (1 : c.F) (v j p y) :
       TensorProduct c₀.F c.F p.R) = _
     rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, one_mul]

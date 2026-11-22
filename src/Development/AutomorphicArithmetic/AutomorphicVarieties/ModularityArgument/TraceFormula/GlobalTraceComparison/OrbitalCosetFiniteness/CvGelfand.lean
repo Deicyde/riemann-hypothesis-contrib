@@ -10,7 +10,6 @@ open GlobalTheory.BCT UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm
 
 namespace UpperTheory.V.Z.Tf.GlobalTraceComparison.Th
 
-theorem cvGelfand : CvGelfand :=
-  _root_.UpperTheory.Reformulated.B.HeckeGelfandPair.cvGelfand
+theorem cvGelfand : CvGelfand := _root_.UpperTheory.Reformulated.B.HeckeGelfandPair.cvGelfand
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Th

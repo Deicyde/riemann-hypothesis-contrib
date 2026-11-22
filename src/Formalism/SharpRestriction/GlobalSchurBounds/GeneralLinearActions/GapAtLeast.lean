@@ -12,7 +12,8 @@ namespace Formalism.MainNotions.StandardLattice
 open NumberField Formalism.BasicNotions Finset
 
 def stdForm (K : Type) [Field K] [StarRing K] (M : ℕ) : (Fin M → K) →ₗ⋆[K] (Fin M → K) →ₗ[K] K :=
-  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K) (fun x y => ∑ i, star (x i) * y i)
+  LinearMap.mk₂'ₛₗ (starRingEnd K) (RingHom.id K)
+    (fun x y => ∑ i, star (x i) * y i)
     (by intro x x' y; simp [add_mul, Finset.sum_add_distrib])
     (by intro c x y; simp [Finset.mul_sum, mul_assoc, starRingEnd_apply])
     (by intro x y y'; simp [mul_add, Finset.sum_add_distrib])
@@ -34,8 +35,9 @@ def facProd (N : ℕ) : ℝ := ∏ i ∈ range N, ((i.factorial : ℕ) : ℝ)
 def dimV {N : ℕ} (x : Fin N → ℝ) : ℝ := vand x / facProd N
 
 def rhoN {N : ℕ} (s : Fin N → Bool) (c : Fin N) : ℝ :=
-  (((univ.filter (fun b => c < b ∧ s b ≠ s c)).card : ℝ) -
-    ((univ.filter (fun a => a < c ∧ s a ≠ s c)).card : ℝ)) / 2
+  (((univ.filter (fun b => c < b ∧ s b ≠ s c)).card : ℝ)
+      - ((univ.filter (fun a => a < c ∧ s a ≠ s c)).card : ℝ))
+    / 2
 
 def nPlus {N : ℕ} (s : Fin N → Bool) : ℕ := (univ.filter (fun a => s a = true)).card
 
@@ -43,8 +45,8 @@ def nMinus {N : ℕ} (s : Fin N → Bool) : ℕ := (univ.filter (fun a => s a = 
 
 def dTau {N : ℕ} (s : Fin N → Bool) (lam : Fin N → ℝ) : ℝ :=
   (∏ a : Fin N, ∏ b ∈ univ.filter (fun b => a < b ∧ s a = s b),
-      ((lam a + rhoN s a) - (lam b + rhoN s b))) /
-    (facProd (nPlus s) * facProd (nMinus s))
+      ((lam a + rhoN s a) - (lam b + rhoN s b)))
+    / (facProd (nPlus s) * facProd (nMinus s))
 
 def lamAbs {N : ℕ} (lam : Fin N → ℝ) : ℝ := ⨆ a : Fin N, ⨆ b : Fin N, |lam a - lam b|
 
@@ -60,15 +62,22 @@ def rowSgn (D : D7) : Fin (D.R.k - 1 + D.R.m) → Bool :=
 def IsUnitri {n : ℕ} {F : Type} [Zero F] [One F] (A : Matrix (Fin n) (Fin n) F) : Prop :=
   (∀ i j, j < i → A i j = 0) ∧ ∀ i, A i i = 1
 
-def blk (rS k i : ℕ) : ℕ := if i < rS then i else if i < rS + k + 1 then rS else i - k
+def blk (rS k i : ℕ) : ℕ :=
+  if i < rS then
+    i
+  else if i < rS + k + 1 then
+    rS
+  else
+    i - k
 
 def IsRowLev (k rS : ℕ) {n : ℕ} {F : Type} [Zero F] [One F] (A : Matrix (Fin n) (Fin n) F) : Prop :=
-  (∀ i j : Fin n, blk rS k j.val < blk rS k i.val → A i j = 0) ∧ (∀ i, A i i = 1) ∧
-  (∀ i j : Fin n, blk rS k i.val = blk rS k j.val → j < i → A i j = 0) ∧
-  (∀ i j : Fin n, j.val = rS + k → i ≠ j → blk rS k i.val = rS → A i j = 0)
+  (∀ i j : Fin n, blk rS k j.val < blk rS k i.val → A i j = 0) ∧ (∀ i, A i i = 1)
+    ∧ (∀ i j : Fin n, blk rS k i.val = blk rS k j.val → j < i → A i j = 0)
+    ∧ (∀ i j : Fin n, j.val = rS + k → i ≠ j → blk rS k i.val = rS → A i j = 0)
 
 def idxLoc (F : Type) [CommRing F] (n : ℕ) (P : Matrix (Fin n) (Fin n) F → Prop) : ℝ :=
-  (Nat.card (GL (Fin n) F) : ℝ) / (Nat.card {A : GL (Fin n) F // P (A : Matrix (Fin n) (Fin n) F)} : ℝ)
+  (Nat.card (GL (Fin n) F) : ℝ)
+    / (Nat.card {A : GL (Fin n) F // P (A : Matrix (Fin n) (Fin n) F)} : ℝ)
 
 def idxColLoc (g k : ℕ) : ℝ := idxLoc (ZMod g) k IsUnitri
 
@@ -89,8 +98,8 @@ def logXu (D : D7) (Dst dst : ℝ) : ℝ := (1 / ((D.R.f : ℝ) * D.R.k)) * Real
 
 def volY0 (D : D7) : ℝ := letI := D.host.cmStar; D.vol (D.sp.Y 0)
 
-def uColR (D : D7) (u : D.what₂.Word) (ρ : D.what₂.Tau) : Fin D.R.k → ℝ :=
-  fun i => (((D.hcW u ρ).u i : ℚ) : ℝ)
+def uColR (D : D7) (u : D.what₂.Word) (ρ : D.what₂.Tau) : Fin D.R.k → ℝ := fun i =>
+  (((D.hcW u ρ).u i : ℚ) : ℝ)
 
 def duStarU (D : D7) (u : D.what₂.Word) : ℝ := duStarP D (D.host.g 0) (D.host.g 1) (uColR D u)
 

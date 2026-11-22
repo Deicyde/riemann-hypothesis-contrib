@@ -13,38 +13,44 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.CellDiag
 
-def evalOne {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup W] [Module ℂ W] (H : Subgroup G) (σ : Representation ℂ H W) :
-    smoothPart (ind H σ) →ₗ[ℂ] W :=
+def evalOne
+    {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
+    (H : Subgroup G) (σ : Representation ℂ H W)
+    : smoothPart (ind H σ) →ₗ[ℂ] W :=
   (LinearMap.proj (1 : G)).comp ((indSpace H σ).subtype.comp (smoothPart (ind H σ)).subtype)
 
-theorem evalOne_injective {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup W] [Module ℂ W] (H : Subgroup G) (hH : H = ⊤) (σ : Representation ℂ H W) :
-    Function.Injective (evalOne H σ) := by
+theorem evalOne_injective
+    {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
+    (H : Subgroup G) (hH : H = ⊤) (σ : Representation ℂ H W)
+    : Function.Injective (evalOne H σ) := by
   subst hH
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro v hv
   have h0 : (v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 1 = 0 := hv
-  have hmem : ∀ (h : (⊤ : Subgroup G)) (x : G),
-      (v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 (↑h * x) =
-        σ h ((v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 x) :=
+  have hmem
+      : ∀ (h : (⊤ : Subgroup G)) (x : G),
+        (v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 (↑h * x)
+          = σ h ((v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 x) :=
     (v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).2
   apply Subtype.ext
   apply Subtype.ext
   funext x
-  have key : (v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 x =
-      σ ⟨x, Subgroup.mem_top x⟩ ((v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 1) := by
+  have key
+      : (v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 x
+        = σ ⟨x, Subgroup.mem_top x⟩ ((v : GlobalTheory.PRep.indSpace (⊤ : Subgroup G) σ).1 1) := by
     have := hmem ⟨x, Subgroup.mem_top x⟩ 1
     rwa [mul_one] at this
   rw [key, h0, map_zero]
-  first
-  | rfl
-  | simp
+  first | rfl | simp
 
-theorem dichotomy {V X T : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup X] [Module ℂ X]
-    [AddCommGroup T] [Module ℂ T] [Module.Finite ℂ X] (hX : Module.finrank ℂ X ≤ 1)
-    (hT : Module.finrank ℂ T = 1) (ι : V →ₗ[ℂ] X) (hι : Function.Injective ι)
-    (φ ψ : V →ₗ[ℂ] T) : φ = 0 ∨ ∃ c : ℂ, ψ = c • φ := by
+theorem dichotomy
+    {V X T : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup X] [Module ℂ X] [AddCommGroup T]
+    [Module ℂ T] [Module.Finite ℂ X]
+    (hX : Module.finrank ℂ X ≤ 1) (hT : Module.finrank ℂ T = 1)
+    (ι : V →ₗ[ℂ] X) (hι : Function.Injective ι)
+    (φ ψ : V →ₗ[ℂ] T)
+    : φ = 0 ∨ ∃ c : ℂ, ψ = c • φ := by
   classical
   by_cases hφ : φ = 0
   · exact Or.inl hφ
@@ -70,19 +76,17 @@ theorem dichotomy {V X T : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup X
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem sizeMatrix_true_false {a b : ℕ}
-    (B : SizeMatrix (Two (Fin a) (Fin b)) (Two (Fin a) (Fin b))) (h : B.1 false true = 0) :
-    B.1 true false = 0 := by
+theorem sizeMatrix_true_false
+    {a b : ℕ} (B : SizeMatrix (Two (Fin a) (Fin b)) (Two (Fin a) (Fin b))) (h : B.1 false true = 0)
+    : B.1 true false = 0 := by
   have hr := B.2.1 false
   have hc := B.2.2 false
-  first
-  | (rw [Fintype.sum_bool] at hr hc; omega)
-  | (simp only [Fintype.sum_bool] at hr hc; omega)
+  first | (rw [Fintype.sum_bool] at hr hc; omega) | (simp only [Fintype.sum_bool] at hr hc; omega)
 
-theorem relParab_eq_top {a b : ℕ}
-    (B : SizeMatrix (Two (Fin a) (Fin b)) (Two (Fin a) (Fin b))) (h : B.1 false true = 0)
-    (g : ∀ j, (Σ i, Fin (B.1 i j)) ≃ Two (Fin a) (Fin b) j) :
-    relParab k (c := fun j i => Fin (B.1 i j)) g = ⊤ := by
+theorem relParab_eq_top
+    {a b : ℕ} (B : SizeMatrix (Two (Fin a) (Fin b)) (Two (Fin a) (Fin b))) (h : B.1 false true = 0)
+    (g : ∀ j, (Σ i, Fin (B.1 i j)) ≃ Two (Fin a) (Fin b) j)
+    : relParab k (c := fun j i => Fin (B.1 i j)) g = ⊤ := by
   have h' := GlobalTheory.CompanionTheory.CellDiag.sizeMatrix_true_false B h
   rw [eq_top_iff]
   intro x _
@@ -99,7 +103,18 @@ theorem relParab_eq_top {a b : ℕ}
   · have := i'.isLt
     omega
 
-theorem diag_cell_at_most_one_map : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (a b : ℕ) (χ₁ χ₂ : kˣ →* ℂˣ) (B : SizeMatrix (Two (Fin a) (Fin b)) (Two (Fin a) (Fin b))) (f : ∀ i, (Σ j, Fin (B.1 i j)) ≃ Two (Fin a) (Fin b) i) (g : ∀ j, (Σ i, Fin (B.1 i j)) ≃ Two (Fin a) (Fin b) j), B.1 false true = 0 → (∀ φ ψ : (cellFunctor f g ((extTensor (detRep (Fin a) χ₁) (detRep (Fin b) χ₂)).comp (leviTwo k (Fin a) (Fin b)).symm.toMonoidHom)).IntertwiningMap (((extTensor (detRep (Fin a) χ₁) (detRep (Fin b) χ₂)).comp (leviTwo k (Fin a) (Fin b)).symm.toMonoidHom)), φ.toLinearMap = 0 ∨ ∃ c : ℂ, ψ.toLinearMap = c • φ.toLinearMap) := by
+theorem diag_cell_at_most_one_map
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (a b : ℕ) (χ₁ χ₂ : kˣ →* ℂˣ) (B : SizeMatrix (Two (Fin a) (Fin b)) (Two (Fin a) (Fin b)))
+        (f : ∀ i, (Σ j, Fin (B.1 i j)) ≃ Two (Fin a) (Fin b) i)
+        (g : ∀ j, (Σ i, Fin (B.1 i j)) ≃ Two (Fin a) (Fin b) j),
+      B.1 false true = 0
+        → (∀ φ ψ : (cellFunctor f g
+              ((extTensor (detRep (Fin a) χ₁) (detRep (Fin b) χ₂)).comp
+                (leviTwo k (Fin a) (Fin b)).symm.toMonoidHom)).IntertwiningMap
+            (((extTensor (detRep (Fin a) χ₁) (detRep (Fin b) χ₂)).comp
+              (leviTwo k (Fin a) (Fin b)).symm.toMonoidHom)),
+          φ.toLinearMap = 0 ∨ ∃ c : ℂ, ψ.toLinearMap = c • φ.toLinearMap) := by
   intro k _ _ _ _ a b χ₁ χ₂ B f g h φ ψ
   have hT : Module.finrank ℂ (ℂ ⊗[ℂ] ℂ) = 1 := by
     first
@@ -108,7 +123,8 @@ theorem diag_cell_at_most_one_map : ∀ (k : Type) [Field k] [ValuativeRel k] [T
     | simp
   refine GlobalTheory.CompanionTheory.CellDiag.dichotomy ?_ hT
     (GlobalTheory.CompanionTheory.CellDiag.evalOne _ _)
-    (GlobalTheory.CompanionTheory.CellDiag.evalOne_injective _ (GlobalTheory.CompanionTheory.CellDiag.relParab_eq_top (k := k) B h g) _)
+    (GlobalTheory.CompanionTheory.CellDiag.evalOne_injective _
+      (GlobalTheory.CompanionTheory.CellDiag.relParab_eq_top (k := k) B h g) _)
     φ.toLinearMap ψ.toLinearMap
   first
   | exact (Submodule.finrank_quotient_le _).trans hT.le

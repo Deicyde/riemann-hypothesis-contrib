@@ -13,8 +13,8 @@ namespace PI.OddDualWeyl.Red
 
 variable {R : Type*} [CommRing R] {k : ℕ}
 
-def sbs (A : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R)) :
-    MvPolynomial (Fin k × Fin k) R →ₐ[R] MvPolynomial (Fin k × Fin k) R :=
+def sbs (A : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R))
+    : MvPolynomial (Fin k × Fin k) R →ₐ[R] MvPolynomial (Fin k × Fin k) R :=
   aeval fun v => A v.1 v.2
 
 def cM (g : Matrix (Fin k) (Fin k) R) : Matrix (Fin k) (Fin k) (MvPolynomial (Fin k × Fin k) R) :=
@@ -99,15 +99,20 @@ lemma rowAct_one (p : MvPolynomial (Fin k × Fin k) R) : rowAct R (1 : Matrix (F
 
 lemma dualSub_eq : dualSub R k = sbs (dualM R k) := rfl
 
-private theorem sum_support_eq_degree_of_isHomogeneous' {σ : Type*} {p : MvPolynomial σ R} {D : ℕ} (hp : p.IsHomogeneous D)
-    {m : σ →₀ ℕ} (hm : m ∈ p.support) : ∑ i ∈ m.support, m i = D := by
+private theorem sum_support_eq_degree_of_isHomogeneous'
+    {σ : Type*} {p : MvPolynomial σ R} {D : ℕ} (hp : p.IsHomogeneous D)
+    {m : σ →₀ ℕ} (hm : m ∈ p.support)
+    : ∑ i ∈ m.support, m i = D := by
   have h1 := hp (MvPolynomial.mem_support_iff.mp hm)
   first
   | simpa [Finsupp.weight_apply, Finsupp.sum] using h1
   | simpa [Finsupp.degree] using h1
   | (rw [← h1]; simp [Finsupp.weight_apply, Finsupp.sum])
   | (rw [← h1]; simp [Finsupp.degree, Finsupp.weight_apply, Finsupp.sum])
-  | (simp only [Finsupp.weight_apply, Finsupp.sum, Pi.one_apply, smul_eq_mul, mul_one] at h1; exact h1)
+  | (
+      simp only [Finsupp.weight_apply, Finsupp.sum, Pi.one_apply, smul_eq_mul, mul_one] at h1
+      exact h1
+    )
 
 lemma aeval_mul_homog {σ S : Type*} [CommRing S] [Algebra R S] (b : σ → S) (c : S)
     {p : MvPolynomial σ R} {D : ℕ} (hp : p.IsHomogeneous D) :
@@ -157,15 +162,17 @@ lemma rowAct_homog (g : Matrix (Fin k) (Fin k) R) {p : MvPolynomial (Fin k × Fi
   rw [hdeg] at h2
   exact h2
 
-private theorem genM_map_mvPolynomial_map {S : Type*} [CommRing S] (ψ : R →+* S) :
-    (PI.OddDualWeyl.genM R k).map (MvPolynomial.map ψ) = PI.OddDualWeyl.genM S k := by
+private theorem genM_map_mvPolynomial_map {S : Type*} [CommRing S] (ψ : R →+* S)
+    : (PI.OddDualWeyl.genM R k).map (MvPolynomial.map ψ) = PI.OddDualWeyl.genM S k := by
   ext i j
   simp [PI.OddDualWeyl.genM]
 
-private theorem dualM_map_mvPolynomial_map {S : Type*} [CommRing S] (ψ : R →+* S) :
-    (PI.OddDualWeyl.dualM R k).map (MvPolynomial.map ψ) = PI.OddDualWeyl.dualM S k := by
+private theorem dualM_map_mvPolynomial_map {S : Type*} [CommRing S] (ψ : R →+* S)
+    : (PI.OddDualWeyl.dualM R k).map (MvPolynomial.map ψ) = PI.OddDualWeyl.dualM S k := by
   refine Matrix.ext fun i j => ?_
-  have h := congrFun (congrFun (RingHom.map_adjugate (MvPolynomial.map ψ) (PI.OddDualWeyl.genM R k)) (Fin.rev j)) i
+  have h :=
+    congrFun
+      (congrFun (RingHom.map_adjugate (MvPolynomial.map ψ) (PI.OddDualWeyl.genM R k)) (Fin.rev j)) i
   rw [RingHom.mapMatrix_apply, RingHom.mapMatrix_apply, genM_map_mvPolynomial_map] at h
   simpa [PI.OddDualWeyl.dualM] using h
 
@@ -287,18 +294,24 @@ namespace PI.OddDualWeyl
 
 open Red
 
-private theorem mem_twisted_weyl_det_iff {O K : Type*} [CommRing O] [Field K] [Algebra O K] (m : ℕ)
-    (lam : Fin (m + 1) → ℤ) (g : Matrix (Fin (m + 1)) (Fin (m + 1)) K)
-    (F : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K) :
-    F ∈ deltaLTw O K m lam g ↔ ∃ F0 : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K,
-      (∃ f ∈ weyl O (m + 1) (m + 1) le_rfl (nuOf lam),
-        MvPolynomial.map (algebraMap O K) f = rowAct K g F0) ∧ g.det ^ (-(lam (Fin.last m))) • F0 = F := by
+private theorem mem_twisted_weyl_det_iff
+    {O K : Type*} [CommRing O] [Field K] [Algebra O K]
+    (m : ℕ) (lam : Fin (m + 1) → ℤ) (g : Matrix (Fin (m + 1)) (Fin (m + 1)) K)
+    (F : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K)
+    : F ∈ deltaLTw O K m lam g
+      ↔ ∃ F0 : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K,
+        (∃ f ∈ weyl O (m + 1) (m + 1) le_rfl (nuOf lam),
+            MvPolynomial.map (algebraMap O K) f = rowAct K g F0)
+          ∧ g.det ^ (-(lam (Fin.last m))) • F0 = F := by
   unfold deltaLTw deltaL
   simp only [Submodule.mem_map, Submodule.mem_comap]
   first
   | rfl
-  | (simp only [LinearMap.coe_restrictScalars, AlgHom.toLinearMap_apply, LinearMap.lsmul_apply,
-      MvPolynomial.mapAlgHom_apply]; rfl)
+  | (
+      simp only [LinearMap.coe_restrictScalars, AlgHom.toLinearMap_apply, LinearMap.lsmul_apply,
+        MvPolynomial.mapAlgHom_apply]
+      rfl
+    )
   | exact Iff.rfl
 
 theorem twistedWeylStep : GStep := by
@@ -314,19 +327,25 @@ theorem twistedWeylStep : GStep := by
       (genM K (m + 1)).det ^ expM lam * MvPolynomial.map (algebraMap O K) f
     rw [← PI.OddDualWeyl.Red.map_dualSub, h0, _root_.map_mul, _root_.map_pow,
       PI.OddDualWeyl.Red.map_det_genM]
-  have hhomK : (MvPolynomial.map (algebraMap O K) f').IsHomogeneous
-      (degW (nuOf (lamStar lam))) := by
+  have hhomK
+      : (MvPolynomial.map (algebraMap O K) f').IsHomogeneous (degW (nuOf (lamStar lam))) := by
     first
     | exact (hhom f' hf').map _
     | (intro d hd0; apply hhom f' hf'; intro h0; apply hd0; rw [coeff_map, h0, _root_.map_zero])
   have hF0 : rowAct K g⁻¹ (MvPolynomial.map (algebraMap O K) f) = F0 := by
-    rw [hfF, PI.OddDualWeyl.Red.rowAct_rowAct, Matrix.mul_nonsing_inv g hg, PI.OddDualWeyl.Red.rowAct_one]
+    rw [hfF, PI.OddDualWeyl.Red.rowAct_rowAct, Matrix.mul_nonsing_inv g hg,
+      PI.OddDualWeyl.Red.rowAct_one]
   have hT : gᵀ * (g⁻¹)ᵀ = 1 := by
     rw [← Matrix.transpose_mul, Matrix.nonsing_inv_mul g hg, Matrix.transpose_one]
   have hdetT : ((g⁻¹)ᵀ).det = (g.det)⁻¹ := by
     rw [Matrix.det_transpose, PI.OddDualWeyl.Red.det_inv_eq]
-  refine ⟨((g⁻¹)ᵀ.det ^ (-(lamStar lam (Fin.last m)))) •
-    rowAct K gᵀ (MvPolynomial.map (algebraMap O K) f'), ?_, ?_, ?_⟩
+  refine ⟨
+    ((g⁻¹)ᵀ.det ^ (-(lamStar lam (Fin.last m))))
+      • rowAct K gᵀ (MvPolynomial.map (algebraMap O K) f'),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [mem_twisted_weyl_det_iff]
     refine ⟨rowAct K gᵀ (MvPolynomial.map (algebraMap O K) f'), ⟨f', hf', ?_⟩, rfl⟩
     rw [PI.OddDualWeyl.Red.rowAct_rowAct, hT, PI.OddDualWeyl.Red.rowAct_one]
@@ -335,8 +354,10 @@ theorem twistedWeylStep : GStep := by
     apply PI.OddDualWeyl.Red.relK g hd hrelK hhomK
     rw [hdetT]
     exact PI.OddDualWeyl.Red.zp g.det hd _ _ _ _ hbal
-  · have hC : IsHomogeneous (C ((g⁻¹)ᵀ.det ^ (-(lamStar lam (Fin.last m)))) :
-        MvPolynomial (Fin (m + 1) × Fin (m + 1)) K) 0 := by
+  · have hC : IsHomogeneous
+        (C ((g⁻¹)ᵀ.det ^ (-(lamStar lam (Fin.last m))))
+          : MvPolynomial (Fin (m + 1) × Fin (m + 1)) K)
+        0 := by
       first | exact isHomogeneous_C _ _ | exact isHomogeneous_C _
     have h1 := hC.mul (PI.OddDualWeyl.Red.rowAct_homog gᵀ hhomK)
     rw [zero_add] at h1

@@ -15,7 +15,10 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGaugeGRaw
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
 theorem gCore_of_genTransfer (hGT : GenTransfer) : GCore :=
-  gauge_construction_of_truncation gauge_section_exists section_move_holds family_locality_holds hGT generator_to_quadratic_form model_locality_holds
-    radial_space_smoothness Formalism.FourierDecayAlt.P.CutMP.Gauge.raw_gauge_smoothness_holds Formalism.FourierDecayAlt.P.CutMP.Gauge.quadratic_local_family_holds assumption_on_sections_holds
+  gauge_construction_of_truncation gauge_section_exists section_move_holds family_locality_holds hGT
+    generator_to_quadratic_form model_locality_holds radial_space_smoothness
+    Formalism.FourierDecayAlt.P.CutMP.Gauge.raw_gauge_smoothness_holds
+    Formalism.FourierDecayAlt.P.CutMP.Gauge.quadratic_local_family_holds
+    assumption_on_sections_holds
 
 end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC

@@ -34,11 +34,13 @@ namespace GlobalTheory.CompanionTheory.Ar.GR.OrdSplit
 
 section General
 
-variable {C : Type} [Field C] {R : Type} [CommRing R] [Algebra R C]
+variable
+  {C : Type} [Field C]
+  {R : Type} [CommRing R] [Algebra R C]
   {N : Type} [AddCommGroup N] [Fintype N] [DecidableEq N]
 
-theorem translate_mem (AA : HopfOrder (C := C) R N) (y : N) {g : N → C} (hg : g ∈ AA.carrier) :
-    (fun x => g (x + y)) ∈ AA.carrier := by
+theorem translate_mem (AA : HopfOrder (C := C) R N) (y : N) {g : N → C} (hg : g ∈ AA.carrier)
+    : (fun x => g (x + y)) ∈ AA.carrier := by
   have key : ∀ F ∈ tensorSpan R AA.carrier, (fun x => F (x, y)) ∈ AA.carrier := by
     intro F hF
     induction hF using Submodule.span_induction with
@@ -72,8 +74,11 @@ def nearZero (v : Valuation C NNReal) (AA : HopfOrder (C := C) R N) : AddSubgrou
     have h1 := hx _ (AA.antipode g hg)
     simpa using h1
 
-theorem exists_sep {v : Valuation C NNReal} (hv : v.Integers R) (AA : HopfOrder (C := C) R N)
-    {y : N} (hy : y ∉ nearZero v AA) : ∃ h ∈ AA.carrier, h y = 0 ∧ v (h 0) = 1 := by
+theorem exists_sep
+    {v : Valuation C NNReal} (hv : v.Integers R)
+    (AA : HopfOrder (C := C) R N)
+    {y : N} (hy : y ∉ nearZero v AA)
+    : ∃ h ∈ AA.carrier, h y = 0 ∧ v (h 0) = 1 := by
   have hy' : ∃ g ∈ AA.carrier, ¬ v (g y - g 0) < 1 := by
     by_contra hcon
     push_neg at hcon
@@ -87,12 +92,13 @@ theorem exists_sep {v : Valuation C NNReal} (hv : v.Integers R) (AA : HopfOrder 
       rw [← hr, ← hs, ← map_sub]
       exact hv.map_le_one _
     have h2 : v (g y - g 0) = 1 := le_antisymm h1 (not_lt.1 hn)
-    have h3 : (g - r • (1 : N → C)) 0 = -(g y - g 0) := by
-      simp [Algebra.smul_def, hr]
+    have h3 : (g - r • (1 : N → C)) 0 = -(g y - g 0) := by simp [Algebra.smul_def, hr]
     rw [h3, Valuation.map_neg, h2]
 
-theorem prod_mem (AA : HopfOrder (C := C) R N) {T : Type} (s : Finset T) (f : T → N → C)
-    (h : ∀ i ∈ s, f i ∈ AA.carrier) : ∏ i ∈ s, f i ∈ AA.carrier := by
+theorem prod_mem
+    (AA : HopfOrder (C := C) R N)
+    {T : Type} (s : Finset T) (f : T → N → C) (h : ∀ i ∈ s, f i ∈ AA.carrier)
+    : ∏ i ∈ s, f i ∈ AA.carrier := by
   classical
   induction s using Finset.induction_on with
   | empty => simpa using AA.one_mem
@@ -101,8 +107,8 @@ theorem prod_mem (AA : HopfOrder (C := C) R N) {T : Type} (s : Finset T) (f : T 
     exact AA.mul_mem _ _ (h a (Finset.mem_insert_self _ _))
       (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
-theorem indicator_mem {v : Valuation C NNReal} (hv : v.Integers R) (AA : HopfOrder (C := C) R N) :
-    Set.indicator (nearZero v AA : Set N) (1 : N → C) ∈ AA.carrier := by
+theorem indicator_mem {v : Valuation C NNReal} (hv : v.Integers R) (AA : HopfOrder (C := C) R N)
+    : Set.indicator (nearZero v AA : Set N) (1 : N → C) ∈ AA.carrier := by
   classical
   set K := nearZero v AA with hK
   have hsep : ∀ y : N, ∃ h ∈ AA.carrier, y ∉ K → h y = 0 ∧ v (h 0) = 1 := by
@@ -130,8 +136,8 @@ theorem indicator_mem {v : Valuation C NNReal} (hv : v.Integers R) (AA : HopfOrd
     rw [h2, Valuation.map_add_eq_of_lt_right v h1, hP1]
   choose r hr using fun k => AA.le_int hPm k
   set F : N → C := ∏ k ∈ Finset.univ.filter (· ∈ K), (P - r k • (1 : N → C)) with hF
-  have hFm : F ∈ AA.carrier := prod_mem AA _ _ fun k _ =>
-    AA.carrier.sub_mem hPm (AA.carrier.smul_mem _ AA.one_mem)
+  have hFm : F ∈ AA.carrier :=
+    prod_mem AA _ _ fun k _ => AA.carrier.sub_mem hPm (AA.carrier.smul_mem _ AA.one_mem)
   have hF0 : ∀ x ∈ K, F x = 0 := by
     intro x hx
     rw [hF, Finset.prod_apply]
@@ -162,9 +168,12 @@ theorem indicator_mem {v : Valuation C NNReal} (hv : v.Integers R) (AA : HopfOrd
   rw [hind]
   exact AA.carrier.sub_mem AA.one_mem (AA.carrier.smul_mem s hFm)
 
-theorem eq_of_le_of_hasColen {v : Valuation C NNReal} (hv : v.Integers R) {X : Type} [Fintype X]
-    [DecidableEq X] {L M : Submodule R (X → C)} (hLM : L ≤ M) {c : NNReal} (hc : c ≠ 0)
-    (hL : HasColen R v L c) (hM : HasColen R v M c) : L = M := by
+theorem eq_of_le_of_hasColen
+    {v : Valuation C NNReal} (hv : v.Integers R)
+    {X : Type} [Fintype X] [DecidableEq X]
+    {L M : Submodule R (X → C)} (hLM : L ≤ M)
+    {c : NNReal} (hc : c ≠ 0) (hL : HasColen R v L c) (hM : HasColen R v M c)
+    : L = M := by
   obtain ⟨P, rfl, hP⟩ := hL
   obtain ⟨Q, rfl, hQ⟩ := hM
   have hcol : ∀ j, ∃ a : X → R, ∑ i, a i • (fun x => Q x i) = fun x => P x j := fun j =>
@@ -203,8 +212,8 @@ theorem eq_of_le_of_hasColen {v : Valuation C NNReal} (hv : v.Integers R) {X : T
   rw [h3]
   exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem intFun_eq_span (X : Type) [Fintype X] [DecidableEq X] :
-    intFun (C := C) R X = Submodule.span R (Set.range fun j x => (1 : Matrix X X C) x j) := by
+theorem intFun_eq_span (X : Type) [Fintype X] [DecidableEq X]
+    : intFun (C := C) R X = Submodule.span R (Set.range fun j x => (1 : Matrix X X C) x j) := by
   refine le_antisymm ?_ ?_
   · intro f hf
     choose r hr using hf
@@ -225,9 +234,11 @@ theorem intFun_eq_span (X : Type) [Fintype X] [DecidableEq X] :
 
 end General
 
-theorem charTable_det_sq {C : Type} [Field C] (p : ℕ) [Fact p.Prime] (v : Valuation C NNReal)
-    (e : ZMod p ≃ AddChar (ZMod p) C) :
-    v (Matrix.of fun x j : ZMod p => e j x).det ^ 2 = v (p : C) ^ p := by
+theorem charTable_det_sq
+    {C : Type} [Field C]
+    (p : ℕ) [Fact p.Prime]
+    (v : Valuation C NNReal) (e : ZMod p ≃ AddChar (ZMod p) C)
+    : v (Matrix.of fun x j : ZMod p => e j x).det ^ 2 = v (p : C) ^ p := by
   set D : Matrix (ZMod p) (ZMod p) C := Matrix.of fun x j : ZMod p => e j x with hD
   set D' : Matrix (ZMod p) (ZMod p) C := Matrix.of fun j y : ZMod p => e j (-y) with hD'
   have hmul : D' * D = (p : C) • (1 : Matrix (ZMod p) (ZMod p) C) := by
@@ -261,20 +272,27 @@ theorem charTable_det_sq {C : Type} [Field C] (p : ℕ) [Fact p.Prime] (v : Valu
 
 section Main
 
-variable {C : Type} [Field C] [IsAlgClosed C] [CharZero C] {v : Valuation C NNReal}
-  {R : Type} [CommRing R] [Algebra R C]
+variable
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
-theorem exists_hasColen_tens (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hp : v (p : C) < 1) :
-    ∃ c : NNReal, HasColen R v (tens (Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C)
-      (x : ZMod p) => ψ x)) (intFun R (ZMod p))) c ∧ c ^ 2 = v (p : C) ^ (p ^ 2) := by
+theorem exists_hasColen_tens (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hp : v (p : C) < 1)
+    : ∃ c : NNReal,
+      HasColen R v
+          (tens (Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x))
+            (intFun R (ZMod p)))
+          c
+        ∧ c ^ 2 = v (p : C) ^ (p ^ 2) := by
   have : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   obtain ⟨ζ, hζ⟩ := ReciprocityTheory.PGsh.Up.U3.exists_primRoot (p := p) (C := C)
   obtain ⟨e, -, -⟩ := ReciprocityTheory.PGsh.Up.U3.exists_charEquiv hζ
   let A₁ : HopfOrder (C := C) R (ZMod p) := multOrder' v hv e
   let A₂ : HopfOrder (C := C) R (ZMod p) := constOrder
-  obtain ⟨AA, hcar, -, -, -, -, hcol⟩ := GlobalTheory.T.tensor_product_hopf_orders p C v R hv hp (ZMod p) (ZMod p) A₁ A₂
-  have h1 : A₁.carrier = Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C)
-      (x : ZMod p) => ψ x) := by
+  obtain ⟨AA, hcar, -, -, -, -, hcol⟩ :=
+    GlobalTheory.T.tensor_product_hopf_orders p C v R hv hp (ZMod p) (ZMod p) A₁ A₂
+  have h1
+      : A₁.carrier
+        = Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x) := by
     show Submodule.span R (Set.range fun j : ZMod p => ((e j : AddChar (ZMod p) C) : ZMod p → C)) = _
     congr 1
     ext f
@@ -295,10 +313,12 @@ theorem exists_hasColen_tens (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hp : 
     · simp [h, Matrix.one_apply]
   have hc₁ : HasColen R v A₁.carrier (v (Matrix.of fun x j : ZMod p => e j x).det) :=
     ⟨Matrix.of fun x j : ZMod p => e j x, rfl, rfl⟩
-  have hc₂ : HasColen R v A₂.carrier 1 :=
-    ⟨1, by rw [h2, intFun_eq_span], by simp⟩
-  refine ⟨v (Matrix.of fun x j : ZMod p => e j x).det ^ Fintype.card (ZMod p) *
-    1 ^ Fintype.card (ZMod p), ?_, ?_⟩
+  have hc₂ : HasColen R v A₂.carrier 1 := ⟨1, by rw [h2, intFun_eq_span], by simp⟩
+  refine ⟨
+    v (Matrix.of fun x j : ZMod p => e j x).det ^ Fintype.card (ZMod p) * 1 ^ Fintype.card (ZMod p),
+    ?_,
+    ?_
+  ⟩
   · have h3 := hcol _ _ hc₁ hc₂
     rw [hcar, h1, h2] at h3
     exact h3
@@ -307,7 +327,21 @@ theorem exists_hasColen_tens (p : ℕ) [Fact p.Prime] (hv : v.Integers R) (hp : 
 
 end Main
 
-theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N], (∀ x : N, p • x = 0) → Fintype.card N = p ^ 2 → ∀ AA : HopfOrder (C := C) R N, ∀ cN, HasColen R v AA.carrier cN → cN ^ 2 = v (p : C) ^ (p ^ 2) → (∃ t : N, ∃ g ∈ AA.carrier, v (g t - g 0) = 1) → ∃ e : ZMod p × ZMod p ≃+ N, AA.carrier.map (LinearMap.funLeft R C (e : ZMod p × ZMod p → N)) = tens (Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : (ZMod p)) => ψ x)) (intFun R (ZMod p)) := by
+theorem ord_split
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (N : Type) [AddCommGroup N] [Fintype N] [DecidableEq N],
+          (∀ x : N, p • x = 0) → Fintype.card N = p ^ 2
+            → ∀ AA : HopfOrder (C := C) R N, ∀ cN,
+              HasColen R v AA.carrier cN → cN ^ 2 = v (p : C) ^ (p ^ 2)
+                → (∃ t : N, ∃ g ∈ AA.carrier, v (g t - g 0) = 1)
+                → ∃ e : ZMod p × ZMod p ≃+ N,
+                  AA.carrier.map (LinearMap.funLeft R C (e : ZMod p × ZMod p → N))
+                    = tens
+                      (Submodule.span R
+                        (Set.range fun (ψ : AddChar (ZMod p) C) (x : (ZMod p)) => ψ x))
+                      (intFun R (ZMod p)) := by
   intro p _ C _ _ _ v R _ _ hv hp N _ _ _ hN hcard AA cN hcol hcN ⟨t, g, hg, ht⟩
   have hp0 : (p : C) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : p.Prime).ne_zero
   have hv0 : v (p : C) ≠ 0 := (Valuation.ne_zero_iff v).2 hp0
@@ -331,8 +365,9 @@ theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClos
       rw [intFun_eq_span, Submodule.span_le]
       rintro _ ⟨j, rfl⟩
       have h1 := hcoset (-j)
-      have h2 : (fun x => Set.indicator (K : Set N) (1 : N → C) (x + -j)) =
-          fun x => (1 : Matrix N N C) x j := by
+      have h2
+          : (fun x => Set.indicator (K : Set N) (1 : N → C) (x + -j))
+            = fun x => (1 : Matrix N N C) x j := by
         funext x
         by_cases hx : x = j
         · subst hx
@@ -345,8 +380,9 @@ theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClos
       exact h1
     have heq : AA.carrier = intFun R N := le_antisymm AA.le_int hint
     obtain ⟨B, hB, hBc⟩ := hcol
-    have h1 := valuation_det_eq_of_span_eq_alt hv (P := (1 : Matrix N N C)) (Q := B) (by simp)
-      ((intFun_eq_span N).symm.trans (heq.symm.trans hB))
+    have h1 :=
+      valuation_det_eq_of_span_eq_alt hv (P := (1 : Matrix N N C)) (Q := B) (by simp)
+        ((intFun_eq_span N).symm.trans (heq.symm.trans hB))
     rw [hBc, Matrix.det_one, map_one] at h1
     rw [h1, one_pow] at hcN
     exact absurd hcN.symm (pow_lt_one₀ zero_le hp hpp).ne
@@ -359,13 +395,14 @@ theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClos
       exact Nat.cast_smul_eq_nsmul (ZMod p) _ _
     rw [h1]
     exact K.nsmul_mem hx _
-  let f : ZMod p × ZMod p →+ N :=
-    { toFun := fun z => z.1 • k + z.2 • t
-      map_zero' := by simp
-      map_add' := by
-        intro a b
-        simp only [Prod.fst_add, Prod.snd_add, add_smul]
-        abel }
+  let f : ZMod p × ZMod p →+ N := {
+    toFun := fun z => z.1 • k + z.2 • t
+    map_zero' := by simp
+    map_add' := by
+      intro a b
+      simp only [Prod.fst_add, Prod.snd_add, add_smul]
+      abel
+  }
   have hK2 : ∀ z, f z ∈ K ↔ z.2 = 0 := by
     rintro ⟨a, b⟩
     show a • k + b • t ∈ K ↔ b = 0
@@ -379,7 +416,8 @@ theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClos
     · rintro rfl
       simpa using hsm a k hkK
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     rintro ⟨a, b⟩ h
     have hb : b = 0 := (hK2 (a, b)).1 (by rw [h]; exact K.zero_mem)
     subst hb
@@ -394,31 +432,37 @@ theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClos
   let e : ZMod p × ZMod p ≃+ N := AddEquiv.ofBijective f hbij
   have he : ∀ z, e z = f z := fun _ => rfl
   refine ⟨e, ?_⟩
-  have hQ : AA.carrier.map (LinearMap.funLeft R C (e : ZMod p × ZMod p → N)) =
-      AA.carrier.map (pbE (C := C) (R := R) e : (N → C) →ₗ[R] (ZMod p × ZMod p → C)) := rfl
+  have hQ
+      : AA.carrier.map (LinearMap.funLeft R C (e : ZMod p × ZMod p → N))
+        = AA.carrier.map (pbE (C := C) (R := R) e : (N → C) →ₗ[R] (ZMod p × ZMod p → C)) :=
+    rfl
   set Q := AA.carrier.map (LinearMap.funLeft R C (e : ZMod p × ZMod p → N)) with hQdef
   have hQmul : ∀ a b, a ∈ Q → b ∈ Q → a * b ∈ Q := by
     rintro _ _ ⟨a, ha, rfl⟩ ⟨b, hb, rfl⟩
     exact ⟨a * b, AA.mul_mem a b ha hb, rfl⟩
 
-  have hQ1 : ∀ h ∈ Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x),
-      (fun z : ZMod p × ZMod p => h z.1) ∈ Q := by
+  have hQ1
+      : ∀ h ∈ Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x),
+        (fun z : ZMod p × ZMod p => h z.1) ∈ Q := by
     intro h hh
-    have hle : Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x) ≤
-        Q.comap (LinearMap.funLeft R C (Prod.fst : ZMod p × ZMod p → ZMod p)) := by
+    have hle
+        : Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x)
+          ≤ Q.comap (LinearMap.funLeft R C (Prod.fst : ZMod p × ZMod p → ZMod p)) := by
       rw [Submodule.span_le]
       rintro _ ⟨ψ, rfl⟩
-      let χ : AddChar N C := ψ.compAddMonoidHom
-        ((AddMonoidHom.fst (ZMod p) (ZMod p)).comp e.symm.toAddMonoidHom)
-      refine ⟨fun x => χ x, GlobalTheory.T.hopf_order_contains_add_characters p C v R hv hp N AA χ, ?_⟩
+      let χ : AddChar N C :=
+        ψ.compAddMonoidHom ((AddMonoidHom.fst (ZMod p) (ZMod p)).comp e.symm.toAddMonoidHom)
+      refine
+        ⟨fun x => χ x, GlobalTheory.T.hopf_order_contains_add_characters p C v R hv hp N AA χ, ?_⟩
       funext z
       simp [χ, LinearMap.funLeft_apply]
     exact hle hh
 
   have hQ2 : ∀ h ∈ intFun (C := C) R (ZMod p), (fun z : ZMod p × ZMod p => h z.2) ∈ Q := by
     intro h hh
-    have hle : intFun (C := C) R (ZMod p) ≤
-        Q.comap (LinearMap.funLeft R C (Prod.snd : ZMod p × ZMod p → ZMod p)) := by
+    have hle
+        : intFun (C := C) R (ZMod p)
+          ≤ Q.comap (LinearMap.funLeft R C (Prod.snd : ZMod p × ZMod p → ZMod p)) := by
       rw [intFun_eq_span, Submodule.span_le]
       rintro _ ⟨b, rfl⟩
       refine ⟨_, hcoset (-(f (0, b))), ?_⟩
@@ -432,12 +476,13 @@ theorem ord_split : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClos
       · have hm : f (z.1, z.2 - b) ∈ (K : Set N) := (hK2 _).2 (sub_eq_zero.2 hb)
         rw [Set.indicator_of_mem hm, hb, Matrix.one_apply_eq]
         rfl
-      · have hm : f (z.1, z.2 - b) ∉ (K : Set N) := fun hc =>
-          hb (sub_eq_zero.1 ((hK2 _).1 hc))
+      · have hm : f (z.1, z.2 - b) ∉ (K : Set N) := fun hc => hb (sub_eq_zero.1 ((hK2 _).1 hc))
         rw [Set.indicator_of_notMem hm, Matrix.one_apply_ne hb]
     exact hle hh
-  have hle : tens (Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x))
-      (intFun R (ZMod p)) ≤ Q := by
+  have hle
+      : tens (Submodule.span R (Set.range fun (ψ : AddChar (ZMod p) C) (x : ZMod p) => ψ x))
+          (intFun R (ZMod p))
+        ≤ Q := by
     rw [tens, Submodule.span_le]
     rintro _ ⟨a, ha, b, hb, rfl⟩
     exact hQmul _ _ (hQ1 a ha) (hQ2 b hb)

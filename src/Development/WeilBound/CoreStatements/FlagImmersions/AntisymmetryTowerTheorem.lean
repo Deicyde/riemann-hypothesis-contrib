@@ -12,12 +12,15 @@ public import Development.AutomorphicSpectrum.Proofs.DivisibilityProofs.Polariza
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology GlobalTheory.CompanionTheory.Ar.Top
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo Filter Topology
+  GlobalTheory.CompanionTheory.Ar.Top
 
 namespace RootFieldNumerics
 
-private theorem comp_swap_eq_swapWt {Ψ : Type} [DecidableEq Ψ] {N : ℕ} (x : Ψ × Fin N → ℝ) (τ : Ψ) (a b : Fin N) :
-    x ∘ ⇑(Equiv.swap (τ, a) (τ, b)) = fun z : Ψ × Fin N => swapWt τ a b (fun s i => x (s, i)) z.1 z.2 := by
+private theorem comp_swap_eq_swapWt
+    {Ψ : Type} [DecidableEq Ψ] {N : ℕ} (x : Ψ × Fin N → ℝ) (τ : Ψ) (a b : Fin N)
+    : x ∘ ⇑(Equiv.swap (τ, a) (τ, b))
+      = fun z : Ψ × Fin N => swapWt τ a b (fun s i => x (s, i)) z.1 z.2 := by
   funext z
   obtain ⟨s, i⟩ := z
   simp only [swapWt, Function.comp_apply, Equiv.swap_apply_def, Prod.mk.injEq]
@@ -32,13 +35,17 @@ private theorem comp_swap_eq_swapWt {Ψ : Type} [DecidableEq Ψ] {N : ℕ} (x : 
       · simp [hia, hib]
   · simp [hs]
 
-private theorem inWall_and_dominant_of_eq_neighbors {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N j : ℕ} (hj0 : 1 ≤ j) (hjN : j < N)
+private theorem inWall_and_dominant_of_eq_neighbors
+    {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
+    {N j : ℕ} (hj0 : 1 ≤ j) (hjN : j < N)
     (τ : Ψ) (x : Ψ × Fin N → ℝ)
-    (hx : x ∈ Metric.closedBall (fun y : Ψ × Fin N => -(1 / (4 * ((N : ℝ) + 1)) *
-        (((y.2 : ℕ) : ℝ) - if y.1 = τ ∧ j ≤ (y.2 : ℕ) then 1 else 0))) (1 / (16 * ((N : ℝ) + 1))))
-    (hxe : x (τ, ⟨j - 1, by omega⟩) = x (τ, ⟨j, hjN⟩)) :
-    InWall j τ (1 / (8 * ((N : ℝ) + 1))) (fun s i => x (s, i)) ∧
-      Dominant (Ψ := Ψ) (N := N) (fun s i => x (s, i)) := by
+    (hx : x ∈ Metric.closedBall
+      (fun y : Ψ × Fin N =>
+        -(1 / (4 * ((N : ℝ) + 1)) * (((y.2 : ℕ) : ℝ) - if y.1 = τ ∧ j ≤ (y.2 : ℕ) then 1 else 0)))
+      (1 / (16 * ((N : ℝ) + 1))))
+    (hxe : x (τ, ⟨j - 1, by omega⟩) = x (τ, ⟨j, hjN⟩))
+    : InWall j τ (1 / (8 * ((N : ℝ) + 1))) (fun s i => x (s, i))
+      ∧ Dominant (Ψ := Ψ) (N := N) (fun s i => x (s, i)) := by
   have hN : (0 : ℝ) < (N : ℝ) + 1 := by positivity
   obtain ⟨δ, hδ⟩ : ∃ δ : ℝ, δ = 1 / (4 * ((N : ℝ) + 1)) := ⟨_, rfl⟩
   have hδpos : 0 < δ := by rw [hδ]; positivity
@@ -55,15 +62,18 @@ private theorem inWall_and_dominant_of_eq_neighbors {Ψ : Type} [Fintype Ψ] [De
     ring
   rw [← hδ, hr] at hx
   rw [hc]
-  have hb : ∀ (s : Ψ) (i : Fin N),
-      |x (s, i) - -(δ * (((i : ℕ) : ℝ) - if s = τ ∧ j ≤ (i : ℕ) then 1 else 0))| ≤ δ / 4 := by
+  have hb
+      : ∀ (s : Ψ) (i : Fin N),
+        |x (s, i) - -(δ * (((i : ℕ) : ℝ) - if s = τ ∧ j ≤ (i : ℕ) then 1 else 0))| ≤ δ / 4 := by
     intro s i
     have h1 := (dist_pi_le_iff (by linarith)).1 (Metric.mem_closedBall.1 hx) (s, i)
     rwa [Real.dist_eq] at h1
-  have G : ∀ (s : Ψ) (a b : Fin N), (b : ℕ) = (a : ℕ) + 1 → ¬ (s = τ ∧ (b : ℕ) = j) →
-      δ / 2 ≤ x (s, a) - x (s, b) := by
+  have G
+      : ∀ (s : Ψ) (a b : Fin N),
+        (b : ℕ) = (a : ℕ) + 1 → ¬(s = τ ∧ (b : ℕ) = j) → δ / 2 ≤ x (s, a) - x (s, b) := by
     intro s a b hab hn
-    have hite : (if s = τ ∧ j ≤ (a : ℕ) then (1 : ℝ) else 0) = if s = τ ∧ j ≤ (b : ℕ) then 1 else 0 := by
+    have hite
+        : (if s = τ ∧ j ≤ (a : ℕ) then (1 : ℝ) else 0) = if s = τ ∧ j ≤ (b : ℕ) then 1 else 0 := by
       by_cases hs : s = τ
       · have hbj : (b : ℕ) ≠ j := fun h => hn ⟨hs, h⟩
         simp only [hs, true_and]
@@ -79,7 +89,8 @@ private theorem inWall_and_dominant_of_eq_neighbors {Ψ : Type} [Fintype Ψ] [De
     intro s a b hab
     by_cases hs : s = τ ∧ (b : ℕ) = j
     · obtain ⟨rfl, hbj⟩ := hs
-      have ha : a = ⟨j - 1, Nat.lt_of_le_of_lt (Nat.sub_le j 1) hjN⟩ := Fin.ext (show (a : ℕ) = j - 1 by omega)
+      have ha : a = ⟨j - 1, Nat.lt_of_le_of_lt (Nat.sub_le j 1) hjN⟩ :=
+        Fin.ext (show (a : ℕ) = j - 1 by omega)
       have hb' : b = ⟨j, hjN⟩ := Fin.ext hbj
       have e1 : x (s, b) = x (s, ⟨j, hjN⟩) := congrArg (fun i => x (s, i)) hb'
       have e2 : x (s, a) = x (s, ⟨j - 1, Nat.lt_of_le_of_lt (Nat.sub_le j 1) hjN⟩) :=
@@ -135,7 +146,11 @@ private theorem inWall_and_dominant_of_eq_neighbors {Ψ : Type} [Fintype Ψ] [De
 
 set_option maxHeartbeats 800000 in
 open GroundTheory.Heights₂.Heights in
-theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPerturbation.Statement → ∀ II : IntersectionSystem, ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (hh : RP Ψ N →ₗ[ℝ] ℝ), T.Proportional → T.ThmW II → T.I8 II hh → I9 (Ψ := Ψ) (N := N) hh → T.ThmB II hh := by
+theorem antisymmetry_tower_theorem
+    : GroundTheory.Heights₂.Heights.AntisymPerturbation.Statement
+      → ∀ II : IntersectionSystem,
+        ∀ (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N : ℕ) (T : RootTower Ψ N) (hh : RP Ψ N →ₗ[ℝ] ℝ),
+          T.Proportional → T.ThmW II → T.I8 II hh → I9 (Ψ := Ψ) (N := N) hh → T.ThmB II hh := by
   intro hS II Ψ _ _ N T hh hprop hW h8 h9
   obtain ⟨hvol, -, -⟩ := hprop
   have hj0 : 1 ≤ T.j := T.j_pos
@@ -143,22 +158,34 @@ theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPert
   have hv : 0 < T.volT := by
     show 0 < ∑ c : T.Comp, T.vol c
     exact Finset.sum_pos (fun c _ => hvol c) Finset.univ_nonempty
-  obtain ⟨h, hhom, hev, -, -⟩ := GlobalTheory.T.polarization_polynomial_coeff_bound (Ψ × Fin N) (dimFl Ψ N + 1) hh
-  let x0 : Ψ → Ψ × Fin N → ℝ := fun τ y => -(1 / (4 * ((N : ℝ) + 1)) *
-    (((y.2 : ℕ) : ℝ) - if y.1 = τ ∧ T.j ≤ (y.2 : ℕ) then 1 else 0))
+  obtain ⟨h, hhom, hev, -, -⟩ :=
+    GlobalTheory.T.polarization_polynomial_coeff_bound (Ψ × Fin N) (dimFl Ψ N + 1) hh
+  let x0 : Ψ → Ψ × Fin N → ℝ := fun τ y =>
+    -(1 / (4 * ((N : ℝ) + 1)) * (((y.2 : ℕ) : ℝ) - if y.1 = τ ∧ T.j ≤ (y.2 : ℕ) then 1 else 0))
   let K : Ψ → Set (Ψ × Fin N → ℝ) := fun τ =>
-    diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩ ∩ Metric.closedBall (x0 τ) (1 / (16 * ((N : ℝ) + 1)))
-  have hK : ∀ τ : Ψ, IsCompact (K τ) ∧ K τ ⊆ diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩ ∧
-      (∃ O : Set (Ψ × Fin N → ℝ), IsOpen O ∧
-        (O ∩ diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩).Nonempty ∧
-        O ∩ diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩ ⊆ K τ) ∧
-      ∀ x ∈ K τ, eval x h = 0 := by
+    diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩
+      ∩ Metric.closedBall (x0 τ) (1 / (16 * ((N : ℝ) + 1)))
+  have hK
+      : ∀ τ : Ψ,
+        IsCompact (K τ) ∧ K τ ⊆ diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩
+          ∧ (∃ O : Set (Ψ × Fin N → ℝ),
+            IsOpen O ∧ (O ∩ diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩).Nonempty
+              ∧ O ∩ diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩ ⊆ K τ)
+          ∧ ∀ x ∈ K τ, eval x h = 0 := by
     intro τ
     have hHc : IsClosed (diagHyperplane Ψ N τ ⟨T.j - 1, by omega⟩ ⟨T.j, hjN⟩) :=
       isClosed_eq (continuous_apply _) (continuous_apply _)
-    refine ⟨(isCompact_closedBall _ _).inter_left hHc, Set.inter_subset_left,
-      ⟨Metric.ball (x0 τ) (1 / (16 * ((N : ℝ) + 1))), Metric.isOpen_ball,
-        ⟨x0 τ, Metric.mem_ball_self (by positivity), ?_⟩, ?_⟩, ?_⟩
+    refine ⟨
+      (isCompact_closedBall _ _).inter_left hHc,
+      Set.inter_subset_left,
+      ⟨
+        Metric.ball (x0 τ) (1 / (16 * ((N : ℝ) + 1))),
+        Metric.isOpen_ball,
+        ⟨x0 τ, Metric.mem_ball_self (by positivity), ?_⟩,
+        ?_
+      ⟩,
+      ?_
+    ⟩
     · show x0 τ (τ, ⟨T.j - 1, by omega⟩) = x0 τ (τ, ⟨T.j, hjN⟩)
       simp [x0, show ¬ T.j ≤ T.j - 1 by omega, Nat.cast_sub hj0]
     · rintro x ⟨hxO, hxH⟩
@@ -166,8 +193,9 @@ theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPert
     · rintro x ⟨hxH, hxB⟩
       obtain ⟨-, hdom⟩ := inWall_and_dominant_of_eq_neighbors hj0 hjN τ x hxB hxH
       rw [hev x]
-      exact h9.1 (fun s i => x (s, i)) hdom
-        ⟨τ, ⟨T.j - 1, by omega⟩, ⟨T.j, hjN⟩, (show T.j = T.j - 1 + 1 by omega), hxH⟩
+      exact h9.1
+        (fun s i => x (s, i))
+        hdom ⟨τ, ⟨T.j - 1, by omega⟩, ⟨T.j, hjN⟩, (show T.j = T.j - 1 + 1 by omega), hxH⟩
   obtain ⟨C0, hC⟩ := hS Ψ N T.j (by omega) hjN h K hK
   obtain ⟨CW, B₁, hB⟩ := hW (1 / (8 * ((N : ℝ) + 1))) (by positivity)
   unfold RootTower.ThmB
@@ -179,15 +207,19 @@ theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPert
   have hL : ∀ F, L F = T.PPt II B F := by
     intro F
     simp [L, RootTower.PPt, RootTower.PPc, toA, LinearMap.sum_apply]
-  obtain ⟨P, hPhom, hPev, -, -⟩ := GlobalTheory.T.polarization_polynomial_coeff_bound (Ψ × Fin N) (dimFl Ψ N + 1) L
-  have hQev : ∀ x : Ψ × Fin N → ℝ, eval x (P - T.volT • h) =
-      (L - T.volT • hh) ((-∑ z, MvPolynomial.C (x z) * X z) ^ (dimFl Ψ N + 1)) := by
+  obtain ⟨P, hPhom, hPev, -, -⟩ :=
+    GlobalTheory.T.polarization_polynomial_coeff_bound (Ψ × Fin N) (dimFl Ψ N + 1) L
+  have hQev
+      : ∀ x : Ψ × Fin N → ℝ,
+        eval x (P - T.volT • h)
+          = (L - T.volT • hh) ((- ∑ z, MvPolynomial.C (x z) * X z) ^ (dimFl Ψ N + 1)) := by
     intro x
     rw [map_sub, MvPolynomial.smul_eval, hPev, hev]
     simp only [LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul]
   have hQhom : (P - T.volT • h).IsHomogeneous (dimFl Ψ N + 1) :=
-    (mem_homogeneousSubmodule _ _).1 (Submodule.sub_mem _ ((mem_homogeneousSubmodule _ _).2 hPhom)
-      (Submodule.smul_mem _ _ ((mem_homogeneousSubmodule _ _).2 hhom)))
+    (mem_homogeneousSubmodule _ _).1
+      (Submodule.sub_mem _ ((mem_homogeneousSubmodule _ _).2 hPhom)
+        (Submodule.smul_mem _ _ ((mem_homogeneousSubmodule _ _).2 hhom)))
   have key : ∀ F, T.PPt II B F - T.volT * hh F = ∑ c, (T.PPc II B c F - T.vol c * hh F) := by
     intro F
     simp only [RootTower.PPt, RootTower.volT, Finset.sum_sub_distrib, Finset.sum_mul]
@@ -205,8 +237,9 @@ theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPert
       rw [eval_rename, map_neg, hQev, hQev, comp_swap_eq_swapWt x τ a b]
       simp only [LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul, hL]
       rw [key, key]
-      have hsum := Finset.sum_congr rfl fun c (_ : c ∈ (Finset.univ : Finset T.Comp)) =>
-        h8 B hB2 c τ a b hab hbj (fun s i => x (s, i))
+      have hsum :=
+        Finset.sum_congr rfl fun c (_ : c ∈ (Finset.univ : Finset T.Comp)) =>
+          h8 B hB2 c τ a b hab hbj (fun s i => x (s, i))
       rw [Finset.sum_neg_distrib] at hsum
       exact hsum
   have hsmall : ∀ τ : Ψ, ∀ x ∈ K τ, |eval x P| ≤ CW * Real.log B / B := by
@@ -215,8 +248,11 @@ theorem antisymmetry_tower_theorem : GroundTheory.Heights₂.Heights.AntisymPert
     rw [hPev x, hL]
     exact hB B hB1 τ (fun s i => x (s, i)) hwall
   obtain ⟨l, hl, hlc⟩ := hC P T.volT (CW * Real.log B / B) hanti hsmall
-  obtain ⟨α, β, hαβ⟩ := GlobalTheory.T.antisymmetric_perturbation_bound Ψ N T.j (L - T.volT • hh) T.volT (C0 * (CW * Real.log B / B))
-    (P - T.volT • h) l hv (fun lam => hQev _) hQhom hl hlc
+  obtain ⟨α, β, hαβ⟩ :=
+    GlobalTheory.T.antisymmetric_perturbation_bound Ψ N T.j (L - T.volT • hh) T.volT
+      (C0 * (CW * Real.log B / B)) (P - T.volT • h) l hv
+      (fun lam => hQev _)
+      hQhom hl hlc
   refine ⟨α, β, fun m hm => ?_⟩
   have h1 := hαβ m hm
   simp only [LinearMap.sub_apply, LinearMap.smul_apply, smul_eq_mul, hL] at h1

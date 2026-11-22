@@ -10,12 +10,16 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-private theorem wsp_orth {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    {F : Fin n → Fin n → Module.End ℂ V} (hF : UF F) {μ ν : Wt n} (h : μ ≠ ν) {x y : V}
-    (hx : x ∈ wsp F μ) (hy : y ∈ wsp F ν) : ⟪x, y⟫_ℂ = 0 := by
+private theorem wsp_orth
+    {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {F : Fin n → Fin n → Module.End ℂ V} (hF : UF F)
+    {μ ν : Wt n} (h : μ ≠ ν)
+    {x y : V} (hx : x ∈ wsp F μ) (hy : y ∈ wsp F ν)
+    : ⟪x, y⟫_ℂ = 0 := by
   obtain ⟨a, ha⟩ := Function.ne_iff.1 h
   have h1 := hF.unit a a x y
   have hx' : F a a x = (μ a : ℂ) • x := hx a
@@ -27,8 +31,15 @@ private theorem wsp_orth {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProdu
     exact fun e => ha (Complex.ofReal_injective e)
   exact (mul_eq_zero.1 h2).resolve_left h3
 
-theorem UpperTheory.RealTr.wtDec :
-    ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (F : Fin n → Fin n → Module.End ℂ V), UF F → ∀ S : Submodule ℂ V, FiniteDimensional ℂ S → Stb F S → ∃ s : Finset (Wt n), (∀ μ ∉ s, wsp F μ ⊓ S = ⊥) ∧ (⨆ μ ∈ s, wsp F μ ⊓ S) = S ∧ iSupIndep fun μ => wsp F μ ⊓ S := by
+theorem UpperTheory.RealTr.wtDec
+    : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        (F : Fin n → Fin n → Module.End ℂ V),
+      UF F
+        → ∀ S : Submodule ℂ V,
+          FiniteDimensional ℂ S → Stb F S
+            → ∃ s : Finset (Wt n),
+              (∀ μ ∉ s, wsp F μ ⊓ S = ⊥) ∧ (⨆ μ ∈ s, wsp F μ ⊓ S) = S
+                ∧ iSupIndep fun μ => wsp F μ ⊓ S := by
   intro n V _ _ F hF S hSfin hS
   have hind : iSupIndep fun μ => wsp F μ ⊓ S := by
     refine OrthogonalFamily.independent (OrthogonalFamily.of_pairwise fun μ ν hne => ?_)
@@ -53,8 +64,9 @@ theorem UpperTheory.RealTr.wtDec :
     show F a a (F b b (x : V)) = F b b (F a a (x : V))
     exact LinearMap.congr_fun h0 (x : V)
   have htop := LinearMap.IsSymmetric.iSup_iInf_eq_top_of_commute hT hcomm
-  have hkey : ∀ χ : Fin n → ℂ, ∀ v : S, v ∈ (⨅ i, Module.End.eigenspace (T i) (χ i)) →
-      (v : V) ∈ wsp F (fun i => (χ i).re) ⊓ S := by
+  have hkey
+      : ∀ χ : Fin n → ℂ, ∀ v : S,
+        v ∈ (⨅ i, Module.End.eigenspace (T i) (χ i)) → (v : V) ∈ wsp F (fun i => (χ i).re) ⊓ S := by
     intro χ v hv
     refine ⟨?_, v.2⟩
     show ∀ i, F i i (v : V) = (((χ i).re : ℝ) : ℂ) • (v : V)
@@ -71,8 +83,9 @@ theorem UpperTheory.RealTr.wtDec :
       rw [hre]
       exact congrArg Subtype.val hvi
   have hspan : S ≤ ⨆ μ : Wt n, wsp F μ ⊓ S := by
-    have hle : Submodule.map S.subtype (⨆ χ : Fin n → ℂ, ⨅ i, Module.End.eigenspace (T i) (χ i))
-        ≤ ⨆ μ : Wt n, wsp F μ ⊓ S := by
+    have hle
+        : Submodule.map S.subtype (⨆ χ : Fin n → ℂ, ⨅ i, Module.End.eigenspace (T i) (χ i))
+          ≤ ⨆ μ : Wt n, wsp F μ ⊓ S := by
       rw [Submodule.map_iSup]
       refine iSup_le fun χ => ?_
       rintro _ ⟨v, hv, rfl⟩

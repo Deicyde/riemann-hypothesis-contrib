@@ -7,17 +7,24 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.Int.Geo
 open AlgebraicGeometry CategoryTheory Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 
-theorem UpperTheory.isogeny_class_exists_of_quotient :
-    QObj → QComp → QUniq → QLev → ClsEx := by
+theorem UpperTheory.isogeny_class_exists_of_quotient : QObj → QComp → QUniq → QLev → ClsEx := by
   intro hObj hComp hUniq hLev q _ D R R' _ _ _ b gb β hM N N₀ c a 𝔞 hN hpos h3 hcop hgen Y X s o
   obtain ⟨o₀, ⟨n⟩⟩ := hObj q D R R' b gb β hM N N₀ c hN hpos hcop X s o
   obtain ⟨l, hl, hln⟩ := hLev q D R R' b gb N N₀ c a 𝔞 hpos hgen X s _ o o₀ n
   obtain ⟨f, ⟨hfs, m, hm⟩, hfu⟩ := Y.rep X _ o₀ l hl
-  have key : ∀ (j : X ⟶ Y.X), j ≫ Y.s = s ≫ spMap β → ∀ (k : QMap o Y.univ j c),
-      (∀ y : D.La, Over.Hom.left (o.eta ((algebraMap (NumberField.RingOfIntegers D.F) D.O) a • y)) ≫ k.φ =
-        j ≫ Over.Hom.left (Y.lv y)) → j = f := by
+  have key
+      : ∀ (j : X ⟶ Y.X),
+        j ≫ Y.s = s ≫ spMap β
+          → ∀ (k : QMap o Y.univ j c),
+            (∀ y : D.La,
+                Over.Hom.left (o.eta ((algebraMap (NumberField.RingOfIntegers D.F) D.O) a • y))
+                    ≫ k.φ
+                  = j ≫ Over.Hom.left (Y.lv y))
+              → j = f := by
     intro j hj k hk
     obtain ⟨k', hk'⟩ : ∃ k' : QMap o Y.univ (𝟙 X ≫ j) c, k'.φ = k.φ := by
       rw [Category.id_comp]

@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.StabUpTo
 
 @[expose] public section
 
-open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.CompanionTheory.CFin
+open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.CompanionTheory.CFin
 open Formalism.UG (cT)
 open GlobalTheory.Orb (archMat)
 open scoped TensorProduct NNReal ENNReal
@@ -15,7 +16,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.CFin
 
-theorem stabUpTo_archMat_of_mem_minParOne : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n r : ℕ) (J : Matrix (Fin n) (Fin n) E) (X : Matrix (Fin n) (Fin r) E) (p : GAd σ J), p ∈ minParOne σ J X → ∀ (w : InfinitePlace F) (τ : EmbOver E w) (j : Fin r), StabUpTo (X.map τ.1) (archMat σ J τ (projArch σ J w p)) j := by
+theorem stabUpTo_archMat_of_mem_minParOne
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (n r : ℕ) (J : Matrix (Fin n) (Fin n) E) (X : Matrix (Fin n) (Fin r) E) (p : GAd σ J),
+          p ∈ minParOne σ J X
+            → ∀ (w : InfinitePlace F) (τ : EmbOver E w) (j : Fin r),
+              StabUpTo (X.map τ.1) (archMat σ J τ (projArch σ J w p)) j := by
   intro F E _ _ _ _ _ σ h n r J X p hp w τ j
   have := h.1
   obtain ⟨B, hB, hE, -⟩ := hp
@@ -30,7 +38,8 @@ theorem stabUpTo_archMat_of_mem_minParOne : ∀ (F E : Type) [Field F] [NumberFi
   intro l hl
   refine ⟨fun m => φ (B m l), ?_, fun m hm => ?_⟩
   · funext a
-    simpa only [Matrix.mul_apply, Matrix.mulVec, dotProduct, Matrix.map_apply] using congrFun (congrFun key a) l
+    simpa only [Matrix.mul_apply, Matrix.mulVec, dotProduct, Matrix.map_apply] using
+      congrFun (congrFun key a) l
   · have e : B m l = 0 := hB (show id l < id m from lt_of_le_of_lt hl hm)
     change φ (B m l) = 0
     rw [e, map_zero]

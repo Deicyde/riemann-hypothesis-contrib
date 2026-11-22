@@ -18,8 +18,8 @@ lemma circPt_eq (t : ℝ) : circPt t = circleMap 0 1 (2 * π * t) := by
 lemma norm_circPt (t : ℝ) : ‖circPt t‖ = 1 := by
   rw [circPt_eq, norm_circleMap_zero]; simp
 
-instance isProbabilityMeasure_restrict_Ioc :
-    IsProbabilityMeasure (volume.restrict (Set.Ioc (0 : ℝ) 1)) :=
+instance isProbabilityMeasure_restrict_Ioc
+    : IsProbabilityMeasure (volume.restrict (Set.Ioc (0 : ℝ) 1)) :=
   ⟨by simp⟩
 
 lemma integrableOn_log_circ (p : ℂ[X]) :

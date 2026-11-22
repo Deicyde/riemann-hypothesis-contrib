@@ -13,8 +13,8 @@ namespace Formalism.RepresentationBoundsCohomology.ringDataObjects
 
 open Formalism.NG
 
-theorem exists_irreducible_big (k : Type) [Field k] [Finite k] (N : ℕ) :
-    ∃ f : k[X], f.Monic ∧ Irreducible f ∧ (N : Cardinal) < Cardinal.mk (AdjoinRoot f) := by
+theorem exists_irreducible_big (k : Type) [Field k] [Finite k] (N : ℕ)
+    : ∃ f : k[X], f.Monic ∧ Irreducible f ∧ (N : Cardinal) < Cardinal.mk (AdjoinRoot f) := by
   classical
   haveI hKinf : Infinite (AlgebraicClosure k) := by
     first
@@ -25,37 +25,40 @@ theorem exists_irreducible_big (k : Type) [Field k] [Finite k] (N : ℕ) :
     IntermediateField.finiteDimensional_adjoin (fun x _ => Algebra.IsIntegral.isIntegral x)
   haveI : Finite (IntermediateField.adjoin k (S : Set (AlgebraicClosure k))) :=
     Module.finite_of_finite k
-  obtain ⟨α, hα⟩ : ∃ α : IntermediateField.adjoin k (S : Set (AlgebraicClosure k)),
-      IntermediateField.adjoin k {α} = ⊤ := by
+  obtain ⟨α, hα⟩
+      : ∃ α : IntermediateField.adjoin k (S : Set (AlgebraicClosure k)),
+        IntermediateField.adjoin k {α} = ⊤ := by
     first
     | exact Field.exists_primitive_element_of_finite_top k _
     | exact Field.exists_primitive_element k _
   have hint : IsIntegral k α := Algebra.IsIntegral.isIntegral α
   refine ⟨minpoly k α, minpoly.monic hint, minpoly.irreducible hint, ?_⟩
-  have e1 : Cardinal.mk (AdjoinRoot (minpoly k α)) =
-      Cardinal.mk (IntermediateField.adjoin k {α}) :=
+  have e1 : Cardinal.mk (AdjoinRoot (minpoly k α)) = Cardinal.mk (IntermediateField.adjoin k {α}) :=
     Cardinal.mk_congr (IntermediateField.adjoinRootEquivAdjoin k hint).toEquiv
   rw [e1, hα]
   rw [Cardinal.mk_congr IntermediateField.topEquiv.toEquiv]
-  have hSF : ∀ x ∈ S, x ∈ IntermediateField.adjoin k (S : Set (AlgebraicClosure k)) :=
-    fun x hx => IntermediateField.subset_adjoin k _ hx
-  have hle : (S.card : Cardinal) ≤
-      Cardinal.mk (IntermediateField.adjoin k (S : Set (AlgebraicClosure k))) := by
-    have hinj : Function.Injective
-        (fun x : S => (⟨x, hSF x x.2⟩ : IntermediateField.adjoin k (S : Set (AlgebraicClosure k)))) :=
+  have hSF : ∀ x ∈ S, x ∈ IntermediateField.adjoin k (S : Set (AlgebraicClosure k)) := fun x hx =>
+    IntermediateField.subset_adjoin k _ hx
+  have hle
+      : (S.card : Cardinal)
+        ≤ Cardinal.mk (IntermediateField.adjoin k (S : Set (AlgebraicClosure k))) := by
+    have hinj : Function.Injective (fun x : S =>
+        (⟨x, hSF x x.2⟩ : IntermediateField.adjoin k (S : Set (AlgebraicClosure k)))) :=
       fun a b h => Subtype.ext (by have h' := congrArg Subtype.val h; exact h')
     simpa using Cardinal.mk_le_of_injective hinj
   rw [hS] at hle
   exact lt_of_lt_of_le (by exact_mod_cast Nat.lt_succ_self N) hle
 
-theorem unram_ext (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (f : O[X])
-    (hf : f.Monic) (hirr : Irreducible (f.map (IsLocalRing.residue O))) :
-    ∃ (_ : IsDomain (AdjoinRoot f)) (_ : IsDiscreteValuationRing (AdjoinRoot f)),
-      Module.Free O (AdjoinRoot f) ∧ Module.Finite O (AdjoinRoot f) ∧
-      (∀ y : O, IsDiscreteValuationRing.addVal (AdjoinRoot f) (algebraMap O (AdjoinRoot f) y) =
-        IsDiscreteValuationRing.addVal O y) ∧
-      Cardinal.mk (IsLocalRing.ResidueField (AdjoinRoot f)) =
-        Cardinal.mk (AdjoinRoot (f.map (IsLocalRing.residue O))) := by
+theorem unram_ext
+    (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (f : O[X]) (hf : f.Monic) (hirr : Irreducible (f.map (IsLocalRing.residue O)))
+    : ∃ (_ : IsDomain (AdjoinRoot f)) (_ : IsDiscreteValuationRing (AdjoinRoot f)),
+      Module.Free O (AdjoinRoot f) ∧ Module.Finite O (AdjoinRoot f)
+        ∧ (∀ y : O,
+          IsDiscreteValuationRing.addVal (AdjoinRoot f) (algebraMap O (AdjoinRoot f) y)
+            = IsDiscreteValuationRing.addVal O y)
+        ∧ Cardinal.mk (IsLocalRing.ResidueField (AdjoinRoot f))
+          = Cardinal.mk (AdjoinRoot (f.map (IsLocalRing.residue O))) := by
   let A := AdjoinRoot f
   let res := IsLocalRing.residue O
   let fb := f.map res
@@ -67,8 +70,9 @@ theorem unram_ext (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing 
   have hfree : Module.Free O A := Module.Free.of_basis pb.basis
   have hfin : Module.Finite O A := pb.finite
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
-  let ψ : A →+* F := AdjoinRoot.lift ((AdjoinRoot.of fb).comp res) (AdjoinRoot.root fb) (by
-    rw [← Polynomial.eval₂_map, AdjoinRoot.eval₂_root])
+  let ψ : A →+* F :=
+    AdjoinRoot.lift ((AdjoinRoot.of fb).comp res) (AdjoinRoot.root fb)
+      (by rw [← Polynomial.eval₂_map, AdjoinRoot.eval₂_root])
   have hψmk : ∀ p : O[X], ψ (AdjoinRoot.mk f p) = AdjoinRoot.mk fb (p.map res) := by
     intro p
     rw [AdjoinRoot.lift_mk, ← Polynomial.eval₂_map, ← AdjoinRoot.aeval_eq]
@@ -135,7 +139,8 @@ theorem unram_ext (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing 
   · obtain ⟨e, he⟩ := exists_ramification O A hinj
     have h1 := he ϖ
     rw [IsDiscreteValuationRing.addVal_uniformizer hϖ, mul_one] at h1
-    have h2 : IsDiscreteValuationRing.addVal A ϖ' = 1 := IsDiscreteValuationRing.addVal_uniformizer hϖ'
+    have h2 : IsDiscreteValuationRing.addVal A ϖ' = 1 :=
+      IsDiscreteValuationRing.addVal_uniformizer hϖ'
     have h3 : (e : ℕ∞) = 1 := h1.symm.trans h2
     intro y
     rw [he y, h3, one_mul]
@@ -152,11 +157,29 @@ theorem bigResidueExt : StatBigResidueExt := by
     obtain ⟨f, hfmap, -, hfm⟩ := Polynomial.lifts_and_degree_eq_and_monic hlift hgm
     rw [← hfmap] at hgi hgN
     obtain ⟨h1, h2, hfree, hfin, hval, hcard⟩ := unram_ext O f hfm hgi
-    exact ⟨AdjoinRoot f, inferInstance, h1, h2, inferInstance, hfree, hfin, hval,
-      lt_of_lt_of_eq hgN hcard.symm⟩
+    exact ⟨
+      AdjoinRoot f,
+      inferInstance,
+      h1,
+      h2,
+      inferInstance,
+      hfree,
+      hfin,
+      hval,
+      lt_of_lt_of_eq hgN hcard.symm
+    ⟩
   · have hinf : Infinite (IsLocalRing.ResidueField O) := not_finite_iff_infinite.mp hk
-    refine ⟨O, inferInstance, inferInstance, inferInstance, Algebra.id O, inferInstance,
-      inferInstance, fun y => rfl, ?_⟩
+    refine ⟨
+      O,
+      inferInstance,
+      inferInstance,
+      inferInstance,
+      Algebra.id O,
+      inferInstance,
+      inferInstance,
+      fun y => rfl,
+      ?_
+    ⟩
     exact lt_of_lt_of_le (Cardinal.natCast_lt_aleph0 (n := N)) (Cardinal.aleph0_le_mk _)
 
 end Formalism.RepresentationBoundsCohomology.ringDataObjects

@@ -17,20 +17,23 @@ variable {N r K : ℕ}
 def condUS (LL : LiftLetters (Fin N)) (i : Fin N) (b : Fin (r + K)) : Prop :=
   (LL.vec i = true ∧ r ≤ b.val) ∨ (LL.vec i = false ∧ b.val < r)
 
-
 open Classical in
-def nomL (R : Type) [CommRing R] (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (i : Fin N) :
-    Fin (r + K) → MvPolynomial (Fin N × Fin (r + K)) R :=
-  fun b => if (condUS LL i b ↔ IsCostly mu c i) then X (i, b) else 0
+def nomL
+    (R : Type) [CommRing R]
+    (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (i : Fin N)
+    : Fin (r + K) → MvPolynomial (Fin N × Fin (r + K)) R := fun b =>
+  if (condUS LL i b ↔ IsCostly mu c i) then X (i, b) else 0
 
-def SgW (R : Type) [CommRing R] (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) :
-    ℕ → Finset (Fin (r + K)) → MvPolynomial (Fin N × Fin (r + K)) R
+def SgW
+    (R : Type) [CommRing R] (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ)
+    : ℕ → Finset (Fin (r + K)) → MvPolynomial (Fin N × Fin (r + K)) R
   | 0 => extOne
   | j + 1 =>
     if h : j < N then
-      colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (nomL R LL mu c ⟨j, h⟩) (SgW R LL mu c j)
-    else SgW R LL mu c j
-
+      colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (nomL R LL mu c ⟨j, h⟩)
+        (SgW R LL mu c j)
+    else
+      SgW R LL mu c j
 
 open Classical in
 def oS (p : ℕ) (pos : Fin N → ℤ) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (j : ℕ) (s : ℤ) : ℕ :=
@@ -138,7 +141,10 @@ end Fac
 
 section Ana
 
-variable (p : ℕ) [Fact p.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {N r K : ℕ}
+variable
+  (p : ℕ) [Fact p.Prime]
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {N r K : ℕ}
 
 lemma piR_ker {σ : Type} (S : UniformizedDVR p O) (Y : MvPolynomial σ O)
     (h : MvPolynomial.map (IsLocalRing.residue O) Y = 0) : ∃ T, Y = C S.w * T := by
@@ -156,8 +162,8 @@ lemma piR_w {σ : Type} (S : UniformizedDVR p O) :
     rw [IsLocalRing.residue_eq_zero_iff, S.w_irr.maximalIdeal_eq]; exact Ideal.mem_span_singleton_self _
   rw [map_C, this, C_0]
 
-def piS (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (pos : Fin N → ℤ) (s : ℤ) :
-    MvPolynomial (Fin N × Fin (r + K)) ℤ →+* MvPolynomial (Fin N × Fin (r + K)) (FF O) :=
+def piS (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (pos : Fin N → ℤ) (s : ℤ)
+    : MvPolynomial (Fin N × Fin (r + K)) ℤ →+* MvPolynomial (Fin N × Fin (r + K)) (FF O) :=
   eval₂Hom (Int.castRingHom _) (fun v => X v ^ p ^ (s - pos v.1).toNat)
 
 lemma piS_frob [CharP (FF O) p] (pos : Fin N → ℤ) (s s' : ℤ) (hs : s ≤ s') (V : Set (Fin N × Fin (r + K)))
@@ -171,7 +177,8 @@ lemma piS_frob [CharP (FF O) p] (pos : Fin N → ℤ) (s s' : ℤ) (hs : s ≤ s
     rw [← pow_mul, ← pow_add]; congr 2; omega
   simpa [iterateFrobenius_def] using key
 
-def yO (w : O) (LL : LiftLetters (Fin N)) (i : Fin N) (b : Fin (r + K)) : MvPolynomial (Fin N × Fin (r + K)) O :=
+def yO (w : O) (LL : LiftLetters (Fin N)) (i : Fin N) (b : Fin (r + K))
+    : MvPolynomial (Fin N × Fin (r + K)) O :=
   C (dW O w LL r i b) * X (i, b)
 
 lemma yO_cond (w : O) (LL : LiftLetters (Fin N)) (i : Fin N) (b : Fin (r + K)) (h : condUS LL i b) :
@@ -183,21 +190,34 @@ lemma yO_ncond (w : O) (LL : LiftLetters (Fin N)) (i : Fin N) (b : Fin (r + K)) 
   unfold condUS at h; unfold yO dW; rw [if_neg h]; simp
 
 def SgVanish (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) : Prop :=
-  ∀ (j : ℕ) (h : j < N), IsCostly mu c ⟨j, h⟩ → ∀ m, ¬ condUS LL ⟨j, h⟩ m → ∀ J : Finset (Fin (r + K)),
-    (((colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c ∧ 1 ≤ c) ∨
-        (colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c ∧ ¬ 1 ≤ c)) → m ∈ J →
-      SgW ℤ LL mu c j (J.erase m) = 0) ∧
-    (((colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c ∧ ¬ 1 ≤ c) ∨
-        (colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c ∧ 1 ≤ c)) → m ∉ J →
-      SgW ℤ LL mu c j (insert m J) = 0)
+  ∀ (j : ℕ) (h : j < N),
+    IsCostly mu c ⟨j, h⟩
+      → ∀ m,
+        ¬ condUS LL ⟨j, h⟩ m
+          → ∀ J : Finset (Fin (r + K)),
+            (((colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c ∧ 1 ≤ c)
+                  ∨ (colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c ∧ ¬ 1 ≤ c))
+                → m ∈ J
+                → SgW ℤ LL mu c j (J.erase m) = 0)
+              ∧ (((colH (mu ⟨j, by omega⟩) c < colH (mu ⟨j + 1, by omega⟩) c ∧ ¬ 1 ≤ c)
+                  ∨ (colH (mu ⟨j + 1, by omega⟩) c < colH (mu ⟨j, by omega⟩) c ∧ 1 ≤ c))
+                → m ∉ J
+                → SgW ℤ LL mu c j (insert m J) = 0)
 
-theorem Inv_main [CharP (FF O) p] (S : UniformizedDVR p O) (LL : LiftLetters (Fin N))
-    (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ) (hmono : Monotone LL.pos)
+theorem Inv_main
+    [CharP (FF O) p]
+    (S : UniformizedDVR p O)
+    (LL : LiftLetters (Fin N)) (mu : Fin (N + 1) → Fin (r + K) → ℤ) (c : ℤ)
+    (hmono : Monotone LL.pos)
     (hposc : ∀ i j : Fin N, i < j → IsUsed mu c i → IsCostly mu c j → LL.pos i < LL.pos j)
-    (HV : SgVanish LL mu c) (j : ℕ) (hj : j ≤ N) :
-    ∀ s : ℤ, (∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s) → ∀ J, ∃ Y : MvPolynomial (Fin N × Fin (r + K)) O,
-      ZZ p (yO S.w LL) LL.pos mu c j s J = C S.w ^ oS p LL.pos mu c j s * Y ∧
-      MvPolynomial.map (IsLocalRing.residue O) Y = piS p O LL.pos s (SgW ℤ LL mu c j J) := by
+    (HV : SgVanish LL mu c)
+    (j : ℕ) (hj : j ≤ N)
+    : ∀ s : ℤ,
+      (∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s)
+        → ∀ J, ∃ Y : MvPolynomial (Fin N × Fin (r + K)) O,
+          ZZ p (yO S.w LL) LL.pos mu c j s J = C S.w ^ oS p LL.pos mu c j s * Y
+            ∧ MvPolynomial.map (IsLocalRing.residue O) Y
+              = piS p O LL.pos s (SgW ℤ LL mu c j J) := by
   have hp0 : p ≠ 0 := (Fact.out : p.Prime).ne_zero
   induction j with
   | zero =>
@@ -214,48 +234,69 @@ theorem Inv_main [CharP (FF O) p] (S : UniformizedDVR p O) (LL : LiftLetters (Fi
       obtain ⟨Y, h1, h2⟩ := ih' s (fun i hi => hs i (by omega)) J
       refine ⟨Y, ?_, ?_⟩
       · rw [ZZ_unused p _ _ mu c s j h hu, oS_succ p _ mu c s j h, if_neg hnc, add_zero]; exact h1
-      · rw [h2]; simp only [SgW, dif_pos h]
+      · rw [h2]
+        simp only [SgW, dif_pos h]
         congr 1
-        unfold colStep; rw [hu]; simp
+        unfold colStep
+        rw [hu]
+        simp
     · set s0 := LL.pos ⟨j, h⟩ with hs0
       have hs0s : s0 ≤ s := hs ⟨j, h⟩ (by simp) hu
       have hprev : ∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s0 := fun i hi _ =>
         hmono (show i ≤ ⟨j, h⟩ from Fin.le_def.mpr (by simp; omega))
 
-      have stepA : ∀ J, ∃ Y : MvPolynomial (Fin N × Fin (r + K)) O,
-          colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (yO S.w LL ⟨j, h⟩)
-            (ZZ p (yO S.w LL) LL.pos mu c j s0) J = C S.w ^ oS p LL.pos mu c (j + 1) s0 * Y ∧
-          MvPolynomial.map (IsLocalRing.residue O) Y = piS p O LL.pos s0 (SgW ℤ LL mu c (j + 1) J) := by
+      have stepA
+          : ∀ J, ∃ Y : MvPolynomial (Fin N × Fin (r + K)) O,
+            colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (yO S.w LL ⟨j, h⟩)
+                  (ZZ p (yO S.w LL) LL.pos mu c j s0) J
+                = C S.w ^ oS p LL.pos mu c (j + 1) s0 * Y
+              ∧ MvPolynomial.map (IsLocalRing.residue O) Y
+                = piS p O LL.pos s0 (SgW ℤ LL mu c (j + 1) J) := by
         intro J
-        have eS : piS p O LL.pos s0 (SgW ℤ LL mu c (j + 1) J) =
-            colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c)
-              (fun b => piS p O LL.pos s0 (nomL ℤ LL mu c ⟨j, h⟩ b))
-              (fun J => piS p O LL.pos s0 (SgW ℤ LL mu c j J)) J := by
+        have eS
+            : piS p O LL.pos s0 (SgW ℤ LL mu c (j + 1) J)
+              = colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c)
+                (fun b => piS p O LL.pos s0 (nomL ℤ LL mu c ⟨j, h⟩ b))
+                (fun J => piS p O LL.pos s0 (SgW ℤ LL mu c j J))
+                J := by
           simp only [SgW, dif_pos h, colStep_map]
         have eX : ∀ b : Fin (r + K), piS p O LL.pos s0 (X (⟨j, h⟩, b)) = X (⟨j, h⟩, b) := by
           intro b; simp [piS, hs0]
         rw [eS]
         by_cases hc : IsCostly mu c ⟨j, h⟩
-        ·
-          have hs1 : ∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s0 - 1 := fun i hi hui => by
+        · have hs1
+              : ∀ i : Fin N, i.val < j → IsUsed mu c i → LL.pos i ≤ s0 - 1 := fun i hi hui => by
             have := hposc i ⟨j, h⟩ (Fin.lt_def.mpr (by simpa using hi)) hui hc
             omega
           choose Y1 hY1 hY2 using ih' (s0 - 1) hs1
           have e1 : (s0 - (s0 - 1)).toNat = 1 := by omega
-          have eZ : ZZ p (yO S.w LL) LL.pos mu c j s0 =
-              fun J => C S.w ^ oS p LL.pos mu c j s0 * (Y1 J) ^ p := by
+          have eZ
+              : ZZ p (yO S.w LL) LL.pos mu c j s0
+                = fun J => C S.w ^ oS p LL.pos mu c j s0 * (Y1 J) ^ p := by
             rw [ZZ_pow p hp0 _ _ mu c j (by omega) (s0 - 1) s0 (by omega) hs1,
               oS_pow p _ mu c j (s0 - 1) s0 (by omega) hs1, e1, pow_one]
-            funext J; simp only [powC]; rw [hY1, mul_pow, ← pow_mul]
-          have eV : ∀ J, MvPolynomial.map (IsLocalRing.residue O) ((Y1 J) ^ p) =
-              piS p O LL.pos s0 (SgW ℤ LL mu c j J) := by
+            funext J
+            simp only [powC]
+            rw [hY1, mul_pow, ← pow_mul]
+          have eV
+              : ∀ J,
+                MvPolynomial.map (IsLocalRing.residue O) ((Y1 J) ^ p)
+                  = piS p O LL.pos s0 (SgW ℤ LL mu c j J) := by
             intro J
-            rw [map_pow, hY2, ← piS_frob p LL.pos (s0 - 1) s0 (by omega) {v : Fin N × Fin (r + K) | v.1.val < j ∧ IsUsed mu c v.1} (fun v hv => hs1 v.1 hv.1 hv.2) _
-              (SgW_supported LL mu c j J), e1, pow_one]
-          have pair : ∀ m J', (condUS LL ⟨j, h⟩ m ∨ SgW ℤ LL mu c j J' = 0) →
-              ∃ u, yO S.w LL ⟨j, h⟩ m * (Y1 J') ^ p = C S.w * u ∧
-                MvPolynomial.map (IsLocalRing.residue O) u =
-                  piS p O LL.pos s0 (nomL ℤ LL mu c ⟨j, h⟩ m) * piS p O LL.pos s0 (SgW ℤ LL mu c j J') := by
+            rw [map_pow, hY2,
+              ← piS_frob p LL.pos (s0 - 1) s0 (by omega)
+                {v : Fin N × Fin (r + K) | v.1.val < j ∧ IsUsed mu c v.1}
+                (fun v hv => hs1 v.1 hv.1 hv.2)
+                _ (SgW_supported LL mu c j J),
+              e1, pow_one]
+          have pair
+              : ∀ m J',
+                (condUS LL ⟨j, h⟩ m ∨ SgW ℤ LL mu c j J' = 0)
+                  → ∃ u,
+                    yO S.w LL ⟨j, h⟩ m * (Y1 J') ^ p = C S.w * u
+                      ∧ MvPolynomial.map (IsLocalRing.residue O) u
+                        = piS p O LL.pos s0 (nomL ℤ LL mu c ⟨j, h⟩ m)
+                          * piS p O LL.pos s0 (SgW ℤ LL mu c j J') := by
             intro m J' hm
             by_cases hcm : condUS LL ⟨j, h⟩ m
             · refine ⟨X (⟨j, h⟩, m) * (Y1 J') ^ p, by rw [yO_cond _ _ _ _ hcm]; ring, ?_⟩
@@ -268,30 +309,46 @@ theorem Inv_main [CharP (FF O) p] (S : UniformizedDVR p O) (LL : LiftLetters (Fi
               have hp1 : p - 1 ≠ 0 := by have := (Fact.out : p.Prime).two_le; omega
               refine ⟨X (⟨j, h⟩, m) * (C S.w ^ (p - 1) * T ^ p), ?_, ?_⟩
               · rw [yO_ncond _ _ _ _ hcm, hT, mul_pow]
-                have e : (C S.w : MvPolynomial (Fin N × Fin (r + K)) O) ^ p = C S.w ^ (p - 1) * C S.w := by
+                have e
+                    : (C S.w : MvPolynomial (Fin N × Fin (r + K)) O) ^ p
+                      = C S.w ^ (p - 1) * C S.w := by
                   rw [← pow_succ, Nat.sub_add_cancel (Fact.out : p.Prime).one_le]
-                rw [e]; ring
+                rw [e]
+                ring
               · rw [map_mul, map_mul, map_pow, piR_w p S, zero_pow hp1, hz, map_zero]; simp
-          obtain ⟨Y, hYa, hYb⟩ := colStep_factor (C S.w) (MvPolynomial.map (IsLocalRing.residue O)) c _ _ hu
-            (yO S.w LL ⟨j, h⟩) (fun J => (Y1 J) ^ p) (fun b => piS p O LL.pos s0 (nomL ℤ LL mu c ⟨j, h⟩ b))
-            (fun J => piS p O LL.pos s0 (SgW ℤ LL mu c j J))
-            (fun m J => ⟨fun hw hmJ => pair m _ (by
-                by_cases hcm : condUS LL ⟨j, h⟩ m
-                · exact Or.inl hcm
-                · exact Or.inr ((HV j h hc m hcm J).1 hw hmJ)),
-              fun hw hmJ => pair m _ (by
-                by_cases hcm : condUS LL ⟨j, h⟩ m
-                · exact Or.inl hcm
-                · exact Or.inr ((HV j h hc m hcm J).2 hw hmJ))⟩) J
+          obtain ⟨Y, hYa, hYb⟩ :=
+            colStep_factor (C S.w) (MvPolynomial.map (IsLocalRing.residue O)) c _ _ hu
+              (yO S.w LL ⟨j, h⟩)
+              (fun J => (Y1 J) ^ p)
+              (fun b => piS p O LL.pos s0 (nomL ℤ LL mu c ⟨j, h⟩ b))
+              (fun J => piS p O LL.pos s0 (SgW ℤ LL mu c j J))
+              (fun m J => ⟨
+                fun hw hmJ =>
+                  pair m _ (by
+                    by_cases hcm : condUS LL ⟨j, h⟩ m
+                    · exact Or.inl hcm
+                    · exact Or.inr ((HV j h hc m hcm J).1 hw hmJ)),
+                fun hw hmJ =>
+                  pair m _ (by
+                    by_cases hcm : condUS LL ⟨j, h⟩ m
+                    · exact Or.inl hcm
+                    · exact Or.inr ((HV j h hc m hcm J).2 hw hmJ))
+              ⟩)
+              J
           refine ⟨Y, ?_, hYb⟩
           rw [eZ, colStep_smul, hYa, oS_succ p _ mu c s0 j h, if_pos hc, ← hs0]
           simp only [sub_self, Int.toNat_zero, pow_zero]
           ring
-        ·
-          choose Y hY1 hY2 using ih' s0 hprev
-          have eZ : ZZ p (yO S.w LL) LL.pos mu c j s0 = fun J => C S.w ^ oS p LL.pos mu c j s0 * Y J :=
+        · choose Y hY1 hY2 using ih' s0 hprev
+          have eZ
+              : ZZ p (yO S.w LL) LL.pos mu c j s0 = fun J => C S.w ^ oS p LL.pos mu c j s0 * Y J :=
             funext hY1
-          refine ⟨colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (yO S.w LL ⟨j, h⟩) Y J, ?_, ?_⟩
+          refine ⟨
+            colStep c (colH (mu ⟨j, by omega⟩) c) (colH (mu ⟨j + 1, by omega⟩) c) (yO S.w LL ⟨j, h⟩)
+              Y J,
+            ?_,
+            ?_
+          ⟩
           · rw [eZ, colStep_smul, oS_succ p _ mu c s0 j h, if_neg hc, add_zero]
           · rw [colStep_map]
             congr 1
@@ -316,8 +373,8 @@ theorem Inv_main [CharP (FF O) p] (S : UniformizedDVR p O) (LL : LiftLetters (Fi
         exact hmono (show i ≤ ⟨j, h⟩ from Fin.le_def.mpr (by simp; omega))
       · rw [map_pow, hYb]
         exact piS_frob p LL.pos s0 s hs0s _
-          (fun v hv => hmono (show v.1 ≤ ⟨j, h⟩ from Fin.le_def.mpr (by have := hv.1; simp; omega))) _
-          (SgW_supported LL mu c (j + 1) J)
+          (fun v hv => hmono (show v.1 ≤ ⟨j, h⟩ from Fin.le_def.mpr (by have := hv.1; simp; omega)))
+          _ (SgW_supported LL mu c (j + 1) J)
 
 end Ana
 

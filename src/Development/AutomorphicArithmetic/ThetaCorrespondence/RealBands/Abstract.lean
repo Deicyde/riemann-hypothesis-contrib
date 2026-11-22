@@ -15,13 +15,17 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.RealBands.Eq
 open MeasureTheory Filter UpperTheory.Lit.Cusp
 open scoped Topology
 
-theorem UpperTheory.Lit.Cusp.average_eq_zero :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [T2Space G]
-      [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G) [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (H : G → ℝ)
-      (ν : Measure G) [IsFiniteMeasureOnCompacts ν], ν Nᶜ = 0 → (∀ m ∈ N, ν.map (fun x => m * x) = ν) →
-      IsRay N a H → ∀ e f : G → ℂ, Continuous e → Integrable e μ → Continuous f → Integrable f μ →
-        (∀ x, conv μ e e x = e x) → (∀ x, conv μ e f x = f x) →
-        ∀ x, (Continuous fun y => ∫ m, f (x * m * y) ∂ν) → ∀ y, ∫ m, f (x * m * y) ∂ν = 0 := by
+theorem UpperTheory.Lit.Cusp.average_eq_zero
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (μ : Measure G)
+        [μ.IsHaarMeasure] (N : Set G) (a : ℝ → G) (H : G → ℝ) (ν : Measure G)
+        [IsFiniteMeasureOnCompacts ν],
+      ν Nᶜ = 0 → (∀ m ∈ N, ν.map (fun x => m * x) = ν) → IsRay N a H
+        → ∀ e f : G → ℂ,
+          Continuous e → Integrable e μ → Continuous f → Integrable f μ → (∀ x, conv μ e e x = e x)
+            → (∀ x, conv μ e f x = f x)
+            → ∀ x,
+              (Continuous fun y => ∫ m, f (x * m * y) ∂ν) → ∀ y, ∫ m, f (x * m * y) ∂ν = 0 := by
   intro G _ _ _ _ _ _ _ _ μ _ N a H ν _ hν hinv hray e f hec hei hfc hfi hee hef x hcont
   have hKe : Kills μ N a e := kills_of_idem G μ N a H e hray hec hei hee
   have hKf : Kills μ N a f := by

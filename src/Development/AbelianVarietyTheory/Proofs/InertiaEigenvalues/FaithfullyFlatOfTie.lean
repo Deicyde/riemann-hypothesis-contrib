@@ -12,16 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsS
 
 noncomputable section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.EtaleExact TensorProduct
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  GlobalTheory.EtaleExact TensorProduct
 
 namespace GlobalTheory.EtaleSub
 
-theorem powerSeries_cases {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
-    (hϖ : Irreducible ϖ) (g : PowerSeries O) :
-    (∃ w, g = PowerSeries.C ϖ * w) ∨
-      ∃ (k : ℕ) (u w : PowerSeries O), IsUnit u ∧ g = u * PowerSeries.X ^ k + PowerSeries.C ϖ * w := by
+theorem powerSeries_cases
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    (g : PowerSeries O)
+    : (∃ w, g = PowerSeries.C ϖ * w)
+      ∨ ∃ (k : ℕ) (u w : PowerSeries O),
+        IsUnit u ∧ g = u * PowerSeries.X ^ k + PowerSeries.C ϖ * w := by
   classical
-  have key : ∀ f : PowerSeries O, (∀ k, ϖ ∣ PowerSeries.coeff k f) → ∃ w, f = PowerSeries.C ϖ * w := by
+  have key
+      : ∀ f : PowerSeries O, (∀ k, ϖ ∣ PowerSeries.coeff k f) → ∃ w, f = PowerSeries.C ϖ * w := by
     intro f hf
     choose c hc using hf
     exact ⟨PowerSeries.mk c, by ext k; simp [hc]⟩
@@ -34,24 +39,31 @@ theorem powerSeries_cases {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuat
     apply Nat.find_spec h
     rw [← Ideal.mem_span_singleton, ← hϖ.maximalIdeal_eq]
     exact hn
-  obtain ⟨w, hw⟩ := key (PowerSeries.trunc (Nat.find h) g : Polynomial O) fun i => by
-    rw [Polynomial.coeff_coe, PowerSeries.coeff_trunc]
-    split_ifs with hi
-    · exact not_not.1 (Nat.find_min h hi)
-    · exact dvd_zero _
+  obtain ⟨w, hw⟩ :=
+    key (PowerSeries.trunc (Nat.find h) g : Polynomial O) fun i => by
+      rw [Polynomial.coeff_coe, PowerSeries.coeff_trunc]
+      split_ifs with hi
+      · exact not_not.1 (Nat.find_min h hi)
+      · exact dvd_zero _
   refine ⟨Nat.find h, PowerSeries.mk fun i => PowerSeries.coeff (i + Nat.find h) g, w, ?_, ?_⟩
   · rw [PowerSeries.isUnit_iff_constantCoeff]
     simpa using hk
   · rw [← hw]
     exact PowerSeries.eq_shift_mul_X_pow_add_trunc _ g
 
-theorem letter_cases {O E : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
-    (hϖ : Irreducible ϖ) [CommRing E] (n : ℕ) (p : ℕ) (hp0 : (p : O) ≠ 0) (hp1 : ¬ IsUnit (p : O))
-    (a : LetA O n →+* E) (hπ : IsUnit (a letπ)) [IsAdicComplete (Ideal.span {(p : E)}) E]
+theorem letter_cases
+    {O E : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    [CommRing E]
+    (n : ℕ)
+    (p : ℕ) (hp0 : (p : O) ≠ 0) (hp1 : ¬ IsUnit (p : O))
+    (a : LetA O n →+* E) (hπ : IsUnit (a letπ))
+    [IsAdicComplete (Ideal.span {(p : E)}) E]
     (hd : ∀ x : E, ∃ (f : LetA O n) (r : ℕ), x * a (letπ ^ r) - a f ∈ Ideal.span {(p : E)})
-    (i : ZMod n) (x : E) :
-    a (letE i) * x = 0 ∨ ∃ (k : ℕ) (u : E), IsUnit u ∧
-      a (letE i) * x = a (letE i) * a (fun _ => PowerSeries.C ϖ) ^ k * u := by
+    (i : ZMod n) (x : E)
+    : a (letE i) * x = 0
+      ∨ ∃ (k : ℕ) (u : E),
+        IsUnit u ∧ a (letE i) * x = a (letE i) * a (fun _ => PowerSeries.C ϖ) ^ k * u := by
   classical
   let ψ : PowerSeries O →+* E := a.comp (Pi.constRingHom (ZMod n) (PowerSeries O))
   have hψ : ∀ f : LetA O n, a (letE i) * a f = a (letE i) * ψ (f i) := by
@@ -63,8 +75,7 @@ theorem letter_cases {O E : Type} [CommRing O] [IsDomain O] [IsDiscreteValuation
     by_cases hk : k = i
     · subst hk; simp [letE]
     · simp [letE, hk]
-  have hidem : a (letE i) * a (letE i) = a (letE i) := by
-    rw [hψ]; simp [letE]
+  have hidem : a (letE i) * a (letE i) = a (letE i) := by rw [hψ]; simp [letE]
   change _ ∨ ∃ (k : ℕ) (u : E), IsUnit u ∧ a (letE i) * x = a (letE i) * ψ (PowerSeries.C ϖ) ^ k * u
   set e := a (letE i)
   set w := ψ (PowerSeries.C ϖ) with hw
@@ -75,10 +86,8 @@ theorem letter_cases {O E : Type} [CommRing O] [IsDomain O] [IsDiscreteValuation
   have hpE : (p : E) = ψ (PowerSeries.C (v : O)) * w ^ m := by
     rw [hw, ← map_pow, ← map_mul, ← map_pow, ← map_mul, ← hv, map_natCast, map_natCast]
   have hvu : IsUnit (ψ (PowerSeries.C (v : O))) := (v.isUnit.map _).map _
-  have hwp : w ∣ (p : E) := by
-    rw [hpE]; exact Dvd.dvd.mul_left (dvd_pow_self w hm) _
-  have hpw : (p : E) ∣ w ^ m := by
-    rw [hpE]; exact hvu.mul_left_dvd.2 dvd_rfl
+  have hwp : w ∣ (p : E) := by rw [hpE]; exact Dvd.dvd.mul_left (dvd_pow_self w hm) _
+  have hpw : (p : E) ∣ w ^ m := by rw [hpE]; exact hvu.mul_left_dvd.2 dvd_rfl
   have hjac : w ∈ Ideal.jacobson (⊥ : Ideal E) := by
     have h1 : w ^ m ∈ Ideal.jacobson (⊥ : Ideal E) :=
       IsAdicComplete.le_jacobson_bot (Ideal.span {(p : E)}) (Ideal.mem_span_singleton.2 hpw)
@@ -91,8 +100,7 @@ theorem letter_cases {O E : Type} [CommRing O] [IsDomain O] [IsDiscreteValuation
     obtain ⟨f, r, hf⟩ := hd y
     obtain ⟨z, hz⟩ := hwp.trans (Ideal.mem_span_singleton.1 hf)
     have hr : IsUnit (a (letπ ^ r)) := by rw [map_pow]; exact hπ.pow r
-    have h1 : e * y * a (letπ ^ r) = e * (ψ (f i) + w * z) := by
-      rw [mul_add, ← hψ, ← hz]; ring
+    have h1 : e * y * a (letπ ^ r) = e * (ψ (f i) + w * z) := by rw [mul_add, ← hψ, ← hz]; ring
     rcases powerSeries_cases hϖ (f i) with ⟨g, hg⟩ | ⟨k, u, g, hu, hg⟩
     · left
       rw [← hr.dvd_mul_right, h1, hg, map_mul]
@@ -115,28 +123,31 @@ theorem letter_cases {O E : Type} [CommRing O] [IsDomain O] [IsDiscreteValuation
     exact (pow_dvd_pow_of_dvd hpw k).trans (by rw [← pow_mul]; exact h _)
   · right
     push_neg at h
-    obtain ⟨k, hk⟩ : ∃ k, Nat.find h = k + 1 := Nat.exists_eq_succ_of_ne_zero fun h0 => by
-      have := Nat.find_spec h
-      rw [h0] at this
-      simp at this
+    obtain ⟨k, hk⟩ : ∃ k, Nat.find h = k + 1 :=
+      Nat.exists_eq_succ_of_ne_zero fun h0 => by
+        have := Nat.find_spec h
+        rw [h0] at this
+        simp at this
     have h1 := Nat.find_spec h
     rw [hk] at h1
     obtain ⟨y, hy⟩ : w ^ k ∣ e * x := not_not.1 (Nat.find_min h (by omega))
-    have h2 : e * x = w ^ k * (e * y) := by
-      rw [← hidem, mul_assoc, hy, hidem]; ring
+    have h2 : e * x = w ^ k * (e * y) := by rw [← hidem, mul_assoc, hy, hidem]; ring
     rcases step y with ⟨z, hz⟩ | ⟨u, hu, hz⟩
     · exact absurd ⟨z, by rw [h2, hz]; ring⟩ h1
     · exact ⟨k, u, hu, by rw [h2, hz]; ring⟩
 
 section Sub
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp LL O : Type} [Field Qp] [Field LL]
-    [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp LL O : Type}
+  [Field Qp] [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
 
-theorem exists_subLat [IsDomain O] [IsPrincipalIdealRing O] (T : LocLat G Qp LL O)
-    (S : Submodule O ↥T.L.T) (hS : ∀ g, ∀ x ∈ S, T.actT g x ∈ S) :
-    ∃ (T' : LocLat G Qp LL O) (ι : LatHom T'.L T.L), Function.Injective ι.f ∧
-      LinearMap.range (latMap ι) = S := by
+theorem exists_subLat
+    [IsDomain O] [IsPrincipalIdealRing O]
+    (T : LocLat G Qp LL O) (S : Submodule O ↥T.L.T) (hS : ∀ g, ∀ x ∈ S, T.actT g x ∈ S)
+    : ∃ (T' : LocLat G Qp LL O) (ι : LatHom T'.L T.L),
+      Function.Injective ι.f ∧ LinearMap.range (latMap ι) = S := by
   haveI := T.L.free
   haveI : Module.Finite O ↥T.L.T := Module.Finite.iff_fg.2 T.L.fg
   let S₁ : Submodule O T.V := S.map T.L.T.subtype
@@ -149,17 +160,21 @@ theorem exists_subLat [IsDomain O] [IsPrincipalIdealRing O] (T : LocLat G Qp LL 
     Submodule.span_le.2 fun x hx => Submodule.subset_span (hS₁ g x hx)
   let ρ' : Representation LL G V' := T.ρ.subrepresentation V' hV'
   let S₂ : Submodule O V' := S₁.comap (V'.subtype.restrictScalars O)
-  let e : S₂ ≃ₗ[O] S :=
-    { toFun := fun x => ⟨⟨x.1.1, hle x.2⟩, by
+  let e : S₂ ≃ₗ[O] S := {
+    toFun := fun x => ⟨
+      ⟨x.1.1, hle x.2⟩,
+      by
         obtain ⟨y, hy, hy'⟩ := x.2
         have : (⟨x.1.1, hle x.2⟩ : ↥T.L.T) = y := Subtype.ext hy'.symm
         rw [this]
-        exact hy⟩
-      invFun := fun y => ⟨⟨y.1.1, Submodule.subset_span ⟨y.1, y.2, rfl⟩⟩, ⟨y.1, y.2, rfl⟩⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+        exact hy
+    ⟩
+    invFun := fun y => ⟨⟨y.1.1, Submodule.subset_span ⟨y.1, y.2, rfl⟩⟩, ⟨y.1, y.2, rfl⟩⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
   letI : TopologicalSpace V' := moduleTopology LL V'
   haveI : IsModuleTopology LL V' := ⟨rfl⟩
   haveI : ContinuousAdd V' := IsModuleTopology.toContinuousAdd LL V'
@@ -167,27 +182,38 @@ theorem exists_subLat [IsDomain O] [IsPrincipalIdealRing O] (T : LocLat G Qp LL 
   haveI : ContinuousSMul LL T.V := IsModuleTopology.toContinuousSMul LL T.V
   obtain ⟨r, hr⟩ := V'.subtype.exists_leftInverse_of_injective V'.ker_subtype
   have hrc : Continuous r := IsModuleTopology.continuous_of_linearMap r
-  let T' : LocLat G Qp LL O :=
-    { V := V'
-      ρ := ρ'
-      cont := fun x => by
-        have : (fun g => ρ' g x) = fun g => r (T.ρ g x) :=
-          funext fun g => (LinearMap.congr_fun hr (ρ' g x)).symm
-        rw [this]
-        exact hrc.comp (T.cont x)
-      L :=
-        { T := S₂
-          stable := fun g x hx => hS₁ g _ hx
-          fg := Module.Finite.iff_fg.1 (Module.Finite.equiv e.symm)
-          free := Module.Free.of_equiv e.symm
-          span := by
-            apply Submodule.map_injective_of_injective V'.injective_subtype
-            rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype]
-            congr 1
-            ext x
-            exact ⟨fun ⟨y, hy, h⟩ => h ▸ hy, fun hx => ⟨⟨x, Submodule.subset_span hx⟩, hx, rfl⟩⟩ } }
-  refine ⟨T', ⟨V'.subtype, fun _ _ => rfl, IsModuleTopology.continuous_of_linearMap V'.subtype,
-    fun x hx => hle hx⟩, V'.injective_subtype, ?_⟩
+  let T' : LocLat G Qp LL O := {
+    V := V'
+    ρ := ρ'
+    cont := fun x => by
+      have : (fun g => ρ' g x) = fun g => r (T.ρ g x) :=
+        funext fun g => (LinearMap.congr_fun hr (ρ' g x)).symm
+      rw [this]
+      exact hrc.comp (T.cont x)
+    L := {
+      T := S₂
+      stable := fun g x hx => hS₁ g _ hx
+      fg := Module.Finite.iff_fg.1 (Module.Finite.equiv e.symm)
+      free := Module.Free.of_equiv e.symm
+      span := by
+        apply Submodule.map_injective_of_injective V'.injective_subtype
+        rw [Submodule.map_span, Submodule.map_top, Submodule.range_subtype]
+        congr 1
+        ext x
+        exact ⟨fun ⟨y, hy, h⟩ => h ▸ hy, fun hx => ⟨⟨x, Submodule.subset_span hx⟩, hx, rfl⟩⟩
+    }
+  }
+  refine ⟨
+    T',
+    ⟨
+      V'.subtype,
+      fun _ _ => rfl,
+      IsModuleTopology.continuous_of_linearMap V'.subtype,
+      fun x hx => hle hx
+    ⟩,
+    V'.injective_subtype,
+    ?_
+  ⟩
   ext x
   constructor
   · rintro ⟨y, rfl⟩
@@ -199,22 +225,27 @@ end Sub
 
 section Generic
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL]
-    [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    {W : LocWach PD LL O v n} {RA RW : Type} [CommRing RA] [CommRing RW] [Algebra O RA]
-    [Algebra O RW] {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
-    (E : EtTie W RA RW inclR φR gR πA)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} {W : LocWach PD LL O v n} {RA RW : Type}
+  [CommRing RA] [CommRing RW] [Algebra O RA] [Algebra O RW]
+  {inclR : RA →ₐ[O] RW} {φR : RW →ₐ[O] RW} {gR : G → (RW →ₐ[O] RW)} {πA : RA}
+  (E : EtTie W RA RW inclR φR gR πA)
 
-theorem faithfullyFlat_of_tie [IsDomain O] [IsDiscreteValuationRing O] (hp0 : (PD.p : O) ≠ 0)
-    (hp1 : ¬ IsUnit (PD.p : O)) (hsep : ∀ x : RW, (∀ k : ℕ, (PD.p : RW) ^ k ∣ x) → x = 0)
-    (htor : ∀ x : RW, (PD.p : RW) * x = 0 → x = 0) :
-    letI := E.ioE.toRingHom.toAlgebra
-    Module.FaithfullyFlat W.EE RW := by
+theorem faithfullyFlat_of_tie
+    [IsDomain O] [IsDiscreteValuationRing O]
+    (hp0 : (PD.p : O) ≠ 0) (hp1 : ¬ IsUnit (PD.p : O))
+    (hsep : ∀ x : RW, (∀ k : ℕ, (PD.p : RW) ^ k ∣ x) → x = 0)
+    (htor : ∀ x : RW, (PD.p : RW) * x = 0 → x = 0)
+    : letI := E.ioE.toRingHom.toAlgebra
+      Module.FaithfullyFlat W.EE RW := by
   classical
   letI := E.ioE.toRingHom.toAlgebra
   haveI := PD.finK₀
@@ -268,21 +299,26 @@ theorem faithfullyFlat_of_tie [IsDomain O] [IsDiscreteValuationRing O] (hp0 : (P
 theorem mem_of_jD_mem_span
     (hff : letI := E.ioE.toRingHom.toAlgebra; Module.FaithfullyFlat W.EE RW)
     (T : LocLat G Qp LL O) (N : Submodule W.EE (W.DD T)) (x : W.DD T)
-    (hx : E.jD T x ∈ Submodule.span RW (E.jD T '' (N : Set (W.DD T)))) : x ∈ N := by
+    (hx : E.jD T x ∈ Submodule.span RW (E.jD T '' (N : Set (W.DD T))))
+    : x ∈ N := by
   letI := E.ioE.toRingHom.toAlgebra
   haveI : Nontrivial O := (algebraMap O LL).domain_nontrivial
   haveI := T.L.free
   haveI := (W.DD_free T).1
   haveI := finite_DD E T
   refine mem_of_mem_span_image (R := RW) (E.jD T).toAddMonoidHom (E.jD_smul T)
-    (fun _ => ?_) (E.jD_span T) N x hx
+    (fun _ => ?_)
+    (E.jD_span T) N x hx
   rw [(W.DD_free T).2, Module.finrank_baseChange]
 
-theorem map_mem_span {M : Type} [AddCommGroup M] [Module O M] (f : RW →ₐ[O] RW) (a : M →ₗ[O] M)
-    (s : Set (RW ⊗[O] M)) (hs : ∀ x ∈ s, TensorProduct.map f.toLinearMap a x ∈ s) :
-    ∀ x ∈ Submodule.span RW s, TensorProduct.map f.toLinearMap a x ∈ Submodule.span RW s := by
-  have hsm : ∀ (r : RW) (x : RW ⊗[O] M), TensorProduct.map f.toLinearMap a (r • x) =
-      f r • TensorProduct.map f.toLinearMap a x := by
+theorem map_mem_span
+    {M : Type} [AddCommGroup M] [Module O M]
+    (f : RW →ₐ[O] RW) (a : M →ₗ[O] M) (s : Set (RW ⊗[O] M))
+    (hs : ∀ x ∈ s, TensorProduct.map f.toLinearMap a x ∈ s)
+    : ∀ x ∈ Submodule.span RW s, TensorProduct.map f.toLinearMap a x ∈ Submodule.span RW s := by
+  have hsm
+      : ∀ (r : RW) (x : RW ⊗[O] M),
+        TensorProduct.map f.toLinearMap a (r • x) = f r • TensorProduct.map f.toLinearMap a x := by
     intro r x
     induction x using TensorProduct.induction_on with
     | zero => simp
@@ -295,30 +331,34 @@ theorem map_mem_span {M : Type} [AddCommGroup M] [Module O M] (f : RW →ₐ[O] 
   | add z w _ _ hz hw => rw [map_add (f := _)]; exact Submodule.add_mem _ hz hw
   | smul r z _ hz => rw [hsm]; exact Submodule.smul_mem _ _ hz
 
-theorem exists_sub_of_tie [IsDomain O] [IsPrincipalIdealRing O]
+theorem exists_sub_of_tie
+    [IsDomain O] [IsPrincipalIdealRing O]
     (hff : letI := E.ioE.toRingHom.toAlgebra; Module.FaithfullyFlat W.EE RW)
     (hs : ∀ y, ∃ b, φR b - b = y)
     (hI : ∀ I : Ideal RW, (∀ x ∈ I, φR x ∈ I) → I ≤ Ideal.span {x | x ∈ I ∧ φR x = x})
     (T : LocLat G Qp LL O) (hfix : ∀ b, TWmap φR T b = b → ∃ t : ↥T.L.T, b = (1 : RW) ⊗ₜ[O] t)
-    (D' : Submodule W.EE (W.DD T)) (hφ : ∀ x ∈ D', W.φD T x ∈ D')
-    (hγ : ∀ g, ∀ x ∈ D', W.γD T g x ∈ D') :
-    ∃ (T' : LocLat G Qp LL O) (ι : LatHom T'.L T.L), Function.Injective ι.f ∧
-      LinearMap.range (W.map ι) = D' := by
+    (D' : Submodule W.EE (W.DD T))
+    (hφ : ∀ x ∈ D', W.φD T x ∈ D') (hγ : ∀ g, ∀ x ∈ D', W.γD T g x ∈ D')
+    : ∃ (T' : LocLat G Qp LL O) (ι : LatHom T'.L T.L),
+      Function.Injective ι.f ∧ LinearMap.range (W.map ι) = D' := by
   haveI := T.L.free
   haveI : Module.Finite O ↥T.L.T := Module.Finite.iff_fg.2 T.L.fg
   set U := Submodule.span RW (E.jD T '' (D' : Set (W.DD T))) with hU
-  have hUφ : ∀ x ∈ U, TWmap φR T x ∈ U := map_mem_span φR _ _ (by
-    rintro _ ⟨x, hx, rfl⟩
-    exact ⟨_, hφ x hx, E.jD_φ T x⟩)
-  have hUg : ∀ g, ∀ x ∈ U, TWact (gR g) T g x ∈ U := fun g => map_mem_span (gR g) _ _ (by
-    rintro _ ⟨x, hx, rfl⟩
-    exact ⟨_, hγ _ x hx, E.jD_act T g x⟩)
+  have hUφ : ∀ x ∈ U, TWmap φR T x ∈ U :=
+    map_mem_span φR _ _ (by
+      rintro _ ⟨x, hx, rfl⟩
+      exact ⟨_, hφ x hx, E.jD_φ T x⟩)
+  have hUg : ∀ g, ∀ x ∈ U, TWact (gR g) T g x ∈ U := fun g =>
+    map_mem_span (gR g) _ _ (by
+      rintro _ ⟨x, hx, rfl⟩
+      exact ⟨_, hγ _ x hx, E.jD_act T g x⟩)
   let S : Submodule O ↥T.L.T := (U.restrictScalars O).comap (TensorProduct.mk O RW ↥T.L.T 1)
   have hSm : ∀ t, t ∈ S ↔ (1 : RW) ⊗ₜ[O] t ∈ U := fun t => Iff.rfl
-  obtain ⟨T', ι, hι, hr⟩ := exists_subLat T S fun g x hx => by
-    have := hUg g _ ((hSm x).1 hx)
-    rw [hSm]
-    simpa [TWact] using this
+  obtain ⟨T', ι, hι, hr⟩ :=
+    exists_subLat T S fun g x hx => by
+      have := hUg g _ ((hSm x).1 hx)
+      rw [hSm]
+      simpa [TWact] using this
   have hspan : Submodule.span RW (E.jD T '' (LinearMap.range (W.map ι) : Set (W.DD T))) = U := by
     rw [span_range_map]
     apply le_antisymm
@@ -343,7 +383,6 @@ theorem exists_sub_of_tie [IsDomain O] [IsPrincipalIdealRing O]
     rw [hspan]
     exact Submodule.subset_span ⟨x, hx, rfl⟩
 
-
 end Generic
 
 section Concrete
@@ -357,14 +396,14 @@ theorem ideal_WCb (I : Ideal (WCb l)) : I ≤ Ideal.span {x | x ∈ I ∧ frobW 
     haveI := (GlobalTheory.TiltAlgClosed.isAlgClosed_tilt_and_valuationRing l).1
     infer_instance
   haveI : IsDiscreteValuationRing (WCb l) := WittVector.isDiscreteValuationRing (k := Cb l)
-  obtain ⟨k, hk⟩ := IsDiscreteValuationRing.ideal_eq_span_pow_irreducible hI
-    (WittVector.irreducible l (k := Cb l))
+  obtain ⟨k, hk⟩ :=
+    IsDiscreteValuationRing.ideal_eq_span_pow_irreducible hI (WittVector.irreducible l (k := Cb l))
   refine hk.le.trans (Ideal.span_mono ?_)
   rintro _ rfl
   exact ⟨hk ▸ Ideal.mem_span_singleton_self _, by rw [map_pow, map_natCast]⟩
 
-theorem ideal_RW (LL : FinExt l) (I : Ideal (RW LL)) (hI : ∀ x ∈ I, φRW LL x ∈ I) :
-    I ≤ Ideal.span {x | x ∈ I ∧ φRW LL x = x} :=
+theorem ideal_RW (LL : FinExt l) (I : Ideal (RW LL)) (hI : ∀ x ∈ I, φRW LL x ∈ I)
+    : I ≤ Ideal.span {x | x ∈ I ∧ φRW LL x = x} :=
   haveI := free_OL LL
   haveI := finite_OL LL
   ideal_le_span (frobW l) (GlobalTheory.ArtinSchreierWitt.main l).1 (fun I _ => ideal_WCb I) I hI
@@ -372,8 +411,8 @@ theorem ideal_RW (LL : FinExt l) (I : Ideal (RW LL)) (hI : ∀ x ∈ I, φRW LL 
 theorem torsionFree_RW (LL : FinExt l) (x : RW LL) (hx : (l : RW LL) * x = 0) : x = 0 := by
   classical
   haveI := free_OL LL
-  let e := TensorProduct.equivFinsuppOfBasisLeft (N := WCb l)
-    (Module.Free.chooseBasis ℤ_[l] ↥(OL LL))
+  let e :=
+    TensorProduct.equivFinsuppOfBasisLeft (N := WCb l) (Module.Free.chooseBasis ℤ_[l] ↥(OL LL))
   apply e.injective
   rw [e.map_zero]
   ext i : 1
@@ -384,10 +423,11 @@ theorem torsionFree_RW (LL : FinExt l) (x : RW LL) (hx : (l : RW LL) * x = 0) : 
   exact (mul_eq_zero.1 h).resolve_left (WittVector.irreducible l (k := Cb l)).ne_zero
 
 set_option synthInstance.maxHeartbeats 400000 in
-theorem faithfullyFlat_RW {P : LocPrime l} {AI : LocAinf l P} {H : LocHW l P} (E : LocFon l P AI H)
-    (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) :
-    letI := (E.E K s LL h).tie.ioE.toRingHom.toAlgebra
-    Module.FaithfullyFlat (H.W K s LL h).EE (RW LL) := by
+theorem faithfullyFlat_RW
+    {P : LocPrime l} {AI : LocAinf l P} {H : LocHW l P} (E : LocFon l P AI H)
+    (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL)
+    : letI := (E.E K s LL h).tie.ioE.toRingHom.toAlgebra
+      Module.FaithfullyFlat (H.W K s LL h).EE (RW LL) := by
   obtain ⟨hdvr, -, h0, h1, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
   have hp : (P.PD K).p = l := P.PD_p K
   exact faithfullyFlat_of_tie (E.E K s LL h).tie (by rw [hp]; exact h0) (by rw [hp]; exact h1)
@@ -395,16 +435,26 @@ theorem faithfullyFlat_RW {P : LocPrime l} {AI : LocAinf l P} {H : LocHW l P} (E
 
 end Concrete
 
-theorem exists_sublattice : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P) (H : LocHW l P) (E : LocFon l P AI H) (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (D' : Submodule (H.W K s LL h).EE ((H.W K s LL h).DD T)), (∀ x ∈ D', (H.W K s LL h).φD T x ∈ D') → (∀ g, ∀ x ∈ D', (H.W K s LL h).γD T g x ∈ D') → ∃ (T' : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (ι : LatHom T'.L T.L), Function.Injective ι.f ∧ LinearMap.range ((H.W K s LL h).map ι) = D' := by
+theorem exists_sublattice
+    : ∀ {l : ℕ} [Fact l.Prime] {P : LocPrime l} (AI : LocAinf l P) (H : LocHW l P)
+        (E : LocFon l P AI H) (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL)
+        (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL))
+        (D' : Submodule (H.W K s LL h).EE ((H.W K s LL h).DD T)),
+      (∀ x ∈ D', (H.W K s LL h).φD T x ∈ D') → (∀ g, ∀ x ∈ D', (H.W K s LL h).γD T g x ∈ D')
+        → ∃ (T' : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) (ι : LatHom T'.L T.L),
+          Function.Injective ι.f ∧ LinearMap.range ((H.W K s LL h).map ι) = D' := by
   intro l _ P AI H E K s LL h T D' hφ hγ
   obtain ⟨hdvr, -⟩ := GlobalTheory.Per.integers_completeDVR l LL
   exact exists_sub_of_tie (E.E K s LL h).tie (faithfullyFlat_RW E K s LL h)
     (GlobalTheory.WittTensorFixed.ring_fixed l LL).1 (ideal_RW LL) T
-    (fun b hb => ((GlobalTheory.WittTensorFixed.main l K LL T).2.1 b).1 hb) D' hφ hγ
+    (fun b hb => ((GlobalTheory.WittTensorFixed.main l K LL T).2.1 b).1 hb)
+    D' hφ hγ
 
-private theorem flat_of_inj {R A : Type} [CommRing R] [IsDomain R] [IsPrincipalIdealRing R]
-    [CommRing A] [IsDomain A] [Algebra R A] (h : Function.Injective (algebraMap R A)) :
-    Module.Flat R A := by
+private theorem flat_of_inj
+    {R A : Type}
+    [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [CommRing A] [IsDomain A] [Algebra R A]
+    (h : Function.Injective (algebraMap R A))
+    : Module.Flat R A := by
   haveI : FaithfulSMul R A := (faithfulSMul_iff_algebraMap_injective _ _).2 h
   infer_instance
 

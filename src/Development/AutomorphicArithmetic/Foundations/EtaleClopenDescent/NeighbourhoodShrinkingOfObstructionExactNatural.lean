@@ -9,12 +9,13 @@ noncomputable section
 open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace UpperTheory.Cb.MorphismProjectionLaws
-open LateralTheory.E.E4 LateralTheory.E.EtaleTopologySheaves LateralTheory.E.SecondDegreeKilling LateralTheory.E.Bridge_yfiPf
+open LateralTheory.E.E4 LateralTheory.E.EtaleTopologySheaves LateralTheory.E.SecondDegreeKilling
+  LateralTheory.E.Bridge_yfiPf
 
 variable {B W Y S T T' T'' : Scheme.{0}}
 
-private def mY (p : Y ⟶ B) (u : T ⟶ B) (u' : T' ⟶ B) (f : T ⟶ T') (h : f ≫ u' = u) :
-    pullback p u ⟶ pullback p u' :=
+private def mY (p : Y ⟶ B) (u : T ⟶ B) (u' : T' ⟶ B) (f : T ⟶ T') (h : f ≫ u' = u)
+    : pullback p u ⟶ pullback p u' :=
   pullback.map p u p u' (𝟙 Y) f (𝟙 B) (by simp) (by simp [h])
 
 private lemma mY_snd (p : Y ⟶ B) (u : T ⟶ B) (u' : T' ⟶ B) (f : T ⟶ T') (h : f ≫ u' = u) :
@@ -39,8 +40,8 @@ private lemma mY_id (p : Y ⟶ B) (u : T ⟶ B) (h : 𝟙 T ≫ u = u) : mY p u 
   · rw [mY_fst, Category.id_comp]
   · rw [mY_snd, Category.comp_id, Category.id_comp]
 
-private def mW (p : Y ⟶ B) (ι : W ⟶ B) (u : T ⟶ B) (u' : T' ⟶ B) (f : T ⟶ T') (h : f ≫ u' = u) :
-    pullback (pullback.snd p u ≫ u) ι ⟶ pullback (pullback.snd p u' ≫ u') ι :=
+private def mW (p : Y ⟶ B) (ι : W ⟶ B) (u : T ⟶ B) (u' : T' ⟶ B) (f : T ⟶ T') (h : f ≫ u' = u)
+    : pullback (pullback.snd p u ≫ u) ι ⟶ pullback (pullback.snd p u' ≫ u') ι :=
   pullback.map _ _ _ _ (mY p u u' f h) (𝟙 W) (𝟙 B)
     (by rw [Category.comp_id, reassoc_of% (mY_snd p u u' f h), h]) (by simp)
 
@@ -171,7 +172,8 @@ private lemma shrink (q : ℕ) (i : ℤ) (p : Y ⟶ B) (ι : W ⟶ B) (U U' : B.
 
 end UpperTheory.Cb.MorphismProjectionLaws
 
-theorem UpperTheory.Cb.neighbourhoodShrinking_of_obstructionExact_natural :
-    LateralTheory.E.NeighbourhoodKilling.ObsExact → LateralTheory.E.NeighbourhoodKilling.ObsNat → LateralTheory.E.GeoProof.Shrink := by
+theorem UpperTheory.Cb.neighbourhoodShrinking_of_obstructionExact_natural
+    : LateralTheory.E.NeighbourhoodKilling.ObsExact → LateralTheory.E.NeighbourhoodKilling.ObsNat
+      → LateralTheory.E.GeoProof.Shrink := by
   intro _ _ q _ i B W Y p ι U U' a m u' S
   exact UpperTheory.Cb.MorphismProjectionLaws.shrink q i p ι U U' a m u' S

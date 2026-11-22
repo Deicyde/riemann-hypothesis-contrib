@@ -9,8 +9,10 @@ open GlobalTheory.UnitDiscAlg
 
 namespace GlobalTheory.UnitDiscAlg
 
-theorem integ_det_le {E : Type} [NontriviallyNormedField E] [IsUltrametricDist E] {m : ℕ}
-    (y : Matrix (Fin m) (Fin m) E) (hy : ∀ i j, ‖y i j‖ ≤ 1) : ‖y.det‖ ≤ 1 := by
+theorem integ_det_le
+    {E : Type} [NontriviallyNormedField E] [IsUltrametricDist E]
+    {m : ℕ} (y : Matrix (Fin m) (Fin m) E) (hy : ∀ i j, ‖y i j‖ ≤ 1)
+    : ‖y.det‖ ≤ 1 := by
   rw [Matrix.det_apply]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one fun σ _ => ?_
   rw [Units.smul_def, zsmul_eq_mul, norm_mul, norm_prod]
@@ -19,10 +21,10 @@ theorem integ_det_le {E : Type} [NontriviallyNormedField E] [IsUltrametricDist E
   exact mul_le_one₀ hs (Finset.prod_nonneg fun _ _ => norm_nonneg _)
     (Finset.prod_le_one₀ (fun _ _ => norm_nonneg _) fun i _ => hy _ _)
 
-theorem isUnit_and_integ_inv_of_norm_det_eq_one :
-    ∀ (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E] (n : ℕ)
-      (x : Matrix (Fin n) (Fin n) E), (∀ i j, ‖x i j‖ ≤ 1) → ‖x.det‖ = 1 →
-      IsUnit x ∧ ∀ i j, ‖x⁻¹ i j‖ ≤ 1 := by
+theorem isUnit_and_integ_inv_of_norm_det_eq_one
+    : ∀ (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E] (n : ℕ)
+        (x : Matrix (Fin n) (Fin n) E),
+      (∀ i j, ‖x i j‖ ≤ 1) → ‖x.det‖ = 1 → IsUnit x ∧ ∀ i j, ‖x⁻¹ i j‖ ≤ 1 := by
   intro E _ _ n x hx hdet
   have hne : x.det ≠ 0 := by
     intro h

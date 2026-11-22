@@ -17,49 +17,55 @@ namespace GlobalTheory.HypOrbitUnique
 
 open PI.RhsWLim PI.RhsWLim.W PI.RhsWLim.W.HU PI.RhsWLim.W.MB
 
-theorem fubini_identity {G X : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G] [MeasurableInv G]
-    [MeasurableSpace X] (act : G → X → X) (hm : Measurable (Function.uncurry act))
+theorem fubini_identity
+    {G X : Type*}
+    [Group G] [MeasurableSpace G] [MeasurableMul G] [MeasurableInv G] [MeasurableSpace X]
+    (act : G → X → X) (hm : Measurable (Function.uncurry act))
     (hmul : ∀ g g' x, act (g * g') x = act g (act g' x)) (hone : ∀ x, act 1 x = x)
     (μ : Measure G) [SFinite μ] [μ.IsMulLeftInvariant] [μ.IsMulRightInvariant]
-    (Q : Measure X) [SFinite Q] (hQ : ∀ g, Q.map (act g) = Q) (x₀ : X)
-    (htr : ∀ᵐ x ∂Q, ∃ g, act g x₀ = x) {f h : X → ℝ≥0∞} (hf : Measurable f) (hh : Measurable h) :
-    (∫⁻ g, f (act g x₀) ∂μ) * ∫⁻ x, h x ∂Q = (∫⁻ x, f x ∂Q) * ∫⁻ g, h (act g⁻¹ x₀) ∂μ := by
+    (Q : Measure X) [SFinite Q]
+    (hQ : ∀ g, Q.map (act g) = Q)
+    (x₀ : X) (htr : ∀ᵐ x ∂Q, ∃ g, act g x₀ = x)
+    {f h : X → ℝ≥0∞} (hf : Measurable f) (hh : Measurable h)
+    : (∫⁻ g, f (act g x₀) ∂μ) * ∫⁻ x, h x ∂Q = (∫⁻ x, f x ∂Q) * ∫⁻ g, h (act g⁻¹ x₀) ∂μ := by
   have hmg : ∀ g, Measurable (act g) := fun g => hm.comp measurable_prodMk_left
   have hm1 : Measurable fun p : X × G => act p.2 p.1 := hm.comp measurable_swap
   have hm2 : Measurable fun p : G × X => act p.1⁻¹ p.2 :=
     hm.comp (measurable_fst.inv.prodMk measurable_snd)
-  calc (∫⁻ g, f (act g x₀) ∂μ) * ∫⁻ x, h x ∂Q
+  calc
+    (∫⁻ g, f (act g x₀) ∂μ) * ∫⁻ x, h x ∂Q
       = ∫⁻ x, (∫⁻ g, f (act g x₀) ∂μ) * h x ∂Q := (lintegral_const_mul _ hh).symm
     _ = ∫⁻ x, ∫⁻ g, f (act g x) * h x ∂μ ∂Q := by
-        refine lintegral_congr_ae (htr.mono ?_)
-        rintro x ⟨p, rfl⟩
-        have hmx : Measurable fun g => f (act g (act p x₀)) := hf.comp (hm.comp measurable_prodMk_right)
-        simp only
-        rw [lintegral_mul_const _ hmx]
-        congr 1
-        simp_rw [← hmul]
-        exact (lintegral_mul_right_eq_self (fun g => f (act g x₀)) p).symm
+      refine lintegral_congr_ae (htr.mono ?_)
+      rintro x ⟨p, rfl⟩
+      have hmx : Measurable fun g => f (act g (act p x₀)) :=
+        hf.comp (hm.comp measurable_prodMk_right)
+      simp only
+      rw [lintegral_mul_const _ hmx]
+      congr 1
+      simp_rw [← hmul]
+      exact (lintegral_mul_right_eq_self (fun g => f (act g x₀)) p).symm
     _ = ∫⁻ g, ∫⁻ x, f (act g x) * h x ∂Q ∂μ :=
-        lintegral_lintegral_swap ((hf.comp hm1).mul (hh.comp measurable_fst)).aemeasurable
+      lintegral_lintegral_swap ((hf.comp hm1).mul (hh.comp measurable_fst)).aemeasurable
     _ = ∫⁻ g, ∫⁻ x, f x * h (act g⁻¹ x) ∂Q ∂μ := by
-        refine lintegral_congr fun g => ?_
-        conv_rhs => rw [← hQ g]
-        rw [lintegral_map (f := fun x => f x * h (act g⁻¹ x)) (hf.mul (hh.comp (hmg g⁻¹))) (hmg g)]
-        refine lintegral_congr fun x => ?_
-        rw [← hmul, inv_mul_cancel, hone]
+      refine lintegral_congr fun g => ?_
+      conv_rhs => rw [← hQ g]
+      rw [lintegral_map (f := fun x => f x * h (act g⁻¹ x)) (hf.mul (hh.comp (hmg g⁻¹))) (hmg g)]
+      refine lintegral_congr fun x => ?_
+      rw [← hmul, inv_mul_cancel, hone]
     _ = ∫⁻ x, ∫⁻ g, f x * h (act g⁻¹ x) ∂μ ∂Q :=
-        lintegral_lintegral_swap ((hf.comp measurable_snd).mul (hh.comp hm2)).aemeasurable
+      lintegral_lintegral_swap ((hf.comp measurable_snd).mul (hh.comp hm2)).aemeasurable
     _ = ∫⁻ x, f x * ∫⁻ g, h (act g⁻¹ x₀) ∂μ ∂Q := by
-        refine lintegral_congr_ae (htr.mono ?_)
-        rintro x ⟨p, rfl⟩
-        have hmx : Measurable fun g : G => h (act g⁻¹ (act p x₀)) :=
-          hh.comp (hm2.comp measurable_prodMk_right)
-        simp only
-        rw [lintegral_const_mul _ hmx]
-        congr 1
-        rw [← lintegral_mul_left_eq_self (fun g : G => h (act g⁻¹ x₀)) p⁻¹]
-        refine lintegral_congr fun g => ?_
-        rw [← hmul, _root_.mul_inv_rev, inv_inv]
+      refine lintegral_congr_ae (htr.mono ?_)
+      rintro x ⟨p, rfl⟩
+      have hmx : Measurable fun g : G => h (act g⁻¹ (act p x₀)) :=
+        hh.comp (hm2.comp measurable_prodMk_right)
+      simp only
+      rw [lintegral_const_mul _ hmx]
+      congr 1
+      rw [← lintegral_mul_left_eq_self (fun g : G => h (act g⁻¹ x₀)) p⁻¹]
+      refine lintegral_congr fun g => ?_
+      rw [← hmul, _root_.mul_inv_rev, inv_inv]
     _ = _ := lintegral_mul_const _ hf
 
 variable {k r : ℕ}
@@ -102,8 +108,8 @@ theorem continuous_act : Continuous (Function.uncurry (act (k := k) (r := r))) :
 theorem act_mul (g g' : Gp k r) (p : (Fin k → ℂ) × ℂ) : act (g * g') p = act g (act g' p) := by
   unfold act
   have e : (Matrix.of (inc (g * g')) : Mat k r) = Matrix.of (inc g) * Matrix.of (inc g') := rfl
-  rw [e, op_uwb_eq_emb (inc_mem g), op_uwb_eq_emb (inc_mem g'), ← emb_mul, opAct_emb, opAct_emb, opAct_emb,
-    blkAct_mul]
+  rw [e, op_uwb_eq_emb (inc_mem g), op_uwb_eq_emb (inc_mem g'), ← emb_mul, opAct_emb, opAct_emb,
+    opAct_emb, blkAct_mul]
 
 theorem act_one (p : (Fin k → ℂ) × ℂ) : act (1 : Gp k r) p = p := by
   have e : (Matrix.of (inc (1 : Gp k r)) : Mat k r) = 1 := rfl
@@ -122,8 +128,8 @@ theorem act_pt (T' : ℝ) (g : Gp k r) : act g (pt k T') = opOrb k r T' (inc g) 
   unfold act opAct opOrb
   rw [opVec_pt]
 
-theorem act_trans {T' : ℝ} (hT : 0 < T') {x : (Fin k → ℂ) × ℂ} (hx : x ∈ hypS k T') :
-    ∃ g : Gp k r, act g (pt k T') = x := by
+theorem act_trans {T' : ℝ} (hT : 0 < T') {x : (Fin k → ℂ) × ℂ} (hx : x ∈ hypS k T')
+    : ∃ g : Gp k r, act g (pt k T') = x := by
   have hTz : Tz k r (opVec k r x) = T' := by
     unfold Tz
     rw [herm_wb _ _ (opVec_inWb x)]
@@ -137,11 +143,15 @@ theorem act_trans {T' : ℝ} (hT : 0 < T') {x : (Fin k → ℂ) × ℂ} (hx : x 
   show opCo k r (p *ᵥ ((Real.sqrt T' : ℂ) • wLast k r)) = x
   rw [hpz, opCo_opVec]
 
-theorem entry_bound {μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hμ : μᴴ * Hb k * μ = Hb k) (i j : Fin (k + 1)) :
-    Complex.normSq (μ i j) ≤ 1 + Complex.normSq (μ (Fin.last k) (Fin.last k)) := by
-  have col : ∀ {ν : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ}, νᴴ * Hb k * ν = Hb k → ∀ j,
-      ∑ l : Fin k, Complex.normSq (ν l.castSucc j) - Complex.normSq (ν (Fin.last k) j) =
-        if j = Fin.last k then -1 else 1 := by
+theorem entry_bound
+    {μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hμ : μᴴ * Hb k * μ = Hb k) (i j : Fin (k + 1))
+    : Complex.normSq (μ i j) ≤ 1 + Complex.normSq (μ (Fin.last k) (Fin.last k)) := by
+  have col
+      : ∀ {ν : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ},
+        νᴴ * Hb k * ν = Hb k
+          → ∀ j,
+            ∑ l : Fin k, Complex.normSq (ν l.castSucc j) - Complex.normSq (ν (Fin.last k) j)
+              = if j = Fin.last k then -1 else 1 := by
     intro ν hν j
     have h := form_apply ν j j
     rw [hν] at h
@@ -152,39 +162,51 @@ theorem entry_bound {μ : Matrix (Fin (k + 1)) (Fin (k + 1)) ℂ} (hμ : μᴴ *
     split_ifs <;> simp
   have hsq : Hb k * Hb k = 1 := by
     rw [Hb, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
-    congr 1; funext j; split_ifs <;> norm_num
+    congr 1
+    funext j
+    split_ifs <;> norm_num
   have hμ' : (μᴴ)ᴴ * Hb k * μᴴ = Hb k := by
     have h1 : μ * (Hb k * μᴴ * Hb k) = 1 := mul_eq_one_comm.1 (hb_inv_mul hμ)
     rw [conjTranspose_conjTranspose]
-    calc μ * Hb k * μᴴ = μ * (Hb k * μᴴ * Hb k) * Hb k := by
-          simp only [Matrix.mul_assoc]; rw [hsq, Matrix.mul_one]
+    calc
+      μ * Hb k * μᴴ
+        = μ * (Hb k * μᴴ * Hb k) * Hb k := by simp only [Matrix.mul_assoc]; rw [hsq, Matrix.mul_one]
       _ = Hb k := by rw [h1, Matrix.one_mul]
-  have row : ∀ j, Complex.normSq (μ (Fin.last k) j) ≤ Complex.normSq (μ (Fin.last k) (Fin.last k)) := by
+  have row
+      : ∀ j, Complex.normSq (μ (Fin.last k) j) ≤ Complex.normSq (μ (Fin.last k) (Fin.last k)) := by
     intro j
     refine Fin.lastCases le_rfl (fun j => ?_) j
     have h := col hμ' (Fin.last k)
     simp only [conjTranspose_apply, if_true, Complex.star_def, Complex.normSq_conj] at h
-    have := Finset.single_le_sum (f := fun l : Fin k => Complex.normSq (μ (Fin.last k) l.castSucc))
-      (fun l _ => Complex.normSq_nonneg _) (Finset.mem_univ j)
+    have :=
+      Finset.single_le_sum
+        (f := fun l : Fin k => Complex.normSq (μ (Fin.last k) l.castSucc))
+        (fun l _ => Complex.normSq_nonneg _)
+        (Finset.mem_univ j)
     linarith
   refine Fin.lastCases (by linarith [row j]) (fun i => ?_) i
   have h := col hμ j
-  have := Finset.single_le_sum (f := fun l : Fin k => Complex.normSq (μ l.castSucc j))
-    (fun l _ => Complex.normSq_nonneg _) (Finset.mem_univ i)
+  have :=
+    Finset.single_le_sum
+      (f := fun l : Fin k => Complex.normSq (μ l.castSucc j))
+      (fun l _ => Complex.normSq_nonneg _)
+      (Finset.mem_univ i)
   have h2 := row j
   split_ifs at h <;> linarith
 
 theorem inc_closedEmbedding : IsClosedEmbedding (inc : Gp k r → Mt k r) :=
   amb_closed.isClosedEmbedding_subtypeVal
 
-theorem orbit_proper {T' : ℝ} (hT : 0 < T') (R : ℝ) :
-    ∃ K : Set (Gp k r), IsCompact K ∧ ∀ g, act g (pt k T') ∈ Metric.closedBall 0 R → g ∈ K := by
-  refine ⟨inc ⁻¹' Metric.closedBall 0 (Real.sqrt (1 + R ^ 2 / T')),
-    inc_closedEmbedding.isCompact_preimage (isCompact_closedBall _ _), fun g hg => ?_⟩
+theorem orbit_proper {T' : ℝ} (hT : 0 < T') (R : ℝ)
+    : ∃ K : Set (Gp k r), IsCompact K ∧ ∀ g, act g (pt k T') ∈ Metric.closedBall 0 R → g ∈ K := by
+  refine ⟨
+    inc ⁻¹' Metric.closedBall 0 (Real.sqrt (1 + R ^ 2 / T')),
+    inc_closedEmbedding.isCompact_preimage (isCompact_closedBall _ _),
+    fun g hg => ?_
+  ⟩
   set μ := (Matrix.of (inc g) : Mat k r).submatrix (wI k r) (wI k r) with hμdef
   have he : (Matrix.of (inc g) : Mat k r) = embWb k r μ := op_uwb_eq_emb (inc_mem g)
-  have hμ : μᴴ * Hb k * μ = Hb k := by
-    rw [← emb_mem (r := r), ← he]; exact (inc_mem g).1
+  have hμ : μᴴ * Hb k * μ = Hb k := by rw [← emb_mem (r := r), ← he]; exact (inc_mem g).1
   have hlast : Complex.normSq (μ (Fin.last k) (Fin.last k)) ≤ R ^ 2 / T' := by
     rw [mem_closedBall_zero_iff] at hg
     have h2 : ‖(act g (pt k T')).2‖ ≤ R := (norm_snd_le _).trans hg
@@ -222,8 +244,10 @@ theorem orbit_proper {T' : ℝ} (hT : 0 < T') (R : ℝ) :
   rw [← Complex.normSq_eq_norm_sq]
   exact hent i j
 
-theorem pull_right (ν : Measure (Mt k r)) (hc : ν {x | Matrix.of x ∉ UWb k r} = 0)
-    (h : ∀ p ∈ UWb k r, ν.map (rmulM p) = ν) : (pull ν).IsMulRightInvariant := by
+theorem pull_right
+    (ν : Measure (Mt k r))
+    (hc : ν {x | Matrix.of x ∉ UWb k r} = 0) (h : ∀ p ∈ UWb k r, ν.map (rmulM p) = ν)
+    : (pull ν).IsMulRightInvariant := by
   refine ⟨fun g => ?_⟩
   apply inc_memb.map_injective
   have e : (inc : Gp k r → Mt k r) ∘ (fun x => x * g) = rmulM (Matrix.of (inc g)) ∘ inc := rfl
@@ -231,16 +255,18 @@ theorem pull_right (ν : Measure (Mt k r)) (hc : ν {x | Matrix.of x ∉ UWb k r
   rw [Measure.map_map inc_memb.measurable (continuous_mul_const g).measurable, e,
     ← Measure.map_map (rmulM_cont _).measurable inc_memb.measurable, map_pull ν hc, h _ (inc_mem g)]
 
-theorem pull_compact (ν : Measure (Mt k r)) (hG : IsGaugeOn k r (UWb k r) ν) {K : Set (Gp k r)}
-    (hK : IsCompact K) : pull ν K ≠ ⊤ := by
+theorem pull_compact
+    (ν : Measure (Mt k r)) (hG : IsGaugeOn k r (UWb k r) ν) {K : Set (Gp k r)} (hK : IsCompact K)
+    : pull ν K ≠ ⊤ := by
   obtain ⟨ρ, h0, ht⟩ := gauge_ball ν hG
   obtain ⟨⟨hσ, hne, hc, hl⟩, -⟩ := hG
   haveI : LocallyCompactSpace (Gp k r) := inc_closedEmbedding.locallyCompactSpace
   haveI : T2Space (Gp k r) := inc_closedEmbedding.isEmbedding.t2Space
   haveI := pull_sigmaFinite ν
   haveI := pull_left ν hl
-  have key := measure_eq_div_smul (Measure.haar : Measure (Gp k r)) (pull ν) (s := inc ⁻¹' bBall k r ρ)
-    (by rw [pull_apply ν hc]; exact h0.ne') (by rw [pull_apply ν hc]; exact ht.ne)
+  have key :=
+    measure_eq_div_smul (Measure.haar : Measure (Gp k r)) (pull ν) (s := inc ⁻¹' bBall k r ρ)
+      (by rw [pull_apply ν hc]; exact h0.ne') (by rw [pull_apply ν hc]; exact ht.ne)
   set c := (Measure.haar : Measure (Gp k r)) (inc ⁻¹' bBall k r ρ) / pull ν (inc ⁻¹' bBall k r ρ)
   have hc0 : c ≠ 0 := by
     intro h
@@ -279,13 +305,15 @@ theorem orbRepY : OrbRepY := by
   set b := ∫⁻ g : Gp k r, C.indicator 1 (act g⁻¹ (pt k T')) ∂(pull νg) with hb
   have key : ∀ E, MeasurableSet E → νg.map (opOrb k r T') E * Q C = Q E * b := by
     intro E hE
-    have h := fubini_identity act continuous_act.measurable act_mul act_one (pull νg) Q
-      (fun g => hQ _ (inc_mem g)) (pt k T') htr (measurable_one.indicator hE) (measurable_one.indicator hCm)
+    have h :=
+      fubini_identity act continuous_act.measurable act_mul act_one (pull νg) Q
+        (fun g => hQ _ (inc_mem g))
+        (pt k T') htr (measurable_one.indicator hE) (measurable_one.indicator hCm)
     rw [lintegral_indicator_one hE, lintegral_indicator_one hCm] at h
     rw [← h]
     congr 1
-    rw [← lintegral_indicator_one hE, ← map_pull νg hc, lintegral_map (measurable_one.indicator hE) hom,
-      inc_memb.lintegral_map, map_pull νg hc]
+    rw [← lintegral_indicator_one hE, ← map_pull νg hc,
+      lintegral_map (measurable_one.indicator hE) hom, inc_memb.lintegral_map, map_pull νg hc]
     simp_rw [act_pt]
   have hbt : b ≠ ⊤ := by
     open scoped Pointwise in
@@ -307,7 +335,7 @@ theorem orbRepY : OrbRepY := by
     · exact hR h
   refine ⟨Q C / b, (ENNReal.div_lt_top hRt hb0).ne, ?_⟩
   ext E hE
-  rw [Measure.smul_apply, smul_eq_mul, div_eq_mul_inv, mul_right_comm, mul_comm (Q C), key E hE, mul_assoc,
-    ENNReal.mul_inv_cancel hb0 hbt, mul_one]
+  rw [Measure.smul_apply, smul_eq_mul, div_eq_mul_inv, mul_right_comm, mul_comm (Q C), key E hE,
+    mul_assoc, ENNReal.mul_inv_cancel hb0 hbt, mul_one]
 
 end GlobalTheory.HypOrbitUnique

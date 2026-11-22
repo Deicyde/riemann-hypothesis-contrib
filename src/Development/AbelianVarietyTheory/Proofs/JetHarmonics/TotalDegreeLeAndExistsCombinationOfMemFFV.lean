@@ -13,9 +13,15 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsInte
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
-open ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm Formalism.MainNotions.ModuliIntegralCharts.H1 Formalism.MainNotions.ModuliIntegralCharts.H1.ExpBijectiveUniformisation Formalism.MainNotions.ModuliIntegralCharts.H1.GSt
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.DVR.QForm
+  Formalism.MainNotions.ModuliIntegralCharts.H1
+  Formalism.MainNotions.ModuliIntegralCharts.H1.ExpBijectiveUniformisation
+  Formalism.MainNotions.ModuliIntegralCharts.H1.GSt
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.PowGerm GlobalTheory.PtTie
@@ -23,8 +29,16 @@ open ReciprocityTheory.ChartRestriction.G.TB (colM dAct)
 
 namespace GlobalTheory
 
-theorem totalDegree_le_and_exists_combination_of_mem_FFV :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), letI := H.starRing; ∀ (T : CDVR) (io : c.F →+* T.Fr) (a : ((E →+* ℂ) × ℕ → ℕ)) (n : ℕ), ∀ P₀ ∈ FFV (Dw := Dw) T a n, P₀.totalDegree ≤ DF Dw a ∧ ∃ (k : ℕ) (cf : Fin k → T.V) (Pi : Fin k → MvPolynomial (LtN Dw n) c.F), (∀ i, Pi i ∈ harmA c a n) ∧ P₀ = ∑ i, algebraMap T.V T.Fr (cf i) • MvPolynomial.map io (Pi i) := by
+theorem totalDegree_le_and_exists_combination_of_mem_FFV
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l),
+      letI := H.starRing
+      ∀ (T : CDVR) (io : c.F →+* T.Fr) (a : ((E →+* ℂ) × ℕ → ℕ)) (n : ℕ),
+        ∀ P₀ ∈ FFV (Dw := Dw) T a n,
+          P₀.totalDegree ≤ DF Dw a
+            ∧ ∃ (k : ℕ) (cf : Fin k → T.V) (Pi : Fin k → MvPolynomial (LtN Dw n) c.F),
+              (∀ i, Pi i ∈ harmA c a n)
+                ∧ P₀ = ∑ i, algebraMap T.V T.Fr (cf i) • MvPolynomial.map io (Pi i) := by
   intro E _ _ _ H Dw l Xo c
   letI := H.starRing
   intro T io a n P₀ hP
@@ -36,13 +50,24 @@ theorem totalDegree_le_and_exists_combination_of_mem_FFV :
     refine Finset.sum_congr rfl fun σ _ => ?_
     rw [Fintype.sum_prod_type]
     exact Finset.sum_congr rfl fun i _ => hP.1.2.2 m hm σ i
-  · obtain ⟨s, cf, Q, hcf, hQ, hs⟩ := GlobalTheory.exists_integral_combination_of_mem_HaO (E →+* ℂ) Dw.mult n ℤ ℚ T.Fr
-      (Rat.castHom T.Fr) (algebraMap T.V T.Fr).range (fun x => ⟨(x : T.V), by simp⟩)
-      ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) P₀ hP
+  · obtain ⟨s, cf, Q, hcf, hQ, hs⟩ :=
+      GlobalTheory.exists_integral_combination_of_mem_HaO (E →+* ℂ) Dw.mult n ℤ ℚ T.Fr
+        (Rat.castHom T.Fr) (algebraMap T.V T.Fr).range
+        (fun x => ⟨(x : T.V), by simp⟩)
+        ComplexEmbedding.conjugate (InPsi H)
+        (fun τ i => a (τ, i))
+        P₀ hP
     choose cf' hcf' using hcf
     refine ⟨s, cf', fun i => MvPolynomial.map (Rat.castHom c.F) (Q i), fun i => ?_, ?_⟩
     · obtain ⟨⟨h1, h2, h3⟩, h4⟩ := hQ i
-      refine ⟨⟨PullbackSections.harmK_map _ h1, PullbackSections.rowInv_map _ h2, PullbackSections.rowDeg_map _ h3⟩, fun m => ?_⟩
+      refine ⟨
+        ⟨
+          PullbackSections.harmK_map _ h1,
+          PullbackSections.rowInv_map _ h2,
+          PullbackSections.rowDeg_map _ h3
+        ⟩,
+        fun m => ?_
+      ⟩
       rw [MvPolynomial.coeff_map]
       obtain ⟨z, hz⟩ := h4 m
       rw [← hz]

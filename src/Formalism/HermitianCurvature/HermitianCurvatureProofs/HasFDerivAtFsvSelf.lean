@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P5
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q Formalism.FourierDecayAlt.Wd
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.Q
+  Formalism.FourierDecayAlt.Wd
 
 theorem contDiff_fsv (s : ℂ) : ContDiff ℝ ∞ (fsv s) := by
   have hL : ContDiff ℝ ∞ (fun t : ℂ => s * t - conj s * conj t) :=

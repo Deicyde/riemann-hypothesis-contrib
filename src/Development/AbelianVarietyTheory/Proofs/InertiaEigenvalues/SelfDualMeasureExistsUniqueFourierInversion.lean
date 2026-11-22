@@ -16,26 +16,30 @@ namespace GlobalTheory.JR.SelfDualUniq
 
 variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [MeasurableSpace V]
 
-theorem fourB_nnsmul (μ : Measure V) (c : NNReal) (B : V → V → ℂ) (f : V → ℂ) (y : V) :
-    fourB (c • μ) B f y = ((c : ℝ) : ℂ) * fourB μ B f y := by
+theorem fourB_nnsmul (μ : Measure V) (c : NNReal) (B : V → V → ℂ) (f : V → ℂ) (y : V)
+    : fourB (c • μ) B f y = ((c : ℝ) : ℂ) * fourB μ B f y := by
   simp only [fourB, integral_smul_nnreal_measure]
   rw [NNReal.smul_def, Complex.real_smul]
 
-theorem fourB_const_mul (μ : Measure V) (a : ℂ) (B : V → V → ℂ) (g : V → ℂ) (y : V) :
-    fourB μ B (fun z => a * g z) y = a * fourB μ B g y := by
+theorem fourB_const_mul (μ : Measure V) (a : ℂ) (B : V → V → ℂ) (g : V → ℂ) (y : V)
+    : fourB μ B (fun z => a * g z) y = a * fourB μ B g y := by
   simp only [fourB, mul_assoc]
   exact integral_const_mul a _
 
-theorem selfDual_unique [IsTopologicalAddGroup V] [T2Space V] [LocallyCompactSpace V]
-    [SecondCountableTopology V] [BorelSpace V] {B : V → V → ℂ} {μ ν : Measure V}
-    (hμ : SelfDual μ B) (hν : SelfDual ν B) (f : V → ℂ) (hf : IsTest f) (h0 : f 0 ≠ 0) : ν = μ := by
+theorem selfDual_unique
+    [IsTopologicalAddGroup V] [T2Space V] [LocallyCompactSpace V] [SecondCountableTopology V]
+    [BorelSpace V]
+    {B : V → V → ℂ} {μ ν : Measure V} (hμ : SelfDual μ B) (hν : SelfDual ν B)
+    (f : V → ℂ) (hf : IsTest f) (h0 : f 0 ≠ 0)
+    : ν = μ := by
   obtain ⟨hμH, hμI⟩ := hμ
   obtain ⟨hνH, hνI⟩ := hν
   have hc := Measure.isAddLeftInvariant_eq_smul ν μ
   set c := Measure.addHaarScalarFactor ν μ
   have key := hνI f hf 0
   rw [hc] at key
-  have e : fourB (c • μ) B f = fun y => ((c : ℝ) : ℂ) * fourB μ B f y := funext (fourB_nnsmul μ c B f)
+  have e : fourB (c • μ) B f = fun y => ((c : ℝ) : ℂ) * fourB μ B f y :=
+    funext (fourB_nnsmul μ c B f)
   rw [e, fourB_nnsmul, fourB_const_mul, hμI f hf 0, neg_zero] at key
   have hsq : (((c : ℝ) : ℂ) * ((c : ℝ) : ℂ) - 1) * f 0 = 0 := by linear_combination key
   have h1 : ((c : ℝ) : ℂ) * ((c : ℝ) : ℂ) = 1 := by
@@ -50,12 +54,15 @@ end GlobalTheory.JR.SelfDualUniq
 
 namespace GlobalTheory.JR.SelfDualUniq
 
-theorem isTest_fourB {F : Type} [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F]
+theorem isTest_fourB
+    {F : Type} [NontriviallyNormedField F] [IsUltrametricDist F] [LocallyCompactSpace F]
     (ψ : AddChar F ℂ) (hψ : IsStdChar ψ)
-    (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V] [IsModuleTopology F V]
-    [MeasurableSpace V] [BorelSpace V] (β : LinearMap.BilinForm F V) (hs : β.IsSymm) (hn : β.Nondegenerate)
-    (μ : Measure V) [μ.IsAddHaarMeasure] (f : V → ℂ) (hf : IsTest f) :
-    IsTest (fourB μ (fun x y => ψ (β x y)) f) := by
+    (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V]
+    [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V]
+    (β : LinearMap.BilinForm F V) (hs : β.IsSymm) (hn : β.Nondegenerate)
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (f : V → ℂ) (hf : IsTest f)
+    : IsTest (fourB μ (fun x y => ψ (β x y)) f) := by
   obtain ⟨_, _, _, _, -⟩ := EtMeas.top_facts F V
   obtain ⟨-, hl⟩ := GlobalTheory.JR.exists_small_dual_lattices F ψ hψ V β hs hn
   obtain ⟨U, hU, hUinv⟩ := AbsInv.exists_nhds_invariant hf
@@ -65,7 +72,8 @@ theorem isTest_fourB {F : Type} [NontriviallyNormedField F] [IsUltrametricDist F
   have hev : ∀ᶠ w in 𝓝 (0 : V), ∀ x ∈ tsupport f, ψ (β x w) = 1 := by
     refine hf.2.isCompact.eventually_forall_of_forall_eventually fun x _ => ?_
     have hc : Continuous (fun z : V × V => β z.2 z.1) := hβ.comp continuous_swap
-    have ho : IsOpen {z : V × V | ‖β z.2 z.1‖ < 1} := isOpen_lt (continuous_norm.comp hc) continuous_const
+    have ho : IsOpen {z : V × V | ‖β z.2 z.1‖ < 1} :=
+      isOpen_lt (continuous_norm.comp hc) continuous_const
     have hmem : ((0 : V), x) ∈ {z : V × V | ‖β z.2 z.1‖ < 1} := by simp
     filter_upwards [ho.mem_nhds hmem] with z hz
     exact hψ.1 _ hz.le
@@ -92,7 +100,16 @@ theorem isTest_fourB {F : Type} [NontriviallyNormedField F] [IsUltrametricDist F
     simp only [map_add (f := _), LinearMap.add_apply, AddChar.map_add_eq_mul, hUinv M hMU x m hm]
     ring
 
-theorem selfDual_exists_unique_isTest : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E] [StarRing E] [Unram F E] (ψ : AddChar F ℂ), IsStdChar ψ → ∀ (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V] [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V] (β : LinearMap.BilinForm F V), β.IsSymm → β.Nondegenerate → (∃! μ : Measure V, SelfDual μ (fun x y => ψ (β x y))) ∧ ∀ μ : Measure V, μ.IsAddHaarMeasure → ∀ f, IsTest f → IsTest (fourB μ (fun x y => ψ (β x y)) f) := by
+theorem selfDual_exists_unique_isTest
+    : ∀ (F E : Type) [NontriviallyNormedField F] [NontriviallyNormedField E] [NormedAlgebra F E]
+        [StarRing E] [Unram F E] (ψ : AddChar F ℂ),
+      IsStdChar ψ
+        → ∀ (V : Type) [AddCommGroup V] [Module F V] [Module.Finite F V] [TopologicalSpace V]
+            [IsModuleTopology F V] [MeasurableSpace V] [BorelSpace V] (β : LinearMap.BilinForm F V),
+          β.IsSymm → β.Nondegenerate
+            → (∃! μ : Measure V, SelfDual μ (fun x y => ψ (β x y)))
+              ∧ ∀ μ : Measure V,
+                μ.IsAddHaarMeasure → ∀ f, IsTest f → IsTest (fourB μ (fun x y => ψ (β x y)) f) := by
   intro F E _ _ _ _ hU ψ hψ V _ _ _ _ _ _ _ β hs hn
   haveI := hU.ultraF
   haveI := hU.lcF
@@ -101,8 +118,10 @@ theorem selfDual_exists_unique_isTest : ∀ (F E : Type) [NontriviallyNormedFiel
   obtain ⟨M, N, -, hMo, hMc, -, -, -, -⟩ := hl Set.univ Filter.univ_mem
   have hM1 : IsClopen (M : Set V) := ⟨AddSubgroup.isClosed_of_isOpen M hMo, hMo⟩
   set f : V → ℂ := ⇑(LocallyConstant.charFn ℂ hM1) with hfdef
-  have hf : IsTest f := ⟨(LocallyConstant.charFn ℂ hM1).isLocallyConstant,
-    HasCompactSupport.intro hMc fun x hx => by simp [f, LocallyConstant.coe_charFn, hx]⟩
+  have hf : IsTest f := ⟨
+    (LocallyConstant.charFn ℂ hM1).isLocallyConstant,
+    HasCompactSupport.intro hMc fun x hx => by simp [f, LocallyConstant.coe_charFn, hx]
+  ⟩
   have hf0 : f 0 ≠ 0 := by simp [f, LocallyConstant.coe_charFn, M.zero_mem]
   refine ⟨?_, fun μ hμ g hg => isTest_fourB ψ hψ V β hs hn μ g hg⟩
   obtain ⟨μ, hμ⟩ := EtMeas.exists_selfDual F ψ hψ V β hs hn

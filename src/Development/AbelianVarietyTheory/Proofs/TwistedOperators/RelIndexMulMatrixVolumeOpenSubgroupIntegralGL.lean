@@ -6,15 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IsMulLeft
 
 @[expose] public section
 
-open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Doubling GlobalTheory.GLDoubling GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition GlobalTheory.SatakeBound
+open MeasureTheory ValuativeRel Matrix GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL
+  GlobalTheory.Doubling GlobalTheory.GLDoubling
+  GlobalTheory.IndefiniteRowSideFullHecke.VolumeFlatSection GlobalTheory.ZonalCellDecomposition
+  GlobalTheory.SatakeBound
 open scoped Pointwise
 
 namespace GlobalTheory.IndexVolume
 
-theorem relIndex_mul_measure_subgroup {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
+theorem relIndex_mul_measure_subgroup
+    {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
     (H L : Subgroup G) (hHL : H ≤ L) [(H.subgroupOf L).FiniteIndex]
-    (hH : MeasurableSet (H : Set G)) (μ : Measure G) [μ.IsMulLeftInvariant] :
-    (H.relIndex L : ENNReal) * μ H = μ L := by
+    (hH : MeasurableSet (H : Set G))
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    : (H.relIndex L : ENNReal) * μ H = μ L := by
   obtain ⟨s, hs, -⟩ := (H.subgroupOf L).exists_isComplement_left 1
   have hs' : Finite s := hs.finite_left_iff.mpr inferInstance
   have hU : (⋃ a : s, (a.val : L) • (H : Set G)) = (L : Set G) := by
@@ -36,42 +41,52 @@ theorem relIndex_mul_measure_subgroup {G : Type*} [Group G] [MeasurableSpace G] 
     have hh1' : (⟨h1, hHL hh1⟩ : L) ∈ H.subgroupOf L := Subgroup.mem_subgroupOf.mpr hh1
     have hh2' : (⟨h2, hHL hh2⟩ : L) ∈ H.subgroupOf L := Subgroup.mem_subgroupOf.mpr hh2
     have e : (a.val : L) * ⟨h1, hHL hh1⟩ = (b.val : L) * ⟨h2, hHL hh2⟩ := Subtype.ext he.symm
-    have := (hs.existsUnique ((a.val : L) * ⟨h1, hHL hh1⟩)).unique
-      (y₁ := (a, ⟨_, hh1'⟩)) (y₂ := (b, ⟨_, hh2'⟩)) rfl e.symm
+    have :=
+      (hs.existsUnique ((a.val : L) * ⟨h1, hHL hh1⟩)).unique (y₁ := (a, ⟨_, hh1'⟩))
+        (y₂ := (b, ⟨_, hh2'⟩)) rfl e.symm
     exact congrArg Prod.fst this
-  calc (H.relIndex L : ENNReal) * μ H = ∑' a : s, μ ((a.val : L) • (H : Set G)) := by
-        simp [measure_smul, hs.encard_left, Subgroup.relIndex]
+  calc
+    (H.relIndex L : ENNReal) * μ H = ∑' a : s, μ ((a.val : L) • (H : Set G)) := by
+      simp [measure_smul, hs.encard_left, Subgroup.relIndex]
     _ = μ (⋃ a : s, (a.val : L) • (H : Set G)) :=
-        (measure_iUnion hdisj fun a => hH.const_smul _).symm
+      (measure_iUnion hdisj fun a => hH.const_smul _).symm
     _ = μ L := by rw [hU]
 
-theorem volGL_of_subset_KO {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] {n : Type} [Fintype n] [DecidableEq n]
-    (ν : Measure k) (s : Set (GL n k)) (hs : MeasurableSet s) (hK : s ⊆ KO k n) :
-    volGL ν n s = volM ν n n (Units.val '' s) := by
+theorem volGL_of_subset_KO
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    [MeasurableSpace k] [BorelSpace k]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (ν : Measure k)
+    (s : Set (GL n k)) (hs : MeasurableSet s) (hK : s ⊆ KO k n)
+    : volGL ν n s = volM ν n n (Units.val '' s) := by
   have hE := Model.measurableEmbedding_val (k := k) n
   unfold volGL
-  rw [withDensity_apply _ hs, setLIntegral_congr_fun hs (g := fun _ => 1), setLIntegral_one, hE.comap_apply]
+  rw [withDensity_apply _ hs, setLIntegral_congr_fun hs (g := fun _ => 1), setLIntegral_one,
+    hE.comap_apply]
   intro g hg
   obtain ⟨u, rfl⟩ := hK hg
-  have h1 : nabs k (Matrix.GeneralLinearGroup.det
-      (Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) u)) = 1 := by
+  have h1
+      : nabs k (Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) u))
+        = 1 := by
     rw [nabs_eq_one_iff]
-    have : ((Matrix.GeneralLinearGroup.det
-      (Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) u) : kˣ) : k) = algebraMap 𝒪[k] k u.val.det :=
+    have : ((Matrix.GeneralLinearGroup.det (Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) u)
+            : kˣ)
+          : k)
+        = algebraMap 𝒪[k] k u.val.det :=
       ((algebraMap 𝒪[k] k).map_det u.val).symm
     rw [this]
     exact (Valuation.integer.integers (valuation k)).one_of_isUnit
       ((Matrix.isUnit_iff_isUnit_det _).1 u.isUnit)
   simp only [h1, Real.one_rpow, ENNReal.ofReal_one]
 
-theorem relIndex_mul_volM : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    [MeasurableSpace k] [BorelSpace k] (ν : Measure k) [ν.IsAddHaarMeasure]
-    (n : Type) [Fintype n] [DecidableEq n] (H L : Subgroup (GL n k)),
-    H ≤ L → L ≤ KO k n → IsOpen (H : Set (GL n k)) →
-    0 < (volM ν n n (Units.val '' (H : Set (GL n k)))).toReal ∧
-    (H.relIndex L : ℝ) * (volM ν n n (Units.val '' (H : Set (GL n k)))).toReal =
-      (volM ν n n (Units.val '' (L : Set (GL n k)))).toReal := by
+theorem relIndex_mul_volM
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ν : Measure k) [ν.IsAddHaarMeasure] (n : Type)
+        [Fintype n] [DecidableEq n] (H L : Subgroup (GL n k)),
+      H ≤ L → L ≤ KO k n → IsOpen (H : Set (GL n k))
+        → 0 < (volM ν n n (Units.val '' (H : Set (GL n k)))).toReal
+          ∧ (H.relIndex L : ℝ) * (volM ν n n (Units.val '' (H : Set (GL n k)))).toReal
+            = (volM ν n n (Units.val '' (L : Set (GL n k)))).toReal := by
   intro k _ _ _ _ _ _ ν _ n _ _ H L hHL hLK hH
   obtain ⟨hB, hlc, hsc, hc, -, -, hhaar, -⟩ := volGL_haar k n ν
   have hL : IsOpen (L : Set (GL n k)) := Subgroup.isOpen_mono hHL hH

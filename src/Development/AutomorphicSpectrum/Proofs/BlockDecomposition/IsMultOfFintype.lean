@@ -39,19 +39,33 @@ theorem inv_mem_GLs {y : Mat n} (hy : y ∈ GLs n) : y⁻¹ ∈ GLs n := by
 section
 variable [MeasurableSpace (G n)] (μ : Measure (G n)) (E : KMod n)
 
-theorem isMult_of_fintype {ι : Type} [Fintype ι] {k : Mat n → (E.V →L[ℂ] E.V)} {val : Inf n → ℂ} {T : ℝ}
+theorem isMult_of_fintype
+    {ι : Type} [Fintype ι]
+    {k : Mat n → (E.V →L[ℂ] E.V)} {val : Inf n → ℂ} {T : ℝ}
     (c : ι → ℂ) (w : ι → List (Bool × ℕ)) (g : ι → ℝ → ℝ) (ks : ι → Mat n → (E.V →L[ℂ] E.V))
-    (h1 : ∀ i, IsBump (g i) T ∧ IsKer μ E (w i) (g i) (ks i)) (h2 : ∀ y ∈ GLs n, k y = ∑ i, c i • ks i y)
-    (h3 : ∀ χ, val χ = ∑ i, c i * zVal (w i) χ * coshT (g i) (cas χ)) : IsMult μ E k val T := by
+    (h1 : ∀ i, IsBump (g i) T ∧ IsKer μ E (w i) (g i) (ks i))
+    (h2 : ∀ y ∈ GLs n, k y = ∑ i, c i • ks i y)
+    (h3 : ∀ χ, val χ = ∑ i, c i * zVal (w i) χ * coshT (g i) (cas χ))
+    : IsMult μ E k val T := by
   let e := Fintype.equivFin ι
-  refine ⟨Fintype.card ι, c ∘ e.symm, w ∘ e.symm, g ∘ e.symm, ks ∘ e.symm, fun i => h1 _, fun y hy => ?_, fun χ => ?_⟩
+  refine ⟨
+    Fintype.card ι,
+    c ∘ e.symm,
+    w ∘ e.symm,
+    g ∘ e.symm,
+    ks ∘ e.symm,
+    fun i => h1 _,
+    fun y hy => ?_,
+    fun χ => ?_
+  ⟩
   · rw [h2 y hy]
     exact (Equiv.sum_comp e.symm (fun i => c i • ks i y)).symm
   · rw [h3 χ]
     exact (Equiv.sum_comp e.symm (fun i => c i * zVal (w i) χ * coshT (g i) (cas χ))).symm
 end
 
-theorem zVal_append (w w' : List (Bool × ℕ)) (χ : Inf n) : zVal (w ++ w') χ = zVal w χ * zVal w' χ := by
+theorem zVal_append (w w' : List (Bool × ℕ)) (χ : Inf n)
+    : zVal (w ++ w') χ = zVal w χ * zVal w' χ := by
   simp [zVal]
 
 section Ops

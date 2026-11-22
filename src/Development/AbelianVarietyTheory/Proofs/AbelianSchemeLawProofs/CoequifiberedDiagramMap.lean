@@ -14,8 +14,8 @@ open Scheme.AffineZariskiSite
 
 variable {W X Y : Scheme.{0}}
 
-def pullOver (f : X ⟶ Y) (g : W ⟶ Y) (a : W ⟶ X) (ha : a ≫ f = g) (U : Y.Opens) :
-    Γ(X, f ⁻¹ᵁ U) ⟶ Γ(W, g ⁻¹ᵁ U) :=
+def pullOver (f : X ⟶ Y) (g : W ⟶ Y) (a : W ⟶ X) (ha : a ≫ f = g) (U : Y.Opens)
+    : Γ(X, f ⁻¹ᵁ U) ⟶ Γ(W, g ⁻¹ᵁ U) :=
   a.appLE _ _ (by rw [← ha]; exact le_rfl)
 
 variable (f : X ⟶ Y) (g : W ⟶ Y) (a : W ⟶ X) (ha : a ≫ f = g) (p : W ⟶ X) (hp : p ≫ f = g)
@@ -47,13 +47,12 @@ lemma map_mem_invariants {U V : Y.Opens} (h : U ≤ V) {x : Γ(X, f ⁻¹ᵁ V)}
     map_pullOver _ _ _ _ h, CommRingCat.comp_apply, CommRingCat.comp_apply,
     (mem_invariants ..).1 hx]
 
-
 set_option backward.isDefEq.respectTransparency false in
 def diagram : Y.Opensᵒᵖ ⥤ CommRingCat where
   obj U := .of (invariants f g a ha p hp U.unop)
   map {V U} i :=
-    CommRingCat.ofHom ((X.presheaf.map (homOfLE (f.preimage_mono i.unop.le)).op).hom.restrict
-      _ _ fun x hx ↦ map_mem_invariants f g a ha p hp i.unop.le hx)
+    CommRingCat.ofHom ((X.presheaf.map (homOfLE (f.preimage_mono i.unop.le)).op).hom.restrict _ _
+      fun x hx ↦ map_mem_invariants f g a ha p hp i.unop.le hx)
   map_id U := by simp; rfl
   map_comp i j := by
     simp only [← CommRingCat.ofHom_comp]
@@ -62,8 +61,9 @@ def diagram : Y.Opensᵒᵖ ⥤ CommRingCat where
     rfl
 
 def diagramMap : Y.presheaf ⟶ diagram f g a ha p hp where
-  app U := CommRingCat.ofHom ((f.app U.unop).hom.codRestrict (invariants f g a ha p hp U.unop)
-    (app_mem_invariants f g a ha p hp))
+  app U :=
+    CommRingCat.ofHom ((f.app U.unop).hom.codRestrict (invariants f g a ha p hp U.unop)
+      (app_mem_invariants f g a ha p hp))
   naturality {U V} i := by ext x; exact Subtype.ext congr($(f.naturality i) x)
 
 set_option backward.isDefEq.respectTransparency false in
@@ -142,35 +142,31 @@ def quot : Scheme := (glueData f g a ha p hp).glued
 
 def cover : (quot f g a ha p hp).OpenCover := (glueData f g a ha p hp).cover
 
-def invariantsInclusion (U : Y.Opens) :
-    (diagram f g a ha p hp).obj (.op U) ⟶ Γ(X, f ⁻¹ᵁ U) :=
+def invariantsInclusion (U : Y.Opens) : (diagram f g a ha p hp).obj (.op U) ⟶ Γ(X, f ⁻¹ᵁ U) :=
   CommRingCat.ofHom (invariants f g a ha p hp U).subtype
 
 def toQuotPiece (U : Y.affineOpens) : (f ⁻¹ᵁ U.1).toScheme ⟶ quot f g a ha p hp :=
-  (f ⁻¹ᵁ U.1).toSpecΓ ≫ Spec.map (invariantsInclusion f g a ha p hp U.1) ≫
-    (cover f g a ha p hp).f U
-
+  (f ⁻¹ᵁ U.1).toSpecΓ ≫ Spec.map (invariantsInclusion f g a ha p hp U.1) ≫ (cover f g a ha p hp).f U
 
 set_option backward.defeqAttrib.useBackward true in
 set_option backward.isDefEq.respectTransparency false in
 def toQuot : X ⟶ quot f g a ha p hp :=
-  Scheme.OpenCover.glueMorphismsOfLocallyDirected
-    ((directedCover Y).pullback₁ f)
+  Scheme.OpenCover.glueMorphismsOfLocallyDirected ((directedCover Y).pullback₁ f)
     (fun U ↦ (pullbackRestrictIsoRestrict f _).hom ≫ toQuotPiece f g a ha p hp U)
     fun {U V : Y.AffineZariskiSite} i ↦ by
-  have : (pullbackRestrictIsoRestrict f U.1).inv ≫
-      Scheme.Cover.trans ((directedCover Y).pullback₁ f) i ≫
-      (pullbackRestrictIsoRestrict f V.1).hom = X.homOfLE
-        (f.preimage_mono (toOpens_mono i.1.1)) := by
-    rw [← cancel_mono (Scheme.Opens.ι _)]
-    simp +instances [Scheme.Cover.trans, Scheme.Cover.locallyDirectedPullbackCover]
-  rw [← Iso.inv_comp_eq, reassoc_of% this, toQuotPiece, toQuotPiece,
-    ← Scheme.Opens.toSpecΓ_SpecMap_presheaf_map_assoc, ← Spec.map_comp_assoc]
-  dsimp [cover]
-  rw [← colimit.w (glueData f g a ha p hp).functor i]
-  dsimp [glueData, relativeGluingData]
-  rw [← Spec.map_comp_assoc]
-  rfl
+      have : (pullbackRestrictIsoRestrict f U.1).inv
+            ≫ Scheme.Cover.trans ((directedCover Y).pullback₁ f) i
+            ≫ (pullbackRestrictIsoRestrict f V.1).hom
+          = X.homOfLE (f.preimage_mono (toOpens_mono i.1.1)) := by
+        rw [← cancel_mono (Scheme.Opens.ι _)]
+        simp +instances [Scheme.Cover.trans, Scheme.Cover.locallyDirectedPullbackCover]
+      rw [← Iso.inv_comp_eq, reassoc_of% this, toQuotPiece, toQuotPiece,
+        ← Scheme.Opens.toSpecΓ_SpecMap_presheaf_map_assoc, ← Spec.map_comp_assoc]
+      dsimp [cover]
+      rw [← colimit.w (glueData f g a ha p hp).functor i]
+      dsimp [glueData, relativeGluingData]
+      rw [← Spec.map_comp_assoc]
+      rfl
 
 set_option backward.isDefEq.respectTransparency.types false in
 set_option backward.defeqAttrib.useBackward true in
@@ -209,7 +205,6 @@ lemma toQuot_fromQuot : toQuot f g a ha p hp ≫ fromQuot f g a ha p hp = f := b
 
 set_option backward.isDefEq.respectTransparency false
 
-
 omit [QuasiCompact f] [QuasiSeparated f] in
 private lemma of_charts_aux (P : MorphismProperty Scheme.{0}) [IsZariskiLocalAtTarget P] {ι : Type}
     (X' Y' : ι → Scheme.{0}) (u : ∀ i, X' i ⟶ X) (v : ∀ i, Y' i ⟶ Y) (f' : ∀ i, X' i ⟶ Y' i)
@@ -227,7 +222,6 @@ lemma of_charts (P : MorphismProperty Scheme.{0}) [IsZariskiLocalAtTarget P] {ι
     [∀ i, IsOpenImmersion (v i)] (hv : ∀ y, ∃ i z, v i z = y)
     (h : ∀ i, IsPullback (f' i) (u i) (v i) f) (hP : ∀ i, P (f' i)) : P f :=
   of_charts_aux f P X' Y' u v f' hv h hP
-
 
 omit [QuasiCompact f] [QuasiSeparated f] [QuasiCompact g] [QuasiSeparated g] in
 lemma isPullback_of_charts {Z Q : Scheme.{0}} (b : W ⟶ Z) (q : X ⟶ Q) (q' : Z ⟶ Q) {ι : Type}
@@ -303,18 +297,19 @@ lemma isFinite_fromQuot [IsFinite f] [IsLocallyNoetherian Y] :
       (IsScalarTower.toAlgHom Γ(Y, U.1) (invariants f g a ha p hp U.1)
         Γ(X, f ⁻¹ᵁ U.1)).toLinearMap Subtype.val_injective
 
-
 omit [QuasiCompact f] [QuasiSeparated f] [QuasiCompact g] [QuasiSeparated g] in
-theorem exists_quotient [IsFinite f] [IsAffineHom g] [IsLocallyNoetherian Y]
-    (H : ∀ U : Y.affineOpens, (invariants f g a ha p hp U.1).subtype.FaithfullyFlat ∧
-      IsPushout (CommRingCat.ofHom (invariants f g a ha p hp U.1).subtype)
-        (CommRingCat.ofHom (invariants f g a ha p hp U.1).subtype)
-        (pullOver f g a ha U.1) (pullOver f g p hp U.1)) :
-    ∃ (Q : Scheme.{0}) (q : X ⟶ Q) (π : Q ⟶ Y), q ≫ π = f ∧ IsFinite π ∧ IsFinite q ∧ Flat q ∧
-      Surjective q ∧ IsPullback a p q q := by
+theorem exists_quotient
+    [IsFinite f] [IsAffineHom g] [IsLocallyNoetherian Y]
+    (H : ∀ U : Y.affineOpens,
+      (invariants f g a ha p hp U.1).subtype.FaithfullyFlat
+        ∧ IsPushout (CommRingCat.ofHom (invariants f g a ha p hp U.1).subtype)
+          (CommRingCat.ofHom (invariants f g a ha p hp U.1).subtype) (pullOver f g a ha U.1)
+          (pullOver f g p hp U.1))
+    : ∃ (Q : Scheme.{0}) (q : X ⟶ Q) (π : Q ⟶ Y),
+      q ≫ π = f ∧ IsFinite π ∧ IsFinite q ∧ Flat q ∧ Surjective q ∧ IsPullback a p q q := by
   have h1 := isFinite_fromQuot f g a ha p hp
-  have hc : ∀ y, ∃ (U : Y.affineOpens) (z : _), (cover f g a ha p hp).f U z = y :=
-    fun y ↦ (cover f g a ha p hp).exists_eq y
+  have hc : ∀ y, ∃ (U : Y.affineOpens) (z : _), (cover f g a ha p hp).f U z = y := fun y ↦
+    (cover f g a ha p hp).exists_eq y
   refine ⟨_, toQuot f g a ha p hp, fromQuot f g a ha p hp, toQuot_fromQuot .., h1, ?_, ?_, ?_, ?_⟩
   · have : IsFinite (toQuot f g a ha p hp ≫ fromQuot f g a ha p hp) := by
       rw [toQuot_fromQuot]; infer_instance
@@ -326,7 +321,8 @@ theorem exists_quotient [IsFinite f] [IsAffineHom g] [IsLocallyNoetherian Y]
       (fun U ↦ isPullback_toQuot f g a ha p hp U (U.2.preimage f))
       fun U ↦ ((flat_and_surjective_SpecMap_iff _).2 (H U).1).2
   · refine isPullback_of_charts a p _ _ _ _ _ _ _ (exists_fromSpec_eq f)
-      (fun U ↦ isPullback_pullOver f g a ha (U.2.preimage f) (U.2.preimage g)) fun U ↦ ?_
+      (fun U ↦ isPullback_pullOver f g a ha (U.2.preimage f) (U.2.preimage g))
+      fun U ↦ ?_
     rw [← SpecMap_pullOver f g p hp (U.2.preimage f), fromSpec_toQuot]
     exact (isPullback_SpecMap_of_isPushout _ _ _ _ (H U).2).paste_vert
       (isPullback_toQuot f g a ha p hp U (U.2.preimage f))

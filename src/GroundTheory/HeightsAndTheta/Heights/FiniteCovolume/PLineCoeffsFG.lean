@@ -22,8 +22,8 @@ theorem LineCoeffsFG.proof : LineCoeffsFG.Statement (E := E) W := by
   have hS : La.toIntSubmodule.FG := by
     rw [Submodule.fg_iff_addSubgroup_fg]
     simpa using hLa
-  have hle : (lineCoeffs (E := E) La x).toIntSubmodule.map f.toIntLinearMap ≤
-      La.toIntSubmodule := by
+  have hle
+      : (lineCoeffs (E := E) La x).toIntSubmodule.map f.toIntLinearMap ≤ La.toIntSubmodule := by
     rintro _ ⟨a, ha, rfl⟩
     exact ha
   have hN : (lineCoeffs (E := E) La x).toIntSubmodule.FG :=

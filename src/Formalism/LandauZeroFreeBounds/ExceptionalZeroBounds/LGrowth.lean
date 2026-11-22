@@ -65,12 +65,13 @@ theorem lfunction_polynomial_growth : LGrowth := by
   have h1 : ‖χ (1 : ZMod q) * (1 : ℂ) ^ (-s)‖ ≤ 1 := by
     rw [one_cpow, mul_one]; exact DirichletCharacter.norm_le_one χ _
   have hs0 : 0 ≤ ‖s‖ := norm_nonneg s
-  have hdiv : ‖s‖ / s.re ≤ 2 * ‖s‖ := by
-    rw [div_le_iff₀ hσ]; nlinarith
+  have hdiv : ‖s‖ / s.re ≤ 2 * ‖s‖ := by rw [div_le_iff₀ hσ]; nlinarith
   have hL : ‖DirichletCharacter.LFunction χ s‖ ≤ 1 + 2 * ((q : ℝ) + 1) * (1 + ‖s‖ / s.re) := by
     have := norm_le_insert' (DirichletCharacter.LFunction χ s) (χ (1 : ZMod q) * (1 : ℂ) ^ (-s))
     linarith
-  calc ‖DirichletCharacter.LFunction χ s‖ ≤ 1 + 2 * ((q : ℝ) + 1) * (1 + ‖s‖ / s.re) := hL
+  calc
+    ‖DirichletCharacter.LFunction χ s‖
+      ≤ 1 + 2 * ((q : ℝ) + 1) * (1 + ‖s‖ / s.re) := hL
     _ ≤ 1 + 2 * ((q : ℝ) + 1) * (1 + 2 * ‖s‖) := by gcongr
     _ ≤ 9 * q * (1 + ‖s‖) := by nlinarith
 

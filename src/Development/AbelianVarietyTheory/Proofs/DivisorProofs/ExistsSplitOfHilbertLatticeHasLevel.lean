@@ -11,7 +11,8 @@ set_option autoImplicit false
 noncomputable section
 
 open NumberField UpperHalfPlane GlobalTheory.HilbFam GlobalTheory.QFam
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac latM qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion)
 open GlobalTheory.IndefiniteRowSideFullHecke.DefiningCoordinates (iterD partialD)
 open scoped Classical MatrixGroups nonZeroDivisors
 
@@ -19,14 +20,16 @@ namespace GlobalTheory.HilbFam
 
 variable {F : Type} [Field F] [NumberField F]
 
-
 set_option autoImplicit false in
 open NumberField UpperHalfPlane in
 open scoped Classical MatrixGroups nonZeroDivisors in
 variable {F : Type} [Field F] [NumberField F] in
-theorem _root_.GlobalTheory.HilbFam.exists_eq_split_of_hasLevel (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
-    (N : ℕ) (L : _root_.GlobalTheory.HilbFam.Lat F) (hN : 0 < N) (hL : _root_.GlobalTheory.HilbFam.HasLevel N L) :
-    ∃ (𝔞 𝔟 : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (x : F), L = _root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x := by
+theorem _root_.GlobalTheory.HilbFam.exists_eq_split_of_hasLevel
+    (F : Type) [Field F] [NumberField F] [IsTotallyReal F]
+    (N : ℕ) (L : _root_.GlobalTheory.HilbFam.Lat F)
+    (hN : 0 < N) (hL : _root_.GlobalTheory.HilbFam.HasLevel N L)
+    : ∃ (𝔞 𝔟 : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.Frac F) (x : F),
+      L = _root_.GlobalTheory.HilbFam.split 𝔞 𝔟 x := by
   obtain ⟨hNL, hLstd⟩ := hL
   have hLint : ∀ v ∈ L, ∀ i, v i ∈ (1 : Submodule (𝓞 F) F) := fun v hv i =>
     (Submodule.mem_pi.1 (hLstd hv)) i (Set.mem_univ i)
@@ -69,8 +72,10 @@ theorem _root_.GlobalTheory.HilbFam.exists_eq_split_of_hasLevel (F : Type) [Fiel
       exact hsingle 1
     rw [h] at hmem
     exact hN0 ((FractionalIdeal.mem_zero_iff _).1 hmem)
-  have key : ∀ t ∈ (Bf : Submodule (𝓞 F) F) * ((Bf⁻¹ : FractionalIdeal (𝓞 F)⁰ F) : Submodule (𝓞 F) F),
-      ∃ y : F, ∀ b ∈ Bf, (![t * b, y * b] : Fin 2 → F) ∈ L := by
+  have key
+      : ∀ t ∈ (Bf : Submodule (𝓞 F) F) * ((Bf⁻¹ : FractionalIdeal (𝓞 F)⁰ F) : Submodule (𝓞 F) F),
+        ∃ y : F, ∀ b ∈ Bf,
+          (![t * b, y * b] : Fin 2 → F) ∈ L := by
     intro t ht
     refine Submodule.mul_induction_on ht ?_ ?_
     · intro b' hb' c hc
@@ -92,22 +97,31 @@ theorem _root_.GlobalTheory.HilbFam.exists_eq_split_of_hasLevel (F : Type) [Fiel
       convert L.add_mem (hy₁ b hb) (hy₂ b hb) using 1
       ext i
       fin_cases i <;> simp <;> ring
-  have h1 : (1 : F) ∈ (Bf : Submodule (𝓞 F) F) *
-      ((Bf⁻¹ : FractionalIdeal (𝓞 F)⁰ F) : Submodule (𝓞 F) F) := by
+  have h1
+      : (1 : F)
+        ∈ (Bf : Submodule (𝓞 F) F) * ((Bf⁻¹ : FractionalIdeal (𝓞 F)⁰ F) : Submodule (𝓞 F) F) := by
     rw [← FractionalIdeal.coe_mul, mul_inv_cancel₀ hBne]
     exact FractionalIdeal.one_mem_one _
   obtain ⟨x, hx⟩ := key 1 h1
-  refine ⟨Units.mk0 (FractionalIdeal.dual ℤ ℚ Cf) (FractionalIdeal.dual_ne_zero ℤ ℚ hCne),
-    Units.mk0 Bf hBne, x, ?_⟩
-  have hlat : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.latM
-      (Units.mk0 (FractionalIdeal.dual ℤ ℚ Cf) (FractionalIdeal.dual_ne_zero ℤ ℚ hCne)) = Cf := by
-    rw [_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.latM_eq_dual, Units.val_mk0, FractionalIdeal.dual_dual]
+  refine ⟨
+    Units.mk0 (FractionalIdeal.dual ℤ ℚ Cf) (FractionalIdeal.dual_ne_zero ℤ ℚ hCne),
+    Units.mk0 Bf hBne,
+    x,
+    ?_
+  ⟩
+  have hlat
+      : _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.latM (Units.mk0
+          (FractionalIdeal.dual ℤ ℚ Cf) (FractionalIdeal.dual_ne_zero ℤ ℚ hCne))
+        = Cf := by
+    rw [_root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.latM_eq_dual,
+      Units.val_mk0, FractionalIdeal.dual_dual]
   ext v
   unfold _root_.GlobalTheory.HilbFam.split
   rw [Submodule.mem_mk]
-  change v ∈ L ↔ v 0 ∈ ((Units.mk0 Bf hBne : (FractionalIdeal (𝓞 F)⁰ F)ˣ) : FractionalIdeal (𝓞 F)⁰ F) ∧
-    v 1 - v 0 * x ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.latM
-      (Units.mk0 (FractionalIdeal.dual ℤ ℚ Cf) (FractionalIdeal.dual_ne_zero ℤ ℚ hCne))
+  change v ∈ L
+    ↔ v 0 ∈ ((Units.mk0 Bf hBne : (FractionalIdeal (𝓞 F)⁰ F)ˣ) : FractionalIdeal (𝓞 F)⁰ F)
+      ∧ v 1 - v 0 * x ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization.latM
+        (Units.mk0 (FractionalIdeal.dual ℤ ℚ Cf) (FractionalIdeal.dual_ne_zero ℤ ℚ hCne))
   rw [hlat, Units.val_mk0]
   change v ∈ L ↔ v 0 ∈ B0 ∧ Pi.single 1 (v 1 - v 0 * x) ∈ L
   constructor

@@ -17,16 +17,18 @@ section Form
 
 variable {E : Type} [Field E] [StarRing E] {m : ℕ} (J : Matrix (Fin m) (Fin m) E)
 
-theorem hform_add_left' (x x' y : Fin m → E) :
-    hform (starRingEnd E) J (x + x') y = hform (starRingEnd E) J x y + hform (starRingEnd E) J x' y := by
+theorem hform_add_left' (x x' y : Fin m → E)
+    : hform (starRingEnd E) J (x + x') y
+      = hform (starRingEnd E) J x y + hform (starRingEnd E) J x' y := by
   simp [hform, map_add (f := _), add_mul, Finset.sum_add_distrib]
 
-theorem hform_add_right' (x y y' : Fin m → E) :
-    hform (starRingEnd E) J x (y + y') = hform (starRingEnd E) J x y + hform (starRingEnd E) J x y' := by
+theorem hform_add_right' (x y y' : Fin m → E)
+    : hform (starRingEnd E) J x (y + y')
+      = hform (starRingEnd E) J x y + hform (starRingEnd E) J x y' := by
   simp [hform, mul_add, Finset.sum_add_distrib]
 
-theorem hform_smul_left' (c : E) (x y : Fin m → E) :
-    hform (starRingEnd E) J (c • x) y = star c * hform (starRingEnd E) J x y := by
+theorem hform_smul_left' (c : E) (x y : Fin m → E)
+    : hform (starRingEnd E) J (c • x) y = star c * hform (starRingEnd E) J x y := by
   unfold hform
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -35,8 +37,8 @@ theorem hform_smul_left' (c : E) (x y : Fin m → E) :
   simp only [Pi.smul_apply, smul_eq_mul, map_mul, starRingEnd_apply]
   ring
 
-theorem hform_smul_right' (c : E) (x y : Fin m → E) :
-    hform (starRingEnd E) J x (c • y) = c * hform (starRingEnd E) J x y := by
+theorem hform_smul_right' (c : E) (x y : Fin m → E)
+    : hform (starRingEnd E) J x (c • y) = c * hform (starRingEnd E) J x y := by
   unfold hform
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
@@ -45,8 +47,8 @@ theorem hform_smul_right' (c : E) (x y : Fin m → E) :
   simp only [Pi.smul_apply, smul_eq_mul]
   ring
 
-theorem hform_swap' (hJ : IsHerm (starRingEnd E) J) (x y : Fin m → E) :
-    hform (starRingEnd E) J y x = star (hform (starRingEnd E) J x y) := by
+theorem hform_swap' (hJ : IsHerm (starRingEnd E) J) (x y : Fin m → E)
+    : hform (starRingEnd E) J y x = star (hform (starRingEnd E) J x y) := by
   have hJ' : ∀ i j, J i j = star (J j i) := by
     intro i j
     have h := congrFun (congrFun hJ i) j
@@ -59,14 +61,18 @@ theorem hform_swap' (hJ : IsHerm (starRingEnd E) J) (x y : Fin m → E) :
   rw [hJ' j i]
   ring
 
-theorem hform_exists_ne (hdet : J.det ≠ 0) (S : Set (Fin m → E)) (hS : Submodule.span E S = ⊤)
-    {x : Fin m → E} (hx : x ≠ 0) : ∃ z ∈ S, hform (starRingEnd E) J x z ≠ 0 := by
+theorem hform_exists_ne
+    (hdet : J.det ≠ 0)
+    (S : Set (Fin m → E)) (hS : Submodule.span E S = ⊤)
+    {x : Fin m → E} (hx : x ≠ 0)
+    : ∃ z ∈ S, hform (starRingEnd E) J x z ≠ 0 := by
   by_contra h
   push_neg at h
-  let f : (Fin m → E) →ₗ[E] E :=
-    { toFun := fun y => hform (starRingEnd E) J x y
-      map_add' := fun y y' => hform_add_right' J x y y'
-      map_smul' := fun c y => by simpa using hform_smul_right' J c x y }
+  let f : (Fin m → E) →ₗ[E] E := {
+    toFun := fun y => hform (starRingEnd E) J x y
+    map_add' := fun y y' => hform_add_right' J x y y'
+    map_smul' := fun c y => by simpa using hform_smul_right' J c x y
+  }
   have hle : Submodule.span E S ≤ LinearMap.ker f := by
     rw [Submodule.span_le]
     intro z hz
@@ -89,21 +95,18 @@ theorem hform_exists_ne (hdet : J.det ≠ 0) (S : Set (Fin m → E)) (hS : Submo
 
 end Form
 
-theorem star_int {E : Type} [Field E] [NumberField E] [StarRing E] (q : 𝓞 E) :
-    ∃ q' : 𝓞 E, algebraMap (𝓞 E) E q' = star (algebraMap (𝓞 E) E q) := by
+theorem star_int {E : Type} [Field E] [NumberField E] [StarRing E] (q : 𝓞 E)
+    : ∃ q' : 𝓞 E, algebraMap (𝓞 E) E q' = star (algebraMap (𝓞 E) E q) := by
   have h : IsIntegral ℤ (algebraMap (𝓞 E) E q) := by
-    first
-      | exact NumberField.RingOfIntegers.isIntegral_coe q
-      | exact q.2
+    first | exact NumberField.RingOfIntegers.isIntegral_coe q | exact q.2
   have h2 : IsIntegral ℤ (star (algebraMap (𝓞 E) E q)) := by
     have h3 := h.map (starRingEnd E).toIntAlgHom
-    first
-      | exact h3
-      | simpa using h3
+    first | exact h3 | simpa using h3
   exact ⟨⟨_, h2⟩, rfl⟩
 
-private theorem exists_finite_residue_reps_mod_natCast (F : Type) [Field F] [NumberField F] (N : ℕ) (hN : 0 < N) :
-    ∃ T : Set (𝓞 F), T.Finite ∧ ∀ f : 𝓞 F, ∃ r ∈ T, ∃ g : 𝓞 F, f = r + (N : 𝓞 F) * g := by
+private theorem exists_finite_residue_reps_mod_natCast
+    (F : Type) [Field F] [NumberField F] (N : ℕ) (hN : 0 < N)
+    : ∃ T : Set (𝓞 F), T.Finite ∧ ∀ f : 𝓞 F, ∃ r ∈ T, ∃ g : 𝓞 F, f = r + (N : 𝓞 F) * g := by
   have hN' : (N : 𝓞 F) ≠ 0 := by
     intro h
     have h2 := congrArg (algebraMap (𝓞 F) F) h
@@ -116,12 +119,16 @@ private theorem exists_finite_residue_reps_mod_natCast (F : Type) [Field F] [Num
     first
       | exact @Finite.of_fintype _ (Ideal.fintypeQuotientOfFreeOfNeBot _ hI)
       | exact Ideal.finiteQuotientOfFreeOfNeBot _ hI
-  refine ⟨Set.range (Function.surjInv (Ideal.Quotient.mk_surjective (I := Ideal.span {(N : 𝓞 F)}))),
-    Set.finite_range _, ?_⟩
+  refine ⟨
+    Set.range (Function.surjInv (Ideal.Quotient.mk_surjective (I := Ideal.span {(N : 𝓞 F)}))),
+    Set.finite_range _,
+    ?_
+  ⟩
   intro f
   refine ⟨_, Set.mem_range_self (Ideal.Quotient.mk (Ideal.span {(N : 𝓞 F)}) f), ?_⟩
-  have h := Function.surjInv_eq (Ideal.Quotient.mk_surjective (I := Ideal.span {(N : 𝓞 F)}))
-    (Ideal.Quotient.mk (Ideal.span {(N : 𝓞 F)}) f)
+  have h :=
+    Function.surjInv_eq (Ideal.Quotient.mk_surjective (I := Ideal.span {(N : 𝓞 F)}))
+      (Ideal.Quotient.mk (Ideal.span {(N : 𝓞 F)}) f)
   rw [Ideal.Quotient.eq] at h
   obtain ⟨g, hg⟩ := Ideal.mem_span_singleton'.mp h
   refine ⟨-g, ?_⟩
@@ -130,12 +137,20 @@ private theorem exists_finite_residue_reps_mod_natCast (F : Type) [Field F] [Num
 theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
   intro F E _ _ _ _ _ _ hCM m d hd
   obtain ⟨B, hB⟩ := hIB E
-  have hreps : ∀ k : ℕ, ∃ T : Set (𝓞 F), T.Finite ∧
-      ∀ f : 𝓞 F, ∃ r ∈ T, ∃ g : 𝓞 F, f = r + ((2 * d * (k + 1) : ℕ) : 𝓞 F) * g :=
-    fun k => exists_finite_residue_reps_mod_natCast F _ (Nat.mul_pos (Nat.mul_pos (by norm_num) hd) k.succ_pos)
+  have hreps
+      : ∀ k : ℕ, ∃ T : Set (𝓞 F),
+        T.Finite
+          ∧ ∀ f : 𝓞 F, ∃ r ∈ T, ∃ g : 𝓞 F, f = r + ((2 * d * (k + 1) : ℕ) : 𝓞 F) * g := fun k =>
+    exists_finite_residue_reps_mod_natCast F _
+      (Nat.mul_pos (Nat.mul_pos (by norm_num) hd) k.succ_pos)
   choose T hTf hT using hreps
-  refine ⟨⋃ k ∈ Set.Iio B, (fun r : 𝓞 F => !![(0 : E), ((d * (k + 1) : ℕ) : E);
-      ((d * (k + 1) : ℕ) : E), algebraMap F E (algebraMap (𝓞 F) F r)]) '' T k, ?_, ?_, ?_⟩
+  refine ⟨
+    ⋃ k ∈ Set.Iio B, (fun r : 𝓞 F => !![(0 : E), ((d * (k + 1) : ℕ) : E);
+      ((d * (k + 1) : ℕ) : E), algebraMap F E (algebraMap (𝓞 F) F r)]) '' T k,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · exact (Set.finite_Iio B).biUnion fun k _ => (hTf k).image _
   · intro Γ hΓ
     simp only [Set.mem_iUnion, Set.mem_image] at hΓ
@@ -152,22 +167,26 @@ theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
     obtain ⟨hJ, hdet, -, hspan, hint, hdual⟩ := hp
     have hinj : Function.Injective (algebraMap (𝓞 E) E) := by
       first
-        | exact NumberField.RingOfIntegers.coe_injective
-        | exact IsFractionRing.injective (𝓞 E) E
-        | exact NoZeroSMulDivisors.algebraMap_injective (𝓞 E) E
-        | exact FaithfulSMul.algebraMap_injective (𝓞 E) E
-    obtain ⟨I, hIdef⟩ : ∃ I : Ideal (𝓞 E), ∀ g, g ∈ I ↔
-        ∃ y ∈ p.2, algebraMap (𝓞 E) E g = hform (starRingEnd E) p.1 x y :=
-      ⟨{ carrier := {g | ∃ y ∈ p.2, algebraMap (𝓞 E) E g = hform (starRingEnd E) p.1 x y}
-         add_mem' := by
-           rintro g g' ⟨y, hy, hg⟩ ⟨y', hy', hg'⟩
-           exact ⟨y + y', p.2.add_mem hy hy', by rw [map_add (f := _), hg, hg', hform_add_right']⟩
-         zero_mem' := ⟨0, p.2.zero_mem, by simp [hform]⟩
-         smul_mem' := by
-           rintro r g ⟨y, hy, hg⟩
-           refine ⟨r • y, p.2.smul_mem r hy, ?_⟩
-           rw [smul_eq_mul, map_mul, hg, ← algebraMap_smul E r y, hform_smul_right'] },
-        fun g => Iff.rfl⟩
+      | exact NumberField.RingOfIntegers.coe_injective
+      | exact IsFractionRing.injective (𝓞 E) E
+      | exact NoZeroSMulDivisors.algebraMap_injective (𝓞 E) E
+      | exact FaithfulSMul.algebraMap_injective (𝓞 E) E
+    obtain ⟨I, hIdef⟩
+        : ∃ I : Ideal (𝓞 E), ∀ g,
+          g ∈ I ↔ ∃ y ∈ p.2, algebraMap (𝓞 E) E g = hform (starRingEnd E) p.1 x y := ⟨
+      {
+        carrier := {g | ∃ y ∈ p.2, algebraMap (𝓞 E) E g = hform (starRingEnd E) p.1 x y}
+        add_mem' := by
+          rintro g g' ⟨y, hy, hg⟩ ⟨y', hy', hg'⟩
+          exact ⟨y + y', p.2.add_mem hy hy', by rw [map_add (f := _), hg, hg', hform_add_right']⟩
+        zero_mem' := ⟨0, p.2.zero_mem, by simp [hform]⟩
+        smul_mem' := by
+          rintro r g ⟨y, hy, hg⟩
+          refine ⟨r • y, p.2.smul_mem r hy, ?_⟩
+          rw [smul_eq_mul, map_mul, hg, ← algebraMap_smul E r y, hform_smul_right']
+      },
+      fun g => Iff.rfl
+    ⟩
     obtain ⟨z, hzM, hz⟩ := hform_exists_ne p.1 hdet (p.2 : Set (Fin m → E)) hspan hx0
     obtain ⟨g0, hg0⟩ := hint x hxM z hzM
     have hI : I ≠ ⊥ := by
@@ -190,13 +209,15 @@ theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
       intro z' hz'
       obtain ⟨gz, hgz⟩ := hint x hxM z' hz'
       obtain ⟨q, hq⟩ := hdiv gz ((hIdef gz).mpr ⟨z', hz', hgz⟩)
-      have hq' : ((k + 1 : ℕ) : E) * hform (starRingEnd E) p.1 x z' =
-          algebraMap (𝓞 E) E c * algebraMap (𝓞 E) E q := by
+      have hq'
+          : ((k + 1 : ℕ) : E) * hform (starRingEnd E) p.1 x z'
+            = algebraMap (𝓞 E) E c * algebraMap (𝓞 E) E q := by
         have h := congrArg (algebraMap (𝓞 E) E) hq
         rw [map_mul, map_mul, map_natCast, hgz] at h
         exact h
-      have E1 : ((k + 1 : ℕ) : E) * star (hform (starRingEnd E) p.1 x z') =
-          star (algebraMap (𝓞 E) E c) * star (algebraMap (𝓞 E) E q) := by
+      have E1
+          : ((k + 1 : ℕ) : E) * star (hform (starRingEnd E) p.1 x z')
+            = star (algebraMap (𝓞 E) E c) * star (algebraMap (𝓞 E) E q) := by
         have h := congrArg star hq'
         simpa only [star_mul', star_natCast] using h
       obtain ⟨q', hq''⟩ := star_int q
@@ -218,21 +239,18 @@ theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
       (hform_swap' p.1 hJ y0 y0).symm
     obtain ⟨f, hf⟩ := (hCM.fixed _).mp hbstar
     have hβint : IsIntegral ℤ (algebraMap (𝓞 E) E β) := by
-      first
-        | exact NumberField.RingOfIntegers.isIntegral_coe β
-        | exact β.2
+      first | exact NumberField.RingOfIntegers.isIntegral_coe β | exact β.2
     have hfint : IsIntegral ℤ f := by
       rw [hβ, ← hf] at hβint
       exact (isIntegral_algHom_iff (algebraMap F E).toIntAlgHom (algebraMap F E).injective).mp hβint
     obtain ⟨r, hrT, g, hfg⟩ := hT k ⟨f, hfint⟩
     have hgint : IsIntegral ℤ (algebraMap F E (algebraMap (𝓞 F) F g)) := by
       have h1 : IsIntegral ℤ (algebraMap (𝓞 F) F g) := by
-        first
-          | exact NumberField.RingOfIntegers.isIntegral_coe g
-          | exact g.2
+        first | exact NumberField.RingOfIntegers.isIntegral_coe g | exact g.2
       exact h1.map (algebraMap F E).toIntAlgHom
-    obtain ⟨sE, hsE⟩ : ∃ sE : 𝓞 E,
-        algebraMap (𝓞 E) E sE = -(algebraMap F E (algebraMap (𝓞 F) F g)) := ⟨⟨_, hgint.neg⟩, rfl⟩
+    obtain ⟨sE, hsE⟩
+        : ∃ sE : 𝓞 E, algebraMap (𝓞 E) E sE = -(algebraMap F E (algebraMap (𝓞 F) F g)) :=
+      ⟨⟨_, hgint.neg⟩, rfl⟩
     have hsstar : star (algebraMap (𝓞 E) E sE) = algebraMap (𝓞 E) E sE := by
       rw [hsE, star_neg, (hCM.fixed (algebraMap F E (algebraMap (𝓞 F) F g))).mpr ⟨_, rfl⟩]
     have hv1M : y0 + sE • v0 ∈ p.2 := p.2.add_mem hy0M (p.2.smul_mem sE hv0M)
@@ -249,8 +267,9 @@ theorem partIso_of (hIB : IdealBoundAll) : PartIso := by
       have h := congrArg (algebraMap (𝓞 F) F) hfg
       rw [map_add (f := _), map_mul, map_natCast] at h
       exact h
-    have h11 : hform (starRingEnd E) p.1 (y0 + sE • v0) (y0 + sE • v0) =
-        algebraMap F E (algebraMap (𝓞 F) F r) := by
+    have h11
+        : hform (starRingEnd E) p.1 (y0 + sE • v0) (y0 + sE • v0)
+          = algebraMap F E (algebraMap (𝓞 F) F r) := by
       rw [hsm]
       simp only [hform_add_left', hform_add_right', hform_smul_left', hform_smul_right']
       rw [hyv0, hv0y, hv00, hsstar, ← hf, hfg', hsE, map_add (f := _), map_mul, map_natCast]

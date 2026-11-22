@@ -560,7 +560,8 @@ theorem regularity_inductive_step : StepCore := by
   set ψ0 : E d → ℝ := ⇑b0 with hψ0def
   have hψ0 : ContDiff ℝ ∞ ψ0 := b0.contDiff
   have hψ0c : HasCompactSupport ψ0 := b0.hasCompactSupport
-  have hψ01 : ∀ y ∈ ball (0 : E d) 1, ψ0 y = 1 := fun y hy => b0.one_of_mem_closedBall (ball_subset_closedBall hy)
+  have hψ01 : ∀ y ∈ ball (0 : E d) 1, ψ0 y = 1 := fun y hy =>
+    b0.one_of_mem_closedBall (ball_subset_closedBall hy)
   have hψ0t : tsupport ψ0 = closedBall 0 (3 / 2) := b0.tsupport_eq
   have hψ0s : tsupport ψ0 ⊆ ball 0 2 := by rw [hψ0t]; exact closedBall_subset_ball (by norm_num)
 
@@ -569,19 +570,23 @@ theorem regularity_inductive_step : StepCore := by
   choose r0 hr0 CK hr0U hKS' using HK
 
   obtain ⟨δ, hδ, hδU⟩ := Metric.isOpen_iff.1 hU x0 hx0
-  obtain ⟨ρ, hρ, hρle⟩ := exists_pos_le (fun p : (Σ i : ι, (Fin (P.ord i) → Fin d)) => r0 p.1 p.2)
-    (fun p => hr0 p.1 p.2)
+  obtain ⟨ρ, hρ, hρle⟩ :=
+    exists_pos_le (fun p : (Σ i : ι, (Fin (P.ord i) → Fin d)) => r0 p.1 p.2) (fun p => hr0 p.1 p.2)
   set S : ℝ := Real.sqrt (2 ^ k / c) *
     ∑ i, ∑ w : Fin (P.ord i) → Fin d, (2 * Real.pi) ^ (P.ord i) * max (CK i w) 0 with hSdef
-  have hS0 : 0 ≤ S := mul_nonneg (Real.sqrt_nonneg _) (Finset.sum_nonneg fun i _ =>
-    Finset.sum_nonneg fun w _ => mul_nonneg (by positivity) (le_max_right _ _))
+  have hS0 : 0 ≤ S :=
+    mul_nonneg (Real.sqrt_nonneg _)
+      (Finset.sum_nonneg fun i _ =>
+        Finset.sum_nonneg fun w _ => mul_nonneg (by positivity) (le_max_right _ _))
   set r : ℝ := min (min ρ (δ / 2)) (1 / (2 * (S + 1))) with hrdef
   have hr : 0 < r := lt_min (lt_min hρ (by linarith)) (by positivity)
   have hrρ : r ≤ ρ := (min_le_left _ _).trans (min_le_left _ _)
   have hrδ : r ≤ δ / 2 := (min_le_left _ _).trans (min_le_right _ _)
   have hrS : S * r ≤ 1 / 2 := by
     have h1 : r ≤ 1 / (2 * (S + 1)) := min_le_right _ _
-    calc S * r ≤ S * (1 / (2 * (S + 1))) := by gcongr
+    calc
+      S * r
+        ≤ S * (1 / (2 * (S + 1))) := by gcongr
       _ ≤ 1 / 2 := by rw [mul_one_div, div_le_iff₀ (by positivity)]; linarith
   have hr0le : ∀ i w, r ≤ r0 i w := fun i w => hrρ.trans (hρle ⟨i, w⟩)
   have h2rU : ball x0 (2 * r) ⊆ U := (ball_subset_ball (by linarith)).trans hδU
@@ -619,7 +624,8 @@ theorem regularity_inductive_step : StepCore := by
   have hM : 0 ≤ M := by positivity
   have hMs : s + 1 + d / 2 < M := by rw [hMdef]; linarith [le_max_right 0 (s + 1 + d / 2)]
 
-  have HD := fun i => hDec d ι P U u hH x0 ψ0 r hψ0 hψ0c hψ01 hψ0s hr h2rU χ χ' hχ hχc hχs hχ' hχ'c hχ'U hχ'1 i
+  have HD := fun i =>
+    hDec d ι P U u hH x0 ψ0 r hψ0 hψ0c hψ01 hψ0s hr h2rU χ χ' hχ hχc hχs hχ' hχ'c hχ'U hχ'1 i
   choose lo cc hlo hcc2 hid using HD
 
   set Kt : (i : ι) → (Fin (P.ord i) → Fin d) → E d → ℂ := fun i w =>
@@ -628,7 +634,8 @@ theorem regularity_inductive_step : StepCore := by
     intro x hx
     have h1 : r⁻¹ • (x - x0) ∈ closedBall (0 : E d) (3 / 2) := by
       rw [← hψ0t]; exact subset_tsupport _ hx
-    rw [mem_closedBall, dist_zero_right, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.2 hr)] at h1
+    rw [mem_closedBall, dist_zero_right, norm_smul, Real.norm_eq_abs, abs_of_pos (inv_pos.2 hr)]
+      at h1
     rw [mem_closedBall, dist_eq_norm]
     have := (inv_mul_le_iff₀ hr).1 h1
     linarith
@@ -642,15 +649,21 @@ theorem regularity_inductive_step : StepCore := by
     hψ0.comp ((contDiff_id.sub contDiff_const).const_smul r⁻¹)
   have hKt : ∀ i w, Continuous (Kt i w) := by
     intro i w
-    have h := hCC d U (fun x => P.a i (P.ord i) w x - P.a i (P.ord i) w x0) (fun x => ψ0 (r⁻¹ • (x - x0))) hU
-      ((hcoef i _ w).continuousOn.sub continuousOn_const) hχKd hχKc hχKU
+    have h :=
+      hCC d U
+        (fun x => P.a i (P.ord i) w x - P.a i (P.ord i) w x0)
+        (fun x => ψ0 (r⁻¹ • (x - x0)))
+        hU ((hcoef i _ w).continuousOn.sub continuousOn_const) hχKd hχKc hχKU
     exact fourier_cont_of h.1 h.2
   have hKm : ∀ i w, ∀ N : ℝ, (∫⁻ ζ, ENNReal.ofReal (‖ζ‖ * (1 + ‖ζ‖) ^ N) * ‖Kt i w ζ‖ₑ) < ⊤ :=
     fun i w N => (hKS' i w r hr (hr0le i w)).2 N
 
   set A : ι → E d → ℂ := fun i ξ => ∑ w : Fin (P.ord i) → Fin d, P.a i (P.ord i) w x0 * mono w ξ with hAdef
-  have HL := fun i => level_i hCB hWD M hM s (P.ord i) (A i) V W hVc hWc (Kt i) (hKt i) (hKm i) (lo i) (cc i)
-    (hlo i) (hcc2 i) (fun ξ => hid i ξ) hVs hWs
+  have HL := fun i =>
+    level_i hCB hWD M hM s (P.ord i) (A i) V W hVc hWc (Kt i) (hKt i) (hKm i) (lo i) (cc i) (hlo i)
+      (hcc2 i)
+      (fun ξ => hid i ξ)
+      hVs hWs
   choose Bi hBi_fin hBi using HL
 
   have hA : ∀ i, Continuous (A i) := fun i =>
@@ -662,10 +675,13 @@ theorem regularity_inductive_step : StepCore := by
     have h2 : (1 : ℝ) ≤ ‖(2 * Real.pi * Complex.I : ℂ)‖ := by
       rw [norm_mul, norm_mul, Complex.norm_I, mul_one, Complex.norm_real, Real.norm_eq_abs,
         abs_of_pos Real.pi_pos]
-      norm_num; linarith [Real.pi_gt_three]
+      norm_num
+      linarith [Real.pi_gt_three]
     have h3 : (1 : ℝ) ≤ ‖(2 * Real.pi * Complex.I : ℂ)‖ ^ (P.ord i) := one_le_pow₀ h2
     nlinarith [norm_nonneg (P.symb i x0 ξ)]
-  have hSb : ∀ ξ : E d, 1 ≤ ‖ξ‖ → c / 2 ^ k ≤ ∑ i, ((1 + ‖ξ‖ ^ 2) ^ P.ord i)⁻¹ * ‖P.symb i x0 ξ‖ ^ 2 := by
+  have hSb
+      : ∀ ξ : E d,
+        1 ≤ ‖ξ‖ → c / 2 ^ k ≤ ∑ i, ((1 + ‖ξ‖ ^ 2) ^ P.ord i)⁻¹ * ‖P.symb i x0 ξ‖ ^ 2 := by
     intro ξ hξ
     have hξ0 : ξ ≠ 0 := by intro h; rw [h, norm_zero] at hξ; linarith
     exact symb_ineq P.ord k hk c hc ξ hξ (fun i => P.symb i x0 ξ) (hSc ξ hξ0)
@@ -673,48 +689,67 @@ theorem regularity_inductive_step : StepCore := by
   set θ : ℝ≥0∞ := ENNReal.ofReal (Real.sqrt (2 ^ k / c)) *
     ∑ i, ∑ w : Fin (P.ord i) → Fin d, ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i)) * (∫⁻ ζ, ‖Kt i w ζ‖ₑ) with hθdef
   have hθ : θ ≤ ENNReal.ofReal (1 / 2) := by
-    have h1 : θ ≤ ENNReal.ofReal (Real.sqrt (2 ^ k / c)) *
-        ∑ i, ∑ w : Fin (P.ord i) → Fin d, ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i) * (max (CK i w) 0 * r)) := by
-      rw [hθdef]
-      gcongr with i _ w _
-      rw [ENNReal.ofReal_mul (by positivity)]
-      gcongr
-      refine (hKS' i w r hr (hr0le i w)).1.trans (ENNReal.ofReal_le_ofReal ?_)
-      exact mul_le_mul_of_nonneg_right (le_max_left _ _) hr.le
+    have h1
+        : θ
+          ≤ ENNReal.ofReal (Real.sqrt (2 ^ k / c))
+            * ∑ i, ∑ w : Fin (P.ord i) → Fin d, ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i) * (max (CK i w) 0 * r)) :=
+      by
+        rw [hθdef]
+        gcongr with i _ w _
+        rw [ENNReal.ofReal_mul (by positivity)]
+        gcongr
+        refine (hKS' i w r hr (hr0le i w)).1.trans (ENNReal.ofReal_le_ofReal ?_)
+        exact mul_le_mul_of_nonneg_right (le_max_left _ _) hr.le
     refine h1.trans (le_of_eq_of_le ?_ (ENNReal.ofReal_le_ofReal hrS))
-    have hnn : ∀ i (w : Fin (P.ord i) → Fin d), 0 ≤ (2 * Real.pi) ^ (P.ord i) * (max (CK i w) 0 * r) :=
+    have hnn
+        : ∀ i (w : Fin (P.ord i) → Fin d), 0 ≤ (2 * Real.pi) ^ (P.ord i) * (max (CK i w) 0 * r) :=
       fun i w => mul_nonneg (by positivity) (mul_nonneg (le_max_right _ _) hr.le)
     rw [hSdef, mul_assoc, ENNReal.ofReal_mul (Real.sqrt_nonneg _)]
     congr 1
-    have e : (∑ i, ∑ w : Fin (P.ord i) → Fin d, (2 * Real.pi) ^ (P.ord i) * max (CK i w) 0) * r =
-        ∑ i, ∑ w : Fin (P.ord i) → Fin d, (2 * Real.pi) ^ (P.ord i) * (max (CK i w) 0 * r) := by
+    have e
+        : (∑ i, ∑ w : Fin (P.ord i) → Fin d, (2 * Real.pi) ^ (P.ord i) * max (CK i w) 0) * r
+          = ∑ i, ∑ w : Fin (P.ord i) → Fin d, (2 * Real.pi) ^ (P.ord i) * (max (CK i w) 0 * r) := by
       rw [Finset.sum_mul]; congr 1; ext i; rw [Finset.sum_mul]; congr 1; ext w; ring
     rw [e, ENNReal.ofReal_sum_of_nonneg (fun i _ => Finset.sum_nonneg fun w _ => hnn i w)]
-    congr 1; ext i
+    congr 1
+    ext i
     rw [ENNReal.ofReal_sum_of_nonneg (fun w _ => hnn i w)]
 
   set B : ℝ≥0∞ := ENNReal.ofReal (Real.sqrt 2) * wn s 0 0 V + ENNReal.ofReal (Real.sqrt (2 ^ k / c)) * ∑ i, Bi i
     with hBdef
-  have hBf : B < ⊤ := ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top ENNReal.ofReal_lt_top hVs,
-    ENNReal.mul_lt_top ENNReal.ofReal_lt_top (ENNReal.sum_lt_top.2 fun i _ => hBi_fin i)⟩
+  have hBf : B < ⊤ :=
+    ENNReal.add_lt_top.2 ⟨
+      ENNReal.mul_lt_top ENNReal.ofReal_lt_top hVs,
+      ENNReal.mul_lt_top ENNReal.ofReal_lt_top (ENNReal.sum_lt_top.2 fun i _ => hBi_fin i)
+    ⟩
   have hunif : ∀ ε : ℝ, 0 < ε → ε ≤ 1 → nrm (s + 1) M ε V ≤ (2 * B) ^ 2 := by
     intro ε hε0 hε1
-    have hXf : wn (s + 1) M ε V < ⊤ := (wn_lt_top_iff _ _ _ _).2
-      (by simpa [hVdef] using hFW d (cut χ u) hcc.1 hcc.2 (s + 1) M ε hε0 hMs)
+    have hXf : wn (s + 1) M ε V < ⊤ :=
+      (wn_lt_top_iff _ _ _ _).2
+        (by simpa [hVdef] using hFW d (cut χ u) hcc.1 hcc.2 (s + 1) M ε hε0 hMs)
     have hE := ell_wn P.ord k c hc (fun i ξ => P.symb i x0 ξ) A hσA hA hSb s M ε V hVc
     have hX : wn (s + 1) M ε V ≤ B + θ * wn (s + 1) M ε V := by
       refine hE.trans ?_
-      have hsum : ∑ i, wn (s + 1 - P.ord i) M ε (fun ξ => A i ξ * V ξ) ≤
-          ∑ i, Bi i + (∑ i, ∑ w : Fin (P.ord i) → Fin d,
-            ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i)) * (∫⁻ ζ, ‖Kt i w ζ‖ₑ)) * wn (s + 1) M ε V := by
+      have hsum
+          : ∑ i, wn (s + 1 - P.ord i) M ε (fun ξ => A i ξ * V ξ)
+            ≤ ∑ i, Bi i
+              + (∑ i, ∑ w : Fin (P.ord i) → Fin d,
+                  ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i)) * (∫⁻ ζ, ‖Kt i w ζ‖ₑ))
+                * wn (s + 1) M ε V := by
         rw [Finset.sum_mul, ← Finset.sum_add_distrib]
         exact Finset.sum_le_sum fun i _ => hBi i ε hε0.le hε1
-      calc ENNReal.ofReal (Real.sqrt 2) * wn s M ε V +
-            ENNReal.ofReal (Real.sqrt (2 ^ k / c)) * ∑ i, wn (s + 1 - P.ord i) M ε (fun ξ => A i ξ * V ξ)
-          ≤ ENNReal.ofReal (Real.sqrt 2) * wn s 0 0 V + ENNReal.ofReal (Real.sqrt (2 ^ k / c)) *
-            (∑ i, Bi i + (∑ i, ∑ w : Fin (P.ord i) → Fin d,
-              ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i)) * (∫⁻ ζ, ‖Kt i w ζ‖ₑ)) * wn (s + 1) M ε V) :=
-            add_le_add (mul_le_mul' le_rfl (weightedNorm_le_unshifted s M ε hM V)) (mul_le_mul' le_rfl hsum)
+      calc
+        ENNReal.ofReal (Real.sqrt 2) * wn s M ε V
+              + ENNReal.ofReal (Real.sqrt (2 ^ k / c))
+                * ∑ i, wn (s + 1 - P.ord i) M ε (fun ξ => A i ξ * V ξ)
+            ≤ ENNReal.ofReal (Real.sqrt 2) * wn s 0 0 V
+              + ENNReal.ofReal (Real.sqrt (2 ^ k / c))
+                * (∑ i, Bi i
+                  + (∑ i, ∑ w : Fin (P.ord i) → Fin d,
+                      ENNReal.ofReal ((2 * Real.pi) ^ (P.ord i)) * (∫⁻ ζ, ‖Kt i w ζ‖ₑ))
+                    * wn (s + 1) M ε V) :=
+          add_le_add (mul_le_mul' le_rfl (weightedNorm_le_unshifted s M ε hM V))
+            (mul_le_mul' le_rfl hsum)
         _ = B + θ * wn (s + 1) M ε V := by rw [hBdef, hθdef, mul_add]; ring
     have hX' : wn (s + 1) M ε V ≤ B + ENNReal.ofReal (1 / 2) * wn (s + 1) M ε V :=
       hX.trans (add_le_add le_rfl (mul_le_mul' hθ le_rfl))

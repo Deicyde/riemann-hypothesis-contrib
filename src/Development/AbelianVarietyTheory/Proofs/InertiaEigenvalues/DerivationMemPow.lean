@@ -6,9 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory.DerivationPowerIdeal
 
-theorem derivation_mem_pow {A' : Type} [CommRing A'] {k : Type} [CommRing k] [Algebra k A']
-    (I : Ideal A') (D : Derivation k A' A') (n : ℕ) {x : A'} (hx : x ∈ I ^ (n + 1)) :
-    D x ∈ I ^ n := by
+theorem derivation_mem_pow
+    {A' : Type} [CommRing A']
+    {k : Type} [CommRing k] [Algebra k A']
+    (I : Ideal A')
+    (D : Derivation k A' A')
+    (n : ℕ)
+    {x : A'} (hx : x ∈ I ^ (n + 1))
+    : D x ∈ I ^ n := by
   induction n generalizing x with
   | zero => simp
   | succ n ih =>

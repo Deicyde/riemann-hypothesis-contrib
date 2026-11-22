@@ -6,18 +6,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 
 namespace GlobalTheory
 
-
 open NumberField MeasureTheory Topology in
 open scoped ComplexOrder ENNReal Matrix in
 theorem _root_.GlobalTheory.exists_maximal_minor_ne_zero_of_linearIndependent
-    (K : Type) [Field K] (r : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] (w : ι → Fin r → K)
-    (hw : LinearIndependent K w) :
-    ∃ e : ι → Fin r, Function.Injective e ∧ (Matrix.of fun k a => w a (e k)).det ≠ 0 := by
+    (K : Type) [Field K]
+    (r : ℕ)
+    (ι : Type) [Fintype ι] [DecidableEq ι]
+    (w : ι → Fin r → K) (hw : LinearIndependent K w)
+    : ∃ e : ι → Fin r, Function.Injective e ∧ (Matrix.of fun k a => w a (e k)).det ≠ 0 := by
   classical
   set A : Matrix (Fin r) ι K := Matrix.of fun k a => w a k with hA
   have hcol : A.col = w := rfl

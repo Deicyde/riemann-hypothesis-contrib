@@ -10,12 +10,15 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcVal
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory
-  NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.LocVol Formalism.L2.SG.TypedSets
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory NumberField
+  IsDedekindDomain
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem volUHermBox_holds {D : D7} (X : HidaSetting D) (ψ : AddChar (AF X.B.I.F) ℂ) : VolUHermBox X ψ := by
+theorem volUHermBox_holds {D : D7} (X : HidaSetting D) (ψ : AddChar (AF X.B.I.F) ℂ)
+    : VolUHermBox X ψ := by
   intro hψ hs v hv
   obtain ⟨hg, -, hd⟩ := VolUT.typ_arith X v hv
   have hann := VolUTr.annX_of X ψ Formalism.L2.SG.Pf.conductor_inverse_different hψ hs v
@@ -23,8 +26,8 @@ theorem volUHermBox_holds {D : D7} (X : HidaSetting D) (ψ : AddChar (AF X.B.I.F
   obtain ⟨hH, -, hO⟩ := VolUL.sd_facts ψ v hψ hfin hann hd (Fin (D.R.rS + 1) × Fin (D.R.rS + 1))
   haveI := hH
   have hmax : v.asIdeal.IsMaximal := v.isMaximal
-  obtain ⟨P, hPmax, hPv⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 X.B.I.E) v.asIdeal
-    (by
+  obtain ⟨P, hPmax, hPv⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 X.B.I.E) v.asIdeal (by
       rw [(RingHom.injective_iff_ker_eq_bot _).mp
         (FaithfulSMul.algebraMap_injective (𝓞 X.B.I.F) (𝓞 X.B.I.E))]
       exact bot_le)
@@ -37,7 +40,8 @@ theorem volUHermBox_holds {D : D7} (X : HidaSetting D) (ψ : AddChar (AF X.B.I.F
     intro h
     apply hnot
     have : θ - t = 0 := by ext; simp [h]
-    rw [this]; exact P.zero_mem
+    rw [this]
+    exact P.zero_mem
   have hnt : ∃ x, σ x ≠ x := ⟨θ, by rw [ht]; exact fun h => hne h.symm⟩
   have hfix : star (((θ : X.B.I.E) - t) ^ 2) = ((θ : X.B.I.E) - t) ^ 2 := by
     have htθ' : (t : X.B.I.E) = star (θ : X.B.I.E) := htθ

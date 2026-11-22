@@ -13,21 +13,29 @@ section SlopeTestRemainingChoices
 
 open Polynomial
 
-private theorem algpt_int {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (maximalIdeal O) O] {R : Type} [CommRing R] [Algebra O R] [IsLocalRing R]
-    {K : Type} [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K] (f : R →ₐ[O] K)
-    (a : R) (ha : a ∈ maximalIdeal R) : IsIntegral O (f a) :=
+private theorem algpt_int
+    {O : Type}
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
+    {R : Type} [CommRing R] [Algebra O R] [IsLocalRing R]
+    {K : Type} [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K]
+    (f : R →ₐ[O] K)
+    (a : R) (ha : a ∈ maximalIdeal R)
+    : IsIntegral O (f a) :=
   _root_.UpperTheory.Reformulated.B.AlgebraicPointIntegral.algpt_int f a ha
 
-private theorem algpt_pow {O S : Type} [CommRing O] [CommRing S] [Algebra O S] [IsNoetherianRing S] (m : Ideal S)
-    (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ m) (n : ℕ) :
-    ∃ N : Submodule O S, N.FG ∧ ∀ x : S, ∃ y ∈ N, x - y ∈ m ^ n :=
+private theorem algpt_pow
+    {O S : Type} [CommRing O] [CommRing S] [Algebra O S] [IsNoetherianRing S]
+    (m : Ideal S) (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ m)
+    (n : ℕ)
+    : ∃ N : Submodule O S, N.FG ∧ ∀ x : S, ∃ y ∈ N, x - y ∈ m ^ n :=
   _root_.UpperTheory.Reformulated.B.FinitelyGeneratedModPow.fg_mod_pow m hres n
 
-private theorem algpt_finite {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O]
-    [CommRing S] [Algebra O S] [IsLocalRing S] [IsNoetherianRing S] [Algebra.IsIntegral O S]
+private theorem algpt_finite
+    {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O] [CommRing S]
+    [Algebra O S] [IsLocalRing S] [IsNoetherianRing S] [Algebra.IsIntegral O S]
     (hloc : ∀ a ∈ maximalIdeal O, algebraMap O S a ∈ maximalIdeal S)
-    (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ maximalIdeal S) : Module.Finite O S := by
+    (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ maximalIdeal S)
+    : Module.Finite O S := by
   set J : Ideal S := (maximalIdeal O).map (algebraMap O S) with hJ
   have hJle : J ≤ maximalIdeal S := Ideal.map_le_iff_le_comap.2 hloc
   have hJne : J ≠ ⊤ := fun h => (maximalIdeal.isMaximal S).ne_top (top_le_iff.1 (h ▸ hJle))
@@ -40,14 +48,15 @@ private theorem algpt_finite {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicCo
     have h1 : maximalIdeal O ≤ P.comap (algebraMap O S) := Ideal.map_le_iff_le_comap.1 hJP
     have h2 : P.comap (algebraMap O S) = maximalIdeal O :=
       ((maximalIdeal.isMaximal O).eq_of_le (Ideal.comap_ne_top _ hP.ne_top) h1).symm
-    have h3 : P.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_comap
-      (algebraMap O S) (algebraMap_isIntegral_iff.mpr ‹Algebra.IsIntegral O S›) P
-      (h2 ▸ maximalIdeal.isMaximal O)
+    have h3 : P.IsMaximal :=
+      Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap O S)
+        (algebraMap_isIntegral_iff.mpr ‹Algebra.IsIntegral O S›) P (h2 ▸ maximalIdeal.isMaximal O)
     exact (eq_maximalIdeal h3).ge
   obtain ⟨n, hn⟩ := Ideal.exists_pow_le_of_le_radical_of_fg hrad (IsNoetherian.noetherian _)
   obtain ⟨N, hN, h⟩ := algpt_pow (maximalIdeal S) hres n
   refine (UpperTheory.V.abelian₂.nakayama O (maximalIdeal O) S).2 ⟨?_⟩
-  have : (⊤ : Submodule O (S ⧸ (maximalIdeal O) • (⊤ : Submodule O S))) = N.map (Submodule.mkQ _) := by
+  have : (⊤ : Submodule O (S ⧸ (maximalIdeal O) • (⊤ : Submodule O S)))
+      = N.map (Submodule.mkQ _) := by
     symm
     rw [Submodule.map_mkQ_eq_top, eq_top_iff]
     intro x _
@@ -61,8 +70,12 @@ private theorem algpt_finite {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicCo
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.W.exists_algebraicPoint_of_groupDeterminant :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (K : Type) [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K] (f : R →ₐ[O] K), Module.Finite O f.range := by
+theorem UpperTheory.V.W.exists_algebraicPoint_of_groupDeterminant
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (K : Type) [Field K] [Algebra O K] [FaithfulSMul O K] [Algebra.IsAlgebraic O K]
+        (f : R →ₐ[O] K),
+      Module.Finite O f.range := by
   intro O _ _ _ _ R _ _ _ K _ _ _ _ f
   have hint : ∀ a : R, IsIntegral O (f a) := by
     intro a

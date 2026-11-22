@@ -18,28 +18,29 @@ variable {R : Type u} [CommRing R] {M : Type u} [AddCommGroup M] [Module R M]
 abbrev K (M : Type u) [AddCommGroup M] [Module R M] (r : R) : Submodule R M :=
   LinearMap.ker (r • LinearMap.id : M →ₗ[R] M)
 
-theorem mem_K {r : R} {x : M} : x ∈ K M r ↔ r • x = 0 := by
-  simp [K]
+theorem mem_K {r : R} {x : M} : x ∈ K M r ↔ r • x = 0 := by simp [K]
 
-theorem smul_top_eq_range (r : R) :
-    (r • ⊤ : Submodule R M) = LinearMap.range (r • LinearMap.id : M →ₗ[R] M) := by
+theorem smul_top_eq_range (r : R)
+    : (r • ⊤ : Submodule R M) = LinearMap.range (r • LinearMap.id : M →ₗ[R] M) := by
   ext x
   rw [Submodule.mem_smul_pointwise_iff_exists, LinearMap.mem_range]
   simp
 
-theorem len_sub_add_quot (N : Submodule R M) :
-    Module.length R M = Module.length R N + Module.length R (M ⧸ N) :=
+theorem len_sub_add_quot (N : Submodule R M)
+    : Module.length R M = Module.length R N + Module.length R (M ⧸ N) :=
   Module.length_eq_add_of_exact N.subtype N.mkQ N.injective_subtype N.mkQ_surjective
     (LinearMap.exact_subtype_mkQ N)
 
-theorem len_K_eq_len_quot (hM : IsFiniteLength R M) (r : R) :
-    Module.length R (K M r) = Module.length R (QuotSMulTop r M) := by
+theorem len_K_eq_len_quot (hM : IsFiniteLength R M) (r : R)
+    : Module.length R (K M r) = Module.length R (QuotSMulTop r M) := by
   set φ : M →ₗ[R] M := r • LinearMap.id with hφ
   have h1 : Module.length R M = Module.length R (K M r) + Module.length R (LinearMap.range φ) :=
     Module.length_eq_add_of_exact (K M r).subtype φ.rangeRestrict (Submodule.injective_subtype _)
       φ.surjective_rangeRestrict
       (LinearMap.exact_iff.2 (by rw [LinearMap.ker_rangeRestrict, Submodule.range_subtype]))
-  have h2 : Module.length R M = Module.length R (r • ⊤ : Submodule R M) + Module.length R (QuotSMulTop r M) :=
+  have h2
+      : Module.length R M
+        = Module.length R (r • ⊤ : Submodule R M) + Module.length R (QuotSMulTop r M) :=
     len_sub_add_quot (r • ⊤ : Submodule R M)
   have h3 : Module.length R (r • ⊤ : Submodule R M) = Module.length R (LinearMap.range φ) :=
     (LinearEquiv.ofEq _ _ (smul_top_eq_range r)).length_eq
@@ -55,8 +56,8 @@ section DVR
 
 variable {R : Type u} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 
-theorem len_quot_pow {t : R} (ht : Irreducible t) (k : ℕ) :
-    Module.length R (R ⧸ Ideal.span {t ^ k}) = k := by
+theorem len_quot_pow {t : R} (ht : Irreducible t) (k : ℕ)
+    : Module.length R (R ⧸ Ideal.span {t ^ k}) = k := by
   have hmax : (Ideal.span {t} : Ideal R).IsMaximal := PrincipalIdealRing.isMaximal_of_irreducible ht
   have h1 : Module.length R (R ⧸ Ideal.span {t}) = 1 := by
     rw [Module.length_eq_one_iff]
@@ -69,13 +70,16 @@ theorem len_quot_pow {t : R} (ht : Irreducible t) (k : ℕ) :
     rw [Nat.cast_zero]
     exact Module.length_eq_zero_iff.2 this
   | succ k ih =>
-    have hle : Ideal.span {t} ≤ Submodule.comap (LinearMap.mulLeft R (t ^ k)) (Ideal.span {t ^ (k + 1)}) := by
+    have hle
+        : Ideal.span {t}
+          ≤ Submodule.comap (LinearMap.mulLeft R (t ^ k)) (Ideal.span {t ^ (k + 1)}) := by
       intro x hx
       obtain ⟨y, rfl⟩ := Ideal.mem_span_singleton'.1 hx
       simp only [Submodule.mem_comap, LinearMap.mulLeft_apply]
       rw [Ideal.mem_span_singleton']
       exact ⟨y, by ring⟩
-    let f := Submodule.mapQ (Ideal.span {t}) (Ideal.span {t ^ (k + 1)}) (LinearMap.mulLeft R (t ^ k)) hle
+    let f :=
+      Submodule.mapQ (Ideal.span {t}) (Ideal.span {t ^ (k + 1)}) (LinearMap.mulLeft R (t ^ k)) hle
     have hfac : Ideal.span {t ^ (k + 1)} ≤ Ideal.span {t ^ k} := by
       rw [Ideal.span_singleton_le_span_singleton]
       exact ⟨t, by ring⟩
@@ -85,7 +89,8 @@ theorem len_quot_pow {t : R} (ht : Irreducible t) (k : ℕ) :
       intro x hx
       obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
       rw [LinearMap.mem_ker] at hx
-      simp only [f, Submodule.mapQ_apply, LinearMap.mulLeft_apply, Submodule.Quotient.mk_eq_zero] at hx
+      simp only [f, Submodule.mapQ_apply, LinearMap.mulLeft_apply, Submodule.Quotient.mk_eq_zero]
+        at hx
       rw [Submodule.mem_bot, Submodule.Quotient.mk_eq_zero]
       obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.1 hx
       rw [Ideal.mem_span_singleton']
@@ -105,10 +110,13 @@ theorem len_quot_pow {t : R} (ht : Irreducible t) (k : ℕ) :
           rw [← Ideal.Quotient.eq_zero_iff_mem]
           exact hz
         obtain ⟨w, rfl⟩ := Ideal.mem_span_singleton'.1 hz'
-        exact ⟨Submodule.Quotient.mk w, by
-          simp only [f, Submodule.mapQ_apply, LinearMap.mulLeft_apply]
-          congr 1
-          ring⟩
+        exact ⟨
+          Submodule.Quotient.mk w,
+          by
+            simp only [f, Submodule.mapQ_apply, LinearMap.mulLeft_apply]
+            congr 1
+            ring
+        ⟩
       · rintro ⟨x, hx⟩
         obtain ⟨x, rfl⟩ := Submodule.Quotient.mk_surjective _ x
         rw [← hx]
@@ -138,12 +146,13 @@ theorem finrank_torsion_eq_zero : Module.finrank R (torsion R H) = 0 := by
   obtain ⟨a, ha⟩ := (Submodule.mem_torsion_iff (x : H)).1 x.2
   exact ⟨a, nonZeroDivisors.ne_zero a.2, Subtype.ext ha⟩
 
-theorem len_quot_split (r : R) :
-    Module.length R (QuotSMulTop r H) = Module.length R (QuotSMulTop r (torsion R H)) +
-      Module.finrank R H * Module.length R (R ⧸ Ideal.span {r}) := by
+theorem len_quot_split (r : R)
+    : Module.length R (QuotSMulTop r H)
+      = Module.length R (QuotSMulTop r (torsion R H))
+        + Module.finrank R H * Module.length R (R ⧸ Ideal.span {r}) := by
   obtain ⟨n, b⟩ := Module.basisOfFiniteTypeTorsionFree' (R := R) (M := H ⧸ torsion R H)
-  obtain ⟨f, hf⟩ := Module.projective_lifting_property (torsion R H).mkQ LinearMap.id
-    (torsion R H).mkQ_surjective
+  obtain ⟨f, hf⟩ :=
+    Module.projective_lifting_property (torsion R H).mkQ LinearMap.id (torsion R H).mkQ_surjective
   have e : (torsion R H × (H ⧸ torsion R H)) ≃ₗ[R] H :=
     lequivProdOfRightSplitExact (torsion R H).injective_subtype
       (by rw [Submodule.range_subtype, Submodule.ker_mkQ]) hf
@@ -151,27 +160,32 @@ theorem len_quot_split (r : R) :
     have h := Submodule.finrank_quotient_add_finrank (torsion R H)
     rw [finrank_torsion_eq_zero, add_zero, Module.finrank_eq_card_basis b, Fintype.card_fin] at h
     exact h.symm
-  have e2 : QuotSMulTop r H ≃ₗ[R]
-      ((R ⧸ Ideal.span {r}) ⊗[R] torsion R H) × ((R ⧸ Ideal.span {r}) ⊗[R] (H ⧸ torsion R H)) :=
-    (QuotSMulTop.congr r e.symm).trans ((QuotSMulTop.equivQuotTensor r _).trans
-      (TensorProduct.prodRight R R _ _ _))
+  have e2
+      : QuotSMulTop r H ≃ₗ[R]
+        ((R ⧸ Ideal.span {r}) ⊗[R] torsion R H) × ((R ⧸ Ideal.span {r}) ⊗[R] (H ⧸ torsion R H)) :=
+    (QuotSMulTop.congr r e.symm).trans
+      ((QuotSMulTop.equivQuotTensor r _).trans (TensorProduct.prodRight R R _ _ _))
   have e3 : ((R ⧸ Ideal.span {r}) ⊗[R] (H ⧸ torsion R H)) ≃ₗ[R] (Fin n →₀ (R ⧸ Ideal.span {r})) :=
     (LinearEquiv.lTensor _ b.repr).trans (TensorProduct.finsuppScalarRight R R _ _)
-  rw [e2.length_eq, Module.length_prod, ← (QuotSMulTop.equivQuotTensor r _).length_eq,
-    e3.length_eq, Module.length_finsupp, hrank]
+  rw [e2.length_eq, Module.length_prod, ← (QuotSMulTop.equivQuotTensor r _).length_eq, e3.length_eq,
+    Module.length_finsupp, hrank]
   simp
 
-theorem len_K_torsion {r : R} (hr : r ≠ 0) :
-    Module.length R (K H r) = Module.length R (K (torsion R H) r) := by
+theorem len_K_torsion {r : R} (hr : r ≠ 0)
+    : Module.length R (K H r) = Module.length R (K (torsion R H) r) := by
   have hmem : ∀ y : H, r • y = 0 → y ∈ torsion R H := fun y hy =>
     (Submodule.mem_torsion_iff y).2 ⟨⟨r, mem_nonZeroDivisors_of_ne_zero hr⟩, hy⟩
-  let f : K (torsion R H) r →ₗ[R] K H r :=
-    { toFun := fun x => ⟨((x : torsion R H) : H), by
+  let f : K (torsion R H) r →ₗ[R] K H r := {
+    toFun := fun x => ⟨
+      ((x : torsion R H) : H),
+      by
         have h1 := mem_K.1 x.2
         rw [mem_K]
-        simpa using congrArg Subtype.val h1⟩
-      map_add' := fun x y => rfl
-      map_smul' := fun c x => rfl }
+        simpa using congrArg Subtype.val h1
+    ⟩
+    map_add' := fun x y => rfl
+    map_smul' := fun c x => rfl
+  }
   have hf : Function.Bijective f := by
     constructor
     · intro x y hxy
@@ -191,12 +205,14 @@ section Main
 
 variable {R : Type u} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
 
-theorem len_quot_eq (H : Type u) [AddCommGroup H] [Module R H] [Module.Finite R H] {t : R}
-    (ht : Irreducible t) (m : ℕ) :
-    Module.length R (QuotSMulTop (t ^ m) H) =
-        ((m * Module.finrank R H : ℕ) : ℕ∞) + Module.length R (K H (t ^ m)) ∧
-      Module.length R (K H (t ^ m)) ≤ Module.length R (torsion R H) ∧
-      Module.length R (torsion R H) ≠ ⊤ := by
+theorem len_quot_eq
+    (H : Type u) [AddCommGroup H] [Module R H] [Module.Finite R H]
+    {t : R} (ht : Irreducible t)
+    (m : ℕ)
+    : Module.length R (QuotSMulTop (t ^ m) H)
+        = ((m * Module.finrank R H : ℕ) : ℕ∞) + Module.length R (K H (t ^ m))
+      ∧ Module.length R (K H (t ^ m)) ≤ Module.length R (torsion R H)
+      ∧ Module.length R (torsion R H) ≠ ⊤ := by
   have htm : t ^ m ≠ 0 := pow_ne_zero _ ht.ne_zero
   have hT := torsion_finLen (R := R) H
   have hK := len_K_torsion (R := R) H htm

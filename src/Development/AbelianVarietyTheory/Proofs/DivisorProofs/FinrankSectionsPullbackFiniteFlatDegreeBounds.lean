@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Finra
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud IsLocalRing
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AbLaw GlobalTheory.UU GlobalTheory.LN GlobalTheory.Raynaud
+  IsLocalRing
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -21,7 +24,19 @@ namespace GlobalTheory
 
 open FiniteCover
 
-theorem finrank_sec_pull_sandwich_flat : ∀ (K : Type) [Field K] (X X' : Scheme.{0}) [IsIntegral X] [IsIntegral X'] (f : X ⟶ Spec (CommRingCat.of K)) (φ : X' ⟶ X) [IsFinite φ] [Flat φ] [Surjective φ] (H : LB X) (n : ℕ) (s : Fin (n + 1) → LB.Sec H), H.IsLB → VeryAmpleBy f H s → ∀ d : ℕ, (∀ x : X, φ.finrank x = d) → (∀ t : ℕ, Module.Finite K (SecOnR f (pw H t) ⊤)) → (∀ t : ℕ, Module.Finite K (SecOnR (φ ≫ f) ((pw H t).pull φ) ⊤)) → ∃ a : ℕ, ∀ t : ℕ, d * Module.finrank K (SecOnR (f) (pw H t) ⊤) ≤ Module.finrank K (SecOnR (φ ≫ f) ((pw H (t + a : ℕ)).pull φ) ⊤) ∧ Module.finrank K (SecOnR (φ ≫ f) ((pw H t).pull φ) ⊤) ≤ d * Module.finrank K (SecOnR (f) (pw H (t + a : ℕ)) ⊤) := by
+theorem finrank_sec_pull_sandwich_flat
+    : ∀ (K : Type) [Field K] (X X' : Scheme.{0}) [IsIntegral X] [IsIntegral X']
+        (f : X ⟶ Spec (CommRingCat.of K)) (φ : X' ⟶ X) [IsFinite φ] [Flat φ] [Surjective φ]
+        (H : LB X) (n : ℕ) (s : Fin (n + 1) → LB.Sec H),
+      H.IsLB → VeryAmpleBy f H s
+        → ∀ d : ℕ,
+          (∀ x : X, φ.finrank x = d) → (∀ t : ℕ, Module.Finite K (SecOnR f (pw H t) ⊤))
+            → (∀ t : ℕ, Module.Finite K (SecOnR (φ ≫ f) ((pw H t).pull φ) ⊤))
+            → ∃ a : ℕ, ∀ t : ℕ,
+              d * Module.finrank K (SecOnR (f) (pw H t) ⊤)
+                  ≤ Module.finrank K (SecOnR (φ ≫ f) ((pw H (t + a : ℕ)).pull φ) ⊤)
+                ∧ Module.finrank K (SecOnR (φ ≫ f) ((pw H t).pull φ) ⊤)
+                  ≤ d * Module.finrank K (SecOnR (f) (pw H (t + a : ℕ)) ⊤) := by
   intro K _ X X' _ _ f φ _ _ _ H n s hH hs d hd hV hW
   have hd1 : 1 ≤ d := hd _ ▸ φ.one_le_finrank_map (genericPoint X')
   letI : Algebra X.functionField X'.functionField := (functionFieldMap φ).toAlgebra
@@ -64,37 +79,54 @@ theorem finrank_sec_pull_sandwich_flat : ∀ (K : Type) [Field K] (X X' : Scheme
     have := congrArg (toField (generic_inf (hη k) h₀)) (hr k.1 i.1 k₀)
     rw [map_mul, toField_rs, toField_rs, toField_rs] at this
     exact (div_eq_iff (hρ k)).2 this
-  let τ : ∀ (t : ℕ) (i : I), SecOn (pw H t) (D i) := fun t i => GlobalTheory.LB.ofSec (powSec (s i.1) t) (D i)
-  have hτc : ∀ (t : ℕ) (i : I) (k : H.ι), GlobalTheory.LB.coord (τ t i) k =
-      rs X (inf_le_right : D i ⊓ H.U k ≤ H.U k) ((s i.1).f k) ^ t := fun t i k =>
-    (GlobalTheory.LB.coord_ofSec _ _ _).trans (map_pow (rs X (inf_le_right : D i ⊓ H.U k ≤ H.U k)) _ _)
+  let τ : ∀ (t : ℕ) (i : I), SecOn (pw H t) (D i) := fun t i =>
+    GlobalTheory.LB.ofSec (powSec (s i.1) t) (D i)
+  have hτc
+      : ∀ (t : ℕ) (i : I) (k : H.ι),
+        GlobalTheory.LB.coord (τ t i) k
+          = rs X (inf_le_right : D i ⊓ H.U k ≤ H.U k) ((s i.1).f k) ^ t := fun t i k =>
+    (GlobalTheory.LB.coord_ofSec _ _ _).trans
+      (map_pow (rs X (inf_le_right : D i ⊓ H.U k ≤ H.U k)) _ _)
   have hτ : ∀ (t : ℕ) (i : I) (k : H.ι), IsUnit (GlobalTheory.LB.coord (τ t i) k) := fun t i k =>
     (hτc t i k).symm ▸ (hu i k).pow t
-  have hτv : ∀ (t : ℕ) (i : I), secVal (M := pw H t) (k₀ := k₀) h₀ (hη i) (τ t i) = ρ i ^ t :=
-    fun t i => (congrArg (toField (generic_inf (hη i) h₀)) (hτc t i k₀)).trans (by
-      rw [map_pow, toField_rs])
+  have hτv
+      : ∀ (t : ℕ) (i : I), secVal (M := pw H t) (k₀ := k₀) h₀ (hη i) (τ t i) = ρ i ^ t := fun t i =>
+    (congrArg (toField (generic_inf (hη i) h₀)) (hτc t i k₀)).trans (by rw [map_pow, toField_rs])
   have h₀' : ∀ t : ℕ, genericPoint X' ∈ ((pw H t).pull φ).U fun _ => k₀ := fun t =>
     le_pull (pw H t) φ (i := k₀) le_rfl (generic_mem_preimage φ h₀)
-  refine finrank_sandwich e (fun i => (toField (hη i)).range)
-    (fun i => (toField (generic_mem_preimage φ (hη i))).range) ρ c hρ hc0
-    (fun i k => ⟨_, (hρr i k).symm⟩) (fun i k => ?_) ?_ hc₁ hc₂
-    (fun t => SecOnR f (pw H t) ⊤) (fun t => SecOnR (φ ≫ f) ((pw H t).pull φ) ⊤) hV hW
+  refine finrank_sandwich e
+    (fun i => (toField (hη i)).range)
+    (fun i => (toField (generic_mem_preimage φ (hη i))).range)
+    ρ c hρ hc0
+    (fun i k => ⟨_, (hρr i k).symm⟩)
+    (fun i k => ?_)
+    ?_ hc₁ hc₂
+    (fun t => SecOnR f (pw H t) ⊤)
+    (fun t => SecOnR (φ ≫ f) ((pw H t).pull φ) ⊤)
+    hV hW
     (fun t => secValLin (M := pw H t) (k₀ := k₀) h₀ f fun _ => rfl)
     (fun t => secValLin (h₀' t) (φ ≫ f) fun _ => rfl)
     (fun t => secVal_injective (M := pw H t) (k₀ := k₀) h₀ generic_top)
-    (fun t => secVal_injective (h₀' t) generic_top) (fun t x => ?_) fun t y => ?_
+    (fun t => secVal_injective (h₀' t) generic_top)
+    (fun t x => ?_)
+    fun t y => ?_
   · obtain ⟨a, ha⟩ := hcm i
     rw [← ha, hρr]
-    exact exists_mul_pow_mem (haff k.1) (hη k) (hη i) _
-      (hρr i k ▸ div_ne_zero (hρ i) (hρ k)) (FiniteCover.basicOpen_le_nonzeroLocus _ _ _ (hr k.1 i.1)) a
+    exact exists_mul_pow_mem (haff k.1) (hη k) (hη i) _ (hρr i k ▸ div_ne_zero (hρ i) (hρ k))
+      (FiniteCover.basicOpen_le_nonzeroLocus _ _ _ (hr k.1 i.1)) a
   · rintro i _ ⟨a, rfl⟩
     exact ⟨_, toField_appLE φ le_rfl (hη i) _ a⟩
-  · refine (exists_secVal_eq_iff (M := pw H t) (k₀ := k₀) h₀ (isLB_pw hH t) D hc hη (τ t) (hτ t)
-      x).trans ?_
+  · refine
+      (exists_secVal_eq_iff (M := pw H t) (k₀ := k₀) h₀ (isLB_pw hH t) D hc hη (τ t) (hτ t) x).trans
+        ?_
     simp only [hτv]
-  · refine (exists_secVal_eq_iff (h₀' t) (LB.isLB_pull (isLB_pw hH t) φ) (fun i => φ ⁻¹ᵁ D i) hc'
-      (fun i => generic_mem_preimage φ (hη i)) (fun i => SecOn.pull (pw H t) φ (D i) (τ t i))
-      (fun i k => (hτ t i (k PUnit.unit)).map _) y).trans ?_
+  · refine (exists_secVal_eq_iff (h₀' t) (LB.isLB_pull (isLB_pw hH t) φ)
+      (fun i => φ ⁻¹ᵁ D i)
+      hc'
+      (fun i => generic_mem_preimage φ (hη i))
+      (fun i => SecOn.pull (pw H t) φ (D i) (τ t i))
+      (fun i k => (hτ t i (k PUnit.unit)).map _)
+      y).trans ?_
     refine forall_congr' fun i => ?_
     rw [secVal_pull (M := pw H t) (k₀ := k₀) h₀ φ (hη i), hτv]
     rfl

@@ -13,25 +13,27 @@ universe u
 
 noncomputable section
 
-variable {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {R : Type u} [CommRing R] {G : Type u} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
 
-theorem exists_cont_select {X : Type u} [TopologicalSpace X] [CompactSpace X] [T2Space X]
-    [TotallyDisconnectedSpace X] {Y : Type u} [TopologicalSpace Y] [DiscreteTopology Y] [Nonempty Y]
-    (P : X → Y → Prop) (hP : ∀ y, IsOpen {x | P x y}) (hex : ∀ x, ∃ y, P x y) :
-    ∃ ψ : X → Y, Continuous ψ ∧ ∀ x, P x (ψ x) := by
+theorem exists_cont_select
+    {X : Type u} [TopologicalSpace X] [CompactSpace X] [T2Space X] [TotallyDisconnectedSpace X]
+    {Y : Type u} [TopologicalSpace Y] [DiscreteTopology Y] [Nonempty Y]
+    (P : X → Y → Prop) (hP : ∀ y, IsOpen {x | P x y}) (hex : ∀ x, ∃ y, P x y)
+    : ∃ ψ : X → Y, Continuous ψ ∧ ∀ x, P x (ψ x) := by
   classical
   have hb : TopologicalSpace.IsTopologicalBasis {s : Set X | IsClopen s} := by
-    first
-      | exact isTopologicalBasis_isClopen
-      | exact isTopologicalBasis_clopen
+    first | exact isTopologicalBasis_isClopen | exact isTopologicalBasis_clopen
   choose yx hyx using hex
   have hnb : ∀ x, ∃ C : Set X, IsClopen C ∧ x ∈ C ∧ C ⊆ {x' | P x' (yx x)} := by
     intro x
     obtain ⟨C, hC, hxC, hCs⟩ := hb.exists_subset_of_mem_open (hyx x) (hP (yx x))
     exact ⟨C, hC, hxC, hCs⟩
   choose C hCc hxC hCs using hnb
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover C (fun x => (hCc x).isOpen)
-    (fun x _ => Set.mem_iUnion.2 ⟨x, hxC x⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover C
+      (fun x => (hCc x).isOpen)
+      (fun x _ => Set.mem_iUnion.2 ⟨x, hxC x⟩)
   have key : ∀ s : Finset X, ∃ ψ : X → Y, Continuous ψ ∧ ∀ x ∈ s, ∀ z ∈ C x, P z (ψ z) := by
     intro s
     refine Finset.induction_on s ?_ ?_
@@ -64,11 +66,17 @@ theorem exists_cont_select {X : Type u} [TopologicalSpace X] [CompactSpace X] [T
 def cj (N : Subgroup G) [N.Normal] (s : G) (n : N) : N :=
   ⟨s⁻¹ * n * s, by simpa using (inferInstance : N.Normal).conj_mem n n.2 s⁻¹⟩
 
-@[simp] theorem cj_coe (N : Subgroup G) [N.Normal] (s : G) (n : N) : (cj N s n : G) = s⁻¹ * n * s := rfl
+@[simp]
+theorem cj_coe (N : Subgroup G) [N.Normal] (s : G) (n : N) : (cj N s n : G) = s⁻¹ * n * s := rfl
 
-theorem isOpen_setOf_conj_eq (M : TRep R G) [DiscreteTopology M.V] (N : Subgroup G) [N.Normal]
-    (hNc : IsClosed (N : Set G)) [CompactSpace G] (f : N → M.V) (hf : Continuous f) (m : M.V) :
-    IsOpen {s : G | ∀ n : N, M.rho s (f (cj N s n)) - f n = M.rho n m - m} := by
+theorem isOpen_setOf_conj_eq
+    (M : TRep R G) [DiscreteTopology M.V]
+    (N : Subgroup G) [N.Normal]
+    (hNc : IsClosed (N : Set G))
+    [CompactSpace G]
+    (f : N → M.V) (hf : Continuous f)
+    (m : M.V)
+    : IsOpen {s : G | ∀ n : N, M.rho s (f (cj N s n)) - f n = M.rho n m - m} := by
   have hact : Continuous (fun q : G × M.V => M.rho q.1 q.2) := M.cont
   haveI : CompactSpace N := isCompact_iff_compactSpace.mp hNc.isCompact
   have hcj : Continuous (fun p : G × N => cj N p.1 p.2) := by
@@ -79,29 +87,35 @@ theorem isOpen_setOf_conj_eq (M : TRep R G) [DiscreteTopology M.V] (N : Subgroup
     refine ((hact.comp (continuous_fst.prodMk (hf.comp hcj))).sub (hf.comp continuous_snd)).sub ?_
     exact (hact.comp ((continuous_subtype_val.comp continuous_snd).prodMk continuous_const)).sub
       continuous_const
-  have hO : IsOpen {p : G × N | M.rho p.1 (f (cj N p.1 p.2)) - f p.2 - (M.rho (p.2 : G) m - m) = 0} :=
+  have hO
+      : IsOpen {p : G × N | M.rho p.1 (f (cj N p.1 p.2)) - f p.2 - (M.rho (p.2 : G) m - m) = 0} :=
     hΦ.isOpen_preimage {0} (isOpen_discrete _)
   rw [isOpen_iff_mem_nhds]
   intro s0 hs0
-  have hev : ∀ᶠ s in nhds s0, ∀ n ∈ (Set.univ : Set N),
-      M.rho s (f (cj N s n)) - f n - (M.rho (n : G) m - m) = 0 := by
+  have hev
+      : ∀ᶠ s in nhds s0, ∀ n ∈ (Set.univ : Set N),
+        M.rho s (f (cj N s n)) - f n - (M.rho (n : G) m - m) = 0 := by
     apply isCompact_univ.eventually_forall_of_forall_eventually
     intro n _
     exact hO.mem_nhds (sub_eq_zero.mpr (hs0 n))
   filter_upwards [hev] with s hs n
   exact sub_eq_zero.mp (hs n (Set.mem_univ n))
 
-theorem exists_ext_cochain [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
-    (M : TRep R G) [DiscreteTopology M.V] (N : Subgroup G) [N.Normal] (hNc : IsClosed (N : Set G))
+theorem exists_ext_cochain
+    [CompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
+    (M : TRep R G) [DiscreteTopology M.V]
+    (N : Subgroup G) [N.Normal]
+    (hNc : IsClosed (N : Set G))
     (f : N → M.V) (hf : Continuous f) (hfc : ∀ a b : N, f (a * b) = f a + M.rho a (f b))
-    (hinv : ∀ s : G, ∃ m : M.V, ∀ n : N, M.rho s (f (cj N s n)) - f n = M.rho n m - m) :
-    ∃ y : G → M.V, Continuous y ∧ (∀ n : N, y n = f n) ∧
-      (∀ g (n : N), y (g * n) = y g + M.rho g (f n)) ∧
-      (∀ (n : N) g, y (n * g) = f n + M.rho n (y g)) := by
+    (hinv : ∀ s : G, ∃ m : M.V, ∀ n : N, M.rho s (f (cj N s n)) - f n = M.rho n m - m)
+    : ∃ y : G → M.V,
+      Continuous y ∧ (∀ n : N, y n = f n) ∧ (∀ g (n : N), y (g * n) = y g + M.rho g (f n))
+        ∧ (∀ (n : N) g, y (n * g) = f n + M.rho n (y g)) := by
   have : Nonempty M.V := ⟨0⟩
-  obtain ⟨ψ, hψc, hψ⟩ := exists_cont_select
-    (fun s m => ∀ n : N, M.rho s (f (cj N s n)) - f n = M.rho n m - m)
-    (isOpen_setOf_conj_eq M N hNc f hf) hinv
+  obtain ⟨ψ, hψc, hψ⟩ :=
+    exists_cont_select
+      (fun s m => ∀ n : N, M.rho s (f (cj N s n)) - f n = M.rho n m - m)
+      (isOpen_setOf_conj_eq M N hNc f hf) hinv
   obtain ⟨r, hrc, hr1, hr⟩ := groupSection_holds G N hNc
   have hf1 : f 1 = 0 := by
     have e := hfc 1 1
@@ -121,8 +135,8 @@ theorem exists_ext_cochain [CompactSpace G] [T2Space G] [TotallyDisconnectedSpac
   have hσn : ∀ (n : N) g, σ (n * g) = σ g := fun n g => by
     simp only [hσ, hr n g, Subgroup.coe_mul, mul_inv_rev]; group
   have h3 : ∀ (n : N) g, y (n * g) = f n + M.rho n (y g) := fun n g => by
-    simp only [hy, hσn, hr n g, hfc, Subgroup.coe_mul, map_mul, Module.End.mul_apply, map_add (f := _),
-      map_sub, hψ1]
+    simp only [hy, hσn, hr n g, hfc, Subgroup.coe_mul, map_mul, Module.End.mul_apply,
+      map_add (f := _), map_sub, hψ1]
     abel
   have h2 : ∀ g (n : N), y (g * n) = y g + M.rho g (f n) := fun g n => by
     set t := σ g with ht
@@ -130,12 +144,15 @@ theorem exists_ext_cochain [CompactSpace G] [T2Space G] [TotallyDisconnectedSpac
     have hg : (r g : G) * t = g := by simp [ht, hσ]
     have e1 : g * n = ((r g * n'' : N) : G) * t := by
       simp only [Subgroup.coe_mul, n'']
-      calc g * n = (r g : G) * t * n := by rw [hg]
+      calc
+        g * n
+          = (r g : G) * t * n := by rw [hg]
         _ = _ := by group
     have hrgn : r (g * n) = r g * n'' := by rw [e1, hr, hrσ g, mul_one]
     have hσgn : σ (g * n) = t := by
       show ((r (g * n) : G))⁻¹ * (g * n) = t
-      rw [hrgn, e1]; group
+      rw [hrgn, e1]
+      group
     have hc : cj N t n'' = n := Subtype.ext (by simp [n'']; group)
     have e2 := hψ t n''
     rw [hc] at e2
@@ -145,8 +162,9 @@ theorem exists_ext_cochain [CompactSpace G] [T2Space G] [TotallyDisconnectedSpac
     have hrg : M.rho g = M.rho (r g) * M.rho t := by rw [← map_mul, hg]
     show f (r (g * n)) + M.rho (r (g * n)) (ψ (σ (g * n))) - ψ 1 = y g + M.rho g (f n)
     rw [hrgn, hσgn, hfc]
-    calc _ = f (r g) + M.rho (r g) (f n'' + M.rho n'' (ψ t)) - ψ 1 := by
-          rw [Subgroup.coe_mul, map_mul, Module.End.mul_apply, map_add (f := _)]; abel
+    calc
+      _ = f (r g) + M.rho (r g) (f n'' + M.rho n'' (ψ t)) - ψ 1 := by
+        rw [Subgroup.coe_mul, map_mul, Module.End.mul_apply, map_add (f := _)]; abel
       _ = f (r g) + M.rho (r g) (M.rho t (f n) + ψ t) - ψ 1 := by rw [e3]
       _ = _ := by rw [map_add (f := _), hrg, Module.End.mul_apply, hy]; simp only [← ht]; abel
   have hy1 : y 1 = 0 := by simp [hy, hr1, hf1, hσ]
@@ -162,9 +180,12 @@ structure InflD (M : TRep R G) (N : Subgroup G) (D : G → G → M.V) : Prop whe
   left : ∀ a b (n : N), D (a * n) b = D a b
   inv : ∀ a b (n : N), M.rho n (D a b) = D a b
 
-theorem inflD_of_ext (M : TRep R G) (N : Subgroup G) [N.Normal] (f : N → M.V) (y : G → M.V)
-    (h2 : ∀ g (n : N), y (g * n) = y g + M.rho g (f n))
-    (h3 : ∀ (n : N) g, y (n * g) = f n + M.rho n (y g)) : InflD M N (D1 M y) := by
+theorem inflD_of_ext
+    (M : TRep R G)
+    (N : Subgroup G) [N.Normal]
+    (f : N → M.V) (y : G → M.V) (h2 : ∀ g (n : N), y (g * n) = y g + M.rho g (f n))
+    (h3 : ∀ (n : N) g, y (n * g) = f n + M.rho n (y g))
+    : InflD M N (D1 M y) := by
   have hc : ∀ (c : G) (n : N), M.rho n (y c) = y c + M.rho c (f (cj N c n)) - f n := by
     intro c n
     have e : (n : G) * c = c * (cj N c n : G) := by rw [cj_coe]; group
@@ -200,8 +221,8 @@ theorem inflD_of_ext (M : TRep R G) (N : Subgroup G) [N.Normal] (f : N → M.V) 
     abel
 
 section
-variable (M : TRep R G) (N : Subgroup G) [N.Normal] (y : G → M.V) (hy1 : y 1 = 0)
-  (hD : InflD M N (D1 M y))
+variable
+  (M : TRep R G) (N : Subgroup G) [N.Normal] (y : G → M.V) (hy1 : y 1 = 0) (hD : InflD M N (D1 M y))
 include hy1 hD
 
 theorem inflD_mul_right (a : G) (n : N) : y (a * n) = y a + M.rho a (y n) := by
@@ -221,8 +242,8 @@ theorem inflD_conj (s : G) (n : N) : M.rho s (y (cj N s n)) - y n = M.rho n (y s
   rw [he, h2] at h1
   exact sub_eq_zero.mp (Eq.trans (by abel) (sub_eq_zero.mpr h1.symm))
 
-theorem inflD_of_zero (hz : ∀ n : N, y n = 0) :
-    (∀ a (n : N), y (a * n) = y a) ∧ ∀ a (n : N), M.rho n (y a) = y a := by
+theorem inflD_of_zero (hz : ∀ n : N, y n = 0)
+    : (∀ a (n : N), y (a * n) = y a) ∧ ∀ a (n : N), M.rho n (y a) = y a := by
   refine ⟨fun a n => ?_, fun a n => ?_⟩
   · rw [inflD_mul_right M N y hy1 hD a n, hz, map_zero, add_zero]
   · have h := inflD_conj M N y hy1 hD a n

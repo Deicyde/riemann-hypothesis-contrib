@@ -94,7 +94,8 @@ theorem unipotent_map_frame : C2.UMapFrame := by
   refine ⟨fun s hs => ?_, fun h hh => ?_⟩
   · obtain ⟨U, hU1, hU2, hsF⟩ := S_F hz.1 hs
     have hu := uMap_eq hz s U (colEq hsF)
-    refine ⟨by rw [hu]; exact colEq hsF, by rw [hu]; exact ⟨fun i j h => hU1 i j h, hU2⟩, fun t ht => ?_⟩
+    refine
+      ⟨by rw [hu]; exact colEq hsF, by rw [hu]; exact ⟨fun i j h => hU1 i j h, hU2⟩, fun t ht => ?_⟩
     obtain ⟨Ut, _, _, htF⟩ := S_F hz.1 ht
     have hut := uMap_eq hz t Ut (colEq htF)
     have hst : s * t * Fm k r z = Fm k r z * (U * Ut) := by
@@ -112,15 +113,18 @@ theorem zhat_equivalence : C2.ZhatEquiv := by
   have hsU : sᴴ * Hpk k r * s = Hpk k r := Sset_UH hs
   have hu : IsUnit s.det := WeylGroupFacts.isUnit_of_uh hsU
   have hHs : Hpk k r * s⁻¹ = sᴴ * Hpk k r := by
-    calc Hpk k r * s⁻¹ = sᴴ * Hpk k r * s * s⁻¹ := by rw [hsU]
+    calc
+      Hpk k r * s⁻¹
+        = sᴴ * Hpk k r * s * s⁻¹ := by rw [hsU]
       _ = sᴴ * Hpk k r := by rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hu, Matrix.mul_one]
-  calc (Fm k r z)ᴴ * Hpk k r * (s⁻¹ * g * s') * Fm k r z'
+  calc
+    (Fm k r z)ᴴ * Hpk k r * (s⁻¹ * g * s') * Fm k r z'
       = (Fm k r z)ᴴ * (Hpk k r * s⁻¹) * g * (s' * Fm k r z') := by simp only [Matrix.mul_assoc]
     _ = (Fm k r z)ᴴ * (sᴴ * Hpk k r) * g * (Fm k r z' * U') := by rw [hHs, hs'F]
     _ = (s * Fm k r z)ᴴ * Hpk k r * g * Fm k r z' * U' := by
-        rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+      rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
     _ = (Fm k r z * U)ᴴ * Hpk k r * g * Fm k r z' * U' := by rw [hsF]
     _ = Uᴴ * ((Fm k r z)ᴴ * Hpk k r * g * Fm k r z') * U' := by
-        rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+      rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
 
 end Formalism.FourierDecayAlt.P

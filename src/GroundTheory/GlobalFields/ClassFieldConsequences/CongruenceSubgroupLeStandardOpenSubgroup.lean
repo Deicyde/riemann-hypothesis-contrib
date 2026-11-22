@@ -15,10 +15,8 @@ noncomputable section
 variable (K : Type*) [Field K] [NumberField K]
 
 structure Modulus where
-
   ideal : Ideal (𝓞 K)
   ideal_ne_bot : ideal ≠ ⊥
-
   real : Set {w : InfinitePlace K // w.IsReal}
 
 variable {K}
@@ -26,8 +24,9 @@ variable {K}
 namespace IdeleGroup
 
 def positiveAt (S : Set {w : InfinitePlace K // w.IsReal}) : Subgroup (IdeleGroup K) where
-  carrier := {x | ∀ w ∈ S, 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
-    ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion)}
+  carrier :=
+    {x | ∀ w ∈ S, 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+      ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion)}
   one_mem' w _ := by simp
   mul_mem' {a b} ha hb w hw := by
     rw [map_mul, Units.val_mul, map_mul]
@@ -36,16 +35,19 @@ def positiveAt (S : Set {w : InfinitePlace K // w.IsReal}) : Subgroup (IdeleGrou
     rw [map_inv, Units.val_inv_eq_inv_val, map_inv₀]
     exact inv_pos.2 (ha w hw)
 
-theorem mem_positiveAt {S : Set {w : InfinitePlace K // w.IsReal}} {x : IdeleGroup K} :
-    x ∈ positiveAt S ↔ ∀ w ∈ S, 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
-      ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion) :=
+theorem mem_positiveAt {S : Set {w : InfinitePlace K // w.IsReal}} {x : IdeleGroup K}
+    : x ∈ positiveAt S
+      ↔ ∀ w ∈ S,
+        0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+          ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion) :=
   Iff.rfl
 
-theorem isOpen_positiveAt (S : Set {w : InfinitePlace K // w.IsReal}) :
-    IsOpen (positiveAt S : Set (IdeleGroup K)) := by
-  have : (positiveAt S : Set (IdeleGroup K)) = ⋂ w ∈ S, (fun x : IdeleGroup K ↦
-      InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
-        ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion)) ⁻¹' Set.Ioi 0 := by
+theorem isOpen_positiveAt (S : Set {w : InfinitePlace K // w.IsReal})
+    : IsOpen (positiveAt S : Set (IdeleGroup K)) := by
+  have : (positiveAt S : Set (IdeleGroup K))
+      = ⋂ w ∈ S, (fun x : IdeleGroup K ↦
+        InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+          ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion)) ⁻¹' Set.Ioi 0 := by
     ext x
     simp [mem_positiveAt]
   rw [this]
@@ -66,23 +68,21 @@ def exponent (v : HeightOneSpectrum (𝓞 K)) : ℕ := by
   exact if FiniteMultiplicity v.asIdeal 𝔪.ideal then multiplicity v.asIdeal 𝔪.ideal else 1
 
 omit [NumberField K] in
-theorem exponent_eq_zero_iff (v : HeightOneSpectrum (𝓞 K)) :
-    𝔪.exponent v = 0 ↔ ¬ v.asIdeal ∣ 𝔪.ideal := by
+theorem exponent_eq_zero_iff (v : HeightOneSpectrum (𝓞 K))
+    : 𝔪.exponent v = 0 ↔ ¬ v.asIdeal ∣ 𝔪.ideal := by
   by_cases h : FiniteMultiplicity v.asIdeal 𝔪.ideal
   · simpa [exponent, h] using (multiplicity_eq_zero h)
-  · have hd : v.asIdeal ∣ 𝔪.ideal := by
-      simpa using (FiniteMultiplicity.not_iff_forall.1 h 1)
+  · have hd : v.asIdeal ∣ 𝔪.ideal := by simpa using (FiniteMultiplicity.not_iff_forall.1 h 1)
     simp [exponent, h, hd]
 
 omit [NumberField K] in
-theorem one_le_exponent_iff (v : HeightOneSpectrum (𝓞 K)) :
-    1 ≤ 𝔪.exponent v ↔ v.asIdeal ∣ 𝔪.ideal := by
+theorem one_le_exponent_iff (v : HeightOneSpectrum (𝓞 K))
+    : 1 ≤ 𝔪.exponent v ↔ v.asIdeal ∣ 𝔪.ideal := by
   rw [Nat.one_le_iff_ne_zero, Ne, exponent_eq_zero_iff, not_not]
 
-
 omit [NumberField K] in
-theorem asIdeal_pow_exponent_dvd (v : HeightOneSpectrum (𝓞 K)) :
-    v.asIdeal ^ 𝔪.exponent v ∣ 𝔪.ideal := by
+theorem asIdeal_pow_exponent_dvd (v : HeightOneSpectrum (𝓞 K))
+    : v.asIdeal ^ 𝔪.exponent v ∣ 𝔪.ideal := by
   by_cases h : FiniteMultiplicity v.asIdeal 𝔪.ideal
   · simpa [exponent, h] using (pow_multiplicity_dvd v.asIdeal 𝔪.ideal)
   · exact FiniteMultiplicity.not_iff_forall.1 h _
@@ -101,11 +101,12 @@ theorem finite_support_exponent : (support 𝔪.exponent).Finite := by
 def congruenceSubgroup : Subgroup (IdeleGroup K) :=
   (idealLevel 𝔪.ideal).comap (toFinite K) ⊓ positiveAt 𝔪.real
 
-theorem mem_congruenceSubgroup {x : IdeleGroup K} :
-    x ∈ 𝔪.congruenceSubgroup ↔
-      (∀ v, finiteProj v x ∈ unitsLevel v (𝔪.exponent v)) ∧
-        ∀ w ∈ 𝔪.real, 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
-          ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion) := by
+theorem mem_congruenceSubgroup {x : IdeleGroup K}
+    : x ∈ 𝔪.congruenceSubgroup
+      ↔ (∀ v, finiteProj v x ∈ unitsLevel v (𝔪.exponent v))
+        ∧ ∀ w ∈ 𝔪.real,
+          0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+            ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion) := by
   rw [congruenceSubgroup, Subgroup.mem_inf, Subgroup.mem_comap, idealLevel, mem_finiteLevel,
     mem_positiveAt]
   simp only [finiteComponent_toFinite]
@@ -119,24 +120,26 @@ theorem isOpen_congruenceSubgroup : IsOpen (𝔪.congruenceSubgroup : Set (Idele
   simpa only [idealLevel, funext he] using
     (isOpen_finiteLevel 𝔪.finite_support_exponent).preimage (continuous_toFinite K)
 
-theorem congruenceSubgroup_le_standardOpenSubgroup :
-    𝔪.congruenceSubgroup ≤ standardOpenSubgroup K := fun x hx ↦ by
+theorem congruenceSubgroup_le_standardOpenSubgroup
+    : 𝔪.congruenceSubgroup ≤ standardOpenSubgroup K := fun x hx ↦ by
   rw [mem_standardOpenSubgroup_iff_toFinite_mem]
   exact finiteLevel_le_finiteLevel_zero _ (Subgroup.mem_inf.1 hx).1
 
 def idelesOneMod : Subgroup (IdeleGroup K) :=
   (⨅ (v : HeightOneSpectrum (𝓞 K)) (_ : v.asIdeal ∣ 𝔪.ideal),
-    (unitsLevel v (𝔪.exponent v)).comap (finiteProj v)) ⊓ positiveAt 𝔪.real
+    (unitsLevel v (𝔪.exponent v)).comap (finiteProj v))
+    ⊓ positiveAt 𝔪.real
 
-theorem mem_idelesOneMod {x : IdeleGroup K} :
-    x ∈ 𝔪.idelesOneMod ↔
-      (∀ v, v.asIdeal ∣ 𝔪.ideal → finiteProj v x ∈ unitsLevel v (𝔪.exponent v)) ∧
-        ∀ w ∈ 𝔪.real, 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
-          ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion) := by
+theorem mem_idelesOneMod {x : IdeleGroup K}
+    : x ∈ 𝔪.idelesOneMod
+      ↔ (∀ v, v.asIdeal ∣ 𝔪.ideal → finiteProj v x ∈ unitsLevel v (𝔪.exponent v))
+        ∧ ∀ w ∈ 𝔪.real,
+          0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal w.2
+            ((infiniteProj w.1 x : (w.1.Completion)ˣ) : w.1.Completion) := by
   simp only [idelesOneMod, Subgroup.mem_inf, Subgroup.mem_iInf, Subgroup.mem_comap, mem_positiveAt]
 
-theorem congruenceSubgroup_eq_inf :
-    𝔪.congruenceSubgroup = 𝔪.idelesOneMod ⊓ standardOpenSubgroup K := by
+theorem congruenceSubgroup_eq_inf
+    : 𝔪.congruenceSubgroup = 𝔪.idelesOneMod ⊓ standardOpenSubgroup K := by
   ext x
   rw [Subgroup.mem_inf, mem_congruenceSubgroup, mem_idelesOneMod,
     mem_standardOpenSubgroup_iff_toFinite_mem, mem_finiteLevel]
@@ -155,21 +158,20 @@ theorem congruenceSubgroup_le_idelesOneMod : 𝔪.congruenceSubgroup ≤ 𝔪.id
   rw [congruenceSubgroup_eq_inf]
   exact inf_le_left
 
-def rayUnits : Subgroup Kˣ :=
-  𝔪.idelesOneMod.comap (diagonal K)
+def rayUnits : Subgroup Kˣ := 𝔪.idelesOneMod.comap (diagonal K)
 
-theorem mem_rayUnits {a : Kˣ} :
-    a ∈ 𝔪.rayUnits ↔
-      (∀ v, v.asIdeal ∣ 𝔪.ideal → v.valuation K ((a : K) - 1) ≤ exp (-(𝔪.exponent v : ℤ))) ∧
-        ∀ w ∈ 𝔪.real, 0 < InfinitePlace.embedding_of_isReal w.2 (a : K) := by
+theorem mem_rayUnits {a : Kˣ}
+    : a ∈ 𝔪.rayUnits
+      ↔ (∀ v, v.asIdeal ∣ 𝔪.ideal → v.valuation K ((a : K) - 1) ≤ exp (-(𝔪.exponent v : ℤ)))
+        ∧ ∀ w ∈ 𝔪.real, 0 < InfinitePlace.embedding_of_isReal w.2 (a : K) := by
   rw [rayUnits, Subgroup.mem_comap, mem_idelesOneMod]
   refine and_congr (forall_congr' fun v ↦ forall_congr' fun hv ↦ ?_)
     (forall_congr' fun w ↦ forall_congr' fun _ ↦ ?_)
   · have hc : ∀ k : K, (k : v.adicCompletion K) = algebraMap K (v.adicCompletion K) k := fun k ↦ by
       rw [HeightOneSpectrum.algebraMap_adicCompletion]
       rfl
-    rw [GroundTheory.Global.mem_unitsLevel_of_one_le ((𝔪.one_le_exponent_iff v).2 hv), coe_finiteProj_diagonal,
-      ← HeightOneSpectrum.valuedAdicCompletion_eq_valuation', hc, hc,
+    rw [GroundTheory.Global.mem_unitsLevel_of_one_le ((𝔪.one_le_exponent_iff v).2 hv),
+      coe_finiteProj_diagonal, ← HeightOneSpectrum.valuedAdicCompletion_eq_valuation', hc, hc,
       (algebraMap K (v.adicCompletion K)).map_sub, (algebraMap K (v.adicCompletion K)).map_one]
   · rw [coe_infiniteProj_diagonal]
     exact Iff.of_eq (congrArg (0 < ·) (InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe _ _))

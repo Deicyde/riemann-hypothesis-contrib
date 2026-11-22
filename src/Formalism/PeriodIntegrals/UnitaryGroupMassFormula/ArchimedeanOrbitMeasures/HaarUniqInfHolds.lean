@@ -12,7 +12,8 @@ noncomputable section
 
 namespace PI.AprimeInfW
 
-open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+open MeasureTheory Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
   Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal
 open scoped TensorProduct
 
@@ -29,7 +30,9 @@ theorem haarUniqInf_holds : HaarUniqInf := by
   ext s hs
   simp [Measure.smul_apply]
 
-def WittInf : Prop := ∀ {D : D7} (X : HidaSetting D) (u' : D.what₂.Word) (ψ : AddChar (AF X.B.I.F) ℂ) hT μinf νinf fibInf,
+def WittInf : Prop :=
+  ∀ {D : D7} (X : HidaSetting D) (u' : D.what₂.Word) (ψ : AddChar (AF X.B.I.F) ℂ) hT μinf νinf
+      fibInf,
     PushHyp X u' ψ hT μinf νinf fibInf → FbI X u' hT ⊆ Set.range (orbM X u')
 
 theorem regI_of (hW : WittInf) : RegI := by
@@ -42,13 +45,20 @@ theorem regI_of (hW : WittInf) : RegI := by
   have hc : Continuous (orbM X u') :=
     PI.AprimeInfT.continuous_orbit (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J _
   have hd := detNZ_holds X u' ψ hT μinf νinf fibInf hP
-  refine ⟨hc.measurable, fun g => ?_, fun g => (continuous_const_mul g).measurable, fun t =>
-    ((continuous_const_mul t).comp continuous_subtype_val).measurable, fun C hC =>
-    ⟨hC.isClosed.measurableSet, hC.image hc, (hC.image hc).isClosed.measurableSet⟩,
-    hW X u' ψ hT μinf νinf fibInf hP, ?_⟩
+  refine ⟨
+    hc.measurable,
+    fun g => ?_,
+    fun g => (continuous_const_mul g).measurable,
+    fun t => ((continuous_const_mul t).comp continuous_subtype_val).measurable,
+    fun C hC => ⟨hC.isClosed.measurableSet, hC.image hc, (hC.image hc).isClosed.measurableSet⟩,
+    hW X u' ψ hT μinf νinf fibInf hP,
+    ?_
+  ⟩
   · have hmat : Continuous (fun _ : TupI X =>
-        ((HA.mat (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J g : GL (Fin X.B.I.n) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) :
-          Matrix (Fin X.B.I.n) (Fin X.B.I.n) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))) := continuous_const
+        ((HA.mat (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J g
+            : GL (Fin X.B.I.n) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))
+          : Matrix (Fin X.B.I.n) (Fin X.B.I.n) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))) :=
+      continuous_const
     have : Continuous (fun y : TupI X => g • y) := by
       show Continuous (fun y : TupI X => actTup (Ainf X.B.I.F) (HA.mat (Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J g) y)
       unfold actTup

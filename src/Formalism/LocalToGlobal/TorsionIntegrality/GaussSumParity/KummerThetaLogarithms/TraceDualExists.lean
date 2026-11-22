@@ -112,8 +112,7 @@ theorem trace_dual_exists : TrDualExists := by
     rw [Fin.val_natCast, ← hτ, hper'.iterate_mod_apply]
   have hxs : ∀ k, τ (x k) = x (k + 1) := by
     intro k
-    have h : k + 1 = ((k.val + 1 : ℕ) : Fin m) := by
-      rw [Nat.cast_succ, Fin.cast_val_eq_self]
+    have h : k + 1 = ((k.val + 1 : ℕ) : Fin m) := by rw [Nat.cast_succ, Fin.cast_val_eq_self]
     rw [h, hxn, Function.iterate_succ_apply', ← hxn, Fin.cast_val_eq_self]
   let V : Matrix (Fin m) (Fin m) K := Matrix.vandermonde x
   have hVa : ∀ k r, V k r = x k ^ (r : ℕ) := fun k r => Matrix.vandermonde_apply x k r
@@ -149,7 +148,8 @@ theorem trace_dual_exists : TrDualExists := by
       refine (IsUltrametricDist.norm_add_le_max _ _).trans ?_
       rw [norm_neg, nx, nx, max_self]
     · by_contra hlt'
-      exact hij (hinj (FormalExponential.root_eq_of_norm_lt hN (hxN j) (hxN i) (not_le.1 hlt'))).symm
+      exact hij (hinj (FormalExponential.root_eq_of_norm_lt hN (hxN j) (hxN i)
+        (not_le.1 hlt'))).symm
   have hdet : ‖V.det‖ = 1 := by
     rw [Matrix.det_vandermonde, norm_prod]
     refine Finset.prod_eq_one fun i _ => ?_
@@ -182,8 +182,12 @@ theorem trace_dual_exists : TrDualExists := by
     induction j with
     | zero => simp
     | succ j ih => rw [Function.iterate_succ_apply', ih, hPs, Nat.cast_succ]
-  refine ⟨fun r => ζ ^ (r : ℕ), fun r => P r 0,
-    ⟨fun r => ⟨by rw [norm_pow, nζ, one_pow], hPint r 0⟩, fun r => ⟨?_, ?_⟩⟩, ⟨?_, ?_⟩⟩
+  refine ⟨
+    fun r => ζ ^ (r : ℕ),
+    fun r => P r 0,
+    ⟨fun r => ⟨by rw [norm_pow, nζ, one_pow], hPint r 0⟩, fun r => ⟨?_, ?_⟩⟩,
+    ⟨?_, ?_⟩
+  ⟩
   · show σ^[m + m] (ζ ^ (r : ℕ)) = ζ ^ (r : ℕ)
     rw [iterate_map_pow, hper]
   · show σ^[m + m] (P r 0) = P r 0

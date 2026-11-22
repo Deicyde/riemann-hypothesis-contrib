@@ -15,21 +15,23 @@ namespace GlobalTheory
 
 open IsLocalRing
 
-theorem gaussRing_isDVR {σ : Type} [Finite σ] (O₁ : Type) [CommRing O₁] [IsDomain O₁]
-    [IsDiscreteValuationRing O₁] (P : Ideal (MvPolynomial σ O₁)) [P.IsPrime]
+theorem gaussRing_isDVR
+    {σ : Type} [Finite σ]
+    (O₁ : Type) [CommRing O₁] [IsDomain O₁] [IsDiscreteValuationRing O₁]
+    (P : Ideal (MvPolynomial σ O₁)) [P.IsPrime]
     (hP : P = Ideal.map MvPolynomial.C (maximalIdeal O₁))
-    (O₂ : Type) [CommRing O₂] [IsLocalRing O₂] [Algebra (MvPolynomial σ O₁) O₂]
-    [IsLocalization.AtPrime O₂ P] : ∃ _ : IsDomain O₂, IsDiscreteValuationRing O₂ := by
+    (O₂ : Type)
+    [CommRing O₂] [IsLocalRing O₂] [Algebra (MvPolynomial σ O₁) O₂] [IsLocalization.AtPrime O₂ P]
+    : ∃ _ : IsDomain O₂, IsDiscreteValuationRing O₂ := by
   have hd : IsDomain O₂ :=
     IsLocalization.isDomain_of_le_nonZeroDivisors O₂ P.primeCompl_le_nonZeroDivisors
   refine ⟨hd, ?_⟩
-  have : IsNoetherianRing O₂ :=
-    IsLocalization.isNoetherianRing P.primeCompl _ inferInstance
+  have : IsNoetherianRing O₂ := IsLocalization.isNoetherianRing P.primeCompl _ inferInstance
   have hinj := IsLocalization.injective O₂ (M := P.primeCompl) P.primeCompl_le_nonZeroDivisors
   obtain ⟨g, hg⟩ := IsPrincipalIdealRing.principal (maximalIdeal O₁)
   have hg' : maximalIdeal O₁ = Ideal.span {g} := hg
-  have hmax : maximalIdeal O₂ =
-      Ideal.span {algebraMap (MvPolynomial σ O₁) O₂ (MvPolynomial.C g)} := by
+  have hmax
+      : maximalIdeal O₂ = Ideal.span {algebraMap (MvPolynomial σ O₁) O₂ (MvPolynomial.C g)} := by
     rw [← IsLocalization.AtPrime.map_eq_maximalIdeal P O₂]
     conv_lhs => rw [hP]
     rw [hg', Ideal.map_span, Set.image_singleton, Ideal.map_span, Set.image_singleton]
@@ -39,14 +41,17 @@ theorem gaussRing_isDVR {σ : Type} [Finite σ] (O₁ : Type) [CommRing O₁] [I
     have h1 := hinj (h.trans (map_zero _).symm)
     have h2 : g = 0 := by simpa using h1
     apply IsDiscreteValuationRing.not_a_field O₁
-    rw [hg', h2]; simp
+    rw [hg', h2]
+    simp
   refine ((IsDiscreteValuationRing.TFAE O₂ hnf).out 1 5).mpr ?_
   rw [hmax]
   exact ⟨⟨_, rfl⟩⟩
 
-theorem exists_mvPolynomial_sub_map_mem {σ R S : Type} [CommRing R] [CommRing S] (φ : R →+* S)
-    (I : Ideal S) (h : ∀ x : S, ∃ a : R, x - φ a ∈ I) (p : MvPolynomial σ S) :
-    ∃ q : MvPolynomial σ R,
+theorem exists_mvPolynomial_sub_map_mem
+    {σ R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S) (I : Ideal S) (h : ∀ x : S, ∃ a : R, x - φ a ∈ I)
+    (p : MvPolynomial σ S)
+    : ∃ q : MvPolynomial σ R,
       p - MvPolynomial.map φ q ∈ Ideal.map (MvPolynomial.C : S →+* MvPolynomial σ S) I := by
   induction p using MvPolynomial.induction_on with
   | C x =>
@@ -60,16 +65,37 @@ theorem exists_mvPolynomial_sub_map_mem {σ R S : Type} [CommRing R] [CommRing S
     refine ⟨a + b, ?_⟩
     have := Ideal.add_mem _ ha hb
     convert this using 1
-    rw [map_add (f := _)]; ring
+    rw [map_add (f := _)]
+    ring
   | mul_X p n hp =>
     obtain ⟨a, ha⟩ := hp
     refine ⟨a * MvPolynomial.X n, ?_⟩
     have := Ideal.mul_mem_right (MvPolynomial.X n) _ ha
     convert this using 1
-    rw [map_mul, MvPolynomial.map_X]; ring
+    rw [map_mul, MvPolynomial.map_X]
+    ring
 
-theorem gaussRing_completion :
-    ∀ (K : Type) [Field K] [NumberField K] (D N : ℕ) (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) (O₁ : Type) [CommRing O₁] [IsDomain O₁] [IsDiscreteValuationRing O₁] [Algebra (𝓞 K) O₁], Function.Injective (algebraMap (𝓞 K) O₁) → Ideal.map (algebraMap (𝓞 K) O₁) la.asIdeal = IsLocalRing.maximalIdeal O₁ → (∀ x : O₁, ∃ a : 𝓞 K, x - algebraMap (𝓞 K) O₁ a ∈ IsLocalRing.maximalIdeal O₁) → ∀ (P : Ideal (MvPolynomial (TVar D N) O₁)) [P.IsPrime], P = Ideal.map MvPolynomial.C (IsLocalRing.maximalIdeal O₁) → ∀ (O₂ : Type) [CommRing O₂] [IsLocalRing O₂] [Algebra (MvPolynomial (TVar D N) O₁) O₂] [IsLocalization.AtPrime O₂ P], (∃ _ : IsDomain O₂, IsDiscreteValuationRing O₂) ∧ ∃ f : Op D N la →+* O₂, (∀ p : OT K D N, f (algebraMap (OT K D N) (Op D N la) p) = algebraMap (MvPolynomial (TVar D N) O₁) O₂ (MvPolynomial.map (algebraMap (𝓞 K) O₁) p)) ∧ f.Flat ∧ IsLocalHom f ∧ Ideal.map f (IsLocalRing.maximalIdeal (Op D N la)) = IsLocalRing.maximalIdeal O₂ ∧ ∀ x : O₂, ∃ a, x - f a ∈ IsLocalRing.maximalIdeal O₂ := by
+theorem gaussRing_completion
+    : ∀ (K : Type) [Field K] [NumberField K] (D N : ℕ)
+        (la : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) (O₁ : Type) [CommRing O₁] [IsDomain O₁]
+        [IsDiscreteValuationRing O₁] [Algebra (𝓞 K) O₁],
+      Function.Injective (algebraMap (𝓞 K) O₁)
+        → Ideal.map (algebraMap (𝓞 K) O₁) la.asIdeal = IsLocalRing.maximalIdeal O₁
+        → (∀ x : O₁, ∃ a : 𝓞 K, x - algebraMap (𝓞 K) O₁ a ∈ IsLocalRing.maximalIdeal O₁)
+        → ∀ (P : Ideal (MvPolynomial (TVar D N) O₁)) [P.IsPrime],
+          P = Ideal.map MvPolynomial.C (IsLocalRing.maximalIdeal O₁)
+            → ∀ (O₂ : Type) [CommRing O₂] [IsLocalRing O₂] [Algebra (MvPolynomial (TVar D N) O₁) O₂]
+                [IsLocalization.AtPrime O₂ P],
+              (∃ _ : IsDomain O₂, IsDiscreteValuationRing O₂)
+                ∧ ∃ f : Op D N la →+* O₂,
+                  (∀ p : OT K D N,
+                      f (algebraMap (OT K D N) (Op D N la) p)
+                        = algebraMap (MvPolynomial (TVar D N) O₁) O₂
+                          (MvPolynomial.map (algebraMap (𝓞 K) O₁) p))
+                    ∧ f.Flat ∧ IsLocalHom f
+                    ∧ Ideal.map f (IsLocalRing.maximalIdeal (Op D N la))
+                      = IsLocalRing.maximalIdeal O₂
+                    ∧ ∀ x : O₂, ∃ a, x - f a ∈ IsLocalRing.maximalIdeal O₂ := by
   intro K _ _ D N la O₁ _ _ _ _ hinj hmap hres P _ hP O₂ _ _ _ _
   obtain ⟨hd, hdvr⟩ := gaussRing_isDVR O₁ P hP O₂
   refine ⟨⟨hd, hdvr⟩, ?_⟩
@@ -78,8 +104,7 @@ theorem gaussRing_completion :
     apply la.isMaximal.eq_of_le
     · exact Ideal.IsPrime.ne_top inferInstance
     · rw [← hmap]; exact Ideal.le_comap_map
-  have hmem : ∀ p : OT K D N,
-      MvPolynomial.map (algebraMap (𝓞 K) O₁) p ∈ P ↔ p ∈ laT D N la := by
+  have hmem : ∀ p : OT K D N, MvPolynomial.map (algebraMap (𝓞 K) O₁) p ∈ P ↔ p ∈ laT D N la := by
     intro p
     rw [hP, MvPolynomial.mem_map_C_iff]
     refine Iff.trans ?_ (MvPolynomial.mem_map_C_iff (I := la.asIdeal) (f := p)).symm
@@ -92,13 +117,16 @@ theorem gaussRing_completion :
       ⟨MvPolynomial.map (algebraMap (𝓞 K) O₁) (y : OT K D N), fun h => y.2 ((hmem _).1 h)⟩
   let f : Op D N la →+* O₂ := IsLocalization.lift (M := (laT D N la).primeCompl) hu
   have hf : f.comp (algebraMap (OT K D N) (Op D N la)) = g := IsLocalization.lift_comp hu
-  have hf' : ∀ p : OT K D N, f (algebraMap (OT K D N) (Op D N la) p) =
-      algebraMap (MvPolynomial (TVar D N) O₁) O₂ (MvPolynomial.map (algebraMap (𝓞 K) O₁) p) :=
+  have hf'
+      : ∀ p : OT K D N,
+        f (algebraMap (OT K D N) (Op D N la) p)
+          = algebraMap (MvPolynomial (TVar D N) O₁) O₂ (MvPolynomial.map (algebraMap (𝓞 K) O₁) p) :=
     fun p => IsLocalization.lift_eq hu p
   have hinj₂ := IsLocalization.injective O₂ (M := P.primeCompl) P.primeCompl_le_nonZeroDivisors
   have hginj : Function.Injective g := hinj₂.comp (MvPolynomial.map_injective _ hinj)
   have hfinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     obtain ⟨⟨p, s⟩, h⟩ := IsLocalization.surj (laT D N la).primeCompl x
     have h1 := congrArg f h
@@ -131,8 +159,8 @@ theorem gaussRing_completion :
   · intro x
     obtain ⟨⟨p, s⟩, h⟩ := IsLocalization.surj P.primeCompl x
     obtain ⟨p₀, hp⟩ := exists_mvPolynomial_sub_map_mem (algebraMap (𝓞 K) O₁) _ hres p
-    obtain ⟨s₀, hs⟩ := exists_mvPolynomial_sub_map_mem (algebraMap (𝓞 K) O₁) _ hres
-      (s : MvPolynomial (TVar D N) O₁)
+    obtain ⟨s₀, hs⟩ :=
+      exists_mvPolynomial_sub_map_mem (algebraMap (𝓞 K) O₁) _ hres (s : MvPolynomial (TVar D N) O₁)
     rw [← hP] at hp hs
     have hs₀ : s₀ ∈ (laT D N la).primeCompl := by
       intro h0
@@ -151,8 +179,7 @@ theorem gaussRing_completion :
     simp only at h hu'
     rw [← hu'] at h2
     have h3 : f u * f ↑u⁻¹ = 1 := by rw [← map_mul]; simp
-    have h4 := Ideal.mul_mem_right (f ↑u⁻¹) _
-      (Ideal.sub_mem _ h1 (Ideal.mul_mem_left _ x h2))
+    have h4 := Ideal.mul_mem_right (f ↑u⁻¹) _ (Ideal.sub_mem _ h1 (Ideal.mul_mem_left _ x h2))
     convert h4 using 1
     rw [map_mul, ← h]
     linear_combination (-x) * h3

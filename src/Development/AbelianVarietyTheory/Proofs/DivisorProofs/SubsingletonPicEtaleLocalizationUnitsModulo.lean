@@ -11,11 +11,13 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 namespace GlobalTheory.PicLoc
 
 open Algebra in
-theorem finite_maximalSpectrum_of_field (B : Type) [CommRing B] (S : Submonoid B) (K : Type)
-    [Field K] [Algebra B K] [IsLocalization S K] (A' : Type) [CommRing A'] [Algebra B A']
-    [FormallyUnramified B A'] [FiniteType B A'] (R : Type) [CommRing R] [Algebra A' R]
-    [IsLocalization (algebraMapSubmonoid A' S) R] [Algebra B R] [IsScalarTower B A' R] :
-    Finite (MaximalSpectrum R) := by
+theorem finite_maximalSpectrum_of_field
+    (B : Type) [CommRing B]
+    (S : Submonoid B) (K : Type) [Field K] [Algebra B K] [IsLocalization S K]
+    (A' : Type) [CommRing A'] [Algebra B A'] [FormallyUnramified B A'] [FiniteType B A']
+    (R : Type) [CommRing R] [Algebra A' R] [IsLocalization (algebraMapSubmonoid A' S) R]
+    [Algebra B R] [IsScalarTower B A' R]
+    : Finite (MaximalSpectrum R) := by
   letI : Algebra K R := localizationAlgebra S A'
   haveI : IsScalarTower B K R := isScalarTower_localizationAlgebra S A'
   haveI : FormallyEtale A' R := FormallyEtale.of_isLocalization (algebraMapSubmonoid A' S)
@@ -28,11 +30,17 @@ theorem finite_maximalSpectrum_of_field (B : Type) [CommRing B] (S : Submonoid B
   haveI : IsArtinianRing R := IsArtinianRing.of_finite K R
   infer_instance
 
-theorem isField_localization (B : Type) [CommRing B] [IsDedekindDomain B] (f : B)
-    (h0 : (0 : B) ∉ (IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
-      (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom ⊔ Submonoid.powers f) :
-    IsField (Localization ((IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
-      (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom ⊔ Submonoid.powers f)) := by
+theorem isField_localization
+    (B : Type) [CommRing B] [IsDedekindDomain B]
+    (f : B)
+    (h0 : (0 : B)
+      ∉ (IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
+          (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom
+        ⊔ Submonoid.powers f)
+    : IsField (Localization
+      ((IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
+          (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom
+        ⊔ Submonoid.powers f)) := by
   set S : Submonoid B := (IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
       (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom ⊔ Submonoid.powers f with hS
   haveI : IsDomain (Localization S) :=
@@ -52,13 +60,17 @@ theorem isField_localization (B : Type) [CommRing B] [IsDedekindDomain B] (f : B
       have hf : f ∉ p := fun h => hdisj f (Submonoid.mem_sup_right (Submonoid.mem_powers f)) h
       have htop : p ⊔ Ideal.span {f} = ⊤ := by
         refine hmax.1.2 _ (lt_of_le_of_ne le_sup_left fun h => hf ?_)
-        rw [h]; exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self f)
-      obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 (htop ▸ Submodule.mem_top : (1 : B) ∈ p ⊔ Ideal.span {f})
+        rw [h]
+        exact Ideal.mem_sup_right (Ideal.mem_span_singleton_self f)
+      obtain ⟨a, ha, b, hb, hab⟩ :=
+        Submodule.mem_sup.1 (htop ▸ Submodule.mem_top : (1 : B) ∈ p ⊔ Ideal.span {f})
       have hunit : IsUnit (Ideal.Quotient.mk (Ideal.span {f}) a) := by
         have hb0 : Ideal.Quotient.mk (Ideal.span {f}) b = 0 := Ideal.Quotient.eq_zero_iff_mem.2 hb
         have : Ideal.Quotient.mk (Ideal.span {f}) a = 1 := by
-          rw [← map_one (Ideal.Quotient.mk (Ideal.span {f})), ← hab, map_add (f := _), hb0, add_zero]
-        rw [this]; exact isUnit_one
+          rw [← map_one (Ideal.Quotient.mk (Ideal.span {f})), ← hab, map_add (f := _), hb0,
+            add_zero]
+        rw [this]
+        exact isUnit_one
       exact hdisj a (Submonoid.mem_sup_left hunit) ha
     rw [← IsLocalization.map_under S (Localization S) Q]
     change Ideal.map _ p = ⊥
@@ -75,7 +87,13 @@ end GlobalTheory.PicLoc
 
 namespace GlobalTheory.PicLoc
 
-theorem subsingleton_pic_localization : ∀ (B : Type) [CommRing B] [IsDedekindDomain B] (f : B) (A' : Type) [CommRing A'] [Algebra B A'] [Algebra.Etale B A'], Subsingleton (CommRing.Pic (Localization (Algebra.algebraMapSubmonoid A' ((IsUnit.submonoid (B ⧸ Ideal.span {f})).comap (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom ⊔ Submonoid.powers f)))) := by
+theorem subsingleton_pic_localization
+    : ∀ (B : Type) [CommRing B] [IsDedekindDomain B] (f : B) (A' : Type) [CommRing A']
+        [Algebra B A'] [Algebra.Etale B A'],
+      Subsingleton (CommRing.Pic (Localization (Algebra.algebraMapSubmonoid A'
+        ((IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
+            (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom
+          ⊔ Submonoid.powers f)))) := by
   intro B _ _ f A' _ _ _
   set S : Submonoid B := (IsUnit.submonoid (B ⧸ Ideal.span {f})).comap
       (Ideal.Quotient.mk (Ideal.span {f})).toMonoidHom ⊔ Submonoid.powers f with hS

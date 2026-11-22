@@ -14,37 +14,41 @@ namespace ReciprocityTheory.ChartRestriction.DS
 namespace USum
 
 variable {n : ℕ} {ε : Fin n → Bool}
-variable {H₁ H₂ : Type*} [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
-  [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
-  {D₁ : Submodule ℂ H₁} {D₂ : Submodule ℂ H₂}
-  {E₁ : Fin n → Fin n → Module.End ℂ D₁} {E₂ : Fin n → Fin n → Module.End ℂ D₂}
-  {V₁ : Submodule ℂ D₁} {V₂ : Submodule ℂ D₂}
+variable
+  {H₁ H₂ : Type*}
+  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
+  {D₁ : Submodule ℂ H₁} {D₂ : Submodule ℂ H₂} {E₁ : Fin n → Fin n → Module.End ℂ D₁}
+  {E₂ : Fin n → Fin n → Module.End ℂ D₂} {V₁ : Submodule ℂ D₁} {V₂ : Submodule ℂ D₂}
 
-def diagι (φ : V₁ →ₗ[ℂ] V₂) : V₁ →ₗ[ℂ] sD D₁ D₂ :=
-  ofP ∘ₗ (V₁.subtype.prod (V₂.subtype ∘ₗ φ))
+def diagι (φ : V₁ →ₗ[ℂ] V₂) : V₁ →ₗ[ℂ] sD D₁ D₂ := ofP ∘ₗ (V₁.subtype.prod (V₂.subtype ∘ₗ φ))
 
-theorem diagι_apply (φ : V₁ →ₗ[ℂ] V₂) (v : V₁) :
-    diagι φ v = ofP ((v : D₁), ((φ v : V₂) : D₂)) := rfl
+theorem diagι_apply (φ : V₁ →ₗ[ℂ] V₂) (v : V₁) : diagι φ v = ofP ((v : D₁), ((φ v : V₂) : D₂)) :=
+  rfl
 
-theorem coe_diagι (φ : V₁ →ₗ[ℂ] V₂) (v : V₁) :
-    ((diagι φ v : sD D₁ D₂) : WithLp 2 (H₁ × H₂)) =
-      toLp 2 (((v : D₁) : H₁), (((φ v : V₂) : D₂) : H₂)) := rfl
+theorem coe_diagι (φ : V₁ →ₗ[ℂ] V₂) (v : V₁)
+    : ((diagι φ v : sD D₁ D₂) : WithLp 2 (H₁ × H₂))
+      = toLp 2 (((v : D₁) : H₁), (((φ v : V₂) : D₂) : H₂)) :=
+  rfl
 
 def diagSub (φ : V₁ →ₗ[ℂ] V₂) : Submodule ℂ (sD D₁ D₂) := LinearMap.range (diagι φ)
 
-theorem sE_diagι (φ : V₁ →ₗ[ℂ] V₂) (hst : IsKStableSub ε E₁ V₁)
+theorem sE_diagι
+    (φ : V₁ →ₗ[ℂ] V₂) (hst : IsKStableSub ε E₁ V₁)
     (hcomm : ∀ a b (hab : ε a = ε b) (v : V₁),
       E₂ a b ((φ v : V₂) : D₂) = ((φ ⟨E₁ a b v, hst a b hab _ v.2⟩ : V₂) : D₂))
-    {a b : Fin n} (hab : ε a = ε b) (v : V₁) :
-    sE E₁ E₂ a b (diagι φ v) = diagι φ ⟨E₁ a b v, hst a b hab _ v.2⟩ := by
+    {a b : Fin n} (hab : ε a = ε b)
+    (v : V₁)
+    : sE E₁ E₂ a b (diagι φ v) = diagι φ ⟨E₁ a b v, hst a b hab _ v.2⟩ := by
   rw [diagι_apply, diagι_apply]
   simp only [sE, lift_ofP]
   rw [hcomm a b hab v]
 
-theorem diagSub_isKIrrHW (φ : V₁ →ₗ[ℂ] V₂) {Λ : Fin n → ℝ} (hV₁ : IsKIrrHW ε E₁ Λ V₁)
+theorem diagSub_isKIrrHW
+    (φ : V₁ →ₗ[ℂ] V₂)
+    {Λ : Fin n → ℝ} (hV₁ : IsKIrrHW ε E₁ Λ V₁)
     (hcomm : ∀ a b (hab : ε a = ε b) (v : V₁),
-      E₂ a b ((φ v : V₂) : D₂) = ((φ ⟨E₁ a b v, hV₁.2.1 a b hab _ v.2⟩ : V₂) : D₂)) :
-    IsKIrrHW ε (sE E₁ E₂) Λ (diagSub φ) := by
+      E₂ a b ((φ v : V₂) : D₂) = ((φ ⟨E₁ a b v, hV₁.2.1 a b hab _ v.2⟩ : V₂) : D₂))
+    : IsKIrrHW ε (sE E₁ E₂) Λ (diagSub φ) := by
   unfold IsKIrrHW
   have : FiniteDimensional ℂ V₁ := hV₁.1
   have hstab : IsKStableSub ε (sE E₁ E₂) (diagSub φ) := by
@@ -102,9 +106,10 @@ theorem diagSub_isKIrrHW (φ : V₁ →ₗ[ℂ] V₂) {Λ : Fin n → ℝ} (hV�
         have h0 : (⟨E₁ a b w, hV₁.2.1 a b hε _ hwV⟩ : V₁) = 0 := Subtype.ext (hwb a b hab hε)
         rw [h0, map_zero]
 
-theorem casimir_diagSub (φ : V₁ →ₗ[ℂ] V₂) {c : ℂ}
-    (hc₁ : ∀ v ∈ V₁, casimir E₁ v = c • v) (hc₂ : ∀ v ∈ V₂, casimir E₂ v = c • v) :
-    ∀ x ∈ diagSub φ, casimir (sE E₁ E₂) x = c • x := by
+theorem casimir_diagSub
+    (φ : V₁ →ₗ[ℂ] V₂)
+    {c : ℂ} (hc₁ : ∀ v ∈ V₁, casimir E₁ v = c • v) (hc₂ : ∀ v ∈ V₂, casimir E₂ v = c • v)
+    : ∀ x ∈ diagSub φ, casimir (sE E₁ E₂) x = c • x := by
   intro x hx
   obtain ⟨v, rfl⟩ := LinearMap.mem_range.mp hx
   rw [casimir_sE, diagι_apply]

@@ -10,7 +10,12 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.StdAtPrime
 
-theorem bnd_of_integral_over_prime : ∀ {E : Type} [Field E] [NumberField E] (p : ℕ), p.Prime → ∀ (n : ℕ) (A : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)), (∀ Q : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ Q.asIdeal → ∀ i j, Valued.v ((A i j) Q) ≤ 1) → GlobalTheory.StdAtPrime.Bnd p A := by
+theorem bnd_of_integral_over_prime
+    : ∀ {E : Type} [Field E] [NumberField E] (p : ℕ),
+      p.Prime
+        → ∀ (n : ℕ) (A : Matrix (Fin n) (Fin n) (FiniteAdeleRing (𝓞 E) E)),
+          (∀ Q : HeightOneSpectrum (𝓞 E), (p : 𝓞 E) ∈ Q.asIdeal → ∀ i j, Valued.v ((A i j) Q) ≤ 1)
+            → GlobalTheory.StdAtPrime.Bnd p A := by
   intro E _ _ p hp n A hA
   let S : Set (HeightOneSpectrum (𝓞 E)) := {Q | ∃ i j, ¬ Valued.v ((A i j) Q) ≤ 1}
   have hS : S.Finite := by

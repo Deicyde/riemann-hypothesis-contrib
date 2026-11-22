@@ -22,31 +22,31 @@ section Transport
 
 variable {h : HermitianForm F E W}
 
-theorem sesq_unitary_smul (g : h.unitaryGroup) (x y : W) :
-    h.toSesq (g • x) (g • y) = h.toSesq x y :=
+theorem sesq_unitary_smul (g : h.unitaryGroup) (x y : W)
+    : h.toSesq (g • x) (g • y) = h.toSesq x y :=
   g.2 x y
 
 theorem unitary_smul_scalar_smul (g : h.unitaryGroup) (a : E) (x : W) : g • (a • x) = a • (g • x) :=
   map_smul (g : W ≃ₗ[E] W) a x
 
-theorem mem_inv_smul_iff {g : h.unitaryGroup} {La : AddSubgroup W} {x : W} :
-    x ∈ g⁻¹ • La ↔ g • x ∈ La := by
+theorem mem_inv_smul_iff {g : h.unitaryGroup} {La : AddSubgroup W} {x : W}
+    : x ∈ g⁻¹ • La ↔ g • x ∈ La := by
   change x ∈ ((g⁻¹ : h.unitaryGroup) : W ≃ₗ[E] W) • La ↔ _
   rw [AddSubgroup.mem_pointwise_smul_iff_inv_smul_mem]
   rfl
 
-theorem lineCoeffs_inv_smul (g : h.unitaryGroup) (La : AddSubgroup W) (x : W) :
-    lineCoeffs (E := E) (g⁻¹ • La) x = lineCoeffs (E := E) La (g • x) := by
+theorem lineCoeffs_inv_smul (g : h.unitaryGroup) (La : AddSubgroup W) (x : W)
+    : lineCoeffs (E := E) (g⁻¹ • La) x = lineCoeffs (E := E) La (g • x) := by
   ext a
   change a • x ∈ g⁻¹ • La ↔ a • (g • x) ∈ La
   rw [mem_inv_smul_iff, unitary_smul_scalar_smul]
 
-theorem dualLattice_inv_smul (g : h.unitaryGroup) (La : AddSubgroup W) :
-    dualLattice h (g⁻¹ • La) = g⁻¹ • dualLattice h La := by
+theorem dualLattice_inv_smul (g : h.unitaryGroup) (La : AddSubgroup W)
+    : dualLattice h (g⁻¹ • La) = g⁻¹ • dualLattice h La := by
   ext y
   rw [mem_inv_smul_iff]
-  change (∀ x ∈ g⁻¹ • La, h.toSesq y x ∈ integralClosure ℤ E) ↔
-    ∀ x ∈ La, h.toSesq (g • y) x ∈ integralClosure ℤ E
+  change (∀ x ∈ g⁻¹ • La, h.toSesq y x ∈ integralClosure ℤ E)
+    ↔ ∀ x ∈ La, h.toSesq (g • y) x ∈ integralClosure ℤ E
   constructor
   · intro hy x hx
     have hx' : g⁻¹ • x ∈ g⁻¹ • La := by rw [mem_inv_smul_iff, smul_inv_smul]; exact hx
@@ -57,13 +57,13 @@ theorem dualLattice_inv_smul (g : h.unitaryGroup) (La : AddSubgroup W) :
     rw [← sesq_unitary_smul g]
     exact hy _ hx
 
-theorem isDIntegral_inv_smul (g : h.unitaryGroup) {D : ℕ} {La : AddSubgroup W}
-    (hLa : IsDIntegral h D La) : IsDIntegral h D (g⁻¹ • La) := by
+theorem isDIntegral_inv_smul
+    (g : h.unitaryGroup) {D : ℕ} {La : AddSubgroup W} (hLa : IsDIntegral h D La)
+    : IsDIntegral h D (g⁻¹ • La) := by
   set γ : W ≃ₗ[E] W := ((g⁻¹ : h.unitaryGroup) : W ≃ₗ[E] W) with hγ
-  have hinj : Function.Injective (DistribMulAction.toAddMonoidEnd (W ≃ₗ[E] W) W γ) :=
-    fun x y hxy => γ.injective hxy
-  have hrel : (g⁻¹ • La).relIndex (dualLattice h (g⁻¹ • La)) =
-      La.relIndex (dualLattice h La) := by
+  have hinj : Function.Injective (DistribMulAction.toAddMonoidEnd (W ≃ₗ[E] W) W γ) := fun x y hxy =>
+    γ.injective hxy
+  have hrel : (g⁻¹ • La).relIndex (dualLattice h (g⁻¹ • La)) = La.relIndex (dualLattice h La) := by
     rw [dualLattice_inv_smul]
     change (γ • La).relIndex (γ • dualLattice h La) = _
     rw [AddSubgroup.pointwise_smul_def, AddSubgroup.pointwise_smul_def]
@@ -78,11 +78,14 @@ theorem isDIntegral_inv_smul (g : h.unitaryGroup) {D : ℕ} {La : AddSubgroup W}
     rw [AddSubgroup.pointwise_smul_def]
     rw [AddSubgroup.fg_iff_exists_fin_addMonoidHom] at hfg ⊢
     obtain ⟨k, f, hf⟩ := hfg
-    exact ⟨k, γ.toLinearMap.toAddMonoidHom.comp f, by
-      rw [AddMonoidHom.range_comp, hf]
-      rfl⟩
-  · have hset : ((g⁻¹ • La : AddSubgroup W) : Set W) =
-        γ.toLinearMap '' (La : Set W) := by
+    exact ⟨
+      k,
+      γ.toLinearMap.toAddMonoidHom.comp f,
+      by
+        rw [AddMonoidHom.range_comp, hf]
+        rfl
+    ⟩
+  · have hset : ((g⁻¹ • La : AddSubgroup W) : Set W) = γ.toLinearMap '' (La : Set W) := by
       ext y
       constructor
       · intro hy
@@ -105,9 +108,12 @@ theorem isDIntegral_inv_smul (g : h.unitaryGroup) {D : ℕ} {La : AddSubgroup W}
 
 end Transport
 
-theorem AdaptedReduction.proof (h : HermitianForm F E W) [FiniteDimensional E W]
+theorem AdaptedReduction.proof
+    (h : HermitianForm F E W)
+    [FiniteDimensional E W]
     (h₁ : HyperbolicPairTransitive.Statement h) (h₂ : LineNormalForm.Statement h)
-    (h₃ : ComplementLattice.Statement h) : AdaptedReduction.Statement h := by
+    (h₃ : ComplementLattice.Statement h)
+    : AdaptedReduction.Statement h := by
   intro v₀ w₀ hp h' hh' D
   obtain ⟨KK, hKK, n, hn, H⟩ := h₂ D
   obtain ⟨D', hD'⟩ := h₃ v₀ w₀ hp h' hh' D n hn
@@ -118,23 +124,35 @@ theorem AdaptedReduction.proof (h : HermitianForm F E W) [FiniteDimensional E W]
     rw [lineCoeffs_inv_smul, hgv]
   have hJ : lineCoeffs (E := E) (g⁻¹ • La) w₀ = lineCoeffs (E := E) La w := by
     rw [lineCoeffs_inv_smul, hgw]
-  have hwv : h.toSesq w v = 1 := by
-    rw [← h.isSymm.eq v w, hvw.2.2, map_one]
-  have hsplit : ∀ x ∈ g⁻¹ • La, ∃ a ∈ lineCoeffs (E := E) (g⁻¹ • La) v₀,
-      ∃ b ∈ lineCoeffs (E := E) (g⁻¹ • La) w₀,
-        n • x - a • v₀ - b • w₀ ∈ hypComplement h v₀ w₀ := by
+  have hwv : h.toSesq w v = 1 := by rw [← h.isSymm.eq v w, hvw.2.2, map_one]
+  have hsplit
+      : ∀ x ∈ g⁻¹ • La, ∃ a ∈ lineCoeffs (E := E) (g⁻¹ • La) v₀,
+        ∃ b ∈ lineCoeffs (E := E) (g⁻¹ • La) w₀,
+          n • x - a • v₀ - b • w₀ ∈ hypComplement h v₀ w₀ := by
     intro x hx
     rw [mem_inv_smul_iff] at hx
     obtain ⟨ha, hb⟩ := hdec _ hx
-    refine ⟨(n : E) * h.toSesq w (g • x), by rw [hI]; exact ha,
-      (n : E) * h.toSesq v (g • x), by rw [hJ]; exact hb, ?_⟩
+    refine ⟨
+      (n : E) * h.toSesq w (g • x),
+      by rw [hI]; exact ha,
+      (n : E) * h.toSesq v (g • x),
+      by rw [hJ]; exact hb,
+      ?_
+    ⟩
     rw [mem_hypComplement, ← sesq_unitary_smul g v₀, ← sesq_unitary_smul g w₀, hgv, hgw,
-      ← Nat.cast_smul_eq_nsmul E, smul_sub, smul_sub, unitary_smul_scalar_smul, unitary_smul_scalar_smul,
-      unitary_smul_scalar_smul, hgv, hgw]
+      ← Nat.cast_smul_eq_nsmul E, smul_sub, smul_sub, unitary_smul_scalar_smul,
+      unitary_smul_scalar_smul, unitary_smul_scalar_smul, hgv, hgw]
     simp only [map_sub, map_smul, smul_eq_mul, hvw.1, hvw.2.1, hvw.2.2, hwv]
     constructor <;> ring
-  refine ⟨g, g⁻¹ • La, smul_inv_smul g La, hgv ▸ hvl, ?_, hsplit,
-    hD' _ (isDIntegral_inv_smul g hLa) hsplit⟩
+  refine ⟨
+    g,
+    g⁻¹ • La,
+    smul_inv_smul g La,
+    hgv ▸ hvl,
+    ?_,
+    hsplit,
+    hD' _ (isDIntegral_inv_smul g hLa) hsplit
+  ⟩
   rw [hI, hJ]
   exact hK
 

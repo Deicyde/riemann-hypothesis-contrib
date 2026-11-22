@@ -5,12 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LiftQMk
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut GlobalTheory.UseLoc Module Classical
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut GlobalTheory.UseLoc
+  Module Classical
 
 namespace GlobalTheory.UseLoc.JumpBlock
 
-theorem reflS_blockJ_iff (D : D7) (q : ℚ) :
-    AdmissibleParameterJ.refl D q ∈ AdmissibleParameterJ.blockJ D ↔ ∃ c : ℕ, c < D.R.t ∧ q = c := by
+theorem reflS_blockJ_iff (D : D7) (q : ℚ)
+    : AdmissibleParameterJ.refl D q ∈ AdmissibleParameterJ.blockJ D
+      ↔ ∃ c : ℕ, c < D.R.t ∧ q = c := by
   simp only [AdmissibleParameterJ.refl, AdmissibleParameterJ.blockJ, Set.mem_setOf_eq]
   constructor
   · rintro ⟨c, hc, hq⟩
@@ -26,14 +30,18 @@ theorem reflS_blockJ_iff (D : D7) (q : ℚ) :
     push_cast
     linarith
 
-theorem jumps_iff : ∀ (D : D7) (up : Bool) (j : ℕ) (ρ : D.what₂.Tau) (q : ℚ),
-    q ∈ AdmissibleParameterJ.JJ D up j ρ ↔ q ∈ AdmissibleParameterJ.JW D up j ρ ∨ ∃ c : ℕ, c < D.R.t ∧ q = c := by
+theorem jumps_iff
+    : ∀ (D : D7) (up : Bool) (j : ℕ) (ρ : D.what₂.Tau) (q : ℚ),
+      q ∈ AdmissibleParameterJ.JJ D up j ρ
+        ↔ q ∈ AdmissibleParameterJ.JW D up j ρ ∨ ∃ c : ℕ, c < D.R.t ∧ q = c := by
   intro D up j ρ q
   cases up
-  · simp only [AdmissibleParameterJ.JJ, AdmissibleParameterJ.JW, AdmissibleParameterJ.Jm, AdmissibleParameterJ.Jp, AdmissibleParameterJ.cloudT, AdmissibleParameterJ.lowT, AdmissibleParameterJ.reflS,
-      Set.mem_union, Set.mem_setOf_eq, Bool.false_eq_true, if_false]
+  · simp only [AdmissibleParameterJ.JJ, AdmissibleParameterJ.JW, AdmissibleParameterJ.Jm,
+      AdmissibleParameterJ.Jp, AdmissibleParameterJ.cloudT, AdmissibleParameterJ.lowT,
+      AdmissibleParameterJ.reflS, Set.mem_union, Set.mem_setOf_eq, Bool.false_eq_true, if_false]
     rw [reflS_blockJ_iff]
-  · simp only [AdmissibleParameterJ.JJ, AdmissibleParameterJ.JW, AdmissibleParameterJ.Jp, AdmissibleParameterJ.cloudT, AdmissibleParameterJ.lowT, AdmissibleParameterJ.blockJ,
+  · simp only [AdmissibleParameterJ.JJ, AdmissibleParameterJ.JW, AdmissibleParameterJ.Jp,
+      AdmissibleParameterJ.cloudT, AdmissibleParameterJ.lowT, AdmissibleParameterJ.blockJ,
       Set.mem_union, Set.mem_setOf_eq, if_true]
 
 end GlobalTheory.UseLoc.JumpBlock

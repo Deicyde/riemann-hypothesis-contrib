@@ -16,16 +16,19 @@ namespace LB
 
 variable {X Y : Scheme.{u}}
 
-def linCombIso {L M : LB X} {K : Type u} [Fintype K] (w : Iso L M) (φ : K → (Y ⟶ X))
-    (ε : K → ℤ) : Iso (LinComb L φ ε) (LinComb M φ ε) where
-  s := fun p => ∏ k, (res (le_inf (inf_le_left.trans (wchart_le M φ p.1 k))
+def linCombIso {L M : LB X} {K : Type u} [Fintype K] (w : Iso L M) (φ : K → (Y ⟶ X)) (ε : K → ℤ)
+    : Iso (LinComb L φ ε) (LinComb M φ ε) where
+  s := fun p =>
+    ∏ k, (res (le_inf (inf_le_left.trans (wchart_le M φ p.1 k))
       (inf_le_right.trans (wchart_le L φ p.2 k)) :
         wchart M φ p.1 ⊓ wchart L φ p.2 ≤ φ k ⁻¹ᵁ (M.U (p.1 k) ⊓ L.U (p.2 k)))
       (pullU (φ k) _ (w.s (p.1 k, p.2 k)))) ^ (ε k)
 
 def Gen.Maps {A B : LB X} (w : Iso A B) (a : Gen A) (b : Gen B) : Prop :=
-  ∀ p : B.ι × A.ι, res (inf_le_left : B.U p.1 ⊓ A.U p.2 ≤ B.U p.1) (b.s p.1) =
-    @id (Γ(X, B.U p.1 ⊓ A.U p.2)ˣ) (w.s p) * res (inf_le_right : B.U p.1 ⊓ A.U p.2 ≤ A.U p.2) (a.s p.2)
+  ∀ p : B.ι × A.ι,
+    res (inf_le_left : B.U p.1 ⊓ A.U p.2 ≤ B.U p.1) (b.s p.1)
+      = @id (Γ(X, B.U p.1 ⊓ A.U p.2)ˣ) (w.s p)
+        * res (inf_le_right : B.U p.1 ⊓ A.U p.2 ≤ A.U p.2) (a.s p.2)
 
 end LB
 
@@ -35,16 +38,18 @@ open MonoidalCategory CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
-structure CubeMap {S S' : Scheme.{u}} (G' : Over S') (G : Over S) [GrpObj G'] [IsCommMonObj G']
-    [GrpObj G] [IsCommMonObj G] where
+structure CubeMap
+    {S S' : Scheme.{u}} (G' : Over S') (G : Over S)
+    [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G] where
   F : G'.left ⟶ G.left
   F3 : (G3 G').left ⟶ (G3 G).left
   e : (𝟙_ (Over S')).left ⟶ (𝟙_ (Over S)).left
   e_comm : eSec G' ≫ F = e ≫ eSec G
   psum_comm : ∀ I : Finset (Fin 3), (psum G' (x3 G') I).left ≫ F = F3 ≫ (psum G (x3 G) I).left
 
-variable {S S' : Scheme.{u}} {G' : Over S'} {G : Over S} [GrpObj G'] [IsCommMonObj G']
-  [GrpObj G] [IsCommMonObj G]
+variable
+  {S S' : Scheme.{u}} {G' : Over S'} {G : Over S}
+  [GrpObj G'] [IsCommMonObj G'] [GrpObj G] [IsCommMonObj G]
 
 lemma rigPull_le (F : G'.left ⟶ G.left) (e : (𝟙_ (Over S')).left ⟶ (𝟙_ (Over S)).left)
     (he : eSec G' ≫ F = e ≫ eSec G) (L : LB G.left)
@@ -57,9 +62,11 @@ lemma rigPull_le (F : G'.left ⟶ G.left) (e : (𝟙_ (Over S')).left ⟶ (𝟙_
   rw [he] at h1
   exact Set.mem_iInter.2 fun _ => h1
 
-def rigPullOf (F : G'.left ⟶ G.left) (e : (𝟙_ (Over S')).left ⟶ (𝟙_ (Over S)).left)
-    (he : eSec G' ≫ F = e ≫ eSec G) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))) :
-    LB.Gen ((L.pull F).pull (eSec G')) where
+def rigPullOf
+    (F : G'.left ⟶ G.left) (e : (𝟙_ (Over S')).left ⟶ (𝟙_ (Over S)).left)
+    (he : eSec G' ≫ F = e ≫ eSec G)
+    (L : LB G.left) (r : LB.Gen (L.pull (eSec G)))
+    : LB.Gen ((L.pull F).pull (eSec G')) where
   s := fun j => res (rigPull_le F e he L j) (pullU e _ (r.s (fun _ => j ⟨⟩ ⟨⟩)))
 
 namespace CubeMap
@@ -75,32 +82,35 @@ lemma theta_le (m : CubeMap G' G) (L : LB G.left) (j : thK.{u} → PUnit.{u+1} �
   rw [m.psum_comm I.down] at h1
   exact h1
 
-def rigPull (m : CubeMap G' G) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))) :
-    LB.Gen ((L.pull m.F).pull (eSec G')) :=
+def rigPull (m : CubeMap G' G) (L : LB G.left) (r : LB.Gen (L.pull (eSec G)))
+    : LB.Gen ((L.pull m.F).pull (eSec G')) :=
   rigPullOf m.F m.e m.e_comm L r
 
-def thetaPull (m : CubeMap G' G) (L : LB G.left) (t : LB.Gen (Theta G L)) :
-    LB.Gen (Theta G' (L.pull m.F)) where
+def thetaPull (m : CubeMap G' G) (L : LB G.left) (t : LB.Gen (Theta G L))
+    : LB.Gen (Theta G' (L.pull m.F)) where
   s := fun j => res (m.theta_le L j) (pullU m.F3 _ (t.s (fun I => j I ⟨⟩)))
 
-def rigLB (m : CubeMap G' G) (L : RigLB G) (hL : (L.L.pull m.F).IsLB)
-    (hr : (m.rigPull L.L L.rig).IsGen) : RigLB G' :=
+def rigLB
+    (m : CubeMap G' G) (L : RigLB G) (hL : (L.L.pull m.F).IsLB) (hr : (m.rigPull L.L L.rig).IsGen)
+    : RigLB G' :=
   ⟨L.L.pull m.F, m.rigPull L.L L.rig, hL, hr⟩
 
-def IsPullCubical (m : CubeMap G' G) {L' : RigLB G'} (c' : CubicalStr G' L') {L : RigLB G}
-    (c : CubicalStr G L) : Prop :=
-  ∃ w : LB.Iso L'.L (L.L.pull m.F), w.IsGen ∧
-    LB.Gen.Maps (LB.linCombIso w (K := PUnit.{u+1}) (fun _ => eSec G') (fun _ => 1)) L'.rig
-      (m.rigPull L.L L.rig) ∧
-    LB.Gen.Maps (LB.linCombIso w (thφ G' (x3 G')) thε) c'.t (m.thetaPull L.L c.t)
+def IsPullCubical
+    (m : CubeMap G' G) {L' : RigLB G'} (c' : CubicalStr G' L') {L : RigLB G} (c : CubicalStr G L)
+    : Prop :=
+  ∃ w : LB.Iso L'.L (L.L.pull m.F),
+    w.IsGen
+      ∧ LB.Gen.Maps (LB.linCombIso w (K := PUnit.{u + 1}) (fun _ => eSec G') (fun _ => 1)) L'.rig
+        (m.rigPull L.L L.rig)
+      ∧ LB.Gen.Maps (LB.linCombIso w (thφ G' (x3 G')) thε) c'.t (m.thetaPull L.L c.t)
 
 end CubeMap
 
 def RigLB.IsSymmetric (L : RigLB G) : Prop :=
   ∃ he : eSec G ≫ (GrpObj.inv (X := G)).left = 𝟙 _ ≫ eSec G,
-  ∃ w : LB.Iso L.L (L.L.pull (GrpObj.inv (X := G)).left), w.IsGen ∧
-    LB.Gen.Maps (LB.linCombIso w (K := PUnit.{u+1}) (fun _ => eSec G) (fun _ => 1)) L.rig
-      (rigPullOf (GrpObj.inv (X := G)).left (𝟙 _) he L.L L.rig)
+    ∃ w : LB.Iso L.L (L.L.pull (GrpObj.inv (X := G)).left),
+      w.IsGen ∧ LB.Gen.Maps (LB.linCombIso w (K := PUnit.{u + 1}) (fun _ => eSec G) (fun _ => 1))
+        L.rig (rigPullOf (GrpObj.inv (X := G)).left (𝟙 _) he L.L L.rig)
 
 section OfHom
 
@@ -141,15 +151,15 @@ def CubeMap.ofHom (f : G'' ⟶ G₀) [IsMonHom f] : CubeMap G'' G₀ where
   F := f.left
   F3 := (f ⊗ₘ f ⊗ₘ f).left
   e := 𝟙 _
-  e_comm := by
-    rw [Category.id_comp, eSec, eSec, ← Over.comp_left, IsMonHom.one_hom]
+  e_comm := by rw [Category.id_comp, eSec, eSec, ← Over.comp_left, IsMonHom.one_hom]
   psum_comm := fun I => by
     rw [← Over.comp_left, ← Over.comp_left]
     congr 1
     simp only [psum]
     rw [foldr_padd_comp, ← foldr_padd_pre]
-    have hx : (fun k acc => padd G₀ (x3 G'' k ≫ f) acc) =
-        (fun k acc => padd G₀ ((f ⊗ₘ f ⊗ₘ f) ≫ x3 G₀ k) acc) := by
+    have hx
+        : (fun k acc => padd G₀ (x3 G'' k ≫ f) acc)
+          = (fun k acc => padd G₀ ((f ⊗ₘ f ⊗ₘ f) ≫ x3 G₀ k) acc) := by
       funext k acc; rw [cubeProj_comp_map]
     rw [hx]
 
@@ -157,10 +167,9 @@ end OfHom
 
 def RigPullIsGenSt : Prop :=
   ∀ {S S' : Scheme.{u}} {G' : Over S'} {G : Over S} [GrpObj G'] [IsCommMonObj G'] [GrpObj G]
-    [IsCommMonObj G] (F : G'.left ⟶ G.left) (e : (𝟙_ (Over S')).left ⟶ (𝟙_ (Over S)).left)
-    (he : eSec G' ≫ F = e ≫ eSec G) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))),
+      [IsCommMonObj G] (F : G'.left ⟶ G.left) (e : (𝟙_ (Over S')).left ⟶ (𝟙_ (Over S)).left)
+      (he : eSec G' ≫ F = e ≫ eSec G) (L : LB G.left) (r : LB.Gen (L.pull (eSec G))),
     L.IsLB → r.IsGen → (rigPullOf F e he L r).IsGen
-
 
 end Group
 

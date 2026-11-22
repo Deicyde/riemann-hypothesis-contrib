@@ -124,12 +124,15 @@ theorem sigma_summable : SigmaSummable := by
 
 theorem sigma_product_locally_uniform : SigmaProdLU := by
   intro L
-  have key : HasProdLocallyUniformlyOn (fun (l : L.lattice) (z : ℂ) => 1 + (wFactor (l : ℂ) z - 1))
-      (fun z => ∏' l : L.lattice, (1 + (wFactor (l : ℂ) z - 1))) Set.univ := by
+  have key : HasProdLocallyUniformlyOn
+      (fun (l : L.lattice) (z : ℂ) => 1 + (wFactor (l : ℂ) z - 1))
+      (fun z => ∏' l : L.lattice, (1 + (wFactor (l : ℂ) z - 1)))
+      Set.univ := by
     rw [HasProdLocallyUniformlyOn, tendstoLocallyUniformlyOn_iff_forall_isCompact isOpen_univ]
     intro K _ hK
     obtain ⟨r, hr⟩ := hK.isBounded.subset_closedBall 0
-    refine HasProdUniformlyOn.tendstoUniformlyOn <| Summable.hasProdUniformlyOn_one_add (f := fun (l : L.lattice) (z : ℂ) => wFactor (l : ℂ) z - 1)
+    refine HasProdUniformlyOn.tendstoUniformlyOn <| Summable.hasProdUniformlyOn_one_add
+      (f := fun (l : L.lattice) (z : ℂ) => wFactor (l : ℂ) z - 1)
       hK (summable_majorant L r) ?_ ?_
     · filter_upwards [eventually_large L (2 * r)] with l hl x hx
       exact norm_wFactor_sub_one_le r l x (by simpa using hr hx) hl

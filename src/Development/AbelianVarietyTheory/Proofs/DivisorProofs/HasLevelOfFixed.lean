@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HeckeOperato
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -22,8 +23,10 @@ namespace GlobalTheory.BCT
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem isCompU_of_equiv {π : Submodule ℂ (UA E n → ℂ)} {w : Pl E} {σ σ' : SmIrr (UL n w)}
-    (h : IsCompU π w σ) (e : σ.ρ.Equiv σ'.ρ) : IsCompU π w σ' := by
+theorem isCompU_of_equiv
+    {π : Submodule ℂ (UA E n → ℂ)} {w : Pl E} {σ σ' : SmIrr (UL n w)}
+    (h : IsCompU π w σ) (e : σ.ρ.Equiv σ'.ρ)
+    : IsCompU π w σ' := by
   obtain ⟨p, hp, -, f, hf0, hfπ, hfe⟩ := h
   let g : σ'.V →ₗ[ℂ] σ.V := e.symm.toLinearEquiv.toLinearMap
   have hg : ∀ x v, g (σ'.ρ x v) = σ.ρ x (g v) := fun x v =>
@@ -36,8 +39,11 @@ theorem isCompU_of_equiv {π : Submodule ℂ (UA E n → ℂ)} {w : Pl E} {σ σ
     simpa [g] using this
   · simp only [LinearMap.comp_apply, hg, hfe]
 
-theorem hasLevel_of_fixed {S : Set (Pl E)} (hS : IsSection S) {π : Submodule ℂ (UA E n → ℂ)}
-    {K' : ∀ w : Pl E, Subgroup (UL n w)} (h : π ⊓ fixed (RF E n) (globLev S K') ≠ ⊥) : HasLevel S π K' := by
+theorem hasLevel_of_fixed
+    {S : Set (Pl E)} (hS : IsSection S)
+    {π : Submodule ℂ (UA E n → ℂ)} {K' : ∀ w : Pl E, Subgroup (UL n w)}
+    (h : π ⊓ fixed (RF E n) (globLev S K') ≠ ⊥)
+    : HasLevel S π K' := by
   obtain ⟨φ, hφ, hφ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot h
   refine ⟨φ, (Submodule.mem_inf.1 hφ).1, hφ0, fun w hw x hx hk => ?_⟩
   obtain ⟨k, hk, hkx⟩ := hk

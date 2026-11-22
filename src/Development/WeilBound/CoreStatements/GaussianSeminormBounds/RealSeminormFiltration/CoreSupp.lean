@@ -6,7 +6,8 @@ public import Development.WeilBound.CoreStatements.GaussianSeminormBounds.RealSe
 
 noncomputable section
 
-open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real FockH1Action MvPolynomial Matrix
+open ReciprocityTheory.ThetaSummability.Real ReciprocityTheory.ChartRestriction.G.ThK.Real
+  FockH1Action MvPolynomial Matrix
 open scoped InnerProductSpace
 
 namespace PositivityTheory.KReal
@@ -15,8 +16,9 @@ section Gen
 
 variable {σ κ : Type} [Fintype κ]
 
-private theorem coeff_pderiv_real_seminorm_filtration (l : σ) (P : MvPolynomial σ ℂ) (γ : σ →₀ ℕ) :
-    AddMonoidAlgebra.coeff (pderiv l P) γ = AddMonoidAlgebra.coeff P (γ + Finsupp.single l 1) * ((γ l : ℂ) + 1) := by
+private theorem coeff_pderiv_real_seminorm_filtration (l : σ) (P : MvPolynomial σ ℂ) (γ : σ →₀ ℕ)
+    : AddMonoidAlgebra.coeff (pderiv l P) γ
+      = AddMonoidAlgebra.coeff P (γ + Finsupp.single l 1) * ((γ l : ℂ) + 1) := by
   classical
   refine MvPolynomial.induction_on' P (fun s a => ?_) (fun p q hp hq => ?_)
   · rw [pderiv_monomial, coeff_monomial, coeff_monomial]
@@ -33,9 +35,11 @@ private theorem coeff_pderiv_real_seminorm_filtration (l : σ) (P : MvPolynomial
         exact (tsub_add_cancel_of_le (Finsupp.single_le_iff.mpr hpos)).symm
   · simp [hp, hq, add_mul]
 
-theorem supp_wt_term (w : σ → ℕ) (l l' : σ) (P : MvPolynomial σ ℂ) (γ : σ →₀ ℕ)
-    (h : AddMonoidAlgebra.coeff (X l * pderiv l' P) γ ≠ 0) :
-    ∃ β ∈ P.support, Finsupp.weight w β + w l = Finsupp.weight w γ + w l' := by
+theorem supp_wt_term
+    (w : σ → ℕ)
+    (l l' : σ) (P : MvPolynomial σ ℂ) (γ : σ →₀ ℕ)
+    (h : AddMonoidAlgebra.coeff (X l * pderiv l' P) γ ≠ 0)
+    : ∃ β ∈ P.support, Finsupp.weight w β + w l = Finsupp.weight w γ + w l' := by
   classical
   rw [coeff_X_mul'] at h
   split_ifs at h with hl
@@ -57,35 +61,39 @@ theorem supp_wt_term (w : σ → ℕ) (l l' : σ) (P : MvPolynomial σ ℂ) (γ 
       omega
   · exact absurd rfl h
 
-private theorem weight_le_of_mem_support_mul_of_right (w : σ → ℕ) (k : ℕ) (F G : MvPolynomial σ ℂ)
-    (hG : ∀ γ ∈ G.support, k ≤ Finsupp.weight w γ) :
-    ∀ γ ∈ (F * G).support, k ≤ Finsupp.weight w γ := by
+private theorem weight_le_of_mem_support_mul_of_right
+    (w : σ → ℕ) (k : ℕ) (F G : MvPolynomial σ ℂ) (hG : ∀ γ ∈ G.support, k ≤ Finsupp.weight w γ)
+    : ∀ γ ∈ (F * G).support, k ≤ Finsupp.weight w γ := by
   classical
   intro γ hγ
   obtain ⟨a, _, b, hb, rfl⟩ := Finset.mem_add.mp (support_mul F G hγ)
   rw [map_add (f := _)]
   exact le_add_left (hG b hb)
 
-private theorem weight_le_of_mem_support_sum {ι : Type} (w : σ → ℕ) (k : ℕ) (s : Finset ι)
-    (F : ι → MvPolynomial σ ℂ) (hF : ∀ i ∈ s, ∀ γ ∈ (F i).support, k ≤ Finsupp.weight w γ) :
-    ∀ γ ∈ (∑ i ∈ s, F i).support, k ≤ Finsupp.weight w γ := by
+private theorem weight_le_of_mem_support_sum
+    {ι : Type} (w : σ → ℕ) (k : ℕ) (s : Finset ι) (F : ι → MvPolynomial σ ℂ)
+    (hF : ∀ i ∈ s, ∀ γ ∈ (F i).support, k ≤ Finsupp.weight w γ)
+    : ∀ γ ∈ (∑ i ∈ s, F i).support, k ≤ Finsupp.weight w γ := by
   classical
   intro γ hγ
   obtain ⟨i, hi, hγi⟩ := Finset.mem_biUnion.mp (support_sum hγ)
   exact hF i hi γ hγi
 
-private theorem exists_mem_support_mul_weight_eq_of_weight_zero (w : σ → ℕ) (b : ℕ) (D g : MvPolynomial σ ℂ) (hD0 : D ≠ 0)
-    (hD : ∀ γ ∈ D.support, Finsupp.weight w γ = 0)
-    (hg : ∀ γ ∈ g.support, b ≤ Finsupp.weight w γ) (γ0 : σ →₀ ℕ) (hγ0 : γ0 ∈ g.support)
-    (hb : Finsupp.weight w γ0 = b) :
-    ∃ γ ∈ (D * g).support, Finsupp.weight w γ = b := by
+private theorem exists_mem_support_mul_weight_eq_of_weight_zero
+    (w : σ → ℕ) (b : ℕ) (D g : MvPolynomial σ ℂ) (hD0 : D ≠ 0)
+    (hD : ∀ γ ∈ D.support, Finsupp.weight w γ = 0) (hg : ∀ γ ∈ g.support, b ≤ Finsupp.weight w γ)
+    (γ0 : σ →₀ ℕ) (hγ0 : γ0 ∈ g.support) (hb : Finsupp.weight w γ0 = b)
+    : ∃ γ ∈ (D * g).support, Finsupp.weight w γ = b := by
   classical
   let g0 : MvPolynomial σ ℂ :=
     ∑ x ∈ g.support.filter (fun x => Finsupp.weight w x = b), monomial x (AddMonoidAlgebra.coeff g x)
-  have hc0 : ∀ γ, AddMonoidAlgebra.coeff g0 γ = if Finsupp.weight w γ = b then AddMonoidAlgebra.coeff g γ else 0 := by
+  have hc0
+      : ∀ γ,
+        AddMonoidAlgebra.coeff g0 γ
+          = if Finsupp.weight w γ = b then AddMonoidAlgebra.coeff g γ else 0 := by
     intro γ
-    by_cases hγ : AddMonoidAlgebra.coeff g γ = 0 <;>
-      simp [g0, coeff_sum, coeff_monomial, Finset.mem_filter, mem_support_iff, hγ]
+    by_cases hγ : AddMonoidAlgebra.coeff g γ = 0
+      <;> simp [g0, coeff_sum, coeff_monomial, Finset.mem_filter, mem_support_iff, hγ]
   have hg0 : g0 ≠ 0 := by
     intro h
     have h1 := hc0 γ0
@@ -119,11 +127,14 @@ private theorem exists_mem_support_mul_weight_eq_of_weight_zero (w : σ → ℕ)
   rw [h4, add_zero]
   exact mem_support_iff.mp hγ
 
-theorem supp_gen_pos {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : ∀ c, pos c = true ↔ ∃ i, ρ i = c)
-    (hρi : Function.Injective ρ) (u : Fin N → κ → σ) (v : κ → σ)
+theorem supp_gen_pos
+    {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : ∀ c, pos c = true ↔ ∃ i, ρ i = c)
+    (hρi : Function.Injective ρ)
+    (u : Fin N → κ → σ) (v : κ → σ)
     (hu : Function.Injective (fun x : Fin N × Fin N => u x.1 (ρ x.2)))
-    (huv : ∀ j c c', u j c ≠ v c') (hv : Function.Injective v) (P : MvPolynomial σ ℂ) (hP : P ≠ 0)
-    (hR : ∀ j, PI.FJMP.gR (u j) v pos P = 0) : ∃ e ∈ P.support, PI.FJMP.sw e v pos ≤ 0 := by
+    (huv : ∀ j c c', u j c ≠ v c') (hv : Function.Injective v)
+    (P : MvPolynomial σ ℂ) (hP : P ≠ 0) (hR : ∀ j, PI.FJMP.gR (u j) v pos P = 0)
+    : ∃ e ∈ P.support, PI.FJMP.sw e v pos ≤ 0 := by
   classical
   suffices key : ∃ e ∈ P.support, ∀ c, pos c = true → e (v c) = 0 by
     obtain ⟨e, he, hz⟩ := key
@@ -175,8 +186,9 @@ theorem supp_gen_pos {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : �
     intro j
     have h := hR j
     unfold PI.FJMP.gR at h
-    rw [Finset.sum_ite, himg, Finset.sum_image (fun a _ b _ hab => hρi hab),
-      Finset.sum_neg_distrib, add_neg_eq_zero] at h
+    rw [Finset.sum_ite, himg, Finset.sum_image (fun a _ b _ hab => hρi hab), Finset.sum_neg_distrib,
+        add_neg_eq_zero]
+      at h
     exact h
   let f : Fin N × Fin N → σ := fun x => u x.1 (ρ x.2)
   have hfi : Function.Injective f := hu
@@ -194,7 +206,8 @@ theorem supp_gen_pos {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : �
     have h1 := congrArg (fun x => M.adjugate *ᵥ x) hMv
     simp only [Matrix.mulVec_mulVec, Matrix.adjugate_mul] at h1
     have h2 := congrFun h1 i0
-    have h3 : ((M.det • (1 : Matrix (Fin N) (Fin N) (MvPolynomial σ ℂ))) *ᵥ g) i0 = M.det * g i0 := by
+    have h3
+        : ((M.det • (1 : Matrix (Fin N) (Fin N) (MvPolynomial σ ℂ))) *ᵥ g) i0 = M.det * g i0 := by
       simp [Matrix.mulVec, dotProduct, Matrix.one_apply]
     rw [← h3, h2]
     rfl
@@ -207,8 +220,11 @@ theorem supp_gen_pos {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : �
     intro γ hγ
     rw [hdetM, support_rename_of_injective hfi, Finset.mem_image] at hγ
     obtain ⟨δ, _, rfl⟩ := hγ
-    rw [Finsupp.weight_apply, Finsupp.sum_mapDomain_index (h := fun i c => c • w i)
-      (fun b => zero_smul ℕ (w b)) (fun b m1 m2 => add_smul m1 m2 (w b))]
+    rw [Finsupp.weight_apply,
+      Finsupp.sum_mapDomain_index
+        (h := fun i c => c • w i)
+        (fun b => zero_smul ℕ (w b))
+        (fun b m1 m2 => add_smul m1 m2 (w b))]
     simp [Finsupp.sum, f, hwu]
   have hR1 : ∀ j, ∀ γ ∈ (R j).support, Finsupp.weight w e0 + 1 ≤ Finsupp.weight w γ := by
     intro j
@@ -218,9 +234,10 @@ theorem supp_gen_pos {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : �
       rw [hwneg c hc', hwu j c] at hβw
       have h1 := hmin β hβ
       omega)
-  have hRHS : ∀ γ ∈ (∑ j, M.adjugate i0 j * R j).support,
-      Finsupp.weight w e0 + 1 ≤ Finsupp.weight w γ :=
-    weight_le_of_mem_support_sum w _ _ _ (fun j _ => weight_le_of_mem_support_mul_of_right w _ _ _ (hR1 j))
+  have hRHS
+      : ∀ γ ∈ (∑ j, M.adjugate i0 j * R j).support, Finsupp.weight w e0 + 1 ≤ Finsupp.weight w γ :=
+    weight_le_of_mem_support_sum w _ _ _
+      (fun j _ => weight_le_of_mem_support_mul_of_right w _ _ _ (hR1 j))
   have hg : ∀ γ ∈ (g i0).support, Finsupp.weight w e0 ≤ Finsupp.weight w γ := by
     intro γ hγ
     have h1 := mem_support_iff.mp hγ
@@ -248,26 +265,30 @@ theorem supp_gen_pos {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : �
     have h1 := congrArg (Finsupp.weight w) hadd
     rw [map_add (f := _), hsw, hwpos _ hpos0, add_zero] at h1
     exact h1
-  obtain ⟨γ, hγ, hγw⟩ := exists_mem_support_mul_weight_eq_of_weight_zero w _ M.det (g i0) hD0 hD hg _ hγ0 hwγ0
+  obtain ⟨γ, hγ, hγw⟩ :=
+    exists_mem_support_mul_weight_eq_of_weight_zero w _ M.det (g i0) hD0 hD hg _ hγ0 hwγ0
   rw [hdet] at hγ
   have h1 := hRHS γ hγ
   omega
 
-theorem supp_gen_neg {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : ∀ c, pos c = false ↔ ∃ i, ρ i = c)
-    (hρi : Function.Injective ρ) (u : Fin N → κ → σ) (v : κ → σ)
+theorem supp_gen_neg
+    {N : ℕ} (pos : κ → Bool) (ρ : Fin N → κ) (hρ : ∀ c, pos c = false ↔ ∃ i, ρ i = c)
+    (hρi : Function.Injective ρ)
+    (u : Fin N → κ → σ) (v : κ → σ)
     (hu : Function.Injective (fun x : Fin N × Fin N => u x.1 (ρ x.2)))
-    (huv : ∀ j c c', u j c ≠ v c') (hv : Function.Injective v) (P : MvPolynomial σ ℂ) (hP : P ≠ 0)
-    (hR : ∀ j, PI.FJMP.gR v (u j) pos P = 0) : ∃ e ∈ P.support, 0 ≤ PI.FJMP.sw e v pos := by
-  have hR' : ∀ j, PI.FJMP.gR (u j) v (fun c => !pos c) P = 0 := by
+    (huv : ∀ j c c', u j c ≠ v c') (hv : Function.Injective v)
+    (P : MvPolynomial σ ℂ) (hP : P ≠ 0) (hR : ∀ j, PI.FJMP.gR v (u j) pos P = 0)
+    : ∃ e ∈ P.support, 0 ≤ PI.FJMP.sw e v pos := by
+  have hR' : ∀ j, PI.FJMP.gR (u j) v (fun c => ! pos c) P = 0 := by
     intro j
-    have h := PI.FJMP.gR_swap (u j) v (fun c => !pos c) P
+    have h := PI.FJMP.gR_swap (u j) v (fun c => ! pos c) P
     simp only [Bool.not_not] at h
     rw [hR j] at h
     exact neg_eq_zero.mp h.symm
-  obtain ⟨e, he, hsw⟩ := supp_gen_pos (fun c => !pos c) ρ
-    (by intro c; rw [← hρ c]; simp) hρi u v hu huv hv P hP hR'
+  obtain ⟨e, he, hsw⟩ :=
+    supp_gen_pos (fun c => ! pos c) ρ (by intro c; rw [← hρ c]; simp) hρi u v hu huv hv P hP hR'
   refine ⟨e, he, ?_⟩
-  have hneg : PI.FJMP.sw e v (fun c => !pos c) = - PI.FJMP.sw e v pos := by
+  have hneg : PI.FJMP.sw e v (fun c => ! pos c) = - PI.FJMP.sw e v pos := by
     unfold PI.FJMP.sw
     rw [← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl (fun c _ => ?_)
@@ -280,13 +301,18 @@ section Col
 
 variable {p q r s : ℕ} {ν : Ix r s → ℚ} {g : Pol p q r s}
 
-theorem supp_lp {c d : Ix r s} (h : posC c d) (a : Ix p q) :
-    linePos ((a, d) : Ln p q r s) = linePos ((a, c) : Ln p q r s) := by
-  rcases c with c | c <;> rcases d with d | d <;> simp only [posC] at h <;> rcases a with a | a <;> rfl
+theorem supp_lp {c d : Ix r s} (h : posC c d) (a : Ix p q)
+    : linePos ((a, d) : Ln p q r s) = linePos ((a, c) : Ln p q r s) := by
+  rcases c with c | c <;> rcases d with d | d <;> simp only [posC] at h <;> rcases a with a | a
+    <;> rfl
 
-theorem supp_gR (hg : IsHW (fockAct2 p q r s) ν g) {c d : Ix r s} (h : posC c d) :
-    PI.FJMP.gR (fun a : Ix p q => ((a, c) : Ln p q r s)) (fun a => (a, d))
-      (fun a => linePos ((a, c) : Ln p q r s)) g = 0 := by
+theorem supp_gR (hg : IsHW (fockAct2 p q r s) ν g) {c d : Ix r s} (h : posC c d)
+    : PI.FJMP.gR
+        (fun a : Ix p q => ((a, c) : Ln p q r s))
+        (fun a => (a, d))
+        (fun a => linePos ((a, c) : Ln p q r s))
+        g
+      = 0 := by
   have hg' : g ≠ 0 ∧ g ∈ hwSub (fockAct2 p q r s) ν := hg
   have hcd : c ≠ d := PI.FJMP.ne_of_posC h
   have h0 := PI.FJMP.ker_of_hw hg'.2 c d h
@@ -300,53 +326,74 @@ theorem supp_gR (hg : IsHW (fockAct2 p q r s) ν g) {c d : Ix r s} (h : posC c d
   rw [← e]
   exact h0
 
-theorem supp_col_pos (hg : IsHW (fockAct2 p q r s) ν g) {N : ℕ} (d : Ix r s) (ρ : Fin N → Ix p q)
+theorem supp_col_pos
+    (hg : IsHW (fockAct2 p q r s) ν g)
+    {N : ℕ} (d : Ix r s) (ρ : Fin N → Ix p q)
     (hρ : ∀ a, linePos ((a, d) : Ln p q r s) = true ↔ ∃ i, ρ i = a) (hρi : Function.Injective ρ)
-    (κ : Fin N → Ix r s) (hκ : Function.Injective κ) (hκd : ∀ j, posC (κ j) d) :
-    shiftNu (cPair p q) ν d ≤ 0 := by
+    (κ : Fin N → Ix r s) (hκ : Function.Injective κ) (hκd : ∀ j, posC (κ j) d)
+    : shiftNu (cPair p q) ν d ≤ 0 := by
   have hg' : g ≠ 0 ∧ g ∈ hwSub (fockAct2 p q r s) ν := hg
-  obtain ⟨e, he, hsw⟩ := supp_gen_pos (fun a : Ix p q => linePos ((a, d) : Ln p q r s)) ρ hρ hρi
-    (fun j a => ((a, κ j) : Ln p q r s)) (fun a => ((a, d) : Ln p q r s))
-    (by
-      rintro ⟨j1, i1⟩ ⟨j2, i2⟩ h
-      simp only [Prod.mk.injEq] at h
-      rw [hρi h.1, hκ h.2])
-    (fun j c c' h => PI.FJMP.ne_of_posC (hκd j) (congrArg Prod.snd h))
-    (fun a b h => congrArg Prod.fst h) g hg'.1
-    (by
-      intro j
-      have h := supp_gR hg (hκd j)
-      have hl : (fun a : Ix p q => linePos ((a, κ j) : Ln p q r s))
-          = fun a => linePos ((a, d) : Ln p q r s) := by
-        funext a
-        exact (supp_lp (hκd j) a).symm
-      rw [hl] at h
-      exact h)
-  have hw := PI.FJMP.monomialRightWeight_eq_weight_sub PI.FJM.rightDiagonalActionFormula hg'.2 e he d
-  have hs : PI.FJMP.sw e (fun a => ((a, d) : Ln p q r s)) (fun a => linePos ((a, d) : Ln p q r s))
-      = PI.FJM.wt2 e d := rfl
+  obtain ⟨e, he, hsw⟩ :=
+    supp_gen_pos
+      (fun a : Ix p q => linePos ((a, d) : Ln p q r s))
+      ρ hρ hρi
+      (fun j a => ((a, κ j) : Ln p q r s))
+      (fun a => ((a, d) : Ln p q r s))
+      (by
+        rintro ⟨j1, i1⟩ ⟨j2, i2⟩ h
+        simp only [Prod.mk.injEq] at h
+        rw [hρi h.1, hκ h.2])
+      (fun j c c' h => PI.FJMP.ne_of_posC (hκd j) (congrArg Prod.snd h))
+      (fun a b h => congrArg Prod.fst h)
+      g hg'.1
+      (by
+        intro j
+        have h := supp_gR hg (hκd j)
+        have hl
+            : (fun a : Ix p q => linePos ((a, κ j) : Ln p q r s))
+              = fun a => linePos ((a, d) : Ln p q r s) := by
+          funext a
+          exact (supp_lp (hκd j) a).symm
+        rw [hl] at h
+        exact h)
+  have hw :=
+    PI.FJMP.monomialRightWeight_eq_weight_sub PI.FJM.rightDiagonalActionFormula hg'.2 e he d
+  have hs
+      : PI.FJMP.sw e (fun a => ((a, d) : Ln p q r s)) (fun a => linePos ((a, d) : Ln p q r s))
+        = PI.FJM.wt2 e d :=
+    rfl
   rw [hs] at hsw
   have hq : (PI.FJM.wt2 e d : ℚ) ≤ 0 := by exact_mod_cast hsw
   rw [hw] at hq
   exact hq
 
-theorem supp_col_neg (hg : IsHW (fockAct2 p q r s) ν g) {N : ℕ} (d : Ix r s) (ρ : Fin N → Ix p q)
+theorem supp_col_neg
+    (hg : IsHW (fockAct2 p q r s) ν g)
+    {N : ℕ} (d : Ix r s) (ρ : Fin N → Ix p q)
     (hρ : ∀ a, linePos ((a, d) : Ln p q r s) = false ↔ ∃ i, ρ i = a) (hρi : Function.Injective ρ)
-    (κ : Fin N → Ix r s) (hκ : Function.Injective κ) (hκd : ∀ j, posC d (κ j)) :
-    0 ≤ shiftNu (cPair p q) ν d := by
+    (κ : Fin N → Ix r s) (hκ : Function.Injective κ) (hκd : ∀ j, posC d (κ j))
+    : 0 ≤ shiftNu (cPair p q) ν d := by
   have hg' : g ≠ 0 ∧ g ∈ hwSub (fockAct2 p q r s) ν := hg
-  obtain ⟨e, he, hsw⟩ := supp_gen_neg (fun a : Ix p q => linePos ((a, d) : Ln p q r s)) ρ hρ hρi
-    (fun j a => ((a, κ j) : Ln p q r s)) (fun a => ((a, d) : Ln p q r s))
-    (by
-      rintro ⟨j1, i1⟩ ⟨j2, i2⟩ h
-      simp only [Prod.mk.injEq] at h
-      rw [hρi h.1, hκ h.2])
-    (fun j c c' h => PI.FJMP.ne_of_posC (hκd j) (congrArg Prod.snd h).symm)
-    (fun a b h => congrArg Prod.fst h) g hg'.1
-    (fun j => supp_gR hg (hκd j))
-  have hw := PI.FJMP.monomialRightWeight_eq_weight_sub PI.FJM.rightDiagonalActionFormula hg'.2 e he d
-  have hs : PI.FJMP.sw e (fun a => ((a, d) : Ln p q r s)) (fun a => linePos ((a, d) : Ln p q r s))
-      = PI.FJM.wt2 e d := rfl
+  obtain ⟨e, he, hsw⟩ :=
+    supp_gen_neg
+      (fun a : Ix p q => linePos ((a, d) : Ln p q r s))
+      ρ hρ hρi
+      (fun j a => ((a, κ j) : Ln p q r s))
+      (fun a => ((a, d) : Ln p q r s))
+      (by
+        rintro ⟨j1, i1⟩ ⟨j2, i2⟩ h
+        simp only [Prod.mk.injEq] at h
+        rw [hρi h.1, hκ h.2])
+      (fun j c c' h => PI.FJMP.ne_of_posC (hκd j) (congrArg Prod.snd h).symm)
+      (fun a b h => congrArg Prod.fst h)
+      g hg'.1
+      (fun j => supp_gR hg (hκd j))
+  have hw :=
+    PI.FJMP.monomialRightWeight_eq_weight_sub PI.FJM.rightDiagonalActionFormula hg'.2 e he d
+  have hs
+      : PI.FJMP.sw e (fun a => ((a, d) : Ln p q r s)) (fun a => linePos ((a, d) : Ln p q r s))
+        = PI.FJM.wt2 e d :=
+    rfl
   rw [hs] at hsw
   have hq : (0 : ℚ) ≤ (PI.FJM.wt2 e d : ℚ) := by exact_mod_cast hsw
   rw [hw] at hq
@@ -354,8 +401,8 @@ theorem supp_col_neg (hg : IsHW (fockAct2 p q r s) ν g) {N : ℕ} (d : Ix r s) 
 
 end Col
 
-theorem supp2 {p q r s : ℕ} {ν : Ix r s → ℚ} {g : Pol p q r s} (hg : IsHW (fockAct2 p q r s) ν g) :
-    Supp p q ν := by
+theorem supp2 {p q r s : ℕ} {ν : Ix r s → ℚ} {g : Pol p q r s} (hg : IsHW (fockAct2 p q r s) ν g)
+    : Supp p q ν := by
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro k hk
     exact supp_col_pos hg (Sum.inl k) (Sum.inl : Fin p → Ix p q)

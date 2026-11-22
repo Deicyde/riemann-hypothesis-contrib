@@ -9,14 +9,16 @@ public import Development.AbelianVarietyTheory.Definitions.AbelianSchemeLaws.IsS
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.LogKS Formalism.L2.Pj
 
 namespace GlobalTheory.AffinePreimageFibre
 
-theorem isPullback_comp_mono {C : Type*} [Category C] {A B T : C} (f : A ⟶ B) (c : B ⟶ T) [Mono c] :
-    IsPullback f (𝟙 A) c (f ≫ c) :=
+theorem isPullback_comp_mono {C : Type*} [Category C] {A B T : C} (f : A ⟶ B) (c : B ⟶ T) [Mono c]
+    : IsPullback f (𝟙 A) c (f ≫ c) :=
   IsPullback.of_isLimit' ⟨by simp⟩
-    (PullbackCone.IsLimit.mk _ (fun s => s.snd)
+    (PullbackCone.IsLimit.mk _
+      (fun s => s.snd)
       (fun s => by
         rw [← cancel_mono c]
         simp only [Category.assoc]
@@ -24,12 +26,15 @@ theorem isPullback_comp_mono {C : Type*} [Category C] {A B T : C} (f : A ⟶ B) 
       (fun s => by simp)
       (fun s m _ h2 => by simpa using h2))
 
-theorem isAffineOpen_preimage_fibre : ∀ (X Z : Scheme.{0}) (p : Z ⟶ X) (U : X.affineOpens) (m : Ideal Γ(X, U.1)) (A : Scheme.{0}) (q : A ⟶ Sp (Γ(X, U.1) ⧸ m)) (ι : A ⟶ Z), IsPullback ι q p (spMap (Ideal.Quotient.mk m) ≫ chart U) → ∀ W : Z.Opens, IsAffineOpen W → W ≤ p ⁻¹ᵁ U.1 → IsAffineOpen (ι ⁻¹ᵁ W) := by
+theorem isAffineOpen_preimage_fibre
+    : ∀ (X Z : Scheme.{0}) (p : Z ⟶ X) (U : X.affineOpens) (m : Ideal Γ(X, U.1)) (A : Scheme.{0})
+        (q : A ⟶ Sp (Γ(X, U.1) ⧸ m)) (ι : A ⟶ Z),
+      IsPullback ι q p (spMap (Ideal.Quotient.mk m) ≫ chart U)
+        → ∀ W : Z.Opens, IsAffineOpen W → W ≤ p ⁻¹ᵁ U.1 → IsAffineOpen (ι ⁻¹ᵁ W) := by
   intro X Z p U m A q ι H W hW hWU
   haveI : IsOpenImmersion (chart U) := U.2.isOpenImmersion_fromSpec
   let h : (W : Scheme) ⟶ Sp Γ(X, U.1) := p.resLE U.1 W hWU ≫ U.2.isoSpec.hom
-  have hh : W.ι ≫ p = h ≫ chart U := by
-    simp [h, chart, IsAffineOpen.fromSpec]
+  have hh : W.ι ≫ p = h ≫ chart U := by simp [h, chart, IsAffineOpen.fromSpec]
   have big := (isPullback_morphismRestrict ι W).paste_vert H
   rw [hh] at big
   have comm : (ι ∣_ W) ≫ h = ((ι ⁻¹ᵁ W).ι ≫ q) ≫ spMap (Ideal.Quotient.mk m) := by

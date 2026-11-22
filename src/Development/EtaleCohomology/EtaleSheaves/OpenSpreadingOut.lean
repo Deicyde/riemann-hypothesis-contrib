@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNeZero
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4 LateralTheory.E.LeafDescendVCut Topology
+open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
+  LateralTheory.E.LeafDescendVCut Topology
 
 namespace LateralTheory.E.OpenSpreadingOut
 
@@ -17,7 +18,8 @@ lemma toR_apply_bot {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] (R : Subal
   change Ideal.comap (algebraMap R Ω) ⊥ = ⊥
   exact Ideal.comap_bot_of_injective _ (FaithfulSMul.algebraMap_injective R Ω)
 
-theorem etale_open_spreading_out_over_finitely_generated_subalgebra : LateralTheory.E.SpreadingOutLocallyQuasiFinite.LeafOpenSpread := by
+theorem etale_open_spreading_out_over_finitely_generated_subalgebra
+    : LateralTheory.E.SpreadingOutLocallyQuasiFinite.LeafOpenSpread := by
   intro k _ Ω _ _ R hR C A c p v U hp sq hU
   obtain ⟨hfp, hqc, hqs⟩ := hp
   have : Algebra.FiniteType k R := (Subalgebra.fg_iff_finiteType R).mp hR
@@ -34,8 +36,9 @@ theorem etale_open_spreading_out_over_finitely_generated_subalgebra : LateralThe
   have hT : IsConstructible (p '' (U : Set A)ᶜ)ᶜ := isConstructible_compl.mpr hI
   have hη : (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum R) ∈ (p '' (U : Set A)ᶜ)ᶜ := by
     rintro ⟨a, ha, hpa⟩
-    obtain ⟨z, hz, -⟩ := Scheme.Pullback.exists_preimage_pullback (f := p) (g := toR R) a
-      (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum Ω) (by rw [hpa, toR_apply_bot])
+    obtain ⟨z, hz, -⟩ :=
+      Scheme.Pullback.exists_preimage_pullback (f := p) (g := toR R) a
+        (⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum Ω) (by rw [hpa, toR_apply_bot])
     apply ha
     have := hU (sq.isoPullback.inv z)
     rwa [← Scheme.Hom.comp_apply, IsPullback.isoPullback_inv_fst, hz] at this

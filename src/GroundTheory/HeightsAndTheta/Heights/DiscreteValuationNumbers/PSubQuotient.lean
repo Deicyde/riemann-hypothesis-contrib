@@ -15,12 +15,14 @@ noncomputable section
 
 section Rename
 
-variable {K : Type*} [DecidableEq K] {ι : K → Type*}
-  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+variable
+  {K : Type*} [DecidableEq K]
+  {ι : K → Type*} {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem classNum_rename {σ τ : Type*} (e : σ → τ) (he : Function.Injective e) (cls : τ → K → ℤ)
-    (H : MvPolynomial σ ℤ) (Q : List (K → ℤ)) (W : Ideal (MRing ι O)) :
-    classNum cls (rename e H) Q W = classNum (cls ∘ e) H Q W := by
+theorem classNum_rename
+    {σ τ : Type*} (e : σ → τ) (he : Function.Injective e) (cls : τ → K → ℤ) (H : MvPolynomial σ ℤ)
+    (Q : List (K → ℤ)) (W : Ideal (MRing ι O))
+    : classNum cls (rename e H) Q W = classNum (cls ∘ e) H Q W := by
   classical
   unfold classNum
   rw [support_rename_of_injective he, Finset.sum_image]
@@ -32,18 +34,24 @@ theorem classNum_rename {σ τ : Type*} (e : σ → τ) (he : Function.Injective
   · intro a _ b _ h
     exact Finsupp.mapDomain_injective he h
 
-theorem rename_psumExpansion {M N : ℕ} (e : Fin M → Fin N) (k : ℕ) (i : Fin M) :
-    rename (Sum.map e e) (psumExpansion M k i) = psumExpansion N k (e i) := by
+theorem rename_psumExpansion {M N : ℕ} (e : Fin M → Fin N) (k : ℕ) (i : Fin M)
+    : rename (Sum.map e e) (psumExpansion M k i) = psumExpansion N k (e i) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [psumExpansion, map_sum, rename_X]
+  simp [psumExpansion, map_sum, rename_X]
 
-theorem pairNum_join {r m N : ℕ} (P : Ideal (MRing ι O)) (e : Fin r ⊕ Fin m ≃ Fin N)
-    (xU xU' : Fin r → K → ℤ) (xV xV' : Fin m → K → ℤ) (fU gU : Fin r → MRing ι O)
-    (fV gV : Fin m → MRing ι O) (k : ℕ) (Q : List (K → ℤ)) :
-    pairNum P (fun i => Sum.elim xU xV (e.symm i)) (fun i => Sum.elim xU' xV' (e.symm i))
-        (fun i => Sum.elim fU fV (e.symm i)) (fun i => Sum.elim gU gV (e.symm i))
-        (psumExpansion N k) Q =
-      pairNum P xU xU' fU gU (psumExpansion r k) Q + pairNum P xV xV' fV gV (psumExpansion m k) Q := by
+theorem pairNum_join
+    {r m N : ℕ}
+    (P : Ideal (MRing ι O)) (e : Fin r ⊕ Fin m ≃ Fin N) (xU xU' : Fin r → K → ℤ)
+    (xV xV' : Fin m → K → ℤ) (fU gU : Fin r → MRing ι O) (fV gV : Fin m → MRing ι O) (k : ℕ)
+    (Q : List (K → ℤ))
+    : pairNum P
+        (fun i => Sum.elim xU xV (e.symm i))
+        (fun i => Sum.elim xU' xV' (e.symm i))
+        (fun i => Sum.elim fU fV (e.symm i))
+        (fun i => Sum.elim gU gV (e.symm i))
+        (psumExpansion N k) Q
+      = pairNum P xU xU' fU gU (psumExpansion r k) Q
+        + pairNum P xV xV' fV gV (psumExpansion m k) Q := by
   unfold pairNum
   rw [← e.sum_comp, Fintype.sum_sum_type]
   have hl : Function.Injective (fun a : Fin r => e (Sum.inl a)) :=
@@ -74,19 +82,24 @@ end Rename
 
 section Join
 
-variable {K : Type*} [Fintype K] {ι : K → Type*} {Ω : Type*} [Field Ω] {O : Type*} [CommRing O]
-  [Algebra O Ω] {N r m : ℕ} {E U V : Type*} [AddCommGroup E] [Module Ω E] [AddCommGroup U]
-  [Module Ω U] [AddCommGroup V] [Module Ω V]
+variable
+  {K : Type*} [Fintype K]
+  {ι : K → Type*} {Ω : Type*} [Field Ω]
+  {O : Type*} [CommRing O] [Algebra O Ω]
+  {N r m : ℕ} {E U V : Type*}
+  [AddCommGroup E] [Module Ω E] [AddCommGroup U] [Module Ω U] [AddCommGroup V] [Module Ω V]
 
-theorem isFlagFrame_join (y : (Σ k, ι k) → Ω) (B : ChartBundle O (segreVec y) N E)
-    (BU : ChartBundle O (segreVec y) r U) (BV : ChartBundle O (segreVec y) m V)
-    (φ : (U × V) ≃ₗ[Ω] E) (e : Fin r ⊕ Fin m ≃ Fin N)
+theorem isFlagFrame_join
+    (y : (Σ k, ι k) → Ω) (B : ChartBundle O (segreVec y) N E) (BU : ChartBundle O (segreVec y) r U)
+    (BV : ChartBundle O (segreVec y) m V)
+    (φ : (U × V) ≃ₗ[Ω] E)
+    (e : Fin r ⊕ Fin m ≃ Fin N)
     (he : ∀ t, ((e t : Fin N) : ℕ) = Sum.elim (fun a : Fin r => (a : ℕ)) (fun b : Fin m => r + b) t)
     (hU : ∀ c, segreVec y c ≠ 0 → ∀ u, u ∈ BU.lat c ↔ φ (u, 0) ∈ B.lat c)
     (hV : ∀ c, segreVec y c ≠ 0 → ∀ q, q ∈ BV.lat c ↔ ∃ z ∈ B.lat c, (φ.symm z).2 = q)
     {wU : Module.Basis (Fin r) Ω U} {xU : Fin r → K → ℤ} (hfU : IsFlagFrame y BU wU xU)
-    {wV : Module.Basis (Fin m) Ω V} {xV : Fin m → K → ℤ} (hfV : IsFlagFrame y BV wV xV) :
-    IsFlagFrame y B (((wU.prod wV).map φ).reindex e) (fun i => Sum.elim xU xV (e.symm i)) where
+    {wV : Module.Basis (Fin m) Ω V} {xV : Fin m → K → ℤ} (hfV : IsFlagFrame y BV wV xV)
+    : IsFlagFrame y B (((wU.prod wV).map φ).reindex e) (fun i => Sum.elim xU xV (e.symm i)) where
   graded c hc i := by
     obtain ⟨t, rfl⟩ := e.surjective i
     rcases t with a | b
@@ -96,19 +109,21 @@ theorem isFlagFrame_join (y : (Σ k, ι k) → Ω) (B : ChartBundle O (segreVec 
       · rintro ⟨v, hv, hhi, rfl⟩
         have h2 : (φ.symm v).2 = 0 := by
           refine wV.repr.injective (Finsupp.ext fun b => ?_)
-          have := hhi (e (Sum.inr b)) (by
-            rw [Fin.lt_def, he, he]
-            have := a.isLt
-            simp only [Sum.elim_inl, Sum.elim_inr]
-            omega)
+          have :=
+            hhi (e (Sum.inr b)) (by
+              rw [Fin.lt_def, he, he]
+              have := a.isLt
+              simp only [Sum.elim_inl, Sum.elim_inr]
+              omega)
           simpa using this
         have hv' : φ ((φ.symm v).1, 0) = v := by
           rw [← h2]
           simp
         refine ⟨(φ.symm v).1, (hU c hc _).2 (hv'.symm ▸ hv), fun a' ha' => ?_, ?_⟩
-        · have := hhi (e (Sum.inl a')) (by
-            rw [Fin.lt_def, he, he]
-            simpa using Fin.lt_def.1 ha')
+        · have :=
+            hhi (e (Sum.inl a')) (by
+              rw [Fin.lt_def, he, he]
+              simpa using Fin.lt_def.1 ha')
           simpa using this
         · simp
       · rintro ⟨u, hu, hhi, rfl⟩
@@ -124,11 +139,12 @@ theorem isFlagFrame_join (y : (Σ k, ι k) → Ω) (B : ChartBundle O (segreVec 
       constructor
       · rintro ⟨v, hv, hhi, rfl⟩
         refine ⟨(φ.symm v).2, (hV c hc _).2 ⟨v, hv, rfl⟩, fun b' hb' => ?_, by simp⟩
-        have := hhi (e (Sum.inr b')) (by
-          rw [Fin.lt_def, he, he]
-          have := Fin.lt_def.1 hb'
-          simp only [Sum.elim_inr]
-          omega)
+        have :=
+          hhi (e (Sum.inr b')) (by
+            rw [Fin.lt_def, he, he]
+            have := Fin.lt_def.1 hb'
+            simp only [Sum.elim_inr]
+            omega)
         simpa using this
       · rintro ⟨q, hq, hhi, rfl⟩
         obtain ⟨z, hz, rfl⟩ := (hV c hc q).1 hq
@@ -144,33 +160,45 @@ theorem isFlagFrame_join (y : (Σ k, ι k) → Ω) (B : ChartBundle O (segreVec 
 
 variable [DecidableEq K]
 
-theorem isFlagPair_join (ϖ : O) (y : (Σ k, ι k) → Ω) (B B' : ChartBundle O (segreVec y) N E)
+theorem isFlagPair_join
+    (ϖ : O)
+    (y : (Σ k, ι k) → Ω) (B B' : ChartBundle O (segreVec y) N E)
     (BU BU' : ChartBundle O (segreVec y) r U) (BV BV' : ChartBundle O (segreVec y) m V)
-    (φ : (U × V) ≃ₗ[Ω] E) (e : Fin r ⊕ Fin m ≃ Fin N)
+    (φ : (U × V) ≃ₗ[Ω] E)
+    (e : Fin r ⊕ Fin m ≃ Fin N)
     (he : ∀ t, ((e t : Fin N) : ℕ) = Sum.elim (fun a : Fin r => (a : ℕ)) (fun b : Fin m => r + b) t)
-    (hU : ∀ c, segreVec y c ≠ 0 → ∀ u,
-      (u ∈ BU.lat c ↔ φ (u, 0) ∈ B.lat c) ∧ (u ∈ BU'.lat c ↔ φ (u, 0) ∈ B'.lat c))
-    (hV : ∀ c, segreVec y c ≠ 0 → ∀ q,
-      (q ∈ BV.lat c ↔ ∃ z ∈ B.lat c, (φ.symm z).2 = q) ∧
-        (q ∈ BV'.lat c ↔ ∃ z ∈ B'.lat c, (φ.symm z).2 = q))
+    (hU : ∀ c,
+      segreVec y c ≠ 0
+        → ∀ u, (u ∈ BU.lat c ↔ φ (u, 0) ∈ B.lat c) ∧ (u ∈ BU'.lat c ↔ φ (u, 0) ∈ B'.lat c))
+    (hV : ∀ c,
+      segreVec y c ≠ 0
+        → ∀ q,
+          (q ∈ BV.lat c ↔ ∃ z ∈ B.lat c, (φ.symm z).2 = q)
+            ∧ (q ∈ BV'.lat c ↔ ∃ z ∈ B'.lat c, (φ.symm z).2 = q))
     {wU wU' : Module.Basis (Fin r) Ω U} {xU xU' : Fin r → K → ℤ} {fU gU : Fin r → MRing ι O}
     (hpU : IsFlagPair ϖ y BU BU' wU wU' xU xU' fU gU)
     {wV wV' : Module.Basis (Fin m) Ω V} {xV xV' : Fin m → K → ℤ} {fV gV : Fin m → MRing ι O}
-    (hpV : IsFlagPair ϖ y BV BV' wV wV' xV xV' fV gV) :
-    IsFlagPair ϖ y B B' (((wU.prod wV).map φ).reindex e) (((wU'.prod wV').map φ).reindex e)
-      (fun i => Sum.elim xU xV (e.symm i)) (fun i => Sum.elim xU' xV' (e.symm i))
-      (fun i => Sum.elim fU fV (e.symm i)) (fun i => Sum.elim gU gV (e.symm i)) := by
+    (hpV : IsFlagPair ϖ y BV BV' wV wV' xV xV' fV gV)
+    : IsFlagPair ϖ y B B' (((wU.prod wV).map φ).reindex e) (((wU'.prod wV').map φ).reindex e)
+      (fun i => Sum.elim xU xV (e.symm i))
+      (fun i => Sum.elim xU' xV' (e.symm i))
+      (fun i => Sum.elim fU fV (e.symm i))
+      (fun i => Sum.elim gU gV (e.symm i)) := by
   refine { flag := ?_, flag' := ?_, sameFlag := ?_, vertical := ?_, generic := ?_ }
-  · exact isFlagFrame_join y B BU BV φ e he (fun c hc u => (hU c hc u).1)
-      (fun c hc q => (hV c hc q).1) hpU.flag hpV.flag
-  · exact isFlagFrame_join y B' BU' BV' φ e he (fun c hc u => (hU c hc u).2)
-      (fun c hc q => (hV c hc q).2) hpU.flag' hpV.flag'
+  · exact isFlagFrame_join y B BU BV φ e he
+      (fun c hc u => (hU c hc u).1)
+      (fun c hc q => (hV c hc q).1)
+      hpU.flag hpV.flag
+  · exact isFlagFrame_join y B' BU' BV' φ e he
+      (fun c hc u => (hU c hc u).2)
+      (fun c hc q => (hV c hc q).2)
+      hpU.flag' hpV.flag'
   · intro i i' hii'
     obtain ⟨t, rfl⟩ := e.surjective i
     obtain ⟨t', rfl⟩ := e.surjective i'
     rw [Fin.lt_def, he, he] at hii'
-    rcases t with a | b <;> rcases t' with a' | b' <;>
-      simp only [Sum.elim_inl, Sum.elim_inr] at hii'
+    rcases t with a | b <;> rcases t' with a' | b'
+      <;> simp only [Sum.elim_inl, Sum.elim_inr] at hii'
     · simpa using hpU.sameFlag a a' (Fin.lt_def.2 hii')
     · simp
     · have := a'.isLt
@@ -190,9 +218,9 @@ theorem isFlagPair_join (ϖ : O) (y : (Σ k, ι k) → Ω) (B B' : ChartBundle O
 end Join
 
 theorem SubQuotient.proof (hF : FlagIndependence.Statement) : SubQuotient.Statement := by
-  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hmod N r E U V _ _ _ _ _ _ B B' BU BU' BV BV' j π hj hπ
-    hjπ hsame hlat w w' x x' f g hfl wU wU' xU xU' fU gU hflU wV wV' xV xV' fV gV hflV k Gs GsU GsV
-    hGs hGsU hGsV Q hQ
+  intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hmod N r E U V _ _ _ _ _ _ B B' BU BU' BV BV' j π hj hπ hjπ
+    hsame hlat w w' x x' f g hfl wU wU' xU xU' fU gU hflU wV wV' xV xV' fV gV hflV k Gs GsU GsV hGs
+    hGsU hGsV Q hQ
 
   have hrN : r ≤ N := by
     have : FiniteDimensional Ω E := Module.Finite.of_basis w
@@ -204,8 +232,7 @@ theorem SubQuotient.proof (hF : FlagIndependence.Statement) : SubQuotient.Statem
 
   obtain ⟨s, hs⟩ := LinearMap.exists_rightInverse_of_surjective π (LinearMap.range_eq_top.mpr hπ)
   have hπs : ∀ v, π (s v) = v := fun v => LinearMap.congr_fun hs v
-  have hπj : ∀ u, π (j u) = 0 := fun u =>
-    LinearMap.mem_ker.1 (hjπ ▸ LinearMap.mem_range_self j u)
+  have hπj : ∀ u, π (j u) = 0 := fun u => LinearMap.mem_ker.1 (hjπ ▸ LinearMap.mem_range_self j u)
   have hbij : Function.Bijective (LinearMap.coprod j s) := by
     constructor
     · rintro ⟨u, v⟩ ⟨u', v'⟩ h
@@ -228,19 +255,26 @@ theorem SubQuotient.proof (hF : FlagIndependence.Statement) : SubQuotient.Statem
 
   have hN : r + (N - r) = N := by omega
   set e : Fin r ⊕ Fin (N - r) ≃ Fin N := finSumFinEquiv.trans (finCongr hN) with hedef
-  have he : ∀ t, ((e t : Fin N) : ℕ) =
-      Sum.elim (fun a : Fin r => (a : ℕ)) (fun b : Fin (N - r) => r + b) t := by
+  have he
+      : ∀ t,
+        ((e t : Fin N) : ℕ)
+          = Sum.elim (fun a : Fin r => (a : ℕ)) (fun b : Fin (N - r) => r + b) t := by
     intro t
     rcases t with a | b <;> simp [hedef]
 
-  have hU : ∀ c, segreVec y c ≠ 0 → ∀ u,
-      (u ∈ BU.lat c ↔ φ (u, 0) ∈ B.lat c) ∧ (u ∈ BU'.lat c ↔ φ (u, 0) ∈ B'.lat c) := by
+  have hU
+      : ∀ c,
+        segreVec y c ≠ 0
+          → ∀ u, (u ∈ BU.lat c ↔ φ (u, 0) ∈ B.lat c) ∧ (u ∈ BU'.lat c ↔ φ (u, 0) ∈ B'.lat c) := by
     intro c hc u
     rw [hφu]
     exact ⟨(hlat c hc).1 u, (hlat c hc).2.1 u⟩
-  have hV : ∀ c, segreVec y c ≠ 0 → ∀ q,
-      (q ∈ BV.lat c ↔ ∃ z ∈ B.lat c, (φ.symm z).2 = q) ∧
-        (q ∈ BV'.lat c ↔ ∃ z ∈ B'.lat c, (φ.symm z).2 = q) := by
+  have hV
+      : ∀ c,
+        segreVec y c ≠ 0
+          → ∀ q,
+            (q ∈ BV.lat c ↔ ∃ z ∈ B.lat c, (φ.symm z).2 = q)
+              ∧ (q ∈ BV'.lat c ↔ ∃ z ∈ B'.lat c, (φ.symm z).2 = q) := by
     intro c hc q
     simp only [hφπ]
     exact ⟨(hlat c hc).2.2.1 q, (hlat c hc).2.2.2 q⟩
@@ -266,15 +300,18 @@ theorem SubQuotient.proof (hF : FlagIndependence.Statement) : SubQuotient.Statem
       exact ⟨n, (hv _).2 ⟨_, hn, map_smul π _ z⟩⟩
 
   have hpc := isFlagPair_join ϖ y B B' BU BU' BV BV' φ e he hU hV hflU hflV
-  have hE := hF O ϖ hϖ Ω K ι y d hmod N E B B' hsame w w' _ _ x x' _ _ f g _ _ hfl hpc k
-    (psum (Fin N) ℤ k) (isHomogeneous_psum N k) (psum_isSymmetric (Fin N) ℤ k) Gs _ hGs
-    (isPairExpansion_psum N k) Q hQ
-  have hEU := hF O ϖ hϖ Ω K ι y d hmod r U BU BU' hsU wU wU' wU wU' xU xU' xU xU' fU gU fU gU
-    hflU hflU k (psum (Fin r) ℤ k) (isHomogeneous_psum r k) (psum_isSymmetric (Fin r) ℤ k) GsU _ hGsU
-    (isPairExpansion_psum r k) Q hQ
-  have hEV := hF O ϖ hϖ Ω K ι y d hmod (N - r) V BV BV' hsV wV wV' wV wV' xV xV' xV xV' fV gV fV gV
-    hflV hflV k (psum (Fin (N - r)) ℤ k) (isHomogeneous_psum (N - r) k) (psum_isSymmetric (Fin (N - r)) ℤ k) GsV _
-    hGsV (isPairExpansion_psum (N - r) k) Q hQ
+  have hE :=
+    hF O ϖ hϖ Ω K ι y d hmod N E B B' hsame w w' _ _ x x' _ _ f g _ _ hfl hpc k (psum (Fin N) ℤ k)
+      (isHomogeneous_psum N k) (psum_isSymmetric (Fin N) ℤ k) Gs _ hGs (isPairExpansion_psum N k) Q
+      hQ
+  have hEU :=
+    hF O ϖ hϖ Ω K ι y d hmod r U BU BU' hsU wU wU' wU wU' xU xU' xU xU' fU gU fU gU hflU hflU k
+      (psum (Fin r) ℤ k) (isHomogeneous_psum r k) (psum_isSymmetric (Fin r) ℤ k) GsU _ hGsU
+      (isPairExpansion_psum r k) Q hQ
+  have hEV :=
+    hF O ϖ hϖ Ω K ι y d hmod (N - r) V BV BV' hsV wV wV' wV wV' xV xV' xV xV' fV gV fV gV hflV hflV
+      k (psum (Fin (N - r)) ℤ k) (isHomogeneous_psum (N - r) k) (psum_isSymmetric (Fin (N - r)) ℤ k)
+      GsV _ hGsV (isPairExpansion_psum (N - r) k) Q hQ
   rw [hE, pairNum_join, hEU, hEV]
 
 end

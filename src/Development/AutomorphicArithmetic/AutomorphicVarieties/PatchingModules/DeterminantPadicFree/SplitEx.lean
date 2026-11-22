@@ -7,11 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 
-private theorem exists_injective_roots_in_integral_closure {A L : Type} [CommRing A] [Field L] [Algebra A L] {n : ℕ} (p : Polynomial A)
-    (hm : p.Monic) (hn : (p.map (algebraMap A L)).natDegree = n) (hsep : (p.map (algebraMap A L)).Separable)
-    (hs : (p.map (algebraMap A L)).Splits) :
-    ∃ al : Fin n → integralClosure A L, Function.Injective al ∧
-      p.map (algebraMap A (integralClosure A L)) = ∏ b, (Polynomial.X - Polynomial.C (al b)) := by
+private theorem exists_injective_roots_in_integral_closure
+    {A L : Type} [CommRing A] [Field L] [Algebra A L]
+    {n : ℕ} (p : Polynomial A) (hm : p.Monic) (hn : (p.map (algebraMap A L)).natDegree = n)
+    (hsep : (p.map (algebraMap A L)).Separable) (hs : (p.map (algebraMap A L)).Splits)
+    : ∃ al : Fin n → integralClosure A L,
+      Function.Injective al
+        ∧ p.map (algebraMap A (integralClosure A L))
+          = ∏ b, (Polynomial.X - Polynomial.C (al b)) := by
   classical
   set pL := p.map (algebraMap A L) with hpL
   have hmL : pL.Monic := hm.map _
@@ -23,8 +26,9 @@ private theorem exists_injective_roots_in_integral_closure {A L : Type} [CommRin
     rw [hsdef, Multiset.toFinset_card_of_nodup hnd, ← hs.natDegree_eq_card_roots, hn]
   have hint : ∀ x ∈ s, x ∈ integralClosure A L := by
     intro x hx
-    rw [hsdef, Multiset.mem_toFinset, Polynomial.mem_roots hmL.ne_zero, Polynomial.IsRoot,
-      hpL, Polynomial.eval_map] at hx
+    rw [hsdef, Multiset.mem_toFinset, Polynomial.mem_roots hmL.ne_zero, Polynomial.IsRoot, hpL,
+        Polynomial.eval_map]
+      at hx
     exact ⟨p, hm, hx⟩
   let e : Fin n ≃ s := (s.equivFin.trans (finCongr hcard)).symm
   refine ⟨fun b => ⟨(e b : L), hint _ (e b).2⟩, ?_, ?_⟩
@@ -33,16 +37,18 @@ private theorem exists_injective_roots_in_integral_closure {A L : Type} [CommRin
     exact e.injective (Subtype.ext h2)
   · apply Polynomial.map_injective (integralClosure A L).val.toRingHom Subtype.val_injective
     rw [Polynomial.map_map, Polynomial.map_prod]
-    have h1 : ((integralClosure A L).val.toRingHom).comp (algebraMap A (integralClosure A L)) =
-        algebraMap A L := by
+    have h1
+        : ((integralClosure A L).val.toRingHom).comp (algebraMap A (integralClosure A L))
+          = algebraMap A L := by
       ext a
       rfl
     rw [h1]
     change pL = _
     simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C]
     rw [hroots]
-    have h3 : ∏ b : Fin n, (Polynomial.X - Polynomial.C ((e b : L))) =
-        ∏ x ∈ s, (Polynomial.X - Polynomial.C x) := by
+    have h3
+        : ∏ b : Fin n, (Polynomial.X - Polynomial.C ((e b : L)))
+          = ∏ x ∈ s, (Polynomial.X - Polynomial.C x) := by
       rw [Equiv.prod_comp e (fun x : s => Polynomial.X - Polynomial.C (x : L))]
       exact Finset.prod_coe_sort s (fun x => Polynomial.X - Polynomial.C x)
     convert h3.symm using 1

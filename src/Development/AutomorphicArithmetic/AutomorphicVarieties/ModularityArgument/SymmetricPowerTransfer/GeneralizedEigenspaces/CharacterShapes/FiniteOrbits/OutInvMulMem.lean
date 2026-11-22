@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi UpperTheory.V.AlgebraTools
-open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.So
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
+open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob UpperTheory.V.Z.Sym.Sig
+  UpperTheory.V.Z.Sym.So
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,27 +19,28 @@ section SlopeTestRemainingChoices
 
 variable {G : Type} [Group G]
 
-private theorem dc_right (U : Subgroup G) (a : G) {r s : G} (h : r⁻¹ * s ∈ U) (hr : r ∈ DC U a) :
-    s ∈ DC U a := by
+private theorem dc_right (U : Subgroup G) (a : G) {r s : G} (h : r⁻¹ * s ∈ U) (hr : r ∈ DC U a)
+    : s ∈ DC U a := by
   obtain ⟨u, hu, w, hw, rfl⟩ := hr
   refine ⟨u, hu, w * ((u * a * w)⁻¹ * s), U.mul_mem hw h, ?_⟩
   group
 
-private theorem dc_left (U : Subgroup G) (b : G) {c g : G} (h : c ∈ U) (hg : g ∈ DC U b) :
-    c * g ∈ DC U b := by
+private theorem dc_left (U : Subgroup G) (b : G) {c g : G} (h : c ∈ U) (hg : g ∈ DC U b)
+    : c * g ∈ DC U b := by
   obtain ⟨u, hu, w, hw, rfl⟩ := hg
   exact ⟨c * u, U.mul_mem h hu, w, hw, by group⟩
 
-private theorem out_inv_mul_mem (U : Subgroup G) (s : G) :
-    (Quotient.out (s : G ⧸ U))⁻¹ * s ∈ U :=
+private theorem out_inv_mul_mem (U : Subgroup G) (s : G) : (Quotient.out (s : G ⧸ U))⁻¹ * s ∈ U :=
   QuotientGroup.eq.1 (QuotientGroup.out_eq' (s : G ⧸ U))
 
-private theorem uf_unique_iff (U : Subgroup G) (a b g : G) :
-    (∃! y : G ⧸ U, y.out ∈ DC U a ∧ y.out⁻¹ * g ∈ DC U b) ↔
-      ∃ r, (r ∈ DC U a ∧ r⁻¹ * g ∈ DC U b) ∧
-        ∀ s, s ∈ DC U a → s⁻¹ * g ∈ DC U b → r⁻¹ * s ∈ U := by
-  have hq : ∀ s, s ∈ DC U a → s⁻¹ * g ∈ DC U b →
-      (Quotient.out (s : G ⧸ U)) ∈ DC U a ∧ (Quotient.out (s : G ⧸ U))⁻¹ * g ∈ DC U b := by
+private theorem uf_unique_iff (U : Subgroup G) (a b g : G)
+    : (∃! y : G ⧸ U, y.out ∈ DC U a ∧ y.out⁻¹ * g ∈ DC U b)
+      ↔ ∃ r,
+        (r ∈ DC U a ∧ r⁻¹ * g ∈ DC U b) ∧ ∀ s, s ∈ DC U a → s⁻¹ * g ∈ DC U b → r⁻¹ * s ∈ U := by
+  have hq
+      : ∀ s,
+        s ∈ DC U a → s⁻¹ * g ∈ DC U b
+          → (Quotient.out (s : G ⧸ U)) ∈ DC U a ∧ (Quotient.out (s : G ⧸ U))⁻¹ * g ∈ DC U b := by
     intro s hs hs'
     have h1 := out_inv_mul_mem U s
     have h2 : s⁻¹ * Quotient.out (s : G ⧸ U) ∈ U := by
@@ -50,8 +53,7 @@ private theorem uf_unique_iff (U : Subgroup G) (a b g : G) :
   · rintro ⟨y, ⟨hy1, hy2⟩, huniq⟩
     refine ⟨y.out, ⟨hy1, hy2⟩, fun s hs hs' => ?_⟩
     have h3 : (s : G ⧸ U) = y := huniq _ (hq s hs hs')
-    have h4 : ((y.out : G) : G ⧸ U) = (s : G ⧸ U) := by
-      rw [h3]; exact QuotientGroup.out_eq' y
+    have h4 : ((y.out : G) : G ⧸ U) = (s : G ⧸ U) := by rw [h3]; exact QuotientGroup.out_eq' y
     exact QuotientGroup.eq.1 h4
   · rintro ⟨r, ⟨hr1, hr2⟩, hall⟩
     refine ⟨(r : G ⧸ U), hq r hr1 hr2, fun y hy => ?_⟩
@@ -60,8 +62,8 @@ private theorem uf_unique_iff (U : Subgroup G) (a b g : G) :
     rw [h6]
     exact (QuotientGroup.out_eq' y).symm
 
-private theorem reps_of_finOrb (U : Subgroup G) (a : G) (h : AlgebraTools.FinOrb U U a) :
-    ∃ R : Finset G, (∀ y ∈ R, y ∈ DC U a) ∧ (∀ y ∈ DC U a, ∃! r, r ∈ R ∧ r⁻¹ * y ∈ U) := by
+private theorem reps_of_finOrb (U : Subgroup G) (a : G) (h : AlgebraTools.FinOrb U U a)
+    : ∃ R : Finset G, (∀ y ∈ R, y ∈ DC U a) ∧ (∀ y ∈ DC U a, ∃! r, r ∈ R ∧ r⁻¹ * y ∈ U) := by
   classical
   have hf : (MulAction.orbit U (a : G ⧸ U)).Finite := h
   have hmk : ∀ y ∈ DC U a, (y : G ⧸ U) ∈ MulAction.orbit U (a : G ⧸ U) := by
@@ -88,8 +90,9 @@ private theorem reps_of_finOrb (U : Subgroup G) (a : G) (h : AlgebraTools.FinOrb
       have h4 : q = (y : G ⧸ U) := (QuotientGroup.out_eq' q).symm.trans h3
       rw [h4]
 
-private theorem finOrb_of_cover (U : Subgroup G) (a : G) (R : Finset G)
-    (h : ∀ y ∈ DC U a, ∃ r ∈ R, r⁻¹ * y ∈ U) : AlgebraTools.FinOrb U U a := by
+private theorem finOrb_of_cover
+    (U : Subgroup G) (a : G) (R : Finset G) (h : ∀ y ∈ DC U a, ∃ r ∈ R, r⁻¹ * y ∈ U)
+    : AlgebraTools.FinOrb U U a := by
   classical
   refine (R.image (fun r : G => (r : G ⧸ U))).finite_toSet.subset ?_
   rintro q ⟨u, rfl⟩
@@ -101,8 +104,7 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.Sym.So
 
-theorem UpperTheory.V.Z.Sym.So.dcMap :
-    UpperTheory.V.Z.Sym.So.DcMap := by
+theorem UpperTheory.V.Z.Sym.So.dcMap : UpperTheory.V.Z.Sym.So.DcMap := by
   classical
   intro G G' V _ _ _ _ e he U' a b
   set U := U'.comap e with hU
@@ -141,12 +143,16 @@ theorem UpperTheory.V.Z.Sym.So.dcMap :
       refine ⟨inv r, Finset.mem_image_of_mem _ hr, (hmem _ _).2 ?_⟩
       rwa [einv]
   refine ⟨hDC a, hfin, ?_, ?_⟩
-  · have hQ : ∀ g : G, (∃! y : G ⧸ U, y.out ∈ DC U a ∧ y.out⁻¹ * g ∈ DC U b) ↔
-        ∃! y : G' ⧸ U', y.out ∈ DC U' (e a) ∧ y.out⁻¹ * e g ∈ DC U' (e b) := by
+  · have hQ
+        : ∀ g : G,
+          (∃! y : G ⧸ U, y.out ∈ DC U a ∧ y.out⁻¹ * g ∈ DC U b)
+            ↔ ∃! y : G' ⧸ U', y.out ∈ DC U' (e a) ∧ y.out⁻¹ * e g ∈ DC U' (e b) := by
       intro g
       rw [uf_unique_iff, uf_unique_iff]
-      have hin : ∀ (r : G), (r ∈ DC U a ∧ r⁻¹ * g ∈ DC U b) ↔
-          (e r ∈ DC U' (e a) ∧ (e r)⁻¹ * e g ∈ DC U' (e b)) := by
+      have hin
+          : ∀ (r : G),
+            (r ∈ DC U a ∧ r⁻¹ * g ∈ DC U b)
+              ↔ (e r ∈ DC U' (e a) ∧ (e r)⁻¹ * e g ∈ DC U' (e b)) := by
         intro r
         rw [hDC a r, hDC b (r⁻¹ * g)]
         simp
@@ -162,8 +168,10 @@ theorem UpperTheory.V.Z.Sym.So.dcMap :
         have h3 := (hin s).1 ⟨h1, h2⟩
         rw [einv]
         exact hall _ h3.1 h3.2
-    have hR : ∀ g y : G, (y ∈ DC U a → y⁻¹ * g ∈ DC U b → g ∈ DC U (a * b)) ↔
-        (e y ∈ DC U' (e a) → (e y)⁻¹ * e g ∈ DC U' (e b) → e g ∈ DC U' (e a * e b)) := by
+    have hR
+        : ∀ g y : G,
+          (y ∈ DC U a → y⁻¹ * g ∈ DC U b → g ∈ DC U (a * b))
+            ↔ (e y ∈ DC U' (e a) → (e y)⁻¹ * e g ∈ DC U' (e b) → e g ∈ DC U' (e a * e b)) := by
       intro g y
       rw [hDC a y, hDC b (y⁻¹ * g), hDC (a * b) g]
       simp
@@ -186,8 +194,7 @@ theorem UpperTheory.V.Z.Sym.So.dcMap :
       intro u hu g
       simp only [Function.comp_apply, map_mul]
       exact hφ _ hu _
-    have hinj : Set.InjOn inv (R' : Set G') := fun x _ y _ h => by
-      rw [← einv x, ← einv y, h]
+    have hinj : Set.InjOn inv (R' : Set G') := fun x _ y _ h => by rw [← einv x, ← einv y, h]
     have hR1 : ∀ y ∈ R'.image inv, y ∈ DC U a := by
       intro y hy
       obtain ⟨r, hr, rfl⟩ := Finset.mem_image.1 hy

@@ -8,33 +8,41 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open MvPolynomial Equiv UpperTheory.V.AlgebraTools.Hk
 
-private theorem X_sub_ne {R : Type} [CommRing R] [IsDomain R] {n : ℕ} (q : R) {i j : Fin n} (h : i ≠ j) :
-    (X i - C q * X j : MvPolynomial (Fin n) R) ≠ 0 := by
+private theorem X_sub_ne
+    {R : Type} [CommRing R] [IsDomain R] {n : ℕ} (q : R) {i j : Fin n} (h : i ≠ j)
+    : (X i - C q * X j : MvPolynomial (Fin n) R) ≠ 0 := by
   intro h0
   have := congrArg (AddMonoidAlgebra.coeff · (Finsupp.single i 1)) h0
-  simp [MvPolynomial.coeff_X', MvPolynomial.coeff_C_mul, Finsupp.single_left_inj, h, Ne.symm h] at this
+  simp [MvPolynomial.coeff_X', MvPolynomial.coeff_C_mul, Finsupp.single_left_inj, h, Ne.symm h]
+    at this
 
-theorem UpperTheory.V.AlgebraTools.hkFaith :
-    ∀ (R : Type) [CommRing R] [IsDomain R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H] (b : Bern n q H), b.Faithful → ∀ c : Perm (Fin n) → MvPolynomial (Fin n) R,
-      (∀ x : MvPolynomial (Fin n) R, (∑ u, b.th (c u) * b.T u) * b.th x * b.one = 0) → c = 0 := by
+theorem UpperTheory.V.AlgebraTools.hkFaith
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (n : ℕ) (q : R) (H : Type) [Ring H] [Algebra R H]
+        (b : Bern n q H),
+      b.Faithful
+        → ∀ c : Perm (Fin n) → MvPolynomial (Fin n) R,
+          (∀ x : MvPolynomial (Fin n) R, (∑ u, b.th (c u) * b.T u) * b.th x * b.one = 0)
+            → c = 0 := by
   classical
   intro R _ _ n q H _ _ b hfaith c hc
   let K := FractionRing (MvPolynomial (Fin n) R)
   have hinj := IsFractionRing.injective (MvPolynomial (Fin n) R) K
   choose F hF1 hF2 hF3 using fun u => UpperTheory.V.AlgebraTools.hkAct R n q H b K u
   choose Y hY1 hY2 using hF1
-  have key : ∀ x : MvPolynomial (Fin n) R,
-      ∑ v, (∑ u, algebraMap (MvPolynomial (Fin n) R) K (c u) * F u v) *
-        algebraMap (MvPolynomial (Fin n) R) K (rename v x) = 0 := by
+  have key
+      : ∀ x : MvPolynomial (Fin n) R,
+        ∑ v, (∑ u, algebraMap (MvPolynomial (Fin n) R) K (c u) * F u v) *
+          algebraMap (MvPolynomial (Fin n) R) K (rename v x)
+          = 0 := by
     intro x
     have h1 : b.th (∑ u, c u * Y u x) * b.one = 0 := by
-      calc b.th (∑ u, c u * Y u x) * b.one
-          = ∑ u, b.th (c u) * (b.th (Y u x) * b.one) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [map_sum, Finset.sum_mul]; simp [map_mul, mul_assoc]
+      calc
+        b.th (∑ u, c u * Y u x) * b.one = ∑ u, b.th (c u) * (b.th (Y u x) * b.one) := by
+          set_option synthInstance.maxHeartbeats 100000 in
+          rw [map_sum, Finset.sum_mul]; simp [map_mul, mul_assoc]
         _ = ∑ u, b.th (c u) * (b.T u * b.th x * b.one) := by simp [hY1]
         _ = (∑ u, b.th (c u) * b.T u) * b.th x * b.one := by
-            rw [Finset.sum_mul, Finset.sum_mul]; simp [mul_assoc]
+          rw [Finset.sum_mul, Finset.sum_mul]; simp [mul_assoc]
         _ = 0 := hc x
     have h2 := congrArg (algebraMap (MvPolynomial (Fin n) R) K) (hfaith _ h1)
     set_option synthInstance.maxHeartbeats 100000 in
@@ -52,8 +60,8 @@ theorem UpperTheory.V.AlgebraTools.hkFaith :
     by_contra hall
     push_neg at hall
     exact hne (funext hall)
-  obtain ⟨w, hwS, hmax⟩ := (Finset.univ.filter (fun u => c u ≠ 0)).exists_max_image invN
-    ⟨w0, by simp [hw0]⟩
+  obtain ⟨w, hwS, hmax⟩ :=
+    (Finset.univ.filter (fun u => c u ≠ 0)).exists_max_image invN ⟨w0, by simp [hw0]⟩
   have hcw : c w ≠ 0 := by simpa using hwS
   have hw := congrFun hD w
   simp only [Pi.zero_apply] at hw

@@ -10,11 +10,13 @@ open NumberField IsDedekindDomain WithZero
 
 namespace GlobalTheory.DenseCompl
 
-theorem exists_eq_algebraMap_of_valued_le_one {W Qq : Type} [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq] [IsFractionRing W Qq] {π : W}
-    (hπ : Irreducible π) (hc : IsAdicComplete (Ideal.span {π}) W) (v : HeightOneSpectrum W)
-    {a : v.adicCompletion Qq} (ha : Valued.v a ≤ 1) :
-    ∃ L : W, a = algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq L) := by
+theorem exists_eq_algebraMap_of_valued_le_one
+    {W Qq : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq]
+    [IsFractionRing W Qq]
+    {π : W} (hπ : Irreducible π) (hc : IsAdicComplete (Ideal.span {π}) W)
+    (v : HeightOneSpectrum W)
+    {a : v.adicCompletion Qq} (ha : Valued.v a ≤ 1)
+    : ∃ L : W, a = algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq L) := by
   choose r hr using fun n : ℕ => GlobalTheory.Idele.exists_valued_sub_le v ha n
   have hle : ∀ m n : ℕ, m ≤ n → exp (-(n : ℤ)) ≤ exp (-(m : ℤ)) := fun m n h => by
     rw [exp_le_exp]; omega
@@ -22,40 +24,47 @@ theorem exists_eq_algebraMap_of_valued_le_one {W Qq : Type} [CommRing W] [IsDoma
     intro m n hmn
     have h1 : v.valuation Qq (algebraMap W Qq (r n - r m)) ≤ exp (-(m : ℤ)) := by
       rw [← GlobalTheory.Idele.valued_algebraMap, map_sub, map_sub]
-      have he : algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n)) -
-          algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r m)) =
-          (a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r m))) -
-          (a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n))) := by ring
+      have he
+          : algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n))
+              - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r m))
+            = (a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r m)))
+              - (a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n))) := by
+        ring
       rw [he]
       exact (Valuation.map_sub _ _ _).trans (max_le (hr m) ((hr n).trans (hle m n hmn)))
     obtain ⟨w, hw⟩ := (exists_eq_pow_mul_iff hπ v _ m).2 h1
     exact ⟨w, IsFractionRing.injective W Qq hw⟩
-  obtain ⟨L, hL⟩ := hc.toIsPrecomplete.prec (f := r) (fun {m n} hmn => by
-    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-      Ideal.mem_span_singleton]
-    exact (dvd_sub_comm).1 (hdiv m n hmn))
+  obtain ⟨L, hL⟩ :=
+    hc.toIsPrecomplete.prec (f := r) (fun {m n} hmn => by
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+        Ideal.mem_span_singleton]
+      exact (dvd_sub_comm).1 (hdiv m n hmn))
   refine ⟨L, ?_⟩
   rw [← sub_eq_zero, ← Valuation.zero_iff Valued.v]
   refine eq_zero_of_forall_le_exp fun n => ?_
   have h2 := hL n
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton] at h2
+      Ideal.mem_span_singleton]
+    at h2
   obtain ⟨w, hw⟩ := h2
-  have h3 : Valued.v (algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n - L))) ≤
-      exp (-(n : ℤ)) := by
+  have h3
+      : Valued.v (algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n - L)))
+        ≤ exp (-(n : ℤ)) := by
     rw [GlobalTheory.Idele.valued_algebraMap]
     exact (exists_eq_pow_mul_iff hπ v _ n).1 ⟨w, by rw [hw]⟩
-  have he : a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq L) =
-      (a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n))) +
-      algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n - L)) := by
+  have he
+      : a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq L)
+        = (a - algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n)))
+          + algebraMap Qq (v.adicCompletion Qq) (algebraMap W Qq (r n - L)) := by
     rw [map_sub, map_sub]; ring
   rw [he]
   exact (Valuation.map_add _ _ _).trans (max_le (hr n) h3)
 
-theorem surjective_algebraMap_adicCompletion : ∀ {W Qq : Type} [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] [Field Qq] [Algebra W Qq] [IsFractionRing W Qq] (π : W)
-    (hπ : Irreducible π) (hc : IsAdicComplete (Ideal.span {π}) W) (v : HeightOneSpectrum W),
-    Function.Surjective (algebraMap Qq (v.adicCompletion Qq)) := by
+theorem surjective_algebraMap_adicCompletion
+    : ∀ {W Qq : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+        [Algebra W Qq] [IsFractionRing W Qq] (π : W) (hπ : Irreducible π)
+        (hc : IsAdicComplete (Ideal.span {π}) W) (v : HeightOneSpectrum W),
+      Function.Surjective (algebraMap Qq (v.adicCompletion Qq)) := by
   intro W Qq _ _ _ _ _ _ π hπ hc v a
   by_cases ha : Valued.v a ≤ 1
   · obtain ⟨L, hL⟩ := exists_eq_algebraMap_of_valued_le_one hπ hc v ha

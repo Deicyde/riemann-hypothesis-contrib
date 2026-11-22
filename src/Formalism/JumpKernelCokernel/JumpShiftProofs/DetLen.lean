@@ -8,9 +8,9 @@ namespace Formalism.KernelCokernelLengths.DeterminantLengthLemmas
 
 open Module
 
-theorem ord_prod {O : Type} [CommRing O] [IsDomain O] {ι : Type} (s : Finset ι) (a : ι → O)
-    (ha : ∀ i, a i ≠ 0) :
-    Ring.ord O (∏ i ∈ s, a i) = ∑ i ∈ s, Ring.ord O (a i) := by
+theorem ord_prod
+    {O : Type} [CommRing O] [IsDomain O] {ι : Type} (s : Finset ι) (a : ι → O) (ha : ∀ i, a i ≠ 0)
+    : Ring.ord O (∏ i ∈ s, a i) = ∑ i ∈ s, Ring.ord O (a i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -21,7 +21,8 @@ theorem ord_prod {O : Type} [CommRing O] [IsDomain O] {ι : Type} (s : Finset ι
 end Formalism.KernelCokernelLengths.DeterminantLengthLemmas
 
 open Module in
-theorem Formalism.KernelCokernelLengths.determinant_length_formula : Formalism.KernelCokernelLengths.DetLen := by
+theorem Formalism.KernelCokernelLengths.determinant_length_formula
+    : Formalism.KernelCokernelLengths.DetLen := by
   intro O _ _ _ M _ _ _ _ d hdet
   classical
   have hinj : Function.Injective d := by
@@ -38,8 +39,7 @@ theorem Formalism.KernelCokernelLengths.determinant_length_formula : Formalism.K
   have ha : ∀ i, a i ≠ 0 := Submodule.smithNormalFormCoeffs_ne_zero b h
 
   have hL : Module.length O (M ⧸ LinearMap.range d) = ∑ i, Ring.ord O (a i) := by
-    rw [((LinearMap.range d).quotientEquivPiSpan b h).length_eq,
-      Module.length_pi_of_fintype]
+    rw [((LinearMap.range d).quotientEquivPiSpan b h).length_eq, Module.length_pi_of_fintype]
     rfl
 
   let u : M ≃ₗ[O] LinearMap.range d := b'.equiv ab (Equiv.refl _)
@@ -50,9 +50,8 @@ theorem Formalism.KernelCokernelLengths.determinant_length_formula : Formalism.K
       ext i j
       rw [LinearMap.toMatrix_apply]
       simp only [D, u, LinearMap.coe_comp, LinearEquiv.coe_coe, Function.comp_apply,
-        Basis.equiv_apply, Equiv.refl_apply, Submodule.coe_subtype, hab, map_smul,
-        Basis.repr_self, Finsupp.smul_apply, smul_eq_mul, Matrix.diagonal_apply,
-        Finsupp.single_apply]
+        Basis.equiv_apply, Equiv.refl_apply, Submodule.coe_subtype, hab, map_smul, Basis.repr_self,
+        Finsupp.smul_apply, smul_eq_mul, Matrix.diagonal_apply, Finsupp.single_apply]
       by_cases hij : j = i
       · subst hij; simp
       · simp [hij, Ne.symm hij]

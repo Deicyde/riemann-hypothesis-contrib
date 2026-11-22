@@ -8,12 +8,15 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.OfInfProj
 
 noncomputable section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT PositivityTheory.Rg.BcB.G3
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+  PositivityTheory.Rg.BcB.G3
 open scoped Classical TensorProduct
 
 namespace PositivityTheory.Rg.BcB.G3.TensorComplP
 
-variable {F K : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Algebra F K]
+variable
+  {F K : Type} [Field F] [NumberField F] [Field K] [NumberField K] [Algebra F K]
   (v : HeightOneSpectrum (𝓞 F))
 
 theorem finite_over : {w : HeightOneSpectrum (𝓞 K) | w.under (𝓞 F) = v}.Finite := by
@@ -24,18 +27,24 @@ theorem finite_over : {w : HeightOneSpectrum (𝓞 K) | w.under (𝓞 F) = v}.Fi
   rintro w rfl
   exact ⟨w.isPrime, ⟨rfl⟩⟩
 
-def phi : v.adicCompletion F ⊗[F] K →+*
-    (∀ u : {u : HeightOneSpectrum (𝓞 K) // u.under (𝓞 F) = v}, u.1.adicCompletion K) :=
+def phi
+    : v.adicCompletion F ⊗[F] K
+      →+* (∀ u : {u : HeightOneSpectrum (𝓞 K) // u.under (𝓞 F) = v}, u.1.adicCompletion K) :=
   RingHom.pi fun u => GlobalTheory.LFun.toCompl u.2
 
-theorem phi_apply (y : v.adicCompletion F ⊗[F] K) (u : {u : HeightOneSpectrum (𝓞 K) // u.under (𝓞 F) = v}) :
-    phi v y u = GlobalTheory.LFun.toCompl u.2 y := rfl
+theorem phi_apply
+    (y : v.adicCompletion F ⊗[F] K) (u : {u : HeightOneSpectrum (𝓞 K) // u.under (𝓞 F) = v})
+    : phi v y u = GlobalTheory.LFun.toCompl u.2 y :=
+  rfl
 
 def extZ : v.adicCompletion F ⊗[F] K →ₗ[F] FiniteAdeleRing (𝓞 F) F ⊗[F] K :=
   LinearMap.rTensor K (GlobalTheory.AdelicU.singleFin v)
 
-theorem map_extZ_self (y : v.adicCompletion F ⊗[F] K) :
-    Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v) (AlgHom.id F K) (extZ v y) = y := by
+theorem map_extZ_self (y : v.adicCompletion F ⊗[F] K)
+    : Algebra.TensorProduct.map
+        (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v) (AlgHom.id F K)
+        (extZ v y)
+      = y := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul a x =>
@@ -43,8 +52,11 @@ theorem map_extZ_self (y : v.adicCompletion F ⊗[F] K) :
     rw [GlobalTheory.AdelicU.evalV_singleFin_self]
   | add a b ha hb => simp only [map_add (f := _), ha, hb]
 
-theorem map_extZ_ne {v' : HeightOneSpectrum (𝓞 F)} (h : v' ≠ v) (y : v.adicCompletion F ⊗[F] K) :
-    Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v') (AlgHom.id F K) (extZ v y) = 0 := by
+theorem map_extZ_ne {v' : HeightOneSpectrum (𝓞 F)} (h : v' ≠ v) (y : v.adicCompletion F ⊗[F] K)
+    : Algebra.TensorProduct.map
+        (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v') (AlgHom.id F K)
+        (extZ v y)
+      = 0 := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul a x =>
@@ -53,7 +65,8 @@ theorem map_extZ_ne {v' : HeightOneSpectrum (𝓞 F)} (h : v' ≠ v) (y : v.adic
   | add a b ha hb => simp only [map_add (f := _), ha, hb, add_zero]
 
 theorem phi_injective : Function.Injective (phi (K := K) v) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro y hy
   have h0 : GlobalTheory.LFun.finAdEquiv F K (extZ v y) = 0 := by
     have hc : ∀ w : HeightOneSpectrum (𝓞 K), GlobalTheory.LFun.finAdEquiv F K (extZ v y) w = 0 := by
@@ -68,12 +81,19 @@ theorem phi_injective : Function.Injective (phi (K := K) v) := by
 
 theorem phi_surjective : Function.Surjective (phi (K := K) v) := by
   intro z
-  obtain ⟨y, hy⟩ := (GlobalTheory.LFun.finAdEquiv F K).surjective
-    ⟨fun w => if h : w.under (𝓞 F) = v then z ⟨w, h⟩ else 0, by
-      filter_upwards [(finite_over (K := K) v).compl_mem_cofinite] with u hu
-      rw [dite_eq_right (by simpa using hu)]
-      exact zero_mem _⟩
-  refine ⟨Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v) (AlgHom.id F K) y, funext fun u => ?_⟩
+  obtain ⟨y, hy⟩ :=
+    (GlobalTheory.LFun.finAdEquiv F K).surjective ⟨
+      fun w => if h : w.under (𝓞 F) = v then z ⟨w, h⟩ else 0,
+      by
+        filter_upwards [(finite_over (K := K) v).compl_mem_cofinite] with u hu
+        rw [dite_eq_right (by simpa using hu)]
+        exact zero_mem _
+    ⟩
+  refine ⟨
+    Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F v)
+      (AlgHom.id F K) y,
+    funext fun u => ?_
+  ⟩
   rw [phi_apply, ← GlobalTheory.LFun.finAdEquiv_apply u.2, hy]
   show (if h : u.1.under (𝓞 F) = v then z ⟨u.1, h⟩ else 0) = z u
   rw [dite_eq_left u.2]

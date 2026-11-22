@@ -26,8 +26,8 @@ theorem nvalEqSt_holds : NvalEqSt := by
   · rw [if_neg hx, hι x hx]
     have he : ((vV T.V ((V.l : ℕ) : T.Fr)).toNat : ℝ) = (vV T.V ((V.l : ℕ) : T.Fr) : ℝ) := by
       first
-        | exact_mod_cast Int.toNat_of_nonneg hl
-        | rw [← Int.cast_natCast (R := ℝ), Int.toNat_of_nonneg hl]
+      | exact_mod_cast Int.toNat_of_nonneg hl
+      | rw [← Int.cast_natCast (R := ℝ), Int.toNat_of_nonneg hl]
     rw [he]
     rfl
 

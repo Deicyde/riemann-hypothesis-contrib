@@ -5,11 +5,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTh
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-theorem UpperTheory.V.Ws.cocycle_card_euler_formula :
-    ∀ (R Γ M : Type) [CommRing R] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module R M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R Γ M), ContAction ρ → Finite (H1 ρ) → Finite (Z1 ρ) ∧ Nat.card (Z1 ρ) * Nat.card (H0 ρ) = Nat.card (H1 ρ) * Nat.card M := by
+theorem UpperTheory.V.Ws.cocycle_card_euler_formula
+    : ∀ (R Γ M : Type) [CommRing R] [Group Γ] [TopologicalSpace Γ] [AddCommGroup M] [Module R M]
+        [Finite M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R Γ M),
+      ContAction ρ → Finite (H1 ρ)
+        → Finite (Z1 ρ) ∧ Nat.card (Z1 ρ) * Nat.card (H0 ρ) = Nat.card (H1 ρ) * Nat.card M := by
   intro R Γ M _ _ _ _ _ _ _ _ ρ hρ hH1
   have hB1Z1 : B1 ρ ≤ Z1 ρ := by
     intro f hf
@@ -50,6 +55,6 @@ theorem UpperTheory.V.Ws.cocycle_card_euler_formula :
   · rw [hZ]
     exact mul_ne_zero hB1pos hH1pos
   · rw [hZ, hM]
-    change Nat.card (B1 ρ) * Nat.card (H1 ρ) * Nat.card (H0 ρ) =
-      Nat.card (H1 ρ) * (Nat.card (H0 ρ) * Nat.card (B1 ρ))
+    change Nat.card (B1 ρ) * Nat.card (H1 ρ) * Nat.card (H0 ρ)
+      = Nat.card (H1 ρ) * (Nat.card (H0 ρ) * Nat.card (B1 ρ))
     ring

@@ -15,18 +15,19 @@ namespace Formalism.L2.Geo.Rec.StarEmbeddingNorm
 
 variable (D : D7)
 
-instance totCx : IsTotallyComplex D.host.E :=
-  (D.host.isCMField_hostE).to_isTotallyComplex
+instance totCx : IsTotallyComplex D.host.E := (D.host.isCMField_hostE).to_isTotallyComplex
 
-theorem conjugate_emb (g : D.R.GG) :
-    ComplexEmbedding.conjugate (D.host.emb g) = D.host.emb (g * D.R.cc) := by
+theorem conjugate_emb (g : D.R.GG)
+    : ComplexEmbedding.conjugate (D.host.emb g) = D.host.emb (g * D.R.cc) := by
   rw [Formalism.L2.Geo.emb_mul_cc_comp]
   ext z
   rw [ComplexEmbedding.conjugate_coe_eq, RingHom.comp_apply]
-  rw [show ((D.host.conj : D.host.E →+* D.host.E) z) = D.host.conj z from rfl, Formalism.MainNotions.WeightFamilies.emb_conj]
+  rw [show ((D.host.conj : D.host.E →+* D.host.E) z) = D.host.conj z from rfl,
+    Formalism.MainNotions.WeightFamilies.emb_conj]
   rfl
 
-theorem mk_tauEmb_injective : Function.Injective fun τ : D.what₂.Tau => InfinitePlace.mk (DV.tauEmb D τ) := by
+theorem mk_tauEmb_injective
+    : Function.Injective fun τ : D.what₂.Tau => InfinitePlace.mk (DV.tauEmb D τ) := by
   intro τ τ' h
   simp only at h
   rcases mk_eq_iff.1 h with h1 | h1
@@ -48,15 +49,16 @@ theorem card_places : Fintype.card (InfinitePlace D.host.E) = Fintype.card D.wha
   omega
 
 def ePl : D.what₂.Tau ≃ InfinitePlace D.host.E :=
-  Equiv.ofBijective _ ((Fintype.bijective_iff_injective_and_card _).2
-    ⟨mk_tauEmb_injective D, (card_places D).symm⟩)
+  Equiv.ofBijective _
+    ((Fintype.bijective_iff_injective_and_card _).2 ⟨mk_tauEmb_injective D, (card_places D).symm⟩)
 
 theorem finrank_E_eq : finrank ℚ D.host.E = 2 * D.R.f := by
   have h2 : D.R.f = 2 * D.R.ord := rfl
   rw [D.host.finrank_cmField, h2]
   ring
 
-@[instance_reducible] def starE : StarRing D.host.E := starRingOfComm
+@[instance_reducible]
+def starE : StarRing D.host.E := starRingOfComm
 
 attribute [local instance] starE
 

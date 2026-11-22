@@ -6,26 +6,32 @@ public import Mathlib
 
 namespace Bl.FirstBlockLemmaH
 
-theorem goal1 :
-  ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {V : Type} [inst_2 : AddCommGroup.{0} V]
-  [inst_3 : Module.{0, 0} E V] [inst_4 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) V]
-  [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E V] {ι : Type} [Fintype.{0} ι] [DecidableEq.{1} ι]
-  {b : Module.Basis.{0, 0, 0} ι E V} {M : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) V},
-  Module.Finite.{0, 0} (NumberField.RingOfIntegers.{0} E) (Subtype.{1} fun (x : V) ↦ Membership.mem.{0, 0} M x) →
-    Exists.{1} fun (s : NumberField.RingOfIntegers.{0} E) ↦
-      And (Membership.mem.{0, 0} (nonZeroDivisors.{0} (NumberField.RingOfIntegers.{0} E)) s)
-        (∀ (v : V),
-          Membership.mem.{0, 0} M v →
-            ∀ (i : ι),
-              Membership.mem.{0, 0}
-                (RingHom.range.{0, 0} (Algebra.algebraMap.{0, 0} (NumberField.RingOfIntegers.{0} E) E))
-                (HMul.hMul.{0, 0, 0}
-                  (DFunLike.coe.{1, 1, 1} (Algebra.algebraMap.{0, 0} (NumberField.RingOfIntegers.{0} E) E) s)
-                  (DFunLike.coe.{1, 1, 1} (DFunLike.coe.{1, 1, 1} (Module.Basis.repr.{0, 0, 0} b) v) i))) := by
+theorem goal1
+    : ∀ {E : Type} [inst : Field.{0} E] [NumberField.{0} E] {V : Type} [inst_2 : AddCommGroup.{0} V]
+        [inst_3 : Module.{0, 0} E V] [inst_4 : Module.{0, 0} (NumberField.RingOfIntegers.{0} E) V]
+        [IsScalarTower.{0, 0, 0} (NumberField.RingOfIntegers.{0} E) E V] {ι : Type} [Fintype.{0} ι]
+        [DecidableEq.{1} ι] {b : Module.Basis.{0, 0, 0} ι E V}
+        {M : Submodule.{0, 0} (NumberField.RingOfIntegers.{0} E) V},
+      Module.Finite.{0, 0} (NumberField.RingOfIntegers.{0} E)
+          (Subtype.{1} fun (x : V) ↦ Membership.mem.{0, 0} M x)
+        → Exists.{1} fun (s : NumberField.RingOfIntegers.{0} E) ↦
+          And (Membership.mem.{0, 0} (nonZeroDivisors.{0} (NumberField.RingOfIntegers.{0} E)) s)
+            (∀ (v : V),
+              Membership.mem.{0, 0} M v
+                → ∀ (i : ι),
+                  Membership.mem.{0, 0}
+                    (RingHom.range.{0, 0} (Algebra.algebraMap.{0, 0}
+                      (NumberField.RingOfIntegers.{0} E) E))
+                    (HMul.hMul.{0, 0, 0}
+                      (DFunLike.coe.{1, 1, 1}
+                        (Algebra.algebraMap.{0, 0} (NumberField.RingOfIntegers.{0} E) E) s)
+                      (DFunLike.coe.{1, 1, 1}
+                        (DFunLike.coe.{1, 1, 1} (Module.Basis.repr.{0, 0, 0} b) v) i))) := by
   intro E _ _ V _ _ _ _ ι _ _ b M hM
   obtain ⟨S, hS⟩ := Module.Finite.iff_fg.mp hM
-  obtain ⟨s, hs⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors (NumberField.RingOfIntegers E))
-    (S ×ˢ (Finset.univ : Finset ι)) (fun p : V × ι => b.repr p.1 p.2)
+  obtain ⟨s, hs⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors (NumberField.RingOfIntegers E))
+      (S ×ˢ (Finset.univ : Finset ι)) (fun p : V × ι => b.repr p.1 p.2)
   refine ⟨s, s.2, ?_⟩
   intro v hv
   rw [← hS] at hv

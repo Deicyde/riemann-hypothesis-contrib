@@ -25,44 +25,83 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top
+  GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl NumberField IsDedekindDomain
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.HeightCounting.Up GlobalTheory.Mem.SRe GlobalTheory.Mem.R3.Rw
-open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.IndefR.Lev
+open Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Cx Formalism.IndefR.Lev
 open GlobalTheory.Mem.R3
 noncomputable section
 namespace GlobalTheory.Mem.R3.SelectionPairing
 open Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.IndefR.AutomorphicEvaluation
 section Args
-variable {K : Ctx} {B : GlobalTheory.Mem.Base} {f : Top.Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z : w.Lt} {Wt : Set B.places.Pl}
-  {L : SizeData₂ (w.st Z).toD7} {hT : GatTies (w.st Z).toD7} {Gi : Formalism.MainNotions.G.Inst (w.st Z).toD7 L} {Gl : Formalism.MainNotions.G.LatInst (w.st Z).toD7}
-  {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX (w.st Z).toD7} {cX : ExtraC} {ex : Extra (w.st Z).toD7 L hT Gi Gl Kc Yd cX}
+variable
+  {K : Ctx} {B : GlobalTheory.Mem.Base} {f : Top.Fr B.toPre} {T : TwDat B} {w : ColW B f T}
+  {Z : w.Lt} {Wt : Set B.places.Pl} {L : SizeData₂ (w.st Z).toD7} {hT : GatTies (w.st Z).toD7}
+  {Gi : Formalism.MainNotions.G.Inst (w.st Z).toD7 L}
+  {Gl : Formalism.MainNotions.G.LatInst (w.st Z).toD7} {Kc : Formalism.MainNotions.G.Consts}
+  {Yd : DivX (w.st Z).toD7} {cX : ExtraC} {ex : Extra (w.st Z).toD7 L hT Gi Gl Kc Yd cX}
   {t : RowsT K w Z Wt ex.p0}
 end Args
 set_option maxHeartbeats 1000000 in
-theorem wp3_ne_bot_and_piece_at_of_multEq (hWR : GlobalTheory.Published.WeilRepresentationUnitaryPair) (hDSE : GlobalTheory.Published.DiscreteSeriesExists)
-    (hHCF : GlobalTheory.Published.HarishChandraFinite) (hCRD : GlobalTheory.Published.CuspRapidDecay) {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL} {K : Ctx}
-    (q : WPt p.s K) (hMult : GlobalTheory.CuspMult.MultEq q.x.what₂.r.z.R.toRealDat) :
-    ∀ p', q.x.what₂.r.z.R.EEp3 p' ≠ ⊥ → ∀ i, q.x.what₂.r.z.R.Wp3 i p' ≠ ⊥ ∧
-      ∀ v, v ≠ (famT q.x.what₂).A.v0 → q.x.what₂.r.z.R.PartAt q.x.what₂.r.z.F i p' v :=
-  GlobalTheory.T.rowPart_forms_and_nonzero_vectors_every_place _ _ _ _ _ _ _ q.x.what₂.r.z.R q.x.what₂.r.z.F q.x.what₂.r.z.cG
-    (GlobalTheory.LinksInputs.inputs_of_hypotheses hWR hDSE hHCF hCRD _) q.x.what₂.r.z.pins q.x.what₂.r.intersectionNumber_baseChange hMult
-    (GlobalTheory.GoodGenericSer.goodGenericCharacter_of_seriesTypes q.x.what₂.r.z.R q.x.what₂.r.z.F q.x.what₂.r.z.pins.char 1 q.x.what₂.r.intersectionNumber_baseChange.ok
-      (fun k => ⟨_, q.core_data_of_point.a.all.types.O k, q.core_data_of_point.a.all.types.eSer_def k⟩)).1
+theorem wp3_ne_bot_and_piece_at_of_multEq
+    (hWR : GlobalTheory.Published.WeilRepresentationUnitaryPair)
+    (hDSE : GlobalTheory.Published.DiscreteSeriesExists)
+    (hHCF : GlobalTheory.Published.HarishChandraFinite)
+    (hCRD : GlobalTheory.Published.CuspRapidDecay)
+    {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL}
+    {K : Ctx} (q : WPt p.s K) (hMult : GlobalTheory.CuspMult.MultEq q.x.what₂.r.z.R.toRealDat)
+    : ∀ p',
+      q.x.what₂.r.z.R.EEp3 p' ≠ ⊥
+        → ∀ i,
+          q.x.what₂.r.z.R.Wp3 i p' ≠ ⊥
+            ∧ ∀ v, v ≠ (famT q.x.what₂).A.v0 → q.x.what₂.r.z.R.PartAt q.x.what₂.r.z.F i p' v :=
+  GlobalTheory.T.rowPart_forms_and_nonzero_vectors_every_place _ _ _ _ _ _ _ q.x.what₂.r.z.R
+    q.x.what₂.r.z.F q.x.what₂.r.z.cG
+    (GlobalTheory.LinksInputs.inputs_of_hypotheses hWR hDSE hHCF hCRD _) q.x.what₂.r.z.pins
+    q.x.what₂.r.intersectionNumber_baseChange hMult
+    (GlobalTheory.GoodGenericSer.goodGenericCharacter_of_seriesTypes q.x.what₂.r.z.R q.x.what₂.r.z.F
+      q.x.what₂.r.z.pins.char 1 q.x.what₂.r.intersectionNumber_baseChange.ok
+      (fun k =>
+        ⟨_, q.core_data_of_point.a.all.types.O k, q.core_data_of_point.a.all.types.eSer_def k⟩)).1
 set_option maxHeartbeats 1000000 in
-theorem ev_at_join_pinned {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL} {K : Ctx} (q : WPt p.s K) (R : _root_.Formalism.L2.RecTAlt q.O.ex) (hR : _root_.GlobalTheory.Mem.Top.Bl.RecordCompatibleExtended q R)
-    (sP : GlobalTheory.Mem.SRe.SPack (q.w.D q.Z) fun u => (R.T.cols.forms u).to0) (hsP : HEq sP q.saturationAtWeightedPoint.P) :
-    EvalTieT (Formalism.L2.SG.RowsJoinPinned.MP q.x.what₂.r.z.R.toRealDat) q.x.what₂.r.z.R.toRealDat.ν0
-      q.x.what₂.r.z.R.toRealDat.fd0 (Formalism.L2.SG.RowsJoinPinned.EP q.x.what₂.r.z.R.toRealDat q.x.what₂.r.z.F.lv2) sP.X sP.G
-      (Formalism.L2.SG.RowsJoinPinned.iotaX sP.X sP.inst).toMulEquiv q.saturationAtWeightedPoint.t q.saturationAtWeightedPoint.c := by
-  have hF0 : (fun u => (R.T.cols.forms u).to0) = (fun u => (q.x.col.C.forms u).to0) := (by with_unfolding_all exact (congrArg (fun (C : type_of% q.x.col.C) => fun u => (C.forms u).to0) hR.s.cols :))
-  exact (by with_unfolding_all exact (pack_move (D := (q.w.st q.Z).toD7) (F0 := fun u => (R.T.cols.forms u).to0) (F0' := fun u => (q.x.col.C.forms u).to0)
-    ((hF0)) (P := (sP)) (P' := (q.saturationAtWeightedPoint.P)) ((hsP))
-    (fun _ P => EvalTieT (Formalism.L2.SG.RowsJoinPinned.MP q.x.what₂.r.z.R.toRealDat) q.x.what₂.r.z.R.toRealDat.ν0
-      q.x.what₂.r.z.R.toRealDat.fd0 (Formalism.L2.SG.RowsJoinPinned.EP q.x.what₂.r.z.R.toRealDat q.x.what₂.r.z.F.lv2) P.X P.G
-      (Formalism.L2.SG.RowsJoinPinned.iotaX P.X P.inst).toMulEquiv q.saturationAtWeightedPoint.t q.saturationAtWeightedPoint.c) ((q.saturationAtWeightedPoint.ev)) : _))
-theorem nonempty_rXs_of_prmR_none {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {N : _root_.GlobalTheory.Mem.Top.Bl.NormChoiceExtension hL} {Γ : GeoP} {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL} (hp : p = _root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension N SExt.none Γ) {K : Ctx}
-    (q : WPt p.s K) : Nonempty (RXs q.x.what₂) := by
+theorem ev_at_join_pinned
+    {hL : _root_.UpperTheory.Zero.LLC.RecTExists} {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL}
+    {K : Ctx} (q : WPt p.s K) (R : _root_.Formalism.L2.RecTAlt q.O.ex)
+    (hR : _root_.GlobalTheory.Mem.Top.Bl.RecordCompatibleExtended q R)
+    (sP : GlobalTheory.Mem.SRe.SPack (q.w.D q.Z) fun u => (R.T.cols.forms u).to0)
+    (hsP : HEq sP q.saturationAtWeightedPoint.P)
+    : EvalTieT (Formalism.L2.SG.RowsJoinPinned.MP q.x.what₂.r.z.R.toRealDat)
+      q.x.what₂.r.z.R.toRealDat.ν0 q.x.what₂.r.z.R.toRealDat.fd0
+      (Formalism.L2.SG.RowsJoinPinned.EP q.x.what₂.r.z.R.toRealDat q.x.what₂.r.z.F.lv2) sP.X sP.G
+      (Formalism.L2.SG.RowsJoinPinned.iotaX sP.X sP.inst).toMulEquiv q.saturationAtWeightedPoint.t
+      q.saturationAtWeightedPoint.c := by
+  have hF0 : (fun u => (R.T.cols.forms u).to0) = (fun u => (q.x.col.C.forms u).to0) := (by
+    with_unfolding_all
+      exact (congrArg (fun (C : type_of% q.x.col.C) => fun u => (C.forms u).to0) hR.s.cols :))
+  exact (by
+    with_unfolding_all
+      exact (pack_move (D := (q.w.st q.Z).toD7)
+          (F0 := fun u => (R.T.cols.forms u).to0)
+          (F0' := fun u => (q.x.col.C.forms u).to0)
+          ((hF0)) (P := (sP)) (P' := (q.saturationAtWeightedPoint.P)) ((hsP))
+          (fun _ P =>
+            EvalTieT (Formalism.L2.SG.RowsJoinPinned.MP q.x.what₂.r.z.R.toRealDat)
+              q.x.what₂.r.z.R.toRealDat.ν0 q.x.what₂.r.z.R.toRealDat.fd0
+              (Formalism.L2.SG.RowsJoinPinned.EP q.x.what₂.r.z.R.toRealDat q.x.what₂.r.z.F.lv2) P.X
+              P.G (Formalism.L2.SG.RowsJoinPinned.iotaX P.X P.inst).toMulEquiv
+              q.saturationAtWeightedPoint.t q.saturationAtWeightedPoint.c)
+          ((q.saturationAtWeightedPoint.ev))
+        : _))
+theorem nonempty_rXs_of_prmR_none
+    {hL : _root_.UpperTheory.Zero.LLC.RecTExists}
+    {N : _root_.GlobalTheory.Mem.Top.Bl.NormChoiceExtension hL} {Γ : GeoP}
+    {p : _root_.GlobalTheory.Mem.Top.Bl.Parameters hL}
+    (hp : p = _root_.GlobalTheory.Mem.Top.Bl.parametersOfExtension N SExt.none Γ)
+    {K : Ctx} (q : WPt p.s K)
+    : Nonempty (RXs q.x.what₂) := by
   subst hp
   exact (by with_unfolding_all exact (Nonempty.intro q.x.rx :))
 end GlobalTheory.Mem.R3.SelectionPairing

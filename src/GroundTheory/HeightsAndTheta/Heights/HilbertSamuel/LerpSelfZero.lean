@@ -14,12 +14,15 @@ open MeasureTheory Set Filter Topology ReciprocityTheory.AnForm ReciprocityTheor
 
 noncomputable section
 
-theorem Weight.lerp_self_zero {D : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas D X}
-    {L : HolLineBundle A} (W : Weight L) : W.lerp W 0 = W := by
+theorem Weight.lerp_self_zero
+    {D : ℕ} {X : Type} [TopologicalSpace X]
+    {A : FinHolAtlas D X} {L : HolLineBundle A} (W : Weight L)
+    : W.lerp W 0 = W := by
   cases W
   simp only [Weight.lerp, zero_mul, add_zero]
 
-theorem SupNormAgainstL2.proof (h : UniformBergmanBound.Statement) : SupNormAgainstL2.Statement := by
+theorem SupNormAgainstL2.proof (h : UniformBergmanBound.Statement)
+    : SupNormAgainstL2.Statement := by
   intro D X _ _ _ _ _ A L W dV hW
   obtain ⟨C, hC⟩ := h A L W W dV hW hW
   refine ⟨⟨Real.sqrt C, fun n hn s hs x => ?_⟩, fun n s hs M hM => ?_⟩
@@ -29,8 +32,8 @@ theorem SupNormAgainstL2.proof (h : UniformBergmanBound.Statement) : SupNormAgai
     rw [Weight.lerp_self_zero] at hB
     set r := ptNormSq W n s x / sectionL2NormSq W dV n s
     have hr0 : 0 ≤ r := div_nonneg (ptNormSq_nonneg W n s x) (sectionL2NormSq_nonneg W dV n s)
-    have hbdd : BddAbove (range fun v : V => ptNormSq W n (v : Fin A.n → X → ℂ) x /
-        sectionL2NormSq W dV n v) := by
+    have hbdd : BddAbove (range fun v : V =>
+        ptNormSq W n (v : Fin A.n → X → ℂ) x / sectionL2NormSq W dV n v) := by
       refine ⟨r, ?_⟩
       rintro _ ⟨⟨v, hv⟩, rfl⟩
       obtain ⟨c, rfl⟩ := Submodule.mem_span_singleton.1 hv
@@ -46,7 +49,8 @@ theorem SupNormAgainstL2.proof (h : UniformBergmanBound.Statement) : SupNormAgai
       positivity
     · have hpt : ptNormSq W n s x ≤ C * ((n : ℝ) ^ D * sectionL2NormSq W dV n s) := by
         rw [← mul_assoc, ← div_le_iff₀ hpos]; exact hrC
-      calc Real.sqrt (ptNormSq W n s x)
+      calc
+        Real.sqrt (ptNormSq W n s x)
           ≤ Real.sqrt (C * ((n : ℝ) ^ D * sectionL2NormSq W dV n s)) := Real.sqrt_le_sqrt hpt
         _ = Real.sqrt C * Real.sqrt ((n : ℝ) ^ D) * Real.sqrt (sectionL2NormSq W dV n s) := by
           rw [Real.sqrt_mul' _ (by positivity), Real.sqrt_mul (by positivity), mul_assoc]
@@ -58,11 +62,14 @@ theorem SupNormAgainstL2.proof (h : UniformBergmanBound.Statement) : SupNormAgai
       have h2 := hM y
       nlinarith [Real.sqrt_nonneg (ptNormSq W n s y)]
     have hl2 : sectionL2NormSq W dV n s ≤ M ^ 2 := by
-      calc sectionL2NormSq W dV n s ≤ ∫ _ : X, M ^ 2 ∂dV.μ :=
-            integral_mono_of_nonneg (Eventually.of_forall fun y => ptNormSq_nonneg W n s y)
-              (integrable_const _) (Eventually.of_forall hpt)
+      calc
+        sectionL2NormSq W dV n s ≤ ∫ _ : X, M ^ 2 ∂dV.μ :=
+          integral_mono_of_nonneg (Eventually.of_forall fun y => ptNormSq_nonneg W n s y)
+            (integrable_const _) (Eventually.of_forall hpt)
         _ = M ^ 2 := by simp
-    calc Real.sqrt (sectionL2NormSq W dV n s) ≤ Real.sqrt (M ^ 2) := Real.sqrt_le_sqrt hl2
+    calc
+      Real.sqrt (sectionL2NormSq W dV n s)
+        ≤ Real.sqrt (M ^ 2) := Real.sqrt_le_sqrt hl2
       _ = M := Real.sqrt_sq hM0
 
 end

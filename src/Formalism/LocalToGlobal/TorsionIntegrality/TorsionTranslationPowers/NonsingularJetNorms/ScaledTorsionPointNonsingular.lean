@@ -14,15 +14,16 @@ namespace Formalism.L2.Th1.E
 
 namespace ScaledTorsionTransport
 
-theorem transport {K : Type*} [Field K] [DecidableEq K] {W W' : WeierstrassCurve K} (hW : W = W')
-    {x y x' y' : K} (hx : x = x') (hy : y = y') (h : W.toAffine.Nonsingular x y) (N : ℕ)
-    (hN : N • WeierstrassCurve.Affine.Point.some _ _ h = 0) :
-    ∃ h' : W'.toAffine.Nonsingular x' y', N • WeierstrassCurve.Affine.Point.some _ _ h' = 0 := by
+theorem transport
+    {K : Type*} [Field K] [DecidableEq K]
+    {W W' : WeierstrassCurve K} (hW : W = W')
+    {x y x' y' : K} (hx : x = x') (hy : y = y') (h : W.toAffine.Nonsingular x y)
+    (N : ℕ) (hN : N • WeierstrassCurve.Affine.Point.some _ _ h = 0)
+    : ∃ h' : W'.toAffine.Nonsingular x' y', N • WeierstrassCurve.Affine.Point.some _ _ h' = 0 := by
   subst hW hx hy
   exact ⟨h, hN⟩
 
 end ScaledTorsionTransport
-
 
 open Formalism.L2.Th1 in
 open Classical in
@@ -39,14 +40,14 @@ theorem scaled_torsion_point_of_add (hA : PtOfAdd) : ScaledTorsionPointNonsingul
     exact hz
   have hNz' : (N : ℂ) * ((ι.symm lam)⁻¹ * z) ∈ (F.scalePair L _ hc).lattice := by
     rw [hmem]
-    have e : ((ι.symm lam)⁻¹)⁻¹ * ((N : ℂ) * ((ι.symm lam)⁻¹ * z)) = (N : ℂ) * z := by
-      field_simp
+    have e : ((ι.symm lam)⁻¹)⁻¹ * ((N : ℂ) * ((ι.symm lam)⁻¹ * z)) = (N : ℂ) * z := by field_simp
     rw [e]
     exact hNz
-  have htor := Tor.nsmul_ptOf (l := l) (L := F.scalePair L _ hc) (ι := ι) hA PtOfZero_of
-    ((ι.symm lam)⁻¹ * z) N
+  have htor :=
+    Tor.nsmul_ptOf (l := l) (L := F.scalePair L _ hc) (ι := ι) hA PtOfZero_of ((ι.symm lam)⁻¹ * z) N
   rw [(PtOfZero_of l (F.scalePair L _ hc) ι _).2 hNz',
-    AnaSys.ptOf_notMem (l := l) (L := F.scalePair L _ hc) (ι := ι) _ hz'] at htor
+      AnaSys.ptOf_notMem (l := l) (L := F.scalePair L _ hc) (ι := ι) _ hz']
+    at htor
   refine ScaledTorsionTransport.transport ?_ ?_ ?_ _ N htor
   · simp only [curveL, hg2, hg3, map_mul, map_inv₀, map_pow, inv_pow, inv_inv,
       RingEquiv.apply_symm_apply]

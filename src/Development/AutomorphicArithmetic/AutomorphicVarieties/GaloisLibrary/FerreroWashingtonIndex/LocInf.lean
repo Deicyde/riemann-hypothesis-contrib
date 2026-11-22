@@ -6,22 +6,32 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.FW.locInf :
-    ∀ (K : Type) [Field K] [NumberField K] [IsCMField K] (x : (maximalRealSubfield K)ˣ), (∀ φ : K →+* ℂ, 0 < (φ (algebraMap (maximalRealSubfield K) K x)).re) → ∀ v, GroundTheory.Global.IdeleGroup.infiniteProj v (GroundTheory.Global.IdeleGroup.diagonal (maximalRealSubfield K) x) ∈ (GroundTheory.Global.IdeleNorm.infiniteLocalNorm K v).range := by
+theorem UpperTheory.V.FW.locInf
+    : ∀ (K : Type) [Field K] [NumberField K] [IsCMField K] (x : (maximalRealSubfield K)ˣ),
+      (∀ φ : K →+* ℂ, 0 < (φ (algebraMap (maximalRealSubfield K) K x)).re)
+        → ∀ v,
+          GroundTheory.Global.IdeleGroup.infiniteProj v
+              (GroundTheory.Global.IdeleGroup.diagonal (maximalRealSubfield K) x)
+            ∈ (GroundTheory.Global.IdeleNorm.infiniteLocalNorm K v).range := by
   intro K _ _ _ x hx v
   classical
   obtain ⟨W, rfl⟩ := InfinitePlace.comap_surjective (k := maximalRealSubfield K) (K := K) v
   set u := W.comap (algebraMap (maximalRealSubfield K) K) with hu_def
   have hWu : W.LiesOver u := { under_eq := rfl }
   have hu : u.IsReal := IsTotallyReal.isReal u
-  have hpos : 0 < InfinitePlace.Completion.ringEquivRealOfIsReal hu
-      (algebraMap (maximalRealSubfield K) u.Completion (x : maximalRealSubfield K)) := by
-    have h0 : InfinitePlace.Completion.ringEquivRealOfIsReal hu
-        (algebraMap (maximalRealSubfield K) u.Completion (x : maximalRealSubfield K)) =
-        InfinitePlace.embedding_of_isReal hu (x : maximalRealSubfield K) := by
+  have hpos
+      : 0
+        < InfinitePlace.Completion.ringEquivRealOfIsReal hu
+          (algebraMap (maximalRealSubfield K) u.Completion (x : maximalRealSubfield K)) := by
+    have h0
+        : InfinitePlace.Completion.ringEquivRealOfIsReal hu
+            (algebraMap (maximalRealSubfield K) u.Completion (x : maximalRealSubfield K))
+          = InfinitePlace.embedding_of_isReal hu (x : maximalRealSubfield K) := by
       change InfinitePlace.Completion.extensionEmbeddingOfIsReal hu _ = _
       rw [InfinitePlace.Completion.algebraMap_apply]
       exact InfinitePlace.Completion.extensionEmbeddingOfIsReal_coe hu _
@@ -35,7 +45,8 @@ theorem UpperTheory.V.FW.locInf :
       rwa [Complex.ofReal_re] at h3
     · have h4 := congrArg (fun f => (f (x : maximalRealSubfield K)).re) h2
       simp only [RingHom.coe_comp, Function.comp_apply, ComplexEmbedding.conjugate_coe_eq,
-        Complex.conj_re] at h4
+          Complex.conj_re]
+        at h4
       rw [h4, ← h1] at h3
       rwa [Complex.ofReal_re] at h3
   letI : Algebra u.Completion W.Completion := AbsoluteValue.Completion.algebraOfLiesOver u.1 W.1

@@ -10,8 +10,12 @@ open Matrix GlobalTheory.KZ GlobalTheory.KZ.ES
 
 namespace GlobalTheory.KZ.ES
 
-theorem rootOfUnity_eq_one_of_val {K Γ : Type*} [Field K] [LinearOrderedCommGroupWithZero Γ] (v : Valuation K Γ)
-    {m : ℕ} (hm : ¬ v (m : K) < 1) {η : K} (hη : η ^ m = 1) (h1 : v (η - 1) < 1) : η = 1 := by
+theorem rootOfUnity_eq_one_of_val
+    {K Γ : Type*} [Field K] [LinearOrderedCommGroupWithZero Γ]
+    (v : Valuation K Γ)
+    {m : ℕ} (hm : ¬ v (m : K) < 1)
+    {η : K} (hη : η ^ m = 1) (h1 : v (η - 1) < 1)
+    : η = 1 := by
   by_contra hne
   apply hm
   have hv : v η = 1 := by
@@ -31,13 +35,15 @@ theorem rootOfUnity_eq_one_of_val {K Γ : Type*} [Field K] [LinearOrderedCommGro
     have := mul_geom_sum η m
     rw [hη, sub_self] at this
     exact (mul_eq_zero.mp this).resolve_left (sub_ne_zero.mpr hne)
-  have e : (m : K) = ∑ i ∈ Finset.range m, (1 - η ^ i) := by
-    rw [Finset.sum_sub_distrib, hs]; simp
+  have e : (m : K) = ∑ i ∈ Finset.range m, (1 - η ^ i) := by rw [Finset.sum_sub_distrib, hs]; simp
   rw [e]
   exact v.map_sum_lt one_ne_zero fun i _ => hi i
 
-theorem not_val_lt_one_of_coprime {K : Type*} [Field K] (V : ValuationSubring K) {m q : ℕ} (h : Nat.Coprime m q)
-    (hq : V.valuation (q : K) < 1) : ¬ V.valuation (m : K) < 1 := by
+theorem not_val_lt_one_of_coprime
+    {K : Type*} [Field K]
+    (V : ValuationSubring K)
+    {m q : ℕ} (h : Nat.Coprime m q) (hq : V.valuation (q : K) < 1)
+    : ¬ V.valuation (m : K) < 1 := by
   intro hm
   obtain ⟨a, b, hab⟩ := Nat.isCoprime_iff_coprime.mpr h
   have e : (1 : K) = (a : K) * m + (b : K) * q := by
@@ -53,9 +59,12 @@ theorem not_val_lt_one_of_coprime {K : Type*} [Field K] (V : ValuationSubring K)
   rw [← e, map_one] at this
   exact lt_irrefl _ this
 
-theorem FrobV.apply_rootOfUnity {Ω : Type} [Field Ω] [Algebra ℚ Ω] {V : ValuationSubring Ω} {q : ℕ}
-    {s : Ω ≃ₐ[ℚ] Ω} (hs : FrobV V q s) {m : ℕ} (hm0 : m ≠ 0) (hm : Nat.Coprime m q) {ζ : Ω} (hζ : ζ ^ m = 1) :
-    s ζ = ζ ^ q := by
+theorem FrobV.apply_rootOfUnity
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {V : ValuationSubring Ω} {q : ℕ} {s : Ω ≃ₐ[ℚ] Ω} (hs : FrobV V q s)
+    {m : ℕ} (hm0 : m ≠ 0) (hm : Nat.Coprime m q)
+    {ζ : Ω} (hζ : ζ ^ m = 1)
+    : s ζ = ζ ^ q := by
   have hq : V.valuation (q : Ω) < 1 := V.mem_nonunits_iff.mp hs.1
   have hv : V.valuation ζ = 1 := by
     have := congrArg V.valuation hζ
@@ -74,9 +83,11 @@ theorem FrobV.apply_rootOfUnity {Ω : Type} [Field Ω] [Algebra ℚ Ω] {V : Val
       exact h
   exact (div_eq_one_iff_eq hq0).mp key
 
-theorem cyclotomicCharacter_frobV : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l q : ℕ) [Fact l.Prime],
-    q.Prime → q ≠ l → ∀ (V : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω), FrobV V q s →
-      (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) = q := by
+theorem cyclotomicCharacter_frobV
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l q : ℕ) [Fact l.Prime],
+      q.Prime → q ≠ l
+        → ∀ (V : ValuationSubring Ω) (s : Ω ≃ₐ[ℚ] Ω),
+          FrobV V q s → (cyclotomicCharacter Ω l s.toRingEquiv : ℤ_[l]) = q := by
   intro Ω _ _ _ l q hl hq hql V s hs
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := algebraRat.charZero Ω

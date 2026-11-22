@@ -29,16 +29,19 @@ theorem Km_anti (N : ℕ) {m m' : ℕ} (h : m ≤ m') : Zls.Km k N m' ≤ Zls.Km
   refine Subgroup.mem_map.2 ⟨g, ?_, rfl⟩
   have hle : Ideal.span {Zls.unif k ^ m'} ≤ Ideal.span {Zls.unif k ^ m} :=
     Ideal.span_singleton_le_span_singleton.2 (pow_dvd_pow _ h)
-  have key : Matrix.GeneralLinearGroup.map (n := Fin N) (Ideal.Quotient.mk (Ideal.span {Zls.unif k ^ m})) g =
-      Matrix.GeneralLinearGroup.map (n := Fin N) (Ideal.Quotient.factor hle)
-        (Matrix.GeneralLinearGroup.map (n := Fin N) (Ideal.Quotient.mk (Ideal.span {Zls.unif k ^ m'})) g) := by
+  have key
+      : Matrix.GeneralLinearGroup.map (n := Fin N) (Ideal.Quotient.mk (Ideal.span {Zls.unif k ^ m}))
+          g
+        = Matrix.GeneralLinearGroup.map (n := Fin N) (Ideal.Quotient.factor hle)
+          (Matrix.GeneralLinearGroup.map (n := Fin N)
+            (Ideal.Quotient.mk (Ideal.span {Zls.unif k ^ m'})) g) := by
     ext i j
     simp
   rw [MonoidHom.mem_ker] at hg ⊢
   rw [key, hg, map_one]
 
-theorem exists_pow_mem_Km (N m' : ℕ) {m : ℕ} {x : GL (Fin N) k} (hx : x ∈ Zls.Km k N m) :
-    ∃ M : ℕ, 0 < M ∧ x ^ M ∈ Zls.Km k N m' := by
+theorem exists_pow_mem_Km (N m' : ℕ) {m : ℕ} {x : GL (Fin N) k} (hx : x ∈ Zls.Km k N m)
+    : ∃ M : ℕ, 0 < M ∧ x ^ M ∈ Zls.Km k N m' := by
   obtain ⟨g, -, rfl⟩ := Subgroup.mem_map.1 hx
   haveI := finite_quotient_unif_pow (k := k) m'
   set f := Matrix.GeneralLinearGroup.map (n := Fin N) (Ideal.Quotient.mk (Ideal.span {Zls.unif k ^ m'}))
@@ -48,11 +51,18 @@ theorem exists_pow_mem_Km (N m' : ℕ) {m : ℕ} {x : GL (Fin N) k} (hx : x ∈ 
   refine Subgroup.mem_map.2 ⟨g ^ orderOf (f g), ?_, rfl⟩
   rw [MonoidHom.mem_ker, map_pow, pow_orderOf_eq_one]
 
-theorem KM_antitone_and_pow : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (n : ℕ) (hd : ∑ _a : Fin n, 1 = n),
-    Antitone (fun m => PositivityTheory.Lbc.KM k n (Zls.Km k n (m + 1)) (fun _ : Fin n => 1) hd) ∧
-    ∀ m m', m ≤ m' → ∀ u ∈ PositivityTheory.Lbc.KM k n (Zls.Km k n (m + 1)) (fun _ : Fin n => 1) hd,
-      ∃ N : ℕ, 0 < N ∧ u ^ N ∈ PositivityTheory.Lbc.KM k n (Zls.Km k n (m' + 1)) (fun _ : Fin n => 1) hd := by
+theorem KM_antitone_and_pow
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (hd : ∑ _a : Fin n, 1 = n),
+      Antitone (fun m => PositivityTheory.Lbc.KM k n (Zls.Km k n (m + 1)) (fun _ : Fin n => 1) hd)
+        ∧ ∀ m m',
+          m ≤ m'
+            → ∀ u ∈ PositivityTheory.Lbc.KM k n (Zls.Km k n (m + 1)) (fun _ : Fin n => 1) hd,
+              ∃ N : ℕ,
+                0 < N
+                  ∧ u ^ N ∈ PositivityTheory.Lbc.KM k n (Zls.Km k n (m' + 1))
+                    (fun _ : Fin n => 1)
+                    hd := by
   intro k _ _ _ _ n hd
   refine ⟨fun m m' h u hu => Km_anti n (Nat.succ_le_succ h) hu, fun m m' _ u hu => ?_⟩
   obtain ⟨M, hM, hp⟩ := exists_pow_mem_Km n (m' + 1) (show _ ∈ Zls.Km k n (m + 1) from hu)

@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Geome
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 open Classical
 open ReciprocityTheory.ChartRestriction.G.Out
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -21,9 +22,20 @@ namespace GlobalTheory.GenSpread
 
 open GlobalTheory.AbLaw GlobalTheory.AbLaw.Seesaw GlobalTheory.ConnFibre
 
-theorem exists_geometricallyConnected : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [Field K] [Algebra R K] [IsFractionRing R K] (X X₀ : Scheme.{0}) (f : X ⟶ Sp R) (f₀ : X₀ ⟶ Sp K) (φ : X₀ ⟶ X), IsPullback φ f₀ f (spMap (algebraMap R K)) → Smooth f → GlobalTheory.AbLaw.IsProjBy f → GeometricallyConnected f₀ → ∃ a : R, a ≠ 0 ∧ ∀ (R' : Type) [CommRing R'] (g : R →+* R'), IsUnit (g a) → ∀ (X' : Scheme.{0}) (π : X' ⟶ X) (f' : X' ⟶ Sp R'), IsPullback π f' f (spMap g) → GeometricallyConnected f' := by
+theorem exists_geometricallyConnected
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] (X X₀ : Scheme.{0}) (f : X ⟶ Sp R) (f₀ : X₀ ⟶ Sp K) (φ : X₀ ⟶ X),
+      IsPullback φ f₀ f (spMap (algebraMap R K)) → Smooth f → GlobalTheory.AbLaw.IsProjBy f
+        → GeometricallyConnected f₀
+        → ∃ a : R,
+          a ≠ 0
+            ∧ ∀ (R' : Type) [CommRing R'] (g : R →+* R'),
+              IsUnit (g a)
+                → ∀ (X' : Scheme.{0}) (π : X' ⟶ X) (f' : X' ⟶ Sp R'),
+                  IsPullback π f' f (spMap g) → GeometricallyConnected f' := by
   intro R K _ _ _ _ _ _ X X₀ f f₀ φ hb hs hp hc
-  obtain ⟨P⟩ := GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj R X f hs hp _ (Inh.trivLB_isLB _)
+  obtain ⟨P⟩ :=
+    GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj R X f hs hp _ (Inh.trivLB_isLB _)
   have hpr : IsProper f := GlobalTheory.AbLaw.isProper_of_isProjBy R X f hp
   let L := AlgebraicClosure K
   let g₀ : R →+* L := (algebraMap K L).comp (algebraMap R K)
@@ -36,7 +48,8 @@ theorem exists_geometricallyConnected : ∀ (R K : Type) [CommRing R] [IsDomain 
     erw [← Spec.map_comp] at this
     exact this
   have hs₀ : Smooth f₀ := MorphismProperty.of_isPullback hb hs
-  have hi := GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ f₀ hs₀ hc
+  have hi :=
+    GlobalTheory.forall_geometricallyIntegral_of_smooth_of_geometricallyConnected _ _ f₀ hs₀ hc
   have hint : IsIntegral (pullback f₀ y₀) :=
     GeometricallyIntegral.geometrically_isIntegral _ _ _ (.of_hasPullback f₀ y₀)
   have hpr₀ : IsProper (pullback.snd f₀ y₀) := MorphismProperty.of_isPullback h₀ hpr
@@ -53,8 +66,10 @@ theorem exists_geometricallyConnected : ∀ (R K : Type) [CommRing R] [IsDomain 
     have hcl : IsClosed (Set.range f) := f.isClosedMap.isClosed_range
     have hbot : (⊥ : PrimeSpectrum R) ∈ Set.range f := by
       refine ⟨(pullback.fst f₀ y₀ ≫ φ) x₀, ?_⟩
-      have e : f ((pullback.fst f₀ y₀ ≫ φ) x₀) =
-          Spec.map (CommRingCat.ofHom g₀) (pullback.snd f₀ y₀ x₀) := congrArg (fun t => t x₀) h₀.w
+      have e
+          : f ((pullback.fst f₀ y₀ ≫ φ) x₀)
+            = Spec.map (CommRingCat.ofHom g₀) (pullback.snd f₀ y₀ x₀) :=
+        congrArg (fun t => t x₀) h₀.w
       refine e.trans (PrimeSpectrum.ext (le_bot_iff.1 fun a ha => ?_))
       have ha' : g₀ a ∈ (pullback.snd f₀ y₀ x₀).asIdeal := ha
       by_contra hne
@@ -67,7 +82,8 @@ theorem exists_geometricallyConnected : ∀ (R K : Type) [CommRing R] [IsDomain 
     exact hsp.mem_closed hcl hbot
   refine ⟨δ, fun h => hδ (h ▸ map_zero g₀), fun R' _ g hg X' π f' hπ => ?_⟩
   refine ⟨geometrically_iff_of_commRing.2 fun F _ _ Z fst snd h => ?_⟩
-  have h' : IsPullback (fst ≫ π) snd f (Spec.map (CommRingCat.ofHom ((algebraMap R' F).comp g))) := by
+  have h'
+      : IsPullback (fst ≫ π) snd f (Spec.map (CommRingCat.ofHom ((algebraMap R' F).comp g))) := by
     have := h.paste_horiz hπ
     erw [← Spec.map_comp] at this
     exact this

@@ -35,14 +35,17 @@ theorem torusBound : TorusBound := by
     rintro ⟨t, ht⟩
     obtain ⟨s, hs, u, hu, k, hk, hkint, hsTA, rfl⟩ := hS' t ht
     obtain ⟨s', hs', hs'TA, k', hk'TA, hk'1, rfl⟩ := hS₂' k hk hkint
-    obtain ⟨g, hg, hdet⟩ := GlobalTheory.UCls.Det.exists_isKM_det_eq E hE r M G Λ hr hM hΛ k' hk'TA hk'1
+    obtain ⟨g, hg, hdet⟩ :=
+      GlobalTheory.UCls.Det.exists_isKM_det_eq E hE r M G Λ hr hM hΛ k' hk'TA hk'1
     have hmem : s * s' ∈ T := Finset.mem_image.2 ⟨(s, s'), Finset.mem_product.2 ⟨hs, hs'⟩, rfl⟩
     refine ⟨⟨s * s', hmem⟩, ?_⟩
     simp only [φ, dif_pos (hTA s s' hsTA hs'TA)]
     refine Quot.sound ⟨u, hu, g, hg, ?_⟩
     rw [hdet]
     ring
-  calc torusNo c G (Λ : Set (Fin r → E)) M = ENat.card Q := rfl
+  calc
+    torusNo c G (Λ : Set (Fin r → E)) M
+      = ENat.card Q := rfl
     _ ≤ ENat.card T := ENat.card_le_card_of_injective (Function.injective_surjInv hφ)
     _ = T.card := by rw [ENat.card_eq_coe_fintype_card, Fintype.card_coe]
     _ ≤ _ := by exact_mod_cast hT

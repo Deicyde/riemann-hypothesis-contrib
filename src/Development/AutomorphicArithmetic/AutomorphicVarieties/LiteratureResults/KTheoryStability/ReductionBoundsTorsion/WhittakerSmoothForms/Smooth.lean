@@ -14,21 +14,26 @@ variable {V : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] {Γ : Type} [Grou
 
 variable (U : Set V) (A : Γ →* (V →L[ℝ] V)) (φ : V → ℝ)
 
-theorem eta_zero {k : ℕ} (c : (Fin (k + 2) → Γ) → ℝ) (σ : ℕ → Γ) :
-    eta A φ c 0 σ = fun _ => ContinuousAlternatingMap.constOfIsEmpty ℝ V (Fin 0) (c fun i => σ i) := rfl
+theorem eta_zero {k : ℕ} (c : (Fin (k + 2) → Γ) → ℝ) (σ : ℕ → Γ)
+    : eta A φ c 0 σ
+      = fun _ => ContinuousAlternatingMap.constOfIsEmpty ℝ V (Fin 0) (c fun i => σ i) :=
+  rfl
 
-theorem eta_succ {k : ℕ} (c : (Fin (k + 2) → Γ) → ℝ) (j : ℕ) (σ : ℕ → Γ) :
-    eta A φ c (j + 1) σ = extDeriv (Kf A φ (eta A φ c j) σ) := rfl
+theorem eta_succ {k : ℕ} (c : (Fin (k + 2) → Γ) → ℝ) (j : ℕ) (σ : ℕ → Γ)
+    : eta A φ c (j + 1) σ = extDeriv (Kf A φ (eta A φ c j) σ) :=
+  rfl
 
-theorem psi_contDiffAt (H : Hyp U A φ) (γ : Γ) {h : V} (hh : h ∈ U) :
-    ContDiffAt ℝ (⊤ : ℕ∞) (psi A φ γ) h := by
+theorem psi_contDiffAt (H : Hyp U A φ) (γ : Γ) {h : V} (hh : h ∈ U)
+    : ContDiffAt ℝ (⊤ : ℕ∞) (psi A φ γ) h := by
   have h1 : ContDiffAt ℝ (⊤ : ℕ∞) φ (A γ⁻¹ h) :=
     H.smooth.contDiffAt (H.isOpen.mem_nhds (H.mapsTo _ h hh))
   exact h1.comp h (A γ⁻¹).contDiff.contDiffAt
 
-theorem Kf_contDiffOn (hL : PLoc U A φ) (H : Hyp U A φ) {q : ℕ}
-    (β : (ℕ → Γ) → V → V [⋀^Fin q]→L[ℝ] ℝ) (hβ : ∀ τ, ContDiffOn ℝ (⊤ : ℕ∞) (β τ) U) (σ : ℕ → Γ) :
-    ContDiffOn ℝ (⊤ : ℕ∞) (Kf A φ β σ) U := by
+theorem Kf_contDiffOn
+    (hL : PLoc U A φ) (H : Hyp U A φ)
+    {q : ℕ} (β : (ℕ → Γ) → V → V [⋀^Fin q]→L[ℝ] ℝ) (hβ : ∀ τ, ContDiffOn ℝ (⊤ : ℕ∞) (β τ) U)
+    (σ : ℕ → Γ)
+    : ContDiffOn ℝ (⊤ : ℕ∞) (Kf A φ β σ) U := by
   intro h hh
   obtain ⟨s, W, hW, hWU, hz⟩ := hL H h hh
   have hsum : ContDiffAt ℝ (⊤ : ℕ∞) (fun x => ∑ γ ∈ s, psi A φ γ x • β (cons γ σ) x) h := by
@@ -44,8 +49,9 @@ theorem Kf_contDiffOn (hL : PLoc U A φ) (H : Hyp U A φ) {q : ℕ}
   apply hγ
   simp [hz γ hn x hx]
 
-theorem extDeriv_contDiffOn (H : Hyp U A φ) {q : ℕ} {ω : V → V [⋀^Fin q]→L[ℝ] ℝ}
-    (hω : ContDiffOn ℝ (⊤ : ℕ∞) ω U) : ContDiffOn ℝ (⊤ : ℕ∞) (extDeriv ω) U := by
+theorem extDeriv_contDiffOn
+    (H : Hyp U A φ) {q : ℕ} {ω : V → V [⋀^Fin q]→L[ℝ] ℝ} (hω : ContDiffOn ℝ (⊤ : ℕ∞) ω U)
+    : ContDiffOn ℝ (⊤ : ℕ∞) (extDeriv ω) U := by
   have hd : ContDiffOn ℝ (⊤ : ℕ∞) (fderiv ℝ ω) U := hω.fderiv_of_isOpen H.isOpen (by simp)
   exact (ContinuousAlternatingMap.alternatizeUncurryFinCLM ℝ V ℝ).contDiff.comp_contDiffOn hd
 
@@ -73,13 +79,12 @@ theorem pClosed (hS : PSmooth U A φ) : PClosed U A φ := by
     simp [extDeriv, ContinuousAlternatingMap.alternatizeUncurryFin_apply]
   | succ j =>
     rw [eta_succ]
-    exact extDeriv_extDeriv_apply ((hS H k c j σ).2.contDiffAt (H.isOpen.mem_nhds hh))
-      (by
-        rw [minSmoothness_of_isRCLikeNormedField]
-        first
-        | exact WithTop.coe_le_coe.2 (le_top : (2 : ℕ∞) ≤ ⊤)
-        | (show ((2 : ℕ∞) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞); exact WithTop.coe_le_coe.2 le_top)
-        | simp)
+    exact extDeriv_extDeriv_apply ((hS H k c j σ).2.contDiffAt (H.isOpen.mem_nhds hh)) (by
+      rw [minSmoothness_of_isRCLikeNormedField]
+      first
+      | exact WithTop.coe_le_coe.2 (le_top : (2 : ℕ∞) ≤ ⊤)
+      | (show ((2 : ℕ∞) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞); exact WithTop.coe_le_coe.2 le_top)
+      | simp)
 
 theorem pDep : PDep A φ := by
   intro k c j

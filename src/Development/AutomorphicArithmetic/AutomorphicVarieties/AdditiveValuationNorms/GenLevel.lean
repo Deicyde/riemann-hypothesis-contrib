@@ -10,17 +10,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.NumberField
 
 @[expose] public section
 
-open UpperTheory.V UpperTheory.V.PropA NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open UpperTheory.V UpperTheory.V.PropA NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V.LDataCardLeFinrank
+  UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
 
-theorem UpperTheory.V.PropA.genLevel :
-    ∀ (l : ℕ) [Fact l.Prime] (L₀ : Type) [Field L₀] [NumberField L₀], HasMuQ l L₀ →
-      ∃ γ : G L₀ (AlgebraicClosure L₀), IsGen l ⊤ γ ∧ IsLevel l (cycZ L₀ _ l γ : ℤ_[l]) (cZero l L₀) ∧
-        ∃ ζ : L₀, IsPrimitiveRoot ζ (l ^ cZero l L₀) := by
+theorem UpperTheory.V.PropA.genLevel
+    : ∀ (l : ℕ) [Fact l.Prime] (L₀ : Type) [Field L₀] [NumberField L₀],
+      HasMuQ l L₀
+        → ∃ γ : G L₀ (AlgebraicClosure L₀),
+          IsGen l ⊤ γ ∧ IsLevel l (cycZ L₀ _ l γ : ℤ_[l]) (cZero l L₀)
+            ∧ ∃ ζ : L₀, IsPrimitiveRoot ζ (l ^ cZero l L₀) := by
   intro l _ L₀ _ _ hmu
   have hM := muQ L₀ (AlgebraicClosure L₀) l
   have hq : qExp l ≤ cZero l L₀ := hM.2.2.1.mp hmu
   have hP := princGen l (cZero l L₀) hq
-  obtain ⟨u, hu, hu'⟩ : ∃ u ∈ KStar.TotallyRealRoots.princ l (cZero l L₀), u ∉ KStar.TotallyRealRoots.princ l (cZero l L₀ + 1) := by
+  obtain ⟨u, hu, hu'⟩
+      : ∃ u ∈ KStar.TotallyRealRoots.princ l (cZero l L₀),
+        u ∉ KStar.TotallyRealRoots.princ l (cZero l L₀ + 1) := by
     by_contra hne
     push_neg at hne
     have h1 := hP.2.2 1

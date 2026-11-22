@@ -15,19 +15,24 @@ theorem ZeroDimIsolated.proof : ZeroDimIsolated.Statement := by
   intro n I q hdim
   classical
   have : Ring.KrullDimLE 0 (curveLocalRing I q) := Ring.krullDimLE_iff.2 (by simpa using hdim)
-  have hnil : ∀ i : Fin n, ∃ s : MvPolynomial (Fin n) ℂ, eval q s ≠ 0 ∧
-      ∃ k : ℕ, s * (X i - C (q i)) ^ k ∈ I := by
+  have hnil
+      : ∀ i : Fin n, ∃ s : MvPolynomial (Fin n) ℂ,
+        eval q s ≠ 0 ∧ ∃ k : ℕ, s * (X i - C (q i)) ^ k ∈ I := by
     intro i
-    have hmem : algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) (X i - C (q i)) ∈
-        Ring.jacobson (curveLocalRing I q) := by
+    have hmem
+        : algebraMap (MvPolynomial (Fin n) ℂ) (curveLocalRing I q) (X i - C (q i))
+          ∈ Ring.jacobson (curveLocalRing I q) := by
       rw [Ring.jacobson_eq_sInf_isMaximal, Submodule.mem_sInf]
       intro P hP
       have hP' : Ideal.IsMaximal P := hP
-      let π : Localization.AtPrime (RingHom.ker (eval q)) →+* curveLocalRing I q := Ideal.Quotient.mk _
+      let π : Localization.AtPrime (RingHom.ker (eval q)) →+* curveLocalRing I q :=
+        Ideal.Quotient.mk _
       have hPm : (Ideal.comap π P).IsMaximal :=
         Ideal.comap_isMaximal_of_surjective π Ideal.Quotient.mk_surjective (H := hP')
-      have hL : algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q)))
-          (X i - C (q i)) ∈ IsLocalRing.maximalIdeal (Localization.AtPrime (RingHom.ker (eval q))) := by
+      have hL
+          : algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q)))
+              (X i - C (q i))
+            ∈ IsLocalRing.maximalIdeal (Localization.AtPrime (RingHom.ker (eval q))) := by
         rw [IsLocalization.AtPrime.to_map_mem_maximal_iff _ (RingHom.ker (eval q))]
         simp [RingHom.mem_ker]
       rw [← IsLocalRing.eq_maximalIdeal hPm] at hL
@@ -35,12 +40,15 @@ theorem ZeroDimIsolated.proof : ZeroDimIsolated.Statement := by
     rw [Ring.jacobson_eq_nilradical_of_krullDimLE_zero, mem_nilradical] at hmem
     obtain ⟨k, hk⟩ := hmem
     rw [← map_pow] at hk
-    have hmap : algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q)))
-        ((X i - C (q i)) ^ k) ∈
-        I.map (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q)))) :=
+    have hmap
+        : algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime (RingHom.ker (eval q)))
+            ((X i - C (q i)) ^ k)
+          ∈ I.map (algebraMap (MvPolynomial (Fin n) ℂ)
+            (Localization.AtPrime (RingHom.ker (eval q)))) :=
       Ideal.Quotient.eq_zero_iff_mem.1 hk
-    obtain ⟨m, hm, hmI⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff
-      (RingHom.ker (eval q)).primeCompl (Localization.AtPrime (RingHom.ker (eval q))) I _).1 hmap
+    obtain ⟨m, hm, hmI⟩ :=
+      (IsLocalization.algebraMap_mem_map_algebraMap_iff (RingHom.ker (eval q)).primeCompl
+        (Localization.AtPrime (RingHom.ker (eval q))) I _).1 hmap
     exact ⟨m, fun h ↦ hm (RingHom.mem_ker.2 h), k, hmI⟩
   choose s hs k hk using hnil
   refine ⟨{x | eval x (∏ i, s i) ≠ 0}, ?_, ?_⟩

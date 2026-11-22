@@ -8,19 +8,33 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Finr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.FrobeniusOrbits GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.FrobeniusOrbits
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 open GlobalTheory.SplitCount in
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.cmHalfTypePlaces_meet_conjugatePairs_and_count : ∀ (D : D7) (i : D.nd.Loc), SplitRowPrime D.host (D.nd.l i) → ∀ s : Bool, (∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w', IsConjPl D.host w w' → Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s)) ∧ (columns (N := D.nd) D.nbr i s).Finite ∧ ∀ w ∈ placesOver D.host.E (D.nd.l i), locDeg D.host.E w * (columns (N := D.nd) D.nbr i s).ncard = D.R.f := by
+theorem _root_.GlobalTheory.T.cmHalfTypePlaces_meet_conjugatePairs_and_count
+    : ∀ (D : D7) (i : D.nd.Loc),
+      SplitRowPrime D.host (D.nd.l i)
+        → ∀ s : Bool,
+          (∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w',
+              IsConjPl D.host w w'
+                → Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s))
+            ∧ (columns (N := D.nd) D.nbr i s).Finite
+            ∧ ∀ w ∈ placesOver D.host.E (D.nd.l i),
+              locDeg D.host.E w * (columns (N := D.nd) D.nbr i s).ncard = D.R.f := by
   intro D i hl s
-  have hx : ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w', IsConjPl D.host w w' →
-      Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s) := by
+  have hx
+      : ∀ w ∈ placesOver D.host.E (D.nd.l i), ∀ w',
+        IsConjPl D.host w w'
+          → Xor (w ∈ columns (N := D.nd) D.nbr i s) (w' ∈ columns (N := D.nd) D.nbr i s) := by
     intro w hw w' h
     have hw' := mem_placesOver_of_conj D.host hw h
     have n1 := GlobalTheory.SplitRowProbe.not_both_columns D i w hw
     have n2 := GlobalTheory.SplitRowProbe.not_both_columns D i w' hw'
     rcases GlobalTheory.T.splitPrime_place_cmType_conjugate D i hl w w' hw hw' h with
-      ⟨h1, h2⟩ | ⟨h1, h2⟩ <;> cases s
+        ⟨h1, h2⟩ | ⟨h1, h2⟩
+      <;> cases s
     · exact Or.inr ⟨⟨hw', h2⟩, fun ⟨_, h3⟩ => n1 ⟨h1, h3⟩⟩
     · exact Or.inl ⟨⟨hw, h1⟩, fun ⟨_, h3⟩ => n2 ⟨h3, h2⟩⟩
     · exact Or.inl ⟨⟨hw, h1⟩, fun ⟨_, h3⟩ => n2 ⟨h2, h3⟩⟩

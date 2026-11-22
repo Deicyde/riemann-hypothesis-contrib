@@ -10,7 +10,9 @@ noncomputable section
 
 namespace GlobalTheory.Mem.Col2.JetEx.VacEqPf
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem.Col2.JetEx
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker
+  GlobalTheory.Mem.Col2.JetEx
 
 variable {D : D7} {X : Fields} (s : Seam D X)
 
@@ -22,9 +24,10 @@ theorem star_conj (x : D.host.E) : (letI := D.host.cmStar; star x) = D.host.conj
 
 def vec {n : ℕ} (x : Sp X.E n) : Fin n → D.host.E := fun i => s.iE (x i)
 
-theorem int_iff (z : X.E) : s.iE z ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ z ∈ (algebraMap (𝓞 X.E) X.E).range := by
-  have h1 : ∀ w : D.host.E, w ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ IsIntegral ℤ w := fun w =>
-    (IsIntegralClosure.isIntegral_iff (A := 𝓞 D.host.E)).symm
+theorem int_iff (z : X.E)
+    : s.iE z ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ z ∈ (algebraMap (𝓞 X.E) X.E).range := by
+  have h1 : ∀ w : D.host.E, w ∈ (algebraMap (𝓞 D.host.E) D.host.E).range ↔ IsIntegral ℤ w :=
+    fun w => (IsIntegralClosure.isIntegral_iff (A := 𝓞 D.host.E)).symm
   have h2 : ∀ w : X.E, w ∈ (algebraMap (𝓞 X.E) X.E).range ↔ IsIntegral ℤ w := fun w =>
     (IsIntegralClosure.isIntegral_iff (A := 𝓞 X.E)).symm
   rw [h1, h2]
@@ -43,7 +46,9 @@ theorem vec_smulE {n : ℕ} (c : X.E) (x : Sp X.E n) : vec s (c • x) = s.iE c 
   funext i
   simp [vec]
 
-theorem vec_smulO {n : ℕ} (r : 𝓞 X.E) (r' : 𝓞 D.host.E) (h : s.iE (r : X.E) = (r' : D.host.E)) (x : Sp X.E n) : vec s (r • x) = r' • vec s x := by
+theorem vec_smulO
+    {n : ℕ} (r : 𝓞 X.E) (r' : 𝓞 D.host.E) (h : s.iE (r : X.E) = (r' : D.host.E)) (x : Sp X.E n)
+    : vec s (r • x) = r' • vec s x := by
   funext i
   show s.iE ((r • x) i) = (r' • vec s x) i
   rw [Pi.smul_apply, Pi.smul_apply, Algebra.smul_def, Algebra.smul_def, map_mul]
@@ -51,34 +56,39 @@ theorem vec_smulO {n : ℕ} (r : 𝓞 X.E) (r' : 𝓞 D.host.E) (h : s.iE (r : X
   rw [h]
   rfl
 
-theorem vec_span {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span (𝓞 X.E) T) :
-    vec s x ∈ Submodule.span (𝓞 D.host.E) (vec s '' T) := by
+theorem vec_span {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span (𝓞 X.E) T)
+    : vec s x ∈ Submodule.span (𝓞 D.host.E) (vec s '' T) := by
   induction hx using Submodule.span_induction with
   | mem x h => exact Submodule.subset_span ⟨x, h, rfl⟩
   | zero =>
     have : vec s (0 : Sp X.E n) = 0 := by funext i; simp [vec]
-    rw [this]; exact Submodule.zero_mem _
-  | add x y _ _ hx hy => rw [vec_add s]; exact Submodule.add_mem _ hx hy
+    rw [this]
+    exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+    rw [vec_add s]; exact Submodule.add_mem _ hx hy
   | smul r x _ hx =>
     obtain ⟨r', hr'⟩ := (int_iff s (r : X.E)).2 ⟨r, rfl⟩
     rw [vec_smulO s r r' hr'.symm]
     exact Submodule.smul_mem _ _ hx
 
-theorem vec_spanE {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span X.E T) :
-    vec s x ∈ Submodule.span D.host.E (vec s '' T) := by
+theorem vec_spanE {n : ℕ} (T : Set (Sp X.E n)) {x : Sp X.E n} (hx : x ∈ Submodule.span X.E T)
+    : vec s x ∈ Submodule.span D.host.E (vec s '' T) := by
   induction hx using Submodule.span_induction with
   | mem x h => exact Submodule.subset_span ⟨x, h, rfl⟩
   | zero =>
     have : vec s (0 : Sp X.E n) = 0 := by funext i; simp [vec]
-    rw [this]; exact Submodule.zero_mem _
+    rw [this]
+    exact Submodule.zero_mem _
   | add x y _ _ hx hy => rw [vec_add s]; exact Submodule.add_mem _ hx hy
   | smul c x _ hx => rw [vec_smulE s]; exact Submodule.smul_mem _ _ hx
 
-theorem vec_surj {n : ℕ} (y : Fin n → D.host.E) : vec s (fun i => s.iE.symm (y i) : Sp X.E n) = y := by
+theorem vec_surj {n : ℕ} (y : Fin n → D.host.E)
+    : vec s (fun i => s.iE.symm (y i) : Sp X.E n) = y := by
   funext i
   simp [vec]
 
-theorem mem_lat {n : ℕ} (N : Submodule (𝓞 X.E) (Sp X.E n)) (y : Fin n → D.host.E) : y ∈ s.lat N ↔ ∃ x ∈ N, vec s x = y := by
+theorem mem_lat {n : ℕ} (N : Submodule (𝓞 X.E) (Sp X.E n)) (y : Fin n → D.host.E)
+    : y ∈ s.lat N ↔ ∃ x ∈ N, vec s x = y := by
   constructor
   · intro hy
     induction hy using Submodule.span_induction with
@@ -98,16 +108,16 @@ theorem mem_lat {n : ℕ} (N : Submodule (𝓞 X.E) (Sp X.E n)) (y : Fin n → D
   · rintro ⟨x, hx, rfl⟩
     exact Submodule.subset_span ⟨x, hx, rfl⟩
 
-theorem stdH_vec (hok : s.Ok) {n : ℕ} (x y : Sp X.E n) :
-    (letI := D.host.cmStar; stdH D.host.E n (vec s x) (vec s y)) = s.iE (hStd X.E n x y) := by
+theorem stdH_vec (hok : s.Ok) {n : ℕ} (x y : Sp X.E n)
+    : (letI := D.host.cmStar; stdH D.host.E n (vec s x) (vec s y)) = s.iE (hStd X.E n x y) := by
   show ∑ i, (letI := D.host.cmStar; star (s.iE (x i))) * s.iE (y i) = s.iE (∑ i, star (x i) * y i)
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, hok.2, star_conj]
 
-theorem sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)} (hN : IsSdLat N) :
-    (letI := D.host.cmStar; IsSDLat D.host.E n (s.lat N)) := by
+theorem sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)} (hN : IsSdLat N)
+    : (letI := D.host.cmStar; IsSDLat D.host.E n (s.lat N)) := by
   refine ⟨?_, ?_, ?_⟩
   · obtain ⟨S, hS⟩ := hN.1.fg
     have h : s.lat N = Submodule.span (𝓞 D.host.E) (vec s '' (S : Set (Sp X.E n))) := by
@@ -140,16 +150,23 @@ theorem sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)} (hN 
           intro z hz
           apply hStd_mem_one_symm
           have hxz : hStd X.E n (e x) z = 0 :=
-            congrArg (fun f : Module.Dual X.E W => f ⟨z, Submodule.subset_span hz⟩) (LinearMap.mem_ker.mp hx)
+            congrArg
+              (fun f : Module.Dual X.E W => f ⟨z, Submodule.subset_span hz⟩)
+              (LinearMap.mem_ker.mp hx)
           simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxz]
         let i : X.E →ₗ[𝓞 X.E] N :=
           ((LinearMap.toSpanSingleton X.E _ (e x)).restrictScalars (𝓞 X.E)).codRestrict N hsmul
         let : Module.Finite (𝓞 X.E) N := Module.Finite.iff_fg.mpr hN.1.fg
-        let : Module.Finite (𝓞 X.E) X.E := Module.Finite.of_injective i fun a b hab =>
-          smul_left_injective X.E (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+        let : Module.Finite (𝓞 X.E) X.E :=
+          Module.Finite.of_injective i fun a b hab =>
+            smul_left_injective X.E
+              (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+              (congrArg Subtype.val hab)
         exact NumberField.RingOfIntegers.not_isField X.E
-          (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E) (Field.toIsField X.E))
-      rw [hspan]; trivial
+          (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 X.E) X.E)
+            (Field.toIsField X.E))
+      rw [hspan]
+      trivial
     have h2 := vec_spanE s _ h1
     rw [vec_surj s] at h2
     exact Submodule.span_mono (fun z hz => Submodule.subset_span hz) h2
@@ -171,11 +188,11 @@ theorem sd_lat (hok : s.Ok) {n : ℕ} {N : Submodule (𝓞 X.E) (Sp X.E n)} (hN 
       rw [← vec_surj s y, stdH_vec s hok, int_iff s] at h1
       exact Submodule.mem_one.2 h1
 
-def matOf {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) : Matrix (Fin n) (Fin n) D.host.E :=
-  fun i j => s.iE (γ (Pi.single j 1) i)
+def matOf {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) : Matrix (Fin n) (Fin n) D.host.E := fun i j =>
+  s.iE (γ (Pi.single j 1) i)
 
-theorem apply_eq_sum {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (x : Sp X.E n) (i : Fin n) :
-    γ x i = ∑ j, γ (Pi.single j 1) i * x j := by
+theorem apply_eq_sum {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (x : Sp X.E n) (i : Fin n)
+    : γ x i = ∑ j, γ (Pi.single j 1) i * x j := by
   have h : x = ∑ j, x j • (Pi.single j 1 : Sp X.E n) := by
     funext k
     simp [Finset.sum_apply, Pi.single_apply]
@@ -185,16 +202,16 @@ theorem apply_eq_sum {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (x : Sp X.E 
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_smul, Pi.smul_apply, smul_eq_mul, mul_comm]
 
-theorem matOf_mulVec {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (x : Sp X.E n) :
-    (matOf s γ).mulVec (vec s x) = vec s (γ x) := by
+theorem matOf_mulVec {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (x : Sp X.E n)
+    : (matOf s γ).mulVec (vec s x) = vec s (γ x) := by
   funext i
   show ∑ j, s.iE (γ (Pi.single j 1) i) * s.iE (x j) = s.iE (γ x i)
   set_option synthInstance.maxHeartbeats 100000 in
     rw [apply_eq_sum γ x i, map_sum]
   simp only [map_mul]
 
-theorem smulLat_matOf {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (N : Submodule (𝓞 X.E) (Sp X.E n)) :
-    (letI := D.host.cmStar; SDLat.smulLat (matOf s γ) (s.lat N)) = s.lat (gmap γ N) := by
+theorem smulLat_matOf {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (N : Submodule (𝓞 X.E) (Sp X.E n))
+    : (letI := D.host.cmStar; SDLat.smulLat (matOf s γ) (s.lat N)) = s.lat (gmap γ N) := by
   ext y
   rw [mem_lat s]
   constructor
@@ -204,16 +221,18 @@ theorem smulLat_matOf {n : ℕ} (γ : Sp X.E n ≃ₗ[X.E] Sp X.E n) (N : Submod
   · rintro ⟨_, ⟨x, hx, rfl⟩, rfl⟩
     exact ⟨vec s x, (mem_lat s N _).2 ⟨x, hx, rfl⟩, matOf_mulVec s γ x⟩
 
-theorem symm_single {n : ℕ} (γ : UF X.E n) (i k : Fin n) :
-    γ.1.symm (Pi.single k 1) i = star (γ.1 (Pi.single i 1) k) := by
-  have h : ∑ l, star (γ.1 (Pi.single i 1) l) * γ.1 (γ.1.symm (Pi.single k 1)) l =
-      ∑ l, star ((Pi.single i 1 : Sp X.E n) l) * γ.1.symm (Pi.single k 1) l := γ.2 (Pi.single i 1) (γ.1.symm (Pi.single k 1))
+theorem symm_single {n : ℕ} (γ : UF X.E n) (i k : Fin n)
+    : γ.1.symm (Pi.single k 1) i = star (γ.1 (Pi.single i 1) k) := by
+  have h
+      : ∑ l, star (γ.1 (Pi.single i 1) l) * γ.1 (γ.1.symm (Pi.single k 1)) l
+        = ∑ l, star ((Pi.single i 1 : Sp X.E n) l) * γ.1.symm (Pi.single k 1) l :=
+    γ.2 (Pi.single i 1) (γ.1.symm (Pi.single k 1))
   rw [LinearEquiv.apply_symm_apply] at h
   simpa [Pi.single_apply, apply_ite star] using h.symm
 
-theorem matOf_unitary (hok : s.Ok) {n : ℕ} (γ : UF X.E n) :
-    letI := D.host.cmStar
-    matOf s γ.1 ∈ Matrix.unitaryGroup (Fin n) D.host.E := by
+theorem matOf_unitary (hok : s.Ok) {n : ℕ} (γ : UF X.E n)
+    : letI := D.host.cmStar
+      matOf s γ.1 ∈ Matrix.unitaryGroup (Fin n) D.host.E := by
   letI := D.host.cmStar
   rw [Matrix.mem_unitaryGroup_iff']
   refine Matrix.ext fun i j => ?_
@@ -228,11 +247,16 @@ theorem matOf_unitary (hok : s.Ok) {n : ℕ} (γ : UF X.E n) :
   rw [h3] at h1
   exact h1
 
-theorem vacEq_ambOf : ∀ (D : D7) (X : Fields) (s : Seam D X) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (B : Formalism.L2.Ker.Base D cc δ) (χ : TaylorLogMetric.IdE D → ℂ) (cD : D.what₂.Tau → ℂ) (a b : ℕ), s.Ok → B.EqP χ → Even a → Even b → VacEq (ambOf s B χ cD) a b := by
+theorem vacEq_ambOf
+    : ∀ (D : D7) (X : Fields) (s : Seam D X) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ)
+        (B : Formalism.L2.Ker.Base D cc δ) (χ : TaylorLogMetric.IdE D → ℂ) (cD : D.what₂.Tau → ℂ)
+        (a b : ℕ),
+      s.Ok → B.EqP χ → Even a → Even b → VacEq (ambOf s B χ cD) a b := by
   intro D X s cc δ B χ cD a b hok hE ha hb γ γ' N N' hN hN' z
   letI := D.host.cmStar
-  have h := hE.1 a b ⟨s.lat N, sd_lat s hok hN⟩ ⟨s.lat N', sd_lat s hok hN'⟩ ha hb
-    ⟨matOf s γ.1, matOf_unitary s hok γ⟩ ⟨matOf s γ'.1, matOf_unitary s hok γ'⟩
+  have h :=
+    hE.1 a b ⟨s.lat N, sd_lat s hok hN⟩ ⟨s.lat N', sd_lat s hok hN'⟩ ha hb
+      ⟨matOf s γ.1, matOf_unitary s hok γ⟩ ⟨matOf s γ'.1, matOf_unitary s hok γ'⟩
   have h1 := smulLat_matOf s γ.1 N
   have h2 := smulLat_matOf s γ'.1 N'
   show B.eNat χ a b (s.lat (gmap γ.1 N)) (s.lat (gmap γ'.1 N')) (fun τ => z (s.iT.symm τ)) =
@@ -250,7 +274,8 @@ theorem vacEq_ambOf : ∀ (D : D7) (X : Fields) (s : Seam D X) (cc : Ideal (𝓞
   rw [Finset.sum_mul]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [hok.1, hok.1, Equiv.apply_symm_apply, symm_single, hok.2,
-    show ∀ x, TaylorLogMetric.embT D τ (D.host.conj x) = starRingEnd ℂ (TaylorLogMetric.embT D τ x) from
+    show ∀ x,
+        TaylorLogMetric.embT D τ (D.host.conj x) = starRingEnd ℂ (TaylorLogMetric.embT D τ x) from
       D.host.conjE_apply (TaylorLogMetric.embT D τ)]
   rfl
 

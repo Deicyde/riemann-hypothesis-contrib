@@ -5,19 +5,26 @@ public import Development.EtaleCohomology.EtaleSheaves.LocSecPfA
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.E4 CochainComplex CochainComplex.HomComplex
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.E.E4
+  CochainComplex CochainComplex.HomComplex
 
 namespace LateralTheory.E.LocSecPfB
 
-def HomSec : Prop := ∀ (R : Type) [CommRing R] (X : Scheme.{0}),
-  ∃ e : ∀ G : Shv R, ((free R).obj (yoneda.obj X) ⟶ G) ≃+ Sec G X,
-    ∀ {G G' : Shv R} (φ : G ⟶ G') (f : (free R).obj (yoneda.obj X) ⟶ G), e G' (f ≫ φ) = Sec.map φ (e G f)
+def HomSec : Prop :=
+  ∀ (R : Type) [CommRing R] (X : Scheme.{0}),
+    ∃ e : ∀ G : Shv R, ((free R).obj (yoneda.obj X) ⟶ G) ≃+ Sec G X,
+      ∀ {G G' : Shv R} (φ : G ⟶ G') (f : (free R).obj (yoneda.obj X) ⟶ G),
+        e G' (f ≫ φ) = Sec.map φ (e G f)
 
-def ClassSec : Prop := ∀ (R : Type) [CommRing R] (X : Scheme.{0})
-  (e : ∀ G : Shv R, ((free R).obj (yoneda.obj X) ⟶ G) ≃+ Sec G X),
-  (∀ {G G' : Shv R} (φ : G ⟶ G') (f : (free R).obj (yoneda.obj X) ⟶ G), e G' (f ≫ φ) = Sec.map φ (e G f)) →
-  ∀ (F : Shv R) (n : ℤ),
-  Nonempty (CohomologyClass (LateralTheory.E.LocSecPf.pt R X) (res R F) n ≃+ (LateralTheory.E.LeafLocPf.secCx F X).homology n)
+def ClassSec : Prop :=
+  ∀ (R : Type) [CommRing R] (X : Scheme.{0})
+      (e : ∀ G : Shv R, ((free R).obj (yoneda.obj X) ⟶ G) ≃+ Sec G X),
+    (∀ {G G' : Shv R} (φ : G ⟶ G') (f : (free R).obj (yoneda.obj X) ⟶ G),
+        e G' (f ≫ φ) = Sec.map φ (e G f))
+      → ∀ (F : Shv R) (n : ℤ),
+        Nonempty
+          (CohomologyClass (LateralTheory.E.LocSecPf.pt R X) (res R F) n
+            ≃+ (LateralTheory.E.LeafLocPf.secCx F X).homology n)
 
 theorem locSecB_of (h1 : HomSec) (h2 : ClassSec) : LateralTheory.E.LocSecPf.LocSecB := by
   intro R _ X F n

@@ -12,15 +12,18 @@ open TensorProduct CrystallineSemistableComparison CrystallineSemistableComparis
 
 namespace GlobalTheory.CompanionTheory.TowerLim
 
-theorem module_finite_lim : ∀ (W : Type) [CommRing W] (l : ℕ) [IsAdicComplete (Ideal.span {(l : W)}) W]
-    (S S' : Sys.{1} W) (_ : LSeq l S S'), IsFiniteLength W (S.M 1) → Module.Finite W S.lim := by
+theorem module_finite_lim
+    : ∀ (W : Type) [CommRing W] (l : ℕ) [IsAdicComplete (Ideal.span {(l : W)}) W] (S S' : Sys.{1} W)
+        (_ : LSeq l S S'),
+      IsFiniteLength W (S.M 1) → Module.Finite W S.lim := by
   intro W _ l _ S S' L h1
   have hfl := GlobalTheory.T.finite_length_of_lseq_first W l S S' L h1
   have hart : ∀ n, IsArtinian W (S.M n) := fun n =>
     (isFiniteLength_iff_isNoetherian_isArtinian.1 (hfl n)).2
   have hinj := GlobalTheory.T.limit_divisible_of_vanishing_level W l S S' L hart
 
-  have hvan : ∀ n, (Ideal.span {(l : W)} ^ n • (⊤ : Submodule W S.lim)) ≤ LinearMap.ker (pr S n) := by
+  have hvan
+      : ∀ n, (Ideal.span {(l : W)} ^ n • (⊤ : Submodule W S.lim)) ≤ LinearMap.ker (pr S n) := by
     intro n
     refine Submodule.smul_le.2 fun r hr m _ => ?_
     rw [Ideal.span_singleton_pow] at hr
@@ -49,12 +52,13 @@ theorem module_finite_lim : ∀ (W : Type) [CommRing W] (l : ℕ) [IsAdicComplet
   have : IsNoetherian W (S.M 1) := (isFiniteLength_iff_isNoetherian_isArtinian.1 h1).1
   have : Module.Finite W (S.lim ⧸ Ideal.span {(l : W)} • (⊤ : Submodule W S.lim)) :=
     Module.Finite.of_injective q hq
-  obtain ⟨r, s, hs⟩ := Module.Finite.exists_fin (R := W)
-    (M := S.lim ⧸ Ideal.span {(l : W)} • (⊤ : Submodule W S.lim))
+  obtain ⟨r, s, hs⟩ :=
+    Module.Finite.exists_fin (R := W) (M := S.lim ⧸ Ideal.span {(l : W)} • (⊤ : Submodule W S.lim))
   choose s' hs' using fun i => Submodule.Quotient.mk_surjective _ (s i)
-  have : IsPrecomplete (Ideal.span {(l : W)}) (Fin r → W) := ReciprocityTheory.Coh.isPrecomplete_pi _
-  have hsurj : Function.Surjective ((Ideal.span {(l : W)} • (⊤ : Submodule W S.lim)).mkQ ∘ₗ
-      Fintype.linearCombination W s') := by
+  have : IsPrecomplete (Ideal.span {(l : W)}) (Fin r → W) :=
+    ReciprocityTheory.Coh.isPrecomplete_pi _
+  have hsurj : Function.Surjective
+      ((Ideal.span {(l : W)} • (⊤ : Submodule W S.lim)).mkQ ∘ₗ Fintype.linearCombination W s') := by
     rw [← LinearMap.range_eq_top, eq_top_iff, ← hs, Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     exact ⟨Pi.single i 1, by simp [hs']⟩

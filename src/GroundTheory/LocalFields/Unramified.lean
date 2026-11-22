@@ -19,20 +19,22 @@ namespace GroundTheory.LocalField
 
 section Generator
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
-theorem isUnit_aeval_derivative_of_separable (P : 𝒪[K][X])
-    (hP : (P.map (residue 𝒪[K])).Separable) (x : 𝒪[L]) (hx : aeval x P = 0) :
-    IsUnit (aeval x (derivative P)) := by
+theorem isUnit_aeval_derivative_of_separable
+    (P : 𝒪[K][X]) (hP : (P.map (residue 𝒪[K])).Separable) (x : 𝒪[L]) (hx : aeval x P = 0)
+    : IsUnit (aeval x (derivative P)) := by
   rw [← residue_ne_zero_iff_isUnit, residue_aeval K L (fun _ ↦ rfl), ← derivative_map]
   refine hP.aeval_derivative_ne_zero ?_
   rw [← residue_aeval K L (fun _ ↦ rfl), hx, map_zero]
 
-theorem IsUnramified.exists_generator [IsUnramified K L] :
-    ∃ (β : 𝒪[L]) (P : 𝒪[K][X]), P.Monic ∧ aeval β P = 0 ∧ (P.map (residue 𝒪[K])).Separable ∧
-      IsUnit (aeval β (derivative P)) ∧ K⟮(β : L)⟯ = ⊤ := by
+theorem IsUnramified.exists_generator [IsUnramified K L]
+    : ∃ (β : 𝒪[L]) (P : 𝒪[K][X]),
+      P.Monic ∧ aeval β P = 0 ∧ (P.map (residue 𝒪[K])).Separable ∧ IsUnit (aeval β (derivative P))
+        ∧ K⟮(β : L)⟯ = ⊤ := by
   obtain ⟨β, P, hPm, hβ, hsep, -, hdeg, -⟩ := exists_unramified_adjoin K L
   refine ⟨β, P, hPm, hβ, hsep, isUnit_aeval_derivative_of_separable K L P hsep β hβ, ?_⟩
   refine IntermediateField.eq_of_le_of_finrank_eq le_top ?_
@@ -42,15 +44,15 @@ end Generator
 
 section Etale
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
-theorem map_maximalIdeal_eq_iff :
-    (maximalIdeal 𝒪[K]).map (algebraMap 𝒪[K] 𝒪[L]) = maximalIdeal 𝒪[L] ↔ IsUnramified K L := by
+theorem map_maximalIdeal_eq_iff
+    : (maximalIdeal 𝒪[K]).map (algebraMap 𝒪[K] 𝒪[L]) = maximalIdeal 𝒪[L] ↔ IsUnramified K L := by
   rw [map_maximalIdeal K L, isUnramified_iff]
-  change maximalIdeal 𝒪[L] ^ ramificationIndex K L = maximalIdeal 𝒪[L] ↔
-    ramificationIndex K L = 1
+  change maximalIdeal 𝒪[L] ^ ramificationIndex K L = maximalIdeal 𝒪[L] ↔ ramificationIndex K L = 1
   constructor
   · intro h
     have hpos := ramificationIndex_pos K L
@@ -59,8 +61,9 @@ theorem map_maximalIdeal_eq_iff :
     have hL : maximalIdeal 𝒪[L] ≠ ⊥ := maximalIdeal_ne_bot L
     have hlt := Ideal.pow_succ_lt_pow hL 1
     have hle : maximalIdeal 𝒪[L] ^ 1 ≤ maximalIdeal 𝒪[L] ^ (1 + 1) :=
-      calc maximalIdeal 𝒪[L] ^ 1 = maximalIdeal 𝒪[L] ^ ramificationIndex K L := by
-            rw [pow_one, h]
+      calc
+        maximalIdeal 𝒪[L] ^ 1
+          = maximalIdeal 𝒪[L] ^ ramificationIndex K L := by rw [pow_one, h]
         _ ≤ maximalIdeal 𝒪[L] ^ (1 + 1) := Ideal.pow_le_pow_right h2
     exact absurd hle (not_le_of_gt hlt)
   · intro h
@@ -70,19 +73,19 @@ end Etale
 
 section Maximal
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [Field L] [ValuativeRel L]
-  [Algebra K L] [ValuativeExtension K L]
+variable
+  (K L : Type*)
+  [Field K] [ValuativeRel K] [Field L] [ValuativeRel L] [Algebra K L] [ValuativeExtension K L]
 
-def maximalUnramified : IntermediateField K L :=
-  sSup {E : IntermediateField K L | IsUnramified K E}
+def maximalUnramified : IntermediateField K L := sSup {E : IntermediateField K L | IsUnramified K E}
 
-variable [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace L]
+variable
+  [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace L]
   [IsNonarchimedeanLocalField L] [FiniteDimensional K L]
 
-
-theorem exists_generator_of_isUnramified (E : IntermediateField K L) [IsUnramified K E] :
-    ∃ (γ : 𝒪[L]) (P : 𝒪[K][X]), P.Monic ∧ aeval γ P = 0 ∧ IsUnit (aeval γ (derivative P)) ∧
-      E = K⟮(γ : L)⟯ := by
+theorem exists_generator_of_isUnramified (E : IntermediateField K L) [IsUnramified K E]
+    : ∃ (γ : 𝒪[L]) (P : 𝒪[K][X]),
+      P.Monic ∧ aeval γ P = 0 ∧ IsUnit (aeval γ (derivative P)) ∧ E = K⟮(γ : L)⟯ := by
   obtain ⟨β, P, hPm, hβ, -, hd, htop⟩ := IsUnramified.exists_generator K E
   refine ⟨algebraMap 𝒪[E] 𝒪[L] β, P, hPm, ?_, ?_, ?_⟩
   · rw [aeval_algebraMap_apply, hβ, map_zero]
@@ -90,13 +93,16 @@ theorem exists_generator_of_isUnramified (E : IntermediateField K L) [IsUnramifi
     exact hd.map _
   · have := congrArg (IntermediateField.map E.val) htop
     rw [IntermediateField.adjoin_map, Set.image_singleton, ← AlgHom.fieldRange_eq_map,
-      IntermediateField.fieldRange_val] at this
+        IntermediateField.fieldRange_val]
+      at this
     exact this.symm
 
-theorem exists_maximalUnramified_eq :
-    ∃ (β : 𝒪[L]) (P : 𝒪[K][X]), P.Monic ∧ aeval β P = 0 ∧ IsUnit (aeval β (derivative P)) ∧
-      maximalUnramified K L = K⟮(β : L)⟯ ∧ IsUnramified K K⟮(β : L)⟯ ∧
-      Module.finrank K K⟮(β : L)⟯ = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) ∧ ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K⟮(β : L)⟯])) = 1 := by
+theorem exists_maximalUnramified_eq
+    : ∃ (β : 𝒪[L]) (P : 𝒪[K][X]),
+      P.Monic ∧ aeval β P = 0 ∧ IsUnit (aeval β (derivative P)) ∧ maximalUnramified K L = K⟮(β : L)⟯
+        ∧ IsUnramified K K⟮(β : L)⟯
+        ∧ Module.finrank K K⟮(β : L)⟯ = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K]))
+        ∧ ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K⟮(β : L)⟯])) = 1 := by
   obtain ⟨β, P, hPm, hβ, hsep, hunr, hdeg, h1⟩ := exists_unramified_adjoin K L
   refine ⟨β, P, hPm, hβ, isUnit_aeval_derivative_of_separable K L P hsep β hβ, ?_, hunr, hdeg, h1⟩
   refine le_antisymm (sSup_le fun E hE ↦ ?_) (le_sSup hunr)
@@ -105,8 +111,9 @@ theorem exists_maximalUnramified_eq :
   rw [hE']
   exact IntermediateField.adjoin_simple_le_iff.2 (mem_of_residueDegree_eq_one K L _ h1 Q hQ γ hγ hd)
 
-theorem finrank_maximalUnramified :
-    Module.finrank K (maximalUnramified K L) = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := by
+theorem finrank_maximalUnramified
+    : Module.finrank K (maximalUnramified K L)
+      = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := by
   obtain ⟨β, P, -, -, -, heq, -, hdeg, -⟩ := exists_maximalUnramified_eq K L
   rw [heq]
   exact hdeg
@@ -115,25 +122,28 @@ end Maximal
 
 section BaseChange
 
-variable (K K' L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K]
-  [IsNonarchimedeanLocalField K] [Field K'] [ValuativeRel K'] [TopologicalSpace K']
-  [IsNonarchimedeanLocalField K'] [Field L] [ValuativeRel L] [TopologicalSpace L]
-  [IsNonarchimedeanLocalField L] [Algebra K K'] [Algebra K' L] [Algebra K L] [IsScalarTower K K' L]
-  [ValuativeExtension K K'] [ValuativeExtension K' L] [ValuativeExtension K L]
-  [FiniteDimensional K L]
+variable
+  (K K' L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field K'] [ValuativeRel K'] [TopologicalSpace K'] [IsNonarchimedeanLocalField K'] [Field L]
+  [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K K'] [Algebra K' L]
+  [Algebra K L] [IsScalarTower K K' L] [ValuativeExtension K K'] [ValuativeExtension K' L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
 end BaseChange
 
 section Galois
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
 def inertiaSubgroup : Subgroup (L ≃ₐ[K] L) := (residueAlgEquiv K L).ker
 
-theorem inertiaSubgroup_apply_eq (σ : L ≃ₐ[K] L) (hσ : σ ∈ inertiaSubgroup K L) (P : 𝒪[K][X])
-    (γ : 𝒪[L]) (hγ : aeval γ P = 0) (hd : IsUnit (aeval γ (derivative P))) : σ γ = γ := by
+theorem inertiaSubgroup_apply_eq
+    (σ : L ≃ₐ[K] L) (hσ : σ ∈ inertiaSubgroup K L)
+    (P : 𝒪[K][X]) (γ : 𝒪[L]) (hγ : aeval γ P = 0) (hd : IsUnit (aeval γ (derivative P)))
+    : σ γ = γ := by
   set γσ := integerAlgEquiv K L σ γ
   have h0 : aeval γσ P = 0 := by
     have := aeval_algHom_apply (integerAlgEquiv K L σ : 𝒪[L] →ₐ[𝒪[K]] 𝒪[L]) γ P
@@ -152,18 +162,23 @@ theorem inertiaSubgroup_apply_eq (σ : L ≃ₐ[K] L) (hσ : σ ∈ inertiaSubgr
   rw [← coe_integerAlgEquiv_apply]
   exact congrArg Subtype.val heq.symm
 
-theorem maximalUnramified_le_fixedField :
-    maximalUnramified K L ≤ IntermediateField.fixedField (inertiaSubgroup K L) := by
+theorem maximalUnramified_le_fixedField
+    : maximalUnramified K L ≤ IntermediateField.fixedField (inertiaSubgroup K L) := by
   obtain ⟨β, P, -, hβ, hd, heq, -, -, -⟩ := exists_maximalUnramified_eq K L
   rw [heq, IntermediateField.adjoin_simple_le_iff]
   exact fun σ ↦ inertiaSubgroup_apply_eq K L σ σ.2 P β hβ hd
 
 variable [IsGalois K L]
 
-theorem inertiaSubgroup_counting :
-    Nat.card (inertiaSubgroup K L) = (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) ∧
-      Nat.card (residueAlgEquiv K L).range = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) ∧
-      Module.finrank K (IntermediateField.fixedField (inertiaSubgroup K L)) = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := by
+theorem inertiaSubgroup_counting
+    : Nat.card (inertiaSubgroup K L)
+        = (_root_.Ideal.ramificationIdx
+          (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+            L)))
+          (_root_.Valuation.integer (_root_.ValuativeRel.valuation K)))
+      ∧ Nat.card (residueAlgEquiv K L).range = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K]))
+      ∧ Module.finrank K (IntermediateField.fixedField (inertiaSubgroup K L))
+        = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := by
   set I := inertiaSubgroup K L
   set F := IntermediateField.fixedField I
   have hn := ramificationIndex_mul_residueDegree K L
@@ -173,9 +188,12 @@ theorem inertiaSubgroup_counting :
   have hG : Nat.card (L ≃ₐ[K] L) = Module.finrank K L := IsGalois.card_aut_eq_finrank K L
   have hIdx : Nat.card I * I.index = Nat.card (L ≃ₐ[K] L) := Subgroup.card_mul_index I
   have hind : I.index = Nat.card (residueAlgEquiv K L).range := Subgroup.index_ker _
-  have hrange : Nat.card (residueAlgEquiv K L).range ≤ ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := by
-    calc Nat.card (residueAlgEquiv K L).range ≤ Nat.card (𝓀[L] ≃ₐ[𝓀[K]] 𝓀[L]) :=
-          Subgroup.card_le_card_group _
+  have hrange
+      : Nat.card (residueAlgEquiv K L).range
+        ≤ ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := by
+    calc
+      Nat.card (residueAlgEquiv K L).range
+        ≤ Nat.card (𝓀[L] ≃ₐ[𝓀[K]] 𝓀[L]) := Subgroup.card_le_card_group _
       _ = Module.finrank 𝓀[K] 𝓀[L] := IsGalois.card_aut_eq_finrank _ _
       _ = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := (residueDegree_eq_finrank K L).symm
   have hFK : Module.finrank K F * Module.finrank F L = Module.finrank K L :=
@@ -192,12 +210,16 @@ theorem inertiaSubgroup_counting :
   rw [hFL, ← hn] at hFK
   have h1 : a ≤ e := by
     refine Nat.le_of_mul_le_mul_left ?_ hf
-    calc f * a ≤ d * a := Nat.mul_le_mul_right _ hTF
+    calc
+      f * a
+        ≤ d * a := Nat.mul_le_mul_right _ hTF
       _ = e * f := hFK
       _ = f * e := mul_comm _ _
   have h2 : e ≤ a := by
     refine Nat.le_of_mul_le_mul_right ?_ hf
-    calc e * f = a * r := hIdx.symm
+    calc
+      e * f
+        = a * r := hIdx.symm
       _ ≤ a * f := Nat.mul_le_mul_left _ hrange
   have hae : a = e := le_antisymm h1 h2
   refine ⟨hae, ?_, ?_⟩
@@ -206,7 +228,12 @@ theorem inertiaSubgroup_counting :
   · rw [hae, mul_comm e f] at hFK
     exact Nat.eq_of_mul_eq_mul_right he hFK
 
-theorem card_inertiaSubgroup : Nat.card (inertiaSubgroup K L) = (_root_.Ideal.ramificationIdx (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation L))) (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) :=
+theorem card_inertiaSubgroup
+    : Nat.card (inertiaSubgroup K L)
+      = (_root_.Ideal.ramificationIdx
+        (_root_.IsLocalRing.maximalIdeal (_root_.Valuation.integer (_root_.ValuativeRel.valuation
+          L)))
+        (_root_.Valuation.integer (_root_.ValuativeRel.valuation K))) :=
   (inertiaSubgroup_counting K L).1
 
 end Galois

@@ -8,15 +8,15 @@ open Matrix Polynomial
 
 namespace GlobalTheory
 
-
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace in
 theorem quadratic_preimage_compact_on_subspace
     (K : Type) [NontriviallyNormedField K] [ProperSpace K] [StarRing K]
-    (hstar : ∀ x : K, ‖star x‖ = ‖x‖) (m : ℕ) (S : Submodule K (Matrix (Fin m) (Fin m) K))
+    (hstar : ∀ x : K, ‖star x‖ = ‖x‖)
+    (m : ℕ) (S : Submodule K (Matrix (Fin m) (Fin m) K))
     (q : Matrix (Fin m) (Fin m) K → Matrix (Fin m) (Fin m) K) (hq : Continuous q)
     (hhom : ∀ (c : K) w, q (c • w) = (c * star c) • q w) (hnull : ∀ w ∈ S, q w = 0 → w = 0)
-    (Q : Set (Matrix (Fin m) (Fin m) K)) (hQ : IsCompact Q) :
-    ∃ B : Set (Matrix (Fin m) (Fin m) K), IsCompact B ∧ ∀ w ∈ S, q w ∈ Q → w ∈ B := by
+    (Q : Set (Matrix (Fin m) (Fin m) K)) (hQ : IsCompact Q)
+    : ∃ B : Set (Matrix (Fin m) (Fin m) K), IsCompact B ∧ ∀ w ∈ S, q w ∈ Q → w ∈ B := by
   haveI : ProperSpace (Matrix (Fin m) (Fin m) K) := FiniteDimensional.proper K _
   obtain ⟨c₀, hc₀⟩ := NormedField.exists_one_lt_norm K
   have hc₀pos : 0 < ‖c₀‖ := lt_trans one_pos hc₀
@@ -38,8 +38,8 @@ theorem quadratic_preimage_compact_on_subspace
     obtain ⟨d, hd0, hlt, hge, -⟩ := rescale_to_shell hc₀ one_pos hw0
     exact ⟨d, hd0, ⟨S.smul_mem d hwS, hge, hlt.le⟩, hlt⟩
   by_cases hne : Sh.Nonempty
-  · obtain ⟨w₀, hw₀, hmin⟩ := hShc.exists_isMinOn hne
-      (f := fun w => ‖q w‖) (continuous_norm.comp hq).continuousOn
+  · obtain ⟨w₀, hw₀, hmin⟩ :=
+      hShc.exists_isMinOn hne (f := fun w => ‖q w‖) (continuous_norm.comp hq).continuousOn
     set μ := ‖q w₀‖ with hμ
     have hμpos : 0 < μ := by
       rw [hμ, norm_pos_iff]
@@ -67,8 +67,9 @@ theorem quadratic_preimage_compact_on_subspace
       nlinarith
     have key : μ * ‖w‖ ^ 2 ≤ R := by
       have hq0 : 0 ≤ ‖q w‖ := norm_nonneg _
-      calc μ * ‖w‖ ^ 2 ≤ ‖d‖ ^ 2 * ‖q w‖ * ‖w‖ ^ 2 :=
-            mul_le_mul_of_nonneg_right hmu_le (by positivity)
+      calc
+        μ * ‖w‖ ^ 2
+          ≤ ‖d‖ ^ 2 * ‖q w‖ * ‖w‖ ^ 2 := mul_le_mul_of_nonneg_right hmu_le (by positivity)
         _ = (‖d‖ ^ 2 * ‖w‖ ^ 2) * ‖q w‖ := by ring
         _ ≤ 1 * ‖q w‖ := mul_le_mul_of_nonneg_right hd2 hq0
         _ ≤ R := by linarith

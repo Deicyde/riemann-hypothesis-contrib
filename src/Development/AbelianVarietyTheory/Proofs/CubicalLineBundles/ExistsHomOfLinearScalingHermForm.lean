@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.DenseCl
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 noncomputable section
 
@@ -76,11 +78,10 @@ end Values
 
 section Criterion
 
-variable {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X] {Z : Type}
-  (ex : Z → (Sp ℂ ⟶ X)) (ey : Z → (Sp ℂ ⟶ Y))
-  (hon : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∃ z, ex z = x)
-
-
+variable
+  {X Y : Scheme.{0}} (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
+  {Z : Type}
+  (ex : Z → (Sp ℂ ⟶ X)) (ey : Z → (Sp ℂ ⟶ Y)) (hon : ∀ x : Sp ℂ ⟶ X, x ≫ p = 𝟙 _ → ∃ z, ex z = x)
 
 include hon in
 lemma exists_hom_of_values {S : Scheme.{0}} (q : Y ⟶ S) [IsSeparated q] [IsAffine S]
@@ -114,7 +115,6 @@ lemma chart_le (j : PUnit → L.ι) :
   show κ (σ y) ∈ L.U (j PUnit.unit)
   rw [h]; exact this
 
-
 include e in
 lemma exists_sec_pow (p : X ⟶ Sp ℂ) [LocallyOfFiniteType p] [IsReduced X]
     (s : (L.LinComb (K := Fin N) (fun _ => κ) (fun _ => 1)).Sec) :
@@ -144,8 +144,9 @@ end Transport
 
 section Theta
 
-variable {A A' : Over (Sp ℂ)} [GrpObj A] [GrpObj A'] {L : LB A.left} {L' : LB A'.left} {g g' : ℕ}
-  (u : HolUnif A L g) (u' : HolUnif A' L' g')
+variable
+  {A A' : Over (Sp ℂ)} [GrpObj A] [GrpObj A']
+  {L : LB A.left} {L' : LB A'.left} {g g' : ℕ} (u : HolUnif A L g) (u' : HolUnif A' L' g')
 
 lemma isThetaFn_comp {Hm : Matrix (Fin g) (Fin g) ℂ} {χ : u.Λ → ℂ}
     {Hm' : Matrix (Fin g') (Fin g') ℂ} {χ' : u'.Λ → ℂ} (hχ : ∀ l, χ l ^ 2 = 1)
@@ -199,8 +200,9 @@ end Theta
 
 section Main
 
-variable {A A' : Over (Sp ℂ)} [GrpObj A] [GrpObj A'] {L : LB A.left} {L' : LB A'.left} {g g' : ℕ}
-  (u : HolUnif A L g) (u' : HolUnif A' L' g')
+variable
+  {A A' : Over (Sp ℂ)} [GrpObj A] [GrpObj A']
+  {L : LB A.left} {L' : LB A'.left} {g g' : ℕ} (u : HolUnif A L g) (u' : HolUnif A' L' g')
 
 lemma isMonHom_of_additive [Smooth A.hom] [IsSeparated A'.hom]
     (F : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)) (f : A ⟶ A') (hf : ∀ z, u'.ex (F z) = u.ex z ≫ f) :
@@ -315,25 +317,23 @@ end Main
 
 end AnalyticHom
 
-
 open AnalyticHom in
-theorem exists_hom_of_linear_scaling_hermForm :
-    ∀ (P P' : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u' : HolUnif P'.A P'.L P'.g)
-      (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Hm' : Matrix (Fin P'.g) (Fin P'.g) ℂ)
-      (χ' : u'.Λ → ℂ),
-    u.IsAH Hm χ → u'.IsAH Hm' χ' →
-    (∀ (k : ℕ) θ, u.IsThetaFn Hm χ k θ → ∃! s, u.IsFnPow k s θ) →
-    (∀ (k : ℕ) s, ∃! θ, u'.IsThetaFn Hm' χ' k θ ∧ u'.IsFnPow k s θ) →
-    ∀ (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)) (n : ℕ), (∀ l ∈ u.Λ, F l ∈ u'.Λ) →
-    (∀ z w, hermForm Hm' (F z) (F w) = (n : ℂ) * hermForm Hm z w) →
-    ∃ f : P.A ⟶ P'.A, IsMonHom f ∧ ∀ z, u'.ex (F z) = u.ex z ≫ f := by
+theorem exists_hom_of_linear_scaling_hermForm
+    : ∀ (P P' : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (u' : HolUnif P'.A P'.L P'.g)
+        (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (Hm' : Matrix (Fin P'.g) (Fin P'.g) ℂ)
+        (χ' : u'.Λ → ℂ),
+      u.IsAH Hm χ → u'.IsAH Hm' χ' → (∀ (k : ℕ) θ, u.IsThetaFn Hm χ k θ → ∃! s, u.IsFnPow k s θ)
+        → (∀ (k : ℕ) s, ∃! θ, u'.IsThetaFn Hm' χ' k θ ∧ u'.IsFnPow k s θ)
+        → ∀ (F : (Fin P.g → ℂ) →ₗ[ℂ] (Fin P'.g → ℂ)) (n : ℕ),
+          (∀ l ∈ u.Λ, F l ∈ u'.Λ) → (∀ z w, hermForm Hm' (F z) (F w) = (n : ℂ) * hermForm Hm z w)
+            → ∃ f : P.A ⟶ P'.A, IsMonHom f ∧ ∀ z, u'.ex (F z) = u.ex z ≫ f := by
   intro P P' u u' Hm χ Hm' χ' h h' hs hθ F n hΛ hH
   haveI := P.isAb.smooth
   haveI := P'.isAb.smooth
   haveI := P'.isAb.proper
-  obtain ⟨f, hf⟩ := exists_hom u u' P.isLB P'.isLB P'.ample
-    (semicharacter_sq_eq_one_of_symmetric P u Hm χ h)
-    (semicharacter_sq_eq_one_of_symmetric P' u' Hm' χ' h') hs hθ F n hΛ hH
+  obtain ⟨f, hf⟩ :=
+    exists_hom u u' P.isLB P'.isLB P'.ample (semicharacter_sq_eq_one_of_symmetric P u Hm χ h)
+      (semicharacter_sq_eq_one_of_symmetric P' u' Hm' χ' h') hs hθ F n hΛ hH
   haveI := isReduced_of_smooth_complex _ P.A.hom inferInstance
   have hw : f ≫ P'.A.hom = P.A.hom := by
     refine ComplexPoints.hom_ext_of_points P.A.hom (terminal.from (Sp ℂ)) (terminal.hom_ext _ _)

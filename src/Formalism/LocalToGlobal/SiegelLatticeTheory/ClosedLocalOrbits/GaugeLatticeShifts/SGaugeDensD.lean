@@ -13,10 +13,13 @@ namespace Formalism.MainNotions.S.Gauge
 
 variable {n : ℕ}
 
-theorem tendsto_ratioAt_of_ball {ε : Fin n → Bool} {c s : ℝ} (hc : 0 < c) (hs : 0 < s)
-    (hb : ∀ ρ : ℝ, 0 < ρ → ρ ≤ s →
-      Formalism.REAL.muG ε (expSet ε (Metric.ball (0 : gLie ε) ρ)) = ENNReal.ofReal c * ∫⁻ t in Metric.ball (0 : EL ε) ρ, jd ε t) :
-    Tendsto (ratioAt ε) (𝓝[>] (0 : ℝ)) (𝓝 c) := by
+theorem tendsto_ratioAt_of_ball
+    {ε : Fin n → Bool} {c s : ℝ} (hc : 0 < c) (hs : 0 < s)
+    (hb : ∀ ρ : ℝ,
+      0 < ρ → ρ ≤ s
+        → Formalism.REAL.muG ε (expSet ε (Metric.ball (0 : gLie ε) ρ))
+          = ENNReal.ofReal c * ∫⁻ t in Metric.ball (0 : EL ε) ρ, jd ε t)
+    : Tendsto (ratioAt ε) (𝓝[>] (0 : ℝ)) (𝓝 c) := by
   rw [Metric.tendsto_nhdsWithin_nhds]
   intro e he
   set δ : ℝ := min (1 / 2) (e / (2 * c)) with hδ
@@ -24,7 +27,9 @@ theorem tendsto_ratioAt_of_ball {ε : Fin n → Bool} {c s : ℝ} (hc : 0 < c) (
   have hδ1 : δ ≤ 1 / 2 := min_le_left _ _
   have hδe : c * δ < e := by
     have : δ ≤ e / (2 * c) := min_le_right _ _
-    calc c * δ ≤ c * (e / (2 * c)) := mul_le_mul_of_nonneg_left this hc.le
+    calc
+      c * δ
+        ≤ c * (e / (2 * c)) := mul_le_mul_of_nonneg_left this hc.le
       _ = e / 2 := by field_simp
       _ < e := by linarith
   have hJc := (continuous_chartJac_thetaExp ε).continuousAt (x := 0)
@@ -36,7 +41,9 @@ theorem tendsto_ratioAt_of_ball {ε : Fin n → Bool} {c s : ℝ} (hc : 0 < c) (
     rwa [Real.dist_eq, sub_zero, abs_of_pos hρ0] at this
   have hρη : ρ ≤ η := (lt_of_lt_of_le hρd' (min_le_left _ _)).le
   have hρr : ρ ≤ s := (lt_of_lt_of_le hρd' (min_le_right _ _)).le
-  have hbound : ∀ t ∈ Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ, |chartJac (thetaExp ε) t - 1| < δ := by
+  have hbound
+      : ∀ t ∈ Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ,
+        |chartJac (thetaExp ε) t - 1| < δ := by
     intro t ht
     have := hcont (lt_of_lt_of_le ht hρη)
     rw [chartJac_thetaExp_zero, Real.dist_eq] at this
@@ -46,18 +53,21 @@ theorem tendsto_ratioAt_of_ball {ε : Fin n → Bool} {c s : ℝ} (hc : 0 < c) (
   have hVfin : V ≠ ⊤ := measure_ball_lt_top.ne
   set I := ∫⁻ t in Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ, ENNReal.ofReal (chartJac (thetaExp ε) t) with hI
   have hup : I ≤ ENNReal.ofReal (1 + δ) * V := by
-    calc I ≤ ∫⁻ _ in Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ, ENNReal.ofReal (1 + δ) := by
-          refine lintegral_mono_ae ?_
-          filter_upwards [ae_restrict_mem measurableSet_ball] with x hx
-          exact ENNReal.ofReal_le_ofReal (by linarith [(abs_lt.1 (hbound x hx)).2])
+    calc
+      I ≤ ∫⁻ _ in Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ, ENNReal.ofReal (1 + δ) := by
+        refine lintegral_mono_ae ?_
+        filter_upwards [ae_restrict_mem measurableSet_ball] with x hx
+        exact ENNReal.ofReal_le_ofReal (by linarith [(abs_lt.1 (hbound x hx)).2])
       _ = ENNReal.ofReal (1 + δ) * V := setLIntegral_const _ _
   have hlo : ENNReal.ofReal (1 - δ) * V ≤ I := by
-    calc ENNReal.ofReal (1 - δ) * V = ∫⁻ _ in Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ, ENNReal.ofReal (1 - δ) :=
-          (setLIntegral_const _ _).symm
+    calc
+      ENNReal.ofReal (1 - δ) * V
+          = ∫⁻ _ in Metric.ball (0 : EuclideanSpace ℝ (Fin (dimL ε))) ρ, ENNReal.ofReal (1 - δ) :=
+        (setLIntegral_const _ _).symm
       _ ≤ I := by
-          refine lintegral_mono_ae ?_
-          filter_upwards [ae_restrict_mem measurableSet_ball] with x hx
-          exact ENNReal.ofReal_le_ofReal (by linarith [(abs_lt.1 (hbound x hx)).1])
+        refine lintegral_mono_ae ?_
+        filter_upwards [ae_restrict_mem measurableSet_ball] with x hx
+        exact ENNReal.ofReal_le_ofReal (by linarith [(abs_lt.1 (hbound x hx)).1])
   have hIfin : I ≠ ⊤ := ne_top_of_le_ne_top (ENNReal.mul_ne_top ENNReal.ofReal_ne_top hVfin) hup
   have hVr : 0 < V.toReal := ENNReal.toReal_pos hVpos.ne' hVfin
   have hupR : I.toReal ≤ (1 + δ) * V.toReal := by

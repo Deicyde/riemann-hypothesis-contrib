@@ -15,11 +15,11 @@ open MvPolynomial MeasureTheory Matrix ComplexSets
 
 noncomputable section
 
-theorem TubeEuclMass.proof (hC : TubeCollarMass.Statement) (hD : TubeDeepMass.Statement) :
-    TubeEuclMass.Statement := by
+theorem TubeEuclMass.proof (hC : TubeCollarMass.Statement) (hD : TubeDeepMass.Statement)
+    : TubeEuclMass.Statement := by
   intro n d J A P R hJ hdim hA hP
-  have hS : {y : Fin (d + 1) → ℂ | logAbsSq P y < -Real.exp 1} =
-      {y | -Real.exp 1 ≤ logAbsSq P y}ᶜ := by
+  have hS
+      : {y : Fin (d + 1) → ℂ | logAbsSq P y < -Real.exp 1} = {y | -Real.exp 1 ≤ logAbsSq P y}ᶜ := by
     ext y
     simp [not_le]
   have h := (hC n d J A P R hJ hdim hA hP).add (hD n d J A P R hJ hdim hA hP)

@@ -10,10 +10,26 @@ open scoped Pointwise
 
 namespace GlobalTheory.UnfoldNormal
 
-theorem aedisjoint_pairGroup_smul_shear_image : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H], ∀ (ν : Measure H) [ν.IsHaarMeasure] (Γ N : Subgroup H), Countable Γ → IsClosed (N : Set H) → ∀ (hN : ∀ γ ∈ Γ, ∀ n ∈ N, γ * n * γ⁻¹ ∈ N) (κ : Measure N) (𝓝 : Set N), κ.IsHaarMeasure → IsFundamentalDomain (Γ.subgroupOf N) 𝓝 κ → (∀ (γ : H) (hγ : γ ∈ Γ), κ.map (fun n : N => (⟨γ * n * γ⁻¹, hN γ hγ n n.2⟩ : N)) = κ) → ∀ 𝓕 : Set H, IsFundamentalDomain Γ 𝓕 ν → Pairwise (AEDisjoint ((κ.prod ν).map (GlobalTheory.UnfoldNormal.shear N)) on fun g : GlobalTheory.UnfoldNormal.pairGroup Γ N hN => g • (GlobalTheory.UnfoldNormal.shear N '' (𝓝 ×ˢ 𝓕))) := by
+theorem aedisjoint_pairGroup_smul_shear_image
+    : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+        [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H],
+      ∀ (ν : Measure H) [ν.IsHaarMeasure] (Γ N : Subgroup H),
+        Countable Γ → IsClosed (N : Set H)
+          → ∀ (hN : ∀ γ ∈ Γ, ∀ n ∈ N, γ * n * γ⁻¹ ∈ N) (κ : Measure N) (𝓝 : Set N),
+            κ.IsHaarMeasure → IsFundamentalDomain (Γ.subgroupOf N) 𝓝 κ
+              → (∀ (γ : H) (hγ : γ ∈ Γ),
+                κ.map (fun n : N => (⟨γ * n * γ⁻¹, hN γ hγ n n.2⟩ : N)) = κ)
+              → ∀ 𝓕 : Set H,
+                IsFundamentalDomain Γ 𝓕 ν
+                  → Pairwise
+                    (AEDisjoint ((κ.prod ν).map (GlobalTheory.UnfoldNormal.shear N))
+                      on fun g : GlobalTheory.UnfoldNormal.pairGroup Γ N hN =>
+                        g • (GlobalTheory.UnfoldNormal.shear N '' (𝓝 ×ˢ 𝓕))) := by
   intro H _ _ _ _ _ _ _ _ ν _ Γ N _ hNc hN κ 𝓝 _ h𝓝 hconj 𝓕 h𝓕
-  have key : ∀ (g : pairGroup Γ N hN) (x : N × H), shear N x ∈ g • (shear N '' (𝓝 ×ˢ 𝓕)) →
-      ∃ n ∈ 𝓝, ∃ h ∈ 𝓕, (x.1 : H) * x.2 = g.1.1 * n * h ∧ x.2 = g.1.2 * h := by
+  have key
+      : ∀ (g : pairGroup Γ N hN) (x : N × H),
+        shear N x ∈ g • (shear N '' (𝓝 ×ˢ 𝓕))
+          → ∃ n ∈ 𝓝, ∃ h ∈ 𝓕, (x.1 : H) * x.2 = g.1.1 * n * h ∧ x.2 = g.1.2 * h := by
     rintro g ⟨a, b⟩ hx
     obtain ⟨_, ⟨⟨n, h⟩, ⟨hn, hh⟩, rfl⟩, he⟩ := Set.mem_smul_set.1 hx
     refine ⟨n, hn, h, hh, ?_⟩
@@ -35,8 +51,10 @@ theorem aedisjoint_pairGroup_smul_shear_image : ∀ (H : Type) [Group H] [Topolo
       have := hN v⁻¹ (Γ.inv_mem hv) (w * v⁻¹) hw
       have e : v⁻¹ * (w * v⁻¹) * v⁻¹⁻¹ = v⁻¹ * w := by group
       rwa [e] at this
-    let δ : Γ.subgroupOf N := ⟨⟨v⁻¹ * u, memN u hu huv⟩, Subgroup.mem_subgroupOf.2 (Γ.mul_mem (Γ.inv_mem hv) hu)⟩
-    let δ' : Γ.subgroupOf N := ⟨⟨v⁻¹ * u', memN u' hu' huv'⟩, Subgroup.mem_subgroupOf.2 (Γ.mul_mem (Γ.inv_mem hv) hu')⟩
+    let δ : Γ.subgroupOf N :=
+      ⟨⟨v⁻¹ * u, memN u hu huv⟩, Subgroup.mem_subgroupOf.2 (Γ.mul_mem (Γ.inv_mem hv) hu)⟩
+    let δ' : Γ.subgroupOf N :=
+      ⟨⟨v⁻¹ * u', memN u' hu' huv'⟩, Subgroup.mem_subgroupOf.2 (Γ.mul_mem (Γ.inv_mem hv) hu')⟩
     have hδ : δ ≠ δ' := by
       intro h
       have := congrArg (fun d : Γ.subgroupOf N => ((d : N) : H)) h
@@ -55,7 +73,9 @@ theorem aedisjoint_pairGroup_smul_shear_image : ∀ (H : Type) [Group H] [Topolo
     · rintro ⟨a, b⟩ ⟨h1, h2⟩
       obtain ⟨n, hn, h, hh, e1, e2⟩ := key _ _ h1
       obtain ⟨n', hn', h', hh', e1', e2'⟩ := key _ _ h2
-      have av : ∀ (w : H) (m : N) (k : H), (a : H) * b = w * m * k → b = v * k → (a : H) * v = w * m := by
+      have av
+          : ∀ (w : H) (m : N) (k : H),
+            (a : H) * b = w * m * k → b = v * k → (a : H) * v = w * m := by
         intro w m k e e'
         rw [e'] at e
         have := congrArg (· * k⁻¹) e
@@ -74,8 +94,11 @@ theorem aedisjoint_pairGroup_smul_shear_image : ∀ (H : Type) [Group H] [Topolo
     · rintro ⟨a, b⟩ ⟨h1, h2⟩
       obtain ⟨n, hn, h, hh, e1, e2⟩ := key _ _ h1
       obtain ⟨n', hn', h', hh', e1', e2'⟩ := key _ _ h2
-      exact ⟨Set.mem_univ _, Set.mem_smul_set.2 ⟨h, hh, by rw [e2]; rfl⟩,
-        Set.mem_smul_set.2 ⟨h', hh', by rw [e2']; rfl⟩⟩
+      exact ⟨
+        Set.mem_univ _,
+        Set.mem_smul_set.2 ⟨h, hh, by rw [e2]; rfl⟩,
+        Set.mem_smul_set.2 ⟨h', hh', by rw [e2']; rfl⟩
+      ⟩
     · rw [Measure.prod_prod, hZ, mul_zero]
 
 end GlobalTheory.UnfoldNormal

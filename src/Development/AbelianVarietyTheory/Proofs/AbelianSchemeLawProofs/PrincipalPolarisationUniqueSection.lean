@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Fin
 
 namespace GlobalTheory.AbLaw
 
-theorem principalPolarisation_unique_section : GlobalTheory.Published.principalPolarisationOneSection :=
+theorem principalPolarisation_unique_section
+    : GlobalTheory.Published.principalPolarisationOneSection :=
   finrank_sections_principal_polarisation_eq_one
 
 end GlobalTheory.AbLaw

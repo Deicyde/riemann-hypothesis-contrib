@@ -54,7 +54,9 @@ theorem factorization_eq_zero {l : ℕ} (h : l ∉ H.small) : H.QS.factorization
   exact ⟨hc.1, hc.2.1, hc.2.2⟩
 
 variable {H} in
-theorem localLevel_eq_one_of_not_mem_smallPrimes {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc) (h : N.l i ∉ H.small) : N.s0 i = 1 := by
+theorem localLevel_eq_one_of_not_mem_smallPrimes
+    {what₂ : Rows.Data R} (N : NData R H what₂) (i : N.Loc) (h : N.l i ∉ H.small)
+    : N.s0 i = 1 := by
   rw [N.restNLevelExponent_of_odd i (ne_two H h), factorization_eq_zero H h]; rfl
 
 end UpperTheory.Small

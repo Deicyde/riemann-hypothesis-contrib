@@ -10,7 +10,9 @@ namespace Formalism.KernelCokernelLengths
 
 theorem row_degree_exponent : ExpRowD := by
   intro ℓ hℓ h η S b a s₁ E e₂ hη hb ha hs hE he
-  have key := Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.expBound_statement ℓ hℓ h η S b a s₁ E e₂ hb ha hs hE he
+  have key :=
+    Formalism.TruncatedSeriesCounting.RamifiedCoefficientChains.expBound_statement ℓ hℓ h η S b a s₁
+      E e₂ hb ha hs hE he
   have hℓ0 : (0 : ℝ) < (ℓ : ℝ) := by exact_mod_cast (by omega : 0 < ℓ)
   have hℓ2 : (0 : ℝ) < (ℓ : ℝ) ^ 2 := by positivity
   have hη' : (2 * (η : ℝ)) ≤ h := by exact_mod_cast hη

@@ -12,8 +12,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-private theorem exists_prime_mem_of_mem {R : Type} [CommRing R] (I : Ideal R) (hI : I.IsPrime) :
-    ∀ n : ℕ, n ≠ 0 → (n : R) ∈ I → ∃ p : ℕ, p.Prime ∧ (p : R) ∈ I := by
+private theorem exists_prime_mem_of_mem {R : Type} [CommRing R] (I : Ideal R) (hI : I.IsPrime)
+    : ∀ n : ℕ, n ≠ 0 → (n : R) ∈ I → ∃ p : ℕ, p.Prime ∧ (p : R) ∈ I := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -35,8 +35,12 @@ private theorem exists_prime_mem_of_mem {R : Type} [CommRing R] (I : Ideal R) (h
           exact lt_mul_of_one_lt_left (Nat.pos_of_ne_zero hm0) hp.one_lt
         exact ih m hlt hm0 h
 
-private theorem cyc_adjoin (K : Type) {L : Type} [Field K] [Field L] [Algebra K L] {n : ℕ} [NeZero n] {ζ : L}
-    (hζ : IsPrimitiveRoot ζ n) : IsCyclotomicExtension {n} K K⟮ζ⟯ := by
+private theorem cyc_adjoin
+    (K : Type)
+    {L : Type} [Field K] [Field L] [Algebra K L]
+    {n : ℕ} [NeZero n]
+    {ζ : L} (hζ : IsPrimitiveRoot ζ n)
+    : IsCyclotomicExtension {n} K K⟮ζ⟯ := by
   change IsCyclotomicExtension {n} K (IntermediateField.adjoin K {ζ}).toSubalgebra
   have hi : IsIntegral K ζ := by
     refine ⟨Polynomial.X ^ n - Polynomial.C 1, Polynomial.monic_X_pow_sub_C 1 (NeZero.ne n), ?_⟩
@@ -44,8 +48,10 @@ private theorem cyc_adjoin (K : Type) {L : Type} [Field K] [Field L] [Algebra K 
   rw [IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic hi.isAlgebraic]
   exact hζ.adjoin_isCyclotomicExtension K
 
-theorem UpperTheory.V.CF.kwRay :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (𝔪 : GroundTheory.Global.Modulus ℚ) (ζ : Ω), IsPrimitiveRoot ζ (Ideal.absNorm 𝔪.ideal) → 𝔪.rayClassField Ω ≤ ℚ⟮ζ⟯ := by
+theorem UpperTheory.V.CF.kwRay
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (𝔪 : GroundTheory.Global.Modulus ℚ)
+        (ζ : Ω),
+      IsPrimitiveRoot ζ (Ideal.absNorm 𝔪.ideal) → 𝔪.rayClassField Ω ≤ ℚ⟮ζ⟯ := by
   intro Ω _ _ _ 𝔪 ζ hζ
   set N := Ideal.absNorm 𝔪.ideal with hN
   have hN0 : N ≠ 0 := by
@@ -56,20 +62,21 @@ theorem UpperTheory.V.CF.kwRay :
   haveI : NumberField ℚ⟮ζ⟯ := @IsCyclotomicExtension.numberField {N} ℚ ℚ⟮ζ⟯ _ _ _ _ _ hcyc
   have hgal := @IsCyclotomicExtension.isGalois {N} ℚ ℚ⟮ζ⟯ _ _ _ hcyc
   haveI := (GroundTheory.Global.Modulus.isAbelianGalois_rayClassField 𝔪 Ω).toIsGalois
-  have hfin : ({v | v.asIdeal ∣ 𝔪.ideal} ∪ {v | v.asIdeal ∣ Ideal.span {(N : 𝓞 ℚ)}} :
-      Set (HeightOneSpectrum (𝓞 ℚ))).Finite := by
+  have hfin
+      : ({v | v.asIdeal ∣ 𝔪.ideal} ∪ {v | v.asIdeal ∣ Ideal.span {(N : 𝓞 ℚ)}}
+        : Set (HeightOneSpectrum (𝓞 ℚ))).Finite := by
     refine (Ideal.finite_factors 𝔪.ideal_ne_bot).union (Ideal.finite_factors ?_)
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hN0
-  refine @UpperTheory.V.CF.bauer ℚ Ω _ _ _ _ (𝔪.rayClassField Ω) ℚ⟮ζ⟯ _ _ _
-    (by convert hgal) _ hfin ?_
+  refine @UpperTheory.V.CF.bauer ℚ Ω _ _ _ _ (𝔪.rayClassField Ω) ℚ⟮ζ⟯ _ _ _ (by convert hgal) _ hfin
+    ?_
   intro v hv hsplit
   simp only [Set.mem_union, Set.mem_setOf_eq, not_or] at hv
   obtain ⟨_, hv2⟩ := hv
   rw [Ideal.dvd_span_singleton] at hv2
-  obtain ⟨p, hp, hpv⟩ := exists_prime_mem_of_mem v.asIdeal v.isPrime
-    (Ideal.absNorm v.asIdeal) (by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot)
-    (Ideal.absNorm_mem _)
+  obtain ⟨p, hp, hpv⟩ :=
+    exists_prime_mem_of_mem v.asIdeal v.isPrime (Ideal.absNorm v.asIdeal)
+      (by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot) (Ideal.absNorm_mem _)
   have hpN : ¬ p ∣ N := by
     rintro ⟨k, hk⟩
     apply hv2
@@ -83,8 +90,6 @@ theorem UpperTheory.V.CF.kwRay :
         | exact Subsingleton.elim _ _
     refine UpperTheory.V.CF.splitCyc N ℚ⟮ζ⟯ v p hp hpv hpN ?_
     convert hsplit
-    all_goals first
-      | rfl
-      | exact Subsingleton.elim _ _
+    all_goals first | rfl | exact Subsingleton.elim _ _
   obtain ⟨hv', hcls⟩ := UpperTheory.V.CF.rayPrime 𝔪 v p hp hpv hmod
   exact (GroundTheory.Global.Modulus.splitsCompletely_rayClassField_iff 𝔪 Ω hv').mpr hcls

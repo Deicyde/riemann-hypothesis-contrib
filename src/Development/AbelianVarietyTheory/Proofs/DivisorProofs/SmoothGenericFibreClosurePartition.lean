@@ -5,16 +5,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClosureGener
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-theorem smooth_genericFibre_closure_partition : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)), Smooth f → ∀ C C' : Set X, C ∪ C' = f ⁻¹' {(⊥ : PrimeSpectrum R)} → Disjoint C (closure C') → Disjoint (closure C) C' → Disjoint (closure C) (closure C') ∧ closure C ∪ closure C' = Set.univ := by
+theorem smooth_genericFibre_closure_partition
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] (X : Scheme.{0})
+        (f : X ⟶ Spec (CommRingCat.of R)),
+      Smooth f
+        → ∀ C C' : Set X,
+          C ∪ C' = f ⁻¹' {(⊥ : PrimeSpectrum R)} → Disjoint C (closure C') → Disjoint (closure C) C'
+            → Disjoint (closure C) (closure C') ∧ closure C ∪ closure C' = Set.univ := by
   intro R _ _ _ X f hf C C' hU h1 h2
-  have key : ∀ (A : CommRingCat.{0}) (j : Spec A ⟶ X) [IsOpenImmersion j],
-      Disjoint (j ⁻¹' closure C) (j ⁻¹' closure C') ∧
-        (j ⁻¹' closure C) ∪ (j ⁻¹' closure C') = Set.univ := by
+  have key
+      : ∀ (A : CommRingCat.{0}) (j : Spec A ⟶ X) [IsOpenImmersion j],
+        Disjoint (j ⁻¹' closure C) (j ⁻¹' closure C')
+          ∧ (j ⁻¹' closure C) ∪ (j ⁻¹' closure C') = Set.univ := by
     intro A j _
     obtain ⟨φ, hφ⟩ := Spec.map_surjective (j ≫ f)
     have hs : Smooth (Spec.map φ) := by rw [hφ]; infer_instance
@@ -24,7 +32,8 @@ theorem smooth_genericFibre_closure_partition : ∀ (R : Type) [CommRing R] [IsD
     have hcl : ∀ S : Set X, j ⁻¹' closure S = closure (j ⁻¹' S) := fun S =>
       j.isOpenEmbedding.isOpenMap.preimage_closure_eq_closure_preimage j.continuous S
     rw [hcl, hcl]
-    refine GlobalTheory.T.closure_generic_fibre_clopen_split_alt R A hA (j ⁻¹' C) (j ⁻¹' C') ?_ ?_ ?_
+    refine GlobalTheory.T.closure_generic_fibre_clopen_split_alt R A hA (j ⁻¹' C) (j ⁻¹' C') ?_ ?_
+      ?_
     · have : j ⁻¹' C ∪ j ⁻¹' C' = (Spec.map φ) ⁻¹' {(⊥ : PrimeSpectrum R)} := by
         rw [← Set.preimage_union, hU, hφ, ← Set.preimage_comp, Scheme.Hom.comp_base]
         rfl

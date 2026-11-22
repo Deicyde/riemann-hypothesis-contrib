@@ -13,7 +13,8 @@ public import Formalism.CyclotomicNorms.StatementTW
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions
 
 namespace Formalism.MainNotions.ExistsIdealDenominator
 
@@ -44,8 +45,7 @@ theorem exists_norm_btwn (x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) : ∃ a : ℂ_
     rw [norm_zpow, ← Real.rpow_intCast, hc', ← Real.rpow_mul (inv_nonneg.2 hl0.le),
       Real.inv_rpow hl0.le, ← Real.rpow_neg hl0.le]
     congr 1
-    have hq : (q : ℝ) = (q.num : ℝ) / (q.den : ℝ) := by
-      exact_mod_cast (Rat.num_div_den q).symm
+    have hq : (q : ℝ) = (q.num : ℝ) / (q.den : ℝ) := by exact_mod_cast (Rat.num_div_den q).symm
     rw [hq]
     push_cast
     field_simp
@@ -53,13 +53,18 @@ theorem exists_norm_btwn (x y : ℝ) (hx : 0 ≤ x) (hxy : x < y) : ∃ a : ℂ_
   · rw [hval]
     refine lt_of_le_of_lt (le_max_left x (y / 2)) ?_
     rw [← hx']
-    calc x' = (l : ℝ) ^ Real.logb l x' := (Real.rpow_logb hl0 hl1.ne' hx'0).symm
+    calc
+      x'
+        = (l : ℝ) ^ Real.logb l x' := (Real.rpow_logb hl0 hl1.ne' hx'0).symm
       _ < (l : ℝ) ^ (q : ℝ) := (Real.rpow_lt_rpow_left_iff hl1).2 hq1
   · rw [hval]
-    calc (l : ℝ) ^ (q : ℝ) < (l : ℝ) ^ Real.logb l y := (Real.rpow_lt_rpow_left_iff hl1).2 hq2
+    calc
+      (l : ℝ) ^ (q : ℝ)
+        < (l : ℝ) ^ Real.logb l y := (Real.rpow_lt_rpow_left_iff hl1).2 hq2
       _ = y := Real.rpow_logb hl0 hl1.ne' hy
 
-@[reducible] def denseC : DenselyNormedField ℂ_[l] where
+@[reducible]
+def denseC : DenselyNormedField ℂ_[l] where
   __ := (inferInstance : NormedField ℂ_[l])
   lt_norm_lt := exists_norm_btwn l
 
@@ -97,10 +102,12 @@ end Gal
 
 section U4
 
-theorem norm_unif {K O : Type} [NormedField K] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Algebra O K] [IsFractionRing O K]
-    (hball : ∀ x : K, ‖x‖ ≤ 1 ↔ x ∈ (algebraMap O K).range) {ϖ : O} (hϖ : Irreducible ϖ) :
-    0 < ‖algebraMap O K ϖ‖ ∧ ‖algebraMap O K ϖ‖ < 1 := by
+theorem norm_unif
+    {K O : Type} [NormedField K] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O K]
+    [IsFractionRing O K]
+    (hball : ∀ x : K, ‖x‖ ≤ 1 ↔ x ∈ (algebraMap O K).range)
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    : 0 < ‖algebraMap O K ϖ‖ ∧ ‖algebraMap O K ϖ‖ < 1 := by
   have h0 : algebraMap O K ϖ ≠ 0 := by
     rw [Ne, map_eq_zero_iff _ (IsFractionRing.injective O K)]; exact hϖ.ne_zero
   refine ⟨norm_pos_iff.2 h0, lt_of_le_of_ne ((hball _).2 ⟨ϖ, rfl⟩) ?_⟩
@@ -112,15 +119,18 @@ theorem norm_unif {K O : Type} [NormedField K] [CommRing O] [IsDomain O] [IsDisc
   apply IsFractionRing.injective O K
   rw [map_mul, ha, map_one, mul_inv_cancel₀ h0]
 
-theorem complete_of_adic {K O : Type} [NormedField K] [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] [Algebra O K] [IsFractionRing O K]
+theorem complete_of_adic
+    {K O : Type} [NormedField K] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra O K]
+    [IsFractionRing O K]
     (hball : ∀ x : K, ‖x‖ ≤ 1 ↔ x ∈ (algebraMap O K).range)
-    (hc : IsAdicComplete (IsLocalRing.maximalIdeal O) O) : CompleteSpace K := by
+    (hc : IsAdicComplete (IsLocalRing.maximalIdeal O) O)
+    : CompleteSpace K := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨hr0, hr1⟩ := norm_unif hball hϖ
   set r := ‖algebraMap O K ϖ‖ with hr
   have hπ0 : algebraMap O K ϖ ≠ 0 := norm_pos_iff.1 hr0
-  have hmem : ∀ (a : O) (n : ℕ), ‖algebraMap O K a‖ ≤ r ^ n → a ∈ IsLocalRing.maximalIdeal O ^ n := by
+  have hmem
+      : ∀ (a : O) (n : ℕ), ‖algebraMap O K a‖ ≤ r ^ n → a ∈ IsLocalRing.maximalIdeal O ^ n := by
     intro a n h
     have h1 : ‖algebraMap O K a / (algebraMap O K ϖ) ^ n‖ ≤ 1 := by
       rw [norm_div, norm_pow, div_le_one (pow_pos hr0 n)]; exact h
@@ -129,13 +139,15 @@ theorem complete_of_adic {K O : Type} [NormedField K] [CommRing O] [IsDomain O]
     refine ⟨c, ?_⟩
     apply IsFractionRing.injective O K
     rw [map_mul, map_pow, hc', mul_div_cancel₀ _ (pow_ne_zero n hπ0)]
-  have hnorm : ∀ (a : O) (n : ℕ), a ∈ IsLocalRing.maximalIdeal O ^ n → ‖algebraMap O K a‖ ≤ r ^ n := by
+  have hnorm
+      : ∀ (a : O) (n : ℕ), a ∈ IsLocalRing.maximalIdeal O ^ n → ‖algebraMap O K a‖ ≤ r ^ n := by
     intro a n h
     rw [hϖ.maximalIdeal_eq, Ideal.span_singleton_pow, Ideal.mem_span_singleton] at h
     obtain ⟨c, rfl⟩ := h
     rw [map_mul, map_pow, norm_mul, norm_pow]
     exact mul_le_of_le_one_right (pow_nonneg hr0.le n) ((hball _).2 ⟨c, rfl⟩)
-  refine Metric.complete_of_convergent_controlled_sequences (fun n => r ^ n) (fun n => pow_pos hr0 n) ?_
+  refine
+    Metric.complete_of_convergent_controlled_sequences (fun n => r ^ n) (fun n => pow_pos hr0 n) ?_
   intro u hu
   have h1 : ∀ n, ∃ a : O, algebraMap O K a = u n - u 0 := by
     intro n
@@ -143,15 +155,19 @@ theorem complete_of_adic {K O : Type} [NormedField K] [CommRing O] [IsDomain O]
     rw [pow_zero, dist_eq_norm] at this
     exact (hball _).1 this.le
   choose a ha using h1
-  obtain ⟨L, hL⟩ := hc.toIsPrecomplete.prec (f := a) (by
-    intro m n hmn
-    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
-    apply hmem
-    rw [map_sub, ha, ha, sub_sub_sub_cancel_right, ← dist_eq_norm]
-    exact (hu m m n le_rfl hmn).le)
+  obtain ⟨L, hL⟩ :=
+    hc.toIsPrecomplete.prec (f := a) (by
+      intro m n hmn
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top]
+      apply hmem
+      rw [map_sub, ha, ha, sub_sub_sub_cancel_right, ← dist_eq_norm]
+      exact (hu m m n le_rfl hmn).le)
   refine ⟨u 0 + algebraMap O K L, ?_⟩
   rw [tendsto_iff_norm_sub_tendsto_zero]
-  refine squeeze_zero (fun n => norm_nonneg _) (fun n => ?_) (tendsto_pow_atTop_nhds_zero_of_lt_one hr0.le hr1)
+  refine squeeze_zero
+    (fun n => norm_nonneg _)
+    (fun n => ?_)
+    (tendsto_pow_atTop_nhds_zero_of_lt_one hr0.le hr1)
   have h2 := hL n
   rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] at h2
   have h3 := hnorm _ n h2
@@ -180,7 +196,8 @@ section PartC
 
 variable {i : D.ntw.Tw} {j : ℕ} {M : ℕ} {Q : Finset (HeightOneSpectrum (𝓞 D.host.E))}
 
-variable {δ : G D.host.E D.nd.Om →* Multiplicative (DelQM D.host (D.ntw.l i) Q M)}
+variable
+  {δ : G D.host.E D.nd.Om →* Multiplicative (DelQM D.host (D.ntw.l i) Q M)}
   {Φ : ↥Q → ZMod (D.ntw.l i ^ M) → D.nth.Lt i j → KK i} {φ : D.nth.Lt i j → KK i}
 
 variable (X : Geo D)

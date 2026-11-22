@@ -16,18 +16,19 @@ namespace Formalism.HermitianLatticesTheory
 
 section Gen
 
-variable {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+  [Module R V] [IsScalarTower R K V]
 
-theorem neighbourConstruct_mem_inv {P : Ideal R} {a : K} :
-    a ∈ invIdeal (K := K) P ↔ ∀ p ∈ P, algebraMap R K p * a ∈ Set.range (algebraMap R K) := by
+theorem neighbourConstruct_mem_inv {P : Ideal R} {a : K}
+    : a ∈ invIdeal (K := K) P ↔ ∀ p ∈ P, algebraMap R K p * a ∈ Set.range (algebraMap R K) := by
   unfold invIdeal
   simp only [Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mulLeft_apply, Submodule.mem_one]
   rfl
 
-theorem neighbourConstruct_mem_span {P : Ideal R} {x z : V} :
-    z ∈ Submodule.span R {z | ∃ a ∈ invIdeal (K := K) P, z = a • x} ↔
-      ∃ a ∈ invIdeal (K := K) P, z = a • x := by
+theorem neighbourConstruct_mem_span {P : Ideal R} {x z : V}
+    : z ∈ Submodule.span R {z | ∃ a ∈ invIdeal (K := K) P, z = a • x}
+      ↔ ∃ a ∈ invIdeal (K := K) P, z = a • x := by
   constructor
   · intro hz
     induction hz using Submodule.span_induction with
@@ -48,18 +49,22 @@ end Gen
 
 section DedekindLFunctions
 
-variable {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-  [IsFractionRing R K] [StarRing K]
-  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [StarRing K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem neighbourConstruct_one_mem (P : Ideal R) (hP0 : P ≠ ⊥) :
-    (1 : K) ∈ Submodule.map (Algebra.linearMap R K) P * invIdeal (K := K) P := by
+theorem neighbourConstruct_one_mem (P : Ideal R) (hP0 : P ≠ ⊥)
+    : (1 : K) ∈ Submodule.map (Algebra.linearMap R K) P * invIdeal (K := K) P := by
   have e := FractionalIdeal.coe_ideal_mul_inv (K := K) P hP0
-  have e2 : ((P : FractionalIdeal R⁰ K) : Submodule R K) *
-      (((P : FractionalIdeal R⁰ K)⁻¹ : FractionalIdeal R⁰ K) : Submodule R K) = 1 := by
+  have e2
+      : ((P : FractionalIdeal R⁰ K) : Submodule R K)
+          * (((P : FractionalIdeal R⁰ K)⁻¹ : FractionalIdeal R⁰ K) : Submodule R K)
+        = 1 := by
     rw [← FractionalIdeal.coe_mul, e, FractionalIdeal.coe_one]
-  have h1 : (1 : K) ∈ ((P : FractionalIdeal R⁰ K) : Submodule R K) *
-      (((P : FractionalIdeal R⁰ K)⁻¹ : FractionalIdeal R⁰ K) : Submodule R K) := by
+  have h1
+      : (1 : K)
+        ∈ ((P : FractionalIdeal R⁰ K) : Submodule R K)
+          * (((P : FractionalIdeal R⁰ K)⁻¹ : FractionalIdeal R⁰ K) : Submodule R K) := by
     rw [e2]; exact Submodule.mem_one.mpr ⟨1, map_one _⟩
   have hne : (P : FractionalIdeal R⁰ K) ≠ 0 := FractionalIdeal.coeIdeal_ne_zero.mpr hP0
   refine (mul_le_mul' ?_ ?_ : _ ≤ Submodule.map (Algebra.linearMap R K) P * invIdeal (K := K) P) h1
@@ -67,13 +72,16 @@ theorem neighbourConstruct_one_mem (P : Ideal R) (hP0 : P ≠ ⊥) :
   · intro a ha
     rw [neighbourConstruct_mem_inv]
     intro p hp
-    have := (FractionalIdeal.mem_inv_iff hne).mp ha (algebraMap R K p)
-      (FractionalIdeal.mem_coeIdeal_of_mem _ hp)
+    have :=
+      (FractionalIdeal.mem_inv_iff hne).mp ha (algebraMap R K p)
+        (FractionalIdeal.mem_coeIdeal_of_mem _ hp)
     rw [mul_comm]
     exact (FractionalIdeal.mem_one_iff _).mp this
 
-theorem neighbourConstruct_key (P : Ideal R) (hP0 : P ≠ ⊥) (L : Submodule R V) (x : V)
-    (H : ∀ a ∈ invIdeal (K := K) P, a • x ∈ L) : x ∈ P • L := by
+theorem neighbourConstruct_key
+    (P : Ideal R) (hP0 : P ≠ ⊥)
+    (L : Submodule R V) (x : V) (H : ∀ a ∈ invIdeal (K := K) P, a • x ∈ L)
+    : x ∈ P • L := by
   have h1 := neighbourConstruct_one_mem (K := K) P hP0
   have : ((1 : K) • x) ∈ P • L := by
     refine Submodule.mul_induction_on (C := fun k => k • x ∈ P • L) h1 ?_ ?_
@@ -82,7 +90,8 @@ theorem neighbourConstruct_key (P : Ideal R) (hP0 : P ≠ ⊥) (L : Submodule R 
       rw [Algebra.linearMap_apply, mul_smul, algebraMap_smul]
       exact Submodule.smul_mem_smul hp (H n hn)
     · intro a b ha hb
-      rw [add_smul]; exact Submodule.add_mem _ ha hb
+      rw [add_smul]
+      exact Submodule.add_mem _ ha hb
   simpa using this
 
 end DedekindLFunctions
@@ -95,7 +104,8 @@ end Avoid
 
 section Main
 
-variable {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
+variable
+  {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [StarRing K] [Algebra R K]
   [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
 end Main

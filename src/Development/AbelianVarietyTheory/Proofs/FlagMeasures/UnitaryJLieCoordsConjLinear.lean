@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 noncomputable section
 
@@ -75,10 +76,17 @@ lemma coord_sum {n d : ℕ} (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
   simp only [Matrix.smul_mul, Matrix.trace_smul, Complex.smul_re, hE]
   simp
 
-theorem coords_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (d : ℕ) (E : Fin d → Matrix (Fin n) (Fin n) ℂ), (∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0) → (∀ X, (X ∈ A ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E)) → ∀ (g m : Formalism.REAL.UJ ε) (L : Matrix (Fin d) (Fin d) ℝ), uMat g - 1 ∈ A → uMat g⁻¹ - 1 ∈ A → (∀ k, uMat m * E k * uMat m⁻¹ = ∑ i, L i k • E i) → (fun i => (((uMat (m * g * m⁻¹) - 1) * (E i)ᴴ).trace).re) = L *ᵥ (fun i => (((uMat g - 1) * (E i)ᴴ).trace).re) := by
+theorem coords_conj
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (d : ℕ)
+        (E : Fin d → Matrix (Fin n) (Fin n) ℂ),
+      (∀ i k, ((E i * (E k)ᴴ).trace).re = if i = k then 1 else 0)
+        → (∀ X, (X ∈ A ∧ Formalism.REAL.inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E))
+        → ∀ (g m : Formalism.REAL.UJ ε) (L : Matrix (Fin d) (Fin d) ℝ),
+          uMat g - 1 ∈ A → uMat g⁻¹ - 1 ∈ A → (∀ k, uMat m * E k * uMat m⁻¹ = ∑ i, L i k • E i)
+            → (fun i => (((uMat (m * g * m⁻¹) - 1) * (E i)ᴴ).trace).re)
+              = L *ᵥ (fun i => (((uMat g - 1) * (E i)ᴴ).trace).re) := by
   intro n ε A d E hE hA g m L hg hg' hL
-  have hEG : ∀ i, inG ε (E i) := fun i =>
-    ((hA (E i)).2 (Submodule.subset_span ⟨i, rfl⟩)).2
+  have hEG : ∀ i, inG ε (E i) := fun i => ((hA (E i)).2 (Submodule.subset_span ⟨i, rfl⟩)).2
   have hX : uMat g - uMat g⁻¹ ∈ Submodule.span ℝ (Set.range E) := by
     refine (hA _).1 ⟨?_, inG_sub_inv g⟩
     have := A.sub_mem hg hg'
@@ -101,7 +109,8 @@ theorem coords_conj : ∀ (n : ℕ) (ε : Fin n → Bool) (A : Submodule ℝ (Ma
   have h4 : ∑ k, L i k * t k = 2 * ∑ k, L i k * (((uMat g - 1) * (E k)ᴴ).trace).re := by
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
-    rw [← h1 k]; ring
+    rw [← h1 k]
+    ring
   linarith
 
 end GlobalTheory.UnitaryCoords

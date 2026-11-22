@@ -12,8 +12,10 @@ namespace PI.VolStabS
 open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes NumberField
 open scoped TensorProduct
 
-theorem isReduced_tens_field (F E C : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] [Field C] [Algebra F C] : IsReduced (C ⊗[F] E) := by
+theorem isReduced_tens_field
+    (F E C : Type)
+    [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [Field C] [Algebra F C]
+    : IsReduced (C ⊗[F] E) := by
   have : Algebra.IsSeparable F E := Algebra.IsSeparable.of_integral F E
   have : Algebra.FormallyUnramified F E := Algebra.FormallyUnramified.of_isSeparable F E
   exact Algebra.FormallyUnramified.isReduced_of_field C (C ⊗[F] E)
@@ -25,8 +27,9 @@ theorem semisimpleTens_holds : SemisimpleTens := by
     inferInstanceAs (IsArtinianRing ((v : InfinitePlace F) → v.Completion))
   have : IsArtinianRing (Ainf F ⊗[F] E) := IsArtinianRing.of_finite (Ainf F) (Ainf F ⊗[F] E)
   let e1 : Ainf F ⊗[F] E ≃ₐ[F] E ⊗[F] Ainf F := Algebra.TensorProduct.comm F (Ainf F) E
-  let e2 : E ⊗[F] ((v : InfinitePlace F) → v.Completion) ≃ₐ[F]
-      ((v : InfinitePlace F) → E ⊗[F] v.Completion) :=
+  let e2
+      : E ⊗[F] ((v : InfinitePlace F) → v.Completion) ≃ₐ[F]
+        ((v : InfinitePlace F) → E ⊗[F] v.Completion) :=
     Algebra.TensorProduct.piRight F F E (fun v : InfinitePlace F => v.Completion)
   have : ∀ v : InfinitePlace F, IsReduced (E ⊗[F] v.Completion) := fun v =>
     have := isReduced_tens_field F E v.Completion

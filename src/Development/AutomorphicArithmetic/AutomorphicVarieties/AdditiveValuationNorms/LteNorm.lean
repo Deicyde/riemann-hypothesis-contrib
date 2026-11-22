@@ -13,16 +13,21 @@ private theorem norm_le_of_dvd' {l : ℕ} [Fact l.Prime] {x y : ℤ_[l]} (h : x 
   rw [norm_mul]
   exact mul_le_of_le_one_right (norm_nonneg _) (PadicInt.norm_le_one z)
 
-private theorem norm_eq_of_addVal {l : ℕ} [Fact l.Prime] {x y : ℤ_[l]}
-    (h : IsDiscreteValuationRing.addVal ℤ_[l] x = IsDiscreteValuationRing.addVal ℤ_[l] y) :
-    ‖x‖ = ‖y‖ := by
+private theorem norm_eq_of_addVal
+    {l : ℕ} [Fact l.Prime]
+    {x y : ℤ_[l]}
+    (h : IsDiscreteValuationRing.addVal ℤ_[l] x = IsDiscreteValuationRing.addVal ℤ_[l] y)
+    : ‖x‖ = ‖y‖ := by
   have h1 : x ∣ y := IsDiscreteValuationRing.addVal_le_iff_dvd.mp h.le
   have h2 : y ∣ x := IsDiscreteValuationRing.addVal_le_iff_dvd.mp h.ge
   exact le_antisymm (norm_le_of_dvd' h2) (norm_le_of_dvd' h1)
 
-theorem UpperTheory.V.PropA.lteNorm :
-    ∀ (l : ℕ) [Fact l.Prime] (u : ℤ_[l]) (c : ℕ), IsLevel l u c → ‖u‖ = 1 ∧ (l : ℤ_[l]) ∣ u - 1 ∧
-      ∀ j a b : ℕ, ‖(u ^ l ^ j) ^ a - (u ^ l ^ j) ^ b‖ = ((l : ℝ) ^ (j + c))⁻¹ * ‖(a : ℤ_[l]) - b‖ := by
+theorem UpperTheory.V.PropA.lteNorm
+    : ∀ (l : ℕ) [Fact l.Prime] (u : ℤ_[l]) (c : ℕ),
+      IsLevel l u c
+        → ‖u‖ = 1 ∧ (l : ℤ_[l]) ∣ u - 1
+          ∧ ∀ j a b : ℕ,
+            ‖(u ^ l ^ j) ^ a - (u ^ l ^ j) ^ b‖ = ((l : ℝ) ^ (j + c))⁻¹ * ‖(a : ℤ_[l]) - b‖ := by
   intro l _ u c hc
   obtain ⟨hv, hc1, hc2⟩ := hc
   have hval1 : IsDiscreteValuationRing.addVal ℤ_[l] (l : ℤ_[l]) = 1 :=
@@ -34,8 +39,9 @@ theorem UpperTheory.V.PropA.lteNorm :
     exact_mod_cast hc1
   have hn1 : ‖u - 1‖ < 1 := (PadicInt.norm_lt_one_iff_dvd _).2 hl
   have hu : ‖u‖ = 1 := by
-    have := PadicInt.norm_eq_of_norm_add_lt_right (z1 := u) (z2 := -1)
-      (by rw [norm_neg, norm_one, ← sub_eq_add_neg]; exact hn1)
+    have :=
+      PadicInt.norm_eq_of_norm_add_lt_right (z1 := u) (z2 := -1)
+        (by rw [norm_neg, norm_one, ← sub_eq_add_neg]; exact hn1)
     rwa [norm_neg, norm_one] at this
   refine ⟨hu, hl, ?_⟩
   intro j a b
@@ -56,8 +62,9 @@ theorem UpperTheory.V.PropA.lteNorm :
     simp only [vl] at hv
     rw [show ((U : ℤ_[l]ˣ) : ℤ_[l]) = u from hvu]
     exact hv
-  have hcond : IsDiscreteValuationRing.addVal ℤ_[l] (l : ℤ_[l]) <
-      ↑(l - 1) * IsDiscreteValuationRing.addVal ℤ_[l] ↑(abelian₂.pt U) := by
+  have hcond
+      : IsDiscreteValuationRing.addVal ℤ_[l] (l : ℤ_[l])
+        < ↑(l - 1) * IsDiscreteValuationRing.addVal ℤ_[l] ↑(abelian₂.pt U) := by
     rw [hval1, hptU]
     have hlt : 1 < (l - 1) * c := by
       have hp := (Fact.out : l.Prime).two_le
@@ -67,7 +74,8 @@ theorem UpperTheory.V.PropA.lteNorm :
         subst h2
         omega
       · have h3 : 2 ≤ l - 1 := by omega
-        calc 1 < 2 * 1 := by norm_num
+        calc
+          1 < 2 * 1 := by norm_num
           _ ≤ (l - 1) * c := Nat.mul_le_mul h3 hc1
     exact_mod_cast hlt
   have key := abelian₂.lte ℤ_[l] l Fact.out hlm U hcond n

@@ -10,8 +10,8 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem rootSum_isAdditive_and_pow_X_sub_one :
-    ∀ (F : Type) [Field F] (θ : AlgebraicClosure F →* ℂ) (k : ℕ),
+theorem rootSum_isAdditive_and_pow_X_sub_one
+    : ∀ (F : Type) [Field F] (θ : AlgebraicClosure F →* ℂ) (k : ℕ),
       IsAdditive (rootSum θ k) ∧ ∀ j : ℕ, rootSum θ k ((X - C 1 : F[X]) ^ j) = j := by
   intro F _ θ k
   refine ⟨fun P Q hP hQ => ?_, fun j => ?_⟩

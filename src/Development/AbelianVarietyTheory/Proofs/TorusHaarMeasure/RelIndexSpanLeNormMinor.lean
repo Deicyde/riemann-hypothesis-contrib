@@ -9,14 +9,25 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.AbsNormEq
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
 namespace GlobalTheory
 
-theorem relIndex_span_le_norm_minor :
-    (∀ (r : ℕ) (X : Data E r), ∃ C : ℝ, 0 < C ∧ ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (w : ι → Fin r → E), LinearIndependent E w → (∀ a, w a ∈ X.Λ) → ∀ e : ι → Fin r, Function.Injective e → (Matrix.of fun k a => w a (e k)).det ≠ 0 → (((Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup.relIndex (X.Λ.toAddSubgroup ⊓ (Submodule.span E (Set.range w)).toAddSubgroup)) : ℝ) ≤ C * ∏ τ : X.Ψ, ‖τ.1 (Matrix.of fun k a => w a (e k)).det‖ ^ 2) := by
+theorem relIndex_span_le_norm_minor
+    : (∀ (r : ℕ) (X : Data E r), ∃ C : ℝ,
+      0 < C
+        ∧ ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (w : ι → Fin r → E),
+          LinearIndependent E w → (∀ a, w a ∈ X.Λ)
+            → ∀ e : ι → Fin r,
+              Function.Injective e → (Matrix.of fun k a => w a (e k)).det ≠ 0
+                → (((Submodule.span (𝓞 E) (Set.range w)).toAddSubgroup.relIndex
+                      (X.Λ.toAddSubgroup ⊓ (Submodule.span E (Set.range w)).toAddSubgroup))
+                    : ℝ)
+                  ≤ C * ∏ τ : X.Ψ, ‖τ.1 (Matrix.of fun k a => w a (e k)).det‖ ^ 2) := by
   intro r X
   obtain ⟨n, hn, hint⟩ := (GlobalTheory.LatDen.latDen r X).2
   have hn1 : (1 : ℝ) ≤ n := by exact_mod_cast hn
@@ -36,14 +47,15 @@ theorem relIndex_span_le_norm_minor :
     intro h
     rw [h] at hdetA
     exact mul_ne_zero (pow_ne_zero _ hn0) hdet (hdetA.symm.trans rfl)
-  let φ : L →+ (ι → 𝓞 E) :=
-    { toFun := fun v k => ⟨(n : E) * v.1 (e k), hint _ v.2.1 _⟩
-      map_zero' := by
-        ext k
-        exact mul_zero (n : E)
-      map_add' := fun u v => by
-        ext k
-        exact mul_add (n : E) _ _ }
+  let φ : L →+ (ι → 𝓞 E) := {
+    toFun := fun v k => ⟨(n : E) * v.1 (e k), hint _ v.2.1 _⟩
+    map_zero' := by
+      ext k
+      exact mul_zero (n : E)
+    map_add' := fun u v => by
+      ext k
+      exact mul_add (n : E) _ _
+  }
   set R := (LinearMap.range A.mulVecLin).toAddSubgroup with hR
   have hidx := index_range_mulVecLin_eq_abs_norm_det ι A hA0
   rw [← hR] at hidx
@@ -60,8 +72,10 @@ theorem relIndex_span_le_norm_minor :
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Matrix.mulVecLin_apply, Matrix.mulVec, dotProduct, map_sum] at h
       apply mul_left_cancel₀ hn0
-      have h2 : (algebraMap (𝓞 E) E) (φ ⟨∑ i, b i • w i, hvΛ, hv⟩ k) =
-          (n : E) * (∑ i, b i • w i) (e k) := rfl
+      have h2
+          : (algebraMap (𝓞 E) E) (φ ⟨∑ i, b i • w i, hvΛ, hv⟩ k)
+            = (n : E) * (∑ i, b i • w i) (e k) :=
+        rfl
       rw [h2] at h
       have h3 : (M *ᵥ b) k = (∑ i, b i • w i) (e k) := by
         simp [Matrix.mulVec, dotProduct, hM, Finset.sum_apply, mul_comm]

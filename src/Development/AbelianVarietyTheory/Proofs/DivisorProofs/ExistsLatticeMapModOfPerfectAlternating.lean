@@ -12,23 +12,26 @@ namespace GlobalTheory
 
 open Module
 
-theorem exists_lattice_map_of_symplecticBasis {La : Type} [AddCommGroup La] {g : ℕ}
-    (EF : LinearMap.BilinForm ℤ La) (hB : EF.IsAlt) (b : Basis (Fin g ⊕ Fin g) ℤ La)
-    (d : Fin g → ℤ) (hb : IsSymplecticBasisOfType EF b d) (M : ℕ) (u t : Fin g → ℤ)
-    (ht : ∀ i, u i * d i = 1 + (M : ℤ) * t i) :
-    ∃ L : (Fin g ⊕ Fin g → ℤ) →+ La,
-      (∀ a, (∃ y, L a = M • y) ↔ ∃ c, a = M • c) ∧ (∀ x, ∃ a y, x = L a + M • y) ∧
-      ∀ a c, ∃ k : ℤ, EF (L a) (L c) = omegaStd a c + M * k := by
+theorem exists_lattice_map_of_symplecticBasis
+    {La : Type} [AddCommGroup La]
+    {g : ℕ}
+    (EF : LinearMap.BilinForm ℤ La) (hB : EF.IsAlt)
+    (b : Basis (Fin g ⊕ Fin g) ℤ La) (d : Fin g → ℤ) (hb : IsSymplecticBasisOfType EF b d)
+    (M : ℕ) (u t : Fin g → ℤ) (ht : ∀ i, u i * d i = 1 + (M : ℤ) * t i)
+    : ∃ L : (Fin g ⊕ Fin g → ℤ) →+ La,
+      (∀ a, (∃ y, L a = M • y) ↔ ∃ c, a = M • c) ∧ (∀ x, ∃ a y, x = L a + M • y)
+        ∧ ∀ a c, ∃ k : ℤ, EF (L a) (L c) = omegaStd a c + M * k := by
   classical
   let w : Fin g ⊕ Fin g → ℤ := Sum.elim u 1
   have hw : ∀ j, IsCoprime (w j) (M : ℤ) := by
     rintro (i | i)
-    · exact ⟨d i, -t i, by simp only [w, Sum.elim_inl]; linear_combination ht i⟩
+    · exact ⟨d i, - t i, by simp only [w, Sum.elim_inl]; linear_combination ht i⟩
     · exact isCoprime_one_left
-  let S : (Fin g ⊕ Fin g → ℤ) →ₗ[ℤ] (Fin g ⊕ Fin g → ℤ) :=
-    { toFun := fun a j => w j * a j
-      map_add' := fun a c => by funext j; simp [mul_add]
-      map_smul' := fun r a => by funext j; simp; ring }
+  let S : (Fin g ⊕ Fin g → ℤ) →ₗ[ℤ] (Fin g ⊕ Fin g → ℤ) := {
+    toFun := fun a j => w j * a j
+    map_add' := fun a c => by funext j; simp [mul_add]
+    map_smul' := fun r a => by funext j; simp; ring
+  }
   let L : (Fin g ⊕ Fin g → ℤ) →+ La := (b.equivFun.symm.toLinearMap ∘ₗ S).toAddMonoidHom
   have hrepr : ∀ v j, b.repr (b.equivFun.symm v) j = v j := fun v j => by
     rw [← Basis.equivFun_apply, LinearEquiv.apply_symm_apply]
@@ -45,8 +48,11 @@ theorem exists_lattice_map_of_symplecticBasis {La : Type} [AddCommGroup La] {g :
     exact ⟨c, funext fun j => by simp [hc j]⟩
   · rintro ⟨c, rfl⟩
     exact ⟨L c, map_nsmul L M c⟩
-  · refine ⟨Sum.elim (fun i => d i * b.repr x (Sum.inl i)) (fun i => b.repr x (Sum.inr i)),
-      b.equivFun.symm (Sum.elim (fun i => -(t i * b.repr x (Sum.inl i))) 0), ?_⟩
+  · refine ⟨
+      Sum.elim (fun i => d i * b.repr x (Sum.inl i)) (fun i => b.repr x (Sum.inr i)),
+      b.equivFun.symm (Sum.elim (fun i => -(t i * b.repr x (Sum.inl i))) 0),
+      ?_
+    ⟩
     apply b.repr.injective
     ext j
     rw [map_add (f := _), Finsupp.add_apply, hL, map_nsmul, Finsupp.smul_apply]
@@ -60,11 +66,15 @@ theorem exists_lattice_map_of_symplecticBasis {La : Type} [AddCommGroup La] {g :
     simp only [hL, w, Sum.elim_inl, Sum.elim_inr, Pi.one_apply, one_mul]
     linear_combination (a (Sum.inl i) * c (Sum.inr i) - a (Sum.inr i) * c (Sum.inl i)) * ht i
 
-theorem exists_lattice_map_mod_of_perfect : ∀ (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La] (EF : LinearMap.BilinForm ℤ La),
-  (∀ x, EF x x = 0) → Function.Injective EF → ∀ (e M : ℕ), (∀ f : La →ₗ[ℤ] ℤ, ∃ x, EF x = e • f) → M.Coprime e →
-  ∃ L : (Fin (Module.finrank ℤ La / 2) ⊕ Fin (Module.finrank ℤ La / 2) → ℤ) →+ La,
-    (∀ a, (∃ y, L a = M • y) ↔ ∃ c, a = M • c) ∧ (∀ x, ∃ a y, x = L a + M • y) ∧
-    ∀ a c, ∃ k : ℤ, EF (L a) (L c) = omegaStd a c + M * k := by
+theorem exists_lattice_map_mod_of_perfect
+    : ∀ (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La]
+        (EF : LinearMap.BilinForm ℤ La),
+      (∀ x, EF x x = 0) → Function.Injective EF
+        → ∀ (e M : ℕ),
+          (∀ f : La →ₗ[ℤ] ℤ, ∃ x, EF x = e • f) → M.Coprime e
+            → ∃ L : (Fin (Module.finrank ℤ La / 2) ⊕ Fin (Module.finrank ℤ La / 2) → ℤ) →+ La,
+              (∀ a, (∃ y, L a = M • y) ↔ ∃ c, a = M • c) ∧ (∀ x, ∃ a y, x = L a + M • y)
+                ∧ ∀ a c, ∃ k : ℤ, EF (L a) (L c) = omegaStd a c + M * k := by
   intro La _ _ _ EF halt hinj e M hperf hcop
   have hB : EF.IsAlt := halt
   obtain ⟨g, b, d, hb, -, -⟩ := exists_isSymplecticBasisOfType_pos hB hinj
@@ -77,12 +87,14 @@ theorem exists_lattice_map_mod_of_perfect : ∀ (La : Type) [AddCommGroup La] [M
     have h1 := hb.apply_right x i
     rw [hx] at h1
     simp only [LinearMap.smul_apply, Basis.coord_apply, Basis.repr_self, Finsupp.single_eq_same,
-      nsmul_eq_mul, mul_one] at h1
+        nsmul_eq_mul, mul_one]
+      at h1
     exact ⟨b.repr x (Sum.inl i), by rw [h1, mul_comm]⟩
   have hc : ∀ i, IsCoprime (M : ℤ) (d i) := fun i =>
     (Nat.isCoprime_iff_coprime.2 hcop).of_isCoprime_of_dvd_right (hde i)
   choose p u hpu using hc
-  exact exists_lattice_map_of_symplecticBasis EF hB b d hb M u (fun i => -p i)
+  exact exists_lattice_map_of_symplecticBasis EF hB b d hb M u
+    (fun i => - p i)
     (fun i => by linear_combination hpu i)
 
 end GlobalTheory

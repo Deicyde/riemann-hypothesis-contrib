@@ -8,7 +8,14 @@ open MeasureTheory Topology
 
 namespace GlobalTheory
 
-theorem addHaar_map_smul_of_norm_eq_one (K V : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (c : K) (hc : ‖c‖ = 1) : Measure.map (fun x : V => c • x) μ = μ := by
+theorem addHaar_map_smul_of_norm_eq_one
+    (K V : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K]
+    [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V]
+    [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V]
+    [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    (c : K) (hc : ‖c‖ = 1)
+    : Measure.map (fun x : V => c • x) μ = μ := by
   have hc0 : c ≠ 0 := by
     rintro rfl
     simp at hc
@@ -23,11 +30,9 @@ theorem addHaar_map_smul_of_norm_eq_one (K V : Type) [NontriviallyNormedField K]
   set k := Measure.addHaarScalarFactor (Measure.map (fun x : V => c • x) μ) μ
   obtain ⟨C, hC, hC0⟩ := exists_compact_mem_nhds (0 : V)
   let S : Set V := (fun p : K × V => p.1 • p.2) '' (Metric.sphere (0 : K) 1 ×ˢ C)
-  have hS : IsCompact S :=
-    ((isCompact_sphere (0 : K) 1).prod hC).image continuous_smul
+  have hS : IsCompact S := ((isCompact_sphere (0 : K) 1).prod hC).image continuous_smul
   have hCS : C ⊆ S := fun x hx => ⟨(1, x), ⟨by simp, hx⟩, by simp⟩
-  have hpos : μ S ≠ 0 :=
-    ((Measure.measure_pos_of_mem_nhds μ hC0).trans_le (measure_mono hCS)).ne'
+  have hpos : μ S ≠ 0 := ((Measure.measure_pos_of_mem_nhds μ hC0).trans_le (measure_mono hCS)).ne'
   have hfin : μ S ≠ ⊤ := hS.measure_lt_top.ne
   have hpre : (fun x : V => c • x) ⁻¹' S = S := by
     ext x

@@ -12,12 +12,14 @@ open scoped ENNReal NNReal
 
 namespace GlobalTheory.CompanionTheory.SW.FibreUniq
 
-theorem measure_eq_of_lintegral_eq {V : Type} [TopologicalSpace V] [LocallyCompactSpace V]
-    [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
+theorem measure_eq_of_lintegral_eq
+    {V : Type} [TopologicalSpace V] [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V]
+    [MeasurableSpace V] [BorelSpace V]
     (m m' : Measure V) (O : Set V) (hO : IsOpen O) (hm : m Oᶜ = 0) (hm' : m' Oᶜ = 0)
-    (h : ∀ φ : V → ℝ, Continuous φ → HasCompactSupport φ → tsupport φ ⊆ O → (∀ v, 0 ≤ φ v) →
-      Integrable φ m ∧ ∫⁻ v, ENNReal.ofReal (φ v) ∂m = ∫⁻ v, ENNReal.ofReal (φ v) ∂m') :
-    m = m' := by
+    (h : ∀ φ : V → ℝ,
+      Continuous φ → HasCompactSupport φ → tsupport φ ⊆ O → (∀ v, 0 ≤ φ v)
+        → Integrable φ m ∧ ∫⁻ v, ENNReal.ofReal (φ v) ∂m = ∫⁻ v, ENNReal.ofReal (φ v) ∂m')
+    : m = m' := by
   have hK : ∀ K : Set V, IsCompact K → K ⊆ O → m.restrict K = m'.restrict K := by
     intro K hK hKO
     obtain ⟨χ, h1, hc, hs, h01⟩ := exists_continuousMap_one_of_isCompact_subset_isOpen hK hO hKO
@@ -26,25 +28,29 @@ theorem measure_eq_of_lintegral_eq {V : Type} [TopologicalSpace V] [LocallyCompa
     have hint := (h χ χ.continuous hc hs (fun v => (h01 v).1)).1
     haveI : IsFiniteMeasure (m.withDensity fun v => ENNReal.ofReal (χ v)) :=
       isFiniteMeasure_withDensity_ofReal hint.2
-    have key : (m.withDensity fun v => ENNReal.ofReal (χ v)) =
-        m'.withDensity fun v => ENNReal.ofReal (χ v) := by
+    have key
+        : (m.withDensity fun v => ENNReal.ofReal (χ v))
+          = m'.withDensity fun v => ENNReal.ofReal (χ v) := by
       apply ext_of_forall_lintegral_eq_of_IsFiniteMeasure
       intro g
       have hg : Measurable fun v => (g v : ℝ≥0∞) :=
         measurable_coe_nnreal_ennreal.comp g.continuous.measurable
       rw [lintegral_withDensity_eq_lintegral_mul _ hχm hg,
         lintegral_withDensity_eq_lintegral_mul _ hχm hg]
-      have := (h (fun v => χ v * (g v : ℝ))
-        (χ.continuous.mul (NNReal.continuous_coe.comp g.continuous))
-        (HasCompactSupport.mul_right (f := fun v => χ v) hc)
-        ((tsupport_mul_subset_left (f := fun v => χ v)).trans hs)
-        (fun v => mul_nonneg (h01 v).1 (g v).2)).2
+      have :=
+        (h
+          (fun v => χ v * (g v : ℝ))
+          (χ.continuous.mul (NNReal.continuous_coe.comp g.continuous))
+          (HasCompactSupport.mul_right (f := fun v => χ v) hc)
+          ((tsupport_mul_subset_left (f := fun v => χ v)).trans hs)
+          (fun v => mul_nonneg (h01 v).1 (g v).2)).2
       have e : ∀ v, ENNReal.ofReal (χ v * (g v : ℝ)) = ENNReal.ofReal (χ v) * (g v : ℝ≥0∞) := by
         intro v
         rw [ENNReal.ofReal_mul (h01 v).1, ENNReal.ofReal_coe_nnreal]
       simpa only [e, Pi.mul_apply] using this
-    have aux : ∀ n : Measure V, (n.withDensity fun v => ENNReal.ofReal (χ v)).restrict K
-        = n.restrict K := by
+    have aux
+        : ∀ n : Measure V,
+          (n.withDensity fun v => ENNReal.ofReal (χ v)).restrict K = n.restrict K := by
       intro n
       rw [restrict_withDensity hK.measurableSet]
       have : (fun v => ENNReal.ofReal (χ v)) =ᵐ[n.restrict K] 1 := by
@@ -67,26 +73,30 @@ theorem measure_eq_of_lintegral_eq {V : Type} [TopologicalSpace V] [LocallyCompa
     filter_upwards [this] with v hv using hcov hv
   rw [← r m hm, ← r m' hm', hU]
 
-theorem ae_eq_of_isFibreFamily {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V]
-    [TopologicalSpace X] [MeasurableSpace X] {μ : Measure V} {ν : Measure X} {f : V → Y}
-    {g : V → X} {ι : X → Y} (hι : Function.Injective ι) (hf : ∀ v, f v = ι (g v))
+theorem ae_eq_of_isFibreFamily
+    {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [TopologicalSpace X] [MeasurableSpace X]
+    {μ : Measure V} {ν : Measure X} {f : V → Y} {g : V → X} {ι : X → Y}
+    (hι : Function.Injective ι) (hf : ∀ v, f v = ι (g v))
     {U : Set V} {B : Set X} {fib : X → Measure V}
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib) (b : X) :
-    ∀ᵐ v ∂(fib b), g v = b ∧ v ∈ U := by
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib)
+    (b : X)
+    : ∀ᵐ v ∂(fib b), g v = b ∧ v ∈ U := by
   have : ∀ᵐ v ∂(fib b), v ∈ f ⁻¹' {ι b} ∩ U := h.1 b
   filter_upwards [this] with v hv
   refine ⟨hι ?_, hv.2⟩
   rw [← hf v]
   exact hv.1
 
-theorem lintegral_preimage {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V]
-    [TopologicalSpace X] [MeasurableSpace X] [BorelSpace X] {μ : Measure V} {ν : Measure X}
-    {f : V → Y} {g : V → X} {ι : X → Y} (hι : Function.Injective ι) (hg : Continuous g)
-    (hf : ∀ v, f v = ι (g v)) {O U : Set V} {B : Set X} {fib : X → Measure V}
-    (hO : IsOpen O) (hU : O ⊆ U) (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib)
+theorem lintegral_preimage
+    {V X Y : Type} [TopologicalSpace V] [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X]
+    [MeasurableSpace X] [BorelSpace X]
+    {μ : Measure V} {ν : Measure X} {f : V → Y} {g : V → X} {ι : X → Y}
+    (hι : Function.Injective ι) (hg : Continuous g) (hf : ∀ v, f v = ι (g v))
+    {O U : Set V} {B : Set X} {fib : X → Measure V} (hO : IsOpen O) (hU : O ⊆ U)
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι U ν B fib)
     (φ : V → ℝ≥0∞) (hφ : Measurable φ) (hs : ∀ v, v ∉ O → φ v = 0)
-    (S : Set X) (hS : MeasurableSet S) :
-    ∫⁻ v in O, (g ⁻¹' S).indicator φ v ∂μ = ∫⁻ b in S, ∫⁻ v, φ v ∂(fib b) ∂ν := by
+    (S : Set X) (hS : MeasurableSet S)
+    : ∫⁻ v in O, (g ⁻¹' S).indicator φ v ∂μ = ∫⁻ b in S, ∫⁻ v, φ v ∂(fib b) ∂ν := by
   have h2 := h.2.1 ((g ⁻¹' S).indicator φ) (hφ.indicator (hg.measurable hS))
   have e1 : ∫⁻ v in U, (g ⁻¹' S).indicator φ v ∂μ = ∫⁻ v in O, (g ⁻¹' S).indicator φ v ∂μ := by
     have : (g ⁻¹' S).indicator φ = O.indicator ((g ⁻¹' S).indicator φ) := by
@@ -112,17 +122,23 @@ theorem lintegral_preimage {V X Y : Type} [TopologicalSpace V] [MeasurableSpace 
     filter_upwards [hb] with v hv
     exact indicator_of_notMem (by simpa [mem_preimage, hv.1] using hbS) _
 
-theorem fibreFamily_eq (V X Y : Type) [TopologicalSpace V] [LocallyCompactSpace V]
-    [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V]
-    [TopologicalSpace X] [LocallyCompactSpace X] [SecondCountableTopology X] [T2Space X]
-    [MeasurableSpace X] [BorelSpace X] (μ : Measure V) (ν : Measure X)
+theorem fibreFamily_eq
+    (V X Y : Type) [TopologicalSpace V] [LocallyCompactSpace V] [SecondCountableTopology V]
+    [T2Space V] [MeasurableSpace V] [BorelSpace V] [TopologicalSpace X] [LocallyCompactSpace X]
+    [SecondCountableTopology X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+    (μ : Measure V) (ν : Measure X)
     [IsLocallyFiniteMeasure μ] [IsLocallyFiniteMeasure ν] [ν.IsOpenPosMeasure]
-    (f : V → Y) (g : V → X) (ι : X → Y) (hι : Function.Injective ι) (hg : Continuous g)
-    (hf : ∀ v, f v = ι (g v)) (B B' : Set X) (hB : IsOpen B) (hB' : IsOpen B') (hBB : B' ⊆ B)
+    (f : V → Y) (g : V → X)
+    (ι : X → Y) (hι : Function.Injective ι)
+    (hg : Continuous g) (hf : ∀ v, f v = ι (g v))
+    (B B' : Set X) (hB : IsOpen B) (hB' : IsOpen B') (hBB : B' ⊆ B)
     (fib fib' : X → Measure V)
-    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B) ν B fib)
-    (h' : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B') ν B' fib')
-    (b : X) (hb : b ∈ B') : fib' b = fib b := by
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B) ν B
+      fib)
+    (h' : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsFibreFamily μ f ι (g ⁻¹' B') ν
+      B' fib')
+    (b : X) (hb : b ∈ B')
+    : fib' b = fib b := by
   have hO : IsOpen (g ⁻¹' B') := hB'.preimage hg
   have hOU : g ⁻¹' B' ⊆ g ⁻¹' B := preimage_mono hBB
   have carried : ∀ n : Measure V, (∀ᵐ v ∂n, g v = b) → n (g ⁻¹' B')ᶜ = 0 := by
@@ -149,7 +165,9 @@ theorem fibreFamily_eq (V X Y : Type) [TopologicalSpace V] [LocallyCompactSpace 
   have c' : ContinuousOn (fun b => ∫⁻ v, ENNReal.ofReal (φ v) ∂(fib' b)) B' :=
     (ENNReal.continuous_ofReal.comp_continuousOn hc2).congr fun b hb =>
       (ofReal_integral_eq_lintegral_ofReal (hi' b hb) (Filter.Eventually.of_forall h0)).symm
-  refine GlobalTheory.T.continuous_densities_eq_of_integrals_on_compacts X ν B' hB' _ _ c' c (fun S hS _ => ?_) b hb
+  refine GlobalTheory.T.continuous_densities_eq_of_integrals_on_compacts X ν B' hB' _ _ c' c
+    (fun S hS _ => ?_)
+    b hb
   rw [← lintegral_preimage hι hg hf hO subset_rfl h' _ hφm hφ0 S hS.measurableSet,
     ← lintegral_preimage hι hg hf hO hOU h _ hφm hφ0 S hS.measurableSet]
 

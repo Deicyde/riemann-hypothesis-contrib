@@ -21,7 +21,9 @@ variable {μ : Measure α} {ι : α → β} {𝓕 : Submodule ℂ (β → ℂ)}
 
 theorem pr_conj (f h : β → ℂ) : pr μ ι h f = star (pr μ ι f h) := by
   simp only [pr]
-  rw [show star (∫ x, f (ι x) * star (h (ι x)) ∂μ) = (starRingEnd ℂ) (∫ x, f (ι x) * star (h (ι x)) ∂μ) from rfl,
+  rw [show star (∫ x, f (ι x) * star (h (ι x)) ∂μ)
+        = (starRingEnd ℂ) (∫ x, f (ι x) * star (h (ι x)) ∂μ) from
+      rfl,
     ← integral_conj]
   congr 1
   funext x
@@ -31,13 +33,13 @@ theorem pr_smul_left (c : ℂ) (f h : β → ℂ) : pr μ ι (c • f) h = c * p
   simp only [pr, Pi.smul_apply, smul_eq_mul, mul_assoc]
   exact integral_const_mul c _
 
-theorem pr_add_left (hI : IntOn μ ι 𝓕) {f f' h : β → ℂ} (hf : f ∈ 𝓕) (hf' : f' ∈ 𝓕) (hh : h ∈ 𝓕) :
-    pr μ ι (f + f') h = pr μ ι f h + pr μ ι f' h := by
+theorem pr_add_left (hI : IntOn μ ι 𝓕) {f f' h : β → ℂ} (hf : f ∈ 𝓕) (hf' : f' ∈ 𝓕) (hh : h ∈ 𝓕)
+    : pr μ ι (f + f') h = pr μ ι f h + pr μ ι f' h := by
   simp only [pr, Pi.add_apply, add_mul]
   exact integral_add (hI f hf h hh) (hI f' hf' h hh)
 
-theorem pr_sub_left (hI : IntOn μ ι 𝓕) {f f' h : β → ℂ} (hf : f ∈ 𝓕) (hf' : f' ∈ 𝓕) (hh : h ∈ 𝓕) :
-    pr μ ι (f - f') h = pr μ ι f h - pr μ ι f' h := by
+theorem pr_sub_left (hI : IntOn μ ι 𝓕) {f f' h : β → ℂ} (hf : f ∈ 𝓕) (hf' : f' ∈ 𝓕) (hh : h ∈ 𝓕)
+    : pr μ ι (f - f') h = pr μ ι f h - pr μ ι f' h := by
   simp only [pr, Pi.sub_apply, sub_mul]
   exact integral_sub (hI f hf h hh) (hI f' hf' h hh)
 
@@ -61,23 +63,25 @@ variable (hI : IntOn μ ι 𝓕)
 
 def rep (x : X hI) : 𝓕 := (Submodule.Quotient.mk_surjective (N hI) x).choose
 
-theorem mk_rep (x : X hI) : Submodule.Quotient.mk (rep hI x) = x := (Submodule.Quotient.mk_surjective (N hI) x).choose_spec
+theorem mk_rep (x : X hI) : Submodule.Quotient.mk (rep hI x) = x :=
+  (Submodule.Quotient.mk_surjective (N hI) x).choose_spec
 
-private theorem pr_left_eq_of_sub_mem_N {f f' : 𝓕} (hf : f - f' ∈ N hI) (h : β → ℂ) (hh : h ∈ 𝓕) :
-    pr μ ι f.1 h = pr μ ι f'.1 h := by
+private theorem pr_left_eq_of_sub_mem_N {f f' : 𝓕} (hf : f - f' ∈ N hI) (h : β → ℂ) (hh : h ∈ 𝓕)
+    : pr μ ι f.1 h = pr μ ι f'.1 h := by
   have hf' : ∀ k ∈ 𝓕, pr μ ι (f - f').1 k = 0 := hf
   have := hf' h hh
   rw [Submodule.coe_sub, pr_sub_left hI f.2 f'.2 hh] at this
   exact sub_eq_zero.mp this
 
-theorem pr_eq_of_sub {f f' h h' : 𝓕} (hf : f - f' ∈ N hI) (hh : h - h' ∈ N hI) :
-    pr μ ι f.1 h.1 = pr μ ι f'.1 h'.1 := by
+theorem pr_eq_of_sub {f f' h h' : 𝓕} (hf : f - f' ∈ N hI) (hh : h - h' ∈ N hI)
+    : pr μ ι f.1 h.1 = pr μ ι f'.1 h'.1 := by
   rw [pr_left_eq_of_sub_mem_N hI hf h.1 h.2, pr_conj (μ := μ) (ι := ι) h.1 f'.1,
     pr_conj (μ := μ) (ι := ι) h'.1 f'.1, pr_left_eq_of_sub_mem_N hI hh f'.1 f'.2]
 
 def ip (x y : X hI) : ℂ := pr μ ι (rep hI x).1 (rep hI y).1
 
-theorem ip_mk (f h : 𝓕) : ip hI (Submodule.Quotient.mk f) (Submodule.Quotient.mk h) = pr μ ι f.1 h.1 := by
+theorem ip_mk (f h : 𝓕)
+    : ip hI (Submodule.Quotient.mk f) (Submodule.Quotient.mk h) = pr μ ι f.1 h.1 := by
   unfold ip
   apply pr_eq_of_sub hI
   · exact (Submodule.Quotient.eq _).mp (mk_rep hI _)
@@ -101,8 +105,7 @@ theorem ip_smul_left (c : ℂ) (x y : X hI) : ip hI (c • x) y = c * ip hI x y 
   rw [← Submodule.Quotient.mk_smul, ip_mk, ip_mk, Submodule.coe_smul, pr_smul_left]
 
 theorem ip_add_right (x y y' : X hI) : ip hI x (y + y') = ip hI x y + ip hI x y' := by
-  rw [ip_conj hI (y + y') x, ip_add_left, star_add, ← ip_conj hI y x,
-    ← ip_conj hI y' x]
+  rw [ip_conj hI (y + y') x, ip_add_left, star_add, ← ip_conj hI y x, ← ip_conj hI y' x]
 
 theorem ip_smul_right (c : ℂ) (x y : X hI) : ip hI x (c • y) = star c * ip hI x y := by
   rw [ip_conj hI (c • y) x, ip_smul_left, star_mul', ← ip_conj hI y x]
@@ -115,8 +118,7 @@ theorem ip_sub_left (x x' y : X hI) : ip hI (x - x') y = ip hI x y - ip hI x' y 
     pr_sub_left hI f.2 f'.2 h.2]
 
 theorem ip_sub_right (x y y' : X hI) : ip hI x (y - y') = ip hI x y - ip hI x y' := by
-  rw [ip_conj hI (y - y') x, ip_sub_left, star_sub, ← ip_conj hI y x,
-    ← ip_conj hI y' x]
+  rw [ip_conj hI (y - y') x, ip_sub_left, star_sub, ← ip_conj hI y x, ← ip_conj hI y' x]
 
 theorem eq_zero_of_ip (x : X hI) (hx : ∀ y, ip hI x y = 0) : x = 0 := by
   obtain ⟨f, rfl⟩ := Submodule.Quotient.mk_surjective (N hI) x
@@ -126,7 +128,8 @@ theorem eq_zero_of_ip (x : X hI) (hx : ∀ y, ip hI x y = 0) : x = 0 := by
   have := hx (Submodule.Quotient.mk ⟨h, hh⟩)
   rwa [ip_mk] at this
 
-theorem eq_of_ip_right {S T : Module.End ℂ (X hI)} (h : ∀ x y, ip hI x (S y) = ip hI x (T y)) : S = T := by
+theorem eq_of_ip_right {S T : Module.End ℂ (X hI)} (h : ∀ x y, ip hI x (S y) = ip hI x (T y))
+    : S = T := by
   refine LinearMap.ext fun y => ?_
   rw [← sub_eq_zero]
   apply eq_zero_of_ip hI
@@ -155,15 +158,19 @@ abbrev A := ↥(Adj hI)
 
 def adjOf (T : A hI) : Module.End ℂ (X hI) := T.2.choose
 
-theorem adjOf_spec (T : A hI) (x y : X hI) : ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x (adjOf hI T y) := T.2.choose_spec x y
+theorem adjOf_spec (T : A hI) (x y : X hI)
+    : ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x (adjOf hI T y) :=
+  T.2.choose_spec x y
 
 theorem adjOf_mem (T : A hI) : adjOf hI T ∈ Adj hI := by
   show ∃ T' : Module.End ℂ (X hI), ∀ x y, ip hI (adjOf hI T x) y = ip hI x (T' y)
   refine ⟨(T : Module.End ℂ (X hI)), fun x y => ?_⟩
   rw [ip_conj hI y (adjOf hI T x), ← adjOf_spec, ← ip_conj hI ((T : Module.End ℂ (X hI)) y) x]
 
-theorem adjOf_unique (T : A hI) (S : Module.End ℂ (X hI))
-    (h : ∀ x y, ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x (S y)) : adjOf hI T = S := by
+theorem adjOf_unique
+    (T : A hI) (S : Module.End ℂ (X hI))
+    (h : ∀ x y, ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x (S y))
+    : adjOf hI T = S := by
   apply eq_of_ip_right hI
   intro x y
   rw [← adjOf_spec, h]
@@ -172,11 +179,14 @@ instance instStar : Star (A hI) := ⟨fun T => ⟨adjOf hI T, adjOf_mem hI T⟩�
 
 theorem star_coe (T : A hI) : ((star T : A hI) : Module.End ℂ (X hI)) = adjOf hI T := rfl
 
-theorem star_spec (T : A hI) (x y : X hI) :
-    ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x (((star T : A hI) : Module.End ℂ (X hI)) y) := adjOf_spec hI T x y
+theorem star_spec (T : A hI) (x y : X hI)
+    : ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x (((star T : A hI) : Module.End ℂ (X hI)) y) :=
+  adjOf_spec hI T x y
 
-theorem star_eq_of (T S : A hI)
-    (h : ∀ x y, ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x ((S : Module.End ℂ (X hI)) y)) : star T = S := by
+theorem star_eq_of
+    (T S : A hI)
+    (h : ∀ x y, ip hI ((T : Module.End ℂ (X hI)) x) y = ip hI x ((S : Module.End ℂ (X hI)) y))
+    : star T = S := by
   apply Subtype.ext
   rw [star_coe]
   exact adjOf_unique hI T _ h
@@ -206,7 +216,6 @@ instance instStarModule : StarModule ℂ (A hI) where
     show ip hI (c • (T : Module.End ℂ (X hI)) x) y = ip hI x (star c • ((star T : A hI) : Module.End ℂ (X hI)) y)
     rw [ip_smul_left, ip_smul_right, star_star, star_spec]
 
-
 open scoped Classical in
 def mk' (f : β → ℂ) : X hI := by
   classical
@@ -219,7 +228,8 @@ theorem mk'_surj (x : X hI) : ∃ f ∈ 𝓕, mk' hI f = x := by
   obtain ⟨f, rfl⟩ := Submodule.Quotient.mk_surjective (N hI) x
   exact ⟨f.1, f.2, mk'_of hI f.2⟩
 
-theorem ip_mk' {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) : ip hI (mk' hI f) (mk' hI h) = pr μ ι f h := by
+theorem ip_mk' {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕)
+    : ip hI (mk' hI f) (mk' hI h) = pr μ ι f h := by
   rw [mk'_of hI hf, mk'_of hI hh, ip_mk]
 
 theorem mk'_add {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) : mk' hI (f + h) = mk' hI f + mk' hI h := by
@@ -230,7 +240,7 @@ theorem mk'_smul (c : ℂ) {f : β → ℂ} (hf : f ∈ 𝓕) : mk' hI (c • f)
   rw [mk'_of hI (𝓕.smul_mem c hf), mk'_of hI hf, ← Submodule.Quotient.mk_smul]
   rfl
 
-theorem mk'_neg {f : β → ℂ} (hf : f ∈ 𝓕) : mk' hI (-f) = -mk' hI f := by
+theorem mk'_neg {f : β → ℂ} (hf : f ∈ 𝓕) : mk' hI (-f) = - mk' hI f := by
   rw [mk'_of hI (𝓕.neg_mem hf), mk'_of hI hf, ← Submodule.Quotient.mk_neg]
   rfl
 
@@ -242,8 +252,10 @@ theorem mk'_zero : mk' hI (0 : β → ℂ) = 0 := by
   rw [mk'_of hI 𝓕.zero_mem]
   exact (Submodule.Quotient.mk_eq_zero _).mpr (N hI).zero_mem
 
-theorem A_ext {S T : A hI}
-    (h : ∀ f ∈ 𝓕, (S : Module.End ℂ (X hI)) (mk' hI f) = (T : Module.End ℂ (X hI)) (mk' hI f)) : S = T := by
+theorem A_ext
+    {S T : A hI}
+    (h : ∀ f ∈ 𝓕, (S : Module.End ℂ (X hI)) (mk' hI f) = (T : Module.End ℂ (X hI)) (mk' hI f))
+    : S = T := by
   apply Subtype.ext
   apply LinearMap.ext
   intro x
@@ -262,8 +274,8 @@ theorem pr_vanish {F : β → ℂ} (hF : ∀ g ∈ G, F g = 0) (h : β → ℂ) 
   simp [hF _ hx]
 
 include hG in
-theorem mk'_eq_of_eqOn {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) (he : ∀ g ∈ G, f g = h g) :
-    mk' hI f = mk' hI h := by
+theorem mk'_eq_of_eqOn {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) (he : ∀ g ∈ G, f g = h g)
+    : mk' hI f = mk' hI h := by
   rw [← sub_eq_zero, ← mk'_sub hI hf hh, mk'_of hI (𝓕.sub_mem hf hh), Submodule.Quotient.mk_eq_zero]
   show ∀ k ∈ 𝓕, pr μ ι (f - h) k = 0
   intro k _
@@ -278,44 +290,52 @@ structure AdjOp (Φ Φ' : (β → ℂ) → (β → ℂ)) : Prop where
 
 variable {G}
 
-theorem AdjOp.symm {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') :
-    AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ' Φ := by
+theorem AdjOp.symm {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ' Φ := by
   refine ⟨hΦ.mem', hΦ.mem, hΦ.lin', hΦ.lin, ?_⟩
   intro f hf h hh
   rw [pr_conj, ← hΦ.adj h hh f hf, ← pr_conj]
 
-private theorem adjOp_map_add_smul {Φ Φ' : (β → ℂ) → (β → ℂ)}
-    (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) (c : ℂ) :
-    ∀ g ∈ G, Φ (f + c • h) g = Φ f g + c * Φ h g :=
-  fun g hg => hΦ.lin f hf h hh c g hg
+private theorem adjOp_map_add_smul
+    {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕)
+    (c : ℂ)
+    : ∀ g ∈ G, Φ (f + c • h) g = Φ f g + c * Φ h g := fun g hg =>
+  hΦ.lin f hf h hh c g hg
 
-theorem AdjOp.zero {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') :
-    ∀ g ∈ G, Φ 0 g = 0 := by
+theorem AdjOp.zero {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    : ∀ g ∈ G, Φ 0 g = 0 := by
   intro g hg
   have := (_root_.PI.QnHermHaar.Gen.adjOp_map_add_smul hΦ) (𝓕.zero_mem) (𝓕.zero_mem) 1 g hg
   rw [smul_zero, add_zero] at this
   linear_combination -this
 
-theorem AdjOp.add {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
-    {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) : ∀ g ∈ G, Φ (f + h) g = Φ f g + Φ h g := by
+theorem AdjOp.add
+    {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕)
+    : ∀ g ∈ G, Φ (f + h) g = Φ f g + Φ h g := by
   intro g hg
   have := (_root_.PI.QnHermHaar.Gen.adjOp_map_add_smul hΦ) hf hh 1 g hg
   rwa [one_smul, one_mul] at this
 
-theorem AdjOp.smul {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
-    (c : ℂ) {h : β → ℂ} (hh : h ∈ 𝓕) : ∀ g ∈ G, Φ (c • h) g = c * Φ h g := by
+theorem AdjOp.smul
+    {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    (c : ℂ)
+    {h : β → ℂ} (hh : h ∈ 𝓕)
+    : ∀ g ∈ G, Φ (c • h) g = c * Φ h g := by
   intro g hg
   have := (_root_.PI.QnHermHaar.Gen.adjOp_map_add_smul hΦ) (𝓕.zero_mem) hh c g hg
   rwa [zero_add, hΦ.zero g hg, zero_add] at this
 
 variable (hG : ∀ᵐ x ∂μ, ι x ∈ G)
 
-def opF {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') : 𝓕 →ₗ[ℂ] X hI where
+def opF {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    : 𝓕 →ₗ[ℂ] X hI where
   toFun f := mk' hI (Φ f.1)
   map_add' f h := by
     show mk' hI (Φ (f.1 + h.1)) = mk' hI (Φ f.1) + mk' hI (Φ h.1)
-    rw [mk'_eq_of_eqOn hI G hG (hΦ.mem _ (𝓕.add_mem f.2 h.2)) (𝓕.add_mem (hΦ.mem _ f.2) (hΦ.mem _ h.2))
-      (fun g hg => by rw [hΦ.add f.2 h.2 g hg]; rfl)]
+    rw [mk'_eq_of_eqOn hI G hG (hΦ.mem _ (𝓕.add_mem f.2 h.2))
+      (𝓕.add_mem (hΦ.mem _ f.2) (hΦ.mem _ h.2)) (fun g hg => by rw [hΦ.add f.2 h.2 g hg]; rfl)]
     exact mk'_add hI (hΦ.mem _ f.2) (hΦ.mem _ h.2)
   map_smul' c f := by
     show mk' hI (Φ (c • f.1)) = c • mk' hI (Φ f.1)
@@ -323,7 +343,8 @@ def opF {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := 
       (fun g hg => by rw [hΦ.smul c f.2 g hg]; rfl)]
     exact mk'_smul hI c (hΦ.mem _ f.2)
 
-def opX {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') : Module.End ℂ (X hI) :=
+def opX {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    : Module.End ℂ (X hI) :=
   (N hI).liftQ (opF hI hG hΦ) (by
     intro f hf
     rw [LinearMap.mem_ker]
@@ -333,40 +354,49 @@ def opX {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := 
     rw [hΦ.adj f.1 f.2 h hh]
     exact hf _ (hΦ.mem' h hh))
 
-theorem opX_mk' {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
-    {f : β → ℂ} (hf : f ∈ 𝓕) : opX hI hG hΦ (mk' hI f) = mk' hI (Φ f) := by
+theorem opX_mk'
+    {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    {f : β → ℂ} (hf : f ∈ 𝓕)
+    : opX hI hG hΦ (mk' hI f) = mk' hI (Φ f) := by
   rw [mk'_of hI hf]
   rfl
 
-def toA {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') : A hI :=
-  ⟨opX hI hG hΦ, opX hI hG hΦ.symm, fun x y => by
+def toA {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') : A hI := ⟨
+  opX hI hG hΦ,
+  opX hI hG hΦ.symm,
+  fun x y => by
     obtain ⟨f, hf, rfl⟩ := mk'_surj hI x
     obtain ⟨h, hh, rfl⟩ := mk'_surj hI y
     rw [opX_mk' hI hG hΦ hf, opX_mk' hI hG hΦ.symm hh, ip_mk' hI (hΦ.mem _ hf) hh,
       ip_mk' hI hf (hΦ.mem' _ hh)]
-    exact hΦ.adj f hf h hh⟩
+    exact hΦ.adj f hf h hh
+⟩
 
-theorem toA_mk' {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
-    {f : β → ℂ} (hf : f ∈ 𝓕) : ((toA hI hG hΦ : A hI) : Module.End ℂ (X hI)) (mk' hI f) = mk' hI (Φ f) := opX_mk' hI hG hΦ hf
+theorem toA_mk'
+    {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    {f : β → ℂ} (hf : f ∈ 𝓕)
+    : ((toA hI hG hΦ : A hI) : Module.End ℂ (X hI)) (mk' hI f) = mk' hI (Φ f) :=
+  opX_mk' hI hG hΦ hf
 
-theorem star_toA {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') :
-    star (toA hI hG hΦ) = toA hI hG hΦ.symm := by
+theorem star_toA {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    : star (toA hI hG hΦ) = toA hI hG hΦ.symm := by
   apply star_eq_of
   intro x y
   obtain ⟨f, hf, rfl⟩ := mk'_surj hI x
   obtain ⟨h, hh, rfl⟩ := mk'_surj hI y
-  rw [toA_mk' hI hG hΦ hf, toA_mk' hI hG hΦ.symm hh,
-    ip_mk' hI (hΦ.mem _ hf) hh, ip_mk' hI hf (hΦ.mem' _ hh)]
+  rw [toA_mk' hI hG hΦ hf, toA_mk' hI hG hΦ.symm hh, ip_mk' hI (hΦ.mem _ hf) hh,
+    ip_mk' hI hf (hΦ.mem' _ hh)]
   exact hΦ.adj f hf h hh
 
 def RepOn (T : A hI) (Φ : (β → ℂ) → β → ℂ) : Prop :=
   ∀ f ∈ 𝓕, Φ f ∈ 𝓕 ∧ (T : Module.End ℂ (X hI)) (mk' hI f) = mk' hI (Φ f)
 
-theorem repOn_toA {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ') :
-    RepOn hI (toA hI hG hΦ) Φ := fun f hf => ⟨hΦ.mem f hf, toA_mk' hI hG hΦ hf⟩
+theorem repOn_toA {Φ Φ' : (β → ℂ) → (β → ℂ)} (hΦ : AdjOp (μ := μ) (ι := ι) (𝓕 := 𝓕) G Φ Φ')
+    : RepOn hI (toA hI hG hΦ) Φ := fun f hf =>
+  ⟨hΦ.mem f hf, toA_mk' hI hG hΦ hf⟩
 
-theorem repOn_mul {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ) :
-    RepOn hI (S * T) (fun f => Φ (Ψ f)) := by
+theorem repOn_mul {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ)
+    : RepOn hI (S * T) (fun f => Φ (Ψ f)) := by
   intro f hf
   obtain ⟨h1, h2⟩ := hT f hf
   obtain ⟨h3, h4⟩ := hS _ h1
@@ -374,8 +404,8 @@ theorem repOn_mul {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn
   show (S : Module.End ℂ (X hI)) ((T : Module.End ℂ (X hI)) (mk' hI f)) = mk' hI (Φ (Ψ f))
   rw [h2, h4]
 
-theorem repOn_add {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ) :
-    RepOn hI (S + T) (fun f => Φ f + Ψ f) := by
+theorem repOn_add {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ)
+    : RepOn hI (S + T) (fun f => Φ f + Ψ f) := by
   intro f hf
   obtain ⟨h1, h2⟩ := hS f hf
   obtain ⟨h3, h4⟩ := hT f hf
@@ -383,8 +413,8 @@ theorem repOn_add {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn
   show (S : Module.End ℂ (X hI)) (mk' hI f) + (T : Module.End ℂ (X hI)) (mk' hI f) = mk' hI (Φ f + Ψ f)
   rw [h2, h4, mk'_add hI h1 h3]
 
-theorem repOn_sub {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ) :
-    RepOn hI (S - T) (fun f => Φ f - Ψ f) := by
+theorem repOn_sub {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ)
+    : RepOn hI (S - T) (fun f => Φ f - Ψ f) := by
   intro f hf
   obtain ⟨h1, h2⟩ := hS f hf
   obtain ⟨h3, h4⟩ := hT f hf
@@ -392,16 +422,16 @@ theorem repOn_sub {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn
   show (S : Module.End ℂ (X hI)) (mk' hI f) - (T : Module.End ℂ (X hI)) (mk' hI f) = mk' hI (Φ f - Ψ f)
   rw [h2, h4, mk'_sub hI h1 h3]
 
-theorem repOn_neg {S : A hI} {Φ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) :
-    RepOn hI (-S) (fun f => -Φ f) := by
+theorem repOn_neg {S : A hI} {Φ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ)
+    : RepOn hI (-S) (fun f => - Φ f) := by
   intro f hf
   obtain ⟨h1, h2⟩ := hS f hf
   refine ⟨𝓕.neg_mem h1, ?_⟩
   show -(S : Module.End ℂ (X hI)) (mk' hI f) = mk' hI (-Φ f)
   rw [h2, mk'_neg hI h1]
 
-theorem repOn_smul (c : ℂ) {S : A hI} {Φ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) :
-    RepOn hI (c • S) (fun f => c • Φ f) := by
+theorem repOn_smul (c : ℂ) {S : A hI} {Φ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ)
+    : RepOn hI (c • S) (fun f => c • Φ f) := by
   intro f hf
   obtain ⟨h1, h2⟩ := hS f hf
   refine ⟨𝓕.smul_mem c h1, ?_⟩
@@ -423,8 +453,10 @@ theorem repOn_algebraMap (c : ℂ) : RepOn hI (algebraMap ℂ (A hI) c) (fun f =
 theorem repOn_intCast (n : ℤ) : RepOn hI ((n : A hI)) (fun f => (n : ℂ) • f) := by
   simpa only [map_intCast] using repOn_algebraMap hI (n : ℂ)
 
-theorem repOn_sum {γ : Type*} (s : Finset γ) {T : γ → A hI} {Φ : γ → (β → ℂ) → β → ℂ}
-    (h : ∀ c ∈ s, RepOn hI (T c) (Φ c)) : RepOn hI (∑ c ∈ s, T c) (fun f => ∑ c ∈ s, Φ c f) := by
+theorem repOn_sum
+    {γ : Type*} (s : Finset γ)
+    {T : γ → A hI} {Φ : γ → (β → ℂ) → β → ℂ} (h : ∀ c ∈ s, RepOn hI (T c) (Φ c))
+    : RepOn hI (∑ c ∈ s, T c) (fun f => ∑ c ∈ s, Φ c f) := by
   classical
   revert h
   refine Finset.induction_on s ?_ ?_
@@ -436,15 +468,17 @@ theorem repOn_sum {γ : Type*} (s : Finset γ) {T : γ → A hI} {Φ : γ → (�
     exact repOn_add hI (h a (Finset.mem_insert_self a s))
       (ih fun c hc => h c (Finset.mem_insert_of_mem hc))
 
-theorem repOn_ite (p : Prop) [Decidable p] {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ)
-    (hT : RepOn hI T Ψ) : RepOn hI (if p then S else T) (if p then Φ else Ψ) := by
+theorem repOn_ite
+    (p : Prop) [Decidable p]
+    {S T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hS : RepOn hI S Φ) (hT : RepOn hI T Ψ)
+    : RepOn hI (if p then S else T) (if p then Φ else Ψ) := by
   split_ifs
   · exact hS
   · exact hT
 
-theorem repOn_list (t : ℕ) (F : Fin t → A hI) (Φ : Fin t → (β → ℂ) → β → ℂ)
-    (h : ∀ k, RepOn hI (F k) (Φ k)) :
-    RepOn hI (List.ofFn F).prod (fun f => (List.ofFn Φ).foldr (fun T h => T h) f) := by
+theorem repOn_list
+    (t : ℕ) (F : Fin t → A hI) (Φ : Fin t → (β → ℂ) → β → ℂ) (h : ∀ k, RepOn hI (F k) (Φ k))
+    : RepOn hI (List.ofFn F).prod (fun f => (List.ofFn Φ).foldr (fun T h => T h) f) := by
   induction t with
   | zero =>
     simp only [List.ofFn_zero, List.prod_nil, List.foldr_nil]
@@ -453,10 +487,11 @@ theorem repOn_list (t : ℕ) (F : Fin t → A hI) (Φ : Fin t → (β → ℂ) �
     simp only [List.ofFn_succ, List.prod_cons, List.foldr_cons]
     exact repOn_mul hI (h 0) (ih (fun i => F i.succ) (fun i => Φ i.succ) (fun i => h i.succ))
 
-theorem pr_of_repOn {T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hT : RepOn hI T Φ) (hS : RepOn hI (star T) Ψ)
-    {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕) : pr μ ι (Φ f) h = pr μ ι f (Ψ h) := by
-  rw [← ip_mk' hI (hT f hf).1 hh, ← (hT f hf).2, star_spec, (hS h hh).2,
-    ip_mk' hI hf (hS h hh).1]
+theorem pr_of_repOn
+    {T : A hI} {Φ Ψ : (β → ℂ) → β → ℂ} (hT : RepOn hI T Φ) (hS : RepOn hI (star T) Ψ)
+    {f h : β → ℂ} (hf : f ∈ 𝓕) (hh : h ∈ 𝓕)
+    : pr μ ι (Φ f) h = pr μ ι f (Ψ h) := by
+  rw [← ip_mk' hI (hT f hf).1 hh, ← (hT f hf).2, star_spec, (hS h hh).2, ip_mk' hI hf (hS h hh).1]
 
 end onG
 

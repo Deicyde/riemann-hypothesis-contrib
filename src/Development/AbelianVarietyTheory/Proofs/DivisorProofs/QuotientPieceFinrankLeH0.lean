@@ -8,16 +8,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.AevalEqZeroO
 
 @[expose] public section
 
-open NumberField MvPolynomial GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.CompHt
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open NumberField MvPolynomial GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic
+  GlobalTheory.CompHt
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 
 open AlgebraicGeometry CategoryTheory
 
 namespace GlobalTheory.Adelic.LinSys
 
-theorem finrank_quotient_piece_le_sections (k : Type) [Field k] (S : LinSys k) (hS : S.IsVariety)
-    (m : ℕ) : Module.finrank k (quotPiece S.imageIdeal (m : ℤ)) ≤ lbH0 k (lbPow S.L m) := by
+theorem finrank_quotient_piece_le_sections
+    (k : Type) [Field k] (S : LinSys k) (hS : S.IsVariety) (m : ℕ)
+    : Module.finrank k (quotPiece S.imageIdeal (m : ℤ)) ≤ lbH0 k (lbPow S.L m) := by
   classical
   let : Module k (lbPow S.L m).Sec := Module.compHom (lbPow S.L m).Sec (algebraMap k Γ(S.Y, ⊤))
   have : IsScalarTower k Γ(S.Y, ⊤) (lbPow S.L m).Sec :=
@@ -31,11 +34,13 @@ theorem finrank_quotient_piece_le_sections (k : Type) [Field k] (S : LinSys k) (
   rw [lineBundleGlobalSectionsDim_eq_finrank]
   let V := homogeneousSubmodule (Fin S.N) k m
 
-  let φ : V →ₗ[k] (lbPow S.L m).Sec :=
-    { toFun := fun g => S.form g.2
-      map_add' := fun g h => (ProjCoh.formSecAdd k S.b (m : ℤ)).map_add
-        ⟨g.1, mem_polyGrading_natCast.2 g.2⟩ ⟨h.1, mem_polyGrading_natCast.2 h.2⟩
-      map_smul' := fun c g => ProjCoh.formSec_smul k S.b c (mem_polyGrading_natCast.2 g.2) _ }
+  let φ : V →ₗ[k] (lbPow S.L m).Sec := {
+    toFun := fun g => S.form g.2
+    map_add' := fun g h =>
+      (ProjCoh.formSecAdd k S.b (m : ℤ)).map_add ⟨g.1, mem_polyGrading_natCast.2 g.2⟩
+        ⟨h.1, mem_polyGrading_natCast.2 h.2⟩
+    map_smul' := fun c g => ProjCoh.formSec_smul k S.b c (mem_polyGrading_natCast.2 g.2) _
+  }
 
   let f : V →ₗ[k] MvPolynomial (Fin S.N) k ⧸ S.imageIdeal :=
     (Ideal.Quotient.mkₐ k S.imageIdeal).toLinearMap ∘ₗ V.subtype

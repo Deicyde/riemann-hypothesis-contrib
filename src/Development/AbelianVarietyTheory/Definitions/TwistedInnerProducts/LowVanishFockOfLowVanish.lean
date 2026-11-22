@@ -9,8 +9,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PtYAn
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField Matrix
-open GlobalTheory.Chain GlobalTheory.Size GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField
+  Matrix
+open GlobalTheory.Chain GlobalTheory.Size
+  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators
 open scoped ENNReal ComplexOrder
 
 namespace GlobalTheory.ChainFr.Model
@@ -19,8 +23,10 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 variable {D : D7}
 
-theorem exists_sign_frame {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ} (hG : G.IsHermitian) (hu : IsUnit G.det) :
-    ∃ (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ), IsUnit A ∧ Aᴴ * Formalism.REAL.Jm ε * A = G := by
+theorem exists_sign_frame
+    {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ} (hG : G.IsHermitian) (hu : IsUnit G.det)
+    : ∃ (ε : Fin n → Bool) (A : Matrix (Fin n) (Fin n) ℂ),
+      IsUnit A ∧ Aᴴ * Formalism.REAL.Jm ε * A = G := by
   classical
   have hne : ∀ i, hG.eigenvalues i ≠ 0 := by
     intro i h0
@@ -37,11 +43,11 @@ theorem exists_sign_frame {n : ℕ} {G : Matrix (Fin n) (Fin n) ℂ} (hG : G.IsH
     · rw [isUnit_diagonal, Pi.isUnit_iff]
       intro i
       simp [d, hne i]
-    · have : Uᴴ * U = 1 := by
-        rw [hU, ← star_eq_conjTranspose]; exact Unitary.coe_star_mul_self _
+    · have : Uᴴ * U = 1 := by rw [hU, ← star_eq_conjTranspose]; exact Unitary.coe_star_mul_self _
       exact IsUnit.of_mul_eq_one _ this
-  · have key : (diagonal d)ᴴ * Formalism.REAL.Jm (fun i => decide (0 < hG.eigenvalues i)) * diagonal d =
-        diagonal (fun i => ((hG.eigenvalues i : ℝ) : ℂ)) := by
+  · have key
+        : (diagonal d)ᴴ * Formalism.REAL.Jm (fun i => decide (0 < hG.eigenvalues i)) * diagonal d
+          = diagonal (fun i => ((hG.eigenvalues i : ℝ) : ℂ)) := by
       rw [diagonal_conjTranspose, Formalism.REAL.Jm, diagonal_mul_diagonal, diagonal_mul_diagonal]
       congr 1
       funext i
@@ -63,28 +69,38 @@ theorem nonempty_fr (V : HSp D) : Nonempty (Fr V) := by
     (GlobalTheory.SmoothForms.RealPts.gramAt_herm V τ) (GlobalTheory.SmoothForms.RealPts.gramAt_unit V τ)
   exact ⟨⟨ε, A, hA, hG⟩⟩
 
-theorem isCartanInv_cart {V : HSp D} (A : Fr V) (τ : D.what₂.Tau) : IsCartanInv (gramAt D V τ) (A.cart τ) := by
+theorem isCartanInv_cart {V : HSp D} (A : Fr V) (τ : D.what₂.Tau)
+    : IsCartanInv (gramAt D V τ) (A.cart τ) := by
   have hd := (isUnit_iff_isUnit_det _).1 (A.fr_unit τ)
   have hJ := Formalism.REAL.Jm_mul_self (A.ε τ)
   have hJc := Formalism.REAL.Jm_conjTranspose (A.ε τ)
-  have hJJ : ∀ X : Matrix (Fin V.rank) (Fin V.rank) ℂ, Formalism.REAL.Jm (A.ε τ) * (Formalism.REAL.Jm (A.ε τ) * X) = X :=
-    fun X => by rw [← Matrix.mul_assoc, hJ, Matrix.one_mul]
+  have hJJ
+      : ∀ X : Matrix (Fin V.rank) (Fin V.rank) ℂ,
+        Formalism.REAL.Jm (A.ε τ) * (Formalism.REAL.Jm (A.ε τ) * X) = X := fun X => by
+    rw [← Matrix.mul_assoc, hJ, Matrix.one_mul]
   have h1 : A.fr τ * A.cart τ = Formalism.REAL.Jm (A.ε τ) * A.fr τ := by
     simp only [Fr.cart, Matrix.mul_assoc, Matrix.mul_nonsing_inv_cancel_left _ _ hd]
   have h2 : gramAt D V τ * A.cart τ = (A.fr τ)ᴴ * A.fr τ := by
     rw [← A.fr_gram τ, Matrix.mul_assoc, h1, Matrix.mul_assoc, hJJ]
   refine ⟨?_, ?_, ?_⟩
-  · simp only [Fr.cart, Matrix.mul_assoc, Matrix.mul_nonsing_inv_cancel_left _ _ hd, hJJ, Matrix.nonsing_inv_mul _ hd]
-  · rw [Matrix.mul_assoc, h2, ← Matrix.mul_assoc, ← conjTranspose_mul, h1, conjTranspose_mul, hJc, A.fr_gram]
+  · simp only [Fr.cart, Matrix.mul_assoc, Matrix.mul_nonsing_inv_cancel_left _ _ hd, hJJ,
+      Matrix.nonsing_inv_mul _ hd]
+  · rw [Matrix.mul_assoc, h2, ← Matrix.mul_assoc, ← conjTranspose_mul, h1, conjTranspose_mul, hJc,
+      A.fr_gram]
   · rw [h2]
-    exact Matrix.PosDef.conjTranspose_mul_self _ (Matrix.mulVec_injective_iff_isUnit.2 (A.fr_unit τ))
+    exact Matrix.PosDef.conjTranspose_mul_self _
+      (Matrix.mulVec_injective_iff_isUnit.2 (A.fr_unit τ))
 
-theorem exists_vac {V W : HSp D} (A : Fr V) (B : Fr W) {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D}
-    (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ) :
-    ∃ f, f ≠ 0 ∧ IsVacF ψ θ A B f ∧ ptF ψ θ A B f 1 = f ∧
-      ∃ U : AddSubgroup (WO V W), IsOpen (U : Set (WO V W)) ∧ f ∈ fockSpan ψ θ A B U := by
-  obtain ⟨f, f0, hf⟩ := GlobalTheory.VacuumO.exists_ne_zero ψ θ hψ hθ V W _ _ (isCartanInv_cart A) (isCartanInv_cart B) _ _
-    (GlobalTheory.PlaceModel.isSelfDualC_latFrame _) (GlobalTheory.PlaceModel.isSelfDualC_latFrame _)
+theorem exists_vac
+    {V W : HSp D} (A : Fr V) (B : Fr W)
+    {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ)
+    : ∃ f,
+      f ≠ 0 ∧ IsVacF ψ θ A B f ∧ ptF ψ θ A B f 1 = f
+        ∧ ∃ U : AddSubgroup (WO V W), IsOpen (U : Set (WO V W)) ∧ f ∈ fockSpan ψ θ A B U := by
+  obtain ⟨f, f0, hf⟩ :=
+    GlobalTheory.VacuumO.exists_ne_zero ψ θ hψ hθ V W _ _ (isCartanInv_cart A) (isCartanInv_cart B)
+      _ _ (GlobalTheory.PlaceModel.isSelfDualC_latFrame _)
+      (GlobalTheory.PlaceModel.isSelfDualC_latFrame _)
   have h : IsVacF ψ θ A B f := ⟨by simpa using (hf 1).1, by simpa using (hf 1).2.2⟩
   have e : ptF ψ θ A B f 1 = f := by
     have h1 : (1 : PolF D W.rank V.rank) = MvPolynomial.basisMonomials _ ℂ 0 := by

@@ -9,13 +9,14 @@ open Polynomial
 
 namespace GlobalTheory
 
-theorem hasseJet_vanishing_mem_pow (k A : Type) [Field k] [IsAlgClosed k] [CommRing A]
-    [IsDedekindDomain A] [Algebra k A] [Algebra.FiniteType k A] (N : ℕ) (Δ : ℕ → A →ₗ[k] k)
-    (hN : 2 ≤ N) (h01 : Δ 0 1 = 1)
+theorem hasseJet_vanishing_mem_pow
+    (k A : Type) [Field k] [IsAlgClosed k] [CommRing A] [IsDedekindDomain A] [Algebra k A]
+    [Algebra.FiniteType k A]
+    (N : ℕ) (Δ : ℕ → A →ₗ[k] k) (hN : 2 ≤ N) (h01 : Δ 0 1 = 1)
     (hL : ∀ l < N, ∀ u w : A, Δ l (u * w) = ∑ p ∈ Finset.range (l + 1), Δ p u * Δ (l - p) w)
-    (hπ : ∃ π : A, Δ 1 π = 1) :
-    ∃ Q : Ideal A, Q.IsMaximal ∧ (∀ u, u ∈ Q ↔ Δ 0 u = 0) ∧
-      ∀ f : A, (∀ l < N, Δ l f = 0) → f ∈ Q ^ N := by
+    (hπ : ∃ π : A, Δ 1 π = 1)
+    : ∃ Q : Ideal A,
+      Q.IsMaximal ∧ (∀ u, u ∈ Q ↔ Δ 0 u = 0) ∧ ∀ f : A, (∀ l < N, Δ l f = 0) → f ∈ Q ^ N := by
   classical
   obtain ⟨π, hπ⟩ := hπ
   have hN0 : 0 < N := by omega
@@ -24,12 +25,13 @@ theorem hasseJet_vanishing_mem_pow (k A : Type) [Field k] [IsAlgClosed k] [CommR
     intro u w
     have := hL 0 hN0 u w
     simpa using this
-  let φ : A →+* k :=
-    { toFun := Δ 0
-      map_one' := h01
-      map_mul' := hmul0
-      map_zero' := map_zero _
-      map_add' := map_add _ }
+  let φ : A →+* k := {
+    toFun := Δ 0
+    map_one' := h01
+    map_mul' := hmul0
+    map_zero' := map_zero _
+    map_add' := map_add _
+  }
   have hφ : ∀ u, φ u = Δ 0 u := fun _ => rfl
   have halg : ∀ l c, Δ l (algebraMap k A c) = c * Δ l 1 := by
     intro l c
@@ -108,7 +110,9 @@ theorem hasseJet_vanishing_mem_pow (k A : Type) [Field k] [IsAlgClosed k] [CommR
     have htop : J ^ j ⊔ Q = ⊤ := by
       rw [sup_comm]
       exact Ideal.sup_pow_eq_top hJQ
-    calc Q ^ j = Q ^ j * (J ^ j ⊔ Q) := by rw [htop, Ideal.mul_top]
+    calc
+      Q ^ j
+        = Q ^ j * (J ^ j ⊔ Q) := by rw [htop, Ideal.mul_top]
       _ = Q ^ j * J ^ j ⊔ Q ^ j * Q := Ideal.mul_sup _ _ _
       _ = Ideal.span {x ^ j} ⊔ Q ^ (j + 1) := by
         rw [← mul_pow, ← hJ, Ideal.span_singleton_pow, pow_succ]
@@ -126,7 +130,8 @@ theorem hasseJet_vanishing_mem_pow (k A : Type) [Field k] [IsAlgClosed k] [CommR
       have hfj : Δ j f = 0 := hf j (by omega)
       have ha : Δ 0 a = 0 := by
         rw [← hyz, map_add (f := _), hzv, add_zero, mul_comm a, hL j (by omega),
-          Finset.sum_eq_single j] at hfj
+            Finset.sum_eq_single j]
+          at hfj
         · rwa [hxpow j (by omega), Nat.sub_self, one_mul] at hfj
         · intro p hp hpj
           have hp' := Finset.mem_range.mp hp

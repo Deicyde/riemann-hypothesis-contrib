@@ -13,11 +13,13 @@ namespace ReciprocityTheory.PGsh
 
 namespace Ainf
 
-variable (p : ℕ) [hp : Fact p.Prime] {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
-  {v : Valuation C NNReal} (O : Type) [CommRing O] [Algebra O C]
-  [Fact ¬IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
-  (hv : v.Integers O) (ε : PreTilt O p)
-  (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
+variable
+  (p : ℕ) [hp : Fact p.Prime]
+  {C : Type} [Field C] [IsAlgClosed C] [CharZero C]
+  {v : Valuation C NNReal}
+  (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (span {(p : O)}) O]
+  (hv : v.Integers O)
+  (ε : PreTilt O p) (hε : IsPrimitiveRoot (((frobeniusEquiv (PreTilt O p) p).symm ε).untilt) p)
 
 def r'Alg (n : ℕ) : R'n p O ε (n + 1) →ₐ[R0 p O ε] R'n p O ε n :=
   Ideal.Quotient.liftₐ _ (Ideal.Quotient.mkₐ (R0 p O ε) _) (fun a ha => by
@@ -26,15 +28,16 @@ def r'Alg (n : ℕ) : R'n p O ε (n + 1) →ₐ[R0 p O ε] R'n p O ε n :=
     exact Ideal.mem_span_singleton'.2 ⟨b * p, by ring⟩)
 
 def rRing (n : ℕ) : Rn p O (n + 1) →+* Rn p O n :=
-  Ideal.Quotient.lift (span {(p : O) ^ (n + 1 + 1)})
-    (Ideal.Quotient.mk (span {(p : O) ^ (n + 1)})) (fun a ha => by
+  Ideal.Quotient.lift (span {(p : O) ^ (n + 1 + 1)}) (Ideal.Quotient.mk (span {(p : O) ^ (n + 1)}))
+    (fun a ha => by
       obtain ⟨b, rfl⟩ := Ideal.mem_span_singleton'.1 ha
       rw [Ideal.Quotient.eq_zero_iff_mem]
       exact Ideal.mem_span_singleton'.2 ⟨b * p, by ring⟩)
 
-def rAlg (n : ℕ) : (LR p O hv ε hε (n + 1) : Type) →ₐ[R0 p O ε] (LR p O hv ε hε n : Type) :=
-  { toRingHom := rRing p O n
-    commutes' := fun _ => rfl }
+def rAlg (n : ℕ) : (LR p O hv ε hε (n + 1) : Type) →ₐ[R0 p O ε] (LR p O hv ε hε n : Type) := {
+  toRingHom := rRing p O n
+  commutes' := fun _ => rfl
+}
 
 lemma r'Alg_surj (n : ℕ) : Function.Surjective (r'Alg p O ε n) := by
   intro y
@@ -116,12 +119,10 @@ lemma root_pow_one (n : ℕ) : root p O ε (n + 1) ^ p ^ n = root p O ε 1 := by
 theorem zeta_succ_pow (n : ℕ) : zetaV p O ε (n + 1) ^ p = zetaV p O ε n := by
   rw [zetaV, zetaV, ← map_pow, ← map_pow, root_succ_pow]
 
-
 include hv hε in
 theorem zeta_primitive (n : ℕ) : IsPrimitiveRoot (zetaV p O ε n) (p ^ (n + 1)) := by
   have hz1 : zetaV p O ε n ^ p ^ (n + 1) = 1 := by
-    rw [zetaV, ← map_pow, ← map_pow, root_pow, fontaineTheta_teichmuller,
-      untilt_eps p O hv ε hε]
+    rw [zetaV, ← map_pow, ← map_pow, root_pow, fontaineTheta_teichmuller, untilt_eps p O hv ε hε]
   have hzn : zetaV p O ε n ^ p ^ n ≠ 1 := by
     rw [zetaV, ← map_pow, ← map_pow, root_pow_one, fontaineTheta_teichmuller]
     exact hε.ne_one hp.out.one_lt
@@ -136,12 +137,10 @@ theorem zeta_primitive (n : ℕ) : IsPrimitiveRoot (zetaV p O ε n) (p ^ (n + 1)
   rw [← hjn, ← hj']
   exact IsPrimitiveRoot.orderOf _
 
-
 include hv hε in
 theorem c_val : v (algebraMap O C (fontaineTheta O p (nu p O ε))) ^ (p - 1) = v (p : C) := by
   obtain ⟨-, -, -, hX, -, -⟩ := a0 p C v O hv
   exact (hX ε hv hε).2.2.1
-
 
 end Ainf
 

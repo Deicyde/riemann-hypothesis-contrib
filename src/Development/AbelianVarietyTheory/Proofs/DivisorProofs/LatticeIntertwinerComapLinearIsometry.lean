@@ -6,18 +6,31 @@ public import Formalism.LocalToGlobal.InertKernelTheory.StatementAlg
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Th1.H GlobalTheory.BaseVacuum
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Ker Formalism.L2.Th1.H
+  GlobalTheory.BaseVacuum
 open Classical
 
 namespace GlobalTheory
 
-theorem inter_comap_isom : ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] (H : Sesq V) (H' : Sesq W) (Φ : V ≃ₗ[ℂ] W), (∀ x y, H x y = H' (Φ x) (Φ y)) → IsHerm H' → ∀ (Λ₁ Λ₂ : AddSubgroup W) (α : W → ℂ) (F : W → ℂ), IsSemiChar H' Λ₂ α → F ∈ fixedBy H' α Λ₁ → relIdx Λ₁ Λ₂ ≠ 0 → ∀ z, inter H (fun v => α (Φ v)) (Λ₁.comap (Φ : V →ₗ[ℂ] W).toAddMonoidHom) (Λ₂.comap (Φ : V →ₗ[ℂ] W).toAddMonoidHom) (fun v => F (Φ v)) z = inter H' α Λ₁ Λ₂ F (Φ z) := by
+theorem inter_comap_isom
+    : ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W] (H : Sesq V)
+        (H' : Sesq W) (Φ : V ≃ₗ[ℂ] W),
+      (∀ x y, H x y = H' (Φ x) (Φ y)) → IsHerm H'
+        → ∀ (Λ₁ Λ₂ : AddSubgroup W) (α : W → ℂ) (F : W → ℂ),
+          IsSemiChar H' Λ₂ α → F ∈ fixedBy H' α Λ₁ → relIdx Λ₁ Λ₂ ≠ 0
+            → ∀ z,
+              inter H
+                  (fun v => α (Φ v))
+                  (Λ₁.comap (Φ : V →ₗ[ℂ] W).toAddMonoidHom)
+                  (Λ₂.comap (Φ : V →ₗ[ℂ] W).toAddMonoidHom)
+                  (fun v => F (Φ v))
+                  z
+                = inter H' α Λ₁ Λ₂ F (Φ z) := by
   intro V W _ _ _ _ H H' Φ hΦ hH' Λ₁ Λ₂ α F hα hF hn z
   set f : V →+ W := (Φ : V →ₗ[ℂ] W).toAddMonoidHom with hf
   have hfs : Function.Surjective f := Φ.surjective
   have hfx : ∀ v, f v = Φ v := fun v => rfl
-  have hH : IsHerm H := by
-    intro x y; rw [hΦ, hΦ, hH']
+  have hH : IsHerm H := by intro x y; rw [hΦ, hΦ, hH']
   have hα' : IsSemiChar H (Λ₂.comap f) (fun v => α (Φ v)) := by
     refine ⟨fun x hx => hα.1 (Φ x) hx, fun x hx y hy => ?_⟩
     have := hα.2 (Φ x) hx (Φ y) hy
@@ -39,7 +52,8 @@ theorem inter_comap_isom : ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [Add
     · intro w hw
       obtain ⟨x, hx, rfl⟩ := Finset.mem_image.1 hw
       show f (Φ.symm x) ∈ Λ₂
-      rw [hfx, LinearEquiv.apply_symm_apply]; exact hS.1 x hx
+      rw [hfx, LinearEquiv.apply_symm_apply]
+      exact hS.1 x hx
     · intro w hw w' hw' hd
       obtain ⟨x, hx, rfl⟩ := Finset.mem_image.1 hw
       obtain ⟨x', hx', rfl⟩ := Finset.mem_image.1 hw'
@@ -51,7 +65,8 @@ theorem inter_comap_isom : ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [Add
       obtain ⟨x, hx, hd⟩ := hS.2.2 (Φ y) hy
       refine ⟨Φ.symm x, Finset.mem_image.2 ⟨x, hx, rfl⟩, ?_⟩
       show f (y - Φ.symm x) ∈ Λ₁
-      rw [hfx, map_sub, LinearEquiv.apply_symm_apply]; exact hd
+      rw [hfx, map_sub, LinearEquiv.apply_symm_apply]
+      exact hd
   rw [InterReps_of semicharacterHom V H hH _ _ _ hα' _ hF' _ hS' z,
     InterReps_of semicharacterHom W H' hH' _ _ _ hα _ hF _ hS (Φ z), hidx]
   congr 1

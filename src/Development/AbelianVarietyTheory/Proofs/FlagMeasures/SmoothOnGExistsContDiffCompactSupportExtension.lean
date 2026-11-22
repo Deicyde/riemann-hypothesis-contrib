@@ -7,16 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsContDif
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory
 
-theorem smoothOnG_exists_contDiff_compactSupport_extension :
-    ∀ (n : ℕ) (ε : Fin n → Bool) (β : Matrix (Fin n) (Fin n) ℂ → ℂ), SmoothOnG ε β →
-      HasCompactSupport (fun g : UJ ε => β (umat g)) →
-      ∃ F : (Fin n → Fin n → ℂ) → ℂ, ContDiff ℝ ∞ F ∧ HasCompactSupport F ∧
-        ∀ g : UJ ε, β (umat g) = F (fun i j => umat g i j) := by
+theorem smoothOnG_exists_contDiff_compactSupport_extension
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (β : Matrix (Fin n) (Fin n) ℂ → ℂ),
+      SmoothOnG ε β → HasCompactSupport (fun g : UJ ε => β (umat g))
+        → ∃ F : (Fin n → Fin n → ℂ) → ℂ,
+          ContDiff ℝ ∞ F ∧ HasCompactSupport F
+            ∧ ∀ g : UJ ε, β (umat g) = F (fun i j => umat g i j) := by
   intro n ε β hβ hc
   obtain ⟨F₀, hF₀, hF₀eq⟩ := smoothOnG_exists_contDiff_extension n ε β hβ
 
@@ -25,8 +27,10 @@ theorem smoothOnG_exists_contDiff_compactSupport_extension :
       Units.continuous_val.comp continuous_subtype_val
     exact continuous_pi fun i => continuous_pi fun j => hu.matrix_elem i j
 
-  have hK : IsCompact ((fun g : UJ ε => (fun i j => umat g i j : Fin n → Fin n → ℂ)) ''
-      tsupport (fun g : UJ ε => β (umat g))) := hc.isCompact.image hp
+  have hK : IsCompact
+      ((fun g : UJ ε => (fun i j => umat g i j : Fin n → Fin n → ℂ))
+        '' tsupport (fun g : UJ ε => β (umat g))) :=
+    hc.isCompact.image hp
   obtain ⟨R, hR⟩ := hK.isBounded.subset_closedBall 0
 
   let χ : ContDiffBump (0 : Fin n → Fin n → ℂ) :=

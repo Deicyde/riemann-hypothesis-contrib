@@ -6,24 +6,37 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Kerne
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix GlobalTheory.TwU GlobalTheory.TwU.AtTrue
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix GlobalTheory.TwU
+  GlobalTheory.TwU.AtTrue
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TwU.AtTrue.Cl
 
-
 open Classical in
-theorem sameCoset_of_mem_cosetIn {X : Fields} {Pr : Primes X} {R : Ranks} {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)}
-    {S : Set ℕ} {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)} {u : Pr.Word} {j : ℕ} (p : PtAt R sel mu cst u j)
-    (h : j + 1 = R.m) (P : rowSG Pr sel mu) {z z' : Sp X.E (R.N j)} (hz : z ∈ cosetIn p P) (hz' : z' ∈ cosetIn p P) :
-    SameCoset sel mu cst P z z' := by
+theorem sameCoset_of_mem_cosetIn
+    {X : Fields} {Pr : Primes X} {R : Ranks}
+    {sel : HeightOneSpectrum (𝓞 X.F) → HeightOneSpectrum (𝓞 X.E)} {S : Set ℕ}
+    {mu : Tup X.F X.E X.K S} {cst : LocCst X (rowSG Pr sel mu)} {u : Pr.Word} {j : ℕ}
+    (p : PtAt R sel mu cst u j) (h : j + 1 = R.m) (P : rowSG Pr sel mu)
+    {z z' : Sp X.E (R.N j)} (hz : z ∈ cosetIn p P) (hz' : z' ∈ cosetIn p P)
+    : SameCoset sel mu cst P z z' := by
   obtain ⟨w, hw, hzw⟩ := hz
   obtain ⟨w', hw', hzw'⟩ := hz'
   obtain ⟨y, -, hY⟩ := p.mem_ybSet h
   rw [hY] at hw hw'
-  have hww : w - w' ∈ locLat (rowSG Pr sel mu) p.1.1.deco.1.N (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) := by
-    have e1 : w - y ∈ locLat (rowSG Pr sel mu) p.1.1.deco.1.N (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) := hw
-    have e2 : w' - y ∈ locLat (rowSG Pr sel mu) p.1.1.deco.1.N (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) := hw'
+  have hww
+      : w - w' ∈ locLat (rowSG Pr sel mu) p.1.1.deco.1.N
+        (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) := by
+    have e1
+        : w - y ∈ locLat (rowSG Pr sel mu) p.1.1.deco.1.N
+          (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) :=
+      hw
+    have e2
+        : w' - y ∈ locLat (rowSG Pr sel mu) p.1.1.deco.1.N
+          (fun P => if P.1 ∈ Pr.vGs then 0 else (cst.M : ℤ)) :=
+      hw'
     have := sub_mem e1 e2
     rwa [sub_sub_sub_cancel_right] at this
   have h1 := (mem_locLat _ _ _ _).1 hww P
@@ -44,7 +57,8 @@ theorem sameCoset_of_mem_cosetIn {X : Fields} {Pr : Primes X} {R : Ranks} {sel :
     apply (hFm _).1
     rw [LinearEquiv.apply_symm_apply]
     exact h1
-  have h3 : c • (z - z') = c • (z - F.symm w) - c • (z' - F.symm w') + c • (F.symm w - F.symm w') := by
+  have h3
+      : c • (z - z') = c • (z - F.symm w) - c • (z' - F.symm w') + c • (F.symm w - F.symm w') := by
     rw [← smul_sub, ← smul_add]
     congr 1
     abel

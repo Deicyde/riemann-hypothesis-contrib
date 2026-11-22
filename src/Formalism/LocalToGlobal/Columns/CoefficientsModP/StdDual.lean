@@ -20,48 +20,66 @@ section One
 
 variable {n : ℕ} (ν : Fin n → ℕ)
 
-instance sdFintype : Fintype (Formalism.GradedWeylDivisibility.ssIdx n n ν) := @Fintype.ofFinite _ (Formalism.GradedWeylDivisibility.sSIdxFinite n n ν).to_subtype
+instance sdFintype : Fintype (Formalism.GradedWeylDivisibility.ssIdx n n ν) :=
+  @Fintype.ofFinite _ (Formalism.GradedWeylDivisibility.sSIdxFinite n n ν).to_subtype
 
-def sdBeta : Formalism.GradedWeylDivisibility.ssIdx n n ν → MvPolynomial (Fin n × Fin n) ℤ := (Formalism.GradedWeylDivisibility.sSBasis ℤ n n ν).choose
+def sdBeta : Formalism.GradedWeylDivisibility.ssIdx n n ν → MvPolynomial (Fin n × Fin n) ℤ :=
+  (Formalism.GradedWeylDivisibility.sSBasis ℤ n n ν).choose
 
-def sdBetaQ (i : Formalism.GradedWeylDivisibility.ssIdx n n ν) : MvPolynomial (Fin n × Fin n) ℚ := map (Int.castRingHom ℚ) (sdBeta ν i)
+def sdBetaQ (i : Formalism.GradedWeylDivisibility.ssIdx n n ν) : MvPolynomial (Fin n × Fin n) ℚ :=
+  map (Int.castRingHom ℚ) (sdBeta ν i)
 
-theorem sd_beta_span : Submodule.span ℤ (Set.range (sdBeta ν)) = Formalism.GradedWeylDivisibility.dualWeyl ℤ n n ν :=
+theorem sd_beta_span
+    : Submodule.span ℤ (Set.range (sdBeta ν)) = Formalism.GradedWeylDivisibility.dualWeyl ℤ n n ν :=
   (Formalism.GradedWeylDivisibility.sSBasis ℤ n n ν).choose_spec.1.2.1
 
-theorem sd_betaQ_spec : LinearIndependent ℚ (sdBetaQ ν) ∧
-    Submodule.span ℚ (Set.range (sdBetaQ ν)) = Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν := by
-  have h := Formalism.GradedWeylDivisibility.nablaLKBasis ℤ ℚ Int.cast_injective n n ν (sdBeta ν) _
-    (Formalism.GradedWeylDivisibility.sSBasis ℤ n n ν).choose_spec.1 1 (by simp)
-  have e : (fun i => Formalism.GradedWeylDivisibility.rowAct ℚ (1 : Matrix (Fin n) (Fin n) ℚ)⁻¹ (map (algebraMap ℤ ℚ) (sdBeta ν i))) =
-      sdBetaQ ν := by
+theorem sd_betaQ_spec
+    : LinearIndependent ℚ (sdBetaQ ν)
+      ∧ Submodule.span ℚ (Set.range (sdBetaQ ν))
+        = Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν := by
+  have h :=
+    Formalism.GradedWeylDivisibility.nablaLKBasis ℤ ℚ Int.cast_injective n n ν (sdBeta ν) _
+      (Formalism.GradedWeylDivisibility.sSBasis ℤ n n ν).choose_spec.1 1 (by simp)
+  have e
+      : (fun i =>
+          Formalism.GradedWeylDivisibility.rowAct ℚ (1 : Matrix (Fin n) (Fin n) ℚ)⁻¹
+            (map (algebraMap ℤ ℚ) (sdBeta ν i)))
+        = sdBetaQ ν := by
     funext i
     rw [inv_one, rd_rowAct_one]
     rfl
   rwa [e] at h
 
-theorem sd_fockB_rat {σ : Type} (f g : MvPolynomial σ ℚ) : fockB f g = Formalism.GradedWeylDivisibility.fockQ f g := by
+theorem sd_fockB_rat {σ : Type} (f g : MvPolynomial σ ℚ)
+    : fockB f g = Formalism.GradedWeylDivisibility.fockQ f g := by
   simp [fockB, Formalism.GradedWeylDivisibility.fockQ, mfact]
 
-def sdC : ℚ := Formalism.GradedWeylDivisibility.fockQ (Formalism.GradedWeylDivisibility.hw ℚ (le_refl n) ν) (Formalism.GradedWeylDivisibility.hw ℚ (le_refl n) ν)
+def sdC : ℚ :=
+  Formalism.GradedWeylDivisibility.fockQ (Formalism.GradedWeylDivisibility.hw ℚ (le_refl n) ν)
+    (Formalism.GradedWeylDivisibility.hw ℚ (le_refl n) ν)
 
 theorem sdC_ne : sdC ν ≠ 0 :=
-  ne_of_gt ((Formalism.GradedWeylDivisibility.fockQPos _ _ (Formalism.GradedWeylDivisibility.hw ℚ (le_refl n) ν)).2 (Formalism.GradedWeylDivisibility.hwNe ℚ n n le_rfl ν))
+  ne_of_gt ((Formalism.GradedWeylDivisibility.fockQPos _ _
+      (Formalism.GradedWeylDivisibility.hw ℚ (le_refl n) ν)).2
+    (Formalism.GradedWeylDivisibility.hwNe ℚ n n le_rfl ν))
 
-def sdGram : Matrix (Formalism.GradedWeylDivisibility.ssIdx n n ν) (Formalism.GradedWeylDivisibility.ssIdx n n ν) ℚ :=
+def sdGram
+    : Matrix (Formalism.GradedWeylDivisibility.ssIdx n n ν)
+      (Formalism.GradedWeylDivisibility.ssIdx n n ν) ℚ :=
   Matrix.of fun i j => Formalism.GradedWeylDivisibility.fockQ (sdBetaQ ν i) (sdBetaQ ν j)
 
 def sdDelta (i : Formalism.GradedWeylDivisibility.ssIdx n n ν) : MvPolynomial (Fin n × Fin n) ℚ :=
   sdC ν • ∑ j, (sdGram ν)⁻¹ i j • sdBetaQ ν j
 
-theorem sd_delta_mem (i : Formalism.GradedWeylDivisibility.ssIdx n n ν) : sdDelta ν i ∈ Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν := by
+theorem sd_delta_mem (i : Formalism.GradedWeylDivisibility.ssIdx n n ν)
+    : sdDelta ν i ∈ Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν := by
   unfold sdDelta
   refine Submodule.smul_mem _ _ (Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ ?_)
   rw [← (sd_betaQ_spec ν).2]
   exact Submodule.subset_span ⟨j, rfl⟩
 
-theorem sd_delta_beta (i k : Formalism.GradedWeylDivisibility.ssIdx n n ν) :
-    fockBL (sdDelta ν i) (sdBetaQ ν k) = if i = k then sdC ν else 0 := by
+theorem sd_delta_beta (i k : Formalism.GradedWeylDivisibility.ssIdx n n ν)
+    : fockBL (sdDelta ν i) (sdBetaQ ν k) = if i = k then sdC ν else 0 := by
   have hdet : IsUnit (sdGram ν).det := by
     rw [isUnit_iff_ne_zero]
     exact ps_gram_det_ne (sdBetaQ ν) (sd_betaQ_spec ν).1
@@ -70,28 +88,35 @@ theorem sd_delta_beta (i k : Formalism.GradedWeylDivisibility.ssIdx n n ν) :
   unfold sdDelta
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_smul, map_sum, LinearMap.smul_apply, LinearMap.sum_apply, h1, smul_eq_mul]
-  have h2 : ∑ j, (sdGram ν)⁻¹ i j * sdGram ν j k = ((sdGram ν)⁻¹ * sdGram ν) i k := (Matrix.mul_apply ..).symm
+  have h2 : ∑ j, (sdGram ν)⁻¹ i j * sdGram ν j k = ((sdGram ν)⁻¹ * sdGram ν) i k :=
+    (Matrix.mul_apply ..).symm
   rw [h2, Matrix.nonsing_inv_mul _ hdet, Matrix.one_apply]
   split_ifs <;> simp
 
-theorem sd_bDual : Formalism.GradedWeylDivisibility.bDual n n le_rfl ν ((Formalism.GradedWeylDivisibility.dualWeyl ℤ n n ν).map (Formalism.GradedWeylDivisibility.intQ n n)) =
-    Submodule.span ℤ (Set.range (sdDelta ν)) := by
+theorem sd_bDual
+    : Formalism.GradedWeylDivisibility.bDual n n le_rfl ν
+        ((Formalism.GradedWeylDivisibility.dualWeyl ℤ n n ν).map
+          (Formalism.GradedWeylDivisibility.intQ n n))
+      = Submodule.span ℤ (Set.range (sdDelta ν)) := by
   apply le_antisymm
   · rintro P ⟨hP, hPQ⟩
-    have hz : ∀ k, ∃ z : ℤ, Formalism.GradedWeylDivisibility.fockQ P (sdBetaQ ν k) = z * sdC ν := fun k =>
-      hPQ _ ⟨sdBeta ν k, by rw [← sd_beta_span]; exact Submodule.subset_span ⟨k, rfl⟩, rfl⟩
+    have hz : ∀ k, ∃ z : ℤ, Formalism.GradedWeylDivisibility.fockQ P (sdBetaQ ν k) = z * sdC ν :=
+      fun k => hPQ _ ⟨sdBeta ν k, by rw [← sd_beta_span]; exact Submodule.subset_span ⟨k, rfl⟩, rfl⟩
     choose z hz using hz
     have hR : P - ∑ k, z k • sdDelta ν k ∈ Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν :=
-      Submodule.sub_mem _ hP (Submodule.sum_mem _ fun k _ => by
-        rw [← Int.cast_smul_eq_zsmul ℚ]; exact Submodule.smul_mem _ _ (sd_delta_mem ν k))
+      Submodule.sub_mem _ hP
+        (Submodule.sum_mem _ fun k _ => by
+          rw [← Int.cast_smul_eq_zsmul ℚ]; exact Submodule.smul_mem _ _ (sd_delta_mem ν k))
     have h0 : ∀ k, fockBL (P - ∑ j, z j • sdDelta ν j) (sdBetaQ ν k) = 0 := by
       intro k
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sub, map_sum, map_zsmul, LinearMap.sub_apply, LinearMap.sum_apply, LinearMap.smul_apply,
-        sd_delta_beta]
+        simp only [map_sub, map_sum, map_zsmul, LinearMap.sub_apply, LinearMap.sum_apply,
+          LinearMap.smul_apply, sd_delta_beta]
       rw [fockBL_apply, sd_fockB_rat, hz k]
       simp
-    have h1 : ∀ y ∈ Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν, fockBL (P - ∑ j, z j • sdDelta ν j) y = 0 := by
+    have h1
+        : ∀ y ∈ Formalism.GradedWeylDivisibility.dualWeyl ℚ n n ν,
+          fockBL (P - ∑ j, z j • sdDelta ν j) y = 0 := by
       intro y hy
       rw [← (sd_betaQ_spec ν).2] at hy
       induction hy using Submodule.span_induction with
@@ -120,14 +145,16 @@ theorem sd_bDual : Formalism.GradedWeylDivisibility.bDual n n le_rfl ν ((Formal
       show Formalism.GradedWeylDivisibility.fockQ (sdDelta ν i) (sdBetaQ ν k) = _
       rw [this]
       split_ifs <;> simp [sdC]
-    | zero => exact ⟨0, by rw [map_zero, ← sd_fockB_rat, ← fockBL_apply, map_zero]; simp⟩
+    | zero =>
+      exact ⟨0, by rw [map_zero, ← sd_fockB_rat, ← fockBL_apply, map_zero]; simp⟩
     | add x y _ _ hx hy =>
       obtain ⟨a, ha⟩ := hx
       obtain ⟨b, hb⟩ := hy
       refine ⟨a + b, ?_⟩
       rw [← sd_fockB_rat, ← fockBL_apply] at ha hb ⊢
       rw [map_add (f := _), map_add (f := _), ha, hb]
-      push_cast; ring
+      push_cast
+      ring
     | smul c x _ hx =>
       obtain ⟨a, ha⟩ := hx
       refine ⟨c * a, ?_⟩
@@ -141,11 +168,13 @@ section Abstract
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem sd_dual_bases {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    {κ : Type} [Fintype κ] [DecidableEq κ] (b : V →ₗ[K] V →ₗ[K] K) (u v : κ → V)
-    (h : ∀ i j, b (u i) (v j) = if i = j then 1 else 0) (x : V) (hx : x ∈ Submodule.span K (Set.range u)) :
-    x ∈ Submodule.span (𝓞 K) (Set.range u) ↔
-      ∀ y ∈ Submodule.span (𝓞 K) (Set.range v), b x y ∈ (1 : Submodule (𝓞 K) K) := by
+theorem sd_dual_bases
+    {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    (b : V →ₗ[K] V →ₗ[K] K) (u v : κ → V) (h : ∀ i j, b (u i) (v j) = if i = j then 1 else 0)
+    (x : V) (hx : x ∈ Submodule.span K (Set.range u))
+    : x ∈ Submodule.span (𝓞 K) (Set.range u)
+      ↔ ∀ y ∈ Submodule.span (𝓞 K) (Set.range v), b x y ∈ (1 : Submodule (𝓞 K) K) := by
   constructor
   · intro hx'
     clear hx
@@ -163,7 +192,8 @@ theorem sd_dual_bases {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) 
       | zero => rw [map_zero]; exact Submodule.zero_mem _
       | add y y' _ _ hy hy' => rw [map_add (f := _)]; exact Submodule.add_mem _ hy hy'
       | smul r y _ hy => rw [LinearMap.map_smul_of_tower]; exact Submodule.smul_mem _ r hy
-    | zero => intro y _; rw [map_zero, LinearMap.zero_apply]; exact Submodule.zero_mem _
+    | zero =>
+      intro y _; rw [map_zero, LinearMap.zero_apply]; exact Submodule.zero_mem _
     | add x x' _ _ hx hx' =>
       intro y hy
       rw [map_add (f := _), LinearMap.add_apply]
@@ -177,8 +207,8 @@ theorem sd_dual_bases {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) 
     have h1 : ∀ j, b (∑ i, a i • u i) (v j) = a j := by
       intro j
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, h, smul_eq_mul, mul_ite, mul_one,
-        mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      simp only [map_sum, map_smul, LinearMap.sum_apply, LinearMap.smul_apply, h, smul_eq_mul,
+        mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     have h2 : ∀ j, ∃ r : 𝓞 K, algebraMap (𝓞 K) K r = a j := fun j => by
       have := hy (v j) (Submodule.subset_span ⟨j, rfl⟩)
       rw [h1 j] at this
@@ -188,11 +218,13 @@ theorem sd_dual_bases {V : Type} [AddCommGroup V] [Module K V] [Module (𝓞 K) 
     rw [← hr i, algebraMap_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem sd_span_image {A B : Type} [AddCommGroup A] [AddCommGroup B] [Module (𝓞 K) B] (φ : A →ₗ[ℤ] B) (S S' : Set A)
-    (h : Submodule.span ℤ S = Submodule.span ℤ S') :
-    Submodule.span (𝓞 K) (φ '' S) = Submodule.span (𝓞 K) (φ '' S') := by
-  rw [← Submodule.span_span_of_tower ℤ (𝓞 K) (φ '' S), ← Submodule.span_span_of_tower ℤ (𝓞 K) (φ '' S'),
-    ← Submodule.map_span, ← Submodule.map_span, h]
+theorem sd_span_image
+    {A B : Type} [AddCommGroup A] [AddCommGroup B] [Module (𝓞 K) B]
+    (φ : A →ₗ[ℤ] B)
+    (S S' : Set A) (h : Submodule.span ℤ S = Submodule.span ℤ S')
+    : Submodule.span (𝓞 K) (φ '' S) = Submodule.span (𝓞 K) (φ '' S') := by
+  rw [← Submodule.span_span_of_tower ℤ (𝓞 K) (φ '' S),
+    ← Submodule.span_span_of_tower ℤ (𝓞 K) (φ '' S'), ← Submodule.map_span, ← Submodule.map_span, h]
 
 end Abstract
 
@@ -203,7 +235,9 @@ variable (K : Type) [Field K] [NumberField K] {n : ℕ}
 def sdQK (σ : Type) : MvPolynomial σ ℚ →ₗ[ℤ] MvPolynomial σ K :=
   (MvPolynomial.map (algebraMap ℚ K)).toAddMonoidHom.toIntLinearMap
 
-theorem sdQK_apply {σ : Type} (f : MvPolynomial σ ℚ) : sdQK K σ f = MvPolynomial.map (algebraMap ℚ K) f := rfl
+theorem sdQK_apply {σ : Type} (f : MvPolynomial σ ℚ)
+    : sdQK K σ f = MvPolynomial.map (algebraMap ℚ K) f :=
+  rfl
 
 theorem sd_word_image (ν : Fin n → ℕ) : nbWord K ν = sdQK K _ '' nbWord ℚ ν := by
   unfold nbWord
@@ -211,9 +245,11 @@ theorem sd_word_image (ν : Fin n → ℕ) : nbWord K ν = sdQK K _ '' nbWord �
   congr 1
   funext w
   show _ = MvPolynomial.map (algebraMap ℚ K) _
-  rw [← Formalism.GradedWeylDivisibility.lclosedeq_applyWord_map, Formalism.GradedWeylDivisibility.lclosedeq_hw_map]
+  rw [← Formalism.GradedWeylDivisibility.lclosedeq_applyWord_map,
+    Formalism.GradedWeylDivisibility.lclosedeq_hw_map]
 
-theorem sd_bid_image (ν : Fin n → ℕ) : bideterminantsOfShape K ν = sdQK K _ '' bideterminantsOfShape ℚ ν := by
+theorem sd_bid_image (ν : Fin n → ℕ)
+    : bideterminantsOfShape K ν = sdQK K _ '' bideterminantsOfShape ℚ ν := by
   ext f
   constructor
   · rintro ⟨N, sz, hsz, I, h, rfl⟩
@@ -221,18 +257,24 @@ theorem sd_bid_image (ν : Fin n → ℕ) : bideterminantsOfShape K ν = sdQK K 
   · rintro ⟨_, ⟨N, sz, hsz, I, h, rfl⟩, rfl⟩
     exact ⟨N, sz, hsz, I, h, Formalism.GradedWeylDivisibility.ldlat_map_bidet _ _ _ _⟩
 
-theorem sd_span_word (ν : Fin n → ℕ) :
-    Submodule.span ℤ (nbWord ℚ ν) = (Formalism.GradedWeylDivisibility.weyl ℤ n n le_rfl ν).map (Formalism.GradedWeylDivisibility.intQ n n) := by
+theorem sd_span_word (ν : Fin n → ℕ)
+    : Submodule.span ℤ (nbWord ℚ ν)
+      = (Formalism.GradedWeylDivisibility.weyl ℤ n n le_rfl ν).map
+        (Formalism.GradedWeylDivisibility.intQ n n) := by
   unfold Formalism.GradedWeylDivisibility.weyl nbWord
   rw [Submodule.map_span, ← Set.range_comp]
   congr 2
   funext w
   show _ = MvPolynomial.map (Int.castRingHom ℚ) _
-  rw [← Formalism.GradedWeylDivisibility.lclosedeq_applyWord_map, Formalism.GradedWeylDivisibility.lclosedeq_hw_map]
+  rw [← Formalism.GradedWeylDivisibility.lclosedeq_applyWord_map,
+    Formalism.GradedWeylDivisibility.lclosedeq_hw_map]
 
-theorem sd_span_bid (ν : Fin n → ℕ) :
-    Submodule.span ℤ (bideterminantsOfShape ℚ ν) = Submodule.span ℤ (Set.range (sdBetaQ ν)) := by
-  have h1 : Submodule.span ℤ (bideterminantsOfShape ℚ ν) = (Formalism.GradedWeylDivisibility.dualWeyl ℤ n n ν).map (Formalism.GradedWeylDivisibility.intQ n n) := by
+theorem sd_span_bid (ν : Fin n → ℕ)
+    : Submodule.span ℤ (bideterminantsOfShape ℚ ν) = Submodule.span ℤ (Set.range (sdBetaQ ν)) := by
+  have h1
+      : Submodule.span ℤ (bideterminantsOfShape ℚ ν)
+        = (Formalism.GradedWeylDivisibility.dualWeyl ℤ n n ν).map
+          (Formalism.GradedWeylDivisibility.intQ n n) := by
     rw [Formalism.GradedWeylDivisibility.standardMonomialSpanDomain ℤ n n ν, Submodule.map_span]
     congr 1
     ext f
@@ -244,19 +286,23 @@ theorem sd_span_bid (ν : Fin n → ℕ) :
   rw [h1, ← sd_beta_span, Submodule.map_span, ← Set.range_comp]
   rfl
 
-def sdBetaK (ν : Fin n → ℕ) (i : Formalism.GradedWeylDivisibility.ssIdx n n ν) : MvPolynomial (Fin n × Fin n) K :=
+def sdBetaK (ν : Fin n → ℕ) (i : Formalism.GradedWeylDivisibility.ssIdx n n ν)
+    : MvPolynomial (Fin n × Fin n) K :=
   MvPolynomial.map (algebraMap ℚ K) (sdBetaQ ν i)
 
-def sdDeltaK (ν : Fin n → ℕ) (i : Formalism.GradedWeylDivisibility.ssIdx n n ν) : MvPolynomial (Fin n × Fin n) K :=
+def sdDeltaK (ν : Fin n → ℕ) (i : Formalism.GradedWeylDivisibility.ssIdx n n ν)
+    : MvPolynomial (Fin n × Fin n) K :=
   MvPolynomial.map (algebraMap ℚ K) (sdDelta ν i)
 
-theorem sd_span_bidK (ν : Fin n → ℕ) :
-    Submodule.span (𝓞 K) (bideterminantsOfShape K ν) = Submodule.span (𝓞 K) (Set.range (sdBetaK K ν)) := by
+theorem sd_span_bidK (ν : Fin n → ℕ)
+    : Submodule.span (𝓞 K) (bideterminantsOfShape K ν)
+      = Submodule.span (𝓞 K) (Set.range (sdBetaK K ν)) := by
   rw [sd_bid_image, sd_span_image (sdQK K _) _ _ (sd_span_bid ν), ← Set.range_comp]
   rfl
 
-theorem sd_span_wordK (hE : Formalism.GradedWeylDivisibility.WeylEqDualNabla) (ν : Fin n → ℕ) (hν : Antitone ν) :
-    Submodule.span (𝓞 K) (nbWord K ν) = Submodule.span (𝓞 K) (Set.range (sdDeltaK K ν)) := by
+theorem sd_span_wordK
+    (hE : Formalism.GradedWeylDivisibility.WeylEqDualNabla) (ν : Fin n → ℕ) (hν : Antitone ν)
+    : Submodule.span (𝓞 K) (nbWord K ν) = Submodule.span (𝓞 K) (Set.range (sdDeltaK K ν)) := by
   have h : Submodule.span ℤ (nbWord ℚ ν) = Submodule.span ℤ (Set.range (sdDelta ν)) := by
     rw [sd_span_word, hE n n le_rfl ν hν, sd_bDual]
   rw [sd_word_image, sd_span_image (sdQK K _) _ _ h, ← Set.range_comp]
@@ -269,8 +315,9 @@ section Tensor
 variable (K : Type) [Field K] [NumberField K] {ι : Type} [Fintype ι] {n : ℕ}
 
 omit [NumberField K] in
-theorem sd_gen_range {κ : ι → Type} (f : ∀ τ : ι, κ τ → MvPolynomial (Fin n × Fin n) K) :
-    nbGen (fun τ => Set.range (f τ)) = Set.range fun i : (∀ τ, κ τ) => ten fun τ => f τ (i τ) := by
+theorem sd_gen_range {κ : ι → Type} (f : ∀ τ : ι, κ τ → MvPolynomial (Fin n × Fin n) K)
+    : nbGen (fun τ => Set.range (f τ))
+      = Set.range fun i : (∀ τ, κ τ) => ten fun τ => f τ (i τ) := by
   ext P
   constructor
   · rintro ⟨g, hg, rfl⟩
@@ -279,44 +326,54 @@ theorem sd_gen_range {κ : ι → Type} (f : ∀ τ : ι, κ τ → MvPolynomial
   · rintro ⟨i, rfl⟩
     exact ⟨_, fun τ => ⟨i τ, rfl⟩, rfl⟩
 
-def sdU (lam : ι → DomWeight n) (i : VVIdx lam) : Pol K ι n := ten fun τ => sdDeltaK K (lam τ).natW (i τ)
+def sdU (lam : ι → DomWeight n) (i : VVIdx lam) : Pol K ι n :=
+  ten fun τ => sdDeltaK K (lam τ).natW (i τ)
 
-def sdV (lam : ι → DomWeight n) (i : VVIdx lam) : Pol K ι n := ten fun τ => sdBetaK K (lam τ).natW (i τ)
+def sdV (lam : ι → DomWeight n) (i : VVIdx lam) : Pol K ι n :=
+  ten fun τ => sdBetaK K (lam τ).natW (i τ)
 
-theorem sd_nabStd (lam : ι → DomWeight n) : nabStd K lam = Submodule.span (𝓞 K) (Set.range (sdV K lam)) := by
-  have h : (fun τ => (nablaSq (𝓞 K) n (lam τ)).map (toK K _)) =
-      fun τ => Submodule.span (𝓞 K) (Set.range (sdBetaK K (lam τ).natW)) :=
+theorem sd_nabStd (lam : ι → DomWeight n)
+    : nabStd K lam = Submodule.span (𝓞 K) (Set.range (sdV K lam)) := by
+  have h
+      : (fun τ => (nablaSq (𝓞 K) n (lam τ)).map (toK K _))
+        = fun τ => Submodule.span (𝓞 K) (Set.range (sdBetaK K (lam τ).natW)) :=
     funext fun τ => (nb_map_nablaSq (𝓞 K) (lam τ)).trans (sd_span_bidK K _)
   rw [nabStd, h, nb_tensorLat_span, sd_gen_range]
   rfl
 
-theorem sd_delStd (hE : Formalism.GradedWeylDivisibility.WeylEqDualNabla) (lam : ι → DomWeight n) :
-    delStd K lam = Submodule.span (𝓞 K) (Set.range (sdU K lam)) := by
-  have h : (fun τ => (delSq (𝓞 K) n (lam τ)).map (toK K _)) =
-      fun τ => Submodule.span (𝓞 K) (Set.range (sdDeltaK K (lam τ).natW)) :=
-    funext fun τ => (nb_map_delSq (𝓞 K) (lam τ)).trans (sd_span_wordK K hE _ (natW_antitone (lam τ)))
+theorem sd_delStd (hE : Formalism.GradedWeylDivisibility.WeylEqDualNabla) (lam : ι → DomWeight n)
+    : delStd K lam = Submodule.span (𝓞 K) (Set.range (sdU K lam)) := by
+  have h
+      : (fun τ => (delSq (𝓞 K) n (lam τ)).map (toK K _))
+        = fun τ => Submodule.span (𝓞 K) (Set.range (sdDeltaK K (lam τ).natW)) :=
+    funext fun τ =>
+      (nb_map_delSq (𝓞 K) (lam τ)).trans (sd_span_wordK K hE _ (natW_antitone (lam τ)))
   rw [delStd, h, nb_tensorLat_span, sd_gen_range]
   rfl
 
 omit [NumberField K] in
-theorem sd_fockB_ten (f g : ι → MvPolynomial (Fin n × Fin n) K) : fockB (ten f) (ten g) = ∏ τ, fockB (f τ) (g τ) :=
+theorem sd_fockB_ten (f g : ι → MvPolynomial (Fin n × Fin n) K)
+    : fockB (ten f) (ten g) = ∏ τ, fockB (f τ) (g τ) :=
   @fockSymTensor_holds K _ starRingOfComm ι _ n f g
 
-theorem sd_fockB_map {σ : Type} (P Q : MvPolynomial σ ℚ) :
-    fockB (MvPolynomial.map (algebraMap ℚ K) P) (MvPolynomial.map (algebraMap ℚ K) Q) =
-      algebraMap ℚ K (Formalism.GradedWeylDivisibility.fockQ P Q) :=
+theorem sd_fockB_map {σ : Type} (P Q : MvPolynomial σ ℚ)
+    : fockB (MvPolynomial.map (algebraMap ℚ K) P) (MvPolynomial.map (algebraMap ℚ K) Q)
+      = algebraMap ℚ K (Formalism.GradedWeylDivisibility.fockQ P Q) :=
   @fockSQ K _ starRingOfComm _ σ P Q
 
-theorem sd_extNormB (lam : ι → DomWeight n) : extNormB K lam = ∏ τ, algebraMap ℚ K (sdC (lam τ).natW) := by
+theorem sd_extNormB (lam : ι → DomWeight n)
+    : extNormB K lam = ∏ τ, algebraMap ℚ K (sdC (lam τ).natW) := by
   unfold extNormB
   refine Finset.prod_congr rfl fun τ _ => ?_
   rw [← map_extremal (algebraMap ℚ K), sd_fockB_map]
   rfl
 
-theorem sd_pair (lam : ι → DomWeight n) [DecidableEq (VVIdx lam)] (i j : VVIdx lam) :
-    pairB lam (sdU K lam i) (sdV K lam j) = if i = j then 1 else 0 := by
-  have h : ∀ τ, fockB (sdDeltaK K (lam τ).natW (i τ)) (sdBetaK K (lam τ).natW (j τ)) =
-      algebraMap ℚ K (if i τ = j τ then sdC (lam τ).natW else 0) := by
+theorem sd_pair (lam : ι → DomWeight n) [DecidableEq (VVIdx lam)] (i j : VVIdx lam)
+    : pairB lam (sdU K lam i) (sdV K lam j) = if i = j then 1 else 0 := by
+  have h
+      : ∀ τ,
+        fockB (sdDeltaK K (lam τ).natW (i τ)) (sdBetaK K (lam τ).natW (j τ))
+          = algebraMap ℚ K (if i τ = j τ then sdC (lam τ).natW else 0) := by
     intro τ
     rw [sdDeltaK, sdBetaK, sd_fockB_map, ← sd_fockB_rat, ← fockBL_apply, sd_delta_beta]
   rw [pairB_apply, sdU, sdV, sd_fockB_ten, sd_extNormB]
@@ -346,9 +403,12 @@ theorem pairBDualStd_of (hE : Formalism.GradedWeylDivisibility.WeylEqDualNabla) 
   rw [sd_delStd K hE lam, sd_nabStd K lam]
   constructor
   · exact sd_dual_bases (pairB lam) (sdU K lam) (sdV K lam) (sd_pair K lam) x (hVu ▸ hx)
-  · have h := sd_dual_bases (pairB lam).flip (sdV K lam) (sdU K lam) (fun i j => by
-      rw [LinearMap.flip_apply, sd_pair]
-      simp only [eq_comm]) x (hVv ▸ hx)
+  · have h :=
+      sd_dual_bases (pairB lam).flip (sdV K lam) (sdU K lam)
+        (fun i j => by
+          rw [LinearMap.flip_apply, sd_pair]
+          simp only [eq_comm])
+        x (hVv ▸ hx)
     refine h.trans (forall₂_congr fun y _ => ?_)
     rw [LinearMap.flip_apply, pairingBSymm_holds K ι n lam y x]
 

@@ -14,15 +14,16 @@ open ReciprocityTheory.ChartRestriction.G.Geo MvPolynomial MeasureTheory Filter 
 
 variable {Ω : Type} [Field Ω] [CharZero Ω] {κ : Type} [Fintype κ] {D : ℕ}
 
-def gbPsi (e : Fin (D + 1) → Ix κ) : (((k : Unit) → GlobalTheory κ k) → ℂ) →ₗ[ℂ] (Fin (D + 1) → ℂ) :=
+def gbPsi (e : Fin (D + 1) → Ix κ)
+    : (((k : Unit) → GlobalTheory κ k) → ℂ) →ₗ[ℂ] (Fin (D + 1) → ℂ) :=
   LinearMap.pi fun k => LinearMap.proj (fun _ => (e k).2)
 
-theorem gb_segre_apply (z : Ix κ → ℂ) (i : (k : Unit) → GlobalTheory κ k) :
-    segre (ι := GlobalTheory κ) z i = z ⟨(), i ()⟩ := by
+theorem gb_segre_apply (z : Ix κ → ℂ) (i : (k : Unit) → GlobalTheory κ k)
+    : segre (ι := GlobalTheory κ) z i = z ⟨(), i ()⟩ := by
   simp only [segre, Fintype.prod_unique]
 
-theorem gbPsi_segre (e : Fin (D + 1) → Ix κ) (z : Ix κ → ℂ) :
-    gbPsi e (segre (ι := GlobalTheory κ) z) = fun k => z (e k) := by
+theorem gbPsi_segre (e : Fin (D + 1) → Ix κ) (z : Ix κ → ℂ)
+    : gbPsi e (segre (ι := GlobalTheory κ) z) = fun k => z (e k) := by
   funext k
   simp only [gbPsi, LinearMap.pi_apply, LinearMap.proj_apply]
   rw [gb_segre_apply]
@@ -44,8 +45,9 @@ theorem gb_mcPts_eq (P : Ideal (MRing (GlobalTheory κ))) : mcPts P = pts P := b
     push_neg at hne
     exact h (funext fun p => hne p.2)
 
-theorem gb_fibre_eq (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (y : Fin D → ℂ) :
-    fibre (coordIdeal ℤ x) (gbPsi e) y = segre (ι := GlobalTheory κ) '' prFib x e (Fin.cons 1 y) := by
+theorem gb_fibre_eq (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (y : Fin D → ℂ)
+    : fibre (coordIdeal ℤ x) (gbPsi e) y
+      = segre (ι := GlobalTheory κ) '' prFib x e (Fin.cons 1 y) := by
   ext w
   simp only [fibre, Set.mem_setOf_eq, Set.mem_image, prFib, gb_mcPts_eq]
   constructor
@@ -58,8 +60,9 @@ theorem gb_fibre_eq (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (y : Fin D �
     funext k
     exact hk k
 
-theorem gb_prFib_smul (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (w : Fin (D + 1) → ℂ) {c : ℂ}
-    (hc : c ≠ 0) : prFib x e (c • w) = (fun z => c • z) '' prFib x e w := by
+theorem gb_prFib_smul
+    (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (w : Fin (D + 1) → ℂ) {c : ℂ} (hc : c ≠ 0)
+    : prFib x e (c • w) = (fun z => c • z) '' prFib x e w := by
   ext z
   constructor
   · rintro ⟨hz, hk⟩
@@ -69,16 +72,21 @@ theorem gb_prFib_smul (x : Ix κ → Ω) (e : Fin (D + 1) → Ix κ) (w : Fin (D
   · rintro ⟨z', ⟨hz', hk⟩, rfl⟩
     exact ⟨smul_mem_pts_coord x hz' hc, fun k => by simp [hk k]⟩
 
-theorem gb_sum_cons (y : Fin D → ℂ) :
-    ∑ k, ‖(Fin.cons 1 y : Fin (D + 1) → ℂ) k‖ ^ 2 = 1 + ∑ i, ‖y i‖ ^ 2 := by
+theorem gb_sum_cons (y : Fin D → ℂ)
+    : ∑ k, ‖(Fin.cons 1 y : Fin (D + 1) → ℂ) k‖ ^ 2 = 1 + ∑ i, ‖y i‖ ^ 2 := by
   rw [Fin.sum_univ_succ]
   simp
 
-theorem gb_sheetDensity {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : ConeMetric (C := ℂ) (ι := Ix κ)}
-    (hFS : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.IsPullFS x e m) {y : Fin D → ℂ} {w : ((k : Unit) → GlobalTheory κ k) → ℂ}
-    (h : ∃ γ, IsSheet (coordIdeal ℤ x) (gbPsi e) y w γ) :
-    sheetDensity (coordIdeal ℤ x) (gbPsi e) (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.purePot m D) (fun _ => 1) y w =
-      maDensity (fun _ : Fin D => gbPot) y := by
+theorem gb_sheetDensity
+    {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : ConeMetric (C := ℂ) (ι := Ix κ)}
+    (hFS : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.IsPullFS x e m)
+    {y : Fin D → ℂ} {w : ((k : Unit) → GlobalTheory κ k) → ℂ}
+    (h : ∃ γ, IsSheet (coordIdeal ℤ x) (gbPsi e) y w γ)
+    : sheetDensity (coordIdeal ℤ x) (gbPsi e)
+        (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.purePot m D)
+        (fun _ => 1)
+        y w
+      = maDensity (fun _ : Fin D => gbPot) y := by
   have hs := h.choose_spec
   unfold sheetDensity
   rw [dite_eq_left h]
@@ -96,25 +104,29 @@ theorem gb_sheetDensity {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : Cone
   rw [← congrFun hΨ k]
 
 def gbConsL (D : ℕ) : (Fin D → ℂ) →L[ℂ] (Fin (D + 1) → ℂ) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := fun y => Fin.cons 0 y
-      map_add' := fun a b => by ext k; refine Fin.cases ?_ (fun i => ?_) k <;> simp
-      map_smul' := fun c a => by ext k; refine Fin.cases ?_ (fun i => ?_) k <;> simp }
+  LinearMap.toContinuousLinearMap {
+    toFun := fun y => Fin.cons 0 y
+    map_add' := fun a b => by ext k; refine Fin.cases ?_ (fun i => ?_) k <;> simp
+    map_smul' := fun c a => by ext k; refine Fin.cases ?_ (fun i => ?_) k <;> simp
+  }
 
-theorem gb_scaledCons_eq (c : ℂ) (y : Fin D → ℂ) :
-    c • (Fin.cons 1 y : Fin (D + 1) → ℂ) = c • (Fin.cons 1 0 : Fin (D + 1) → ℂ) + (c • gbConsL D) y := by
+theorem gb_scaledCons_eq (c : ℂ) (y : Fin D → ℂ)
+    : c • (Fin.cons 1 y : Fin (D + 1) → ℂ)
+      = c • (Fin.cons 1 0 : Fin (D + 1) → ℂ) + (c • gbConsL D) y := by
   ext k
   refine Fin.cases ?_ (fun i => ?_) k <;> simp [gbConsL]
 
-theorem gb_analytic_scaledCons (c : ℂ) :
-    AnalyticOnNhd ℂ (fun y : Fin D → ℂ => c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Set.univ := by
-  have h : (fun y : Fin D → ℂ => c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) =
-      fun y => c • (Fin.cons 1 0 : Fin (D + 1) → ℂ) + (c • gbConsL D) y := funext (gb_scaledCons_eq c)
+theorem gb_analytic_scaledCons (c : ℂ)
+    : AnalyticOnNhd ℂ (fun y : Fin D → ℂ => c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Set.univ := by
+  have h
+      : (fun y : Fin D → ℂ => c • (Fin.cons 1 y : Fin (D + 1) → ℂ))
+        = fun y => c • (Fin.cons 1 0 : Fin (D + 1) → ℂ) + (c • gbConsL D) y :=
+    funext (gb_scaledCons_eq c)
   rw [h]
   exact analyticOnNhd_const.add ((c • gbConsL D).analyticOnNhd _)
 
-theorem gb_exists_scale {Δ : MvPolynomial (Fin (D + 1)) ℂ} (hΔ : Δ ≠ 0) :
-    ∃ c : ℂ, c ≠ 0 ∧ ∃ y₀ : Fin D → ℂ, eval (c • (Fin.cons 1 y₀ : Fin (D + 1) → ℂ)) Δ ≠ 0 := by
+theorem gb_exists_scale {Δ : MvPolynomial (Fin (D + 1)) ℂ} (hΔ : Δ ≠ 0)
+    : ∃ c : ℂ, c ≠ 0 ∧ ∃ y₀ : Fin D → ℂ, eval (c • (Fin.cons 1 y₀ : Fin (D + 1) → ℂ)) Δ ≠ 0 := by
   have h1 : Δ * X 0 ≠ 0 := mul_ne_zero hΔ (X_ne_zero _)
   obtain ⟨w, hw⟩ : ∃ w, eval w (Δ * X 0) ≠ 0 := by
     by_contra hne
@@ -127,16 +139,16 @@ theorem gb_exists_scale {Δ : MvPolynomial (Fin (D + 1)) ℂ} (hΔ : Δ ≠ 0) :
     ext k
     refine Fin.cases ?_ (fun i => ?_) k
     · simp
-    · first
-      | (simp [hw0]; done)
-      | (simp; field_simp)
+    · first | (simp [hw0]; done) | (simp; field_simp)
   rw [hw']
   exact left_ne_zero_of_mul hw
 
-theorem gb_ae_good {c : ℂ} {Δ : MvPolynomial (Fin (D + 1)) ℂ} {y₀ : Fin D → ℂ}
-    (h₀ : eval (c • (Fin.cons 1 y₀ : Fin (D + 1) → ℂ)) Δ ≠ 0) :
-    ∀ᵐ y : Fin D → ℂ, eval (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Δ ≠ 0 := by
-  have hpoly : ∀ p : MvPolynomial (Fin (D + 1)) ℂ, AnalyticOnNhd ℂ (fun w => eval w p) Set.univ := by
+theorem gb_ae_good
+    {c : ℂ} {Δ : MvPolynomial (Fin (D + 1)) ℂ} {y₀ : Fin D → ℂ}
+    (h₀ : eval (c • (Fin.cons 1 y₀ : Fin (D + 1) → ℂ)) Δ ≠ 0)
+    : ∀ᵐ y : Fin D → ℂ, eval (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Δ ≠ 0 := by
+  have hpoly
+      : ∀ p : MvPolynomial (Fin (D + 1)) ℂ, AnalyticOnNhd ℂ (fun w => eval w p) Set.univ := by
     intro p
     induction p using MvPolynomial.induction_on
     next a =>
@@ -147,29 +159,37 @@ theorem gb_ae_good {c : ℂ} {Δ : MvPolynomial (Fin (D + 1)) ℂ} {y₀ : Fin D
       exact hp.add hq
     next p i hp =>
       simp only [map_mul, eval_X]
-      exact hp.mul ((ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin (D + 1) => ℂ) i).analyticOnNhd _)
-  have hf : AnalyticOnNhd ℂ ((fun w => eval w Δ) ∘ fun y : Fin D → ℂ => c • (Fin.cons 1 y : Fin (D + 1) → ℂ))
-      Set.univ := (hpoly Δ).comp (gb_analytic_scaledCons c) (Set.mapsTo_univ _ _)
-  have h := ReciprocityTheory.AnForm.volume_zero_set_of_analyticOnNhd isOpen_univ isPreconnected_univ hf
-    ⟨y₀, Set.mem_univ _, h₀⟩
+      exact hp.mul
+        ((ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : Fin (D + 1) => ℂ) i).analyticOnNhd _)
+  have hf : AnalyticOnNhd ℂ
+      ((fun w => eval w Δ) ∘ fun y : Fin D → ℂ => c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Set.univ :=
+    (hpoly Δ).comp (gb_analytic_scaledCons c) (Set.mapsTo_univ _ _)
+  have h :=
+    ReciprocityTheory.AnForm.volume_zero_set_of_analyticOnNhd isOpen_univ isPreconnected_univ hf
+      ⟨y₀, Set.mem_univ _, h₀⟩
   rw [ae_iff]
   simpa using h
 
-theorem gb_fibre_good {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {Δ : MvPolynomial (Fin (D + 1)) ℂ}
-    (hΔ : IsDiscr x e Δ) {c : ℂ} (hc : c ≠ 0) {y : Fin D → ℂ}
-    (hy : eval (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Δ ≠ 0) :
-    (fibre (coordIdeal ℤ x) (gbPsi e) y).Finite ∧
-      (fibre (coordIdeal ℤ x) (gbPsi e) y).ncard = projDeg x e ∧
-      ∀ w ∈ fibre (coordIdeal ℤ x) (gbPsi e) y, ∃ γ, IsSheet (coordIdeal ℤ x) (gbPsi e) y w γ := by
+theorem gb_fibre_good
+    {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {Δ : MvPolynomial (Fin (D + 1)) ℂ} (hΔ : IsDiscr x e Δ)
+    {c : ℂ} (hc : c ≠ 0)
+    {y : Fin D → ℂ} (hy : eval (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) Δ ≠ 0)
+    : (fibre (coordIdeal ℤ x) (gbPsi e) y).Finite
+      ∧ (fibre (coordIdeal ℤ x) (gbPsi e) y).ncard = projDeg x e
+      ∧ ∀ w ∈ fibre (coordIdeal ℤ x) (gbPsi e) y, ∃ γ,
+        IsSheet (coordIdeal ℤ x) (gbPsi e) y w γ := by
   obtain ⟨hfin, hcard, hsec, -⟩ := hΔ.2 _ hy
-  have hS : prFib x e (Fin.cons 1 y) =
-      (fun z => c⁻¹ • z) '' prFib x e (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) := by
+  have hS
+      : prFib x e (Fin.cons 1 y)
+        = (fun z => c⁻¹ • z) '' prFib x e (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) := by
     rw [← gb_prFib_smul x e (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) (inv_ne_zero hc), smul_smul,
       inv_mul_cancel₀ hc, one_smul]
   have hinj : Function.Injective (fun z : Ix κ → ℂ => segre (ι := GlobalTheory κ) (c⁻¹ • z)) :=
     fun a b hab => smul_right_injective _ (inv_ne_zero hc) (gb_segre_injective hab)
-  have hF : fibre (coordIdeal ℤ x) (gbPsi e) y =
-      (fun z => segre (ι := GlobalTheory κ) (c⁻¹ • z)) '' prFib x e (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) := by
+  have hF
+      : fibre (coordIdeal ℤ x) (gbPsi e) y
+        = (fun z => segre (ι := GlobalTheory κ) (c⁻¹ • z))
+          '' prFib x e (c • (Fin.cons 1 y : Fin (D + 1) → ℂ)) := by
     rw [gb_fibre_eq, hS, Set.image_image]
   refine ⟨?_, ?_, ?_⟩
   · rw [hF]
@@ -194,11 +214,13 @@ theorem gb_fibre_good {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {Δ : MvPol
         funext k
         simp [hmem.2 k, hc]
 
-theorem gb_integrand_ae {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : ConeMetric (C := ℂ) (ι := Ix κ)}
-    (hfr : IsProjFrame x e) (hFS : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.IsPullFS x e m) :
-    ∀ᵐ y : Fin D → ℂ, ∑ᶠ w ∈ fibre (coordIdeal ℤ x) (gbPsi e) y,
-        sheetDensity (coordIdeal ℤ x) (gbPsi e) (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.purePot m D) (fun _ => 1) y w =
-      (projDeg x e : ℝ) * maDensity (fun _ : Fin D => gbPot) y := by
+theorem gb_integrand_ae
+    {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : ConeMetric (C := ℂ) (ι := Ix κ)}
+    (hfr : IsProjFrame x e)
+    (hFS : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.IsPullFS x e m)
+    : ∀ᵐ y : Fin D → ℂ, ∑ᶠ w ∈ fibre (coordIdeal ℤ x) (gbPsi e) y,
+          sheetDensity (coordIdeal ℤ x) (gbPsi e) (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.purePot m D) (fun _ => 1) y w =
+        (projDeg x e : ℝ) * maDensity (fun _ : Fin D => gbPot) y := by
   obtain ⟨Δ, hΔ⟩ := exists_isDiscr hfr
   obtain ⟨c, hc, y₀, h₀⟩ := gb_exists_scale hΔ.1
   filter_upwards [gb_ae_good h₀] with y hy
@@ -207,17 +229,21 @@ theorem gb_integrand_ae {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : Cone
     finsum_mem_eq_finite_toFinset_sum _ hfin, Finset.sum_const, nsmul_eq_mul,
     ← Set.ncard_eq_toFinset_card _ hfin, hcard]
 
-theorem gb_ptsIntegralAt {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : ConeMetric (C := ℂ) (ι := Ix κ)}
-    (hfr : IsProjFrame x e) (hFS : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.IsPullFS x e m) :
-    ptsIntegralAt (coordIdeal ℤ x) (gbPsi e) (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.purePot m D) (fun _ => 1) = projDeg x e := by
+theorem gb_ptsIntegralAt
+    {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} {m : ConeMetric (C := ℂ) (ι := Ix κ)}
+    (hfr : IsProjFrame x e)
+    (hFS : ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.IsPullFS x e m)
+    : ptsIntegralAt (coordIdeal ℤ x) (gbPsi e)
+        (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.purePot m D) (fun _ => 1)
+      = projDeg x e := by
   unfold ptsIntegralAt
   rw [integral_congr_ae (gb_integrand_ae hfr hFS)]
   first
   | rw [integral_const_mul, integral_maDensity_gbPot, mul_one]
   | rw [integral_mul_left, integral_maDensity_gbPot, mul_one]
 
-theorem gb_isGoodProj {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsProjFrame x e) :
-    IsGoodProj (coordIdeal ℤ x) (gbPsi e) := by
+theorem gb_isGoodProj {x : Ix κ → Ω} {e : Fin (D + 1) → Ix κ} (hfr : IsProjFrame x e)
+    : IsGoodProj (coordIdeal ℤ x) (gbPsi e) := by
   intro z hz
   rw [gbPsi_segre]
   rw [gb_mcPts_eq] at hz

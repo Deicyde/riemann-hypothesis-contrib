@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ThetaTran
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum GlobalTheory.RatEqui GlobalTheory.InertParity
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum GlobalTheory.RatEqui GlobalTheory.InertParity
 open scoped BigOperators Pointwise
 
 namespace GlobalTheory.ThetaCovIndex
@@ -19,28 +21,29 @@ section General
 
 variable {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W] [FiniteDimensional ℝ W]
 
-
 omit [FiniteDimensional ℝ W] in
 set_option backward.isDefEq.respectTransparency false in
-theorem relIndex_eq_abs_det {ι : Type} [Fintype ι] [DecidableEq ι] (b₁ b₂ : Basis ι ℝ W) {L₁ L₂ : AddSubgroup W}
-    (h₁ : (Submodule.span ℤ (Set.range b₁)).toAddSubgroup = L₁)
-    (h₂ : (Submodule.span ℤ (Set.range b₂)).toAddSubgroup = L₂) (h : L₁ ≤ L₂) :
-    (L₁.relIndex L₂ : ℝ) = |b₂.det b₁| := by
+theorem relIndex_eq_abs_det
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b₁ b₂ : Basis ι ℝ W)
+    {L₁ L₂ : AddSubgroup W} (h₁ : (Submodule.span ℤ (Set.range b₁)).toAddSubgroup = L₁)
+    (h₂ : (Submodule.span ℤ (Set.range b₂)).toAddSubgroup = L₂) (h : L₁ ≤ L₂)
+    : (L₁.relIndex L₂ : ℝ) = |b₂.det b₁| := by
   subst h₁ h₂
   rw [AddSubgroup.relIndex_eq_natAbs_det _ _ h (b₁.restrictScalars ℤ) (b₂.restrictScalars ℤ),
     Nat.cast_natAbs, Int.cast_abs]
   congr 1
   rw [Basis.det_apply, Basis.det_apply, Int.cast_det]
-  congr; ext i j
+  congr
+  ext i j
   rw [Matrix.map_apply, Basis.toMatrix_apply, Basis.toMatrix_apply]
-  have := b₂.restrictScalars_repr_apply ℤ
-    ⟨b₁.restrictScalars ℤ j, h (Submodule.coe_mem _)⟩ i
+  have := b₂.restrictScalars_repr_apply ℤ ⟨b₁.restrictScalars ℤ j, h (Submodule.coe_mem _)⟩ i
   refine this.trans ?_
   simp
 
-theorem exists_basis_finrank {A : AddSubgroup W} (hA : DiscreteTopology A)
-    (hsp : Submodule.span ℝ (A : Set W) = ⊤) :
-    ∃ b : Basis (Fin (finrank ℝ W)) ℝ W, (Submodule.span ℤ (Set.range b)).toAddSubgroup = A := by
+theorem exists_basis_finrank
+    {A : AddSubgroup W} (hA : DiscreteTopology A) (hsp : Submodule.span ℝ (A : Set W) = ⊤)
+    : ∃ b : Basis (Fin (finrank ℝ W)) ℝ W, (Submodule.span ℤ (Set.range b)).toAddSubgroup = A := by
   have : DiscreteTopology A.toIntSubmodule := hA
   have : IsZLattice ℝ A.toIntSubmodule := ⟨hsp⟩
   let b₀ := Module.finBasisOfFinrankEq ℤ A.toIntSubmodule (ZLattice.rank ℝ A.toIntSubmodule)
@@ -48,12 +51,14 @@ theorem exists_basis_finrank {A : AddSubgroup W} (hA : DiscreteTopology A)
   rw [Basis.ofZLatticeBasis_span]
   rfl
 
-theorem relIndex_map {A B : AddSubgroup W} (hA : DiscreteTopology A)
-    (hsp : Submodule.span ℝ (A : Set W) = ⊤) (f : W ≃ₗ[ℝ] W) (hB : B ≤ A)
-    (hf : B.map (f : W →ₗ[ℝ] W).toAddMonoidHom ≤ A) {m : ℕ} (hm : 0 < m)
-    (hx : ∀ x ∈ A, ∃ y ∈ B, m • x = f y) :
-    B.relIndex A ≠ 0 ∧ ((B.map (f : W →ₗ[ℝ] W).toAddMonoidHom).relIndex A : ℝ) =
-      B.relIndex A * |LinearMap.det (f : W →ₗ[ℝ] W)| := by
+theorem relIndex_map
+    {A B : AddSubgroup W} (hA : DiscreteTopology A) (hsp : Submodule.span ℝ (A : Set W) = ⊤)
+    (f : W ≃ₗ[ℝ] W)
+    (hB : B ≤ A) (hf : B.map (f : W →ₗ[ℝ] W).toAddMonoidHom ≤ A)
+    {m : ℕ} (hm : 0 < m) (hx : ∀ x ∈ A, ∃ y ∈ B, m • x = f y)
+    : B.relIndex A ≠ 0
+      ∧ ((B.map (f : W →ₗ[ℝ] W).toAddMonoidHom).relIndex A : ℝ)
+        = B.relIndex A * |LinearMap.det (f : W →ₗ[ℝ] W)| := by
   have hBd : DiscreteTopology B := DiscreteTopology.of_subset hA hB
   have hBs : Submodule.span ℝ (B : Set W) = ⊤ := by
     have h1 : (Submodule.span ℝ (B : Set W)).map (f : W →ₗ[ℝ] W) = ⊤ := by
@@ -70,8 +75,9 @@ theorem relIndex_map {A B : AddSubgroup W} (hA : DiscreteTopology A)
     exact f.injective e ▸ hy
   obtain ⟨a, ha⟩ := exists_basis_finrank hA hsp
   obtain ⟨b, hb⟩ := exists_basis_finrank hBd hBs
-  have hb₁ : (Submodule.span ℤ (Set.range (b.map f))).toAddSubgroup =
-      B.map (f : W →ₗ[ℝ] W).toAddMonoidHom := by
+  have hb₁
+      : (Submodule.span ℤ (Set.range (b.map f))).toAddSubgroup
+        = B.map (f : W →ₗ[ℝ] W).toAddMonoidHom := by
     ext y
     obtain ⟨x, rfl⟩ := f.surjective y
     have : f x ∈ B.map (f : W →ₗ[ℝ] W).toAddMonoidHom ↔ x ∈ B :=
@@ -90,19 +96,19 @@ theorem relIndex_map {A B : AddSubgroup W} (hA : DiscreteTopology A)
 
 end General
 
-theorem relIndex_image_one_sub_complexLinearEquiv {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] [FiniteDimensional ℂ W]
+theorem relIndex_image_one_sub_complexLinearEquiv
+    {W : Type} [NormedAddCommGroup W] [NormedSpace ℂ W] [FiniteDimensional ℂ W]
     {A A₁ : AddSubgroup W} (t₁ : DiscreteTopology A) (s₁ : Submodule.span ℝ (A : Set W) = ⊤)
-    (u : W ≃ₗ[ℂ] W) (hA : ∀ x, x ∈ A ↔ u x ∈ A₁)
-    (hdet : LinearMap.det (LinearMap.id - (u.symm : W →ₗ[ℂ] W)) ≠ 0) {m : ℕ} (hm : 0 < m)
-    (hx : ∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y) :
-    A₁.relIndex A ≠ 0 ∧
-      (((A.map (LinearMap.id - (u.symm : W →ₗ[ℂ] W)).toAddMonoidHom).relIndex A : ℕ) : ℝ) =
-        (A₁.relIndex A : ℝ) * ‖LinearMap.det (LinearMap.id - (u.symm : W →ₗ[ℂ] W))‖ ^ 2 := by
+    (u : W ≃ₗ[ℂ] W)
+    (hA : ∀ x, x ∈ A ↔ u x ∈ A₁) (hdet : LinearMap.det (LinearMap.id - (u.symm : W →ₗ[ℂ] W)) ≠ 0)
+    {m : ℕ} (hm : 0 < m) (hx : ∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y)
+    : A₁.relIndex A ≠ 0
+      ∧ (((A.map (LinearMap.id - (u.symm : W →ₗ[ℂ] W)).toAddMonoidHom).relIndex A : ℕ) : ℝ)
+        = (A₁.relIndex A : ℝ) * ‖LinearMap.det (LinearMap.id - (u.symm : W →ₗ[ℂ] W))‖ ^ 2 := by
   set g : W →ₗ[ℂ] W := LinearMap.id - (u.symm : W →ₗ[ℂ] W) with hg
   have hgy : ∀ y, g y = y - u.symm y := fun y => rfl
   let f : W ≃ₗ[ℝ] W := (LinearMap.equivOfDetNeZero g hdet).restrictScalars ℝ
-  have hfg : (f : W →ₗ[ℝ] W) = g.restrictScalars ℝ := by
-    ext1 y; simp [f]
+  have hfg : (f : W →ₗ[ℝ] W) = g.restrictScalars ℝ := by ext1 y; simp [f]
   have hfy : ∀ y, f y = y - u.symm y := fun y => congrArg (fun φ => φ y) hfg
   have hA' : ∀ y, u.symm y ∈ A ↔ y ∈ A₁ := fun y => by rw [hA, u.apply_symm_apply]
   have hinf : (A₁ ⊓ A).map (f : W →ₗ[ℝ] W).toAddMonoidHom = A.map g.toAddMonoidHom ⊓ A := by
@@ -117,16 +123,35 @@ theorem relIndex_image_one_sub_complexLinearEquiv {W : Type} [NormedAddCommGroup
       refine ⟨y, ⟨(hA' y).1 ?_, hy⟩, hfy y⟩
       have h3 : y - u.symm y ∈ A := h2
       simpa using A.sub_mem hy h3
-  have key := relIndex_map (B := A₁ ⊓ A) t₁ s₁ f inf_le_right (hinf.le.trans inf_le_right) hm
-    fun x hxA => by
+  have key :=
+    relIndex_map (B := A₁ ⊓ A) t₁ s₁ f inf_le_right (hinf.le.trans inf_le_right) hm fun x hxA => by
       obtain ⟨y, hy, hy', e⟩ := hx x hxA
       exact ⟨y, ⟨(hA' y).1 hy', hy⟩, e.trans (hfy y).symm⟩
   rw [hinf, AddSubgroup.inf_relIndex_right, AddSubgroup.inf_relIndex_right, hfg,
-    LinearMap.det_restrictScalars, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq,
-    abs_of_nonneg (by positivity)] at key
+      LinearMap.det_restrictScalars, Algebra.norm_complex_apply, Complex.normSq_eq_norm_sq,
+      abs_of_nonneg (by positivity)]
+    at key
   exact key
 
-theorem relIndex_one_sub : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ), Crv D cc δ → ∀ (N N' : ℕ) (A A₁ : AddSubgroup (VC D N N')), KLat D (tor0 D cc δ) A → KLat D (tor0 D cc δ) A₁ → ∀ (u : VC D N N' ≃ₗ[ℂ] VC D N N'), (∀ z w, Hf D (tor0 D cc δ) (u z) (u w) = Hf D (tor0 D cc δ) z w) → (∀ x, x ∈ A ↔ u x ∈ A₁) → LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')) ≠ 0 → (∃ m : ℕ, 0 < m ∧ ∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y) → A₁.relIndex A ≠ 0 ∧ ((((A.map (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')).toAddMonoidHom).relIndex A : ℕ) : ℝ)) = (A₁.relIndex A : ℝ) * ‖LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N'))‖ ^ 2 := by
+theorem relIndex_one_sub
+    : ∀ (D : D7) (cc : Ideal (𝓞 D.host.K)) (δ : ℂ),
+      Crv D cc δ
+        → ∀ (N N' : ℕ) (A A₁ : AddSubgroup (VC D N N')),
+          KLat D (tor0 D cc δ) A → KLat D (tor0 D cc δ) A₁
+            → ∀ (u : VC D N N' ≃ₗ[ℂ] VC D N N'),
+              (∀ z w, Hf D (tor0 D cc δ) (u z) (u w) = Hf D (tor0 D cc δ) z w)
+                → (∀ x, x ∈ A ↔ u x ∈ A₁)
+                → LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')) ≠ 0
+                → (∃ m : ℕ, 0 < m ∧ ∀ x ∈ A, ∃ y ∈ A, u.symm y ∈ A ∧ m • x = y - u.symm y)
+                → A₁.relIndex A ≠ 0
+                  ∧ ((((A.map
+                          (LinearMap.id
+                            - (u.symm : VC D N N' →ₗ[ℂ] VC D N N')).toAddMonoidHom).relIndex A
+                        : ℕ)
+                      : ℝ))
+                    = (A₁.relIndex A : ℝ)
+                      * ‖LinearMap.det (LinearMap.id - (u.symm : VC D N N' →ₗ[ℂ] VC D N N'))‖
+                        ^ 2 := by
   intro D cc δ hc N N' A A₁ h₁ _ u _ hA hdet ⟨m, hm, hx⟩
   obtain ⟨f₁, s₁, d₁, -⟩ := klat_facts hc h₁
   have t₁ := discrete_of_selfDual (isHerm_sesqOf D (tor0 D cc δ) N N') d₁ f₁

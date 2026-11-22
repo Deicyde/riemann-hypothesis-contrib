@@ -17,8 +17,12 @@ namespace GroundTheory.Automorphic
 
 open Module GroundTheory.LocalField ValuativeRel IsLocalRing Polynomial
 
-theorem mem_or_mul_inv_mem_of_natCard_eq_two {G : Type*} [CommGroup G] {N : Subgroup G}
-    (hN : Nat.card (G ⧸ N) = 2) {t : G} (ht : t ∉ N) (u : G) : u ∈ N ∨ u * t⁻¹ ∈ N := by
+theorem mem_or_mul_inv_mem_of_natCard_eq_two
+    {G : Type*} [CommGroup G]
+    {N : Subgroup G} (hN : Nat.card (G ⧸ N) = 2)
+    {t : G} (ht : t ∉ N)
+    (u : G)
+    : u ∈ N ∨ u * t⁻¹ ∈ N := by
   by_contra H
   push Not at H
   obtain ⟨y, -, hy⟩ := (Nat.card_eq_two_iff' (1 : G ⧸ N)).1 hN
@@ -32,8 +36,8 @@ section General
 
 variable {F E : Type*} [Field F] [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 
-theorem mem_range_normUnits_iff (u : Fˣ) :
-    u ∈ (normUnits F E).range ↔ ∃ z : E, Algebra.norm F z = u := by
+theorem mem_range_normUnits_iff (u : Fˣ)
+    : u ∈ (normUnits F E).range ↔ ∃ z : E, Algebra.norm F z = u := by
   constructor
   · rintro ⟨w, rfl⟩
     exact ⟨w, (coe_normUnits w).symm⟩
@@ -48,11 +52,10 @@ section Local
 variable (F : Type*) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
 
 variable {F}
-variable {E : Type*} [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
-  [Algebra.IsSeparable F E]
+variable
+  {E : Type*} [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E] [Algebra.IsSeparable F E]
 
-theorem natCard_quotient_range_normUnits_eq_two :
-    Nat.card (Fˣ ⧸ (normUnits F E).range) = 2 := by
+theorem natCard_quotient_range_normUnits_eq_two : Nat.card (Fˣ ⧸ (normUnits F E).range) = 2 := by
   obtain ⟨_, _, _, _⟩ := exists_isNonarchimedeanLocalField_valuativeExtension F E
   rw [natCard_units_quotient_range_normUnits, Algebra.IsQuadraticExtension.finrank_eq_two]
 

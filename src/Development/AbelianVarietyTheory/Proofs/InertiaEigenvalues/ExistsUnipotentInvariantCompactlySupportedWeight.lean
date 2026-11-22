@@ -18,7 +18,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsW
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG GlobalTheory.LFun Formalism.L2.Host
+open NumberField IsDedekindDomain MeasureTheory GlobalTheory.CuspRep GlobalTheory.JSW Formalism.UG
+  GlobalTheory.LFun Formalism.L2.Host
 open scoped ENNReal ComplexConjugate ContDiff
 open Matrix
 open GlobalTheory.WhitBump
@@ -29,22 +30,30 @@ namespace GlobalTheory.KappaCut
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem decomp (h : GA E a) :
-    h = infGL E a (GeneralLinearGroup.map (pInf E) h) * finGL E a (GeneralLinearGroup.map (pFin E) h) := by
+theorem decomp (h : GA E a)
+    : h
+      = infGL E a (GeneralLinearGroup.map (pInf E) h)
+        * finGL E a (GeneralLinearGroup.map (pFin E) h) := by
   refine ga_ext ?_ ?_ <;> simp
 
-theorem continuous_of_chart (b : GA E a → ℂ) (U : Subgroup (GL (Fin a) (Af E))) (hU : IsOpen (U : Set (GL (Fin a) (Af E))))
-    (hR : ∀ u ∈ U, ∀ g, b (g * finGL E a u) = b g) (hC : ∀ g, ContDiffOn ℝ ∞ (chart b g) (invSet E a)) :
-    Continuous b := by
+theorem continuous_of_chart
+    (b : GA E a → ℂ) (U : Subgroup (GL (Fin a) (Af E)))
+    (hU : IsOpen (U : Set (GL (Fin a) (Af E)))) (hR : ∀ u ∈ U, ∀ g, b (g * finGL E a u) = b g)
+    (hC : ∀ g, ContDiffOn ℝ ∞ (chart b g) (invSet E a))
+    : Continuous b := by
   rw [continuous_iff_continuousAt]
   intro g
   let pI : GA E a → GL (Fin a) (Cinf E) := fun h => GeneralLinearGroup.map (pInf E) h
   let pF : GA E a → GL (Fin a) (Af E) := fun h => GeneralLinearGroup.map (pFin E) h
   have hpI : Continuous pI := ContAut.continuous_map_pInf E a
   have hpF : Continuous pF := ContAut.continuous_map_pFin E a
-  let F : GA E a → Lie E a := fun g' => toL ((pI (g⁻¹ * g') : GL (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E))
-  have hF : Continuous F := (Units.continuous_val (M := Matrix (Fin a) (Fin a) (Cinf E))).comp (hpI.comp (continuous_const.mul continuous_id))
-  have hFmem : ∀ g', F g' ∈ invSet E a := fun g' => show IsUnit (Matrix.of (F g')) from (pI (g⁻¹ * g')).isUnit
+  let F : GA E a → Lie E a := fun g' =>
+    toL ((pI (g⁻¹ * g') : GL (Fin a) (Cinf E)) : Matrix (Fin a) (Fin a) (Cinf E))
+  have hF : Continuous F :=
+    (Units.continuous_val (M := Matrix (Fin a) (Fin a) (Cinf E))).comp
+      (hpI.comp (continuous_const.mul continuous_id))
+  have hFmem : ∀ g', F g' ∈ invSet E a := fun g' =>
+    show IsUnit (Matrix.of (F g')) from (pI (g⁻¹ * g')).isUnit
   have heq : ∀ g', pF (g⁻¹ * g') ∈ U → b g' = chart b g (F g') := by
     intro g' hg'
     have hx : IsUnit (Matrix.of (F g')) := (pI (g⁻¹ * g')).isUnit
@@ -53,7 +62,8 @@ theorem continuous_of_chart (b : GA E a → ℂ) (U : Subgroup (GL (Fin a) (Af E
     rw [hu]
     have e : g' = g * infGL E a (pI (g⁻¹ * g')) * finGL E a (pF (g⁻¹ * g')) := by
       rw [mul_assoc, ← decomp, mul_inv_cancel_left]
-    rw [show b g' = b (g * infGL E a (pI (g⁻¹ * g')) * finGL E a (pF (g⁻¹ * g'))) from congrArg b e, hR _ hg']
+    rw [show b g' = b (g * infGL E a (pI (g⁻¹ * g')) * finGL E a (pF (g⁻¹ * g'))) from congrArg b e,
+      hR _ hg']
   have hopen : {g' | pF (g⁻¹ * g') ∈ U} ∈ nhds g := by
     refine (hU.preimage (hpF.comp (continuous_const.mul continuous_id))).mem_nhds ?_
     simp [pF, U.one_mem]
@@ -73,16 +83,23 @@ theorem contDiff_normSq_ofReal : ContDiff ℝ ∞ (fun z : ℂ => ((Complex.norm
 
 end GlobalTheory.KappaCut
 
-
 open GlobalTheory.KappaCut in
-theorem GlobalTheory.KappaCut.exists_kappa : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ) (x₀ : GA E (m + 1)),
-    ∃ κ : GA E (m + 1) → ℝ, Continuous κ ∧ (∀ h, 0 ≤ κ h) ∧ (∀ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)), ∀ h, κ (u * h) = κ h) ∧
-      (∃ C : Set (GA E (m + 1)), IsCompact C ∧ ∀ h, κ h ≠ 0 → ∃ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)), u⁻¹ * h ∈ C) ∧
-      (∃ U : Subgroup (GL (Fin (m + 1)) (Af E)), IsOpen (U : Set (GL (Fin (m + 1)) (Af E))) ∧
-        ∀ u ∈ U, ∀ h, κ (h * finGL E (m + 1) u) = κ h) ∧
-      (∀ g, ContDiffOn ℝ ∞ (chart (fun h => (κ h : ℂ)) g) (invSet E (m + 1))) ∧ 0 < κ x₀ := by
+theorem GlobalTheory.KappaCut.exists_kappa
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (m : ℕ)
+        (x₀ : GA E (m + 1)),
+      ∃ κ : GA E (m + 1) → ℝ,
+        Continuous κ ∧ (∀ h, 0 ≤ κ h)
+          ∧ (∀ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)), ∀ h, κ (u * h) = κ h)
+          ∧ (∃ C : Set (GA E (m + 1)),
+            IsCompact C
+              ∧ ∀ h, κ h ≠ 0 → ∃ u ∈ GlobalTheory.JSW.NA (E := E) (a := (m + 1)), u⁻¹ * h ∈ C)
+          ∧ (∃ U : Subgroup (GL (Fin (m + 1)) (Af E)),
+            IsOpen (U : Set (GL (Fin (m + 1)) (Af E)))
+              ∧ ∀ u ∈ U, ∀ h, κ (h * finGL E (m + 1) u) = κ h)
+          ∧ (∀ g, ContDiffOn ℝ ∞ (chart (fun h => (κ h : ℂ)) g) (invSet E (m + 1))) ∧ 0 < κ x₀ := by
   intro E _ _ _ m x₀
-  obtain ⟨b, hb1, hbN, ⟨C, hC, hCs⟩, ⟨U, hU, hUr⟩, hbc⟩ := GlobalTheory.WhitBump.exists_bump_glob E m
+  obtain ⟨b, hb1, hbN, ⟨C, hC, hCs⟩, ⟨U, hU, hUr⟩, hbc⟩ :=
+    GlobalTheory.WhitBump.exists_bump_glob E m
   have hbcont : Continuous b := continuous_of_chart b U hU hUr hbc
   let pI : GA E (m + 1) → GL (Fin (m + 1)) (Cinf E) := fun h => GeneralLinearGroup.map (pInf E) h
   let pF : GA E (m + 1) → GL (Fin (m + 1)) (Af E) := fun h => GeneralLinearGroup.map (pFin E) h
@@ -106,23 +123,33 @@ theorem GlobalTheory.KappaCut.exists_kappa : ∀ (E : Type) [Field E] [NumberFie
     · intro u hu h
       have hu' : pF x₀ * u * (pF x₀)⁻¹ ∈ U := hu
       show Complex.normSq (b (h * finGL E (m + 1) u * x₀⁻¹)) = Complex.normSq (b (h * x₀⁻¹))
-      have e : h * finGL E (m + 1) u * x₀⁻¹ = h * x₀⁻¹ * finGL E (m + 1) (pF x₀ * u * (pF x₀)⁻¹) := by
+      have e
+          : h * finGL E (m + 1) u * x₀⁻¹ = h * x₀⁻¹ * finGL E (m + 1) (pF x₀ * u * (pF x₀)⁻¹) := by
         rw [← hconjF]; group
       rw [e, hUr _ hu']
   · intro g
     set A : GL (Fin (m + 1)) (Cinf E) := pI x₀ with hA
-    let L0 : Lie E (m + 1) →ₗ[ℝ] Lie E (m + 1) :=
-      { toFun := fun x => toL ((A : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) * Matrix.of x *
-          ((A⁻¹ : GL (Fin (m + 1)) (Cinf E)) : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)))
-        map_add' := fun x y => by
-          show toL (_ * (Matrix.of x + Matrix.of y) * _) = _
-          rw [Matrix.mul_add, Matrix.add_mul]; rfl
-        map_smul' := fun c x => by
-          show toL (_ * (c • Matrix.of x) * _) = _
-          rw [Matrix.mul_smul, Matrix.smul_mul]; rfl }
+    let L0 : Lie E (m + 1) →ₗ[ℝ] Lie E (m + 1) := {
+      toFun := fun x =>
+        toL
+          ((A : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) * Matrix.of x
+            * ((A⁻¹ : GL (Fin (m + 1)) (Cinf E)) : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)))
+      map_add' := fun x y => by
+        show toL (_ * (Matrix.of x + Matrix.of y) * _) = _
+        rw [Matrix.mul_add, Matrix.add_mul]
+        rfl
+      map_smul' := fun c x => by
+        show toL (_ * (c • Matrix.of x) * _) = _
+        rw [Matrix.mul_smul, Matrix.smul_mul]
+        rfl
+    }
     let L : Lie E (m + 1) →L[ℝ] Lie E (m + 1) := LinearMap.toContinuousLinearMap L0
-    have hLx : ∀ x : Lie E (m + 1), Matrix.of (L x) = (A : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) * Matrix.of x *
-        ((A⁻¹ : GL (Fin (m + 1)) (Cinf E)) : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) := by
+    have hLx
+        : ∀ x : Lie E (m + 1),
+          Matrix.of (L x)
+            = (A : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) * Matrix.of x
+              * ((A⁻¹ : GL (Fin (m + 1)) (Cinf E))
+                : Matrix (Fin (m + 1)) (Fin (m + 1)) (Cinf E)) := by
       intro x
       simp only [L]
       erw [LinearMap.coe_toContinuousLinearMap']
@@ -141,7 +168,8 @@ theorem GlobalTheory.KappaCut.exists_kappa : ∀ (E : Type) [Field E] [NumberFie
     simp only [Function.comp, chart, dif_pos hx', dif_pos hL']
     congr 3
     have hu : hL'.unit = A * hx'.unit * A⁻¹ := Units.ext (by rw [IsUnit.unit_spec, hLx]; simp)
-    rw [hu, ← hconjI]; group
+    rw [hu, ← hconjI]
+    group
   · simp [hb1]
 
 end

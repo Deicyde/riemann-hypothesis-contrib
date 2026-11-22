@@ -8,13 +8,16 @@ open NumberField MeasureTheory GlobalTheory.CuspRep GlobalTheory.HCF Topology
 
 namespace GlobalTheory
 
-theorem finiteDim_norm_le_on_Icc_of_determined :
-    ∀ (V : Submodule ℂ (ℝ → ℂ)), FiniteDimensional ℂ V → (∀ f ∈ V, Continuous f) → ∀ ℓ : ℝ, 0 < ℓ →
-    (∀ f ∈ V, (∀ x ∈ Set.Icc 0 ℓ, f x = 0) → f = 0) → ∀ R : ℝ, ∃ C : ℝ, ∀ f ∈ V, ∀ M : ℝ,
-      (∀ x ∈ Set.Icc 0 ℓ, ‖f x‖ ≤ M) → ∀ t ∈ Set.Icc (-R) R, ‖f t‖ ≤ C * M := by
+theorem finiteDim_norm_le_on_Icc_of_determined
+    : ∀ (V : Submodule ℂ (ℝ → ℂ)),
+      FiniteDimensional ℂ V → (∀ f ∈ V, Continuous f)
+        → ∀ ℓ : ℝ,
+          0 < ℓ → (∀ f ∈ V, (∀ x ∈ Set.Icc 0 ℓ, f x = 0) → f = 0)
+            → ∀ R : ℝ, ∃ C : ℝ, ∀ f ∈ V, ∀ M : ℝ,
+              (∀ x ∈ Set.Icc 0 ℓ, ‖f x‖ ≤ M) → ∀ t ∈ Set.Icc (-R) R, ‖f t‖ ≤ C * M := by
   intro V hV hcont ℓ hℓ hdet R
-  let ev : Set.Icc (0:ℝ) ℓ → Module.Dual ℂ V := fun x =>
-    (LinearMap.proj (R := ℂ) (φ := fun _ : ℝ => ℂ) (x:ℝ)).comp V.subtype
+  let ev : Set.Icc (0 : ℝ) ℓ → Module.Dual ℂ V := fun x =>
+    (LinearMap.proj (R := ℂ) (φ := fun _ : ℝ => ℂ) (x : ℝ)).comp V.subtype
   obtain ⟨κ, a, -, hspan, hli⟩ := exists_linearIndependent' ℂ ev
   haveI : Finite κ := hli.finite
   letI : Fintype κ := Fintype.ofFinite κ
@@ -29,7 +32,7 @@ theorem finiteDim_norm_le_on_Icc_of_determined :
       have := congrFun hg k
       simpa [T] using this
     rw [hspan] at h1
-    have h2 : ∀ x ∈ Set.Icc (0:ℝ) ℓ, (g : ℝ → ℂ) x = 0 := by
+    have h2 : ∀ x ∈ Set.Icc (0 : ℝ) ℓ, (g : ℝ → ℂ) x = 0 := by
       intro x hx
       have := h1 (Submodule.subset_span ⟨⟨x, hx⟩, rfl⟩)
       simpa [ev] using this
@@ -48,8 +51,7 @@ theorem finiteDim_norm_le_on_Icc_of_determined :
   set_option synthInstance.maxHeartbeats 100000 in
     rw [e2, map_sum] at e
   have e3 := congrFun (congrArg Subtype.val e) t
-  have hft : f t = ∑ k, f (a k) * g k t := by
-    simpa [g, Finset.sum_apply] using e3
+  have hft : f t = ∑ k, f (a k) * g k t := by simpa [g, Finset.sum_apply] using e3
   rw [hft, Finset.sum_mul]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun k _ => ?_)
   rw [norm_mul, mul_comm]

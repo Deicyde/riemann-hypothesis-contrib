@@ -8,9 +8,12 @@ namespace GlobalTheory.CompanionTheory.QuadraticUnit
 
 open Polynomial IsLocalRing
 
-theorem norm_isUnit {R : Type} [CommRing R] [HenselianLocalRing R] (D : R) (hD : IsUnit D)
-    (h2 : IsUnit (2 : R)) (hns : ¬ ∃ e : R, D = e * e) (a b : R)
-    (hab : IsUnit a ∨ IsUnit b) : IsUnit (a * a - D * (b * b)) := by
+theorem norm_isUnit
+    {R : Type} [CommRing R] [HenselianLocalRing R]
+    (D : R) (hD : IsUnit D)
+    (h2 : IsUnit (2 : R)) (hns : ¬ ∃ e : R, D = e * e)
+    (a b : R) (hab : IsUnit a ∨ IsUnit b)
+    : IsUnit (a * a - D * (b * b)) := by
   have hmax : ∀ x : R, x ∈ maximalIdeal R ↔ ¬ IsUnit x := fun x => by
     rw [mem_maximalIdeal, mem_nonunits_iff]
   by_contra hnu
@@ -43,18 +46,21 @@ theorem norm_isUnit {R : Type} [CommRing R] [HenselianLocalRing R] (D : R) (hD :
       exact sub_mem ((hmax _).2 hcc) hcD
     exact (hmax _).1 hDm hD
   have hcu : IsUnit c := isUnit_of_mul_isUnit_left hcc
-  obtain ⟨e, he, -⟩ := HenselianLocalRing.is_henselian (X ^ 2 - C D) (monic_X_pow_sub_C D two_ne_zero) c
-    (by simpa [sq] using hcD) (by simpa [derivative_X_pow, one_add_one_eq_two] using h2.mul hcu)
+  obtain ⟨e, he, -⟩ :=
+    HenselianLocalRing.is_henselian (X ^ 2 - C D) (monic_X_pow_sub_C D two_ne_zero) c
+      (by simpa [sq] using hcD) (by simpa [derivative_X_pow, one_add_one_eq_two] using h2.mul hcu)
   apply hns
   refine ⟨e, ?_⟩
   have := he.eq_zero
   simp only [eval_sub, eval_pow, eval_X, eval_C] at this
   linear_combination -this
 
-theorem isUnit_add_mul {R O : Type} [CommRing R] [HenselianLocalRing R] [CommRing O]
+theorem isUnit_add_mul
+    {R O : Type} [CommRing R] [HenselianLocalRing R] [CommRing O]
     (ι : R →+* O) (δ : O) (D : R) (hδ : δ * δ = ι D) (hD : IsUnit D)
-    (h2 : IsUnit (2 : R)) (hns : ¬ ∃ e : R, D = e * e) (a b : R)
-    (hab : IsUnit a ∨ IsUnit b) : IsUnit (ι a + ι b * δ) := by
+    (h2 : IsUnit (2 : R)) (hns : ¬ ∃ e : R, D = e * e)
+    (a b : R) (hab : IsUnit a ∨ IsUnit b)
+    : IsUnit (ι a + ι b * δ) := by
   have hn := (norm_isUnit D hD h2 hns a b hab).map ι
   have he : (ι a + ι b * δ) * (ι a - ι b * δ) = ι (a * a - D * (b * b)) := by
     rw [map_sub, map_mul, map_mul, map_mul, ← hδ]
@@ -62,11 +68,13 @@ theorem isUnit_add_mul {R O : Type} [CommRing R] [HenselianLocalRing R] [CommRin
   rw [← he] at hn
   exact isUnit_of_mul_isUnit_left hn
 
-theorem exists_eq_mul_isUnit {R O : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [HenselianLocalRing R] [CommRing O] (ι : R →+* O) (δ : O) (D : R) (hδ : δ * δ = ι D)
-    (hspan : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ) (hD : IsUnit D)
-    (h2 : IsUnit (2 : R)) (hns : ¬ ∃ e : R, D = e * e) (y : O) :
-    ∃ (g : R) (u : O), IsUnit u ∧ y = ι g * u := by
+theorem exists_eq_mul_isUnit
+    {R O : Type}
+    [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [HenselianLocalRing R] [CommRing O]
+    (ι : R →+* O) (δ : O) (D : R) (hδ : δ * δ = ι D)
+    (hspan : ∀ y : O, ∃ p q : R, y = ι p + ι q * δ) (hD : IsUnit D) (h2 : IsUnit (2 : R))
+    (hns : ¬ ∃ e : R, D = e * e) (y : O)
+    : ∃ (g : R) (u : O), IsUnit u ∧ y = ι g * u := by
   obtain ⟨p, q, rfl⟩ := hspan y
   rcases ValuationRing.dvd_total p q with ⟨r, rfl⟩ | ⟨r, rfl⟩
   · refine ⟨p, 1 + ι r * δ, ?_, by rw [map_mul]; ring⟩
@@ -74,11 +82,13 @@ theorem exists_eq_mul_isUnit {R O : Type} [CommRing R] [IsDomain R] [IsDiscreteV
   · refine ⟨q, ι r + δ, ?_, by rw [map_mul]; ring⟩
     simpa using isUnit_add_mul ι δ D hδ hD h2 hns r 1 (Or.inr isUnit_one)
 
-theorem isPrincipalIdealRing_of_nonsquare_unit :
-    ∀ (R O : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [HenselianLocalRing R]
-      [CommRing O] (ι : R →+* O) (δ : O) (D : R), δ * δ = ι D →
-      (∀ y : O, ∃ p q : R, y = ι p + ι q * δ) → (∀ p q : R, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) →
-      IsUnit D → IsUnit (2 : R) → (¬ ∃ e : R, D = e * e) → IsPrincipalIdealRing O := by
+theorem isPrincipalIdealRing_of_nonsquare_unit
+    : ∀ (R O : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [HenselianLocalRing R]
+        [CommRing O] (ι : R →+* O) (δ : O) (D : R),
+      δ * δ = ι D → (∀ y : O, ∃ p q : R, y = ι p + ι q * δ)
+        → (∀ p q : R, ι p + ι q * δ = 0 → p = 0 ∧ q = 0) → IsUnit D → IsUnit (2 : R)
+        → (¬ ∃ e : R, D = e * e)
+        → IsPrincipalIdealRing O := by
   intro R O _ _ _ _ _ ι δ D hδ hspan _ hD h2 hns
   refine ⟨fun I => ⟨?_⟩⟩
   obtain ⟨g₀, hg₀⟩ := (IsPrincipalIdealRing.principal (Ideal.comap ι I)).principal

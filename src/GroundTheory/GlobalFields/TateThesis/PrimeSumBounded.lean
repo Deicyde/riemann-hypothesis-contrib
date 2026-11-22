@@ -20,32 +20,31 @@ namespace HeckeCharacter
 
 variable (χ : HeckeCharacter K)
 
-def primeSum (s : ℝ) : ℂ :=
-  ∑' v : HeightOneSpectrum (𝓞 K), χ.coeffTerm (s : ℂ) v.asIdeal
+def primeSum (s : ℝ) : ℂ := ∑' v : HeightOneSpectrum (𝓞 K), χ.coeffTerm (s : ℂ) v.asIdeal
 
 def primeLogSum (s : ℝ) : ℂ :=
   ∑' v : HeightOneSpectrum (𝓞 K), -Complex.log (1 - χ.coeffTerm (s : ℂ) v.asIdeal)
 
-theorem norm_coeffTerm_asIdeal_le {s : ℝ} (hs : 1 ≤ s) (v : HeightOneSpectrum (𝓞 K)) :
-    ‖χ.coeffTerm (s : ℂ) v.asIdeal‖ ≤ (Ideal.absNorm v.asIdeal : ℝ)⁻¹ := by
+theorem norm_coeffTerm_asIdeal_le {s : ℝ} (hs : 1 ≤ s) (v : HeightOneSpectrum (𝓞 K))
+    : ‖χ.coeffTerm (s : ℂ) v.asIdeal‖ ≤ (Ideal.absNorm v.asIdeal : ℝ)⁻¹ := by
   refine (χ.norm_coeffTerm_le _).trans ?_
-  have h1 : (1 : ℝ) ≤ Ideal.absNorm v.asIdeal := by
-    exact_mod_cast (one_lt_absNorm_asIdeal v).le
+  have h1 : (1 : ℝ) ≤ Ideal.absNorm v.asIdeal := by exact_mod_cast (one_lt_absNorm_asIdeal v).le
   rw [ofReal_re]
   refine inv_anti₀ (by positivity) ?_
-  calc (Ideal.absNorm v.asIdeal : ℝ) = (Ideal.absNorm v.asIdeal : ℝ) ^ (1 : ℝ) :=
-        (Real.rpow_one _).symm
+  calc
+    (Ideal.absNorm v.asIdeal : ℝ)
+      = (Ideal.absNorm v.asIdeal : ℝ) ^ (1 : ℝ) := (Real.rpow_one _).symm
     _ ≤ _ := Real.rpow_le_rpow_of_exponent_le h1 hs
 
-theorem norm_coeffTerm_asIdeal_le_half {s : ℝ} (hs : 1 ≤ s) (v : HeightOneSpectrum (𝓞 K)) :
-    ‖χ.coeffTerm (s : ℂ) v.asIdeal‖ ≤ 1 / 2 := by
+theorem norm_coeffTerm_asIdeal_le_half {s : ℝ} (hs : 1 ≤ s) (v : HeightOneSpectrum (𝓞 K))
+    : ‖χ.coeffTerm (s : ℂ) v.asIdeal‖ ≤ 1 / 2 := by
   refine (χ.norm_coeffTerm_asIdeal_le hs v).trans ?_
   have h2 : (2 : ℝ) ≤ Ideal.absNorm v.asIdeal := by exact_mod_cast one_lt_absNorm_asIdeal v
   rw [one_div]
   exact inv_anti₀ two_pos h2
 
-theorem summable_norm_coeffTerm_asIdeal {s : ℝ} (hs : 1 < s) :
-    Summable fun v : HeightOneSpectrum (𝓞 K) ↦ ‖χ.coeffTerm (s : ℂ) v.asIdeal‖ :=
+theorem summable_norm_coeffTerm_asIdeal {s : ℝ} (hs : 1 < s)
+    : Summable fun v : HeightOneSpectrum (𝓞 K) ↦ ‖χ.coeffTerm (s : ℂ) v.asIdeal‖ :=
   (χ.summable_norm_coeffTerm (by simpa using hs)).comp_injective fun _ _ h ↦ HeightOneSpectrum.ext h
 
 theorem exp_primeLogSum {s : ℝ} (hs : 1 < s) : Complex.exp (χ.primeLogSum s) = χ.LFunction s := by
@@ -83,7 +82,9 @@ theorem continuousOn_primeLogSum : ContinuousOn χ.primeLogSum (Ioi 1) := by
   have hc : ContinuousOn χ.primeLogSum (Ioi ((1 + s₀) / 2)) := by
     refine continuousOn_tsum
       (u := fun v : HeightOneSpectrum (𝓞 K) ↦
-        3 / 2 * ((Ideal.absNorm v.asIdeal : ℝ) ^ ((1 + s₀) / 2))⁻¹) (fun v ↦ ?_) ?_
+        3 / 2 * ((Ideal.absNorm v.asIdeal : ℝ) ^ ((1 + s₀) / 2))⁻¹)
+      (fun v ↦ ?_)
+      ?_
       (fun v s hs ↦ ?_)
     · have hN : (Ideal.absNorm v.asIdeal : ℂ) ≠ 0 := by
         exact_mod_cast (one_pos.trans (one_lt_absNorm_asIdeal v)).ne'
@@ -100,27 +101,27 @@ theorem continuousOn_primeLogSum : ContinuousOn χ.primeLogSum (Ioi 1) := by
         simp only [coeffTerm_apply]
         exact continuousAt_const.div hcp hden
       refine (ContinuousAt.clog (continuousAt_const.sub hterm) ?_).neg
-      have hm := mem_slitPlane_of_norm_lt_one (z := -χ.coeffTerm (s : ℂ) v.asIdeal)
-        (by rw [norm_neg]; exact (χ.norm_coeffTerm_asIdeal_le_half hs1 v).trans_lt (by norm_num))
+      have hm :=
+        mem_slitPlane_of_norm_lt_one (z := - χ.coeffTerm (s : ℂ) v.asIdeal)
+          (by rw [norm_neg]; exact (χ.norm_coeffTerm_asIdeal_le_half hs1 v).trans_lt (by norm_num))
       rwa [← sub_eq_add_neg] at hm
-    · exact ((summable_absNorm_rpow_inv hσ1).comp_injective
-        fun _ _ h ↦ HeightOneSpectrum.ext h).mul_left _
+    · exact ((summable_absNorm_rpow_inv hσ1).comp_injective fun _ _ h ↦
+        HeightOneSpectrum.ext h).mul_left _
     · have hs' : (1 + s₀) / 2 < s := hs
       have hs1 : (1 : ℝ) ≤ s := by linarith
-      have h1 : (1 : ℝ) ≤ Ideal.absNorm v.asIdeal := by
-        exact_mod_cast (one_lt_absNorm_asIdeal v).le
+      have h1 : (1 : ℝ) ≤ Ideal.absNorm v.asIdeal := by exact_mod_cast (one_lt_absNorm_asIdeal v).le
       rw [norm_neg, sub_eq_add_neg]
-      refine (norm_log_one_add_half_le_self
-        (by rw [norm_neg]; exact χ.norm_coeffTerm_asIdeal_le_half hs1 v)).trans ?_
+      refine (norm_log_one_add_half_le_self (by
+        rw [norm_neg]; exact χ.norm_coeffTerm_asIdeal_le_half hs1 v)).trans ?_
       rw [norm_neg]
       refine mul_le_mul_of_nonneg_left ((χ.norm_coeffTerm_le _).trans ?_) (by norm_num)
       rw [ofReal_re]
       exact inv_anti₀ (by positivity) (Real.rpow_le_rpow_of_exponent_le h1 hs'.le)
   exact (hc.continuousAt (Ioi_mem_nhds hσs)).continuousWithinAt
 
-theorem exists_tendsto_primeLogSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
-    (hL : Tendsto (fun s : ℝ ↦ χ.LFunction s) (𝓝[>] 1) (𝓝 L₁)) :
-    ∃ c : ℂ, Tendsto χ.primeLogSum (𝓝[>] 1) (𝓝 c) := by
+theorem exists_tendsto_primeLogSum
+    {L₁ : ℂ} (hL₁ : L₁ ≠ 0) (hL : Tendsto (fun s : ℝ ↦ χ.LFunction s) (𝓝[>] 1) (𝓝 L₁))
+    : ∃ c : ℂ, Tendsto χ.primeLogSum (𝓝[>] 1) (𝓝 c) := by
   have hw1 : Tendsto (fun s : ℝ ↦ χ.LFunction s / L₁) (𝓝[>] 1) (𝓝 1) := by
     have := hL.div_const L₁
     rwa [div_self hL₁] at this
@@ -135,8 +136,9 @@ theorem exists_tendsto_primeLogSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
     rwa [add_sub_cancel] at this
   have hLc : ∀ s ∈ Ioo (1 : ℝ) u, ContinuousAt (fun s : ℝ ↦ χ.LFunction s) s := fun s hs ↦ by
     have hs' : 1 < ((s : ℝ) : ℂ).re := by simpa using hs.1
-    have hd := (χ.differentiableOn_LFunction _ hs').differentiableAt
-      ((isOpen_lt continuous_const continuous_re).mem_nhds hs')
+    have hd :=
+      (χ.differentiableOn_LFunction _ hs').differentiableAt
+        ((isOpen_lt continuous_const continuous_re).mem_nhds hs')
     exact hd.continuousAt.comp continuous_ofReal.continuousAt
   have hs₀ : (1 + u) / 2 ∈ Ioo (1 : ℝ) u := ⟨by linarith, by linarith⟩
   set s₀ := (1 + u) / 2
@@ -144,8 +146,11 @@ theorem exists_tendsto_primeLogSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
   have heq : EqOn χ.primeLogSum (fun s : ℝ ↦ Complex.log (χ.LFunction s / L₁) + c) (Ioo 1 u) := by
     refine isCoveringMap_exp.eqOn_of_comp_eqOn isPreconnected_Ioo
       (χ.continuousOn_primeLogSum.mono fun s hs ↦ hs.1)
-      (fun s hs ↦ ((ContinuousAt.clog ((hLc s hs).div_const L₁) (hslit s hs)).add
-        continuousAt_const).continuousWithinAt) (fun s hs ↦ ?_) hs₀ (by rw [hc]; ring)
+      (fun s hs ↦
+        ((ContinuousAt.clog ((hLc s hs).div_const L₁) (hslit s hs)).add
+          continuousAt_const).continuousWithinAt)
+      (fun s hs ↦ ?_)
+      hs₀ (by rw [hc]; ring)
     apply Subtype.ext
     simp only [Function.comp_apply]
     rw [Complex.exp_add, Complex.exp_log (slitPlane_ne_zero (hslit s hs)), hc, Complex.exp_sub,
@@ -154,21 +159,22 @@ theorem exists_tendsto_primeLogSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
     have h0 : χ.LFunction s₀ ≠ 0 := χ.LFunction_ne_zero (by simpa using hs₀.1)
     field_simp
   refine ⟨c, ?_⟩
-  have hlim : Tendsto (fun s : ℝ ↦ Complex.log (χ.LFunction s / L₁) + c) (𝓝[>] 1)
-      (𝓝 (Complex.log 1 + c)) :=
+  have hlim : Tendsto
+      (fun s : ℝ ↦ Complex.log (χ.LFunction s / L₁) + c)
+      (𝓝[>] 1) (𝓝 (Complex.log 1 + c)) :=
     ((continuousAt_clog (by simp)).tendsto.comp hw1).add tendsto_const_nhds
   rw [Complex.log_one, zero_add] at hlim
   refine hlim.congr' ?_
   filter_upwards [Ioo_mem_nhdsGT hu1'] with s hs using (heq hs).symm
 
-theorem isBoundedUnder_norm_primeSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
-    (hL : Tendsto (fun s : ℝ ↦ χ.LFunction s) (𝓝[>] 1) (𝓝 L₁)) :
-    IsBoundedUnder (· ≤ ·) (𝓝[>] 1) fun s ↦ ‖χ.primeSum s‖ := by
+theorem isBoundedUnder_norm_primeSum
+    {L₁ : ℂ} (hL₁ : L₁ ≠ 0) (hL : Tendsto (fun s : ℝ ↦ χ.LFunction s) (𝓝[>] 1) (𝓝 L₁))
+    : IsBoundedUnder (· ≤ ·) (𝓝[>] 1) fun s ↦ ‖χ.primeSum s‖ := by
   obtain ⟨c, hc⟩ := χ.exists_tendsto_primeLogSum hL₁ hL
-  have hB : Summable fun v : HeightOneSpectrum (𝓞 K) ↦
-      ((Ideal.absNorm v.asIdeal : ℝ) ^ (2 : ℝ))⁻¹ :=
-    (summable_absNorm_rpow_inv (K := K) one_lt_two).comp_injective
-      fun _ _ h ↦ HeightOneSpectrum.ext h
+  have hB
+      : Summable fun v : HeightOneSpectrum (𝓞 K) ↦ ((Ideal.absNorm v.asIdeal : ℝ) ^ (2 : ℝ))⁻¹ :=
+    (summable_absNorm_rpow_inv (K := K) one_lt_two).comp_injective fun _ _ h ↦
+      HeightOneSpectrum.ext h
   set B := ∑' v : HeightOneSpectrum (𝓞 K), ((Ideal.absNorm v.asIdeal : ℝ) ^ (2 : ℝ))⁻¹
   have hnear : ∀ᶠ s in 𝓝[>] (1 : ℝ), ‖χ.primeLogSum s‖ ≤ ‖c‖ + 1 := by
     filter_upwards [hc.norm.eventually (gt_mem_nhds (lt_add_one ‖c‖))] with s hs using hs.le
@@ -179,19 +185,19 @@ theorem isBoundedUnder_norm_primeSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
     have hP : Summable fun v : HeightOneSpectrum (𝓞 K) ↦ χ.coeffTerm (s : ℂ) v.asIdeal :=
       Summable.of_norm (χ.summable_norm_coeffTerm_asIdeal hs1')
     have hF : Summable fun v : HeightOneSpectrum (𝓞 K) ↦
-        -Complex.log (1 - χ.coeffTerm (s : ℂ) v.asIdeal) := by
+        - Complex.log (1 - χ.coeffTerm (s : ℂ) v.asIdeal) := by
       refine Summable.of_norm_bounded ((χ.summable_norm_coeffTerm_asIdeal hs1').mul_left (3 / 2))
         fun v ↦ ?_
       rw [norm_neg, sub_eq_add_neg]
-      refine (norm_log_one_add_half_le_self
-        (by rw [norm_neg]; exact χ.norm_coeffTerm_asIdeal_le_half hs1'.le v)).trans ?_
+      refine (norm_log_one_add_half_le_self (by
+        rw [norm_neg]; exact χ.norm_coeffTerm_asIdeal_le_half hs1'.le v)).trans ?_
       rw [norm_neg]
     rw [primeLogSum, primeSum, ← hF.tsum_sub hP]
     refine tsum_of_norm_bounded hB.hasSum fun v ↦ ?_
     set a := χ.coeffTerm (s : ℂ) v.asIdeal
     have ha := χ.norm_coeffTerm_asIdeal_le_half hs1'.le v
     have ha' := χ.norm_coeffTerm_asIdeal_le hs1'.le v
-    have e : -Complex.log (1 - a) - a = -(Complex.log (1 + -a) - -a) := by
+    have e : - Complex.log (1 - a) - a = -(Complex.log (1 + -a) - -a) := by
       rw [sub_eq_add_neg 1 a]
       ring
     rw [e, norm_neg]
@@ -203,17 +209,20 @@ theorem isBoundedUnder_norm_primeSum {L₁ : ℂ} (hL₁ : L₁ ≠ 0)
       linarith
     have hN0 : (0 : ℝ) < Ideal.absNorm v.asIdeal := by
       exact_mod_cast one_pos.trans (one_lt_absNorm_asIdeal v)
-    calc ‖a‖ ^ 2 * (1 - ‖a‖)⁻¹ / 2 ≤ ‖a‖ ^ 2 * 2 / 2 := by gcongr
+    calc
+      ‖a‖ ^ 2 * (1 - ‖a‖)⁻¹ / 2
+        ≤ ‖a‖ ^ 2 * 2 / 2 := by gcongr
       _ = ‖a‖ ^ 2 := by ring
       _ ≤ ((Ideal.absNorm v.asIdeal : ℝ)⁻¹) ^ 2 := by gcongr
       _ = ((Ideal.absNorm v.asIdeal : ℝ) ^ (2 : ℝ))⁻¹ := by rw [Real.rpow_two, inv_pow]
-  calc ‖χ.primeSum s‖ = ‖χ.primeLogSum s - (χ.primeLogSum s - χ.primeSum s)‖ := by
-        rw [sub_sub_cancel]
+  calc
+    ‖χ.primeSum s‖
+      = ‖χ.primeLogSum s - (χ.primeLogSum s - χ.primeSum s)‖ := by rw [sub_sub_cancel]
     _ ≤ ‖χ.primeLogSum s‖ + ‖χ.primeLogSum s - χ.primeSum s‖ := norm_sub_le _ _
     _ ≤ ‖c‖ + 1 + B := add_le_add hs hdiff
 
-theorem not_exists_cpow_of_pow_eq_one {n : ℕ} (hn : n ≠ 0) (hχn : χ ^ n = 1) (hχ : χ ≠ 1) :
-    ¬ ∃ τ : ℝ, ∀ x : IdeleGroup K,
+theorem not_exists_cpow_of_pow_eq_one {n : ℕ} (hn : n ≠ 0) (hχn : χ ^ n = 1) (hχ : χ ≠ 1)
+    : ¬ ∃ τ : ℝ, ∀ x : IdeleGroup K,
       (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ ((τ : ℂ) * I) := by
   rintro ⟨τ, hτ⟩
   have h0 : τ * n = 0 := by
@@ -239,8 +248,8 @@ theorem not_exists_cpow_of_pow_eq_one {n : ℕ} (hn : n ≠ 0) (hχn : χ ^ n = 
 
 theorem exists_tendsto_LFunction_of_not_exists
     (hχ : ¬ ∃ τ : ℝ, ∀ x : IdeleGroup K,
-      (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ ((τ : ℂ) * I)) :
-    ∃ L₁ : ℂ, L₁ ≠ 0 ∧ Tendsto (fun s : ℝ ↦ χ.LFunction s) (𝓝[>] 1) (𝓝 L₁) := by
+      (χ.toIdele x : ℂ) = ((ideleModule K x : ℝ) : ℂ) ^ ((τ : ℂ) * I))
+    : ∃ L₁ : ℂ, L₁ ≠ 0 ∧ Tendsto (fun s : ℝ ↦ χ.LFunction s) (𝓝[>] 1) (𝓝 L₁) := by
   obtain ⟨G, hG, hGL⟩ := χ.exists_LFunction_continuation hχ
   refine ⟨G 1, χ.continuation_ne_zero_of_one_le_re hχ hG hGL (by simp), ?_⟩
   have h1 : Tendsto (fun s : ℝ ↦ (s : ℂ)) (𝓝[>] 1) (𝓝 (1 : ℂ)) := by
@@ -250,8 +259,9 @@ theorem exists_tendsto_LFunction_of_not_exists
   filter_upwards [self_mem_nhdsWithin] with s hs
   exact hGL s (by simpa using hs)
 
-theorem isBoundedUnder_norm_primeSum_of_pow_eq_one {n : ℕ} (hn : n ≠ 0) (hχn : χ ^ n = 1)
-    (hχ : χ ≠ 1) : IsBoundedUnder (· ≤ ·) (𝓝[>] 1) fun s ↦ ‖χ.primeSum s‖ := by
+theorem isBoundedUnder_norm_primeSum_of_pow_eq_one
+    {n : ℕ} (hn : n ≠ 0) (hχn : χ ^ n = 1) (hχ : χ ≠ 1)
+    : IsBoundedUnder (· ≤ ·) (𝓝[>] 1) fun s ↦ ‖χ.primeSum s‖ := by
   obtain ⟨L₁, hL₁, hL⟩ :=
     χ.exists_tendsto_LFunction_of_not_exists (χ.not_exists_cpow_of_pow_eq_one hn hχn hχ)
   exact χ.isBoundedUnder_norm_primeSum hL₁ hL

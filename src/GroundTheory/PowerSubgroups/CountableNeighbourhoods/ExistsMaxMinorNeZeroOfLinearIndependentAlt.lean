@@ -6,18 +6,19 @@ public import Mathlib
 
 namespace GroundTheory.Variant₂.N1
 
-def KSubset (n k : ℕ) : Type := { s : Finset (Fin n) // s.card = k }
+def KSubset (n k : ℕ) : Type := {s : Finset (Fin n) // s.card = k}
 
-def KSubset.emb {n k : ℕ} (s : KSubset n k) : Fin k ↪o Fin n :=
-  (s.1).orderEmbOfFin s.2
+def KSubset.emb {n k : ℕ} (s : KSubset n k) : Fin k ↪o Fin n := (s.1).orderEmbOfFin s.2
 
-def maxMinor {R : Type*} [CommRing R] {n k : ℕ} (B : Matrix (Fin n) (Fin k) R)
-    (s : KSubset n k) : R :=
+def maxMinor {R : Type*} [CommRing R] {n k : ℕ} (B : Matrix (Fin n) (Fin k) R) (s : KSubset n k)
+    : R :=
   (B.submatrix (⇑s.emb) id).det
 
-theorem exists_maxMinor_ne_zero_of_linearIndependent_alt {R : Type*} [CommRing R] {n k : ℕ}
-    [IsDomain R] (B : Matrix (Fin n) (Fin k) R) (hB : LinearIndependent R B.col) :
-    ∃ s : KSubset n k, maxMinor B s ≠ 0 := by
+theorem exists_maxMinor_ne_zero_of_linearIndependent_alt
+    {R : Type*} [CommRing R]
+    {n k : ℕ} [IsDomain R]
+    (B : Matrix (Fin n) (Fin k) R) (hB : LinearIndependent R B.col)
+    : ∃ s : KSubset n k, maxMinor B s ≠ 0 := by
   classical
   set K := FractionRing R
   set B' : Matrix (Fin n) (Fin k) K := B.map (algebraMap R K) with hB'
@@ -41,8 +42,7 @@ theorem exists_maxMinor_ne_zero_of_linearIndependent_alt {R : Type*} [CommRing R
   obtain ⟨κ, a, ha, hspan, hli⟩ := exists_linearIndependent' K B'.row
   have : Finite κ := Finite.of_injective a ha
   let : Fintype κ := Fintype.ofFinite κ
-  have hcard : Fintype.card κ = k := by
-    rw [← hrank, ← hspan, finrank_span_eq_card hli]
+  have hcard : Fintype.card κ = k := by rw [← hrank, ← hspan, finrank_span_eq_card hli]
   let t : Finset (Fin n) := Finset.univ.map ⟨a, ha⟩
   have ht : t.card = k := by simp [t, hcard]
   let s : KSubset n k := ⟨t, ht⟩

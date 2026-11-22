@@ -17,15 +17,18 @@ noncomputable section
 
 namespace Formalism.L2.Col
 
-open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.LogVandermondeBounds
+open Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV
+  Formalism.LogVandermondeBounds
 
 section CoordLemmas
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} {P : HeightOneSpectrum (𝓞 E)}
-  {N : Submodule (𝓞 E) (Sp E n)}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {n : ℕ} {P : HeightOneSpectrum (𝓞 E)} {N : Submodule (𝓞 E) (Sp E n)}
 
-theorem FunAt.of_smul_mem {f : Sp E n → 𝓞 E ⧸ P.asIdeal} (h : FunAt P N f) {z : Sp E n}
-    (hz : z ∈ P.asIdeal • N) : f z = 0 := by
+theorem FunAt.of_smul_mem
+    {f : Sp E n → 𝓞 E ⧸ P.asIdeal} (h : FunAt P N f) {z : Sp E n} (hz : z ∈ P.asIdeal • N)
+    : f z = 0 := by
   have key : z ∈ N ∧ f z = 0 := by
     refine Submodule.smul_induction_on hz (fun p hp y hy => ?_) (fun y y' hy hy' => ?_)
     · refine ⟨N.smul_mem p hy, ?_⟩
@@ -37,9 +40,11 @@ theorem FunAt.of_smul_mem {f : Sp E n → 𝓞 E ⧸ P.asIdeal} (h : FunAt P N f
 variable {co : Sp E n → (Fin n → 𝓞 E ⧸ P.asIdeal)}
 
 theorem CoordAt.comp (h : CoordAt P N co) (i : Fin n) : FunAt P N fun y => co y i := by
-  exact ⟨fun x hx y hy => congrFun (h.add x hx y hy) i,
+  exact ⟨
+    fun x hx y hy => congrFun (h.add x hx y hy) i,
     fun a x hx => congrFun (h.smul a x hx) i,
-    fun x hx => congrFun (h.off x hx) i⟩
+    fun x hx => congrFun (h.off x hx) i
+  ⟩
 
 theorem CoordAt.of_smul_mem (h : CoordAt P N co) {z : Sp E n} (hz : z ∈ P.asIdeal • N) : co z = 0 :=
   funext fun i => (h.comp i).of_smul_mem hz
@@ -48,18 +53,23 @@ end CoordLemmas
 
 section FibLemmas
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-  {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
 
-variable {d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG)} {P : ST} {q : 𝓞 E} {co : Sp E n → (Fin n → 𝓞 E ⧸ P.1.asIdeal)}
+variable
+  {d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG)} {P : ST} {q : 𝓞 E}
+  {co : Sp E n → (Fin n → 𝓞 E ⧸ P.1.asIdeal)}
 
 end FibLemmas
 
 section FibModel
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
-  {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
-  {d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG)} {P : ST} {q : 𝓞 E} {co : Sp E n → (Fin n → 𝓞 E ⧸ P.1.asIdeal)}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
+  {d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG)} {P : ST}
+  {q : 𝓞 E} {co : Sp E n → (Fin n → 𝓞 E ⧸ P.1.asIdeal)}
 
 end FibModel
 
@@ -67,16 +77,18 @@ section Exists
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
 
-theorem intAt_algebraMap_ow (P : HeightOneSpectrum (𝓞 E)) (r : Ow P) : IntAt P (algebraMap (Ow P) E r) := by
+theorem intAt_algebraMap_ow (P : HeightOneSpectrum (𝓞 E)) (r : Ow P)
+    : IntAt P (algebraMap (Ow P) E r) := by
   obtain ⟨a, t, rfl⟩ := IsLocalization.exists_mk'_eq P.asIdeal.primeCompl r
   refine ⟨a, t, t.2, ?_⟩
   rw [IsScalarTower.algebraMap_apply (𝓞 E) (Ow P) E, ← map_mul, mul_comm, IsLocalization.mk'_spec,
     ← IsScalarTower.algebraMap_apply]
 
-theorem exists_locBasis (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) (Sp E n)}
-    (hN : Submodule.IsFullLattice E N) :
-    ∃ β : Module.Basis (Fin n) E (Sp E n), (∀ i, β i ∈ localization₂ P.asIdeal N) ∧
-      ∀ y ∈ localization₂ P.asIdeal N, ∀ i, IntAt P (β.repr y i) := by
+theorem exists_locBasis
+    (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsFullLattice E N)
+    : ∃ β : Module.Basis (Fin n) E (Sp E n),
+      (∀ i, β i ∈ localization₂ P.asIdeal N)
+        ∧ ∀ y ∈ localization₂ P.asIdeal N, ∀ i, IntAt P (β.repr y i) := by
   classical
   obtain ⟨ι, _, b, bK, hb⟩ := exists_basis_atW P hN.toIsLattice.fg hN.span_eq_top
   have hcard : Fintype.card ι = n := by
@@ -99,14 +111,18 @@ theorem exists_locBasis (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E)
     rw [Module.Basis.repr_reindex_apply, h4]
     exact intAt_algebraMap_ow P _
 
-theorem exists_coordAt (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) (Sp E n)}
-    (hN : Submodule.IsFullLattice E N) : ∃ co, CoordAt P N co := by
+theorem exists_coordAt
+    (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsFullLattice E N)
+    : ∃ co, CoordAt P N co := by
   classical
   obtain ⟨β, hβ, hint⟩ := exists_locBasis P hN
   let co : Sp E n → (Fin n → 𝓞 E ⧸ P.asIdeal) := fun y =>
     if y ∈ localization₂ P.asIdeal N then fun i => redP P (β.repr y i) else 0
-  have hpos : ∀ y, y ∈ localization₂ P.asIdeal N → co y = fun i => redP P (β.repr y i) := fun y hy => if_pos hy
-  have hsm : ∀ (a : 𝓞 E), ∀ x ∈ localization₂ P.asIdeal N, co (a • x) = Ideal.Quotient.mk P.asIdeal a • co x := by
+  have hpos : ∀ y, y ∈ localization₂ P.asIdeal N → co y = fun i => redP P (β.repr y i) :=
+    fun y hy => if_pos hy
+  have hsm
+      : ∀ (a : 𝓞 E), ∀ x ∈ localization₂ P.asIdeal N,
+        co (a • x) = Ideal.Quotient.mk P.asIdeal a • co x := by
     intro a x hx
     rw [hpos _ (Submodule.smul_mem _ a hx), hpos _ hx]
     funext i
@@ -121,7 +137,8 @@ theorem exists_coordAt (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) 
     rfl
   · intro c
     choose r hr using fun i => Ideal.Quotient.mk_surjective (c i)
-    have hy0 : ∑ i, r i • β i ∈ localization₂ P.asIdeal N := Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hβ i)
+    have hy0 : ∑ i, r i • β i ∈ localization₂ P.asIdeal N :=
+      Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hβ i)
     have hc0 : co (∑ i, r i • β i) = c := by
       rw [hpos _ hy0]
       funext i
@@ -148,7 +165,8 @@ theorem exists_coordAt (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) 
       obtain ⟨s', hs', hb⟩ := (mem_locP _ _ _).1 (hβ i)
       refine (mem_locP _ _ _).2 ⟨s * s', fun hm => (P.isPrime.mem_or_mem hm).elim hs hs', ?_⟩
       have e : (s * s') • (β.repr x i • β i) = r • (s' • β i) := by
-        rw [mul_smul, smul_comm s' (β.repr x i) (β i), ← algebraMap_smul E s, smul_smul, hrs, algebraMap_smul]
+        rw [mul_smul, smul_comm s' (β.repr x i) (β i), ← algebraMap_smul E s, smul_smul, hrs,
+          algebraMap_smul]
       rw [e]
       exact Submodule.smul_mem_smul hr hb
     have hsum : x ∈ localization₂ P.asIdeal (P.asIdeal • N) := by
@@ -161,28 +179,33 @@ end Exists
 
 section Apply
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
   (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
 
 end Apply
 
 section Dict
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
   {C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))} {Λ : LevFam X.E X.K n SG}
 
 attribute [local instance] resField resFintype
 
 open Classical
 
-variable {P : ST} {q : 𝓞 X.E} {d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)} {co : Sp X.E n → (Fin n → 𝓞 X.E ⧸ P.1.asIdeal)}
-  {R : Type} [CommRing R] {σ : X.K →+* R}
+variable
+  {P : ST} {q : 𝓞 X.E} {d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)}
+  {co : Sp X.E n → (Fin n → 𝓞 X.E ⧸ P.1.asIdeal)} {R : Type} [CommRing R]
+  {σ : X.K →+* R}
 
 end Dict
 
 section T1
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
   (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
 
 attribute [local instance] resField resFintype
@@ -193,8 +216,10 @@ variable {P : ST} {q : 𝓞 X.E}
 
 section Lin
 
-variable {C Λ} {d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)} {co : Sp X.E n → (Fin n → 𝓞 X.E ⧸ P.1.asIdeal)}
-  {R : Type} [CommRing R] {σ : X.K →+* R}
+variable
+  {C Λ} {d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)}
+  {co : Sp X.E n → (Fin n → 𝓞 X.E ⧸ P.1.asIdeal)} {R : Type} [CommRing R]
+  {σ : X.K →+* R}
 
 end Lin
 
@@ -202,7 +227,8 @@ end T1
 
 section T7
 
-variable {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
+variable
+  {X : Fields} {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 X.E))}
   (C : CoefPk X n (DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG))) (Λ : LevFam X.E X.K n SG)
 
 attribute [local instance] resField resFintype
@@ -213,7 +239,9 @@ variable {P : ST} {q : 𝓞 X.E}
 
 section DictC
 
-variable {C Λ} {d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)} {co : Sp X.E n → (Fin n → 𝓞 X.E ⧸ P.1.asIdeal)} {σ : X.K →+* ℂ}
+variable
+  {C Λ} {d : DecoSet (E := X.E) (n := n) (ST := ST) (SG := SG)}
+  {co : Sp X.E n → (Fin n → 𝓞 X.E ⧸ P.1.asIdeal)} {σ : X.K →+* ℂ}
 
 end DictC
 
@@ -228,7 +256,9 @@ variable (Ps : CharT X Pr)
 end ColsT1
 
 section AdjA
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {n : ℕ} {ST SG : Finset (HeightOneSpectrum (𝓞 E))}
 
 end AdjA
 
@@ -238,7 +268,9 @@ variable {X : Fields}
 end AdjB
 
 section AdjC
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (Ps : CharT X Pr)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (Ps : CharT X Pr)
 
 end AdjC
 
@@ -248,13 +280,17 @@ variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : GSD K)
 end AdjD
 
 section AdjF
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (Ps : CharT X Pr)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (Ps : CharT X Pr)
 
 end AdjF
 
 section RamStable
 
-variable {X : Fields} {Pr : Primes X} {R : Ranks} (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (Ps : CharT X Pr)
+variable
+  {X : Fields} {Pr : Primes X} {R : Ranks}
+  (W : Wts X Pr.Word R) (Ch : Chars X Pr R.m) (Ps : CharT X Pr)
 
 end RamStable
 

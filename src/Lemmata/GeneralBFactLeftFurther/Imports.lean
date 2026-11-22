@@ -64,9 +64,11 @@ public import Formalism.RealPlaceAnalysis.StatementC
 
 namespace Bl.general_b_fact_left_further
 
-theorem goal1 :
-  ∀ {n : Nat} {mu : Fin n → Int},
-  Formalism.MainNotions.G.Dominant mu → ∀ (c : Int) (m : Fin n), Iff (LE.le.{0} c (mu m)) (LT.lt.{0} m.val (Formalism.MainNotions.G.colH mu c)) := by
+theorem goal1
+    : ∀ {n : Nat} {mu : Fin n → Int},
+      Formalism.MainNotions.G.Dominant mu
+        → ∀ (c : Int) (m : Fin n),
+          Iff (LE.le.{0} c (mu m)) (LT.lt.{0} m.val (Formalism.MainNotions.G.colH mu c)) := by
   intro n mu hd c m
   have ha : Antitone mu := hd
   unfold Formalism.MainNotions.G.colH

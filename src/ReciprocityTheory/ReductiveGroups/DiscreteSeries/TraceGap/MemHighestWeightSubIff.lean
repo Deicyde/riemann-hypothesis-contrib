@@ -13,22 +13,25 @@ namespace ReciprocityTheory.ChartRestriction.DS.TRGap
 
 variable {n : ℕ}
 
-theorem gc_coord_num (x : Fin n × Fin n) (s : Finset (Fin (n * n))) :
-    (fockBasis n).coord s ∘ₗ (cpFock x.1 x.2 ∘ₗ cmFock x.1 x.2) =
-      (if finProdFinEquiv x ∈ s then (1 : ℂ) else 0) • (fockBasis n).coord s := by
+theorem gc_coord_num (x : Fin n × Fin n) (s : Finset (Fin (n * n)))
+    : (fockBasis n).coord s ∘ₗ (cpFock x.1 x.2 ∘ₗ cmFock x.1 x.2)
+      = (if finProdFinEquiv x ∈ s then (1 : ℂ) else 0) • (fockBasis n).coord s := by
   refine (fockBasis n).ext fun t => ?_
-  simp only [LinearMap.comp_apply, lf_num_basis, LinearMap.smul_apply, Module.Basis.coord_apply, smul_eq_mul]
+  simp only [LinearMap.comp_apply, lf_num_basis, LinearMap.smul_apply, Module.Basis.coord_apply,
+    smul_eq_mul]
   by_cases h : t = s
   · subst h
     split_ifs <;> simp
   · split_ifs <;> simp [Module.Basis.repr_self, h]
 
-theorem gc_support_phys {ε : Fin n → Bool} {f : Fock n} (hf : f ∈ physFock ε) {s : Finset (Fin (n * n))}
-    (hs : (fockBasis n).coord s f ≠ 0) : s ⊆ lfPhysModes ε := by
+theorem gc_support_phys
+    {ε : Fin n → Bool} {f : Fock n} (hf : f ∈ physFock ε)
+    {s : Finset (Fin (n * n))} (hs : (fockBasis n).coord s f ≠ 0)
+    : s ⊆ lfPhysModes ε := by
   intro m hm
   by_contra hnot
   obtain ⟨x, rfl⟩ := finProdFinEquiv.surjective m
-  have hx : ¬ (ε x.1 = true ∧ ε x.2 = false) := fun h => hnot ((lf_mem_phys ε x.1 x.2).2 h)
+  have hx : ¬(ε x.1 = true ∧ ε x.2 = false) := fun h => hnot ((lf_mem_phys ε x.1 x.2).2 h)
   have h0 : cmFock x.1 x.2 f = 0 := by
     simp only [physFock, Submodule.mem_iInf, LinearMap.mem_ker] at hf
     exact hf x.1 x.2 hx
@@ -37,12 +40,14 @@ theorem gc_support_phys {ε : Fin n → Bool} {f : Fock n} (hf : f ∈ physFock 
   exact hs h.symm
 
 def gcPh (ε : Fin n → Bool) (s : Finset (Fin (n * n))) : Finset (Fin n × Fin n) :=
-  (s \ (lowerWedgeAlt ε).1).image finProdFinEquiv.symm ∪
-    ((lowerWedgeAlt ε).1 \ s).image fun k => ((finProdFinEquiv.symm k).2, (finProdFinEquiv.symm k).1)
+  (s \ (lowerWedgeAlt ε).1).image finProdFinEquiv.symm
+    ∪ ((lowerWedgeAlt ε).1 \ s).image fun k =>
+      ((finProdFinEquiv.symm k).2, (finProdFinEquiv.symm k).1)
 
-theorem gc_disj (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε) :
-    Disjoint ((s \ (lowerWedgeAlt ε).1).image finProdFinEquiv.symm)
-      (((lowerWedgeAlt ε).1 \ s).image fun k => ((finProdFinEquiv.symm k).2, (finProdFinEquiv.symm k).1)) := by
+theorem gc_disj (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε)
+    : Disjoint ((s \ (lowerWedgeAlt ε).1).image finProdFinEquiv.symm)
+      (((lowerWedgeAlt ε).1 \ s).image fun k =>
+        ((finProdFinEquiv.symm k).2, (finProdFinEquiv.symm k).1)) := by
   rw [Finset.disjoint_left]
   intro x hx1 hx2
   obtain ⟨k, hk, rfl⟩ := Finset.mem_image.1 hx1
@@ -54,8 +59,8 @@ theorem gc_disj (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfP
   rw [e, hp.1] at hp'
   exact Bool.noConfusion hp'.2
 
-theorem gc_isPosNC (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε) :
-    IsPosNC ε (gcPh ε s) := by
+theorem gc_isPosNC (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε)
+    : IsPosNC ε (gcPh ε s) := by
   intro x hx
   rcases Finset.mem_union.1 hx with h | h
   · obtain ⟨k, hk, rfl⟩ := Finset.mem_image.1 h
@@ -80,13 +85,15 @@ theorem gc_isPosNC (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ 
     rw [hk0.1, hk0.2.1]
     simp
 
-theorem gc_phSum (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε) :
-    phSum (gcPh ε s) = ∑ k ∈ s \ (lowerWedgeAlt ε).1, modeWt ε (finProdFinEquiv.symm k) -
-      ∑ k ∈ (lowerWedgeAlt ε).1 \ s, modeWt ε (finProdFinEquiv.symm k) := by
+theorem gc_phSum (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε)
+    : phSum (gcPh ε s)
+      = ∑ k ∈ s \ (lowerWedgeAlt ε).1, modeWt ε (finProdFinEquiv.symm k)
+        - ∑ k ∈ (lowerWedgeAlt ε).1 \ s, modeWt ε (finProdFinEquiv.symm k) := by
   unfold phSum gcPh
-  rw [Finset.sum_union (gc_disj ε hs), Finset.sum_image (fun a _ b _ h => finProdFinEquiv.symm.injective h),
-    Finset.sum_image (fun a _ b _ h => finProdFinEquiv.symm.injective
-      (Prod.ext (congrArg Prod.snd h) (congrArg Prod.fst h))),
+  rw [Finset.sum_union (gc_disj ε hs),
+    Finset.sum_image (fun a _ b _ h => finProdFinEquiv.symm.injective h),
+    Finset.sum_image (fun a _ b _ h =>
+      finProdFinEquiv.symm.injective (Prod.ext (congrArg Prod.snd h) (congrArg Prod.fst h))),
     sub_eq_add_neg, ← Finset.sum_neg_distrib]
   congr 1
   · refine Finset.sum_congr rfl fun k hk => ?_
@@ -98,17 +105,22 @@ theorem gc_phSum (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lf
     simp only [lfPhysModes, mem_filter, mem_univ, true_and] at hp
     simp only [modeWt, if_pos hp, root, neg_sub]
 
-theorem fockWeight_wedge_lowerModes (ε : Fin n → Bool) : fockWt ε (lowerWedgeAlt ε).1 = rhoHol ε - rhoN ε :=
+theorem fockWeight_wedge_lowerModes (ε : Fin n → Bool)
+    : fockWt ε (lowerWedgeAlt ε).1 = rhoHol ε - rhoN ε :=
   (coord_wt_eq ε (lowerWedge_weight ε) (by simp)).symm
 
-theorem gc_wt_eq (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε) :
-    fockWt ε s = rhoHol ε - rhoN ε + phSum (gcPh ε s) := by
+theorem gc_wt_eq (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε)
+    : fockWt ε s = rhoHol ε - rhoN ε + phSum (gcPh ε s) := by
   rw [gc_phSum ε hs, ← fockWeight_wedge_lowerModes]
   unfold fockWt
-  have e1 := Finset.sum_sdiff (f := fun k => modeWt ε (finProdFinEquiv.symm k))
-    (Finset.inter_subset_left : s ∩ (lowerWedgeAlt ε).1 ⊆ s)
-  have e2 := Finset.sum_sdiff (f := fun k => modeWt ε (finProdFinEquiv.symm k))
-    (Finset.inter_subset_right : s ∩ (lowerWedgeAlt ε).1 ⊆ (lowerWedgeAlt ε).1)
+  have e1 :=
+    Finset.sum_sdiff
+      (f := fun k => modeWt ε (finProdFinEquiv.symm k))
+      (Finset.inter_subset_left : s ∩ (lowerWedgeAlt ε).1 ⊆ s)
+  have e2 :=
+    Finset.sum_sdiff
+      (f := fun k => modeWt ε (finProdFinEquiv.symm k))
+      (Finset.inter_subset_right : s ∩ (lowerWedgeAlt ε).1 ⊆ (lowerWedgeAlt ε).1)
   have d1 : s \ (s ∩ (lowerWedgeAlt ε).1) = s \ (lowerWedgeAlt ε).1 := by
     ext; simp only [Finset.mem_sdiff, Finset.mem_inter]; tauto
   have d2 : (lowerWedgeAlt ε).1 \ (s ∩ (lowerWedgeAlt ε).1) = (lowerWedgeAlt ε).1 \ s := by
@@ -118,14 +130,16 @@ theorem gc_wt_eq (ε : Fin n → Bool) {s : Finset (Fin (n * n))} (hs : s ⊆ lf
   rw [← e1, ← e2]
   abel
 
-theorem gc_Ph_empty {ε : Fin n → Bool} {s : Finset (Fin (n * n))} (h : gcPh ε s = ∅) : s = (lowerWedgeAlt ε).1 := by
+theorem gc_Ph_empty {ε : Fin n → Bool} {s : Finset (Fin (n * n))} (h : gcPh ε s = ∅)
+    : s = (lowerWedgeAlt ε).1 := by
   unfold gcPh at h
-  rw [Finset.union_eq_empty, Finset.image_eq_empty, Finset.image_eq_empty, Finset.sdiff_eq_empty_iff_subset,
-    Finset.sdiff_eq_empty_iff_subset] at h
+  rw [Finset.union_eq_empty, Finset.image_eq_empty, Finset.image_eq_empty,
+      Finset.sdiff_eq_empty_iff_subset, Finset.sdiff_eq_empty_iff_subset]
+    at h
   exact Finset.Subset.antisymm h.1 h.2
 
-theorem gc_plus_sum {ε : Fin n → Bool} {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε) :
-    ∑ a ∈ plusIdx ε, fockWt ε s a = (s.card : ℝ) := by
+theorem gc_plus_sum {ε : Fin n → Bool} {s : Finset (Fin (n * n))} (hs : s ⊆ lfPhysModes ε)
+    : ∑ a ∈ plusIdx ε, fockWt ε s a = (s.card : ℝ) := by
   unfold fockWt
   simp only [Finset.sum_apply]
   rw [Finset.sum_comm, Finset.card_eq_sum_ones, Nat.cast_sum, Nat.cast_one]

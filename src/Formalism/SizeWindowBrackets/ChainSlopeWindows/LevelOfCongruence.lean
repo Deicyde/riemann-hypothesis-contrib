@@ -14,8 +14,11 @@ open Formalism.RankGapBounds.WeightedMeanData
 
 noncomputable section
 
-variable {U0 : Type} [Fintype U0] {W : U0 → Type} [∀ u0, Fintype (W u0)]
-  [∀ u0, Nonempty (W u0)] {Top : Type} [Fintype Top] {m f : ℕ}
+variable
+  {U0 : Type} [Fintype U0]
+  {W : U0 → Type} [∀ u0, Fintype (W u0)] [∀ u0, Nonempty (W u0)]
+  {Top : Type} [Fintype Top]
+  {m f : ℕ}
 variable (D : Data U0 W Top m f) (C : Consts) (Xpp : ℝ)
 
 def Lam5 (u0 : U0) : ℝ :=
@@ -27,8 +30,8 @@ def K5v5 (u0 : U0) : ℝ :=
     + D.SDiv - D.sumA * Lam5 D C u0 + D.EDiv C
 
 def K0v5 : ℝ :=
-  D.sumA * (C.cCount * (D.La + (m : ℝ) ^ 2 * D.La / D.k))
-    + D.EDiv C + (m : ℝ) * C.cE * D.B0 + C.cSlope * D.nT * D.a * D.La * (1 + (m : ℝ) / D.k)
+  D.sumA * (C.cCount * (D.La + (m : ℝ) ^ 2 * D.La / D.k)) + D.EDiv C + (m : ℝ) * C.cE * D.B0
+    + C.cSlope * D.nT * D.a * D.La * (1 + (m : ℝ) / D.k)
 
 def K7v5 : ℝ :=
   C.cSl1 * D.nT * (m : ℝ) * (D.a / D.k + D.b') * (C.cCount * (m : ℝ) * D.L) + C.cSl1 * Xpp + 1
@@ -168,9 +171,13 @@ lemma weighted_mean_lower_bound_le (hS : D.HidaSetting C) (hCount : Count5 D C) 
 
 end
 
-theorem each_unit_bound_statement {U0 : Type} [Fintype U0] {W : U0 → Type}
-    [∀ u0, Fintype (W u0)] [∀ u0, Nonempty (W u0)] {Top : Type} [Fintype Top] {m f : ℕ}
-    (D : Data U0 W Top m f) (C : Consts) (Xpp : ℝ) : PointwiseBoundVariant D C Xpp := by
+theorem each_unit_bound_statement
+    {U0 : Type} [Fintype U0]
+    {W : U0 → Type} [∀ u0, Fintype (W u0)] [∀ u0, Nonempty (W u0)]
+    {Top : Type} [Fintype Top]
+    {m f : ℕ} (D : Data U0 W Top m f)
+    (C : Consts) (Xpp : ℝ)
+    : PointwiseBoundVariant D C Xpp := by
   intro hS hDIV hE hH hCount hSl hSN hLoss hSI hHH hFP u0
   have hx : 0 < D.x := hS.1
   have hdelBar : D.delBar < 1 := hS.2.2.2.2.2.2.2.2.2.2.2.2.2.1

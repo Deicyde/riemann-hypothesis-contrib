@@ -6,25 +6,35 @@ public import ReciprocityTheory.SemistableReduction.TorusL2CauchyInequality
 
 @[expose] public section
 
-open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
+open NumberField MvPolynomial ReciprocityTheory.MultiplicativeHeights
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.ChowHt GlobalTheory.Adelic GlobalTheory.HermTools
+  GlobalTheory.HilbertSamuel GlobalTheory.HSChoice GlobalTheory.HSShort
 
 set_option autoImplicit false
 
 namespace GlobalTheory.HSShort.Sys
 
-variable {F A : Type} [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A] [IsScalarTower (𝓞 F) F A]
+variable
+  {F A : Type}
+  [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A] [IsScalarTower (𝓞 F) F A]
 
-theorem word_succ {K B : Type} [Field K] [AddCommGroup B] [Module K B] {N : ℕ} (mul : (Fin N → K) →ₗ[K] Module.End K B)
-    {t : ℕ} (u : Fin (t + 1) → Fin N → K) : word mul u = mul (u 0) * word mul (fun i => u i.succ) := by
+theorem word_succ
+    {K B : Type} [Field K] [AddCommGroup B] [Module K B]
+    {N : ℕ} (mul : (Fin N → K) →ₗ[K] Module.End K B)
+    {t : ℕ} (u : Fin (t + 1) → Fin N → K)
+    : word mul u = mul (u 0) * word mul (fun i => u i.succ) := by
   simp [word, List.ofFn_succ]
 
-theorem word_zero {K B : Type} [Field K] [AddCommGroup B] [Module K B] {N : ℕ} (mul : (Fin N → K) →ₗ[K] Module.End K B)
-    (u : Fin 0 → Fin N → K) : word mul u = 1 := by
+theorem word_zero
+    {K B : Type} [Field K] [AddCommGroup B] [Module K B]
+    {N : ℕ} (mul : (Fin N → K) →ₗ[K] Module.End K B) (u : Fin 0 → Fin N → K)
+    : word mul u = 1 := by
   simp [word]
 
-theorem mul_mem_V_succ (S : Sys F A) (hS : S.Hyp) {j : ℕ} (hj : j < S.T) (u : Fin S.N → F) {x : A} (hx : x ∈ S.V j) :
-    S.mul u x ∈ S.V (j + 1) := by
+theorem mul_mem_V_succ
+    (S : Sys F A) (hS : S.Hyp) {j : ℕ} (hj : j < S.T) (u : Fin S.N → F) {x : A} (hx : x ∈ S.V j)
+    : S.mul u x ∈ S.V (j + 1) := by
   have key : ∀ m ∈ S.M j, ∀ u : Fin S.N → F, S.mul u (m : A) ∈ S.V (j + 1) := by
     intro m hm u
     have hu : u ∈ Submodule.span F (Set.range S.w.col) := hS.lat.spans ▸ Submodule.mem_top
@@ -47,9 +57,10 @@ theorem mul_mem_V_succ (S : Sys F A) (hS : S.Hyp) {j : ℕ} (hj : j < S.T) (u : 
     (hS.full j hj.le).span ▸ Submodule.mem_top
   exact hP hx'
 
-theorem word_mem (S : Sys F A) (hS : S.Hyp) (j t : ℕ) (hjt : j + t ≤ S.T) :
-    (∀ (u : Fin t → Fin S.N → F), ∀ x ∈ S.V j, word S.mul u x ∈ S.V (j + t)) ∧
-      ∀ (e : Fin t → Fin S.n), ∀ x ∈ S.M j, ∃ g ∈ S.M (j + t), (g : A) = word S.mul (fun i => S.w.col (e i)) x := by
+theorem word_mem (S : Sys F A) (hS : S.Hyp) (j t : ℕ) (hjt : j + t ≤ S.T)
+    : (∀ (u : Fin t → Fin S.N → F), ∀ x ∈ S.V j, word S.mul u x ∈ S.V (j + t))
+      ∧ ∀ (e : Fin t → Fin S.n), ∀ x ∈ S.M j, ∃ g ∈ S.M (j + t),
+        (g : A) = word S.mul (fun i => S.w.col (e i)) x := by
   induction t with
   | zero =>
     refine ⟨fun u x hx => ?_, fun e x hx => ⟨x, hx, ?_⟩⟩
@@ -70,7 +81,15 @@ end GlobalTheory.HSShort.Sys
 
 namespace GlobalTheory.HSShort
 
-theorem wordMem : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A] [IsScalarTower (𝓞 F) F A] (S : Sys F A), S.Hyp → ∀ (j t : ℕ), j + t ≤ S.T → (∀ (u : Fin t → Fin S.N → F), ∀ x ∈ S.V j, word S.mul u x ∈ S.V (j + t)) ∧ ∀ (e : Fin t → Fin S.n), ∀ x ∈ S.M j, ∃ g ∈ S.M (j + t), (g : A) = word S.mul (fun i => S.w.col (e i)) x :=
+theorem wordMem
+    : ∀ (F A : Type) [Field F] [NumberField F] [AddCommGroup A] [Module F A] [Module (𝓞 F) A]
+        [IsScalarTower (𝓞 F) F A] (S : Sys F A),
+      S.Hyp
+        → ∀ (j t : ℕ),
+          j + t ≤ S.T
+            → (∀ (u : Fin t → Fin S.N → F), ∀ x ∈ S.V j, word S.mul u x ∈ S.V (j + t))
+              ∧ ∀ (e : Fin t → Fin S.n), ∀ x ∈ S.M j, ∃ g ∈ S.M (j + t),
+                (g : A) = word S.mul (fun i => S.w.col (e i)) x :=
   fun _ _ _ _ _ _ _ _ S hS j t hjt => S.word_mem hS j t hjt
 
 end GlobalTheory.HSShort

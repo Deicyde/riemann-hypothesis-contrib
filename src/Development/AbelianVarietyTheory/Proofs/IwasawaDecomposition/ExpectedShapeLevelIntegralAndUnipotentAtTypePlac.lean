@@ -6,7 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -24,11 +29,15 @@ section Gen
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem proj_eq_of_compAt (s : SplitPlace L) {x y : AL L}
-    (h : compAt L s.v x = compAt L s.v y) : s.proj x = s.proj y := by
-  have key : ∀ z : AL L, s.proj z =
-      (Algebra.TensorProduct.lift s.i (AlgHom.id _ (s.v.adicCompletion (maximalRealSubfield L)))
-        (fun _ _ => Commute.all _ _)) (compAt L s.v z) := by
+theorem proj_eq_of_compAt (s : SplitPlace L) {x y : AL L} (h : compAt L s.v x = compAt L s.v y)
+    : s.proj x = s.proj y := by
+  have key
+      : ∀ z : AL L,
+        s.proj z
+          = (Algebra.TensorProduct.lift s.i
+              (AlgHom.id _ (s.v.adicCompletion (maximalRealSubfield L)))
+              (fun _ _ => Commute.all _ _))
+            (compAt L s.v z) := by
     intro z
     induction z using TensorProduct.induction_on with
     | zero => simp
@@ -36,9 +45,12 @@ theorem proj_eq_of_compAt (s : SplitPlace L) {x y : AL L}
     | add a b ha hb => rw [map_add (f := _), map_add (f := _), ha, hb, map_add (f := _)]
   rw [key, key, h]
 
-theorem loc_eq_of_comp (s : SplitPlace L) {x y : GAf L n}
-    (h : (x.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L s.v) = (y.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L s.v)) :
-    s.loc n x = s.loc n y := by
+theorem loc_eq_of_comp
+    (s : SplitPlace L)
+    {x y : GAf L n}
+    (h : (x.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L s.v)
+      = (y.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L s.v))
+    : s.loc n x = s.loc n y := by
   apply Units.ext
   refine Matrix.ext fun i j => ?_
   have hij := congrFun (congrFun h i) j
@@ -47,13 +59,21 @@ theorem loc_eq_of_comp (s : SplitPlace L) {x y : GAf L n}
 
 end Gen
 
-theorem bound : ∀ (D : D7) (η : HChar D.host.E) (J : Subgroup (GAf D.host.E D.R.nV)), GPlaces D → GrpShape D η J → ∀ κ ∈ J, κ ∈ Umax D.host.E D.R.nV ∧ ∀ k v (s : SplitPlace D.host.E), s.w = D.naut.plGw k v → NG.UniRT s D.R.r (s.loc _ κ) := by
+theorem bound
+    : ∀ (D : D7) (η : HChar D.host.E) (J : Subgroup (GAf D.host.E D.R.nV)),
+      GPlaces D → GrpShape D η J
+        → ∀ κ ∈ J,
+          κ ∈ Umax D.host.E D.R.nV
+            ∧ ∀ k v (s : SplitPlace D.host.E),
+              s.w = D.naut.plGw k v → NG.UniRT s D.R.r (s.loc _ κ) := by
   intro D η J hG hS κ hκ
   obtain ⟨hprod, hpara, huni, hhyp⟩ := hS
 
-  have hloc : ∀ w, ∃ κ' ∈ J, κ' ∈ Umax D.host.E D.R.nV ∧
-      (κ'.1 : Matrix (Fin D.R.nV) (Fin D.R.nV) (AL D.host.E)).map (compAt D.host.E w) =
-        (κ.1 : Matrix (Fin D.R.nV) (Fin D.R.nV) (AL D.host.E)).map (compAt D.host.E w) := by
+  have hloc
+      : ∀ w, ∃ κ' ∈ J,
+        κ' ∈ Umax D.host.E D.R.nV
+          ∧ (κ'.1 : Matrix (Fin D.R.nV) (Fin D.R.nV) (AL D.host.E)).map (compAt D.host.E w)
+            = (κ.1 : Matrix (Fin D.R.nV) (Fin D.R.nV) (AL D.host.E)).map (compAt D.host.E w) := by
     intro w
     obtain ⟨κ', hκ', htr, heq⟩ := hprod κ hκ w
     refine ⟨κ', hκ', ?_, heq⟩

@@ -18,7 +18,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.Gaps.LG
 
-open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.UG.P Formalism.BasicNotions Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain Matrix Formalism.UG Formalism.UG.P Formalism.BasicNotions
+  Formalism.FrobeniusOrbits
 open scoped TensorProduct
 
 section Order
@@ -39,19 +40,19 @@ variable (E) in
 def trV (v : HeightOneSpectrum (𝓞 F)) : E ⊗[F] v.adicCompletion F →ₗ[F] v.adicCompletion F :=
   (TensorProduct.lid F _).toLinearMap ∘ₗ (Algebra.trace F E).rTensor _
 
-theorem trV_tmul (v : HeightOneSpectrum (𝓞 F)) (e : E) (a : v.adicCompletion F) :
-    trV E v (e ⊗ₜ a) = algebraMap F _ (Algebra.trace F E e) * a := by
+theorem trV_tmul (v : HeightOneSpectrum (𝓞 F)) (e : E) (a : v.adicCompletion F)
+    : trV E v (e ⊗ₜ a) = algebraMap F _ (Algebra.trace F E e) * a := by
   simp [trV, Algebra.smul_def]
 
-theorem trV_prV (v : HeightOneSpectrum (𝓞 F)) (z : 𝒜) :
-    trV E v (prV (E := E) v z) = (adelstabT F E z) v := by
+theorem trV_prV (v : HeightOneSpectrum (𝓞 F)) (z : 𝒜)
+    : trV E v (prV (E := E) v z) = (adelstabT F E z) v := by
   induction z using TensorProduct.induction_on with
   | zero => rw [map_zero, map_zero, map_zero]; rfl
   | tmul e a => rw [afsplit_prV_tmul, trV_tmul, adelstabT_tmul]; rfl
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), map_add (f := _), hx, hy]; rfl
 
-theorem trV_int (v : HeightOneSpectrum (𝓞 F)) (y : E ⊗[F] v.adicCompletion F) (hy : y ∈ intV E v) :
-    trV E v y ∈ v.adicCompletionIntegers F := by
+theorem trV_int (v : HeightOneSpectrum (𝓞 F)) (y : E ⊗[F] v.adicCompletion F) (hy : y ∈ intV E v)
+    : trV E v y ∈ v.adicCompletionIntegers F := by
   obtain ⟨a, rfl⟩ := levelv_S_le_range v y hy
   show trV E v (∑ i, algebraMap (𝓞 E) E (RingOfIntegers.basis E i) ⊗ₜ[F]
     ((a i : v.adicCompletionIntegers F) : v.adicCompletion F)) ∈ _
@@ -63,15 +64,18 @@ theorem trV_int (v : HeightOneSpectrum (𝓞 F)) (y : E ⊗[F] v.adicCompletion 
   rw [← ht, ← IsScalarTower.algebraMap_apply]
   exact mul_mem (levelaf_int_mem_v v t) (a i).2
 
-theorem adele_expand {ι : Type} [Fintype ι] [DecidableEq ι] (β : Module.Basis ι F E) (x : 𝒜) :
-    x = ∑ i, ((Algebra.traceForm F E).dualBasis (traceForm_nondegenerate F E) β i) ⊗ₜ[F]
-      adelstabT F E (x * (β i ⊗ₜ[F] (1 : 𝔸))) := by
+theorem adele_expand {ι : Type} [Fintype ι] [DecidableEq ι] (β : Module.Basis ι F E) (x : 𝒜)
+    : x
+      = ∑ i, ((Algebra.traceForm F E).dualBasis (traceForm_nondegenerate F E) β i) ⊗ₜ[F]
+        adelstabT F E (x * (β i ⊗ₜ[F] (1 : 𝔸))) := by
   set β' := (Algebra.traceForm F E).dualBasis (traceForm_nondegenerate F E) β
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul e a =>
-    have h : ∀ i, β' i ⊗ₜ[F] adelstabT F E ((e ⊗ₜ[F] a) * (β i ⊗ₜ[F] (1 : 𝔸))) =
-        (Algebra.trace F E (e * β i) • β' i) ⊗ₜ[F] a := by
+    have h
+        : ∀ i,
+          β' i ⊗ₜ[F] adelstabT F E ((e ⊗ₜ[F] a) * (β i ⊗ₜ[F] (1 : 𝔸)))
+            = (Algebra.trace F E (e * β i) • β' i) ⊗ₜ[F] a := by
       intro i
       rw [Algebra.TensorProduct.tmul_mul_tmul, mul_one, adelstabT_tmul, ← Algebra.smul_def,
         TensorProduct.smul_tmul]
@@ -85,18 +89,18 @@ theorem adele_expand {ι : Type} [Fintype ι] [DecidableEq ι] (β : Module.Basi
     simp only [add_mul, map_add (f := _), TensorProduct.tmul_add, Finset.sum_add_distrib]
     exact congrArg₂ (· + ·) hx hy
 
-
 variable (F E) in
-theorem loc_int_bound : ∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x : 𝒜, (∀ w, prV (E := E) w x ∈ intV E w) →
-    levelafC E c * x ∈ 𝒮 := by
+theorem loc_int_bound
+    : ∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x : 𝒜, (∀ w, prV (E := E) w x ∈ intV E w) → levelafC E c * x ∈ 𝒮 := by
   classical
   set β := Module.finBasis F E
   set β' := (Algebra.traceForm F E).dualBasis (traceForm_nondegenerate F E) β with hβ'
   obtain ⟨N, hN, hNi⟩ := adelstabL_den (fun i => β i)
   obtain ⟨M, hM, hMi⟩ := adelstabL_den (fun i => β' i)
   refine ⟨((M * N : ℤ) : 𝓞 F), by exact_mod_cast (mul_ne_zero hM hN), fun x hx => ?_⟩
-  have key : levelafC E ((M * N : ℤ) : 𝓞 F) * x =
-      ∑ i, ((M : E) * β' i) ⊗ₜ[F] adelstabT F E (x * (((N : E) * β i) ⊗ₜ[F] (1 : 𝔸))) := by
+  have key
+      : levelafC E ((M * N : ℤ) : 𝓞 F) * x
+        = ∑ i, ((M : E) * β' i) ⊗ₜ[F] adelstabT F E (x * (((N : E) * β i) ⊗ₜ[F] (1 : 𝔸))) := by
     conv_lhs => rw [adele_expand β x]
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_

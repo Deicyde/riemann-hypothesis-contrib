@@ -4,16 +4,16 @@ public import Mathlib
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj TopologicalSpace TensorProduct
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  TopologicalSpace TensorProduct
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
 theorem preirreducibleSpace_primeSpectrum_tensor_localizationAway
-    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (b : B) (k : Type) [Field k]
-    [Algebra A k] :
-    PreirreducibleSpace (PrimeSpectrum (k ⊗[A] B)) →
-      PreirreducibleSpace (PrimeSpectrum (k ⊗[A] Localization.Away b)) := by
+    (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (b : B) (k : Type) [Field k] [Algebra A k]
+    : PreirreducibleSpace (PrimeSpectrum (k ⊗[A] B))
+      → PreirreducibleSpace (PrimeSpectrum (k ⊗[A] Localization.Away b)) := by
   intro hX
   letI : Algebra (k ⊗[A] B) (k ⊗[A] Localization.Away b) :=
     (Algebra.TensorProduct.map (AlgHom.id A k)

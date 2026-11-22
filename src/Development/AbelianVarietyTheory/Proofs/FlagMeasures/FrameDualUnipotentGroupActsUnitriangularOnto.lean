@@ -4,16 +4,19 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.AtBas
 
 @[expose] public section
 
-open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG GlobalTheory.LocOver
+open ValuativeRel Formalism.MainNotions.S Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG
+  GlobalTheory.LocOver
 open scoped Classical
 
 noncomputable section
 
 namespace GlobalTheory.LocOver.UnipOnto
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
-  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V)
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+  (H : HermSp M V)
 
 def lf (w : V) : V →ₗ[E] E where
   toFun y := H.h y w
@@ -46,10 +49,8 @@ def eichF (x v : V) (c : F) (y : V) : V :=
 
 def eichL (x v : V) (c : F) : V →ₗ[E] V where
   toFun := eichF H x v c
-  map_add' y y' := by
-    simp only [eichF, H.h_add_left, add_smul, mul_add]; abel
-  map_smul' a y := by
-    simp only [eichF, H.h_smul_left, RingHom.id_apply]; module
+  map_add' y y' := by simp only [eichF, H.h_add_left, add_smul, mul_add]; abel
+  map_smul' a y := by simp only [eichF, H.h_smul_left, RingHom.id_apply]; module
 
 lemma eich_hL (x v : V) (c : F) (y w : V) : H.h (eichF H x v c y) w =
     H.h y w + H.h y v * H.h x w - H.h y x * H.h v w + algebraMap F E c * H.h y x * H.h x w := by
@@ -92,8 +93,8 @@ lemma eich_inv (hxx : H.h x x = 0) (hxv : H.h x v = 0)
   rw [hc, zero_mul, zero_smul, sub_eq_zero] at key
   exact key
 
-def eichE (hxx : H.h x x = 0) (hxv : H.h x v = 0) (hc : 2 * algebraMap F E c + H.h v v = 0) :
-    V ≃ₗ[E] V :=
+def eichE (hxx : H.h x x = 0) (hxv : H.h x v = 0) (hc : 2 * algebraMap F E c + H.h v v = 0)
+    : V ≃ₗ[E] V :=
   LinearEquiv.ofLinear (eichL H x v c) (eichL H (-x) v c)
     (LinearMap.ext fun y => eich_inv H hxx hxv hc y)
     (LinearMap.ext fun y => by
@@ -229,16 +230,19 @@ def NUg : Subgroup (V ≃ₗ[E] V) where
       rw [span_fin_eq] at hga hka ⊢
       have h1 : g (k (Fr.f a.castSucc) - Fr.f a.castSucc) ∈ Fr.Fj a.val :=
         (NU_flag Fr hg a.val a.isLt.le _).2 hka
-      have : (g * k) (Fr.f a.castSucc) - Fr.f a.castSucc =
-          g (k (Fr.f a.castSucc) - Fr.f a.castSucc) + (g (Fr.f a.castSucc) - Fr.f a.castSucc) := by
+      have : (g * k) (Fr.f a.castSucc) - Fr.f a.castSucc
+          = g (k (Fr.f a.castSucc) - Fr.f a.castSucc)
+            + (g (Fr.f a.castSucc) - Fr.f a.castSucc) := by
         rw [map_sub]; simp
-      rw [this]; exact add_mem h1 hga
+      rw [this]
+      exact add_mem h1 hga
     · have hk3 := hk.2.2 v hv
       have hg3 := hg.2.2 v hv
       rw [← Fj_r] at hk3 hg3 ⊢
       have h1 : g (k v - v) ∈ Fr.Fj r := (NU_flag Fr hg r le_rfl _).2 hk3
       have : (g * k) v - v = g (k v - v) + (g v - v) := by rw [map_sub]; simp
-      rw [this]; exact add_mem h1 hg3
+      rw [this]
+      exact add_mem h1 hg3
   inv_mem' := by
     intro g hg
     refine ⟨fun x y => ?_, fun a => ?_, fun v hv => ?_⟩
@@ -248,14 +252,17 @@ def NUg : Subgroup (V ≃ₗ[E] V) where
     · have hga := hg.2.1 a
       rw [span_fin_eq] at hga ⊢
       refine (NU_flag Fr hg a.val a.isLt.le _).1 ?_
-      have : g (g⁻¹ (Fr.f a.castSucc) - Fr.f a.castSucc) = -(g (Fr.f a.castSucc) - Fr.f a.castSucc) := by
+      have : g (g⁻¹ (Fr.f a.castSucc) - Fr.f a.castSucc)
+          = -(g (Fr.f a.castSucc) - Fr.f a.castSucc) := by
         rw [map_sub]; simp
-      rw [this]; exact neg_mem hga
+      rw [this]
+      exact neg_mem hga
     · have hg3 := hg.2.2 v hv
       rw [← Fj_r] at hg3 ⊢
       refine (NU_flag Fr hg r le_rfl _).1 ?_
       have : g (g⁻¹ v - v) = -(g v - v) := by rw [map_sub]; simp
-      rw [this]; exact neg_mem hg3
+      rw [this]
+      exact neg_mem hg3
 
 lemma NSet_eq : Fr.NSet = (NUg Fr : Set (V ≃ₗ[E] V)) := by
   ext g
@@ -470,11 +477,14 @@ end GlobalTheory.LocOver.UnipOnto
 
 namespace GlobalTheory.LocOver.UnipOnto
 
-theorem unipotent_onto : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
-    [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type}
-    [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ Fr : FrameD H r, Fr.T ≠ 0 →
-    (∀ n, n ∈ Fr.N ↔ n ∈ NU H Fr.f) ∧ (∀ n ∈ Fr.N, Tri E Fr.f fun b => n (Fr.f b)) ∧
-      ∀ g : Fin (r + 1) → V, Tri E Fr.f g → ∃ n ∈ Fr.N, g = fun b => n (Fr.f b) := by
+theorem unipotent_onto
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ), ∀ Fr : FrameD H r,
+          Fr.T ≠ 0
+            → (∀ n, n ∈ Fr.N ↔ n ∈ NU H Fr.f) ∧ (∀ n ∈ Fr.N, Tri E Fr.f fun b => n (Fr.f b))
+              ∧ ∀ g : Fin (r + 1) → V, Tri E Fr.f g → ∃ n ∈ Fr.N, g = fun b => n (Fr.f b) := by
   intro F _ _ _ E _ _ _ _ M hOK V _ _ H r Fr hT
   haveI := hOK.char0
   refine ⟨fun n => by rw [N_eq]; exact Iff.rfl, fun n hn => ?_, fun g hg => ?_⟩

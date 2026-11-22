@@ -27,12 +27,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNormOn
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.NormOneProper
 
-theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ (n : ℕ) (w : Pl E) (y : GLw n w), (nrmL n w y).val.charpoly.Separable → ∀ C : Set (GLw n w), IsCompact C → ∃ D : Set (GLw n w), IsCompact D ∧ ∀ z : GLw n w, z * nrmL n w y = nrmL n w y * z → z⁻¹ * y * thL n w z ∈ C → ∃ t ∈ twCent (thL n w) y, ∃ d ∈ D, z = t * d := by
+theorem main
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ (n : ℕ) (w : Pl E) (y : GLw n w),
+          (nrmL n w y).val.charpoly.Separable
+            → ∀ C : Set (GLw n w),
+              IsCompact C
+                → ∃ D : Set (GLw n w),
+                  IsCompact D
+                    ∧ ∀ z : GLw n w,
+                      z * nrmL n w y = nrmL n w y * z → z⁻¹ * y * thL n w z ∈ C
+                        → ∃ t ∈ twCent (thL n w) y, ∃ d ∈ D, z = t * d := by
   intro E _ _ _ hU n w y hy C hC
   by_cases hs : IsSplitAt w
   · refine ⟨{1}, isCompact_singleton, fun z hz _ => ⟨z, ?_, 1, rfl, (mul_one z).symm⟩⟩
@@ -60,22 +72,28 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E →
     haveI : ProperSpace K := ProperSpace.of_nontriviallyNormedField_of_weaklyLocallyCompactSpace _
     have hnorm : ∀ x : K, ‖star x‖ = ‖x‖ := fun x => by
       simp only [Valued.toNormedField.norm_def]
-      have h1 := Valuation.embedding_restrict (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (star x)
-      have h2 := Valuation.embedding_restrict (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) x
-      have h3 : (Valued.v : Valuation K (WithZero (Multiplicative ℤ))).restrict (star x) =
-          (Valued.v : Valuation K (WithZero (Multiplicative ℤ))).restrict x :=
-        MonoidWithZeroHom.ValueGroup₀.embedding_strictMono.injective (h1.trans ((hv x).trans h2.symm))
+      have h1 :=
+        Valuation.embedding_restrict (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) (star x)
+      have h2 :=
+        Valuation.embedding_restrict (Valued.v : Valuation K (WithZero (Multiplicative ℤ))) x
+      have h3
+          : (Valued.v : Valuation K (WithZero (Multiplicative ℤ))).restrict (star x)
+            = (Valued.v : Valuation K (WithZero (Multiplicative ℤ))).restrict x :=
+        MonoidWithZeroHom.ValueGroup₀.embedding_strictMono.injective (h1.trans ((hv x).trans
+          h2.symm))
       rw [h3]
     set C' : Set (GLw n w) := (fun c : GLw n w => y * c⁻¹) '' C
     have hC' : IsCompact C' := hC.image (by fun_prop)
-    obtain ⟨D, hD, hDp⟩ := GlobalTheory.T.exists_normOne_mul_compact_of_twistedNorm_compact K hnorm n y.val hReg C' hC'
+    obtain ⟨D, hD, hDp⟩ :=
+      GlobalTheory.T.exists_normOne_mul_compact_of_twistedNorm_compact K hnorm n y.val hReg C' hC'
     refine ⟨D, hD, fun z hz hzC => ?_⟩
     have hzv : z.val * GlobalTheory.Tw.nrm y.val = GlobalTheory.Tw.nrm y.val * z.val := by
       rw [← hN, ← Units.val_mul, hz, Units.val_mul]
     have hzA : z.val ∈ Algebra.adjoin K {GlobalTheory.Tw.nrm y.val} := (TC.2.2.2.2.1 z.val).1 hzv
     have hcomm : ∀ x ∈ Algebra.adjoin K {GlobalTheory.Tw.nrm y.val}, z.val * x = x * z.val := by
       intro x hx
-      have hle : Algebra.adjoin K {GlobalTheory.Tw.nrm y.val} ≤ Subalgebra.centralizer K {z.val} := by
+      have hle
+          : Algebra.adjoin K {GlobalTheory.Tw.nrm y.val} ≤ Subalgebra.centralizer K {z.val} := by
         rw [Algebra.adjoin_le_iff, Set.singleton_subset_iff]
         intro g hg
         rw [Set.mem_singleton_iff] at hg
@@ -85,7 +103,8 @@ theorem main : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E →
     have hadj : GlobalTheory.Tw.adj y.val z.val = (y * (thL n w z)⁻¹ * y⁻¹).val := by
       rw [Units.val_mul, Units.val_mul, ← map_inv, hθv, GlobalTheory.Tw.theta, GlobalTheory.Tw.adj]
       have hzi : ((z⁻¹ : GLw n w).val)⁻¹ = z.val := by
-        rw [Matrix.coe_units_inv, Matrix.nonsing_inv_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).1 z.isUnit)]
+        rw [Matrix.coe_units_inv,
+          Matrix.nonsing_inv_nonsing_inv _ ((Matrix.isUnit_iff_isUnit_det _).1 z.isUnit)]
       rw [hzi, Matrix.coe_units_inv y]
       simp only [Matrix.mul_assoc]
     have hu : (y * (z⁻¹ * y * thL n w z)⁻¹).val = z.val * GlobalTheory.Tw.adj y.val z.val := by

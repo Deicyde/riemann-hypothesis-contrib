@@ -6,10 +6,38 @@ public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.SameK
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 namespace GlobalTheory.PlaneSplit
 
-private theorem planeSplit_of_lattice : ∀ (E : Type) [Field E] [NumberField E] [StarRing E], Formalism.HermitianLatticesTheory.IsCMUnram E → ∀ (J : Matrix (Fin 2) (Fin 2) E), Jᴴ = J → (∀ (φ : E →+* ℂ) (y : Fin 2 → E), y ≠ 0 → 0 < (φ (star y ⬝ᵥ (J *ᵥ y))).re) → ∀ Λ : Submodule (𝓞 E) (Fin 2 → E), Submodule.IsLattice E Λ → (∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, star y ⬝ᵥ (J *ᵥ x) ∈ (algebraMap (𝓞 E) E).range) → ∀ u ∈ Λ, u ≠ 0 → ∀ ρ : ℝ, (∀ φ : E →+* ℂ, (φ (star u ⬝ᵥ (J *ᵥ u))).re ≤ ρ) → ∃ (γ : GL (Fin 2) E) (β₁ β₂ : E) (N₁ N₂ : Submodule (𝓞 E) E) (𝔫 : Ideal (𝓞 E)), (γ : Matrix (Fin 2) (Fin 2) E)ᴴ * J * (γ : Matrix (Fin 2) (Fin 2) E) = Matrix.diagonal ![β₁, β₂] ∧ star β₁ = β₁ ∧ star β₂ = β₂ ∧ (∀ φ : E →+* ℂ, 0 < (φ β₁).re ∧ 0 < (φ β₂).re) ∧ Submodule.IsFullLattice E N₁ ∧ Submodule.IsFullLattice E N₂ ∧ (∀ t, t ∈ N₁ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![t, 0] ∈ Λ) ∧ (∀ t, t ∈ N₂ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![0, t] ∈ Λ) ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫 ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₂, ∃ y ∈ N₂, t = star x * β₂ * y} = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫 ∧ 𝔫 ≠ ⊥ ∧ 𝔫 = Ideal.span {t | t ∈ 𝔫 ∧ star (t : E) = t} ∧ (Ideal.absNorm 𝔫 : ℝ) ≤ ρ ^ (2 * Formalism.HermitianLatticesTheory.fDeg E) := by
+private theorem planeSplit_of_lattice
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
+      Formalism.HermitianLatticesTheory.IsCMUnram E
+        → ∀ (J : Matrix (Fin 2) (Fin 2) E),
+          Jᴴ = J → (∀ (φ : E →+* ℂ) (y : Fin 2 → E), y ≠ 0 → 0 < (φ (star y ⬝ᵥ (J *ᵥ y))).re)
+            → ∀ Λ : Submodule (𝓞 E) (Fin 2 → E),
+              Submodule.IsLattice E Λ
+                → (∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, star y ⬝ᵥ (J *ᵥ x) ∈ (algebraMap (𝓞 E) E).range)
+                → ∀ u ∈ Λ,
+                  u ≠ 0
+                    → ∀ ρ : ℝ,
+                      (∀ φ : E →+* ℂ, (φ (star u ⬝ᵥ (J *ᵥ u))).re ≤ ρ)
+                        → ∃ (γ : GL (Fin 2) E) (β₁ β₂ : E) (N₁ N₂ : Submodule (𝓞 E) E)
+                            (𝔫 : Ideal (𝓞 E)),
+                          (γ : Matrix (Fin 2) (Fin 2) E)ᴴ * J * (γ : Matrix (Fin 2) (Fin 2) E)
+                              = Matrix.diagonal ![β₁, β₂]
+                            ∧ star β₁ = β₁ ∧ star β₂ = β₂
+                            ∧ (∀ φ : E →+* ℂ, 0 < (φ β₁).re ∧ 0 < (φ β₂).re)
+                            ∧ Submodule.IsFullLattice E N₁ ∧ Submodule.IsFullLattice E N₂
+                            ∧ (∀ t, t ∈ N₁ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![t, 0] ∈ Λ)
+                            ∧ (∀ t, t ∈ N₂ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![0, t] ∈ Λ)
+                            ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y}
+                              = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫
+                            ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₂, ∃ y ∈ N₂, t = star x * β₂ * y}
+                              = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫
+                            ∧ 𝔫 ≠ ⊥ ∧ 𝔫 = Ideal.span {t | t ∈ 𝔫 ∧ star (t : E) = t}
+                            ∧ (Ideal.absNorm 𝔫 : ℝ)
+                              ≤ ρ ^ (2 * Formalism.HermitianLatticesTheory.fDeg E) := by
   intro E _ _ _ hE J hJ hpos Λ hΛ hdual u hu hu0 ρ hρ
   have hne : ∀ y : Fin 2 → E, y ≠ 0 → star y ⬝ᵥ (J *ᵥ y) ≠ 0 := by
     intro y hy h
@@ -41,13 +69,17 @@ private theorem planeSplit_of_lattice : ∀ (E : Type) [Field E] [NumberField E]
     rw [Matrix.det_fin_two]
     simp only [G, w, Matrix.of_apply]
     simp only [Matrix.cons_val_zero, Matrix.cons_val_one]
-    intro h; apply h10; rw [hb1, ← h]; ring
+    intro h
+    apply h10
+    rw [hb1, ← h]
+    ring
   have hGv : ∀ a b : E, G *ᵥ ![a, b] = a • u + b • w := by
     intro a b; ext i; simp [G, mulVec, dotProduct, Fin.sum_univ_two, mul_comm]
   have hGJ : Gᴴ * J * G = Matrix.diagonal ![β₁, β₂] := by
     have : ∀ i j, (Gᴴ * J * G) i j = star (![u, w] i) ⬝ᵥ (J *ᵥ (![u, w] j)) := by
       intro i j
-      simp [G, Matrix.mul_apply, mulVec, dotProduct, Fin.sum_univ_two]; ring
+      simp [G, Matrix.mul_apply, mulVec, dotProduct, Fin.sum_univ_two]
+      ring
     ext i j
     rw [this]
     fin_cases i <;> fin_cases j
@@ -55,14 +87,16 @@ private theorem planeSplit_of_lattice : ∀ (E : Type) [Field E] [NumberField E]
   let f : (E × E) →ₗ[E] (Fin 2 → E) :=
     (LinearMap.toSpanSingleton E _ u).coprod (LinearMap.toSpanSingleton E _ w)
   have hf : ∀ x : E × E, f x = x.1 • u + x.2 • w := fun x => rfl
-  have hpair : ∀ x y : E × E, star (f y) ⬝ᵥ (J *ᵥ f x) = star y.1 * β₁ * x.1 + star y.2 * β₂ * x.2 := by
+  have hpair
+      : ∀ x y : E × E, star (f y) ⬝ᵥ (J *ᵥ f x) = star y.1 * β₁ * x.1 + star y.2 * β₂ * x.2 := by
     intro x y
     rw [hf, hf]
-    simp only [star_add, star_smul, mulVec_add, mulVec_smul, add_dotProduct, dotProduct_add, smul_dotProduct,
-      dotProduct_smul, huw, hwu, ← hβ₁, ← hβ₂, smul_eq_mul]
+    simp only [star_add, star_smul, mulVec_add, mulVec_smul, add_dotProduct, dotProduct_add,
+      smul_dotProduct, dotProduct_smul, huw, hwu, ← hβ₁, ← hβ₂, smul_eq_mul]
     ring
   have hinj : Function.Injective f := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro x hx
     have a0 := hpair x (1, 0)
     have a1 := hpair x (0, 1)
@@ -94,10 +128,12 @@ private theorem planeSplit_of_lattice : ∀ (E : Type) [Field E] [NumberField E]
     rw [hLm, hdual]
     constructor
     · intro h y hy
-      rw [← hpair, ← mem_range_iff]; exact h _ hy
+      rw [← hpair, ← mem_range_iff]
+      exact h _ hy
     · intro h y hy
       obtain ⟨y, rfl⟩ := hsurj y
-      rw [mem_range_iff, hpair]; exact h y hy
+      rw [mem_range_iff, hpair]
+      exact h y hy
   obtain ⟨A, B, 𝔫, hA, hB, hA', hB', hS, hT, hfix⟩ :=
     diag_split β₁ β₂ h1 h2 h10 h20 L hLfg ⟨_, hu1, one_ne_zero⟩ hq hL
   have hβn : β₁ ∈ Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫 := by
@@ -108,8 +144,27 @@ private theorem planeSplit_of_lattice : ∀ (E : Type) [Field E] [NumberField E]
   have hb0 : b ≠ 0 := by
     rintro rfl
     exact h10 (by rw [← hbβ']; rfl)
-  refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero G hG, β₁, β₂, A, B, 𝔫, hGJ, h1, h2,
-    fun φ => ⟨hpos φ u hu0, hpos φ w hw0⟩, hA, hB, fun t => ?_, fun t => ?_, hS, hT, ?_, hfix, ?_⟩
+  refine ⟨
+    Matrix.GeneralLinearGroup.mkOfDetNeZero G hG,
+    β₁,
+    β₂,
+    A,
+    B,
+    𝔫,
+    hGJ,
+    h1,
+    h2,
+    fun φ => ⟨hpos φ u hu0, hpos φ w hw0⟩,
+    hA,
+    hB,
+    fun t => ?_,
+    fun t => ?_,
+    hS,
+    hT,
+    ?_,
+    hfix,
+    ?_
+  ⟩
   · rw [hA', hLm, hf]
     change _ ↔ G *ᵥ _ ∈ Λ
     rw [hGv]
@@ -127,11 +182,37 @@ private theorem planeSplit_of_lattice : ∀ (E : Type) [Field E] [NumberField E]
     rw [← Complex.abs_re_eq_norm.2 him, abs_of_pos (hpos φ u hu0)]
     exact hρ φ
 
-
 end GlobalTheory.PlaneSplit
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.definiteUnimodularPlane_split_along_vector : ∀ (E : Type) [Field E] [NumberField E] [StarRing E], Formalism.HermitianLatticesTheory.IsCMUnram E → ∀ (J : Matrix (Fin 2) (Fin 2) E), Jᴴ = J → (∀ (φ : E →+* ℂ) (y : Fin 2 → E), y ≠ 0 → 0 < (φ (star y ⬝ᵥ (J *ᵥ y))).re) → ∀ Λ : Submodule (𝓞 E) (Fin 2 → E), Submodule.IsLattice E Λ → (∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, star y ⬝ᵥ (J *ᵥ x) ∈ (algebraMap (𝓞 E) E).range) → ∀ u ∈ Λ, u ≠ 0 → ∀ ρ : ℝ, (∀ φ : E →+* ℂ, (φ (star u ⬝ᵥ (J *ᵥ u))).re ≤ ρ) → ∃ (γ : GL (Fin 2) E) (β₁ β₂ : E) (N₁ N₂ : Submodule (𝓞 E) E) (𝔫 : Ideal (𝓞 E)), (γ : Matrix (Fin 2) (Fin 2) E)ᴴ * J * (γ : Matrix (Fin 2) (Fin 2) E) = Matrix.diagonal ![β₁, β₂] ∧ star β₁ = β₁ ∧ star β₂ = β₂ ∧ (∀ φ : E →+* ℂ, 0 < (φ β₁).re ∧ 0 < (φ β₂).re) ∧ Submodule.IsLattice E N₁ ∧ Submodule.IsLattice E N₂ ∧ (∀ t, t ∈ N₁ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![t, 0] ∈ Λ) ∧ (∀ t, t ∈ N₂ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![0, t] ∈ Λ) ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y} = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫 ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₂, ∃ y ∈ N₂, t = star x * β₂ * y} = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫 ∧ 𝔫 ≠ ⊥ ∧ 𝔫 = Ideal.span {t | t ∈ 𝔫 ∧ star (t : E) = t} ∧ (Ideal.absNorm 𝔫 : ℝ) ≤ ρ ^ (2 * Formalism.HermitianLatticesTheory.fDeg E) := by
+theorem _root_.GlobalTheory.T.definiteUnimodularPlane_split_along_vector
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E],
+      Formalism.HermitianLatticesTheory.IsCMUnram E
+        → ∀ (J : Matrix (Fin 2) (Fin 2) E),
+          Jᴴ = J → (∀ (φ : E →+* ℂ) (y : Fin 2 → E), y ≠ 0 → 0 < (φ (star y ⬝ᵥ (J *ᵥ y))).re)
+            → ∀ Λ : Submodule (𝓞 E) (Fin 2 → E),
+              Submodule.IsLattice E Λ
+                → (∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, star y ⬝ᵥ (J *ᵥ x) ∈ (algebraMap (𝓞 E) E).range)
+                → ∀ u ∈ Λ,
+                  u ≠ 0
+                    → ∀ ρ : ℝ,
+                      (∀ φ : E →+* ℂ, (φ (star u ⬝ᵥ (J *ᵥ u))).re ≤ ρ)
+                        → ∃ (γ : GL (Fin 2) E) (β₁ β₂ : E) (N₁ N₂ : Submodule (𝓞 E) E)
+                            (𝔫 : Ideal (𝓞 E)),
+                          (γ : Matrix (Fin 2) (Fin 2) E)ᴴ * J * (γ : Matrix (Fin 2) (Fin 2) E)
+                              = Matrix.diagonal ![β₁, β₂]
+                            ∧ star β₁ = β₁ ∧ star β₂ = β₂
+                            ∧ (∀ φ : E →+* ℂ, 0 < (φ β₁).re ∧ 0 < (φ β₂).re)
+                            ∧ Submodule.IsLattice E N₁ ∧ Submodule.IsLattice E N₂
+                            ∧ (∀ t, t ∈ N₁ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![t, 0] ∈ Λ)
+                            ∧ (∀ t, t ∈ N₂ ↔ (γ : Matrix (Fin 2) (Fin 2) E) *ᵥ ![0, t] ∈ Λ)
+                            ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₁, ∃ y ∈ N₁, t = star x * β₁ * y}
+                              = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫
+                            ∧ Submodule.span (𝓞 E) {t | ∃ x ∈ N₂, ∃ y ∈ N₂, t = star x * β₂ * y}
+                              = Submodule.map (Algebra.linearMap (𝓞 E) E) 𝔫
+                            ∧ 𝔫 ≠ ⊥ ∧ 𝔫 = Ideal.span {t | t ∈ 𝔫 ∧ star (t : E) = t}
+                            ∧ (Ideal.absNorm 𝔫 : ℝ)
+                              ≤ ρ ^ (2 * Formalism.HermitianLatticesTheory.fDeg E) := by
   intro E _ _ _ hE J hJ hpos Λ hΛ hdual u hu hu0 ρ hρ
   obtain ⟨γ, β₁, β₂, N₁, N₂, 𝔫, hγ, hβ₁, hβ₂, hpos', hN₁, hN₂, hrest⟩ :=
     GlobalTheory.PlaneSplit.planeSplit_of_lattice E hE J hJ hpos Λ hΛ hdual u hu hu0 ρ hρ

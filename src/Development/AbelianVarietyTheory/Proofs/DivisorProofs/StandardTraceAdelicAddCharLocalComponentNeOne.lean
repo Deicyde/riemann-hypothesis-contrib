@@ -12,15 +12,22 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open Classical
 open scoped TensorProduct ComplexConjugate GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames Formalism.L2.DIV
-open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels (Base Spc Model HasExp SplitsFully Chars)
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames Formalism.L2.DIV
+open GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation
+  (spV spW spW₁ spV₁ alpha beta Num skewGram blk conjU)
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  (Base Spc Model HasExp SplitsFully Chars)
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 open scoped GlobalTheory.VacAny
 
 noncomputable section
@@ -32,9 +39,10 @@ open scoped nonZeroDivisors
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem exists_trace_not_int (v : HeightOneSpectrum (𝓞 F)) :
-    ∃ z : F, (∀ w : HeightOneSpectrum (𝓞 F), w ≠ v → w.valuation F z ≤ 1) ∧
-      Algebra.trace ℚ F z ∉ (algebraMap ℤ ℚ).range := by
+theorem exists_trace_not_int (v : HeightOneSpectrum (𝓞 F))
+    : ∃ z : F,
+      (∀ w : HeightOneSpectrum (𝓞 F), w ≠ v → w.valuation F z ≤ 1)
+        ∧ Algebra.trace ℚ F z ∉ (algebraMap ℤ ℚ).range := by
   classical
   set C : FractionalIdeal (𝓞 F)⁰ F := FractionalIdeal.dual ℤ ℚ (1 : FractionalIdeal (𝓞 F)⁰ F) with hC
   set N : ℕ := (-(FractionalIdeal.count F v C)).toNat + 1 with hN
@@ -67,8 +75,11 @@ theorem exists_trace_not_int (v : HeightOneSpectrum (𝓞 F)) :
   rw [hcount v, if_pos rfl] at this
   omega
 
-theorem psiV_ne_one : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ), GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ →
-    ∀ v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F), GlobalTheory.VacAny.psiV ψ v ≠ 1 := by
+theorem psiV_ne_one
+    : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF F) ℂ),
+      GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.IsStd ψ
+        → ∀ v : GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Pl (F := F),
+          GlobalTheory.VacAny.psiV ψ v ≠ 1 := by
   intro F _ _ ψ hψ v h1
   obtain ⟨z, hz, hzt⟩ := exists_trace_not_int (F := F) v
   have hloc : ∀ t : Fv F v, ψ (GlobalTheory.EmbChart.atPlace v t) = 1 := fun t => by
@@ -80,11 +91,17 @@ theorem psiV_ne_one : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF
     by_cases hw : w = v
     · subst hw
       rw [hα, map_sub, GlobalTheory.AdelicU.evalV_singleFin_self]
-      have : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w (algebraMap F (Af F) z) = zv := rfl
+      have : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w
+            (algebraMap F (Af F) z)
+          = zv :=
+        rfl
       rw [this, sub_self]
       exact zero_mem _
     · rw [hα, map_sub, GlobalTheory.AdelicU.evalV_singleFin_ne hw, sub_zero]
-      have : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w (algebraMap F (Af F) z) = algebraMap F (Fv F w) z := rfl
+      have : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV F w
+            (algebraMap F (Af F) z)
+          = algebraMap F (Fv F w) z :=
+        rfl
       rw [this, HeightOneSpectrum.mem_adicCompletionIntegers, GlobalTheory.Idele.valued_algebraMap]
       exact hz w hw
   have htr : ∀ a : 𝓞 F, ∃ k : ℤ, Algebra.trace ℚ F ((a : F) * 1) = k := by
@@ -96,7 +113,8 @@ theorem psiV_ne_one : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF
     exact ⟨k, by rw [← hk]; simp⟩
   have h0 := GlobalTheory.LatVacArith.psi_int hψ 1 htr α hαint
   rw [map_one, mul_one] at h0
-  have hsplit : pairA F 0 (algebraMap F (Af F) z) = pairA F 0 α + GlobalTheory.EmbChart.atPlace v zv := by
+  have hsplit
+      : pairA F 0 (algebraMap F (Af F) z) = pairA F 0 α + GlobalTheory.EmbChart.atPlace v zv := by
     refine Prod.ext (add_zero (0 : Ainf F)).symm ?_
     show algebraMap F (Af F) z = α + GlobalTheory.AdelicU.singleFin v zv
     rw [hα, sub_add_cancel]
@@ -109,7 +127,8 @@ theorem psiV_ne_one : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar (AF
   have hc : ((Algebra.trace ℚ F z : ℚ) : ℂ) = (n : ℂ) := by
     have h2 : (2 * Real.pi * Complex.I : ℂ) ≠ 0 := Complex.two_pi_I_ne_zero
     apply mul_left_cancel₀ h2
-    rw [hn]; ring
+    rw [hn]
+    ring
   rw [eq_intCast]
   exact_mod_cast hc.symm
 

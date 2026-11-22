@@ -10,10 +10,16 @@ namespace ReciprocityTheory.Neutral.Cmp
 
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {p : ℕ} [Fact p.Prime]
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+  {p : ℕ} [Fact p.Prime]
 
-theorem mem_range_of_aeval_rat_eq_zero (ι : Ω →+* PadicAlgCl p) [IsAlgClosed Ω] {g : Polynomial ℚ} (hg : g ≠ 0)
-    {b : PadicAlgCl p} (hb : Polynomial.aeval b g = 0) : b ∈ ι.range := by
+theorem mem_range_of_aeval_rat_eq_zero
+    (ι : Ω →+* PadicAlgCl p)
+    [IsAlgClosed Ω]
+    {g : Polynomial ℚ} (hg : g ≠ 0)
+    {b : PadicAlgCl p} (hb : Polynomial.aeval b g = 0)
+    : b ∈ ι.range := by
   classical
   haveI : CharZero Ω := RingHom.charZero ι
   have hmap : (g.map (algebraMap ℚ Ω)).map ι = g.map (algebraMap ℚ (PadicAlgCl p)) := by
@@ -23,11 +29,13 @@ theorem mem_range_of_aeval_rat_eq_zero (ι : Ω →+* PadicAlgCl p) [IsAlgClosed
   have hroot : ((g.map (algebraMap ℚ Ω)).map ι).IsRoot b := by
     rw [hmap, Polynomial.IsRoot, Polynomial.eval_map, ← Polynomial.aeval_def]
     exact hb
-  exact Polynomial.Splits.mem_range_of_isRoot (IsAlgClosed.splits _) (Polynomial.map_ne_zero hg) hroot
+  exact Polynomial.Splits.mem_range_of_isRoot (IsAlgClosed.splits _) (Polynomial.map_ne_zero hg)
+    hroot
 
-private theorem exists_root_norm_sub_pow_le_eval {K : Type*} [NormedField K] [IsAlgClosed K] (n : ℕ) :
-    ∀ G : Polynomial K, G.Monic → G.natDegree = n + 1 → ∀ b : K,
-      ∃ β, G.IsRoot β ∧ ‖b - β‖ ^ (n + 1) ≤ ‖G.eval b‖ := by
+private theorem exists_root_norm_sub_pow_le_eval {K : Type*} [NormedField K] [IsAlgClosed K] (n : ℕ)
+    : ∀ G : Polynomial K,
+      G.Monic → G.natDegree = n + 1
+        → ∀ b : K, ∃ β, G.IsRoot β ∧ ‖b - β‖ ^ (n + 1) ≤ ‖G.eval b‖ := by
   induction n with
   | zero =>
     intro G hG hd b
@@ -45,9 +53,9 @@ private theorem exists_root_norm_sub_pow_le_eval {K : Type*} [NormedField K] [Is
       omega
     have hQ1 : G /ₘ (Polynomial.X - Polynomial.C α) = 1 := by
       first
-        | exact Polynomial.eq_one_of_monic_natDegree_zero hQm hQd
-        | exact hQm.natDegree_eq_zero.mp hQd
-        | exact (Polynomial.Monic.natDegree_eq_zero_iff_eq_one hQm).mp hQd
+      | exact Polynomial.eq_one_of_monic_natDegree_zero hQm hQd
+      | exact hQm.natDegree_eq_zero.mp hQd
+      | exact (Polynomial.Monic.natDegree_eq_zero_iff_eq_one hQm).mp hQd
     have he : G.eval b = (b - α) * (G /ₘ (Polynomial.X - Polynomial.C α)).eval b := by
       conv_lhs => rw [← hQ]
       rw [Polynomial.eval_mul, Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C]
@@ -77,7 +85,8 @@ private theorem exists_root_norm_sub_pow_le_eval {K : Type*} [NormedField K] [Is
     rcases le_total ‖b - α‖ ‖b - β‖ with h | h
     · refine ⟨α, hα, ?_⟩
       rw [hGb, pow_succ']
-      exact mul_le_mul_of_nonneg_left ((pow_le_pow_left₀ (norm_nonneg _) h _).trans hb) (norm_nonneg _)
+      exact mul_le_mul_of_nonneg_left ((pow_le_pow_left₀ (norm_nonneg _) h _).trans hb)
+        (norm_nonneg _)
     · refine ⟨β, hβG, ?_⟩
       rw [hGb, pow_succ']
       exact mul_le_mul h hb (by positivity) (norm_nonneg _)
@@ -109,7 +118,8 @@ theorem denseRange_of_isAlgClosed (ι : Ω →+* PadicAlgCl p) [IsAlgClosed Ω] 
   set g : Polynomial ℚ := Polynomial.X ^ (n + 1) + s with hg
   have hgm : g.Monic := Polynomial.monic_X_pow_add hsdeg
   have hgn : g.natDegree = n + 1 := by
-    rw [hg, Polynomial.natDegree_add_eq_left_of_degree_lt (by rw [Polynomial.degree_X_pow]; exact hsdeg),
+    rw [hg,
+      Polynomial.natDegree_add_eq_left_of_degree_lt (by rw [Polynomial.degree_X_pow]; exact hsdeg),
       Polynomial.natDegree_X_pow]
   set G := g.map (algebraMap ℚ (PadicAlgCl p)) with hG
   set F := f.map (algebraMap ℚ_[p] (PadicAlgCl p)) with hF
@@ -135,8 +145,9 @@ theorem denseRange_of_isAlgClosed (ι : Ω →+* PadicAlgCl p) [IsAlgClosed Ω] 
             Polynomial.finsetSum_coeff]
           simp only [Polynomial.coeff_C_mul_X_pow]
           rw [Finset.sum_ite_eq, if_pos (Finset.mem_range.mpr hi')]
-        rw [hgc, eq_ratCast (algebraMap ℚ (PadicAlgCl p)), ← map_ratCast (algebraMap ℚ_[p] (PadicAlgCl p)),
-          ← map_sub, PadicAlgCl.norm_extends, norm_sub_rev]
+        rw [hgc, eq_ratCast (algebraMap ℚ (PadicAlgCl p)),
+          ← map_ratCast (algebraMap ℚ_[p] (PadicAlgCl p)), ← map_sub, PadicAlgCl.norm_extends,
+          norm_sub_rev]
         exact (hq i).le
       · have hi2 : i = n + 1 := by omega
         have hg1 : g.coeff i = 1 := by
@@ -164,9 +175,10 @@ theorem denseRange_of_isAlgClosed (ι : Ω →+* PadicAlgCl p) [IsAlgClosed Ω] 
     linarith
   obtain ⟨β, hβ, hβb⟩ := exists_root_norm_sub_pow_le_eval n G hGm hGn b
   have hβε : ‖b - β‖ < ε := lt_of_pow_lt_pow_left₀ (n + 1) hε.le (lt_of_le_of_lt hβb hGlt)
-  have hβr : β ∈ ι.range := mem_range_of_aeval_rat_eq_zero ι hgm.ne_zero (by
-    rw [Polynomial.aeval_def, ← Polynomial.eval_map]
-    exact hβ)
+  have hβr : β ∈ ι.range :=
+    mem_range_of_aeval_rat_eq_zero ι hgm.ne_zero (by
+      rw [Polynomial.aeval_def, ← Polynomial.eval_map]
+      exact hβ)
   obtain ⟨y, hy⟩ := RingHom.mem_range.mp hβr
   refine ⟨y, ?_⟩
   rw [dist_eq_norm, hy]
@@ -183,7 +195,8 @@ theorem finiteDimensional_Kloc (ι : Ω →+* PadicAlgCl p) : FiniteDimensional 
       rw [← b.sum_repr y, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_rat_smul, Rat.smul_def, ← map_ratCast (algebraMap ℚ_[p] (PadicAlgCl p))]
-    exact mul_mem (IntermediateField.algebraMap_mem _ _) (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩)
+    exact mul_mem (IntermediateField.algebraMap_mem _ _)
+      (IntermediateField.subset_adjoin _ _ ⟨i, rfl⟩)
   haveI : FiniteDimensional ℚ_[p] (IntermediateField.adjoin ℚ_[p] (Set.range fun i => f (b i))) :=
     IntermediateField.finiteDimensional_adjoin fun x _ => (Algebra.IsAlgebraic.isAlgebraic x).isIntegral
   exact FiniteDimensional.of_injective (IntermediateField.inclusion hle).toLinearMap
@@ -191,7 +204,6 @@ theorem finiteDimensional_Kloc (ι : Ω →+* PadicAlgCl p) : FiniteDimensional 
 
 theorem isAlgClosure_Kloc (ι : Ω →+* PadicAlgCl p) : IsAlgClosure (Kloc F ι) (PadicAlgCl p) := by
   exact ⟨inferInstance, inferInstance⟩
-
 
 variable (F) in
 include F in

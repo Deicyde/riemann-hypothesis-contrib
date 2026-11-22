@@ -11,22 +11,30 @@ namespace GlobalTheory.CompanionTheory.TensorCompleteFinite
 
 open GlobalTheory.CompanionTheory.TensorComplete
 
-theorem isAdicComplete_of_linearEquiv_univ {A : Type} [CommRing A] {π : A} {M : Type} {M' : Type 1}
-    [AddCommGroup M] [Module A M] [AddCommGroup M'] [Module A M'] (e : M ≃ₗ[A] M')
-    (h : IsAdicComplete (Ideal.span {π}) M) : IsAdicComplete (Ideal.span {π}) M' := by
-  have hM : ∀ (n : ℕ) (x : M), x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M) →
-      e x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M') := by
+theorem isAdicComplete_of_linearEquiv_univ
+    {A : Type} [CommRing A]
+    {π : A} {M : Type} {M' : Type 1} [AddCommGroup M] [Module A M] [AddCommGroup M'] [Module A M']
+    (e : M ≃ₗ[A] M') (h : IsAdicComplete (Ideal.span {π}) M)
+    : IsAdicComplete (Ideal.span {π}) M' := by
+  have hM
+      : ∀ (n : ℕ) (x : M),
+        x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M)
+          → e x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M') := by
     intro n x hx
-    have h1 : (Ideal.span {π} ^ n • ⊤ : Submodule A M).map (e : M →ₗ[A] M') ≤
-        Ideal.span {π} ^ n • ⊤ := by
+    have h1
+        : (Ideal.span {π} ^ n • ⊤ : Submodule A M).map (e : M →ₗ[A] M')
+          ≤ Ideal.span {π} ^ n • ⊤ := by
       rw [Submodule.map_smul'']
       exact Submodule.smul_mono le_rfl le_top
     exact h1 (Submodule.mem_map_of_mem hx)
-  have hM' : ∀ (n : ℕ) (x : M'), x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M') →
-      e.symm x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M) := by
+  have hM'
+      : ∀ (n : ℕ) (x : M'),
+        x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M')
+          → e.symm x ∈ (Ideal.span {π} ^ n • ⊤ : Submodule A M) := by
     intro n x hx
-    have h1 : (Ideal.span {π} ^ n • ⊤ : Submodule A M').map (e.symm : M' →ₗ[A] M) ≤
-        Ideal.span {π} ^ n • ⊤ := by
+    have h1
+        : (Ideal.span {π} ^ n • ⊤ : Submodule A M').map (e.symm : M' →ₗ[A] M)
+          ≤ Ideal.span {π} ^ n • ⊤ := by
       rw [Submodule.map_smul'']
       exact Submodule.smul_mono le_rfl le_top
     exact h1 (Submodule.mem_map_of_mem hx)
@@ -40,24 +48,28 @@ theorem isAdicComplete_of_linearEquiv_univ {A : Type} [CommRing A] {π : A} {M :
       exact hM' n x hx'
     simpa using congrArg e h0
   · intro f hf
-    obtain ⟨L, hL⟩ := h.toIsPrecomplete.prec' (fun n => e.symm (f n)) (fun {m n} hmn => by
-      rw [SModEq.sub_mem, ← map_sub]
-      exact hM' m _ ((SModEq.sub_mem).mp (hf hmn)))
+    obtain ⟨L, hL⟩ :=
+      h.toIsPrecomplete.prec'
+        (fun n => e.symm (f n))
+        (fun {m n} hmn => by
+          rw [SModEq.sub_mem, ← map_sub]
+          exact hM' m _ ((SModEq.sub_mem).mp (hf hmn)))
     refine ⟨e L, fun n => ?_⟩
     rw [SModEq.sub_mem]
     have h2 := hM n _ ((SModEq.sub_mem).mp (hL n))
     rwa [map_sub, LinearEquiv.apply_symm_apply] at h2
 
-theorem isAdicComplete_tensor_finite : ∀ (W : Type) [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] (l : ℕ), Irreducible (l : W) →
-    ∀ (A : Type) [CommRing A] [Algebra W A] [IsAdicComplete (Ideal.span {(l : A)}) A]
-      (L : Type 1) [AddCommGroup L] [Module W L] [Module.Finite W L],
-      IsAdicComplete (Ideal.span {(l : A)}) (A ⊗[W] L) := by
+theorem isAdicComplete_tensor_finite
+    : ∀ (W : Type) [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] (l : ℕ),
+      Irreducible (l : W)
+        → ∀ (A : Type) [CommRing A] [Algebra W A] [IsAdicComplete (Ideal.span {(l : A)}) A]
+            (L : Type 1) [AddCommGroup L] [Module W L] [Module.Finite W L],
+          IsAdicComplete (Ideal.span {(l : A)}) (A ⊗[W] L) := by
   intro W _ _ _ l hl A _ _ hA L _ _ _
   have hl0 : l ≠ 0 := by
     rintro rfl
     exact hl.ne_zero Nat.cast_zero
-  obtain ⟨p, hpmem, hpu⟩ : ∃ p ∈ l.primeFactorsList, ¬IsUnit (p : W) := by
+  obtain ⟨p, hpmem, hpu⟩ : ∃ p ∈ l.primeFactorsList, ¬ IsUnit (p : W) := by
     by_contra hcon
     push_neg at hcon
     apply hl.1
@@ -87,7 +99,7 @@ theorem isAdicComplete_tensor_finite : ∀ (W : Type) [CommRing W] [IsDomain W]
   have hN := isAdicComplete_tensor p W A hp0 hpu ((Fin n → W) ⧸ LinearMap.ker f)
   rw [hI]
   exact isAdicComplete_of_linearEquiv_univ
-    (TensorProduct.AlgebraTensorModule.congr (LinearEquiv.refl A A)
-      (f.quotKerEquivOfSurjective hf)) hN
+    (TensorProduct.AlgebraTensorModule.congr (LinearEquiv.refl A A) (f.quotKerEquivOfSurjective hf))
+    hN
 
 end GlobalTheory.CompanionTheory.TensorCompleteFinite

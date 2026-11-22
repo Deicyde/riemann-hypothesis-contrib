@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-private theorem chain_stab {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (K : Ideal R)
-    (hK : maximalIdeal R * K = ⊥) (F : ℕ → Ideal R) (hF : Antitone F) (hle : ∀ n, F n ≤ K) :
-    ∃ N, ∀ n, F N ≤ F n := by
+private theorem chain_stab
+    {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+    (K : Ideal R) (hK : maximalIdeal R * K = ⊥)
+    (F : ℕ → Ideal R) (hF : Antitone F) (hle : ∀ n, F n ≤ K)
+    : ∃ N, ∀ n, F N ≤ F n := by
   classical
   have hT : Module.IsTorsionBySet R K (maximalIdeal R : Set R) := by
     intro x a
@@ -42,9 +44,11 @@ private theorem chain_stab {R : Type} [CommRing R] [IsLocalRing R] [IsNoetherian
   rw [← heq] at h2
   exact hF (le_max_right N n) h2
 
-private theorem mul_mem_of_mem_ideal_killed_by_maximalIdeal {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R]
-    [IsCO O R] (J : Ideal R) (hJ : maximalIdeal R * J = ⊥) (S : Submodule O R) (r k : R)
-    (hk : k ∈ J) (hS : k ∈ S) : r * k ∈ S := by
+private theorem mul_mem_of_mem_ideal_killed_by_maximalIdeal
+    {O R : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
+    (J : Ideal R) (hJ : maximalIdeal R * J = ⊥)
+    (S : Submodule O R) (r k : R) (hk : k ∈ J) (hS : k ∈ S)
+    : r * k ∈ S := by
   obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) r
   have h0 : (r - algebraMap O R a) * k = 0 := by
     have h1 := Ideal.mul_mem_mul ha hk
@@ -56,10 +60,18 @@ private theorem mul_mem_of_mem_ideal_killed_by_maximalIdeal {O R : Type} [CommRi
   rw [h2]
   exact S.smul_mem a hS
 
-theorem UpperTheory.V.Alg.cont_section :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (p : R →ₐ[O] R'), Function.Surjective p → maximalIdeal R * RingHom.ker p = ⊥ → ∀ (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) →
-      ∀ (Γ : Type) [TopologicalSpace Γ] (j : X) (x : Γ → R'), AdicCont (maximalIdeal R') x → (∀ g, x g ∈ (W.part j).map p.toLinearMap) →
-      ∃ y : Γ → R, AdicCont (maximalIdeal R) y ∧ (∀ g, y g ∈ W.part j) ∧ ∀ g, p (y g) = x g := by
+theorem UpperTheory.V.Alg.cont_section
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X]
+        [Module.Finite ℤ X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type)
+        [CommRing R'] [Algebra O R'] [IsCO O R'] (p : R →ₐ[O] R'),
+      Function.Surjective p → maximalIdeal R * RingHom.ker p = ⊥
+        → ∀ (W : WPres O X R),
+          (∀ s, W.z s ∈ maximalIdeal R)
+            → ∀ (Γ : Type) [TopologicalSpace Γ] (j : X) (x : Γ → R'),
+              AdicCont (maximalIdeal R') x → (∀ g, x g ∈ (W.part j).map p.toLinearMap)
+                → ∃ y : Γ → R,
+                  AdicCont (maximalIdeal R) y ∧ (∀ g, y g ∈ W.part j) ∧ ∀ g, p (y g) = x g := by
   intro O _ _ _ _ X _ _ _ R _ _ _ R' _ _ _ p hp hker W hz Γ _ j x hxc hxp
   classical
   have hmem : ∀ r : R, p r ∈ maximalIdeal R' ↔ r ∈ maximalIdeal R := by
@@ -78,30 +90,39 @@ theorem UpperTheory.V.Alg.cont_section :
     intro n a ha
     rw [← hmapm, ← Ideal.map_pow] at ha
     exact (Ideal.mem_map_iff_of_surjective p hp).1 ha
-  obtain ⟨N0, hN0⟩ := chain_stab (RingHom.ker p) hker (fun n => maximalIdeal R ^ n ⊓ RingHom.ker p)
-    (fun a b h => inf_le_inf_right _ (Ideal.pow_le_pow_right h)) (fun n => inf_le_right)
+  obtain ⟨N0, hN0⟩ :=
+    chain_stab (RingHom.ker p) hker
+      (fun n => maximalIdeal R ^ n ⊓ RingHom.ker p)
+      (fun a b h => inf_le_inf_right _ (Ideal.pow_le_pow_right h))
+      (fun n => inf_le_right)
   have hinj : ∀ u v : R, u ∈ maximalIdeal R ^ N0 → v ∈ maximalIdeal R ^ N0 → p u = p v → u = v := by
     intro u v hu hv huv
     have hk : u - v ∈ maximalIdeal R ^ N0 ⊓ RingHom.ker p :=
       ⟨Ideal.sub_mem _ hu hv, (RingHom.mem_ker).2 (by rw [map_sub, huv, sub_self])⟩
     have hall : u - v ∈ ⨅ n, maximalIdeal R ^ n := Ideal.mem_iInf.2 fun n => (hN0 n hk).1
     rw [Ideal.iInf_pow_eq_bot_of_isLocalRing (I := maximalIdeal R)
-      (IsLocalRing.maximalIdeal.isMaximal R).ne_top] at hall
+        (IsLocalRing.maximalIdeal.isMaximal R).ne_top]
+      at hall
     exact sub_eq_zero.1 ((Ideal.mem_bot).1 hall)
-  let F : ℕ → Ideal R := fun n =>
-    { carrier := {k | k ∈ RingHom.ker p ∧ k ∈ W.part j ⊔ (maximalIdeal R ^ n).restrictScalars O}
-      add_mem' := fun ha hb => ⟨Ideal.add_mem _ ha.1 hb.1, Submodule.add_mem _ ha.2 hb.2⟩
-      zero_mem' := ⟨Ideal.zero_mem _, Submodule.zero_mem _⟩
-      smul_mem' := fun r k hk =>
-        ⟨Ideal.mul_mem_left _ r hk.1, mul_mem_of_mem_ideal_killed_by_maximalIdeal (O := O) _ hker _ r k hk.1 hk.2⟩ }
+  let F : ℕ → Ideal R := fun n => {
+    carrier := {k | k ∈ RingHom.ker p ∧ k ∈ W.part j ⊔ (maximalIdeal R ^ n).restrictScalars O}
+    add_mem' := fun ha hb => ⟨Ideal.add_mem _ ha.1 hb.1, Submodule.add_mem _ ha.2 hb.2⟩
+    zero_mem' := ⟨Ideal.zero_mem _, Submodule.zero_mem _⟩
+    smul_mem' := fun r k hk => ⟨
+      Ideal.mul_mem_left _ r hk.1,
+      mul_mem_of_mem_ideal_killed_by_maximalIdeal (O := O) _ hker _ r k hk.1 hk.2
+    ⟩
+  }
   have hFanti : Antitone F := by
     intro a b h k hk
     have H : (maximalIdeal R ^ b).restrictScalars O ≤ (maximalIdeal R ^ a).restrictScalars O :=
       fun z hz => Ideal.pow_le_pow_right h hz
     exact ⟨hk.1, SetLike.le_def.1 (sup_le_sup_left H (W.part j)) hk.2⟩
   obtain ⟨N1, hN1⟩ := chain_stab (RingHom.ker p) hker F hFanti (fun n k hk => hk.1)
-  have hclosed : ∀ k, k ∈ RingHom.ker p →
-      k ∈ W.part j ⊔ (maximalIdeal R ^ N1).restrictScalars O → k ∈ W.part j := by
+  have hclosed
+      : ∀ k,
+        k ∈ RingHom.ker p → k ∈ W.part j ⊔ (maximalIdeal R ^ N1).restrictScalars O
+          → k ∈ W.part j := by
     intro k hk1 hk2
     have hkF : k ∈ F N1 := ⟨hk1, hk2⟩
     apply part_closed O X R W hz j k
@@ -110,8 +131,10 @@ theorem UpperTheory.V.Alg.cont_section :
     refine ⟨y, hy, ?_⟩
     rw [← hyz, add_sub_cancel_left]
     exact hz2
-  have hL : ∀ a, a ∈ (W.part j).map p.toLinearMap → a ∈ maximalIdeal R' ^ (max N0 N1) →
-      ∃ w, w ∈ W.part j ∧ w ∈ maximalIdeal R ^ (max N0 N1) ∧ p w = a := by
+  have hL
+      : ∀ a,
+        a ∈ (W.part j).map p.toLinearMap → a ∈ maximalIdeal R' ^ (max N0 N1)
+          → ∃ w, w ∈ W.part j ∧ w ∈ maximalIdeal R ^ (max N0 N1) ∧ p w = a := by
     intro a ha haM
     obtain ⟨e, he, rfl⟩ := Submodule.mem_map.1 ha
     obtain ⟨w, hw, hpw⟩ := hlift _ _ haM
@@ -126,28 +149,41 @@ theorem UpperTheory.V.Alg.cont_section :
     have h3 := Submodule.sub_mem _ he hk
     rwa [sub_sub_cancel] at h3
   let base : (R' ⧸ maximalIdeal R' ^ (max N0 N1)) → R := fun c =>
-    if h : ∃ e, e ∈ W.part j ∧ Ideal.Quotient.mk (maximalIdeal R' ^ (max N0 N1)) (p e) = c
-    then h.choose else 0
-  have hbase : ∀ g, base (Ideal.Quotient.mk _ (x g)) ∈ W.part j ∧
-      x g - p (base (Ideal.Quotient.mk _ (x g))) ∈ maximalIdeal R' ^ (max N0 N1) := by
+    if h : ∃ e, e ∈ W.part j ∧ Ideal.Quotient.mk (maximalIdeal R' ^ (max N0 N1)) (p e) = c then
+      h.choose
+    else
+      0
+  have hbase
+      : ∀ g,
+        base (Ideal.Quotient.mk _ (x g)) ∈ W.part j
+          ∧ x g - p (base (Ideal.Quotient.mk _ (x g))) ∈ maximalIdeal R' ^ (max N0 N1) := by
     intro g
     obtain ⟨e, he, hpe⟩ := Submodule.mem_map.1 (hxp g)
-    have h : ∃ e, e ∈ W.part j ∧ Ideal.Quotient.mk (maximalIdeal R' ^ (max N0 N1)) (p e) =
-        Ideal.Quotient.mk _ (x g) := ⟨e, he, by rw [← hpe]; rfl⟩
+    have h
+        : ∃ e,
+          e ∈ W.part j
+            ∧ Ideal.Quotient.mk (maximalIdeal R' ^ (max N0 N1)) (p e) = Ideal.Quotient.mk _ (x g) :=
+      ⟨e, he, by rw [← hpe]; rfl⟩
     simp only [base]
     rw [dite_eq_left h]
     refine ⟨h.choose_spec.1, ?_⟩
     rw [← Ideal.Quotient.eq]
     exact h.choose_spec.2.symm
-  have hw : ∀ g, ∃ w, w ∈ W.part j ∧ w ∈ maximalIdeal R ^ (max N0 N1) ∧
-      p w = x g - p (base (Ideal.Quotient.mk _ (x g))) := by
+  have hw
+      : ∀ g, ∃ w,
+        w ∈ W.part j ∧ w ∈ maximalIdeal R ^ (max N0 N1)
+          ∧ p w = x g - p (base (Ideal.Quotient.mk _ (x g))) := by
     intro g
     apply hL
     · exact Submodule.sub_mem _ (hxp g) (Submodule.mem_map_of_mem (hbase g).1)
     · exact (hbase g).2
   choose w hwP hwM hwp using hw
-  refine ⟨fun g => base (Ideal.Quotient.mk _ (x g)) + w g, ?_,
-    fun g => Submodule.add_mem _ (hbase g).1 (hwP g), fun g => ?_⟩
+  refine ⟨
+    fun g => base (Ideal.Quotient.mk _ (x g)) + w g,
+    ?_,
+    fun g => Submodule.add_mem _ (hbase g).1 (hwP g),
+    fun g => ?_
+  ⟩
   · unfold AdicCont at hxc ⊢
     intro N
     rw [IsLocallyConstant.iff_eventually_eq]
@@ -155,8 +191,8 @@ theorem UpperTheory.V.Alg.cont_section :
     have hx0 := (IsLocallyConstant.iff_eventually_eq _).1 (hxc (max N (max N0 N1))) g0
     filter_upwards [hx0] with g hg
     have hd : x g - x g0 ∈ maximalIdeal R' ^ max N (max N0 N1) := Ideal.Quotient.eq.1 hg
-    have hcls : Ideal.Quotient.mk (maximalIdeal R' ^ (max N0 N1)) (x g) =
-        Ideal.Quotient.mk _ (x g0) :=
+    have hcls
+        : Ideal.Quotient.mk (maximalIdeal R' ^ (max N0 N1)) (x g) = Ideal.Quotient.mk _ (x g0) :=
       Ideal.Quotient.eq.2 (Ideal.pow_le_pow_right (le_max_right _ _) hd)
     obtain ⟨v, hv, hpv⟩ := hlift _ _ hd
     have hM0 : maximalIdeal R ^ (max N0 N1) ≤ maximalIdeal R ^ N0 :=
@@ -170,8 +206,9 @@ theorem UpperTheory.V.Alg.cont_section :
     apply Ideal.Quotient.eq.2
     show base (Ideal.Quotient.mk _ (x g)) + w g - (base (Ideal.Quotient.mk _ (x g0)) + w g0) ∈ _
     rw [hcls]
-    have h4 : base (Ideal.Quotient.mk _ (x g0)) + w g -
-        (base (Ideal.Quotient.mk _ (x g0)) + w g0) = v := by
+    have h4
+        : base (Ideal.Quotient.mk _ (x g0)) + w g - (base (Ideal.Quotient.mk _ (x g0)) + w g0)
+          = v := by
       rw [← heq]
       ring
     rw [h4]

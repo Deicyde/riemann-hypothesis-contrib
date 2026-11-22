@@ -8,11 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Monodro
 
 open PowerSeries GlobalTheory.BK
 
-theorem GlobalTheory.BK.BKDat.phi_sub_sub_mem_xi : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι] [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a] [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H), ∀ y ∈ D.Y, ∀ σ : Vec K a ι, D.conn σ = D.zeta y → ∃ d : D.D, D.phi σ - σ - D.phi y = D.xi d := by
+theorem GlobalTheory.BK.BKDat.phi_sub_sub_mem_xi
+    : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+        [Algebra O K] [IsUnitBall O K] (l e a : ℕ) (ι : Type) [Fintype ι] [DecidableEq ι]
+        [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] [NeZero a]
+        [TameDescentExponentData K l e a] (η H : ℕ) (D : BKDat O K l e a ι η H),
+      ∀ y ∈ D.Y, ∀ σ : Vec K a ι,
+        D.conn σ = D.zeta y → ∃ d : D.D, D.phi σ - σ - D.phi y = D.xi d := by
   intro O K _ _ _ _ _ _ l e a ι _ _ _ _ _ _ _ η H D y hy σ hσ
   haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ_[l] K).injective
   have hyl : y ∈ D.Yl := D.desc.mem_Yl_iff.2 ⟨0, by rw [pow_zero, one_smul]; exact hy⟩
-  obtain ⟨⟨s, -, -, hs, d, -, hd⟩, -⟩ := GlobalTheory.T.monodromy_mem_range_of_invariant_vector O K l e a ι η H D y hyl
+  obtain ⟨⟨s, -, -, hs, d, -, hd⟩, -⟩ :=
+    GlobalTheory.T.monodromy_mem_range_of_invariant_vector O K l e a ι η H D y hyl
   have h0 : D.conn (σ - s) = 0 := by rw [map_sub, hσ, hs, sub_self]
   set w := D.xiExt.symm (σ - s) with hw
   have hder : derV w = 0 := by

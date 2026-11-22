@@ -13,14 +13,21 @@ open scoped MatrixGroups Real ComplexConjugate
 
 namespace GlobalTheory.EisM
 
-theorem dif_comp_add (L : ℕ) (ι : ℤ × ℤ → ℤ × ℤ) (hι : ∀ x v : ℤ × ℤ, ∀ r : ℤ, ι (x + r • v) = ι x + r • ι v)
-    (v : ℤ × ℤ) (F : ℤ × ℤ → ℂ) :
-    dif L v (fun y => F (ι y)) = fun x => dif L (ι v) F (ι x) := by
+theorem dif_comp_add
+    (L : ℕ)
+    (ι : ℤ × ℤ → ℤ × ℤ) (hι : ∀ x v : ℤ × ℤ, ∀ r : ℤ, ι (x + r • v) = ι x + r • ι v)
+    (v : ℤ × ℤ) (F : ℤ × ℤ → ℂ)
+    : dif L v (fun y => F (ι y)) = fun x => dif L (ι v) F (ι x) := by
   funext x
   simp only [dif, hι]
 
-theorem lat_dilate : ∀ (j L N : ℕ) (v : ℤ × ℤ) (Φ : ℤ × ℤ → ℂ) (τ τ' : ℍ), 0 < N → (τ' : ℂ) = N * τ →
-    lat j 0 L v Φ τ' = lat j 0 L ((N : ℤ) * v.1, v.2) (fun y => if (N : ℤ) ∣ y.1 then Φ (y.1 / N, y.2) else 0) τ := by
+theorem lat_dilate
+    : ∀ (j L N : ℕ) (v : ℤ × ℤ) (Φ : ℤ × ℤ → ℂ) (τ τ' : ℍ),
+      0 < N → (τ' : ℂ) = N * τ
+        → lat j 0 L v Φ τ'
+          = lat j 0 L ((N : ℤ) * v.1, v.2)
+            (fun y => if (N : ℤ) ∣ y.1 then Φ (y.1 / N, y.2) else 0)
+            τ := by
   intro j L N v Φ τ τ' hN hτ
   set ι : ℤ × ℤ → ℤ × ℤ := fun x => ((N : ℤ) * x.1, x.2) with hιdef
   have hN' : (N : ℤ) ≠ 0 := by exact_mod_cast hN.ne'
@@ -30,8 +37,8 @@ theorem lat_dilate : ∀ (j L N : ℕ) (v : ℤ × ℤ) (Φ : ℤ × ℤ → ℂ
     exact Prod.ext (mul_left_cancel₀ hN' h.1) h.2
   have hι : ∀ x v : ℤ × ℤ, ∀ r : ℤ, ι (x + r • v) = ι x + r • ι v := by
     intro x v r
-    simp only [hιdef, Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, smul_eq_mul, Prod.mk_add_mk,
-      Prod.smul_mk]
+    simp only [hιdef, Prod.fst_add, Prod.snd_add, Prod.smul_fst, Prod.smul_snd, smul_eq_mul,
+      Prod.mk_add_mk, Prod.smul_mk]
     ext <;> simp only <;> ring
   set T : ℤ × ℤ → ℂ := fun y => trm j 0 ((y.1 : ℂ) * τ + y.2) with hT
   have hG : (fun y : ℤ × ℤ => trm j 0 ((y.1 : ℂ) * (τ' : ℂ) + y.2)) = fun y => T (ι y) := by
@@ -41,8 +48,10 @@ theorem lat_dilate : ∀ (j L N : ℕ) (v : ℤ × ℤ) (Φ : ℤ × ℤ → ℂ
     push_cast
     ring
   have hvι : ι v = ((N : ℤ) * v.1, v.2) := rfl
-  have hdd : ∀ x, dif L v (dif L v fun y => trm j 0 ((y.1 : ℂ) * (τ' : ℂ) + y.2)) x =
-      dif L (ι v) (dif L (ι v) T) (ι x) := by
+  have hdd
+      : ∀ x,
+        dif L v (dif L v fun y => trm j 0 ((y.1 : ℂ) * (τ' : ℂ) + y.2)) x
+          = dif L (ι v) (dif L (ι v) T) (ι x) := by
     intro x
     rw [hG, dif_comp_add L ι hι, dif_comp_add L ι hι]
   set Ψ : ℤ × ℤ → ℂ := fun y => if (N : ℤ) ∣ y.1 then Φ (y.1 / N, y.2) else 0 with hΨ

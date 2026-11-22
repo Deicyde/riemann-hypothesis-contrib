@@ -5,11 +5,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pFormPerfSt :
-    FormPerfSt := by
+theorem UpperTheory.Gal.W2.Seed.pFormPerfSt : FormPerfSt := by
   intro E _ _ _ A n q hP
   obtain ⟨e, he, hx, c', hc⟩ := hP
   refine ⟨e ^ 3, Nat.Coprime.pow_left 3 he, fun f => ?_⟩
@@ -18,8 +18,10 @@ theorem UpperTheory.Gal.W2.Seed.pFormPerfSt :
   refine ⟨fun i => -((if (i : ℕ) = 0 then c' * (e : 𝓞 E) else c' ^ 2) * x i), ?_⟩
   refine LinearMap.ext fun y => ?_
   rw [Arith.EF_apply]
-  have key : ∀ i, A.hd n i * -((if (i : ℕ) = 0 then c' * (e : 𝓞 E) else c' ^ 2) * x i) * A.bar (y i)
-      = ((e ^ 2 : ℕ) : 𝓞 E) * (x i * A.bar (y i)) := by
+  have key
+      : ∀ i,
+        A.hd n i * -((if (i : ℕ) = 0 then c' * (e : 𝓞 E) else c' ^ 2) * x i) * A.bar (y i)
+          = ((e ^ 2 : ℕ) : 𝓞 E) * (x i * A.bar (y i)) := by
     intro i
     simp only [Arith.hd, Arith.dg]
     push_cast
@@ -31,7 +33,8 @@ theorem UpperTheory.Gal.W2.Seed.pFormPerfSt :
     rw [hxf i]
     simp [Arith.bar_bar]
   set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_congr rfl (fun i _ => key i), ← Finset.mul_sum, ← nsmul_eq_mul, map_nsmul, map_sum]
+    rw [Finset.sum_congr rfl (fun i _ => key i), ← Finset.mul_sum, ← nsmul_eq_mul, map_nsmul,
+      map_sum]
   simp_rw [hs]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← Finset.mul_sum, ← map_sum, Finset.univ_sum_single]

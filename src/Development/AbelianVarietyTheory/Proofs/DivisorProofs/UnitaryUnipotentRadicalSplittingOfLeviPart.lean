@@ -10,16 +10,20 @@ open Formalism.UG GlobalTheory.SatakeWeyl
 
 namespace GlobalTheory.SatakeWeyl
 
-theorem antiJ_eq_one_rev {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {n : ℕ} (i j : Fin n) :
-    antiJ L n i j = if i.rev = j then 1 else 0 := by
+theorem antiJ_eq_one_rev
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {n : ℕ} (i j : Fin n)
+    : antiJ L n i j = if i.rev = j then 1 else 0 := by
   have := antiJ_mul_apply (1 : Matrix (Fin n) (Fin n) L) i j
   rw [Matrix.mul_one] at this
   rw [this, Matrix.one_apply]
 
-theorem exists_mat_submatrix {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {n r : ℕ}
+theorem exists_mat_submatrix
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    {σ : L →+* L} {n r : ℕ}
     (e : Fin r → Fin n) (he : Function.Injective e) (hrev : ∀ i, e i.rev = (e i).rev) (m : GU σ n)
-    (hm : ∀ a b, (a ∉ Set.range e ∨ b ∉ Set.range e) → mat m a b = (1 : Matrix (Fin n) (Fin n) L) a b) :
-    ∃ a : GU σ r, mat a = (mat m).submatrix e e := by
+    (hm
+      : ∀ a b, (a ∉ Set.range e ∨ b ∉ Set.range e) → mat m a b = (1 : Matrix (Fin n) (Fin n) L) a b)
+    : ∃ a : GU σ r, mat a = (mat m).submatrix e e := by
   apply exists_mat
   ext i j
   have h1 : cT σ (mat m) * antiJ L n * mat m = antiJ L n := m.2
@@ -46,7 +50,9 @@ theorem unipSplit_of_leviPart (hL : LeviPart) : UnipSplit := by
     rw [hu' a b hba.le, Matrix.one_apply_ne hba.ne']
   obtain ⟨m, hmL, hmu, hrad⟩ := hL L σ n β hβrev u htri
   have hmL' : ∀ i j, β i ≠ β j → mat m i j = 0 := hmL
-  have hm : ∀ a b, (a ∉ Set.range e ∨ b ∉ Set.range e) → mat m a b = (1 : Matrix (Fin n) (Fin n) L) a b := by
+  have hm
+      : ∀ a b,
+        (a ∉ Set.range e ∨ b ∉ Set.range e) → mat m a b = (1 : Matrix (Fin n) (Fin n) L) a b := by
     intro a b hab
     by_cases h : β a = β b
     · rcases hβe a b h with rfl | ⟨h1, h2⟩

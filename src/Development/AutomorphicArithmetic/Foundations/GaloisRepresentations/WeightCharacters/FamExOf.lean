@@ -4,34 +4,48 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.Branching
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.Branching
 open UpperTheory.Gal.Gen (IsLevel fixedBy)
 open UpperTheory.Gal.Wt
 
-private theorem cEmb_fin {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} (τ : E →+* ℂ) {c : UA E n}
-    (hc : c ∈ finU (E := E) (n := n)) : cEmb τ c = 1 := by
+private theorem cEmb_fin
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n : ℕ}
+    (τ : E →+* ℂ)
+    {c : UA E n} (hc : c ∈ finU (E := E) (n := n))
+    : cEmb τ c = 1 := by
   have : cInf c = 1 := hc
   simp [cEmb, this]
 
-theorem UpperTheory.Gal.Wt.famEx_of : NeatLev → EllC → Twist → TwistBd → Kap0 → Pieces → DeltaNear → FamOf → FamEx := by
-  intro hN hE hT hTB hK hP hD hF E _ _ _ l _ ι a ha w₀ hl hs v' hs' hap K hKl hKv Kv hKo W f hf τ hτ X b hb ε hε
+theorem UpperTheory.Gal.Wt.famEx_of
+    : NeatLev → EllC → Twist → TwistBd → Kap0 → Pieces → DeltaNear → FamOf → FamEx := by
+  intro hN hE hT hTB hK hP hD hF E _ _ _ l _ ι a ha w₀ hl hs v' hs' hap K hKl hKv Kv hKo W f hf τ hτ
+    X b hb ε hε
   classical
-  obtain ⟨C, hC, hKC, hneat, hint, hfC⟩ := hN E l Fact.out a ha w₀ hl hs v' hs' hap K hKl hKv Kv hKo W f hf
+  obtain ⟨C, hC, hKC, hneat, hint, hfC⟩ :=
+    hN E l Fact.out a ha w₀ hl hs v' hs' hap K hKl hKv Kv hKo W f hf
   obtain ⟨ℓ, hℓ⟩ := hE E a C hC.fin hneat
   obtain ⟨R, hR0, hR⟩ := hTB E l ι a C hC ℓ hℓ W f X b hb
   obtain ⟨κ, hκr, hκi, hκ1, hκc, hκI⟩ := hK E l ι a v' τ hτ
   haveI : CompactSpace C := isCompact_iff_compactSpace.1 hC.compact
   let φ : C →* GL (Fin a) ℂ := κ.comp C.subtype
   have hφI : ∀ c : C, IntGL ι (φ c) := fun c => hκI _ (hint _ c.2)
-  obtain ⟨Q, _, c, P, hQ⟩ := hP l ι a C φ (fun i j => (hκc i j).comp continuous_subtype_val) hφI
-    ((Kv.comap (cLoc v')).subgroupOf C)
-    (hKo.preimage ((GlobalTheory.BCT.GlobLev.continuous_cLoc v').comp continuous_subtype_val))
-    (fun x hx => by
-      have h1 : cLoc v' x.1 = 1 := (hκ1 _).1 hx
-      change cLoc v' x.1 ∈ Kv
-      rw [h1]; exact Kv.one_mem) (ε / R) (div_pos hε hR0)
+  obtain ⟨Q, _, c, P, hQ⟩ :=
+    hP l ι a C φ
+      (fun i j => (hκc i j).comp continuous_subtype_val)
+      hφI ((Kv.comap (cLoc v')).subgroupOf C)
+      (hKo.preimage ((GlobalTheory.BCT.GlobLev.continuous_cLoc v').comp continuous_subtype_val))
+      (fun x hx => by
+        have h1 : cLoc v' x.1 = 1 := (hκ1 _).1 hx
+        change cLoc v' x.1 ∈ Kv
+        rw [h1]
+        exact Kv.one_mem)
+      (ε / R) (div_pos hε hR0)
   choose F hFC hFv using fun q => hT E a C hC ℓ hℓ W f (c q)
   let M : UA E a → GL (Fin a) ℂ := fun g => (cEmb τ g)⁻¹ * κ g
   let n : UA E a → GL (Fin a) ℂ := fun g => φ (ℓ g) * (M g)⁻¹
@@ -51,7 +65,11 @@ theorem UpperTheory.Gal.Wt.famEx_of : NeatLev → EllC → Twist → TwistBd →
   refine ⟨d, M, fun g h hh h1 => ?_, fun ν => ?_⟩
   · simp only [M, map_mul, cEmb_fin τ hh, (hκ1 h).2 h1, mul_one]
   have hfam := hd ν fun q => (φ (c q))⁻¹
-  refine ⟨_, ⟨hfam.aut, fun k hk => hfam.fix k (hKC hk), hfam.inf, hfam.up, hfam.le, hfam.ge, hfam.fin⟩, fun g i => ?_⟩
+  refine ⟨
+    _,
+    ⟨hfam.aut, fun k hk => hfam.fix k (hKC hk), hfam.inf, hfam.up, hfam.le, hfam.ge, hfam.fin⟩,
+    fun g i => ?_
+  ⟩
   obtain ⟨q₀, h0, h1, h2, h3⟩ := hQ (ℓ g)
   have hnM : n g * M g = φ (ℓ g) := by simp only [n]; group
   have hε' : 0 ≤ ε / R := (div_pos hε hR0).le
@@ -62,9 +80,13 @@ theorem UpperTheory.Gal.Wt.famEx_of : NeatLev → EllC → Twist → TwistBd →
     group
   have hδ : ∀ q, (φ (c q))⁻¹ * φ (ℓ g) = φ ((c q)⁻¹ * ℓ g) := fun q => by rw [map_mul, map_inv]
   rw [famOf_apply, hv, hnM]
-  have e : (F q₀).1 (b g i) g - ∑ q, pev (P q) (φ (ℓ g)) * delta ν ((φ (c q))⁻¹ * φ (ℓ g)) * (F q).1 (b g i) g =
-      ∑ q, ((if q = q₀ then 1 else 0) - pev (P q) (φ (ℓ g)) * delta ν (φ ((c q)⁻¹ * ℓ g))) * (F q).1 (b g i) g := by
-    simp only [sub_mul, Finset.sum_sub_distrib, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true, hδ]
+  have e
+      : (F q₀).1 (b g i) g
+          - ∑ q, pev (P q) (φ (ℓ g)) * delta ν ((φ (c q))⁻¹ * φ (ℓ g)) * (F q).1 (b g i) g
+        = ∑ q, ((if q = q₀ then 1 else 0) - pev (P q) (φ (ℓ g)) * delta ν (φ ((c q)⁻¹ * ℓ g))) * (F q).1 (b g i) g :=
+    by
+      simp only [sub_mul, Finset.sum_sub_distrib, ite_mul, one_mul, zero_mul, Finset.sum_ite_eq',
+        Finset.mem_univ, if_true, hδ]
   set_option synthInstance.maxHeartbeats 100000 in
     rw [e, map_sum]
   refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg hε.le fun q _ => ?_
@@ -75,8 +97,11 @@ theorem UpperTheory.Gal.Wt.famEx_of : NeatLev → EllC → Twist → TwistBd →
   · subst hq
     have hb3 := hb2 _ hε' h1
     rw [if_pos rfl]
-    have e2 : 1 - pev (P q) (φ (ℓ g)) * delta ν (φ ((c q)⁻¹ * ℓ g)) =
-        -((pev (P q) (φ (ℓ g)) - 1) * delta ν (φ ((c q)⁻¹ * ℓ g)) + (delta ν (φ ((c q)⁻¹ * ℓ g)) - 1)) := by ring
+    have e2
+        : 1 - pev (P q) (φ (ℓ g)) * delta ν (φ ((c q)⁻¹ * ℓ g))
+          = -((pev (P q) (φ (ℓ g)) - 1) * delta ν (φ ((c q)⁻¹ * ℓ g))
+            + (delta ν (φ ((c q)⁻¹ * ℓ g)) - 1)) := by
+      ring
     rw [e2, map_neg, norm_neg, map_add (f := _)]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le ?_ hb3)
     rw [map_mul, norm_mul]

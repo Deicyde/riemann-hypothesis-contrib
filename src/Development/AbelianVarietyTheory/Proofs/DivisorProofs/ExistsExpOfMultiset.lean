@@ -24,12 +24,18 @@ open Formalism.L2.Host
 
 namespace GlobalTheory.HenQ
 
-theorem local_bound (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (n : ℕ) (V : Type)
-    [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V)
-    (Bf : V →ₗ⋆[ℂ] V →ₗ[ℂ] ℂ) (h1 : ∀ x y, Bf y x = starRingEnd ℂ (Bf x y)) (h2 : ∀ x, x ≠ 0 → 0 < (Bf x x).re)
-    (h3 : ∀ g x y, Bf (ρ g x) (ρ g y) = Bf x y) (B : Multiset ℂˣ) (hB : GlobalTheory.LFun.HasSatGL w ρ B) :
-    ∀ b ∈ B, ‖(b : ℂ)‖ ≤ ((Formalism.UG.qV E w : ℝ) ^ (n * n + n)) ∧
-      ‖((b⁻¹ : ℂˣ) : ℂ)‖ ≤ ((Formalism.UG.qV E w : ℝ) ^ (n * n + n)) ^ n := by
+theorem local_bound
+    (E : Type) [Field E] [NumberField E]
+    (w : HeightOneSpectrum (𝓞 E))
+    (n : ℕ)
+    (V : Type) [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (Bf : V →ₗ⋆[ℂ] V →ₗ[ℂ] ℂ)
+    (h1 : ∀ x y, Bf y x = starRingEnd ℂ (Bf x y)) (h2 : ∀ x, x ≠ 0 → 0 < (Bf x x).re)
+    (h3 : ∀ g x y, Bf (ρ g x) (ρ g y) = Bf x y)
+    (B : Multiset ℂˣ) (hB : GlobalTheory.LFun.HasSatGL w ρ B)
+    : ∀ b ∈ B,
+      ‖(b : ℂ)‖ ≤ ((Formalism.UG.qV E w : ℝ) ^ (n * n + n))
+        ∧ ‖((b⁻¹ : ℂˣ) : ℂ)‖ ≤ ((Formalism.UG.qV E w : ℝ) ^ (n * n + n)) ^ n := by
   obtain ⟨x, hx0, hxK, hcard, hT⟩ := hB.exists_vec
   obtain ⟨ϖ, hϖ⟩ := GlobalTheory.LFun.exists_isUnifV w
   set q := Formalism.UG.qV E w with hqdef
@@ -42,7 +48,9 @@ theorem local_bound (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum 
     have hh : ∀ g, ‖Formalism.UG.Tj ℂ n (Formalism.UG.Ov E w) ϖ j g‖ ≤ 1 := fun g => by
       unfold Formalism.UG.Tj
       exact (norm_indicator_le_norm_self _ _).trans (by simp)
-    have k1 := GlobalTheory.T.norm_heckeEigenvalue_le_card_cosets _ (GlobalTheory.LFun.KGL w (n := n)) V ρ Bf h1 h2 h3 _ x _ hh hfin hx0 (hT ϖ hϖ j hjn)
+    have k1 :=
+      GlobalTheory.T.norm_heckeEigenvalue_le_card_cosets _ (GlobalTheory.LFun.KGL w (n := n)) V ρ Bf
+        h1 h2 h3 _ x _ hh hfin hx0 (hT ϖ hϖ j hjn)
     have k2 : ‖(B.map fun b : ℂˣ => (b : ℂ)).esymm j‖ ≤ ‖GlobalTheory.LFun.satEig q n B j‖ := by
       unfold GlobalTheory.LFun.satEig
       rw [norm_mul, Complex.norm_natCast_cpow_of_pos (by omega)]
@@ -62,12 +70,14 @@ theorem local_bound (E : Type) [Field E] [NumberField E] (w : HeightOneSpectrum 
     linarith
   have hup : ∀ b ∈ B, ‖(b : ℂ)‖ ≤ (q : ℝ) ^ (n * n + n) := by
     intro b hb
-    refine (GlobalTheory.T.norm_root_le_card_mul_bound_of_esymm_norm_le n B _ hcard (one_le_pow₀ hq1) he b hb).trans ?_
+    refine (GlobalTheory.T.norm_root_le_card_mul_bound_of_esymm_norm_le n B _ hcard
+      (one_le_pow₀ hq1) he b hb).trans ?_
     rw [pow_add, mul_comm]
     exact mul_le_mul_of_nonneg_left hnq (by positivity)
   refine fun b hb => ⟨hup b hb, ?_⟩
 
-  obtain ⟨g, hg⟩ := GlobalTheory.T.heckeTn_scalar_uniformiser_single_translation E w n V ρ ϖ hϖ x hxK
+  obtain ⟨g, hg⟩ :=
+    GlobalTheory.T.heckeTn_scalar_uniformiser_single_translation E w n V ρ ϖ hϖ x hxK
   have hn := hT ϖ hϖ n le_rfl
   have hsat : GlobalTheory.LFun.satEig q n B n = (B.map fun b : ℂˣ => (b : ℂ)).prod := by
     unfold GlobalTheory.LFun.satEig

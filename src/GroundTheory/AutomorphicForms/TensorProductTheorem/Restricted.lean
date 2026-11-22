@@ -17,18 +17,16 @@ open scoped TensorProduct RestrictedProduct
 
 variable {ι : Type*} {V : ι → Type*} [∀ v, AddCommGroup (V v)] [∀ v, Module ℂ (V v)]
 
-def IsRestricted (ξ x : ∀ v, V v) : Prop :=
-  ∀ᶠ v in cofinite, x v = ξ v
+def IsRestricted (ξ x : ∀ v, V v) : Prop := ∀ᶠ v in cofinite, x v = ξ v
 
-theorem isRestricted_iff_finite {ξ x : ∀ v, V v} :
-    IsRestricted ξ x ↔ {v | x v ≠ ξ v}.Finite :=
+theorem isRestricted_iff_finite {ξ x : ∀ v, V v} : IsRestricted ξ x ↔ {v | x v ≠ ξ v}.Finite :=
   Filter.eventually_cofinite
 
-theorem isRestricted_self (ξ : ∀ v, V v) : IsRestricted ξ ξ :=
-  Eventually.of_forall fun _ => rfl
+theorem isRestricted_self (ξ : ∀ v, V v) : IsRestricted ξ ξ := Eventually.of_forall fun _ => rfl
 
-theorem IsRestricted.update [DecidableEq ι] {ξ x : ∀ v, V v} (h : IsRestricted ξ x) (i : ι)
-    (a : V i) : IsRestricted ξ (Function.update x i a) := by
+theorem IsRestricted.update
+    [DecidableEq ι] {ξ x : ∀ v, V v} (h : IsRestricted ξ x) (i : ι) (a : V i)
+    : IsRestricted ξ (Function.update x i a) := by
   rw [isRestricted_iff_finite] at h ⊢
   refine (h.union (Set.finite_singleton i)).subset fun v hv => ?_
   by_cases hvi : v = i
@@ -39,8 +37,8 @@ theorem IsRestricted.update [DecidableEq ι] {ξ x : ∀ v, V v} (h : IsRestrict
 def restrictedTensor (ξ : ∀ v, V v) : Submodule ℂ (⨂[ℂ] v, V v) :=
   Submodule.span ℂ (tprod ℂ '' {x | IsRestricted ξ x})
 
-theorem tprod_mem_restrictedTensor {ξ x : ∀ v, V v} (h : IsRestricted ξ x) :
-    tprod ℂ x ∈ restrictedTensor ξ :=
+theorem tprod_mem_restrictedTensor {ξ x : ∀ v, V v} (h : IsRestricted ξ x)
+    : tprod ℂ x ∈ restrictedTensor ξ :=
   Submodule.subset_span ⟨x, h, rfl⟩
 
 section Lift
@@ -49,17 +47,17 @@ def weight (T : Finset ι) (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) (v : ι)
   classical
   exact if v ∈ T then 1 else l v (x v)
 
-theorem weight_of_mem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) {v : ι}
-    (hv : v ∈ T) : weight T l x v = 1 := by
+theorem weight_of_mem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) {v : ι} (hv : v ∈ T)
+    : weight T l x v = 1 := by
   simp [weight, hv]
 
-theorem weight_of_notMem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) {v : ι}
-    (hv : v ∉ T) : weight T l x v = l v (x v) := by
+theorem weight_of_notMem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) {v : ι} (hv : v ∉ T)
+    : weight T l x v = l v (x v) := by
   simp [weight, hv]
 
-theorem mulSupport_weight_subset (ξ : ∀ v, V v) (T : Finset ι) (l : ∀ v, Dual ℂ (V v))
-    (x : ∀ v, V v) :
-    mulSupport (weight T l x) ⊆ {v | x v ≠ ξ v} ∪ {v | l v (ξ v) ≠ 1} := by
+theorem mulSupport_weight_subset
+    (ξ : ∀ v, V v) (T : Finset ι) (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v)
+    : mulSupport (weight T l x) ⊆ {v | x v ≠ ξ v} ∪ {v | l v (ξ v) ≠ 1} := by
   intro v hv
   rw [mem_mulSupport] at hv
   by_cases hvT : v ∈ T
@@ -72,14 +70,17 @@ theorem mulSupport_weight_subset (ξ : ∀ v, V v) (T : Finset ι) (l : ∀ v, D
       exact hv
     · exact Or.inl hx
 
-theorem finite_mulSupport_weight {ξ x : ∀ v, V v} (hx : IsRestricted ξ x) (T : Finset ι)
-    {l : ∀ v, Dual ℂ (V v)} (hl : ∀ᶠ v in cofinite, l v (ξ v) = 1) :
-    (mulSupport (weight T l x)).Finite :=
+theorem finite_mulSupport_weight
+    {ξ x : ∀ v, V v} (hx : IsRestricted ξ x)
+    (T : Finset ι)
+    {l : ∀ v, Dual ℂ (V v)} (hl : ∀ᶠ v in cofinite, l v (ξ v) = 1)
+    : (mulSupport (weight T l x)).Finite :=
   ((isRestricted_iff_finite.1 hx).union (Filter.eventually_cofinite.1 hl)).subset
     (mulSupport_weight_subset ξ T l x)
 
-theorem finprod_update_eq_mul [DecidableEq ι] (w : ι → ℂ) (hw : (mulSupport w).Finite) (i : ι) (c : ℂ) :
-    ∏ᶠ v, Function.update w i c v = c * ∏ᶠ v, Function.update w i 1 v := by
+theorem finprod_update_eq_mul
+    [DecidableEq ι] (w : ι → ℂ) (hw : (mulSupport w).Finite) (i : ι) (c : ℂ)
+    : ∏ᶠ v, Function.update w i c v = c * ∏ᶠ v, Function.update w i 1 v := by
   classical
   set s : Finset ι := insert i hw.toFinset
   have hs : ∀ c, mulSupport (Function.update w i c) ⊆ (s : Set ι) := by
@@ -88,24 +89,29 @@ theorem finprod_update_eq_mul [DecidableEq ι] (w : ι → ℂ) (hw : (mulSuppor
     · simp [s, hvi]
     · rw [mem_mulSupport, Function.update_of_ne hvi] at hv
       simp [s, hv]
-  rw [finprod_eq_prod_of_mulSupport_subset _ (hs c),
-    finprod_eq_prod_of_mulSupport_subset _ (hs 1),
+  rw [finprod_eq_prod_of_mulSupport_subset _ (hs c), finprod_eq_prod_of_mulSupport_subset _ (hs 1),
     Finset.prod_update_of_mem (Finset.mem_insert_self i _),
     Finset.prod_update_of_mem (Finset.mem_insert_self i _), one_mul]
 
-theorem weight_update_of_mem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) {i : ι}
-    (hi : i ∈ T) (a : V i) {inst : DecidableEq ι} :
-    weight T l (@Function.update _ _ inst x i a) = weight T l x := by
+theorem weight_update_of_mem
+    {T : Finset ι}
+    (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v)
+    {i : ι} (hi : i ∈ T) (a : V i)
+    {inst : DecidableEq ι}
+    : weight T l (@Function.update _ _ inst x i a) = weight T l x := by
   funext v
   by_cases hv : v ∈ T
   · rw [weight_of_mem l _ hv, weight_of_mem l _ hv]
   · rw [weight_of_notMem l _ hv, weight_of_notMem l _ hv,
       Function.update_of_ne (fun h => hv (by rw [h]; exact hi))]
 
-theorem weight_update_of_notMem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v) {i : ι}
-    (hi : i ∉ T) (a : V i) {inst : DecidableEq ι} :
-    weight T l (@Function.update _ _ inst x i a) =
-      @Function.update _ _ inst (weight T l x) i (l i a) := by
+theorem weight_update_of_notMem
+    {T : Finset ι}
+    (l : ∀ v, Dual ℂ (V v)) (x : ∀ v, V v)
+    {i : ι} (hi : i ∉ T) (a : V i)
+    {inst : DecidableEq ι}
+    : weight T l (@Function.update _ _ inst x i a)
+      = @Function.update _ _ inst (weight T l x) i (l i a) := by
   funext v
   by_cases hvi : v = i
   · subst hvi
@@ -115,19 +121,19 @@ theorem weight_update_of_notMem {T : Finset ι} (l : ∀ v, Dual ℂ (V v)) (x :
     · rw [weight_of_mem l _ hv, weight_of_mem l _ hv]
     · rw [weight_of_notMem l _ hv, weight_of_notMem l _ hv, Function.update_of_ne hvi]
 
-theorem restrict_update_of_mem {T : Finset ι} (x : ∀ v, V v) {i : ι} (hi : i ∈ T) (a : V i)
-    {inst : DecidableEq ι} :
-    (fun v : T => @Function.update _ _ inst x i a v) =
-      Function.update (fun v : T => x v) ⟨i, hi⟩ a := by
+theorem restrict_update_of_mem
+    {T : Finset ι} (x : ∀ v, V v) {i : ι} (hi : i ∈ T) (a : V i) {inst : DecidableEq ι}
+    : (fun v : T => @Function.update _ _ inst x i a v)
+      = Function.update (fun v : T => x v) ⟨i, hi⟩ a := by
   funext ⟨v, hv⟩
   by_cases hvi : v = i
   · subst hvi
     simp
   · rw [Function.update_of_ne hvi, Function.update_of_ne (fun h => hvi (congrArg Subtype.val h))]
 
-theorem restrict_update_of_notMem {T : Finset ι} (x : ∀ v, V v) {i : ι} (hi : i ∉ T) (a : V i)
-    {inst : DecidableEq ι} :
-    (fun v : T => @Function.update _ _ inst x i a v) = fun v : T => x v := by
+theorem restrict_update_of_notMem
+    {T : Finset ι} (x : ∀ v, V v) {i : ι} (hi : i ∉ T) (a : V i) {inst : DecidableEq ι}
+    : (fun v : T => @Function.update _ _ inst x i a v) = fun v : T => x v := by
   funext ⟨v, hv⟩
   rw [Function.update_of_ne (fun h => hi (by rw [← h]; exact hv))]
 
@@ -137,18 +143,20 @@ def restrictedIndicator (ξ x : ∀ v, V v) : ℂ := by
   classical
   exact if IsRestricted ξ x then 1 else 0
 
-theorem restrictedIndicator_of {ξ x : ∀ v, V v} (h : IsRestricted ξ x) :
-    restrictedIndicator ξ x = 1 := by
+theorem restrictedIndicator_of {ξ x : ∀ v, V v} (h : IsRestricted ξ x)
+    : restrictedIndicator ξ x = 1 := by
   simp [restrictedIndicator, h]
 
-theorem restrictedIndicator_of_not {ξ x : ∀ v, V v} (h : ¬ IsRestricted ξ x) :
-    restrictedIndicator ξ x = 0 := by
+theorem restrictedIndicator_of_not {ξ x : ∀ v, V v} (h : ¬ IsRestricted ξ x)
+    : restrictedIndicator ξ x = 0 := by
   simp [restrictedIndicator, h]
 
-def restrictedLift (ξ : ∀ v, V v) (T : Finset ι) (l : ∀ v, Dual ℂ (V v))
-    (hl : ∀ᶠ v in cofinite, l v (ξ v) = 1)
-    (f : MultilinearMap (RingHom.id ℂ) (fun v : T => V v) N) :
-    MultilinearMap (RingHom.id ℂ) V N where
+def restrictedLift
+    (ξ : ∀ v, V v)
+    (T : Finset ι)
+    (l : ∀ v, Dual ℂ (V v)) (hl : ∀ᶠ v in cofinite, l v (ξ v) = 1)
+    (f : MultilinearMap (RingHom.id ℂ) (fun v : T => V v) N)
+    : MultilinearMap (RingHom.id ℂ) V N where
   toFun x := restrictedIndicator ξ x • (∏ᶠ v, weight T l x v) • f (fun v => x v)
   map_update_add' := by
     intro inst x i a b
@@ -190,21 +198,22 @@ def restrictedLift (ξ : ∀ v, V v) (T : Finset ι) (l : ∀ v, Dual ℂ (V v))
         rwa [Function.update_idem, Function.update_eq_self] at this
       simp [restrictedIndicator_of_not (h1 _)]
 
-theorem restrictedLift_apply_of {ξ : ∀ v, V v} {T : Finset ι} {l : ∀ v, Dual ℂ (V v)}
-    {hl : ∀ᶠ v in cofinite, l v (ξ v) = 1}
+theorem restrictedLift_apply_of
+    {ξ : ∀ v, V v} {T : Finset ι} {l : ∀ v, Dual ℂ (V v)} {hl : ∀ᶠ v in cofinite, l v (ξ v) = 1}
     (f : MultilinearMap (RingHom.id ℂ) (fun v : T => V v) N)
-    {x : ∀ v, V v} (hx : IsRestricted ξ x) :
-    restrictedLift ξ T l hl f x = (∏ᶠ v, weight T l x v) • f (fun v => x v) := by
+    {x : ∀ v, V v} (hx : IsRestricted ξ x)
+    : restrictedLift ξ T l hl f x = (∏ᶠ v, weight T l x v) • f (fun v => x v) := by
   show restrictedIndicator ξ x • ((∏ᶠ v, weight T l x v) • f (fun v => x v)) = _
   rw [restrictedIndicator_of hx, one_smul]
 
-def evalForm (ξ : ∀ v, V v) (l : ∀ v, Dual ℂ (V v)) (hl : ∀ᶠ v in cofinite, l v (ξ v) = 1) :
-    (⨂[ℂ] v, V v) →ₗ[ℂ] ℂ :=
+def evalForm (ξ : ∀ v, V v) (l : ∀ v, Dual ℂ (V v)) (hl : ∀ᶠ v in cofinite, l v (ξ v) = 1)
+    : (⨂[ℂ] v, V v) →ₗ[ℂ] ℂ :=
   lift (restrictedLift ξ ∅ l hl (MultilinearMap.constOfIsEmpty (RingHom.id ℂ) _ 1))
 
-theorem evalForm_tprod {ξ : ∀ v, V v} {l : ∀ v, Dual ℂ (V v)}
-    {hl : ∀ᶠ v in cofinite, l v (ξ v) = 1} {x : ∀ v, V v} (hx : IsRestricted ξ x) :
-    evalForm ξ l hl (tprod ℂ x) = ∏ᶠ v, l v (x v) := by
+theorem evalForm_tprod
+    {ξ : ∀ v, V v} {l : ∀ v, Dual ℂ (V v)} {hl : ∀ᶠ v in cofinite, l v (ξ v) = 1} {x : ∀ v, V v}
+    (hx : IsRestricted ξ x)
+    : evalForm ξ l hl (tprod ℂ x) = ∏ᶠ v, l v (x v) := by
   rw [evalForm, lift.tprod, restrictedLift_apply_of _ hx]
   simp only [MultilinearMap.constOfIsEmpty_apply, Function.const_apply, smul_eq_mul, mul_one]
   exact finprod_congr fun v => weight_of_notMem l x (Finset.notMem_empty v)
@@ -215,11 +224,11 @@ section Finite
 
 variable [DecidableEq ι]
 
-def extend (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V v) : ∀ v, V v :=
-  fun v => if h : v ∈ T then y ⟨v, h⟩ else ξ v
+def extend (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V v) : ∀ v, V v := fun v =>
+  if h : v ∈ T then y ⟨v, h⟩ else ξ v
 
-theorem isRestricted_extend (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V v) :
-    IsRestricted ξ (extend ξ T y) := by
+theorem isRestricted_extend (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V v)
+    : IsRestricted ξ (extend ξ T y) := by
   rw [isRestricted_iff_finite]
   refine T.finite_toSet.subset fun v hv => ?_
   by_contra hvT
@@ -229,8 +238,8 @@ theorem isRestricted_extend (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V 
 def finiteEmbed (ξ : ∀ v, V v) (T : Finset ι) : (⨂[ℂ] v : T, V v) →ₗ[ℂ] ⨂[ℂ] v, V v :=
   lift ((PiTensorProduct.tprod ℂ).domDomRestrict (· ∈ T) fun w => ξ w)
 
-theorem finiteEmbed_tprod (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V v) :
-    finiteEmbed ξ T (tprod ℂ y) = tprod ℂ (extend ξ T y) := by
+theorem finiteEmbed_tprod (ξ : ∀ v, V v) (T : Finset ι) (y : ∀ v : T, V v)
+    : finiteEmbed ξ T (tprod ℂ y) = tprod ℂ (extend ξ T y) := by
   rw [finiteEmbed, lift.tprod, MultilinearMap.domDomRestrict_apply]
   rfl
 
@@ -240,10 +249,9 @@ section Rep
 
 variable {G : ι → Type*} [∀ v, Group (G v)] {K : ∀ v, Subgroup (G v)}
 
-
 variable (K) in
-def tensorRep (π : ∀ v, Representation ℂ (G v) (V v)) :
-    Representation ℂ (Πʳ v, [G v, K v]) (⨂[ℂ] v, V v) where
+def tensorRep (π : ∀ v, Representation ℂ (G v) (V v))
+    : Representation ℂ (Πʳ v, [G v, K v]) (⨂[ℂ] v, V v) where
   toFun g := PiTensorProduct.map fun v => π v (g v)
   map_one' := by
     simp only [RestrictedProduct.one_apply, map_one]
@@ -252,14 +260,15 @@ def tensorRep (π : ∀ v, Representation ℂ (G v) (V v)) :
     simp only [RestrictedProduct.mul_apply, map_mul]
     exact PiTensorProduct.map_mul _ _
 
-theorem tensorRep_tprod (π : ∀ v, Representation ℂ (G v) (V v)) (g : Πʳ v, [G v, K v])
-    (x : ∀ v, V v) :
-    tensorRep (K := K) π g (tprod ℂ x) = tprod ℂ fun v => π v (g v) (x v) :=
+theorem tensorRep_tprod
+    (π : ∀ v, Representation ℂ (G v) (V v)) (g : Πʳ v, [G v, K v]) (x : ∀ v, V v)
+    : tensorRep (K := K) π g (tprod ℂ x) = tprod ℂ fun v => π v (g v) (x v) :=
   PiTensorProduct.map_tprod _ _
 
-def restrictedSubrep (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V v)
-    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v)) :
-    Subrepresentation (tensorRep (K := K) π) where
+def restrictedSubrep
+    (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V v)
+    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
+    : Subrepresentation (tensorRep (K := K) π) where
   toSubmodule := restrictedTensor ξ
   apply_mem_toSubmodule g t ht := by
     have : restrictedTensor ξ ≤ (restrictedTensor ξ).comap (tensorRep (K := K) π g) := by
@@ -272,15 +281,17 @@ def restrictedSubrep (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V
       exact h2 _ h3
     exact this ht
 
-def restrictedTensorRep (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V v)
-    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v)) :
-    Representation ℂ (Πʳ v, [G v, K v]) (restrictedTensor ξ) :=
+def restrictedTensorRep
+    (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V v)
+    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
+    : Representation ℂ (Πʳ v, [G v, K v]) (restrictedTensor ξ) :=
   (restrictedSubrep π ξ hξ).toRepresentation
 
-theorem coe_restrictedTensorRep_apply (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V v)
-    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v)) (g : Πʳ v, [G v, K v])
-    (t : restrictedTensor ξ) :
-    (restrictedTensorRep π ξ hξ g t : ⨂[ℂ] v, V v) = tensorRep (K := K) π g t :=
+theorem coe_restrictedTensorRep_apply
+    (π : ∀ v, Representation ℂ (G v) (V v)) (ξ : ∀ v, V v)
+    (hξ : ∀ᶠ v in cofinite, ξ v ∈ fixedVectors (π v) (K v))
+    (g : Πʳ v, [G v, K v]) (t : restrictedTensor ξ)
+    : (restrictedTensorRep π ξ hξ g t : ⨂[ℂ] v, V v) = tensorRep (K := K) π g t :=
   rfl
 
 end Rep

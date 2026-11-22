@@ -4,185 +4,209 @@ public import Mathlib
 
 @[expose] public section
 
-noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.Jm :
-    {n : Nat} → (Fin n → Bool) → Matrix (Fin n) (Fin n) Complex :=
-    fun {n : Nat} (ε : Fin n → Bool) ↦
-      @Matrix.diagonal (Fin n) Complex (instDecidableEqFin n) Complex.instZero fun (a : Fin n) ↦
-        @ite Complex (@Eq Bool (ε a) Bool.true) (instDecidableEqBool (ε a) Bool.true)
-          (@OfNat.ofNat Complex (nat_lit 1) (@One.toOfNat1 Complex Complex.instOne))
-          (@Neg.neg Complex Complex.instNeg (@OfNat.ofNat Complex (nat_lit 1) (@One.toOfNat1 Complex Complex.instOne)))
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.Jm
+    : {n : Nat} → (Fin n → Bool)
+      → Matrix (Fin n) (Fin n) Complex := fun {n : Nat} (ε : Fin n → Bool) ↦
+  @Matrix.diagonal (Fin n) Complex (instDecidableEqFin n) Complex.instZero fun (a : Fin n) ↦
+    @ite Complex (@Eq Bool (ε a) Bool.true) (instDecidableEqBool (ε a) Bool.true)
+      (@OfNat.ofNat Complex (nat_lit 1) (@One.toOfNat1 Complex Complex.instOne))
+      (@Neg.neg Complex Complex.instNeg
+        (@OfNat.ofNat Complex (nat_lit 1) (@One.toOfNat1 Complex Complex.instOne)))
 
-noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.inUJ :
-    {n : Nat} → (Fin n → Bool) → Matrix (Fin n) (Fin n) Complex → Prop :=
-    fun {n : Nat} (ε : Fin n → Bool) (g : Matrix (Fin n) (Fin n) Complex) ↦
-      @Eq (Matrix (Fin n) (Fin n) Complex)
-        (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
-          (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex (Fin.fintype n) Complex.instMul
-            Complex.instAddCommMonoid)
-          (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
-            (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex (Fin.fintype n) Complex.instMul
-              Complex.instAddCommMonoid)
-            (@Matrix.conjTranspose (Fin n) (Fin n) Complex
-              (@InvolutiveStar.toStar Complex
-                (@StarAddMonoid.toInvolutiveStar Complex
-                  (@AddCommMonoid.toAddMonoid Complex
-                    (@NonUnitalNonAssocSemiring.toAddCommMonoid Complex
-                      (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring Complex
-                        (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing Complex
-                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex Complex.instNonUnitalCommRing)))))
-                  (@StarRing.toStarAddMonoid Complex
-                    (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring Complex
-                      (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing Complex
-                        (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex Complex.instNonUnitalCommRing)))
-                    Complex.instStarRing)))
-              g)
-            (@UpperTheory.Reformulated.B.InvolutionInvariants.Jm n ε))
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.inUJ
+    : {n : Nat} → (Fin n → Bool) → Matrix (Fin n) (Fin n) Complex
+      → Prop := fun {n : Nat} (ε : Fin n → Bool) (g : Matrix (Fin n) (Fin n) Complex) ↦
+  @Eq (Matrix (Fin n) (Fin n) Complex)
+    (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
+      (Matrix (Fin n) (Fin n) Complex)
+      (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex (Fin.fintype n)
+        Complex.instMul Complex.instAddCommMonoid)
+      (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
+        (Matrix (Fin n) (Fin n) Complex)
+        (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex
+          (Fin.fintype n) Complex.instMul Complex.instAddCommMonoid)
+        (@Matrix.conjTranspose (Fin n) (Fin n) Complex
+          (@InvolutiveStar.toStar Complex
+            (@StarAddMonoid.toInvolutiveStar Complex
+              (@AddCommMonoid.toAddMonoid Complex
+                (@NonUnitalNonAssocSemiring.toAddCommMonoid Complex
+                  (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring Complex
+                    (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing Complex
+                      (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex
+                        Complex.instNonUnitalCommRing)))))
+              (@StarRing.toStarAddMonoid Complex
+                (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring Complex
+                  (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing Complex
+                    (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex
+                      Complex.instNonUnitalCommRing)))
+                Complex.instStarRing)))
           g)
-        (@UpperTheory.Reformulated.B.InvolutionInvariants.Jm n ε)
+        (@UpperTheory.Reformulated.B.InvolutionInvariants.Jm n ε))
+      g)
+    (@UpperTheory.Reformulated.B.InvolutionInvariants.Jm n ε)
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux3 :
-    ∀ {n : Nat} (ε : Fin n → Bool)
-      {g h :
-        @Units (Matrix (Fin n) (Fin n) Complex)
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux3
+    : ∀ {n : Nat} (ε : Fin n → Bool)
+        {g h : @Units (Matrix (Fin n) (Fin n) Complex)
           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))},
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n)))},
       @Membership.mem
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (Set
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-          (@Set.instMembership
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (Set (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.instMembership (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
           (@Set.ofPred
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            fun
-              (g :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
-            @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
-              (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            fun (g : @Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
-                g))
-          g →
-        @Membership.mem
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            (Set
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-            (@Set.instMembership
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-            (@Set.ofPred
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              fun
-                (g :
-                  @Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))) ↦
               @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
                 (@Units.val (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))
                   g))
-            h →
-          @Membership.mem
+          g
+        → @Membership.mem
+          (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (Set (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.instMembership (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.ofPred
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            (Set
-              (@Units (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            fun (g : @Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-            (@Set.instMembership
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-            (@Set.ofPred
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              fun
-                (g :
-                  @Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))) ↦
               @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
                 (@Units.val (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))
                   g))
-            (@HMul.hMul
+          h
+        → @Membership.mem
+          (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (Set (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.instMembership (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.ofPred
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            fun (g : @Units (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))) ↦
+              @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
+                (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))
+                  g))
+          (@HMul.hMul
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@instHMul
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@instHMul
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@MulOne.toMul
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@MulOne.toMul
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
+                (@MulOneClass.toMulOne
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@MulOneClass.toMulOne
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
+                  (@Monoid.toMulOneClass
                     (@Units (Matrix (Fin n) (Fin n) Complex)
                       (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                    (@Monoid.toMulOneClass
+                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                          (instDecidableEqFin n))))
+                    (@DivInvMonoid.toMonoid
                       (@Units (Matrix (Fin n) (Fin n) Complex)
                         (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                      (@DivInvMonoid.toMonoid
+                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                            (instDecidableEqFin n))))
+                      (@Group.toDivInvMonoid
                         (@Units (Matrix (Fin n) (Fin n) Complex)
                           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                        (@Group.toDivInvMonoid
-                          (@Units (Matrix (Fin n) (Fin n) Complex)
-                            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
-                                (instDecidableEqFin n))))
-                          (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
-                                (instDecidableEqFin n))))))))))
-              g h) := by
+                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                              (instDecidableEqFin n))))
+                        (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+                          (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                              (instDecidableEqFin n))))))))))
+            g h) := by
   intro n ε g h hg hh
   change UpperTheory.Reformulated.B.InvolutionInvariants.inUJ ε _ at hg hh ⊢
   unfold UpperTheory.Reformulated.B.InvolutionInvariants.inUJ at hg hh ⊢
   rw [Units.val_mul, Matrix.conjTranspose_mul]
-  calc _ = (h.val).conjTranspose * ((g.val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * g.val) * h.val := by
-        simp only [Matrix.mul_assoc]
+  calc
+    _ = (h.val).conjTranspose
+        * ((g.val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * g.val)
+        * h.val := by
+      simp only [Matrix.mul_assoc]
     _ = _ := by rw [hg, hh]
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux4 :
-    ∀ {n : Nat} (ε : Fin n → Bool),
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux4
+    : ∀ {n : Nat} (ε : Fin n → Bool),
       @Eq (Matrix (Fin n) (Fin n) Complex)
-        (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
-          (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex (Fin.fintype n) Complex.instMul
-            Complex.instAddCommMonoid)
-          (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
-            (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex (Fin.fintype n) Complex.instMul
-              Complex.instAddCommMonoid)
+        (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
+          (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex
+            (Fin.fintype n) Complex.instMul Complex.instAddCommMonoid)
+          (@HMul.hMul (Matrix (Fin n) (Fin n) Complex) (Matrix (Fin n) (Fin n) Complex)
+            (Matrix (Fin n) (Fin n) Complex)
+            (@Matrix.instHMulOfFintypeOfMulOfAddCommMonoid (Fin n) (Fin n) (Fin n) Complex
+              (Fin.fintype n) Complex.instMul Complex.instAddCommMonoid)
             (@Matrix.conjTranspose (Fin n) (Fin n) Complex
               (@InvolutiveStar.toStar Complex
                 (@StarAddMonoid.toInvolutiveStar Complex
@@ -190,32 +214,39 @@ theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux4 :
                     (@NonUnitalNonAssocSemiring.toAddCommMonoid Complex
                       (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring Complex
                         (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing Complex
-                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex Complex.instNonUnitalCommRing)))))
+                          (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex
+                            Complex.instNonUnitalCommRing)))))
                   (@StarRing.toStarAddMonoid Complex
                     (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring Complex
                       (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing Complex
-                        (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex Complex.instNonUnitalCommRing)))
+                        (@NonUnitalCommRing.toNonUnitalNonAssocCommRing Complex
+                          Complex.instNonUnitalCommRing)))
                     Complex.instStarRing)))
               (@Units.val (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))
                 (@OfNat.ofNat
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (nat_lit 1)
                   (@One.toOfNat1
                     (@Units (Matrix (Fin n) (Fin n) Complex)
                       (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                          (instDecidableEqFin n))))
                     (@MulOne.toOne
                       (@Units (Matrix (Fin n) (Fin n) Complex)
                         (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                            (instDecidableEqFin n))))
                       (@MulOneClass.toMulOne
                         (@Units (Matrix (Fin n) (Fin n) Complex)
                           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                              (instDecidableEqFin n))))
                         (@Monoid.toMulOneClass
                           (@Units (Matrix (Fin n) (Fin n) Complex)
                             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
@@ -224,46 +255,53 @@ theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux4 :
                           (@DivInvMonoid.toMonoid
                             (@Units (Matrix (Fin n) (Fin n) Complex)
                               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
-                                  (instDecidableEqFin n))))
+                                (@Matrix.semiring (Fin n) Complex Complex.instSemiring
+                                  (Fin.fintype n) (instDecidableEqFin n))))
                             (@Group.toDivInvMonoid
                               (@Units (Matrix (Fin n) (Fin n) Complex)
                                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
-                                    (instDecidableEqFin n))))
+                                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring
+                                    (Fin.fintype n) (instDecidableEqFin n))))
                               (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
-                                    (instDecidableEqFin n)))))))))))))
+                                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring
+                                    (Fin.fintype n) (instDecidableEqFin n)))))))))))))
             (@UpperTheory.Reformulated.B.InvolutionInvariants.Jm n ε))
           (@Units.val (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))
             (@OfNat.ofNat
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
               (nat_lit 1)
               (@One.toOfNat1
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@MulOne.toOne
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@MulOneClass.toMulOne
                     (@Units (Matrix (Fin n) (Fin n) Complex)
                       (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                          (instDecidableEqFin n))))
                     (@Monoid.toMulOneClass
                       (@Units (Matrix (Fin n) (Fin n) Complex)
                         (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                            (instDecidableEqFin n))))
                       (@DivInvMonoid.toMonoid
                         (@Units (Matrix (Fin n) (Fin n) Complex)
                           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                              (instDecidableEqFin n))))
                         (@Group.toDivInvMonoid
                           (@Units (Matrix (Fin n) (Fin n) Complex)
                             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
@@ -277,278 +315,325 @@ theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux4 :
   intro n ε
   simp
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux5 :
-    ∀ {n : Nat} (ε : Fin n → Bool)
-      {g :
-        @Units (Matrix (Fin n) (Fin n) Complex)
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux5
+    : ∀ {n : Nat} (ε : Fin n → Bool)
+        {g : @Units (Matrix (Fin n) (Fin n) Complex)
           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))},
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n)))},
       @Membership.mem
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (Set
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-          (@Set.instMembership
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (Set (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.instMembership (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
           (@Set.ofPred
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            fun
-              (g :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
-            @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
-              (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            fun (g : @Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
-                g))
-          g →
-        @Membership.mem
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))) ↦
+              @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
+                (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))
+                  g))
+          g
+        → @Membership.mem
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (Set
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-          (@Set.instMembership
-            (@Units (Matrix (Fin n) (Fin n) Complex)
-              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (Set (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
+          (@Set.instMembership (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
           (@Set.ofPred
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            fun
-              (g :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
-            @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
-              (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            fun (g : @Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
-                g))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))) ↦
+              @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
+                (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))
+                  g))
           (@Inv.inv
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
             (@InvOneClass.toInv
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
               (@DivInvOneMonoid.toInvOneClass
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@DivisionMonoid.toDivInvOneMonoid
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Group.toDivisionMonoid
                     (@Units (Matrix (Fin n) (Fin n) Complex)
                       (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                          (instDecidableEqFin n))))
                     (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                       (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))))
+                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                          (instDecidableEqFin n))))))))
             g) := by
   intro n ε g hg
   change UpperTheory.Reformulated.B.InvolutionInvariants.inUJ ε _ at hg ⊢
   unfold UpperTheory.Reformulated.B.InvolutionInvariants.inUJ at hg ⊢
   have h1 : g.val * (g⁻¹).val = 1 := Units.mul_inv g
-  calc _ = ((g⁻¹).val).conjTranspose * ((g.val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * g.val)
-          * (g⁻¹).val := by rw [hg]
-    _ = (g.val * (g⁻¹).val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * (g.val * (g⁻¹).val) := by
-        simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+  calc
+    _ = ((g⁻¹).val).conjTranspose
+        * ((g.val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * g.val)
+        * (g⁻¹).val := by
+      rw [hg]
+    _ = (g.val * (g⁻¹).val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε
+        * (g.val * (g⁻¹).val) := by
+      simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
     _ = _ := by rw [h1, Matrix.conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
 
-noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.UJ :
-    {n : Nat} →
-      (Fin n → Bool) →
-        @Subgroup
-          (@Units (Matrix (Fin n) (Fin n) Complex)
-            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) :=
-    fun {n : Nat} (ε : Fin n → Bool) ↦
-      @Subgroup.mk
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.UJ
+    : {n : Nat} → (Fin n → Bool)
+      → @Subgroup
         (@Units (Matrix (Fin n) (Fin n) Complex)
           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n))))
         (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
           (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-        (@Submonoid.mk
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n)))) := fun {n : Nat} (ε : Fin n → Bool) ↦
+  @Subgroup.mk
+    (@Units (Matrix (Fin n) (Fin n) Complex)
+      (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+          (instDecidableEqFin n))))
+    (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+      (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+          (instDecidableEqFin n))))
+    (@Submonoid.mk
+      (@Units (Matrix (Fin n) (Fin n) Complex)
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n))))
+      (@Monoid.toMulOneClass
+        (@Units (Matrix (Fin n) (Fin n) Complex)
+          (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n))))
+        (@DivInvMonoid.toMonoid
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (@Monoid.toMulOneClass
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (@Group.toDivInvMonoid
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            (@DivInvMonoid.toMonoid
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@Group.toDivInvMonoid
-                (@Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))))
-          (@Subsemigroup.mk
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))))))
+      (@Subsemigroup.mk
+        (@Units (Matrix (Fin n) (Fin n) Complex)
+          (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n))))
+        (@MulOne.toMul
+          (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (@MulOneClass.toMulOne
             (@Units (Matrix (Fin n) (Fin n) Complex)
               (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-            (@MulOne.toMul
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Monoid.toMulOneClass
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@MulOneClass.toMulOne
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@DivInvMonoid.toMonoid
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@Monoid.toMulOneClass
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
+                (@Group.toDivInvMonoid
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@DivInvMonoid.toMonoid
-                    (@Units (Matrix (Fin n) (Fin n) Complex)
-                      (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                        (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                    (@Group.toDivInvMonoid
-                      (@Units (Matrix (Fin n) (Fin n) Complex)
-                        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                      (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
-                            (instDecidableEqFin n)))))))))
-            (@Set.ofPred
-              (@Units (Matrix (Fin n) (Fin n) Complex)
-                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              fun
-                (g :
-                  @Units (Matrix (Fin n) (Fin n) Complex)
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
+                  (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
-              @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
-                (@Units.val (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))
-                  g))
-            (@UpperTheory.Reformulated.B.InvolutionInvariants.aux3 n ε))
-          (@UpperTheory.Reformulated.B.InvolutionInvariants.aux4 n ε))
-        (@UpperTheory.Reformulated.B.InvolutionInvariants.aux5 n ε)
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n)))))))))
+        (@Set.ofPred
+          (@Units (Matrix (Fin n) (Fin n) Complex)
+            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          fun (g : @Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))) ↦
+            @UpperTheory.Reformulated.B.InvolutionInvariants.inUJ n ε
+              (@Units.val (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))
+                g))
+        (@UpperTheory.Reformulated.B.InvolutionInvariants.aux3 n ε))
+      (@UpperTheory.Reformulated.B.InvolutionInvariants.aux4 n ε))
+    (@UpperTheory.Reformulated.B.InvolutionInvariants.aux5 n ε)
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ :
-    (n : Nat) → (ε : Fin n → Bool) → MeasurableSpace ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) :=
-    fun (n : Nat) (ε : Fin n → Bool) ↦
-      @borel (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-        (@instTopologicalSpaceSubtype
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ
+    : (n : Nat) → (ε : Fin n → Bool)
+      → MeasurableSpace ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n
+        ε) := fun (n : Nat) (ε : Fin n → Bool) ↦
+  @borel (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+    (@instTopologicalSpaceSubtype
+      (@Units (Matrix (Fin n) (Fin n) Complex)
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n))))
+      (fun (x : @Units (Matrix (Fin n) (Fin n) Complex)
+          (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n)))) ↦
+        @Membership.mem
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (fun
-              (x :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
-            @Membership.mem
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (@Subgroup
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))))
+          (@SetLike.instMembership
+            (@Subgroup
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@Subgroup
-                (@Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-              (@SetLike.instMembership
-                (@Subgroup
-                  (@Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-                (@Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@Subgroup.instSetLike
-                  (@Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))
-              (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
-          (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
-            (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
-              (@UniformSpace.toTopologicalSpace Complex
-                (@PseudoMetricSpace.toUniformSpace Complex
-                  (@SeminormedRing.toPseudoMetricSpace Complex
-                    (@SeminormedCommRing.toSeminormedRing Complex
-                      (@NormedCommRing.toSeminormedCommRing Complex
-                        (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
-            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))))
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Subgroup.instSetLike
+              (@Units (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))))
+          (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
+      (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
+        (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
+          (@UniformSpace.toTopologicalSpace Complex
+            (@PseudoMetricSpace.toUniformSpace Complex
+              (@SeminormedRing.toPseudoMetricSpace Complex
+                (@SeminormedCommRing.toSeminormedRing Complex
+                  (@NormedCommRing.toSeminormedCommRing Complex
+                    (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n)))))
 attribute [local instance] UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux8 :
-    ∀ {n : Nat} (ε : Fin n → Bool),
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux8
+    : ∀ {n : Nat} (ε : Fin n → Bool),
       @IsTopologicalGroup (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
         (@instTopologicalSpaceSubtype
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (fun
-              (x :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (fun (x : @Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))) ↦
             @Membership.mem
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
               (@Subgroup
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))))
               (@SetLike.instMembership
                 (@Subgroup
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n)))))
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Subgroup.instSetLike
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))))
               (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
           (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
             (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
@@ -557,61 +642,73 @@ theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux8 :
                   (@SeminormedRing.toPseudoMetricSpace Complex
                     (@SeminormedCommRing.toSeminormedRing Complex
                       (@NormedCommRing.toSeminormedCommRing Complex
-                        (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
+                        (@CommCStarAlgebra.toNormedCommRing Complex
+                          instCommCStarAlgebraComplex)))))))
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
         (@Subgroup.toGroup
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
           (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
           (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) := by
   intro n ε
   infer_instance
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux9 :
-    ∀ (n : Nat) (ε : Fin n → Bool),
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux9
+    : ∀ (n : Nat) (ε : Fin n → Bool),
       @BorelSpace (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
         (@instTopologicalSpaceSubtype
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (fun
-              (x :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (fun (x : @Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))) ↦
             @Membership.mem
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
               (@Subgroup
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))))
               (@SetLike.instMembership
                 (@Subgroup
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n)))))
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Subgroup.instSetLike
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))))
               (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
           (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
             (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
@@ -620,54 +717,64 @@ theorem UpperTheory.Reformulated.B.InvolutionInvariants.aux9 :
                   (@SeminormedRing.toPseudoMetricSpace Complex
                     (@SeminormedCommRing.toSeminormedRing Complex
                       (@NormedCommRing.toSeminormedCommRing Complex
-                        (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
+                        (@CommCStarAlgebra.toNormedCommRing Complex
+                          instCommCStarAlgebraComplex)))))))
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n)))))
         (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε) := by
   intro n ε
   exact ⟨rfl⟩
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.laurent_T_neg_one_mul_T_one :
-    ∀ (n : Nat) (ε : Fin n → Bool),
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.laurent_T_neg_one_mul_T_one
+    : ∀ (n : Nat) (ε : Fin n → Bool),
       @LocallyCompactSpace (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
         (@instTopologicalSpaceSubtype
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (fun
-              (x :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (fun (x : @Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))) ↦
             @Membership.mem
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
               (@Subgroup
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n)))))
               (@SetLike.instMembership
                 (@Subgroup
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n)))))
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Subgroup.instSetLike
                   (@Units (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))
                   (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                     (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))
+                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                        (instDecidableEqFin n))))))
               (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
           (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
             (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
@@ -676,135 +783,168 @@ theorem UpperTheory.Reformulated.B.InvolutionInvariants.laurent_T_neg_one_mul_T_
                   (@SeminormedRing.toPseudoMetricSpace Complex
                     (@SeminormedCommRing.toSeminormedRing Complex
                       (@NormedCommRing.toSeminormedCommRing Complex
-                        (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
+                        (@CommCStarAlgebra.toNormedCommRing Complex
+                          instCommCStarAlgebraComplex)))))))
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))) := by
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))) := by
   intro n ε
   haveI : LocallyCompactSpace (Matrix (Fin n) (Fin n) ℂ) :=
     inferInstanceAs (LocallyCompactSpace (Fin n → Fin n → ℂ))
-  have hc : IsClosed {g : (Matrix (Fin n) (Fin n) ℂ)ˣ |
-      (g.val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * g.val = UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε} :=
-    isClosed_eq ((Units.continuous_val.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul
-      Units.continuous_val) continuous_const
+  have hc : IsClosed
+      {g : (Matrix (Fin n) (Fin n) ℂ)ˣ |
+        (g.val).conjTranspose * UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε * g.val = UpperTheory.Reformulated.B.InvolutionInvariants.Jm ε} :=
+    isClosed_eq
+      ((Units.continuous_val.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul
+        Units.continuous_val)
+      continuous_const
   exact hc.locallyCompactSpace
 
-noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.muG :
-    {n : Nat} →
-      (ε : Fin n → Bool) → @MeasureTheory.Measure (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε) :=
-    fun {n : Nat} (ε : Fin n → Bool) ↦
-      @MeasureTheory.Measure.haar (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-        (@Subgroup.toGroup
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.muG
+    : {n : Nat} → (ε : Fin n → Bool)
+      → @MeasureTheory.Measure (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n
+          ε) := fun {n : Nat} (ε : Fin n → Bool) ↦
+  @MeasureTheory.Measure.haar (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+    (@Subgroup.toGroup
+      (@Units (Matrix (Fin n) (Fin n) Complex)
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n))))
+      (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n))))
+      (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+    (@instTopologicalSpaceSubtype
+      (@Units (Matrix (Fin n) (Fin n) Complex)
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n))))
+      (fun (x : @Units (Matrix (Fin n) (Fin n) Complex)
+          (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+            (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+              (instDecidableEqFin n)))) ↦
+        @Membership.mem
           (@Units (Matrix (Fin n) (Fin n) Complex)
             (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-        (@instTopologicalSpaceSubtype
-          (@Units (Matrix (Fin n) (Fin n) Complex)
-            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-          (fun
-              (x :
-                @Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))) ↦
-            @Membership.mem
+              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                (instDecidableEqFin n))))
+          (@Subgroup
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n)))))
+          (@SetLike.instMembership
+            (@Subgroup
               (@Units (Matrix (Fin n) (Fin n) Complex)
                 (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-              (@Subgroup
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n)))))
+            (@Units (Matrix (Fin n) (Fin n) Complex)
+              (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                  (instDecidableEqFin n))))
+            (@Subgroup.instSetLike
+              (@Units (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))))
+          (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
+      (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
+        (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
+          (@UniformSpace.toTopologicalSpace Complex
+            (@PseudoMetricSpace.toUniformSpace Complex
+              (@SeminormedRing.toPseudoMetricSpace Complex
+                (@SeminormedCommRing.toSeminormedRing Complex
+                  (@NormedCommRing.toSeminormedCommRing Complex
+                    (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
+        (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+          (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+            (instDecidableEqFin n)))))
+    (@UpperTheory.Reformulated.B.InvolutionInvariants.aux8 n ε)
+    (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
+    (UpperTheory.Reformulated.B.InvolutionInvariants.aux9 n ε)
+    (UpperTheory.Reformulated.B.InvolutionInvariants.laurent_T_neg_one_mul_T_one n ε)
+
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.Unimodular : Prop :=
+  ∀ (n : Nat) (ε : Fin n → Bool) (g : ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)),
+    @Eq
+      (@MeasureTheory.Measure (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε))
+      (@MeasureTheory.Measure.map (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
+        (fun (x : ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) ↦
+          @HMul.hMul (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+            (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+            (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+            (@instHMul (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+              (@Subgroup.mul
                 (@Units (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
                 (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
                   (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-              (@SetLike.instMembership
-                (@Subgroup
-                  (@Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-                (@Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@Subgroup.instSetLike
-                  (@Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))))
-              (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε) x)
-          (@Units.instTopologicalSpaceUnits (Matrix (Fin n) (Fin n) Complex)
-            (@instTopologicalSpaceMatrix (Fin n) (Fin n) Complex
-              (@UniformSpace.toTopologicalSpace Complex
-                (@PseudoMetricSpace.toUniformSpace Complex
-                  (@SeminormedRing.toPseudoMetricSpace Complex
-                    (@SeminormedCommRing.toSeminormedRing Complex
-                      (@NormedCommRing.toSeminormedCommRing Complex
-                        (@CommCStarAlgebra.toNormedCommRing Complex instCommCStarAlgebraComplex)))))))
-            (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-              (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n)))))
-        (@UpperTheory.Reformulated.B.InvolutionInvariants.aux8 n ε) (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε) (UpperTheory.Reformulated.B.InvolutionInvariants.aux9 n ε)
-        (UpperTheory.Reformulated.B.InvolutionInvariants.laurent_T_neg_one_mul_T_one n ε)
+                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                      (instDecidableEqFin n))))
+                (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)))
+            x g)
+        (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε))
+      (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε)
 
-noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.Unimodular :
-    Prop :=
-    ∀ (n : Nat) (ε : Fin n → Bool) (g : ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)),
-      @Eq (@MeasureTheory.Measure (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε))
-        (@MeasureTheory.Measure.map (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-          (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε) (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
-          (fun (x : ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) ↦
-            @HMul.hMul (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-              (@instHMul (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-                (@Subgroup.mul
-                  (@Units (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                    (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                      (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                  (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)))
-              x g)
-          (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε))
-        (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε)
-
-noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.InvInvariant :
-    Prop :=
-    ∀ (n : Nat) (ε : Fin n → Bool),
-      @Eq (@MeasureTheory.Measure (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε))
-        (@MeasureTheory.Measure.map (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-          (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε) (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
-          (fun (x : ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) ↦
-            @Inv.inv (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-              (@Subgroup.inv
-                (@Units (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
-                  (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
-                    (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n) (instDecidableEqFin n))))
-                (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
-              x)
-          (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε))
-        (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε)
+noncomputable def UpperTheory.Reformulated.B.InvolutionInvariants.InvInvariant : Prop :=
+  ∀ (n : Nat) (ε : Fin n → Bool),
+    @Eq
+      (@MeasureTheory.Measure (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε))
+      (@MeasureTheory.Measure.map (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
+        (UpperTheory.Reformulated.B.InvolutionInvariants.instMeasurableSpaceUJ n ε)
+        (fun (x : ↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε)) ↦
+          @Inv.inv (↥(@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+            (@Subgroup.inv
+              (@Units (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@Units.instGroup (Matrix (Fin n) (Fin n) Complex)
+                (@Semiring.toMonoid (Matrix (Fin n) (Fin n) Complex)
+                  (@Matrix.semiring (Fin n) Complex Complex.instSemiring (Fin.fintype n)
+                    (instDecidableEqFin n))))
+              (@UpperTheory.Reformulated.B.InvolutionInvariants.UJ n ε))
+            x)
+        (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε))
+      (@UpperTheory.Reformulated.B.InvolutionInvariants.muG n ε)
 
 open scoped Pointwise in
 open MeasureTheory MeasureTheory.Measure in
-private theorem UpperTheory.Reformulated.B.InvolutionInvariants.haar_map_inv {G : Type*} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G] [LocallyCompactSpace G]
-    (h : ∀ g : G, Measure.map (fun x => x * g) (haar : Measure G) = haar) :
-    Measure.map (fun x => x⁻¹) (haar : Measure G) = haar := by
+private theorem UpperTheory.Reformulated.B.InvolutionInvariants.haar_map_inv
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+    [BorelSpace G] [LocallyCompactSpace G]
+    (h : ∀ g : G, Measure.map (fun x => x * g) (haar : Measure G) = haar)
+    : Measure.map (fun x => x⁻¹) (haar : Measure G) = haar := by
   haveI : (haar : Measure G).IsMulRightInvariant := ⟨h⟩
   haveI : (haar : Measure G).Regular := regular_haarMeasure
-  obtain ⟨c, hc⟩ : ∃ c : ENNReal, (haar : Measure G).inv = c • haar :=
-    ⟨haarScalarFactor (haar : Measure G).inv haar,
-      isMulLeftInvariant_eq_smul_of_regular (haar : Measure G).inv haar⟩
+  obtain ⟨c, hc⟩ : ∃ c : ENNReal, (haar : Measure G).inv = c • haar := ⟨
+    haarScalarFactor (haar : Measure G).inv haar,
+    isMulLeftInvariant_eq_smul_of_regular (haar : Measure G).inv haar
+  ⟩
   have K : TopologicalSpace.PositiveCompacts G := Classical.arbitrary _
   have h0 : (haar : Measure G) K ≠ 0 := (measure_pos_of_nonempty_interior _ K.interior_nonempty).ne'
   have ht : (haar : Measure G) K ≠ ⊤ := K.isCompact.measure_lt_top.ne
@@ -817,10 +957,12 @@ private theorem UpperTheory.Reformulated.B.InvolutionInvariants.haar_map_inv {G 
   rw [h3, one_smul] at hc
   exact hc
 
-theorem UpperTheory.Reformulated.B.InvolutionInvariants.invInvariant_of :
-    UpperTheory.Reformulated.B.InvolutionInvariants.Unimodular → UpperTheory.Reformulated.B.InvolutionInvariants.InvInvariant := by
+theorem UpperTheory.Reformulated.B.InvolutionInvariants.invInvariant_of
+    : UpperTheory.Reformulated.B.InvolutionInvariants.Unimodular
+      → UpperTheory.Reformulated.B.InvolutionInvariants.InvInvariant := by
   intro h n ε
   haveI := UpperTheory.Reformulated.B.InvolutionInvariants.aux8 ε
   haveI := UpperTheory.Reformulated.B.InvolutionInvariants.aux9 n ε
   haveI := UpperTheory.Reformulated.B.InvolutionInvariants.laurent_T_neg_one_mul_T_one n ε
-  exact UpperTheory.Reformulated.B.InvolutionInvariants.haar_map_inv (G := ↥(UpperTheory.Reformulated.B.InvolutionInvariants.UJ ε)) (h n ε)
+  exact UpperTheory.Reformulated.B.InvolutionInvariants.haar_map_inv
+    (G := ↥(UpperTheory.Reformulated.B.InvolutionInvariants.UJ ε)) (h n ε)

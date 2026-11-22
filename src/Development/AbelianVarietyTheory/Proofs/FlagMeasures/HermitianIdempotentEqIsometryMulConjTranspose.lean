@@ -5,13 +5,14 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory
 
-theorem hermitian_idempotent_eq_isometry_mul_conjTranspose :
-    ∀ (n : ℕ) (R : Matrix (Fin n) (Fin n) ℂ), Rᴴ = R → R * R = R →
-      ∃ (r : ℕ) (P : Matrix (Fin n) (Fin r) ℂ), Pᴴ * P = 1 ∧ P * Pᴴ = R := by
+theorem hermitian_idempotent_eq_isometry_mul_conjTranspose
+    : ∀ (n : ℕ) (R : Matrix (Fin n) (Fin n) ℂ),
+      Rᴴ = R → R * R = R → ∃ (r : ℕ) (P : Matrix (Fin n) (Fin r) ℂ), Pᴴ * P = 1 ∧ P * Pᴴ = R := by
   intro n R hH hI
   classical
   have hA : R.IsHermitian := hH
@@ -23,8 +24,10 @@ theorem hermitian_idempotent_eq_isometry_mul_conjTranspose :
     have h2 : R *ᵥ (R *ᵥ ⇑(hA.eigenvectorBasis i)) = R *ᵥ ⇑(hA.eigenvectorBasis i) := by
       rw [mulVec_mulVec, hI]
     rw [hv, mulVec_smul, hv, smul_smul] at h2
-    have h3 : (hA.eigenvalues i * hA.eigenvalues i - hA.eigenvalues i) •
-        (⇑(hA.eigenvectorBasis i) : Fin n → ℂ) = 0 := by
+    have h3
+        : (hA.eigenvalues i * hA.eigenvalues i - hA.eigenvalues i)
+            • (⇑(hA.eigenvectorBasis i) : Fin n → ℂ)
+          = 0 := by
       rw [sub_smul, h2, sub_self]
     rcases smul_eq_zero.mp h3 with h | h
     · have h4 : hA.eigenvalues i * (hA.eigenvalues i - 1) = 0 := by linear_combination h

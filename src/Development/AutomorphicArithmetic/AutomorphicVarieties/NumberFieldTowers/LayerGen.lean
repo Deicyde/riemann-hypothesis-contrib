@@ -9,11 +9,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.NumberField
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Tower
 
-theorem UpperTheory.V.Tower.layerGen :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime], HasMuQ l L → (∀ m, (layU l L Ω m).index = l ^ m) ∧
-        ∀ γ : G L Ω, IsGen l ⊤ γ → PropA.IsLevel l (cycZ L Ω l γ : ℤ_[l]ˣ) (cZero l L) ∧ γ ∈ levU l ⊤ 1 ∧ ∀ m, IsGen l (layU l L Ω m) (γ ^ l ^ m) := by
+theorem UpperTheory.V.Tower.layerGen
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
+        [Fact l.Prime],
+      HasMuQ l L
+        → (∀ m, (layU l L Ω m).index = l ^ m)
+          ∧ ∀ γ : G L Ω,
+            IsGen l ⊤ γ
+              → PropA.IsLevel l (cycZ L Ω l γ : ℤ_[l]ˣ) (cZero l L) ∧ γ ∈ levU l ⊤ 1
+                ∧ ∀ m, IsGen l (layU l L Ω m) (γ ^ l ^ m) := by
   intro L Ω _ _ _ _ _ l _ hmu
   obtain ⟨-, h2, h3, -⟩ := muQ L Ω l
   have hq := h3.1 hmu

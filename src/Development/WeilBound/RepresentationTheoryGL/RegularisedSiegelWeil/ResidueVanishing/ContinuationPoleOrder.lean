@@ -10,8 +10,10 @@ open Filter Topology Set Metric GlobalTheory.Cont
 
 namespace PositivityTheory.Rg.Rsw.Kplug
 
-theorem k2b2_tendsto {s₀ : ℂ} : ∀ (k : ℕ) {g : ℂ → ℂ} {p : FormalMultilinearSeries ℂ ℂ ℂ}, HasFPowerSeriesAt g p s₀ →
-    (∀ i < k, p.coeff i = 0) → Tendsto (fun s => g s / (s - s₀) ^ k) (𝓝[≠] s₀) (𝓝 (p.coeff k)) := by
+theorem k2b2_tendsto {s₀ : ℂ}
+    : ∀ (k : ℕ) {g : ℂ → ℂ} {p : FormalMultilinearSeries ℂ ℂ ℂ},
+      HasFPowerSeriesAt g p s₀ → (∀ i < k, p.coeff i = 0)
+        → Tendsto (fun s => g s / (s - s₀) ^ k) (𝓝[≠] s₀) (𝓝 (p.coeff k)) := by
   intro k g p hp hk
   have hG := hp.has_fpower_series_iterate_dslope_fslope k
   have hval : ∀ j, (Function.swap dslope s₀)^[j] g s₀ = p.coeff j := fun j => by
@@ -19,8 +21,7 @@ theorem k2b2_tendsto {s₀ : ℂ} : ∀ (k : ℕ) {g : ℂ → ℂ} {p : FormalM
     have := FormalMultilinearSeries.coeff_iterate_fslope (p := p) j 0
     rw [zero_add] at this
     exact this
-  have hz : ∀ j < k, (Function.swap dslope s₀)^[j] g s₀ = 0 := fun j hj => by
-    rw [hval j, hk j hj]
+  have hz : ∀ j < k, (Function.swap dslope s₀)^[j] g s₀ = 0 := fun j hj => by rw [hval j, hk j hj]
   have heq := pow_sub_smul_iterate_dslope_of_zero k hz
   have hc : Tendsto ((Function.swap dslope s₀)^[k] g) (𝓝[≠] s₀) (𝓝 (p.coeff k)) := by
     rw [← hval k]
@@ -30,9 +31,9 @@ theorem k2b2_tendsto {s₀ : ℂ} : ∀ (k : ℕ) {g : ℂ → ℂ} {p : FormalM
   have hne : (s - s₀) ^ k ≠ 0 := pow_ne_zero _ (sub_ne_zero.mpr hs)
   rw [← heq s, smul_eq_mul, mul_div_cancel_left₀ _ hne]
 
-theorem k2b2_cps (f : ℂ → ℂ) (c : ℂ) (R : ℝ) (n : ℕ) :
-    (cauchyPowerSeries f c R).coeff n =
-      (2 * Real.pi * Complex.I)⁻¹ • ∮ z in C(c, R), (1 / (z - c)) ^ n • (z - c)⁻¹ • f z :=
+theorem k2b2_cps (f : ℂ → ℂ) (c : ℂ) (R : ℝ) (n : ℕ)
+    : (cauchyPowerSeries f c R).coeff n
+      = (2 * Real.pi * Complex.I)⁻¹ • ∮ z in C(c, R), (1 / (z - c)) ^ n • (z - c)⁻¹ • f z :=
   cauchyPowerSeries_apply f c R n 1
 
 theorem continuation_pole_order : PositivityTheory.Rg.Rsw.Kplug.K2 := by
@@ -76,10 +77,15 @@ theorem continuation_pole_order : PositivityTheory.Rg.Rsw.Kplug.K2 := by
     set R : NNReal := ε.toNNReal with hRdef
     have hR : (R : ℝ) = ε := Real.coe_toNNReal _ hε.le
     have hRpos : 0 < R := Real.toNNReal_pos.mpr hε
-    have hFps := (show DifferentiableOn ℂ F (closedBall s₀ (R : ℝ)) by rw [hR]; exact hFd).hasFPowerSeriesOnBall hRpos
-    have hcf : ∀ j, j + 1 ≤ m → (cauchyPowerSeries F s₀ (R : ℝ)).coeff j =
-        (2 * ↑Real.pi * Complex.I)⁻¹ *
-          ∮ (z : ℂ) in C(s₀, ε), (z - s₀) ^ (m - 1 - j) * (e z / Polynomial.eval z d) := by
+    have hFps :=
+      (show DifferentiableOn ℂ F (closedBall s₀ (R : ℝ)) by
+        rw [hR]; exact hFd).hasFPowerSeriesOnBall hRpos
+    have hcf
+        : ∀ j,
+          j + 1 ≤ m
+            → (cauchyPowerSeries F s₀ (R : ℝ)).coeff j
+              = (2 * ↑Real.pi * Complex.I)⁻¹
+                * ∮ (z : ℂ) in C(s₀, ε), (z - s₀) ^ (m - 1 - j) * (e z / Polynomial.eval z d) := by
       intro j hj
       rw [k2b2_cps, hR, smul_eq_mul]
       congr 1
@@ -99,15 +105,19 @@ theorem continuation_pole_order : PositivityTheory.Rg.Rsw.Kplug.K2 := by
     have hFan := hFps.hasFPowerSeriesAt
     rcases Nat.eq_zero_or_pos m with hm0 | hmpos
     · have hc0 : c = 0 := by
-        have hI : ∮ (z : ℂ) in C(s₀, ε), (z - s₀) ^ (1 - 1) * (e z / Polynomial.eval z d) =
-            ∮ (z : ℂ) in C(s₀, ε), F z := by
+        have hI
+            : ∮ (z : ℂ) in C(s₀, ε), (z - s₀) ^ (1 - 1) * (e z / Polynomial.eval z d)
+              = ∮ (z : ℂ) in C(s₀, ε), F z := by
           apply circleIntegral.integral_congr hε.le
           intro z hz
           simp [hdeval, hm0, hF]
-        rw [hc, hI, Complex.circleIntegral_eq_zero_of_differentiable_on_off_countable hε.le
-          Set.countable_empty hFd.continuousOn, mul_zero]
+        rw [hc, hI,
+          Complex.circleIntegral_eq_zero_of_differentiable_on_off_countable hε.le
+            Set.countable_empty hFd.continuousOn,
+          mul_zero]
         intro z hz
-        exact hFd.differentiableAt (Filter.mem_of_superset (isOpen_ball.mem_nhds hz.1) ball_subset_closedBall)
+        exact hFd.differentiableAt (Filter.mem_of_superset (isOpen_ball.mem_nhds hz.1)
+          ball_subset_closedBall)
       rw [hc0]
       have hlim : Tendsto (fun s => (s - s₀) * F s) (𝓝 s₀) (𝓝 ((s₀ - s₀) * F s₀)) :=
         ((continuous_id.sub continuous_const).continuousAt.mul hFan.continuousAt).tendsto

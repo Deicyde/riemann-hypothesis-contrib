@@ -4,9 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.hasEnoughRootsOfUnity_exponent_units_zmod_two_pow (O : Type) [CommRing O] (k j : ℕ) (hj : j ≤ k + 3)
-    [HasEnoughRootsOfUnity O (2 ^ (k + 3))] :
-    HasEnoughRootsOfUnity O (Monoid.exponent (ZMod (2 ^ j))ˣ) := by
+private theorem UpperTheory.hasEnoughRootsOfUnity_exponent_units_zmod_two_pow
+    (O : Type) [CommRing O] (k j : ℕ) (hj : j ≤ k + 3) [HasEnoughRootsOfUnity O (2 ^ (k + 3))]
+    : HasEnoughRootsOfUnity O (Monoid.exponent (ZMod (2 ^ j))ˣ) := by
   have hd : Monoid.exponent (ZMod (2 ^ j))ˣ ∣ 2 ^ (k + 3) := by
     refine Group.exponent_dvd_card.trans ?_
     rw [ZMod.card_units_eq_totient]
@@ -17,8 +17,10 @@ private theorem UpperTheory.hasEnoughRootsOfUnity_exponent_units_zmod_two_pow (O
       simpa using pow_dvd_pow 2 (by omega : j - 1 ≤ k + 3)
   exact HasEnoughRootsOfUnity.of_dvd O hd
 
-theorem UpperTheory.exists_primitive_odd_dirichletCharacter_two_pow :
-    ∀ (O : Type) [CommRing O] [IsDomain O] (n : ℕ), 3 ≤ n → HasEnoughRootsOfUnity O (2 ^ n) → ∃ ξ : DirichletCharacter O (2 ^ n), ξ.IsPrimitive ∧ ξ (-1) = -1 := by
+theorem UpperTheory.exists_primitive_odd_dirichletCharacter_two_pow
+    : ∀ (O : Type) [CommRing O] [IsDomain O] (n : ℕ),
+      3 ≤ n → HasEnoughRootsOfUnity O (2 ^ n)
+        → ∃ ξ : DirichletCharacter O (2 ^ n), ξ.IsPrimitive ∧ ξ (-1) = -1 := by
   intro O _ _ n hn hroots
   obtain ⟨k, rfl⟩ : ∃ k, n = k + 3 := ⟨n - 3, by omega⟩
   have e1 := UpperTheory.hasEnoughRootsOfUnity_exponent_units_zmod_two_pow O k (k + 3) le_rfl
@@ -48,9 +50,11 @@ theorem UpperTheory.exists_primitive_odd_dirichletCharacter_two_pow :
     rw [hz]
     push_cast
     rw [show (2 : ZMod (2 ^ (k + 2))) ^ (k + 2) = ((2 ^ (k + 2) : ℕ) : ZMod (2 ^ (k + 2))) by
-      push_cast; rfl, ZMod.natCast_self, add_zero]
-  have prim : ∀ χ : DirichletCharacter O (2 ^ (k + 3)), χ (z : ZMod (2 ^ (k + 3))) ≠ 1 →
-      χ.IsPrimitive := by
+        push_cast; rfl,
+      ZMod.natCast_self, add_zero]
+  have prim
+      : ∀ χ : DirichletCharacter O (2 ^ (k + 3)),
+        χ (z : ZMod (2 ^ (k + 3))) ≠ 1 → χ.IsPrimitive := by
     intro χ hχ
     rw [DirichletCharacter.isPrimitive_def]
     obtain ⟨i, hi, hc⟩ := (Nat.dvd_prime_pow Nat.prime_two).1 χ.conductor_dvd_level
@@ -68,8 +72,9 @@ theorem UpperTheory.exists_primitive_odd_dirichletCharacter_two_pow :
     rw [hf.eq_changeLevel, DirichletCharacter.changeLevel_eq_cast_of_dvd' _ hf.dvd hcopN, hzM,
       map_one]
   obtain ⟨χ, hχ⟩ := DirichletCharacter.exists_apply_ne_one_of_hasEnoughRootsOfUnity O hzN
-  obtain ⟨ψ₀, hψ₀⟩ := DirichletCharacter.exists_apply_ne_one_of_hasEnoughRootsOfUnity O
-    (show (-1 : ZMod (2 ^ 2)) ≠ 1 by decide)
+  obtain ⟨ψ₀, hψ₀⟩ :=
+    DirichletCharacter.exists_apply_ne_one_of_hasEnoughRootsOfUnity O
+      (show (-1 : ZMod (2 ^ 2)) ≠ 1 by decide)
   have h42 : 2 ^ 2 ∣ 2 ^ (k + 3) := pow_dvd_pow 2 (by omega)
   set ψ := DirichletCharacter.changeLevel h42 ψ₀ with hψ
   have hcm1 : IsCoprime (-1 : ℤ) ((2 ^ (k + 3) : ℕ) : ℤ) := isCoprime_one_left.neg_left
@@ -81,13 +86,11 @@ theorem UpperTheory.exists_primitive_odd_dirichletCharacter_two_pow :
       push_cast at this
       rw [hψ, this]
     rw [h1]
-    have hsq : ψ₀ (-1) * ψ₀ (-1) = 1 := by
-      rw [← map_mul, neg_one_mul, neg_neg, map_one]
+    have hsq : ψ₀ (-1) * ψ₀ (-1) = 1 := by rw [← map_mul, neg_one_mul, neg_neg, map_one]
     rcases mul_self_eq_one_iff.1 hsq with h | h
     · exact absurd h hψ₀
     · exact h
-  have hsq : χ (-1) * χ (-1) = 1 := by
-    rw [← map_mul, neg_one_mul, neg_neg, map_one]
+  have hsq : χ (-1) * χ (-1) = 1 := by rw [← map_mul, neg_one_mul, neg_neg, map_one]
   rcases mul_self_eq_one_iff.1 hsq with h | h
   · refine ⟨χ * ψ, prim _ ?_, ?_⟩
     · rw [MulChar.mul_apply, hψz, mul_one]

@@ -11,7 +11,8 @@ noncomputable section
 
 namespace QnRdSkewW
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt Formalism.FourierDecayAlt.Q
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt
+  Formalism.FourierDecayAlt.Q
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 

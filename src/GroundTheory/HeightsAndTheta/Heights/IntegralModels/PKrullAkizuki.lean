@@ -15,18 +15,15 @@ namespace KrullAkizuki
 theorem noetherian_and_dimensionLEOne
     {R : Type} [CommRing R] [IsDomain R]
     {K : Type} [Field K] [Algebra R K] [IsFractionRing R K]
-    {L : Type} [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra R L]
-    [IsScalarTower R K L] (S : Subalgebra R L)
-    (h : ∀ b : R, b ≠ 0 → IsFiniteLength R (S ⧸ Ideal.span {algebraMap R S b})) :
-    IsNoetherianRing S ∧ Ring.DimensionLEOne S := by
-
+    {L : Type} [Field L] [Algebra K L] [FiniteDimensional K L] [Algebra R L] [IsScalarTower R K L]
+    (S : Subalgebra R L) (h : ∀ b : R, b ≠ 0 → IsFiniteLength R (S ⧸ Ideal.span {algebraMap R S b}))
+    : IsNoetherianRing S ∧ Ring.DimensionLEOne S := by
   have hmeet : ∀ I : Ideal S, I ≠ ⊥ → ∃ b : R, b ≠ 0 ∧ algebraMap R S b ∈ I := by
     intro I hI
     obtain ⟨x, hxI, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
     have halg : Algebra.IsAlgebraic R L :=
       (IsFractionRing.comap_isAlgebraic_iff (K := K)).mpr inferInstance
-    have hx : IsAlgebraic R x :=
-      Subalgebra.isAlgebraic_iff_isAlgebraic_val.mpr (halg.isAlgebraic _)
+    have hx : IsAlgebraic R x := Subalgebra.isAlgebraic_iff_isAlgebraic_val.mpr (halg.isAlgebraic _)
     obtain ⟨b, hb, hb0⟩ :=
       Submodule.exists_mem_ne_zero_of_ne_bot (Ideal.comap_ne_bot_of_algebraic_mem hx0 hxI hx)
     exact ⟨b, hb0, hb⟩
@@ -62,7 +59,7 @@ theorem proof (h : KrullAkizukiQuotientLength.Statement) : KrullAkizuki.Statemen
       noetherian_and_dimensionLEOne (K := K) (L := K) (integralClosure R K) (h R hR K K _)
     have : IsIntegrallyClosed (integralClosure R K) :=
       integralClosure.isIntegrallyClosedOfFiniteExtension (R := R) K (L := K)
-    exact { }
+    exact {}
 
 end KrullAkizuki
 

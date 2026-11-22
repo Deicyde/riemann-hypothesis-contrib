@@ -5,8 +5,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 open NumberField Matrix UpperTheory.V.KT UpperTheory.V.Af.BA in
-theorem UpperTheory.adelic_realPart_invariant :
-    UpperTheory.V.Af.BA.ReInv := by
+theorem UpperTheory.adelic_realPart_invariant : UpperTheory.V.Af.BA.ReInv := by
   intro L _ _ N σ hσ
   refine ⟨fun x => ?_, fun h hh => ⟨fun y => ?_, fun g hg => ?_⟩⟩
   · obtain ⟨w⟩ : Nonempty (InfinitePlace L) := inferInstance
@@ -19,13 +18,17 @@ theorem UpperTheory.adelic_realPart_invariant :
     simp only [dotProduct, mulVec, Pi.star_apply, Finset.mul_sum, Complex.re_sum, hz]
     refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
     have him : ((mat h w) i j).im = 0 := hh w i j
-    simp only [Complex.mul_re, Complex.mul_im, Complex.star_def,
-      Complex.conj_re, Complex.conj_im, him]
+    simp only [Complex.mul_re, Complex.mul_im, Complex.star_def, Complex.conj_re, Complex.conj_im,
+      him]
     ring
-  · have hfix : ∀ i j, σ ((↑g⁻¹ : Matrix (Fin N) (Fin N) (𝓞 L)) i j)
-        = (↑g⁻¹ : Matrix (Fin N) (Fin N) (𝓞 L)) i j := fun i j => by
-      have := congrArg (fun u : Gm L N => (u : Matrix (Fin N) (Fin N) (𝓞 L)) i j)
-        (mem_Fix.mp (inv_mem hg))
+  · have hfix
+        : ∀ i j,
+          σ ((↑g⁻¹ : Matrix (Fin N) (Fin N) (𝓞 L)) i j)
+            = (↑g⁻¹ : Matrix (Fin N) (Fin N) (𝓞 L)) i j := fun i j => by
+      have :=
+        congrArg
+          (fun u : Gm L N => (u : Matrix (Fin N) (Fin N) (𝓞 L)) i j)
+          (mem_Fix.mp (inv_mem hg))
       exact this
     intro w i j
     have hs : g • h = pull (↑g⁻¹ : Matrix (Fin N) (Fin N) (𝓞 L)) h := rfl

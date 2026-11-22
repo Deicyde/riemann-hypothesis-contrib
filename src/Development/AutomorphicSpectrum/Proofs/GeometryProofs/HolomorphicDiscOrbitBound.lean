@@ -14,8 +14,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 @[expose] public section
 
 open NumberField IsDedekindDomain Filter Topology
-open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
-open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec GlobalTheory.CompanionTheory.Ar.Plug
+open Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.BasicNotions Formalism.MainNotions
+open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Rec
+  GlobalTheory.CompanionTheory.Ar.Plug
 attribute [-instance] GlobalTheory.CompHt.fintypePsi
 namespace GlobalTheory.CompanionTheory.Ar.Plug.Disc
 
@@ -29,21 +32,22 @@ theorem orbit_symm {u w : (Σ k, ι k) → ℂ} (h : SameOrbit u w) : SameOrbit 
   funext p
   simp [← mul_assoc, inv_mul_cancel₀ (hc p.1)]
 
-theorem orbit_trans {u v w : (Σ k, ι k) → ℂ} (h : SameOrbit u v) (h' : SameOrbit v w) :
-    SameOrbit u w := by
+theorem orbit_trans {u v w : (Σ k, ι k) → ℂ} (h : SameOrbit u v) (h' : SameOrbit v w)
+    : SameOrbit u w := by
   obtain ⟨c, hc, rfl⟩ := h
   obtain ⟨d, hd, rfl⟩ := h'
   exact ⟨fun k => c k * d k, fun k => mul_ne_zero (hc k) (hd k), by funext p; simp [mul_assoc]⟩
 
-theorem orbit_cross {u w : (Σ k, ι k) → ℂ} (h : SameOrbit u w) (k : K) (a b : ι k) :
-    u ⟨k, a⟩ * w ⟨k, b⟩ = u ⟨k, b⟩ * w ⟨k, a⟩ := by
+theorem orbit_cross {u w : (Σ k, ι k) → ℂ} (h : SameOrbit u w) (k : K) (a b : ι k)
+    : u ⟨k, a⟩ * w ⟨k, b⟩ = u ⟨k, b⟩ * w ⟨k, a⟩ := by
   obtain ⟨c, hc, rfl⟩ := h
   simp only []
   ring
 
-theorem orbit_of_cross {u w : (Σ k, ι k) → ℂ} (hu : ∀ k, ∃ i, u ⟨k, i⟩ ≠ 0)
-    (hw : ∀ k, ∃ i, w ⟨k, i⟩ ≠ 0)
-    (h : ∀ k (a b : ι k), u ⟨k, a⟩ * w ⟨k, b⟩ = u ⟨k, b⟩ * w ⟨k, a⟩) : SameOrbit u w := by
+theorem orbit_of_cross
+    {u w : (Σ k, ι k) → ℂ} (hu : ∀ k, ∃ i, u ⟨k, i⟩ ≠ 0) (hw : ∀ k, ∃ i, w ⟨k, i⟩ ≠ 0)
+    (h : ∀ k (a b : ι k), u ⟨k, a⟩ * w ⟨k, b⟩ = u ⟨k, b⟩ * w ⟨k, a⟩)
+    : SameOrbit u w := by
   choose l hl using hw
   refine ⟨fun k => u ⟨k, l k⟩ / w ⟨k, l k⟩, fun k => ?_, ?_⟩
   · refine div_ne_zero (fun h0 => ?_) (hl k)
@@ -57,8 +61,8 @@ theorem orbit_of_cross {u w : (Σ k, ι k) → ℂ} (hu : ∀ k, ∃ i, u ⟨k, 
     field_simp [hl k]
     linear_combination this
 
-theorem affCoord_orbit {u w : (Σ k, ι k) → ℂ} (h : SameOrbit u w) (p : (k : K) → ι k) :
-    affCoord p u = affCoord p w := by
+theorem affCoord_orbit {u w : (Σ k, ι k) → ℂ} (h : SameOrbit u w) (p : (k : K) → ι k)
+    : affCoord p u = affCoord p w := by
   obtain ⟨c, hc, rfl⟩ := h
   funext q
   simp only [affCoord]
@@ -68,32 +72,39 @@ section Atlas
 
 variable {e : ℕ} {X : Type} [TopologicalSpace X]
 
-theorem continuousAt_of_chart {F : Type} [TopologicalSpace F] (A : FinHolAtlas e X) {g : X → F}
-    {x : X} (j : Fin A.n) (hj : x ∈ (A.chart j).source)
-    (h : ContinuousAt (g ∘ (A.chart j).symm) (A.chart j x)) : ContinuousAt g x := by
+theorem continuousAt_of_chart
+    {F : Type} [TopologicalSpace F]
+    (A : FinHolAtlas e X)
+    {g : X → F} {x : X}
+    (j : Fin A.n)
+    (hj : x ∈ (A.chart j).source) (h : ContinuousAt (g ∘ (A.chart j).symm) (A.chart j x))
+    : ContinuousAt g x := by
   have h1 : ContinuousAt ((g ∘ (A.chart j).symm) ∘ (A.chart j)) x :=
     ContinuousAt.comp h ((A.chart j).continuousAt hj)
   refine h1.congr ?_
   filter_upwards [(A.chart j).open_source.mem_nhds hj] with y hy
   simp [(A.chart j).left_inv hy]
 
-theorem chart_mem (A : FinHolAtlas e X) {U : Set X} {x : X} (hx : x ∈ U) (j : Fin A.n)
-    (hj : x ∈ (A.chart j).source) :
-    A.chart j x ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U :=
+theorem chart_mem
+    (A : FinHolAtlas e X)
+    {U : Set X} {x : X} (hx : x ∈ U)
+    (j : Fin A.n) (hj : x ∈ (A.chart j).source)
+    : A.chart j x ∈ (A.chart j).target ∩ (A.chart j).symm ⁻¹' U :=
   ⟨(A.chart j).map_source hj, by simpa [(A.chart j).left_inv hj] using hx⟩
 
-theorem analyticAt_comp {e' : ℕ} {Y : Type} [TopologicalSpace Y] {B : FinHolAtlas e' Y}
-    {A : FinHolAtlas e X} {h : Y → X} (hh : HoloMap B A h) {V : Set X} {G : X → ℂ}
-    (hG : A.HoloOn V G) {y₀ : Y} (hy : h y₀ ∈ V) (j : Fin B.n)
-    (hj : y₀ ∈ (B.chart j).source) :
-    AnalyticAt ℂ (G ∘ h ∘ (B.chart j).symm) (B.chart j y₀) := by
+theorem analyticAt_comp
+    {e' : ℕ} {Y : Type} [TopologicalSpace Y]
+    {B : FinHolAtlas e' Y} {A : FinHolAtlas e X} {h : Y → X} (hh : HoloMap B A h)
+    {V : Set X} {G : X → ℂ} (hG : A.HoloOn V G)
+    {y₀ : Y} (hy : h y₀ ∈ V)
+    (j : Fin B.n) (hj : y₀ ∈ (B.chart j).source)
+    : AnalyticAt ℂ (G ∘ h ∘ (B.chart j).symm) (B.chart j y₀) := by
   obtain ⟨k, hk⟩ := A.cover (h y₀)
   have hv := (B.chart j).map_source hj
   have hl := (B.chart j).left_inv hj
   have h1 : AnalyticAt ℂ (A.chart k ∘ h ∘ (B.chart j).symm) (B.chart j y₀) :=
     hh.2 j k _ ⟨hv, by simpa [hl] using hk⟩
-  have h2 : AnalyticAt ℂ (G ∘ (A.chart k).symm) (A.chart k (h y₀)) :=
-    hG k _ (chart_mem A hy k hk)
+  have h2 : AnalyticAt ℂ (G ∘ (A.chart k).symm) (A.chart k (h y₀)) := hG k _ (chart_mem A hy k hk)
   have h2' : AnalyticAt ℂ (G ∘ (A.chart k).symm)
       ((A.chart k ∘ h ∘ (B.chart j).symm) (B.chart j y₀)) := by
     simpa [hl] using h2
@@ -110,17 +121,20 @@ end Atlas
 
 variable {P J : Ideal (MRing ι)} {e : ℕ}
 
-theorem lift_continuousAt (R : AnLogRes P J e) (x : R.X) {y : R.X} (hy : y ∈ R.U x) :
-    ContinuousAt (R.lift x) y := by
+theorem lift_continuousAt (R : AnLogRes P J e) (x : R.X) {y : R.X} (hy : y ∈ R.U x)
+    : ContinuousAt (R.lift x) y := by
   obtain ⟨j, hj⟩ := R.A.cover y
   refine continuousAt_pi.2 fun p => ?_
   refine continuousAt_of_chart R.A j hj ?_
   exact (R.holo x p j _ (chart_mem R.A hy j hj)).continuousAt
 
-theorem tendsto_center (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
+theorem tendsto_center
+    (R : AnLogRes P J e)
+    (hJ : ∀ z, z ∉ mcPts J)
     {Zf : ℂ → (Σ k, ι k) → ℂ} (hZ : ContinuousAt Zf 0) (hZ0 : ∀ k, ∃ i, Zf 0 ⟨k, i⟩ ≠ 0)
     {x : ℂ → R.X} (hx : ∀ᶠ z in 𝓝 (0 : ℂ), SameOrbit (R.lift (x z) (x z)) (Zf z))
-    {x₀ : R.X} (h0 : SameOrbit (R.lift x₀ x₀) (Zf 0)) : Tendsto x (𝓝 0) (𝓝 x₀) := by
+    {x₀ : R.X} (h0 : SameOrbit (R.lift x₀ x₀) (Zf 0))
+    : Tendsto x (𝓝 0) (𝓝 x₀) := by
   rw [tendsto_iff_ultrafilter]
   intro F hF
   have hxs : Tendsto x F (𝓝 (F.map x).lim) := (F.map x).le_nhds_lim
@@ -133,14 +147,16 @@ theorem tendsto_center (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
   have horb : ∀ᶠ z in (F : Filter ℂ), SameOrbit (R.lift xs (x z)) (Zf z) := by
     filter_upwards [hU, hF hx] with z h1 h2
     exact orbit_trans (R.compat xs (x z) (x z) ⟨h1, R.mem_U _⟩) h2
-  have hcross : ∀ k (a b : ι k), R.lift xs xs ⟨k, a⟩ * Zf 0 ⟨k, b⟩ =
-      R.lift xs xs ⟨k, b⟩ * Zf 0 ⟨k, a⟩ := by
+  have hcross
+      : ∀ k (a b : ι k), R.lift xs xs ⟨k, a⟩ * Zf 0 ⟨k, b⟩ = R.lift xs xs ⟨k, b⟩ * Zf 0 ⟨k, a⟩ := by
     intro k a b
-    have t1 : Tendsto (fun z => R.lift xs (x z) ⟨k, a⟩ * Zf z ⟨k, b⟩) F
-        (𝓝 (R.lift xs xs ⟨k, a⟩ * Zf 0 ⟨k, b⟩)) :=
+    have t1 : Tendsto
+        (fun z => R.lift xs (x z) ⟨k, a⟩ * Zf z ⟨k, b⟩)
+        F (𝓝 (R.lift xs xs ⟨k, a⟩ * Zf 0 ⟨k, b⟩)) :=
       ((tendsto_pi_nhds.1 hl) _).mul ((tendsto_pi_nhds.1 hZF) _)
-    have t2 : Tendsto (fun z => R.lift xs (x z) ⟨k, b⟩ * Zf z ⟨k, a⟩) F
-        (𝓝 (R.lift xs xs ⟨k, b⟩ * Zf 0 ⟨k, a⟩)) :=
+    have t2 : Tendsto
+        (fun z => R.lift xs (x z) ⟨k, b⟩ * Zf z ⟨k, a⟩)
+        F (𝓝 (R.lift xs xs ⟨k, b⟩ * Zf 0 ⟨k, a⟩)) :=
       ((tendsto_pi_nhds.1 hl) _).mul ((tendsto_pi_nhds.1 hZF) _)
     refine tendsto_nhds_unique_of_eventuallyEq t1 t2 ?_
     filter_upwards [horb] with z hz
@@ -151,13 +167,14 @@ theorem tendsto_center (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
   rw [← this]
   exact hxs
 
-theorem chart_differentiable (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
-    {Zf : ℂ → (Σ k, ι k) → ℂ}
-    (hZ : ∀ q, ∀ᶠ z in 𝓝 (0 : ℂ), DifferentiableAt ℂ (fun w => Zf w q) z)
+theorem chart_differentiable
+    (R : AnLogRes P J e)
+    (hJ : ∀ z, z ∉ mcPts J)
+    {Zf : ℂ → (Σ k, ι k) → ℂ} (hZ : ∀ q, ∀ᶠ z in 𝓝 (0 : ℂ), DifferentiableAt ℂ (fun w => Zf w q) z)
     {x : ℂ → R.X} {x₀ : R.X} (hx : ∀ᶠ z in 𝓝 (0 : ℂ), SameOrbit (R.lift (x z) (x z)) (Zf z))
-    (h0 : SameOrbit (R.lift x₀ x₀) (Zf 0)) (ht : Tendsto x (𝓝 0) (𝓝 x₀)) (j : Fin R.A.n)
-    (hj : x₀ ∈ (R.A.chart j).source) :
-    ∀ᶠ z in 𝓝 (0 : ℂ), DifferentiableAt ℂ (fun w => R.A.chart j (x w)) z := by
+    (h0 : SameOrbit (R.lift x₀ x₀) (Zf 0)) (ht : Tendsto x (𝓝 0) (𝓝 x₀))
+    (j : Fin R.A.n) (hj : x₀ ∈ (R.A.chart j).source)
+    : ∀ᶠ z in 𝓝 (0 : ℂ), DifferentiableAt ℂ (fun w => R.A.chart j (x w)) z := by
   classical
   choose p hp using (R.mem x₀ x₀ (R.mem_U x₀)).1
   have hv₀ := chart_mem R.A (R.mem_U x₀) j hj
@@ -172,17 +189,19 @@ theorem chart_differentiable (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
   have ha : AnalyticAt ℂ a (R.A.chart j x₀) := by
     refine analyticAt_pi_iff.2 fun q => ?_
     exact (hcoord q).div (hcoord _) (hden q.1)
-  have hker : ((fderiv ℂ a (R.A.chart j x₀) : (Fin e → ℂ) →L[ℂ] ((Σ k, ι k) → ℂ)) :
-      (Fin e → ℂ) →ₗ[ℂ] ((Σ k, ι k) → ℂ)).ker = ⊥ :=
+  have hker
+      : ((fderiv ℂ a (R.A.chart j x₀) : (Fin e → ℂ) →L[ℂ] ((Σ k, ι k) → ℂ))
+          : (Fin e → ℂ) →ₗ[ℂ] ((Σ k, ι k) → ℂ)).ker
+        = ⊥ :=
     R.immersion x₀ (hJ _) p hp j hj
   obtain ⟨ρ, hρ⟩ := LinearMap.exists_leftInverse_of_injective _ hker
   let ρc : ((Σ k, ι k) → ℂ) →L[ℂ] (Fin e → ℂ) := LinearMap.toContinuousLinearMap ρ
   let b : (Fin e → ℂ) → (Fin e → ℂ) := fun v => ρc (a v)
-  have hb : ContDiffAt ℂ 1 b (R.A.chart j x₀) :=
-    ρc.contDiff.contDiffAt.comp _ ha.contDiffAt
+  have hb : ContDiffAt ℂ 1 b (R.A.chart j x₀) := ρc.contDiff.contDiffAt.comp _ ha.contDiffAt
   have hb' : HasFDerivAt b
-      ((ContinuousLinearEquiv.refl ℂ (Fin e → ℂ) : (Fin e → ℂ) ≃L[ℂ] (Fin e → ℂ)) :
-        (Fin e → ℂ) →L[ℂ] (Fin e → ℂ)) (R.A.chart j x₀) := by
+      ((ContinuousLinearEquiv.refl ℂ (Fin e → ℂ) : (Fin e → ℂ) ≃L[ℂ] (Fin e → ℂ))
+        : (Fin e → ℂ) →L[ℂ] (Fin e → ℂ))
+      (R.A.chart j x₀) := by
     have h1 := ρc.hasFDerivAt.comp (R.A.chart j x₀) ha.differentiableAt.hasFDerivAt
     refine HasFDerivAt.congr_fderiv h1 (ContinuousLinearMap.ext fun v => ?_)
     exact LinearMap.congr_fun hρ v
@@ -196,8 +215,7 @@ theorem chart_differentiable (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
     obtain ⟨d, -, hd⟩ := h0
     intro k h
     exact hp k (by rw [hd]; simp [h])
-  have hall : ∀ᶠ z in 𝓝 (0 : ℂ), ∀ q, DifferentiableAt ℂ (fun w => Zf w q) z :=
-    eventually_all.2 hZ
+  have hall : ∀ᶠ z in 𝓝 (0 : ℂ), ∀ q, DifferentiableAt ℂ (fun w => Zf w q) z := eventually_all.2 hZ
   have hDen : ∀ᶠ z in 𝓝 (0 : ℂ), ∀ k, Zf z ⟨k, p k⟩ ≠ 0 := by
     refine eventually_all.2 fun k => ?_
     exact (hZ ⟨k, p k⟩).self_of_nhds.continuousAt.eventually_ne (hZp k)
@@ -229,9 +247,8 @@ theorem chart_differentiable (R : AnLogRes P J e) (hJ : ∀ z, z ∉ mcPts J)
   filter_upwards [hdiff, heq.eventually_nhds] with z h1 h2
   exact h1.congr_of_eventuallyEq h2
 
-theorem exists_lower_bound {g : ℂ → ℂ} (hg : AnalyticAt ℂ g 0)
-    (hne : ∀ᶠ z in 𝓝[≠] (0 : ℂ), g z ≠ 0) :
-    ∃ (c : ℝ) (m : ℕ), 0 < c ∧ ∀ᶠ z in 𝓝 (0 : ℂ), c * ‖z‖ ^ m ≤ ‖g z‖ := by
+theorem exists_lower_bound {g : ℂ → ℂ} (hg : AnalyticAt ℂ g 0) (hne : ∀ᶠ z in 𝓝[≠] (0 : ℂ), g z ≠ 0)
+    : ∃ (c : ℝ) (m : ℕ), 0 < c ∧ ∀ᶠ z in 𝓝 (0 : ℂ), c * ‖z‖ ^ m ≤ ‖g z‖ := by
   have hnot : ¬ ∀ᶠ z in 𝓝 (0 : ℂ), g z = 0 := by
     intro h
     have h1 : ∀ᶠ z in 𝓝[≠] (0 : ℂ), g z = 0 := h.filter_mono nhdsWithin_le_nhds
@@ -251,9 +268,26 @@ end GlobalTheory.CompanionTheory.Ar.Plug.Disc
 
 namespace GlobalTheory.CompanionTheory.Ar.Plug
 
-open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.M.FinHolAtlas GlobalTheory.CompanionTheory.Ar.Plug.Disc
+open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.M.FinHolAtlas
+  GlobalTheory.CompanionTheory.Ar.Plug.Disc
 
-theorem rW_le_log_disc : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (D : ℕ) (σ : Type) (S : PB.AnSys D σ) (P : Ideal (MRing ι)) (Re : PB.Realis S P), Re.J = ⊤ → ∀ Zf : ℂ → (Σ k, ι k) → ℂ, (∀ p, DifferentiableOn ℂ (fun z => Zf z p) (Metric.ball 0 1)) → (∀ z ∈ Metric.ball (0 : ℂ) 1, Zf z ∈ mcPts P) → (∀ z ∈ Metric.ball (0 : ℂ) 1, z ≠ 0 → ∀ x : Re.R.X, SameOrbit (Re.R.lift x x) (Zf z) → Re.π x ∈ S.open') → ∃ C ρ : ℝ, 0 < ρ ∧ ∀ z : ℂ, 0 < ‖z‖ → ‖z‖ < ρ → ∀ x : Re.R.X, SameOrbit (Re.R.lift x x) (Zf z) → ReciprocityTheory.AnForm.P.rW S.L S.s (Re.π x) ≤ C * (1 + |Real.log ‖z‖|) := by
+theorem rW_le_log_disc
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (D : ℕ) (σ : Type)
+        (S : PB.AnSys D σ) (P : Ideal (MRing ι)) (Re : PB.Realis S P),
+      Re.J = ⊤
+        → ∀ Zf : ℂ → (Σ k, ι k) → ℂ,
+          (∀ p, DifferentiableOn ℂ (fun z => Zf z p) (Metric.ball 0 1))
+            → (∀ z ∈ Metric.ball (0 : ℂ) 1, Zf z ∈ mcPts P)
+            → (∀ z ∈ Metric.ball (0 : ℂ) 1,
+              z ≠ 0 → ∀ x : Re.R.X, SameOrbit (Re.R.lift x x) (Zf z) → Re.π x ∈ S.open')
+            → ∃ C ρ : ℝ,
+              0 < ρ
+                ∧ ∀ z : ℂ,
+                  0 < ‖z‖ → ‖z‖ < ρ
+                    → ∀ x : Re.R.X,
+                      SameOrbit (Re.R.lift x x) (Zf z)
+                        → ReciprocityTheory.AnForm.P.rW S.L S.s (Re.π x)
+                          ≤ C * (1 + |Real.log ‖z‖|) := by
   intro K _ ι _ D σ S P Re hJ Zf hZ hmem hopen
   have hJ' : ∀ z, z ∉ mcPts Re.J := by
     intro z hz
@@ -290,13 +324,13 @@ theorem rW_le_log_disc : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fi
     refine h4.congr_of_eventuallyEq ?_
     filter_upwards [h3] with w hw
     simp [(Re.R.A.chart j).left_inv hw]
-  have hyt : Tendsto (fun z => Re.π (x z)) (𝓝 0) (𝓝 (Re.π x₀)) :=
-    (Re.holo.1.tendsto x₀).comp ht
+  have hyt : Tendsto (fun z => Re.π (x z)) (𝓝 0) (𝓝 (Re.π x₀)) := (Re.holo.1.tendsto x₀).comp ht
   have hLU : ∀ᶠ z in 𝓝 (0 : ℂ), Re.π (x z) ∈ S.L.U (Re.π x₀) :=
     hyt.eventually ((S.L.isOpen_U _).mem_nhds (S.L.mem_U _))
-  have hkey : ∀ᶠ z in 𝓝 (0 : ℂ), z ≠ 0 → S.s (Re.π x₀) (Re.π (x z)) ≠ 0 ∧
-      logNormSec S.L S.s (Re.π (x z)) = Real.log ‖S.s (Re.π x₀) (Re.π (x z))‖ -
-        S.L.φ (Re.π x₀) (Re.π (x z)) := by
+  have hkey
+      : ∀ᶠ z in 𝓝 (0 : ℂ), z ≠ 0 → S.s (Re.π x₀) (Re.π (x z)) ≠ 0 ∧
+        logNormSec S.L S.s (Re.π (x z)) = Real.log ‖S.s (Re.π x₀) (Re.π (x z))‖ -
+          S.L.φ (Re.π x₀) (Re.π (x z)) := by
     filter_upwards [hball, hLU] with z hz hU hz0
     have hop : S.s (Re.π (x z)) (Re.π (x z)) ≠ 0 := hopen z hz hz0 (x z) (hxs z hz)
     have hsec := S.sec.2 (Re.π x₀) (Re.π (x z)) (Re.π (x z)) ⟨hU, S.L.mem_U _⟩
@@ -305,7 +339,8 @@ theorem rW_le_log_disc : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fi
       rw [h, norm_zero, zero_mul] at hsec
       exact (mul_pos (norm_pos_iff.2 hop) (Real.exp_pos _)).ne hsec
     refine ⟨hne, ?_⟩
-    rw [logNormSec, ← hsec, Real.log_mul (norm_ne_zero_iff.2 hne) (Real.exp_pos _).ne', Real.log_exp]
+    rw [logNormSec, ← hsec, Real.log_mul (norm_ne_zero_iff.2 hne) (Real.exp_pos _).ne',
+      Real.log_exp]
     ring
   have hne : ∀ᶠ z in 𝓝[≠] (0 : ℂ), S.s (Re.π x₀) (Re.π (x z)) ≠ 0 := by
     rw [eventually_nhdsWithin_iff]
@@ -337,7 +372,7 @@ theorem rW_le_log_disc : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fi
   have hlog : Real.log c + m * Real.log ‖z‖ ≤ Real.log ‖S.s (Re.π x₀) (Re.π (x z))‖ := by
     have := Real.log_le_log (by positivity) h2
     rwa [Real.log_mul hc.ne' (by positivity), Real.log_pow] at this
-  have hlz : Real.log ‖z‖ = -|Real.log ‖z‖| := by
+  have hlz : Real.log ‖z‖ = - |Real.log ‖z‖| := by
     rw [abs_of_nonpos (Real.log_nonpos hz0.le hz1.le), neg_neg]
   have hL : 0 ≤ |Real.log ‖z‖| := abs_nonneg _
   have hc1 := neg_abs_le (Real.log c)

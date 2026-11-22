@@ -7,7 +7,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix ComplexConjugate ComplexOrder
 
 namespace GlobalTheory.MajorantContinuity
@@ -104,12 +106,16 @@ lemma ne_zero_of_sphere {r : ℕ} {w : Fin r → ℂ} (hw : w ∈ Metric.sphere 
   rw [mem_sphere_zero_iff_norm, norm_zero] at hw
   exact zero_ne_one hw
 
-theorem eventually_comparable {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {ε : ℝ}
-    (hε : 0 < ε) : ∀ᶠ y in 𝓝 x, y ∈ X.dom ∧ ∀ (τ : X.Ψ) (v : Fin r → ℂ),
+theorem eventually_comparable
+    {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : x ∈ X.dom) {ε : ℝ} (hε : 0 < ε)
+    : ∀ᶠ y in 𝓝 x, y ∈ X.dom ∧ ∀ (τ : X.Ψ) (v : Fin r → ℂ),
       X.maj x τ v ≤ (1 + ε) * X.maj y τ v ∧ X.maj y τ v ≤ (1 + ε) * X.maj x τ v := by
-  have hdom : ∀ᶠ y in 𝓝 x, y ∈ X.dom := (ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientDomain.isOpen_dom X).mem_nhds hx
-  have key : ∀ τ : X.Ψ, ∀ᶠ y in 𝓝 x, ∀ w ∈ Metric.sphere (0 : Fin r → ℂ) 1,
-      X.maj x τ w < (1 + ε) * X.maj y τ w ∧ X.maj y τ w < (1 + ε) * X.maj x τ w := by
+  have hdom : ∀ᶠ y in 𝓝 x, y ∈ X.dom :=
+    (ReciprocityTheory.ChartRestriction.G.FD.FourierCoefficientDomain.isOpen_dom X).mem_nhds hx
+  have key
+      : ∀ τ : X.Ψ,
+        ∀ᶠ y in 𝓝 x, ∀ w ∈ Metric.sphere (0 : Fin r → ℂ) 1,
+          X.maj x τ w < (1 + ε) * X.maj y τ w ∧ X.maj y τ w < (1 + ε) * X.maj x τ w := by
     intro τ
     refine (isCompact_sphere (0 : Fin r → ℂ) 1).eventually_forall_of_forall_eventually ?_
     intro w hw
@@ -117,9 +123,10 @@ theorem eventually_comparable {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : 
     have h1 : ContinuousAt (fun p : Frame X.Ψ r × (Fin r → ℂ) => X.maj p.1 τ p.2) (x, w) :=
       continuousAt_maj X τ hx w
     have h2 : ContinuousAt (fun p : Frame X.Ψ r × (Fin r → ℂ) => X.maj x τ p.2) (x, w) :=
-      ContinuousAt.comp_of_eq (g := fun p : Frame X.Ψ r × (Fin r → ℂ) => X.maj p.1 τ p.2)
-        (f := fun p : Frame X.Ψ r × (Fin r → ℂ) => (x, p.2)) h1
-        (continuous_const.prodMk continuous_snd).continuousAt rfl
+      ContinuousAt.comp_of_eq
+        (g := fun p : Frame X.Ψ r × (Fin r → ℂ) => X.maj p.1 τ p.2)
+        (f := fun p : Frame X.Ψ r × (Fin r → ℂ) => (x, p.2))
+        h1 (continuous_const.prodMk continuous_snd).continuousAt rfl
     refine (h2.eventually_lt (continuousAt_const.mul h1) ?_).and
       (h1.eventually_lt (continuousAt_const.mul h2) ?_)
     · show X.maj x τ w < (1 + ε) * X.maj x τ w
@@ -144,17 +151,24 @@ theorem eventually_comparable {r : ℕ} (X : Data E r) {x : Frame X.Ψ r} (hx : 
   · nlinarith [mul_le_mul_of_nonneg_left k1.le ht]
   · nlinarith [mul_le_mul_of_nonneg_left k2.le ht]
 
-theorem compact_bounds {r : ℕ} (X : Data E r) {K : Set (Frame X.Ψ r)} (hK : IsCompact K)
-    (hKd : K ⊆ X.dom) : ∃ c C : ℝ, 0 < c ∧ ∀ x ∈ K, ∀ (τ : X.Ψ) (v : Fin r → ℂ),
-      c * ‖v‖ ^ 2 ≤ X.maj x τ v ∧ X.maj x τ v ≤ C * ‖v‖ ^ 2 := by
+theorem compact_bounds
+    {r : ℕ} (X : Data E r) {K : Set (Frame X.Ψ r)} (hK : IsCompact K) (hKd : K ⊆ X.dom)
+    : ∃ c C : ℝ,
+      0 < c
+        ∧ ∀ x ∈ K, ∀ (τ : X.Ψ) (v : Fin r → ℂ),
+          c * ‖v‖ ^ 2 ≤ X.maj x τ v ∧ X.maj x τ v ≤ C * ‖v‖ ^ 2 := by
   classical
   have hKS := hK.prod (isCompact_sphere (0 : Fin r → ℂ) 1)
-  have hcont : ∀ τ : X.Ψ, ContinuousOn (fun p : Frame X.Ψ r × (Fin r → ℂ) => X.maj p.1 τ p.2)
-      (K ×ˢ Metric.sphere (0 : Fin r → ℂ) 1) :=
-    fun τ => continuousOn_of_forall_continuousAt fun p hp => continuousAt_maj X τ (hKd hp.1) p.2
-  have hlow : ∀ τ : X.Ψ, ∃ c', 0 < c' ∧ ∀ p ∈ K ×ˢ Metric.sphere (0 : Fin r → ℂ) 1,
-      c' ≤ X.maj p.1 τ p.2 :=
-    fun τ => hKS.exists_forall_le' (hcont τ) fun p hp => X.maj_pos (hKd hp.1) τ (ne_zero_of_sphere hp.2)
+  have hcont
+      : ∀ τ : X.Ψ,
+        ContinuousOn
+          (fun p : Frame X.Ψ r × (Fin r → ℂ) => X.maj p.1 τ p.2)
+          (K ×ˢ Metric.sphere (0 : Fin r → ℂ) 1) := fun τ =>
+    continuousOn_of_forall_continuousAt fun p hp => continuousAt_maj X τ (hKd hp.1) p.2
+  have hlow
+      : ∀ τ : X.Ψ, ∃ c',
+        0 < c' ∧ ∀ p ∈ K ×ˢ Metric.sphere (0 : Fin r → ℂ) 1, c' ≤ X.maj p.1 τ p.2 := fun τ =>
+    hKS.exists_forall_le' (hcont τ) fun p hp => X.maj_pos (hKd hp.1) τ (ne_zero_of_sphere hp.2)
   have hup : ∀ τ : X.Ψ, ∃ C', ∀ p ∈ K ×ˢ Metric.sphere (0 : Fin r → ℂ) 1, ‖X.maj p.1 τ p.2‖ ≤ C' :=
     fun τ => hKS.exists_bound_of_continuousOn (hcont τ)
   choose cτ hcpos hcle using hlow
@@ -164,13 +178,15 @@ theorem compact_bounds {r : ℕ} (X : Data E r) {K : Set (Frame X.Ψ r)} (hK : I
   intro x hx τ v
   have hc_le : (1 + ∑ σ, (cτ σ)⁻¹)⁻¹ ≤ cτ τ := by
     have h1 : (cτ τ)⁻¹ ≤ ∑ σ, (cτ σ)⁻¹ :=
-      Finset.single_le_sum (f := fun σ => (cτ σ)⁻¹) (fun σ _ => (inv_pos.2 (hcpos σ)).le)
+      Finset.single_le_sum
+        (f := fun σ => (cτ σ)⁻¹)
+        (fun σ _ => (inv_pos.2 (hcpos σ)).le)
         (Finset.mem_univ τ)
     rw [inv_le_comm₀ (by linarith) (hcpos τ)]
     linarith
   have hC_le : Cτ τ ≤ ∑ σ, |Cτ σ| :=
-    (le_abs_self _).trans (Finset.single_le_sum (f := fun σ => |Cτ σ|) (fun σ _ => abs_nonneg _)
-      (Finset.mem_univ τ))
+    (le_abs_self _).trans
+      (Finset.single_le_sum (f := fun σ => |Cτ σ|) (fun σ _ => abs_nonneg _) (Finset.mem_univ τ))
   rcases eq_or_ne v 0 with rfl | hv
   · simp [maj_at_zero]
   obtain ⟨w, hw, hvw⟩ := exists_sphere hv
@@ -178,16 +194,24 @@ theorem compact_bounds {r : ℕ} (X : Data E r) {K : Set (Frame X.Ψ r)} (hK : I
     conv_lhs => rw [hvw]
     exact maj_real_smul X x τ _ w
   have hlo : cτ τ ≤ X.maj x τ w := hcle τ (x, w) ⟨hx, hw⟩
-  have hhi : X.maj x τ w ≤ Cτ τ := (le_abs_self _).trans
-    ((Real.norm_eq_abs _).symm.trans_le (hCle τ (x, w) ⟨hx, hw⟩))
+  have hhi : X.maj x τ w ≤ Cτ τ :=
+    (le_abs_self _).trans ((Real.norm_eq_abs _).symm.trans_le (hCle τ (x, w) ⟨hx, hw⟩))
   have ht : 0 ≤ ‖v‖ ^ 2 := sq_nonneg _
   rw [hm]
   constructor
   · nlinarith [mul_le_mul_of_nonneg_left (hc_le.trans hlo) ht]
   · nlinarith [mul_le_mul_of_nonneg_left (hhi.trans hC_le) ht]
 
-theorem majorant_continuity :
-    ((∀ (r : ℕ) (X : Data E r), ∀ x ∈ X.dom, ∀ ε : ℝ, 0 < ε → ∀ᶠ y in 𝓝 x, y ∈ X.dom ∧ ∀ (τ : X.Ψ) (v : Fin r → ℂ), X.maj x τ v ≤ (1 + ε) * X.maj y τ v ∧ X.maj y τ v ≤ (1 + ε) * X.maj x τ v) ∧ (∀ (r : ℕ) (X : Data E r) (K : Set (Frame X.Ψ r)), IsCompact K → K ⊆ X.dom → ∃ c C : ℝ, 0 < c ∧ ∀ x ∈ K, ∀ (τ : X.Ψ) (v : Fin r → ℂ), c * ‖v‖ ^ 2 ≤ X.maj x τ v ∧ X.maj x τ v ≤ C * ‖v‖ ^ 2)) := ⟨fun _ X _ hx _ hε => eventually_comparable X hx hε,
-    fun _ X _ hK hKd => compact_bounds X hK hKd⟩
+theorem majorant_continuity
+    : ((∀ (r : ℕ) (X : Data E r), ∀ x ∈ X.dom, ∀ ε : ℝ,
+        0 < ε
+          → ∀ᶠ y in 𝓝 x, y ∈ X.dom ∧ ∀ (τ : X.Ψ) (v : Fin r → ℂ), X.maj x τ v ≤ (1 + ε) * X.maj y τ v ∧ X.maj y τ v ≤ (1 + ε) * X.maj x τ v)
+      ∧ (∀ (r : ℕ) (X : Data E r) (K : Set (Frame X.Ψ r)),
+        IsCompact K → K ⊆ X.dom
+          → ∃ c C : ℝ,
+            0 < c
+              ∧ ∀ x ∈ K, ∀ (τ : X.Ψ) (v : Fin r → ℂ),
+                c * ‖v‖ ^ 2 ≤ X.maj x τ v ∧ X.maj x τ v ≤ C * ‖v‖ ^ 2)) :=
+  ⟨fun _ X _ hx _ hε => eventually_comparable X hx hε, fun _ X _ hK hKd => compact_bounds X hK hKd⟩
 
 end GlobalTheory.MajorantContinuity

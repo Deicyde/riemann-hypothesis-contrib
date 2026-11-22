@@ -11,14 +11,17 @@ open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual Rec
 
 namespace PositivityTheory.Lit1.PTN
 
-theorem contAction_twDual_C {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] {r : ℕ} (S : Finset (HeightOneSpectrum (𝓞 F)))
+theorem contAction_twDual_C
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} [Fact l.Prime]
+    {r : ℕ} (S : Finset (HeightOneSpectrum (𝓞 F)))
     (μ : GS Ω (S : Set (HeightOneSpectrum (𝓞 F))) →* (ZMod (l ^ r))ˣ)
     (hμ : μ.comp (toGS Ω _) = cycMod F Ω l r)
-    {M : Type} [AddCommGroup M] [Module (ZMod (l ^ r)) M] [Finite M] [TopologicalSpace M]
-    [DiscreteTopology M]
+    {M : Type}
+    [AddCommGroup M] [Module (ZMod (l ^ r)) M] [Finite M] [TopologicalSpace M] [DiscreteTopology M]
     (ρ : Representation (ZMod (l ^ r)) (GS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) M)
-    (hρ : ContAction ρ) : ContAction (twDual μ ρ) := by
+    (hρ : ContAction ρ)
+    : ContAction (twDual μ ρ) := by
   have hμc : Continuous μ := by
     have hq : Topology.IsQuotientMap (toGS Ω (S : Set (HeightOneSpectrum (𝓞 F)))) :=
       QuotientGroup.isQuotientMap_mk _
@@ -36,9 +39,10 @@ theorem contAction_twDual_C {F Ω : Type} [Field F] [NumberField F] [Field Ω] [
   intro φ
   refine continuous_discrete_rng.mpr ?_
   intro ψ
-  have hset : (fun g => (twDual μ ρ g) φ) ⁻¹' {ψ} =
-      ⋂ m : M, (fun g : GS Ω (S : Set (HeightOneSpectrum (𝓞 F))) =>
-        ((μ g : (ZMod (l ^ r))ˣ) : ZMod (l ^ r)) * φ (ρ g⁻¹ m)) ⁻¹' {ψ m} := by
+  have hset
+      : (fun g => (twDual μ ρ g) φ) ⁻¹' {ψ}
+        = ⋂ m : M, (fun g : GS Ω (S : Set (HeightOneSpectrum (𝓞 F))) =>
+            ((μ g : (ZMod (l ^ r))ˣ) : ZMod (l ^ r)) * φ (ρ g⁻¹ m)) ⁻¹' {ψ m} := by
     ext g
     simp only [Set.mem_preimage, Set.mem_singleton_iff, Set.mem_iInter]
     constructor

@@ -14,7 +14,14 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFor
 open NumberField IsDedekindDomain
 open Classical
 
-theorem GlobalTheory.twPl_under_not_mem_prime : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L : Formalism.IndefR.Links.LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} (G : GlobalTheory.ChiGrid.GridData L sc) (t : T) {l : ℕ}, l.Prime → ∀ {w : Formalism.PairingDivisionLocalBalance.Pl D.what₂.LL}, (l : 𝓞 D.what₂.LL) ∈ w.asIdeal → (GlobalTheory.SqTop.Qn G t : 𝓞 D.what₂.LL) ∉ w.asIdeal → ∀ q ∈ ((GlobalTheory.SqTop.twPl G t).image fun P => P.under (𝓞 D.host.F)), (l : 𝓞 D.host.F) ∉ q.asIdeal := by
+theorem GlobalTheory.twPl_under_not_mem_prime
+    : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L : Formalism.IndefR.Links.LevCh D T}
+        {sc : GlobalTheory.ChiGrid.Consts} (G : GlobalTheory.ChiGrid.GridData L sc) (t : T) {l : ℕ},
+      l.Prime
+        → ∀ {w : Formalism.PairingDivisionLocalBalance.Pl D.what₂.LL},
+          (l : 𝓞 D.what₂.LL) ∈ w.asIdeal → (GlobalTheory.SqTop.Qn G t : 𝓞 D.what₂.LL) ∉ w.asIdeal
+            → ∀ q ∈ ((GlobalTheory.SqTop.twPl G t).image fun P => P.under (𝓞 D.host.F)),
+              (l : 𝓞 D.host.F) ∉ q.asIdeal := by
   intro D T L sc G t l hl w hlw hQ q hq hlq
   obtain ⟨P, hP, rfl⟩ := Finset.mem_image.mp hq
   have hlP : ((l : ℕ) : 𝓞 D.host.E) ∈ P.asIdeal := by
@@ -36,8 +43,7 @@ theorem GlobalTheory.twPl_under_not_mem_prime : ∀ {D : Formalism.BasicNotions.
     rcases k with _ | k
     · rw [pow_zero] at hk; exact absurd hk hne
     · rw [hk]; exact dvd_pow_self l (Nat.succ_ne_zero k)
-  have hQd : l ∣ GlobalTheory.SqTop.Qn G t :=
-    dvd_trans hdvd (Finset.dvd_prod_of_mem _ hP)
+  have hQd : l ∣ GlobalTheory.SqTop.Qn G t := dvd_trans hdvd (Finset.dvd_prod_of_mem _ hP)
   obtain ⟨k, hk⟩ := hQd
   apply hQ
   rw [hk, Nat.cast_mul]

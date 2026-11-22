@@ -7,16 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CardDualZ
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology IsLocalRing UpperTheory.V UpperTheory.V.Base UpperTheory.V.X
 
-theorem UpperTheory.V.X.So.dualGen :
-    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (a : O), a ≠ 0 → ∀ (r : ℕ) (M : Type) [AddCommGroup M] [Module O M] [Module (ZMod (l ^ r)) M], Nonempty (M ≃ₗ[O] (O ⧸ Ideal.span {a})) → ∃ φ₀ : M →ₗ[ZMod (l ^ r)] ZMod (l ^ r), (∀ x : O, (∀ m, φ₀ (x • m) = 0) ↔ a ∣ x) ∧ ∀ φ : M →ₗ[ZMod (l ^ r)] ZMod (l ^ r), ∃ x : O, ∀ m, φ m = φ₀ (x • m) := by
+theorem UpperTheory.V.X.So.dualGen
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] (a : O),
+      a ≠ 0
+        → ∀ (r : ℕ) (M : Type) [AddCommGroup M] [Module O M] [Module (ZMod (l ^ r)) M],
+          Nonempty (M ≃ₗ[O] (O ⧸ Ideal.span {a}))
+            → ∃ φ₀ : M →ₗ[ZMod (l ^ r)] ZMod (l ^ r),
+              (∀ x : O, (∀ m, φ₀ (x • m) = 0) ↔ a ∣ x)
+                ∧ ∀ φ : M →ₗ[ZMod (l ^ r)] ZMod (l ^ r), ∃ x : O, ∀ m, φ m = φ₀ (x • m) := by
   intro l _ O _ _ _ _ _ a ha r M _ _ _ hne
   obtain ⟨e⟩ := hne
   haveI : NeZero (l ^ r) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   obtain ⟨hMfin, -, -⟩ := UpperTheory.V.X.So.levFacts l O a ha M ⟨e⟩
-  have hsm : ∀ x y : O,
-      x • e.symm (Ideal.Quotient.mk (Ideal.span {a}) y) = e.symm (Ideal.Quotient.mk _ (x * y)) := by
+  have hsm
+      : ∀ x y : O,
+        x • e.symm (Ideal.Quotient.mk (Ideal.span {a}) y)
+          = e.symm (Ideal.Quotient.mk _ (x * y)) := by
     intro x y
     rw [← map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq, ← map_mul]
   have hmk0 : ∀ y : O, e.symm (Ideal.Quotient.mk (Ideal.span {a}) y) = 0 ↔ a ∣ y := by
@@ -26,8 +36,8 @@ theorem UpperTheory.V.X.So.dualGen :
     intro m
     obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (e m)
     exact ⟨y, by rw [hy, LinearEquiv.symm_apply_apply]⟩
-  obtain ⟨φ₀, hφ₀⟩ : ∃ φ₀ : M →ₗ[ZMod (l ^ r)] ZMod (l ^ r),
-      ∀ x : O, ¬ a ∣ x → ∃ m : M, φ₀ (x • m) ≠ 0 := by
+  obtain ⟨φ₀, hφ₀⟩
+      : ∃ φ₀ : M →ₗ[ZMod (l ^ r)] ZMod (l ^ r), ∀ x : O, ¬ a ∣ x → ∃ m : M, φ₀ (x • m) ≠ 0 := by
     by_cases hu : IsUnit a
     · exact ⟨0, fun x hx => absurd hu.dvd hx⟩
     · obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
@@ -35,14 +45,15 @@ theorem UpperTheory.V.X.So.dualGen :
       have hs0 : s ≠ 0 := by
         rintro rfl
         exact hu (associated_one_iff_isUnit.mp (by simpa using hs))
-      have hpd : ∀ t u : ℕ, ϖ ^ t ∣ ϖ ^ u ↔ t ≤ u :=
-        fun t u => pow_dvd_pow_iff hϖ.ne_zero hϖ.not_isUnit
+      have hpd : ∀ t u : ℕ, ϖ ^ t ∣ ϖ ^ u ↔ t ≤ u := fun t u =>
+        pow_dvd_pow_iff hϖ.ne_zero hϖ.not_isUnit
       have hz : e.symm (Ideal.Quotient.mk (Ideal.span {a}) (ϖ ^ (s - 1))) ≠ 0 := by
         rw [Ne, hmk0, hs.dvd_iff_dvd_left, hpd]
         omega
-      obtain ⟨f, -, hf⟩ := KStar.Selmer.exists_form_ne_zero (⊥ : Submodule (ZMod (l ^ r)) M)
-        (z := e.symm (Ideal.Quotient.mk (Ideal.span {a}) (ϖ ^ (s - 1))))
-        (by rw [Submodule.mem_bot]; exact hz)
+      obtain ⟨f, -, hf⟩ :=
+        KStar.Selmer.exists_form_ne_zero (⊥ : Submodule (ZMod (l ^ r)) M)
+          (z := e.symm (Ideal.Quotient.mk (Ideal.span {a}) (ϖ ^ (s - 1))))
+          (by rw [Submodule.mem_bot]; exact hz)
       refine ⟨f, fun x hx => ?_⟩
       have hx0 : x ≠ 0 := by
         rintro rfl
@@ -77,17 +88,18 @@ theorem UpperTheory.V.X.So.dualGen :
     · intro hx m
       rw [hann x hx m, map_zero]
   refine ⟨φ₀, hcond, fun φ => ?_⟩
-  let sm : O → (M →ₗ[ZMod (l ^ r)] M) :=
-    fun x => (DistribSMul.toAddMonoidHom M x).toZModLinearMap (l ^ r)
-  let Ψ : O →+ Module.Dual (ZMod (l ^ r)) M :=
-    { toFun := fun x => φ₀ ∘ₗ sm x
-      map_zero' := by
-        ext m
-        simp [sm]
-      map_add' := by
-        intro x y
-        ext m
-        simp [sm, add_smul] }
+  let sm : O → (M →ₗ[ZMod (l ^ r)] M) := fun x =>
+    (DistribSMul.toAddMonoidHom M x).toZModLinearMap (l ^ r)
+  let Ψ : O →+ Module.Dual (ZMod (l ^ r)) M := {
+    toFun := fun x => φ₀ ∘ₗ sm x
+    map_zero' := by
+      ext m
+      simp [sm]
+    map_add' := by
+      intro x y
+      ext m
+      simp [sm, add_smul]
+  }
   have hΨ : ∀ x m, Ψ x m = φ₀ (x • m) := fun x m => rfl
   have hker : Ψ.ker = (Ideal.span {a}).toAddSubgroup := by
     ext x

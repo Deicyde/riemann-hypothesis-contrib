@@ -14,12 +14,15 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.NatCard
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations Module GlobalTheory.CompanionTheory.LocDual
 
 namespace GlobalTheory.CompanionTheory.LocDual.GenChar
 
-theorem exists_addHom_zmod_ne_zero {N : ℕ} [NeZero N] {A : Type} [AddCommGroup A]
-    (hA : ∀ a : A, N • a = 0) {q : A} (hq : q ≠ 0) : ∃ f : A →+ ZMod N, f q ≠ 0 := by
+theorem exists_addHom_zmod_ne_zero
+    {N : ℕ} [NeZero N] {A : Type} [AddCommGroup A] (hA : ∀ a : A, N • a = 0) {q : A} (hq : q ≠ 0)
+    : ∃ f : A →+ ZMod N, f q ≠ 0 := by
   obtain ⟨c, hc⟩ := CharacterModule.exists_character_apply_ne_zero_of_ne_zero hq
   let c' : A →+ AddCircle (1 : ℚ) := c
   have hc' : c' q ≠ 0 := hc
@@ -59,8 +62,11 @@ theorem exists_addHom_zmod_ne_zero {N : ℕ} [NeZero N] {A : Type} [AddCommGroup
     rw [zsmul_eq_mul, mul_one, nsmul_eq_mul] at hk
     rw [hk]
     field_simp
-  refine ⟨(AddMonoidHom.ofInjective hinj).symm.toAddMonoidHom.comp
-    (AddMonoidHom.codRestrict c' ι.range hmem), ?_⟩
+  refine ⟨
+    (AddMonoidHom.ofInjective hinj).symm.toAddMonoidHom.comp
+      (AddMonoidHom.codRestrict c' ι.range hmem),
+    ?_
+  ⟩
   intro h0
   apply hc'
   have h1 : AddMonoidHom.codRestrict c' ι.range hmem q = 0 := by
@@ -69,9 +75,12 @@ theorem exists_addHom_zmod_ne_zero {N : ℕ} [NeZero N] {A : Type} [AddCommGroup
   have h2 := congrArg Subtype.val h1
   simpa using h2
 
-theorem exists_mul_eq_socle {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    {ϖ : O} (hϖ : Irreducible ϖ) (s : ℕ) {x : O ⧸ Ideal.span {ϖ ^ (s + 1)}} (hx : x ≠ 0) :
-    ∃ o, o * x = Ideal.Quotient.mk (Ideal.span {ϖ ^ (s + 1)}) (ϖ ^ s) := by
+theorem exists_mul_eq_socle
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    (s : ℕ)
+    {x : O ⧸ Ideal.span {ϖ ^ (s + 1)}} (hx : x ≠ 0)
+    : ∃ o, o * x = Ideal.Quotient.mk (Ideal.span {ϖ ^ (s + 1)}) (ϖ ^ s) := by
   obtain ⟨y, rfl⟩ := Ideal.Quotient.mk_surjective x
   have hy : y ≠ 0 := by
     rintro rfl
@@ -85,16 +94,25 @@ theorem exists_mul_eq_socle {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValu
   refine ⟨Ideal.Quotient.mk _ (↑u⁻¹ * ϖ ^ (s - n)), ?_⟩
   rw [← map_mul, hu]
   congr 1
-  calc ↑u⁻¹ * ϖ ^ (s - n) * (↑u * ϖ ^ n) = (↑u⁻¹ * ↑u) * (ϖ ^ (s - n) * ϖ ^ n) := by ring
+  calc
+    ↑u⁻¹ * ϖ ^ (s - n) * (↑u * ϖ ^ n)
+      = (↑u⁻¹ * ↑u) * (ϖ ^ (s - n) * ϖ ^ n) := by ring
     _ = ϖ ^ s := by rw [Units.inv_mul, one_mul, ← pow_add, Nat.sub_add_cancel hn]
 
-theorem socle_ne_zero {O : Type} [CommRing O] [IsDomain O] {ϖ : O} (hϖ : Irreducible ϖ) (s : ℕ) :
-    Ideal.Quotient.mk (Ideal.span {ϖ ^ (s + 1)}) (ϖ ^ s) ≠ 0 := by
+theorem socle_ne_zero {O : Type} [CommRing O] [IsDomain O] {ϖ : O} (hϖ : Irreducible ϖ) (s : ℕ)
+    : Ideal.Quotient.mk (Ideal.span {ϖ ^ (s + 1)}) (ϖ ^ s) ≠ 0 := by
   rw [Ne, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_span_singleton,
     pow_dvd_pow_iff hϖ.ne_zero hϖ.not_isUnit]
   omega
 
-theorem exists_generating_character : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O), Irreducible ϖ → ∀ (r N : ℕ), 0 < N → Finite (O ⧸ Ideal.span {ϖ ^ r}) → ((N : O) ∈ Ideal.span {ϖ ^ r}) → ∃ ψ₀ : (O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N, (∀ x, (∀ o, ψ₀ (o * x) = 0) → x = 0) ∧ ∀ ψ : (O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N, ∃ o, ∀ x, ψ x = ψ₀ (o * x) := by
+theorem exists_generating_character
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ (r N : ℕ),
+          0 < N → Finite (O ⧸ Ideal.span {ϖ ^ r}) → ((N : O) ∈ Ideal.span {ϖ ^ r})
+            → ∃ ψ₀ : (O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N,
+              (∀ x, (∀ o, ψ₀ (o * x) = 0) → x = 0)
+                ∧ ∀ ψ : (O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N, ∃ o, ∀ x, ψ x = ψ₀ (o * x) := by
   intro O _ _ _ ϖ hϖ r N hN hfin hNmem
   haveI : NeZero N := ⟨by omega⟩
   have htors : ∀ a : O ⧸ Ideal.span {ϖ ^ r}, N • a = 0 := by
@@ -103,8 +121,7 @@ theorem exists_generating_character : ∀ (O : Type) [CommRing O] [IsDomain O] [
       rw [← map_natCast (Ideal.Quotient.mk (Ideal.span {ϖ ^ r}))]
       exact Ideal.Quotient.eq_zero_iff_mem.2 hNmem
     rw [nsmul_eq_mul, hN0, zero_mul]
-  have key : ∃ ψ₀ : (O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N,
-      ∀ x, (∀ o, ψ₀ (o * x) = 0) → x = 0 := by
+  have key : ∃ ψ₀ : (O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N, ∀ x, (∀ o, ψ₀ (o * x) = 0) → x = 0 := by
     cases r with
     | zero =>
       refine ⟨0, fun x _ => ?_⟩
@@ -121,8 +138,8 @@ theorem exists_generating_character : ∀ (O : Type) [CommRing O] [IsDomain O] [
       exact hψ₀ h5
   obtain ⟨ψ₀, hψ₀⟩ := key
   refine ⟨ψ₀, hψ₀, ?_⟩
-  let Φ : (O ⧸ Ideal.span {ϖ ^ r}) → ((O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N) :=
-    fun o => ψ₀.comp (AddMonoidHom.mulLeft o)
+  let Φ : (O ⧸ Ideal.span {ϖ ^ r}) → ((O ⧸ Ideal.span {ϖ ^ r}) →+ ZMod N) := fun o =>
+    ψ₀.comp (AddMonoidHom.mulLeft o)
   have hinj : Function.Injective Φ := by
     intro a b hab
     have h0 : ∀ x, ψ₀ ((a - b) * x) = 0 := by

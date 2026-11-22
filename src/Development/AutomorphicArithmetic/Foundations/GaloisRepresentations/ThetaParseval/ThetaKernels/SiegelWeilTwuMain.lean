@@ -18,7 +18,9 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix
-open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.TowU
+open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  GlobalTheory.TowU
 namespace PositivityTheory.SiegelWeilFormula.TW.Twu
 attribute [-instance] CStarMatrix.instHMulOfFintypeOfMulOfAddCommMonoid
 open PositivityTheory.SiegelWeilFormula.TBij.Adp PositivityTheory.SiegelWeilFormula.KTunit
@@ -30,12 +32,19 @@ theorem uniq_k : _root_.PositivityTheory.SiegelWeilFormula.TW.Uniq_k := by
   by_cases hC : C = 0
   · refine ⟨0, fun Φ hΦ => ?_⟩
     have h0 : d.T Φ = 0 := funext fun X => by rw [hT Φ hΦ X, hC, zero_mul]; rfl
-    rw [(_root_.PositivityTheory.SiegelWeilFormula.TBij_k.tBij F E σ d).2.2 Φ hΦ h0, map_zero, zero_mul]
-  have rhoS : ∀ w, ∀ φ ∈ schA F d.κ, S0 (d.dd.rho d.B.ψ w φ) = schr d.B.ψ (_root_.PositivityTheory.SiegelWeilFormula.TBij_k.Adp.c0 d τ w) (S0 φ) := by
+    rw [(_root_.PositivityTheory.SiegelWeilFormula.TBij_k.tBij F E σ d).2.2 Φ hΦ h0, map_zero,
+      zero_mul]
+  have rhoS
+      : ∀ w, ∀ φ ∈ schA F d.κ,
+        S0 (d.dd.rho d.B.ψ w φ)
+          = schr d.B.ψ (_root_.PositivityTheory.SiegelWeilFormula.TBij_k.Adp.c0 d τ w) (S0 φ) := by
     intro w φ hφ
     simp only [Darboux.rho]
     rw [hop.Heisenberg₂ _ _ hφ, LinearEquiv.symm_apply_apply]
-  have rhoS' : ∀ w, ∀ φ ∈ schA F d.κ, S0' (schr d.B.ψ (_root_.PositivityTheory.SiegelWeilFormula.TBij_k.Adp.c0 d τ w) φ) = d.dd.rho d.B.ψ w (S0' φ) := by
+  have rhoS'
+      : ∀ w, ∀ φ ∈ schA F d.κ,
+        S0' (schr d.B.ψ (_root_.PositivityTheory.SiegelWeilFormula.TBij_k.Adp.c0 d τ w) φ)
+          = d.dd.rho d.B.ψ w (S0' φ) := by
     intro w φ hφ
     have h1 := rhoS w (S0' φ) (hop.pres' φ hφ)
     rw [hop.right φ hφ] at h1
@@ -44,18 +53,29 @@ theorem uniq_k : _root_.PositivityTheory.SiegelWeilFormula.TW.Uniq_k := by
     rw [← h1, hop.left _ hm]
   letI : MeasurableSpace (d.κ → AF F) := borel _
   obtain ⟨hμ, hint⟩ := _root_.PositivityTheory.SiegelWeilFormula.KTunit.map_haar_k d τ ν hν
-  obtain ⟨c, hc⟩ := translation_invariant_functional_haar d.B.ψ hψ d.κ (ν.map (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_k d τ)) hμ (Λ ∘ₗ S0') (hop.adm' Λ hΛ) (by
-    intro a φ hφ
-    have e0 := _root_.PositivityTheory.SiegelWeilFormula.TBij_k.Adp.coordinates_frame d τ (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cinv_k d τ a)
-    have ea : (fun k => d.crd (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cinv_k d τ a) (τ k)) = a := _root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_cinv_k d τ a
-    rw [ea] at e0
-    rw [← schr_zero_right, ← e0, LinearMap.comp_apply, LinearMap.comp_apply, rhoS' _ φ hφ]
-    exact hinv _ _ (hop.pres' φ hφ))
+  obtain ⟨c, hc⟩ :=
+    translation_invariant_functional_haar d.B.ψ hψ d.κ
+      (ν.map (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_k d τ)) hμ (Λ ∘ₗ S0')
+      (hop.adm' Λ hΛ)
+      (by
+        intro a φ hφ
+        have e0 :=
+          _root_.PositivityTheory.SiegelWeilFormula.TBij_k.Adp.coordinates_frame d τ
+            (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cinv_k d τ a)
+        have ea
+            : (fun k => d.crd (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cinv_k d τ a) (τ k))
+              = a :=
+          _root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_cinv_k d τ a
+        rw [ea] at e0
+        rw [← schr_zero_right, ← e0, LinearMap.comp_apply, LinearMap.comp_apply, rhoS' _ φ hφ]
+        exact hinv _ _ (hop.pres' φ hφ))
   refine ⟨c / C, fun Φ hΦ => ?_⟩
   have h1 := hc (S0 Φ) (hop.pres Φ hΦ)
   rw [LinearMap.comp_apply, hop.left Φ hΦ] at h1
   rw [h1, ← hint]
-  have e2 : ∫ Z, d.T Φ Z ∂ν = C * ∫ Z, S0 Φ (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_k d τ Z) ∂ν := by
+  have e2
+      : ∫ Z, d.T Φ Z ∂ν
+        = C * ∫ Z, S0 Φ (_root_.PositivityTheory.SiegelWeilFormula.KTunit.cmap_k d τ Z) ∂ν := by
     rw [← integral_const_mul]
     exact integral_congr_ae (Filter.Eventually.of_forall fun Z => hT Φ hΦ Z)
   rw [e2]

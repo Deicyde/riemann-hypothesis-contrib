@@ -28,14 +28,14 @@ private lemma hexp_finite {F : Type} [Field F] [NumberField F] {n : ℕ} (t₀ :
       funext i
       rw [hh i, ← hm i₀]
 
-theorem UpperTheory.Gal.LocalSmoothExtension.unifBound_of :
-    UnifBound := by
+theorem UpperTheory.Gal.LocalSmoothExtension.unifBound_of : UnifBound := by
   intro F _ _ n I _ t ε lam κ
-  have hb : ∀ (π : (F →+* ℂ) → (F →+* ℂ)) (i : I), ∃ b, ∀ h : Fin n → ℕ,
-      IsHExp (t i) ε (fun τ => lam (π τ)) h → κ (fun τ => lam (π τ)) i h ≤ b := by
+  have hb
+      : ∀ (π : (F →+* ℂ) → (F →+* ℂ)) (i : I), ∃ b, ∀ h : Fin n → ℕ,
+        IsHExp (t i) ε (fun τ => lam (π τ)) h → κ (fun τ => lam (π τ)) i h ≤ b := by
     intro π i
-    obtain ⟨b, hb⟩ := ((hexp_finite (t i) ε (fun τ => lam (π τ))).image
-      (κ (fun τ => lam (π τ)) i)).bddAbove
+    obtain ⟨b, hb⟩ :=
+      ((hexp_finite (t i) ε (fun τ => lam (π τ))).image (κ (fun τ => lam (π τ)) i)).bddAbove
     exact ⟨b, fun h hh => hb ⟨h, hh, rfl⟩⟩
   choose b hb using hb
   obtain ⟨k, hk⟩ := Finite.exists_le (fun q : ((F →+* ℂ) → (F →+* ℂ)) × I => b q.1 q.2)

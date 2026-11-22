@@ -12,10 +12,15 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 noncomputable section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
 open GlobalTheory.CuspRep GlobalTheory.GalOfCusp
 namespace UpperTheory.V.Ws
-variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c}
+variable
+  {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+  {l : ℕ} [Fact l.Prime]
+  {c : Coef l} {D : Raw Ω c}
 namespace Link
 variable {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (K : Link T c' h) (X : Space (T.fr ∅) (inc h))
 end Link

@@ -10,8 +10,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -19,14 +22,21 @@ namespace GlobalTheory.AbLaw
 
 open TopologicalSpace GlobalTheory.AmpleLocal
 
-theorem gs_cst {R : Type} [CommRing R] {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of R)) (D : X.Opens) (c : R)
-    (z : X) (hz : z ∈ D) : gs (𝟙 X) z D (AbLaw.cst f D c) = gs (𝟙 X) z ⊤ (AbLaw.cst f ⊤ c) := by
+theorem gs_cst
+    {R : Type} [CommRing R]
+    {X : Scheme.{0}} (f : X ⟶ Spec (CommRingCat.of R)) (D : X.Opens)
+    (c : R)
+    (z : X) (hz : z ∈ D)
+    : gs (𝟙 X) z D (AbLaw.cst f D c) = gs (𝟙 X) z ⊤ (AbLaw.cst f ⊤ c) := by
   rw [← rs_cst f (le_top : D ≤ ⊤) c]
   exact gs_res (𝟙 X) z le_top hz _
 
-theorem veryAmpleBy_pw : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)) (H : LB X)
-    (n : ℕ) (s : Fin (n + 1) → LB.Sec H), H.IsLB → VeryAmpleBy f H s → ∀ d : ℕ, 1 ≤ d →
-    ∃ (n' : ℕ) (s' : Fin (n' + 1) → LB.Sec (pw H d)), VeryAmpleBy f (pw H d) s' := by
+theorem veryAmpleBy_pw
+    : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶ Spec (CommRingCat.of R)) (H : LB X)
+        (n : ℕ) (s : Fin (n + 1) → LB.Sec H),
+      H.IsLB → VeryAmpleBy f H s
+        → ∀ d : ℕ,
+          1 ≤ d → ∃ (n' : ℕ) (s' : Fin (n' + 1) → LB.Sec (pw H d)), VeryAmpleBy f (pw H d) s' := by
   intro R _ X f H n s hH ⟨cov, hs⟩ d hd
   obtain ⟨e, rfl⟩ : ∃ e, d = e + 1 := ⟨d - 1, by omega⟩
   choose aff r hr surj using hs
@@ -38,10 +48,15 @@ theorem veryAmpleBy_pw : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶
   let σ : Fin (n + 1) → Fn X := fun i => sv c (s i)
   have hσ : ∀ i, Sc H.U G ⊤ 1 (σ i) := fun i =>
     sc_sv (P := H) (κ := id) (fun _ => le_rfl) hc (fun _ _ _ => (pow_one _).symm) (s i)
-  have gen : ∀ i, Gen (nonzeroLocus (s i)) (Set.range φ ∪ Set.range fun m => σ m * AmpleLocal.inv (σ i)) := fun i =>
-    (gen_iff _ (r i) _ _ (fun a z hz => gs_cst f _ a z hz)
+  have gen
+      : ∀ i,
+        Gen (nonzeroLocus (s i))
+          (Set.range φ ∪ Set.range fun m => σ m * AmpleLocal.inv (σ i)) := fun i =>
+    (gen_iff _ (r i) _ _
+      (fun a z hz => gs_cst f _ a z hz)
       (fun m => (ratio_iff hc (s i) (s m) (r i m)).1 (hr i m))).2 (surj i)
-  obtain ⟨M, hM⟩ := Nat.exists_eq_succ_of_ne_zero (Fintype.card_pos (α := Fin (n + 1) × Fin (n + 1))).ne'
+  obtain ⟨M, hM⟩ :=
+    Nat.exists_eq_succ_of_ne_zero (Fintype.card_pos (α := Fin (n + 1) × Fin (n + 1))).ne'
   let ε := Fintype.equivFinOfCardEq hM
   let τ : Fin (M + 1) → Fn X := fun m => σ (ε.symm m).2 * σ (ε.symm m).1 ^ e
   have hτ : ∀ m, Sc H.U G ⊤ (1 * (e + 1)) (τ m) := fun m => by
@@ -53,9 +68,12 @@ theorem veryAmpleBy_pw : ∀ (R : Type) [CommRing R] (X : Scheme.{0}) (f : X ⟶
       show (gm (𝟙 X) y _ (H.g i (c y) ^ ((e + 1 : ℕ) : ℤ))).val = _
       rw [zpow_natCast, map_pow, Units.val_pow_eq_pow_val, _root_.one_mul]) (isLB_pw hH _) (hτ m)
   have loc : ∀ m, IsLoc (nonzeroLocus (t m)) ⊤ (τ m) := fun m => ht m ▸ loc_sv hγ (t m)
-  have main := fun m => extra_section hU hG hσ (fun i => loc_sv hc (s i))
-    (fun z _ => Opens.mem_iSup.1 (cov.ge trivial)) aff (S₀ := Set.range φ)
-    (by rintro _ ⟨a, rfl⟩; exact mem_reg_iff.2 ⟨_, fun _ _ => rfl⟩) gen (hτ m) (loc m)
+  have main := fun m =>
+    extra_section hU hG hσ
+      (fun i => loc_sv hc (s i))
+      (fun z _ => Opens.mem_iSup.1 (cov.ge trivial))
+      aff (S₀ := Set.range φ) (by rintro _ ⟨a, rfl⟩; exact mem_reg_iff.2 ⟨_, fun _ _ => rfl⟩) gen
+      (hτ m) (loc m)
   refine ⟨M, t, top_le_iff.1 fun z _ => ?_, fun i => ⟨(main i).1, ?_⟩⟩
   · obtain ⟨j, hj⟩ := Opens.mem_iSup.1 (cov.ge (Set.mem_univ z))
     have hu : IsUnit (σ j z) := (loc_sv hc (s j)).unit hj

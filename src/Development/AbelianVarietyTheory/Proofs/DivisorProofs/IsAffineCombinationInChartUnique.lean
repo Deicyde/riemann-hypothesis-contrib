@@ -11,9 +11,12 @@ noncomputable section
 
 namespace GlobalTheory.SecGlue
 
-theorem eq_of_chartHom_eq {Y : Scheme.{0}} {V : Y.Opens} (hV : IsAffineOpen V) {S : Type}
-    [CommRing S] (c c' : Sp S ⟶ Y) (hc : c ⁻¹ᵁ V = ⊤) (hc' : c' ⁻¹ᵁ V = ⊤)
-    (e : ∀ x, chartHom V c hc x = chartHom V c' hc' x) : c = c' := by
+theorem eq_of_chartHom_eq
+    {Y : Scheme.{0}} {V : Y.Opens} (hV : IsAffineOpen V)
+    {S : Type} [CommRing S]
+    (c c' : Sp S ⟶ Y) (hc : c ⁻¹ᵁ V = ⊤) (hc' : c' ⁻¹ᵁ V = ⊤)
+    (e : ∀ x, chartHom V c hc x = chartHom V c' hc' x)
+    : c = c' := by
   have e₁ : c.appLE V ⊤ hc.ge = c'.appLE V ⊤ hc'.ge := by
     rw [← cancel_mono (Scheme.ΓSpecIso (CommRingCat.of S)).hom]
     exact CommRingCat.hom_ext (RingHom.ext e)
@@ -22,9 +25,13 @@ theorem eq_of_chartHom_eq {Y : Scheme.{0}} {V : Y.Opens} (hV : IsAffineOpen V) {
   rw [e₁, a', IsAffineOpen.fromSpec_top] at a
   exact ((cancel_epi _).1 a).symm
 
-theorem combIn_unique : ∀ (Y : Scheme.{0}) (V : Y.Opens), IsAffineOpen V → ∀ (S : Type) [CommRing S] (ι : Type) [Fintype ι]
-    (u c c' : Sp S ⟶ Y) (w : ι → (Sp S ⟶ Y)) (a : ι → S),
-    GlobalTheory.SecGlue.IsCombIn V u c w a → GlobalTheory.SecGlue.IsCombIn V u c' w a → c = c' := by
+theorem combIn_unique
+    : ∀ (Y : Scheme.{0}) (V : Y.Opens),
+      IsAffineOpen V
+        → ∀ (S : Type) [CommRing S] (ι : Type) [Fintype ι] (u c c' : Sp S ⟶ Y) (w : ι → (Sp S ⟶ Y))
+            (a : ι → S),
+          GlobalTheory.SecGlue.IsCombIn V u c w a → GlobalTheory.SecGlue.IsCombIn V u c' w a
+            → c = c' := by
   intro Y V hV S _ ι _ u c c' w a h h'
   obtain ⟨hu, hc, hw, e⟩ := h
   obtain ⟨hu', hc', hw', e'⟩ := h'

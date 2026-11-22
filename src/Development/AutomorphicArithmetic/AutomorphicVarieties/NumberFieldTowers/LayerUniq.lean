@@ -10,15 +10,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.NumberField
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Tower
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Tower
 
-private theorem lu_key (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
-    [Fact l.Prime] (hmu : HasMuQ l L) (n : ℕ) (L₁ : Type) [Field L₁] [NumberField L₁] [Algebra L L₁] [Algebra L₁ Ω]
-    [IsScalarTower L L₁ Ω] [IsCyclotomicExtension {l ^ n} L L₁] :
-    galOf L L₁ Ω = layU l L Ω (n - cZero l L) ∧ Module.finrank L L₁ = l ^ (n - cZero l L) := by
+private theorem lu_key
+    (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    (l : ℕ) [Fact l.Prime]
+    (hmu : HasMuQ l L)
+    (n : ℕ) (L₁ : Type) [Field L₁] [NumberField L₁] [Algebra L L₁] [Algebra L₁ Ω]
+    [IsScalarTower L L₁ Ω] [IsCyclotomicExtension {l ^ n} L L₁]
+    : galOf L L₁ Ω = layU l L Ω (n - cZero l L) ∧ Module.finrank L L₁ = l ^ (n - cZero l L) := by
   haveI : IsAlgClosure L₁ Ω := ⟨IsAlgClosure.isAlgClosed L, Algebra.IsAlgebraic.tower_top (K := L) L₁⟩
-  have h1 : galOf L L₁ Ω = Un L Ω l n := by
-    rw [galOfCyc L Ω l n L L₁, galOf_self]
+  have h1 : galOf L L₁ Ω = Un L Ω l n := by rw [galOfCyc L Ω l n L L₁, galOf_self]
   have h2 : Un L Ω l n = layU l L Ω (n - cZero l L) := by
     rcases le_total n (cZero l L) with h | h
     · rw [((muQ L Ω l).2.1 n).2 h, layU, ((muQ L Ω l).2.1 _).2 (by omega)]
@@ -26,10 +30,16 @@ private theorem lu_key (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algeb
   refine ⟨h1.trans h2, ?_⟩
   rw [← (galEmbTop L L₁ Ω).2.2, h1, h2, (layerGen L Ω l hmu).1]
 
-theorem UpperTheory.V.Tower.layerUniq :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime], HasMuQ l L → (∀ m, IsLayer l m L (layF l L Ω m)) ∧
-        (∀ (m : ℕ) (L₁ : Type) [Field L₁] [NumberField L₁] [Algebra L L₁] [Algebra L₁ Ω] [IsScalarTower L L₁ Ω], IsLayer l m L L₁ → galOf L L₁ Ω = layU l L Ω m) ∧
-        ∀ (n : ℕ) (L₁ : Type) [Field L₁] [NumberField L₁] [Algebra L L₁], IsCyclotomicExtension {l ^ n} L L₁ → IsLayer l (n - cZero l L) L L₁ := by
+theorem UpperTheory.V.Tower.layerUniq
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ)
+        [Fact l.Prime],
+      HasMuQ l L
+        → (∀ m, IsLayer l m L (layF l L Ω m))
+          ∧ (∀ (m : ℕ) (L₁ : Type) [Field L₁] [NumberField L₁] [Algebra L L₁] [Algebra L₁ Ω]
+              [IsScalarTower L L₁ Ω],
+            IsLayer l m L L₁ → galOf L L₁ Ω = layU l L Ω m)
+          ∧ ∀ (n : ℕ) (L₁ : Type) [Field L₁] [NumberField L₁] [Algebra L L₁],
+            IsCyclotomicExtension {l ^ n} L L₁ → IsLayer l (n - cZero l L) L L₁ := by
   intro L Ω _ _ _ _ _ l hl hmu
   refine ⟨fun m => ?_, fun m L₁ _ _ _ _ _ h => ?_, fun n L₁ _ _ _ h => ?_⟩
   · haveI h := (fnCyc L Ω l (cZero l L + m)).1
@@ -43,8 +53,7 @@ theorem UpperTheory.V.Tower.layerUniq :
     haveI : FiniteDimensional L L₁ := Module.Finite.of_restrictScalars_finite ℚ L L₁
     let f : L₁ →ₐ[L] Ω := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     letI : Algebra L₁ Ω := f.toRingHom.toAlgebra
     haveI : IsScalarTower L L₁ Ω := IsScalarTower.of_algebraMap_eq fun x => (f.commutes x).symm

@@ -31,8 +31,10 @@ lemma smulHom_sum (F : X.Modules) {ι : Type*} (s : Finset ι) (r : ι → Γ(X,
 lemma smulHom_one (F : X.Modules) : smulHom F 1 = 𝟙 F := by
   rw [← smulRingHom_apply, map_one, End.one_asHom]
 
-def imageMapOf {P₁ P₂ G : X.Modules} (f₁ : P₁ ⟶ G) (f₂ : P₂ ⟶ G) (φ : G ⟶ G) (h : P₁ ⟶ P₂)
-    (w : f₁ ≫ φ = h ≫ f₂) : kernel (cokernel.π f₁) ⟶ kernel (cokernel.π f₂) :=
+def imageMapOf
+    {P₁ P₂ G : X.Modules}
+    (f₁ : P₁ ⟶ G) (f₂ : P₂ ⟶ G) (φ : G ⟶ G) (h : P₁ ⟶ P₂) (w : f₁ ≫ φ = h ≫ f₂)
+    : kernel (cokernel.π f₁) ⟶ kernel (cokernel.π f₂) :=
   kernel.lift _ (kernel.ι _ ≫ φ) (by
     rw [Category.assoc]
     apply (cancel_epi (Abelian.factorThruImage f₁)).1
@@ -127,8 +129,8 @@ abbrev quotPow (n : ℕ) : X.Modules := cokernel (idealPowι I F (n + 1))
 abbrev quotPowπ (n : ℕ) : F ⟶ quotPow I F n := cokernel.π _
 
 def quotPowMap (n : ℕ) : quotPow I F (n + 1) ⟶ quotPow I F n :=
-  cokernel.desc _ (quotPowπ I F n) (by
-    rw [← idealPowSucc_ι, Category.assoc, cokernel.condition, comp_zero])
+  cokernel.desc _ (quotPowπ I F n)
+    (by rw [← idealPowSucc_ι, Category.assoc, cokernel.condition, comp_zero])
 
 lemma quotPowπ_map (n : ℕ) : quotPowπ I F (n + 1) ≫ quotPowMap I F n = quotPowπ I F n :=
   cokernel.π_desc _ _ _
@@ -153,22 +155,25 @@ instance (n : ℕ) : (idealPow I F n).IsQuasicoherent := inferInstance
 
 abbrev toFunctions (V : X.Opens) : A →+* Γ(X, V) := (restrictTop V).comp (algebraMap A Γ(X, ⊤))
 
-theorem range_idealPowι_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ) :
-    Set.range ((idealPowι I F n).app V) =
-      ((Ideal.map (toFunctions V) (I ^ n) • ⊤ : Submodule Γ(X, V) Γ(F, V)) : Set Γ(F, V)) := by
+theorem range_idealPowι_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ)
+    : Set.range ((idealPowι I F n).app V)
+      = ((Ideal.map (toFunctions V) (I ^ n) • ⊤ : Submodule Γ(X, V) Γ(F, V)) : Set Γ(F, V)) := by
   rw [range_kernel_ι_cokernel_π_app _ hV]
   set g := idealGen (I ^ n)
-  let L : (Fin (idealGenNum (I ^ n)) → Γ(F, V)) →ₗ[Γ(X, V)] Γ(F, V) :=
-    { toFun := fun x => ∑ k, toFunctions V (g k) • x k
-      map_add' := fun x y => by simp [smul_add, Finset.sum_add_distrib]
-      map_smul' := fun r x => by simp [Finset.smul_sum, smul_comm r] }
+  let L : (Fin (idealGenNum (I ^ n)) → Γ(F, V)) →ₗ[Γ(X, V)] Γ(F, V) := {
+    toFun := fun x => ∑ k, toFunctions V (g k) • x k
+    map_add' := fun x y => by simp [smul_add, Finset.sum_add_distrib]
+    map_smul' := fun r x => by simp [Finset.smul_sum, smul_comm r]
+  }
   have h1 : Set.range ((idealSumMap F (I ^ n)).app V) = Set.range L := by
     ext m
     constructor
     · rintro ⟨p, rfl⟩
       refine ⟨fun k => (biproduct.π (fun _ : Fin (idealGenNum (I ^ n)) => F) k).app V p, ?_⟩
-      change (∑ k, toFunctions V (g k) •
-        (biproduct.π (fun _ : Fin (idealGenNum (I ^ n)) => F) k).app V p) = _
+      change
+        (∑ k, toFunctions V (g k) •
+          (biproduct.π (fun _ : Fin (idealGenNum (I ^ n)) => F) k).app V p)
+          = _
       conv_rhs => rw [biproduct_app_eq_sum _ V p]
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum]
@@ -202,13 +207,13 @@ theorem range_idealPowι_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ) :
   rw [← h2]
   rfl
 
-theorem surjective_quotPowπ_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ) :
-    Function.Surjective ((quotPowπ I F n).app V) :=
+theorem surjective_quotPowπ_app {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ)
+    : Function.Surjective ((quotPowπ I F n).app V) :=
   surjective_cokernel_π_app _ hV
 
-theorem quotPowπ_app_eq_zero_iff {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ) (m : Γ(F, V)) :
-    (quotPowπ I F n).app V m = 0 ↔
-      m ∈ (Ideal.map (toFunctions V) (I ^ (n + 1)) • ⊤ : Submodule Γ(X, V) Γ(F, V)) := by
+theorem quotPowπ_app_eq_zero_iff {V : X.Opens} (hV : IsAffineOpen V) (n : ℕ) (m : Γ(F, V))
+    : (quotPowπ I F n).app V m = 0
+      ↔ m ∈ (Ideal.map (toFunctions V) (I ^ (n + 1)) • ⊤ : Submodule Γ(X, V) Γ(F, V)) := by
   rw [← mem_range_app_iff _ hV, range_idealPowι_app I F hV]
   rfl
 

@@ -5,7 +5,11 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.BasePartFlagPt
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 open GlobalTheory.CompanionTheory.Ar.PB.WSq
 
@@ -13,8 +17,9 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.WSq.FC
 
-theorem mul_one_add_single_apply {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (ca cb : Fin N) (t : ℂ) (r c : Fin N) :
-    (h * (1 + Matrix.single cb ca t)) r c = h r c + if c = ca then t * h r cb else 0 := by
+theorem mul_one_add_single_apply
+    {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (ca cb : Fin N) (t : ℂ) (r c : Fin N)
+    : (h * (1 + Matrix.single cb ca t)) r c = h r c + if c = ca then t * h r cb else 0 := by
   rw [Matrix.mul_add, Matrix.mul_one, Matrix.add_apply, Matrix.mul_apply]
   congr 1
   simp only [Matrix.single_apply]
@@ -23,9 +28,11 @@ theorem mul_one_add_single_apply {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (ca 
     simp [mul_comm]
   · simp [Ne.symm hc]
 
-theorem minorIJ_mul_transvection {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (I J : Finset (Fin N)) {ca cb : Fin N}
-    (hne : ca ≠ cb) (t : ℂ) (hJ : ca ∈ J ↔ cb ∈ J) :
-    minorIJ (h * (1 + Matrix.single cb ca t)) I J = minorIJ h I J := by
+theorem minorIJ_mul_transvection
+    {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (I J : Finset (Fin N))
+    {ca cb : Fin N} (hne : ca ≠ cb)
+    (t : ℂ) (hJ : ca ∈ J ↔ cb ∈ J)
+    : minorIJ (h * (1 + Matrix.single cb ca t)) I J = minorIJ h I J := by
   unfold minorIJ
   split_ifs with e
   · by_cases hca : ca ∈ J
@@ -36,7 +43,8 @@ theorem minorIJ_mul_transvection {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (I J
         rw [Finset.range_orderEmbOfFin]; exact hcb
       have hpq : p ≠ q := fun h' => hne (by rw [← hp, ← hq, h'])
       refine (congrArg Matrix.det ?_).trans
-        (Matrix.det_updateCol_add_smul_self (h.submatrix (I.orderEmbOfFin e) (J.orderEmbOfFin rfl)) hpq t)
+        (Matrix.det_updateCol_add_smul_self (h.submatrix (I.orderEmbOfFin e) (J.orderEmbOfFin rfl))
+          hpq t)
       ext a b
       rw [Matrix.submatrix_apply, mul_one_add_single_apply]
       by_cases hb : b = p
@@ -52,9 +60,10 @@ theorem minorIJ_mul_transvection {N : ℕ} (h : Matrix (Fin N) (Fin N) ℂ) (I J
       simp [mul_one_add_single_apply, hbc]
   · rfl
 
-theorem mem_stepCols_iff {N j : ℕ} {a b i ca cb : Fin N} (hb : (b : ℕ) = a + 1) (hab : (b : ℕ) < j ∨ j ≤ (a : ℕ))
-    (hca : (ca : ℕ) = lastCol N j a) (hcb : (cb : ℕ) = ca + 1) (hi : i ≠ a) :
-    ca ∈ stepCols N j i ↔ cb ∈ stepCols N j i := by
+theorem mem_stepCols_iff
+    {N j : ℕ} {a b i ca cb : Fin N} (hb : (b : ℕ) = a + 1) (hab : (b : ℕ) < j ∨ j ≤ (a : ℕ))
+    (hca : (ca : ℕ) = lastCol N j a) (hcb : (cb : ℕ) = ca + 1) (hi : i ≠ a)
+    : ca ∈ stepCols N j i ↔ cb ∈ stepCols N j i := by
   have hi' : (i : ℕ) ≠ a := fun h => hi (Fin.ext h)
   have := a.isLt
   have := b.isLt
@@ -65,7 +74,17 @@ theorem mem_stepCols_iff {N j : ℕ} {a b i ca cb : Fin N} (hb : (b : ℕ) = a +
   unfold lastCol at hca
   split_ifs at hca ⊢ <;> omega
 
-theorem fstPt_sndPt_wVec : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ] (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ) (M : FlagModel y Ψ N j) (τ : Ψ) (a b : Fin N) (k₀ : K) (ca cb : Fin N), (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ)) → M.blk (τ, a) = some k₀ → (ca : ℕ) = lastCol N j a → (cb : ℕ) = ca + 1 → ∀ (F : FrameData ι Ψ N M.Ω M.blk) (b : (Σ k, baseIdx ι M.blk k) → ℂ) (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (t : ℂ), fstPt k₀ (FC.wVec M F b h τ a k₀ ca cb t) = FC.flagPt M F b h ∧ sndPt k₀ (FC.wVec M F b h τ a k₀ ca cb t) = FC.flagPt M F b (Function.update h τ (h τ * (1 + Matrix.single cb ca t))) := by
+theorem fstPt_sndPt_wVec
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Φ : Type) [Field Φ]
+        (y : (Σ k, ι k) → Φ) (Ψ : Type) [Fintype Ψ] [DecidableEq Ψ] (N j : ℕ)
+        (M : FlagModel y Ψ N j) (τ : Ψ) (a b : Fin N) (k₀ : K) (ca cb : Fin N),
+      (b : ℕ) = a + 1 → ((b : ℕ) < j ∨ j ≤ (a : ℕ)) → M.blk (τ, a) = some k₀
+        → (ca : ℕ) = lastCol N j a → (cb : ℕ) = ca + 1
+        → ∀ (F : FrameData ι Ψ N M.Ω M.blk) (b : (Σ k, baseIdx ι M.blk k) → ℂ)
+            (h : Ψ → Matrix (Fin N) (Fin N) ℂ) (t : ℂ),
+          fstPt k₀ (FC.wVec M F b h τ a k₀ ca cb t) = FC.flagPt M F b h
+            ∧ sndPt k₀ (FC.wVec M F b h τ a k₀ ca cb t)
+              = FC.flagPt M F b (Function.update h τ (h τ * (1 + Matrix.single cb ca t))) := by
   intro K _ ι _ Φ _ y Ψ _ _ N j M τ a b k₀ ca cb hb hab hblk hca hcb F bv h t
   have hne : ca ≠ cb := by
     intro e
@@ -99,7 +118,8 @@ theorem fstPt_sndPt_wVec : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, 
           have hia : i ≠ a := by
             rintro rfl
             exact hk (Option.some_injective _ (hp.symm.trans hblk))
-          rw [Function.update_self, minorIJ_mul_transvection _ _ _ hne t (mem_stepCols_iff hb hab hca hcb hia)]
+          rw [Function.update_self,
+            minorIJ_mul_transvection _ _ _ hne t (mem_stepCols_iff hb hab hca hcb hia)]
         · rw [Function.update_of_ne hτ]
 
 end GlobalTheory.CompanionTheory.Ar.PB.WSq.FC

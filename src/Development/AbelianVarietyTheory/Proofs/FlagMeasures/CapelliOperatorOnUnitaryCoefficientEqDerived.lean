@@ -23,7 +23,8 @@ lemma eabV_pair {E E' : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] [Normed
   rw [map_add (f := _), map_smul, (rdVPair_of vector_right_derivative_extends n ε E E' L f _ g hf h1 hg).2,
     (rdVPair_of vector_right_derivative_extends n ε E E' L f _ g hf h2 hg).2]
 
-variable {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+variable
+  {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
   {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
 
 lemma dsigC_unitM (ab : Fin n × Fin n) (v : H) :
@@ -31,8 +32,8 @@ lemma dsigC_unitM (ab : Fin n × Fin n) (v : H) :
   simp only [PI.DSInfCharCap.dsigC, PI.DSInfCharCap.unitM, PI.DSInfCharCap.thetaJ, PI.PhMeasCore.dsig,
     EabV, EcV, RdV, cpart1, cpart2, Matrix.one_mul, sub_neg_eq_add, ← sub_eq_add_neg]
 
-def freeAct (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ) :
-    FreeAlgebra ℂ (Fin n × Fin n) →ₐ[ℂ] Module.End ℂ (smoothVec ε σ) :=
+def freeAct (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ)
+    : FreeAlgebra ℂ (Fin n × Fin n) →ₐ[ℂ] Module.End ℂ (smoothVec ε σ) :=
   FreeAlgebra.lift ℂ fun ab => unitAct hσ ab.1 ab.2
 
 lemma dsigCW_eq (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ) (w : List (Fin n × Fin n)) (v : smoothVec ε σ) :
@@ -56,11 +57,14 @@ lemma actU_eq (hσ : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.U
     LinearMap.sum_apply, Submodule.coe_sum, LinearMap.smul_apply, Submodule.coe_smul, FreeMonoid.lift_apply]
   rfl
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
 
-def IsCoef (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (P : H →L[ℂ] Wp)
-    (B : Wq →ₗ[ℂ] smoothVec ε σ) (f : Matrix (Fin n) (Fin n) ℂ → (Wq →L[ℂ] Wp)) : Prop :=
+def IsCoef
+    (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (P : H →L[ℂ] Wp) (B : Wq →ₗ[ℂ] smoothVec ε σ) (f : Matrix (Fin n) (Fin n) ℂ → (Wq →L[ℂ] Wp))
+    : Prop :=
   ∀ g, inUJ ε g → ∀ w, f g w = P (σ g (B w))
 
 lemma IsCoef.smooth {P : H →L[ℂ] Wp} {B : Wq →ₗ[ℂ] smoothVec ε σ}
@@ -108,9 +112,9 @@ theorem capelli_coef : PI.UnitaryGroupMassFormula.CapelliEig.FunAct := by
   have e : Q w = (B w : Hs) := rfl
   rw [e, actU_eq hσ]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [capelli, qdetOp, qminorOp, qdet, qminor, map_sum, map_mul, map_intCast, Finset.sum_apply,
-    _root_.sum_apply, LinearMap.sum_apply, Submodule.coe_sum, Pi.smul_apply,
-    _root_.smul_apply]
+    simp only [capelli, qdetOp, qminorOp, qdet, qminor, map_sum, map_mul, map_intCast,
+      Finset.sum_apply, _root_.sum_apply, LinearMap.sum_apply, Submodule.coe_sum, Pi.smul_apply,
+      _root_.smul_apply]
   refine Finset.sum_congr rfl fun τ _ => ?_
   have h := h0.word hσ (List.ofFn fun k : Fin n => (u - ((k : ℕ) : ℂ), τ k, k)) g hg w
   simp only [List.map_ofFn, Function.comp_def] at h

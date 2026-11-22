@@ -5,10 +5,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem cardTors (l : ℕ) [Fact l.Prime] (n : ℕ) (hn : n ≠ 0) :
-    Nat.card {x : QZ l // (n : ℤ) • x = 0} = l ^ n.factorization l := by
+private theorem cardTors (l : ℕ) [Fact l.Prime] (n : ℕ) (hn : n ≠ 0)
+    : Nat.card {x : QZ l // (n : ℤ) • x = 0} = l ^ n.factorization l := by
   have hl : l.Prime := Fact.out
   obtain ⟨ι, hι, hr, -⟩ := zmodToQZ l (n.factorization l)
   have hcop : ¬ l ∣ n / l ^ n.factorization l := Nat.not_dvd_ordCompl hl hn

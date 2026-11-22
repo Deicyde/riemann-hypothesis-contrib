@@ -10,17 +10,19 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW.ThW.Lco
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core GlobalTheory.CompanionTheory.SW.ThW
+open NumberField IsDedekindDomain MeasureTheory Matrix Topology GlobalTheory.CompanionTheory.SW.Core
+  GlobalTheory.CompanionTheory.SW.ThW
 open scoped ENNReal NNReal MatrixGroups Kronecker
 
-theorem latN_coe_eq_pi (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] [DecidableEq ι]
-    (N : ℕ) : (latN F ι N : Set (ι → A F)) =
-      Set.pi Set.univ (fun _ => {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y}) := by
+theorem latN_coe_eq_pi
+    (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] [DecidableEq ι] (N : ℕ)
+    : (latN F ι N : Set (ι → A F))
+      = Set.pi Set.univ (fun _ => {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y}) := by
   ext x
   exact ⟨fun h i _ => h i, fun h i => h i (Set.mem_univ i)⟩
 
-theorem isCompact_mul_oh (F : Type) [Field F] [NumberField F] (N : ℕ) :
-    IsCompact {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} := by
+theorem isCompact_mul_oh (F : Type) [Field F] [NumberField F] (N : ℕ)
+    : IsCompact {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} := by
   have hOh : IsCompact (Oh F) := (GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F).2.2.2.1
   have heq : {x : A F | ∃ y ∈ Oh F, x = (N : A F) * y} = (fun y => (N : A F) * y) '' Oh F := by
     ext x
@@ -32,9 +34,11 @@ theorem isCompact_mul_oh (F : Type) [Field F] [NumberField F] (N : ℕ) :
   rw [heq]
   exact hOh.image (continuous_const.mul continuous_id)
 
-theorem main : ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] [DecidableEq ι] (N : ℕ),
-    0 < N → IsCompact (latN F ι N : Set (ι → A F)) ∧ IsOpen (latN F ι N : Set (ι → A F)) ∧
-      ∀ a : ι → F, SB (indC N a) := by
+theorem main
+    : ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι] [DecidableEq ι] (N : ℕ),
+      0 < N
+        → IsCompact (latN F ι N : Set (ι → A F)) ∧ IsOpen (latN F ι N : Set (ι → A F))
+          ∧ ∀ a : ι → F, SB (indC N a) := by
   intro F _ _ ι _ _ N hN
   obtain ⟨-, -, hT2, -, -, -, -, -, -, hOpen⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   have hC : IsCompact (latN F ι N : Set (ι → A F)) := by
@@ -48,8 +52,9 @@ theorem main : ∀ (F : Type) [Field F] [NumberField F] (ι : Type) [Fintype ι]
   have hcont : Continuous fun x : ι → A F => x - toA a := continuous_id.sub continuous_const
   have hS : IsClopen {x : ι → A F | x - toA a ∈ latN F ι N} := hclopen.preimage hcont
   have hK : IsCompact {x : ι → A F | x - toA a ∈ latN F ι N} := by
-    have h : {x : ι → A F | x - toA a ∈ latN F ι N} =
-        (fun x => x + toA a) '' (latN F ι N : Set (ι → A F)) := by
+    have h
+        : {x : ι → A F | x - toA a ∈ latN F ι N}
+          = (fun x => x + toA a) '' (latN F ι N : Set (ι → A F)) := by
       ext x
       constructor
       · intro hx

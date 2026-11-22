@@ -9,15 +9,14 @@ open IsLocalRing NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-
 open IsLocalRing IsDedekindDomain NumberField in
 theorem _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_valuationSubringAtPrime
-    {R : Type*} [CommRing R] [IsDedekindDomain R] (K : Type*) [Field K] [Algebra R K]
-    [IsFractionRing R K] (v : IsDedekindDomain.HeightOneSpectrum R)
-    (hfin : Finite (R ⧸ v.asIdeal)) :
-      IsDiscreteValuationRing ↥(IsDedekindDomain.HeightOneSpectrum.valuationSubringAtPrime K v) ∧
-        Finite (IsLocalRing.ResidueField
-          ↥(IsDedekindDomain.HeightOneSpectrum.valuationSubringAtPrime K v)) := by
+    {R : Type*} [CommRing R] [IsDedekindDomain R]
+    (K : Type*) [Field K] [Algebra R K] [IsFractionRing R K]
+    (v : IsDedekindDomain.HeightOneSpectrum R) (hfin : Finite (R ⧸ v.asIdeal))
+    : IsDiscreteValuationRing ↥(IsDedekindDomain.HeightOneSpectrum.valuationSubringAtPrime K v)
+      ∧ Finite (IsLocalRing.ResidueField
+        ↥(IsDedekindDomain.HeightOneSpectrum.valuationSubringAtPrime K v)) := by
   let S := Localization.subalgebra.ofField K _ v.asIdeal.primeCompl_le_nonZeroDivisors
   haveI : IsLocalization.AtPrime S v.asIdeal := Localization.subalgebra.isLocalization_ofField K _ _
   have hD : IsDiscreteValuationRing S :=
@@ -29,18 +28,22 @@ theorem _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_valu
   exact ⟨hD, hS⟩
 
 open IsLocalRing IsDedekindDomain NumberField in
-private theorem eq_of_le_of_mem_nonunits_of_dvr {K : Type*} [Field K]
+private theorem eq_of_le_of_mem_nonunits_of_dvr
+    {K : Type*} [Field K]
     (A W : ValuationSubring K) (h : A ≤ W) [IsDiscreteValuationRing A]
-    (a : A) (ha0 : a ≠ 0) (haW : (a : K) ∈ W.nonunits) : A = W := by
-  have hmem : ∀ (B : ValuationSubring K) (hB : A ≤ B) (x : A),
-      x ∈ A.idealOfLE B hB ↔ (x : K) ∈ B.nonunits := by
+    (a : A) (ha0 : a ≠ 0) (haW : (a : K) ∈ W.nonunits)
+    : A = W := by
+  have hmem
+      : ∀ (B : ValuationSubring K) (hB : A ≤ B) (x : A),
+        x ∈ A.idealOfLE B hB ↔ (x : K) ∈ B.nonunits := by
     intro B hB x
     rw [ValuationSubring.mem_nonunits_iff]
     unfold ValuationSubring.idealOfLE
     rw [Ideal.mem_comap, ValuationSubring.valuation_lt_one_iff]
     rfl
-  have hmax : ∀ (B : ValuationSubring K) (hB : A ≤ B), (a : K) ∈ B.nonunits →
-      A.idealOfLE B hB = maximalIdeal A := by
+  have hmax
+      : ∀ (B : ValuationSubring K) (hB : A ≤ B),
+        (a : K) ∈ B.nonunits → A.idealOfLE B hB = maximalIdeal A := by
     intro B hB haB
     have hne : A.idealOfLE B hB ≠ ⊥ := by
       intro hbot
@@ -52,31 +55,33 @@ private theorem eq_of_le_of_mem_nonunits_of_dvr {K : Type*} [Field K]
   have haA : (a : K) ∈ A.nonunits := (ValuationSubring.nonunits_le_nonunits.2 h) haW
   have hcongr : ∀ (P Q : Ideal A) [P.IsPrime] [Q.IsPrime], P = Q → A.ofPrime P = A.ofPrime Q := by
     rintro P Q _ _ rfl; rfl
-  calc A = A.ofPrime (A.idealOfLE A le_rfl) := (A.ofPrime_idealOfLE A le_rfl).symm
+  calc
+    A = A.ofPrime (A.idealOfLE A le_rfl) := (A.ofPrime_idealOfLE A le_rfl).symm
     _ = A.ofPrime (A.idealOfLE W h) := hcongr _ _ ((hmax A le_rfl haA).trans (hmax W h haW).symm)
     _ = W := A.ofPrime_idealOfLE W h
 
-
 open IsLocalRing IsDedekindDomain NumberField in
-theorem _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_of_numberField {L : Type*} [Field L]
-    [NumberField L] (W : ValuationSubring L) {n : ℕ} (hn : n ≠ (0 : ℕ))
-    (hW : (↑n : L) ∈ W.nonunits) :
-      IsDiscreteValuationRing ↥W ∧ Finite (IsLocalRing.ResidueField ↥W) := by
+theorem _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_of_numberField
+    {L : Type*} [Field L] [NumberField L]
+    (W : ValuationSubring L)
+    {n : ℕ} (hn : n ≠ (0 : ℕ)) (hW : (↑n : L) ∈ W.nonunits)
+    : IsDiscreteValuationRing ↥W ∧ Finite (IsLocalRing.ResidueField ↥W) := by
   have hnW := hW
   have hint : ∀ x : 𝓞 L, algebraMap (𝓞 L) L x ∈ W := by
     intro x
     have h : IsIntegral W (x : L) := (RingOfIntegers.isIntegral_coe x).tower_top
     obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.mp h
     show (x : L) ∈ W
-    rw [← hy]; exact y.2
+    rw [← hy]
+    exact y.2
   let f : 𝓞 L →+* W := (algebraMap (𝓞 L) L).codRestrict W hint
   have hf : ∀ x : 𝓞 L, ((f x : W) : L) = (x : L) := fun x => rfl
   let P : Ideal (𝓞 L) := (maximalIdeal W).comap f
   have hPmem : ∀ x : 𝓞 L, x ∈ P ↔ (x : L) ∈ W.nonunits := by
     intro x
-    rw [Ideal.mem_comap, ValuationSubring.valuation_lt_one_iff, ValuationSubring.mem_nonunits_iff, hf]
-  have hnP : (n : 𝓞 L) ∈ P := by
-    rw [hPmem]; simpa using hnW
+    rw [Ideal.mem_comap, ValuationSubring.valuation_lt_one_iff, ValuationSubring.mem_nonunits_iff,
+      hf]
+  have hnP : (n : 𝓞 L) ∈ P := by rw [hPmem]; simpa using hnW
   have hPne : P ≠ ⊥ := by
     intro hbot
     rw [hbot, Ideal.mem_bot] at hnP
@@ -97,22 +102,25 @@ theorem _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_of_n
       by_contra hns
       exact s.2 (show (s : 𝓞 L) ∈ P from (IsLocalRing.mem_maximalIdeal _).2 hns)
     obtain ⟨t, ht⟩ := hsu.exists_right_inv
-    have h1 : ((s : 𝓞 L) : L) * (t : L) = 1 := by
-      rw [← hf]; exact congrArg Subtype.val ht
+    have h1 : ((s : 𝓞 L) : L) * (t : L) = 1 := by rw [← hf]; exact congrArg Subtype.val ht
     have hx' : x = (a : L) * (t : L) := by
-      calc x = x * (((s : 𝓞 L) : L) * (t : L)) := by rw [h1, mul_one]
+      calc
+        x = x * (((s : 𝓞 L) : L) * (t : L)) := by rw [h1, mul_one]
         _ = (a : L) * (t : L) := by rw [← mul_assoc, hspec]
     rw [hx']
     exact mul_mem (hint a) t.2
   obtain ⟨hD, hF⟩ :=
-    _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_valuationSubringAtPrime L v hfin
+    _root_.GlobalTheory.isDiscreteValuationRing_and_finite_residueField_valuationSubringAtPrime L v
+      hfin
   have hnA : (n : L) ∈ A := natCast_mem A n
-  have heq : A = W := eq_of_le_of_mem_nonunits_of_dvr A W hAW ⟨(n : L), hnA⟩
-    (by
-      intro h0
-      have := congrArg Subtype.val h0
-      simp only [ZeroMemClass.coe_zero] at this
-      exact hn (by exact_mod_cast this)) hnW
+  have heq : A = W :=
+    eq_of_le_of_mem_nonunits_of_dvr A W hAW ⟨(n : L), hnA⟩
+      (by
+        intro h0
+        have := congrArg Subtype.val h0
+        simp only [ZeroMemClass.coe_zero] at this
+        exact hn (by exact_mod_cast this))
+      hnW
   rw [← heq]
   exact ⟨hD, hF⟩
 

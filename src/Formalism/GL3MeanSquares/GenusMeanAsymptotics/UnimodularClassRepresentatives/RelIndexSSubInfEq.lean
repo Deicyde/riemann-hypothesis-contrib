@@ -11,35 +11,39 @@ noncomputable section
 namespace Formalism.HermitianLattices.Ext.L3.D2
 
 variable {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-variable {V : Type} [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-  [IsScalarTower (𝓞 K) K V]
+variable
+  {V : Type}
+  [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-private theorem exists_int_add_star_eq_one_of_isCMUnram (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F) :
-    ∃ θ : 𝓞 K, algebraMap (𝓞 K) K θ + star (algebraMap (𝓞 K) K θ) = 1 := by
+private theorem exists_int_add_star_eq_one_of_isCMUnram
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    : ∃ θ : 𝓞 K, algebraMap (𝓞 K) K θ + star (algebraMap (𝓞 K) K θ) = 1 := by
   classical
   have hstarF : ∀ f : F, star (algebraMap F K f) = algebraMap F K f := fun f => (hF _).mpr ⟨f, rfl⟩
   have hint : ∀ c : 𝓞 F, IsIntegral ℤ (algebraMap F K (algebraMap (𝓞 F) F c)) := fun c =>
-    (isIntegral_algebraMap_iff ).mpr
-      (NumberField.RingOfIntegers.isIntegral_coe c)
-  have hcompat : ∀ x : 𝓞 F, algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) x) =
-      algebraMap F K (algebraMap (𝓞 F) F x) := fun x => rfl
+    (isIntegral_algebraMap_iff).mpr (NumberField.RingOfIntegers.isIntegral_coe c)
+  have hcompat
+      : ∀ x : 𝓞 F,
+        algebraMap (𝓞 K) K (algebraMap (𝓞 F) (𝓞 K) x) = algebraMap F K (algebraMap (𝓞 F) F x) :=
+    fun x => rfl
   let tr : 𝓞 K → K := fun θ => algebraMap (𝓞 K) K θ + star (algebraMap (𝓞 K) K θ)
   show ∃ θ : 𝓞 K, tr θ = 1
   by_contra hne
   push_neg at hne
-  let I : Ideal (𝓞 F) :=
-    { carrier := {a | ∃ θ : 𝓞 K, tr θ = algebraMap F K (algebraMap (𝓞 F) F a)}
-      add_mem' := by
-        rintro a b ⟨θ, hθ⟩ ⟨θ', hθ'⟩
-        refine ⟨θ + θ', ?_⟩
-        simp only [tr, map_add (f := _), star_add] at hθ hθ' ⊢
-        linear_combination hθ + hθ'
-      zero_mem' := ⟨0, by simp [tr]⟩
-      smul_mem' := by
-        rintro c a ⟨θ, hθ⟩
-        refine ⟨algebraMap (𝓞 F) (𝓞 K) c * θ, ?_⟩
-        simp only [tr, smul_eq_mul, map_mul, star_mul', hcompat, hstarF] at hθ ⊢
-        linear_combination (algebraMap F K (algebraMap (𝓞 F) F c)) * hθ }
+  let I : Ideal (𝓞 F) := {
+    carrier := {a | ∃ θ : 𝓞 K, tr θ = algebraMap F K (algebraMap (𝓞 F) F a)}
+    add_mem' := by
+      rintro a b ⟨θ, hθ⟩ ⟨θ', hθ'⟩
+      refine ⟨θ + θ', ?_⟩
+      simp only [tr, map_add (f := _), star_add] at hθ hθ' ⊢
+      linear_combination hθ + hθ'
+    zero_mem' := ⟨0, by simp [tr]⟩
+    smul_mem' := by
+      rintro c a ⟨θ, hθ⟩
+      refine ⟨algebraMap (𝓞 F) (𝓞 K) c * θ, ?_⟩
+      simp only [tr, smul_eq_mul, map_mul, star_mul', hcompat, hstarF] at hθ ⊢
+      linear_combination (algebraMap F K (algebraMap (𝓞 F) F c)) * hθ
+  }
   have hI : (1 : 𝓞 F) ∉ I := by
     rintro ⟨θ, hθ⟩
     exact hne θ (by simpa using hθ)
@@ -55,13 +59,14 @@ private theorem exists_int_add_star_eq_one_of_isCMUnram (hK : Formalism.Hermitia
   obtain ⟨P, hP, hP𝔮⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral (S := 𝓞 K) 𝔮 hker
   obtain ⟨a, t, ht, hat⟩ := hK.2.2 P hP
   have hta : star (algebraMap (𝓞 K) K t) = algebraMap (𝓞 K) K a := by rw [ht, star_star]
-  have hdfix : star ((algebraMap (𝓞 K) K a - algebraMap (𝓞 K) K t) ^ 2) =
-      (algebraMap (𝓞 K) K a - algebraMap (𝓞 K) K t) ^ 2 := by
+  have hdfix
+      : star ((algebraMap (𝓞 K) K a - algebraMap (𝓞 K) K t) ^ 2)
+        = (algebraMap (𝓞 K) K a - algebraMap (𝓞 K) K t) ^ 2 := by
     rw [star_pow, star_sub, ← ht, hta]
     ring
   obtain ⟨f, hf⟩ := (hF _).mp hdfix
   have hfi : IsIntegral ℤ f := by
-    rw [← isIntegral_algebraMap_iff (A := F) (B := K) , hf]
+    rw [← isIntegral_algebraMap_iff (A := F) (B := K), hf]
     have := NumberField.RingOfIntegers.isIntegral_coe ((a - t) ^ 2)
     simpa using this
   let fO : 𝓞 F := ⟨f, hfi⟩
@@ -84,9 +89,11 @@ private theorem exists_int_add_star_eq_one_of_isCMUnram (hK : Formalism.Hermitia
   rw [heq] at hmem
   exact hat (hP.isPrime.mem_of_pow_mem 2 hmem)
 
-theorem mul_inv_mem_iff {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) {A B : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)} {n : ℕ}
-    {U W : V ≃ₗ[K] V} (hUA : U ∈ glSub A) (hUB : U ∈ glSub B) (hWA : W ∈ glSub A) (hWB : W ∈ glSub B) :
-    U * W⁻¹ ∈ sSub h B 𝔭 n ⊓ glSub A ↔ IA.phi h U - IA.phi h W ∈ hermL B 𝔭 n := by
+theorem mul_inv_mem_iff
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
+    {A B : Submodule (𝓞 K) V} {𝔭 : Ideal (𝓞 F)} {n : ℕ} {U W : V ≃ₗ[K] V}
+    (hUA : U ∈ glSub A) (hUB : U ∈ glSub B) (hWA : W ∈ glSub A) (hWB : W ∈ glSub B)
+    : U * W⁻¹ ∈ sSub h B 𝔭 n ⊓ glSub A ↔ IA.phi h U - IA.phi h W ∈ hermL B 𝔭 n := by
   have eW : ∀ z : V, W (W⁻¹ z) = z := fun z => by
     rw [← LinearEquiv.mul_apply, mul_inv_cancel]
     rfl
@@ -102,21 +109,27 @@ theorem mul_inv_mem_iff {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) {A B 
       simp only [LinearEquiv.mul_apply, eW'] at this
       simpa only [LinearMap.sub_apply, IA.phi_apply, sub_sub_sub_cancel_right] using this
   · intro hZ
-    refine Subgroup.mem_inf.mpr ⟨⟨mul_mem hUB (inv_mem hWB), fun x hx y hy => ?_⟩,
-      mul_mem hUA (inv_mem hWA)⟩
+    refine Subgroup.mem_inf.mpr
+      ⟨⟨mul_mem hUB (inv_mem hWB), fun x hx y hy => ?_⟩, mul_mem hUA (inv_mem hWA)⟩
     have := hZ.2 (W⁻¹ x) (apply_mem (inv_mem hWB) hx) (W⁻¹ y) (apply_mem (inv_mem hWB) hy)
     simp only [LinearMap.sub_apply, IA.phi_apply, sub_sub_sub_cancel_right, eW] at this
     simpa only [LinearEquiv.mul_apply] using this
 
-theorem exists_newton (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsFullLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {B₀ : Submodule (𝓞 K) V}
-    (hB₀ : Submodule.IsFullLattice K B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {r r' e : ℕ}
+theorem exists_newton
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
+    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {B₀ : Submodule (𝓞 K) V} (hB₀ : Submodule.IsFullLattice K B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {r r' e : ℕ}
     (hr : extP K 𝔭 ^ r • locF 𝔭 A₀ ≤ locF 𝔭 B₀) (hr' : extP K 𝔭 ^ r' • locF 𝔭 B₀ ≤ locF 𝔭 A₀)
-    (he : ∀ (k : ℕ) (x : V), (∀ y ∈ locF 𝔭 A₀, h y x ∈ pK K 𝔭 (k + e)) → x ∈ extP K 𝔭 ^ k • locF 𝔭 A₀)
-    {k c : ℕ} (hk : c + 2 * e + 2 * r' + r + r' + 1 ≤ k) {Z : V →ₗ⋆[K] V →ₗ[K] K}
-    (hZ : Z ∈ hermL (locF 𝔭 A₀) 𝔭 k) :
-    ∃ X ∈ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀), IA.phi h X - Z ∈ hermL (locF 𝔭 B₀) 𝔭 (k + c) := by
+    (he
+      : ∀ (k : ℕ) (x : V), (∀ y ∈ locF 𝔭 A₀, h y x ∈ pK K 𝔭 (k + e)) → x ∈ extP K 𝔭 ^ k • locF 𝔭 A₀)
+    {k c : ℕ} (hk : c + 2 * e + 2 * r' + r + r' + 1 ≤ k)
+    {Z : V →ₗ⋆[K] V →ₗ[K] K} (hZ : Z ∈ hermL (locF 𝔭 A₀) 𝔭 k)
+    : ∃ X ∈ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀),
+      IA.phi h X - Z ∈ hermL (locF 𝔭 B₀) 𝔭 (k + c) := by
   have hsym : ∀ a b : V, star (h a b) = h b a := by
     intro a b
     exact hs.eq a b
@@ -160,46 +173,56 @@ theorem exists_newton (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF :
     exact add_mem (hZ.2 x hx y hy) (pK_anti 𝔭 (by omega) (hYY x hx y hy))
   · intro x y
     simp only [LinearMap.sub_apply, star_sub, IA.star_phi hs, hZ.1]
-  · refine IA.sesq_scale hF h𝔭 hr' (IA.phi h X - Z) (n := k + c) (m := (k - e) + (k - e))
-      (by omega) ?_
+  · refine IA.sesq_scale hF h𝔭 hr' (IA.phi h X - Z) (n := k + c) (m := (k - e) + (k - e)) (by omega)
+      ?_
     intro x hx y hy
     rw [LinearMap.sub_apply, LinearMap.sub_apply, hphi]
     exact hYY x hx y hy
 
-theorem relIndex_sSub_inf_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
-    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h) {A₀ : Submodule (𝓞 K) V}
-    (hA₀ : Submodule.IsFullLattice K A₀) (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀) {B₀ : Submodule (𝓞 K) V}
-    (hB₀ : Submodule.IsFullLattice K B₀) (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀) {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) :
-    ∃ c₀ : ℕ, ∀ c ≥ c₀, ∃ k₀ : ℕ, ∀ k ≥ k₀,
-      sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀) ≤ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) ∧
-      sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k ∧
-      (sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)).relIndex
-          (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)) =
-        (hermL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (hermL (locF 𝔭 A₀) 𝔭 k) := by
+theorem relIndex_sSub_inf_eq
+    (hK : Formalism.HermitianLatticesTheory.IsCMUnram K) (hF : IsFixF K F)
+    {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) (hd : IsTotPosDef h)
+    {A₀ : Submodule (𝓞 K) V} (hA₀ : Submodule.IsFullLattice K A₀)
+    (hA₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h A₀)
+    {B₀ : Submodule (𝓞 K) V} (hB₀ : Submodule.IsFullLattice K B₀)
+    (hB₀i : Formalism.HermitianLatticesTheory.IsIntegralLat h B₀)
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    : ∃ c₀ : ℕ, ∀ c ≥ c₀, ∃ k₀ : ℕ, ∀ k ≥ k₀,
+      sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀) ≤ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)
+        ∧ sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k
+        ∧ (sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)).relIndex
+            (sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀))
+          = (hermL (locF 𝔭 B₀) 𝔭 (k + c)).relIndex (hermL (locF 𝔭 A₀) 𝔭 k) := by
   obtain ⟨r, hr⟩ := exists_smul_le hA₀.toIsLattice hB₀ h𝔭
   obtain ⟨r', hr'⟩ := exists_smul_le hB₀.toIsLattice hA₀ h𝔭
   obtain ⟨e, he⟩ := exists_dual_bound hK hF hs hd hA₀ h𝔭
   refine ⟨2 * r, fun c hc => ⟨c + 2 * e + 2 * r' + r + r' + 1, fun k hk => ?_⟩⟩
 
-  have hGA : ∀ {X : V ≃ₗ[K] V}, X ∈ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) →
-      X ∈ glSub (locF 𝔭 A₀) ∧ X ∈ glSub (locF 𝔭 B₀) := fun hX =>
+  have hGA
+      : ∀ {X : V ≃ₗ[K] V},
+        X ∈ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀)
+          → X ∈ glSub (locF 𝔭 A₀) ∧ X ∈ glSub (locF 𝔭 B₀) := fun hX =>
     ⟨(mem_sSub.mp (Subgroup.mem_inf.mp hX).1).1, (Subgroup.mem_inf.mp hX).2⟩
-  have hphiA : ∀ {X : V ≃ₗ[K] V}, X ∈ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) →
-      IA.phi h X ∈ hermL (locF 𝔭 A₀) 𝔭 k := by
+  have hphiA
+      : ∀ {X : V ≃ₗ[K] V},
+        X ∈ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) → IA.phi h X ∈ hermL (locF 𝔭 A₀) 𝔭 k := by
     intro X hX
     refine ⟨fun x y => IA.star_phi hs X x y, fun x hx y hy => ?_⟩
     rw [IA.phi_apply]
     exact (mem_sSub.mp (Subgroup.mem_inf.mp hX).1).2 x hx y hy
   have hsesq : sesqL (locF 𝔭 B₀) 𝔭 (k + c) ≤ sesqL (locF 𝔭 A₀) 𝔭 k := fun s hs' =>
     IA.sesq_scale hF h𝔭 hr s (n := k) (m := k + c) (by omega) hs'
-  have hHG : sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀) ≤
-      sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) := by
+  have hHG
+      : sSub h (locF 𝔭 B₀) 𝔭 (k + c) ⊓ glSub (locF 𝔭 A₀)
+        ≤ sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) := by
     intro X hX
     obtain ⟨hXB, hXA⟩ := Subgroup.mem_inf.mp hX
     obtain ⟨hXBgl, hXBv⟩ := mem_sSub.mp hXB
     refine Subgroup.mem_inf.mpr ⟨mem_sSub.mpr ⟨hXA, fun x hx y hy => ?_⟩, hXBgl⟩
-    have := IA.sesq_scale hF h𝔭 hr (IA.phi h X) (n := k) (m := k + c) (by omega)
-      (fun x hx y hy => by rw [IA.phi_apply]; exact hXBv x hx y hy) x hx y hy
+    have :=
+      IA.sesq_scale hF h𝔭 hr (IA.phi h X) (n := k) (m := k + c) (by omega)
+        (fun x hx y hy => by rw [IA.phi_apply]; exact hXBv x hx y hy)
+        x hx y hy
     rwa [IA.phi_apply] at this
   refine ⟨hHG, hsesq, ?_⟩
   set G := sSub h (locF 𝔭 A₀) 𝔭 k ⊓ glSub (locF 𝔭 B₀) with hGdef
@@ -207,8 +230,10 @@ theorem relIndex_sSub_inf_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K
   set HA := hermL (locF 𝔭 A₀) 𝔭 k with hHAdef
   set HB := hermL (locF 𝔭 B₀) 𝔭 (k + c) with hHBdef
 
-  have key : ∀ X Y : G, (QuotientGroup.mk X : G ⧸ H.subgroupOf G) = QuotientGroup.mk Y ↔
-      IA.phi h (X : V ≃ₗ[K] V)⁻¹ - IA.phi h (Y : V ≃ₗ[K] V)⁻¹ ∈ HB := by
+  have key
+      : ∀ X Y : G,
+        (QuotientGroup.mk X : G ⧸ H.subgroupOf G) = QuotientGroup.mk Y
+          ↔ IA.phi h (X : V ≃ₗ[K] V)⁻¹ - IA.phi h (Y : V ≃ₗ[K] V)⁻¹ ∈ HB := by
     intro X Y
     rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
     have hX := hGA (inv_mem X.2)
@@ -219,8 +244,10 @@ theorem relIndex_sSub_inf_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K
     simp only [Subgroup.coe_mul, Subgroup.coe_inv]
     try exact Iff.rfl
   have hmk : ∀ X : G, IA.phi h (X : V ≃ₗ[K] V)⁻¹ ∈ HA := fun X => hphiA (inv_mem X.2)
-  have keyA : ∀ a b : HA, (QuotientAddGroup.mk a : HA ⧸ HB.addSubgroupOf HA) = QuotientAddGroup.mk b ↔
-      (a : V →ₗ⋆[K] V →ₗ[K] K) - b ∈ HB := by
+  have keyA
+      : ∀ a b : HA,
+        (QuotientAddGroup.mk a : HA ⧸ HB.addSubgroupOf HA) = QuotientAddGroup.mk b
+          ↔ (a : V →ₗ⋆[K] V →ₗ[K] K) - b ∈ HB := by
     intro a b
     rw [QuotientAddGroup.eq, AddSubgroup.mem_addSubgroupOf, AddSubgroup.coe_add,
       AddSubgroup.coe_neg]
@@ -232,27 +259,28 @@ theorem relIndex_sSub_inf_eq (hK : Formalism.HermitianLatticesTheory.IsCMUnram K
       have := HB.neg_mem hab
       rwa [neg_sub, sub_eq_neg_add] at this
   let f : G ⧸ H.subgroupOf G → HA ⧸ HB.addSubgroupOf HA :=
-    Quotient.lift (fun X : G => (QuotientAddGroup.mk ⟨_, hmk X⟩ : HA ⧸ HB.addSubgroupOf HA))
+    Quotient.lift
+      (fun X : G => (QuotientAddGroup.mk ⟨_, hmk X⟩ : HA ⧸ HB.addSubgroupOf HA))
       (fun X Y hXY => (keyA _ _).mpr ((key X Y).mp (Quotient.sound hXY)))
   have hinj : Function.Injective f := by
     intro q₁ q₂
     induction q₁ using QuotientGroup.induction_on with
     | H X =>
-    induction q₂ using QuotientGroup.induction_on with
-    | H Y =>
-    intro hXY
-    exact (key X Y).mpr ((keyA _ _).mp hXY)
+      induction q₂ using QuotientGroup.induction_on with
+      | H Y =>
+        intro hXY
+        exact (key X Y).mpr ((keyA _ _).mp hXY)
   have hsurj : Function.Surjective f := by
     intro q
     induction q using QuotientAddGroup.induction_on with
     | H Z =>
-    obtain ⟨X, hXG, hXZ⟩ := exists_newton hK hF hs hd hA₀ hA₀i hB₀ h𝔭 hr hr' he (c := c) (k := k)
-      (by omega) Z.2
-    refine ⟨QuotientGroup.mk ⟨X⁻¹, inv_mem hXG⟩, ?_⟩
-    show (QuotientAddGroup.mk ⟨_, hmk ⟨X⁻¹, inv_mem hXG⟩⟩ : HA ⧸ HB.addSubgroupOf HA) =
-      QuotientAddGroup.mk Z
-    rw [keyA]
-    simpa only [inv_inv] using hXZ
+      obtain ⟨X, hXG, hXZ⟩ :=
+        exists_newton hK hF hs hd hA₀ hA₀i hB₀ h𝔭 hr hr' he (c := c) (k := k) (by omega) Z.2
+      refine ⟨QuotientGroup.mk ⟨X⁻¹, inv_mem hXG⟩, ?_⟩
+      show (QuotientAddGroup.mk ⟨_, hmk ⟨X⁻¹, inv_mem hXG⟩⟩ : HA ⧸ HB.addSubgroupOf HA) =
+        QuotientAddGroup.mk Z
+      rw [keyA]
+      simpa only [inv_inv] using hXZ
   show Nat.card (G ⧸ H.subgroupOf G) = Nat.card (HA ⧸ HB.addSubgroupOf HA)
   exact Nat.card_congr (Equiv.ofBijective f ⟨hinj, hsurj⟩)
 

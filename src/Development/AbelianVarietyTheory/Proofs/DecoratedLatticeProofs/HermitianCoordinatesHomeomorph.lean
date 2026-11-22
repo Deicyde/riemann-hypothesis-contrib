@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.OneVectorCcOf
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
+open NumberField IsDedekindDomain MeasureTheory Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx
 open scoped TensorProduct NNReal ENNReal
 open GlobalTheory.SWC GlobalTheory.HermSD
 
@@ -16,18 +17,24 @@ namespace GlobalTheory.HermCoordEquiv
 
 open GlobalTheory.GaussMean.OneVec
 
-theorem sum_sum_split {M : Type} [AddCommMonoid M] {n : ℕ} (f : Fin n → Fin n → M) :
-    ∑ a, ∑ b, f a b = ∑ a, f a a + ∑ p : {p : Fin n × Fin n // p.1 < p.2}, (f p.1.1 p.1.2 + f p.1.2 p.1.1) := by
+theorem sum_sum_split {M : Type} [AddCommMonoid M] {n : ℕ} (f : Fin n → Fin n → M)
+    : ∑ a, ∑ b, f a b
+      = ∑ a, f a a + ∑ p : {p : Fin n × Fin n // p.1 < p.2}, (f p.1.1 p.1.2 + f p.1.2 p.1.1) := by
   classical
-  have h1 : ∀ a b, f a b = (if a < b then f a b else 0) + (if a = b then f a b else 0) +
-      (if b < a then f a b else 0) := by
+  have h1
+      : ∀ a b,
+        f a b
+          = (if a < b then f a b else 0) + (if a = b then f a b else 0)
+            + (if b < a then f a b else 0) := by
     intro a b
     rcases lt_trichotomy a b with h | h | h
     · simp [h, h.ne, not_lt.2 h.le]
     · subst h; simp
     · simp [h, h.ne', not_lt.2 h.le]
-  have hsub : ∀ g : Fin n → Fin n → M, ∑ p : {p : Fin n × Fin n // p.1 < p.2}, g p.1.1 p.1.2 =
-      ∑ a, ∑ b, if a < b then g a b else 0 := by
+  have hsub
+      : ∀ g : Fin n → Fin n → M,
+        ∑ p : {p : Fin n × Fin n // p.1 < p.2}, g p.1.1 p.1.2
+          = ∑ a, ∑ b, if a < b then g a b else 0 := by
     intro g
     rw [← Fintype.sum_prod_type' (f := fun a b => if a < b then g a b else 0), ← Finset.sum_filter]
     exact (Finset.sum_subtype _ (by simp) (fun a : Fin n × Fin n => g a.1 a.2)).symm
@@ -39,20 +46,25 @@ theorem sum_sum_split {M : Type} [AddCommMonoid M] {n : ℕ} (f : Fin n → Fin 
 
 section Main
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {σ : E →ₐ[F] E}
   (R : Type) [CommRing R] [Algebra F R]
 
-theorem pair_eq (h : IsCMExt F E σ) {n : ℕ} (S T : HermR R σ n) :
-    pairHerm R σ n S T = coordPair R σ n (hermCoord R σ S) (hermCoord R σ T) := by
+theorem pair_eq (h : IsCMExt F E σ) {n : ℕ} (S T : HermR R σ n)
+    : pairHerm R σ n S T = coordPair R σ n (hermCoord R σ S) (hermCoord R σ T) := by
   unfold pairHerm coordPair
-  rw [sum_sum_split (fun a b => (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a b * (T : Matrix (Fin n) (Fin n) _) b a)]
+  rw [sum_sum_split (fun a b =>
+    (S : Matrix (Fin n) (Fin n) (R ⊗[F] E)) a b * (T : Matrix (Fin n) (Fin n) _) b a)]
   beta_reduce
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_add (f := _), map_sum, map_sum, mul_add, Finset.mul_sum, Finset.mul_sum]
   congr 1
   · refine Finset.sum_congr rfl fun a _ => ?_
-    have := half_trace R h (algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (S.1 a a) *
-      (algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (T.1 a a)))
+    have :=
+      half_trace R h
+        (algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (S.1 a a)
+          * (algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (T.1 a a)))
     rw [map_mul, fixed_eq R h (S.2 a a), fixed_eq R h (T.2 a a)] at this
     simpa [hermCoord] using this
   · refine Finset.sum_congr rfl fun p _ => ?_
@@ -60,8 +72,11 @@ theorem pair_eq (h : IsCMExt F E σ) {n : ℕ} (S T : HermR R σ n) :
     have hS : S.1 p.1.2 p.1.1 = sigR R σ (S.1 p.1.1 p.1.2) := (S.2 p.1.2 p.1.1).symm
     simp only [hermCoord]
     rw [hT, hS]
-    have hw : S.1 p.1.1 p.1.2 * sigR R σ (T.1 p.1.1 p.1.2) + sigR R σ (S.1 p.1.1 p.1.2) * T.1 p.1.1 p.1.2 =
-        algebraMap R (R ⊗[F] E) (Algebra.trace R (R ⊗[F] E) (sigR R σ (S.1 p.1.1 p.1.2) * T.1 p.1.1 p.1.2)) := by
+    have hw
+        : S.1 p.1.1 p.1.2 * sigR R σ (T.1 p.1.1 p.1.2)
+            + sigR R σ (S.1 p.1.1 p.1.2) * T.1 p.1.1 p.1.2
+          = algebraMap R (R ⊗[F] E)
+            (Algebra.trace R (R ⊗[F] E) (sigR R σ (S.1 p.1.1 p.1.2) * T.1 p.1.1 p.1.2)) := by
       rw [← add_sigR R h, add_comm, map_mul, sigR_sigR R h]
     rw [hw, half_trace R h]
 

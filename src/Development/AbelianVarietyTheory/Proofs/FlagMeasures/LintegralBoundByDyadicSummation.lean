@@ -9,39 +9,45 @@ open scoped ENNReal
 
 namespace GlobalTheory.Dyadic
 
-theorem lintegral_mul_le_of_sq {X : Type} [MeasurableSpace X] (μ : Measure X) (A B : X → ℝ)
-    (hA : Measurable A) (α β : ℝ) (hα : 0 < α) (hβ : 0 < β)
-    (h1 : ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ ≤ ENNReal.ofReal (α ^ 2))
-    (h2 : ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ ≤ ENNReal.ofReal (β ^ 2)) :
-    ∫⁻ x, ENNReal.ofReal (A x * B x) ∂μ ≤ ENNReal.ofReal (α * β) := by
+theorem lintegral_mul_le_of_sq
+    {X : Type} [MeasurableSpace X]
+    (μ : Measure X)
+    (A B : X → ℝ) (hA : Measurable A)
+    (α β : ℝ)
+    (hα : 0 < α) (hβ : 0 < β) (h1 : ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ ≤ ENNReal.ofReal (α ^ 2))
+    (h2 : ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ ≤ ENNReal.ofReal (β ^ 2))
+    : ∫⁻ x, ENNReal.ofReal (A x * B x) ∂μ ≤ ENNReal.ofReal (α * β) := by
   have hc : 0 ≤ β / (2 * α) := by positivity
   have hd : 0 ≤ α / (2 * β) := by positivity
-  calc ∫⁻ x, ENNReal.ofReal (A x * B x) ∂μ
-      ≤ ∫⁻ x, (ENNReal.ofReal (β / (2 * α)) * ENNReal.ofReal (A x ^ 2)
-          + ENNReal.ofReal (α / (2 * β)) * ENNReal.ofReal (B x ^ 2)) ∂μ := by
-        refine lintegral_mono fun x => ?_
-        rw [← ENNReal.ofReal_mul hc, ← ENNReal.ofReal_mul hd,
-          ← ENNReal.ofReal_add (by positivity) (by positivity)]
-        refine ENNReal.ofReal_le_ofReal ?_
-        have : β / (2 * α) * A x ^ 2 + α / (2 * β) * B x ^ 2 - A x * B x
-            = (β * A x - α * B x) ^ 2 / (2 * α * β) := by
-          field_simp; ring
-        have h3 : 0 ≤ (β * A x - α * B x) ^ 2 / (2 * α * β) := by positivity
-        linarith
-    _ = ENNReal.ofReal (β / (2 * α)) * ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ
-          + ENNReal.ofReal (α / (2 * β)) * ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ := by
-        rw [lintegral_add_left (by fun_prop), lintegral_const_mul' _ _ ENNReal.ofReal_ne_top,
-          lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
-    _ ≤ ENNReal.ofReal (β / (2 * α)) * ENNReal.ofReal (α ^ 2)
-          + ENNReal.ofReal (α / (2 * β)) * ENNReal.ofReal (β ^ 2) := by gcongr
-    _ = ENNReal.ofReal (α * β) := by
-        rw [← ENNReal.ofReal_mul hc, ← ENNReal.ofReal_mul hd,
-          ← ENNReal.ofReal_add (by positivity) (by positivity)]
-        congr 1
+  calc
+    ∫⁻ x, ENNReal.ofReal (A x * B x) ∂μ
+        ≤ ∫⁻ x, (ENNReal.ofReal (β / (2 * α)) * ENNReal.ofReal (A x ^ 2)
+            + ENNReal.ofReal (α / (2 * β)) * ENNReal.ofReal (B x ^ 2)) ∂μ := by
+      refine lintegral_mono fun x => ?_
+      rw [← ENNReal.ofReal_mul hc, ← ENNReal.ofReal_mul hd,
+        ← ENNReal.ofReal_add (by positivity) (by positivity)]
+      refine ENNReal.ofReal_le_ofReal ?_
+      have : β / (2 * α) * A x ^ 2 + α / (2 * β) * B x ^ 2 - A x * B x
+          = (β * A x - α * B x) ^ 2 / (2 * α * β) := by
         field_simp; ring
+      have h3 : 0 ≤ (β * A x - α * B x) ^ 2 / (2 * α * β) := by positivity
+      linarith
+    _ = ENNReal.ofReal (β / (2 * α)) * ∫⁻ x, ENNReal.ofReal (A x ^ 2) ∂μ
+        + ENNReal.ofReal (α / (2 * β)) * ∫⁻ x, ENNReal.ofReal (B x ^ 2) ∂μ := by
+      rw [lintegral_add_left (by fun_prop), lintegral_const_mul' _ _ ENNReal.ofReal_ne_top,
+        lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
+    _ ≤ ENNReal.ofReal (β / (2 * α)) * ENNReal.ofReal (α ^ 2)
+        + ENNReal.ofReal (α / (2 * β)) * ENNReal.ofReal (β ^ 2) := by
+      gcongr
+    _ = ENNReal.ofReal (α * β) := by
+      rw [← ENNReal.ofReal_mul hc, ← ENNReal.ofReal_mul hd,
+        ← ENNReal.ofReal_add (by positivity) (by positivity)]
+      congr 1
+      field_simp
+      ring
 
-theorem exists_shell (s H : ℝ) (hH : 0 < H) :
-    ∃ i : ℕ, s ≤ 2 ^ i * H ∧ (i = 0 ∨ 2 ^ i * H / 2 < s) := by
+theorem exists_shell (s H : ℝ) (hH : 0 < H)
+    : ∃ i : ℕ, s ≤ 2 ^ i * H ∧ (i = 0 ∨ 2 ^ i * H / 2 < s) := by
   have hex : ∃ i : ℕ, s ≤ 2 ^ i * H := by
     obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (s / H) (one_lt_two (α := ℝ))
     exact ⟨n, ((div_lt_iff₀ hH).1 hn).le⟩
@@ -52,38 +58,45 @@ theorem exists_shell (s H : ℝ) (hH : 0 < H) :
   · right
     have := Nat.find_min hex (m := j) (by omega)
     push Not at this
-    rw [pow_succ]; linarith
+    rw [pow_succ]
+    linarith
 
-theorem exists_shell_down (y T : ℝ) (hy : 0 < y) (hT : y ≤ T) :
-    ∃ a : ℕ, T / 2 ^ (a + 1) < y ∧ y ≤ 2 * (T / 2 ^ (a + 1)) := by
-  obtain ⟨n, h1, h2⟩ := exists_nat_pow_near (x := T / y) (y := (2 : ℝ))
-    ((one_le_div hy).2 hT) one_lt_two
+theorem exists_shell_down (y T : ℝ) (hy : 0 < y) (hT : y ≤ T)
+    : ∃ a : ℕ, T / 2 ^ (a + 1) < y ∧ y ≤ 2 * (T / 2 ^ (a + 1)) := by
+  obtain ⟨n, h1, h2⟩ :=
+    exists_nat_pow_near (x := T / y) (y := (2 : ℝ)) ((one_le_div hy).2 hT) one_lt_two
   refine ⟨n, ?_, ?_⟩
   · rw [div_lt_iff₀ (by positivity)]
-    rw [div_lt_iff₀ hy] at h2; linarith
+    rw [div_lt_iff₀ hy] at h2
+    linarith
   · rw [le_div_iff₀ hy] at h1
     have : 2 * (T / 2 ^ (n + 1)) = T / 2 ^ n := by rw [pow_succ]; field_simp
-    rw [this, le_div_iff₀ (by positivity)]; linarith
+    rw [this, le_div_iff₀ (by positivity)]
+    linarith
 
-theorem piece_bound (r kk : ℕ) (H De D l l' u v : ℝ) (hr : 1 ≤ r) (hkk : 1 ≤ kk) (hH : 1 ≤ H)
-    (hDe : 1 ≤ De) (hD : 0 < D) (hl : 1 ≤ l) (hl' : 1 ≤ l') (hu : 0 < u) (hv : 0 < v)
-    (h1 : (r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / u *
-      ((r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / v) * D ≤ 2 ^ r)
-    (h2 : D ≤ (l * l' * H) ^ (2 * r)) :
-    ((l * l' * H) ^ (10 * r ^ 3) * ((r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / u) ^ kk *
-        (l ^ (24 * r ^ 3 + 1))⁻¹) *
-      ((l * l' * H) ^ (10 * r ^ 3) * ((r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / v) ^ kk *
-        (l' ^ (24 * r ^ 3 + 1))⁻¹) ≤
-      (r : ℝ) ^ (2 * r) * H ^ (24 * r ^ 3) * De ^ (2 * r) * (2 ^ r / D) ^ kk *
-        (l⁻¹ * l'⁻¹ * u⁻¹ * v⁻¹) := by
-  have hR : 1 ≤ l * l' * H := one_le_mul_of_one_le_of_one_le
-    (one_le_mul_of_one_le_of_one_le hl hl') hH
-  have hRe : (l * l' * H) ^ (24 * r ^ 3) = l ^ (24 * r ^ 3) * l' ^ (24 * r ^ 3) * H ^ (24 * r ^ 3) := by
+theorem piece_bound
+    (r kk : ℕ) (H De D l l' u v : ℝ) (hr : 1 ≤ r) (hkk : 1 ≤ kk) (hH : 1 ≤ H) (hDe : 1 ≤ De)
+    (hD : 0 < D) (hl : 1 ≤ l) (hl' : 1 ≤ l') (hu : 0 < u) (hv : 0 < v)
+    (h1 : (r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / u
+        * ((r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / v) * D
+      ≤ 2 ^ r)
+    (h2 : D ≤ (l * l' * H) ^ (2 * r))
+    : ((l * l' * H) ^ (10 * r ^ 3) * ((r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / u) ^ kk
+          * (l ^ (24 * r ^ 3 + 1))⁻¹)
+        * ((l * l' * H) ^ (10 * r ^ 3) * ((r * (l * l' * H) ^ (2 * r - 1) * De) ^ r / v) ^ kk
+          * (l' ^ (24 * r ^ 3 + 1))⁻¹)
+      ≤ (r : ℝ) ^ (2 * r) * H ^ (24 * r ^ 3) * De ^ (2 * r) * (2 ^ r / D) ^ kk
+        * (l⁻¹ * l'⁻¹ * u⁻¹ * v⁻¹) := by
+  have hR : 1 ≤ l * l' * H :=
+    one_le_mul_of_one_le_of_one_le (one_le_mul_of_one_le_of_one_le hl hl') hH
+  have hRe
+      : (l * l' * H) ^ (24 * r ^ 3) = l ^ (24 * r ^ 3) * l' ^ (24 * r ^ 3) * H ^ (24 * r ^ 3) := by
     rw [mul_pow, mul_pow]
   generalize l * l' * H = R at *
   have hr0 : (0 : ℝ) < r := by exact_mod_cast hr
-  have hT2 : (r * R ^ (2 * r - 1) * De) ^ r * (r * R ^ (2 * r - 1) * De) ^ r * R ^ (2 * r)
-      = (r : ℝ) ^ (2 * r) * De ^ (2 * r) * R ^ (4 * r ^ 2) := by
+  have hT2
+      : (r * R ^ (2 * r - 1) * De) ^ r * (r * R ^ (2 * r - 1) * De) ^ r * R ^ (2 * r)
+        = (r : ℝ) ^ (2 * r) * De ^ (2 * r) * R ^ (4 * r ^ 2) := by
     obtain ⟨m, rfl⟩ : ∃ m, r = m + 1 := ⟨r - 1, by omega⟩
     have : 2 * (m + 1) - 1 = 2 * m + 1 := by omega
     rw [this]
@@ -101,10 +114,14 @@ theorem piece_bound (r kk : ℕ) (H De D l l' u v : ℝ) (hr : 1 ≤ r) (hkk : 1
     have h4 : w ^ m ≤ P ^ m := pow_le_pow_left₀ hwpos.le hwP m
     have h5 : 1 ≤ P * R ^ (2 * r) := by
       have : (1 : ℝ) ≤ 2 ^ r := one_le_pow₀ one_le_two
-      calc (1 : ℝ) ≤ 2 ^ r := this
+      calc
+        (1 : ℝ)
+          ≤ 2 ^ r := this
         _ = P * D := by rw [hP]; field_simp
         _ ≤ P * R ^ (2 * r) := by gcongr
-    calc w ^ (m + 1) = w ^ m * w * 1 := by ring
+    calc
+      w ^ (m + 1)
+        = w ^ m * w * 1 := by ring
       _ ≤ P ^ m * w * (P * R ^ (2 * r)) := by gcongr
       _ = _ := by rw [hw]; ring
   rw [hT2] at h3
@@ -117,15 +134,21 @@ theorem piece_bound (r kk : ℕ) (H De D l l' u v : ℝ) (hr : 1 ≤ r) (hkk : 1
   have hl0' : 0 < l' := by linarith
   have hR0 : 0 < R := by linarith
   have hDe0 : 0 < De := by linarith
-  calc _ = R ^ (10 * r ^ 3) * R ^ (10 * r ^ 3) * w ^ kk *
-        ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by
-          rw [hw, mul_pow]; ring
-    _ ≤ R ^ (10 * r ^ 3) * R ^ (10 * r ^ 3) * (P ^ kk * ((r : ℝ) ^ (2 * r) * De ^ (2 * r) * R ^ (4 * r ^ 2) * (u⁻¹ * v⁻¹))) *
-        ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by gcongr
-    _ = (R ^ (10 * r ^ 3) * R ^ (10 * r ^ 3) * R ^ (4 * r ^ 2)) * (P ^ kk * ((r : ℝ) ^ (2 * r) * De ^ (2 * r) * (u⁻¹ * v⁻¹))) *
-        ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by ac_rfl
-    _ ≤ R ^ (24 * r ^ 3) * (P ^ kk * ((r : ℝ) ^ (2 * r) * De ^ (2 * r) * (u⁻¹ * v⁻¹))) *
-        ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by gcongr
+  calc
+    _ = R ^ (10 * r ^ 3) * R ^ (10 * r ^ 3) * w ^ kk
+        * ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by
+      rw [hw, mul_pow]; ring
+    _ ≤ R ^ (10 * r ^ 3) * R ^ (10 * r ^ 3)
+        * (P ^ kk * ((r : ℝ) ^ (2 * r) * De ^ (2 * r) * R ^ (4 * r ^ 2) * (u⁻¹ * v⁻¹)))
+        * ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by
+      gcongr
+    _ = (R ^ (10 * r ^ 3) * R ^ (10 * r ^ 3) * R ^ (4 * r ^ 2))
+        * (P ^ kk * ((r : ℝ) ^ (2 * r) * De ^ (2 * r) * (u⁻¹ * v⁻¹)))
+        * ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by
+      ac_rfl
+    _ ≤ R ^ (24 * r ^ 3) * (P ^ kk * ((r : ℝ) ^ (2 * r) * De ^ (2 * r) * (u⁻¹ * v⁻¹)))
+        * ((l ^ (24 * r ^ 3 + 1))⁻¹ * (l' ^ (24 * r ^ 3 + 1))⁻¹) := by
+      gcongr
     _ = _ := by
       rw [hRe, pow_succ l, pow_succ l']
       have e1 : 0 < l ^ (24 * r ^ 3) := by positivity
@@ -138,11 +161,10 @@ theorem piece_bound (r kk : ℕ) (H De D l l' u v : ℝ) (hr : 1 ≤ r) (hkk : 1
       generalize De ^ (2 * r) = f
       field_simp
 
-theorem tsum_four (C : ℝ≥0∞) :
-    ∑' p : ℕ × ℕ × ℕ × ℕ, C * (2⁻¹ ^ p.1 * (2⁻¹ ^ p.2.1 * (2⁻¹ ^ p.2.2.1 * 2⁻¹ ^ p.2.2.2)))
+theorem tsum_four (C : ℝ≥0∞)
+    : ∑' p : ℕ × ℕ × ℕ × ℕ, C * (2⁻¹ ^ p.1 * (2⁻¹ ^ p.2.1 * (2⁻¹ ^ p.2.2.1 * 2⁻¹ ^ p.2.2.2)))
       = C * 16 := by
-  have h : ∑' n : ℕ, (2⁻¹ : ℝ≥0∞) ^ n = 2 := by
-    rw [ENNReal.tsum_geometric]; simp
+  have h : ∑' n : ℕ, (2⁻¹ : ℝ≥0∞) ^ n = 2 := by rw [ENNReal.tsum_geometric]; simp
   simp only [ENNReal.tsum_prod', ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, h]
   norm_num
 

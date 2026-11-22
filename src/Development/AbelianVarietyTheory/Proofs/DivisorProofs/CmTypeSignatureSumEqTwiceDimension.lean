@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EigRank
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -20,10 +23,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.BalProj
 
-theorem signature_count : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (p q : ℕ),
-    ∑ τ : E →+* ℂ, (if τ (H.rt : E) = H.rt0 then p else q) *
-      (if NumberField.ComplexEmbedding.conjugate τ (H.rt : E) = H.rt0 then p else q) =
-      2 * (Module.finrank ℚ E / 2 * p * q) := by
+theorem signature_count
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (p q : ℕ),
+      ∑ τ : E →+* ℂ, (if τ (H.rt : E) = H.rt0 then p else q) *
+        (if NumberField.ComplexEmbedding.conjugate τ (H.rt : E) = H.rt0 then p else q)
+        = 2 * (Module.finrank ℚ E / 2 * p * q) := by
   intro E _ _ _ H p q
   have hdpos : (0 : ℝ) < H.d := by exact_mod_cast H.d_prime.pos
   have h0 := H.sqrt_neg_disc_sq
@@ -44,15 +48,17 @@ theorem signature_count : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
     rw [h] at h0
     have : (H.d : ℂ) = 0 := by simpa using h0
     exact hdpos.ne' (by exact_mod_cast this)
-  have hconj : (starRingEnd ℂ) H.rt0 = -H.rt0 := by
-    apply Complex.ext <;> simp [hre]
+  have hconj : (starRingEnd ℂ) H.rt0 = -H.rt0 := by apply Complex.ext <;> simp [hre]
   have hnn : H.rt0 ≠ -H.rt0 := by
     intro h
     apply hne
     have : (2 : ℂ) * H.rt0 = 0 := by rw [two_mul]; nth_rewrite 2 [h]; ring
     simpa using this
-  have key : ∀ τ : E →+* ℂ, (if τ (H.rt : E) = H.rt0 then p else q) *
-      (if NumberField.ComplexEmbedding.conjugate τ (H.rt : E) = H.rt0 then p else q) = p * q := by
+  have key
+      : ∀ τ : E →+* ℂ,
+        (if τ (H.rt : E) = H.rt0 then p else q)
+            * (if NumberField.ComplexEmbedding.conjugate τ (H.rt : E) = H.rt0 then p else q)
+          = p * q := by
     intro τ
     have hsq : (τ (H.rt : E)) ^ 2 = H.rt0 ^ 2 := by
       have hrtE : ((H.rt : E)) ^ 2 = -(H.d : E) := by

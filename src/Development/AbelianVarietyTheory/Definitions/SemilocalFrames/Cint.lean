@@ -12,8 +12,8 @@ namespace GlobalTheory.IdxInt
 variable {W : Type} [AddCommGroup W]
 
 def Fine (A : AddSubgroup W) (φ : W → ℂ) (B : AddSubgroup W) : Prop :=
-  B ≤ A ∧ B.relIndex A ≠ 0 ∧ (∀ w, ∀ b ∈ B, φ (w + b) = φ w) ∧
-    ((fun w => (QuotientAddGroup.mk w : W ⧸ B)) '' Function.support φ).Finite
+  B ≤ A ∧ B.relIndex A ≠ 0 ∧ (∀ w, ∀ b ∈ B, φ (w + b) = φ w)
+    ∧ ((fun w => (QuotientAddGroup.mk w : W ⧸ B)) '' Function.support φ).Finite
 
 def Nice (A : AddSubgroup W) (φ : W → ℂ) : Prop := ∃ B, Fine A φ B
 

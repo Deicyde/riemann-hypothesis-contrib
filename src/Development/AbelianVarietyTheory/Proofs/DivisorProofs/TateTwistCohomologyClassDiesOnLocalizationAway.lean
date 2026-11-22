@@ -15,7 +15,6 @@ namespace GlobalTheory.EtC.AwayCont
 variable {A : Type} [CommRing A] (M : Submonoid A)
 
 structure Idx (M : Submonoid A) where
-
   val : A
   mem : val ∈ M
 
@@ -27,38 +26,44 @@ instance : Preorder (Idx M) where
     exact ⟨t * s, M.mul_mem ht hs, by rw [h2, h1, mul_assoc]⟩
 
 instance : IsDirected (Idx M) (· ≤ ·) where
-  directed a b := ⟨⟨a.val * b.val, M.mul_mem a.mem b.mem⟩, ⟨b.val, b.mem, rfl⟩, ⟨a.val, a.mem, mul_comm _ _⟩⟩
+  directed a b :=
+    ⟨⟨a.val * b.val, M.mul_mem a.mem b.mem⟩, ⟨b.val, b.mem, rfl⟩, ⟨a.val, a.mem, mul_comm _ _⟩⟩
 
 instance : Nonempty (Idx M) := ⟨⟨1, M.one_mem⟩⟩
 
-theorem isUnit_of_le {a b : Idx M} (h : a ≤ b) :
-    IsUnit (algebraMap A (Localization.Away b.val) a.val) := by
+theorem isUnit_of_le {a b : Idx M} (h : a ≤ b)
+    : IsUnit (algebraMap A (Localization.Away b.val) a.val) := by
   obtain ⟨t, -, ht⟩ := h
   have hb := IsLocalization.Away.algebraMap_isUnit (S := Localization.Away b.val) b.val
-  rw [show algebraMap A (Localization.Away b.val) b.val =
-      algebraMap A _ a.val * algebraMap A _ t by rw [← map_mul, ← ht]] at hb
+  rw [show algebraMap A (Localization.Away b.val) b.val = algebraMap A _ a.val * algebraMap A _ t by
+      rw [← map_mul, ← ht]]
+    at hb
   exact isUnit_of_mul_isUnit_left hb
 
 def trans {a b : Idx M} (h : a ≤ b) : Localization.Away a.val →+* Localization.Away b.val :=
   IsLocalization.Away.lift a.val (isUnit_of_le M h)
 
-theorem trans_comp {a b : Idx M} (h : a ≤ b) :
-    (trans M h).comp (algebraMap A _) = algebraMap A _ :=
+theorem trans_comp {a b : Idx M} (h : a ≤ b) : (trans M h).comp (algebraMap A _) = algebraMap A _ :=
   IsLocalization.Away.lift_comp _ _
 
-theorem ext_away {a : A} {P : Type} [CommRing P] {f g : Localization.Away a →+* P}
-    (hf : f.comp (algebraMap A _) = g.comp (algebraMap A _)) : f = g :=
+theorem ext_away
+    {a : A} {P : Type} [CommRing P]
+    {f g : Localization.Away a →+* P} (hf : f.comp (algebraMap A _) = g.comp (algebraMap A _))
+    : f = g :=
   IsLocalization.ringHom_ext (Submonoid.powers a) hf
 
 def diag : Idx M ⥤ CommRingCat.{0} where
   obj a := CommRingCat.of (Localization.Away a.val)
   map {a b} h := CommRingCat.ofHom (trans M h.le)
   map_id a := by
-    ext1; apply ext_away
+    ext1
+    apply ext_away
     simp only [CommRingCat.hom_ofHom, CommRingCat.hom_id]
-    rw [trans_comp]; rfl
+    rw [trans_comp]
+    rfl
   map_comp {a b c} f g := by
-    ext1; apply ext_away
+    ext1
+    apply ext_away
     simp only [CommRingCat.hom_ofHom, CommRingCat.hom_comp]
     rw [RingHom.comp_assoc, trans_comp, trans_comp, trans_comp]
 
@@ -70,13 +75,16 @@ theorem toLoc_comp (a : Idx M) : (toLoc M a).comp (algebraMap A _) = algebraMap 
 
 def cocone : Cocone (diag M) where
   pt := CommRingCat.of (Localization M)
-  ι := { app := fun a => CommRingCat.ofHom (toLoc M a)
-         naturality := fun a b h => by
-           ext1; apply ext_away
-           simp only [CommRingCat.hom_ofHom, CommRingCat.hom_comp, diag, Functor.const_obj_map,
-             CommRingCat.hom_id, RingHom.id_comp]
-           rw [RingHom.comp_assoc, trans_comp, toLoc_comp]
-           exact (toLoc_comp M a).symm }
+  ι := {
+    app := fun a => CommRingCat.ofHom (toLoc M a)
+    naturality := fun a b h => by
+      ext1
+      apply ext_away
+      simp only [CommRingCat.hom_ofHom, CommRingCat.hom_comp, diag, Functor.const_obj_map,
+        CommRingCat.hom_id, RingHom.id_comp]
+      rw [RingHom.comp_assoc, trans_comp, toLoc_comp]
+      exact (toLoc_comp M a).symm
+  }
 
 end GlobalTheory.EtC.AwayCont
 end
@@ -90,12 +98,12 @@ variable {A : Type} [CommRing A] (M : Submonoid A)
 theorem toLoc_trans {a b : Idx M} (h : a ≤ b) : (toLoc M b).comp (trans M h) = toLoc M a :=
   ext_away (by rw [RingHom.comp_assoc, trans_comp, toLoc_comp, toLoc_comp])
 
-theorem trans_trans {a b c : Idx M} (h : a ≤ b) (h' : b ≤ c) :
-    (trans M h').comp (trans M h) = trans M (h.trans h') :=
+theorem trans_trans {a b c : Idx M} (h : a ≤ b) (h' : b ≤ c)
+    : (trans M h').comp (trans M h) = trans M (h.trans h') :=
   ext_away (by rw [RingHom.comp_assoc, trans_comp, trans_comp, trans_comp])
 
-theorem kill (a : Idx M) (z : Localization.Away a.val) (hz : toLoc M a z = 0) :
-    ∃ (b : Idx M) (h : a ≤ b), trans M h z = 0 := by
+theorem kill (a : Idx M) (z : Localization.Away a.val) (hz : toLoc M a z = 0)
+    : ∃ (b : Idx M) (h : a ≤ b), trans M h z = 0 := by
   obtain ⟨⟨x, s⟩, hs⟩ := IsLocalization.surj (Submonoid.powers a.val) z
   have h1 : algebraMap A (Localization M) x = 0 := by
     have := congrArg (toLoc M a) hs
@@ -111,7 +119,8 @@ theorem kill (a : Idx M) (z : Localization.Away a.val) (hz : toLoc M a z = 0) :
   have hua : IsUnit (algebraMap A (Localization.Away b.val) a.val) := isUnit_of_mul_isUnit_left hu
   have huc : IsUnit (algebraMap A (Localization.Away b.val) c) := isUnit_of_mul_isUnit_right hu
   have hx : algebraMap A (Localization.Away b.val) x = 0 := by
-    have : algebraMap A (Localization.Away b.val) c * algebraMap A (Localization.Away b.val) x = 0 := by
+    have : algebraMap A (Localization.Away b.val) c * algebraMap A (Localization.Away b.val) x
+        = 0 := by
       rw [← map_mul, hc, map_zero]
     exact (huc.mul_right_eq_zero).mp this
   have hs' := congrArg (trans M hab) hs
@@ -128,8 +137,12 @@ def isColimit : IsColimit (cocone M) := by
     (Types.FilteredColimit.isColimitOf _ ((forget CommRingCat.{0}).mapCocone (cocone M)) ?_ ?_)
   · intro (x : Localization M)
     obtain ⟨⟨a, s⟩, rfl⟩ := IsLocalization.mk'_surjective M x
-    refine ⟨⟨s.1, s.2⟩, IsLocalization.mk' (Localization.Away s.1) a
-      (⟨s.1, Submonoid.mem_powers _⟩ : Submonoid.powers s.1), ?_⟩
+    refine ⟨
+      ⟨s.1, s.2⟩,
+      IsLocalization.mk' (Localization.Away s.1) a
+        (⟨s.1, Submonoid.mem_powers _⟩ : Submonoid.powers s.1),
+      ?_
+    ⟩
     show _ = toLoc M ⟨s.1, s.2⟩ _
     rw [eq_comm, IsLocalization.eq_mk'_iff_mul_eq]
     have e1 := RingHom.congr_fun (toLoc_comp M ⟨s.1, s.2⟩) s.1
@@ -158,11 +171,15 @@ end
 
 namespace GlobalTheory.EtC.AwayCont
 
-theorem kill_of_loc : B1 → ∀ (q : ℕ) (A : Type) [CommRing A] (M : Submonoid A) (n i : ℤ), IsUnit (q : A) →
-    ∀ m ∈ M, ∀ y : Ht q (sp (Localization.Away m)) n i, ∀ φ : Localization.Away m →+* Localization M,
-    φ.comp (algebraMap A _) = algebraMap A _ → pull _ (spMap φ) _ _ y = 0 →
-    ∃ m' ∈ M, ∀ ψ : Localization.Away m →+* Localization.Away (m * m'),
-      ψ.comp (algebraMap A _) = algebraMap A _ → pull _ (spMap ψ) _ _ y = 0 := by
+theorem kill_of_loc
+    : B1
+      → ∀ (q : ℕ) (A : Type) [CommRing A] (M : Submonoid A) (n i : ℤ),
+        IsUnit (q : A)
+          → ∀ m ∈ M, ∀ y : Ht q (sp (Localization.Away m)) n i,
+            ∀ φ : Localization.Away m →+* Localization M,
+              φ.comp (algebraMap A _) = algebraMap A _ → pull _ (spMap φ) _ _ y = 0
+                → ∃ m' ∈ M, ∀ ψ : Localization.Away m →+* Localization.Away (m * m'),
+                  ψ.comp (algebraMap A _) = algebraMap A _ → pull _ (spMap ψ) _ _ y = 0 := by
   intro hB q A _ M n i hq m hm y φ hφ hy
   let a : Idx M := ⟨m, hm⟩
   have hq' : IsUnit ((q : ℕ) : (diag M).obj a) := by
@@ -172,8 +189,7 @@ theorem kill_of_loc : B1 → ∀ (q : ℕ) (A : Type) [CommRing A] (M : Submonoi
   have hφ' : ((cocone M).ι.app a).hom = φ := by
     show toLoc M a = φ
     exact ext_away (by rw [hφ]; exact toLoc_comp M a)
-  have hy' : pull _ (spMap ((cocone M).ι.app a).hom) _ _ y = 0 := by
-    rw [hφ']; exact hy
+  have hy' : pull _ (spMap ((cocone M).ι.app a).hom) _ _ y = 0 := by rw [hφ']; exact hy
   obtain ⟨⟨k1, hk1⟩, f, hk⟩ := (hB q (diag M) (cocone M) (isColimit M) n i).2 a y hq' hy'
   obtain ⟨t, ht, hkt⟩ := f.le
   change k1 = m * t at hkt

@@ -13,40 +13,55 @@ public import Development.AbelianVarietyTheory.Proofs.HomogeneousIdeals.GenericE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open scoped CategoryTheory.Obj
 
 namespace PositivityTheory.Xgn.TorusKernelSpreading
 
-theorem one_left {S : Scheme.{0}} (G : Over S) [GrpObj G] {Y : Scheme.{0}} (a : Y ⟶ S) :
-    (1 : Over.mk a ⟶ G).left = a ≫ (η[G]).left := by
+theorem one_left {S : Scheme.{0}} (G : Over S) [GrpObj G] {Y : Scheme.{0}} (a : Y ⟶ S)
+    : (1 : Over.mk a ⟶ G).left = a ≫ (η[G]).left := by
   rw [Hom.one_def, Over.comp_left]
   congr 1
 
 theorem unit_w {S : Scheme.{0}} (G : Over S) [GrpObj G] : (η[G]).left ≫ G.hom = 𝟙 S := Over.w η[G]
 
-noncomputable def pr (S : Scheme.{0}) (X : Type) [AddCommGroup X] :
-    (splitTorus S X).left ⟶ Spec (torusRing ZU X) :=
+noncomputable def pr (S : Scheme.{0}) (X : Type) [AddCommGroup X]
+    : (splitTorus S X).left ⟶ Spec (torusRing ZU X) :=
   pullback.fst (splitTorusAff ZU X).hom (toZ S)
 
-noncomputable def cv {S : Scheme.{0}} {X : Type} [AddCommGroup X] {A : Type} [CommRing A]
-    (f : Sp A ⟶ (splitTorus S X).left) : AddMonoidAlgebra (ULift.{0} ℤ) X →+* A :=
+noncomputable def cv
+    {S : Scheme.{0}} {X : Type} [AddCommGroup X]
+    {A : Type} [CommRing A]
+    (f : Sp A ⟶ (splitTorus S X).left)
+    : AddMonoidAlgebra (ULift.{0} ℤ) X →+* A :=
   (Spec.preimage (f ≫ pr S X)).hom
 
-theorem cv_comp {S : Scheme.{0}} {X : Type} [AddCommGroup X] {A B : Type} [CommRing A] [CommRing B]
-    (k : A →+* B) (f : Sp A ⟶ (splitTorus S X).left) : cv (spMap k ≫ f) = k.comp (cv f) := by
-  have : Spec.preimage ((spMap k ≫ f) ≫ pr S X) = Spec.preimage (f ≫ pr S X) ≫ CommRingCat.ofHom k := by
+theorem cv_comp
+    {S : Scheme.{0}} {X : Type} [AddCommGroup X]
+    {A B : Type} [CommRing A] [CommRing B]
+    (k : A →+* B) (f : Sp A ⟶ (splitTorus S X).left)
+    : cv (spMap k ≫ f) = k.comp (cv f) := by
+  have : Spec.preimage ((spMap k ≫ f) ≫ pr S X)
+      = Spec.preimage (f ≫ pr S X) ≫ CommRingCat.ofHom k := by
     apply Spec.map_injective
     rw [Spec.map_comp, Spec.map_preimage, Spec.map_preimage, Category.assoc]
   exact congrArg CommRingCat.Hom.hom this
 
-theorem ext_of_span {S : Scheme.{0}} {X : Type} [AddCommGroup X] {A : Type} [CommRing A]
+theorem ext_of_span
+    {S : Scheme.{0}} {X : Type} [AddCommGroup X]
+    {A : Type} [CommRing A]
     (f g : Sp A ⟶ (splitTorus S X).left) (hw : f ≫ (splitTorus S X).hom = g ≫ (splitTorus S X).hom)
     (s : Set X) (hs : Submodule.span ℤ s = ⊤)
-    (h : ∀ x ∈ s, cv f (AddMonoidAlgebra.single x 1) = cv g (AddMonoidAlgebra.single x 1)) : f = g := by
-  have hmul : ∀ x y : X, (AddMonoidAlgebra.single (x + y) 1 : AddMonoidAlgebra (ULift.{0} ℤ) X) =
-      AddMonoidAlgebra.single x 1 * AddMonoidAlgebra.single y 1 := by
+    (h : ∀ x ∈ s, cv f (AddMonoidAlgebra.single x 1) = cv g (AddMonoidAlgebra.single x 1))
+    : f = g := by
+  have hmul
+      : ∀ x y : X,
+        (AddMonoidAlgebra.single (x + y) 1 : AddMonoidAlgebra (ULift.{0} ℤ) X)
+          = AddMonoidAlgebra.single x 1 * AddMonoidAlgebra.single y 1 := by
     intro x y
     rw [AddMonoidAlgebra.single_mul_single, _root_.one_mul]
   have h0 : (AddMonoidAlgebra.single (0 : X) 1 : AddMonoidAlgebra (ULift.{0} ℤ) X) = 1 := rfl
@@ -67,9 +82,13 @@ theorem ext_of_span {S : Scheme.{0}} {X : Type} [AddCommGroup X] {A : Type} [Com
       exact left_inv_eq_right_inv e1 e2
   have hcv : cv f = cv g := by
     refine AddMonoidAlgebra.ringHom_ext (fun r => ?_) hall
-    have : (cv f).comp AddMonoidAlgebra.singleZeroRingHom = (cv g).comp AddMonoidAlgebra.singleZeroRingHom := by
-      have h2 : ((cv f).comp AddMonoidAlgebra.singleZeroRingHom).comp (ULift.ringEquiv.{0, 0} (R := ℤ)).symm.toRingHom =
-          ((cv g).comp AddMonoidAlgebra.singleZeroRingHom).comp (ULift.ringEquiv.{0, 0} (R := ℤ)).symm.toRingHom :=
+    have : (cv f).comp AddMonoidAlgebra.singleZeroRingHom
+        = (cv g).comp AddMonoidAlgebra.singleZeroRingHom := by
+      have h2
+          : ((cv f).comp AddMonoidAlgebra.singleZeroRingHom).comp
+              (ULift.ringEquiv.{0, 0} (R := ℤ)).symm.toRingHom
+            = ((cv g).comp AddMonoidAlgebra.singleZeroRingHom).comp
+              (ULift.ringEquiv.{0, 0} (R := ℤ)).symm.toRingHom :=
         RingHom.ext_int _ _
       ext z
       exact RingHom.congr_fun h2 z.down
@@ -79,26 +98,33 @@ theorem ext_of_span {S : Scheme.{0}} {X : Type} [AddCommGroup X] {A : Type} [Com
     rw [← Spec.map_preimage (f ≫ pr S X), this, Spec.map_preimage]
   exact pullback.hom_ext hp hw
 
-theorem aff_snd {P Q T : Scheme.{0}} (f : P ⟶ T) (g : Q ⟶ T) (h : IsAffineHom f) : IsAffineHom (pullback.snd f g) :=
+theorem aff_snd {P Q T : Scheme.{0}} (f : P ⟶ T) (g : Q ⟶ T) (h : IsAffineHom f)
+    : IsAffineHom (pullback.snd f g) :=
   isAffineHom_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback f g) h
 
 theorem cl_id (S : Scheme.{0}) : IsClosedImmersion (𝟙 S) := inferInstance
 
-theorem exists_univ {S : Scheme.{0}} (G : Over S) [GrpObj G] [IsSeparated G.hom] {X : Type} [AddCommGroup X]
-    (u : splitTorus S X ⟶ G) {R : Type} [CommRing R] (w : Sp R ⟶ S) :
-    ∃ (C : Type) (_ : CommRing C) (ψ : R →+* C) (t₀ : Sp C ⟶ (splitTorus S X).left),
-      t₀ ≫ (splitTorus S X).hom = spMap ψ ≫ w ∧ t₀ ≫ u.left = spMap ψ ≫ w ≫ (η[G]).left ∧
-      ∀ (A : Type) [CommRing A] (h : R →+* A) (t : Sp A ⟶ (splitTorus S X).left),
-        t ≫ u.left = spMap h ≫ w ≫ (η[G]).left → ∃ k : C →+* A, k.comp ψ = h ∧ spMap k ≫ t₀ = t := by
+theorem exists_univ
+    {S : Scheme.{0}} (G : Over S) [GrpObj G] [IsSeparated G.hom]
+    {X : Type} [AddCommGroup X]
+    (u : splitTorus S X ⟶ G)
+    {R : Type} [CommRing R]
+    (w : Sp R ⟶ S)
+    : ∃ (C : Type) (_ : CommRing C) (ψ : R →+* C) (t₀ : Sp C ⟶ (splitTorus S X).left),
+      t₀ ≫ (splitTorus S X).hom = spMap ψ ≫ w ∧ t₀ ≫ u.left = spMap ψ ≫ w ≫ (η[G]).left
+        ∧ ∀ (A : Type) [CommRing A] (h : R →+* A) (t : Sp A ⟶ (splitTorus S X).left),
+          t ≫ u.left = spMap h ≫ w ≫ (η[G]).left
+            → ∃ k : C →+* A, k.comp ψ = h ∧ spMap k ≫ t₀ = t := by
   have hcl : IsClosedImmersion (η[G]).left := by
-    have : IsClosedImmersion ((η[G]).left ≫ G.hom) := by
-      rw [unit_w]; exact cl_id S
+    have : IsClosedImmersion ((η[G]).left ≫ G.hom) := by rw [unit_w]; exact cl_id S
     exact IsClosedImmersion.of_comp _ G.hom
   have haT : IsAffineHom (splitTorus S X).hom := by
     have : IsAffine (splitTorusAff ZU X).left := inferInstanceAs (IsAffine (Spec (torusRing ZU X)))
     have : IsAffineHom (splitTorusAff ZU X).hom := inferInstance
     exact aff_snd _ _ this
-  have hq : pullback.snd u.left (η[G]).left = pullback.fst u.left (η[G]).left ≫ (splitTorus S X).hom := by
+  have hq
+      : pullback.snd u.left (η[G]).left
+        = pullback.fst u.left (η[G]).left ≫ (splitTorus S X).hom := by
     rw [← Over.w u, ← Category.assoc, pullback.condition, Category.assoc, unit_w]
     exact (Category.comp_id _).symm
   have haq : IsAffineHom (pullback.snd u.left (η[G]).left) := by rw [hq]; infer_instance
@@ -129,10 +155,14 @@ theorem exists_univ {S : Scheme.{0}} (G : Over S) [GrpObj G] [IsSeparated G.hom]
     · rw [hk, Category.assoc, Iso.hom_inv_id_assoc]
       exact pullback.lift_fst _ _ _
 
-theorem exists_factor {Z : Scheme.{0}} [IsIntegral Z] {L : Type} [Field L] {j : Sp L ⟶ Z}
-    (hj : GlobalTheory.IsGenericPointHom j) {W : Z.Opens} (hW : IsAffineOpen W) [Nonempty W] {A : Type} [CommRing A]
-    (m : Γ(Z, W) →+* A) (hm : ∀ y : nonZeroDivisors Γ(Z, W), IsUnit (m y)) :
-    ∃ g : L →+* A, spMap g ≫ j = spMap m ≫ hW.fromSpec := by
+theorem exists_factor
+    {Z : Scheme.{0}} [IsIntegral Z]
+    {L : Type} [Field L]
+    {j : Sp L ⟶ Z} (hj : GlobalTheory.IsGenericPointHom j)
+    {W : Z.Opens} (hW : IsAffineOpen W) [Nonempty W]
+    {A : Type} [CommRing A]
+    (m : Γ(Z, W) →+* A) (hm : ∀ y : nonZeroDivisors Γ(Z, W), IsUnit (m y))
+    : ∃ g : L →+* A, spMap g ≫ j = spMap m ≫ hW.fromSpec := by
   obtain ⟨e, rfl⟩ := hj
   have := functionField_isFractionRing_of_isAffineOpen Z W hW
   let g₀ : Z.functionField →+* A := IsLocalization.lift hm
@@ -140,9 +170,10 @@ theorem exists_factor {Z : Scheme.{0}} [IsIntegral Z] {L : Type} [Field L] {j : 
   let g : CommRingCat.of L ⟶ CommRingCat.of A := Spec.preimage (spMap g₀ ≫ e.inv)
   have hg : spMap g.hom = spMap g₀ ≫ e.inv := Spec.map_preimage _
   refine ⟨g.hom, ?_⟩
-  have hmem : genericPoint Z ∈ W := ((genericPoint_spec Z).mem_open_set_iff W.isOpen).2 (by
-    obtain ⟨⟨x, hx⟩⟩ := ‹Nonempty W›
-    exact ⟨x, trivial, hx⟩)
+  have hmem : genericPoint Z ∈ W :=
+    ((genericPoint_spec Z).mem_open_set_iff W.isOpen).2 (by
+      obtain ⟨⟨x, hx⟩⟩ := ‹Nonempty W›
+      exact ⟨x, trivial, hx⟩)
   rw [hg, Category.assoc, Iso.inv_hom_id_assoc, ← hW.fromSpecStalk_eq_fromSpecStalk hmem, ← hg₀,
     IsAffineOpen.fromSpecStalk, ← Category.assoc]
   congr 1
@@ -151,12 +182,22 @@ theorem exists_factor {Z : Scheme.{0}} [IsIntegral Z] {L : Type} [Field L] {j : 
 end PositivityTheory.Xgn.TorusKernelSpreading
 
 open PositivityTheory.Xgn.TorusKernelSpreading in
-theorem PositivityTheory.Xgn.torus_kernel_trivial_spreads_open : ∀ (Z' : Scheme.{0}) [IsIntegral Z'] (G : Over Z') [GrpObj G] [IsSeparated G.hom] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (u : splitTorus Z' X ⟶ G) [IsMonHom u] (L' : Type) [Field L'] (j : Sp L' ⟶ Z'), GlobalTheory.IsGenericPointHom j → (∀ (A : Type) [CommRing A] (g : L' →+* A) (t : Over.mk (spMap g ≫ j) ⟶ splitTorus Z' X), t ≫ u = 1 → t = 1) → ∃ V : Z'.Opens, (V : Set Z').Nonempty ∧ ∀ (A : Type) [CommRing A] (a : Sp A ⟶ Z'), ⊤ ≤ a ⁻¹ᵁ V → ∀ t : Over.mk a ⟶ splitTorus Z' X, t ≫ u = 1 → t = 1 := by
+theorem PositivityTheory.Xgn.torus_kernel_trivial_spreads_open
+    : ∀ (Z' : Scheme.{0}) [IsIntegral Z'] (G : Over Z') [GrpObj G] [IsSeparated G.hom] (X : Type)
+        [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (u : splitTorus Z' X ⟶ G)
+        [IsMonHom u] (L' : Type) [Field L'] (j : Sp L' ⟶ Z'),
+      GlobalTheory.IsGenericPointHom j
+        → (∀ (A : Type) [CommRing A] (g : L' →+* A) (t : Over.mk (spMap g ≫ j) ⟶ splitTorus Z' X),
+          t ≫ u = 1 → t = 1)
+        → ∃ V : Z'.Opens,
+          (V : Set Z').Nonempty
+            ∧ ∀ (A : Type) [CommRing A] (a : Sp A ⟶ Z'),
+              ⊤ ≤ a ⁻¹ᵁ V → ∀ t : Over.mk a ⟶ splitTorus Z' X, t ≫ u = 1 → t = 1 := by
   intro Z' _ G _ _ X _ _ _ u _ L' _ j hj H
   classical
   obtain ⟨x₀⟩ : Nonempty Z' := inferInstance
-  obtain ⟨_, ⟨W, hW, rfl⟩, hx₀, -⟩ := Z'.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ x₀) isOpen_univ
+  obtain ⟨_, ⟨W, hW, rfl⟩, hx₀, -⟩ :=
+    Z'.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x₀) isOpen_univ
   have : Nonempty W := ⟨⟨x₀, hx₀⟩⟩
   let w : Sp Γ(Z', W) ⟶ Z' := hW.fromSpec
   have : IsOpenImmersion w := IsAffineOpen.isOpenImmersion_fromSpec hW
@@ -164,25 +205,35 @@ theorem PositivityTheory.Xgn.torus_kernel_trivial_spreads_open : ∀ (Z' : Schem
   obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := ℤ) (M := X)
   let o : Sp C ⟶ (splitTorus Z' X).left := spMap ψ ≫ w ≫ (η[splitTorus Z' X]).left
   let M : Submonoid C := (nonZeroDivisors Γ(Z', W)).map ψ
-  have hsp : ∀ {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (f : A →+* B) (g : B →+* D),
-      spMap (g.comp f) = spMap g ≫ spMap f := fun f g => Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)
-  have hloc : spMap (algebraMap C (Localization M)) ≫ t₀ = spMap (algebraMap C (Localization M)) ≫ o := by
-    obtain ⟨g, hg⟩ := exists_factor hj hW ((algebraMap C (Localization M)).comp ψ)
-      (fun y => IsLocalization.map_units (Localization M) (⟨ψ y, y, y.2, rfl⟩ : M))
+  have hsp
+      : ∀ {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (f : A →+* B) (g : B →+* D),
+        spMap (g.comp f) = spMap g ≫ spMap f := fun f g =>
+    Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)
+  have hloc
+      : spMap (algebraMap C (Localization M)) ≫ t₀ = spMap (algebraMap C (Localization M)) ≫ o := by
+    obtain ⟨g, hg⟩ :=
+      exists_factor hj hW ((algebraMap C (Localization M)).comp ψ)
+        (fun y => IsLocalization.map_units (Localization M) (⟨ψ y, y, y.2, rfl⟩ : M))
     rw [hsp, Category.assoc] at hg
-    have h1 := H (Localization M) g (Over.homMk (spMap (algebraMap C (Localization M)) ≫ t₀) (by
-      change (_ ≫ t₀) ≫ _ = spMap g ≫ j
-      rw [hg, Category.assoc, ht₁])) (by
-      apply Over.OverMorphism.ext
-      rw [one_left]
-      change (_ ≫ t₀) ≫ u.left = (spMap g ≫ j) ≫ _
-      rw [hg]
-      simp only [Category.assoc, ht₂, w])
+    have h1 :=
+      H (Localization M) g
+        (Over.homMk (spMap (algebraMap C (Localization M)) ≫ t₀) (by
+          change (_ ≫ t₀) ≫ _ = spMap g ≫ j
+          rw [hg, Category.assoc, ht₁]))
+        (by
+          apply Over.OverMorphism.ext
+          rw [one_left]
+          change (_ ≫ t₀) ≫ u.left = (spMap g ≫ j) ≫ _
+          rw [hg]
+          simp only [Category.assoc, ht₂, w])
     have h2 := congrArg (·.left) h1
     simp only [one_left, hg] at h2
     simpa only [o, w, Category.assoc, Over.homMk_left] using h2
-  have hr : ∀ x : X, ∃ r : Γ(Z', W), r ≠ 0 ∧
-      ψ r * cv t₀ (AddMonoidAlgebra.single x 1) = ψ r * cv o (AddMonoidAlgebra.single x 1) := by
+  have hr
+      : ∀ x : X, ∃ r : Γ(Z', W),
+        r ≠ 0
+          ∧ ψ r * cv t₀ (AddMonoidAlgebra.single x 1)
+            = ψ r * cv o (AddMonoidAlgebra.single x 1) := by
     intro x
     have h1 := RingHom.congr_fun (congrArg cv hloc) (AddMonoidAlgebra.single x 1)
     rw [cv_comp, cv_comp] at h1
@@ -230,6 +281,7 @@ theorem PositivityTheory.Xgn.torus_kernel_trivial_spreads_open : ∀ (Z' : Schem
   rw [map_mul, map_mul] at e1
   have e2 := hux.mul_left_cancel e1
   have e3 : cv (A := A) t.left = k.comp (cv t₀) := by rw [← cv_comp, hk₂]
-  have e4 : cv (A := A) (1 : Over.mk a ⟶ splitTorus Z' X).left = k.comp (cv o) := by rw [← cv_comp, ← ho]
+  have e4 : cv (A := A) (1 : Over.mk a ⟶ splitTorus Z' X).left = k.comp (cv o) := by
+    rw [← cv_comp, ← ho]
   rw [e3, e4]
   exact e2

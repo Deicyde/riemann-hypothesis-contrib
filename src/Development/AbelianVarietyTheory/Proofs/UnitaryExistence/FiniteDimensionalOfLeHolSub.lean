@@ -14,8 +14,11 @@ namespace GlobalTheory.CuspSecFin
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem mem_SS_of_mem_holSub {Comp : Type} (X : Comp → Data E r) (la : ∀ k, Wt (X k).Ψ r)
-    {P : FDSec X} (hP : P ∈ holSub X la) (k : Comp) : P k ∈ (X k).SS (la k) := by
+theorem mem_SS_of_mem_holSub
+    {Comp : Type} (X : Comp → Data E r) (la : ∀ k, Wt (X k).Ψ r)
+    {P : FDSec X} (hP : P ∈ holSub X la)
+    (k : Comp)
+    : P k ∈ (X k).SS (la k) := by
   obtain ⟨⟨h0, hadd, hsmul⟩, -⟩ := siegelSpaceAlgebra_holds (E := E) r (X k) (la k) (la k) 0
   induction hP using Submodule.span_induction with
   | mem P hP => exact hP k

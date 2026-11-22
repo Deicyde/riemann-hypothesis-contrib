@@ -10,12 +10,14 @@ namespace SheetDecomposition.PF
 
 open MvPolynomial
 
-theorem ker_baseChange {k B K σ Φ Φ' : Type} [Field k] [CommRing B] [Algebra k B] [Field Φ] [Field Φ']
-    [Algebra (MvPolynomial K k) Φ] [IsFractionRing (MvPolynomial K k) Φ] (a : k →+* Φ)
-    (ha : ∀ c, a c = algebraMap (MvPolynomial K k) Φ (C c)) (ν : MvPolynomial K B →+* Φ') (hν : Function.Injective ν)
+theorem ker_baseChange
+    {k B K σ Φ Φ' : Type} [Field k] [CommRing B] [Algebra k B] [Field Φ] [Field Φ']
+    [Algebra (MvPolynomial K k) Φ] [IsFractionRing (MvPolynomial K k) Φ]
+    (a : k →+* Φ) (ha : ∀ c, a c = algebraMap (MvPolynomial K k) Φ (C c))
+    (ν : MvPolynomial K B →+* Φ') (hν : Function.Injective ν)
     (L : Φ →+* Φ') (hL : ∀ r, L (algebraMap (MvPolynomial K k) Φ r) = ν (map (algebraMap k B) r))
-    (ψ : MvPolynomial σ k →ₐ[k] B) :
-    RingHom.ker (eval₂Hom L fun s => ν (C (ψ (X s)))) = (RingHom.ker ψ).map (map a) := by
+    (ψ : MvPolynomial σ k →ₐ[k] B)
+    : RingHom.ker (eval₂Hom L fun s => ν (C (ψ (X s)))) = (RingHom.ker ψ).map (map a) := by
   classical
   obtain ⟨Θ, hΘ⟩ : ∃ f : MvPolynomial σ Φ →+* Φ', f = eval₂Hom L fun s => ν (C (ψ (X s))) :=
     ⟨_, rfl⟩
@@ -24,14 +26,17 @@ theorem ker_baseChange {k B K σ Φ Φ' : Type} [Field k] [CommRing B] [Algebra 
     exact main
   have hΘC : ∀ f : Φ, Θ (C f) = L f := fun f => by rw [hΘ, eval₂Hom_C]
   have hΘX : ∀ s : σ, Θ (X s) = ν (C (ψ (X s))) := fun s => by rw [hΘ, eval₂Hom_X']
-  obtain ⟨α, hα⟩ : ∃ f : MvPolynomial K (MvPolynomial σ k) →+* MvPolynomial σ Φ,
-      f = eval₂Hom (map a) fun i => C (algebraMap (MvPolynomial K k) Φ (X i)) := ⟨_, rfl⟩
+  obtain ⟨α, hα⟩
+      : ∃ f : MvPolynomial K (MvPolynomial σ k) →+* MvPolynomial σ Φ,
+        f = eval₂Hom (map a) fun i => C (algebraMap (MvPolynomial K k) Φ (X i)) :=
+    ⟨_, rfl⟩
   have hαC : ∀ p : MvPolynomial σ k, α (C p) = map a p := fun p => by rw [hα, eval₂Hom_C]
   have hαX : ∀ i : K, α (X i) = C (algebraMap (MvPolynomial K k) Φ (X i)) := fun i => by
     rw [hα, eval₂Hom_X']
   have hΘa : ∀ p : MvPolynomial σ k, Θ (map a p) = ν (C (ψ p)) := by
-    have h : Θ.comp (map a) =
-        ν.comp ((C : B →+* MvPolynomial K B).comp (ψ : MvPolynomial σ k →+* B)) := by
+    have h
+        : Θ.comp (map a)
+          = ν.comp ((C : B →+* MvPolynomial K B).comp (ψ : MvPolynomial σ k →+* B)) := by
       apply MvPolynomial.ringHom_ext
       · intro c
         simp only [RingHom.comp_apply, map_C, hΘC, ha, hL, RingHom.coe_coe, algHom_C]
@@ -48,10 +53,12 @@ theorem ker_baseChange {k B K σ Φ Φ' : Type} [Field k] [CommRing B] [Algebra 
         simp only [RingHom.comp_apply, hαX, hΘC, hL, map_X]
     intro Q
     exact DFunLike.congr_fun h Q
-  have hαmapC : ∀ p : MvPolynomial K k, α (map (C : k →+* MvPolynomial σ k) p) =
-      C (algebraMap (MvPolynomial K k) Φ p) := by
-    have h : α.comp (map (C : k →+* MvPolynomial σ k)) =
-        (C : Φ →+* MvPolynomial σ Φ).comp (algebraMap (MvPolynomial K k) Φ) := by
+  have hαmapC
+      : ∀ p : MvPolynomial K k,
+        α (map (C : k →+* MvPolynomial σ k) p) = C (algebraMap (MvPolynomial K k) Φ p) := by
+    have h
+        : α.comp (map (C : k →+* MvPolynomial σ k))
+          = (C : Φ →+* MvPolynomial σ Φ).comp (algebraMap (MvPolynomial K k) Φ) := by
       apply MvPolynomial.ringHom_ext
       · intro c
         simp only [RingHom.comp_apply, map_C, hαC, ha]
@@ -59,15 +66,18 @@ theorem ker_baseChange {k B K σ Φ Φ' : Type} [Field k] [CommRing B] [Algebra 
         simp only [RingHom.comp_apply, map_X, hαX]
     intro p
     exact DFunLike.congr_fun h p
-  have hCmem : ∀ q : MvPolynomial K k, C (algebraMap (MvPolynomial K k) Φ q) ∈ α.range :=
-    fun q => RingHom.mem_range.mpr ⟨_, hαmapC q⟩
+  have hCmem : ∀ q : MvPolynomial K k, C (algebraMap (MvPolynomial K k) Φ q) ∈ α.range := fun q =>
+    RingHom.mem_range.mpr ⟨_, hαmapC q⟩
   have hXmem : ∀ s : σ, (X s : MvPolynomial σ Φ) ∈ α.range := fun s =>
     RingHom.mem_range.mpr ⟨C (X s), by rw [hαC, map_X]⟩
-  have hden : ∀ P : MvPolynomial σ Φ, ∃ q : MvPolynomial K k, q ≠ 0 ∧
-      C (algebraMap (MvPolynomial K k) Φ q) * P ∈ α.range := by
+  have hden
+      : ∀ P : MvPolynomial σ Φ, ∃ q : MvPolynomial K k,
+        q ≠ 0 ∧ C (algebraMap (MvPolynomial K k) Φ q) * P ∈ α.range := by
     intro P
-    refine MvPolynomial.induction_on (motive := fun P => ∃ q : MvPolynomial K k, q ≠ 0 ∧
-      C (algebraMap (MvPolynomial K k) Φ q) * P ∈ α.range) P ?_ ?_ ?_
+    refine MvPolynomial.induction_on
+      (motive := fun P =>
+        ∃ q : MvPolynomial K k, q ≠ 0 ∧ C (algebraMap (MvPolynomial K k) Φ q) * P ∈ α.range)
+      P ?_ ?_ ?_
     · intro f
       try dsimp only
       obtain ⟨p, q, hq, rfl⟩ := IsFractionRing.div_surjective (MvPolynomial K k) f
@@ -79,9 +89,11 @@ theorem ker_baseChange {k B K σ Φ Φ' : Type} [Field k] [CommRing B] [Algebra 
       obtain ⟨q₁, hq₁, h₁⟩ := h₁
       obtain ⟨q₂, hq₂, h₂⟩ := h₂
       refine ⟨q₁ * q₂, mul_ne_zero hq₁ hq₂, ?_⟩
-      have e : C (algebraMap (MvPolynomial K k) Φ (q₁ * q₂)) * (P₁ + P₂) =
-          C (algebraMap (MvPolynomial K k) Φ q₂) * (C (algebraMap (MvPolynomial K k) Φ q₁) * P₁) +
-            C (algebraMap (MvPolynomial K k) Φ q₁) * (C (algebraMap (MvPolynomial K k) Φ q₂) * P₂) := by
+      have e
+          : C (algebraMap (MvPolynomial K k) Φ (q₁ * q₂)) * (P₁ + P₂)
+            = C (algebraMap (MvPolynomial K k) Φ q₂) * (C (algebraMap (MvPolynomial K k) Φ q₁) * P₁)
+              + C (algebraMap (MvPolynomial K k) Φ q₁)
+                * (C (algebraMap (MvPolynomial K k) Φ q₂) * P₂) := by
         rw [map_mul, C_mul]
         ring
       rw [e]

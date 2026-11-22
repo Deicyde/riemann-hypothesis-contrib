@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsP
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.JSW Filter Topology Formalism.UG GlobalTheory.RSNonvan
+open NumberField IsDedekindDomain GlobalTheory.CuspRep GlobalTheory.JSW Filter Topology Formalism.UG
+  GlobalTheory.RSNonvan
 
 noncomputable section
 
@@ -14,23 +15,38 @@ namespace GlobalTheory.RSNonvan.GoodSet
 
 variable {E : Type} [Field E] [NumberField E]
 
-theorem psiLoc_cond (w : HeightOneSpectrum (𝓞 E))
-    (hw : FractionalIdeal.count E w ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) :
-      FractionalIdeal (nonZeroDivisors (𝓞 E)) E) = 0) (x : w.adicCompletion E) :
-    (∀ y ∈ Ov E w, (GroundTheory.Global.adelicChar _ (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y))) : ℂ) = 1) ↔ x ∈ Ov E w := by
-  have key : (∀ y ∈ Ov E w, (GroundTheory.Global.adelicChar _ (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y))) : ℂ) = 1) ↔
-      ∀ a ∈ w.adicCompletionIntegers E, GroundTheory.Global.localAdelicChar E w (a * x) = 1 := by
+theorem psiLoc_cond
+    (w : HeightOneSpectrum (𝓞 E))
+    (hw : FractionalIdeal.count E w
+        ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+      = 0)
+    (x : w.adicCompletion E)
+    : (∀ y ∈ Ov E w,
+        (GroundTheory.Global.adelicChar _
+              (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y)))
+            : ℂ)
+          = 1)
+      ↔ x ∈ Ov E w := by
+  have key
+      : (∀ y ∈ Ov E w,
+          (GroundTheory.Global.adelicChar _
+                (GlobalTheory.CuspRep.sFin _ (GlobalTheory.CuspRep.sLoc _ w (x * y)))
+              : ℂ)
+            = 1)
+        ↔ ∀ a ∈ w.adicCompletionIntegers E,
+          GroundTheory.Global.localAdelicChar E w (a * x) = 1 := by
     refine forall_congr' fun y => imp_congr Iff.rfl ?_
     change GlobalTheory.StdCharConductor.psi E (sFin E (sLoc E w (x * y))) = 1 ↔ _
     rw [GlobalTheory.StdCharConductor.psi_loc_eq_one_iff, mul_comm]
-  rw [key, GroundTheory.Global.forall_localAdelicChar_mul_eq_one_iff, GroundTheory.Global.mem_localInvDifferent_iff_valued, hw]
+  rw [key, GroundTheory.Global.forall_localAdelicChar_mul_eq_one_iff,
+    GroundTheory.Global.mem_localInvDifferent_iff_valued, hw]
   change _ ↔ x ∈ w.adicCompletionIntegers E
   rw [HeightOneSpectrum.mem_adicCompletionIntegers]
   rfl
 
-theorem finite_sameBelow (u : HeightOneSpectrum (𝓞 E)) :
-    {w' : HeightOneSpectrum (𝓞 E) | Ideal.comap (algebraMap ℤ (𝓞 E)) w'.asIdeal =
-      Ideal.comap (algebraMap ℤ (𝓞 E)) u.asIdeal}.Finite := by
+theorem finite_sameBelow (u : HeightOneSpectrum (𝓞 E))
+    : {w' : HeightOneSpectrum (𝓞 E) | Ideal.comap (algebraMap ℤ (𝓞 E)) w'.asIdeal =
+        Ideal.comap (algebraMap ℤ (𝓞 E)) u.asIdeal}.Finite := by
   set N : ℕ := Ideal.absNorm u.asIdeal
   have hN : N ≠ 0 := by
     have := NumberField.HeightOneSpectrum.one_lt_absNorm u
@@ -49,19 +65,21 @@ theorem finite_sameBelow (u : HeightOneSpectrum (𝓞 E)) :
 
 variable [_root_.NumberField.IsTotallyComplex E]
 
-theorem exists_isGood_superset (T : Finset (HeightOneSpectrum (𝓞 E))) :
-    ∃ T' : Finset (HeightOneSpectrum (𝓞 E)), T ⊆ T' ∧ IsGood T' := by
+theorem exists_isGood_superset (T : Finset (HeightOneSpectrum (𝓞 E)))
+    : ∃ T' : Finset (HeightOneSpectrum (𝓞 E)), T ⊆ T' ∧ IsGood T' := by
   classical
-  have hD : {w : HeightOneSpectrum (𝓞 E) | FractionalIdeal.count E w ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) :
-      FractionalIdeal (nonZeroDivisors (𝓞 E)) E) ≠ 0}.Finite :=
-    FractionalIdeal.finite_factors (K := E) ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) :
-      FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
+  have hD
+      : {w : HeightOneSpectrum (𝓞 E) | FractionalIdeal.count E w ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) :
+        FractionalIdeal (nonZeroDivisors (𝓞 E)) E) ≠ 0}.Finite :=
+    FractionalIdeal.finite_factors (K := E)
+      ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (nonZeroDivisors (𝓞 E)) E)
   set T₁ : Finset (HeightOneSpectrum (𝓞 E)) := T ∪ hD.toFinset
   set S : Set (HeightOneSpectrum (𝓞 E)) := {w' | ∃ u ∈ T₁, Ideal.comap (algebraMap ℤ (𝓞 E)) w'.asIdeal =
       Ideal.comap (algebraMap ℤ (𝓞 E)) u.asIdeal}
   have hS : S.Finite := by
-    have : S = ⋃ u ∈ T₁, {w' : HeightOneSpectrum (𝓞 E) | Ideal.comap (algebraMap ℤ (𝓞 E)) w'.asIdeal =
-        Ideal.comap (algebraMap ℤ (𝓞 E)) u.asIdeal} := by
+    have : S
+        = ⋃ u ∈ T₁, {w' : HeightOneSpectrum (𝓞 E) | Ideal.comap (algebraMap ℤ (𝓞 E)) w'.asIdeal =
+          Ideal.comap (algebraMap ℤ (𝓞 E)) u.asIdeal} := by
       ext w'
       simp [S]
     rw [this]
@@ -81,8 +99,11 @@ theorem exists_isGood_superset (T : Finset (HeightOneSpectrum (𝓞 E))) :
 
 end GlobalTheory.RSNonvan.GoodSet
 
-theorem GlobalTheory.RSNonvan.exists_isGood_superset_all : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
-    (T : Finset (HeightOneSpectrum (𝓞 E))), ∃ T' : Finset (HeightOneSpectrum (𝓞 E)), T ⊆ T' ∧ IsGood T' :=
-  fun _ _ _ _ T => GlobalTheory.RSNonvan.GoodSet.exists_isGood_superset T
+theorem GlobalTheory.RSNonvan.exists_isGood_superset_all
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+        (T : Finset (HeightOneSpectrum (𝓞 E))),
+      ∃ T' : Finset (HeightOneSpectrum (𝓞 E)),
+        T ⊆ T' ∧ IsGood T' := fun _ _ _ _ T =>
+  GlobalTheory.RSNonvan.GoodSet.exists_isGood_superset T
 
 end

@@ -18,31 +18,38 @@ namespace SecRankSpecialize
 
 open Vertical
 
-def secMap {R : Type*} [CommRing R] (S : Type*) [CommRing S] [Algebra R S] {n e : ℕ}
-    (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R) :
-    SecAlg Q y →ₐ[R] SecAlg (Q.map (MvPolynomial.map (algebraMap R S))) (algebraMap R S ∘ y) :=
+def secMap
+    {R : Type*} [CommRing R]
+    (S : Type*) [CommRing S] [Algebra R S]
+    {n e : ℕ} (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R)
+    : SecAlg Q y →ₐ[R] SecAlg (Q.map (MvPolynomial.map (algebraMap R S))) (algebraMap R S ∘ y) :=
   Ideal.quotientMapₐ _ (MvPolynomial.mapAlgHom (Algebra.ofId R S))
     (by rw [SecAlgFieldChange.secIdeal_map]; exact Ideal.le_comap_map)
 
-theorem secMap_mk {R : Type*} [CommRing R] (S : Type*) [CommRing S] [Algebra R S] {n e : ℕ}
-    (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R) (p : MvPolynomial (Fin n) R) :
-    secMap S Q y (Ideal.Quotient.mk _ p) =
-      Ideal.Quotient.mk _ (MvPolynomial.map (algebraMap R S) p) := rfl
+theorem secMap_mk
+    {R : Type*} [CommRing R]
+    (S : Type*) [CommRing S] [Algebra R S]
+    {n e : ℕ} (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R) (p : MvPolynomial (Fin n) R)
+    : secMap S Q y (Ideal.Quotient.mk _ p)
+      = Ideal.Quotient.mk _ (MvPolynomial.map (algebraMap R S) p) :=
+  rfl
 
-theorem mem_maximalIdeal_smul_of_secMap_eq_zero {R : Type*} [CommRing R] [IsLocalRing R]
-    (κ : Type*) [Field κ] [Algebra R κ] (hsurj : Function.Surjective (algebraMap R κ)) {n e : ℕ}
-    (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R) (x : SecAlg Q y)
-    (hx : secMap κ Q y x = 0) :
-    x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R (SecAlg Q y)) := by
+theorem mem_maximalIdeal_smul_of_secMap_eq_zero
+    {R : Type*} [CommRing R] [IsLocalRing R]
+    (κ : Type*) [Field κ] [Algebra R κ]
+    (hsurj : Function.Surjective (algebraMap R κ))
+    {n e : ℕ} (Q : Ideal (MvPolynomial (Fin n) R)) (y : Par e n → R) (x : SecAlg Q y)
+    (hx : secMap κ Q y x = 0)
+    : x ∈ IsLocalRing.maximalIdeal R • (⊤ : Submodule R (SecAlg Q y)) := by
   obtain ⟨p, rfl⟩ := Ideal.Quotient.mk_surjective x
   have hker : RingHom.ker (algebraMap R κ) = IsLocalRing.maximalIdeal R := by
     have := RingHom.ker_isMaximal_of_surjective _ hsurj
     exact IsLocalRing.eq_maximalIdeal this
   have hp : p ∈ secIdeal Q y ⊔ Ideal.map C (IsLocalRing.maximalIdeal R) := by
     rw [secMap_mk, Ideal.Quotient.eq_zero_iff_mem, SecAlgFieldChange.secIdeal_map,
-      ← Ideal.mem_comap,
-      Ideal.comap_map_of_surjective _ (MvPolynomial.map_surjective _ hsurj),
-      ← RingHom.ker_eq_comap_bot, MvPolynomial.ker_map, hker] at hx
+        ← Ideal.mem_comap, Ideal.comap_map_of_surjective _ (MvPolynomial.map_surjective _ hsurj),
+        ← RingHom.ker_eq_comap_bot, MvPolynomial.ker_map, hker]
+      at hx
     exact hx
   have hm := Ideal.mem_map_of_mem (Ideal.Quotient.mk (secIdeal Q y)) hp
   rw [Ideal.map_sup, Ideal.map_quotient_self, bot_sup_eq, Ideal.map_map] at hm
@@ -52,7 +59,6 @@ theorem mem_maximalIdeal_smul_of_secMap_eq_zero {R : Type*} [CommRing R] [IsLoca
   rwa [he] at hm
 
 end SecRankSpecialize
-
 
 open SecRankSpecialize in
 theorem SecRankSpecialize.proof : SecRankSpecialize.Statement := by
@@ -71,8 +77,9 @@ theorem SecRankSpecialize.proof : SecRankSpecialize.Statement := by
   have : Module.Finite κ
       (Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R κ))) (algebraMap R κ ∘ y)) :=
     Module.Finite.of_restrictScalars_finite R κ _
-  let v := Module.finBasis κ
-    (Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R κ))) (algebraMap R κ ∘ y))
+  let v :=
+    Module.finBasis κ
+      (Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R κ))) (algebraMap R κ ∘ y))
   choose b hb using fun i => hρ (v i)
 
   have htop : Submodule.span R (Set.range b) = ⊤ := by
@@ -109,22 +116,24 @@ theorem SecRankSpecialize.proof : SecRankSpecialize.Statement := by
     obtain ⟨p, rfl⟩ := Ideal.Quotient.mk_surjective z
     induction p using MvPolynomial.induction_on' with
     | monomial u a =>
-      have hmon : (Ideal.Quotient.mk _ (monomial u a) :
-          Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R K))) (algebraMap R K ∘ y)) =
-          a • ι (Ideal.Quotient.mk _ (monomial u 1)) := by
-        rw [secMap_mk, MvPolynomial.map_monomial, map_one, ← Ideal.Quotient.mkₐ_eq_mk K,
-          ← map_smul, smul_monomial, smul_eq_mul, mul_one]
+      have hmon
+          : (Ideal.Quotient.mk _ (monomial u a)
+              : Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R K))) (algebraMap R K ∘ y))
+            = a • ι (Ideal.Quotient.mk _ (monomial u 1)) := by
+        rw [secMap_mk, MvPolynomial.map_monomial, map_one, ← Ideal.Quotient.mkₐ_eq_mk K, ← map_smul,
+          smul_monomial, smul_eq_mul, mul_one]
       rw [hmon]
       exact Submodule.smul_mem _ _ (hB _)
     | add p q hp hq => rw [map_add (f := _)]; exact Submodule.add_mem _ hp hq
-  calc Module.finrank K
+  calc
+    Module.finrank K
           (Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R K))) (algebraMap R K ∘ y))
         = Module.finrank K (Submodule.span K (Set.range fun i => ι (b i))) := by
-          rw [hspan, finrank_top]
-      _ ≤ Fintype.card (Fin (Module.finrank κ
-          (Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R κ))) (algebraMap R κ ∘ y)))) :=
-          finrank_range_le_card _
-      _ = _ := Fintype.card_fin _
+      rw [hspan, finrank_top]
+    _ ≤ Fintype.card (Fin (Module.finrank κ
+        (Vertical.SecAlg (Q.map (MvPolynomial.map (algebraMap R κ))) (algebraMap R κ ∘ y)))) :=
+      finrank_range_le_card _
+    _ = _ := Fintype.card_fin _
 
 end
 

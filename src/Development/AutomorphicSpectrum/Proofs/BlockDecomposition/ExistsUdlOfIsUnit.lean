@@ -20,26 +20,27 @@ theorem ex_inr {n : ℕ} (k : Fin 1) : ex n (Sum.inr k) = Fin.last n := by
   ext
   simp [ex]
 
-theorem one_ex {n : ℕ} (i j : Fin n ⊕ Fin 1) :
-    (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (ex n i) (ex n j) =
-      fromBlocks (1 : Matrix (Fin n) (Fin n) R) 0 0 (1 : Matrix (Fin 1) (Fin 1) R) i j := by
+theorem one_ex {n : ℕ} (i j : Fin n ⊕ Fin 1)
+    : (1 : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (ex n i) (ex n j)
+      = fromBlocks (1 : Matrix (Fin n) (Fin n) R) 0 0 (1 : Matrix (Fin 1) (Fin 1) R) i j := by
   rw [fromBlocks_one]
   simp [Matrix.one_apply]
 
 def IsUp (I : Ideal R) {n : ℕ} (u : Matrix (Fin n) (Fin n) R) : Prop :=
-  (∀ i j, u i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I) ∧ (∀ i j, j < i → u i j = 0) ∧
-    ∀ i, u i i = 1
+  (∀ i j, u i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I) ∧ (∀ i j, j < i → u i j = 0)
+    ∧ ∀ i, u i i = 1
 
 def IsLo (I : Ideal R) {n : ℕ} (l : Matrix (Fin n) (Fin n) R) : Prop :=
-  (∀ i j, l i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I) ∧ (∀ i j, i < j → l i j = 0) ∧
-    ∀ i, l i i = 1
+  (∀ i j, l i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I) ∧ (∀ i j, i < j → l i j = 0)
+    ∧ ∀ i, l i i = 1
 
 def IsDi (I : Ideal R) {n : ℕ} (d : Matrix (Fin n) (Fin n) R) : Prop :=
   (∀ i j, d i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I) ∧ ∀ i j, i ≠ j → d i j = 0
 
-theorem up_step {I : Ideal R} {n : ℕ} {u : Matrix (Fin n) (Fin n) R} (hu : IsUp I u)
-    {x : Matrix (Fin n) (Fin 1) R} (hx : ∀ i k, x i k ∈ I) :
-    IsUp I ((fromBlocks u x 0 1).submatrix (ex n).symm (ex n).symm) := by
+theorem up_step
+    {I : Ideal R} {n : ℕ} {u : Matrix (Fin n) (Fin n) R} (hu : IsUp I u)
+    {x : Matrix (Fin n) (Fin 1) R} (hx : ∀ i k, x i k ∈ I)
+    : IsUp I ((fromBlocks u x 0 1).submatrix (ex n).symm (ex n).symm) := by
   refine ⟨?_, ?_, ?_⟩
   · intro i j
     obtain ⟨i, rfl⟩ := (ex n).surjective i
@@ -68,9 +69,10 @@ theorem up_step {I : Ideal R} {n : ℕ} {u : Matrix (Fin n) (Fin n) R} (hu : IsU
     · simpa using hu.2.2 i
     · simp
 
-theorem lo_step {I : Ideal R} {n : ℕ} {l : Matrix (Fin n) (Fin n) R} (hl : IsLo I l)
-    {y : Matrix (Fin 1) (Fin n) R} (hy : ∀ k j, y k j ∈ I) :
-    IsLo I ((fromBlocks l 0 y 1).submatrix (ex n).symm (ex n).symm) := by
+theorem lo_step
+    {I : Ideal R} {n : ℕ} {l : Matrix (Fin n) (Fin n) R} (hl : IsLo I l)
+    {y : Matrix (Fin 1) (Fin n) R} (hy : ∀ k j, y k j ∈ I)
+    : IsLo I ((fromBlocks l 0 y 1).submatrix (ex n).symm (ex n).symm) := by
   refine ⟨?_, ?_, ?_⟩
   · intro i j
     obtain ⟨i, rfl⟩ := (ex n).surjective i
@@ -99,9 +101,10 @@ theorem lo_step {I : Ideal R} {n : ℕ} {l : Matrix (Fin n) (Fin n) R} (hl : IsL
     · simpa using hl.2.2 i
     · simp
 
-theorem di_step {I : Ideal R} {n : ℕ} {d : Matrix (Fin n) (Fin n) R} (hd : IsDi I d)
-    {a : Matrix (Fin 1) (Fin 1) R} (ha : ∀ k k', a k k' - (1 : Matrix (Fin 1) (Fin 1) R) k k' ∈ I) :
-    IsDi I ((fromBlocks d 0 0 a).submatrix (ex n).symm (ex n).symm) := by
+theorem di_step
+    {I : Ideal R} {n : ℕ} {d : Matrix (Fin n) (Fin n) R} (hd : IsDi I d)
+    {a : Matrix (Fin 1) (Fin 1) R} (ha : ∀ k k', a k k' - (1 : Matrix (Fin 1) (Fin 1) R) k k' ∈ I)
+    : IsDi I ((fromBlocks d 0 0 a).submatrix (ex n).symm (ex n).symm) := by
   refine ⟨?_, ?_⟩
   · intro i j
     obtain ⟨i, rfl⟩ := (ex n).surjective i
@@ -123,27 +126,35 @@ theorem di_step {I : Ideal R} {n : ℕ} {d : Matrix (Fin n) (Fin n) R} (hd : IsD
     · simp
     · exact absurd (by rw [Subsingleton.elim i j]) hij
 
-theorem fromBlocks_udl {n : ℕ} (A : Matrix (Fin n) (Fin n) R) (c : Matrix (Fin n) (Fin 1) R)
-    (r : Matrix (Fin 1) (Fin n) R) (a b : Matrix (Fin 1) (Fin 1) R) (hab : a * b = 1)
-    (hba : b * a = 1) (u d l : Matrix (Fin n) (Fin n) R) (h : A - c * b * r = u * d * l) :
-    fromBlocks A c r a =
-      fromBlocks u (c * b) 0 1 * fromBlocks d 0 0 a * fromBlocks l 0 (b * r) 1 := by
+theorem fromBlocks_udl
+    {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) R) (c : Matrix (Fin n) (Fin 1) R) (r : Matrix (Fin 1) (Fin n) R)
+    (a b : Matrix (Fin 1) (Fin 1) R) (hab : a * b = 1) (hba : b * a = 1)
+    (u d l : Matrix (Fin n) (Fin n) R) (h : A - c * b * r = u * d * l)
+    : fromBlocks A c r a
+      = fromBlocks u (c * b) 0 1 * fromBlocks d 0 0 a * fromBlocks l 0 (b * r) 1 := by
   have h' : A = u * d * l + c * b * r := by rw [← h]; abel
   simp only [fromBlocks_multiply, Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add,
     Matrix.mul_one, Matrix.one_mul]
   rw [Matrix.mul_assoc c b a, hba, Matrix.mul_one, ← Matrix.mul_assoc a b r, hab, Matrix.one_mul]
   rw [h', Matrix.mul_assoc c b r]
 
-theorem exists_udl_of_isUnit (I : Ideal R) (hI : ∀ x ∈ I, IsUnit (1 + x)) (n : ℕ) :
-    ∀ g : Matrix (Fin n) (Fin n) R,
-      (∀ i j, g i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I) →
-        ∃ u d l : Matrix (Fin n) (Fin n) R, IsUp I u ∧ IsDi I d ∧ IsLo I l ∧ g = u * d * l := by
+theorem exists_udl_of_isUnit (I : Ideal R) (hI : ∀ x ∈ I, IsUnit (1 + x)) (n : ℕ)
+    : ∀ g : Matrix (Fin n) (Fin n) R,
+      (∀ i j, g i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ I)
+        → ∃ u d l : Matrix (Fin n) (Fin n) R, IsUp I u ∧ IsDi I d ∧ IsLo I l ∧ g = u * d * l := by
   induction n with
   | zero =>
     intro g _
-    exact ⟨1, 1, 1, ⟨fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩,
-      ⟨fun i => i.elim0, fun i => i.elim0⟩, ⟨fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩,
-      Subsingleton.elim _ _⟩
+    exact ⟨
+      1,
+      1,
+      1,
+      ⟨fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩,
+      ⟨fun i => i.elim0, fun i => i.elim0⟩,
+      ⟨fun i => i.elim0, fun i => i.elim0, fun i => i.elim0⟩,
+      Subsingleton.elim _ _
+    ⟩
   | succ n ih =>
     intro g hg
     set A : Matrix (Fin n) (Fin n) R := fun i j => g i.castSucc j.castSucc with hA
@@ -182,8 +193,9 @@ theorem exists_udl_of_isUnit (I : Ideal R) (hI : ∀ x ∈ I, IsUnit (1 + x)) (n
       have h2 : (c * b * r) i j ∈ I := by
         simp only [Matrix.mul_apply, Finset.univ_unique, Finset.sum_singleton]
         exact I.mul_mem_right _ (I.mul_mem_right _ (hcI i default))
-      have h3 : (A - c * b * r) i j - (1 : Matrix (Fin n) (Fin n) R) i j =
-          (A i j - (1 : Matrix (Fin n) (Fin n) R) i j) - (c * b * r) i j := by
+      have h3
+          : (A - c * b * r) i j - (1 : Matrix (Fin n) (Fin n) R) i j
+            = (A i j - (1 : Matrix (Fin n) (Fin n) R) i j) - (c * b * r) i j := by
         simp only [Matrix.sub_apply]
         ring
       rw [h3]
@@ -211,15 +223,17 @@ theorem exists_udl_of_isUnit (I : Ideal R) (hI : ∀ x ∈ I, IsUnit (1 + x)) (n
     rw [hg', fromBlocks_udl A c r a b hab hba u d l hudl]
     simp only [Matrix.submatrix_mul_equiv]
 
-theorem iwahori_udl : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (n : ℕ)
-    (ϖ : R) (m : ℕ), Irreducible ϖ → 1 ≤ m → ∀ g : Matrix (Fin n) (Fin n) R,
-    (∀ i j, g i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m}) →
-    ∃ (u d l : Matrix (Fin n) (Fin n) R),
-      (∀ i j, u i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m}) ∧
-      (∀ i j, d i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m}) ∧
-      (∀ i j, l i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m}) ∧
-      (∀ i j, j < i → u i j = 0) ∧ (∀ i, u i i = 1) ∧ (∀ i j, i ≠ j → d i j = 0) ∧
-      (∀ i j, i < j → l i j = 0) ∧ (∀ i, l i i = 1) ∧ g = u * d * l := by
+theorem iwahori_udl
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] (n : ℕ) (ϖ : R) (m : ℕ),
+      Irreducible ϖ → 1 ≤ m
+        → ∀ g : Matrix (Fin n) (Fin n) R,
+          (∀ i j, g i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m})
+            → ∃ (u d l : Matrix (Fin n) (Fin n) R),
+              (∀ i j, u i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m})
+                ∧ (∀ i j, d i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m})
+                ∧ (∀ i j, l i j - (1 : Matrix (Fin n) (Fin n) R) i j ∈ Ideal.span {ϖ ^ m})
+                ∧ (∀ i j, j < i → u i j = 0) ∧ (∀ i, u i i = 1) ∧ (∀ i j, i ≠ j → d i j = 0)
+                ∧ (∀ i j, i < j → l i j = 0) ∧ (∀ i, l i i = 1) ∧ g = u * d * l := by
   intro R _ _ _ n ϖ m hϖ hm g hg
   have hmem : ϖ ^ m ∈ IsLocalRing.maximalIdeal R :=
     Ideal.pow_mem_of_mem _ ((IsLocalRing.mem_maximalIdeal _).mpr hϖ.not_isUnit) m (by omega)
@@ -229,8 +243,7 @@ theorem iwahori_udl : ∀ (R : Type) [CommRing R] [IsDomain R] [IsDiscreteValuat
     intro x hx
     by_contra hnu
     have h1 : 1 + x ∈ IsLocalRing.maximalIdeal R := (IsLocalRing.mem_maximalIdeal _).mpr hnu
-    have h2 : (1 : R) ∈ IsLocalRing.maximalIdeal R := by
-      simpa using Ideal.sub_mem _ h1 (hle hx)
+    have h2 : (1 : R) ∈ IsLocalRing.maximalIdeal R := by simpa using Ideal.sub_mem _ h1 (hle hx)
     exact (Ideal.ne_top_iff_one _).mp (IsLocalRing.maximalIdeal.isMaximal R).ne_top h2
   obtain ⟨u, d, l, hu, hd, hl, h⟩ := exists_udl_of_isUnit _ hI n g hg
   exact ⟨u, d, l, hu.1, hd.1, hl.1, hu.2.1, hu.2.2, hd.2, hl.2.1, hl.2.2, h⟩

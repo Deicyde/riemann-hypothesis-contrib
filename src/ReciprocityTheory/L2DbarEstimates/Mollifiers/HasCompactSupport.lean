@@ -10,8 +10,10 @@ open MeasureTheory Filter Topology Set Metric
 open scoped Convolution ContDiff ENNReal Pointwise
 
 section
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] {μ : Measure E}
+variable
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+  [BorelSpace E]
+  {μ : Measure E}
 
 theorem Kernel.hasCompactSupport (K : Kernel E μ) : HasCompactSupport K.toFun :=
   HasCompactSupport.intro (isCompact_closedBall (0 : E) K.r) fun x hx => by
@@ -20,19 +22,28 @@ theorem Kernel.hasCompactSupport (K : Kernel E μ) : HasCompactSupport K.toFun :
 
 end
 
-theorem moll_smooth (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] : SmoothSt E μ := fun K _ hu =>
+theorem moll_smooth
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    : SmoothSt E μ := fun K _ hu =>
   K.hasCompactSupport.contDiff_convolution_left _ K.smooth hu
 
-theorem moll_support (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] : SupportSt E μ := by
+theorem moll_support
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    : SupportSt E μ := by
   intro K u
   refine (support_convolution_subset _).trans ?_
   rw [add_comm]
   exact Set.add_subset_add_left K.support_subset
 
-theorem kernel_std (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-    [MeasurableSpace E] [BorelSpace E] (μ : Measure E) [μ.IsAddHaarMeasure] : StdSt E μ := by
+theorem kernel_std
+    (E : Type*) [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+    [BorelSpace E]
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    : StdSt E μ := by
   have h : (fun ε : ℝ => (Kernel.std E μ ε).r) =ᶠ[𝓝[>] 0] id := by
     filter_upwards [self_mem_nhdsWithin] with ε hε
     simp [Kernel.std, Kernel.ofBump, stdBump, show (0 : ℝ) < ε from hε]

@@ -65,12 +65,14 @@ end ring
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-noncomputable def beta {R : Type} [CommRing R] [Algebra ℚ R] (e : Matrix ι ι ℚ) (g : Matrix ι ι R) :
-    Matrix ι ι R :=
+noncomputable def beta {R : Type} [CommRing R] [Algebra ℚ R] (e : Matrix ι ι ℚ) (g : Matrix ι ι R)
+    : Matrix ι ι R :=
   e.map (algebraMap ℚ R) * g * (1 - e.map (algebraMap ℚ R)) * (blk e g).adjugate
 
-noncomputable def sec {R : Type} [CommRing R] [Algebra ℚ R] (e : Matrix ι ι ℚ) (c : ι × ι → ι × ι → ℚ)
-    (g : Matrix ι ι R) : Matrix ι ι R :=
+noncomputable def sec
+    {R : Type} [CommRing R] [Algebra ℚ R]
+    (e : Matrix ι ι ℚ) (c : ι × ι → ι × ι → ℚ) (g : Matrix ι ι R)
+    : Matrix ι ι R :=
   (1 - linExt c (beta e g)) * g
 
 section natural
@@ -115,17 +117,34 @@ lemma linExt_zero (c : ι × ι → ι × ι → ℚ) : linExt c (0 : Matrix ι 
 
 end GlobalTheory.ClassFin.IdempotentCornerSection
 
-
 open GlobalTheory.ClassFin.IdempotentCornerSection in
-theorem GlobalTheory.ClassFin.exists_blk_section : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ), IsQGroup Γ → e * e = e → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0) → ∃ (c : ι × ι → ι × ι → ℚ) (b : ι → ι → MvPolynomial (ι × ι) ℚ), (∀ X : Matrix ι ι ℂ, 1 + linExt c X ∈ Γ ∧ e.map (algebraMap ℚ ℂ) * linExt c X * (1 - e.map (algebraMap ℚ ℂ)) = linExt c X) ∧ (Matrix.of fun i j => ev (b i j) (1 : Matrix ι ι ℂ)) = 1 ∧ ∀ g ∈ Γ, (Matrix.of fun i j => ev (b i j) (blk e g)) ∈ Γ ∧ blk e (Matrix.of fun i j => ev (b i j) (blk e g)) = blk e g ∧ g = (1 + linExt c (e.map (algebraMap ℚ ℂ) * g * (1 - e.map (algebraMap ℚ ℂ)) * (blk e g).adjugate)) * (Matrix.of fun i j => ev (b i j) (blk e g)) := by
+theorem GlobalTheory.ClassFin.exists_blk_section
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (Γ : Set (Matrix ι ι ℂ)) (e : Matrix ι ι ℚ),
+      IsQGroup Γ → e * e = e
+        → (∀ g ∈ Γ, (1 - e.map (algebraMap ℚ ℂ)) * g * e.map (algebraMap ℚ ℂ) = 0)
+        → ∃ (c : ι × ι → ι × ι → ℚ) (b : ι → ι → MvPolynomial (ι × ι) ℚ),
+          (∀ X : Matrix ι ι ℂ,
+              1 + linExt c X ∈ Γ
+                ∧ e.map (algebraMap ℚ ℂ) * linExt c X * (1 - e.map (algebraMap ℚ ℂ)) = linExt c X)
+            ∧ (Matrix.of fun i j => ev (b i j) (1 : Matrix ι ι ℂ)) = 1
+            ∧ ∀ g ∈ Γ,
+              (Matrix.of fun i j => ev (b i j) (blk e g)) ∈ Γ
+                ∧ blk e (Matrix.of fun i j => ev (b i j) (blk e g)) = blk e g
+                ∧ g
+                  = (1 + linExt c
+                      (e.map (algebraMap ℚ ℂ) * g * (1 - e.map (algebraMap ℚ ℂ))
+                        * (blk e g).adjugate))
+                    * (Matrix.of fun i j => ev (b i j) (blk e g)) := by
   intro ι _ _ Γ e hΓ he htri
   obtain ⟨c, hc, hfix⟩ := GlobalTheory.T.exists_rat_linear_param_blockDiag_kernel ι Γ e hΓ he
   have hpre := GlobalTheory.T.isAutStableSLMatrixGroup_image_blockDiagPart ι Γ e hΓ.toIsPre he htri
-  obtain ⟨hb1, -, hdec, hbb, -⟩ := GlobalTheory.T.blockDiagPartOfRatIdempotent_one_and_mul_of_triangular ι e ℂ he
+  obtain ⟨hb1, -, hdec, hbb, -⟩ :=
+    GlobalTheory.T.blockDiagPartOfRatIdempotent_one_and_mul_of_triangular ι e ℂ he
   obtain ⟨f, hf⟩ := exists_poly e c
   have hE : e.map (algebraMap ℚ ℂ) * e.map (algebraMap ℚ ℂ) = e.map (algebraMap ℚ ℂ) := by
     rw [← Matrix.map_mul, he]
-  have hcomm : ∀ g : Matrix ι ι ℂ, e.map (algebraMap ℚ ℂ) * blk e g = blk e g * e.map (algebraMap ℚ ℂ) :=
+  have hcomm
+      : ∀ g : Matrix ι ι ℂ, e.map (algebraMap ℚ ℂ) * blk e g = blk e g * e.map (algebraMap ℚ ℂ) :=
     fun g => diag_comm hE g
   have hdet : ∀ g ∈ Γ, (blk e g).det = 1 := fun g hg => hpre.det_eq _ ⟨g, hg, rfl⟩
   have h1 : ∀ g ∈ Γ, blk e g * (blk e g).adjugate = 1 := fun g hg => by
@@ -146,9 +165,12 @@ theorem GlobalTheory.ClassFin.exists_blk_section : ∀ (ι : Type) [Fintype ι] 
     rw [mul_add, sub_mul, sub_mul, h0]
     simp only [mul_one, one_mul, sub_zero]
     abel
-  have hsub : ∀ x y : Matrix ι ι ℂ, e.map (algebraMap ℚ ℂ) * x * (1 - e.map (algebraMap ℚ ℂ)) = x →
-      e.map (algebraMap ℚ ℂ) * y * (1 - e.map (algebraMap ℚ ℂ)) = y →
-      e.map (algebraMap ℚ ℂ) * (x - y) * (1 - e.map (algebraMap ℚ ℂ)) = x - y := fun x y hx hy => by
+  have hsub
+      : ∀ x y : Matrix ι ι ℂ,
+        e.map (algebraMap ℚ ℂ) * x * (1 - e.map (algebraMap ℚ ℂ)) = x
+          → e.map (algebraMap ℚ ℂ) * y * (1 - e.map (algebraMap ℚ ℂ)) = y
+          → e.map (algebraMap ℚ ℂ) * (x - y) * (1 - e.map (algebraMap ℚ ℂ))
+            = x - y := fun x y hx hy => by
     rw [mul_sub (e.map (algebraMap ℚ ℂ)) x y, sub_mul, hx, hy]
   have hconst : ∀ x ∈ Γ, ∀ x' ∈ Γ, blk e x = blk e x' → sec e c x = sec e c x' := by
     intro x hx x' hx' hxx
@@ -156,13 +178,15 @@ theorem GlobalTheory.ClassFin.exists_blk_section : ∀ (ι : Type) [Fintype ι] 
     have h0 := corner_mul hE hε (hβ x' hx')
     have hxe : x = (1 + (beta e x - beta e x')) * x' := by
       have : (1 + (beta e x - beta e x')) * x'
-          = (1 + (beta e x - beta e x')) * ((1 + beta e x') * blk e x') := by rw [← hg1 x' hx']
+          = (1 + (beta e x - beta e x')) * ((1 + beta e x') * blk e x') := by
+        rw [← hg1 x' hx']
       rw [this, ← mul_assoc, ← hxx]
       have h3 : (1 + (beta e x - beta e x')) * (1 + beta e x') = 1 + beta e x := by
         rw [mul_add, add_mul _ _ (beta e x'), h0]
         simp only [mul_one, one_mul, add_zero]
         abel
-      rw [h3]; exact hg1 x hx
+      rw [h3]
+      exact hg1 x hx
     have hmem : 1 + (beta e x - beta e x') ∈ Γ := by
       have h4 : x * x'.adjugate = 1 + (beta e x - beta e x') := by
         have : x * x'.adjugate = ((1 + (beta e x - beta e x')) * x') * x'.adjugate := by rw [← hxe]
@@ -175,9 +199,10 @@ theorem GlobalTheory.ClassFin.exists_blk_section : ∀ (ι : Type) [Fintype ι] 
     congr 2
     rw [sub_eq_iff_eq_add.mp h5]
     abel
-  have hb : ∀ i j, ∃ b : MvPolynomial (ι × ι) ℚ, ∀ x ∈ Γ, ev (f i j) x = ev b (blk e x) := fun i j =>
-    GlobalTheory.T.descend_blockDiagPart_ratPoly_of_fibre_const ι Γ e hΓ he htri (f i j) fun x hx x' hx' hxx => by
-      rw [hf, hf, hconst x hx x' hx' hxx]
+  have hb
+      : ∀ i j, ∃ b : MvPolynomial (ι × ι) ℚ, ∀ x ∈ Γ, ev (f i j) x = ev b (blk e x) := fun i j =>
+    GlobalTheory.T.descend_blockDiagPart_ratPoly_of_fibre_const ι Γ e hΓ he htri (f i j)
+      fun x hx x' hx' hxx => by rw [hf, hf, hconst x hx x' hx' hxx]
   choose b hb using hb
   have hbs : ∀ g ∈ Γ, (Matrix.of fun i j => ev (b i j) (blk e g)) = sec e c g := fun g hg => by
     ext i j; rw [Matrix.of_apply, ← hb i j g hg, hf]
@@ -198,8 +223,10 @@ theorem GlobalTheory.ClassFin.exists_blk_section : ∀ (ι : Type) [Fintype ι] 
       rw [hs g hg, add_mul, one_mul]
       generalize (beta e g - linExt c (beta e g)) * blk e g = y at h
       generalize blk e g = D at h' ⊢
-      have : blk e (D + y) = blk e D + (e.map (algebraMap ℚ ℂ) * y * e.map (algebraMap ℚ ℂ) +
-          (1 - e.map (algebraMap ℚ ℂ)) * y * (1 - e.map (algebraMap ℚ ℂ))) := by
+      have : blk e (D + y)
+          = blk e D
+            + (e.map (algebraMap ℚ ℂ) * y * e.map (algebraMap ℚ ℂ)
+              + (1 - e.map (algebraMap ℚ ℂ)) * y * (1 - e.map (algebraMap ℚ ℂ))) := by
         simp only [blk, mul_add, add_mul]; abel
       rw [this, h, h', add_zero]
     · have h0 := corner_mul hE (hc (beta e g)).2 (hc (beta e g)).2

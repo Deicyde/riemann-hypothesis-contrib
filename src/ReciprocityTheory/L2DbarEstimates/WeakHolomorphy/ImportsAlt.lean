@@ -12,7 +12,8 @@ open scoped ENNReal
 theorem ident : IdentStatement := by
   intro n Ω F a hΩ hc hF ha h0 x hx
   set L : ℂ → V n := fun t => a + t • (x - a) with hL
-  have hLd : Differentiable ℂ L := (differentiable_const a).add (differentiable_id.smul_const (x - a))
+  have hLd : Differentiable ℂ L :=
+    (differentiable_const a).add (differentiable_id.smul_const (x - a))
   have hLc : Continuous L := hLd.continuous
   set U : Set ℂ := L ⁻¹' Ω with hU
   have hUo : IsOpen U := hΩ.preimage hLc

@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trChar_of :
-    FL → OpEq → TrSum → PtInj → TrChar := by
+theorem UpperTheory.Gal.TranscendenceTraces.trChar_of : FL → OpEq → TrSum → PtInj → TrChar := by
   intro hFL hOp hTS hPI q _ i Z S p _ w hw hq
   have hOver : (trFam p w q i).Over (tr0 p w q i) := by
     unfold trFam

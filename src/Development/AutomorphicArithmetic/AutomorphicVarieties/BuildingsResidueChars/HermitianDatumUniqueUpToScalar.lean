@@ -6,12 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob Matrix
 
-private theorem star_alg {K : Type} [Field K] {Δ : K} (x : K) :
-    star (algebraMap K (Lsq K Δ) x) = algebraMap K (Lsq K Δ) x := by
+private theorem star_alg {K : Type} [Field K] {Δ : K} (x : K)
+    : star (algebraMap K (Lsq K Δ) x) = algebraMap K (Lsq K Δ) x := by
   ext <;> simp
 
-private theorem sigL_mul' {K : Type} [Field K] {Δ τ : K} (a b : EL Δ τ) :
-    sigL (a * b) = sigL a * sigL b := by
+private theorem sigL_mul' {K : Type} [Field K] {Δ τ : K} (a b : EL Δ τ)
+    : sigL (a * b) = sigL a * sigL b := by
   ext <;> simp [sigL, star_alg] <;> ring
 
 private theorem sigL_one' {K : Type} [Field K] {Δ τ : K} : sigL (1 : EL Δ τ) = 1 := by
@@ -19,8 +19,9 @@ private theorem sigL_one' {K : Type} [Field K] {Δ τ : K} : sigL (1 : EL Δ τ)
   · exact star_one (Lsq K Δ)
   · exact star_zero (Lsq K Δ)
 
-private theorem fixed_scalar {K : Type} [Field K] [CharZero K] {Δ τ : K} (r : EL Δ τ)
-    (h1 : sigL r = r) (h2 : star r = r) : ∃ p : K, ∀ x : EL Δ τ, r * x = p • x := by
+private theorem fixed_scalar
+    {K : Type} [Field K] [CharZero K] {Δ τ : K} (r : EL Δ τ) (h1 : sigL r = r) (h2 : star r = r)
+    : ∃ p : K, ∀ x : EL Δ τ, r * x = p • x := by
   have z : ∀ y : K, -y = y → y = 0 := fun y h => by
     have h' : (2 : K) * y = 0 := by linear_combination -h
     simpa using h'
@@ -32,16 +33,18 @@ private theorem fixed_scalar {K : Type} [Field K] [CharZero K] {Δ τ : K} (r : 
     rw [show algebraMap K (EL Δ τ) r.re.re = ⟨⟨r.re.re, 0⟩, 0⟩ from rfl]
     ext <;> simp [z _ e1, z _ e2, z _ e3]
   refine ⟨r.re.re, fun x => ?_⟩
-  calc r * x = algebraMap K (EL Δ τ) r.re.re * x := by rw [hr]
+  calc
+    r * x
+      = algebraMap K (EL Δ τ) r.re.re * x := by rw [hr]
     _ = r.re.re • x := (Algebra.smul_def _ _).symm
 
-theorem UpperTheory.hermitian_datum_unique_up_to_scalar :
-    ∀ (K : Type) [Field K] [CharZero K] (Δ τ c c' : K) (d m m' : EL Δ τ), IsDat c d m → IsDat c' d m' → ∃ t : Kˣ, m' = (t : K) • m := by
+theorem UpperTheory.hermitian_datum_unique_up_to_scalar
+    : ∀ (K : Type) [Field K] [CharZero K] (Δ τ c c' : K) (d m m' : EL Δ τ),
+      IsDat c d m → IsDat c' d m' → ∃ t : Kˣ, m' = (t : K) • m := by
   intro K _ _ Δ τ c c' d m m' hm hm'
   obtain ⟨u, hu⟩ := hm.m_unit
   set r : EL Δ τ := m' * ↑u⁻¹ with hrdef
-  have hrm : r * m = m' := by
-    rw [hrdef, ← hu, mul_assoc, Units.inv_mul, mul_one]
+  have hrm : r * m = m' := by rw [hrdef, ← hu, mul_assoc, Units.inv_mul, mul_one]
   have hsu : IsUnit (sigL m) := by
     refine IsUnit.of_mul_eq_one (sigL (↑u⁻¹ : EL Δ τ)) ?_
     rw [← sigL_mul', ← hu, Units.mul_inv, sigL_one']
@@ -57,7 +60,9 @@ theorem UpperTheory.hermitian_datum_unique_up_to_scalar :
     exact star_star _
   have hst : star r = r := by
     have e : star r * sigL m = r * sigL m :=
-      calc star r * sigL m = star r * star m := by rw [hsm]
+      calc
+        star r * sigL m
+          = star r * star m := by rw [hsm]
         _ = star (r * m) := (star_mul' r m).symm
         _ = star m' := by rw [hrm]
         _ = sigL m' := hsm'

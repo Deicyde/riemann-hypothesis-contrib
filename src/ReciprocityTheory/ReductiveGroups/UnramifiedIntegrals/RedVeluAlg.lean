@@ -37,19 +37,19 @@ theorem rootPoly_eval_mem {t : K} (ht : t ∈ xs) : (rootPoly xs).eval t = 0 := 
   rw [rootPoly_eval]
   exact Finset.prod_eq_zero ht (sub_self t)
 
-theorem rootPoly_erase {x : K} (hx : x ∈ xs) :
-    rootPoly xs = (X - C x) * rootPoly (xs.erase x) := by
+theorem rootPoly_erase {x : K} (hx : x ∈ xs) : rootPoly xs = (X - C x) * rootPoly (xs.erase x) := by
   unfold rootPoly
   exact (Finset.mul_prod_erase xs (fun y => (X - C y : K[X])) hx).symm
 
-theorem veluNum_eval' (t : K) :
-    (veluNum g2 g3 xs).eval t = t * (rootPoly xs).eval t ^ 2
-      + ∑ x ∈ xs, (fW g2 g3 x + fW' g2 x / 2 * (t - x)) * (rootPoly (xs.erase x)).eval t ^ 2 := by
+theorem veluNum_eval' (t : K)
+    : (veluNum g2 g3 xs).eval t
+      = t * (rootPoly xs).eval t ^ 2
+        + ∑ x ∈ xs, (fW g2 g3 x + fW' g2 x / 2 * (t - x)) * (rootPoly (xs.erase x)).eval t ^ 2 := by
   unfold veluNum
   simp [eval_finsetSum]
 
-theorem veluNum_eval {t : K} (ht : t ∉ xs) :
-    (veluNum g2 g3 xs).eval t = veluFun g2 g3 xs t * (rootPoly xs).eval t ^ 2 := by
+theorem veluNum_eval {t : K} (ht : t ∉ xs)
+    : (veluNum g2 g3 xs).eval t = veluFun g2 g3 xs t * (rootPoly xs).eval t ^ 2 := by
   rw [veluNum_eval']
   unfold veluFun
   rw [add_mul, Finset.sum_mul]
@@ -82,16 +82,16 @@ theorem veluNum_natDegree_le : (veluNum g2 g3 xs).natDegree ≤ 2 * xs.card + 1 
       simp
     omega
 
-theorem veluNum_eval_mem {x : K} (hx : x ∈ xs) :
-    (veluNum g2 g3 xs).eval x = fW g2 g3 x * (rootPoly (xs.erase x)).eval x ^ 2 := by
+theorem veluNum_eval_mem {x : K} (hx : x ∈ xs)
+    : (veluNum g2 g3 xs).eval x = fW g2 g3 x * (rootPoly (xs.erase x)).eval x ^ 2 := by
   rw [veluNum_eval', rootPoly_eval_mem xs hx, Finset.sum_eq_single_of_mem x hx]
   · simp
   · intro y _ hy
     rw [rootPoly_eval_mem (xs.erase y) (Finset.mem_erase.2 ⟨hy.symm, hx⟩)]
     simp
 
-theorem veluNum_coprime (h : ∀ x ∈ xs, fW g2 g3 x ≠ 0) :
-    IsCoprime (veluNum g2 g3 xs) (rootPoly xs ^ 2) := by
+theorem veluNum_coprime (h : ∀ x ∈ xs, fW g2 g3 x ≠ 0)
+    : IsCoprime (veluNum g2 g3 xs) (rootPoly xs ^ 2) := by
   refine IsCoprime.pow_right ?_
   unfold rootPoly
   refine IsCoprime.prod_right (fun x hx => ?_)

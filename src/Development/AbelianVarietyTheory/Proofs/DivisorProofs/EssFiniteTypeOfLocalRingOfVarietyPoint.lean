@@ -9,16 +9,19 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsLocalizati
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
 
 namespace GlobalTheory
 
-theorem essFiniteType_of_isLocModel : ∀ {K : Type} [Field K] [Algebra ℂ K] (R : Subring K),
-    IsLocModel (algebraMap ℂ K) R → Algebra.EssFiniteType ℂ K := by
+theorem essFiniteType_of_isLocModel
+    : ∀ {K : Type} [Field K] [Algebra ℂ K] (R : Subring K),
+      IsLocModel (algebraMap ℂ K) R → Algebra.EssFiniteType ℂ K := by
   intro K _ _ R h
   letI : Algebra ℂ R := ((algebraMap ℂ K).codRestrict R h.const_mem).toAlgebra
   haveI : Algebra.EssFiniteType ℂ R := h.essFiniteType

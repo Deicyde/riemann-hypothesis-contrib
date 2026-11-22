@@ -20,10 +20,13 @@ noncomputable section
 
 universe u
 
-theorem blowUpEval_ne_zero_of_not_mem {K : Type} [DecidableEq K] {ι : K → Type} {J : Type} {O : Type u}
-    [CommRing O] {P : Ideal (MRing ι O)} [P.IsPrime] {u : J → MRing ι O} {F : MRing (extIdx ι J) O}
-    {b : Option K → ℕ} (hF : IsMultiHomog F b) (hFb : F ∉ blowUpOf P u) :
-    algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (blowUpEval P u F) ≠ 0 := by
+theorem blowUpEval_ne_zero_of_not_mem
+    {K : Type} [DecidableEq K]
+    {ι : K → Type} {J : Type} {O : Type u} [CommRing O]
+    {P : Ideal (MRing ι O)} [P.IsPrime]
+    {u : J → MRing ι O} {F : MRing (extIdx ι J) O} {b : Option K → ℕ}
+    (hF : IsMultiHomog F b) (hFb : F ∉ blowUpOf P u)
+    : algebraMap (MRing ι O ⧸ P) (FractionRing (MRing ι O ⧸ P)) (blowUpEval P u F) ≠ 0 := by
   rw [Ne, map_eq_zero_iff _ (IsFractionRing.injective _ _)]
   intro h
   apply hFb
@@ -32,8 +35,8 @@ theorem blowUpEval_ne_zero_of_not_mem {K : Type} [DecidableEq K] {ι : K → Typ
   show aeval (blowUpSubst P u) F = 0
   rw [aeval_blowUpSubst_of_isMultiHomog P u hF, h, map_zero, zero_mul]
 
-theorem div_mul_div_mul_cancel_of_ne_zero {F : Type*} [Field F] (a b c w : F) (hb : b ≠ 0) :
-    a / b * (b / c * w) = a / c * w := by
+theorem div_mul_div_mul_cancel_of_ne_zero {F : Type*} [Field F] (a b c w : F) (hb : b ≠ 0)
+    : a / b * (b / c * w) = a / c * w := by
   rw [← mul_assoc, div_mul_div_comm, mul_comm a b, mul_div_mul_left _ _ hb]
 
 theorem BlowUpOverLocPointLoc.proof (hfin : BlowUpOverLocFinite.Statement.{u})

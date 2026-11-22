@@ -6,11 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.ThetaGL UpperTheory.Gal.TP.Loc
+open NumberField IsDedekindDomain ValuativeRel GlobalTheory.PRep GlobalTheory.SmGL
+  GlobalTheory.SplitWeil GlobalTheory.ThetaGL UpperTheory.Gal.TP.Loc
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.Gal.TP.Loc.satContra :
-    UpperTheory.Gal.TP.Loc.ContraUnit → UpperTheory.Gal.TP.Loc.SatContra := by
+theorem UpperTheory.Gal.TP.Loc.satContra
+    : UpperTheory.Gal.TP.Loc.ContraUnit → UpperTheory.Gal.TP.Loc.SatContra := by
   intro hCU K _ _ w n V _ _ ρ hs hi hu B hB
   obtain ⟨-, C, hC⟩ := hCU (w.adicCompletion K) n V ρ hs hi hu
   obtain ⟨b, -, hp, hinv⟩ := hu

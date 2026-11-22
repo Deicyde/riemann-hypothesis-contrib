@@ -9,15 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.EncardBiUnion
 
 noncomputable section
 
-open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
+open NumberField Module Matrix Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.Cnt GlobalTheory.LoopC
 open scoped ENNReal Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.LoopC.PairLat
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : HSpace E} {r : ℕ} {T T' T₂ : E}
-  {Λ : Submodule (𝓞 E) S.V} {g : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E]
+  {S : HSpace E} {r : ℕ} {T T' T₂ : E} {Λ : Submodule (𝓞 E) S.V} {g : ℕ}
 
 theorem mem_orth {U : Submodule E S.V} {x : S.V} : x ∈ orth S U ↔ ∀ u ∈ U, S.hT u x = 0 := by
   simp [orth, Submodule.mem_iInf, LinearMap.mem_ker]
@@ -43,8 +45,8 @@ theorem X_eq_Xflag (F : LFlag S r T) : Xsp F = Xflag F r := by
   · rintro ⟨a, _, rfl⟩
     exact ⟨a, rfl⟩
 
-theorem mem_Lsub_of {F : LFlag S r T} {l y : S.V} (hl : l ∈ Lrep Λ F) (h : y - l ∈ Xsp F) :
-    y ∈ Lsub Λ F := by
+theorem mem_Lsub_of {F : LFlag S r T} {l y : S.V} (hl : l ∈ Lrep Λ F) (h : y - l ∈ Xsp F)
+    : y ∈ Lsub Λ F := by
   have hlo : l ∈ orth S (Xsp F) := (Submodule.mem_inf.1 hl).2
   have hy : y = l + (y - l) := by abel
   refine Submodule.mem_inf.2 ⟨?_, ?_⟩
@@ -56,8 +58,10 @@ theorem mem_Lsub_of {F : LFlag S r T} {l y : S.V} (hl : l ∈ Lrep Λ F) (h : y 
 theorem IotaRel_zero (F : LFlag S r T) (F' : LFlag S r T') : IotaRel Λ g F F' 0 :=
   ⟨0, Submodule.zero_mem _, by simp, 0, Submodule.zero_mem _, by simp, by simp⟩
 
-theorem IotaRel_add {F : LFlag S r T} {F' : LFlag S r T'} {x y : S.V}
-    (hx : IotaRel Λ g F F' x) (hy : IotaRel Λ g F F' y) : IotaRel Λ g F F' (x + y) := by
+theorem IotaRel_add
+    {F : LFlag S r T} {F' : LFlag S r T'} {x y : S.V}
+    (hx : IotaRel Λ g F F' x) (hy : IotaRel Λ g F F' y)
+    : IotaRel Λ g F F' (x + y) := by
   obtain ⟨l, hl, h1, l', hl', h2, h3⟩ := hx
   obtain ⟨m, hm, k1, m', hm', k2, k3⟩ := hy
   refine ⟨l + m, Submodule.add_mem _ hl hm, ?_, l' + m', Submodule.add_mem _ hl' hm', ?_, ?_⟩
@@ -68,8 +72,9 @@ theorem IotaRel_add {F : LFlag S r T} {F' : LFlag S r T'} {x y : S.V}
   · have := Submodule.add_mem _ h3 k3
     rwa [show l - l' + (m - m') = l + m - (l' + m') by abel] at this
 
-theorem IotaRel_smul {F : LFlag S r T} {F' : LFlag S r T'} {x : S.V} (o : 𝓞 E)
-    (hx : IotaRel Λ g F F' x) : IotaRel Λ g F F' (o • x) := by
+theorem IotaRel_smul
+    {F : LFlag S r T} {F' : LFlag S r T'} {x : S.V} (o : 𝓞 E) (hx : IotaRel Λ g F F' x)
+    : IotaRel Λ g F F' (o • x) := by
   obtain ⟨l, hl, h1, l', hl', h2, h3⟩ := hx
   refine ⟨o • l, Submodule.smul_mem _ o hl, ?_, o • l', Submodule.smul_mem _ o hl', ?_, ?_⟩
   · rw [← smul_sub]
@@ -79,19 +84,22 @@ theorem IotaRel_smul {F : LFlag S r T} {F' : LFlag S r T'} {x : S.V} (o : 𝓞 E
   · rw [← smul_sub]
     exact Submodule.smul_mem _ o h3
 
-theorem La_props {F : LFlag S r T} {F' : LFlag S r T'} {x : S.V} (hx : x ∈ La Λ g F F') :
-    x ∈ L0sub Λ F ∧ x ∈ L0sub Λ F' ∧ IotaRel Λ g F F' x := by
+theorem La_props {F : LFlag S r T} {F' : LFlag S r T'} {x : S.V} (hx : x ∈ La Λ g F F')
+    : x ∈ L0sub Λ F ∧ x ∈ L0sub Λ F' ∧ IotaRel Λ g F F' x := by
   induction hx using Submodule.span_induction with
   | mem x hx => exact hx.2
   | zero => exact ⟨Submodule.zero_mem _, Submodule.zero_mem _, IotaRel_zero F F'⟩
   | add y z _ _ h1 h2 =>
-    exact ⟨Submodule.add_mem _ h1.1 h2.1, Submodule.add_mem _ h1.2.1 h2.2.1, IotaRel_add h1.2.2 h2.2.2⟩
+    exact
+      ⟨Submodule.add_mem _ h1.1 h2.1, Submodule.add_mem _ h1.2.1 h2.2.1, IotaRel_add h1.2.2 h2.2.2⟩
   | smul c y _ h =>
     exact ⟨Submodule.smul_mem _ c h.1, Submodule.smul_mem _ c h.2.1, IotaRel_smul c h.2.2⟩
 
-theorem map_Lrep {F' F'' : LFlag S r T'} {β : S.V ≃ₗ[E] S.V} (hβ : IsAutLam S Λ β)
-    (hX : (Xsp F').map (β : S.V →ₗ[E] S.V) = Xsp F'') {l : S.V} (hl : l ∈ Lrep Λ F') :
-    β l ∈ Lrep Λ F'' := by
+theorem map_Lrep
+    {F' F'' : LFlag S r T'} {β : S.V ≃ₗ[E] S.V}
+    (hβ : IsAutLam S Λ β) (hX : (Xsp F').map (β : S.V →ₗ[E] S.V) = Xsp F'')
+    {l : S.V} (hl : l ∈ Lrep Λ F')
+    : β l ∈ Lrep Λ F'' := by
   obtain ⟨h1, h2⟩ := Submodule.mem_inf.1 hl
   refine Submodule.mem_inf.2 ⟨(FrEqv.aut_mem_iff hβ l).2 h1, ?_⟩
   refine mem_orth.2 fun u hu => ?_
@@ -100,9 +108,12 @@ theorem map_Lrep {F' F'' : LFlag S r T'} {β : S.V ≃ₗ[E] S.V} (hβ : IsAutLa
   have := hβ.1 v l
   exact this.trans (mem_orth.1 h2 v hv)
 
-theorem Mlat_le_La_sup (E : Type) [Field E] [NumberField E] [StarRing E] (S : HSpace E) (r : ℕ) (T T' : E)
+theorem Mlat_le_La_sup
+    (E : Type) [Field E] [NumberField E] [StarRing E]
+    (S : HSpace E) (r : ℕ) (T T' : E)
     (Λ : Submodule (𝓞 E) S.V) (g : ℕ) (F : LFlag S r T) (F' F'' : LFlag S r T') (β : S.V ≃ₗ[E] S.V)
-    (hP : IsPair Λ F F' F'' β g) : Mlat Λ F F' F'' β g ≤ La Λ g F F'' ⊔ toO S (Xsp F) := by
+    (hP : IsPair Λ F F' F'' β g)
+    : Mlat Λ F F' F'' β g ≤ La Λ g F F'' ⊔ toO S (Xsp F) := by
   obtain ⟨hβ, hfl, hz, hc⟩ := hP
   have hX : (Xsp F').map (β : S.V →ₗ[E] S.V) = Xsp F'' := by
     rw [X_eq_Xflag F', X_eq_Xflag F'']
@@ -138,8 +149,18 @@ theorem Mlat_le_La_sup (E : Type) [Field E] [NumberField E] [StarRing E] (S : HS
     rw [map_sub, ← hz, hβ.1 F'.fl.z a, hz1', zero_sub, neg_eq_zero, hz] at this
     exact this
   have hmem : x₂ ∈ La Λ g F F'' := by
-    refine Submodule.subset_span ⟨hx₂, Submodule.mem_inf.2 ⟨mem_Lsub_of hl k1, m1⟩,
-      Submodule.mem_inf.2 ⟨mem_Lsub_of hβl k2, m2⟩, l, hl, k1, β l', hβl, k2, ?_⟩
+    refine Submodule.subset_span ⟨
+      hx₂,
+      Submodule.mem_inf.2 ⟨mem_Lsub_of hl k1, m1⟩,
+      Submodule.mem_inf.2 ⟨mem_Lsub_of hβl k2, m2⟩,
+      l,
+      hl,
+      k1,
+      β l',
+      hβl,
+      k2,
+      ?_
+    ⟩
     exact (hc l' hl' l hl).1 hll
   have hsum : a = x₂ + (a - x₂) := by abel
   rw [hsum]

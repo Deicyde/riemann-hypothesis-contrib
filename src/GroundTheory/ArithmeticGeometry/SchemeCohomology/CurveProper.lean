@@ -12,15 +12,19 @@ universe u
 
 namespace GroundTheory.Arith.SchemeCoh
 
-theorem isNoetherian_of_finiteType {k : Type u} [Field k] (X : Scheme.{u})
-    [X.Over (Spec (.of k))] [LocallyOfFiniteType (X ↘ Spec (.of k))]
-    [QuasiCompact (X ↘ Spec (.of k))] : IsNoetherian X := by
+theorem isNoetherian_of_finiteType
+    {k : Type u} [Field k]
+    (X : Scheme.{u}) [X.Over (Spec (.of k))] [LocallyOfFiniteType (X ↘ Spec (.of k))]
+    [QuasiCompact (X ↘ Spec (.of k))]
+    : IsNoetherian X := by
   have := LocallyOfFiniteType.isLocallyNoetherian (X ↘ Spec (.of k))
   have := QuasiCompact.compactSpace_of_compactSpace (X ↘ Spec (.of k))
   exact ⟨⟩
 
-theorem isLocallyFactorial_of_dim_le_one {X : Scheme.{u}} [IsIntegral X] [IsLocallyNoetherian X]
-    [IsNormalScheme X] (hX : topologicalKrullDim X ≤ 1) : IsLocallyFactorial X := by
+theorem isLocallyFactorial_of_dim_le_one
+    {X : Scheme.{u}} [IsIntegral X] [IsLocallyNoetherian X] [IsNormalScheme X]
+    (hX : topologicalKrullDim X ≤ 1)
+    : IsLocallyFactorial X := by
   refine ⟨fun x => ?_⟩
   by_cases hx : x = genericPoint X
   · subst hx

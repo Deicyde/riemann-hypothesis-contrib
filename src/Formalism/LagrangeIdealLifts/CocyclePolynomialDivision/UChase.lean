@@ -125,7 +125,8 @@ end Aux2
 section Aux3
 
 variable {ℓ : ℕ} [Fact ℓ.Prime] {A : Type} [CommRing A] [Algebra ℤ_[ℓ] A] {B : Base ℓ A} {M : ℕ}
-variable {D D' : Type} [AddCommGroup D] [Module A D] [Module ℤ_[ℓ] D] [IsScalarTower ℤ_[ℓ] A D]
+variable
+  {D D' : Type} [AddCommGroup D] [Module A D] [Module ℤ_[ℓ] D] [IsScalarTower ℤ_[ℓ] A D]
   [AddCommGroup D'] [Module A D'] [Module ℤ_[ℓ] D'] [IsScalarTower ℤ_[ℓ] A D']
   {W : WD B M D} {W' : WD B M D'}
 
@@ -150,11 +151,11 @@ end Aux3
 section DiagramChase₂
 
 variable {ℓ : ℕ} [Fact ℓ.Prime] {A : Type} [CommRing A] [Algebra ℤ_[ℓ] A] {B : Base ℓ A} {M : ℕ}
-variable {D₀ D₁ D₂ : Type}
-    [AddCommGroup D₀] [Module A D₀] [Module ℤ_[ℓ] D₀] [IsScalarTower ℤ_[ℓ] A D₀]
-    [AddCommGroup D₁] [Module A D₁] [Module ℤ_[ℓ] D₁] [IsScalarTower ℤ_[ℓ] A D₁]
-    [AddCommGroup D₂] [Module A D₂] [Module ℤ_[ℓ] D₂] [IsScalarTower ℤ_[ℓ] A D₂]
-    {W₀ : WD B M D₀} {W₁ : WD B M D₁} {W₂ : WD B M D₂}
+variable
+  {D₀ D₁ D₂ : Type} [AddCommGroup D₀] [Module A D₀] [Module ℤ_[ℓ] D₀] [IsScalarTower ℤ_[ℓ] A D₀]
+  [AddCommGroup D₁] [Module A D₁] [Module ℤ_[ℓ] D₁] [IsScalarTower ℤ_[ℓ] A D₁] [AddCommGroup D₂]
+  [Module A D₂] [Module ℤ_[ℓ] D₂] [IsScalarTower ℤ_[ℓ] A D₂]
+  {W₀ : WD B M D₀} {W₁ : WD B M D₁} {W₂ : WD B M D₂}
 
 lemma uc_pi_iota (S : SES W₀ W₁ W₂) (x : D₀) : S.π.f (S.ι.f x) = 0 := (S.exact (S.ι.f x)).mpr ⟨x, rfl⟩
 
@@ -203,8 +204,7 @@ theorem uChase_proof : UChase := by
   obtain ⟨hq, hph⟩ := uc_phi W₁ hn₁
   have hω : W₁.d1 y₁ (B.X • n₁) = B.X • (a - (B.Q • W₁.φ n₁ - n₁)) := by
     rw [WD.d1, hga, hph]; exact (smul_sub _ _ _).symm
-  have hπω : S.π.f (W₁.d1 y₁ (B.X • n₁)) = 0 := by
-    rw [uc_hom, hπy, hπz, uc_smul, hd, smul_zero]
+  have hπω : S.π.f (W₁.d1 y₁ (B.X • n₁)) = 0 := by rw [uc_hom, hπy, hπz, uc_smul, hd, smul_zero]
   obtain ⟨y₀, hy₀, hιy₀⟩ : ∃ y₀, W₀.QInv y₀ ∧ S.ι.f y₀ = a - (B.Q • W₁.φ n₁ - n₁) := by
     apply uc_pull_qinv S (uc_qinv_sub W₁ ha hq)
     rw [hω, map_smul] at hπω
@@ -220,10 +220,11 @@ theorem uChase_proof : UChase := by
   set m := K • n₁ - L • nz + x' with hm
   have hZ : K • (B.X • n₁) - L • (B.X • nz) + (W₁.γ x₁ - x₁) = B.X • m := by
     rw [hγx, hm, smul_add, smul_sub, smul_comm K, smul_comm L]
-  have hmN : m ∈ W₁.N := W₁.N.add_mem (W₁.N.sub_mem (W₁.N.smul_of_tower_mem _ hn₁)
-    (W₁.N.smul_of_tower_mem _ hnz)) hx'
-  have hYq : W₁.QInv Y := uc_qinv_add W₁ (uc_qinv_sub W₁ (uc_qinv_smul W₁ _ hy₁)
-    (uc_qinv_smul W₁ _ hy')) (uc_qinv_phi_sub W₁ hx₁)
+  have hmN : m ∈ W₁.N :=
+    W₁.N.add_mem (W₁.N.sub_mem (W₁.N.smul_of_tower_mem _ hn₁) (W₁.N.smul_of_tower_mem _ hnz)) hx'
+  have hYq : W₁.QInv Y :=
+    uc_qinv_add W₁ (uc_qinv_sub W₁ (uc_qinv_smul W₁ _ hy₁) (uc_qinv_smul W₁ _ hy'))
+      (uc_qinv_phi_sub W₁ hx₁)
   have hπY : S.π.f Y = 0 := by
     simp only [hY, map_add (f := _), map_sub, uc_hom_tsmul, S.π.φ_comm, hπy, hπy', hπx]
     rw [map_smul W₂.φ]
@@ -289,7 +290,8 @@ lemma uc_val_factor (ℓ : ℕ) [Fact ℓ.Prime] (u : ℤ_[ℓ]ˣ) (M s : ℕ) (
           rw [← e1, ← e2]
 
 theorem lemmaU_of (hC : UClaim) (hS : UChase) : LemmaU := by
-  intro ℓ _ A _ _ B M D₀ D₁ D₂ _ _ _ _ _ _ _ _ _ _ _ _ W₀ W₁ W₂ S e s J hs h2 hv hJ h1 h3 h4 h5 hK hR
+  intro ℓ _ A _ _ B M D₀ D₁ D₂ _ _ _ _ _ _ _ _ _ _ _ _ W₀ W₁ W₂ S e s J hs h2 hv hJ h1 h3 h4 h5 hK
+    hR
   have hT := hC ℓ A B M D₀ W₀ s J hs h2 hv hJ h1 h3 h4 h5
   have hL := hS ℓ A B M D₀ D₁ D₂ W₀ W₁ W₂ S e _ hK hR hT
   obtain ⟨ν, hν⟩ := uc_val_factor ℓ B.u M s J hs h2 hv hJ

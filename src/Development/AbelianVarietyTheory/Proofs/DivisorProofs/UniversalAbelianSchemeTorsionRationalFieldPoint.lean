@@ -10,9 +10,13 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjIsAbelianS
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart GlobalTheory.UCanon
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.UChart
+  GlobalTheory.UCanon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -24,8 +28,8 @@ open GlobalTheory.FullLevel
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
 
-theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap g ≫ spMap f = spMap (g.comp f) :=
+theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap g ≫ spMap f = spMap (g.comp f) :=
   (Spec.map_comp (CommRingCat.ofHom f) (CommRingCat.ofHom g)).symm
 
 theorem zeta_pow (l : Geo.Tor.Level H) : zeta l.M' ^ (l.M' / l.A) = zeta l.A := by
@@ -42,11 +46,15 @@ theorem zeta_pow (l : Geo.Tor.Level H) : zeta l.M' ^ (l.M' / l.A) = zeta l.A := 
   push_cast
   field_simp
 
-theorem torsion_fixed {D : Datum H} {l : Geo.Tor.Level H} {B : Type} [CommRing B] {b : Base l B}
-    {S : Scheme.{0}} {s : S ⟶ Sp B} (o : Obj D l b s) (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S)
-    (β : B →+* k) (hx : x ≫ s = spMap β) (z : kˣ) (hz : IsPrimitiveRoot z l.M')
-    (hzA : (z : k) ^ (l.M' / l.A) = β b.ζ) (σ : k ≃+* k) (hσ : spMap (σ : k →+* k) ≫ x = x) (hσz : σ z = z)
-    (w : Over.mk x ⟶ o.t.G) (hw : w ^ l.M' = 1) : spMap (σ : k →+* k) ≫ w.left = w.left := by
+theorem torsion_fixed
+    {D : Datum H} {l : Geo.Tor.Level H} {B : Type} [CommRing B]
+    {b : Base l B} {S : Scheme.{0}} {s : S ⟶ Sp B} (o : Obj D l b s)
+    (k : Type) [Field k] [IsAlgClosed k]
+    (x : Sp k ⟶ S) (β : B →+* k) (hx : x ≫ s = spMap β)
+    (z : kˣ) (hz : IsPrimitiveRoot z l.M') (hzA : (z : k) ^ (l.M' / l.A) = β b.ζ)
+    (σ : k ≃+* k) (hσ : spMap (σ : k →+* k) ≫ x = x) (hσz : σ z = z)
+    (w : Over.mk x ⟶ o.t.G) (hw : w ^ l.M' = 1)
+    : spMap (σ : k →+* k) ≫ w.left = w.left := by
   obtain ⟨ev, ⟨⟨h1, h2, h3, h4, h5⟩, h6, h7⟩, hu⟩ := exists_unique_fullLevel o k x β hx z hz hzA
   have hid : spMap (RingHom.id k) = 𝟙 (Sp k) := Spec.map_id _
   have e1 : spMap (σ.symm : k →+* k) ≫ spMap (σ : k →+* k) = 𝟙 _ := by
@@ -60,8 +68,11 @@ theorem torsion_fixed {D : Datum H} {l : Geo.Tor.Level H} {B : Type} [CommRing B
   have gg' : g ≫ g' = 𝟙 _ := Over.OverMorphism.ext e2
   have g'g : g' ≫ g = 𝟙 _ := Over.OverMorphism.ext e1
   have key : (fun a => g ≫ ev a) = ev := by
-    refine (hu _ ⟨⟨fun a c => ?_, fun c a => ?_, fun a => ?_, fun u => ?_, fun a c => ?_⟩, fun a => ?_, fun a ha => ?_⟩).trans
-      (hu ev ⟨⟨h1, h2, h3, h4, h5⟩, h6, h7⟩).symm
+    refine (hu _ ⟨
+      ⟨fun a c => ?_, fun c a => ?_, fun a => ?_, fun u => ?_, fun a c => ?_⟩,
+      fun a => ?_,
+      fun a ha => ?_
+    ⟩).trans (hu ev ⟨⟨h1, h2, h3, h4, h5⟩, h6, h7⟩).symm
     · show g ≫ ev (a + c) = (g ≫ ev a) * (g ≫ ev c)
       rw [h1, MonObj.comp_mul]
     · show g ≫ ev (c • a) = (g ≫ ev a) ≫ o.t.act.act c
@@ -78,11 +89,14 @@ theorem torsion_fixed {D : Datum H} {l : Geo.Tor.Level H} {B : Type} [CommRing B
       · rintro ⟨a, rfl⟩
         show (g ≫ ev a) ^ l.M' = 1
         rw [← MonObj.comp_pow, (h4 _).2 ⟨a, rfl⟩, MonObj.comp_one]
-    · have h₁ := GlobalTheory.CommPairing.weilIs_pull GlobalTheory.SemiRigid.globalFns (GlobalTheory.ObjDim.isAbelianScheme o) o.t.PP.isLB g
-        (h5 a c)
-      have e' : Units.map g.left.appTop.hom.toMonoidHom (unitOn (z ^ D.EF a c)) =
-          unitOn (Units.map (σ : k →+* k).toMonoidHom (z ^ D.EF a c)) :=
-        Units.ext (congrArg (fun q => q.hom (z ^ D.EF a c).val)
+    · have h₁ :=
+        GlobalTheory.CommPairing.weilIs_pull GlobalTheory.SemiRigid.globalFns
+          (GlobalTheory.ObjDim.isAbelianScheme o) o.t.PP.isLB g (h5 a c)
+      have e'
+          : Units.map g.left.appTop.hom.toMonoidHom (unitOn (z ^ D.EF a c))
+            = unitOn (Units.map (σ : k →+* k).toMonoidHom (z ^ D.EF a c)) :=
+        Units.ext (congrArg
+          (fun q => q.hom (z ^ D.EF a c).val)
           (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom (σ : k →+* k)))).symm
       have e'' : Units.map (σ : k →+* k).toMonoidHom (z ^ D.EF a c) = z ^ D.EF a c := by
         rw [map_zpow]
@@ -97,7 +111,14 @@ theorem torsion_fixed {D : Datum H} {l : Geo.Tor.Level H} {B : Type} [CommRing B
   obtain ⟨a, rfl⟩ := (h4 w).1 hw
   exact congrArg CommaMorphism.left (congrFun key a)
 
-theorem torsion_rational : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Geo.Tor.Level H} (Xo : Moduli Dw l) (c : Coeff l) (φ : InvFun (𝓞 E)), ∀ (K K' : Type) [Field K] [Field K'] [IsAlgClosed K'] (κ : K →+* K') (y : Sp K ⟶ Xo.XF c) (x : Over.mk (spMap κ ≫ y ≫ pullback.fst _ _) ⟶ Xo.univ.t.G), x ^ l.M' = 1 → ∃ x₀ : Over.mk (y ≫ pullback.fst _ _) ⟶ Xo.univ.t.G, x₀ ^ l.M' = 1 ∧ x.left = spMap κ ≫ x₀.left := by
+theorem torsion_rational
+    : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H}
+        {l : Geo.Tor.Level H} (Xo : Moduli Dw l) (c : Coeff l) (φ : InvFun (𝓞 E)),
+      ∀ (K K' : Type) [Field K] [Field K'] [IsAlgClosed K'] (κ : K →+* K') (y : Sp K ⟶ Xo.XF c)
+          (x : Over.mk (spMap κ ≫ y ≫ pullback.fst _ _) ⟶ Xo.univ.t.G),
+        x ^ l.M' = 1
+          → ∃ x₀ : Over.mk (y ≫ pullback.fst _ _) ⟶ Xo.univ.t.G,
+            x₀ ^ l.M' = 1 ∧ x.left = spMap κ ≫ x₀.left := by
   intro E _ _ _ H Dw l Xo c _ K K' _ _ _ κ y x hx
   obtain ⟨bF, hbF⟩ : ∃ bF : c.F →+* K, y ≫ pullback.snd _ _ = spMap bF :=
     ⟨(Spec.preimage (y ≫ pullback.snd _ _)).hom, (Spec.map_preimage _).symm⟩
@@ -105,11 +126,14 @@ theorem torsion_rational : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E
   letI : Algebra K K' := κ.toAlgebra
   let inc := (IntermediateField.inclusion c.le).toRingHom
   have hs : (spMap κ ≫ y ≫ pullback.fst _ _) ≫ Xo.s = spMap (κ.comp (bF.comp inc)) := by
-    rw [Category.assoc, Category.assoc, pullback.condition, ← Category.assoc y, hbF, spMap_comp, spMap_comp]
+    rw [Category.assoc, Category.assoc, pullback.condition, ← Category.assoc y, hbF, spMap_comp,
+      spMap_comp]
   let z₀ : c.F := ⟨zeta l.M', c.zeta_mem⟩
-  have hz₀ : IsPrimitiveRoot z₀ l.M' := IsPrimitiveRoot.of_map_of_injective (f := c.F.val.toRingHom)
-    (Complex.isPrimitiveRoot_exp l.M' (M'_pos l).ne') Subtype.val_injective
-  have hz₁ : IsPrimitiveRoot (κ (bF z₀)) l.M' := (hz₀.map_of_injective bF.injective).map_of_injective κ.injective
+  have hz₀ : IsPrimitiveRoot z₀ l.M' :=
+    IsPrimitiveRoot.of_map_of_injective (f := c.F.val.toRingHom)
+      (Complex.isPrimitiveRoot_exp l.M' (M'_pos l).ne') Subtype.val_injective
+  have hz₁ : IsPrimitiveRoot (κ (bF z₀)) l.M' :=
+    (hz₀.map_of_injective bF.injective).map_of_injective κ.injective
   let z : K'ˣ := (hz₁.isUnit (M'_pos l).ne').unit
   have hz : IsPrimitiveRoot z l.M' := IsPrimitiveRoot.coe_units_iff.1 hz₁
   have hzA : (z : K') ^ (l.M' / l.A) = (κ.comp (bF.comp inc)) (baseKA l).ζ := by
@@ -117,12 +141,15 @@ theorem torsion_rational : ∀ {E : Type} [Field E] [NumberField E] [IsCMField E
     rw [← map_pow, ← map_pow]
     congr 2
     exact Subtype.ext (zeta_pow l)
-  obtain ⟨p, hp, -⟩ := GlobalTheory.FixedPoint.existsUnique_factor_of_isAlgClosed (K₀ := K) (L := K') x.left fun σ =>
-    torsion_fixed Xo.univ K' _ _ hs z hz hzA σ.toRingEquiv (by
-      rw [← Category.assoc, spMap_comp]
-      congr 2
-      ext a
-      exact σ.commutes a) (σ.commutes (bF z₀)) x hx
+  obtain ⟨p, hp, -⟩ :=
+    GlobalTheory.FixedPoint.existsUnique_factor_of_isAlgClosed (K₀ := K) (L := K') x.left fun σ =>
+      torsion_fixed Xo.univ K' _ _ hs z hz hzA σ.toRingEquiv
+        (by
+          rw [← Category.assoc, spMap_comp]
+          congr 2
+          ext a
+          exact σ.commutes a)
+        (σ.commutes (bF z₀)) x hx
   haveI : Epi (spMap κ) := GlobalTheory.FixedPoint.epi_specAlg (K₀ := K) (K₁ := K')
   have hp' : spMap κ ≫ p = x.left := hp
   have hpo : p ≫ Xo.univ.t.G.hom = y ≫ pullback.fst _ _ := by

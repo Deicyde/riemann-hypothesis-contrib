@@ -12,9 +12,11 @@ namespace GlobalTheory
 
 open Polynomial
 
-theorem exists_root_of_unity_close_of_pow_close : ∀ {Ω K : Type} [Field Ω] [IsAlgClosed Ω] [CharZero Ω] [Field K]
-    [Algebra Ω K] (W : ValuationSubring K) (x : K) (N : ℕ), 0 < N → W.valuation (x ^ N - 1) < 1 →
-    ∃ ζ : Ω, ζ ^ N = 1 ∧ W.valuation (x - algebraMap Ω K ζ) < 1 := by
+theorem exists_root_of_unity_close_of_pow_close
+    : ∀ {Ω K : Type} [Field Ω] [IsAlgClosed Ω] [CharZero Ω] [Field K] [Algebra Ω K]
+        (W : ValuationSubring K) (x : K) (N : ℕ),
+      0 < N → W.valuation (x ^ N - 1) < 1
+        → ∃ ζ : Ω, ζ ^ N = 1 ∧ W.valuation (x - algebraMap Ω K ζ) < 1 := by
   intro Ω K _ _ _ _ _ W x N hN hv
   classical
   set p : Polynomial Ω := X ^ N - C 1 with hp

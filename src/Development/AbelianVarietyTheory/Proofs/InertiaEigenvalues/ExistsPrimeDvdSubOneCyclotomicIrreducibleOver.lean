@@ -19,8 +19,9 @@ private lemma natAbs_eq_one_of_dvd_prime_pow_not_dvd {d : ℤ} {m k : ℕ} (hm :
     exact h2 (Int.natCast_dvd.mpr h)
   exact Nat.Coprime.eq_one_of_dvd (Nat.Coprime.pow_left k hc).symm h1'
 
-theorem irreducible_cyclotomic_of_not_dvd_discr (K : Type) [Field K] [NumberField K] (m : ℕ)
-    (hm : m.Prime) (hd : ¬ (m : ℤ) ∣ discr K) : Irreducible (cyclotomic m K) := by
+theorem irreducible_cyclotomic_of_not_dvd_discr
+    (K : Type) [Field K] [NumberField K] (m : ℕ) (hm : m.Prime) (hd : ¬ (m : ℤ) ∣ discr K)
+    : Irreducible (cyclotomic m K) := by
   have : NeZero m := ⟨hm.ne_zero⟩
   have : Fact m.Prime := ⟨hm⟩
   let E := CyclotomicField m K
@@ -34,8 +35,9 @@ theorem irreducible_cyclotomic_of_not_dvd_discr (K : Type) [Field K] [NumberFiel
   have hinf : A ⊓ B = ⊥ := by
     let F : IntermediateField ℚ E := A ⊓ B
     let _ : Algebra F A := (IntermediateField.inclusion (inf_le_left : F ≤ A)).toRingHom.toAlgebra
-    let _ : Algebra F K := (((IsScalarTower.toAlgHom ℚ K E).equivFieldRange.symm.toAlgHom).comp
-      (IntermediateField.inclusion (inf_le_right : F ≤ B))).toRingHom.toAlgebra
+    let _ : Algebra F K :=
+      (((IsScalarTower.toAlgHom ℚ K E).equivFieldRange.symm.toAlgHom).comp
+        (IntermediateField.inclusion (inf_le_right : F ≤ B))).toRingHom.toAlgebra
     have hFA : NumberField.discr F ∣ NumberField.discr A := NumberField.discr_dvd_discr F A
     have hFK : NumberField.discr F ∣ NumberField.discr K := NumberField.discr_dvd_discr F K
     have hA : NumberField.discr A = (-1) ^ ((m - 1) / 2) * (m : ℤ) ^ (m - 2) :=
@@ -63,14 +65,17 @@ theorem irreducible_cyclotomic_of_not_dvd_discr (K : Type) [Field K] [NumberFiel
     hdisK.adjoin_rank_eq_rank_left_of_isAlgebraic_left
   have htop : IntermediateField.adjoin K {ζ} = ⊤ := by
     rw [← IntermediateField.toSubalgebra_inj,
-      IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic ζ),
+      IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic
+        ζ),
       IntermediateField.top_toSubalgebra]
     exact IsCyclotomicExtension.adjoin_primitive_root_eq_top hζ
   have htop' : IntermediateField.adjoin K (A : Set E) = ⊤ := by
     refine top_le_iff.mp (htop ▸ ?_)
     exact IntermediateField.adjoin_le_iff.mpr (Set.singleton_subset_iff.mpr
-      (IntermediateField.subset_adjoin K (A : Set E) (IntermediateField.mem_adjoin_simple_self ℚ ζ)))
-  have hfinA : Module.finrank ℚ A = m.totient := IsCyclotomicExtension.finrank A (cyclotomic.irreducible_rat hm.pos)
+      (IntermediateField.subset_adjoin K (A : Set E)
+        (IntermediateField.mem_adjoin_simple_self ℚ ζ)))
+  have hfinA : Module.finrank ℚ A = m.totient :=
+    IsCyclotomicExtension.finrank A (cyclotomic.irreducible_rat hm.pos)
   have hfinE : Module.finrank K E = m.totient := by
     have h' : Module.finrank K (IntermediateField.adjoin K (A : Set E)) = m.totient := by
       rw [Module.finrank, hrk]
@@ -89,9 +94,9 @@ theorem irreducible_cyclotomic_of_not_dvd_discr (K : Type) [Field K] [NumberFiel
   rw [heq]
   exact minpoly.irreducible hint
 
-theorem exists_prime_dvd_sub_one_irreducible_cyclotomic :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ), n ≠ 0 →
-      ∃ m : ℕ, m.Prime ∧ n ∣ m - 1 ∧ Irreducible (cyclotomic m K) := by
+theorem exists_prime_dvd_sub_one_irreducible_cyclotomic
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ),
+      n ≠ 0 → ∃ m : ℕ, m.Prime ∧ n ∣ m - 1 ∧ Irreducible (cyclotomic m K) := by
   intro K _ _ n hn
   obtain ⟨m, hmp, hgt, hmod⟩ := Nat.exists_prime_gt_modEq_one (NumberField.discr K).natAbs hn
   refine ⟨m, hmp, (Nat.modEq_iff_dvd' hmp.one_le).mp hmod.symm, ?_⟩

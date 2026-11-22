@@ -10,16 +10,24 @@ open Finset Matrix MeasureTheory
 
 namespace ReciprocityTheory.ChartRestriction.DS
 
-open ReciprocityTheory.ChartRestriction.DS.S7 ReciprocityTheory.ChartRestriction.DS.UpperTriangularMatrices
+open ReciprocityTheory.ChartRestriction.DS.S7
+  ReciprocityTheory.ChartRestriction.DS.UpperTriangularMatrices
 
 variable {N : ℕ}
 
-theorem upMat_triCoOf_mul (t t0 : TriCo N) :
-    upMat (triCoOf (upMat t * upMat t0)) = upMat t * upMat t0 ∧
-      ∀ j, (triCoOf (upMat t * upMat t0)).1 j = t.1 j * t0.1 j := by
-  have hU : ∀ (s : TriCo N) (a b : Fin N), upMat s a b =
-      if a = b then ((s.1 a : ℝ) : ℂ) else if h : a < b then s.2 ⟨(a, b), h⟩ else 0 :=
-    fun s a b => rfl
+theorem upMat_triCoOf_mul (t t0 : TriCo N)
+    : upMat (triCoOf (upMat t * upMat t0)) = upMat t * upMat t0
+      ∧ ∀ j, (triCoOf (upMat t * upMat t0)).1 j = t.1 j * t0.1 j := by
+  have hU
+      : ∀ (s : TriCo N) (a b : Fin N),
+        upMat s a b
+          = if a = b then
+              ((s.1 a : ℝ) : ℂ)
+            else if h : a < b then
+              s.2 ⟨(a, b), h⟩
+            else
+              0 := fun s a b =>
+    rfl
   have hz : ∀ (s : TriCo N) (a b : Fin N), b < a → upMat s a b = 0 := by
     intro s a b h
     rw [hU s a b, if_neg (ne_of_gt h), dite_eq_right (not_lt.mpr h.le)]
@@ -53,8 +61,8 @@ theorem upMat_triCoOf_mul (t t0 : TriCo N) :
   · show ((upMat t * upMat t0) j j).re = t.1 j * t0.1 j
     rw [hdiag, Complex.ofReal_re]
 
-theorem triMeas_map_mul_right (t0 : TriCo N) (h0 : t0 ∈ triPos N) :
-    Measure.map (fun t : TriCo N => triCoOf (upMat t * upMat t0)) (triMeas N) = triMeas N := by
+theorem triMeas_map_mul_right (t0 : TriCo N) (h0 : t0 ∈ triPos N)
+    : Measure.map (fun t : TriCo N => triCoOf (upMat t * upMat t0)) (triMeas N) = triMeas N := by
   classical
   have hfun : (fun t : TriCo N => triCoOf (upMat t * upMat t0)) = ⇑(rmulL (upMat t0)) := by
     funext t
@@ -96,35 +104,40 @@ theorem triMeas_map_mul_right (t0 : TriCo N) (h0 : t0 ∈ triPos N) :
   have hS : MeasurableSet (s ∩ triPos N) := hs.inter hP
   rw [Measure.map_apply hLm hs, triMeas, withDensity_apply _ (hLm hs), withDensity_apply _ hs,
     Measure.restrict_restrict (hLm hs), Measure.restrict_restrict hs, hpre s]
-  have h1 : ∫⁻ x in L ⁻¹' (s ∩ triPos N), triDens x =
-      ∫⁻ x in L ⁻¹' (s ∩ triPos N), ENNReal.ofReal D * triDens (L x) := by
+  have h1
+      : ∫⁻ x in L ⁻¹' (s ∩ triPos N), triDens x
+        = ∫⁻ x in L ⁻¹' (s ∩ triPos N), ENNReal.ofReal D * triDens (L x) := by
     refine lintegral_congr fun x => ?_
     rw [hL, hD, ← triDens_rmulL t0 x h0]
-  have h2 : ∫⁻ x in L ⁻¹' (s ∩ triPos N), ENNReal.ofReal D * triDens (L x) =
-      ENNReal.ofReal D * ∫⁻ x, (s ∩ triPos N).indicator triDens (L x) := by
+  have h2
+      : ∫⁻ x in L ⁻¹' (s ∩ triPos N), ENNReal.ofReal D * triDens (L x)
+        = ENNReal.ofReal D * ∫⁻ x, (s ∩ triPos N).indicator triDens (L x) := by
     rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, ← lintegral_indicator (hLm hS)]
     congr 1
-  have h3 : ∫⁻ x, (s ∩ triPos N).indicator triDens (L x) =
-      ENNReal.ofReal |D⁻¹| * ∫⁻ y in s ∩ triPos N, triDens y := by
+  have h3
+      : ∫⁻ x, (s ∩ triPos N).indicator triDens (L x)
+        = ENNReal.ofReal |D⁻¹| * ∫⁻ y in s ∩ triPos N, triDens y := by
     rw [← lintegral_map ((triDens_measurable).indicator hS) hLm, hvol, lintegral_smul_measure,
       lintegral_indicator hS]
     rfl
   rw [h1, h2, h3, ← mul_assoc, ← ENNReal.ofReal_mul hDpos.le, abs_of_pos (inv_pos.mpr hDpos),
     mul_inv_cancel₀ hDpos.ne', ENNReal.ofReal_one, one_mul]
 
-theorem triMeas_compact_lt_top (K : Set (TriCo N)) (hK : IsCompact K) (hK0 : K ⊆ triPos N) :
-    triMeas N K < ⊤ := by
+theorem triMeas_compact_lt_top (K : Set (TriCo N)) (hK : IsCompact K) (hK0 : K ⊆ triPos N)
+    : triMeas N K < ⊤ := by
   have hKm : MeasurableSet K := hK.isClosed.measurableSet
   unfold triMeas
   rw [withDensity_apply _ hKm, Measure.restrict_restrict hKm, Set.inter_eq_left.mpr hK0]
-  have hgc : ContinuousOn (fun t : TriCo N => ∏ j : Fin N, t.1 j ^ (-(2 * ((j : ℕ) : ℤ) + 1))) K := by
+  have hgc
+      : ContinuousOn (fun t : TriCo N => ∏ j : Fin N, t.1 j ^ (-(2 * ((j : ℕ) : ℤ) + 1))) K := by
     refine continuousOn_finsetProd _ (fun j _ => ?_)
     exact ContinuousOn.zpow₀ (by fun_prop : Continuous fun t : TriCo N => t.1 j).continuousOn _
       (fun x hx => Or.inl (hK0 hx j).ne')
   obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn hgc
-  calc ∫⁻ a in K, triDens a ≤ ∫⁻ _ in K, ENNReal.ofReal C := by
-        refine setLIntegral_mono' hKm (fun x hx => ?_)
-        exact ENNReal.ofReal_le_ofReal ((Real.le_norm_self _).trans (hC x hx))
+  calc
+    ∫⁻ a in K, triDens a ≤ ∫⁻ _ in K, ENNReal.ofReal C := by
+      refine setLIntegral_mono' hKm (fun x hx => ?_)
+      exact ENNReal.ofReal_le_ofReal ((Real.le_norm_self _).trans (hC x hx))
     _ = ENNReal.ofReal C * volume K := setLIntegral_const _ _
     _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top hK.measure_lt_top
 

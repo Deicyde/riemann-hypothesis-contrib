@@ -11,29 +11,32 @@ namespace JSetup
 
 variable {K : Type*} [Field K] (S : JSetup K)
 
-private theorem mulVec_comp_equiv_apply {ι : Type*} [Fintype ι] {m : ℕ} (Γ : Matrix ι ι K) (e : ι ≃ Fin m)
-    (x : Fin m → K) (i : ι) :
-    (Γ *ᵥ (x ∘ e)) i = (Γ.submatrix e.symm e.symm *ᵥ x) (e i) := by
+private theorem mulVec_comp_equiv_apply
+    {ι : Type*} [Fintype ι] {m : ℕ} (Γ : Matrix ι ι K) (e : ι ≃ Fin m) (x : Fin m → K) (i : ι)
+    : (Γ *ᵥ (x ∘ e)) i = (Γ.submatrix e.symm e.symm *ᵥ x) (e i) := by
   simp only [mulVec, dotProduct, submatrix_apply, Equiv.symm_apply_apply, Function.comp]
   exact Fintype.sum_equiv e _ _ (fun j => by simp)
 
-private theorem vecMul_comp_equiv_apply {ι : Type*} [Fintype ι] {m : ℕ} (Γ : Matrix ι ι K) (e : ι ≃ Fin m)
-    (x : Fin m → K) (j : ι) :
-    ((x ∘ e) ᵥ* Γ) j = (x ᵥ* Γ.submatrix e.symm e.symm) (e j) := by
+private theorem vecMul_comp_equiv_apply
+    {ι : Type*} [Fintype ι] {m : ℕ} (Γ : Matrix ι ι K) (e : ι ≃ Fin m) (x : Fin m → K) (j : ι)
+    : ((x ∘ e) ᵥ* Γ) j = (x ᵥ* Γ.submatrix e.symm e.symm) (e j) := by
   simp only [vecMul, dotProduct, submatrix_apply, Equiv.symm_apply_apply, Function.comp]
   exact Fintype.sum_equiv e _ _ (fun i => by simp)
 
-theorem jac {ι : Type*} [Fintype ι] [DecidableEq ι] (Γ : Matrix ι ι K) (hΓ : S.IntM Γ) (hH : S.Herm Γ)
-    (hU : S.UM Γ) :
-    ∃ (k : ℕ) (v : Fin k → ι → K), (∀ c, S.IntV (v c)) ∧
-      (∀ c c', S.hf Γ (v c) (v c') = if c = c' then 1 else 0) ∧
-      ∑ c, Matrix.vecMulVec (Γ *ᵥ v c) (S.cv (v c) ᵥ* Γ) = Γ := by
+theorem jac
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (Γ : Matrix ι ι K) (hΓ : S.IntM Γ) (hH : S.Herm Γ) (hU : S.UM Γ)
+    : ∃ (k : ℕ) (v : Fin k → ι → K),
+      (∀ c, S.IntV (v c)) ∧ (∀ c c', S.hf Γ (v c) (v c') = if c = c' then 1 else 0)
+        ∧ ∑ c, Matrix.vecMulVec (Γ *ᵥ v c) (S.cv (v c) ᵥ* Γ) = Γ := by
   classical
   set e : ι ≃ Fin (Fintype.card ι) := Fintype.equivFin ι with he
   have hU' : S.UM (Γ.submatrix e.symm e.symm) := by
     intro x hx hxd
-    obtain ⟨x', hx', hxx'⟩ := hU (x ∘ e) (fun i => hx (e i)) (fun i => by
-      rw [mulVec_comp_equiv_apply Γ e x i]; exact hxd (e i))
+    obtain ⟨x', hx', hxx'⟩ :=
+      hU (x ∘ e)
+        (fun i => hx (e i))
+        (fun i => by rw [mulVec_comp_equiv_apply Γ e x i]; exact hxd (e i))
     refine ⟨x' ∘ e.symm, fun s => hx' (e.symm s), ?_⟩
     funext s
     have h1 := mulVec_comp_equiv_apply Γ e x (e.symm s)
@@ -42,10 +45,12 @@ theorem jac {ι : Type*} [Fintype ι] [DecidableEq ι] (Γ : Matrix ι ι K) (h�
     have h3 : (x' ∘ e.symm) ∘ e = x' := by funext i; simp
     rw [h3] at h2
     rw [Pi.smul_apply, ← h1, ← h2, hxx', Pi.smul_apply]
-  have jac_fin : ∀ (m : ℕ) (Γ : Matrix (Fin m) (Fin m) K), S.IntM Γ → S.Herm Γ → S.UM Γ →
-      ∃ (k : ℕ) (v : Fin k → Fin m → K), (∀ c, S.IntV (v c)) ∧
-        (∀ c c', S.hf Γ (v c) (v c') = if c = c' then 1 else 0) ∧
-        ∑ c, vecMulVec (Γ *ᵥ v c) (S.cv (v c) ᵥ* Γ) = Γ := by
+  have jac_fin
+      : ∀ (m : ℕ) (Γ : Matrix (Fin m) (Fin m) K),
+        S.IntM Γ → S.Herm Γ → S.UM Γ
+          → ∃ (k : ℕ) (v : Fin k → Fin m → K),
+            (∀ c, S.IntV (v c)) ∧ (∀ c c', S.hf Γ (v c) (v c') = if c = c' then 1 else 0)
+              ∧ ∑ c, vecMulVec (Γ *ᵥ v c) (S.cv (v c) ᵥ* Γ) = Γ := by
     intro m
     induction m with
     | zero =>
@@ -62,8 +67,11 @@ theorem jac {ι : Type*} [Fintype ι] [DecidableEq ι] (Γ : Matrix ι ι K) (h�
       have hGa := S.Γp_mulVec_self (Γ := Γ) haa
       have haG := S.vecMul_Γp_self (Γ := Γ) haa
       set G := S.Γp Γ a with hG_def
-      obtain ⟨k, v'', hvI, hvo, hvs⟩ := ih (G.submatrix i.succAbove i.succAbove)
-        (fun s t => hG _ _) (fun s t => hHG _ _) (S.UM_drop i hUG ha hai hGa haG)
+      obtain ⟨k, v'', hvI, hvo, hvs⟩ :=
+        ih (G.submatrix i.succAbove i.succAbove)
+          (fun s t => hG _ _)
+          (fun s t => hHG _ _)
+          (S.UM_drop i hUG ha hai hGa haG)
       have hai0 : a i ≠ 0 := S.ne_zero_of_not_NU hai
       have hσa : S.σ (a i) ≠ 0 := S.ne_zero_of_not_NU (S.not_NU_σ (ha i) hai)
       set v' : Fin k → Fin (m + 1) → K := fun c => ins i (v'' c) with hv'_def
@@ -79,7 +87,8 @@ theorem jac {ι : Type*} [Fintype ι] [DecidableEq ι] (Γ : Matrix ι ι K) (h�
           simp only [vecMulVec_apply, hv'_def, S.cv_ins, mulVec_ins, vecMul_ins]
         · rw [sum_mulVec']
           refine Finset.sum_eq_zero fun c _ => ?_
-          rw [vecMulVec_mulVec, ← dotProduct_mulVec, hGa, dotProduct_zero, op_smul_eq_smul, zero_smul]
+          rw [vecMulVec_mulVec, ← dotProduct_mulVec, hGa, dotProduct_zero, op_smul_eq_smul,
+            zero_smul]
         · rw [vecMul_sum']
           refine Finset.sum_eq_zero fun c _ => ?_
           rw [vecMul_vecMulVec, dotProduct_mulVec, haG, zero_dotProduct, zero_smul]
@@ -99,19 +108,20 @@ theorem jac {ι : Type*} [Fintype ι] [DecidableEq ι] (Γ : Matrix ι ι K) (h�
           exact hv'o c c'
       · rw [Fin.sum_univ_succ]
         simp only [Fin.cons_zero, Fin.cons_succ]
-        have : ∀ c, vecMulVec (Γ *ᵥ S.proj Γ a (v' c)) (S.cv (S.proj Γ a (v' c)) ᵥ* Γ)
-            = vecMulVec (G *ᵥ v' c) (S.cv (v' c) ᵥ* G) := fun c => by
+        have : ∀ c,
+            vecMulVec (Γ *ᵥ S.proj Γ a (v' c)) (S.cv (S.proj Γ a (v' c)) ᵥ* Γ)
+              = vecMulVec (G *ᵥ v' c) (S.cv (v' c) ᵥ* G) := fun c => by
           rw [S.mulVec_proj, S.vecMul_proj hΓ hH ha (hv'I c)]
         rw [Finset.sum_congr rfl (fun c _ => this c), hv's, hG_def, Γp]
         abel
-  obtain ⟨k, v, hv, hort, hsum⟩ := jac_fin (Fintype.card ι) (Γ.submatrix e.symm e.symm)
-    (fun s t => hΓ _ _) (fun s t => hH _ _) hU'
+  obtain ⟨k, v, hv, hort, hsum⟩ :=
+    jac_fin (Fintype.card ι) (Γ.submatrix e.symm e.symm) (fun s t => hΓ _ _) (fun s t => hH _ _) hU'
   have hconj : ∀ x : Fin (Fintype.card ι) → K, S.cv (x ∘ e) = S.cv x ∘ e := fun x => rfl
   refine ⟨k, fun c => v c ∘ e, fun c i => hv c (e i), fun c c' => ?_, ?_⟩
   · rw [← hort c c']
     simp only [hf, hconj, dotProduct]
-    exact Fintype.sum_equiv e _ _ (fun i => by
-      simp only [Function.comp, mulVec_comp_equiv_apply Γ e (v c') i])
+    exact Fintype.sum_equiv e _ _
+      (fun i => by simp only [Function.comp, mulVec_comp_equiv_apply Γ e (v c') i])
   · ext i j
     have h := congrFun (congrFun hsum (e i)) (e j)
     simp only [Matrix.sum_apply, vecMulVec_apply, submatrix_apply, Equiv.symm_apply_apply] at h
@@ -121,9 +131,11 @@ theorem jac {ι : Type*} [Fintype ι] [DecidableEq ι] (Γ : Matrix ι ι K) (h�
 
 end JSetup
 
-theorem card_eq_of_mul_eq_one {K : Type*} [Field K] {n : Type*} [Fintype n] [DecidableEq n] {k : ℕ}
-    (V : Matrix n (Fin k) K) (W : Matrix (Fin k) n K) (h1 : V * W = 1) (h2 : W * V = 1) :
-    Fintype.card n = k := by
+theorem card_eq_of_mul_eq_one
+    {K : Type*} [Field K]
+    {n : Type*} [Fintype n] [DecidableEq n]
+    {k : ℕ} (V : Matrix n (Fin k) K) (W : Matrix (Fin k) n K) (h1 : V * W = 1) (h2 : W * V = 1)
+    : Fintype.card n = k := by
   have e : (Fin k → K) ≃ₗ[K] (n → K) :=
     LinearEquiv.ofLinear (Matrix.toLin' V) (Matrix.toLin' W)
       (by rw [← Matrix.toLin'_mul, h1, Matrix.toLin'_one])

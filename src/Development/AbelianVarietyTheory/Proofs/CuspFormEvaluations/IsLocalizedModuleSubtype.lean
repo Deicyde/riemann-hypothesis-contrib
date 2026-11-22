@@ -42,7 +42,6 @@ lemma _root_.GlobalTheory.DualFamily.isIntegral_cc {a : E} (ha : IsIntegral ℤ 
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
   exact ha.map (RingHom.toIntAlgHom (IsCMField.complexConj E).toRingEquiv.toRingHom)
 
-
 open NumberField in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
@@ -53,7 +52,6 @@ lemma _root_.GlobalTheory.DualFamily.exists_herm_eq {n : ℕ} (f : (Fin n → E)
   refine Finset.sum_congr rfl fun a _ => ?_
   unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.cc
   rw [IsCMField.complexConj_apply_apply, smul_eq_mul]
-
 
 open NumberField in
 open scoped nonZeroDivisors in
@@ -138,12 +136,17 @@ private lemma exists_linearForm_extend_of_span_eq_univ {n : ℕ} (Λ : Submodule
 open NumberField in
 open scoped nonZeroDivisors in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.exists_dual_family {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E))
-    (hfg : Λ.FG)
-    (hint : ∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 x y))
-    (hdual : ∀ x, (∀ y ∈ Λ, IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 x y)) → x ∈ Λ) :
-    Submodule.span E (Λ : Set (Fin n → E)) = ⊤ ∧ ∃ (m : ℕ) (v w : Fin m → Fin n → E),
-      (∀ i, v i ∈ Λ) ∧ (∀ i, w i ∈ Λ) ∧ ∀ u : Fin n → E, u = ∑ i, _root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 u (w i) • v i := by
+theorem _root_.GlobalTheory.exists_dual_family
+    {n : ℕ} (Λ : Submodule (𝓞 E) (Fin n → E)) (hfg : Λ.FG)
+    (hint
+      : ∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 x y))
+    (hdual : ∀ x,
+      (∀ y ∈ Λ, IsIntegral ℤ (_root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 x y)) → x ∈ Λ)
+    : Submodule.span E (Λ : Set (Fin n → E)) = ⊤
+      ∧ ∃ (m : ℕ) (v w : Fin m → Fin n → E),
+        (∀ i, v i ∈ Λ) ∧ (∀ i, w i ∈ Λ)
+          ∧ ∀ u : Fin n → E,
+            u = ∑ i, _root_.ReciprocityTheory.ChartRestriction.G.FD.herm 1 u (w i) • v i := by
   have hspan := _root_.GlobalTheory.DualFamily.span_eq_top Λ hfg hdual
   refine ⟨hspan, ?_⟩
   have : Module.Finite (𝓞 E) Λ := Module.Finite.iff_fg.mpr hfg
@@ -151,8 +154,9 @@ theorem _root_.GlobalTheory.exists_dual_family {n : ℕ} (Λ : Submodule (𝓞 E
   have : Module.Projective (𝓞 E) Λ := Module.Flat.projective_of_finitePresentation
   obtain ⟨m, π, hπ⟩ := Module.Finite.exists_fin' (𝓞 E) Λ
   obtain ⟨σ, hσ⟩ := Module.projective_lifting_property π LinearMap.id hπ
-  have hext : ∀ j : Fin m, ∃ φ : (Fin n → E) →ₗ[E] E, ∀ y (hy : y ∈ Λ), φ y = σ ⟨y, hy⟩ j :=
-    fun j => (exists_linearForm_extend_of_span_eq_univ Λ hspan ((LinearMap.proj j).comp σ)).imp
+  have hext
+      : ∀ j : Fin m, ∃ φ : (Fin n → E) →ₗ[E] E, ∀ y (hy : y ∈ Λ), φ y = σ ⟨y, hy⟩ j := fun j =>
+    (exists_linearForm_extend_of_span_eq_univ Λ hspan ((LinearMap.proj j).comp σ)).imp
       fun φ h y hy => h ⟨y, hy⟩
   choose φ hφ using hext
   choose w hw using fun j => _root_.GlobalTheory.DualFamily.exists_herm_eq (φ j)

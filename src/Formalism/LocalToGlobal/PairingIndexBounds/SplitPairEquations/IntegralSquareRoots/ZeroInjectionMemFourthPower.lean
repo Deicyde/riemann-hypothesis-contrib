@@ -26,27 +26,32 @@ def sl0 (n : Type) : (Fin 4 × n → ℂ) →ₗ[ℂ] (n → ℂ) where
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem slice_zero_injection (x : n → ℂ) (a : Fin 4) : slice a (inj0 n x) = if a = 0 then x else 0 := by
+theorem slice_zero_injection (x : n → ℂ) (a : Fin 4)
+    : slice a (inj0 n x) = if a = 0 then x else 0 := by
   funext i
   by_cases h : a = 0 <;> simp [slice, inj0, h]
 
-theorem zero_injection_mem_fourth_power (ΛM : AddSubgroup (n → ℂ)) {x : n → ℂ} (hx : x ∈ ΛM) : inj0 n x ∈ pow4 ΛM := by
+theorem zero_injection_mem_fourth_power (ΛM : AddSubgroup (n → ℂ)) {x : n → ℂ} (hx : x ∈ ΛM)
+    : inj0 n x ∈ pow4 ΛM := by
   intro a
   rw [slice_zero_injection]
   split_ifs
   · exact hx
   · exact ΛM.zero_mem
 
-theorem is_lattice_of_fourth_power (ΛM : AddSubgroup (n → ℂ)) (g : (Fin 4 × n → ℂ) ≃ₗ[ℂ] (Fin 4 × n → ℂ))
-    (h : IsLat (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 ΛM))) : IsLat ΛM := by
+theorem is_lattice_of_fourth_power
+    (ΛM : AddSubgroup (n → ℂ)) (g : (Fin 4 × n → ℂ) ≃ₗ[ℂ] (Fin 4 × n → ℂ))
+    (h : IsLat (imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 ΛM)))
+    : IsLat ΛM := by
   constructor
   · haveI := h.1
     let f : ΛM → imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 ΛM) := fun x =>
       ⟨g (inj0 n x.1), ⟨inj0 n x.1, zero_injection_mem_fourth_power ΛM x.2, rfl⟩⟩
     have hf : Continuous f :=
       Continuous.subtype_mk
-        ((((g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)).comp (inj0 n)).continuous_of_finiteDimensional).comp
-          continuous_subtype_val) _
+        ((((g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)).comp
+          (inj0 n)).continuous_of_finiteDimensional).comp continuous_subtype_val)
+        _
     have hinj : Function.Injective f := by
       intro x y hxy
       have h1 : g (inj0 n x.1) = g (inj0 n y.1) := congrArg Subtype.val hxy
@@ -58,8 +63,12 @@ theorem is_lattice_of_fourth_power (ΛM : AddSubgroup (n → ℂ)) (g : (Fin 4 �
     intro v _
     let p : (Fin 4 × n → ℂ) →ₗ[ℝ] (n → ℂ) :=
       ((sl0 n).comp (g.symm : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ))).restrictScalars ℝ
-    have h2 : (Submodule.span ℝ ((imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 ΛM) :
-        AddSubgroup (Fin 4 × n → ℂ)) : Set (Fin 4 × n → ℂ))).map p ≤ Submodule.span ℝ (ΛM : Set (n → ℂ)) := by
+    have h2
+        : (Submodule.span ℝ
+            ((imgLat (g : (Fin 4 × n → ℂ) →ₗ[ℂ] (Fin 4 × n → ℂ)) (pow4 ΛM)
+                : AddSubgroup (Fin 4 × n → ℂ))
+              : Set (Fin 4 × n → ℂ))).map p
+          ≤ Submodule.span ℝ (ΛM : Set (n → ℂ)) := by
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨y, ⟨x, hx, rfl⟩, rfl⟩
       apply Submodule.subset_span
@@ -76,17 +85,20 @@ def putL (n : Type) (N N' : ℕ) (k : Fin N' × Fin N) : (n → ℂ) →ₗ[ℂ]
   map_add' x y := by funext τ i j; by_cases h : (i, j) = k <;> simp [h]
   map_smul' c x := by funext τ i j; by_cases h : (i, j) = k <;> simp [h]
 
-theorem putL_mem (ΛM : AddSubgroup (n → ℂ)) (N N' : ℕ) (k : Fin N' × Fin N) {x : n → ℂ} (hx : x ∈ ΛM) :
-    putL n N N' k x ∈ Ker.powLat ΛM N N' := by
+theorem putL_mem
+    (ΛM : AddSubgroup (n → ℂ)) (N N' : ℕ) (k : Fin N' × Fin N) {x : n → ℂ} (hx : x ∈ ΛM)
+    : putL n N N' k x ∈ Ker.powLat ΛM N N' := by
   intro i j
   by_cases h : (i, j) = k
   · have : (fun τ => putL n N N' k x τ i j) = x := by funext τ; simp [putL, h]
-    rw [this]; exact hx
+    rw [this]
+    exact hx
   · have : (fun τ => putL n N N' k x τ i j) = 0 := by funext τ; simp [putL, h]
-    rw [this]; exact ΛM.zero_mem
+    rw [this]
+    exact ΛM.zero_mem
 
-theorem sum_putL (N N' : ℕ) (z : n → Fin N' → Fin N → ℂ) :
-    z = ∑ k : Fin N' × Fin N, putL n N N' k (fun τ => z τ k.1 k.2) := by
+theorem sum_putL (N N' : ℕ) (z : n → Fin N' → Fin N → ℂ)
+    : z = ∑ k : Fin N' × Fin N, putL n N N' k (fun τ => z τ k.1 k.2) := by
   funext τ i j
   simp only [Finset.sum_apply]
   rw [Finset.sum_eq_single (i, j)]
@@ -96,10 +108,12 @@ theorem sum_putL (N N' : ℕ) (z : n → Fin N' → Fin N → ℂ) :
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem isLat_powLat (ΛM : AddSubgroup (n → ℂ)) (h : IsLat ΛM) (N N' : ℕ) : IsLat (Ker.powLat ΛM N N') := by
+theorem isLat_powLat (ΛM : AddSubgroup (n → ℂ)) (h : IsLat ΛM) (N N' : ℕ)
+    : IsLat (Ker.powLat ΛM N N') := by
   constructor
   · haveI := h.1
-    let f : Ker.powLat ΛM N N' → (∀ _ : Fin N' × Fin N, ΛM) := fun x k => ⟨fun τ => x.1 τ k.1 k.2, x.2 k.1 k.2⟩
+    let f : Ker.powLat ΛM N N' → (∀ _ : Fin N' × Fin N, ΛM) := fun x k =>
+      ⟨fun τ => x.1 τ k.1 k.2, x.2 k.1 k.2⟩
     have hf : Continuous f := by
       refine continuous_pi fun k => Continuous.subtype_mk (continuous_pi fun τ => ?_) _
       have h1 : Continuous fun z : n → Fin N' → Fin N → ℂ => z τ k.1 k.2 := by fun_prop
@@ -114,8 +128,11 @@ theorem isLat_powLat (ΛM : AddSubgroup (n → ℂ)) (h : IsLat ΛM) (N N' : ℕ
     intro z _
     rw [sum_putL N N' z]
     refine Submodule.sum_mem _ fun k _ => ?_
-    have h2 : (Submodule.span ℝ (ΛM : Set (n → ℂ))).map ((putL n N N' k).restrictScalars ℝ) ≤
-        Submodule.span ℝ ((Ker.powLat ΛM N N' : AddSubgroup (n → Fin N' → Fin N → ℂ)) : Set (n → Fin N' → Fin N → ℂ)) := by
+    have h2
+        : (Submodule.span ℝ (ΛM : Set (n → ℂ))).map ((putL n N N' k).restrictScalars ℝ)
+          ≤ Submodule.span ℝ
+            ((Ker.powLat ΛM N N' : AddSubgroup (n → Fin N' → Fin N → ℂ))
+              : Set (n → Fin N' → Fin N → ℂ)) := by
       rw [Submodule.map_span, Submodule.span_le]
       rintro _ ⟨y, hy, rfl⟩
       exact Submodule.subset_span (putL_mem ΛM N N' k hy)

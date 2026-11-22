@@ -17,10 +17,13 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc
 
-theorem exists_injective_lift_field {R S K : Type} [CommRing R] [CommRing S] [CommRing K] [Algebra R S]
-    (M : Submonoid R) [IsLocalization M S] (hK : IsField K) (g : R →+* K) (hg : Function.Injective g)
-    (hM : ∀ y ∈ M, y ≠ 0) :
-    ∃ ι : S →+* K, (∀ x : R, ι (algebraMap R S x) = g x) ∧ Function.Injective ι := by
+theorem exists_injective_lift_field
+    {R S K : Type} [CommRing R] [CommRing S] [CommRing K] [Algebra R S]
+    (M : Submonoid R) [IsLocalization M S]
+    (hK : IsField K)
+    (g : R →+* K) (hg : Function.Injective g)
+    (hM : ∀ y ∈ M, y ≠ 0)
+    : ∃ ι : S →+* K, (∀ x : R, ι (algebraMap R S x) = g x) ∧ Function.Injective ι := by
   have hu : ∀ y : M, IsUnit (g y) := by
     intro y
     have h : g y ≠ 0 := fun h => hM y y.2 (hg (by rw [h, map_zero]))
@@ -35,13 +38,16 @@ theorem exists_injective_lift_field {R S K : Type} [CommRing R] [CommRing S] [Co
   · intro h
     rw [hg h]
 
-theorem algebraMap_ainf_acris_eq {l : ℕ} [Fact l.Prime] (x : Per.Ainf l) :
-    algebraMap (Per.Ainf l) (Per.Acris l) x =
-      algebraMap (Per.Acris0 l) (Per.Acris l) (algebraMap (Per.Ainf l) (Per.Acris0 l) x) :=
+theorem algebraMap_ainf_acris_eq {l : ℕ} [Fact l.Prime] (x : Per.Ainf l)
+    : algebraMap (Per.Ainf l) (Per.Acris l) x
+      = algebraMap (Per.Acris0 l) (Per.Acris l) (algebraMap (Per.Ainf l) (Per.Acris0 l) x) :=
   GlobalTheory.RingIface.tower l x
 
-theorem algebraMap_ainf_acris_ne_zero_pt {l : ℕ} [Fact l.Prime] (j : Per.Acris l →+* Per.BdRp l)
-    (hj : IsCrisP j) (x : Per.Ainf l) (hx0 : x ≠ 0) : algebraMap (Per.Ainf l) (Per.Acris l) x ≠ 0 := by
+theorem algebraMap_ainf_acris_ne_zero_pt
+    {l : ℕ} [Fact l.Prime]
+    (j : Per.Acris l →+* Per.BdRp l) (hj : IsCrisP j)
+    (x : Per.Ainf l) (hx0 : x ≠ 0)
+    : algebraMap (Per.Ainf l) (Per.Acris l) x ≠ 0 := by
   obtain ⟨hd, -, hi⟩ := GlobalTheory.T.usage l
   intro h'
   apply hx0
@@ -52,24 +58,33 @@ theorem algebraMap_ainf_acris_ne_zero_pt {l : ℕ} [Fact l.Prime] (j : Per.Acris
     GlobalTheory.T.algebraMap_ainfInvPrime_bdRPlus_injective l (by rw [map_zero]; exact h1.symm)
   exact hi (by rw [map_zero]; exact h2)
 
-theorem pow_root_ne_zero {l : ℕ} [Fact l.Prime] (j : Per.Acris l →+* Per.BdRp l) (hj : IsCrisP j)
-    (e : Per.Fl l) (hne : e ≠ 1) (n : ℕ) :
-    algebraMap (Per.Ainf l) (Per.Acris l) (Per.tm e - 1) ^ n ≠ 0 := by
+theorem pow_root_ne_zero
+    {l : ℕ} [Fact l.Prime]
+    (j : Per.Acris l →+* Per.BdRp l) (hj : IsCrisP j)
+    (e : Per.Fl l) (hne : e ≠ 1)
+    (n : ℕ)
+    : algebraMap (Per.Ainf l) (Per.Acris l) (Per.tm e - 1) ^ n ≠ 0 := by
   obtain ⟨hd, -, -⟩ := GlobalTheory.T.usage l
   rw [← map_pow]
   refine algebraMap_ainf_acris_ne_zero_pt j hj _ (pow_ne_zero n fun h => ?_)
   exact GlobalTheory.CrisLoc.constantCoeff_root_ne_zero l e hne (by rw [h, map_zero])
 
-theorem exists_iota_cris_dR : ∀ (l : ℕ) [Fact l.Prime], ∀ j : Per.Acris l →+* Per.BdRp l, IsCrisP j →
-    ∃ ι : Per.Bcris l →+* Per.BdR l, (∀ x : Per.Acris l, ι (algebraMap (Per.Acris l) (Per.Bcris l) x) =
-      algebraMap (Per.BdRp l) (Per.BdR l) (j x)) ∧ Function.Injective ι := by
+theorem exists_iota_cris_dR
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ j : Per.Acris l →+* Per.BdRp l,
+      IsCrisP j
+        → ∃ ι : Per.Bcris l →+* Per.BdR l,
+          (∀ x : Per.Acris l,
+              ι (algebraMap (Per.Acris l) (Per.Bcris l) x)
+                = algebraMap (Per.BdRp l) (Per.BdR l) (j x))
+            ∧ Function.Injective ι := by
   intro l _ j hj
   obtain ⟨-, hi, hK, -⟩ := GlobalTheory.T.bdRPlus_isDomain_bdR_isField l
   obtain ⟨e, he, hne⟩ := GlobalTheory.CrisLoc.exists_root_ne_one l
   haveI := GlobalTheory.CrisLoc.bcris_away l e he hne
   refine exists_injective_lift_field
     (Submonoid.powers (algebraMap (Per.Ainf l) (Per.Acris l) (Per.tm e - 1))) hK
-    ((algebraMap (Per.BdRp l) (Per.BdR l)).comp j) (hi.comp (GlobalTheory.T.acrisToBdRPlus_injective l j hj)) ?_
+    ((algebraMap (Per.BdRp l) (Per.BdR l)).comp j)
+    (hi.comp (GlobalTheory.T.acrisToBdRPlus_injective l j hj)) ?_
   rintro _ ⟨n, rfl⟩
   exact pow_root_ne_zero j hj e hne n
 

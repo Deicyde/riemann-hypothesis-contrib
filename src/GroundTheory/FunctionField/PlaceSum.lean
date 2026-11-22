@@ -11,8 +11,11 @@ open IsDedekindDomain IsLocalRing
 
 open scoped WithZero
 
-theorem valuation_eq_of_isEquiv {F : Type*} [Field F] {v₁ v₂ : Valuation F ℤᵐ⁰}
-    (h : v₁.IsEquiv v₂) (h₁ : Function.Surjective v₁) (h₂ : Function.Surjective v₂) : v₁ = v₂ := by
+theorem valuation_eq_of_isEquiv
+    {F : Type*} [Field F]
+    {v₁ v₂ : Valuation F ℤᵐ⁰}
+    (h : v₁.IsEquiv v₂) (h₁ : Function.Surjective v₁) (h₂ : Function.Surjective v₂)
+    : v₁ = v₂ := by
   have disc : ∀ y : ℤᵐ⁰, y < 1 → y ≤ WithZero.exp (-1) := by
     intro y hy
     rcases eq_or_ne y 0 with rfl | hy0
@@ -20,8 +23,7 @@ theorem valuation_eq_of_isEquiv {F : Type*} [Field F] {v₁ v₂ : Valuation F �
     · rw [← WithZero.exp_log hy0, ← WithZero.exp_zero, WithZero.exp_lt_exp] at hy
       rw [← WithZero.exp_log hy0, WithZero.exp_le_exp]
       omega
-  have hlt : WithZero.exp (-1 : ℤ) < 1 := by
-    rw [← WithZero.exp_zero, WithZero.exp_lt_exp]; omega
+  have hlt : WithZero.exp (-1 : ℤ) < 1 := by rw [← WithZero.exp_zero, WithZero.exp_lt_exp]; omega
   obtain ⟨π, hπ⟩ := h₁ (WithZero.exp (-1))
   obtain ⟨π', hπ'⟩ := h₂ (WithZero.exp (-1))
   have hπ2 : v₂ π = WithZero.exp (-1) := by
@@ -47,8 +49,9 @@ theorem valuation_eq_of_isEquiv {F : Type*} [Field F] {v₁ v₂ : Valuation F �
 
 namespace Place
 
-variable {k K K' : Type*} [Field k] [Field K] [Field K'] [Algebra k K] [Algebra k K']
-  [Algebra K K'] [IsScalarTower k K K']
+variable
+  {k K K' : Type*}
+  [Field k] [Field K] [Field K'] [Algebra k K] [Algebra k K'] [Algebra K K'] [IsScalarTower k K K']
 
 noncomputable abbrev algebraExt (v : Place k K) : Algebra v.ring K' :=
   ((algebraMap K K').comp (algebraMap v.ring K)).toAlgebra
@@ -63,8 +66,8 @@ attribute [local instance] isScalarTower_ext
 
 omit [Algebra k K'] [IsScalarTower k K K'] in
 theorem isTorsionFree_ext (v : Place k K) : Module.IsTorsionFree v.ring K' :=
-  Module.isTorsionFree_iff_algebraMap_injective.2
-    ((algebraMap K K').injective.comp (IsFractionRing.injective v.ring K))
+  Module.isTorsionFree_iff_algebraMap_injective.2 ((algebraMap K K').injective.comp
+    (IsFractionRing.injective v.ring K))
 
 attribute [local instance] isTorsionFree_ext
 
@@ -90,12 +93,11 @@ theorem isTorsionFree_closure : Module.IsTorsionFree v.ring (integralClosure v.r
   IsIntegralClosure.isTorsionFree v.ring K'
 
 omit [Algebra k K'] [IsScalarTower k K K'] in
-theorem finrank_closure :
-    Module.finrank v.ring (integralClosure v.ring K') = Module.finrank K K' :=
+theorem finrank_closure : Module.finrank v.ring (integralClosure v.ring K') = Module.finrank K K' :=
   IsIntegralClosure.rank v.ring K K' _
 
-attribute [local instance] isDedekindDomain_closure isFractionRing_closure finite_closure
-  isTorsionFree_closure
+attribute [local instance]
+  isDedekindDomain_closure isFractionRing_closure finite_closure isTorsionFree_closure
 
 end Closure
 
@@ -103,12 +105,14 @@ section Correspondence
 
 variable [IsFunctionField k K] [FiniteDimensional K K'] [Algebra.IsSeparable K K'] (v : Place k K)
 
-attribute [local instance] isDedekindDomain_closure isFractionRing_closure finite_closure
-  isTorsionFree_closure
+attribute [local instance]
+  isDedekindDomain_closure isFractionRing_closure finite_closure isTorsionFree_closure
 
 omit [Algebra k K'] [IsScalarTower k K K'] [FiniteDimensional K K'] [Algebra.IsSeparable K K'] in
-theorem ne_bot_of_mem_primesOver {q : Ideal (integralClosure v.ring K')}
-    (hq : q ∈ (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) : q ≠ ⊥ := by
+theorem ne_bot_of_mem_primesOver
+    {q : Ideal (integralClosure v.ring K')}
+    (hq : q ∈ (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : q ≠ ⊥ := by
   intro h
   have hinj : Function.Injective (algebraMap v.ring (integralClosure v.ring K')) :=
     Module.isTorsionFree_iff_algebraMap_injective.1 (isTorsionFree_closure v)
@@ -116,22 +120,23 @@ theorem ne_bot_of_mem_primesOver {q : Ideal (integralClosure v.ring K')}
   rw [hq.2.over, h]
   exact Ideal.comap_bot_of_injective _ hinj
 
-noncomputable def primeHS (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    HeightOneSpectrum (integralClosure v.ring K') :=
+noncomputable def primeHS (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : HeightOneSpectrum (integralClosure v.ring K') :=
   ⟨q.1, q.2.1, v.ne_bot_of_mem_primesOver q.2⟩
 
-
-omit [IsScalarTower k K K'] [IsFunctionField k K] [FiniteDimensional K K'] [Algebra.IsSeparable K K'] in
-theorem mem_of_isIntegral_of_liesOver {w : Place k K'} (h : w.LiesOver v) {x : K'}
-    (hx : IsIntegral v.ring x) : x ∈ w.ring := by
+omit [IsScalarTower k K K'] [IsFunctionField k K] [FiniteDimensional K K']
+  [Algebra.IsSeparable K K'] in
+theorem mem_of_isIntegral_of_liesOver
+    {w : Place k K'} (h : w.LiesOver v) {x : K'} (hx : IsIntegral v.ring x)
+    : x ∈ w.ring := by
   let := h.algebra
   have : IsScalarTower v.ring w.ring K' := IsScalarTower.of_algebraMap_eq fun _ => rfl
   obtain ⟨y, hy⟩ := IsIntegrallyClosed.isIntegral_iff.1 (hx.tower_top (A := w.ring))
   rw [← hy]
   exact y.2
 
-noncomputable abbrev placeOfPrime (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    Place k K' where
+noncomputable abbrev placeOfPrime (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : Place k K' where
   ring := HeightOneSpectrum.valuationSubringAtPrime K' (v.primeHS q)
   ne_top := by
     intro htop
@@ -140,23 +145,26 @@ noncomputable abbrev placeOfPrime (q : (maximalIdeal v.ring).primesOver (integra
     have hmem : π⁻¹ ∈ ((v.primeHS q).valuation K').valuationSubring :=
       hle (htop ▸ ValuationSubring.mem_top _)
     rw [Valuation.mem_valuationSubring_iff, map_inv₀, hπ, ← WithZero.exp_neg, ← WithZero.exp_zero,
-      WithZero.exp_le_exp] at hmem
+        WithZero.exp_le_exp]
+      at hmem
     omega
   algebraMap_mem c := by
     have hc : IsIntegral v.ring (algebraMap k K' c) := by
       rw [IsScalarTower.algebraMap_apply k K K']
       exact isIntegral_algebraMap (R := v.ring) (x := (⟨_, v.algebraMap_mem c⟩ : v.ring))
-    exact Subalgebra.algebraMap_mem (Localization.subalgebra.ofField K' _
-      (v.primeHS q).asIdeal.primeCompl_le_nonZeroDivisors)
+    exact Subalgebra.algebraMap_mem
+      (Localization.subalgebra.ofField K' _ (v.primeHS q).asIdeal.primeCompl_le_nonZeroDivisors)
       (⟨algebraMap k K' c, hc⟩ : integralClosure v.ring K')
 
-theorem closure_mem_placeOfPrime (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
-    (b : integralClosure v.ring K') : (b : K') ∈ (v.placeOfPrime q).ring :=
-  Subalgebra.algebraMap_mem (Localization.subalgebra.ofField K' _
-    (v.primeHS q).asIdeal.primeCompl_le_nonZeroDivisors) b
+theorem closure_mem_placeOfPrime
+    (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    (b : integralClosure v.ring K')
+    : (b : K') ∈ (v.placeOfPrime q).ring :=
+  Subalgebra.algebraMap_mem
+    (Localization.subalgebra.ofField K' _ (v.primeHS q).asIdeal.primeCompl_le_nonZeroDivisors) b
 
-theorem placeOfPrime_liesOver (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    (v.placeOfPrime q).LiesOver v :=
+theorem placeOfPrime_liesOver (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : (v.placeOfPrime q).LiesOver v :=
   liesOver_of_le fun x hx =>
     v.closure_mem_placeOfPrime q (algebraMap v.ring (integralClosure v.ring K') ⟨x, hx⟩)
 
@@ -164,20 +172,23 @@ end Correspondence
 
 section Sum
 
-variable [IsFunctionField k K] [IsFunctionField k K'] [FiniteDimensional K K']
-  [Algebra.IsSeparable K K'] (v : Place k K)
+variable
+  [IsFunctionField k K] [IsFunctionField k K'] [FiniteDimensional K K'] [Algebra.IsSeparable K K']
+  (v : Place k K)
 
-attribute [local instance] isDedekindDomain_closure isFractionRing_closure finite_closure
-  isTorsionFree_closure
+attribute [local instance]
+  isDedekindDomain_closure isFractionRing_closure finite_closure isTorsionFree_closure
 
-noncomputable def closureHom {w : Place k K'} (h : w.LiesOver v) :
-    integralClosure v.ring K' →+* w.ring :=
+noncomputable def closureHom {w : Place k K'} (h : w.LiesOver v)
+    : integralClosure v.ring K' →+* w.ring :=
   RingHom.codRestrict (algebraMap (integralClosure v.ring K') K') w.ring fun b =>
     v.mem_of_isIntegral_of_liesOver h ((mem_integralClosure_iff v.ring K').1 b.2)
 
-noncomputable def primeOfPlace {w : Place k K'} (h : w.LiesOver v) :
-    (maximalIdeal v.ring).primesOver (integralClosure v.ring K') :=
-  ⟨(maximalIdeal w.ring).comap (v.closureHom h), Ideal.comap_isPrime _ _, ⟨by
+noncomputable def primeOfPlace {w : Place k K'} (h : w.LiesOver v)
+    : (maximalIdeal v.ring).primesOver (integralClosure v.ring K') := ⟨
+  (maximalIdeal w.ring).comap (v.closureHom h),
+  Ideal.comap_isPrime _ _,
+  ⟨by
     let := h.algebra
     have : IsLocalHom (algebraMap v.ring w.ring) := by
       refine ⟨fun a ha => ?_⟩
@@ -187,32 +198,35 @@ noncomputable def primeOfPlace {w : Place k K'} (h : w.LiesOver v) :
         rw [hzero, map_zero]
       · rw [map_inv₀]
         exact hinv
-    have hc : (v.closureHom h).comp (algebraMap v.ring (integralClosure v.ring K')) =
-        algebraMap v.ring w.ring := RingHom.ext fun a => Subtype.ext rfl
-    change maximalIdeal v.ring = Ideal.comap (algebraMap v.ring (integralClosure v.ring K'))
-      (Ideal.comap (v.closureHom h) (maximalIdeal w.ring))
+    have hc
+        : (v.closureHom h).comp (algebraMap v.ring (integralClosure v.ring K'))
+          = algebraMap v.ring w.ring :=
+      RingHom.ext fun a => Subtype.ext rfl
+    change maximalIdeal v.ring
+      = Ideal.comap (algebraMap v.ring (integralClosure v.ring K'))
+        (Ideal.comap (v.closureHom h) (maximalIdeal w.ring))
     rw [Ideal.comap_comap, hc]
     have hlo : (maximalIdeal w.ring).LiesOver (maximalIdeal v.ring) := inferInstance
-    exact hlo.over⟩⟩
+    exact hlo.over⟩
+⟩
 
-theorem placeOfPrime_primeOfPlace {w : Place k K'} (h : w.LiesOver v) :
-    v.placeOfPrime (v.primeOfPlace h) = w := by
+theorem placeOfPrime_primeOfPlace {w : Place k K'} (h : w.LiesOver v)
+    : v.placeOfPrime (v.primeOfPlace h) = w := by
   refine Place.eq_of_le fun x hx => ?_
   obtain ⟨a, s, hs, rfl⟩ := hx
   have ha : ((a : integralClosure v.ring K') : K') ∈ w.ring := (v.closureHom h a).2
   have hsw : ((s : integralClosure v.ring K') : K') ∈ w.ring := (v.closureHom h s).2
   have hs' : v.closureHom h s ∉ maximalIdeal w.ring := hs
   have hs1 : w.ring.valuation (s : K') = 1 :=
-    le_antisymm (w.ring.valuation_le_one_iff _ |>.2 hsw) (not_lt.1 fun hlt =>
-      hs' ((w.ring.valuation_lt_one_iff _).2 hlt))
+    le_antisymm (w.ring.valuation_le_one_iff _ |>.2 hsw)
+      (not_lt.1 fun hlt => hs' ((w.ring.valuation_lt_one_iff _).2 hlt))
   have hsinv : ((s : integralClosure v.ring K') : K')⁻¹ ∈ w.ring := by
     rw [← w.ring.valuation_le_one_iff, map_inv₀, hs1, inv_one]
   exact mul_mem ha hsinv
 
 omit [IsFunctionField k K'] in
-theorem primeOfPlace_placeOfPrime
-    (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    v.primeOfPlace (v.placeOfPrime_liesOver q) = q := by
+theorem primeOfPlace_placeOfPrime (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : v.primeOfPlace (v.placeOfPrime_liesOver q) = q := by
   apply Subtype.ext
   ext b
   change v.closureHom _ b ∈ maximalIdeal (v.placeOfPrime q).ring ↔ b ∈ q.1
@@ -229,17 +243,18 @@ theorem primeOfPlace_placeOfPrime
       rw [h0, inv_zero] at hinv
       exact hbq (by
         have : b = 0 := Subtype.ext h0
-        rw [this]; exact q.1.zero_mem)
+        rw [this]
+        exact q.1.zero_mem)
     have h1 := (v.placeOfPrime q).ring.valuation_le_one_iff _ |>.2 hinv
     rw [map_inv₀, inv_le_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 hb0))] at h1
     exact absurd hb (not_lt.2 h1)
   · intro hbq
     by_contra hb
     have hb1 : (v.placeOfPrime q).ring.valuation (b : K') = 1 :=
-      le_antisymm ((v.placeOfPrime q).ring.valuation_le_one_iff _ |>.2
-        (v.closure_mem_placeOfPrime q b)) (not_lt.1 hb)
-    have hb0 : (b : K') ≠ 0 := by
-      intro h0; rw [h0, map_zero] at hb1; exact zero_ne_one hb1
+      le_antisymm
+        ((v.placeOfPrime q).ring.valuation_le_one_iff _ |>.2 (v.closure_mem_placeOfPrime q b))
+        (not_lt.1 hb)
+    have hb0 : (b : K') ≠ 0 := by intro h0; rw [h0, map_zero] at hb1; exact zero_ne_one hb1
     have hinv : ((b : integralClosure v.ring K') : K')⁻¹ ∈ (v.placeOfPrime q).ring := by
       rw [← ValuationSubring.valuation_le_one_iff, map_inv₀, hb1, inv_one]
     have hle := HeightOneSpectrum.valuationSubringAtPrime_le_valuation (K := K') (v := v.primeHS q)
@@ -249,33 +264,35 @@ theorem primeOfPlace_placeOfPrime
     rw [map_inv₀, inv_le_one₀ (zero_lt_iff.2 ((Valuation.ne_zero_iff _).2 hb0))] at h1
     exact absurd h2 (not_lt.2 h1)
 
-noncomputable def primesOverEquiv :
-    (maximalIdeal v.ring).primesOver (integralClosure v.ring K') ≃
-      {w : Place k K' // w.LiesOver v} where
+noncomputable def primesOverEquiv
+    : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')
+      ≃ {w : Place k K' // w.LiesOver v} where
   toFun q := ⟨v.placeOfPrime q, v.placeOfPrime_liesOver q⟩
   invFun w := v.primeOfPlace w.2
   left_inv q := v.primeOfPlace_placeOfPrime q
   right_inv w := Subtype.ext (v.placeOfPrime_primeOfPlace w.2)
 
-theorem valuation_primeHS (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    (v.primeHS q).valuation K' = (v.placeOfPrime q).valuation := by
+theorem valuation_primeHS (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : (v.primeHS q).valuation K' = (v.placeOfPrime q).valuation := by
   symm
   refine valuation_eq_of_isEquiv ?_ (v.placeOfPrime q).valuation_surjective
     (HeightOneSpectrum.valuation_surjective K' _)
   refine Valuation.isEquiv_iff_val_le_one.2 fun {x} => ?_
   rw [Place.valuation_le_one_iff]
   have hle := HeightOneSpectrum.valuationSubringAtPrime_le_valuation (K := K') (v := v.primeHS q)
-  let P : Place k K' :=
-    { ring := ((v.primeHS q).valuation K').valuationSubring
-      ne_top := by
-        intro htop
-        obtain ⟨π, hπ⟩ := (v.primeHS q).valuation_exists_uniformizer K'
-        have hmem : π⁻¹ ∈ ((v.primeHS q).valuation K').valuationSubring :=
-          htop ▸ ValuationSubring.mem_top _
-        rw [Valuation.mem_valuationSubring_iff, map_inv₀, hπ, ← WithZero.exp_neg,
-          ← WithZero.exp_zero, WithZero.exp_le_exp] at hmem
-        omega
-      algebraMap_mem := fun c => hle ((v.placeOfPrime q).algebraMap_mem c) }
+  let P : Place k K' := {
+    ring := ((v.primeHS q).valuation K').valuationSubring
+    ne_top := by
+      intro htop
+      obtain ⟨π, hπ⟩ := (v.primeHS q).valuation_exists_uniformizer K'
+      have hmem : π⁻¹ ∈ ((v.primeHS q).valuation K').valuationSubring :=
+        htop ▸ ValuationSubring.mem_top _
+      rw [Valuation.mem_valuationSubring_iff, map_inv₀, hπ, ← WithZero.exp_neg, ← WithZero.exp_zero,
+          WithZero.exp_le_exp]
+        at hmem
+      omega
+    algebraMap_mem := fun c => hle ((v.placeOfPrime q).algebraMap_mem c)
+  }
   have heq : v.placeOfPrime q = P := Place.eq_of_le hle
   constructor
   · intro hx
@@ -286,26 +303,27 @@ theorem valuation_primeHS (q : (maximalIdeal v.ring).primesOver (integralClosure
     exact hxP
 
 theorem ramificationIdx_primeOfPlace_eq
-    (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    q.1.ramificationIdx v.ring = (v.placeOfPrime q).ramificationIdx v := by
+    (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : q.1.ramificationIdx v.ring = (v.placeOfPrime q).ramificationIdx v := by
   have := q.2.1
   have := q.2.2
   have : (v.primeHS q).asIdeal.LiesOver v.heightOneSpectrum.asIdeal := q.2.2
-  have he : v.valuation v.uniformizer ^ q.1.ramificationIdx v.ring =
-      (v.primeHS q).valuation K' (algebraMap K K' v.uniformizer) :=
+  have he
+      : v.valuation v.uniformizer ^ q.1.ramificationIdx v.ring
+        = (v.primeHS q).valuation K' (algebraMap K K' v.uniformizer) :=
     HeightOneSpectrum.valuation_liesOver K' v.heightOneSpectrum (v.primeHS q) v.uniformizer
   rw [valuation_primeHS, v.valuation_eq_exp_neg_ord v.uniformizer_ne_zero, v.ord_uniformizer,
-    ← WithZero.exp_nsmul] at he
+      ← WithZero.exp_nsmul]
+    at he
   have hlog := congrArg WithZero.log he
   rw [WithZero.log_exp, nsmul_eq_mul, mul_neg_one] at hlog
-  change _ = (-WithZero.log ((v.placeOfPrime q).valuation (algebraMap K K' v.uniformizer))).toNat
+  change _ = (- WithZero.log ((v.placeOfPrime q).valuation (algebraMap K K' v.uniformizer))).toNat
   rw [← hlog, neg_neg, Int.toNat_natCast]
-
 
 omit [IsFunctionField k K'] in
 theorem inertiaDeg_primeOfPlace_eq
-    (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K')) :
-    q.1.inertiaDeg v.ring = (v.placeOfPrime q).inertiaDeg v := by
+    (q : (maximalIdeal v.ring).primesOver (integralClosure v.ring K'))
+    : q.1.inertiaDeg v.ring = (v.placeOfPrime q).inertiaDeg v := by
   have := q.2.1
   have := q.2.2
   have hmax : q.1.IsMaximal := q.2.1.isMaximal (v.ne_bot_of_mem_primesOver q.2)
@@ -313,16 +331,18 @@ theorem inertiaDeg_primeOfPlace_eq
   have h : w.LiesOver v := v.placeOfPrime_liesOver q
   let := h.algebra
   have hcomap : (maximalIdeal w.ring).comap (algebraMap v.ring w.ring) = maximalIdeal v.ring := by
-    have hq : maximalIdeal v.ring =
-        ((maximalIdeal w.ring).comap (v.closureHom h)).under v.ring := (v.primeOfPlace h).2.2.over
-    have hc : (v.closureHom h).comp (algebraMap v.ring (integralClosure v.ring K')) =
-        algebraMap v.ring w.ring := RingHom.ext fun a => Subtype.ext rfl
+    have hq : maximalIdeal v.ring = ((maximalIdeal w.ring).comap (v.closureHom h)).under v.ring :=
+      (v.primeOfPlace h).2.2.over
+    have hc
+        : (v.closureHom h).comp (algebraMap v.ring (integralClosure v.ring K'))
+          = algebraMap v.ring w.ring :=
+      RingHom.ext fun a => Subtype.ext rfl
     simpa only [Ideal.under, Ideal.comap_comap, hc] using hq.symm
   have : IsLocalHom (algebraMap v.ring w.ring) := ((local_hom_tfae _).out 5 1).mp hcomap
   have hfinrank : Module.finrank v.ResidueField w.ResidueField = w.inertiaDeg v := by
     let : Algebra k w.ring := (fun u : Place k K' => (inferInstance : Algebra k u.ring)) w
-    have : IsScalarTower k v.ring w.ring := IsScalarTower.of_algebraMap_eq fun c =>
-      Subtype.ext (IsScalarTower.algebraMap_apply k K K' c)
+    have : IsScalarTower k v.ring w.ring :=
+      IsScalarTower.of_algebraMap_eq fun c => Subtype.ext (IsScalarTower.algebraMap_apply k K K' c)
     have : Module.Free v.ResidueField w.ResidueField := Module.Free.of_divisionRing _ _
     have hdeg : v.deg * Module.finrank v.ResidueField w.ResidueField = w.deg :=
       Module.finrank_mul_finrank k v.ResidueField w.ResidueField
@@ -343,19 +363,19 @@ theorem finite_liesOver : {w : Place k K' | w.LiesOver v}.Finite := by
   have := hfin.to_subtype
   exact Set.finite_coe_iff.1 (Finite.of_equiv _ v.primesOverEquiv)
 
-theorem sum_ramificationIdx_mul_inertiaDeg :
-    ∑ w ∈ (v.finite_liesOver (K' := K')).toFinset, w.ramificationIdx v * w.inertiaDeg v =
-      Module.finrank K K' := by
+theorem sum_ramificationIdx_mul_inertiaDeg
+    : ∑ w ∈ (v.finite_liesOver (K' := K')).toFinset, w.ramificationIdx v * w.inertiaDeg v
+      = Module.finrank K K' := by
   classical
   have hfin : ((maximalIdeal v.ring).primesOver (integralClosure v.ring K')).Finite :=
     Algebra.QuasiFinite.finite_primesOver _
   let : Fintype ((maximalIdeal v.ring).primesOver (integralClosure v.ring K')) := hfin.fintype
   let : Fintype {w : Place k K' // w.LiesOver v} := Fintype.ofEquiv _ v.primesOverEquiv
-  have hsum := Ideal.sum_ramification_inertia_eq_finrank (maximalIdeal v.ring)
-    (integralClosure v.ring K')
+  have hsum :=
+    Ideal.sum_ramification_inertia_eq_finrank (maximalIdeal v.ring) (integralClosure v.ring K')
   rw [finrank_closure] at hsum
-  have hs : ∀ w : Place k K', w ∈ (v.finite_liesOver (K' := K')).toFinset ↔ w.LiesOver v :=
-    fun w => Set.Finite.mem_toFinset _
+  have hs : ∀ w : Place k K', w ∈ (v.finite_liesOver (K' := K')).toFinset ↔ w.LiesOver v := fun w =>
+    Set.Finite.mem_toFinset _
   rw [← hsum, Finset.sum_subtype _ hs]
   refine (Fintype.sum_equiv v.primesOverEquiv _ _ fun q => ?_).symm
   rw [ramificationIdx_primeOfPlace_eq, inertiaDeg_primeOfPlace_eq]

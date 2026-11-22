@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial
 
-private theorem ptFin_int {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
+private theorem ptFin_int {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l)
+    : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
   have hi : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   have h0 : ‖x‖ = spectralValue (minpoly ℚ_[l] x) := rfl
   rw [h0, spectralValue_le_one_iff (minpoly.monic hi)]
@@ -23,15 +25,19 @@ private theorem ptFin_int {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsIntegr
     obtain ⟨q, hq, -, hqm⟩ := lifts_and_degree_eq_and_monic hl' (minpoly.monic hi)
     exact ⟨q, hqm, by rw [← aeval_def, ← aeval_map_algebraMap ℚ_[l], hq, minpoly.aeval]⟩
 
-private theorem ptFin_pow {O S : Type} [CommRing O] [CommRing S] [Algebra O S] [IsNoetherianRing S] (m : Ideal S)
-    (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ m) (n : ℕ) :
-    ∃ N : Submodule O S, N.FG ∧ ∀ x : S, ∃ y ∈ N, x - y ∈ m ^ n :=
+private theorem ptFin_pow
+    {O S : Type} [CommRing O] [CommRing S] [Algebra O S] [IsNoetherianRing S]
+    (m : Ideal S) (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ m)
+    (n : ℕ)
+    : ∃ N : Submodule O S, N.FG ∧ ∀ x : S, ∃ y ∈ N, x - y ∈ m ^ n :=
   _root_.UpperTheory.Reformulated.B.PointFinitePower.ptFin_pow m hres n
 
-private theorem ptFin_finite {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O]
-    [CommRing S] [Algebra O S] [IsLocalRing S] [IsNoetherianRing S] [Algebra.IsIntegral O S]
+private theorem ptFin_finite
+    {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O] [CommRing S]
+    [Algebra O S] [IsLocalRing S] [IsNoetherianRing S] [Algebra.IsIntegral O S]
     (hloc : ∀ a ∈ maximalIdeal O, algebraMap O S a ∈ maximalIdeal S)
-    (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ maximalIdeal S) : Module.Finite O S := by
+    (hres : ∀ x : S, ∃ a : O, x - algebraMap O S a ∈ maximalIdeal S)
+    : Module.Finite O S := by
   set J : Ideal S := (maximalIdeal O).map (algebraMap O S) with hJ
   have hJle : J ≤ maximalIdeal S := Ideal.map_le_iff_le_comap.2 hloc
   have hJne : J ≠ ⊤ := fun h => (maximalIdeal.isMaximal S).ne_top (top_le_iff.1 (h ▸ hJle))
@@ -44,13 +50,15 @@ private theorem ptFin_finite {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicCo
     have h1 : maximalIdeal O ≤ P.comap (algebraMap O S) := Ideal.map_le_iff_le_comap.1 hJP
     have h2 : P.comap (algebraMap O S) = maximalIdeal O :=
       ((maximalIdeal.isMaximal O).eq_of_le (Ideal.comap_ne_top _ hP.ne_top) h1).symm
-    have h3 : P.IsMaximal := Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := O) P
-      (by change (P.comap (algebraMap O S)).IsMaximal; rw [h2]; infer_instance)
+    have h3 : P.IsMaximal :=
+      Ideal.isMaximal_of_isIntegral_of_isMaximal_under (R := O) P
+        (by change (P.comap (algebraMap O S)).IsMaximal; rw [h2]; infer_instance)
     exact (eq_maximalIdeal h3).ge
   obtain ⟨n, hn⟩ := Ideal.exists_pow_le_of_le_radical_of_fg hrad (IsNoetherian.noetherian _)
   obtain ⟨N, hN, h⟩ := ptFin_pow (maximalIdeal S) hres n
   refine (UpperTheory.V.abelian₂.nakayama O (maximalIdeal O) S).2 ⟨?_⟩
-  have : (⊤ : Submodule O (S ⧸ (maximalIdeal O) • (⊤ : Submodule O S))) = N.map (Submodule.mkQ _) := by
+  have : (⊤ : Submodule O (S ⧸ (maximalIdeal O) • (⊤ : Submodule O S)))
+      = N.map (Submodule.mkQ _) := by
     symm
     rw [Submodule.map_mkQ_eq_top, eq_top_iff]
     intro x _
@@ -62,14 +70,19 @@ private theorem ptFin_finite {O S : Type} [CommRing O] [IsLocalRing O] [IsAdicCo
   rw [this]
   exact hN.map _
 
-theorem UpperTheory.V.Loc.ptFin :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O] [Algebra O (PadicAlgCl l)] [IsScalarTower ℤ_[l] O (PadicAlgCl l)] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (F : R →ₐ[O] DualNumber (PadicAlgCl l)), IsLocPt (dualFst F) → ∃ E' : FinExt l, ∀ a, (F a).fst ∈ E'.1 ∧ (F a).snd ∈ E'.1 := by
+theorem UpperTheory.V.Loc.ptFin
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O]
+        [Algebra O (PadicAlgCl l)] [IsScalarTower ℤ_[l] O (PadicAlgCl l)] (R : Type) [CommRing R]
+        [Algebra O R] [IsCO O R] (F : R →ₐ[O] DualNumber (PadicAlgCl l)),
+      IsLocPt (dualFst F) → ∃ E' : FinExt l, ∀ a, (F a).fst ∈ E'.1 ∧ (F a).snd ∈ E'.1 := by
   intro l _ O _ _ _ _ _ _ _ _ _ R _ _ _ F hF
   classical
   set f := dualFst F with hf
   have hfa : ∀ a, (F a).fst = f a := fun a => rfl
   have hO : ∀ a : O, IsIntegral ℤ_[l] (algebraMap O (PadicAlgCl l) a) := fun a =>
-    (Algebra.IsIntegral.isIntegral (R := ℤ_[l]) a).map (IsScalarTower.toAlgHom ℤ_[l] O (PadicAlgCl l))
+    (Algebra.IsIntegral.isIntegral (R := ℤ_[l]) a).map
+      (IsScalarTower.toAlgHom ℤ_[l] O (PadicAlgCl l))
   have hint : ∀ a : R, IsIntegral O (f a) := by
     intro a
     obtain ⟨c, hc⟩ := IsCO.res_surj (O := O) a
@@ -99,10 +112,12 @@ theorem UpperTheory.V.Loc.ptFin :
   choose b hb using fun i => hg (s i)
   obtain ⟨r', o, ho⟩ := Module.Finite.exists_fin (R := ℤ_[l]) (M := O)
   obtain ⟨P, hP⟩ : (RingHom.ker f).FG := IsNoetherian.noetherian _
-  let T : Set (PadicAlgCl l) := Set.range (fun i => algebraMap O (PadicAlgCl l) (o i)) ∪ Set.range (fun i => f (b i)) ∪
-    Set.range (fun i => (F (b i)).snd) ∪ (fun p => (F p).snd) '' (P : Set R)
+  let T : Set (PadicAlgCl l) :=
+    Set.range (fun i => algebraMap O (PadicAlgCl l) (o i)) ∪ Set.range (fun i => f (b i))
+      ∪ Set.range (fun i => (F (b i)).snd) ∪ (fun p => (F p).snd) '' (P : Set R)
   have hT : T.Finite :=
-    (((Set.finite_range _).union (Set.finite_range _)).union (Set.finite_range _)).union (P.finite_toSet.image _)
+    (((Set.finite_range _).union (Set.finite_range _)).union (Set.finite_range _)).union
+      (P.finite_toSet.image _)
   haveI : Finite T := hT
   let E : IntermediateField ℚ_[l] (PadicAlgCl l) := IntermediateField.adjoin ℚ_[l] T
   have hE : FiniteDimensional ℚ_[l] E :=

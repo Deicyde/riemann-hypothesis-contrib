@@ -10,8 +10,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.ProfCoh
 
-open NumberField IsDedekindDomain IntermediateField GroundTheory.Global GroundTheory.Global.IdeleGroup GroundTheory.LocalField
-  Function
+open NumberField IsDedekindDomain IntermediateField GroundTheory.Global
+  GroundTheory.Global.IdeleGroup GroundTheory.LocalField Function
 
 noncomputable section
 
@@ -21,10 +21,10 @@ section Restrict
 
 variable {F Ω : Type*} [Field F] [Field Ω] [Algebra F Ω] [IsGalois F Ω]
 
-theorem restrictAb_restrictNormalHom (E : IntermediateField F Ω) [Normal F E]
-    (h : E ≤ maximalAbelianExtension F Ω) (g : Gal(Ω/F)) :
-    restrictAb E h (AlgEquiv.restrictNormalHom (maximalAbelianExtension F Ω) g) =
-      AlgEquiv.restrictNormalHom E g := by
+theorem restrictAb_restrictNormalHom
+    (E : IntermediateField F Ω) [Normal F E] (h : E ≤ maximalAbelianExtension F Ω) (g : Gal(Ω/F))
+    : restrictAb E h (AlgEquiv.restrictNormalHom (maximalAbelianExtension F Ω) g)
+      = AlgEquiv.restrictNormalHom E g := by
   rw [← topologicalAbelianizationEquiv_mk, restrictAb_topologicalAbelianizationEquiv]
 
 end Restrict
@@ -33,7 +33,9 @@ theorem zmod_pow_eq_one {n : ℕ} (z : Multiplicative (ZMod n)) : z ^ n = 1 := b
   change Multiplicative.ofAdd (n • Multiplicative.toAdd z) = Multiplicative.ofAdd 0
   rw [nsmul_eq_mul, ZMod.natCast_self, zero_mul]
 
-variable {K : Type u} [Field K] [NumberField K] {Ω : Type u} [Field Ω] [Algebra K Ω] [IsGalois K Ω]
+variable
+  {K : Type u} [Field K] [NumberField K]
+  {Ω : Type u} [Field Ω] [Algebra K Ω] [IsGalois K Ω]
   {S : Set (HeightOneSpectrum (𝓞 K))} {n : ℕ}
 
 section Character
@@ -43,8 +45,8 @@ variable (χ : ContinuousMonoidHom (galUnramifiedOutside K Ω S) (Multiplicative
 def charAbs : Gal(Ω/K) →* Multiplicative (ZMod n) :=
   χ.toMonoidHom.comp (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S))
 
-theorem charAbs_apply (g : Gal(Ω/K)) :
-    charAbs χ g = χ (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S) g) :=
+theorem charAbs_apply (g : Gal(Ω/K))
+    : charAbs χ g = χ (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S) g) :=
   rfl
 
 theorem continuous_charAbs : Continuous (charAbs χ) :=
@@ -58,19 +60,21 @@ theorem isClosed_ker_charAbs : IsClosed ((charAbs χ).ker : Set Gal(Ω/K)) := by
   rw [MonoidHom.coe_ker]
   exact (isClosed_discrete {1}).preimage (continuous_charAbs χ)
 
-theorem closure_commutator_le_ker_charAbs :
-    (commutator Gal(Ω/K)).topologicalClosure ≤ (charAbs χ).ker :=
+theorem closure_commutator_le_ker_charAbs
+    : (commutator Gal(Ω/K)).topologicalClosure ≤ (charAbs χ).ker :=
   Subgroup.topologicalClosure_minimal _ (commutator_le_ker_of_comm _) (isClosed_ker_charAbs χ)
 
-def charAb : (maximalAbelianExtension K Ω ≃ₐ[K] maximalAbelianExtension K Ω) →* Multiplicative (ZMod n) :=
+def charAb
+    : (maximalAbelianExtension K Ω ≃ₐ[K] maximalAbelianExtension K Ω) →* Multiplicative (ZMod n) :=
   (QuotientGroup.lift _ (charAbs χ) (closure_commutator_le_ker_charAbs χ)).comp
     (topologicalAbelianizationEquiv K Ω).symm.toMulEquiv.toMonoidHom
 
-theorem charAb_restrictNormalHom (g : Gal(Ω/K)) :
-    charAb χ (AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) g) = charAbs χ g := by
+theorem charAb_restrictNormalHom (g : Gal(Ω/K))
+    : charAb χ (AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) g) = charAbs χ g := by
   rw [← topologicalAbelianizationEquiv_mk]
   change QuotientGroup.lift _ (charAbs χ) (closure_commutator_le_ker_charAbs χ)
-    ((topologicalAbelianizationEquiv K Ω).symm (topologicalAbelianizationEquiv K Ω _)) = _
+      ((topologicalAbelianizationEquiv K Ω).symm (topologicalAbelianizationEquiv K Ω _))
+    = _
   rw [ContinuousMulEquiv.symm_apply_apply]
   rfl
 
@@ -80,22 +84,24 @@ theorem fixingSubgroup_charField : (charField χ).fixingSubgroup = (charAbs χ).
   InfiniteGalois.fixingSubgroup_fixedField ⟨(charAbs χ).ker, isClosed_ker_charAbs χ⟩
 
 instance finiteDimensional_charField : FiniteDimensional K (charField χ) :=
-  (InfiniteGalois.isOpen_iff_finite _).1 (by rw [fixingSubgroup_charField]; exact isOpen_ker_charAbs χ)
+  (InfiniteGalois.isOpen_iff_finite _).1
+    (by rw [fixingSubgroup_charField]; exact isOpen_ker_charAbs χ)
 
 instance isGalois_charField : IsGalois K (charField χ) := IsGalois.of_fixedField_normal_subgroup _
 
-theorem charAbs_eq_one_iff (g : Gal(Ω/K)) :
-    charAbs χ g = 1 ↔ AlgEquiv.restrictNormalHom (charField χ) g = 1 := by
+theorem charAbs_eq_one_iff (g : Gal(Ω/K))
+    : charAbs χ g = 1 ↔ AlgEquiv.restrictNormalHom (charField χ) g = 1 := by
   rw [← MonoidHom.mem_ker, ← MonoidHom.mem_ker, IntermediateField.restrictNormalHom_ker,
     fixingSubgroup_charField]
 
 instance isAbelianGalois_charField : IsAbelianGalois K (charField χ) := by
-  have : IsMulCommutative (charField χ ≃ₐ[K] charField χ) := ⟨⟨fun τ₁ τ₂ ↦ by
-    obtain ⟨g₁, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (E := Ω) τ₁
-    obtain ⟨g₂, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (E := Ω) τ₂
-    rw [← map_mul, ← map_mul, ← mul_inv_eq_one, ← map_inv, ← map_mul, ← charAbs_eq_one_iff,
-      map_mul, map_inv, map_mul, map_mul]
-    exact mul_inv_eq_one.2 (mul_comm _ _)⟩⟩
+  have : IsMulCommutative (charField χ ≃ₐ[K] charField χ) :=
+    ⟨⟨fun τ₁ τ₂ ↦ by
+      obtain ⟨g₁, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (E := Ω) τ₁
+      obtain ⟨g₂, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (E := Ω) τ₂
+      rw [← map_mul, ← map_mul, ← mul_inv_eq_one, ← map_inv, ← map_mul, ← charAbs_eq_one_iff,
+        map_mul, map_inv, map_mul, map_mul]
+      exact mul_inv_eq_one.2 (mul_comm _ _)⟩⟩
   exact ⟨⟩
 
 theorem charField_le : charField χ ≤ maxUnramifiedOutside K Ω S := by
@@ -114,14 +120,15 @@ theorem isUnramifiedOutside_charField : IsUnramifiedOutside S (charField χ) :=
 
 theorem charAb_eq_one_of_restrictAb
     {σ : maximalAbelianExtension K Ω ≃ₐ[K] maximalAbelianExtension K Ω}
-    (h : restrictAb (charField χ) (le_maximalAbelianExtension _) σ = 1) : charAb χ σ = 1 := by
+    (h : restrictAb (charField χ) (le_maximalAbelianExtension _) σ = 1)
+    : charAb χ σ = 1 := by
   obtain ⟨g, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (E := Ω) σ
   rw [restrictAb_restrictNormalHom] at h
   rw [charAb_restrictNormalHom, charAbs_eq_one_iff]
   exact h
 
-theorem sIdeleSubgroupPos_le_ker :
-    sIdeleSubgroupPos S ≤ (((charAb χ).comp (artinMap K Ω)).comp (IdeleClassGroup.mk K)).ker := by
+theorem sIdeleSubgroupPos_le_ker
+    : sIdeleSubgroupPos S ≤ (((charAb χ).comp (artinMap K Ω)).comp (IdeleClassGroup.mk K)).ker := by
   refine sup_le ?_ fun u hu ↦ ?_
   · rintro _ ⟨a, rfl⟩
     rw [MonoidHom.mem_ker, MonoidHom.comp_apply, MonoidHom.comp_apply, IdeleClassGroup.mk_diagonal,
@@ -136,35 +143,36 @@ def charToSIdelePos : SIdeleClassGroupPos S →* Multiplicative (ZMod n) :=
   QuotientGroup.lift _ (((charAb χ).comp (artinMap K Ω)).comp (IdeleClassGroup.mk K))
     (sIdeleSubgroupPos_le_ker χ)
 
-theorem charToSIdelePos_mk (x : IdeleGroup K) :
-    charToSIdelePos χ (SIdeleClassGroupPos.mk S x) = charAb χ (artinMap K Ω (IdeleClassGroup.mk K x)) :=
+theorem charToSIdelePos_mk (x : IdeleGroup K)
+    : charToSIdelePos χ (SIdeleClassGroupPos.mk S x)
+      = charAb χ (artinMap K Ω (IdeleClassGroup.mk K x)) :=
   rfl
 
-theorem charToSIdelePos_mk_eq (x : IdeleGroup K) (g : Gal(Ω/K))
+theorem charToSIdelePos_mk_eq
+    (x : IdeleGroup K) (g : Gal(Ω/K))
     (hg : ∀ (y : Ω) (hy : y ∈ maximalAbelianExtension K Ω),
-      g y = (artinMap K Ω (IdeleClassGroup.mk K x) ⟨y, hy⟩ : Ω)) :
-    charToSIdelePos χ (SIdeleClassGroupPos.mk S x) =
-      χ (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S) g) := by
-  have : AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) g =
-      artinMap K Ω (IdeleClassGroup.mk K x) :=
+      g y = (artinMap K Ω (IdeleClassGroup.mk K x) ⟨y, hy⟩ : Ω))
+    : charToSIdelePos χ (SIdeleClassGroupPos.mk S x)
+      = χ (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S) g) := by
+  have : AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) g
+      = artinMap K Ω (IdeleClassGroup.mk K x) :=
     AlgEquiv.ext fun y ↦ Subtype.ext (by rw [AlgEquiv.restrictNormalHom_apply, hg y y.2])
   rw [charToSIdelePos_mk, ← this, charAb_restrictNormalHom]
   rfl
 
 end Character
 
-
 omit [NumberField K] in
-theorem liftNormal_apply_of_mem (σ : maximalAbelianExtension K Ω ≃ₐ[K] maximalAbelianExtension K Ω)
-    (y : Ω) (hy : y ∈ maximalAbelianExtension K Ω) :
-    σ.liftNormal Ω y = (σ ⟨y, hy⟩ : Ω) :=
+theorem liftNormal_apply_of_mem
+    (σ : maximalAbelianExtension K Ω ≃ₐ[K] maximalAbelianExtension K Ω)
+    (y : Ω) (hy : y ∈ maximalAbelianExtension K Ω)
+    : σ.liftNormal Ω y = (σ ⟨y, hy⟩ : Ω) :=
   AlgEquiv.liftNormal_commutes σ Ω ⟨y, hy⟩
 
-
 variable (K Ω S n) in
-def charToSIdelePosHom :
-    ContinuousMonoidHom (galUnramifiedOutside K Ω S) (Multiplicative (ZMod n)) →*
-      (SIdeleClassGroupPos S →* Multiplicative (ZMod n)) where
+def charToSIdelePosHom
+    : ContinuousMonoidHom (galUnramifiedOutside K Ω S) (Multiplicative (ZMod n))
+      →* (SIdeleClassGroupPos S →* Multiplicative (ZMod n)) where
   toFun := charToSIdelePos
   map_one' := by
     refine QuotientGroup.monoidHom_ext _ (MonoidHom.ext fun x ↦ ?_)
@@ -173,37 +181,38 @@ def charToSIdelePosHom :
     rfl
   map_mul' χ₁ χ₂ := by
     refine QuotientGroup.monoidHom_ext _ (MonoidHom.ext fun x ↦ ?_)
-    change charToSIdelePos (χ₁ * χ₂) (SIdeleClassGroupPos.mk S x) =
-      charToSIdelePos χ₁ (SIdeleClassGroupPos.mk S x) * charToSIdelePos χ₂ (SIdeleClassGroupPos.mk S x)
+    change charToSIdelePos (χ₁ * χ₂) (SIdeleClassGroupPos.mk S x)
+      = charToSIdelePos χ₁ (SIdeleClassGroupPos.mk S x)
+        * charToSIdelePos χ₂ (SIdeleClassGroupPos.mk S x)
     rw [charToSIdelePos_mk_eq _ x _ (liftNormal_apply_of_mem _),
       charToSIdelePos_mk_eq _ x _ (liftNormal_apply_of_mem _),
       charToSIdelePos_mk_eq _ x _ (liftNormal_apply_of_mem _), ContinuousMonoidHom.mul_apply]
-
 
 variable (S) in
 def ofIdeleClassPos : IdeleClassGroup K →* SIdeleClassGroupPos S :=
   QuotientGroup.map _ _ (MonoidHom.id _) le_sup_left
 
-theorem ofIdeleClassPos_mk (x : IdeleGroup K) :
-    ofIdeleClassPos S (IdeleClassGroup.mk K x) = SIdeleClassGroupPos.mk S x :=
+theorem ofIdeleClassPos_mk (x : IdeleGroup K)
+    : ofIdeleClassPos S (IdeleClassGroup.mk K x) = SIdeleClassGroupPos.mk S x :=
   rfl
 
-theorem charToSIdelePosHom_injective [IsAlgClosure K Ω] :
-    Injective (charToSIdelePosHom K Ω S n) := by
+theorem charToSIdelePosHom_injective [IsAlgClosure K Ω]
+    : Injective (charToSIdelePosHom K Ω S n) := by
   rw [injective_iff_map_eq_one]
   intro χ hχ
   refine ContinuousMonoidHom.ext fun τ ↦ ?_
   obtain ⟨g, rfl⟩ := AlgEquiv.restrictNormalHom_surjective (E := Ω) τ
-  obtain ⟨c, hc⟩ := artinMap_surjective (K := K) (Ω := Ω)
-    (AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) g)
+  obtain ⟨c, hc⟩ :=
+    artinMap_surjective (K := K) (Ω := Ω)
+      (AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) g)
   obtain ⟨x, rfl⟩ := IdeleClassGroup.mk_surjective K c
-  have h := charToSIdelePos_mk_eq (S := S) χ x g fun y hy ↦ by
-    rw [hc, AlgEquiv.restrictNormalHom_apply]
+  have h :=
+    charToSIdelePos_mk_eq (S := S) χ x g fun y hy ↦ by rw [hc, AlgEquiv.restrictNormalHom_apply]
   rw [← h]
   exact DFunLike.congr_fun hχ _
 
-theorem charToSIdelePosHom_surjective [IsAlgClosure K Ω] (hS : S.Finite) [NeZero n] :
-    Surjective (charToSIdelePosHom K Ω S n) := by
+theorem charToSIdelePosHom_surjective [IsAlgClosure K Ω] (hS : S.Finite) [NeZero n]
+    : Surjective (charToSIdelePosHom K Ω S n) := by
   intro ψ
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed K
   have hn : n ≠ 0 := NeZero.ne n
@@ -218,8 +227,9 @@ theorem charToSIdelePosHom_surjective [IsAlgClosure K Ω] (hS : S.Finite) [NeZer
   have := finiteIndex_of_pow_mem_of_unitsOutsidePos hS hn ψC.ker hpow hU
   obtain ⟨E, _, _, hE⟩ :=
     exists_intermediateField_range_ideleClassNorm_eq_of_finiteIndex (Ω := Ω) ψC.ker hNo
-  have hEu : IsUnramifiedOutside S E := isUnramifiedOutside_of_range_ideleClassNorm hS hn E
-    (by rw [hE]; exact hpow) (by rw [hE]; exact hU)
+  have hEu : IsUnramifiedOutside S E :=
+    isUnramifiedOutside_of_range_ideleClassNorm hS hn E (by rw [hE]; exact hpow)
+      (by rw [hE]; exact hU)
   have hES : E ≤ maxUnramifiedOutside K Ω S :=
     (isUnramifiedOutside_iff_le_maxUnramifiedOutside S).1 hEu
   have hρ : Surjective (reciprocityMap K E) := reciprocityMap_surjective
@@ -231,8 +241,10 @@ theorem charToSIdelePosHom_surjective [IsAlgClosure K Ω] (hS : S.Finite) [NeZer
   let χΩ : Gal(Ω/K) →* Multiplicative (ZMod n) := χE.comp (AlgEquiv.restrictNormalHom E)
   have hχΩc : Continuous χΩ := by
     rw [MonoidHom.coe_comp]
-    exact (continuous_of_discreteTopology (f := ⇑χE)).comp (InfiniteGalois.restrictNormalHom_continuous E)
-  have hres : RightInverse (fun τ : galUnramifiedOutside K Ω S ↦ τ.liftNormal Ω)
+    exact (continuous_of_discreteTopology (f := ⇑χE)).comp
+      (InfiniteGalois.restrictNormalHom_continuous E)
+  have hres : RightInverse
+      (fun τ : galUnramifiedOutside K Ω S ↦ τ.liftNormal Ω)
       (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S)) := fun τ ↦
     AlgEquiv.restrict_liftNormal (E := Ω) τ
   have hkerS : (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S)).ker ≤ χΩ.ker := by
@@ -249,8 +261,8 @@ theorem charToSIdelePosHom_surjective [IsAlgClosure K Ω] (hS : S.Finite) [NeZer
   have hq : Topology.IsQuotientMap
       (AlgEquiv.restrictNormalHom (maxUnramifiedOutside K Ω S) : Gal(Ω/K) → _) := by
     have : T2Space (galUnramifiedOutside K Ω S) := krullTopology_t2
-    have hc := InfiniteGalois.restrictNormalHom_continuous (k := K) (K := Ω)
-      (maxUnramifiedOutside K Ω S)
+    have hc :=
+      InfiniteGalois.restrictNormalHom_continuous (k := K) (K := Ω) (maxUnramifiedOutside K Ω S)
     exact hc.isClosedMap.isQuotientMap hc (AlgEquiv.restrictNormalHom_surjective Ω)
   have hcont : Continuous χS := by
     rw [hq.continuous_iff]
@@ -266,18 +278,18 @@ theorem charToSIdelePosHom_surjective [IsAlgClosure K Ω] (hS : S.Finite) [NeZer
   have hg' : AlgEquiv.restrictNormalHom (maximalAbelianExtension K Ω) (σ.liftNormal Ω) = σ :=
     AlgEquiv.restrict_liftNormal (E := Ω) σ
   change χE (AlgEquiv.restrictNormalHom E (σ.liftNormal Ω)) = _
-  rw [← restrictAb_restrictNormalHom E (le_maximalAbelianExtension E), hg', restrictAb_artinMap, hχE]
+  rw [← restrictAb_restrictNormalHom E (le_maximalAbelianExtension E), hg', restrictAb_artinMap,
+    hχE]
   rfl
 
-theorem charToSIdelePosHom_bijective [IsAlgClosure K Ω] (hS : S.Finite) [NeZero n] :
-    Bijective (charToSIdelePosHom K Ω S n) :=
+theorem charToSIdelePosHom_bijective [IsAlgClosure K Ω] (hS : S.Finite) [NeZero n]
+    : Bijective (charToSIdelePosHom K Ω S n) :=
   ⟨charToSIdelePosHom_injective, charToSIdelePosHom_surjective hS⟩
 
-
 variable (Ω) in
-def charEquivPos [IsAlgClosure K Ω] (hS : S.Finite) [NeZero n] :
-    ContinuousMonoidHom (galUnramifiedOutside K Ω S) (Multiplicative (ZMod n)) ≃*
-      (SIdeleClassGroupPos S →* Multiplicative (ZMod n)) :=
+def charEquivPos [IsAlgClosure K Ω] (hS : S.Finite) [NeZero n]
+    : ContinuousMonoidHom (galUnramifiedOutside K Ω S) (Multiplicative (ZMod n))
+      ≃* (SIdeleClassGroupPos S →* Multiplicative (ZMod n)) :=
   MulEquiv.ofBijective _ (charToSIdelePosHom_bijective hS)
 
 end

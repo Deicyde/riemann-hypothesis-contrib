@@ -6,19 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem exists_conj (K : Type) [Field K] [NumberField K] (h : Module.finrank ℚ K = 2) :
-    ∃ t : K ≃ₐ[ℚ] K, t ≠ 1 ∧ (∀ s : K ≃ₐ[ℚ] K, s ≠ 1 → s = t) ∧
-      ∀ x : 𝓞 K, x * RingOfIntegers.mapRingEquiv t.toRingEquiv x = ((Algebra.norm ℤ x : ℤ) : 𝓞 K) := by
+private theorem exists_conj (K : Type) [Field K] [NumberField K] (h : Module.finrank ℚ K = 2)
+    : ∃ t : K ≃ₐ[ℚ] K,
+      t ≠ 1 ∧ (∀ s : K ≃ₐ[ℚ] K, s ≠ 1 → s = t)
+        ∧ ∀ x : 𝓞 K,
+          x * RingOfIntegers.mapRingEquiv t.toRingEquiv x = ((Algebra.norm ℤ x : ℤ) : 𝓞 K) := by
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨h⟩
   have hc : Fintype.card (K ≃ₐ[ℚ] K) = 2 := by
     rw [← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank, h]
   obtain ⟨t, ht⟩ : ∃ t : K ≃ₐ[ℚ] K, t ≠ 1 := by
     by_contra hne
     push_neg at hne
-    have : Fintype.card (K ≃ₐ[ℚ] K) ≤ 1 := Fintype.card_le_one_iff.mpr fun a b => by
-      rw [hne a, hne b]
+    have : Fintype.card (K ≃ₐ[ℚ] K) ≤ 1 :=
+      Fintype.card_le_one_iff.mpr fun a b => by rw [hne a, hne b]
     omega
   have huniq : ∀ s : K ≃ₐ[ℚ] K, s ≠ 1 → s = t := by
     intro s hs
@@ -48,13 +51,16 @@ private theorem exists_conj (K : Type) [Field K] [NumberField K] (h : Module.fin
   rw [← key]
   simp
 
-private theorem mul_map {K : Type} [Field K] [NumberField K] (τ : 𝓞 K ≃+* 𝓞 K)
-    (hτ : ∀ x : 𝓞 K, x * τ x = ((Algebra.norm ℤ x : ℤ) : 𝓞 K)) (I : Ideal (𝓞 K)) :
-    I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)} := by
+private theorem mul_map
+    {K : Type} [Field K] [NumberField K]
+    (τ : 𝓞 K ≃+* 𝓞 K) (hτ : ∀ x : 𝓞 K, x * τ x = ((Algebra.norm ℤ x : ℤ) : 𝓞 K))
+    (I : Ideal (𝓞 K))
+    : I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)} := by
   classical
   have hspan : Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 K)} ≤ I * I.map τ := by
-    have h1 : Ideal.map (algebraMap ℤ (𝓞 K)) (Ideal.relNorm ℤ I) =
-        Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 K)} := by
+    have h1
+        : Ideal.map (algebraMap ℤ (𝓞 K)) (Ideal.relNorm ℤ I)
+          = Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 K)} := by
       rw [Ideal.relNorm_int, Ideal.map_span, Set.image_singleton]
       simp
     rw [← h1, Ideal.map_relNorm, Ideal.span_le]
@@ -78,10 +84,10 @@ private theorem mul_map {K : Type} [Field K] [NumberField K] (τ : 𝓞 K ≃+* 
     rw [← Ideal.absNorm_relNorm ℤ (𝓞 K) (I.map τ), ← Ideal.absNorm_relNorm ℤ (𝓞 K) I]
     congr 1
     exact Ideal.relNorm_map_algEquiv τ.toIntAlgEquiv I
-  have habs : Ideal.absNorm (Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 K)}) =
-      Ideal.absNorm I ^ 2 := by
-    rw [Ideal.absNorm_span_singleton, show ((Ideal.absNorm I : ℕ) : 𝓞 K) =
-      algebraMap ℤ (𝓞 K) (Ideal.absNorm I : ℤ) by simp, Algebra.norm_algebraMap, hd]
+  have habs : Ideal.absNorm (Ideal.span {((Ideal.absNorm I : ℕ) : 𝓞 K)}) = Ideal.absNorm I ^ 2 := by
+    rw [Ideal.absNorm_span_singleton,
+      show ((Ideal.absNorm I : ℕ) : 𝓞 K) = algebraMap ℤ (𝓞 K) (Ideal.absNorm I : ℤ) by simp,
+      Algebra.norm_algebraMap, hd]
     simp [Int.natAbs_pow]
   obtain ⟨L, hL⟩ := Ideal.dvd_iff_le.mpr hspan
   by_cases hn : Ideal.absNorm I = 0
@@ -91,27 +97,36 @@ private theorem mul_map {K : Type} [Field K] [NumberField K] (τ : 𝓞 K ≃+* 
   · have h3 := congrArg Ideal.absNorm hL
     rw [map_mul, map_mul, hmap, habs] at h3
     have hL1 : Ideal.absNorm L = 1 := by
-      have hpos : 0 < Ideal.absNorm I * Ideal.absNorm I := Nat.mul_pos (Nat.pos_of_ne_zero hn) (Nat.pos_of_ne_zero hn)
-      have : Ideal.absNorm I * Ideal.absNorm I * 1 = Ideal.absNorm I * Ideal.absNorm I * Ideal.absNorm L := by
+      have hpos : 0 < Ideal.absNorm I * Ideal.absNorm I :=
+        Nat.mul_pos (Nat.pos_of_ne_zero hn) (Nat.pos_of_ne_zero hn)
+      have : Ideal.absNorm I * Ideal.absNorm I * 1
+          = Ideal.absNorm I * Ideal.absNorm I * Ideal.absNorm L := by
         rw [mul_one, ← h3, sq]
       exact (Nat.eq_of_mul_eq_mul_left hpos this).symm
     rw [Ideal.absNorm_eq_one_iff] at hL1
     rw [hL, hL1, Ideal.mul_top]
 
-private theorem dvd_of_mem {K : Type} [Field K] [NumberField K] (h : Module.finrank ℚ K = 2) {a b : ℕ}
-    (hab : (b : 𝓞 K) ∈ Ideal.span {(a : 𝓞 K)}) : a ∣ b := by
+private theorem dvd_of_mem
+    {K : Type} [Field K] [NumberField K]
+    (h : Module.finrank ℚ K = 2)
+    {a b : ℕ} (hab : (b : 𝓞 K) ∈ Ideal.span {(a : 𝓞 K)})
+    : a ∣ b := by
   rw [Ideal.mem_span_singleton] at hab
   have hn := map_dvd (Algebra.norm ℤ) hab
   rw [show (a : 𝓞 K) = algebraMap ℤ (𝓞 K) (a : ℤ) by simp,
-    show (b : 𝓞 K) = algebraMap ℤ (𝓞 K) (b : ℤ) by simp, Algebra.norm_algebraMap,
-    Algebra.norm_algebraMap, RingOfIntegers.rank, h, Int.pow_dvd_pow_iff two_ne_zero] at hn
+      show (b : 𝓞 K) = algebraMap ℤ (𝓞 K) (b : ℤ) by simp, Algebra.norm_algebraMap,
+      Algebra.norm_algebraMap, RingOfIntegers.rank, h, Int.pow_dvd_pow_iff two_ne_zero]
+    at hn
   exact_mod_cast hn
 
-private theorem split_facts {K : Type} [Field K] [NumberField K] (h : Module.finrank ℚ K = 2) (τ : 𝓞 K ≃+* 𝓞 K)
-    (hτ : ∀ I : Ideal (𝓞 K), I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)}) {p : ℕ} (hp : p.Prime)
-    (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal) (hne : w.asIdeal ≠ w.asIdeal.map τ) :
-    Ideal.absNorm w.asIdeal = p ∧ IsCoprime w.asIdeal (w.asIdeal.map τ) ∧
-      ∀ n : ℕ, ∃ φ : 𝓞 K →+* ZMod (p ^ n), RingHom.ker φ = w.asIdeal ^ n := by
+private theorem split_facts
+    {K : Type} [Field K] [NumberField K]
+    (h : Module.finrank ℚ K = 2)
+    (τ : 𝓞 K ≃+* 𝓞 K) (hτ : ∀ I : Ideal (𝓞 K), I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)})
+    {p : ℕ} (hp : p.Prime)
+    (w : HeightOneSpectrum (𝓞 K)) (hw : (p : 𝓞 K) ∈ w.asIdeal) (hne : w.asIdeal ≠ w.asIdeal.map τ)
+    : Ideal.absNorm w.asIdeal = p ∧ IsCoprime w.asIdeal (w.asIdeal.map τ)
+      ∧ ∀ n : ℕ, ∃ φ : 𝓞 K →+* ZMod (p ^ n), RingHom.ker φ = w.asIdeal ^ n := by
   classical
   haveI hwm : w.asIdeal.IsMaximal := w.isMaximal
   haveI hτm : (w.asIdeal.map τ).IsMaximal := Ideal.map_isMaximal_of_equiv τ
@@ -152,8 +167,9 @@ private theorem split_facts {K : Type} [Field K] [NumberField K] (h : Module.fin
     rw [← Submodule.cardQuot_apply, ← Ideal.absNorm_apply, map_pow, hnorm]
   haveI : Finite (𝓞 K ⧸ w.asIdeal ^ n) :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; exact pow_ne_zero _ hp.ne_zero)
-  have hbij := (ZMod.castHom_injective (𝓞 K ⧸ w.asIdeal ^ n)).bijective_of_nat_card_le
-    (by rw [hcard, Nat.card_zmod])
+  have hbij :=
+    (ZMod.castHom_injective (𝓞 K ⧸ w.asIdeal ^ n)).bijective_of_nat_card_le
+      (by rw [hcard, Nat.card_zmod])
   let e := RingEquiv.ofBijective _ hbij
   refine ⟨e.symm.toRingHom.comp (Ideal.Quotient.mk _), ?_⟩
   ext x
@@ -179,8 +195,7 @@ private theorem dvd_twelve_of_totient_le_two (k : ℕ) (hk : 0 < k) (h : k.totie
       have h4 : 2 ≤ (12 : ℕ).factorization 2 :=
         (Nat.prime_two.pow_dvd_iff_le_factorization (by norm_num)).mp (by norm_num)
       by_contra hc
-      have h8 : 2 ^ 2 ≤ 2 ^ (k.factorization 2 - 1) :=
-        Nat.pow_le_pow_right (by norm_num) (by omega)
+      have h8 : 2 ^ 2 ≤ 2 ^ (k.factorization 2 - 1) := Nat.pow_le_pow_right (by norm_num) (by omega)
       omega
     · by_cases h3 : p = 3
       · subst h3
@@ -204,10 +219,14 @@ private theorem dvd_twelve_of_totient_le_two (k : ℕ) (hk : 0 < k) (h : k.totie
   · rw [Nat.factorization_eq_zero_of_not_prime _ hp]
     exact Nat.zero_le _
 
-private theorem units_pm {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K] (h : Module.finrank ℚ K = 2)
+private theorem units_pm
+    {K : Type} [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (h : Module.finrank ℚ K = 2)
     (t : K ≃ₐ[ℚ] K) (hu : ∀ s : K ≃ₐ[ℚ] K, s ≠ 1 → s = t)
-    (hτ : ∀ x : 𝓞 K, x * RingOfIntegers.mapRingEquiv t.toRingEquiv x = ((Algebra.norm ℤ x : ℤ) : 𝓞 K))
-    (φ : 𝓞 K →+* ZMod 4) (u : (𝓞 K)ˣ) : u = 1 ∨ u = -1 := by
+    (hτ
+      : ∀ x : 𝓞 K, x * RingOfIntegers.mapRingEquiv t.toRingEquiv x = ((Algebra.norm ℤ x : ℤ) : 𝓞 K))
+    (φ : 𝓞 K →+* ZMod 4) (u : (𝓞 K)ˣ)
+    : u = 1 ∨ u = -1 := by
   have hr : NumberField.Units.rank K = 0 := by
     have h1 := IsTotallyComplex.finrank K
     have h0 := IsTotallyComplex.nrRealPlaces_eq_zero K
@@ -230,24 +249,30 @@ private theorem units_pm {K : Type} [Field K] [NumberField K] [_root_.NumberFiel
     orderOf_pos_iff.mpr (isOfFinOrder_iff_pow_eq_one.mpr
       ⟨_, NumberField.Units.torsionOrder_pos K, hx⟩)
   have htot : (orderOf ((u : 𝓞 K) : K)).totient ≤ 2 := by
-    have := IsPrimitiveRoot.lcm_totient_le_finrank (K := ℚ)
-      (IsPrimitiveRoot.orderOf ((u : 𝓞 K) : K)) (IsPrimitiveRoot.orderOf ((u : 𝓞 K) : K))
-      (by rw [Nat.lcm_self]; exact Polynomial.cyclotomic.irreducible_rat hfin)
+    have :=
+      IsPrimitiveRoot.lcm_totient_le_finrank (K := ℚ) (IsPrimitiveRoot.orderOf ((u : 𝓞 K) : K))
+        (IsPrimitiveRoot.orderOf ((u : 𝓞 K) : K))
+        (by rw [Nat.lcm_self]; exact Polynomial.cyclotomic.irreducible_rat hfin)
     rwa [Nat.lcm_self, h] at this
   have h12 : ((u : 𝓞 K) : K) ^ 12 = 1 :=
     orderOf_dvd_iff_pow_eq_one.mp (dvd_twelve_of_totient_le_two _ hfin htot)
   have hu12 : (u : 𝓞 K) ^ 12 = 1 := by
     apply RingOfIntegers.ext
     simpa using h12
-  have hfac : ((u : 𝓞 K) - 1) * ((u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 2 + 1) *
-      ((u : 𝓞 K) ^ 2 + (u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 2 - (u : 𝓞 K) + 1) *
-      ((u : 𝓞 K) ^ 4 - (u : 𝓞 K) ^ 2 + 1) = 0 := by
-    have e : ((u : 𝓞 K) - 1) * ((u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 2 + 1) *
-        ((u : 𝓞 K) ^ 2 + (u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 2 - (u : 𝓞 K) + 1) *
-        ((u : 𝓞 K) ^ 4 - (u : 𝓞 K) ^ 2 + 1) = (u : 𝓞 K) ^ 12 - 1 := by ring
+  have hfac
+      : ((u : 𝓞 K) - 1) * ((u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 2 + 1) * ((u : 𝓞 K) ^ 2 + (u : 𝓞 K) + 1)
+          * ((u : 𝓞 K) ^ 2 - (u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 4 - (u : 𝓞 K) ^ 2 + 1)
+        = 0 := by
+    have e
+        : ((u : 𝓞 K) - 1) * ((u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 2 + 1) * ((u : 𝓞 K) ^ 2 + (u : 𝓞 K) + 1)
+            * ((u : 𝓞 K) ^ 2 - (u : 𝓞 K) + 1) * ((u : 𝓞 K) ^ 4 - (u : 𝓞 K) ^ 2 + 1)
+          = (u : 𝓞 K) ^ 12 - 1 := by
+      ring
     rw [e, hu12, sub_self]
-  have hφ : ∀ y : ZMod 4, y ^ 2 + 1 ≠ 0 ∧ y ^ 2 + y + 1 ≠ 0 ∧ y ^ 2 - y + 1 ≠ 0 ∧
-      y ^ 4 - y ^ 2 + 1 ≠ 0 := by decide
+  have hφ
+      : ∀ y : ZMod 4,
+        y ^ 2 + 1 ≠ 0 ∧ y ^ 2 + y + 1 ≠ 0 ∧ y ^ 2 - y + 1 ≠ 0 ∧ y ^ 4 - y ^ 2 + 1 ≠ 0 := by
+    decide
   obtain h' | h6 := mul_eq_zero.mp hfac
   · obtain h' | h5 := mul_eq_zero.mp h'
     · obtain h' | h4 := mul_eq_zero.mp h'
@@ -277,16 +302,37 @@ private theorem units_pm {K : Type} [Field K] [NumberField K] [_root_.NumberFiel
     exact (hφ _).2.2.2 this
 
 open Pointwise in
-theorem UpperTheory.V.Ws.Tw.quadFacts :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (K : IntermediateField ℚ Ω) [NumberField K] [_root_.NumberField.IsTotallyComplex K], Module.finrank ℚ K = 2 → ∃ τ : 𝓞 K ≃+* 𝓞 K, (∀ c ∉ K.fixingSubgroup, ∀ x : 𝓞 K, c ((x : K) : Ω) = ((τ x : 𝓞 K) : K)) ∧ (∀ I : Ideal (𝓞 K), I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)}) ∧ (∀ c ∉ K.fixingSubgroup, ∀ s s' : G K Ω, resQ K s' = c * resQ K s * c⁻¹ → ∀ (w : HeightOneSpectrum (𝓞 K)) (A : ValuationSubring Ω), IsPlaceOver A w → IsFrob A (normV w) s → ∃ (w' : HeightOneSpectrum (𝓞 K)) (A' : ValuationSubring Ω), w'.asIdeal = w.asIdeal.map τ ∧ IsPlaceOver A' w' ∧ IsFrob A' (normV w') s') ∧ (∀ (p : ℕ) (A : ValuationSubring Ω), p.Prime → A.valuation (p : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup → ∃ w : HeightOneSpectrum (𝓞 K), IsPlaceOver A w ∧ Ideal.absNorm w.asIdeal = p ∧ IsCoprime w.asIdeal (w.asIdeal.map τ) ∧ ∀ n : ℕ, ∃ φ : 𝓞 K →+* ZMod (p ^ n), RingHom.ker φ = w.asIdeal ^ n) ∧ ((∀ A : ValuationSubring Ω, A.valuation (2 : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup) → ∀ u : (𝓞 K)ˣ, u = 1 ∨ u = -1) := by
+theorem UpperTheory.V.Ws.Tw.quadFacts
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+      l ≠ 2
+        → ∀ (K : IntermediateField ℚ Ω) [NumberField K] [_root_.NumberField.IsTotallyComplex K],
+          Module.finrank ℚ K = 2
+            → ∃ τ : 𝓞 K ≃+* 𝓞 K,
+              (∀ c ∉ K.fixingSubgroup, ∀ x : 𝓞 K, c ((x : K) : Ω) = ((τ x : 𝓞 K) : K))
+                ∧ (∀ I : Ideal (𝓞 K), I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)})
+                ∧ (∀ c ∉ K.fixingSubgroup, ∀ s s' : G K Ω,
+                  resQ K s' = c * resQ K s * c⁻¹
+                    → ∀ (w : HeightOneSpectrum (𝓞 K)) (A : ValuationSubring Ω),
+                      IsPlaceOver A w → IsFrob A (normV w) s
+                        → ∃ (w' : HeightOneSpectrum (𝓞 K)) (A' : ValuationSubring Ω),
+                          w'.asIdeal = w.asIdeal.map τ ∧ IsPlaceOver A' w'
+                            ∧ IsFrob A' (normV w') s')
+                ∧ (∀ (p : ℕ) (A : ValuationSubring Ω),
+                  p.Prime → A.valuation (p : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup
+                    → ∃ w : HeightOneSpectrum (𝓞 K),
+                      IsPlaceOver A w ∧ Ideal.absNorm w.asIdeal = p
+                        ∧ IsCoprime w.asIdeal (w.asIdeal.map τ)
+                        ∧ ∀ n : ℕ, ∃ φ : 𝓞 K →+* ZMod (p ^ n), RingHom.ker φ = w.asIdeal ^ n)
+                ∧ ((∀ A : ValuationSubring Ω,
+                    A.valuation (2 : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup)
+                  → ∀ u : (𝓞 K)ˣ, u = 1 ∨ u = -1) := by
   intro Ω _ _ _ l _ hl K _ _ h
   haveI : Algebra.IsQuadraticExtension ℚ K := ⟨h⟩
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : IsAlgClosure K Ω := ⟨inferInstance, Algebra.IsAlgebraic.tower_top (K := ℚ) K⟩
   obtain ⟨t, ht, hu, hτ⟩ := exists_conj K h
   let τ : 𝓞 K ≃+* 𝓞 K := RingOfIntegers.mapRingEquiv t.toRingEquiv
-  have hτI : ∀ I : Ideal (𝓞 K), I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)} :=
-    mul_map τ hτ
+  have hτI : ∀ I : Ideal (𝓞 K), I * I.map τ = Ideal.span {(Ideal.absNorm I : 𝓞 K)} := mul_map τ hτ
   have hres : ∀ c : G ℚ Ω, c ∉ K.fixingSubgroup → ∀ y : K, c (y : Ω) = ((t y : K) : Ω) := by
     intro c hc y
     have hne : c.restrictNormal K ≠ 1 := by
@@ -299,12 +345,15 @@ theorem UpperTheory.V.Ws.Tw.quadFacts :
       exact this.symm
     rw [← hu _ hne]
     exact (AlgEquiv.restrictNormal_commutes c K y).symm
-  have hval : ∀ (c : G ℚ Ω) (B : ValuationSubring Ω) (z : Ω),
-      (c • B).valuation (c z) < 1 ↔ B.valuation z < 1 := fun c B z =>
+  have hval
+      : ∀ (c : G ℚ Ω) (B : ValuationSubring Ω) (z : Ω),
+        (c • B).valuation (c z) < 1 ↔ B.valuation z < 1 := fun c B z =>
     UpperTheory.V.val_lt_one (σ := c.toRingEquiv)
-      (fun x => ValuationSubring.smul_mem_pointwise_smul_iff (g := c) (S := B) (x := x)) z
-  have hle : ∀ (c : G ℚ Ω) (B : ValuationSubring Ω) (z : Ω),
-      (c • B).valuation (c z) ≤ 1 ↔ B.valuation z ≤ 1 := by
+      (fun x => ValuationSubring.smul_mem_pointwise_smul_iff (g := c) (S := B) (x := x))
+      z
+  have hle
+      : ∀ (c : G ℚ Ω) (B : ValuationSubring Ω) (z : Ω),
+        (c • B).valuation (c z) ≤ 1 ↔ B.valuation z ≤ 1 := by
     intro c B z
     rw [ValuationSubring.valuation_le_one_iff, ValuationSubring.valuation_le_one_iff]
     exact ValuationSubring.smul_mem_pointwise_smul_iff (g := c) (S := B) (x := z)
@@ -314,15 +363,20 @@ theorem UpperTheory.V.Ws.Tw.quadFacts :
     rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem,
       ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, ← map_inv]
     rfl
-  let tw : HeightOneSpectrum (𝓞 K) → HeightOneSpectrum (𝓞 K) := fun w =>
-    ⟨w.asIdeal.map τ, by haveI := w.isPrime; exact Ideal.map_isPrime_of_equiv τ,
-      (Ideal.map_eq_bot_iff_of_injective τ.injective).not.mpr w.ne_bot⟩
-  have hmemτ : ∀ (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K),
-      x ∈ w.asIdeal.map τ ↔ τ.symm x ∈ w.asIdeal := by
+  let tw : HeightOneSpectrum (𝓞 K) → HeightOneSpectrum (𝓞 K) := fun w => ⟨
+    w.asIdeal.map τ,
+    by haveI := w.isPrime; exact Ideal.map_isPrime_of_equiv τ,
+    (Ideal.map_eq_bot_iff_of_injective τ.injective).not.mpr w.ne_bot
+  ⟩
+  have hmemτ
+      : ∀ (w : HeightOneSpectrum (𝓞 K)) (x : 𝓞 K), x ∈ w.asIdeal.map τ ↔ τ.symm x ∈ w.asIdeal := by
     intro w x
     rw [← Ideal.comap_symm, Ideal.mem_comap]
-  have hplace : ∀ c : G ℚ Ω, c ∉ K.fixingSubgroup → ∀ (A : ValuationSubring Ω)
-      (w : HeightOneSpectrum (𝓞 K)), IsPlaceOver A w → IsPlaceOver (c • A) (tw w) := by
+  have hplace
+      : ∀ c : G ℚ Ω,
+        c ∉ K.fixingSubgroup
+          → ∀ (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 K)),
+            IsPlaceOver A w → IsPlaceOver (c • A) (tw w) := by
     intro c hc A w hA x
     have e1 : algebraMap K Ω (x : K) = c (algebraMap K Ω ((τ.symm x : 𝓞 K) : K)) := by
       have h2 := hres c hc ((τ.symm x : 𝓞 K) : K)
@@ -351,10 +405,12 @@ theorem UpperTheory.V.Ws.Tw.quadFacts :
     rw [IntermediateField.mem_fixingSubgroup_iff] at hmem
     have h2 := hmem (y : Ω) y.2
     exact h1.symm.trans h2
-  have h4 : ∀ (p : ℕ) (A : ValuationSubring Ω), p.Prime → A.valuation (p : Ω) < 1 →
-      Dec (F := ℚ) A ≤ K.fixingSubgroup → ∃ w : HeightOneSpectrum (𝓞 K), IsPlaceOver A w ∧
-        Ideal.absNorm w.asIdeal = p ∧ IsCoprime w.asIdeal (w.asIdeal.map τ) ∧
-        ∀ n : ℕ, ∃ φ : 𝓞 K →+* ZMod (p ^ n), RingHom.ker φ = w.asIdeal ^ n := by
+  have h4
+      : ∀ (p : ℕ) (A : ValuationSubring Ω),
+        p.Prime → A.valuation (p : Ω) < 1 → Dec (F := ℚ) A ≤ K.fixingSubgroup
+          → ∃ w : HeightOneSpectrum (𝓞 K),
+            IsPlaceOver A w ∧ Ideal.absNorm w.asIdeal = p ∧ IsCoprime w.asIdeal (w.asIdeal.map τ)
+              ∧ ∀ n : ℕ, ∃ φ : 𝓞 K →+* ZMod (p ^ n), RingHom.ker φ = w.asIdeal ^ n := by
     intro p A hp hA hdec
     have hAtop : A ≠ ⊤ := by
       intro htop
@@ -402,15 +458,20 @@ theorem UpperTheory.V.Ws.Tw.quadFacts :
       intro hunit
       have := hunit.map (Algebra.norm ℤ)
       rw [show (2 : 𝓞 K) = algebraMap ℤ (𝓞 K) 2 by simp, Algebra.norm_algebraMap,
-        RingOfIntegers.rank, h] at this
+          RingOfIntegers.rank, h]
+        at this
       norm_num [Int.isUnit_iff] at this
-    obtain ⟨M, hM, h2M⟩ := Ideal.exists_le_maximal (Ideal.span {(2 : 𝓞 K)})
-      (by rwa [Ne, Ideal.span_singleton_eq_top])
-    let w0 : HeightOneSpectrum (𝓞 K) := ⟨M, hM.isPrime, by
-      intro hb
-      rw [hb] at h2M
-      have := h2M (Ideal.mem_span_singleton_self 2)
-      simp at this⟩
+    obtain ⟨M, hM, h2M⟩ :=
+      Ideal.exists_le_maximal (Ideal.span {(2 : 𝓞 K)}) (by rwa [Ne, Ideal.span_singleton_eq_top])
+    let w0 : HeightOneSpectrum (𝓞 K) := ⟨
+      M,
+      hM.isPrime,
+      by
+        intro hb
+        rw [hb] at h2M
+        have := h2M (Ideal.mem_span_singleton_self 2)
+        simp at this
+    ⟩
     obtain ⟨A, hA⟩ := exists_isPlaceOver Ω w0
     have hA2 : A.valuation (2 : Ω) < 1 := by
       have := (hA 2).mpr (h2M (Ideal.mem_span_singleton_self 2))

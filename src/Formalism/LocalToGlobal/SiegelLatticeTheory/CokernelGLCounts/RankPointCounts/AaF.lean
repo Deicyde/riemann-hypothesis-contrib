@@ -12,7 +12,8 @@ open scoped Classical
 
 namespace Formalism.L2.SG.Pf.FibQ
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat PI.PairValDefs PI.NRCW
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  PI.PairValDefs PI.NRCW
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -23,9 +24,13 @@ variable (D : D7)
 abbrev aaF (a : Fin (D.R.rS + 1)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E :=
   ddS D ^ (-((D.R.rS : ℤ) - (a : ℕ)))
 
-theorem entry_mem (Λ : Submodule (𝓞 D.host.E) (VS D).V) {T : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T)
-    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ NLam Λ G) (hXS : XLam Λ G = XS D G.fl) (hz : G.fl.z ∈ Λ)
-    (c b : Fin (D.R.rS + 1)) (hcb : c < b) : ∀ x ∈ aaF D b, x * fmat D G n c b ∈ aaF D c := by
+theorem entry_mem
+    (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+    {T : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T)
+    (n : (VS D).V ≃ₗ[D.host.E] (VS D).V) (hn : n ∈ NLam Λ G)
+    (hXS : XLam Λ G = XS D G.fl) (hz : G.fl.z ∈ Λ)
+    (c b : Fin (D.R.rS + 1)) (hcb : c < b)
+    : ∀ x ∈ aaF D b, x * fmat D G n c b ∈ aaF D c := by
   have hc : c.val < D.R.rS := by have := b.isLt; omega
   have hf : fmat D G n c b = G.fl.coefX (n (frame G b) - frame G b) ⟨c.val, hc⟩ := by
     simp only [fmat, dif_pos hc]
@@ -50,16 +55,18 @@ theorem entry_mem (Λ : Submodule (𝓞 D.host.E) (VS D).V) {T : D.host.E} (G : 
     have hcx := (coefX_of_mem_XS D G.fl hn1).2 ⟨c.val, hc⟩
     have hd : n (G.fl.e ⟨b.val, hb⟩) - G.fl.e ⟨b.val, hb⟩ ∈ G.fl.X :=
       Xa_le_X _ _ ((nlam_frame_mem G hn).1 _)
-    have hsplit : n (x • G.fl.e ⟨b.val, hb⟩) =
-        x • (G.fl.e ⟨b.val, hb⟩ + (n (G.fl.e ⟨b.val, hb⟩) - G.fl.e ⟨b.val, hb⟩)) := by
+    have hsplit
+        : n (x • G.fl.e ⟨b.val, hb⟩)
+          = x • (G.fl.e ⟨b.val, hb⟩ + (n (G.fl.e ⟨b.val, hb⟩) - G.fl.e ⟨b.val, hb⟩)) := by
       rw [map_smul]; congr 1; abel
     have hne : (⟨b.val, hb⟩ : Fin D.R.rS) ≠ ⟨c.val, hc⟩ := by
       intro e
       have := congrArg Fin.val e
       simp only at this
       omega
-    rw [hsplit, coefX_smul _ (add_mem (e_mem_X _ _) hd), coefX_add _ (e_mem_X _ _) hd, coefX_e, if_neg hne,
-      zero_add] at hcx
+    rw [hsplit, coefX_smul _ (add_mem (e_mem_X _ _) hd), coefX_add _ (e_mem_X _ _) hd, coefX_e,
+        if_neg hne, zero_add]
+      at hcx
     exact hcx
   · have hfz : frame G b = G.fl.z := by
       have h0 := frame_last G

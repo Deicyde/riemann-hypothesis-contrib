@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.CommuteGelfan
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -77,30 +78,39 @@ private lemma sum_mulVec_one_eq_sum_entries {n : ℕ} (P : Matrix (Fin n) (Fin n
     ∑ i, (P *ᵥ fun _ => (1 : ℂ)) i = ∑ a, ∑ b, P a b := by
   simp [Matrix.mulVec, dotProduct]
 
-
 open Polynomial in
-theorem trace_transpose_pow {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V)
-    (hE : Formalism.REAL.GlRel E) (χ : Fin n → ℂ) (v : V)
-    (hv : ∀ k : ℕ, (∑ c, (Matrix.of E ^ k) c c) v = gelfVal χ k • v) (m : ℕ) :
-    (∑ c, (Matrix.of (fun a b => E b a) ^ m) c c) v = ((-1) ^ m * gelfVal (fun a => -χ a) m) • v := by
+theorem trace_transpose_pow
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    {n : ℕ} (E : Fin n → Fin n → Module.End ℂ V) (hE : Formalism.REAL.GlRel E) (χ : Fin n → ℂ)
+    (v : V) (hv : ∀ k : ℕ, (∑ c, (Matrix.of E ^ k) c c) v = gelfVal χ k • v)
+    (m : ℕ)
+    : (∑ c, (Matrix.of (fun a b => E b a) ^ m) c c) v
+      = ((-1) ^ m * gelfVal (fun a => - χ a) m) • v := by
   set Am := Formalism.REAL.Amat (fun c => χ c + ((n : ℂ) - 1) / 2) with hAm
   set M : Matrix (Fin n) (Fin n) ℂ := Am - (n : ℂ) • 1 + Matrix.of (fun _ _ => (1 : ℂ)) with hM
   have hgv : ∀ k, gelfVal χ k = ∑ a, ∑ b, (Am ^ k) a b := fun k => rfl
-  have hsumvec : ∀ (m : ℕ) (α : ℕ → ℂ), ∑ i, ((∑ j ∈ Finset.range (m + 1), α j • Am ^ j) *ᵥ fun _ => (1 : ℂ)) i =
-      ∑ j ∈ Finset.range (m + 1), α j * gelfVal χ j := by
+  have hsumvec
+      : ∀ (m : ℕ) (α : ℕ → ℂ),
+        ∑ i, ((∑ j ∈ Finset.range (m + 1), α j • Am ^ j) *ᵥ fun _ => (1 : ℂ)) i
+          = ∑ j ∈ Finset.range (m + 1), α j * gelfVal χ j := by
     intro m α
     rw [sum_mulVec_one_eq_sum_entries]
-    have hab : ∀ a b, (∑ j ∈ Finset.range (m + 1), α j • Am ^ j) a b =
-        ∑ j ∈ Finset.range (m + 1), α j * (Am ^ j) a b := by
+    have hab
+        : ∀ a b,
+          (∑ j ∈ Finset.range (m + 1), α j • Am ^ j) a b
+            = ∑ j ∈ Finset.range (m + 1), α j * (Am ^ j) a b := by
       intro a b
       simp [Matrix.sum_apply]
     simp only [hab, hgv, Finset.mul_sum]
     conv_rhs => rw [Finset.sum_comm]
     exact Finset.sum_congr rfl fun a _ => Finset.sum_comm
-  have key : ∀ m : ℕ, ∃ α : ℕ → ℂ,
-      (∀ a b, (Matrix.of (fun a b => E b a) ^ m) a b v =
-        ∑ j ∈ Finset.range (m + 1), α j • (Matrix.of E ^ j) b a v) ∧
-      (∑ j ∈ Finset.range (m + 1), α j • Am ^ j) *ᵥ (fun _ => (1 : ℂ)) = M ^ m *ᵥ (fun _ => 1) := by
+  have key
+      : ∀ m : ℕ, ∃ α : ℕ → ℂ,
+        (∀ a b,
+            (Matrix.of (fun a b => E b a) ^ m) a b v
+              = ∑ j ∈ Finset.range (m + 1), α j • (Matrix.of E ^ j) b a v)
+          ∧ (∑ j ∈ Finset.range (m + 1), α j • Am ^ j) *ᵥ (fun _ => (1 : ℂ))
+            = M ^ m *ᵥ (fun _ => 1) := by
     intro m
     induction m with
     | zero =>
@@ -113,8 +123,13 @@ theorem trace_transpose_pow {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
     | succ m ih =>
       obtain ⟨α, h1, h2⟩ := ih
       set φ : ℂ := ∑ j ∈ Finset.range (m + 1), α j * gelfVal χ j with hφ
-      refine ⟨fun j => (if 1 ≤ j then α (j - 1) else 0) - (n : ℂ) * (if j ≤ m then α j else 0) +
-        (if j = 0 then φ else 0), fun a b => ?_, ?_⟩
+      refine ⟨
+        fun j =>
+          (if 1 ≤ j then α (j - 1) else 0) - (n : ℂ) * (if j ≤ m then α j else 0)
+            + (if j = 0 then φ else 0),
+        fun a b => ?_,
+        ?_
+      ⟩
       · rw [sum_range_shift_smul_eq_sub_add α m (n : ℂ) φ (fun j => (Matrix.of E ^ j) b a v)]
         rw [pow_succ', Matrix.mul_apply, LinearMap.sum_apply]
         set_option synthInstance.maxHeartbeats 100000 in
@@ -132,9 +147,11 @@ theorem trace_transpose_pow {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
           · subst hab
             simp [hφ, Finset.sum_smul, smul_smul]
           · simp [hab, Ne.symm hab, Matrix.one_apply_ne (Ne.symm hab)]
-      · rw [sum_range_shift_smul_eq_sub_add α m (n : ℂ) φ (fun j => Am ^ j), pow_succ', ← Matrix.mulVec_mulVec, ← h2,
-          Matrix.mulVec_mulVec]
-        have hP : ∑ j ∈ Finset.range (m + 1), α j • Am ^ (j + 1) = Am * ∑ j ∈ Finset.range (m + 1), α j • Am ^ j := by
+      · rw [sum_range_shift_smul_eq_sub_add α m (n : ℂ) φ (fun j => Am ^ j), pow_succ',
+          ← Matrix.mulVec_mulVec, ← h2, Matrix.mulVec_mulVec]
+        have hP
+            : ∑ j ∈ Finset.range (m + 1), α j • Am ^ (j + 1)
+              = Am * ∑ j ∈ Finset.range (m + 1), α j • Am ^ j := by
           rw [Finset.mul_sum]
           exact Finset.sum_congr rfl fun j _ => by rw [Matrix.mul_smul, pow_succ']
         rw [hP, pow_zero, hM, Matrix.add_mul, Matrix.sub_mul, Matrix.add_mulVec, Matrix.sub_mulVec,
@@ -143,24 +160,27 @@ theorem trace_transpose_pow {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
         rw [← Matrix.mulVec_mulVec]
         ext i
         have := hsumvec m α
-        simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, one_mul, Matrix.smul_apply, Matrix.one_apply,
-          smul_eq_mul, mul_one] at this ⊢
+        simp only [Matrix.mulVec, dotProduct, Matrix.of_apply, one_mul, Matrix.smul_apply,
+            Matrix.one_apply, smul_eq_mul, mul_one]
+          at this ⊢
         rw [this, hφ]
         simp
   obtain ⟨α, h1, h2⟩ := key m
-  have hM' : M = (-Formalism.REAL.Amat (fun c => -χ c + ((n : ℂ) - 1) / 2))ᵀ := by
+  have hM' : M = (- Formalism.REAL.Amat (fun c => - χ c + ((n : ℂ) - 1) / 2))ᵀ := by
     ext a b
-    simp only [hM, hAm, Formalism.REAL.Amat, Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply,
-      Matrix.of_apply, Matrix.transpose_apply, Matrix.neg_apply, smul_eq_mul]
+    simp only [hM, hAm, Formalism.REAL.Amat, Matrix.add_apply, Matrix.sub_apply, Matrix.smul_apply,
+      Matrix.one_apply, Matrix.of_apply, Matrix.transpose_apply, Matrix.neg_apply, smul_eq_mul]
     rcases lt_trichotomy a b with h | rfl | h
     · simp [h, h.ne, h.ne', not_lt.2 h.le]
     · simp
       ring
     · simp [h, h.ne, h.ne', not_lt.2 h.le]
-  have hval : ∑ j ∈ Finset.range (m + 1), α j * gelfVal χ j = (-1) ^ m * gelfVal (fun a => -χ a) m := by
+  have hval
+      : ∑ j ∈ Finset.range (m + 1), α j * gelfVal χ j = (-1) ^ m * gelfVal (fun a => - χ a) m := by
     rw [← hsumvec m α, h2, sum_mulVec_one_eq_sum_entries, hM', ← Matrix.transpose_pow]
-    have hneg : (-Formalism.REAL.Amat (fun c => -χ c + ((n : ℂ) - 1) / 2)) ^ m =
-        ((-1 : ℂ) ^ m) • Formalism.REAL.Amat (fun c => -χ c + ((n : ℂ) - 1) / 2) ^ m := by
+    have hneg
+        : (- Formalism.REAL.Amat (fun c => - χ c + ((n : ℂ) - 1) / 2)) ^ m
+          = ((-1 : ℂ) ^ m) • Formalism.REAL.Amat (fun c => - χ c + ((n : ℂ) - 1) / 2) ^ m := by
       rw [← _root_.smul_pow, neg_one_smul]
     rw [hneg]
     simp only [Matrix.transpose_apply, Matrix.smul_apply, smul_eq_mul, gelfVal, Finset.mul_sum]
@@ -172,7 +192,6 @@ theorem trace_transpose_pow {V : Type} [AddCommGroup V] [Module ℂ V] {n : ℕ}
   rw [hval]
 
 variable {n : ℕ}
-
 
 open GlobalTheory.CapelliCentral in
 lemma word_apply {ε : Fin n → Bool} (w : List (Fin n × Fin n)) (F : smoothSpace ε ℂ) {f : Matrix (Fin n) (Fin n) ℂ → ℂ}
@@ -231,7 +250,6 @@ lemma sum_cycWord {A : Type} [Ring A] (E : Fin n → Fin n → A) (m : ℕ) :
       ext
       simp [Fin.val_add_one_of_lt (Fin.lt_last_iff_ne_last.2 ht)]
     rw [hs, Fin.snoc_castSucc, Fin.snoc_castSucc]
-
 
 open GlobalTheory.CapelliCentral in
 lemma gelf_apply {ε : Fin n → Bool} (m : ℕ) (F : smoothSpace ε ℂ) {f : Matrix (Fin n) (Fin n) ℂ → ℂ}
@@ -421,19 +439,36 @@ lemma Eab_perm (ε : Fin n → Bool) (s : Equiv.Perm (Fin n)) (a b : Fin n) (f :
     simp [Matrix.single_apply, s.injective.eq_iff]
   simp only [Formalism.REAL.Eab, Formalism.REAL.Ec, rd_submatrix_perm, cpart1_submatrix_perm, cpart2_submatrix_perm, hsg]
 
-
-theorem trWord : ∀ (n : ℕ) (ε : Fin n → Bool) (χ : Fin n → ℂ) (f : Matrix (Fin n) (Fin n) ℂ → ℂ), SmoothOnG ε f → IsZEigen ε χ f → ∀ m : ℕ, ∀ g ∈ UJset ε, ∑ a : Fin (m + 1) → Fin n, Eword ε ((cycWord a).map Prod.swap) f g = (-1) ^ (m + 1) * gelfVal (fun a => -χ a) (m + 1) * f g := by
+theorem trWord
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (χ : Fin n → ℂ) (f : Matrix (Fin n) (Fin n) ℂ → ℂ),
+      SmoothOnG ε f → IsZEigen ε χ f
+        → ∀ m : ℕ, ∀ g ∈ UJset ε,
+          ∑ a : Fin (m + 1) → Fin n, Eword ε ((cycWord a).map Prod.swap) f g
+            = (-1) ^ (m + 1) * gelfVal (fun a => - χ a) (m + 1) * f g := by
   intro n ε χ f hf hz m g hg
-  have hT := trace_transpose_pow (GlobalTheory.CapelliCentral.eabEnd ε ℂ) GlobalTheory.CapelliCentral.eabEnd_glRel χ (GlobalTheory.CapelliCentral.mk f hz.1) (fun k => gelf_mk hz k) (m + 1)
+  have hT :=
+    trace_transpose_pow (GlobalTheory.CapelliCentral.eabEnd ε ℂ)
+      GlobalTheory.CapelliCentral.eabEnd_glRel χ (GlobalTheory.CapelliCentral.mk f hz.1)
+      (fun k => gelf_mk hz k)
+      (m + 1)
   have h2 := congrArg (fun F : GlobalTheory.CapelliCentral.smoothSpace ε ℂ => F.1 g) hT
-  rw [← sum_cycWord (fun a b => GlobalTheory.CapelliCentral.eabEnd ε ℂ b a), LinearMap.sum_apply, Submodule.coe_sum, Finset.sum_apply] at h2
-  rw [Submodule.coe_smul, Pi.smul_apply, GlobalTheory.CapelliCentral.mk_apply f hz.1 hg, smul_eq_mul] at h2
+  rw [← sum_cycWord (fun a b => GlobalTheory.CapelliCentral.eabEnd ε ℂ b a), LinearMap.sum_apply,
+      Submodule.coe_sum, Finset.sum_apply]
+    at h2
+  rw [Submodule.coe_smul, Pi.smul_apply, GlobalTheory.CapelliCentral.mk_apply f hz.1 hg,
+      smul_eq_mul]
+    at h2
   rw [← h2]
   refine Finset.sum_congr rfl fun a _ => ?_
-  have hw : ((cycWord a).map fun p => GlobalTheory.CapelliCentral.eabEnd ε ℂ p.2 p.1) =
-      (((cycWord a).map Prod.swap).map fun p => GlobalTheory.CapelliCentral.eabEnd ε ℂ p.1 p.2) := by
+  have hw
+      : ((cycWord a).map fun p => GlobalTheory.CapelliCentral.eabEnd ε ℂ p.2 p.1)
+        = (((cycWord a).map Prod.swap).map fun p =>
+          GlobalTheory.CapelliCentral.eabEnd ε ℂ p.1 p.2) := by
     simp [List.map_map, Function.comp_def]
-  rw [hw, word_apply ((cycWord a).map Prod.swap) (GlobalTheory.CapelliCentral.mk f hz.1) (fun g' hg' => GlobalTheory.CapelliCentral.mk_apply f hz.1 hg') g hg]
+  rw [hw,
+    word_apply ((cycWord a).map Prod.swap) (GlobalTheory.CapelliCentral.mk f hz.1)
+      (fun g' hg' => GlobalTheory.CapelliCentral.mk_apply f hz.1 hg')
+      g hg]
 
 private lemma eword_map_star_eq_prod_neg_sgn_mul_swap (ε : Fin n → Bool) (f : Matrix (Fin n) (Fin n) ℂ → ℂ) (w : List (Fin n × Fin n)) :
     Formalism.REAL.Eword ε w (fun x => f (x.map star)) = fun g =>
@@ -449,11 +484,20 @@ private lemma eword_map_star_eq_prod_neg_sgn_mul_swap (ε : Fin n → Bool) (f :
     rw [ih, Eab_conj]
     simp only [Prod.fst_swap, Prod.snd_swap]
 
-theorem wordConj : ∀ (n : ℕ) (ε : Fin n → Bool) (f : Matrix (Fin n) (Fin n) ℂ → ℂ) (w : List (Fin n × Fin n)) (g : Matrix (Fin n) (Fin n) ℂ), Eword ε w (fun x => f (x.map star)) g = (w.map fun p => -((Formalism.REAL.sgn ε p.1 p.2 : ℝ) : ℂ)).prod * Eword ε (w.map Prod.swap) f (g.map star) := by
+theorem wordConj
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (f : Matrix (Fin n) (Fin n) ℂ → ℂ) (w : List (Fin n × Fin n))
+        (g : Matrix (Fin n) (Fin n) ℂ),
+      Eword ε w (fun x => f (x.map star)) g
+        = (w.map fun p => -((Formalism.REAL.sgn ε p.1 p.2 : ℝ) : ℂ)).prod
+          * Eword ε (w.map Prod.swap) f (g.map star) := by
   intro n ε f w g
   exact congrFun (eword_map_star_eq_prod_neg_sgn_mul_swap ε f w) g
 
-theorem eigConj : ∀ (n : ℕ) (ε : Fin n → Bool) (χ : Fin n → ℂ) (f : Matrix (Fin n) (Fin n) ℂ → ℂ), SmoothOnG ε f → IsZEigen ε χ f → SmoothOnG ε (fun x => f (x.map star)) ∧ IsZEigen ε (fun a => -χ a) (fun x => f (x.map star)) := by
+theorem eigConj
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (χ : Fin n → ℂ) (f : Matrix (Fin n) (Fin n) ℂ → ℂ),
+      SmoothOnG ε f → IsZEigen ε χ f
+        → SmoothOnG ε (fun x => f (x.map star))
+          ∧ IsZEigen ε (fun a => - χ a) (fun x => f (x.map star)) := by
   intro n ε χ f hf hz
   have hsm : SmoothOnG ε (fun x => f (x.map star)) := by
     letI : NormedAddCommGroup (Matrix (Fin n) (Fin n) ℂ) := Matrix.normedAddCommGroup
@@ -461,10 +505,17 @@ theorem eigConj : ∀ (n : ℕ) (ε : Fin n → Bool) (χ : Fin n → ℂ) (f : 
     intro g₀ hg₀
     obtain ⟨U, F, hU, hgU, hF, hfF⟩ := hf (g₀.map star) (UJ_star hg₀)
     have hc : ∀ {k : WithTop ℕ∞}, ContDiff ℝ k (fun x : Matrix (Fin n) (Fin n) ℂ => x.map star) :=
-      contDiff_pi.2 fun i => contDiff_pi.2 fun j =>
-        (Complex.conjCLE : ℂ →L[ℝ] ℂ).contDiff.comp (contDiff_apply_apply (𝕜 := ℝ) i j)
-    refine ⟨(fun x : Matrix (Fin n) (Fin n) ℂ => x.map star) ⁻¹' U, fun x => F (x.map star),
-      hU.preimage (hc (k := 0)).continuous, by simpa using hgU, hF.comp hc.contDiffOn (fun x hx => hx), ?_⟩
+      contDiff_pi.2 fun i =>
+        contDiff_pi.2 fun j =>
+          (Complex.conjCLE : ℂ →L[ℝ] ℂ).contDiff.comp (contDiff_apply_apply (𝕜 := ℝ) i j)
+    refine ⟨
+      (fun x : Matrix (Fin n) (Fin n) ℂ => x.map star) ⁻¹' U,
+      fun x => F (x.map star),
+      hU.preimage (hc (k := 0)).continuous,
+      by simpa using hgU,
+      hF.comp hc.contDiffOn (fun x hx => hx),
+      ?_
+    ⟩
     intro g hg hgu
     exact hfF _ hg (UJ_star hgu)
   refine ⟨hsm, hsm, ?_⟩

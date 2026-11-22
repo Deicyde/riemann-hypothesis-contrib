@@ -29,8 +29,8 @@ lemma mapsTo_prod (T : J → Module.End ℂ V) (hT : ∀ i j, T i * T j = T j * 
     simp only [List.map_cons, List.prod_cons, Module.End.mul_apply]
     exact mapsTo_E T hT s a (ih hx)
 
-noncomputable def R (T : J → Module.End ℂ V) (hT : ∀ i j, T i * T j = T j * T i) (s : J → ℂ)
-    (j : J) : Module.End ℂ (E T s) :=
+noncomputable def R (T : J → Module.End ℂ V) (hT : ∀ i j, T i * T j = T j * T i) (s : J → ℂ) (j : J)
+    : Module.End ℂ (E T s) :=
   (T j).restrict (mapsTo_E T hT s j)
 
 lemma R_apply (T : J → Module.End ℂ V) (hT : ∀ i j, T i * T j = T j * T i) (s : J → ℂ)
@@ -164,11 +164,14 @@ theorem UpperTheory.Esk.pf_Sys : UpperTheory.Esk.Sys := by
       (fun i j φ => Module.End.mapsTo_maxGenEigenspace_of_comm (hT j i) φ)
   have htop : ⨆ s, E T s = ⊤ :=
     Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_iSup_maxGenEigenspace_eq_top_of_commute T
-      (fun i j _ => hT i j) (fun i => Module.End.iSup_maxGenEigenspace_eq_top (T i))
+      (fun i j _ => hT i j)
+      (fun i => Module.End.iSup_maxGenEigenspace_eq_top (T i))
   have hfin : {s | E T s ≠ ⊥}.Finite := WellFoundedGT.finite_ne_bot_of_iSupIndep hind
   have hint := DirectSum.isInternal_submodule_of_iSupIndep_of_iSup_eq_top hind htop
-  have htr : ∀ W : List J, LinearMap.trace ℂ V (W.map T).prod =
-      ∑ s ∈ hfin.toFinset, (Module.finrank ℂ (E T s) : ℂ) * (W.map s).prod := by
+  have htr
+      : ∀ W : List J,
+        LinearMap.trace ℂ V (W.map T).prod
+          = ∑ s ∈ hfin.toFinset, (Module.finrank ℂ (E T s) : ℂ) * (W.map s).prod := by
     intro W
     rw [LinearMap.trace_eq_sum_trace_restrict' hint hfin (mapsTo_prod T hT · W)]
     exact Finset.sum_congr rfl fun s _ => trace_restrict T hT s W _

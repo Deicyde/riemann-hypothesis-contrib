@@ -33,7 +33,8 @@ open Formalism.MainNotions.S Formalism.MainNotions.BridgeLemma Formalism.MainNot
 
 variable (I : AutInst)
 
-theorem muA_right (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsHaarMeasure] : (I.muA μf).IsMulRightInvariant := by
+theorem muA_right (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsHaarMeasure]
+    : (I.muA μf).IsMulRightInvariant := by
   have : μf.IsMulRightInvariant := Formalism.L2.SG.Closed.GfUnimod_holds I μf
   exact rr_muA_right I μf
 

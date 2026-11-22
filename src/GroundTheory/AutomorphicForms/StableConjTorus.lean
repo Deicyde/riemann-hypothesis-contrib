@@ -14,8 +14,9 @@ section CommuteField
 
 variable {E V : Type*} [Field E] [AddCommGroup V] [Module E V] [FiniteDimensional E V]
 
-theorem commute_of_commute_of_separable_charpoly {f g g' : Module.End E V}
-    (hf : f.charpoly.Separable) (hg : Commute f g) (hg' : Commute f g') : Commute g g' := by
+theorem commute_of_commute_of_separable_charpoly
+    {f g g' : Module.End E V} (hf : f.charpoly.Separable) (hg : Commute f g) (hg' : Commute f g')
+    : Commute g g' := by
   classical
   set n := finrank E V
   let b : Basis (Fin n) E V := Module.finBasis E V
@@ -61,14 +62,14 @@ noncomputable def adjoint (A : Module.End E V) : Module.End E V where
     simp only [Equiv.ofBijective_apply_symm_apply, LinearMap.map_smulₛₗ, LinearMap.smul_comp,
       RingHom.id_apply]
 
-theorem toSesq_adjoint_left (A : Module.End E V) (y x : V) :
-    h.toSesq (h.adjoint A y) x = h.toSesq y (A x) := by
+theorem toSesq_adjoint_left (A : Module.End E V) (y x : V)
+    : h.toSesq (h.adjoint A y) x = h.toSesq y (A x) := by
   change h.toSesq ((Equiv.ofBijective _ h.nonsingular).symm ((h.toSesq y).comp A)) x = _
   rw [Equiv.ofBijective_apply_symm_apply (⇑h.toSesq) h.nonsingular]
   rfl
 
-theorem eq_adjoint_iff (A B : Module.End E V) :
-    B = h.adjoint A ↔ ∀ y x, h.toSesq (B y) x = h.toSesq y (A x) := by
+theorem eq_adjoint_iff (A B : Module.End E V)
+    : B = h.adjoint A ↔ ∀ y x, h.toSesq (B y) x = h.toSesq y (A x) := by
   refine ⟨fun hB y x => hB ▸ h.toSesq_adjoint_left A y x, fun hB => LinearMap.ext fun y => ?_⟩
   apply h.nonsingular.1
   ext x
@@ -92,15 +93,13 @@ noncomputable def adjointEquiv (g : V ≃ₗ[E] V) : V ≃ₗ[E] V where
   left_inv x := by
     change (h.adjoint g.symm.toLinearMap * h.adjoint g.toLinearMap) x = x
     rw [← adjoint_mul]
-    have : g.toLinearMap * g.symm.toLinearMap = 1 := by
-      ext y; simp
+    have : g.toLinearMap * g.symm.toLinearMap = 1 := by ext y; simp
     rw [this, adjoint_one]
     rfl
   right_inv x := by
     change (h.adjoint g.toLinearMap * h.adjoint g.symm.toLinearMap) x = x
     rw [← adjoint_mul]
-    have : g.symm.toLinearMap * g.toLinearMap = 1 := by
-      ext y; simp
+    have : g.symm.toLinearMap * g.toLinearMap = 1 := by ext y; simp
     rw [this, adjoint_one]
     rfl
 
@@ -110,22 +109,15 @@ section Stable
 
 variable [FiniteDimensional E V]
 
-def IsRegularSemisimple (γ : V ≃ₗ[E] V) : Prop :=
-  (γ.toLinearMap).charpoly.Separable
+def IsRegularSemisimple (γ : V ≃ₗ[E] V) : Prop := (γ.toLinearMap).charpoly.Separable
 
-def torusE (γ : V ≃ₗ[E] V) : Subgroup (V ≃ₗ[E] V) :=
-  Subgroup.centralizer {γ}
-
-
+def torusE (γ : V ≃ₗ[E] V) : Subgroup (V ≃ₗ[E] V) := Subgroup.centralizer {γ}
 
 def TorusE (γ : V ≃ₗ[E] V) : Type _ := torusE γ
 
 namespace TorusE
 
 variable {γ : V ≃ₗ[E] V}
-
-
-
 
 variable [Fact (IsRegularSemisimple γ)]
 

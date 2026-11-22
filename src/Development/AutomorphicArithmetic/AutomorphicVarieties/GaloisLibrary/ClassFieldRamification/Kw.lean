@@ -10,8 +10,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.kw :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (L : IntermediateField ℚ Ω) [FiniteDimensional ℚ L] [IsAbelianGalois ℚ L], ∃ (N : ℕ) (ζ : Ω), 0 < N ∧ IsPrimitiveRoot ζ N ∧ L ≤ ℚ⟮ζ⟯ := by
+theorem UpperTheory.V.CF.kw
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosed Ω] (L : IntermediateField ℚ Ω)
+        [FiniteDimensional ℚ L] [IsAbelianGalois ℚ L],
+      ∃ (N : ℕ) (ζ : Ω),
+        0 < N ∧ IsPrimitiveRoot ζ N ∧ L ≤ ℚ⟮ζ⟯ := by
   intro Ω _ _ _ L hfd hab
   obtain ⟨m, hm⟩ := GroundTheory.Global.exists_le_rayClassField Ω L
   have hn : Ideal.absNorm m.ideal ≠ 0 := by

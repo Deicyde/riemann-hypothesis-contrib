@@ -7,12 +7,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 namespace GlobalTheory
 
-theorem exists_grpObj_isAbelianScheme_of_isPullback_spMap : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ), IsAbelianScheme A → SmoothOfRelativeDimension g A.hom → ∀ (R' : Type) [CommRing R'] (σ : R →+* R') (X' : Scheme.{0}) (s' : X' ⟶ Sp R') (φ : X' ⟶ A.left), IsPullback φ s' A.hom (spMap σ) → ∃ _ : GrpObj (Over.mk s'), IsAbelianScheme (Over.mk s') ∧ SmoothOfRelativeDimension g s' := by
+theorem exists_grpObj_isAbelianScheme_of_isPullback_spMap
+    : ∀ (R : Type) [CommRing R] (A : Over (Sp R)) [GrpObj A] (g : ℕ),
+      IsAbelianScheme A → SmoothOfRelativeDimension g A.hom
+        → ∀ (R' : Type) [CommRing R'] (σ : R →+* R') (X' : Scheme.{0}) (s' : X' ⟶ Sp R')
+            (φ : X' ⟶ A.left),
+          IsPullback φ s' A.hom (spMap σ)
+            → ∃ _ : GrpObj (Over.mk s'),
+              IsAbelianScheme (Over.mk s') ∧ SmoothOfRelativeDimension g s' := by
   intro R _ A _ g hA hg R' _ σ X' s' φ h
   have hsm : SmoothOfRelativeDimension g s' := by
     have := smoothOfRelativeDimension_isStableUnderBaseChange (n := g)
@@ -32,6 +42,8 @@ theorem exists_grpObj_isAbelianScheme_of_isPullback_spMap : ∀ (R : Type) [Comm
         ← Category.assoc (β_ B B).hom, IsCommMonObj.mul_comm]
     smooth := MorphismProperty.of_isPullback (P := @Smooth) h hA.smooth
     proper := MorphismProperty.of_isPullback (P := @IsProper) h hA.proper
-    geomConnected := MorphismProperty.of_isPullback (P := @GeometricallyConnected) h hA.geomConnected }
+    geomConnected :=
+      MorphismProperty.of_isPullback (P := @GeometricallyConnected) h hA.geomConnected
+  }
 
 end GlobalTheory

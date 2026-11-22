@@ -9,7 +9,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSecti
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi NumberField IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore
+open AlgebraicGeometry CategoryTheory ReciprocityTheory.ChartRestriction.G.Semi NumberField
+  IsDedekindDomain Module Formalism.BasicNotions Formalism.L2.Pj
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  GlobalTheory.AllWt GlobalTheory.FlatLine GlobalTheory.CompHt GlobalTheory.FlatCore
 
 set_option autoImplicit false
 
@@ -17,13 +20,26 @@ noncomputable section
 
 namespace GlobalTheory.CompHS.FlatDiag
 
-theorem norm_diagChar_flatWt : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (c : Coeff l) (σ : c.F →+* ℂ) (τ : Psi H) (t : Ix Dw → (CAt σ)ˣ), ‖GlobalTheory.CompHS.diagChar (exOf Dw (flatWt Dw τ) 0) t‖ = (∏ j : Fin (Dw.mult (conjEmb τ.1)), ‖toC ((t (some ⟨conjEmb τ.1, j⟩) : CAt σ))‖) / ∏ i : Fin (Dw.mult τ.1), ‖toC ((t (some ⟨τ.1, i⟩) : CAt σ))‖ := by
+theorem norm_diagChar_flatWt
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (c : Coeff l) (σ : c.F →+* ℂ) (τ : Psi H) (t : Ix Dw → (CAt σ)ˣ),
+      ‖GlobalTheory.CompHS.diagChar (exOf Dw (flatWt Dw τ) 0) t‖
+        = (∏ j : Fin (Dw.mult (conjEmb τ.1)), ‖toC ((t (some ⟨conjEmb τ.1, j⟩) : CAt σ))‖)
+          / ∏ i : Fin (Dw.mult τ.1), ‖toC ((t (some ⟨τ.1, i⟩) : CAt σ))‖ := by
   classical
   intro E _ _ _ H Dw l c σ τ t
   set e := exOf Dw (flatWt Dw τ) 0 with he_def
   have hne : τ.1 ≠ conjEmb τ.1 := fun h => conj_not_mem τ (h ▸ τ.2)
-  have hE : ∀ (ρ : E →+* ℂ) (i : Fin (Dw.mult ρ)),
-      e (some ⟨ρ, i⟩) = if ρ = τ.1 then -1 else if ρ = conjEmb τ.1 then 1 else 0 := by
+  have hE
+      : ∀ (ρ : E →+* ℂ) (i : Fin (Dw.mult ρ)),
+        e (some ⟨ρ, i⟩)
+          = if ρ = τ.1 then
+              -1
+            else if ρ = conjEmb τ.1 then
+              1
+            else
+              0 := by
     intro ρ i
     obtain ⟨n, hi⟩ := i
     simp only [he_def, exOf, exZ, wtOf, flatWt, parWt, Datum.mult] at hi ⊢
@@ -42,11 +58,12 @@ theorem norm_diagChar_flatWt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       by_cases h' : conjEmb ρ (H.rt : E) = H.rt0
       · rw [dite_eq_left h', dite_eq_left hi]
         by_cases h2 : ρ = conjEmb τ.1
-        · have h3 : (⟨conjEmb ρ, h'⟩ : Psi H) = τ := Subtype.ext (show conjEmb ρ = τ.1 by rw [h2, conjEmb_conjEmb])
+        · have h3 : (⟨conjEmb ρ, h'⟩ : Psi H) = τ :=
+            Subtype.ext (show conjEmb ρ = τ.1 by rw [h2, conjEmb_conjEmb])
           rw [if_pos h3, if_neg h1, if_pos h2]
           norm_num
-        · have h3 : (⟨conjEmb ρ, h'⟩ : Psi H) ≠ τ := fun e => h2 (by
-            rw [← congrArg Subtype.val e, conjEmb_conjEmb])
+        · have h3 : (⟨conjEmb ρ, h'⟩ : Psi H) ≠ τ := fun e =>
+            h2 (by rw [← congrArg Subtype.val e, conjEmb_conjEmb])
           rw [if_neg h3, if_neg h1, if_neg h2]
           norm_num
       · rw [dite_eq_right h']
@@ -59,10 +76,11 @@ theorem norm_diagChar_flatWt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
     have : (∏ ix, f (t ix) ^ e ix) = f (∏ ix, t ix ^ e ix) := by simp only [map_prod, map_zpow]
     rw [this, hf]
     rfl
-  let g : (E →+* ℂ) → ℝ := fun ρ => ∏ i : Fin (Dw.mult ρ), ‖toC ((t (some ⟨ρ, i⟩) : CAt σ))‖ ^ e (some ⟨ρ, i⟩)
+  let g : (E →+* ℂ) → ℝ := fun ρ =>
+    ∏ i : Fin (Dw.mult ρ), ‖toC ((t (some ⟨ρ, i⟩) : CAt σ))‖ ^ e (some ⟨ρ, i⟩)
   have e₂ : ‖GlobalTheory.CompHS.diagChar e t‖ = ∏ ρ, g ρ := by
-    rw [e₁, Units.coe_prod, norm_prod, Fintype.prod_option, e0, zpow_zero, Units.val_one, norm_one, one_mul,
-      Fintype.prod_sigma]
+    rw [e₁, Units.coe_prod, norm_prod, Fintype.prod_option, e0, zpow_zero, Units.val_one, norm_one,
+      one_mul, Fintype.prod_sigma]
     refine Finset.prod_congr rfl fun ρ _ => Finset.prod_congr rfl fun i _ => ?_
     rw [Units.val_zpow_eq_zpow_val, norm_zpow, hf]
   have e₃ : ∏ ρ, g ρ = g τ.1 * g (conjEmb τ.1) := by
@@ -73,7 +91,9 @@ theorem norm_diagChar_flatWt : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
   have gτ : g τ.1 = (∏ i : Fin (Dw.mult τ.1), ‖toC ((t (some ⟨τ.1, i⟩) : CAt σ))‖)⁻¹ := by
     rw [← Finset.prod_inv_distrib]
     exact Finset.prod_congr rfl fun i _ => by rw [hE, if_pos rfl, zpow_neg_one]
-  have gc : g (conjEmb τ.1) = ∏ j : Fin (Dw.mult (conjEmb τ.1)), ‖toC ((t (some ⟨conjEmb τ.1, j⟩) : CAt σ))‖ :=
+  have gc
+      : g (conjEmb τ.1)
+        = ∏ j : Fin (Dw.mult (conjEmb τ.1)), ‖toC ((t (some ⟨conjEmb τ.1, j⟩) : CAt σ))‖ :=
     Finset.prod_congr rfl fun i _ => by rw [hE, if_neg hne.symm, if_pos rfl, zpow_one]
   rw [e₂, e₃, gτ, gc, div_eq_mul_inv, mul_comm]
 

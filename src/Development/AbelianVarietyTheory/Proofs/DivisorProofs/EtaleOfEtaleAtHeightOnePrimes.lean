@@ -9,14 +9,19 @@ open IsLocalRing
 namespace GlobalTheory.PurityDisc
 open TensorProduct
 
-theorem trace_one_tmul (R A S : Type) [CommRing R] [CommRing A] [Algebra R A] [CommRing S]
-    [Algebra R S] [Module.Free R A] [Module.Finite R A] (a : A) :
-    Algebra.trace S (S ⊗[R] A) (1 ⊗ₜ a) = algebraMap R S (Algebra.trace R A a) := by
-  rw [Algebra.trace_apply, Algebra.trace_apply, ← LinearMap.trace_baseChange, Algebra.baseChange_lmul]
+theorem trace_one_tmul
+    (R A S : Type) [CommRing R] [CommRing A] [Algebra R A] [CommRing S] [Algebra R S]
+    [Module.Free R A] [Module.Finite R A]
+    (a : A)
+    : Algebra.trace S (S ⊗[R] A) (1 ⊗ₜ a) = algebraMap R S (Algebra.trace R A a) := by
+  rw [Algebra.trace_apply, Algebra.trace_apply, ← LinearMap.trace_baseChange,
+    Algebra.baseChange_lmul]
 
-theorem discr_baseChange (R A S : Type) [CommRing R] [CommRing A] [Algebra R A] [CommRing S]
-    [Algebra R S] {ι : Type} [Fintype ι] [DecidableEq ι] (b : Module.Basis ι R A) :
-    Algebra.discr S (Algebra.TensorProduct.basis S b) = algebraMap R S (Algebra.discr R b) := by
+theorem discr_baseChange
+    (R A S : Type) [CommRing R] [CommRing A] [Algebra R A] [CommRing S] [Algebra R S]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι R A)
+    : Algebra.discr S (Algebra.TensorProduct.basis S b) = algebraMap R S (Algebra.discr R b) := by
   haveI := Module.Free.of_basis b
   haveI := Module.Finite.of_basis b
   rw [Algebra.discr_def, Algebra.discr_def, RingHom.map_det]
@@ -25,14 +30,14 @@ theorem discr_baseChange (R A S : Type) [CommRing R] [CommRing A] [Algebra R A] 
   simp [Algebra.traceMatrix_apply, Algebra.traceForm_apply, Algebra.TensorProduct.basis_apply,
     Algebra.TensorProduct.tmul_mul_tmul, trace_one_tmul]
 
-theorem trace_pi (K σ : Type) [Field K] [Fintype σ] [DecidableEq σ] (z : σ → K) :
-    Algebra.trace K (σ → K) z = ∑ i, z i := by
+theorem trace_pi (K σ : Type) [Field K] [Fintype σ] [DecidableEq σ] (z : σ → K)
+    : Algebra.trace K (σ → K) z = ∑ i, z i := by
   rw [Algebra.trace_eq_matrix_trace (Pi.basisFun K σ), Matrix.trace]
   refine Finset.sum_congr rfl fun i _ => ?_
   simp [Matrix.diag, Algebra.leftMulMatrix_eq_repr_mul, Pi.single_apply]
 
-theorem traceForm_pi_nondegenerate (K σ : Type) [Field K] [Fintype σ] [DecidableEq σ] :
-    (Algebra.traceForm K (σ → K)).Nondegenerate := by
+theorem traceForm_pi_nondegenerate (K σ : Type) [Field K] [Fintype σ] [DecidableEq σ]
+    : (Algebra.traceForm K (σ → K)).Nondegenerate := by
   refine ⟨fun x hx => ?_, fun x hx => ?_⟩
   · funext i
     have h := hx (Pi.single i 1)
@@ -43,9 +48,12 @@ theorem traceForm_pi_nondegenerate (K σ : Type) [Field K] [Fintype σ] [Decidab
     rw [Algebra.traceForm_apply, trace_pi] at h
     simpa [Pi.single_apply] using h
 
-theorem discr_ne_zero_of_etale (K A : Type) [Field K] [CommRing A] [Algebra K A] {ι : Type}
-    [Fintype ι] [DecidableEq ι] (b : Module.Basis ι K A) [Algebra.Etale K A] :
-    Algebra.discr K b ≠ 0 := by
+theorem discr_ne_zero_of_etale
+    (K A : Type) [Field K] [CommRing A] [Algebra K A]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι K A)
+    [Algebra.Etale K A]
+    : Algebra.discr K b ≠ 0 := by
   classical
   let L := AlgebraicClosure K
   let e := Algebra.FormallyEtale.equivPiOfIsSepClosed L (L ⊗[K] A)
@@ -54,8 +62,9 @@ theorem discr_ne_zero_of_etale (K A : Type) [Field K] [CommRing A] [Algebra K A]
   haveI : Fintype (PrimeSpectrum (L ⊗[K] A)) := Fintype.ofFinite _
   let c := (Algebra.TensorProduct.basis L b).map e.toLinearEquiv
   have hc : Algebra.discr L c ≠ 0 := by
-    have h := (LinearMap.BilinForm.nondegenerate_iff_det_ne_zero c).mp
-      (traceForm_pi_nondegenerate L (PrimeSpectrum (L ⊗[K] A)))
+    have h :=
+      (LinearMap.BilinForm.nondegenerate_iff_det_ne_zero c).mp
+        (traceForm_pi_nondegenerate L (PrimeSpectrum (L ⊗[K] A)))
     rw [Algebra.discr_def]
     convert h using 2
     ext i j
@@ -67,9 +76,11 @@ theorem discr_ne_zero_of_etale (K A : Type) [Field K] [CommRing A] [Algebra K A]
   intro h
   exact hc (by rw [h, map_zero])
 
-theorem exists_dual (R A : Type) [CommRing R] [CommRing A] [Algebra R A] {ι : Type}
-    [Fintype ι] [DecidableEq ι] (b : Module.Basis ι R A) (h : IsUnit (Algebra.discr R b)) :
-    ∃ d : ι → A, ∀ i j, Algebra.trace R A (b i * d j) = if i = j then 1 else 0 := by
+theorem exists_dual
+    (R A : Type) [CommRing R] [CommRing A] [Algebra R A]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι R A) (h : IsUnit (Algebra.discr R b))
+    : ∃ d : ι → A, ∀ i j, Algebra.trace R A (b i * d j) = if i = j then 1 else 0 := by
   classical
   set M := Algebra.traceMatrix R b
   have hM : IsUnit M.det := by rwa [Algebra.discr_def] at h
@@ -83,10 +94,12 @@ theorem exists_dual (R A : Type) [CommRing R] [CommRing A] [Algebra R A] {ι : T
   rw [mul_smul_comm, LinearMap.map_smul, smul_eq_mul, mul_comm]
   simp [M, Algebra.traceMatrix_apply, Algebra.traceForm_apply]
 
-theorem formallyUnramified_of_dual (R A : Type) [CommRing R] [CommRing A] [Algebra R A] {ι : Type}
-    [Fintype ι] [DecidableEq ι] (b : Module.Basis ι R A) (d : ι → A)
-    (hd : ∀ i j, Algebra.trace R A (b i * d j) = if i = j then 1 else 0) :
-    Algebra.FormallyUnramified R A := by
+theorem formallyUnramified_of_dual
+    (R A : Type) [CommRing R] [CommRing A] [Algebra R A]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι R A) (d : ι → A)
+    (hd : ∀ i j, Algebra.trace R A (b i * d j) = if i = j then 1 else 0)
+    : Algebra.FormallyUnramified R A := by
   classical
   haveI := Module.Free.of_basis b
   haveI := Module.Finite.of_basis b
@@ -122,20 +135,20 @@ theorem formallyUnramified_of_dual (R A : Type) [CommRing R] [CommRing A] [Algeb
   · rw [sub_mul, sub_eq_zero, Finset.mul_sum, Finset.mul_sum]
     simp_rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul]
     symm
-    calc ∑ i, (s * b i) ⊗ₜ[R] d i
-        = ∑ i, ∑ j, (T (s * b i * d j) • b j) ⊗ₜ[R] d i := by
-          refine Finset.sum_congr rfl fun i _ => ?_
-          conv_lhs => rw [← b.sum_repr (s * b i)]
-          rw [TensorProduct.sum_tmul]
-          simp_rw [hrepr]
+    calc
+      ∑ i, (s * b i) ⊗ₜ[R] d i = ∑ i, ∑ j, (T (s * b i * d j) • b j) ⊗ₜ[R] d i := by
+        refine Finset.sum_congr rfl fun i _ => ?_
+        conv_lhs => rw [← b.sum_repr (s * b i)]
+        rw [TensorProduct.sum_tmul]
+        simp_rw [hrepr]
       _ = ∑ j, b j ⊗ₜ[R] (∑ i, T ((s * d j) * b i) • d i) := by
-          rw [Finset.sum_comm]
-          refine Finset.sum_congr rfl fun j _ => ?_
-          rw [TensorProduct.tmul_sum]
-          refine Finset.sum_congr rfl fun i _ => ?_
-          rw [TensorProduct.smul_tmul]
-          congr 2
-          ring_nf
+        rw [Finset.sum_comm]
+        refine Finset.sum_congr rfl fun j _ => ?_
+        rw [TensorProduct.tmul_sum]
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [TensorProduct.smul_tmul]
+        congr 2
+        ring_nf
       _ = ∑ j, b j ⊗ₜ[R] (s * d j) := by simp_rw [hexp]
   · rw [map_sum]
     simp_rw [Algebra.TensorProduct.lmul'_apply_tmul]
@@ -149,9 +162,11 @@ theorem formallyUnramified_of_dual (R A : Type) [CommRing R] [CommRing A] [Algeb
     congr 1
     ring
 
-theorem etale_of_isUnit_discr (R A : Type) [CommRing R] [CommRing A] [Algebra R A] {ι : Type}
-    [Fintype ι] [DecidableEq ι] (b : Module.Basis ι R A) (h : IsUnit (Algebra.discr R b)) :
-    Algebra.Etale R A := by
+theorem etale_of_isUnit_discr
+    (R A : Type) [CommRing R] [CommRing A] [Algebra R A]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι R A) (h : IsUnit (Algebra.discr R b))
+    : Algebra.Etale R A := by
   haveI := Module.Free.of_basis b
   haveI := Module.Finite.of_basis b
   obtain ⟨d, hd⟩ := exists_dual R A b h
@@ -160,10 +175,10 @@ theorem etale_of_isUnit_discr (R A : Type) [CommRing R] [CommRing A] [Algebra R 
   haveI : Algebra.FinitePresentation R A := inferInstance
   exact Algebra.Etale.of_formallyUnramified_of_flat
 
-theorem exists_height_one_mem (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] {x : R}
-    (hx : x ≠ 0) (hu : ¬ IsUnit x) : ∃ P : Ideal R, P.IsPrime ∧ P.height = 1 ∧ x ∈ P := by
-  have hne : Ideal.span {x} ≠ ⊤ := by
-    rwa [Ne, Ideal.span_singleton_eq_top]
+theorem exists_height_one_mem
+    (R : Type) [CommRing R] [IsDomain R] [IsNoetherianRing R] {x : R} (hx : x ≠ 0) (hu : ¬ IsUnit x)
+    : ∃ P : Ideal R, P.IsPrime ∧ P.height = 1 ∧ x ∈ P := by
+  have hne : Ideal.span {x} ≠ ⊤ := by rwa [Ne, Ideal.span_singleton_eq_top]
   obtain ⟨M, hM, hxM⟩ := Ideal.exists_le_maximal _ hne
   obtain ⟨P, hmin, -⟩ := Ideal.exists_minimalPrimes_le hxM
   have hP : P.IsPrime := hmin.1.1
@@ -174,11 +189,14 @@ theorem exists_height_one_mem (R : Type) [CommRing R] [IsDomain R] [IsNoetherian
   have h0 : P.height ≠ 0 := fun h => hP0 (Ideal.height_eq_zero_iff_eq_bot.mp h)
   exact ⟨P, hP, le_antisymm h1 (Order.one_le_iff_ne_zero.mpr h0), hxP⟩
 
-theorem etale_of_etale_height_one : ∀ (R A : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R]
-    [IsNoetherianRing R] [CommRing A] [Algebra R A] [Module.Free R A] [Module.Finite R A],
-    ¬ IsField R →
-    (∀ (p : Ideal R) [p.IsPrime], p.height = 1 → Algebra.Etale (Localization.AtPrime p)
-      (TensorProduct R (Localization.AtPrime p) A)) → Algebra.Etale R A := by
+theorem etale_of_etale_height_one
+    : ∀ (R A : Type) [CommRing R] [IsDomain R] [IsIntegrallyClosed R] [IsNoetherianRing R]
+        [CommRing A] [Algebra R A] [Module.Free R A] [Module.Finite R A],
+      ¬ IsField R
+        → (∀ (p : Ideal R) [p.IsPrime],
+          p.height = 1
+            → Algebra.Etale (Localization.AtPrime p) (TensorProduct R (Localization.AtPrime p) A))
+        → Algebra.Etale R A := by
   intro R A _ _ _ _ _ _ _ _ hR hp
   classical
   let b := Module.Free.chooseBasis R A
@@ -188,8 +206,9 @@ theorem etale_of_etale_height_one : ∀ (R A : Type) [CommRing R] [IsDomain R] [
     haveI := hp p h1
     let Rp := Localization.AtPrime p
     let κ := ResidueField Rp
-    have h := discr_ne_zero_of_etale κ (κ ⊗[Rp] (Rp ⊗[R] A))
-      (Algebra.TensorProduct.basis κ (Algebra.TensorProduct.basis Rp b))
+    have h :=
+      discr_ne_zero_of_etale κ (κ ⊗[Rp] (Rp ⊗[R] A))
+        (Algebra.TensorProduct.basis κ (Algebra.TensorProduct.basis Rp b))
     rw [discr_baseChange, discr_baseChange] at h
     have hu : IsUnit (algebraMap R Rp (Algebra.discr R b)) := by
       by_contra hn

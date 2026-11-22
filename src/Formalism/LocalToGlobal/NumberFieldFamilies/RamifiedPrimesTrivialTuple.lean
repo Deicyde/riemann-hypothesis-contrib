@@ -15,8 +15,9 @@ open Formalism.BasicNotions Formalism.L2.Host
 
 variable {D : D7} {C : CharFrame D} {nch : NChoice D}
 
-theorem unrAt_one {L : Type} [Field L] [NumberField L] (w : HeightOneSpectrum (𝓞 L)) : (1 : HChar L).UnrAt w :=
-  fun _ _ => rfl
+theorem unrAt_one {L : Type} [Field L] [NumberField L] (w : HeightOneSpectrum (𝓞 L))
+    : (1 : HChar L).UnrAt w := fun _ _ =>
+  rfl
 
 structure ConjAt (D : D7) where
   M : ℕ → Type
@@ -30,8 +31,8 @@ structure ConjAt (D : D7) where
   th : ∀ j, T j →ₗ[ℂ] M j
   part : ∀ j, D.what₂.FT → Submodule ℂ (M j)
 
-attribute [instance] ConjAt.instM ConjAt.instMi ConjAt.instMf ConjAt.instT ConjAt.instTi ConjAt.instTf
-
+attribute [instance]
+  ConjAt.instM ConjAt.instMi ConjAt.instMf ConjAt.instT ConjAt.instTi ConjAt.instTf
 
 end Formalism.L2.Fam.DivCQ
 

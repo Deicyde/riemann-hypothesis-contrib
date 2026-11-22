@@ -10,16 +10,18 @@ namespace ValPl
 
 open IsDedekindDomain WithZero IsLocalRing
 
-variable {O F L : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F]
-  [Algebra O F] [IsFractionRing O F] [Field L] [Algebra F L] [FiniteDimensional F L]
-  [Algebra.IsSeparable F L] [Algebra O L] [IsScalarTower O F L]
-  [IsDedekindDomain (integralClosure O L)] [IsFractionRing (integralClosure O L) L]
+variable
+  {O F L : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F] [Algebra O F]
+  [IsFractionRing O F] [Field L] [Algebra F L] [FiniteDimensional F L] [Algebra.IsSeparable F L]
+  [Algebra O L] [IsScalarTower O F L] [IsDedekindDomain (integralClosure O L)]
+  [IsFractionRing (integralClosure O L) L]
 
 variable (F) in
-theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
-    letI := resAlg (F := F) (addv L v);
-    Module.finrank (ResidueField ((vRing (addv L v)).comap (algebraMap F L)))
-      (ResidueField (vRing (addv L v))) = v.asIdeal.inertiaDeg O := by
+theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L))
+    : letI := resAlg (F := F) (addv L v)
+      Module.finrank (ResidueField ((vRing (addv L v)).comap (algebraMap F L)))
+          (ResidueField (vRing (addv L v)))
+        = v.asIdeal.inertiaDeg O := by
   classical
   set w := addv L v with hw_def
   letI : Algebra (ResidueField ((vRing w).comap (algebraMap F L))) (ResidueField (vRing w)) :=
@@ -28,8 +30,7 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
     intro x
     constructor
     · rintro ⟨u, rfl⟩
-      have hm : ((u : vRing w) : L) * ((↑u⁻¹ : vRing w) : L) = 1 :=
-        congrArg Subtype.val u.mul_inv
+      have hm : ((u : vRing w) : L) * ((↑u⁻¹ : vRing w) : L) = 1 := congrArg Subtype.val u.mul_inv
       have h1 : w ((u : vRing w) : L) + w ((↑u⁻¹ : vRing w) : L) = 0 := by
         rw [← AddValuation.map_mul, hm, AddValuation.map_one]
       exact wt_add_eq_zero (u : vRing w).2 (↑u⁻¹ : vRing w).2 h1
@@ -42,8 +43,15 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
           rw [← AddValuation.map_mul, mul_inv_cancel₀ hx0, AddValuation.map_one]
         rw [h0, zero_add] at h2
         rw [h2]
-      exact ⟨⟨x, ⟨_, hinv⟩, Subtype.ext (by simp [mul_inv_cancel₀ hx0]),
-        Subtype.ext (by simp [inv_mul_cancel₀ hx0])⟩, rfl⟩
+      exact ⟨
+        ⟨
+          x,
+          ⟨_, hinv⟩,
+          Subtype.ext (by simp [mul_inv_cancel₀ hx0]),
+          Subtype.ext (by simp [inv_mul_cancel₀ hx0])
+        ⟩,
+        rfl
+      ⟩
   have hmaxV : ∀ x : vRing w, x ∈ maximalIdeal (vRing w) ↔ 0 < w (x : L) := by
     intro x
     rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, hunit]
@@ -67,7 +75,7 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
       have h := x.2
       change 0 ≤ addv L v (x : L) at h
       rw [addv_apply v hx0] at h
-      have h' : 0 ≤ -log (v.valuation L (x : L)) := by exact_mod_cast h
+      have h' : 0 ≤ - log (v.valuation L (x : L)) := by exact_mod_cast h
       have hne : v.valuation L (x : L) ≠ 0 := by simpa using hx0
       rw [← exp_log hne, ← exp_zero, exp_le_exp]
       omega
@@ -78,12 +86,15 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
       have : d' * d - 1 ∈ RingHom.ker ψB := by
         rw [hkerB]
         have : d' * d - 1 = -i := by linear_combination hdi
-        rw [this]; exact v.asIdeal.neg_mem hi
+        rw [this]
+        exact v.asIdeal.neg_mem hi
       rw [RingHom.mem_ker, map_sub, map_mul, map_one, sub_eq_zero] at this
-      rw [mul_comm]; exact this
-    have hxd : x * φB d = φB n := Subtype.ext (by
-      change (x : L) * algebraMap (integralClosure O L) L d = algebraMap (integralClosure O L) L n
-      exact hnd)
+      rw [mul_comm]
+      exact this
+    have hxd : x * φB d = φB n :=
+      Subtype.ext (by
+        change (x : L) * algebraMap (integralClosure O L) L d = algebraMap (integralClosure O L) L n
+        exact hnd)
     have hres := congrArg (residue (vRing w)) hxd
     rw [map_mul] at hres
     rw [map_mul, hψB n, ← hres, mul_assoc, ← hψB, hd1, mul_one]
@@ -96,8 +107,9 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
   let φO : O →+* (vRing w).comap (algebraMap F L) := (algebraMap O F).codRestrict _ hOw
   let ψO : O →+* ResidueField ((vRing w).comap (algebraMap F L)) := (residue _).comp φO
   have hψO : ∀ a, ψO a = residue _ (φO a) := fun _ => rfl
-  have hmaxV0 : ∀ x : (vRing w).comap (algebraMap F L),
-      x ∈ maximalIdeal ((vRing w).comap (algebraMap F L)) ↔ 0 < w (algebraMap F L x) := by
+  have hmaxV0
+      : ∀ x : (vRing w).comap (algebraMap F L),
+        x ∈ maximalIdeal ((vRing w).comap (algebraMap F L)) ↔ 0 < w (algebraMap F L x) := by
     intro x
     have h := hmaxV (comapIncl (vRing w) (algebraMap F L) x)
     have e : ((comapIncl (vRing w) (algebraMap F L) x : vRing w) : L) = algebraMap F L x := rfl
@@ -124,7 +136,8 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
     · by_cases hau : IsUnit a
       · obtain ⟨u, rfl⟩ := hau
         refine ⟨↑u⁻¹, ?_⟩
-        rw [hψO]; congr 1
+        rw [hψO]
+        congr 1
         apply Subtype.ext
         change algebraMap O F ↑u⁻¹ = (x : F)
         have h1 : algebraMap O F (u : O) * algebraMap O F ↑u⁻¹ = 1 := by
@@ -151,9 +164,11 @@ theorem resDeg_addv (v : HeightOneSpectrum (integralClosure O L)) :
   have hmax : (v.asIdeal.comap (algebraMap O (integralClosure O L))).IsMaximal :=
     Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := O) v.asIdeal
   haveI : v.asIdeal.LiesOver (maximalIdeal O) := ⟨(IsLocalRing.eq_maximalIdeal hmax).symm⟩
-  have hc : (algebraMap (ResidueField ((vRing w).comap (algebraMap F L)))
-      (ResidueField (vRing w))).comp jO.toRingHom =
-      jB.toRingHom.comp (algebraMap (O ⧸ maximalIdeal O) (integralClosure O L ⧸ v.asIdeal)) := by
+  have hc
+      : (algebraMap (ResidueField ((vRing w).comap (algebraMap F L))) (ResidueField (vRing w))).comp
+          jO.toRingHom
+        = jB.toRingHom.comp (algebraMap (O ⧸ maximalIdeal O)
+          (integralClosure O L ⧸ v.asIdeal)) := by
     apply Ideal.Quotient.ringHom_ext
     ext a
     simp only [RingHom.comp_apply, Ideal.Quotient.algebraMap_mk_of_liesOver]

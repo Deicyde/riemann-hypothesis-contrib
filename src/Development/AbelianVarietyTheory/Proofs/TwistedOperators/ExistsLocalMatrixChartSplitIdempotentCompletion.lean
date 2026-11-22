@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.ExistsMat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj
+open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.FWT Formalism.L2.Pj
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 noncomputable section
 open NumberField
@@ -20,10 +21,14 @@ namespace GlobalTheory.HatLocalChart
 
 open scoped TensorProduct
 
-theorem smul_mem_hat (D : D7) {n : ℕ} (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
-    {a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E} (ha : a ∈ intAE D)
-    {y : Fin n → GlobalTheory.AdLat.RA D.host.F D.host.E} (hy : y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E))) :
-    a • y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)) := by
+theorem smul_mem_hat
+    (D : D7)
+    {n : ℕ} (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
+    {a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E}
+    (ha : a ∈ intAE D)
+    {y : Fin n → GlobalTheory.AdLat.RA D.host.F D.host.E}
+    (hy : y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)))
+    : a • y ∈ GlobalTheory.AdLat.hat D.host.F (L : Set (Fin n → D.host.E)) := by
   induction ha using AddSubgroup.closure_induction with
   | mem a' ha' =>
     obtain ⟨b, hb, x, rfl⟩ := ha'
@@ -33,7 +38,9 @@ theorem smul_mem_hat (D : D7) {n : ℕ} (L : Submodule (𝓞 D.host.E) (Fin n �
       apply AddSubgroup.subset_closure
       refine ⟨b * c, fun v => ?_, x • w, L.smul_mem x hw, ?_⟩
       · have hbv := hb v
-        simp only [Formalism.MainNotions.StandardLattice.intAf, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV, Set.mem_setOf_eq] at hbv
+        simp only [Formalism.MainNotions.StandardLattice.intAf,
+            Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.evalV, Set.mem_setOf_eq]
+          at hbv
         exact mul_mem hbv (hc v)
       · funext i
         simp only [Pi.smul_apply, smul_eq_mul, Algebra.TensorProduct.tmul_mul_tmul]
@@ -44,7 +51,6 @@ theorem smul_mem_hat (D : D7) {n : ℕ} (L : Submodule (𝓞 D.host.E) (Fin n �
   | zero => rw [zero_smul]; exact zero_mem _
   | add a₁ a₂ _ _ h₁ h₂ => rw [add_smul]; exact add_mem h₁ h₂
   | neg a _ h => rw [neg_smul]; exact neg_mem h
-
 
 set_option maxHeartbeats 1000000 in
 theorem exists_chart : ∀ (D : D7) (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F))

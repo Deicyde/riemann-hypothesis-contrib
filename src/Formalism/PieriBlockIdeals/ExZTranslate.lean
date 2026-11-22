@@ -9,11 +9,11 @@ noncomputable section
 namespace Formalism.CohomologicalDescent.LA
 
 def InclZTwist : Prop :=
-  ∀ (r : ℕ) (ν : Fin r → ℕ) (c l e : ℕ), Antitone ν → l.Prime →
-    (InclZ r r le_rfl (fun a => ν a + c) l e ↔ InclZ r r le_rfl ν l e)
+  ∀ (r : ℕ) (ν : Fin r → ℕ) (c l e : ℕ),
+    Antitone ν → l.Prime → (InclZ r r le_rfl (fun a => ν a + c) l e ↔ InclZ r r le_rfl ν l e)
 
 def ExZTwist : Prop :=
-  ∀ (r : ℕ) (ν : Fin r → ℕ) (c l : ℕ), Antitone ν → l.Prime →
-    exZ r r le_rfl (fun a => ν a + c) l = exZ r r le_rfl ν l
+  ∀ (r : ℕ) (ν : Fin r → ℕ) (c l : ℕ),
+    Antitone ν → l.Prime → exZ r r le_rfl (fun a => ν a + c) l = exZ r r le_rfl ν l
 
 end Formalism.CohomologicalDescent.LA

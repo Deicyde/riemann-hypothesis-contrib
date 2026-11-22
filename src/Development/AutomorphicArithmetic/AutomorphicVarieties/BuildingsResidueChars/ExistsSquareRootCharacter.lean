@@ -4,11 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
-open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
+open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd
+  UpperTheory.V.Sd.S3
 
-private theorem sqrt_ex {O : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O] (h2 : IsUnit (2 : O))
-    (a : O) (ha : residue O a = 1) : ∃ x : O, x ^ 2 = a ∧ residue O x = 1 := by
+private theorem sqrt_ex
+    {O : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete (maximalIdeal O) O]
+    (h2 : IsUnit (2 : O))
+    (a : O) (ha : residue O a = 1)
+    : ∃ x : O, x ^ 2 = a ∧ residue O x = 1 := by
   haveI : HenselianRing O (maximalIdeal O) := IsAdicComplete.henselianRing O (maximalIdeal O)
   have hev : eval 1 (X ^ 2 - C a) ∈ maximalIdeal O := by
     simp only [eval_sub, eval_pow, eval_X, eval_C, one_pow]
@@ -16,46 +22,53 @@ private theorem sqrt_ex {O : Type} [CommRing O] [IsLocalRing O] [IsAdicComplete 
   have hd : eval 1 (derivative (X ^ 2 - C a)) = (2 : O) := by
     simp
     exact one_add_one_eq_two
-  obtain ⟨x, hx, hx1⟩ := HenselianRing.is_henselian (X ^ 2 - C a) (monic_X_pow_sub_C a two_ne_zero) 1 hev
-    (by rw [hd]; exact h2.map _)
+  obtain ⟨x, hx, hx1⟩ :=
+    HenselianRing.is_henselian (X ^ 2 - C a) (monic_X_pow_sub_C a two_ne_zero) 1 hev
+      (by rw [hd]; exact h2.map _)
   refine ⟨x, ?_, ?_⟩
   · simpa [sub_eq_zero] using hx
   · rw [← sub_eq_zero, ← map_one (residue O), ← map_sub, residue_eq_zero_iff]
     exact hx1
 
-private theorem add_unit {O : Type} [CommRing O] [IsLocalRing O] (h2 : IsUnit (2 : O)) {x y : O}
-    (hx : residue O x = 1) (hy : residue O y = 1) : IsUnit (x + y) := by
+private theorem add_unit
+    {O : Type} [CommRing O] [IsLocalRing O]
+    (h2 : IsUnit (2 : O))
+    {x y : O} (hx : residue O x = 1) (hy : residue O y = 1)
+    : IsUnit (x + y) := by
   rw [← residue_ne_zero_iff_isUnit, map_add (f := _), hx, hy]
   have h2' : residue O (2 : O) = 1 + 1 := by
     rw [← map_one (residue O), ← map_add (f := _), one_add_one_eq_two]
   rw [← h2']
   exact (residue_ne_zero_iff_isUnit (2 : O)).mpr h2
 
-private theorem sqrt_uniq {O : Type} [CommRing O] [IsLocalRing O] (h2 : IsUnit (2 : O)) {x y : O}
-    (hx : residue O x = 1) (hy : residue O y = 1) (h : x ^ 2 = y ^ 2) : x = y := by
+private theorem sqrt_uniq
+    {O : Type} [CommRing O] [IsLocalRing O]
+    (h2 : IsUnit (2 : O))
+    {x y : O} (hx : residue O x = 1) (hy : residue O y = 1) (h : x ^ 2 = y ^ 2)
+    : x = y := by
   have hu := add_unit h2 hx hy
   have hz : (x - y) * (x + y) = 0 := by linear_combination h
   exact sub_eq_zero.mp (hu.mul_left_eq_zero.mp hz)
 
-theorem UpperTheory.exists_square_root_character :
-    UpperTheory.V.Sd.S3.SqrtChar := by
+theorem UpperTheory.exists_square_root_character : UpperTheory.V.Sd.S3.SqrtChar := by
   intro O _ _ _ h2 Γ _ _ μ hμ hc
   have ex : ∀ g, ∃ x : O, x ^ 2 = (μ g : O) ∧ residue O x = 1 := fun g => sqrt_ex h2 _ (hμ g)
   choose s hs1 hs2 using ex
   have hsu : ∀ g, IsUnit (s g) := fun g =>
     (residue_ne_zero_iff_isUnit _).mp (by rw [hs2 g]; exact one_ne_zero)
-  let η : Γ →* Oˣ :=
-    { toFun := fun g => (hsu g).unit
-      map_one' := by
-        apply Units.ext
-        show s 1 = 1
-        exact sqrt_uniq h2 (hs2 1) (map_one _) (by rw [hs1, map_one, Units.val_one, one_pow])
-      map_mul' := by
-        intro g k
-        apply Units.ext
-        show s (g * k) = s g * s k
-        refine sqrt_uniq h2 (hs2 _) (by rw [map_mul, hs2, hs2, one_mul]) ?_
-        rw [mul_pow, hs1, hs1, hs1, map_mul, Units.val_mul] }
+  let η : Γ →* Oˣ := {
+    toFun := fun g => (hsu g).unit
+    map_one' := by
+      apply Units.ext
+      show s 1 = 1
+      exact sqrt_uniq h2 (hs2 1) (map_one _) (by rw [hs1, map_one, Units.val_one, one_pow])
+    map_mul' := by
+      intro g k
+      apply Units.ext
+      show s (g * k) = s g * s k
+      refine sqrt_uniq h2 (hs2 _) (by rw [map_mul, hs2, hs2, one_mul]) ?_
+      rw [mul_pow, hs1, hs1, hs1, map_mul, Units.val_mul]
+  }
   refine ⟨η, ?_, ?_, ?_, ?_⟩
   · intro g
     apply Units.ext

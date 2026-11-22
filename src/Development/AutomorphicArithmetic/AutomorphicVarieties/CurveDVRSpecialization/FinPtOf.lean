@@ -14,14 +14,19 @@ open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
 namespace UpperTheory.V.Pr
 
-private theorem charpoly_of_cyc {A : Type} [CommRing A] (M : Matrix (Fin 3) (Fin 3) A)
+private theorem charpoly_of_cyc
+    {A : Type} [CommRing A]
+    (M : Matrix (Fin 3) (Fin 3) A)
     (h01 : M 0 1 * M 1 0 = 0) (h02 : M 0 2 * M 2 0 = 0) (h12 : M 1 2 * M 2 1 = 0)
-    (h012 : M 0 1 * (M 1 2 * M 2 0) = 0) (h021 : M 0 2 * (M 2 1 * M 1 0) = 0) :
-    M.charpoly = ∏ i, (Polynomial.X - Polynomial.C (M i i)) := by
+    (h012 : M 0 1 * (M 1 2 * M 2 0) = 0) (h021 : M 0 2 * (M 2 1 * M 1 0) = 0)
+    : M.charpoly = ∏ i, (Polynomial.X - Polynomial.C (M i i)) := by
   have e : ∀ a b : A, a * b = 0 → Polynomial.C a * Polynomial.C b = 0 := fun a b h => by
     rw [← Polynomial.C_mul, h, Polynomial.C_0]
-  have e3 : ∀ a b c : A, a * (b * c) = 0 → Polynomial.C a * (Polynomial.C b * Polynomial.C c) = 0 :=
-    fun a b c h => by rw [← Polynomial.C_mul, ← Polynomial.C_mul, h, Polynomial.C_0]
+  have e3
+      : ∀ a b c : A,
+        a * (b * c) = 0
+          → Polynomial.C a * (Polynomial.C b * Polynomial.C c) = 0 := fun a b c h => by
+    rw [← Polynomial.C_mul, ← Polynomial.C_mul, h, Polynomial.C_0]
   rw [Matrix.charpoly, Matrix.det_fin_three, Fin.prod_univ_three]
   simp only [Matrix.charmatrix_apply_eq, ne_eq, Fin.reduceEq, not_false_eq_true,
     Matrix.charmatrix_apply_ne]
@@ -30,13 +35,18 @@ private theorem charpoly_of_cyc {A : Type} [CommRing A] (M : Matrix (Fin 3) (Fin
     + (-(Polynomial.X - Polynomial.C (M 1 1))) * e _ _ h02
     - e3 _ _ _ h012 - e3 _ _ _ h021
 
-private theorem char_eq {l : ℕ} [Fact l.Prime] {G A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [Finite (ResidueField A)] [CharP A l]
+private theorem char_eq
+    {l : ℕ} [Fact l.Prime]
+    {G A : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CommRing A] [IsDomain A]
+    [IsLocalRing A] [IsNoetherianRing A] [Finite (ResidueField A)] [CharP A l]
     (T : Set G) (h : ℕ) (h0 : h ≠ 0)
-    (hcl : ∀ (B : Type) [CommGroup B] [Finite B], IsPGroup l B → ∀ χ : G →* B,
-      IsOpen (χ.ker : Set G) → (∀ g ∈ T, χ g = 1) → ∀ g, χ g ^ h = 1)
-    (a b : G →* Aˣ) (ha : AdicCont (maximalIdeal A) fun g => (a g : A)) (hb : IsOpen (b.ker : Set G))
-    (hab : ∀ g, (a g : A) - b g ∈ maximalIdeal A) (hT : ∀ g ∈ T, a g = b g) (g : G) : a g = b g := by
+    (hcl : ∀ (B : Type) [CommGroup B] [Finite B],
+      IsPGroup l B → ∀ χ : G →* B, IsOpen (χ.ker : Set G) → (∀ g ∈ T, χ g = 1) → ∀ g, χ g ^ h = 1)
+    (a b : G →* Aˣ)
+    (ha : AdicCont (maximalIdeal A) fun g => (a g : A)) (hb : IsOpen (b.ker : Set G))
+    (hab : ∀ g, (a g : A) - b g ∈ maximalIdeal A) (hT : ∀ g ∈ T, a g = b g)
+    (g : G)
+    : a g = b g := by
   set m := maximalIdeal A with hm
   set χ : G →* Aˣ := a * b⁻¹ with hχ
   have hχg : ∀ g, χ g = a g * (b g)⁻¹ := fun g => rfl
@@ -68,10 +78,13 @@ private theorem char_eq {l : ℕ} [Fact l.Prime] {G A : Type} [Group G] [Topolog
       rw [← map_pow, ← map_one q, Ideal.Quotient.eq]
       exact hpowN N g
     let χ' : G →* S := χN.codRestrict S hS
-    have hp : IsPGroup l S := fun x => ⟨N, Subtype.ext (by
-      have := x.2
-      rw [MonoidHom.mem_ker, powMonoidHom_apply] at this
-      simpa using this)⟩
+    have hp : IsPGroup l S := fun x => ⟨
+      N,
+      Subtype.ext (by
+        have := x.2
+        rw [MonoidHom.mem_ker, powMonoidHom_apply] at this
+        simpa using this)
+    ⟩
     have hval : ∀ g, χ' g = 1 ↔ q ((χ g : Aˣ) : A) = 1 := by
       intro g
       constructor
@@ -104,25 +117,30 @@ private theorem char_eq {l : ℕ} [Fact l.Prime] {G A : Type} [Group G] [Topolog
     simpa using this
   have hbot : ((χ g : Aˣ) : A) ^ h - 1 ∈ (⨅ N : ℕ, m ^ N) := Ideal.mem_iInf.2 (fun N => key N g)
   rw [Ideal.iInf_pow_eq_bot_of_isLocalRing m (Ideal.IsPrime.ne_top inferInstance), Ideal.mem_bot,
-    sub_eq_zero] at hbot
+      sub_eq_zero]
+    at hbot
   have h1 := UpperTheory.V.Pr.T.oneUnitTF l _ h h0 (hm1 g) hbot
   have h2 : χ g = 1 := Units.ext h1
   rw [hχg, mul_inv_eq_one] at h2
   exact h2
 
-private theorem diag_eq {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}
-    (hF : F.Ok C₀) {A : Type} [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A]
-    [Finite (ResidueField A)] (j : k →+* A) (ρ : NRep F 3 A) (hc : ρ.Cont (maximalIdeal A))
+private theorem diag_eq
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k] [CharP k l]
+    {F : Frame l k} {C₀ : ℕ} (hF : F.Ok C₀)
+    {A : Type}
+    [CommRing A] [IsDomain A] [IsLocalRing A] [IsNoetherianRing A] [Finite (ResidueField A)]
+    (j : k →+* A) (ρ : NRep F 3 A) (hc : ρ.Cont (maximalIdeal A))
     (hbar : ∀ g i, ρ.r g i i - j ((F.Ψ g ^ w 3 i : kˣ) : k) ∈ maximalIdeal A)
     (hmul : ∀ g h i, ρ.r (g * h) i i = ρ.r g i i * ρ.r h i i)
-    (h1 : ∀ v, ∀ g ∈ F.Iv v, F.Ψ (F.loc v g) = 1 → ∀ i, ρ.r (F.loc0 v g) i i = 1) (g : F.G0) (i : Fin 3) :
-    ρ.r g i i = j ((F.Ψ g ^ w 3 i : kˣ) : k) := by
+    (h1 : ∀ v, ∀ g ∈ F.Iv v, F.Ψ (F.loc v g) = 1 → ∀ i, ρ.r (F.loc0 v g) i i = 1)
+    (g : F.G0) (i : Fin 3)
+    : ρ.r g i i = j ((F.Ψ g ^ w 3 i : kˣ) : k) := by
   haveI : CharP A l := charP_of_injective_ringHom j.injective l
   obtain ⟨h, h0, hcl⟩ := hF.cl
   choose u a₀ hu _ hgen using hF.gen
   have hstar := UpperTheory.V.Fr.star hF
-  have hconj : ∀ x : F.G0, F.conj x = F.star x⁻¹ := by
-    intro x; simp [Frame.star]
+  have hconj : ∀ x : F.G0, F.conj x = F.star x⁻¹ := by intro x; simp [Frame.star]
   have hconjc : Continuous F.conj := by
     have : (F.conj : F.G0 → F.G0) = F.star ∘ (fun x => x⁻¹) := funext hconj
     rw [this]
@@ -133,8 +151,10 @@ private theorem diag_eq {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l
     rw [inv_mul_cancel, map_one, Matrix.one_apply_eq, hx, mul_one] at this
     exact this.symm
   let T : Set F.G0 := {x | ∃ (p : F.V × Bool) (a : Fin (F.dv p.1)), x = F.loc2 p (u p.1 a)}
-  have hcl' : ∀ (B : Type) [CommGroup B] [Finite B], IsPGroup l B → ∀ χ : F.G0 →* B,
-      IsOpen (χ.ker : Set F.G0) → (∀ g ∈ T, χ g = 1) → ∀ g, χ g ^ h = 1 := by
+  have hcl'
+      : ∀ (B : Type) [CommGroup B] [Finite B],
+        IsPGroup l B
+          → ∀ χ : F.G0 →* B, IsOpen (χ.ker : Set F.G0) → (∀ g ∈ T, χ g = 1) → ∀ g, χ g ^ h = 1 := by
     intro B _ _ hp χ hχ hT
     apply hcl B hp χ hχ
     intro p g hg
@@ -147,12 +167,16 @@ private theorem diag_eq {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l
       rw [← MonoidHom.comap_ker, Subgroup.coe_comap]
       exact hχ.preimage hcont
     exact hgen p.1 B hp (χ.comp (F.loc2 p)) hop (fun a => hT _ ⟨p, a, rfl⟩) g hg
-  let a : F.G0 →* Aˣ :=
-    { toFun := fun g => ⟨ρ.r g i i, ρ.r g⁻¹ i i,
-        by rw [← hmul, mul_inv_cancel, map_one, Matrix.one_apply_eq],
-        by rw [← hmul, inv_mul_cancel, map_one, Matrix.one_apply_eq]⟩
-      map_one' := Units.ext (by simp)
-      map_mul' := fun g g' => Units.ext (by simp [hmul]) }
+  let a : F.G0 →* Aˣ := {
+    toFun := fun g => ⟨
+      ρ.r g i i,
+      ρ.r g⁻¹ i i,
+      by rw [← hmul, mul_inv_cancel, map_one, Matrix.one_apply_eq],
+      by rw [← hmul, inv_mul_cancel, map_one, Matrix.one_apply_eq]
+    ⟩
+    map_one' := Units.ext (by simp)
+    map_mul' := fun g g' => Units.ext (by simp [hmul])
+  }
   let b : F.G0 →* Aˣ :=
     (Units.map (j : k →* A)).comp ((zpowGroupHom (w 3 i)).comp (F.Ψ.comp F.del.ker.subtype))
   have hb : IsOpen (b.ker : Set F.G0) := by
@@ -191,26 +215,32 @@ theorem finPtOf : FinPtOf := by
   haveI : IsNoetherianRing A := PrincipalIdealRing.isNoetherianRing
   have hCL : UpperTheory.V.CA.IsCL O A :=
     ⟨inferInstance, UpperTheory.V.Pr.IsCD.complete (O := O), inferInstance, Module.Finite.of_finite⟩
-  have hres : ∀ x : ResidueField O,
-      IsLocalRing.ResidueField.map (algebraMap O A) x
-        = IsLocalRing.residue A (algebraMap (ResidueField O) A x) := by
+  have hres
+      : ∀ x : ResidueField O,
+        IsLocalRing.ResidueField.map (algebraMap O A) x
+          = IsLocalRing.residue A (algebraMap (ResidueField O) A x) := by
     intro x
     obtain ⟨o, rfl⟩ := IsLocalRing.residue_surjective x
     rw [IsLocalRing.ResidueField.map_residue]
     congr 1
-    rw [IsScalarTower.algebraMap_apply O (ResidueField O) A o, IsLocalRing.ResidueField.algebraMap_eq]
-  obtain ⟨ξ, hξ, -⟩ := UpperTheory.V.Fr.point_loc hF (Or.inr rfl) S A hCL
-    (IsLocalRing.ResidueField.map (algebraMap O A))
-    (fun a => IsLocalRing.ResidueField.map_residue _ a) ρ hρ.cont hρ.bar
-  have hent : ∀ g i j, ρ.r g i j = ξ (S.u.r g i j) := by
-    intro g i j; rw [← hξ]; rfl
+    rw [IsScalarTower.algebraMap_apply O (ResidueField O) A o,
+      IsLocalRing.ResidueField.algebraMap_eq]
+  obtain ⟨ξ, hξ, -⟩ :=
+    UpperTheory.V.Fr.point_loc hF (Or.inr rfl) S A hCL
+      (IsLocalRing.ResidueField.map (algebraMap O A))
+      (fun a => IsLocalRing.ResidueField.map_residue _ a)
+      ρ hρ.cont hρ.bar
+  have hent : ∀ g i j, ρ.r g i j = ξ (S.u.r g i j) := by intro g i j; rw [← hξ]; rfl
   have hψent : ∀ v i x, ((ρ.ψ v i x : Aˣ) : A) = ξ ((S.u.ψ v i x : (↥S.A)ˣ) : S.A) := by
     intro v i x; rw [← hξ]; rfl
-  suffices key : (∀ g : F.G0, ρ.r g 0 1 * ρ.r g 1 0 = 0 ∧ ρ.r g 0 2 * ρ.r g 2 0 = 0 ∧
-      ρ.r g 1 2 * ρ.r g 2 1 = 0 ∧ ρ.r g 0 1 * (ρ.r g 1 2 * ρ.r g 2 0) = 0 ∧
-      ρ.r g 0 2 * (ρ.r g 2 1 * ρ.r g 1 0) = 0) ∧
-      (∀ (g : F.G0) (i : Fin 3), ρ.r g i i
-        = algebraMap (ResidueField O) A ((F.Ψ (g : F.Γ) ^ w 3 i : (ResidueField O)ˣ) : ResidueField O)) by
+  suffices key
+      : (∀ g : F.G0,
+          ρ.r g 0 1 * ρ.r g 1 0 = 0 ∧ ρ.r g 0 2 * ρ.r g 2 0 = 0 ∧ ρ.r g 1 2 * ρ.r g 2 1 = 0
+            ∧ ρ.r g 0 1 * (ρ.r g 1 2 * ρ.r g 2 0) = 0 ∧ ρ.r g 0 2 * (ρ.r g 2 1 * ρ.r g 1 0) = 0)
+        ∧ (∀ (g : F.G0) (i : Fin 3),
+          ρ.r g i i
+            = algebraMap (ResidueField O) A
+              ((F.Ψ (g : F.Γ) ^ w 3 i : (ResidueField O)ˣ) : ResidueField O)) by
     obtain ⟨hc, hd⟩ := key
     obtain ⟨c1, c2, c3, c4, c5⟩ := hc g
     rw [charpoly_of_cyc _ c1 c2 c3 c4 c5]
@@ -227,7 +257,8 @@ theorem finPtOf : FinPtOf := by
         rw [Ideal.mem_comap, RingHom.mem_ker]
         show ξ (S.inc (algebraMap O S.B o)) = 0
         rw [AlgHom.commutes, AlgHom.commutes, IsScalarTower.algebraMap_apply O (ResidueField O) A,
-          IsLocalRing.ResidueField.algebraMap_eq, (IsLocalRing.residue_eq_zero_iff o).2 ho, map_zero]
+          IsLocalRing.ResidueField.algebraMap_eq, (IsLocalRing.residue_eq_zero_iff o).2 ho,
+          map_zero]
       · rw [Ideal.span_le]
         rintro x ⟨v, i, y, hy, hΨ, rfl⟩
         rw [SetLike.mem_coe, RingHom.mem_ker, map_sub, map_one, sub_eq_zero]
@@ -251,9 +282,10 @@ theorem finPtOf : FinPtOf := by
       show ξ (S.inc (algebraMap O S.B o)) = _
       rw [AlgHom.commutes, AlgHom.commutes, IsScalarTower.algebraMap_apply O (ResidueField O) A,
         IsLocalRing.ResidueField.algebraMap_eq]
-    have hprod : ∀ L : List (F.G0 × Fin 3 × Fin 3),
-        (L.map (fun s => w 3 s.2.1 - w 3 s.2.2)).sum = 0 → (∃ s ∈ L, s.2.1 ≠ s.2.2) →
-        (L.map (fun s => ρ.r s.1 s.2.1 s.2.2)).prod = 0 := by
+    have hprod
+        : ∀ L : List (F.G0 × Fin 3 × Fin 3),
+          (L.map (fun s => w 3 s.2.1 - w 3 s.2.2)).sum = 0 → (∃ s ∈ L, s.2.1 ≠ s.2.2)
+            → (L.map (fun s => ρ.r s.1 s.2.1 s.2.2)).prod = 0 := by
       intro L hL hne
       have hx : (L.map (fun s => S.ρ.r s.1 s.2.1 s.2.2)).prod ∈ S.B := S.mon_mem ⟨L, hL, rfl⟩
       have e1 : (L.map (fun s => ρ.r s.1 s.2.1 s.2.2)).prod = φ ⟨_, hx⟩ := by
@@ -277,16 +309,19 @@ theorem finPtOf : FinPtOf := by
     · simpa using hprod [(g, 0, 1), (g, 1, 0)] (by simp [w]) ⟨(g, 0, 1), by simp, by simp⟩
     · simpa using hprod [(g, 0, 2), (g, 2, 0)] (by simp [w]) ⟨(g, 0, 2), by simp, by simp⟩
     · simpa using hprod [(g, 1, 2), (g, 2, 1)] (by simp [w]) ⟨(g, 1, 2), by simp, by simp⟩
-    · simpa using hprod [(g, 0, 1), (g, 1, 2), (g, 2, 0)] (by simp [w]) ⟨(g, 0, 1), by simp, by simp⟩
-    · simpa using hprod [(g, 0, 2), (g, 2, 1), (g, 1, 0)] (by simp [w]) ⟨(g, 0, 2), by simp, by simp⟩
+    · simpa using
+        hprod [(g, 0, 1), (g, 1, 2), (g, 2, 0)] (by simp [w]) ⟨(g, 0, 1), by simp, by simp⟩
+    · simpa using
+        hprod [(g, 0, 2), (g, 2, 1), (g, 1, 0)] (by simp [w]) ⟨(g, 0, 2), by simp, by simp⟩
     · have e : S.inc (S.aB g i) = S.u.r g i i := rfl
       rw [hent, ← e]
       show φ (S.aB g i) = _
       rw [hval]
       congr 1
       exact S.lift.2.1.1 g i
-  · have htri : (∀ (g : F.G0) (i j : Fin 3), j < i → ρ.r g i j = 0) ∨
-        (∀ (g : F.G0) (i j : Fin 3), i < j → ρ.r g i j = 0) := by
+  · have htri
+        : (∀ (g : F.G0) (i j : Fin 3), j < i → ρ.r g i j = 0)
+          ∨ (∀ (g : F.G0) (i j : Fin 3), i < j → ρ.r g i j = 0) := by
       unfold NRep.OffTri at hOT
       rw [not_and_or, not_not, not_not] at hOT
       rcases hOT with h | h
@@ -298,9 +333,11 @@ theorem finPtOf : FinPtOf := by
         intro g i j hij
         rw [hent]
         exact h (Ideal.subset_span ⟨g, i, j, hij, rfl⟩)
-    have hcyc : ∀ g : F.G0, ρ.r g 0 1 * ρ.r g 1 0 = 0 ∧ ρ.r g 0 2 * ρ.r g 2 0 = 0 ∧
-        ρ.r g 1 2 * ρ.r g 2 1 = 0 ∧ ρ.r g 0 1 * (ρ.r g 1 2 * ρ.r g 2 0) = 0 ∧
-        ρ.r g 0 2 * (ρ.r g 2 1 * ρ.r g 1 0) = 0 := by
+    have hcyc
+        : ∀ g : F.G0,
+          ρ.r g 0 1 * ρ.r g 1 0 = 0 ∧ ρ.r g 0 2 * ρ.r g 2 0 = 0 ∧ ρ.r g 1 2 * ρ.r g 2 1 = 0
+            ∧ ρ.r g 0 1 * (ρ.r g 1 2 * ρ.r g 2 0) = 0
+            ∧ ρ.r g 0 2 * (ρ.r g 2 1 * ρ.r g 1 0) = 0 := by
       intro g
       rcases htri with h | h
       · simp [h g 1 0 (by decide), h g 2 0 (by decide), h g 2 1 (by decide)]
@@ -315,9 +352,11 @@ theorem finPtOf : FinPtOf := by
       · rw [ht h b i hb', mul_zero]
       · rw [ht h b i hb', mul_zero]
       · rw [ht g i b hb', zero_mul]
-    have hbar : ∀ (g : F.G0) (i : Fin 3), ρ.r g i i
-        - algebraMap (ResidueField O) A ((F.Ψ (g : F.Γ) ^ w 3 i : (ResidueField O)ˣ) : ResidueField O)
-        ∈ maximalIdeal A := by
+    have hbar
+        : ∀ (g : F.G0) (i : Fin 3),
+          ρ.r g i i - algebraMap (ResidueField O) A
+              ((F.Ψ (g : F.Γ) ^ w 3 i : (ResidueField O)ˣ) : ResidueField O)
+            ∈ maximalIdeal A := by
       intro g i
       refine Ideal.Quotient.eq.1 ?_
       have hb := hρ.bar.1 g i
@@ -335,12 +374,14 @@ theorem finPtOf : FinPtOf := by
       rw [charpoly_of_cyc _ c1 c2 c3 c4 c5] at this
       have hev := congrArg (Polynomial.eval (ρ.r (F.loc0 v x) i i)) this
       rw [Polynomial.eval_prod, Polynomial.eval_prod,
-        Finset.prod_eq_zero (Finset.mem_univ i) (by simp)] at hev
+          Finset.prod_eq_zero (Finset.mem_univ i) (by simp)]
+        at hev
       have hone : ∀ j, (ξ : S.A →+* A) ((S.u.ψ v j x : (↥S.A)ˣ) : S.A) = 1 := by
         intro j
         rw [RingHom.coe_coe, ← hψent, hψ v j x hx hΨ, Units.val_one]
-      simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, hone,
-        Polynomial.eval_sub, Polynomial.eval_X, Polynomial.eval_C] at hev
+      simp only [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, hone, Polynomial.eval_sub,
+          Polynomial.eval_X, Polynomial.eval_C]
+        at hev
       obtain ⟨j, -, hj⟩ := Finset.prod_eq_zero_iff.1 hev.symm
       exact sub_eq_zero.1 hj
     exact diag_eq hF (algebraMap (ResidueField O) A) ρ hρ.cont hbar hmul h1 g i

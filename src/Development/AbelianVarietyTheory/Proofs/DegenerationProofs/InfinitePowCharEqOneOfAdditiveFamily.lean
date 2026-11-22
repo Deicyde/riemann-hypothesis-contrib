@@ -6,30 +6,32 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem exists_forall_eval_add_ne_zero {k : Type} [Field k] [Infinite k] {Q : Polynomial k}
-    (hQ : Q ≠ 0) (S : Finset k) : ∃ β : k, ∀ c ∈ S, Q.eval (c + β) ≠ 0 := by
+theorem exists_forall_eval_add_ne_zero
+    {k : Type} [Field k] [Infinite k] {Q : Polynomial k} (hQ : Q ≠ 0) (S : Finset k)
+    : ∃ β : k, ∀ c ∈ S, Q.eval (c + β) ≠ 0 := by
   classical
-  obtain ⟨β, hβ⟩ := Infinite.exists_notMem_finset
-    ((S ×ˢ Q.roots.toFinset).image (fun x : k × k => x.2 - x.1))
+  obtain ⟨β, hβ⟩ :=
+    Infinite.exists_notMem_finset ((S ×ˢ Q.roots.toFinset).image (fun x : k × k => x.2 - x.1))
   refine ⟨β, fun c hc h => hβ ?_⟩
   refine Finset.mem_image.2 ⟨(c, c + β), ?_, by simp⟩
   simp [hc, hQ, h]
 
-theorem infinite_pow_char_eq_one_of_additive_family :
-    ∀ (k : Type) [Field k] [Infinite k] (p : ℕ) [CharP k p] (M : Type) [Group M] (A : Type)
-      [CommRing A] [Algebra k A] (r : ℕ) (f : Fin r → A) (ε : A →ₐ[k] k)
-      (em : (A →ₐ[k] k) → M) (Pd : Polynomial k) (P : Fin r → Polynomial k)
-      (ψ : k → (A →ₐ[k] k)), Algebra.adjoin k (Set.range f) = ⊤ → (∀ i, ε (f i) = 0) →
-      Function.Injective em → em ε = 1 → Pd ≠ 0 → (∃ i, P i ≠ 0) →
-      (∀ t, Pd.eval t ≠ 0 → ∀ i, ψ t (f i) * Pd.eval t = (P i).eval t) →
-      (∀ t t', Pd.eval t ≠ 0 → Pd.eval t' ≠ 0 → Pd.eval (t + t') ≠ 0 →
-        em (ψ t) * em (ψ t') = em (ψ (t + t'))) → Infinite {x : M // x ^ p = 1} := by
+theorem infinite_pow_char_eq_one_of_additive_family
+    : ∀ (k : Type) [Field k] [Infinite k] (p : ℕ) [CharP k p] (M : Type) [Group M] (A : Type)
+        [CommRing A] [Algebra k A] (r : ℕ) (f : Fin r → A) (ε : A →ₐ[k] k) (em : (A →ₐ[k] k) → M)
+        (Pd : Polynomial k) (P : Fin r → Polynomial k) (ψ : k → (A →ₐ[k] k)),
+      Algebra.adjoin k (Set.range f) = ⊤ → (∀ i, ε (f i) = 0) → Function.Injective em → em ε = 1
+        → Pd ≠ 0 → (∃ i, P i ≠ 0) → (∀ t, Pd.eval t ≠ 0 → ∀ i, ψ t (f i) * Pd.eval t = (P i).eval t)
+        → (∀ t t',
+          Pd.eval t ≠ 0 → Pd.eval t' ≠ 0 → Pd.eval (t + t') ≠ 0
+            → em (ψ t) * em (ψ t') = em (ψ (t + t')))
+        → Infinite {x : M // x ^ p = 1} := by
   intro k _ _ p _ M _ A _ _ r f ε em Pd P ψ hgen hε hinj hem hPd hP hval hadd
   classical
   have hpow : ∀ α, Pd.eval α ≠ 0 → em (ψ α) ^ p = 1 := by
     intro α hα
-    obtain ⟨β, hβ⟩ := exists_forall_eval_add_ne_zero hPd
-      ((Finset.range (p + 1)).image (fun n : ℕ => (n : k) * α))
+    obtain ⟨β, hβ⟩ :=
+      exists_forall_eval_add_ne_zero hPd ((Finset.range (p + 1)).image (fun n : ℕ => (n : k) * α))
     have hβ' : ∀ n : ℕ, n ≤ p → Pd.eval ((n : k) * α + β) ≠ 0 := fun n hn =>
       hβ _ (Finset.mem_image.2 ⟨n, Finset.mem_range.2 (by omega), rfl⟩)
     have key : ∀ n : ℕ, n ≤ p → em (ψ α) ^ n * em (ψ β) = em (ψ ((n : k) * α + β)) := by
@@ -48,8 +50,7 @@ theorem infinite_pow_char_eq_one_of_additive_family :
   by_contra hfin
   rw [not_infinite_iff_finite] at hfin
   have hU : Set.Infinite {t : k | Pd.eval t ≠ 0} := by
-    have : {t : k | Pd.eval t ≠ 0} = {t : k | Pd.IsRoot t}ᶜ := by
-      ext t; simp
+    have : {t : k | Pd.eval t ≠ 0} = {t : k | Pd.IsRoot t}ᶜ := by ext t; simp
     rw [this]
     exact (Polynomial.finite_setOf_isRoot hPd).infinite_compl
   haveI : Infinite {t : k | Pd.eval t ≠ 0} := hU.to_subtype
@@ -57,8 +58,7 @@ theorem infinite_pow_char_eq_one_of_additive_family :
   obtain ⟨y, hy⟩ := Finite.exists_infinite_fiber g
   obtain ⟨⟨t₀, ht₀⟩⟩ : Nonempty (g ⁻¹' {y}) := inferInstance
   have hy' : (g ⁻¹' {y}).Infinite := Set.infinite_coe_iff.1 hy
-  have hy'' : (Subtype.val '' (g ⁻¹' {y})).Infinite :=
-    hy'.image Subtype.val_injective.injOn
+  have hy'' : (Subtype.val '' (g ⁻¹' {y})).Infinite := hy'.image Subtype.val_injective.injOn
   set χ := ψ t₀.1 with hχ
   have hpoly : ∀ i, P i = Polynomial.C (χ (f i)) * Pd := by
     intro i

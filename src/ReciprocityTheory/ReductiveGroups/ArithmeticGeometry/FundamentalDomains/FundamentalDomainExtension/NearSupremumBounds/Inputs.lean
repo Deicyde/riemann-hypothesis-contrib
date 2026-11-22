@@ -24,9 +24,11 @@ theorem fourierJacobi_realFlow : FjRealFlow (E := E) := by
 
   exact X.fj_flow_real la ξ hξ ν P hP'.1.1 hP'.1.2 x hx s
 
-theorem fd_fj_near_sup_full :
-    HolomorphicPeriodicityExtension (E := E) → FlowNormRatio (E := E) → ModerateCoefficientPositivity (E := E) →
-      NearSupremumTransference (E := E) :=
-  fd_fj_near_sup_of flowDomainCriterion_holds fourierJacobi_holomorphic fourierJacobi_realFlow orthonormalFlagTranslate_holds
+theorem fd_fj_near_sup_full
+    : HolomorphicPeriodicityExtension (E := E) → FlowNormRatio (E := E)
+      → ModerateCoefficientPositivity (E := E)
+      → NearSupremumTransference (E := E) :=
+  fd_fj_near_sup_of flowDomainCriterion_holds fourierJacobi_holomorphic fourierJacobi_realFlow
+    orthonormalFlagTranslate_holds
 
 end PI.FdFjNearSup.W

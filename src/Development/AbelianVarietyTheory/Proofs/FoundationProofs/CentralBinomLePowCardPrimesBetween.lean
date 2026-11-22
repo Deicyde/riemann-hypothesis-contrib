@@ -93,12 +93,13 @@ private lemma centralBinom_le_pow_mul_four_pow_mul_prod_large_primes (m : ℕ) (
             _ ≤ 4 ^ (2 * m / 3) := primorial_le_four_pow _
         · rw [← Finset.prod_filter]
 
-
 open Polynomial Classical in
-theorem _root_.GlobalTheory.BadShare.inv_log_le_sum_inv_primes_between :
-    ∀ N : ℕ, 100000 ≤ N → 1 / (10 * Real.log N) ≤
-      ∑ p ∈ (Finset.range (N + 1)).filter (fun p => p.Prime ∧ N < 2 * p ∧ p + 3 ≤ N),
-        (1 : ℝ) / p := by
+theorem _root_.GlobalTheory.BadShare.inv_log_le_sum_inv_primes_between
+    : ∀ N : ℕ,
+      100000 ≤ N
+        → 1 / (10 * Real.log N)
+          ≤ ∑ p ∈ (Finset.range (N + 1)).filter (fun p => p.Prime ∧ N < 2 * p ∧ p + 3 ≤ N),
+              (1 : ℝ) / p := by
   intro N hN
   set S := (Finset.range (N + 1)).filter (fun p => p.Prime ∧ N < 2 * p ∧ p + 3 ≤ N) with hS
   set m := N / 2 with hm
@@ -106,57 +107,66 @@ theorem _root_.GlobalTheory.BadShare.inv_log_le_sum_inv_primes_between :
   set k := S.card with hk
   set q := 2 * m / 3 with hq
   have hm3 : 2 < m := by omega
-  have hT : ∏ p ∈ (Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p), p ≤
-      N ^ 3 * N ^ k := by
+  have hT
+      : ∏ p ∈ (Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p), p ≤ N ^ 3 * N ^ k := by
     rw [← Finset.prod_filter_mul_prod_filter_not
-      ((Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p)) (· ∈ S), mul_comm]
+        ((Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p)) (· ∈ S),
+      mul_comm]
     apply Nat.mul_le_mul
-    · have hsub : ((Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p)).filter
-          (fun x => x ∉ S) ⊆ Finset.Icc (N - 2) N := by
+    · have hsub
+          : ((Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p)).filter (fun x => x ∉ S)
+            ⊆ Finset.Icc (N - 2) N := by
         intro x hx
         simp only [Finset.mem_filter, Finset.mem_range] at hx
         obtain ⟨⟨h1, h2, h3⟩, h4⟩ := hx
-        have h5 : ¬ (x + 3 ≤ N) := fun h5 => h4 (by
-          rw [hS]
-          simp only [Finset.mem_filter, Finset.mem_range]
-          exact ⟨by omega, h2, by omega, h5⟩)
+        have h5 : ¬(x + 3 ≤ N) := fun h5 =>
+          h4 (by
+            rw [hS]
+            simp only [Finset.mem_filter, Finset.mem_range]
+            exact ⟨by omega, h2, by omega, h5⟩)
         rw [Finset.mem_Icc]
         omega
-      calc _ ≤ N ^ (((Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p)).filter
+      calc
+        _ ≤ N ^ (((Finset.range (2 * m + 1)).filter (fun p => p.Prime ∧ m < p)).filter
             (fun x => x ∉ S)).card :=
-            Finset.prod_le_pow_card _ _ _ (fun x hx => (Finset.mem_Icc.mp (hsub hx)).2)
+          Finset.prod_le_pow_card _ _ _ (fun x hx => (Finset.mem_Icc.mp (hsub hx)).2)
         _ ≤ N ^ 3 := by
-            apply Nat.pow_le_pow_right (by omega)
-            calc _ ≤ (Finset.Icc (N - 2) N).card := Finset.card_le_card hsub
-              _ = 3 := by rw [Nat.card_Icc]; omega
-    · calc _ ≤ ∏ x ∈ S, x := by
-            apply Finset.prod_le_prod_of_subset_of_one_le'
-            · intro x hx
-              exact (Finset.mem_filter.mp hx).2
-            · intro x hx _
-              rw [hS] at hx
-              exact (Finset.mem_filter.mp hx).2.1.one_lt.le
-        _ ≤ N ^ k := Finset.prod_le_pow_card _ _ _ (fun x hx => by
+          apply Nat.pow_le_pow_right (by omega)
+          calc
+            _ ≤ (Finset.Icc (N - 2) N).card := Finset.card_le_card hsub
+            _ = 3 := by rw [Nat.card_Icc]; omega
+    · calc
+        _ ≤ ∏ x ∈ S, x := by
+          apply Finset.prod_le_prod_of_subset_of_one_le'
+          · intro x hx
+            exact (Finset.mem_filter.mp hx).2
+          · intro x hx _
+            rw [hS] at hx
+            exact (Finset.mem_filter.mp hx).2.1.one_lt.le
+        _ ≤ N ^ k :=
+          Finset.prod_le_pow_card _ _ _ (fun x hx => by
             rw [hS] at hx
             have := (Finset.mem_filter.mp hx).1
             rw [Finset.mem_range] at this
             omega)
   have hnat : 4 ^ m < N ^ (s + 5 + k) * 4 ^ q := by
-    calc 4 ^ m < m * m.centralBinom := Nat.four_pow_lt_mul_centralBinom m (by omega)
+    calc
+      4 ^ m
+        < m * m.centralBinom := Nat.four_pow_lt_mul_centralBinom m (by omega)
       _ ≤ N * ((2 * m) ^ (s + 1) * 4 ^ q * (N ^ 3 * N ^ k)) :=
-          Nat.mul_le_mul (by omega)
-            (le_trans (centralBinom_le_pow_mul_four_pow_mul_prod_large_primes m hm3)
-              (Nat.mul_le_mul_left _ hT))
+        Nat.mul_le_mul (by omega)
+          (le_trans (centralBinom_le_pow_mul_four_pow_mul_prod_large_primes m hm3)
+            (Nat.mul_le_mul_left _ hT))
       _ ≤ N * (N ^ (s + 1) * 4 ^ q * (N ^ 3 * N ^ k)) := by
-          gcongr
-          omega
+        gcongr
+        omega
       _ = N ^ (s + 5 + k) * 4 ^ q := by ring
   have hN0 : (0 : ℝ) < N := by exact_mod_cast (by omega : 0 < N)
   have hreal : (m : ℝ) * Real.log 4 < (s + 5 + k) * Real.log N + q * Real.log 4 := by
     have h' : (4 : ℝ) ^ m < (N : ℝ) ^ (s + 5 + k) * (4 : ℝ) ^ q := by exact_mod_cast hnat
     have h2 := Real.log_lt_log (by positivity) h'
-    rw [Real.log_mul (pow_pos hN0 _).ne' (by positivity), Real.log_pow, Real.log_pow,
-      Real.log_pow] at h2
+    rw [Real.log_mul (pow_pos hN0 _).ne' (by positivity), Real.log_pow, Real.log_pow, Real.log_pow]
+      at h2
     push_cast at h2
     linarith
   have hq3 : (3 : ℝ) * q ≤ 2 * m := by exact_mod_cast (by omega : 3 * q ≤ 2 * m)
@@ -195,15 +205,15 @@ theorem _root_.GlobalTheory.BadShare.inv_log_le_sum_inv_primes_between :
     rw [Finset.mem_range] at h1
     apply one_div_le_one_div_of_le (by exact_mod_cast h2.pos)
     exact_mod_cast (by omega : p ≤ N)
-  have hA : ((m : ℝ) - q) * 1.386 ≤ (m : ℝ) * Real.log 4 - q * Real.log 4 := by
-    nlinarith
+  have hA : ((m : ℝ) - q) * 1.386 ≤ (m : ℝ) * Real.log 4 - q * Real.log 4 := by nlinarith
   have hB : ((s : ℝ) + 5) * Real.log N ≤ (t + 5) * (7.72 + t / 50) :=
     mul_le_mul (by linarith) hL hLpos.le (by positivity)
   have hkey : (N : ℝ) ≤ k * (10 * Real.log N) := by
     nlinarith [mul_nonneg (sub_nonneg.mpr htlow) ht0]
-  calc 1 / (10 * Real.log N) ≤ k * (1 / N) := by
-        rw [mul_one_div, div_le_div_iff₀ (by positivity) hN0]
-        linarith
+  calc
+    1 / (10 * Real.log N) ≤ k * (1 / N) := by
+      rw [mul_one_div, div_le_div_iff₀ (by positivity) hN0]
+      linarith
     _ ≤ _ := hsum
 
 end GlobalTheory.BadShare

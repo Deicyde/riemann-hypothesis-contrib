@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LValEtaBounds
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.MainNotions.S
+open NumberField Matrix GlobalTheory.Mass Formalism.HermitianLatticesTheory Formalism.BasicNotions
+  Formalism.MainNotions.S
 open scoped ENNReal Classical
 
 namespace GlobalTheory.MassRatioInvBound
@@ -36,25 +37,31 @@ private lemma one_le_factorial_mul_exp_div_pow (k : ℕ) (hk : 1 ≤ k) :
   rw [mul_comm]
   exact h
 
-theorem one_le_ratio_mul (f k : ℕ) (v L : ℝ) (hv : 0 < v) (hk : 1 ≤ k) (hL : ((2 : ℝ) ^ f)⁻¹ ≤ L) :
-    1 ≤ (((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) ^ f / Real.sqrt ((2 * v) ^ f) * L *
-      ((Real.exp 1 * Real.pi / (k * v)) ^ (k * f) * (2 * (k : ℝ) * (2 * v) ^ ((1 : ℝ) / 2)) ^ f) := by
+theorem one_le_ratio_mul (f k : ℕ) (v L : ℝ) (hv : 0 < v) (hk : 1 ≤ k) (hL : ((2 : ℝ) ^ f)⁻¹ ≤ L)
+    : 1
+      ≤ (((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) ^ f / Real.sqrt ((2 * v) ^ f) * L
+        * ((Real.exp 1 * Real.pi / (k * v)) ^ (k * f)
+          * (2 * (k : ℝ) * (2 * v) ^ ((1 : ℝ) / 2)) ^ f) := by
   have hkpos : (0 : ℝ) < k := by exact_mod_cast (show 0 < k by omega)
   have hpi := Real.pi_pos
   have hs0 : 0 < Real.sqrt (2 * v) := Real.sqrt_pos.mpr (by linarith)
   have hrp : (2 * v) ^ ((1 : ℝ) / 2) = Real.sqrt (2 * v) := by rw [Real.sqrt_eq_rpow]
   rw [hrp, sqrt_pow_eq_pow_sqrt (2 * v) (by linarith) f, pow_mul]
 
-  have hcol : (((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) ^ f / Real.sqrt (2 * v) ^ f * L *
-      (((Real.exp 1 * Real.pi / (k * v)) ^ k) ^ f * (2 * (k : ℝ) * Real.sqrt (2 * v)) ^ f) =
-      ((((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) * (Real.exp 1 * Real.pi / (k * v)) ^ k *
-        (2 * (k : ℝ) * Real.sqrt (2 * v)) / Real.sqrt (2 * v)) ^ f * L := by
+  have hcol
+      : (((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) ^ f / Real.sqrt (2 * v) ^ f * L
+          * (((Real.exp 1 * Real.pi / (k * v)) ^ k) ^ f * (2 * (k : ℝ) * Real.sqrt (2 * v)) ^ f)
+        = ((((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) * (Real.exp 1 * Real.pi / (k * v)) ^ k
+              * (2 * (k : ℝ) * Real.sqrt (2 * v)) / Real.sqrt (2 * v))
+            ^ f
+          * L := by
     rw [div_pow, mul_pow, mul_pow]
     ring
 
-  have hbase : (((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) * (Real.exp 1 * Real.pi / (k * v)) ^ k *
-      (2 * (k : ℝ) * Real.sqrt (2 * v)) / Real.sqrt (2 * v) =
-      (((k - 1).factorial : ℝ) * k * (Real.exp 1) ^ k / (k : ℝ) ^ k) * 2 := by
+  have hbase
+      : (((k - 1).factorial : ℝ) * (v / Real.pi) ^ k) * (Real.exp 1 * Real.pi / (k * v)) ^ k
+          * (2 * (k : ℝ) * Real.sqrt (2 * v)) / Real.sqrt (2 * v)
+        = (((k - 1).factorial : ℝ) * k * (Real.exp 1) ^ k / (k : ℝ) ^ k) * 2 := by
     have hv0 : v ≠ 0 := hv.ne'
     have hk0 : (k : ℝ) ≠ 0 := hkpos.ne'
     have hp0 : Real.pi ≠ 0 := hpi.ne'
@@ -63,13 +70,16 @@ theorem one_le_ratio_mul (f k : ℕ) (v L : ℝ) (hv : 0 < v) (hk : 1 ≤ k) (hL
     field_simp
   rw [hcol, hbase, mul_pow]
   have hA := one_le_factorial_mul_exp_div_pow k hk
-  have hAf : 1 ≤ (((k - 1).factorial : ℝ) * k * (Real.exp 1) ^ k / (k : ℝ) ^ k) ^ f := one_le_pow₀ hA
+  have hAf : 1 ≤ (((k - 1).factorial : ℝ) * k * (Real.exp 1) ^ k / (k : ℝ) ^ k) ^ f :=
+    one_le_pow₀ hA
   have h2 : 1 ≤ (2 : ℝ) ^ f * L := by
     have h := mul_le_mul_of_nonneg_left hL (by positivity : (0 : ℝ) ≤ 2 ^ f)
     rwa [mul_inv_cancel₀ (by positivity)] at h
-  calc (1 : ℝ) = 1 * 1 := by ring
+  calc
+    (1 : ℝ)
+      = 1 * 1 := by ring
     _ ≤ (((k - 1).factorial : ℝ) * k * (Real.exp 1) ^ k / (k : ℝ) ^ k) ^ f * ((2 : ℝ) ^ f * L) :=
-        mul_le_mul hAf h2 zero_le_one (by linarith)
+      mul_le_mul hAf h2 zero_le_one (by linarith)
     _ = _ := by ring
 
 theorem stdH_eq (D : D7) (j : ℕ) : Cnt.stdH D.host.E j = massTelescope_form D.host.E j := rfl
@@ -80,12 +90,18 @@ theorem stdLat_eq (D : D7) (j : ℕ) : Cnt.stdLat D.host.E j = massTelescope_lat
   funext i
   simp [Pi.basisFun_apply]
 
-theorem massS_eq (D : D7) (j : ℕ) :
-    Cnt.massS D j = mass (massTelescope_form D.host.E j) (massTelescope_lat D.host.E j) := by
+theorem massS_eq (D : D7) (j : ℕ)
+    : Cnt.massS D j = mass (massTelescope_form D.host.E j) (massTelescope_lat D.host.E j) := by
   unfold Cnt.massS Cnt.massU
   rw [stdH_eq, stdLat_eq]
 
-theorem mass_pred_le : ∀ D : D7, UnitaryVolumeMass.stMassRatio D → Cnt.massS D (D.R.k - 1) ≤ Cnt.massS D D.R.k * ((Real.exp 1 * Real.pi / (D.R.k * D.host.v)) ^ (D.R.k * D.R.f) * (2 * (D.R.k : ℝ) * D.host.rdE ^ ((1 : ℝ) / 2)) ^ D.R.f) := by
+theorem mass_pred_le
+    : ∀ D : D7,
+      UnitaryVolumeMass.stMassRatio D
+        → Cnt.massS D (D.R.k - 1)
+          ≤ Cnt.massS D D.R.k
+            * ((Real.exp 1 * Real.pi / (D.R.k * D.host.v)) ^ (D.R.k * D.R.f)
+              * (2 * (D.R.k : ℝ) * D.host.rdE ^ ((1 : ℝ) / 2)) ^ D.R.f) := by
   intro D hM
   have hk : 5 ≤ D.R.k := D.R.k_ge
   have hrd : D.host.rdE = 2 * D.host.v := by
@@ -99,13 +115,16 @@ theorem mass_pred_le : ∀ D : D7, UnitaryVolumeMass.stMassRatio D → Cnt.massS
   have hK : Formalism.HermitianLatticesTheory.IsCMUnram D.host.E := D.sp.cm.cmUnram
   have hL := (GlobalTheory.EtaValueBound.lValEta_bounds D.host.E hK D.R.k (by omega)).1
   rw [Formalism.MainNotions.StandardLattice.fDeg_host] at hL
-  have hrat := hM D.R.k (by omega) (Fin D.R.k → D.host.E) (Fin (D.R.k - 1) → D.host.E)
-    (massTelescope_form D.host.E D.R.k) (massTelescope_form D.host.E (D.R.k - 1))
-    (massTelescope_lat D.host.E D.R.k) (massTelescope_lat D.host.E (D.R.k - 1))
-    (massTelescope_symm D.host.E _) (massTelescope_symm D.host.E _)
-    (massTelescope_ortho D.host.E _) (massTelescope_ortho D.host.E _)
+  have hrat :=
+    hM D.R.k (by omega) (Fin D.R.k → D.host.E) (Fin (D.R.k - 1) → D.host.E)
+      (massTelescope_form D.host.E D.R.k) (massTelescope_form D.host.E (D.R.k - 1))
+      (massTelescope_lat D.host.E D.R.k) (massTelescope_lat D.host.E (D.R.k - 1))
+      (massTelescope_symm D.host.E _) (massTelescope_symm D.host.E _)
+      (massTelescope_ortho D.host.E _) (massTelescope_ortho D.host.E _)
   unfold massRatioRightSide at hrat
-  rw [Formalism.MainNotions.StandardLattice.fDeg_host, Formalism.MainNotions.StandardLattice.vInv_host] at hrat
+  rw [Formalism.MainNotions.StandardLattice.fDeg_host,
+      Formalism.MainNotions.StandardLattice.vInv_host]
+    at hrat
   have key := one_le_ratio_mul D.R.f D.R.k D.host.v (lValEta D.host.E D.R.k) hv (by omega) hL
   rw [massS_eq, massS_eq, hrd]
   set a := mass (massTelescope_form D.host.E D.R.k) (massTelescope_lat D.host.E D.R.k) with ha
@@ -132,10 +151,13 @@ theorem mass_pred_le : ∀ D : D7, UnitaryVolumeMass.stMassRatio D → Cnt.massS
     linarith
   have hab : a = R * b := by rw [← hrat, div_mul_cancel₀ a hbne]
   rw [hab]
-  calc b = b * 1 := (mul_one b).symm
-    _ ≤ b * (R * ((Real.exp 1 * Real.pi / (D.R.k * D.host.v)) ^ (D.R.k * D.R.f) *
-        (2 * (D.R.k : ℝ) * (2 * D.host.v) ^ ((1 : ℝ) / 2)) ^ D.R.f)) :=
-        mul_le_mul_of_nonneg_left key hb0
+  calc
+    b = b * 1 := (mul_one b).symm
+    _ ≤ b
+        * (R
+          * ((Real.exp 1 * Real.pi / (D.R.k * D.host.v)) ^ (D.R.k * D.R.f)
+            * (2 * (D.R.k : ℝ) * (2 * D.host.v) ^ ((1 : ℝ) / 2)) ^ D.R.f)) :=
+      mul_le_mul_of_nonneg_left key hb0
     _ = _ := by ring
 
 end GlobalTheory.MassRatioInvBound

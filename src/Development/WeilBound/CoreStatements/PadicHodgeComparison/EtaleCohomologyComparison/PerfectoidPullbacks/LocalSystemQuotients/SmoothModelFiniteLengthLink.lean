@@ -36,15 +36,22 @@ private lemma isHecke_div_and_resEtaPow_div {b : Base} {L : b.Fun} (Q : ObjectPr
       (LinearEquiv.ofBijective _ hb).symm.surjective
   · exact hvan
 
-theorem wittCohomology_finite_length {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] [PerfectRing k l] {O : Type} [CommRing O]
-    {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O)) [IsProper q] [Smooth q] (ρ : O →+* k) (j : ℕ) :
-    IsFiniteLength (WittVector l k) (CH.H (Wc.OM l (B.schFn q) ρ 1) j) := by
+theorem wittCohomology_finite_length
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k] [CharP k l] [PerfectRing k l]
+    {O : Type} [CommRing O]
+    {X : Scheme.{0}} (q : X ⟶ Spec (CommRingCat.of O)) [IsProper q] [Smooth q]
+    (ρ : O →+* k) (j : ℕ)
+    : IsFiniteLength (WittVector l k) (CH.H (Wc.OM l (B.schFn q) ρ 1) j) := by
   obtain ⟨U⟩ := (CrystallineSemistableComparison.Pb.cov_ex q).1 inferInstance
   refine GlobalTheory.T.finite_length_witt_cohomology q ρ j ?_
-  have hvan := GlobalTheory.T.witt_level_one_vanish_above_dim q ρ U (Finset.univ.sup U.d) (fun α => Finset.le_sup (Finset.mem_univ α))
+  have hvan :=
+    GlobalTheory.T.witt_level_one_vanish_above_dim q ρ U (Finset.univ.sup U.d)
+      (fun α => Finset.le_sup (Finset.mem_univ α))
   have hfin := isHecke_div_and_resEtaPow_div _ _ hvan ?hN ?hgr j
   · refine Module.Finite.of_surjective (hM := hfin)
-      (LinearEquiv.ofBijective ((incl ?hle).o.pull j) ?hb).symm.toLinearMap (LinearEquiv.surjective _)
+      (LinearEquiv.ofBijective ((incl ?hle).o.pull j) ?hb).symm.toLinearMap
+      (LinearEquiv.surjective _)
     · intro T hT
       exact ⟨hT.1, ⊤, Set.mem_singleton _, by simp [InU]⟩
     · refine (CrystallineSemistableComparison.Pb.zar ⊤ ?u (Set.range U.U) {⊤} _ ?hcov j).2.2
@@ -54,8 +61,11 @@ theorem wittCohomology_finite_length {l : ℕ} [Fact l.Prime] {k : Type} [Field 
   · exact GlobalTheory.T.truncated_witt_isNoetherian
   · exact GlobalTheory.T.witt_level_one_graded_finite q ρ U
 
-theorem smooth_model_finite_length_link {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : Res l K) (M : Model l K)
-    (hM : M.Sm) (j : ℕ) : IsFiniteLength (WittVector l r.k) ((Wc.HS l (B.schFn M.p) r.ρ j).M 1) := by
+theorem smooth_model_finite_length_link
+    {l : ℕ} [Fact l.Prime]
+    {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (r : Res l K) (M : Model l K) (hM : M.Sm)
+    (j : ℕ)
+    : IsFiniteLength (WittVector l r.k) ((Wc.HS l (B.schFn M.p) r.ρ j).M 1) := by
   have : IsProper M.p := sm_proper hM
   have : Smooth M.p := hM.2
   exact wittCohomology_finite_length M.p r.ρ j

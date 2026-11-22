@@ -19,15 +19,21 @@ noncomputable section
 
 namespace GlobalTheory.WeylLatDualProof
 
-abbrev IncreasingRowChoicePerColumn (N : ℕ) (Y : YoungDiagram) : Type := ∀ c : Fin (Y.rowLen 0), Fin (Y.colLen c) ↪o Fin N
+abbrev IncreasingRowChoicePerColumn (N : ℕ) (Y : YoungDiagram) : Type :=
+  ∀ c : Fin (Y.rowLen 0), Fin (Y.colLen c) ↪o Fin N
 
-def sig {Lt : Type} (N : ℕ) (s : Lt) : Fin N × Fin N → Lt × ℕ × Fin N := fun v => (s, (v.2 : ℕ), v.1)
+def sig {Lt : Type} (N : ℕ) (s : Lt) : Fin N × Fin N → Lt × ℕ × Fin N := fun v =>
+  (s, (v.2 : ℕ), v.1)
 
-theorem map_nablaX {Lt : Type} [Fintype Lt] (K : Type) [CommRing K] (N : ℕ) (nu : Lt → YoungDiagram)
-    (hY : ∀ s, (nu s).colLen 0 ≤ N) (J : WeylLatticeDuality.ColChoice N nu) :
-    map (Int.castRingHom K) (WeylLatticeDuality.nablaX N nu J) =
-      ∏ s, rename (sig N s) (GlobalTheory.WeylMinorDual.colProd K N (nu s) (hY s) (J s)) := by
-  unfold WeylLatticeDuality.nablaX GlobalTheory.WeylMinorDual.colProd Formalism.GradedWeylDivisibility.bideterminant
+theorem map_nablaX
+    {Lt : Type} [Fintype Lt]
+    (K : Type) [CommRing K]
+    (N : ℕ) (nu : Lt → YoungDiagram)
+    (hY : ∀ s, (nu s).colLen 0 ≤ N) (J : WeylLatticeDuality.ColChoice N nu)
+    : map (Int.castRingHom K) (WeylLatticeDuality.nablaX N nu J)
+      = ∏ s, rename (sig N s) (GlobalTheory.WeylMinorDual.colProd K N (nu s) (hY s) (J s)) := by
+  unfold WeylLatticeDuality.nablaX GlobalTheory.WeylMinorDual.colProd
+    Formalism.GradedWeylDivisibility.bideterminant
   rw [map_prod]
   refine Finset.prod_congr rfl fun s _ => ?_
   rw [map_prod, map_prod]

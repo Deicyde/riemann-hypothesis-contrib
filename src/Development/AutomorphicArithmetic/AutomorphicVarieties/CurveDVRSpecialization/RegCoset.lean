@@ -144,22 +144,29 @@ private lemma regCoset_diag (G κ : Type) [Group G] [Field κ] (n : ℕ) (hn : n
 end UpperTheory.V.Pr
 
 open Matrix Polynomial in
-theorem UpperTheory.V.Pr.regCoset :
-    UpperTheory.V.Pr.RegCoset := by
+theorem UpperTheory.V.Pr.regCoset : UpperTheory.V.Pr.RegCoset := by
   intro G κ _ _ n hn r hr u α hα hu y
   have hinj : Function.Injective fun i => ((α i : κˣ) : κ) := by
     intro i j h
     by_contra hij
     exact hα i j hij 1 one_pos (by simpa using Units.ext h)
   obtain ⟨P, hP⟩ := exists_diag (gm r u) _ hinj hu
-  have e : ∀ g, gm ((MulAut.conj P⁻¹).toMonoidHom.comp r) g = ((P⁻¹ * r g * P : GL (Fin n) κ) : Matrix _ _ κ) := by
+  have e
+      : ∀ g,
+        gm ((MulAut.conj P⁻¹).toMonoidHom.comp r) g
+          = ((P⁻¹ * r g * P : GL (Fin n) κ) : Matrix _ _ κ) := by
     intro g
     simp [gm]
-  obtain ⟨h, hh⟩ := regCoset_diag G κ n hn _ (strongIrr_conj r hr P) u α hα (by
-    rw [e, Units.val_mul, Units.val_mul, Matrix.mul_assoc, hP, ← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul])
-    (P⁻¹ * y * P)
+  obtain ⟨h, hh⟩ :=
+    regCoset_diag G κ n hn _ (strongIrr_conj r hr P) u α hα
+      (by
+        rw [e, Units.val_mul, Units.val_mul, Matrix.mul_assoc, hP, ← Matrix.mul_assoc,
+          Units.inv_mul, Matrix.one_mul])
+      (P⁻¹ * y * P)
   refine ⟨h, ?_⟩
   rw [e, ← Units.val_mul] at hh
   have e2 : P⁻¹ * y * P * (P⁻¹ * r h * P) = P⁻¹ * (y * r h * P) := by group
-  rw [e2, Units.val_mul, Matrix.charpoly_mul_comm, ← Units.val_mul, mul_inv_cancel_right, Units.val_mul] at hh
+  rw [e2, Units.val_mul, Matrix.charpoly_mul_comm, ← Units.val_mul, mul_inv_cancel_right,
+      Units.val_mul]
+    at hh
   exact hh

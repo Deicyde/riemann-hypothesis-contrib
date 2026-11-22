@@ -28,8 +28,10 @@ def chC : AddChar (E0 × H) ℂ where
   map_add_eq_mul' a b := by
     rcases a with ⟨⟨a1, a2⟩, ah⟩
     rcases b with ⟨⟨b1, b2⟩, bh⟩
-    have key : ∀ x y : ZMod 2, (if x + y = 0 then (1 : ℂ) else -1)
-        = (if x = 0 then 1 else -1) * (if y = 0 then 1 else -1) := by
+    have key
+        : ∀ x y : ZMod 2,
+          (if x + y = 0 then (1 : ℂ) else -1)
+            = (if x = 0 then 1 else -1) * (if y = 0 then 1 else -1) := by
       intro x y
       have h2 : ∀ z : ZMod 2, z = 0 ∨ z = 1 := by decide
       have h11 : (1 : ZMod 2) + 1 = 0 := rfl
@@ -54,12 +56,9 @@ structure HostFacts (D : ArithData H) : Prop where
   first_prime_ne_two : D.q1 ≠ 2
   d_ne_two : D.d ≠ 2
   firstPrime_ne_secondPrime : D.q1 ≠ D.d
-
   unram : ∀ p : ℕ, p.Prime → p ≠ 2 → p ≠ D.q1 → p ≠ D.d → D.inertia p = ⊥
-
   split_inertia : ∀ p : ℕ, (p = 2 ∨ p = D.q1) → ∀ x ∈ D.inertia p, InPhi x
   split_frob : ∀ p : ℕ, (p = 2 ∨ p = D.q1) → InPhi (D.frob p)
-
   inertia_d : ∀ x, x ∈ D.inertia D.d ↔ x = 0 ∨ x = sgc0
 
 def cosetMean (I : AddSubgroup (E0 × H)) (h : E0 × H) (ψ : AddChar (E0 × H) ℂ) : ℂ := by
@@ -70,7 +69,9 @@ def primVal (D : ArithData H) (ψ : AddChar (E0 × H) ℂ) (n : ℕ) : ℂ :=
   ∏ p ∈ n.primeFactors, cosetMean (D.inertia p) (n.factorization p • D.frob p) ψ
 
 def GPsi (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) (ψ : AddChar (E0 × H) ℂ) (y : ℝ) : ℂ :=
-  if ψ = 0 then ((Gz y : ℝ) : ℂ) else
+  if ψ = 0 then
+    ((Gz y : ℝ) : ℂ)
+  else
     (∑ n ∈ Icc 1 ⌊y⌋₊, (Λ n : ℂ) * primVal D ψ n * ((y / n - 1 : ℝ) : ℂ)) + (y : ℂ) * ell ψ
 
 def IsInert (D : ArithData H) (p : ℕ) : Prop :=
@@ -82,8 +83,9 @@ def askP (D : ArithData H) (N : ℕ) (a : ℝ) (t : H) (w : E0 × H → ℝ) (p 
 
 def askD (D : ArithData H) (N : ℕ) (a : ℝ) (t : H) (w : E0 × H → ℝ) : ℝ := by
   classical
-  exact ∑ i ∈ Icc 1 N, ∑ g ∈ univ.filter (fun g => g - i • D.frob D.d ∈ D.inertia D.d ∧ ¬ InPhi g),
-    max (a / (D.d : ℝ) ^ i - w (partner t g)) 0
+  exact
+    ∑ i ∈ Icc 1 N, ∑ g ∈ univ.filter (fun g => g - i • D.frob D.d ∈ D.inertia D.d ∧ ¬ InPhi g),
+      max (a / (D.d : ℝ) ^ i - w (partner t g)) 0
 
 def ASK (D : ArithData H) (N : ℕ) (a : ℝ) (t : H) (w : E0 × H → ℝ) : ℝ := by
   classical
@@ -91,36 +93,48 @@ def ASK (D : ArithData H) (N : ℕ) (a : ℝ) (t : H) (w : E0 × H → ℝ) : �
     + Real.log D.d * askD D N a t w
 
 def MAIN (ell : AddChar (E0 × H) ℂ → ℂ) (a : ℝ) (w : E0 × H → ℝ) : ℂ :=
-  (a : ℂ) * (((Real.log a - 1 - Real.eulerMascheroniConstant : ℝ) : ℂ) + ell chC
-    - (((1 / ((PhiSet (H := H)).card : ℝ)) * ∑ ρ ∈ PhiSet (H := H), Real.log (w ρ) : ℝ) : ℂ))
+  (a : ℂ)
+    * (((Real.log a - 1 - Real.eulerMascheroniConstant : ℝ) : ℂ) + ell chC
+      - (((1 / ((PhiSet (H := H)).card : ℝ)) * ∑ ρ ∈ PhiSet (H := H), Real.log (w ρ) : ℝ) : ℂ))
 
 def De (D : ArithData H) (ell : AddChar (E0 × H) ℂ → ℂ) (a : ℝ) (t : H) (w : E0 × H → ℝ) : ℂ :=
-  (1 / ((PhiSet (H := H)).card : ℂ)) * ∑ g ∈ univ.filter (fun g : E0 × H => ¬ InPhi g),
-    ∑ ψ : AddChar (E0 × H) ℂ, starRingEnd ℂ (ψ g) * ((w (partner t g) : ℝ) : ℂ)
-      * GPsi D ell ψ (a / w (partner t g))
+  (1 / ((PhiSet (H := H)).card : ℂ))
+    * ∑ g ∈ univ.filter (fun g : E0 × H => ¬ InPhi g),
+      ∑ ψ : AddChar (E0 × H) ℂ, starRingEnd ℂ (ψ g) * ((w (partner t g) : ℝ) : ℂ)
+        * GPsi D ell ψ (a / w (partner t g))
 
 def AskMainBalance : Prop :=
-  ∀ (D : ArithData H), HostFacts D → ∀ (ell : AddChar (E0 × H) ℂ → ℂ) (a : ℝ) (t : H) (w : E0 × H → ℝ),
-    0 < a → (∀ ρ, InPhi ρ → 0 < w ρ) → ∀ N : ℕ, (∀ ρ, InPhi ρ → a / w ρ ≤ N) →
-      (ASK D N a t w : ℂ) - MAIN ell a w = De D ell a t w
+  ∀ (D : ArithData H),
+    HostFacts D
+      → ∀ (ell : AddChar (E0 × H) ℂ → ℂ) (a : ℝ) (t : H) (w : E0 × H → ℝ),
+        0 < a → (∀ ρ, InPhi ρ → 0 < w ρ)
+          → ∀ N : ℕ,
+            (∀ ρ, InPhi ρ → a / w ρ ≤ N) → (ASK D N a t w : ℂ) - MAIN ell a w = De D ell a t w
 
 def PrimValPow : Prop :=
-  ∀ (D : ArithData H) (ψ : AddChar (E0 × H) ℂ) (p i : ℕ), p.Prime → 1 ≤ i →
-    primVal D ψ (p ^ i) = cosetMean (D.inertia p) (i • D.frob p) ψ
+  ∀ (D : ArithData H) (ψ : AddChar (E0 × H) ℂ) (p i : ℕ),
+    p.Prime → 1 ≤ i → primVal D ψ (p ^ i) = cosetMean (D.inertia p) (i • D.frob p) ψ
 
-def PrimValTriv : Prop :=
-  ∀ (D : ArithData H) (n : ℕ), primVal D 0 n = 1
+def PrimValTriv : Prop := ∀ (D : ArithData H) (n : ℕ), primVal D 0 n = 1
 
 def OrthoRam : Prop := by
   classical
-  exact
-  ∀ (D : ArithData H) (p i : ℕ), p.Prime → 1 ≤ i → ∀ g : E0 × H,
-    (1 / ((PhiSet (H := H)).card : ℂ)) * ∑ ψ : AddChar (E0 × H) ℂ, starRingEnd ℂ (ψ g) * primVal D ψ (p ^ i)
-      = if g - i • D.frob p ∈ D.inertia p then 2 / (Nat.card (D.inertia p) : ℂ) else 0
+  exact ∀ (D : ArithData H) (p i : ℕ),
+    p.Prime → 1 ≤ i
+      → ∀ g : E0 × H,
+        (1 / ((PhiSet (H := H)).card : ℂ))
+            * ∑ ψ : AddChar (E0 × H) ℂ, starRingEnd ℂ (ψ g) * primVal D ψ (p ^ i)
+          = if g - i • D.frob p ∈ D.inertia p then 2 / (Nat.card (D.inertia p) : ℂ) else 0
 
 def ColourSum : Prop :=
-  ∀ ψ : AddChar (E0 × H) ℂ, ∑ g ∈ univ.filter (fun g : E0 × H => ¬ InPhi g), starRingEnd ℂ (ψ g)
-    = if ψ = 0 then ((PhiSet (H := H)).card : ℂ) else if ψ = chC then -((PhiSet (H := H)).card : ℂ) else 0
+  ∀ ψ : AddChar (E0 × H) ℂ,
+    ∑ g ∈ univ.filter (fun g : E0 × H => ¬ InPhi g), starRingEnd ℂ (ψ g)
+      = if ψ = 0 then
+          ((PhiSet (H := H)).card : ℂ)
+        else if ψ = chC then
+          -((PhiSet (H := H)).card : ℂ)
+        else
+          0
 
 end
 

@@ -12,17 +12,20 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.MixedDensityNo
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.PshAdd
 
 open ReciprocityTheory.AnForm.M.LocPot
 
-theorem isPshOn_add_psh {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (U : Set X)
-    (P : LocPot X) (f : X → ℝ) (Θ : LocPot X) (hU : IsOpen U) (hP : IsPotential A P)
-    (hΘ : IsPotential A Θ) (hf : A.SmoothOn U f) (hPf : IsPshOn A U (P + LocPot.ofFun f))
-    (hΘp : IsPsh A Θ) : IsPshOn A U (P + LocPot.ofFun f + Θ) := by
+theorem isPshOn_add_psh
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (U : Set X) (P : LocPot X) (f : X → ℝ) (Θ : LocPot X)
+    (hU : IsOpen U) (hP : IsPotential A P) (hΘ : IsPotential A Θ) (hf : A.SmoothOn U f)
+    (hPf : IsPshOn A U (P + LocPot.ofFun f)) (hΘp : IsPsh A Θ)
+    : IsPshOn A U (P + LocPot.ofFun f + Θ) := by
   intro x j y hy w
   obtain ⟨hyt, ⟨⟨hyP, -⟩, hyΘ⟩, hyU⟩ := hy
   have hP2 : ContDiffAt ℝ 2 (P.φ x ∘ (A.chart j).symm) y := by
@@ -41,11 +44,15 @@ theorem isPshOn_add_psh {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtl
     hP2.add hf2
   have h1 := hPf x j y ⟨hyt, ⟨hyP, Set.mem_univ _⟩, hyU⟩ w
   have h2 := hΘp x j y ⟨hyt, hyΘ⟩ w
-  have hsum := ReciprocityTheory.AnForm.levi_add_smul (f := fun z => P.φ x ((A.chart j).symm z) + f ((A.chart j).symm z))
-    (g := Θ.φ x ∘ (A.chart j).symm) 1 hPf2 hΘ2 w
-  have heq : ((P + LocPot.ofFun f + Θ).φ x ∘ (A.chart j).symm) =
-      fun z => (P.φ x ((A.chart j).symm z) + f ((A.chart j).symm z)) +
-        1 * (Θ.φ x ∘ (A.chart j).symm) z := by
+  have hsum :=
+    ReciprocityTheory.AnForm.levi_add_smul
+      (f := fun z => P.φ x ((A.chart j).symm z) + f ((A.chart j).symm z))
+      (g := Θ.φ x ∘ (A.chart j).symm) 1 hPf2 hΘ2 w
+  have heq
+      : ((P + LocPot.ofFun f + Θ).φ x ∘ (A.chart j).symm)
+        = fun z =>
+          (P.φ x ((A.chart j).symm z) + f ((A.chart j).symm z))
+            + 1 * (Θ.φ x ∘ (A.chart j).symm) z := by
     funext z; simp [Function.comp, HAdd.hAdd, Add.add, LocPot.ofFun]
   rw [heq, hsum, one_mul]
   exact add_nonneg h1 h2

@@ -42,8 +42,8 @@ lemma d_zero_apply (σ : Cochain P U 0) (i : Fin 2 → ι) :
   rw [d_apply, Fin.sum_univ_two]
   simp [sub_eq_add_neg]
 
-def constCochain {V : Opens X} (hUV : ∀ a, U a ≤ V) (s : P.obj (op V)) : Cochain P U 0 :=
-  fun i => res P ((inter_le U i 0).trans (hUV (i 0))) s
+def constCochain {V : Opens X} (hUV : ∀ a, U a ≤ V) (s : P.obj (op V)) : Cochain P U 0 := fun i =>
+  res P ((inter_le U i 0).trans (hUV (i 0))) s
 
 lemma d_constCochain {V : Opens X} (hUV : ∀ a, U a ≤ V) (s : P.obj (op V)) :
     d P U 0 (constCochain P U hUV s) = 0 := by
@@ -54,9 +54,8 @@ lemma d_constCochain {V : Opens X} (hUV : ∀ a, U a ≤ V) (s : P.obj (op V)) :
 
 end
 
-variable (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u})
-  (hP : Presheaf.IsSheaf (Opens.grothendieckTopology X) P)
-
+variable
+  (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) (hP : Presheaf.IsSheaf (Opens.grothendieckTopology X) P)
 
 include hP in
 lemma exists_glue {ι : Type w} (U : ι → Opens X) (V : Opens X) (hUV : ∀ a, U a ≤ V)
@@ -95,7 +94,6 @@ lemma exists_glue {ι : Type w} (U : ι → Opens X) (V : Opens X) (hUV : ∀ a,
   rw [← res_res P (inter_le U i 0) (hUV (i 0)), ht']
   simp only [sf, res_res]
   exact (res_congr P U τ hi _ le_rfl).trans (res_refl _ _ _)
-
 
 variable {P} in
 lemma CechAcyclic.of_shortExact' {ι : Type w} (U : ι → Opens X)
@@ -151,8 +149,10 @@ end
 variable (B : Opens X → Prop)
 
 def CechCondition (F : TopCat.Sheaf AddCommGrpCat.{u} X) : Prop :=
-  ∀ V, B V → ∀ (ι : Type u) [Finite ι] (U : ι → Opens X), (∀ a, B (U a)) → iSup U = V →
-    CechAcyclic F.obj U
+  ∀ V,
+    B V
+      → ∀ (ι : Type u) [Finite ι] (U : ι → Opens X),
+        (∀ a, B (U a)) → iSup U = V → CechAcyclic F.obj U
 
 variable {B}
 

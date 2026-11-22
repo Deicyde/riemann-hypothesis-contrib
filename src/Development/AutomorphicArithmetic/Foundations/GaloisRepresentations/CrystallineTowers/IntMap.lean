@@ -6,22 +6,26 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.Pst CrystallineSemistableComparison UpperTheory.Gal.Int.Geo
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.Pst
+  CrystallineSemistableComparison UpperTheory.Gal.Int.Geo
 
 namespace UpperTheory.Gal.Seam
 
 section Place
 
-variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
+variable
+  {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω]
   {w : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω}
 
-private theorem exists_den {x : E} (hx : w.valuation E x ≤ 1) :
-    ∃ a b : 𝓞 E, b ∉ w.asIdeal ∧ x * algebraMap (𝓞 E) E b = algebraMap (𝓞 E) E a := by
+private theorem exists_den {x : E} (hx : w.valuation E x ≤ 1)
+    : ∃ a b : 𝓞 E, b ∉ w.asIdeal ∧ x * algebraMap (𝓞 E) E b = algebraMap (𝓞 E) E a := by
   obtain ⟨n, d, hd, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 E) x
   have hd0 : d ≠ 0 := nonZeroDivisors.ne_zero hd
   have hd1 : algebraMap (𝓞 E) E d ≠ 0 := by simpa using hd0
-  rw [map_div₀, div_le_one₀ (zero_lt_iff.2 (by simpa using hd1)), HeightOneSpectrum.valuation_of_algebraMap,
-    HeightOneSpectrum.valuation_of_algebraMap] at hx
+  rw [map_div₀, div_le_one₀ (zero_lt_iff.2 (by simpa using hd1)),
+      HeightOneSpectrum.valuation_of_algebraMap, HeightOneSpectrum.valuation_of_algebraMap]
+    at hx
   set k := (Associates.mk w.asIdeal).count (Associates.mk (Ideal.span {d})).factors with hk
   have hv : w.intValuation d = WithZero.exp (-(k : ℤ)) := w.intValuation_if_neg hd0
   have h1 : d ∈ w.asIdeal ^ k := (w.intValuation_le_pow_iff_mem d k).1 hv.le
@@ -32,11 +36,12 @@ private theorem exists_den {x : E} (hx : w.valuation E x ≤ 1) :
     push_cast at this
     omega
   obtain ⟨J, hJ⟩ := Ideal.dvd_iff_le.2 ((Ideal.span_singleton_le_iff_mem _).2 h1)
-  have h4 : ¬ J ≤ w.asIdeal := fun h => h3 <| by
-    have : d ∈ Ideal.span {d} := Ideal.mem_span_singleton_self d
-    rw [hJ] at this
-    rw [pow_succ]
-    exact Ideal.mul_mono_right h this
+  have h4 : ¬ J ≤ w.asIdeal := fun h =>
+    h3 <| by
+      have : d ∈ Ideal.span {d} := Ideal.mem_span_singleton_self d
+      rw [hJ] at this
+      rw [pow_succ]
+      exact Ideal.mul_mono_right h this
   obtain ⟨b, hbJ, hb⟩ := SetLike.not_le_iff_exists.1 h4
   have h5 : n * b ∈ Ideal.span {d} := hJ ▸ Ideal.mul_mem_mul h2 hbJ
   obtain ⟨a, ha⟩ := Ideal.mem_span_singleton'.1 h5
@@ -50,12 +55,12 @@ private theorem mem_of_int (a : 𝓞 E) : algebraMap E Ω (algebraMap (𝓞 E) E
   rw [← hy]
   exact y.2
 
-private theorem val_eq_one (hA : IsPlaceOver A w) {b : 𝓞 E} (hb : b ∉ w.asIdeal) :
-    A.valuation (algebraMap E Ω (algebraMap (𝓞 E) E b)) = 1 :=
+private theorem val_eq_one (hA : IsPlaceOver A w) {b : 𝓞 E} (hb : b ∉ w.asIdeal)
+    : A.valuation (algebraMap E Ω (algebraMap (𝓞 E) E b)) = 1 :=
   le_antisymm ((A.valuation_le_one_iff _).2 (mem_of_int b)) (not_lt.1 fun h => hb ((hA b).1 h))
 
-private theorem mem_of_le_one (hA : IsPlaceOver A w) {x : E} (hx : w.valuation E x ≤ 1) :
-    algebraMap E Ω x ∈ A := by
+private theorem mem_of_le_one (hA : IsPlaceOver A w) {x : E} (hx : w.valuation E x ≤ 1)
+    : algebraMap E Ω x ∈ A := by
   obtain ⟨a, b, hb, e⟩ := exists_den hx
   rw [← A.valuation_le_one_iff]
   have h := congrArg (fun y => A.valuation (algebraMap E Ω y)) e
@@ -63,8 +68,8 @@ private theorem mem_of_le_one (hA : IsPlaceOver A w) {x : E} (hx : w.valuation E
   rw [h]
   exact (A.valuation_le_one_iff _).2 (mem_of_int a)
 
-private theorem val_lt_one (hA : IsPlaceOver A w) {x : E} (hx : w.valuation E x < 1) :
-    A.valuation (algebraMap E Ω x) < 1 := by
+private theorem val_lt_one (hA : IsPlaceOver A w) {x : E} (hx : w.valuation E x < 1)
+    : A.valuation (algebraMap E Ω x) < 1 := by
   obtain ⟨a, b, hb, e⟩ := exists_den hx.le
   have hb1 : w.valuation E (algebraMap (𝓞 E) E b) = 1 :=
     le_antisymm (w.valuation_le_one b) (not_lt.1 fun h => hb ((w.valuation_lt_one_iff_mem b).1 h))
@@ -78,8 +83,8 @@ private theorem val_lt_one (hA : IsPlaceOver A w) {x : E} (hx : w.valuation E x 
   rw [h]
   exact (hA a).2 ha
 
-private theorem le_one_of_mem (hA : IsPlaceOver A w) {x : E} (hx : algebraMap E Ω x ∈ A) :
-    w.valuation E x ≤ 1 := by
+private theorem le_one_of_mem (hA : IsPlaceOver A w) {x : E} (hx : algebraMap E Ω x ∈ A)
+    : w.valuation E x ≤ 1 := by
   by_contra h
   have h1 : 1 < w.valuation E x := not_le.1 h
   have h0 : w.valuation E x ≠ 0 := (zero_lt_one.trans h1).ne'
@@ -96,14 +101,19 @@ private theorem le_one_of_mem (hA : IsPlaceOver A w) {x : E} (hx : algebraMap E 
 
 end Place
 
-private theorem mem_OK_iff {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (x : ↥K) :
-    x ∈ OK l K ↔ ‖(x : PadicAlgCl l)‖ ≤ 1 :=
+private theorem mem_OK_iff
+    {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (x : ↥K)
+    : x ∈ OK l K ↔ ‖(x : PadicAlgCl l)‖ ≤ 1 :=
   GroundTheory.PAdicHodge.mem_normInteger
 
-private theorem isUnit_OK_iff {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (y : ↥(OK l K)) :
-    IsUnit y ↔ ‖((y : ↥K) : PadicAlgCl l)‖ = 1 := by
-  have hmul : ∀ a b : ↥(OK l K), ‖(((a * b : ↥(OK l K)) : ↥K) : PadicAlgCl l)‖ =
-      ‖((a : ↥K) : PadicAlgCl l)‖ * ‖((b : ↥K) : PadicAlgCl l)‖ := fun a b => norm_mul _ _
+private theorem isUnit_OK_iff
+    {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} (y : ↥(OK l K))
+    : IsUnit y ↔ ‖((y : ↥K) : PadicAlgCl l)‖ = 1 := by
+  have hmul
+      : ∀ a b : ↥(OK l K),
+        ‖(((a * b : ↥(OK l K)) : ↥K) : PadicAlgCl l)‖
+          = ‖((a : ↥K) : PadicAlgCl l)‖ * ‖((b : ↥K) : PadicAlgCl l)‖ := fun a b =>
+    norm_mul _ _
   have hle : ∀ a : ↥(OK l K), ‖((a : ↥K) : PadicAlgCl l)‖ ≤ 1 := fun a => (mem_OK_iff _).1 a.2
   constructor
   · rintro ⟨u, rfl⟩
@@ -132,7 +142,11 @@ theorem intMap : IntMap := by
     mem_of_le_one hA ((Valuation.mem_valuationSubring_iff _ _).1 x.2)
   have hφ : ∀ x : Ow w, ((kOf Bw).comp (algebraMap (Ow w) E)) x ∈ OK l Bw.Kw.1 := fun x =>
     (mem_OK_iff _).2 ((hj _).1 (hmem x))
-  refine ⟨((kOf Bw).comp (algebraMap (Ow w) E)).codRestrict (OK l Bw.Kw.1) hφ, fun x => rfl, fun ϖ hϖ => ?_⟩
+  refine ⟨
+    ((kOf Bw).comp (algebraMap (Ow w) E)).codRestrict (OK l Bw.Kw.1) hφ,
+    fun x => rfl,
+    fun ϖ hϖ => ?_
+  ⟩
   let ν : Ow w → ℝ := fun x => ‖Bw.j (algebraMap E Ω (algebraMap (Ow w) E x))‖
   let M : ↥(OK l Bw.Kw.1) → ℝ := fun y => ‖((y : ↥Bw.Kw.1) : PadicAlgCl l)‖
   have hν1 : ∀ x, ν x ≤ 1 := fun x => (hj _).1 (hmem x)
@@ -202,12 +216,14 @@ theorem intMap : IntMap := by
     have hprod : ν ϖ = M a * M b := by rw [← hMϖ, hab, hMmul]
     have ha0 : 0 ≤ M a := norm_nonneg _
     have hb0 : 0 ≤ M b := norm_nonneg _
-    have hap : 0 < M a := lt_of_le_of_ne ha0 fun h => by
-      rw [← h, zero_mul] at hprod
-      exact hϖp.ne' hprod
-    have hbp : 0 < M b := lt_of_le_of_ne hb0 fun h => by
-      rw [← h, mul_zero] at hprod
-      exact hϖp.ne' hprod
+    have hap : 0 < M a :=
+      lt_of_le_of_ne ha0 fun h => by
+        rw [← h, zero_mul] at hprod
+        exact hϖp.ne' hprod
+    have hbp : 0 < M b :=
+      lt_of_le_of_ne hb0 fun h => by
+        rw [← h, mul_zero] at hprod
+        exact hϖp.ne' hprod
     have h1 := hbound a ha1 hap
     have h2 := hbound b hb1 hbp
     have h3 : M a * M b ≤ ν ϖ * ν ϖ := mul_le_mul h1 h2 hb0 hϖp.le

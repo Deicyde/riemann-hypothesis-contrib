@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -26,12 +28,14 @@ theorem ku_of : jumpWindows.G5 → D0 → KU := by
     exact mul_left_cancel₀ (hpos 1).ne' (h.symm.trans (mul_one _).symm)
   set F : GA E k → ℂ := fun c => conj (Wh ψ φ c) * (Dt c : ℂ) ^ ((u : ℂ) * Complex.I) with hF
   have hDc : Continuous fun c : GA E k => (Dt c : ℂ) := Complex.continuous_ofReal.comp hcont
-  have hFc : Continuous F := (Complex.continuous_conj.comp hWc).mul
-    (hDc.cpow continuous_const fun c => Complex.ofReal_mem_slitPlane.2 (hpos c))
+  have hFc : Continuous F :=
+    (Complex.continuous_conj.comp hWc).mul
+      (hDc.cpow continuous_const fun c => Complex.ofReal_mem_slitPlane.2 (hpos c))
   have hF1 : F 1 = 1 := by simp [F, h1, hD1]
   refine ⟨{c | Dt c ∈ Set.Ioo (1 / 2 : ℝ) 2} ∩ {c | 0 < (F c).re}, ?_, ?_⟩
   · apply IsOpen.mem_nhds
-    · exact (isOpen_Ioo.preimage hcont).inter (isOpen_lt continuous_const (Complex.continuous_re.comp hFc))
+    · exact (isOpen_Ioo.preimage hcont).inter
+        (isOpen_lt continuous_const (Complex.continuous_re.comp hFc))
     · simp only [Set.mem_inter_iff, Set.mem_ofPred_eq, Set.mem_Ioo, hD1, hF1]
       norm_num
   · rintro c ⟨⟨ha, hb⟩, hc⟩

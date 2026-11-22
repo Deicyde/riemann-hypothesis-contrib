@@ -12,10 +12,12 @@ open scoped ENNReal NNReal Pointwise
 
 namespace PI.FoldUnfold.UnitaryGroupMassFormula
 
-theorem count_ae_one {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G] (μ : Measure G)
-    (S : Subgroup G) [Countable S] (F : Set G) (hF : IsFundamentalDomain S F μ) :
-    ∀ᵐ y ∂μ, ∑' s : S, F.indicator (fun _ => (1 : ℝ≥0∞)) ((s : G) * y) = 1 := by
-
+theorem count_ae_one
+    {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
+    (μ : Measure G)
+    (S : Subgroup G) [Countable S]
+    (F : Set G) (hF : IsFundamentalDomain S F μ)
+    : ∀ᵐ y ∂μ, ∑' s : S, F.indicator (fun _ => (1 : ℝ≥0∞)) ((s : G) * y) = 1 := by
   have hcov := hF.ae_covers
   have hnull : ∀ᵐ y ∂μ, ∀ s t : S, s ≠ t → ¬ ((s : G) * y ∈ F ∧ (t : G) * y ∈ F) := by
     rw [ae_all_iff]
@@ -29,8 +31,10 @@ theorem count_ae_one {G : Type*} [Group G] [MeasurableSpace G] [MeasurableMul G]
       have h1 : ∀ᵐ y ∂μ, y ∉ s⁻¹ • F ∩ t⁻¹ • F := ae_iff.mpr (by simpa using h0)
       filter_upwards [h1] with y hy _ hyy
       apply hy
-      exact ⟨by simpa [Set.mem_inv_smul_set_iff, Subgroup.smul_def] using hyy.1,
-        by simpa [Set.mem_inv_smul_set_iff, Subgroup.smul_def] using hyy.2⟩
+      exact ⟨
+        by simpa [Set.mem_inv_smul_set_iff, Subgroup.smul_def] using hyy.1,
+        by simpa [Set.mem_inv_smul_set_iff, Subgroup.smul_def] using hyy.2
+      ⟩
   filter_upwards [hcov, hnull] with y hy huniq
   obtain ⟨g, hg⟩ := hy
   rw [Subgroup.smul_def, smul_eq_mul] at hg
@@ -47,8 +51,9 @@ theorem foldUnfold_main : PI.FoldUnfold.FoldUnfold := by
     (f := fun d : D => (⟨d.1, hD.1 d.2⟩ : Γ)) (fun a b h => Subtype.ext (congrArg (fun γ : Γ => (γ : G)) h))
 
   have hpt : ∀ᵐ x ∂μ, ∑' γ : Γ, F.indicator f ((γ : G) * x) = ∑' δ : D, f ((δ : G) * x) := by
-    have hA : ∀ᵐ x ∂μ, ∀ δ : D,
-        ∑' s : S, F.indicator (fun _ => (1 : ℝ≥0∞)) ((s : G) * ((δ : G) * x)) = 1 := by
+    have hA
+        : ∀ᵐ x ∂μ, ∀ δ : D,
+          ∑' s : S, F.indicator (fun _ => (1 : ℝ≥0∞)) ((s : G) * ((δ : G) * x)) = 1 := by
       rw [ae_all_iff]
       intro δ
       exact (measurePreserving_mul_left μ (δ : G)).quasiMeasurePreserving.ae (count_ae_one μ S F hF)
@@ -67,7 +72,9 @@ theorem foldUnfold_main : PI.FoldUnfold.FoldUnfold := by
         exact ⟨q, Subtype.ext hq⟩
     rw [← (Equiv.ofBijective e he).tsum_eq, ENNReal.tsum_prod', ENNReal.tsum_comm]
     refine tsum_congr fun δ => ?_
-    calc _ = ∑' s : S, F.indicator (fun _ => (1 : ℝ≥0∞)) ((s : G) * ((δ : G) * x)) * f ((δ : G) * x) := by
+    calc
+      _ = ∑' s : S, F.indicator (fun _ => (1 : ℝ≥0∞)) ((s : G) * ((δ : G) * x)) * f ((δ : G) * x) :=
+        by
           refine tsum_congr fun s => ?_
           show F.indicator f ((s : G) * δ * x) = _
           rw [mul_assoc, ← hfS s s.2 ((δ : G) * x)]
@@ -82,7 +89,7 @@ theorem foldUnfold_main : PI.FoldUnfold.FoldUnfold := by
     exact hx.symm
   · intro γ
     have h1 : AEMeasurable (F.indicator f) μ := hf.aemeasurable.indicator₀ hF.nullMeasurableSet
-    exact (h1.comp_quasiMeasurePreserving
-      (measurePreserving_mul_left μ (γ : G)).quasiMeasurePreserving).restrict
+    exact (h1.comp_quasiMeasurePreserving (measurePreserving_mul_left μ
+      (γ : G)).quasiMeasurePreserving).restrict
 
 end PI.FoldUnfold.UnitaryGroupMassFormula

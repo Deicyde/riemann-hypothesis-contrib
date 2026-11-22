@@ -10,12 +10,21 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Fl GlobalTheory.CompanionTheory.Ar.Flat Filter Topology Metric
 
 namespace GlobalTheory.CompanionTheory.Ar.LbMarking
 
-theorem linearLift_bijective_of_discrete_kernels : ∀ (M : Type) [Group M] (g g' : ℕ) (ex : (Fin g' → ℂ) → M) (r : (Fin g → ℂ) → M) (h : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)), (∀ z w, ex (z + w) = ex z * ex w) → (∀ x, ex (h x) = r x) → Function.Surjective r → (∃ δ : ℝ, 0 < δ ∧ ∀ x, ‖x‖ < δ → r x = 1 → x = 0) → (∃ δ : ℝ, 0 < δ ∧ ∀ y, ‖y‖ < δ → ex y = 1 → y = 0) → Function.Bijective h := by
+theorem linearLift_bijective_of_discrete_kernels
+    : ∀ (M : Type) [Group M] (g g' : ℕ) (ex : (Fin g' → ℂ) → M) (r : (Fin g → ℂ) → M)
+        (h : (Fin g → ℂ) →ₗ[ℂ] (Fin g' → ℂ)),
+      (∀ z w, ex (z + w) = ex z * ex w) → (∀ x, ex (h x) = r x) → Function.Surjective r
+        → (∃ δ : ℝ, 0 < δ ∧ ∀ x, ‖x‖ < δ → r x = 1 → x = 0)
+        → (∃ δ : ℝ, 0 < δ ∧ ∀ y, ‖y‖ < δ → ex y = 1 → y = 0)
+        → Function.Bijective h := by
   intro M _ g g' ex r h hadd hr hsurj ⟨δ, hδ, hsep⟩ ⟨ε, hε, hsep'⟩
   have hex0 : ex 0 = 1 := by
     have h0 := hadd 0 0
@@ -27,14 +36,11 @@ theorem linearLift_bijective_of_discrete_kernels : ∀ (M : Type) [Group M] (g g
     by_contra hne
     have hnorm : 0 < ‖x‖ := norm_pos_iff.mpr hne
     have hs : 0 < δ / (2 * ‖x‖) := by positivity
-    have ht : ((δ / (2 * ‖x‖) : ℝ) : ℂ) ≠ 0 := by
-      exact_mod_cast hs.ne'
-    have h1 : r (((δ / (2 * ‖x‖) : ℝ) : ℂ) • x) = 1 := by
-      rw [← hr, map_smul, hx, smul_zero, hex0]
+    have ht : ((δ / (2 * ‖x‖) : ℝ) : ℂ) ≠ 0 := by exact_mod_cast hs.ne'
+    have h1 : r (((δ / (2 * ‖x‖) : ℝ) : ℂ) • x) = 1 := by rw [← hr, map_smul, hx, smul_zero, hex0]
     have h2 : ‖((δ / (2 * ‖x‖) : ℝ) : ℂ) • x‖ < δ := by
       rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hs]
-      have : δ / (2 * ‖x‖) * ‖x‖ = δ / 2 := by
-        field_simp
+      have : δ / (2 * ‖x‖) * ‖x‖ = δ / 2 := by field_simp
       rw [this]
       linarith
     have h3 := hsep _ h2 h1
@@ -50,8 +56,8 @@ theorem linearLift_bijective_of_discrete_kernels : ∀ (M : Type) [Group M] (g g
         exact h2.symm
       exact hab (sub_eq_zero.mp (hsep' _ (not_le.mp hlt) h1))
     have hK : {y | ex y = 1}.Countable := by
-      have hdisj : ({y | ex y = 1} : Set (Fin g' → ℂ)).PairwiseDisjoint
-          (fun y => ball y (ε / 2)) := by
+      have hdisj
+          : ({y | ex y = 1} : Set (Fin g' → ℂ)).PairwiseDisjoint (fun y => ball y (ε / 2)) := by
         intro a ha b hb hab
         refine Set.disjoint_left.mpr ?_
         intro z hza hzb
@@ -61,7 +67,8 @@ theorem linearLift_bijective_of_discrete_kernels : ∀ (M : Type) [Group M] (g g
         have h4 : dist a b ≤ dist z a + dist z b := dist_triangle_left a b z
         rw [dist_eq_norm a b] at h4
         linarith
-      exact hdisj.countable_of_isOpen (fun _ _ => isOpen_ball)
+      exact hdisj.countable_of_isOpen
+        (fun _ _ => isOpen_ball)
         (fun y _ => ⟨y, mem_ball_self (half_pos hε)⟩)
     choose x hx using fun t : ℂ => hsurj (ex (t • v))
     have hkK : ∀ t, ex (t • v - h (x t)) = 1 := by
@@ -69,8 +76,7 @@ theorem linearLift_bijective_of_discrete_kernels : ∀ (M : Type) [Group M] (g g
       have h2 := hadd (t • v - h (x t)) (h (x t))
       rw [sub_add_cancel, hr, hx t] at h2
       exact right_eq_mul.mp h2
-    have hinj : Function.Injective (fun t : ℂ =>
-        (⟨t • v - h (x t), hkK t⟩ : {y | ex y = 1})) := by
+    have hinj : Function.Injective (fun t : ℂ => (⟨t • v - h (x t), hkK t⟩ : {y | ex y = 1})) := by
       intro s t hst
       by_contra hne
       have h1 : s • v - h (x s) = t • v - h (x t) := congrArg Subtype.val hst

@@ -135,11 +135,16 @@ private lemma bernoulliExpectation_mem_and (q : ℕ → ℝ) {S : Finset ℕ} {i
 
 end UpperTheory.BernoulliSumsFrobeniusOrbits
 
-theorem UpperTheory.BernoulliSumsFrobeniusOrbits.orbit_sum :
-    ∀ (α : Type) [Fintype α] [DecidableEq α] [AddCommGroup α] (p : α → ℝ) (b h t : α), (∃ i : ℕ, b + i • h = t) →
-      ∀ A : Finset ℕ → Prop, ∃ i₀ < addOrderOf h, b + i₀ • h = t ∧
-        ∑ T : Finset α, pw p T * ind (t ∈ T ∧ A ((univ.filter (fun i : Fin (addOrderOf h) => b + (i : ℕ) • h ∈ T)).map Fin.valEmbedding)) =
-          p t * exP (fun i => p (b + i • h)) ((range (addOrderOf h)).erase i₀) (fun U => ind (A (insert i₀ U))) := by
+theorem UpperTheory.BernoulliSumsFrobeniusOrbits.orbit_sum
+    : ∀ (α : Type) [Fintype α] [DecidableEq α] [AddCommGroup α] (p : α → ℝ) (b h t : α),
+      (∃ i : ℕ, b + i • h = t)
+        → ∀ A : Finset ℕ → Prop, ∃ i₀ < addOrderOf h,
+          b + i₀ • h = t
+            ∧ ∑ T : Finset α, pw p T * ind (t ∈ T ∧ A ((univ.filter (fun i : Fin (addOrderOf h) => b + (i : ℕ) • h ∈ T)).map Fin.valEmbedding))
+              = p t * exP
+                (fun i => p (b + i • h))
+                ((range (addOrderOf h)).erase i₀)
+                (fun U => ind (A (insert i₀ U))) := by
   intro α _ _ _ p b h t ht A
   obtain ⟨i, hi⟩ := ht
   have hpos : 0 < addOrderOf h := addOrderOf_pos h
@@ -152,11 +157,13 @@ theorem UpperTheory.BernoulliSumsFrobeniusOrbits.orbit_sum :
     exact Fin.ext (nsmul_injOn_Iio_addOrderOf j.2 k.2 this)
   have h1 := bernoulliExpectation_mem_and (fun i => p (b + i • h)) (mem_range.2 hlt) A
   rw [ht] at h1
-  rw [← h1, ← fin_sum_eq, ← marginal p _ hinj
-    (fun S => ind (i % addOrderOf h ∈ S.map Fin.valEmbedding ∧ A (S.map Fin.valEmbedding)))]
+  rw [← h1, ← fin_sum_eq,
+    ← marginal p _ hinj
+      (fun S => ind (i % addOrderOf h ∈ S.map Fin.valEmbedding ∧ A (S.map Fin.valEmbedding)))]
   refine sum_congr rfl fun T _ => ?_
-  have : t ∈ T ↔ i % addOrderOf h ∈ (univ.filter
-      (fun i : Fin (addOrderOf h) => b + (i : ℕ) • h ∈ T)).map Fin.valEmbedding := by
+  have : t ∈ T
+      ↔ i % addOrderOf h ∈ (univ.filter (fun i : Fin (addOrderOf h) => b + (i : ℕ) • h ∈ T)).map
+        Fin.valEmbedding := by
     rw [show i % addOrderOf h = Fin.valEmbedding (⟨_, hlt⟩ : Fin (addOrderOf h)) from rfl,
       Finset.mem_map']
     simp [hi]

@@ -16,7 +16,8 @@ section V2
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem br_geZ_int (x : WithTop ℤ) (k : ℤ) (h : Formalism.MainNotions.PlaneGramData.geZ x (k : ℝ)) : ((k : ℤ) : WithTop ℤ) ≤ x := by
+theorem br_geZ_int (x : WithTop ℤ) (k : ℤ) (h : Formalism.MainNotions.PlaneGramData.geZ x (k : ℝ))
+    : ((k : ℤ) : WithTop ℤ) ≤ x := by
   induction x using WithTop.recTopCoe with
   | top => exact le_top
   | coe j =>
@@ -24,13 +25,15 @@ theorem br_geZ_int (x : WithTop ℤ) (k : ℤ) (h : Formalism.MainNotions.PlaneG
     have h2 : k ≤ j := by exact_mod_cast h1
     exact_mod_cast h2
 
-theorem br_wt_sub (a b : WithTop ℤ) (n : ℤ) (h : a ≤ b + ((n : ℤ) : WithTop ℤ)) :
-    a + ((-n : ℤ) : WithTop ℤ) ≤ b := by
-  calc a + ((-n : ℤ) : WithTop ℤ) ≤ (b + ((n : ℤ) : WithTop ℤ)) + ((-n : ℤ) : WithTop ℤ) := by gcongr
+theorem br_wt_sub (a b : WithTop ℤ) (n : ℤ) (h : a ≤ b + ((n : ℤ) : WithTop ℤ))
+    : a + ((-n : ℤ) : WithTop ℤ) ≤ b := by
+  calc
+    a + ((-n : ℤ) : WithTop ℤ)
+      ≤ (b + ((n : ℤ) : WithTop ℤ)) + ((-n : ℤ) : WithTop ℤ) := by gcongr
     _ = b := by rw [add_assoc, ← WithTop.coe_add, add_neg_cancel, WithTop.coe_zero, add_zero]
 
-theorem br_onLetter {L : Type} {r : ℕ} (i : L) (β : Fin r →₀ ℕ) :
-    onLetter i β = Formalism.MainNotions.PlaneGramData.atLetter i (fun a => β a) := by
+theorem br_onLetter {L : Type} {r : ℕ} (i : L) (β : Fin r →₀ ℕ)
+    : onLetter i β = Formalism.MainNotions.PlaneGramData.atLetter i (fun a => β a) := by
   classical
   ext ⟨j, b⟩
   unfold onLetter Formalism.MainNotions.PlaneGramData.atLetter
@@ -57,7 +60,9 @@ theorem br_absE {r : ℕ} (β : Fin r →₀ ℕ) : absE β = ∑ a, β a := by
   unfold absE
   exact Finsupp.sum_fintype _ _ (fun _ => rfl)
 
-theorem second_valuation_of_admitted [CharZero (KK O)] (h : Formalism.MainNotions.PlaneGramData.ValuationStabilityAtRing O) : V2 (KK O) := by
+theorem second_valuation_of_admitted
+    [CharZero (KK O)] (h : Formalism.MainNotions.PlaneGramData.ValuationStabilityAtRing O)
+    : V2 (KK O) := by
   classical
   intro L _ _ sg r _ S
   obtain ⟨ha, hb⟩ := h
@@ -110,46 +115,65 @@ section Fock
 
 variable {K : Type} [Field K]
 
-private theorem fock_eq_sum_coeff_mul_expFact_of_support_subset {σ : Type} (F G : MvPolynomial σ K) (S : Finset (σ →₀ ℕ))
-    (hS : F.support ⊆ S) : Formalism.MainNotions.G.fock F G = ∑ m ∈ S, F.coeff m * G.coeff m * (expFact m : K) := by
+private theorem fock_eq_sum_coeff_mul_expFact_of_support_subset
+    {σ : Type} (F G : MvPolynomial σ K) (S : Finset (σ →₀ ℕ)) (hS : F.support ⊆ S)
+    : Formalism.MainNotions.G.fock F G = ∑ m ∈ S, F.coeff m * G.coeff m * (expFact m : K) := by
   unfold Formalism.MainNotions.G.fock
   exact Finset.sum_subset hS (fun m _ hm => by
     simp only [MvPolynomial.mem_support_iff, not_not] at hm
     rw [hm]
     ring)
 
-theorem br_fock_comm {σ : Type} (F G : MvPolynomial σ K) : Formalism.MainNotions.G.fock F G = Formalism.MainNotions.G.fock G F := by
+theorem br_fock_comm {σ : Type} (F G : MvPolynomial σ K)
+    : Formalism.MainNotions.G.fock F G = Formalism.MainNotions.G.fock G F := by
   classical
-  rw [fock_eq_sum_coeff_mul_expFact_of_support_subset F G (F.support ∪ G.support) Finset.subset_union_left,
-    fock_eq_sum_coeff_mul_expFact_of_support_subset G F (F.support ∪ G.support) Finset.subset_union_right]
+  rw [fock_eq_sum_coeff_mul_expFact_of_support_subset F G (F.support ∪ G.support)
+      Finset.subset_union_left,
+    fock_eq_sum_coeff_mul_expFact_of_support_subset G F (F.support ∪ G.support)
+      Finset.subset_union_right]
   exact Finset.sum_congr rfl fun m _ => by ring
 
-theorem br_fock_sub_left {σ : Type} (F F' G : MvPolynomial σ K) :
-    Formalism.MainNotions.G.fock (F - F') G = Formalism.MainNotions.G.fock F G - Formalism.MainNotions.G.fock F' G := by
+theorem br_fock_sub_left {σ : Type} (F F' G : MvPolynomial σ K)
+    : Formalism.MainNotions.G.fock (F - F') G
+      = Formalism.MainNotions.G.fock F G - Formalism.MainNotions.G.fock F' G := by
   classical
   have hsub : (F - F').support ⊆ F.support ∪ F'.support := MvPolynomial.support_sub σ F F'
   rw [fock_eq_sum_coeff_mul_expFact_of_support_subset (F - F') G (F.support ∪ F'.support) hsub,
-    fock_eq_sum_coeff_mul_expFact_of_support_subset F G (F.support ∪ F'.support) Finset.subset_union_left,
-    fock_eq_sum_coeff_mul_expFact_of_support_subset F' G (F.support ∪ F'.support) Finset.subset_union_right, ← Finset.sum_sub_distrib]
+    fock_eq_sum_coeff_mul_expFact_of_support_subset F G (F.support ∪ F'.support)
+      Finset.subset_union_left,
+    fock_eq_sum_coeff_mul_expFact_of_support_subset F' G (F.support ∪ F'.support)
+      Finset.subset_union_right,
+    ← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl fun m _ => by rw [MvPolynomial.coeff_sub]; ring
 
-theorem br_Aset_eq {L : Type} [DecidableEq L] {r : ℕ} [NeZero r] (sg : L → Bool) (S : Finset L) (th : ℤ) :
-    (Aset sg S th : Set (MvPolynomial (L × Fin r) K)) = ASet (⟨sg⟩ : Letters L) (↑S : Set L) th := by
+theorem br_Aset_eq
+    {L : Type} [DecidableEq L] {r : ℕ} [NeZero r] (sg : L → Bool) (S : Finset L) (th : ℤ)
+    : (Aset sg S th : Set (MvPolynomial (L × Fin r) K))
+      = ASet (⟨sg⟩ : Letters L) (↑S : Set L) th := by
   ext F
   show ((th : ℤ) : WithTop ℤ) ≤ valS sg S F ↔ ((th : ℤ) : WithTop ℤ) ≤ Formalism.MainNotions.G.valS (⟨sg⟩ : Letters L) (↑S : Set L) F
   rw [valS_eq]
 
-theorem br_proj_iff {L : Type} [DecidableEq L] {r : ℕ} [NeZero r] (sg : L → Bool) (S : Finset L) (d : L → ℕ)
-    (th : ℤ) (π : MvPolynomial (L × Fin r) K →ₗ[K] MvPolynomial (L × Fin r) K) :
-    IsFockProj (K := K) d (Aset sg S th) π ↔
-      Formalism.MainNotions.PlaneGramData.IsFockProj d (Formalism.MainNotions.PlaneGramData.AK (K := K) (r := r) (⟨sg⟩ : Letters L) (↑S : Set L) d th) π := by
+theorem br_proj_iff
+    {L : Type} [DecidableEq L]
+    {r : ℕ} [NeZero r]
+    (sg : L → Bool) (S : Finset L) (d : L → ℕ) (th : ℤ)
+    (π : MvPolynomial (L × Fin r) K →ₗ[K] MvPolynomial (L × Fin r) K)
+    : IsFockProj (K := K) d (Aset sg S th) π
+      ↔ Formalism.MainNotions.PlaneGramData.IsFockProj d
+        (Formalism.MainNotions.PlaneGramData.AK (K := K) (r := r) (⟨sg⟩ : Letters L) (↑S : Set L) d
+          th)
+        π := by
   rw [br_Aset_eq]
   constructor
   · intro h
-    refine ⟨fun F hF => ⟨(h F hF).1, (h F hF).1, (h F hF).2.1⟩, fun F hF hU => (h F hF).2.2.1 hU.2, ?_⟩
+    refine
+      ⟨fun F hF => ⟨(h F hF).1, (h F hF).1, (h F hF).2.1⟩, fun F hF hU => (h F hF).2.2.1 hU.2, ?_⟩
     intro F hF G hG
-    have h1 : Formalism.MainNotions.G.fock (G - π G) (π F) = 0 := (h G hG).2.2.2 (π F) (h F hF).1 (h F hF).2.1
-    have h2 : Formalism.MainNotions.G.fock (F - π F) (π G) = 0 := (h F hF).2.2.2 (π G) (h G hG).1 (h G hG).2.1
+    have h1 : Formalism.MainNotions.G.fock (G - π G) (π F) = 0 :=
+      (h G hG).2.2.2 (π F) (h F hF).1 (h F hF).2.1
+    have h2 : Formalism.MainNotions.G.fock (F - π F) (π G) = 0 :=
+      (h F hF).2.2.2 (π G) (h G hG).1 (h G hG).2.1
     rw [br_fock_sub_left, sub_eq_zero] at h1 h2
     rw [br_fock_comm (π F) G, h1, br_fock_comm (π G) (π F), h2]
   · intro h F hF
@@ -157,9 +181,12 @@ theorem br_proj_iff {L : Type} [DecidableEq L] {r : ℕ} [NeZero r] (sg : L → 
     show Formalism.MainNotions.G.fock (F - π F) G = 0
     rw [br_fock_sub_left, h.2.2 F hF G hG, h.2.1 G hG ⟨hG, hGU⟩, sub_self]
 
-theorem br_glAct_single {L : Type} [Fintype L] {r : ℕ} (LL : Letters L) (i : L) (hi : LL.vec i = true)
-    (a b : Fin r) (F : MvPolynomial (L × Fin r) K) :
-    glAct K LL ({i} : Set L) a b F = X (i, a) * pderiv (i, b) F := by
+theorem br_glAct_single
+    {L : Type} [Fintype L]
+    {r : ℕ}
+    (LL : Letters L) (i : L) (hi : LL.vec i = true)
+    (a b : Fin r) (F : MvPolynomial (L × Fin r) K)
+    : glAct K LL ({i} : Set L) a b F = X (i, a) * pderiv (i, b) F := by
   classical
   unfold glAct
   rw [LinearMap.sum_apply, Finset.sum_eq_single i]
@@ -182,9 +209,11 @@ theorem br_vR_mul (x y : K) : vR v (x * y) = vR v x + vR v y := by
   induction a using WithTop.recTopCoe <;> induction b using WithTop.recTopCoe <;> simp
   norm_cast
 
-theorem br_le_vBB_iff {σ : Type} (t : ℝ) (F : MvPolynomial σ K) :
-    ((t : ℝ) : WithTop ℝ) ≤ vBB v F ↔ ∀ α, ((t : ℝ) : WithTop ℝ) ≤
-      vR v (F.coeff α) + ((((v (fact α : K)).untopD 0 : ℚ) : ℝ) / 2 : ℝ) := by
+theorem br_le_vBB_iff {σ : Type} (t : ℝ) (F : MvPolynomial σ K)
+    : ((t : ℝ) : WithTop ℝ) ≤ vBB v F
+      ↔ ∀ α,
+        ((t : ℝ) : WithTop ℝ)
+          ≤ vR v (F.coeff α) + ((((v (fact α : K)).untopD 0 : ℚ) : ℝ) / 2 : ℝ) := by
   unfold vBB
   rw [Finset.le_inf_iff]
   constructor
@@ -196,9 +225,11 @@ theorem br_le_vBB_iff {σ : Type} (t : ℝ) (F : MvPolynomial σ K) :
   · intro h α _
     exact h α
 
-theorem br_le_vBB_smul {σ : Type} (c : K) (n : ℚ) (hc : v c = ((n : ℚ) : WithTop ℚ)) (t : ℝ)
-    (F : MvPolynomial σ K) (h : ((t : ℝ) : WithTop ℝ) ≤ vBB v F) :
-    (((t + n : ℝ)) : WithTop ℝ) ≤ vBB v (c • F) := by
+theorem br_le_vBB_smul
+    {σ : Type}
+    (c : K) (n : ℚ) (hc : v c = ((n : ℚ) : WithTop ℚ))
+    (t : ℝ) (F : MvPolynomial σ K) (h : ((t : ℝ) : WithTop ℝ) ≤ vBB v F)
+    : (((t + n : ℝ)) : WithTop ℝ) ≤ vBB v (c • F) := by
   rw [br_le_vBB_iff] at h ⊢
   intro α
   rw [MvPolynomial.coeff_smul, smul_eq_mul, br_vR_mul]
@@ -207,18 +238,22 @@ theorem br_le_vBB_smul {σ : Type} (c : K) (n : ℚ) (hc : v c = ((n : ℚ) : Wi
     rw [hc]
     rfl
   rw [hvc]
-  calc (((t + n : ℝ)) : WithTop ℝ) = ((n : ℝ) : WithTop ℝ) + ((t : ℝ) : WithTop ℝ) := by
-        rw [add_comm]
-        norm_cast
-    _ ≤ ((n : ℝ) : WithTop ℝ) + (vR v (F.coeff α) + ((((v (fact α : K)).untopD 0 : ℚ) : ℝ) / 2 : ℝ)) :=
-        add_le_add le_rfl (h α)
+  calc
+    (((t + n : ℝ)) : WithTop ℝ) = ((n : ℝ) : WithTop ℝ) + ((t : ℝ) : WithTop ℝ) := by
+      rw [add_comm]
+      norm_cast
+    _ ≤ ((n : ℝ) : WithTop ℝ)
+        + (vR v (F.coeff α) + ((((v (fact α : K)).untopD 0 : ℚ) : ℝ) / 2 : ℝ)) :=
+      add_le_add le_rfl (h α)
     _ = _ := by rw [add_assoc]
 
-theorem br_v_inv (c : K) (n : ℚ) (hc : v c = ((n : ℚ) : WithTop ℚ)) : v c⁻¹ = (((-n : ℚ)) : WithTop ℚ) := by
+theorem br_v_inv (c : K) (n : ℚ) (hc : v c = ((n : ℚ) : WithTop ℚ))
+    : v c⁻¹ = (((-n : ℚ)) : WithTop ℚ) := by
   rw [AddValuation.map_inv, hc]
   rfl
 
-theorem br_exists_v {p : ℕ} (hvp : v (p : K) = 1) (N : ℤ) : ∃ c : K, v c = (((N : ℤ) : ℚ) : WithTop ℚ) := by
+theorem br_exists_v {p : ℕ} (hvp : v (p : K) = 1) (N : ℤ)
+    : ∃ c : K, v c = (((N : ℤ) : ℚ) : WithTop ℚ) := by
   refine ⟨(p : K) ^ N, ?_⟩
   rcases Int.eq_nat_or_neg N with ⟨n, rfl | rfl⟩
   · rw [zpow_natCast, AddValuation.map_pow, hvp]
@@ -226,8 +261,10 @@ theorem br_exists_v {p : ℕ} (hvp : v (p : K) = 1) (N : ℤ) : ∃ c : K, v c =
   · rw [zpow_neg, zpow_natCast, AddValuation.map_inv, AddValuation.map_pow, hvp]
     simp
 
-theorem br_le_add_of_forall (y z : WithTop ℝ) (e : ℝ)
-    (h : ∀ t : ℝ, ((t : ℝ) : WithTop ℝ) ≤ y → ((t - e : ℝ) : WithTop ℝ) ≤ z) : y ≤ z + ((e : ℝ) : WithTop ℝ) := by
+theorem br_le_add_of_forall
+    (y z : WithTop ℝ) (e : ℝ)
+    (h : ∀ t : ℝ, ((t : ℝ) : WithTop ℝ) ≤ y → ((t - e : ℝ) : WithTop ℝ) ≤ z)
+    : y ≤ z + ((e : ℝ) : WithTop ℝ) := by
   induction y using WithTop.recTopCoe with
   | top =>
     have hz : z = ⊤ := by
@@ -250,8 +287,9 @@ end BB
 
 section Num
 
-theorem br_exp_le {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) (a b : ℕ) (hab : a ≤ b) :
-    ((r.choose 2 : ℕ) : ℝ) * Real.logb p (2 * (a : ℝ) + r) + 1 ≤ (r : ℝ) ^ 2 * lg p r (2 * b) := by
+theorem br_exp_le {p : ℕ} (hp : 2 ≤ p) {r : ℕ} (hr : 1 ≤ r) (a b : ℕ) (hab : a ≤ b)
+    : ((r.choose 2 : ℕ) : ℝ) * Real.logb p (2 * (a : ℝ) + r) + 1
+      ≤ (r : ℝ) ^ 2 * lg p r (2 * b) := by
   unfold lg
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp
   have hr1 : (1 : ℝ) ≤ r := by exact_mod_cast hr
@@ -276,8 +314,11 @@ section PROJ
 
 variable {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem brPROJ (S0 : UniformizedDVR p O) [CharZero (KK O)] (h4 : Formalism.MainNotions.PlaneGramData.FockProjectorAtRing p O) :
-    PROJ (KK O) (vQ p S0) p 1 := by
+theorem brPROJ
+    (S0 : UniformizedDVR p O)
+    [CharZero (KK O)]
+    (h4 : Formalism.MainNotions.PlaneGramData.FockProjectorAtRing p O)
+    : PROJ (KK O) (vQ p S0) p 1 := by
   classical
   intro hD L _ _ sg r _ d S th
   have hp : p.Prime := hD.prime
@@ -305,7 +346,8 @@ theorem brPROJ (S0 : UniformizedDVR p O) [CharZero (KK O)] (h4 : Formalism.MainN
     have hN1 : -t ≤ (⌈-t⌉ : ℝ) := Int.le_ceil _
     have hN2 : (⌈-t⌉ : ℝ) < -t + 1 := Int.ceil_lt_add_one _
     have hin : InBB (O := O) p (c • F) := by
-      have h2 : Formalism.MainNotions.PlaneGramData.geQ (Formalism.MainNotions.G.vBB (O := O) p (c • F)) 0 := by
+      have h2 : Formalism.MainNotions.PlaneGramData.geQ
+          (Formalism.MainNotions.G.vBB (O := O) p (c • F)) 0 := by
         rw [geQ_vBB_iff hp S0]
         refine le_trans ?_ h1
         rw [WithTop.coe_le_coe]

@@ -17,9 +17,10 @@ namespace Formalism.NG
 
 namespace GlobalDeterminantRelations
 
-variable {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {X' : Type*}
-  {d : Type} [Fintype d] [DecidableEq d] (R' : Subalgebra O (X' → Matrix d d (FractionRing O)))
-  (x' : X')
+variable
+  {O : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {X' : Type*} {d : Type} [Fintype d] [DecidableEq d]
+  (R' : Subalgebra O (X' → Matrix d d (FractionRing O))) (x' : X')
 
 lemma evalSp_smul (r : R') (v : EvalSp O d R' x') (a : d) :
     (r • v : d → FractionRing O) a =
@@ -28,8 +29,8 @@ lemma evalSp_smul (r : R') (v : EvalSp O d R' x') (a : d) :
 instance : SMulCommClass R' (FractionRing O) (EvalSp O d R' x') where
   smul_comm r c v := by
     funext a
-    change (∑ b, (r : X' → Matrix d d (FractionRing O)) x' a b * (c * (v : d → FractionRing O) b)) =
-      c * ∑ b, (r : X' → Matrix d d (FractionRing O)) x' a b * (v : d → FractionRing O) b
+    change (∑ b, (r : X' → Matrix d d (FractionRing O)) x' a b * (c * (v : d → FractionRing O) b))
+      = c * ∑ b, (r : X' → Matrix d d (FractionRing O)) x' a b * (v : d → FractionRing O) b
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     ring
@@ -77,16 +78,18 @@ end GlobalDeterminantRelations
 universe u v w
 
 open GlobalDeterminantRelations in
-theorem globalConcrete_of (hD : StatDescent.{u, v, w}) (hV : StatVccSpan.{u, v}) :
-    CharacterColumnGlobal.{u, v, w} := by
-  intro O _ _ _ X X' T T' Z p q b hT hZ d _ _ R' m g _ _ _ P hdet hφ π' ρπ hρπ α _ _ bl hbl ρk
-    hsurj hblk hcard
+theorem globalConcrete_of (hD : StatDescent.{u, v, w}) (hV : StatVccSpan.{u, v})
+    : CharacterColumnGlobal.{u, v, w} := by
+  intro O _ _ _ X X' T T' Z p q b hT hZ d _ _ R' m g _ _ _ P hdet hφ π' ρπ hρπ α _ _ bl hbl ρk hsurj
+    hblk hcard
   classical
   obtain ⟨C, hC⟩ := genericFin R' O m g α (fun k => {a // bl a = k}) hcard ρk hsurj P
   obtain ⟨f, hfT, hf⟩ := hdet (C * P)
-  have hcomp : ∀ (x' : X') (v : g → EvalSp O d R' x'),
-      relMap (FractionRing O) (EvalSp O d R' x') (C * P) v =
-        relMap (FractionRing O) (EvalSp O d R' x') C (relMap (FractionRing O) (EvalSp O d R' x') P v) := by
+  have hcomp
+      : ∀ (x' : X') (v : g → EvalSp O d R' x'),
+        relMap (FractionRing O) (EvalSp O d R' x') (C * P) v
+          = relMap (FractionRing O) (EvalSp O d R' x') C
+            (relMap (FractionRing O) (EvalSp O d R' x') P v) := by
     intro x' v
     funext i
     show ∑ j, (C * P) i j • v j = ∑ l, C i l • ∑ j, P l j • v j
@@ -95,8 +98,10 @@ theorem globalConcrete_of (hD : StatDescent.{u, v, w}) (hV : StatVccSpan.{u, v})
   have hvanish : ∀ x', p x' ∉ Z → f x' = 0 := by
     intro x' hx
     obtain ⟨φ, hφ0⟩ := hφ x' hx
-    let e := (homEquiv P : (Coker P →ₗ[R'] EvalSp O d R' x') ≃ₗ[FractionRing O]
-      LinearMap.ker (relMap (FractionRing O) (EvalSp O d R' x') P))
+    let e :=
+      (homEquiv P
+        : (Coker P →ₗ[R'] EvalSp O d R' x') ≃ₗ[FractionRing O]
+          LinearMap.ker (relMap (FractionRing O) (EvalSp O d R' x') P))
     have hne : e φ ≠ 0 := fun h => hφ0 (e.injective (h.trans (map_zero e).symm))
     have hv0 : ((e φ : LinearMap.ker _) : g → EvalSp O d R' x') ≠ 0 := fun h => hne (Subtype.ext h)
     have hvk := LinearMap.mem_ker.mp (e φ).2
@@ -142,21 +147,26 @@ theorem globalConcrete_of (hD : StatDescent.{u, v, w}) (hV : StatVccSpan.{u, v})
       exact ⟨x.2, hx⟩
     · rintro ⟨a, ha⟩
       exact ⟨(Classical.arbitrary g, a), ha⟩
-  have hprod : ∀ (s : Finset α) (F : α → O), IsDiscreteValuationRing.addVal O (∏ k ∈ s, F k) =
-      ∑ k ∈ s, IsDiscreteValuationRing.addVal O (F k) := by
+  have hprod
+      : ∀ (s : Finset α) (F : α → O),
+        IsDiscreteValuationRing.addVal O (∏ k ∈ s, F k)
+          = ∑ k ∈ s, IsDiscreteValuationRing.addVal O (F k) := by
     intro s F
     refine Finset.induction_on s ?_ ?_
     · rw [Finset.prod_empty, Finset.sum_empty, IsDiscreteValuationRing.addVal_one]
     · intro a s ha ih
       rw [Finset.prod_insert ha, Finset.sum_insert ha, IsDiscreteValuationRing.addVal_mul, ih]
-  have hblock : ∀ k, ((bigMat (fun r : R' => ρπ r) (C * P)).toSquareBlock
-      (fun x : g × d => bl x.2) k).det = (bigMat (fun r : R' => ρk k r) (C * P)).det := by
+  have hblock
+      : ∀ k,
+        ((bigMat (fun r : R' => ρπ r) (C * P)).toSquareBlock (fun x : g × d => bl x.2) k).det
+          = (bigMat (fun r : R' => ρk k r) (C * P)).det := by
     intro k
-    let eK : g × {a // bl a = k} ≃ {x : g × d // bl x.2 = k} :=
-      { toFun := fun y => ⟨(y.1, y.2.1), y.2.2⟩
-        invFun := fun x => (x.1.1, ⟨x.1.2, x.2⟩)
-        left_inv := fun _ => rfl
-        right_inv := fun _ => rfl }
+    let eK : g × {a // bl a = k} ≃ {x : g × d // bl x.2 = k} := {
+      toFun := fun y => ⟨(y.1, y.2.1), y.2.2⟩
+      invFun := fun x => (x.1.1, ⟨x.1.2, x.2⟩)
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl
+    }
     rw [← Matrix.det_reindex_self eK.symm]
     congr 1
     refine Matrix.ext fun x y => ?_

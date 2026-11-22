@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
+open ValuativeRel Matrix Polynomial GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Sig UpperTheory.V.Z.Sym.Loc
+  UpperTheory.V.Z.Sym.Glob
 
 theorem UpperTheory.V.Z.Sym.Sig.suppZ : UpperTheory.V.Z.Sym.Sig.SuppZ := by
   intro k _ _ _ _ V ω d hd g hg
@@ -23,14 +25,17 @@ theorem UpperTheory.V.Z.Sym.Sig.suppZ : UpperTheory.V.Z.Sym.Sig.SuppZ := by
     ext i l
     rw [val_diagT]
     simp [Matrix.diagonal_apply, Matrix.scalar_apply]
-  have hcomm : (GeneralLinearGroup.scalar (Fin 2)) z * j⁻¹ = j⁻¹ * (GeneralLinearGroup.scalar (Fin 2)) z := by
+  have hcomm
+      : (GeneralLinearGroup.scalar (Fin 2)) z * j⁻¹
+        = j⁻¹ * (GeneralLinearGroup.scalar (Fin 2)) z := by
     have hzc : (GeneralLinearGroup.scalar (Fin 2)) z ∈ Subgroup.center (GL (Fin 2) k) := by
       rw [GeneralLinearGroup.center_eq_range_scalar]
       exact ⟨z, rfl⟩
     exact ((Subgroup.mem_center_iff.mp hzc) j⁻¹).symm
   refine ⟨j, z * c 0 * d 0, z * c 1 * d 1, ?_, ?_⟩
-  · have hdg : dg ![z * c 0 * d 0, z * c 1 * d 1] =
-        (GeneralLinearGroup.scalar (Fin 2)) z * (diagT k (Fin 2) c * dg d) := by
+  · have hdg
+        : dg ![z * c 0 * d 0, z * c 1 * d 1]
+          = (GeneralLinearGroup.scalar (Fin 2)) z * (diagT k (Fin 2) c * dg d) := by
       rw [hsc]
       unfold dg
       rw [← map_mul, ← map_mul]

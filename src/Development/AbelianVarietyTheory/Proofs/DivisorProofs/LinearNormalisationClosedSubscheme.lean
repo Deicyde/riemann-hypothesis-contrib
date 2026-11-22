@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoordComp
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.ChartRestriction.G.Out
@@ -16,17 +17,18 @@ noncomputable section
 
 namespace GlobalTheory.HomFixUniv
 
-theorem factors_quot_iff {P : Type} [CommRing P] (I : Ideal P) (T : Scheme.{0}) (g : T ⟶ Sp P) :
-    (∃ w : T ⟶ Sp (P ⧸ I), w ≫ Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I)) = g) ↔
-      ∀ x ∈ I, g.appTop ((Scheme.ΓSpecIso (CommRingCat.of P)).inv x) = 0 := by
+theorem factors_quot_iff {P : Type} [CommRing P] (I : Ideal P) (T : Scheme.{0}) (g : T ⟶ Sp P)
+    : (∃ w : T ⟶ Sp (P ⧸ I), w ≫ Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I)) = g)
+      ↔ ∀ x ∈ I, g.appTop ((Scheme.ΓSpecIso (CommRingCat.of P)).inv x) = 0 := by
   constructor
   · rintro ⟨w, rfl⟩ x hx
-    have e : (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I))).appTop
-        ((Scheme.ΓSpecIso (CommRingCat.of P)).inv x) =
-        (Scheme.ΓSpecIso (CommRingCat.of (P ⧸ I))).inv (Ideal.Quotient.mk I x) := by
+    have e
+        : (Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I))).appTop
+            ((Scheme.ΓSpecIso (CommRingCat.of P)).inv x)
+          = (Scheme.ΓSpecIso (CommRingCat.of (P ⧸ I))).inv (Ideal.Quotient.mk I x) := by
       rw [← CommRingCat.comp_apply, ← Scheme.ΓSpecIso_inv_naturality]; rfl
-    rw [Scheme.Hom.comp_appTop, CommRingCat.comp_apply, e,
-      Ideal.Quotient.eq_zero_iff_mem.2 hx, map_zero, map_zero]
+    rw [Scheme.Hom.comp_appTop, CommRingCat.comp_apply, e, Ideal.Quotient.eq_zero_iff_mem.2 hx,
+      map_zero, map_zero]
   · intro h
     let φ : CommRingCat.of P ⟶ Γ(T, ⊤) := (Scheme.ΓSpecIso (CommRingCat.of P)).inv ≫ g.appTop
     let ψ : CommRingCat.of (P ⧸ I) ⟶ Γ(T, ⊤) :=
@@ -37,22 +39,31 @@ theorem factors_quot_iff {P : Type} [CommRing P] (I : Ideal P) (T : Scheme.{0}) 
     simp only [φ, Spec.map_comp, ← Scheme.toSpecΓ_naturality_assoc, toSpecΓ_SpecMap_ΓSpecIso_inv,
       Category.comp_id]
 
-def normEq {Rg : Type} [CommRing Rg] {mA mB : ℕ} (α : Fin mA → Γ(Sp Rg, ⊤)) (β : Fin mB → Γ(Sp Rg, ⊤))
-    (j : Fin mB) : MvPolynomial (Fin (mA * mB)) Rg :=
-  MvPolynomial.C ((Scheme.ΓSpecIso (CommRingCat.of Rg)).hom (β j)) -
-    ∑ i, MvPolynomial.X (finProdFinEquiv (i, j)) *
-      MvPolynomial.C ((Scheme.ΓSpecIso (CommRingCat.of Rg)).hom (α i))
+def normEq
+    {Rg : Type} [CommRing Rg]
+    {mA mB : ℕ} (α : Fin mA → Γ(Sp Rg, ⊤)) (β : Fin mB → Γ(Sp Rg, ⊤)) (j : Fin mB)
+    : MvPolynomial (Fin (mA * mB)) Rg :=
+  MvPolynomial.C ((Scheme.ΓSpecIso (CommRingCat.of Rg)).hom (β j))
+    - ∑ i, MvPolynomial.X (finProdFinEquiv (i, j)) *
+        MvPolynomial.C ((Scheme.ΓSpecIso (CommRingCat.of Rg)).hom (α i))
 
-theorem appTop_affπ {Rg : Type} [CommRing Rg] {N : ℕ} (a : Γ(Sp Rg, ⊤)) :
-    (affπ Rg N).appTop a = (Scheme.ΓSpecIso (CommRingCat.of (MvPolynomial (Fin N) Rg))).inv
-      (MvPolynomial.C ((Scheme.ΓSpecIso (CommRingCat.of Rg)).hom a)) := by
+theorem appTop_affπ {Rg : Type} [CommRing Rg] {N : ℕ} (a : Γ(Sp Rg, ⊤))
+    : (affπ Rg N).appTop a
+      = (Scheme.ΓSpecIso (CommRingCat.of (MvPolynomial (Fin N) Rg))).inv
+        (MvPolynomial.C ((Scheme.ΓSpecIso (CommRingCat.of Rg)).hom a)) := by
   conv_lhs => rw [← (Scheme.ΓSpecIso (CommRingCat.of Rg)).hom_inv_id_apply a]
-  rw [← CommRingCat.comp_apply, ← Scheme.ΓSpecIso_inv_naturality]; rfl
+  rw [← CommRingCat.comp_apply, ← Scheme.ΓSpecIso_inv_naturality]
+  rfl
 
-theorem normal_iff {Rg : Type} [CommRing Rg] {mA mB : ℕ} (α : Fin mA → Γ(Sp Rg, ⊤)) (β : Fin mB → Γ(Sp Rg, ⊤))
-    (T : Scheme.{0}) (g : T ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg)) :
-    Normal (g ≫ affπ Rg (mA * mB)) (matOf g) α β ↔
-      ∀ j, g.appTop ((Scheme.ΓSpecIso (CommRingCat.of (MvPolynomial (Fin (mA * mB)) Rg))).inv (normEq α β j)) = 0 := by
+theorem normal_iff
+    {Rg : Type} [CommRing Rg]
+    {mA mB : ℕ} (α : Fin mA → Γ(Sp Rg, ⊤)) (β : Fin mB → Γ(Sp Rg, ⊤))
+    (T : Scheme.{0}) (g : T ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg))
+    : Normal (g ≫ affπ Rg (mA * mB)) (matOf g) α β
+      ↔ ∀ j,
+        g.appTop ((Scheme.ΓSpecIso (CommRingCat.of (MvPolynomial (Fin (mA * mB)) Rg))).inv
+            (normEq α β j))
+          = 0 := by
   refine forall_congr' fun j => ?_
   set_option synthInstance.maxHeartbeats 100000 in
     rw [normEq, map_sub, map_sub, sub_eq_zero, map_sum, map_sum]
@@ -62,11 +73,21 @@ end GlobalTheory.HomFixUniv
 
 namespace GlobalTheory.HomFixUniv
 
-theorem normal_closed : ∀ (Rg : Type) [CommRing Rg] (mA mB : ℕ) (α : Fin mA → Γ(Sp Rg, ⊤)) (β : Fin mB → Γ(Sp Rg, ⊤)), ∃ (Z : Scheme.{0}) (ιZ : Z ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg)), IsClosedImmersion ιZ ∧ ∀ (T : Scheme.{0}) (g : T ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg)), (GlobalTheory.HomFixUniv.Normal (g ≫ affπ Rg (mA * mB)) (matOf g) α β ↔ ∃ w : T ⟶ Z, w ≫ ιZ = g) := by
+theorem normal_closed
+    : ∀ (Rg : Type) [CommRing Rg] (mA mB : ℕ) (α : Fin mA → Γ(Sp Rg, ⊤)) (β : Fin mB → Γ(Sp Rg, ⊤)),
+      ∃ (Z : Scheme.{0}) (ιZ : Z ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg)),
+        IsClosedImmersion ιZ
+          ∧ ∀ (T : Scheme.{0}) (g : T ⟶ Sp (MvPolynomial (Fin (mA * mB)) Rg)),
+            (GlobalTheory.HomFixUniv.Normal (g ≫ affπ Rg (mA * mB)) (matOf g) α β
+              ↔ ∃ w : T ⟶ Z, w ≫ ιZ = g) := by
   intro Rg _ mA mB α β
   let I : Ideal (MvPolynomial (Fin (mA * mB)) Rg) := Ideal.span (Set.range (normEq α β))
-  refine ⟨Sp (MvPolynomial (Fin (mA * mB)) Rg ⧸ I), Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I)),
-    IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective, fun T g => ?_⟩
+  refine ⟨
+    Sp (MvPolynomial (Fin (mA * mB)) Rg ⧸ I),
+    Spec.map (CommRingCat.ofHom (Ideal.Quotient.mk I)),
+    IsClosedImmersion.spec_of_surjective _ Ideal.Quotient.mk_surjective,
+    fun T g => ?_
+  ⟩
   rw [factors_quot_iff, normal_iff]
   let φ : MvPolynomial (Fin (mA * mB)) Rg →+* Γ(T, ⊤) :=
     g.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of (MvPolynomial (Fin (mA * mB)) Rg))).inv.hom

@@ -11,14 +11,19 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  MvPolynomial
 
 noncomputable section
 
 namespace FibreNormPullback
 
-theorem charZero_of_isArithVar {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
-    {y : (Σ k, ι k) → Ω} {d : ℕ} (hV : IsArithVar (mCoordIdeal y) d) : CharZero Ω := by
+theorem charZero_of_isArithVar
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω]
+    {y : (Σ k, ι k) → Ω} {d : ℕ} (hV : IsArithVar (mCoordIdeal y) d)
+    : CharZero Ω := by
   refine charZero_of_inj_zero fun m hm => ?_
   have hmem : (m : ℤ) ∈ (mCoordIdeal y).comap (C : ℤ →+* MRing ι) := by
     show mConeMap y (C (m : ℤ)) = 0
@@ -27,22 +32,26 @@ theorem charZero_of_isArithVar {K : Type} [Fintype K] {ι : K → Type} [∀ k, 
   rw [hV.2.2.1, Ideal.mem_bot] at hmem
   exact_mod_cast hmem
 
-theorem isHomogeneous_of_map {σ : Type} {F : MvPolynomial σ ℤ} {m : ℕ}
-    (h : (map (Int.castRingHom ℚ) F).IsHomogeneous m) : F.IsHomogeneous m := fun {d} hd =>
+theorem isHomogeneous_of_map
+    {σ : Type} {F : MvPolynomial σ ℤ} {m : ℕ} (h : (map (Int.castRingHom ℚ) F).IsHomogeneous m)
+    : F.IsHomogeneous m := fun {d} hd =>
   h (by rw [coeff_map, eq_intCast, ne_eq, Int.cast_eq_zero]; exact hd)
 
-theorem norm_prod_le_pow {B : ℝ} (hB : 0 ≤ B) (m : Multiset ℂ) (h : ∀ x ∈ m, ‖x‖ ≤ B) :
-    ‖m.prod‖ ≤ B ^ Multiset.card m := by
+theorem norm_prod_le_pow {B : ℝ} (hB : 0 ≤ B) (m : Multiset ℂ) (h : ∀ x ∈ m, ‖x‖ ≤ B)
+    : ‖m.prod‖ ≤ B ^ Multiset.card m := by
   induction m using Multiset.induction_on with
   | empty => simp
   | cons a m ih =>
     rw [Multiset.prod_cons, norm_mul, Multiset.card_cons, pow_succ']
-    exact mul_le_mul (h a (Multiset.mem_cons_self a m)) (ih fun x hx => h x (Multiset.mem_cons_of_mem hx))
-      (norm_nonneg _) hB
+    exact mul_le_mul (h a (Multiset.mem_cons_self a m))
+      (ih fun x hx => h x (Multiset.mem_cons_of_mem hx)) (norm_nonneg _) hB
 
-theorem norm_last_le {n : ℕ} (a : ℕ → ℂ) (ha : a 0 = 1) {B : ℝ} (hB : 0 ≤ B)
-    (hroot : ∀ w : ℂ, ∑ i ∈ Finset.range (n + 1), a i * w ^ (n - i) = 0 → ‖w‖ ≤ B) :
-    ‖a n‖ ≤ B ^ n := by
+theorem norm_last_le
+    {n : ℕ}
+    (a : ℕ → ℂ) (ha : a 0 = 1)
+    {B : ℝ}
+    (hB : 0 ≤ B) (hroot : ∀ w : ℂ, ∑ i ∈ Finset.range (n + 1), a i * w ^ (n - i) = 0 → ‖w‖ ≤ B)
+    : ‖a n‖ ≤ B ^ n := by
   classical
   set p : Polynomial ℂ := ∑ i ∈ Finset.range (n + 1), Polynomial.C (a i) * Polynomial.X ^ (n - i) with hp
   have hcoeff : ∀ k, p.coeff k = ∑ i ∈ Finset.range (n + 1), if k = n - i then a i else 0 := by
@@ -60,7 +69,8 @@ theorem norm_last_le {n : ℕ} (a : ℕ → ℂ) (ha : a 0 = 1) {B : ℝ} (hB : 
       rw [if_neg]
       omega
     · intro h; exact absurd (Finset.mem_range.mpr (Nat.succ_pos n)) h
-  have hmon : p.Monic := Polynomial.monic_of_degree_le n (Polynomial.degree_le_of_natDegree_le hdeg) hlead
+  have hmon : p.Monic :=
+    Polynomial.monic_of_degree_le n (Polynomial.degree_le_of_natDegree_le hdeg) hlead
   have hnat : p.natDegree = n :=
     Polynomial.natDegree_eq_of_le_of_coeff_ne_zero hdeg (by rw [hlead]; exact one_ne_zero)
   have hzero : p.coeff 0 = a n := by

@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ArithHeightP
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr GlobalTheory.HSNef
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
+  GlobalTheory.HSNef
 
 set_option autoImplicit false
 
@@ -21,9 +23,12 @@ noncomputable section
 
 namespace GlobalTheory.HSNef
 
-theorem isNef_pull : GlobalTheory.Published.ArCalc → SemiPull → ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) [IsIntegral X]
-    [IsIntegral Y] (p : X ⟶ Sp k) (q : Y ⟶ Sp k) (D E : ℕ), IsArithVar p D → IsArithVar q E →
-    ∀ (π : Y ⟶ X) (hπ : π ≫ p = q) (L : HermLB p), L.IsNef D → (L.pull π hπ).IsNef E := by
+theorem isNef_pull
+    : GlobalTheory.Published.ArCalc → SemiPull
+      → ∀ (k : Type) [CommRing k] (X Y : Scheme.{0}) [IsIntegral X] [IsIntegral Y] (p : X ⟶ Sp k)
+          (q : Y ⟶ Sp k) (D E : ℕ),
+        IsArithVar p D → IsArithVar q E
+          → ∀ (π : Y ⟶ X) (hπ : π ≫ p = q) (L : HermLB p), L.IsNef D → (L.pull π hπ).IsNef E := by
   intro hA hS k _ X Y _ _ p q D E hX hY π hπ L hN
   obtain ⟨h, hh⟩ := ((hA.arExists k X p D hX).1 L)
   obtain ⟨h', hh'⟩ := ((hA.arExists k Y q E hY).1 (L.pull π hπ))
@@ -37,9 +42,11 @@ theorem isNef_pull : GlobalTheory.Published.ArCalc → SemiPull → ∀ (k : Typ
   have hAX := GlobalTheory.MixHt.isAmb_of_isArithVar hX
   obtain ⟨-, -, -, -, hcl, hgd⟩ := GlobalTheory.MixHt.hasDim_basic k Y q hAY
   obtain ⟨⟨m', hm'⟩, -, -, -, hcl', hgd'⟩ := GlobalTheory.MixHt.hasDim_basic k X p hAX
-  have hy : GlobalTheory.MixHt.HasDim (i (genericPoint Z)) 1 := (hcl Z i _ 1).2 ((hgd Z 1).2 (by exact_mod_cast hd))
+  have hy : GlobalTheory.MixHt.HasDim (i (genericPoint Z)) 1 :=
+    (hcl Z i _ 1).2 ((hgd Z 1).2 (by exact_mod_cast hd))
   obtain ⟨d', -, hd'⟩ := hm' (π (i (genericPoint Z)))
-  obtain ⟨-, hiff⟩ := GlobalTheory.DimDeg.dim_le_and_residueDegree_ne_zero_iff k X Y p q hAX hAY π hπ _ 1 d' hy hd'
+  obtain ⟨-, hiff⟩ :=
+    GlobalTheory.DimDeg.dim_le_and_residueDegree_ne_zero_iff k X Y p q hAX hAY π hπ _ 1 d' hy hd'
   have e1 : 1 = d' := hiff.1 h0
   subst e1
   obtain ⟨W, j, _, _, hj⟩ := exists_isClosedImmersion_genericPoint (π (i (genericPoint Z)))

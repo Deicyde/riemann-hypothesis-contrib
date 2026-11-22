@@ -73,16 +73,18 @@ def psiOf (θ : F) (x : Fin (r + 1) → V) : ℂ := M.L.psi0 (algebraMap F E θ�
 def psiN (θ : F) (g : V ≃ₗ[E] V) : ℂ := Fr.psiOf θ (fun b => g (Fr.f b))
 
 def IsInner (L : Submodule M.L.O (H.Wb Fr.f)) : Prop :=
-  L.FG ∧
-  (∀ x : ↥(H.perp (H.X Fr.f)),
-    H.mkW Fr.f x ∈ L ↔ ∀ y : ↥(H.perp (H.X Fr.f)), H.mkW Fr.f y ∈ L → H.h x y ∈ M.L.O) ∧
-  ∃ xz : ↥(H.perp (H.X Fr.f)), (xz : V) = Fr.z ∧ H.mkW Fr.f xz ∈ L ∧
-    ∀ (c : M.L.O) (y : ↥(H.perp (H.X Fr.f))), H.mkW Fr.f y ∈ L →
-      H.mkW Fr.f xz = (c : E) • H.mkW Fr.f y → IsUnit c
+  L.FG
+    ∧ (∀ x : ↥(H.perp (H.X Fr.f)),
+      H.mkW Fr.f x ∈ L ↔ ∀ y : ↥(H.perp (H.X Fr.f)), H.mkW Fr.f y ∈ L → H.h x y ∈ M.L.O)
+    ∧ ∃ xz : ↥(H.perp (H.X Fr.f)),
+      (xz : V) = Fr.z ∧ H.mkW Fr.f xz ∈ L
+        ∧ ∀ (c : M.L.O) (y : ↥(H.perp (H.X Fr.f))),
+          H.mkW Fr.f y ∈ L → H.mkW Fr.f xz = (c : E) • H.mkW Fr.f y → IsUnit c
 
 def LamStd (L : Submodule M.L.O (H.Wb Fr.f)) : Submodule M.L.O V :=
-  Submodule.span M.L.O {v | (∀ a, H.h v (Fr.es a) ∈ M.L.O) ∧ (∀ a, H.h v (Fr.e a) ∈ M.L.O) ∧
-    ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF v ∧ H.mkW Fr.f w ∈ L}
+  Submodule.span M.L.O
+    {v | (∀ a, H.h v (Fr.es a) ∈ M.L.O) ∧ (∀ a, H.h v (Fr.e a) ∈ M.L.O) ∧
+      ∃ w : ↥(H.perp (H.X Fr.f)), (w : V) = Fr.prF v ∧ H.mkW Fr.f w ∈ L}
 
 end FrameD
 
@@ -101,39 +103,41 @@ def Gv : E := H.Gdet P.A.f P.B.f P.A.T P.B.T
 def St : Subgroup (V ≃ₗ[E] V) := P.A.N ⊓ P.B.N
 
 def IsPoint : Prop :=
-  ∃ w : Loc.Pt E (r + 1), ∀ a b : Fin (r + 1), (-1) ^ (r - b.val) * H.Zhat P.A.f P.B.f a b = w.mat a b
+  ∃ w : Loc.Pt E (r + 1), ∀ a b : Fin (r + 1),
+    (-1) ^ (r - b.val) * H.Zhat P.A.f P.B.f a b = w.mat a b
 
 def NormsOK : Prop :=
-  P.A.T ∈ 𝒪[F] ∧ P.A.T ≠ 0 ∧ P.B.T ∈ 𝒪[F] ∧ P.B.T ≠ 0 ∧
-    ∀ g, M.split = some g →
-      (∃ u v : 𝒪[F], (u : F) * P.A.T = 1 ∧ (v : F) * P.B.T = 1) ∧
-      ∃ c : 𝒪[F], P.A.T - P.B.T = (g.q : F) ^ 2 * c
+  P.A.T ∈ 𝒪[F] ∧ P.A.T ≠ 0 ∧ P.B.T ∈ 𝒪[F] ∧ P.B.T ≠ 0
+    ∧ ∀ g,
+      M.split = some g
+        → (∃ u v : 𝒪[F], (u : F) * P.A.T = 1 ∧ (v : F) * P.B.T = 1)
+          ∧ ∃ c : 𝒪[F], P.A.T - P.B.T = (g.q : F) ^ 2 * c
 
 def RelG (θ : F) : Prop :=
-  H.Xp P.A.f ⊓ H.Xp P.B.f = ⊥ ∧ IsUnit (P.Dm (r + 1)) ∧ P.Gv ≠ 0 ∧
-    (∀ l, l ≤ r + 1 → P.Dm l = 0 ∨ IsUnit (P.Dm l)) ∧
-    (∀ g ∈ P.St, P.A.psiN θ g = P.B.psiN θ g) ∧ P.IsPoint ∧ P.NormsOK
+  H.Xp P.A.f ⊓ H.Xp P.B.f = ⊥ ∧ IsUnit (P.Dm (r + 1)) ∧ P.Gv ≠ 0
+    ∧ (∀ l, l ≤ r + 1 → P.Dm l = 0 ∨ IsUnit (P.Dm l)) ∧ (∀ g ∈ P.St, P.A.psiN θ g = P.B.psiN θ g)
+    ∧ P.IsPoint ∧ P.NormsOK
 
 def UW0 : Subgroup (V ≃ₗ[E] V) :=
   Subgroup.closure {g | IsUnitary H g ∧ ∀ b, g (P.A.f b) = P.A.f b ∧ g (P.B.f b) = P.B.f b}
 
 def K0 : Subgroup (V ≃ₗ[E] V) :=
-  Subgroup.closure {s | s ∈ P.St ∧ ∀ (a : Fin r) (b : Fin (r + 1)),
-    H.h (s (P.A.f b)) (P.A.es a) ∈ M.L.O ∧ H.h (s (P.B.f b)) (P.B.es a) ∈ M.L.O}
+  Subgroup.closure
+    {s | s ∈ P.St ∧ ∀ (a : Fin r) (b : Fin (r + 1)),
+      H.h (s (P.A.f b)) (P.A.es a) ∈ M.L.O ∧ H.h (s (P.B.f b)) (P.B.es a) ∈ M.L.O}
 
 def ends : Finset ℕ :=
   haveI := Classical.decPred (fun l : ℕ => 1 ≤ l ∧ IsUnit (P.Dm l))
   (Finset.range (r + 2)).filter (fun l => 1 ≤ l ∧ IsUnit (P.Dm l))
 
-def MMgen : Fin (r + 1) ⊕ Fin (r + 1) → V :=
-  H.MMfam ⟨0, P.A.f, P.B.f, P.A.T, P.B.T⟩
+def MMgen : Fin (r + 1) ⊕ Fin (r + 1) → V := H.MMfam ⟨0, P.A.f, P.B.f, P.A.T, P.B.T⟩
 
 def Hp : ℝ :=
-  (M.modK (algebraMap F E (theta M)) * M.modK (H.gram P.MMgen).det *
-    ∏ l ∈ P.ends, M.modK (P.Dm l * M.L.cj (P.Dm l))) ^ (-(1 / 2 : ℝ))
+  (M.modK (algebraMap F E (theta M)) * M.modK (H.gram P.MMgen).det
+      * ∏ l ∈ P.ends, M.modK (P.Dm l * M.L.cj (P.Dm l)))
+    ^ (-(1 / 2 : ℝ))
 
-def PrimeTo : Prop :=
-  M.split = none ∧ IsUnitO M P.Gv ∧ ∀ l ∈ P.ends, IsUnitO M (P.Dm l)
+def PrimeTo : Prop := M.split = none ∧ IsUnitO M P.Gv ∧ ∀ l ∈ P.ends, IsUnitO M (P.Dm l)
 
 end FPair
 
@@ -152,10 +156,12 @@ namespace Datum
 variable {P : FPair H r}
 
 def Moves (g : V ≃ₗ[E] V) (d d' : Datum P) : Prop :=
-  (∀ x y : ↥(H.perp (H.X P.A.f)), (y : V) = g x → (H.mkW P.A.f x ∈ d.L ↔ H.mkW P.A.f y ∈ d'.L)) ∧
-  (∀ x y : ↥(H.perp (H.X P.B.f)), (y : V) = g x → (H.mkW P.B.f x ∈ d.L' ↔ H.mkW P.B.f y ∈ d'.L')) ∧
-  ∀ (x' y' : ↥(H.perp (H.X P.B.f))) (x y : ↥(H.perp (H.X P.A.f))), (y' : V) = g x' → (y : V) = g x →
-    ((H.mkW P.B.f x', H.mkW P.A.f x) ∈ d.io ↔ (H.mkW P.B.f y', H.mkW P.A.f y) ∈ d'.io)
+  (∀ x y : ↥(H.perp (H.X P.A.f)), (y : V) = g x → (H.mkW P.A.f x ∈ d.L ↔ H.mkW P.A.f y ∈ d'.L))
+    ∧ (∀ x y : ↥(H.perp (H.X P.B.f)),
+      (y : V) = g x → (H.mkW P.B.f x ∈ d.L' ↔ H.mkW P.B.f y ∈ d'.L'))
+    ∧ ∀ (x' y' : ↥(H.perp (H.X P.B.f))) (x y : ↥(H.perp (H.X P.A.f))),
+      (y' : V) = g x' → (y : V) = g x
+        → ((H.mkW P.B.f x', H.mkW P.A.f x) ∈ d.io ↔ (H.mkW P.B.f y', H.mkW P.A.f y) ∈ d'.io)
 
 def Rel (d d' : Datum P) : Prop := ∃ g ∈ P.UW0, Moves g d d'
 
@@ -166,14 +172,14 @@ def wt (d0 d : Datum P) : ℝ := 1 / volRel (Stab d) (Stab d0)
 end Datum
 
 def IsTermOver (P : FPair H r) (d : Datum P) (t : Term V M r) : Prop :=
-  t.T = P.A.T ∧ t.T' = P.B.T ∧
-  (∃ n ∈ P.A.N, t.f = (fun b => n (P.A.f b)) ∧ t.abelian₂ = img n (P.A.LamStd d.L)) ∧
-  (∃ n' ∈ P.B.N, t.f' = (fun b => n' (P.B.f b)) ∧ t.abelian₂ = img n' (P.B.LamStd d.L')) ∧
-  ∀ g, M.split = some g → H.Admissible g t ∧
-    H.iotaGraph g ⟨t.abelian₂, P.A.f, P.B.f, t.T, t.T'⟩ = d.io
+  t.T = P.A.T ∧ t.T' = P.B.T
+    ∧ (∃ n ∈ P.A.N, t.f = (fun b => n (P.A.f b)) ∧ t.abelian₂ = img n (P.A.LamStd d.L))
+    ∧ (∃ n' ∈ P.B.N, t.f' = (fun b => n' (P.B.f b)) ∧ t.abelian₂ = img n' (P.B.LamStd d.L'))
+    ∧ ∀ g,
+      M.split = some g
+        → H.Admissible g t ∧ H.iotaGraph g ⟨t.abelian₂, P.A.f, P.B.f, t.T, t.T'⟩ = d.io
 
-def TRel (P : FPair H r) (t t' : Term V M r) : Prop :=
-  ∃ s ∈ P.St, t'.abelian₂ = img s t.abelian₂
+def TRel (P : FPair H r) (t t' : Term V M r) : Prop := ∃ s ∈ P.St, t'.abelian₂ = img s t.abelian₂
 
 def om (P : FPair H r) (t : Term V M r) : ℂ :=
   P.A.psiOf (theta M) t.f * (P.B.psiOf (theta M) t.f')⁻¹
@@ -183,8 +189,8 @@ def Aut (Λ : Submodule M.L.O V) : Subgroup (V ≃ₗ[E] V) := Subgroup.closure 
 def mu (P : FPair H r) (t : Term V M r) : ℝ := 1 / volRel (P.St ⊓ Aut t.abelian₂) P.K0
 
 def BBne (t : Term V M r) : Prop :=
-  ∃ v ∈ t.abelian₂, v ∈ Submodule.span E (Set.range (H.MMfam t)) ∧
-    v ∉ Submodule.span M.L.O (Set.range (H.MMfam t))
+  ∃ v ∈ t.abelian₂,
+    v ∈ Submodule.span E (Set.range (H.MMfam t)) ∧ v ∉ Submodule.span M.L.O (Set.range (H.MMfam t))
 
 structure Reps (P : FPair H r) where
   RD : Set (Datum P)
@@ -205,12 +211,15 @@ def nn (R : Reps P) (d0 : Datum P) : ENNReal :=
 
 def NGAt (k : ℕ) (P : FPair H r) (C : ℝ) : Prop :=
   ∀ (R : Reps P) (d0 : Datum P),
-    sumSq R d0 (BBne (H := H)) ≤ ENNReal.ofReal (P.Hp ^ (C * ((r : ℝ) + 1) ^ 2) *
-        (qF F : ℝ) ^ (-((k : ℝ) - 2 * r - 5))) * nn R d0 ∧
-    sumSq R d0 (fun t => ¬ BBne (H := H) t) ≤ ENNReal.ofReal (P.Hp ^ (C * ((r : ℝ) + 1) ^ 2)) * nn R d0 ∧
-    sumSq R d0 (fun _ => True) ≤ ENNReal.ofReal (P.Hp ^ (C * ((r : ℝ) + 1) ^ 2)) * nn R d0 ∧
-    (P.PrimeTo → P.Hp = 1 ∧ sumSq R d0 (fun t => ¬ BBne (H := H) t) = nn R d0 ∧
-      sumSq R d0 (fun _ => True) = nn R d0)
+    sumSq R d0 (BBne (H := H))
+        ≤ ENNReal.ofReal (P.Hp ^ (C * ((r : ℝ) + 1) ^ 2) * (qF F : ℝ) ^ (-((k : ℝ) - 2 * r - 5)))
+          * nn R d0
+      ∧ sumSq R d0 (fun t => ¬ BBne (H := H) t)
+        ≤ ENNReal.ofReal (P.Hp ^ (C * ((r : ℝ) + 1) ^ 2)) * nn R d0
+      ∧ sumSq R d0 (fun _ => True) ≤ ENNReal.ofReal (P.Hp ^ (C * ((r : ℝ) + 1) ^ 2)) * nn R d0
+      ∧ (P.PrimeTo
+        → P.Hp = 1 ∧ sumSq R d0 (fun t => ¬ BBne (H := H) t) = nn R d0
+          ∧ sumSq R d0 (fun _ => True) = nn R d0)
 
 end Formalism.MainNotions.S.LocNG
 

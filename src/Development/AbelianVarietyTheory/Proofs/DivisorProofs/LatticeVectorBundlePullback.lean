@@ -8,9 +8,12 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsF
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.PDivGroup GlobalTheory.Dieu
+  GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKMid GlobalTheory.LKGeo GlobalTheory.LKRes
 open ReciprocityTheory.DiscreteGroups.LocalClassField
 open scoped TensorProduct
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -35,12 +38,12 @@ def extF (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) : AfP p ⊗[ℚ] VQ D →ₗ[A
   LinearMap.liftBaseChange (AfP p)
     ((Algebra.linearMap ℚ (AfP p)) ∘ₗ LinearMap.liftBaseChange ℚ ((Algebra.linearMap ℤ ℚ) ∘ₗ f))
 
-theorem extF_tmul (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) (a : AfP p) (x : D.La) :
-    extF D f (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = a * ((f x : ℤ) : AfP p) := by
+theorem extF_tmul (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) (a : AfP p) (x : D.La)
+    : extF D f (a ⊗ₜ ((1 : ℚ) ⊗ₜ x)) = a * ((f x : ℤ) : AfP p) := by
   simp [extF, LinearMap.liftBaseChange_tmul, Algebra.smul_def]
 
-theorem extF_mem (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) {w : AfP p ⊗[ℚ] VQ D} (hw : w ∈ LaHat D) :
-    extF D f w ∈ intAf p := by
+theorem extF_mem (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) {w : AfP p ⊗[ℚ] VQ D} (hw : w ∈ LaHat D)
+    : extF D f w ∈ intAf p := by
   induction hw using AddSubgroup.closure_induction with
   | mem z hz =>
     obtain ⟨a, x, ha, rfl⟩ := hz
@@ -51,8 +54,11 @@ theorem extF_mem (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) {w : AfP p ⊗[ℚ] VQ
   | add x y _ _ hx hy => rw [map_add]; exact add_mem hx hy
   | neg x _ hx => rw [map_neg]; exact neg_mem hx
 
-theorem int_dvd (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) (x : D.La) (n : ℕ) (hn : 0 < n) (hnp : n.Coprime p)
-    (w : AfP p ⊗[ℚ] VQ D) (hw : w ∈ LaHat D) (h : inAf D x = n • w) : (n : ℤ) ∣ f x := by
+theorem int_dvd
+    (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) (x : D.La)
+    (n : ℕ) (hn : 0 < n) (hnp : n.Coprime p)
+    (w : AfP p ⊗[ℚ] VQ D) (hw : w ∈ LaHat D) (h : inAf D x = n • w)
+    : (n : ℤ) ∣ f x := by
   have hb := extF_mem D f hw
   have e : ((f x : ℤ) : AfP p) = (n : AfP p) * extF D f w := by
     have := congrArg (extF D f) h
@@ -74,17 +80,19 @@ theorem int_dvd (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) (x : D.La) (n : ℕ) (h
         rw [hnp] at h3
         exact (Fact.out : p.Prime).one_lt.ne' (Nat.dvd_one.1 h3)
       have h2 : v.valuation ℚ ((f x : ℤ) : ℚ) ≤ 1 := by
-        rw [← eq_intCast (algebraMap ℤ ℚ), IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
+        rw [← eq_intCast (algebraMap ℤ ℚ),
+          IsDedekindDomain.HeightOneSpectrum.valuation_of_algebraMap]
         exact v.intValuation_le_one _
-      rw [hq, map_div₀, h1, div_one]; exact h2
+      rw [hq, map_div₀, h1, div_one]
+      exact h2
     · let v' : AwayP p := ⟨v, hv⟩
       have hbv := hb v'
       have e2 := congrArg (AfP.eval v') e
       rw [map_intCast, map_mul, map_natCast] at e2
       have hqv : algebraMap ℚ (v.adicCompletion ℚ) q = AfP.eval v' (extF D f w) := by
         have hn' : algebraMap ℚ (v.adicCompletion ℚ) (n : ℚ) ≠ 0 := (map_ne_zero _).2 hn0
-        have : algebraMap ℚ (v.adicCompletion ℚ) q * algebraMap ℚ (v.adicCompletion ℚ) (n : ℚ) =
-            ((f x : ℤ) : v.adicCompletion ℚ) := by
+        have : algebraMap ℚ (v.adicCompletion ℚ) q * algebraMap ℚ (v.adicCompletion ℚ) (n : ℚ)
+            = ((f x : ℤ) : v.adicCompletion ℚ) := by
           rw [← map_mul, hq, div_mul_cancel₀ _ hn0, map_intCast]
         rw [← mul_left_inj' hn', this, e2, map_natCast]
         ring
@@ -95,16 +103,16 @@ theorem int_dvd (D : Datum p) (f : D.La →ₗ[ℤ] ℤ) (x : D.La) (n : ℕ) (h
   obtain ⟨k, hk⟩ := IsDedekindDomain.HeightOneSpectrum.mem_integers_of_valuation_le_one ℚ q hval
   refine ⟨k, ?_⟩
   have : ((k : ℤ) : ℚ) = (f x : ℚ) / n := by rw [← eq_intCast (algebraMap ℤ ℚ)]; exact hk.trans hq
-  have h4 : ((f x : ℤ) : ℚ) = ((n : ℤ) * k : ℤ) := by
-    push_cast; rw [this]; field_simp
+  have h4 : ((f x : ℤ) : ℚ) = ((n : ℤ) * k : ℤ) := by push_cast; rw [this]; field_simp
   exact_mod_cast h4
 
 end GlobalTheory.LKGeo.LatDiv
 
 namespace GlobalTheory.LKGeo.LatDiv
 
-theorem eq_nsmul_of_inAf_eq_nsmul : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (x : D.La) (n : ℕ), 0 < n → n.Coprime p →
-    ∀ w ∈ LaHat D, inAf D x = n • w → ∃ z, x = n • z := by
+theorem eq_nsmul_of_inAf_eq_nsmul
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (x : D.La) (n : ℕ),
+      0 < n → n.Coprime p → ∀ w ∈ LaHat D, inAf D x = n • w → ∃ z, x = n • z := by
   intro p _ D x n hn hnp w hw h
   haveI := D.freeLa
   haveI := D.finLa

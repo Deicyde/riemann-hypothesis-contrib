@@ -130,22 +130,23 @@ private lemma log_factorial_le_stirling_bound (n : ℕ) (hn : 1 ≤ n) :
     Real.log_exp] at h1
   linarith [h1]
 
-
 open Finset in
-theorem _root_.GlobalTheory.PrimeLogSum.sum_log_div_pred_le : ∀ N : ℕ,
-    ∑ p ∈ (Finset.range (N + 1)).filter Nat.Prime, Real.log p / ((p : ℝ) - 1)
-      ≤ Real.log N + 2.2 := by
+theorem _root_.GlobalTheory.PrimeLogSum.sum_log_div_pred_le
+    : ∀ N : ℕ,
+      ∑ p ∈ (Finset.range (N + 1)).filter Nat.Prime, Real.log p / ((p : ℝ) - 1)
+        ≤ Real.log N + 2.2 := by
   intro N
   have hl2 := Real.log_two_lt_d9
   have hl3 := log_three_lt_one_point_one_one
   have hl3' : 0 ≤ Real.log 3 := Real.log_nonneg (by norm_num)
   rcases Nat.lt_or_ge N 4 with hN | hN
-  · interval_cases N <;>
-      simp [Finset.sum_filter, Finset.sum_range_succ, Nat.prime_two, Nat.prime_three] <;>
-      norm_num <;> linarith
+  · interval_cases N
+      <;> simp [Finset.sum_filter, Finset.sum_range_succ, Nat.prime_two, Nat.prime_three]
+      <;> norm_num <;> linarith
   set P := (Finset.range (N + 1)).filter Nat.Prime with hP
-  have hsplit : ∑ p ∈ P, Real.log p / ((p : ℝ) - 1)
-      = ∑ p ∈ P, Real.log p / p + ∑ p ∈ P, Real.log p / ((p : ℝ) * ((p : ℝ) - 1)) := by
+  have hsplit
+      : ∑ p ∈ P, Real.log p / ((p : ℝ) - 1)
+        = ∑ p ∈ P, Real.log p / p + ∑ p ∈ P, Real.log p / ((p : ℝ) * ((p : ℝ) - 1)) := by
     rw [← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
     intro p hp
@@ -154,8 +155,9 @@ theorem _root_.GlobalTheory.PrimeLogSum.sum_log_div_pred_le : ∀ N : ℕ,
     have h4 : (p : ℝ) ≠ 0 := by linarith
     field_simp
     ring
-  have hB : ∑ p ∈ P, Real.log p / ((p : ℝ) * ((p : ℝ) - 1))
-      ≤ ∑ n ∈ Finset.range (N + 1), Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) := by
+  have hB
+      : ∑ p ∈ P, Real.log p / ((p : ℝ) * ((p : ℝ) - 1))
+        ≤ ∑ n ∈ Finset.range (N + 1), Real.log n / ((n : ℝ) * ((n : ℝ) - 1)) := by
     apply Finset.sum_le_sum_of_subset_of_nonneg (Finset.filter_subset _ _)
     intro n _ _
     apply div_nonneg (Real.log_natCast_nonneg n)
@@ -182,8 +184,8 @@ theorem _root_.GlobalTheory.PrimeLogSum.sum_log_div_pred_le : ∀ N : ℕ,
     rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.log_pow]
     norm_num
   have hA' : ∑ p ∈ P, Real.log p / p ≤ Real.log N - 1 + 0.25 + 0.2 + Real.log 4 := by
-    have h : (N : ℝ) * ∑ p ∈ P, Real.log p / p
-        ≤ N * (Real.log N - 1 + 0.25 + 0.2 + Real.log 4) := by
+    have h
+        : (N : ℝ) * ∑ p ∈ P, Real.log p / p ≤ N * (Real.log N - 1 + 0.25 + 0.2 + Real.log 4) := by
       linarith
     exact le_of_mul_le_mul_left h hNpos
   rw [hsplit]

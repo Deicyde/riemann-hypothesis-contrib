@@ -22,23 +22,38 @@ open Classical
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {N : ℕ}
 
 instance scUN (N : ℕ) : SecondCountableTopology (UN N) :=
-  (Topology.IsEmbedding.subtypeVal (p := fun x => x ∈ Matrix.unitaryGroup (Fin N) ℂ)).secondCountableTopology
+  (Topology.IsEmbedding.subtypeVal
+    (p := fun x => x ∈ Matrix.unitaryGroup (Fin N) ℂ)).secondCountableTopology
 
 theorem one_mem_GLs' : (1 : Mat N) ∈ GLs N := by simp [GLs]
 
-theorem local_repro (hK : KerEx) (hM : MultAlg) (hB : Bridge.BridgeSt) (W : Submodule ℂ (Kinf E N → ℂ))
-    (hW : FiniteDimensional ℂ W) (R : ℝ) (v : InfinitePlace E) [MeasurableSpace (G N)] [BorelSpace (G N)]
-    (μ0 : Measure (G N)) [μ0.IsHaarMeasure] :
-    ∃ a : G N → ℂ, Continuous a ∧ HasCompactSupport a ∧ ∀ φ : Sm E N,
-      (∀ g, (fun k : Kinf E N => φ.1 (g * infGL E N (Unitary.toUnits k))) ∈ W) →
-      PositivityTheory.Rg.BcB.SpectralAccumulation.InfBdd R (Submodule.span ℂ {φ}) →
-      ∃ s : ℂ, 1 / 2 ≤ ‖s‖ ∧ ∀ g : GA E N, ∫ t, a t * φ.1 (g * infP N (Pi.mulSingle v t)) ∂μ0 = s * φ.1 g := by
+theorem local_repro
+    (hK : KerEx) (hM : MultAlg) (hB : Bridge.BridgeSt)
+    (W : Submodule ℂ (Kinf E N → ℂ)) (hW : FiniteDimensional ℂ W)
+    (R : ℝ) (v : InfinitePlace E)
+    [MeasurableSpace (G N)] [BorelSpace (G N)]
+    (μ0 : Measure (G N)) [μ0.IsHaarMeasure]
+    : ∃ a : G N → ℂ,
+      Continuous a ∧ HasCompactSupport a
+        ∧ ∀ φ : Sm E N,
+          (∀ g, (fun k : Kinf E N => φ.1 (g * infGL E N (Unitary.toUnits k))) ∈ W)
+            → PositivityTheory.Rg.BcB.SpectralAccumulation.InfBdd R (Submodule.span ℂ {φ})
+            → ∃ s : ℂ,
+              1 / 2 ≤ ‖s‖
+                ∧ ∀ g : GA E N, ∫ t, a t * φ.1 (g * infP N (Pi.mulSingle v t)) ∂μ0 = s * φ.1 g := by
   obtain ⟨g, T, hT, hg, hval⟩ := exists_bump N R
   obtain ⟨c0, hc0⟩ := hK N
   obtain ⟨k, hk⟩ := (hc0 μ0 (Mv W hW v)).1 [] g T hg
-  have hmult : IsMult μ0 (Mv W hW v) k (fun χ => coshT g (cas χ)) T :=
-    ⟨1, fun _ => 1, fun _ => [], fun _ => g, fun _ => k, fun _ => ⟨hg, hk⟩, fun y _ => by simp,
-      fun χ => by simp [zVal]⟩
+  have hmult : IsMult μ0 (Mv W hW v) k (fun χ => coshT g (cas χ)) T := ⟨
+    1,
+    fun _ => 1,
+    fun _ => [],
+    fun _ => g,
+    fun _ => k,
+    fun _ => ⟨hg, hk⟩,
+    fun y _ => by simp,
+    fun χ => by simp [zVal]
+  ⟩
   have hact := (hM N μ0 (Mv W hW v) k k _ _ T T hmult hmult).2.2.2
   have : CompleteSpace (Mv W hW v).V := FiniteDimensional.complete ℂ _
   set b : G N → (Mv W hW v).V := fun y =>
@@ -50,7 +65,8 @@ theorem local_repro (hK : KerEx) (hM : MultAlg) (hB : Bridge.BridgeSt) (W : Subm
       ((ContinuousLinearMap.compL ℂ _ _ ℂ (evL W hW v 1)).continuous.comp (mult_continuous hmult))
   set c : G N → UN N → ℂ := fun y u => conj (toFun W v (b y) u) with hcdef
   have hcc : Continuous (Function.uncurry c) :=
-    Complex.continuous_conj.comp ((continuous_toFun₂ W hW v).comp ((hbc.comp continuous_fst).prodMk continuous_snd))
+    Complex.continuous_conj.comp ((continuous_toFun₂ W hW v).comp
+      ((hbc.comp continuous_fst).prodMk continuous_snd))
   set Kc := tsupport fun y : G N => k y.val with hKcdef
   have hKc : IsCompact Kc := mult_hasCompactSupport hmult
   have hk0 : ∀ y, y ∉ Kc → k y.val = 0 := fun y hy =>
@@ -65,7 +81,8 @@ theorem local_repro (hK : KerEx) (hM : MultAlg) (hB : Bridge.BridgeSt) (W : Subm
   set Ku : Subgroup (G N) := (Unitary.toUnits (R := Mat N)).range with hKudef
   have hKu : IsCompact (Ku : Set (G N)) := by
     have : (Ku : Set (G N)) = Set.range ι := by ext x; simp [Ku, ι]
-    rw [this]; exact isCompact_range hι
+    rw [this]
+    exact isCompact_range hι
   have hιK : ∀ u, ι u ∈ Ku := fun u => ⟨u, rfl⟩
   obtain ⟨ha1, ha2⟩ := avg_cont_supp (nuN N) Ku hKu ι hι hιK c hcc Kc hKc hcK
   refine ⟨_, ha1, ha2, ?_⟩
@@ -87,10 +104,12 @@ theorem local_repro (hK : KerEx) (hM : MultAlg) (hB : Bridge.BridgeSt) (W : Subm
   have h2 := congrArg (evL W hW v 1) h1
   simp only [PositivityTheory.RgBcC.act] at h2
   rw [← ContinuousLinearMap.integral_comp_comm _ hint] at h2
-  have hL : ∀ y : G N, evL W hW v 1 (k y.val (F (1 * y.val))) = ∫ u, c y u * h (y * ι u) ∂nuN N := by
+  have hL
+      : ∀ y : G N, evL W hW v 1 (k y.val (F (1 * y.val))) = ∫ u, c y u * h (y * ι u) ∂nuN N := by
     intro y
     rw [one_mul, evL_apply, ← hb]
-    refine (inner_eq W v (b y) (F y.val)).trans (integral_congr_ae (Filter.Eventually.of_forall fun u => ?_))
+    refine (inner_eq W v (b y) (F y.val)).trans
+      (integral_congr_ae (Filter.Eventually.of_forall fun u => ?_))
     simp only [hcdef, hhdef]
     rw [toFun_sec W hW v φ.1 φ.2 hφ g0 (val_mem_GLs y) u]
     congr 1

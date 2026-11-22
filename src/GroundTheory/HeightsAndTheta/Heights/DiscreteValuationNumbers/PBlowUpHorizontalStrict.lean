@@ -22,12 +22,13 @@ set_option linter.unusedSectionVars false
 
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {J : Type} {R : Type*} [CommRing R]
 
-theorem blowUpOf_mono {P W : Ideal (MRing ι R)} (h : P ≤ W) (u : J → MRing ι R) :
-    blowUpOf P u ≤ blowUpOf W u := by
+theorem blowUpOf_mono {P W : Ideal (MRing ι R)} (h : P ≤ W) (u : J → MRing ι R)
+    : blowUpOf P u ≤ blowUpOf W u := by
   intro F hF
   let φ := Polynomial.mapRingHom (Ideal.Quotient.factor h)
-  have key : φ.comp (aeval (R := R) (blowUpSubst P u)).toRingHom =
-      (aeval (R := R) (blowUpSubst W u)).toRingHom := by
+  have key
+      : φ.comp (aeval (R := R) (blowUpSubst P u)).toRingHom
+        = (aeval (R := R) (blowUpSubst W u)).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro r
       simp [φ]
@@ -40,15 +41,16 @@ theorem blowUpOf_mono {P W : Ideal (MRing ι R)} (h : P ≤ W) (u : J → MRing 
   rw [blowUpOf, RingHom.mem_ker] at hF ⊢
   rw [← e, hF, map_zero]
 
-theorem blowUpOf_isPrime {W : Ideal (MRing ι R)} (hW : W.IsPrime) (u : J → MRing ι R) :
-    (blowUpOf W u).IsPrime := by
+theorem blowUpOf_isPrime {W : Ideal (MRing ι R)} (hW : W.IsPrime) (u : J → MRing ι R)
+    : (blowUpOf W u).IsPrime := by
   have := hW
   exact RingHom.ker_isPrime _
 
-theorem blowUpOf_comap_le {P : Ideal (MRing ι R)} {u : J → MRing ι R} {H : Ideal (MRing (extIdx ι J) R)}
-    (hH : H.IsPrime) (hPH : blowUpOf P u ≤ H) {j₀ : J}
-    (hj₀ : u j₀ ∉ H.comap (liftForm (ι := ι) (J := J) (R := R))) :
-    blowUpOf (H.comap (liftForm (ι := ι) (J := J) (R := R))) u ≤ H := by
+theorem blowUpOf_comap_le
+    {P : Ideal (MRing ι R)} {u : J → MRing ι R} {H : Ideal (MRing (extIdx ι J) R)}
+    (hH : H.IsPrime) (hPH : blowUpOf P u ≤ H)
+    {j₀ : J} (hj₀ : u j₀ ∉ H.comap (liftForm (ι := ι) (J := J) (R := R)))
+    : blowUpOf (H.comap (liftForm (ι := ι) (J := J) (R := R))) u ≤ H := by
   have := hH
   let L := FractionRing (MRing (extIdx ι J) R ⧸ H)
   let q : MRing (extIdx ι J) R →+* L := (algebraMap _ L).comp (Ideal.Quotient.mk H)
@@ -58,13 +60,15 @@ theorem blowUpOf_comap_le {P : Ideal (MRing ι R)} {u : J → MRing ι R} {H : I
     rw [map_eq_zero_iff _ (IsFractionRing.injective _ L), Ideal.Quotient.eq_zero_iff_mem]
   have hu₀ : q (liftForm (u j₀)) ≠ 0 := fun h0 => hj₀ ((hq _).mp h0)
   let ψ : MRing ι R ⧸ H.comap (liftForm (ι := ι) (J := J) (R := R)) →+* L :=
-    Ideal.Quotient.lift _ (q.comp (liftForm (ι := ι) (J := J) (R := R)).toRingHom) fun a ha => (hq _).mpr ha
+    Ideal.Quotient.lift _ (q.comp (liftForm (ι := ι) (J := J) (R := R)).toRingHom) fun a ha =>
+      (hq _).mpr ha
   let ε : Polynomial (MRing ι R ⧸ H.comap (liftForm (ι := ι) (J := J) (R := R))) →+* L :=
     Polynomial.eval₂RingHom ψ (q (newVar j₀) / q (liftForm (u j₀)))
   have hψ : ∀ a : MRing ι R, ψ (Ideal.Quotient.mk _ a) = q (liftForm a) := fun a =>
     Ideal.Quotient.lift_mk _ _ _
 
-  have hrelq : ∀ j : J, q (newVar j) * q (liftForm (u j₀)) = q (liftForm (u j)) * q (newVar j₀) := by
+  have hrelq
+      : ∀ j : J, q (newVar j) * q (liftForm (u j₀)) = q (liftForm (u j)) * q (newVar j₀) := by
     intro j
     have hr : newVar j * liftForm (u j₀) - newVar j₀ * liftForm (u j) ∈ H :=
       hPH (mem_blowUpOf_of_sub (P := P) (u := u) (j := j) (j' := j₀) (a := u j₀) (a' := u j)
@@ -72,8 +76,10 @@ theorem blowUpOf_comap_le {P : Ideal (MRing ι R)} {u : J → MRing ι R} {H : I
     have h1 := (hq _).mpr hr
     rw [map_sub, map_mul, map_mul, sub_eq_zero] at h1
     rw [h1, mul_comm]
-  have key : ε.comp (aeval (R := R) (blowUpSubst (H.comap (liftForm (ι := ι) (J := J) (R := R))) u)).toRingHom =
-      q := by
+  have key
+      : ε.comp (aeval (R := R)
+          (blowUpSubst (H.comap (liftForm (ι := ι) (J := J) (R := R))) u)).toRingHom
+        = q := by
     apply MvPolynomial.ringHom_ext
     · intro r
       rw [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, AlgHom.coe_toRingHom, aeval_C,
@@ -110,11 +116,18 @@ theorem BlowUpHorizontalStrict.full : BlowUpHorizontalStrict.Statement.{u} := by
     split_ifs at hW with h
     · exact h.1
     · exact absurd rfl hW
-  have hPW₀ : P ≤ W.comap (liftForm (ι := ι) (J := J) (R := O)) := fun p hp => hBW (liftForm_mem_blowUpOf hp)
+  have hPW₀ : P ≤ W.comap (liftForm (ι := ι) (J := J) (R := O)) := fun p hp =>
+    hBW (liftForm_mem_blowUpOf hp)
   have hle := blowUpOf_comap_le hWp hBW hj₀
   have hxW : liftForm x ∈ W := hmin.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
-  refine le_antisymm (hmin.2 ⟨blowUpOf_isPrime (Ideal.comap_isPrime _ _) u,
-    sup_le (blowUpOf_mono hPW₀ u) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)⟩ hle) hle
+  refine le_antisymm
+    (hmin.2
+      ⟨
+        blowUpOf_isPrime (Ideal.comap_isPrime _ _) u,
+        sup_le (blowUpOf_mono hPW₀ u) ((Ideal.span_singleton_le_iff_mem _).mpr ?_)
+      ⟩
+      hle)
+    hle
   exact liftForm_mem_blowUpOf (P := W.comap (liftForm (ι := ι) (J := J) (R := O))) hxW
 
 end

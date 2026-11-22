@@ -8,14 +8,18 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
-  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic GlobalTheory.Vanishing GlobalTheory.CompHS
+open CategoryTheory AlgebraicGeometry TopologicalSpace Limits NumberField
+  ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.CechPic
+  GlobalTheory.Vanishing GlobalTheory.CompHS
 
 namespace GlobalTheory.CompHS.Modif
 
-theorem geometricallyConnected_str : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y ⟶ Sp F) (U : Y.Opens) (D : ℕ)
-    (M : Modif p U D), SmoothOfRelativeDimension D p → GeometricallyConnected p → Dense (U : Set Y) →
-    GeometricallyConnected M.str := by
+theorem geometricallyConnected_str
+    : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (p : Y ⟶ Sp F) (U : Y.Opens) (D : ℕ)
+        (M : Modif p U D),
+      SmoothOfRelativeDimension D p → GeometricallyConnected p → Dense (U : Set Y)
+        → GeometricallyConnected M.str := by
   intro F _ Y p U D M hs hc hd
   have : Smooth p := SmoothOfRelativeDimension.smooth D p
   have : GeometricallyIntegral p := GlobalTheory.geometricallyIntegral_of_smooth p
@@ -40,11 +44,11 @@ theorem geometricallyConnected_str : ∀ (F : Type) [Field F] (Y : Scheme.{0}) (
   have hdense : Dense ((fst ⁻¹ᵁ M.opn : Z.Opens) : Set Z) := M.dense.preimage fst.isOpenMap
   have hsq : IsPullback (fst ∣_ M.opn) ((fst ⁻¹ᵁ M.opn).ι ≫ snd) (M.opn.ι ≫ M.str) y :=
     (isPullback_morphismRestrict fst M.opn).paste_vert h
-  have : IrreducibleSpace (fst ⁻¹ᵁ M.opn) :=
-    hO.geometrically_irreducibleSpace y _ _ hsq
+  have : IrreducibleSpace (fst ⁻¹ᵁ M.opn) := hO.geometrically_irreducibleSpace y _ _ hsq
   have hirr : IsIrreducible ((fst ⁻¹ᵁ M.opn : Z.Opens) : Set Z) := by
-    have := (IrreducibleSpace.isIrreducible_univ (fst ⁻¹ᵁ M.opn)).image _
-      (fst ⁻¹ᵁ M.opn).ι.continuous.continuousOn
+    have :=
+      (IrreducibleSpace.isIrreducible_univ (fst ⁻¹ᵁ M.opn)).image _
+        (fst ⁻¹ᵁ M.opn).ι.continuous.continuousOn
     rwa [Set.image_univ, Scheme.Opens.range_ι] at this
   have : IrreducibleSpace Z := by
     have hc := hirr.closure

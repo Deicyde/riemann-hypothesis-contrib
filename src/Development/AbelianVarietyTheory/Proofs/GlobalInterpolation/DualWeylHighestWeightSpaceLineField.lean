@@ -17,10 +17,12 @@ noncomputable section
 
 namespace GlobalTheory.Alc
 
-theorem rowDiv_raise_eq_zero (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ)
-    (f : MvPolynomial (Fin N × Fin N) k) (hf : f ∈ dualWeyl k N N ν)
-    (hwt : IsWeightedHomogeneous (rowW N N) f ν) (a b : Fin N) (hab : a < b) (j : ℕ) (hj : 1 ≤ j) :
-    rowDiv k a b j f = 0 := by
+theorem rowDiv_raise_eq_zero
+    (k : Type) [Field k]
+    (N : ℕ) (ν : Fin N → ℕ) (f : MvPolynomial (Fin N × Fin N) k) (hf : f ∈ dualWeyl k N N ν)
+    (hwt : IsWeightedHomogeneous (rowW N N) f ν) (a b : Fin N) (hab : a < b)
+    (j : ℕ) (hj : 1 ≤ j)
+    : rowDiv k a b j f = 0 := by
   classical
   by_contra hne
   have hg : rowDiv k a b j f ∈ dualWeyl k N N ν := rowDivStable k N N ν a b j f hf
@@ -31,15 +33,23 @@ theorem rowDiv_raise_eq_zero (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ)
   have hsh := GlobalTheory.LvT.KerLat.rowDiv_shift k (fun i => (ν i : ℤ)) a b j f hZ
   obtain ⟨m, hm⟩ := ne_zero_iff.mp hne
   have e := hsh hm
-  have dom := (GlobalTheory.DualWeyl.rowDeg_dominated_of_mem_nabla ν _ hg m (mem_support_iff.mpr hm)).1 (a.val + 1)
-  have hrow : ∀ i, ((rowDeg m i : ℕ) : ℤ) = (ν i : ℤ) + (j : ℤ) * ((Pi.single a (1:ℤ) : Fin N → ℤ) i - (Pi.single b (1:ℤ) : Fin N → ℤ) i) := by
+  have dom :=
+    (GlobalTheory.DualWeyl.rowDeg_dominated_of_mem_nabla ν _ hg m (mem_support_iff.mpr hm)).1
+      (a.val + 1)
+  have hrow
+      : ∀ i,
+        ((rowDeg m i : ℕ) : ℤ)
+          = (ν i : ℤ)
+            + (j : ℤ)
+              * ((Pi.single a (1 : ℤ) : Fin N → ℤ) i - (Pi.single b (1 : ℤ) : Fin N → ℤ) i) := by
     intro i
     have := congrFun e i
     rw [GlobalTheory.LvT.KerLat.weight_rowZ, GlobalTheory.LvT.KerLat.weight_rowW] at this
     rw [this]
     simp [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
-  have hcast : ((∑ i : Fin N with i.val < a.val + 1, rowDeg m i : ℕ) : ℤ) =
-      ((∑ i : Fin N with i.val < a.val + 1, ν i : ℕ) : ℤ) + j := by
+  have hcast
+      : ((∑ i : Fin N with i.val < a.val + 1, rowDeg m i : ℕ) : ℤ)
+        = ((∑ i : Fin N with i.val < a.val + 1, ν i : ℕ) : ℤ) + j := by
     push_cast
     simp only [hrow]
     rw [Finset.sum_add_distrib, ← Finset.mul_sum, Finset.sum_sub_distrib]
@@ -52,19 +62,25 @@ theorem rowDiv_raise_eq_zero (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ)
       apply Finset.sum_eq_zero
       intro i hi
       have : i ≠ b := by
-        intro h; subst h
+        intro h
+        subst h
         simp at hi
         have : a.val < i.val := hab
         omega
       simp [Pi.single_apply, this]
-    rw [ha, hb]; ring
+    rw [ha, hb]
+    ring
   have hj' : (1 : ℤ) ≤ j := by exact_mod_cast hj
-  have : ((∑ i : Fin N with i.val < a.val + 1, rowDeg m i : ℕ) : ℤ) ≤
-      ((∑ i : Fin N with i.val < a.val + 1, ν i : ℕ) : ℤ) := by exact_mod_cast dom
+  have : ((∑ i : Fin N with i.val < a.val + 1, rowDeg m i : ℕ) : ℤ)
+      ≤ ((∑ i : Fin N with i.val < a.val + 1, ν i : ℕ) : ℤ) := by
+    exact_mod_cast dom
   omega
 
-theorem hw_line_field : ∀ (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ), Antitone ν → ∀ f ∈ dualWeyl k N N ν,
-    IsWeightedHomogeneous (rowW N N) f ν → ∃ c : k, f = c • hw k le_rfl ν := by
+theorem hw_line_field
+    : ∀ (k : Type) [Field k] (N : ℕ) (ν : Fin N → ℕ),
+      Antitone ν
+        → ∀ f ∈ dualWeyl k N N ν,
+          IsWeightedHomogeneous (rowW N N) f ν → ∃ c : k, f = c • hw k le_rfl ν := by
   intro k _ N ν hν f hf hwt
   classical
   let K := AlgebraicClosure k

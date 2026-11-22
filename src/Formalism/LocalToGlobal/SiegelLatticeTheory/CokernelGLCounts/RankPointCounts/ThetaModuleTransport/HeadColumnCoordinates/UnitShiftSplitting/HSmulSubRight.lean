@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.UnitaryGroupMassFormula.LocCntUG
 
@@ -14,30 +15,33 @@ variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 variable {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
 
-theorem h_smul_sub_left (H : HermSp M V) (c : E) (x y z : V) :
-    H.h (c • (x - y)) z = c * (H.h x z - H.h y z) := by
+theorem h_smul_sub_left (H : HermSp M V) (c : E) (x y z : V)
+    : H.h (c • (x - y)) z = c * (H.h x z - H.h y z) := by
   have : c • (x - y) = c • x + (-c) • y := by rw [smul_sub, sub_eq_add_neg, neg_smul]
   rw [this, H.h_add_left, H.h_smul_left, H.h_smul_left]
   ring
 
-theorem h_smul_sub_right (H : HermSp M V) (c : E) (x y z : V) :
-    H.h z (c • (x - y)) = M.L.cj c * (H.h z x - H.h z y) := by
+theorem h_smul_sub_right (H : HermSp M V) (c : E) (x y z : V)
+    : H.h z (c • (x - y)) = M.L.cj c * (H.h z x - H.h z y) := by
   rw [H.h_herm, h_smul_sub_left, map_mul, map_sub, ← H.h_herm, ← H.h_herm]
 
 theorem e_cj (g : SplitG M.L) (x : E) : g.e (M.L.cj x) = ((g.e x).2, (g.e x).1) := g.e_cj x
 
-theorem zz_mem_R {g : SplitG M.L} (hs : M.split = some g) (H : HermSp M V) {r : ℕ} (t : Term V M r)
-    (hF : Formalism.MainNotions.ThinScalesBound.FrameK H t.f t.T) (hF' : Formalism.MainNotions.ThinScalesBound.FrameK H t.f' t.T')
-    (hT : ∃ c : 𝒪[F], t.T - t.T' = (g.q : F) ^ 2 * c) (hint : MMInt H t) (a b : Fin (r + 1)) :
-    HermSp.ZZplusOf M (H.Zhat t.f t.f') t.T t.T' a b ∈ M.R := by
+theorem zz_mem_R
+    {g : SplitG M.L} (hs : M.split = some g)
+    (H : HermSp M V)
+    {r : ℕ} (t : Term V M r) (hF : Formalism.MainNotions.ThinScalesBound.FrameK H t.f t.T)
+    (hF' : Formalism.MainNotions.ThinScalesBound.FrameK H t.f' t.T')
+    (hT : ∃ c : 𝒪[F], t.T - t.T' = (g.q : F) ^ 2 * c) (hint : MMInt H t) (a b : Fin (r + 1))
+    : HermSp.ZZplusOf M (H.Zhat t.f t.f') t.T t.T' a b ∈ M.R := by
   have hq0 : (g.q : F) ≠ 0 := fun h => g.q_irr.ne_zero (Subtype.ext h)
   set q : F := (g.q : F) with hqdef
   set qi : E := algebraMap F E q⁻¹ with hqi
   have hMM : H.MMfam t = Sum.elim t.f (fun a => qi • (t.f' a - t.f a)) := by
     unfold HermSp.MMfam; rw [hs]
   have memf : ∀ a, t.f a ∈ MMo H t := fun a => Submodule.subset_span ⟨Sum.inl a, by rw [hMM]; rfl⟩
-  have memg : ∀ a, qi • (t.f' a - t.f a) ∈ MMo H t :=
-    fun a => Submodule.subset_span ⟨Sum.inr a, by rw [hMM]; rfl⟩
+  have memg : ∀ a, qi • (t.f' a - t.f a) ∈ MMo H t := fun a =>
+    Submodule.subset_span ⟨Sum.inr a, by rw [hMM]; rfl⟩
   have i1 := comp_mem_O g (hint _ (memg b) _ (memf a))
   have i2 := comp_mem_O g (hint _ (memg a) _ (memf b))
   have i3 := comp_mem_O g (hint _ (memg b) _ (memg a))
@@ -57,12 +61,16 @@ theorem zz_mem_R {g : SplitG M.L} (hs : M.split = some g) (H : HermSp M V) {r : 
     rw [if_pos ⟨rfl, rfl⟩]
     rw [hF.2] at i1
     rw [hF.2, hF'.2] at i3
-    simp only [map_mul, map_sub, map_add (f := _), map_neg, e_alg, e_cj, cj_alg, eqi, cqi, Prod.fst_mul, Prod.snd_mul,
-      Prod.fst_sub, Prod.snd_sub, Prod.fst_add, Prod.snd_add, Prod.fst_neg, Prod.snd_neg] at i1 i3
+    simp only [map_mul, map_sub, map_add (f := _), map_neg, e_alg, e_cj, cj_alg, eqi, cqi,
+        Prod.fst_mul, Prod.snd_mul, Prod.fst_sub, Prod.snd_sub, Prod.fst_add, Prod.snd_add,
+        Prod.fst_neg, Prod.snd_neg]
+      at i1 i3
     rw [← hz] at i1 i3
     apply mem_R_of hs
     · simp only [map_sub, AlgEquiv.apply_symm_apply, Prod.fst_sub, ← hz, ← hqdef]
-      convert i1.1 using 1; field_simp; try ring
+      convert i1.1 using 1
+      field_simp
+      try ring
     · simp only [map_sub, AlgEquiv.apply_symm_apply, Prod.snd_sub, ← hz, ← hqdef]
       have : -(z.2 / q) - t.T' / q = -(q⁻¹ * (z.2 - -t.T)) + q * c := by
         field_simp; linear_combination hc
@@ -78,16 +86,21 @@ theorem zz_mem_R {g : SplitG M.L} (hs : M.split = some g) (H : HermSp M V) {r : 
     rw [hF.1 b a hba'] at i1
     rw [hF.1 a b hab'] at i2
     rw [hF.1 b a hba', hF'.1 b a hba'] at i3
-    simp only [map_mul, map_sub, map_add (f := _), map_neg, map_zero, e_alg, e_cj, cj_alg, eqi, cqi, Prod.fst_mul, Prod.snd_mul,
-      Prod.fst_sub, Prod.snd_sub, Prod.fst_add, Prod.snd_add, Prod.fst_neg, Prod.snd_neg, Prod.fst_zero,
-      Prod.snd_zero] at i1 i2 i3
+    simp only [map_mul, map_sub, map_add (f := _), map_neg, map_zero, e_alg, e_cj, cj_alg, eqi, cqi,
+        Prod.fst_mul, Prod.snd_mul, Prod.fst_sub, Prod.snd_sub, Prod.fst_add, Prod.snd_add,
+        Prod.fst_neg, Prod.snd_neg, Prod.fst_zero, Prod.snd_zero]
+      at i1 i2 i3
     rw [← hz] at i1 i3
     rw [← hw] at i2 i3
     apply mem_R_of hs
     · simp only [AlgEquiv.apply_symm_apply, ← hqdef]
-      convert i1.1 using 1; field_simp; try ring
+      convert i1.1 using 1
+      field_simp
+      try ring
     · simp only [AlgEquiv.apply_symm_apply, ← hqdef]
-      convert (𝒪[F]).neg_mem i2.2 using 1; field_simp; ring
+      convert (𝒪[F]).neg_mem i2.2 using 1
+      field_simp
+      ring
     · refine ⟨-_, (𝒪[F]).neg_mem i3.1, ?_⟩
       simp only [AlgEquiv.apply_symm_apply, ← hqdef]
       field_simp

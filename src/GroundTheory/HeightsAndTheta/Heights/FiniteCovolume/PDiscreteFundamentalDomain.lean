@@ -9,9 +9,10 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 
 open MeasureTheory Set Topology
 
-theorem DiscreteFundamentalDomain.proof (G : Type*) [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
-    [MeasurableSpace G] [BorelSpace G] : DiscreteFundamentalDomain.Statement G := by
+theorem DiscreteFundamentalDomain.proof
+    (G : Type*) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G]
+    : DiscreteFundamentalDomain.Statement G := by
   classical
   intro μ Γ hΓ
 
@@ -33,8 +34,10 @@ theorem DiscreteFundamentalDomain.proof (G : Type*) [Group G] [TopologicalSpace 
     rw [hteq] at h'
     exact h'
 
-  obtain ⟨T, hTc, hTU⟩ := TopologicalSpace.isOpen_iUnion_countable
-    (fun g : G => (fun x => x * g⁻¹) ⁻¹' U) (fun g => hUo.preimage (continuous_mul_const _))
+  obtain ⟨T, hTc, hTU⟩ :=
+    TopologicalSpace.isOpen_iUnion_countable
+      (fun g : G => (fun x => x * g⁻¹) ⁻¹' U)
+      (fun g => hUo.preimage (continuous_mul_const _))
   have hall : ∀ x : G, x ∈ ⋃ g : G, (fun x => x * g⁻¹) ⁻¹' U := fun x =>
     mem_iUnion.2 ⟨x, by simpa using hU1⟩
   have hTne : T.Nonempty := by
@@ -52,15 +55,16 @@ theorem DiscreteFundamentalDomain.proof (G : Type*) [Group G] [TopologicalSpace 
     obtain ⟨_, ⟨n, rfl⟩, hx⟩ := mem_iUnion₂.1 h
     exact ⟨n, hx⟩
 
-  let FD : Set G :=
-    ⋃ n, A n ∩ ⋂ m, ⋂ (_ : m < n), ⋂ γ : Γ, (fun x => (γ : G) * x) ⁻¹' (A m)ᶜ
+  let FD : Set G := ⋃ n, A n ∩ ⋂ m, ⋂ (_ : m < n), ⋂ γ : Γ, (fun x => (γ : G) * x) ⁻¹' (A m)ᶜ
   have memFD : ∀ y, y ∈ FD ↔ ∃ n, y ∈ A n ∧ ∀ m < n, ∀ γ : Γ, (γ : G) * y ∉ A m := by
     intro y
     simp only [FD, mem_iUnion, mem_inter_iff, mem_iInter, mem_preimage, mem_compl_iff]
   have hmeas : MeasurableSet FD :=
-    MeasurableSet.iUnion fun n => (hAo n).measurableSet.inter <|
-      MeasurableSet.iInter fun m => MeasurableSet.iInter fun _ => MeasurableSet.iInter fun γ =>
-        (hAo m).measurableSet.compl.preimage (continuous_const_mul _).measurable
+    MeasurableSet.iUnion fun n =>
+      (hAo n).measurableSet.inter <| MeasurableSet.iInter fun m =>
+        MeasurableSet.iInter fun _ =>
+          MeasurableSet.iInter fun γ =>
+            (hAo m).measurableSet.compl.preimage (continuous_const_mul _).measurable
 
   have uniq : ∀ y, ∀ δ : Γ, y ∈ FD → (δ : G) * y ∈ FD → δ = 1 := by
     intro y δ hy hδy

@@ -17,8 +17,8 @@ section Mat
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem sgUp_mul {N : ℕ} {U V : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U) (hV : IsUpUni V) :
-    sgUp (U * V) = sgUp U + sgUp V := by
+theorem sgUp_mul {N : ℕ} {U V : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U) (hV : IsUpUni V)
+    : sgUp (U * V) = sgUp U + sgUp V := by
   unfold sgUp
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -53,8 +53,8 @@ theorem det_upUni {N : ℕ} {U : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U) : U.
   rw [Matrix.det_of_upperTriangular (fun i j h => (hU i j).1 h)]
   exact Finset.prod_eq_one fun i _ => (hU i i).2 rfl
 
-theorem isUpUni_inv {N : ℕ} {U : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U) :
-    IsUpUni U⁻¹ ∧ U * U⁻¹ = 1 := by
+theorem isUpUni_inv {N : ℕ} {U : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U)
+    : IsUpUni U⁻¹ ∧ U * U⁻¹ = 1 := by
   have hdet : IsUnit U.det := by rw [det_upUni hU]; exact isUnit_one
   have hmul : U * U⁻¹ = 1 := Matrix.mul_nonsing_inv U hdet
   haveI : Invertible U := Matrix.invertibleOfIsUnitDet U hdet
@@ -79,7 +79,8 @@ theorem sgUp_inv {N : ℕ} {U : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U) : sgU
 
 variable [StarRing K]
 
-theorem isLoUni_conjTranspose {N : ℕ} {U : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U) : IsLoUni Uᴴ := by
+theorem isLoUni_conjTranspose {N : ℕ} {U : Matrix (Fin N) (Fin N) K} (hU : IsUpUni U)
+    : IsLoUni Uᴴ := by
   intro i j
   refine ⟨fun h => ?_, fun h => ?_⟩
   · rw [Matrix.conjTranspose_apply, (hU j i).1 h, star_zero]
@@ -94,7 +95,8 @@ theorem sgLo_conjTranspose {N : ℕ} (U : Matrix (Fin N) (Fin N) K) : sgLo Uᴴ 
   · exact Matrix.conjTranspose_apply _ _ _
   · rw [star_zero]
 
-def epsM (r : ℕ) : Matrix (Fin (r + 1)) (Fin (r + 1)) K := Matrix.diagonal fun b => (-1) ^ (r - b.val)
+def epsM (r : ℕ) : Matrix (Fin (r + 1)) (Fin (r + 1)) K :=
+  Matrix.diagonal fun b => (-1) ^ (r - b.val)
 
 theorem epsM_mul_self (r : ℕ) : (epsM r : Matrix (Fin (r + 1)) (Fin (r + 1)) K) * epsM r = 1 := by
   rw [epsM, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -107,8 +109,8 @@ theorem zhatOM_eq {r : ℕ} (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) K) : ZhatOM 
   simp only [ZhatOM, epsM, Matrix.mul_diagonal]
   ring
 
-theorem isUpUni_eps {r : ℕ} {M : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (hM : IsUpUni M) :
-    IsUpUni (epsM r * M * epsM r) := by
+theorem isUpUni_eps {r : ℕ} {M : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (hM : IsUpUni M)
+    : IsUpUni (epsM r * M * epsM r) := by
   intro i j
   simp only [epsM, Matrix.mul_diagonal, Matrix.diagonal_mul]
   refine ⟨fun h => ?_, fun h => ?_⟩
@@ -117,8 +119,8 @@ theorem isUpUni_eps {r : ℕ} {M : Matrix (Fin (r + 1)) (Fin (r + 1)) K} (hM : I
   · subst h
     rw [(hM i i).2 rfl, mul_one, ← mul_pow, neg_one_mul, neg_neg, one_pow]
 
-theorem sgUp_eps {r : ℕ} (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K) :
-    sgUp (epsM r * M * epsM r) = - sgUp M := by
+theorem sgUp_eps {r : ℕ} (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K)
+    : sgUp (epsM r * M * epsM r) = - sgUp M := by
   unfold sgUp
   rw [← Finset.sum_neg_distrib]
   refine Finset.sum_congr rfl fun a _ => ?_
@@ -132,16 +134,16 @@ theorem sgUp_eps {r : ℕ} (M : Matrix (Fin (r + 1)) (Fin (r + 1)) K) :
     linear_combination (-(M a ⟨a.val + 1, h⟩)) * hx
   · simp
 
-theorem core_Z {r : ℕ} (Z₁ Z₂ N M : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (hN : IsUpUni N) (hM : IsUpUni M)
-    (h : Nᴴ * Z₂ = Z₁ * M) :
-    ∃ A B : Matrix (Fin (r + 1)) (Fin (r + 1)) K, IsLoUni A ∧ IsUpUni B ∧
-      ZhatOM Z₂ = A * ZhatOM Z₁ * B ∧ sgLo A + sgUp B = -(star (sgUp N) + sgUp M) := by
+theorem core_Z
+    {r : ℕ} (Z₁ Z₂ N M : Matrix (Fin (r + 1)) (Fin (r + 1)) K) (hN : IsUpUni N) (hM : IsUpUni M)
+    (h : Nᴴ * Z₂ = Z₁ * M)
+    : ∃ A B : Matrix (Fin (r + 1)) (Fin (r + 1)) K,
+      IsLoUni A ∧ IsUpUni B ∧ ZhatOM Z₂ = A * ZhatOM Z₁ * B
+        ∧ sgLo A + sgUp B = -(star (sgUp N) + sgUp M) := by
   obtain ⟨hNi, hNN⟩ := isUpUni_inv hN
   refine ⟨(N⁻¹)ᴴ, epsM r * M * epsM r, isLoUni_conjTranspose hNi, isUpUni_eps hM, ?_, ?_⟩
-  · have hinv : (N⁻¹)ᴴ * Nᴴ = 1 := by
-      rw [← Matrix.conjTranspose_mul, hNN, Matrix.conjTranspose_one]
-    have hZ2 : Z₂ = (N⁻¹)ᴴ * (Z₁ * M) := by
-      rw [← h, ← Matrix.mul_assoc, hinv, Matrix.one_mul]
+  · have hinv : (N⁻¹)ᴴ * Nᴴ = 1 := by rw [← Matrix.conjTranspose_mul, hNN, Matrix.conjTranspose_one]
+    have hZ2 : Z₂ = (N⁻¹)ᴴ * (Z₁ * M) := by rw [← h, ← Matrix.mul_assoc, hinv, Matrix.one_mul]
     rw [zhatOM_eq, zhatOM_eq, hZ2]
     have hee := epsM_mul_self (K := K) r
     simp only [Matrix.mul_assoc]

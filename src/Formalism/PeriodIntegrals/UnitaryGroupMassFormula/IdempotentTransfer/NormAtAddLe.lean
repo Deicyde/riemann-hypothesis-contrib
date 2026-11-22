@@ -24,16 +24,13 @@ section GroupAlg
 
 variable {K : Type} [Field K] [CharZero K] {G : Type} [Group G] [Fintype G]
 
-
-
-
-
 end GroupAlg
 
 section Norms
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {V ι : Type} [AddCommGroup V] [Module K V]
-  [Fintype ι] [DecidableEq ι]
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {V ι : Type} [AddCommGroup V] [Module K V] [Fintype ι] [DecidableEq ι]
 
 lemma normAt_add_le' (b : Basis ι K V) (X : InfinitePlace K → Matrix ι ι ℂ) (v : InfinitePlace K) (x y : V) :
     Formalism.HermitianLatticesTheory.normAt b X v (x + y) ≤ Formalism.HermitianLatticesTheory.normAt b X v x + Formalism.HermitianLatticesTheory.normAt b X v y := by

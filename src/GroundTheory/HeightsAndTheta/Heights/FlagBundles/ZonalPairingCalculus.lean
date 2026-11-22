@@ -27,9 +27,10 @@ theorem exists_polynomial_antiderivative (p : ℝ[X]) : ∃ q : ℝ[X], derivati
     push_cast
     field_simp
 
-theorem exists_centredPrimitive_poly (F : ℝ[X]) :
-    ∃ G : ℝ[X], (∀ c, centredPrimitive F c = G.eval c) ∧
-      derivative G = F - C (uniformMean F.eval) ∧ G.eval (-1) = 0 ∧ G.eval 1 = 0 := by
+theorem exists_centredPrimitive_poly (F : ℝ[X])
+    : ∃ G : ℝ[X],
+      (∀ c, centredPrimitive F c = G.eval c) ∧ derivative G = F - C (uniformMean F.eval)
+        ∧ G.eval (-1) = 0 ∧ G.eval 1 = 0 := by
   obtain ⟨q, hq⟩ := exists_polynomial_antiderivative (F - C (uniformMean F.eval))
   have hprim : ∀ c, centredPrimitive F c = q.eval c - q.eval (-1) := by
     intro c
@@ -43,15 +44,16 @@ theorem exists_centredPrimitive_poly (F : ℝ[X]) :
   have h1 := hprim 1
   unfold centredPrimitive at h1
   rw [intervalIntegral.integral_sub (F.continuous.intervalIntegrable _ _) intervalIntegrable_const,
-    intervalIntegral.integral_const] at h1
+      intervalIntegral.integral_const]
+    at h1
   simp only [eval_sub, eval_C]
   rw [← h1]
   unfold uniformMean
   simp only [smul_eq_mul]
   ring
 
-theorem exists_eq_sq_sub_one_mul (G : ℝ[X]) (hm : G.eval (-1) = 0) (hp : G.eval 1 = 0) :
-    ∃ w : ℝ[X], G = (X ^ 2 - C 1) * w := by
+theorem exists_eq_sq_sub_one_mul (G : ℝ[X]) (hm : G.eval (-1) = 0) (hp : G.eval 1 = 0)
+    : ∃ w : ℝ[X], G = (X ^ 2 - C 1) * w := by
   have h1 : (X - C 1) * (G /ₘ (X - C 1)) = G := mul_divByMonic_eq_iff_isRoot.mpr hp
   have hq : (G /ₘ (X - C 1)).IsRoot (-1) := by
     have h := congrArg (eval (-1)) h1
@@ -64,8 +66,8 @@ theorem exists_eq_sq_sub_one_mul (G : ℝ[X]) (hm : G.eval (-1) = 0) (hp : G.eva
   simp only [map_neg, map_one]
   ring
 
-theorem zonalKernel_of_le {x y : ℝ} (hx : -1 < x) (hy : y < 1) (hyx : y ≤ x) :
-    zonalKernel x y = (1 / 2) * Real.log (1 + x) + (1 / 2) * Real.log (1 - y) - Real.log 2 := by
+theorem zonalKernel_of_le {x y : ℝ} (hx : -1 < x) (hy : y < 1) (hyx : y ≤ x)
+    : zonalKernel x y = (1 / 2) * Real.log (1 + x) + (1 / 2) * Real.log (1 - y) - Real.log 2 := by
   have h1 : (0 : ℝ) < 1 + x := by linarith
   have h2 : (0 : ℝ) < 1 - y := by linarith
   unfold zonalKernel
@@ -77,8 +79,8 @@ theorem zonalKernel_of_le {x y : ℝ} (hx : -1 < x) (hy : y < 1) (hyx : y ≤ x)
   rw [this]
   ring
 
-theorem zonalKernel_of_ge {x y : ℝ} (hx : x < 1) (hy : -1 < y) (hxy : x ≤ y) :
-    zonalKernel x y = (1 / 2) * Real.log (1 + y) + (1 / 2) * Real.log (1 - x) - Real.log 2 := by
+theorem zonalKernel_of_ge {x y : ℝ} (hx : x < 1) (hy : -1 < y) (hxy : x ≤ y)
+    : zonalKernel x y = (1 / 2) * Real.log (1 + y) + (1 / 2) * Real.log (1 - x) - Real.log 2 := by
   have h1 : (0 : ℝ) < 1 + y := by linarith
   have h2 : (0 : ℝ) < 1 - x := by linarith
   unfold zonalKernel
@@ -90,8 +92,8 @@ theorem zonalKernel_of_ge {x y : ℝ} (hx : x < 1) (hy : -1 < y) (hxy : x ≤ y)
   rw [this]
   ring
 
-theorem continuousOn_zonalKernel_mul_eval {x : ℝ} (hx : x ∈ Ioo (-1 : ℝ) 1) (H : ℝ[X]) :
-    ContinuousOn (fun y => zonalKernel x y * H.eval y) (Icc (-1) 1) := by
+theorem continuousOn_zonalKernel_mul_eval {x : ℝ} (hx : x ∈ Ioo (-1 : ℝ) 1) (H : ℝ[X])
+    : ContinuousOn (fun y => zonalKernel x y * H.eval y) (Icc (-1) 1) := by
   apply ContinuousOn.mul _ H.continuous.continuousOn
   unfold zonalKernel
   apply ContinuousOn.mul continuousOn_const
@@ -101,12 +103,12 @@ theorem continuousOn_zonalKernel_mul_eval {x : ℝ} (hx : x ∈ Ioo (-1 : ℝ) 1
   have h2 : 0 < 1 - min x y := by linarith [min_le_left x y, hx.2]
   exact (div_pos (mul_pos h1 h2) (by norm_num)).ne'
 
-theorem integral_zonalKernel_mul_eval (H w ρ σ : ℝ[X]) (e : ℝ)
-    (hw : derivative ((X ^ 2 - C 1) * w) = H - C e)
+theorem integral_zonalKernel_mul_eval
+    (H w ρ σ : ℝ[X]) (e : ℝ) (hw : derivative ((X ^ 2 - C 1) * w) = H - C e)
     (hρ : derivative ρ = -((X + C 1) * w)) (hσ : derivative σ = (C 1 - X) * w)
-    {x : ℝ} (hx : x ∈ Ioo (-1 : ℝ) 1) :
-    ∫ y in (-1 : ℝ)..1, zonalKernel x y * H.eval y =
-      -e + (1 / 2) * (ρ.eval x - ρ.eval (-1) - σ.eval x + σ.eval 1) := by
+    {x : ℝ} (hx : x ∈ Ioo (-1 : ℝ) 1)
+    : ∫ y in (-1 : ℝ)..1, zonalKernel x y * H.eval y
+      = -e + (1 / 2) * (ρ.eval x - ρ.eval (-1) - σ.eval x + σ.eval 1) := by
   obtain ⟨hx1, hx2⟩ := hx
   have hcont := continuousOn_zonalKernel_mul_eval ⟨hx1, hx2⟩ H
   have hint1 : IntervalIntegrable (fun y => zonalKernel x y * H.eval y) volume (-1) x :=
@@ -116,15 +118,19 @@ theorem integral_zonalKernel_mul_eval (H w ρ σ : ℝ[X]) (e : ℝ)
   set Γ : ℝ[X] := (X ^ 2 - C 1) * w with hΓ
   have hΓe : ∀ y, Γ.eval y = (y ^ 2 - 1) * w.eval y := fun y => by simp [hΓ]
   rw [← intervalIntegral.integral_add_adjacent_intervals hint1 hint2]
-  have h1 : ∫ y in (-1 : ℝ)..x, zonalKernel x y * H.eval y =
-      (((1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - x)) *
-          (Γ.eval x + e * (1 + x)) + (1 / 2) * (ρ.eval x - e * x - 2 * e * Real.log (1 - x))) -
-      (((1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - -1)) *
-          (Γ.eval (-1) + e * (1 + -1)) +
-        (1 / 2) * (ρ.eval (-1) - e * (-1) - 2 * e * Real.log (1 - -1))) := by
-    refine intervalIntegral.integral_eq_sub_of_hasDerivAt (f := fun y =>
-      ((1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - y)) *
-          (Γ.eval y + e * (1 + y)) + (1 / 2) * (ρ.eval y - e * y - 2 * e * Real.log (1 - y)))
+  have h1
+      : ∫ y in (-1 : ℝ)..x, zonalKernel x y * H.eval y
+        = (((1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - x))
+              * (Γ.eval x + e * (1 + x))
+            + (1 / 2) * (ρ.eval x - e * x - 2 * e * Real.log (1 - x)))
+          - (((1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - -1))
+              * (Γ.eval (-1) + e * (1 + -1))
+            + (1 / 2) * (ρ.eval (-1) - e * (-1) - 2 * e * Real.log (1 - -1))) := by
+    refine intervalIntegral.integral_eq_sub_of_hasDerivAt
+      (f := fun y =>
+        ((1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - y))
+            * (Γ.eval y + e * (1 + y))
+          + (1 / 2) * (ρ.eval y - e * y - 2 * e * Real.log (1 - y)))
       ?_ hint1
     intro y hy
     rw [uIcc_of_le hx1.le] at hy
@@ -132,12 +138,14 @@ theorem integral_zonalKernel_mul_eval (H w ρ σ : ℝ[X]) (e : ℝ)
     have hy3 : 0 < 1 - y := by linarith
     have hL : HasDerivAt (fun y => Real.log (1 - y)) (-1 / (1 - y)) y := by
       exact ((hasDerivAt_id y).const_sub 1).log hy3.ne'
-    have hk : HasDerivAt (fun y => (1 / 2) * Real.log (1 + x) - Real.log 2 +
-        (1 / 2) * Real.log (1 - y)) ((1 / 2) * (-1 / (1 - y))) y :=
+    have hk : HasDerivAt
+        (fun y => (1 / 2) * Real.log (1 + x) - Real.log 2 + (1 / 2) * Real.log (1 - y))
+        ((1 / 2) * (-1 / (1 - y))) y :=
       (hL.const_mul (1 / 2)).const_add _
     have hP : HasDerivAt (fun y => Γ.eval y + e * (1 + y)) (Γ.derivative.eval y + e * 1) y :=
       (Γ.hasDerivAt y).add (((hasDerivAt_id y).const_add 1).const_mul e)
-    have hQ : HasDerivAt (fun y => (1 / 2) * (ρ.eval y - e * y - 2 * e * Real.log (1 - y)))
+    have hQ : HasDerivAt
+        (fun y => (1 / 2) * (ρ.eval y - e * y - 2 * e * Real.log (1 - y)))
         ((1 / 2) * (ρ.derivative.eval y - e * 1 - 2 * e * (-1 / (1 - y)))) y :=
       (((ρ.hasDerivAt y).sub ((hasDerivAt_id y).const_mul e)).sub (hL.const_mul (2 * e))).const_mul
         (1 / 2)
@@ -146,16 +154,19 @@ theorem integral_zonalKernel_mul_eval (H w ρ σ : ℝ[X]) (e : ℝ)
     simp only [eval_sub, eval_neg, eval_mul, eval_add, eval_C, eval_X, hΓe]
     field_simp
     ring
-  have h2 : ∫ y in x..1, zonalKernel x y * H.eval y =
-      (-(((1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + 1)) *
-          (-Γ.eval 1 + e * (1 - 1))) +
-        (1 / 2) * (σ.eval 1 + 2 * e * Real.log (1 + 1) - e * 1)) -
-      (-(((1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + x)) *
-          (-Γ.eval x + e * (1 - x))) +
-        (1 / 2) * (σ.eval x + 2 * e * Real.log (1 + x) - e * x)) := by
-    refine intervalIntegral.integral_eq_sub_of_hasDerivAt (f := fun y =>
-      -(((1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + y)) *
-          (-Γ.eval y + e * (1 - y))) + (1 / 2) * (σ.eval y + 2 * e * Real.log (1 + y) - e * y))
+  have h2
+      : ∫ y in x..1, zonalKernel x y * H.eval y
+        = (-(((1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + 1))
+              * (- Γ.eval 1 + e * (1 - 1)))
+            + (1 / 2) * (σ.eval 1 + 2 * e * Real.log (1 + 1) - e * 1))
+          - (-(((1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + x))
+              * (- Γ.eval x + e * (1 - x)))
+            + (1 / 2) * (σ.eval x + 2 * e * Real.log (1 + x) - e * x)) := by
+    refine intervalIntegral.integral_eq_sub_of_hasDerivAt
+      (f := fun y =>
+        -(((1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + y))
+            * (- Γ.eval y + e * (1 - y)))
+          + (1 / 2) * (σ.eval y + 2 * e * Real.log (1 + y) - e * y))
       ?_ hint2
     intro y hy
     rw [uIcc_of_le hx2.le] at hy
@@ -163,12 +174,14 @@ theorem integral_zonalKernel_mul_eval (H w ρ σ : ℝ[X]) (e : ℝ)
     have hy3 : 0 < 1 + y := by linarith
     have hL : HasDerivAt (fun y => Real.log (1 + y)) (1 / (1 + y)) y := by
       exact ((hasDerivAt_id y).const_add 1).log hy3.ne'
-    have hk : HasDerivAt (fun y => (1 / 2) * Real.log (1 - x) - Real.log 2 +
-        (1 / 2) * Real.log (1 + y)) ((1 / 2) * (1 / (1 + y))) y :=
+    have hk : HasDerivAt
+        (fun y => (1 / 2) * Real.log (1 - x) - Real.log 2 + (1 / 2) * Real.log (1 + y))
+        ((1 / 2) * (1 / (1 + y))) y :=
       (hL.const_mul (1 / 2)).const_add _
-    have hP : HasDerivAt (fun y => -Γ.eval y + e * (1 - y)) (-Γ.derivative.eval y + e * (-1)) y :=
+    have hP : HasDerivAt (fun y => - Γ.eval y + e * (1 - y)) (- Γ.derivative.eval y + e * (-1)) y :=
       (Γ.hasDerivAt y).neg.add (((hasDerivAt_id y).const_sub 1).const_mul e)
-    have hQ : HasDerivAt (fun y => (1 / 2) * (σ.eval y + 2 * e * Real.log (1 + y) - e * y))
+    have hQ : HasDerivAt
+        (fun y => (1 / 2) * (σ.eval y + 2 * e * Real.log (1 + y) - e * y))
         ((1 / 2) * (σ.derivative.eval y + 2 * e * (1 / (1 + y)) - e * 1)) y :=
       (((σ.hasDerivAt y).add (hL.const_mul (2 * e))).sub ((hasDerivAt_id y).const_mul e)).const_mul
         (1 / 2)

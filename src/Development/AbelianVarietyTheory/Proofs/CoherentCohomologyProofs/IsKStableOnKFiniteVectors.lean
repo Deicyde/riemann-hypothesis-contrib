@@ -11,7 +11,8 @@ open Formalism.MainNotions.S
 
 variable {n : ℕ} {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-def kFiniteVectors (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Submodule ℂ H where
+def kFiniteVectors (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    : Submodule ℂ H where
   carrier := {v | IsKFin ε σ v}
   zero_mem' := by
     refine ⟨⊥, inferInstance, Submodule.zero_mem _, ?_⟩
@@ -29,8 +30,8 @@ def kFiniteVectors (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H
     rintro c a ⟨S, hS, ha, hSK⟩
     exact ⟨S, hS, S.smul_mem c ha, hSK⟩
 
-theorem mem_kFiniteVectors (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v : H) :
-    v ∈ kFiniteVectors ε σ ↔ IsKFin ε σ v := by
+theorem mem_kFiniteVectors (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v : H)
+    : v ∈ kFiniteVectors ε σ ↔ IsKFin ε σ v := by
   exact Iff.rfl
 
 end GlobalTheory.KFiniteVectors

@@ -4,42 +4,52 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-private theorem evI_mulVec {L : Type} [AddCommGroup L] {g : ℕ} (P : L →+ (Fin g → ℂ)) (f : L →ₗ[ℤ] L)
-    (H : Matrix (Fin g) (Fin g) ℂ) (h : ∀ x, P (f x) = H *ᵥ P x) (q : ℤ[X]) (x : L) :
-    P (aeval f q x) = aeval H q *ᵥ P x := by
+private theorem evI_mulVec
+    {L : Type} [AddCommGroup L]
+    {g : ℕ} (P : L →+ (Fin g → ℂ))
+    (f : L →ₗ[ℤ] L) (H : Matrix (Fin g) (Fin g) ℂ) (h : ∀ x, P (f x) = H *ᵥ P x)
+    (q : ℤ[X]) (x : L)
+    : P (aeval f q x) = aeval H q *ᵥ P x := by
   induction q using Polynomial.induction_on generalizing x with
   | C a =>
-    simp [Polynomial.aeval_C, Module.algebraMap_end_apply, Algebra.algebraMap_eq_smul_one, Matrix.smul_mulVec]
+    simp [Polynomial.aeval_C, Module.algebraMap_end_apply, Algebra.algebraMap_eq_smul_one,
+      Matrix.smul_mulVec]
     ext j
     simp
-  | add p r hp hr => simp only [map_add (f := _), LinearMap.add_apply, hp, hr, Matrix.add_mulVec]
+  | add p r hp hr =>
+    simp only [map_add (f := _), LinearMap.add_apply, hp, hr, Matrix.add_mulVec]
   | monomial n a ih =>
-    rw [pow_succ, ← _root_.mul_assoc, map_mul (aeval f) (C a * X ^ n) X, map_mul (aeval H) (C a * X ^ n) X,
-      aeval_X, aeval_X, Module.End.mul_apply, ih, h, Matrix.mulVec_mulVec]
+    rw [pow_succ, ← _root_.mul_assoc, map_mul (aeval f) (C a * X ^ n) X,
+      map_mul (aeval H) (C a * X ^ n) X, aeval_X, aeval_X, Module.End.mul_apply, ih, h,
+      Matrix.mulVec_mulVec]
 
-private theorem evI_diag {g : ℕ} (H Sb : Matrix (Fin g) (Fin g) ℂ) (ev : Fin g → ℂ)
-    (h : H * Sb = Sb * Matrix.diagonal ev) (q : ℤ[X]) :
-    aeval H q * Sb = Sb * Matrix.diagonal fun i => aeval (ev i) q := by
+private theorem evI_diag
+    {g : ℕ}
+    (H Sb : Matrix (Fin g) (Fin g) ℂ) (ev : Fin g → ℂ) (h : H * Sb = Sb * Matrix.diagonal ev)
+    (q : ℤ[X])
+    : aeval H q * Sb = Sb * Matrix.diagonal fun i => aeval (ev i) q := by
   induction q using Polynomial.induction_on with
   | C a =>
     rw [Polynomial.aeval_C]
     simp only [Polynomial.aeval_C, algebraMap_int_eq, eq_intCast, map_intCast]
     rw [Matrix.diagonal_intCast, Int.cast_comm]
-  | add p r hp hr => simp only [map_add (f := _), add_mul, hp, hr, ← Matrix.diagonal_add, mul_add, Pi.add_def]
+  | add p r hp hr =>
+    simp only [map_add (f := _), add_mul, hp, hr, ← Matrix.diagonal_add, mul_add, Pi.add_def]
   | monomial n a ih =>
-    rw [pow_succ, ← _root_.mul_assoc, map_mul (aeval H) (C a * X ^ n) X, aeval_X, _root_.mul_assoc, h,
-      ← _root_.mul_assoc, ih, _root_.mul_assoc, Matrix.diagonal_mul_diagonal]
+    rw [pow_succ, ← _root_.mul_assoc, map_mul (aeval H) (C a * X ^ n) X, aeval_X, _root_.mul_assoc,
+      h, ← _root_.mul_assoc, ih, _root_.mul_assoc, Matrix.diagonal_mul_diagonal]
     congr 2
     funext i
     rw [map_mul (aeval (ev i)) (C a * X ^ n) X, aeval_X]
 
-theorem UpperTheory.Gal.W2.evIntegral_of :
-    UpperTheory.Gal.W2.EvIntegral := by
+theorem UpperTheory.Gal.W2.evIntegral_of : UpperTheory.Gal.W2.EvIntegral := by
   intro F _ _ O _ bar g ρ a D P₀ hP ga H hH Sb ty ev hD i x
   haveI := D.fin
   haveI := D.free
@@ -72,7 +82,8 @@ theorem UpperTheory.Gal.W2.evIntegral_of :
   have hev0 : aeval (ev i) f.charpoly = 0 := by
     have hii := congrFun (congrFun hd i) i
     simpa using hii
-  have hint_ev : IsIntegral ℤ (ev i) := ⟨f.charpoly, LinearMap.charpoly_monic f, by rw [← aeval_def]; exact hev0⟩
+  have hint_ev : IsIntegral ℤ (ev i) :=
+    ⟨f.charpoly, LinearMap.charpoly_monic f, by rw [← aeval_def]; exact hev0⟩
   have hint_t : IsIntegral ℤ (ty i (x : F)) :=
     (NumberField.RingOfIntegers.isIntegral_coe x).map (ty i).toIntAlgHom
   intro hzero
@@ -86,7 +97,7 @@ theorem UpperTheory.Gal.W2.evIntegral_of :
   have hhalf : IsIntegral ℤ (algebraMap ℚ ℂ (1 / 2)) := by
     rw [hprod]
     exact hint_t.mul hint_ev
-  rw [isIntegral_algebraMap_iff ] at hhalf
+  rw [isIntegral_algebraMap_iff] at hhalf
   obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.1 hhalf
   have h2n : ((2 * n : ℤ) : ℚ) = 1 := by
     push_cast

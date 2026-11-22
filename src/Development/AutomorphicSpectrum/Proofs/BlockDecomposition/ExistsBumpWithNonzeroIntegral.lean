@@ -10,11 +10,12 @@ open scoped ENNReal NNReal Topology
 namespace GlobalTheory.CompanionTheory.MeasureBump
 
 theorem exists_integral_ne_zero_of_carried_by_isOpen
-    (X : Type) [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X]
-    [SecondCountableTopology X] [MeasurableSpace X] [BorelSpace X] (m : Measure X) (U : Set X)
-    (hU : IsOpen U) (hc : m Uᶜ = 0) (hm : m ≠ 0)
-    (hint : ∀ χ : X → ℝ, Continuous χ → HasCompactSupport χ → tsupport χ ⊆ U → Integrable χ m) :
-    ∃ χ : X → ℝ, Continuous χ ∧ HasCompactSupport χ ∧ tsupport χ ⊆ U ∧ ∫ x, χ x ∂m ≠ 0 := by
+    (X : Type) [TopologicalSpace X] [T2Space X] [LocallyCompactSpace X] [SecondCountableTopology X]
+    [MeasurableSpace X] [BorelSpace X]
+    (m : Measure X) (U : Set X) (hU : IsOpen U) (hc : m Uᶜ = 0)
+    (hm : m ≠ 0)
+    (hint : ∀ χ : X → ℝ, Continuous χ → HasCompactSupport χ → tsupport χ ⊆ U → Integrable χ m)
+    : ∃ χ : X → ℝ, Continuous χ ∧ HasCompactSupport χ ∧ tsupport χ ⊆ U ∧ ∫ x, χ x ∂m ≠ 0 := by
   have hmU : m U ≠ 0 := by
     intro h0
     apply hm

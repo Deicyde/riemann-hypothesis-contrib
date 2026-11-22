@@ -13,10 +13,13 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory.CapBound
 
-theorem row_le (D : D7) (u : D.what₂.Word) (j : ℕ) (hj : j < D.R.m) (z : Bool × HH D) (r : ℕ) (hr1 : r ≤ 1)
-    (hr : r < D.R.k) :
-    (((nuD D u j z).rowLen r : ℕ) : ℝ) ≤
-      wPl D (j + 1) z - kaJ D (j + 1) + (((D.hcW u (tauPl D z)).u ⟨r, hr⟩ : ℚ) : ℝ) := by
+theorem row_le
+    (D : D7) (u : D.what₂.Word)
+    (j : ℕ) (hj : j < D.R.m)
+    (z : Bool × HH D)
+    (r : ℕ) (hr1 : r ≤ 1) (hr : r < D.R.k)
+    : (((nuD D u j z).rowLen r : ℕ) : ℝ)
+      ≤ wPl D (j + 1) z - kaJ D (j + 1) + (((D.hcW u (tauPl D z)).u ⟨r, hr⟩ : ℚ) : ℝ) := by
   have hw : wPl D (j + 1) z = (((D.hcW u (tauPl D z)).e ⟨j, hj⟩ : ℚ) : ℝ) := by
     unfold wPl wj
     rw [dite_eq_left (by simpa using hj), D.hcW_e]
@@ -30,7 +33,16 @@ theorem row_le (D : D7) (u : D.what₂.Word) (j : ℕ) (hj : j < D.R.m) (z : Boo
   push_cast
   linarith
 
-theorem cap_le : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), (if IsTopPl (Fm.D x i) z then (((nuD (Fm.D x i) u j z).rowLen 1 : ℕ) : ℝ) else (((nuD (Fm.D x i) u j z).rowLen 0 : ℕ) : ℝ)) ≤ fillG (Fm.Gx x i) (bL (Fm.L x i)) (j + 1) z + cG (Fm.L x i) := by
+theorem cap_le
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m,
+          ∀ (z : Bool × HH (Fm.D x i)),
+            (if IsTopPl (Fm.D x i) z then
+               (((nuD (Fm.D x i) u j z).rowLen 1 : ℕ) : ℝ)
+             else
+               (((nuD (Fm.D x i) u j z).rowLen 0 : ℕ) : ℝ))
+              ≤ fillG (Fm.Gx x i) (bL (Fm.L x i)) (j + 1) z + cG (Fm.L x i) := by
   intro eps Fm
   obtain ⟨x0, hx0⟩ := GlobalTheory.fill_eq_wPl Fm
   refine ⟨x0, fun x hx hx1 i u j hj z => ?_⟩
@@ -41,11 +53,13 @@ theorem cap_le : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm
   rw [hx0 x hx hx1 i j hj z]
   split_ifs with hz
   · have h1 := row_le (Fm.D x i) u j hj z 1 le_rfl (by omega)
-    obtain ⟨-, h4⟩ := (Fm.L x i).cloud_u u (tauPl (Fm.D x i) z) ⟨1, by omega⟩ le_rfl (by show 1 + 1 < _; omega)
+    obtain ⟨-, h4⟩ :=
+      (Fm.L x i).cloud_u u (tauPl (Fm.D x i) z) ⟨1, by omega⟩ le_rfl (by show 1 + 1 < _; omega)
     linarith
   · have h1 := row_le (Fm.D x i) u j hj z 0 (by omega) (by omega)
-    obtain ⟨-, h4⟩ := GlobalTheory.LongRows.u_bounds_off (Fm.params x hx1 i) u _
-      (GlobalTheory.LongRows.not_mem_topPlaces _ z hz) 0 (by omega)
+    obtain ⟨-, h4⟩ :=
+      GlobalTheory.LongRows.u_bounds_off (Fm.params x hx1 i) u _
+        (GlobalTheory.LongRows.not_mem_topPlaces _ z hz) 0 (by omega)
     rw [if_pos rfl] at h4
     linarith
 

@@ -6,15 +6,18 @@ public import Mathlib
 
 open IsLocalRing Polynomial
 
-theorem UpperTheory.V.Th.Sp.dlam :
-    ∀ (O σ : Type) [CommRing O] [DecidableEq σ] (th : MvPowerSeries σ O →ₐ[O] O) (k : σ), ∃ d : MvPowerSeries σ O →ₗ[O] O, (∀ a b, d (a * b) = th a • d b + th b • d a) ∧ ∀ k', d (MvPowerSeries.X k') = if k = k' then 1 else 0 := by
+theorem UpperTheory.V.Th.Sp.dlam
+    : ∀ (O σ : Type) [CommRing O] [DecidableEq σ] (th : MvPowerSeries σ O →ₐ[O] O) (k : σ),
+      ∃ d : MvPowerSeries σ O →ₗ[O] O,
+        (∀ a b, d (a * b) = th a • d b + th b • d a)
+          ∧ ∀ k', d (MvPowerSeries.X k') = if k = k' then 1 else 0 := by
   intro O σ _ _ th k
   refine ⟨th.toLinearMap ∘ₗ (MvPowerSeries.pderiv (R := O) k).toLinearMap, ?_, ?_⟩
   · intro a b
     show th (MvPowerSeries.pderiv (R := O) k (a * b)) =
       th a • th (MvPowerSeries.pderiv (R := O) k b) + th b • th (MvPowerSeries.pderiv (R := O) k a)
-    rw [Derivation.leibniz, map_add (f := _), smul_eq_mul, smul_eq_mul, map_mul, map_mul, smul_eq_mul,
-      smul_eq_mul]
+    rw [Derivation.leibniz, map_add (f := _), smul_eq_mul, smul_eq_mul, map_mul, map_mul,
+      smul_eq_mul, smul_eq_mul]
   · intro k'
     show th (MvPowerSeries.pderiv (R := O) k (MvPowerSeries.X k')) = if k = k' then 1 else 0
     by_cases h : k = k'

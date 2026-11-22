@@ -16,9 +16,9 @@ section PrimeDegree
 
 variable {K L : Type u} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
-theorem SecondInequalityRoots.index_le_of_prime (hR : SecondInequalityRoots.{u}) [IsGalois K L]
-    {p : ℕ} (hp : p.Prime) (hL : finrank K L = p) :
-    (ideleClassNorm K L).range.index ≠ 0 ∧ (ideleClassNorm K L).range.index ≤ p := by
+theorem SecondInequalityRoots.index_le_of_prime
+    (hR : SecondInequalityRoots.{u}) [IsGalois K L] {p : ℕ} (hp : p.Prime) (hL : finrank K L = p)
+    : (ideleClassNorm K L).range.index ≠ 0 ∧ (ideleClassNorm K L).range.index ≤ p := by
   have : Fact p.Prime := ⟨hp⟩
   have : NeZero p := ⟨hp.ne_zero⟩
   let E := CyclotomicField p L
@@ -51,9 +51,12 @@ theorem SecondInequalityRoots.index_le_of_prime (hR : SecondInequalityRoots.{u})
     rw [map_cyclotomic]
     exact IsCyclotomicExtension.splitting_field_cyclotomic p L E
   have : IsSplittingField K E (f * cyclotomic p K) :=
-    IsSplittingField.mul (F := K) (K := L) (L := E) f (cyclotomic p K) hfsep.ne_zero (cyclotomic_ne_zero p K)
-  have : IsGalois K E :=
-    { to_isSeparable := inferInstance, to_normal := Normal.of_isSplittingField (f * cyclotomic p K) }
+    IsSplittingField.mul (F := K) (K := L) (L := E) f (cyclotomic p K) hfsep.ne_zero
+      (cyclotomic_ne_zero p K)
+  have : IsGalois K E := {
+    to_isSeparable := inferInstance
+    to_normal := Normal.of_isSplittingField (f * cyclotomic p K)
+  }
   have : IsGalois K' E := IsGalois.tower_top_of_isGalois K K' E
 
   let L' : IntermediateField K E := (IsScalarTower.toAlgHom K L E).fieldRange
@@ -70,7 +73,9 @@ theorem SecondInequalityRoots.index_le_of_prime (hR : SecondInequalityRoots.{u})
     | add _ _ _ _ h1 h2 => exact add_mem h1 h2
     | mul _ _ _ _ h1 h2 => exact mul_mem h1 h2
   have hL' : finrank K L' = p := by
-    exact (AlgEquiv.ofInjectiveField (IsScalarTower.toAlgHom K L E)).toLinearEquiv.finrank_eq.symm.trans hL
+    exact
+      (AlgEquiv.ofInjectiveField (IsScalarTower.toAlgHom K L E)).toLinearEquiv.finrank_eq.symm.trans
+        hL
 
   have htow1 : finrank K K' * finrank K' E = finrank K E := finrank_mul_finrank K K' E
   have htow2 : finrank K L * finrank L E = finrank K E := finrank_mul_finrank K L E
@@ -91,8 +96,8 @@ theorem SecondInequalityRoots.index_le_of_prime (hR : SecondInequalityRoots.{u})
 
   have hE := (enatCard_quotient_le_iff _ p).1 (hR K' E p hp hroots hdeg)
 
-  have hcomap : (ideleClassNorm K' E).range.comap (ideleClassMap K K') ≤
-      (ideleClassNorm K L).range := by
+  have hcomap
+      : (ideleClassNorm K' E).range.comap (ideleClassMap K K') ≤ (ideleClassNorm K L).range := by
     intro c hc
     obtain ⟨y, hy⟩ := hc
     refine mem_of_pow_mem_of_coprime hcop ?_ (hL ▸ pow_finrank_mem_range_ideleClassNorm c)

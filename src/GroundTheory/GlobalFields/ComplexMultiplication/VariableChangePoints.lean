@@ -12,9 +12,9 @@ variable {F : Type*} [Field F]
 
 section VariableChangePoint
 
-theorem nonsingular_variableChange (C : VariableChange F) (W : WeierstrassCurve F) {x y : F}
-    (h : W.toAffine.Nonsingular x y) :
-    (C • W).toAffine.Nonsingular (↑C.u⁻¹ ^ 2 * (x - C.r))
+theorem nonsingular_variableChange
+    (C : VariableChange F) (W : WeierstrassCurve F) {x y : F} (h : W.toAffine.Nonsingular x y)
+    : (C • W).toAffine.Nonsingular (↑C.u⁻¹ ^ 2 * (x - C.r))
       (↑C.u⁻¹ ^ 3 * (y - C.s * (x - C.r) - C.t)) := by
   rw [Affine.nonsingular_iff'] at h ⊢
   obtain ⟨he, hd⟩ := h
@@ -39,17 +39,21 @@ theorem nonsingular_variableChange (C : VariableChange F) (W : WeierstrassCurve 
     · exact hd hX
     · exact hd hY
 
-def variableChangePoint (C : VariableChange F) {W W' : WeierstrassCurve F} (hC : C • W = W') :
-    W.toAffine.Point → W'.toAffine.Point
+def variableChangePoint (C : VariableChange F) {W W' : WeierstrassCurve F} (hC : C • W = W')
+    : W.toAffine.Point → W'.toAffine.Point
   | .zero => .zero
-  | .some x y h => .some (↑C.u⁻¹ ^ 2 * (x - C.r)) (↑C.u⁻¹ ^ 3 * (y - C.s * (x - C.r) - C.t))
+  | .some x y h =>
+    .some (↑C.u⁻¹ ^ 2 * (x - C.r)) (↑C.u⁻¹ ^ 3 * (y - C.s * (x - C.r) - C.t))
       (by subst hC; exact nonsingular_variableChange C W h)
 
-theorem variableChangePoint_some (C : VariableChange F) {W W' : WeierstrassCurve F}
-    (hC : C • W = W') {x y : F} (h : W.toAffine.Nonsingular x y) :
-    variableChangePoint C hC (.some x y h) =
-      .some (↑C.u⁻¹ ^ 2 * (x - C.r)) (↑C.u⁻¹ ^ 3 * (y - C.s * (x - C.r) - C.t))
-        (by subst hC; exact nonsingular_variableChange C W h) := rfl
+theorem variableChangePoint_some
+    (C : VariableChange F)
+    {W W' : WeierstrassCurve F} (hC : C • W = W')
+    {x y : F} (h : W.toAffine.Nonsingular x y)
+    : variableChangePoint C hC (.some x y h)
+      = .some (↑C.u⁻¹ ^ 2 * (x - C.r)) (↑C.u⁻¹ ^ 3 * (y - C.s * (x - C.r) - C.t))
+        (by subst hC; exact nonsingular_variableChange C W h) :=
+  rfl
 
 end VariableChangePoint
 

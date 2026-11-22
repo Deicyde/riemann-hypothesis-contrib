@@ -8,13 +8,18 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.C
 
-private theorem summand_map {G H : Type} [Group G] [TopologicalSpace G] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) (W : Submodule ℂ H) (e : G ≃* G)
-    (U : H ≃ₗᵢ[ℂ] H) (hU : ∀ g v, U (π g v) = π (e g) (U v)) (hW : W.map (U : H →ₗ[ℂ] H) = W)
-    {V : Submodule ℂ H} (hV : IsSummandOf π W V) : IsSummandOf π W (V.map (U : H →ₗ[ℂ] H)) := by
+private theorem summand_map
+    {G H : Type}
+    [Group G] [TopologicalSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : UnitaryRep G H) (W : Submodule ℂ H) (e : G ≃* G) (U : H ≃ₗᵢ[ℂ] H)
+    (hU : ∀ g v, U (π g v) = π (e g) (U v)) (hW : W.map (U : H →ₗ[ℂ] H) = W)
+    {V : Submodule ℂ H} (hV : IsSummandOf π W V)
+    : IsSummandOf π W (V.map (U : H →ₗ[ℂ] H)) := by
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · rintro _ ⟨v, hv, rfl⟩
     rw [← hW]
@@ -56,23 +61,30 @@ private theorem summand_map {G H : Type} [Group G] [TopologicalSpace G] [NormedA
       rw [← h] at hv
       exact hv
 
-private theorem preserves_closure {H ι : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (V : ι → Submodule ℂ H) (W : Submodule ℂ H) (hc : IsClosed (W : Set H))
-    (hspan : (⨆ i, V i).topologicalClosure = W) (B : H →L[ℂ] H) (hB : ∀ i, ∀ v ∈ V i, B v ∈ V i)
-    (hle : ∀ i, V i ≤ W) : ∀ v ∈ W, B v ∈ W := by
-  have hcl : IsClosed ((W.comap (B : H →ₗ[ℂ] H) : Submodule ℂ H) : Set H) := hc.preimage B.continuous
+private theorem preserves_closure
+    {H ι : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (V : ι → Submodule ℂ H) (W : Submodule ℂ H)
+    (hc : IsClosed (W : Set H)) (hspan : (⨆ i, V i).topologicalClosure = W)
+    (B : H →L[ℂ] H) (hB : ∀ i, ∀ v ∈ V i, B v ∈ V i)
+    (hle : ∀ i, V i ≤ W)
+    : ∀ v ∈ W, B v ∈ W := by
+  have hcl : IsClosed ((W.comap (B : H →ₗ[ℂ] H) : Submodule ℂ H) : Set H) :=
+    hc.preimage B.continuous
   have h1 : (⨆ i, V i) ≤ W.comap (B : H →ₗ[ℂ] H) := iSup_le fun i v hv => hle i (hB i v hv)
   have h2 := Submodule.topologicalClosure_minimal _ h1 hcl
   rw [hspan] at h2
   exact fun v hv => h2 hv
 
-private theorem trOn_eig_zero {G H : Type} [Group G] [TopologicalSpace G] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) (W : Submodule ℂ H) (e : G ≃* G)
-    (U : H ≃ₗᵢ[ℂ] H) (hU : ∀ g v, U (π g v) = π (e g) (U v)) (hW : W.map (U : H →ₗ[ℂ] H) = W)
+private theorem trOn_eig_zero
+    {G H : Type}
+    [Group G] [TopologicalSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : UnitaryRep G H) (W : Submodule ℂ H) (e : G ≃* G) (U : H ≃ₗᵢ[ℂ] H)
+    (hU : ∀ g v, U (π g v) = π (e g) (U v)) (hW : W.map (U : H →ₗ[ℂ] H) = W)
     (hmult : ∀ V V', IsSummandOf π W V → IsSummandOf π W V' → V ≠ V' → V ⟂ V')
-    (T : H →L[ℂ] H) (hT : ∀ V, IsSummandOf π W V → ∀ v ∈ V, T v ∈ V) (A : H →L[ℂ] H) (x : ℝ)
-    {V : Submodule ℂ H} (hV : IsSummandOf π W V) (hne : V.map (U : H →ₗ[ℂ] H) ≠ V) :
-    trOn (eigIn V A x) (T ∘L (U : H →L[ℂ] H)) = 0 := by
+    (T : H →L[ℂ] H) (hT : ∀ V, IsSummandOf π W V → ∀ v ∈ V, T v ∈ V)
+    (A : H →L[ℂ] H) (x : ℝ)
+    {V : Submodule ℂ H} (hV : IsSummandOf π W V) (hne : V.map (U : H →ₗ[ℂ] H) ≠ V)
+    : trOn (eigIn V A x) (T ∘L (U : H →L[ℂ] H)) = 0 := by
   have hm := summand_map π W e U hU hW hV
   have ho : V.map (U : H →ₗ[ℂ] H) ⟂ V := hmult _ _ hm hV hne
   have hEV : eigIn V A x ≤ V := inf_le_left
@@ -90,23 +102,27 @@ private theorem trOn_eig_zero {G H : Type} [Group G] [TopologicalSpace G] [Norme
   rw [h0]
   simp [trace]
 
-private theorem band_core {G H : Type} [Group G] [TopologicalSpace G] [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (π : UnitaryRep G H) (W : Submodule ℂ H) (e : G ≃* G)
-    (U : H ≃ₗᵢ[ℂ] H) (hU : ∀ g v, U (π g v) = π (e g) (U v)) (hW : W.map (U : H →ₗ[ℂ] H) = W)
+private theorem band_core
+    {G H : Type}
+    [Group G] [TopologicalSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (π : UnitaryRep G H) (W : Submodule ℂ H) (e : G ≃* G) (U : H ≃ₗᵢ[ℂ] H)
+    (hU : ∀ g v, U (π g v) = π (e g) (U v)) (hW : W.map (U : H →ₗ[ℂ] H) = W)
     (hspan : (⨆ V : {V // IsSummandOf π W V}, V.1).topologicalClosure = W)
     (hmult : ∀ V V', IsSummandOf π W V → IsSummandOf π W V' → V ≠ V' → V ⟂ V')
     (A : H →L[ℂ] H) (hA0 : 0 ≤ A) (hAV : ∀ V, IsSummandOf π W V → ∀ v ∈ V, A v ∈ V)
-    (hAc : IsCompactOperator (A ∘L prj W)) (η : ℝ) (hη : 0 < η) :
-    ∃ S : Finset (ℝ × Submodule ℂ H),
-      (∀ p, p ∈ S ↔ η < p.1 ∧ IsSummandOf π W p.2 ∧ p.2.map (U : H →ₗ[ℂ] H) = p.2 ∧
-        eigIn p.2 A p.1 ≠ ⊥) ∧
-      (∀ p ∈ S, FiniteDimensional ℂ (eigIn p.2 A p.1)) ∧
-      ∀ (φ : ℝ → ℝ) (c : ℝ) (T : H →L[ℂ] H), Continuous φ → 0 ≤ c →
-        (∀ x ∈ Set.Icc 0 η, |φ x| ≤ c) →
-        (∀ V, IsSummandOf π W V → ∀ v ∈ V, T v ∈ V) → IsTraceClass (prj W ∘L T ∘L prj W) →
-        ‖trace (prj W ∘L cfc φ A ∘L T ∘L (U : H →L[ℂ] H) ∘L prj W) -
-            ∑ p ∈ S, (φ p.1 : ℂ) * trOn (eigIn p.2 A p.1) (T ∘L (U : H →L[ℂ] H))‖ ≤
-          c * (traceNorm (prj W ∘L T ∘L prj W)).toReal := by
+    (hAc : IsCompactOperator (A ∘L prj W))
+    (η : ℝ) (hη : 0 < η)
+    : ∃ S : Finset (ℝ × Submodule ℂ H),
+      (∀ p,
+          p ∈ S
+            ↔ η < p.1 ∧ IsSummandOf π W p.2 ∧ p.2.map (U : H →ₗ[ℂ] H) = p.2 ∧ eigIn p.2 A p.1 ≠ ⊥)
+        ∧ (∀ p ∈ S, FiniteDimensional ℂ (eigIn p.2 A p.1))
+        ∧ ∀ (φ : ℝ → ℝ) (c : ℝ) (T : H →L[ℂ] H),
+          Continuous φ → 0 ≤ c → (∀ x ∈ Set.Icc 0 η, |φ x| ≤ c)
+            → (∀ V, IsSummandOf π W V → ∀ v ∈ V, T v ∈ V) → IsTraceClass (prj W ∘L T ∘L prj W)
+            → ‖trace (prj W ∘L cfc φ A ∘L T ∘L (U : H →L[ℂ] H) ∘L prj W) -
+                  ∑ p ∈ S, (φ p.1 : ℂ) * trOn (eigIn p.2 A p.1) (T ∘L (U : H →L[ℂ] H))‖
+              ≤ c * (traceNorm (prj W ∘L T ∘L prj W)).toReal := by
   classical
   have hc : IsClosed (W : Set H) := by
     rw [← hspan]
@@ -122,27 +138,40 @@ private theorem band_core {G H : Type} [Group G] [TopologicalSpace G] [NormedAdd
     exact ⟨w, hw, rfl⟩
   have hle : ∀ i : {V // IsSummandOf π W V}, i.1 ≤ W := fun i => i.2.le
   have hpres : ∀ B : H →L[ℂ] H, (∀ V, IsSummandOf π W V → ∀ v ∈ V, B v ∈ V) → ∀ v ∈ W, B v ∈ W :=
-    fun B hB => preserves_closure (fun i : {V // IsSummandOf π W V} => i.1) W hc hspan B
-      (fun i => hB i.1 i.2) hle
+    fun B hB =>
+      preserves_closure
+        (fun i : {V // IsSummandOf π W V} => i.1)
+        W hc hspan B
+        (fun i => hB i.1 i.2)
+        hle
   have hAW := hpres A hAV
   obtain ⟨S0, hS1, hS2, hS3⟩ := UpperTheory.ConvolutionTheory.C.eigSplit H W A hc hA0 hAW hAc η hη
   have hsa : IsSelfAdjoint A := hA0.isSelfAdjoint
-  have hex : ∀ x ∈ S0, ∃ s : Finset {V // IsSummandOf π W V},
-      (∀ i, i ∈ s ↔ eigIn i.1 A x ≠ ⊥) ∧ ∀ B : H →L[ℂ] H,
-        trOn (eigIn W A x) B = ∑ i ∈ s, trOn (eigIn i.1 A x) B := by
+  have hex
+      : ∀ x ∈ S0, ∃ s : Finset {V // IsSummandOf π W V},
+        (∀ i, i ∈ s ↔ eigIn i.1 A x ≠ ⊥)
+          ∧ ∀ B : H →L[ℂ] H, trOn (eigIn W A x) B = ∑ i ∈ s, trOn (eigIn i.1 A x) B := by
     intro x hx
-    obtain ⟨s, h1, -, h3⟩ := UpperTheory.ConvolutionTheory.C.eigSummands H {V // IsSummandOf π W V} (fun i => i.1) W A x
-      (fun i => i.2.closed)
-      (fun a b hab => hmult a.1 b.1 a.2 b.2 fun h => hab (Subtype.ext h)) hspan hsa
-      (fun i => hAV i.1 i.2) (hS2 x hx)
+    obtain ⟨s, h1, -, h3⟩ :=
+      UpperTheory.ConvolutionTheory.C.eigSummands H {V // IsSummandOf π W V}
+        (fun i => i.1)
+        W A x
+        (fun i => i.2.closed)
+        (fun a b hab => hmult a.1 b.1 a.2 b.2 fun h => hab (Subtype.ext h))
+        hspan hsa
+        (fun i => hAV i.1 i.2)
+        (hS2 x hx)
     exact ⟨s, h1, h3⟩
   choose! s hs1 hs2 using hex
-  have hEle : ∀ {V : Submodule ℂ H} (x : ℝ), V ≤ W → eigIn V A x ≤ eigIn W A x :=
-    fun {V} x h => inf_le_inf_right _ h
+  have hEle : ∀ {V : Submodule ℂ H} (x : ℝ), V ≤ W → eigIn V A x ≤ eigIn W A x := fun {V} x h =>
+    inf_le_inf_right _ h
   let f : ℝ → Finset (ℝ × Submodule ℂ H) := fun x =>
     ((s x).filter fun i => i.1.map (U : H →ₗ[ℂ] H) = i.1).image fun i => (x, i.1)
-  have hmemS : ∀ p, p ∈ S0.biUnion f ↔ η < p.1 ∧ IsSummandOf π W p.2 ∧
-      p.2.map (U : H →ₗ[ℂ] H) = p.2 ∧ eigIn p.2 A p.1 ≠ ⊥ := by
+  have hmemS
+      : ∀ p,
+        p ∈ S0.biUnion f
+          ↔ η < p.1 ∧ IsSummandOf π W p.2 ∧ p.2.map (U : H →ₗ[ℂ] H) = p.2
+            ∧ eigIn p.2 A p.1 ≠ ⊥ := by
     rintro ⟨x, V⟩
     simp only [Finset.mem_biUnion, f, Finset.mem_image, Finset.mem_filter, Prod.mk.injEq]
     constructor
@@ -159,33 +188,39 @@ private theorem band_core {G H : Type} [Group G] [TopologicalSpace G] [NormedAdd
     exact Submodule.finiteDimensional_of_le (hEle p.1 h2.le)
   · intro φ c T hφ hc0 hb hT htr
     have hTW := hpres T hT
-    have hcomp : prj W ∘L (T ∘L (U : H →L[ℂ] H)) ∘L prj W =
-        (prj W ∘L T ∘L prj W) ∘L ((U : H →L[ℂ] H) ∘L prj W) := by
+    have hcomp
+        : prj W ∘L (T ∘L (U : H →L[ℂ] H)) ∘L prj W
+          = (prj W ∘L T ∘L prj W) ∘L ((U : H →L[ℂ] H) ∘L prj W) := by
       ext y
       change prj W (T (U (prj W y))) = prj W (T (prj W (U (prj W y))))
       rw [hPself _ (hUW _ (hPmem y))]
     have hUP : ‖(U : H →L[ℂ] H) ∘L prj W‖ₑ ≤ 1 := by
-      refine enorm_le_one_of_norm_le_one (ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun y => ?_)
+      refine enorm_le_one_of_norm_le_one (ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun y =>
+        ?_)
       change ‖U (prj W y)‖ ≤ 1 * ‖y‖
       rw [U.norm_map, one_mul]
       exact Submodule.norm_starProjection_apply_le _ _
-    have hnorm : traceNorm (prj W ∘L (T ∘L (U : H →L[ℂ] H)) ∘L prj W) ≤
-        traceNorm (prj W ∘L T ∘L prj W) := by
+    have hnorm
+        : traceNorm (prj W ∘L (T ∘L (U : H →L[ℂ] H)) ∘L prj W)
+          ≤ traceNorm (prj W ∘L T ∘L prj W) := by
       rw [hcomp]
       refine (traceNorm_comp_right_le _ _).trans ?_
-      calc _ ≤ 1 * traceNorm (prj W ∘L T ∘L prj W) := by gcongr
+      calc
+        _ ≤ 1 * traceNorm (prj W ∘L T ∘L prj W) := by gcongr
         _ = _ := one_mul _
     have htc : IsTraceClass (prj W ∘L (T ∘L (U : H →L[ℂ] H)) ∘L prj W) := hnorm.trans_lt htr
     have hmain := hS3 φ c (T ∘L (U : H →L[ℂ] H)) hφ hc0 hb htc
-    have hfirst : trOn W (cfc φ A ∘L prj W ∘L (T ∘L (U : H →L[ℂ] H))) =
-        trace (prj W ∘L cfc φ A ∘L T ∘L (U : H →L[ℂ] H) ∘L prj W) := by
+    have hfirst
+        : trOn W (cfc φ A ∘L prj W ∘L (T ∘L (U : H →L[ℂ] H)))
+          = trace (prj W ∘L cfc φ A ∘L T ∘L (U : H →L[ℂ] H) ∘L prj W) := by
       unfold trOn
       congr 1
       ext y
       change prj W (cfc φ A (prj W (T (U (prj W y))))) = prj W (cfc φ A (T (U (prj W y))))
       rw [hPself _ (hTW _ (hUW _ (hPmem y)))]
-    have hsum : ∑ p ∈ S0.biUnion f, (φ p.1 : ℂ) * trOn (eigIn p.2 A p.1) (T ∘L (U : H →L[ℂ] H)) =
-        ∑ x ∈ S0, (φ x : ℂ) * trOn (eigIn W A x) (T ∘L (U : H →L[ℂ] H)) := by
+    have hsum
+        : ∑ p ∈ S0.biUnion f, (φ p.1 : ℂ) * trOn (eigIn p.2 A p.1) (T ∘L (U : H →L[ℂ] H))
+          = ∑ x ∈ S0, (φ x : ℂ) * trOn (eigIn W A x) (T ∘L (U : H →L[ℂ] H)) := by
       rw [Finset.sum_biUnion]
       · refine Finset.sum_congr rfl fun x hx => ?_
         rw [Finset.sum_image, hs2 x hx, Finset.mul_sum, Finset.sum_filter]
@@ -205,18 +240,21 @@ private theorem band_core {G H : Type} [Group G] [TopologicalSpace G] [NormedAdd
     refine hmain.trans ?_
     exact mul_le_mul_of_nonneg_left (ENNReal.toReal_mono htr.ne hnorm) hc0
 
-private theorem prj_eq_star {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    [CompleteSpace H] (W : Submodule ℂ H) [W.HasOrthogonalProjection] (hc : IsClosed (W : Set H)) :
-    prj W = W.starProjection := by
-  have key : ∀ (K K' : Submodule ℂ H) [K.HasOrthogonalProjection] [K'.HasOrthogonalProjection],
-      K = K' → K.starProjection = K'.starProjection := by
+private theorem prj_eq_star
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (W : Submodule ℂ H) [W.HasOrthogonalProjection]
+    (hc : IsClosed (W : Set H))
+    : prj W = W.starProjection := by
+  have key
+      : ∀ (K K' : Submodule ℂ H) [K.HasOrthogonalProjection] [K'.HasOrthogonalProjection],
+        K = K' → K.starProjection = K'.starProjection := by
     intro K K' _ _ h
     subst h
     rfl
   exact key _ _ hc.submodule_topologicalClosure_eq
 
-theorem UpperTheory.ConvolutionTheory.C.cuspTrBand :
-    UpperTheory.ConvolutionTheory.C.CuspTrBand := by
+theorem UpperTheory.ConvolutionTheory.C.cuspTrBand
+    : UpperTheory.ConvolutionTheory.C.CuspTrBand := by
   intro K _ _ n μ _ θ hm A hA0 hAV hAc η hη
   obtain ⟨U, hU1, hU2, hU3⟩ := UpperTheory.ConvolutionTheory.C.twistUnitary K n μ θ
   have hspan := UpperTheory.ConvolutionTheory.C.summandsSpan K n μ
@@ -225,7 +263,11 @@ theorem UpperTheory.ConvolutionTheory.C.cuspTrBand :
     exact Submodule.isClosed_topologicalClosure _
   have hP : Pc μ = prj (cuspidalL2 μ) := (prj_eq_star _ hc).symm
   rw [hP] at hAc ⊢
-  have := band_core (rightRegularRep (Gam K n) μ) (cuspidalL2 μ) θ.e.toMulEquiv U
-    (fun g v => hU2 g v) hU3 hspan (fun V V' h h' hne => hm V V' h h' hne) A hA0 hAV hAc η hη
+  have :=
+    band_core (rightRegularRep (Gam K n) μ) (cuspidalL2 μ) θ.e.toMulEquiv U
+      (fun g v => hU2 g v)
+      hU3 hspan
+      (fun V V' h h' hne => hm V V' h h' hne)
+      A hA0 hAV hAc η hη
   rw [← hU1]
   exact this

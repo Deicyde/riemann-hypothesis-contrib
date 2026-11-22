@@ -16,9 +16,15 @@ open Classical
 
 namespace GlobalTheory.SqTop
 
-open Formalism.BasicNotions Formalism.IndefR.Links Formalism.L2.Host GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
+open Formalism.BasicNotions Formalism.IndefR.Links Formalism.L2.Host GlobalTheory.ChiGrid
+  GlobalTheory.FunObj GlobalTheory.FunObj.SqNum
 
-theorem nuH_not_unrAt_twPl : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L : Formalism.IndefR.Links.LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} (G : GlobalTheory.ChiGrid.GridData L sc) {μ₀ : T}, L.Is μ₀ → ∀ (t : T) (i j : Fin D.R.m), ∀ P ∈ GlobalTheory.SqTop.twPl G t, ¬ (GlobalTheory.FunObj.SqNum.nuH G t i j).UnrAt P := by
+theorem nuH_not_unrAt_twPl
+    : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L : Formalism.IndefR.Links.LevCh D T}
+        {sc : GlobalTheory.ChiGrid.Consts} (G : GlobalTheory.ChiGrid.GridData L sc) {μ₀ : T},
+      L.Is μ₀
+        → ∀ (t : T) (i j : Fin D.R.m), ∀ P ∈ GlobalTheory.SqTop.twPl G t,
+          ¬ (GlobalTheory.FunObj.SqNum.nuH G t i j).UnrAt P := by
   intro D T L sc G μ₀ hL t i j P hP
   classical
   have hP' : P ∈ L.Q t ∧ P ∉ G.pl.W0 := by
@@ -47,7 +53,8 @@ theorem nuH_not_unrAt_twPl : ∀ {D : Formalism.BasicNotions.D7} {T : Type} {L :
     exact (hnu.mul hmu.inv).mul hchi
   · have : ((D.host.g k : ℕ) : 𝓞 D.host.F) ∈ (P.under (𝓞 D.host.F)).asIdeal := by
       show algebraMap _ (𝓞 D.host.E) _ ∈ P.asIdeal
-      rw [map_natCast]; exact hk
+      rw [map_natCast]
+      exact hk
     fin_cases k
     · exact Or.inl this
     · exact Or.inr (Or.inl this)

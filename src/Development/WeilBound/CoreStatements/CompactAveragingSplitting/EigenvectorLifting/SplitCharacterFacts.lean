@@ -11,13 +11,20 @@ noncomputable section
 
 namespace PositivityTheory.ThK.SplitAsm
 
-open NumberField IsDedekindDomain GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SplitFlip
+open NumberField IsDedekindDomain GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.SplitFlip
 open ValuativeRel
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem condLE_add {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    {ϖ : kˣ} (hϖ : GlobalTheory.SplitFlip.IsUnif ϖ) {e : ℕ} (f : ℕ) {χ : kˣ →* ℂˣ} (h : CondLE ϖ e χ) : CondLE ϖ (e + f) χ := by
+theorem condLE_add
+    {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {ϖ : kˣ} (hϖ : GlobalTheory.SplitFlip.IsUnif ϖ)
+    {e : ℕ}
+    (f : ℕ)
+    {χ : kˣ →* ℂˣ} (h : CondLE ϖ e χ)
+    : CondLE ϖ (e + f) χ := by
   intro x hx
   apply h x
   refine ⟨hx.1, le_trans hx.2 ?_⟩
@@ -36,7 +43,8 @@ theorem val_eq_one_iff (x : Fv F v) : valuation (Fv F v) x = 1 ↔ Valued.v x = 
     first
     | exact ⟨fun _ _ => Iff.rfl⟩
     | (delta GlobalTheory.LocalData.complRel; infer_instance)
-  have he : (valuation (Fv F v)).IsEquiv (Valued.v : Valuation (Fv F v) _) := ValuativeRel.isEquiv _ _
+  have he : (valuation (Fv F v)).IsEquiv (Valued.v : Valuation (Fv F v) _) :=
+    ValuativeRel.isEquiv _ _
   have h1 := he.le_iff_le (x := x) (y := 1)
   have h2 := he.le_iff_le (x := 1) (y := x)
   simp only [map_one] at h1 h2
@@ -46,8 +54,8 @@ theorem val_eq_one_iff (x : Fv F v) : valuation (Fv F v) x = 1 ↔ Valued.v x = 
   · intro h
     exact le_antisymm (h1.mpr h.le) (h2.mpr h.ge)
 
-theorem isUnram_chrW_iff (χ : Chr F E) (τ : E →ₐ[F] Fv F v) :
-    GlobalTheory.SplitWeil.IsUnram (chrW χ τ) ↔ UnrAt χ (splitPrime τ) := by
+theorem isUnram_chrW_iff (χ : Chr F E) (τ : E →ₐ[F] Fv F v)
+    : GlobalTheory.SplitWeil.IsUnram (chrW χ τ) ↔ UnrAt χ (splitPrime τ) := by
   obtain ⟨ψ, hψ, -, hv, -, -⟩ :=
     GlobalTheory.LFun.SplitChart.exists_equiv_complMap τ (GlobalTheory.AdelicU.splitPrime_under τ)
   constructor
@@ -59,7 +67,10 @@ theorem isUnram_chrW_iff (χ : Chr F E) (τ : E →ₐ[F] Fv F v) :
       rw [val_eq_one_iff, ← hv, RingEquiv.apply_symm_apply]
       exact hy'
     have h1 := hU x hxv
-    have hxy : Units.map (GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ)).toMonoidHom x = y := by
+    have hxy
+        : Units.map
+            (GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ)).toMonoidHom x
+          = y := by
       apply Units.ext
       show GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ)
         (ψ.symm (y : HeightOneSpectrum.adicCompletion E (splitPrime τ))) = y
@@ -68,15 +79,22 @@ theorem isUnram_chrW_iff (χ : Chr F E) (τ : E →ₐ[F] Fv F v) :
     exact h1
   · intro hU x hx
     have hx' : Valued.v (x : Fv F v) = 1 := (val_eq_one_iff _).mp hx
-    have hc : Valued.v (GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ) (x : Fv F v)) = 1 := by
+    have hc
+        : Valued.v (GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ)
+            (x : Fv F v))
+          = 1 := by
       rw [← hψ, hv]
       exact hx'
-    exact hU (Units.map (GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ)).toMonoidHom x) hc
+    exact hU
+      (Units.map (GlobalTheory.LFun.complMap (GlobalTheory.AdelicU.splitPrime_under τ)).toMonoidHom
+        x)
+      hc
 
-theorem continuous_chrW {χ : Chr F E} (hχ : Continuous χ) (τ : E →ₐ[F] Fv F v) :
-    Continuous fun x => (chrW χ τ x : ℂ) := by
+theorem continuous_chrW {χ : Chr F E} (hχ : Continuous χ) (τ : E →ₐ[F] Fv F v)
+    : Continuous fun x => (chrW χ τ x : ℂ) := by
   exact (GlobalTheory.LFun.continuous_locChar hχ _).comp
-    (Units.continuous_map (GlobalTheory.LFun.SplitChart.continuous_complMap (GlobalTheory.AdelicU.splitPrime_under τ)))
+    (Units.continuous_map (GlobalTheory.LFun.SplitChart.continuous_complMap
+      (GlobalTheory.AdelicU.splitPrime_under τ)))
 
 theorem chrW_div (α β : Chr F E) (τ : E →ₐ[F] Fv F v) : chrW (α / β) τ = chrW α τ / chrW β τ := by
   refine MonoidHom.ext fun x => ?_
@@ -95,8 +113,10 @@ theorem split_character_facts : ChrFacts := by
   · intro x
     exact Circle.norm_coe _
   · exact chrW_div X.α X.β τ
-  · obtain ⟨e₁, h₁⟩ := GlobalTheory.GaussNonvanish.exists_condLE hu (chrW X.α τ) (continuous_chrW heckeα.1 τ)
-    obtain ⟨e₂, h₂⟩ := GlobalTheory.GaussNonvanish.exists_condLE hu (chrW X.β τ) (continuous_chrW heckeβ.1 τ)
+  · obtain ⟨e₁, h₁⟩ :=
+      GlobalTheory.GaussNonvanish.exists_condLE hu (chrW X.α τ) (continuous_chrW heckeα.1 τ)
+    obtain ⟨e₂, h₂⟩ :=
+      GlobalTheory.GaussNonvanish.exists_condLE hu (chrW X.β τ) (continuous_chrW heckeβ.1 τ)
     refine ⟨e₁ + e₂, condLE_add hu e₂ h₁, ?_⟩
     rw [add_comm]
     exact condLE_add hu e₁ h₂
@@ -109,7 +129,10 @@ theorem split_character_facts : ChrFacts := by
     have hw : splitPrime τ ∉ GlobalTheory.LFun.above E (X.T : Set (Pl F)) := by
       intro hm
       apply hvT
-      have hm' : HeightOneSpectrum.under (NumberField.RingOfIntegers F) (splitPrime τ) ∈ (X.T : Set (Pl F)) := hm
+      have hm'
+          : HeightOneSpectrum.under (NumberField.RingOfIntegers F) (splitPrime τ)
+            ∈ (X.T : Set (Pl F)) :=
+        hm
       rw [GlobalTheory.AdelicU.splitPrime_under] at hm'
       exact hm'
     exact ⟨(isUnram_chrW_iff _ _).mpr (unrα _ hw), (isUnram_chrW_iff _ _).mpr (unrβ _ hw)⟩

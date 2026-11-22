@@ -6,7 +6,9 @@ public import Mathlib
 
 namespace UpperTheory.Reformulated.B.S6
 
-theorem norm_le_one_of_isIntegral (l : ℕ) [Fact l.Prime] (x : PadicAlgCl l) (hx : IsIntegral ℤ_[l] x) : ‖x‖ ≤ 1 := by
+theorem norm_le_one_of_isIntegral
+    (l : ℕ) [Fact l.Prime] (x : PadicAlgCl l) (hx : IsIntegral ℤ_[l] x)
+    : ‖x‖ ≤ 1 := by
   let v : Valuation (PadicAlgCl l) NNReal := NormedField.valuation
   have hmem : ∀ a : ℤ_[l], algebraMap ℤ_[l] (PadicAlgCl l) a ∈ v.integer := by
     intro a

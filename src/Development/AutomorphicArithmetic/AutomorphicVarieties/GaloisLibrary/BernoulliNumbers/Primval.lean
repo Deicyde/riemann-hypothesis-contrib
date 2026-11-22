@@ -7,8 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_primval :
-    ∀ {R : Type} [CommRing R] {N : ℕ} [NeZero N] (χ : DirichletCharacter R N) (x : ZMod χ.conductor), χ.primitiveCharacter x = 0 ∨ ∃ u : (ZMod N)ˣ, χ.primitiveCharacter x = χ u := by
+theorem UpperTheory.V.Bern.b_primval
+    : ∀ {R : Type} [CommRing R] {N : ℕ} [NeZero N] (χ : DirichletCharacter R N)
+        (x : ZMod χ.conductor),
+      χ.primitiveCharacter x = 0 ∨ ∃ u : (ZMod N)ˣ, χ.primitiveCharacter x = χ u := by
   intro R _ N _ χ x
   by_cases hx : IsUnit x
   · right

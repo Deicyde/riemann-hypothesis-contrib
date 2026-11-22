@@ -15,14 +15,14 @@ noncomputable section
 
 universe u
 
-theorem weightedHomogeneousComponent_map {σ M R S : Type*} [AddCommMonoid M] [CommRing R]
-    [CommRing S] (φ : R →+* S) (w : σ → M) (n : M) (p : MvPolynomial σ R) :
-    weightedHomogeneousComponent w n (MvPolynomial.map φ p) =
-      MvPolynomial.map φ (weightedHomogeneousComponent w n p) := by
+theorem weightedHomogeneousComponent_map
+    {σ M R S : Type*} [AddCommMonoid M] [CommRing R] [CommRing S]
+    (φ : R →+* S) (w : σ → M) (n : M) (p : MvPolynomial σ R)
+    : weightedHomogeneousComponent w n (MvPolynomial.map φ p)
+      = MvPolynomial.map φ (weightedHomogeneousComponent w n p) := by
   classical
   ext d
-  rw [coeff_weightedHomogeneousComponent, coeff_map, coeff_map,
-    coeff_weightedHomogeneousComponent]
+  rw [coeff_weightedHomogeneousComponent, coeff_map, coeff_map, coeff_weightedHomogeneousComponent]
   split_ifs <;> simp
 
 attribute [local instance] MvPolynomial.algebraMvPolynomial

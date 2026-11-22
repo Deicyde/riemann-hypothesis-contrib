@@ -9,11 +9,14 @@ open IsLocalRing
 
 namespace GlobalTheory.Mum
 
-theorem exists_uniformiser_mul_eq_mul_pow_of_height_eq_one (O : Type) [CommRing O] [IsDomain O]
-    [IsNoetherianRing O] [IsIntegrallyClosed O] (p : Ideal O) [hp : p.IsPrime] (h1 : p.height = 1)
-    (h : O) (hh : h ≠ 0) :
-    ∃ π ∈ p, π ≠ 0 ∧ (∀ y ∈ p, ∃ s ∉ p, π ∣ s * y) ∧
-      ∃ (n : ℕ) (b c : O), b ∉ p ∧ c ∉ p ∧ b * h = c * π ^ n := by
+theorem exists_uniformiser_mul_eq_mul_pow_of_height_eq_one
+    (O : Type) [CommRing O] [IsDomain O] [IsNoetherianRing O] [IsIntegrallyClosed O]
+    (p : Ideal O) [hp : p.IsPrime]
+    (h1 : p.height = 1)
+    (h : O) (hh : h ≠ 0)
+    : ∃ π ∈ p,
+      π ≠ 0 ∧ (∀ y ∈ p, ∃ s ∉ p, π ∣ s * y)
+        ∧ ∃ (n : ℕ) (b c : O), b ∉ p ∧ c ∉ p ∧ b * h = c * π ^ n := by
   have := GlobalTheory.localizationAtPrime_isDiscreteValuationRing_of_height_eq_one O p h1
   let R := Localization.AtPrime p
   have hinj : Function.Injective (algebraMap O R) :=
@@ -51,7 +54,14 @@ theorem exists_uniformiser_mul_eq_mul_pow_of_height_eq_one (O : Type) [CommRing 
     · rw [map_mul, map_mul, map_pow, hu, ← hb']
       ring
 
-theorem exists_mul_eq_mul_sq_of_faithfullyFlat_of_map_isPrime : ∀ (O C : Type) [CommRing O] [IsDomain O] [IsNoetherianRing O] [IsIntegrallyClosed O] [CommRing C] [IsDomain C] [IsNoetherianRing C] [Algebra O C] [Module.FaithfullyFlat O C] (h : O), h ≠ 0 → (∃ (u : Cˣ) (g : C), algebraMap O C h = u * g ^ 2) → ∀ p : Ideal O, p.IsPrime → p.height = 1 → (Ideal.map (algebraMap O C) p).IsPrime → ∃ a b c : O, b ∉ p ∧ c ∉ p ∧ b * h = c * a ^ 2 := by
+theorem exists_mul_eq_mul_sq_of_faithfullyFlat_of_map_isPrime
+    : ∀ (O C : Type) [CommRing O] [IsDomain O] [IsNoetherianRing O] [IsIntegrallyClosed O]
+        [CommRing C] [IsDomain C] [IsNoetherianRing C] [Algebra O C] [Module.FaithfullyFlat O C]
+        (h : O),
+      h ≠ 0 → (∃ (u : Cˣ) (g : C), algebraMap O C h = u * g ^ 2)
+        → ∀ p : Ideal O,
+          p.IsPrime → p.height = 1 → (Ideal.map (algebraMap O C) p).IsPrime
+            → ∃ a b c : O, b ∉ p ∧ c ∉ p ∧ b * h = c * a ^ 2 := by
   intro O C _ _ _ _ _ _ _ _ _ h hh hsq p hp h1 hP
   obtain ⟨u, g, hg⟩ := hsq
   obtain ⟨π, hπp, hπ0, hgen, n, b, c, hb, hc, hbc⟩ :=
@@ -86,7 +96,8 @@ theorem exists_mul_eq_mul_sq_of_faithfullyFlat_of_map_isPrime : ∀ (O C : Type)
     rw [isField_iff_maximalIdeal_eq, hmax, Ideal.span_singleton_eq_bot] at hf
     exact hπR hf
   have hdvr : IsDiscreteValuationRing R :=
-    ((IsDiscreteValuationRing.TFAE R hnf).out 5 1).1 (show (maximalIdeal R).IsPrincipal from ⟨⟨φ π, hmax⟩⟩)
+    ((IsDiscreteValuationRing.TFAE R hnf).out 5 1).1
+      (show (maximalIdeal R).IsPrincipal from ⟨⟨φ π, hmax⟩⟩)
   have hirr : Irreducible (φ π) := (IsDiscreteValuationRing.irreducible_iff_uniformizer _).2 hmax
   have hhR : φ h = algebraMap C R u * algebraMap C R g ^ 2 := by
     show algebraMap C R (algebraMap O C h) = _

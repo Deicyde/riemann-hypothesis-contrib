@@ -76,8 +76,11 @@ open GroundTheory.Heights₂.Heights.LowerBoundFree
 
 section Clauses
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
   {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
   {D : ComponentData II Ψ K ι Ω E} {O Lt : Type} [CommRing O] [AddCommGroup Lt] [Module O Lt]
 
@@ -87,14 +90,21 @@ section Mass
 
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M GlobalTheory.CompanionTheory.Ar.Giv.MuLimit
 
-variable {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {K : Type} [Fintype K] {ι : K → Type}
-  [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω] [Algebra ℚ Ω] {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)]
-  [∀ τ, Module Ω (E τ)] {D : ComponentData II Ψ K ι Ω E} {O Lt : Type} [CommRing O] [AddCommGroup Lt] [Module O Lt]
+variable
+  {II : IntersectionSystem} {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ]
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+  {E : Ψ → Type} [∀ τ, AddCommGroup (E τ)] [∀ τ, Module Ω (E τ)]
+  {D : ComponentData II Ψ K ι Ω E} {O Lt : Type} [CommRing O] [AddCommGroup Lt] [Module O Lt]
 
 theorem degMu_nonneg (X : ComponentSetting D O Lt) : 0 ≤ degMu X.H := by
   classical
-  have hN := MuHomDensityNonneg.proof (MuSheetLeviNonneg.proof SheetChartHolo.proof RefAlongSheet.proof)
-  have hdeg : degMu X.H = ptsIntegral (e := D.n) (mCoordIdeal D.y) (fun _ => phMu X.H) (fun _ => 1) := rfl
+  have hN :=
+    MuHomDensityNonneg.proof (MuSheetLeviNonneg.proof SheetChartHolo.proof RefAlongSheet.proof)
+  have hdeg
+      : degMu X.H = ptsIntegral (e := D.n) (mCoordIdeal D.y) (fun _ => phMu X.H) (fun _ => 1) :=
+    rfl
   rw [hdeg]
   unfold ptsIntegral
   split_ifs with hΨ

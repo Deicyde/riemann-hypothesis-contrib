@@ -9,11 +9,11 @@ open GlobalTheory.LN
 
 namespace GlobalTheory.ValCrit
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.ValCrit.isIntegral_of_mem_adjoin_inv {R K : Type*} [CommRing R] [Field K] [Algebra R K]
-    (y : K) (hy : y ≠ 0)
-    (h : y⁻¹ ∈ Algebra.adjoin R {y}) : IsIntegral R y⁻¹ := by
+theorem _root_.GlobalTheory.ValCrit.isIntegral_of_mem_adjoin_inv
+    {R K : Type*} [CommRing R] [Field K] [Algebra R K]
+    (y : K) (hy : y ≠ 0) (h : y⁻¹ ∈ Algebra.adjoin R {y})
+    : IsIntegral R y⁻¹ := by
   rw [Algebra.adjoin_singleton_eq_range_aeval] at h
   obtain ⟨p, hp⟩ := h
   letI : Invertible y := invertibleOfNonzero hy
@@ -33,10 +33,12 @@ theorem _root_.GlobalTheory.ValCrit.isIntegral_of_mem_adjoin_inv {R K : Type*} [
       inv_pow, mul_comm]
   rw [eval₂_sub, eval₂_X_pow, hval, sub_self]
 
-private theorem maximalIdeal_map_sup_span_ne_univ_of_inv_not_mem_adjoin {R K : Type} [CommRing R]
-    [IsLocalRing R] [Field K] [Algebra R K] (y : K) (hnot : y⁻¹ ∉ Algebra.adjoin R {y}) :
-    (IsLocalRing.maximalIdeal R).map (algebraMap R (Algebra.adjoin R {y})) ⊔
-      Ideal.span {(⟨y, Algebra.self_mem_adjoin_singleton R y⟩ : Algebra.adjoin R {y})} ≠ ⊤ := by
+private theorem maximalIdeal_map_sup_span_ne_univ_of_inv_not_mem_adjoin
+    {R K : Type} [CommRing R] [IsLocalRing R] [Field K] [Algebra R K]
+    (y : K) (hnot : y⁻¹ ∉ Algebra.adjoin R {y})
+    : (IsLocalRing.maximalIdeal R).map (algebraMap R (Algebra.adjoin R {y}))
+        ⊔ Ideal.span {(⟨y, Algebra.self_mem_adjoin_singleton R y⟩ : Algebra.adjoin R {y})}
+      ≠ ⊤ := by
   set S := Algebra.adjoin R {y}
   set ys : S := ⟨y, Algebra.self_mem_adjoin_singleton R y⟩
   intro hJ
@@ -53,31 +55,36 @@ private theorem maximalIdeal_map_sup_span_ne_univ_of_inv_not_mem_adjoin {R K : T
     refine ⟨f.coeff 0, ?_⟩
     rw [← hs, ← hfs, RingHom.comp_apply]
     conv_rhs => rw [← Polynomial.X_mul_divX_add f]
-    rw [map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, map_add (f := _), map_mul,
-      Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self ys), zero_mul, zero_add]
+    rw [map_add (f := _), map_mul, Polynomial.aeval_X, Polynomial.aeval_C, map_add (f := _),
+      map_mul, Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self ys), zero_mul,
+      zero_add]
   have htop : (IsLocalRing.maximalIdeal R).map (π.comp (algebraMap R S)) = ⊤ := by
     have := congrArg (Ideal.map π) hJ
     rwa [Ideal.map_sup, Ideal.map_map, Ideal.map_quotient_self, sup_bot_eq, Ideal.map_top] at this
-  obtain ⟨a, ha, ha1⟩ := (Ideal.mem_map_iff_of_surjective _ hsurj).1
-    (htop ▸ Submodule.mem_top : (1 : S ⧸ Ideal.span {ys}) ∈ _)
+  obtain ⟨a, ha, ha1⟩ :=
+    (Ideal.mem_map_iff_of_surjective _ hsurj).1
+      (htop ▸ Submodule.mem_top : (1 : S ⧸ Ideal.span {ys}) ∈ _)
   have hmem : ys ∣ algebraMap R S (1 - a) := by
     rw [← Ideal.mem_span_singleton, map_sub, map_one, ← Ideal.Quotient.eq]
     exact ha1.symm
   have hunitA : IsUnit (algebraMap R S (1 - a)) :=
-    (IsLocalRing.isUnit_one_sub_self_of_mem_nonunits a
-      ((IsLocalRing.mem_maximalIdeal a).1 ha)).map _
+    (IsLocalRing.isUnit_one_sub_self_of_mem_nonunits a ((IsLocalRing.mem_maximalIdeal a).1 ha)).map
+      _
   obtain ⟨u, hu⟩ := isUnit_of_dvd_unit hmem hunitA
   apply hnot
   have h1 : ((u⁻¹ : Sˣ) : S) * ys = 1 := by rw [← hu, Units.inv_mul]
   have h2 : (((u⁻¹ : Sˣ) : S) : K) = y⁻¹ := eq_inv_of_mul_eq_one_left (congrArg Subtype.val h1)
   exact h2 ▸ ((u⁻¹ : Sˣ) : S).2
 
-theorem _root_.GlobalTheory.ValCrit.dvd_of_forall_cdvr : ∀ (R : Type) [CommRing R] [IsDomain R]
-    [IsLocalRing R] [IsNoetherianRing R] [IsIntegrallyClosed R] [CharZero R] (p q : R), q ≠ 0 →
-    (∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (φ : R →+* V),
-      _root_.GlobalTheory.LN.CDvr V → Function.Injective φ →
-      (IsLocalRing.maximalIdeal V).comap φ = IsLocalRing.maximalIdeal R → φ q ∣ φ p) →
-    q ∣ p := by
+theorem _root_.GlobalTheory.ValCrit.dvd_of_forall_cdvr
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R] [IsNoetherianRing R]
+        [IsIntegrallyClosed R] [CharZero R] (p q : R),
+      q ≠ 0
+        → (∀ (V : Type) [CommRing V] [IsDomain V] [IsLocalRing V] (φ : R →+* V),
+          _root_.GlobalTheory.LN.CDvr V → Function.Injective φ
+            → (IsLocalRing.maximalIdeal V).comap φ = IsLocalRing.maximalIdeal R
+            → φ q ∣ φ p)
+        → q ∣ p := by
   intro R _ _ _ _ _ _ p q hq H
   by_cases hp : p = 0
   · exact hp ▸ dvd_zero q
@@ -110,11 +117,11 @@ theorem _root_.GlobalTheory.ValCrit.dvd_of_forall_cdvr : ∀ (R : Type) [CommRin
     refine ((IsLocalRing.maximalIdeal.isMaximal R).eq_of_le ?_ ?_).symm
     · exact (hPmax.isPrime.comap (algebraMap R S)).ne_top
     · exact Ideal.map_le_iff_le_comap.1 (le_trans le_sup_left hJP)
-  obtain ⟨V, _, _, _, φ, hV, hφ, hcomap⟩ :=
-    _root_.GlobalTheory.PrimeUnif.exists_cdvr S P
+  obtain ⟨V, _, _, _, φ, hV, hφ, hcomap⟩ := _root_.GlobalTheory.PrimeUnif.exists_cdvr S P
   have hψ : Function.Injective (φ.comp (algebraMap R S)) := hφ.comp hinjS
-  have hψc : (IsLocalRing.maximalIdeal V).comap (φ.comp (algebraMap R S)) =
-      IsLocalRing.maximalIdeal R := by
+  have hψc
+      : (IsLocalRing.maximalIdeal V).comap (φ.comp (algebraMap R S))
+        = IsLocalRing.maximalIdeal R := by
     rw [← Ideal.comap_comap, hcomap, hcomapP]
   obtain ⟨v, hv⟩ := H V (φ.comp (algebraMap R S)) hV hψ hψc
   have hrel : ys * algebraMap R S p = algebraMap R S q := by
@@ -128,7 +135,9 @@ theorem _root_.GlobalTheory.ValCrit.dvd_of_forall_cdvr : ∀ (R : Type) [CommRin
     apply mul_left_cancel₀ hψp
     simp only [RingHom.comp_apply] at hv
     rw [← hrel, map_mul] at hv
-    calc φ (algebraMap R S p) * (φ ys * v) = φ ys * φ (algebraMap R S p) * v := by ring
+    calc
+      φ (algebraMap R S p) * (φ ys * v)
+        = φ ys * φ (algebraMap R S p) * v := by ring
       _ = φ (algebraMap R S p) := hv.symm
       _ = φ (algebraMap R S p) * 1 := (mul_one _).symm
   have hunit : IsUnit (φ ys) := isUnit_iff_exists_inv.2 ⟨v, hone⟩

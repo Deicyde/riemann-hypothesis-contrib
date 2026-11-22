@@ -23,9 +23,10 @@ noncomputable section
 
 namespace RegularizedLogDensityNonneg
 
-theorem hessC_logDistSq_comp_posSemidef {n e : ℕ} (x : Fin n → ℂ) (s : (Fin e → ℂ) → Fin n → ℂ)
-    (y : Fin e → ℂ) (han : AnalyticAt ℂ s y) (hne : s y ≠ x) :
-    (ReciprocityTheory.AnForm.hessC (logDistSq x ∘ s) y).PosSemidef := by
+theorem hessC_logDistSq_comp_posSemidef
+    {n e : ℕ} (x : Fin n → ℂ) (s : (Fin e → ℂ) → Fin n → ℂ) (y : Fin e → ℂ) (han : AnalyticAt ℂ s y)
+    (hne : s y ≠ x)
+    : (ReciprocityTheory.AnForm.hessC (logDistSq x ∘ s) y).PosSemidef := by
   let τ : (Fin e → ℂ) → Fin n → ℂ := fun w => s w - x
   have hτ : AnalyticAt ℂ τ y := han.sub analyticAt_const
   have hS : sqSum (τ y) ≠ 0 := by
@@ -42,7 +43,8 @@ theorem hessC_logDistSq_comp_posSemidef {n e : ℕ} (x : Fin n → ℂ) (s : (Fi
     simp only [Function.comp_apply, logDistSq, phi, τ, euclPot, sqSum]
     ring
   have hP : (ReciprocityTheory.AnForm.hessC (phi ∘ τ) y).PosSemidef := by
-    refine ReciprocityTheory.AnForm.M.hessC_posSemidef _ _ (hφ.comp _ hτ.restrictScalars.contDiffAt) fun v => ?_
+    refine ReciprocityTheory.AnForm.M.hessC_posSemidef _ _ (hφ.comp _ hτ.restrictScalars.contDiffAt)
+      fun v => ?_
     rw [ReciprocityTheory.AnForm.levi_comp v hτ hφ]
     exact GroundTheory.Heights₂.Heights.Inter.TorusInvariantLevi.leviForm_phi_nonneg hS _
   rw [hfun, ReciprocityTheory.AnForm.M.hessC_const_mul']
@@ -62,13 +64,15 @@ theorem RegLogDensNonneg.proof : RegLogDensNonneg.Statement := by
     set y := A *ᵥ z
     have hh : AnalyticAt ℂ (fun w => linEval u (s w)) y := by
       unfold linEval
-      exact Finset.analyticAt_fun_sum _ fun j _ => analyticAt_const.mul ((analyticAt_pi_iff.1 han) j)
+      exact Finset.analyticAt_fun_sum _ fun j _ =>
+        analyticAt_const.mul ((analyticAt_pi_iff.1 han) j)
     let τ : (Fin (d + 1) → ℂ) → (Fin 2 → ℂ) := fun w => ![linEval u (s w), ((√ε : ℝ) : ℂ)]
     have hτ : AnalyticAt ℂ τ y := by
       refine analyticAt_pi_iff.2 fun i => ?_
       fin_cases i
       · simpa [τ] using hh
-      · simpa [τ] using (analyticAt_const : AnalyticAt ℂ (fun _ : Fin (d + 1) → ℂ => ((√ε : ℝ) : ℂ)) y)
+      · simpa [τ] using
+          (analyticAt_const : AnalyticAt ℂ (fun _ : Fin (d + 1) → ℂ => ((√ε : ℝ) : ℂ)) y)
     have hS : sqSum (τ y) ≠ 0 := by
       have : sqSum (τ y) = ‖linEval u (s y)‖ ^ 2 + ε := by
         simp only [τ, sqSum, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one,
@@ -80,7 +84,8 @@ theorem RegLogDensNonneg.proof : RegLogDensNonneg.Statement := by
       funext w
       exact RegularizedDensityNonneg.half_log_eq_phi _ hε.le
     rw [hfun]
-    refine ReciprocityTheory.AnForm.M.hessC_posSemidef _ _ (hφ.comp _ hτ.restrictScalars.contDiffAt) fun v => ?_
+    refine ReciprocityTheory.AnForm.M.hessC_posSemidef _ _ (hφ.comp _ hτ.restrictScalars.contDiffAt)
+      fun v => ?_
     rw [ReciprocityTheory.AnForm.levi_comp v hτ hφ]
     exact GroundTheory.Heights₂.Heights.Inter.TorusInvariantLevi.leviForm_phi_nonneg hS _
   · simp only [Matrix.cons_val_succ]

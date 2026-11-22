@@ -12,8 +12,11 @@ open scoped ENNReal InnerProductSpace ComplexConjugate ContDiff
 
 noncomputable section
 
-theorem weakSSmooth (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] : WeakSSmoothStatement n M := by
+theorem weakSSmooth
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    : WeakSSmoothStatement n M := by
   intro z hz f hf φ hφ j k
   have hφ1 : Ck n z 1 φ := Smooth.ck n z 1 φ hφ.1
   have hcd : ∀ i : Fin n, HasCompactSupport (db n z i φ) := fun i =>
@@ -24,17 +27,20 @@ theorem weakSSmooth (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
   have hI1 : ∀ a b : Fin n, Integrable (fun x => f x a * db n z b φ x) (vol n z) := fun a b =>
     integrable_of_continuous n z hz _ ((hfc a).mul (hcont b)) ((hcd b).mul_left)
   have hI2 : ∀ a b : Fin n, Integrable (fun x => db n z b (fun y => f y a) x * φ x) (vol n z) :=
-    fun a b => integrable_of_continuous n z hz _
-      ((Ck.continuous n z hz 0 _ (Ck.db n z 0 b _ (hf a))).mul (Ck.continuous n z hz 1 _ hφ1))
-      hφ.2.mul_left
+    fun a b =>
+      integrable_of_continuous n z hz _
+        ((Ck.continuous n z hz 0 _ (Ck.db n z 0 b _ (hf a))).mul (Ck.continuous n z hz 1 _ hφ1))
+        hφ.2.mul_left
   have h1 := integral_db_mul n z hz j (fun y => f y k) φ (hf k) hφ1 hφ.2
   have h2 := integral_db_mul n z hz k (fun y => f y j) φ (hf j) hφ1 hφ.2
-  have hL : ∫ x, (f x k * db n z j φ x - f x j * db n z k φ x) ∂vol n z
-      = ∫ x, f x k * db n z j φ x ∂vol n z - ∫ x, f x j * db n z k φ x ∂vol n z :=
+  have hL
+      : ∫ x, (f x k * db n z j φ x - f x j * db n z k φ x) ∂vol n z
+        = ∫ x, f x k * db n z j φ x ∂vol n z - ∫ x, f x j * db n z k φ x ∂vol n z :=
     integral_sub (hI1 k j) (hI1 j k)
-  have hR : ∫ x, sbar n z f x j k * φ x ∂vol n z
-      = ∫ x, db n z j (fun y => f y k) x * φ x ∂vol n z
-        - ∫ x, db n z k (fun y => f y j) x * φ x ∂vol n z := by
+  have hR
+      : ∫ x, sbar n z f x j k * φ x ∂vol n z
+        = ∫ x, db n z j (fun y => f y k) x * φ x ∂vol n z
+          - ∫ x, db n z k (fun y => f y j) x * φ x ∂vol n z := by
     rw [← integral_sub (hI2 k j) (hI2 j k)]
     congr 1
     funext x
@@ -97,8 +103,11 @@ private lemma fderiv_wdb_apply_eq {n : ℕ} (k : Fin n) (h : V n → ℂ) (y0 : 
     ContinuousLinearMap.flip_apply, smul_eq_mul]
   ring
 
-theorem sbarDbar (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] : SbarDbarStatement n M := by
+theorem sbarDbar
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    : SbarDbarStatement n M := by
   intro z hz g hg x
   obtain ⟨e0, hx0, hze⟩ := hz x
   have he0 : IsChart n z e0 := by
@@ -114,14 +123,16 @@ theorem sbarDbar (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
     simpa using this
   have hd : DifferentiableAt ℝ (fderiv ℝ (g ∘ e0.symm)) (z x) :=
     (hcd.fderiv_right (m := 1) (by norm_num)).differentiableAt (by norm_num)
-  have hsym : ∀ v w : V n, fderiv ℝ (fderiv ℝ (g ∘ e0.symm)) (z x) v w =
-      fderiv ℝ (fderiv ℝ (g ∘ e0.symm)) (z x) w v := by
+  have hsym
+      : ∀ v w : V n,
+        fderiv ℝ (fderiv ℝ (g ∘ e0.symm)) (z x) v w
+          = fderiv ℝ (fderiv ℝ (g ∘ e0.symm)) (z x) w v := by
     intro v w
     first
-      | exact hcd.isSymmSndFDerivAt (by simp) v w
-      | exact hcd.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField]) v w
-  have hloc : ∀ k : Fin n,
-      ((fun y => db n z k g y) ∘ e0.symm) =ᶠ[𝓝 (z x)] wdb n k (g ∘ e0.symm) := by
+    | exact hcd.isSymmSndFDerivAt (by simp) v w
+    | exact hcd.isSymmSndFDerivAt (by simp [minSmoothness_of_isRCLikeNormedField]) v w
+  have hloc
+      : ∀ k : Fin n, ((fun y => db n z k g y) ∘ e0.symm) =ᶠ[𝓝 (z x)] wdb n k (g ∘ e0.symm) := by
     intro k
     filter_upwards [hnb] with y hy
     rw [Function.comp_apply, db_eq_wdb_comp_chart_symm z e0 he0 k g _ (e0.map_target hy),
@@ -130,11 +141,11 @@ theorem sbarDbar (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
   show db n z j (fun y => db n z k g y) x - db n z k (fun y => db n z j g y) x = 0
   rw [db_eq_wdb_comp_chart_symm z e0 he0 j _ x hx0, db_eq_wdb_comp_chart_symm z e0 he0 k _ x hx0]
   unfold wdb
-  rw [(hloc k).fderiv_eq, (hloc j).fderiv_eq,
-    fderiv_wdb_apply_eq k _ _ hd (bas n j), fderiv_wdb_apply_eq k _ _ hd (Complex.I • bas n j),
-    fderiv_wdb_apply_eq j _ _ hd (bas n k), fderiv_wdb_apply_eq j _ _ hd (Complex.I • bas n k),
-    hsym (bas n k) (bas n j), hsym (bas n k) (Complex.I • bas n j),
-    hsym (Complex.I • bas n k) (bas n j), hsym (Complex.I • bas n k) (Complex.I • bas n j)]
+  rw [(hloc k).fderiv_eq, (hloc j).fderiv_eq, fderiv_wdb_apply_eq k _ _ hd (bas n j),
+    fderiv_wdb_apply_eq k _ _ hd (Complex.I • bas n j), fderiv_wdb_apply_eq j _ _ hd (bas n k),
+    fderiv_wdb_apply_eq j _ _ hd (Complex.I • bas n k), hsym (bas n k) (bas n j),
+    hsym (bas n k) (Complex.I • bas n j), hsym (Complex.I • bas n k) (bas n j),
+    hsym (Complex.I • bas n k) (Complex.I • bas n j)]
   ring
 
 end

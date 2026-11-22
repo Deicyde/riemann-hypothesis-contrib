@@ -42,7 +42,8 @@ theorem fm_smul_left (f g : α →₀ ℂ) (r : ℂ) : P.fm (r • f) g = conj r
   unfold fm
   rw [Finsupp.sum_smul_index' (fun _ => by simp), Finsupp.mul_sum]
   refine Finset.sum_congr rfl fun x _ => ?_
-  simp only [smul_eq_mul, map_mul]; ring
+  simp only [smul_eq_mul, map_mul]
+  ring
 
 theorem fm_conj (f g : α →₀ ℂ) : conj (P.fm g f) = P.fm f g := by
   unfold fm
@@ -50,17 +51,21 @@ theorem fm_conj (f g : α →₀ ℂ) : conj (P.fm g f) = P.fm f g := by
     simp only [Finsupp.sum, map_sum, map_mul, Complex.conj_conj, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun y _ => Finset.sum_congr rfl fun x _ => ?_
-  rw [P.herm y x]; ring
+  rw [P.herm y x]
+  ring
 
 theorem fm_nonneg (f : α →₀ ℂ) : 0 ≤ (P.fm f f).re := by
   classical
   have h := (Matrix.posSemidef_iff_dotProduct_mulVec.1 (P.psd f.support)).2 (fun i => f i)
-  have e : dotProduct (star (fun i : f.support => f i)) (Matrix.mulVec (Matrix.of fun x y : f.support => P.K x y) (fun i => f i)) =
-      P.fm f f := by
+  have e
+      : dotProduct (star (fun i : f.support => f i))
+          (Matrix.mulVec (Matrix.of fun x y : f.support => P.K x y) (fun i => f i))
+        = P.fm f f := by
     simp only [dotProduct, Matrix.mulVec, Matrix.of_apply, Pi.star_apply]
     unfold fm
     simp only [Finsupp.sum]
-    rw [← Finset.sum_coe_sort f.support (fun x => (starRingEnd ℂ) (f x) * ∑ y ∈ f.support, P.K x y * f y)]
+    rw [← Finset.sum_coe_sort f.support
+      (fun x => (starRingEnd ℂ) (f x) * ∑ y ∈ f.support, P.K x y * f y)]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [← Finset.sum_coe_sort f.support (fun y => P.K (↑i) y * f y)]
     simp only [Complex.star_def]
@@ -74,7 +79,8 @@ instance core : PreInnerProductSpace.Core ℂ P.Sp where
   add_left f₁ f₂ g := P.fm_add_left f₁ f₂ g
   smul_left f g r := P.fm_smul_left f g r
 
-instance : SeminormedAddCommGroup P.Sp := InnerProductSpace.Core.toSeminormedAddCommGroup (c := P.core)
+instance : SeminormedAddCommGroup P.Sp :=
+  InnerProductSpace.Core.toSeminormedAddCommGroup (c := P.core)
 instance : InnerProductSpace ℂ P.Sp := InnerProductSpace.ofCore P.core
 
 abbrev H : Type := UniformSpace.Completion P.Sp
@@ -90,9 +96,12 @@ theorem inner_vec (x y : α) : ⟪P.vec x, P.vec y⟫_ℂ = P.K x y := by
 
 end PKer
 
-theorem kolmogorov {α : Type} (K : α → α → ℂ) (hK : ∀ Y : Finset α, Formalism.FourierDecayAlt.TB.PSDOn Y K) :
-    ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H) (_ : CompleteSpace H) (V : α → H),
-      ∀ x y, K x y = ⟪V x, V y⟫_ℂ :=
+theorem kolmogorov
+    {α : Type} (K : α → α → ℂ) (hK : ∀ Y : Finset α, Formalism.FourierDecayAlt.TB.PSDOn Y K)
+    : ∃ (H : Type) (_ : NormedAddCommGroup H) (_ : InnerProductSpace ℂ H) (_ : CompleteSpace H)
+        (V : α → H),
+      ∀ x y,
+        K x y = ⟪V x, V y⟫_ℂ :=
   let P : PKer α := ⟨K, hK⟩
   ⟨P.H, inferInstance, inferInstance, inferInstance, P.vec, fun x y => (P.inner_vec x y).symm⟩
 

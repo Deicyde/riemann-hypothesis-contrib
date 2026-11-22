@@ -14,8 +14,10 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.TopLePreimag
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 
 noncomputable section
@@ -25,20 +27,22 @@ section Scale
 
 variable {R : Type} [CommRing R] {X : Scheme.{0}} (p : X ⟶ Sp R) {L : LB X}
 
-theorem res_constFn {U V : X.Opens} (h : V ≤ U) (a : R) :
-    (X.presheaf.map (homOfLE h).op).hom (constFn p U a) = constFn p V a :=
-  congrArg (fun k => k.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom a))
+theorem res_constFn {U V : X.Opens} (h : V ≤ U) (a : R)
+    : (X.presheaf.map (homOfLE h).op).hom (constFn p U a) = constFn p V a :=
+  congrArg
+    (fun k => k.hom ((Scheme.ΓSpecIso (CommRingCat.of R)).inv.hom a))
     (Scheme.Hom.appLE_map p (U := ⊤) (fun _ _ => trivial) (homOfLE h).op)
 
-theorem constFn_mul (U : X.Opens) (a b : R) : constFn p U (a * b) = constFn p U a * constFn p U b := by
+theorem constFn_mul (U : X.Opens) (a b : R)
+    : constFn p U (a * b) = constFn p U a * constFn p U b := by
   rw [constFn, constFn, constFn, map_mul, map_mul]
 
-theorem constFn_one (U : X.Opens) : constFn p U (1 : R) = 1 := by
-  rw [constFn, map_one, map_one]
+theorem constFn_one (U : X.Opens) : constFn p U (1 : R) = 1 := by rw [constFn, map_one, map_one]
 
-theorem exists_sec_div {a b : R} (h : a * b = 1) (s : L.Sec) :
-    ∃ t : L.Sec, (∀ i, t.f i = constFn p _ b * s.f i) ∧ (∀ i, s.f i = constFn p _ a * t.f i) ∧
-      Out.nonzeroLocus s ≤ Out.nonzeroLocus t := by
+theorem exists_sec_div {a b : R} (h : a * b = 1) (s : L.Sec)
+    : ∃ t : L.Sec,
+      (∀ i, t.f i = constFn p _ b * s.f i) ∧ (∀ i, s.f i = constFn p _ a * t.f i)
+        ∧ Out.nonzeroLocus s ≤ Out.nonzeroLocus t := by
   have e : ∀ i, s.f i = constFn p _ a * (constFn p _ b * s.f i) := fun i => by
     rw [← _root_.mul_assoc, ← constFn_mul, h, constFn_one, _root_.one_mul]
   refine ⟨⟨fun i => constFn p _ b * s.f i, fun i j => ?_⟩, fun _ => rfl, e, iSup_mono fun i => ?_⟩
@@ -48,8 +52,16 @@ theorem exists_sec_div {a b : R} (h : a * b = 1) (s : L.Sec) :
 
 end Scale
 
-theorem value_at_normalForm :
-    ∀ (N : ℕ → ℕ) (g₀ : ℕ) (κ : KeyIn ℂ → ℂˣ) (g : ℕ) (a b : Fin g → ℂ), g₀ ≤ g → GlobalTheory.KeyPow.ClauseH ℂ N g₀ κ → (∀ (x : KeyIn ℂ) (h : x.P.g = g) (τ : Matrix (Fin x.P.g) (Fin x.P.g) ℂ), GlobalTheory.KeyPow.NormalAt x τ 1 (fun i => a (i.cast h)) (fun i => b (i.cast h)) 1 → κ x = 1) → ∀ (x : KeyIn ℂ) (h : x.P.g = g) (τ M : Matrix (Fin x.P.g) (Fin x.P.g) ℂ) (c : ℂ), c ≠ 0 → M.det ≠ 0 → GlobalTheory.KeyPow.NormalAt x τ M (fun i => a (i.cast h)) (fun i => b (i.cast h)) c → (κ x : ℂ) = (M.det ^ 4 / c ^ 8) ^ N g := by
+theorem value_at_normalForm
+    : ∀ (N : ℕ → ℕ) (g₀ : ℕ) (κ : KeyIn ℂ → ℂˣ) (g : ℕ) (a b : Fin g → ℂ),
+      g₀ ≤ g → GlobalTheory.KeyPow.ClauseH ℂ N g₀ κ
+        → (∀ (x : KeyIn ℂ) (h : x.P.g = g) (τ : Matrix (Fin x.P.g) (Fin x.P.g) ℂ),
+          GlobalTheory.KeyPow.NormalAt x τ 1 (fun i => a (i.cast h)) (fun i => b (i.cast h)) 1
+            → κ x = 1)
+        → ∀ (x : KeyIn ℂ) (h : x.P.g = g) (τ M : Matrix (Fin x.P.g) (Fin x.P.g) ℂ) (c : ℂ),
+          c ≠ 0 → M.det ≠ 0
+            → GlobalTheory.KeyPow.NormalAt x τ M (fun i => a (i.cast h)) (fun i => b (i.cast h)) c
+            → (κ x : ℂ) = (M.det ^ 4 / c ^ 8) ^ N g := by
   intro N g₀ κ g a b hg₀ hH hN x h τ M c hc hM hx
   obtain ⟨P, hg, rig, hr, th, hth, v, hv⟩ := x
   dsimp only at h τ M
@@ -70,8 +82,8 @@ theorem value_at_normalForm :
     rw [e] at h1
     rwa [(ex _).unique (sgl i) h1]
   obtain ⟨th₀, e₀, e₁, hle⟩ := exists_sec_div P.A.hom (mul_inv_cancel₀ hc) th
-  have hth₀ : ∀ s : Sp ℂ, ∃ y : P.A.left, P.A.hom y = s ∧ y ∈ Out.nonzeroLocus th₀ :=
-    fun s => (hth s).imp fun y hy => ⟨hy.1, hle hy.2⟩
+  have hth₀ : ∀ s : Sp ℂ, ∃ y : P.A.left, P.A.hom y = s ∧ y ∈ Out.nonzeroLocus th₀ := fun s =>
+    (hth s).imp fun y hy => ⟨hy.1, hle hy.2⟩
   have h0 : κ ⟨P, hg, rig, hr, th₀, hth₀, v₀, hb₀⟩ = 1 := by
     refine hN ⟨P, hg, rig, hr, th₀, hth₀, v₀, hb₀⟩ rfl τ ⟨u, h₁, h₂, h₃, h₄, ?_, ?_⟩
     · intro i z hz
@@ -82,9 +94,11 @@ theorem value_at_normalForm :
       beta_reduce
       rw [_root_.one_mul, ← _root_.mul_assoc, inv_mul_cancel_left₀ hc]
     · intro i
-      have h1 := GlobalTheory.UnifDifferential.isDiff_of_isLieComb P.A P.L P.g P.g u _ v _ _ hv.1 h₆ (hv₀ i)
-      have e : ∑ j, M⁻¹ i j • ((2 * Real.pi * Complex.I : ℂ)⁻¹ • M j) =
-          (2 * Real.pi * Complex.I : ℂ)⁻¹ • (1 : Matrix (Fin P.g) (Fin P.g) ℂ) i := by
+      have h1 :=
+        GlobalTheory.UnifDifferential.isDiff_of_isLieComb P.A P.L P.g P.g u _ v _ _ hv.1 h₆ (hv₀ i)
+      have e
+          : ∑ j, M⁻¹ i j • ((2 * Real.pi * Complex.I : ℂ)⁻¹ • M j)
+            = (2 * Real.pi * Complex.I : ℂ)⁻¹ • (1 : Matrix (Fin P.g) (Fin P.g) ℂ) i := by
         simp only [smul_comm (M⁻¹ i _) (2 * Real.pi * Complex.I : ℂ)⁻¹]
         rw [← Finset.smul_sum, ← Matrix.vecMul_eq_sum, ← Matrix.nonsing_inv_mul M hM.isUnit]
         rfl

@@ -6,17 +6,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
 section
 
-variable {Γ V S : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] {d : ℕ} (G : Dr.Geo Γ V S d)
+variable
+  {Γ V S : Type} [Group Γ] [NormedAddCommGroup V] [NormedSpace ℝ V] {d : ℕ} (G : Dr.Geo Γ V S d)
 
-private theorem tr_tr (q : ℕ) (γ δ : Γ) (h : γ * δ = 1) (m : V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) :
-    G.tr q γ (G.tr q δ m) = m := by
+private theorem tr_tr (q : ℕ) (γ δ : Γ) (h : γ * δ = 1) (m : V [⋀^Fin q]→L[ℝ] (Fin d → ℂ))
+    : G.tr q γ (G.tr q δ m) = m := by
   have hδ : δ = γ⁻¹ := eq_inv_of_mul_eq_one_right h
   subst hδ
   ext v
@@ -27,15 +29,17 @@ private theorem tr_tr (q : ℕ) (γ δ : Γ) (h : γ * δ = 1) (m : V [⋀^Fin q
     exact Geo.ρ_inv_apply G γ⁻¹ (v i)
   rw [hv]
 
-private theorem tr_coneOp (q : ℕ) (γ : Γ) (w : V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) (p x : V) :
-    G.tr q γ (coneOp p w (G.ρ γ⁻¹ x)) = coneOp (G.ρ γ p) (fun y => G.tr (q + 1) γ (w (G.ρ γ⁻¹ y))) x := by
+private theorem tr_coneOp (q : ℕ) (γ : Γ) (w : V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) (p x : V)
+    : G.tr q γ (coneOp p w (G.ρ γ⁻¹ x))
+      = coneOp (G.ρ γ p) (fun y => G.tr (q + 1) γ (w (G.ρ γ⁻¹ y))) x := by
   let L : (V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) ≃L[ℝ] (V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) :=
     ContinuousLinearEquiv.equivOfInverse (G.tr q γ) (G.tr q γ⁻¹)
       (fun m => tr_tr G q γ⁻¹ γ (inv_mul_cancel γ) m)
       (fun m => tr_tr G q γ γ⁻¹ (mul_inv_cancel γ) m)
   have hL : ∀ m, L m = G.tr q γ m := fun m => rfl
-  have key : ∀ f : ℝ → (V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)),
-      L (∫ t in (0:ℝ)..1, f t) = ∫ t in (0:ℝ)..1, L (f t) := by
+  have key
+      : ∀ f : ℝ → (V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)),
+        L (∫ t in (0:ℝ)..1, f t) = ∫ t in (0:ℝ)..1, L (f t) := by
     intro f
     simp only [intervalIntegral, map_sub, L.integral_comp_comm]
   have hpt : ∀ t : ℝ, G.ρ γ⁻¹ (G.ρ γ p + t • (x - G.ρ γ p)) = p + t • (G.ρ γ⁻¹ x - p) := by
@@ -62,16 +66,18 @@ private theorem tr_coneOp (q : ℕ) (γ : Γ) (w : V → V [⋀^Fin (q + 1)]→L
 
 end
 
-theorem UpperTheory.V.Cj.H.poinOp :
-    UpperTheory.V.Cj.H.PoinOp := by
+theorem UpperTheory.V.Cj.H.poinOp : UpperTheory.V.Cj.H.PoinOp := by
   intro Γ V S _ _ _ _ d G hconv q
   classical
   have hD := coneD V (Fin d → ℂ) G.Y G.isOpen hconv
-  let f : V → G.Om (q + 1) → S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ) :=
-    fun p w s x => if x ∈ G.Y then coneOp p ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) x else 0
-  have hwm : ∀ (w : G.Om (q + 1)) (s : S),
-      ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) G.Y ∧
-        ∀ x ∉ G.Y, (w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s x = 0 := fun w => w.2
+  let f : V → G.Om (q + 1) → S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ) := fun p w s x =>
+    if x ∈ G.Y then coneOp p ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) x else 0
+  have hwm
+      : ∀ (w : G.Om (q + 1)) (s : S),
+        ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s)
+            G.Y
+          ∧ ∀ x ∉ G.Y, (w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s x = 0 := fun w =>
+    w.2
   have hf : ∀ p ∈ G.Y, ∀ w, f p w ∈ G.Om q := by
     intro p hp w
     refine fun s => ⟨?_, ?_⟩
@@ -79,7 +85,9 @@ theorem UpperTheory.V.Cj.H.poinOp :
     · intro x hx
       exact if_neg hx
   let K : V → G.Om (q + 1) → G.Om q := fun p w => if hp : p ∈ G.Y then ⟨f p w, hf p hp w⟩ else 0
-  have hK : ∀ p (hp : p ∈ G.Y) w, ((K p w : G.Om q) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) = f p w := by
+  have hK
+      : ∀ p (hp : p ∈ G.Y) w,
+        ((K p w : G.Om q) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) = f p w := by
     intro p hp w
     simp [K, hp]
   refine ⟨K, ?_, ?_, ?_⟩
@@ -88,14 +96,18 @@ theorem UpperTheory.V.Cj.H.poinOp :
     funext s x
     by_cases hx : x ∈ G.Y
     · rw [Geo.dOm_apply G (K p w) s hx, hK p hp w]
-      have hclosed : ∀ y ∈ G.Y, extDeriv ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) y = 0 := by
+      have hclosed
+          : ∀ y ∈ G.Y, extDeriv ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s) y = 0 := by
         intro y hy
-        have h0 := congrArg
-          (fun u : G.Om (q + 1 + 1) => (u : S → V → V [⋀^Fin (q + 1 + 1)]→L[ℝ] (Fin d → ℂ)) s y) hw0
+        have h0 :=
+          congrArg
+            (fun u : G.Om (q + 1 + 1) => (u : S → V → V [⋀^Fin (q + 1 + 1)]→L[ℝ] (Fin d → ℂ)) s y)
+            hw0
         rw [Geo.dOm_apply G w s hy] at h0
         simpa using h0
-      have hloc : extDeriv (f p w s) x =
-          extDeriv (coneOp p ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s)) x := by
+      have hloc
+          : extDeriv (f p w s) x
+            = extDeriv (coneOp p ((w : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s)) x := by
         rw [← extDerivWithin_univ, ← extDerivWithin_univ]
         apply Filter.EventuallyEq.extDerivWithin_eq_of_mem _ (Set.mem_univ x)
         rw [nhdsWithin_univ]
@@ -125,9 +137,11 @@ theorem UpperTheory.V.Cj.H.poinOp :
         rwa [h3] at h2
       simp only [f, if_neg hx, if_neg hx', map_zero]
   · intro p hp w hw s C hC hCc
-    have h := coneLim V (Fin d → ℂ) G.Y hconv p hp q
-      (fun k => ((w k : G.Om (q + 1)) : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s)
-      (fun C' hC' hC'c => hw s C' hC' hC'c) C hC hCc
+    have h :=
+      coneLim V (Fin d → ℂ) G.Y hconv p hp q
+        (fun k => ((w k : G.Om (q + 1)) : S → V → V [⋀^Fin (q + 1)]→L[ℝ] (Fin d → ℂ)) s)
+        (fun C' hC' hC'c => hw s C' hC' hC'c)
+        C hC hCc
     refine h.congr ?_
     filter_upwards with k
     intro x hx

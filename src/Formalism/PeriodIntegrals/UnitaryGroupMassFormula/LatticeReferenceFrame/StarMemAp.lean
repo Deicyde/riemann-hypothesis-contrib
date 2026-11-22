@@ -34,11 +34,9 @@ theorem hG_smul_right (c : I.E) (x y : Fin I.n → I.E) : hG I x (c • y) = c *
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hG_zero_left (y : Fin I.n → I.E) : hG I 0 y = 0 := by
-  simp [hG_def]
+theorem hG_zero_left (y : Fin I.n → I.E) : hG I 0 y = 0 := by simp [hG_def]
 
-theorem hG_zero_right (x : Fin I.n → I.E) : hG I x 0 = 0 := by
-  simp [hG_def]
+theorem hG_zero_right (x : Fin I.n → I.E) : hG I x 0 = 0 := by simp [hG_def]
 
 theorem hG_neg_right (x y : Fin I.n → I.E) : hG I x (-y) = - hG I x y := by
   simp only [hG_def, Pi.neg_apply, mul_neg, Finset.sum_neg_distrib]
@@ -46,8 +44,8 @@ theorem hG_neg_right (x y : Fin I.n → I.E) : hG I x (-y) = - hG I x y := by
 theorem hG_sub_right (x y z : Fin I.n → I.E) : hG I x (y - z) = hG I x y - hG I x z := by
   rw [sub_eq_add_neg, hG_add_right, hG_neg_right, ← sub_eq_add_neg]
 
-theorem hG_sum_right {ι : Type*} (s : Finset ι) (x : Fin I.n → I.E) (y : ι → Fin I.n → I.E) :
-    hG I x (∑ t ∈ s, y t) = ∑ t ∈ s, hG I x (y t) := by
+theorem hG_sum_right {ι : Type*} (s : Finset ι) (x : Fin I.n → I.E) (y : ι → Fin I.n → I.E)
+    : hG I x (∑ t ∈ s, y t) = ∑ t ∈ s, hG I x (y t) := by
   exact map_sum (AddMonoidHom.mk' (hG I x) (hG_add_right I x)) y s
 
 theorem J_entry (i j : Fin I.n) : star (I.J j i) = I.J i j := by
@@ -62,8 +60,7 @@ theorem hG_symm (x y : Fin I.n → I.E) : hG I y x = star (hG I x y) := by
   rw [J_entry I a b]
   ring
 
-theorem hG_single (i : Fin I.n) (v : Fin I.n → I.E) :
-    hG I (Pi.single i 1) v = (I.J *ᵥ v) i := by
+theorem hG_single (i : Fin I.n) (v : Fin I.n → I.E) : hG I (Pi.single i 1) v = (I.J *ᵥ v) i := by
   rw [hG_def, Finset.sum_eq_single i]
   · simp [Matrix.mulVec, dotProduct]
   · intro b _ hb
@@ -71,15 +68,17 @@ theorem hG_single (i : Fin I.n) (v : Fin I.n → I.E) :
   · simp
 
 theorem hG_nondeg (v : Fin I.n → I.E) (h : ∀ x, hG I x v = 0) : v = 0 := by
-  have h1 : I.J *ᵥ v = 0 := funext fun i => by
-    rw [← hG_single I i v]
-    exact h _
+  have h1 : I.J *ᵥ v = 0 :=
+    funext fun i => by
+      rw [← hG_single I i v]
+      exact h _
   exact Matrix.eq_zero_of_mulVec_eq_zero I.J_det h1
 
 variable {I}
 
-theorem mem_Ap {p : ℕ} {x : I.E} :
-    x ∈ Ap I p ↔ ∃ s : ℕ, Nat.Coprime s p ∧ ∃ a : 𝓞 I.E, (s : I.E) * x = (a : I.E) := Iff.rfl
+theorem mem_Ap {p : ℕ} {x : I.E}
+    : x ∈ Ap I p ↔ ∃ s : ℕ, Nat.Coprime s p ∧ ∃ a : 𝓞 I.E, (s : I.E) * x = (a : I.E) :=
+  Iff.rfl
 
 theorem inv_mem_Ap {p s : ℕ} (hp : p.Prime) (hs : Nat.Coprime s p) : ((s : I.E))⁻¹ ∈ Ap I p := by
   have hs0 : (s : I.E) ≠ 0 := by

@@ -27,48 +27,63 @@ end Null
 
 section Cover
 
-variable {A B ι κ : Type} [TopologicalSpace A] [TopologicalSpace B] [T2Space A] [T2Space B]
-  [SecondCountableTopology A] [SecondCountableTopology B] [MeasurableSpace A] [BorelSpace A]
-  [MeasurableSpace B] [BorelSpace B]
+variable
+  {A B ι κ : Type}
+  [TopologicalSpace A] [TopologicalSpace B] [T2Space A] [T2Space B] [SecondCountableTopology A]
+  [SecondCountableTopology B] [MeasurableSpace A] [BorelSpace A] [MeasurableSpace B] [BorelSpace B]
   {e : ι → OpenPartialHomeomorph A (V n)} {ρ : ι → A → ℝ≥0∞}
   {e' : κ → OpenPartialHomeomorph B (V n)} {ρ' : κ → B → ℝ≥0∞} {m : B → A}
-
 
 set_option autoImplicit false in
 open MeasureTheory Set Topology in
 open scoped ENNReal in
 variable {n : ℕ} in
-variable {A B ι κ : Type} [TopologicalSpace A] [TopologicalSpace B] [T2Space A] [T2Space B]
-  [SecondCountableTopology A] [SecondCountableTopology B] [MeasurableSpace A] [BorelSpace A]
-  [MeasurableSpace B] [BorelSpace B]
-  {e : ι → OpenPartialHomeomorph A (_root_.ReciprocityTheory.L2DbarEstimates.V n)} {ρ : ι → A → ℝ≥0∞}
-  {e' : κ → OpenPartialHomeomorph B (_root_.ReciprocityTheory.L2DbarEstimates.V n)} {ρ' : κ → B → ℝ≥0∞} {m : B → A} in
+variable
+  {A B ι κ : Type}
+  [TopologicalSpace A] [TopologicalSpace B] [T2Space A] [T2Space B] [SecondCountableTopology A]
+  [SecondCountableTopology B] [MeasurableSpace A] [BorelSpace A] [MeasurableSpace B] [BorelSpace B]
+  {e : ι → OpenPartialHomeomorph A (_root_.ReciprocityTheory.L2DbarEstimates.V n)}
+  {ρ : ι → A → ℝ≥0∞}
+  {e' : κ → OpenPartialHomeomorph B (_root_.ReciprocityTheory.L2DbarEstimates.V n)}
+  {ρ' : κ → B → ℝ≥0∞} {m : B → A} in
 omit [T2Space A] [T2Space B] in
 theorem _root_.GlobalTheory.GlueCover.exists_sheet
-    (hd : ∀ i j, DifferentiableOn ℂ (e j ∘ (e i).symm) (_root_.ReciprocityTheory.L2DbarEstimates.Y.ovl e i j))
-    (hρ : ∀ i j y, y ∈ (e i).source → y ∈ (e j).source →
-      ρ i y = ENNReal.ofReal (‖_root_.GlobalTheory.ChartGlue.transDet (e i) (e j) y‖ ^ 2) * ρ j y)
-    (hd' : ∀ i j, DifferentiableOn ℂ (e' j ∘ (e' i).symm) (_root_.ReciprocityTheory.L2DbarEstimates.Y.ovl e' i j))
-    (hρ' : ∀ i j y, y ∈ (e' i).source → y ∈ (e' j).source →
-      ρ' i y = ENNReal.ofReal (‖_root_.GlobalTheory.ChartGlue.transDet (e' i) (e' j) y‖ ^ 2) * ρ' j y)
-    (hm : Continuous m) {z : B}
-    (hch : ∃ i j, z ∈ (e' j).source ∧ m z ∈ (e i).source ∧ ∀ w ∈ (e' j).source,
-      m w ∈ (e i).source → e' j w = e i (m w) ∧ ρ' j w = ρ i (m w))
-    {U : Set B} (hUo : IsOpen U) (hzU : z ∈ U) :
-    ∃ M : Set B, M ⊆ U ∧ IsOpen M ∧ z ∈ M ∧ IsOpen (m '' M) ∧
-      ∀ Q : Set A, MeasurableSet Q → Q ⊆ m '' M →
-        _root_.GlobalTheory.ChartGlue.glueMeas e' ρ' (M ∩ m ⁻¹' Q) = _root_.GlobalTheory.ChartGlue.glueMeas e ρ Q := by
+    (hd : ∀ i j,
+      DifferentiableOn ℂ (e j ∘ (e i).symm) (_root_.ReciprocityTheory.L2DbarEstimates.Y.ovl e i j))
+    (hρ : ∀ i j y,
+      y ∈ (e i).source → y ∈ (e j).source
+        → ρ i y
+          = ENNReal.ofReal (‖_root_.GlobalTheory.ChartGlue.transDet (e i) (e j) y‖ ^ 2) * ρ j y)
+    (hd' : ∀ i j,
+      DifferentiableOn ℂ (e' j ∘ (e' i).symm)
+        (_root_.ReciprocityTheory.L2DbarEstimates.Y.ovl e' i j))
+    (hρ' : ∀ i j y,
+      y ∈ (e' i).source → y ∈ (e' j).source
+        → ρ' i y
+          = ENNReal.ofReal (‖_root_.GlobalTheory.ChartGlue.transDet (e' i) (e' j) y‖ ^ 2) * ρ' j y)
+    (hm : Continuous m)
+    {z : B}
+    (hch : ∃ i j,
+      z ∈ (e' j).source ∧ m z ∈ (e i).source
+        ∧ ∀ w ∈ (e' j).source, m w ∈ (e i).source → e' j w = e i (m w) ∧ ρ' j w = ρ i (m w))
+    {U : Set B} (hUo : IsOpen U) (hzU : z ∈ U)
+    : ∃ M : Set B,
+      M ⊆ U ∧ IsOpen M ∧ z ∈ M ∧ IsOpen (m '' M)
+        ∧ ∀ Q : Set A,
+          MeasurableSet Q → Q ⊆ m '' M
+            → _root_.GlobalTheory.ChartGlue.glueMeas e' ρ' (M ∩ m ⁻¹' Q)
+              = _root_.GlobalTheory.ChartGlue.glueMeas e ρ Q := by
   obtain ⟨i, j, hzj, hzi, hcompat⟩ := hch
   have hMo : IsOpen (U ∩ (e' j).source ∩ m ⁻¹' (e i).source) :=
     (hUo.inter (e' j).open_source).inter ((e i).open_source.preimage hm)
-  refine ⟨U ∩ (e' j).source ∩ m ⁻¹' (e i).source, fun w hw => hw.1.1, hMo,
-    ⟨⟨hzU, hzj⟩, hzi⟩, ?_, ?_⟩
-  · have hm_eq : ∀ w ∈ U ∩ (e' j).source ∩ m ⁻¹' (e i).source,
-        (e i).symm (e' j w) = m w := by
+  refine
+    ⟨U ∩ (e' j).source ∩ m ⁻¹' (e i).source, fun w hw => hw.1.1, hMo, ⟨⟨hzU, hzj⟩, hzi⟩, ?_, ?_⟩
+  · have hm_eq : ∀ w ∈ U ∩ (e' j).source ∩ m ⁻¹' (e i).source, (e i).symm (e' j w) = m w := by
       intro w hw
       rw [(hcompat w hw.1.2 hw.2).1, (e i).left_inv hw.2]
-    have himage : m '' (U ∩ (e' j).source ∩ m ⁻¹' (e i).source) =
-        (e i).symm '' (e' j '' (U ∩ (e' j).source ∩ m ⁻¹' (e i).source)) := by
+    have himage
+        : m '' (U ∩ (e' j).source ∩ m ⁻¹' (e i).source)
+          = (e i).symm '' (e' j '' (U ∩ (e' j).source ∩ m ⁻¹' (e i).source)) := by
       rw [Set.image_image]
       exact (Set.image_congr hm_eq).symm
     rw [himage]
@@ -85,8 +100,8 @@ theorem _root_.GlobalTheory.GlueCover.exists_sheet
       exact hw.2
     have hPm : MeasurableSet (U ∩ (e' j).source ∩ m ⁻¹' (e i).source ∩ m ⁻¹' Q) :=
       hMo.measurableSet.inter (hm.measurable hQ)
-    have hPj : U ∩ (e' j).source ∩ m ⁻¹' (e i).source ∩ m ⁻¹' Q ⊆ (e' j).source :=
-      fun w hw => hw.1.1.2
+    have hPj : U ∩ (e' j).source ∩ m ⁻¹' (e i).source ∩ m ⁻¹' Q ⊆ (e' j).source := fun w hw =>
+      hw.1.1.2
     rw [_root_.GlobalTheory.ChartGlue.glueMeas_apply e' ρ' hd' hρ' j hPm hPj,
       _root_.GlobalTheory.ChartGlue.glueMeas_apply e ρ hd hρ i hQ hQi,
       _root_.GlobalTheory.ChartGlue.chartMeas_apply_of_subset _ _ hPm hPj,

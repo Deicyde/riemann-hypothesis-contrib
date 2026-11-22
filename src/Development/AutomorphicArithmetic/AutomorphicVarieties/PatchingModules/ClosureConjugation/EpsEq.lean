@@ -4,11 +4,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
-theorem UpperTheory.V.Pa.eps_eq :
-    ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ} {x : NP G0.frame n} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] [Algebra O x.K] {r : Resid G.frame O n} {B : Type} [CommRing B] [Algebra O B] [IsCO O B] {u : Pair r B} (P : OoPt h x u), ∀ g : G.G₀, P.f (G.frame.eps O B g : Bˣ) = ((G0.frame.eps ℤ_[l] x.A (h.p₀ g) : x.Aˣ) : x.A) ∧ h.p₀ (G.frame.conj g) = G0.frame.conj (h.p₀ g) := by
+theorem UpperTheory.V.Pa.eps_eq
+    : ∀ {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} {h : G.Hom G0} {n : ℕ}
+        {x : NP G0.frame n} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] [Algebra ℤ_[l] O] [Algebra O x.K] {r : Resid G.frame O n} {B : Type}
+        [CommRing B] [Algebra O B] [IsCO O B] {u : Pair r B} (P : OoPt h x u),
+      ∀ g : G.G₀,
+        P.f (G.frame.eps O B g : Bˣ) = ((G0.frame.eps ℤ_[l] x.A (h.p₀ g) : x.Aˣ) : x.A)
+          ∧ h.p₀ (G.frame.conj g) = G0.frame.conj (h.p₀ g) := by
   intro l _ L G G0 h n x O _ _ _ _ _ _ r B _ _ _ u P g
   have hl : (l : x.K) = 0 := by
     by_contra hn
@@ -36,6 +43,7 @@ theorem UpperTheory.V.Pa.eps_eq :
     have e2 := key ((algebraMap ℤ_[l] x.A).comp (algebraMap ℤ_[l] ℤ_[l])) (G0.ε (h.p g) : ℤ_[l])
     rw [h.ε] at e2
     refine e1.trans (e2.symm.trans ?_)
-    rw [← h.ε]; rfl
+    rw [← h.ε]
+    rfl
   · show h.p (G.c * g * G.c⁻¹) = G0.c * h.p g * G0.c⁻¹
     rw [map_mul, map_mul, map_inv, h.c]

@@ -7,16 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Uni
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum Formalism.L2.Forms MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.QPl GlobalTheory.QTw GlobalTheory.AdForm GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Fam GlobalTheory.SeeSaw GlobalTheory.StepData GlobalTheory.SplitWeil
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Datum
+  Formalism.L2.Forms MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.LocMod GlobalTheory.MiS GlobalTheory.QPl GlobalTheory.QTw GlobalTheory.AdForm
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Fam GlobalTheory.SeeSaw GlobalTheory.StepData
+  GlobalTheory.SplitWeil
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-attribute [local instance] GlobalTheory.Fam.GeoAll.fld GlobalTheory.Fam.GeoAll.val GlobalTheory.Fam.GeoAll.top GlobalTheory.Fam.GeoAll.loc
+attribute [local instance]
+  GlobalTheory.Fam.GeoAll.fld GlobalTheory.Fam.GeoAll.val GlobalTheory.Fam.GeoAll.top
+  GlobalTheory.Fam.GeoAll.loc
 
 namespace GlobalTheory.QPl.EpsSupp
 
-theorem exists_prod_of_mem_support_conv {G : Type} [Monoid G] : ∀ (n : ℕ) (f : Fin n → (G →₀ ℂ)) (g : G),
-    g ∈ (conv (List.ofFn f)).support → ∃ x : Fin n → G, (∀ i, x i ∈ (f i).support) ∧ g = (List.ofFn x).prod := by
+theorem exists_prod_of_mem_support_conv {G : Type} [Monoid G]
+    : ∀ (n : ℕ) (f : Fin n → (G →₀ ℂ)) (g : G),
+      g ∈ (conv (List.ofFn f)).support
+        → ∃ x : Fin n → G, (∀ i, x i ∈ (f i).support) ∧ g = (List.ofFn x).prod := by
   classical
   intro n
   induction n with
@@ -43,9 +53,12 @@ theorem exists_prod_of_mem_support_conv {G : Type} [Monoid G] : ∀ (n : ℕ) (f
     rw [List.ofFn_succ, List.prod_cons, h5, hxe]
     simp
 
-theorem eps_mem_grpAt {D : D7} {c : Comm D} {v : VCom c} {t : Tup c} (F : QFam v t) (sc cT : ℕ → ℂ)
-    (h0 : ∀ i β, (F.Q i).εL 0 β = Finsupp.single 1 1) (j : ℕ) (α : t.Ch j) :
-    ∀ g ∈ ((F.pinTup sc cT).ε j α).support, g ∈ GlobalTheory.FinPl.grpAt (c.V j) (· ∈ (F.pinTup sc cT).Q) := by
+theorem eps_mem_grpAt
+    {D : D7} {c : Comm D} {v : VCom c} {t : Tup c} (F : QFam v t)
+    (sc cT : ℕ → ℂ) (h0 : ∀ i β, (F.Q i).εL 0 β = Finsupp.single 1 1)
+    (j : ℕ) (α : t.Ch j)
+    : ∀ g ∈ ((F.pinTup sc cT).ε j α).support,
+      g ∈ GlobalTheory.FinPl.grpAt (c.V j) (· ∈ (F.pinTup sc cT).Q) := by
   classical
   intro g hg
   dsimp only [QFam.pinTup] at hg ⊢
@@ -55,14 +68,16 @@ theorem eps_mem_grpAt {D : D7} {c : Comm D} {v : VCom c} {t : Tup c} (F : QFam v
     apply Subgroup.list_prod_mem
     intro y hy
     obtain ⟨i, rfl⟩ := List.mem_ofFn.1 hy
-    have hP : (F.Q i).q.v ∈ Finset.univ.image fun i => (F.Q i).q.v := Finset.mem_image_of_mem _ (Finset.mem_univ i)
+    have hP : (F.Q i).q.v ∈ Finset.univ.image fun i => (F.Q i).q.v :=
+      Finset.mem_image_of_mem _ (Finset.mem_univ i)
     rcases hc with ⟨ρ, hρ⟩ | hj
     · obtain ⟨e, -, he⟩ := (F.Q i).εL_at j ρ hρ (2 * ρ) (by have := (F.Q i).hs; omega) (F.eqv j α i)
       have hxi := hx i
       rw [he] at hxi
       obtain ⟨a, -, hax⟩ := Finset.mem_image.1 (Finsupp.mapDomain_support hxi)
       rw [← hax]
-      exact GlobalTheory.SuppGrp.mem_grpAt_of_suppAt D _ (F.Q i).q _ _ ((F.Q i).gl_loc _ _ _ a).1 _ hP
+      exact GlobalTheory.SuppGrp.mem_grpAt_of_suppAt D _ (F.Q i).q _ _ ((F.Q i).gl_loc _ _ _ a).1 _
+        hP
     · subst hj
       have hxi := hx i
       rw [h0] at hxi
@@ -73,4 +88,3 @@ theorem eps_mem_grpAt {D : D7} {c : Comm D} {v : VCom c} {t : Tup c} (F : QFam v
   · simp at hg
 
 end GlobalTheory.QPl.EpsSupp
-

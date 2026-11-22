@@ -5,21 +5,25 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.GlobSp
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.L2.Col Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.GO
+open NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.L2.Col
+  Formalism.HermitianLatticesTheory Formalism.BasicNotions Formalism.L2.DIV GlobalTheory.GO
 
 namespace GlobalTheory.GO.SplitGlue
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
 
-
 omit [StarRing E] in
-theorem exists_smul_le {N N' : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsFullLattice E N)
-    (hN' : Submodule.IsLattice E N') : ∃ a : 𝓞 E, a ≠ 0 ∧ ∀ x ∈ N', a • x ∈ N := by
+theorem exists_smul_le
+    {N N' : Submodule (𝓞 E) (Sp E n)}
+    (hN : Submodule.IsFullLattice E N) (hN' : Submodule.IsLattice E N')
+    : ∃ a : 𝓞 E, a ≠ 0 ∧ ∀ x ∈ N', a • x ∈ N := by
   classical
   have h0 : ∀ x : Sp E n, ∃ a : 𝓞 E, a ≠ 0 ∧ a • x ∈ N := by
     intro x
-    have hx : x ∈ Submodule.span E (N : Set (Sp E n)) := Submodule.IsFullLattice.span_eq_top (self := hN) ▸ Submodule.mem_top
-    obtain ⟨t, ht⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 E)) E (N : Set (Sp E n)) x hx
+    have hx : x ∈ Submodule.span E (N : Set (Sp E n)) :=
+      Submodule.IsFullLattice.span_eq_top (self := hN) ▸ Submodule.mem_top
+    obtain ⟨t, ht⟩ :=
+      multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 E)) E (N : Set (Sp E n)) x hx
     rw [Submodule.span_eq] at ht
     exact ⟨t, nonZeroDivisors.ne_zero t.2, ht⟩
   obtain ⟨s, rfl⟩ := hN'.fg
@@ -34,20 +38,21 @@ theorem exists_smul_le {N N' : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsFu
   | add y z _ _ hy hz => rw [smul_add]; exact N.add_mem hy hz
   | smul c y _ hy => rw [smul_comm]; exact N.smul_mem _ hy
 
-
 omit [StarRing E] in
-theorem mem_of_forall (N : Submodule (𝓞 E) (Sp E n)) {x : Sp E n}
-    (h : ∀ w : HeightOneSpectrum (𝓞 E), ∃ s ∉ w.asIdeal, s • x ∈ N) : x ∈ N := by
+theorem mem_of_forall
+    (N : Submodule (𝓞 E) (Sp E n))
+    {x : Sp E n} (h : ∀ w : HeightOneSpectrum (𝓞 E), ∃ s ∉ w.asIdeal, s • x ∈ N)
+    : x ∈ N := by
   by_contra hx
   have hI : N.comap (LinearMap.toSpanSingleton (𝓞 E) (Sp E n) x) ≠ ⊤ := by
     intro h1
-    have : (1 : 𝓞 E) ∈ N.comap (LinearMap.toSpanSingleton (𝓞 E) (Sp E n) x) := h1 ▸ Submodule.mem_top
+    have : (1 : 𝓞 E) ∈ N.comap (LinearMap.toSpanSingleton (𝓞 E) (Sp E n) x) :=
+      h1 ▸ Submodule.mem_top
     exact hx (by simpa using this)
   obtain ⟨m, hm, hle⟩ := Ideal.exists_le_maximal _ hI
   have hm0 : m ≠ ⊥ := Ring.ne_bot_of_isMaximal_of_not_isField hm (RingOfIntegers.not_isField E)
   obtain ⟨s, hs, hsx⟩ := h ⟨m, hm.isPrime, hm0⟩
   exact hs (hle (by simpa using hsx))
-
 
 omit [StarRing E] in
 theorem eq_of_sameAt {N N' : Submodule (𝓞 E) (Sp E n)} (h : ∀ w, SameAt w N N') : N = N' := by
@@ -62,18 +67,27 @@ theorem eq_of_sameAt {N N' : Submodule (𝓞 E) (Sp E n)} (h : ∀ w, SameAt w N
     exact ⟨a, ha, h1 x hx⟩
 
 omit [NumberField E] [StarRing E] in
-theorem sameAt_symm {Q : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) (Sp E n)} (h : SameAt Q N N') :
-    SameAt Q N' N := by
+theorem sameAt_symm
+    {Q : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) (Sp E n)} (h : SameAt Q N N')
+    : SameAt Q N' N := by
   obtain ⟨a, ha, a', ha', h1, h2⟩ := h
   exact ⟨a', ha', a, ha, h2, h1⟩
 
 omit [NumberField E] [StarRing E] in
-theorem sameAt_trans {Q : HeightOneSpectrum (𝓞 E)} {N N' N'' : Submodule (𝓞 E) (Sp E n)} (h : SameAt Q N N')
-    (h' : SameAt Q N' N'') : SameAt Q N N'' := by
+theorem sameAt_trans
+    {Q : HeightOneSpectrum (𝓞 E)} {N N' N'' : Submodule (𝓞 E) (Sp E n)}
+    (h : SameAt Q N N') (h' : SameAt Q N' N'')
+    : SameAt Q N N'' := by
   obtain ⟨a, ha, a', ha', h1, h2⟩ := h
   obtain ⟨b, hb, b', hb', h3, h4⟩ := h'
-  refine ⟨a * b, fun hm => (Q.isPrime.mem_or_mem hm).elim ha hb, b' * a',
-    fun hm => (Q.isPrime.mem_or_mem hm).elim hb' ha', fun x hx => ?_, fun x hx => ?_⟩
+  refine ⟨
+    a * b,
+    fun hm => (Q.isPrime.mem_or_mem hm).elim ha hb,
+    b' * a',
+    fun hm => (Q.isPrime.mem_or_mem hm).elim hb' ha',
+    fun x hx => ?_,
+    fun x hx => ?_
+  ⟩
   · rw [mul_smul]; exact h1 _ (h3 x hx)
   · rw [mul_smul]; exact h4 _ (h2 x hx)
 
@@ -81,10 +95,18 @@ theorem conjP_conjP (P : HeightOneSpectrum (𝓞 E)) : conjPrime₂ (conjPrime�
   ext r
   rw [mem_conjP, mem_conjP, cO_cO]
 
-theorem sameAt_dual {Q : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) (Sp E n)} (h : SameAt Q N N') :
-    SameAt (conjPrime₂ Q) (dual (hStd E n) N) (dual (hStd E n) N') := by
+theorem sameAt_dual
+    {Q : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) (Sp E n)} (h : SameAt Q N N')
+    : SameAt (conjPrime₂ Q) (dual (hStd E n) N) (dual (hStd E n) N') := by
   obtain ⟨a, ha, a', ha', h1, h2⟩ := h
-  refine ⟨cO E a', by rwa [mem_conjP, cO_cO], cO E a, by rwa [mem_conjP, cO_cO], fun x hx => ?_, fun x hx => ?_⟩
+  refine ⟨
+    cO E a',
+    by rwa [mem_conjP, cO_cO],
+    cO E a,
+    by rwa [mem_conjP, cO_cO],
+    fun x hx => ?_,
+    fun x hx => ?_
+  ⟩
   · rw [mem_dual] at hx ⊢
     intro y hy
     rw [← hStd_osmul_left]
@@ -94,15 +116,22 @@ theorem sameAt_dual {Q : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) 
     rw [← hStd_osmul_left]
     exact hx _ (h1 y hy)
 
-theorem exists_glue {L L' : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsFullLattice E L) (hL' : Submodule.IsFullLattice E L')
-    (P : HeightOneSpectrum (𝓞 E)) : ∃ L'' : Submodule (𝓞 E) (Sp E n), Submodule.IsFullLattice E L'' ∧ SameAt P L' L'' ∧
-      ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q L L'' := by
+theorem exists_glue
+    {L L' : Submodule (𝓞 E) (Sp E n)}
+    (hL : Submodule.IsFullLattice E L) (hL' : Submodule.IsFullLattice E L')
+    (P : HeightOneSpectrum (𝓞 E))
+    : ∃ L'' : Submodule (𝓞 E) (Sp E n),
+      Submodule.IsFullLattice E L'' ∧ SameAt P L' L''
+        ∧ ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q L L'' := by
   classical
   obtain ⟨a, ha0, ha⟩ := exists_smul_le hL hL'.toIsLattice
   obtain ⟨b, hb0, hb⟩ := exists_smul_le hL' hL.toIsLattice
   have hI : Ideal.span {a * b} ≠ ⊥ := by simpa using ⟨ha0, hb0⟩
   obtain ⟨J, hJ, hdJ⟩ := Ideal.eq_prime_pow_mul_coprime hI P.asIdeal (hpm := P.isMaximal)
-  generalize Multiset.count P.asIdeal (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {a * b})) = k at hdJ
+  generalize Multiset.count P.asIdeal
+        (UniqueFactorizationMonoid.normalizedFactors (Ideal.span {a * b}))
+      = k
+    at hdJ
   have hdvd : ∀ r ∈ P.asIdeal ^ k, ∀ s ∈ J, ∃ c, r * s = c * (a * b) := by
     intro r hr s hs
     have := Ideal.mul_mem_mul hr hs
@@ -127,7 +156,8 @@ theorem exists_glue {L L' : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsFullL
     exact P.isPrime.ne_top (top_le_iff.1 this)
   have hs0 : s ≠ 0 := by rintro rfl; exact hsP P.asIdeal.zero_mem
   let L'' : Submodule (𝓞 E) (Sp E n) := J • L' ⊔ (P.asIdeal ^ k) • L
-  have hA : ∀ x ∈ L', s • x ∈ L'' := fun x hx => Submodule.mem_sup_left (Submodule.smul_mem_smul hsJ hx)
+  have hA : ∀ x ∈ L', s • x ∈ L'' := fun x hx =>
+    Submodule.mem_sup_left (Submodule.smul_mem_smul hsJ hx)
   have hB : ∀ x ∈ L'', s • x ∈ L' := by
     intro x hx
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx
@@ -137,11 +167,15 @@ theorem exists_glue {L L' : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsFullL
     · rw [← mul_smul, mul_comm]; exact h1 r hr s hsJ u hu
     · rw [smul_add]; exact L'.add_mem hu hv
   refine ⟨L'', ?_, ⟨s, hsP, s, hsP, hB, hA⟩, fun Q hQ => ?_⟩
-  · have hsup : Submodule.IsLattice E (L' ⊔ L) :=
-      ⟨hL'.fg.sup hL.fg, by
+  · have hsup : Submodule.IsLattice E (L' ⊔ L) := ⟨
+      hL'.fg.sup hL.fg,
+      by
         intro s hs hli
-        exact (LinearIndependent.iff_fractionRing _ _).mp hli⟩
-    let : Submodule.IsLattice E L'' := lattice_of_smul hL'.toIsLattice hsup (sup_le_sup Submodule.smul_le_right Submodule.smul_le_right) hs0 hA
+        exact (LinearIndependent.iff_fractionRing _ _).mp hli
+    ⟩
+    let : Submodule.IsLattice E L'' :=
+      lattice_of_smul hL'.toIsLattice hsup
+        (sup_le_sup Submodule.smul_le_right Submodule.smul_le_right) hs0 hA
     refine { span_eq_top := ?_ }
     apply top_unique
     intro x hx
@@ -149,18 +183,25 @@ theorem exists_glue {L L' : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsFullL
       Submodule.IsFullLattice.span_eq_top (self := hL') ▸ Submodule.mem_top
     have hspan : ∀ y ∈ L', y ∈ Submodule.span E (L'' : Set (Sp E n)) := by
       intro y hy
-      have hsE : (algebraMap (𝓞 E) E s) ≠ 0 :=
-        fun h => hs0 ((IsFractionRing.injective (𝓞 E) E) (by simpa using h))
+      have hsE : (algebraMap (𝓞 E) E s) ≠ 0 := fun h =>
+        hs0 ((IsFractionRing.injective (𝓞 E) E) (by simpa using h))
       have hy' : s • y ∈ Submodule.span E (L'' : Set (Sp E n)) := Submodule.subset_span (hA y hy)
       rw [← IsScalarTower.algebraMap_smul E s y] at hy'
       have := (Submodule.span E (L'' : Set (Sp E n))).smul_mem (algebraMap (𝓞 E) E s)⁻¹ hy'
       rw [← mul_smul, inv_mul_cancel₀ hsE, one_smul] at this
       exact this
-    exact (Submodule.span_le.mpr hspan) hx' 
+    exact (Submodule.span_le.mpr hspan) hx'
   · obtain ⟨t, htP, htQ⟩ := exists_mem_notMem hQ.symm
     have ht : t ^ k ∈ P.asIdeal ^ k := Ideal.pow_mem_pow htP k
     have ht' : t ^ k ∉ Q.asIdeal := fun h => htQ (Q.isPrime.mem_of_pow_mem k h)
-    refine ⟨t ^ k, ht', t ^ k, ht', fun x hx => ?_, fun x hx => Submodule.mem_sup_right (Submodule.smul_mem_smul ht hx)⟩
+    refine ⟨
+      t ^ k,
+      ht',
+      t ^ k,
+      ht',
+      fun x hx => ?_,
+      fun x hx => Submodule.mem_sup_right (Submodule.smul_mem_smul ht hx)
+    ⟩
     obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx
     rw [smul_add]
     refine L.add_mem ?_ (L.smul_mem _ (Submodule.smul_le_right hz))
@@ -168,15 +209,22 @@ theorem exists_glue {L L' : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsFullL
     · rw [← mul_smul]; exact h2 _ ht r hr u hu
     · rw [smul_add]; exact L.add_mem hu hv
 
-theorem exists_selfDual_prescribed (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ)
-    (N M : Submodule (𝓞 E) (Sp E n)) (Q : HeightOneSpectrum (𝓞 E)) (hQ : conjPrime₂ Q ≠ Q) (hN : Submodule.IsFullLattice E N)
-    (hu : IsUnimodular (hStd E n) N) (hM : Submodule.IsFullLattice E M) :
-    ∃ N' : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E N' ∧ IsUnimodular (hStd E n) N' ∧
-      localization₂ Q.asIdeal N' = localization₂ Q.asIdeal M ∧
-      ∀ Q' : HeightOneSpectrum (𝓞 E), Q' ≠ Q → Q' ≠ conjPrime₂ Q → localization₂ Q'.asIdeal N' = localization₂ Q'.asIdeal N := by
-  have hsymm : (hStd E n).IsSymm := ⟨fun x y => by
-    simp only [hStd, LinearMap.mk₂'ₛₗ_apply, map_sum, map_mul, starRingEnd_apply, star_star]
-    exact Finset.sum_congr rfl fun i _ => mul_comm _ _⟩
+theorem exists_selfDual_prescribed
+    (E : Type) [Field E] [NumberField E] [StarRing E]
+    (n : ℕ) (N M : Submodule (𝓞 E) (Sp E n))
+    (Q : HeightOneSpectrum (𝓞 E)) (hQ : conjPrime₂ Q ≠ Q)
+    (hN : Submodule.IsFullLattice E N) (hu : IsUnimodular (hStd E n) N)
+    (hM : Submodule.IsFullLattice E M)
+    : ∃ N' : Submodule (𝓞 E) (Sp E n),
+      Submodule.IsLattice E N' ∧ IsUnimodular (hStd E n) N'
+        ∧ localization₂ Q.asIdeal N' = localization₂ Q.asIdeal M
+        ∧ ∀ Q' : HeightOneSpectrum (𝓞 E),
+          Q' ≠ Q → Q' ≠ conjPrime₂ Q
+            → localization₂ Q'.asIdeal N' = localization₂ Q'.asIdeal N := by
+  have hsymm : (hStd E n).IsSymm :=
+    ⟨fun x y => by
+      simp only [hStd, LinearMap.mk₂'ₛₗ_apply, map_sum, map_mul, starRingEnd_apply, star_star]
+      exact Finset.sum_congr rfl fun i _ => mul_comm _ _⟩
   have hdual := dualLattice (𝓞 E) E (Sp E n) (hStd E n) hsymm hStd_nondeg star_range M hM
   obtain ⟨L, hL, hLQ, hLo⟩ := exists_glue hN hM Q
   obtain ⟨N', hN', hc, ho⟩ := exists_glue hL hdual.1 (conjPrime₂ Q)
@@ -193,8 +241,10 @@ theorem exists_selfDual_prescribed (E : Type) [Field E] [NumberField E] [StarRin
   by_cases hw' : w = conjPrime₂ Q
   · subst hw'
     exact sameAt_trans (sameAt_symm (sameAt_dual h1)) hc
-  have := sameAt_dual (h2 (conjPrime₂ w) (fun h => hw' (by rw [← h, conjP_conjP]))
-    (fun h => hw (by rw [← conjP_conjP w, h, conjP_conjP])))
+  have :=
+    sameAt_dual (h2 (conjPrime₂ w)
+      (fun h => hw' (by rw [← h, conjP_conjP]))
+      (fun h => hw (by rw [← conjP_conjP w, h, conjP_conjP])))
   rw [conjP_conjP, show dual (hStd E n) N = N from hu] at this
   exact sameAt_trans (sameAt_symm this) (h2 w hw hw')
 

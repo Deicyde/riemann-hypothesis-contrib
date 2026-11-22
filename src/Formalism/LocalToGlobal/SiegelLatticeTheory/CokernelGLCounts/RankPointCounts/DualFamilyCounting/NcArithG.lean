@@ -14,20 +14,28 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.NcArithG
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
-  Formalism.L2.SG.LocVol Formalism.L2.SG.MassDataConc Formalism.L2.SG.TypedSets MeasureTheory NumberField
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.TermDef Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.AdBridge Formalism.L2.SG.LocVol Formalism.L2.SG.MassDataConc
+  Formalism.L2.SG.TypedSets MeasureTheory NumberField
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-variable {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter) (FdN FdN' : Set X.B.I.Ginf)
-  (u u' : D.what₂.Word) (X0 : Fin (2 * D.R.rS + 2) → Fin X.B.I.n → X.B.I.E)
+variable
+  {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter)
+  (FdN FdN' : Set X.B.I.Ginf) (u u' : D.what₂.Word)
+  (X0 : Fin (2 * D.R.rS + 2) → Fin X.B.I.n → X.B.I.E)
   (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ)
   {τ Rw I H H₁ : Type} [Fintype I] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] (T : Formalism.FourierDecayAlt.PB.Terms τ Rw I H H₁) (sd C Th : ℝ)
-  {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)} {what₂ : Finset (Submodule (NumberField.RingOfIntegers D.host.E) (VS D).V)}
-  (vR : Formalism.L2.SG.TermDef.Term D u u' F0 what₂ → ℝ) (Q : Formalism.L2.SG.PairVal.PairSys D u u' F0 what₂)
+  [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
+  (T : Formalism.FourierDecayAlt.PB.Terms τ Rw I H H₁) (sd C Th : ℝ)
+  {F0 : FlagG (VS D) D.R.rS ((Tu D u : ℕ) : D.host.E)}
+  {what₂ : Finset (Submodule (NumberField.RingOfIntegers D.host.E) (VS D).V)}
+  (vR : Formalism.L2.SG.TermDef.Term D u u' F0 what₂ → ℝ)
+  (Q : Formalism.L2.SG.PairVal.PairSys D u u' F0 what₂)
   (M : ∀ p : PlF D, Loc.Model (D.s.atP p).Fp (D.s.atP p).Ep) (δ : ∀ p : PlF D, (D.s.atP p).Fp)
-  (i0 i0' : ∀ _ : NumberField.InfinitePlace X.B.I.F, Fin D.R.k) (νq : X.B.I.Ginf → Measure X.B.I.Ginf)
+  (i0 i0' : ∀ _ : NumberField.InfinitePlace X.B.I.F, Fin D.R.k)
+  (νq : X.B.I.Ginf → Measure X.B.I.Ginf)
 
 theorem rm_eq (D : D7) : D.R.m = 2 * (D.R.rS + 1) := by
   obtain ⟨j, hj⟩ := D.R.m_even
@@ -35,47 +43,60 @@ theorem rm_eq (D : D7) : D.R.m = 2 * (D.R.rS + 1) := by
   show D.R.m = 2 * (D.R.m / 2 - 1 + 1)
   omega
 
-theorem cMass_succ {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
-    (k : ℕ) (hk : 2 ≤ k) :
-    Formalism.L2.SG.Pf.Cnt.cMass K F k = Formalism.L2.SG.Pf.Cnt.cMass K F (k - 1) * Formalism.HermitianLatticesTheory.massRatioRightSide K k := by
+theorem cMass_succ
+    {K F : Type} [Field K] [NumberField K] [StarRing K] [Field F] [NumberField F] [Algebra F K]
+    (k : ℕ) (hk : 2 ≤ k)
+    : Formalism.L2.SG.Pf.Cnt.cMass K F k
+      = Formalism.L2.SG.Pf.Cnt.cMass K F (k - 1)
+        * Formalism.HermitianLatticesTheory.massRatioRightSide K k := by
   unfold Formalism.L2.SG.Pf.Cnt.cMass
   obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
   rw [Finset.prod_Icc_succ_top (by omega), Nat.add_sub_cancel, mul_assoc]
 
 variable [Fact Formalism.HermitianLattices.Ext.L3.HermRepUnram] in
-theorem ncValueC_of_global (a' Ω ATyp A' AT PT : ℝ)
-    (hP : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).Pos)
-    (ha : 0 < a') (hATyp : 0 < ATyp) (hA' : 0 < A') (hPT : 0 < PT)
-    (hS : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μK * a' =
-      (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μH' * Ω)
-    (hR : Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volH *
-        (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volN *
-        (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volN' =
-      a' * 2 ^ (D.R.k * Module.finrank ℚ D.host.F) *
-        (Real.pi ^ D.R.k / (Nat.factorial (D.R.k - 1) : ℝ)) ^ Module.finrank ℚ D.host.F *
-        ((Tw u : ℕ) : ℝ) ^ (-((D.R.k * Module.finrank ℚ D.host.F : ℕ) : ℤ)) *
-        |(NumberField.discr D.host.F : ℝ)| ^
-          (-(8 * (D.R.rS : ℝ) ^ 3 + 6 * (D.R.rS : ℝ) ^ 2 + 6 * D.R.k * (D.R.rS : ℝ) ^ 2 + D.R.rS) / 3))
-    (hG1 : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).unitLevelVolume /
-        (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volZZ =
-      |(NumberField.discr D.host.F : ℝ)| ^ (((D.R.rS : ℝ) + 1) * (8 * (D.R.rS : ℝ) ^ 2 + 10 * D.R.rS + 3) / 3) *
-        ((Lat.gS D : ℕ) : ℝ) ^ ((D.R.rS + 1) * (2 * D.R.rS + 3) * Module.finrank ℚ D.host.F))
-    (hG2 : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μKnat /
-        (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μK =
-      ((Lat.gS D : ℕ) : ℝ) ^ (-(((D.R.rS + 1) * (2 * D.R.k + 2 * D.R.rS + 1) * Module.finrank ℚ D.host.F : ℕ) : ℤ)) /
-        ATyp)
-    (hG3 : Ω = |(NumberField.discr D.host.F : ℝ)| ^
-        (-((D.R.r : ℝ) * (2 * D.R.rS + 1) - ((2 * (D.R.rS : ℝ) + 1) ^ 2) / 2)) * A')
+theorem ncValueC_of_global
+    (a' Ω ATyp A' AT PT : ℝ)
+    (hP : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).Pos) (ha : 0 < a')
+    (hATyp : 0 < ATyp) (hA' : 0 < A') (hPT : 0 < PT)
+    (hS : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μK * a'
+      = (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μH' * Ω)
+    (hR : Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1
+        * (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volH
+        * (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volN
+        * (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volN'
+      = a' * 2 ^ (D.R.k * Module.finrank ℚ D.host.F)
+        * (Real.pi ^ D.R.k / (Nat.factorial (D.R.k - 1) : ℝ)) ^ Module.finrank ℚ D.host.F
+        * ((Tw u : ℕ) : ℝ) ^ (-((D.R.k * Module.finrank ℚ D.host.F : ℕ) : ℤ))
+        * |(NumberField.discr D.host.F : ℝ)|
+          ^ (-(8 * (D.R.rS : ℝ) ^ 3 + 6 * (D.R.rS : ℝ) ^ 2 + 6 * D.R.k * (D.R.rS : ℝ) ^ 2 + D.R.rS)
+            / 3))
+    (hG1 : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).unitLevelVolume
+        / (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).volZZ
+      = |(NumberField.discr D.host.F : ℝ)|
+          ^ (((D.R.rS : ℝ) + 1) * (8 * (D.R.rS : ℝ) ^ 2 + 10 * D.R.rS + 3) / 3)
+        * ((Lat.gS D : ℕ) : ℝ) ^ ((D.R.rS + 1) * (2 * D.R.rS + 3) * Module.finrank ℚ D.host.F))
+    (hG2 : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μKnat
+        / (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).μK
+      = ((Lat.gS D : ℕ) : ℝ)
+          ^ (-(((D.R.rS + 1) * (2 * D.R.k + 2 * D.R.rS + 1) * Module.finrank ℚ D.host.F : ℕ) : ℤ))
+        / ATyp)
+    (hG3 : Ω
+      = |(NumberField.discr D.host.F : ℝ)|
+          ^ (-((D.R.r : ℝ) * (2 * D.R.rS + 1) - ((2 * (D.R.rS : ℝ) + 1) ^ 2) / 2))
+        * A')
     (hG4 : (bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq).al * ATyp = AT * A')
-    (hG5 : AT * ∏ i ∈ Finset.Icc (D.R.k + 1) D.R.r, Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F i = PT)
-    (hRM : Formalism.MainNotions.S.Cnt.massRows D F0 what₂ =
-      Formalism.L2.SG.Pf.Cnt.cMass D.host.E D.host.F D.R.k * ((Tw u : ℕ) : ℝ) ^ (D.R.k * Module.finrank ℚ D.host.F) * PT)
-    (hV : Formalism.HermitianLatticesTheory.vInv D.host.E =
-      |(NumberField.discr D.host.F : ℝ)| ^ ((1 : ℝ) / Module.finrank ℚ D.host.F) / 2)
+    (hG5 : AT
+        * ∏ i ∈ Finset.Icc (D.R.k + 1) D.R.r, Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F i
+      = PT)
+    (hRM : Formalism.MainNotions.S.Cnt.massRows D F0 what₂
+      = Formalism.L2.SG.Pf.Cnt.cMass D.host.E D.host.F D.R.k
+        * ((Tw u : ℕ) : ℝ) ^ (D.R.k * Module.finrank ℚ D.host.F) * PT)
+    (hV : Formalism.HermitianLatticesTheory.vInv D.host.E
+      = |(NumberField.discr D.host.F : ℝ)| ^ ((1 : ℝ) / Module.finrank ℚ D.host.F) / 2)
     (hfE : Formalism.HermitianLatticesTheory.fDeg D.host.E = Module.finrank ℚ D.host.F)
-    (hng : ngFac D = ((Lat.gS D : ℕ) : ℝ) ^ (D.R.m * Module.finrank ℚ D.host.F * (D.R.k - 1))) :
-    Formalism.L2.SG.Pf.NcAsm.NcValueC X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq := by
-
+    (hng : ngFac D = ((Lat.gS D : ℕ) : ℝ) ^ (D.R.m * Module.finrank ℚ D.host.F * (D.R.k - 1)))
+    : Formalism.L2.SG.Pf.NcAsm.NcValueC X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0'
+      νq := by
   set B := bCF X hb hK FdN FdN' u u' X0 ψ T sd C Th vR Q M δ i0 i0' νq with hB
   obtain ⟨hKc, hFc, -⟩ := Formalism.L2.SG.Pf.Cnt.field_dictionary_holds D
   set dd : ℝ := |(NumberField.discr D.host.F : ℝ)| with hdd
@@ -115,22 +136,27 @@ theorem ncValueC_of_global (a' Ω ATyp A' AT PT : ℝ)
     rw [← Formalism.HermitianLattices.Ext.L3.lValEta_eq_lValEtaF hKc hFc i hi2]
     exact Formalism.HermitianLattices.Ext.L3.lValEta_pos hKc i hi2
   have hcm := (Formalism.L2.SG.Pf.Asm.cMass_spec hKc hFc (k - 1) (by omega)).1
-  have hIcc : (∏ i ∈ Finset.Icc k D.R.r, Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F i) =
-      Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F k * Lk := by
+  have hIcc
+      : (∏ i ∈ Finset.Icc k D.R.r, Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F i)
+        = Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F k * Lk := by
     have hIo : Finset.Ioc k D.R.r = Finset.Icc (k + 1) D.R.r := by
       ext i; simp only [Finset.mem_Ioc, Finset.mem_Icc]; omega
     rw [Finset.Icc_eq_cons_Ioc (show k ≤ D.R.r by omega), Finset.prod_cons, hLk, hIo]
 
-  have hvI : 2 * Formalism.HermitianLatticesTheory.vInv D.host.E = dd ^ ((1 : ℝ) / f) := by rw [hV]; ring
-  have hvIpos : 0 < Formalism.HermitianLatticesTheory.vInv D.host.E := by
-    rw [hV]; positivity
+  have hvI : 2 * Formalism.HermitianLatticesTheory.vInv D.host.E = dd ^ ((1 : ℝ) / f) := by
+    rw [hV]; ring
+  have hvIpos : 0 < Formalism.HermitianLatticesTheory.vInv D.host.E := by rw [hV]; positivity
   have hpow1 : (dd ^ ((1 : ℝ) / f)) ^ f = dd := by
     rw [← Real.rpow_natCast, ← Real.rpow_mul hdpos.le]
     rw [show (1 : ℝ) / f * (f : ℝ) = 1 by field_simp]
     exact Real.rpow_one dd
-  have hsq : Real.sqrt ((2 * Formalism.HermitianLatticesTheory.vInv D.host.E) ^ f) = dd ^ ((1 : ℝ) / 2) := by
+  have hsq
+      : Real.sqrt ((2 * Formalism.HermitianLatticesTheory.vInv D.host.E) ^ f)
+        = dd ^ ((1 : ℝ) / 2) := by
     rw [hvI, hpow1, Real.sqrt_eq_rpow]
-  have hvk : (Formalism.HermitianLatticesTheory.vInv D.host.E) ^ (k * f) = dd ^ (k : ℝ) / 2 ^ (k * f) := by
+  have hvk
+      : (Formalism.HermitianLatticesTheory.vInv D.host.E) ^ (k * f)
+        = dd ^ (k : ℝ) / 2 ^ (k * f) := by
     have h2 : Formalism.HermitianLatticesTheory.vInv D.host.E = dd ^ ((1 : ℝ) / f) / 2 := by rw [hV]
     rw [h2, div_pow, pow_mul', hpow1, Real.rpow_natCast]
 
@@ -147,35 +173,43 @@ theorem ncValueC_of_global (a' Ω ATyp A' AT PT : ℝ)
     ring
   have hde : dd ^ e = dd ^ E1 * (dd ^ Xe)⁻¹ * dd ^ e2 := by
     rw [hexp, Real.rpow_add hdpos, Real.rpow_sub hdpos, div_eq_mul_inv]
-  have hdE1 : dd ^ E1 = dd ^ ((-((2 * s * (s + 1) * (k - 1) : ℕ) : ℤ) : ℤ) : ℝ) * dd ^ ((1 : ℝ) / 2) *
-      (dd ^ (k : ℝ))⁻¹ := by
+  have hdE1
+      : dd ^ E1
+        = dd ^ ((-((2 * s * (s + 1) * (k - 1) : ℕ) : ℤ) : ℤ) : ℝ) * dd ^ ((1 : ℝ) / 2)
+          * (dd ^ (k : ℝ))⁻¹ := by
     rw [hE1, ← Real.rpow_neg hdpos.le, ← Real.rpow_add hdpos, ← Real.rpow_add hdpos]
     congr 1
     push_cast
     ring
 
-  have hgc : gg ^ ((s + 1) * (2 * s + 3) * f) * gg ^ (D.R.m * f * (k - 1)) =
-      gg ^ ((s + 1) * (2 * k + 2 * s + 1) * f) := by
+  have hgc
+      : gg ^ ((s + 1) * (2 * s + 3) * f) * gg ^ (D.R.m * f * (k - 1))
+        = gg ^ ((s + 1) * (2 * k + 2 * s + 1) * f) := by
     rw [← pow_add]
     congr 1
     rw [hm]
     obtain ⟨j, hj⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
     rw [hj, Nat.add_sub_cancel]
     ring
-  have hgpow : gg ^ (-(((s + 1) * (2 * k + 2 * s + 1) * f : ℕ) : ℤ)) =
-      (gg ^ ((s + 1) * (2 * k + 2 * s + 1) * f))⁻¹ := by
+  have hgpow
+      : gg ^ (-(((s + 1) * (2 * k + 2 * s + 1) * f : ℕ) : ℤ))
+        = (gg ^ ((s + 1) * (2 * k + 2 * s + 1) * f))⁻¹ := by
     rw [zpow_neg, zpow_natCast]
   have hTpow : TT ^ (-((k * f : ℕ) : ℤ)) = (TT ^ (k * f))⁻¹ := by rw [zpow_neg, zpow_natCast]
 
   have hal : B.al = AT * A' / ATyp := by rw [eq_div_iff hATyp.ne']; exact hG4
   have hAT : AT = PT / Lk := by rw [eq_div_iff hLkk.ne']; exact hG5
-  have hratio : Formalism.HermitianLatticesTheory.massRatioRightSide D.host.E k =
-      ((Nat.factorial (k - 1) : ℝ) ^ f * (dd ^ (k : ℝ) / 2 ^ (k * f)) / Real.pi ^ (k * f)) /
-        dd ^ ((1 : ℝ) / 2) * Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F k := by
+  have hratio
+      : Formalism.HermitianLatticesTheory.massRatioRightSide D.host.E k
+        = ((Nat.factorial (k - 1) : ℝ) ^ f * (dd ^ (k : ℝ) / 2 ^ (k * f)) / Real.pi ^ (k * f))
+          / dd ^ ((1 : ℝ) / 2)
+          * Formalism.HermitianLattices.Ext.L3.lValEtaF D.host.E D.host.F k := by
     unfold Formalism.HermitianLatticesTheory.massRatioRightSide
-    rw [hfE, hsq, Formalism.HermitianLattices.Ext.L3.lValEta_eq_lValEtaF hKc hFc k hk2, mul_pow, ← pow_mul, div_pow, hvk]
+    rw [hfE, hsq, Formalism.HermitianLattices.Ext.L3.lValEta_eq_lValEtaF hKc hFc k hk2, mul_pow,
+      ← pow_mul, div_pow, hvk]
     ring
-  have hratio_pos : 0 < Formalism.HermitianLatticesTheory.massRatioRightSide D.host.E k := Formalism.HermitianLattices.Ext.L3.massRatio_pos hKc k hk2
+  have hratio_pos : 0 < Formalism.HermitianLatticesTheory.massRatioRightSide D.host.E k :=
+    Formalism.HermitianLattices.Ext.L3.massRatio_pos hKc k hk2
 
   have hKrat : B.μKnat / B.μH' = (B.μKnat / B.μK) * (Ω / a') := by
     have h1 : B.μK / B.μH' = Ω / a' := by
@@ -185,36 +219,39 @@ theorem ncValueC_of_global (a' Ω ATyp A' AT PT : ℝ)
     field_simp
   unfold Formalism.L2.SG.Pf.NcAsm.NcValueC
   rw [← hB]
-  calc _ = dd ^ E1 * 2 ^ (k * f) * (Real.pi ^ k / (Nat.factorial (k - 1) : ℝ)) ^ f * TT ^ (-((k * f : ℕ) : ℤ)) *
-          A' / ATyp := by
-        unfold Formalism.L2.SG.Pf.Cnt.cExpl
-        try rw [← hdd]
-        try rw [← hfdef]
-        try rw [← hkdef]
-        try rw [← hsdef]
-        rw [hIcc, hRM, cMass_succ k hk2, hratio, hal, hAT, hdE1,
-          ← Real.rpow_intCast dd, hTpow, div_pow, ← pow_mul]
-        have hpi : 0 < Real.pi := Real.pi_pos
-        have hfac : (0 : ℝ) < (Nat.factorial (k - 1) : ℝ) := by exact_mod_cast Nat.factorial_pos _
-        field_simp
-    _ = Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * B.volH * B.volN * B.volN' * (B.unitLevelVolume / B.volZZ) * B.μKnat / B.μH' *
-          ngFac D := by
-        rw [show Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * B.volH * B.volN * B.volN' * (B.unitLevelVolume / B.volZZ) * B.μKnat /
-            B.μH' * ngFac D = (Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * B.volH * B.volN * B.volN') *
-            (B.unitLevelVolume / B.volZZ) * (B.μKnat / B.μH') * ngFac D by ring]
-        rw [hR, hG1, hKrat, hG2, hG3, hng]
-        try rw [← hdd]
-        try rw [← hfdef]
-        try rw [← hkdef]
-        try rw [← hsdef]
-        try rw [← hgg]
-        try rw [← hTT]
-        rw [hde, hgpow, Real.rpow_neg hdpos.le]
-        rw [← hgc]
-        have hX : 0 < dd ^ Xe := Real.rpow_pos_of_pos hdpos _
-        have he2p : 0 < dd ^ e2 := Real.rpow_pos_of_pos hdpos _
-        have hgA : 0 < gg ^ ((s + 1) * (2 * s + 3) * f) := pow_pos hgpos _
-        have hgC : 0 < gg ^ (D.R.m * f * (k - 1)) := pow_pos hgpos _
-        field_simp
+  calc
+    _ = dd ^ E1 * 2 ^ (k * f) * (Real.pi ^ k / (Nat.factorial (k - 1) : ℝ)) ^ f
+        * TT ^ (-((k * f : ℕ) : ℤ)) * A' / ATyp := by
+      unfold Formalism.L2.SG.Pf.Cnt.cExpl
+      try rw [← hdd]
+      try rw [← hfdef]
+      try rw [← hkdef]
+      try rw [← hsdef]
+      rw [hIcc, hRM, cMass_succ k hk2, hratio, hal, hAT, hdE1, ← Real.rpow_intCast dd, hTpow,
+        div_pow, ← pow_mul]
+      have hpi : 0 < Real.pi := Real.pi_pos
+      have hfac : (0 : ℝ) < (Nat.factorial (k - 1) : ℝ) := by exact_mod_cast Nat.factorial_pos _
+      field_simp
+    _ = Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * B.volH * B.volN * B.volN'
+        * (B.unitLevelVolume / B.volZZ) * B.μKnat / B.μH' * ngFac D := by
+      rw [show Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * B.volH * B.volN * B.volN'
+            * (B.unitLevelVolume / B.volZZ) * B.μKnat / B.μH' * ngFac D
+          = (Formalism.L2.SG.RealObj.DisintegrationConstant X u u' 1 * B.volH * B.volN * B.volN')
+            * (B.unitLevelVolume / B.volZZ) * (B.μKnat / B.μH') * ngFac D by
+        ring]
+      rw [hR, hG1, hKrat, hG2, hG3, hng]
+      try rw [← hdd]
+      try rw [← hfdef]
+      try rw [← hkdef]
+      try rw [← hsdef]
+      try rw [← hgg]
+      try rw [← hTT]
+      rw [hde, hgpow, Real.rpow_neg hdpos.le]
+      rw [← hgc]
+      have hX : 0 < dd ^ Xe := Real.rpow_pos_of_pos hdpos _
+      have he2p : 0 < dd ^ e2 := Real.rpow_pos_of_pos hdpos _
+      have hgA : 0 < gg ^ ((s + 1) * (2 * s + 3) * f) := pow_pos hgpos _
+      have hgC : 0 < gg ^ (D.R.m * f * (k - 1)) := pow_pos hgpos _
+      field_simp
 
 end Formalism.L2.SG.Pf.NcArithG

@@ -14,17 +14,17 @@ namespace UpperTheory.Ru.crystallineComparison
 
 variable {l : ℕ} [Fact l.Prime]
 
-private theorem isDec_surj {A : Test l} {S : Fam A} (h : IsDec S) (i : S.ι) :
-    Function.Surjective (PAlg.Hom.f (S.f i).hom) := by
+private theorem isDec_surj {A : Test l} {S : Fam A} (h : IsDec S) (i : S.ι)
+    : Function.Surjective (PAlg.Hom.f (S.f i).hom) := by
   classical
   intro b
   obtain ⟨a, ha⟩ := h.2 (Pi.single i b)
   exact ⟨a, by simpa using congrFun ha i⟩
 
-private theorem exists_idem {A : Test l} {S : Fam A} (h : IsDec S) :
-    ∃ e : S.ι → A.obj.A, CompleteOrthogonalIdempotents e ∧
-      (∀ i, PAlg.Hom.f (S.f i).hom (e i) = 1) ∧
-      ∀ i a, PAlg.Hom.f (S.f i).hom a = 0 → a * e i = 0 := by
+private theorem exists_idem {A : Test l} {S : Fam A} (h : IsDec S)
+    : ∃ e : S.ι → A.obj.A,
+      CompleteOrthogonalIdempotents e ∧ (∀ i, PAlg.Hom.f (S.f i).hom (e i) = 1)
+        ∧ ∀ i a, PAlg.Hom.f (S.f i).hom a = 0 → a * e i = 0 := by
   classical
   choose e he using fun i => h.2 (Pi.single i (1 : (S.B i).obj.A))
   have hv : ∀ i j, PAlg.Hom.f (S.f j).hom (e i) = (Pi.single i 1 : ∀ k, (S.B k).obj.A) j :=
@@ -61,14 +61,16 @@ private theorem exists_idem {A : Test l} {S : Fam A} (h : IsDec S) :
     · subst hji; rw [ha, zero_mul]
     · rw [hne i j hji, mul_zero]
 
-private theorem pullback_decomposition {A A' : Test l} (φ : A ⟶ A') (S : Fam A) (h : IsDec S) :
-    ∃ (B' : S.ι → Test l) (f' : ∀ i, A' ⟶ B' i) (ψ : ∀ i, S.B i ⟶ B' i),
+private theorem pullback_decomposition {A A' : Test l} (φ : A ⟶ A') (S : Fam A) (h : IsDec S)
+    : ∃ (B' : S.ι → Test l) (f' : ∀ i, A' ⟶ B' i) (ψ : ∀ i, S.B i ⟶ B' i),
       IsDec (⟨S.ι, B', f'⟩ : Fam A') ∧ ∀ i, S.f i ≫ ψ i = φ ≫ f' i := by
   obtain ⟨e, he, h1, h0⟩ := exists_idem h
-  obtain ⟨B', f', hd, hf⟩ := decEx l A' S.ι (fun i => PAlg.Hom.f φ.hom (e i))
-    (he.map (PAlg.Hom.f φ.hom))
-  have key : ∀ i, RingHom.ker (PAlg.Hom.f (S.f i).hom) ≤
-      RingHom.ker ((PAlg.Hom.f (f' i).hom).comp (PAlg.Hom.f φ.hom)) := by
+  obtain ⟨B', f', hd, hf⟩ :=
+    decEx l A' S.ι (fun i => PAlg.Hom.f φ.hom (e i)) (he.map (PAlg.Hom.f φ.hom))
+  have key
+      : ∀ i,
+        RingHom.ker (PAlg.Hom.f (S.f i).hom)
+          ≤ RingHom.ker ((PAlg.Hom.f (f' i).hom).comp (PAlg.Hom.f φ.hom)) := by
     intro i a ha
     have ha0 : a * e i = 0 := h0 i a ha
     have h2 : PAlg.Hom.f (f' i).hom (PAlg.Hom.f φ.hom a) * 1 = 0 := by
@@ -85,8 +87,7 @@ private theorem pullback_decomposition {A A' : Test l} (φ : A ⟶ A') (S : Fam 
     refine RingHom.ext fun x => ?_
     have c1 : PAlg.Hom.f (S.f i).hom (A.obj.s x) = (S.B i).obj.s x :=
       RingHom.congr_fun (PAlg.Hom.comm (S.f i).hom) x
-    have c2 : PAlg.Hom.f φ.hom (A.obj.s x) = A'.obj.s x :=
-      RingHom.congr_fun (PAlg.Hom.comm φ.hom) x
+    have c2 : PAlg.Hom.f φ.hom (A.obj.s x) = A'.obj.s x := RingHom.congr_fun (PAlg.Hom.comm φ.hom) x
     have c3 : PAlg.Hom.f (f' i).hom (A'.obj.s x) = (B' i).obj.s x :=
       RingHom.congr_fun (PAlg.Hom.comm (f' i).hom) x
     rw [RingHom.comp_apply, ← c1, hg, c2, c3]
@@ -95,11 +96,12 @@ private theorem pullback_decomposition {A A' : Test l} (φ : A ⟶ A') (S : Fam 
   apply PAlg.Hom.ext
   exact RingHom.ext fun a => hg i a
 
-theorem partsEx :
-    UpperTheory.Ru.crystallineComparison.PartsEx := by
+theorem partsEx : UpperTheory.Ru.crystallineComparison.PartsEx := by
   intro l _
-  refine ⟨{ Cov := fun S => IsDec S, triv := ?_, pull := ?_, trans := ?_, epi := ?_, disj := ?_ },
-    fun _ _ => Iff.rfl⟩
+  refine ⟨
+    { Cov := fun S => IsDec S, triv := ?_, pull := ?_, trans := ?_, epi := ?_, disj := ?_ },
+    fun _ _ => Iff.rfl
+  ⟩
   · intro A
     constructor
     · intro a b hab
@@ -141,7 +143,9 @@ theorem partsEx :
       have := congrFun ha j
       simpa [Pi.single_eq_of_ne hij.symm] using this
     have h10 : (1 : X.obj.A) = 0 := by
-      have h3 : PAlg.Hom.f u.hom (PAlg.Hom.f (S.f i).hom a) = PAlg.Hom.f v.hom (PAlg.Hom.f (S.f j).hom a) :=
+      have h3
+          : PAlg.Hom.f u.hom (PAlg.Hom.f (S.f i).hom a)
+            = PAlg.Hom.f v.hom (PAlg.Hom.f (S.f j).hom a) :=
         congrArg (fun w => PAlg.Hom.f w.hom a) huv
       rw [hi, hj, map_one, map_zero] at h3
       exact h3

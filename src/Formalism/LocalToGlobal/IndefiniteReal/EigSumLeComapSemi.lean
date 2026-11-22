@@ -20,52 +20,63 @@ section Gen
 
 variable {K : Type} [Field K] {σ : K →+* ℂ}
 
-def cxSys {I : Type} (σ : K →+* ℂ) (C : (I → K) → Prop) : (I → ℂ) → Prop :=
-  fun y => ∃ x, C x ∧ y = fun i => σ (x i)
+def cxSys {I : Type} (σ : K →+* ℂ) (C : (I → K) → Prop) : (I → ℂ) → Prop := fun y =>
+  ∃ x, C x ∧ y = fun i => σ (x i)
 
 variable {V E : Type} [AddCommGroup V] [Module K V] [AddCommGroup E] [Module ℂ E]
 
-theorem map_pow_sub (f : V →ₛₗ[σ] E) (T : Module.End K V) (S : Module.End ℂ E)
-    (h : ∀ v, f (T v) = S (f v)) (a : K) (k : ℕ) (v : V) :
-    f (((T - a • 1) ^ k) v) = ((S - σ a • 1) ^ k) (f v) := by
+theorem map_pow_sub
+    (f : V →ₛₗ[σ] E) (T : Module.End K V) (S : Module.End ℂ E) (h : ∀ v, f (T v) = S (f v))
+    (a : K) (k : ℕ) (v : V)
+    : f (((T - a • 1) ^ k) v) = ((S - σ a • 1) ^ k) (f v) := by
   induction k generalizing v with
   | zero => simp
   | succ k ih =>
     rw [pow_succ, Module.End.mul_apply, ih, pow_succ, Module.End.mul_apply]
     congr 1
-    simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smulₛₗ, h]
+    simp only [LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, map_sub, map_smulₛₗ,
+      h]
 
-theorem map_maxGen (f : V →ₛₗ[σ] E) {T : Module.End K V} {S : Module.End ℂ E}
-    (h : ∀ v, f (T v) = S (f v)) {a : K} {v : V} (hv : v ∈ T.maxGenEigenspace a) :
-    f v ∈ S.maxGenEigenspace (σ a) := by
+theorem map_maxGen
+    (f : V →ₛₗ[σ] E)
+    {T : Module.End K V} {S : Module.End ℂ E} (h : ∀ v, f (T v) = S (f v))
+    {a : K} {v : V} (hv : v ∈ T.maxGenEigenspace a)
+    : f v ∈ S.maxGenEigenspace (σ a) := by
   rw [Module.End.mem_maxGenEigenspace] at hv ⊢
   obtain ⟨k, hk⟩ := hv
   exact ⟨k, by rw [← map_pow_sub f T S h a k v, hk, map_zero]⟩
 
 variable {I : Type}
 
-theorem map_eigAt (f : V →ₛₗ[σ] E) {op : I → Module.End K V} {h : I → Module.End ℂ E}
-    (hf : ∀ i v, f (op i v) = h i (f v)) {x : I → K} {v : V} (hv : v ∈ eigAt op x) :
-    f v ∈ eigAt h (fun i => σ (x i)) := by
+theorem map_eigAt
+    (f : V →ₛₗ[σ] E)
+    {op : I → Module.End K V} {h : I → Module.End ℂ E} (hf : ∀ i v, f (op i v) = h i (f v))
+    {x : I → K} {v : V} (hv : v ∈ eigAt op x)
+    : f v ∈ eigAt h (fun i => σ (x i)) := by
   unfold eigAt at hv ⊢
   rw [Submodule.mem_iInf] at hv ⊢
   exact fun i => map_maxGen f (hf i) (hv i)
 
-theorem eigSum_le_comap_semi (f : V →ₛₗ[σ] E) {op : I → Module.End K V} {h : I → Module.End ℂ E}
-    (hf : ∀ i v, f (op i v) = h i (f v)) (C : (I → K) → Prop) :
-    eigSum op C ≤ (eigSum h (cxSys σ C)).comap f := by
+theorem eigSum_le_comap_semi
+    (f : V →ₛₗ[σ] E)
+    {op : I → Module.End K V} {h : I → Module.End ℂ E} (hf : ∀ i v, f (op i v) = h i (f v))
+    (C : (I → K) → Prop)
+    : eigSum op C ≤ (eigSum h (cxSys σ C)).comap f := by
   show (⨆ (x : I → K) (_ : C x), eigAt op x) ≤ _
   refine iSup₂_le fun x hx => ?_
   intro v hv
   rw [Submodule.mem_comap]
   exact eigAt_le_eigSum (op := h) ⟨x, hx, rfl⟩ (map_eigAt f hf hv)
 
-theorem mem_eigSum_iff_map [FiniteDimensional K V] [FiniteDimensional ℂ E] (f : V →ₛₗ[σ] E)
+theorem mem_eigSum_iff_map
+    [FiniteDimensional K V] [FiniteDimensional ℂ E]
+    (f : V →ₛₗ[σ] E)
     {op : I → Module.End K V} (hc : PairComm op) (hs : SplitOver op)
     {h : I → Module.End ℂ E} (hch : PairComm h) (hf : ∀ i v, f (op i v) = h i (f v))
     {Z : Submodule K V} (hZ : ∀ i, Z ≤ Z.comap (op i)) (hinj : ∀ z ∈ Z, f z = 0 → z = 0)
-    (C : (I → K) → Prop) {v : V} (hv : v ∈ Z) :
-    v ∈ eigSum op C ↔ f v ∈ eigSum h (cxSys σ C) := by
+    (C : (I → K) → Prop)
+    {v : V} (hv : v ∈ Z)
+    : v ∈ eigSum op C ↔ f v ∈ eigSum h (cxSys σ C) := by
   constructor
   · intro hv'
     exact eigSum_le_comap_semi f hf C hv'
@@ -91,8 +102,9 @@ theorem mem_eigSum_iff_map [FiniteDimensional K V] [FiniteDimensional ℂ E] (f 
     rw [e]
     exact hpv
 
-theorem inj_of_li {ι : Type*} (b : Basis ι K V) (f : V →ₛₗ[σ] E)
-    (h : LinearIndependent ℂ fun k => f (b k)) : Function.Injective f := by
+theorem inj_of_li
+    {ι : Type*} (b : Basis ι K V) (f : V →ₛₗ[σ] E) (h : LinearIndependent ℂ fun k => f (b k))
+    : Function.Injective f := by
   refine (injective_iff_map_eq_zero f).2 fun v hv => ?_
   have e := b.linearCombination_repr v
   rw [Finsupp.linearCombination_apply, Finsupp.sum] at e
@@ -115,16 +127,19 @@ namespace CxData
 
 variable {Bs : DefBase K} {A : DefAmb Bs} (X : CxData A)
 
-theorem theta_jR_inj (hR : X.KFormR) (t : Bs.Tup) (z : A.FR t) (hz : z ∈ X.Z t)
-    (h0 : X.Θ t (X.jR t z) = 0) : z = 0 := by
+theorem theta_jR_inj
+    (hR : X.KFormR) (t : Bs.Tup) (z : A.FR t) (hz : z ∈ X.Z t) (h0 : X.Θ t (X.jR t z) = 0)
+    : z = 0 := by
   simp only [CxData.Z, Submodule.mem_comap, LinearMap.mem_range] at hz
   obtain ⟨w, hw⟩ := hz
   have h1 : X.jR t z = 0 := by
     rw [← inner_self_eq_zero (𝕜 := ℂ), ← hw, LinearMap.adjoint_inner_left, hw, h0, inner_zero_right]
   exact inj_of_li (bR (A := A) t) (X.jR t) (hR t).1 (h1.trans (map_zero _).symm)
 
-theorem theta_jL_inj (hL : X.KFormL) (j : Bs.J) (t : Bs.Tup) (z : A.FL j t) (hz : z ∈ X.Zl j t)
-    (h0 : X.θ' j t (X.jL j t z) = 0) : z = 0 := by
+theorem theta_jL_inj
+    (hL : X.KFormL)
+    (j : Bs.J) (t : Bs.Tup) (z : A.FL j t) (hz : z ∈ X.Zl j t) (h0 : X.θ' j t (X.jL j t z) = 0)
+    : z = 0 := by
   simp only [CxData.Zl, Submodule.mem_comap, LinearMap.mem_range] at hz
   obtain ⟨w, hw⟩ := hz
   have h1 : X.jL j t z = 0 := by
@@ -133,23 +148,23 @@ theorem theta_jL_inj (hL : X.KFormL) (j : Bs.J) (t : Bs.Tup) (z : A.FL j t) (hz 
 
 variable {fc : DefSub A → DefFace Bs} (cr : Crd A fc) (b : Bool)
 
-theorem iC_cpt_eq (t : Bs.Tup) (x : Fin ((lv (fc X.zs) b).dQ t) → K) :
-    X.iC cr b t (cpt Bs.v0.embedding x) = X.Θ t (X.jR t (cr.toR X.zs b t x)) := by
+theorem iC_cpt_eq (t : Bs.Tup) (x : Fin ((lv (fc X.zs) b).dQ t) → K)
+    : X.iC cr b t (cpt Bs.v0.embedding x) = X.Θ t (X.jR t (cr.toR X.zs b t x)) := by
   have hx : x = ∑ k, x k • Pi.single k (1 : K) := by
     funext i
     simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [hx]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, map_smulₛₗ, CxData.iC, lin, Fintype.linearCombination_apply, cpt]
+  simp only [map_sum, map_smul, map_smulₛₗ, CxData.iC, lin, Fintype.linearCombination_apply, cpt]
 
-theorem tC_cpt_eq (j : Bs.J) (t : Bs.Tup) (x : Fin ((lv (fc X.zs) b).dZ j t) → K) :
-    X.tC cr b j t (cpt Bs.v0.embedding x) = X.θ' j t (X.jL j t (cr.toL X.zs b j t x)) := by
+theorem tC_cpt_eq (j : Bs.J) (t : Bs.Tup) (x : Fin ((lv (fc X.zs) b).dZ j t) → K)
+    : X.tC cr b j t (cpt Bs.v0.embedding x) = X.θ' j t (X.jL j t (cr.toL X.zs b j t x)) := by
   have hx : x = ∑ k, x k • Pi.single k (1 : K) := by
     funext i
     simp [Finset.sum_apply, Pi.single_apply]
   conv_rhs => rw [hx]
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, map_smulₛₗ, CxData.tC, lin, Fintype.linearCombination_apply, cpt]
+  simp only [map_sum, map_smul, map_smulₛₗ, CxData.tC, lin, Fintype.linearCombination_apply, cpt]
 
 end CxData
 
@@ -160,13 +175,15 @@ variable (A : FamIn K G Pl0 T m) (X : CxData A.fam.amb)
 
 variable {A X}
 
-theorem toF_mem_Z {B : BlockDat K G Pl0} (ℓ : Lvl K G) (Z : Submodule K B.S.Forms) (y : Fin (B.dZ ℓ Z) → K) :
-    B.toF ℓ Z y ∈ Z := by
+theorem toF_mem_Z
+    {B : BlockDat K G Pl0} (ℓ : Lvl K G) (Z : Submodule K B.S.Forms) (y : Fin (B.dZ ℓ Z) → K)
+    : B.toF ℓ Z y ∈ Z := by
   have h1 : (B.zE ℓ Z).mulVec y ∈ B.Z0 ℓ Z := by
     rw [BlockDat.zE, subE_mulVec]
     exact Submodule.coe_mem _
   simp only [BlockDat.Z0, BlockDat.inV0, BlockDat.coord, Submodule.mem_comap, Submodule.mem_map,
-    Matrix.mulVecLin_apply] at h1
+      Matrix.mulVecLin_apply]
+    at h1
   obtain ⟨w, hw, hwe⟩ := h1
   have e : B.toF ℓ Z y = w := by
     simp only [BlockDat.toF, LinearMap.coe_comp, Function.comp_apply, LinearEquiv.coe_coe,
@@ -176,8 +193,10 @@ theorem toF_mem_Z {B : BlockDat K G Pl0} (ℓ : Lvl K G) (Z : Submodule K B.S.Fo
   rw [e]
   exact hw
 
-variable (P0 : Subgroup G) (ψ0 : P0 →* Kˣ) (P1 : Subgroup G) (ψ1 : P1 →* Kˣ)
-  (Dc : ∀ Zs : DefSub A.fam.amb, DefCols (A.side P1 ψ1 Zs)) (Sp : ∀ Zs : DefSub A.fam.amb, SPer (Dc Zs))
+variable
+  (P0 : Subgroup G) (ψ0 : P0 →* Kˣ)
+  (P1 : Subgroup G) (ψ1 : P1 →* Kˣ) (Dc : ∀ Zs : DefSub A.fam.amb, DefCols (A.side P1 ψ1 Zs))
+  (Sp : ∀ Zs : DefSub A.fam.amb, SPer (Dc Zs))
   (Zsc : DefSub A.fam.amb → IndefScale A.fam.base)
 
 end Concrete

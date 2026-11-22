@@ -5,11 +5,15 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem trHl_id_apply (hHl : TrHl) (hL : TrLin) (hW : WtLin) (l : ℕ) [Fact l.Prime] (n i : ℤ) (S : Scheme.{0})
-    (d : ℤ) (hu : IsUnit (l : Γ(S, ⊤))) (x : Hl l (sch.obj S) n i) :
-    trHl l (𝟙 S) (Wt.const S d) n i x = d • x := by
+private theorem trHl_id_apply
+    (hHl : TrHl) (hL : TrLin) (hW : WtLin)
+    (l : ℕ) [Fact l.Prime]
+    (n i : ℤ) (S : Scheme.{0})
+    (d : ℤ) (hu : IsUnit (l : Γ(S, ⊤))) (x : Hl l (sch.obj S) n i)
+    : trHl l (𝟙 S) (Wt.const S d) n i x = d • x := by
   have hw : IsWt (𝟙 S) (Wt.const S d) := hW.2.2 (𝟙 S) d
   refine Subtype.ext (funext fun k => ?_)
   haveI : NeZero (l ^ k) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
@@ -19,8 +23,7 @@ private theorem trHl_id_apply (hHl : TrHl) (hL : TrLin) (hW : WtLin) (l : ℕ) [
   refine (hHl l n i (𝟙 S) _ hw hu x k).trans ?_
   exact (hL (l ^ k) n i).2.2 S d hq (x.1 k)
 
-theorem UpperTheory.Gal.TranscendenceTraces.trIdQ_of :
-    TrHl → TrLin → WtLin → TrIdQ := by
+theorem UpperTheory.Gal.TranscendenceTraces.trIdQ_of : TrHl → TrLin → WtLin → TrIdQ := by
   intro hHl hL hW l _ n i S d hu
   unfold trHQ
   apply LinearMap.ext

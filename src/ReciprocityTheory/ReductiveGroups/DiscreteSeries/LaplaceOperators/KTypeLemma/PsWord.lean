@@ -46,15 +46,16 @@ lemma diffAt {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [NormedAdd
     (hx : x ∈ s) : DifferentiableAt ℂ f x := by
   exact (h.contDiffAt (hs.mem_nhds hx)).differentiableAt (by simp)
 
-private theorem contDiff_det_k_type {m : ℕ} {k : WithTop ℕ∞} :
-    ContDiff ℂ k (fun z : Fin m → Fin m → ℂ => Matrix.det z) := by
-  have h : (fun z : Fin m → Fin m → ℂ => Matrix.det z) =
-      fun z => ∑ σ : Equiv.Perm (Fin m), ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, z (σ i) i := by
+private theorem contDiff_det_k_type {m : ℕ} {k : WithTop ℕ∞}
+    : ContDiff ℂ k (fun z : Fin m → Fin m → ℂ => Matrix.det z) := by
+  have h
+      : (fun z : Fin m → Fin m → ℂ => Matrix.det z)
+        = fun z => ∑ σ : Equiv.Perm (Fin m), ((Equiv.Perm.sign σ : ℤ) : ℂ) * ∏ i, z (σ i) i := by
     funext z
     exact Matrix.det_apply' _
   rw [h]
-  exact ContDiff.sum fun σ _ => contDiff_const.mul
-    (contDiff_prod fun i _ => contDiff_pi.1 (contDiff_pi.1 contDiff_id (σ i)) i)
+  exact ContDiff.sum fun σ _ =>
+    contDiff_const.mul (contDiff_prod fun i _ => contDiff_pi.1 (contDiff_pi.1 contDiff_id (σ i)) i)
 
 lemma contDiff_lead (i : ℕ) : ContDiff ℂ ω (fun z : 𝕄 => lead i z) := by
   by_cases h : i ≤ n
@@ -125,8 +126,7 @@ variable {ε : Fin n → Bool} {Λ : Fin n → ℝ}
 
 def psi (k : KG ε) (z : 𝕄) : WW := ((toMK k⁻¹, toMK k), mmul (mmul (toMK k⁻¹) z) (toMK k))
 
-def dpsi (k : KG ε) : 𝕄 →L[ℂ] WW :=
-  (0 : 𝕄 →L[ℂ] 𝕄 × 𝕄).prod (Ps1.conjCLM (toMK k⁻¹) (toMK k))
+def dpsi (k : KG ε) : 𝕄 →L[ℂ] WW := (0 : 𝕄 →L[ℂ] 𝕄 × 𝕄).prod (Ps1.conjCLM (toMK k⁻¹) (toMK k))
 
 lemma hasFDerivAt_psi (k : KG ε) (z : 𝕄) : HasFDerivAt (psi k) (dpsi k) z := by
   first
@@ -154,8 +154,7 @@ def cc (T : KType ε Λ) : ℂ := (Module.finrank ℂ T.V : ℂ) / ((muK ε Set.
 def G (T : KType ε Λ) (μ : Fin n → ℤ) (D : List MM) (z : 𝕄) (k : KG ε) : T.V →L[ℂ] T.V :=
   Fw μ D (psi k z) • (T.op k * projW T * T.op k⁻¹)
 
-def G' (T : KType ε Λ) (μ : Fin n → ℤ) (D : List MM) (z : 𝕄) (k : KG ε) :
-    𝕄 →L[ℂ] (T.V →L[ℂ] T.V) :=
+def G' (T : KType ε Λ) (μ : Fin n → ℤ) (D : List MM) (z : 𝕄) (k : KG ε) : 𝕄 →L[ℂ] (T.V →L[ℂ] T.V) :=
   ((fderiv ℂ (Fw μ D) (psi k z)).comp (dpsi k)).smulRight (T.op k * projW T * T.op k⁻¹)
 
 lemma hasFDerivAt_G (T : KType ε Λ) (μ : Fin n → ℤ) (D : List MM) (k : KG ε) {x : 𝕄}
@@ -315,8 +314,13 @@ end PsW
 theorem psM_word (n : ℕ) : PsMWordInterface n := by
   intro ε Λ T μ
   haveI : CompactSpace (KG ε) := compactSpace_KG ε
-  refine ⟨Ps1.Uset ε, Ps1.isOpen_Uset, Ps1.posSet_subset_Uset, fun z hz k => hz k, fun D =>
-    ⟨?_, fun z hz => PsW.continuous_Fwk μ D hz, fun z hz => ?_⟩⟩
+  refine ⟨
+    Ps1.Uset ε,
+    Ps1.isOpen_Uset,
+    Ps1.posSet_subset_Uset,
+    fun z hz k => hz k,
+    fun D => ⟨?_, fun z hz => PsW.continuous_Fwk μ D hz, fun z hz => ?_⟩
+  ⟩
   · intro z hz
     have heq : lWord D (psM T μ) =ᶠ[𝓝 z] fun x => PsW.cc T • ∫ k, PsW.G T μ D x k ∂(muK ε) :=
       Filter.eventually_of_mem (Ps1.isOpen_Uset.mem_nhds hz) fun x hx => PsW.lWord_psM T μ D x hx

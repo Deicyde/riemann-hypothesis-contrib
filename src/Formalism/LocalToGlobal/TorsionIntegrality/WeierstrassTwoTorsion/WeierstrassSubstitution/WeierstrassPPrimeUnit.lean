@@ -18,14 +18,16 @@ namespace Rr
 
 variable {K : Type u} [Field K] [CharZero K] (W : WeierstrassCurve K)
 
-theorem wpPrimeInZ : expSer W ^ 3 * (-2 + X ^ 3 * derivative (wpReg W))
-    = X ^ 3 * (-2 * (xS W).subst (expSer W) + C W.a₁ * expSer W * (xS W).subst (expSer W)
-        + C W.a₃ * expSer W ^ 3) := by
+theorem wpPrimeInZ
+    : expSer W ^ 3 * (-2 + X ^ 3 * derivative (wpReg W))
+      = X ^ 3
+        * (-2 * (xS W).subst (expSer W) + C W.a₁ * expSer W * (xS W).subst (expSer W)
+          + C W.a₃ * expSer W ^ 3) := by
   have h1 := (wpODE K W).1
   have h2 := (wpPrimeShape K W).1
   have hq := Two.exp_mul_inv W
   have hz : (toL X : LaurentSeries K) * uPow (-1) = 1 := Plus.toL_X_mul
-  have hy : (yS W).subst (expSer W) = -(xS W).subst (expSer W) := by
+  have hy : (yS W).subst (expSer W) = - (xS W).subst (expSer W) := by
     rw [yS, ← coe_substAlgHom (Two.he W), map_neg]
   rw [h2, xZ, yZ, hy, Plus.uPow_neg_three] at h1
   apply toL_injective
@@ -49,7 +51,8 @@ theorem weierstrass_p_prime_unit : WpPrimeInU.{u} := by
   have h := congrArg (ISer.subHom (logSer W) l0) (Rr.wpPrimeInZ W)
   have k := subst_comp_subst_apply (Two.he W) hl (xS W)
   rw [hel, X_subst] at k
-  simp only [map_mul, map_add (f := _), map_neg, map_pow, map_ofNat, ISer.subHom_C, ISer.subHom_X] at h
+  simp only [map_mul, map_add (f := _), map_neg, map_pow, map_ofNat, ISer.subHom_C, ISer.subHom_X]
+    at h
   simp only [ISer.subHom_apply, hel, k] at h
   exact h
 
@@ -59,13 +62,16 @@ theorem three_curves_relation : BridgeCurve3 := by
   obtain ⟨-, ⟨e, he, he0, hdet⟩, -⟩ :=
     cube_mem' K W (Formalism.G.unitBall K) hW.1 hW.2.1 hW.2.2.1 hW.2.2.2.1 hW.2.2.2.2
   refine ⟨e, Bridge.integral_of_mvCoeff he, he0, ?_⟩
-  have hy : ∀ i : Fin 3, (yS W).subst (MvPowerSeries.X i : MvPowerSeries (Fin 3) K)
-      = -(xS W).subst (MvPowerSeries.X i : MvPowerSeries (Fin 3) K) := by
+  have hy
+      : ∀ i : Fin 3,
+        (yS W).subst (MvPowerSeries.X i : MvPowerSeries (Fin 3) K)
+          = - (xS W).subst (MvPowerSeries.X i : MvPowerSeries (Fin 3) K) := by
     intro i
     have hs : HasSubst (MvPowerSeries.X i : MvPowerSeries (Fin 3) K) := HasSubst.X i
     rw [yS, ← coe_substAlgHom hs, map_neg]
   simp only [hy] at hdet
-  unfold Formalism.L2.Th1.B.F3 Formalism.InvariantFactorPaths.G7.in3 Formalism.InvariantFactorPaths.G7.at1
+  unfold Formalism.L2.Th1.B.F3 Formalism.InvariantFactorPaths.G7.in3
+    Formalism.InvariantFactorPaths.G7.at1
   exact hdet
 
 end Formalism.L2.Th1.A

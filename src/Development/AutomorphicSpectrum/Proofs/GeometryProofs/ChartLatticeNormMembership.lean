@@ -9,9 +9,11 @@ open ReciprocityTheory.ChartRestriction.G.Geo
 
 namespace GlobalTheory.CompanionTheory.Ar.ChartVal
 
-theorem isIntegral_of_forall_valuationSubring {R Ω : Type} [CommRing R] [Field Ω] [Algebra R Ω]
-    (hf : Function.Injective (algebraMap R Ω)) (a : Ω)
-    (H : ∀ V : ValuationSubring Ω, (∀ r : R, algebraMap R Ω r ∈ V) → a ∈ V) : IsIntegral R a := by
+theorem isIntegral_of_forall_valuationSubring
+    {R Ω : Type} [CommRing R] [Field Ω] [Algebra R Ω]
+    (hf : Function.Injective (algebraMap R Ω))
+    (a : Ω) (H : ∀ V : ValuationSubring Ω, (∀ r : R, algebraMap R Ω r ∈ V) → a ∈ V)
+    : IsIntegral R a := by
   classical
   by_contra hna
   have ha0 : a ≠ 0 := by
@@ -24,7 +26,9 @@ theorem isIntegral_of_forall_valuationSubring {R Ω : Type} [CommRing R] [Field 
     obtain ⟨w, hw⟩ := hu.exists_right_inv
     have h1 : a⁻¹ * (w : Ω) = 1 := congrArg Subtype.val hw
     have hwa : (w : Ω) = a := by
-      calc (w : Ω) = a * (a⁻¹ * w) := by rw [← mul_assoc, mul_inv_cancel₀ ha0, one_mul]
+      calc
+        (w : Ω)
+          = a * (a⁻¹ * w) := by rw [← mul_assoc, mul_inv_cancel₀ ha0, one_mul]
         _ = a := by rw [h1, mul_one]
     have haA : a ∈ Algebra.adjoin R {a⁻¹} := by
       have hw2 := w.2
@@ -43,13 +47,16 @@ theorem isIntegral_of_forall_valuationSubring {R Ω : Type} [CommRing R] [Field 
     refine (show ∃ q : Polynomial R, q.Monic ∧ Polynomial.eval₂ (algebraMap R Ω) a q = 0 from
       ⟨Polynomial.X ^ (p.natDegree + 1) - p.reverse, Polynomial.monic_X_pow_sub hdeg, ?_⟩)
     rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, sub_eq_zero]
-    calc a ^ (p.natDegree + 1) = a * a ^ p.natDegree := pow_succ' a _
+    calc
+      a ^ (p.natDegree + 1)
+        = a * a ^ p.natDegree := pow_succ' a _
       _ = Polynomial.eval₂ (algebraMap R Ω) a p.reverse * a⁻¹ ^ p.natDegree * a ^ p.natDegree := by
-          rw [key]
+        rw [key]
       _ = Polynomial.eval₂ (algebraMap R Ω) a p.reverse := by
-          rw [mul_assoc, ← mul_pow, inv_mul_cancel₀ ha0, one_pow, mul_one]
-  obtain ⟨P, hP, hxP⟩ := Ideal.exists_le_maximal (Ideal.span {(⟨a⁻¹, hbA⟩ : B)})
-    (by rw [Ne, Ideal.span_singleton_eq_top]; exact hnu)
+        rw [mul_assoc, ← mul_pow, inv_mul_cancel₀ ha0, one_pow, mul_one]
+  obtain ⟨P, hP, hxP⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {(⟨a⁻¹, hbA⟩ : B)})
+      (by rw [Ne, Ideal.span_singleton_eq_top]; exact hnu)
   haveI := hP.isPrime
   have hx : (⟨a⁻¹, hbA⟩ : B) ∈ P := hxP (Ideal.mem_span_singleton_self _)
   have hg : ∀ y : P.primeCompl, IsUnit (B.subtype (y : B)) := by
@@ -77,16 +84,16 @@ theorem isIntegral_of_forall_valuationSubring {R Ω : Type} [CommRing R] [Field 
   have hmemL : ∀ z : B, (z : Ω) ∈ (LocalSubring.range f).toSubring := by
     intro z
     first
-      | exact (show (z : Ω) ∈ Set.range f from ⟨_, hfl z⟩)
-      | (rw [LocalSubring.range_toSubring]; exact ⟨_, hfl z⟩)
+    | exact (show (z : Ω) ∈ Set.range f from ⟨_, hfl z⟩)
+    | (rw [LocalSubring.range_toSubring]; exact ⟨_, hfl z⟩)
   have haV : a ∈ V := H V fun r => hle (hmemL ⟨algebraMap R Ω r, Subalgebra.algebraMap_mem _ r⟩)
   let xL : (LocalSubring.range f).toSubring := ⟨a⁻¹, hmemL ⟨a⁻¹, hbA⟩⟩
   have hunitV : IsUnit (Subring.inclusion hle xL) :=
     isUnit_iff_exists_inv.mpr ⟨⟨a, haV⟩, Subtype.ext (inv_mul_cancel₀ ha0)⟩
   have hunitL : IsUnit xL := by
     first
-      | exact isUnit_of_map_unit (Subring.inclusion hle) xL hunitV
-      | exact IsUnit.of_map (Subring.inclusion hle) xL hunitV
+    | exact isUnit_of_map_unit (Subring.inclusion hle) xL hunitV
+    | exact IsUnit.of_map (Subring.inclusion hle) xL hunitV
   obtain ⟨w, hw⟩ := hunitL.exists_right_inv
   have hw2 : (w : Ω) ∈ Set.range f := w.2
   obtain ⟨s, hs⟩ := hw2
@@ -98,14 +105,18 @@ theorem isIntegral_of_forall_valuationSubring {R Ω : Type} [CommRing R] [Field 
   rw [IsLocalization.AtPrime.isUnit_to_map_iff (Localization.AtPrime P) P] at hu
   exact hu hx
 
-theorem mem_chartLatNm_of_forall_valuationSubring : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)]
-    (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω) (a : K → ℤ) (u : Ω) (q : ℕ) (x : Ω),
-    (∀ (c : (k : K) → ι k), (∀ k, y ⟨k, c k⟩ ≠ 0) → ∀ W : ValuationSubring Ω,
-      (∀ p, y p / y ⟨p.1, c p.1⟩ ∈ W) → x * (u * ∏ k, y ⟨k, c k⟩ ^ (-a k)) ^ q ∈ W) →
-    x * u ^ q ∈ chartLatNm y a q := by
+theorem mem_chartLatNm_of_forall_valuationSubring
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
+        (y : (Σ k, ι k) → Ω) (a : K → ℤ) (u : Ω) (q : ℕ) (x : Ω),
+      (∀ (c : (k : K) → ι k),
+          (∀ k, y ⟨k, c k⟩ ≠ 0)
+            → ∀ W : ValuationSubring Ω,
+              (∀ p, y p / y ⟨p.1, c p.1⟩ ∈ W) → x * (u * ∏ k, y ⟨k, c k⟩ ^ (-a k)) ^ q ∈ W)
+        → x * u ^ q ∈ chartLatNm y a q := by
   intro K _ ι _ Ω _ y a u q x H c hc
-  have e : x * u ^ q * ∏ k, y ⟨k, c k⟩ ^ (-((q : ℤ) * a k)) =
-      x * (u * ∏ k, y ⟨k, c k⟩ ^ (-a k)) ^ q := by
+  have e
+      : x * u ^ q * ∏ k, y ⟨k, c k⟩ ^ (-((q : ℤ) * a k))
+        = x * (u * ∏ k, y ⟨k, c k⟩ ^ (-a k)) ^ q := by
     rw [mul_pow, ← Finset.prod_pow, mul_assoc]
     congr 2
     refine Finset.prod_congr rfl fun k _ => ?_
@@ -114,7 +125,8 @@ theorem mem_chartLatNm_of_forall_valuationSubring : ∀ (K : Type) [Fintype K] (
     ring
   show x * u ^ q * ∏ k, y ⟨k, c k⟩ ^ (-((q : ℤ) * a k)) ∈ integralClosure (chartRingZ y c) Ω
   rw [e, mem_integralClosure_iff]
-  refine isIntegral_of_forall_valuationSubring Subtype.val_injective _ fun V hV => H c hc V fun p => ?_
+  refine isIntegral_of_forall_valuationSubring Subtype.val_injective _ fun V hV =>
+    H c hc V fun p => ?_
   exact hV ⟨_, Algebra.subset_adjoin ⟨p, rfl⟩⟩
 
 end GlobalTheory.CompanionTheory.Ar.ChartVal

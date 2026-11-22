@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-theorem UpperTheory.V.Z.Kato.Sym.kaB :
-    UpperTheory.V.Z.Kato.Sym.KaB := by
+theorem UpperTheory.V.Z.Kato.Sym.kaB : UpperTheory.V.Z.Kato.Sym.KaB := by
   intro Ω _ _ _ ε X m hm θ u hu hθ
   haveI : NeZero m := ⟨hm.ne'⟩
   obtain ⟨hprim, hrep, huniq, hcoc, hmul, hequiv, -⟩ := lgB Ω ε X m hm
@@ -19,21 +18,21 @@ theorem UpperTheory.V.Z.Kato.Sym.kaB :
     rw [zero_pow hm.ne'] at hy
     exact hio hw hy.symm
   have hθ0 : θ ≠ 0 := hne hu hθ
-  have hpow : ∀ {y : Kb X} {w : X.K} (h : RingAut (Kb X)), InD X h → y ^ m = io X w →
-      (h y) ^ m = y ^ m := by
+  have hpow
+      : ∀ {y : Kb X} {w : X.K} (h : RingAut (Kb X)),
+        InD X h → y ^ m = io X w → (h y) ^ m = y ^ m := by
     intro y w h hh hy
     rw [← map_pow, hy, hh w]
   have hzt : ∀ (g : RingAut (Kb X)), InD X g → g (zt X m) = zt X m := fun g hg => hg _
-  have hkey : ∀ (h : RingAut (Kb X)), InD X h → h θ = zt X m ^ (ka X m θ h).val * θ :=
-    fun h hh => hrep _ _ hθ0 (hpow h hh hθ)
+  have hkey : ∀ (h : RingAut (Kb X)), InD X h → h θ = zt X m ^ (ka X m θ h).val * θ := fun h hh =>
+    hrep _ _ hθ0 (hpow h hh hθ)
   have hself : ∀ a : Kb X, a ≠ 0 → lg X m a a = 0 := fun a ha =>
     huniq a a 0 ha (by rw [ZMod.val_zero, pow_zero, one_mul])
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro g h hg hh
     have e1 : (g * h) θ = g (h θ) := rfl
     have hgθ : g θ ≠ 0 := (map_ne_zero g).mpr hθ0
-    have hA : ((g * h) θ) ^ m = (g θ) ^ m := by
-      rw [e1, ← map_pow, hpow h hh hθ, map_pow]
+    have hA : ((g * h) θ) ^ m = (g θ) ^ m := by rw [e1, ← map_pow, hpow h hh hθ, map_pow]
     have hB : (g θ) ^ m = θ ^ m := hpow g hg hθ
     have hC : ka X m θ (g * h) = lg X m ((g * h) θ) (g θ) + ka X m θ g := hcoc _ _ _ hθ0 hA hB
     have hD : lg X m ((g * h) θ) (g θ) = ka X m θ h := by
@@ -41,15 +40,17 @@ theorem UpperTheory.V.Z.Kato.Sym.kaB :
       rw [e1, hkey h hh, map_mul, map_pow, hzt g hg]
     rw [hC, hD, add_comm]
   · intro θ' hθ' h hh
-    obtain ⟨j, hj⟩ : ∃ j : ZMod m, θ' = zt X m ^ j.val * θ :=
-      ⟨_, hrep _ _ hθ0 (by rw [hθ', hθ])⟩
+    obtain ⟨j, hj⟩ : ∃ j : ZMod m, θ' = zt X m ^ j.val * θ := ⟨_, hrep _ _ hθ0 (by rw [hθ', hθ])⟩
     subst hj
     have hz0 : zt X m ^ j.val ≠ 0 := pow_ne_zero _ (hprim.ne_zero hm.ne')
     show lg X m (h (zt X m ^ j.val * θ)) (zt X m ^ j.val * θ) = lg X m (h θ) θ
     rw [map_mul, map_pow, hzt h hh, hmul _ _ _ _ hz0 hθ0 rfl (hpow h hh hθ), hself _ hz0, zero_add]
-  · exact ⟨{θ}, fun h h' _ _ hb => by
-      show lg X m (h θ) θ = lg X m (h' θ) θ
-      rw [hb θ (by simp)]⟩
+  · exact ⟨
+      {θ},
+      fun h h' _ _ hb => by
+        show lg X m (h θ) θ = lg X m (h' θ) θ
+        rw [hb θ (by simp)]
+    ⟩
   · intro hU B h hOv hh hsmall
     by_contra hk
     have hone : ∀ y : Kb X, y ≠ 0 → y ∈ B → y⁻¹ ∈ B → B.valuation y = 1 := by

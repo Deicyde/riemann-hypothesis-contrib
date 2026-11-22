@@ -75,19 +75,22 @@ private lemma mFourierCoeff_lift_eq_integral {ι : Type} [Fintype ι] (g : C(Uni
   simp only [Pi.neg_apply, Int.cast_neg, neg_mul, Finset.sum_neg_distrib]
   ring
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 open MeasureTheory in
-theorem _root_.GlobalTheory.exists_fourier_expansion_tube :
-    ∀ (ι : Type) [Fintype ι] (Ω : Set (ι → ℝ)) (f : (ι → ℂ) → ℂ), IsOpen Ω → Convex ℝ Ω →
-      DifferentiableOn ℂ f {z | (fun i => (z i).im) ∈ Ω} →
-      (∀ z, (fun i => (z i).im) ∈ Ω → ∀ m : ι → ℤ, f (z + fun i => (m i : ℂ)) = f z) →
-      ∃ a : (ι → ℤ) → ℂ, (∀ z, (fun i => (z i).im) ∈ Ω →
-        HasSum (fun ν : ι → ℤ => a ν * cexp (2 * π * I * ∑ i, (ν i : ℂ) * z i)) (f z)) ∧
-        ∀ y ∈ Ω, ∀ ν : ι → ℤ, a ν = ∫ x in Set.pi Set.univ (fun _ : ι => Set.Ico (0 : ℝ) 1),
-          f (fun i => (x i : ℂ) + I * y i) *
-            cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))) := by
+theorem _root_.GlobalTheory.exists_fourier_expansion_tube
+    : ∀ (ι : Type) [Fintype ι] (Ω : Set (ι → ℝ)) (f : (ι → ℂ) → ℂ),
+      IsOpen Ω → Convex ℝ Ω → DifferentiableOn ℂ f {z | (fun i => (z i).im) ∈ Ω}
+        → (∀ z, (fun i => (z i).im) ∈ Ω → ∀ m : ι → ℤ, f (z + fun i => (m i : ℂ)) = f z)
+        → ∃ a : (ι → ℤ) → ℂ,
+          (∀ z,
+              (fun i => (z i).im) ∈ Ω
+                → HasSum (fun ν : ι → ℤ => a ν * cexp (2 * π * I * ∑ i, (ν i : ℂ) * z i)) (f z))
+            ∧ ∀ y ∈ Ω, ∀ ν : ι → ℤ,
+              a ν
+                = ∫ x in Set.pi Set.univ (fun _ : ι => Set.Ico (0 : ℝ) 1),
+                  f (fun i => (x i : ℂ) + I * y i) *
+                    cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))) := by
   intro ι _ Ω f hΩo hΩc hf hper
   set T : Set (ι → ℂ) := {z | (fun i => (z i).im) ∈ Ω} with hT
   have him : Continuous fun z : ι → ℂ ↦ fun i ↦ (z i).im :=
@@ -105,78 +108,92 @@ theorem _root_.GlobalTheory.exists_fourier_expansion_tube :
   have hmemT : ∀ (x y : ι → ℝ), y ∈ Ω → (fun i ↦ (x i : ℂ) + I * y i) ∈ T := by
     intro x y hy
     simpa [hT] using hy
-  let c : (ι → ℝ) → (ι → ℤ) → ℂ := fun y ν ↦ ∫ x in Set.Icc (0 : ι → ℝ) 1,
-    f (fun i => (x i : ℂ) + I * y i) * cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i)))
+  let c : (ι → ℝ) → (ι → ℤ) → ℂ := fun y ν ↦
+    ∫ x in Set.Icc (0 : ι → ℝ) 1,
+      f (fun i => (x i : ℂ) + I * y i) * cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i)))
   have hc_indep : ∀ y ∈ Ω, ∀ y' ∈ Ω, ∀ ν, c y ν = c y' ν := by
     intro y hy y' hy' ν
     let h : (ι → ℂ) → ℂ := fun z ↦ f z * cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * z i))
     have hw : ∀ y ∈ Ω, (fun i ↦ I * (y i : ℂ)) ∈ T := fun y hy ↦ by simpa [hT] using hy
-    have key := _root_.GlobalTheory.Koecher.setIntegral_unitCube_tube (f := h) (U := T) hTo hTc
-      (fun z hz t ↦ by simpa [hT] using hz)
-      (hf.mul (Differentiable.differentiableOn (by fun_prop)))
-      (fun z hz i ↦ by
-        have hm := hper z hz (Pi.single i 1)
-        have hs : (fun j ↦ ((Pi.single i (1 : ℤ) : ι → ℤ) j : ℂ)) = Pi.single i 1 := by
-          funext j; by_cases hj : j = i <;> simp [Pi.single_apply, hj]
-        rw [hs] at hm
-        simp only [h]
-        rw [hm]
-        congr 1
-        rw [show ∑ j, (ν j : ℂ) * (z + (Pi.single i (1 : ℂ) : ι → ℂ)) j =
-            ∑ j, (ν j : ℂ) * z j + ν i by
-          simp [Pi.add_apply, mul_add, Finset.sum_add_distrib, Pi.single_apply]]
-        rw [mul_add, neg_add, Complex.exp_add]
-        have h1 : cexp (-(2 * π * I * (ν i : ℂ))) = 1 := by
-          rw [show -(2 * π * I * (ν i : ℂ)) = ((-ν i : ℤ) : ℂ) * (2 * π * I) by push_cast; ring]
-          exact Complex.exp_int_mul_two_pi_mul_I _
-        rw [h1, mul_one])
-      (hw y hy) (hw y' hy')
+    have key :=
+      _root_.GlobalTheory.Koecher.setIntegral_unitCube_tube (f := h) (U := T) hTo hTc
+        (fun z hz t ↦ by simpa [hT] using hz)
+        (hf.mul (Differentiable.differentiableOn (by fun_prop)))
+        (fun z hz i ↦ by
+          have hm := hper z hz (Pi.single i 1)
+          have hs : (fun j ↦ ((Pi.single i (1 : ℤ) : ι → ℤ) j : ℂ)) = Pi.single i 1 := by
+            funext j; by_cases hj : j = i <;> simp [Pi.single_apply, hj]
+          rw [hs] at hm
+          simp only [h]
+          rw [hm]
+          congr 1
+          rw [show ∑ j, (ν j : ℂ) * (z + (Pi.single i (1 : ℂ) : ι → ℂ)) j
+              = ∑ j, (ν j : ℂ) * z j + ν i by
+            simp [Pi.add_apply, mul_add, Finset.sum_add_distrib, Pi.single_apply]]
+          rw [mul_add, neg_add, Complex.exp_add]
+          have h1 : cexp (-(2 * π * I * (ν i : ℂ))) = 1 := by
+            rw [show -(2 * π * I * (ν i : ℂ)) = ((- ν i : ℤ) : ℂ) * (2 * π * I) by push_cast; ring]
+            exact Complex.exp_int_mul_two_pi_mul_I _
+          rw [h1, mul_one])
+        (hw y hy) (hw y' hy')
     exact key
-  have hc_Ico : ∀ y ν, c y ν = ∫ x in Set.pi Set.univ (fun _ : ι => Set.Ico (0 : ℝ) 1),
-      f (fun i => (x i : ℂ) + I * y i) *
-        cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))) := by
+  have hc_Ico
+      : ∀ y ν,
+        c y ν
+          = ∫ x in Set.pi Set.univ (fun _ : ι => Set.Ico (0 : ℝ) 1),
+            f (fun i => (x i : ℂ) + I * y i) *
+              cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))) := by
     intro y ν
     have hae : (Set.univ.pi fun _ : ι ↦ Set.Ico (0 : ℝ) 1) =ᵐ[volume] Set.Icc (0 : ι → ℝ) 1 := by
       rw [volume_pi]; exact Measure.univ_pi_Ico_ae_eq_Icc
     rw [setIntegral_congr_set hae]
-  have hc_bound : ∀ y ∈ Ω, ∀ M : ℝ, (∀ x : ι → ℝ, ‖f (fun i ↦ (x i : ℂ) + I * y i)‖ ≤ M) →
-      ∀ ν, ‖c y ν‖ ≤ Real.exp (2 * π * ∑ i, (ν i : ℝ) * y i) * M := by
+  have hc_bound
+      : ∀ y ∈ Ω, ∀ M : ℝ,
+        (∀ x : ι → ℝ, ‖f (fun i ↦ (x i : ℂ) + I * y i)‖ ≤ M)
+          → ∀ ν, ‖c y ν‖ ≤ Real.exp (2 * π * ∑ i, (ν i : ℝ) * y i) * M := by
     intro y hy M hM ν
     have hvol : volume (Set.Icc (0 : ι → ℝ) 1) = 1 := by simp [Real.volume_Icc_pi]
-    refine (norm_setIntegral_le_of_norm_le_const
-      (C := Real.exp (2 * π * ∑ i, (ν i : ℝ) * y i) * M) (by simp [hvol]) fun x _ ↦ ?_).trans ?_
+    refine (norm_setIntegral_le_of_norm_le_const (C := Real.exp (2 * π * ∑ i, (ν i : ℝ) * y i) * M)
+      (by simp [hvol]) fun x _ ↦ ?_).trans ?_
     · rw [norm_mul, Complex.norm_exp, mul_comm]
-      have hre : (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))).re =
-          2 * π * ∑ i, (ν i : ℝ) * y i := by
+      have hre
+          : (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))).re
+            = 2 * π * ∑ i, (ν i : ℝ) * y i := by
         simp [Complex.re_sum, Complex.im_sum, Complex.mul_re, Complex.mul_im, Finset.mul_sum]
       rw [hre]
       exact mul_le_mul_of_nonneg_left (hM x) (Real.exp_pos _).le
     · simp [Measure.real, hvol]
-  have hc_coef : ∀ y ∈ Ω, ∃ g : C(UnitAddTorus ι, ℂ),
-      (∀ x : ι → ℝ, g (fun i ↦ (x i : UnitAddCircle)) = f (fun i ↦ (x i : ℂ) + I * y i)) ∧
-      ∀ ν, UnitAddTorus.mFourierCoeff g ν = Real.exp (-(2 * π * ∑ i, (ν i : ℝ) * y i)) * c y ν := by
+  have hc_coef
+      : ∀ y ∈ Ω, ∃ g : C(UnitAddTorus ι, ℂ),
+        (∀ x : ι → ℝ, g (fun i ↦ (x i : UnitAddCircle)) = f (fun i ↦ (x i : ℂ) + I * y i))
+          ∧ ∀ ν,
+            UnitAddTorus.mFourierCoeff g ν
+              = Real.exp (-(2 * π * ∑ i, (ν i : ℝ) * y i)) * c y ν := by
     intro y hy
     have hFc : Continuous fun x : ι → ℝ ↦ f (fun i ↦ (x i : ℂ) + I * y i) :=
       hcont.comp_continuous (by fun_prop) fun x ↦ hmemT x y hy
-    obtain ⟨g, hg⟩ := exists_unitAddTorus_lift_of_periodic _ hFc (fun x m ↦ by
-      have := hper (fun i ↦ (x i : ℂ) + I * y i) (by simpa using hy) m
-      convert this using 2
-      funext i
-      simp only [Pi.add_apply]
-      push_cast
-      ring)
+    obtain ⟨g, hg⟩ :=
+      exists_unitAddTorus_lift_of_periodic _ hFc (fun x m ↦ by
+        have := hper (fun i ↦ (x i : ℂ) + I * y i) (by simpa using hy) m
+        convert this using 2
+        funext i
+        simp only [Pi.add_apply]
+        push_cast
+        ring)
     refine ⟨g, hg, fun ν ↦ ?_⟩
     rw [mFourierCoeff_lift_eq_integral g _ hg ν]
     simp only [c]
     rw [← integral_const_mul]
     refine setIntegral_congr_fun measurableSet_Icc fun x _ ↦ ?_
-    have hs : ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i) =
-        ∑ i, (ν i : ℂ) * x i + I * ∑ i, (ν i : ℂ) * y i := by
+    have hs
+        : ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i)
+          = ∑ i, (ν i : ℂ) * x i + I * ∑ i, (ν i : ℂ) * y i := by
       rw [Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun i _ ↦ ?_
       ring
-    have he : cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i))) =
-        cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * x i)) * cexp (2 * π * ∑ i, (ν i : ℂ) * y i) := by
+    have he
+        : cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * ((x i : ℂ) + I * y i)))
+          = cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * x i)) * cexp (2 * π * ∑ i, (ν i : ℂ) * y i) := by
       rw [← Complex.exp_add, hs]
       congr 1
       ring_nf
@@ -184,8 +201,9 @@ theorem _root_.GlobalTheory.exists_fourier_expansion_tube :
       ring
     rw [he]
     push_cast
-    have hB : cexp (-(2 * π * ∑ i, (ν i : ℂ) * (y i : ℂ))) *
-        cexp (2 * π * ∑ i, (ν i : ℂ) * y i) = 1 := by
+    have hB
+        : cexp (-(2 * π * ∑ i, (ν i : ℂ) * (y i : ℂ))) * cexp (2 * π * ∑ i, (ν i : ℂ) * y i)
+          = 1 := by
       rw [← Complex.exp_add]; simp
     linear_combination -(cexp (-(2 * π * I * ∑ i, (ν i : ℂ) * x i)) *
       f (fun i ↦ (x i : ℂ) + I * y i)) * hB
@@ -204,29 +222,37 @@ theorem _root_.GlobalTheory.exists_fourier_expansion_tube :
   have hδ0 : 0 < δ := by positivity
   have hsub : Metric.closedBall y₀ δ ⊆ Ω :=
     (Metric.closedBall_subset_ball (half_lt_self hε)).trans hball
-  have hK : IsCompact ((fun p : (ι → ℝ) × (ι → ℝ) ↦ fun i ↦ (p.1 i : ℂ) + I * p.2 i) ''
-      (Set.Icc 0 1 ×ˢ Metric.closedBall y₀ δ)) :=
+  have hK : IsCompact
+      ((fun p : (ι → ℝ) × (ι → ℝ) ↦ fun i ↦ (p.1 i : ℂ) + I * p.2 i)
+        '' (Set.Icc 0 1 ×ˢ Metric.closedBall y₀ δ)) :=
     (isCompact_Icc.prod (isCompact_closedBall _ _)).image (by fun_prop)
-  have hKT : ((fun p : (ι → ℝ) × (ι → ℝ) ↦ fun i ↦ (p.1 i : ℂ) + I * p.2 i) ''
-      (Set.Icc 0 1 ×ˢ Metric.closedBall y₀ δ)) ⊆ T := by
+  have hKT
+      : ((fun p : (ι → ℝ) × (ι → ℝ) ↦ fun i ↦ (p.1 i : ℂ) + I * p.2 i)
+          '' (Set.Icc 0 1 ×ˢ Metric.closedBall y₀ δ))
+        ⊆ T := by
     rintro _ ⟨⟨x, y⟩, ⟨-, hy⟩, rfl⟩
     exact hmemT x y (hsub hy)
   obtain ⟨M, hM⟩ := hK.exists_bound_of_continuousOn (hcont.mono hKT)
-  have hMall : ∀ y ∈ Metric.closedBall y₀ δ, ∀ x : ι → ℝ,
-      ‖f (fun i ↦ (x i : ℂ) + I * y i)‖ ≤ M := by
+  have hMall
+      : ∀ y ∈ Metric.closedBall y₀ δ, ∀ x : ι → ℝ, ‖f (fun i ↦ (x i : ℂ) + I * y i)‖ ≤ M := by
     intro y hy x
-    have h1 := hper (fun i ↦ ((Int.fract (x i) : ℝ) : ℂ) + I * y i) (by simpa using hsub hy)
-      (fun i ↦ ⌊x i⌋)
-    have heq : ((fun i ↦ ((Int.fract (x i) : ℝ) : ℂ) + I * y i) + fun i ↦ ((⌊x i⌋ : ℤ) : ℂ)) =
-        fun i ↦ (x i : ℂ) + I * y i := by
+    have h1 :=
+      hper (fun i ↦ ((Int.fract (x i) : ℝ) : ℂ) + I * y i) (by simpa using hsub hy) (fun i ↦ ⌊x i⌋)
+    have heq
+        : ((fun i ↦ ((Int.fract (x i) : ℝ) : ℂ) + I * y i) + fun i ↦ ((⌊x i⌋ : ℤ) : ℂ))
+          = fun i ↦ (x i : ℂ) + I * y i := by
       funext i; simp only [Pi.add_apply, Int.fract]; push_cast; ring
     rw [heq] at h1
     rw [h1]
-    exact hM _ ⟨(fun i ↦ Int.fract (x i), y),
-      ⟨⟨fun i ↦ Int.fract_nonneg _, fun i ↦ (Int.fract_lt_one _).le⟩, hy⟩, rfl⟩
+    exact hM _ ⟨
+      (fun i ↦ Int.fract (x i), y),
+      ⟨⟨fun i ↦ Int.fract_nonneg _, fun i ↦ (Int.fract_lt_one _).le⟩, hy⟩,
+      rfl
+    ⟩
   have hsum : Summable (UnitAddTorus.mFourierCoeff g) := by
     refine Summable.of_norm_bounded
-      ((_root_.GlobalTheory.Koecher.summable_exp_neg_mul_sum_abs (ι := ι) (ε := 2 * π * δ) (by positivity)).mul_left M)
+      ((_root_.GlobalTheory.Koecher.summable_exp_neg_mul_sum_abs (ι := ι) (ε := 2 * π * δ)
+        (by positivity)).mul_left M)
       fun ν ↦ ?_
     set s : ι → ℝ := fun i ↦ y₀ i - δ * (Int.sign (ν i) : ℝ) with hsdef
     have hs : s ∈ Metric.closedBall y₀ δ := by
@@ -239,39 +265,42 @@ theorem _root_.GlobalTheory.exists_fourier_expansion_tube :
       nlinarith
     rw [hgc ν, hc_indep y₀ hz s (hsub hs), norm_mul, Complex.norm_real, Real.norm_eq_abs,
       abs_of_pos (Real.exp_pos _)]
-    calc Real.exp (-(2 * π * ∑ i, (ν i : ℝ) * y₀ i)) * ‖c s ν‖
-        ≤ Real.exp (-(2 * π * ∑ i, (ν i : ℝ) * y₀ i)) *
-            (Real.exp (2 * π * ∑ i, (ν i : ℝ) * s i) * M) :=
-          mul_le_mul_of_nonneg_left (hc_bound s (hsub hs) M (hMall s hs) ν) (Real.exp_pos _).le
+    calc
+      Real.exp (-(2 * π * ∑ i, (ν i : ℝ) * y₀ i)) * ‖c s ν‖
+          ≤ Real.exp (-(2 * π * ∑ i, (ν i : ℝ) * y₀ i))
+            * (Real.exp (2 * π * ∑ i, (ν i : ℝ) * s i) * M) :=
+        mul_le_mul_of_nonneg_left (hc_bound s (hsub hs) M (hMall s hs) ν) (Real.exp_pos _).le
       _ = M * Real.exp (-(2 * π * δ * ∑ i, |((ν i : ℤ) : ℝ)|)) := by
-          rw [← mul_assoc, ← Real.exp_add, mul_comm]
-          congr 2
-          have habs : ∀ i, (ν i : ℝ) * (Int.sign (ν i) : ℝ) = |((ν i : ℤ) : ℝ)| := by
-            intro i
-            rcases Int.sign_trichotomy (ν i) with h | h | h
-            · rw [h, Int.cast_one, mul_one,
-                abs_of_pos (by exact_mod_cast Int.sign_eq_one_iff_pos.1 h)]
-            · rw [h]; simp [Int.sign_eq_zero_iff_zero.1 h]
-            · rw [h, Int.cast_neg, Int.cast_one, mul_neg_one,
-                abs_of_neg (by exact_mod_cast Int.sign_eq_neg_one_iff_neg.1 h)]
-          simp only [hsdef, mul_sub, Finset.sum_sub_distrib]
-          rw [show ∑ i, (ν i : ℝ) * (δ * (Int.sign (ν i) : ℝ)) = δ * ∑ i, |((ν i : ℤ) : ℝ)| by
-            rw [Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ ↦ ?_; rw [← habs]; ring]
-          ring
-  have key := UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsum
-    (fun i ↦ (x₀ i : UnitAddCircle))
+        rw [← mul_assoc, ← Real.exp_add, mul_comm]
+        congr 2
+        have habs : ∀ i, (ν i : ℝ) * (Int.sign (ν i) : ℝ) = |((ν i : ℤ) : ℝ)| := by
+          intro i
+          rcases Int.sign_trichotomy (ν i) with h | h | h
+          · rw [h, Int.cast_one, mul_one,
+              abs_of_pos (by exact_mod_cast Int.sign_eq_one_iff_pos.1 h)]
+          · rw [h]; simp [Int.sign_eq_zero_iff_zero.1 h]
+          · rw [h, Int.cast_neg, Int.cast_one, mul_neg_one,
+              abs_of_neg (by exact_mod_cast Int.sign_eq_neg_one_iff_neg.1 h)]
+        simp only [hsdef, mul_sub, Finset.sum_sub_distrib]
+        rw [show ∑ i, (ν i : ℝ) * (δ * (Int.sign (ν i) : ℝ)) = δ * ∑ i, |((ν i : ℤ) : ℝ)| by
+          rw [Finset.mul_sum]; refine Finset.sum_congr rfl fun i _ ↦ ?_; rw [← habs]; ring]
+        ring
+  have key :=
+    UnitAddTorus.hasSum_mFourier_series_apply_of_summable hsum (fun i ↦ (x₀ i : UnitAddCircle))
   rw [hg] at key
   convert (preTransparency := .reducible) key using 1
   · funext ν
     rw [hgc ν, mFourier_apply_coe, hc_indep y₁ hy₁ y₀ hz, smul_eq_mul]
     conv_lhs => rw [hz']
-    have hs : ∑ i, (ν i : ℂ) * ((x₀ i : ℂ) + I * y₀ i) =
-        ∑ i, (ν i : ℂ) * x₀ i + I * ∑ i, (ν i : ℂ) * y₀ i := by
+    have hs
+        : ∑ i, (ν i : ℂ) * ((x₀ i : ℂ) + I * y₀ i)
+          = ∑ i, (ν i : ℂ) * x₀ i + I * ∑ i, (ν i : ℂ) * y₀ i := by
       rw [Finset.mul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun i _ ↦ ?_
       ring
-    have he : cexp (2 * π * I * ∑ i, (ν i : ℂ) * ((x₀ i : ℂ) + I * y₀ i)) =
-        cexp (-(2 * π * ∑ i, (ν i : ℂ) * y₀ i)) * cexp (2 * π * I * ∑ i, (ν i : ℂ) * x₀ i) := by
+    have he
+        : cexp (2 * π * I * ∑ i, (ν i : ℂ) * ((x₀ i : ℂ) + I * y₀ i))
+          = cexp (-(2 * π * ∑ i, (ν i : ℂ) * y₀ i)) * cexp (2 * π * I * ∑ i, (ν i : ℂ) * x₀ i) := by
       rw [← Complex.exp_add, hs]
       congr 1
       ring_nf

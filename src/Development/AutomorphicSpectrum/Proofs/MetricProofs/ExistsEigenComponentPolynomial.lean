@@ -11,7 +11,9 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.RiemannLattice
 
 @[expose] public section
 
-open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree GroundTheory.Heights₂.Heights.Regular
+open NumberField Matrix Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp GroundTheory.Heights₂.Heights.LowerBoundFree
+  GroundTheory.Heights₂.Heights.Regular
 open GlobalTheory.CompanionTheory.Ar.RiemannLimit GlobalTheory.CompanionTheory.Ar.Cusp.BoundaryLimit
 open scoped TensorProduct
 
@@ -37,8 +39,9 @@ theorem extEmb_apply (s : 𝓞 E →+* ℂ) (a : 𝓞 E) : extEmb s (algebraMap 
 theorem extEmb_comp (s : 𝓞 E →+* ℂ) : (extEmb s).comp (algebraMap (𝓞 E) E) = s :=
   RingHom.ext (extEmb_apply s)
 
-theorem comp_injective {s s' : E →+* ℂ}
-    (h : s.comp (algebraMap (𝓞 E) E) = s'.comp (algebraMap (𝓞 E) E)) : s = s' :=
+theorem comp_injective
+    {s s' : E →+* ℂ} (h : s.comp (algebraMap (𝓞 E) E) = s'.comp (algebraMap (𝓞 E) E))
+    : s = s' :=
   IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E)) h
 
 def charVec (a : 𝓞 E) : (E →+* ℂ) → ℂ := fun s => s (algebraMap (𝓞 E) E a)
@@ -56,15 +59,16 @@ theorem span_charVec : Submodule.span ℂ (Set.range (charVec (E := E))) = ⊤ :
   apply hf0
   have li := (linearIndependent_monoidHom (𝓞 E) ℂ).comp _ (toChar_injective (E := E))
   rw [Fintype.linearIndependent_iff] at li
-  have hl := li (fun s => f fun j => if s = j then 1 else 0) (by
-    funext a
-    have h1 : f (charVec a) = 0 := hf (Submodule.subset_span ⟨a, rfl⟩)
-    rw [LinearMap.pi_apply_eq_sum_univ] at h1
-    simp only [Finset.sum_apply, Pi.smul_apply, Function.comp, smul_eq_mul, Pi.zero_apply]
-    refine Eq.trans ?_ h1
-    refine Finset.sum_congr rfl fun s _ => ?_
-    rw [smul_eq_mul]
-    exact mul_comm (_ : ℂ) _)
+  have hl :=
+    li (fun s => f fun j => if s = j then 1 else 0) (by
+      funext a
+      have h1 : f (charVec a) = 0 := hf (Submodule.subset_span ⟨a, rfl⟩)
+      rw [LinearMap.pi_apply_eq_sum_univ] at h1
+      simp only [Finset.sum_apply, Pi.smul_apply, Function.comp, smul_eq_mul, Pi.zero_apply]
+      refine Eq.trans ?_ h1
+      refine Finset.sum_congr rfl fun s _ => ?_
+      rw [smul_eq_mul]
+      exact mul_comm (_ : ℂ) _)
   refine LinearMap.ext fun v => ?_
   rw [LinearMap.pi_apply_eq_sum_univ f v, LinearMap.zero_apply]
   exact Finset.sum_eq_zero fun s _ => (congrArg (v s • ·) (hl s)).trans (smul_zero _)
@@ -74,14 +78,18 @@ def evalHom (E : Type) [Field E] [NumberField E] : ℂ ⊗[ℤ] 𝓞 E →ₐ[�
     (Pi.ringHom fun s : E →+* ℂ => s.comp (algebraMap (𝓞 E) E)).toIntAlgHom
     fun x y => Algebra.commutes x _
 
-theorem evalHom_tmul (z : ℂ) (a : 𝓞 E) (s : E →+* ℂ) :
-    evalHom E (z ⊗ₜ a) s = z * s (algebraMap (𝓞 E) E a) := by
-  have h := Algebra.TensorProduct.lift_tmul (Algebra.ofId ℂ ((E →+* ℂ) → ℂ))
-    (Pi.ringHom fun s : E →+* ℂ => s.comp (algebraMap (𝓞 E) E)).toIntAlgHom
-    (fun x y => Algebra.commutes x _) z a
+theorem evalHom_tmul (z : ℂ) (a : 𝓞 E) (s : E →+* ℂ)
+    : evalHom E (z ⊗ₜ a) s = z * s (algebraMap (𝓞 E) E a) := by
+  have h :=
+    Algebra.TensorProduct.lift_tmul (Algebra.ofId ℂ ((E →+* ℂ) → ℂ))
+      (Pi.ringHom fun s : E →+* ℂ => s.comp (algebraMap (𝓞 E) E)).toIntAlgHom
+      (fun x y => Algebra.commutes x _)
+      z a
   have h2 := congrFun h s
-  have h3 : (Pi.ringHom fun s : E →+* ℂ => s.comp (algebraMap (𝓞 E) E)) a s =
-      s (algebraMap (𝓞 E) E a) := rfl
+  have h3
+      : (Pi.ringHom fun s : E →+* ℂ => s.comp (algebraMap (𝓞 E) E)) a s
+        = s (algebraMap (𝓞 E) E a) :=
+    rfl
   simpa [evalHom, Algebra.ofId_apply, h3] using h2
 
 theorem evalHom_surjective : Function.Surjective (evalHom E) := by
@@ -99,16 +107,16 @@ theorem evalHom_injective : Function.Injective (evalHom E) := by
   have hdim : Module.finrank ℂ (ℂ ⊗[ℤ] 𝓞 E) = Module.finrank ℂ ((E →+* ℂ) → ℂ) := by
     rw [Module.finrank_baseChange, RingOfIntegers.rank, Module.finrank_fintype_fun_eq_card,
       NumberField.Embeddings.card]
-  exact (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim
-    (f := (evalHom E).toLinearMap)).2 evalHom_surjective
+  exact
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim (f := (evalHom E).toLinearMap)).2
+      evalHom_surjective
 
 def combo (c : 𝓞 E →₀ ℂ) : ℂ ⊗[ℤ] 𝓞 E := ∑ a ∈ c.support, c a ⊗ₜ a
 
-theorem evalHom_combo (c : 𝓞 E →₀ ℂ) (s : E →+* ℂ) :
-    evalHom E (combo c) s = ∑ a ∈ c.support, c a * s (algebraMap (𝓞 E) E a) := by
+theorem evalHom_combo (c : 𝓞 E →₀ ℂ) (s : E →+* ℂ)
+    : evalHom E (combo c) s = ∑ a ∈ c.support, c a * s (algebraMap (𝓞 E) E a) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp only [combo, map_sum, Finset.sum_apply, evalHom_tmul]
-
+  simp only [combo, map_sum, Finset.sum_apply, evalHom_tmul]
 
 open Classical in
 theorem exists_coeff (s : E →+* ℂ) : ∃ c : 𝓞 E →₀ ℂ, evalHom E (combo c) = Pi.single s 1 := by
@@ -130,25 +138,28 @@ variable {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Modul
 def actHom (ρ : 𝓞 E →+* Module.End ℂ V) : ℂ ⊗[ℤ] 𝓞 E →ₐ[ℂ] Module.End ℂ V :=
   Algebra.TensorProduct.lift (Algebra.ofId ℂ _) ρ.toIntAlgHom fun x y => Algebra.commutes x (ρ y)
 
-theorem actHom_tmul (ρ : 𝓞 E →+* Module.End ℂ V) (z : ℂ) (a : 𝓞 E) :
-    actHom ρ (z ⊗ₜ a) = z • ρ a := by
-  have h := Algebra.TensorProduct.lift_tmul (Algebra.ofId ℂ (Module.End ℂ V)) ρ.toIntAlgHom
-    (fun x y => Algebra.commutes x (ρ y)) z a
+theorem actHom_tmul (ρ : 𝓞 E →+* Module.End ℂ V) (z : ℂ) (a : 𝓞 E)
+    : actHom ρ (z ⊗ₜ a) = z • ρ a := by
+  have h :=
+    Algebra.TensorProduct.lift_tmul (Algebra.ofId ℂ (Module.End ℂ V)) ρ.toIntAlgHom
+      (fun x y => Algebra.commutes x (ρ y))
+      z a
   simpa [actHom, Algebra.ofId_apply, Algebra.smul_def] using h
 
-theorem actHom_combo (ρ : 𝓞 E →+* Module.End ℂ V) (c : 𝓞 E →₀ ℂ) (x : V) :
-    actHom ρ (combo c) x = ∑ a ∈ c.support, c a • ρ a x := by
+theorem actHom_combo (ρ : 𝓞 E →+* Module.End ℂ V) (c : 𝓞 E →₀ ℂ) (x : V)
+    : actHom ρ (combo c) x = ∑ a ∈ c.support, c a • ρ a x := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [combo, map_sum, actHom_tmul, LinearMap.sum_apply]
+  simp [combo, map_sum, actHom_tmul, LinearMap.sum_apply]
 
-theorem mem_eigSp_iff {ρ : 𝓞 E →+* Module.End ℂ V} {s : 𝓞 E →+* ℂ} {x : V} :
-    x ∈ eigSp ρ s ↔ ∀ a, ρ a x = s a • x := by
+theorem mem_eigSp_iff {ρ : 𝓞 E →+* Module.End ℂ V} {s : 𝓞 E →+* ℂ} {x : V}
+    : x ∈ eigSp ρ s ↔ ∀ a, ρ a x = s a • x := by
   simp [eigSp, Submodule.mem_iInf, sub_eq_zero]
 
-theorem eigComp_eq_combination : ∀ (E : Type) [Field E] [NumberField E] (s₀ : 𝓞 E →+* ℂ), ∃ c : 𝓞 E →₀ ℂ,
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : 𝓞 E →+* Module.End ℂ V),
-      (∀ x, eigComp ρ s₀ x = ∑ a ∈ c.support, c a • ρ a x) ∧ (∀ x, eigComp ρ s₀ x ∈ eigSp ρ s₀) ∧
-        ∀ x ∈ eigSp ρ s₀, eigComp ρ s₀ x = x := by
+theorem eigComp_eq_combination
+    : ∀ (E : Type) [Field E] [NumberField E] (s₀ : 𝓞 E →+* ℂ), ∃ c : 𝓞 E →₀ ℂ,
+      ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : 𝓞 E →+* Module.End ℂ V),
+        (∀ x, eigComp ρ s₀ x = ∑ a ∈ c.support, c a • ρ a x) ∧ (∀ x, eigComp ρ s₀ x ∈ eigSp ρ s₀)
+          ∧ ∀ x ∈ eigSp ρ s₀, eigComp ρ s₀ x = x := by
   intro E _ _ s₀
   classical
   choose cs hcs using exists_coeff (E := E)
@@ -160,8 +171,9 @@ theorem eigComp_eq_combination : ∀ (E : Type) [Field E] [NumberField E] (s₀ 
     simp only [hcs]
     funext s'
     simp [Finset.sum_apply, Pi.single_apply]
-  have hmul : ∀ (s : E →+* ℂ) (b : 𝓞 E),
-      ((1 : ℂ) ⊗ₜ[ℤ] b) * combo (cs s) = s (algebraMap (𝓞 E) E b) • combo (cs s) := by
+  have hmul
+      : ∀ (s : E →+* ℂ) (b : 𝓞 E),
+        ((1 : ℂ) ⊗ₜ[ℤ] b) * combo (cs s) = s (algebraMap (𝓞 E) E b) • combo (cs s) := by
     intro s b
     apply evalHom_injective
     rw [map_mul, map_smul, hcs]
@@ -177,14 +189,17 @@ theorem eigComp_eq_combination : ∀ (E : Type) [Field E] [NumberField E] (s₀ 
       rw [map_sum, map_one] at h
     have h2 := LinearMap.congr_fun h x
     simpa [LinearMap.sum_apply] using h2
-  have heig : ∀ (s : E →+* ℂ) x, actHom ρ (combo (cs s)) x ∈ eigSp ρ (s.comp (algebraMap (𝓞 E) E)) := by
+  have heig
+      : ∀ (s : E →+* ℂ) x, actHom ρ (combo (cs s)) x ∈ eigSp ρ (s.comp (algebraMap (𝓞 E) E)) := by
     intro s x
     refine mem_eigSp_iff.2 fun b => ?_
     have h := congrArg (actHom ρ) (hmul s b)
     rw [map_mul, map_smul, actHom_tmul, one_smul] at h
     exact LinearMap.congr_fun h x
-  have hval : ∀ (s : E →+* ℂ) (σ : 𝓞 E →+* ℂ) x, x ∈ eigSp ρ σ →
-      actHom ρ (combo (cs s)) x = (Pi.single s 1 : (E →+* ℂ) → ℂ) (extEmb σ) • x := by
+  have hval
+      : ∀ (s : E →+* ℂ) (σ : 𝓞 E →+* ℂ) x,
+        x ∈ eigSp ρ σ
+          → actHom ρ (combo (cs s)) x = (Pi.single s 1 : (E →+* ℂ) → ℂ) (extEmb σ) • x := by
     intro s σ x hx
     rw [actHom_combo, ← hcs s, evalHom_combo, Finset.sum_smul]
     refine Finset.sum_congr rfl fun a _ => ?_
@@ -193,31 +208,36 @@ theorem eigComp_eq_combination : ∀ (E : Type) [Field E] [NumberField E] (s₀ 
     intro x hx
     rw [hval _ s₀ x hx]
     simp
-  have hz : ∀ y ∈ ⨆ σ' ∈ {σ' : 𝓞 E →+* ℂ | σ' ≠ s₀}, eigSp ρ σ',
-      actHom ρ (combo (cs (extEmb s₀))) y = 0 := by
-    have hle : (⨆ σ' ∈ {σ' : 𝓞 E →+* ℂ | σ' ≠ s₀}, eigSp ρ σ') ≤
-        LinearMap.ker (actHom ρ (combo (cs (extEmb s₀)))) := by
+  have hz
+      : ∀ y ∈ ⨆ σ' ∈ {σ' : 𝓞 E →+* ℂ | σ' ≠ s₀}, eigSp ρ σ',
+        actHom ρ (combo (cs (extEmb s₀))) y = 0 := by
+    have hle
+        : (⨆ σ' ∈ {σ' : 𝓞 E →+* ℂ | σ' ≠ s₀}, eigSp ρ σ')
+          ≤ LinearMap.ker (actHom ρ (combo (cs (extEmb s₀)))) := by
       refine iSup₂_le fun σ' hσ' y hy => ?_
       rw [LinearMap.mem_ker, hval _ σ' y hy]
-      have hne : extEmb σ' ≠ extEmb s₀ := fun h => hσ' (by
-        rw [← extEmb_comp σ', h, extEmb_comp])
+      have hne : extEmb σ' ≠ extEmb s₀ := fun h => hσ' (by rw [← extEmb_comp σ', h, extEmb_comp])
       simp [Pi.single_apply, hne]
     exact fun y hy => hle hy
-  have hex : ∀ x, actHom ρ (combo (cs (extEmb s₀))) x ∈ eigSp ρ s₀ ∧
-      x - actHom ρ (combo (cs (extEmb s₀))) x ∈ ⨆ σ' ∈ {σ' : 𝓞 E →+* ℂ | σ' ≠ s₀}, eigSp ρ σ' := by
+  have hex
+      : ∀ x,
+        actHom ρ (combo (cs (extEmb s₀))) x ∈ eigSp ρ s₀
+          ∧ x - actHom ρ (combo (cs (extEmb s₀))) x
+            ∈ ⨆ σ' ∈ {σ' : 𝓞 E →+* ℂ | σ' ≠ s₀}, eigSp ρ σ' := by
     intro x
     refine ⟨?_, ?_⟩
     · have h := heig (extEmb s₀) x
       rwa [extEmb_comp] at h
-    · have e : x - actHom ρ (combo (cs (extEmb s₀))) x =
-          ∑ s ∈ Finset.univ.erase (extEmb s₀), actHom ρ (combo (cs s)) x := by
+    · have e
+          : x - actHom ρ (combo (cs (extEmb s₀))) x
+            = ∑ s ∈ Finset.univ.erase (extEmb s₀), actHom ρ (combo (cs s)) x := by
         have h := hsum' x
         rw [← Finset.add_sum_erase _ _ (Finset.mem_univ (extEmb s₀))] at h
         exact sub_eq_of_eq_add' h.symm
       rw [e]
       refine Submodule.sum_mem _ fun s hs => ?_
-      have hne : s.comp (algebraMap (𝓞 E) E) ≠ s₀ := fun h => (Finset.mem_erase.1 hs).1
-        (comp_injective (h.trans (extEmb_comp s₀).symm))
+      have hne : s.comp (algebraMap (𝓞 E) E) ≠ s₀ := fun h =>
+        (Finset.mem_erase.1 hs).1 (comp_injective (h.trans (extEmb_comp s₀).symm))
       exact Submodule.mem_iSup_of_mem _ (Submodule.mem_iSup_of_mem hne (heig s x))
   have hcomp : ∀ x, eigComp ρ s₀ x = actHom ρ (combo (cs (extEmb s₀))) x := by
     intro x

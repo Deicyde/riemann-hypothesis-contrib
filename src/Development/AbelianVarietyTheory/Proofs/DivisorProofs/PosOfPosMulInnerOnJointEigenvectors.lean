@@ -8,19 +8,23 @@ namespace GlobalTheory
 
 open Module.End
 
-theorem pos_of_pos_mul_inner_on_joint_eigenvectors_finiteDimensional {E H I : Type*} [NormedAddCommGroup E]
-    [InnerProductSpace ℂ E] [FiniteDimensional ℂ E] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+theorem pos_of_pos_mul_inner_on_joint_eigenvectors_finiteDimensional
+    {E H I : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H]
     (T : I → E →ₗ[ℂ] E) (hT : ∀ i, (T i).IsSymmetric) (hc : ∀ i j, Commute (T i) (T j))
     (j u : E →ₗ[ℂ] H)
-    (hu : ∀ (m : I → ℝ) (y : E), (∀ i, T i y = (m i : ℂ) • y) →
-      ∃ c : ℝ, 0 < c ∧ ∀ x, inner ℂ (j x) (u y) = (c : ℂ) * inner ℂ x y)
-    (x : E) (hx : x ≠ 0) : (inner ℂ (j x) (u x)).im = 0 ∧ 0 < (inner ℂ (j x) (u x)).re := by
+    (hu : ∀ (m : I → ℝ) (y : E),
+      (∀ i, T i y = (m i : ℂ) • y)
+        → ∃ c : ℝ, 0 < c ∧ ∀ x, inner ℂ (j x) (u y) = (c : ℂ) * inner ℂ x y)
+    (x : E) (hx : x ≠ 0)
+    : (inner ℂ (j x) (u x)).im = 0 ∧ 0 < (inner ℂ (j x) (u x)).re := by
   classical
   have htop : (⨆ χ : I → ℂ, ⨅ i, eigenspace (T i) (χ i)) = ⊤ :=
     LinearMap.IsSymmetric.iSup_iInf_eq_top_of_commute hT (fun a b _ => hc a b)
   have hO := LinearMap.IsSymmetric.orthogonalFamily_iInf_eigenspaces hT
-  have key : ∀ (χ : I → ℂ) (y : ↥(⨅ i, eigenspace (T i) (χ i))), ∃ c : ℝ, 0 < c ∧
-      ∀ z, inner ℂ (j z) (u y) = (c : ℂ) * inner ℂ z (y : E) := by
+  have key
+      : ∀ (χ : I → ℂ) (y : ↥(⨅ i, eigenspace (T i) (χ i))), ∃ c : ℝ,
+        0 < c ∧ ∀ z, inner ℂ (j z) (u y) = (c : ℂ) * inner ℂ z (y : E) := by
     intro χ y
     apply hu (fun i => (χ i).re) (y : E)
     intro i
@@ -31,8 +35,7 @@ theorem pos_of_pos_mul_inner_on_joint_eigenvectors_finiteDimensional {E H I : Ty
     · have hr := (hT i).conj_eigenvalue_eq_self (hasEigenvalue_of_hasEigenvector ⟨hmem, h0⟩)
       have hre : ((χ i).re : ℂ) = χ i := Complex.conj_eq_iff_re.mp hr
       rw [hy, hre]
-  have hx' : x ∈ ⨆ χ : I → ℂ, ⨅ i, eigenspace (T i) (χ i) := by
-    rw [htop]; exact Submodule.mem_top
+  have hx' : x ∈ ⨆ χ : I → ℂ, ⨅ i, eigenspace (T i) (χ i) := by rw [htop]; exact Submodule.mem_top
   obtain ⟨s, hs⟩ := Submodule.mem_iSup_iff_exists_finset.mp hx'
   obtain ⟨μ, hμ⟩ := (Submodule.mem_iSup_finset_iff_exists_sum _ x).mp hs
   choose c hc0 hcx using key
@@ -55,11 +58,27 @@ theorem pos_of_pos_mul_inner_on_joint_eigenvectors_finiteDimensional {E H I : Ty
     apply hx
     rw [← hμ]
     exact Finset.sum_eq_zero fun χ hχ => by_contra fun h => hcon ⟨χ, hχ, h⟩
-  exact Finset.sum_pos' (fun ψ _ => mul_nonneg (hc0 _ _).le (sq_nonneg _))
+  exact Finset.sum_pos'
+    (fun ψ _ => mul_nonneg (hc0 _ _).le (sq_nonneg _))
     ⟨χ, hχ, mul_pos (hc0 _ _) (pow_pos (norm_pos_iff.mpr hne) 2)⟩
 
-theorem pos_of_pos_mul_inner_on_joint_eigenvectors :
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (ι : V →ₗ[ℂ] H), Function.Injective ι → ∀ (W : Submodule ℂ V), FiniteDimensional ℂ W → ∀ (I : Type) (T : I → Module.End ℂ V), (∀ i, ∀ w ∈ W, T i w ∈ W) → (∀ i x y, inner ℂ (ι (T i x)) (ι y) = inner ℂ (ι x) (ι (T i y))) → (∀ i j, T i * T j = T j * T i) → ∀ (u : V →ₗ[ℂ] H), (∀ (m : I → ℝ), ∀ y ∈ W, (∀ i, T i y = (m i : ℂ) • y) → ∃ c : ℝ, 0 < c ∧ ∀ x ∈ W, inner ℂ (ι x) (u y) = (c : ℂ) * inner ℂ (ι x) (ι y)) → ∀ x ∈ W, x ≠ 0 → (inner ℂ (ι x) (u x)).im = 0 ∧ 0 < (inner ℂ (ι x) (u x)).re := by
+theorem pos_of_pos_mul_inner_on_joint_eigenvectors
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] (ι : V →ₗ[ℂ] H),
+      Function.Injective ι
+        → ∀ (W : Submodule ℂ V),
+          FiniteDimensional ℂ W
+            → ∀ (I : Type) (T : I → Module.End ℂ V),
+              (∀ i, ∀ w ∈ W, T i w ∈ W)
+                → (∀ i x y, inner ℂ (ι (T i x)) (ι y) = inner ℂ (ι x) (ι (T i y)))
+                → (∀ i j, T i * T j = T j * T i)
+                → ∀ (u : V →ₗ[ℂ] H),
+                  (∀ (m : I → ℝ), ∀ y ∈ W,
+                      (∀ i, T i y = (m i : ℂ) • y)
+                        → ∃ c : ℝ,
+                          0 < c ∧ ∀ x ∈ W, inner ℂ (ι x) (u y) = (c : ℂ) * inner ℂ (ι x) (ι y))
+                    → ∀ x ∈ W,
+                      x ≠ 0 → (inner ℂ (ι x) (u x)).im = 0 ∧ 0 < (inner ℂ (ι x) (u x)).re := by
   intro V _ _ H _ _ ι hι W hW I T hTW hsym hcomm u hu x hxW hx0
   let e : W ≃ₗ[ℂ] W.map ι := Submodule.equivMapOfInjective ι hι W
   have : FiniteDimensional ℂ (W.map ι) := e.finiteDimensional
@@ -85,8 +104,10 @@ theorem pos_of_pos_mul_inner_on_joint_eigenvectors :
     simp only [hTe]
     exact LinearMap.congr_fun (hcomm i k) _
   let u' : (W.map ι) →ₗ[ℂ] H := u ∘ₗ W.subtype ∘ₗ e.symm.toLinearMap
-  have hu' : ∀ (m : I → ℝ) (y : W.map ι), (∀ i, T' i y = (m i : ℂ) • y) →
-      ∃ c : ℝ, 0 < c ∧ ∀ z, inner ℂ ((W.map ι).subtype z) (u' y) = (c : ℂ) * inner ℂ z y := by
+  have hu'
+      : ∀ (m : I → ℝ) (y : W.map ι),
+        (∀ i, T' i y = (m i : ℂ) • y)
+          → ∃ c : ℝ, 0 < c ∧ ∀ z, inner ℂ ((W.map ι).subtype z) (u' y) = (c : ℂ) * inner ℂ z y := by
     intro m y hy
     have hy' : ∀ i, T i (e.symm y) = (m i : ℂ) • (e.symm y : V) := by
       intro i
@@ -101,8 +122,9 @@ theorem pos_of_pos_mul_inner_on_joint_eigenvectors :
     apply hx0
     have h2 : ((e ⟨x, hxW⟩ : W.map ι) : H) = 0 := by rw [h]; rfl
     exact hι ((show ι x = 0 from h2).trans (map_zero ι).symm)
-  have hmain := pos_of_pos_mul_inner_on_joint_eigenvectors_finiteDimensional T' hsym' hc' (W.map ι).subtype u' hu'
-    (e ⟨x, hxW⟩) hne
+  have hmain :=
+    pos_of_pos_mul_inner_on_joint_eigenvectors_finiteDimensional T' hsym' hc' (W.map ι).subtype u'
+      hu' (e ⟨x, hxW⟩) hne
   have h1 : (W.map ι).subtype (e ⟨x, hxW⟩) = ι x := rfl
   have h2 : u' (e ⟨x, hxW⟩) = u x := by simp [u']
   rw [h1, h2] at hmain

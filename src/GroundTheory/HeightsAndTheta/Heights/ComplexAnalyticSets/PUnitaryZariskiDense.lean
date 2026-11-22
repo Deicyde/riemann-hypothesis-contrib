@@ -15,15 +15,15 @@ noncomputable section
 
 namespace UnitaryZariskiDense
 
-theorem eval_aeval_subst {σ τ : Type*} (F : σ → MvPolynomial τ ℂ) (p : MvPolynomial σ ℂ)
-    (x : τ → ℂ) : eval x (aeval F p) = eval (fun i => eval x (F i)) p := by
+theorem eval_aeval_subst {σ τ : Type*} (F : σ → MvPolynomial τ ℂ) (p : MvPolynomial σ ℂ) (x : τ → ℂ)
+    : eval x (aeval F p) = eval (fun i => eval x (F i)) p := by
   induction p using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => rw [map_add (f := _), map_add (f := _), hp, hq, map_add (f := _)]
   | mul_X p i hp => rw [map_mul, map_mul, hp, aeval_X, map_mul, eval_X]
 
-theorem polyEval_aeval_subst {σ : Type*} (F : σ → Polynomial ℂ) (p : MvPolynomial σ ℂ) (z : ℂ) :
-    (aeval F p).eval z = eval (fun i => (F i).eval z) p := by
+theorem polyEval_aeval_subst {σ : Type*} (F : σ → Polynomial ℂ) (p : MvPolynomial σ ℂ) (z : ℂ)
+    : (aeval F p).eval z = eval (fun i => (F i).eval z) p := by
   induction p using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => simp [hp, hq]
@@ -37,12 +37,15 @@ theorem unit_circle_infinite : {z : ℂ | ‖z‖ = 1}.Infinite := by
     rw [Set.Finite.mem_toFinset]
     exact Complex.norm_eq_one_of_pow_eq_one hz (Nat.succ_ne_zero _)
   have hc := Finset.card_le_card hsub
-  rw [(Complex.isPrimitiveRoot_exp (hfin.toFinset.card + 1) (Nat.succ_ne_zero _)).card_nthRootsFinset]
+  rw [(Complex.isPrimitiveRoot_exp (hfin.toFinset.card + 1)
+      (Nat.succ_ne_zero _)).card_nthRootsFinset]
     at hc
   omega
 
-theorem conj_diagonal_mem {n : ℕ} {V : Matrix (Fin n) (Fin n) ℂ} (hV : V ∈ unitaryGroup (Fin n) ℂ)
-    {d : Fin n → ℂ} (hd : ∀ k, ‖d k‖ = 1) : V * diagonal d * star V ∈ unitaryGroup (Fin n) ℂ := by
+theorem conj_diagonal_mem
+    {n : ℕ} {V : Matrix (Fin n) (Fin n) ℂ} (hV : V ∈ unitaryGroup (Fin n) ℂ)
+    {d : Fin n → ℂ} (hd : ∀ k, ‖d k‖ = 1)
+    : V * diagonal d * star V ∈ unitaryGroup (Fin n) ℂ := by
   have hD : diagonal d ∈ unitaryGroup (Fin n) ℂ := by
     rw [mem_unitaryGroup_iff, star_eq_conjTranspose, diagonal_conjTranspose, diagonal_mul_diagonal,
       ← diagonal_one]
@@ -53,7 +56,6 @@ theorem conj_diagonal_mem {n : ℕ} {V : Matrix (Fin n) (Fin n) ℂ} (hV : V ∈
 
 end UnitaryZariskiDense
 
-
 open UnitaryZariskiDense in
 theorem UnitaryZariskiDense.proof : UnitaryZariskiDense.Statement := by
   intro n p hp
@@ -61,16 +63,18 @@ theorem UnitaryZariskiDense.proof : UnitaryZariskiDense.Statement := by
   push Not at hall
   apply hp
 
-  have herm : ∀ H : Matrix (Fin n) (Fin n) ℂ, H.IsHermitian →
-      eval (fun ij : Fin n × Fin n => H ij.1 ij.2) p = 0 := by
+  have herm
+      : ∀ H : Matrix (Fin n) (Fin n) ℂ,
+        H.IsHermitian → eval (fun ij : Fin n × Fin n => H ij.1 ij.2) p = 0 := by
     intro H hH
     have hspec := hH.spectral_theorem
     rw [Unitary.conjStarAlgAut_apply] at hspec
     set V : Matrix (Fin n) (Fin n) ℂ := (hH.eigenvectorUnitary : Matrix (Fin n) (Fin n) ℂ) with hVdef
     have hV : V ∈ unitaryGroup (Fin n) ℂ := hH.eigenvectorUnitary.2
-    have hentry : ∀ d : Fin n → ℂ,
-        eval d (aeval (fun ij : Fin n × Fin n => ∑ k, C (V ij.1 k * star V k ij.2) * X k) p) =
-          eval (fun ij : Fin n × Fin n => (V * diagonal d * star V) ij.1 ij.2) p := by
+    have hentry
+        : ∀ d : Fin n → ℂ,
+          eval d (aeval (fun ij : Fin n × Fin n => ∑ k, C (V ij.1 k * star V k ij.2) * X k) p)
+            = eval (fun ij : Fin n × Fin n => (V * diagonal d * star V) ij.1 ij.2) p := by
       intro d
       rw [eval_aeval_subst]
       refine congrArg (fun f => eval f p) (funext fun ij => ?_)
@@ -79,23 +83,32 @@ theorem UnitaryZariskiDense.proof : UnitaryZariskiDense.Statement := by
         simp only [map_sum, map_mul, eval_C, eval_X, Matrix.mul_diagonal]
       exact Finset.sum_congr rfl fun k _ => by ring
     have hr : aeval (fun ij : Fin n × Fin n => ∑ k, C (V ij.1 k * star V k ij.2) * X k) p = 0 :=
-      funext_set (fun _ => {z : ℂ | ‖z‖ = 1}) (fun _ => unit_circle_infinite) fun d hd => by
-        rw [hentry, map_zero]
-        exact hall _ (conj_diagonal_mem hV fun k => hd k trivial)
+      funext_set
+        (fun _ => {z : ℂ | ‖z‖ = 1})
+        (fun _ => unit_circle_infinite)
+        fun d hd => by
+          rw [hentry, map_zero]
+          exact hall _ (conj_diagonal_mem hV fun k => hd k trivial)
     have h0 := hentry (RCLike.ofReal ∘ hH.eigenvalues)
     rw [hr, map_zero] at h0
     rw [h0]
     refine congrArg (fun f => eval f p) (funext fun ij => ?_)
     exact congrFun (congrFun hspec ij.1) ij.2
 
-  have all : ∀ A : Matrix (Fin n) (Fin n) ℂ, eval (fun ij : Fin n × Fin n => A ij.1 ij.2) p = 0 := by
+  have all
+      : ∀ A : Matrix (Fin n) (Fin n) ℂ, eval (fun ij : Fin n × Fin n => A ij.1 ij.2) p = 0 := by
     intro A
     set g : Polynomial ℂ := aeval (fun ij : Fin n × Fin n =>
       Polynomial.C (A ij.1 ij.2) * (Polynomial.C (1 / 2) - Polynomial.C (I / 2) * Polynomial.X) +
         Polynomial.C (Aᴴ ij.1 ij.2) * (Polynomial.C (1 / 2) + Polynomial.C (I / 2) * Polynomial.X)) p
       with hgdef
-    have hg : ∀ z : ℂ, g.eval z = eval (fun ij : Fin n × Fin n =>
-        A ij.1 ij.2 * (1 / 2 - I / 2 * z) + Aᴴ ij.1 ij.2 * (1 / 2 + I / 2 * z)) p := by
+    have hg
+        : ∀ z : ℂ,
+          g.eval z
+            = eval
+              (fun ij : Fin n × Fin n =>
+                A ij.1 ij.2 * (1 / 2 - I / 2 * z) + Aᴴ ij.1 ij.2 * (1 / 2 + I / 2 * z))
+              p := by
       intro z
       rw [hgdef, polyEval_aeval_subst]
       refine congrArg (fun f => eval f p) (funext fun ij => ?_)
@@ -131,8 +144,7 @@ theorem UnitaryZariskiDense.proof : UnitaryZariskiDense.Statement := by
     rw [h1, h2]
     ring
 
-  exact MvPolynomial.funext fun x => by
-    simpa using all (Matrix.of fun i j => x (i, j))
+  exact MvPolynomial.funext fun x => by simpa using all (Matrix.of fun i j => x (i, j))
 
 end
 

@@ -20,15 +20,14 @@ section Length
 
 variable {R : Type*} [CommRing R] {L : Type*} [AddCommGroup L] [Module R L]
 
-abbrev colonIdeal (A : Submodule R L) (y : L) : Ideal R :=
-  A.comap (LinearMap.toSpanSingleton R L y)
+abbrev colonIdeal (A : Submodule R L) (y : L) : Ideal R := A.comap (LinearMap.toSpanSingleton R L y)
 
 theorem mem_colonIdeal {A : Submodule R L} {y : L} {r : R} : r ∈ colonIdeal A y ↔ r • y ∈ A := by
   simp [colonIdeal]
 
-theorem length_sup_span_singleton (A : Submodule R L) (y : L) :
-    Module.length R (A ⊔ Submodule.span R {y} : Submodule R L) =
-      Module.length R A + Module.length R (R ⧸ colonIdeal A y) := by
+theorem length_sup_span_singleton (A : Submodule R L) (y : L)
+    : Module.length R (A ⊔ Submodule.span R {y} : Submodule R L)
+      = Module.length R A + Module.length R (R ⧸ colonIdeal A y) := by
   set B : Submodule R L := A ⊔ Submodule.span R {y}
   let A' : Submodule R B := A.comap B.subtype
   have e1 : Module.length R B = Module.length R A' + Module.length R (B ⧸ A') :=
@@ -60,7 +59,8 @@ end Length
 namespace GradedPMod
 
 variable {S : Type u} [CommRing S] {N : ℕ}
-variable {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M]
+variable
+  {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M]
   (𝓜 : GradedPMod S N M) [DirectSum.Decomposition 𝓜.piece]
 
 def IsGradedSub (A : Submodule (Poly S N) M) : Prop :=
@@ -68,10 +68,10 @@ def IsGradedSub (A : Submodule (Poly S N) M) : Prop :=
 
 variable {𝓜}
 
-theorem decompose_smul_eq {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e) (r : Poly S N) (c : ℤ) :
-    (DirectSum.decompose 𝓜.piece (r • g) c : M) =
-      ∑ i ∈ Finset.range (r.totalDegree + 1),
-        if e + (i : ℤ) = c then homogeneousComponent i r • g else 0 := by
+theorem decompose_smul_eq {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e) (r : Poly S N) (c : ℤ)
+    : (DirectSum.decompose 𝓜.piece (r • g) c : M)
+      = ∑ i ∈ Finset.range (r.totalDegree + 1),
+          if e + (i : ℤ) = c then homogeneousComponent i r • g else 0 := by
   conv_lhs => rw [← sum_homogeneousComponent r]
   rw [Finset.sum_smul, DirectSum.decompose_sum]
   rw [DFinsupp.finsetSum_apply, Submodule.coe_sum]
@@ -81,8 +81,8 @@ theorem decompose_smul_eq {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e) (r : Poly 
   · subst h; exact DirectSum.decompose_of_mem_same _ hm
   · exact DirectSum.decompose_of_mem_ne _ hm h
 
-theorem decompose_smul_add {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e) (r : Poly S N) (d : ℕ) :
-    (DirectSum.decompose 𝓜.piece (r • g) (e + d) : M) = homogeneousComponent d r • g := by
+theorem decompose_smul_add {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e) (r : Poly S N) (d : ℕ)
+    : (DirectSum.decompose 𝓜.piece (r • g) (e + d) : M) = homogeneousComponent d r • g := by
   rw [decompose_smul_eq hg]
   simp only [add_right_inj, Nat.cast_inj, Finset.sum_ite_eq', Finset.mem_range]
   split_ifs with h
@@ -94,25 +94,30 @@ theorem isGradedSub_bot : 𝓜.IsGradedSub ⊥ := by
   rw [(Submodule.mem_bot _).mp hm, DirectSum.decompose_zero]
   exact Submodule.zero_mem _
 
-theorem isGradedSub_sup_span {A : Submodule (Poly S N) M} (hA : 𝓜.IsGradedSub A) {g : M} {e : ℤ}
-    (hg : g ∈ 𝓜.piece e) : 𝓜.IsGradedSub (A ⊔ Submodule.span (Poly S N) {g}) := by
+theorem isGradedSub_sup_span
+    {A : Submodule (Poly S N) M} (hA : 𝓜.IsGradedSub A) {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e)
+    : 𝓜.IsGradedSub (A ⊔ Submodule.span (Poly S N) {g}) := by
   intro m hm c
   obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp hm
   obtain ⟨r, rfl⟩ := Submodule.mem_span_singleton.mp hb
   rw [DirectSum.decompose_add, DirectSum.add_apply, Submodule.coe_add, decompose_smul_eq hg]
-  refine Submodule.add_mem _ (Submodule.mem_sup_left (hA a ha c)) (Submodule.sum_mem _ fun i _ => ?_)
+  refine Submodule.add_mem _ (Submodule.mem_sup_left (hA a ha c))
+    (Submodule.sum_mem _ fun i _ => ?_)
   split_ifs
   · exact Submodule.mem_sup_right (Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self g))
   · exact Submodule.zero_mem _
 
-theorem homogeneousComponent_mem_colonIdeal {A : Submodule (Poly S N) M} (hA : 𝓜.IsGradedSub A)
-    {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e) {r : Poly S N} (hr : r ∈ colonIdeal A g) (d : ℕ) :
-    homogeneousComponent d r ∈ colonIdeal A g := by
+theorem homogeneousComponent_mem_colonIdeal
+    {A : Submodule (Poly S N) M} (hA : 𝓜.IsGradedSub A)
+    {g : M} {e : ℤ} (hg : g ∈ 𝓜.piece e)
+    {r : Poly S N} (hr : r ∈ colonIdeal A g)
+    (d : ℕ)
+    : homogeneousComponent d r ∈ colonIdeal A g := by
   rw [mem_colonIdeal, ← decompose_smul_add hg]
   exact hA _ (mem_colonIdeal.mp hr) _
 
-theorem exists_homogeneous_notMem {A : Submodule (Poly S N) M} (hne : A ≠ ⊤) :
-    ∃ (g : M) (e : ℤ), g ∈ 𝓜.piece e ∧ g ∉ A := by
+theorem exists_homogeneous_notMem {A : Submodule (Poly S N) M} (hne : A ≠ ⊤)
+    : ∃ (g : M) (e : ℤ), g ∈ 𝓜.piece e ∧ g ∉ A := by
   classical
   by_contra! h
   apply hne
@@ -121,12 +126,12 @@ theorem exists_homogeneous_notMem {A : Submodule (Poly S N) M} (hne : A ≠ ⊤)
   rw [← DirectSum.sum_support_decompose 𝓜.piece m]
   exact Submodule.sum_mem _ fun c _ => h _ c (SetLike.coe_mem _)
 
-
 attribute [local instance] MvPolynomial.gradedAlgebra in
-theorem exists_isPrime_colonIdeal [IsNoetherianRing S] {A : Submodule (Poly S N) M}
-    (hA : 𝓜.IsGradedSub A) (hne : A ≠ ⊤) :
-    ∃ ge : M × ℤ, ge.1 ∈ 𝓜.piece ge.2 ∧ (colonIdeal A ge.1).IsPrime ∧
-      ∀ p ∈ colonIdeal A ge.1, ∀ d : ℕ, homogeneousComponent d p ∈ colonIdeal A ge.1 := by
+theorem exists_isPrime_colonIdeal
+    [IsNoetherianRing S] {A : Submodule (Poly S N) M} (hA : 𝓜.IsGradedSub A) (hne : A ≠ ⊤)
+    : ∃ ge : M × ℤ,
+      ge.1 ∈ 𝓜.piece ge.2 ∧ (colonIdeal A ge.1).IsPrime
+        ∧ ∀ p ∈ colonIdeal A ge.1, ∀ d : ℕ, homogeneousComponent d p ∈ colonIdeal A ge.1 := by
   obtain ⟨g0, e0, hg0, hg0A⟩ := exists_homogeneous_notMem (𝓜 := 𝓜) hne
   obtain ⟨I, ⟨g, e, hg, hgA, rfl⟩, hmax⟩ :=
     set_has_maximal_iff_noetherian.mpr (inferInstance : IsNoetherian (Poly S N) (Poly S N))
@@ -163,23 +168,25 @@ theorem exists_isPrime_colonIdeal [IsNoetherianRing S] {A : Submodule (Poly S N)
 
 variable (𝓜)
 
-
 open Classical in
 def primeFiltNext [IsNoetherianRing S] (A : Submodule (Poly S N) M) : M × ℤ :=
   open scoped Classical in
-  if h : 𝓜.IsGradedSub A ∧ A ≠ ⊤ then Classical.choose (exists_isPrime_colonIdeal h.1 h.2) else (0, 0)
+  if h : 𝓜.IsGradedSub A ∧ A ≠ ⊤ then
+    Classical.choose (exists_isPrime_colonIdeal h.1 h.2)
+  else
+    (0, 0)
 
-theorem primeFiltNext_mem [IsNoetherianRing S] (A : Submodule (Poly S N) M) :
-    (𝓜.primeFiltNext A).1 ∈ 𝓜.piece (𝓜.primeFiltNext A).2 := by
+theorem primeFiltNext_mem [IsNoetherianRing S] (A : Submodule (Poly S N) M)
+    : (𝓜.primeFiltNext A).1 ∈ 𝓜.piece (𝓜.primeFiltNext A).2 := by
   unfold primeFiltNext
   split_ifs with h
   · exact (Classical.choose_spec (exists_isPrime_colonIdeal h.1 h.2)).1
   · exact Submodule.zero_mem _
 
-theorem primeFiltNext_spec [IsNoetherianRing S] {A : Submodule (Poly S N) M}
-    (hA : 𝓜.IsGradedSub A) (hne : A ≠ ⊤) :
-    (colonIdeal A (𝓜.primeFiltNext A).1).IsPrime ∧
-      ∀ p ∈ colonIdeal A (𝓜.primeFiltNext A).1, ∀ d : ℕ,
+theorem primeFiltNext_spec
+    [IsNoetherianRing S] {A : Submodule (Poly S N) M} (hA : 𝓜.IsGradedSub A) (hne : A ≠ ⊤)
+    : (colonIdeal A (𝓜.primeFiltNext A).1).IsPrime
+      ∧ ∀ p ∈ colonIdeal A (𝓜.primeFiltNext A).1, ∀ d : ℕ,
         homogeneousComponent d p ∈ colonIdeal A (𝓜.primeFiltNext A).1 := by
   unfold primeFiltNext
   rw [dite_eq_left ⟨hA, hne⟩]
@@ -189,17 +196,18 @@ def primeFiltSeq [IsNoetherianRing S] : ℕ → Submodule (Poly S N) M
   | 0 => ⊥
   | k + 1 => primeFiltSeq k ⊔ Submodule.span (Poly S N) {(𝓜.primeFiltNext (primeFiltSeq k)).1}
 
-theorem primeFiltSeq_isGradedSub [IsNoetherianRing S] (k : ℕ) :
-    𝓜.IsGradedSub (𝓜.primeFiltSeq k) := by
+theorem primeFiltSeq_isGradedSub [IsNoetherianRing S] (k : ℕ)
+    : 𝓜.IsGradedSub (𝓜.primeFiltSeq k) := by
   induction k with
   | zero => exact isGradedSub_bot
   | succ k ih => exact isGradedSub_sup_span ih (𝓜.primeFiltNext_mem _)
 
-theorem exists_primeFiltSeq_eq_top [IsNoetherianRing S] [Module.Finite (Poly S N) M] :
-    ∃ n, 𝓜.primeFiltSeq n = ⊤ := by
+theorem exists_primeFiltSeq_eq_top [IsNoetherianRing S] [Module.Finite (Poly S N) M]
+    : ∃ n, 𝓜.primeFiltSeq n = ⊤ := by
   have hmono : Monotone 𝓜.primeFiltSeq := monotone_nat_of_le_succ fun k => le_sup_left
-  obtain ⟨n, hn⟩ := monotone_stabilizes_iff_noetherian.mpr
-    (inferInstance : IsNoetherian (Poly S N) M) ⟨𝓜.primeFiltSeq, hmono⟩
+  obtain ⟨n, hn⟩ :=
+    monotone_stabilizes_iff_noetherian.mpr (inferInstance : IsNoetherian (Poly S N) M)
+      ⟨𝓜.primeFiltSeq, hmono⟩
   refine ⟨n, by_contra fun hne => ?_⟩
   have hp := (𝓜.primeFiltNext_spec (𝓜.primeFiltSeq_isGradedSub n) hne).1
   apply hp.ne_top
@@ -208,7 +216,6 @@ theorem exists_primeFiltSeq_eq_top [IsNoetherianRing S] [Module.Finite (Poly S N
     Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
   have h2 : 𝓜.primeFiltSeq n = 𝓜.primeFiltSeq (n + 1) := hn (n + 1) (Nat.le_succ n)
   rwa [← h2] at h1
-
 
 open scoped Classical in
 open Classical in
@@ -223,10 +230,12 @@ def primeFilt [IsNoetherianRing S] [Module.Finite (Poly S N) M] : PrimeFilt 𝓜
   step_succ k := rfl
   gen_mem k := 𝓜.primeFiltNext_mem _
   mem_prime k p := mem_colonIdeal
-  isPrime k := (𝓜.primeFiltNext_spec (𝓜.primeFiltSeq_isGradedSub k)
-    (Nat.find_min 𝓜.exists_primeFiltSeq_eq_top k.2)).1
-  isHomogeneous k := (𝓜.primeFiltNext_spec (𝓜.primeFiltSeq_isGradedSub k)
-    (Nat.find_min 𝓜.exists_primeFiltSeq_eq_top k.2)).2
+  isPrime k :=
+    (𝓜.primeFiltNext_spec (𝓜.primeFiltSeq_isGradedSub k)
+      (Nat.find_min 𝓜.exists_primeFiltSeq_eq_top k.2)).1
+  isHomogeneous k :=
+    (𝓜.primeFiltNext_spec (𝓜.primeFiltSeq_isGradedSub k)
+      (Nat.find_min 𝓜.exists_primeFiltSeq_eq_top k.2)).2
   ann_le k p hp := by
     rw [mem_colonIdeal, (Module.mem_annihilator.mp hp)]
     exact Submodule.zero_mem _
@@ -236,36 +245,41 @@ end GradedPMod
 namespace PrimeFilt
 
 variable {S : Type u} [CommRing S] {N : ℕ}
-variable {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M]
-  {𝓜 : GradedPMod S N M}
+variable {M : Type v} [AddCommGroup M] [Module (Poly S N) M] [Module S M] {𝓜 : GradedPMod S N M}
 
 open scoped Classical in
-theorem card_prime_eq_length (F : PrimeFilt 𝓜) (pp : Ideal (Poly S N)) [pp.IsPrime]
-    (hpp : pp ∈ (Module.annihilator (Poly S N) M).minimalPrimes) :
-    (((Finset.univ.filter fun k => F.prime k = pp).card : ℕ) : ℕ∞) =
-      Module.length (Localization.AtPrime pp) (LocalizedModule pp.primeCompl M) := by
+theorem card_prime_eq_length
+    (F : PrimeFilt 𝓜)
+    (pp : Ideal (Poly S N)) [pp.IsPrime]
+    (hpp : pp ∈ (Module.annihilator (Poly S N) M).minimalPrimes)
+    : (((Finset.univ.filter fun k => F.prime k = pp).card : ℕ) : ℕ∞)
+      = Module.length (Localization.AtPrime pp) (LocalizedModule pp.primeCompl M) := by
   classical
   let R := Localization.AtPrime pp
   let f := LocalizedModule.mkLinearMap pp.primeCompl M
-  let Loc : Submodule (Poly S N) M → Submodule R (LocalizedModule pp.primeCompl M) :=
-    fun A => A.localized' R pp.primeCompl f
-  have hstep : ∀ k : Fin F.n, Module.length R (Loc (F.step k.succ)) =
-      Module.length R (Loc (F.step k.castSucc)) + if F.prime k = pp then 1 else 0 := by
+  let Loc : Submodule (Poly S N) M → Submodule R (LocalizedModule pp.primeCompl M) := fun A =>
+    A.localized' R pp.primeCompl f
+  have hstep
+      : ∀ k : Fin F.n,
+        Module.length R (Loc (F.step k.succ))
+          = Module.length R (Loc (F.step k.castSucc)) + if F.prime k = pp then 1 else 0 := by
     intro k
-    have hsup : Loc (F.step k.succ) =
-        Loc (F.step k.castSucc) ⊔ Submodule.span R {f (F.gen k)} := by
+    have hsup : Loc (F.step k.succ) = Loc (F.step k.castSucc) ⊔ Submodule.span R {f (F.gen k)} := by
       simp only [Loc]
       rw [F.step_succ k, (Submodule.localized'gi R pp.primeCompl f).gc.l_sup,
         Submodule.localized'_span, Set.image_singleton]
     rw [hsup, length_sup_span_singleton]
     congr 1
-    have hmemloc : ∀ r : Poly S N, r • F.gen k ∈ F.step k.castSucc →
-        algebraMap (Poly S N) R r ∈ colonIdeal (Loc (F.step k.castSucc)) (f (F.gen k)) := by
+    have hmemloc
+        : ∀ r : Poly S N,
+          r • F.gen k ∈ F.step k.castSucc
+            → algebraMap (Poly S N) R r ∈ colonIdeal (Loc (F.step k.castSucc)) (f (F.gen k)) := by
       intro r hr
       rw [mem_colonIdeal, algebraMap_smul, ← LinearMap.map_smul]
       exact ⟨r • F.gen k, hr, 1, IsLocalizedModule.mk'_one _ _ _⟩
     split_ifs with h
-    · have hI : colonIdeal (Loc (F.step k.castSucc)) (f (F.gen k)) = IsLocalRing.maximalIdeal R := by
+    · have hI
+          : colonIdeal (Loc (F.step k.castSucc)) (f (F.gen k)) = IsLocalRing.maximalIdeal R := by
         apply le_antisymm
         · apply IsLocalRing.le_maximalIdeal
           intro htop
@@ -287,7 +301,8 @@ theorem card_prime_eq_length (F : PrimeFilt 𝓜) (pp : Ideal (Poly S N)) [pp.Is
           exact hmemloc r ((F.mem_prime k r).mp (h ▸ hr))
       rw [hI]
       have : IsSimpleModule R (R ⧸ IsLocalRing.maximalIdeal R) :=
-        isSimpleModule_iff_isCoatom.mpr (Ideal.isMaximal_def.mp (IsLocalRing.maximalIdeal.isMaximal R))
+        isSimpleModule_iff_isCoatom.mpr (Ideal.isMaximal_def.mp (IsLocalRing.maximalIdeal.isMaximal
+          R))
       exact Module.length_eq_one _ _
     · have hnle : ¬ F.prime k ≤ pp := fun hle =>
         h (le_antisymm hle (hpp.2 ⟨F.isPrime k, F.ann_le k⟩ hle))
@@ -297,33 +312,37 @@ theorem card_prime_eq_length (F : PrimeFilt 𝓜) (pp : Ideal (Poly S N)) [pp.Is
           (IsLocalization.map_units R (⟨t, htp⟩ : pp.primeCompl))
       rw [hI]
       exact Module.length_eq_zero_iff.mpr (Submodule.Quotient.subsingleton_iff.mpr rfl)
-  have key : ∀ j (hj : j ≤ F.n), Module.length R (Loc (F.step ⟨j, by omega⟩)) =
-      ∑ i ∈ Finset.range j, (if h : i < F.n then (if F.prime ⟨i, h⟩ = pp then 1 else 0) else 0 : ℕ∞) := by
-    intro j
-    induction j with
-    | zero =>
-      intro _
-      rw [Finset.sum_range_zero, show (⟨0, by omega⟩ : Fin (F.n + 1)) = 0 from rfl, F.step_zero]
-      change Module.length R (Submodule.localized' R pp.primeCompl f ⊥) = 0
-      rw [Submodule.localized'_bot]
-      exact Module.length_bot
-    | succ j ih =>
-      intro hj
-      rw [Finset.sum_range_succ, ← ih (by omega), dite_eq_left (by omega)]
-      exact hstep ⟨j, by omega⟩
-  calc (((Finset.univ.filter fun k => F.prime k = pp).card : ℕ) : ℕ∞)
-      = ∑ k : Fin F.n, (if F.prime k = pp then 1 else 0 : ℕ∞) := by
-        rw [Finset.card_filter]; push_cast; rfl
+  have key
+      : ∀ j (hj : j ≤ F.n),
+        Module.length R (Loc (F.step ⟨j, by omega⟩))
+          = ∑ i ∈ Finset.range j, (if h : i < F.n then (if F.prime ⟨i, h⟩ = pp then 1 else 0) else 0 : ℕ∞) :=
+    by
+      intro j
+      induction j with
+      | zero =>
+        intro _
+        rw [Finset.sum_range_zero, show (⟨0, by omega⟩ : Fin (F.n + 1)) = 0 from rfl, F.step_zero]
+        change Module.length R (Submodule.localized' R pp.primeCompl f ⊥) = 0
+        rw [Submodule.localized'_bot]
+        exact Module.length_bot
+      | succ j ih =>
+        intro hj
+        rw [Finset.sum_range_succ, ← ih (by omega), dite_eq_left (by omega)]
+        exact hstep ⟨j, by omega⟩
+  calc
+    (((Finset.univ.filter fun k => F.prime k = pp).card : ℕ) : ℕ∞)
+        = ∑ k : Fin F.n, (if F.prime k = pp then 1 else 0 : ℕ∞) := by
+      rw [Finset.card_filter]; push_cast; rfl
     _ = ∑ i ∈ Finset.range F.n,
           (if h : i < F.n then (if F.prime ⟨i, h⟩ = pp then 1 else 0) else 0 : ℕ∞) := by
-        rw [← Fin.sum_univ_eq_sum_range]
-        exact Finset.sum_congr rfl fun k _ => by rw [dite_eq_left k.isLt]
+      rw [← Fin.sum_univ_eq_sum_range]
+      exact Finset.sum_congr rfl fun k _ => by rw [dite_eq_left k.isLt]
     _ = Module.length R (Loc (F.step ⟨F.n, by omega⟩)) := (key _ le_rfl).symm
     _ = Module.length R (LocalizedModule pp.primeCompl M) := by
-        rw [show (⟨F.n, by omega⟩ : Fin (F.n + 1)) = Fin.last F.n from rfl, F.step_last]
-        change Module.length R (Submodule.localized' R pp.primeCompl f ⊤) = _
-        rw [Submodule.localized'_top]
-        exact Module.length_top
+      rw [show (⟨F.n, by omega⟩ : Fin (F.n + 1)) = Fin.last F.n from rfl, F.step_last]
+      change Module.length R (Submodule.localized' R pp.primeCompl f ⊤) = _
+      rw [Submodule.localized'_top]
+      exact Module.length_top
 
 end PrimeFilt
 

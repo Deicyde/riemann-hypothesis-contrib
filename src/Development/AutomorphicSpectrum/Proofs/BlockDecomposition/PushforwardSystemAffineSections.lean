@@ -11,7 +11,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE TensorProduct
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE TensorProduct
 
 namespace GlobalTheory.CompanionTheory.GE.Chart
 
@@ -19,14 +20,18 @@ attribute [local instance] algebraOfOver
 
 variable {X Z : Scheme.{0}}
 
-theorem idealPowι_comp_pullback_map_cokernel_eq_zero {A : Type} [CommRing A] [IsNoetherianRing A]
-    (I : Ideal A) [X.Over (Spec (.of A))] [Z.Over (Spec (.of A))] (φ : Z ⟶ X)
-    (hφ : φ ≫ (X ↘ Spec (.of A)) = (Z ↘ Spec (.of A))) (E : X.Modules) (D : Subobject E) (m : ℕ)
-    (hD : powSub I E m ≤ D) :
-    idealPowι I ((Scheme.Modules.pullback φ).obj E) m ≫
-      (Scheme.Modules.pullback φ).map (cokernel.π D.arrow) = 0 := by
-  apply (cancel_epi (Abelian.factorThruImage
-    (idealSumMap ((Scheme.Modules.pullback φ).obj E) (I ^ m)))).1
+theorem idealPowι_comp_pullback_map_cokernel_eq_zero
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    (I : Ideal A)
+    [X.Over (Spec (.of A))] [Z.Over (Spec (.of A))]
+    (φ : Z ⟶ X) (hφ : φ ≫ (X ↘ Spec (.of A)) = (Z ↘ Spec (.of A)))
+    (E : X.Modules) (D : Subobject E)
+    (m : ℕ) (hD : powSub I E m ≤ D)
+    : idealPowι I ((Scheme.Modules.pullback φ).obj E) m
+        ≫ (Scheme.Modules.pullback φ).map (cokernel.π D.arrow)
+      = 0 := by
+  apply (cancel_epi (Abelian.factorThruImage (idealSumMap ((Scheme.Modules.pullback φ).obj E)
+    (I ^ m)))).1
   rw [comp_zero, ← Category.assoc, Abelian.image.fac]
   apply biproduct.hom_ext'
   intro k
@@ -39,13 +44,18 @@ theorem idealPowι_comp_pullback_map_cokernel_eq_zero {A : Type} [CommRing A] [I
   rw [hL, ← Abelian.image.fac (idealSumMap E (I ^ m)), Category.assoc, Category.assoc, hι,
     comp_zero, comp_zero, Functor.map_zero]
 
-theorem chartIn_of_pullback_app_eq_zero (φ : Z ⟶ X) {E : X.Modules} [E.IsQuasicoherent]
-    (D : Subobject E) [(D : X.Modules).IsQuasicoherent] (V : X.Opens) (hV : IsAffineOpen V)
-    (x : Γ(E, V))
-    (hx : ∀ (U : Z.Opens), IsAffineOpen U → ∀ h : U ≤ φ ⁻¹ᵁ V,
-      ((Scheme.Modules.pullback φ).map (cokernel.π D.arrow)).app U
-        (GlobalTheory.QCoh.pullbackSections φ E h x) = 0) :
-    ChartIn φ V (secsSub D V) x := by
+theorem chartIn_of_pullback_app_eq_zero
+    (φ : Z ⟶ X)
+    {E : X.Modules} [E.IsQuasicoherent]
+    (D : Subobject E) [(D : X.Modules).IsQuasicoherent]
+    (V : X.Opens) (hV : IsAffineOpen V) (x : Γ(E, V))
+    (hx : ∀ (U : Z.Opens),
+      IsAffineOpen U
+        → ∀ h : U ≤ φ ⁻¹ᵁ V,
+          ((Scheme.Modules.pullback φ).map (cokernel.π D.arrow)).app U
+              (GlobalTheory.QCoh.pullbackSections φ E h x)
+            = 0)
+    : ChartIn φ V (secsSub D V) x := by
   intro U hU h
   letI : Algebra Γ(X, V) Γ(Z, U) := (φ.appLE V U h).hom.toAlgebra
   have hx' := hx U hU h
@@ -53,10 +63,11 @@ theorem chartIn_of_pullback_app_eq_zero (φ : Z ⟶ X) {E : X.Modules} [E.IsQuas
   letI := GlobalTheory.QCoh.appLEModule φ ((Scheme.Modules.pullback φ).obj (cokernel D.arrow)) h
   haveI := GlobalTheory.QCoh.appLE_isScalarTower φ ((Scheme.Modules.pullback φ).obj (cokernel D.arrow)) h
   have hbc := GlobalTheory.QCoh.isBaseChange_pullbackSections φ (cokernel D.arrow) hU hV h
-  let πl : Γ(E, V) →ₗ[Γ(X, V)] Γ(cokernel D.arrow, V) :=
-    { toFun := (cokernel.π D.arrow).app V
-      map_add' := map_add _
-      map_smul' := Scheme.Modules.Hom.app_smul _ }
+  let πl : Γ(E, V) →ₗ[Γ(X, V)] Γ(cokernel D.arrow, V) := {
+    toFun := (cokernel.π D.arrow).app V
+    map_add' := map_add _
+    map_smul' := Scheme.Modules.Hom.app_smul _
+  }
   have hsurj : Function.Surjective πl := surjective_cokernel_π_app D.arrow hV
   have hex : Function.Exact (secsSub D V).subtype πl := by
     intro m
@@ -74,13 +85,19 @@ theorem chartIn_of_pullback_app_eq_zero (φ : Z ⟶ X) {E : X.Modules} [E.IsQuas
     exact hx'
   rw [← TensorProduct.comm_tmul, h1, map_zero]
 
-theorem chartIn_adjKer : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X Z : Scheme.{0}}
-    [X.Over (Spec (.of A))] [Z.Over (Spec (.of A))] [IsLocallyNoetherian X] (φ : Z ⟶ X),
-    φ ≫ (X ↘ Spec (.of A)) = (Z ↘ Spec (.of A)) → ∀ {E : X.Modules}, IsCoherent E →
-    ∀ {S : ℕ → Subobject E}, ClosedSys I E S →
-    ∀ (B : Subobject ((Scheme.Modules.pullback φ).obj E)),
-    (∀ e, B ⊔ powSub I _ (e + 1) = pullSys I φ E S e) → ∀ (V : X.Opens), IsAffineOpen V →
-    ∀ x ∈ secs (adjKer φ B) V, ∀ n, ChartIn φ V (secsSub (S n) V) x := by
+theorem chartIn_adjKer
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X Z : Scheme.{0}}
+        [X.Over (Spec (.of A))] [Z.Over (Spec (.of A))] [IsLocallyNoetherian X] (φ : Z ⟶ X),
+      φ ≫ (X ↘ Spec (.of A)) = (Z ↘ Spec (.of A))
+        → ∀ {E : X.Modules},
+          IsCoherent E
+            → ∀ {S : ℕ → Subobject E},
+              ClosedSys I E S
+                → ∀ (B : Subobject ((Scheme.Modules.pullback φ).obj E)),
+                  (∀ e, B ⊔ powSub I _ (e + 1) = pullSys I φ E S e)
+                    → ∀ (V : X.Opens),
+                      IsAffineOpen V
+                        → ∀ x ∈ secs (adjKer φ B) V, ∀ n, ChartIn φ V (secsSub (S n) V) x := by
   intro A _ _ I X Z _ _ _ φ hφ E hE S hS B hB V hV x hx n
   have : E.IsQuasicoherent := hE.1
   have : ((S n : Subobject E) : X.Modules).IsQuasicoherent := hS.qcoh n
@@ -89,8 +106,8 @@ theorem chartIn_adjKer : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : I
   obtain ⟨y, rfl⟩ := hx
   set g := (Scheme.Modules.pullback φ).map (cokernel.π (S n).arrow) with hg
   have hK : pullSys I φ E S n ≤ kernelSubobject g := by
-    change imageSubobject ((Scheme.Modules.pullback φ).map (S n).arrow) ⊔
-      powSub I _ (n + 1) ≤ kernelSubobject g
+    change imageSubobject ((Scheme.Modules.pullback φ).map (S n).arrow) ⊔ powSub I _ (n + 1)
+      ≤ kernelSubobject g
     refine sup_le (image_le_kernel _ _ ?_) (le_kernelSubobject _ _ ?_)
     · rw [hg, ← Functor.map_comp, cokernel.condition, Functor.map_zero]
     · rw [powSub, ← Subobject.underlyingIso_hom_comp_eq_mk, Category.assoc,
@@ -105,14 +122,18 @@ theorem chartIn_adjKer : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : I
     have hk : (adjKer φ B).arrow ≫ adjMap φ B = 0 := kernelSubobject_arrow_comp _
     rw [← ConcreteCategory.comp_apply, ← Scheme.Modules.Hom.comp_app, hk]
     rfl
-  have h1 : (cokernel.π B.arrow).app (φ ⁻¹ᵁ V)
-      (((Scheme.Modules.pullbackPushforwardAdjunction φ).unit.app E).app V
-        ((adjKer φ B).arrow.app V y)) = 0 := by
+  have h1
+      : (cokernel.π B.arrow).app (φ ⁻¹ᵁ V)
+          (((Scheme.Modules.pullbackPushforwardAdjunction φ).unit.app E).app V
+            ((adjKer φ B).arrow.app V y))
+        = 0 := by
     rw [adjMap, Adjunction.homEquiv_unit] at h0
     exact h0
   have hfac : g = cokernel.π B.arrow ≫ cokernel.desc B.arrow g hBg := (cokernel.π_desc _ _ _).symm
-  have h2 : (cokernel.π B.arrow).app U
-      (GlobalTheory.QCoh.pullbackSections φ E h ((adjKer φ B).arrow.app V y)) = 0 := by
+  have h2
+      : (cokernel.π B.arrow).app U
+          (GlobalTheory.QCoh.pullbackSections φ E h ((adjKer φ B).arrow.app V y))
+        = 0 := by
     rw [GlobalTheory.QCoh.pullbackSections_apply]
     erw [GlobalTheory.QCoh.hom_app_res (cokernel.π B.arrow) h]
     rw [h1, map_zero]

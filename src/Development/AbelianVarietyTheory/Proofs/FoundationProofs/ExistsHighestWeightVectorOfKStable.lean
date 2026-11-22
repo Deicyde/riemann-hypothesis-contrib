@@ -75,22 +75,28 @@ lemma eig_rat {p q : ℕ} (M : GKMod p q) (a : Ix p q) {t : ℂ} {v : M.V} (hv0 
     exact Module.End.mem_eigenspace_iff.2 (mem_wt.1 hx a)
   exact hv0 (Submodule.disjoint_def.1 hd v hv (hle (M.wts v)))
 
-theorem exists_highestWeight (p q : ℕ) (M : GKMod p q) (W : Submodule ℂ M.V)
-    (hfd : FiniteDimensional ℂ W) (hW : KStable M.act W) (h0 : W ≠ ⊥) :
-    ∃ (μ : Ix p q → ℚ) (v : M.V), v ∈ W ∧ IsHW M.act μ v := by
+theorem exists_highestWeight
+    (p q : ℕ) (M : GKMod p q) (W : Submodule ℂ M.V)
+    (hfd : FiniteDimensional ℂ W) (hW : KStable M.act W) (h0 : W ≠ ⊥)
+    : ∃ (μ : Ix p q → ℚ) (v : M.V), v ∈ W ∧ IsHW M.act μ v := by
   have hL : Formalism.MainNotions.SchurIrreducible.IsKLieAct M.act := fun X Y _ _ => M.lie X Y
   set c : Ix p q → ℂ := fun a => (grad p q a : ℂ) with hc
   set H : Module.End ℂ M.V := M.act (Matrix.diagonal c) with hH
   have hHW : ∀ x ∈ W, H x ∈ W := hW _ (isKC_diag c)
-  obtain ⟨t, ht, hmax⟩ := Set.exists_max_image _ Complex.re (finite_eig H W hHW)
-    (exists_eig H W h0 hHW)
+  obtain ⟨t, ht, hmax⟩ :=
+    Set.exists_max_image _ Complex.re (finite_eig H W hHW) (exists_eig H W h0 hHW)
   set N := W ⊓ H.eigenspace t with hN
   haveI : FiniteDimensional ℂ N := Submodule.finiteDimensional_of_le inf_le_left
   have hkill : ∀ a b, posC a b → ∀ x ∈ N, M.act (Eab a b) x = 0 := by
     intro a b hab x hx
     by_contra hne
-    have := hmax (t + (c a - c b)) ((Submodule.ne_bot_iff _).2 ⟨_,
-      ⟨hW _ (isKC_Eab (same_of_pos hab)) x hx.1, eig_shift hL c (same_of_pos hab) hx.2⟩, hne⟩)
+    have :=
+      hmax (t + (c a - c b))
+        ((Submodule.ne_bot_iff _).2 ⟨
+          _,
+          ⟨hW _ (isKC_Eab (same_of_pos hab)) x hx.1, eig_shift hL c (same_of_pos hab) hx.2⟩,
+          hne
+        ⟩)
     simp only [hc, Complex.add_re, Complex.sub_re, Complex.ofReal_re] at this
     linarith [grad_lt hab]
   have hst : ∀ a, ∀ x ∈ N, M.act (Eab a a) x ∈ N := by
@@ -98,7 +104,8 @@ theorem exists_highestWeight (p q : ℕ) (M : GKMod p q) (W : Submodule ℂ M.V)
     refine ⟨hW _ (isKC_Eab (same_refl a)) x hx.1, ?_⟩
     have := eig_shift hL c (same_refl a) hx.2
     rwa [sub_self, add_zero] at this
-  have hcomm : ∀ a b x, M.act (Eab a a) (M.act (Eab b b) x) = M.act (Eab b b) (M.act (Eab a a) x) := by
+  have hcomm
+      : ∀ a b x, M.act (Eab a a) (M.act (Eab b b) x) = M.act (Eab b b) (M.act (Eab a a) x) := by
     intro a b x
     rw [lie_apply hL (isKC_Eab (same_refl a)) (isKC_Eab (same_refl b))]
     have : (Eab a a * Eab b b - Eab b b * Eab a a : Mat p q) = 0 := by

@@ -10,21 +10,25 @@ noncomputable section
 
 namespace PI.LevelKSplit.W.NCA
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory Topology
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory Topology
 open PI.LevelKSplit PI.LevelKSplit.W.NC PI.LevelKSplit.W.SemiA
 open scoped TensorProduct
 
 section Gen
 
-variable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
+variable
+  {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V] [T2Space V]
   [LocallyCompactSpace V] [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
 
-theorem map_eq_of_split (p : V →+ V) (hp : Continuous p) (hpp : ∀ v, p (p v) = p v)
+theorem map_eq_of_split
+    (p : V →+ V) (hp : Continuous p) (hpp : ∀ v, p (p v) = p v)
     (W : AddSubgroup V) (hW : ∀ v, v ∈ W ↔ p v = v)
     (g : V →+ V) (hg : Continuous g) (hgU : ∀ u, p u = 0 → g u = u)
     (hV : ∀ μ : Measure V, μ.IsAddHaarMeasure → μ.map g = μ)
-    (f : W → W) (hf : ∀ w, (f w : V) = g w) (μ : Measure W) (hμ : μ.IsAddHaarMeasure) :
-    μ.map f = μ := by
+    (f : W → W) (hf : ∀ w, (f w : V) = g w)
+    (μ : Measure W) (hμ : μ.IsAddHaarMeasure)
+    : μ.map f = μ := by
   classical
   haveI := hμ
   set U : AddSubgroup V := p.ker with hUdef
@@ -49,17 +53,20 @@ theorem map_eq_of_split (p : V →+ V) (hp : Continuous p) (hpp : ∀ v, p (p v)
     have e : (Subtype.val ∘ f : W → V) = fun w : W => g (w : V) := funext hf
     rw [e]
     exact hg.comp continuous_subtype_val
-  let Φ : W × U →+ V := W.subtype.comp (AddMonoidHom.fst W U) + U.subtype.comp (AddMonoidHom.snd W U)
+  let Φ : W × U →+ V :=
+    W.subtype.comp (AddMonoidHom.fst W U) + U.subtype.comp (AddMonoidHom.snd W U)
   have hΦ : ∀ x : W × U, Φ x = (x.1 : V) + (x.2 : V) := fun x => rfl
   have hΦc : Continuous Φ := by
     have e : (Φ : W × U → V) = fun x => (x.1 : V) + (x.2 : V) := funext hΦ
     rw [e]
-    exact (continuous_subtype_val.comp continuous_fst).add (continuous_subtype_val.comp continuous_snd)
-  let Ψ : V → W × U := fun v => (⟨p v, (hW _).2 (hpp v)⟩,
-    ⟨v - p v, by simp [hUdef, AddMonoidHom.mem_ker, map_sub, hpp]⟩)
+    exact (continuous_subtype_val.comp continuous_fst).add
+      (continuous_subtype_val.comp continuous_snd)
+  let Ψ : V → W × U := fun v =>
+    (⟨p v, (hW _).2 (hpp v)⟩, ⟨v - p v, by simp [hUdef, AddMonoidHom.mem_ker, map_sub, hpp]⟩)
   have hΨc : Continuous Ψ :=
-    (hp.subtype_mk fun v => (hW _).2 (hpp v)).prodMk ((continuous_id.sub hp).subtype_mk fun v => by
-      simp [hUdef, AddMonoidHom.mem_ker, map_sub, hpp])
+    (hp.subtype_mk fun v => (hW _).2 (hpp v)).prodMk
+      ((continuous_id.sub hp).subtype_mk fun v => by
+        simp [hUdef, AddMonoidHom.mem_ker, map_sub, hpp])
   have hΦΨ : ∀ v, Φ (Ψ v) = v := fun v => by
     rw [hΦ]
     simp [Ψ]
@@ -76,9 +83,14 @@ theorem map_eq_of_split (p : V →+ V) (hp : Continuous p) (hpp : ∀ v, p (p v)
       rw [hpx, hΦ]
       simp
   have hΦs : Function.Surjective Φ := fun v => ⟨Ψ v, hΦΨ v⟩
-  let e : (W × U) ≃ₜ V :=
-    { toFun := Φ, invFun := Ψ, left_inv := hΨΦ, right_inv := hΦΨ,
-      continuous_toFun := hΦc, continuous_invFun := hΨc }
+  let e : (W × U) ≃ₜ V := {
+    toFun := Φ
+    invFun := Ψ
+    left_inv := hΨΦ
+    right_inv := hΦΨ
+    continuous_toFun := hΦc
+    continuous_invFun := hΨc
+  }
   let ν : Measure U := Measure.addHaar
   set P : Measure (W × U) := μ.prod ν with hP
   haveI hPH : P.IsAddHaarMeasure := by rw [hP]; infer_instance
@@ -91,8 +103,8 @@ theorem map_eq_of_split (p : V →+ V) (hp : Continuous p) (hpp : ∀ v, p (p v)
     simp only [Function.comp, Prod.map, id, hΦ, map_add (f := _), hgU u u.2, hf]
   have hfm : Measurable f := hfc.measurable
   have hPm : Measurable (Prod.map f (id : U → U)) := hfm.prodMap measurable_id
-  rw [Measure.map_map hg.measurable hΦc.measurable, hgΦ,
-    ← Measure.map_map hΦc.measurable hPm] at hmap
+  rw [Measure.map_map hg.measurable hΦc.measurable, hgΦ, ← Measure.map_map hΦc.measurable hPm]
+    at hmap
   have hinv : ∀ Q : Measure (W × U), (Q.map Φ).map Ψ = Q := by
     intro Q
     rw [Measure.map_map hΨc.measurable hΦc.measurable]
@@ -122,8 +134,10 @@ namespace DatL
 
 open PI.LevelKSplit.W.SemiG PI.LevelKSplit.W.SemiG.Dat
 
-variable {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n] {r : ℕ}
-  {D : PI.LevelKSplit.W.SemiG.Dat A n r}
+variable
+  {A : Type} [CommRing A]
+  {n : Type} [Fintype n] [DecidableEq n]
+  {r : ℕ} {D : PI.LevelKSplit.W.SemiG.Dat A n r}
 
 theorem h_e_pXv (H : D.Hyp) (b : Fin r) (v : n → A) : D.h (D.e b) (D.pXv v) = D.h (D.e b) v := by
   set_option synthInstance.maxHeartbeats 100000 in
@@ -149,7 +163,6 @@ theorem h_f_pXv (H : D.Hyp) (b : Fin r) (v : n → A) : D.h (D.f b) (D.pXv v) = 
   simp only [LinearMap.smulRight_apply, map_smul, smul_eq_mul, Dat.hL_apply, H.ff, mul_zero,
     Finset.sum_const_zero]
 
-
 variable (D) in
 def pL : (n → A) →ₗ[A] (n → A) := LinearMap.id - D.pX - D.pXv
 
@@ -172,8 +185,8 @@ theorem h_f_pL (H : D.Hyp) (b : Fin r) (v : n → A) : D.h (D.f b) (pL D v) = 0 
   rw [h_f_pX H, h_f_pXv H]
   ring
 
-theorem pL_of {v : n → A} (he : ∀ a, D.h (D.e a) v = 0) (hf : ∀ a, D.h (D.f a) v = 0) :
-    pL D v = v := by
+theorem pL_of {v : n → A} (he : ∀ a, D.h (D.e a) v = 0) (hf : ∀ a, D.h (D.f a) v = 0)
+    : pL D v = v := by
   have h1 : D.pX v = 0 := by
     simp only [Dat.pX, LinearMap.sum_apply, LinearMap.smulRight_apply, Dat.hL_apply, hf, zero_smul,
       Finset.sum_const_zero]
@@ -185,8 +198,10 @@ theorem pL_of {v : n → A} (he : ∀ a, D.h (D.e a) v = 0) (hf : ∀ a, D.h (D.
 theorem pL_pL (H : D.Hyp) (v : n → A) : pL D (pL D v) = pL D v :=
   pL_of (fun a => h_e_pL H a v) (fun a => h_f_pL H a v)
 
-theorem fix_of_pL_zero {S : (n → A) →ₗ[A] (n → A)} (hSe : ∀ a, S (D.e a) = D.e a)
-    (hSf : ∀ a, S (D.f a) = D.f a) {u : n → A} (hu : pL D u = 0) : S u = u := by
+theorem fix_of_pL_zero
+    {S : (n → A) →ₗ[A] (n → A)} (hSe : ∀ a, S (D.e a) = D.e a) (hSf : ∀ a, S (D.f a) = D.f a)
+    {u : n → A} (hu : pL D u = 0)
+    : S u = u := by
   have hu' : u = D.pX u + D.pXv u := by
     rw [pL_apply, sub_sub, sub_eq_zero] at hu
     exact hu
@@ -195,17 +210,19 @@ theorem fix_of_pL_zero {S : (n → A) →ₗ[A] (n → A)} (hSe : ∀ a, S (D.e 
   set_option synthInstance.maxHeartbeats 100000 in
     · simp only [Dat.pX, LinearMap.sum_apply, LinearMap.smulRight_apply, map_sum, map_smul, hSe]
   set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [Dat.pXv, LinearMap.sum_apply, LinearMap.smulRight_apply, map_sum, map_smul, hSf]
+  · simp only [Dat.pXv, LinearMap.sum_apply, LinearMap.smulRight_apply, map_sum, map_smul, hSf]
 
 end DatL
 
 section Wp
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] {R : Type} [CommRing R] [Algebra F R]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  {R : Type} [CommRing R] [Algebra F R]
   {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {r : ℕ} {P : Frame E M r} {T : F}
 
-theorem mem_Wp_iff (H : (datR R σ J P T).Hyp) (v : Fin M → R ⊗[F] E) :
-    v ∈ Wp R σ J P ↔ DatL.pL (datR R σ J P T) v = v := by
+theorem mem_Wp_iff (H : (datR R σ J P T).Hyp) (v : Fin M → R ⊗[F] E)
+    : v ∈ Wp R σ J P ↔ DatL.pL (datR R σ J P T) v = v := by
   constructor
   · rintro ⟨he, hf⟩
     exact DatL.pL_of (fun a => he a) (fun a => hf a)
@@ -219,11 +236,12 @@ theorem mem_Wp_iff (H : (datR R σ J P T).Hyp) (v : Fin M → R ⊗[F] E) :
       rw [h] at h1
       exact h1
 
-theorem lin_mem_Wp {h : HA R σ J} (hh : h ∈ Hsub R σ J P) {w : Fin M → R ⊗[F] E}
-    (hw : w ∈ Wp R σ J P) : lin R σ J h w ∈ Wp R σ J P := by
+theorem lin_mem_Wp
+    {h : HA R σ J} (hh : h ∈ Hsub R σ J P) {w : Fin M → R ⊗[F] E} (hw : w ∈ Wp R σ J P)
+    : lin R σ J h w ∈ Wp R σ J P := by
   obtain ⟨he, hf⟩ := hw
-  have hfix : ∀ i, lin R σ J h (ratV (F := F) R (tupH P i)) = ratV (F := F) R (tupH P i) :=
-    fun i => congrFun (MulAction.mem_stabilizer_iff.mp hh) i
+  have hfix : ∀ i, lin R σ J h (ratV (F := F) R (tupH P i)) = ratV (F := F) R (tupH P i) := fun i =>
+    congrFun (MulAction.mem_stabilizer_iff.mp hh) i
   change (∀ a, _) ∧ (∀ a, _)
   refine ⟨fun a => ?_, fun a => ?_⟩
   · have h1 := hfix (Fin.castAdd r (Fin.castSucc a))
@@ -242,19 +260,24 @@ end Wp
 
 section Af
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] [FiniteDimensional F E]
   {σ : E →ₐ[F] E} {M : ℕ} {J : Matrix (Fin M) (Fin M) E} {r : ℕ} {P : Frame E M r} {T : F}
 
 theorem sc_tens : SecondCountableTopology (Af F ⊗[F] E) := by
   haveI := PI.LevelKSplit.W.SC.finite_adeles_secondCountable F
   infer_instance
 
-theorem wp_map (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T)
-    (hV : PI.LevelKSplit.W.CD.ModV F E σ M J) {h : HA (Af F) σ J} (hh : h ∈ Hsub (Af F) σ J P)
-    (μ : Measure (Wp (Af F) σ J P)) (hμ : μ.IsAddHaarMeasure) : μ.map (linWp hh) = μ := by
+theorem wp_map
+    (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd σ J T)
+    (hV : PI.LevelKSplit.W.CD.ModV F E σ M J)
+    {h : HA (Af F) σ J} (hh : h ∈ Hsub (Af F) σ J P)
+    (μ : Measure (Wp (Af F) σ J P)) (hμ : μ.IsAddHaarMeasure)
+    : μ.map (linWp hh) = μ := by
   haveI := sc_tens (F := F) (E := E)
   have H := datR_hyp (R := Af F) hσσ hJ hP
-  have hfix : ∀ i, lin (Af F) σ J h (ratV (F := F) (Af F) (tupH P i)) = ratV (F := F) (Af F) (tupH P i) :=
+  have hfix
+      : ∀ i, lin (Af F) σ J h (ratV (F := F) (Af F) (tupH P i)) = ratV (F := F) (Af F) (tupH P i) :=
     fun i => congrFun (MulAction.mem_stabilizer_iff.mp hh) i
   have hSe : ∀ a, lin (Af F) σ J h ((datR (Af F) σ J P T).e a) = (datR (Af F) σ J P T).e a := by
     intro a
@@ -267,9 +290,15 @@ theorem wp_map (hσσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (hP : P.IsStd
     simp only [tupH, Fin.append_right] at h1
     exact h1
   refine map_eq_of_split (DatL.pL (datR (Af F) σ J P T)).toAddMonoidHom ?_
-    (fun v => DatL.pL_pL H v) (Wp (Af F) σ J P) (fun v => mem_Wp_iff H v)
-    (lin (Af F) σ J h).toAddMonoidHom ?_ (fun u hu => DatL.fix_of_pL_zero hSe hSf hu)
-    (fun ν hν => hV hJ hσσ h ν hν) (linWp hh) (fun w => rfl) μ hμ
+    (fun v => DatL.pL_pL H v)
+    (Wp (Af F) σ J P)
+    (fun v => mem_Wp_iff H v)
+    (lin (Af F) σ J h).toAddMonoidHom ?_
+    (fun u hu => DatL.fix_of_pL_zero hSe hSf hu)
+    (fun ν hν => hV hJ hσσ h ν hν)
+    (linWp hh)
+    (fun w => rfl)
+    μ hμ
   · exact LinearMap.continuous_on_pi _
   · exact LinearMap.continuous_on_pi _
 

@@ -11,13 +11,15 @@ noncomputable section
 
 namespace Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
-theorem jacobi_congr {a b s : ℕ} (h : a ≡ b [MOD s]) : jacobiSym (a : ℤ) s = jacobiSym (b : ℤ) s := by
+theorem jacobi_congr {a b s : ℕ} (h : a ≡ b [MOD s])
+    : jacobiSym (a : ℤ) s = jacobiSym (b : ℤ) s := by
   rw [jacobiSym.mod_left (a : ℤ), jacobiSym.mod_left (b : ℤ)]
   have h' : a % s = b % s := h
   rw [← Int.natCast_mod, ← Int.natCast_mod, h']
 
-theorem exists_jacobi_neg_one (m t : ℕ) (ht : Odd t) (hsq : Squarefree t) (h1 : 1 < t)
-    (hc : t.Coprime m) : ∃ u : ℕ, u ≡ 1 [MOD m] ∧ jacobiSym (u : ℤ) t = -1 := by
+theorem exists_jacobi_neg_one
+    (m t : ℕ) (ht : Odd t) (hsq : Squarefree t) (h1 : 1 < t) (hc : t.Coprime m)
+    : ∃ u : ℕ, u ≡ 1 [MOD m] ∧ jacobiSym (u : ℤ) t = -1 := by
   obtain ⟨p, hp, hpt⟩ := Nat.exists_prime_and_dvd (show t ≠ 1 by omega)
   haveI := Fact.mk hp
   obtain ⟨t', rfl⟩ := hpt
@@ -33,8 +35,8 @@ theorem exists_jacobi_neg_one (m t : ℕ) (ht : Odd t) (hsq : Squarefree t) (h1 
     exact hp.one_lt.ne' (Nat.isUnit_iff.mp this)
   have hcp : p.Coprime t' := (Nat.Prime.coprime_iff_not_dvd hp).mpr hpt'
   have hpm : p.Coprime m := Nat.Coprime.coprime_dvd_left (Dvd.intro t' rfl) hc
-  obtain ⟨a, ha⟩ := FiniteField.exists_nonsquare (F := ZMod p)
-    (by rw [ZMod.ringChar_zmod_n]; exact hp2)
+  obtain ⟨a, ha⟩ :=
+    FiniteField.exists_nonsquare (F := ZMod p) (by rw [ZMod.ringChar_zmod_n]; exact hp2)
   obtain ⟨k, hk1, hk2⟩ := Nat.chineseRemainder (Nat.Coprime.mul_right hcp hpm) a.val 1
   refine ⟨k, Nat.ModEq.of_mul_left t' hk2, ?_⟩
   haveI : NeZero t' := ⟨ht0⟩
@@ -42,10 +44,11 @@ theorem exists_jacobi_neg_one (m t : ℕ) (ht : Odd t) (hsq : Squarefree t) (h1 
     ← jacobiSym.legendreSym.to_jacobiSym p, (legendreSym.eq_neg_one_iff p).mpr (by simpa using ha)]
   simp
 
-private theorem dvd_of_jacobiSym_agree_on_residue_class (m₀ s₁ s₂ : ℕ) (h1 : Odd s₁) (h2 : Odd s₂)
-    (hq1 : Squarefree s₁) (hc1 : s₁.Coprime m₀)
-    (h : ∀ u : ℕ, u % m₀ = 1 % m₀ → u.Coprime (s₁ * s₂) → jacobiSym (u : ℤ) s₁ = jacobiSym (u : ℤ) s₂) :
-    s₁ ∣ s₂ := by
+private theorem dvd_of_jacobiSym_agree_on_residue_class
+    (m₀ s₁ s₂ : ℕ) (h1 : Odd s₁) (h2 : Odd s₂) (hq1 : Squarefree s₁) (hc1 : s₁.Coprime m₀)
+    (h : ∀ u : ℕ,
+      u % m₀ = 1 % m₀ → u.Coprime (s₁ * s₂) → jacobiSym (u : ℤ) s₁ = jacobiSym (u : ℤ) s₂)
+    : s₁ ∣ s₂ := by
   by_contra hnd
   have hs1 : s₁ ≠ 0 := by
     rintro rfl
@@ -56,7 +59,8 @@ private theorem dvd_of_jacobiSym_agree_on_residue_class (m₀ s₁ s₂ : ℕ) (
   have hgd : Nat.gcd s₁ s₂ ∣ s₁ := Nat.gcd_dvd_left s₁ s₂
   have hg0 : Nat.gcd s₁ s₂ ≠ 0 := Nat.gcd_ne_zero_left hs1
   have hga : Nat.gcd s₁ s₂ * (s₁ / Nat.gcd s₁ s₂) = s₁ := Nat.mul_div_cancel' hgd
-  have hgb : Nat.gcd s₁ s₂ * (s₂ / Nat.gcd s₁ s₂) = s₂ := Nat.mul_div_cancel' (Nat.gcd_dvd_right s₁ s₂)
+  have hgb : Nat.gcd s₁ s₂ * (s₂ / Nat.gcd s₁ s₂) = s₂ :=
+    Nat.mul_div_cancel' (Nat.gcd_dvd_right s₁ s₂)
   set g := Nat.gcd s₁ s₂ with hg
   set a := s₁ / g with ha
   set b := s₂ / g with hb
@@ -80,9 +84,9 @@ private theorem dvd_of_jacobiSym_agree_on_residue_class (m₀ s₁ s₂ : ℕ) (
     rw [← hgb]
     exact Nat.Coprime.mul_right hag hab
   have ham : a.Coprime m₀ := Nat.Coprime.coprime_dvd_left hadv hc1
-  obtain ⟨u, hu1, hJ⟩ := exists_jacobi_neg_one (m₀ * s₂) a hao haq
-    (lt_of_le_of_ne (Nat.pos_of_ne_zero ha0) (Ne.symm ha1))
-    (Nat.Coprime.mul_right ham has2)
+  obtain ⟨u, hu1, hJ⟩ :=
+    exists_jacobi_neg_one (m₀ * s₂) a hao haq
+      (lt_of_le_of_ne (Nat.pos_of_ne_zero ha0) (Ne.symm ha1)) (Nat.Coprime.mul_right ham has2)
   have hum : u ≡ 1 [MOD m₀] := Nat.ModEq.of_mul_right s₂ hu1
   have hus : u ≡ 1 [MOD s₂] := Nat.ModEq.of_mul_left m₀ hu1
   have hug : u ≡ 1 [MOD g] := Nat.ModEq.of_dvd (Nat.gcd_dvd_right s₁ s₂) hus
@@ -116,10 +120,12 @@ private theorem dvd_of_jacobiSym_agree_on_residue_class (m₀ s₁ s₂ : ℕ) (
   rw [hJ1, hJs] at this
   norm_num at this
 
-theorem jacobi_separate (m₀ s₁ s₂ : ℕ) (hm : 0 < m₀) (h1 : Odd s₁) (h2 : Odd s₂) (hq1 : Squarefree s₁)
+theorem jacobi_separate
+    (m₀ s₁ s₂ : ℕ) (hm : 0 < m₀) (h1 : Odd s₁) (h2 : Odd s₂) (hq1 : Squarefree s₁)
     (hq2 : Squarefree s₂) (hc1 : s₁.Coprime m₀) (hc2 : s₂.Coprime m₀)
-    (h : ∀ u : ℕ, u % m₀ = 1 % m₀ → u.Coprime (s₁ * s₂) → jacobiSym (u : ℤ) s₁ = jacobiSym (u : ℤ) s₂) :
-    s₁ = s₂ := by
+    (h : ∀ u : ℕ,
+      u % m₀ = 1 % m₀ → u.Coprime (s₁ * s₂) → jacobiSym (u : ℤ) s₁ = jacobiSym (u : ℤ) s₂)
+    : s₁ = s₂ := by
   apply Nat.dvd_antisymm
   · exact dvd_of_jacobiSym_agree_on_residue_class m₀ s₁ s₂ h1 h2 hq1 hc1 h
   · exact dvd_of_jacobiSym_agree_on_residue_class m₀ s₂ s₁ h2 h1 hq2 hc2

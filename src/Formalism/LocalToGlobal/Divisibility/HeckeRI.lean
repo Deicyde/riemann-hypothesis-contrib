@@ -17,19 +17,17 @@ open Formalism.DivisionValues Formalism.L2.Indef
 
 section Dat
 
-variable {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
+variable
+  {K : Type} [Field K] [NumberField K] [StarRing K] {G : Type} [Group G] [Fintype G] {Pl0 : Type}
 
-structure FamIn3 (K : Type) [Field K] [NumberField K] [StarRing K] (G : Type) [Group G] [Fintype G]
+structure FamIn3
+    (K : Type) [Field K] [NumberField K] [StarRing K]
+    (G : Type) [Group G] [Fintype G]
     (Pl0 I0 Ty T : Type) (m : ℕ) where
-
   A : FamIn K G Pl0 T m
-
   okI : T → Set I0
-
   heckeRI : ∀ τ, okI τ × Ty → Module.End K (A.MtildeCSD τ).Forms
-
   heckeLI : ∀ j τ, okI τ × Ty → Module.End K (A.MtCSD j τ).Forms
-
   trI : Fin m → (I0 × Ty → K) → I0 × Ty → K
 
 namespace FamIn3
@@ -52,7 +50,8 @@ def fam3 : DefFam3 K G Pl0 I0 Ty T (Fin m) where
   LI := A3.liftI
   trI := A3.trI
 
-def side3 (P : Subgroup G) (ψ : P →* Kˣ) (Zs : DefSub A3.fam3.amb3) : DefSide A3.fam3.base3 := A3.fam3.side3 P ψ Zs
+def side3 (P : Subgroup G) (ψ : P →* Kˣ) (Zs : DefSub A3.fam3.amb3) : DefSide A3.fam3.base3 :=
+  A3.fam3.side3 P ψ Zs
 
 end FamIn3
 

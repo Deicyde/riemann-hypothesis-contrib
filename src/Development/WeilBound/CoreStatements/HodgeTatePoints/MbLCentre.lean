@@ -13,8 +13,10 @@ open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberFiel
 
 namespace PositivityTheory.HtPt.Mb.LCentre.Centre
 
-theorem isUnit_regAt_iff {X : Scheme.{0}} {Ω : Type} [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
-    (p : Cpt ξ) (a : regAt ξ p) : IsUnit a ↔ unitAt ξ p (a : Ω) := by
+theorem isUnit_regAt_iff
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    (ξ : Spec (CommRingCat.of Ω) ⟶ X) (p : Cpt ξ) (a : regAt ξ p)
+    : IsUnit a ↔ unitAt ξ p (a : Ω) := by
   constructor
   · intro h
     obtain ⟨b, hb⟩ := isUnit_iff_exists_inv.1 h
@@ -26,7 +28,16 @@ theorem isUnit_regAt_iff {X : Scheme.{0}} {Ω : Type} [Field Ω] (ξ : Spec (Com
   · rintro ⟨h0, -, hi⟩
     exact isUnit_iff_exists_inv.2 ⟨⟨(a : Ω)⁻¹, hi⟩, Subtype.ext (mul_inv_cancel₀ h0)⟩
 
-theorem exists_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (M : PModel o x) (X' : Scheme.{0}) (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (p' : Cpt ξ'), p' ∈ ctrSet o x i ξ' → ∃ p₀ : Cpt M.ξ, ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p') ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a) ∧ (∀ p : Cpt M.ξ, (∀ a ∈ regAt M.ξ p, i a ∈ regAt ξ' p') → p₀.1 ⤳ p.1) ∧ ∀ c, x c ≠ 0 → (∀ j, i (x j / x c) ∈ regAt ξ' p') → InChart M.ξ x c p₀ := by
+theorem exists_centre
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (M : PModel o x) (X' : Scheme.{0}) (Ω' : Type) [Field Ω']
+        (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (p' : Cpt ξ'),
+      p' ∈ ctrSet o x i ξ'
+        → ∃ p₀ : Cpt M.ξ,
+          ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p')
+              ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a)
+            ∧ (∀ p : Cpt M.ξ, (∀ a ∈ regAt M.ξ p, i a ∈ regAt ξ' p') → p₀.1 ⤳ p.1)
+            ∧ ∀ c, x c ≠ 0 → (∀ j, i (x j / x c) ∈ regAt ξ' p') → InChart M.ξ x c p₀ := by
   intro o _ Ω _ _ κ _ x M X' Ω' _ ξ' i p' hp'
   obtain ⟨c, hc, hreg⟩ := hp'
   haveI : IsLocalRing (regAt ξ' p') := (PositivityTheory.HtPt.Ma.reg_local X' Ω' ξ').1 p'
@@ -71,8 +82,7 @@ theorem exists_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Alge
       exact hj c
     have hu := hlift _ hmem hunit
     refine ⟨h1, fun j => ?_⟩
-    have h2 : x j / x c₁ = x j / x c * (x c₁ / x c)⁻¹ := by
-      field_simp
+    have h2 : x j / x c₁ = x j / x c * (x c₁ / x c)⁻¹ := by field_simp
     rw [h2]
     exact mul_mem (hch _ (Algebra.subset_adjoin ⟨j, rfl⟩)) hu.2.2
   refine ⟨p₀, ⟨hdom, hlift⟩, ?_, hchart⟩
@@ -83,14 +93,23 @@ theorem exists_centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Alge
   intro a ha
   obtain ⟨u, hu, v, hv, hvu, rfl⟩ := ((hloc c₁ p hc₁).2 a).1 ha
   have hch₁ := (hloc c₁ p₀ hin₁).1
-  have hv' : unitAt M.ξ p₀ v := hlift v (hch₁ v hv)
-    ⟨(map_ne_zero i).2 hvu.1, hp v hvu.2.1, by rw [← map_inv₀]; exact hp _ hvu.2.2⟩
+  have hv' : unitAt M.ξ p₀ v :=
+    hlift v (hch₁ v hv)
+      ⟨(map_ne_zero i).2 hvu.1, hp v hvu.2.1, by rw [← map_inv₀]; exact hp _ hvu.2.2⟩
   rw [div_eq_mul_inv]
   exact mul_mem (hch₁ u hu) hv'.2.2
 
 end PositivityTheory.HtPt.Mb.LCentre.Centre
 
-
 open AlgebraicGeometry CategoryTheory GlobalTheory.CompanionTheory.Ar NumberField in
-theorem PositivityTheory.HtPt.Mb.centre : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω) (M : PModel o x) (X' : Scheme.{0}) (Ω' : Type) [Field Ω'] (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (p' : Cpt ξ'), p' ∈ ctrSet o x i ξ' → ∃ p₀ : Cpt M.ξ, ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p') ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a) ∧ (∀ p : Cpt M.ξ, (∀ a ∈ regAt M.ξ p, i a ∈ regAt ξ' p') → p₀.1 ⤳ p.1) ∧ ∀ c, x c ≠ 0 → (∀ j, i (x j / x c) ∈ regAt ξ' p') → InChart M.ξ x c p₀ :=
+theorem PositivityTheory.HtPt.Mb.centre
+    : ∀ (o : Type) [CommRing o] (Ω : Type) [Field Ω] [Algebra o Ω] (κ : Type) [Finite κ] (x : κ → Ω)
+        (M : PModel o x) (X' : Scheme.{0}) (Ω' : Type) [Field Ω']
+        (ξ' : Spec (CommRingCat.of Ω') ⟶ X') (i : Ω →+* Ω') (p' : Cpt ξ'),
+      p' ∈ ctrSet o x i ξ'
+        → ∃ p₀ : Cpt M.ξ,
+          ((∀ a ∈ regAt M.ξ p₀, i a ∈ regAt ξ' p')
+              ∧ ∀ a ∈ regAt M.ξ p₀, unitAt ξ' p' (i a) → unitAt M.ξ p₀ a)
+            ∧ (∀ p : Cpt M.ξ, (∀ a ∈ regAt M.ξ p, i a ∈ regAt ξ' p') → p₀.1 ⤳ p.1)
+            ∧ ∀ c, x c ≠ 0 → (∀ j, i (x j / x c) ∈ regAt ξ' p') → InChart M.ξ x c p₀ :=
   @PositivityTheory.HtPt.Mb.LCentre.Centre.exists_centre

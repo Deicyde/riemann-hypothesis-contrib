@@ -17,10 +17,12 @@ open MajorantConjugateTransfer
 
 variable {r : ℕ} (X : Data E r) (ξ : Fin r → E) (τ : X.Ψ)
 
-theorem flowMat_add (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (a b : ℂ) :
-    X.flowMat ξ τ (a + b) = X.flowMat ξ τ a * X.flowMat ξ τ b := by
-  obtain ⟨V, hV⟩ : ∃ V : Matrix (Fin r) (Fin r) ℂ,
-      V = Matrix.of fun a b => τ.1 (ξ a) * ∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k)) := ⟨_, rfl⟩
+theorem flowMat_add (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (a b : ℂ)
+    : X.flowMat ξ τ (a + b) = X.flowMat ξ τ a * X.flowMat ξ τ b := by
+  obtain ⟨V, hV⟩
+      : ∃ V : Matrix (Fin r) (Fin r) ℂ,
+        V = Matrix.of fun a b => τ.1 (ξ a) * ∑ k, τ.1 (X.Gm b k) * conj (τ.1 (ξ k)) :=
+    ⟨_, rfl⟩
   have hM : ∀ s : ℂ, X.flowMat ξ τ s = 1 - (I * (X.c τ : ℂ) * s) • V := by
     intro s
     ext a b
@@ -28,19 +30,21 @@ theorem flowMat_add (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ
       Matrix.of_apply, smul_eq_mul]
     ring
   have h0 : ∑ k, τ.1 (ξ k) * ∑ m, τ.1 (X.Gm k m) * conj (τ.1 (ξ m)) = 0 := by
-    calc _ = hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) := by
-          simp only [hermC, Data.emb, Finset.mul_sum]
-          exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun m _ => by ring
+    calc
+      _ = hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) := by
+        simp only [hermC, Data.emb, Finset.mul_sum]
+        exact Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun m _ => by ring
       _ = 0 := hiso
   have hVV : V * V = 0 := by
     ext a b
     simp only [hV, Matrix.mul_apply, Matrix.of_apply, Matrix.zero_apply]
-    calc ∑ k, τ.1 (ξ a) * (∑ m, τ.1 (X.Gm k m) * conj (τ.1 (ξ m))) *
-          (τ.1 (ξ k) * ∑ m, τ.1 (X.Gm b m) * conj (τ.1 (ξ m)))
-        = τ.1 (ξ a) * (∑ m, τ.1 (X.Gm b m) * conj (τ.1 (ξ m))) *
-          ∑ k, τ.1 (ξ k) * ∑ m, τ.1 (X.Gm k m) * conj (τ.1 (ξ m)) := by
-          rw [Finset.mul_sum]
-          exact Finset.sum_congr rfl fun k _ => by ring
+    calc
+      ∑ k, τ.1 (ξ a) * (∑ m, τ.1 (X.Gm k m) * conj (τ.1 (ξ m))) *
+       (τ.1 (ξ k) * ∑ m, τ.1 (X.Gm b m) * conj (τ.1 (ξ m)))
+          = τ.1 (ξ a) * (∑ m, τ.1 (X.Gm b m) * conj (τ.1 (ξ m)))
+            * ∑ k, τ.1 (ξ k) * ∑ m, τ.1 (X.Gm k m) * conj (τ.1 (ξ m)) := by
+        rw [Finset.mul_sum]
+        exact Finset.sum_congr rfl fun k _ => by ring
       _ = 0 := by rw [h0, mul_zero]
   simp only [hM, sub_mul, mul_sub, one_mul, mul_one, Matrix.smul_mul, Matrix.mul_smul, smul_smul,
     hVV, smul_zero, sub_zero, mul_add, add_smul]
@@ -50,9 +54,11 @@ theorem flowMat_zero : X.flowMat ξ τ 0 = 1 := by
   ext a b
   simp only [Data.flowMat, Matrix.of_apply, mul_zero, zero_mul, sub_zero, Matrix.one_apply]
 
-theorem flow_split (hiso : ∀ τ : X.Ψ, hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0)
-    (s : X.Ψ → ℂ) (x : Frame X.Ψ r) :
-    X.flow ξ s x = X.flow ξ (fun τ => I * ((s τ).im : ℂ)) (X.flow ξ (fun τ => ((s τ).re : ℂ)) x) := by
+theorem flow_split
+    (hiso : ∀ τ : X.Ψ, hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (s : X.Ψ → ℂ)
+    (x : Frame X.Ψ r)
+    : X.flow ξ s x
+      = X.flow ξ (fun τ => I * ((s τ).im : ℂ)) (X.flow ξ (fun τ => ((s τ).re : ℂ)) x) := by
   funext τ
   have hs : I * ((s τ).im : ℂ) + ((s τ).re : ℂ) = s τ := by
     rw [add_comm, mul_comm, Complex.re_add_im]
@@ -61,8 +67,9 @@ theorem flow_split (hiso : ∀ τ : X.Ψ, hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Da
   conv_lhs => rw [← hs]
   rw [flowMat_add X ξ τ (hiso τ), mul_assoc]
 
-theorem flowMat_inv (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (a : ℂ)
-    (w : Fin r → ℂ) : Matrix.mulVec (X.flowMat ξ τ a) (Matrix.mulVec (X.flowMat ξ τ (-a)) w) = w := by
+theorem flowMat_inv
+    (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (a : ℂ) (w : Fin r → ℂ)
+    : Matrix.mulVec (X.flowMat ξ τ a) (Matrix.mulVec (X.flowMat ξ τ (-a)) w) = w := by
   rw [Matrix.mulVec_mulVec, ← flowMat_add X ξ τ hiso, add_neg_cancel, flowMat_zero,
     Matrix.one_mulVec]
 
@@ -79,12 +86,15 @@ private lemma hermC_sub_smul_right_lemma_9 (σ : E →+* ℂ) (G : Matrix (Fin r
     ← Finset.sum_sub_distrib]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
-theorem flowMat_isom_real (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (t : ℝ)
-    (u v : Fin r → ℂ) :
-    hermC τ.1 X.Gm (Matrix.mulVec (X.flowMat ξ τ t) u) (Matrix.mulVec (X.flowMat ξ τ t) v) =
-      hermC τ.1 X.Gm u v := by
-  have hMv : ∀ w : Fin r → ℂ, Matrix.mulVec (X.flowMat ξ τ t) w =
-      w - (I * (X.c τ : ℂ) * (t : ℂ) * hermC τ.1 X.Gm w (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ := by
+theorem flowMat_isom_real
+    (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb τ.1 ξ) = 0) (t : ℝ) (u v : Fin r → ℂ)
+    : hermC τ.1 X.Gm (Matrix.mulVec (X.flowMat ξ τ t) u) (Matrix.mulVec (X.flowMat ξ τ t) v)
+      = hermC τ.1 X.Gm u v := by
+  have hMv
+      : ∀ w : Fin r → ℂ,
+        Matrix.mulVec (X.flowMat ξ τ t) w
+          = w
+            - (I * (X.c τ : ℂ) * (t : ℂ) * hermC τ.1 X.Gm w (Data.emb τ.1 ξ)) • Data.emb τ.1 ξ := by
     intro w
     funext i
     show ∑ b, X.flowMat ξ τ t i b * w b = _
@@ -94,21 +104,21 @@ theorem flowMat_isom_real (hiso : hermC τ.1 X.Gm (Data.emb τ.1 ξ) (Data.emb �
     congr 1
     simp only [Finset.mul_sum, Finset.sum_mul]
     exact Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun k _ => by ring
-  rw [hMv u, hMv v, hermC_sub_smul_left_lemma_8, hermC_sub_smul_right_lemma_9, hermC_sub_smul_right_lemma_9,
-    hiso, ← hermC_conj τ.1 X.Gm_herm v (Data.emb τ.1 ξ)]
+  rw [hMv u, hMv v, hermC_sub_smul_left_lemma_8, hermC_sub_smul_right_lemma_9,
+    hermC_sub_smul_right_lemma_9, hiso, ← hermC_conj τ.1 X.Gm_herm v (Data.emb τ.1 ξ)]
   simp only [map_mul, Complex.conj_I, Complex.conj_ofReal]
   ring
 
-theorem Hf_add_left (x : Frame X.Ψ r) (u u' w : Fin r → ℂ) :
-    X.Hf x τ (u + u') w = X.Hf x τ u w + X.Hf x τ u' w := by
+theorem Hf_add_left (x : Frame X.Ψ r) (u u' w : Fin r → ℂ)
+    : X.Hf x τ (u + u') w = X.Hf x τ u w + X.Hf x τ u' w := by
   unfold Data.Hf hermC
   rw [X.ppos_add x τ]
   simp only [smul_add, Pi.add_apply, Pi.sub_apply, Pi.smul_apply, smul_eq_mul,
     ← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
 
-theorem Hf_add_right (x : Frame X.Ψ r) (u w w' : Fin r → ℂ) :
-    X.Hf x τ u (w + w') = X.Hf x τ u w + X.Hf x τ u w' := by
+theorem Hf_add_right (x : Frame X.Ψ r) (u w w' : Fin r → ℂ)
+    : X.Hf x τ u (w + w') = X.Hf x τ u w + X.Hf x τ u w' := by
   unfold Data.Hf hermC
   simp only [Pi.add_apply, map_add (f := _), mul_add, Finset.sum_add_distrib]
 
@@ -193,13 +203,13 @@ private lemma maj_eq_lemma_7 (x : Frame X.Ψ r) (v : Fin r → ℂ) :
   rw [← hP, hermC_smul_sub_left_lemma_3, Complex.sub_re, Complex.mul_re]
   simp
 
-theorem maj_jp {x : Frame X.Ψ r} (hx : x ∈ X.dom) (v : Fin r → ℂ) :
-    X.maj x τ (X.jp x τ v) = X.maj x τ v := by
+theorem maj_jp {x : Frame X.Ψ r} (hx : x ∈ X.dom) (v : Fin r → ℂ)
+    : X.maj x τ (X.jp x τ v) = X.maj x τ v := by
   rw [maj_eq_lemma_7 X τ x (X.jp x τ v), maj_eq_lemma_7 X τ x v, X.jp_jp hx τ v,
     ← hermC_conj τ.1 X.Gm_herm v (X.jp x τ v), Complex.conj_re]
 
-theorem herm_eq_Hf_jp {x : Frame X.Ψ r} (hx : x ∈ X.dom) (u v : Fin r → ℂ) :
-    hermC τ.1 X.Gm u v = X.Hf x τ u (X.jp x τ v) := by
+theorem herm_eq_Hf_jp {x : Frame X.Ψ r} (hx : x ∈ X.dom) (u v : Fin r → ℂ)
+    : hermC τ.1 X.Gm u v = X.Hf x τ u (X.jp x τ v) := by
   exact (hermC_jp_lemma_6 X τ hx u v).symm
 
 private lemma flowMat_mulVec_lemma_10 (t : ℝ) (w : Fin r → ℂ) :
@@ -214,9 +224,9 @@ private lemma flowMat_mulVec_lemma_10 (t : ℝ) (w : Fin r → ℂ) :
   simp only [Finset.mul_sum, Finset.sum_mul]
   exact Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun k _ => by ring
 
-theorem maj_flow_le {x : Frame X.Ψ r} (hx : x ∈ X.dom) (t : ℝ) (u : Fin r → ℂ) :
-    X.maj x τ (Matrix.mulVec (X.flowMat ξ τ t) u) ≤
-      (1 + X.c τ * |t| * X.maj x τ (Data.emb τ.1 ξ)) ^ 2 * X.maj x τ u := by
+theorem maj_flow_le {x : Frame X.Ψ r} (hx : x ∈ X.dom) (t : ℝ) (u : Fin r → ℂ)
+    : X.maj x τ (Matrix.mulVec (X.flowMat ξ τ t) u)
+      ≤ (1 + X.c τ * |t| * X.maj x τ (Data.emb τ.1 ξ)) ^ 2 * X.maj x τ u := by
   have hHs : ∀ p q, conj (X.Hf x τ p q) = X.Hf x τ q p := by
     intro p q
     unfold Data.Hf
@@ -245,9 +255,11 @@ theorem maj_flow_le {x : Frame X.Ψ r} (hx : x ∈ X.dom) (t : ℝ) (u : Fin r �
     unfold Data.Hf
     simp only [hermC, Pi.smul_apply, smul_eq_mul, map_mul, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
-  have hexp : ∀ (α β : ℂ) p q, X.Hf x τ (α • p + β • q) (α • p + β • q) =
-      α * conj α * X.Hf x τ p p + α * conj β * X.Hf x τ p q + β * conj α * X.Hf x τ q p +
-        β * conj β * X.Hf x τ q q := by
+  have hexp
+      : ∀ (α β : ℂ) p q,
+        X.Hf x τ (α • p + β • q) (α • p + β • q)
+          = α * conj α * X.Hf x τ p p + α * conj β * X.Hf x τ p q + β * conj α * X.Hf x τ q p
+            + β * conj β * X.Hf x τ q q := by
     intro α β p q
     simp only [Hf_add_left X τ, Hf_add_right X τ, hsl, hsr]
     ring
@@ -263,8 +275,9 @@ theorem maj_flow_le {x : Frame X.Ψ r} (hx : x ∈ X.dom) (t : ℝ) (u : Fin r �
       have h0 := hnn (((X.maj x τ q : ℝ) : ℂ) • p + (-z) • q)
       rw [hN, hexp, hreal p, hreal q, ← hHs p q, ← hz] at h0
       simp only [Complex.add_re, Complex.mul_re, Complex.neg_re, Complex.neg_im, Complex.conj_re,
-        Complex.conj_im, Complex.ofReal_re, Complex.ofReal_im, Complex.mul_im, Complex.add_im,
-        map_neg] at h0
+          Complex.conj_im, Complex.ofReal_re, Complex.ofReal_im, Complex.mul_im, Complex.add_im,
+          map_neg]
+        at h0
       rw [← hz, Complex.normSq_apply]
       nlinarith [h0, hn]
   obtain ⟨ℓ, hℓ⟩ : ∃ ℓ, ℓ = hermC τ.1 X.Gm u (Data.emb τ.1 ξ) := ⟨_, rfl⟩
@@ -272,11 +285,11 @@ theorem maj_flow_le {x : Frame X.Ψ r} (hx : x ∈ X.dom) (t : ℝ) (u : Fin r �
   have hMu : Matrix.mulVec (X.flowMat ξ τ t) u = (1 : ℂ) • u + (-β) • Data.emb τ.1 ξ := by
     rw [flowMat_mulVec_lemma_10 X ξ τ t u, ← hℓ, ← hβ, one_smul, neg_smul, sub_eq_add_neg]
   obtain ⟨z, hz⟩ : ∃ z, z = X.Hf x τ u (Data.emb τ.1 ξ) := ⟨_, rfl⟩
-  have hval : X.maj x τ (Matrix.mulVec (X.flowMat ξ τ t) u) = X.maj x τ u -
-      2 * (conj β * z).re + Complex.normSq β * X.maj x τ (Data.emb τ.1 ξ) := by
+  have hval
+      : X.maj x τ (Matrix.mulVec (X.flowMat ξ τ t) u)
+        = X.maj x τ u - 2 * (conj β * z).re + Complex.normSq β * X.maj x τ (Data.emb τ.1 ξ) := by
     rw [hN, hMu, hexp, hreal u, hreal (Data.emb τ.1 ξ), ← hHs u (Data.emb τ.1 ξ), ← hz]
-    have e1 : β * conj z = conj (conj β * z) := by
-      rw [map_mul, Complex.conj_conj, mul_comm]
+    have e1 : β * conj z = conj (conj β * z) := by rw [map_mul, Complex.conj_conj, mul_comm]
     have e2 : β * conj β = (Complex.normSq β : ℂ) := Complex.mul_conj β
     simp only [map_one, one_mul, mul_one, map_neg, neg_mul, mul_neg, neg_neg]
     rw [e1, e2]

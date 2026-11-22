@@ -12,22 +12,28 @@ noncomputable section
 
 namespace Formalism.L2.SG.Pf.Coef.SplitCoefficientComponents.RF
 
-open Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG ValuativeRel PI.IntegralDiscriminantMembership
+open Formalism.MainNotions.S.Loc Formalism.MainNotions.S.LocNG ValuativeRel
+  PI.IntegralDiscriminantMembership
 
-theorem finite_max_of {R : Type*} [CommRing R] (c : R) (hc : ∀ m : Ideal R, m.IsMaximal → c ∈ m)
-    (hfin : Finite (R ⧸ Ideal.span {c})) : {m : Ideal R | m.IsMaximal}.Finite := by
+theorem finite_max_of
+    {R : Type*} [CommRing R]
+    (c : R) (hc : ∀ m : Ideal R, m.IsMaximal → c ∈ m) (hfin : Finite (R ⧸ Ideal.span {c}))
+    : {m : Ideal R | m.IsMaximal}.Finite := by
   haveI := hfin
   haveI : Finite (Ideal (R ⧸ Ideal.span {c})) :=
     Finite.of_injective (fun I : Ideal (R ⧸ Ideal.span {c}) => (I : Set (R ⧸ Ideal.span {c}))) SetLike.coe_injective
-  refine (Set.finite_univ.image (fun J : Ideal (R ⧸ Ideal.span {c}) => Ideal.comap (Ideal.Quotient.mk _) J)).subset ?_
+  refine (Set.finite_univ.image (fun J : Ideal (R ⧸ Ideal.span {c}) =>
+    Ideal.comap (Ideal.Quotient.mk _) J)).subset ?_
   intro m hm
   refine ⟨Ideal.map (Ideal.Quotient.mk _) m, Set.mem_univ _, ?_⟩
   dsimp only
-  rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot, Ideal.mk_ker]
+  rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
+    Ideal.mk_ker]
   exact sup_eq_left.mpr ((Ideal.span_singleton_le_iff_mem m).mpr (hc m hm))
 
-theorem finite_max_of_equiv {R S : Type*} [CommRing R] [CommRing S] (e : R ≃+* S)
-    (h : {m : Ideal S | m.IsMaximal}.Finite) : {m : Ideal R | m.IsMaximal}.Finite := by
+theorem finite_max_of_equiv
+    {R S : Type*} [CommRing R] [CommRing S] (e : R ≃+* S) (h : {m : Ideal S | m.IsMaximal}.Finite)
+    : {m : Ideal R | m.IsMaximal}.Finite := by
   refine (h.image (fun n : Ideal S => Ideal.comap e n)).subset ?_
   intro m hm
   haveI : m.IsMaximal := hm
@@ -37,21 +43,24 @@ theorem finite_max_of_equiv {R S : Type*} [CommRing R] [CommRing S] (e : R ≃+*
   | exact Ideal.comap_map_of_bijective e e.bijective
   | simp
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem unit_one_sub (M : Model F E) (hOK : M.OK) (π : 𝒪[F]) (hπ : π ∈ nonunits 𝒪[F]) (r : M.L.O) :
-    IsUnit (1 - (⟨algebraMap F E (π : F), (alg_mem_O M).mpr π.2⟩ : M.L.O) * r) := by
+theorem unit_one_sub (M : Model F E) (hOK : M.OK) (π : 𝒪[F]) (hπ : π ∈ nonunits 𝒪[F]) (r : M.L.O)
+    : IsUnit (1 - (⟨algebraMap F E (π : F), (alg_mem_O M).mpr π.2⟩ : M.L.O) * r) := by
   have := hOK.loc
   haveI : IsLocalRing 𝒪[F] := inferInstance
   obtain ⟨⟨tr, htr⟩, ⟨nr, hnr⟩⟩ := (mem_O_iff M r).mp r.2
   set x : E := 1 - algebraMap F E (π : F) * r with hx
   have hcj : M.L.cj x = 1 - algebraMap F E (π : F) * M.L.cj r := by
     rw [hx, map_sub, map_one, map_mul, cj_alg]
-  have hN : x * M.L.cj x = algebraMap F E ((1 : F) - (π : F) * ((tr : F) - (π : F) * (nr : F))) := by
+  have hN
+      : x * M.L.cj x = algebraMap F E ((1 : F) - (π : F) * ((tr : F) - (π : F) * (nr : F))) := by
     rw [hcj, hx]
     simp only [map_sub, map_one, map_mul]
-    rw [htr, hnr]; ring
+    rw [htr, hnr]
+    ring
   set n : 𝒪[F] := 1 - π * (tr - π * nr) with hn
   have hnu : IsUnit n := by
     apply IsLocalRing.isUnit_one_sub_self_of_mem_nonunits
@@ -59,14 +68,16 @@ theorem unit_one_sub (M : Model F E) (hOK : M.OK) (π : 𝒪[F]) (hπ : π ∈ n
   obtain ⟨nu, hnu'⟩ := hnu
   have hNn : x * M.L.cj x = algebraMap F E (n : F) := by rw [hN, hn]; push_cast; ring_nf
   have hyO : M.L.cj x * algebraMap F E ((nu⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) ∈ M.L.O :=
-    M.L.O.mul_mem (Formalism.L2.SG.Pf.Cnt.DualityBasisChange.cj_mem_O (M := M) x (by
-      rw [hx]; exact M.L.O.sub_mem M.L.O.one_mem (M.L.O.mul_mem ((alg_mem_O M).mpr π.2) r.2)))
+    M.L.O.mul_mem
+      (Formalism.L2.SG.Pf.Cnt.DualityBasisChange.cj_mem_O (M := M) x
+        (by rw [hx]; exact M.L.O.sub_mem M.L.O.one_mem (M.L.O.mul_mem ((alg_mem_O M).mpr π.2) r.2)))
       ((alg_mem_O M).mpr (nu⁻¹ : 𝒪[F]ˣ).1.2)
   refine isUnit_iff_exists_inv.2 ⟨⟨_, hyO⟩, Subtype.ext ?_⟩
   show x * (M.L.cj x * algebraMap F E ((nu⁻¹ : 𝒪[F]ˣ) : 𝒪[F])) = 1
   rw [← mul_assoc, hNn, ← map_mul, ← hnu']
   rw [show ((nu : 𝒪[F]) : F) * (((nu⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) : F) = 1 by
-    rw [← Subring.coe_mul, Units.mul_inv]; rfl, map_one]
+      rw [← Subring.coe_mul, Units.mul_inv]; rfl,
+    map_one]
 
 theorem finite_max_O (M : Model F E) (hOK : M.OK) : {m : Ideal M.L.O | m.IsMaximal}.Finite := by
   have := hOK.loc
@@ -74,9 +85,12 @@ theorem finite_max_O (M : Model F E) (hOK : M.OK) : {m : Ideal M.L.O | m.IsMaxim
   set c : M.L.O := ⟨algebraMap F E (π : F), (alg_mem_O M).mpr π.2⟩ with hc
   refine finite_max_of c (fun m hm => ?_) ?_
   · by_contra hcm
-    have htop : m ⊔ Ideal.span {c} = ⊤ := hm.1.2 _ (lt_of_le_of_ne le_sup_left (fun h => hcm (h ▸
-      Ideal.mem_sup_right (Ideal.mem_span_singleton_self c))))
-    obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.1 (htop ▸ Submodule.mem_top : (1 : M.L.O) ∈ m ⊔ Ideal.span {c})
+    have htop : m ⊔ Ideal.span {c} = ⊤ :=
+      hm.1.2 _
+        (lt_of_le_of_ne le_sup_left
+          (fun h => hcm (h ▸ Ideal.mem_sup_right (Ideal.mem_span_singleton_self c))))
+    obtain ⟨a, ha, b, hb, hab⟩ :=
+      Submodule.mem_sup.1 (htop ▸ Submodule.mem_top : (1 : M.L.O) ∈ m ⊔ Ideal.span {c})
     obtain ⟨r, rfl⟩ := Ideal.mem_span_singleton'.1 hb
     have hu := unit_one_sub M hOK π hπ.not_isUnit r
     have : a = 1 - c * r := by rw [← hab]; ring
@@ -88,12 +102,15 @@ theorem finite_max_O (M : Model F E) (hOK : M.OK) : {m : Ideal M.L.O | m.IsMaxim
 
 section ModeG
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
   {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-theorem mem_R_some (M : Model F E) {g : SplitG M.L} (hs : M.split = some g) (x : E) :
-    x ∈ M.R ↔ ∃ a b : 𝒪[F], g.e x = ((a : F), (b : F)) ∧
-      Ideal.Quotient.mk (Ideal.span {g.q}) a = Ideal.Quotient.mk (Ideal.span {g.q}) b := by
+theorem mem_R_some (M : Model F E) {g : SplitG M.L} (hs : M.split = some g) (x : E)
+    : x ∈ M.R
+      ↔ ∃ a b : 𝒪[F],
+        g.e x = ((a : F), (b : F))
+          ∧ Ideal.Quotient.mk (Ideal.span {g.q}) a = Ideal.Quotient.mk (Ideal.span {g.q}) b := by
   unfold Formalism.MainNotions.S.Loc.Model.R
   rw [hs]
   simp only [Subring.mem_comap, Subring.mem_map]
@@ -103,10 +120,13 @@ theorem mem_R_some (M : Model F E) {g : SplitG M.L} (hs : M.split = some g) (x :
   · rintro ⟨a, b, he, hab⟩
     exact ⟨(a, b), hab, he.symm⟩
 
-theorem isUnit_of_fst (M : Model F E) (hOK : M.OK) {g : SplitG M.L} (hs : M.split = some g) (x : M.R)
-    (a b : 𝒪[F]) (he : g.e x = ((a : F), (b : F)))
-    (hab : Ideal.Quotient.mk (Ideal.span {g.q}) a = Ideal.Quotient.mk (Ideal.span {g.q}) b) (ha : IsUnit a) :
-    IsUnit x := by
+theorem isUnit_of_fst
+    (M : Model F E) (hOK : M.OK)
+    {g : SplitG M.L} (hs : M.split = some g)
+    (x : M.R) (a b : 𝒪[F]) (he : g.e x = ((a : F), (b : F)))
+    (hab : Ideal.Quotient.mk (Ideal.span {g.q}) a = Ideal.Quotient.mk (Ideal.span {g.q}) b)
+    (ha : IsUnit a)
+    : IsUnit x := by
   have := hOK.loc
   haveI : IsLocalRing 𝒪[F] := inferInstance
   obtain ⟨s, hsq⟩ := Ideal.mem_span_singleton'.1 ((Ideal.Quotient.eq).1 hab.symm)
@@ -130,31 +150,49 @@ theorem isUnit_of_fst (M : Model F E) (hOK : M.OK) {g : SplitG M.L} (hs : M.spli
     refine Ideal.mem_span_singleton'.2 ⟨((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * s, ?_⟩
     have h1 : ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * (ub : 𝒪[F]) = 1 := Units.inv_mul ub
     have h2 : ((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * (ua : 𝒪[F]) = 1 := Units.inv_mul ua
-    have e1 : ((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) - ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) =
-        ((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * ((ub : 𝒪[F]) - (ua : 𝒪[F])) := by
+    have e1
+        : ((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) - ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F])
+          = ((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * ((ub : 𝒪[F]) - (ua : 𝒪[F])) := by
       linear_combination (-((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F])) * h1 + ((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) * h2
-    rw [e1, ← hsq]; ring
+    rw [e1, ← hsq]
+    ring
   refine isUnit_iff_exists_inv.2 ⟨⟨y, hyR⟩, Subtype.ext ?_⟩
   show (x : E) * y = 1
   apply g.e.injective
   rw [map_mul, he, hy, AlgEquiv.apply_symm_apply, map_one]
   ext
   · show ((ua : 𝒪[F]) : F) * (((ua⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) : F) = 1
-    rw [← Subring.coe_mul, Units.mul_inv]; rfl
+    rw [← Subring.coe_mul, Units.mul_inv]
+    rfl
   · show ((ub : 𝒪[F]) : F) * (((ub⁻¹ : 𝒪[F]ˣ) : 𝒪[F]) : F) = 1
-    rw [← Subring.coe_mul, Units.mul_inv]; rfl
+    rw [← Subring.coe_mul, Units.mul_inv]
+    rfl
 
-theorem fst_isUnit (M : Model F E) {g : SplitG M.L} (hs : M.split = some g) (x : M.R) (hx : IsUnit x)
-    (a b : 𝒪[F]) (he : g.e x = ((a : F), (b : F))) : IsUnit a := by
+theorem fst_isUnit
+    (M : Model F E)
+    {g : SplitG M.L} (hs : M.split = some g)
+    (x : M.R) (hx : IsUnit x)
+    (a b : 𝒪[F]) (he : g.e x = ((a : F), (b : F)))
+    : IsUnit a := by
   obtain ⟨u, rfl⟩ := hx
-  obtain ⟨a', b', he', -⟩ := (mem_R_some M hs (((u⁻¹ : (M.R)ˣ) : M.R) : E)).mp ((u⁻¹ : (M.R)ˣ) : M.R).2
+  obtain ⟨a', b', he', -⟩ :=
+    (mem_R_some M hs (((u⁻¹ : (M.R)ˣ) : M.R) : E)).mp ((u⁻¹ : (M.R)ˣ) : M.R).2
   have h1 : g.e ((((u : (M.R)ˣ) : M.R) : E) * (((u⁻¹ : (M.R)ˣ) : M.R) : E)) = 1 := by
     rw [← MulMemClass.coe_mul, Units.mul_inv, OneMemClass.coe_one, map_one]
   rw [map_mul, he, he'] at h1
   have h2 : (a : F) * a' = 1 := congrArg Prod.fst h1
-  exact ⟨⟨a, a', Subtype.ext (by push_cast; exact h2), Subtype.ext (by push_cast; rw [mul_comm]; exact h2)⟩, rfl⟩
+  exact ⟨
+    ⟨
+      a,
+      a',
+      Subtype.ext (by push_cast; exact h2),
+      Subtype.ext (by push_cast; rw [mul_comm]; exact h2)
+    ⟩,
+    rfl
+  ⟩
 
-theorem isLocal_R (M : Model F E) (hOK : M.OK) {g : SplitG M.L} (hs : M.split = some g) : IsLocalRing M.R := by
+theorem isLocal_R (M : Model F E) (hOK : M.OK) {g : SplitG M.L} (hs : M.split = some g)
+    : IsLocalRing M.R := by
   have := hOK.loc
   haveI : IsLocalRing 𝒪[F] := inferInstance
   haveI : Nontrivial M.R := by
@@ -177,7 +215,8 @@ theorem rFinMax_holds : RFinMax := by
   intro F _ _ _ E _ _ _ _ M hOK
   cases hs : M.split with
   | none =>
-    exact finite_max_of_equiv (RingEquiv.subringCongr (PI.NGStepBBW.R_eq_O_of_none hs)) (finite_max_O M hOK)
+    exact finite_max_of_equiv (RingEquiv.subringCongr (PI.NGStepBBW.R_eq_O_of_none hs))
+      (finite_max_O M hOK)
   | some g =>
     haveI := isLocal_R M hOK hs
     refine (Set.finite_singleton (IsLocalRing.maximalIdeal M.R)).subset ?_

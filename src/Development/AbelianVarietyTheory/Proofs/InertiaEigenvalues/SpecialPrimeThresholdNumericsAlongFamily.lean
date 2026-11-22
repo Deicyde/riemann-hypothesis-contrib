@@ -10,16 +10,25 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.NEqRZeroMulXPow
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
+open NumberField IsDedekindDomain Formalism Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pass GlobalTheory.Cut
 
 namespace GlobalTheory
 
-theorem lStar_numerics_at_record : ∀ {eps : ℝ} (Fm : FamP eps) (x : ℝ), Fm.x1 < x → ∀ (a : Fm.Ix x),
-    ((Fm.D x a).R.t : ℝ) ≤ (Fm.L x a).etaSz ∧ 0 < (Fm.L x a).etaSz ∧ 0 ≤ (Fm.L x a).sc.b / LevelStarExponents.lStar (Fm.L x a) ∧
-    0 ≤ (Fm.L x a).Sc ∧ 1 < LevelStarExponents.lStar (Fm.L x a) ∧
-    2 * (Fm.L x a).etaSz + (Fm.D x a).R.t + 8 * ((Fm.L x a).sc.b / LevelStarExponents.lStar (Fm.L x a)) + 7 < LevelStarExponents.lStar (Fm.L x a) ∧
-    ((Fm.L x a).sc.b + (Fm.L x a).Sc + 2 * (Fm.L x a).etaSz + 3) * LevelStarExponents.lStar (Fm.L x a) ≤
-      2 * (Fm.L x a).sc.b * (LevelStarExponents.lStar (Fm.L x a) - 1) := by
+theorem lStar_numerics_at_record
+    : ∀ {eps : ℝ} (Fm : FamP eps) (x : ℝ),
+      Fm.x1 < x
+        → ∀ (a : Fm.Ix x),
+          ((Fm.D x a).R.t : ℝ) ≤ (Fm.L x a).etaSz ∧ 0 < (Fm.L x a).etaSz
+            ∧ 0 ≤ (Fm.L x a).sc.b / LevelStarExponents.lStar (Fm.L x a) ∧ 0 ≤ (Fm.L x a).Sc
+            ∧ 1 < LevelStarExponents.lStar (Fm.L x a)
+            ∧ 2 * (Fm.L x a).etaSz + (Fm.D x a).R.t
+                + 8 * ((Fm.L x a).sc.b / LevelStarExponents.lStar (Fm.L x a)) + 7
+              < LevelStarExponents.lStar (Fm.L x a)
+            ∧ ((Fm.L x a).sc.b + (Fm.L x a).Sc + 2 * (Fm.L x a).etaSz + 3)
+                * LevelStarExponents.lStar (Fm.L x a)
+              ≤ 2 * (Fm.L x a).sc.b * (LevelStarExponents.lStar (Fm.L x a) - 1) := by
   intro eps Fm x hx a
   have P := Fm.params x hx a
   set L := Fm.L x a with hLdef
@@ -42,24 +51,33 @@ theorem lStar_numerics_at_record : ∀ {eps : ℝ} (Fm : FamP eps) (x : ℝ), Fm
   have hn := Formalism.MainNotions.TwistedPlaces.n_ge_one (Fm.D x a)
   have hL1 := Formalism.MainNotions.TwistedPlaces.L_ge_one L
   have hbl : 0 ≤ L.sc.b / LevelStarExponents.lStar L := div_nonneg (by linarith) hls.le
-  have h8 : 8 * L.sc.b / LevelStarExponents.lStar L = 8 * (L.sc.b / LevelStarExponents.lStar L) := by ring
+  have h8
+      : 8 * L.sc.b / LevelStarExponents.lStar L = 8 * (L.sc.b / LevelStarExponents.lStar L) := by
+    ring
   rw [h8] at h2
 
   have hDen2 : 2 * ((Fm.D x a).R.m : ℝ) ≤ Formalism.MainNotions.TwistedPlaces.Den L := by
     unfold Formalism.MainNotions.TwistedPlaces.Den
     have hn2 : (1 : ℝ) ≤ ((Fm.D x a).R.n : ℝ) ^ 2 := by nlinarith
     have hLg0 : (0 : ℝ) ≤ Formalism.MainNotions.TwistedPlaces.large₂ L := by linarith
-    have h0 : (0 : ℝ) ≤ ((Fm.D x a).R.n : ℝ) * ((Fm.D x a).R.t : ℝ) ^ 2 *
-        (((Fm.D x a).R.N (Fm.D x a).R.m : ℝ) + (Fm.D x a).R.t) * Formalism.MainNotions.TwistedPlaces.large₂ L ^ 2 := by positivity
-    have hA : (2 : ℝ) ≤ L.Sc + (Fm.D x a).R.t + Formalism.MainNotions.TwistedPlaces.large₂ L := by linarith
+    have h0
+        : (0 : ℝ)
+          ≤ ((Fm.D x a).R.n : ℝ) * ((Fm.D x a).R.t : ℝ) ^ 2
+            * (((Fm.D x a).R.N (Fm.D x a).R.m : ℝ) + (Fm.D x a).R.t)
+            * Formalism.MainNotions.TwistedPlaces.large₂ L ^ 2 := by
+      positivity
+    have hA : (2 : ℝ) ≤ L.Sc + (Fm.D x a).R.t + Formalism.MainNotions.TwistedPlaces.large₂ L := by
+      linarith
     have hB : (1 : ℝ) ≤ ((Fm.D x a).R.k : ℝ) * ((Fm.D x a).R.n : ℝ) ^ 2 := by nlinarith
-    have : 2 * ((Fm.D x a).R.k : ℝ) * ((Fm.D x a).R.n : ℝ) ^ 2 ≤
-        ((Fm.D x a).R.k : ℝ) * ((Fm.D x a).R.n : ℝ) ^ 2 * (L.Sc + (Fm.D x a).R.t + Formalism.MainNotions.TwistedPlaces.large₂ L) := by
+    have : 2 * ((Fm.D x a).R.k : ℝ) * ((Fm.D x a).R.n : ℝ) ^ 2
+        ≤ ((Fm.D x a).R.k : ℝ) * ((Fm.D x a).R.n : ℝ) ^ 2
+          * (L.Sc + (Fm.D x a).R.t + Formalism.MainNotions.TwistedPlaces.large₂ L) := by
       nlinarith
     nlinarith
   have hlb : 2 * LevelStarExponents.lStar L ≤ L.sc.b := by nlinarith
   have hb' := Formalism.MainNotions.TwistedPlaces.b'_pos L
-  have hq : L.sc.b / LevelStarExponents.lStar L * LevelStarExponents.lStar L = L.sc.b := div_mul_cancel₀ _ hls.ne'
+  have hq : L.sc.b / LevelStarExponents.lStar L * LevelStarExponents.lStar L = L.sc.b :=
+    div_mul_cancel₀ _ hls.ne'
   refine ⟨P.t_le_eta, he, hbl, hS.le, by linarith, h2, ?_⟩
   nlinarith
 

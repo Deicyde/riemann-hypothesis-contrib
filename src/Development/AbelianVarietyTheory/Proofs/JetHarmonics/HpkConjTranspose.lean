@@ -164,32 +164,57 @@ private lemma mulVec_adjugate_single_last_apply_eq_zero_of_lt (z' : Fin (2 * r +
     simp [conjTranspose_apply, _root_.GlobalTheory.LeadingMinorInv.flagMat, _root_.Formalism.QuantumDeterminants.fvec, _root_.Formalism.QuantumDeterminants.bvec, Pi.single_apply, hl]
   · simp
 
-
 open Matrix in
-theorem _root_.GlobalTheory.WigSh.omg_mul_N : ∀ (k r : ℕ) (z z' : (Fin (2 * r + k + 1) → ℂ))
-    (g m : _root_.Formalism.FourierDecayAlt.Q.Mx k r), _root_.Formalism.QuantumDeterminants.inWb k r z → _root_.Formalism.QuantumDeterminants.inWb k r z' →
-    g ∈ _root_.Formalism.QuantumDeterminants.UH (_root_.Formalism.QuantumDeterminants.Hpk k r) → m ∈ _root_.Formalism.QuantumDeterminants.Nset k r →
-    _root_.GlobalTheory.WigSh.omg k r z z' (g * m) = _root_.GlobalTheory.WigSh.omg k r z z' g := by
+theorem _root_.GlobalTheory.WigSh.omg_mul_N
+    : ∀ (k r : ℕ) (z z' : (Fin (2 * r + k + 1) → ℂ))
+        (g m : _root_.Formalism.FourierDecayAlt.Q.Mx k r),
+      _root_.Formalism.QuantumDeterminants.inWb k r z
+        → _root_.Formalism.QuantumDeterminants.inWb k r z'
+        → g ∈ _root_.Formalism.QuantumDeterminants.UH (_root_.Formalism.QuantumDeterminants.Hpk k r)
+        → m ∈ _root_.Formalism.QuantumDeterminants.Nset k r
+        → _root_.GlobalTheory.WigSh.omg k r z z' (g * m)
+          = _root_.GlobalTheory.WigSh.omg k r z z' g := by
   intro k r z z' g m _ hz' _ hm
   obtain ⟨U, hU, hmF⟩ := _root_.GlobalTheory.LeadingMinorInv.exists_N k r z' hz' m hm
-  have hmUH : m ∈ _root_.Formalism.QuantumDeterminants.UH (_root_.Formalism.QuantumDeterminants.Hpk k r) := ((_root_.PI.QuotSetU.UnitaryGroupMassFormula.SW.mem_Nset_iff m).1 hm).1
-  have hQm : _root_.Formalism.QuantumDeterminants.Hpk k r * (g * m)ᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z =
-      m⁻¹ * (_root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z) := by
+  have hmUH
+      : m
+        ∈ _root_.Formalism.QuantumDeterminants.UH (_root_.Formalism.QuantumDeterminants.Hpk k r) :=
+    ((_root_.PI.QuotSetU.UnitaryGroupMassFormula.SW.mem_Nset_iff m).1 hm).1
+  have hQm
+      : _root_.Formalism.QuantumDeterminants.Hpk k r * (g * m)ᴴ
+          * _root_.Formalism.QuantumDeterminants.Hpk k r
+          * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z
+        = m⁻¹
+          * (_root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ
+            * _root_.Formalism.QuantumDeterminants.Hpk k r
+            * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z) := by
     rw [inv_eq_hpk_mul_conjTranspose_mul_hpk_of_mem_UH hmUH]
     simp only [conjTranspose_mul, Matrix.mul_assoc, hpk_mul_hpk_mul_eq_self]
-  have hC : (m⁻¹ * (_root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z))ᴴ *
-      (_root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z') =
-      ((_root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z)ᴴ *
-        (_root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z')) * U := by
+  have hC
+      : (m⁻¹
+            * (_root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ
+              * _root_.Formalism.QuantumDeterminants.Hpk k r
+              * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z))ᴴ
+          * (_root_.Formalism.QuantumDeterminants.Hpk k r
+            * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z')
+        = ((_root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ
+              * _root_.Formalism.QuantumDeterminants.Hpk k r
+              * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z)ᴴ
+            * (_root_.Formalism.QuantumDeterminants.Hpk k r
+              * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z'))
+          * U := by
     rw [conjTranspose_mul m⁻¹, inv_eq_hpk_mul_conjTranspose_mul_hpk_of_mem_UH hmUH]
     simp only [conjTranspose_mul, conjTranspose_conjTranspose, hpk_conjTranspose_eq_self',
       Matrix.mul_assoc, hpk_mul_hpk_mul_eq_self, hmF]
   have he : U.adjugateᴴ *ᵥ Pi.single (Fin.last r) 1 = Pi.single (Fin.last r) 1 := by
     ext a
     simp [mulVec_single_one, conjTranspose_apply, adjugate_upUni_last_apply hU, Pi.single_apply]
-  rw [rW_mulVec_adjugate_zhat_single_last_eq, rW_mulVec_adjugate_zhat_single_last_eq, gram_eq_conjTranspose_hpk_mul_flagMat_mul, gram_eq_conjTranspose_hpk_mul_flagMat_mul, hQm, hC, adjugate_mul_distrib, conjTranspose_mul,
-    ← mulVec_mulVec _ (adjugate _)ᴴ, he, ← mulVec_mulVec _ m⁻¹]
-  exact prW_mulVec_eq_of_mem_nset_of_tail_eq_zero ((_root_.PI.QuotSetU.UnitaryGroupMassFormula.SW.nilpotent_subgroup k r).2.2 m hm)
+  rw [rW_mulVec_adjugate_zhat_single_last_eq, rW_mulVec_adjugate_zhat_single_last_eq,
+    gram_eq_conjTranspose_hpk_mul_flagMat_mul, gram_eq_conjTranspose_hpk_mul_flagMat_mul, hQm, hC,
+    adjugate_mul_distrib, conjTranspose_mul, ← mulVec_mulVec _ (adjugate _)ᴴ, he,
+    ← mulVec_mulVec _ m⁻¹]
+  exact prW_mulVec_eq_of_mem_nset_of_tail_eq_zero
+    ((_root_.PI.QuotSetU.UnitaryGroupMassFormula.SW.nilpotent_subgroup k r).2.2 m hm)
     (mulVec_adjugate_single_last_apply_eq_zero_of_lt _ _)
 
 end GlobalTheory.WigSh

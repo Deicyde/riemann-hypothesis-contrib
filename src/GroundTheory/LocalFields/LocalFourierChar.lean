@@ -17,8 +17,8 @@ variable {K : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchi
 
 section Basis
 
-theorem hasBasis_nhds_zero_valBall :
-    (𝓝 (0 : K)).HasBasis (fun _ : ℤ => True) (fun n => (valBall (K := K) n : Set K)) := by
+theorem hasBasis_nhds_zero_valBall
+    : (𝓝 (0 : K)).HasBasis (fun _ : ℤ => True) (fun n => (valBall (K := K) n : Set K)) := by
   have hballs := tendsto_zero_iff_valBall.mp (tendsto_id (x := 𝓝 (0 : K)))
   refine ⟨fun t => ⟨fun ht => ?_, fun ⟨n, _, hn⟩ => Filter.mem_of_superset (hballs n) hn⟩⟩
   by_contra h
@@ -41,12 +41,14 @@ end Basis
 
 section Characters
 
-
 omit [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] in
-theorem eq_one_of_forall_norm_sub_one_lt (χ : AddChar K Circle) (H : AddSubgroup K)
-    (h : ∀ x ∈ H, ‖(χ x : ℂ) - 1‖ < 1 / 2) {x : K} (hx : x ∈ H) : χ x = 1 := by
-  have := GroundTheory.Global.eq_one_of_sq_mem (s := (fun y => (χ y : ℂ)) '' (H : Set K)) ?_ ?_
-    ⟨x, hx, rfl⟩
+theorem eq_one_of_forall_norm_sub_one_lt
+    (χ : AddChar K Circle) (H : AddSubgroup K) (h : ∀ x ∈ H, ‖(χ x : ℂ) - 1‖ < 1 / 2)
+    {x : K} (hx : x ∈ H)
+    : χ x = 1 := by
+  have :=
+    GroundTheory.Global.eq_one_of_sq_mem (s := (fun y => (χ y : ℂ)) '' (H : Set K)) ?_ ?_
+      ⟨x, hx, rfl⟩
   · exact Circle.coe_eq_one.mp this
   · rintro _ ⟨y, hy, rfl⟩
     refine ⟨y + y, H.add_mem hy hy, ?_⟩
@@ -54,8 +56,7 @@ theorem eq_one_of_forall_norm_sub_one_lt (χ : AddChar K Circle) (H : AddSubgrou
   · rintro _ ⟨y, hy, rfl⟩
     exact h y hy
 
-theorem setOf_norm_sub_one_lt_mem_nhds :
-    {z : Circle | ‖(z : ℂ) - 1‖ < 1 / 2} ∈ 𝓝 (1 : Circle) := by
+theorem setOf_norm_sub_one_lt_mem_nhds : {z : Circle | ‖(z : ℂ) - 1‖ < 1 / 2} ∈ 𝓝 (1 : Circle) := by
   have hc : Continuous fun z : Circle ↦ ‖(z : ℂ) - 1‖ :=
     (continuous_subtype_val.sub continuous_const).norm
   exact (isOpen_lt hc continuous_const).mem_nhds (by simp)
@@ -65,10 +66,10 @@ variable (ψ : AddChar K Circle)
 def IsTrivialOn (n : ℤ) : Prop := ∀ x ∈ valBall (K := K) n, ψ x = 1
 
 variable {ψ} in
-theorem IsTrivialOn.mono {m n : ℤ} (h : IsTrivialOn ψ m) (hmn : m ≤ n) : IsTrivialOn ψ n :=
-  fun x hx => by
-    have hval : normalizedValuation K x ≤ WithZero.exp (-n) := hx
-    exact h x (hval.trans (WithZero.exp_le_exp.mpr (by omega)))
+theorem IsTrivialOn.mono {m n : ℤ} (h : IsTrivialOn ψ m) (hmn : m ≤ n)
+    : IsTrivialOn ψ n := fun x hx => by
+  have hval : normalizedValuation K x ≤ WithZero.exp (-n) := hx
+  exact h x (hval.trans (WithZero.exp_le_exp.mpr (by omega)))
 
 theorem exists_isTrivialOn (hψ : Continuous ψ) : ∃ n, IsTrivialOn ψ n := by
   have : ψ ⁻¹' {z : Circle | ‖(z : ℂ) - 1‖ < 1 / 2} ∈ 𝓝 (0 : K) := by
@@ -76,7 +77,8 @@ theorem exists_isTrivialOn (hψ : Continuous ψ) : ∃ n, IsTrivialOn ψ n := by
     rw [AddChar.map_zero_eq_one]
     exact setOf_norm_sub_one_lt_mem_nhds
   obtain ⟨n, -, hn⟩ := hasBasis_nhds_zero_valBall.mem_iff.mp this
-  exact ⟨n, fun x hx => eq_one_of_forall_norm_sub_one_lt ψ (valBall (K := K) n) (fun y hy => hn hy) hx⟩
+  exact
+    ⟨n, fun x hx => eq_one_of_forall_norm_sub_one_lt ψ (valBall (K := K) n) (fun y hy => hn hy) hx⟩
 
 theorem exists_le_of_isTrivialOn (hψ1 : ψ ≠ 1) : ∃ N, ∀ n, IsTrivialOn ψ n → N ≤ n := by
   obtain ⟨x, hx⟩ : ∃ x, ψ x ≠ 1 := by
@@ -102,13 +104,14 @@ theorem isTrivialOn_addCharConductor : IsTrivialOn ψ (addCharConductor ψ) := b
   obtain ⟨n, hn⟩ := exists_isTrivialOn ψ hψ
   exact Int.csInf_mem ⟨n, hn⟩ (bddBelow_isTrivialOn hψ1)
 
-theorem isTrivialOn_iff (n : ℤ) : IsTrivialOn ψ n ↔ addCharConductor ψ ≤ n :=
-  ⟨fun h => csInf_le (bddBelow_isTrivialOn hψ1) h,
-    fun h => (isTrivialOn_addCharConductor hψ hψ1).mono h⟩
+theorem isTrivialOn_iff (n : ℤ) : IsTrivialOn ψ n ↔ addCharConductor ψ ≤ n := ⟨
+  fun h => csInf_le (bddBelow_isTrivialOn hψ1) h,
+  fun h => (isTrivialOn_addCharConductor hψ hψ1).mono h
+⟩
 
 omit hψ hψ1 in
-theorem isTrivialOn_mulShift_iff {a : K} (ha : a ≠ 0) (n : ℤ) :
-    IsTrivialOn (ψ.mulShift a) n ↔ IsTrivialOn ψ (n + ord a) := by
+theorem isTrivialOn_mulShift_iff {a : K} (ha : a ≠ 0) (n : ℤ)
+    : IsTrivialOn (ψ.mulShift a) n ↔ IsTrivialOn ψ (n + ord a) := by
   constructor
   · intro h y hy
     have hy' : y ∈ a • (valBall (K := K) n : Set K) := by
@@ -124,8 +127,8 @@ theorem isTrivialOn_mulShift_iff {a : K} (ha : a ≠ 0) (n : ℤ) :
     rw [smul_valBall ha] at this
     exact this
 
-theorem isTrivialOn_mulShift_iff_mem (a : K) (n : ℤ) :
-    IsTrivialOn (ψ.mulShift a) n ↔ a ∈ valBall (K := K) (addCharConductor ψ - n) := by
+theorem isTrivialOn_mulShift_iff_mem (a : K) (n : ℤ)
+    : IsTrivialOn (ψ.mulShift a) n ↔ a ∈ valBall (K := K) (addCharConductor ψ - n) := by
   by_cases ha : a = 0
   · simp [ha, IsTrivialOn]
   rw [isTrivialOn_mulShift_iff ha, isTrivialOn_iff hψ hψ1, mem_valBall_iff_le_ord ha]
@@ -143,12 +146,12 @@ omit hψ [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] in
 theorem mulShift_ne_one {a : K} (ha : a ≠ 0) : ψ.mulShift a ≠ 1 :=
   AddChar.IsPrimitive.of_ne_one hψ1 ha
 
-
-theorem addCharConductor_mulShift {a : K} (ha : a ≠ 0) :
-    addCharConductor (ψ.mulShift a) = addCharConductor ψ - ord a := by
+theorem addCharConductor_mulShift {a : K} (ha : a ≠ 0)
+    : addCharConductor (ψ.mulShift a) = addCharConductor ψ - ord a := by
   have hc := continuous_mulShift hψ a
   have h1 := mulShift_ne_one hψ1 ha
-  have key : ∀ n, addCharConductor (ψ.mulShift a) ≤ n ↔ addCharConductor ψ - ord a ≤ n := fun n => by
+  have key
+      : ∀ n, addCharConductor (ψ.mulShift a) ≤ n ↔ addCharConductor ψ - ord a ≤ n := fun n => by
     rw [← isTrivialOn_iff hc h1, isTrivialOn_mulShift_iff ha, isTrivialOn_iff hψ hψ1]
     omega
   exact le_antisymm ((key _).mpr le_rfl) ((key _).mp le_rfl)
@@ -169,7 +172,6 @@ end Duality
 section SelfDual
 
 variable {ψ : AddChar K Circle} (hψ : Continuous ψ) (hψ1 : ψ ≠ 1)
-
 
 end SelfDual
 

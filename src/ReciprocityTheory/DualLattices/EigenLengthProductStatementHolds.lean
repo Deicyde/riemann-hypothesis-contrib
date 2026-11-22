@@ -18,14 +18,18 @@ section len
 
 variable {C : Type} [Field C] {v : Valuation C NNReal} {R : Type} [CommRing R] [Algebra R C]
 
-theorem hasLen_equiv {M N : Type} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
-    (e : M ≃ₗ[R] N) {x : NNReal} (h : HasLen v R N x) : HasLen v R M x := by
+theorem hasLen_equiv
+    {M N : Type} [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N]
+    (e : M ≃ₗ[R] N)
+    {x : NNReal} (h : HasLen v R N x)
+    : HasLen v R M x := by
   obtain ⟨m, c, ⟨f⟩, hx⟩ := h
   exact ⟨m, c, ⟨e.trans f⟩, hx⟩
 
-theorem hasLen_pi {m : ℕ} (M : Fin m → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]
-    (X : Fin m → NNReal) (h : ∀ i, HasLen v R (M i) (X i)) :
-    HasLen v R ((i : Fin m) → M i) (∏ i, X i) := by
+theorem hasLen_pi
+    {m : ℕ} (M : Fin m → Type) [∀ i, AddCommGroup (M i)] [∀ i, Module R (M i)]
+    (X : Fin m → NNReal) (h : ∀ i, HasLen v R (M i) (X i))
+    : HasLen v R ((i : Fin m) → M i) (∏ i, X i) := by
   classical
   choose n c he hX using h
   let e : ∀ i, M i ≃ₗ[R] ((j : Fin (n i)) → R ⧸ Ideal.span {c i j}) := fun i => (he i).some
@@ -34,17 +38,19 @@ theorem hasLen_pi {m : ℕ} (M : Fin m → Type) [∀ i, AddCommGroup (M i)] [�
   · exact (LinearEquiv.piCongrRight e).trans
       ((LinearEquiv.piCurry R (fun i j => R ⧸ Ideal.span {c i j})).symm.trans
         (LinearEquiv.piCongrLeft R (fun p : Σ i, Fin (n i) => R ⧸ Ideal.span {c p.1 p.2}) σ).symm)
-  · rw [Fintype.prod_equiv σ (fun k => v (algebraMap R C (c (σ k).1 (σ k).2)))
-      (fun p => v (algebraMap R C (c p.1 p.2))) (fun k => rfl), Fintype.prod_sigma]
+  · rw [Fintype.prod_equiv σ
+        (fun k => v (algebraMap R C (c (σ k).1 (σ k).2)))
+        (fun p => v (algebraMap R C (c p.1 p.2)))
+        (fun k => rfl),
+      Fintype.prod_sigma]
     exact Finset.prod_congr rfl fun i _ => hX i
 
 end len
 
 variable {R : Type} [CommRing R]
 
-theorem sum_fromBlocks_diag {g : ℕ} {ι : Type} (s : Finset ι)
-    (A D : ι → Matrix (Fin g) (Fin g) R) :
-    ∑ i ∈ s, fromBlocks (A i) 0 0 (D i) = fromBlocks (∑ i ∈ s, A i) 0 0 (∑ i ∈ s, D i) := by
+theorem sum_fromBlocks_diag {g : ℕ} {ι : Type} (s : Finset ι) (A D : ι → Matrix (Fin g) (Fin g) R)
+    : ∑ i ∈ s, fromBlocks (A i) 0 0 (D i) = fromBlocks (∑ i ∈ s, A i) 0 0 (∑ i ∈ s, D i) := by
   classical
   induction s using Finset.induction_on with
   | empty => simp [fromBlocks_zero]
@@ -52,8 +58,9 @@ theorem sum_fromBlocks_diag {g : ℕ} {ι : Type} (s : Finset ι)
     rw [Finset.sum_insert ha, Finset.sum_insert ha, Finset.sum_insert ha, ih, fromBlocks_add,
       add_zero]
 
-theorem sum_mulVec' {n : Type} [Fintype n] {ι : Type} (s : Finset ι) (A : ι → Matrix n n R)
-    (w : n → R) : (∑ i ∈ s, A i) *ᵥ w = ∑ i ∈ s, A i *ᵥ w := by
+theorem sum_mulVec'
+    {n : Type} [Fintype n] {ι : Type} (s : Finset ι) (A : ι → Matrix n n R) (w : n → R)
+    : (∑ i ∈ s, A i) *ᵥ w = ∑ i ∈ s, A i *ᵥ w := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
@@ -68,17 +75,19 @@ theorem eigenLengthProductStatement_holds : EigenLengthProductStatement := by
   set Φ := fromRows Ht Bt with hΦ
   set Pm : Fin m → Matrix (Fin g ⊕ Fin g) (Fin g ⊕ Fin g) R :=
     fun i => fromBlocks ((εL (π i))ᵀ) 0 0 (εL i) with hPm
-  have hPmv : ∀ i w, Pm i *ᵥ w =
-      Sum.elim ((εL (π i))ᵀ *ᵥ (w ∘ Sum.inl)) (εL i *ᵥ (w ∘ Sum.inr)) := by
+  have hPmv
+      : ∀ i w, Pm i *ᵥ w = Sum.elim ((εL (π i))ᵀ *ᵥ (w ∘ Sum.inl)) (εL i *ᵥ (w ∘ Sum.inr)) := by
     intro i w
     simp only [hPm, fromBlocks_mulVec, zero_mulVec, add_zero, zero_add]
   have hmem : ∀ i w, Pm i *ᵥ w ∈ qE εL i (π i) := by
     intro i w
     refine Submodule.mem_inf.2 ⟨⟨w ∘ Sum.inl, ?_⟩, ⟨w ∘ Sum.inr, ?_⟩⟩
     · show (εL (π i))ᵀ *ᵥ (w ∘ Sum.inl) = (Pm i *ᵥ w) ∘ Sum.inl
-      rw [hPmv]; rfl
+      rw [hPmv]
+      rfl
     · show εL i *ᵥ (w ∘ Sum.inr) = (Pm i *ᵥ w) ∘ Sum.inr
-      rw [hPmv]; rfl
+      rw [hPmv]
+      rfl
   have hsel : ∀ i k w, w ∈ qE εL i (π i) → Pm k *ᵥ w = if k = i then w else 0 := by
     intro i k w hw
     obtain ⟨⟨y1, hy1⟩, ⟨y2, hy2⟩⟩ := Submodule.mem_inf.1 hw
@@ -91,9 +100,9 @@ theorem eigenLengthProductStatement_holds : EigenLengthProductStatement := by
       rw [← e1, ← e2, Sum.elim_comp_inl_inr]
     · have hne : π i ≠ π k := fun h => hki (π.injective h).symm
       simp only [hki, hne, if_false, transpose_zero, zero_mulVec]
-      ext s; cases s <;> rfl
-  have hT : ∑ i, (εL (π i))ᵀ = 1 := by
-    rw [← transpose_sum, Equiv.sum_comp π εL, hLs, transpose_one]
+      ext s
+      cases s <;> rfl
+  have hT : ∑ i, (εL (π i))ᵀ = 1 := by rw [← transpose_sum, Equiv.sum_comp π εL, hLs, transpose_one]
   have hPsum : ∑ i, Pm i = 1 := by
     simp only [hPm]
     rw [sum_fromBlocks_diag, hT, hLs, fromBlocks_one]
@@ -103,8 +112,7 @@ theorem eigenLengthProductStatement_holds : EigenLengthProductStatement := by
   have hPΦ : ∀ i, Pm i * Φ = Φ * εT i := by
     intro i
     rw [hΦ, hPm, fromBlocks_mul_fromRows, fromRows_mul, Matrix.zero_mul, Matrix.zero_mul, add_zero,
-      zero_add,
-      hHt, hBt]
+      zero_add, hHt, hBt]
   set Ψ : (Fin g ⊕ Fin g → R) →ₗ[R] ((i : Fin m) → xModE Ht Bt εT εL π i) :=
     LinearMap.pi fun i => Submodule.mkQ _ ∘ₗ
       LinearMap.codRestrict (qE εL i (π i)) (mulVecLin (Pm i)) (hmem i) with hΨdef
@@ -143,8 +151,9 @@ theorem eigenLengthProductStatement_holds : EigenLengthProductStatement := by
       refine ⟨εT i *ᵥ t, ⟨t, rfl⟩, ?_⟩
       show Φ *ᵥ (εT i *ᵥ t) = Pm i *ᵥ (Φ *ᵥ t)
       rw [mulVec_mulVec, mulVec_mulVec, hPΦ]
-  have iso : ((Fin g ⊕ Fin g → R) ⧸ LinearMap.range (mulVecLin Φ)) ≃ₗ[R]
-      ((i : Fin m) → xModE Ht Bt εT εL π i) :=
+  have iso
+      : ((Fin g ⊕ Fin g → R) ⧸ LinearMap.range (mulVecLin Φ)) ≃ₗ[R]
+        ((i : Fin m) → xModE Ht Bt εT εL π i) :=
     (Submodule.quotEquivOfEq _ _ hker.symm).trans (Ψ.quotKerEquivOfSurjective hsurj)
   set e : Fin g ⊕ Fin g ≃ Fin (g + g) := finSumFinEquiv with he
   set Φ' := reindex e e Φ with hΦ'
@@ -156,7 +165,8 @@ theorem eigenLengthProductStatement_holds : EigenLengthProductStatement := by
     rw [hFapp, hFapp, hΦ', reindex_apply, submatrix_mulVec_equiv]
     ext s
     simp
-  have hmap : (LinearMap.range (mulVecLin Φ')).map F.toLinearMap = LinearMap.range (mulVecLin Φ) := by
+  have hmap
+      : (LinearMap.range (mulVecLin Φ')).map F.toLinearMap = LinearMap.range (mulVecLin Φ) := by
     ext z
     constructor
     · rintro ⟨_, ⟨y, rfl⟩, rfl⟩

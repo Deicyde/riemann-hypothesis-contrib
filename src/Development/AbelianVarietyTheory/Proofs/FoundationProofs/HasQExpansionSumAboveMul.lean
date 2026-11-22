@@ -14,8 +14,9 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.FNProd
 
-theorem hs_mul : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C : ℝ) (φ ψ : ℂ → ℂ) (h h' : HahnSeries ℚ Ω),
-    HS ε C φ h → HS ε C ψ h' → HS ε C (φ * ψ) (h * h') := by
+theorem hs_mul
+    : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C : ℝ) (φ ψ : ℂ → ℂ) (h h' : HahnSeries ℚ Ω),
+      HS ε C φ h → HS ε C ψ h' → HS ε C (φ * ψ) (h * h') := by
   intro Ω _ ε C φ ψ h h' H H' z hz
   set e : ℚ → ℂ := fun r => Complex.exp (2 * Real.pi * Complex.I * (r : ℂ) * z) with he
   set a : ℚ → ℂ := fun r => ε (h.coeff r) * e r with ha
@@ -29,13 +30,16 @@ theorem hs_mul : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C : ℝ) (φ ψ
   have hF := hP.tsum_fiberwise (fun p : ℚ × ℚ => p.1 + p.2)
   refine hF.congr_fun ?_
   intro s
-  have hexp : ∀ p : ℚ × ℚ, p.1 + p.2 = s → a p.1 * b p.2 = ε (h.coeff p.1) * ε (h'.coeff p.2) * e s := by
+  have hexp
+      : ∀ p : ℚ × ℚ, p.1 + p.2 = s → a p.1 * b p.2 = ε (h.coeff p.1) * ε (h'.coeff p.2) * e s := by
     intro p hp
     simp only [ha, hb, he, ← hp]
-    have : Complex.exp (2 * Real.pi * Complex.I * ((p.1 + p.2 : ℚ) : ℂ) * z) =
-        Complex.exp (2 * Real.pi * Complex.I * (p.1 : ℂ) * z) * Complex.exp (2 * Real.pi * Complex.I * (p.2 : ℂ) * z) := by
+    have : Complex.exp (2 * Real.pi * Complex.I * ((p.1 + p.2 : ℚ) : ℂ) * z)
+        = Complex.exp (2 * Real.pi * Complex.I * (p.1 : ℂ) * z)
+          * Complex.exp (2 * Real.pi * Complex.I * (p.2 : ℂ) * z) := by
       rw [← Complex.exp_add]; congr 1; push_cast; ring
-    rw [this]; ring
+    rw [this]
+    ring
   rw [tsum_subtype (f := fun p : ℚ × ℚ => a p.1 * b p.2)]
   rw [tsum_eq_sum (s := Finset.antidiagonal h.isPWO_support h'.isPWO_support s)]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -51,8 +55,7 @@ theorem hs_mul : ∀ (Ω : Type) [Field Ω] (ε : Ω →+* ℂ) (C : ℝ) (φ ψ
       simp only [HahnSeries.mem_support, not_and] at hp
       by_cases h1 : h.coeff p.1 = 0
       · simp [h1]
-      · have h2 : h'.coeff p.2 = 0 := by
-          by_contra h2; exact hp h1 h2 hs
+      · have h2 : h'.coeff p.2 = 0 := by by_contra h2; exact hp h1 h2 hs
         simp [h2]
     · exact Set.indicator_of_notMem (by simpa using hs) _
 

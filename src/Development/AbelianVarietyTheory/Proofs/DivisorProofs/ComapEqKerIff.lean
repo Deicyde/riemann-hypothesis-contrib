@@ -35,8 +35,8 @@ lemma isPullback_comap {X Y : Scheme.{0}} (I : Y.IdealSheafData) (f : X ⟶ Y) :
 
 variable {S Z : Scheme.{0}} (z : Z ⟶ S)
 
-def bc {T T' : Scheme.{0}} (c : T' ⟶ T) (g : T ⟶ S) (k : T' ⟶ S) (w : c ≫ g = k) :
-    pullback z k ⟶ pullback z g :=
+def bc {T T' : Scheme.{0}} (c : T' ⟶ T) (g : T ⟶ S) (k : T' ⟶ S) (w : c ≫ g = k)
+    : pullback z k ⟶ pullback z g :=
   pullback.map z k z g (𝟙 Z) c (𝟙 S) (by simp) (by rw [Category.comp_id, w])
 
 lemma isPullback_bc {T T' : Scheme.{0}} (c : T' ⟶ T) (g : T ⟶ S) (k : T' ⟶ S) (w : c ≫ g = k) :
@@ -64,10 +64,13 @@ abbrev HPt (T : Scheme.{0}) : Type := Σ g : T ⟶ S, HIdeal z r g
 
 variable {z r}
 
-def HIdeal.pull {T T' : Scheme.{0}} (c : T' ⟶ T) {g : T ⟶ S} {k : T' ⟶ S} (w : c ≫ g = k)
-    (I : HIdeal z r g) : HIdeal z r k :=
-  ⟨I.1.comap (bc z c g k w), IsFinFlatRk.of_isPullback
-    ((isPullback_comap I.1 (bc z c g k w)).flip.paste_vert (isPullback_bc z c g k w)) I.2⟩
+def HIdeal.pull
+    {T T' : Scheme.{0}} (c : T' ⟶ T) {g : T ⟶ S} {k : T' ⟶ S} (w : c ≫ g = k) (I : HIdeal z r g)
+    : HIdeal z r k := ⟨
+  I.1.comap (bc z c g k w),
+  IsFinFlatRk.of_isPullback
+    ((isPullback_comap I.1 (bc z c g k w)).flip.paste_vert (isPullback_bc z c g k w)) I.2
+⟩
 
 def HPt.map {T T' : Scheme.{0}} (c : T' ⟶ T) (x : HPt z r T) : HPt z r T' :=
   ⟨c ≫ x.1, x.2.pull c rfl⟩
@@ -122,19 +125,24 @@ lemma IsFinFlatRk.ker_subschemeι {T V : Scheme.{0}} {g : T ⟶ S} (v : V ⟶ pu
   rw [e, Category.assoc]
   exact hv.iso_comp _
 
-def mkPt {T V : Scheme.{0}} (g : T ⟶ S) (v : V ⟶ pullback z g) [IsClosedImmersion v]
-    (hv : IsFinFlatRk (v ≫ pullback.snd z g) r) : HPt z r T :=
+def mkPt
+    {T V : Scheme.{0}} (g : T ⟶ S) (v : V ⟶ pullback z g) [IsClosedImmersion v]
+    (hv : IsFinFlatRk (v ≫ pullback.snd z g) r)
+    : HPt z r T :=
   ⟨g, v.ker, hv.ker_subschemeι v⟩
 
-theorem comap_eq_ker_iff {X Y V : Scheme.{0}} (m : X ⟶ Y) (I : Y.IdealSheafData) (v : V ⟶ X)
-    [IsClosedImmersion v] : I.comap m = v.ker ↔ ∃ w : V ⟶ I.subscheme, IsPullback v w m I.subschemeι := by
+theorem comap_eq_ker_iff
+    {X Y V : Scheme.{0}} (m : X ⟶ Y) (I : Y.IdealSheafData) (v : V ⟶ X) [IsClosedImmersion v]
+    : I.comap m = v.ker ↔ ∃ w : V ⟶ I.subscheme, IsPullback v w m I.subschemeι := by
   constructor
   · intro h
     have H : I.subschemeι.ker ≤ (v ≫ m).ker := by
       rw [Scheme.IdealSheafData.ker_subschemeι, Scheme.Hom.ker_comp,
         Scheme.IdealSheafData.le_map_iff_comap_le, h]
-    refine ⟨IsClosedImmersion.lift I.subschemeι (v ≫ m) H,
-      isPullback_of_isClosedImmersion _ _ _ _ (IsClosedImmersion.lift_fac _ _ _).symm ?_⟩
+    refine ⟨
+      IsClosedImmersion.lift I.subschemeι (v ≫ m) H,
+      isPullback_of_isClosedImmersion _ _ _ _ (IsClosedImmersion.lift_fac _ _ _).symm ?_
+    ⟩
     rw [Scheme.IdealSheafData.ker_subschemeι, h]
   · rintro ⟨w, hP⟩
     rw [← hP.isoPullback_hom_fst, Scheme.Hom.ker_comp_of_isIso,

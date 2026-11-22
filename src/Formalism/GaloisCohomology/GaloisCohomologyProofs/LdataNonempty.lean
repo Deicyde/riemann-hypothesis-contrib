@@ -10,12 +10,12 @@ namespace Formalism.GaloisCohomology
 
 section
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
   (l : ℕ) [Fact l.Prime]
 
-theorem chi_exists (S : Set (HeightOneSpectrum (𝓞 F)))
-    (hS : ∀ v ∉ S, ((l:ℕ) : 𝓞 F) ∉ v.asIdeal) :
-    ∃ chi : GS Ω S →* ℤ_[l]ˣ, chi.comp (toGS Ω S) = cycZ F Ω l := by
+theorem chi_exists (S : Set (HeightOneSpectrum (𝓞 F))) (hS : ∀ v ∉ S, ((l : ℕ) : 𝓞 F) ∉ v.asIdeal)
+    : ∃ chi : GS Ω S →* ℤ_[l]ˣ, chi.comp (toGS Ω S) = cycZ F Ω l := by
   have hU : UnramOutside S (cycZ F Ω l) := by
     rw [unramOutside_iff S _ (continuous_cycZ F Ω l)]
     intro v hv A hA σ hσ
@@ -23,7 +23,8 @@ theorem chi_exists (S : Set (HeightOneSpectrum (𝓞 F)))
     rw [cycZ_toZModPow_eq (hS v hv) hA (q := 1) (fun x hx => by simpa using hσ.2 x hx) n]
     simp
   refine ⟨QuotientGroup.lift (NS Ω S) (cycZ F Ω l) (fun σ h => (MonoidHom.mem_ker).2 (hU σ h)), ?_⟩
-  ext σ; rfl
+  ext σ
+  rfl
 
 theorem above_finite : (Above F l).Finite := by
   have hl : ((l : ℕ) : 𝓞 F) ≠ 0 := by
@@ -44,7 +45,8 @@ theorem ldata_nonempty : Nonempty (LData F Ω l) := by
   classical
   let S := (above_finite (F := F) l).toFinset
   have hS : (S : Set _) = Above F l := by simp [S]
-  obtain ⟨chi, hchi⟩ := chi_exists (F := F) (Ω := Ω) l (S : Set _) (fun v hv h => hv (by rw [hS]; exact h))
+  obtain ⟨chi, hchi⟩ :=
+    chi_exists (F := F) (Ω := Ω) l (S : Set _) (fun v hv h => hv (by rw [hS]; exact h))
   exact ⟨⟨S, hS, fun v => placeOf Ω v.1, fun v => isPlaceOver_placeOf Ω v.1, chi, hchi⟩⟩
 
 end

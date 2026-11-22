@@ -16,8 +16,8 @@ variable {q : ℕ} [Fact q.Prime]
 
 theorem bd_nonneg {B : ℝ} {f : ℂ_[q]⟦X⟧} (h : Bd B f) : 0 ≤ B := (norm_nonneg _).trans (h 0)
 
-theorem coeff_pow_mul_le (u h : ℂ_[q]⟦X⟧) (B : ℝ) (hu : Bd 1 u) (hh : Bd B h) (N : ℕ) :
-    ∀ n, ‖coeff n (u ^ N * h)‖ ≤ B * ‖coeff 0 u‖ ^ (N - n) := by
+theorem coeff_pow_mul_le (u h : ℂ_[q]⟦X⟧) (B : ℝ) (hu : Bd 1 u) (hh : Bd B h) (N : ℕ)
+    : ∀ n, ‖coeff n (u ^ N * h)‖ ≤ B * ‖coeff 0 u‖ ^ (N - n) := by
   have hB := bd_nonneg hh
   have hr0 : 0 ≤ ‖coeff 0 u‖ := norm_nonneg _
   have hr1 : ‖coeff 0 u‖ ≤ 1 := hu 0
@@ -31,11 +31,13 @@ theorem coeff_pow_mul_le (u h : ℂ_[q]⟦X⟧) (B : ℝ) (hu : Bd 1 u) (hh : Bd
     rw [norm_mul]
     rcases Nat.eq_zero_or_pos x.1 with h0 | h0
     · rw [h0]
-      calc _ ≤ ‖coeff 0 u‖ * (B * ‖coeff 0 u‖ ^ (N - x.2)) := mul_le_mul_of_nonneg_left (ih _) hr0
+      calc
+        _ ≤ ‖coeff 0 u‖ * (B * ‖coeff 0 u‖ ^ (N - x.2)) := mul_le_mul_of_nonneg_left (ih _) hr0
         _ = B * ‖coeff 0 u‖ ^ (N - x.2 + 1) := by ring
         _ ≤ _ := mul_le_mul_of_nonneg_left (pow_le_pow_of_le_one hr0 hr1 (by omega)) hB
-    · calc _ ≤ 1 * (B * ‖coeff 0 u‖ ^ (N - x.2)) :=
-            mul_le_mul (hu _) (ih _) (norm_nonneg _) zero_le_one
+    · calc
+        _ ≤ 1 * (B * ‖coeff 0 u‖ ^ (N - x.2)) :=
+          mul_le_mul (hu _) (ih _) (norm_nonneg _) zero_le_one
         _ = B * ‖coeff 0 u‖ ^ (N - x.2) := by ring
         _ ≤ _ := mul_le_mul_of_nonneg_left (pow_le_pow_of_le_one hr0 hr1 (by omega)) hB
 
@@ -47,20 +49,23 @@ structure Hom (Φ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧) : Prop where
 
 theorem hom_shift {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) : Hom (shiftS ζ) := by
   obtain ⟨hbd, haddmul, hconst, _⟩ := GlobalTheory.MomOne.Shift.shift_laws q ζ hζ
-  exact ⟨hbd, fun f g hf hg => (haddmul f g hf hg).1,
-    fun f g hf hg => (haddmul f g hf hg).2, hconst⟩
+  exact
+    ⟨hbd, fun f g hf hg => (haddmul f g hf hg).1, fun f g hf hg => (haddmul f g hf hg).2, hconst⟩
 
-theorem bd_X : Bd 1 (X : ℂ_[q]⟦X⟧) := by
-  intro n; rw [coeff_X]; split_ifs <;> simp
+theorem bd_X : Bd 1 (X : ℂ_[q]⟦X⟧) := by intro n; rw [coeff_X]; split_ifs <;> simp
 
 theorem bdd_C (c : ℂ_[q]) : Bdd (C c : ℂ_[q]⟦X⟧) := by
   refine ⟨‖c‖, fun n => ?_⟩
-  rw [coeff_C]; split_ifs <;> simp
+  rw [coeff_C]
+  split_ifs <;> simp
 
 theorem bdd_add {f g : ℂ_[q]⟦X⟧} (hf : Bdd f) (hg : Bdd g) : Bdd (f + g) := by
   obtain ⟨A, hA⟩ := hf
   obtain ⟨B, hB⟩ := hg
-  exact ⟨A + B, fun n => by rw [map_add (f := _)]; exact (norm_add_le _ _).trans (add_le_add (hA n) (hB n))⟩
+  exact ⟨
+    A + B,
+    fun n => by rw [map_add (f := _)]; exact (norm_add_le _ _).trans (add_le_add (hA n) (hB n))
+  ⟩
 
 theorem bdd_mul {f g : ℂ_[q]⟦X⟧} (hf : Bdd f) (hg : Bdd g) : Bdd (f * g) := by
   obtain ⟨A, hA⟩ := hf
@@ -75,14 +80,18 @@ theorem bdd_mul {f g : ℂ_[q]⟦X⟧} (hf : Bdd f) (hg : Bdd g) : Bdd (f * g) :
 theorem Hom.comp {Φ Ψ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (h' : Hom Ψ) : Hom (fun f => Φ (Ψ f)) := by
   refine ⟨fun f B hf => h.bd _ _ (h'.bd _ _ hf), ?_, ?_, ?_⟩
   · intro f g hf hg
-    rw [h'.add f g hf hg, h.add _ _ (hf.imp fun B hB => h'.bd _ _ hB) (hg.imp fun B hB => h'.bd _ _ hB)]
+    rw [h'.add f g hf hg,
+      h.add _ _ (hf.imp fun B hB => h'.bd _ _ hB) (hg.imp fun B hB => h'.bd _ _ hB)]
   · intro f g hf hg
-    rw [h'.mul f g hf hg, h.mul _ _ (hf.imp fun B hB => h'.bd _ _ hB) (hg.imp fun B hB => h'.bd _ _ hB)]
+    rw [h'.mul f g hf hg,
+      h.mul _ _ (hf.imp fun B hB => h'.bd _ _ hB) (hg.imp fun B hB => h'.bd _ _ hB)]
   · intro c
     exact (congrArg Φ (h'.const c)).trans (h.const c)
 
-theorem Hom.ext {Φ Ψ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (h' : Hom Ψ) (hX : Φ X = Ψ X)
-    (h0 : ‖coeff 0 (Ψ X)‖ < 1) (f : ℂ_[q]⟦X⟧) (hf : Bdd f) : Φ f = Ψ f := by
+theorem Hom.ext
+    {Φ Ψ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (h' : Hom Ψ) (hX : Φ X = Ψ X) (h0 : ‖coeff 0 (Ψ X)‖ < 1)
+    (f : ℂ_[q]⟦X⟧) (hf : Bdd f)
+    : Φ f = Ψ f := by
   obtain ⟨B, hB⟩ := hf
   have key : ∀ N : ℕ, ∀ f, Bd B f → ∃ g, Bd (B + B) g ∧ Φ f - Ψ f = Ψ X ^ N * g := by
     intro N
@@ -101,7 +110,8 @@ theorem Hom.ext {Φ Ψ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (h' : H
       have e := eq_X_mul_shift_add_const f
       have b1 : Bdd (X : ℂ_[q]⟦X⟧) := ⟨1, bd_X⟩
       rw [e, h.add _ _ (bdd_mul b1 ⟨B, hg⟩) (bdd_C _), h'.add _ _ (bdd_mul b1 ⟨B, hg⟩) (bdd_C _),
-        h.mul _ _ b1 ⟨B, hg⟩, h'.mul _ _ b1 ⟨B, hg⟩, h.const, h'.const, hX, pow_succ', mul_assoc, ← hg2]
+        h.mul _ _ b1 ⟨B, hg⟩, h'.mul _ _ b1 ⟨B, hg⟩, h.const, h'.const, hX, pow_succ', mul_assoc,
+        ← hg2]
       ring
   rw [← sub_eq_zero]
   ext n
@@ -116,11 +126,12 @@ theorem Hom.ext {Φ Ψ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (h' : H
 theorem shift_X {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) : shiftS ζ X = C ζ * (1 + X) - 1 :=
   (GlobalTheory.MomOne.Shift.shift_laws q ζ hζ).2.2.2.1
 
-theorem Hom.lin {Φ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (c : ℂ_[q]) :
-    Φ (C c * (1 + X) - 1) = C c * (1 + Φ X) - 1 := by
+theorem Hom.lin {Φ : ℂ_[q]⟦X⟧ → ℂ_[q]⟦X⟧} (h : Hom Φ) (c : ℂ_[q])
+    : Φ (C c * (1 + X) - 1) = C c * (1 + Φ X) - 1 := by
   have b1 : Bdd (X : ℂ_[q]⟦X⟧) := ⟨1, bd_X⟩
   have e : (C c * (1 + X) - 1 : ℂ_[q]⟦X⟧) = C c * X + C (c - 1) := by rw [map_sub, map_one]; ring
-  rw [e, h.add _ _ (bdd_mul (bdd_C _) b1) (bdd_C _), h.mul _ _ (bdd_C _) b1, h.const, h.const, map_sub, map_one]
+  rw [e, h.add _ _ (bdd_mul (bdd_C _) b1) (bdd_C _), h.mul _ _ (bdd_C _) b1, h.const, h.const,
+    map_sub, map_one]
   ring
 
 theorem norm_le_one_of {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) : ‖ζ‖ ≤ 1 := by
@@ -140,8 +151,8 @@ theorem norm_pow_sub_one {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) (k : ℕ) : ‖
   | zero => simp
   | succ k ih => rw [pow_succ]; exact norm_mul_sub_one ih hζ
 
-theorem shift_shift (ζ ξ : ℂ_[q]) (f : ℂ_[q]⟦X⟧) (hζ : ‖ζ - 1‖ < 1) (hξ : ‖ξ - 1‖ < 1) (hf : Bdd f) :
-    shiftS ζ (shiftS ξ f) = shiftS (ζ * ξ) f := by
+theorem shift_shift (ζ ξ : ℂ_[q]) (f : ℂ_[q]⟦X⟧) (hζ : ‖ζ - 1‖ < 1) (hξ : ‖ξ - 1‖ < 1) (hf : Bdd f)
+    : shiftS ζ (shiftS ξ f) = shiftS (ζ * ξ) f := by
   have hm := norm_mul_sub_one hζ hξ
   refine ((hom_shift hζ).comp (hom_shift hξ)).ext (hom_shift hm) ?_ ?_ f hf
   · show shiftS ζ (shiftS ξ X) = _
@@ -179,7 +190,8 @@ theorem continuous_coeff_mulS (n : ℕ) : Continuous fun a : ℤ_[q] => coeff n 
 
 theorem mulS_natCast (m : ℕ) : mulS (m : ℤ_[q]) = (1 + X) ^ m - 1 := by
   ext n
-  have e : ((1 + X : ℂ_[q]⟦X⟧)) ^ m = (((1 + Polynomial.X) ^ m : Polynomial ℂ_[q]) : ℂ_[q]⟦X⟧) := by simp
+  have e : ((1 + X : ℂ_[q]⟦X⟧)) ^ m = (((1 + Polynomial.X) ^ m : Polynomial ℂ_[q]) : ℂ_[q]⟦X⟧) := by
+    simp
   rw [mulS, coeff_mk, map_sub, e, Polynomial.coeff_coe, Polynomial.coeff_one_add_X_pow, coeff_one,
     Ring.choose_natCast, zc_natCast]
   split_ifs with h
@@ -188,17 +200,24 @@ theorem mulS_natCast (m : ℕ) : mulS (m : ℤ_[q]) = (1 + X) ^ m - 1 := by
 
 theorem hom_subst (a : ℤ_[q]) : Hom (fun f : ℂ_[q]⟦X⟧ => f.subst (mulS a : ℂ_[q]⟦X⟧)) := by
   have ha := HasSubst.of_constantCoeff_zero' (const_mulS a)
-  exact ⟨fun f B hf => (GlobalTheory.MomOne.sup_norm_laws q).2.1 f _ B hf (bd_mulS a) (const_mulS a),
-    fun f g _ _ => subst_add ha f g, fun f g _ _ => subst_mul ha f g, subst_C⟩
+  exact ⟨
+    fun f B hf => (GlobalTheory.MomOne.sup_norm_laws q).2.1 f _ B hf (bd_mulS a) (const_mulS a),
+    fun f g _ _ => subst_add ha f g,
+    fun f g _ _ => subst_mul ha f g,
+    subst_C
+  ⟩
 
-theorem shift_mulS_natCast {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) (m : ℕ) :
-    shiftS ζ (mulS (m : ℤ_[q])) = C (ζ ^ m) * (1 + mulS (m : ℤ_[q])) - 1 := by
+theorem shift_mulS_natCast {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) (m : ℕ)
+    : shiftS ζ (mulS (m : ℤ_[q])) = C (ζ ^ m) * (1 + mulS (m : ℤ_[q])) - 1 := by
   have h := hom_shift hζ
   have b1 : Bdd (1 + X : ℂ_[q]⟦X⟧) := bdd_add (by simpa using bdd_C (1 : ℂ_[q])) ⟨1, bd_X⟩
   have h1 : shiftS ζ (1 + X) = C ζ * (1 + X) := by
-    rw [show (1 + X : ℂ_[q]⟦X⟧) = C 1 + X by simp, h.add _ _ (bdd_C _) ⟨1, bd_X⟩, h.const, shift_X hζ, map_one]
+    rw [show (1 + X : ℂ_[q]⟦X⟧) = C 1 + X by simp, h.add _ _ (bdd_C _) ⟨1, bd_X⟩, h.const,
+      shift_X hζ, map_one]
     ring
-  have hp : ∀ m : ℕ, Bdd ((1 + X : ℂ_[q]⟦X⟧) ^ m) ∧ shiftS ζ ((1 + X) ^ m) = C (ζ ^ m) * (1 + X) ^ m := by
+  have hp
+      : ∀ m : ℕ,
+        Bdd ((1 + X : ℂ_[q]⟦X⟧) ^ m) ∧ shiftS ζ ((1 + X) ^ m) = C (ζ ^ m) * (1 + X) ^ m := by
     intro m
     induction m with
     | zero => exact ⟨by simpa using bdd_C (1 : ℂ_[q]), by simpa using h.const 1⟩
@@ -206,22 +225,27 @@ theorem shift_mulS_natCast {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) (m : ℕ) :
       refine ⟨by rw [pow_succ]; exact bdd_mul ih.1 b1, ?_⟩
       rw [pow_succ, h.mul _ _ ih.1 b1, ih.2, h1, map_pow, map_pow]
       ring
-  rw [mulS_natCast, show ((1 + X) ^ m - 1 : ℂ_[q]⟦X⟧) = (1 + X) ^ m + C (-1) by simp [sub_eq_add_neg],
+  rw [mulS_natCast,
+    show ((1 + X) ^ m - 1 : ℂ_[q]⟦X⟧) = (1 + X) ^ m + C (-1) by simp [sub_eq_add_neg],
     h.add _ _ (hp m).1 (bdd_C _), h.const, (hp m).2]
   simp [sub_eq_add_neg]
 
-theorem continuous_coeff_shift_mulS {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) (n : ℕ) :
-    Continuous fun a : ℤ_[q] => coeff n (shiftS ζ (mulS a)) := by
+theorem continuous_coeff_shift_mulS {ζ : ℂ_[q]} (hζ : ‖ζ - 1‖ < 1) (n : ℕ)
+    : Continuous fun a : ℤ_[q] => coeff n (shiftS ζ (mulS a)) := by
   simp only [shiftS, coeff_mk]
-  refine continuous_tsum (u := fun m => ‖ζ - 1‖ ^ (m - n))
-    (fun m => (continuous_coeff_mulS m).mul continuous_const) ?_ fun m a => ?_
+  refine continuous_tsum
+    (u := fun m => ‖ζ - 1‖ ^ (m - n))
+    (fun m => (continuous_coeff_mulS m).mul continuous_const)
+    ?_
+    fun m a => ?_
   · rw [← summable_nat_add_iff n]
     simpa using summable_geometric_of_lt_one (norm_nonneg _) hζ
   · rw [norm_mul, norm_mul, norm_mul, norm_pow, norm_pow]
     have h1 := bd_mulS a m
     have h2 : ‖(m.choose n : ℂ_[q])‖ ≤ 1 := IsUltrametricDist.norm_natCast_le_one _ _
     have h3 : ‖ζ‖ ^ n ≤ 1 := pow_le_one₀ (norm_nonneg _) (norm_le_one_of hζ)
-    calc _ ≤ 1 * (1 * 1 * ‖ζ - 1‖ ^ (m - n)) := by gcongr
+    calc
+      _ ≤ 1 * (1 * 1 * ‖ζ - 1‖ ^ (m - n)) := by gcongr
       _ = _ := by ring
 
 theorem norm_sub_one_lt_of_root {ζ : ℂ_[q]} {n : ℕ} (h : ζ ^ (q ^ n) = 1) : ‖ζ - 1‖ < 1 := by
@@ -231,22 +255,23 @@ theorem norm_sub_one_lt_of_root {ζ : ℂ_[q]} {n : ℕ} (h : ζ ^ (q ^ n) = 1) 
     have := congrArg norm h
     rw [norm_pow, norm_one] at this
     exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn).mp this
-  let O : Subring ℂ_[q] :=
-    { carrier := {x | ‖x‖ ≤ 1}
-      mul_mem' := fun {a b} ha hb => by
-        show ‖a * b‖ ≤ 1
-        rw [norm_mul]; exact mul_le_one₀ ha (norm_nonneg _) hb
-      one_mem' := by simp
-      add_mem' := fun {a b} ha hb => (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb)
-      zero_mem' := by simp
-      neg_mem' := fun {a} ha => by simpa using ha }
+  let O : Subring ℂ_[q] := {
+    carrier := {x | ‖x‖ ≤ 1}
+    mul_mem' := fun {a b} ha hb => by
+      show ‖a * b‖ ≤ 1
+      rw [norm_mul]
+      exact mul_le_one₀ ha (norm_nonneg _) hb
+    one_mem' := by simp
+    add_mem' := fun {a b} ha hb => (IsUltrametricDist.norm_add_le_max a b).trans (max_le ha hb)
+    zero_mem' := by simp
+    neg_mem' := fun {a} ha => by simpa using ha
+  }
   have hz : ζ ∈ O := h1.le
   obtain ⟨r, hr⟩ := exists_add_pow_prime_pow_eq hp ((⟨ζ, hz⟩ : O) - 1) 1 n
   have hr' := congrArg (fun x : O => (x : ℂ_[q])) hr
   simp only [sub_add_cancel] at hr'
   push_cast at hr'
-  have hq : ‖(q : ℂ_[q])‖ < 1 := by
-    rw [← zc_natCast, norm_zc]; exact Padic.norm_p_lt_one
+  have hq : ‖(q : ℂ_[q])‖ < 1 := by rw [← zc_natCast, norm_zc]; exact Padic.norm_p_lt_one
   have e : (ζ - 1) ^ q ^ n = -((q : ℂ_[q]) * ((ζ - 1) * r)) := by
     rw [h, one_pow] at hr'
     linear_combination -hr'
@@ -256,9 +281,10 @@ theorem norm_sub_one_lt_of_root {ζ : ℂ_[q]} {n : ℕ} (h : ζ ^ (q ^ n) = 1) 
     exact (mul_le_of_le_one_right (norm_nonneg _) hm).trans_lt hq
   exact (pow_lt_one_iff_of_nonneg (norm_nonneg _) hn).mp this
 
-theorem shift_mulS {ζ : ℂ_[q]} {n k : ℕ} {a : ℤ_[q]} (h : ζ ^ (q ^ n) = 1)
-    (ha : ‖a - (k : ℤ_[q])‖ ≤ (q : ℝ) ^ (-(n : ℤ))) :
-    shiftS ζ (mulS a) = C (ζ ^ k) * (1 + mulS a) - 1 := by
+theorem shift_mulS
+    {ζ : ℂ_[q]} {n k : ℕ} {a : ℤ_[q]}
+    (h : ζ ^ (q ^ n) = 1) (ha : ‖a - (k : ℤ_[q])‖ ≤ (q : ℝ) ^ (-(n : ℤ)))
+    : shiftS ζ (mulS a) = C (ζ ^ k) * (1 + mulS a) - 1 := by
   have hζ := norm_sub_one_lt_of_root h
   obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.mp ((PadicInt.norm_le_pow_iff_mem_span_pow _ _).mp ha)
   obtain rfl : a = k + b * (q : ℤ_[q]) ^ n := by rw [hb]; ring
@@ -268,14 +294,16 @@ theorem shift_mulS {ζ : ℂ_[q]} {n k : ℕ} {a : ℤ_[q]} (h : ζ ^ (q ^ n) = 
   refine PadicInt.denseRange_natCast.induction_on b (isClosed_eq ?_ ?_) fun m => ?_
   · exact (continuous_coeff_shift_mulS hζ j).comp hc
   · simp only [map_sub, coeff_C_mul, map_add (f := _)]
-    exact (continuous_const.mul (continuous_const.add ((continuous_coeff_mulS j).comp hc))).sub continuous_const
+    exact (continuous_const.mul (continuous_const.add ((continuous_coeff_mulS j).comp hc))).sub
+      continuous_const
   · have e : (k : ℤ_[q]) + (m : ℤ_[q]) * (q : ℤ_[q]) ^ n = ((k + q ^ n * m : ℕ) : ℤ_[q]) := by
       push_cast; ring
     rw [e, shift_mulS_natCast hζ, pow_add, pow_mul, h, one_pow, mul_one]
 
-theorem shift_subst (ζ : ℂ_[q]) (n k : ℕ) (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧) (h : ζ ^ (q ^ n) = 1)
-    (ha : ‖a - (k : ℤ_[q])‖ ≤ (q : ℝ) ^ (-(n : ℤ))) (hf : Bdd f) :
-    shiftS ζ (f.subst (mulS a : ℂ_[q]⟦X⟧)) = (shiftS (ζ ^ k) f).subst (mulS a : ℂ_[q]⟦X⟧) := by
+theorem shift_subst
+    (ζ : ℂ_[q]) (n k : ℕ) (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧)
+    (h : ζ ^ (q ^ n) = 1) (ha : ‖a - (k : ℤ_[q])‖ ≤ (q : ℝ) ^ (-(n : ℤ))) (hf : Bdd f)
+    : shiftS ζ (f.subst (mulS a : ℂ_[q]⟦X⟧)) = (shiftS (ζ ^ k) f).subst (mulS a : ℂ_[q]⟦X⟧) := by
   have hζ := norm_sub_one_lt_of_root h
   have hk := norm_pow_sub_one hζ k
   have hX : (X : ℂ_[q]⟦X⟧).subst (mulS a : ℂ_[q]⟦X⟧) = mulS a :=
@@ -292,7 +320,15 @@ theorem shift_subst (ζ : ℂ_[q]) (n k : ℕ) (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧
     rw [e]
     simpa [const_mulS] using hk
 
-theorem main : ∀ (q : ℕ) [Fact q.Prime], (∀ (ζ ξ : ℂ_[q]) (f : ℂ_[q]⟦X⟧), ‖ζ - 1‖ < 1 → ‖ξ - 1‖ < 1 → Bdd f → shiftS ζ (shiftS ξ f) = shiftS (ζ * ξ) f) ∧ ∀ (ζ : ℂ_[q]) (n k : ℕ) (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧), ζ ^ (q ^ n) = 1 → ‖a - (k : ℤ_[q])‖ ≤ (q : ℝ) ^ (-(n : ℤ)) → Bdd f → ‖ζ - 1‖ < 1 ∧ shiftS ζ (f.subst (mulS a : ℂ_[q]⟦X⟧)) = (shiftS (ζ ^ k) f).subst (mulS a : ℂ_[q]⟦X⟧) :=
-  fun _ _ => ⟨shift_shift, fun ζ n k a f h ha hf => ⟨norm_sub_one_lt_of_root h, shift_subst ζ n k a f h ha hf⟩⟩
+theorem main
+    : ∀ (q : ℕ) [Fact q.Prime],
+      (∀ (ζ ξ : ℂ_[q]) (f : ℂ_[q]⟦X⟧),
+          ‖ζ - 1‖ < 1 → ‖ξ - 1‖ < 1 → Bdd f → shiftS ζ (shiftS ξ f) = shiftS (ζ * ξ) f)
+        ∧ ∀ (ζ : ℂ_[q]) (n k : ℕ) (a : ℤ_[q]) (f : ℂ_[q]⟦X⟧),
+          ζ ^ (q ^ n) = 1 → ‖a - (k : ℤ_[q])‖ ≤ (q : ℝ) ^ (-(n : ℤ)) → Bdd f
+            → ‖ζ - 1‖ < 1
+              ∧ shiftS ζ (f.subst (mulS a : ℂ_[q]⟦X⟧))
+                = (shiftS (ζ ^ k) f).subst (mulS a : ℂ_[q]⟦X⟧) := fun _ _ =>
+  ⟨shift_shift, fun ζ n k a f h ha hf => ⟨norm_sub_one_lt_of_root h, shift_subst ζ n k a f h ha hf⟩⟩
 
 end GlobalTheory.MomOne.ShiftComp

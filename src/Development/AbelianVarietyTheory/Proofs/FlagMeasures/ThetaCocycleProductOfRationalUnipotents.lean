@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LeSpanEInfToO
 
 @[expose] public section
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.SnFam
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.FourierDecayAlt Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.SnFam
 open scoped Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -25,8 +28,9 @@ theorem orth_anti {U U' : Submodule E S.V} (h : U ≤ U') : orth S U' ≤ orth S
   rw [mem_orth_iff] at hv ⊢
   exact fun y hy => hv y (h hy)
 
-theorem le_spanE_inf (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (U : Submodule E S.V) :
-    U ≤ spanE S (Λ ⊓ toO S U) := by
+theorem le_spanE_inf
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (U : Submodule E S.V)
+    : U ≤ spanE S (Λ ⊓ toO S U) := by
   exact _root_.GlobalTheory.SpanInfDenominators.le_spanE_inf_toO Λ hΛ U
 
 end Gen
@@ -37,9 +41,11 @@ namespace GlobalTheory.DcosetCompl
 
 section Flags
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ}
 
-theorem xa_eq_x_of_le {T : E} (F : Formalism.MainNotions.S.FlagG S r T) {j : ℕ} (hj : r ≤ j) : F.Xa j = F.X := by
+theorem xa_eq_x_of_le {T : E} (F : Formalism.MainNotions.S.FlagG S r T) {j : ℕ} (hj : r ≤ j)
+    : F.Xa j = F.X := by
   unfold Formalism.MainNotions.S.FlagG.Xa Formalism.MainNotions.S.FlagG.X
   congr 1
   ext v
@@ -58,8 +64,8 @@ theorem z_mem_orth {T : E} (F : Formalism.MainNotions.S.FlagG S r T) : F.z ∈ o
     simp [F.z_orth i]
   simpa using this hy
 
-theorem map_eq_of_sub_mem (g : S.V ≃ₗ[E] S.V) (X : Submodule E S.V) (h : ∀ x ∈ X, g x - x ∈ X) :
-    X.map (g : S.V →ₗ[E] S.V) = X := by
+theorem map_eq_of_sub_mem (g : S.V ≃ₗ[E] S.V) (X : Submodule E S.V) (h : ∀ x ∈ X, g x - x ∈ X)
+    : X.map (g : S.V →ₗ[E] S.V) = X := by
   have hle : X.map (g : S.V →ₗ[E] S.V) ≤ X := by
     rintro _ ⟨x, hx, rfl⟩
     have := X.add_mem (h x hx) hx
@@ -74,19 +80,25 @@ namespace GlobalTheory.DcosetCompl
 
 section Main
 
-variable {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E} {r : ℕ}
 
-theorem sub_le_uue {T T' : E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
-    (F : LFlag S r T) (F' : LFlag S r T') :
-    Xsp F ≤ UUE Λ F F' ∧ Xsp F' ≤ UUE Λ F F' ∧ F.zt ∈ UUE Λ F F' ∧ F'.zt ∈ UUE Λ F F' := by
-  have hUU : UU Λ F F' = XLam Λ F ⊔ Submodule.span (𝓞 E) {F.zt} ⊔ XLam Λ F' ⊔ Submodule.span (𝓞 E) {F'.zt} := rfl
+theorem sub_le_uue
+    {T T' : E}
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
+    (F : LFlag S r T) (F' : LFlag S r T')
+    : Xsp F ≤ UUE Λ F F' ∧ Xsp F' ≤ UUE Λ F F' ∧ F.zt ∈ UUE Λ F F' ∧ F'.zt ∈ UUE Λ F F' := by
+  have hUU
+      : UU Λ F F'
+        = XLam Λ F ⊔ Submodule.span (𝓞 E) {F.zt} ⊔ XLam Λ F' ⊔ Submodule.span (𝓞 E) {F'.zt} :=
+    rfl
   have h1 : XLam Λ F ≤ UU Λ F F' := by
     rw [hUU]; exact le_sup_left.trans (le_sup_left.trans le_sup_left)
-  have h2 : XLam Λ F' ≤ UU Λ F F' := by
-    rw [hUU]; exact le_sup_right.trans le_sup_left
+  have h2 : XLam Λ F' ≤ UU Λ F F' := by rw [hUU]; exact le_sup_right.trans le_sup_left
   have h3 : F.zt ∈ UU Λ F F' := by
     rw [hUU]
-    exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)))
+    exact Submodule.mem_sup_left (Submodule.mem_sup_left (Submodule.mem_sup_right
+      (Submodule.mem_span_singleton_self _)))
   have h4 : F'.zt ∈ UU Λ F F' := by
     rw [hUU]
     exact Submodule.mem_sup_right (Submodule.mem_span_singleton_self _)
@@ -96,10 +108,13 @@ theorem sub_le_uue {T T' : E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsF
   have hl2 : Xsp F' ≤ spanE S (XLam Λ F') := le_spanE_inf Λ hΛ _
   exact ⟨hl1.trans hs1, hl2.trans hs2, Submodule.subset_span h3, Submodule.subset_span h4⟩
 
-theorem uue_le {T T' : E} (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F'' : LFlag S r T')
-    (hz : F.zt = F.fl.z) (hz'' : F''.zt = F''.fl.z) (M : Submodule E S.V)
-    (hX : Xsp F ≤ M) (hX'' : Xsp F'' ≤ M) (hzM : F.fl.z ∈ M) (hz''M : F''.fl.z ∈ M) :
-    UUE Λ F F'' ≤ M := by
+theorem uue_le
+    {T T' : E}
+    (Λ : Submodule (𝓞 E) S.V)
+    (F : LFlag S r T) (F'' : LFlag S r T') (hz : F.zt = F.fl.z) (hz'' : F''.zt = F''.fl.z)
+    (M : Submodule E S.V)
+    (hX : Xsp F ≤ M) (hX'' : Xsp F'' ≤ M) (hzM : F.fl.z ∈ M) (hz''M : F''.fl.z ∈ M)
+    : UUE Λ F F'' ≤ M := by
   unfold UUE spanE
   rw [Submodule.span_le]
   have : UU Λ F F'' ≤ M.restrictScalars (𝓞 E) := by
@@ -110,17 +125,22 @@ theorem uue_le {T T' : E} (Λ : Submodule (𝓞 E) S.V) (F : LFlag S r T) (F'' :
     · exact Submodule.span_le.mpr (Set.singleton_subset_iff.mpr (by rw [hz'']; exact hz''M))
   exact fun v hv => this hv
 
-theorem th_eq_hp_gen {T T' : E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
+theorem th_eq_hp_gen
+    {T T' : E}
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ)
     (F : LFlag S r T) (F' F'' : LFlag S r T')
     (hz : F.zt = F.fl.z) (hz' : F'.zt = F'.fl.z) (hz'' : F''.zt = F''.fl.z)
-    (n m : S.V ≃ₗ[E] S.V) (hni : ∀ x y, S.hT (n x) (n y) = S.hT x y)
-    (hnX : ∀ x ∈ Xsp F, n x - x ∈ Xsp F) (hnP : ∀ x ∈ orth S (Xsp F), n x - x ∈ Xsp F)
-    (hmX : ∀ x ∈ Xsp F', m x - x ∈ Xsp F') (hmP : ∀ x ∈ orth S (Xsp F'), m x - x ∈ Xsp F')
-    (hfr : ∀ a, frame F'' a = (n * m) (frame F' a)) :
-    Th Λ F F' F'' (n * m) = Hp Λ F F' := by
+    (n m : S.V ≃ₗ[E] S.V)
+    (hni : ∀ x y, S.hT (n x) (n y) = S.hT x y) (hnX : ∀ x ∈ Xsp F, n x - x ∈ Xsp F)
+    (hnP : ∀ x ∈ orth S (Xsp F), n x - x ∈ Xsp F) (hmX : ∀ x ∈ Xsp F', m x - x ∈ Xsp F')
+    (hmP : ∀ x ∈ orth S (Xsp F'), m x - x ∈ Xsp F') (hfr : ∀ a, frame F'' a = (n * m) (frame F' a))
+    : Th Λ F F' F'' (n * m) = Hp Λ F F' := by
   obtain ⟨hXU, hX'U, hzU, hz'U⟩ := sub_le_uue Λ hΛ F F'
-  rw [hz] at hzU; rw [hz'] at hz'U
-  have hcomp : ((n * m : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) = (n : S.V →ₗ[E] S.V).comp (m : S.V →ₗ[E] S.V) := by
+  rw [hz] at hzU
+  rw [hz'] at hz'U
+  have hcomp
+      : ((n * m : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V)
+        = (n : S.V →ₗ[E] S.V).comp (m : S.V →ₗ[E] S.V) := by
     ext x; rfl
   have he : ∀ i, F''.fl.e i = n (m (F'.fl.e i)) := by
     intro i
@@ -136,7 +156,8 @@ theorem th_eq_hp_gen {T T' : E} (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.I
       show F''.fl.X = F'.fl.X.map _
       unfold Formalism.MainNotions.S.FlagG.X
       rw [Submodule.map_span, ← Set.range_comp]
-      have hfun : F''.fl.e = (((n * m : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) ∘ F'.fl.e) := funext fun i => he i
+      have hfun : F''.fl.e = (((n * m : S.V ≃ₗ[E] S.V) : S.V →ₗ[E] S.V) ∘ F'.fl.e) :=
+        funext fun i => he i
       rw [hfun]
     rw [h0, hcomp, Submodule.map_comp, hmX']
   have hUle : UUE Λ F F'' ≤ (UUE Λ F F').map (n : S.V →ₗ[E] S.V) := by
@@ -184,20 +205,29 @@ end GlobalTheory.DcosetCompl
 
 namespace GlobalTheory.DcosetCompl
 
-theorem th_eq_hp : ∀ (D : D7) {T T' : D.host.E} (Λ : Submodule (𝓞 D.host.E) (VS D).V) (F : LFlag (D.sp.Y 0) D.R.rS T) (F' F'' : LFlag (D.sp.Y 0) D.R.rS T'), Submodule.IsFullLattice D.host.E Λ → F.zt = F.fl.z → F'.zt = F'.fl.z → F''.zt = F''.fl.z → ∀ n ∈ NRat F, ∀ m ∈ NRat F', (∀ a, frame F'' a = (n * m) (frame F' a)) → Th Λ F F' F'' (n * m) = Hp Λ F F' := by
+theorem th_eq_hp
+    : ∀ (D : D7) {T T' : D.host.E} (Λ : Submodule (𝓞 D.host.E) (VS D).V)
+        (F : LFlag (D.sp.Y 0) D.R.rS T) (F' F'' : LFlag (D.sp.Y 0) D.R.rS T'),
+      Submodule.IsFullLattice D.host.E Λ → F.zt = F.fl.z → F'.zt = F'.fl.z → F''.zt = F''.fl.z
+        → ∀ n ∈ NRat F, ∀ m ∈ NRat F',
+          (∀ a, frame F'' a = (n * m) (frame F' a)) → Th Λ F F' F'' (n * m) = Hp Λ F F' := by
   intro D T T' Λ F F' F'' hΛ hz hz' hz'' n hn m hm hfr
   have hnX : ∀ x ∈ Xsp F, n x - x ∈ Xsp F := by
     intro x hx
-    have h := hn.2.1 D.R.rS x (by
-      show x ∈ F.fl.Xa (D.R.rS + 1)
-      rw [xa_eq_x_of_le F.fl (Nat.le_succ _)]; exact hx)
+    have h :=
+      hn.2.1 D.R.rS x (by
+        show x ∈ F.fl.Xa (D.R.rS + 1)
+        rw [xa_eq_x_of_le F.fl (Nat.le_succ _)]
+        exact hx)
     change n x - x ∈ F.fl.Xa D.R.rS at h
     rwa [xa_eq_x_of_le F.fl (le_refl _)] at h
   have hmX : ∀ x ∈ Xsp F', m x - x ∈ Xsp F' := by
     intro x hx
-    have h := hm.2.1 D.R.rS x (by
-      show x ∈ F'.fl.Xa (D.R.rS + 1)
-      rw [xa_eq_x_of_le F'.fl (Nat.le_succ _)]; exact hx)
+    have h :=
+      hm.2.1 D.R.rS x (by
+        show x ∈ F'.fl.Xa (D.R.rS + 1)
+        rw [xa_eq_x_of_le F'.fl (Nat.le_succ _)]
+        exact hx)
     change m x - x ∈ F'.fl.Xa D.R.rS at h
     rwa [xa_eq_x_of_le F'.fl (le_refl _)] at h
   exact th_eq_hp_gen Λ hΛ F F' F'' hz hz' hz'' n m (fun x y => hn.1 x y) hnX hn.2.2 hmX hm.2.2 hfr

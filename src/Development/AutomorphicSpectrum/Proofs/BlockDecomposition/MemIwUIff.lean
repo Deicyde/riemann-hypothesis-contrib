@@ -15,9 +15,12 @@ namespace GlobalTheory.CompanionTheory.SatPow
 
 variable {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] {σ : L →+* L} {n : ℕ}
 
-theorem latK_mulVec {M : Matrix (Fin n) (Fin n) L} (h1 : ∀ i j, Valued.v (M i j) ≤ 1)
-    (h2 : ∀ i j, j < i → Valued.v (M i j) < 1) (k : ℕ) {x : Fin n → L} (hx : x ∈ latK L n k) :
-    M.mulVec x ∈ latK L n k := by
+theorem latK_mulVec
+    {M : Matrix (Fin n) (Fin n) L}
+    (h1 : ∀ i j, Valued.v (M i j) ≤ 1) (h2 : ∀ i j, j < i → Valued.v (M i j) < 1)
+    (k : ℕ)
+    {x : Fin n → L} (hx : x ∈ latK L n k)
+    : M.mulVec x ∈ latK L n k := by
   have hx1 : ∀ j, Valued.v (x j) ≤ 1 := fun j => by
     have := hx j
     split_ifs at this with h
@@ -34,22 +37,25 @@ theorem latK_mulVec {M : Matrix (Fin n) (Fin n) L} (h1 : ∀ i j, Valued.v (M i 
   · refine Valuation.map_sum_lt _ one_ne_zero fun j _ => ?_
     rw [map_mul]
     by_cases hjk : j.val < k
-    · have hji : j < i := by
-        rw [Fin.lt_def]; omega
+    · have hji : j < i := by rw [Fin.lt_def]; omega
       exact (mul_le_of_le_one_right' (hx1 j)).trans_lt (h2 i j hji)
     · have := hx j
       rw [if_neg hjk] at this
       exact (mul_le_of_le_one_left' (h1 i j)).trans_lt this
 
-theorem mem_iwU_iff (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n) :
-    g ∈ IwU σ n ↔ (∀ i j, Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j) ≤ 1) ∧
-      ∀ i j, j < i → Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j) < 1 := by
+theorem mem_iwU_iff (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n)
+    : g ∈ IwU σ n
+      ↔ (∀ i j, Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j) ≤ 1)
+        ∧ ∀ i j, j < i → Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j) < 1 := by
   constructor
   · intro hg
     have hg' : (g : GL (Fin n) L) ∈ IwGL L n := hg
-    refine ⟨fun i j => GlobalTheory.CompanionTheory.KUFactsU.iwGL_entries hg' i j, fun i j hji => ?_⟩
+    refine
+      ⟨fun i j => GlobalTheory.CompanionTheory.KUFactsU.iwGL_entries hg' i j, fun i j hji => ?_⟩
     have h := (Subgroup.mem_iInf.1 hg') ⟨i.val, by omega⟩
-    have hs : (Matrix.GeneralLinearGroup.toLin (g : GL (Fin n) L)) • latK L n i.val = latK L n i.val := h
+    have hs
+        : (Matrix.GeneralLinearGroup.toLin (g : GL (Fin n) L)) • latK L n i.val = latK L n i.val :=
+      h
     have he : (Pi.single j (1 : L) : Fin n → L) ∈ latK L n i.val := by
       intro k
       by_cases hk : k = j
@@ -63,8 +69,10 @@ theorem mem_iwU_iff (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n) :
     rw [hs] at hm
     have hi := hm i
     rw [if_neg (lt_irrefl _)] at hi
-    have e : ((Matrix.GeneralLinearGroup.toLin (g : GL (Fin n) L)) • (Pi.single j (1 : L) : Fin n → L)) i =
-        ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j := by
+    have e
+        : ((Matrix.GeneralLinearGroup.toLin (g : GL (Fin n) L)) • (Pi.single j (1 : L) : Fin n → L))
+            i
+          = ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j := by
       show (Matrix.mulVec ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) (Pi.single j (1 : L) : Fin n → L)) i = _
       simp
     rwa [e] at hi
@@ -84,33 +92,47 @@ theorem mem_iwU_iff (hσv : ∀ x, Valued.v (σ x) = Valued.v x) (g : GU σ n) :
       show ((g : GL (Fin n) L)).val.mulVec (((g : GL (Fin n) L)⁻¹).val.mulVec x) = x
       rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
 
-theorem iwU_diag (hσv : ∀ x, Valued.v (σ x) = Valued.v x) {g : GU σ n} (hg : g ∈ IwU σ n) (i : Fin n) :
-    Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i) = 1 := by
+theorem iwU_diag
+    (hσv : ∀ x, Valued.v (σ x) = Valued.v x) {g : GU σ n} (hg : g ∈ IwU σ n) (i : Fin n)
+    : Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i) = 1 := by
   classical
   obtain ⟨h1, h2⟩ := (mem_iwU_iff hσv g).1 hg
   obtain ⟨k1, k2⟩ := (mem_iwU_iff hσv g⁻¹).1 (inv_mem hg)
-  have hprod : (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) *
-      (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)) i i = 1 := by
+  have hprod
+      : (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L)
+            * (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L))
+          i i
+        = 1 := by
     rw [← Units.val_mul, ← Subgroup.coe_mul, mul_inv_cancel]; simp
   rw [Matrix.mul_apply, ← Finset.add_sum_erase _ _ (Finset.mem_univ i)] at hprod
-  have hrest : Valued.v (∑ j ∈ Finset.univ.erase i, ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j *
-      (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) j i) < 1 := by
+  have hrest
+      : Valued.v
+          (∑ j ∈ Finset.univ.erase i, ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j *
+            (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) j i)
+        < 1 := by
     refine Valuation.map_sum_lt _ one_ne_zero fun j hj => ?_
     rw [map_mul]
     rcases lt_or_gt_of_ne (Finset.ne_of_mem_erase hj) with hji | hji
     · exact (mul_le_of_le_one_right' (k1 j i)).trans_lt (h2 i j hji)
     · exact (mul_le_of_le_one_left' (h1 i j)).trans_lt (k2 j i hji)
-  have hmain : Valued.v (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i *
-      (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i) = 1 := by
-    have e : ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i *
-        (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i =
-        1 - ∑ j ∈ Finset.univ.erase i, ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j *
-          (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) j i := by
+  have hmain
+      : Valued.v
+          (((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i
+            * (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i)
+        = 1 := by
+    have e
+        : ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i
+            * (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i i
+          = 1
+            - ∑ j ∈ Finset.univ.erase i, ((g : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) i j *
+              (((g⁻¹ : GU σ n) : GL (Fin n) L) : Matrix (Fin n) (Fin n) L) j i := by
       rw [← hprod]; ring
     rw [e, Valuation.map_sub_eq_of_lt_left _ (by simpa using hrest), map_one]
   rw [map_mul] at hmain
   refine le_antisymm (h1 i i) ?_
-  calc (1 : WithZero (Multiplicative ℤ)) = _ := hmain.symm
+  calc
+    (1 : WithZero (Multiplicative ℤ))
+      = _ := hmain.symm
     _ ≤ _ := mul_le_of_le_one_right' (k1 i i)
 
 end GlobalTheory.CompanionTheory.SatPow

@@ -19,8 +19,8 @@ attribute [local instance] MvPolynomial.weightedGradedAlgebra
 
 variable {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem OrbitCompNonvanish.isHomogeneous_blkWt {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P) :
-    P.IsHomogeneous (weightedHomogeneousSubmodule ℤ (blkWt (ι := ι))) := by
+theorem OrbitCompNonvanish.isHomogeneous_blkWt {P : Ideal (MRing ι)} (hP : IsMultiHomogIdeal P)
+    : P.IsHomogeneous (weightedHomogeneousSubmodule ℤ (blkWt (ι := ι))) := by
   obtain ⟨S, hS, rfl⟩ := hP
   apply Ideal.homogeneous_span
   intro f hf
@@ -31,11 +31,12 @@ theorem OrbitCompNonvanish.isHomogeneous_blkWt {P : Ideal (MRing ι)} (hP : IsMu
   rw [weight_blkWt_apply, ha m (mem_support_iff.mpr hm) k]
   simp
 
-theorem OrbitCompNonvanish.isMultiHomog_component (E : MRing ι) (δ : K →₀ ℕ) :
-    IsMultiHomog (weightedHomogeneousComponent (blkWt (ι := ι)) δ E) δ := by
+theorem OrbitCompNonvanish.isMultiHomog_component (E : MRing ι) (δ : K →₀ ℕ)
+    : IsMultiHomog (weightedHomogeneousComponent (blkWt (ι := ι)) δ E) δ := by
   intro m hm k
-  have h := weightedHomogeneousComponent_isWeightedHomogeneous (w := blkWt (ι := ι)) δ E
-    (mem_support_iff.mp hm)
+  have h :=
+    weightedHomogeneousComponent_isWeightedHomogeneous (w := blkWt (ι := ι)) δ E
+      (mem_support_iff.mp hm)
   rw [← weight_blkWt_apply, h]
 
 theorem OrbitCompNonvanish.proof : OrbitCompNonvanish.Statement := by
@@ -65,21 +66,22 @@ theorem OrbitCompNonvanish.proof : OrbitCompNonvanish.Statement := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Q, map_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
-    rw [eval_smul_homog (comp b) b (OrbitCompNonvanish.isMultiHomog_component E b) c z, eval_monomial,
-      Finsupp.prod_fintype _ _ (by simp)]
+    rw [eval_smul_homog (comp b) b (OrbitCompNonvanish.isMultiHomog_component E b) c z,
+      eval_monomial, Finsupp.prod_fintype _ _ (by simp)]
     ring
   have hQ0 : Q ≠ 0 := by
     intro h0
     have hc := congrArg (AddMonoidAlgebra.coeff · δ) h0
-    simp only [Q, coeff_sum, coeff_monomial, AddMonoidAlgebra.coeff_zero,
-      Finsupp.zero_apply] at hc
+    simp only [Q, coeff_sum, coeff_monomial, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply] at hc
     rw [Finset.sum_ite_eq' T δ] at hc
-    simp only [show δ ∈ T from Finset.mem_insert_self _ _, ↓reduceIte] at hc
+    simp only [show δ ∈ T from Finset.mem_insert_self _ _, ↓ reduceIte] at hc
     exact hz hc
   by_contra hno
   push Not at hno
   apply hQ0
-  refine funext_set (fun _ => ({0}ᶜ : Set ℂ)) (fun _ => (Set.finite_singleton 0).infinite_compl)
+  refine funext_set
+    (fun _ => ({0}ᶜ : Set ℂ))
+    (fun _ => (Set.finite_singleton 0).infinite_compl)
     fun x hx => ?_
   rw [hQ, map_zero]
   exact hno x fun k => hx k (Set.mem_univ k)

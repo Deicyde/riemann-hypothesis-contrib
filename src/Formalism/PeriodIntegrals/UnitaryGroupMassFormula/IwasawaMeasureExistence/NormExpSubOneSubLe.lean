@@ -37,9 +37,9 @@ section Trotter
 
 variable {𝔸 : Type*} [NormedRing 𝔸] [NormedAlgebra ℝ 𝔸] [CompleteSpace 𝔸] [NormOneClass 𝔸]
 
-theorem norm_exp_sub_partial_le (x : 𝔸) (m : ℕ) :
-    ‖NormedSpace.exp x - ∑ i ∈ Finset.range m, ((i.factorial : ℝ)⁻¹) • x ^ i‖ ≤
-      Real.exp ‖x‖ - ∑ i ∈ Finset.range m, ((i.factorial : ℝ)⁻¹) * ‖x‖ ^ i := by
+theorem norm_exp_sub_partial_le (x : 𝔸) (m : ℕ)
+    : ‖NormedSpace.exp x - ∑ i ∈ Finset.range m, ((i.factorial : ℝ)⁻¹) • x ^ i‖
+      ≤ Real.exp ‖x‖ - ∑ i ∈ Finset.range m, ((i.factorial : ℝ)⁻¹) * ‖x‖ ^ i := by
   have h1 : HasSum (fun i : ℕ => ((i.factorial : ℝ)⁻¹) • x ^ i) (NormedSpace.exp x) :=
     NormedSpace.exp_series_hasSum_exp' (𝕂 := ℝ) x
   have h2 : HasSum (fun i : ℕ => ((i.factorial : ℝ)⁻¹) • ‖x‖ ^ i) (Real.exp ‖x‖) := by
@@ -59,8 +59,9 @@ end Trotter
 
 section Mat
 
-attribute [local instance] Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace
-  Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
+attribute [local instance]
+  Matrix.linftyOpNormedAddCommGroup Matrix.linftyOpNormedSpace Matrix.linftyOpNormedRing
+  Matrix.linftyOpNormedAlgebra
 
 end Mat
 

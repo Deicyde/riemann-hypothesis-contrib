@@ -12,15 +12,21 @@ open ReciprocityTheory.ChartRestriction.G.Geo MvPolynomial
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem le_of_mem_support_mHom {a : K → ℕ} {f : MRing ι} (hf : f ∈ mHom ι a) {m : (Σ k, ι k) →₀ ℕ}
-    (hm : m ∈ f.support) (p : Σ k, ι k) : m p ≤ a p.1 := by
+theorem le_of_mem_support_mHom
+    {a : K → ℕ} {f : MRing ι} (hf : f ∈ mHom ι a)
+    {m : (Σ k, ι k) →₀ ℕ} (hm : m ∈ f.support)
+    (p : Σ k, ι k)
+    : m p ≤ a p.1 := by
   classical
   revert m
   induction hf using Submodule.span_induction with
   | mem s hs =>
     intro m hm
     rw [← hs m hm p.1]
-    exact Finset.single_le_sum (f := fun i => m ⟨p.1, i⟩) (fun _ _ => Nat.zero_le _) (Finset.mem_univ p.2)
+    exact Finset.single_le_sum
+      (f := fun i => m ⟨p.1, i⟩)
+      (fun _ _ => Nat.zero_le _)
+      (Finset.mem_univ p.2)
   | zero =>
     intro m hm
     simp at hm
@@ -33,8 +39,7 @@ theorem le_of_mem_support_mHom {a : K → ℕ} {f : MRing ι} (hf : f ∈ mHom �
     intro m hm
     exact hx (MvPolynomial.support_smul hm)
 
-theorem finite_monoBox (a : K → ℕ) :
-    {m : (Σ k, ι k) →₀ ℕ | ∀ p, m p ≤ a p.1}.Finite := by
+theorem finite_monoBox (a : K → ℕ) : {m : (Σ k, ι k) →₀ ℕ | ∀ p, m p ≤ a p.1}.Finite := by
   have hfin : (Set.pi Set.univ fun p : (Σ k, ι k) => Set.Iic (a p.1)).Finite :=
     Set.Finite.pi fun p => Set.finite_Iic _
   refine (hfin.preimage (Finsupp.equivFunOnFinite.injective.injOn)).subset ?_
@@ -43,24 +48,29 @@ theorem finite_monoBox (a : K → ℕ) :
 
 def monoBox (a : K → ℕ) : Finset ((Σ k, ι k) →₀ ℕ) := (finite_monoBox (ι := ι) a).toFinset
 
-theorem support_subset_monoBox {a : K → ℕ} {f : MRing ι} (hf : f ∈ mHom ι a) :
-    f.support ⊆ monoBox a := by
+theorem support_subset_monoBox {a : K → ℕ} {f : MRing ι} (hf : f ∈ mHom ι a)
+    : f.support ⊆ monoBox a := by
   intro m hm
   simp only [monoBox, Set.Finite.mem_toFinset, Set.mem_setOf_eq]
   exact fun p => le_of_mem_support_mHom hf hm p
 
-theorem finite_mPiece (J : Ideal (MRing ι)) (a : K → ℕ) {p : ℕ} (hp : 0 < p)
-    (hpJ : (p : MRing ι) ∈ J) : Finite (mPiece J a) := by
+theorem finite_mPiece
+    (J : Ideal (MRing ι)) (a : K → ℕ) {p : ℕ} (hp : 0 < p) (hpJ : (p : MRing ι) ∈ J)
+    : Finite (mPiece J a) := by
   classical
   obtain ⟨q, rfl⟩ : ∃ q, p = q + 1 := ⟨p - 1, by omega⟩
   let g : (monoBox (ι := ι) a → Fin (q + 1)) → MRing ι ⧸ J := fun c =>
-    Ideal.Quotient.mk J (∑ m : monoBox (ι := ι) a,
-      MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (((c m : ℕ) : ℤ)))
+    Ideal.Quotient.mk J
+      (∑ m : monoBox (ι := ι) a,
+        MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (((c m : ℕ) : ℤ)))
   have hsub : (mPiece J a : Set (MRing ι ⧸ J)) ⊆ Set.range g := by
     intro x hx
     obtain ⟨f, hf, rfl⟩ := Submodule.mem_map.mp hx
     have hq : (0 : ℤ) < ((q + 1 : ℕ) : ℤ) := by omega
-    refine ⟨fun m => ⟨((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat, ?_⟩, ?_⟩
+    refine ⟨
+      fun m => ⟨((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat, ?_⟩,
+      ?_
+    ⟩
     · have h0 := Int.emod_nonneg (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) hq.ne'
       have h1 := Int.emod_lt_of_pos (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) hq
       omega
@@ -68,44 +78,61 @@ theorem finite_mPiece (J : Ideal (MRing ι)) (a : K → ℕ) {p : ℕ} (hp : 0 <
           ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat : ℕ) : ℤ)) =
         Ideal.Quotient.mk J f
       rw [Ideal.Quotient.eq]
-      have hf' : f = ∑ m : monoBox (ι := ι) a,
-          MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) := by
-        rw [Finset.sum_coe_sort (monoBox a) (fun m => MvPolynomial.monomial m (AddMonoidAlgebra.coeff f m))]
-        conv_lhs => rw [MvPolynomial.as_sum f]
-        refine Finset.sum_subset (support_subset_monoBox hf) (fun m _ hm => ?_)
-        simp only [MvPolynomial.mem_support_iff, ne_eq, not_not] at hm
-        simp [hm]
+      have hf'
+          : f
+            = ∑ m : monoBox (ι := ι) a,
+              MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) :=
+        by
+          rw [Finset.sum_coe_sort (monoBox a)
+            (fun m => MvPolynomial.monomial m (AddMonoidAlgebra.coeff f m))]
+          conv_lhs => rw [MvPolynomial.as_sum f]
+          refine Finset.sum_subset (support_subset_monoBox hf) (fun m _ hm => ?_)
+          simp only [MvPolynomial.mem_support_iff, ne_eq, not_not] at hm
+          simp [hm]
       have hP : ((q + 1 : ℕ) : MRing ι) ∈ J := hpJ
-      have hdiff : ∀ m : monoBox (ι := ι) a, MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
-          ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat : ℕ) : ℤ) -
-          MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) ∈ J := by
+      have hdiff
+          : ∀ m : monoBox (ι := ι) a,
+            MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
+                  ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat
+                      : ℕ)
+                    : ℤ)
+                - MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
+                  (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ))
+              ∈ J := by
         intro m
         have h0 := Int.emod_nonneg (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) hq.ne'
         rw [Int.toNat_of_nonneg h0, ← map_sub, Int.emod_def]
-        have e : AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ) - ((q + 1 : ℕ) : ℤ) *
-            (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ) / ((q + 1 : ℕ) : ℤ)) -
-            AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ) =
-            ((q + 1 : ℕ) : ℤ) * (-(AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ) / ((q + 1 : ℕ) : ℤ))) := by
+        have e
+            : AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)
+                - ((q + 1 : ℕ) : ℤ)
+                  * (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ) / ((q + 1 : ℕ) : ℤ))
+                - AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)
+              = ((q + 1 : ℕ) : ℤ)
+                * (-(AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ) / ((q + 1 : ℕ) : ℤ))) := by
           ring
         rw [e, ← MvPolynomial.C_mul_monomial, map_natCast]
         exact J.mul_mem_right _ hP
-      have e2 : (∑ m : monoBox (ι := ι) a, MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
-          ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat : ℕ) : ℤ)) - f =
-          ∑ m : monoBox (ι := ι) a, (MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
-          ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat : ℕ) : ℤ) -
-          MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ))) := by
-        rw [Finset.sum_sub_distrib, ← hf']
+      have e2
+          : (∑ m : monoBox (ι := ι) a, MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
+              ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat : ℕ) : ℤ))
+              - f
+            = ∑ m : monoBox (ι := ι) a, (MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ)
+              ((((AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ)) % ((q + 1 : ℕ) : ℤ)).toNat : ℕ) : ℤ) -
+              MvPolynomial.monomial (m : (Σ k, ι k) →₀ ℕ) (AddMonoidAlgebra.coeff f (m : (Σ k, ι k) →₀ ℕ))) :=
+        by rw [Finset.sum_sub_distrib, ← hf']
       rw [e2]
       exact Ideal.sum_mem _ fun m _ => hdiff m
   exact ((Set.finite_range g).subset hsub).to_subtype
 
-theorem card_mPiece_pos (J : Ideal (MRing ι)) (a : K → ℕ) {p : ℕ} (hp : 0 < p)
-    (hpJ : (p : MRing ι) ∈ J) : 0 < Nat.card (mPiece J a) := by
+theorem card_mPiece_pos
+    (J : Ideal (MRing ι)) (a : K → ℕ) {p : ℕ} (hp : 0 < p) (hpJ : (p : MRing ι) ∈ J)
+    : 0 < Nat.card (mPiece J a) := by
   haveI := finite_mPiece J a hp hpJ
   exact Nat.card_pos
 
-theorem card_mPiece_irrel {q : Ideal (MRing ι)} {k : K} (hk : ∀ i, (X ⟨k, i⟩ : MRing ι) ∈ q)
-    {a : K → ℕ} (ha : 0 < a k) : Nat.card (mPiece q a) = 1 := by
+theorem card_mPiece_irrel
+    {q : Ideal (MRing ι)} {k : K} (hk : ∀ i, (X ⟨k, i⟩ : MRing ι) ∈ q) {a : K → ℕ} (ha : 0 < a k)
+    : Nat.card (mPiece q a) = 1 := by
   classical
   have hmem : ∀ f ∈ mHom ι a, f ∈ q := by
     intro f hf
@@ -119,8 +146,10 @@ theorem card_mPiece_irrel {q : Ideal (MRing ι)} {k : K} (hk : ∀ i, (X ⟨k, i
         push_neg at hc
         have h0 : ∑ i, m ⟨k, i⟩ = 0 := Finset.sum_eq_zero fun i _ => by have := hc i; omega
         omega
-      have e : MvPolynomial.monomial m (AddMonoidAlgebra.coeff s m) =
-          MvPolynomial.X ⟨k, i⟩ * MvPolynomial.monomial (m - Finsupp.single ⟨k, i⟩ 1) (AddMonoidAlgebra.coeff s m) := by
+      have e
+          : MvPolynomial.monomial m (AddMonoidAlgebra.coeff s m)
+            = MvPolynomial.X ⟨k, i⟩ * MvPolynomial.monomial (m - Finsupp.single ⟨k, i⟩ 1)
+              (AddMonoidAlgebra.coeff s m) := by
         rw [MvPolynomial.X, MvPolynomial.monomial_mul, one_mul,
           add_tsub_cancel_of_le (Finsupp.single_le_iff.mpr hi)]
       rw [e]
@@ -137,8 +166,8 @@ theorem card_mPiece_irrel {q : Ideal (MRing ι)} {k : K} (hk : ∀ i, (X ⟨k, i
   haveI : Unique (mPiece q a) := ⟨⟨0⟩, hzero⟩
   exact Nat.card_unique
 
-theorem card_mPiece_mono {J J' : Ideal (MRing ι)} (h : J ≤ J') (a : K → ℕ) [Finite (mPiece J a)] :
-    Nat.card (mPiece J' a) ≤ Nat.card (mPiece J a) := by
+theorem card_mPiece_mono {J J' : Ideal (MRing ι)} (h : J ≤ J') (a : K → ℕ) [Finite (mPiece J a)]
+    : Nat.card (mPiece J' a) ≤ Nat.card (mPiece J a) := by
   have hmap : ∀ x ∈ mPiece J a, Ideal.Quotient.factor h x ∈ mPiece J' a := by
     intro x hx
     obtain ⟨g, hg, rfl⟩ := Submodule.mem_map.mp hx

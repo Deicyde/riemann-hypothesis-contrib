@@ -5,20 +5,23 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 @[expose] public section
 
-open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing Polynomial UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
 section
 variable {R : Type} [CommRing R]
 
 private theorem adj_mul' (X Y : M4 R) : adj (X * Y) = adj Y * adj X := by
   ext i j
-  fin_cases i <;> fin_cases j <;> simp [adj_apply, sgn, Fin.rev, Matrix.mul_apply, Fin.sum_univ_four] <;> ring
+  fin_cases i <;> fin_cases j
+    <;> simp [adj_apply, sgn, Fin.rev, Matrix.mul_apply, Fin.sum_univ_four] <;> ring
 
 private theorem adj_adj' (X : M4 R) : adj (adj X) = X := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [adj_apply, sgn, Fin.rev]
 
-private theorem adj_diag' (d : Fin 4 → R) : adj (Matrix.diagonal d) = Matrix.diagonal fun i => d i.rev := by
+private theorem adj_diag' (d : Fin 4 → R)
+    : adj (Matrix.diagonal d) = Matrix.diagonal fun i => d i.rev := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [adj_apply, sgn, Fin.rev, Matrix.diagonal]
 
@@ -26,7 +29,8 @@ private theorem adj_sub_one (X : M4 R) : adj (X - 1) = adj X - 1 := by
   ext i j
   fin_cases i <;> fin_cases j <;> simp [adj_apply, sgn, Fin.rev]
 
-private theorem unit_of_sub [IsLocalRing R] {x y : R} (hy : IsUnit y) (h : x - y ∈ maximalIdeal R) : IsUnit x := by
+private theorem unit_of_sub [IsLocalRing R] {x y : R} (hy : IsUnit y) (h : x - y ∈ maximalIdeal R)
+    : IsUnit x := by
   by_contra hx
   have hx' : x ∈ maximalIdeal R := (mem_maximalIdeal x).mpr hx
   have hy' : y ∈ maximalIdeal R := by
@@ -46,30 +50,34 @@ private theorem sg_eq (i j : Fin 4) (h : lamW i = lamW j) : sg R i = sg R j := b
 
 end
 
-theorem UpperTheory.V.Ws.normal :
-    ∀ (C : Type) [CommRing C] [IsLocalRing C] [IsAdicComplete (maximalIdeal C) C] (ν : C) (g : M4 C), IsUnit (2 : C) → IsGSp ν g →
-      (∀ i j, i ≠ j → g i j ∈ maximalIdeal C) → (∀ i j, i ≠ j → IsUnit (g i i - g j j)) → IsUnit ν →
-      ∃ u : M4 C, IsGSp 1 u ∧ (∀ i j, (u - 1) i j ∈ maximalIdeal C) ∧ (adj u * g * u).IsDiag ∧ (IsBlock g → IsBlock u) := by
+theorem UpperTheory.V.Ws.normal
+    : ∀ (C : Type) [CommRing C] [IsLocalRing C] [IsAdicComplete (maximalIdeal C) C] (ν : C)
+        (g : M4 C),
+      IsUnit (2 : C) → IsGSp ν g → (∀ i j, i ≠ j → g i j ∈ maximalIdeal C)
+        → (∀ i j, i ≠ j → IsUnit (g i i - g j j)) → IsUnit ν
+        → ∃ u : M4 C,
+          IsGSp 1 u ∧ (∀ i j, (u - 1) i j ∈ maximalIdeal C) ∧ (adj u * g * u).IsDiag
+            ∧ (IsBlock g → IsBlock u) := by
   intro C _ _ _ ν g h2u hg hoff hdiff hν
   haveI : HenselianLocalRing C :=
     { (inferInstance : IsLocalRing C) with
       is_henselian := fun f hf a₀ h₁ h₂ =>
         (IsAdicComplete.henselianRing C (maximalIdeal C)).is_henselian f hf a₀ h₁
           (h₂.map (Ideal.Quotient.mk _)) }
-  obtain ⟨u, d, hu1, hgu, hdg, huniq⟩ := UpperTheory.V.AlgebraTools.henselDiag C (Fin 4) g hoff hdiff
+  obtain ⟨u, d, hu1, hgu, hdg, huniq⟩ :=
+    UpperTheory.V.AlgebraTools.henselDiag C (Fin 4) g hoff hdiff
   have hg' : adj g * g = ν • 1 := hg
-  have mulL : ∀ X Y : M4 C, (∀ i j, X i j ∈ maximalIdeal C) →
-      ∀ i j, (X * Y) i j ∈ maximalIdeal C := by
+  have mulL
+      : ∀ X Y : M4 C, (∀ i j, X i j ∈ maximalIdeal C) → ∀ i j, (X * Y) i j ∈ maximalIdeal C := by
     intro X Y hX i j
     rw [Matrix.mul_apply]
     exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_right _ _ (hX i k)
-  have mulR : ∀ X Y : M4 C, (∀ i j, Y i j ∈ maximalIdeal C) →
-      ∀ i j, (X * Y) i j ∈ maximalIdeal C := by
+  have mulR
+      : ∀ X Y : M4 C, (∀ i j, Y i j ∈ maximalIdeal C) → ∀ i j, (X * Y) i j ∈ maximalIdeal C := by
     intro X Y hY i j
     rw [Matrix.mul_apply]
     exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (hY k j)
-  have adjM : ∀ X : M4 C, (∀ i j, X i j ∈ maximalIdeal C) →
-      ∀ i j, adj X i j ∈ maximalIdeal C := by
+  have adjM : ∀ X : M4 C, (∀ i j, X i j ∈ maximalIdeal C) → ∀ i j, adj X i j ∈ maximalIdeal C := by
     intro X hX i j
     rw [adj_apply, zsmul_eq_mul]
     exact Ideal.mul_mem_left _ _ (hX _ _)
@@ -85,11 +93,11 @@ theorem UpperTheory.V.Ws.normal :
       have := hW1 i i
       rwa [Matrix.sub_apply, Matrix.one_apply_eq] at this)
   have hkey : ν • (adj u * u) = adj (Matrix.diagonal d) * (adj u * u) * Matrix.diagonal d := by
-    have e1 : adj u * adj g = adj (Matrix.diagonal d) * adj u := by
-      rw [← adj_mul', ← adj_mul', hgu]
-    calc ν • (adj u * u) = adj u * (adj g * g) * u := by
-          rw [hg']
-          simp [Matrix.mul_smul, Matrix.smul_mul]
+    have e1 : adj u * adj g = adj (Matrix.diagonal d) * adj u := by rw [← adj_mul', ← adj_mul', hgu]
+    calc
+      ν • (adj u * u) = adj u * (adj g * g) * u := by
+        rw [hg']
+        simp [Matrix.mul_smul, Matrix.smul_mul]
       _ = (adj u * adj g) * (g * u) := by simp only [Matrix.mul_assoc]
       _ = adj (Matrix.diagonal d) * adj u * (u * Matrix.diagonal d) := by rw [e1, hgu]
       _ = _ := by simp only [Matrix.mul_assoc]
@@ -101,16 +109,14 @@ theorem UpperTheory.V.Ws.normal :
     exact this
   have hdd : ∀ i, d i.rev * d i = ν := by
     intro i
-    have h0 : (adj u * u) i i * (d i.rev * d i - ν) = 0 := by
-      linear_combination (-1 : C) * hent i i
+    have h0 : (adj u * u) i i * (d i.rev * d i - ν) = 0 := by linear_combination (-1 : C) * hent i i
     exact sub_eq_zero.mp ((hWu i).mul_right_eq_zero.mp h0)
   have hdu : ∀ i, IsUnit (d i) := fun i => by
     have : IsUnit (d i.rev * d i) := by rw [hdd i]; exact hν
     exact isUnit_of_mul_isUnit_right this
   have hoffW : ∀ i j, i ≠ j → (adj u * u) i j = 0 := by
     intro i j hij
-    have h0 : (adj u * u) i j * (d i.rev * d j - ν) = 0 := by
-      linear_combination (-1 : C) * hent i j
+    have h0 : (adj u * u) i j * (d i.rev * d j - ν) = 0 := by linear_combination (-1 : C) * hent i j
     have hu : IsUnit (d i.rev * d j - ν) := by
       rw [← hdd i, ← mul_sub]
       refine (hdu _).mul ?_
@@ -151,23 +157,23 @@ theorem UpperTheory.V.Ws.normal :
   obtain ⟨t, ht⟩ : ∃ t : Fin 4 → C, t = ![1, 1, a, b] := ⟨_, rfl⟩
   have htw : ∀ i, t i.rev * w i * t i = 1 := by
     intro i
-    fin_cases i <;> simp [ht, Fin.rev, h21, h30] <;>
-      first | linear_combination ha | linear_combination hb
+    fin_cases i <;> simp [ht, Fin.rev, h21, h30]
+      <;> first | linear_combination ha | linear_combination hb
   have htm : ∀ i, t i - 1 ∈ maximalIdeal C := by
     intro i
     fin_cases i <;> simp [ht] <;> first | exact ha1 | exact hb1
   refine ⟨u * Matrix.diagonal t, ?_, ?_, ?_, ?_⟩
   · show adj (u * Matrix.diagonal t) * (u * Matrix.diagonal t) = (1 : C) • (1 : M4 C)
     rw [adj_mul', adj_diag', one_smul]
-    calc Matrix.diagonal (fun i => t i.rev) * adj u * (u * Matrix.diagonal t)
-        = Matrix.diagonal (fun i => t i.rev) * (adj u * u) * Matrix.diagonal t := by
-          simp only [Matrix.mul_assoc]
+    calc
+      Matrix.diagonal (fun i => t i.rev) * adj u * (u * Matrix.diagonal t)
+          = Matrix.diagonal (fun i => t i.rev) * (adj u * u) * Matrix.diagonal t := by
+        simp only [Matrix.mul_assoc]
       _ = 1 := by
-          rw [hWd, Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal,
-            ← Matrix.diagonal_one]
-          congr 1
-          funext i
-          exact htw i
+        rw [hWd, Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+        congr 1
+        funext i
+        exact htw i
   · intro i j
     have e : u * Matrix.diagonal t - 1 = (u - 1) * Matrix.diagonal t + (Matrix.diagonal t - 1) := by
       noncomm_ring
@@ -179,15 +185,18 @@ theorem UpperTheory.V.Ws.normal :
       exact htm i
     · rw [Matrix.sub_apply, Matrix.diagonal_apply_ne _ hij, Matrix.one_apply_ne hij, sub_zero]
       exact Submodule.zero_mem _
-  · have e : adj (u * Matrix.diagonal t) * g * (u * Matrix.diagonal t)
-        = Matrix.diagonal (fun i => t i.rev) * (adj u * u) * Matrix.diagonal d * Matrix.diagonal t := by
+  · have e
+        : adj (u * Matrix.diagonal t) * g * (u * Matrix.diagonal t)
+          = Matrix.diagonal (fun i => t i.rev) * (adj u * u) * Matrix.diagonal d
+            * Matrix.diagonal t := by
       rw [adj_mul', adj_diag']
-      calc Matrix.diagonal (fun i => t i.rev) * adj u * g * (u * Matrix.diagonal t)
-          = Matrix.diagonal (fun i => t i.rev) * adj u * (g * u) * Matrix.diagonal t := by
-            simp only [Matrix.mul_assoc]
+      calc
+        Matrix.diagonal (fun i => t i.rev) * adj u * g * (u * Matrix.diagonal t)
+            = Matrix.diagonal (fun i => t i.rev) * adj u * (g * u) * Matrix.diagonal t := by
+          simp only [Matrix.mul_assoc]
         _ = _ := by
-            rw [hgu]
-            simp only [Matrix.mul_assoc]
+          rw [hgu]
+          simp only [Matrix.mul_assoc]
     rw [e, hWd, Matrix.diagonal_mul_diagonal, Matrix.diagonal_mul_diagonal,
       Matrix.diagonal_mul_diagonal]
     exact Matrix.isDiag_diagonal _
@@ -218,14 +227,15 @@ theorem UpperTheory.V.Ws.normal :
       rw [e]
       exact mulL _ _ (mulR _ _ hu1) i j
     have h2 : g * (S * u * S) = S * u * S * Matrix.diagonal d := by
-      calc g * (S * u * S) = S * (g * u) * S := by
-            rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hgS, Matrix.mul_assoc S g u]
+      calc
+        g * (S * u * S) = S * (g * u) * S := by
+          rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, hgS, Matrix.mul_assoc S g u]
         _ = S * u * (Matrix.diagonal d * S) := by
-            rw [hgu]
-            simp only [Matrix.mul_assoc]
+          rw [hgu]
+          simp only [Matrix.mul_assoc]
         _ = S * u * S * Matrix.diagonal d := by
-            rw [hdS]
-            simp only [Matrix.mul_assoc]
+          rw [hdS]
+          simp only [Matrix.mul_assoc]
     obtain ⟨-, t', ht'⟩ := huniq (S * u * S) d h1 h2
     have hent2 : ∀ i j, sg C i * u i j * sg C j = u i j * t' j := by
       intro i j
@@ -235,9 +245,10 @@ theorem UpperTheory.V.Ws.normal :
     have ht'1 : ∀ j, t' j = 1 := by
       intro j
       have h := hent2 j j
-      have hu : IsUnit (u j j) := unit_of_sub isUnit_one (by
-        have := hu1 j j
-        rwa [Matrix.sub_apply, Matrix.one_apply_eq] at this)
+      have hu : IsUnit (u j j) :=
+        unit_of_sub isUnit_one (by
+          have := hu1 j j
+          rwa [Matrix.sub_apply, Matrix.one_apply_eq] at this)
       have h0 : u j j * (t' j - 1) = 0 := by
         linear_combination (-1 : C) * h + u j j * sg_sq (R := C) j
       exact sub_eq_zero.mp (hu.mul_right_eq_zero.mp h0)

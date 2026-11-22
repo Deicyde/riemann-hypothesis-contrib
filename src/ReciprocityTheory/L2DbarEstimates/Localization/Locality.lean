@@ -31,15 +31,20 @@ private lemma d_apply_eq_zero_of_eventuallyEq_zero {M : Type*} [TopologicalSpace
     simp
   · rfl
 
-theorem locality (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
-    [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M] : LocalityStatement n M := by
+theorem locality
+    (n : ℕ)
+    (M : Type*)
+    [TopologicalSpace M] [T2Space M] [SecondCountableTopology M] [MeasurableSpace M] [BorelSpace M]
+    : LocalityStatement n M := by
   intro z _ ph ph' ψ U f _ _ hsupp hph
   have hfz : ∀ x, x ∉ U → f x = 0 := by
     intro x hx
     by_contra h
     exact hx (hsupp (subset_tsupport _ h))
-  have hfun : ∀ j, (fun y => (Real.exp (-(w2 ph' ψ y)) : ℂ) * f y j) =
-      fun y => (Real.exp (-ph y) : ℂ) * f y j := by
+  have hfun
+      : ∀ j,
+        (fun y => (Real.exp (-(w2 ph' ψ y)) : ℂ) * f y j)
+          = fun y => (Real.exp (- ph y) : ℂ) * f y j := by
     intro j
     funext y
     by_cases hy : y ∈ U
@@ -63,7 +68,7 @@ theorem locality (n : ℕ) (M : Type*) [TopologicalSpace M] [T2Space M]
       rw [h1]
     · have hx' : x ∉ tsupport f := fun h => hx (hsupp h)
       have hev : f =ᶠ[𝓝 x] 0 := notMem_tsupport_iff_eventuallyEq.1 hx'
-      have hS : ∀ j, d n z j (fun y => (Real.exp (-ph y) : ℂ) * f y j) x = 0 := fun j =>
+      have hS : ∀ j, d n z j (fun y => (Real.exp (- ph y) : ℂ) * f y j) x = 0 := fun j =>
         d_apply_eq_zero_of_eventuallyEq_zero n z j _ x (hev.mono fun y hy => by simp [hy])
       rw [Finset.sum_eq_zero (fun j _ => hS j)]
       simp

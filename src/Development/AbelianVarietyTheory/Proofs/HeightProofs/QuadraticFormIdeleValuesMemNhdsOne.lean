@@ -17,8 +17,8 @@ namespace NormOpen
 
 variable {F : Type} [Field F] [NumberField F]
 
-theorem eventually_isSquare_finite (v : HeightOneSpectrum (𝓞 F)) :
-    ∀ᶠ x in 𝓝 (1 : v.adicCompletion F), IsSquare x := by
+theorem eventually_isSquare_finite (v : HeightOneSpectrum (𝓞 F))
+    : ∀ᶠ x in 𝓝 (1 : v.adicCompletion F), IsSquare x := by
   have h2eq : ((2 : F) : v.adicCompletion F) = 2 := by
     rw [show (2 : F) = 1 + 1 from one_add_one_eq_two.symm,
       show (2 : v.adicCompletion F) = 1 + 1 from one_add_one_eq_two.symm,
@@ -53,16 +53,19 @@ theorem eventually_isSquare_finite (v : HeightOneSpectrum (𝓞 F)) :
   have hc1 : Valued.v c < 1 := by
     rw [hc, show (1 : WithZero (Multiplicative ℤ)) = WithZero.exp 0 from rfl, WithZero.exp_lt_exp]
     omega
-  have hN : {x : v.adicCompletion F | (x - 1) * c⁻¹ ∈ (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))).integer} ∈
-      𝓝 (1 : v.adicCompletion F) := by
+  have hN
+      : {x : v.adicCompletion F | (x - 1) * c⁻¹ ∈ (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))).integer}
+        ∈ 𝓝 (1 : v.adicCompletion F) := by
     refine IsOpen.mem_nhds ?_ ?_
-    · exact (Valued.isOpen_integer _).preimage ((continuous_id.sub continuous_const).mul continuous_const)
+    · exact (Valued.isOpen_integer _).preimage
+        ((continuous_id.sub continuous_const).mul continuous_const)
     · simp [Valuation.mem_integer_iff]
   filter_upwards [hN] with x hx
   rw [Valuation.mem_integer_iff] at hx
   have hle : Valued.v (x - 1) ≤ Valued.v c :=
-    calc Valued.v (x - 1) = Valued.v ((x - 1) * c⁻¹) * Valued.v c := by
-          rw [← map_mul, inv_mul_cancel_right₀ hc0]
+    calc
+      Valued.v (x - 1)
+        = Valued.v ((x - 1) * c⁻¹) * Valued.v c := by rw [← map_mul, inv_mul_cancel_right₀ hc0]
       _ ≤ 1 * Valued.v c := by gcongr
       _ = Valued.v c := one_mul _
   have hvx : Valued.v x = 1 := by
@@ -73,20 +76,22 @@ theorem eventually_isSquare_finite (v : HeightOneSpectrum (𝓞 F)) :
     intro h
     rw [h, map_zero] at hvx
     exact zero_ne_one hvx
-  have hu : Units.mk0 x hx0 ∈ hiUnits (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))) (2 * e + 1) :=
+  have hu
+      : Units.mk0 x hx0 ∈ hiUnits
+        (Valued.v : Valuation (v.adicCompletion F) (WithZero (Multiplicative ℤ))) (2 * e + 1) :=
     ⟨hvx, hc ▸ hle⟩
   obtain ⟨y, -, hy⟩ := Subgroup.mem_map.1 (hiUnits_le_sqs_hiUnits F v e he hu)
   have hy' := congrArg Units.val hy
   simp only [powMonoidHom_apply, Units.val_mk0, pow_two] at hy'
   exact ⟨y, hy'.symm⟩
 
-
 omit [NumberField F] in
-theorem eventually_isSquare_infinite (w : InfinitePlace F) :
-    ∀ᶠ x in 𝓝 (1 : w.Completion), IsSquare x := by
+theorem eventually_isSquare_infinite (w : InfinitePlace F)
+    : ∀ᶠ x in 𝓝 (1 : w.Completion), IsSquare x := by
   rcases w.isReal_or_isComplex with hw | hw
   · let φ := InfinitePlace.Completion.ringEquivRealOfIsReal hw
-    have hφ : Continuous φ := (InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal hw).continuous
+    have hφ : Continuous φ :=
+      (InfinitePlace.Completion.isometry_extensionEmbeddingOfIsReal hw).continuous
     have hpos : ∀ᶠ x in 𝓝 (1 : w.Completion), 0 < φ x := by
       have h := hφ.tendsto 1
       rw [map_one] at h
@@ -99,21 +104,24 @@ theorem eventually_isSquare_infinite (w : InfinitePlace F) :
     obtain ⟨z, hz⟩ := IsAlgClosed.exists_eq_mul_self (φ x)
     simpa using IsSquare.map φ.symm (⟨z, hz⟩ : IsSquare (φ x))
 
-theorem eventually_integral :
-    ∀ᶠ a in 𝓝 (1 : FiniteAdeleRing (𝓞 F) F), ∀ v, a v ∈ v.adicCompletionIntegers F := by
+theorem eventually_integral
+    : ∀ᶠ a in 𝓝 (1 : FiniteAdeleRing (𝓞 F) F), ∀ v, a v ∈ v.adicCompletionIntegers F := by
   have ho : IsOpen {a : FiniteAdeleRing (𝓞 F) F | ∀ v, a.1 v ∈ v.adicCompletionIntegers F} :=
     RestrictedProduct.isOpen_forall_mem (fun v => Valued.isOpen_valuationSubring _)
   exact ho.mem_nhds (fun v => (one_mem (v.adicCompletionIntegers F) : _))
 
-theorem continuous_eval (v : HeightOneSpectrum (𝓞 F)) :
-    Continuous (fun a : FiniteAdeleRing (𝓞 F) F => a v) := by
+theorem continuous_eval (v : HeightOneSpectrum (𝓞 F))
+    : Continuous (fun a : FiniteAdeleRing (𝓞 F) F => a v) := by
   exact RestrictedProduct.continuous_eval v
 
 end NormOpen
 
-
 open NormOpen in
-theorem norm_form_mem_nhds_one : ∀ (F : Type) [Field F] [NumberField F] (δ : F), δ ≠ 0 → {a : (AdeleRing (𝓞 F) F)ˣ | ∃ x y : AdeleRing (𝓞 F) F, (a : AdeleRing (𝓞 F) F) = x ^ 2 - algebraMap F (AdeleRing (𝓞 F) F) δ * y ^ 2} ∈ 𝓝 (1 : (AdeleRing (𝓞 F) F)ˣ) := by
+theorem norm_form_mem_nhds_one
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F),
+      δ ≠ 0
+        → {a : (AdeleRing (𝓞 F) F)ˣ | ∃ x y : AdeleRing (𝓞 F) F, (a : AdeleRing (𝓞 F) F) = x ^ 2 - algebraMap F (AdeleRing (𝓞 F) F) δ * y ^ 2}
+          ∈ 𝓝 (1 : (AdeleRing (𝓞 F) F)ˣ) := by
   intro F _ _ δ hδ
   set S : Set (HeightOneSpectrum (𝓞 F)) :=
     {v | v.valuation F (2 : F) ≠ 1} ∪ {v | v.valuation F δ ≠ 1} with hS
@@ -132,15 +140,18 @@ theorem norm_form_mem_nhds_one : ∀ (F : Type) [Field F] [NumberField F] (δ : 
       exact h
     have h2 : ∀ᶠ b in 𝓝 (1 : FiniteAdeleRing (𝓞 F) F), ∀ v ∈ S, IsSquare (b v) := by
       refine (Filter.eventually_all_finite hSfin).2 fun v _ => ?_
-      exact ((NormOpen.continuous_eval v).tendsto 1).eventually (NormOpen.eventually_isSquare_finite v)
-    have h3 : ∀ᶠ z in 𝓝 ((1 : InfiniteAdeleRing F), (1 : FiniteAdeleRing (𝓞 F) F)),
-        (∀ w, IsSquare (z.1 w)) ∧ ((∀ v, z.2 v ∈ v.adicCompletionIntegers F) ∧ ∀ v ∈ S, IsSquare (z.2 v)) :=
+      exact ((NormOpen.continuous_eval v).tendsto 1).eventually
+        (NormOpen.eventually_isSquare_finite v)
+    have h3
+        : ∀ᶠ z in 𝓝 ((1 : InfiniteAdeleRing F), (1 : FiniteAdeleRing (𝓞 F) F)),
+          (∀ w, IsSquare (z.1 w)) ∧ ((∀ v, z.2 v ∈ v.adicCompletionIntegers F) ∧ ∀ v ∈ S, IsSquare (z.2 v)) :=
       h1.prod_nhds (NormOpen.eventually_integral.and h2)
     exact h3
-  have hV : ∀ᶠ a : (AdeleRing (𝓞 F) F)ˣ in 𝓝 1,
-      (a : AdeleRing (𝓞 F) F) ∈ U ∧ ((a⁻¹ : (AdeleRing (𝓞 F) F)ˣ) : AdeleRing (𝓞 F) F) ∈ U := by
-    have hc1 : Filter.Tendsto (fun a : (AdeleRing (𝓞 F) F)ˣ => (a : AdeleRing (𝓞 F) F))
-        (𝓝 1) (𝓝 1) := by
+  have hV
+      : ∀ᶠ a : (AdeleRing (𝓞 F) F)ˣ in 𝓝 1,
+        (a : AdeleRing (𝓞 F) F) ∈ U ∧ ((a⁻¹ : (AdeleRing (𝓞 F) F)ˣ) : AdeleRing (𝓞 F) F) ∈ U := by
+    have hc1
+        : Filter.Tendsto (fun a : (AdeleRing (𝓞 F) F)ˣ => (a : AdeleRing (𝓞 F) F)) (𝓝 1) (𝓝 1) := by
       simpa using Units.continuous_val.tendsto (1 : (AdeleRing (𝓞 F) F)ˣ)
     have hc2 : Filter.Tendsto
         (fun a : (AdeleRing (𝓞 F) F)ˣ => ((a⁻¹ : (AdeleRing (𝓞 F) F)ˣ) : AdeleRing (𝓞 F) F))
@@ -152,17 +163,16 @@ theorem norm_form_mem_nhds_one : ∀ (F : Type) [Field F] [NumberField F] (δ : 
   set A : AdeleRing (𝓞 F) F := (a : AdeleRing (𝓞 F) F) with hA_def
   set B : AdeleRing (𝓞 F) F := ((a⁻¹ : (AdeleRing (𝓞 F) F)ˣ) : AdeleRing (𝓞 F) F) with hB_def
   have hAB : A * B = 1 := a.mul_inv
-  have hloc : ∀ v : HeightOneSpectrum (𝓞 F), ∃ p : v.adicCompletion F × v.adicCompletion F,
-      A.2 v = p.1 ^ 2 - (algebraMap F (AdeleRing (𝓞 F) F) δ).2 v * p.2 ^ 2 ∧
-      (v ∉ S → p.1 ∈ v.adicCompletionIntegers F ∧ p.2 ∈ v.adicCompletionIntegers F) := by
+  have hloc
+      : ∀ v : HeightOneSpectrum (𝓞 F), ∃ p : v.adicCompletion F × v.adicCompletion F,
+        A.2 v = p.1 ^ 2 - (algebraMap F (AdeleRing (𝓞 F) F) δ).2 v * p.2 ^ 2
+          ∧ (v ∉ S → p.1 ∈ v.adicCompletionIntegers F ∧ p.2 ∈ v.adicCompletionIntegers F) := by
     intro v
     by_cases hv : v ∈ S
     · obtain ⟨r, hr⟩ := hAS v hv
       exact ⟨(r, 0), by rw [hr]; ring, fun h => absurd hv h⟩
-    · have hv2 : v.valuation F (2 : F) = 1 := by
-        by_contra h; exact hv (Or.inl h)
-      have hvδ : v.valuation F δ = 1 := by
-        by_contra h; exact hv (Or.inr h)
+    · have hv2 : v.valuation F (2 : F) = 1 := by by_contra h; exact hv (Or.inl h)
+      have hvδ : v.valuation F δ = 1 := by by_contra h; exact hv (Or.inr h)
       have h2eq : ((2 : F) : v.adicCompletion F) = 2 := by
         rw [show (2 : F) = 1 + 1 from one_add_one_eq_two.symm,
           show (2 : v.adicCompletion F) = 1 + 1 from one_add_one_eq_two.symm,
@@ -178,14 +188,14 @@ theorem norm_form_mem_nhds_one : ∀ (F : Type) [Field F] [NumberField F] (δ : 
       have hAle : Valued.v (A.2 v) ≤ 1 := hAint v
       have hBle : Valued.v (B.2 v) ≤ 1 := hBint v
       have hAv : Valued.v (A.2 v) = 1 := by
-        have hmul : Valued.v (A.2 v) * Valued.v (B.2 v) = 1 := by
-          rw [← map_mul, hprod, map_one]
+        have hmul : Valued.v (A.2 v) * Valued.v (B.2 v) = 1 := by rw [← map_mul, hprod, map_one]
         refine le_antisymm hAle ?_
-        calc (1 : WithZero (Multiplicative ℤ)) = Valued.v (A.2 v) * Valued.v (B.2 v) := hmul.symm
+        calc
+          (1 : WithZero (Multiplicative ℤ))
+            = Valued.v (A.2 v) * Valued.v (B.2 v) := hmul.symm
           _ ≤ Valued.v (A.2 v) * 1 := by gcongr
           _ = Valued.v (A.2 v) := mul_one _
-      obtain ⟨x, hx, y, hy, hxy⟩ :=
-        exists_integral_sq_sub_mul_sq_of_unit F v _ (A.2 v) h2 hδv hAv
+      obtain ⟨x, hx, y, hy, hxy⟩ := exists_integral_sq_sub_mul_sq_of_unit F v _ (A.2 v) h2 hδv hAv
       exact ⟨(x, y), hxy, fun _ => ⟨hx, hy⟩⟩
   choose p hp using hloc
   choose r hr using hAinf

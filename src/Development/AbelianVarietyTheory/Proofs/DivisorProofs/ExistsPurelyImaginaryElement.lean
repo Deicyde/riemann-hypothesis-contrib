@@ -5,12 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ToGAdMat
 
 @[expose] public section
 
-open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.ThK.SquareIntegrability
+open NumberField MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.AdelicU
+  GlobalTheory.SiegelSet GlobalTheory.UAut GlobalTheory.ThK.SquareIntegrability
 
 namespace GlobalTheory.CMImag
 
-theorem exists_imag_ne_zero : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
-    IsCMExt F E σ → ∃ c : E, c ≠ 0 ∧ σ c = -c := by
+theorem exists_imag_ne_zero
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → ∃ c : E, c ≠ 0 ∧ σ c = -c := by
   intro F E _ _ _ _ _ σ h
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have hconj : ∀ x, τ (σ x) = star (τ x) := h.2.2.2 τ

@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FullRk
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun
 open scoped Matrix
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open Filter Topology
@@ -16,7 +18,17 @@ namespace GlobalTheory.SmoothCharDet
 
 open GlobalTheory.SplitFlip GlobalTheory.SplitWeil Matrix
 
-theorem isSmoothChar_of_detChar_apow_nhds : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}, 0 < n → ∀ (ν : kˣ →* ℂˣ) (s : ℂ) (P : Set (GL (Fin n) k)), P ∈ 𝓝 1 → (∀ g ∈ P, (ν (GlobalTheory.SplitFlip.gdet g) : ℂ) * GlobalTheory.SplitFlip.apow (GlobalTheory.SplitFlip.gdet g) s = 1) → GlobalTheory.SmGL.IsSmoothChar ν := by
+theorem isSmoothChar_of_detChar_apow_nhds
+    : ∀ {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        {n : ℕ},
+      0 < n
+        → ∀ (ν : kˣ →* ℂˣ) (s : ℂ) (P : Set (GL (Fin n) k)),
+          P ∈ 𝓝 1
+            → (∀ g ∈ P,
+              (ν (GlobalTheory.SplitFlip.gdet g) : ℂ)
+                  * GlobalTheory.SplitFlip.apow (GlobalTheory.SplitFlip.gdet g) s
+                = 1)
+            → GlobalTheory.SmGL.IsSmoothChar ν := by
   intro k _ _ _ _ n hn ν s P hP hν
   let i0 : Fin n := ⟨0, hn⟩
   let d : kˣ →* GL (Fin n) k :=
@@ -24,7 +36,8 @@ theorem isSmoothChar_of_detChar_apow_nhds : ∀ {k : Type} [Field k] [ValuativeR
   have hval : Continuous fun x : kˣ => ((d x : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) := by
     show Continuous fun x : kˣ => diagonal fun i => (((Pi.mulSingle (M := fun _ : Fin n => kˣ) i0 x) i : kˣ) : k)
     exact Continuous.matrix_diagonal (continuous_pi fun i =>
-      Units.continuous_val.comp ((continuous_apply i).comp (continuous_mulSingle (A := fun _ : Fin n => kˣ) i0)))
+      Units.continuous_val.comp ((continuous_apply i).comp
+        (continuous_mulSingle (A := fun _ : Fin n => kˣ) i0)))
   have hd : Continuous d := by
     refine Units.continuous_iff.2 ⟨hval, ?_⟩
     have := hval.comp continuous_inv

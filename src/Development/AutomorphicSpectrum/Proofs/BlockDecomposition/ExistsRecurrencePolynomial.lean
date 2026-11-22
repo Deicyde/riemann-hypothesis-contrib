@@ -8,13 +8,14 @@ open Polynomial
 
 namespace GlobalTheory.CompanionTheory.KillDeg
 
-theorem exists_common_eigvector {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+theorem exists_common_eigvector
+    {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
     {ι : Type*} (f : ι → Module.End ℂ V) (hc : ∀ i j, Commute (f i) (f j))
-    (W : Submodule ℂ V) (hW : W ≠ ⊥) (hinv : ∀ i, ∀ w ∈ W, f i w ∈ W) :
-    ∃ v ∈ W, v ≠ 0 ∧ ∀ i, ∃ μ : ℂ, f i v = μ • v := by
+    (W : Submodule ℂ V) (hW : W ≠ ⊥) (hinv : ∀ i, ∀ w ∈ W, f i w ∈ W)
+    : ∃ v ∈ W, v ≠ 0 ∧ ∀ i, ∃ μ : ℂ, f i v = μ • v := by
   classical
-  let P : ℕ → Prop := fun n => ∃ U : Submodule ℂ V, U ≤ W ∧ U ≠ ⊥ ∧
-    (∀ i, ∀ w ∈ U, f i w ∈ U) ∧ Module.finrank ℂ U = n
+  let P : ℕ → Prop := fun n =>
+    ∃ U : Submodule ℂ V, U ≤ W ∧ U ≠ ⊥ ∧ (∀ i, ∀ w ∈ U, f i w ∈ U) ∧ Module.finrank ℂ U = n
   have hP : ∃ n, P n := ⟨_, W, le_rfl, hW, hinv, rfl⟩
   obtain ⟨U, hUW, hU, hUinv, hUn⟩ := Nat.find_spec hP
   have hmin : ∀ U' : Submodule ℂ V, U' ≤ U → U' ≠ ⊥ → (∀ i, ∀ w ∈ U', f i w ∈ U') → U' = U := by
@@ -51,11 +52,11 @@ theorem exists_common_eigvector {V : Type*} [AddCommGroup V] [Module ℂ V] [Fin
   have hvm : v ∈ U' := by rw [hU']; exact hvU
   exact ⟨μ, Module.End.mem_eigenspace_iff.1 hvm.2⟩
 
-theorem char_eq_cexp (χ : ℝ → ℂ) (hc : Continuous χ) (h0 : χ 0 = 1)
-    (hm : ∀ s t, χ (s + t) = χ s * χ t) : ∃ c : ℂ, ∀ t : ℝ, χ t = Complex.exp (c * t) := by
+theorem char_eq_cexp
+    (χ : ℝ → ℂ) (hc : Continuous χ) (h0 : χ 0 = 1) (hm : ∀ s t, χ (s + t) = χ s * χ t)
+    : ∃ c : ℂ, ∀ t : ℝ, χ t = Complex.exp (c * t) := by
   let I : ℝ → ℂ := fun x => ∫ s in (0 : ℝ)..x, χ s
-  have hI : ∀ x, HasDerivAt I (χ x) x := fun x =>
-    (hc.integral_hasStrictDerivAt 0 x).hasDerivAt
+  have hI : ∀ x, HasDerivAt I (χ x) x := fun x => (hc.integral_hasStrictDerivAt 0 x).hasDerivAt
   obtain ⟨δ, hδ⟩ : ∃ δ, I δ ≠ 0 := by
     by_contra hcon
     push_neg at hcon
@@ -65,8 +66,8 @@ theorem char_eq_cexp (χ : ℝ → ℂ) (hc : Continuous χ) (h0 : χ 0 = 1)
     have h2 := h1.unique (hasDerivAt_const (0 : ℝ) (0 : ℂ))
     rw [h0] at h2
     exact one_ne_zero h2
-  have hint : ∀ a b : ℝ, IntervalIntegrable χ MeasureTheory.volume a b :=
-    fun a b => hc.intervalIntegrable a b
+  have hint : ∀ a b : ℝ, IntervalIntegrable χ MeasureTheory.volume a b := fun a b =>
+    hc.intervalIntegrable a b
   have hid : ∀ t, χ t * I δ = I (t + δ) - I t := by
     intro t
     have h1 : ∫ s in (0 : ℝ)..δ, χ (t + s) = χ t * I δ := by
@@ -108,8 +109,7 @@ theorem char_eq_cexp (χ : ℝ → ℂ) (hc : Continuous χ) (h0 : χ 0 = 1)
       rw [he]
       exact h
     have h2 := (hd u).mul h1.cexp
-    have h3 : c * χ u * Complex.exp (-(c * u)) + χ u * (Complex.exp (-(c * u)) * -c) = 0 := by
-      ring
+    have h3 : c * χ u * Complex.exp (-(c * u)) + χ u * (Complex.exp (-(c * u)) * -c) = 0 := by ring
     rw [h3] at h2
     exact h2
   have hy0 : y t = y 0 :=
@@ -123,15 +123,20 @@ theorem char_eq_cexp (χ : ℝ → ℂ) (hc : Continuous χ) (h0 : χ 0 = 1)
   field_simp at h5
   exact h5
 
-theorem killPoly_natDegree_le (G : Type) [Group G] (a : ℝ → G) (F₀ : G → ℂ)
-    (S : Submodule ℂ (ℝ → ℂ)) (ha : ∀ s t, a (s + t) = a s * a t)
-    (hcont : ∀ g, Continuous fun t => F₀ (a t * g)) (hfin : FiniteDimensional ℂ S)
-    (hS : ∀ g, (fun t => F₀ (a t * g)) ∈ S) :
-    ∃ p : ℂ[X], p.Monic ∧ p.natDegree ≤ Module.finrank ℂ S ∧
-      (∀ g, ∑ j ∈ Finset.range (p.natDegree + 1), p.coeff j * F₀ (a j * g) = 0) ∧
-      ∀ z, p.IsRoot z → ∃ c : ℂ, z = Complex.exp c ∧
-        ∃ F ∈ Submodule.span ℂ (Set.range fun t : ℝ => fun g => F₀ (a t * g)), F ≠ 0 ∧
-          ∀ (t : ℝ) g, F (a t * g) = Complex.exp (c * t) * F g := by
+theorem killPoly_natDegree_le
+    (G : Type) [Group G]
+    (a : ℝ → G) (F₀ : G → ℂ) (S : Submodule ℂ (ℝ → ℂ))
+    (ha : ∀ s t, a (s + t) = a s * a t) (hcont : ∀ g, Continuous fun t => F₀ (a t * g))
+    (hfin : FiniteDimensional ℂ S) (hS : ∀ g, (fun t => F₀ (a t * g)) ∈ S)
+    : ∃ p : ℂ[X],
+      p.Monic ∧ p.natDegree ≤ Module.finrank ℂ S
+        ∧ (∀ g, ∑ j ∈ Finset.range (p.natDegree + 1), p.coeff j * F₀ (a j * g) = 0)
+        ∧ ∀ z,
+          p.IsRoot z
+            → ∃ c : ℂ,
+              z = Complex.exp c
+                ∧ ∃ F ∈ Submodule.span ℂ (Set.range fun t : ℝ => fun g => F₀ (a t * g)),
+                  F ≠ 0 ∧ ∀ (t : ℝ) g, F (a t * g) = Complex.exp (c * t) * F g := by
   have ha0 : a 0 = 1 := by
     have h := ha 0 0
     rw [add_zero] at h
@@ -139,10 +144,11 @@ theorem killPoly_natDegree_le (G : Type) [Group G] (a : ℝ → G) (F₀ : G →
   let τ : ℝ → G → ℂ := fun t g => F₀ (a t * g)
   let T : Submodule ℂ (G → ℂ) := Submodule.span ℂ (Set.range τ)
 
-  let Λ : Module.Dual ℂ S →ₗ[ℂ] (G → ℂ) :=
-    { toFun := fun l g => l ⟨fun t => F₀ (a t * g), hS g⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let Λ : Module.Dual ℂ S →ₗ[ℂ] (G → ℂ) := {
+    toFun := fun l g => l ⟨fun t => F₀ (a t * g), hS g⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hTle : T ≤ LinearMap.range Λ := by
     refine Submodule.span_le.2 ?_
     rintro _ ⟨t, rfl⟩
@@ -186,8 +192,9 @@ theorem killPoly_natDegree_le (G : Type) [Group G] (a : ℝ → G) (F₀ : G →
       rfl
   have hint : IsIntegral ℂ (R 1) := Algebra.IsIntegral.isIntegral _
   have hdeg : (minpoly ℂ (R 1)).natDegree ≤ Module.finrank ℂ T := by
-    have h1 := Polynomial.natDegree_le_of_dvd (LinearMap.minpoly_dvd_charpoly (R 1))
-      (LinearMap.charpoly_monic (R 1)).ne_zero
+    have h1 :=
+      Polynomial.natDegree_le_of_dvd (LinearMap.minpoly_dvd_charpoly (R 1))
+        (LinearMap.charpoly_monic (R 1)).ne_zero
     rwa [LinearMap.charpoly_natDegree] at h1
   refine ⟨minpoly ℂ (R 1), minpoly.monic hint, hdeg.trans hrank, ?_, ?_⟩
   · intro g
@@ -195,9 +202,10 @@ theorem killPoly_natDegree_le (G : Type) [Group G] (a : ℝ → G) (F₀ : G →
     rw [Polynomial.aeval_eq_sum_range] at hz
     let f₀ : T := ⟨τ 0, Submodule.subset_span ⟨0, rfl⟩⟩
     have h1 := congrArg (fun e : Module.End ℂ T => ((e f₀ : T) : G → ℂ) g) hz
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.zero_apply,
-      Submodule.coe_sum, Submodule.coe_smul, Submodule.coe_zero, Finset.sum_apply,
-      Pi.smul_apply, Pi.zero_apply, smul_eq_mul] at h1
+    simp only [LinearMap.sum_apply, LinearMap.smul_apply, LinearMap.zero_apply, Submodule.coe_sum,
+        Submodule.coe_smul, Submodule.coe_zero, Finset.sum_apply, Pi.smul_apply, Pi.zero_apply,
+        smul_eq_mul]
+      at h1
     rw [← h1]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [hpow]
@@ -211,14 +219,15 @@ theorem killPoly_natDegree_le (G : Type) [Group G] (a : ℝ → G) (F₀ : G →
         Module.End.mem_eigenspace_iff.2 hx.apply_eq_smul
       rw [hb] at hxm
       exact hx.2 (by simpa using hxm)
-    obtain ⟨v, hvW, hv0, hv⟩ := exists_common_eigvector R hcomm _ hWne (by
-      intro t w hw
-      refine Module.End.mem_eigenspace_iff.2 ?_
-      have hwe : R 1 w = z • w := Module.End.mem_eigenspace_iff.1 hw
-      have hc1 : R 1 (R t w) = R t (R 1 w) := by
-        have := congrArg (fun e : Module.End ℂ T => e w) (hcomm 1 t).eq
-        simpa using this
-      rw [hc1, hwe, map_smul])
+    obtain ⟨v, hvW, hv0, hv⟩ :=
+      exists_common_eigvector R hcomm _ hWne (by
+        intro t w hw
+        refine Module.End.mem_eigenspace_iff.2 ?_
+        have hwe : R 1 w = z • w := Module.End.mem_eigenspace_iff.1 hw
+        have hc1 : R 1 (R t w) = R t (R 1 w) := by
+          have := congrArg (fun e : Module.End ℂ T => e w) (hcomm 1 t).eq
+          simpa using this
+        rw [hc1, hwe, map_smul])
     have hv1 : R 1 v = z • v := Module.End.mem_eigenspace_iff.1 hvW
     obtain ⟨g₀, hg₀⟩ : ∃ g₀, (v : G → ℂ) g₀ ≠ 0 := by
       by_contra hcon

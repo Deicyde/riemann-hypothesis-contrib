@@ -22,21 +22,16 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 namespace CompanionTheory.RgExh.Fin
 
 theorem exhaustion_finite_length : CompanionTheory.RgExh.Finish :=
-  GlobalTheory.CompanionTheory.RgExhFin.finish
-    GlobalTheory.CompanionTheory.RgStart.startMod
-    GlobalTheory.CompanionTheory.RgSteps.pathFin
-    GlobalTheory.CompanionTheory.RgPath.pathExists
+  GlobalTheory.CompanionTheory.RgExhFin.finish GlobalTheory.CompanionTheory.RgStart.startMod
+    GlobalTheory.CompanionTheory.RgSteps.pathFin GlobalTheory.CompanionTheory.RgPath.pathExists
     GlobalTheory.CompanionTheory.RgPath.pathEndNat
     GlobalTheory.CompanionTheory.RgExhFin.simpleDistinct
     GlobalTheory.CompanionTheory.AdjointSignNormality.scalar_of_separating_smooth_l2_maps
     GlobalTheory.CompanionTheory.RgExhFin.unitarizable_of_separating_smooth_l2_maps
-    GlobalTheory.CompanionTheory.RgIso.isoFacts
-    GlobalTheory.CompanionTheory.CharOfLowK.charOfAlgDS
+    GlobalTheory.CompanionTheory.RgIso.isoFacts GlobalTheory.CompanionTheory.CharOfLowK.charOfAlgDS
     GlobalTheory.CompanionTheory.LowestDataIso.algUniq
-    GlobalTheory.CompanionTheory.LowestData.dataUniq
-    GlobalTheory.CompanionTheory.RenumDS.dsOfArr
-    GlobalTheory.CompanionTheory.DSData.dsOfData
-    GlobalTheory.CompanionTheory.KModOfStep.kModOf
+    GlobalTheory.CompanionTheory.LowestData.dataUniq GlobalTheory.CompanionTheory.RenumDS.dsOfArr
+    GlobalTheory.CompanionTheory.DSData.dsOfData GlobalTheory.CompanionTheory.KModOfStep.kModOf
     GlobalTheory.CompanionTheory.ArrCount.arrCount
 
 end CompanionTheory.RgExh.Fin

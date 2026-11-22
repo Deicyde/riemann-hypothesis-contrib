@@ -8,9 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Unifo
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField
 open scoped CategoryTheory.Obj BigOperators
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory GlobalTheory.Ex GlobalTheory.Ex.Trait
 noncomputable section
@@ -26,10 +28,12 @@ private theorem twist_theta' {k : ℕ} (β : N.Form k) (u : Oˣ) : (N.twist β u
 
 private theorem twist_c {k : ℕ} (β : N.Form k) (u : Oˣ) : (N.twist β u).c = N.c := rfl
 
-theorem qEq_twist {j k m : ℕ} (β : N.Form j) {u r r' : Oˣ} (h₁ : r' ^ m = r) (h₂ : r ^ k = u)
+theorem qEq_twist
+    {j k m : ℕ} (β : N.Form j)
+    {u r r' : Oˣ} (h₁ : r' ^ m = r) (h₂ : r ^ k = u)
     {q' : N.QT (k * m)} {q : N.QT k} {p' : (N.twist β u).QT (k * m)} {p : (N.twist β u).QT k}
-    (t' : TwRel β u r' q' p') (t : TwRel β u r q p) (e : N.QEq (lower q') q) :
-    (N.twist β u).QEq (lower p') p := by
+    (t' : TwRel β u r' q' p') (t : TwRel β u r q p) (e : N.QEq (lower q') q)
+    : (N.twist β u).QEq (lower p') p := by
   obtain ⟨z, hy, hg⟩ := e
   obtain ⟨ty', tb', ts'⟩ := t'
   obtain ⟨ty, tb, ts⟩ := t
@@ -51,13 +55,12 @@ theorem qEq_twist {j k m : ℕ} (β : N.Form j) {u r r' : Oˣ} (h₁ : r' ^ m = 
         have A4' := NumD.Gt.pow_s p'.1.2 m χ
         rw [tb'] at A4'
         exact A4'
-      have Bq : (p'.1.2 ^ m).b = (q'.1.2 ^ m).b := by
-        rw [NumD.Gt.pow_b, NumD.Gt.pow_b, tb'] <;> rfl
+      have Bq : (p'.1.2 ^ m).b = (q'.1.2 ^ m).b := by rw [NumD.Gt.pow_b, NumD.Gt.pow_b, tb'] <;> rfl
       have A5 := ts' χ
       have A6 := N.twist_τ β u z χ
       have hy' : β.be q.1.1.toAdd χ = β.be q'.1.1.toAdd χ + k * β.be z χ := by
-        rw [show q.1.1.toAdd = q'.1.1.toAdd + k • z from hy, map_add (f := _), map_nsmul, LinearMap.add_apply,
-          LinearMap.smul_apply, nsmul_eq_mul]
+        rw [show q.1.1.toAdd = q'.1.1.toAdd + k • z from hy, map_add (f := _), map_nsmul,
+          LinearMap.add_apply, LinearMap.smul_apply, nsmul_eq_mul]
       rw [hy'] at A1
       rw [NumD.Gt.mul_s (p'.1.2 ^ m) ((N.twist β u).io z) χ, NumD.io_s (N.twist β u) z χ,
         NumD.io_b (N.twist β u) z, Bq, twist_theta' β u, twist_c β u, A6]
@@ -73,42 +76,54 @@ theorem qEq_twist {j k m : ℕ} (β : N.Form j) {u r r' : Oˣ} (h₁ : r' ^ m = 
       clear hy hg hg' hy' ty ty' tb tb' ts ts' A6 A1 A2 A3 A4 A5
       module
 
-theorem exists_image (J : NumD.Iso N N') {k : ℕ} (p : N.QT k) :
-    ∃ q : N'.QT k, q.1.1.toAdd = J.e p.1.1.toAdd ∧ J.Rel p.1.2 q.1.2 := by
+theorem exists_image (J : NumD.Iso N N') {k : ℕ} (p : N.QT k)
+    : ∃ q : N'.QT k, q.1.1.toAdd = J.e p.1.1.toAdd ∧ J.Rel p.1.2 q.1.2 := by
   let I := NumD.Hom.ofIso J
   have hid (u : Oˣ) : (Units.map (RingHom.id O).toMonoidHom) u = u := by
     ext
     rfl
-  let g : N'.Gt :=
-    ⟨I.φ p.1.2.b, fun χ => p.1.2.s (I.e.symm χ) * I.h (N.c (I.e.symm χ)) * I.h p.1.2.b / I.h (N.c (I.e.symm χ) * p.1.2.b),
-      fun χ χ' => by
-        obtain ⟨χ, rfl⟩ := I.e.surjective χ
-        obtain ⟨χ', rfl⟩ := I.e.surjective χ'
-        rw [← map_add (f := _)]
-        simp only [AddEquiv.symm_apply_apply]
-        rw [I.c_eq, I.c_eq, N.c_add]
-        have a := I.θ_eq (N.c χ) (N.c χ') p.1.2.b
-        simp only [hid] at a
-        have b := p.1.2.mult χ χ'
-        apply Additive.ofMul.injective
-        replace a := congrArg Additive.ofMul a
-        replace b := congrArg Additive.ofMul b
-        simp only [ofMul_mul, ofMul_div] at a b ⊢
-        linear_combination (norm := abel) a + b⟩
-  have hg : I.Rel p.1.2 g := ⟨rfl, fun χ => by simp only [g, AddEquiv.symm_apply_apply, div_mul_cancel, hid]⟩
+  let g : N'.Gt := ⟨
+    I.φ p.1.2.b,
+    fun χ =>
+      p.1.2.s (I.e.symm χ) * I.h (N.c (I.e.symm χ)) * I.h p.1.2.b
+        / I.h (N.c (I.e.symm χ) * p.1.2.b),
+    fun χ χ' => by
+      obtain ⟨χ, rfl⟩ := I.e.surjective χ
+      obtain ⟨χ', rfl⟩ := I.e.surjective χ'
+      rw [← map_add (f := _)]
+      simp only [AddEquiv.symm_apply_apply]
+      rw [I.c_eq, I.c_eq, N.c_add]
+      have a := I.θ_eq (N.c χ) (N.c χ') p.1.2.b
+      simp only [hid] at a
+      have b := p.1.2.mult χ χ'
+      apply Additive.ofMul.injective
+      replace a := congrArg Additive.ofMul a
+      replace b := congrArg Additive.ofMul b
+      simp only [ofMul_mul, ofMul_div] at a b ⊢
+      linear_combination (norm := abel) a + b
+  ⟩
+  have hg : I.Rel p.1.2 g :=
+    ⟨rfl, fun χ => by simp only [g, AddEquiv.symm_apply_apply, div_mul_cancel, hid]⟩
   have h1 : I.Rel (p.1.2 ^ k) (g ^ k) := hg.pow k
   rw [N.mem_QT.1 p.2] at h1
   have h2 := I.rel_io p.1.1.toAdd
   have h3 : g ^ k = N'.io (J.e p.1.1.toAdd) :=
-    NumD.Gt.ext (h1.1.trans h2.1.symm) (funext fun χ => by
-      obtain ⟨χ, rfl⟩ := I.e.surjective χ
-      exact mul_right_cancel ((h1.2 χ).trans (h2.2 χ).symm))
-  exact ⟨⟨(Multiplicative.ofAdd (J.e p.1.1.toAdd), g), N'.mem_QT.2 h3⟩, rfl,
-    (NumD.Hom.ofIso_rel J _ _).1 hg⟩
+    NumD.Gt.ext (h1.1.trans h2.1.symm)
+      (funext fun χ => by
+        obtain ⟨χ, rfl⟩ := I.e.surjective χ
+        exact mul_right_cancel ((h1.2 χ).trans (h2.2 χ).symm))
+  exact ⟨
+    ⟨(Multiplicative.ofAdd (J.e p.1.1.toAdd), g), N'.mem_QT.2 h3⟩,
+    rfl,
+    (NumD.Hom.ofIso_rel J _ _).1 hg
+  ⟩
 
-theorem qEq_image (J : NumD.Iso N N') {k m : ℕ} {p' : N.QT (k * m)} {p : N.QT k} {q' : N'.QT (k * m)} {q : N'.QT k}
-    (a' : q'.1.1.toAdd = J.e p'.1.1.toAdd) (b' : J.Rel p'.1.2 q'.1.2) (a : q.1.1.toAdd = J.e p.1.1.toAdd)
-    (b : J.Rel p.1.2 q.1.2) (e : N.QEq (lower p') p) : N'.QEq (lower q') q := by
+theorem qEq_image
+    (J : NumD.Iso N N')
+    {k m : ℕ} {p' : N.QT (k * m)} {p : N.QT k} {q' : N'.QT (k * m)} {q : N'.QT k}
+    (a' : q'.1.1.toAdd = J.e p'.1.1.toAdd) (b' : J.Rel p'.1.2 q'.1.2)
+    (a : q.1.1.toAdd = J.e p.1.1.toAdd) (b : J.Rel p.1.2 q.1.2) (e : N.QEq (lower p') p)
+    : N'.QEq (lower q') q := by
   obtain ⟨z, hy, hg⟩ := e
   let I := NumD.Hom.ofIso J
   refine ⟨J.e z, ?_, ?_⟩
@@ -127,14 +142,18 @@ theorem qEq_image (J : NumD.Iso N N') {k m : ℕ} {p' : N.QT (k * m)} {p : N.QT 
     obtain ⟨χ, rfl⟩ := I.e.surjective χ
     exact mul_right_cancel ((r1.2 χ).trans (r2.2 χ).symm)
 
-private theorem pow_left_of_isGrpPullback' {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) {T : Over S'} (x : T ⟶ G')
-    (z : Over.mk (T.hom ≫ f) ⟶ G) (e : z.left = x.left ≫ φ) (n : ℕ) : (z ^ n).left = (x ^ n).left ≫ φ := by
+private theorem pow_left_of_isGrpPullback'
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    {T : Over S'} (x : T ⟶ G') (z : Over.mk (T.hom ≫ f) ⟶ G) (e : z.left = x.left ≫ φ)
+    (n : ℕ)
+    : (z ^ n).left = (x ^ n).left ≫ φ := by
   induction n with
   | zero =>
-    let o : Over.mk (T.hom ≫ f) ⟶ G := Over.homMk ((1 : T ⟶ G').left ≫ φ) (by
-      simp only [Over.mk_hom, Category.assoc]
-      rw [h.1.w, ← Category.assoc, Over.w])
+    let o : Over.mk (T.hom ≫ f) ⟶ G :=
+      Over.homMk ((1 : T ⟶ G').left ≫ φ) (by
+        simp only [Over.mk_hom, Category.assoc]
+        rw [h.1.w, ← Category.assoc, Over.w])
     have ho : o * o = o := by
       apply Over.OverMorphism.ext
       rw [h.2 T 1 1 o o rfl rfl, _root_.mul_one]
@@ -147,9 +166,12 @@ private theorem pow_left_of_isGrpPullback' {S S' : Scheme.{0}} {G : Over S} {G' 
     exact h.2 T _ _ _ _ ih e
 end Values
 
-theorem pow_left {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G'] {f : S' ⟶ S}
-    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) (x : baseOver S' ⟶ G') (z : Over.mk f ⟶ G)
-    (e : z.left = x.left ≫ φ) (n : ℕ) : (z ^ n).left = (x ^ n).left ≫ φ := by
+theorem pow_left
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    (x : baseOver S' ⟶ G') (z : Over.mk f ⟶ G) (e : z.left = x.left ≫ φ)
+    (n : ℕ)
+    : (z ^ n).left = (x ^ n).left ≫ φ := by
   let w : Over.mk ((baseOver S').hom ≫ f) ⟶ Over.mk f := Over.homMk (𝟙 S') (by simp)
   have h1 : (w ≫ z).left = x.left ≫ φ := by
     rw [Over.comp_left, e]
@@ -158,7 +180,11 @@ theorem pow_left {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [Grp
   rw [← comp_pow, Over.comp_left] at h2
   simpa [w] using h2
 
-theorem labels_of_four_le : GlobalTheory.UT.LL → BrGtSt → AllS fun {_} _ _ _ {_} {_} {_} {_} {_} _ {_} {_} _ _ {_} _ {_} _ _ A u r {_} M _ {_} ν' J => M.P.TorsionIso → (∀ k, 4 ≤ k → Labels A u r M ν' J k) → ∀ k, 0 < k → Labels A u r M ν' J k := by
+theorem labels_of_four_le
+    : GlobalTheory.UT.LL → BrGtSt
+      → AllS fun {_} _ _ _ {_} {_} {_} {_} {_} _ {_} {_} _ _ {_} _ {_} _ _ A u r {_} M _ {_} ν' J =>
+        M.P.TorsionIso → (∀ k, 4 ≤ k → Labels A u r M ν' J k)
+          → ∀ k, 0 < k → Labels A u r M ν' J k := by
   intro hL hBr E _ _ _ H D l c O _ β O' _ _ _ b a C _ _ _ _ _ _ A u r o M f N' ν' J hR _ hT h4 k hk
   intro x p q' p' z hTw hqy hqg hQ hz
   have hK : 0 < k * 4 := by omega
@@ -176,8 +202,9 @@ theorem labels_of_four_le : GlobalTheory.UT.LL → BrGtSt → AllS fun {_} _ _ _
   have hn₂ : GtPtF.IsNsmul 4 p₁'.g p₂.g := (GtValues.isNsmul_val ν' 4 hp₁'.2 hp₂.2).2 rfl
   haveI := M.admissible_base_of_complete_dvr.2
   have t₂ : M.P.ToA C k p₂ (z₁ ^ 4) :=
-    (GlobalTheory.LevelCompat.qkToAkU_level hL M.W (IsLocalRing.maximalIdeal M.W) M.admissible_base_of_complete_dvr.1 M.P.D M.P.A M.t.G M.t.semi
-      M.P.U C k 4 (k * 4) hk (by norm_num) rfl p₂ p₁' z₁).2 hy₂ hn₂ t₁
+    (GlobalTheory.LevelCompat.qkToAkU_level hL M.W (IsLocalRing.maximalIdeal M.W)
+      M.admissible_base_of_complete_dvr.1 M.P.D M.P.A M.t.G M.t.semi M.P.U C k 4 (k * 4) hk
+      (by norm_num) rfl p₂ p₁' z₁).2 hy₂ hn₂ t₁
   obtain ⟨hgA, -, -, -, hQA⟩ := hBr O' a.D₀ a.even a.bimult C A.N A.ν
   obtain ⟨q₀, hq₀y, hq₀n, hq₀e⟩ := A.I.tower k 4 hk (by norm_num) x
   have hqA := A.hq (k * 4) x

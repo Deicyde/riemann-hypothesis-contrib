@@ -5,17 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex GlobalTheory.EtC
+  UpperTheory.Gal.TranscendenceTraces
 
-private noncomputable def postFam {Z S : Scheme.{0}} {p : Z ⟶ S} {R : Type} [CommRing R] {G K J : Shv R}
-    (t : Fam0 p G K) (m : K ⟶ J) : Fam0 p G J where
+private noncomputable def postFam
+    {Z S : Scheme.{0}} {p : Z ⟶ S} {R : Type} [CommRing R]
+    {G K J : Shv R} (t : Fam0 p G K) (m : K ⟶ J)
+    : Fam0 p G J where
   app A := ((m.hom.app (op A.U)).hom.toAddMonoidHom).comp (t.app A)
   nat {A B} s a := by
     change Sec.res s.g (Sec.map m (t.app B a)) = Sec.map m (t.app A (Sec.res s.k a))
     rw [← t.nat s a, map_res]
 
-theorem UpperTheory.Gal.TranscendenceTraces.famHom_of :
-    FamHom := by
+theorem UpperTheory.Gal.TranscendenceTraces.famHom_of : FamHom := by
   intro Q Z S p Φ _ e hrep I J
   constructor
   · intro m

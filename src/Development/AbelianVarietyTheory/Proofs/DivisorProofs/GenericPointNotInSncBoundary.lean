@@ -7,15 +7,19 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsIsLogM
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.ChartRestriction.G.DVR.FlatBC (algX)
-open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.PairStep
+open GlobalTheory GlobalTheory.CechPic GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.PairStep
 
 namespace GlobalTheory.PairStep
 
-theorem genericPoint_notMem_of_snc (Y : Scheme.{0}) [IsIntegral Y] (B : Closeds Y)
-    (h : FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal B)) : genericPoint Y ∉ B := by
+theorem genericPoint_notMem_of_snc
+    (Y : Scheme.{0}) [IsIntegral Y]
+    (B : Closeds Y) (h : FinalTheorems.Snc (Scheme.IdealSheafData.vanishingIdeal B))
+    : genericPoint Y ∉ B := by
   obtain ⟨-, U, hy, n, f, J, ⟨-, hn⟩, hI⟩ := h (genericPoint Y)
   have hdim : ringKrullDim (Y.presheaf.stalk (genericPoint Y)) = 0 :=
     ringKrullDim_eq_zero_of_field Y.functionField

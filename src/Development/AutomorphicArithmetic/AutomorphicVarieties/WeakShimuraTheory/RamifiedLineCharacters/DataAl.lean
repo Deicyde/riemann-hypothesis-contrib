@@ -4,11 +4,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-theorem UpperTheory.V.Ws.Gys.dataAl :
-    ∀ {O Γ R : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [CommRing R] (Φ : Fr O Γ) (a : O →+* R) (p : PD Φ.ι Γ R), Φ.IsRes a p → Supp nM p.r →
-      ∃ x : Γ → R, Φ.Coc a (-wAl) x ∧ x Φ.g0 = 0 ∧ Φ.LocTriv a (-wAl) x (fun v => p.n v 1 0) ∧ ∀ g, p.r g 1 0 = x g * a (Φ.χ 0 g) := by
+theorem UpperTheory.V.Ws.Gys.dataAl
+    : ∀ {O Γ R : Type} [CommRing O] [Group Γ] [TopologicalSpace Γ] [CommRing R] (Φ : Fr O Γ)
+        (a : O →+* R) (p : PD Φ.ι Γ R),
+      Φ.IsRes a p → Supp nM p.r
+        → ∃ x : Γ → R,
+          Φ.Coc a (-wAl) x ∧ x Φ.g0 = 0 ∧ Φ.LocTriv a (-wAl) x (fun v => p.n v 1 0)
+            ∧ ∀ g, p.r g 1 0 = x g * a (Φ.χ 0 g) := by
   intro O Γ R _ _ _ _ Φ a p hp hs
   have h12 : ∀ g, p.r g 1 2 = 0 := fun g => hs g 1 2 (by decide) (by decide)
   have h13 : ∀ g, p.r g 1 3 = 0 := fun g => hs g 1 3 (by decide) (by decide)
@@ -51,8 +56,9 @@ theorem UpperTheory.V.Ws.Gys.dataAl :
       rw [← mul_assoc, ← mul_assoc, hinv, one_mul]
     generalize adj (p.n v) * p.r s * p.n v = U at hU hc key
     have k := congrFun (congrFun key 1) 0
-    rw [Matrix.mul_apply, Matrix.mul_apply, Fin.sum_univ_four, Fin.sum_univ_four, hU 1 0 (by decide), hU 2 0 (by decide),
-      hU 3 0 (by decide), hc, h12, h13, hd, l2, l2] at k
+    rw [Matrix.mul_apply, Matrix.mul_apply, Fin.sum_univ_four, Fin.sum_univ_four,
+        hU 1 0 (by decide), hU 2 0 (by decide), hU 3 0 (by decide), hc, h12, h13, hd, l2, l2]
+      at k
     rw [hrt]
     beta_reduce
     linear_combination (-a (((Φ.χ 0 s)⁻¹ : Oˣ) : O)) * k + p.n v 1 0 * hu s

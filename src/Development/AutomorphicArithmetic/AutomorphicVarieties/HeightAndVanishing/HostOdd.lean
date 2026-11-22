@@ -11,18 +11,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem eq_one_of_odd {Γ : Type} [Monoid Γ] {x : Γ} {k m : ℕ} (h1 : orderOf x ∣ 2 ^ k) (h2 : orderOf x ∣ m)
-    (hm : Odd m) : x = 1 := by
+private theorem eq_one_of_odd
+    {Γ : Type} [Monoid Γ]
+    {x : Γ} {k m : ℕ} (h1 : orderOf x ∣ 2 ^ k) (h2 : orderOf x ∣ m) (hm : Odd m)
+    : x = 1 := by
   have hc : Nat.Coprime (2 ^ k) m := Nat.Coprime.pow_left _ (Nat.coprime_two_left.mpr hm)
   have h3 : orderOf x ∣ Nat.gcd (2 ^ k) m := Nat.dvd_gcd h1 h2
   rw [hc.gcd_eq_one, Nat.dvd_one, orderOf_eq_one_iff] at h3
   exact h3
 
-private theorem cond_dvd (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N) (hψ : h.IsChar ψ)
-    (h2 : comp 2 ψ = 1) (ho : ∀ p, p.Prime → p = h.q1 ∨ p = h.d → ∃ m, Odd m ∧ orderOf (comp p ψ) ∣ m) :
-    ψ.conductor ∣ h.q := by
+private theorem cond_dvd
+    (h : Host)
+    (O : Type) [CommRing O] [IsDomain O]
+    (ψ : DirichletCharacter O h.N) (hψ : h.IsChar ψ) (h2 : comp 2 ψ = 1)
+    (ho : ∀ p, p.Prime → p = h.q1 ∨ p = h.d → ∃ m, Odd m ∧ orderOf (comp p ψ) ∣ m)
+    : ψ.conductor ∣ h.q := by
   have hN : h.N ≠ 0 := NeZero.ne _
   obtain ⟨-, -, -, -, -, hpf, hpow, hq1, hd, -⟩ := hostIndex h
   rw [(compCond O h.N ψ 2 Nat.prime_two).2.2.2.2.2 h.q h.q_dvd]
@@ -65,22 +71,31 @@ private theorem cond_dvd (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : D
   · exact absurd hq1' hpe.1
   · exact absurd hd' hpe.2
 
-private theorem comp_two_eq_one (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (ψ : DirichletCharacter O N)
-    (ho : Odd (orderOf ψ)) : comp 2 ψ = 1 := by
+private theorem comp_two_eq_one
+    (O : Type) [CommRing O] [IsDomain O]
+    (N : ℕ) [NeZero N]
+    (ψ : DirichletCharacter O N) (ho : Odd (orderOf ψ))
+    : comp 2 ψ = 1 := by
   obtain ⟨k, hk⟩ := (compOrd O N ψ 2 Nat.prime_two).2.1
   have hd : orderOf (comp 2 ψ) ∣ orderOf ψ := ((compAlg O N 2 Nat.prime_two).2.2.2.2.2.1 ψ).2.1
   exact eq_one_of_odd (k := k) (hk ▸ dvd_refl _) hd ho
 
-theorem UpperTheory.V.HV.hostOdd :
-    ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N), h.IsChar ψ →
-      (Odd (orderOf ψ) → orderOf ψ ∣ ordCompl[2] h.o ∧ psi2 ψ = 1 ∧ c2 ψ = 0 ∧ Odd ψ.conductor ∧ ψ.conductor ∣ h.q) ∧
-      ∀ l, l.Prime → l ≠ 2 → l ≠ h.q1 → l ≠ h.d → Odd (orderOf (chiP l ψ)) → ψ.conductor ∣ h.q ∧ psi2 ψ = 1 := by
+theorem UpperTheory.V.HV.hostOdd
+    : ∀ (h : Host) (O : Type) [CommRing O] [IsDomain O] (ψ : DirichletCharacter O h.N),
+      h.IsChar ψ
+        → (Odd (orderOf ψ)
+            → orderOf ψ ∣ ordCompl[2] h.o ∧ psi2 ψ = 1 ∧ c2 ψ = 0 ∧ Odd ψ.conductor
+              ∧ ψ.conductor ∣ h.q)
+          ∧ ∀ l,
+            l.Prime → l ≠ 2 → l ≠ h.q1 → l ≠ h.d → Odd (orderOf (chiP l ψ))
+              → ψ.conductor ∣ h.q ∧ psi2 ψ = 1 := by
   intro h O _ _ ψ hψ
   obtain ⟨hord, hpos, -⟩ := hostComp h O ψ hψ
   refine ⟨fun hodd => ?_, fun l hl hl2 hlq1 hld hodd => ?_⟩
   · have h2 : comp 2 ψ = 1 := comp_two_eq_one O h.N ψ hodd
-    have hcd : ψ.conductor ∣ h.q := cond_dvd h O ψ hψ h2
-      (fun p hp _ => ⟨orderOf ψ, hodd, ((compAlg O h.N p hp).2.2.2.2.2.1 ψ).2.1⟩)
+    have hcd : ψ.conductor ∣ h.q :=
+      cond_dvd h O ψ hψ h2
+        (fun p hp _ => ⟨orderOf ψ, hodd, ((compAlg O h.N p hp).2.2.2.2.2.1 ψ).2.1⟩)
     obtain ⟨hc2eq, hone2, -⟩ := compCond O h.N ψ 2 Nat.prime_two
     have hnd : ¬ 2 ∣ ψ.conductor := hone2.mp h2
     refine ⟨?_, h2, ?_, ?_, hcd⟩
@@ -102,8 +117,11 @@ theorem UpperTheory.V.HV.hostOdd :
       rcases hpe with rfl | rfl
       exacts [hlq1.symm, hld.symm]
     obtain ⟨hkap, -⟩ := partOrd _ l hl ψ hpos
-    refine ⟨orderOf (chiP l ψ) * l ^ (orderOf ψ).factorization l,
-      Odd.mul hodd (Odd.pow (hl.odd_of_ne_two hl2)), ?_⟩
+    refine ⟨
+      orderOf (chiP l ψ) * l ^ (orderOf ψ).factorization l,
+      Odd.mul hodd (Odd.pow (hl.odd_of_ne_two hl2)),
+      ?_
+    ⟩
     have e : comp p ψ = comp p (th0 l ψ) * comp p (kap l ψ) := by
       rw [← (compAlg O h.N p hp).2.1, dirichletPrimeToLPart_mul_lPowerPart]
     rw [e]

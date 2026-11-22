@@ -4,11 +4,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
-open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing
+  Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement
+open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd
+  UpperTheory.V.Sd.S3
 
-theorem UpperTheory.teichmuller_character_spec :
-    UpperTheory.V.Sd.S3.Teich := by
+theorem UpperTheory.teichmuller_character_spec : UpperTheory.V.Sd.S3.Teich := by
   intro l _ c x m hcop hx hres
   haveI := c.dvr
   haveI := c.fin
@@ -16,13 +18,12 @@ theorem UpperTheory.teichmuller_character_spec :
   have hnd : ¬ l ∣ m := fun h =>
     (Nat.Prime.one_lt (Fact.out : l.Prime)).ne' (Nat.Coprime.eq_one_of_dvd hcop h)
   have hm := hunit m hnd
-  have hX : (x : c.O) ^ m = 1 := by
-    rw [← Units.val_pow_eq_pow_val, hx, Units.val_one]
+  have hX : (x : c.O) ^ m = 1 := by rw [← Units.val_pow_eq_pow_val, hx, Units.val_one]
   have hgeom : (∑ i ∈ Finset.range m, (x : c.O) ^ i) * ((x : c.O) - 1) = 0 := by
     rw [geom_sum_mul, hX, sub_self]
   have hres' : residue c.O (∑ i ∈ Finset.range m, (x : c.O) ^ i) = residue c.O (m : c.O) := by
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [map_sum, map_pow, hres]
+    simp [map_sum, map_pow, hres]
   have hS : IsUnit (∑ i ∈ Finset.range m, (x : c.O) ^ i) := by
     rw [← isUnit_map_iff (residue c.O), hres', isUnit_map_iff]
     exact hm

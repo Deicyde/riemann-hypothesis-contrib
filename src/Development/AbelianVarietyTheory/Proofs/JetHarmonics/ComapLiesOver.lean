@@ -14,11 +14,15 @@ noncomputable section
 
 namespace GlobalTheory.FrobPlace
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth GlobalTheory.RunDepth
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth
+  GlobalTheory.RunDepth
 
-theorem comap_liesOver {E K : Type} [Field E] [Field K] [NumberField K] (f : 𝓞 E →+* 𝓞 K)
-    (la : HeightOneSpectrum (𝓞 K)) :
-    (la.asIdeal.comap f).LiesOver (Ideal.span {((resCharOf la : ℕ) : ℤ)}) := by
+theorem comap_liesOver
+    {E K : Type} [Field E] [Field K] [NumberField K]
+    (f : 𝓞 E →+* 𝓞 K) (la : HeightOneSpectrum (𝓞 K))
+    : (la.asIdeal.comap f).LiesOver (Ideal.span {((resCharOf la : ℕ) : ℤ)}) := by
   have hl := Crude.resCharOf_prime la
   have hP := la.isPrime
   have hmax : (Ideal.span {((resCharOf la : ℕ) : ℤ)}).IsMaximal :=
@@ -37,13 +41,13 @@ theorem comap_liesOver {E K : Type} [Field E] [Field K] [NumberField K] (f : �
     rwa [map_one, map_one] at h1
   exact ⟨hmax.eq_of_le hne hle⟩
 
-theorem card_under {S : Type} [CommRing S] (p : ℕ) (Q : Ideal S) [h : Q.LiesOver (Ideal.span {(p : ℤ)})] :
-    Nat.card (ℤ ⧸ Q.under ℤ) = p := by
+theorem card_under
+    {S : Type} [CommRing S] (p : ℕ) (Q : Ideal S) [h : Q.LiesOver (Ideal.span {(p : ℤ)})]
+    : Nat.card (ℤ ⧸ Q.under ℤ) = p := by
   rw [← h.over, Nat.card_congr (Int.quotientSpanNatEquivZMod p).toEquiv, Nat.card_zmod]
 
-theorem eTau_plOf (D : D7) (z : RPl D.R) :
-    ((D.eTau (plOf D z) : D.R.Psi) : D.R.GG) =
-      ((if z.1 then -1 else 1, 1), D.R.iota z.2) := by
+theorem eTau_plOf (D : D7) (z : RPl D.R)
+    : ((D.eTau (plOf D z) : D.R.Psi) : D.R.GG) = ((if z.1 then -1 else 1, 1), D.R.iota z.2) := by
   unfold plOf
   rw [Equiv.apply_symm_apply]
   cases z.1 <;> rfl
@@ -58,12 +62,15 @@ theorem inert_ne {N : NumDatum} {l : ℕ} (h : Inert N l) : l ∉ N.H.small ∧ 
   · rw [if_pos hd] at h
     split_ifs at h <;> rcases h with h | h <;> cases h
 
-theorem gal_step (D : D7) (L : SizeData₂ D) (p : ℕ) [Fact p.Prime] (hI : Inert (numOf D L) p)
+theorem gal_step
+    (D : D7) (L : SizeData₂ D)
+    (p : ℕ) [Fact p.Prime]
+    (hI : Inert (numOf D L) p)
     (P : Ideal (𝓞 D.host.E)) [P.IsPrime] [P.LiesOver (Ideal.span {(p : ℤ)})]
-    (σ : D.host.E ≃ₐ[ℚ] D.host.E) (hσ : IsArithFrobAt ℤ σ P) (z : RPl D.R) :
-    ((D.eTau (plOf D ((numOf D L).pos p z 1)) : D.R.Psi) : D.R.GG) * D.R.cc =
-      ((D.eTau (plOf D z) : D.R.Psi) : D.R.GG) *
-        D.host.galE σ := by
+    (σ : D.host.E ≃ₐ[ℚ] D.host.E) (hσ : IsArithFrobAt ℤ σ P)
+    (z : RPl D.R)
+    : ((D.eTau (plOf D ((numOf D L).pos p z 1)) : D.R.Psi) : D.R.GG) * D.R.cc
+      = ((D.eTau (plOf D z) : D.R.Psi) : D.R.GG) * D.host.galE σ := by
   obtain ⟨h2, hq, hd⟩ := inert_ne hI
   have hN : ¬ p ∣ D.host.condN := fun h => by
     rcases (D.host.toHostRaw.dvd_condN_iff_small Fact.out).1 h with h | h | h
@@ -76,8 +83,9 @@ theorem gal_step (D : D7) (L : SizeData₂ D) (p : ℕ) [Fact p.Prime] (hI : Ine
     rw [e2, Formalism.HC.Frame.iota_iotaInv]
     exact congrArg Prod.snd e1
   have hcls : (numOf D L).cls p = D.host.cls p := rfl
-  have hpos := eTau_plOf D
-    (xor z.1 (decide (D.host.cls p = PrimeClass.signal ∧ Odd 1)), z.2 + 1 • (numOf D L).hP p)
+  have hpos :=
+    eTau_plOf D
+      (xor z.1 (decide (D.host.cls p = PrimeClass.signal ∧ Odd 1)), z.2 + 1 • (numOf D L).hP p)
   refine (congrArg (· * D.R.cc) hpos).trans ?_
   rw [eTau_plOf]
   refine Prod.ext ?_ ?_
@@ -94,9 +102,10 @@ theorem gal_step (D : D7) (L : SizeData₂ D) (p : ℕ) [Fact p.Prime] (hI : Ine
     rw [Formalism.HC.Frame.iota_add]
     exact congrArg (fun t => D.R.iota z.2 * D.R.iota t) (one_nsmul _)
 
-theorem conj_emb {R : Ranks} (H : Formalism.BasicNotions.Host R) (g g' : R.GG) (σ : H.E ≃ₐ[ℚ] H.E)
-    (h : g' * R.cc = g * H.galE σ) (x : H.E) :
-    ComplexEmbedding.conjugate (H.emb g') x = H.emb g (σ x) := by
+theorem conj_emb
+    {R : Ranks} (H : Formalism.BasicNotions.Host R) (g g' : R.GG) (σ : H.E ≃ₐ[ℚ] H.E)
+    (h : g' * R.cc = g * H.galE σ) (x : H.E)
+    : ComplexEmbedding.conjugate (H.emb g') x = H.emb g (σ x) := by
   have hg : ∀ g : R.GG, H.galE (H.sigmaOf g) = g := fun g => MulEquiv.apply_symm_apply _ _
   have he : H.sigmaOf g' * H.conj = H.sigmaOf g * σ := by
     apply H.galE_injective
@@ -105,8 +114,19 @@ theorem conj_emb {R : Ranks} (H : Formalism.BasicNotions.Host R) (g g' : R.GG) (
   change H.φ₀ ((H.sigmaOf g' * H.conj) x) = H.φ₀ ((H.sigmaOf g * σ) x)
   rw [he]
 
-theorem frob_place : ∀ (D : D7) (L : SizeData₂ D) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (lv : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H) (c : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff lv) (la : HeightOneSpectrum (𝓞 c.F)), Inert (numOf D L) (resCharOf la) → ∀ (z : RPl D.R) (x : 𝓞 D.host.E),
-  ∃ y ∈ la.asIdeal, ((y : 𝓞 c.F) : c.F) = embK c (ComplexEmbedding.conjugate (DV.tauEmb D (plOf D ((numOf D L).pos (resCharOf la) z 1)))) x - embK c (DV.tauEmb D (plOf D z)) x ^ resCharOf la := by
+theorem frob_place
+    : ∀ (D : D7) (L : SizeData₂ D) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E)
+        (lv : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H)
+        (c : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff lv)
+        (la : HeightOneSpectrum (𝓞 c.F)),
+      Inert (numOf D L) (resCharOf la)
+        → ∀ (z : RPl D.R) (x : 𝓞 D.host.E), ∃ y ∈ la.asIdeal,
+          ((y : 𝓞 c.F) : c.F)
+            = embK c
+                (ComplexEmbedding.conjugate (DV.tauEmb D
+                  (plOf D ((numOf D L).pos (resCharOf la) z 1))))
+                x
+              - embK c (DV.tauEmb D (plOf D z)) x ^ resCharOf la := by
   intro D L H lv c la hI z x
   haveI : Fact (resCharOf la).Prime := ⟨Crude.resCharOf_prime la⟩
   obtain ⟨h2, hq, hd⟩ := inert_ne hI

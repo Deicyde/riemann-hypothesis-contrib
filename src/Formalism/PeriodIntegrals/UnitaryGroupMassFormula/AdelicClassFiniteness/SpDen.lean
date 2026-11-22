@@ -13,9 +13,12 @@ open NumberField
 
 theorem spDen : SpDen := by
   intro E _ _ k X
-  have h : ∀ p : Fin k × Fin k, ∃ D : ℕ, 1 ≤ D ∧ (D : E) * X p.1 p.2 ∈ (algebraMap (𝓞 E) E).range := by
+  have h
+      : ∀ p : Fin k × Fin k, ∃ D : ℕ, 1 ≤ D ∧ (D : E) * X p.1 p.2 ∈ (algebraMap (𝓞 E) E).range := by
     intro p
-    obtain ⟨y, hy, hint⟩ := IsAlgebraic.exists_integral_multiple (IsFractionRing.isAlgebraic_iff ℤ ℚ E |>.mpr (.of_finite ℚ (X p.1 p.2)))
+    obtain ⟨y, hy, hint⟩ :=
+      IsAlgebraic.exists_integral_multiple (IsFractionRing.isAlgebraic_iff ℤ ℚ E
+        |>.mpr (.of_finite ℚ (X p.1 p.2)))
     refine ⟨y.natAbs, Int.natAbs_pos.2 hy, ?_⟩
     have hmem : (y : E) * X p.1 p.2 ∈ (algebraMap (𝓞 E) E).range :=
       ⟨⟨(y : E) * X p.1 p.2, by rw [mem_integralClosure_iff]; simpa [zsmul_eq_mul] using hint⟩, rfl⟩

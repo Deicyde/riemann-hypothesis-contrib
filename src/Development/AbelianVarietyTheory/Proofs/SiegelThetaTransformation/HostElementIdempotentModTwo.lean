@@ -19,8 +19,12 @@ public import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -29,8 +33,9 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Ker.AtRecord
 
-theorem isRelTraceOneIdempotentModTwo_hostElement {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Geo.Tor.Host E) :
-    IdemTwo (H.w0 : E) := by
+theorem isRelTraceOneIdempotentModTwo_hostElement
+    {E : Type} [Field E] [NumberField E] [IsCMField E] (H : Geo.Tor.Host E)
+    : IdemTwo (H.w0 : E) := by
   obtain ⟨k, hk⟩ : ∃ k, H.d = 16 * k + 7 := ⟨H.d / 16, by have := H.d_mod; omega⟩
   have h1 : (H.w0 : E) + cc (H.w0 : E) = 1 := by
     have := congrArg (algebraMap (𝓞 E) E) (PullbackSections.CVA.cmHostUnit_add_conj_eq_one H)

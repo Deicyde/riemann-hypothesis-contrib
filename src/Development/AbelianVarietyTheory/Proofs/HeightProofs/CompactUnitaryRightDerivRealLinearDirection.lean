@@ -16,7 +16,9 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.ContDiffMatri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S Formalism.L2.Theta Matrix
 open Formalism.REAL GlobalTheory.SmoothGlob GlobalTheory.TypeSum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -36,7 +38,8 @@ theorem inK_zero' (ε : Fin n → Bool) : inK ε (0 : Mx n) := by
     simp
   · simp
 
-theorem inK_add'' {ε : Fin n → Bool} {X Y : Mx n} (hX : inK ε X) (hY : inK ε Y) : inK ε (X + Y) := by
+theorem inK_add'' {ε : Fin n → Bool} {X Y : Mx n} (hX : inK ε X) (hY : inK ε Y)
+    : inK ε (X + Y) := by
   obtain ⟨h1, h2⟩ := hX
   obtain ⟨h3, h4⟩ := hY
   refine ⟨?_, ?_⟩
@@ -44,13 +47,15 @@ theorem inK_add'' {ε : Fin n → Bool} {X Y : Mx n} (hX : inK ε X) (hY : inK �
     have h3' : Yᴴ * Jm ε + Jm ε * Y = 0 := h3
     show (X + Y)ᴴ * Jm ε + Jm ε * (X + Y) = 0
     rw [Matrix.conjTranspose_add, Matrix.add_mul, Matrix.mul_add]
-    calc Xᴴ * Jm ε + Yᴴ * Jm ε + (Jm ε * X + Jm ε * Y)
+    calc
+      Xᴴ * Jm ε + Yᴴ * Jm ε + (Jm ε * X + Jm ε * Y)
         = (Xᴴ * Jm ε + Jm ε * X) + (Yᴴ * Jm ε + Jm ε * Y) := by abel
       _ = 0 := by rw [h1', h3', add_zero]
   · rw [Matrix.add_mul, Matrix.mul_add, h2, h4]
 
-theorem inK_sum_real {ε : Fin n → Bool} {r : ℕ} (X : Fin r → Mx n) (c : Fin r → ℝ) (hX : ∀ j, inK ε (X j)) :
-    inK ε (∑ j, (c j : ℂ) • X j) := by
+theorem inK_sum_real
+    {ε : Fin n → Bool} {r : ℕ} (X : Fin r → Mx n) (c : Fin r → ℝ) (hX : ∀ j, inK ε (X j))
+    : inK ε (∑ j, (c j : ℂ) • X j) := by
   classical
   refine Finset.sum_induction _ (inK ε) (fun _ _ ha hb => inK_add'' ha hb) (inK_zero' ε) ?_
   intro j _
@@ -58,8 +63,7 @@ theorem inK_sum_real {ε : Fin n → Bool} {r : ℕ} (X : Fin r → Mx n) (c : F
 
 def entryDer (ε : Fin n → Bool) (k : KG ε) (a b : Fin n) : Mx n →ₗ[ℝ] ℂ where
   toFun Y := ∑ l, toMK k a l * Y l b
-  map_add' Y Z := by
-    simp only [Matrix.add_apply, mul_add, Finset.sum_add_distrib]
+  map_add' Y Z := by simp only [Matrix.add_apply, mul_add, Finset.sum_add_distrib]
   map_smul' r Y := by
     simp only [Matrix.smul_apply, RingHom.id_apply, Finset.smul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
@@ -68,42 +72,48 @@ def entryDer (ε : Fin n → Bool) (k : KG ε) (a b : Fin n) : Mx n →ₗ[ℝ] 
 
 def entryDerStar (ε : Fin n → Bool) (k : KG ε) (a b : Fin n) : Mx n →ₗ[ℝ] ℂ where
   toFun Y := star (∑ l, toMK k a l * Y l b)
-  map_add' Y Z := by
-    simp only [Matrix.add_apply, mul_add, Finset.sum_add_distrib, star_add]
+  map_add' Y Z := by simp only [Matrix.add_apply, mul_add, Finset.sum_add_distrib, star_add]
   map_smul' r Y := by
     simp only [Matrix.smul_apply, RingHom.id_apply, Complex.real_smul]
     simp only [star_sum, Finset.mul_sum, star_mul', Complex.star_def, map_mul, Complex.conj_ofReal]
     refine Finset.sum_congr rfl fun l _ => ?_
     ring
 
-theorem hasDerivAt_coord_lin {ε : Fin n → Bool} (c : Fin n × Fin n × Bool) :
-    ∃ D : KG ε → Mx n →ₗ[ℝ] ℂ, ∀ (k : KG ε) (Y : Mx n), inK ε Y →
-      HasDerivAt (fun t : ℝ => coord ε c (k * expK ε Y t)) (D k Y) 0 := by
+theorem hasDerivAt_coord_lin {ε : Fin n → Bool} (c : Fin n × Fin n × Bool)
+    : ∃ D : KG ε → Mx n →ₗ[ℝ] ℂ, ∀ (k : KG ε) (Y : Mx n),
+      inK ε Y → HasDerivAt (fun t : ℝ => coord ε c (k * expK ε Y t)) (D k Y) 0 := by
   obtain ⟨a, b, f⟩ := c
-  have hent : ∀ (k : KG ε) (Y : Mx n), inK ε Y → HasDerivAt (fun t : ℝ => (toMK (k * expK ε Y t)) a b)
-      (∑ l, toMK k a l * Y l b) 0 := by
+  have hent
+      : ∀ (k : KG ε) (Y : Mx n),
+        inK ε Y
+          → HasDerivAt (fun t : ℝ => (toMK (k * expK ε Y t)) a b) (∑ l, toMK k a l * Y l b) 0 := by
     intro k Y hY
-    have e : (fun t : ℝ => (toMK (k * expK ε Y t)) a b) =
-        fun t : ℝ => ∑ l, toMK k a l * (NormedSpace.exp ((t : ℂ) • Y)) l b := by
+    have e
+        : (fun t : ℝ => (toMK (k * expK ε Y t)) a b)
+          = fun t : ℝ => ∑ l, toMK k a l * (NormedSpace.exp ((t : ℂ) • Y)) l b := by
       funext t; simp only [toMK_mul, toMK_expK hY, Matrix.mul_apply]
     rw [e]
     exact HasDerivAt.fun_sum fun l _ => (hasDerivAt_exp_entry_real Y l b).const_mul _
   cases f
   · refine ⟨fun k => entryDerStar ε k a b, fun k Y hY => ?_⟩
     have h := (hent k Y hY).star
-    have e1 : (fun t : ℝ => coord ε (a, b, false) (k * expK ε Y t)) =
-        fun t => star ((toMK (k * expK ε Y t)) a b) := by
+    have e1
+        : (fun t : ℝ => coord ε (a, b, false) (k * expK ε Y t))
+          = fun t => star ((toMK (k * expK ε Y t)) a b) := by
       funext t; simp [coord]
-    rw [e1]; exact h
+    rw [e1]
+    exact h
   · refine ⟨fun k => entryDer ε k a b, fun k Y hY => ?_⟩
-    have e1 : (fun t : ℝ => coord ε (a, b, true) (k * expK ε Y t)) =
-        fun t => (toMK (k * expK ε Y t)) a b := by
+    have e1
+        : (fun t : ℝ => coord ε (a, b, true) (k * expK ε Y t))
+          = fun t => (toMK (k * expK ε Y t)) a b := by
       funext t; simp [coord]
-    rw [e1]; exact hent k Y hY
+    rw [e1]
+    exact hent k Y hY
 
-theorem hasDerivAt_mono_lin {ε : Fin n → Bool} (s : List (Fin n × Fin n × Bool)) :
-    ∃ D : KG ε → Mx n →ₗ[ℝ] ℂ, ∀ (k : KG ε) (Y : Mx n), inK ε Y →
-      HasDerivAt (fun t : ℝ => mono ε s (k * expK ε Y t)) (D k Y) 0 := by
+theorem hasDerivAt_mono_lin {ε : Fin n → Bool} (s : List (Fin n × Fin n × Bool))
+    : ∃ D : KG ε → Mx n →ₗ[ℝ] ℂ, ∀ (k : KG ε) (Y : Mx n),
+      inK ε Y → HasDerivAt (fun t : ℝ => mono ε s (k * expK ε Y t)) (D k Y) 0 := by
   induction s with
   | nil =>
     refine ⟨0, fun k Y _ => ?_⟩
@@ -113,8 +123,9 @@ theorem hasDerivAt_mono_lin {ε : Fin n → Bool} (s : List (Fin n × Fin n × B
     obtain ⟨Ds, hs⟩ := ih
     refine ⟨fun k => mono ε s k • Dc k + coord ε c k • Ds k, fun k Y hY => ?_⟩
     have h := (hc k Y hY).mul (hs k Y hY)
-    have e : (fun t : ℝ => mono ε (c :: s) (k * expK ε Y t)) =
-        fun t => coord ε c (k * expK ε Y t) * mono ε s (k * expK ε Y t) := by
+    have e
+        : (fun t : ℝ => mono ε (c :: s) (k * expK ε Y t))
+          = fun t => coord ε c (k * expK ε Y t) * mono ε s (k * expK ε Y t) := by
       funext t; simp [mono]
     rw [e]
     rw [coord_mul_expK_zero hY, mono_mul_expK_zero hY] at h
@@ -122,9 +133,9 @@ theorem hasDerivAt_mono_lin {ε : Fin n → Bool} (s : List (Fin n × Fin n × B
     simp only [LinearMap.add_apply, LinearMap.smul_apply, smul_eq_mul]
     ring
 
-theorem hasDerivAt_lin_of_mem {ε : Fin n → Bool} {d : ℕ} {φ : KG ε → ℂ} (hφ : φ ∈ polyV ε d) :
-    ∃ D : KG ε → Mx n →ₗ[ℝ] ℂ, ∀ (k : KG ε) (Y : Mx n), inK ε Y →
-      HasDerivAt (fun t : ℝ => φ (k * expK ε Y t)) (D k Y) 0 := by
+theorem hasDerivAt_lin_of_mem {ε : Fin n → Bool} {d : ℕ} {φ : KG ε → ℂ} (hφ : φ ∈ polyV ε d)
+    : ∃ D : KG ε → Mx n →ₗ[ℝ] ℂ, ∀ (k : KG ε) (Y : Mx n),
+      inK ε Y → HasDerivAt (fun t : ℝ => φ (k * expK ε Y t)) (D k Y) 0 := by
   induction hφ using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨s, -, rfl⟩ := hx
@@ -139,9 +150,11 @@ theorem hasDerivAt_lin_of_mem {ε : Fin n → Bool} {d : ℕ} {φ : KG ε → �
     obtain ⟨D, dD⟩ := hx
     exact ⟨a • D, fun k Y hY => by simpa using (dD k Y hY).const_mul a⟩
 
-theorem rder_real_linear {n : ℕ} (ε : Fin n → Bool) (d : ℕ) (φ : KG ε → ℂ) (hφ : φ ∈ polyV ε d)
-    {r : ℕ} (X : Fin r → Mx n) (c : Fin r → ℝ) (hX : ∀ j, inK ε (X j)) :
-    rder ε [∑ j, (c j : ℂ) • X j] φ = ∑ j, (c j : ℂ) • rder ε [X j] φ := by
+theorem rder_real_linear
+    {n : ℕ} (ε : Fin n → Bool)
+    (d : ℕ) (φ : KG ε → ℂ) (hφ : φ ∈ polyV ε d)
+    {r : ℕ} (X : Fin r → Mx n) (c : Fin r → ℝ) (hX : ∀ j, inK ε (X j))
+    : rder ε [∑ j, (c j : ℂ) • X j] φ = ∑ j, (c j : ℂ) • rder ε [X j] φ := by
   obtain ⟨D, hD⟩ := hasDerivAt_lin_of_mem hφ
   have hr : ∀ (Y : Mx n), inK ε Y → ∀ k, rder ε [Y] φ k = D k Y := by
     intro Y hY k

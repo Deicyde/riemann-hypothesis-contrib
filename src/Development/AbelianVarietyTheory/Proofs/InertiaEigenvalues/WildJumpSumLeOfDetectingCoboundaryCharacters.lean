@@ -8,20 +8,29 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.WildJum
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField GlobalTheory.PMon.Ram
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ValuativeRel GroundTheory.LocalField
+  GlobalTheory.PMon.Ram
 
 namespace GlobalTheory.PMon.Ram
 
-theorem jumpSum_le_of_detects : ∀ (K L : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K] [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L] [IsGalois K L] (p E r : ℕ) (A B : Subgroup (L ≃ₐ[K] L)), p.Prime → 0 < E → OrdIs L p E → AxIn K L p → Detects p r A B → jumpSum (wild K L) A B ≤ 6 * E := by
+theorem jumpSum_le_of_detects
+    : ∀ (K L : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+        [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+        [ValuativeExtension K L] [FiniteDimensional K L] [IsGalois K L] (p E r : ℕ)
+        (A B : Subgroup (L ≃ₐ[K] L)),
+      p.Prime → 0 < E → OrdIs L p E → AxIn K L p → Detects p r A B
+        → jumpSum (wild K L) A B ≤ 6 * E := by
   intro K L _ _ _ _ _ _ _ _ _ _ _ _ p E r A B hp hE hord hax hdet
-  obtain ⟨j, hinj, hrange, happ, hram⟩ := GlobalTheory.T.galoisGroup_fixedField_baseChange_localField K L A
+  obtain ⟨j, hinj, hrange, happ, hram⟩ :=
+    GlobalTheory.T.galoisGroup_fixedField_baseChange_localField K L A
 
   have haxF : AxIn (IntermediateField.fixedField A) L p := by
     intro J x hx
-    obtain ⟨y, hy, hxy⟩ := hax (J.map j) x (by
-      rintro σ ⟨τ, hτ, rfl⟩
-      rw [happ]
-      exact hx τ hτ)
+    obtain ⟨y, hy, hxy⟩ :=
+      hax (J.map j) x (by
+        rintro σ ⟨τ, hτ, rfl⟩
+        rw [happ]
+        exact hx τ hτ)
     refine ⟨y, fun τ hτ => ?_, hxy⟩
     rw [← happ]
     exact hy (j τ) ⟨τ, hτ, rfl⟩
@@ -34,7 +43,9 @@ theorem jumpSum_le_of_detects : ∀ (K L : Type) [Field K] [ValuativeRel K] [Top
     refine ⟨z, hz, ?_⟩
     rw [← happ]
     exact hzx
-  have key := GlobalTheory.T.wild_jumpSum_le_of_coboundary_detects (IntermediateField.fixedField A) L p E r (B.comap j) hp hE hord haxF hdetF
+  have key :=
+    GlobalTheory.T.wild_jumpSum_le_of_coboundary_detects (IntermediateField.fixedField A) L p E r
+      (B.comap j) hp hE hord haxF hdetF
   have hwild : wild (IntermediateField.fixedField A) L = fun t => (wild K L t).comap j := by
     funext t
     exact hram _

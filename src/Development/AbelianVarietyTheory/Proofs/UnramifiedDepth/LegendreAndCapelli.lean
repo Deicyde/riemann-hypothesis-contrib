@@ -12,13 +12,12 @@ namespace GlobalTheory.LegendreFacts
 
 open GlobalTheory.LegendreBounds
 
-theorem mfact_eq_prod {σ : Type} [Fintype σ] (A : σ →₀ ℕ) :
-    mfact A = ∏ j, (A j).factorial := by
+theorem mfact_eq_prod {σ : Type} [Fintype σ] (A : σ →₀ ℕ) : mfact A = ∏ j, (A j).factorial := by
   unfold mfact
   exact Finsupp.prod_fintype A _ (fun _ => Nat.factorial_zero)
 
-theorem capNat_mul (n0 x : ℕ) :
-    capNat n0 x * ∏ c ∈ Finset.range n0, c.factorial
+theorem capNat_mul (n0 x : ℕ)
+    : capNat n0 x * ∏ c ∈ Finset.range n0, c.factorial
       = ∏ c ∈ Finset.range n0, (x + c).factorial := by
   unfold capNat
   rw [← Finset.prod_mul_distrib]
@@ -38,12 +37,20 @@ theorem capelli_bound : F3 := by
       have h := capNat_mul n0 x
       rw [h0, zero_mul] at h
       exact (Finset.prod_ne_zero_iff.mpr (fun c _ => Nat.factorial_ne_zero (x + c))) h.symm
-    have hv : padicValNat l (capNat n0 x) + padicValNat l (∏ c ∈ Finset.range n0, c.factorial)
-        = padicValNat l (∏ c ∈ Finset.range n0, (x + c).factorial) := by
-      rw [← (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)], a ≠ 0 → b ≠ 0 → _root_.padicValNat p (a * b) = _root_.padicValNat p a + _root_.padicValNat p b from by simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul) hC hP, capNat_mul]
-    have hvR : (padicValNat l (capNat n0 x) : ℝ)
-        = (padicValNat l (∏ c ∈ Finset.range n0, (x + c).factorial) : ℝ)
-          - (padicValNat l (∏ c ∈ Finset.range n0, c.factorial) : ℝ) := by
+    have hv
+        : padicValNat l (capNat n0 x) + padicValNat l (∏ c ∈ Finset.range n0, c.factorial)
+          = padicValNat l (∏ c ∈ Finset.range n0, (x + c).factorial) := by
+      rw [← (show ∀ {p a b : ℕ} [_root_.Fact (_root_.Nat.Prime p)],
+              a ≠ 0 → b ≠ 0
+                → _root_.padicValNat p (a * b)
+                  = _root_.padicValNat p a + _root_.padicValNat p b from by
+            simpa only [← _root_.Nat.padicValNat_def] using @_root_.Nat.multiplicity_mul)
+          hC hP,
+        capNat_mul]
+    have hvR
+        : (padicValNat l (capNat n0 x) : ℝ)
+          = (padicValNat l (∏ c ∈ Finset.range n0, (x + c).factorial) : ℝ)
+            - (padicValNat l (∏ c ∈ Finset.range n0, c.factorial) : ℝ) := by
       rw [← hv]
       push_cast
       ring

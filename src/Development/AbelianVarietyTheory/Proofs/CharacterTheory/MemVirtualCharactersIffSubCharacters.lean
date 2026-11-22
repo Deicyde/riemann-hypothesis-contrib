@@ -9,8 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.CharacterTheory.IsCharacte
 open GlobalTheory.BI
 namespace GlobalTheory.BI
 
-theorem mem_virt_iff_sub (K L : Type) [Field K] [Field L] [Algebra K L] (G : Type) [Group G] (f : G → L) :
-    f ∈ Virt K L G ↔ ∃ a b : G → L, IsChar K L a ∧ IsChar K L b ∧ f = a - b := by
+theorem mem_virt_iff_sub
+    (K L : Type) [Field K] [Field L] [Algebra K L] (G : Type) [Group G] (f : G → L)
+    : f ∈ Virt K L G ↔ ∃ a b : G → L, IsChar K L a ∧ IsChar K L b ∧ f = a - b := by
   obtain ⟨h0, hadd⟩ := GlobalTheory.T.isCharacterOverSubfield_zero_and_add K L G
   unfold Virt
   constructor

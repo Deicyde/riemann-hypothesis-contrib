@@ -18,8 +18,8 @@ section Generic
 
 variable {E L : Type} [Field E] [NumberField E] [Field L] [NumberField L]
 
-theorem exists_lift [IsGalois ℚ L] (ι : E →ₐ[ℚ] L) (σ : E ≃ₐ[ℚ] E) :
-    ∃ τ : L ≃ₐ[ℚ] L, ∀ x, ι (σ x) = τ (ι x) := by
+theorem exists_lift [IsGalois ℚ L] (ι : E →ₐ[ℚ] L) (σ : E ≃ₐ[ℚ] E)
+    : ∃ τ : L ≃ₐ[ℚ] L, ∀ x, ι (σ x) = τ (ι x) := by
   let _ : Algebra E L := ι.toRingHom.toAlgebra
   have : IsScalarTower ℚ E L := IsScalarTower.of_algebraMap_eq fun x => (ι.commutes x).symm
   exact ⟨σ.liftNormal L, fun x => (AlgEquiv.liftNormal_commutes σ L x).symm⟩
@@ -39,14 +39,18 @@ variable (N : ℕ) [NeZero N]
 def tauN : (ZMod N)ˣ ≃* (Cond.Cyc N ≃ₐ[ℚ] Cond.Cyc N) :=
   (IsCyclotomicExtension.Rat.galEquivZMod N (Cond.Cyc N)).symm
 
-theorem tauN_root (u : (ZMod N)ˣ) (w : Cond.Cyc N) (hw : w ^ N = 1) : tauN N u w = w ^ (u : ZMod N).val := by
-  rw [IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N (Cond.Cyc N) _ hw, tauN, MulEquiv.apply_symm_apply]
+theorem tauN_root (u : (ZMod N)ˣ) (w : Cond.Cyc N) (hw : w ^ N = 1)
+    : tauN N u w = w ^ (u : ZMod N).val := by
+  rw [IsCyclotomicExtension.Rat.galEquivZMod_apply_of_pow_eq N (Cond.Cyc N) _ hw, tauN,
+    MulEquiv.apply_symm_apply]
 
 theorem cyc_isGalois : IsGalois ℚ (Cond.Cyc N) := IsCyclotomicExtension.isGalois {N} ℚ _
 
-theorem tauN_neg_one (Ψ : Cond.Cyc N →+* ℂ) (x : Cond.Cyc N) : Ψ (tauN N (-1) x) = starRingEnd ℂ (Ψ x) := by
-  have key : (Ψ.comp (tauN N (-1) : Cond.Cyc N →+* Cond.Cyc N)).toRatAlgHom =
-      ((starRingEnd ℂ).comp Ψ).toRatAlgHom := by
+theorem tauN_neg_one (Ψ : Cond.Cyc N →+* ℂ) (x : Cond.Cyc N)
+    : Ψ (tauN N (-1) x) = starRingEnd ℂ (Ψ x) := by
+  have key
+      : (Ψ.comp (tauN N (-1) : Cond.Cyc N →+* Cond.Cyc N)).toRatAlgHom
+        = ((starRingEnd ℂ).comp Ψ).toRatAlgHom := by
     refine AlgHom.ext_of_adjoin_eq_top
       (IsCyclotomicExtension.adjoin_primitive_root_eq_top (Cond.z_spec N)) ?_
     intro y hy
@@ -75,12 +79,12 @@ instance neZero_condN : NeZero H.condN :=
 
 def emb : H.E →ₐ[ℚ] Cond.Cyc H.condN := H.cycEmb
 
-theorem emb_art (u : (ZMod H.condN)ˣ) (x : H.E) :
-    emb H (H.gal.symm (H.art u) x) = tauN H.condN u (emb H x) :=
+theorem emb_art (u : (ZMod H.condN)ˣ) (x : H.E)
+    : emb H (H.gal.symm (H.art u) x) = tauN H.condN u (emb H x) :=
   H.art_spec u (tauN H.condN u) (tauN_root H.condN u _ H.cycZeta_prim.pow_eq_one) x
 
-theorem gal_eq_art_iff (σ : H.E ≃ₐ[ℚ] H.E) (u : (ZMod H.condN)ˣ) :
-    H.gal σ = H.art u ↔ ∀ x, emb H (σ x) = tauN H.condN u (emb H x) := by
+theorem gal_eq_art_iff (σ : H.E ≃ₐ[ℚ] H.E) (u : (ZMod H.condN)ˣ)
+    : H.gal σ = H.art u ↔ ∀ x, emb H (σ x) = tauN H.condN u (emb H x) := by
   constructor
   · intro h x
     rw [← emb_art, ← h, MulEquiv.symm_apply_apply]
@@ -100,10 +104,12 @@ theorem gal_conj : H.gal H.conj = φ.cc := H.gal.apply_symm_apply _
 
 theorem conj_apply (ψ : H.E →+* ℂ) (x : H.E) : ψ (H.conj x) = starRingEnd ℂ (ψ x) := by
   obtain ⟨Ψ, hΨ⟩ := exists_emb_lift (emb H) ψ
-  rw [← hΨ, ← hΨ, ← tauN_neg_one, (gal_eq_art_iff H H.conj (-1)).mp ((gal_conj H).trans H.art_neg_one.symm)]
+  rw [← hΨ, ← hΨ, ← tauN_neg_one,
+    (gal_eq_art_iff H H.conj (-1)).mp ((gal_conj H).trans H.art_neg_one.symm)]
 
-theorem conj_iff : ∀ (ψ : H.E →+* ℂ) (σ : H.E ≃ₐ[ℚ] H.E),
-    (∀ x, ψ (σ x) = starRingEnd ℂ (ψ x)) ↔ H.gal σ = φ.cc := by
+theorem conj_iff
+    : ∀ (ψ : H.E →+* ℂ) (σ : H.E ≃ₐ[ℚ] H.E),
+      (∀ x, ψ (σ x) = starRingEnd ℂ (ψ x)) ↔ H.gal σ = φ.cc := by
   intro ψ σ
   constructor
   · intro h
@@ -168,12 +174,14 @@ theorem mem_F : ∀ x : H.E, x ∈ H.F ↔ H.conj x = x := by
 
 theorem d_mod_four : H.d % 4 = 3 := D7.d4 H.hyp
 
-theorem art_ch : ∀ u : (ZMod H.condN)ˣ,
-    (((H.art u).1.2 : ℤˣ) : ℤ) = jacobiSym (((u : ZMod H.condN).val : ℕ) : ℤ) H.d := by
+theorem art_ch
+    : ∀ u : (ZMod H.condN)ˣ,
+      (((H.art u).1.2 : ℤˣ) : ℤ) = jacobiSym (((u : ZMod H.condN).val : ℕ) : ℤ) H.d := by
   intro u
   have hd : H.d ∣ H.condN := dvd_mul_left _ _
-  have h1 := D7.sqrt_act H.hyp.2.1 (d_mod_four H) hd u (tauN H.condN u) (tauN_root H.condN u) (emb H H.sqd)
-    (by rw [← map_pow, H.sqd_sq, map_neg, map_natCast])
+  have h1 :=
+    D7.sqrt_act H.hyp.2.1 (d_mod_four H) hd u (tauN H.condN u) (tauN_root H.condN u) (emb H H.sqd)
+      (by rw [← map_pow, H.sqd_sq, map_neg, map_natCast])
   rw [← emb_art, H.gal_sqd, MulEquiv.apply_symm_apply, map_mul, map_intCast, D7.sgnN_val] at h1
   have h2 := mul_right_cancel₀ ((map_ne_zero (emb H)).mpr (sqd_ne_zero H)) h1
   exact_mod_cast h2

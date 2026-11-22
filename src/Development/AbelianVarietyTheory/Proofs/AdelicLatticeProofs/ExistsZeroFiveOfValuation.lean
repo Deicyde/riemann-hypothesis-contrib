@@ -217,15 +217,17 @@ lemma exists_scale (v : Valuation K ℤᵐ⁰) (hv : Function.Surjective v) {x y
 
 end FiveVar
 
-
 open FiveVar in
-theorem exists_zero_five_of_valuation {K : Type*} [Field K] (h2 : (2 : K) ≠ 0)
-    (v : Valuation K ℤᵐ⁰) (hv : Function.Surjective v)
-    (hsq : ∀ x : K, v (x - 1) < v 4 → IsSquare x)
-    (hcw : ∀ c : Fin 3 → Fin 3 → K, (∀ i j, v (c i j) ≤ 1) →
-      ∃ x : Fin 3 → K, (∀ i, v (x i) ≤ 1) ∧ (∃ i, v (x i) = 1) ∧
-        v (∑ i, ∑ j, c i j * x i * x j) < 1)
-    (a : Fin 5 → K) : ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0 := by
+theorem exists_zero_five_of_valuation
+    {K : Type*} [Field K]
+    (h2 : (2 : K) ≠ 0)
+    (v : Valuation K ℤᵐ⁰) (hv : Function.Surjective v) (hsq : ∀ x : K, v (x - 1) < v 4 → IsSquare x)
+    (hcw : ∀ c : Fin 3 → Fin 3 → K,
+      (∀ i j, v (c i j) ≤ 1)
+        → ∃ x : Fin 3 → K,
+          (∀ i, v (x i) ≤ 1) ∧ (∃ i, v (x i) = 1) ∧ v (∑ i, ∑ j, c i j * x i * x j) < 1)
+    (a : Fin 5 → K)
+    : ∃ x : Fin 5 → K, x ≠ 0 ∧ ∑ i, a i * x i ^ 2 = 0 := by
   by_contra hno
   have han : ∀ x, qf a x = 0 → x = 0 := by
     intro x hx
@@ -251,21 +253,23 @@ theorem exists_zero_five_of_valuation {K : Type*} [Field K] (h2 : (2 : K) ≠ 0)
   have h0 : v (qf a (P i)) = v w := rfl
   have h1 : v (qf a (s • P j)) = v w := by rw [qf_smul, map_mul, map_pow, hs]
   have h2' : v (qf a (t • P k)) = v w := by rw [qf_smul, map_mul, map_pow, ht]
-  obtain ⟨x, -, ⟨l, hl⟩, hx⟩ := hcw
-    ![![qf a (P i) / w, bf a (P i) (s • P j) / w, bf a (P i) (t • P k) / w],
-      ![0, qf a (s • P j) / w, bf a (s • P j) (t • P k) / w],
-      ![0, 0, qf a (t • P k) / w]] (by
-      intro p q
-      fin_cases p <;> fin_cases q
-      · exact hq _ h0
-      · exact hb _ _ h0 h1
-      · exact hb _ _ h0 h2'
-      · simp
-      · exact hq _ h1
-      · exact hb _ _ h1 h2'
-      · simp
-      · simp
-      · exact hq _ h2')
+  obtain ⟨x, -, ⟨l, hl⟩, hx⟩ :=
+    hcw
+      ![![qf a (P i) / w, bf a (P i) (s • P j) / w, bf a (P i) (t • P k) / w],
+        ![0, qf a (s • P j) / w, bf a (s • P j) (t • P k) / w],
+        ![0, 0, qf a (t • P k) / w]]
+      (by
+        intro p q
+        fin_cases p <;> fin_cases q
+        · exact hq _ h0
+        · exact hb _ _ h0 h1
+        · exact hb _ _ h0 h2'
+        · simp
+        · exact hq _ h1
+        · exact hb _ _ h1 h2'
+        · simp
+        · simp
+        · exact hq _ h2')
   set c : Fin 5 → K := Pi.single i (x 0) + Pi.single j (x 1 * s) + Pi.single k (x 2 * t) with hc
   have hsum : ∑ p, c p • P p = x 0 • P i + x 1 • s • P j + x 2 • t • P k := by
     simp only [hc, Pi.add_apply, add_smul, Finset.sum_add_distrib, Pi.single_apply, ite_smul,

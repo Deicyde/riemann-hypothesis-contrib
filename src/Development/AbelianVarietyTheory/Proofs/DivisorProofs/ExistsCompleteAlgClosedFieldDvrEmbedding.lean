@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NormNatEqOne
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.KeyEven
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -17,9 +18,12 @@ open Classical
 
 namespace GlobalTheory.CompleteDvrToComplex
 
-theorem norm_lt_one_of_mem_maximalIdeal {W C : Type} [CommRing W] [IsDomain W]
-    [IsDiscreteValuationRing W] [NormedField C] (g : W →+* C) (hg : ∀ a, ‖g a‖ ≤ 1) {b : W}
-    (hb0 : b ≠ 0) (hb : ‖g b‖ < 1) {a : W} (ha : a ∈ IsLocalRing.maximalIdeal W) : ‖g a‖ < 1 := by
+theorem norm_lt_one_of_mem_maximalIdeal
+    {W C : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [NormedField C]
+    (g : W →+* C) (hg : ∀ a, ‖g a‖ ≤ 1)
+    {b : W} (hb0 : b ≠ 0) (hb : ‖g b‖ < 1)
+    {a : W} (ha : a ∈ IsLocalRing.maximalIdeal W)
+    : ‖g a‖ < 1 := by
   obtain ⟨π, hπ⟩ := IsDiscreteValuationRing.exists_irreducible W
   obtain ⟨n, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hb0 hπ
   rw [hπ.maximalIdeal_eq, Ideal.mem_span_singleton] at ha
@@ -31,7 +35,8 @@ theorem norm_lt_one_of_mem_maximalIdeal {W C : Type} [CommRing W] [IsDomain W]
 
 theorem norm_le_one_padicComplexInt (p : ℕ) [Fact p.Prime] (x : 𝓞_ℂ_[p]) : ‖(x : ℂ_[p])‖ ≤ 1 := by
   have hv : ((Valued.v (x : ℂ_[p]) : NNReal) : ℝ) = ‖(x : ℂ_[p])‖ := by
-    rw [PadicComplex.norm_eq_norm, Valued.v.norm_def, (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl),
+    rw [PadicComplex.norm_eq_norm, Valued.v.norm_def,
+      (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl),
       Valuation.embedding_restrict]
   rw [← hv]
   have : Valued.v (x : ℂ_[p]) ≤ 1 := x.2
@@ -44,14 +49,30 @@ theorem norm_natCast_prime_lt_one (p : ℕ) [Fact p.Prime] : ‖(p : ℂ_[p])‖
   rw [h]
   exact Padic.norm_p_lt_one
 
-theorem exists_complete_closed_field :
-    ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V], IsAdicComplete (IsLocalRing.maximalIdeal V) V → Finite (IsLocalRing.ResidueField V) → ∃ (C : Type) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C) (_ : CompleteSpace C) (_ : IsAlgClosed C) (_ : CharZero C) (_ : Algebra (FractionRing V) C), CExt V (IsLocalRing.maximalIdeal V) C ∧ Nonempty (C ≃+* ℂ) := by
+theorem exists_complete_closed_field
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V],
+      IsAdicComplete (IsLocalRing.maximalIdeal V) V → Finite (IsLocalRing.ResidueField V)
+        → ∃ (C : Type) (_ : NontriviallyNormedField C) (_ : IsUltrametricDist C)
+            (_ : CompleteSpace C) (_ : IsAlgClosed C) (_ : CharZero C)
+            (_ : Algebra (FractionRing V) C),
+          CExt V (IsLocalRing.maximalIdeal V) C ∧ Nonempty (C ≃+* ℂ) := by
   intro V _ _ _ _ hc hf
   let T : Formalism.L2.Pj.CDVR := { V := V }
-  obtain ⟨p, hp, k, kO, hk⟩ := GlobalTheory.CompleteDvrEmbedding.exists_embedding_padicComplexInt T hf
+  obtain ⟨p, hp, k, kO, hk⟩ :=
+    GlobalTheory.CompleteDvrEmbedding.exists_embedding_padicComplexInt T hf
   letI : Algebra (FractionRing V) ℂ_[p] := k.toAlgebra
   obtain ⟨eC⟩ := GlobalTheory.MomOne.Inh.nonempty_iso p
-  refine ⟨ℂ_[p], inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, this, ⟨?_, ?_⟩, ⟨eC.symm⟩⟩
+  refine ⟨
+    ℂ_[p],
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    this,
+    ⟨?_, ?_⟩,
+    ⟨eC.symm⟩
+  ⟩
   · have hle : ∀ r : V, ‖k (algebraMap V (FractionRing V) r)‖ ≤ 1 := fun r => by
       rw [← hk r]
       exact norm_le_one_padicComplexInt p (kO r)

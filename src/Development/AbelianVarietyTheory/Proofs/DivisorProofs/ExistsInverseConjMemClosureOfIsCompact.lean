@@ -7,17 +7,19 @@ public import GroundTheory.GlobalFields.IdeleGroups.IdeleNorms
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.QSA GlobalTheory.Published
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.QSA GlobalTheory.Published
 open Matrix
 open scoped Quaternion Topology TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_inverse_conj_mem_closure_of_isCompact :
-    ∀ (X : Type) [Monoid X] [TopologicalSpace X] [ContinuousMul X] [T2Space X] (H C : Set X),
-      IsCompact C → ∀ g : X, (∀ W ∈ 𝓝 g, ∃ c ∈ C, ∃ c' ∈ C, c * c' = 1 ∧ c' * c = 1 ∧
-        ∃ w ∈ W, c * w * c' ∈ H) →
-      ∃ c ∈ C, ∃ c' ∈ C, c * c' = 1 ∧ c' * c = 1 ∧ c * g * c' ∈ closure H := by
+theorem exists_inverse_conj_mem_closure_of_isCompact
+    : ∀ (X : Type) [Monoid X] [TopologicalSpace X] [ContinuousMul X] [T2Space X] (H C : Set X),
+      IsCompact C
+        → ∀ g : X,
+          (∀ W ∈ 𝓝 g, ∃ c ∈ C, ∃ c' ∈ C, c * c' = 1 ∧ c' * c = 1 ∧ ∃ w ∈ W, c * w * c' ∈ H)
+            → ∃ c ∈ C, ∃ c' ∈ C, c * c' = 1 ∧ c' * c = 1 ∧ c * g * c' ∈ closure H := by
   intro X _ _ _ _ H C hC g hW
   let K : Set (X × X) := (C ×ˢ C) ∩ {p | p.1 * p.2 = 1 ∧ p.2 * p.1 = 1}
   have hK : IsCompact K := by
@@ -33,8 +35,10 @@ theorem exists_inverse_conj_mem_closure_of_isCompact :
     apply hcont.continuousAt.preimage_mem_nhds
     apply isClosed_closure.isOpen_compl.mem_nhds
     exact hne y.1 hy.1.1 y.2 hy.1.2 hy.2.1 hy.2.2
-  have hev := hK.eventually_forall_of_forall_eventually (x₀ := g)
-    (P := fun w (y : X × X) => y.1 * w * y.2 ∈ (closure H)ᶜ) hP
+  have hev :=
+    hK.eventually_forall_of_forall_eventually (x₀ := g)
+      (P := fun w (y : X × X) => y.1 * w * y.2 ∈ (closure H)ᶜ)
+      hP
   obtain ⟨c, hc, c', hc', h1, h2, w, hw, hH⟩ := hW _ hev
   exact hw (c, c') ⟨⟨hc, hc'⟩, h1, h2⟩ (subset_closure hH)
 

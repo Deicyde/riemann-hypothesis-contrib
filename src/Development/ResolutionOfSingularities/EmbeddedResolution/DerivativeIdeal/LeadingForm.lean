@@ -14,8 +14,8 @@ open IsLocalRing
 def multiIndicesOfDegree (h r : ℕ) : Finset (Fin h → ℕ) :=
   (Fintype.piFinset fun _ : Fin h => Finset.range (r + 1)).filter fun β => ∑ i, β i = r
 
-theorem mem_multiIndicesOfDegree {h r : ℕ} (β : Fin h → ℕ) :
-    β ∈ multiIndicesOfDegree h r ↔ ∑ i, β i = r := by
+theorem mem_multiIndicesOfDegree {h r : ℕ} (β : Fin h → ℕ)
+    : β ∈ multiIndicesOfDegree h r ↔ ∑ i, β i = r := by
   simp only [multiIndicesOfDegree, Finset.mem_filter, Fintype.mem_piFinset, Finset.mem_range]
   constructor
   · exact fun hβ => hβ.2
@@ -26,15 +26,17 @@ theorem mem_multiIndicesOfDegree {h r : ℕ} (β : Fin h → ℕ) :
       exact Finset.single_le_sum (f := β) (fun j _ => Nat.zero_le _) (Finset.mem_univ i)
     omega
 
-private theorem mem_maximalIdeal_pow_succ_of_multiIndexDeriv_mem {k R : Type*} [CommRing k] [CommRing R]
-    [IsLocalRing R] [Algebra k R] {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
+private theorem mem_maximalIdeal_pow_succ_of_multiIndexDeriv_mem
+    {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R] [Algebra k R]
+    {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
     (hx : Ideal.span (Set.range x) = IsLocalRing.maximalIdeal R)
     (hD : ∀ i j, D i (x j) = if i = j then 1 else 0)
     (hDD : ∀ i j : Fin h, ∀ a : R, D i (D j a) = D j (D i a))
-    (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R)) (r : ℕ) :
-    ∀ f : R, f ∈ IsLocalRing.maximalIdeal R ^ r →
-      (∀ β : Fin h → ℕ, (∑ i, β i = r) → multiIndexDeriv D β f ∈ IsLocalRing.maximalIdeal R) →
-      f ∈ IsLocalRing.maximalIdeal R ^ (r + 1) := by
+    (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R)) (r : ℕ)
+    : ∀ f : R,
+      f ∈ IsLocalRing.maximalIdeal R ^ r
+        → (∀ β : Fin h → ℕ, (∑ i, β i = r) → multiIndexDeriv D β f ∈ IsLocalRing.maximalIdeal R)
+        → f ∈ IsLocalRing.maximalIdeal R ^ (r + 1) := by
   induction r with
   | zero =>
     intro f _ hβ
@@ -46,8 +48,8 @@ private theorem mem_maximalIdeal_pow_succ_of_multiIndexDeriv_mem {k R : Type*} [
     have key : ∀ i, D i f ∈ IsLocalRing.maximalIdeal R ^ (r + 1) := by
       intro i
       refine ih (D i f) ?_ ?_
-      · have h1 := multiIndexDeriv_mem_pow_sub D (IsLocalRing.maximalIdeal R) (r + 1) hf
-          (unitMultiIndex i)
+      · have h1 :=
+          multiIndexDeriv_mem_pow_sub D (IsLocalRing.maximalIdeal R) (r + 1) hf (unitMultiIndex i)
         rw [multiIndexDeriv_unitMultiIndex, sum_unitMultiIndex] at h1
         simpa using h1
       · intro β hβ'
@@ -57,21 +59,22 @@ private theorem mem_maximalIdeal_pow_succ_of_multiIndexDeriv_mem {k R : Type*} [
         have h2 := hβ (β + unitMultiIndex i) hsum
         rwa [multiIndexDeriv_add_unitMultiIndex_apply_first D hDD β i f] at h2
     have hfx : f ∈ Ideal.span (Set.range x) ^ (r + 1) := by rw [hx]; exact hf
-    have hdx : ∀ i, D i f ∈ Ideal.span (Set.range x) ^ (r + 1) := by
-      intro i; rw [hx]; exact key i
+    have hdx : ∀ i, D i f ∈ Ideal.span (Set.range x) ^ (r + 1) := by intro i; rw [hx]; exact key i
     have hres := mem_pow_succ_of_deriv_mem_pow k x D hD (hunit (r + 1) (by omega)) hfx hdx
     rw [hx] at hres
     exact hres
 
-theorem mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem {k R : Type*} [CommRing k] [CommRing R]
-    [IsLocalRing R] [Algebra k R] {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
+theorem mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem
+    {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R] [Algebra k R]
+    {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
     (hx : Ideal.span (Set.range x) = IsLocalRing.maximalIdeal R)
     (hD : ∀ i j, D i (x j) = if i = j then 1 else 0)
     (hDD : ∀ i j : Fin h, ∀ a : R, D i (D j a) = D j (D i a))
     (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R))
-    (r : ℕ) {f : R} (hf : f ∈ IsLocalRing.maximalIdeal R ^ r) :
-    f ∈ IsLocalRing.maximalIdeal R ^ (r + 1) ↔
-      ∀ β ∈ multiIndicesOfDegree h r, multiIndexDeriv D β f ∈ IsLocalRing.maximalIdeal R := by
+    (r : ℕ)
+    {f : R} (hf : f ∈ IsLocalRing.maximalIdeal R ^ r)
+    : f ∈ IsLocalRing.maximalIdeal R ^ (r + 1)
+      ↔ ∀ β ∈ multiIndicesOfDegree h r, multiIndexDeriv D β f ∈ IsLocalRing.maximalIdeal R := by
   constructor
   · intro hfs β hβ
     have hβ' : ∑ i, β i = r := (mem_multiIndicesOfDegree β).mp hβ
@@ -84,11 +87,13 @@ theorem mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem {k R : Type*} [CommRin
     exact mem_maximalIdeal_pow_succ_of_multiIndexDeriv_mem x D hx hD hDD hunit r f hf
       (fun β hb => hall β ((mem_multiIndicesOfDegree β).mpr hb))
 
-private theorem idealOrder_eq_of_le_of_not_le {R : Type*} [CommRing R] [IsLocalRing R] {n : ℕ}
-    {I : Ideal R} (h1 : I ≤ IsLocalRing.maximalIdeal R ^ n)
-    (h2 : ¬ I ≤ IsLocalRing.maximalIdeal R ^ (n + 1)) : idealOrder I = (n : ℕ∞) := by
+private theorem idealOrder_eq_of_le_of_not_le
+    {R : Type*} [CommRing R] [IsLocalRing R]
+    {n : ℕ} {I : Ideal R}
+    (h1 : I ≤ IsLocalRing.maximalIdeal R ^ n) (h2 : ¬ I ≤ IsLocalRing.maximalIdeal R ^ (n + 1))
+    : idealOrder I = (n : ℕ∞) := by
   have h3 : (n : ℕ∞) ≤ idealOrder I := (le_idealOrder_iff I n).mpr h1
-  have h4 : ¬ (((n + 1 : ℕ) : ℕ∞) ≤ idealOrder I) := fun hc =>
+  have h4 : ¬(((n + 1 : ℕ) : ℕ∞) ≤ idealOrder I) := fun hc =>
     h2 ((le_idealOrder_iff I (n + 1)).mp hc)
   rw [not_le] at h4
   obtain ⟨m, hm⟩ := ENat.ne_top_iff_exists.mp (ne_top_of_lt h4)
@@ -100,13 +105,13 @@ private theorem idealOrder_eq_of_le_of_not_le {R : Type*} [CommRing R] [IsLocalR
 
 private def ofDigitsFin (N : ℕ) {h : ℕ} (β : Fin h → ℕ) : ℕ := ∑ i, β i * N ^ (i : ℕ)
 
-private theorem ofDigits_add (N : ℕ) {h : ℕ} (β γ : Fin h → ℕ) :
-    ofDigitsFin N (fun i => β i + γ i) = ofDigitsFin N β + ofDigitsFin N γ := by
+private theorem ofDigits_add (N : ℕ) {h : ℕ} (β γ : Fin h → ℕ)
+    : ofDigitsFin N (fun i => β i + γ i) = ofDigitsFin N β + ofDigitsFin N γ := by
   simp only [ofDigitsFin, add_mul]
   rw [Finset.sum_add_distrib]
 
-private theorem ofDigits_fin_succ (N : ℕ) {n : ℕ} (δ : Fin (n + 1) → ℕ) :
-    ofDigitsFin N δ = δ 0 + (ofDigitsFin N fun i : Fin n => δ i.succ) * N := by
+private theorem ofDigits_fin_succ (N : ℕ) {n : ℕ} (δ : Fin (n + 1) → ℕ)
+    : ofDigitsFin N δ = δ 0 + (ofDigitsFin N fun i : Fin n => δ i.succ) * N := by
   simp only [ofDigitsFin]
   rw [Fin.sum_univ_succ, Finset.sum_mul]
   congr 1
@@ -114,8 +119,9 @@ private theorem ofDigits_fin_succ (N : ℕ) {n : ℕ} (δ : Fin (n + 1) → ℕ)
   · refine Finset.sum_congr rfl fun i _ => ?_
     rw [Fin.val_succ, pow_succ, mul_assoc]
 
-private theorem ofDigits_injective_of_lt (N : ℕ) (hN : 0 < N) : ∀ (h : ℕ) (β γ : Fin h → ℕ),
-    (∀ i, β i < N) → (∀ i, γ i < N) → ofDigitsFin N β = ofDigitsFin N γ → β = γ := by
+private theorem ofDigits_injective_of_lt (N : ℕ) (hN : 0 < N)
+    : ∀ (h : ℕ) (β γ : Fin h → ℕ),
+      (∀ i, β i < N) → (∀ i, γ i < N) → ofDigitsFin N β = ofDigitsFin N γ → β = γ := by
   intro h
   induction h with
   | zero =>
@@ -126,10 +132,13 @@ private theorem ofDigits_injective_of_lt (N : ℕ) (hN : 0 < N) : ∀ (h : ℕ) 
     intro β γ hβ hγ hsum
     rw [ofDigits_fin_succ N β, ofDigits_fin_succ N γ] at hsum
     have h0 : β 0 = γ 0 := by
-      have hmod : (β 0 + (ofDigitsFin N fun i : Fin n => β i.succ) * N) % N
-          = (γ 0 + (ofDigitsFin N fun i : Fin n => γ i.succ) * N) % N := by rw [hsum]
-      rwa [Nat.add_mul_mod_self_right, Nat.add_mul_mod_self_right,
-        Nat.mod_eq_of_lt (hβ 0), Nat.mod_eq_of_lt (hγ 0)] at hmod
+      have hmod
+          : (β 0 + (ofDigitsFin N fun i : Fin n => β i.succ) * N) % N
+            = (γ 0 + (ofDigitsFin N fun i : Fin n => γ i.succ) * N) % N := by
+        rw [hsum]
+      rwa [Nat.add_mul_mod_self_right, Nat.add_mul_mod_self_right, Nat.mod_eq_of_lt (hβ 0),
+          Nat.mod_eq_of_lt (hγ 0)]
+        at hmod
     rw [h0] at hsum
     have h1 : (ofDigitsFin N fun i : Fin n => β i.succ) = ofDigitsFin N fun i : Fin n => γ i.succ :=
       Nat.eq_of_mul_eq_mul_right hN (Nat.add_left_cancel hsum)
@@ -140,22 +149,30 @@ private theorem ofDigits_injective_of_lt (N : ℕ) (hN : 0 < N) : ∀ (h : ℕ) 
     · intro j
       exact congrFun h2 j
 
-private theorem exists_ofDigits_le_of_sum_eq {h : ℕ} (P : (Fin h → ℕ) → Prop) (r N : ℕ)
-    (hex : ∃ β : Fin h → ℕ, (∑ i, β i = r) ∧ P β) :
-    ∃ β₀ : Fin h → ℕ, (∑ i, β₀ i = r) ∧ P β₀ ∧
-      ∀ β : Fin h → ℕ, (∑ i, β i = r) → P β → ofDigitsFin N β₀ ≤ ofDigitsFin N β := by
+private theorem exists_ofDigits_le_of_sum_eq
+    {h : ℕ} (P : (Fin h → ℕ) → Prop) (r N : ℕ) (hex : ∃ β : Fin h → ℕ, (∑ i, β i = r) ∧ P β)
+    : ∃ β₀ : Fin h → ℕ,
+      (∑ i, β₀ i = r) ∧ P β₀
+        ∧ ∀ β : Fin h → ℕ, (∑ i, β i = r) → P β → ofDigitsFin N β₀ ≤ ofDigitsFin N β := by
   classical
   obtain ⟨β₁, hβ₁, hP₁⟩ := hex
-  obtain ⟨β₀, hmem, hmin⟩ := Finset.exists_min_image
-    ((multiIndicesOfDegree h r).filter P) (ofDigitsFin N)
-    ⟨β₁, Finset.mem_filter.mpr ⟨(mem_multiIndicesOfDegree β₁).mpr hβ₁, hP₁⟩⟩
+  obtain ⟨β₀, hmem, hmin⟩ :=
+    Finset.exists_min_image ((multiIndicesOfDegree h r).filter P) (ofDigitsFin N)
+      ⟨β₁, Finset.mem_filter.mpr ⟨(mem_multiIndicesOfDegree β₁).mpr hβ₁, hP₁⟩⟩
   rw [Finset.mem_filter, mem_multiIndicesOfDegree] at hmem
-  exact ⟨β₀, hmem.1, hmem.2, fun β hβ hPβ =>
-    hmin β (Finset.mem_filter.mpr ⟨(mem_multiIndicesOfDegree β).mpr hβ, hPβ⟩)⟩
+  exact ⟨
+    β₀,
+    hmem.1,
+    hmem.2,
+    fun β hβ hPβ => hmin β (Finset.mem_filter.mpr ⟨(mem_multiIndicesOfDegree β).mpr hβ, hPβ⟩)
+  ⟩
 
-private theorem sum_notMem_of_unique_notMem {R : Type*} [CommRing R] {I : Ideal R} {ι : Type*}
-    [DecidableEq ι] (t : Finset ι) (F : ι → R) (a : ι) (ha : a ∈ t) (hFa : F a ∉ I)
-    (hrest : ∀ b ∈ t, b ≠ a → F b ∈ I) : (∑ b ∈ t, F b) ∉ I := by
+private theorem sum_notMem_of_unique_notMem
+    {R : Type*} [CommRing R]
+    {I : Ideal R} {ι : Type*} [DecidableEq ι]
+    (t : Finset ι) (F : ι → R) (a : ι)
+    (ha : a ∈ t) (hFa : F a ∉ I) (hrest : ∀ b ∈ t, b ≠ a → F b ∈ I)
+    : (∑ b ∈ t, F b) ∉ I := by
   intro hsum
   refine hFa ?_
   have h1 : (∑ b ∈ t.erase a, F b) ∈ I :=
@@ -165,49 +182,54 @@ private theorem sum_notMem_of_unique_notMem {R : Type*} [CommRing R] {I : Ideal 
   rw [← h2, add_sub_cancel_right] at h3
   exact h3
 
-private theorem mul_notMem_maximalIdeal_pow_add_succ {k R : Type*} [CommRing k] [CommRing R]
-    [IsLocalRing R] [Algebra k R] {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
+private theorem mul_notMem_maximalIdeal_pow_add_succ
+    {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R] [Algebra k R]
+    {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
     (hx : Ideal.span (Set.range x) = IsLocalRing.maximalIdeal R)
     (hD : ∀ i j, D i (x j) = if i = j then 1 else 0)
     (hDD : ∀ i j : Fin h, ∀ a : R, D i (D j a) = D j (D i a))
     (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R))
-    {r s : ℕ} {f g : R} (hf : f ∈ IsLocalRing.maximalIdeal R ^ r)
-    (hnf : f ∉ IsLocalRing.maximalIdeal R ^ (r + 1))
-    (hg : g ∈ IsLocalRing.maximalIdeal R ^ s)
-    (hng : g ∉ IsLocalRing.maximalIdeal R ^ (s + 1)) :
-    f * g ∉ IsLocalRing.maximalIdeal R ^ (r + s + 1) := by
-  have hfex : ∃ β : Fin h → ℕ, (∑ i, β i = r) ∧
-      multiIndexDeriv D β f ∉ IsLocalRing.maximalIdeal R := by
+    {r s : ℕ} {f g : R}
+    (hf : f ∈ IsLocalRing.maximalIdeal R ^ r) (hnf : f ∉ IsLocalRing.maximalIdeal R ^ (r + 1))
+    (hg : g ∈ IsLocalRing.maximalIdeal R ^ s) (hng : g ∉ IsLocalRing.maximalIdeal R ^ (s + 1))
+    : f * g ∉ IsLocalRing.maximalIdeal R ^ (r + s + 1) := by
+  have hfex
+      : ∃ β : Fin h → ℕ, (∑ i, β i = r) ∧ multiIndexDeriv D β f ∉ IsLocalRing.maximalIdeal R := by
     by_contra hcon
     push Not at hcon
     refine hnf ((mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem x D hx hD hDD hunit r hf).mpr ?_)
     intro β hβ
     exact hcon β ((mem_multiIndicesOfDegree β).mp hβ)
-  have hgex : ∃ γ : Fin h → ℕ, (∑ i, γ i = s) ∧
-      multiIndexDeriv D γ g ∉ IsLocalRing.maximalIdeal R := by
+  have hgex
+      : ∃ γ : Fin h → ℕ, (∑ i, γ i = s) ∧ multiIndexDeriv D γ g ∉ IsLocalRing.maximalIdeal R := by
     by_contra hcon
     push Not at hcon
     refine hng ((mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem x D hx hD hDD hunit s hg).mpr ?_)
     intro γ hγ
     exact hcon γ ((mem_multiIndicesOfDegree γ).mp hγ)
-  obtain ⟨β₀, hβ₀deg, hβ₀f, hβ₀min⟩ := exists_ofDigits_le_of_sum_eq
-    (fun β => multiIndexDeriv D β f ∉ IsLocalRing.maximalIdeal R) r (r + s + 1) hfex
-  obtain ⟨γ₀, hγ₀deg, hγ₀g, hγ₀min⟩ := exists_ofDigits_le_of_sum_eq
-    (fun γ => multiIndexDeriv D γ g ∉ IsLocalRing.maximalIdeal R) s (r + s + 1) hgex
+  obtain ⟨β₀, hβ₀deg, hβ₀f, hβ₀min⟩ :=
+    exists_ofDigits_le_of_sum_eq
+      (fun β => multiIndexDeriv D β f ∉ IsLocalRing.maximalIdeal R)
+      r (r + s + 1) hfex
+  obtain ⟨γ₀, hγ₀deg, hγ₀g, hγ₀min⟩ :=
+    exists_ofDigits_le_of_sum_eq
+      (fun γ => multiIndexDeriv D γ g ∉ IsLocalRing.maximalIdeal R)
+      s (r + s + 1) hgex
   obtain ⟨α, hα⟩ : ∃ α : Fin h → ℕ, ∀ i, α i = β₀ i + γ₀ i := ⟨_, fun _ => rfl⟩
   have hαsum : ∑ i, α i = r + s := by
     have hc : ∑ i, α i = ∑ i, (β₀ i + γ₀ i) := Finset.sum_congr rfl fun i _ => hα i
     rw [hc, Finset.sum_add_distrib, hβ₀deg, hγ₀deg]
-  have hbase : ofDigitsFin (r + s + 1) α
-      = ofDigitsFin (r + s + 1) β₀ + ofDigitsFin (r + s + 1) γ₀ := by
+  have hbase
+      : ofDigitsFin (r + s + 1) α = ofDigitsFin (r + s + 1) β₀ + ofDigitsFin (r + s + 1) γ₀ := by
     rw [← ofDigits_add]
     exact congrArg (ofDigitsFin (r + s + 1)) (funext hα)
   intro hmem
   have hfg : f * g ∈ IsLocalRing.maximalIdeal R ^ (r + s) := by
     rw [pow_add]
     exact Ideal.mul_mem_mul hf hg
-  have hkey := (mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem x D hx hD hDD hunit (r + s) hfg).mp hmem
-    α ((mem_multiIndicesOfDegree α).mpr hαsum)
+  have hkey :=
+    (mem_maximalIdeal_pow_succ_iff_multiIndexDeriv_mem x D hx hD hDD hunit (r + s) hfg).mp hmem α
+      ((mem_multiIndicesOfDegree α).mpr hαsum)
   have hsub := multiIndexDeriv_mul_sub_sum_mem D (IsLocalRing.maximalIdeal R) r s α hαsum hf hg
   have hT := sub_mem hkey hsub
   rw [sub_sub_cancel] at hT
@@ -227,15 +249,12 @@ private theorem mul_notMem_maximalIdeal_pow_add_succ {k R : Type*} [CommRing k] 
       refine (Nat.choose_pos ?_).ne'
       have := hα i
       omega
-    exact IsLocalRing.notMem_maximalIdeal.mpr
-      (((hunit _ (Nat.one_le_iff_ne_zero.mpr hcne)).mul
-        (IsLocalRing.notMem_maximalIdeal.mp hβ₀f)).mul
-        (IsLocalRing.notMem_maximalIdeal.mp hγ₀g))
+    exact IsLocalRing.notMem_maximalIdeal.mpr (((hunit _ (Nat.one_le_iff_ne_zero.mpr hcne)).mul
+      (IsLocalRing.notMem_maximalIdeal.mp hβ₀f)).mul (IsLocalRing.notMem_maximalIdeal.mp hγ₀g))
   · intro β hβt hβne
     rw [Finset.mem_filter, Fintype.mem_piFinset] at hβt
     obtain ⟨hβrange, hβsum⟩ := hβt
-    have hβle : ∀ i, β i ≤ α i := fun i =>
-      Nat.lt_succ_iff.mp (Finset.mem_range.mp (hβrange i))
+    have hβle : ∀ i, β i ≤ α i := fun i => Nat.lt_succ_iff.mp (Finset.mem_range.mp (hβrange i))
     by_cases hcase : multiIndexDeriv D β f ∈ IsLocalRing.maximalIdeal R
     · exact Ideal.mul_mem_right _ _ (Ideal.mul_mem_left _ _ hcase)
     · have hmin1 : ofDigitsFin (r + s + 1) β₀ ≤ ofDigitsFin (r + s + 1) β := hβ₀min β hβsum hcase
@@ -262,13 +281,15 @@ private theorem mul_notMem_maximalIdeal_pow_add_succ {k R : Type*} [CommRing k] 
             omega
         rw [Finset.sum_add_distrib, hβsum, hαsum] at h1
         omega
-      have hsplit : ofDigitsFin (r + s + 1) β + ofDigitsFin (r + s + 1) (fun i => α i - β i)
-          = ofDigitsFin (r + s + 1) α := by
+      have hsplit
+          : ofDigitsFin (r + s + 1) β + ofDigitsFin (r + s + 1) (fun i => α i - β i)
+            = ofDigitsFin (r + s + 1) α := by
         rw [← ofDigits_add]
-        exact congrArg (ofDigitsFin (r + s + 1)) (funext fun i => by
-          show β i + (α i - β i) = α i
-          have := hβle i
-          omega)
+        exact congrArg (ofDigitsFin (r + s + 1))
+          (funext fun i => by
+            show β i + (α i - β i) = α i
+            have := hβle i
+            omega)
       have hγlt : ofDigitsFin (r + s + 1) (fun i => α i - β i) < ofDigitsFin (r + s + 1) γ₀ := by
         omega
       have hgmem : multiIndexDeriv D (fun i => α i - β i) g ∈ IsLocalRing.maximalIdeal R := by
@@ -276,13 +297,14 @@ private theorem mul_notMem_maximalIdeal_pow_add_succ {k R : Type*} [CommRing k] 
         exact absurd (hγ₀min _ hγsum hcon2) (by omega)
       exact Ideal.mul_mem_left _ _ hgmem
 
-theorem idealOrder_mul {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] [Algebra k R] {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
+theorem idealOrder_mul
+    {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [Algebra k R]
+    {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
     (hx : Ideal.span (Set.range x) = IsLocalRing.maximalIdeal R)
     (hD : ∀ i j, D i (x j) = if i = j then 1 else 0)
     (hDD : ∀ i j : Fin h, ∀ a : R, D i (D j a) = D j (D i a))
-    (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R)) (I J : Ideal R) :
-    idealOrder (I * J) = idealOrder I + idealOrder J := by
+    (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R)) (I J : Ideal R)
+    : idealOrder (I * J) = idealOrder I + idealOrder J := by
   by_cases hI : I = ⊥
   · subst hI
     have hbm : (⊥ : Ideal R) * J = ⊥ := by
@@ -303,10 +325,8 @@ theorem idealOrder_mul {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R]
       exact le_antisymm le_add_self le_top
     · obtain ⟨r, hr⟩ := exists_idealOrder_eq_coe hI
       obtain ⟨s, hs⟩ := exists_idealOrder_eq_coe hJ
-      have hIr : I ≤ IsLocalRing.maximalIdeal R ^ r :=
-        (le_idealOrder_iff I r).mp (le_of_eq hr.symm)
-      have hJs : J ≤ IsLocalRing.maximalIdeal R ^ s :=
-        (le_idealOrder_iff J s).mp (le_of_eq hs.symm)
+      have hIr : I ≤ IsLocalRing.maximalIdeal R ^ r := (le_idealOrder_iff I r).mp (le_of_eq hr.symm)
+      have hJs : J ≤ IsLocalRing.maximalIdeal R ^ s := (le_idealOrder_iff J s).mp (le_of_eq hs.symm)
       have hIn : ¬ I ≤ IsLocalRing.maximalIdeal R ^ (r + 1) := by
         intro hc
         have hle := (le_idealOrder_iff I (r + 1)).mpr hc
@@ -337,13 +357,14 @@ theorem idealOrder_mul {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R]
       rw [idealOrder_eq_of_le_of_not_le h2 h1, hr, hs]
       exact Nat.cast_add r s
 
-theorem idealOrder_pow {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] [Algebra k R] {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
+theorem idealOrder_pow
+    {k R : Type*} [CommRing k] [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [Algebra k R]
+    {h : ℕ} (x : Fin h → R) (D : Fin h → Derivation k R R)
     (hx : Ideal.span (Set.range x) = IsLocalRing.maximalIdeal R)
     (hD : ∀ i j, D i (x j) = if i = j then 1 else 0)
     (hDD : ∀ i j : Fin h, ∀ a : R, D i (D j a) = D j (D i a))
-    (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R)) (I : Ideal R) (c : ℕ) :
-    idealOrder (I ^ c) = (c : ℕ∞) * idealOrder I := by
+    (hunit : ∀ n : ℕ, 1 ≤ n → IsUnit ((n : ℕ) : R)) (I : Ideal R) (c : ℕ)
+    : idealOrder (I ^ c) = (c : ℕ∞) * idealOrder I := by
   induction c with
   | zero =>
     rw [pow_zero, Ideal.one_eq_top, idealOrder_top]

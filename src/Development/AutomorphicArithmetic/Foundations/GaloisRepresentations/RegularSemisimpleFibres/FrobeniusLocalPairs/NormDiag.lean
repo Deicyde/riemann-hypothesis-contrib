@@ -9,8 +9,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open MeasureTheory NumberField IsDedekindDomain ValuativeRel Matrix GroundTheory.Global GroundTheory.Global.SemiLocal
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc UpperTheory.ConvolutionTheory.Loc
+open MeasureTheory NumberField IsDedekindDomain ValuativeRel Matrix GroundTheory.Global
+  GroundTheory.Global.SemiLocal
+open GlobalTheory.PRep GlobalTheory.SplitWeil
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets PositivityTheory.Rg.Tf.Loc
+  UpperTheory.ConvolutionTheory.Loc
 open GlobalTheory.SmGL hiding iwahori
 open PositivityTheory.Rg.Tf.Geo (incFin galFin)
 open UpperTheory.V.Published UpperTheory.CBC
@@ -29,9 +32,12 @@ private theorem iter_eq (σ : E ≃ₐ[k] E) (j : ℕ) (x : E) : (σ : E ≃+* E
     rw [Function.iterate_succ_apply', ih, pow_succ', AlgEquiv.mul_apply]
     rfl
 
-private theorem norm_prod [FiniteDimensional k E] [IsGalois k E] (σ : E ≃ₐ[k] E)
-    (hg : ∀ τ : E ≃ₐ[k] E, τ ∈ Subgroup.zpowers σ) (x : E) :
-    algebraMap k E (Algebra.norm k x) = ∏ j ∈ Finset.range (Module.finrank k E), (σ : E ≃+* E)^[j] x := by
+private theorem norm_prod
+    [FiniteDimensional k E] [IsGalois k E]
+    (σ : E ≃ₐ[k] E) (hg : ∀ τ : E ≃ₐ[k] E, τ ∈ Subgroup.zpowers σ)
+    (x : E)
+    : algebraMap k E (Algebra.norm k x)
+      = ∏ j ∈ Finset.range (Module.finrank k E), (σ : E ≃+* E)^[j] x := by
   rw [Algebra.norm_eq_prod_automorphisms]
   have hN : Module.finrank k E = orderOf σ := by
     rw [orderOf_eq_card_of_forall_mem_zpowers hg, ← IsGalois.card_aut_eq_finrank]
@@ -48,24 +54,28 @@ private theorem norm_prod [FiniteDimensional k E] [IsGalois k E] (σ : E ≃ₐ[
   · intro j _
     exact iter_eq σ j x
 
-private theorem map_diag {F : Type} [Field F] (f : E →+* F) (u : Fin n → Eˣ) :
-    Matrix.GeneralLinearGroup.map f (diagT E (Fin n) u) = diagT F (Fin n) fun i => Units.map (f : E →* F) (u i) := by
+private theorem map_diag {F : Type} [Field F] (f : E →+* F) (u : Fin n → Eˣ)
+    : Matrix.GeneralLinearGroup.map f (diagT E (Fin n) u)
+      = diagT F (Fin n) fun i => Units.map (f : E →* F) (u i) := by
   ext i j
   simp [GlobalTheory.SmGL.val_diagT, Matrix.diagonal_apply]
   split_ifs <;> simp
 
-private theorem nrm_diag (σ : E ≃+* E) (q : ℕ) (u : Fin n → Eˣ) :
-    (UpperTheory.ConvolutionTheory.Loc.nrm σ q (diagT E (Fin n) u)).val = Matrix.diagonal fun i => ∏ j ∈ Finset.range q, σ^[j] (u i) := by
+private theorem nrm_diag (σ : E ≃+* E) (q : ℕ) (u : Fin n → Eˣ)
+    : (UpperTheory.ConvolutionTheory.Loc.nrm σ q (diagT E (Fin n) u)).val
+      = Matrix.diagonal fun i => ∏ j ∈ Finset.range q, σ^[j] (u i) := by
   induction q with
   | zero =>
     ext i j
     simp [UpperTheory.ConvolutionTheory.Loc.nrm, Matrix.one_apply, Matrix.diagonal_apply]
   | succ q ih =>
     rw [UpperTheory.ConvolutionTheory.Loc.nrm_succ, Units.val_mul, ih]
-    have h2 : (((⇑(sg σ))^[q] (diagT E (Fin n) u)) : Matrix (Fin n) (Fin n) E)
-        = Matrix.diagonal fun i => σ^[q] (u i) := by
+    have h2
+        : (((⇑(sg σ))^[q] (diagT E (Fin n) u)) : Matrix (Fin n) (Fin n) E)
+          = Matrix.diagonal fun i => σ^[q] (u i) := by
       ext i j
-      rw [sg_iterate_apply, GlobalTheory.SmGL.val_diagT, Matrix.diagonal_apply, Matrix.diagonal_apply]
+      rw [sg_iterate_apply, GlobalTheory.SmGL.val_diagT, Matrix.diagonal_apply,
+        Matrix.diagonal_apply]
       split_ifs <;> simp [iterate_map_zero]
     rw [h2, Matrix.diagonal_mul_diagonal]
     congr 1
@@ -82,16 +92,18 @@ private theorem nrmT_div (a b : Fin n → Eˣ) : nrmT k (a / b) = nrmT k a / nrm
   ext
   simp [nrmT, map_div₀]
 
-private theorem nrmT_sg [FiniteDimensional k E] (σ : E ≃ₐ[k] E) (u : Fin n → Eˣ) :
-    nrmT k (sgT (σ : E ≃+* E) u) = nrmT k u := by
+private theorem nrmT_sg [FiniteDimensional k E] (σ : E ≃ₐ[k] E) (u : Fin n → Eˣ)
+    : nrmT k (sgT (σ : E ≃+* E) u) = nrmT k u := by
   funext i
   ext
   simp only [nrmT, sgT, Units.coe_map, MonoidHom.coe_coe]
   exact Algebra.norm_eq_of_algEquiv σ _
 
-private theorem h90 [FiniteDimensional k E] [IsGalois k E] (σ : E ≃ₐ[k] E)
-    (hg : ∀ τ : E ≃ₐ[k] E, τ ∈ Subgroup.zpowers σ) (z : Fin n → Eˣ) (hz : nrmT k z = 1) :
-    ∃ w : Fin n → Eˣ, sgT (σ : E ≃+* E) w / w = z := by
+private theorem h90
+    [FiniteDimensional k E] [IsGalois k E]
+    (σ : E ≃ₐ[k] E) (hg : ∀ τ : E ≃ₐ[k] E, τ ∈ Subgroup.zpowers σ)
+    (z : Fin n → Eˣ) (hz : nrmT k z = 1)
+    : ∃ w : Fin n → Eˣ, sgT (σ : E ≃+* E) w / w = z := by
   haveI : IsCyclic (E ≃ₐ[k] E) := ⟨⟨σ, hg⟩⟩
   have hzi : ∀ i, Algebra.norm k ((z i : Eˣ) : E) = 1 := by
     intro i
@@ -109,14 +121,18 @@ end Alg
 
 section Top
 
-variable {k E : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-  [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E]
-  [Algebra k E] [ValuativeExtension k E] [FiniteDimensional k E] {n : ℕ}
+variable
+  {k E : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  [Field E] [ValuativeRel E] [TopologicalSpace E] [IsNonarchimedeanLocalField E] [Algebra k E]
+  [ValuativeExtension k E] [FiniteDimensional k E]
+  {n : ℕ}
 
 variable (k E) in
 private theorem emb_alg : Topology.IsEmbedding (algebraMap k E) := by
-  have key : ∀ a b : k, valuation E (algebraMap k E a) < valuation E (algebraMap k E b) ↔
-      valuation k a < valuation k b := by
+  have key
+      : ∀ a b : k,
+        valuation E (algebraMap k E a) < valuation E (algebraMap k E b)
+          ↔ valuation k a < valuation k b := by
     intro a b
     rw [lt_iff_not_ge, lt_iff_not_ge, ← (valuation E).vle_iff_le, ← (valuation k).vle_iff_le,
       ValuativeExtension.vle_iff_vle]
@@ -180,18 +196,21 @@ private theorem cont_sg {σ : E ≃+* E} (hσ : Isom σ) : Continuous σ := by
   rw [hσ z]
   exact hz
 
-private theorem cont_norm [IsGalois k E] (σ : E ≃ₐ[k] E) (hg : ∀ τ : E ≃ₐ[k] E, τ ∈ Subgroup.zpowers σ)
-    (hσ : Isom (σ : E ≃+* E)) : Continuous (Algebra.norm k : E → k) := by
+private theorem cont_norm
+    [IsGalois k E]
+    (σ : E ≃ₐ[k] E) (hg : ∀ τ : E ≃ₐ[k] E, τ ∈ Subgroup.zpowers σ) (hσ : Isom (σ : E ≃+* E))
+    : Continuous (Algebra.norm k : E → k) := by
   rw [(emb_alg k E).continuous_iff]
-  have h : (algebraMap k E ∘ (Algebra.norm k : E → k)) =
-      fun x => ∏ j ∈ Finset.range (Module.finrank k E), (σ : E ≃+* E)^[j] x := by
+  have h
+      : (algebraMap k E ∘ (Algebra.norm k : E → k))
+        = fun x => ∏ j ∈ Finset.range (Module.finrank k E), (σ : E ≃+* E)^[j] x := by
     funext x
     exact norm_prod σ hg x
   rw [h]
   exact continuous_finsetProd _ fun j _ => (cont_sg hσ).iterate j
 
-private theorem near_compact {r : ValueGroupWithZero E} (hr : r < 1) :
-    IsCompact {u : Eˣ | valuation E ((u : E) - 1) ≤ r} := by
+private theorem near_compact {r : ValueGroupWithZero E} (hr : r < 1)
+    : IsCompact {u : Eˣ | valuation E ((u : E) - 1) ≤ r} := by
   have hB : IsCompact ((fun x : E => x + 1) '' {x | valuation E x ≤ r}) :=
     (IsNonarchimedeanLocalField.isCompact_closedBall E r).image (continuous_id.add continuous_const)
   rw [Units.isEmbedding_val₀.isCompact_iff]
@@ -214,8 +233,8 @@ end Top
 end UpperTheory.Gal.InertialTypesAlt.L
 
 open UpperTheory.Gal.InertialTypesAlt.L in
-theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag :
-    UpperTheory.Gal.InertialTypesAlt.L.NormDiag := by
+theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag
+    : UpperTheory.Gal.InertialTypesAlt.L.NormDiag := by
   intro k E _ _ _ _ _ _ _ _ _ _ _ _ _ σ hg n
   obtain ⟨hcyc, -, hbr⟩ := bridge k E σ
   obtain ⟨-, hnrm, -, -, -⟩ := hbr n
@@ -226,18 +245,22 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag :
     induction j with
     | zero => intro x; rfl
     | succ j ih => intro x; rw [Function.iterate_succ_apply', hiso, ih]
-  have hvn : ∀ x : E, valuation E (algebraMap k E (Algebra.norm k x)) = valuation E x ^ Module.finrank k E := by
+  have hvn
+      : ∀ x : E,
+        valuation E (algebraMap k E (Algebra.norm k x)) = valuation E x ^ Module.finrank k E := by
     intro x
     rw [norm_prod σ hg x, map_prod]
     simp only [hit, Finset.prod_const, Finset.card_range]
   have hstrict : ∀ d : Fin n → Eˣ, Strict d → Strict (nrmT k d) := by
     intro d hd i j hij
     rw [← (ValuativeExtension.mapValueGroupWithZero_strictMono (A := k) (B := E)).lt_iff_lt,
-      ValuativeExtension.mapValueGroupWithZero_valuation, ValuativeExtension.mapValueGroupWithZero_valuation]
+      ValuativeExtension.mapValueGroupWithZero_valuation,
+      ValuativeExtension.mapValueGroupWithZero_valuation]
     show valuation E (algebraMap k E (Algebra.norm k (d i : E))) < valuation E (algebraMap k E (Algebra.norm k (d j : E)))
     rw [hvn, hvn]
     exact pow_lt_pow_left₀ (hd i j hij) zero_le' hq.ne'
-  have hdiag : ∀ d : Fin n → Eˣ, normGL σ (diagT E (Fin n) d) = incl (diagT k (Fin n) (nrmT k d)) := by
+  have hdiag
+      : ∀ d : Fin n → Eˣ, normGL σ (diagT E (Fin n) d) = incl (diagT k (Fin n) (nrmT k d)) := by
     intro d
     rw [← hnrm]
     apply Units.ext
@@ -265,8 +288,9 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag :
     intro w
     funext i
     simp [sgT]
-  have hpart2 : ∀ (r : ValueGroupWithZero E) (d t : Fin n → Eˣ),
-      (∃ u, Near r (d * sgT σ.toRingEquiv u / u / t)) ↔ nrmT k d ∈ nrmSet k r t := by
+  have hpart2
+      : ∀ (r : ValueGroupWithZero E) (d t : Fin n → Eˣ),
+        (∃ u, Near r (d * sgT σ.toRingEquiv u / u / t)) ↔ nrmT k d ∈ nrmSet k r t := by
     intro r d t
     constructor
     · rintro ⟨u, hu⟩
@@ -279,14 +303,13 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag :
       have h1 : nrmT k (d / (t * s)) = 1 := by rw [nrmT_div, ← hx, div_self']
       obtain ⟨w, hw⟩ := h90 σ hg _ h1
       refine ⟨w⁻¹, ?_⟩
-      have e3 : sgT σ.toRingEquiv w = d / (t * s) * w := by
-        rw [← hw, div_mul_cancel]
+      have e3 : sgT σ.toRingEquiv w = d / (t * s) * w := by rw [← hw, div_mul_cancel]
       have e2 : d * sgT σ.toRingEquiv w⁻¹ / w⁻¹ / t = s := by
         rw [hsg_inv, e3]
         funext i
         apply Units.ext
-        simp only [Pi.div_apply, Pi.mul_apply, Pi.inv_apply, Units.val_div_eq_div_val, Units.val_mul,
-          Units.val_inv_eq_inv_val]
+        simp only [Pi.div_apply, Pi.mul_apply, Pi.inv_apply, Units.val_div_eq_div_val,
+          Units.val_mul, Units.val_inv_eq_inv_val]
         have := (w i).ne_zero
         have := (t i).ne_zero
         have := (s i).ne_zero
@@ -305,8 +328,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag :
     show valuation E ((t i : E) * u i) < valuation E ((t j : E) * u j)
     rw [map_mul, map_mul, hu1, hu1, mul_one, mul_one]
     exact ht i j hij
-  · have hS : nrmSet k r t = (fun u => nrmT k (t * u)) ''
-        Set.pi Set.univ (fun _ => {u : Eˣ | valuation E ((u : E) - 1) ≤ r}) := by
+  · have hS
+        : nrmSet k r t
+          = (fun u => nrmT k (t * u))
+            '' Set.pi Set.univ (fun _ => {u : Eˣ | valuation E ((u : E) - 1) ≤ r}) := by
       ext x
       constructor
       · rintro ⟨u, hu, rfl⟩
@@ -315,5 +340,7 @@ theorem UpperTheory.Gal.InertialTypesAlt.L.normDiag :
         exact ⟨u, fun i => hu i (Set.mem_univ i), rfl⟩
     rw [hS]
     apply IsCompact.image (isCompact_univ_pi fun _ => near_compact hr)
-    have hc : Continuous (Units.map (Algebra.norm k : E →* k)) := Continuous.units_map _ (cont_norm σ hg hiso)
-    exact continuous_pi fun i => hc.comp ((continuous_apply i).comp (continuous_const.mul continuous_id))
+    have hc : Continuous (Units.map (Algebra.norm k : E →* k)) :=
+      Continuous.units_map _ (cont_norm σ hg hiso)
+    exact continuous_pi fun i =>
+      hc.comp ((continuous_apply i).comp (continuous_const.mul continuous_id))

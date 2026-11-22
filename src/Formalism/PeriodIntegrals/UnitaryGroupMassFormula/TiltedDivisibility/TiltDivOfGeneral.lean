@@ -13,14 +13,16 @@ open Ideal
 
 section General
 
-variable {K : Type*} [Field K] {v : Valuation K ℝ≥0} {O : Type*} [CommRing O] [Algebra O K]
+variable
+  {K : Type*} [Field K]
+  {v : Valuation K ℝ≥0} {O : Type*} [CommRing O] [Algebra O K]
   {p : ℕ} [Fact p.Prime] [Fact (¬ IsUnit (p : O))] [IsAdicComplete (span {(p : O)}) O]
 
 noncomputable def lift (u : PreTilt O p) (m : ℕ) : O :=
   PreTilt.untilt (((frobeniusEquiv (PreTilt O p) p).symm^[m]) u)
 
-theorem mk_lift (u : PreTilt O p) (m : ℕ) :
-    Ideal.Quotient.mk (span {(p : O)}) (lift u m) = PreTilt.coeff m u := by
+theorem mk_lift (u : PreTilt O p) (m : ℕ)
+    : Ideal.Quotient.mk (span {(p : O)}) (lift u m) = PreTilt.coeff m u := by
   rw [lift, PreTilt.mk_untilt_eq_coeff_zero, PreTilt.coeff_iterate_frobeniusEquiv_symm, zero_add]
 
 theorem lift_succ_pow (u : PreTilt O p) (m : ℕ) : lift u (m + 1) ^ p = lift u m := by
@@ -32,15 +34,15 @@ theorem lift_pow (u : PreTilt O p) (m : ℕ) : lift u m ^ p ^ m = PreTilt.untilt
 variable (hv : v.Integers O)
 include hv
 
-theorem val_eq_untilt (u : PreTilt O p) (hu : u ≠ 0) :
-    PreTilt.val K v O hv p u = v (algebraMap O K (PreTilt.untilt u)) := by
+theorem val_eq_untilt (u : PreTilt O p) (hu : u ≠ 0)
+    : PreTilt.val K v O hv p u = v (algebraMap O K (PreTilt.untilt u)) := by
   obtain ⟨n, hn⟩ : ∃ n, PreTilt.coeff n u ≠ 0 := not_forall.1 fun h => hu (Perfection.ext h)
   have hn' : (Ideal.Quotient.mk (span {(p : O)}) (lift u n) : ModP O p) ≠ 0 := by rwa [mk_lift]
   change PreTilt.valAux K v O p u = _
   rw [PreTilt.valAux_eq hv hn, ← mk_lift, ModP.preVal_mk hv hn', ← lift_pow u n, map_pow, map_pow]
 
-theorem dvd_of_val_le (x y : PreTilt O p)
-    (h : PreTilt.val K v O hv p x ≤ PreTilt.val K v O hv p y) : y ∣ x := by
+theorem dvd_of_val_le (x y : PreTilt O p) (h : PreTilt.val K v O hv p x ≤ PreTilt.val K v O hv p y)
+    : y ∣ x := by
   by_cases hx : x = 0
   · exact hx ▸ dvd_zero y
   by_cases hy : y = 0
@@ -73,9 +75,13 @@ theorem dvd_of_val_le (x y : PreTilt O p)
     rw [map_mul, map_mul] at h2
     exact mul_left_cancel₀ hK h2
   let e : PreTilt O p :=
-    (⟨fun m => Ideal.Quotient.mk (span {(p : O)}) (q m), fun m => by
-      simp only
-      rw [← map_pow, hqs]⟩ : Perfection (ModP O p) p)
+    (⟨
+       fun m => Ideal.Quotient.mk (span {(p : O)}) (q m),
+       fun m => by
+         simp only
+         rw [← map_pow, hqs]
+     ⟩
+      : Perfection (ModP O p) p)
   refine ⟨e, Perfection.ext fun n => ?_⟩
   change PreTilt.coeff n x = PreTilt.coeff n (y * e)
   rw [map_mul, ← mk_lift, ← mk_lift, hq n, map_mul]
@@ -87,15 +93,21 @@ end PI.ASDivW
 
 namespace PI.ArtSch
 
-private theorem complete_of_eq {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K] (S : Subring K)
-    (hS : S = GroundTheory.PAdicHodge.normInteger K) (a : S) (ha : ‖(a : K)‖ < 1) : IsAdicComplete (Ideal.span {a}) S := by
+private theorem complete_of_eq
+    {K : Type*} [NormedField K] [IsUltrametricDist K] [CompleteSpace K]
+    (S : Subring K) (hS : S = GroundTheory.PAdicHodge.normInteger K) (a : S) (ha : ‖(a : K)‖ < 1)
+    : IsAdicComplete (Ideal.span {a}) S := by
   subst hS
   exact GroundTheory.PAdicHodge.isAdicComplete_span_singleton ha
 
-private theorem norm_eq_val (l : ℕ) [Fact l.Prime] (x : PadicComplex l) : ‖x‖ = (((PadicComplex.valued l).v x : NNReal) : ℝ) := by
-  rw [PadicComplex.norm_eq_norm, Valuation.norm_def, (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl), Valuation.embedding_restrict]
+private theorem norm_eq_val (l : ℕ) [Fact l.Prime] (x : PadicComplex l)
+    : ‖x‖ = (((PadicComplex.valued l).v x : NNReal) : ℝ) := by
+  rw [PadicComplex.norm_eq_norm, Valuation.norm_def,
+    (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl),
+    Valuation.embedding_restrict]
 
-private theorem complete_OC (l : ℕ) [Fact l.Prime] : IsAdicComplete (Ideal.span {((l : ℕ) : OC l)}) (OC l) := by
+private theorem complete_OC (l : ℕ) [Fact l.Prime]
+    : IsAdicComplete (Ideal.span {((l : ℕ) : OC l)}) (OC l) := by
   refine complete_of_eq (PadicComplexInt l).toSubring ?_ ((l : ℕ) : OC l) ?_
   · ext x
     rw [GroundTheory.PAdicHodge.mem_normInteger]

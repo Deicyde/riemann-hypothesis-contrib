@@ -20,14 +20,15 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.MassGlue
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
+variable
+  {F : Type}
+  [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
 variable {L : LocE F E} {r k : ℕ}
 
-
 omit [IsNonarchimedeanLocalField F] [CharZero F] in
-theorem sumCls_le (S : Frames L r k) (φ : Set S.FrP → ℝ≥0∞) (c : ℝ≥0∞) (h : ∀ C, φ C ≤ c) :
-    S.sumCls φ ≤ (S.sumCls fun _ => 1) * c := by
+theorem sumCls_le (S : Frames L r k) (φ : Set S.FrP → ℝ≥0∞) (c : ℝ≥0∞) (h : ∀ C, φ C ≤ c)
+    : S.sumCls φ ≤ (S.sumCls fun _ => 1) * c := by
   unfold Frames.sumCls
   rw [← ENNReal.tsum_mul_right]
   refine ENNReal.tsum_le_tsum fun o => ?_
@@ -37,16 +38,22 @@ theorem sumCls_le (S : Frames L r k) (φ : Set S.FrP → ℝ≥0∞) (c : ℝ≥
     exact h _
   · simp
 
-theorem mass_le (S : Frames L r k) (d : S.Datum) (j : ℕ) :
-    (S.mass d fun Λ => S.cardI d Λ = j) ≤
-      ENNReal.ofReal (S.Hp ^ (9 * (r + 1) ^ 2 + 12 * (r + 1)) * (j : ℝ) ^ (k - 1)) := by
+theorem mass_le (S : Frames L r k) (d : S.Datum) (j : ℕ)
+    : (S.mass d fun Λ => S.cardI d Λ = j)
+      ≤ ENNReal.ofReal (S.Hp ^ (9 * (r + 1) ^ 2 + 12 * (r + 1)) * (j : ℝ) ^ (k - 1)) := by
   by_cases hex : ∃ Λ, S.IsTerm d Λ
   · obtain ⟨Λ₀, h₀⟩ := hex
-    have hH : 1 ≤ S.Hp := (GlobalTheory.T.term_exponents_nonneg_and_defect_group_bound L r k S d Λ₀ h₀).2.2.2.2.1
+    have hH : 1 ≤ S.Hp :=
+      (GlobalTheory.T.term_exponents_nonneg_and_defect_group_bound L r k S d Λ₀ h₀).2.2.2.2.1
     rw [GlobalTheory.T.hermitianMass_eq_sum_frameClasses L r k S d _ (fun h hh Λ hT hP => by
-      rw [(GlobalTheory.T.hermitianFrames_stabilizer_acts_on_terms L r k S d Λ hT h hh).2.2.2.2.2.2.1]; exact hP)]
-    refine (sumCls_le S _ _ fun C => GlobalTheory.T.hermitianTermCount_frameClass_le L r k S d C j).trans ?_
-    refine (mul_le_mul_left (GlobalTheory.T.hermitianFrameClasses_total_weight_le L r k S ⟨d, Λ₀, h₀⟩) _).trans ?_
+      rw [(GlobalTheory.T.hermitianFrames_stabilizer_acts_on_terms L r k S d Λ hT h
+        hh).2.2.2.2.2.2.1]
+      exact hP)]
+    refine
+      (sumCls_le S _ _ fun C => GlobalTheory.T.hermitianTermCount_frameClass_le L r k S d C j).trans
+        ?_
+    refine (mul_le_mul_left
+      (GlobalTheory.T.hermitianFrameClasses_total_weight_le L r k S ⟨d, Λ₀, h₀⟩) _).trans ?_
     rw [← ENNReal.ofReal_mul (by positivity)]
     refine ENNReal.ofReal_le_ofReal ?_
     rw [← mul_assoc, ← pow_add]
@@ -58,10 +65,11 @@ theorem mass_le (S : Frames L r k) (d : S.Datum) (j : ℕ) :
     rw [this]
     exact zero_le
 
-theorem finite_fibre (S : Frames L r k) (d : S.Datum) (C : Set S.FrP) :
-    {Λ | S.IsTerm d Λ ∧ S.Fr d Λ = C}.Finite := by
+theorem finite_fibre (S : Frames L r k) (d : S.Datum) (C : Set S.FrP)
+    : {Λ | S.IsTerm d Λ ∧ S.Fr d Λ = C}.Finite := by
   have h1 : ∀ j : ℕ, {Λ | S.IsTerm d Λ ∧ S.cardI d Λ = j ∧ S.Fr d Λ = C}.Finite := fun j => by
-    have h := (GlobalTheory.T.hermitianTermCount_frameClass_le L r k S d C j).trans_lt ENNReal.ofReal_lt_top
+    have h :=
+      (GlobalTheory.T.hermitianTermCount_frameClass_le L r k S d C j).trans_lt ENNReal.ofReal_lt_top
     unfold Frames.nT at h
     rw [← Set.encard_lt_top_iff]
     by_contra hc
@@ -71,22 +79,26 @@ theorem finite_fibre (S : Frames L r k) (d : S.Datum) (C : Set S.FrP) :
   refine ((Set.finite_Iic S.a.toNat).biUnion fun i _ =>
     (Set.finite_Iic (S.q ^ i)).biUnion fun j _ => h1 j).subset ?_
   rintro Λ ⟨hT, hC⟩
-  obtain ⟨i, hi, hb⟩ := (GlobalTheory.T.term_exponents_nonneg_and_defect_group_bound L r k S d Λ hT).2.2.2.2.2.1
+  obtain ⟨i, hi, hb⟩ :=
+    (GlobalTheory.T.term_exponents_nonneg_and_defect_group_bound L r k S d Λ hT).2.2.2.2.2.1
   have h2 := (GlobalTheory.T.gluingImage_card_pow_le_defectGroup_card L r k S d Λ hT).2.1
   simp only [Set.mem_iUnion, Set.mem_Iic, Set.mem_setOf_eq]
   exact ⟨i, by omega, S.cardI d Λ, hb ▸ h2, hT, rfl, hC⟩
 
-theorem finite_cls (S : Frames L r k) (h : ∃ d Λ, S.IsTerm d Λ) :
-    {o : MulAction.orbitRel.Quotient S.St (Set S.FrP) | S.IsIntCls o.out}.Finite := by
-  have h1 := ((GlobalTheory.T.hermitianFrameClasses_total_weight_le L r k S h).trans_lt ENNReal.ofReal_lt_top).ne
+theorem finite_cls (S : Frames L r k) (h : ∃ d Λ, S.IsTerm d Λ)
+    : {o : MulAction.orbitRel.Quotient S.St (Set S.FrP) | S.IsIntCls o.out}.Finite := by
+  have h1 :=
+    ((GlobalTheory.T.hermitianFrameClasses_total_weight_le L r k S h).trans_lt
+      ENNReal.ofReal_lt_top).ne
   unfold Frames.sumCls at h1
   refine (ENNReal.finite_const_le_of_tsum_ne_top h1 (ε := 1) one_ne_zero).subset fun o ho => ?_
   have ho' : S.IsIntCls o.out := ho
   simp only [Set.mem_setOf_eq, if_pos ho', mul_one]
-  exact ENNReal.one_le_ofReal.2 ((GlobalTheory.T.commonStabilizer_stabilizers_commensurable_volume L r k S).2 _ ho'.1).2.2.1
+  exact ENNReal.one_le_ofReal.2
+    ((GlobalTheory.T.commonStabilizer_stabilizers_commensurable_volume L r k S).2 _ ho'.1).2.2.1
 
-theorem finite_orbits (S : Frames L r k) (d : S.Datum) :
-    {o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V) | S.IsTerm d o.out}.Finite := by
+theorem finite_orbits (S : Frames L r k) (d : S.Datum)
+    : {o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V) | S.IsTerm d o.out}.Finite := by
   by_cases hex : ∃ Λ, S.IsTerm d Λ
   · obtain ⟨Λ₀, h₀⟩ := hex
     refine (((finite_cls S ⟨d, Λ₀, h₀⟩).biUnion fun o _ => finite_fibre S d o.out).image
@@ -100,13 +112,24 @@ theorem finite_orbits (S : Frames L r k) (d : S.Datum) :
     have hF : S.Fr d (h.1 • o.out) = o'.out := hA.2.2.2.2.1.trans hh
     refine ⟨h.1 • o.out, ?_, ?_⟩
     · simp only [Set.mem_iUnion, Set.mem_setOf_eq]
-      exact ⟨o', hF ▸ (GlobalTheory.HL.TermBasic.term_basic L r k S d _ hA.1).2.2.2.2.2.2.1, hA.1, hF⟩
+      exact
+        ⟨o', hF ▸ (GlobalTheory.HL.TermBasic.term_basic L r k S d _ hA.1).2.2.2.2.2.2.1, hA.1, hF⟩
     · refine Eq.trans ?_ (Quotient.out_eq o)
       exact Quotient.sound (MulAction.orbitRel_apply.2 ⟨h, rfl⟩)
   · refine Set.finite_empty.subset fun o ho => hex ⟨_, ho⟩
 
 end GlobalTheory.HL.MassGlue
 
-theorem GlobalTheory.HL.MassGlue.mass_le_and_finite : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E), ∀ (r k : ℕ) (S : Frames L r k), 1 ≤ k → ∀ d : S.Datum, (∀ j : ℕ, (S.mass d fun Λ => S.cardI d Λ = j) ≤ ENNReal.ofReal (S.Hp ^ (9 * (r + 1) ^ 2 + 12 * (r + 1)) * (j : ℝ) ^ (k - 1))) ∧ {o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V) | S.IsTerm d o.out}.Finite := by
-  intro F _ _ _ _ _ E _ _ _ L r k S _ d
-  exact ⟨GlobalTheory.HL.MassGlue.mass_le S d, GlobalTheory.HL.MassGlue.finite_orbits S d⟩
+theorem GlobalTheory.HL.MassGlue.mass_le_and_finite
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : LocE F E),
+      ∀ (r k : ℕ) (S : Frames L r k),
+        1 ≤ k
+          → ∀ d : S.Datum,
+            (∀ j : ℕ,
+                (S.mass d fun Λ => S.cardI d Λ = j)
+                  ≤ ENNReal.ofReal (S.Hp ^ (9 * (r + 1) ^ 2 + 12 * (r + 1)) * (j : ℝ) ^ (k - 1)))
+              ∧ {o : MulAction.orbitRel.Quotient S.St (Submodule L.O S.V) | S.IsTerm d o.out}.Finite :=
+  by
+    intro F _ _ _ _ _ E _ _ _ L r k S _ d
+    exact ⟨GlobalTheory.HL.MassGlue.mass_le S d, GlobalTheory.HL.MassGlue.finite_orbits S d⟩

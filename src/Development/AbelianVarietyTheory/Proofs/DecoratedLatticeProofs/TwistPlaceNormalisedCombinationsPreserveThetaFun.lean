@@ -6,10 +6,16 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Hei
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SeeSaw GlobalTheory.LocMod GlobalTheory.QPl ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum MeasureTheory IsDedekindDomain
+  NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.SeeSaw
+  GlobalTheory.LocMod GlobalTheory.QPl ValuativeRel
 open GlobalTheory.PosOne (toOne Covers TriPos)
-open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage (app HasTensorVal fl opEFJ IsQuotIntFJ RFJ)
+open GlobalTheory.IndefiniteRowSideFullHecke.FourierJacobiAverage
+  (app HasTensorVal fl opEFJ IsQuotIntFJ RFJ)
 open GlobalTheory.IndefiniteRowSideFullHecke.FramePositiveSum (IsCO)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -18,8 +24,10 @@ namespace GlobalTheory.QPl.ThetaPin
 
 variable {D : D7}
 
-theorem isFinComb_of_half {S T : HSp D} {v : HeightOneSpectrum (𝓞 D.host.F)} {ε : AF D.host.F} (hε : IsPlaceIdem D v ε) (c : WO S T →₀ ℂ)
-    (hc : ∀ u ∈ c.support, IsHalf (algebraMap (AF D.host.F) (AE D) ε) u) : IsFinComb c := by
+theorem isFinComb_of_half
+    {S T : HSp D} {v : HeightOneSpectrum (𝓞 D.host.F)} {ε : AF D.host.F} (hε : IsPlaceIdem D v ε)
+    (c : WO S T →₀ ℂ) (hc : ∀ u ∈ c.support, IsHalf (algebraMap (AF D.host.F) (AE D) ε) u)
+    : IsFinComb c := by
   intro u hu
   have h0 : infPart D (algebraMap (AF D.host.F) (AE D) ε) = 0 := by
     obtain ⟨α, rfl, -, -⟩ := hε
@@ -31,24 +39,28 @@ theorem isFinComb_of_half {S T : HSp D} {v : HeightOneSpectrum (𝓞 D.host.F)} 
   simp only [Matrix.map_apply, Matrix.zero_apply]
   rw [← hc u hu i j, map_mul, h0, zero_mul]
 
-theorem aconv_support {G : Type} [AddMonoid G] (P : AddSubmonoid G) :
-    ∀ (l : List (G →₀ ℂ)), (∀ e ∈ l, ∀ g ∈ e.support, g ∈ P) → ∀ g ∈ (aconv l).support, g ∈ P
+theorem aconv_support {G : Type} [AddMonoid G] (P : AddSubmonoid G)
+    : ∀ (l : List (G →₀ ℂ)), (∀ e ∈ l, ∀ g ∈ e.support, g ∈ P) → ∀ g ∈ (aconv l).support, g ∈ P
   | [], _, g, hg => by
-    have : g = 0 := by
-      simpa [aconv] using Finsupp.support_single_subset hg
-    rw [this]; exact P.zero_mem
+    have : g = 0 := by simpa [aconv] using Finsupp.support_single_subset hg
+    rw [this]
+    exact P.zero_mem
   | e :: l, hl, g, hg => by
     classical
     have ih := aconv_support P l (fun e' he' => hl e' (List.mem_cons_of_mem _ he'))
     have he := hl e List.mem_cons_self
-    change g ∈ (e.sum fun g a => (aconv l).sum fun h b => Finsupp.single (g + h) (a * b)).support at hg
-    have houter : g ∈ e.support.biUnion
-        (fun x => ((aconv l).sum fun y b => Finsupp.single (x + y) (e x * b)).support) :=
+    change g ∈ (e.sum fun g a => (aconv l).sum fun h b => Finsupp.single (g + h) (a * b)).support
+      at hg
+    have houter
+        : g ∈ e.support.biUnion (fun x =>
+          ((aconv l).sum fun y b => Finsupp.single (x + y) (e x * b)).support) :=
       Finsupp.support_sum (f := e)
-        (g := fun x a => (aconv l).sum fun y b => Finsupp.single (x + y) (a * b)) hg
+        (g := fun x a => (aconv l).sum fun y b => Finsupp.single (x + y) (a * b))
+        hg
     rcases Finset.mem_biUnion.mp houter with ⟨x, hx, hg⟩
-    have hinner : g ∈ (aconv l).support.biUnion
-        (fun y => (Finsupp.single (x + y) (e x * aconv l y)).support) :=
+    have hinner
+        : g ∈ (aconv l).support.biUnion
+          (fun y => (Finsupp.single (x + y) (e x * aconv l y)).support) :=
       Finsupp.support_sum (f := aconv l) (g := fun y b => Finsupp.single (x + y) (e x * b)) hg
     rcases Finset.mem_biUnion.mp hinner with ⟨y, hy, hg⟩
     rw [Finset.mem_singleton.1 (Finsupp.support_single_subset hg)]
@@ -61,19 +73,29 @@ def finSub (S T : HSp D) : AddSubmonoid (WO S T) where
     change Matrix.map a (infPart D) = 0 at ha
     change Matrix.map b (infPart D) = 0 at hb
     change Matrix.map (a + b) (infPart D) = 0
-    rw [Matrix.map_add (infPart D) (fun x y => RingHom.map_add (infPart D) x y) a b, ha, hb, add_zero]
+    rw [Matrix.map_add (infPart D) (fun x y => RingHom.map_add (infPart D) x y) a b, ha, hb,
+      add_zero]
 
-theorem isFinComb_aconv {S T : HSp D} (l : List (WO S T →₀ ℂ)) (hl : ∀ e ∈ l, IsFinComb e) : IsFinComb (aconv l) :=
+theorem isFinComb_aconv {S T : HSp D} (l : List (WO S T →₀ ℂ)) (hl : ∀ e ∈ l, IsFinComb e)
+    : IsFinComb (aconv l) :=
   aconv_support (finSub S T) l hl
 
-theorem isFinComb_cast {c : Comm D} {a b : ℕ} (e : a = b) (x : WO (c.V (a + 1)) c.T →₀ ℂ) (hx : IsFinComb x) :
-    IsFinComb (e ▸ x : WO (c.V (b + 1)) c.T →₀ ℂ) := by
+theorem isFinComb_cast
+    {c : Comm D} {a b : ℕ} (e : a = b) (x : WO (c.V (a + 1)) c.T →₀ ℂ) (hx : IsFinComb x)
+    : IsFinComb (e ▸ x : WO (c.V (b + 1)) c.T →₀ ℂ) := by
   subst e; exact hx
 
 end GlobalTheory.QPl.ThetaPin
 
 open GlobalTheory.QPl.ThetaPin in
-theorem GlobalTheory.QPl.pins_keep_theta : ∀ (D : D7) (c : Comm D) (v : VCom c) (t : Tup c) (w : VTup t) (F : QFam v t), c.Is → F.Pins w → ∀ j (h : j + 2 * 0 + 2 = D.R.m) (Ψ₁ : WO (c.V j) (c.V (j + 1)) → ℂ) (Ψ₂ : WO (c.V (j + 1)) c.T → ℂ), IsThetaFunO c.ψ _ _ Ψ₁ → IsThetaFunO c.ψ _ _ Ψ₂ → IsThetaFunO c.ψ _ _ (comb c.ψ _ _ (w.eQ j) Ψ₁) ∧ IsThetaFunO c.ψ _ _ (comb c.ψ _ _ (w.eQT j h) Ψ₂) := by
+theorem GlobalTheory.QPl.pins_keep_theta
+    : ∀ (D : D7) (c : Comm D) (v : VCom c) (t : Tup c) (w : VTup t) (F : QFam v t),
+      c.Is → F.Pins w
+        → ∀ j (h : j + 2 * 0 + 2 = D.R.m) (Ψ₁ : WO (c.V j) (c.V (j + 1)) → ℂ)
+            (Ψ₂ : WO (c.V (j + 1)) c.T → ℂ),
+          IsThetaFunO c.ψ _ _ Ψ₁ → IsThetaFunO c.ψ _ _ Ψ₂
+            → IsThetaFunO c.ψ _ _ (comb c.ψ _ _ (w.eQ j) Ψ₁)
+              ∧ IsThetaFunO c.ψ _ _ (comb c.ψ _ _ (w.eQT j h) Ψ₂) := by
   intro D c v t w F hc hP j h Ψ₁ Ψ₂ h1 h2
   have hs : ∀ i, (F.Q i).s = j := fun i => by have := (F.Q i).hs; omega
   refine ⟨?_, ?_⟩

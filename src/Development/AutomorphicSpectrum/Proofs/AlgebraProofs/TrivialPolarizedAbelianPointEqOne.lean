@@ -14,8 +14,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.DimZero
 
-theorem isIso_hom_of_relDim_zero {S : Scheme.{0}} (A : Over S) [GrpObj A] (h : IsAbelianScheme A)
-    (hd : SmoothOfRelativeDimension 0 A.hom) : IsIso A.hom := by
+theorem isIso_hom_of_relDim_zero
+    {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    (h : IsAbelianScheme A) (hd : SmoothOfRelativeDimension 0 A.hom)
+    : IsIso A.hom := by
   haveI := h.proper
   haveI := h.geomConnected
   haveI : Etale A.hom := (Etale.iff_smoothOfRelativeDimension_zero _).2 hd
@@ -45,9 +47,10 @@ theorem over_hom_eq_of_mono {S : Scheme.{0}} {T A : Over S} [Mono A.hom] (x y : 
   ext1
   rw [← cancel_mono A.hom, Over.w x, Over.w y]
 
-theorem eq_one_of_g_eq_zero (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
-    (P : Out.PolAV (Spec (CommRingCat.of R))) (hg : P.g = 0) (z : sp (R₀ := R) R ⟶ P.A) :
-    z = 1 := by
+theorem eq_one_of_g_eq_zero
+    (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R]
+    (P : Out.PolAV (Spec (CommRingCat.of R))) (hg : P.g = 0) (z : sp (R₀ := R) R ⟶ P.A)
+    : z = 1 := by
   have hd : SmoothOfRelativeDimension 0 P.A.hom := hg ▸ P.smoothDim
   haveI := isIso_hom_of_relDim_zero P.A P.isAb hd
   exact over_hom_eq_of_mono _ _

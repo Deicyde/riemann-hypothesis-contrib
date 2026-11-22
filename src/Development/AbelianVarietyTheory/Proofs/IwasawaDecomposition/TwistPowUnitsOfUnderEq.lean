@@ -11,11 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HostC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1 ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr Classical
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.FrobeniusOrbits Neutral.B1
+  ReciprocityTheory.Neutral.Bridge.HCFR Formalism.L2.Host GlobalTheory.Mem.Chr Classical
 
 namespace GlobalTheory.Mem.Chr
 
-theorem twist_pow_units_of_under_eq : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (S : Set ℕ) (ξ : HChar H.E), IsTwist H S ξ → ∀ (Q Q' : HeightOneSpectrum (𝓞 H.E)), Q.under (𝓞 H.F) = Q'.under (𝓞 H.F) → ∀ n : ℕ, (∀ x, IsUnitAt Q' x → ξ.loc Q' x ^ n = 1) → ∀ x, IsUnitAt Q x → ξ.loc Q x ^ n = 1 := by
+theorem twist_pow_units_of_under_eq
+    : ∀ (R : Ranks) (H : Formalism.BasicNotions.Host R) (S : Set ℕ) (ξ : HChar H.E),
+      IsTwist H S ξ
+        → ∀ (Q Q' : HeightOneSpectrum (𝓞 H.E)),
+          Q.under (𝓞 H.F) = Q'.under (𝓞 H.F)
+            → ∀ n : ℕ,
+              (∀ x, IsUnitAt Q' x → ξ.loc Q' x ^ n = 1)
+                → ∀ x, IsUnitAt Q x → ξ.loc Q x ^ n = 1 := by
   intro R H S ξ hξ Q Q' hu n hn x hx
   by_cases hQ : Q = Q'
   · subst hQ

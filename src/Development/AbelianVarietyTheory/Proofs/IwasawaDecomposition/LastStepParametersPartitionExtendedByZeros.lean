@@ -7,7 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.HcPar
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum GlobalTheory.Chain GlobalTheory.CompactHowe Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.S
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult
+  Formalism.IndefR.Datum GlobalTheory.Chain GlobalTheory.CompactHowe Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -154,8 +157,8 @@ lemma partition {n t : ℕ} (e s p : ℤ) (ht : (t : ℤ) = 2 * s + 1) (hn : (n 
       ring
 
 def IsEntry {R : Ranks} (P : HCParam R) (j : ℕ) (y : ℚ) : Prop :=
-  (∃ i, y = P.v i) ∨ (∃ i, y = -P.b i) ∨
-    ∃ i : Fin R.m, (i : ℕ) < j ∧ ∃ a : ℕ, a < R.t ∧ y = -P.e i + ((R.t : ℚ) - 1) / 2 - a
+  (∃ i, y = P.v i) ∨ (∃ i, y = - P.b i)
+    ∨ ∃ i : Fin R.m, (i : ℕ) < j ∧ ∃ a : ℕ, a < R.t ∧ y = - P.e i + ((R.t : ℚ) - 1) / 2 - a
 
 lemma mem_parB (D : D7) (j : ℕ) (hj : D.R.m ≤ j + 1) (τ : D.what₂.Tau) (q : ℚ) (s : Bool) :
     (q, s) ∈ parB (Ptw D) j τ ↔
@@ -211,7 +214,22 @@ lemma entry_succ {R : Ranks} (P : HCParam R) (k : Fin R.m) (hk : (k : ℕ) + 1 =
     · exact .inr (.inr ⟨i, i.2, h⟩)
     · exact .inr (.inr ⟨k, k.2, h⟩)
 
-theorem lastStep_param : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N : ℕ) (lam : Fin n → ℝ) (ε : Fin n → Bool) (lam' : Fin N → ℝ) (ε' : Fin N → Bool), (k : ℕ) + 1 = D.R.m → n = D.R.r + k * D.R.t → N = n + D.R.t → IsEnum (parB (Ptw D) k τ) lam ε → IsEnum (parB (Ptw D) D.R.m τ) lam' ε' → ε = allPos n ∧ ε' = allPos N ∧ ∃ x₁ x₃ : ℤ, (x₁ : ℚ) = expS D k τ + (n : ℚ) / 2 ∧ (x₃ : ℚ) = -((N : ℚ) / 2 + expT D k τ) ∧ ∃ (hn : n ≤ N) (ν : Fin N → ℕ), Antitone ν ∧ (∀ b : Fin N, n ≤ (b : ℕ) → ν b = 0) ∧ (∀ a, Formalism.QuantumDeterminants.lowK (allPos n) lam a = (x₃ : ℝ) - ν (Fin.castLE hn (Fin.rev a))) ∧ ∀ b, Formalism.QuantumDeterminants.lowK (allPos N) lam' b = -(x₁ : ℝ) - ν (Fin.rev b) := by
+theorem lastStep_param
+    : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N : ℕ) (lam : Fin n → ℝ) (ε : Fin n → Bool)
+        (lam' : Fin N → ℝ) (ε' : Fin N → Bool),
+      (k : ℕ) + 1 = D.R.m → n = D.R.r + k * D.R.t → N = n + D.R.t → IsEnum (parB (Ptw D) k τ) lam ε
+        → IsEnum (parB (Ptw D) D.R.m τ) lam' ε'
+        → ε = allPos n ∧ ε' = allPos N
+          ∧ ∃ x₁ x₃ : ℤ,
+            (x₁ : ℚ) = expS D k τ + (n : ℚ) / 2 ∧ (x₃ : ℚ) = -((N : ℚ) / 2 + expT D k τ)
+              ∧ ∃ (hn : n ≤ N) (ν : Fin N → ℕ),
+                Antitone ν ∧ (∀ b : Fin N, n ≤ (b : ℕ) → ν b = 0)
+                  ∧ (∀ a,
+                    Formalism.QuantumDeterminants.lowK (allPos n) lam a
+                      = (x₃ : ℝ) - ν (Fin.castLE hn (Fin.rev a)))
+                  ∧ ∀ b,
+                    Formalism.QuantumDeterminants.lowK (allPos N) lam' b
+                      = -(x₁ : ℝ) - ν (Fin.rev b) := by
   intro D k τ n N lam ε lam' ε' hk hn hN ⟨hl, q, hq, hS⟩ ⟨hl', q', hq', hS'⟩
   subst hN
   obtain ⟨s, hs⟩ := D.R.t_odd
@@ -225,7 +243,8 @@ theorem lastStep_param : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N 
   have hnev : Even n := by
     rw [hn]
     refine Odd.add_odd ⟨k' + m' - 1, ?_⟩ (hkodd.mul D.R.t_odd)
-    unfold Ranks.r; omega
+    unfold Ranks.r
+    omega
   obtain ⟨p, hp⟩ := hnev
   have hsQ : (D.R.t : ℚ) = 2 * s + 1 := by exact_mod_cast hs
   have hpQ : (n : ℚ) = 2 * p := by rw [hp]; push_cast; ring
@@ -241,7 +260,7 @@ theorem lastStep_param : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N 
     simpa using this
   have hε : ∀ a, ε a = true := fun a => ((A _ _).mp ⟨a, rfl⟩).1
   have hε' : ∀ a, ε' a = true := fun a => ((B _ _).mp ⟨a, rfl⟩).1
-  have hE : ∀ a, IsEntry (D.hc τ) k (-q a + 1 / 2) := fun a => ((A _ _).mp ⟨a, rfl⟩).2
+  have hE : ∀ a, IsEntry (D.hc τ) k (- q a + 1 / 2) := fun a => ((A _ _).mp ⟨a, rfl⟩).2
   choose z hz using fun a => entry_int _ _ _ (hE a)
   refine ⟨funext hε, funext hε', -e + p, e - p - s, ?_, ?_, ?_⟩
   · simp only [expS, if_neg hkne, he, hpQ]
@@ -280,8 +299,9 @@ theorem lastStep_param : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N 
         push_cast
         ring
     · rintro (⟨a, rfl⟩ | ⟨c, hc, rfl⟩)
-      · obtain ⟨b, hb⟩ := (B (-(z a : ℚ)) true).mpr
-          ⟨rfl, (entry_succ _ k hk _).mpr (.inl (by rw [neg_neg, ← hz]; exact hE a))⟩
+      · obtain ⟨b, hb⟩ :=
+          (B (-(z a : ℚ)) true).mpr
+            ⟨rfl, (entry_succ _ k hk _).mpr (.inl (by rw [neg_neg, ← hz]; exact hE a))⟩
         refine ⟨b, ?_⟩
         rw [hq', (Prod.mk.inj hb).1]
         push_cast
@@ -289,9 +309,11 @@ theorem lastStep_param : ∀ (D : D7) (k : Fin D.R.m) (τ : D.what₂.Tau) (n N 
       · have h3 : ((D.R.t - 1 - c : ℕ) : ℚ) = 2 * s - c := by
           have : ((D.R.t - 1 - c : ℕ) : ℤ) = 2 * s - c := by omega
           exact_mod_cast this
-        obtain ⟨b, hb⟩ := (B ((e : ℚ) + s - c) true).mpr
-          ⟨rfl, (entry_succ _ k hk _).mpr (.inr ⟨D.R.t - 1 - c, by omega, by
-            rw [h3, he, hsQ]; ring⟩)⟩
+        obtain ⟨b, hb⟩ :=
+          (B ((e : ℚ) + s - c) true).mpr ⟨
+            rfl,
+            (entry_succ _ k hk _).mpr (.inr ⟨D.R.t - 1 - c, by omega, by rw [h3, he, hsQ]; ring⟩)
+          ⟩
         refine ⟨b, ?_⟩
         rw [hq', (Prod.mk.inj hb).1]
         push_cast

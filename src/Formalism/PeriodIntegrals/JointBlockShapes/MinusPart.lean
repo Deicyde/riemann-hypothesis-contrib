@@ -44,18 +44,21 @@ def linePos {p q r s : ℕ} : Ln p q r s → Bool
   | _ => false
 
 def lowB {p q r s : ℕ} (l : Ln p q r s) : Module.End ℂ (Pol p q r s) :=
-  if linePos l then (MvPolynomial.pderiv l).toLinearMap
-  else LinearMap.mulLeft ℂ (MvPolynomial.X l)
+  if linePos l then
+    (MvPolynomial.pderiv l).toLinearMap
+  else
+    LinearMap.mulLeft ℂ (MvPolynomial.X l)
 
 def raiB {p q r s : ℕ} (l : Ln p q r s) : Module.End ℂ (Pol p q r s) :=
-  if linePos l then LinearMap.mulLeft ℂ (MvPolynomial.X l)
-  else -(MvPolynomial.pderiv l).toLinearMap
+  if linePos l then
+    LinearMap.mulLeft ℂ (MvPolynomial.X l)
+  else
+    -(MvPolynomial.pderiv l).toLinearMap
 
 def omE {p q r s : ℕ} (l l' : Ln p q r s) : Module.End ℂ (Pol p q r s) :=
   raiB l * lowB l' + if l = l' then (1 / 2 : ℂ) • 1 else 0
 
-def omAct (p q r s : ℕ) :
-    Matrix (Ln p q r s) (Ln p q r s) ℂ →ₗ[ℂ] Module.End ℂ (Pol p q r s) :=
+def omAct (p q r s : ℕ) : Matrix (Ln p q r s) (Ln p q r s) ℂ →ₗ[ℂ] Module.End ℂ (Pol p q r s) :=
   ∑ l, ∑ l', (Matrix.entryLinearMap ℂ ℂ l l').smulRight (omE l l')
 
 def fockAct1 (p q r s : ℕ) : Mat p q →ₗ[ℂ] Module.End ℂ (Pol p q r s) :=
@@ -77,29 +80,43 @@ def minusPart (A : Module.End ℂ (MvPolynomial σ ℂ)) (P : MvPolynomial σ �
 abbrev homog (σ : Type*) (d : ℕ) : Submodule ℂ (MvPolynomial σ ℂ) :=
   MvPolynomial.homogeneousSubmodule σ ℂ d
 
-
 open Classical in
-def fockInner (P Q : MvPolynomial σ ℂ) : ℂ :=
-  by
-    classical
-    exact ∑ α ∈ P.support, ∑ β ∈ Q.support,
+def fockInner (P Q : MvPolynomial σ ℂ) : ℂ := by
+  classical
+  exact
+    ∑ α ∈ P.support, ∑ β ∈ Q.support,
       (starRingEnd ℂ) (AddMonoidAlgebra.coeff P α) * AddMonoidAlgebra.coeff Q β *
         (if α = β then α.prod (fun _ k => (k.factorial : ℂ)) else 0)
 
 end Grading
 
-def H1 : Prop := ∀ p q r s : ℕ,
-  (∀ Z : Mat p q, IsKC Z → ∀ d, ∀ P ∈ homog (Ix p q × Ix r s) d, fockAct1 p q r s Z P ∈
-    homog (Ix p q × Ix r s) d) ∧
-  (∀ Z : Mat r s, IsKC Z → ∀ d, ∀ P ∈ homog (Ix p q × Ix r s) d, fockAct2 p q r s Z P ∈
-    homog (Ix p q × Ix r s) d) ∧
-  (∀ Z : Mat p q, IsPC Z → ∀ P, fockAct1 p q r s Z P =
-    plusPart (fockAct1 p q r s Z) P + minusPart (fockAct1 p q r s Z) P) ∧
-  (∀ Z : Mat r s, IsPC Z → ∀ P, fockAct2 p q r s Z P =
-    plusPart (fockAct2 p q r s Z) P + minusPart (fockAct2 p q r s Z) P) ∧
-  (∀ Z : Mat p q, IsPC Z → ∀ P Q : Pol p q r s,
-    fockInner (plusPart (fockAct1 p q r s Z) P) Q = - fockInner P (minusPart (fockAct1 p q r s (conjR Z)) Q)) ∧
-  (∀ Z : Mat r s, IsPC Z → ∀ P Q : Pol p q r s,
-    fockInner (plusPart (fockAct2 p q r s Z) P) Q = - fockInner P (minusPart (fockAct2 p q r s (conjR Z)) Q))
+def H1 : Prop :=
+  ∀ p q r s : ℕ,
+    (∀ Z : Mat p q,
+        IsKC Z
+          → ∀ d, ∀ P ∈ homog (Ix p q × Ix r s) d, fockAct1 p q r s Z P ∈ homog (Ix p q × Ix r s) d)
+      ∧ (∀ Z : Mat r s,
+        IsKC Z
+          → ∀ d, ∀ P ∈ homog (Ix p q × Ix r s) d, fockAct2 p q r s Z P ∈ homog (Ix p q × Ix r s) d)
+      ∧ (∀ Z : Mat p q,
+        IsPC Z
+          → ∀ P,
+            fockAct1 p q r s Z P
+              = plusPart (fockAct1 p q r s Z) P + minusPart (fockAct1 p q r s Z) P)
+      ∧ (∀ Z : Mat r s,
+        IsPC Z
+          → ∀ P,
+            fockAct2 p q r s Z P
+              = plusPart (fockAct2 p q r s Z) P + minusPart (fockAct2 p q r s Z) P)
+      ∧ (∀ Z : Mat p q,
+        IsPC Z
+          → ∀ P Q : Pol p q r s,
+            fockInner (plusPart (fockAct1 p q r s Z) P) Q
+              = - fockInner P (minusPart (fockAct1 p q r s (conjR Z)) Q))
+      ∧ (∀ Z : Mat r s,
+        IsPC Z
+          → ∀ P Q : Pol p q r s,
+            fockInner (plusPart (fockAct2 p q r s Z) P) Q
+              = - fockInner P (minusPart (fockAct2 p q r s (conjR Z)) Q))
 
 end FockH1Action

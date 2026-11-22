@@ -8,13 +8,15 @@ open MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.Casselman
 
-theorem mul_rpow_lt_one_of_memLp_geometric {X : Type} [MeasurableSpace X]
-    (μ : MeasureTheory.Measure X) (f : X → ℝ) (p : ℝ) (hp : 0 < p)
-    (hf : MeasureTheory.MemLp f (ENNReal.ofReal p) μ) (E : ℕ → Set X)
-    (hE : ∀ j, MeasurableSet (E j)) (hdisj : Pairwise (Function.onFun Disjoint E))
-    (c D B r : ℝ) (hc : 0 < c) (hB : 0 < B) (hr : 0 ≤ r)
-    (hμ : ∀ j : ℕ, ENNReal.ofReal (c * D ^ j) ≤ μ (E j))
-    (hlow : ∀ j : ℕ, ∀ x ∈ E j, B * r ^ j ≤ |f x|) : D * r ^ p < 1 := by
+theorem mul_rpow_lt_one_of_memLp_geometric
+    {X : Type} [MeasurableSpace X]
+    (μ : MeasureTheory.Measure X) (f : X → ℝ) (p : ℝ)
+    (hp : 0 < p) (hf : MeasureTheory.MemLp f (ENNReal.ofReal p) μ)
+    (E : ℕ → Set X) (hE : ∀ j, MeasurableSet (E j)) (hdisj : Pairwise (Function.onFun Disjoint E))
+    (c D B r : ℝ)
+    (hc : 0 < c) (hB : 0 < B) (hr : 0 ≤ r) (hμ : ∀ j : ℕ, ENNReal.ofReal (c * D ^ j) ≤ μ (E j))
+    (hlow : ∀ j : ℕ, ∀ x ∈ E j, B * r ^ j ≤ |f x|)
+    : D * r ^ p < 1 := by
   by_contra hcon
   have hq : 1 ≤ D * r ^ p := not_lt.1 hcon
   have hrp : 0 ≤ r ^ p := Real.rpow_nonneg hr p
@@ -23,8 +25,9 @@ theorem mul_rpow_lt_one_of_memLp_geometric {X : Type} [MeasurableSpace X]
     have : D * r ^ p ≤ 0 := mul_nonpos_of_nonpos_of_nonneg (not_le.1 hD).le hrp
     linarith
   have hp0 : ENNReal.ofReal p ≠ 0 := by simpa using hp
-  have hI := (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 ENNReal.ofReal_ne_top hf.aestronglyMeasurable).1
-    hf.eLpNorm_lt_top
+  have hI :=
+    (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 ENNReal.ofReal_ne_top
+      hf.aestronglyMeasurable).1 hf.eLpNorm_lt_top
   rw [ENNReal.toReal_ofReal hp.le] at hI
   have ha : 0 < c * B ^ p := mul_pos hc (Real.rpow_pos_of_pos hB p)
   have hterm : ∀ j : ℕ, ENNReal.ofReal (c * B ^ p) ≤ ∫⁻ x in E j, ‖f x‖ₑ ^ p ∂μ := by
@@ -47,8 +50,7 @@ theorem mul_rpow_lt_one_of_memLp_geometric {X : Type} [MeasurableSpace X]
     exact le_mul_of_one_le_right ha.le (one_le_pow₀ hq)
   have htop : ∑' j : ℕ, ∫⁻ x in E j, ‖f x‖ₑ ^ p ∂μ = ⊤ := by
     refine top_le_iff.1 ?_
-    rw [← ENNReal.tsum_const_eq_top_of_ne_zero (α := ℕ)
-      (ENNReal.ofReal_pos.2 ha).ne']
+    rw [← ENNReal.tsum_const_eq_top_of_ne_zero (α := ℕ) (ENNReal.ofReal_pos.2 ha).ne']
     exact ENNReal.tsum_le_tsum hterm
   have hle : ∑' j : ℕ, ∫⁻ x in E j, ‖f x‖ₑ ^ p ∂μ ≤ ∫⁻ x, ‖f x‖ₑ ^ p ∂μ := by
     rw [← lintegral_iUnion hE hdisj]

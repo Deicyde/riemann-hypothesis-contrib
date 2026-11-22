@@ -19,7 +19,9 @@ instance fin_KQ (d : ℕ) : FiniteDimensional ℚ (KQ d) := fin_sqQ _
 
 instance normal_KQ (d : ℕ) : Normal ℚ (KQ d) := normal_sqQ _
 
-def quadFields (d : ℕ) (ι : Qb →+* ℂ) (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL] (hE : KQ d ≤ LL) : Fields where
+def quadFields
+    (d : ℕ) (ι : Qb →+* ℂ) (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ LL] (hE : KQ d ≤ LL)
+    : Fields where
   F := ℚ
   E := KQ d
   K := CoF ι LL
@@ -52,12 +54,12 @@ variable (ι : Qb →+* ℂ) (LL : Fld) [FiniteDimensional ℚ LL] [Normal ℚ L
 
 def iQb : Qb := Classical.choose (exists_sqrt (-((1 : ℕ) : ℤ)))
 
-theorem iQb_mem : iQb ∈ sqrts (-((1 : ℕ) : ℤ)) := Classical.choose_spec (exists_sqrt (-((1 : ℕ) : ℤ)))
+theorem iQb_mem : iQb ∈ sqrts (-((1 : ℕ) : ℤ)) :=
+  Classical.choose_spec (exists_sqrt (-((1 : ℕ) : ℤ)))
 
 abbrev gaussFields : Fields := quadFields 1 ι LL hE
 
 def iE : (gaussFields ι LL hE).E := (⟨iQb, sqrts_sub _ iQb_mem⟩ : KQ 1)
-
 
 end Gauss
 

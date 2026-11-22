@@ -6,13 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory.PowMulUnit
 
-theorem exists_eq_pow_mul_unit {S : Type} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
-    {π : S} (hπ : IsLocalRing.maximalIdeal S = Ideal.span {π}) {x : S} (hx : x ≠ (0 : S)) :
-    ∃ (k : ℕ) (u : S), IsUnit u ∧ x = π ^ k * u := by
+theorem exists_eq_pow_mul_unit
+    {S : Type} [CommRing S] [IsLocalRing S] [IsNoetherianRing S]
+    {π : S} (hπ : IsLocalRing.maximalIdeal S = Ideal.span {π})
+    {x : S} (hx : x ≠ (0 : S))
+    : ∃ (k : ℕ) (u : S), IsUnit u ∧ x = π ^ k * u := by
   classical
-  have hK := Ideal.iInf_pow_eq_bot_of_isLocalRing (IsLocalRing.maximalIdeal S)
-    (IsLocalRing.maximalIdeal.isMaximal S).ne_top
-  have hex : ∃ n : ℕ, ¬ (π ^ n ∣ x) := by
+  have hK :=
+    Ideal.iInf_pow_eq_bot_of_isLocalRing (IsLocalRing.maximalIdeal S)
+      (IsLocalRing.maximalIdeal.isMaximal S).ne_top
+  have hex : ∃ n : ℕ, ¬(π ^ n ∣ x) := by
     by_contra h0
     have h : ∀ n : ℕ, π ^ n ∣ x := fun n => not_not.mp (not_exists.mp h0 n)
     apply hx

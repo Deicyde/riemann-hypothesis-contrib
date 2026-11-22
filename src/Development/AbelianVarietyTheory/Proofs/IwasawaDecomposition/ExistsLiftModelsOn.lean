@@ -24,25 +24,36 @@ instance {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) : AddC
 instance {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) : Module ℂ (Syn V) :=
   inferInstanceAs (Module ℂ V)
 
-def Syn.incl {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) : Syn V →ₗ[ℂ] X := V.subtype
+def Syn.incl {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) : Syn V →ₗ[ℂ] X :=
+  V.subtype
 
-theorem Syn.incl_mem {X : Type} [AddCommGroup X] [Module ℂ X] {V : Submodule ℂ X} (x : Syn V) : Syn.incl V x ∈ V :=
+theorem Syn.incl_mem {X : Type} [AddCommGroup X] [Module ℂ X] {V : Submodule ℂ X} (x : Syn V)
+    : Syn.incl V x ∈ V :=
   (show V from x).2
 
-theorem Syn.incl_injective {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) :
-    Function.Injective (Syn.incl V) := Subtype.val_injective
+theorem Syn.incl_injective {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X)
+    : Function.Injective (Syn.incl V) :=
+  Subtype.val_injective
 
-theorem Syn.range_incl {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) :
-    LinearMap.range (Syn.incl V) = V := V.range_subtype
+theorem Syn.range_incl {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X)
+    : LinearMap.range (Syn.incl V) = V :=
+  V.range_subtype
 
-@[reducible] def core {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) (ip : X → X → ℂ)
-    (h : ∀ x ∈ V, ∀ y ∈ V, ∀ z ∈ V, ∀ c : ℂ, ip x (y + c • z) = ip x y + c * ip x z ∧ ip y x = star (ip x y))
-    (hp : ∀ x ∈ V, x ≠ 0 → 0 < (ip x x).re) : InnerProductSpace.Core ℂ (Syn V) :=
-  have hs : ∀ x ∈ V, ∀ y ∈ V, ip y x = star (ip x y) := fun x hx y hy => (h x hx y hy 0 V.zero_mem 0).2
+@[reducible]
+def core
+    {X : Type} [AddCommGroup X] [Module ℂ X]
+    (V : Submodule ℂ X) (ip : X → X → ℂ)
+    (h : ∀ x ∈ V, ∀ y ∈ V, ∀ z ∈ V, ∀ c : ℂ,
+      ip x (y + c • z) = ip x y + c * ip x z ∧ ip y x = star (ip x y))
+    (hp : ∀ x ∈ V, x ≠ 0 → 0 < (ip x x).re)
+    : InnerProductSpace.Core ℂ (Syn V) :=
+  have hs : ∀ x ∈ V, ∀ y ∈ V, ip y x = star (ip x y) := fun x hx y hy =>
+    (h x hx y hy 0 V.zero_mem 0).2
   have h0 : ∀ x ∈ V, ip x 0 = 0 := fun x hx => by
     have := (h x hx 0 V.zero_mem 0 V.zero_mem 1).1
     simpa using this
-  { inner := fun x y => ip (Syn.incl V x) (Syn.incl V y)
+  {
+    inner := fun x y => ip (Syn.incl V x) (Syn.incl V y)
     conj_inner_symm := fun x y => (hs _ (Syn.incl_mem y) _ (Syn.incl_mem x)).symm
     re_inner_nonneg := fun x => by
       show 0 ≤ (ip (Syn.incl V x) (Syn.incl V x)).re
@@ -68,14 +79,27 @@ theorem Syn.range_incl {X : Type} [AddCommGroup X] [Module ℂ X] (V : Submodule
       have h1 : Syn.incl V x ≠ 0 := fun h2 => hne (Syn.incl_injective V (by rw [h2, map_zero]))
       have := hp _ (Syn.incl_mem x) h1
       rw [hx'] at this
-      simp at this }
+      simp at this
+  }
 
-theorem exists_hmod : ∀ (X : Type) [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) (ip : X → X → ℂ), FiniteDimensional ℂ V → (∀ x ∈ V, ∀ y ∈ V, ∀ z ∈ V, ∀ c : ℂ, ip x (y + c • z) = ip x y + c * ip x z ∧ ip y x = star (ip x y)) → (∀ x ∈ V, x ≠ 0 → 0 < (ip x x).re) → ∃ M : HMod X, M.Is V ip := by
+theorem exists_hmod
+    : ∀ (X : Type) [AddCommGroup X] [Module ℂ X] (V : Submodule ℂ X) (ip : X → X → ℂ),
+      FiniteDimensional ℂ V
+        → (∀ x ∈ V, ∀ y ∈ V, ∀ z ∈ V, ∀ c : ℂ,
+          ip x (y + c • z) = ip x y + c * ip x z ∧ ip y x = star (ip x y))
+        → (∀ x ∈ V, x ≠ 0 → 0 < (ip x x).re)
+        → ∃ M : HMod X, M.Is V ip := by
   intro X _ _ V ip hf h hp
   let cd : InnerProductSpace.Core ℂ (Syn V) := core V ip h hp
-  let nH : NormedAddCommGroup (Syn V) := InnerProductSpace.Core.toNormedAddCommGroup (𝕜 := ℂ) (cd := cd)
+  let nH : NormedAddCommGroup (Syn V) :=
+    InnerProductSpace.Core.toNormedAddCommGroup (𝕜 := ℂ) (cd := cd)
   let iH : InnerProductSpace ℂ (Syn V) := InnerProductSpace.ofCore cd.toCore
-  exact ⟨@Formalism.IndefR.Links.HMod.mk X _ _ (Syn V) nH iH hf (Syn.incl V), Syn.incl_injective V, Syn.range_incl V, fun _ _ => rfl⟩
+  exact ⟨
+    @Formalism.IndefR.Links.HMod.mk X _ _ (Syn V) nH iH hf (Syn.incl V),
+    Syn.incl_injective V,
+    Syn.range_incl V,
+    fun _ _ => rfl
+  ⟩
 
 section Lift
 
@@ -84,23 +108,39 @@ variable {X : Type} [AddCommGroup X] [Module ℂ X] {M : HMod X} {V : Submodule 
 def equivSub (hM : M.Is V ip) : M.H ≃ₗ[ℂ] V :=
   (LinearEquiv.ofInjective M.e hM.1).trans (LinearEquiv.ofEq _ _ hM.2.1)
 
-@[simp] theorem coe_equivSub (hM : M.Is V ip) (x : M.H) : (equivSub hM x : X) = M.e x := rfl
+@[simp]
+theorem coe_equivSub (hM : M.Is V ip) (x : M.H) : (equivSub hM x : X) = M.e x := rfl
 
-@[simp] theorem e_equivSub_symm (hM : M.Is V ip) (v : V) : M.e ((equivSub hM).symm v) = v := by
+@[simp]
+theorem e_equivSub_symm (hM : M.Is V ip) (v : V) : M.e ((equivSub hM).symm v) = v := by
   rw [← coe_equivSub hM, LinearEquiv.apply_symm_apply]
 
-theorem exists_lift_fun {R A : Type*} [Semiring R] [AddCommMonoid A] [Module R A] (σ : R →+* ℂ) (hM : M.Is V ip)
-    (f : A → X) (hadd : ∀ a b, f (a + b) = f a + f b) (hsmul : ∀ (c : R) a, f (c • a) = σ c • f a) (hf : ∀ a, f a ∈ V) :
-    ∃ g : A →ₛₗ[σ] M.H, ∀ a, M.e (g a) = f a :=
-  ⟨{ toFun := fun a => (equivSub hM).symm ⟨f a, hf a⟩
-     map_add' := fun a b => hM.1 (by simp [hadd])
-     map_smul' := fun c a => hM.1 (by simp [hsmul]) }, fun a => e_equivSub_symm hM _⟩
+theorem exists_lift_fun
+    {R A : Type*} [Semiring R] [AddCommMonoid A] [Module R A]
+    (σ : R →+* ℂ)
+    (hM : M.Is V ip)
+    (f : A → X) (hadd : ∀ a b, f (a + b) = f a + f b) (hsmul : ∀ (c : R) a, f (c • a) = σ c • f a)
+    (hf : ∀ a, f a ∈ V)
+    : ∃ g : A →ₛₗ[σ] M.H, ∀ a, M.e (g a) = f a := ⟨
+  {
+    toFun := fun a => (equivSub hM).symm ⟨f a, hf a⟩
+    map_add' := fun a b => hM.1 (by simp [hadd])
+    map_smul' := fun c a => hM.1 (by simp [hsmul])
+  },
+  fun a => e_equivSub_symm hM _
+⟩
 
-theorem exists_lift {R A : Type*} [Semiring R] [AddCommMonoid A] [Module R A] {σ : R →+* ℂ} (hM : M.Is V ip)
-    (f : A →ₛₗ[σ] X) (hf : ∀ a, f a ∈ V) : ∃ g : A →ₛₗ[σ] M.H, ∀ a, M.e (g a) = f a :=
+theorem exists_lift
+    {R A : Type*} [Semiring R] [AddCommMonoid A] [Module R A]
+    {σ : R →+* ℂ}
+    (hM : M.Is V ip)
+    (f : A →ₛₗ[σ] X) (hf : ∀ a, f a ∈ V)
+    : ∃ g : A →ₛₗ[σ] M.H, ∀ a, M.e (g a) = f a :=
   exists_lift_fun σ hM f f.map_add f.map_smulₛₗ hf
 
-variable {X' : Type} [AddCommGroup X'] [Module ℂ X'] {M' : HMod X'} {V' : Submodule ℂ X'} {ip' : X' → X' → ℂ}
+variable
+  {X' : Type} [AddCommGroup X'] [Module ℂ X']
+  {M' : HMod X'} {V' : Submodule ℂ X'} {ip' : X' → X' → ℂ}
 
 end Lift
 

@@ -16,32 +16,40 @@ open CategoryTheory Limits
 
 universe u
 
-theorem eq_zero_of_coprime_nsmul_of_pow_nsmul {M : Type*} [AddCommGroup M] {ℓ m j : ℕ}
-    (hm : m.Coprime ℓ) {x : M} (h1 : m • x = 0) (h2 : ℓ ^ j • x = 0) : x = 0 := by
+theorem eq_zero_of_coprime_nsmul_of_pow_nsmul
+    {M : Type*} [AddCommGroup M]
+    {ℓ m j : ℕ} (hm : m.Coprime ℓ)
+    {x : M} (h1 : m • x = 0) (h2 : ℓ ^ j • x = 0)
+    : x = 0 := by
   have hd : addOrderOf x ∣ Nat.gcd m (ℓ ^ j) :=
     Nat.dvd_gcd (addOrderOf_dvd_of_nsmul_eq_zero h1) (addOrderOf_dvd_of_nsmul_eq_zero h2)
   rw [Nat.Coprime.gcd_eq_one (hm.pow_right j), Nat.dvd_one] at hd
   exact AddMonoid.addOrderOf_eq_one_iff.1 hd
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [CompactSpace G] [TotallyDisconnectedSpace G]
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  [TotallyDisconnectedSpace G]
 
-theorem eq_zero_of_cohomologyInfl_three_eq_zero (A : Rep.{u} k G) [IsDiscreteRep A] (N : Subgroup G)
-    [N.Normal] (hN : IsClosed (N : Set G)) (h1 : IsZero (cohomology (Rep.res N.subtype A) 1)) (ℓ : ℕ)
-    (h2 : ∀ y : cohomology (Rep.res N.subtype A) 2, ∃ m : ℕ, m.Coprime ℓ ∧ m • y = 0)
+theorem eq_zero_of_cohomologyInfl_three_eq_zero
+    (A : Rep.{u} k G) [IsDiscreteRep A]
+    (N : Subgroup G) [N.Normal]
+    (hN : IsClosed (N : Set G)) (h1 : IsZero (cohomology (Rep.res N.subtype A) 1))
+    (ℓ : ℕ) (h2 : ∀ y : cohomology (Rep.res N.subtype A) 2, ∃ m : ℕ, m.Coprime ℓ ∧ m • y = 0)
     (x : cohomology (A.quotientToInvariants N) 3) (hx : (cohomologyInfl A N 3).hom x = 0)
-    (j : ℕ) (hj : ℓ ^ j • x = 0) : x = 0 := by
+    (j : ℕ) (hj : ℓ ^ j • x = 0)
+    : x = 0 := by
   have hX := coindShortComplex_shortExact A
   have hS := shortExact_map_res N hX
   have hQ := shortExact_map_quotientToInvariants_coindShortComplex A N h1
-  have hδQ : IsIso (δ hQ (1 + 1) (1 + 1 + 1) rfl) := isIso_δ_of_isZero hQ 1
-    (isZero_cohomology_quotientToInvariants_discreteCoind (k := k) A N 1)
-    (isZero_cohomology_quotientToInvariants_discreteCoind (k := k) A N (1 + 1))
-  have hδX : IsIso (δ hX (1 + 1) (1 + 1 + 1) rfl) := isIso_δ_of_isZero hX 1
-    (isZero_cohomology_discreteCoind k G A 1) (isZero_cohomology_discreteCoind k G A (1 + 1))
-  have hδS : IsIso (δ hS (0 + 1) (0 + 1 + 1) rfl) := isIso_δ_of_isZero hS 0
-    (isZero_cohomology_res_discreteCoind (k := k) A N hN 0)
-    (isZero_cohomology_res_discreteCoind (k := k) A N hN (0 + 1))
+  have hδQ : IsIso (δ hQ (1 + 1) (1 + 1 + 1) rfl) :=
+    isIso_δ_of_isZero hQ 1 (isZero_cohomology_quotientToInvariants_discreteCoind (k := k) A N 1)
+      (isZero_cohomology_quotientToInvariants_discreteCoind (k := k) A N (1 + 1))
+  have hδX : IsIso (δ hX (1 + 1) (1 + 1 + 1) rfl) :=
+    isIso_δ_of_isZero hX 1 (isZero_cohomology_discreteCoind k G A 1)
+      (isZero_cohomology_discreteCoind k G A (1 + 1))
+  have hδS : IsIso (δ hS (0 + 1) (0 + 1 + 1) rfl) :=
+    isIso_δ_of_isZero hS 0 (isZero_cohomology_res_discreteCoind (k := k) A N hN 0)
+      (isZero_cohomology_res_discreteCoind (k := k) A N hN (0 + 1))
   have injQ : Function.Injective (δ hQ (1 + 1) (1 + 1 + 1) rfl).hom :=
     (ModuleCat.mono_iff_injective _).1 inferInstance
   have injX : Function.Injective (δ hX (1 + 1) (1 + 1 + 1) rfl).hom :=
@@ -53,8 +61,9 @@ theorem eq_zero_of_cohomologyInfl_three_eq_zero (A : Rep.{u} k G) [IsDiscreteRep
   obtain ⟨x', rfl⟩ := surjQ x
   have hsq := δ_comp_cohomologyInfl N hX hQ (1 + 1) (1 + 1 + 1) rfl
   have hx' : (cohomologyInfl (coindCokernel A) N (1 + 1)).hom x' = 0 := by
-    have e : (δ hX (1 + 1) (1 + 1 + 1) rfl).hom ((cohomologyInfl (coindCokernel A) N (1 + 1)).hom x') =
-        (cohomologyInfl A N 3).hom ((δ hQ (1 + 1) (1 + 1 + 1) rfl).hom x') :=
+    have e
+        : (δ hX (1 + 1) (1 + 1 + 1) rfl).hom ((cohomologyInfl (coindCokernel A) N (1 + 1)).hom x')
+          = (cohomologyInfl A N 3).hom ((δ hQ (1 + 1) (1 + 1 + 1) rfl).hom x') :=
       (congrArg (fun φ => ModuleCat.Hom.hom φ x') hsq).symm
     exact injX (e.trans (hx.trans (map_zero _).symm))
   have hmem : x' ∈ LinearMap.ker (cohomologyInfl (coindCokernel A) N 2).hom := hx'
@@ -65,8 +74,7 @@ theorem eq_zero_of_cohomologyInfl_three_eq_zero (A : Rep.{u} k G) [IsDiscreteRep
     apply Subtype.ext
     apply injS
     exact (map_nsmul (δ hS (0 + 1) (0 + 1 + 1) rfl).hom m w.1).trans (hmw.trans (map_zero _).symm)
-  have h1' : m • transgression (coindCokernel A) N hN w = 0 := by
-    rw [← map_nsmul, hw, map_zero]
+  have h1' : m • transgression (coindCokernel A) N hN w = 0 := by rw [← map_nsmul, hw, map_zero]
   have h2' : ℓ ^ j • transgression (coindCokernel A) N hN w = 0 := by
     apply injQ
     exact (map_nsmul _ (ℓ ^ j) _).trans (hj.trans (map_zero _).symm)
@@ -75,14 +83,17 @@ theorem eq_zero_of_cohomologyInfl_three_eq_zero (A : Rep.{u} k G) [IsDiscreteRep
 
 section Extension
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
   (A : Rep.{u} k G) [IsDiscreteRep A]
 
-
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
-theorem inv_mul_contractNth_mem {n : ℕ} (V : Subgroup G) [V.Normal] (g g' : Fin (n + 1) → G)
-    (h : ∀ i, (g i)⁻¹ * g' i ∈ V) (j : Fin (n + 1)) (i : Fin n) :
-    (Fin.contractNth j (· * ·) g i)⁻¹ * Fin.contractNth j (· * ·) g' i ∈ V := by
+theorem inv_mul_contractNth_mem
+    {n : ℕ}
+    (V : Subgroup G) [V.Normal]
+    (g g' : Fin (n + 1) → G) (h : ∀ i, (g i)⁻¹ * g' i ∈ V)
+    (j : Fin (n + 1)) (i : Fin n)
+    : (Fin.contractNth j (· * ·) g i)⁻¹ * Fin.contractNth j (· * ·) g' i ∈ V := by
   rcases lt_trichotomy (i : ℕ) j with hij | hij | hij
   · rw [Fin.contractNth_apply_of_lt _ _ _ _ hij, Fin.contractNth_apply_of_lt _ _ _ _ hij]
     exact h _
@@ -99,8 +110,9 @@ theorem inv_mul_contractNth_mem {n : ℕ} (V : Subgroup G) [V.Normal] (g g' : Fi
     exact h _
 
 omit [TopologicalSpace G] [IsTopologicalGroup G] in
-theorem coe_contractNth {N : Subgroup G} {n : ℕ} (j : Fin (n + 1)) (g : Fin (n + 1) → N) (i : Fin n) :
-    ((Fin.contractNth j (· * ·) g i : N) : G) = Fin.contractNth j (· * ·) (fun k => (g k : G)) i := by
+theorem coe_contractNth {N : Subgroup G} {n : ℕ} (j : Fin (n + 1)) (g : Fin (n + 1) → N) (i : Fin n)
+    : ((Fin.contractNth j (· * ·) g i : N) : G)
+      = Fin.contractNth j (· * ·) (fun k => (g k : G)) i := by
   rcases lt_trichotomy (i : ℕ) j with h | h | h
   · rw [Fin.contractNth_apply_of_lt _ _ _ _ h, Fin.contractNth_apply_of_lt _ _ _ _ h]
   · rw [Fin.contractNth_apply_of_eq _ _ _ _ h, Fin.contractNth_apply_of_eq _ _ _ _ h]
@@ -111,13 +123,16 @@ end Extension
 
 section ExtensionLemma
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [CompactSpace G] [TotallyDisconnectedSpace G] (A : Rep.{u} k G) [IsDiscreteRep A]
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  [TotallyDisconnectedSpace G]
+  (A : Rep.{u} k G) [IsDiscreteRep A]
 
-theorem exists_isOpen_cohomologyResLE_eq (N : Subgroup G) (hN : IsClosed (N : Set G)) (n : ℕ)
-    (y : cohomology (Rep.res N.subtype A) n) :
-    ∃ (H : Subgroup G) (_ : IsOpen (H : Set G)) (hNH : N ≤ H)
-      (y' : cohomology (Rep.res H.subtype A) n), (cohomologyResLE A hNH n).hom y' = y := by
+theorem exists_isOpen_cohomologyResLE_eq
+    (N : Subgroup G) (hN : IsClosed (N : Set G)) (n : ℕ) (y : cohomology (Rep.res N.subtype A) n)
+    : ∃ (H : Subgroup G) (_ : IsOpen (H : Set G)) (hNH : N ≤ H)
+        (y' : cohomology (Rep.res H.subtype A) n),
+      (cohomologyResLE A hNH n).hom y' = y := by
   classical
   have : CompactSpace N := isCompact_iff_compactSpace.mp hN.isCompact
   obtain ⟨z, rfl⟩ := cohomologyπ_surjective _ n y
@@ -145,15 +160,17 @@ theorem exists_isOpen_cohomologyResLE_eq (N : Subgroup G) (hN : IsClosed (N : Se
     exact ⟨⟨m, hm⟩, by rw [← hmv]; simpa using hv⟩
   choose sel hsel using hsel
 
-  have hP : ∀ (x : Fin n → N) (x' : Fin n → N),
-      (∀ i, ((x i : G))⁻¹ * x' i ∈ (V : Subgroup G)) → c x = c x' := by
+  have hP
+      : ∀ (x : Fin n → N) (x' : Fin n → N),
+        (∀ i, ((x i : G))⁻¹ * x' i ∈ (V : Subgroup G)) → c x = c x' := by
     intro x x' hxx'
     apply hU
     intro i
     exact (hOU' _).1 (hVO _ (by simpa using hxx' i))
   set c' : (Fin n → H) → A := fun h => c (fun i => sel (h i)) with hc'_def
-  have hP' : ∀ (x : Fin n → N) (h : Fin n → H),
-      (∀ i, ((x i : G))⁻¹ * (h i : G) ∈ (V : Subgroup G)) → c' h = c x := by
+  have hP'
+      : ∀ (x : Fin n → N) (h : Fin n → H),
+        (∀ i, ((x i : G))⁻¹ * (h i : G) ∈ (V : Subgroup G)) → c' h = c x := by
     intro x h hxh
     refine (hP x (fun i => sel (h i)) fun i => ?_).symm
     have := mul_mem (hxh i) (inv_mem (hsel (h i)))
@@ -162,35 +179,47 @@ theorem exists_isOpen_cohomologyResLE_eq (N : Subgroup G) (hN : IsClosed (N : Se
   have hc' : IsLocallyConstant c' := by
     rw [IsLocallyConstant.iff_exists_open]
     intro h
-    refine ⟨⋂ i, (fun h' : Fin n → H => ((h i : G))⁻¹ * (h' i : G)) ⁻¹' (V : Set G),
-      isOpen_iInter_of_finite fun i => V.isOpen'.preimage
-        (continuous_const.mul (continuous_subtype_val.comp (continuous_apply i))),
-      Set.mem_iInter.2 fun i => by simp, fun h' hh' => ?_⟩
-    have hh'' : ∀ i, ((h i : G))⁻¹ * (h' i : G) ∈ (V : Subgroup G) := fun i => Set.mem_iInter.1 hh' i
+    refine ⟨
+      ⋂ i, (fun h' : Fin n → H => ((h i : G))⁻¹ * (h' i : G)) ⁻¹' (V : Set G),
+      isOpen_iInter_of_finite fun i =>
+        V.isOpen'.preimage (continuous_const.mul (continuous_subtype_val.comp (continuous_apply
+          i))),
+      Set.mem_iInter.2 fun i => by simp,
+      fun h' hh' => ?_
+    ⟩
+    have hh'' : ∀ i, ((h i : G))⁻¹ * (h' i : G) ∈ (V : Subgroup G) := fun i =>
+      Set.mem_iInter.1 hh' i
     refine (hP' (fun i => sel (h i)) h' fun i => ?_).trans rfl
     have := mul_mem (hsel (h i)) (hh'' i)
     convert this using 1
     group
-  have t0 : ∀ h : Fin (n + 1) → H, (Rep.res H.subtype A).ρ (h 0) (c' fun i => h i.succ) =
-      (Rep.res N.subtype A).ρ (sel (h 0)) (c fun i => sel (h i.succ)) := by
+  have t0
+      : ∀ h : Fin (n + 1) → H,
+        (Rep.res H.subtype A).ρ (h 0) (c' fun i => h i.succ)
+          = (Rep.res N.subtype A).ρ (sel (h 0)) (c fun i => sel (h i.succ)) := by
     intro h
     have hv := hsel (h 0)
-    change A.ρ (h 0 : G) (c fun i => sel (h i.succ)) = A.ρ (sel (h 0) : G) (c fun i => sel (h i.succ))
-    calc A.ρ (h 0 : G) (c fun i => sel (h i.succ))
-        = A.ρ ((sel (h 0) : G) * ((sel (h 0) : G)⁻¹ * h 0)) (c fun i => sel (h i.succ)) := by
-          rw [mul_inv_cancel_left]
+    change A.ρ (h 0 : G) (c fun i => sel (h i.succ))
+      = A.ρ (sel (h 0) : G) (c fun i => sel (h i.succ))
+    calc
+      A.ρ (h 0 : G) (c fun i => sel (h i.succ))
+          = A.ρ ((sel (h 0) : G) * ((sel (h 0) : G)⁻¹ * h 0)) (c fun i => sel (h i.succ)) := by
+        rw [mul_inv_cancel_left]
       _ = A.ρ (sel (h 0) : G) (A.ρ ((sel (h 0) : G)⁻¹ * h 0) (c fun i => sel (h i.succ))) := by
-          rw [map_mul]
-          rfl
-      _ = A.ρ (sel (h 0) : G) (c fun i => sel (h i.succ)) := by
-          rw [hVfix _ hv _ ⟨_, rfl⟩]
-  have tj : ∀ (h : Fin (n + 1) → H) (j : Fin (n + 1)),
-      c' (Fin.contractNth j (· * ·) h) = c (Fin.contractNth j (· * ·) fun i => sel (h i)) := by
+        rw [map_mul]
+        rfl
+      _ = A.ρ (sel (h 0) : G) (c fun i => sel (h i.succ)) := by rw [hVfix _ hv _ ⟨_, rfl⟩]
+  have tj
+      : ∀ (h : Fin (n + 1) → H) (j : Fin (n + 1)),
+        c' (Fin.contractNth j (· * ·) h) = c (Fin.contractNth j (· * ·) fun i => sel (h i)) := by
     intro h j
     refine hP' _ _ fun i => ?_
     rw [coe_contractNth, coe_contractNth]
-    exact inv_mul_contractNth_mem (V : Subgroup G) (fun k => (sel (h k) : G)) (fun k => (h k : G))
-      (fun k => hsel (h k)) j i
+    exact inv_mul_contractNth_mem (V : Subgroup G)
+      (fun k => (sel (h k) : G))
+      (fun k => (h k : G))
+      (fun k => hsel (h k))
+      j i
   have hdc : (inhomogeneousCochains.d (Rep.res H.subtype A) n).hom c' = 0 := by
     have hz := d_cocycleι z
     funext h
@@ -203,7 +232,8 @@ theorem exists_isOpen_cohomologyResLE_eq (N : Subgroup G) (hN : IsClosed (N : Se
       apply cochainOf_injective (A := Rep.res H.subtype A)
       exact (cochainOf_d _).trans hdc)
   have hz' : cochainOf _ (cocycleι (A := Rep.res H.subtype A) (p := n) z') = c' :=
-    congrArg (cochainOf (Rep.res H.subtype A)) ((cochainsComplex (Rep.res H.subtype A)).i_cyclesMk _ _ _ _)
+    congrArg (cochainOf (Rep.res H.subtype A))
+      ((cochainsComplex (Rep.res H.subtype A)).i_cyclesMk _ _ _ _)
   refine ⟨H, hHo, le_sup_left, cohomologyπ _ n z', ?_⟩
   rw [cohomologyResLE_eq, cohomologyMapAlong_cohomologyπ]
   congr 1

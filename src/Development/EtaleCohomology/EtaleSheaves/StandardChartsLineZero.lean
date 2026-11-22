@@ -14,7 +14,8 @@ variable {A K : Type} [CommRing A] [IsLocalRing A] [Field K] [Algebra A K]
 
 def mS (S : Subalgebra A K) : Submodule A K := IsLocalRing.maximalIdeal A • Subalgebra.toSubmodule S
 
-def AdjoinInv (B : Subalgebra A K) (t : K) : Subalgebra A K := Algebra.adjoin A ((B : Set K) ∪ {t⁻¹})
+def AdjoinInv (B : Subalgebra A K) (t : K) : Subalgebra A K :=
+  Algebra.adjoin A ((B : Set K) ∪ {t⁻¹})
 
 structure Charts (B C : Subalgebra A K) (t : K) : Prop where
   ne : t ≠ 0
@@ -27,20 +28,27 @@ structure Charts (B C : Subalgebra A K) (t : K) : Prop where
 def IdemPair (B C : Subalgebra A K) (t e f : K) : Prop :=
   e ∈ B ∧ f ∈ C ∧ e * e - e ∈ mS B ∧ f * f - f ∈ mS C ∧ e - f ∈ mS (AdjoinInv B t)
 
-def StdCharts : Prop := ∀ (A : Type) [CommRing A] [IsLocalRing A] {Z : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)),
-  IL p → AICSch Z →
-  ∃ (K : Type) (_ : Field K) (_ : Algebra A K) (B C : Subalgebra A K) (t : K), Charts B C t ∧
-    (∀ x ∈ B, x ∈ C → IsIntegral A x) ∧
-    ∀ W : Set ↑(pullback p (cpt A)), IsClopen W → ∃ e f : K, IdemPair B C t e f ∧
-      ((e ∈ mS B ∧ f ∈ mS C) → W = ∅) ∧ ((e - 1 ∈ mS B ∧ f - 1 ∈ mS C) → W = Set.univ)
+def StdCharts : Prop :=
+  ∀ (A : Type) [CommRing A] [IsLocalRing A] {Z : Scheme.{0}} (p : Z ⟶ Spec (CommRingCat.of A)),
+    IL p → AICSch Z
+      → ∃ (K : Type) (_ : Field K) (_ : Algebra A K) (B C : Subalgebra A K) (t : K),
+        Charts B C t ∧ (∀ x ∈ B, x ∈ C → IsIntegral A x)
+          ∧ ∀ W : Set ↑(pullback p (cpt A)),
+            IsClopen W
+              → ∃ e f : K,
+                IdemPair B C t e f ∧ ((e ∈ mS B ∧ f ∈ mS C) → W = ∅)
+                  ∧ ((e - 1 ∈ mS B ∧ f - 1 ∈ mS C) → W = Set.univ)
 
-def IdemLift : Prop := ∀ (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A] (K : Type) [Field K] [Algebra A K]
-  (B C : Subalgebra A K) (t : K), Charts B C t → ∀ e f : K, IdemPair B C t e f →
-  ∃ g ∈ B, g ∈ C ∧ g - e ∈ mS B ∧ g - f ∈ mS C
+def IdemLift : Prop :=
+  ∀ (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A] (K : Type) [Field K]
+      [Algebra A K] (B C : Subalgebra A K) (t : K),
+    Charts B C t → ∀ e f : K, IdemPair B C t e f → ∃ g ∈ B, g ∈ C ∧ g - e ∈ mS B ∧ g - f ∈ mS C
 
-def AlgGlue : Prop := ∀ (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A] (K : Type) [Field K] [Algebra A K]
-  (B C : Subalgebra A K) (t : K), Charts B C t → (∀ x ∈ B, x ∈ C → IsIntegral A x) → ∀ e f : K, IdemPair B C t e f →
-  (e ∈ mS B ∧ f ∈ mS C) ∨ (e - 1 ∈ mS B ∧ f - 1 ∈ mS C)
+def AlgGlue : Prop :=
+  ∀ (A : Type) [CommRing A] [IsLocalRing A] [HenselianLocalRing A] (K : Type) [Field K]
+      [Algebra A K] (B C : Subalgebra A K) (t : K),
+    Charts B C t → (∀ x ∈ B, x ∈ C → IsIntegral A x)
+      → ∀ e f : K, IdemPair B C t e f → (e ∈ mS B ∧ f ∈ mS C) ∨ (e - 1 ∈ mS B ∧ f - 1 ∈ mS C)
 
 theorem goal_of (hS : StdCharts) (hG : AlgGlue) : LateralTheory.E.t_E2Cut.LineZero := by
   intro A _ _ hSH Z p hIL hZ

@@ -9,7 +9,8 @@ public import Formalism.MirabolicMackeyTheory.StatementT
 
 noncomputable section
 
-open NumberField IsDedekindDomain TensorProduct Formalism.UG Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain TensorProduct Formalism.UG Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 
 namespace Formalism.L2.DIV
 
@@ -26,8 +27,9 @@ def kills {G : Type} (A : Type) [Group G] [CommGroup A] (H : Subgroup G) : Subgr
     rw [MonoidHom.mem_ker] at h1 ⊢
     rw [MonoidHom.inv_apply, h1, inv_one]
 
-theorem mem_kills {G A : Type} [Group G] [CommGroup A] {H : Subgroup G} {ξ : G →* A} :
-    ξ ∈ kills A H ↔ H ≤ ξ.ker := Iff.rfl
+theorem mem_kills {G A : Type} [Group G] [CommGroup A] {H : Subgroup G} {ξ : G →* A}
+    : ξ ∈ kills A H ↔ H ≤ ξ.ker :=
+  Iff.rfl
 
 section Ideles
 
@@ -37,10 +39,13 @@ abbrev AfE : Type := E ⊗[F] FiniteAdeleRing (𝓞 F) F
 
 abbrev RInt : Subring (AfE F E) := tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)
 
-def ratId : Eˣ →* (AfE F E)ˣ := Units.map (inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)).toMonoidHom
+def ratId : Eˣ →* (AfE F E)ˣ :=
+  Units.map (inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)).toMonoidHom
 
 def idF : (FiniteAdeleRing (𝓞 F) F)ˣ →* (AfE F E)ˣ :=
-  Units.map (Algebra.TensorProduct.includeRight : FiniteAdeleRing (𝓞 F) F →ₐ[F] AfE F E).toRingHom.toMonoidHom
+  Units.map
+    (Algebra.TensorProduct.includeRight
+      : FiniteAdeleRing (𝓞 F) F →ₐ[F] AfE F E).toRingHom.toMonoidHom
 
 def intU : Subgroup (AfE F E)ˣ := (RInt F E).toSubmonoid.units
 
@@ -60,9 +65,8 @@ def wildAt (v : HeightOneSpectrum (𝓞 F)) : Subgroup (AfE F E)ˣ :=
   congU F E (Ideal.span {((plc v : ℕ) : RInt F E)}).radical ⊓ suppAt E v
 
 def SplitAt (v : HeightOneSpectrum (𝓞 F)) : Prop :=
-  ∃ P P' : HeightOneSpectrum (𝓞 E), P ≠ P' ∧
-    Ideal.map (algebraMap (𝓞 F) (𝓞 E)) v.asIdeal = P.asIdeal * P'.asIdeal
-
+  ∃ P P' : HeightOneSpectrum (𝓞 E),
+    P ≠ P' ∧ Ideal.map (algebraMap (𝓞 F) (𝓞 E)) v.asIdeal = P.asIdeal * P'.asIdeal
 
 variable {E} in
 def DegOne (v : HeightOneSpectrum (𝓞 F)) : Prop :=
@@ -72,8 +76,8 @@ def GoodPl (S : Set ℕ) (v : HeightOneSpectrum (𝓞 F)) : Prop := SplitAt E v 
 
 end Ideles
 
-theorem mem_kerRed {R : Type} [CommRing R] (I : Ideal R) (u : Rˣ) :
-    u ∈ (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker ↔ (u : R) - 1 ∈ I := by
+theorem mem_kerRed {R : Type} [CommRing R] (I : Ideal R) (u : Rˣ)
+    : u ∈ (Units.map (Ideal.Quotient.mk I).toMonoidHom).ker ↔ (u : R) - 1 ∈ I := by
   rw [MonoidHom.mem_ker, Units.ext_iff, ← Ideal.Quotient.eq]
   simp
 
@@ -101,9 +105,12 @@ def openChr : Subgroup (Chr F E L) where
   one_mem' := ⟨1, Nat.one_pos, fun x _ => by simp⟩
   mul_mem' := by
     rintro a b ⟨M, hM, ha⟩ ⟨N, hN, hb⟩
-    exact ⟨M * N, Nat.mul_pos hM hN,
+    exact ⟨
+      M * N,
+      Nat.mul_pos hM hN,
       (kills Lˣ (congN F E (M * N))).mul_mem ((congN_dvd F E (Dvd.intro _ rfl)).trans ha)
-        ((congN_dvd F E (Dvd.intro_left _ rfl)).trans hb)⟩
+        ((congN_dvd F E (Dvd.intro_left _ rfl)).trans hb)
+    ⟩
   inv_mem' := by
     rintro a ⟨M, hM, ha⟩
     exact ⟨M, hM, (kills Lˣ (congN F E M)).inv_mem ha⟩
@@ -112,8 +119,8 @@ def finChar : Subgroup (Chr F E L) :=
   kills Lˣ (ratId F E).range ⊓ openChr F E L ⊓ CommGroup.torsion (Chr F E L)
 
 def tupGrp (S : Set ℕ) : Subgroup (Chr F E L) :=
-  finChar F E L ⊓ kills Lˣ (idF F E).range ⊓ (⨅ v : HeightOneSpectrum (𝓞 F), kills Lˣ (wildAt E v)) ⊓
-    ⨅ (v : HeightOneSpectrum (𝓞 F)) (_ : ¬ GoodPl E S v), kills Lˣ (inertAt E v)
+  finChar F E L ⊓ kills Lˣ (idF F E).range ⊓ (⨅ v : HeightOneSpectrum (𝓞 F), kills Lˣ (wildAt E v))
+    ⊓ ⨅ (v : HeightOneSpectrum (𝓞 F)) (_ : ¬ GoodPl E S v), kills Lˣ (inertAt E v)
 
 def hostS (q d g₁ g₂ : ℕ) (T : Set ℕ) : Set ℕ := {2, q, d, g₁, g₂} ∪ T
 
@@ -125,7 +132,9 @@ end Chars
 
 section Ram
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {L : Type} [Field L]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {L : Type} [Field L]
 
 def Qprime (ξ : Chr F E L) : Set (HeightOneSpectrum (𝓞 F)) := {v | ¬ inertAt E v ≤ ξ.ker}
 
@@ -137,22 +146,23 @@ def InertOrd (ξ : Chr F E L) (v : HeightOneSpectrum (𝓞 F)) (n : ℕ) : Prop 
 def TrivAt (ξ : Chr F E L) (v : HeightOneSpectrum (𝓞 F)) : Prop := suppAt E v ≤ ξ.ker
 
 def IsBaseChar (p : ℕ) (δ : Chr F E L) : Prop :=
-  p.Prime ∧ ∀ v : HeightOneSpectrum (𝓞 F), (plc v = p → InertOrd δ v 15) ∧ (plc v ≠ p → v ∉ Qprime δ)
-
+  p.Prime
+    ∧ ∀ v : HeightOneSpectrum (𝓞 F), (plc v = p → InertOrd δ v 15) ∧ (plc v ≠ p → v ∉ Qprime δ)
 
 variable (F E) in
 def toRInt : 𝓞 E →+* RInt F E :=
-  ((inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)).comp (algebraMap (𝓞 E) E)).codRestrict (RInt F E)
-    fun b => Subring.subset_closure (Or.inl ⟨⟨algebraMap (𝓞 E) E b, b, rfl⟩, rfl⟩)
+  ((inclE (F := F) (E := E) (FiniteAdeleRing (𝓞 F) F)).comp (algebraMap (𝓞 E) E)).codRestrict
+    (RInt F E) fun b => Subring.subset_closure (Or.inl ⟨⟨algebraMap (𝓞 E) E b, b, rfl⟩, rfl⟩)
 
 def IsResChar (ξ : Chr F E L) (P : HeightOneSpectrum (𝓞 E)) (χ : (𝓞 E ⧸ P.asIdeal)ˣ →* Lˣ) : Prop :=
-  ∀ v : HeightOneSpectrum (𝓞 F), P.asIdeal.under (𝓞 F) = v.asIdeal →
-  ∀ (u : (RInt F E)ˣ) (a : (𝓞 E ⧸ P.asIdeal)ˣ) (b : 𝓞 E), Ideal.Quotient.mk P.asIdeal b = a →
-    Units.map (RInt F E).subtype.toMonoidHom u ∈ suppAt E v →
-    (u : RInt F E) - toRInt F E b ∈ P.asIdeal.map (toRInt F E) →
-    (∀ P' : HeightOneSpectrum (𝓞 E), P' ≠ P → (u : RInt F E) - 1 ∈ P'.asIdeal.map (toRInt F E)) →
-    ξ (Units.map (RInt F E).subtype.toMonoidHom u) = χ a
-
+  ∀ v : HeightOneSpectrum (𝓞 F),
+    P.asIdeal.under (𝓞 F) = v.asIdeal
+      → ∀ (u : (RInt F E)ˣ) (a : (𝓞 E ⧸ P.asIdeal)ˣ) (b : 𝓞 E),
+        Ideal.Quotient.mk P.asIdeal b = a → Units.map (RInt F E).subtype.toMonoidHom u ∈ suppAt E v
+          → (u : RInt F E) - toRInt F E b ∈ P.asIdeal.map (toRInt F E)
+          → (∀ P' : HeightOneSpectrum (𝓞 E),
+            P' ≠ P → (u : RInt F E) - 1 ∈ P'.asIdeal.map (toRInt F E))
+          → ξ (Units.map (RInt F E).subtype.toMonoidHom u) = χ a
 
 open scoped Classical in
 open Classical in
@@ -163,7 +173,9 @@ end Ram
 
 section Tilde
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {L : Type} [Field L]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {L : Type} [Field L]
 
 def conjId (σ : E →ₐ[F] E) : (AfE F E)ˣ →* (AfE F E)ˣ :=
   Units.map (sigR σ (FiniteAdeleRing (𝓞 F) F)).toMonoidHom
@@ -172,15 +184,14 @@ def h90 (σ : E →ₐ[F] E) : (AfE F E)ˣ →* (AfE F E)ˣ := MonoidHom.id _ / 
 
 def U1 (σ : E →ₐ[F] E) : Subgroup (AfE F E)ˣ := (MonoidHom.id _ * conjId σ).ker
 
-
 open scoped Classical in
 open Classical in
 def tilde (σ : E →ₐ[F] E) (ξ : Chr F E L) : (h90 σ).range →* Lˣ :=
   if h : (h90 σ).ker ≤ ξ.ker then
     (h90 σ).rangeRestrict.liftOfSurjective (h90 σ).rangeRestrict_surjective
       ⟨ξ, by rw [MonoidHom.ker_rangeRestrict]; exact h⟩
-  else 1
-
+  else
+    1
 
 open scoped Classical in
 open Classical in
@@ -191,29 +202,39 @@ end Tilde
 
 section Maps
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  {K : Type} [Field K] [NumberField K] [StarRing K] {S : Set ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {K : Type} [Field K] [NumberField K] [StarRing K]
+  {S : Set ℕ}
 
 def deAt (p : ℕ) (δ0 δ0' : Tup F E K S) (w : HeightOneSpectrum (𝓞 K)) : Tup F E K S :=
   if plc w = p then δ0' else δ0
 
-def muTw (p : ℕ) (δ0 δ0' : Tup F E K S) (ψ : HeightOneSpectrum (𝓞 K) → Tup F E K S)
-    (w : HeightOneSpectrum (𝓞 K)) : Tup F E K S := deAt p δ0 δ0' w * ψ w
+def muTw
+    (p : ℕ) (δ0 δ0' : Tup F E K S) (ψ : HeightOneSpectrum (𝓞 K) → Tup F E K S)
+    (w : HeightOneSpectrum (𝓞 K))
+    : Tup F E K S :=
+  deAt p δ0 δ0' w * ψ w
 
 end Maps
 
 section Ref
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {L : Type} [Field L]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {L : Type} [Field L]
 
-structure IsMu0 (σ : E →ₐ[F] E) (Ψ : Finset (E →+* L)) (e : (E →+* L) → ℤ) (G : Set ℕ) (μ : Chr F E L) : Prop where
+structure IsMu0
+    (σ : E →ₐ[F] E) (Ψ : Finset (E →+* L)) (e : (E →+* L) → ℤ) (G : Set ℕ) (μ : Chr F E L)
+    : Prop where
   isOpen : μ ∈ openChr F E L
   rat : ∀ a : Eˣ, ((μ (ratId F E a) : Lˣ) : L) = ∏ τ ∈ Ψ, (τ (a : E) / τ (σ (a : E))) ^ e τ
   trivF : (idF F E).range ≤ μ.ker
   tame : ∀ v : HeightOneSpectrum (𝓞 F), wildAt E v ≤ μ.ker
   ram : ∀ v : HeightOneSpectrum (𝓞 F), v ∈ Qprime μ ↔ plc v ∈ G
 
-def chiOf (μ : Chr F E L) (P : HeightOneSpectrum (𝓞 E)) : (𝓞 E ⧸ P.asIdeal)ˣ →* Lˣ := (resChar μ P)⁻¹
+def chiOf (μ : Chr F E L) (P : HeightOneSpectrum (𝓞 E)) : (𝓞 E ⧸ P.asIdeal)ˣ →* Lˣ :=
+  (resChar μ P)⁻¹
 
 end Ref
 

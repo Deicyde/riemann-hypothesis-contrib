@@ -6,8 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.EqZeroOfMemMaximalPow
 
-theorem eq_zero_of_mem_pow_maximal {R : Type} [CommRing R] [IsNoetherianRing R] (y : R)
-    (h : ∀ i : MaximalSpectrum R × ℕ, y ∈ i.1.asIdeal ^ (i.2 + 1)) : y = 0 := by
+theorem eq_zero_of_mem_pow_maximal
+    {R : Type} [CommRing R] [IsNoetherianRing R]
+    (y : R) (h : ∀ i : MaximalSpectrum R × ℕ, y ∈ i.1.asIdeal ^ (i.2 + 1))
+    : y = 0 := by
   by_contra hy
   have hJ : LinearMap.ker (LinearMap.toSpanSingleton R R y) ≠ ⊤ := by
     intro htop

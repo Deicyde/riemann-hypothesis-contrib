@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open NumberField Matrix IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.Aut UpperTheory.V.UnitaryThreeInertia
+open NumberField Matrix IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.Aut
+  UpperTheory.V.UnitaryThreeInertia
 
-private theorem prim4 {L : Type} [Field L] [CharZero L] {i : L} (hi : i * i = -1) : IsPrimitiveRoot i (2 ^ 2) := by
+private theorem prim4 {L : Type} [Field L] [CharZero L] {i : L} (hi : i * i = -1)
+    : IsPrimitiveRoot i (2 ^ 2) := by
   have hne : (1 : L) ≠ -1 := by
     intro h
     have h2 : (2 : L) = 0 := by linear_combination h
@@ -25,8 +28,9 @@ private theorem prim4 {L : Type} [Field L] [CharZero L] {i : L} (hi : i * i = -1
   · intro h3
     exact hne (by linear_combination (1 - i ^ 2 + i) * hi + (i - 1) * h3)
 
-private theorem adj_top {K : Type} [Field K] [NumberField K] (h : Module.finrank ℚ K = 2) {i : K} (hi : i * i = -1) :
-    Algebra.adjoin ℚ {i} = ⊤ := by
+private theorem adj_top
+    {K : Type} [Field K] [NumberField K] (h : Module.finrank ℚ K = 2) {i : K} (hi : i * i = -1)
+    : Algebra.adjoin ℚ {i} = ⊤ := by
   have hnb : i ∉ (⊥ : Subalgebra ℚ K) := by
     rw [Algebra.mem_bot]
     rintro ⟨q, hq⟩
@@ -42,19 +46,24 @@ private theorem adj_top {K : Type} [Field K] [NumberField K] (h : Module.finrank
   have hle : Module.finrank ℚ (Subalgebra.toSubmodule (Algebra.adjoin ℚ {i})) ≤ 2 :=
     h ▸ Submodule.finrank_le _
   have hpos : 0 < Module.finrank ℚ (Algebra.adjoin ℚ {i}) := Module.finrank_pos
-  have hne1 : Module.finrank ℚ (Algebra.adjoin ℚ {i}) ≠ 1 :=
-    fun h1 => hS (Subalgebra.finrank_eq_one_iff.mp h1)
-  have h2 : Module.finrank ℚ (Subalgebra.toSubmodule (Algebra.adjoin ℚ {i})) = Module.finrank ℚ K := by
-    have : Module.finrank ℚ (Subalgebra.toSubmodule (Algebra.adjoin ℚ {i})) =
-        Module.finrank ℚ (Algebra.adjoin ℚ {i}) := rfl
+  have hne1 : Module.finrank ℚ (Algebra.adjoin ℚ {i}) ≠ 1 := fun h1 =>
+    hS (Subalgebra.finrank_eq_one_iff.mp h1)
+  have h2
+      : Module.finrank ℚ (Subalgebra.toSubmodule (Algebra.adjoin ℚ {i})) = Module.finrank ℚ K := by
+    have : Module.finrank ℚ (Subalgebra.toSubmodule (Algebra.adjoin ℚ {i}))
+        = Module.finrank ℚ (Algebra.adjoin ℚ {i}) :=
+      rfl
     omega
   apply Subalgebra.toSubmodule_injective
   rw [Algebra.top_toSubmodule]
   exact Submodule.eq_top_of_finrank_eq h2
 
 open UpperTheory.V UpperTheory.V.Base in
-private theorem fix_iff (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (ζ : Ω) (hζ : IsPrimitiveRoot ζ 4)
-    (σ : G ℚ Ω) : σ ζ = ζ ↔ eta4 Ω σ = 1 := by
+private theorem fix_iff
+    (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (ζ : Ω) (hζ : IsPrimitiveRoot ζ 4)
+    (σ : G ℚ Ω)
+    : σ ζ = ζ ↔ eta4 Ω σ = 1 := by
   have hspec := UpperTheory.V.Chr.cls_spec (k := ℚ) 4 σ ζ hζ.pow_eq_one
   have key : ∀ u : (ZMod 4)ˣ, u = 1 ∨ u = -1 := by decide
   have heta : eta4 Ω σ = MulChar.toUnitHom ZMod.χ₄ (UpperTheory.V.Chr.cls ℚ Ω 4 σ) := rfl
@@ -81,9 +90,11 @@ private theorem fix_iff (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
       exact hζ.pow_ne_one_of_pos_of_lt (by norm_num) (by norm_num) hsq
     exact iff_of_false hz hm
 
-theorem UpperTheory.V.UnitaryThreeInertia.gaussian_field_range_eq_ker_quartic_char :
-    (∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K), IsQi K) ∧ ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω] [IsScalarTower ℚ K Ω], IsQi K →
-      (Base.galEmb ℚ K Ω).range = (eta4 Ω).ker ∧ discr K = -4 := by
+theorem UpperTheory.V.UnitaryThreeInertia.gaussian_field_range_eq_ker_quartic_char
+    : (∃ (K : Type) (_ : Field K) (_ : NumberField K) (_ : IsCMField K), IsQi K)
+      ∧ ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+          [Algebra K Ω] [IsScalarTower ℚ K Ω],
+        IsQi K → (Base.galEmb ℚ K Ω).range = (eta4 Ω).ker ∧ discr K = -4 := by
   have sq_of_prim : ∀ {L : Type} [Field L] {z : L}, IsPrimitiveRoot z 4 → z * z = -1 := by
     intro L _ z hz
     have h4 : z ^ 4 = 1 := hz.pow_eq_one
@@ -94,8 +105,13 @@ theorem UpperTheory.V.UnitaryThreeInertia.gaussian_field_range_eq_ker_quartic_ch
     · linear_combination h
   refine ⟨⟨CyclotomicField 4 ℚ, inferInstance, inferInstance, ?_, ?_⟩, ?_⟩
   · exact IsCyclotomicExtension.Rat.isCMField (CyclotomicField 4 ℚ) (S := {4}) ⟨4, rfl, by norm_num⟩
-  · refine ⟨?_, ⟨IsCyclotomicExtension.zeta 4 ℚ (CyclotomicField 4 ℚ),
-      sq_of_prim (IsCyclotomicExtension.zeta_spec 4 ℚ (CyclotomicField 4 ℚ))⟩⟩
+  · refine ⟨
+      ?_,
+      ⟨
+        IsCyclotomicExtension.zeta 4 ℚ (CyclotomicField 4 ℚ),
+        sq_of_prim (IsCyclotomicExtension.zeta_spec 4 ℚ (CyclotomicField 4 ℚ))
+      ⟩
+    ⟩
     rw [IsCyclotomicExtension.Rat.finrank 4 (CyclotomicField 4 ℚ)]
     decide
   · intro Ω _ _ _ K _ _ _ _ hK
@@ -112,7 +128,8 @@ theorem UpperTheory.V.UnitaryThreeInertia.gaussian_field_range_eq_ker_quartic_ch
       · intro h
         exact h i
       · intro h x
-        have hφ : (σ.toAlgHom).comp (IsScalarTower.toAlgHom ℚ K Ω) = IsScalarTower.toAlgHom ℚ K Ω := by
+        have hφ
+            : (σ.toAlgHom).comp (IsScalarTower.toAlgHom ℚ K Ω) = IsScalarTower.toAlgHom ℚ K Ω := by
           apply AlgHom.ext_of_adjoin_eq_top hadj
           intro y hy
           rw [Set.mem_singleton_iff] at hy

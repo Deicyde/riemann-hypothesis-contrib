@@ -9,13 +9,16 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.RadialRaising
 
 @[expose] public section
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory GlobalTheory.HatNF
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
+  GlobalTheory.HatNF
 
 namespace GlobalTheory.HatNF.BoundedFactors
 
-theorem star_prod_ofFn {A : Type} [Ring A] [StarRing A] {r : ℕ} (f g : Fin r → A)
-    (h : ∀ l, star (f l) = g l) (hc : ∀ l m, Commute (g l) (g m)) :
-    star (List.ofFn f).prod = (List.ofFn g).prod := by
+theorem star_prod_ofFn
+    {A : Type} [Ring A] [StarRing A]
+    {r : ℕ} (f g : Fin r → A) (h : ∀ l, star (f l) = g l) (hc : ∀ l m, Commute (g l) (g m))
+    : star (List.ofFn f).prod = (List.ofFn g).prod := by
   induction r with
   | zero => simp
   | succ n ih =>
@@ -26,11 +29,14 @@ theorem star_prod_ofFn {A : Type} [Ring A] [StarRing A] {r : ℕ} (f g : Fin r �
     obtain ⟨i, rfl⟩ := (List.mem_ofFn' _ _).1 hx
     exact hc _ _
 
-theorem star_phase {A : Type} [Ring A] [StarRing A] [Algebra ℂ A] {r : ℕ} (L : LevelData A r)
-    (hc : ∀ l, star (L.c l) = L.cb l) (hi : ∀ l, star (L.ci l) = L.cbi l) :
-    star (L.Drb * L.Dri) = L.Dr * L.Drbi := by
+theorem star_phase
+    {A : Type} [Ring A] [StarRing A] [Algebra ℂ A]
+    {r : ℕ}
+    (L : LevelData A r) (hc : ∀ l, star (L.c l) = L.cb l) (hi : ∀ l, star (L.ci l) = L.cbi l)
+    : star (L.Drb * L.Dri) = L.Dr * L.Drbi := by
   have h1 : star L.Drb = L.Dr :=
-    star_prod_ofFn _ _ (fun l => by rw [← hc l, star_star])
+    star_prod_ofFn _ _
+      (fun l => by rw [← hc l, star_star])
       (fun l m => L.fns_comm _ (by simp) _ (by simp))
   have h2 : star L.Dri = L.Drbi :=
     star_prod_ofFn _ _ hi (fun l m => L.fns_comm _ (by simp) _ (by simp))
@@ -45,7 +51,8 @@ theorem star_phase {A : Type} [Ring A] [StarRing A] [Algebra ℂ A] {r : ℕ} (L
 
 section
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
   {P : M.Par} {Bs : B.RealPlaceData P.k P.r Wp Wq}
 
@@ -59,7 +66,8 @@ theorem hsInner_norm_le (A C : Wq →L[ℂ] Wp) : ‖B.hsInner A C‖ ≤ ‖B.h
   rw [mul_comm]
   exact norm_inner_le_norm _ _
 
-theorem ptB_of_star_mul_self (b : RA P Bs) (ha : PtAdj P Bs b) (hb : PtB P Bs (star b * b)) : PtB P Bs b := by
+theorem ptB_of_star_mul_self (b : RA P Bs) (ha : PtAdj P Bs b) (hb : PtB P Bs (star b * b))
+    : PtB P Bs b := by
   obtain ⟨C, hC, h⟩ := hb
   refine ⟨Real.sqrt C, Real.sqrt_nonneg _, fun Φ x hx => ?_⟩
   have h1 := ha Φ (b.1 Φ) x hx
@@ -93,12 +101,22 @@ theorem ptB_star (b : RA P Bs) (ha : PtAdj P Bs b) (hb : PtB P Bs b) : PtB P Bs 
 
 end
 
-theorem ptB_of_mem_bmon : ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : M.Par) (Bs : B.RealPlaceData P.k P.r Wp Wq) (X : Q.ActualOps P.k P.r Bs.z Bs.z' Bs.π Bs.π') (μ : Measure (Mt P.k P.r)) (L : LevelData (RA P Bs) P.r) (st : Start (RA P Bs)) (l0 : ℕ) (d : Q.NFData P (RA P Bs)), P5.IsData P Bs.z Bs.z' Bs.π Bs.π' X μ L st l0 → IsNF X d → ∀ b ∈ bmon d, PtB P Bs b := by
+theorem ptB_of_mem_bmon
+    : ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+        [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : M.Par)
+        (Bs : B.RealPlaceData P.k P.r Wp Wq) (X : Q.ActualOps P.k P.r Bs.z Bs.z' Bs.π Bs.π')
+        (μ : Measure (Mt P.k P.r)) (L : LevelData (RA P Bs) P.r) (st : Start (RA P Bs)) (l0 : ℕ)
+        (d : Q.NFData P (RA P Bs)),
+      P5.IsData P Bs.z Bs.z' Bs.π Bs.π' X μ L st l0 → IsNF X d → ∀ b ∈ bmon d, PtB P Bs b := by
   intro Wp Wq _ _ _ _ _ _ P Bs X μ L st l0 d hD hN
-  obtain ⟨⟨-, -, hRel, -, hc, hi, -⟩, -⟩ := GlobalTheory.T.normalForm_actualOperators_algebraicHypotheses Wp Wq P Bs X μ L st l0 d hD hN
-  have hκ := GlobalTheory.T.radialPairConstants_pointwiseAdjoint_bounded Wp Wq P Bs X μ L st l0 d hD hN
-  obtain ⟨⟨h1, hmul⟩, hζi, hζbi, hD1, hD2, hD3, hD4, -⟩ := GlobalTheory.T.pointwise_bounded_radial_ops_closure_and_functions Wp Wq P Bs X μ L st l0 d hD hN
-  have hS := GlobalTheory.T.radialRaisingOperators_pointwiseAdjointPair Wp Wq P Bs X μ L st l0 d hD hN
+  obtain ⟨⟨-, -, hRel, -, hc, hi, -⟩, -⟩ :=
+    GlobalTheory.T.normalForm_actualOperators_algebraicHypotheses Wp Wq P Bs X μ L st l0 d hD hN
+  have hκ :=
+    GlobalTheory.T.radialPairConstants_pointwiseAdjoint_bounded Wp Wq P Bs X μ L st l0 d hD hN
+  obtain ⟨⟨h1, hmul⟩, hζi, hζbi, hD1, hD2, hD3, hD4, -⟩ :=
+    GlobalTheory.T.pointwise_bounded_radial_ops_closure_and_functions Wp Wq P Bs X μ L st l0 d hD hN
+  have hS :=
+    GlobalTheory.T.radialRaisingOperators_pointwiseAdjointPair Wp Wq P Bs X μ L st l0 d hD hN
   have hSb : ∀ l ∈ Finset.Icc 1 (P.k - 1), PtB P Bs (d.SS l) := fun l hl =>
     ptB_of_star_mul_self _ (hS l hl) (by rw [hRel.2.2.2.2.2 l hl]; exact (hκ _).2)
   have hSs : ∀ l ∈ Finset.Icc 1 (P.k - 1), PtB P Bs (star (d.SS l)) := fun l hl =>

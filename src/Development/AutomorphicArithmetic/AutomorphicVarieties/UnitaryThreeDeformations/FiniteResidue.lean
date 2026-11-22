@@ -11,12 +11,20 @@ open IsLocalRing UpperTheory.V.HV
 
 namespace UpperTheory.V.UnitaryThreeInertia
 
-def Frame.shaLen {O : Type} [CommRing O] [IsLocalRing O] {G Γ : Type} [Group G] [Group Γ] {ι : Type}
-    (F : Frame O G Γ ι) [TopologicalSpace Γ] (a : O) : ℕ∞ := Module.length O (F.ShaO a)
+def Frame.shaLen
+    {O : Type} [CommRing O] [IsLocalRing O]
+    {G Γ : Type} [Group G] [Group Γ]
+    {ι : Type} (F : Frame O G Γ ι)
+    [TopologicalSpace Γ]
+    (a : O)
+    : ℕ∞ :=
+  Module.length O (F.ShaO a)
 
-instance Coef.isLocalRing {l : ℕ} [Fact l.Prime] (c : Coef l) : IsLocalRing c.O := c.dvr.toIsLocalRing
+instance Coef.isLocalRing {l : ℕ} [Fact l.Prime] (c : Coef l) : IsLocalRing c.O :=
+  c.dvr.toIsLocalRing
 
-instance Coef.complete {l : ℕ} [Fact l.Prime] (c : Coef l) : IsAdicComplete (maximalIdeal c.O) c.O :=
+instance Coef.complete {l : ℕ} [Fact l.Prime] (c : Coef l)
+    : IsAdicComplete (maximalIdeal c.O) c.O :=
   (UpperTheory.V.Base.dvrFacts l c.O).2.2.2.1
 
 instance Coef.finite_residue {l : ℕ} [Fact l.Prime] (c : Coef l) : Finite (ResidueField c.O) := by

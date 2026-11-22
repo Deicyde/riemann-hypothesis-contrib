@@ -92,9 +92,21 @@ lemma sumPoly_monic {A : Type} [CommRing A] (c : ℕ → A) (n : ℕ) (h : c n =
     exact (natDegree_C_mul_X_pow_le _ _).trans (Nat.lt_succ_iff.mp (Finset.mem_range.mp hk))
   · rw [sumPoly_coeff]; simp [h]
 
-theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (D R S : ℂ → Module.End ℂ V) (Wn I : Submodule ℂ V) (W₀ : Set V) (c₁ c₂ : ℂ) (n₁ n₂ : ℕ) (a b : ℕ → Module.End ℂ V), (∀ u v, Commute (R u) (R v)) → (∀ u v, Commute (R u) (S v)) → (∀ u v, Commute (S u) (S v)) → (∀ u, ∀ F ∈ Wn, D u F ∈ Wn) → (∀ u, ∀ F ∈ I, R u F ∈ I) → (∀ u, ∀ F ∈ I, S u F ∈ I) → (∀ u, ∀ F ∈ Wn, D u F - S (u + c₂) (R (u + c₁) F) ∈ I) → a n₁ = 1 → (∀ k, a k ∈ Submodule.span ℂ (Set.range R)) → (∀ u : ℂ, R u = ∑ k ∈ Finset.range (n₁ + 1), u ^ k • a k) → b n₂ = 1 → (∀ k, b k ∈ Submodule.span ℂ (Set.range S)) → (∀ u : ℂ, S u = ∑ k ∈ Finset.range (n₂ + 1), u ^ k • b k) → W₀ ⊆ Wn → (∀ u, ∃ p : Polynomial ℂ, p.Monic ∧ ∀ F ∈ W₀, Polynomial.aeval (D u) p F = 0) → (∀ u, ∃ q : Polynomial ℂ, q.Monic ∧ ∀ F ∈ W₀, Polynomial.aeval (R u) q F ∈ I) ∧ ∀ u, ∃ q : Polynomial ℂ, q.Monic ∧ ∀ F ∈ W₀, Polynomial.aeval (S u) q F ∈ I := by
-  intro V _ _ D R S Wn I W₀ c₁ c₂ n₁ n₂ a b hRR hRS hSS hD hRI hSI hDβ ha1 haspan hRform hb1
-    hbspan hSform hW0 hp
+theorem monic_relations_to_blocks
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (D R S : ℂ → Module.End ℂ V) (Wn I : Submodule ℂ V)
+        (W₀ : Set V) (c₁ c₂ : ℂ) (n₁ n₂ : ℕ) (a b : ℕ → Module.End ℂ V),
+      (∀ u v, Commute (R u) (R v)) → (∀ u v, Commute (R u) (S v)) → (∀ u v, Commute (S u) (S v))
+        → (∀ u, ∀ F ∈ Wn, D u F ∈ Wn) → (∀ u, ∀ F ∈ I, R u F ∈ I) → (∀ u, ∀ F ∈ I, S u F ∈ I)
+        → (∀ u, ∀ F ∈ Wn, D u F - S (u + c₂) (R (u + c₁) F) ∈ I) → a n₁ = 1
+        → (∀ k, a k ∈ Submodule.span ℂ (Set.range R))
+        → (∀ u : ℂ, R u = ∑ k ∈ Finset.range (n₁ + 1), u ^ k • a k) → b n₂ = 1
+        → (∀ k, b k ∈ Submodule.span ℂ (Set.range S))
+        → (∀ u : ℂ, S u = ∑ k ∈ Finset.range (n₂ + 1), u ^ k • b k) → W₀ ⊆ Wn
+        → (∀ u, ∃ p : Polynomial ℂ, p.Monic ∧ ∀ F ∈ W₀, Polynomial.aeval (D u) p F = 0)
+        → (∀ u, ∃ q : Polynomial ℂ, q.Monic ∧ ∀ F ∈ W₀, Polynomial.aeval (R u) q F ∈ I)
+          ∧ ∀ u, ∃ q : Polynomial ℂ, q.Monic ∧ ∀ F ∈ W₀, Polynomial.aeval (S u) q F ∈ I := by
+  intro V _ _ D R S Wn I W₀ c₁ c₂ n₁ n₂ a b hRR hRS hSS hD hRI hSI hDβ ha1 haspan hRform hb1 hbspan
+    hSform hW0 hp
   let s : Set (Module.End ℂ V) := Set.range R ∪ Set.range S
   have hcomm : s.Pairwise Commute := by
     rintro x (⟨u, rfl⟩ | ⟨u, rfl⟩) y (⟨v, rfl⟩ | ⟨v, rfl⟩) _
@@ -109,15 +121,15 @@ theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ 
     rintro x (⟨u, rfl⟩ | ⟨u, rfl⟩)
     · exact hRI u
     · exact hSI u
-  let Y : Ideal (Algebra.adjoin ℂ s) :=
-    { carrier := {x | ∀ F ∈ W₀, (x : Module.End ℂ V) F ∈ I}
-      add_mem' := fun {x y} hx hy F hF => by
-        simpa using I.add_mem (hx F hF) (hy F hF)
-      zero_mem' := fun F _ => by simp
-      smul_mem' := fun c x hx F hF => by
-        show ((c * x : Algebra.adjoin ℂ s) : Module.End ℂ V) F ∈ I
-        rw [Subalgebra.coe_mul, Module.End.mul_apply]
-        exact hpres c.2 _ (hx F hF) }
+  let Y : Ideal (Algebra.adjoin ℂ s) := {
+    carrier := {x | ∀ F ∈ W₀, (x : Module.End ℂ V) F ∈ I}
+    add_mem' := fun {x y} hx hy F hF => by simpa using I.add_mem (hx F hF) (hy F hF)
+    zero_mem' := fun F _ => by simp
+    smul_mem' := fun c x hx F hF => by
+      show ((c * x : Algebra.adjoin ℂ s) : Module.End ℂ V) F ∈ I
+      rw [Subalgebra.coe_mul, Module.End.mul_apply]
+      exact hpres c.2 _ (hx F hF)
+  }
   let π := Ideal.Quotient.mkₐ ℂ Y
   have hRmem : ∀ u, R u ∈ Algebra.adjoin ℂ s := fun u => Algebra.subset_adjoin (Or.inl ⟨u, rfl⟩)
   have hSmem : ∀ u, S u ∈ Algebra.adjoin ℂ s := fun u => Algebra.subset_adjoin (Or.inr ⟨u, rfl⟩)
@@ -129,14 +141,16 @@ theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ 
       (by rintro x ⟨u, rfl⟩; exact hSmem u) (hbspan k)
   let P : (Algebra.adjoin ℂ s ⧸ Y)[X] := sumPoly (fun k => π ⟨a k, hamem k⟩) n₁
   let Q : (Algebra.adjoin ℂ s ⧸ Y)[X] := sumPoly (fun k => π ⟨b k, hbmem k⟩) n₂
-  have hPm : P.Monic := sumPoly_monic _ _ (by
-    have : (⟨a n₁, hamem n₁⟩ : Algebra.adjoin ℂ s) = 1 := Subtype.ext ha1
-    change π ⟨a n₁, hamem n₁⟩ = 1
-    rw [this, map_one])
-  have hQm : Q.Monic := sumPoly_monic _ _ (by
-    have : (⟨b n₂, hbmem n₂⟩ : Algebra.adjoin ℂ s) = 1 := Subtype.ext hb1
-    change π ⟨b n₂, hbmem n₂⟩ = 1
-    rw [this, map_one])
+  have hPm : P.Monic :=
+    sumPoly_monic _ _ (by
+      have : (⟨a n₁, hamem n₁⟩ : Algebra.adjoin ℂ s) = 1 := Subtype.ext ha1
+      change π ⟨a n₁, hamem n₁⟩ = 1
+      rw [this, map_one])
+  have hQm : Q.Monic :=
+    sumPoly_monic _ _ (by
+      have : (⟨b n₂, hbmem n₂⟩ : Algebra.adjoin ℂ s) = 1 := Subtype.ext hb1
+      change π ⟨b n₂, hbmem n₂⟩ = 1
+      rw [this, map_one])
   have hPev : ∀ t : ℂ, P.eval (algebraMap ℂ _ t) = π ⟨R t, hRmem t⟩ := by
     intro t
     have : (⟨R t, hRmem t⟩ : Algebra.adjoin ℂ s)
@@ -155,8 +169,9 @@ theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ 
       rw [this, map_sum, sumPoly_eval]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_smul, Algebra.smul_def, map_pow, mul_comm]
-  have hβ : ∀ u : ℂ, IsIntegral ℂ (P.eval (algebraMap ℂ _ (u + c₁)) *
-      Q.eval (algebraMap ℂ _ (u + c₂))) := by
+  have hβ
+      : ∀ u : ℂ,
+        IsIntegral ℂ (P.eval (algebraMap ℂ _ (u + c₁)) * Q.eval (algebraMap ℂ _ (u + c₂))) := by
     intro u
     rw [hPev, hQev, ← map_mul]
     obtain ⟨p, hpm, hp0⟩ := hp u
@@ -165,12 +180,15 @@ theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ 
       Ideal.Quotient.eq_zero_iff_mem]
     intro F hF
     rw [Polynomial.aeval_subalgebra_coe]
-    have key := aeval_sub_aeval_mem (R (u + c₁) * S (u + c₂)) (D u) Wn I
-      (hpres (mul_mem (hRmem _) (hSmem _))) (hD u)
-      (fun F hF => by rw [(hRS _ _).eq]; exact hDβ u F hF) p F (hW0 hF)
+    have key :=
+      aeval_sub_aeval_mem (R (u + c₁) * S (u + c₂)) (D u) Wn I (hpres (mul_mem (hRmem _) (hSmem _)))
+        (hD u)
+        (fun F hF => by rw [(hRS _ _).eq]; exact hDβ u F hF)
+        p F (hW0 hF)
     rw [hp0 F hF, sub_zero] at key
     exact key
-  have hcoef := GlobalTheory.T.monic_factor_coefficients_integral (Algebra.adjoin ℂ s ⧸ Y) P Q c₁ c₂ hPm hQm hβ
+  have hcoef :=
+    GlobalTheory.T.monic_factor_coefficients_integral (Algebra.adjoin ℂ s ⧸ Y) P Q c₁ c₂ hPm hQm hβ
   refine ⟨fun u => ?_, fun u => ?_⟩
   · have hint : IsIntegral ℂ (π ⟨R u, hRmem u⟩) := by
       rw [← hPev]
@@ -178,7 +196,8 @@ theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ 
     obtain ⟨q, hqm, hq0⟩ := hint
     refine ⟨q, hqm, fun F hF => ?_⟩
     rw [← Polynomial.aeval_def, Polynomial.aeval_algHom_apply, Ideal.Quotient.mkₐ_eq_mk,
-      Ideal.Quotient.eq_zero_iff_mem] at hq0
+        Ideal.Quotient.eq_zero_iff_mem]
+      at hq0
     have := hq0 F hF
     rwa [Polynomial.aeval_subalgebra_coe] at this
   · have hint : IsIntegral ℂ (π ⟨S u, hSmem u⟩) := by
@@ -187,7 +206,8 @@ theorem monic_relations_to_blocks : ∀ (V : Type) [AddCommGroup V] [Module ℂ 
     obtain ⟨q, hqm, hq0⟩ := hint
     refine ⟨q, hqm, fun F hF => ?_⟩
     rw [← Polynomial.aeval_def, Polynomial.aeval_algHom_apply, Ideal.Quotient.mkₐ_eq_mk,
-      Ideal.Quotient.eq_zero_iff_mem] at hq0
+        Ideal.Quotient.eq_zero_iff_mem]
+      at hq0
     have := hq0 F hF
     rwa [Polynomial.aeval_subalgebra_coe] at this
 

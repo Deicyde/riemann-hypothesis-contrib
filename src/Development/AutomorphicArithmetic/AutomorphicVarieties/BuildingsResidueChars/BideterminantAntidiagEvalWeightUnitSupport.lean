@@ -6,45 +6,75 @@ public import Formalism.GradedWeylDivisibility.FinalD
 
 open MvPolynomial Formalism.GradedWeylDivisibility
 
-theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support :
-    ∀ (R : Type) [CommRing R] (n K : ℕ) (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n) (I : ∀ k, Fin (sz k) → Fin n), (∀ x : Matrix (Fin n) (Fin n) R, (∀ i j, j < i → x i j = 0) → eval (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0) (rowAct R x.transpose (bideterminant R sz hsz I)) = (∏ i, x i i ^ shapeDeg sz (Fin.rev i)) * eval (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0) (bideterminant R sz hsz I)) ∧ ((∀ k p, (I k p : ℕ) + sz k = n + p) → IsUnit (eval (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0) (bideterminant R sz hsz I))) ∧ ((∀ k, StrictMono (I k)) → eval (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0) (bideterminant R sz hsz I) ≠ 0 → ∀ k p, (I k p : ℕ) + sz k = n + p) := by
+theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support
+    : ∀ (R : Type) [CommRing R] (n K : ℕ) (sz : Fin K → ℕ) (hsz : ∀ k, sz k ≤ n)
+        (I : ∀ k, Fin (sz k) → Fin n),
+      (∀ x : Matrix (Fin n) (Fin n) R,
+          (∀ i j, j < i → x i j = 0)
+            → eval
+                (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
+                (rowAct R x.transpose (bideterminant R sz hsz I))
+              = (∏ i, x i i ^ shapeDeg sz (Fin.rev i)) * eval
+                (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
+                (bideterminant R sz hsz I))
+        ∧ ((∀ k p, (I k p : ℕ) + sz k = n + p)
+          → IsUnit (eval
+            (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
+            (bideterminant R sz hsz I)))
+        ∧ ((∀ k, StrictMono (I k))
+          → eval
+              (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
+              (bideterminant R sz hsz I)
+            ≠ 0
+          → ∀ k p, (I k p : ℕ) + sz k = n + p) := by
   intro R _ n K sz hsz I
-  have hrev : ∀ {s : ℕ} (hs : s ≤ n) (a : Fin n) (r : Fin s),
-      a = Fin.rev (Fin.castLE hs r) ↔ (a : ℕ) + r + 1 = n := by
+  have hrev
+      : ∀ {s : ℕ} (hs : s ≤ n) (a : Fin n) (r : Fin s),
+        a = Fin.rev (Fin.castLE hs r) ↔ (a : ℕ) + r + 1 = n := by
     intro s hs a r
     rw [Fin.ext_iff, Fin.val_rev, Fin.coe_castLE]
     have := a.isLt
     have := r.isLt
     omega
-  have key : ∀ φ : MvPolynomial (Fin n × Fin n) R →+* R, φ (bideterminant R sz hsz I) =
-      ∏ k, (Matrix.of fun p q : Fin (sz k) => φ (X (I k p, Fin.castLE (hsz k) q))).det := by
+  have key
+      : ∀ φ : MvPolynomial (Fin n × Fin n) R →+* R,
+        φ (bideterminant R sz hsz I)
+          = ∏ k, (Matrix.of fun p q : Fin (sz k) => φ (X (I k p, Fin.castLE (hsz k) q))).det := by
     intro φ
     simp only [bideterminant, initMinor, map_prod, RingHom.map_det]
     rfl
-  have hE : eval (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0) (bideterminant R sz hsz I)
-      = ∏ k, (Matrix.of fun p q : Fin (sz k) => if (I k p : ℕ) + q + 1 = n then (1 : R) else 0).det := by
-    rw [key]
-    congr 1
-    ext k
-    congr 1
-    ext p q
-    simp [hrev]
-  refine ⟨?_, ?_, ?_⟩
-  · intro x hx
-    have hR : eval (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
-        (rowAct R x.transpose (bideterminant R sz hsz I)) =
-        ∏ k, (Matrix.of fun p q : Fin (sz k) => x (Fin.rev (Fin.castLE (hsz k) q)) (I k p)).det := by
-      refine (key ((eval fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0).comp
-        (rowAct R x.transpose).toRingHom)).trans ?_
+  have hE
+      : eval
+          (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
+          (bideterminant R sz hsz I)
+        = ∏ k, (Matrix.of fun p q : Fin (sz k) => if (I k p : ℕ) + q + 1 = n then (1 : R) else 0).det :=
+    by
+      rw [key]
       congr 1
       ext k
       congr 1
       ext p q
-      simp [rowAct, Matrix.transpose_apply, mul_ite, Finset.sum_ite_eq']
-    have hk : ∀ (s : ℕ) (hs : s ≤ n) (J : Fin s → Fin n),
-        (Matrix.of fun p q : Fin s => x (Fin.rev (Fin.castLE hs q)) (J p)).det =
-        (Matrix.of fun p q : Fin s => if (J p : ℕ) + q + 1 = n then (1 : R) else 0).det *
-          ∏ q : Fin s, x (Fin.rev (Fin.castLE hs q)) (Fin.rev (Fin.castLE hs q)) := by
+      simp [hrev]
+  refine ⟨?_, ?_, ?_⟩
+  · intro x hx
+    have hR
+        : eval
+            (fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0)
+            (rowAct R x.transpose (bideterminant R sz hsz I))
+          = ∏ k, (Matrix.of fun p q : Fin (sz k) => x (Fin.rev (Fin.castLE (hsz k) q)) (I k p)).det :=
+      by
+        refine (key ((eval fun v : Fin n × Fin n => if v.1 = Fin.rev v.2 then (1 : R) else 0).comp
+          (rowAct R x.transpose).toRingHom)).trans ?_
+        congr 1
+        ext k
+        congr 1
+        ext p q
+        simp [rowAct, Matrix.transpose_apply, mul_ite, Finset.sum_ite_eq']
+    have hk
+        : ∀ (s : ℕ) (hs : s ≤ n) (J : Fin s → Fin n),
+          (Matrix.of fun p q : Fin s => x (Fin.rev (Fin.castLE hs q)) (J p)).det
+            = (Matrix.of fun p q : Fin s => if (J p : ℕ) + q + 1 = n then (1 : R) else 0).det
+              * ∏ q : Fin s, x (Fin.rev (Fin.castLE hs q)) (Fin.rev (Fin.castLE hs q)) := by
       intro s hs J
       have hU : (Matrix.of fun r q : Fin s =>
           x (Fin.rev (Fin.castLE hs q)) (Fin.rev (Fin.castLE hs r))).IsUpperTriangular := by
@@ -88,8 +118,10 @@ theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support :
           omega
         · intro h'
           exact absurd (Finset.mem_univ _) h'
-    have hreg : ∀ k, ∏ q : Fin (sz k), x (Fin.rev (Fin.castLE (hsz k) q)) (Fin.rev (Fin.castLE (hsz k) q))
-        = ∏ i : Fin n, if ((Fin.rev i : Fin n) : ℕ) < sz k then x i i else 1 := by
+    have hreg
+        : ∀ k,
+          ∏ q : Fin (sz k), x (Fin.rev (Fin.castLE (hsz k) q)) (Fin.rev (Fin.castLE (hsz k) q))
+            = ∏ i : Fin n, if ((Fin.rev i : Fin n) : ℕ) < sz k then x i i else 1 := by
       intro k
       rw [← Finset.prod_filter]
       refine Finset.prod_bij (fun q _ => Fin.rev (Fin.castLE (hsz k) q)) ?_ ?_ ?_ ?_
@@ -109,8 +141,8 @@ theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support :
         omega
       · intro q _
         rfl
-    rw [hR, hE, Finset.prod_congr rfl (fun k _ => hk (sz k) (hsz k) (I k)),
-      Finset.prod_mul_distrib, mul_comm]
+    rw [hR, hE, Finset.prod_congr rfl (fun k _ => hk (sz k) (hsz k) (I k)), Finset.prod_mul_distrib,
+      mul_comm]
     congr 1
     rw [Finset.prod_congr rfl (fun k _ => hreg k), Finset.prod_comm]
     refine Finset.prod_congr rfl (fun i _ => ?_)
@@ -120,14 +152,16 @@ theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support :
     rw [hE]
     refine Finset.prod_induction _ IsUnit (fun a b ha hb => ha.mul hb) isUnit_one ?_
     intro k _
-    have hP : (Matrix.of fun p q : Fin (sz k) => if (I k p : ℕ) + q + 1 = n then (1 : R) else 0)
-        = (Fin.revPerm).permMatrix R := by
+    have hP
+        : (Matrix.of fun p q : Fin (sz k) => if (I k p : ℕ) + q + 1 = n then (1 : R) else 0)
+          = (Fin.revPerm).permMatrix R := by
       ext p q
       have h1 := hI k p
       have h2 := p.isLt
       have h3 := q.isLt
       have h4 := hsz k
-      have hiff : ((I k p : ℕ) + q + 1 = n) ↔ q ∈ (Fin.revPerm : Equiv.Perm (Fin (sz k))).toPEquiv p := by
+      have hiff
+          : ((I k p : ℕ) + q + 1 = n) ↔ q ∈ (Fin.revPerm : Equiv.Perm (Fin (sz k))).toPEquiv p := by
         simp only [Equiv.toPEquiv_apply, Option.mem_def, Option.some.injEq, Fin.revPerm_apply,
           Fin.ext_iff, Fin.val_rev]
         constructor <;> intro <;> omega
@@ -137,9 +171,10 @@ theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support :
     exact (Units.isUnit _).map (Int.castRingHom R)
   · intro hmono hne k p
     rw [hE] at hne
-    have hdet : (Matrix.of fun p q : Fin (sz k) =>
-        if (I k p : ℕ) + q + 1 = n then (1 : R) else 0).det ≠ 0 :=
-      fun h0 => hne (Finset.prod_eq_zero (Finset.mem_univ k) h0)
+    have hdet
+        : (Matrix.of fun p q : Fin (sz k) => if (I k p : ℕ) + q + 1 = n then (1 : R) else 0).det
+          ≠ 0 := fun h0 =>
+      hne (Finset.prod_eq_zero (Finset.mem_univ k) h0)
     have hlow : ∀ p : Fin (sz k), n ≤ (I k p : ℕ) + sz k := by
       intro p
       by_contra hlt
@@ -165,7 +200,8 @@ theorem UpperTheory.bideterminant_antidiag_eval_weight_unit_support :
           have := b.isLt
           omega
         have h1 := ih a ⟨a + d, hb'⟩ rfl
-        have h2 : I k ⟨a + d, hb'⟩ < I k b := hmono k (by rw [Fin.lt_iff_val_lt_val]; simp only; omega)
+        have h2 : I k ⟨a + d, hb'⟩ < I k b :=
+          hmono k (by rw [Fin.lt_iff_val_lt_val]; simp only; omega)
         rw [Fin.lt_iff_val_lt_val] at h2
         omega
     have hs : 0 < sz k := by

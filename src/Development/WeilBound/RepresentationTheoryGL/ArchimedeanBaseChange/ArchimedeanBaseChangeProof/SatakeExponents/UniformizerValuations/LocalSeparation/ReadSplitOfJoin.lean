@@ -33,12 +33,14 @@ theorem weightJoin_holds : WeightJoin := GlobalTheory.CompanionTheory.WeightJoin
 
 theorem muLoc_holds' : MuLoc := GlobalTheory.CompanionTheory.MuLocal.muLoc_holds
 
-theorem treeMod_of (h : JoinMod) : TreeMod := treeModOf_holds leafMod_holds GlobalTheory.CompanionTheory.NodeSep.nodeMod h
+theorem treeMod_of (h : JoinMod) : TreeMod :=
+  treeModOf_holds leafMod_holds GlobalTheory.CompanionTheory.NodeSep.nodeMod h
 
 theorem readMod_of (h : JoinMod) : ReadMod := readModOf_holds (treeMod_of h)
 
 theorem readSplit_of_join (h : JoinMod) : ReadSplit :=
-  readSplit_of (treeSatOf_holds (treeMod_of h)) pairSat_holds thetaSat2_holds GlobalTheory.CompanionTheory.CtS.ctSat muLoc_holds' joinSat_holds
+  readSplit_of (treeSatOf_holds (treeMod_of h)) pairSat_holds thetaSat2_holds
+    GlobalTheory.CompanionTheory.CtS.ctSat muLoc_holds' joinSat_holds
     GlobalTheory.CompanionTheory.SatSplitAt.satSplit GlobalTheory.CompanionTheory.ConjSat.satConj
 
 end PositivityTheory.Rg.BcB.F.RS

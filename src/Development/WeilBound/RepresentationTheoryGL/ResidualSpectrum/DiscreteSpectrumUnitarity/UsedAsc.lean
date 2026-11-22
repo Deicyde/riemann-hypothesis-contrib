@@ -40,11 +40,18 @@ namespace PositivityTheory.Rg.Rs
 
 namespace Re.Asc
 
-theorem hasSpehComp (h3 : Clause3Asc) (hF : GlobalTheory.Published.AutomorphicFormsFiniteGL)
-    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {N a d : ℕ} (hN : 1 ≤ N)
-    {V : Submodule ℂ (Sm E N)} (hV : IsDiscrete V) {π : CuspSub E a} (hn : IsNormalised π) (e : AscEmb V π d) :
-    HasSpehComp V π d := by
-  refine ⟨fun w => ?_, h3 E N a d V π hN hV (GlobalTheory.SpehPair.isUnitary_of_isNormalised hn) hn e, fun τ => ?_⟩
+theorem hasSpehComp
+    (h3 : Clause3Asc) (hF : GlobalTheory.Published.AutomorphicFormsFiniteGL)
+    {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E]
+    {N a d : ℕ} (hN : 1 ≤ N)
+    {V : Submodule ℂ (Sm E N)} (hV : IsDiscrete V)
+    {π : CuspSub E a} (hn : IsNormalised π) (e : AscEmb V π d)
+    : HasSpehComp V π d := by
+  refine ⟨
+    fun w => ?_,
+    h3 E N a d V π hN hV (GlobalTheory.SpehPair.isUnitary_of_isNormalised hn) hn e,
+    fun τ => ?_
+  ⟩
   · obtain ⟨σ, hσ, -⟩ := LocEx.exists_isLocComp hF E a π w
     obtain ⟨σ', hσ'⟩ := GlobalTheory.DiscLocEx.exists_isLocCompGL hF E N V hV w
     exact ⟨σ, σ', hσ, hσ'⟩

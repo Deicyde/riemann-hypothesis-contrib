@@ -24,26 +24,33 @@ instance rr_muG_right {n : ℕ} (ε : Fin n → Bool) : (Formalism.REAL.muG ε).
 instance rr_muG_haar {n : ℕ} (ε : Fin n → Bool) : (Formalism.REAL.muG ε).IsHaarMeasure := by
   unfold Formalism.REAL.muG; infer_instance
 
-theorem rr_rep_eq_rep (I : AutInst) (fund : Set I.GA) (y : I.GA) : I.rep fund y = rr_rep I.GFset fund y := rfl
+theorem rr_rep_eq_rep (I : AutInst) (fund : Set I.GA) (y : I.GA)
+    : I.rep fund y = rr_rep I.GFset fund y :=
+  rfl
 
-theorem rr_muA_left (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsMulLeftInvariant] :
-    (I.muA μf).IsMulLeftInvariant :=
+theorem rr_muA_left (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsMulLeftInvariant]
+    : (I.muA μf).IsMulLeftInvariant :=
   Measure.prod.instIsMulLeftInvariant
 
-theorem rr_muA_right (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsMulRightInvariant] :
-    (I.muA μf).IsMulRightInvariant :=
+theorem rr_muA_right (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsMulRightInvariant]
+    : (I.muA μf).IsMulRightInvariant :=
   Measure.prod.instIsMulRightInvariant
 
-theorem rr_muA_sigmaFinite (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] : SigmaFinite (I.muA μf) := by
+theorem rr_muA_sigmaFinite (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf]
+    : SigmaFinite (I.muA μf) := by
   unfold AutInst.muA; infer_instance
 
-theorem rr_FD_of (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (h : I.IsFundDom (I.muA μf) fund) : rr_FD (I.muA μf) (rr_GF I) fund :=
+theorem rr_FD_of
+    (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA) (h : I.IsFundDom (I.muA μf) fund)
+    : rr_FD (I.muA μf) (rr_GF I) fund :=
   ⟨h.1, h.2.1, h.2.2⟩
 
-theorem rr_IsReg_of (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
-    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (h : I.IsRightReg μf fund R) :
-    rr_IsReg (I.muA μf) (rr_GF I) fund R := h
+theorem rr_IsReg_of
+    (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf]
+    (fund : Set I.GA) (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (h : I.IsRightReg μf fund R)
+    : rr_IsReg (I.muA μf) (rr_GF I) fund R :=
+  h
 
 def RepAlg (X : CData) : Prop :=
   (∀ g h, X.R (g * h) = X.R g ∘L X.R h) ∧ X.R 1 = 1 ∧ ∀ g (F : X.L2), ‖X.R g F‖ = ‖F‖
@@ -51,7 +58,8 @@ def RepAlg (X : CData) : Prop :=
 def RegData (X : CData) : Prop :=
   X.μf.IsHaarMeasure ∧ X.I.IsFundDom (X.I.muA X.μf) X.fund ∧ X.I.IsRightReg X.μf X.fund X.R
 
-theorem rightRegular_isometric_multiplicative (X : CData) (hd : RegData X) (hu : UnimodA X) : RepAlg X := by
+theorem rightRegular_isometric_multiplicative (X : CData) (hd : RegData X) (hu : UnimodA X)
+    : RepAlg X := by
   obtain ⟨hH, hF, hR⟩ := hd
   have := hH
   have : (X.I.muA X.μf).IsMulLeftInvariant := rr_muA_left X.I X.μf
@@ -60,8 +68,8 @@ theorem rightRegular_isometric_multiplicative (X : CData) (hd : RegData X) (hu :
   have h2 := rr_IsReg_of X.I X.μf X.fund X.R hR
   exact ⟨fun g k => rr_mul h1 h2 g k, rr_one h1 h2, fun g F => rr_norm h1 h2 g F⟩
 
-theorem regular_rep_coeff_measurable (X : CData) (hd : RegData X) (hu : UnimodA X) (x y : X.L2) :
-    StronglyMeasurable fun g => ⟪x, X.R g y⟫_ℂ := by
+theorem regular_rep_coeff_measurable (X : CData) (hd : RegData X) (hu : UnimodA X) (x y : X.L2)
+    : StronglyMeasurable fun g => ⟪x, X.R g y⟫_ℂ := by
   obtain ⟨hH, hF, hR⟩ := hd
   have := hH
   have : SecondCountableTopology X.I.Gf := rr_secondCountable X.I X.μf

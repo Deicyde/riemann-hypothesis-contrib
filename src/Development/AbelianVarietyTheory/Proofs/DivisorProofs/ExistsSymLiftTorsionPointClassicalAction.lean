@@ -11,9 +11,13 @@ public import Development.AbelianVarietyTheory.Counterexamples.JetSurvey.InVVwIf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
-open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.GeometryOfNumbersTheory
+open GlobalTheory GlobalTheory.LieHt GlobalTheory.Cartier GlobalTheory.ThetaOnto GlobalTheory.KeyCl
+  GlobalTheory.Ex GlobalTheory.MBLow GlobalTheory.SecJet
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.MBLow.Cl Matrix
@@ -22,12 +26,12 @@ noncomputable section
 
 namespace GlobalTheory.MBLow.Cl.SymLiftCl
 
-open GlobalTheory.ThetaFn GlobalTheory.SymLiftFrame GlobalTheory.CubeValues GlobalTheory.SymmetricSemicharacter
+open GlobalTheory.ThetaFn GlobalTheory.SymLiftFrame GlobalTheory.CubeValues
+  GlobalTheory.SymmetricSemicharacter
 
 variable {g : ℕ}
 
-theorem cv_dot (M N : Fin g → ℤ) : cv N ⬝ᵥ cv M = ((N ⬝ᵥ M : ℤ) : ℂ) := by
-  simp [cv, dotProduct]
+theorem cv_dot (M N : Fin g → ℤ) : cv N ⬝ᵥ cv M = ((N ⬝ᵥ M : ℤ) : ℂ) := by simp [cv, dotProduct]
 
 theorem half_dot {a : Fin g → ℂ} (ha : Half a) (M : Fin g → ℤ) : ∃ n : ℤ, 2 * (a ⬝ᵥ cv M) = n := by
   have h : ∀ i, ∃ e : ℤ, 2 * a i = e := fun i => by
@@ -38,47 +42,65 @@ theorem half_dot {a : Fin g → ℂ} (ha : Half a) (M : Fin g → ℤ) : ∃ n :
   refine ⟨e ⬝ᵥ M, ?_⟩
   simp only [dotProduct, cv, Finset.mul_sum, Int.cast_sum, Int.cast_mul, ← he, _root_.mul_assoc]
 
-theorem perV_neg (τ : Matrix (Fin g) (Fin g) ℂ) (M N : Fin g → ℤ) : perV τ (-M) (-N) = -perV τ M N := by
-  have h : ∀ K : Fin g → ℤ, cv (-K) = -cv K := fun K => funext fun i => by simp [cv]
+theorem perV_neg (τ : Matrix (Fin g) (Fin g) ℂ) (M N : Fin g → ℤ)
+    : perV τ (-M) (-N) = - perV τ M N := by
+  have h : ∀ K : Fin g → ℤ, cv (-K) = - cv K := fun K => funext fun i => by simp [cv]
   rw [perV, perV, h, h, Matrix.mulVec_neg, neg_add]
 
-theorem dot_symm {τ : Matrix (Fin g) (Fin g) ℂ} (hs : τ.IsSymm) (v w : Fin g → ℂ) : v ⬝ᵥ τ *ᵥ w = w ⬝ᵥ τ *ᵥ v := by
+theorem dot_symm {τ : Matrix (Fin g) (Fin g) ℂ} (hs : τ.IsSymm) (v w : Fin g → ℂ)
+    : v ⬝ᵥ τ *ᵥ w = w ⬝ᵥ τ *ᵥ v := by
   rw [Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, hs.eq, dotProduct_comm]
 
-theorem exp_eq_of_int {s t : ℂ} (n : ℤ) (h : s = t + n * (2 * Real.pi * Complex.I)) : Complex.exp s = Complex.exp t := by
+theorem exp_eq_of_int {s t : ℂ} (n : ℤ) (h : s = t + n * (2 * Real.pi * Complex.I))
+    : Complex.exp s = Complex.exp t := by
   rw [h, Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, _root_.mul_one]
 
 variable {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {u : HolUnif A L g}
 
-theorem const_of_periodic {r : (Fin g → ℂ) → ℂ} (hd : Differentiable ℂ r) (h0 : ∀ z, r z ≠ 0)
-    (hp : ∀ l ∈ u.Λ, ∀ z, r (z + l) = r z) (z : Fin g → ℂ) : r z = r 0 := by
+theorem const_of_periodic
+    {r : (Fin g → ℂ) → ℂ}
+    (hd : Differentiable ℂ r) (h0 : ∀ z, r z ≠ 0) (hp : ∀ l ∈ u.Λ, ∀ z, r (z + l) = r z)
+    (z : Fin g → ℂ)
+    : r z = r 0 := by
   haveI := u.discrete
-  refine (appellHumbert_trivial_of_nowhere_vanishing g u.Λ u.full 0 (fun _ => 1) r Matrix.isHermitian_zero
-    (fun _ => norm_one) hd h0 (fun l z => ?_)).2.2 z
+  refine (appellHumbert_trivial_of_nowhere_vanishing g u.Λ u.full 0
+    (fun _ => 1)
+    r Matrix.isHermitian_zero
+    (fun _ => norm_one)
+    hd h0
+    (fun l z => ?_)).2.2 z
   rw [hp l l.2]
   simp [hermForm]
 
 variable {T : Over (Sp ℂ)} {p : 𝟙_ (Over (Sp ℂ)) ⟶ T}
 
-def Reads (u : HolUnif A L g) (p : 𝟙_ (Over (Sp ℂ)) ⟶ T) {m : T ⊗ A ⟶ A} {k : ℤ}
-    (α : LB.Gen (LB.LinComb L (K := Fin 2) ![(snd T A).left, m.left] ![k, -k])) (w : (Fin g → ℂ) → Fin g → ℂ)
-    (r : (Fin g → ℂ) → ℂ) : Prop :=
-  ∀ (j : Fin 2 → L.ι) z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U (j 0) → ⊤ ≤ (u.ex (w z)).left ⁻¹ᵁ L.U (j 1) →
-    valAt' (exAt u p z) (LB.wchart L ![(snd T A).left, m.left] j) (α.s j).val * u.fr (j 1) (w z) ^ k =
-      r z * u.fr (j 0) z ^ k
+def Reads
+    (u : HolUnif A L g) (p : 𝟙_ (Over (Sp ℂ)) ⟶ T)
+    {m : T ⊗ A ⟶ A} {k : ℤ}
+    (α : LB.Gen (LB.LinComb L (K := Fin 2) ![(snd T A).left, m.left] ![k, -k]))
+    (w : (Fin g → ℂ) → Fin g → ℂ) (r : (Fin g → ℂ) → ℂ)
+    : Prop :=
+  ∀ (j : Fin 2 → L.ι) z,
+    ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U (j 0) → ⊤ ≤ (u.ex (w z)).left ⁻¹ᵁ L.U (j 1)
+      → valAt' (exAt u p z) (LB.wchart L ![(snd T A).left, m.left] j) (α.s j).val
+          * u.fr (j 1) (w z) ^ k
+        = r z * u.fr (j 0) z ^ k
 
-theorem Reads.period (hL : L.IsLB) {m : T ⊗ A ⟶ A} {k : ℤ}
-    {α : LB.Gen (LB.LinComb L (K := Fin 2) ![(snd T A).left, m.left] ![k, -k])} {w : (Fin g → ℂ) → Fin g → ℂ}
-    {r : (Fin g → ℂ) → ℂ} (h : Reads u p α w r) {z l l' : Fin g → ℂ} (hl : l ∈ u.Λ) (hl' : l' ∈ u.Λ)
-    (hw : w (z + l) = w z + l') {s t : ℂ}
-    (h0 : ∀ i, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → u.fr i z = Complex.exp s * u.fr i (z + l))
-    (h1 : ∀ i, ⊤ ≤ (u.ex (w z)).left ⁻¹ᵁ L.U i → u.fr i (w z) = Complex.exp t * u.fr i (w z + l')) :
-    r (z + l) = Complex.exp (k * s - k * t) * r z := by
+theorem Reads.period
+    (hL : L.IsLB)
+    {m : T ⊗ A ⟶ A} {k : ℤ}
+    {α : LB.Gen (LB.LinComb L (K := Fin 2) ![(snd T A).left, m.left] ![k, -k])}
+    {w : (Fin g → ℂ) → Fin g → ℂ} {r : (Fin g → ℂ) → ℂ} (h : Reads u p α w r)
+    {z l l' : Fin g → ℂ} (hl : l ∈ u.Λ) (hl' : l' ∈ u.Λ) (hw : w (z + l) = w z + l')
+    {s t : ℂ} (h0 : ∀ i, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → u.fr i z = Complex.exp s * u.fr i (z + l))
+    (h1 : ∀ i, ⊤ ≤ (u.ex (w z)).left ⁻¹ᵁ L.U i → u.fr i (w z) = Complex.exp t * u.fr i (w z + l'))
+    : r (z + l) = Complex.exp (k * s - k * t) * r z := by
   obtain ⟨i, hi⟩ := exists_chart u valueRules hL z
   obtain ⟨i', hi'⟩ := exists_chart u valueRules hL (w z)
   have e1 := h ![i, i'] z hi hi'
-  have e2 := h ![i, i'] (z + l) (by rw [ex_add_period u _ _ hl]; exact hi)
-    (by rw [hw, ex_add_period u _ _ hl']; exact hi')
+  have e2 :=
+    h ![i, i'] (z + l) (by rw [ex_add_period u _ _ hl]; exact hi)
+      (by rw [hw, ex_add_period u _ _ hl']; exact hi')
   have n0 : u.fr i (z + l) ≠ 0 := u.fr_ne _ _ (by rw [ex_add_period u _ _ hl]; exact hi)
   rw [exAt_add_period u p z l hl, hw] at e2
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one] at e1 e2
@@ -89,31 +111,41 @@ theorem Reads.period (hL : L.IsLB) {m : T ⊗ A ⟶ A} {k : ℤ}
 
 variable {J : (Sp ℂ ⟶ A.left) → L.ι}
 
-theorem Reads.cval (hJ : ∀ ψ : Sp ℂ ⟶ A.left, ⊤ ≤ ψ ⁻¹ᵁ L.U (J ψ)) {m : T ⊗ A ⟶ A} {k : ℤ}
-    {α : LB.Gen (LB.LinComb L (K := Fin 2) ![(snd T A).left, m.left] ![k, -k])} {w : (Fin g → ℂ) → Fin g → ℂ}
-    {r : (Fin g → ℂ) → ℂ} (h : Reads u p α w r) (hw : ∀ z, exAt u p z ≫ m.left = (u.ex (w z)).left) (z : Fin g → ℂ) :
-    cval (L := L) α (exAt u p z) J * u.fr (J (u.ex (w z)).left) (w z) ^ k = r z * u.fr (J (u.ex z).left) z ^ k := by
+theorem Reads.cval
+    (hJ : ∀ ψ : Sp ℂ ⟶ A.left, ⊤ ≤ ψ ⁻¹ᵁ L.U (J ψ))
+    {m : T ⊗ A ⟶ A} {k : ℤ}
+    {α : LB.Gen (LB.LinComb L (K := Fin 2) ![(snd T A).left, m.left] ![k, -k])}
+    {w : (Fin g → ℂ) → Fin g → ℂ} {r : (Fin g → ℂ) → ℂ}
+    (h : Reads u p α w r) (hw : ∀ z, exAt u p z ≫ m.left = (u.ex (w z)).left)
+    (z : Fin g → ℂ)
+    : cval (L := L) α (exAt u p z) J * u.fr (J (u.ex (w z)).left) (w z) ^ k
+      = r z * u.fr (J (u.ex z).left) z ^ k := by
   rw [cval_two α (hw z)]
   exact h ![J (u.ex z).left, J (u.ex (w z)).left] z (hJ _) (hJ _)
 
 variable {k : ℤ} {Θ : ThetaGrp A L k T} {x : Fin g → ℂ} {r : (Fin g → ℂ) → ℂ}
 
-theorem prod_mul_eq_one (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.φ (fun z => z + x) r) {n : ℕ}
-    (hl : (n : ℂ) • x ∈ u.Λ) {e : ℂ}
-    (he : ∀ i, ⊤ ≤ (u.ex 0).left ⁻¹ᵁ L.U i → u.fr i 0 = e * u.fr i (0 + (n : ℂ) • x))
-    (h : LB.Gen.Corr L _ _ _ _ (powGen A L k Θ n) (LB.oneGen L)) :
-    (∏ i ∈ Finset.range n, r ((i : ℂ) • x)) * e ^ k = 1 := by
+theorem prod_mul_eq_one
+    (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.φ (fun z => z + x) r)
+    {n : ℕ} (hl : (n : ℂ) • x ∈ u.Λ)
+    {e : ℂ} (he : ∀ i, ⊤ ≤ (u.ex 0).left ⁻¹ᵁ L.U i → u.fr i 0 = e * u.fr i (0 + (n : ℂ) • x))
+    (h : LB.Gen.Corr L _ _ _ _ (powGen A L k Θ n) (LB.oneGen L))
+    : (∏ i ∈ Finset.range n, r ((i : ℂ) • x)) * e ^ k = 1 := by
   obtain ⟨J, hJ⟩ := exists_choice hL
-  have ht : ∀ i : ℕ, exAt u p 0 ≫ (translT A (Θ.pt ^ i)).left = exAt u p ((i : ℂ) • x) := fun i => by
+  have ht
+      : ∀ i : ℕ, exAt u p 0 ≫ (translT A (Θ.pt ^ i)).left = exAt u p ((i : ℂ) • x) := fun i => by
     rw [exAt_translT u (x := (i : ℂ) • x) (by rw [MonObj.comp_pow, hx, ex_natCast_smul]), zero_add]
-  have key : ∀ m : ℕ, (∏ i ∈ Finset.range m, cval (L := L) Θ.φ (exAt u p ((i : ℂ) • x)) J) *
-      u.fr (J (u.ex ((m : ℂ) • x)).left) ((m : ℂ) • x) ^ k =
-      (∏ i ∈ Finset.range m, r ((i : ℂ) • x)) * u.fr (J (u.ex 0).left) 0 ^ k := fun m => by
+  have key
+      : ∀ m : ℕ,
+        (∏ i ∈ Finset.range m, cval (L := L) Θ.φ (exAt u p ((i : ℂ) • x)) J)
+            * u.fr (J (u.ex ((m : ℂ) • x)).left) ((m : ℂ) • x) ^ k
+          = (∏ i ∈ Finset.range m, r ((i : ℂ) • x)) * u.fr (J (u.ex 0).left) 0 ^ k := fun m => by
     induction m with
     | zero => simp
     | succ m ih =>
       have e := hr.cval hJ (exAt_translPt u hx) ((m : ℂ) • x)
-      rw [Finset.prod_range_succ, Finset.prod_range_succ, Nat.cast_succ, add_smul, one_smul, _root_.mul_assoc]
+      rw [Finset.prod_range_succ, Finset.prod_range_succ, Nat.cast_succ, add_smul, one_smul,
+        _root_.mul_assoc]
       refine (congrArg (_ * ·) e).trans ?_
       linear_combination r ((m : ℂ) • x) * ih
   have h1 := (cval_powGen hJ Θ n (exAt u p 0)).symm.trans (cval_corr_one hJ h _)
@@ -125,12 +157,15 @@ theorem prod_mul_eq_one (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u 
   refine mul_right_cancel₀ (zpow_ne_zero k h6) ?_
   linear_combination -h2
 
-theorem exAt_neg (z : Fin g → ℂ) : exAt u p z ≫ (snd T A ≫ (GrpObj.inv : A ⟶ A)).left = (u.ex (-z)).left := by
+theorem exAt_neg (z : Fin g → ℂ)
+    : exAt u p z ≫ (snd T A ≫ (GrpObj.inv : A ⟶ A)).left = (u.ex (-z)).left := by
   rw [Over.comp_left, ← Category.assoc, exAt_snd, ex_neg_left]
 
-theorem mul_eq_one_of_sym (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.φ (fun z => z + x) r)
+theorem mul_eq_one_of_sym
+    (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.φ (fun z => z + x) r)
     {nu : LB.Gen (negLB A L k T)} {d : ℂ} (hν : Reads u p nu (fun z => -z) fun _ => d)
-    (h : LB.Gen.Corr L _ _ _ _ (symGen A L k Θ nu) (LB.oneGen L)) : r (-x) * r 0 = 1 := by
+    (h : LB.Gen.Corr L _ _ _ _ (symGen A L k Θ nu) (LB.oneGen L))
+    : r (-x) * r 0 = 1 := by
   obtain ⟨J, hJ⟩ := exists_choice hL
   have hneg : ∀ z, u.ex (-z) = (u.ex z)⁻¹ := fun z => by
     rw [eq_inv_iff_mul_eq_one, ← u.ex_add, neg_add_cancel, ex_zero]
@@ -145,7 +180,8 @@ theorem mul_eq_one_of_sym (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads 
     hr.cval hJ (exAt_translPt u hx) (-x)
   have e2 : cval (L := L) Θ.φ (exAt u p 0) J * u.fr (J (u.ex (0 + x)).left) (0 + x) ^ k = _ :=
     hr.cval hJ (exAt_translPt u hx) 0
-  have e3 : cval (L := L) nu (exAt u p 0) J * u.fr (J (u.ex (-0)).left) (-0) ^ k = d * _ := hν.cval hJ exAt_neg 0
+  have e3 : cval (L := L) nu (exAt u p 0) J * u.fr (J (u.ex (-0)).left) (-0) ^ k = d * _ :=
+    hν.cval hJ exAt_neg 0
   have e4 : cval (L := L) nu (exAt u p (-x)) J * u.fr (J (u.ex (- -x)).left) (- -x) ^ k = d * _ :=
     hν.cval hJ exAt_neg (-x)
   rw [neg_add_cancel] at e1
@@ -166,9 +202,11 @@ theorem mul_eq_one_of_sym (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads 
     d * (cval (L := L) Θ.φ (exAt u p 0) J * u.fr (J (u.ex x).left) x ^ k) * e1 -
     d * (r (-x) * u.fr (J (u.ex (-x)).left) (-x) ^ k) * e2
 
-theorem Reads.act (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.φ (fun z => z + x) r)
-    {s s' : LB.Sec (LPow A L k T)} (hs : IsActOf A L k Θ s s') {θ : (Fin g → ℂ) → ℂ} (hθ : IsFnAt u p k s θ) :
-    IsFnAt u p k s' fun z => r z * θ (z + x) := by
+theorem Reads.act
+    (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.φ (fun z => z + x) r)
+    {s s' : LB.Sec (LPow A L k T)} (hs : IsActOf A L k Θ s s')
+    {θ : (Fin g → ℂ) → ℂ} (hθ : IsFnAt u p k s θ)
+    : IsFnAt u p k s' fun z => r z * θ (z + x) := by
   have hθ' := isFnAt_fnAt u p hL k s'
   convert hθ' using 1
   funext z
@@ -180,11 +218,15 @@ theorem Reads.act (hL : L.IsLB) (hx : p ≫ Θ.pt = u.ex x) (hr : Reads u p Θ.�
   refine mul_right_cancel₀ (zpow_ne_zero k (u.fr_ne (![i, i'] 0) _ hi)) ?_
   linear_combination -e - θ (z + x) * e'
 
-theorem fnT_iff {P : PolAV (Sp ℂ)} (u : HolUnif P.A P.L g) (k : ℕ) (t : LB.Sec (LPow P.A P.L (k : ℤ) (baseOver (Sp ℂ))))
-    (f : (Fin g → ℂ) → ℂ) : FnT u k t f ↔ IsFnAt u basePt k t f := by
+theorem fnT_iff
+    {P : PolAV (Sp ℂ)} (u : HolUnif P.A P.L g)
+    (k : ℕ) (t : LB.Sec (LPow P.A P.L (k : ℤ) (baseOver (Sp ℂ))))
+    (f : (Fin g → ℂ) → ℂ)
+    : FnT u k t f ↔ IsFnAt u basePt k t f := by
   constructor
   · intro h j z hj
-    obtain ⟨i, rfl⟩ : ∃ i, j = fun _ => i := ⟨j 0, funext fun k => congrArg j (Subsingleton.elim _ _)⟩
+    obtain ⟨i, rfl⟩ : ∃ i, j = fun _ => i :=
+      ⟨j 0, funext fun k => congrArg j (Subsingleton.elim _ _)⟩
     rw [zpow_natCast]
     exact h i z ((exAt_mem_chart_iff u basePt _ _ z).1 hj)
   · intro h i z hi
@@ -194,51 +236,73 @@ theorem fnT_iff {P : PolAV (Sp ℂ)} (u : HolUnif P.A P.L g) (k : ℕ) (t : LB.S
 
 variable {τ : Matrix (Fin g) (Fin g) ℂ} {a b : Fin g → ℂ}
 
-theorem exists_reads_neg (hL : L.IsLB) (ha : Half a) (hb : Half b) (hΛ : ∀ z, z ∈ u.Λ ↔ ∃ M N, z = perV τ M N)
-    (hfr : ∀ M N i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → u.fr i z = autV τ a b M N z * u.fr i (z + perV τ M N))
-    {nu : LB.Gen (negLB A L k T)} (hnu : nu.IsGen) : ∃ d : ℂ, Reads u p nu (fun z => -z) fun _ => d := by
-  obtain ⟨r, hd, h0, hr⟩ := exists_entire_twist u p hL (a := k) (b := k) nu hnu (w := fun z => -z) (by fun_prop) exAt_neg
-  have hc := const_of_periodic (u := u) hd h0 fun l hl z => by
-    obtain ⟨M, N, rfl⟩ := (hΛ l).1 hl
-    rw [Reads.period hL (w := fun z => -z) hr hl (l' := perV τ (-M) (-N)) ((hΛ _).2 ⟨_, _, rfl⟩)
-      (by rw [perV_neg, neg_add]) (hfr M N · z) (hfr (-M) (-N) · (-z))]
-    obtain ⟨n, hn⟩ := half_dot ha M
-    obtain ⟨n', hn'⟩ := half_dot hb N
-    have h : ∀ K : Fin g → ℤ, cv (-K) = -cv K := fun K => funext fun i => by simp [cv]
-    rw [exp_eq_of_int (t := 0) (k * (n - n')), Complex.exp_zero, _root_.one_mul]
-    simp only [h, dotProduct_neg, neg_dotProduct, Matrix.mulVec_neg, neg_neg]
-    push_cast
-    rw [← hn, ← hn']
-    ring
+theorem exists_reads_neg
+    (hL : L.IsLB) (ha : Half a) (hb : Half b) (hΛ : ∀ z, z ∈ u.Λ ↔ ∃ M N, z = perV τ M N)
+    (hfr : ∀ M N i z,
+      ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → u.fr i z = autV τ a b M N z * u.fr i (z + perV τ M N))
+    {nu : LB.Gen (negLB A L k T)} (hnu : nu.IsGen)
+    : ∃ d : ℂ, Reads u p nu (fun z => -z) fun _ => d := by
+  obtain ⟨r, hd, h0, hr⟩ :=
+    exists_entire_twist u p hL (a := k) (b := k) nu hnu (w := fun z => -z) (by fun_prop) exAt_neg
+  have hc :=
+    const_of_periodic (u := u) hd h0 fun l hl z => by
+      obtain ⟨M, N, rfl⟩ := (hΛ l).1 hl
+      rw [Reads.period hL
+        (w := fun z => -z)
+        hr hl (l' := perV τ (-M) (-N)) ((hΛ _).2 ⟨_, _, rfl⟩) (by rw [perV_neg, neg_add])
+        (hfr M N · z) (hfr (-M) (-N) · (-z))]
+      obtain ⟨n, hn⟩ := half_dot ha M
+      obtain ⟨n', hn'⟩ := half_dot hb N
+      have h : ∀ K : Fin g → ℤ, cv (-K) = - cv K := fun K => funext fun i => by simp [cv]
+      rw [exp_eq_of_int (t := 0) (k * (n - n')), Complex.exp_zero, _root_.one_mul]
+      simp only [h, dotProduct_neg, neg_dotProduct, Matrix.mulVec_neg, neg_neg]
+      push_cast
+      rw [← hn, ← hn']
+      ring
   exact ⟨r 0, fun j z h1 h2 => (hr j z h1 h2).trans (by rw [hc])⟩
 
-theorem exists_reads_transl (hL : L.IsLB) (hs : τ.IsSymm) (hΛ : ∀ z, z ∈ u.Λ ↔ ∃ M N, z = perV τ M N)
-    (hfr : ∀ M N i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → u.fr i z = autV τ a b M N z * u.fr i (z + perV τ M N))
-    (hx : p ≫ Θ.pt = u.ex x) {M N : Fin g → ℤ} (hk : (k : ℂ) • x = perV τ M N) :
-    ∃ c : ℂ, Reads u p Θ.φ (fun z => z + x) fun z => c * Complex.exp (2 * Real.pi * Complex.I * (cv N ⬝ᵥ z)) := by
-  obtain ⟨r, hd, h0, hr⟩ := exists_entire_twist u p hL Θ.φ Θ.isGen (w := fun z => z + x) (by fun_prop) (exAt_translPt u hx)
-  have hd' : Differentiable ℂ fun z : Fin g → ℂ => Complex.exp (-(2 * Real.pi * Complex.I * (cv N ⬝ᵥ z))) := by
+theorem exists_reads_transl
+    (hL : L.IsLB) (hs : τ.IsSymm) (hΛ : ∀ z, z ∈ u.Λ ↔ ∃ M N, z = perV τ M N)
+    (hfr : ∀ M N i z,
+      ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → u.fr i z = autV τ a b M N z * u.fr i (z + perV τ M N))
+    (hx : p ≫ Θ.pt = u.ex x)
+    {M N : Fin g → ℤ} (hk : (k : ℂ) • x = perV τ M N)
+    : ∃ c : ℂ,
+      Reads u p Θ.φ
+        (fun z => z + x)
+        fun z => c * Complex.exp (2 * Real.pi * Complex.I * (cv N ⬝ᵥ z)) := by
+  obtain ⟨r, hd, h0, hr⟩ :=
+    exists_entire_twist u p hL Θ.φ Θ.isGen (w := fun z => z + x) (by fun_prop) (exAt_translPt u hx)
+  have hd' : Differentiable ℂ fun z : Fin g → ℂ =>
+      Complex.exp (-(2 * Real.pi * Complex.I * (cv N ⬝ᵥ z))) := by
     unfold dotProduct
     fun_prop
-  have hc := const_of_periodic (u := u) (r := fun z => r z * Complex.exp (-(2 * Real.pi * Complex.I * (cv N ⬝ᵥ z))))
-    (hd.mul hd') (fun z => mul_ne_zero (h0 z) (Complex.exp_ne_zero _)) fun l hl z => by
-    obtain ⟨M', N', rfl⟩ := (hΛ l).1 hl
-    rw [Reads.period hL (w := fun z => z + x) hr hl hl (add_right_comm _ _ _) (hfr M' N' · z) (hfr M' N' · (z + x)),
-      _root_.mul_comm _ (r z), _root_.mul_assoc, ← Complex.exp_add]
-    refine congrArg _ (exp_eq_of_int (N' ⬝ᵥ M - N ⬝ᵥ M') ?_)
-    have e : (k : ℂ) * (cv N' ⬝ᵥ x) = cv N' ⬝ᵥ cv M + cv N ⬝ᵥ τ *ᵥ cv N' := by
-      rw [← smul_eq_mul, ← dotProduct_smul, hk, perV, dotProduct_add, dot_symm hs]
-    rw [Int.cast_sub, ← cv_dot, ← cv_dot]
-    simp only [perV, dotProduct_add]
-    linear_combination (2 * Real.pi * Complex.I) * e
+  have hc :=
+    const_of_periodic (u := u)
+      (r := fun z => r z * Complex.exp (-(2 * Real.pi * Complex.I * (cv N ⬝ᵥ z))))
+      (hd.mul hd')
+      (fun z => mul_ne_zero (h0 z) (Complex.exp_ne_zero _))
+      fun l hl z => by
+        obtain ⟨M', N', rfl⟩ := (hΛ l).1 hl
+        rw [Reads.period hL
+            (w := fun z => z + x)
+            hr hl hl (add_right_comm _ _ _) (hfr M' N' · z) (hfr M' N' · (z + x)),
+          _root_.mul_comm _ (r z), _root_.mul_assoc, ← Complex.exp_add]
+        refine congrArg _ (exp_eq_of_int (N' ⬝ᵥ M - N ⬝ᵥ M') ?_)
+        have e : (k : ℂ) * (cv N' ⬝ᵥ x) = cv N' ⬝ᵥ cv M + cv N ⬝ᵥ τ *ᵥ cv N' := by
+          rw [← smul_eq_mul, ← dotProduct_smul, hk, perV, dotProduct_add, dot_symm hs]
+        rw [Int.cast_sub, ← cv_dot, ← cv_dot]
+        simp only [perV, dotProduct_add]
+        linear_combination (2 * Real.pi * Complex.I) * e
   refine ⟨r 0, fun j z h1 h2 => (hr j z h1 h2).trans (congrArg (· * _) ?_)⟩
   have e := hc z
   simp only [dotProduct_zero, mul_zero, neg_zero, Complex.exp_zero, _root_.mul_one] at e
   beta_reduce
   rw [← e, _root_.mul_assoc, ← Complex.exp_add, neg_add_cancel, Complex.exp_zero, _root_.mul_one]
 
-theorem prod_exp (c s : ℂ) (n : ℕ) :
-    ∏ i ∈ Finset.range n, c * Complex.exp (2 * (i * s)) = c ^ n * Complex.exp (n * (n - 1) * s) := by
+theorem prod_exp (c s : ℂ) (n : ℕ)
+    : ∏ i ∈ Finset.range n, c * Complex.exp (2 * (i * s))
+      = c ^ n * Complex.exp (n * (n - 1) * s) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -247,8 +311,10 @@ theorem prod_exp (c s : ℂ) (n : ℕ) :
     push_cast
     ring
 
-theorem eq_exp_of_odd {c s t : ℂ} {j : ℕ} (h1 : c ^ 2 * Complex.exp (2 * s) = 1)
-    (h2 : c ^ (2 * j + 1) * Complex.exp t = 1) : c = Complex.exp (2 * j * s - t) := by
+theorem eq_exp_of_odd
+    {c s t : ℂ} {j : ℕ}
+    (h1 : c ^ 2 * Complex.exp (2 * s) = 1) (h2 : c ^ (2 * j + 1) * Complex.exp t = 1)
+    : c = Complex.exp (2 * j * s - t) := by
   have h3 : (c ^ 2 * Complex.exp (2 * s)) ^ j = 1 := by rw [h1, one_pow]
   rw [mul_pow, ← Complex.exp_nat_mul, ← pow_mul, show (j : ℂ) * (2 * s) = 2 * j * s by ring] at h3
   rw [Complex.exp_sub, eq_div_iff (Complex.exp_ne_zero _)]
@@ -258,9 +324,22 @@ end GlobalTheory.MBLow.Cl.SymLiftCl
 
 namespace GlobalTheory.MBLow.Cl
 
-
 open GlobalTheory.ThetaFn GlobalTheory.CubeValues SymLiftCl in
-theorem exists_symLift_act_classical : ∀ (g : ℕ) (x : KeyIn ℂ) (hg : x.P.g = g) (u : HolUnif x.P.A x.P.L g) (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ) (c : ℂ) (W : Fin g → Fin g → ℂ), NF x hg u τ a b c W → ∀ m : ℕ, Odd m → ∀ (M N : Fin g → ℤ) (pt : (baseOver (Sp ℂ)) ⟶ x.P.A), pt.left = (u.ex (((m : ℂ) ^ 2)⁻¹ • perV τ M N)).left → ∃ U : ThetaGrp x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (baseOver (Sp ℂ)), SymLift x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (m ^ 2) pt U ∧ ∀ s f, FnT u (m ^ 2) s f → ∃ t, IsActOf x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) U s t ∧ FnT u (m ^ 2) t fun z => trFac τ a b m M N z * f (z + ((m : ℂ) ^ 2)⁻¹ • perV τ M N) := by
+theorem exists_symLift_act_classical
+    : ∀ (g : ℕ) (x : KeyIn ℂ) (hg : x.P.g = g) (u : HolUnif x.P.A x.P.L g)
+        (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ) (c : ℂ) (W : Fin g → Fin g → ℂ),
+      NF x hg u τ a b c W
+        → ∀ m : ℕ,
+          Odd m
+            → ∀ (M N : Fin g → ℤ) (pt : (baseOver (Sp ℂ)) ⟶ x.P.A),
+              pt.left = (u.ex (((m : ℂ) ^ 2)⁻¹ • perV τ M N)).left
+                → ∃ U : ThetaGrp x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (baseOver (Sp ℂ)),
+                  SymLift x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) (m ^ 2) pt U
+                    ∧ ∀ s f,
+                      FnT u (m ^ 2) s f
+                        → ∃ t,
+                          IsActOf x.P.A x.P.L ((m ^ 2 : ℕ) : ℤ) U s t ∧ FnT u (m ^ 2) t fun z =>
+                            trFac τ a b m M N z * f (z + ((m : ℂ) ^ 2)⁻¹ • perV τ M N) := by
   intro g x hg u τ a b c W hNF m hm M N pt hpt
   have hfr := frame_eq_autV_mul g x hg u τ a b c W hNF
   obtain ⟨hs, -, ha, hb, -, hΛ, -⟩ := hNF
@@ -275,11 +354,15 @@ theorem exists_symLift_act_classical : ∀ (g : ℕ) (x : KeyIn ℂ) (hg : x.P.g
     exact (u.ker _).2 hl
   obtain ⟨U, hU⟩ := GlobalTheory.WeightProbe.exists_symLift_top x.P (N := m ^ 2) hm.pow pt htor
   have hx : basePt ≫ U.pt = u.ex y := hU.pt_eq ▸ hp
-  obtain ⟨ξ, hξ⟩ := exists_reads_transl x.P.isLB hs hΛ hfr hx (M := M) (N := N) (by rw [Int.cast_natCast]; exact hk)
+  obtain ⟨ξ, hξ⟩ :=
+    exists_reads_transl x.P.isLB hs hΛ hfr hx (M := M) (N := N) (by rw [Int.cast_natCast]; exact hk)
   obtain ⟨nu, hnu, hsym⟩ := hU.sym
   obtain ⟨d, hd⟩ := exists_reads_neg (p := basePt) x.P.isLB ha hb hΛ hfr hnu
   have h1 := mul_eq_one_of_sym x.P.isLB hx hξ hd hsym
-  have h2 := prod_mul_eq_one x.P.isLB hx hξ hl (e := autV τ a b M N 0) (fun i hi => by rw [hk]; exact hfr M N i 0 hi) hU.pow_eq
+  have h2 :=
+    prod_mul_eq_one x.P.isLB hx hξ hl (e := autV τ a b M N 0)
+      (fun i hi => by rw [hk]; exact hfr M N i 0 hi)
+      hU.pow_eq
   have hσ : ((m : ℂ) ^ 2) * (cv N ⬝ᵥ y) = cv N ⬝ᵥ cv M + cv N ⬝ᵥ τ *ᵥ cv N := by
     rw [← smul_eq_mul, ← dotProduct_smul, ← Nat.cast_pow, hk, perV, dotProduct_add]
   obtain ⟨j, hj⟩ : Odd (m ^ 2) := hm.pow
@@ -287,15 +370,21 @@ theorem exists_symLift_act_classical : ∀ (g : ℕ) (x : KeyIn ℂ) (hg : x.P.g
   have h1' : ξ ^ 2 * Complex.exp (2 * (-(Real.pi * Complex.I * (cv N ⬝ᵥ y)))) = 1 := by
     rw [← h1]
     simp only [dotProduct_zero, mul_zero, Complex.exp_zero, dotProduct_neg]
-    rw [show 2 * (-(Real.pi * Complex.I * (cv N ⬝ᵥ y))) = 2 * Real.pi * Complex.I * -(cv N ⬝ᵥ y) by ring]
+    rw [show 2 * (-(Real.pi * Complex.I * (cv N ⬝ᵥ y))) = 2 * Real.pi * Complex.I * -(cv N ⬝ᵥ y) by
+      ring]
     ring
-  simp only [dotProduct_smul, smul_eq_mul, show ∀ i s : ℂ, 2 * Real.pi * Complex.I * (i * s) =
-    2 * (i * (Real.pi * Complex.I * s)) from fun i s => by ring] at h2
-  rw [prod_exp, zpow_natCast, autV, ← Complex.exp_nat_mul, _root_.mul_assoc, ← Complex.exp_add, hj] at h2
+  simp only [dotProduct_smul, smul_eq_mul,
+      show ∀ i s : ℂ,
+          2 * Real.pi * Complex.I * (i * s) = 2 * (i * (Real.pi * Complex.I * s)) from fun i s => by
+        ring]
+    at h2
+  rw [prod_exp, zpow_natCast, autV, ← Complex.exp_nat_mul, _root_.mul_assoc, ← Complex.exp_add, hj]
+    at h2
   have h3 := eq_exp_of_odd h1' h2
   refine ⟨U, hU, fun s f hf => ?_⟩
-  obtain ⟨t, ht⟩ := GlobalTheory.ThetaPtExist.exists_isTwistPull x.P.isLB (translT x.P.A U.pt) (translPt x.P.A U.pt) (lift_snd _ _)
-    _ _ U.φ U.isGen s
+  obtain ⟨t, ht⟩ :=
+    GlobalTheory.ThetaPtExist.exists_isTwistPull x.P.isLB (translT x.P.A U.pt) (translPt x.P.A U.pt)
+      (lift_snd _ _) _ _ U.φ U.isGen s
   refine ⟨t, ht, (fnT_iff u _ t _).2 ?_⟩
   convert hξ.act x.P.isLB hx ht ((fnT_iff u _ s f).1 hf) using 3 with z
   obtain ⟨n, hn⟩ := half_dot ha M

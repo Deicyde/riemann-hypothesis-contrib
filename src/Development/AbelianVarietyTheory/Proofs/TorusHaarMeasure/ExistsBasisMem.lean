@@ -7,14 +7,19 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.LatDen
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 
 namespace GlobalTheory.LatBasis
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_basis_mem : (∀ (r : ℕ) (X : Data E r) (W : Submodule E (Fin r → E)), ∃ w : Fin (Module.finrank E W) → Fin r → E, LinearIndependent E w ∧ (∀ a, w a ∈ X.Λ) ∧ Submodule.span E (Set.range w) = W) := by
+theorem exists_basis_mem
+    : (∀ (r : ℕ) (X : Data E r) (W : Submodule E (Fin r → E)),
+      ∃ w : Fin (Module.finrank E W) → Fin r → E,
+        LinearIndependent E w ∧ (∀ a, w a ∈ X.Λ) ∧ Submodule.span E (Set.range w) = W) := by
   intro r X W
   choose n hn hmem using (GlobalTheory.LatDen.latDen r X).1
   set b := Module.finBasis E W

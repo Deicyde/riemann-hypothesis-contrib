@@ -13,11 +13,10 @@ noncomputable section
 
 variable {l : ℕ} [hl : Fact l.Prime]
 
-theorem coeff_add_pow (x : OCb l) (n : ℕ) : ∀ k : ℕ,
-    PreTilt.coeff (n + k) x ^ (l ^ k) = PreTilt.coeff n x
+theorem coeff_add_pow (x : OCb l) (n : ℕ)
+    : ∀ k : ℕ, PreTilt.coeff (n + k) x ^ (l ^ k) = PreTilt.coeff n x
   | 0 => by simp
-  | k + 1 => by
-    rw [pow_succ', pow_mul, ← add_assoc, PreTilt.coeff_pow_p, coeff_add_pow x n k]
+  | k + 1 => by rw [pow_succ', pow_mul, ← add_assoc, PreTilt.coeff_pow_p, coeff_add_pow x n k]
 
 theorem v_l_lt_one : (PadicComplex.valued l).v ((l : ℕ) : PadicComplex l) < 1 := by
   have hv := PadicComplexInt.integers l
@@ -28,8 +27,8 @@ theorem v_l_lt_one : (PadicComplex.valued l).v ((l : ℕ) : PadicComplex l) < 1 
   rw [map_natCast] at h1 h2
   exact lt_of_le_of_ne h1 h2
 
-theorem valb_le_of_coeff_eq_zero (r : OCb l) (n : ℕ) (hr : PreTilt.coeff n r = 0) :
-    valb l r ≤ (PadicComplex.valued l).v ((l : ℕ) : PadicComplex l) ^ (l ^ n) := by
+theorem valb_le_of_coeff_eq_zero (r : OCb l) (n : ℕ) (hr : PreTilt.coeff n r = 0)
+    : valb l r ≤ (PadicComplex.valued l).v ((l : ℕ) : PadicComplex l) ^ (l ^ n) := by
   by_cases h0 : r = 0
   · rw [h0, map_zero]; exact zero_le
   have hex : ∃ m, PreTilt.coeff m r ≠ 0 := by
@@ -54,12 +53,15 @@ theorem valb_le_of_coeff_eq_zero (r : OCb l) (n : ℕ) (hr : PreTilt.coeff n r =
   rw [pow_add, pow_mul]
   exact pow_le_pow_left₀ zero_le hle _
 
-theorem exists_small (t : ℝ≥0) (ht : 0 < t) :
-    ∃ n : ℕ, (PadicComplex.valued l).v ((l : ℕ) : PadicComplex l) ^ (l ^ n) < t := by
+theorem exists_small (t : ℝ≥0) (ht : 0 < t)
+    : ∃ n : ℕ, (PadicComplex.valued l).v ((l : ℕ) : PadicComplex l) ^ (l ^ n) < t := by
   have hq := v_l_lt_one (l := l)
   obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one ht hq
-  exact ⟨n, lt_of_le_of_lt (pow_le_pow_of_le_one zero_le hq.le
-    (Nat.lt_pow_self (Fact.out : l.Prime).one_lt).le) hn⟩
+  exact ⟨
+    n,
+    lt_of_le_of_lt
+      (pow_le_pow_of_le_one zero_le hq.le (Nat.lt_pow_self (Fact.out : l.Prime).one_lt).le) hn
+  ⟩
 
 theorem frob_surj (hR : RootModP) : Function.Surjective (frobenius (ModP (OC l) l) l) := by
   intro b
@@ -96,10 +98,8 @@ theorem tiltGlue : TiltGlue := by
     exact absurd hvr (not_lt.mpr h3)
   obtain ⟨w, hw⟩ := hS l (-e) (by rwa [Valuation.map_neg])
   obtain ⟨Z, hZ⟩ : ∃ Z : OCb l, Z = z + (s : OCb l) * w := ⟨_, rfl⟩
-  have hfrob : Z ^ l = z ^ l + (s : OCb l) ^ l * w ^ l := by
-    rw [hZ, add_pow_char, mul_pow]
-  have hcs : c * (s : OCb l) = (s : OCb l) ^ l := by
-    rw [hc, ← pow_succ, Nat.sub_add_cancel hl1]
+  have hfrob : Z ^ l = z ^ l + (s : OCb l) ^ l * w ^ l := by rw [hZ, add_pow_char, mul_pow]
+  have hcs : c * (s : OCb l) = (s : OCb l) ^ l := by rw [hc, ← pow_succ, Nat.sub_add_cancel hl1]
   have he1 : z ^ l - c * z - b = (s : OCb l) ^ l * e := by rw [← hrr]; exact he
   have key : Z ^ l - c * Z - b = 0 := by
     linear_combination hfrob + he1 + (s : OCb l) ^ l * hw - w * hcs - c * hZ
@@ -110,12 +110,15 @@ theorem tiltGlue : TiltGlue := by
   have hmap := congrArg (algebraMap (OCb l) (Cb l)) key
   rw [RingHom.map_sub, map_sub, map_mul, map_pow, map_zero, hc, hb, map_mul, map_pow] at hmap
   have hT0 : algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1) ≠ 0 := pow_ne_zero _ hS0
-  have hSl : algebraMap (OCb l) (Cb l) (s : OCb l) ^ l =
-      algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1) * algebraMap (OCb l) (Cb l) (s : OCb l) := by
+  have hSl
+      : algebraMap (OCb l) (Cb l) (s : OCb l) ^ l
+        = algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1)
+          * algebraMap (OCb l) (Cb l) (s : OCb l) := by
     rw [← pow_succ, Nat.sub_add_cancel hl1]
-  rw [div_pow, hSl, show algebraMap (OCb l) (Cb l) Z ^ l =
-      algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1) * algebraMap (OCb l) (Cb l) Z +
-        algebraMap (OCb l) (Cb l) x * algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1) by
+  rw [div_pow, hSl,
+    show algebraMap (OCb l) (Cb l) Z ^ l
+        = algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1) * algebraMap (OCb l) (Cb l) Z
+          + algebraMap (OCb l) (Cb l) x * algebraMap (OCb l) (Cb l) (s : OCb l) ^ (l - 1) by
       linear_combination hmap]
   field_simp
   ring

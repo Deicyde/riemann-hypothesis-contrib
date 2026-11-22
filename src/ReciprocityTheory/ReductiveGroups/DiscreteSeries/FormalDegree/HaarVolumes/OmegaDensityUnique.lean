@@ -21,7 +21,8 @@ local instance instTGUpqT (P Q : ℕ) : IsTopologicalGroup (Formalism.BasicNotio
 
 local instance instBorelUpqT (P Q : ℕ) : BorelSpace (Formalism.BasicNotions.UpqT P Q) := ⟨rfl⟩
 
-def reU {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) : GL (Fin P ⊕ Fin Q) ℂ ≃* (Matrix (Fin n) (Fin n) ℂ)ˣ :=
+def reU {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n)
+    : GL (Fin P ⊕ Fin Q) ℂ ≃* (Matrix (Fin n) (Fin n) ℂ)ˣ :=
   Units.mapEquiv (Matrix.reindexAlgEquiv ℂ ℂ e).toMulEquiv
 
 lemma Jpq_eq {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
@@ -79,9 +80,10 @@ lemma map_eq {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
     apply (Matrix.reindex e e).injective
     rw [← hk, ← hgM, hg', Matrix.reindex_apply, ← hJ']
 
-def psi {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false) :
-    Formalism.BasicNotions.UpqT P Q ≃* UJ ε :=
+def psi
+    {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    : Formalism.BasicNotions.UpqT P Q ≃* UJ ε :=
   ((reU e).subgroupMap (Formalism.UG.Upq P Q)).trans (MulEquiv.subgroupCongr (map_eq e he1 he2))
 
 lemma psi_cont {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
@@ -110,16 +112,19 @@ lemma psi_symm_cont {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → 
   · exact hre.comp (Units.continuous_val.comp hc)
   · exact hre.comp (Units.continuous_coe_inv.comp hc)
 
-def psiC {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false) :
-    Formalism.BasicNotions.UpqT P Q ≃ₜ* UJ ε :=
-  { psi e he1 he2 with
-    continuous_toFun := psi_cont e he1 he2
-    continuous_invFun := psi_symm_cont e he1 he2 }
+def psiC
+    {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    : Formalism.BasicNotions.UpqT P Q ≃ₜ* UJ ε := {
+  psi e he1 he2 with
+  continuous_toFun := psi_cont e he1 he2
+  continuous_invFun := psi_symm_cont e he1 he2
+}
 
-def psiM {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false) :
-    Formalism.BasicNotions.UpqT P Q ≃ᵐ UJ ε :=
+def psiM
+    {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    : Formalism.BasicNotions.UpqT P Q ≃ᵐ UJ ε :=
   (psiC e he1 he2).toHomeomorph.toMeasurableEquiv
 
 private theorem jm_sq_lemma (ε : Fin n → Bool) : Formalism.REAL.Jm ε * Formalism.REAL.Jm ε = 1 := by
@@ -129,42 +134,54 @@ private theorem jm_sq_lemma (ε : Fin n → Bool) : Formalism.REAL.Jm ε * Forma
   funext i
   split_ifs <;> norm_num
 
-private theorem isClosedEmbedding_coe_of_mem_iff_conjTranspose_Jm_mul_eq (ε : Fin n → Bool) (H : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ)
-    (hH : ∀ g : (Matrix (Fin n) (Fin n) ℂ)ˣ, g ∈ H ↔
-      (g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Formalism.REAL.Jm ε * g = Formalism.REAL.Jm ε) :
-    Topology.IsClosedEmbedding
-      (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) := by
+private theorem isClosedEmbedding_coe_of_mem_iff_conjTranspose_Jm_mul_eq
+    (ε : Fin n → Bool) (H : Subgroup (Matrix (Fin n) (Fin n) ℂ)ˣ)
+    (hH : ∀ g : (Matrix (Fin n) (Fin n) ℂ)ˣ,
+      g ∈ H ↔ (g : Matrix (Fin n) (Fin n) ℂ)ᴴ * Formalism.REAL.Jm ε * g = Formalism.REAL.Jm ε)
+    : Topology.IsClosedEmbedding (fun g : H =>
+      ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) := by
   set J := Formalism.REAL.Jm ε with hJdef
   have hJJ : J * J = 1 := jm_sq_lemma ε
   have hleft : ∀ M : Matrix (Fin n) (Fin n) ℂ, Mᴴ * J * M = J → (J * Mᴴ * J) * M = 1 := by
     intro M hM
-    calc J * Mᴴ * J * M = J * (Mᴴ * J * M) := by simp only [Matrix.mul_assoc]
+    calc
+      J * Mᴴ * J * M
+        = J * (Mᴴ * J * M) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hM, hJJ]
-  have hinv : ∀ g : H, (((g : (Matrix (Fin n) (Fin n) ℂ)ˣ)⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) :
-      Matrix (Fin n) (Fin n) ℂ) = J * ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ * J := by
+  have hinv
+      : ∀ g : H,
+        (((g : (Matrix (Fin n) (Fin n) ℂ)ˣ)⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ)
+            : Matrix (Fin n) (Fin n) ℂ)
+          = J * ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)ᴴ * J := by
     intro g
     exact Units.inv_eq_of_mul_eq_one_left (hleft _ ((hH _).1 g.2))
-  have hcont : Continuous (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) :=
+  have hcont
+      : Continuous (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) :=
     Units.continuous_val.comp continuous_subtype_val
   have hct : Continuous (fun M : Matrix (Fin n) (Fin n) ℂ => J * Mᴴ * J) := by
-    exact (continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul continuous_const
+    exact (continuous_const.matrix_mul continuous_id.matrix_conjTranspose).matrix_mul
+      continuous_const
   have hψ : Continuous (fun M : Matrix (Fin n) (Fin n) ℂ => (M, MulOpposite.op (J * Mᴴ * J))) := by
     exact continuous_id.prodMk (MulOpposite.continuous_op.comp hct)
-  have hcomp : ((fun M : Matrix (Fin n) (Fin n) ℂ => (M, MulOpposite.op (J * Mᴴ * J))) ∘
-      (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ))) =
-      (Units.embedProduct (Matrix (Fin n) (Fin n) ℂ)) ∘ (Subtype.val : H → (Matrix (Fin n) (Fin n) ℂ)ˣ) := by
+  have hcomp
+      : ((fun M : Matrix (Fin n) (Fin n) ℂ => (M, MulOpposite.op (J * Mᴴ * J)))
+          ∘ (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)))
+        = (Units.embedProduct (Matrix (Fin n) (Fin n) ℂ))
+          ∘ (Subtype.val : H → (Matrix (Fin n) (Fin n) ℂ)ˣ) := by
     funext g
     simp only [Function.comp_apply, Units.embedProduct_apply, hinv]
-  have hind : Topology.IsInducing ((fun M : Matrix (Fin n) (Fin n) ℂ => (M, MulOpposite.op (J * Mᴴ * J))) ∘
-      (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ))) := by
+  have hind : Topology.IsInducing
+      ((fun M : Matrix (Fin n) (Fin n) ℂ => (M, MulOpposite.op (J * Mᴴ * J)))
+        ∘ (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ))) := by
     rw [hcomp]
     exact Units.isInducing_embedProduct.comp Topology.IsInducing.subtypeVal
-  have hemb : Topology.IsEmbedding
-      (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) :=
+  have hemb : Topology.IsEmbedding (fun g : H =>
+      ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) :=
     ⟨Topology.IsInducing.of_comp hcont hψ hind, fun a b hab => Subtype.ext (Units.ext hab)⟩
   refine ⟨hemb, ?_⟩
-  have hrange : Set.range (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)) =
-      {M | Mᴴ * J * M = J} := by
+  have hrange
+      : Set.range (fun g : H => ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ))
+        = {M | Mᴴ * J * M = J} := by
     ext M
     constructor
     · rintro ⟨g, rfl⟩
@@ -309,14 +326,19 @@ lemma omegaDensity_rel {P Q : ℕ} {μ ν : Measure (Formalism.BasicNotions.UpqT
 end UpperTriangularPsiTransport
 
 open UpperTriangularPsiTransport in
-theorem muCD_eq_cd_vol (cd : Formalism.BasicNotions.CDHaar) {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n) {ε : Fin n → Bool}
-    (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
-    (A : Set (Formalism.REAL.UJ ε)) (hA : MeasurableSet A) :
-    muCD ε A = cd.cd P Q {g | ∃ a ∈ A, Formalism.MainNotions.S.umat a = Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g)} := by
+theorem muCD_eq_cd_vol
+    (cd : Formalism.BasicNotions.CDHaar)
+    {P Q : ℕ} (e : Fin P ⊕ Fin Q ≃ Fin n)
+    {ε : Fin n → Bool} (he1 : ∀ i, ε (e (Sum.inl i)) = true) (he2 : ∀ j, ε (e (Sum.inr j)) = false)
+    (A : Set (Formalism.REAL.UJ ε)) (hA : MeasurableSet A)
+    : muCD ε A
+      = cd.cd P Q
+        {g | ∃ a ∈ A, Formalism.MainNotions.S.umat a = Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g)} := by
   obtain ⟨a, -, hrel⟩ := key cd e he1 he2
   have hn : P + Q = n := by simpa using Fintype.card_congr e
   obtain ⟨c', -, -, h1, h2⟩ := cd.trick P Q
-  have hc' : c' = ENNReal.ofReal (cOmega (P + Q)) := omegaDensity_unique h2 (omegaDensity_cd cd (P + Q))
+  have hc' : c' = ENNReal.ofReal (cOmega (P + Q)) :=
+    omegaDensity_unique h2 (omegaDensity_cd cd (P + Q))
   have hc0 : ENNReal.ofReal (cPQ ε) ≠ 0 := by simpa using cPQ_pos ε
   have hw0 : ENNReal.ofReal (cOmega n) ≠ 0 := by simpa using cOmega_pos n
   have hrel2 := omegaDensity_rel ENNReal.ofReal_ne_top hw0 hrel h1 (omegaDensity_muCDtr e he1 he2)
@@ -329,10 +351,14 @@ theorem muCD_eq_cd_vol (cd : Formalism.BasicNotions.CDHaar) {P Q : ℕ} (e : Fin
   rw [hac, mul_comm] at hE
   rw [(ENNReal.mul_right_inj hc0 ENNReal.ofReal_ne_top).1 hE]
   have hemb : MeasurableEmbedding (β := Fin n → Fin n → ℂ)
-      (fun g : Formalism.BasicNotions.UpqT P Q => Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g)) :=
+      (fun g : Formalism.BasicNotions.UpqT P Q =>
+        Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g)) :=
     (toM_emb ε).comp (psiM e he1 he2).measurableEmbedding
-  have himg : (fun g : Formalism.BasicNotions.UpqT P Q => Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g)) '' E =
-      (fun g : Formalism.REAL.UJ ε => Formalism.MainNotions.S.umat g) '' A := by
+  have himg
+      : (fun g : Formalism.BasicNotions.UpqT P Q =>
+            Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g))
+          '' E
+        = (fun g : Formalism.REAL.UJ ε => Formalism.MainNotions.S.umat g) '' A := by
     ext M
     constructor
     · rintro ⟨g, ⟨x, hx, hxg⟩, rfl⟩
@@ -341,11 +367,17 @@ theorem muCD_eq_cd_vol (cd : Formalism.BasicNotions.CDHaar) {P Q : ℕ} (e : Fin
       have hx2 : x.1 ∈ UJ ε := by rw [← real_UJ_eq_UJ ε]; exact x.2
       have hy := congrArg (fun y : UJ ε => toM y) ((psi e he1 he2).apply_symm_apply ⟨x.1, hx2⟩)
       exact ⟨(psi e he1 he2).symm ⟨x.1, hx2⟩, ⟨x, hx, hy.symm⟩, hy⟩
-  have hL : muCD ε A = ENNReal.ofReal (cPQ ε) *
-      muPolarMat ε ((fun g : Formalism.REAL.UJ ε => Formalism.MainNotions.S.umat g) '' A) :=
+  have hL
+      : muCD ε A
+        = ENNReal.ofReal (cPQ ε)
+          * muPolarMat ε ((fun g : Formalism.REAL.UJ ε => Formalism.MainNotions.S.umat g) '' A) :=
     (Measure.smul_apply _ _ _).trans (congrArg _ ((umat_emb ε).comap_apply _ _))
-  have hR : muCDtr e ε E = ENNReal.ofReal (cPQ ε) *
-      muPolarMat ε ((fun g : Formalism.BasicNotions.UpqT P Q => Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g)) '' E) :=
+  have hR
+      : muCDtr e ε E
+        = ENNReal.ofReal (cPQ ε) * muPolarMat ε
+          ((fun g : Formalism.BasicNotions.UpqT P Q =>
+              Matrix.reindex e e (Formalism.BasicNotions.UpqT.mat g))
+            '' E) :=
     (hemb.comap_apply _ _).trans (Measure.smul_apply _ _ _)
   rw [hL, hR]
   exact congrArg (fun S => ENNReal.ofReal (cPQ ε) * muPolarMat ε S) himg.symm

@@ -4,8 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
@@ -21,8 +24,8 @@ private def unitBall (p : ℕ) [Fact p.Prime] : Subring (PadicAlgCl p) where
   zero_mem' := by simp
   neg_mem' := by simp
 
-private theorem den_of_norm {p : ℕ} [hp : Fact p.Prime] (q : ℚ) (h : ‖(q : ℚ_[p])‖ ≤ 1) :
-    ¬ p ∣ q.den := by
+private theorem den_of_norm {p : ℕ} [hp : Fact p.Prime] (q : ℚ) (h : ‖(q : ℚ_[p])‖ ≤ 1)
+    : ¬ p ∣ q.den := by
   intro hd
   have hnum : ¬ (p : ℤ) ∣ q.num := by
     intro hn
@@ -39,8 +42,12 @@ private theorem den_of_norm {p : ℕ} [hp : Fact p.Prime] (q : ℚ) (h : ‖(q :
   rw [norm_mul, hn1] at hn
   nlinarith [norm_nonneg (q.den : ℚ_[p]), norm_nonneg (q : ℚ_[p])]
 
-private theorem coeff_den {p : ℕ} [Fact p.Prime] {F : Type} [Field F] [NumberField F] (x : F)
-    (h : ∀ τ : F →+* PadicAlgCl p, ‖τ x‖ ≤ 1) (i : ℕ) : ¬ p ∣ ((minpoly ℚ x).coeff i).den := by
+private theorem coeff_den
+    {p : ℕ} [Fact p.Prime]
+    {F : Type} [Field F] [NumberField F]
+    (x : F) (h : ∀ τ : F →+* PadicAlgCl p, ‖τ x‖ ≤ 1)
+    (i : ℕ)
+    : ¬ p ∣ ((minpoly ℚ x).coeff i).den := by
   have hx : IsIntegral ℚ x := Algebra.IsIntegral.isIntegral x
   set P := (minpoly ℚ x).map (algebraMap ℚ (PadicAlgCl p)) with hP
   have hPm : P.Monic := (minpoly.monic hx).map _
@@ -55,7 +62,8 @@ private theorem coeff_den {p : ℕ} [Fact p.Prime] {F : Type} [Field F] [NumberF
     obtain ⟨ψ, rfl⟩ := hr'
     exact h ψ.toRingHom
   have hprod : (P.roots.map fun a => Polynomial.X - Polynomial.C a).prod = P :=
-    Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hPm IsAlgClosed.card_roots_eq_natDegree
+    Polynomial.prod_multiset_X_sub_C_of_monic_of_roots_card_eq hPm
+      IsAlgClosed.card_roots_eq_natDegree
   have hlift : P ∈ Polynomial.lifts (unitBall p).subtype := by
     rw [← hprod]
     refine Subsemiring.multiset_prod_mem _ _ ?_
@@ -68,15 +76,18 @@ private theorem coeff_den {p : ℕ} [Fact p.Prime] {F : Type} [Field F] [NumberF
     exact y.2
   rw [hP, Polynomial.coeff_map] at hn
   apply den_of_norm
-  have hc : algebraMap ℚ (PadicAlgCl p) ((minpoly ℚ x).coeff i)
-      = algebraMap ℚ_[p] (PadicAlgCl p) (((minpoly ℚ x).coeff i : ℚ) : ℚ_[p]) := by
+  have hc
+      : algebraMap ℚ (PadicAlgCl p) ((minpoly ℚ x).coeff i)
+        = algebraMap ℚ_[p] (PadicAlgCl p) (((minpoly ℚ x).coeff i : ℚ) : ℚ_[p]) := by
     simp only [eq_ratCast, map_ratCast]
   rw [hc] at hn
   exact (PadicAlgCl.norm_extends p _).symm.trans_le hn
 
-private theorem integral_multiple_coprime {p : ℕ} [Fact p.Prime] {F : Type} [Field F] [NumberField F] (x : F)
-    (h : ∀ i, ¬ p ∣ ((minpoly ℚ x).coeff i).den) :
-    ∃ (m : ℕ) (c : 𝓞 F), m.Coprime p ∧ (c : F) = m * x := by
+private theorem integral_multiple_coprime
+    {p : ℕ} [Fact p.Prime]
+    {F : Type} [Field F] [NumberField F]
+    (x : F) (h : ∀ i, ¬ p ∣ ((minpoly ℚ x).coeff i).den)
+    : ∃ (m : ℕ) (c : 𝓞 F), m.Coprime p ∧ (c : F) = m * x := by
   have hx : IsIntegral ℚ x := Algebra.IsIntegral.isIntegral x
   set P := minpoly ℚ x with hP
   set M : ℕ := ∏ i ∈ Finset.range (P.natDegree + 1), (P.coeff i).den with hM
@@ -108,7 +119,8 @@ private theorem integral_multiple_coprime {p : ℕ} [Fact p.Prime] {F : Type} [F
         exact (minpoly.monic hx).leadingCoeff.symm
     · refine ⟨0, ?_⟩
       simp [Polynomial.coeff_eq_zero_of_natDegree_lt (not_le.mp hi)]
-  have hmon : (P.scaleRoots (M : ℚ)).Monic := (Polynomial.monic_scaleRoots_iff _).mpr (minpoly.monic hx)
+  have hmon : (P.scaleRoots (M : ℚ)).Monic :=
+    (Polynomial.monic_scaleRoots_iff _).mpr (minpoly.monic hx)
   obtain ⟨Q, hQmap, -, hQm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic hQ hmon
   have hint : IsIntegral ℤ ((M : F) * x) := by
     refine ⟨Q, hQm, ?_⟩
@@ -119,17 +131,19 @@ private theorem integral_multiple_coprime {p : ℕ} [Fact p.Prime] {F : Type} [F
     exact h0
   exact ⟨M, ⟨(M : F) * x, hint⟩, hMcop, rfl⟩
 
-theorem UpperTheory.Gal.W2.fInt_of :
-    UpperTheory.Gal.W2.EmbAll → UpperTheory.Gal.W2.FInt := by
+theorem UpperTheory.Gal.W2.fInt_of : UpperTheory.Gal.W2.EmbAll → UpperTheory.Gal.W2.FInt := by
   intro hE p _ G x hx
   apply integral_multiple_coprime
   apply coeff_den
   intro τ
   obtain ⟨w, σ, h | h⟩ := hE p G τ
   · rw [h x]
-    calc ‖σ (G.emb w x)‖ = ‖G.emb w x‖ := (spectralNorm_eq_of_equiv σ _).symm
+    calc
+      ‖σ (G.emb w x)‖
+        = ‖G.emb w x‖ := (spectralNorm_eq_of_equiv σ _).symm
       _ ≤ 1 := (hx w).1
   · rw [h x]
-    calc ‖σ (G.emb w ((IsCMField.complexConj G.F) x))‖
+    calc
+      ‖σ (G.emb w ((IsCMField.complexConj G.F) x))‖
         = ‖G.emb w ((IsCMField.complexConj G.F) x)‖ := (spectralNorm_eq_of_equiv σ _).symm
       _ ≤ 1 := (hx w).2

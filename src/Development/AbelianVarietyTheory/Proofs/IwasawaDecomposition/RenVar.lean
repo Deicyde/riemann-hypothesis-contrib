@@ -30,8 +30,8 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 def renVar {H : Host E} (τ : GlobalTheory.AllWt.Psi H) (y : Bool × ℕ) : (E →+* ℂ) × ℕ :=
   (if y.1 then τ.1 else conjEmb τ.1, y.2)
 
-def ren {H : Host E} (τ : GlobalTheory.AllWt.Psi H) :
-    MvPolynomial (Bool × ℕ) ℝ →ₐ[ℝ] MvPolynomial ((E →+* ℂ) × ℕ) ℝ :=
+def ren {H : Host E} (τ : GlobalTheory.AllWt.Psi H)
+    : MvPolynomial (Bool × ℕ) ℝ →ₐ[ℝ] MvPolynomial ((E →+* ℂ) × ℕ) ℝ :=
   rename (renVar τ)
 
 end GlobalTheory.GrassTop

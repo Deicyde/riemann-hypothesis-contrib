@@ -9,7 +9,12 @@ open GlobalTheory.SeqCx Matrix
 
 namespace GlobalTheory.ShearLow
 
-theorem main : ∀ (R : Type) [CommRing R] (n : ℕ) (h : (ℕ →₀ R) →ₗ[R] R) (t : ℕ →₀ R), t ∈ low R n → h t = 0 → ∃ ψ : (ℕ →₀ R) ≃ₗ[R] (ℕ →₀ R), (∀ x, ψ x = x + h x • t) ∧ (∀ x, ψ x ∈ low R n ↔ x ∈ low R n) ∧ ∀ j x, ψ x ∈ aff R n j ↔ x ∈ aff R n j := by
+theorem main
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (h : (ℕ →₀ R) →ₗ[R] R) (t : ℕ →₀ R),
+      t ∈ low R n → h t = 0
+        → ∃ ψ : (ℕ →₀ R) ≃ₗ[R] (ℕ →₀ R),
+          (∀ x, ψ x = x + h x • t) ∧ (∀ x, ψ x ∈ low R n ↔ x ∈ low R n)
+            ∧ ∀ j x, ψ x ∈ aff R n j ↔ x ∈ aff R n j := by
   intro R _ n h t ht hht
   have key : ∀ x y : ℕ →₀ R, y ∈ low R n → (x + y ∈ low R n ↔ x ∈ low R n) := by
     intro x y hy
@@ -26,22 +31,24 @@ theorem main : ∀ (R : Type) [CommRing R] (n : ℕ) (h : (ℕ →₀ R) →ₗ[
     simp only [low, Set.mem_setOf_eq, Finsupp.smul_apply] at ht ⊢
     intro i hi
     rw [ht i hi, smul_zero]
-  let ψ : (ℕ →₀ R) ≃ₗ[R] (ℕ →₀ R) :=
-    { toFun := fun x => x + h x • t
-      invFun := fun x => x - h x • t
-      map_add' := by
-        intro x y
-        simp only [map_add (f := _), add_smul]
-        abel
-      map_smul' := by
-        intro c x
-        simp only [map_smul, smul_eq_mul, mul_smul, RingHom.id_apply, smul_add]
-      left_inv := by
-        intro x
-        simp only [map_add (f := _), map_smul, hht, smul_eq_mul, mul_zero, add_zero, add_sub_cancel_right]
-      right_inv := by
-        intro x
-        simp only [map_sub, map_smul, hht, smul_eq_mul, mul_zero, sub_zero, sub_add_cancel] }
+  let ψ : (ℕ →₀ R) ≃ₗ[R] (ℕ →₀ R) := {
+    toFun := fun x => x + h x • t
+    invFun := fun x => x - h x • t
+    map_add' := by
+      intro x y
+      simp only [map_add (f := _), add_smul]
+      abel
+    map_smul' := by
+      intro c x
+      simp only [map_smul, smul_eq_mul, mul_smul, RingHom.id_apply, smul_add]
+    left_inv := by
+      intro x
+      simp only [map_add (f := _), map_smul, hht, smul_eq_mul, mul_zero, add_zero,
+        add_sub_cancel_right]
+    right_inv := by
+      intro x
+      simp only [map_sub, map_smul, hht, smul_eq_mul, mul_zero, sub_zero, sub_add_cancel]
+  }
   have hψ : ∀ x, ψ x = x + h x • t := fun x => rfl
   refine ⟨ψ, hψ, ?_, ?_⟩
   · intro x
@@ -58,7 +65,11 @@ end GlobalTheory.ShearLow
 
 section
 open GlobalTheory.SeqCx Matrix
-theorem _root_.GlobalTheory.T.exists_transvection_preserving_low_and_aff : ∀ (R : Type) [CommRing R] (n : ℕ) (h : (ℕ →₀ R) →ₗ[R] R) (t : ℕ →₀ R), t ∈ low R n → h t = 0 → ∃ ψ : (ℕ →₀ R) ≃ₗ[R] (ℕ →₀ R), (∀ x, ψ x = x + h x • t) ∧ (∀ x, ψ x ∈ low R n ↔ x ∈ low R n) ∧ ∀ j x, ψ x ∈ aff R n j ↔ x ∈ aff R n j := by
-  first
-  | exact @GlobalTheory.ShearLow.main
+theorem _root_.GlobalTheory.T.exists_transvection_preserving_low_and_aff
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (h : (ℕ →₀ R) →ₗ[R] R) (t : ℕ →₀ R),
+      t ∈ low R n → h t = 0
+        → ∃ ψ : (ℕ →₀ R) ≃ₗ[R] (ℕ →₀ R),
+          (∀ x, ψ x = x + h x • t) ∧ (∀ x, ψ x ∈ low R n ↔ x ∈ low R n)
+            ∧ ∀ j x, ψ x ∈ aff R n j ↔ x ∈ aff R n j := by
+  first | exact @GlobalTheory.ShearLow.main
 end

@@ -29,16 +29,14 @@ def segreIndex : Fin (n + 1) × Fin (m + 1) ≃ Fin (n * m + n + m + 1) :=
 variable {n m}
 
 abbrev segreOpen (i : Fin (n + 1)) (j : Fin (m + 1)) : (prodP A n m).Opens :=
-  pullback.fst (toSpecBase A n) (toSpecBase A m) ⁻¹ᵁ Proj.basicOpen (grading A n) (X i) ⊓
-    pullback.snd (toSpecBase A n) (toSpecBase A m) ⁻¹ᵁ Proj.basicOpen (grading A m) (X j)
-
+  pullback.fst (toSpecBase A n) (toSpecBase A m) ⁻¹ᵁ Proj.basicOpen (grading A n) (X i)
+    ⊓ pullback.snd (toSpecBase A n) (toSpecBase A m) ⁻¹ᵁ Proj.basicOpen (grading A m) (X j)
 
 omit [CommRing A] in
 lemma top_le_preimage_ι_comp {Y Z : Scheme.{u}} (V : Y.Opens) (q : Y ⟶ Z) {U : Z.Opens}
     (h : V ≤ q ⁻¹ᵁ U) : ⊤ ≤ (V.ι ≫ q) ⁻¹ᵁ U := by
   intro x _
   exact h x.2
-
 
 omit [CommRing A] in
 lemma homOfLE_appTop_appLE {Y Z : Scheme.{u}} (q : Y ⟶ Z) {U : Z.Opens} {V W : Y.Opens}
@@ -99,16 +97,19 @@ variable (A)
 
 def segreU (i : Fin (n + 1)) (j : Fin (m + 1)) (a : Fin (n + 1)) : Γ(segreOpen A i j, ⊤) :=
   ((segreOpen A i j).ι ≫ pullback.fst (toSpecBase A n) (toSpecBase A m)).appLE
-    (Proj.basicOpen (grading A n) (X i)) ⊤ (top_le_preimage_ι_comp _ _ inf_le_left) (chartHom i (X a))
+    (Proj.basicOpen (grading A n) (X i)) ⊤ (top_le_preimage_ι_comp _ _ inf_le_left)
+    (chartHom i (X a))
 
 def segreV (i : Fin (n + 1)) (j : Fin (m + 1)) (b : Fin (m + 1)) : Γ(segreOpen A i j, ⊤) :=
   ((segreOpen A i j).ι ≫ pullback.snd (toSpecBase A n) (toSpecBase A m)).appLE
-    (Proj.basicOpen (grading A m) (X j)) ⊤ (top_le_preimage_ι_comp _ _ inf_le_right) (chartHom j (X b))
+    (Proj.basicOpen (grading A m) (X j)) ⊤ (top_le_preimage_ι_comp _ _ inf_le_right)
+    (chartHom j (X b))
 
-def segreRing (i : Fin (n + 1)) (j : Fin (m + 1)) :
-    MvPolynomial (Fin (n * m + n + m + 1)) A →+* Γ(segreOpen A i j, ⊤) :=
-  eval₂Hom ((((segreOpen A i j).ι ≫ pullback.fst (toSpecBase A n) (toSpecBase A m)).appLE
-      (Proj.basicOpen (grading A n) (X i)) ⊤ (top_le_preimage_ι_comp _ _ inf_le_left)).hom.comp
+def segreRing (i : Fin (n + 1)) (j : Fin (m + 1))
+    : MvPolynomial (Fin (n * m + n + m + 1)) A →+* Γ(segreOpen A i j, ⊤) :=
+  eval₂Hom
+    ((((segreOpen A i j).ι ≫ pullback.fst (toSpecBase A n) (toSpecBase A m)).appLE
+        (Proj.basicOpen (grading A n) (X i)) ⊤ (top_le_preimage_ι_comp _ _ inf_le_left)).hom.comp
       ((chartHom i).comp C))
     (fun c => segreU A i j ((segreIndex n m).symm c).1 * segreV A i j ((segreIndex n m).symm c).2)
 
@@ -128,8 +129,8 @@ lemma segreRing_irrelevant (i : Fin (n + 1)) (j : Fin (m + 1)) :
     rw [segreRing_X, segreU_self, segreV_self, mul_one]
     exact isUnit_one)
 
-def segreLocal (i : Fin (n + 1)) (j : Fin (m + 1)) :
-    (segreOpen A i j).toScheme ⟶ projectiveSpace A (n * m + n + m) :=
+def segreLocal (i : Fin (n + 1)) (j : Fin (m + 1))
+    : (segreOpen A i j).toScheme ⟶ projectiveSpace A (n * m + n + m) :=
   Proj.fromOfGlobalSections (grading A _) (segreRing A i j) (segreRing_irrelevant A i j)
 
 lemma segreRing_res_X (i : Fin (n + 1)) (j : Fin (m + 1)) {W : (prodP A n m).Opens}
@@ -198,7 +199,6 @@ lemma segreLocal_agree (i k : Fin (n + 1)) (j l : Fin (m + 1)) :
     rw [← e₁, ← e₂]
     ring
 
-
 variable (n m) in
 lemma iSup_segreOpen : ⨆ c : Fin (n + 1) × Fin (m + 1), segreOpen A c.1 c.2 = ⊤ := by
   rw [eq_top_iff]
@@ -211,21 +211,22 @@ lemma iSup_segreOpen : ⨆ c : Fin (n + 1) × Fin (m + 1), segreOpen A c.1 c.2 =
       ⨆ j : Fin (m + 1), Proj.basicOpen (grading A m) (X j) by rw [iSup_basicOpen_X]; trivial)
   exact TopologicalSpace.Opens.mem_iSup.2 ⟨(i, j), ⟨hi, hj⟩⟩
 
-
 variable (n m) in
 def segreCover : (prodP A n m).OpenCover :=
-  (prodP A n m).openCoverOfIsOpenCover (fun c : Fin (n + 1) × Fin (m + 1) => segreOpen A c.1 c.2)
+  (prodP A n m).openCoverOfIsOpenCover
+    (fun c : Fin (n + 1) × Fin (m + 1) => segreOpen A c.1 c.2)
     (iSup_segreOpen A n m)
-
 
 variable (n m) in
 def segre : prodP A n m ⟶ projectiveSpace A (n * m + n + m) :=
-  (segreCover A n m).glueMorphisms (fun c => segreLocal A c.1 c.2) fun c d => by
-    have H := isPullback_opens_inf (segreOpen A c.1 c.2) (segreOpen A d.1 d.2)
-    change pullback.fst (segreOpen A c.1 c.2).ι (segreOpen A d.1 d.2).ι ≫ segreLocal A c.1 c.2 =
-      pullback.snd (segreOpen A c.1 c.2).ι (segreOpen A d.1 d.2).ι ≫ segreLocal A d.1 d.2
-    rw [← H.isoPullback_inv_fst, ← H.isoPullback_inv_snd, Category.assoc, Category.assoc,
-      segreLocal_agree]
+  (segreCover A n m).glueMorphisms
+    (fun c => segreLocal A c.1 c.2)
+    fun c d => by
+      have H := isPullback_opens_inf (segreOpen A c.1 c.2) (segreOpen A d.1 d.2)
+      change pullback.fst (segreOpen A c.1 c.2).ι (segreOpen A d.1 d.2).ι ≫ segreLocal A c.1 c.2
+        = pullback.snd (segreOpen A c.1 c.2).ι (segreOpen A d.1 d.2).ι ≫ segreLocal A d.1 d.2
+      rw [← H.isoPullback_inv_fst, ← H.isoPullback_inv_snd, Category.assoc, Category.assoc,
+        segreLocal_agree]
 
 lemma ι_segre (i : Fin (n + 1)) (j : Fin (m + 1)) :
     (segreOpen A i j).ι ≫ segre A n m = segreLocal A i j :=
@@ -239,15 +240,16 @@ lemma fromOfGlobalSections_toSpecBase {N : ℕ} {O : Scheme.{u}}
   rw [toSpecBase, Proj.fromOfGlobalSections_toSpecZero_assoc, ← Spec.map_comp]
   rfl
 
-
 variable (n m) in
-theorem segre_toSpecBase :
-    segre A n m ≫ toSpecBase A (n * m + n + m) =
-      pullback.fst (toSpecBase A n) (toSpecBase A m) ≫ toSpecBase A n := by
+theorem segre_toSpecBase
+    : segre A n m ≫ toSpecBase A (n * m + n + m)
+      = pullback.fst (toSpecBase A n) (toSpecBase A m) ≫ toSpecBase A n := by
   refine (segreCover A n m).hom_ext _ _ fun c => ?_
   change (segreOpen A c.1 c.2).ι ≫ _ = (segreOpen A c.1 c.2).ι ≫ _
-  have htop : ((segreOpen A c.1 c.2).ι ≫ pullback.fst (toSpecBase A n) (toSpecBase A m)) ⁻¹ᵁ
-      Proj.basicOpen (grading A n) (X c.1) = ⊤ :=
+  have htop
+      : ((segreOpen A c.1 c.2).ι ≫ pullback.fst (toSpecBase A n) (toSpecBase A m))
+          ⁻¹ᵁ Proj.basicOpen (grading A n) (X c.1)
+        = ⊤ :=
     top_unique (top_le_preimage_ι_comp _ _ inf_le_left)
   rw [← Category.assoc, ι_segre, segreLocal, fromOfGlobalSections_toSpecBase, ← Category.assoc,
     eq_fromOfGlobalSections_of_preimage_eq_top _ c.1 htop, fromOfGlobalSections_toSpecBase]

@@ -18,11 +18,32 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCechLi
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PicGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.PicGlue
 
 namespace GlobalTheory.RigLBDense
 
-theorem exists_extension_of_local_ext : ∀ {S Y U YU : Scheme.{0}} [IsLocallyNoetherian S] [GlobalTheory.IsNormalScheme S] (f : Y ⟶ S) [Smooth f] [GeometricallyConnected f] (j : U ⟶ S) [IsOpenImmersion j], Dense (Set.range j) → ∀ (e : YU ⟶ Y) (fU : YU ⟶ U), IsPullback e fU f j → ∀ (σ : S ⟶ Y) (σU : U ⟶ YU), σ ≫ f = 𝟙 S → σU ≫ e = j ≫ σ → ∀ (L : LB YU), L.IsLB → ∀ (r : LB.Gen (L.pull σU)), r.IsGen → (∀ x : S, x ∉ Set.range j → ∃ W : S.Opens, x ∈ W ∧ ∃ N : LB ↑(f ⁻¹ᵁ W), N.IsLB ∧ ∀ (T : Scheme.{0}) (a : T ⟶ ↑(f ⁻¹ᵁ W)) (b : T ⟶ YU), a ≫ (f ⁻¹ᵁ W).ι = b ≫ e → LBIso (N.pull a) (L.pull b)) → ∃ M : LB Y, M.IsLB ∧ LBIso (M.pull e) L := by
+theorem exists_extension_of_local_ext
+    : ∀ {S Y U YU : Scheme.{0}} [IsLocallyNoetherian S] [GlobalTheory.IsNormalScheme S] (f : Y ⟶ S)
+        [Smooth f] [GeometricallyConnected f] (j : U ⟶ S) [IsOpenImmersion j],
+      Dense (Set.range j)
+        → ∀ (e : YU ⟶ Y) (fU : YU ⟶ U),
+          IsPullback e fU f j
+            → ∀ (σ : S ⟶ Y) (σU : U ⟶ YU),
+              σ ≫ f = 𝟙 S → σU ≫ e = j ≫ σ
+                → ∀ (L : LB YU),
+                  L.IsLB
+                    → ∀ (r : LB.Gen (L.pull σU)),
+                      r.IsGen
+                        → (∀ x : S,
+                          x ∉ Set.range j
+                            → ∃ W : S.Opens,
+                              x ∈ W
+                                ∧ ∃ N : LB ↑(f ⁻¹ᵁ W),
+                                  N.IsLB
+                                    ∧ ∀ (T : Scheme.{0}) (a : T ⟶ ↑(f ⁻¹ᵁ W)) (b : T ⟶ YU),
+                                      a ≫ (f ⁻¹ᵁ W).ι = b ≫ e → LBIso (N.pull a) (L.pull b))
+                        → ∃ M : LB Y, M.IsLB ∧ LBIso (M.pull e) L := by
   intro S Y U YU _ _ f _ _ j _ hj e fU hP σ σU hσ hσU L hL r hr hloc
   haveI : IsOpenImmersion e := MorphismProperty.of_isPullback hP.flip ‹IsOpenImmersion j›
   haveI : IsReduced S := isReduced_of_isReduced_stalk S
@@ -50,9 +71,11 @@ theorem exists_extension_of_local_ext : ∀ {S Y U YU : Scheme.{0}} [IsLocallyNo
     have i₁ : LBIso ((M.pull (f ⁻¹ᵁ W).ι).pull a) (M.pull (T.ι ≫ e)) := by
       have := isOn_pull_comp Y _ _ (f ⁻¹ᵁ W) M (f ⁻¹ᵁ W).ι a hM hι
       rwa [ha] at this
-    have i₂ : LBIso ((M.pull (f ⁻¹ᵁ W).ι).pull a) (N.pull a) := LBIso.chartPull (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull _ a a rfl) (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull _ a a rfl) hMN
+    have i₂ : LBIso ((M.pull (f ⁻¹ᵁ W).ι).pull a) (N.pull a) :=
+      LBIso.chartPull (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull _ a a rfl)
+        (ReciprocityTheory.ChartRestriction.G.Geo.Tor.chartPullPull _ a a rfl) hMN
     have i₃ : LBIso (N.pull a) (L.pull T.ι) := hagr T a T.ι ha
-    exact LBIso.trans k₂ k₁ (LB.isLB_pull hL _) i₁.symm (LBIso.trans k₁ (LB.isLB_pull hN a) (LB.isLB_pull hL _) i₂ i₃)
-  )
+    exact LBIso.trans k₂ k₁ (LB.isLB_pull hL _) i₁.symm
+      (LBIso.trans k₁ (LB.isLB_pull hN a) (LB.isLB_pull hL _) i₂ i₃))
 
 end GlobalTheory.RigLBDense

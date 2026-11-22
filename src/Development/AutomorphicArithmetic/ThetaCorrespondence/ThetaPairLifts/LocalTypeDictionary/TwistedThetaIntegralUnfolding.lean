@@ -34,7 +34,10 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 section
 open GlobalTheory.RowClaim GlobalTheory.RowVal GlobalTheory.RowReal
 namespace GlobalTheory.RowUnfLast
-theorem twisted_theta_integral_unfolding : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal → SumOKK → StepUnfold := fun p c s =>
+theorem twisted_theta_integral_unfolding
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal → SumOKK
+      → StepUnfold := fun p c s =>
   have rel := GlobalTheory.T.lastRow_real_iterated_integral_eq_const_mul_finite
   have hcv := GlobalTheory.T.cellSumRelationsPassToIntegrals_proof
   have grp := GlobalTheory.T.rowPeriodGroups_split_real_finite_large_depth
@@ -52,15 +55,43 @@ theorem twisted_theta_integral_unfolding : _root_.GlobalTheory.FunPr.ThetaLocalI
   have bas := GlobalTheory.T.lastRow_unfolding_basicHypotheses
   have one := GlobalTheory.T.rowTest_support_families_staircase_cosets
   have rl := GlobalTheory.RowReal.realLine
-  big_mono (fun ch ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨rel, grp⟩, it⟩, inv⟩, ⟨e, fl⟩⟩, supp⟩, rep⟩, val⟩, off⟩, tens⟩, vol⟩, wt⟩, fock⟩, bas⟩, one⟩, rl⟩, s⟩ =>
-    rel grp it.1 it.2 inv ⟨e, supp e fl off inv tens bas, rep e, val e fl tens vol (wt e) fock bas one s⟩ rl s)
-  (((((((((((((((((rel hcv).and grp).and (it p c)).and inv).and flat).and supp).and rep).and val).and off).and tens).and vol).and wt).and fock).and bas).and one).and rl).and s)
+  big_mono
+    (fun ch
+        ⟨
+          ⟨
+            ⟨
+              ⟨
+                ⟨
+                  ⟨
+                    ⟨⟨⟨⟨⟨⟨⟨⟨⟨⟨rel, grp⟩, it⟩, inv⟩, ⟨e, fl⟩⟩, supp⟩, rep⟩, val⟩, off⟩, tens⟩, vol⟩,
+                    wt
+                  ⟩,
+                  fock
+                ⟩,
+                bas
+              ⟩,
+              one
+            ⟩,
+            rl
+          ⟩,
+          s
+        ⟩ =>
+      rel grp it.1 it.2 inv
+        ⟨e, supp e fl off inv tens bas, rep e, val e fl tens vol (wt e) fock bas one s⟩ rl s)
+    (((((((((((((((((rel hcv).and grp).and (it p c)).and inv).and flat).and supp).and rep).and
+      val).and off).and tens).and vol).and wt).and fock).and bas).and one).and rl).and s)
 end GlobalTheory.RowUnfLast
 end
 
 section
 open GlobalTheory.RowClaim
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.twisted_theta_integral_unfolds : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal → SumOKK → StepUnfold := by
-  first | exact @_root_.GlobalTheory.RowUnfLast.twisted_theta_integral_unfolding | exact _root_.GlobalTheory.RowUnfLast.twisted_theta_integral_unfolding | (intros; apply _root_.GlobalTheory.RowUnfLast.twisted_theta_integral_unfolding <;> assumption)
+theorem _root_.GlobalTheory.T.twisted_theta_integral_unfolds
+    : _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal → SumOKK
+      → StepUnfold := by
+  first
+  | exact @_root_.GlobalTheory.RowUnfLast.twisted_theta_integral_unfolding
+  | exact _root_.GlobalTheory.RowUnfLast.twisted_theta_integral_unfolding
+  | (intros; apply _root_.GlobalTheory.RowUnfLast.twisted_theta_integral_unfolding <;> assumption)
 end

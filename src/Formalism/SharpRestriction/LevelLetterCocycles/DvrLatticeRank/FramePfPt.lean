@@ -8,7 +8,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 section Zero
 
@@ -16,9 +18,9 @@ open PowerSeries
 
 variable {LL : Type} [Field LL]
 
-theorem framepf_exp_pow_sub_one (E : PowerSeries LL) (h0 : constantCoeff E = 1)
-    (hd : PowerSeries.derivative E = E) (p : ℕ) :
-    ∃ w : PowerSeries LL, E ^ p - 1 = X * w ∧ constantCoeff w = (p : LL) := by
+theorem framepf_exp_pow_sub_one
+    (E : PowerSeries LL) (h0 : constantCoeff E = 1) (hd : PowerSeries.derivative E = E) (p : ℕ)
+    : ∃ w : PowerSeries LL, E ^ p - 1 = X * w ∧ constantCoeff w = (p : LL) := by
   have hX1 : X ∣ E - 1 := by
     rw [PowerSeries.X_dvd_iff]
     simp [h0]
@@ -31,8 +33,7 @@ theorem framepf_exp_pow_sub_one (E : PowerSeries LL) (h0 : constantCoeff E = 1)
     have h1 : coeff 1 (E - 1) = coeff 0 w1 := by
       rw [hw1]
       exact PowerSeries.coeff_succ_X_mul 0 w1
-    have h3 : coeff 1 (E - 1) = coeff 1 E := by
-      simp [PowerSeries.coeff_one]
+    have h3 : coeff 1 (E - 1) = coeff 1 E := by simp [PowerSeries.coeff_one]
     rw [← PowerSeries.coeff_zero_eq_constantCoeff_apply, ← h1, h3, ← h2,
       PowerSeries.coeff_zero_eq_constantCoeff_apply, h0]
   induction p with
@@ -49,19 +50,20 @@ end Zero
 
 section Local
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [TopologicalSpace LL]
-    [CommRing O] [Algebra O LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
-    (W : LocWach PD LL O v n)
-
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL O : Type}
+  [Field LL] [Algebra Qp LL] [TopologicalSpace LL] [CommRing O] [Algebra O LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : LocWach PD LL O v n)
 
 open PowerSeries in
-theorem framepf_lev_q_simple (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p) :
-    ∃ u : PowerSeries LL, W.lev c ζ W.q = X * u ∧ constantCoeff u ≠ 0 := by
+theorem framepf_lev_q_simple (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+    : ∃ u : PowerSeries LL, W.lev c ζ W.q = X * u ∧ constantCoeff u ≠ 0 := by
   obtain ⟨E, hE0, hEd, hE⟩ := W.lev_π c ζ ⟨1, by simpa using hζ⟩
   obtain ⟨w, hw, hwc⟩ := framepf_exp_pow_sub_one E hE0 hEd PD.p
   have hp0 : (PD.p : LL) ≠ 0 := by
@@ -85,8 +87,8 @@ theorem framepf_lev_q_simple (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD
     simp only [Pi.mul_apply, Pi.sub_apply, Pi.pow_apply, Pi.add_apply, Pi.one_apply]
     exact W.q₀_def
   have hfq : W.lev c ζ letπ * W.lev c ζ W.q = E ^ PD.p - 1 := by
-    rw [← map_mul, hq, map_sub, map_pow, map_add (f := _), map_one, hE, mul_pow, ← map_pow, hζp, map_one,
-      one_mul]
+    rw [← map_mul, hq, map_sub, map_pow, map_add (f := _), map_one, hE, mul_pow, ← map_pow, hζp,
+      map_one, one_mul]
   set P := W.lev c ζ letπ with hPdef
   have hP : P = C ζ * E - 1 := eq_sub_of_add_eq' hE
   have hPc : constantCoeff P = ζ - 1 := by
@@ -97,17 +99,18 @@ theorem framepf_lev_q_simple (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD
     exact sub_ne_zero.mpr hζ1
   refine ⟨w * P⁻¹, ?_, ?_⟩
   · have hinv : P⁻¹ * P = 1 := PowerSeries.inv_mul_cancel P hPne
-    calc W.lev c ζ W.q = (P⁻¹ * P) * W.lev c ζ W.q := by rw [hinv, one_mul]
+    calc
+      W.lev c ζ W.q
+        = (P⁻¹ * P) * W.lev c ζ W.q := by rw [hinv, one_mul]
       _ = P⁻¹ * (E ^ PD.p - 1) := by rw [mul_assoc, hfq]
       _ = X * (w * P⁻¹) := by rw [hw]; ring
   · rw [map_mul, hwc, PowerSeries.constantCoeff_inv, hPc]
     exact mul_ne_zero hp0 (inv_ne_zero (sub_ne_zero.mpr hζ1))
 
-theorem framepf_Q_eq_q (hs : W.s = 1) : W.Q = W.q := by
-  simp [Formalism.BasicNotions.LocWach.Q, hs]
+theorem framepf_Q_eq_q (hs : W.s = 1) : W.Q = W.q := by simp [Formalism.BasicNotions.LocWach.Q, hs]
 
-theorem framepf_Q_at (hs : W.s = 1) (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p) :
-    PowerSeries.constantCoeff (W.lev c ζ W.Q) = 0 ∧ PowerSeries.coeff 1 (W.lev c ζ W.Q) ≠ 0 := by
+theorem framepf_Q_at (hs : W.s = 1) (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoot ζ PD.p)
+    : PowerSeries.constantCoeff (W.lev c ζ W.Q) = 0 ∧ PowerSeries.coeff 1 (W.lev c ζ W.Q) ≠ 0 := by
   obtain ⟨u, hu, hu0⟩ := framepf_lev_q_simple W c ζ hζ
   rw [framepf_Q_eq_q W hs, hu]
   refine ⟨by simp, ?_⟩
@@ -118,9 +121,13 @@ theorem framepf_Q_at (hs : W.s = 1) (c : ZMod n) (ζ : LL) (hζ : IsPrimitiveRoo
 
 end Local
 
-theorem framepf_pt_prim (D : D7) (HW : HWOf D.loc) {l : ℕ} [Fact l.Prime] {K LL : FinExt l}
+theorem framepf_pt_prim
+    (D : D7) (HW : HWOf D.loc)
+    {l : ℕ} [Fact l.Prime]
+    {K LL : FinExt l}
     (hG : Good K 1 LL) (c : ZMod (finrank ℚ_[l] ↥(K0 K))) (ζ : ↥LL.1) (τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1)
-    (hpt : Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG c ζ τ) : IsPrimitiveRoot ζ l := by
+    (hpt : Formalism.MainNotions.DeltaInvariantLattices.ptK D.loc HW hG c ζ τ)
+    : IsPrimitiveRoot ζ l := by
   obtain ⟨τs, ⟨-, hroot⟩, -⟩ := hpt
   have hpow : (D.loc l).ζQ 1 ^ l = 1 := by
     have h := (D.loc l).ζQ_succ 0

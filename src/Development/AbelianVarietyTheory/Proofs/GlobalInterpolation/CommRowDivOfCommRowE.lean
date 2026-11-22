@@ -11,22 +11,24 @@ open MvPolynomial Formalism.GradedWeylDivisibility Formalism.BasicNotions Global
 
 namespace GlobalTheory.Alc
 
-theorem pol_eq_rowE_apply (R : Type) [CommRing R] (r n : ℕ) (a b : Fin r) (g : MvPolynomial (Fin r × Fin n) R) :
-    PI.WGL.pol R a b g = rowE R r n a b g := by
+theorem pol_eq_rowE_apply
+    (R : Type) [CommRing R] (r n : ℕ) (a b : Fin r) (g : MvPolynomial (Fin r × Fin n) R)
+    : PI.WGL.pol R a b g = rowE R r n a b g := by
   rw [PI.WGL.pol_apply]
   simp [rowE, LinearMap.sum_apply]
 
-theorem rowDiv_succ_smul {r n : ℕ} (a b : Fin r) (k : ℕ) (g : MvPolynomial (Fin r × Fin n) ℚ) :
-    ((k : ℚ) + 1) • rowDiv ℚ a b (k + 1) g =
-      rowDiv ℚ a b k (rowE ℚ r n a b g) - (if a = b then (k : ℚ) • rowDiv ℚ a b k g else 0) := by
+theorem rowDiv_succ_smul {r n : ℕ} (a b : Fin r) (k : ℕ) (g : MvPolynomial (Fin r × Fin n) ℚ)
+    : ((k : ℚ) + 1) • rowDiv ℚ a b (k + 1) g
+      = rowDiv ℚ a b k (rowE ℚ r n a b g) - (if a = b then (k : ℚ) • rowDiv ℚ a b k g else 0) := by
   have h := PI.WGL.rowDiv_succ ℚ a b k g
   rw [pol_eq_rowE_apply] at h
   rw [← h]
   split_ifs <;> simp [Algebra.smul_def, mul_comm]
 
-theorem comm_rowDiv_of_comm_rowE : ∀ (r n : ℕ) (T : Module.End ℚ (MvPolynomial (Fin r × Fin n) ℚ)),
-    (∀ a b, T * rowE ℚ r n a b = rowE ℚ r n a b * T) →
-      ∀ a b k f, T (rowDiv ℚ a b k f) = rowDiv ℚ a b k (T f) := by
+theorem comm_rowDiv_of_comm_rowE
+    : ∀ (r n : ℕ) (T : Module.End ℚ (MvPolynomial (Fin r × Fin n) ℚ)),
+      (∀ a b, T * rowE ℚ r n a b = rowE ℚ r n a b * T)
+        → ∀ a b k f, T (rowDiv ℚ a b k f) = rowDiv ℚ a b k (T f) := by
   intro r n T hT a b k
   have hE : ∀ g, T (rowE ℚ r n a b g) = rowE ℚ r n a b (T g) := fun g => by
     have := LinearMap.congr_fun (hT a b) g

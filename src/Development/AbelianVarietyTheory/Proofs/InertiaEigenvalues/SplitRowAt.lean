@@ -12,13 +12,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CmHalfT
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.FrobeniusOrbits GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.FrobeniusOrbits
+  GlobalTheory.IndefiniteRowSideFullHecke.SplitPlaceTypes
 
 namespace GlobalTheory.SplitRowAll
 
 theorem splitRow_at : ∀ D : D7, SplitRow_at D := by
   intro D
-  refine ⟨fun l hl => GlobalTheory.T.split_prime_implies_places_split D.host l hl, fun i hi => ⟨?_, ?_, ?_, ?_⟩⟩
+  refine ⟨
+    fun l hl => GlobalTheory.T.split_prime_implies_places_split D.host l hl,
+    fun i hi => ⟨?_, ?_, ?_, ?_⟩
+  ⟩
   · intro w hw
     have h2 : D.nd.l i ∉ D.host.small := ((primeClass_eq_splitK_iff _).1 hi.2.2.2.2.2).1
     exact (GlobalTheory.T.K0_eq_and_good_of_ne D i h2 hi.2.2.1 hi.2.2.2.1 w hw).1

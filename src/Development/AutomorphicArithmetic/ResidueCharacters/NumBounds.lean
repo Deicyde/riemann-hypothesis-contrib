@@ -25,8 +25,8 @@ theorem one_le_lam (hl : 2 ≤ l) (hh : 1 ≤ h) : 1 ≤ lam l s h := by
   have : (0 : ℝ) ≤ s := Nat.cast_nonneg _
   linarith
 
-theorem natLog_le_logb (hl : 2 ≤ l) {n : ℕ} {y : ℝ} (hy : 1 ≤ y) (hn : (n : ℝ) ≤ y) :
-    (Nat.log l n : ℝ) ≤ Real.logb l y := by
+theorem natLog_le_logb (hl : 2 ≤ l) {n : ℕ} {y : ℝ} (hy : 1 ≤ y) (hn : (n : ℝ) ≤ y)
+    : (Nat.log l n : ℝ) ≤ Real.logb l y := by
   have hl' : (1 : ℝ) < l := by exact_mod_cast hl
   rcases Nat.eq_zero_or_pos n with rfl | hpos
   · simp only [Nat.log_zero_right, Nat.cast_zero]
@@ -34,8 +34,8 @@ theorem natLog_le_logb (hl : 2 ≤ l) {n : ℕ} {y : ℝ} (hy : 1 ≤ y) (hn : (
   · have hn0 : (0 : ℝ) < n := by exact_mod_cast hpos
     exact (Real.natLog_le_logb n l).trans (Real.logb_le_logb_of_le hl' hn0 hn)
 
-theorem natLog_le_lam (hl : 2 ≤ l) (hs : 1 ≤ s) (hh : 1 ≤ h) {n : ℕ} (hn : (n : ℝ) ≤ 8 * h) :
-    (Nat.log l n : ℝ) ≤ lam l s h := by
+theorem natLog_le_lam (hl : 2 ≤ l) (hs : 1 ≤ s) (hh : 1 ≤ h) {n : ℕ} (hn : (n : ℝ) ≤ 8 * h)
+    : (Nat.log l n : ℝ) ≤ lam l s h := by
   have hl1 : (1 : ℝ) < l := by exact_mod_cast (by omega : 1 < l)
   have h1 := natLog_le_logb hl (y := 4 * (2 * h)) (by linarith) (by linarith)
   rw [Real.logb_mul (by norm_num) (by linarith)] at h1
@@ -45,7 +45,8 @@ theorem natLog_le_lam (hl : 2 ≤ l) (hs : 1 ≤ s) (hh : 1 ≤ h) {n : ℕ} (hn
     rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
     nlinarith
   have : (1 : ℝ) ≤ s := by exact_mod_cast hs
-  unfold lam; linarith
+  unfold lam
+  linarith
 
 theorem lam_le (hl : 2 ≤ l) (hs : 1 ≤ s) (hh : 1 ≤ h) : lam l s h ≤ 6 * h * s := by
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast hl

@@ -5,14 +5,23 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
-open Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt Formalism.L2.LamCM GlobalTheory GlobalTheory.ArcQ GlobalTheory.LamF GlobalTheory.ArcCM
+open AlgebraicGeometry CategoryTheory CategoryTheory.Limits MonoidalCategory
+  CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FreeQuotientRank
+open Formalism.L2.Pj Formalism.L2.PjFree Formalism.L2.Pj.QAt Formalism.L2.LamCM GlobalTheory
+  GlobalTheory.ArcQ GlobalTheory.LamF GlobalTheory.ArcCM
 open scoped LaurentSeries
 
 namespace GlobalTheory.ArcCM
 
-theorem modelsAt_of_good_level : Known → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), 1 ≤ Dw.p + Dw.q → (∀ p : ℕ, p.Prime → l.GoodAt p) → ModelsAt Xo c := by
+theorem modelsAt_of_good_level
+    : Known
+      → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+          (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+          (Xo : Moduli Dw l) (c : Coeff l),
+        1 ≤ Dw.p + Dw.q → (∀ p : ℕ, p.Prime → l.GoodAt p) → ModelsAt Xo c := by
   intro hK E _ _ _ H Dw l Xo c hr hg
   classical
   have key : ∀ Xs : ∀ l' : Level H, Moduli Dw l', ModelsAt (Xs l) c := by

@@ -9,30 +9,37 @@ public import Development.AutomorphicArithmetic.PAdicLatticeApproximation.Finran
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.archEx_of :
-    UpperTheory.Gal.W2.FMat → UpperTheory.Gal.W2.FForm → UpperTheory.Gal.W2.SN → UpperTheory.Gal.W2.ArchSpan → UpperTheory.Gal.W2.ArchEx := by
+theorem UpperTheory.Gal.W2.archEx_of
+    : UpperTheory.Gal.W2.FMat → UpperTheory.Gal.W2.FForm → UpperTheory.Gal.W2.SN
+      → UpperTheory.Gal.W2.ArchSpan
+      → UpperTheory.Gal.W2.ArchEx := by
   intro hFM hFF hSN hAS p _ D G L hm
   obtain ⟨kp, σ, hk⟩ := hFM p D G L hm
   obtain ⟨A, hdet, hskew, hform, hcomm⟩ := hFF p D G L kp σ hk
   choose S lam hS hpsi hconj hAv using fun v => UpperTheory.exists_hermitian_diagonalization_at_infinitePlace_of_skewHermitian p G σ A hSN hdet hskew hcomm v
-  let th : VQ D →+ Arch G :=
-    { toFun := fun w v => S v *ᵥ fun i => v.embedding (kp w i)
-      map_zero' := by
-        funext v
-        simp
-        exact Matrix.mulVec_zero _
-      map_add' := fun x y => by
-        funext v
-        have : (fun i => v.embedding (kp (x + y) i)) = (fun i => v.embedding (kp x i)) + (fun i => v.embedding (kp y i)) := by
-          funext i; simp
-        simp only [this, Matrix.mulVec_add]
-        rfl }
+  let th : VQ D →+ Arch G := {
+    toFun := fun w v => S v *ᵥ fun i => v.embedding (kp w i)
+    map_zero' := by
+      funext v
+      simp
+      exact Matrix.mulVec_zero _
+    map_add' := fun x y => by
+      funext v
+      have : (fun i => v.embedding (kp (x + y) i))
+          = (fun i => v.embedding (kp x i)) + (fun i => v.embedding (kp y i)) := by
+        funext i; simp
+      simp only [this, Matrix.mulVec_add]
+      rfl
+  }
   have hth : ∀ w v, th w v = S v *ᵥ fun i => v.embedding (kp w i) := fun _ _ => rfl
   have hact : ∀ (c : G.C) w v, th (L.rep c w) v = G.psi v c *ᵥ th w v := by
     intro c w v
@@ -41,11 +48,15 @@ theorem UpperTheory.Gal.W2.archEx_of :
     funext i
     rw [hk c w]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, map_sum]
-  have hform' : ∀ u w, ((D.EF.baseChange ℚ u w : ℚ) : ℝ) = ∑ v, 2 * (lam v * hv (G.gram v) (th u v) (th w v)).re := by
+    simp [Matrix.mulVec, dotProduct, map_sum]
+  have hform'
+      : ∀ u w,
+        ((D.EF.baseChange ℚ u w : ℚ) : ℝ)
+          = ∑ v, 2 * (lam v * hv (G.gram v) (th u v) (th w v)).re := by
     intro u w
     rw [hform u w]
-    exact UpperTheory.trace_conj_dotProduct_eq_sum_infinitePlaces G.F G.n hAS A S G.gram lam hS hAv (kp u) (kp w)
+    exact UpperTheory.trace_conj_dotProduct_eq_sum_infinitePlaces G.F G.n hAS A S G.gram lam hS hAv
+      (kp u) (kp w)
   have hspan : Submodule.span ℝ (Set.range th) = ⊤ := by
     rw [← UpperTheory.span_real_matrix_mulVec_infinitePlace_embedding_eq_top G.F G.n hAS S hS]
     congr 1
@@ -55,13 +66,16 @@ theorem UpperTheory.Gal.W2.archEx_of :
       exact ⟨kp w, rfl⟩
     · rintro ⟨x, rfl⟩
       exact ⟨kp.symm x, by funext v; simp [hth]⟩
-  have hpos := UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula p D G L th lam hact hform' hspan hconj
+  have hpos :=
+    UpperTheory.re_mul_signature_I_pos_of_hermitian_trace_formula p D G L th lam hact hform' hspan
+      hconj
   obtain ⟨hd1, hd2⟩ := UpperTheory.finrank_archimedean_eq_two_mul_dim p D G L hm hAS
   have hs2 : ∀ v, sgnV L v * sgnV L v = 1 := by
     intro v
     unfold sgnV
     split_ifs <;> simp
-  have hlamim : ∀ v, lam v = ((lam v * sgnV L v * Complex.I).re : ℂ) * (-(sgnV L v) * Complex.I) := by
+  have hlamim
+      : ∀ v, lam v = ((lam v * sgnV L v * Complex.I).re : ℂ) * (-(sgnV L v) * Complex.I) := by
     intro v
     have hre : (lam v).re = 0 := by
       have := congrArg Complex.re (hconj v)
@@ -90,4 +104,5 @@ theorem UpperTheory.Gal.W2.archEx_of :
       ring
     span := hspan
     dim := hd1
-    dimg := hd2 }⟩
+    dimg := hd2
+  }⟩

@@ -12,8 +12,8 @@ open scoped ComplexConjugate Real
 
 namespace GlobalTheory.SW.Parab
 
-noncomputable def parChar {κ ι : Type} [Fintype κ] [Fintype ι] (S : Matrix ι ι ℚ)
-    (x : Matrix κ ι ℚ) : ℂ :=
+noncomputable def parChar {κ ι : Type} [Fintype κ] [Fintype ι] (S : Matrix ι ι ℚ) (x : Matrix κ ι ℚ)
+    : ℂ :=
   cexp (-(Real.pi * I * ((∑ k, x k ⬝ᵥ S *ᵥ x k : ℚ) : ℂ)))
 
 open Matrix Complex in
@@ -52,9 +52,11 @@ private lemma isIntegral_int_rat_iff_exists_int (q : ℚ) : IsIntegral ℤ q ↔
 
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.SW.Parab.isSB_parChar_mul {κ ι : Type} [Fintype κ] [Fintype ι] (S : Matrix ι ι ℚ)
-    (φ : Matrix κ ι ℚ → ℂ) (h : _root_.GlobalTheory.SW.IsSB φ) :
-    _root_.GlobalTheory.SW.IsSB fun x => _root_.GlobalTheory.SW.Parab.parChar S x * φ x := by
+theorem _root_.GlobalTheory.SW.Parab.isSB_parChar_mul
+    {κ ι : Type} [Fintype κ] [Fintype ι]
+    (S : Matrix ι ι ℚ)
+    (φ : Matrix κ ι ℚ → ℂ) (h : _root_.GlobalTheory.SW.IsSB φ)
+    : _root_.GlobalTheory.SW.IsSB fun x => _root_.GlobalTheory.SW.Parab.parChar S x * φ x := by
   obtain ⟨R, hR, hsupp, hper⟩ := h
   obtain ⟨d, hd, T, hT⟩ := exists_pos_nat_mul_eq_int S
   refine ⟨2 * d * R, by positivity, ?_, ?_⟩
@@ -90,12 +92,18 @@ theorem _root_.GlobalTheory.SW.Parab.isSB_parChar_mul {κ ι : Type} [Fintype κ
     have hY : ∀ k i, ∃ n : ℤ, (n : ℚ) = y k i := fun k i =>
       (isIntegral_int_rat_iff_exists_int _).1 (hy k i)
     choose Y hY using hY
-    have hQ : ∑ k, (x + ((2 * d * R : ℕ) : ℚ) • y) k ⬝ᵥ S *ᵥ (x + ((2 * d * R : ℕ) : ℚ) • y) k =
-        ∑ k, x k ⬝ᵥ S *ᵥ x k + 2 * ((∑ k, ∑ i, ∑ j, (U k i * T i j * Y k j + Y k i * T i j * U k j +
-          2 * d * R ^ 2 * Y k i * T i j * Y k j) : ℤ) : ℚ) := by
+    have hQ
+        : ∑ k, (x + ((2 * d * R : ℕ) : ℚ) • y) k ⬝ᵥ S *ᵥ (x + ((2 * d * R : ℕ) : ℚ) • y) k
+          = ∑ k, x k ⬝ᵥ S *ᵥ x k
+            + 2
+              * ((∑ k, ∑ i, ∑ j, (U k i * T i j * Y k j + Y k i * T i j * U k j +
+                    2 * d * R ^ 2 * Y k i * T i j * Y k j)
+                  : ℤ)
+                : ℚ) := by
       push_cast
       simp only [dotProduct, mulVec, Finset.mul_sum, ← Finset.sum_add_distrib]
-      refine Finset.sum_congr rfl fun k _ => Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+      refine Finset.sum_congr rfl fun k _ =>
+        Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
       have hR' : (R : ℚ) ≠ 0 := by positivity
       have hd' : (d : ℚ) ≠ 0 := by positivity
       have hx1 : x k i = U k i / R := by rw [hU]; field_simp
@@ -110,29 +118,35 @@ theorem _root_.GlobalTheory.SW.Parab.isSB_parChar_mul {κ ι : Type} [Fintype κ
     rw [hQ]
     set m : ℤ := ∑ k, ∑ i, ∑ j, (U k i * T i j * Y k j + Y k i * T i j * U k j +
           2 * d * R ^ 2 * Y k i * T i j * Y k j)
-    have : -(↑π * I * (((∑ k, x k ⬝ᵥ S *ᵥ x k + 2 * (m : ℚ) : ℚ)) : ℂ)) =
-        -(↑π * I * ((∑ k, x k ⬝ᵥ S *ᵥ x k : ℚ) : ℂ)) + ((-m : ℤ) : ℂ) * (2 * π * I) := by
+    have : -(↑π * I * (((∑ k, x k ⬝ᵥ S *ᵥ x k + 2 * (m : ℚ) : ℚ)) : ℂ))
+        = -(↑π * I * ((∑ k, x k ⬝ᵥ S *ᵥ x k : ℚ) : ℂ)) + ((-m : ℤ) : ℂ) * (2 * π * I) := by
       push_cast
       ring
     rw [this, Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]
 
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.SW.Parab.qv_row_mul {κ ι : Type} [Fintype ι] (x : Matrix κ ι ℚ) (A : Matrix ι ι ℚ) (k : κ) :
-    _root_.GlobalTheory.SW.qv ((x * A) k) = _root_.GlobalTheory.SW.qv (x k) ᵥ* _root_.GlobalTheory.SW.qm A := by
+theorem _root_.GlobalTheory.SW.Parab.qv_row_mul
+    {κ ι : Type} [Fintype ι] (x : Matrix κ ι ℚ) (A : Matrix ι ι ℚ) (k : κ)
+    : _root_.GlobalTheory.SW.qv ((x * A) k)
+      = _root_.GlobalTheory.SW.qv (x k) ᵥ* _root_.GlobalTheory.SW.qm A := by
   funext j
   simp [_root_.GlobalTheory.SW.qv, _root_.GlobalTheory.SW.qm, vecMul, dotProduct, Matrix.mul_apply]
 
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.SW.Parab.qv_bilin {ι : Type} [Fintype ι] (S : Matrix ι ι ℚ) (v : ι → ℚ) :
-    ((v ⬝ᵥ S *ᵥ v : ℚ) : ℂ) = _root_.GlobalTheory.SW.qv v ⬝ᵥ _root_.GlobalTheory.SW.qm S *ᵥ _root_.GlobalTheory.SW.qv v := by
+theorem _root_.GlobalTheory.SW.Parab.qv_bilin {ι : Type} [Fintype ι] (S : Matrix ι ι ℚ) (v : ι → ℚ)
+    : ((v ⬝ᵥ S *ᵥ v : ℚ) : ℂ)
+      = _root_.GlobalTheory.SW.qv v
+        ⬝ᵥ _root_.GlobalTheory.SW.qm S *ᵥ _root_.GlobalTheory.SW.qv v := by
   simp [_root_.GlobalTheory.SW.qv, _root_.GlobalTheory.SW.qm, mulVec, dotProduct]
 
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.SW.Parab.qm_mul' {α β γ : Type} [Fintype β] (A : Matrix α β ℚ) (B : Matrix β γ ℚ) :
-    _root_.GlobalTheory.SW.qm (A * B) = _root_.GlobalTheory.SW.qm A * _root_.GlobalTheory.SW.qm B := by
+theorem _root_.GlobalTheory.SW.Parab.qm_mul'
+    {α β γ : Type} [Fintype β] (A : Matrix α β ℚ) (B : Matrix β γ ℚ)
+    : _root_.GlobalTheory.SW.qm (A * B)
+      = _root_.GlobalTheory.SW.qm A * _root_.GlobalTheory.SW.qm B := by
   ext i j
   simp [_root_.GlobalTheory.SW.qm, Matrix.mul_apply]
 
@@ -155,15 +169,17 @@ private lemma parabolic_exponent_term_eq {ι : Type} [Fintype ι] (A B : Matrix 
     dotProduct_mulVec, vecMul_transpose, dotProduct_mulVec _ (_root_.GlobalTheory.SW.qm A) z]
   ring
 
-
 open Matrix Complex in
 open scoped ComplexConjugate Real in
-theorem _root_.GlobalTheory.SW.Parab.trans_parabolic : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι]
-    (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ), Even (Fintype.card κ) → σ ∈ Matrix.symplecticGroup ι ℚ →
-    σ.toBlocks₂₁ = 0 → ∃ ω : (Matrix κ ι ℚ → ℂ) → (Matrix κ ι ℚ → ℂ), ∀ φ, _root_.GlobalTheory.SW.IsSB φ →
-    _root_.GlobalTheory.SW.IsSB (ω φ) ∧ _root_.GlobalTheory.SW.TransS σ φ (ω φ) ∧
-    ∀ φ', _root_.GlobalTheory.SW.IsSB φ' → _root_.GlobalTheory.SW.ip (ω φ) (ω φ') =
-      _root_.GlobalTheory.SW.ip φ φ' := by
+theorem _root_.GlobalTheory.SW.Parab.trans_parabolic
+    : ∀ (κ ι : Type) [Fintype κ] [Fintype ι] [DecidableEq ι] (σ : Matrix (ι ⊕ ι) (ι ⊕ ι) ℚ),
+      Even (Fintype.card κ) → σ ∈ Matrix.symplecticGroup ι ℚ → σ.toBlocks₂₁ = 0
+        → ∃ ω : (Matrix κ ι ℚ → ℂ) → (Matrix κ ι ℚ → ℂ), ∀ φ,
+          _root_.GlobalTheory.SW.IsSB φ
+            → _root_.GlobalTheory.SW.IsSB (ω φ) ∧ _root_.GlobalTheory.SW.TransS σ φ (ω φ)
+              ∧ ∀ φ',
+                _root_.GlobalTheory.SW.IsSB φ'
+                  → _root_.GlobalTheory.SW.ip (ω φ) (ω φ') = _root_.GlobalTheory.SW.ip φ φ' := by
   intro κ ι _ _ _ σ hev hσ hC
   classical
   have hDA : σ.toBlocks₂₂ * σ.toBlocks₁₁ᵀ = 1 := by
@@ -181,13 +197,17 @@ theorem _root_.GlobalTheory.SW.Parab.trans_parabolic : ∀ (κ ι : Type) [Finty
     have h := congrArg Matrix.det hDA
     rwa [det_mul, det_transpose, det_one] at h
   have hdetA : A.det ≠ 0 := fun h => by simp [h] at hdet
-  let e : Matrix κ ι ℚ ≃ Matrix κ ι ℚ :=
-    { toFun := fun x => x * A
-      invFun := fun x => x * Dᵀ
-      left_inv := fun x => by simp [Matrix.mul_assoc, hADt]
-      right_inv := fun x => by simp [Matrix.mul_assoc, hDtA] }
+  let e : Matrix κ ι ℚ ≃ Matrix κ ι ℚ := {
+    toFun := fun x => x * A
+    invFun := fun x => x * Dᵀ
+    left_inv := fun x => by simp [Matrix.mul_assoc, hADt]
+    right_inv := fun x => by simp [Matrix.mul_assoc, hDtA]
+  }
   let c : ℂ := (_root_.GlobalTheory.SW.qm D).det ^ (Fintype.card κ / 2)
-  refine ⟨fun φ => c • fun x => _root_.GlobalTheory.SW.Parab.parChar (B * Aᵀ) x * φ (x * A), fun φ hφ => ?_⟩
+  refine ⟨
+    fun φ => c • fun x => _root_.GlobalTheory.SW.Parab.parChar (B * Aᵀ) x * φ (x * A),
+    fun φ hφ => ?_
+  ⟩
   have hφA := (_root_.GlobalTheory.SW.LinChange.haar_mul ℚ κ ι φ hφ).1 A hdetA
   have hf := _root_.GlobalTheory.SW.Parab.isSB_parChar_mul (B * Aᵀ) _ hφA.1
   refine ⟨(_root_.GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι _ _ hf hf).2.1 c, ?_, ?_⟩
@@ -202,13 +222,13 @@ theorem _root_.GlobalTheory.SW.Parab.trans_parabolic : ∀ (κ ι : Type) [Finty
       simp [_root_.GlobalTheory.SW.qm]
     unfold _root_.GlobalTheory.SW.thS _root_.GlobalTheory.SW.spAct _root_.GlobalTheory.SW.spDen
     rw [h0, ← hA, ← hB, ← hD]
-    simp only [zero_mul, zero_add, Matrix.mul_zero, zero_mulVec, dotProduct_zero, Finset.sum_const_zero,
-      mul_zero, Complex.exp_zero, mul_one, hqD, Pi.smul_apply, smul_eq_mul]
+    simp only [zero_mul, zero_add, Matrix.mul_zero, zero_mulVec, dotProduct_zero,
+      Finset.sum_const_zero, mul_zero, Complex.exp_zero, mul_one, hqD, Pi.smul_apply, smul_eq_mul]
     conv_rhs => rw [← e.tsum_eq, ← tsum_mul_left]
     congr 1
     funext x
-    simp only [e, Equiv.coe_fn_mk, _root_.GlobalTheory.SW.Parab.qv_row_mul, parabolic_exponent_term_eq,
-      Finset.sum_add_distrib]
+    simp only [e, Equiv.coe_fn_mk, _root_.GlobalTheory.SW.Parab.qv_row_mul,
+      parabolic_exponent_term_eq, Finset.sum_add_distrib]
     unfold _root_.GlobalTheory.SW.Parab.parChar
     rw [Rat.cast_sum, mul_add, Complex.exp_add, Complex.exp_neg]
     field_simp
@@ -220,9 +240,11 @@ theorem _root_.GlobalTheory.SW.Parab.trans_parabolic : ∀ (κ ι : Type) [Finty
     have hgA := (_root_.GlobalTheory.SW.LinChange.haar_mul ℚ κ ι _ hg).1 A hdetA
     have hgA' := (_root_.GlobalTheory.SW.isSB_algebra_haar_linear ℚ κ ι _ _ hgA.1 hgA.1).2.2.2.2.2.1
     unfold _root_.GlobalTheory.SW.ip
-    have hpt : (fun x => (c • fun x => _root_.GlobalTheory.SW.Parab.parChar (B * Aᵀ) x * φ (x * A)) x *
-        conj ((c • fun x => _root_.GlobalTheory.SW.Parab.parChar (B * Aᵀ) x * φ' (x * A)) x)) =
-        (c * conj c) • fun x => φ (x * A) * conj (φ' (x * A)) := by
+    have hpt
+        : (fun x =>
+            (c • fun x => _root_.GlobalTheory.SW.Parab.parChar (B * Aᵀ) x * φ (x * A)) x * conj
+              ((c • fun x => _root_.GlobalTheory.SW.Parab.parChar (B * Aᵀ) x * φ' (x * A)) x))
+          = (c * conj c) • fun x => φ (x * A) * conj (φ' (x * A)) := by
       funext x
       simp only [Pi.smul_apply, smul_eq_mul, map_mul]
       linear_combination (c * conj c * φ (x * A) * conj (φ' (x * A))) *

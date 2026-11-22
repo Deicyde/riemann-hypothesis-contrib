@@ -15,8 +15,8 @@ namespace Formalism.L2.SG.Pf.Tau
 
 open Size Formalism.MainNotions.S
 
-theorem one_le_norm_embedding_alt (I : AutInst) (a : 𝓞 I.E) (ha : a ≠ 0) :
-    ∃ v, 1 ≤ ‖I.φ v (a : I.E)‖ := by
+theorem one_le_norm_embedding_alt (I : AutInst) (a : 𝓞 I.E) (ha : a ≠ 0)
+    : ∃ v, 1 ≤ ‖I.φ v (a : I.E)‖ := by
   set β : I.E := (a : I.E) * star (a : I.E) with hβ
   have hfix : star β = β := by simp [hβ, mul_comm]
   obtain ⟨γ, hγ⟩ := (I.cm.fixed β).1 hfix
@@ -49,12 +49,43 @@ theorem one_le_norm_embedding_alt (I : AutInst) (a : 𝓞 I.E) (ha : a ≠ 0) :
   push Not at h
   nlinarith [norm_nonneg (I.φ w (a : I.E))]
 
-theorem lattice_common_denominator (I : AutInst) : ∃ b : 𝓞 I.E, b ≠ 0 ∧
-    ∀ y ∈ I.L, ∀ i, ∃ c : 𝓞 I.E, (c : I.E) = (b : I.E) * y i := by
-  first | exact UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator .. | (apply UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator <;> assumption) | (intros; apply UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator <;> assumption) | (apply @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator <;> assumption) | (intros; apply @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator <;> assumption) | (apply @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator <;> first | assumption | infer_instance) | exact @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator I
+theorem lattice_common_denominator (I : AutInst)
+    : ∃ b : 𝓞 I.E, b ≠ 0 ∧ ∀ y ∈ I.L, ∀ i, ∃ c : 𝓞 I.E, (c : I.E) = (b : I.E) * y i := by
+  first
+  | exact UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+      ..
+  | (
+      apply
+          UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+        <;> assumption
+    )
+  | (
+      intros
+      apply
+          UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+        <;> assumption
+    )
+  | (
+      apply
+          @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+        <;> assumption
+    )
+  | (
+      intros
+      apply
+          @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+        <;> assumption
+    )
+  | (
+      apply
+          @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+        <;> first | assumption | infer_instance
+    )
+  | exact @UpperTheory.Reformulated.B.LatticeCoordinatesCommonDenominator.lattice_common_denominator
+      I
 
-theorem invertible_matrix_lower_bound {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : IsUnit A) :
-    ∃ C : ℝ, 0 < C ∧ ∀ (w : Fin n → ℂ) (i : Fin n), ‖w i‖ ^ 2 ≤ C * ∑ k, ‖(A *ᵥ w) k‖ ^ 2 := by
+theorem invertible_matrix_lower_bound {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ) (hA : IsUnit A)
+    : ∃ C : ℝ, 0 < C ∧ ∀ (w : Fin n → ℂ) (i : Fin n), ‖w i‖ ^ 2 ≤ C * ∑ k, ‖(A *ᵥ w) k‖ ^ 2 := by
   obtain ⟨U, rfl⟩ := hA
   set B : Matrix (Fin n) (Fin n) ℂ := ((U⁻¹ : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)
   refine ⟨∑ i, ∑ k, ‖B i k‖ ^ 2 + 1, by positivity, fun w i => ?_⟩
@@ -69,8 +100,11 @@ theorem invertible_matrix_lower_bound {n : ℕ} (A : Matrix (Fin n) (Fin n) ℂ)
   have h2 : ‖w i‖ ^ 2 ≤ (∑ k, ‖B i k‖ ^ 2) * ∑ k, ‖z k‖ ^ 2 :=
     (pow_le_pow_left₀ (norm_nonneg _) h1 2).trans (Finset.sum_mul_sq_le_sq_mul_sq _ _ _)
   have h3 : ∑ k, ‖B i k‖ ^ 2 ≤ ∑ i, ∑ k, ‖B i k‖ ^ 2 + 1 := by
-    have := Finset.single_le_sum (f := fun i => ∑ k, ‖B i k‖ ^ 2) (fun _ _ => by positivity)
-      (Finset.mem_univ i)
+    have :=
+      Finset.single_le_sum
+        (f := fun i => ∑ k, ‖B i k‖ ^ 2)
+        (fun _ _ => by positivity)
+        (Finset.mem_univ i)
     linarith
   exact h2.trans (mul_le_mul_of_nonneg_right h3 (by positivity))
 
@@ -78,8 +112,11 @@ theorem lattice_vectors_bounded_below (h0 : LatticeCommensurable) : LatticeVecto
   intro I x
   obtain ⟨m, hm1, hm, -⟩ := h0 I x
   obtain ⟨b, hb0, hb⟩ := lattice_common_denominator I
-  have hC : ∀ v, ∃ C : ℝ, 0 < C ∧ ∀ (u : Fin I.n → I.E) (i : Fin I.n),
-      ‖I.φ v (u i)‖ ^ 2 ≤ C * ∑ k, ‖coordV I x v u k‖ ^ 2 := fun v => by
+  have hC
+      : ∀ v, ∃ C : ℝ,
+        0 < C
+          ∧ ∀ (u : Fin I.n → I.E) (i : Fin I.n),
+            ‖I.φ v (u i)‖ ^ 2 ≤ C * ∑ k, ‖coordV I x v u k‖ ^ 2 := fun v => by
     have hU : IsUnit (uMat (x.1 v)⁻¹ * (I.P v)⁻¹) :=
       (Units.isUnit _).mul (Matrix.isUnit_nonsing_inv_iff.2 (I.P_unit v))
     obtain ⟨C, hC, hCw⟩ := invertible_matrix_lower_bound _ hU
@@ -110,22 +147,28 @@ theorem lattice_vectors_bounded_below (h0 : LatticeCommensurable) : LatticeVecto
       Complex.norm_natCast, mul_assoc]
   set S := ∑ w, ∑ k, ‖coordV I x w u k‖ ^ 2
   have hSv : ∑ k, ‖coordV I x v u k‖ ^ 2 ≤ S :=
-    Finset.single_le_sum (f := fun w => ∑ k, ‖coordV I x w u k‖ ^ 2) (fun _ _ => by positivity)
+    Finset.single_le_sum
+      (f := fun w => ∑ k, ‖coordV I x w u k‖ ^ 2)
+      (fun _ _ => by positivity)
       (Finset.mem_univ v)
   have hS0 : 0 ≤ S := by positivity
   have h1 : 1 ≤ ‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * ‖I.φ v (u i)‖ ^ 2 := by
     have : 1 ≤ ‖I.φ v (c : I.E)‖ ^ 2 := by nlinarith
     rw [e] at this
     nlinarith
-  have h2 : ‖I.φ v (u i)‖ ^ 2 ≤ C v * S := (hCb v u i).trans
-    (mul_le_mul_of_nonneg_left hSv (hCpos v).le)
+  have h2 : ‖I.φ v (u i)‖ ^ 2 ≤ C v * S :=
+    (hCb v u i).trans (mul_le_mul_of_nonneg_left hSv (hCpos v).le)
   have h3 : ‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * C v ≤ K := by
-    have := Finset.single_le_sum (f := fun w => ‖I.φ w (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * C w)
-      (fun w _ => by have := hCpos w; positivity) (Finset.mem_univ v)
+    have :=
+      Finset.single_le_sum
+        (f := fun w => ‖I.φ w (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * C w)
+        (fun w _ => by have := hCpos w; positivity)
+        (Finset.mem_univ v)
     linarith
   have h4 : 1 ≤ K * S := by
     have hbm : 0 ≤ ‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 := by positivity
-    calc 1 ≤ ‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * ‖I.φ v (u i)‖ ^ 2 := h1
+    calc
+      1 ≤ ‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * ‖I.φ v (u i)‖ ^ 2 := h1
       _ ≤ ‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * (C v * S) := mul_le_mul_of_nonneg_left h2 hbm
       _ = (‖I.φ v (b : I.E)‖ ^ 2 * (m : ℝ) ^ 2 * C v) * S := by ring
       _ ≤ K * S := mul_le_mul_of_nonneg_right h3 hS0

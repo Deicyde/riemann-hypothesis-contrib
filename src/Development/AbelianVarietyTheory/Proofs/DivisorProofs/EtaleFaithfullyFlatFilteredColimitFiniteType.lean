@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleFaithfu
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 noncomputable section
 
@@ -16,7 +17,10 @@ set_option backward.isDefEq.respectTransparency false
 
 namespace GlobalTheory.EtFFApprox
 
-variable {J : Type} [SmallCategory J] (D0 : J ⥤ CommRingCat.{0}) (j : J) {B' : CommRingCat.{0}} (g' : D0.obj j ⟶ B')
+variable
+  {J : Type} [SmallCategory J]
+  (D0 : J ⥤ CommRingCat.{0}) (j : J)
+  {B' : CommRingCat.{0}} (g' : D0.obj j ⟶ B')
 
 def pmap {k k' : Under j} (φ : k ⟶ k') : pushout g' (D0.map k.hom) ⟶ pushout g' (D0.map k'.hom) :=
   pushout.desc (pushout.inl _ _) (D0.map φ.right ≫ pushout.inr _ _)
@@ -43,20 +47,25 @@ def arrF : Under j ⥤ Arrow CommRingCat.{0} where
 @[simp] lemma arrF_map_left {k k' : Under j} (φ : k ⟶ k') : ((arrF D0 j g').map φ).left = D0.map φ.right := rfl
 @[simp] lemma arrF_map_right {k k' : Under j} (φ : k ⟶ k') : ((arrF D0 j g').map φ).right = pmap D0 j g' φ := rfl
 
-variable {A B : CommRingCat.{0}} (ι0 : D0 ⟶ (Functor.const J).obj A) (g : A ⟶ B) (h : B' ⟶ B)
+variable
+  {A B : CommRingCat.{0}} (ι0 : D0 ⟶ (Functor.const J).obj A) (g : A ⟶ B) (h : B' ⟶ B)
   (hnat : ∀ k : Under j, g' ≫ h = D0.map k.hom ≫ ι0.app k.right ≫ g)
 
-def pdesc (k : Under j) : pushout g' (D0.map k.hom) ⟶ B := pushout.desc h (ι0.app k.right ≫ g) (hnat k)
+def pdesc (k : Under j) : pushout g' (D0.map k.hom) ⟶ B :=
+  pushout.desc h (ι0.app k.right ≫ g) (hnat k)
 
 def coc : arrF D0 j g' ⟶ (Functor.const (Under j)).obj (Arrow.mk g) where
-  app k := Arrow.homMk (f := (arrF D0 j g').obj k) (g := Arrow.mk g) (ι0.app k.right) (pdesc D0 j g' ι0 g h hnat k)
-    (pushout.inr_desc _ _ (hnat k)).symm
+  app k :=
+    Arrow.homMk (f := (arrF D0 j g').obj k) (g := Arrow.mk g) (ι0.app k.right)
+      (pdesc D0 j g' ι0 g h hnat k) (pushout.inr_desc _ _ (hnat k)).symm
   naturality k k' φ := by
     ext : 1
-    · simp only [Arrow.comp_left, Functor.const_obj_map, Arrow.id_left, Category.comp_id, Arrow.homMk_left, arrF_map_left]
+    · simp only [Arrow.comp_left, Functor.const_obj_map, Arrow.id_left, Category.comp_id,
+        Arrow.homMk_left, arrF_map_left]
       rw [ι0.naturality φ.right]
       simp
-    · simp only [Arrow.comp_right, Functor.const_obj_map, Arrow.id_right, Category.comp_id, Arrow.homMk_right, arrF_map_right]
+    · simp only [Arrow.comp_right, Functor.const_obj_map, Arrow.id_right, Category.comp_id,
+        Arrow.homMk_right, arrF_map_right]
       apply pushout.hom_ext
       · simp [pdesc]
       · simp only [pdesc, inr_pmap_assoc, pushout.inr_desc]
@@ -70,20 +79,25 @@ lemma snd_coc (k : Under j) : (Comma.snd (𝟭 _) (𝟭 _)).map ((coc D0 j g' ι
 
 def leftOf (s : Cocone (arrF D0 j g' ⋙ Comma.snd (𝟭 _) (𝟭 _))) : Cocone (Under.forget j ⋙ D0) where
   pt := s.pt
-  ι := { app := fun k => pushout.inr g' (D0.map k.hom) ≫ s.ι.app k
-         naturality := fun k k' φ => by
-           have hw := s.w φ
-           simp only [Functor.comp_map, Comma.snd_map] at hw
-           dsimp
-           rw [← hw, Category.comp_id]
-           simp }
+  ι := {
+    app := fun k => pushout.inr g' (D0.map k.hom) ≫ s.ι.app k
+    naturality := fun k k' φ => by
+      have hw := s.w φ
+      simp only [Functor.comp_map, Comma.snd_map] at hw
+      dsimp
+      rw [← hw, Category.comp_id]
+      simp
+  }
 
 @[simp] lemma leftOf_ι_app (s : Cocone (arrF D0 j g' ⋙ Comma.snd (𝟭 _) (𝟭 _))) (k : Under j) :
     (leftOf D0 j g' s).ι.app k = pushout.inr g' (D0.map k.hom) ≫ s.ι.app k := rfl
 
-def rightIsColimit (hP : IsPushout g' (ι0.app j) h g) (hL : IsColimit ((Cocone.mk A ι0).whisker (Under.forget j))) :
-    IsColimit ((Comma.snd (𝟭 _) (𝟭 _)).mapCocone (Cocone.mk (Arrow.mk g) (coc D0 j g' ι0 g h hnat))) where
-  desc s := hP.desc (pushout.inl _ _ ≫ s.ι.app (Under.mk (𝟙 j))) (hL.desc (leftOf D0 j g' s)) (by
+def rightIsColimit
+    (hP : IsPushout g' (ι0.app j) h g) (hL : IsColimit ((Cocone.mk A ι0).whisker (Under.forget j)))
+    : IsColimit ((Comma.snd (𝟭 _) (𝟭 _)).mapCocone
+      (Cocone.mk (Arrow.mk g) (coc D0 j g' ι0 g h hnat))) where
+  desc s :=
+    hP.desc (pushout.inl _ _ ≫ s.ι.app (Under.mk (𝟙 j))) (hL.desc (leftOf D0 j g' s)) (by
       have := hL.fac (leftOf D0 j g' s) (Under.mk (𝟙 j))
       simp only [Cocone.whisker_ι, Functor.whiskerLeft_app, Under.forget_obj, leftOf_ι_app] at this
       rw [pushout.condition_assoc]
@@ -118,12 +132,21 @@ def rightIsColimit (hP : IsPushout g' (ι0.app j) h g) (hL : IsColimit ((Cocone.
 
 end GlobalTheory.EtFFApprox
 
-
 open GlobalTheory.EtFFApprox in
-theorem GlobalTheory.EtC.etFF_filtered_colimit_finiteType : ∀ (A B : CommRingCat.{0}) (g : A ⟶ B), EtFF g → ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J) (D : J ⥤ Arrow CommRingCat.{0}) (ι : D ⟶ (Functor.const J).obj (Arrow.mk g)), Nonempty (IsColimit (Cocone.mk (Arrow.mk g) ι)) ∧ ∀ j, EtFF (D.obj j).hom ∧ Algebra.FiniteType ℤ (D.obj j).left ∧ Algebra.FiniteType ℤ (D.obj j).right := by
+theorem GlobalTheory.EtC.etFF_filtered_colimit_finiteType
+    : ∀ (A B : CommRingCat.{0}) (g : A ⟶ B),
+      EtFF g
+        → ∃ (J : Type) (_ : SmallCategory J) (_ : IsFiltered J) (D : J ⥤ Arrow CommRingCat.{0})
+            (ι : D ⟶ (Functor.const J).obj (Arrow.mk g)),
+          Nonempty (IsColimit (Cocone.mk (Arrow.mk g) ι))
+            ∧ ∀ j,
+              EtFF (D.obj j).hom ∧ Algebra.FiniteType ℤ (D.obj j).left
+                ∧ Algebra.FiniteType ℤ (D.obj j).right := by
   intro A B g hg
-  obtain ⟨J, _, _, D0, ι0, ⟨hc⟩, hft⟩ := GlobalTheory.FiniteTypeColimit.exists_filtered_colimit_finiteType A
-  obtain ⟨j, B', g', h, hg', hP⟩ := GlobalTheory.T.etaleFaithfullyFlat_descends_of_isColimit J D0 (Cocone.mk A ι0) hc B g hg
+  obtain ⟨J, _, _, D0, ι0, ⟨hc⟩, hft⟩ :=
+    GlobalTheory.FiniteTypeColimit.exists_filtered_colimit_finiteType A
+  obtain ⟨j, B', g', h, hg', hP⟩ :=
+    GlobalTheory.T.etaleFaithfullyFlat_descends_of_isColimit J D0 (Cocone.mk A ι0) hc B g hg
   have hb := GlobalTheory.EtC.etFF_basic
   haveI := hb.1.2.1
   have hP' : IsPushout g' (ι0.app j) h g := hP
@@ -133,8 +156,17 @@ theorem GlobalTheory.EtC.etFF_filtered_colimit_finiteType : ∀ (A B : CommRingC
     intro k
     rw [← Category.assoc, ι0.naturality k.hom]
     simpa using hP'.w
-  refine ⟨Under j, inferInstance, inferInstance, arrF D0 j g', coc D0 j g' ι0 g h hnat, ⟨?_⟩, fun k => ?_⟩
+  refine ⟨
+    Under j,
+    inferInstance,
+    inferInstance,
+    arrF D0 j g',
+    coc D0 j g' ι0 g h hnat,
+    ⟨?_⟩,
+    fun k => ?_
+  ⟩
   · exact Comma.fstSndJointlyReflectColimit hL (rightIsColimit D0 j g' ι0 g h hnat hP' hL)
   · have hk : EtFF (pushout.inr g' (D0.map k.hom)) :=
-      MorphismProperty.IsStableUnderCobaseChange.of_isPushout (IsPushout.of_hasPushout g' (D0.map k.hom)).flip hg'
+      MorphismProperty.IsStableUnderCobaseChange.of_isPushout
+        (IsPushout.of_hasPushout g' (D0.map k.hom)).flip hg'
     exact ⟨hk, hft k.right, hb.2.2 _ _ _ hk (hft k.right)⟩

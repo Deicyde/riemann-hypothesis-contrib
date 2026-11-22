@@ -5,22 +5,34 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.SubsetSpanBy
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan
+  GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef
 open scoped CategoryTheory.Obj
 open GlobalTheory.Desc
 
 namespace GlobalTheory.Desc
 
-theorem hom_ext_of_cartesian {S S₀ X : Scheme.{0}} {q : X ⟶ S} {s₀ : S₀ ⟶ S} {A : Over S₀}
-    {i : A.left ⟶ X} (h : IsPullback i A.hom q s₀) {T : Scheme.{0}} {t₀ : T ⟶ S₀}
-    (c c' : Over.mk t₀ ⟶ A) (hc : c.left ≫ i = c'.left ≫ i) : c = c' := by
+theorem hom_ext_of_cartesian
+    {S S₀ X : Scheme.{0}} {q : X ⟶ S} {s₀ : S₀ ⟶ S} {A : Over S₀} {i : A.left ⟶ X}
+    (h : IsPullback i A.hom q s₀)
+    {T : Scheme.{0}} {t₀ : T ⟶ S₀} (c c' : Over.mk t₀ ⟶ A) (hc : c.left ≫ i = c'.left ≫ i)
+    : c = c' := by
   apply Over.OverMorphism.ext
   apply h.hom_ext hc
   rw [Over.w c, Over.w c']
 
-theorem oneAgree_invAgree_of_mulAgree : ∀ (S S₀ S₁ X : Scheme.{0}) (q : X ⟶ S) (s₀ : S₀ ⟶ S) (s₁ : S₁ ⟶ S) (A : Over S₀) [GrpObj A] (G : Over S₁) [GrpObj G] (i : A.left ⟶ X) (e : G.left ⟶ X), IsPullback i A.hom q s₀ → e ≫ q = G.hom ≫ s₁ → MulAgree G A e i → OneAgree s₁ s₀ G A e i ∧ ∀ (T : Scheme.{0}) (t₁ : T ⟶ S₁) (t₀ : T ⟶ S₀) (a : Over.mk t₁ ⟶ G) (a' : Over.mk t₀ ⟶ A), a.left ≫ e = a'.left ≫ i → (a⁻¹).left ≫ e = (a'⁻¹).left ≫ i := by
+theorem oneAgree_invAgree_of_mulAgree
+    : ∀ (S S₀ S₁ X : Scheme.{0}) (q : X ⟶ S) (s₀ : S₀ ⟶ S) (s₁ : S₁ ⟶ S) (A : Over S₀) [GrpObj A]
+        (G : Over S₁) [GrpObj G] (i : A.left ⟶ X) (e : G.left ⟶ X),
+      IsPullback i A.hom q s₀ → e ≫ q = G.hom ≫ s₁ → MulAgree G A e i
+        → OneAgree s₁ s₀ G A e i
+          ∧ ∀ (T : Scheme.{0}) (t₁ : T ⟶ S₁) (t₀ : T ⟶ S₀) (a : Over.mk t₁ ⟶ G)
+              (a' : Over.mk t₀ ⟶ A),
+            a.left ≫ e = a'.left ≫ i → (a⁻¹).left ≫ e = (a'⁻¹).left ≫ i := by
   intro S S₀ S₁ X q s₀ s₁ A _ G _ i e h he hm
   have one : OneAgree s₁ s₀ G A e i := by
     intro T t₁ t₀ ht
@@ -38,7 +50,9 @@ theorem oneAgree_invAgree_of_mulAgree : ∀ (S S₀ S₁ X : Scheme.{0}) (q : X 
   have ht : t₁ ≫ s₁ = t₀ ≫ s₀ := by
     have w1 : a.left ≫ G.hom = t₁ := Over.w a
     have w0 : a'.left ≫ A.hom = t₀ := Over.w a'
-    calc t₁ ≫ s₁ = (a.left ≫ G.hom) ≫ s₁ := by rw [w1]
+    calc
+      t₁ ≫ s₁
+        = (a.left ≫ G.hom) ≫ s₁ := by rw [w1]
       _ = (a.left ≫ e) ≫ q := by rw [Category.assoc, Category.assoc, he]
       _ = (a'.left ≫ i) ≫ q := by rw [haa]
       _ = (a'.left ≫ A.hom) ≫ s₀ := by rw [Category.assoc, Category.assoc, h.w]

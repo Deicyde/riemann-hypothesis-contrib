@@ -10,7 +10,9 @@ namespace Formalism.L2.G
 
 open Formalism.MainNotions.FormalGroupSystem
 
-variable {p : ℕ} [hp : Fact p.Prime] {C : Type} [NormedField C] [IsUltrametricDist C] [IsAlgClosed C]
+variable
+  {p : ℕ} [hp : Fact p.Prime]
+  {C : Type} [NormedField C] [IsUltrametricDist C] [IsAlgClosed C]
   (f : K0 p →+* C)
 
 def iC : Kc p →+* C :=
@@ -27,9 +29,10 @@ include hf
 
 theorem iC_le {x : Kc p} (hx : x ∈ Oc p) : ‖iC f x‖ ≤ 1 := by
   let v : Valuation C NNReal := NormedField.valuation
-  let φ : WW p →+* v.integer := (f.comp (algebraMap (WW p) (K0 p))).codRestrict v.integer (fun x => by
-    show ‖f (algebraMap (WW p) (K0 p) x)‖₊ ≤ 1
-    exact_mod_cast hf x)
+  let φ : WW p →+* v.integer :=
+    (f.comp (algebraMap (WW p) (K0 p))).codRestrict v.integer (fun x => by
+      show ‖f (algebraMap (WW p) (K0 p) x)‖₊ ≤ 1
+      exact_mod_cast hf x)
   have h1 : IsIntegral v.integer (iC f x) :=
     ((mem_Oc p x).1 hx).map_of_comp_eq φ (iC f) (by
       ext z
@@ -73,8 +76,9 @@ theorem norm_p_lt_one : ‖(p : ℂ_[p])‖ < 1 := by
   rw [h2]
   exact Padic.norm_p_lt_one
 
-theorem iC_int_Cp (f : K0 p →+* ℂ_[p]) (hf : ∀ x : WW p, ‖f (algebraMap (WW p) (K0 p) x)‖ ≤ 1) (x : Kc p) :
-    x ∈ Oc p ↔ ‖iC f x‖ ≤ 1 :=
+theorem iC_int_Cp
+    (f : K0 p →+* ℂ_[p]) (hf : ∀ x : WW p, ‖f (algebraMap (WW p) (K0 p) x)‖ ≤ 1) (x : Kc p)
+    : x ∈ Oc p ↔ ‖iC f x‖ ≤ 1 :=
   iC_int f hf norm_p_lt_one x
 
 end Formalism.L2.G

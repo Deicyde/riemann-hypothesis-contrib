@@ -8,10 +8,10 @@ namespace ReciprocityTheory.L2DbarEstimates
 
 open scoped InnerProductSpace
 
-theorem ontoWithBound (E H₁ H₂ : Type*) [AddCommGroup E] [Module ℂ E]
-    [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁] [CompleteSpace H₁]
-    [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂] :
-    OntoWithBoundStatement E H₁ H₂ := by
+theorem ontoWithBound
+    (E H₁ H₂ : Type*) [AddCommGroup E] [Module ℂ E] [NormedAddCommGroup H₁] [InnerProductSpace ℂ H₁]
+    [CompleteSpace H₁] [NormedAddCommGroup H₂] [InnerProductSpace ℂ H₂]
+    : OntoWithBoundStatement E H₁ H₂ := by
   intro G Gs θ Q c hc hadj hbd f hf
   let θ' : (Q × E) →ₗ[ℂ] H₁ := Gs ∘ₗ Q.subtype ∘ₗ LinearMap.fst ℂ Q E + θ ∘ₗ LinearMap.snd ℂ Q E
   let ℓ : (Q × E) →ₗ[ℂ] ℂ := (innerₛₗ ℂ f) ∘ₗ Q.subtype ∘ₗ LinearMap.fst ℂ Q E
@@ -24,7 +24,9 @@ theorem ontoWithBound (E H₁ H₂ : Type*) [AddCommGroup E] [Module ℂ E]
     have h1 : ‖⟪f, (x.1 : H₂)⟫_ℂ‖ ≤ ‖f‖ * ‖(x.1 : H₂)‖ := norm_inner_le_norm _ _
     have h2 := hbd x.1 x.1.2 x.2
     have h0 : 0 ≤ ‖⟪f, (x.1 : H₂)⟫_ℂ‖ := norm_nonneg _
-    calc ‖⟪f, (x.1 : H₂)⟫_ℂ‖ ^ 2 ≤ (‖f‖ * ‖(x.1 : H₂)‖) ^ 2 := pow_le_pow_left₀ h0 h1 2
+    calc
+      ‖⟪f, (x.1 : H₂)⟫_ℂ‖ ^ 2
+        ≤ (‖f‖ * ‖(x.1 : H₂)‖) ^ 2 := pow_le_pow_left₀ h0 h1 2
       _ = ‖f‖ ^ 2 / c * (c * ‖(x.1 : H₂)‖ ^ 2) := by
         rw [mul_pow, div_mul_eq_mul_div, eq_div_iff hc.ne']
         ring

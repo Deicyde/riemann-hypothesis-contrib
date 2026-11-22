@@ -15,8 +15,8 @@ noncomputable section
 
 open Classical
 
-theorem gl_isLocPt_snoc {a : C.LPt} {j m : ℕ} (ha : D.IsLocPt a j) (hm : 1 ≤ m) {c : ℂ} (hc : c ≠ 0) :
-    D.IsLocPt (a ++ [(m, c)]) (j + m) := by
+theorem gl_isLocPt_snoc {a : C.LPt} {j m : ℕ} (ha : D.IsLocPt a j) (hm : 1 ≤ m) {c : ℂ} (hc : c ≠ 0)
+    : D.IsLocPt (a ++ [(m, c)]) (j + m) := by
   refine ⟨fun x hx => ?_, ?_⟩
   · rcases List.mem_append.1 hx with hx | hx
     · exact ha.1 x hx
@@ -30,8 +30,8 @@ theorem gl_fsv (σ z : ℂ) : P5.fsv σ z = G.psi (-U.betaU) (1 * σ * z) := by
   rw [TBBx1.fsv_eq]
   unfold G.psi U.betaU Formalism.QuantumDeterminants.cStd
   congr 1
-  simp only [Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im, Complex.I_re, Complex.I_im,
-    Complex.re_ofNat, Complex.im_ofNat, Complex.one_re, Complex.one_im]
+  simp only [Complex.mul_re, Complex.mul_im, Complex.neg_re, Complex.neg_im, Complex.I_re,
+    Complex.I_im, Complex.re_ofNat, Complex.im_ofNat, Complex.one_re, Complex.one_im]
   push_cast
   ring
 

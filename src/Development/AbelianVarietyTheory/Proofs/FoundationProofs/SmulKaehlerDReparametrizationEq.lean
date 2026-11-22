@@ -25,7 +25,9 @@ theorem thL_zero : thL (0 : Lau p) = 0 := by
 def sh (N : ℕ) (i : ℤ) (w : ℤ → ℤ_[p]) (b : Lau p) : Lau p where
   coeff r := if (N : ℤ) ∣ r then w r * b.coeff (r + i) else 0
   isPWO_support' := by
-    refine (b.isPWO_support.image_of_monotone (f := fun r : ℤ => r - i) (fun x y h => by simpa using h)).mono ?_
+    refine (b.isPWO_support.image_of_monotone
+      (f := fun r : ℤ => r - i)
+      (fun x y h => by simpa using h)).mono ?_
     intro r hr
     refine ⟨r + i, ?_, by simp⟩
     intro h
@@ -43,11 +45,12 @@ def dn (N : ℕ) (hN : 0 < N) (B : Lau p) : Lau p where
     obtain ⟨m, n, hmn, h⟩ := hwf (fun k => (N : ℤ) * g k) hg
     exact ⟨m, n, hmn, hm.le_iff_le.1 h⟩
 
-theorem coeff_natCast_mul (n : ℕ) (X : Lau p) (s : ℤ) : ((n : Lau p) * X).coeff s = (n : ℤ_[p]) * X.coeff s := by
+theorem coeff_natCast_mul (n : ℕ) (X : Lau p) (s : ℤ)
+    : ((n : Lau p) * X).coeff s = (n : ℤ_[p]) * X.coeff s := by
   rw [← nsmul_eq_mul, ← Nat.cast_smul_eq_nsmul ℤ_[p], HahnSeries.coeff_smul, smul_eq_mul]
 
-theorem decomp (N : ℕ) (hN : 0 < N) (b : Lau p) :
-    b = ∑ i ∈ Finset.range N, HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun _ => 1) b := by
+theorem decomp (N : ℕ) (hN : 0 < N) (b : Lau p)
+    : b = ∑ i ∈ Finset.range N, HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun _ => 1) b := by
   ext s
   have hN' : (0 : ℤ) < N := by exact_mod_cast hN
   rw [HahnSeries.coeff_sum, Finset.sum_eq_single (s % N).toNat]
@@ -73,10 +76,12 @@ theorem decomp (N : ℕ) (hN : 0 < N) (b : Lau p) :
     have := Int.emod_nonneg s hN'.ne'
     omega
 
-theorem thL_part (N i : ℕ) (b : Lau p) :
-    thL (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun _ => 1) b) =
-      (i : Lau p) * (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun _ => 1) b) +
-      (N : Lau p) * (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun r => ((r / N : ℤ) : ℤ_[p])) b) := by
+theorem thL_part (N i : ℕ) (b : Lau p)
+    : thL (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun _ => 1) b)
+      = (i : Lau p) * (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh N i (fun _ => 1) b)
+        + (N : Lau p)
+          * (HahnSeries.single (i : ℤ) (1 : ℤ_[p])
+            * sh N i (fun r => ((r / N : ℤ) : ℤ_[p])) b) := by
   ext s : 2
   rw [HahnSeries.coeff_add, coeff_natCast_mul, coeff_natCast_mul]
   change (s : ℤ_[p]) * _ = _
@@ -88,11 +93,17 @@ theorem thL_part (N i : ℕ) (b : Lau p) :
     rw [← mul_assoc, ← add_mul, ← h1]
   · simp
 
-theorem part_eq_zero {A R M : Type*} [CommRing A] [CommRing R] [Algebra A R] [AddCommGroup M] [Module R M] [Module A M]
-    (D : Derivation A R M) (q β γ : R) (i N : ℕ) (hβ : D β = 0) (hN : (N : R) • D q = 0) :
-    q • D (q ^ i * β) - ((i : R) * (q ^ i * β) + (N : R) * γ) • D q = 0 := by
-  rw [Derivation.leibniz, hβ, smul_zero, zero_add, add_smul, mul_comm (N : R), mul_smul γ, hN, smul_zero, add_zero,
-    Derivation.leibniz_pow, ← Nat.cast_smul_eq_nsmul R, smul_smul, smul_smul, smul_smul, ← sub_smul]
+theorem part_eq_zero
+    {A R M : Type*}
+    [CommRing A] [CommRing R] [Algebra A R] [AddCommGroup M] [Module R M] [Module A M]
+    (D : Derivation A R M)
+    (q β γ : R)
+    (i N : ℕ)
+    (hβ : D β = 0) (hN : (N : R) • D q = 0)
+    : q • D (q ^ i * β) - ((i : R) * (q ^ i * β) + (N : R) * γ) • D q = 0 := by
+  rw [Derivation.leibniz, hβ, smul_zero, zero_add, add_smul, mul_comm (N : R), mul_smul γ, hN,
+    smul_zero, add_zero, Derivation.leibniz_pow, ← Nat.cast_smul_eq_nsmul R, smul_smul, smul_smul,
+    smul_smul, ← sub_smul]
   rcases Nat.eq_zero_or_pos i with rfl | hi
   · simp
   · have h : q * β * i * q ^ (i - 1) - i * (q ^ i * β) = 0 := by
@@ -100,7 +111,15 @@ theorem part_eq_zero {A R M : Type*} [CommRing A] [CommRing R] [Algebra A R] [Ad
       ring
     rw [h, zero_smul]
 
-theorem smul_D_psi : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω] (T : Tower p Ω) (L : ℕ) (ψ : O0 p →+* Ω), IsReb T L ψ → ∀ (b : Lau p) (x y qL : integralClosure (O0 p) Ω), (x : Ω) = ψ (algebraMap (Lau p) (O0 p) b) → (y : Ω) = ψ (algebraMap (Lau p) (O0 p) (thL b)) → (qL : Ω) = T.qq L → qL • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) x = y • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) qL := by
+theorem smul_D_psi
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω] (T : Tower p Ω) (L : ℕ)
+        (ψ : O0 p →+* Ω),
+      IsReb T L ψ
+        → ∀ (b : Lau p) (x y qL : integralClosure (O0 p) Ω),
+          (x : Ω) = ψ (algebraMap (Lau p) (O0 p) b)
+            → (y : Ω) = ψ (algebraMap (Lau p) (O0 p) (thL b)) → (qL : Ω) = T.qq L
+            → qL • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) x
+              = y • KaehlerDifferential.D (O0 p) (integralClosure (O0 p) Ω) qL := by
   intro p hp Ω _ _ T L ψ hψ b x y qL hx hy hq
   have hqi : IsIntegral (O0 p) (T.qq L) :=
     IsIntegral.of_pow (pow_pos hp.out.pos L) (by rw [Basic.qq_pow]; exact isIntegral_algebraMap)
@@ -108,7 +127,9 @@ theorem smul_D_psi : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebr
     have h1 : ψ z ∈ ψ.range := ⟨z, rfl⟩
     rw [hψ.rng] at h1
     exact adjoin_le_integralClosure hqi h1
-  obtain ⟨Ψ, hΨ⟩ : ∃ Ψ : Lau p →+* integralClosure (O0 p) Ω, ∀ c, (Ψ c : Ω) = ψ (algebraMap (Lau p) (O0 p) c) :=
+  obtain ⟨Ψ, hΨ⟩
+      : ∃ Ψ : Lau p →+* integralClosure (O0 p) Ω, ∀ c,
+        (Ψ c : Ω) = ψ (algebraMap (Lau p) (O0 p) c) :=
     ⟨(ψ.codRestrict (integralClosure (O0 p) Ω) hmem).comp (algebraMap (Lau p) (O0 p)), fun _ => rfl⟩
   have hx' : x = Ψ b := Subtype.ext (hx.trans (hΨ _).symm)
   have hy' : y = Ψ (thL b) := Subtype.ext (hy.trans (hΨ _).symm)
@@ -122,20 +143,26 @@ theorem smul_D_psi : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebr
     rw [Derivation.leibniz_pow] at h1
     have h2 : qL • ((p ^ L) • qL ^ (p ^ L - 1) • D qL) = 0 := by rw [h1, smul_zero]
     rw [← Nat.cast_smul_eq_nsmul (integralClosure (O0 p) Ω), smul_smul, smul_smul, mul_right_comm,
-      mul_pow_sub_one hN.ne', hqN, mul_smul] at h2
-    have hu : IsUnit (algebraMap (O0 p) (integralClosure (O0 p) Ω) (qO p)) := (Basic.isUnit_qO p).map _
+        mul_pow_sub_one hN.ne', hqN, mul_smul]
+      at h2
+    have hu : IsUnit (algebraMap (O0 p) (integralClosure (O0 p) Ω) (qO p)) :=
+      (Basic.isUnit_qO p).map _
     exact hu.smul_left_cancel.1 (h2.trans (smul_zero _).symm)
   have hmono : ∀ i : ℕ, Ψ (HahnSeries.single (i : ℤ) (1 : ℤ_[p])) = qL ^ i := by
     intro i
-    have h1 : (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) : Lau p) = (HahnSeries.single (1 : ℤ) (1 : ℤ_[p])) ^ i := by
+    have h1
+        : (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) : Lau p)
+          = (HahnSeries.single (1 : ℤ) (1 : ℤ_[p])) ^ i := by
       rw [HahnSeries.single_pow]; simp
     have h2 : Ψ (HahnSeries.single (1 : ℤ) (1 : ℤ_[p])) = qL :=
       Subtype.ext (by rw [hΨ, hq]; exact hψ.par)
     rw [h1, map_pow, h2]
   have hsub : ∀ (i : ℤ), D (Ψ (sh (p ^ L) i (fun _ => 1) b)) = 0 := by
     intro i
-    have h1 : Ψ (sh (p ^ L) i (fun _ => 1) b) = algebraMap (O0 p) (integralClosure (O0 p) Ω)
-        (algebraMap (Lau p) (O0 p) (dn (p ^ L) hN (sh (p ^ L) i (fun _ => 1) b))) := by
+    have h1
+        : Ψ (sh (p ^ L) i (fun _ => 1) b)
+          = algebraMap (O0 p) (integralClosure (O0 p) Ω)
+            (algebraMap (Lau p) (O0 p) (dn (p ^ L) hN (sh (p ^ L) i (fun _ => 1) b))) := by
       apply Subtype.ext
       rw [hΨ]
       refine hψ.sub _ _ (fun j => ?_) (fun r hr => ?_)
@@ -144,18 +171,21 @@ theorem smul_D_psi : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebr
         exact if_neg h2
     rw [h1]
     exact D.map_algebraMap _
-  let E : Lau p →+ KaehlerDifferential (O0 p) (integralClosure (O0 p) Ω) :=
-    { toFun := fun c => qL • D (Ψ c) - Ψ (thL c) • D qL
-      map_zero' := by simp [thL_zero]
-      map_add' := by
-        intro a c
-        simp only [thL_add, map_add (f := _), add_smul, smul_add]
-        abel }
-  have hpart : ∀ i ∈ Finset.range (p ^ L),
-      E (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh (p ^ L) i (fun _ => 1) b) = 0 := by
+  let E : Lau p →+ KaehlerDifferential (O0 p) (integralClosure (O0 p) Ω) := {
+    toFun := fun c => qL • D (Ψ c) - Ψ (thL c) • D qL
+    map_zero' := by simp [thL_zero]
+    map_add' := by
+      intro a c
+      simp only [thL_add, map_add (f := _), add_smul, smul_add]
+      abel
+  }
+  have hpart
+      : ∀ i ∈ Finset.range (p ^ L),
+        E (HahnSeries.single (i : ℤ) (1 : ℤ_[p]) * sh (p ^ L) i (fun _ => 1) b) = 0 := by
     intro i _
     change qL • D (Ψ _) - Ψ (thL _) • D qL = 0
-    rw [thL_part, map_add Ψ, map_mul Ψ (i : Lau p), map_mul Ψ ((p ^ L : ℕ) : Lau p), map_mul Ψ, map_natCast Ψ, map_natCast Ψ, hmono]
+    rw [thL_part, map_add Ψ, map_mul Ψ (i : Lau p), map_mul Ψ ((p ^ L : ℕ) : Lau p), map_mul Ψ,
+      map_natCast Ψ, map_natCast Ψ, hmono]
     exact part_eq_zero D qL _ _ i (p ^ L) (hsub i) hND
   have hE : E b = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in

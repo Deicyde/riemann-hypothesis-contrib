@@ -12,10 +12,13 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutGCoreGenT
 
 namespace Formalism.FourierDecayAlt.P.CutMP.Gauge.GC
 
-theorem lie_group_existence_holds : KLExists := lie_existence_of_iso_group KLIso.lie_algebra_isomorphism_holds lie_group_realization
+theorem lie_group_existence_holds : KLExists :=
+  lie_existence_of_iso_group KLIso.lie_algebra_isomorphism_holds lie_group_realization
 
-theorem gauge_kappa_line_holds : GTKLine := gTKLine_of_cut lie_eigenvalue_holds lie_weight_at_most_holds lie_group_existence_holds
+theorem gauge_kappa_line_holds : GTKLine :=
+  gTKLine_of_cut lie_eigenvalue_holds lie_weight_at_most_holds lie_group_existence_holds
 
-theorem gauge_kappa_holds : GTKap := GTK.gauge_kappa_of_point_line gauge_kappa_pointwise_holds gauge_kappa_line_holds
+theorem gauge_kappa_holds : GTKap :=
+  GTK.gauge_kappa_of_point_line gauge_kappa_pointwise_holds gauge_kappa_line_holds
 
 end Formalism.FourierDecayAlt.P.CutMP.Gauge.GC

@@ -6,12 +6,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NineTerm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion GlobalTheory.CompanionTheory.PTIso
+open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion
+  GlobalTheory.CompanionTheory.PTIso
 
 namespace GlobalTheory.CompanionTheory.PTIso
 
-theorem isTotallyComplex_of_ringEquiv : ∀ (F F' : Type) [Field F] [NumberField F] [Field F']
-    [NumberField F'] (e : F ≃+* F'), IsTotallyComplex F → IsTotallyComplex F' := by
+theorem isTotallyComplex_of_ringEquiv
+    : ∀ (F F' : Type) [Field F] [NumberField F] [Field F'] [NumberField F'] (e : F ≃+* F'),
+      IsTotallyComplex F → IsTotallyComplex F' := by
   intro F F' _ _ _ _ e h
   refine ⟨fun w => ?_⟩
   rw [← InfinitePlace.not_isReal_iff_isComplex]

@@ -12,28 +12,32 @@ open Formalism.L2.Th1.CM Formalism.L2.Th1.F
 
 namespace ReciprocityTheory.ChartRestriction.L1
 
-theorem sqD_eq (d r : ℕ) :
-    (r : ℂ) + redSqD d = (((r : ℤ) - 1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * omegaK d := by
+theorem sqD_eq (d r : ℕ)
+    : (r : ℂ) + redSqD d = (((r : ℤ) - 1 : ℤ) : ℂ) + ((2 : ℤ) : ℂ) * omegaK d := by
   unfold redSqD
   push_cast
   ring
 
 theorem sqD_normSq (d r : ℕ) : Complex.normSq ((r : ℂ) + redSqD d) = ((r ^ 2 + d : ℕ) : ℝ) := by
   unfold redSqD omegaK
-  have h : (r : ℂ) + (2 * ((1 + Complex.I * ((Real.sqrt d : ℝ) : ℂ)) / 2) - 1)
-      = ⟨(r : ℝ), Real.sqrt d⟩ := by
+  have h
+      : (r : ℂ) + (2 * ((1 + Complex.I * ((Real.sqrt d : ℝ) : ℂ)) / 2) - 1)
+        = ⟨(r : ℝ), Real.sqrt d⟩ := by
     apply Complex.ext <;> simp <;> ring
   rw [h, Complex.normSq_mk, Real.mul_self_sqrt (Nat.cast_nonneg d)]
   push_cast
   ring
 
-theorem sqD_mulStable (d : ℕ) (L : PeriodPair) (hCM : HasCMBy d L) (r : ℕ) : MulStable L ((r : ℂ) + redSqD d) := by
+theorem sqD_mulStable (d : ℕ) (L : PeriodPair) (hCM : HasCMBy d L) (r : ℕ)
+    : MulStable L ((r : ℂ) + redSqD d) := by
   rw [sqD_eq]
   exact (hasCMByStable d L hCM _ _).1
 
-theorem kerProdAt_of_norm (d : ℕ) (L : PeriodPair) (hCM : HasCMBy d L) (l e r : ℕ) (hodd : Odd (r ^ 2 + d))
-    (hl : ¬ l ∣ r ^ 2 + d) (he : ¬ e ∣ r ^ 2 + d) (he' : ¬ e ∣ (r ^ 2 + d - 1) / 2) :
-    KerProdAt d L l e := by
+theorem kerProdAt_of_norm
+    (d : ℕ) (L : PeriodPair) (hCM : HasCMBy d L)
+    (l e r : ℕ) (hodd : Odd (r ^ 2 + d)) (hl : ¬ l ∣ r ^ 2 + d) (he : ¬ e ∣ r ^ 2 + d)
+    (he' : ¬ e ∣ (r ^ 2 + d - 1) / 2)
+    : KerProdAt d L l e := by
   have hN := sqD_normSq d r
   have hs := sqD_mulStable d L hCM r
   have hα : (r : ℂ) + redSqD d ≠ 0 := by
@@ -60,8 +64,13 @@ theorem kerProdAt_of_norm (d : ℕ) (L : PeriodPair) (hCM : HasCMBy d L) (l e r 
     unfold xsOf at h4
     rwa [Finset.prod_image (fun a ha b hb hab => hT.injOn ha hb hab)] at h4
 
-theorem kerProd_prin (d : ℕ) (L : PeriodPair) (hd4 : d % 4 = 3) (hCM : HasCMBy d L) (l : ℕ) (hl : l.Prime)
-    (h5 : 5 ≤ l) (hld : ¬ l ∣ d) (e : ℕ) (he : e = 2 ∨ e = 3 ∧ ¬ 3 ∣ d) : KerProdAt d L l e := by
+theorem kerProd_prin
+    (d : ℕ)
+    (L : PeriodPair)
+    (hd4 : d % 4 = 3) (hCM : HasCMBy d L)
+    (l : ℕ) (hl : l.Prime) (h5 : 5 ≤ l) (hld : ¬ l ∣ d)
+    (e : ℕ) (he : e = 2 ∨ e = 3 ∧ ¬ 3 ∣ d)
+    : KerProdAt d L l e := by
   rcases he with rfl | ⟨rfl, h3⟩
   · refine kerProdAt_of_norm d L hCM l 2 0 ?_ ?_ ?_ ?_
     · rw [Nat.odd_iff]; omega

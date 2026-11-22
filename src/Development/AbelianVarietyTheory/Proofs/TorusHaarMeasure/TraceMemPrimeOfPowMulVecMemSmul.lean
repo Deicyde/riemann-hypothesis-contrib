@@ -37,12 +37,13 @@ private lemma charpoly_dvd_pow_card_of_aeval_eq_zero {K : Type} [Field K] {r : �
     _ = (φ.map (algebraMap K Ω)) ^ r := by
         rw [Multiset.map_const', Multiset.prod_replicate, hcard]
 
-
 open NumberField Polynomial Matrix in
-theorem _root_.GlobalTheory.trace_mem_prime_of_pow_mulVec_mem_smul : ∀ (K : Type) [Field K] [NumberField K] (r : ℕ) (L : Submodule (𝓞 K) (Fin r → K))
-      (N : Matrix (Fin r) (Fin r) K) (P : Ideal (𝓞 K)) (n : ℕ), L.FG →
-      Submodule.span K (L : Set (Fin r → K)) = ⊤ → P.IsPrime → (∀ x ∈ L, N.mulVec x ∈ L) →
-      (∀ x ∈ L, (N ^ n).mulVec x ∈ P • L) → ∃ z ∈ P, ((z : 𝓞 K) : K) = N.trace := by
+theorem _root_.GlobalTheory.trace_mem_prime_of_pow_mulVec_mem_smul
+    : ∀ (K : Type) [Field K] [NumberField K] (r : ℕ) (L : Submodule (𝓞 K) (Fin r → K))
+        (N : Matrix (Fin r) (Fin r) K) (P : Ideal (𝓞 K)) (n : ℕ),
+      L.FG → Submodule.span K (L : Set (Fin r → K)) = ⊤ → P.IsPrime → (∀ x ∈ L, N.mulVec x ∈ L)
+        → (∀ x ∈ L, (N ^ n).mulVec x ∈ P • L)
+        → ∃ z ∈ P, ((z : 𝓞 K) : K) = N.trace := by
   intro K _ _ r L N P n hL hspan hP hN hNn
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · exact ⟨0, P.zero_mem, by simp [Matrix.trace]⟩
@@ -61,23 +62,26 @@ theorem _root_.GlobalTheory.trace_mem_prime_of_pow_mulVec_mem_smul : ∀ (K : Ty
   have hf : ∀ y : L, ((f y : L) : Fin r → K) = (N ^ m) *ᵥ (y : Fin r → K) := fun y => by
     show Matrix.toLin' (N ^ m) (y : Fin r → K) = _
     exact Matrix.toLin'_apply _ _
-  have hpow : ∀ (i : ℕ) (y : L), (((f ^ i) y : L) : Fin r → K) = ((N ^ m) ^ i) *ᵥ (y : Fin r → K) := by
+  have hpow
+      : ∀ (i : ℕ) (y : L), (((f ^ i) y : L) : Fin r → K) = ((N ^ m) ^ i) *ᵥ (y : Fin r → K) := by
     intro i
     induction i with
     | zero => intro y; simp
-    | succ i ih => intro y; rw [pow_succ', Module.End.mul_apply, hf, ih, Matrix.mulVec_mulVec, ← pow_succ']
+    | succ i ih =>
+      intro y; rw [pow_succ', Module.End.mul_apply, hf, ih, Matrix.mulVec_mulVec, ← pow_succ']
   have hrange : LinearMap.range f ≤ P • ⊤ := by
     rintro _ ⟨y, rfl⟩
     rw [Submodule.mem_smul_top_iff, hf]
     exact hNm _ y.2
-  obtain ⟨q, hqm, -, hqc, hq0⟩ := LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero (𝓞 K) f P hrange
+  obtain ⟨q, hqm, -, hqc, hq0⟩ :=
+    LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero (𝓞 K) f P hrange
   have hzero : aeval (N ^ m) q = 0 := by
     have hon : ∀ x ∈ L, (aeval (N ^ m) q) *ᵥ x = 0 := by
       intro x hx
       have := congrArg (fun g : Module.End (𝓞 K) L => ((g ⟨x, hx⟩ : L) : Fin r → K)) hq0
-      simp only [Polynomial.aeval_eq_sum_range, LinearMap.sum_apply,
-        Submodule.coe_sum, LinearMap.smul_apply, Submodule.coe_smul, hpow, LinearMap.zero_apply,
-        Submodule.coe_zero] at this
+      simp only [Polynomial.aeval_eq_sum_range, LinearMap.sum_apply, Submodule.coe_sum,
+          LinearMap.smul_apply, Submodule.coe_smul, hpow, LinearMap.zero_apply, Submodule.coe_zero]
+        at this
       rw [Polynomial.aeval_eq_sum_range, Matrix.sum_mulVec]
       refine (Finset.sum_congr rfl fun i _ => ?_).trans this
       exact Matrix.smul_mulVec _ _ _
@@ -100,7 +104,8 @@ theorem _root_.GlobalTheory.trace_mem_prime_of_pow_mulVec_mem_smul : ∀ (K : Ty
     exact Polynomial.monic_of_injective hinj this
   have hχdvd : χ ∣ φ ^ r := (Polynomial.map_dvd_map _ hinj hχm).1 (hχ ▸ hdvd)
   have hχdeg : χ.natDegree = r := by
-    rw [← natDegree_map_eq_of_injective hinj, hχ, Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+    rw [← natDegree_map_eq_of_injective hinj, hχ, Matrix.charpoly_natDegree_eq_dim,
+      Fintype.card_fin]
   have hqπ : q.map (Ideal.Quotient.mk P) = X ^ q.natDegree := by
     ext k
     rw [coeff_map, coeff_X_pow]
@@ -127,7 +132,7 @@ theorem _root_.GlobalTheory.trace_mem_prime_of_pow_mulVec_mem_smul : ∀ (K : Ty
     have := congrArg (fun p => p.coeff (r - 1)) hχπ
     simp only [coeff_map, coeff_X_pow, hir] at this
     rw [this, if_neg (by omega)]
-  refine ⟨-χ.coeff (r - 1), P.neg_mem hcoeff, ?_⟩
+  refine ⟨- χ.coeff (r - 1), P.neg_mem hcoeff, ?_⟩
   rw [Matrix.trace_eq_neg_charpoly_coeff, Fintype.card_fin, ← hχ, coeff_map]
   show algebraMap (𝓞 K) K (-χ.coeff (r - 1)) = _
   rw [map_neg]

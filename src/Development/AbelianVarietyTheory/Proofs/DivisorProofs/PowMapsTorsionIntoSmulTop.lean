@@ -6,18 +6,20 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open Submodule in
-theorem pow_maps_torsion_into_smul_top (R : Type) [CommRing R] [IsDedekindDomain R] (M : Type)
-    [AddCommGroup M] [Module R M] (I J : Ideal R) (f : M →ₗ[R] M) (m : ℕ) :
-    I.IsMaximal → J ≠ ⊥ → (∀ x, (f ^ m) x ∈ I • (⊤ : Submodule R M)) →
-      ∃ j : ℕ, ∀ y : M, (∀ a ∈ I, a • y ∈ J • (⊤ : Submodule R M)) →
-        (f ^ j) y ∈ J • (⊤ : Submodule R M) := by
+theorem pow_maps_torsion_into_smul_top
+    (R : Type) [CommRing R] [IsDedekindDomain R]
+    (M : Type) [AddCommGroup M] [Module R M]
+    (I J : Ideal R) (f : M →ₗ[R] M) (m : ℕ)
+    : I.IsMaximal → J ≠ ⊥ → (∀ x, (f ^ m) x ∈ I • (⊤ : Submodule R M))
+      → ∃ j : ℕ, ∀ y : M,
+        (∀ a ∈ I, a • y ∈ J • (⊤ : Submodule R M)) → (f ^ j) y ∈ J • (⊤ : Submodule R M) := by
   intro hI hJ hf
   obtain ⟨Q, hIQ, hJQ⟩ := Ideal.eq_prime_pow_mul_coprime hJ I
   set k := Multiset.count I (UniqueFactorizationMonoid.normalizedFactors J)
 
-  have hstab : ∀ (n : ℕ) (z : M), z ∈ J • (⊤ : Submodule R M) → (f ^ n) z ∈ J • (⊤ : Submodule R M) := by
+  have hstab
+      : ∀ (n : ℕ) (z : M), z ∈ J • (⊤ : Submodule R M) → (f ^ n) z ∈ J • (⊤ : Submodule R M) := by
     intro n z hz
     have : (J • (⊤ : Submodule R M)).map (f ^ n) ≤ J • (⊤ : Submodule R M) := by
       rw [Submodule.map_smul'']

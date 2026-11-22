@@ -5,12 +5,25 @@ public import Formalism.GaloisCohomology.LocalTateDualityK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology
 
 namespace GlobalTheory
 
-theorem exists_coboundary_of_subsingleton_Hn_three :
-    ∀ (R : Type) [CommRing R] (Γ : Type) [Group Γ] [TopologicalSpace Γ] (M : Type) [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M] (ρ : Representation R Γ M), Subsingleton (Hn ρ 3) → ∀ c : Γ × Γ × Γ → M, Continuous c → (∀ g h k m, ρ g (c (h, k, m)) - c (g * h, k, m) + c (g, h * k, m) - c (g, h, k * m) + c (g, h, k) = 0) → ∃ u : Γ × Γ → M, Continuous u ∧ ∀ g h k, ρ g (u (h, k)) - u (g * h, k) + u (g, h * k) - u (g, h) = c (g, h, k) := by
+theorem exists_coboundary_of_subsingleton_Hn_three
+    : ∀ (R : Type) [CommRing R] (Γ : Type) [Group Γ] [TopologicalSpace Γ] (M : Type)
+        [AddCommGroup M] [Module R M] [TopologicalSpace M] [DiscreteTopology M]
+        (ρ : Representation R Γ M),
+      Subsingleton (Hn ρ 3)
+        → ∀ c : Γ × Γ × Γ → M,
+          Continuous c
+            → (∀ g h k m,
+              ρ g (c (h, k, m)) - c (g * h, k, m) + c (g, h * k, m) - c (g, h, k * m) + c (g, h, k)
+                = 0)
+            → ∃ u : Γ × Γ → M,
+              Continuous u
+                ∧ ∀ g h k,
+                  ρ g (u (h, k)) - u (g * h, k) + u (g, h * k) - u (g, h) = c (g, h, k) := by
   intro R _ Γ _ _ M _ _ _ _ ρ hs c hc hcoc
   let f : (Fin 3 → Γ) → M := fun x => c (x 0, x 1, x 2)
   have hf : Continuous f := hc.comp (by fun_prop)

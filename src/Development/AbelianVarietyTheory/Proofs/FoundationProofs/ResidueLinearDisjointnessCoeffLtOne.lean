@@ -15,8 +15,8 @@ namespace GlobalTheory.K5.ResDisj
 
 variable {p : ℕ} [hp : Fact p.Prime]
 
-theorem const_of_pow_eq {f : ℕ} (hf : f ≠ 0) (a : LaurentSeries (ZMod p)) (ha : a ^ p ^ f = a) :
-    a = HahnSeries.C (a.coeff 0) := by
+theorem const_of_pow_eq {f : ℕ} (hf : f ≠ 0) (a : LaurentSeries (ZMod p)) (ha : a ^ p ^ f = a)
+    : a = HahnSeries.C (a.coeff 0) := by
   haveI : CharP (LaurentSeries (ZMod p)) p :=
     (CharP.charP_iff_prime_eq_zero hp.out).2 (by
       rw [← map_natCast (HahnSeries.C : ZMod p →+* LaurentSeries (ZMod p))]; simp)
@@ -36,10 +36,16 @@ theorem const_of_pow_eq {f : ℕ} (hf : f ≠ 0) (a : LaurentSeries (ZMod p)) (h
     · exact h
   exact hb (HahnSeries.coeff_order_eq_zero.1 (by rw [h2]; exact h0))
 
-theorem coeff_rel_of_pow {k : Type} [Field k] [Algebra (ZMod p) k] {ι : Type} [Fintype ι]
-    (φ : LaurentSeries (ZMod p) →+* k) {f : ℕ} (hf : f ≠ 0) (ε : ι → k) (hε : ∀ t, ε t ^ p ^ f = ε t)
-    (s : Finset ι) : ∀ b : ι → LaurentSeries (ZMod p), (∀ t, t ∉ s → b t = 0) → ∑ t, ε t * φ (b t) = 0 →
-      ∀ r, ∑ t, ε t * algebraMap (ZMod p) k ((b t).coeff r) = 0 := by
+theorem coeff_rel_of_pow
+    {k : Type} [Field k] [Algebra (ZMod p) k]
+    {ι : Type} [Fintype ι]
+    (φ : LaurentSeries (ZMod p) →+* k)
+    {f : ℕ} (hf : f ≠ 0)
+    (ε : ι → k) (hε : ∀ t, ε t ^ p ^ f = ε t)
+    (s : Finset ι)
+    : ∀ b : ι → LaurentSeries (ZMod p),
+      (∀ t, t ∉ s → b t = 0) → ∑ t, ε t * φ (b t) = 0
+        → ∀ r, ∑ t, ε t * algebraMap (ZMod p) k ((b t).coeff r) = 0 := by
   classical
   haveI : CharP k p := (CharP.charP_iff_prime_eq_zero hp.out).2 (by
       rw [← map_natCast (algebraMap (ZMod p) k)]; simp)
@@ -47,66 +53,81 @@ theorem coeff_rel_of_pow {k : Type} [Field k] [Algebra (ZMod p) k] {ι : Type} [
     DFunLike.congr_fun (Subsingleton.elim (φ.comp HahnSeries.C) (algebraMap (ZMod p) k)) c
   induction s using Finset.strongInduction with
   | H s ih =>
-  intro b hb hrel r
-  by_cases hA : ∃ l : ι → ZMod p, (∀ t, t ∉ s → l t = 0) ∧ ∑ t, ε t * algebraMap (ZMod p) k (l t) = 0 ∧ ∃ u, l u = 1
-  · obtain ⟨l, hl, hlr, u, hu⟩ := hA
-    have hus : u ∈ s := by
-      by_contra h
-      rw [hl u h] at hu; exact zero_ne_one hu
-    have := ih (s.erase u) (Finset.erase_ssubset hus) (fun t => b t - HahnSeries.C (l t) * b u) ?_ ?_ r
-    · simp only [HahnSeries.coeff_sub, HahnSeries.C_mul_eq_smul, HahnSeries.coeff_smul, smul_eq_mul,
-        map_sub, map_mul, mul_sub, Finset.sum_sub_distrib, ← mul_assoc, ← Finset.sum_mul, hlr] at this
-      simpa using this
-    · intro t ht
-      by_cases htu : t = u
-      · subst htu; simp [hu]
-      · have : t ∉ s := fun h => ht (Finset.mem_erase.2 ⟨htu, h⟩)
-        simp [hb t this, hl t this]
-    · simp only [map_sub, map_mul, hC, mul_sub, Finset.sum_sub_distrib, ← mul_assoc, ← Finset.sum_mul, hlr, hrel]
-      simp
-  · have hb0 : ∀ u, b u = 0 := by
-      intro u
-      by_contra hu
+    intro b hb hrel r
+    by_cases hA
+      : ∃ l : ι → ZMod p,
+        (∀ t, t ∉ s → l t = 0) ∧ ∑ t, ε t * algebraMap (ZMod p) k (l t) = 0 ∧ ∃ u, l u = 1
+    · obtain ⟨l, hl, hlr, u, hu⟩ := hA
       have hus : u ∈ s := by
         by_contra h
-        exact hu (hb u h)
-      have hq : p ^ f ≠ 0 := pow_ne_zero _ hp.out.ne_zero
-      set c : ι → LaurentSeries (ZMod p) := fun t => b t * (b u)⁻¹ with hc
-      have hcu : c u = 1 := mul_inv_cancel₀ hu
-      have hcs : ∀ t, t ∉ s → c t = 0 := fun t ht => by simp [hc, hb t ht]
-      have hcr : ∑ t, ε t * φ (c t) = 0 := by
-        simp only [hc, map_mul, ← mul_assoc, ← Finset.sum_mul, hrel, zero_mul]
-      have hcr' : ∑ t, ε t * φ (c t ^ p ^ f) = 0 := by
-        have := congrArg (· ^ p ^ f) hcr
-        simp only [sum_pow_char_pow, mul_pow, hε, zero_pow hq] at this
-        simpa only [map_pow] using this
-      have hi := ih (s.erase u) (Finset.erase_ssubset hus) (fun t => c t ^ p ^ f - c t) ?_ ?_
-      · have hfix : ∀ t, c t ^ p ^ f = c t := by
-          intro t
-          rw [← sub_eq_zero]
-          ext r'
-          by_contra hne
-          apply hA
-          refine ⟨fun t' => (c t' ^ p ^ f - c t').coeff r' * ((c t ^ p ^ f - c t).coeff r')⁻¹, ?_, ?_, t,
-            mul_inv_cancel₀ hne⟩
-          · intro t' ht'
-            simp [hcs t' ht', zero_pow hq]
-          · simp only [map_mul, ← mul_assoc, ← Finset.sum_mul, hi r', zero_mul]
-        apply hA
-        refine ⟨fun t => (c t).coeff 0, fun t ht => by simp [hcs t ht], ?_, u, by simp [hcu]⟩
-        rw [← hcr]
-        refine Finset.sum_congr rfl fun t _ => ?_
-        rw [← hC, ← const_of_pow_eq hf _ (hfix t)]
+        rw [hl u h] at hu
+        exact zero_ne_one hu
+      have :=
+        ih (s.erase u) (Finset.erase_ssubset hus) (fun t => b t - HahnSeries.C (l t) * b u) ?_ ?_ r
+      · simp only [HahnSeries.coeff_sub, HahnSeries.C_mul_eq_smul, HahnSeries.coeff_smul,
+            smul_eq_mul, map_sub, map_mul, mul_sub, Finset.sum_sub_distrib, ← mul_assoc,
+            ← Finset.sum_mul, hlr]
+          at this
+        simpa using this
       · intro t ht
         by_cases htu : t = u
-        · subst htu; simp [hcu]
+        · subst htu; simp [hu]
         · have : t ∉ s := fun h => ht (Finset.mem_erase.2 ⟨htu, h⟩)
-          simp [hcs t this, zero_pow hq]
-      · simp only [map_sub, mul_sub, Finset.sum_sub_distrib, hcr, hcr', sub_self]
-    simp [hb0]
+          simp [hb t this, hl t this]
+      · simp only [map_sub, map_mul, hC, mul_sub, Finset.sum_sub_distrib, ← mul_assoc,
+          ← Finset.sum_mul, hlr, hrel]
+        simp
+    · have hb0 : ∀ u, b u = 0 := by
+        intro u
+        by_contra hu
+        have hus : u ∈ s := by
+          by_contra h
+          exact hu (hb u h)
+        have hq : p ^ f ≠ 0 := pow_ne_zero _ hp.out.ne_zero
+        set c : ι → LaurentSeries (ZMod p) := fun t => b t * (b u)⁻¹ with hc
+        have hcu : c u = 1 := mul_inv_cancel₀ hu
+        have hcs : ∀ t, t ∉ s → c t = 0 := fun t ht => by simp [hc, hb t ht]
+        have hcr : ∑ t, ε t * φ (c t) = 0 := by
+          simp only [hc, map_mul, ← mul_assoc, ← Finset.sum_mul, hrel, zero_mul]
+        have hcr' : ∑ t, ε t * φ (c t ^ p ^ f) = 0 := by
+          have := congrArg (· ^ p ^ f) hcr
+          simp only [sum_pow_char_pow, mul_pow, hε, zero_pow hq] at this
+          simpa only [map_pow] using this
+        have hi := ih (s.erase u) (Finset.erase_ssubset hus) (fun t => c t ^ p ^ f - c t) ?_ ?_
+        · have hfix : ∀ t, c t ^ p ^ f = c t := by
+            intro t
+            rw [← sub_eq_zero]
+            ext r'
+            by_contra hne
+            apply hA
+            refine ⟨
+              fun t' => (c t' ^ p ^ f - c t').coeff r' * ((c t ^ p ^ f - c t).coeff r')⁻¹,
+              ?_,
+              ?_,
+              t,
+              mul_inv_cancel₀ hne
+            ⟩
+            · intro t' ht'
+              simp [hcs t' ht', zero_pow hq]
+            · simp only [map_mul, ← mul_assoc, ← Finset.sum_mul, hi r', zero_mul]
+          apply hA
+          refine ⟨fun t => (c t).coeff 0, fun t ht => by simp [hcs t ht], ?_, u, by simp [hcu]⟩
+          rw [← hcr]
+          refine Finset.sum_congr rfl fun t _ => ?_
+          rw [← hC, ← const_of_pow_eq hf _ (hfix t)]
+        · intro t ht
+          by_cases htu : t = u
+          · subst htu; simp [hcu]
+          · have : t ∉ s := fun h => ht (Finset.mem_erase.2 ⟨htu, h⟩)
+            simp [hcs t this, zero_pow hq]
+        · simp only [map_sub, mul_sub, Finset.sum_sub_distrib, hcr, hcr', sub_self]
+      simp [hb0]
 
-theorem exists_pow_eq {k : Type} [Field k] [Algebra (ZMod p) k] {ι : Type} [Fintype ι] (ε : ι → k)
-    (h : ∀ t, IsAlgebraic (ZMod p) (ε t)) : ∃ f : ℕ, f ≠ 0 ∧ ∀ t, ε t ^ p ^ f = ε t := by
+theorem exists_pow_eq
+    {k : Type} [Field k] [Algebra (ZMod p) k]
+    {ι : Type} [Fintype ι]
+    (ε : ι → k) (h : ∀ t, IsAlgebraic (ZMod p) (ε t))
+    : ∃ f : ℕ, f ≠ 0 ∧ ∀ t, ε t ^ p ^ f = ε t := by
   let K := IntermediateField.adjoin (ZMod p) (Set.range ε)
   haveI : FiniteDimensional (ZMod p) K :=
     IntermediateField.finiteDimensional_adjoin (by rintro _ ⟨t, rfl⟩; exact (h t).isIntegral)
@@ -121,8 +142,8 @@ theorem exists_pow_eq {k : Type} [Field k] [Algebra (ZMod p) k] {ι : Type} [Fin
   exact congrArg Subtype.val this
 
 open Polynomial in
-theorem exists_prim (P : ℤ_[p][X]) (hP : P ≠ 0) :
-    ∃ (c : ℤ_[p]) (Q : ℤ_[p][X]), c ≠ 0 ∧ P = C c * Q ∧ Q.map (PadicInt.toZMod (p := p)) ≠ 0 := by
+theorem exists_prim (P : ℤ_[p][X]) (hP : P ≠ 0)
+    : ∃ (c : ℤ_[p]) (Q : ℤ_[p][X]), c ≠ 0 ∧ P = C c * Q ∧ Q.map (PadicInt.toZMod (p := p)) ≠ 0 := by
   classical
   letI : NormalizedGCDMonoid ℤ_[p] := Classical.arbitrary _
   refine ⟨P.content, P.primPart, by rwa [Ne, content_eq_zero_iff], P.eq_C_content_mul_primPart, ?_⟩
@@ -132,16 +153,22 @@ theorem exists_prim (P : ℤ_[p][X]) (hP : P ≠ 0) :
     have := congrArg (fun Q => Q.coeff n) h0
     simp only [coeff_map, coeff_zero] at this
     rwa [← RingHom.mem_ker, PadicInt.ker_toZMod, PadicInt.maximalIdeal_eq_span_p,
-      Ideal.mem_span_singleton] at this
-  exact PadicInt.prime_p.not_unit (isPrimitive_primPart P (p : ℤ_[p]) ((C_dvd_iff_dvd_coeff _ _).2 hd))
+        Ideal.mem_span_singleton]
+      at this
+  exact PadicInt.prime_p.not_unit (isPrimitive_primPart P (p : ℤ_[p])
+    ((C_dvd_iff_dvd_coeff _ _).2 hd))
 
-theorem coeff_lt_one : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
-    IsClo p Ω → ∀ (v : Valuation Ω ℝ≥0), (∀ x : Ω, v x ≤ 1 ↔ IsInt (p := p) x) →
-    v (p : Ω) < 1 → ∀ (T : GlobalTheory.K5.Tower p Ω) (n : ℕ) (ψ : O0 p →+* Ω), IsReb T n ψ →
-    ∀ (d : ℕ) (e : Fin d → Ω) (a : Fin d → Lau p),
-    (∀ t, IsInt (p := p) (e t) ∧ IsAlgZp (p := p) (e t)) →
-    v (∑ t, e t * ψ (algebraMap (Lau p) (O0 p) (a t))) < 1 →
-    ∀ r : ℤ, v (∑ t, e t * zp Ω ((a t).coeff r)) < 1 := by
+theorem coeff_lt_one
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ (v : Valuation Ω ℝ≥0),
+          (∀ x : Ω, v x ≤ 1 ↔ IsInt (p := p) x) → v (p : Ω) < 1
+            → ∀ (T : GlobalTheory.K5.Tower p Ω) (n : ℕ) (ψ : O0 p →+* Ω),
+              IsReb T n ψ
+                → ∀ (d : ℕ) (e : Fin d → Ω) (a : Fin d → Lau p),
+                  (∀ t, IsInt (p := p) (e t) ∧ IsAlgZp (p := p) (e t))
+                    → v (∑ t, e t * ψ (algebraMap (Lau p) (O0 p) (a t))) < 1
+                    → ∀ r : ℤ, v (∑ t, e t * zp Ω ((a t).coeff r)) < 1 := by
   intro p hp Ω _ _ hC v hv hvp T n ψ hψ d e a he hsum r
   have hq : p ^ n ≠ 0 := pow_ne_zero _ hp.out.ne_zero
   have hqq : IsIntegral (O0 p) (T.qq n) :=
@@ -157,7 +184,8 @@ theorem coeff_lt_one : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alge
     · by_cases hi : i = 0
       · simp [hi]
       · have : (p : ℤ) ^ n * i ≠ 0 := mul_ne_zero (by exact_mod_cast hq) hi
-        simp [HahnSeries.C_apply, HahnSeries.coeff_single_of_ne this, HahnSeries.coeff_single_of_ne hi]
+        simp [HahnSeries.C_apply, HahnSeries.coeff_single_of_ne this,
+          HahnSeries.coeff_single_of_ne hi]
     · have : r ≠ 0 := by rintro rfl; exact hr (dvd_zero _)
       simp [HahnSeries.C_apply, HahnSeries.coeff_single_of_ne this]
   let A := v.valuationSubring
@@ -167,8 +195,7 @@ theorem coeff_lt_one : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alge
     rw [IsLocalRing.residue_eq_zero_iff, Valuation.mem_maximalIdeal_iff]
   let g : Lau p →+* A := (ψ.comp (algebraMap (Lau p) (O0 p))).codRestrict A (fun x => hint _)
   have hg : ∀ x, (g x : Ω) = ψ (algebraMap (Lau p) (O0 p) x) := fun _ => rfl
-  have hp0 : (p : k) = 0 := by
-    rw [← map_natCast ρ, hρ]; simpa using hvp
+  have hp0 : (p : k) = 0 := by rw [← map_natCast ρ, hρ]; simpa using hvp
   haveI : CharP k p := (CharP.charP_iff_prime_eq_zero hp.out).2 hp0
   letI : Algebra (ZMod p) k := ZMod.algebra k p
   have hker : RingHom.ker (LauZ.red p) ≤ RingHom.ker (ρ.comp g) := by
@@ -205,10 +232,12 @@ theorem coeff_lt_one : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alge
     obtain ⟨P, hP, hPe⟩ := (he t).2
     obtain ⟨c, Q, hc, rfl, hQ⟩ := exists_prim P hP
     refine ⟨_, hQ, ?_⟩
-    rw [Polynomial.aeval_def, Polynomial.eval₂_map, hg0, Polynomial.eval₂_mul, Polynomial.eval₂_C] at hPe
+    rw [Polynomial.aeval_def, Polynomial.eval₂_map, hg0, Polynomial.eval₂_mul, Polynomial.eval₂_C]
+      at hPe
     have hc' : (A.subtype.comp g0) c ≠ 0 := by
       haveI : CharZero Ω := Basic.charZero_of_isClo hC
-      obtain ⟨m, u, rfl⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hc PadicInt.irreducible_p
+      obtain ⟨m, u, rfl⟩ :=
+        IsDiscreteValuationRing.eq_unit_mul_pow_irreducible hc PadicInt.irreducible_p
       rw [map_mul, map_pow, map_natCast]
       exact mul_ne_zero (u.isUnit.map _).ne_zero (pow_ne_zero _ (by exact_mod_cast hp.out.ne_zero))
     have h1 := (mul_eq_zero.1 hPe).resolve_left hc'
@@ -229,13 +258,15 @@ theorem coeff_lt_one : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alge
     rw [hρ]
     convert hsum using 2
     exact map_sum A.subtype _ _
-  have hres := coeff_rel_of_pow φ hf _ hfix Finset.univ _ (fun t ht => absurd (Finset.mem_univ t) ht) hrel r
+  have hres :=
+    coeff_rel_of_pow φ hf _ hfix Finset.univ _ (fun t ht => absurd (Finset.mem_univ t) ht) hrel r
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [LauZ.red_coeff, ← hCz, ← map_mul, ← map_sum] at hres
   rw [hρ] at hres
   convert hres using 2
   refine Eq.trans ?_ (map_sum A.subtype _ _).symm
   refine Finset.sum_congr rfl fun t _ => ?_
-  rw [← hzp]; rfl
+  rw [← hzp]
+  rfl
 
 end GlobalTheory.K5.ResDisj

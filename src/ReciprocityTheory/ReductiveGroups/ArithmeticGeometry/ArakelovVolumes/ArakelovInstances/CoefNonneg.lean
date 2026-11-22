@@ -14,8 +14,9 @@ open Matrix NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheor
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
 
-theorem coef_nonneg (la : Wt X.Ψ r) (hdom : X.IsDominant la) (τ : X.Ψ) (a j : Fin r) (h : (a : ℕ) < j) :
-    0 ≤ coef X la τ a j := by
+theorem coef_nonneg
+    (la : Wt X.Ψ r) (hdom : X.IsDominant la) (τ : X.Ψ) (a j : Fin r) (h : (a : ℕ) < j)
+    : 0 ≤ coef X la τ a j := by
   obtain ⟨h1, h2', h3⟩ := hdom τ
   have haj : a < j := Fin.lt_def.2 h
   unfold coef Dsg sgn
@@ -38,8 +39,8 @@ theorem coef_nonneg (la : Wt X.Ψ r) (hdom : X.IsDominant la) (τ : X.Ψ) (a j :
       norm_num
       linarith
 
-theorem coef_pos (la : Wt X.Ψ r) (hs : IsStrictDom X la) (τ : X.Ψ) (a j : Fin r) (h : (a : ℕ) < j) :
-    0 < coef X la τ a j := by
+theorem coef_pos (la : Wt X.Ψ r) (hs : IsStrictDom X la) (τ : X.Ψ) (a j : Fin r) (h : (a : ℕ) < j)
+    : 0 < coef X la τ a j := by
   obtain ⟨h1, h2', h3⟩ := hs τ
   have haj : a < j := Fin.lt_def.2 h
   unfold coef Dsg sgn
@@ -72,8 +73,9 @@ theorem Lin_ne (u : V (nd X)) (hu : u ≠ 0) : ∃ τ, KapPf.Lin X τ u ≠ 0 :=
     rw [← he]
     exact Equiv.apply_symm_apply _ _
   have h0 := congrArg (fun M : Matrix (Fin r) (Fin r) ℂ => M x c) (hall τ)
-  simp only [KapPf.Lin, LinearMap.coe_mk, AddHom.coe_mk, Matrix.of_apply, KapPf.embF,
-    KapPf.vecOf, hxc, dite_true, Matrix.zero_apply] at h0
+  simp only [KapPf.Lin, LinearMap.coe_mk, AddHom.coe_mk, Matrix.of_apply, KapPf.embF, KapPf.vecOf,
+      hxc, dite_true, Matrix.zero_apply]
+    at h0
   rw [hi] at h0
   simpa using h0
 
@@ -92,12 +94,11 @@ theorem Xd_lower (z u : V (nd X)) (τ : X.Ψ) (i j : Fin r) (hij : i ≤ j) : Xd
   by_cases hik : i < k
   · rw [hLi (OrderDual.toDual_lt_toDual.2 hik), zero_mul]
   · have hkj : ¬ j < k := fun h => hik (lt_of_le_of_lt hij h)
-    have hz : KapPf.Lin X τ u k j = 0 := by
-      simp [KapPf.Lin, KapPf.embF, hkj]
+    have hz : KapPf.Lin X τ u k j = 0 := by simp [KapPf.Lin, KapPf.embF, hkj]
     rw [hz, mul_zero]
 
-theorem Yd_ne (b : Frame X.Ψ r) (hb : b ∈ Bor X.Ψ r) (z u : V (nd X)) (hu : u ≠ 0) :
-    ∃ τ, ∃ a j : Fin r, (a : ℕ) < j ∧ Yd X b z u τ j a ≠ 0 := by
+theorem Yd_ne (b : Frame X.Ψ r) (hb : b ∈ Bor X.Ψ r) (z u : V (nd X)) (hu : u ≠ 0)
+    : ∃ τ, ∃ a j : Fin r, (a : ℕ) < j ∧ Yd X b z u τ j a ≠ 0 := by
   obtain ⟨τ, hτ⟩ := Lin_ne X u hu
   refine ⟨τ, ?_⟩
   by_contra hall

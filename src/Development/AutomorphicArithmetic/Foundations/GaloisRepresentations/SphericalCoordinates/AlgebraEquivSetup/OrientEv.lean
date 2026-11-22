@@ -7,7 +7,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.W2.Seed.Ori
@@ -24,15 +25,15 @@ def evM {n : ℕ} (σ : E →+* ℂ) : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E →
 theorem realTensorEvalAlgHom_tmul (σ : E →+* ℂ) (r : ℝ) (x : E) : ev1 σ (r ⊗ₜ x) = r • σ x := by
   simp [ev1, Algebra.ofId_apply, Algebra.smul_def]
 
-theorem evM_tmul {n : ℕ} (σ : E →+* ℂ) (r : ℝ) (x : Matrix (Fin n) (Fin n) E) :
-    evM σ (r ⊗ₜ x) = r • x.map σ := by
+theorem evM_tmul {n : ℕ} (σ : E →+* ℂ) (r : ℝ) (x : Matrix (Fin n) (Fin n) E)
+    : evM σ (r ⊗ₜ x) = r • x.map σ := by
   unfold evM
   refine (Algebra.TensorProduct.lift_tmul _ _ _ r x).trans ?_
   rw [Algebra.smul_def]
   rfl
 
-theorem evM_conj {n : ℕ} (σ : E →+* ℂ) (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) :
-    evM (ComplexEmbedding.conjugate σ) z = (evM σ z).map (starRingEnd ℂ) := by
+theorem evM_conj {n : ℕ} (σ : E →+* ℂ) (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E)
+    : evM (ComplexEmbedding.conjugate σ) z = (evM σ z).map (starRingEnd ℂ) := by
   induction z using TensorProduct.induction_on with
   | zero => simp
   | tmul r x =>
@@ -41,22 +42,32 @@ theorem evM_conj {n : ℕ} (σ : E →+* ℂ) (z : ℝ ⊗[ℚ] Matrix (Fin n) (
     simp [ComplexEmbedding.conjugate_coe_eq]
   | add a b ha hb => rw [map_add (f := _), ha, hb, map_add (f := _), Matrix.map_add _ (map_add _)]
 
-def Th {K : Type} (f : K → (E →+* ℂ)) {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V] (β : V →ₗ[ℚ] (Fin n → E)) :
-    ℝ ⊗[ℚ] V →ₗ[ℝ] (K × Fin n → ℂ) :=
-  LinearMap.liftBaseChange ℝ
-    { toFun := fun w k => f k.1 (β w k.2)
-      map_add' := fun a b => by ext k; simp
-      map_smul' := fun q a => by ext k; simp [map_rat_smul] }
+def Th
+    {K : Type} (f : K → (E →+* ℂ))
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
+    (β : V →ₗ[ℚ] (Fin n → E))
+    : ℝ ⊗[ℚ] V →ₗ[ℝ] (K × Fin n → ℂ) :=
+  LinearMap.liftBaseChange ℝ {
+    toFun := fun w k => f k.1 (β w k.2)
+    map_add' := fun a b => by ext k; simp
+    map_smul' := fun q a => by ext k; simp [map_rat_smul]
+  }
 
-theorem Th_tmul {K : Type} (f : K → (E →+* ℂ)) {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
-    (β : V →ₗ[ℚ] (Fin n → E)) (r : ℝ) (w : V) (k : K × Fin n) :
-    Th f β (r ⊗ₜ w) k = r • f k.1 (β w k.2) := by
+theorem Th_tmul
+    {K : Type} (f : K → (E →+* ℂ))
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
+    (β : V →ₗ[ℚ] (Fin n → E)) (r : ℝ) (w : V) (k : K × Fin n)
+    : Th f β (r ⊗ₜ w) k = r • f k.1 (β w k.2) := by
   simp [Th]
 
-private theorem th_actOn_tmul_eq_evM_mulVec {K : Type} (f : K → (E →+* ℂ)) {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
+private theorem th_actOn_tmul_eq_evM_mulVec
+    {K : Type} (f : K → (E →+* ℂ))
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
     (β : V →ₗ[ℚ] (Fin n → E)) (rep : Matrix (Fin n) (Fin n) E →ₐ[ℚ] Module.End ℚ V)
-    (hβ : ∀ x z, β (rep x z) = x *ᵥ β z) (r s : ℝ) (m : Matrix (Fin n) (Fin n) E) (w : V) (τ : K) (i : Fin n) :
-    Th f β (actOn rep ℝ (r ⊗ₜ m) (s ⊗ₜ w)) (τ, i) = (evM (f τ) (r ⊗ₜ m) *ᵥ fun j => Th f β (s ⊗ₜ w) (τ, j)) i := by
+    (hβ : ∀ x z, β (rep x z) = x *ᵥ β z)
+    (r s : ℝ) (m : Matrix (Fin n) (Fin n) E) (w : V) (τ : K) (i : Fin n)
+    : Th f β (actOn rep ℝ (r ⊗ₜ m) (s ⊗ₜ w)) (τ, i)
+      = (evM (f τ) (r ⊗ₜ m) *ᵥ fun j => Th f β (s ⊗ₜ w) (τ, j)) i := by
   have hl : actOn rep ℝ (r ⊗ₜ m) = algebraMap ℝ _ r * (Module.End.baseChangeHom ℚ ℝ V) (rep m) := by
     unfold actOn
     exact Algebra.TensorProduct.lift_tmul _ _ _ r m
@@ -67,12 +78,16 @@ private theorem th_actOn_tmul_eq_evM_mulVec {K : Type} (f : K → (E →+* ℂ))
   rw [ha, Th_tmul, evM_tmul, hβ]
   simp only [Th_tmul]
   rw [RingHom.map_mulVec]
-  simp [Matrix.mulVec, dotProduct, Finset.smul_sum, Finset.mul_sum, mul_comm, mul_left_comm, mul_assoc]
+  simp [Matrix.mulVec, dotProduct, Finset.smul_sum, Finset.mul_sum, mul_comm, mul_left_comm,
+    mul_assoc]
 
-theorem Th_act {K : Type} (f : K → (E →+* ℂ)) {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
+theorem Th_act
+    {K : Type} (f : K → (E →+* ℂ))
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℚ V]
     (β : V →ₗ[ℚ] (Fin n → E)) (rep : Matrix (Fin n) (Fin n) E →ₐ[ℚ] Module.End ℚ V)
-    (hβ : ∀ x z, β (rep x z) = x *ᵥ β z) (y : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) (x : ℝ ⊗[ℚ] V) (τ : K) (i : Fin n) :
-    Th f β (actOn rep ℝ y x) (τ, i) = (evM (f τ) y *ᵥ fun j => Th f β x (τ, j)) i := by
+    (hβ : ∀ x z, β (rep x z) = x *ᵥ β z)
+    (y : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) (x : ℝ ⊗[ℚ] V) (τ : K) (i : Fin n)
+    : Th f β (actOn rep ℝ y x) (τ, i) = (evM (f τ) y *ᵥ fun j => Th f β x (τ, j)) i := by
   induction y using TensorProduct.induction_on with
   | zero => simp
   | tmul r m =>
@@ -80,23 +95,29 @@ theorem Th_act {K : Type} (f : K → (E →+* ℂ)) {n : ℕ} {V : Type} [AddCom
     | zero =>
       simp
       exact (congrFun (Matrix.mulVec_zero _) i).symm
-    | tmul s w => exact th_actOn_tmul_eq_evM_mulVec f β rep hβ r s m w τ i
+    | tmul s w =>
+      exact th_actOn_tmul_eq_evM_mulVec f β rep hβ r s m w τ i
     | add a b ha hb =>
       rw [map_add (f := _), map_add (f := _), Pi.add_apply, ha, hb]
-      have : (fun j => Th f β (a + b) (τ, j)) = (fun j => Th f β a (τ, j)) + (fun j => Th f β b (τ, j)) := by
+      have : (fun j => Th f β (a + b) (τ, j))
+          = (fun j => Th f β a (τ, j)) + (fun j => Th f β b (τ, j)) := by
         ext j
         simp
       rw [this, Matrix.mulVec_add, Pi.add_apply]
   | add c d hc hd =>
-    rw [map_add (f := _), LinearMap.add_apply, map_add (f := _), Pi.add_apply, hc, hd, map_add (f := _), Matrix.add_mulVec, Pi.add_apply]
+    rw [map_add (f := _), LinearMap.add_apply, map_add (f := _), Pi.add_apply, hc, hd,
+      map_add (f := _), Matrix.add_mulVec, Pi.add_apply]
 
 variable [IsCMField E]
 
-theorem evM_star {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (hH : (H.map (IsCMField.complexConj E : E →+* E))ᵀ = H)
-    (hdet : H.det ≠ 0) (σ : E →+* ℂ) (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E) :
-    gramAt H σ * evM σ (starT (hermStar H hdet) ℝ z).unop = (evM σ z)ᴴ * gramAt H σ := by
-  have hc : ∀ M : Matrix (Fin n) (Fin n) E,
-      (M.map (IsCMField.complexConj E : E →+* E)).map σ = (M.map σ).map (starRingEnd ℂ) := by
+theorem evM_star
+    {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (hH : (H.map (IsCMField.complexConj E : E →+* E))ᵀ = H)
+    (hdet : H.det ≠ 0)
+    (σ : E →+* ℂ) (z : ℝ ⊗[ℚ] Matrix (Fin n) (Fin n) E)
+    : gramAt H σ * evM σ (starT (hermStar H hdet) ℝ z).unop = (evM σ z)ᴴ * gramAt H σ := by
+  have hc
+      : ∀ M : Matrix (Fin n) (Fin n) E,
+        (M.map (IsCMField.complexConj E : E →+* E)).map σ = (M.map σ).map (starRingEnd ℂ) := by
     intro M
     ext i j
     simp [IsCMField.complexEmbedding_complexConj]
@@ -105,7 +126,8 @@ theorem evM_star {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (hH : (H.map (IsCMFiel
     rw [Matrix.transpose_transpose] at h1
     rw [h1, gramAt, Matrix.transpose_map]
   have hu : IsUnit (H.map (IsCMField.complexConj E : E →+* E)).det := by
-    rw [show (H.map (IsCMField.complexConj E : E →+* E)).det = (IsCMField.complexConj E : E →+* E) H.det from
+    rw [show (H.map (IsCMField.complexConj E : E →+* E)).det
+        = (IsCMField.complexConj E : E →+* E) H.det from
       (RingHom.map_det _ H).symm]
     exact ((map_ne_zero _).mpr hdet).isUnit
   have hG : IsUnit (gramAt H σ).det := by
@@ -122,15 +144,19 @@ theorem evM_star {n : ℕ} (H : Matrix (Fin n) (Fin n) E) (hH : (H.map (IsCMFiel
     rw [hx, Matrix.mul_smul, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hG,
       Matrix.one_mul, star_trivial, Matrix.smul_mul]
   | add a b ha hb =>
-    rw [map_add (f := _), MulOpposite.unop_add, map_add (f := _), map_add (f := _), Matrix.mul_add, ha, hb,
-      Matrix.conjTranspose_add, Matrix.add_mul]
+    rw [map_add (f := _), MulOpposite.unop_add, map_add (f := _), map_add (f := _), Matrix.mul_add,
+      ha, hb, Matrix.conjTranspose_add, Matrix.add_mul]
 
-theorem term_pos (D h z : ℂ) (hD : D.re = 0) (hD' : D.im < 0) (hi : h.im = 0) (hr : h.re ≠ 0) :
-    0 ≤ (D * h * ((if 0 < h.re then Complex.I else -Complex.I) * z) * (starRingEnd ℂ) z).re ∧
-    (z ≠ 0 → 0 < (D * h * ((if 0 < h.re then Complex.I else -Complex.I) * z) * (starRingEnd ℂ) z).re) := by
+theorem term_pos (D h z : ℂ) (hD : D.re = 0) (hD' : D.im < 0) (hi : h.im = 0) (hr : h.re ≠ 0)
+    : 0 ≤ (D * h * ((if 0 < h.re then Complex.I else -Complex.I) * z) * (starRingEnd ℂ) z).re
+      ∧ (z ≠ 0
+        → 0
+          < (D * h * ((if 0 < h.re then Complex.I else -Complex.I) * z)
+            * (starRingEnd ℂ) z).re) := by
   have hz : z * (starRingEnd ℂ) z = (Complex.normSq z : ℂ) := Complex.mul_conj z
-  have e : D * h * ((if 0 < h.re then Complex.I else -Complex.I) * z) * (starRingEnd ℂ) z =
-      D * h * (if 0 < h.re then Complex.I else -Complex.I) * (Complex.normSq z : ℂ) := by
+  have e
+      : D * h * ((if 0 < h.re then Complex.I else -Complex.I) * z) * (starRingEnd ℂ) z
+        = D * h * (if 0 < h.re then Complex.I else -Complex.I) * (Complex.normSq z : ℂ) := by
     rw [← hz]
     ring
   rw [e]

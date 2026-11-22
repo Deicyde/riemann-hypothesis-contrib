@@ -12,15 +12,17 @@ variable {B A : Type} [CommRing B] [CommRing A] [Algebra B A] {k : ℕ} (N : Fin
 
 private noncomputable def monoL (m : Fin k →₀ ℕ) : lat N m →ₗ[B] rees N where
   toFun f := mono N m f.1 f.2
-  map_add' f g := Subtype.ext (by
-    show MvPolynomial.monomial m (f.1 + g.1) = MvPolynomial.monomial m f.1 + MvPolynomial.monomial m g.1
-    rw [map_add (f := _)])
-  map_smul' c f := Subtype.ext (by
-    show MvPolynomial.monomial m (c • f.1) = c • MvPolynomial.monomial m f.1
-    rw [MvPolynomial.smul_monomial])
+  map_add' f g :=
+    Subtype.ext (by
+      show MvPolynomial.monomial m (f.1 + g.1) = MvPolynomial.monomial m f.1 + MvPolynomial.monomial m g.1
+      rw [map_add (f := _)])
+  map_smul' c f :=
+    Subtype.ext (by
+      show MvPolynomial.monomial m (c • f.1) = c • MvPolynomial.monomial m f.1
+      rw [MvPolynomial.smul_monomial])
 
-private theorem eq_mono {m : Fin k →₀ ℕ} {p : rees N} (hp : p ∈ reesGr N (toDeg m)) :
-    p = mono N m (AddMonoidAlgebra.coeff p.1 m) (p.2 m) := by
+private theorem eq_mono {m : Fin k →₀ ℕ} {p : rees N} (hp : p ∈ reesGr N (toDeg m))
+    : p = mono N m (AddMonoidAlgebra.coeff p.1 m) (p.2 m) := by
   classical
   apply Subtype.ext
   ext n
@@ -30,7 +32,8 @@ private theorem eq_mono {m : Fin k →₀ ℕ} {p : rees N} (hp : p ∈ reesGr N
   · rw [h]
   · exact hp n fun h' => h (toDeg_injective h').symm
 
-private theorem gr_eq_range (m : Fin k →₀ ℕ) : reesGr N (toDeg m) = LinearMap.range (monoL N m) := by
+private theorem gr_eq_range (m : Fin k →₀ ℕ)
+    : reesGr N (toDeg m) = LinearMap.range (monoL N m) := by
   apply le_antisymm
   · intro p hp
     exact ⟨⟨_, p.2 m⟩, (eq_mono N hp).symm⟩
@@ -44,19 +47,23 @@ private theorem e_eq (i : Fin k) : e i = toDeg (Finsupp.single i 1) := by
     simp [e, toDeg]
   · simp [e, toDeg, Pi.single_apply, h, Finsupp.single_apply, Ne.symm h]
 
-private theorem gr_add (m m' : Fin k →₀ ℕ) :
-    reesGr N (toDeg (m + m')) = reesGr N (toDeg m) * reesGr N (toDeg m') := by
+private theorem gr_add (m m' : Fin k →₀ ℕ)
+    : reesGr N (toDeg (m + m')) = reesGr N (toDeg m) * reesGr N (toDeg m') := by
   apply le_antisymm
   · intro p hp
     have hf : AddMonoidAlgebra.coeff p.1 (m + m') ∈ lat N m * lat N m' := by
       rw [← lat_add]
       exact p.2 (m + m')
-    obtain ⟨q, hq, hqv⟩ : ∃ q ∈ reesGr N (toDeg m) * reesGr N (toDeg m'),
-        q.1 = MvPolynomial.monomial (m + m') (AddMonoidAlgebra.coeff p.1 (m + m')) := by
+    obtain ⟨q, hq, hqv⟩
+        : ∃ q ∈ reesGr N (toDeg m) * reesGr N (toDeg m'),
+          q.1 = MvPolynomial.monomial (m + m') (AddMonoidAlgebra.coeff p.1 (m + m')) := by
       refine Submodule.mul_induction_on hf ?_ ?_
       · intro a ha b hb
-        refine ⟨mono N m a ha * mono N m' b hb,
-          Submodule.mul_mem_mul (mono_mem N m a ha) (mono_mem N m' b hb), ?_⟩
+        refine ⟨
+          mono N m a ha * mono N m' b hb,
+          Submodule.mul_mem_mul (mono_mem N m a ha) (mono_mem N m' b hb),
+          ?_
+        ⟩
         show MvPolynomial.monomial m a * MvPolynomial.monomial m' b = _
         rw [MvPolynomial.monomial_mul]
       · rintro x y ⟨q₁, h₁, e₁⟩ ⟨q₂, h₂, e₂⟩
@@ -78,15 +85,17 @@ private theorem gr_add (m m' : Fin k →₀ ℕ) :
       apply Subtype.ext
       show a.1 * b.1 = MvPolynomial.monomial (m + m') _
       rw [← MvPolynomial.monomial_mul]
-      exact congrArg₂ (· * ·) (congrArg Subtype.val (eq_mono N ha)) (congrArg Subtype.val (eq_mono N hb))
+      exact congrArg₂ (· * ·) (congrArg Subtype.val (eq_mono N ha))
+        (congrArg Subtype.val (eq_mono N hb))
     rw [h]
     exact mono_mem N (m + m') _ hab
 
 end
 
-theorem UpperTheory.V.Alg.M.std_holds :
-    ∀ (B A : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [CommRing A] [Algebra B A] (k : ℕ)
-      (N : Fin k → Submodule B A), (∀ i, (N i).FG) → Std (reesGr N) := by
+theorem UpperTheory.V.Alg.M.std_holds
+    : ∀ (B A : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [CommRing A] [Algebra B A]
+        (k : ℕ) (N : Fin k → Submodule B A),
+      (∀ i, (N i).FG) → Std (reesGr N) := by
   intro B A _ _ hB _ _ k N hN
   have hdeg : ∀ d : Deg k, 0 ≤ d → ∃ m : Fin k →₀ ℕ, toDeg m = d := by
     intro d hd

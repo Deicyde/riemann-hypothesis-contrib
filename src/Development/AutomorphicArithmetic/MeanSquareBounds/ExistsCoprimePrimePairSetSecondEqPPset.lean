@@ -4,19 +4,22 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.PrimeSetTwoBoun
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-private theorem oddM_odd (z : ℝ) (q : ℕ) (hq : q.Prime) (h2 : q ≠ 2) : Nat.Coprime 2 (oddM z q) := by
+private theorem oddM_odd (z : ℝ) (q : ℕ) (hq : q.Prime) (h2 : q ≠ 2)
+    : Nat.Coprime 2 (oddM z q) := by
   have hq2 : Nat.Coprime 2 q := (Nat.coprime_primes Nat.prime_two hq).mpr (Ne.symm h2)
   refine Nat.Coprime.mul_right hq2 (Nat.Coprime.prod_right fun p hp => ?_)
   have hp' := Finset.mem_filter.mp hp
   have h3 : 3 ≤ p := (Finset.mem_Icc.mp hp'.1).1
   exact (Nat.coprime_primes Nat.prime_two hp'.2).mpr (by omega)
 
-private theorem chineseRemainder_finiteCover (M : ℕ) (h : Nat.Coprime 2 M) : ∃ a : ℕ, a.Coprime (16 * M) ∧
-    ∀ d : ℕ, (d % 16 = 7 ∧ M ∣ d + 1) ↔ d % (16 * M) = a % (16 * M) := by
+private theorem chineseRemainder_finiteCover (M : ℕ) (h : Nat.Coprime 2 M)
+    : ∃ a : ℕ,
+      a.Coprime (16 * M) ∧ ∀ d : ℕ, (d % 16 = 7 ∧ M ∣ d + 1) ↔ d % (16 * M) = a % (16 * M) := by
   have hM0 : M ≠ 0 := by
     rintro rfl
     simp at h
@@ -57,9 +60,12 @@ private theorem chineseRemainder_finiteCover (M : ℕ) (h : Nat.Coprime 2 M) : �
   rw [key1 d, key2 d]
   exact Nat.modEq_and_modEq_iff_modEq_mul h16
 
-theorem exists_coprime_primePairSetSecond_eq_PPset :
-    ∀ (z z' : ℝ) (q : ℕ), q.Prime → q ≠ 2 → ∃ a₀ : ℕ, a₀.Coprime (16 * oddM z q) ∧
-      primeSetTwoBounds z z' q = PPset (16 * oddM z q) a₀ (Real.exp z') := by
+theorem exists_coprime_primePairSetSecond_eq_PPset
+    : ∀ (z z' : ℝ) (q : ℕ),
+      q.Prime → q ≠ 2
+        → ∃ a₀ : ℕ,
+          a₀.Coprime (16 * oddM z q)
+            ∧ primeSetTwoBounds z z' q = PPset (16 * oddM z q) a₀ (Real.exp z') := by
   intro z z' q hq h2
   obtain ⟨a, ha, hiff⟩ := chineseRemainder_finiteCover _ (oddM_odd z q hq h2)
   refine ⟨a, ha, ?_⟩

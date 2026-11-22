@@ -15,11 +15,15 @@ namespace PI.LocHaarRR
 
 section
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} {p : HeightOneSpectrum (𝓞 F)}
 
-def ordR {A : Formalism.MainNotions.S.Loc.LocAt F E sig p}
-    (sg : Formalism.MainNotions.S.Loc.SplitAt A.Fp A.Ep A.cj (Formalism.MainNotions.S.Loc.resChar p)) : Subring A.Ep :=
+def ordR
+    {A : Formalism.MainNotions.S.Loc.LocAt F E sig p}
+    (sg
+      : Formalism.MainNotions.S.Loc.SplitAt A.Fp A.Ep A.cj (Formalism.MainNotions.S.Loc.resChar p))
+    : Subring A.Ep :=
   let S : Subring (𝒪[A.Fp] × 𝒪[A.Fp]) :=
     RingHom.eqLocus ((Ideal.Quotient.mk (Ideal.span {sg.q})).comp (RingHom.fst _ _))
       ((Ideal.Quotient.mk (Ideal.span {sg.q})).comp (RingHom.snd _ _))
@@ -33,8 +37,8 @@ def RR (A : Formalism.MainNotions.S.Loc.LocAt F E sig p) : Set A.Ep :=
 end
 
 def Target : Prop :=
-  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (sig : E →ₐ[F] E) (p : HeightOneSpectrum (𝓞 F)) (A : Formalism.MainNotions.S.Loc.LocAt F E sig p),
+  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (sig : E →ₐ[F] E)
+      (p : HeightOneSpectrum (𝓞 F)) (A : Formalism.MainNotions.S.Loc.LocAt F E sig p),
     IsReduced A.Ep → ∃ μ : Measure A.Ep, μ.IsAddHaarMeasure ∧ SigmaFinite μ ∧ μ (RR A) = 1
 
 end PI.LocHaarRR

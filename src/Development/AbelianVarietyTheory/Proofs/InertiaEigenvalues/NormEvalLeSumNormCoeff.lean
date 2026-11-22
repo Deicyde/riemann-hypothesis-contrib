@@ -6,10 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory.EvalNormCoefficientBound
 
-theorem norm_eval_le_sum_norm_coeff {σ : Type} (P : MvPolynomial σ ℂ) (v : σ → ℂ)
-    (hv : ∀ (s : σ), ‖v s‖ ≤ (1 : ℝ)) :
-    ‖(MvPolynomial.eval v : MvPolynomial σ ℂ → ℂ) P‖ ≤
-      ∑ d ∈ MvPolynomial.support P, ‖AddMonoidAlgebra.coeff P d‖ := by
+theorem norm_eval_le_sum_norm_coeff
+    {σ : Type} (P : MvPolynomial σ ℂ) (v : σ → ℂ) (hv : ∀ (s : σ), ‖v s‖ ≤ (1 : ℝ))
+    : ‖(MvPolynomial.eval v : MvPolynomial σ ℂ → ℂ) P‖
+      ≤ ∑ d ∈ MvPolynomial.support P, ‖AddMonoidAlgebra.coeff P d‖ := by
   rw [MvPolynomial.eval_eq]
   refine (norm_sum_le _ _).trans (Finset.sum_le_sum (fun d _ => ?_))
   rw [norm_mul]

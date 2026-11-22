@@ -10,7 +10,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Conti
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -20,24 +22,29 @@ open GlobalTheory.PointAtPlaceHom
 
 variable {D : D7} {θ : InfF D} {V : HSp D}
 
-theorem Rder_rTr {k : GA D V} (hk : k ∈ GfC V) (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ)
-    (φ : GA D V → ℂ) : Rder θ V τ X (rTr V k φ) = rTr V k (Rder θ V τ X φ) := by
+theorem Rder_rTr
+    {k : GA D V} (hk : k ∈ GfC V)
+    (τ : D.what₂.Tau) (X : Matrix (Fin V.rank) (Fin V.rank) ℂ) (φ : GA D V → ℂ)
+    : Rder θ V τ X (rTr V k φ) = rTr V k (Rder θ V τ X φ) := by
   funext g
   unfold Rder rTr
   congr 1
   funext t
   rw [mul_assoc, mul_assoc, oneP, comm_of_mem V (atTau_mem V τ _) hk]
 
-theorem foldr_rTr {α : Type} (k : GA D V) (F : α → (GA D V → ℂ) → (GA D V → ℂ)) (l : List α)
-    (h : ∀ a ∈ l, ∀ φ, F a (rTr V k φ) = rTr V k (F a φ)) (φ : GA D V → ℂ) :
-    l.foldr F (rTr V k φ) = rTr V k (l.foldr F φ) := by
+theorem foldr_rTr
+    {α : Type} (k : GA D V) (F : α → (GA D V → ℂ) → (GA D V → ℂ)) (l : List α)
+    (h : ∀ a ∈ l, ∀ φ, F a (rTr V k φ) = rTr V k (F a φ))
+    (φ : GA D V → ℂ)
+    : l.foldr F (rTr V k φ) = rTr V k (l.foldr F φ) := by
   induction l with
   | nil => rfl
   | cons a l ih =>
-    rw [List.foldr_cons, List.foldr_cons, ih fun b hb => h b (List.mem_cons_of_mem _ hb), h a List.mem_cons_self]
+    rw [List.foldr_cons, List.foldr_cons, ih fun b hb => h b (List.mem_cons_of_mem _ hb),
+      h a List.mem_cons_self]
 
-theorem gelf_rTr {k : GA D V} (hk : k ∈ GfC V) (τ : D.what₂.Tau) (n : ℕ) (φ : GA D V → ℂ) :
-    gelf θ V τ n (rTr V k φ) = rTr V k (gelf θ V τ n φ) := by
+theorem gelf_rTr {k : GA D V} (hk : k ∈ GfC V) (τ : D.what₂.Tau) (n : ℕ) (φ : GA D V → ℂ)
+    : gelf θ V τ n (rTr V k φ) = rTr V k (gelf θ V τ n φ) := by
   unfold gelf
   rw [Finset.sum_congr rfl fun idx _ => foldr_rTr k _ _ (fun a ha ψ => ?_) φ]
   · funext g
@@ -47,12 +54,21 @@ theorem gelf_rTr {k : GA D V} (hk : k ∈ GfC V) (τ : D.what₂.Tau) (n : ℕ) 
     rw [Rder_rTr hk, Rder_rTr hk]
     rfl
 
-theorem isAutFunSm_rTr_fin : ∀ (D : D7) (θ : InfF D), IsInfFam θ → ∀ (V : HSp D) (φ : GA D V → ℂ),
-    IsAutFunSm θ V φ → ∀ k ∈ GfC V, IsAutFunSm θ V (rTr V k φ) := by
+theorem isAutFunSm_rTr_fin
+    : ∀ (D : D7) (θ : InfF D),
+      IsInfFam θ
+        → ∀ (V : HSp D) (φ : GA D V → ℂ),
+          IsAutFunSm θ V φ → ∀ k ∈ GfC V, IsAutFunSm θ V (rTr V k φ) := by
   intro D θ _ V φ h k hk
   haveI : IsTopologicalGroup (GA D V) := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.topGroupHA _ _
-  refine { left := fun γ hγ g => ?_, level := ?_, cont := h.cont.comp (continuous_mul_const k),
-           smooth := fun n τs Xs hX g => ?_, zfin := ?_, growth := ?_ }
+  refine {
+    left := fun γ hγ g => ?_
+    level := ?_
+    cont := h.cont.comp (continuous_mul_const k)
+    smooth := fun n τs Xs hX g => ?_
+    zfin := ?_
+    growth := ?_
+  }
   · unfold rTr
     rw [mul_assoc, h.left γ hγ]
   · obtain ⟨U, hU, e⟩ := h.level

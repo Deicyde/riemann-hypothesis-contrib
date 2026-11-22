@@ -19,17 +19,19 @@ def unitBallSubring (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E]
   zero_mem' := by simp
   neg_mem' {a} ha := by simpa using ha
 
-theorem norm_det_one_add_smul (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E] (n : ℕ)
-    (x : Matrix (Fin n) (Fin n) E) (ϖ : E) (hϖ : ‖ϖ‖ < 1) (hx : ∀ i j, ‖x i j‖ ≤ 1) :
-    ‖(1 + ϖ • x).det‖ = 1 := by
+theorem norm_det_one_add_smul
+    (E : Type) [NontriviallyNormedField E] [IsUltrametricDist E]
+    (n : ℕ) (x : Matrix (Fin n) (Fin n) E)
+    (ϖ : E) (hϖ : ‖ϖ‖ < 1)
+    (hx : ∀ i j, ‖x i j‖ ≤ 1)
+    : ‖(1 + ϖ • x).det‖ = 1 := by
   set O := unitBallSubring E
   let y : Matrix (Fin n) (Fin n) O := fun i j => ⟨x i j, hx i j⟩
   let w : O := ⟨ϖ, hϖ.le⟩
   have hmap : O.subtype.mapMatrix (1 + w • y) = 1 + ϖ • x := by
     rw [map_add (f := _), map_one]
     congr 1
-  have hdet : (1 + ϖ • x).det = ((1 + w • y).det : E) := by
-    rw [← hmap, ← RingHom.map_det]; rfl
+  have hdet : (1 + ϖ • x).det = ((1 + w • y).det : E) := by rw [← hmap, ← RingHom.map_det]; rfl
   have hq : (Ideal.Quotient.mk (Ideal.span {w})) (1 + w • y).det = 1 := by
     rw [RingHom.map_det, map_add (f := _), map_one]
     have : (Ideal.Quotient.mk (Ideal.span {w})).mapMatrix (w • y) = 0 := by
@@ -44,7 +46,9 @@ theorem norm_det_one_add_smul (E : Type) [NontriviallyNormedField E] [IsUltramet
     simpa [w] using this.symm
   have hlt : ‖(1 + ϖ • x).det - 1‖ < 1 := by
     rw [hdet, hc', norm_mul]
-    calc ‖(c : E)‖ * ‖ϖ‖ ≤ 1 * ‖ϖ‖ := mul_le_mul_of_nonneg_right c.2 (norm_nonneg _)
+    calc
+      ‖(c : E)‖ * ‖ϖ‖
+        ≤ 1 * ‖ϖ‖ := mul_le_mul_of_nonneg_right c.2 (norm_nonneg _)
       _ < 1 := by rw [one_mul]; exact hϖ
   have key : (1 + ϖ • x).det = 1 + ((1 + ϖ • x).det - 1) := by ring
   rw [key, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [norm_one]; exact hlt.ne')]

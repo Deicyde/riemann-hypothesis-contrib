@@ -4,9 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qn14.le_of_add_one_le_succ :
-    ∀ {a : WithBot ℕ∞} {k : ℕ},
-    a + (1 : WithBot ℕ∞) ≤ (↑(k + (1 : ℕ)) : WithBot ℕ∞) → a ≤ (↑k : WithBot ℕ∞) := by
+theorem UpperTheory.Reformulated.B.Qn14.le_of_add_one_le_succ
+    : ∀ {a : WithBot ℕ∞} {k : ℕ},
+      a + (1 : WithBot ℕ∞) ≤ (↑(k + (1 : ℕ)) : WithBot ℕ∞) → a ≤ (↑k : WithBot ℕ∞) := by
   intro a k h
   induction a using WithBot.recBotCoe with
   | bot => exact bot_le

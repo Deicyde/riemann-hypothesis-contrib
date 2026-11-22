@@ -28,8 +28,11 @@ public import Formalism.LocalToGlobal.Columns.CoefficientsModP.LatticeBasisExist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -41,14 +44,17 @@ namespace GlobalTheory.MovedJetNZ
 
 open GlobalTheory.Grid (neg ofSgn)
 
-theorem std_eq_colLat_one' {D : D7} {n : ℕ} (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
-    (hL : ∀ y, y ∈ L ↔ ∀ i, ∃ b : 𝓞 D.host.E, (b : D.host.E) = y i) :
-    (L : Set (Fin n → D.host.E)) = (colLat (1 : GL (Fin n) D.host.E) : Set _) := by
+theorem std_eq_colLat_one'
+    {D : D7} {n : ℕ} (L : Submodule (𝓞 D.host.E) (Fin n → D.host.E))
+    (hL : ∀ y, y ∈ L ↔ ∀ i, ∃ b : 𝓞 D.host.E, (b : D.host.E) = y i)
+    : (L : Set (Fin n → D.host.E)) = (colLat (1 : GL (Fin n) D.host.E) : Set _) := by
   ext y
   simp only [SetLike.mem_coe, hL, lc_mem_colLat_one, Submodule.mem_one]
 
-theorem even_bot' {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
-    {i j : Fin D.R.m} {A A' WW : HSp D} {X : Tri T A A' WW} (hX : IsBottomTri W i j X) : Even (A.rank * WW.rank) := by
+theorem even_bot'
+    {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
+    {i j : Fin D.R.m} {A A' WW : HSp D} {X : Tri T A A' WW} (hX : IsBottomTri W i j X)
+    : Even (A.rank * WW.rank) := by
   refine Even.mul_left ?_ _
   have h1 := hX.rank
   have h2 := hX.rank'
@@ -58,10 +64,15 @@ theorem even_bot' {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridDat
   refine ⟨SqNum.halfRank D i j - (D.R.m - (j.1 + 1)) / 2 - (D.R.m - j.1) / 2, ?_⟩
   omega
 
-theorem vac_jet_ne_zero {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
-    {i j : Fin D.R.m} {A A' WW : HSp D} {X : Tri T A A' WW} (hI : ∀ D, GlobalTheory.NormSum.Inp D) (hX : IsBottomTri W i j X) :
-    ∃ k : FVar D WW.rank A.rank →₀ ℕ, pureTensorO W.ψ W.θ (neg A) WW (fun τ => -X.rA.s τ) X.rW.s X.rA.B X.rW.B X.vac
-      (MvPolynomial.monomial k 1) 0 ≠ 0 := by
+theorem vac_jet_ne_zero
+    {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {W : G.Weil}
+    {i j : Fin D.R.m} {A A' WW : HSp D} {X : Tri T A A' WW}
+    (hI : ∀ D, GlobalTheory.NormSum.Inp D) (hX : IsBottomTri W i j X)
+    : ∃ k : FVar D WW.rank A.rank →₀ ℕ,
+      pureTensorO W.ψ W.θ (neg A) WW
+          (fun τ => - X.rA.s τ)
+          X.rW.s X.rA.B X.rW.B X.vac (MvPolynomial.monomial k 1) 0
+        ≠ 0 := by
   classical
   have hIs := hX.is
   have hψ : IsStdChar D W.ψ (-1) := hIs.isVac.1
@@ -73,12 +84,16 @@ theorem vac_jet_ne_zero {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : G
       (colLat (1 : GL (Fin WW.rank) D.host.E) : Set _) f := by
     rw [← std_eq_colLat_one' X.rA.Λ hX.std.2.1, ← std_eq_colLat_one' X.rW.Λ hX.stdW.2.1]
     exact hf0
-  have hS : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (1 : GL (Fin A.rank) D.host.E).1 * A.gram *
-      (1 : GL (Fin A.rank) D.host.E).1 = 1 := by
+  have hS
+      : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (1 : GL (Fin A.rank) D.host.E).1
+          * A.gram * (1 : GL (Fin A.rank) D.host.E).1
+        = 1 := by
     rw [hX.std.1]
     simp [Formalism.UG.cT]
-  have hW : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (1 : GL (Fin WW.rank) D.host.E).1 * WW.gram *
-      (1 : GL (Fin WW.rank) D.host.E).1 = 1 := by
+  have hW
+      : Formalism.UG.cT (D.sp.cm.sig : D.host.E →+* D.host.E) (1 : GL (Fin WW.rank) D.host.E).1
+          * WW.gram * (1 : GL (Fin WW.rank) D.host.E).1
+        = 1 := by
     rw [hX.stdW.1]
     simp [Formalism.UG.cT]
   have hcA : ∀ τ, IsCartanInv (gramAt D A τ) (X.rA.s τ) := fun τ => (hIs.rigA.2.2 τ).1
@@ -93,14 +108,20 @@ theorem vac_jet_ne_zero {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : G
     simp
   obtain ⟨δ, hC, hδ⟩ := GlobalTheory.FunObj.exists_delta D
   obtain ⟨t0, ht0⟩ := ((hI D).t0Ex D.host.ccK δ hC).1
-  obtain ⟨e0, he0, he0ne⟩ := GlobalTheory.Vacuum.exists_vacuum D D.host.ccK δ hC t0 ht0 A.rank WW.rank (even_bot' hX)
-  obtain ⟨c, hc⟩ := GlobalTheory.FockPos.fock_jets_eq_unit_mul_period_jets W.ψ W.θ A WW X.rA.s X.rW.s 1 1 hS hW hcA hcW δ t0 hC hδ
-    ht0 e0 he0 f hf
+  obtain ⟨e0, he0, he0ne⟩ :=
+    GlobalTheory.Vacuum.exists_vacuum D D.host.ccK δ hC t0 ht0 A.rank WW.rank (even_bot' hX)
+  obtain ⟨c, hc⟩ :=
+    GlobalTheory.FockPos.fock_jets_eq_unit_mul_period_jets W.ψ W.θ A WW X.rA.s X.rW.s 1 1 hS hW hcA
+      hcW δ t0 hC hδ ht0 e0 he0 f hf
   obtain ⟨α, hα⟩ := GlobalTheory.NatFamily.exists_taylor_ne D he0.1.1 he0ne
   refine ⟨α, ?_⟩
-  change pureTensorO W.ψ W.θ (negSp A) WW (fun τ => -X.rA.s τ) X.rW.s X.rA.B X.rW.B X.vac (MvPolynomial.monomial α 1) 0 ≠ 0
-  rw [GlobalTheory.FockConj.pureTensorO_negSp_monomial W.ψ W.θ A WW X.rA.s X.rW.s X.rA.B X.rW.B X.vac hψ hθ α 0, map_ne_zero,
-    ← hBA, ← hBW, hc α, GlobalTheory.FockPos.applyAt0_monomial']
+  change pureTensorO W.ψ W.θ (negSp A) WW
+      (fun τ => - X.rA.s τ)
+      X.rW.s X.rA.B X.rW.B X.vac (MvPolynomial.monomial α 1) 0
+    ≠ 0
+  rw [GlobalTheory.FockConj.pureTensorO_negSp_monomial W.ψ W.θ A WW X.rA.s X.rW.s X.rA.B X.rW.B
+      X.vac hψ hθ α 0,
+    map_ne_zero, ← hBA, ← hBW, hc α, GlobalTheory.FockPos.applyAt0_monomial']
   have hprod : (α.prod fun v n => GlobalTheory.FunObj.period δ v.1 ^ n) ≠ 0 :=
     Finsupp.prod_ne_zero_iff.2 fun v _ => pow_ne_zero _ (GlobalTheory.FunObj.period_ne_zero hδ v.1)
   have hfac : (α.prod fun _ n => (n.factorial : ℂ)) ≠ 0 :=

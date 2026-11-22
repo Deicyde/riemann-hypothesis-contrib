@@ -10,9 +10,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix UpperTheory.V.Weyl
 
-theorem UpperTheory.V.Weyl.existsScalar :
-    ∀ (n : ℕ) (ν : Fin n → ℕ), Antitone ν → ∀ H : ℕ, (∀ k, ν k ≤ H) →
-      ∃ Ξ : Pre n, 0 < Ξ.d ∧ Ξ.d ≤ (n * H + 1) ^ (n * n) ∧ Ξ.HasWt fun k => (ν k : ℂ) := by
+theorem UpperTheory.V.Weyl.existsScalar
+    : ∀ (n : ℕ) (ν : Fin n → ℕ),
+      Antitone ν
+        → ∀ H : ℕ,
+          (∀ k, ν k ≤ H)
+            → ∃ Ξ : Pre n, 0 < Ξ.d ∧ Ξ.d ≤ (n * H + 1) ^ (n * n) ∧ Ξ.HasWt fun k => (ν k : ℂ) := by
   intro n ν hν H hH
   obtain ⟨f, hf0, hdeg, hf⟩ := topPol n ν hν H hH
   obtain ⟨Ξ, e, he⟩ := polPre n (n * H)

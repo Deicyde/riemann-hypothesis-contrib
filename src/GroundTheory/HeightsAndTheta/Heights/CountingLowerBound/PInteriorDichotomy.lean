@@ -39,9 +39,10 @@ theorem InteriorDichotomy.proof : InteriorDichotomy.Statement := by
   have hstep3 : 2 + g + max h 0 ≤ (3 + C2) * exp (2 * La) :=
     hstep1.trans (mul_le_mul_of_nonneg_left hstep2 (by linarith))
   have hlog : log (2 + g + max h 0) ≤ (log (3 + C2) + 2) * La := by
-    calc log (2 + g + max h 0) ≤ log ((3 + C2) * exp (2 * La)) := Real.log_le_log hpos hstep3
-      _ = log (3 + C2) + 2 * La := by
-          rw [Real.log_mul (by linarith) (exp_pos _).ne', Real.log_exp]
+    calc
+      log (2 + g + max h 0)
+        ≤ log ((3 + C2) * exp (2 * La)) := Real.log_le_log hpos hstep3
+      _ = log (3 + C2) + 2 * La := by rw [Real.log_mul (by linarith) (exp_pos _).ne', Real.log_exp]
       _ ≤ (log (3 + C2) + 2) * La := by nlinarith
   have hC0log : C0 * log (2 + g + max h 0) ≤ C0 * ((log (3 + C2) + 2) * La) :=
     mul_le_mul_of_nonneg_left hlog hC0

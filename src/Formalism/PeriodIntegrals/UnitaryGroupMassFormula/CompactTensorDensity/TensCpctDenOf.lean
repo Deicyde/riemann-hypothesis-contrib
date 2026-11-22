@@ -15,16 +15,14 @@ section Coord
 
 variable {F E R : Type} [Field F] [CommRing E] [Algebra F E] [CommRing R] [Algebra F R]
 
-def coordR (φ : E →ₗ[F] F) : E ⊗[F] R →ₗ[F] R :=
-  TensorProduct.lid F R ∘ₗ φ.rTensor R
+def coordR (φ : E →ₗ[F] F) : E ⊗[F] R →ₗ[F] R := TensorProduct.lid F R ∘ₗ φ.rTensor R
 
 theorem coordR_tmul (φ : E →ₗ[F] F) (e : E) (x : R) : coordR φ (e ⊗ₜ[F] x) = φ e • x := by
   simp [coordR]
 
 attribute [local instance] Algebra.TensorProduct.rightAlgebra
 
-theorem coordR_smul (φ : E →ₗ[F] F) (a : R) (t : E ⊗[F] R) :
-    coordR φ (a • t) = a * coordR φ t := by
+theorem coordR_smul (φ : E →ₗ[F] F) (a : R) (t : E ⊗[F] R) : coordR φ (a • t) = a * coordR φ t := by
   induction t using TensorProduct.induction_on with
   | zero => simp
   | tmul e x =>
@@ -42,8 +40,8 @@ theorem coordL_tmul (φ : E →ₗ[F] F) (e : E) (x : R) : coordL φ (e ⊗ₜ[F
 
 end Coord
 
-theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (x : E) :
-    ∃ D : ℕ, 0 < D ∧ IsIntegral ℤ ((D : E) * x) := by
+theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (x : E)
+    : ∃ D : ℕ, 0 < D ∧ IsIntegral ℤ ((D : E) * x) := by
   obtain ⟨n, hn, -, hi⟩ := NumberField.exists_nat_le_mulHeight₁ x
   exact ⟨n, Nat.pos_of_ne_zero hn, hi⟩
 
@@ -70,8 +68,9 @@ theorem PI.tensCpctDen_of (hA : PI.AdCpctDen) : PI.TensCpctDen := by
   refine ⟨N0 * D0, Nat.mul_pos hN0pos hD0pos, fun e he => ?_⟩
   have hφ : ∀ i, IsIntegral ℤ ((N0 : F) * b.coord i e) := by
     intro i
-    have hmem : algebraMap F (FiniteAdeleRing (𝓞 F) F) (b.coord i e) ∈
-        coordL (R := FiniteAdeleRing (𝓞 F) F) (b.coord i) '' C := by
+    have hmem
+        : algebraMap F (FiniteAdeleRing (𝓞 F) F) (b.coord i e)
+          ∈ coordL (R := FiniteAdeleRing (𝓞 F) F) (b.coord i) '' C := by
       refine ⟨_, he, ?_⟩
       show coordL (b.coord i) ((e : E) ⊗ₜ[F] (1 : FiniteAdeleRing (𝓞 F) F)) = _
       rw [coordL_tmul, Algebra.smul_def, mul_one]
@@ -90,8 +89,9 @@ theorem PI.tensCpctDen_of (hA : PI.AdCpctDen) : PI.TensCpctDen := by
       ring
     rw [hsplit, mul_assoc]
     exact (isIntegral_natCast _).mul (hDb i)
-  have he_sum : ((N0 * D0 : ℕ) : E) * e =
-      ∑ i, algebraMap F E ((N0 : F) * b.coord i e) * ((D0 : E) * b i) := by
+  have he_sum
+      : ((N0 * D0 : ℕ) : E) * e
+        = ∑ i, algebraMap F E ((N0 : F) * b.coord i e) * ((D0 : E) * b i) := by
     conv_lhs => rw [← b.sum_repr e]
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun i _ => ?_

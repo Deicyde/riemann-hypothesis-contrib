@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsCommon
 @[expose] public section
 
 open NumberField IsDedekindDomain Polynomial Filter
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
 open scoped Classical TensorProduct
 open GlobalTheory.BCT
 
@@ -17,29 +18,38 @@ namespace GlobalTheory.BCT.GeoFin
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem norm_coeff_le {n : ℕ} {P : E[X]} (hP : P ∈ Ell E n) (τ : E →+* ℂ) (i : ℕ) :
-    ‖τ (P.coeff i)‖ ≤ n.choose i := by
+theorem norm_coeff_le {n : ℕ} {P : E[X]} (hP : P ∈ Ell E n) (τ : E →+* ℂ) (i : ℕ)
+    : ‖τ (P.coeff i)‖ ≤ n.choose i := by
   obtain ⟨hm, hd, -, hr⟩ := hP
-  have h := Polynomial.coeff_le_of_roots_le (f := τ) (B := 1) i hm (IsAlgClosed.splits _)
-    (fun z hz => (hr τ z hz).le)
+  have h :=
+    Polynomial.coeff_le_of_roots_le (f := τ) (B := 1) i hm (IsAlgClosed.splits _)
+      (fun z hz => (hr τ z hz).le)
   rw [one_pow, one_mul, hd, Polynomial.coeff_map] at h
   exact h
 
-theorem valued_algebraMap (w : Pl E) (k : E) :
-    Valued.v (algebraMap E (w.adicCompletion E) k) = w.valuation E k :=
+theorem valued_algebraMap (w : Pl E) (k : E)
+    : Valued.v (algebraMap E (w.adicCompletion E) k) = w.valuation E k :=
   Formalism.UG.P.levelaf_valued_algebraMap w k
 
-theorem valuation_conjE (w : Pl E) (k : E) :
-    w.valuation E (GlobalTheory.SplitPts.conjE E k) = (conjSrc (GlobalTheory.SplitPts.conjE E) w).valuation E k := by
+theorem valuation_conjE (w : Pl E) (k : E)
+    : w.valuation E (GlobalTheory.SplitPts.conjE E k)
+      = (conjSrc (GlobalTheory.SplitPts.conjE E) w).valuation E k := by
   have h := (conjLoc_spec (GlobalTheory.SplitPts.conjE E) w).2.2 (algebraMap E _ k)
-  rw [(conjLoc_spec (GlobalTheory.SplitPts.conjE E) w).2.1, valued_algebraMap, valued_algebraMap] at h
+  rw [(conjLoc_spec (GlobalTheory.SplitPts.conjE E) w).2.1, valued_algebraMap, valued_algebraMap]
+    at h
   exact h
 
-theorem valuation_coeff_le {n : ℕ} {S : Set (Pl E)} (hS : IsSection S) {γ : Pl E → WithZero (Multiplicative ℤ)} (hγ0 : ∀ w, γ w ≠ 0)
-    {P : E[X]} (hP : P ∈ Ell E n) (hPS : ∀ w ∈ S, (∀ i, Valued.v ((atPl w P).coeff i) ≤ γ w) ∧
-      (γ w)⁻¹ ≤ Valued.v ((atPl w P).coeff 0)) (w : Pl E) (i : ℕ) :
-    w.valuation E (P.coeff i) ≤ if w ∈ S then γ w else γ (conjSrc (GlobalTheory.SplitPts.conjE E) w) ^ 2 := by
-  have hv : ∀ u ∈ S, (∀ j, u.valuation E (P.coeff j) ≤ γ u) ∧ (γ u)⁻¹ ≤ u.valuation E (P.coeff 0) := by
+theorem valuation_coeff_le
+    {n : ℕ} {S : Set (Pl E)} (hS : IsSection S)
+    {γ : Pl E → WithZero (Multiplicative ℤ)} (hγ0 : ∀ w, γ w ≠ 0)
+    {P : E[X]} (hP : P ∈ Ell E n)
+    (hPS : ∀ w ∈ S,
+      (∀ i, Valued.v ((atPl w P).coeff i) ≤ γ w) ∧ (γ w)⁻¹ ≤ Valued.v ((atPl w P).coeff 0))
+    (w : Pl E) (i : ℕ)
+    : w.valuation E (P.coeff i)
+      ≤ if w ∈ S then γ w else γ (conjSrc (GlobalTheory.SplitPts.conjE E) w) ^ 2 := by
+  have hv
+      : ∀ u ∈ S, (∀ j, u.valuation E (P.coeff j) ≤ γ u) ∧ (γ u)⁻¹ ≤ u.valuation E (P.coeff 0) := by
     intro u hu
     obtain ⟨h1, h2⟩ := hPS u hu
     refine ⟨fun j => ?_, ?_⟩
@@ -74,15 +84,19 @@ theorem valuation_coeff_le {n : ℕ} {S : Set (Pl E)} (hS : IsSection S) {γ : P
   rw [hci, Valuation.map_mul, valuation_conjE, sq]
   exact mul_le_mul' hw0 ((hv u hu).1 _)
 
-theorem finite_ell_bounded : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (S : Set (Pl E)), IsSection S →
-    ∀ γ : Pl E → WithZero (Multiplicative ℤ), (∀ w, γ w ≠ 0) → (∀ᶠ w in cofinite, γ w = 1) →
-    {P : E[X] | P ∈ Ell E n ∧ ∀ w ∈ S, (∀ i, Valued.v ((atPl w P).coeff i) ≤ γ w) ∧
-      (γ w)⁻¹ ≤ Valued.v ((atPl w P).coeff 0)}.Finite := by
+theorem finite_ell_bounded
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (S : Set (Pl E)),
+      IsSection S
+        → ∀ γ : Pl E → WithZero (Multiplicative ℤ),
+          (∀ w, γ w ≠ 0) → (∀ᶠ w in cofinite, γ w = 1)
+            → {P : E[X] | P ∈ Ell E n ∧ ∀ w ∈ S, (∀ i, Valued.v ((atPl w P).coeff i) ≤ γ w) ∧
+                (γ w)⁻¹ ≤ Valued.v ((atPl w P).coeff 0)}.Finite := by
   intro E _ _ _ n S hS γ hγ0 hγ1
   set σ := GlobalTheory.SplitPts.conjE E
   set β : Pl E → WithZero (Multiplicative ℤ) := fun w => if w ∈ S then γ w else γ (conjSrc σ w) ^ 2 with hβ
   have hβ1 : ∀ᶠ w in cofinite, β w ≤ 1 := by
-    have h2 : ∀ᶠ w in cofinite, γ (conjSrc σ w) = 1 := (conjSrc_injective σ).tendsto_cofinite.eventually hγ1
+    have h2 : ∀ᶠ w in cofinite, γ (conjSrc σ w) = 1 :=
+      (conjSrc_injective σ).tendsto_cofinite.eventually hγ1
     filter_upwards [hγ1, h2] with w h1 h2
     simp only [hβ]
     split_ifs
@@ -93,14 +107,18 @@ theorem finite_ell_bounded : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
   set r : ℕ → ℝ := fun i => (∑ τ : E →+* ℂ, ‖τ (D : E)‖) * n.choose i with hr
   set X : Fin (n + 1) → Set E := fun i => {x | IsIntegral ℤ x ∧ ∀ φ : E →+* ℂ, ‖φ x‖ ≤ r i} with hXd
   have hX : ∀ i, (X i).Finite := fun i => Embeddings.finite_of_norm_le E ℂ (r i)
-  refine Set.Finite.of_finite_image (f := fun (P : E[X]) (i : Fin (n + 1)) => (D : E) * P.coeff i)
+  refine Set.Finite.of_finite_image
+    (f := fun (P : E[X]) (i : Fin (n + 1)) => (D : E) * P.coeff i)
     ((Set.Finite.pi hX).subset ?_) ?_
   · rintro _ ⟨P, ⟨hP, hPS⟩, rfl⟩ i -
     refine ⟨hD _ fun w => valuation_coeff_le hS hγ0 hP hPS w i, fun φ => ?_⟩
     rw [map_mul, norm_mul]
-    exact mul_le_mul (Finset.single_le_sum (f := fun τ : E →+* ℂ => ‖τ (D : E)‖) (fun τ _ => norm_nonneg _)
-      (Finset.mem_univ φ)) (norm_coeff_le hP φ i) (norm_nonneg _)
-      (Finset.sum_nonneg fun τ _ => norm_nonneg _)
+    exact mul_le_mul
+      (Finset.single_le_sum
+        (f := fun τ : E →+* ℂ => ‖τ (D : E)‖)
+        (fun τ _ => norm_nonneg _)
+        (Finset.mem_univ φ))
+      (norm_coeff_le hP φ i) (norm_nonneg _) (Finset.sum_nonneg fun τ _ => norm_nonneg _)
   · intro P hP Q hQ hPQ
     ext k
     by_cases hk : k ≤ n

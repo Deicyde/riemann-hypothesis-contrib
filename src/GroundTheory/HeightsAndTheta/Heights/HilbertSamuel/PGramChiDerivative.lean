@@ -12,7 +12,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MeasureTheory Set Filter Topology Metric ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M IntegralOfBergman
+open MeasureTheory Set Filter Topology Metric ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  IntegralOfBergman
 open scoped ComplexConjugate InnerProductSpace Matrix ComplexOrder
 
 noncomputable section
@@ -239,7 +240,6 @@ lemma trace_eq (W : Weight L) (dV : SmoothVolume A) {n : ℕ} {V : Submodule ℂ
 
 end GramChiDerivative
 
-
 open GramChiDerivative in
 theorem GramChiDerivative.proof : GramChiDerivative.Statement := by
   intro D X _ _ _ _ _ A L W₀ W₁ dV n V _ hV e t
@@ -249,22 +249,26 @@ theorem GramChiDerivative.proof : GramChiDerivative.Statement := by
   have hE : ∀ a, (e a : Fin A.n → X → ℂ) ∈ L.sections n := fun a ↦ hV (e a).2
   let G : ℝ → Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ := fun s ↦
     gram (W₀.lerp W₁ s) dV n (fun a ↦ (e a : Fin A.n → X → ℂ))
-  let G' : ℝ → Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ := fun s ↦ Matrix.of fun a b ↦
-    ∫ x, ((-(n : ℝ) * u x : ℝ) : ℂ) *
-      ptInner (W₀.lerp W₁ s) n (e a : Fin A.n → X → ℂ) (e b) x ∂dV.μ
+  let G' : ℝ → Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ := fun s ↦
+    Matrix.of fun a b ↦
+      ∫ x, ((-(n : ℝ) * u x : ℝ) : ℂ) *
+        ptInner (W₀.lerp W₁ s) n (e a : Fin A.n → X → ℂ) (e b) x ∂dV.μ
   have hpos : ∀ s, (G s).PosDef := fun s ↦ gram_posDef (W₀.lerp W₁ s) dV hV e
   have hder : ∀ s a b, HasDerivAt (fun r ↦ G r a b) (G' s a b) s := by
     intro s a b
-    have hG : (fun r ↦ G r a b) = fun r ↦ ∫ x, ptInner W₀ n (e a : Fin A.n → X → ℂ) (e b) x *
-        ((Real.exp (-(n : ℝ) * r * u x) : ℝ) : ℂ) ∂dV.μ := by
+    have hG
+        : (fun r ↦ G r a b)
+          = fun r ↦
+            ∫ x, ptInner W₀ n (e a : Fin A.n → X → ℂ) (e b) x *
+              ((Real.exp (-(n : ℝ) * r * u x) : ℝ) : ℂ) ∂dV.μ := by
       funext r
       simp only [G, gram, Matrix.of_apply]
       congr 1
       funext x
       exact ptInner_lerp W₀ W₁ n _ _ r x
     rw [hG]
-    refine (hasDerivAt_integral_exp (μ := dV.μ) (continuous_ptInner W₀ (hE a) (hE b)) hu
-      (-(n : ℝ)) s).congr_deriv ?_
+    refine (hasDerivAt_integral_exp (μ := dV.μ) (continuous_ptInner W₀ (hE a) (hE b)) hu (-(n : ℝ))
+      s).congr_deriv ?_
     simp only [G', Matrix.of_apply]
     congr 1
     funext x
@@ -272,8 +276,9 @@ theorem GramChiDerivative.proof : GramChiDerivative.Statement := by
     push_cast
     ring
   have h := LogDetDerivative.intersectionNumber_baseChange (Module.finrank ℂ V) G G' hpos hder t
-  have htr : ((G t)⁻¹ * G' t).trace =
-      ∫ x, ((-(n : ℝ) * u x : ℝ) : ℂ) * (bergman (W₀.lerp W₁ t) dV V n x : ℂ) ∂dV.μ :=
+  have htr
+      : ((G t)⁻¹ * G' t).trace
+        = ∫ x, ((-(n : ℝ) * u x : ℝ) : ℂ) * (bergman (W₀.lerp W₁ t) dV V n x : ℂ) ∂dV.μ :=
     trace_eq (W₀.lerp W₁ t) dV hV e _ (Complex.continuous_ofReal.comp (continuous_const.mul hu))
   refine h.congr_deriv ?_
   rw [htr]

@@ -94,12 +94,16 @@ theorem rightOne_of (hJ : JensenCount) : RightOne := by
         linarith
       have hcn : ‖c‖ ≤ 2 + |t| := by
         rw [hc]
-        calc ‖(2 : ℂ) + (t : ℂ) * Complex.I‖ ≤ ‖(2 : ℂ)‖ + ‖(t : ℂ) * Complex.I‖ := norm_add_le _ _
+        calc
+          ‖(2 : ℂ) + (t : ℂ) * Complex.I‖
+            ≤ ‖(2 : ℂ)‖ + ‖(t : ℂ) * Complex.I‖ := norm_add_le _ _
           _ = 2 + |t| := by simp
       have hzn : ‖z‖ ≤ |t| + 4 := by
         have := norm_le_insert' z c
         have h2 : ‖z‖ ≤ ‖c‖ + ‖z - c‖ := by
-          calc ‖z‖ = ‖c + (z - c)‖ := by ring_nf
+          calc
+            ‖z‖
+              = ‖c + (z - c)‖ := by ring_nf
             _ ≤ ‖c‖ + ‖z - c‖ := norm_add_le _ _
         linarith
       have hz1n : ‖z - 1‖ ≤ |t| + 5 := by
@@ -115,13 +119,15 @@ theorem rightOne_of (hJ : JensenCount) : RightOne := by
         linarith
       have hA : ‖z - 1‖ * ‖z‖ * (1 + 1 / z.re) ≤ (|t| + 5) * (|t| + 5) * 11 := by
         have h1 : 0 ≤ ‖z - 1‖ * ‖z‖ := by positivity
-        calc ‖z - 1‖ * ‖z‖ * (1 + 1 / z.re) ≤ ‖z - 1‖ * ‖z‖ * 11 := mul_le_mul_of_nonneg_left hinv h1
+        calc
+          ‖z - 1‖ * ‖z‖ * (1 + 1 / z.re)
+            ≤ ‖z - 1‖ * ‖z‖ * 11 := mul_le_mul_of_nonneg_left hinv h1
           _ ≤ (|t| + 5) * (|t| + 5) * 11 := by
             have : ‖z‖ ≤ |t| + 5 := by linarith
             gcongr
-      calc ‖z - 1‖ * ‖riemannZeta z‖
-          ≤ ‖z - 1‖ * (1 + 1 / ‖z - 1‖ + ‖z‖ * (1 + 1 / z.re)) :=
-            mul_le_mul_of_nonneg_left hζ (norm_nonneg _)
+      calc
+        ‖z - 1‖ * ‖riemannZeta z‖ ≤ ‖z - 1‖ * (1 + 1 / ‖z - 1‖ + ‖z‖ * (1 + 1 / z.re)) :=
+          mul_le_mul_of_nonneg_left hζ (norm_nonneg _)
         _ = ‖z - 1‖ + ‖z - 1‖ * (1 / ‖z - 1‖) + ‖z - 1‖ * ‖z‖ * (1 + 1 / z.re) := by ring
         _ = ‖z - 1‖ + 1 + ‖z - 1‖ * ‖z‖ * (1 + 1 / z.re) := by rw [mul_one_div_cancel hz1pos.ne']
         _ ≤ 13 * (|t| + 5) ^ 2 := by nlinarith
@@ -144,8 +150,9 @@ theorem rightOne_of (hJ : JensenCount) : RightOne := by
   obtain ⟨hfin, hsum⟩ := hJ zeta1 c (13 * (|t| + 5) ^ 2) hAn hfc hM1 hsph _ hsub
   refine ⟨hfin, ?_⟩
   rw [hL]
-  have hcongr : ∑ᶠ ρ ∈ RightNear χ t, (analyticOrderNatAt riemannZeta ρ : ℝ) =
-      ∑ᶠ ρ ∈ RightNear χ t, (analyticOrderNatAt zeta1 ρ : ℝ) := by
+  have hcongr
+      : ∑ᶠ ρ ∈ RightNear χ t, (analyticOrderNatAt riemannZeta ρ : ℝ)
+        = ∑ᶠ ρ ∈ RightNear χ t, (analyticOrderNatAt zeta1 ρ : ℝ) := by
     refine finsum_mem_congr rfl fun ρ hρ => ?_
     have hρ1 : ρ ≠ 1 := by
       intro e
@@ -170,7 +177,9 @@ theorem rightOne_of (hJ : JensenCount) : RightOne := by
     have e4 : y ^ 10 ≤ y ^ 11 := pow_le_pow_right₀ (by linarith) (by norm_num)
     have e5 : 256 * y ^ 2 ≤ y ^ 10 := by
       have := mul_le_mul_of_nonneg_right e3 (sq_nonneg y)
-      calc 256 * y ^ 2 ≤ y ^ 8 * y ^ 2 := this
+      calc
+        256 * y ^ 2
+          ≤ y ^ 8 * y ^ 2 := this
         _ = y ^ 10 := by ring
     have e6 : y ^ 11 * (1 / 2) ≤ y ^ 11 * ‖zeta1 c‖ :=
       mul_le_mul_of_nonneg_left hfcl (by positivity)
@@ -178,8 +187,10 @@ theorem rightOne_of (hJ : JensenCount) : RightOne := by
   have hlog : Real.log (13 * (|t| + 5) ^ 2 / ‖zeta1 c‖) ≤ 11 * Real.log y := by
     rw [show (11 : ℝ) * Real.log y = Real.log (y ^ 11) by rw [Real.log_pow]; norm_num]
     exact Real.log_le_log (by positivity) hq
-  calc Real.log (13 * (|t| + 5) ^ 2 / ‖zeta1 c‖) / Real.log ((19 / 10) / (37 / 20))
-      ≤ 11 * Real.log y / Real.log ((19 / 10) / (37 / 20)) := div_le_div_of_nonneg_right hlog hlogq.le
+  calc
+    Real.log (13 * (|t| + 5) ^ 2 / ‖zeta1 c‖) / Real.log ((19 / 10) / (37 / 20))
+        ≤ 11 * Real.log y / Real.log ((19 / 10) / (37 / 20)) :=
+      div_le_div_of_nonneg_right hlog hlogq.le
     _ = 11 / Real.log ((19 / 10) / (37 / 20)) * Real.log y := by ring
 
 end PI.ZW

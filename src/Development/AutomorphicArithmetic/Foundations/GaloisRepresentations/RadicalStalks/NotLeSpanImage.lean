@@ -5,8 +5,11 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Cry
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
+open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+  GlobalTheory.ConjSeq GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES UpperTheory.Gal.Ord
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.Ord
@@ -271,20 +274,30 @@ private lemma exists_not_mem {k C P : Type*} [Field k] [IsAlgClosed k] [CommRing
 
 end UpperTheory.Gal.Ord
 
-theorem UpperTheory.Gal.Ord.alg2 :
-    ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] [CharP k p] (C : Type) [CommRing C] (w : Ideal C) (f : ℕ), 0 < f →
-      Nat.card (C ⧸ w) = p ^ f → ∀ (π : Par p w f) (χ : C →+* k) (P : Type 1) [AddCommGroup P] [Module k P] (ρ : C → Module.End k P) (F : Submodule k P)
-      (Φ : P →+ P), Lin p π χ ρ F Φ →
-      ∃ x : Module.Dual k P, (∀ y, x (ρ π.ε y) = x y) ∧ (∀ z, x (ρ π.g (Φ^[f] z)) = 0) ∧ ∃ y, (∀ c, ρ c y = χ c • y) ∧ x y ≠ 0 := by
+theorem UpperTheory.Gal.Ord.alg2
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [IsAlgClosed k] [CharP k p] (C : Type)
+        [CommRing C] (w : Ideal C) (f : ℕ),
+      0 < f → Nat.card (C ⧸ w) = p ^ f
+        → ∀ (π : Par p w f) (χ : C →+* k) (P : Type 1) [AddCommGroup P] [Module k P]
+            (ρ : C → Module.End k P) (F : Submodule k P) (Φ : P →+ P),
+          Lin p π χ ρ F Φ
+            → ∃ x : Module.Dual k P,
+              (∀ y, x (ρ π.ε y) = x y) ∧ (∀ z, x (ρ π.g (Φ^[f] z)) = 0)
+                ∧ ∃ y, (∀ c, ρ c y = χ c • y) ∧ x y ≠ 0 := by
   intro p _ k _ _ _ C _ w f hf hcard π χ P _ _ ρ F Φ L
   haveI := L.fin
-  let ρh : C →+* Module.End k P :=
-    { toFun := ρ, map_one' := L.one, map_mul' := L.mul, map_add' := L.add
-      map_zero' := by
-        have h := L.add 0 0
-        simpa using h }
+  let ρh : C →+* Module.End k P := {
+    toFun := ρ
+    map_one' := L.one
+    map_mul' := L.mul
+    map_add' := L.add
+    map_zero' := by
+      have h := L.add 0 0
+      simpa using h
+  }
   have hp : ρh (p : C) = 0 := by
-    rw [map_natCast, ← map_natCast (algebraMap k (Module.End k P)), CharP.cast_eq_zero k p, map_zero]
+    rw [map_natCast, ← map_natCast (algebraMap k (Module.End k P)), CharP.cast_eq_zero k p,
+      map_zero]
   have hdvd : ∀ x : C, (p : C) ∣ x → ρh x = 0 := by
     rintro _ ⟨d, rfl⟩
     rw [map_mul, hp, zero_mul]
@@ -301,15 +314,19 @@ theorem UpperTheory.Gal.Ord.alg2 :
   have hinj : Function.Injective fun x : k => x ^ (p ^ f) := by
     intro x y h
     exact (iterateFrobenius k p f).injective (by simpa [iterateFrobenius_def] using h)
-  let A : P →+ P :=
-    { toFun := (⇑Φ)^[f], map_zero' := iterate_map_zero Φ f, map_add' := iterate_map_add Φ f }
+  let A : P →+ P := {
+    toFun := (⇑Φ)^[f]
+    map_zero' := iterate_map_zero Φ f
+    map_add' := iterate_map_add Φ f
+  }
   have hsemiN : ∀ (n : ℕ) (l : k) x, (⇑Φ)^[n] (l • x) = l ^ (p ^ n) • (⇑Φ)^[n] x := by
     intro n
     induction n with
     | zero => intro l x; simp
     | succ n ih =>
       intro l x
-      rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih, L.semi, ← pow_mul, pow_succ]
+      rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih, L.semi, ← pow_mul,
+        pow_succ]
   have hcommN : ∀ (n : ℕ) c x, (⇑Φ)^[n] (ρ c x) = ρ c ((⇑Φ)^[n] x) := by
     intro n
     induction n with
@@ -336,20 +353,27 @@ theorem UpperTheory.Gal.Ord.alg2 :
     refine ⟨e, ?_⟩
     have h := hdvd _ he
     rwa [map_mul, map_pow] at h
-  obtain ⟨u, hu, hnot⟩ := exists_not_mem ρh χ (p ^ f) (pow_pos (Fact.out : p.Prime).pos f) A
-    (fun l x => hsemiN f l x) (fun c x => hcommN f c x) hfix hinj π.ε π.a π.g hε hε1 hnil
-    (fun x h => by
-      obtain ⟨u, v, e⟩ := L.annG x h
-      exact ⟨u, v, e⟩)
-    (ρ π.ε x0) hx0 (fun c => L.eig c x0 hx0F) hAv
+  obtain ⟨u, hu, hnot⟩ :=
+    exists_not_mem ρh χ (p ^ f) (pow_pos (Fact.out : p.Prime).pos f) A
+      (fun l x => hsemiN f l x)
+      (fun c x => hcommN f c x)
+      hfix hinj π.ε π.a π.g hε hε1 hnil
+      (fun x h => by
+        obtain ⟨u, v, e⟩ := L.annG x h
+        exact ⟨u, v, e⟩)
+      (ρ π.ε x0) hx0
+      (fun c => L.eig c x0 hx0F)
+      hAv
   have kills : ∀ x, χ x = 0 → ρh x (ρh π.g u) = 0 := by
     intro x hx
     have hxw : x ∈ w := L.ker ▸ (RingHom.mem_ker.2 hx)
     obtain ⟨u0, d1⟩ := π.gen x hxw
     have hd : (p : C) ∣ x * π.g := by
-      have e : x * π.g = (π.ε * x - π.a * u0) * π.g - x * (π.ε * π.g - π.g) + u0 * (π.a * π.g) := by ring
+      have e : x * π.g = (π.ε * x - π.a * u0) * π.g - x * (π.ε * π.g - π.g) + u0 * (π.a * π.g) := by
+        ring
       rw [e]
-      exact dvd_add (dvd_sub (d1.mul_right _) (π.geps.mul_left _)) ((Dvd.intro _ π.prod.symm).mul_left _)
+      exact dvd_add (dvd_sub (d1.mul_right _) (π.geps.mul_left _))
+        ((Dvd.intro _ π.prod.symm).mul_left _)
     have h := hdvd _ hd
     rw [map_mul] at h
     rw [← Module.End.mul_apply, h]

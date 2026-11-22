@@ -8,8 +8,11 @@ open Complex Filter Topology
 
 namespace GlobalTheory
 
-theorem lSeriesSummable_bounded_mul_of_summable_normSq :
-    ∀ (e : ℕ) (θ g : ℕ → ℂ) (s : ℝ), 1 ≤ e → 0 < s → (∀ n, ‖θ n‖ ≤ 1) → (∀ t : ℝ, 0 < t → Summable fun n : ℕ => ‖g n‖ ^ 2 / (n : ℝ) ^ (((2 * e + 1 : ℕ) : ℝ) + t)) → LSeriesSummable (fun n : ℕ => θ n * g n) (((2 * (e : ℝ) + s : ℝ)) : ℂ) := by
+theorem lSeriesSummable_bounded_mul_of_summable_normSq
+    : ∀ (e : ℕ) (θ g : ℕ → ℂ) (s : ℝ),
+      1 ≤ e → 0 < s → (∀ n, ‖θ n‖ ≤ 1)
+        → (∀ t : ℝ, 0 < t → Summable fun n : ℕ => ‖g n‖ ^ 2 / (n : ℝ) ^ (((2 * e + 1 : ℕ) : ℝ) + t))
+        → LSeriesSummable (fun n : ℕ => θ n * g n) (((2 * (e : ℝ) + s : ℝ)) : ℂ) := by
   intro e θ g s he hs hθ hg
   have h1 := hg s hs
   have he' : (1 : ℝ) ≤ e := by exact_mod_cast he
@@ -28,10 +31,13 @@ theorem lSeriesSummable_bounded_mul_of_summable_normSq :
     have hb : ‖θ n * g n‖ ≤ ‖g n‖ := by
       rw [norm_mul]
       exact mul_le_of_le_one_left (norm_nonneg _) (hθ n)
-    calc ‖θ n * g n‖ / N ≤ ‖g n‖ / N := by gcongr
+    calc
+      ‖θ n * g n‖ / N
+        ≤ ‖g n‖ / N := by gcongr
       _ ≤ (‖g n‖ ^ 2 / (N * n) + 1 / (N / n)) / 2 := by
         have : (‖g n‖ ^ 2 / (N * n) + 1 / (N / n)) / 2 - ‖g n‖ / N
-            = (‖g n‖ - n) ^ 2 / (2 * N * n) := by field_simp; ring
+            = (‖g n‖ - n) ^ 2 / (2 * N * n) := by
+          field_simp; ring
         have h3 : 0 ≤ (‖g n‖ - n) ^ 2 / (2 * N * n) := by positivity
         linarith
 

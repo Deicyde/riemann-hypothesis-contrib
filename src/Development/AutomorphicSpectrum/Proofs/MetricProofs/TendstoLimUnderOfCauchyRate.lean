@@ -8,12 +8,13 @@ open Filter Topology
 
 namespace GlobalTheory.CompanionTheory.Ar.PB
 
-theorem tendsto_limUnder_of_cauchy_rate :
-    ∀ (f δ : ℝ → ℝ) (t₁ : ℝ), 0 < t₁ → Filter.Tendsto δ (nhdsWithin 0 (Set.Ioi 0)) (nhds 0) →
-      (∀ t t', 0 < t' → t' ≤ t → t ≤ t₁ → |f t - f t'| ≤ δ t) →
-      Filter.Tendsto f (nhdsWithin 0 (Set.Ioi 0))
-          (nhds (Filter.limUnder (nhdsWithin 0 (Set.Ioi 0)) f)) ∧
-        ∀ t, 0 < t → t ≤ t₁ → |f t - Filter.limUnder (nhdsWithin 0 (Set.Ioi 0)) f| ≤ δ t := by
+theorem tendsto_limUnder_of_cauchy_rate
+    : ∀ (f δ : ℝ → ℝ) (t₁ : ℝ),
+      0 < t₁ → Filter.Tendsto δ (nhdsWithin 0 (Set.Ioi 0)) (nhds 0)
+        → (∀ t t', 0 < t' → t' ≤ t → t ≤ t₁ → |f t - f t'| ≤ δ t)
+        → Filter.Tendsto f (nhdsWithin 0 (Set.Ioi 0))
+            (nhds (Filter.limUnder (nhdsWithin 0 (Set.Ioi 0)) f))
+          ∧ ∀ t, 0 < t → t ≤ t₁ → |f t - Filter.limUnder (nhdsWithin 0 (Set.Ioi 0)) f| ≤ δ t := by
   intro f δ t₁ ht₁ hδ hrate
   set F : Filter ℝ := nhdsWithin 0 (Set.Ioi 0) with hF
 
@@ -25,7 +26,10 @@ theorem tendsto_limUnder_of_cauchy_rate :
     exact ⟨hδt, ht, ht₁t⟩
   have hC : Cauchy (Filter.map f F) := by
     rw [Metric.cauchy_iff]
-    refine ⟨inferInstance, fun ε hε => ⟨f '' {t | δ t < ε ∧ 0 < t ∧ t ≤ t₁}, Filter.image_mem_map (hS ε hε), ?_⟩⟩
+    refine ⟨
+      inferInstance,
+      fun ε hε => ⟨f '' {t | δ t < ε ∧ 0 < t ∧ t ≤ t₁}, Filter.image_mem_map (hS ε hε), ?_⟩
+    ⟩
     rintro _ ⟨t, ⟨h1, h2, h3⟩, rfl⟩ _ ⟨t', ⟨h1', h2', h3'⟩, rfl⟩
     rw [Real.dist_eq]
     rcases le_total t' t with h | h

@@ -8,18 +8,21 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.PrimeI
 
 @[expose] public section
 
-open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical HeckeCharacterZeroLocus.ThmBIn
+open NumberField IsDedekindDomain NumberField.mixedEmbedding Complex Classical
+  HeckeCharacterZeroLocus.ThmBIn
 open scoped TensorProduct ContDiff nonZeroDivisors
 
 namespace GlobalTheory.HeckeUnif
 
-theorem idem_glue_mul {R : Type*} [CommRing R] {e : R} (he : e * e = e) (a b : R) :
-    (e * a + (1 - e)) * (e * b + (1 - e)) = e * (a * b) + (1 - e) := by
+theorem idem_glue_mul {R : Type*} [CommRing R] {e : R} (he : e * e = e) (a b : R)
+    : (e * a + (1 - e)) * (e * b + (1 - e)) = e * (a * b) + (1 - e) := by
   linear_combination (a * b - a - b + 1) * he
 
-theorem intValuation_of_mem_notMem_sq {R : Type*} [CommRing R] [IsDedekindDomain R]
-    (P : HeightOneSpectrum R) {a : R} (h1 : a ∈ P.asIdeal) (h2 : a ∉ P.asIdeal ^ 2) :
-    P.intValuation a = WithZero.exp (-1 : ℤ) := by
+theorem intValuation_of_mem_notMem_sq
+    {R : Type*} [CommRing R] [IsDedekindDomain R]
+    (P : HeightOneSpectrum R)
+    {a : R} (h1 : a ∈ P.asIdeal) (h2 : a ∉ P.asIdeal ^ 2)
+    : P.intValuation a = WithZero.exp (-1 : ℤ) := by
   have ha : a ≠ 0 := by rintro rfl; exact h2 (zero_mem _)
   have k1 : P.intValuation a ≤ WithZero.exp (-((1 : ℕ) : ℤ)) := by
     rw [HeightOneSpectrum.intValuation_le_pow_iff_mem]; simpa using h1
@@ -31,9 +34,17 @@ theorem intValuation_of_mem_notMem_sq {R : Type*} [CommRing R] [IsDedekindDomain
   congr 1
   omega
 
-theorem unifIdele_exists_chiAt : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (χ : (AE F E)ˣ →* Circle) (P : HeightOneSpectrum (𝓞 E)), (∃ x, IsUnifIdele σ P x) ∧ (IsUnramAt σ χ P → ∀ x, IsUnifIdele σ P x → chiAt σ χ P = (χ x : ℂ)) ∧ ‖chiAt σ χ P‖ ≤ 1 := by
+theorem unifIdele_exists_chiAt
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (χ : (AE F E)ˣ →* Circle) (P : HeightOneSpectrum (𝓞 E)),
+          (∃ x, IsUnifIdele σ P x)
+            ∧ (IsUnramAt σ χ P → ∀ x, IsUnifIdele σ P x → chiAt σ χ P = (χ x : ℂ))
+            ∧ ‖chiAt σ χ P‖ ≤ 1 := by
   intro F E _ _ _ _ _ σ hσ χ P
-  obtain ⟨Φ, h1, h2, h3, -, -⟩ := GlobalTheory.T.cmExtension_adeles_standardModel_dictionary F E σ hσ
+  obtain ⟨Φ, h1, h2, h3, -, -⟩ :=
+    GlobalTheory.T.cmExtension_adeles_standardModel_dictionary F E σ hσ
   have hu := GlobalTheory.T.primeIdempotent_eq_indicator_prime F E σ Φ h1 h2 h3 P
   obtain ⟨e, f, hef⟩ := GlobalTheory.T.exists_primeIdempotent_CMField F E σ hσ P
   obtain ⟨ea, eb, ec⟩ := hu e f hef
@@ -57,8 +68,8 @@ theorem unifIdele_exists_chiAt : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     by_cases hQ : Q = P
     · subst hQ; rw [eb, mul_one]
     · rw [ec Q hQ, mul_zero]
-  have hint : ∀ c : E, P.valuation E c ≤ 1 →
-      finPart F E (e * incA F E c + (1 - e)) ∈ intAE F E := by
+  have hint
+      : ∀ c : E, P.valuation E c ≤ 1 → finPart F E (e * incA F E c + (1 - e)) ∈ intAE F E := by
     intro c hc
     rw [h2]
     intro Q
@@ -79,9 +90,11 @@ theorem unifIdele_exists_chiAt : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     have hm : (e * incA F E (ϖ : E) + (1 - e)) * (e * incA F E (ϖ : E)⁻¹ + (1 - e)) = 1 := by
       rw [idem_glue_mul he, ← map_mul, mul_inv_cancel₀ hϖ, map_one]; ring
     exact ⟨⟨_, _, hm, by rw [mul_comm, hm]⟩, e, f, ϖ, hef, by simpa using m1, m2, rfl⟩
-  have hq : ∀ x y : (AE F E)ˣ, IsUnifIdele σ P x → IsUnifIdele σ P y →
-      ∃ c : E, P.valuation E c ≤ 1 ∧
-        ((x * y⁻¹ : (AE F E)ˣ) : AE F E) = e * incA F E c + (1 - e) := by
+  have hq
+      : ∀ x y : (AE F E)ˣ,
+        IsUnifIdele σ P x → IsUnifIdele σ P y
+          → ∃ c : E,
+            P.valuation E c ≤ 1 ∧ ((x * y⁻¹ : (AE F E)ˣ) : AE F E) = e * incA F E c + (1 - e) := by
     rintro x y ⟨e1, f1, a, p1, a1, a2, hx⟩ ⟨e2, f2, b, p2, b1, b2, hy⟩
     rw [huniq _ _ p1] at hx
     rw [huniq _ _ p2] at hy
@@ -109,9 +122,9 @@ theorem unifIdele_exists_chiAt : ∀ (F E : Type) [Field F] [NumberField F] [Fie
     rw [huniq _ _ p'] at hχ
     obtain ⟨c, c1, c2⟩ := hq y x hy hx
     obtain ⟨d, d1, d2⟩ := hq x y hx hy
-    have := hχ (y * x⁻¹) (by rw [c2]; linear_combination (1 - incA F E c) * he)
-      (by rw [c2]; exact hint c c1)
-      (by rw [mul_inv_rev, inv_inv, d2]; exact hint d d1)
+    have :=
+      hχ (y * x⁻¹) (by rw [c2]; linear_combination (1 - incA F E c) * he)
+        (by rw [c2]; exact hint c c1) (by rw [mul_inv_rev, inv_inv, d2]; exact hint d d1)
     rw [map_mul, map_inv, mul_inv_eq_one] at this
     rw [this]
   · rw [chiAt]

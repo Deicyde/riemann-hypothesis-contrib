@@ -73,8 +73,10 @@ theorem zeroFreeRegionExceptionalZeroOfBounds : ZFRDirichletOf := by
   refine ⟨c, hc0, ?_⟩
   intro q _ χ s hs hz
 
-  have key : ∀ (χ : DirichletCharacter ℂ q) (s : ℂ), InRegion c q s → IsLZero χ s →
-      χ ^ 2 = 1 ∧ χ ≠ 1 ∧ |s.im| < δ / Real.log ((q : ℝ) * (|s.im| + 2)) := by
+  have key
+      : ∀ (χ : DirichletCharacter ℂ q) (s : ℂ),
+        InRegion c q s → IsLZero χ s
+          → χ ^ 2 = 1 ∧ χ ≠ 1 ∧ |s.im| < δ / Real.log ((q : ℝ) * (|s.im| + 2)) := by
     intro χ s hs hz
     obtain ⟨hne, h0⟩ := hz
     have hχ1 : χ ≠ 1 := by
@@ -90,13 +92,14 @@ theorem zeroFreeRegionExceptionalZeroOfBounds : ZFRDirichletOf := by
     push_neg at hlt
     exact hL q χ s hsq hχ1 hlt (inRegion_mono' hccL hs) h0
   obtain ⟨hsq, hχ1, hsm⟩ := key χ s hs hz
-  obtain ⟨him, hder, -⟩ := hS q χ hsq hχ1 s s hsm hsm (inRegion_mono' hccS hs)
-    (inRegion_mono' hccS hs) hz.2 hz.2
+  obtain ⟨him, hder, -⟩ :=
+    hS q χ hsq hχ1 s s hsm hsm (inRegion_mono' hccS hs) (inRegion_mono' hccS hs) hz.2 hz.2
   refine ⟨hsq, hχ1, him, hder, ?_⟩
   intro χ' s' hs' hz'
   obtain ⟨hsq', hχ1', hsm'⟩ := key χ' s' hs' hz'
-  have him' := (hS q χ' hsq' hχ1' s' s' hsm' hsm' (inRegion_mono' hccS hs')
-    (inRegion_mono' hccS hs') hz'.2 hz'.2).1
+  have him' :=
+    (hS q χ' hsq' hχ1' s' s' hsm' hsm' (inRegion_mono' hccS hs') (inRegion_mono' hccS hs') hz'.2
+      hz'.2).1
   have hχeq : χ' = χ := by
     by_contra hne
     have es : ((s.re : ℝ) : ℂ) = s := Complex.ext (by simp) (by simp [him])
@@ -108,7 +111,7 @@ theorem zeroFreeRegionExceptionalZeroOfBounds : ZFRDirichletOf := by
     · exact h (by rw [es']; exact hz'.2)
   refine ⟨hχeq, ?_⟩
   rw [hχeq] at hz'
-  exact (hS q χ hsq hχ1 s s' hsm hsm' (inRegion_mono' hccS hs) (inRegion_mono' hccS hs')
-    hz.2 hz'.2).2.2
+  exact (hS q χ hsq hχ1 s s' hsm hsm' (inRegion_mono' hccS hs) (inRegion_mono' hccS hs') hz.2
+    hz'.2).2.2
 
 end Formalism.ZeroFreeDirichlet

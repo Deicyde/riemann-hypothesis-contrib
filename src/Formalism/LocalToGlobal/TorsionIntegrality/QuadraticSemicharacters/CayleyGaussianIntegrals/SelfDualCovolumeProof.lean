@@ -16,7 +16,8 @@ section Neg
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-theorem img_neg (Λ : AddSubgroup V) : imgLat ((LinearEquiv.neg ℂ : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V) Λ = Λ := by
+theorem img_neg (Λ : AddSubgroup V)
+    : imgLat ((LinearEquiv.neg ℂ : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V) Λ = Λ := by
   ext x
   simp only [imgLat, AddSubgroup.mem_map, LinearMap.toAddMonoidHom_coe, LinearEquiv.coe_coe,
     LinearEquiv.neg_apply]
@@ -28,9 +29,10 @@ theorem img_neg (Λ : AddSubgroup V) : imgLat ((LinearEquiv.neg ℂ : V ≃ₗ[�
 
 theorem relIdx_self (Λ : AddSubgroup V) : relIdx Λ Λ = 1 := AddSubgroup.relIndex_self Λ
 
-theorem data_neg {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hH : IsHerm H) (hP : IsPosDef H)
-    (hsd : IsSelfDual H Λ) (hα : IsSemiChar H Λ α) :
-    UnitaryData H Λ α (LinearEquiv.neg ℂ) (LinearEquiv.smulOfNeZero ℂ V 2 two_ne_zero) := by
+theorem data_neg
+    {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ}
+    (hH : IsHerm H) (hP : IsPosDef H) (hsd : IsSelfDual H Λ) (hα : IsSemiChar H Λ α)
+    : UnitaryData H Λ α (LinearEquiv.neg ℂ) (LinearEquiv.smulOfNeZero ℂ V 2 two_ne_zero) := by
   refine ⟨hH, hP, hsd, hα, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · intro x y
     simp
@@ -43,8 +45,10 @@ theorem data_neg {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hH : IsHerm
   · intro x
     simp [two_smul]
 
-theorem inter_self {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hH : IsHerm H) (hα : IsSemiChar H Λ α)
-    {F : V → ℂ} (hF : F ∈ fixedBy H α Λ) : inter H α Λ Λ F = F := by
+theorem inter_self
+    {H : Sesq V} {Λ : AddSubgroup V} {α : V → ℂ} (hH : IsHerm H) (hα : IsSemiChar H Λ α)
+    {F : V → ℂ} (hF : F ∈ fixedBy H α Λ)
+    : inter H α Λ Λ F = F := by
   funext z
   have hS : IsReps Λ Λ ({0} : Finset V) := by
     refine ⟨?_, ?_, ?_⟩
@@ -95,15 +99,18 @@ theorem SelfDualCovolume_proof : SelfDualCovolume := by
     rw [norm_mul, norm_one] at h
     nlinarith [norm_nonneg c]
   have hγ : 0 < ∫ z, wt H z ∂μ := (UC.gaussIntegrable V μ H hH hP Real.pi Real.pi_pos).2
-  have hdt0 : LinearMap.det ((LinearEquiv.smulOfNeZero ℂ V 2 two_ne_zero : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V) ≠ 0 :=
+  have hdt0
+      : LinearMap.det ((LinearEquiv.smulOfNeZero ℂ V 2 two_ne_zero : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V) ≠ 0 :=
     (LinearEquiv.isUnit_det' _).ne_zero
   have hn := congrArg norm hval
-  rw [norm_mul, norm_mul, norm_mul, norm_div, hcn, hphi, hcard, Complex.norm_real, Complex.norm_real,
-    norm_inv, Complex.norm_real] at hn
+  rw [norm_mul, norm_mul, norm_mul, norm_div, hcn, hphi, hcard, Complex.norm_real,
+      Complex.norm_real, norm_inv, Complex.norm_real]
+    at hn
   simp only [Nat.cast_one, Real.sqrt_one, norm_one, inv_one, one_mul] at hn
   rw [Real.norm_of_nonneg ENNReal.toReal_nonneg, Real.norm_of_nonneg (le_of_lt hγ)] at hn
   rw [hn]
-  have : ‖LinearMap.det ((LinearEquiv.smulOfNeZero ℂ V 2 two_ne_zero : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V)‖ ≠ 0 :=
+  have : ‖LinearMap.det ((LinearEquiv.smulOfNeZero ℂ V 2 two_ne_zero : V ≃ₗ[ℂ] V) : V →ₗ[ℂ] V)‖
+      ≠ 0 :=
     norm_ne_zero_iff.mpr hdt0
   field_simp
 
@@ -115,13 +122,15 @@ theorem UnitaryConstant_proof : UnitaryConstant := by
   obtain ⟨D, hDf, hDb, hDpos, hsub⟩ := fundamentalDomainExists V μ Λ hL
   have hidx : relIdx (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ) Λ = relIdx (imgLat (δ : V →ₗ[ℂ] V) Λ) Λ :=
     AddSubgroup.inf_relIndex_left _ _
-  obtain ⟨D', hD'f, hD'b, hD'm⟩ := hsub (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ) inf_le_left
-    (by rw [hidx]; exact hU.idx₁)
+  obtain ⟨D', hD'f, hD'b, hD'm⟩ :=
+    hsub (Λ ⊓ imgLat (δ : V →ₗ[ℂ] V) Λ) inf_le_left (by rw [hidx]; exact hU.idx₁)
   obtain ⟨c, hc, hval⟩ := UC.const_value μ hL hU hLine hD'f hD'b hS
-  have hcov := SelfDualCovolume_proof V μ H Λ α hU.herm hU.pos hL hU.selfDual hU.semi hLine D hDf hDb
+  have hcov :=
+    SelfDualCovolume_proof V μ H Λ α hU.herm hU.pos hL hU.selfDual hU.semi hLine D hDf hDb
   have hcard := UC.sqrt_card hL hU hS
-  have hie := indexEq V H hU.herm Λ (imgLat (δ : V →ₗ[ℂ] V) Λ) hU.selfDual
-    (Cay.selfDual_img H Λ δ hU.isom hU.selfDual) hU.idx₂ hU.idx₁
+  have hie :=
+    indexEq V H hU.herm Λ (imgLat (δ : V →ₗ[ℂ] V) Λ) hU.selfDual
+      (Cay.selfDual_img H Λ δ hU.isom hU.selfDual) hU.idx₂ hU.idx₁
   rw [hc θ hθ]
   congr 1
   rw [gaussC, hcard]

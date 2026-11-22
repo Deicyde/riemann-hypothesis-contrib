@@ -8,16 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.SmoothO
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj TensorProduct
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Serre
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.Serre
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
 
 namespace GlobalTheory.TensorDualDim
 
-theorem finrank_dual_eq (O X : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [Module O X]
-    [Module.Finite O X] [Module.Projective O X] :
-    Module.finrank O (Module.Dual O X) = Module.finrank O X := by
+theorem finrank_dual_eq
+    (O X : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [Module O X] [Module.Finite O X]
+    [Module.Projective O X]
+    : Module.finrank O (Module.Dual O X) = Module.finrank O X := by
   haveI : Module.FinitePresentation O X := Module.finitePresentation_of_projective O X
   let F := FractionRing O
   let f : X →ₗ[O] F ⊗[O] X := TensorProduct.mk O F X 1
@@ -29,11 +31,18 @@ theorem finrank_dual_eq (O X : Type) [CommRing O] [IsDomain O] [AddCommGroup X] 
     (LinearMap.extendScalarsOfIsLocalizationEquiv (nonZeroDivisors O) F).finrank_eq]
   exact Subspace.dual_finrank_eq
 
-theorem smoothOfRelativeDimension_tensorObj_dual : ∀ (S : Scheme.{0}) (B : Over S) [GrpObj B] [IsCommMonObj B] (O : Type) [CommRing O] [IsDomain O] [Module.Finite ℤ O] (a : OAct O B) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] [Module.Projective O X] (g : ℕ), SmoothOfRelativeDimension g B.hom → SmoothOfRelativeDimension (Module.finrank O X * g) (tensorObj (Module.Dual O X) a).hom := by
+theorem smoothOfRelativeDimension_tensorObj_dual
+    : ∀ (S : Scheme.{0}) (B : Over S) [GrpObj B] [IsCommMonObj B] (O : Type) [CommRing O]
+        [IsDomain O] [Module.Finite ℤ O] (a : OAct O B) (X : Type) [AddCommGroup X] [Module O X]
+        [Module.Finite O X] [Module.Projective O X] (g : ℕ),
+      SmoothOfRelativeDimension g B.hom
+        → SmoothOfRelativeDimension (Module.finrank O X * g)
+          (tensorObj (Module.Dual O X) a).hom := by
   intro S B _ _ O _ _ _ a X _ _ _ _ g hg
-  have h := GlobalTheory.SerreDim.smoothOfRelativeDimension_tensor S O (Module.Dual O X) B
-    (tensorObj (Module.Dual O X) a) a (tensorAct (Module.Dual O X) a) g
-    ⟨GlobalTheory.Serre.isTensor (Module.Dual O X) a⟩ hg
+  have h :=
+    GlobalTheory.SerreDim.smoothOfRelativeDimension_tensor S O (Module.Dual O X) B
+      (tensorObj (Module.Dual O X) a) a (tensorAct (Module.Dual O X) a) g
+      ⟨GlobalTheory.Serre.isTensor (Module.Dual O X) a⟩ hg
   rwa [finrank_dual_eq] at h
 
 end GlobalTheory.TensorDualDim

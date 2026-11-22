@@ -201,8 +201,10 @@ theorem pwdecay : PWdecay := by
     (hT.cont.smul hF).integrable_of_hasCompactSupport hT.cs.smul_right
   ext y
   rw [coe_toC0 hRc hRt, ← ev_apply y, ← (ev y).integral_comp_comm hH]
-  have e : ∀ t, ev y ((g t : ℂ) • toC0 (wv c N 0 t)) =
-      ((cut c y * ((1 + y ^ 2) ^ N)⁻¹ : ℝ) : ℂ) * ((g t : ℂ) * chj 0 t y) := by
+  have e
+      : ∀ t,
+        ev y ((g t : ℂ) • toC0 (wv c N 0 t))
+          = ((cut c y * ((1 + y ^ 2) ^ N)⁻¹ : ℝ) : ℂ) * ((g t : ℂ) * chj 0 t y) := by
     intro t
     have h1 := (fcurve c N 0 (by omega) t).1
     rw [map_smul, ev_apply, coe_toC0 h1.1 h1.2, smul_eq_mul]

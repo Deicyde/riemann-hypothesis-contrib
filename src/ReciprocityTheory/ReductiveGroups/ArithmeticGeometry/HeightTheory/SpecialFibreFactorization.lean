@@ -11,27 +11,33 @@ namespace ReciprocityTheory.ChartRestriction.G.T0
 
 open NumberField
 
-variable {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
+variable
+  {K : Type} [Field K] [NumberField K]
+  {ι : Type} [Fintype ι]
   {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
   {WT : Type} [AddCommGroup WT]
-  {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-  [∀ c, Algebra (𝓞 K) (A c)]
+  {A : ι → Type}
+  [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)] [∀ c, Algebra (𝓞 K) (A c)]
   {𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)}
 
 namespace Data
 
 variable (d : Data K ι Ω WT A)
 
-theorem SpecialFibreFactorization (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (F : KTp K d.D d.N)
+theorem SpecialFibreFactorization
+    (hd : d.AxH 𝒜)
+    (h : d.S1) (c : ι) (F : KTp K d.D d.N)
     (hF : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) F = d.fZ h c)
-    (x : Fin (d.N + 1) → K) (hx : d.wx x c ≠ 0) :
-    ∃ κ : K, κ ≠ 0 ∧
-      algebraMap (KTp K d.D d.N) (KTf K d.D d.N)
-        (MvPolynomial.aeval (fun v : TVar d.D d.N =>
-          if v.1 = 0 then MvPolynomial.C (x v.2) else MvPolynomial.X v) F) =
-      algebraMap K (KTf K d.D d.N) κ *
-        ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
-          algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ d.nPMM h c (d.wx x c) p := by
+    (x : Fin (d.N + 1) → K) (hx : d.wx x c ≠ 0)
+    : ∃ κ : K,
+      κ ≠ 0
+        ∧ algebraMap (KTp K d.D d.N) (KTf K d.D d.N)
+            (MvPolynomial.aeval
+              (fun v : TVar d.D d.N => if v.1 = 0 then MvPolynomial.C (x v.2) else MvPolynomial.X v)
+              F)
+          = algebraMap K (KTf K d.D d.N) κ
+            * ∏ᶠ (p : Ideal (KTp K d.D d.N)) (_ : p ∈ d.HtOne),
+                algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.gen p) ^ d.nPMM h c (d.wx x c) p := by
   classical
   obtain ⟨P, Q, hQ0, hQx, hPQ, hspec⟩ := d.norm_generic_ratio_spec hd h c
   obtain ⟨Pp, Pm, hPm0, hPpx, hPmx, hPi⟩ := d.pi_free hd h c (d.w (d.jc c) c)
@@ -49,15 +55,16 @@ theorem SpecialFibreFactorization (hd : d.AxH 𝒜) (h : d.S1) (c : ι) (F : KTp
   have hφ := congrArg (algebraMap (KTp K d.D d.N) (KTf K d.D d.N)) hsub
   simp only [map_mul] at hφ
   rw [hspec x hx, hPi] at hφ
-  have hQ' : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Q ≠ 0 :=
-    (map_ne_zero_iff _ hφinj).mpr hQ0
+  have hQ' : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Q ≠ 0 := (map_ne_zero_iff _ hφinj).mpr hQ0
   have hPm' : algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Pm ≠ 0 :=
     (map_ne_zero_iff _ hφinj).mpr hPm0
   rw [← hκeq]
   apply mul_left_cancel₀ (mul_ne_zero hQ' hPm')
-  calc _ = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Q *
-        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.sub0 x F) *
-        algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Pm := by ring
+  calc
+    _ = algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Q
+        * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) (d.sub0 x F)
+        * algebraMap (KTp K d.D d.N) (KTf K d.D d.N) Pm := by
+      ring
     _ = _ := hφ
     _ = _ := by ring
 

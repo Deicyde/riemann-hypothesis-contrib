@@ -8,22 +8,24 @@ namespace ReciprocityTheory.L2DbarEstimates
 
 open Filter Topology
 
-theorem cvx (H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] :
-    CVXStatement H := by
+theorem cvx (H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    : CVXStatement H := by
   unfold CVXStatement
   intro K hanti hne hcl hmid hb
   obtain ⟨R, hR⟩ := isBounded_iff_forall_norm_le.1 hb
-  have hbdd : ∀ n, BddBelow ((fun w : H => ‖w‖) '' K n) :=
-    fun n => ⟨0, by rintro _ ⟨w, _, rfl⟩; exact norm_nonneg w⟩
+  have hbdd : ∀ n, BddBelow ((fun w : H => ‖w‖) '' K n) := fun n =>
+    ⟨0, by rintro _ ⟨w, _, rfl⟩; exact norm_nonneg w⟩
   have hSne : ∀ n, ((fun w : H => ‖w‖) '' K n).Nonempty := fun n => (hne n).image _
   obtain ⟨d, hd⟩ : ∃ d : ℕ → ℝ, d = fun n => sInf ((fun w : H => ‖w‖) '' K n) := ⟨_, rfl⟩
   have hdle : ∀ n, ∀ w ∈ K n, d n ≤ ‖w‖ := by
     intro n w hw; rw [hd]; exact csInf_le (hbdd n) ⟨w, hw, rfl⟩
   have hd0 : ∀ n, 0 ≤ d n := by
-    intro n; rw [hd]
+    intro n
+    rw [hd]
     exact le_csInf (hSne n) (by rintro _ ⟨w, _, rfl⟩; exact norm_nonneg w)
   have hdmono : Monotone d := by
-    intro n m hnm; rw [hd]
+    intro n m hnm
+    rw [hd]
     exact csInf_le_csInf (hbdd n) (hSne m) (Set.image_mono (hanti hnm))
   have hdR : ∀ n, d n ≤ R := by
     intro n
@@ -47,11 +49,10 @@ theorem cvx (H : Type*) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [Comple
     have h1 := hdle n _ (hmid n (x m) hmK (x n) (hxK n))
     have h2 : ‖x m + x n‖ = 2 * ‖(2 : ℂ)⁻¹ • (x m + x n)‖ := by
       first
-        | (rw [norm_smul, norm_inv, Complex.norm_two]; ring)
-        | (rw [norm_smul]; norm_num)
-        | (simp [norm_smul]; ring)
-    have h3 : 4 * d n ^ 2 ≤ ‖x m + x n‖ ^ 2 := by
-      rw [h2]; nlinarith [h1, hd0 n]
+      | (rw [norm_smul, norm_inv, Complex.norm_two]; ring)
+      | (rw [norm_smul]; norm_num)
+      | (simp [norm_smul]; ring)
+    have h3 : 4 * d n ^ 2 ≤ ‖x m + x n‖ ^ 2 := by rw [h2]; nlinarith [h1, hd0 n]
     have hpar := parallelogram_law_with_norm ℂ (x m) (x n)
     nlinarith [hpar, h3]
   have hcauchy : CauchySeq x := by

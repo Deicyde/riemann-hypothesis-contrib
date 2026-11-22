@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2
 open scoped Classical
 open UpperTheory.ConvolutionTheory.R2.C
@@ -21,14 +23,22 @@ private lemma quadraticForm_rational_embed {F : Type} [Field F] [NumberField F] 
     q4 δ (fun i => UpperTheory.ConvolutionTheory.R2.rt (ξ i)) = UpperTheory.ConvolutionTheory.R2.rt (ξ 2 ^ 2 - δ * ξ 3 ^ 2 - ξ 1 * ξ 0) := by
   simp [q4, UpperTheory.ConvolutionTheory.R2.rt, map_sub, map_mul, map_pow]
 
-theorem UpperTheory.ConvolutionTheory.R2.C.thOm :
-    ∀ (F : Type) [Field F] [NumberField F] (δ : F) (η : (A F)ˣ →* ℂˣ) (Om : G1 F →* Module.End ℂ (S4 F)), δ ≠ 0 → IsOm δ η Om → ∀ γ φ, Th (Om (ratS F γ) φ).1 = Th φ.1 := by
+theorem UpperTheory.ConvolutionTheory.R2.C.thOm
+    : ∀ (F : Type) [Field F] [NumberField F] (δ : F) (η : (A F)ˣ →* ℂˣ)
+        (Om : G1 F →* Module.End ℂ (S4 F)),
+      δ ≠ 0 → IsOm δ η Om → ∀ γ φ, Th (Om (ratS F γ) φ).1 = Th φ.1 := by
   intro F _ _ δ η Om hδ hO γ
-  have hγ : ratS F γ ∈ Subgroup.closure (Set.range (fun b : F => nU (UpperTheory.ConvolutionTheory.R2.rt b)) ∪ {wW F}) := by
+  have hγ
+      : ratS F γ ∈ Subgroup.closure
+        (Set.range (fun b : F => nU (UpperTheory.ConvolutionTheory.R2.rt b)) ∪ {wW F}) := by
     rw [(UpperTheory.ConvolutionTheory.R2.gen F).2]
     exact ⟨γ, rfl⟩
-  have key : ∀ g ∈ Subgroup.closure (Set.range (fun b : F => nU (UpperTheory.ConvolutionTheory.R2.rt b)) ∪ {wW F}),
-      ∀ φ : S4 F, Th (Om g φ).1 = Th φ.1 := by
+  have key
+      : ∀ g
+          ∈ Subgroup.closure
+            (Set.range (fun b : F => nU (UpperTheory.ConvolutionTheory.R2.rt b)) ∪ {wW F}),
+        ∀ φ : S4 F,
+          Th (Om g φ).1 = Th φ.1 := by
     intro g hg
     induction hg using Subgroup.closure_induction with
     | mem g hg =>
@@ -42,7 +52,8 @@ theorem UpperTheory.ConvolutionTheory.R2.C.thOm :
         have h : (Om (wW F) φ).1 = ft4 δ φ.1 := funext (hO.w φ)
         rw [h]
         exact (UpperTheory.ConvolutionTheory.R2.C.ftBasic F δ hδ φ.1 φ.2).2.2
-    | one => intro φ; simp
+    | one =>
+      intro φ; simp
     | mul x y _ _ hx hy =>
       intro φ
       rw [map_mul, Module.End.mul_apply, hx, hy]

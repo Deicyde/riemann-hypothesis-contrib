@@ -15,7 +15,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LowestKTypeMu
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -23,18 +24,21 @@ namespace GlobalTheory.DSId.LowCharGap
 open GlobalTheory.Dec.FormF
 variable {n : ℕ}
 
-private theorem mul_mem_UJset' {ε : Fin n → Bool} {g h : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε)
-    (hh : inUJ ε h) : g * h ∈ UJset ε := by
+private theorem mul_mem_UJset'
+    {ε : Fin n → Bool} {g h : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ UJset ε) (hh : inUJ ε h)
+    : g * h ∈ UJset ε := by
   have hg' : gᴴ * Jm ε * g = Jm ε := hg
   have hh' : hᴴ * Jm ε * h = Jm ε := hh
   show (g * h)ᴴ * Jm ε * (g * h) = Jm ε
-  calc (g * h)ᴴ * Jm ε * (g * h) = hᴴ * (gᴴ * Jm ε * g) * h := by
-        rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
+  calc
+    (g * h)ᴴ * Jm ε * (g * h)
+      = hᴴ * (gᴴ * Jm ε * g) * h := by rw [Matrix.conjTranspose_mul]; simp only [Matrix.mul_assoc]
     _ = Jm ε := by rw [hg', hh']
 
-private theorem eword_congr_on_UJset {ε : Fin n → Bool} {f f' : Matrix (Fin n) (Fin n) ℂ → ℂ}
-    (h : ∀ g ∈ UJset ε, f g = f' g) (w : List (Fin n × Fin n)) :
-    ∀ g ∈ UJset ε, Eword ε w f g = Eword ε w f' g := by
+private theorem eword_congr_on_UJset
+    {ε : Fin n → Bool} {f f' : Matrix (Fin n) (Fin n) ℂ → ℂ} (h : ∀ g ∈ UJset ε, f g = f' g)
+    (w : List (Fin n × Fin n))
+    : ∀ g ∈ UJset ε, Eword ε w f g = Eword ε w f' g := by
   induction w with
   | nil => intro g hg; exact h g hg
   | cons p w ih =>
@@ -58,8 +62,9 @@ lemma gelf_congr {ε : Fin n → Bool} {f f' : Matrix (Fin n) (Fin n) ℂ → �
   unfold gelf
   exact Finset.sum_congr rfl (fun a _ => eword_congr_on_UJset h _ g hg)
 
-private theorem star_mem_Kset_of_mem {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset ε) :
-    star k ∈ Kset ε := by
+private theorem star_mem_Kset_of_mem
+    {ε : Fin n → Bool} {k : Matrix (Fin n) (Fin n) ℂ} (hk : k ∈ Kset ε)
+    : star k ∈ Kset ε := by
   have hk' : k ∈ Matrix.unitaryGroup (Fin n) ℂ ∧ k * Jm ε = Jm ε * k := hk
   have h := congrArg star hk'.2
   simp only [star_mul] at h
@@ -68,10 +73,12 @@ private theorem star_mem_Kset_of_mem {ε : Fin n → Bool} {k : Matrix (Fin n) (
   show star k ∈ Matrix.unitaryGroup (Fin n) ℂ ∧ star k * Jm ε = Jm ε * star k
   exact ⟨Unitary.star_mem hk'.1, h.symm⟩
 
-private theorem posDef_conjTranspose_mul_exp_mul {ε : Fin n → Bool} {m X : Matrix (Fin n) (Fin n) ℂ} (hm : m ∈ Kset ε)
-    (hX : inP ε X) : (mᴴ * NormedSpace.exp X * m).PosDef := by
+private theorem posDef_conjTranspose_mul_exp_mul
+    {ε : Fin n → Bool} {m X : Matrix (Fin n) (Fin n) ℂ} (hm : m ∈ Kset ε) (hX : inP ε X)
+    : (mᴴ * NormedSpace.exp X * m).PosDef := by
   have hm' : m ∈ Matrix.unitaryGroup (Fin n) ℂ ∧ m * Jm ε = Jm ε * m := hm
-  have hu : mᴴ * m = 1 := by rw [← Matrix.star_eq_conjTranspose]; exact Unitary.star_mul_self_of_mem hm'.1
+  have hu : mᴴ * m = 1 := by
+    rw [← Matrix.star_eq_conjTranspose]; exact Unitary.star_mul_self_of_mem hm'.1
   apply Matrix.PosDef.conjTranspose_mul_mul_same (exp_posDef hX)
   intro a b hab
   have := congrArg (fun x => (mᴴ).mulVec x) hab
@@ -171,17 +178,22 @@ lemma two_mul_lt_gap {ε : Fin n → Bool} {lam : Fin n → ℝ} {h : ℝ} (hgap
   have hp : (1:ℝ) ≤ ((rkR ε : ℕ) : ℝ) ^ ((3:ℝ)/2) := Real.one_le_rpow hq (by norm_num)
   nlinarith
 
-theorem lowChar_of_formula (hF : FormulaGap) (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type)
-    [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
-    (hlam : IsHCParam lam) (hσ : IsDS ε lam σ) (h : ℝ) (hgap : GapAtLeast ε lam h)
-    (hh : 120 * (n : ℝ) * ((rkR ε : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h)
-    (hS : IsKTypeOf ε σ (lowK ε lam) (lowKSub ε lam σ)) :
-    ∀ s ∈ lowKSub ε lam σ, ∀ y : H, IsZEigen ε (fun a => (lam a : ℂ)) (fun g => ⟪y, σ g s⟫_ℂ) := by
+theorem lowChar_of_formula
+    (hF : FormulaGap)
+    (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ)
+    (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (hlam : IsHCParam lam) (hσ : IsDS ε lam σ)
+    (h : ℝ) (hgap : GapAtLeast ε lam h) (hh : 120 * (n : ℝ) * ((rkR ε : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h)
+    (hS : IsKTypeOf ε σ (lowK ε lam) (lowKSub ε lam σ))
+    : ∀ s ∈ lowKSub ε lam σ, ∀ y : H,
+      IsZEigen ε (fun a => (lam a : ℂ)) (fun g => ⟪y, σ g s⟫_ℂ) := by
   haveI : CompleteSpace H := hσ.1
   obtain ⟨-, -, hU, -, -, -, -⟩ := id hσ
   have hKU : IsURepOn (Kset ε) σ := URep_K hU
   obtain ⟨⟨hσ1, -⟩, -, -⟩ := id hU
-  obtain ⟨c, hc⟩ := GlobalTheory.T.gelfandInvariants_scalar_on_lowestKType_coefficients n ε lam H σ hU hS
+  obtain ⟨c, hc⟩ :=
+    GlobalTheory.T.gelfandInvariants_scalar_on_lowestKType_coefficients n ε lam H σ hU hS
   obtain ⟨-, -, -, ⟨v0, hv0S, hv0, hv0w⟩, -⟩ := id hS
   obtain ⟨w, hwdef⟩ : ∃ w : H, w = ((‖v0‖ : ℂ))⁻¹ • v0 := ⟨_, rfl⟩
   have hwS : w ∈ lowKSub ε lam σ := by rw [hwdef]; exact (lowKSub ε lam σ).smul_mem _ hv0S
@@ -190,13 +202,17 @@ theorem lowChar_of_formula (hF : FormulaGap) (n : ℕ) (ε : Fin n → Bool) (la
     intro θ hθ
     rw [hwdef, map_smul, hv0w θ hθ]
     exact smul_comm _ _ _
-  obtain ⟨τ, hτ, hτσ⟩ := GlobalTheory.T.kType_extends_holomorphic_complexifiedK n ε (lowK ε lam) H σ (lowKSub ε lam σ) ⟨w, hwS⟩ hKU hS hwn hww
+  obtain ⟨τ, hτ, hτσ⟩ :=
+    GlobalTheory.T.kType_extends_holomorphic_complexifiedK n ε (lowK ε lam) H σ (lowKSub ε lam σ)
+      ⟨w, hwS⟩ hKU hS hwn hww
   have hhw : IsHighestUnit ε lam σ ((⟨w, hwS⟩ : lowKSub ε lam σ) : H) := by
     show _ ∧ _ ∧ _
     exact ⟨hwn, hwS, hww⟩
   have hcomp := compress_of_formula hF hlam hσ hgap hh hS hhw hτ hτσ
   have h1UJ : (1 : Matrix (Fin n) (Fin n) ℂ) ∈ UJset ε := K_UJ (one_K ε)
-  have hPE := GlobalTheory.T.psiEntries_centreEigenfunctions_discreteSeries n ε lam (lowKSub ε lam σ) τ ⟨w, hwS⟩ hlam hτ ⟨w, hwS⟩ ⟨w, hwS⟩
+  have hPE :=
+    GlobalTheory.T.psiEntries_centreEigenfunctions_discreteSeries n ε lam (lowKSub ε lam σ) τ
+      ⟨w, hwS⟩ hlam hτ ⟨w, hwS⟩ ⟨w, hwS⟩
   have hEC := eigConj n ε _ _ hPE.1 hPE.2
   have hfs : SmoothOnG ε (fun g => ⟪w, σ g w⟫_ℂ) := (hc w hwS w).1
   have hone : ⟪w, σ 1 w⟫_ℂ = 1 := by
@@ -218,8 +234,18 @@ theorem lowChar_of_formula (hF : FormulaGap) (n : ℕ) (ε : Fin n → Bool) (la
   refine ⟨(hc s hs y).1, fun m g hg => ?_⟩
   rw [(hc s hs y).2 m g hg, hcm m]
 
-theorem lowChar : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsHCParam lam → IsDS ε lam σ → ∀ h : ℝ, GapAtLeast ε lam h → 120 * (n : ℝ) * ((rkR ε : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h → ∀ s ∈ lowKSub ε lam σ, ∀ y : H, IsZEigen ε (fun a => (lam a : ℂ)) (fun g => ⟪y, σ g s⟫_ℂ) := fun n ε lam H _ _ σ hlam hσ h hgap hh =>
-  lowChar_of_formula GlobalTheory.T.lowestKType_compressionFormula_of_strictLowestKType n ε lam H σ hlam hσ h hgap hh
-    (GlobalTheory.T.lowestKType_isKType_of_large_gaps n ε lam H σ hlam hσ (fun a b hab => two_mul_lt_gap hgap hh a b hab))
+theorem lowChar
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H]
+        [InnerProductSpace ℂ H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)),
+      IsHCParam lam → IsDS ε lam σ
+        → ∀ h : ℝ,
+          GapAtLeast ε lam h → 120 * (n : ℝ) * ((rkR ε : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h
+            → ∀ s ∈ lowKSub ε lam σ, ∀ y : H,
+              IsZEigen ε (fun a => (lam a : ℂ)) (fun g => ⟪y, σ g s⟫_ℂ) :=
+  fun n ε lam H _ _ σ hlam hσ h hgap hh =>
+    lowChar_of_formula GlobalTheory.T.lowestKType_compressionFormula_of_strictLowestKType n ε lam H
+      σ hlam hσ h hgap hh
+      (GlobalTheory.T.lowestKType_isKType_of_large_gaps n ε lam H σ hlam hσ
+        (fun a b hab => two_mul_lt_gap hgap hh a b hab))
 
 end GlobalTheory.DSId.LowCharGap

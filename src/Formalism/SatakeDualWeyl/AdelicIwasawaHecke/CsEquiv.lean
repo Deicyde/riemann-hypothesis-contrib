@@ -15,24 +15,28 @@ open Formalism.UG Formalism.UG.CS
 
 section
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {n : Type} [Fintype n] [DecidableEq n]
 
-theorem csEquiv_bc_mulVec (γ : GL n E) (x : n → E) :
-    (((bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) :
-        Matrix n n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) *ᵥ
-        (fun i => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x i))) =
-      fun i => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (((γ : Matrix n n E) *ᵥ x) i) := by
+theorem csEquiv_bc_mulVec (γ : GL n E) (x : n → E)
+    : (((bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F))
+          : Matrix n n (E ⊗[F] FiniteAdeleRing (𝓞 F) F))
+        *ᵥ (fun i => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (x i)))
+      = fun i => inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (((γ : Matrix n n E) *ᵥ x) i) := by
   funext i
   rw [RingHom.map_mulVec]
   rfl
 
-theorem csEquiv_mem (Λ : Submodule (𝓞 E) (n → E)) (γ : GL n E)
+theorem csEquiv_mem
+    (Λ : Submodule (𝓞 E) (n → E))
+    (γ : GL n E)
     (g k : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F))
     (hk : k ∈ stabGL (latS (F := F) (FiniteAdeleRing (𝓞 F) F)
-      (tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)) Λ)) (x : n → E) :
-    x ∈ globLat (bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ * g * k) Λ ↔
-      ((γ⁻¹ : GL n E) : Matrix n n E) *ᵥ x ∈ globLat g Λ := by
+      (tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)) Λ))
+    (x : n → E)
+    : x ∈ globLat (bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ * g * k) Λ
+      ↔ ((γ⁻¹ : GL n E) : Matrix n n E) *ᵥ x ∈ globLat g Λ := by
   have hki := (stabGL _).inv_mem hk
   show (((bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ * g * k)⁻¹ :
       GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) : Matrix n n (E ⊗[F] FiniteAdeleRing (𝓞 F) F)) *ᵥ
@@ -45,12 +49,14 @@ theorem csEquiv_mem (Λ : Submodule (𝓞 E) (n → E)) (γ : GL n E)
     ← Matrix.mulVec_mulVec, ← map_inv, csEquiv_bc_mulVec]
   exact (hki _).symm
 
-theorem csEquiv_main (Λ : Submodule (𝓞 E) (n → E)) (γ : GL n E)
+theorem csEquiv_main
+    (Λ : Submodule (𝓞 E) (n → E))
+    (γ : GL n E)
     (g k : GL n (E ⊗[F] FiniteAdeleRing (𝓞 F) F))
     (hk : k ∈ stabGL (latS (F := F) (FiniteAdeleRing (𝓞 F) F)
-      (tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)) Λ)) :
-    globLat (bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ * g * k) Λ =
-      Formalism.HermitianLatticesTheory.gmap (glEquiv γ) (globLat g Λ) := by
+      (tensInt (F := F) (FiniteAdeleRing (𝓞 F) F) (intOE E) (intAd F)) Λ))
+    : globLat (bc (inclE (F := F) (FiniteAdeleRing (𝓞 F) F)) γ * g * k) Λ
+      = Formalism.HermitianLatticesTheory.gmap (glEquiv γ) (globLat g Λ) := by
   ext x
   rw [csEquiv_mem Λ γ g k hk x]
   unfold Formalism.HermitianLatticesTheory.gmap

@@ -11,8 +11,9 @@ namespace GlobalTheory.GenusTwoPureComparison.Cmp
 
 open CategoryTheory Limits AlgebraicGeometry Polynomial GlobalTheory.EtC
 
-theorem monic_eq_prod_of_aic {T : Type} [CommRing T] (hT : AIC T) :
-    ∀ (n : ℕ) (f : T[X]), f.Monic → f.natDegree = n → ∃ s : Multiset T, f = (s.map fun a => X - C a).prod := by
+theorem monic_eq_prod_of_aic {T : Type} [CommRing T] (hT : AIC T)
+    : ∀ (n : ℕ) (f : T[X]),
+      f.Monic → f.natDegree = n → ∃ s : Multiset T, f = (s.map fun a => X - C a).prod := by
   intro n
   induction n with
   | zero =>
@@ -22,7 +23,8 @@ theorem monic_eq_prod_of_aic {T : Type} [CommRing T] (hT : AIC T) :
     intro f hf hn
     rcases subsingleton_or_nontrivial T with hT0 | hT0
     · have h0 : f = 0 := Subsingleton.elim _ _
-      rw [h0, natDegree_zero] at hn; omega
+      rw [h0, natDegree_zero] at hn
+      omega
     obtain ⟨a, ha⟩ := hT f hf (by omega)
     have hmul : (X - C a) * (f /ₘ (X - C a)) = f := mul_divByMonic_eq_iff_isRoot.2 ha
     have hq : (f /ₘ (X - C a)).Monic := (monic_X_sub_C a).of_mul_monic_left (by rw [hmul]; exact hf)
@@ -32,7 +34,8 @@ theorem monic_eq_prod_of_aic {T : Type} [CommRing T] (hT : AIC T) :
     refine ⟨a ::ₘ s, ?_⟩
     rw [Multiset.map_cons, Multiset.prod_cons, ← hs, hmul]
 
-theorem henselianLocalRing_of_aic {T : Type} [CommRing T] [IsLocalRing T] (hT : AIC T) : HenselianLocalRing T where
+theorem henselianLocalRing_of_aic {T : Type} [CommRing T] [IsLocalRing T] (hT : AIC T)
+    : HenselianLocalRing T where
   is_henselian f hf a₀ h₁ _ := by
     classical
     obtain ⟨s, hs⟩ := monic_eq_prod_of_aic hT _ f hf rfl
@@ -41,7 +44,8 @@ theorem henselianLocalRing_of_aic {T : Type} [CommRing T] [IsLocalRing T] (hT : 
       rw [Polynomial.eval_multiset_prod, Multiset.map_map]
       exact congrArg _ (Multiset.map_congr rfl fun a _ => by simp)
     rw [hev] at h₁
-    obtain ⟨c, hc, hcm⟩ := ((IsLocalRing.maximalIdeal.isMaximal T).isPrime.multiset_prod_mem_iff_exists_mem _).1 h₁
+    obtain ⟨c, hc, hcm⟩ :=
+      ((IsLocalRing.maximalIdeal.isMaximal T).isPrime.multiset_prod_mem_iff_exists_mem _).1 h₁
     obtain ⟨a, ha, rfl⟩ := Multiset.mem_map.1 hc
     refine ⟨a, ?_, ?_⟩
     · show f.eval a = 0
@@ -49,13 +53,16 @@ theorem henselianLocalRing_of_aic {T : Type} [CommRing T] [IsLocalRing T] (hT : 
       exact Multiset.prod_eq_zero (Multiset.mem_map.2 ⟨a, ha, by simp⟩)
     · rw [← neg_sub]; exact (Ideal.neg_mem_iff _).2 hcm
 
-theorem isAlgClosed_residueField_of_aic {T : Type} [CommRing T] [IsLocalRing T] (hT : AIC T) :
-    IsAlgClosed (IsLocalRing.ResidueField T) := by
+theorem isAlgClosed_residueField_of_aic {T : Type} [CommRing T] [IsLocalRing T] (hT : AIC T)
+    : IsAlgClosed (IsLocalRing.ResidueField T) := by
   refine IsAlgClosed.of_exists_root _ fun p hp hirr => ?_
-  obtain ⟨q, hqp, hqd, hqm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-    (Polynomial.lifts_iff_coeff_lifts p |>.2 fun n => IsLocalRing.residue_surjective (p.coeff n)) hp
+  obtain ⟨q, hqp, hqd, hqm⟩ :=
+    Polynomial.lifts_and_natDegree_eq_and_monic
+      (Polynomial.lifts_iff_coeff_lifts p |>.2 fun n => IsLocalRing.residue_surjective (p.coeff n))
+      hp
   have hdeg : 0 < q.natDegree := by
-    rw [hqd]; exact Polynomial.natDegree_pos_iff_degree_pos.2 (Polynomial.degree_pos_of_irreducible hirr)
+    rw [hqd]
+    exact Polynomial.natDegree_pos_iff_degree_pos.2 (Polynomial.degree_pos_of_irreducible hirr)
   obtain ⟨a, ha⟩ := hT q hqm hdeg
   refine ⟨IsLocalRing.residue T a, ?_⟩
   rw [← hqp, Polynomial.eval_map, Polynomial.eval₂_at_apply, ha, map_zero]
@@ -94,12 +101,21 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC
 section Torsion
 variable {T : Type} [CommRing T] [IsDomain T] [IsLocalRing T]
 
-theorem eqv_spInc (hE2 : E2) (hT : AIC T) (q : ℕ) (hq : IsUnit (q : T)) {X : Scheme.{0}}
-    (p : X ⟶ Spec (CommRingCat.of T)) [IsProper p] (i : ℤ) : Eqv (ZMod q) (sch.map (spInc p)) (tw q i) :=
+theorem eqv_spInc
+    (hE2 : E2) (hT : AIC T)
+    (q : ℕ) (hq : IsUnit (q : T))
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of T)) [IsProper p]
+    (i : ℤ)
+    : Eqv (ZMod q) (sch.map (spInc p)) (tw q i) :=
   hE2 q T (sh_of_aic hT) hq p i
 
-theorem eqv_genInc (hE3 : E3) (hT : AIC T) (q : ℕ) [NeZero q] (hq : IsUnit (q : T)) {X : Scheme.{0}}
-    (p : X ⟶ Spec (CommRingCat.of T)) [Smooth p] (i : ℤ) : Eqv (ZMod q) (sch.map (genInc p)) (tw q i) :=
+theorem eqv_genInc
+    (hE3 : E3) (hT : AIC T)
+    (q : ℕ) [NeZero q]
+    (hq : IsUnit (q : T))
+    {X : Scheme.{0}} (p : X ⟶ Spec (CommRingCat.of T)) [Smooth p]
+    (i : ℤ)
+    : Eqv (ZMod q) (sch.map (genInc p)) (tw q i) :=
   hE3 q T hT hq p i
 
 end Torsion
@@ -113,9 +129,10 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC
 section Adic
 variable (l : ℕ) [Fact l.Prime]
 
-theorem pullHl_bijective {E E' : Spc} (f : E ⟶ E') (n i : ℤ)
-    (hf : ∀ k : ℕ, Function.Bijective (pull (ZMod (l ^ k)) f (tw (l ^ k) i) n)) :
-    Function.Bijective (pullHl l f n i) := by
+theorem pullHl_bijective
+    {E E' : Spc} (f : E ⟶ E')
+    (n i : ℤ) (hf : ∀ k : ℕ, Function.Bijective (pull (ZMod (l ^ k)) f (tw (l ^ k) i) n))
+    : Function.Bijective (pullHl l f n i) := by
   constructor
   · intro x y hxy
     apply Subtype.ext
@@ -128,9 +145,10 @@ theorem pullHl_bijective {E E' : Spc} (f : E ⟶ E') (n i : ℤ)
     rw [pull_red, hx, hx]
     exact y.2 k
 
-theorem pullHQ_bijective {E E' : Spc} (f : E ⟶ E') (n i : ℤ)
-    (hf : ∀ k : ℕ, Function.Bijective (pull (ZMod (l ^ k)) f (tw (l ^ k) i) n)) :
-    Function.Bijective (pullHQ l f n i) := by
+theorem pullHQ_bijective
+    {E E' : Spc} (f : E ⟶ E')
+    (n i : ℤ) (hf : ∀ k : ℕ, Function.Bijective (pull (ZMod (l ^ k)) f (tw (l ^ k) i) n))
+    : Function.Bijective (pullHQ l f n i) := by
   let e := LinearEquiv.ofBijective (pullHl l f n i) (pullHl_bijective l f n i hf)
   have h : pullHQ l f n i = (e.baseChange ℤ_[l] ℚ_[l] _ _).toLinearMap := by
     apply TensorProduct.AlgebraTensorModule.ext
@@ -156,8 +174,10 @@ end GlobalTheory.GenusTwoPureComparison.Cmp
 
 namespace GlobalTheory.GenusTwoPureComparison.Cmp
 
-theorem aic_of_isAlgClosed' (K : Type) [Field K] [IsAlgClosed K] : GlobalTheory.EtC.AIC K := fun p hp hd =>
-  IsAlgClosed.exists_root p (by rw [Polynomial.degree_eq_natDegree hp.ne_zero]; exact_mod_cast hd.ne')
+theorem aic_of_isAlgClosed' (K : Type) [Field K] [IsAlgClosed K]
+    : GlobalTheory.EtC.AIC K := fun p hp hd =>
+  IsAlgClosed.exists_root p
+    (by rw [Polynomial.degree_eq_natDegree hp.ne_zero]; exact_mod_cast hd.ne')
 
 end GlobalTheory.GenusTwoPureComparison.Cmp
 

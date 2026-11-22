@@ -5,19 +5,23 @@ public import Development.AutomorphicSpectrum.Definitions.GlobalGeometry.IsGener
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 namespace GlobalTheory.CompanionTheory.Ar.FlagGrGen
 
-theorem exists_coord {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {r : ℕ} {b : Fin r → E}
-    (hb : LinearIndependent Ω b) (i : Fin r) :
-    ∃ φ : E →ₗ[Ω] Ω, φ (b i) = 1 ∧ ∀ k, k ≠ i → φ (b k) = 0 := by
+theorem exists_coord
+    {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E]
+    {r : ℕ} {b : Fin r → E} (hb : LinearIndependent Ω b) (i : Fin r)
+    : ∃ φ : E →ₗ[Ω] Ω, φ (b i) = 1 ∧ ∀ k, k ≠ i → φ (b k) = 0 := by
   obtain ⟨g, hg⟩ := LinearMap.exists_extend ((Module.Basis.span hb).coord i)
   have key : ∀ k, g (b k) = Finsupp.single k (1 : Ω) i := by
     intro k
     have hk : (Module.Basis.span hb k : E) = b k := by rw [Module.Basis.span_apply]
     have := LinearMap.congr_fun hg (Module.Basis.span hb k)
-    simp only [LinearMap.comp_apply, Submodule.subtype_apply, Module.Basis.coord_apply, Module.Basis.repr_self] at this
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, Module.Basis.coord_apply,
+        Module.Basis.repr_self]
+      at this
     rw [hk] at this
     exact this
   refine ⟨g, ?_, ?_⟩
@@ -27,7 +31,13 @@ theorem exists_coord {Ω E : Type} [Field Ω] [AddCommGroup E] [Module Ω E] {r 
     rw [key]
     simp [Ne.symm hk]
 
-theorem gr_isGenAt : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (r : ℕ) (b₀ b : Fin r → E) (p : Cpt ξ) (i : Fin r) (t : Ω), LinearIndependent Ω b₀ → (∀ s, flagStep Ω b s = flagStep Ω b₀ s) → L.IsFrameAt b p → b i - t • b₀ i ∈ flagStep Ω b₀ i → (L.gr b₀ i).IsGenAt p t := by
+theorem gr_isGenAt
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (L : Lat ξ E) (r : ℕ) (b₀ b : Fin r → E) (p : Cpt ξ)
+        (i : Fin r) (t : Ω),
+      LinearIndependent Ω b₀ → (∀ s, flagStep Ω b s = flagStep Ω b₀ s) → L.IsFrameAt b p
+        → b i - t • b₀ i ∈ flagStep Ω b₀ i
+        → (L.gr b₀ i).IsGenAt p t := by
   intro X Ω _ ξ E _ _ L r b₀ b p i t hb₀ hflag hframe hti
   obtain ⟨hb, hLp⟩ := hframe
   obtain ⟨f0, hf0⟩ := exists_coord hb₀ i

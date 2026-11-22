@@ -8,8 +8,10 @@ open NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-private theorem eq_of_forall_trace_mul_eq_trace_mul {E : Type} [Field E] [NumberField E] {b c : E}
-    (h : ∀ a : E, Algebra.trace ℚ E (a * b) = Algebra.trace ℚ E (a * c)) : b = c := by
+private theorem eq_of_forall_trace_mul_eq_trace_mul
+    {E : Type} [Field E] [NumberField E]
+    {b c : E} (h : ∀ a : E, Algebra.trace ℚ E (a * b) = Algebra.trace ℚ E (a * c))
+    : b = c := by
   apply ((Algebra.traceForm ℚ E).toDual (traceForm_nondegenerate ℚ E)).injective
   ext a
   rw [LinearMap.BilinForm.toDual_def, LinearMap.BilinForm.toDual_def, Algebra.traceForm_apply,

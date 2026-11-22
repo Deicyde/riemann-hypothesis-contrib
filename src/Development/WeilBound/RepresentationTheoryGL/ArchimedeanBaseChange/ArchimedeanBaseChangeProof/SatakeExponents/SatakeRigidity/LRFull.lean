@@ -9,26 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.SpehDat
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC
 open PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.One
 
 namespace PositivityTheory.Rg.BcB.F.Rig
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-theorem rfull_finite_under_eq (u : HeightOneSpectrum (𝓞 E)) :
-    {w : HeightOneSpectrum (𝓞 E) |
-      w.under (𝓞 (maximalRealSubfield E)) = u.under (𝓞 (maximalRealSubfield E))}.Finite := by
+theorem rfull_finite_under_eq (u : HeightOneSpectrum (𝓞 E))
+    : {w : HeightOneSpectrum (𝓞 E) |
+        w.under (𝓞 (maximalRealSubfield E)) = u.under (𝓞 (maximalRealSubfield E))}.Finite := by
   have hm : (u.under (𝓞 (maximalRealSubfield E))).asIdeal.IsMaximal := (u.under _).isMaximal
-  refine (Set.Finite.preimage (f := HeightOneSpectrum.asIdeal) (fun a _ b _ h => HeightOneSpectrum.ext h)
-    (IsDedekindDomain.primesOver_finite (u.under (𝓞 (maximalRealSubfield E))).asIdeal (𝓞 E))).subset ?_
+  refine (Set.Finite.preimage (f := HeightOneSpectrum.asIdeal)
+    (fun a _ b _ h => HeightOneSpectrum.ext h)
+    (IsDedekindDomain.primesOver_finite (u.under (𝓞 (maximalRealSubfield E))).asIdeal
+      (𝓞 E))).subset ?_
   intro w hw
   exact ⟨w.isPrime, ⟨by rw [← hw]; rfl⟩⟩
 
-theorem rfull_eventually_sat (D : Pre E n) :
-    ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ B, D.Sat w B := by
-  have h : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite,
-      ∀ i, GlobalTheory.LGrp.IsSpherical (D.σ i w).ρ (GlobalTheory.LFun.KGL w (n := (D.N i))) :=
+theorem rfull_eventually_sat (D : Pre E n)
+    : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ B, D.Sat w B := by
+  have h
+      : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite,
+        ∀ i, GlobalTheory.LGrp.IsSpherical (D.σ i w).ρ (GlobalTheory.LFun.KGL w (n := (D.N i))) :=
     Filter.eventually_all.2 fun i =>
       (GlobalTheory.SpehPair.eventually_spherical (D.discrete i)).mono fun w hw => hw _ (D.loc i w)
   refine h.mono fun w hw => ?_
@@ -36,10 +40,10 @@ theorem rfull_eventually_sat (D : Pre E n) :
     GlobalTheory.SatInd.exists_hasSatGL_of_isIrreducible (D.σ i w).smooth (D.σ i w).irred (hw i)
   exact ⟨∑ i, b i, b, fun i => ⟨hw i, hb i⟩, rfl⟩
 
-theorem rfull_bcParam_map_inv (n : ℕ) (α : Fin (n / 2) → ℂˣ) :
-    (GlobalTheory.LGrp.bcParam n α).map (·⁻¹) = GlobalTheory.LGrp.bcParam n α := by
-  simp only [GlobalTheory.LGrp.bcParam, Multiset.map_add (f := _), Multiset.map_map, Function.comp_def, inv_inv,
-    Multiset.map_replicate, inv_one]
+theorem rfull_bcParam_map_inv (n : ℕ) (α : Fin (n / 2) → ℂˣ)
+    : (GlobalTheory.LGrp.bcParam n α).map (·⁻¹) = GlobalTheory.LGrp.bcParam n α := by
+  simp only [GlobalTheory.LGrp.bcParam, Multiset.map_add (f := _), Multiset.map_map,
+    Function.comp_def, inv_inv, Multiset.map_replicate, inv_one]
   rw [add_comm (Multiset.map _ _) (Multiset.map _ _)]
 
 theorem rFullSat : RFullSat := by
@@ -56,8 +60,9 @@ theorem rFullSat : RFullSat := by
 
 theorem rFullTheta : RFullTheta := by
   intro hU hI hC E _ _ _ hE n π hπ D hD
-  have hbad : {u : HeightOneSpectrum (𝓞 E) |
-      ¬ ((∃ B, D.Sat u B) ∧ (IsSplitAt u → D.SplitAt π u))}.Finite := by
+  have hbad
+      : {u : HeightOneSpectrum (𝓞 E) |
+        ¬ ((∃ B, D.Sat u B) ∧ (IsSplitAt u → D.SplitAt π u))}.Finite := by
     refine ((Filter.eventually_cofinite.1 (rfull_eventually_sat D)).union hD.1.2).subset ?_
     intro u hu
     by_cases h1 : ∃ B, D.Sat u B
@@ -66,8 +71,9 @@ theorem rFullTheta : RFullTheta := by
       exact hu ⟨h1, fun hs => by_contra fun h3 => h2 ⟨hs, h3⟩⟩
     · left
       exact h1
-  have hconj : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∀ u, ConjPl w u →
-      (∃ B, D.Sat u B) ∧ (IsSplitAt u → D.SplitAt π u) := by
+  have hconj
+      : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∀ u, ConjPl w u →
+        (∃ B, D.Sat u B) ∧ (IsSplitAt u → D.SplitAt π u) := by
     rw [Filter.eventually_cofinite]
     refine (hbad.biUnion fun u _ => rfull_finite_under_eq u).subset ?_
     intro w hw
@@ -75,7 +81,8 @@ theorem rFullTheta : RFullTheta := by
     obtain ⟨u, hu⟩ := not_forall.1 hw'
     obtain ⟨hc, hu'⟩ := Classical.not_imp.1 hu
     exact Set.mem_biUnion hu' hc.1.symm
-  have hsp0 : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ¬ (IsSplitAt w ∧ ¬ D.SplitAt π w) :=
+  have hsp0
+      : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ¬ (IsSplitAt w ∧ ¬ D.SplitAt π w) :=
     Filter.eventually_cofinite.2 (hD.1.2.subset fun x hx => not_not.1 hx)
   filter_upwards [hU E n π hπ, rfull_eventually_sat D, hconj, hsp0]
     with w hu hs hc hsp

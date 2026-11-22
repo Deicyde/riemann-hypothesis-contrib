@@ -4,8 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C
 
 private lemma powSum_eq_count (s : Multiset ℂ) (S : Finset ℂ) (h : ∀ z ∈ s, z ∈ S) (j : ℕ) :
     (s.map (· ^ j)).sum = ∑ z ∈ S, (s.count z : ℂ) * z ^ j := by
@@ -28,8 +32,7 @@ private lemma powHom_injective : Function.Injective powHom := by
   have := DFunLike.congr_fun h (Multiplicative.ofAdd 1)
   simpa [powHom] using this
 
-theorem UpperTheory.ConvolutionTheory.C.powIndep :
-    UpperTheory.ConvolutionTheory.C.PowIndep := by
+theorem UpperTheory.ConvolutionTheory.C.powIndep : UpperTheory.ConvolutionTheory.C.PowIndep := by
   classical
   intro ι _ c Z hZ hev ζ
   obtain ⟨N, hN⟩ := eventually_atTop.1 hev
@@ -50,14 +53,16 @@ theorem UpperTheory.ConvolutionTheory.C.powIndep :
     obtain ⟨i, -, hi⟩ := Finset.mem_biUnion.1 hz
     exact hZ i (h0 ▸ Multiset.mem_toFinset.1 hi)
   have lin : LinearIndependent ℂ (fun z : S => (powHom z : Multiplicative ℕ → ℂ)) :=
-    (linearIndependent_monoidHom (Multiplicative ℕ) ℂ).comp (fun z : S => powHom z)
+    (linearIndependent_monoidHom (Multiplicative ℕ) ℂ).comp
+      (fun z : S => powHom z)
       (powHom_injective.comp Subtype.val_injective)
   rw [Fintype.linearIndependent_iff] at lin
-  have hb := lin (fun z => a z * (z : ℂ) ^ N) (by
-    funext n
-    have := key (N + n.toAdd) (Nat.le_add_right _ _)
-    rw [← Finset.sum_coe_sort S] at this
-    simpa [powHom, pow_add, mul_assoc, Finset.sum_apply] using this)
+  have hb :=
+    lin (fun z => a z * (z : ℂ) ^ N) (by
+      funext n
+      have := key (N + n.toAdd) (Nat.le_add_right _ _)
+      rw [← Finset.sum_coe_sort S] at this
+      simpa [powHom, pow_add, mul_assoc, Finset.sum_apply] using this)
   have ha : a ζ = 0 := by
     by_cases hζ : ζ ∈ S
     · have := hb ⟨ζ, hζ⟩

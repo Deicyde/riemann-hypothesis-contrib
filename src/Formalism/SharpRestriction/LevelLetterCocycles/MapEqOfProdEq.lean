@@ -32,15 +32,20 @@ def eG : (Fin (r + t) → K) ≃ₗ[K] ((Fin r → K) × (Fin t → K)) :=
   (LinearEquiv.funCongrLeft K K finSumFinEquiv).trans
     (LinearEquiv.sumArrowLequivProdArrow (Fin r) (Fin t) K K)
 
-theorem eG_apply (u : Fin (r + t) → K) :
-    eG r t K u = (fun a => u (Fin.castAdd t a), fun c => u (Fin.natAdd r c)) := rfl
+theorem eG_apply (u : Fin (r + t) → K)
+    : eG r t K u = (fun a => u (Fin.castAdd t a), fun c => u (Fin.natAdd r c)) :=
+  rfl
 
 variable {r t K}
 
-theorem eG_mulVec (M : Matrix (Fin (r + t)) (Fin (r + t)) K)
-    (hM : ∀ a b, blkG r t a ≠ blkG r t b → M a b = 0) (u : Fin (r + t) → K) :
-    eG r t K (M *ᵥ u) = ((M.submatrix (Fin.castAdd t) (Fin.castAdd t)) *ᵥ (eG r t K u).1,
-      fun c => M (Fin.natAdd r c) (Fin.natAdd r c) * (eG r t K u).2 c) := by
+theorem eG_mulVec
+    (M : Matrix (Fin (r + t)) (Fin (r + t)) K) (hM : ∀ a b, blkG r t a ≠ blkG r t b → M a b = 0)
+    (u : Fin (r + t) → K)
+    : eG r t K (M *ᵥ u)
+      = (
+        (M.submatrix (Fin.castAdd t) (Fin.castAdd t)) *ᵥ (eG r t K u).1,
+        fun c => M (Fin.natAdd r c) (Fin.natAdd r c) * (eG r t K u).2 c
+      ) := by
   simp only [eG_apply]
   ext a
   · simp only [Matrix.mulVec, dotProduct, Matrix.submatrix_apply]
@@ -75,7 +80,8 @@ section Gen2
 
 variable {r t : ℕ} {A : Type} [CommRing A]
 
-theorem blkG_inj {a b : Fin (r + t)} (h : blkG r t a = blkG r t b) (ha : blkG r t a ≠ 0) : a = b := by
+theorem blkG_inj {a b : Fin (r + t)} (h : blkG r t a = blkG r t b) (ha : blkG r t a ≠ 0)
+    : a = b := by
   unfold blkG at h ha
   by_cases h1 : (a : ℕ) < r
   · rw [dite_eq_left h1] at ha
@@ -87,11 +93,11 @@ theorem blkG_inj {a b : Fin (r + t)} (h : blkG r t a = blkG r t b) (ha : blkG r 
       have h3 : (a : ℕ) - r + 1 = (b : ℕ) - r + 1 := congrArg Fin.val h
       exact Fin.ext (by omega)
 
-theorem diag_conj (M : Matrix (Fin (r + t)) (Fin (r + t)) A)
-    (hM : ∀ a b, blkG r t a ≠ blkG r t b → M a b = 0) :
-    (Matrix.diagonal fun a => if blkG r t a = 0 then (0 : A) else 1) * M *
-        (Matrix.diagonal fun a => if blkG r t a = 0 then (0 : A) else 1) =
-      Matrix.diagonal fun a => if blkG r t a = 0 then 0 else M a a := by
+theorem diag_conj
+    (M : Matrix (Fin (r + t)) (Fin (r + t)) A) (hM : ∀ a b, blkG r t a ≠ blkG r t b → M a b = 0)
+    : (Matrix.diagonal fun a => if blkG r t a = 0 then (0 : A) else 1) * M
+        * (Matrix.diagonal fun a => if blkG r t a = 0 then (0 : A) else 1)
+      = Matrix.diagonal fun a => if blkG r t a = 0 then 0 else M a a := by
   ext a b
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.diagonal_apply]
   by_cases hab : a = b

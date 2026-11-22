@@ -14,19 +14,31 @@ set_option synthInstance.maxHeartbeats 200000
 section
 noncomputable section
 open scoped TensorProduct NNReal Matrix Classical
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 namespace PositivityTheory.SiegelWeilFormula.Ald
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 theorem chartFacts_k : _root_.PositivityTheory.SiegelWeilFormula.Ald.ChartFacts_k := by
   intro F E _ _ _ _ _ σ d n h Y b j ε hn hs hb e1 e2 hj dd0 dd' h0 h'
-  have rdE : ∀ w, (GlobalTheory.TowU.reindexD dd0 (eK d.m h).symm).e w = ((dd0.e w).1 ∘ eK d.m h, (dd0.e w).2 ∘ eK d.m h) :=
-    fun w => by rw [GlobalTheory.TowU.reindexD_e, Equiv.symm_symm]
-  have hfr : ∀ g, inFrame d.b (j g) = blk h (inFrame b g) 1 := fun g => eq_blk h _ _ (hj.2.1 g) (hj.2.2 g)
-  refine ⟨fun w' => ?_, fun u v => ⟨_, LinearEquiv.apply_symm_apply _ _⟩, fun g w H1 H2 => ?_, fun g w' => ?_,
-    fun u w' => ?_⟩
-  ·
-    rw [rdE, adapted_e h0, frQ_emb, embQ_toCols₁, embQ_toCols₂, adapted_e h']
+  have rdE
+      : ∀ w,
+        (GlobalTheory.TowU.reindexD dd0 (eK d.m h).symm).e w
+          = ((dd0.e w).1 ∘ eK d.m h, (dd0.e w).2 ∘ eK d.m h) := fun w => by
+    rw [GlobalTheory.TowU.reindexD_e, Equiv.symm_symm]
+  have hfr : ∀ g, inFrame d.b (j g) = blk h (inFrame b g) 1 := fun g =>
+    eq_blk h _ _ (hj.2.1 g) (hj.2.2 g)
+  refine ⟨
+    fun w' => ?_,
+    fun u v => ⟨_, LinearEquiv.apply_symm_apply _ _⟩,
+    fun g w H1 H2 => ?_,
+    fun g w' => ?_,
+    fun u w' => ?_
+  ⟩
+  · rw [rdE, adapted_e h0, frQ_emb, embQ_toCols₁, embQ_toCols₂, adapted_e h']
     refine Prod.ext (funext fun q => ?_) (funext fun q => ?_)
     · rcases q with ⟨a, c, t⟩ | ⟨a, t⟩
       · exact crdB_col _ _ _ a _ c t (extend_zero_embedded_column h _ a c)
@@ -34,8 +46,7 @@ theorem chartFacts_k : _root_.PositivityTheory.SiegelWeilFormula.Ald.ChartFacts_
     · rcases q with ⟨a, c, t⟩ | ⟨a, t⟩
       · exact Bf_col _ _ _ _ a _ c t (fun p => extend_zero_embedded_column h _ p c)
       · exact Bf_zero_col _ _ _ a _ t (fun p => extend_zero_last_column h _ p)
-  ·
-    set Q := frQ d.b w with hQdef
+  · set Q := frQ d.b w with hQdef
     set Q' := Q.submatrix id (Sum.map (em0 h) (em0 h)) with hQ'def
     have hw := adapted_e h0 w
     have hz : dd0.e (embQ h Q' * (incM F d.b.1)ᵀ) = 0 := by
@@ -72,7 +83,10 @@ theorem chartFacts_k : _root_.PositivityTheory.SiegelWeilFormula.Ald.ChartFacts_
     rw [frQ_mul_mat, hfr, ← hQdef]
     ext a u
     rw [Matrix.mul_apply]
-    have hterm : ∀ v, Q a v * (blk h (inFrame b g) 1)ᵀ v u = Q a v * (1 : Matrix (Fin d.n ⊕ Fin d.n) _ (AE F E)) u v := by
+    have hterm
+        : ∀ v,
+          Q a v * (blk h (inFrame b g) 1)ᵀ v u
+            = Q a v * (1 : Matrix (Fin d.n ⊕ Fin d.n) _ (AE F E)) u v := by
       intro v
       rcases idx_cases h v with ⟨v', rfl⟩ | hv | hv
       · rw [hQv, zero_mul, zero_mul]
@@ -80,12 +94,10 @@ theorem chartFacts_k : _root_.PositivityTheory.SiegelWeilFormula.Ald.ChartFacts_
       · rw [Matrix.transpose_apply, (blk_out h _ v (by rw [hv]; exact Or.inr rfl) u).2]
     rw [Finset.sum_congr rfl fun v _ => hterm v]
     simp [Matrix.one_apply]
-  ·
-    apply frQ_injective d.b
+  · apply frQ_injective d.b
     show frQ d.b (emb h b d.b w' * ((j g).1.1)ᵀ) = frQ d.b (emb h b d.b (w' * (g.1.1)ᵀ))
     rw [frQ_mul_mat, frQ_emb, frQ_emb, frQ_mul_mat, hfr, embQ_mul_blk]
-  ·
-    rw [emb_eq, emb_eq, frQ_left, ← embQ_mul_left, Matrix.mul_assoc]
+  · rw [emb_eq, emb_eq, frQ_left, ← embQ_mul_left, Matrix.mul_assoc]
 end PositivityTheory.SiegelWeilFormula.Ald
 end
 end

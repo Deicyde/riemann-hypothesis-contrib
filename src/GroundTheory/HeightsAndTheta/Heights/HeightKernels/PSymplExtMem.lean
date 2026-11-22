@@ -35,18 +35,17 @@ lemma row_inr (i : Fin n) :
 
 end PSymplExtMem
 
-
 open PSymplExtMem in
-theorem SymplExtMem.proof (h1 : SymplOmegaMem.Statement) (h2 : SymplCons.Statement) :
-    SymplExtMem.Statement := by
+theorem SymplExtMem.proof (h1 : SymplOmegaMem.Statement) (h2 : SymplCons.Statement)
+    : SymplExtMem.Statement := by
   intro R _ n α β γ δ Q hdet hQ
   rw [h1 R (Fin (n + 1))]
   have hQ' := (h1 R (Fin n) Q).1 hQ
   have hc := (h2 R n).2
-  rintro (x | x) (y | y) <;> cases x using Fin.cases <;> cases y using Fin.cases <;>
-    simp only [row_e, row_f, row_inl, row_inr, hc, hQ', omega_zero_left, omega_zero_right] <;>
-    simp [Matrix.J, Matrix.one_apply, Fin.succ_ne_zero, Fin.succ_inj] <;>
-    first
+  rintro (x | x) (y | y) <;> cases x using Fin.cases <;> cases y using Fin.cases
+    <;> simp only [row_e, row_f, row_inl, row_inr, hc, hQ', omega_zero_left, omega_zero_right]
+    <;> simp [Matrix.J, Matrix.one_apply, Fin.succ_ne_zero, Fin.succ_inj]
+    <;> first
       | ring1
       | linear_combination hdet
       | linear_combination (-1 : R) * hdet

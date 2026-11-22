@@ -222,22 +222,37 @@ private lemma exists_small_direction_eval_circle_ne_zero {d : ℕ} {P : MvPolyno
       · rw [mem_sphere_zero_iff_norm] at hw
         rw [norm_mul, hw, one_mul, Complex.norm_real, Real.norm_of_nonneg hr.1.le]
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_algebra :
-    ∀ (d : ℕ) (B : Type) [CommRing B] [IsDomain B] [Algebra (MvPolynomial (Fin d) ℚ) B] [Module.Finite (MvPolynomial (Fin d) ℚ) B], Function.Injective (algebraMap (MvPolynomial (Fin d) ℚ) B) → (letI : TopologicalSpace (B →+* ℂ) := TopologicalSpace.induced (fun x : B →+* ℂ => (x : B → ℂ)) inferInstance; ∀ (ψ : (B →+* ℂ) → ℝ), Continuous ψ → ∀ s : B, s ≠ 0 → ∀ (x₀ : B →+* ℂ) (δ : ℝ), 0 < δ → ∃ (W K : Set (B →+* ℂ)), W ∈ nhds x₀ ∧ IsCompact K ∧ (∀ x ∈ K, x s ≠ 0) ∧ ∀ (N : ℕ) (f : B) (R : ℝ), (∀ x ∈ K, ‖x f‖ * Real.exp (-(N * ψ x)) ≤ R) → ∀ y ∈ W, ‖y f‖ * Real.exp (-(N * ψ y)) ≤ Real.exp (δ * N) * R) := by
+theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_algebra
+    : ∀ (d : ℕ) (B : Type) [CommRing B] [IsDomain B] [Algebra (MvPolynomial (Fin d) ℚ) B]
+        [Module.Finite (MvPolynomial (Fin d) ℚ) B],
+      Function.Injective (algebraMap (MvPolynomial (Fin d) ℚ) B)
+        → (letI : TopologicalSpace (B →+* ℂ) :=
+             TopologicalSpace.induced (fun x : B →+* ℂ => (x : B → ℂ)) inferInstance
+           ∀ (ψ : (B →+* ℂ) → ℝ),
+             Continuous ψ
+               → ∀ s : B,
+                 s ≠ 0
+                   → ∀ (x₀ : B →+* ℂ) (δ : ℝ),
+                     0 < δ
+                       → ∃ (W K : Set (B →+* ℂ)),
+                         W ∈ nhds x₀ ∧ IsCompact K ∧ (∀ x ∈ K, x s ≠ 0)
+                           ∧ ∀ (N : ℕ) (f : B) (R : ℝ),
+                             (∀ x ∈ K, ‖x f‖ * Real.exp (-(N * ψ x)) ≤ R)
+                               → ∀ y ∈ W,
+                                 ‖y f‖ * Real.exp (-(N * ψ y)) ≤ Real.exp (δ * N) * R) := by
   intro d B _ _ _ _ hinj
   letI : TopologicalSpace (B →+* ℂ) := TopologicalSpace.induced (fun x : B →+* ℂ => (x : B → ℂ)) inferInstance
   intro ψ hψ s hs x₀ δ hδ
   classical
   set π : (B →+* ℂ) → (Fin d → ℂ) :=
     fun x i => x (algebraMap (MvPolynomial (Fin d) ℚ) B (MvPolynomial.X i)) with hπ
-  have hev : ∀ b : B, Continuous fun x : B →+* ℂ => x b :=
-    fun b => (continuous_apply b).comp continuous_induced_dom
+  have hev : ∀ b : B, Continuous fun x : B →+* ℂ => x b := fun b =>
+    (continuous_apply b).comp continuous_induced_dom
   have hπc : Continuous π := continuous_pi fun i => hev _
   have hind : Topology.IsInducing (fun x : B →+* ℂ => (x : B → ℂ)) := Topology.IsInducing.induced _
-  have hcpt : ∀ T : Set (Fin d → ℂ), IsCompact T → IsCompact {x : B →+* ℂ | π x ∈ T} :=
-    fun T hT => hind.isCompact_iff.mpr (isCompact_image_homs_over_isCompact hT)
+  have hcpt : ∀ T : Set (Fin d → ℂ), IsCompact T → IsCompact {x : B →+* ℂ | π x ∈ T} := fun T hT =>
+    hind.isCompact_iff.mpr (isCompact_image_homs_over_isCompact hT)
   set z := π x₀
 
   obtain ⟨k, e, he⟩ := ((finite_setOf_homs_over_point (B := B) z).diff (t := {x₀})).fin_embedding
@@ -264,8 +279,7 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
     exact sub_ne_zero.mpr (hb j).symm
   have hΦ0 : Φ (x₀, x₀) = 1 :=
     Finset.prod_eq_one fun j _ => mul_inv_cancel₀ (sub_ne_zero.mpr (hb j).symm)
-  have hΦj : ∀ j, Φ (x₀, e j) = 0 := fun j =>
-    Finset.prod_eq_zero (Finset.mem_univ j) (by simp [t])
+  have hΦj : ∀ j, Φ (x₀, e j) = 0 := fun j => Finset.prod_eq_zero (Finset.mem_univ j) (by simp [t])
   have hnear : ∀ᶠ p in nhds (x₀, x₀), ‖Φ p‖ < Real.exp (δ / 3) := by
     refine (hΦc x₀).norm.eventually (gt_mem_nhds ?_)
     show ‖Φ (x₀, x₀)‖ < _
@@ -279,9 +293,12 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
     exact Real.exp_pos _
   rw [nhds_prod_eq, Filter.eventually_prod_iff] at hnear
   obtain ⟨pa, hpa, pb, hpb, hnear⟩ := hnear
-  have hfar' : ∀ j, ∃ pa : (B →+* ℂ) → Prop, (∀ᶠ y in nhds x₀, pa y) ∧
-      ∃ pb : (B →+* ℂ) → Prop, (∀ᶠ x in nhds (e j), pb x) ∧
-        ∀ {y}, pa y → ∀ {x}, pb x → ‖Φ (y, x)‖ < Real.exp (ψ x₀ - C) := by
+  have hfar'
+      : ∀ j, ∃ pa : (B →+* ℂ) → Prop,
+        (∀ᶠ y in nhds x₀, pa y)
+          ∧ ∃ pb : (B →+* ℂ) → Prop,
+            (∀ᶠ x in nhds (e j), pb x)
+              ∧ ∀ {y}, pa y → ∀ {x}, pb x → ‖Φ (y, x)‖ < Real.exp (ψ x₀ - C) := by
     intro j
     have h := hfar j
     rw [nhds_prod_eq, Filter.eventually_prod_iff] at h
@@ -300,8 +317,7 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
       obtain ⟨j, rfl⟩ := hxr
       filter_upwards [hqb j] with y hy
       exact Or.inr ⟨j, hy⟩
-  have hKc : IsCompact (π '' (K₀ \ interior {x | Q x})) :=
-    (hK₀.diff isOpen_interior).image hπc
+  have hKc : IsCompact (π '' (K₀ \ interior {x | Q x})) := (hK₀.diff isOpen_interior).image hπc
   have hzK : z ∉ π '' (K₀ \ interior {x | Q x}) := by
     rintro ⟨x, hx, hxz⟩
     exact hx.2 (mem_interior_iff_mem_nhds.mpr (hQ x hxz))
@@ -309,22 +325,25 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
   have hcover : ∀ x, dist (π x) z < min ρ 1 → Q x := by
     intro x hx
     by_contra hq
-    have hxK : x ∈ K₀ \ interior {x | Q x} :=
-      ⟨Metric.mem_closedBall.mpr (hx.le.trans (min_le_right _ _)),
-        fun hi => hq (show x ∈ {x | Q x} from interior_subset hi)⟩
+    have hxK : x ∈ K₀ \ interior {x | Q x} := ⟨
+      Metric.mem_closedBall.mpr (hx.le.trans (min_le_right _ _)),
+      fun hi => hq (show x ∈ {x | Q x} from interior_subset hi)
+    ⟩
     exact hρz (Metric.mem_ball.mpr (hx.trans_le (min_le_left _ _))) ⟨x, hxK, rfl⟩
 
   obtain ⟨a, ha0, hadvd⟩ := exists_ne_zero_dvd_algebraMap_of_ne_zero (d := d) (B := B) hs
   set P := MvPolynomial.map (algebraMap ℚ ℂ) a
   have hP : P ≠ 0 := fun h =>
     ha0 (MvPolynomial.map_injective _ (algebraMap ℚ ℂ).injective (by rw [map_zero]; exact h))
-  obtain ⟨v, hv, hvz⟩ := exists_small_direction_eval_circle_ne_zero hP z (ρ := min ρ 1 / 2) (by positivity)
+  obtain ⟨v, hv, hvz⟩ :=
+    exists_small_direction_eval_circle_ne_zero hP z (ρ := min ρ 1 / 2) (by positivity)
   obtain ⟨ε, hε, hεz⟩ := Metric.eventually_nhds_iff.mp hvz
   set r := min (ε / 2) (min ρ 1 / 4)
   have hr : 0 < r := lt_min (by positivity) (by positivity)
   set T := (fun p : (Fin d → ℂ) × ℂ => p.1 + p.2 • v) '' (Metric.closedBall z r ×ˢ Metric.sphere 0 1)
-  have hT : IsCompact T := ((isCompact_closedBall z r).prod (isCompact_sphere 0 1)).image
-    (continuous_fst.add (continuous_snd.smul continuous_const))
+  have hT : IsCompact T :=
+    ((isCompact_closedBall z r).prod (isCompact_sphere 0 1)).image
+      (continuous_fst.add (continuous_snd.smul continuous_const))
   have hKQ : ∀ x, π x ∈ T → Q x ∧ x ∈ K₀ := by
     rintro x ⟨⟨z', w⟩, ⟨hz', hw⟩, hxe⟩
     have hd : dist (π x) z < min ρ 1 := by
@@ -332,7 +351,9 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
       simp only at hz' hw ⊢
       rw [Metric.mem_closedBall, dist_eq_norm] at hz'
       rw [mem_sphere_zero_iff_norm] at hw
-      calc ‖z' + w • v - z‖ = ‖(z' - z) + w • v‖ := by congr 1; abel
+      calc
+        ‖z' + w • v - z‖
+          = ‖(z' - z) + w • v‖ := by congr 1; abel
         _ ≤ ‖z' - z‖ + ‖w‖ * ‖v‖ := (norm_add_le _ _).trans (by rw [norm_smul])
         _ < min ρ 1 := by
           rw [hw, one_mul]
@@ -341,8 +362,9 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
     exact ⟨hcover x hd, Metric.mem_closedBall.mpr (hd.le.trans (min_le_right _ _))⟩
   have hKs : ∀ x : B →+* ℂ, π x ∈ T → x s ≠ 0 := by
     rintro x ⟨⟨z', w⟩, ⟨hz', hw⟩, hxe⟩ hxs
-    have h1 := hεz (lt_of_le_of_lt (Metric.mem_closedBall.mp hz')
-      ((min_le_left _ _).trans_lt (by linarith))) w (by simpa using hw)
+    have h1 :=
+      hεz (lt_of_le_of_lt (Metric.mem_closedBall.mp hz') ((min_le_left _ _).trans_lt (by linarith)))
+        w (by simpa using hw)
     apply h1
     obtain ⟨c, hc⟩ := hadvd
     have h2 := ringHom_algebraMap_eq_eval_map x a
@@ -350,8 +372,14 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
     simp only at hxe
     rw [hxe]
     exact h2.symm
-  refine ⟨{y | dist (π y) z < r ∧ pa y ∧ (∀ j, qa j y) ∧ (∀ j, y (b j) ≠ t j) ∧ ψ x₀ - δ / 3 < ψ y},
-    {x | π x ∈ T}, ?_, hcpt T hT, fun x hx => hKs x hx, ?_⟩
+  refine ⟨
+    {y | dist (π y) z < r ∧ pa y ∧ (∀ j, qa j y) ∧ (∀ j, y (b j) ≠ t j) ∧ ψ x₀ - δ / 3 < ψ y},
+    {x | π x ∈ T},
+    ?_,
+    hcpt T hT,
+    fun x hx => hKs x hx,
+    ?_
+  ⟩
   · filter_upwards [hπc.continuousAt.eventually (Metric.ball_mem_nhds z hr), hpa,
       Filter.eventually_all.2 hqa,
       Filter.eventually_all.2 fun j => (hev (b j)).continuousAt.eventually_ne (hb j).symm,
@@ -369,7 +397,9 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
         MvPolynomial.eval₂_prod, MvPolynomial.eval₂_sub, MvPolynomial.eval₂_X, Fin.append_left,
         Fin.append_right]
     set R' := R * Real.exp (N * (ψ x₀ + 2 * δ / 3))
-    have key := _root_.GlobalTheory.maxPrinciple_line_eval₂ d B hinj (k + k) G c (π y) v R' ?_ y (fun i => rfl)
+    have key :=
+      _root_.GlobalTheory.maxPrinciple_line_eval₂ d B hinj (k + k) G c (π y) v R' ?_ y
+        (fun i => rfl)
     · rw [hG] at key
       have hΦy : Φ (y, y) = 1 :=
         Finset.prod_eq_one fun j _ => mul_inv_cancel₀ (sub_ne_zero.mpr (hy4 j))
@@ -379,18 +409,21 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
         push_neg at h
         have := mul_neg_of_neg_of_pos h (Real.exp_pos (N * (ψ x₀ + 2 * δ / 3)))
         linarith [norm_nonneg (y f)]
-      calc ‖y f‖ * Real.exp (-(N * ψ y)) ≤ R' * Real.exp (-(N * ψ y)) :=
-            mul_le_mul_of_nonneg_right key (Real.exp_pos _).le
-        _ = R * Real.exp (N * (ψ x₀ + 2 * δ / 3) + -(N * ψ y)) := by
-            rw [mul_assoc, ← Real.exp_add]
+      calc
+        ‖y f‖ * Real.exp (-(N * ψ y))
+          ≤ R' * Real.exp (-(N * ψ y)) := mul_le_mul_of_nonneg_right key (Real.exp_pos _).le
+        _ = R * Real.exp (N * (ψ x₀ + 2 * δ / 3) + -(N * ψ y)) := by rw [mul_assoc, ← Real.exp_add]
         _ ≤ R * Real.exp (δ * N) := by
-            gcongr
-            have hN : (0 : ℝ) ≤ N := Nat.cast_nonneg N
-            nlinarith
+          gcongr
+          have hN : (0 : ℝ) ≤ N := Nat.cast_nonneg N
+          nlinarith
         _ = Real.exp (δ * N) * R := mul_comm _ _
     · intro x w hw hx
-      have hxT : π x ∈ T := ⟨(π y, w), ⟨Metric.mem_closedBall.mpr hy1.le, by simpa using hw⟩,
-        by funext i; exact (hx i).symm⟩
+      have hxT : π x ∈ T := ⟨
+        (π y, w),
+        ⟨Metric.mem_closedBall.mpr hy1.le, by simpa using hw⟩,
+        by funext i; exact (hx i).symm
+      ⟩
       obtain ⟨hQx, hxK₀⟩ := hKQ x hxT
       have hf := hK x hxT
       have hR : 0 ≤ R := le_trans (by positivity) hf
@@ -403,23 +436,27 @@ theorem _root_.GlobalTheory.local_maximum_principle_weight_finite_mvPolynomial_a
       rw [hG, norm_mul, norm_pow]
       rcases hQx with ⟨h1, h2⟩ | ⟨j, hj⟩
       · have hΦ := hnear hy2 h1
-        calc ‖x f‖ * ‖Φ (y, x)‖ ^ N ≤ R * Real.exp (N * ψ x) * Real.exp (δ / 3) ^ N :=
-              mul_le_mul hxf (pow_le_pow_left₀ (norm_nonneg _) hΦ.le N) (by positivity) (by positivity)
+        calc
+          ‖x f‖ * ‖Φ (y, x)‖ ^ N ≤ R * Real.exp (N * ψ x) * Real.exp (δ / 3) ^ N :=
+            mul_le_mul hxf (pow_le_pow_left₀ (norm_nonneg _) hΦ.le N) (by positivity)
+              (by positivity)
           _ = R * Real.exp (N * ψ x + N * (δ / 3)) := by
-              rw [← Real.exp_nat_mul, mul_assoc, ← Real.exp_add]
+            rw [← Real.exp_nat_mul, mul_assoc, ← Real.exp_add]
           _ ≤ R' := by
-              show _ ≤ R * Real.exp (N * (ψ x₀ + 2 * δ / 3))
-              gcongr
-              nlinarith
+            show _ ≤ R * Real.exp (N * (ψ x₀ + 2 * δ / 3))
+            gcongr
+            nlinarith
       · have hΦ := hfar j (hy3 j) hj
         have hψC : ψ x ≤ C := le_trans (le_abs_self _) (by simpa [Real.norm_eq_abs] using hC x hxK₀)
-        calc ‖x f‖ * ‖Φ (y, x)‖ ^ N ≤ R * Real.exp (N * ψ x) * Real.exp (ψ x₀ - C) ^ N :=
-              mul_le_mul hxf (pow_le_pow_left₀ (norm_nonneg _) hΦ.le N) (by positivity) (by positivity)
+        calc
+          ‖x f‖ * ‖Φ (y, x)‖ ^ N ≤ R * Real.exp (N * ψ x) * Real.exp (ψ x₀ - C) ^ N :=
+            mul_le_mul hxf (pow_le_pow_left₀ (norm_nonneg _) hΦ.le N) (by positivity)
+              (by positivity)
           _ = R * Real.exp (N * ψ x + N * (ψ x₀ - C)) := by
-              rw [← Real.exp_nat_mul, mul_assoc, ← Real.exp_add]
+            rw [← Real.exp_nat_mul, mul_assoc, ← Real.exp_add]
           _ ≤ R' := by
-              show _ ≤ R * Real.exp (N * (ψ x₀ + 2 * δ / 3))
-              gcongr
-              nlinarith
+            show _ ≤ R * Real.exp (N * (ψ x₀ + 2 * δ / 3))
+            gcongr
+            nlinarith
 
 end GlobalTheory

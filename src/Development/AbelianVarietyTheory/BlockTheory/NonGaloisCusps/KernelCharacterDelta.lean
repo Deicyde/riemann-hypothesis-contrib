@@ -33,21 +33,23 @@ def DeltaInv (x : k⸨X⸩) : Prop := ∀ t : ℤ_[l]ˣ, t ^ (l - 1) = 1 → act
 variable {k l}
 
 def IsCyclotomic (R : RingPG k l) (ι : k⸨X⸩ →ₐ[k] k⸨X⸩) : Prop :=
-  Set.range ι = {y | DeltaInv k l y} ∧
-  Set.range (fun a : k⟦X⟧ => ι (a : k⸨X⸩)) = {y | (∃ b : k⟦X⟧, y = (b : k⸨X⸩)) ∧ DeltaInv k l y} ∧
-  (∃ u : (k⟦X⟧)ˣ, ι (vv k) = ((u : k⟦X⟧) : k⸨X⸩) * vv k ^ (l - 1)) ∧
-  (∀ x, ι (R.φ x) = frobπ k l (ι x)) ∧
-  (∀ x, ι (R.γ x) = gamπ k l (ι x))
+  Set.range ι = {y | DeltaInv k l y}
+    ∧ Set.range (fun a : k⟦X⟧ => ι (a : k⸨X⸩)) = {y | (∃ b : k⟦X⟧, y = (b : k⸨X⸩)) ∧ DeltaInv k l y}
+    ∧ (∃ u : (k⟦X⟧)ˣ, ι (vv k) = ((u : k⟦X⟧) : k⸨X⸩) * vv k ^ (l - 1))
+    ∧ (∀ x, ι (R.φ x) = frobπ k l (ι x)) ∧ (∀ x, ι (R.γ x) = gamπ k l (ι x))
 
 def PsiRing (R : RingPG k l) (ψ₀ : k⸨X⸩ →ₗ[k] k⸨X⸩) : Prop :=
-  (∀ a b, ψ₀ (R.φ a * b) = a * ψ₀ b) ∧ ψ₀ 1 = 1 ∧ (∀ a, ψ₀ (R.γ a) = R.γ (ψ₀ a)) ∧
-  ∀ a : ℤ, 2 - (l : ℤ) ≤ a → a ≤ 1 →
-    ψ₀ '' {x | ∃ b : k⟦X⟧, x = vv k ^ a * (b : k⸨X⸩)} = Set.range (fun b : k⟦X⟧ => (b : k⸨X⸩))
+  (∀ a b, ψ₀ (R.φ a * b) = a * ψ₀ b) ∧ ψ₀ 1 = 1 ∧ (∀ a, ψ₀ (R.γ a) = R.γ (ψ₀ a))
+    ∧ ∀ a : ℤ,
+      2 - (l : ℤ) ≤ a → a ≤ 1
+        → ψ₀ '' {x | ∃ b : k⟦X⟧, x = vv k ^ a * (b : k⸨X⸩)} = Set.range (fun b : k⟦X⟧ => (b : k⸨X⸩))
 
 end Rings
 
 section Modules
-variable {k : Type} [Field k] {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V]
+variable
+  {k : Type} [Field k]
+  {V : Type} [AddCommGroup V] [Module k⸨X⸩ V] [Module k⟦X⟧ V] [Module k V]
   [IsScalarTower k⟦X⟧ k⸨X⸩ V] [IsScalarTower k k⸨X⸩ V] [IsScalarTower k k⟦X⟧ V]
 
 def kerPsi (ψ : V →ₗ[k] V) (M : Submodule k⟦X⟧ V) (a : ℤ) : Set V := {x | x ∈ sh a M ∧ ψ x = 0}
@@ -57,8 +59,8 @@ def PsiShift (l : ℕ) (g ψ : V →ₗ[k] V) (M : Submodule k⟦X⟧ V) : Prop 
 
 end Modules
 
-theorem binomPow_natCast (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (m : ℕ) :
-    binomPow k l (m : ℤ_[l]) = (1 + PowerSeries.X) ^ m := by
+theorem binomPow_natCast (k : Type) [Field k] (l : ℕ) [Fact l.Prime] [CharP k l] (m : ℕ)
+    : binomPow k l (m : ℤ_[l]) = (1 + PowerSeries.X) ^ m := by
   rw [binomPow, PowerSeries.binomialSeries_nat]
   simp
 

@@ -14,14 +14,17 @@ open ReciprocityTheory.ChartRestriction.G.AI
 
 universe u
 
-theorem mem_minimalPrimes_of_locCycle_ne_zero' {S : Type*} [CommRing S] {J W : Ideal S}
-    (h : locCycle J W ≠ 0) : W ∈ J.minimalPrimes := by
+theorem mem_minimalPrimes_of_locCycle_ne_zero'
+    {S : Type*} [CommRing S] {J W : Ideal S} (h : locCycle J W ≠ 0)
+    : W ∈ J.minimalPrimes := by
   by_contra hc
   exact h (by unfold locCycle; rw [dite_eq_right hc])
 
-theorem LocalCoeffLocal.proof (h₁ : LocCycleSpanMul.Statement.{u}) (h₂ : LocCyclePos.Statement.{u})
+theorem LocalCoeffLocal.proof
+    (h₁ : LocCycleSpanMul.Statement.{u}) (h₂ : LocCyclePos.Statement.{u})
     (h₃ : MinimalPrimesSpanSingleton.Statement.{u}) (h₄ : LocalDomainDimTwo.Statement.{u})
-    (h₅ : DimTwoSumReading.Statement.{u}) : LocalCoeffLocal.Statement.{u} := by
+    (h₅ : DimTwoSumReading.Statement.{u})
+    : LocalCoeffLocal.Statement.{u} := by
   intro A _ _ _ _ hchain f g s u v hf hg hs hu huv hno
 
   have hv : v ≠ 0 := by
@@ -35,17 +38,21 @@ theorem LocalCoeffLocal.proof (h₁ : LocCycleSpanMul.Statement.{u}) (h₂ : Loc
     ext x
     rw [hspan, Submodule.mem_colon_singleton, smul_eq_mul, Ideal.mem_span_singleton,
       Ideal.mem_span_singleton, mul_dvd_mul_iff_right hg]
-  have hadd : ∀ W : Ideal A, locCycle (Ideal.span {f}) W =
-      locCycle (Ideal.span {v}) W + locCycle (Ideal.span {g}) W := by
+  have hadd
+      : ∀ W : Ideal A,
+        locCycle (Ideal.span {f}) W
+          = locCycle (Ideal.span {v}) W + locCycle (Ideal.span {g}) W := by
     intro W
     rw [hspan]
     exact h₁ A v g hv hg W
 
-  have hmin1 : ∀ x : A, x ≠ 0 → ∀ W : Ideal A, locCycle (Ideal.span {x}) W ≠ 0 →
-      W.IsPrime ∧ W.height = 1 ∧ x ∈ W :=
+  have hmin1
+      : ∀ x : A,
+        x ≠ 0 → ∀ W : Ideal A, locCycle (Ideal.span {x}) W ≠ 0 → W.IsPrime ∧ W.height = 1 ∧ x ∈ W :=
     fun x hx W h => (h₃ A x hx W).mp (mem_minimalPrimes_of_locCycle_ne_zero' h)
-  have hpos : ∀ x : A, x ≠ 0 → ∀ p : Ideal A, p.IsPrime → p.height = 1 → x ∈ p →
-      locCycle (Ideal.span {x}) p ≠ 0 :=
+  have hpos
+      : ∀ x : A,
+        x ≠ 0 → ∀ p : Ideal A, p.IsPrime → p.height = 1 → x ∈ p → locCycle (Ideal.span {x}) p ≠ 0 :=
     fun x hx p hp h1 hxp => (h₂ A _ p ((h₃ A x hx p).mpr ⟨hp, h1, hxp⟩)).ne'
 
   have nb : ∀ p : Ideal A, p.IsPrime → p.height = 1 → v ∈ p → s ∉ p := by
@@ -53,18 +60,20 @@ theorem LocalCoeffLocal.proof (h₁ : LocCycleSpanMul.Statement.{u}) (h₂ : Loc
     have e := hno p (hpos s hs p hp h1 hsp)
     rw [hadd] at e
     exact hpos v hv p hp h1 hvp (by omega)
-  have hne : ∀ x : A, x ≠ 0 → ∀ p : Ideal A, x ∈ p → p ≠ ⊥ :=
-    fun x hx p hxp h => hx (by rw [h] at hxp; exact (Submodule.mem_bot A).mp hxp)
-  have hL : ∀ G : Ideal A, (locCycle (Ideal.span {f}) G - locCycle (Ideal.span {g}) G) *
-      locCycle (G ⊔ Ideal.span {s}) (IsLocalRing.maximalIdeal A) =
-      locCycle (Ideal.span {v}) G * locCycle (G ⊔ Ideal.span {s}) (IsLocalRing.maximalIdeal A) := by
+  have hne : ∀ x : A, x ≠ 0 → ∀ p : Ideal A, x ∈ p → p ≠ ⊥ := fun x hx p hxp h =>
+    hx (by rw [h] at hxp; exact (Submodule.mem_bot A).mp hxp)
+  have hL
+      : ∀ G : Ideal A,
+        (locCycle (Ideal.span {f}) G - locCycle (Ideal.span {g}) G)
+            * locCycle (G ⊔ Ideal.span {s}) (IsLocalRing.maximalIdeal A)
+          = locCycle (Ideal.span {v}) G
+            * locCycle (G ⊔ Ideal.span {s}) (IsLocalRing.maximalIdeal A) := by
     intro G
     rw [hadd]
     ring
   rw [finsum_congr hL, hcolon]
   by_cases hQ : ∃ Q : Ideal A, Q.IsPrime ∧ ⊥ < Q ∧ Q < IsLocalRing.maximalIdeal A
-  ·
-    obtain ⟨hd, -, hht⟩ := h₄ A hchain hQ
+  · obtain ⟨hd, -, hht⟩ := h₄ A hchain hQ
     obtain ⟨n₁, e₁, e₁'⟩ := h₅ A hd v s hv nb
     obtain ⟨n₂, e₂, e₂'⟩ := h₅ A hd s v hs (fun p hp h1 hsp hvp => nb p hp h1 hvp hsp)
     have hlen : Module.length A (A ⧸ Ideal.span {v, s}) ≠ ⊤ := by
@@ -84,19 +93,25 @@ theorem LocalCoeffLocal.proof (h₁ : LocCycleSpanMul.Statement.{u}) (h₂ : Loc
         have : IsArtinianRing (A ⧸ Ideal.span {v, s}) :=
           IsLocalRing.quotient_artinian_of_mem_minimalPrimes_of_isLocalRing _ hI
         have : IsArtinian A (A ⧸ Ideal.span {v, s}) :=
-          isArtinian_of_surjective_algebraMap (Ideal.Quotient.mk_surjective (I := Ideal.span {v, s}))
+          isArtinian_of_surjective_algebraMap (Ideal.Quotient.mk_surjective
+            (I := Ideal.span {v, s}))
         exact Module.length_ne_top
     have key := (lengthFormulaDimTwo A v s hd hv hs hlen).2.2
     rw [e₁', e₂'] at key
     rw [e₁, e₂, Nat.cast_inj.mp key]
-  ·
-    have hQ' : ∀ Q : Ideal A, Q.IsPrime → Q ≠ ⊥ → Q = IsLocalRing.maximalIdeal A := by
+  · have hQ' : ∀ Q : Ideal A, Q.IsPrime → Q ≠ ⊥ → Q = IsLocalRing.maximalIdeal A := by
       intro Q hQp h0
       by_contra hQm
-      exact hQ ⟨Q, hQp, bot_lt_iff_ne_bot.mpr h0,
-        lt_of_le_of_ne (IsLocalRing.le_maximalIdeal hQp.ne_top) hQm⟩
-    have zl : ∀ G : Ideal A, locCycle (Ideal.span {v}) G *
-        locCycle (G ⊔ Ideal.span {s}) (IsLocalRing.maximalIdeal A) = 0 := by
+      exact hQ ⟨
+        Q,
+        hQp,
+        bot_lt_iff_ne_bot.mpr h0,
+        lt_of_le_of_ne (IsLocalRing.le_maximalIdeal hQp.ne_top) hQm
+      ⟩
+    have zl
+        : ∀ G : Ideal A,
+          locCycle (Ideal.span {v}) G * locCycle (G ⊔ Ideal.span {s}) (IsLocalRing.maximalIdeal A)
+            = 0 := by
       intro G
       by_contra h
       obtain ⟨hGp, hG1, hvG⟩ := hmin1 v hv G (left_ne_zero_of_mul h)
@@ -106,8 +121,10 @@ theorem LocalCoeffLocal.proof (h₁ : LocCycleSpanMul.Statement.{u}) (h₂ : Loc
         rw [← hGm] at h'
         exact h' (Ideal.mem_sup_right (Ideal.mem_span_singleton_self s))
       exact nb G hGp hG1 hvG hsG
-    have zr : ∀ W : Ideal A, locCycle (Ideal.span {s}) W *
-        locCycle (W ⊔ Ideal.span {v}) (IsLocalRing.maximalIdeal A) = 0 := by
+    have zr
+        : ∀ W : Ideal A,
+          locCycle (Ideal.span {s}) W * locCycle (W ⊔ Ideal.span {v}) (IsLocalRing.maximalIdeal A)
+            = 0 := by
       intro W
       by_contra h
       obtain ⟨hWp, hW1, hsW⟩ := hmin1 s hs W (left_ne_zero_of_mul h)

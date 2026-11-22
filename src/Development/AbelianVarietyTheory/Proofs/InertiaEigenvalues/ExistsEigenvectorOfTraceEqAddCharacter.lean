@@ -113,8 +113,13 @@ private lemma false_of_trace_pow_eq_card_add_one_sub {L ι : Type} [Field L] [Ch
     exact_mod_cast htr
   omega
 
-theorem _root_.GlobalTheory.exists_eigenvector_of_trace_eq_add_character :
-    ∀ (K L Γ V ι : Type) [Field K] [Field L] [CharZero L] [Group Γ] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Fintype ι] [DecidableEq ι] (φ : K →+* L) (ρ : Representation K Γ V) (σ : Γ →* Matrix ι ι L) (χ : Γ →* Kˣ), ρ.IsSemisimpleRepresentation → (∀ g, φ (LinearMap.trace K V (ρ g)) = (σ g).trace + φ ((χ g : Kˣ) : K)) → ∃ v : V, v ≠ 0 ∧ ∀ g, ρ g v = ((χ g : Kˣ) : K) • v := by
+theorem _root_.GlobalTheory.exists_eigenvector_of_trace_eq_add_character
+    : ∀ (K L Γ V ι : Type) [Field K] [Field L] [CharZero L] [Group Γ] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Fintype ι] [DecidableEq ι] (φ : K →+* L) (ρ : Representation K Γ V)
+        (σ : Γ →* Matrix ι ι L) (χ : Γ →* Kˣ),
+      ρ.IsSemisimpleRepresentation
+        → (∀ g, φ (LinearMap.trace K V (ρ g)) = (σ g).trace + φ ((χ g : Kˣ) : K))
+        → ∃ v : V, v ≠ 0 ∧ ∀ g, ρ g v = ((χ g : Kˣ) : K) • v := by
   intro K L Γ V ι _ _ _ _ _ _ _ _ _ φ ρ σ χ hs htr
   by_contra hcon
   push_neg at hcon
@@ -126,13 +131,16 @@ theorem _root_.GlobalTheory.exists_eigenvector_of_trace_eq_add_character :
   let S : MonoidAlgebra K Γ →+* Matrix ι ι L :=
     MonoidAlgebra.liftNCRingHom ((Matrix.scalar ι).comp φ) σ
       (fun _ _ => Matrix.scalar_commute _ (fun _ => Commute.all _ _) _)
-  have hkey : ∀ z : MonoidAlgebra K Γ, φ (LinearMap.trace K V (ρ.asAlgebraHom z)) =
-      (S z).trace + φ (MonoidAlgebra.lift K K Γ ((Units.coeHom K).comp χ) z) := by
+  have hkey
+      : ∀ z : MonoidAlgebra K Γ,
+        φ (LinearMap.trace K V (ρ.asAlgebraHom z))
+          = (S z).trace + φ (MonoidAlgebra.lift K K Γ ((Units.coeHom K).comp χ) z) := by
     intro z
     refine MonoidAlgebra.induction_linear z ?_ ?_ ?_
     · simp
     · intro f g hf hg
-      simp only [map_add (f := _), Matrix.trace_add, hf, hg]; ring
+      simp only [map_add (f := _), Matrix.trace_add, hf, hg]
+      ring
     · intro g r
       rw [Representation.asAlgebraHom_single, map_smul, smul_eq_mul, map_mul, htr g]
       have hS : S (MonoidAlgebra.single g r) = Matrix.scalar ι (φ r) * σ g := by
@@ -144,7 +152,8 @@ theorem _root_.GlobalTheory.exists_eigenvector_of_trace_eq_add_character :
       ring
   have hdim := htr 1
   rw [map_one ρ, LinearMap.trace_one, map_natCast, map_one σ, Matrix.trace_one, map_one χ,
-    Units.val_one, map_one φ] at hdim
+      Units.val_one, map_one φ]
+    at hdim
   have hpow : ∀ n : ℕ, ((S x) ^ n).trace = ((Fintype.card ι : L) + 1) - 0 ^ n := by
     intro n
     have h1 := hkey (x ^ n)

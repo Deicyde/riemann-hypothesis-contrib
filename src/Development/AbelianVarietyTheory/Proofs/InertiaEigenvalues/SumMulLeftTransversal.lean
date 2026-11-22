@@ -6,10 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory.LeftTransversalSum
 
-theorem sum_mul_left_transversal {G M : Type} [Group G] [AddCommMonoid M] (H N : Subgroup G)
-    (S : Finset G) (hS : ∀ s ∈ S, s ∈ H) (huniq : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ N)
-    (f : G → M) (hf : ∀ (g n : G), n ∈ N → f (g * n) = f g) :
-    ∀ h ∈ H, ∑ s ∈ S, f (h * s) = ∑ s ∈ S, f s := by
+theorem sum_mul_left_transversal
+    {G M : Type} [Group G] [AddCommMonoid M]
+    (H N : Subgroup G) (S : Finset G)
+    (hS : ∀ s ∈ S, s ∈ H) (huniq : ∀ h ∈ H, ∃! s : G, s ∈ S ∧ s⁻¹ * h ∈ N)
+    (f : G → M) (hf : ∀ (g n : G), n ∈ N → f (g * n) = f g)
+    : ∀ h ∈ H, ∑ s ∈ S, f (h * s) = ∑ s ∈ S, f s := by
   intro h hh
   have hex : ∀ s : G, ∃ t : G, s ∈ S → t ∈ S ∧ t⁻¹ * (h * s) ∈ N := by
     intro s

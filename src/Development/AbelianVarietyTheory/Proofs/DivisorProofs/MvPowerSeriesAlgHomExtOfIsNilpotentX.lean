@@ -8,20 +8,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MvPowerSerie
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 namespace GlobalTheory
 
-theorem mvPowerSeries_algHom_ext_of_isNilpotent :
-    ∀ (k : Type) [CommRing k] (σ : Type) [Finite σ] (A : Type) [CommRing A] [Algebra k A],
-      ∀ φ ψ : MvPowerSeries σ k →ₐ[k] A, (∀ i, IsNilpotent (φ (X i))) →
-        (∀ i, φ (X i) = ψ (X i)) → φ = ψ := by
+theorem mvPowerSeries_algHom_ext_of_isNilpotent
+    : ∀ (k : Type) [CommRing k] (σ : Type) [Finite σ] (A : Type) [CommRing A] [Algebra k A],
+      ∀ φ ψ : MvPowerSeries σ k →ₐ[k] A,
+        (∀ i, IsNilpotent (φ (X i))) → (∀ i, φ (X i) = ψ (X i)) → φ = ψ := by
   intro k _ σ _ A _ _ φ ψ hφ h
   classical
   obtain ⟨N₁, h₁⟩ := GlobalTheory.mvPowerSeries_algHom_kill_high_order k σ A φ hφ
   obtain ⟨N₂, h₂⟩ := GlobalTheory.mvPowerSeries_algHom_kill_high_order k σ A ψ (fun i => h i ▸ hφ i)
-  have hp : φ.comp (MvPolynomial.coeToMvPowerSeries.algHom k) =
-      ψ.comp (MvPolynomial.coeToMvPowerSeries.algHom k) := by
+  have hp
+      : φ.comp (MvPolynomial.coeToMvPowerSeries.algHom k)
+        = ψ.comp (MvPolynomial.coeToMvPowerSeries.algHom k) := by
     apply MvPolynomial.algHom_ext
     intro i
     simp [h i]

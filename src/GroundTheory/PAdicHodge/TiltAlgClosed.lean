@@ -19,33 +19,37 @@ section Approximation
 
 variable {F : Type*} [NontriviallyNormedField F] [CompleteSpace F] [IsUltrametricDist F]
 
-theorem norm_coeff_rpow_le_norm_coeff_zero_rpow {L : Type*} [Field L] [Algebra F L]
-    [Algebra.IsAlgebraic F L] (β : L) {i : ℕ} (hi : i < (minpoly F β).natDegree) :
-    ‖(minpoly F β).coeff i‖ ^ (1 / ((minpoly F β).natDegree - i : ℝ)) ≤
-      ‖(minpoly F β).coeff 0‖ ^ (1 / (minpoly F β).natDegree : ℝ) := by
-  rw [← spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow, ← spectralValueTerms_of_lt_natDegree _ hi]
+theorem norm_coeff_rpow_le_norm_coeff_zero_rpow
+    {L : Type*} [Field L] [Algebra F L] [Algebra.IsAlgebraic F L]
+    (β : L)
+    {i : ℕ} (hi : i < (minpoly F β).natDegree)
+    : ‖(minpoly F β).coeff i‖ ^ (1 / ((minpoly F β).natDegree - i : ℝ))
+      ≤ ‖(minpoly F β).coeff 0‖ ^ (1 / (minpoly F β).natDegree : ℝ) := by
+  rw [← spectralNorm.spectralNorm_eq_norm_coeff_zero_rpow,
+    ← spectralValueTerms_of_lt_natDegree _ hi]
   exact le_ciSup (spectralValueTerms_bddAbove _) i
 
-theorem norm_coeff_comp_rpow_le {P : F[X]} (hmon : P.Monic) (hirr : Irreducible P) (x : F) {i : ℕ}
-    (hi : i < P.natDegree) :
-    ‖(P.comp (X + C x)).coeff i‖ ^ (1 / (P.natDegree - i : ℝ)) ≤
-      ‖P.eval x‖ ^ (1 / P.natDegree : ℝ) := by
-  obtain ⟨α, hα⟩ := IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure F) P
-    (degree_pos_of_irreducible hirr).ne'
+theorem norm_coeff_comp_rpow_le
+    {P : F[X]} (hmon : P.Monic) (hirr : Irreducible P) (x : F) {i : ℕ} (hi : i < P.natDegree)
+    : ‖(P.comp (X + C x)).coeff i‖ ^ (1 / (P.natDegree - i : ℝ))
+      ≤ ‖P.eval x‖ ^ (1 / P.natDegree : ℝ) := by
+  obtain ⟨α, hα⟩ :=
+    IsAlgClosed.exists_aeval_eq_zero (AlgebraicClosure F) P (degree_pos_of_irreducible hirr).ne'
   have hmin : minpoly F (α - algebraMap F (AlgebraicClosure F) x) = P.comp (X + C x) := by
     rw [minpoly.sub_algebraMap, ← minpoly.eq_of_irreducible_of_monic hirr hα hmon]
   have hdeg : (P.comp (X + C x)).natDegree = P.natDegree := by
     rw [natDegree_comp, natDegree_X_add_C, mul_one]
-  have h := norm_coeff_rpow_le_norm_coeff_zero_rpow (F := F) (L := AlgebraicClosure F)
-    (α - algebraMap F (AlgebraicClosure F) x) (i := i) (by rw [hmin, hdeg]; exact hi)
+  have h :=
+    norm_coeff_rpow_le_norm_coeff_zero_rpow (F := F) (L := AlgebraicClosure F)
+      (α - algebraMap F (AlgebraicClosure F) x) (i := i) (by rw [hmin, hdeg]; exact hi)
   rwa [hmin, hdeg, coeff_zero_eq_eval_zero, eval_comp, eval_add, eval_X, eval_C, zero_add] at h
 
 theorem isAlgClosed_of_exists_approx_root
     (hdiv : ∀ z : F, z ≠ 0 → ∀ n : ℕ, 0 < n → ∃ c : F, ‖c‖ ^ n = ‖z‖)
     {δ : ℝ} (hδ0 : 0 ≤ δ) (hδ1 : δ < 1)
-    (happrox : ∀ R : F[X], R.Monic → 0 < R.natDegree → (∀ i, ‖R.coeff i‖ ≤ 1) →
-      ∃ y : F, ‖y‖ ≤ 1 ∧ ‖R.eval y‖ ≤ δ) :
-    IsAlgClosed F := by
+    (happrox : ∀ R : F[X],
+      R.Monic → 0 < R.natDegree → (∀ i, ‖R.coeff i‖ ≤ 1) → ∃ y : F, ‖y‖ ≤ 1 ∧ ‖R.eval y‖ ≤ δ)
+    : IsAlgClosed F := by
   refine IsAlgClosed.of_exists_root _ fun P hmon hirr => ?_
   set d := P.natDegree with hd
   have hd0 : 0 < d := natDegree_pos_iff_degree_pos.2 (degree_pos_of_irreducible hirr)
@@ -72,8 +76,9 @@ theorem isAlgClosed_of_exists_approx_root
       have hdi : (d : ℝ) - i = ((d - i : ℕ) : ℝ) := by rw [Nat.cast_sub hi.le]
       rw [hdi, one_div] at h
       have hne : d - i ≠ 0 := by omega
-      calc ‖Q.coeff i‖ = (‖Q.coeff i‖ ^ (((d - i : ℕ) : ℝ)⁻¹)) ^ (d - i) :=
-            (Real.rpow_inv_natCast_pow (norm_nonneg _) hne).symm
+      calc
+        ‖Q.coeff i‖ = (‖Q.coeff i‖ ^ (((d - i : ℕ) : ℝ)⁻¹)) ^ (d - i) :=
+          (Real.rpow_inv_natCast_pow (norm_nonneg _) hne).symm
         _ ≤ ‖c‖ ^ (d - i) := pow_le_pow_left₀ (by positivity) h _
     set R := Q.scaleRoots c⁻¹ with hR
     have hRmon : R.Monic := (monic_scaleRoots_iff _).2 hQmon
@@ -122,15 +127,16 @@ theorem isAlgClosed_of_exists_approx_root
     have h2 : ‖f (s n) - s n‖ = (‖f (s n) - s n‖ ^ d) ^ (1 / d : ℝ) := by
       rw [one_div, Real.pow_rpow_inv_natCast (norm_nonneg _) hd0.ne']
     rw [h2]
-    calc (‖f (s n) - s n‖ ^ d) ^ (1 / d : ℝ) ≤ (δ ^ n * M) ^ (1 / d : ℝ) :=
-          Real.rpow_le_rpow (by positivity) h1 (by positivity)
+    calc
+      (‖f (s n) - s n‖ ^ d) ^ (1 / d : ℝ)
+        ≤ (δ ^ n * M) ^ (1 / d : ℝ) := Real.rpow_le_rpow (by positivity) h1 (by positivity)
       _ = M ^ (1 / d : ℝ) * r ^ n := by
-          rw [Real.mul_rpow (pow_nonneg hδ0 _) (norm_nonneg _), mul_comm ((δ ^ n) ^ (1 / d : ℝ))]
-          congr 1
-          rw [hr, ← Real.rpow_natCast δ n, ← Real.rpow_mul hδ0,
-            ← Real.rpow_natCast (δ ^ (1 / d : ℝ)) n, ← Real.rpow_mul hδ0]
-          congr 1
-          ring
+        rw [Real.mul_rpow (pow_nonneg hδ0 _) (norm_nonneg _), mul_comm ((δ ^ n) ^ (1 / d : ℝ))]
+        congr 1
+        rw [hr, ← Real.rpow_natCast δ n, ← Real.rpow_mul hδ0,
+          ← Real.rpow_natCast (δ ^ (1 / d : ℝ)) n, ← Real.rpow_mul hδ0]
+        congr 1
+        ring
   obtain ⟨L, hL⟩ := cauchySeq_tendsto_of_complete (cauchySeq_of_le_geometric r _ hr1 hdist)
   refine ⟨L, ?_⟩
   have hlim : Tendsto (fun n => P.eval (s n)) atTop (𝓝 (P.eval L)) :=
@@ -152,8 +158,8 @@ local notation "𝒪♭" => PreTilt (normInteger K) p
 local notation "K♭" => FractionRing 𝒪♭
 local notation "♮" x:arg => ((PreTilt.untilt x : normInteger K) : K)
 
-theorem exists_tilt_norm_pow_eq [IsAlgClosed K] (z : K♭) (hz : z ≠ 0) (n : ℕ) (hn : 0 < n) :
-    ∃ c : K♭, ‖c‖ ^ n = ‖z‖ := by
+theorem exists_tilt_norm_pow_eq [IsAlgClosed K] (z : K♭) (hz : z ≠ 0) (n : ℕ) (hn : 0 < n)
+    : ∃ c : K♭, ‖c‖ ^ n = ‖z‖ := by
   obtain ⟨w, hw⟩ := IsAlgClosed.exists_pow_nat_eq (tiltSharp (K := K) (p := p) z) hn
   have hw0 : w ≠ 0 := by
     rintro rfl
@@ -162,9 +168,11 @@ theorem exists_tilt_norm_pow_eq [IsAlgClosed K] (z : K♭) (hz : z ≠ 0) (n : �
   obtain ⟨c, hc⟩ := exists_tilt_norm_eq (p := p) hw0
   exact ⟨c, by rw [hc, ← norm_pow, hw, norm_tiltSharp]⟩
 
-theorem exists_approx_root_tilt [IsAlgClosed K] (a : 𝒪♭) (hp : ‖(p : K)‖ ≤ ‖♮a‖) (ha1 : ‖♮a‖ < 1)
-    (R : K♭[X]) (hmon : R.Monic) (hdeg : 0 < R.natDegree) (hR : ∀ i, ‖R.coeff i‖ ≤ 1) :
-    ∃ y : K♭, ‖y‖ ≤ 1 ∧ ‖R.eval y‖ ≤ ‖a‖ := by
+theorem exists_approx_root_tilt
+    [IsAlgClosed K]
+    (a : 𝒪♭) (hp : ‖(p : K)‖ ≤ ‖♮a‖) (ha1 : ‖♮a‖ < 1)
+    (R : K♭[X]) (hmon : R.Monic) (hdeg : 0 < R.natDegree) (hR : ∀ i, ‖R.coeff i‖ ≤ 1)
+    : ∃ y : K♭, ‖y‖ ≤ 1 ∧ ‖R.eval y‖ ≤ ‖a‖ := by
   have hinj : Function.Injective (algebraMap 𝒪♭ K♭) := IsFractionRing.injective 𝒪♭ K♭
 
   obtain ⟨R', hR'⟩ : R ∈ lifts (algebraMap 𝒪♭ K♭) :=
@@ -183,19 +191,23 @@ theorem exists_approx_root_tilt [IsAlgClosed K] (a : 𝒪♭) (hp : ‖(p : K)�
     exact absurd (h1.trans_lt ha1) (lt_irrefl _)
   set Qbar := R'.map φ with hQbar
   have hQbarmon : Qbar.Monic := hR'mon.map φ
-  have hQbardeg : Qbar.natDegree = R.natDegree := by
-    rw [hQbar, hR'mon.natDegree_map, hR'deg]
-  obtain ⟨Q, hQmap, hQdeg, hQmon⟩ := lifts_and_natDegree_eq_and_monic
-    (f := Ideal.Quotient.mk (Ideal.span {ϖ}))
-    (map_surjective _ Ideal.Quotient.mk_surjective Qbar) hQbarmon
+  have hQbardeg : Qbar.natDegree = R.natDegree := by rw [hQbar, hR'mon.natDegree_map, hR'deg]
+  obtain ⟨Q, hQmap, hQdeg, hQmon⟩ :=
+    lifts_and_natDegree_eq_and_monic (f := Ideal.Quotient.mk (Ideal.span {ϖ}))
+      (map_surjective _ Ideal.Quotient.mk_surjective Qbar) hQbarmon
 
-  obtain ⟨z, hz⟩ := IsAlgClosed.exists_root (Q.map (normInteger K).subtype) (by
-    rw [degree_eq_natDegree (hQmon.map _).ne_zero, natDegree_map_eq_of_injective
-      Subtype.val_injective, hQdeg, hQbardeg]
-    exact_mod_cast hdeg.ne')
-  have hzint : IsIntegral (normInteger K) z := ⟨Q, hQmon, by
-    rw [IsRoot.def, eval_map] at hz
-    exact hz⟩
+  obtain ⟨z, hz⟩ :=
+    IsAlgClosed.exists_root (Q.map (normInteger K).subtype) (by
+      rw [degree_eq_natDegree (hQmon.map _).ne_zero,
+        natDegree_map_eq_of_injective Subtype.val_injective, hQdeg, hQbardeg]
+      exact_mod_cast hdeg.ne')
+  have hzint : IsIntegral (normInteger K) z := ⟨
+    Q,
+    hQmon,
+    by
+      rw [IsRoot.def, eval_map] at hz
+      exact hz
+  ⟩
   have hzmem : z ∈ normInteger K := Valuation.Integers.mem_of_integral normInteger_integers hzint
   set z' : normInteger K := ⟨z, hzmem⟩
   have hQz : Q.eval z' = 0 := by
@@ -218,8 +230,9 @@ theorem exists_approx_root_tilt [IsAlgClosed K] (a : 𝒪♭) (hp : ‖(p : K)�
     exact hker
 
 instance isAlgClosed_tilt [IsAlgClosed K] : IsAlgClosed K♭ := by
-  obtain ⟨ϖ, h1, h2⟩ := IsPerfectoidField.exists_norm_mem_Ioo (K := K) (p := p) ‖(p : K)‖
-    IsPerfectoidField.norm_natCast_lt_one
+  obtain ⟨ϖ, h1, h2⟩ :=
+    IsPerfectoidField.exists_norm_mem_Ioo (K := K) (p := p) ‖(p : K)‖
+      IsPerfectoidField.norm_natCast_lt_one
   obtain ⟨a, ha⟩ := exists_norm_untilt_eq (p := p) ⟨ϖ, mem_normInteger.2 h2.le⟩ h1
   have hp : ‖(p : K)‖ ≤ ‖♮a‖ := by rw [ha]; exact h1.le
   have ha1 : ‖♮a‖ < 1 := by rw [ha]; exact h2

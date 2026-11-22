@@ -81,14 +81,24 @@ theorem Step_of : LateralTheory.EtaleTrace.Cov.Step := by
     rw [this]
     exact mul_ne_zero ((map_ne_zero _).mpr (inv_ne_zero hcl)) hcs
   set w : Fin n → K := fun j => v j.castSucc - algebraMap k K (d j.castSucc) * v (Fin.last n) with hw
-  have hjw : ∀ j, LateralTheory.EtaleTrace.Cov.jet k w j =
-      LateralTheory.EtaleTrace.Cov.jet k v j.castSucc - algebraMap k K (d j.castSucc) • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) := by
+  have hjw
+      : ∀ j,
+        LateralTheory.EtaleTrace.Cov.jet k w j
+          = LateralTheory.EtaleTrace.Cov.jet k v j.castSucc
+            - algebraMap k K (d j.castSucc)
+              • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) := by
     intro j
     exact jet_sub _ _ _
-  have h1 : ∀ j : Fin n, LateralTheory.EtaleTrace.Cov.jet k v j.castSucc =
-      LateralTheory.EtaleTrace.Cov.jet k w j + algebraMap k K (d j.castSucc) • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) := by
+  have h1
+      : ∀ j : Fin n,
+        LateralTheory.EtaleTrace.Cov.jet k v j.castSucc
+          = LateralTheory.EtaleTrace.Cov.jet k w j
+            + algebraMap k K (d j.castSucc)
+              • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) := by
     intro j; rw [hjw]; abel
-  have hlast : s • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) = -(∑ j : Fin n, a j.castSucc • LateralTheory.EtaleTrace.Cov.jet k w j) := by
+  have hlast
+      : s • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n)
+        = -(∑ j : Fin n, a j.castSucc • LateralTheory.EtaleTrace.Cov.jet k w j) := by
     have hs : s = ∑ j : Fin n, a j.castSucc * algebraMap k K (d j.castSucc) + a (Fin.last n) := by
       rw [hsdef, Fin.sum_univ_castSucc, hdl, map_one, mul_one]
     rw [Fin.sum_univ_castSucc] at ha
@@ -106,8 +116,11 @@ theorem Step_of : LateralTheory.EtaleTrace.Cov.Step := by
       rw [hjw]
       exact Submodule.sub_mem _ (Submodule.subset_span ⟨_, rfl⟩)
         (Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩))
-    · have hL : LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) ∈ Submodule.span K (Set.range (LateralTheory.EtaleTrace.Cov.jet k w)) := by
-        have : LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n) = s⁻¹ • (s • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n)) := by
+    · have hL
+          : LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n)
+            ∈ Submodule.span K (Set.range (LateralTheory.EtaleTrace.Cov.jet k w)) := by
+        have : LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n)
+            = s⁻¹ • (s • LateralTheory.EtaleTrace.Cov.jet k v (Fin.last n)) := by
           rw [smul_smul, inv_mul_cancel₀ hs0, one_smul]
         rw [this, hlast]
         refine Submodule.smul_mem _ _ (Submodule.neg_mem _ (Submodule.sum_mem _ fun j _ => ?_))
@@ -128,13 +141,13 @@ theorem Step_of : LateralTheory.EtaleTrace.Cov.Step := by
       change O.subtype (eval₂ ι U F) = 0
       rw [h]
       have h2 : O.subtype.comp ι = algebraMap k K := by ext x; rfl
-      have h3 : (O.subtype ∘ U) = fun j => (v i)⁻¹ * v j := by
-        funext j; simp [U, div_eq_inv_mul]
+      have h3 : (O.subtype ∘ U) = fun j => (v i)⁻¹ * v j := by funext j; simp [U, div_eq_inv_mul]
       rw [h2, h3, eval₂_mul_left _ _ _ hFh, ← aeval_def, hFv, mul_zero]
     let W : Fin n → O := fun l => U l.castSucc - ι (d l.castSucc) * U (Fin.last n)
     have hWv : ∀ l, (W l : K) = w l / v i := by
       intro l
-      simp only [W, U, ι, hw, AddSubgroupClass.coe_sub, MulMemClass.coe_mul, RingHom.codRestrict_apply]
+      simp only [W, U, ι, hw, AddSubgroupClass.coe_sub, MulMemClass.coe_mul,
+        RingHom.codRestrict_apply]
       ring
     by_contra hcon
     push Not at hcon
@@ -146,13 +159,14 @@ theorem Step_of : LateralTheory.EtaleTrace.Cov.Step := by
       have hval : w l / v i * (y : K) = 1 := by
         rw [← hWv]
         exact congrArg Subtype.val hy
-      have hwl : w l ≠ 0 := by
-        intro h0; rw [h0, zero_div, zero_mul] at hval; exact zero_ne_one hval
+      have hwl : w l ≠ 0 := by intro h0; rw [h0, zero_div, zero_mul] at hval; exact zero_ne_one hval
       obtain ⟨j, hj⟩ := hcon l hwl
       apply hj
       have : v j / w l = v j / v i * (y : K) := by
         rw [eq_comm, eq_div_iff hwl]
-        calc v j / v i * (y : K) * w l = v j * (w l / v i * (y : K)) := by ring
+        calc
+          v j / v i * (y : K) * w l
+            = v j * (w l / v i * (y : K)) := by ring
           _ = v j := by rw [hval, mul_one]
       rw [this]
       exact O.mul_mem (hvO j) y.2

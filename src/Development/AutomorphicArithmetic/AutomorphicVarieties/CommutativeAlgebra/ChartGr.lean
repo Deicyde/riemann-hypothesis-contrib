@@ -32,8 +32,11 @@ private lemma lin_coeff_sq {O R K τ : Type} [CommRing O] [CommRing R] [Algebra 
   rw [Finsupp.degree_single]
   exact lt_of_lt_of_le (by norm_num) hord
 
-theorem UpperTheory.V.Alg.chart_gr :
-    ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R] [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) [Module.Free ℤ X] [Module.Finite ℤ X] (τ : Type) (wt : τ → X) (φ : R →ₐ[O] MvPowerSeries τ (FractionRing O)), IsChart W.part (W.origin h) wt φ → IsChart W.gr (W.originA h) wt (φ.comp W.A.val) := by
+theorem UpperTheory.V.Alg.chart_gr
+    : ∀ (O X R : Type) [CommRing O] [IsDomain O] [AddCommGroup X] [DecidableEq X] [CommRing R]
+        [Algebra O R] (W : WPres O X R) (h : W.HasOrigin) [Module.Free ℤ X] [Module.Finite ℤ X]
+        (τ : Type) (wt : τ → X) (φ : R →ₐ[O] MvPowerSeries τ (FractionRing O)),
+      IsChart W.part (W.origin h) wt φ → IsChart W.gr (W.originA h) wt (φ.comp W.A.val) := by
   intro O X R _ _ _ _ _ _ W h _ _ τ wt φ hφ
   obtain ⟨hk, hsurj⟩ := ker_pow O R X W h 2
   refine ⟨?_, ?_, ?_, ?_⟩
@@ -44,10 +47,11 @@ theorem UpperTheory.V.Alg.chart_gr :
   · intro i
     obtain ⟨g, hg1, hg2⟩ := hφ.onto i
     obtain ⟨y, hy⟩ := hsurj g
-    have hd : ∀ i', coeff (Finsupp.single i' 1) (φ (g - y)) = 0 :=
-      fun i' => lin_coeff_sq (W.origin h) φ hφ.const i' _ hy
-    have he : ∀ i', coeff (Finsupp.single i' 1) ((φ.comp W.A.val) y) =
-        coeff (Finsupp.single i' 1) (φ g) := by
+    have hd : ∀ i', coeff (Finsupp.single i' 1) (φ (g - y)) = 0 := fun i' =>
+      lin_coeff_sq (W.origin h) φ hφ.const i' _ hy
+    have he
+        : ∀ i',
+          coeff (Finsupp.single i' 1) ((φ.comp W.A.val) y) = coeff (Finsupp.single i' 1) (φ g) := by
       intro i'
       have := hd i'
       rw [map_sub, map_sub, sub_eq_zero] at this

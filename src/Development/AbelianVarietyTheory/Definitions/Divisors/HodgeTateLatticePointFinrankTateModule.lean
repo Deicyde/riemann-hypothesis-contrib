@@ -21,19 +21,27 @@ noncomputable section
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct NNReal
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Pdiv ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.ChTor GlobalTheory.EigenSplit
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.HTLat
 
-abbrev embC (C : Type) [Field C] {O : Type} [CommRing O] [Algebra O C] {Λ : Type} [CommRing Λ]
-    {J : Type} (σ : J → Λ →+* O) : J → Λ →+* C := fun i => (algebraMap O C).comp (σ i)
+abbrev embC
+    (C : Type) [Field C]
+    {O : Type} [CommRing O] [Algebra O C]
+    {Λ : Type} [CommRing Λ]
+    {J : Type} (σ : J → Λ →+* O)
+    : J → Λ →+* C := fun i =>
+  (algebraMap O C).comp (σ i)
 
 section Independence
 
-variable {O C : Type} [CommRing O] [Field C] [Algebra O C]
-  {U : Type} [AddCommGroup U] [Module C U] [Module O U] [IsScalarTower O C U] {N : ℕ}
+variable
+  {O C : Type} [CommRing O] [Field C] [Algebra O C]
+  {U : Type} [AddCommGroup U] [Module C U] [Module O U] [IsScalarTower O C U]
+  {N : ℕ}
   (v : Valuation C ℝ≥0)
 
 variable {U' : Type} [AddCommGroup U'] [Module C U'] [Module O U'] [IsScalarTower O C U']
@@ -42,17 +50,21 @@ end Independence
 
 namespace Point
 
-variable {p : ℕ} [Fact p.Prime] {C : Type} [Field C] {v : Valuation C ℝ≥0} {O : Type} [CommRing O]
-  [Algebra O C] {Λ : Type} [CommRing Λ] [StarRing Λ] (P : Point p v O Λ)
+variable
+  {p : ℕ} [Fact p.Prime]
+  {C : Type} [Field C]
+  {v : Valuation C ℝ≥0} {O : Type} [CommRing O] [Algebra O C]
+  {Λ : Type} [CommRing Λ] [StarRing Λ]
+  (P : Point p v O Λ)
 
 section Free
 
 variable [IsAlgClosed C] [CharZero C]
 
-theorem card_torsion (n : ℕ) :
-    Nat.card {x : Pts P.A.A // x ^ p ^ n = 1} = p ^ (2 * P.A.g * n) := by
-  have h := (GlobalTheory.firstFiveLaws.1.mulN (Sp C) P.A (p ^ n) (one_le_ppow p n)).2.2.2.2 C (𝟙 _)
-    (Nat.cast_ne_zero.2 (pow_ne_zero _ (Fact.out : p.Prime).ne_zero))
+theorem card_torsion (n : ℕ) : Nat.card {x : Pts P.A.A // x ^ p ^ n = 1} = p ^ (2 * P.A.g * n) := by
+  have h :=
+    (GlobalTheory.firstFiveLaws.1.mulN (Sp C) P.A (p ^ n) (one_le_ppow p n)).2.2.2.2 C (𝟙 _)
+      (Nat.cast_ne_zero.2 (pow_ne_zero _ (Fact.out : p.Prime).ne_zero))
   rw [← pow_mul, mul_comm n] at h
   exact h
 
@@ -92,11 +104,11 @@ variable [IsAlgClosed C] [CharZero C]
 
 def pairV : LinearMap.BilinForm C P.V := (pairT P.A P.eps).baseChange C
 
-theorem pairV_tmul (c d : C) (s t : P.T) :
-    P.pairV (c ⊗ₜ s) (d ⊗ₜ t) = pairT P.A P.eps s t • (c * d) := rfl
+theorem pairV_tmul (c d : C) (s t : P.T)
+    : P.pairV (c ⊗ₜ s) (d ⊗ₜ t) = pairT P.A P.eps s t • (c * d) :=
+  rfl
 
-theorem pairV_act (a : Λ) (x y : P.V) :
-    P.pairV (P.actV a x) y = P.pairV x (P.actV (star a) y) := by
+theorem pairV_act (a : Λ) (x y : P.V) : P.pairV (P.actV a x) y = P.pairV x (P.actV (star a) y) := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | add x x' hx hx' => simp only [map_add (f := _), LinearMap.add_apply, hx, hx']
@@ -106,22 +118,24 @@ theorem pairV_act (a : Λ) (x y : P.V) :
     | add y y' hy hy' => simp only [map_add (f := _), hy, hy']
     | tmul d t => exact congrArg (· • (c * d)) (pairT_act P.oA P.eps a s t)
 
-theorem exists_dual_bases : ∃ (n : ℕ) (e s : Module.Basis (Fin n) ℤ_[p] P.T),
-    (∀ i t, pairT P.A P.eps (s i) t = e.repr t i) ∧
-      ∀ (w : P.V) (j : Fin n), (s.baseChange C).repr w j = P.pairV w (1 ⊗ₜ e j) := by
+theorem exists_dual_bases
+    : ∃ (n : ℕ) (e s : Module.Basis (Fin n) ℤ_[p] P.T),
+      (∀ i t, pairT P.A P.eps (s i) t = e.repr t i)
+        ∧ ∀ (w : P.V) (j : Fin n), (s.baseChange C).repr w j = P.pairV w (1 ⊗ₜ e j) := by
   let e := Module.finBasis ℤ_[p] P.T
   let q := LinearEquiv.ofBijective _ P.pairT_bijective
   let s := e.dualBasis.map q.symm
   have h1 : ∀ i t, pairT P.A P.eps (s i) t = e.repr t i := fun i t =>
     (LinearMap.congr_fun (q.apply_symm_apply (e.dualBasis i)) t).trans (e.dualBasis_apply i t)
   refine ⟨_, e, s, h1, fun w j => ?_⟩
-  have : (s.baseChange C).coord j = P.pairV.flip (1 ⊗ₜ e j) := (s.baseChange C).ext fun i => by
-    rw [Module.Basis.coord_apply, Module.Basis.repr_self, Module.Basis.baseChange_apply]
-    change _ = P.pairV (1 ⊗ₜ s i) (1 ⊗ₜ e j)
-    rw [pairV_tmul, h1, Module.Basis.repr_self, Finsupp.single_apply, Finsupp.single_apply]
-    by_cases h : i = j
-    · simp [h]
-    · simp [h, Ne.symm h]
+  have : (s.baseChange C).coord j = P.pairV.flip (1 ⊗ₜ e j) :=
+    (s.baseChange C).ext fun i => by
+      rw [Module.Basis.coord_apply, Module.Basis.repr_self, Module.Basis.baseChange_apply]
+      change _ = P.pairV (1 ⊗ₜ s i) (1 ⊗ₜ e j)
+      rw [pairV_tmul, h1, Module.Basis.repr_self, Finsupp.single_apply, Finsupp.single_apply]
+      by_cases h : i = j
+      · simp [h]
+      · simp [h, Ne.symm h]
   exact LinearMap.congr_fun this w
 
 theorem existsUnique_pairV (l : P.T →ₗ[ℤ_[p]] C) : ∃! w : P.V, ∀ t, P.pairV w (1 ⊗ₜ t) = l t := by
@@ -129,15 +143,16 @@ theorem existsUnique_pairV (l : P.T →ₗ[ℤ_[p]] C) : ∃! w : P.V, ∀ t, P.
   refine ⟨∑ i, l (e i) ⊗ₜ s i, fun t => ?_, fun w hw => ?_⟩
   · conv_rhs => rw [← e.sum_repr t]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, pairV_tmul, h1, map_smul, _root_.mul_one]
+    simp only [map_sum, LinearMap.sum_apply, pairV_tmul, h1, map_smul, _root_.mul_one]
   · conv_lhs => rw [← (s.baseChange C).sum_repr w]
     refine Finset.sum_congr rfl fun i _ => ?_
-    rw [h2, hw, Module.Basis.baseChange_apply, TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
+    rw [h2, hw, Module.Basis.baseChange_apply, TensorProduct.smul_tmul', smul_eq_mul,
+      _root_.mul_one]
 
-theorem eq_of_pairV {w w' : P.V} (h : ∀ t : P.T, P.pairV w (1 ⊗ₜ t) = P.pairV w' (1 ⊗ₜ t)) :
-    w = w' :=
-  (P.existsUnique_pairV (((P.pairV w').restrictScalars ℤ_[p]) ∘ₗ TensorProduct.mk ℤ_[p] C _ 1)).unique
-    h fun _ => rfl
+theorem eq_of_pairV {w w' : P.V} (h : ∀ t : P.T, P.pairV w (1 ⊗ₜ t) = P.pairV w' (1 ⊗ₜ t))
+    : w = w' :=
+  (P.existsUnique_pairV
+    (((P.pairV w').restrictScalars ℤ_[p]) ∘ₗ TensorProduct.mk ℤ_[p] C _ 1)).unique h fun _ => rfl
 
 end Pairing
 
@@ -151,8 +166,7 @@ theorem inclT_tmul (c : O) (t : P.T) : P.inclT (c ⊗ₜ t) = algebraMap O C c �
   rw [inclT, LinearMap.liftBaseChange_tmul, TensorProduct.mk_apply, TensorProduct.smul_tmul',
     Algebra.algebraMap_eq_smul_one]
 
-theorem one_tmul_mem_latT (t : P.T) : (1 : C) ⊗ₜ t ∈ P.latT :=
-  ⟨1 ⊗ₜ t, by rw [inclT_tmul, map_one]⟩
+theorem one_tmul_mem_latT (t : P.T) : (1 : C) ⊗ₜ t ∈ P.latT := ⟨1 ⊗ₜ t, by rw [inclT_tmul, map_one]⟩
 
 variable {J : Type} [DecidableEq J] {σ : J → Λ →+* O} (h : IsSplitting (embC C σ))
 
@@ -173,8 +187,8 @@ theorem fg_latT : P.latT.FG := Module.Finite.iff_fg.1 (Module.Finite.range P.inc
 
 theorem fg_latTQuot (i : J) : (P.latTQuot h i).FG := P.fg_latT.map _
 
-theorem mem_latT_iff (w : P.V) :
-    w ∈ P.latT ↔ ∀ t : P.T, ∃ c : O, algebraMap O C c = P.pairV w (1 ⊗ₜ t) := by
+theorem mem_latT_iff (w : P.V)
+    : w ∈ P.latT ↔ ∀ t : P.T, ∃ c : O, algebraMap O C c = P.pairV w (1 ⊗ₜ t) := by
   constructor
   · rintro ⟨x, rfl⟩ t
     induction x using TensorProduct.induction_on with
@@ -182,7 +196,10 @@ theorem mem_latT_iff (w : P.V) :
     | add x y hx hy =>
       obtain ⟨c, hc⟩ := hx
       obtain ⟨d, hd⟩ := hy
-      exact ⟨c + d, by rw [map_add (f := _), map_add (f := _), map_add (f := _), LinearMap.add_apply, hc, hd]⟩
+      exact ⟨
+        c + d,
+        by rw [map_add (f := _), map_add (f := _), map_add (f := _), LinearMap.add_apply, hc, hd]
+      ⟩
     | tmul c s =>
       refine ⟨pairT P.A P.eps s t • c, ?_⟩
       rw [inclT_tmul, pairV_tmul, _root_.mul_one, Algebra.smul_def, Algebra.smul_def, map_mul,
@@ -195,13 +212,13 @@ theorem mem_latT_iff (w : P.V) :
     rw [h2, ← hc, algebraMap_smul, Module.Basis.baseChange_apply]
     exact Submodule.smul_mem _ c (P.one_tmul_mem_latT _)
 
-variable [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
+variable [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
 
 def alC : P.V →ₗ[C] P.OmC := (P.inclOm.restrictScalars ℤ_[p] ∘ₗ P.al₀).liftBaseChange C
 
 theorem alC_tmul (c : C) (t : P.T) : P.alC (c ⊗ₜ t) = c ⊗ₜ P.al₀ t := by
-  rw [alC, LinearMap.liftBaseChange_tmul, LinearMap.comp_apply, LinearMap.restrictScalars_apply, inclOm,
-    TensorProduct.mk_apply, TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
+  rw [alC, LinearMap.liftBaseChange_tmul, LinearMap.comp_apply, LinearMap.restrictScalars_apply,
+    inclOm, TensorProduct.mk_apply, TensorProduct.smul_tmul', smul_eq_mul, _root_.mul_one]
 
 theorem alC_inclT (x : O ⊗[ℤ_[p]] P.T) : P.alC (P.inclT x) = P.inclOm (P.al x) := by
   induction x using TensorProduct.induction_on with
@@ -211,31 +228,30 @@ theorem alC_inclT (x : O ⊗[ℤ_[p]] P.T) : P.alC (P.inclT x) = P.inclOm (P.al 
     rw [inclT_tmul, alC_tmul, al_tmul, inclOm, TensorProduct.mk_apply, TensorProduct.tmul_smul,
       TensorProduct.smul_tmul', Algebra.algebraMap_eq_smul_one]
 
-
 def evalAl (x : LieG P.Gt) : P.T →ₗ[ℤ_[p]] C :=
   (Algebra.linearMap O C ∘ₗ LinearMap.proj x ∘ₗ (omega P.Gt).subtype).restrictScalars ℤ_[p] ∘ₗ P.al₀
 
 def bLie (x : LieG P.Gt) : P.V := (P.existsUnique_pairV (P.evalAl x)).choose
 
-theorem pairV_bLie (x : LieG P.Gt) (t : P.T) :
-    P.pairV (P.bLie x) (1 ⊗ₜ t) = algebraMap O C ((P.al₀ t).1 x) :=
+theorem pairV_bLie (x : LieG P.Gt) (t : P.T)
+    : P.pairV (P.bLie x) (1 ⊗ₜ t) = algebraMap O C ((P.al₀ t).1 x) :=
   (P.existsUnique_pairV (P.evalAl x)).choose_spec.1 t
 
 theorem bLie_add (x y : LieG P.Gt) : P.bLie (lieAdd x y) = P.bLie x + P.bLie y :=
   P.eq_of_pairV fun t => by
-    rw [map_add (f := _), LinearMap.add_apply, pairV_bLie, pairV_bLie, pairV_bLie, omega_lieAdd, map_add (f := _)]
+    rw [map_add (f := _), LinearMap.add_apply, pairV_bLie, pairV_bLie, pairV_bLie, omega_lieAdd,
+      map_add (f := _)]
 
 theorem bLie_zero : P.bLie (lieZero P.Gt) = 0 :=
-  P.eq_of_pairV fun t => by
-    rw [pairV_bLie, omega_lieZero, map_zero, map_zero, LinearMap.zero_apply]
+  P.eq_of_pairV fun t => by rw [pairV_bLie, omega_lieZero, map_zero, map_zero, LinearMap.zero_apply]
 
 theorem bLie_scale (c : O) (x : LieG P.Gt) : P.bLie (AvDefs.lieScale P.Gt c x) = c • P.bLie x :=
   P.eq_of_pairV fun t => by
     rw [← algebraMap_smul C c, map_smul, LinearMap.smul_apply, pairV_bLie, pairV_bLie,
       omega_lieScale, map_mul, smul_eq_mul]
 
-theorem bLie_act (a : Λ) (x : LieG P.Gt) :
-    P.bLie (AvDefs.lieAct P.Gt P.oGt a x) = P.actV a (P.bLie x) :=
+theorem bLie_act (a : Λ) (x : LieG P.Gt)
+    : P.bLie (AvDefs.lieAct P.Gt P.oGt a x) = P.actV a (P.bLie x) :=
   P.eq_of_pairV fun t => by
     rw [pairV_act, pairV_bLie]
     change _ = P.pairV _ (1 ⊗ₜ P.actT (star a) t)
@@ -268,8 +284,7 @@ theorem latLie_le_latT : P.latLie ≤ P.latT := by
   rintro _ ⟨x, rfl⟩
   exact P.bLie_mem_latT x
 
-theorem wRec_le (τ : Λ →+* O) :
-    P.wRec τ ≤ eigSubLat P.actV ((algebraMap O C).comp τ) P.latLie := by
+theorem wRec_le (τ : Λ →+* O) : P.wRec τ ≤ eigSubLat P.actV ((algebraMap O C).comp τ) P.latLie := by
   rintro _ ⟨x, rfl⟩
   refine ⟨⟨x.1, rfl⟩, mem_eigenSub.2 fun a => ?_⟩
   rw [← bLie_act, x.2 a, bLie_scale, RingHom.comp_apply, algebraMap_smul]
@@ -279,22 +294,24 @@ theorem wRec_le_latTSub (τ : Λ →+* O) : P.wRec τ ≤ P.latTSub τ :=
 
 variable {P} {N j : ℕ}
 
-
 end Point
 
 section Inhabitants
 
-variable {p : ℕ} [Fact p.Prime] {C : Type} [Field C] {v : Valuation C ℝ≥0} {O : Type} [CommRing O]
-  [Algebra O C] {Λ : Type} [CommRing Λ] [StarRing Λ]
+variable
+  {p : ℕ} [Fact p.Prime]
+  {C : Type} [Field C]
+  {v : Valuation C ℝ≥0} {O : Type} [CommRing O] [Algebra O C]
+  {Λ : Type} [CommRing Λ] [StarRing Λ]
 
-theorem exists_oAct_polPull {S S' : Scheme.{0}} (f : S' ⟶ S) (B : Out.PolAV S) (o : B.OAct Λ) :
-    ∃ o' : (StrictPull.polPull B f).OAct Λ, ∀ a, (o'.act a).left ≫ pullback.fst B.A.hom f =
-      pullback.fst B.A.hom f ≫ (o.act a).left :=
+theorem exists_oAct_polPull {S S' : Scheme.{0}} (f : S' ⟶ S) (B : Out.PolAV S) (o : B.OAct Λ)
+    : ∃ o' : (StrictPull.polPull B f).OAct Λ, ∀ a,
+      (o'.act a).left ≫ pullback.fst B.A.hom f = pullback.fst B.A.hom f ≫ (o.act a).left :=
   polOActPull _ _ f B (StrictPull.polPull B f) _ (isGrpPullback_pullback B.A f)
     (PolBaseChange.lbIso_refl (StrictPull.polPull B f).isLB) Λ o
 
-def ofGoodReduction (hv : v.Integers O) (ε : Eps p C) (B : Out.PolAV (Sp O)) (o : B.OAct Λ) :
-    Point p v O Λ where
+def ofGoodReduction (hv : v.Integers O) (ε : Eps p C) (B : Out.PolAV (Sp O)) (o : B.OAct Λ)
+    : Point p v O Λ where
   integers := hv
   eps := ε
   A := StrictPull.polPull B (spMap (algebraMap O C))

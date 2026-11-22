@@ -8,34 +8,44 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.LcscAdeli
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
 
 namespace GlobalTheory.CompanionTheory.SW
 
-theorem latV_compact_open_mass : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ (n M : ℕ) (v : HeightOneSpectrum (𝓞 F)), IsCompact (latV (M := M) (n := n) b v) ∧ IsOpen (latV (M := M) (n := n) b v) ∧ (0 : Fin n → Fin M → Fv F v ⊗[F] E) ∈ latV b v ∧ ∀ lam : Measure (Fv F v), IsStdV v lam → coordW (Fv F v) b lam n M (latV b v) = 1 := by
+theorem latV_compact_open_mass
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), ∀ (n M : ℕ) (v : HeightOneSpectrum (𝓞 F)),
+          IsCompact (latV (M := M) (n := n) b v) ∧ IsOpen (latV (M := M) (n := n) b v)
+            ∧ (0 : Fin n → Fin M → Fv F v ⊗[F] E) ∈ latV b v
+            ∧ ∀ lam : Measure (Fv F v),
+              IsStdV v lam → coordW (Fv F v) b lam n M (latV b v) = 1 := by
   intro F E _ _ _ _ _ σ hσ d b n M v
   obtain ⟨i1, i2, i3, i4, -⟩ := GlobalTheory.T.completion_is_local_ring F v
   obtain ⟨-, -, -, -, -, -, hH, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ (Fv F v)
-  let f : Fv F v ⊗[F] E → Fin d → Fv F v :=
-    fun y k => (Algebra.TensorProduct.basis (Fv F v) b).repr y k
+  let f : Fv F v ⊗[F] E → Fin d → Fv F v := fun y k =>
+    (Algebra.TensorProduct.basis (Fv F v) b).repr y k
   let e : (Fv F v ⊗[F] E) ≃ₜ (Fin d → Fv F v) := (hH d b).homeomorph f
   have hef : ∀ y, e y = f y := fun _ => rfl
   let O : Set (Fv F v) := (v.adicCompletionIntegers F : Set (Fv F v))
   have hOo : IsOpen O := Valued.isOpen_valuationSubring _
   have hOc : IsCompact O :=
-    isCompact_iff_compactSpace.2 (GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers F v)
+    isCompact_iff_compactSpace.2 (GlobalTheory.AdelicUnitaryTop.compactSpace_adicCompletionIntegers
+      F v)
   let P : Set (Fin d → Fv F v) := Set.pi Set.univ fun _ => O
   let B : Set (Fv F v ⊗[F] E) := e ⁻¹' P
-  have hBc : IsCompact B :=
-    (Homeomorph.isCompact_preimage e).2 (isCompact_univ_pi fun _ => hOc)
+  have hBc : IsCompact B := (Homeomorph.isCompact_preimage e).2 (isCompact_univ_pi fun _ => hOc)
   have hBo : IsOpen B :=
     (Homeomorph.isOpen_preimage e).2 (isOpen_set_pi Set.finite_univ fun _ _ => hOo)
   have hlat : latV (M := M) (n := n) b v = Set.pi Set.univ fun _ => Set.pi Set.univ fun _ => B := by
     ext Y
-    simp only [latV, Set.mem_setOf_eq, Set.mem_pi, Set.mem_univ, true_implies, B, P, Set.mem_preimage]
+    simp only [latV, Set.mem_setOf_eq, Set.mem_pi, Set.mem_univ, true_implies, B, P,
+      Set.mem_preimage]
     rfl
   refine ⟨?_, ?_, ?_, ?_⟩
   · rw [hlat]

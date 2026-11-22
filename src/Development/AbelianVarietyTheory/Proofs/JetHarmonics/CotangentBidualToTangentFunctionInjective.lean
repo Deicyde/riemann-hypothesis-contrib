@@ -14,7 +14,8 @@ open IsLocalRing ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.Cha
 
 namespace GlobalTheory.HodgeTateCompare
 
-open GlobalTheory.IndefiniteRowSideFullHecke.HodgeTateCharacterSystems GlobalTheory.TangentPow GlobalTheory.GmPoints GlobalTheory.HodgeTateImage
+open GlobalTheory.IndefiniteRowSideFullHecke.HodgeTateCharacterSystems GlobalTheory.TangentPow
+  GlobalTheory.GmPoints GlobalTheory.HodgeTateImage
 
 noncomputable section
 
@@ -22,15 +23,17 @@ section Tangent
 
 variable {O : Type} [CommRing O] [IsLocalRing O] (G : Over (Spec (CommRingCat.of O))) [GrpObj G]
 
-def locIncl : specO O (LocRing G) ⟶ G :=
-  Over.homMk (fromLoc G) (spec_strMap G).symm
+def locIncl : specO O (LocRing G) ⟶ G := Over.homMk (fromLoc G) (spec_strMap G).symm
 
 variable {G}
 
-theorem ptMap_locIncl_injective {R : Type} [CommRing R] [Algebra O R]
-    {φ ψ : LocRing G →ₐ[O] R} (h : ptMap φ ≫ locIncl G = ptMap ψ ≫ locIncl G) : φ = ψ := by
-  have h1 : Spec.map (CommRingCat.ofHom φ.toRingHom) ≫ G.left.fromSpecStalk (origin G) =
-      Spec.map (CommRingCat.ofHom ψ.toRingHom) ≫ G.left.fromSpecStalk (origin G) :=
+theorem ptMap_locIncl_injective
+    {R : Type} [CommRing R] [Algebra O R]
+    {φ ψ : LocRing G →ₐ[O] R} (h : ptMap φ ≫ locIncl G = ptMap ψ ≫ locIncl G)
+    : φ = ψ := by
+  have h1
+      : Spec.map (CommRingCat.ofHom φ.toRingHom) ≫ G.left.fromSpecStalk (origin G)
+        = Spec.map (CommRingCat.ofHom ψ.toRingHom) ≫ G.left.fromSpecStalk (origin G) :=
     congrArg Over.Hom.left h
   have h2 := Spec.map_injective ((cancel_mono (G.left.fromSpecStalk (origin G))).1 h1)
   exact AlgHom.ext fun a => congrArg (fun q => q.hom a) h2
@@ -45,19 +48,22 @@ theorem ptMap_aug_locIncl : ptMap (aug G) ≫ locIncl G = 1 := by
   rw [h]
   exact (Category.id_comp _).symm
 
-theorem tangentPt_eq {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R) :
-    (tangentPt v : specO O (DualNumber R) ⟶ G) = ptMap (tangentAlg v) ≫ locIncl G := rfl
+theorem tangentPt_eq {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R)
+    : (tangentPt v : specO O (DualNumber R) ⟶ G) = ptMap (tangentAlg v) ≫ locIncl G :=
+  rfl
 
-theorem tangentAlg_fst {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R)
-    (a : LocRing G) : (tangentAlg v a).fst = algebraMap O R (aug G a) := by
+theorem tangentAlg_fst
+    {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R) (a : LocRing G)
+    : (tangentAlg v a).fst = algebraMap O R (aug G a) := by
   simp [tangentAlg]
 
-theorem tangentAlg_snd {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R)
-    (a : LocRing G) : (tangentAlg v a).snd = v (dAt G a) := by
+theorem tangentAlg_snd
+    {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R) (a : LocRing G)
+    : (tangentAlg v a).snd = v (dAt G a) := by
   simp [tangentAlg]
 
-theorem fst_tangentPt {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R) :
-    ptMap (TrivSqZeroExt.fstHom O R R) ≫ (tangentPt v : specO O (DualNumber R) ⟶ G) = 1 := by
+theorem fst_tangentPt {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R)
+    : ptMap (TrivSqZeroExt.fstHom O R R) ≫ (tangentPt v : specO O (DualNumber R) ⟶ G) = 1 := by
   have h : (TrivSqZeroExt.fstHom O R R).comp (tangentAlg v) = (Algebra.ofId O R).comp (aug G) :=
     AlgHom.ext fun a => tangentAlg_fst v a
   rw [tangentPt_eq, ← Category.assoc, ptMap_comp_ptMap, h, ← ptMap_comp_ptMap, Category.assoc,
@@ -77,15 +83,16 @@ theorem isLocalRing_dualNumber : IsLocalRing (DualNumber O) :=
     simp only [TrivSqZeroExt.isUnit_iff_isUnit_fst, TrivSqZeroExt.fst_sub, TrivSqZeroExt.fst_one]
     exact isUnit_or_isUnit_one_sub_self _
 
-theorem exists_factor {T : Type} [CommRing T] [IsLocalRing T] [Algebra O T] (w : specO O T ⟶ G)
-    (hw : w.left (closedPoint T) = origin G) :
-    ∃ φ : LocRing G →ₐ[O] T, ptMap φ ≫ locIncl G = w := by
-  have h0 : ∃ φ : G.left.presheaf.stalk (origin G) ⟶ .of T,
-      Spec.map φ ≫ G.left.fromSpecStalk (origin G) = w.left := by
+theorem exists_factor
+    {T : Type} [CommRing T] [IsLocalRing T] [Algebra O T]
+    (w : specO O T ⟶ G) (hw : w.left (closedPoint T) = origin G)
+    : ∃ φ : LocRing G →ₐ[O] T, ptMap φ ≫ locIncl G = w := by
+  have h0
+      : ∃ φ : G.left.presheaf.stalk (origin G) ⟶ .of T,
+        Spec.map φ ≫ G.left.fromSpecStalk (origin G) = w.left := by
     rw [← hw]
     exact ⟨_, Scheme.Spec_stalkClosedPointTo_fromSpecStalk (R := .of T) w.left⟩
-  obtain ⟨φ, hφ⟩ : ∃ φ : CommRingCat.of (LocRing G) ⟶ .of T,
-      Spec.map φ ≫ fromLoc G = w.left := h0
+  obtain ⟨φ, hφ⟩ : ∃ φ : CommRingCat.of (LocRing G) ⟶ .of T, Spec.map φ ≫ fromLoc G = w.left := h0
   have h : strMap G ≫ φ = CommRingCat.ofHom (algebraMap O T) := by
     apply Spec.map_injective
     have h2 := Over.w w
@@ -104,8 +111,10 @@ theorem toLieG_surjective : Function.Surjective (toLieG (G := G)) := by
   have hloc : IsLocalHom (TrivSqZeroExt.fstHom O O O).toRingHom :=
     ⟨fun a ha => TrivSqZeroExt.isUnit_iff_isUnit_fst.2 ha⟩
   have hpt : x.1.left (closedPoint (DualNumber O)) = origin G := by
-    have h1 : Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom O O O).toRingHom) ≫ x.1.left =
-        unitSec G := (congrArg Over.Hom.left hx).trans (spec_augMap G)
+    have h1
+        : Spec.map (CommRingCat.ofHom (TrivSqZeroExt.fstHom O O O).toRingHom) ≫ x.1.left
+          = unitSec G :=
+      (congrArg Over.Hom.left hx).trans (spec_augMap G)
     have h2 := congrArg (fun q : Spec (CommRingCat.of O) ⟶ G.left => q (closedPoint O)) h1
     refine Eq.trans ?_ ((Scheme.Hom.comp_apply _ _ _).symm.trans h2)
     congr 1
@@ -125,25 +134,23 @@ theorem toLieG_surjective : Function.Surjective (toLieG (G := G)) := by
   · rw [tangentAlg_fst, h3]; rfl
   · rw [tangentAlg_snd, hv]
 
-
 variable (G) in
-def lieEquiv : Lie G ≃ LieG G :=
-  Equiv.ofBijective toLieG ⟨toLieG_injective, toLieG_surjective⟩
+def lieEquiv : Lie G ≃ LieG G := Equiv.ofBijective toLieG ⟨toLieG_injective, toLieG_surjective⟩
 
-theorem scale_tangentPt {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R) (a : R) :
-    scale O a ≫ (tangentPt v : specO O (DualNumber R) ⟶ G) = tangentPt (a • v) := by
+theorem scale_tangentPt {R : Type} [CommRing R] [Algebra O R] (v : Cotangent G →ₗ[O] R) (a : R)
+    : scale O a ≫ (tangentPt v : specO O (DualNumber R) ⟶ G) = tangentPt (a • v) := by
   rw [tangentPt_eq, tangentPt_eq, ← Category.assoc, scale, ptMap_comp_ptMap]
   congr 2
   refine AlgHom.ext fun b => TrivSqZeroExt.ext ?_ ?_
   · simp [tangentAlg_fst]
   · simp [tangentAlg_snd]
 
-theorem lieEquiv_smul (a : O) (v : Lie G) :
-    (lieEquiv G (a • v)).1 = ptMap (dualScale a) ≫ (lieEquiv G v).1 :=
+theorem lieEquiv_smul (a : O) (v : Lie G)
+    : (lieEquiv G (a • v)).1 = ptMap (dualScale a) ≫ (lieEquiv G v).1 :=
   (scale_tangentPt v a).symm
 
-theorem lieEquiv_add (v w : Lie G) :
-    (lieEquiv G (v + w)).1 = (lieEquiv G v).1 * (lieEquiv G w).1 := by
+theorem lieEquiv_add (v w : Lie G)
+    : (lieEquiv G (v + w)).1 = (lieEquiv G v).1 * (lieEquiv G w).1 := by
   let i₁ := LinearMap.inl O O O
   let i₂ := LinearMap.inr O O O
   let x : specO O (DualNumber O) ⟶ G := tangentPt v
@@ -151,8 +158,9 @@ theorem lieEquiv_add (v w : Lie G) :
   have hx : ptMap (TrivSqZeroExt.fstHom O O O) ≫ x = 1 := fst_tangentPt v
   have hy : ptMap (TrivSqZeroExt.fstHom O O O) ≫ y = 1 := fst_tangentPt w
   let u : Cotangent G →ₗ[O] O × O := LinearMap.prod v w
-  obtain ⟨α, hα₁, hα₂⟩ : ∃ α : LocRing G →ₐ[O] TrivSqZeroExt O (O × O),
-      (∀ a, (α a).fst = aug G a) ∧ ∀ a, (α a).snd = u (dAt G a) :=
+  obtain ⟨α, hα₁, hα₂⟩
+      : ∃ α : LocRing G →ₐ[O] TrivSqZeroExt O (O × O),
+        (∀ a, (α a).fst = aug G a) ∧ ∀ a, (α a).snd = u (dAt G a) :=
     ⟨AugCot.toSqZero (aug G) u, AugCot.fst_toSqZero (aug G) u, AugCot.snd_toSqZero (aug G) u⟩
   let z : specO O (TrivSqZeroExt O (O × O)) ⟶ G := ptMap α ≫ locIncl G
   have hz : ∀ l : O × O →ₗ[O] O, ofTwo O l ≫ z = tangentPt (G := G) (l ∘ₗ u) := by
@@ -207,8 +215,8 @@ section Cotangent
 
 variable {O : Type} [CommRing O] [IsLocalRing O] {G : Over (Spec (CommRingCat.of O))} [GrpObj G]
 
-theorem mem_omega_iff (g : LieG G → O) :
-    g ∈ omega G ↔ ∃ F : Module.Dual O (Lie G), ∀ v, g (lieEquiv G v) = F v := by
+theorem mem_omega_iff (g : LieG G → O)
+    : g ∈ omega G ↔ ∃ F : Module.Dual O (Lie G), ∀ v, g (lieEquiv G v) = F v := by
   constructor
   · rintro ⟨h₁, h₂⟩
     refine ⟨⟨⟨fun v => g (lieEquiv G v), fun v w => ?_⟩, fun a v => ?_⟩, fun _ => rfl⟩
@@ -229,21 +237,23 @@ theorem mem_omega_iff (g : LieG G → O) :
       rw [hF, ← smul_eq_mul, ← map_smul, ← hF]
       exact congrArg g (Subtype.ext (lieEquiv_smul a v).symm)
 
-
 variable (G) in
 def cotangentBidualToTangentFunction : Module.Dual O (Lie G) →ₗ[O] (LieG G → O) where
   toFun F x := F ((lieEquiv G).symm x)
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-theorem cotangentBidualToTangentFunction_apply (F : Module.Dual O (Lie G)) (v : Lie G) :
-    cotangentBidualToTangentFunction G F (lieEquiv G v) = F v :=
+theorem cotangentBidualToTangentFunction_apply (F : Module.Dual O (Lie G)) (v : Lie G)
+    : cotangentBidualToTangentFunction G F (lieEquiv G v) = F v :=
   congrArg F ((lieEquiv G).symm_apply_apply v)
 
-theorem cotangentBidualToTangentFunction_injective : Function.Injective (cotangentBidualToTangentFunction G) := fun F F' h =>
-  LinearMap.ext fun v => by rw [← cotangentBidualToTangentFunction_apply, h, cotangentBidualToTangentFunction_apply]
+theorem cotangentBidualToTangentFunction_injective
+    : Function.Injective (cotangentBidualToTangentFunction G) := fun F F' h =>
+  LinearMap.ext fun v => by
+    rw [← cotangentBidualToTangentFunction_apply, h, cotangentBidualToTangentFunction_apply]
 
-theorem range_cotangentBidualToTangentFunction : LinearMap.range (cotangentBidualToTangentFunction G) = omega G := by
+theorem range_cotangentBidualToTangentFunction
+    : LinearMap.range (cotangentBidualToTangentFunction G) = omega G := by
   ext g
   rw [mem_omega_iff]
   constructor
@@ -254,14 +264,14 @@ theorem range_cotangentBidualToTangentFunction : LinearMap.range (cotangentBidua
     obtain ⟨v, rfl⟩ := (lieEquiv G).surjective x
     rw [cotangentBidualToTangentFunction_apply, hF]
 
-
 variable (G) in
 def bidualEquivOmega : Module.Dual O (Lie G) ≃ₗ[O] omega G :=
-  (LinearEquiv.ofInjective _ cotangentBidualToTangentFunction_injective).trans (LinearEquiv.ofEq _ _ range_cotangentBidualToTangentFunction)
-
+  (LinearEquiv.ofInjective _ cotangentBidualToTangentFunction_injective).trans
+    (LinearEquiv.ofEq _ _ range_cotangentBidualToTangentFunction)
 
 variable (G) in
-def ev : Cotangent G →ₗ[O] (LieG G → O) := cotangentBidualToTangentFunction G ∘ₗ Module.Dual.eval O (Cotangent G)
+def ev : Cotangent G →ₗ[O] (LieG G → O) :=
+  cotangentBidualToTangentFunction G ∘ₗ Module.Dual.eval O (Cotangent G)
 
 theorem ev_apply (f : Cotangent G) (v : Lie G) : ev G f (lieEquiv G v) = v f :=
   cotangentBidualToTangentFunction_apply (Module.Dual.eval O (Cotangent G) f) v
@@ -270,26 +280,29 @@ theorem ev_injective [Module.IsReflexive O (Cotangent G)] : Function.Injective (
   cotangentBidualToTangentFunction_injective.comp (Module.bijective_dual_eval O (Cotangent G)).1
 
 theorem range_ev [Module.IsReflexive O (Cotangent G)] : LinearMap.range (ev G) = omega G := by
-  rw [ev, LinearMap.range_comp_of_range_eq_top _
-    (LinearMap.range_eq_top.2 (Module.bijective_dual_eval O (Cotangent G)).2), range_cotangentBidualToTangentFunction]
-
+  rw [ev,
+    LinearMap.range_comp_of_range_eq_top _
+      (LinearMap.range_eq_top.2 (Module.bijective_dual_eval O (Cotangent G)).2),
+    range_cotangentBidualToTangentFunction]
 
 variable (G) in
 def omegaEquiv [Module.IsReflexive O (Cotangent G)] : Cotangent G ≃ₗ[O] omega G :=
   (LinearEquiv.ofInjective _ ev_injective).trans (LinearEquiv.ofEq _ _ range_ev)
 
-theorem strMap_eq : strMap G =
-    StructureSheaf.toStalk O (G.hom (origin G)) ≫ G.hom.stalkMap (origin G) := by
+theorem strMap_eq
+    : strMap G = StructureSheaf.toStalk O (G.hom (origin G)) ≫ G.hom.stalkMap (origin G) := by
   apply Spec.map_injective
-  have e : (Spec (CommRingCat.of O)).fromSpecStalk (G.hom (origin G)) =
-      Spec.map (StructureSheaf.toStalk O (G.hom (origin G))) := Spec.fromSpecStalk_eq' _ _
+  have e
+      : (Spec (CommRingCat.of O)).fromSpecStalk (G.hom (origin G))
+        = Spec.map (StructureSheaf.toStalk O (G.hom (origin G))) :=
+    Spec.fromSpecStalk_eq' _ _
   refine (spec_strMap G).trans ?_
   refine (Scheme.SpecMap_stalkMap_fromSpecStalk G.hom (x := origin G)).symm.trans ?_
   rw [e]
   exact (Spec.map_comp _ _).symm
 
-theorem finite_projective_of_smooth [Smooth G.hom] :
-    Module.Finite O (Cotangent G) ∧ Module.Projective O (Cotangent G) := by
+theorem finite_projective_of_smooth [Smooth G.hom]
+    : Module.Finite O (Cotangent G) ∧ Module.Projective O (Cotangent G) := by
   let q : PrimeSpectrum O := G.hom (origin G)
   letI : Algebra O ((Spec (CommRingCat.of O)).presheaf.stalk q) := StructureSheaf.stalkAlgebra O q
   have := q.isPrime
@@ -303,8 +316,7 @@ theorem finite_projective_of_smooth [Smooth G.hom] :
     rw [strMap_eq]
     exact RingHom.FormallySmooth.comp (RingHom.formallySmooth_algebraMap.2 h₀) hs
   have h₂ : (strMap G).hom.EssFiniteType := by
-    have hs : (G.hom.stalkMap (origin G)).hom.EssFiniteType :=
-      LocallyOfFiniteType.stalkMap G.hom _
+    have hs : (G.hom.stalkMap (origin G)).hom.EssFiniteType := LocallyOfFiniteType.stalkMap G.hom _
     have h₀ : Algebra.EssFiniteType O ((Spec (CommRingCat.of O)).presheaf.stalk q) :=
       Algebra.EssFiniteType.of_isLocalization _ q.asIdeal.primeCompl
     rw [strMap_eq]
@@ -320,7 +332,6 @@ section Characters
 variable {O : Type} [CommRing O] {G : Over (Spec (CommRingCat.of O))} [GrpObj G]
 
 variable [IsCommMonObj G]
-
 
 end Characters
 

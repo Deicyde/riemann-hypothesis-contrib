@@ -16,8 +16,9 @@ namespace GlobalTheory.Proof.GenusMassSignature
 open NumberField Formalism.BasicNotions Matrix
 open scoped ComplexOrder MatrixOrder
 
-theorem denseRange_of_not_isReal {K : Type} [Field K] (σ : K →+* ℂ)
-    (h : ¬ ComplexEmbedding.IsReal σ) : DenseRange σ := by
+theorem denseRange_of_not_isReal
+    {K : Type} [Field K] (σ : K →+* ℂ) (h : ¬ ComplexEmbedding.IsReal σ)
+    : DenseRange σ := by
   have hc : IsClosed (σ.fieldRange.topologicalClosure : Set ℂ) :=
     Subfield.isClosed_topologicalClosure _
   rcases Complex.subfield_eq_of_closed hc with h1 | h1
@@ -35,11 +36,10 @@ theorem denseRange_of_not_isReal {K : Type} [Field K] (σ : K →+* ℂ)
       exact this
     exact dense_iff_closure_eq.2 this
 
-theorem hasSignature_of_posDef {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} (h : J.PosDef) :
-    Formalism.UG.HasSignature J n 0 := by
+theorem hasSignature_of_posDef {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} (h : J.PosDef)
+    : Formalism.UG.HasSignature J n 0 := by
   let e : Fin n ≃ Fin n ⊕ Fin 0 := (Equiv.sumEmpty (Fin n) (Fin 0)).symm
-  have h1 : (J.reindex e e).PosDef := by
-    simpa using h.submatrix (e := e.symm) e.symm.injective
+  have h1 : (J.reindex e e).PosDef := by simpa using h.submatrix (e := e.symm) e.symm.injective
   have hJ : Formalism.UG.Jpq n 0 = 1 := by
     ext i j
     rcases i with i | i
@@ -56,42 +56,46 @@ theorem hasSignature_of_posDef {n : ℕ} {J : Matrix (Fin n) (Fin n) ℂ} (h : J
     exact isUnit_of_mul_isUnit_left this
   obtain ⟨U, hU⟩ := hu
   refine ⟨e, U⁻¹, ?_⟩
-  have hc : Formalism.UG.cT (starRingEnd ℂ) ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix _ _ ℂ) =
-      star ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) := by
+  have hc
+      : Formalism.UG.cT (starRingEnd ℂ) ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix _ _ ℂ)
+        = star ((U⁻¹ : GL (Fin n ⊕ Fin 0) ℂ) : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) := by
     ext i j; rfl
-  have hA2 : A = star (U : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) * U := by
-    rw [hU, hS, hSS]
+  have hA2 : A = star (U : Matrix (Fin n ⊕ Fin 0) (Fin n ⊕ Fin 0) ℂ) * U := by rw [hU, hS, hSS]
   rw [hJ, hc, ← hA, hA2, ← mul_assoc, ← star_mul, mul_assoc, Units.mul_inv, star_one, one_mul]
 
 section Field
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem emb_form (hst : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a))
-    (W : HSpace E) (τ : E →+* ℂ) (x : W.V) :
-    τ (W.hD x x) = star (fun i => τ (W.frame.repr x i)) ⬝ᵥ
-        (W.gram.map τ).mulVec (fun i => τ (W.frame.repr x i)) := by
+theorem emb_form
+    (hst : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a))
+    (W : HSpace E)
+    (τ : E →+* ℂ) (x : W.V)
+    : τ (W.hD x x)
+      = star (fun i => τ (W.frame.repr x i))
+        ⬝ᵥ (W.gram.map τ).mulVec (fun i => τ (W.frame.repr x i)) := by
   unfold HSpace.hD
   conv_lhs => rw [← W.frame.sum_repr x]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
-    smul_eq_mul, map_mul, RingHom.id_apply, starRingEnd_apply, hst, dotProduct, Matrix.mulVec,
-    Matrix.map_apply, HSpace.gram, Pi.star_apply, Finset.mul_sum]
+      smul_eq_mul, map_mul, RingHom.id_apply, starRingEnd_apply, hst, dotProduct, Matrix.mulVec,
+      Matrix.map_apply, HSpace.gram, Pi.star_apply, Finset.mul_sum]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem gram_isHermitian (hst : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a))
-    (W : HSpace E) (τ : E →+* ℂ) : (W.gram.map τ).IsHermitian := by
+theorem gram_isHermitian
+    (hst : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a)) (W : HSpace E) (τ : E →+* ℂ)
+    : (W.gram.map τ).IsHermitian := by
   ext i k
   rw [conjTranspose_apply, Matrix.map_apply, Matrix.map_apply, HSpace.gram, HSpace.gram,
     ← W.herm.eq (W.frame k) (W.frame i), starRingEnd_apply, hst]
   rfl
 
-theorem pos_iff_posDef (htc : IsTotallyComplex E)
-    (hst : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a))
-    (W : HSpace E) (τ : E →+* ℂ) :
-    (∀ x : W.V, x ≠ 0 → 0 < (τ (W.hD x x)).re) ↔ (W.gram.map τ).PosDef := by
+theorem pos_iff_posDef
+    (htc : IsTotallyComplex E) (hst : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a))
+    (W : HSpace E) (τ : E →+* ℂ)
+    : (∀ x : W.V, x ≠ 0 → 0 < (τ (W.hD x x)).re) ↔ (W.gram.map τ).PosDef := by
   constructor
   · intro h
     have hH := gram_isHermitian hst W τ
@@ -99,8 +103,10 @@ theorem pos_iff_posDef (htc : IsTotallyComplex E)
       denseRange_of_not_isReal τ (IsTotallyComplex.complexEmbedding_not_isReal τ)
     have hdn : DenseRange fun (l : Fin W.rank → E) => (fun i => τ (l i)) :=
       DenseRange.piMap (fun _ : Fin W.rank => hd)
-    have hco : ∀ l : Fin W.rank → E, τ (W.hD (W.frame.equivFun.symm l) (W.frame.equivFun.symm l)) =
-        star (fun i => τ (l i)) ⬝ᵥ (W.gram.map τ).mulVec (fun i => τ (l i)) := by
+    have hco
+        : ∀ l : Fin W.rank → E,
+          τ (W.hD (W.frame.equivFun.symm l) (W.frame.equivFun.symm l))
+            = star (fun i => τ (l i)) ⬝ᵥ (W.gram.map τ).mulVec (fun i => τ (l i)) := by
       intro l
       rw [emb_form hst]
       have : ∀ i, W.frame.repr (W.frame.equivFun.symm l) i = l i := fun i =>

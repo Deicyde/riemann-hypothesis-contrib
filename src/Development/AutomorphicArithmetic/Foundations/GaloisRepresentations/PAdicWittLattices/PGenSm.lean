@@ -10,8 +10,11 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.IsSepara
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
@@ -19,9 +22,12 @@ universe u
 theorem UpperTheory.Gal.G3.pGenSm : GenSm := by
   intro p _ D R _ _ gb N X
   haveI : CharZero R := charZero_of_injective_algebraMap (algebraMap ℚ R).injective
-  obtain ⟨M⟩ := GlobalTheory.T.harrisTaylorIntegralModel_nonempty p D R (GenCmp.baseOf gb) N.1 N.2.1 N.2.2
-  obtain ⟨j, hoi, hci, hj, -⟩ := GenCmp.genModel_eq_genericFibre p D R (GenCmp.baseOf gb) R (RingHom.id R) gb
-    rfl (fun _ => rfl) N.1 N.2.1 N.2.2 M X
+  obtain ⟨M⟩ :=
+    GlobalTheory.T.harrisTaylorIntegralModel_nonempty p D R (GenCmp.baseOf gb) N.1 N.2.1 N.2.2
+  obtain ⟨j, hoi, hci, hj, -⟩ :=
+    GenCmp.genModel_eq_genericFibre p D R (GenCmp.baseOf gb) R (RingHom.id R) gb rfl
+      (fun _ => rfl)
+      N.1 N.2.1 N.2.2 M X
   haveI := hoi
   haveI := hci
   haveI : IsQProjOver M.s := M.qproj

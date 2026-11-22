@@ -38,53 +38,64 @@ section Hom
 
 variable {K : Type} [Field K]
 
-theorem mvSubst_subst {σ τ : Type} {a : σ → MvPowerSeries τ K} (ha : MvPowerSeries.HasSubst a)
-    {g : MvPowerSeries σ K} (hg : MvPowerSeries.constantCoeff g = 0) (f : PowerSeries K) :
-    MvPowerSeries.subst a (PowerSeries.subst g f) = PowerSeries.subst (MvPowerSeries.subst a g) f := by
+theorem mvSubst_subst
+    {σ τ : Type} {a : σ → MvPowerSeries τ K} (ha : MvPowerSeries.HasSubst a)
+    {g : MvPowerSeries σ K} (hg : MvPowerSeries.constantCoeff g = 0)
+    (f : PowerSeries K)
+    : MvPowerSeries.subst a (PowerSeries.subst g f)
+      = PowerSeries.subst (MvPowerSeries.subst a g) f := by
   rw [PowerSeries.subst_def, PowerSeries.subst_def,
     MvPowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.of_constantCoeff_zero hg).const ha]
 
-theorem cc_zPt {n : Type} {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0) (i : n) :
-    MvPowerSeries.constantCoeff
-      (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) linv : MvPowerSeries n K) = 0 :=
+theorem cc_zPt {n : Type} {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0) (i : n)
+    : MvPowerSeries.constantCoeff
+        (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) linv : MvPowerSeries n K)
+      = 0 :=
   PowerSeries.constantCoeff_subst_eq_zero (MvPowerSeries.constantCoeff_X i) linv h0
 
-theorem hasSubst_zPt {n : Type} [Finite n] {linv : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff linv = 0) :
-    MvPowerSeries.HasSubst (fun i : n =>
+theorem hasSubst_zPt
+    {n : Type} [Finite n] {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    : MvPowerSeries.HasSubst (fun i : n =>
       (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) linv : MvPowerSeries n K)) :=
   MvPowerSeries.hasSubst_of_constantCoeff_zero fun i => cc_zPt h0 i
 
-def toZHom {n : Type} [Finite n] {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0) :
-    MvPowerSeries n K →ₐ[K] MvPowerSeries n K :=
+def toZHom {n : Type} [Finite n] {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    : MvPowerSeries n K →ₐ[K] MvPowerSeries n K :=
   MvPowerSeries.substAlgHom (hasSubst_zPt h0)
 
-theorem toZHom_apply {n : Type} [Finite n] {linv : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff linv = 0) (f : MvPowerSeries n K) :
-    toZHom h0 f = toZ linv f :=
+theorem toZHom_apply
+    {n : Type} [Finite n]
+    {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    (f : MvPowerSeries n K)
+    : toZHom h0 f = toZ linv f :=
   MvPowerSeries.substAlgHom_apply _ f
 
-theorem toZ_subst_X {n : Type} [Finite n] {linv : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff linv = 0) (f : PowerSeries K) (i : n) :
-    toZ linv (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) f) =
-      PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) (PowerSeries.subst linv f) := by
+theorem toZ_subst_X
+    {n : Type} [Finite n]
+    {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    (f : PowerSeries K) (i : n)
+    : toZ linv (PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) f)
+      = PowerSeries.subst (MvPowerSeries.X i : MvPowerSeries n K) (PowerSeries.subst linv f) := by
   unfold toZ
   rw [mvSubst_subst (hasSubst_zPt h0) (MvPowerSeries.constantCoeff_X i),
     MvPowerSeries.subst_X (hasSubst_zPt h0),
     PowerSeries.subst_comp_subst_apply (PowerSeries.HasSubst.of_constantCoeff_zero' h0)
       (PowerSeries.HasSubst.of_constantCoeff_zero (MvPowerSeries.constantCoeff_X i))]
 
-theorem toZ_phSum {n : Type} [Fintype n] {linv : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff linv = 0) (c : n → K) (ph : PowerSeries K) :
-    toZ linv (phSum c ph) = phSum c (PowerSeries.subst linv ph) := by
+theorem toZ_phSum
+    {n : Type} [Fintype n]
+    {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    (c : n → K) (ph : PowerSeries K)
+    : toZ linv (phSum c ph) = phSum c (PowerSeries.subst linv ph) := by
   unfold phSum
   set_option synthInstance.maxHeartbeats 100000 in
     rw [← toZHom_apply h0, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_smul, toZHom_apply, toZ_subst_X h0]
 
-theorem cc_phSum {n : Type} [Fintype n] (c : n → K) {ph : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff ph = 0) : MvPowerSeries.constantCoeff (phSum c ph) = 0 := by
+theorem cc_phSum
+    {n : Type} [Fintype n] (c : n → K) {ph : PowerSeries K} (h0 : PowerSeries.constantCoeff ph = 0)
+    : MvPowerSeries.constantCoeff (phSum c ph) = 0 := by
   unfold phSum
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -92,24 +103,34 @@ theorem cc_phSum {n : Type} [Fintype n] (c : n → K) {ph : PowerSeries K}
   rw [MvPowerSeries.smul_eq_C_mul, map_mul,
     PowerSeries.constantCoeff_subst_eq_zero (MvPowerSeries.constantCoeff_X i) ph h0, mul_zero]
 
-theorem jetsIn_phSum [CharZero K] {R : Subring K} {n : Type} [Fintype n]
-    {c : n → K} (hc : ∀ i, c i ∈ R) {f : PowerSeries K} (hf : JetsIn1 R f) :
-    JetsIn R (phSum c f) := by
+theorem jetsIn_phSum
+    [CharZero K]
+    {R : Subring K} {n : Type} [Fintype n]
+    {c : n → K} (hc : ∀ i, c i ∈ R)
+    {f : PowerSeries K} (hf : JetsIn1 R f)
+    : JetsIn R (phSum c f) := by
   unfold phSum
   refine jetsIn_sum _ _ fun i _ => ?_
   rw [MvPowerSeries.smul_eq_C_mul]
   exact jetsIn_mul (jetsIn_C (hc i))
     (jetsIn_subst_one hf (MvPowerSeries.constantCoeff_X i) (jetsIn_X i))
 
-theorem jetsIn_toZ [CharZero K] {R : Subring K} {l linv : PowerSeries K}
-    (h : IsLogPair l linv) (hl : IsOneUnit R (PowerSeries.derivative (R := K) l)) {n : Type} [Fintype n]
-    {G : MvPowerSeries n K} (hG : IntMv R G) : JetsIn R (toZ linv G) :=
-  IntMvZ_of (JetsSubst_of jets_ring_holds jets_div_pow_holds) integral_jets_holds jets_subst_one_holds
-    jets_ring_holds K R l linv h hl n G hG
+theorem jetsIn_toZ
+    [CharZero K]
+    {R : Subring K} {l linv : PowerSeries K}
+    (h : IsLogPair l linv) (hl : IsOneUnit R (PowerSeries.derivative (R := K) l))
+    {n : Type} [Fintype n]
+    {G : MvPowerSeries n K} (hG : IntMv R G)
+    : JetsIn R (toZ linv G) :=
+  IntMvZ_of (JetsSubst_of jets_ring_holds jets_div_pow_holds) integral_jets_holds
+    jets_subst_one_holds jets_ring_holds K R l linv h hl n G hG
 
-theorem toZ_mvExp [CharZero K] {n : Type} [Finite n] {linv : PowerSeries K}
-    (h0 : PowerSeries.constantCoeff linv = 0) {f : MvPowerSeries n K}
-    (hf : MvPowerSeries.constantCoeff f = 0) : toZ linv (mvExp f) = mvExp (toZ linv f) :=
+theorem toZ_mvExp
+    [CharZero K]
+    {n : Type} [Finite n]
+    {linv : PowerSeries K} (h0 : PowerSeries.constantCoeff linv = 0)
+    {f : MvPowerSeries n K} (hf : MvPowerSeries.constantCoeff f = 0)
+    : toZ linv (mvExp f) = mvExp (toZ linv f) :=
   mvSubst_mvExp hf (hasSubst_zPt h0)
 
 end Hom

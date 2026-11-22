@@ -9,10 +9,11 @@ open scoped ComplexOrder Matrix.Norms.L2Operator MatrixOrder
 
 namespace GlobalTheory
 
-theorem posDef_conjTranspose_mul_self_eq_exp_polynomial :
-    ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ), IsUnit g →
-      ∃ (L : Matrix (Fin n) (Fin n) ℂ) (p : Polynomial ℂ),
-        Lᴴ = L ∧ NormedSpace.exp L = gᴴ * g ∧ L = Polynomial.aeval (gᴴ * g) p := by
+theorem posDef_conjTranspose_mul_self_eq_exp_polynomial
+    : ∀ (n : ℕ) (g : Matrix (Fin n) (Fin n) ℂ),
+      IsUnit g
+        → ∃ (L : Matrix (Fin n) (Fin n) ℂ) (p : Polynomial ℂ),
+          Lᴴ = L ∧ NormedSpace.exp L = gᴴ * g ∧ L = Polynomial.aeval (gᴴ * g) p := by
   intro n g hg
   set h : Matrix (Fin n) (Fin n) ℂ := gᴴ * g with hh
   have hpd : h.PosDef :=
@@ -28,8 +29,7 @@ theorem posDef_conjTranspose_mul_self_eq_exp_polynomial :
     have hxs : x ∈ s := hfin.mem_toFinset.mpr hx
     exact Lagrange.eval_interpolate_at_node (r := Real.log) (Set.injOn_id _) hxs
   refine ⟨CFC.log h, q.map (algebraMap ℝ ℂ), ?_, CFC.exp_log h hsp, ?_⟩
-  · have : IsSelfAdjoint (CFC.log h) := by
-      unfold CFC.log; exact cfc_predicate _ _
+  · have : IsSelfAdjoint (CFC.log h) := by unfold CFC.log; exact cfc_predicate _ _
     exact this
   · rw [Polynomial.aeval_map_algebraMap, ← cfc_polynomial q h]
     unfold CFC.log

@@ -9,9 +9,11 @@ open CrystallineSemistableComparison.Pb.Kap
 
 namespace GlobalTheory.CompanionTheory.KapRho
 
-theorem exists_rho {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K]
-    (C : Chain.{1} Λ A B K) (hC : C.Good) {j : ℕ} (x : ∀ n, C.S n j) (hx : C.Comp x) :
-    ∃ f : Module.Dual K (C.V j) →+ B, C.Rho x f := by
+theorem exists_rho
+    {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Field K]
+    (C : Chain.{1} Λ A B K) (hC : C.Good)
+    {j : ℕ} (x : ∀ n, C.S n j) (hx : C.Comp x)
+    : ∃ f : Module.Dual K (C.V j) →+ B, C.Rho x f := by
   obtain ⟨e, z, hz⟩ := hC.lift j x hx
   haveI := hC.fin j
   have hunit : IsUnit (C.ℓ : B) := by
@@ -24,10 +26,11 @@ theorem exists_rho {Λ A B K : Type} [CommRing Λ] [CommRing A] [CommRing B] [Fi
   let w : C.W j := ((u⁻¹ : Bˣ) : B) ^ e • C.b j z
   let bs₀ := Module.finBasis K (C.V j)
   obtain ⟨g, hg, -⟩ := hC.basis j bs₀ w
-  let f : Module.Dual K (C.V j) →+ B :=
-    { toFun := fun φ => ∑ t, C.o (φ (bs₀ t)) * g t
-      map_zero' := by simp
-      map_add' := fun φ ψ => by simp [add_mul, Finset.sum_add_distrib] }
+  let f : Module.Dual K (C.V j) →+ B := {
+    toFun := fun φ => ∑ t, C.o (φ (bs₀ t)) * g t
+    map_zero' := by simp
+    map_add' := fun φ ψ => by simp [add_mul, Finset.sum_add_distrib]
+  }
   refine ⟨f, fun k φ => ?_, e, z, hz, fun {m} bs => ?_⟩
   · simp [f, Finset.mul_sum, mul_assoc]
   · have key : ∑ s, f (bs.coord s) • C.μ j (bs s) = w := by

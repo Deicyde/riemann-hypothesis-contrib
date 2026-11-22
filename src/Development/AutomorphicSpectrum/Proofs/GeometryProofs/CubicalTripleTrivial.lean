@@ -25,8 +25,11 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Glo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.UU
 
 noncomputable section
@@ -34,7 +37,15 @@ namespace GlobalTheory.CompanionTheory.Ar.CubeUnit
 
 open GlobalTheory.CubicUnit
 
-theorem eq_one_at_rational_points : ∀ (K : Type) [Field K] (G : Over (Sp K)) [GrpObj G] [IsCommMonObj G], IsSemiAbelian G → TorusExtension G → ∀ (v : Γ((G ⊗ G ⊗ G).left, ⊤)ˣ), (∀ (T : Over (Sp K)) (x y : T ⟶ G), (lift (1 : T ⟶ G) (lift x y)).left.appTop.hom v.val = 1 ∧ (lift x (lift (1 : T ⟶ G) y)).left.appTop.hom v.val = 1 ∧ (lift x (lift y (1 : T ⟶ G))).left.appTop.hom v.val = 1) → ∀ x y w : 𝟙_ (Over (Sp K)) ⟶ G, (lift x (lift y w)).left.appTop.hom v.val = 1 := by
+theorem eq_one_at_rational_points
+    : ∀ (K : Type) [Field K] (G : Over (Sp K)) [GrpObj G] [IsCommMonObj G],
+      IsSemiAbelian G → TorusExtension G
+        → ∀ (v : Γ((G ⊗ G ⊗ G).left, ⊤)ˣ),
+          (∀ (T : Over (Sp K)) (x y : T ⟶ G),
+              (lift (1 : T ⟶ G) (lift x y)).left.appTop.hom v.val = 1
+                ∧ (lift x (lift (1 : T ⟶ G) y)).left.appTop.hom v.val = 1
+                ∧ (lift x (lift y (1 : T ⟶ G))).left.appTop.hom v.val = 1)
+            → ∀ x y w : 𝟙_ (Over (Sp K)) ⟶ G, (lift x (lift y w)).left.appTop.hom v.val = 1 := by
   intro K _ G _ _ hs τ v hv x₀ y₀ w₀
   letI := τ.addCommGroup
   haveI := τ.free
@@ -61,15 +72,19 @@ theorem eq_one_at_rational_points : ∀ (K : Type) [Field K] (G : Over (Sp K)) [
     fun T x y => Units.ext (hv T x y).2.1
   let m : splitTorus (Sp K) τ.X ⊗ (G ⊗ G) ⟶ G ⊗ (G ⊗ G) :=
     lift ((fst _ _ ≫ τ.i) * (snd _ _ ≫ fst _ _)) (lift (snd _ _ ≫ snd _ _) (toUnit _ ≫ w₀))
-  have hm : ∀ (Z : Over (Sp K)) (t : Z ⟶ splitTorus (Sp K) τ.X) (x y : Z ⟶ G),
-      lift t (lift x y) ≫ m = lift ((t ≫ τ.i) * x) (lift y (toUnit Z ≫ w₀)) := fun Z t x y => by
+  have hm
+      : ∀ (Z : Over (Sp K)) (t : Z ⟶ splitTorus (Sp K) τ.X) (x y : Z ⟶ G),
+        lift t (lift x y) ≫ m = lift ((t ≫ τ.i) * x) (lift y (toUnit Z ≫ w₀)) := fun Z t x y => by
     simp [m, comp_lift, MonObj.comp_mul]
-  obtain ⟨χ, hχ⟩ := GlobalTheory.CompanionTheory.TorusMono.torus_unit_eq_char_mul (Sp K) τ.X (G ⊗ G) (ev m v)
-  have h1 : ∀ (Z : Over (Sp K)) (t : Z ⟶ splitTorus (Sp K) τ.X) (x y : Z ⟶ G),
-      ev (lift ((t ≫ τ.i) * x) (lift y (toUnit Z ≫ w₀))) v =
-        chV t χ * ev (lift x (lift y (toUnit Z ≫ w₀))) v := fun Z t x y => by
-    have e : ev (lift t (lift x y)) (ev m v) =
-        chV t χ * ev (lift (1 : Z ⟶ splitTorus (Sp K) τ.X) (lift x y)) (ev m v) :=
+  obtain ⟨χ, hχ⟩ :=
+    GlobalTheory.CompanionTheory.TorusMono.torus_unit_eq_char_mul (Sp K) τ.X (G ⊗ G) (ev m v)
+  have h1
+      : ∀ (Z : Over (Sp K)) (t : Z ⟶ splitTorus (Sp K) τ.X) (x y : Z ⟶ G),
+        ev (lift ((t ≫ τ.i) * x) (lift y (toUnit Z ≫ w₀))) v
+          = chV t χ * ev (lift x (lift y (toUnit Z ≫ w₀))) v := fun Z t x y => by
+    have e
+        : ev (lift t (lift x y)) (ev m v)
+          = chV t χ * ev (lift (1 : Z ⟶ splitTorus (Sp K) τ.X) (lift x y)) (ev m v) :=
       Units.ext (hχ Z t (lift x y))
     rw [ev_comp, ev_comp, hm, hm, MonObj.one_comp, _root_.one_mul] at e
     exact e
@@ -77,18 +92,23 @@ theorem eq_one_at_rational_points : ∀ (K : Type) [Field K] (G : Over (Sp K)) [
     have e := h1 Z t 1 1
     rw [hf2, hf2, _root_.mul_one] at e
     exact e.symm
-  have h3 : ∀ (Z : Over (Sp K)) (t : Z ⟶ splitTorus (Sp K) τ.X) (x y : Z ⟶ G),
-      ev (lift ((t ≫ τ.i) * x) (lift y (toUnit Z ≫ w₀))) v =
-        ev (lift x (lift y (toUnit Z ≫ w₀))) v := fun Z t x y => by
+  have h3
+      : ∀ (Z : Over (Sp K)) (t : Z ⟶ splitTorus (Sp K) τ.X) (x y : Z ⟶ G),
+        ev (lift ((t ≫ τ.i) * x) (lift y (toUnit Z ≫ w₀))) v
+          = ev (lift x (lift y (toUnit Z ≫ w₀))) v := fun Z t x y => by
     rw [h1, h2, _root_.one_mul]
   let s : G ⟶ G ⊗ (G ⊗ G) := lift (𝟙 G) (lift (toUnit G ≫ y₀) (toUnit G ≫ w₀))
-  have hs' : ∀ (Z : Over (Sp K)) (g : Z ⟶ G),
-      g ≫ s = lift g (lift (toUnit Z ≫ y₀) (toUnit Z ≫ w₀)) := fun Z g => by
+  have hs'
+      : ∀ (Z : Over (Sp K)) (g : Z ⟶ G),
+        g ≫ s = lift g (lift (toUnit Z ≫ y₀) (toUnit Z ≫ w₀)) := fun Z g => by
     simp [s, comp_lift]
-  have h8 : IsWt τ.i ⊤ (ev s v).val 0 := isWt_top_iff.2 fun Z t g => by
-    rw [← ev_val, ← ev_val, ev_comp, ev_comp, hs', hs', h3, chV_zero, Units.val_one, _root_.one_mul]
-  obtain ⟨c, hc⟩ := (invariant_functions_descend (Sp K) G τ.B _ τ.q τ.i τ.q_hom τ.i_hom τ.q_flat
-    τ.q_surjective τ.q_quasiCompact τ.isKernel ⊤).2.2 (ev s v).val fun Z t g h₁ h₂ => by
+  have h8 : IsWt τ.i ⊤ (ev s v).val 0 :=
+    isWt_top_iff.2 fun Z t g => by
+      rw [← ev_val, ← ev_val, ev_comp, ev_comp, hs', hs', h3, chV_zero, Units.val_one,
+        _root_.one_mul]
+  obtain ⟨c, hc⟩ :=
+    (invariant_functions_descend (Sp K) G τ.B _ τ.q τ.i τ.q_hom τ.i_hom τ.q_flat τ.q_surjective
+        τ.q_quasiCompact τ.isKernel ⊤).2.2 (ev s v).val fun Z t g h₁ h₂ => by
       refine (h8 Z t g h₁ h₂).trans ?_
       rw [← chV_val, chV_zero, Units.val_one, _root_.one_mul]
       rfl

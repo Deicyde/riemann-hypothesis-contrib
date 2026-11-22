@@ -9,14 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsP
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct PowerSeries
+  GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP GlobalTheory.MemLoc
+  GlobalTheory.Pst GlobalTheory.BKLim GlobalTheory.Cong Matrix
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.LiftDiv
 
-theorem dvd_mod_E : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (s : bk.S) (n : ℕ) (y : OC l), Per.θ l (bk.ev s) = (l : OC l) ^ n * y → ∃ s' t : bk.S, s = (l : bk.S) ^ n * s' + bk.E * t := by
+theorem dvd_mod_E
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (s : bk.S) (n : ℕ) (y : OC l),
+      Per.θ l (bk.ev s) = (l : OC l) ^ n * y
+        → ∃ s' t : bk.S, s = (l : bk.S) ^ n * s' + bk.E * t := by
   intro l _ K bk s n y h
   set r : ↥(OL K) := bk.str.symm (Ideal.Quotient.mk _ s) with hr
   have hθ : Per.θ l (bk.ev s) = intToOC K r := bk.θ_ev r s (by rw [hr, RingEquiv.apply_symm_apply])
@@ -40,14 +46,16 @@ theorem dvd_mod_E : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (s :
   have hrr : r = (l : ↥(OL K)) ^ n * r' := by
     apply Subtype.ext
     apply Subtype.ext
-    have : ((((l : ↥(OL K)) ^ n * r' : ↥(OL K)) : ↥K.1) : Om l) = (l : Om l) ^ n * ((q : ↥K.1) : Om l) := by
+    have : ((((l : ↥(OL K)) ^ n * r' : ↥(OL K)) : ↥K.1) : Om l)
+        = (l : Om l) ^ n * ((q : ↥K.1) : Om l) := by
       push_cast; rfl
     rw [this, hqO, mul_div_cancel₀ _ (pow_ne_zero _ hl0)]
   obtain ⟨s', hs'⟩ := Ideal.Quotient.mk_surjective (bk.str r')
   have hmk : Ideal.Quotient.mk (Ideal.span {bk.E}) (s - (l : bk.S) ^ n * s') = 0 := by
     have e1 : Ideal.Quotient.mk (Ideal.span {bk.E}) s = bk.str r := by
       rw [hr, RingEquiv.apply_symm_apply]
-    rw [map_sub, map_mul, map_pow, map_natCast, e1, hs', hrr, map_mul, map_pow, map_natCast, sub_self]
+    rw [map_sub, map_mul, map_pow, map_natCast, e1, hs', hrr, map_mul, map_pow, map_natCast,
+      sub_self]
   obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.1 (Ideal.Quotient.eq_zero_iff_mem.1 hmk)
   exact ⟨s', t, by rw [mul_comm bk.E t, ht]; ring⟩
 

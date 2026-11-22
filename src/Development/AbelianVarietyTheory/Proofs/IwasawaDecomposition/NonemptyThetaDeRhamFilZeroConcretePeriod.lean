@@ -21,25 +21,26 @@ namespace GlobalTheory.MemLoc.TiedTheta
 
 variable {l : ℕ} [Fact l.Prime]
 
-
 open Classical in
 def thetaExt (x : Per.BdR l) : ℂ_[l] :=
   if h : ∃ y : Per.BdRp l, algebraMap (Per.BdRp l) (Per.BdR l) y = x then Per.θD l h.choose else 0
 
-theorem thetaExt_alg (y : Per.BdRp l) :
-    thetaExt (algebraMap (Per.BdRp l) (Per.BdR l) y) = Per.θD l y := by
-  have h : ∃ z : Per.BdRp l, algebraMap (Per.BdRp l) (Per.BdR l) z =
-      algebraMap (Per.BdRp l) (Per.BdR l) y := ⟨y, rfl⟩
+theorem thetaExt_alg (y : Per.BdRp l)
+    : thetaExt (algebraMap (Per.BdRp l) (Per.BdR l) y) = Per.θD l y := by
+  have h
+      : ∃ z : Per.BdRp l,
+        algebraMap (Per.BdRp l) (Per.BdR l) z = algebraMap (Per.BdRp l) (Per.BdR l) y :=
+    ⟨y, rfl⟩
   rw [thetaExt, dite_eq_left h, (BdRField.bdR_isField l).2.1 h.choose_spec]
 
-theorem exists_of_mem_FilD_zero {x : Per.BdR l} (hx : x ∈ Per.FilD l 0) :
-    ∃ y : Per.BdRp l, x = algebraMap (Per.BdRp l) (Per.BdR l) y := by
+theorem exists_of_mem_FilD_zero {x : Per.BdR l} (hx : x ∈ Per.FilD l 0)
+    : ∃ y : Per.BdRp l, x = algebraMap (Per.BdRp l) (Per.BdR l) y := by
   obtain ⟨e, he⟩ := FilLaws.exists_isEps l
   obtain ⟨y, hy⟩ := (mem_FilD_iff_xi_pow l e he 0 x).1 hx
   exact ⟨y, by simpa using hy⟩
 
-theorem actC_eq {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (c : ℂ_[l]) :
-    AI.actC g c = Per.σC g c := by
+theorem actC_eq {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (c : ℂ_[l])
+    : AI.actC g c = Per.σC g c := by
   have h1 : Continuous (AI.actC g) :=
     (AddMonoidHomClass.isometry_of_norm (AI.actC g) (AI.actC_norm g)).continuous
   have h2 : Continuous (Per.σC g) :=
@@ -48,20 +49,23 @@ theorem actC_eq {P : LocPrime l} (AI : LocAinf l P) (g : GQ l) (c : ℂ_[l]) :
   | hp => exact isClosed_eq h1 h2
   | ih a => exact (AI.actC_ext g a).trans (GlobalTheory.RingBasics.σC_coe g a).symm
 
-theorem norm_untilt_sub (x : Per.Fl l) (y : Per.OC l)
-    (h : PreTilt.coeff 0 x = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : Per.OC l)}) y) :
-    ‖((x.untilt : Per.OC l) : ℂ_[l]) - (y : ℂ_[l])‖ ≤ ‖(l : ℂ_[l])‖ := by
+theorem norm_untilt_sub
+    (x : Per.Fl l) (y : Per.OC l)
+    (h : PreTilt.coeff 0 x = Ideal.Quotient.mk (Ideal.span {((l : ℕ) : Per.OC l)}) y)
+    : ‖((x.untilt : Per.OC l) : ℂ_[l]) - (y : ℂ_[l])‖ ≤ ‖(l : ℂ_[l])‖ := by
   rw [← PreTilt.mk_untilt_eq_coeff_zero, Ideal.Quotient.eq] at h
   have h1 := (GlobalTheory.RingBasics.mem_span_pow_OC 1 (x.untilt - y)).1 (by rwa [pow_one])
   rw [pow_one] at h1
   exact h1
 
-theorem nonempty_thetaL : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
-    LocTied l P AI → Nonempty (Formalism.MainNotions.LocalSituation.ThetaL P AI) := by
+theorem nonempty_thetaL
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P),
+      LocTied l P AI → Nonempty (Formalism.MainNotions.LocalSituation.ThetaL P AI) := by
   intro l _ P AI T
-  have hex : ∀ x ∈ (P.PD (MainNotions.LocalSituation.botExt l)).Fil 0,
-      ∃ y : Per.BdRp l, T.eD x = algebraMap (Per.BdRp l) (Per.BdR l) y :=
-    fun x hx => exists_of_mem_FilD_zero ((T.fil _ _ _).1 hx)
+  have hex
+      : ∀ x ∈ (P.PD (MainNotions.LocalSituation.botExt l)).Fil 0, ∃ y : Per.BdRp l,
+        T.eD x = algebraMap (Per.BdRp l) (Per.BdR l) y := fun x hx =>
+    exists_of_mem_FilD_zero ((T.fil _ _ _).1 hx)
   have hU := TiedUnif.tied_uniformiser l P AI T
   refine ⟨{
     θ := fun x => thetaExt (T.eD x)
@@ -75,11 +79,13 @@ theorem nonempty_thetaL : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : Lo
     θ_int := fun a => ?_
     θ_teich := fun x y h => ?_
     fil_succ_iff_mul_t := hU.2.2 _
-    t_μ := hU.1 _ }⟩
+    t_μ := hU.1 _
+  }⟩
   · rw [map_one, ← map_one (algebraMap (Per.BdRp l) (Per.BdR l)), thetaExt_alg, map_one]
   · obtain ⟨u, hu⟩ := hex x hx
     obtain ⟨v, hv⟩ := hex y hy
-    rw [map_add (f := _), hu, hv, ← map_add (f := _), thetaExt_alg, thetaExt_alg, thetaExt_alg, map_add (f := _)]
+    rw [map_add (f := _), hu, hv, ← map_add (f := _), thetaExt_alg, thetaExt_alg, thetaExt_alg,
+      map_add (f := _)]
   · obtain ⟨u, hu⟩ := hex x hx
     obtain ⟨v, hv⟩ := hex y hy
     rw [map_mul, hu, hv, ← map_mul, thetaExt_alg, thetaExt_alg, thetaExt_alg, map_mul]

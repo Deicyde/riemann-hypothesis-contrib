@@ -20,21 +20,21 @@ def Base.q {O : Type} [CommRing O] (B : Base O) : PowerSeries O :=
 
 def Base.p {O : Type} [CommRing O] (B : Base O) (s : ℕ) : PowerSeries O := (⇑B.φ)^[s] B.q
 
-structure Lat {O : Type} [CommRing O] (B : Base O) (n : ℕ) (V : Type) [AddCommGroup V]
-    [Module (PowerSeries O) V] where
-
+structure Lat
+    {O : Type} [CommRing O]
+    (B : Base O) (n : ℕ)
+    (V : Type) [AddCommGroup V] [Module (PowerSeries O) V] where
   φ : ZMod n → V →+ V
-
   γ : ZMod n → V →+ V
   φ_semi : ∀ i (a : PowerSeries O) (v : V), φ i (a • v) = B.φ a • φ i v
   γ_semi : ∀ i (a : PowerSeries O) (v : V), γ i (a • v) = B.γ a • γ i v
   comm : ∀ i (v : V), φ i (γ (i - 1) v) = γ i (φ i v)
-
   N : ZMod n → Submodule (PowerSeries O) V
 
 section
-variable {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V]
-  [Module (PowerSeries O) V]
+variable
+  {O : Type} [CommRing O]
+  {B : Base O} {n : ℕ} {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
 
 def Lat.phiIt (L : Lat B n V) (i : ZMod n) : ℕ → V → V
   | 0, v => v
@@ -49,8 +49,7 @@ def sm (a : PowerSeries O) (S : Submodule (PowerSeries O) V) : Submodule (PowerS
 def dv (a : PowerSeries O) (S : Submodule (PowerSeries O) V) : Submodule (PowerSeries O) V :=
   S.comap (LinearMap.lsmul (PowerSeries O) V a)
 
-def Lat.Ic (L : Lat B n V) (c : ZMod n) (w : V) : Prop :=
-  L.γ c w - w ∈ sm PowerSeries.X (L.N c)
+def Lat.Ic (L : Lat B n V) (c : ZMod n) (w : V) : Prop := L.γ c w - w ∈ sm PowerSeries.X (L.N c)
 
 def Lat.dφ (L : Lat B n V) (m : ZMod n → V) : ZMod n → V := fun i => L.φ i (m (i - 1)) - m i
 
@@ -63,8 +62,10 @@ def Lat.IsCobound (L : Lat B n V) (y z : ZMod n → V) : Prop :=
 
 end
 
-structure LatHom {O : Type} [CommRing O] {B : Base O} {n : ℕ} {V V' : Type} [AddCommGroup V]
-    [Module (PowerSeries O) V] [AddCommGroup V'] [Module (PowerSeries O) V']
+structure LatHom
+    {O : Type} [CommRing O]
+    {B : Base O} {n : ℕ} {V V' : Type}
+    [AddCommGroup V] [Module (PowerSeries O) V] [AddCommGroup V'] [Module (PowerSeries O) V']
     (L : Lat B n V) (L' : Lat B n V') where
   f : V →ₗ[PowerSeries O] V'
   φ_comm : ∀ i v, f (L.φ i v) = L'.φ i (f v)

@@ -10,24 +10,29 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormSubL
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 open GlobalTheory.CompanionTheory.LTPer.Tilt
 
 namespace GlobalTheory.CompanionTheory.LTPer.Tilt
 
-theorem isUnit_BdRp_of_thB {l : ℕ} [Fact l.Prime] {u : Formalism.Per6.BdRp l} (h : thB l u ≠ 0) :
-    IsUnit u := by
+theorem isUnit_BdRp_of_thB {l : ℕ} [Fact l.Prime] {u : Formalism.Per6.BdRp l} (h : thB l u ≠ 0)
+    : IsUnit u := by
   change IsUnit (show BDeRhamPlus (GroundTheory.PAdicHodge.normInteger ℂ_[l]) l from u)
   by_contra hy
   have h2 := (IsLocalRing.mem_maximalIdeal _).2 hy
   rw [GroundTheory.PAdicHodge.IsPerfectoidField.maximalIdeal_bDeRhamPlus, RingHom.mem_ker] at h2
   exact h h2
 
-theorem eq_of_pow_eq_self_of_thB_eq {l : ℕ} [Fact l.Prime] {q : ℕ} (hq : 2 ≤ q)
-    {a b : Formalism.Per6.BdRp l} (ha : a ^ q = a) (hb : b ^ q = b) (hab : thB l a = thB l b) :
-    a = b := by
+theorem eq_of_pow_eq_self_of_thB_eq
+    {l : ℕ} [Fact l.Prime]
+    {q : ℕ} (hq : 2 ≤ q)
+    {a b : Formalism.Per6.BdRp l} (ha : a ^ q = a) (hb : b ^ q = b) (hab : thB l a = thB l b)
+    : a = b := by
   set S : Formalism.Per6.BdRp l := ∑ i ∈ Finset.range q, a ^ i * b ^ (q - 1 - i) with hS
   have hkey : (a - b) * (S - 1) = 0 := by
     have h1 : (a - b) * S = a ^ q - b ^ q := (Commute.all a b).mul_geom_sum₂ q
@@ -54,8 +59,10 @@ theorem eq_of_pow_eq_self_of_thB_eq {l : ℕ} [Fact l.Prime] {q : ℕ} (hq : 2 �
   have hu := isUnit_BdRp_of_thB hne
   exact sub_eq_zero.1 ((hu.mul_left_eq_zero).1 hkey)
 
-theorem tch_eq_rB_of_sh_eq : ∀ {l : ℕ} [Fact l.Prime] (q : ℕ), 2 ≤ q → l ∣ q → ∀ (x : Tl l) (y : Om l),
-    x ^ q = x → y ^ q = y → sh x = omC y → tch l x = rB l y := by
+theorem tch_eq_rB_of_sh_eq
+    : ∀ {l : ℕ} [Fact l.Prime] (q : ℕ),
+      2 ≤ q → l ∣ q
+        → ∀ (x : Tl l) (y : Om l), x ^ q = x → y ^ q = y → sh x = omC y → tch l x = rB l y := by
   intro l _ q hq _ x y hx hy hxy
   refine eq_of_pow_eq_self_of_thB_eq hq ?_ ?_ ?_
   · rw [← tch_pow, hx]

@@ -6,15 +6,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.V.Af.Smo (Eig EigAt)
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
 open scoped Classical
 open scoped nonZeroDivisors
 
-private theorem coset_shift {K : Type} [Field K] [NumberField K]
+private theorem coset_shift
+    {K : Type} [Field K] [NumberField K]
     (J : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (b x s : FiniteAdeleRing (𝓞 K) K)
-    (hs : s ∈ idealFiniteAdeles J) : cosetIndicator J b (x + s) = cosetIndicator J b x := by
+    (hs : s ∈ idealFiniteAdeles J)
+    : cosetIndicator J b (x + s) = cosetIndicator J b x := by
   rw [cosetIndicator_apply, cosetIndicator_apply]
   have e : x + s - b = (x - b) + s := by ring
   have h : x + s - b ∈ idealFiniteAdeles J ↔ x - b ∈ idealFiniteAdeles J := by
@@ -22,10 +26,11 @@ private theorem coset_shift {K : Type} [Field K] [NumberField K]
     exact AddSubgroup.add_mem_cancel_right _ hs
   simp only [h]
 
-private theorem std_gen {K : Type} [Field K] [NumberField K]
+private theorem std_gen
+    {K : Type} [Field K] [NumberField K]
     (J : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (v : P K)
-    (hJ : FractionalIdeal.count K v (J : FractionalIdeal (𝓞 K)⁰ K) = 0) (y : Kv v) (hy : IsInt y) :
-    (sg v y).2 ∈ idealFiniteAdeles J := by
+    (hJ : FractionalIdeal.count K v (J : FractionalIdeal (𝓞 K)⁰ K) = 0) (y : Kv v) (hy : IsInt y)
+    : (sg v y).2 ∈ idealFiniteAdeles J := by
   rw [mem_idealFiniteAdeles]
   intro v'
   obtain ⟨-, -, -, -, -, -, -, h8, -⟩ := sgLaws K v
@@ -40,8 +45,8 @@ private theorem std_gen {K : Type} [Field K] [NumberField K]
     rw [map_zero]
     exact zero_le
 
-theorem UpperTheory.ConvolutionTheory.R2.H.stdAe :
-    ∀ (K : Type) [Field K] [NumberField K] (φ : S4 K), ∀ᶠ v in cofinite, Std v φ.1 := by
+theorem UpperTheory.ConvolutionTheory.R2.H.stdAe
+    : ∀ (K : Type) [Field K] [NumberField K] (φ : S4 K), ∀ᶠ v in cofinite, Std v φ.1 := by
   intro K _ _ φ
   obtain ⟨f, hf⟩ := φ
   change ∀ᶠ v in cofinite, Std v f
@@ -49,7 +54,8 @@ theorem UpperTheory.ConvolutionTheory.R2.H.stdAe :
   induction hf using Submodule.span_induction with
   | mem F h =>
     obtain ⟨g, J, b, rfl⟩ := h
-    have h1 : ∀ᶠ v : P K in cofinite, FractionalIdeal.count K v (J : FractionalIdeal (𝓞 K)⁰ K) = 0 :=
+    have h1
+        : ∀ᶠ v : P K in cofinite, FractionalIdeal.count K v (J : FractionalIdeal (𝓞 K)⁰ K) = 0 :=
       FractionalIdeal.finite_factors (J : FractionalIdeal (𝓞 K)⁰ K)
     have h2 : ∀ᶠ v : P K in cofinite, ∀ i, Valued.v ((b i) v) ≤ 1 :=
       eventually_all.2 fun i => (b i).2

@@ -18,9 +18,11 @@ open scoped ENNReal
 
 noncomputable section
 
-theorem GraphAreaFibre.differentiableAt_graphPt {d m n : ℕ} (e : Fin n ≃ Fin d ⊕ Fin m)
+theorem GraphAreaFibre.differentiableAt_graphPt
+    {d m n : ℕ} (e : Fin n ≃ Fin d ⊕ Fin m)
     {Φ : EuclideanSpace ℂ (Fin d) → EuclideanSpace ℂ (Fin m)} {x : EuclideanSpace ℂ (Fin d)}
-    (hΦ : DifferentiableAt ℂ Φ x) : DifferentiableAt ℂ (graphPt e Φ) x := by
+    (hΦ : DifferentiableAt ℂ Φ x)
+    : DifferentiableAt ℂ (graphPt e Φ) x := by
   rw [differentiableAt_piLp]
   intro j
   show DifferentiableAt ℂ (fun y => Sum.elim (fun i => y i) (fun i => Φ y i) (e j)) x
@@ -28,13 +30,15 @@ theorem GraphAreaFibre.differentiableAt_graphPt {d m n : ℕ} (e : Fin n ≃ Fin
   · exact (differentiableAt_piLp 2).1 differentiableAt_id i
   · exact (differentiableAt_piLp 2).1 hΦ i
 
-theorem GraphAreaFibre.continuous_graphBase {d k n : ℕ} (e : Fin n ≃ Fin d ⊕ Fin k) :
-    Continuous (graphBase e : EuclideanSpace ℂ (Fin n) → EuclideanSpace ℂ (Fin d)) := by
+theorem GraphAreaFibre.continuous_graphBase {d k n : ℕ} (e : Fin n ≃ Fin d ⊕ Fin k)
+    : Continuous (graphBase e : EuclideanSpace ℂ (Fin n) → EuclideanSpace ℂ (Fin d)) := by
   unfold graphBase
   fun_prop
 
-theorem GraphAreaFibre.proof (hInt : GraphAreaIntegral.Statement) (hJac : TangentJacComp.Statement)
-    (hMult : AreaMultiplicityWeight.Statement) : GraphAreaFibre.Statement := by
+theorem GraphAreaFibre.proof
+    (hInt : GraphAreaIntegral.Statement) (hJac : TangentJacComp.Statement)
+    (hMult : AreaMultiplicityWeight.Statement)
+    : GraphAreaFibre.Statement := by
   intro d k n e Ω Φ hΩ hΦ P hPΩ hPm T hT π
   set G : EuclideanSpace ℂ (Fin d) → EuclideanSpace ℂ (Fin n) := graphPt e Φ with hGdef
   set μ : Measure (EuclideanSpace ℂ (Fin d)) := Measure.hausdorffMeasure ((2 * d : ℕ) : ℝ) with hμdef
@@ -89,9 +93,9 @@ theorem GraphAreaFibre.proof (hInt : GraphAreaIntegral.Statement) (hJac : Tangen
       · rintro ⟨x, ⟨⟨-, hxP⟩, hxw⟩, rfl⟩
         exact ⟨hxP, hxw⟩
     rw [hset, (graphPt_injective_of_graphBase e Φ).injOn.encard_image]
-  have hNfun : (fun w : EuclideanSpace ℂ (Fin d) =>
-      (({y | y ∈ P ∧ linProj π y = w}.encard : ℕ∞) : ℝ≥0∞)) =
-      fun w => (({x ∈ A | f x = w}.encard : ℕ∞) : ℝ≥0∞) := by
+  have hNfun
+      : (fun w : EuclideanSpace ℂ (Fin d) => (({y | y ∈ P ∧ linProj π y = w}.encard : ℕ∞) : ℝ≥0∞))
+        = fun w => (({x ∈ A | f x = w}.encard : ℕ∞) : ℝ≥0∞) := by
     funext w
     rw [hcount w]
 
@@ -100,17 +104,21 @@ theorem GraphAreaFibre.proof (hInt : GraphAreaIntegral.Statement) (hJac : Tangen
   · rw [hNfun]
     exact hNm.mono_ac (Measure.absolutelyContinuous_isAddHaarMeasure volume μ)
 
-  have h1 : ∫⁻ y in P, g (linProj π y) * ENNReal.ofReal (tangentJac π (T y))
-      ∂(Measure.hausdorffMeasure ((2 * d : ℕ) : ℝ)) =
-      ∫⁻ x in A, g (f x) * ENNReal.ofReal |(fderiv ℝ f x).det| ∂μ := by
+  have h1
+      : ∫⁻ y in P, g (linProj π y) * ENNReal.ofReal (tangentJac π (T y))
+          ∂(Measure.hausdorffMeasure ((2 * d : ℕ) : ℝ))
+        = ∫⁻ x in A, g (f x) * ENNReal.ofReal |(fderiv ℝ f x).det| ∂μ := by
     rw [← hGA, hInt d k n e Ω Φ hΩ hΦ A hAΩ hAm]
     refine setLIntegral_congr_fun hAm fun x hx => ?_
     have hG' : fderiv ℝ G x = (fderiv ℂ G x).restrictScalars ℝ :=
       ((hGd x (hAΩ hx)).hasFDerivAt.restrictScalars ℝ).fderiv
     have hf'x : fderiv ℝ f x = (Lπ.comp (fderiv ℂ G x)).restrictScalars ℝ := (hfd x (hAΩ hx)).fderiv
     have hJ := hJac d n (fderiv ℂ G x : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin n)) π
-    have hTx : T (G x) = LinearMap.range (fderiv ℂ G x :
-        EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin n)) := hT x (hAΩ hx) hx.2
+    have hTx
+        : T (G x)
+          = LinearMap.range
+            (fderiv ℂ G x : EuclideanSpace ℂ (Fin d) →ₗ[ℂ] EuclideanSpace ℂ (Fin n)) :=
+      hT x (hAΩ hx) hx.2
     have hnn : 0 ≤ tangentJac π (T (G x)) := by
       unfold tangentJac
       positivity

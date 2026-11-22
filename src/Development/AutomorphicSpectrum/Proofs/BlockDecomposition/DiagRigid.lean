@@ -6,22 +6,34 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.IwahoriPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC
+  Formalism.UG
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace GlobalTheory.CompanionTheory.DiagRigid
 
-theorem diag_rigid : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n : ℕ) (y : Fin n → ℤ), Function.Injective y → ∀ (d d' : Fin n → Lˣ), (∀ i, ordL (d i : L) = y i) → (∀ i, ordL (d' i : L) = y i) → ∀ h : GL (Fin n) L, h⁻¹ * GlobalTheory.SmGL.diagT L (Fin n) d * h = GlobalTheory.SmGL.diagT L (Fin n) d' → d = d' ∧ ∃ s : Fin n → Lˣ, h = GlobalTheory.SmGL.diagT L (Fin n) s := by
+theorem diag_rigid
+    : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicative ℤ))] (n : ℕ) (y : Fin n → ℤ),
+      Function.Injective y
+        → ∀ (d d' : Fin n → Lˣ),
+          (∀ i, ordL (d i : L) = y i) → (∀ i, ordL (d' i : L) = y i)
+            → ∀ h : GL (Fin n) L,
+              h⁻¹ * GlobalTheory.SmGL.diagT L (Fin n) d * h = GlobalTheory.SmGL.diagT L (Fin n) d'
+                → d = d' ∧ ∃ s : Fin n → Lˣ, h = GlobalTheory.SmGL.diagT L (Fin n) s := by
   intro L _ _ n y hy d d' hd hd' h hh
-  have key : GlobalTheory.SmGL.diagT L (Fin n) d * h = h * GlobalTheory.SmGL.diagT L (Fin n) d' := by
+  have key
+      : GlobalTheory.SmGL.diagT L (Fin n) d * h = h * GlobalTheory.SmGL.diagT L (Fin n) d' := by
     rw [← hh]; simp only [mul_assoc, mul_inv_cancel_left]
-  have key' : (Matrix.diagonal fun i => (d i : L)) * (h : Matrix (Fin n) (Fin n) L)
-      = (h : Matrix (Fin n) (Fin n) L) * Matrix.diagonal fun i => (d' i : L) := by
+  have key'
+      : (Matrix.diagonal fun i => (d i : L)) * (h : Matrix (Fin n) (Fin n) L)
+        = (h : Matrix (Fin n) (Fin n) L) * Matrix.diagonal fun i => (d' i : L) := by
     have := congrArg (fun g : GL (Fin n) L => (g : Matrix (Fin n) (Fin n) L)) key
     simpa only [Units.val_mul, GlobalTheory.SmGL.val_diagT] using this
-  have ent : ∀ i j, (d i : L) * (h : Matrix (Fin n) (Fin n) L) i j
-      = (h : Matrix (Fin n) (Fin n) L) i j * (d' j : L) := by
+  have ent
+      : ∀ i j,
+        (d i : L) * (h : Matrix (Fin n) (Fin n) L) i j
+          = (h : Matrix (Fin n) (Fin n) L) i j * (d' j : L) := by
     intro i j
     have := congrFun (congrFun key' i) j
     rwa [Matrix.diagonal_mul, Matrix.mul_diagonal] at this
@@ -35,8 +47,9 @@ theorem diag_rigid : ∀ (L : Type) [Field L] [Valued L (WithZero (Multiplicativ
     apply hij
     apply hy
     rw [← hd i, ← hd' j, e]
-  have hdiag : (h : Matrix (Fin n) (Fin n) L)
-      = Matrix.diagonal fun i => (h : Matrix (Fin n) (Fin n) L) i i := by
+  have hdiag
+      : (h : Matrix (Fin n) (Fin n) L)
+        = Matrix.diagonal fun i => (h : Matrix (Fin n) (Fin n) L) i i := by
     ext i j
     by_cases hij : i = j
     · subst hij; simp

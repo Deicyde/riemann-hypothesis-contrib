@@ -4,14 +4,15 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh2.diagz :
-    ∀ {K : Type} [inst : Field K]
-    (M : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K) (a : Fin (4 : ℕ) → K),
-    Function.Injective a →
-      M.charpoly = ∏ i : Fin (4 : ℕ), (Polynomial.X - (Polynomial.C : K → Polynomial K) (a i)) →
-        ∃ (P : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K) (Q : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K),
-          P * Q = (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K) ∧
-            Q * P = (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K) ∧ Q * M * P = Matrix.diagonal a := by
+theorem UpperTheory.Reformulated.B.Qh2.diagz
+    : ∀ {K : Type} [inst : Field K] (M : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K)
+        (a : Fin (4 : ℕ) → K),
+      Function.Injective a
+        → M.charpoly = ∏ i : Fin (4 : ℕ), (Polynomial.X - (Polynomial.C : K → Polynomial K) (a i))
+        → ∃ (P : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K) (Q : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K),
+          P * Q = (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K)
+            ∧ Q * P = (1 : Matrix (Fin (4 : ℕ)) (Fin (4 : ℕ)) K)
+            ∧ Q * M * P = Matrix.diagonal a := by
   intro K _ M a ha hM
   have hev : ∀ i, Module.End.HasEigenvalue (Matrix.toLin' M) (a i) := by
     intro i

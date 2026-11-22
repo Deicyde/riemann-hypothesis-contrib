@@ -8,9 +8,11 @@ namespace GlobalTheory.LatticeCovolumeL2
 
 open NumberField Matrix
 
-theorem det_compl {n : Type} [Fintype n] [DecidableEq n] (M Y : Matrix n n ℝ) (h : M * Y = 1) (p : n → Prop)
-    [DecidablePred p] :
-    (toSquareBlockProp Y (fun k => ¬ p k)).det = (toSquareBlockProp M p).det * Y.det := by
+theorem det_compl
+    {n : Type} [Fintype n] [DecidableEq n]
+    (M Y : Matrix n n ℝ) (h : M * Y = 1)
+    (p : n → Prop) [DecidablePred p]
+    : (toSquareBlockProp Y (fun k => ¬ p k)).det = (toSquareBlockProp M p).det * Y.det := by
   let Z : Matrix n n ℝ := fun i k => if p k then (1 : Matrix n n ℝ) i k else Y i k
   have hMZ : ∀ i k, (M * Z) i k = if p k then M i k else (1 : Matrix n n ℝ) i k := by
     intro i k
@@ -57,8 +59,9 @@ theorem det_compl {n : Type} [Fintype n] [DecidableEq n] (M Y : Matrix n n ℝ) 
 
 variable {E : Type} [Field E] [NumberField E]
 
-noncomputable def cmEquiv (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) :
-    Ψ ⊕ Ψ ≃ (E →+* ℂ) :=
+noncomputable def cmEquiv
+    (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ)
+    : Ψ ⊕ Ψ ≃ (E →+* ℂ) :=
   Equiv.ofBijective (Sum.elim (fun τ => τ.1) (fun τ => ComplexEmbedding.conjugate τ.1)) <| by
     have cc : ∀ τ : E →+* ℂ, ComplexEmbedding.conjugate (ComplexEmbedding.conjugate τ) = τ :=
       fun τ => star_star τ
@@ -77,11 +80,13 @@ noncomputable def cmEquiv (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ τ : E →+* �
         by_contra h'
         exact h ((hΨ τ).2 h')
 
-theorem det_gram {ι : Type} [Fintype ι] [DecidableEq ι] (hι : Fintype.card ι = Module.finrank ℚ E)
+theorem det_gram
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (hι : Fintype.card ι = Module.finrank ℚ E)
     (Ψ : Finset (E →+* ℂ)) (hΨ : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ)
     (a : ι → E) (s : Ψ → ℝ) (G : Matrix ι ι ℝ)
-    (hG : ∀ k l, G k l = ∑ τ : Ψ, (τ.1 (a k) * (starRingEnd ℂ) (τ.1 (a l))).re * s τ) :
-    G.det = |((Algebra.discr ℚ a : ℚ) : ℝ)| * (∏ τ, (s τ / 2)) ^ 2 := by
+    (hG : ∀ k l, G k l = ∑ τ : Ψ, (τ.1 (a k) * (starRingEnd ℂ) (τ.1 (a l))).re * s τ)
+    : G.det = |((Algebra.discr ℚ a : ℚ) : ℝ)| * (∏ τ, (s τ / 2)) ^ 2 := by
   let κ := Ψ ⊕ Ψ
   let e1 : κ ≃ (E →+* ℂ) := cmEquiv Ψ hΨ
   have hcard : Fintype.card ι = Fintype.card κ := by
@@ -114,8 +119,8 @@ theorem det_gram {ι : Type} [Fintype ι] [DecidableEq ι] (hι : Fintype.card �
     have h1 : ((G.det : ℝ) : ℂ) = (G.map (fun x : ℝ => (x : ℂ))).det :=
       RingHom.map_det Complex.ofRealHom G
     have h2 : (B.map (starRingEnd ℂ)).det = (starRingEnd ℂ) B.det := (RingHom.map_det _ B).symm
-    rw [h1, hGm, det_mul, det_mul, det_diagonal, det_transpose, h2,
-      Equiv.prod_comp f d, Fintype.prod_sum_type]
+    rw [h1, hGm, det_mul, det_mul, det_diagonal, det_transpose, h2, Equiv.prod_comp f d,
+      Fintype.prod_sum_type]
     simp only [d, Sum.elim_inl, Sum.elim_inr]
     ring
   have hn : ((|((Algebra.discr ℚ a : ℚ) : ℝ)| : ℝ) : ℂ) = B.det * (starRingEnd ℂ) B.det := by
@@ -126,9 +131,10 @@ theorem det_gram {ι : Type} [Fintype ι] [DecidableEq ι] (hι : Fintype.card �
   rw [hdetG, Complex.ofReal_mul, hn, Complex.ofReal_pow, Complex.ofReal_prod]
   simp only [Complex.ofReal_div, Complex.ofReal_ofNat]
 
-theorem discr_le {ι : Type} [Fintype ι] [DecidableEq ι] (a b : ι → E)
-    (h : ∀ i, b i ∈ Submodule.span ℤ (Set.range a)) (hb : Algebra.discr ℚ b ≠ 0) :
-    Algebra.discr ℚ a ≠ 0 ∧ |Algebra.discr ℚ a| ≤ |Algebra.discr ℚ b| := by
+theorem discr_le
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (a b : ι → E) (h : ∀ i, b i ∈ Submodule.span ℤ (Set.range a)) (hb : Algebra.discr ℚ b ≠ 0)
+    : Algebra.discr ℚ a ≠ 0 ∧ |Algebra.discr ℚ a| ≤ |Algebra.discr ℚ b| := by
   have hc : ∀ i, ∃ c : ι → ℤ, ∑ j, c j • a j = b i := fun i =>
     (Submodule.mem_span_range_iff_exists_fun (R := ℤ)).1 (h i)
   choose c hc using hc
@@ -140,8 +146,7 @@ theorem discr_le {ι : Type} [Fintype ι] [DecidableEq ι] (a b : ι → E)
     simp [Matrix.mulVec, dotProduct, Pq, P, zsmul_eq_mul, map_intCast]
   have hd := Algebra.discr_of_matrix_mulVec a Pq
   rw [hb'] at hd
-  have hPq : Pq.det = (P.det : ℚ) := by
-    exact (RingHom.map_det (Int.castRingHom ℚ) P).symm
+  have hPq : Pq.det = (P.det : ℚ) := by exact (RingHom.map_det (Int.castRingHom ℚ) P).symm
   rw [hPq] at hd
   have hP0 : P.det ≠ 0 := by
     intro h0
@@ -156,13 +161,16 @@ theorem discr_le {ι : Type} [Fintype ι] [DecidableEq ι] (a b : ι → E)
     exact one_le_pow₀ (by exact_mod_cast this)
   nlinarith [abs_nonneg (Algebra.discr ℚ a)]
 
-theorem finrank_int_le {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite ℤ X]
-    (h : Module.finrank (𝓞 E) X = 1) : Module.finrank ℤ X ≤ Module.finrank ℚ E := by
+theorem finrank_int_le
+    {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.Finite ℤ X]
+    (h : Module.finrank (𝓞 E) X = 1)
+    : Module.finrank ℤ X ≤ Module.finrank ℚ E := by
   have : Module.Finite (𝓞 E) X := Module.Finite.of_restrictScalars_finite ℤ (𝓞 E) X
   obtain ⟨x, hx⟩ := exists_linearIndependent_of_le_finrank (R := 𝓞 E) (M := X) (n := 1) h.ge
   have hx0 : ∀ c : 𝓞 E, c • x 0 = 0 → c = 0 := by
     intro c hc
-    exact linearIndependent_iff'.1 hx Finset.univ (fun _ => c) (by simpa using hc) 0 (Finset.mem_univ _)
+    exact
+      linearIndependent_iff'.1 hx Finset.univ (fun _ => c) (by simpa using hc) 0 (Finset.mem_univ _)
   have key : ∀ y : X, ∃ N : ℤ, N ≠ 0 ∧ ∃ α : 𝓞 E, N • y = α • x 0 := by
     intro y
     have hdep : ¬ LinearIndependent (𝓞 E) ![x 0, y] := by
@@ -177,8 +185,9 @@ theorem finrank_int_le {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.F
       intro ht0
       rw [ht0, zero_smul, add_zero] at hst
       exact hne (hx0 s hst) ht0
-    have hI := Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := Ideal.span {t}) ht
-      (Ideal.mem_span_singleton_self t) (NumberField.RingOfIntegers.isIntegral t)
+    have hI :=
+      Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := Ideal.span {t}) ht
+        (Ideal.mem_span_singleton_self t) (NumberField.RingOfIntegers.isIntegral t)
     obtain ⟨N, hN, hN0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
     rw [Ideal.mem_comap, Ideal.mem_span_singleton] at hN
     obtain ⟨c, hc⟩ := hN
@@ -186,16 +195,19 @@ theorem finrank_int_le {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.F
     have hty : t • y = -(s • x 0) := eq_neg_of_add_eq_zero_right hst
     rw [← algebraMap_smul (𝓞 E) N y, hc, mul_comm t c, mul_smul, hty]
     simp [smul_neg, mul_smul]
-  obtain ⟨yv, hy⟩ := exists_linearIndependent_of_le_finrank (R := ℤ) (M := X) (le_refl (Module.finrank ℤ X))
+  obtain ⟨yv, hy⟩ :=
+    exists_linearIndependent_of_le_finrank (R := ℤ) (M := X) (le_refl (Module.finrank ℤ X))
   choose N hN α hα using fun i => key (yv i)
   let N0 : ℤ := ∏ i, N i
   have hN0 : N0 ≠ 0 := Finset.prod_ne_zero_iff.2 fun i _ => hN i
   let φ : 𝓞 E →ₗ[ℤ] X := (LinearMap.toSpanSingleton (𝓞 E) X (x 0)).restrictScalars ℤ
-  let β : Fin (Module.finrank ℤ X) → 𝓞 E := fun i => ((∏ j ∈ Finset.univ.erase i, N j : ℤ) : 𝓞 E) * α i
+  let β : Fin (Module.finrank ℤ X) → 𝓞 E := fun i =>
+    ((∏ j ∈ Finset.univ.erase i, N j : ℤ) : 𝓞 E) * α i
   have hβ : ∀ i, φ (β i) = N0 • yv i := by
     intro i
     show (((∏ j ∈ Finset.univ.erase i, N j : ℤ) : 𝓞 E) * α i) • x 0 = N0 • yv i
-    rw [mul_smul, ← hα i, Int.cast_smul_eq_zsmul, smul_smul, Finset.prod_erase_mul _ _ (Finset.mem_univ i)]
+    rw [mul_smul, ← hα i, Int.cast_smul_eq_zsmul, smul_smul,
+      Finset.prod_erase_mul _ _ (Finset.mem_univ i)]
   have hli : LinearIndependent ℤ (φ ∘ β) := by
     have hfun : φ ∘ β = fun i => N0 • yv i := funext hβ
     rw [hfun]
@@ -206,14 +218,19 @@ theorem finrank_int_le {X : Type} [AddCommGroup X] [Module (𝓞 E) X] [Module.F
   have := (LinearIndependent.of_comp φ hli).fintype_card_le_finrank
   simpa [NumberField.RingOfIntegers.rank] using this
 
-theorem exists_line_basis {La ι V : Type} [AddCommGroup La] [Module (𝓞 E) La] [Fintype ι]
-    [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
-    (ψ : La →ₗ[𝓞 E] V) (hψ : Function.Injective ψ) (T : La → Prop) (b : ι → La)
+theorem exists_line_basis
+    {La ι V : Type} [AddCommGroup La] [Module (𝓞 E) La] [Fintype ι] [AddCommGroup V] [Module E V]
+    [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (ψ : La →ₗ[𝓞 E] V) (hψ : Function.Injective ψ)
+    (T : La → Prop)
+    (b : ι → La)
     (hT : ∀ (c : 𝓞 E) v, T v → T (c • v)) (hsat : ∀ (m : ℤ) v, m ≠ 0 → T (m • v) → T v)
     (hb : ∀ v, T v → v ∈ Submodule.span ℤ (Set.range b)) (hι : Fintype.card ι ≤ Module.finrank ℚ E)
-    (t : La) (ht : T t) (h0 : ψ t ≠ 0) :
-    Fintype.card ι = Module.finrank ℚ E ∧ ∃ a : ι → E, (∀ k, ψ (b k) = a k • ψ t) ∧
-      ∀ e : E, e • ψ t ∈ LinearMap.range ψ ↔ e ∈ Submodule.span ℤ (Set.range a) := by
+    (t : La) (ht : T t) (h0 : ψ t ≠ 0)
+    : Fintype.card ι = Module.finrank ℚ E
+      ∧ ∃ a : ι → E,
+        (∀ k, ψ (b k) = a k • ψ t)
+          ∧ ∀ e : E, e • ψ t ∈ LinearMap.range ψ ↔ e ∈ Submodule.span ℤ (Set.range a) := by
   have hinj : ∀ c : 𝓞 E, c • t = 0 → c = 0 := by
     intro c hc
     have h1 := congrArg ψ hc
@@ -223,14 +240,16 @@ theorem exists_line_basis {La ι V : Type} [AddCommGroup La] [Module (𝓞 E) La
     · exact absurd h2 h0
   let S : Submodule ℤ La := Submodule.span ℤ (Set.range b)
   have hSfin : Module.Finite ℤ S := Module.Finite.span_of_finite ℤ (Set.finite_range b)
-  have hS : ∀ {κ : Type} [Fintype κ] (w : κ → La), (∀ i, w i ∈ S) → LinearIndependent ℤ w →
-      Fintype.card κ ≤ Fintype.card ι := by
+  have hS
+      : ∀ {κ : Type} [Fintype κ] (w : κ → La),
+        (∀ i, w i ∈ S) → LinearIndependent ℤ w → Fintype.card κ ≤ Fintype.card ι := by
     intro κ _ w hw hli
     let w' : κ → S := fun i => ⟨w i, hw i⟩
     have hli' : LinearIndependent ℤ w' := LinearIndependent.of_comp S.subtype hli
     exact hli'.fintype_card_le_finrank.trans (finrank_range_le_card b)
-  obtain ⟨β, hβ⟩ := exists_linearIndependent_of_le_finrank (R := ℤ) (M := 𝓞 E)
-    (le_of_eq (NumberField.RingOfIntegers.rank E).symm)
+  obtain ⟨β, hβ⟩ :=
+    exists_linearIndependent_of_le_finrank (R := ℤ) (M := 𝓞 E)
+      (le_of_eq (NumberField.RingOfIntegers.rank E).symm)
   let φ : 𝓞 E →ₗ[ℤ] La := (LinearMap.toSpanSingleton (𝓞 E) La t).restrictScalars ℤ
   have hφ : LinearMap.ker φ = ⊥ := by
     rw [LinearMap.ker_eq_bot']
@@ -261,9 +280,9 @@ theorem exists_line_basis {La ι V : Type} [AddCommGroup La] [Module (𝓞 E) La
       cases o with
       | none => exact ho hz
       | some j => exact ho (this j)
-    let γ : 𝓞 E := -∑ j, (g (some j) : 𝓞 E) * β j
+    let γ : 𝓞 E := - ∑ j, (g (some j) : 𝓞 E) * β j
     have hmb : g none • b k = γ • t := by
-      have h1 : g none • b k = -∑ j, g (some j) • φ (β j) := eq_neg_of_add_eq_zero_left hg
+      have h1 : g none • b k = - ∑ j, g (some j) • φ (β j) := eq_neg_of_add_eq_zero_left hg
       rw [h1]
       simp only [γ, φ, LinearMap.restrictScalars_apply, LinearMap.toSpanSingleton_apply, neg_smul,
         Finset.sum_smul, mul_smul, Int.cast_smul_eq_zsmul]
@@ -277,14 +296,16 @@ theorem exists_line_basis {La ι V : Type} [AddCommGroup La] [Module (𝓞 E) La
   · rintro ⟨v, hv⟩
     obtain ⟨α, β', hβ'⟩ := IsFractionRing.div_surjective (A := 𝓞 E) e
     have hβ0 : β' ≠ 0 := nonZeroDivisors.ne_zero hβ'.1
-    have hβE : algebraMap (𝓞 E) E β' ≠ 0 := (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).2 hβ0
+    have hβE : algebraMap (𝓞 E) E β' ≠ 0 :=
+      (map_ne_zero_iff _ (IsFractionRing.injective (𝓞 E) E)).2 hβ0
     have h1 : β' • v = α • t := by
       apply hψ
       rw [map_smul, map_smul, hv, ← algebraMap_smul E β', ← algebraMap_smul E α, smul_smul, ← hβ'.2]
       congr 1
       field_simp
-    have hI := Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := Ideal.span {β'}) hβ0
-      (Ideal.mem_span_singleton_self β') (NumberField.RingOfIntegers.isIntegral β')
+    have hI :=
+      Ideal.comap_ne_bot_of_integral_mem (R := ℤ) (I := Ideal.span {β'}) hβ0
+        (Ideal.mem_span_singleton_self β') (NumberField.RingOfIntegers.isIntegral β')
     obtain ⟨N, hN, hN0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hI
     rw [Ideal.mem_comap, Ideal.mem_span_singleton] at hN
     obtain ⟨c, hc⟩ := hN

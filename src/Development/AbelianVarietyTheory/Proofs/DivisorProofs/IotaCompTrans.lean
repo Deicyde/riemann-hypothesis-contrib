@@ -18,11 +18,14 @@ def iota (hI : RingHom.ker π = I) (S : Subring R) : S ⧸ I.comap S.subtype →
     rw [← hI] at h
     exact h
 
-theorem iota_comp_mk (hI : RingHom.ker π = I) (S : Subring R) :
-    (iota I π hI S).comp (Ideal.Quotient.mk _) = π.comp S.subtype := rfl
+theorem iota_comp_mk (hI : RingHom.ker π = I) (S : Subring R)
+    : (iota I π hI S).comp (Ideal.Quotient.mk _) = π.comp S.subtype :=
+  rfl
 
-theorem iota_injective (hI : RingHom.ker π = I) (S : Subring R) : Function.Injective (iota I π hI S) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+theorem iota_injective (hI : RingHom.ker π = I) (S : Subring R)
+    : Function.Injective (iota I π hI S) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro a ha
   obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective a
   rw [Ideal.Quotient.eq_zero_iff_mem]
@@ -33,12 +36,13 @@ theorem iota_injective (hI : RingHom.ker π = I) (S : Subring R) : Function.Inje
 def trans {S S' : Subring R} (h : S ≤ S') : S ⧸ I.comap S.subtype →+* S' ⧸ I.comap S'.subtype :=
   Ideal.quotientMap _ (Subring.inclusion h) fun x hx => hx
 
-theorem iota_comp_trans (hI : RingHom.ker π = I) {S S' : Subring R} (h : S ≤ S') :
-    (iota I π hI S').comp (trans I h) = iota I π hI S := by
+theorem iota_comp_trans (hI : RingHom.ker π = I) {S S' : Subring R} (h : S ≤ S')
+    : (iota I π hI S').comp (trans I h) = iota I π hI S := by
   ext x
   rfl
 
-theorem trans_comp_mk {S S' : Subring R} (h : S ≤ S') :
-    (trans I h).comp (Ideal.Quotient.mk _) = (Ideal.Quotient.mk _).comp (Subring.inclusion h) := rfl
+theorem trans_comp_mk {S S' : Subring R} (h : S ≤ S')
+    : (trans I h).comp (Ideal.Quotient.mk _) = (Ideal.Quotient.mk _).comp (Subring.inclusion h) :=
+  rfl
 
 end GlobalTheory.AbHomDesc

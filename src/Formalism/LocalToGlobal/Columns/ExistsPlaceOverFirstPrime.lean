@@ -18,19 +18,27 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 section Repack0
 
-variable {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
-  {sp : Spaces R F E} {gp : Fin 2 → ℕ} {ι : Type} [Fintype ι] {hc : ι → HCParam R} {C : ColumnChain R ι hc} {A : ColumnsAtT R C}
+variable
+  {R : Ranks} {F E : Type}
+  [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+  {sp : Spaces R F E} {gp : Fin 2 → ℕ} {ι : Type} [Fintype ι]
+  {hc : ι → HCParam R} {C : ColumnChain R ι hc} {A : ColumnsAtT R C}
   {clsLat : ∀ i, C.cls i → Submodule (𝓞 E) (sp.X i).V} {bad : Set (HeightOneSpectrum (𝓞 F))}
 
-def LevPack.toCol (P : LevPack sp.cm R.k sp.gram0 gp A.T R.f bad (C.stab 0) fun c => sp.crdLat0 (clsLat 0 c))
-    (spl : ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 F)), (gp i : 𝓞 F) ∈ v.asIdeal →
-      E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
+def LevPack.toCol
+    (P : LevPack sp.cm R.k sp.gram0 gp A.T R.f bad (C.stab 0) fun c => sp.crdLat0 (clsLat 0 c))
+    (spl : ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 F)),
+      (gp i : 𝓞 F) ∈ v.asIdeal
+        → E ⊗[F] v.adicCompletion F ≃+* v.adicCompletion F × v.adicCompletion F)
     (spl_sig : ∀ i v h x, spl i v h (sigR sp.cm.sig (v.adicCompletion F) x) = swapR _ (spl i v h x))
     (hiw : ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 F)) (h : (gp i : 𝓞 F) ∈ v.asIdeal),
-      ∀ x ∈ UPts sp.cm.sig sp.gram0 (v.adicCompletion F), x ∈ P.lev.Uloc v ↔
-        (1 : GL (Fin R.k) (v.adicCompletion F))⁻¹ * bc ((RingHom.fst _ _).comp (spl i v h).toRingHom) x * 1 ∈ iwU F R.k v)
-    (w1 : HeightOneSpectrum (𝓞 F)) (reflection_mem_Glev_castSucc : (gp 0 : 𝓞 F) ∈ w1.asIdeal) :
-    ColLevel R F E sp gp C A clsLat where
+      ∀ x ∈ UPts sp.cm.sig sp.gram0 (v.adicCompletion F),
+        x ∈ P.lev.Uloc v
+          ↔ (1 : GL (Fin R.k) (v.adicCompletion F))⁻¹
+              * bc ((RingHom.fst _ _).comp (spl i v h).toRingHom) x * 1
+            ∈ iwU F R.k v)
+    (w1 : HeightOneSpectrum (𝓞 F)) (reflection_mem_Glev_castSucc : (gp 0 : 𝓞 F) ∈ w1.asIdeal)
+    : ColLevel R F E sp gp C A clsLat where
   Lb := P.lev.Lb
   Lb_fin := P.lev.Lb_fin
   Lb_span := P.lev.Lb_span
@@ -70,26 +78,40 @@ end Repack0
 
 section Gen
 
-variable {X : Fields} {Pr : Primes X} (hc : CMData X.F X.E) (hX : X.Ok) (hPr : Pr.Ok) (σ₀ : X.K →+* ℂ) (u : Pr.Word)
-  {n : ℕ} [NeZero n] (Λ : LevFam X.E X.K n Pr.vGs)
-  (spl : ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 X.F)), (Pr.g i : 𝓞 X.F) ∈ v.asIdeal →
-      X.E ⊗[X.F] v.adicCompletion X.F ≃+* v.adicCompletion X.F × v.adicCompletion X.F)
+variable
+  {X : Fields} {Pr : Primes X}
+  (hc : CMData X.F X.E) (hX : X.Ok) (hPr : Pr.Ok) (σ₀ : X.K →+* ℂ) (u : Pr.Word)
+  {n : ℕ} [NeZero n]
+  (Λ : LevFam X.E X.K n Pr.vGs)
+  (spl : ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 X.F)),
+    (Pr.g i : 𝓞 X.F) ∈ v.asIdeal
+      → X.E ⊗[X.F] v.adicCompletion X.F ≃+* v.adicCompletion X.F × v.adicCompletion X.F)
 
 def IwLoc : Prop :=
   ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 X.F)) (h : (Pr.g i : 𝓞 X.F) ∈ v.asIdeal),
-    ∀ x ∈ UPts hc.sig (1 : Matrix (Fin n) (Fin n) X.E) (v.adicCompletion X.F), x ∈ levLoc hc n (Pr.vT u) Pr.vGs Λ.grp v ↔
-      (1 : GL (Fin n) (v.adicCompletion X.F))⁻¹ * bc ((RingHom.fst _ _).comp (spl i v h).toRingHom) x * 1 ∈ iwU X.F n v
+    ∀ x ∈ UPts hc.sig (1 : Matrix (Fin n) (Fin n) X.E) (v.adicCompletion X.F),
+      x ∈ levLoc hc n (Pr.vT u) Pr.vGs Λ.grp v
+        ↔ (1 : GL (Fin n) (v.adicCompletion X.F))⁻¹
+            * bc ((RingHom.fst _ _).comp (spl i v h).toRingHom) x * 1
+          ∈ iwU X.F n v
 
-variable (c₀ : DiaG (E := X.E) (ST := Pr.vT u)) (s : DecoCl n (Pr.vT u) Pr.vGs Λ.grp → DecoSet (E := X.E) (n := n) (ST := Pr.vT u) (SG := Pr.vGs))
+variable
+  (c₀ : DiaG (E := X.E) (ST := Pr.vT u))
+  (s : DecoCl n (Pr.vT u) Pr.vGs Λ.grp → DecoSet (E := X.E) (n := n) (ST := Pr.vT u) (SG := Pr.vGs))
 
-theorem levPack_iw (hS : DecoPtSurj hc n (Pr.vT u) Pr.vGs) (hs : ∀ c, decoCls n (Pr.vT u) Pr.vGs Λ.grp (s c) = c)
-    (hK : LocalLevelIsKOneAtT hc u Λ) (hI : IwLoc hc u Λ spl) (H : HCrd Pr n fun c => (s c).1.L) :
-    ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 X.F)) (h : (Pr.g i : 𝓞 X.F) ∈ v.asIdeal),
-      ∀ x ∈ UPts hc.sig H.J (v.adicCompletion X.F), x ∈ (levPack hc hX hPr σ₀ u Λ c₀ s hS hs hK H).lev.Uloc v ↔
-        (1 : GL (Fin H.n') (v.adicCompletion X.F))⁻¹ * bc ((RingHom.fst _ _).comp (spl i v h).toRingHom) x * 1 ∈ iwU X.F H.n' v := by
+theorem levPack_iw
+    (hS : DecoPtSurj hc n (Pr.vT u) Pr.vGs) (hs : ∀ c, decoCls n (Pr.vT u) Pr.vGs Λ.grp (s c) = c)
+    (hK : LocalLevelIsKOneAtT hc u Λ) (hI : IwLoc hc u Λ spl) (H : HCrd Pr n fun c => (s c).1.L)
+    : ∀ (i : Fin 2) (v : HeightOneSpectrum (𝓞 X.F)) (h : (Pr.g i : 𝓞 X.F) ∈ v.asIdeal),
+      ∀ x ∈ UPts hc.sig H.J (v.adicCompletion X.F),
+        x ∈ (levPack hc hX hPr σ₀ u Λ c₀ s hS hs hK H).lev.Uloc v
+          ↔ (1 : GL (Fin H.n') (v.adicCompletion X.F))⁻¹
+              * bc ((RingHom.fst _ _).comp (spl i v h).toRingHom) x * 1
+            ∈ iwU X.F H.n' v := by
   obtain ⟨n', hn, J, rfl, f, rfl, bad, rfl, lat, hlat⟩ := H
   subst hn
-  obtain rfl : lat = fun c => (s c).1.L := funext fun c => (hlat c).trans (Formalism.L2.Forms.reL_rfl _)
+  obtain rfl : lat = fun c => (s c).1.L :=
+    funext fun c => (hlat c).trans (Formalism.L2.Forms.reL_rfl _)
   exact hI
 
 def th_resMap (P : Pl X.E) : 𝓞 X.F ⧸ (underPl X.F P).asIdeal →+* 𝓞 X.E ⧸ P.asIdeal :=
@@ -105,21 +127,25 @@ theorem th_resMap_bij (P : {P // P ∈ Pr.vT u}) : Function.Bijective (th_resMap
     have hcard : Nat.card (𝓞 X.E ⧸ P.1.asIdeal) = Pr.T u := by
       rw [← Ideal.absNorm_eq_natCard]
       exact hPr.vT_norm u P.1 P.2
-    obtain ⟨k, hk⟩ := mem_zmultiples_of_prime_card hcard (g := (1 : 𝓞 X.E ⧸ P.1.asIdeal)) (g' := b) one_ne_zero
+    obtain ⟨k, hk⟩ :=
+      mem_zmultiples_of_prime_card hcard (g := (1 : 𝓞 X.E ⧸ P.1.asIdeal)) (g' := b) one_ne_zero
     refine ⟨(k : 𝓞 X.F ⧸ (underPl X.F P.1).asIdeal), ?_⟩
     rw [map_intCast, ← hk]
     simp
 
-def tieFv (P : {P // P ∈ Pr.vT u}) : (𝓞 X.E ⧸ P.1.asIdeal) ≃+* (𝓞 X.F ⧸ (tieEV hc hX hPr u P).1.asIdeal) :=
+def tieFv (P : {P // P ∈ Pr.vT u})
+    : (𝓞 X.E ⧸ P.1.asIdeal) ≃+* (𝓞 X.F ⧸ (tieEV hc hX hPr u P).1.asIdeal) :=
   (RingEquiv.ofBijective (th_resMap (X := X) P.1) (th_resMap_bij hPr u P)).symm
 
-theorem tieFv_mk (P : {P // P ∈ Pr.vT u}) (x : 𝓞 X.F) :
-    tieFv hc hX hPr u P (Ideal.Quotient.mk P.1.asIdeal (algebraMap (𝓞 X.F) (𝓞 X.E) x)) = Ideal.Quotient.mk _ x :=
-  (RingEquiv.ofBijective (th_resMap (X := X) P.1) (th_resMap_bij hPr u P)).symm_apply_apply (Ideal.Quotient.mk _ x)
-
+theorem tieFv_mk (P : {P // P ∈ Pr.vT u}) (x : 𝓞 X.F)
+    : tieFv hc hX hPr u P (Ideal.Quotient.mk P.1.asIdeal (algebraMap (𝓞 X.F) (𝓞 X.E) x))
+      = Ideal.Quotient.mk _ x :=
+  (RingEquiv.ofBijective (th_resMap (X := X) P.1) (th_resMap_bij hPr u P)).symm_apply_apply
+    (Ideal.Quotient.mk _ x)
 
 include hX hPr in
-theorem exists_place_over_first_prime : ∃ v : HeightOneSpectrum (𝓞 X.F), (Pr.g 0 : 𝓞 X.F) ∈ v.asIdeal := by
+theorem exists_place_over_first_prime
+    : ∃ v : HeightOneSpectrum (𝓞 X.F), (Pr.g 0 : 𝓞 X.F) ∈ v.asIdeal := by
   have hcard : 0 < (Pr.vG 0).card := by rw [hPr.vG_card 0]; exact hX.f_pos
   obtain ⟨P, hP⟩ := Finset.card_pos.1 hcard
   refine ⟨underPl X.F P, ?_⟩

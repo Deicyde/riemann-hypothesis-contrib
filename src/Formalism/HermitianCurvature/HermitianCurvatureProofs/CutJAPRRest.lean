@@ -28,17 +28,20 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutJAPRPHTht
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR
 
 theorem phase_invariance_holds : PhaseInv :=
-  PH.phase_invariance_of_truncation PH.phase_section_holds PH.lower_unipotent_rotation_holds PH.rotation_radial_space_holds PH.theta_rotation_holds kappa_line_holds algebraic_shift_holds
+  PH.phase_invariance_of_truncation PH.phase_section_holds PH.lower_unipotent_rotation_holds
+    PH.rotation_radial_space_holds PH.theta_rotation_holds kappa_line_holds algebraic_shift_holds
     datum_constancy_holds fibre_stability_holds
 
 theorem corePoly_of (hD : CP.Decomp) (hW : CP.WordPSVOfCut) : CorePoly :=
   CP.radial_polynomial_of_truncation CP.lower_unipotent_matrix_words
-    (hW CP.radial_coefficient_linearity CP.radial_coefficient_smoothness CP.radial_coefficient_commutation CP.left_covariance_holds CP.right_covariance_holds CP.section_derivative_holds hD
-      CP.polynomial_shift_calculation)
+    (hW CP.radial_coefficient_linearity CP.radial_coefficient_smoothness
+      CP.radial_coefficient_commutation CP.left_covariance_holds CP.right_covariance_holds
+      CP.section_derivative_holds hD CP.polynomial_shift_calculation)
     CP.polynomial_shift_calculation
 
 theorem polyRadialS_of (hD : CP.Decomp) (hW : CP.WordPSVOfCut) : PolyRadialS :=
-  polynomialRadial_of_base polynomial_radial_base_holds SSn.Rep.theta_facts_hold transfer_holds datum_constancy_holds kappa_line_holds
-    fibre_stability_holds algebraic_shift_holds (corePoly_of hD hW) phase_invariance_holds phase_extraction_holds word_nonvanishing_holds
+  polynomialRadial_of_base polynomial_radial_base_holds SSn.Rep.theta_facts_hold transfer_holds
+    datum_constancy_holds kappa_line_holds fibre_stability_holds algebraic_shift_holds
+    (corePoly_of hD hW) phase_invariance_holds phase_extraction_holds word_nonvanishing_holds
 
 end Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Rep.Core.TC.PR

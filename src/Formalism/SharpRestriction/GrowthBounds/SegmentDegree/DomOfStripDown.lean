@@ -12,27 +12,31 @@ open Formalism.MainNotions.G Formalism.MainNotions.SelectionLemmas
 
 variable {N r K : ℕ}
 
-theorem glueT_lt (t : ℕ) (be : ℤ) (τ : Fin (K + t) → ℤ) (m : Fin (r + K)) (h : m.val < r - t) :
-    glueT t be τ m = be := by
+theorem glueT_lt (t : ℕ) (be : ℤ) (τ : Fin (K + t) → ℤ) (m : Fin (r + K)) (h : m.val < r - t)
+    : glueT t be τ m = be := by
   unfold glueT; rw [dite_eq_left h]
 
-theorem glueT_ge (t : ℕ) (ht : t ≤ r) (be : ℤ) (τ : Fin (K + t) → ℤ) (m : Fin (r + K)) (h : r - t ≤ m.val) :
-    glueT t be τ m = τ ⟨m.val - (r - t), by have := m.2; omega⟩ := by
+theorem glueT_ge
+    (t : ℕ) (ht : t ≤ r) (be : ℤ) (τ : Fin (K + t) → ℤ) (m : Fin (r + K)) (h : r - t ≤ m.val)
+    : glueT t be τ m = τ ⟨m.val - (r - t), by have := m.2; omega⟩ := by
   unfold glueT; rw [dite_eq_right (by omega), dite_eq_left]
 
-theorem dom_of_strip_up {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (h : HStrip ν μ b) (hν : Dominant ν) : Dominant μ := by
+theorem dom_of_strip_up {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (h : HStrip ν μ b) (hν : Dominant ν)
+    : Dominant μ := by
   intro m m' hmm
   rcases eq_or_lt_of_le hmm with he | hlt
   · rw [he]
   · have hm1 : (m'.val - 1) + 1 < n := by have := m'.2; have : m.val < m'.val := hlt; omega
     have h2 := h.2.1 ⟨m'.val - 1, by have := m'.2; omega⟩ hm1
-    have hme : (⟨(m'.val - 1) + 1, hm1⟩ : Fin n) = m' := Fin.ext (by simp only; have : m.val < m'.val := hlt; omega)
+    have hme : (⟨(m'.val - 1) + 1, hm1⟩ : Fin n) = m' :=
+      Fin.ext (by simp only; have : m.val < m'.val := hlt; omega)
     rw [hme] at h2
     have h3 : ν ⟨m'.val - 1, by have := m'.2; omega⟩ ≤ ν m :=
       hν (by rw [Fin.le_def]; simp only; have : m.val < m'.val := hlt; omega)
     exact le_trans h2 (le_trans h3 (h.1 m))
 
-theorem dom_of_strip_down {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (h : HStrip μ ν b) (hν : Dominant ν) : Dominant μ := by
+theorem dom_of_strip_down {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (h : HStrip μ ν b) (hν : Dominant ν)
+    : Dominant μ := by
   intro m m' hmm
   rcases eq_or_lt_of_le hmm with he | hlt
   · rw [he]
@@ -43,13 +47,16 @@ theorem dom_of_strip_down {n : ℕ} {ν μ : Fin n → ℤ} {b : ℕ} (h : HStri
     exact le_trans (h.1 m') (le_trans h3 h2)
 
 section
-variable {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ} {p : ℕ}
+variable
+  {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ}
+  {p : ℕ}
 
 open Classical in
-theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFamilyLowerSet D) (H : HypT N n0 r K LL B od bb a La p)
-    (hfin : (SAll (r := r) (K := K) LL n0 B).Finite) :
-    ∀ (t s : ℕ) (hst : s + t = N) (_ht : t ≤ r) (μ0 : Fin (N + 1) → Fin (r + K) → ℤ), VP LL n0 B s μ0 →
-      (Af hfin s μ0).card = stCount (K + t) (tailT t (μ0 ⟨s, by omega⟩)) := by
+theorem tau_count
+    (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFamilyLowerSet D)
+    (H : HypT N n0 r K LL B od bb a La p) (hfin : (SAll (r := r) (K := K) LL n0 B).Finite)
+    : ∀ (t s : ℕ) (hst : s + t = N) (_ht : t ≤ r) (μ0 : Fin (N + 1) → Fin (r + K) → ℤ),
+      VP LL n0 B s μ0 → (Af hfin s μ0).card = stCount (K + t) (tailT t (μ0 ⟨s, by omega⟩)) := by
   intro t
   induction t with
   | zero =>
@@ -70,8 +77,8 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
     have hdom : Dominant (pEnd (tanPart μ0)) := by
       intro x y hxy
       exact hv.2.1 (Fin.last s) (by simp) (by rw [Fin.le_def] at hxy ⊢; simp; omega)
-    rw [hA, Finset.card_image_of_injective _ (fun x y h => (Prod.ext_iff.1 h).2), ← Set.ncard_eq_toFinset_card _ (finite_St (tanPart μ0)),
-      wt_eq D h3 _ hdom]
+    rw [hA, Finset.card_image_of_injective _ (fun x y h => (Prod.ext_iff.1 h).2),
+      ← Set.ncard_eq_toFinset_card _ (finite_St (tanPart μ0)), wt_eq D h3 _ hdom]
     show stCount K _ = stCount K _
     congr 1
     funext l
@@ -84,18 +91,24 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
     have hs : s < N := by omega
     have hN := H.hN
     have hn0 : n0 ≤ s := by omega
-    have hla : ∀ m, μ0 (⟨s, hs⟩ : Fin N).castSucc m ≤ (beA n0 B : ℤ) := fun m => vp_le hv s (by omega) le_rfl m
+    have hla : ∀ m, μ0 (⟨s, hs⟩ : Fin N).castSucc m ≤ (beA n0 B : ℤ) := fun m =>
+      vp_le hv s (by omega) le_rfl m
     have hlad : Dominant (μ0 (⟨s, hs⟩ : Fin N).castSucc) := hv.2.1 _ (by simp)
     generalize hlaeq : μ0 (⟨s, hs⟩ : Fin N).castSucc = la at hla hlad
     have hheads : ∀ m : Fin (r + K), m.val + 1 < r - t → la m = (beA n0 B : ℤ) := by
       intro m hm
       have hs1 : s - 1 < N := by omega
-      have h1 := ((hv.2.2 ⟨s - 1, hs1⟩ (by simp only; omega)).2 (by simp only; omega)).2 m (by simp only; omega)
+      have h1 :=
+        ((hv.2.2 ⟨s - 1, hs1⟩ (by simp only; omega)).2 (by simp only; omega)).2 m
+          (by simp only; omega)
       have he : (⟨s - 1, hs1⟩ : Fin N).succ = (⟨s, hs⟩ : Fin N).castSucc := Fin.ext (by simp; omega)
       rw [he, hlaeq] at h1
       exact h1
-    have hν : ∀ l : Fin (K + t + 1), (tailT (t + 1) la : Fin (K + t + 1) → ℤ) l =
-        la ⟨(r - (t + 1)) + l.val, by have := l.2; omega⟩ := fun l => tailT_apply (t + 1) ht la l
+    have hν
+        : ∀ l : Fin (K + t + 1),
+          (tailT (t + 1) la : Fin (K + t + 1) → ℤ) l
+            = la ⟨(r - (t + 1)) + l.val, by have := l.2; omega⟩ := fun l =>
+      tailT_apply (t + 1) ht la l
     have hνdom : Dominant (tailT (t + 1) la : Fin (K + t + 1) → ℤ) := by
       intro x y hxy
       rw [hν, hν]
@@ -108,8 +121,11 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
       exact Finset.mem_Icc.mp (hτ l)
     have hinj : Set.InjOn (glueT (r := r) t (beA n0 B : ℤ)) (T : Set (Fin (K + t) → ℤ)) := by
       intro τ _ τ' _ h
-      rw [← tailT_glueT (r := r) t (by omega) (beA n0 B : ℤ) τ, h, tailT_glueT (r := r) t (by omega)]
-    have hE : ∀ q ∈ Af hfin s μ0, q.1 (⟨s, hs⟩ : Fin N).succ ∈ T.image (glueT (r := r) t (beA n0 B : ℤ)) := by
+      rw [← tailT_glueT (r := r) t (by omega) (beA n0 B : ℤ) τ, h,
+        tailT_glueT (r := r) t (by omega)]
+    have hE
+        : ∀ q ∈ Af hfin s μ0,
+          q.1 (⟨s, hs⟩ : Fin N).succ ∈ T.image (glueT (r := r) t (beA n0 B : ℤ)) := by
       intro q hq
       obtain ⟨_, hstq⟩ := Af_step H hfin s hs μ0 q hq
       rw [hlaeq] at hstq
@@ -123,11 +139,16 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
         rw [Finset.mem_Icc, hν, hν, tailT_apply t (by omega)]
         constructor
         · have := hS.1 ⟨(r - t) + l.val, by omega⟩
-          have he : (⟨(r - (t + 1)) + (l.succ : Fin (K + t + 1)).val, by simp; omega⟩ : Fin (r + K)) =
-              ⟨(r - t) + l.val, by omega⟩ := Fin.ext (by simp; omega)
-          rw [he]; exact this
+          have he
+              : (⟨(r - (t + 1)) + (l.succ : Fin (K + t + 1)).val, by simp; omega⟩ : Fin (r + K))
+                = ⟨(r - t) + l.val, by omega⟩ :=
+            Fin.ext (by simp; omega)
+          rw [he]
+          exact this
         · have := hS.2.1 ⟨(r - (t + 1)) + l.val, by omega⟩ (by simp only; omega)
-          have he : (⟨(r - (t + 1)) + l.val + 1, by omega⟩ : Fin (r + K)) = ⟨(r - t) + l.val, by omega⟩ :=
+          have he
+              : (⟨(r - (t + 1)) + l.val + 1, by omega⟩ : Fin (r + K))
+                = ⟨(r - t) + l.val, by omega⟩ :=
             Fin.ext (by simp only; omega)
           rw [he] at this
           exact this
@@ -137,8 +158,11 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
         · rw [glueT_ge t (by omega) _ _ m (by omega), tailT_apply t (by omega)]
           congr 1
           exact Fin.ext (by simp only; omega)
-    have hterm : ∀ τ ∈ T, (Af hfin (s + 1) (Function.update μ0 (⟨s, hs⟩ : Fin N).succ
-        (glueT (r := r) t (beA n0 B : ℤ) τ))).card = stCount (K + t) τ := by
+    have hterm
+        : ∀ τ ∈ T,
+          (Af hfin (s + 1)
+              (Function.update μ0 (⟨s, hs⟩ : Fin N).succ (glueT (r := r) t (beA n0 B : ℤ) τ))).card
+            = stCount (K + t) τ := by
       intro τ hτT
       have hb := hτ τ hτT
       have hτanti : ∀ l l' : Fin (K + t), l ≤ l' → τ l' ≤ τ l := by
@@ -152,7 +176,8 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
       have hτbe : ∀ l : Fin (K + t), τ l ≤ (beA n0 B : ℤ) := by
         intro l
         refine le_trans (hb l).2 ?_
-        rw [hν]; exact hla _
+        rw [hν]
+        exact hla _
       have hd' : Dominant (glueT (r := r) t (beA n0 B : ℤ) τ) := by
         intro m m' hmm
         have hmm' : m.val ≤ m'.val := hmm
@@ -170,22 +195,44 @@ theorem tau_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
         · rw [glueT_ge t (by omega) _ _ x (by omega)]
           have h2 := (hb ⟨x.val - (r - t), by have := x.2; omega⟩).1
           rw [hν] at h2
-          have he : (⟨(r - (t + 1)) + ((⟨x.val - (r - t), by have := x.2; omega⟩ : Fin (K + t)).succ :
-              Fin (K + t + 1)).val, by have := x.2; simp; omega⟩ : Fin (r + K)) = x := Fin.ext (by simp; omega)
+          have he
+              : (⟨
+                   (r - (t + 1))
+                     + ((⟨x.val - (r - t), by have := x.2; omega⟩ : Fin (K + t)).succ
+                       : Fin (K + t + 1)).val,
+                   by have := x.2; simp; omega
+                 ⟩
+                  : Fin (r + K))
+                = x :=
+            Fin.ext (by simp; omega)
           rw [he] at h2
           exact h2
-      have hst' : StepOK LL n0 B ⟨s, hs⟩ (μ0 (⟨s, hs⟩ : Fin N).castSucc) (glueT (r := r) t (beA n0 B : ℤ) τ) := by
+      have hst' : StepOK LL n0 B ⟨s, hs⟩ (μ0 (⟨s, hs⟩ : Fin N).castSucc)
+          (glueT (r := r) t (beA n0 B : ℤ) τ) := by
         rw [hlaeq]
-        refine ⟨fun h => absurd h (by simp only; omega), fun _ => ⟨⟨(∑ x, (glueT (r := r) t (beA n0 B : ℤ) τ x - la x)).toNat,
-          hS1, ?_, ?_⟩, fun m hm => glueT_lt t _ _ m (by simp only at hm; omega)⟩⟩
+        refine ⟨
+          fun h => absurd h (by simp only; omega),
+          fun _ => ⟨
+            ⟨(∑ x, (glueT (r := r) t (beA n0 B : ℤ) τ x - la x)).toNat, hS1, ?_, ?_⟩,
+            fun m hm => glueT_lt t _ _ m (by simp only at hm; omega)
+          ⟩
+        ⟩
         · intro x hx
           by_cases h1 : x.val + 1 < r - t
           · rw [glueT_lt t _ _ _ (by simp only; exact h1), hheads x h1]
           · rw [glueT_ge t (by omega) _ _ _ (by simp only; omega)]
             have h2 := (hb ⟨x.val + 1 - (r - t), by have := x.2; omega⟩).2
             rw [hν] at h2
-            have he : (⟨(r - (t + 1)) + ((⟨x.val + 1 - (r - t), by have := x.2; omega⟩ : Fin (K + t)).castSucc :
-                Fin (K + t + 1)).val, by have := x.2; simp; omega⟩ : Fin (r + K)) = x := Fin.ext (by simp; omega)
+            have he
+                : (⟨
+                     (r - (t + 1))
+                       + ((⟨x.val + 1 - (r - t), by have := x.2; omega⟩ : Fin (K + t)).castSucc
+                         : Fin (K + t + 1)).val,
+                     by have := x.2; simp; omega
+                   ⟩
+                    : Fin (r + K))
+                  = x :=
+              Fin.ext (by simp; omega)
             rw [he] at h2
             exact h2
         · exact (Int.toNat_of_nonneg (Finset.sum_nonneg fun x _ => sub_nonneg.mpr (hS1 x))).symm

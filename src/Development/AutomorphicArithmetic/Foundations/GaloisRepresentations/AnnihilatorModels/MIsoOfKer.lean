@@ -6,8 +6,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 open GlobalTheory.IwLevel (InSub IsIsogDeg)
 open GlobalTheory.AbDual (evc IsAdditive swap)
 attribute [local instance] Ideal.Quotient.field
@@ -81,8 +84,8 @@ private lemma evc_pow_right {B : Over S} [GrpObj B] {P : LB (A ⊗ B).left} (hP 
 end UpperTheory.Gal.crystallineComparison.Mod.IsoOfKernelFactorization
 
 open UpperTheory.Gal.crystallineComparison.Mod.IsoOfKernelFactorization in
-theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of :
-    PairCalc → Adjoint → DivC → TorsFree → IsoOfKer := by
+theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of
+    : PairCalc → Adjoint → DivC → TorsFree → IsoOfKer := by
   intro hPC hAdj hDiv hTF
   intro p _ D R _ b N k _ s c o o₁ o₂ ψ₁ ψ₂ h1 h2 hker
   have hc : 0 < c := h1.pos
@@ -93,7 +96,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of :
   haveI := hψ₁'
   haveI := hψ₂'
   obtain ⟨ρ, hρ, -, hρ1⟩ := factor hDiv o.ab o₁.ab hc ψ₁ ψ₁' ψ₂ u1 v1 (fun T g h => (hker T g).1 h)
-  obtain ⟨ρ', hρ', -, hρ2⟩ := factor hDiv o.ab o₂.ab hc ψ₂ ψ₂' ψ₁ u2 v2 (fun T g h => (hker T g).2 h)
+  obtain ⟨ρ', hρ', -, hρ2⟩ :=
+    factor hDiv o.ab o₂.ab hc ψ₂ ψ₂' ψ₁ u2 v2 (fun T g h => (hker T g).2 h)
   haveI := hρ
   haveI := hρ'
   have hrr : ρ ≫ ρ' = 𝟙 o₁.A :=
@@ -107,16 +111,19 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of :
   have e2 := (hP0.2.2.2.2 o₂ ψ₂ c).1 hpol2
   have hLp : (o₂.P.pull (sq2 ρ)).IsLB := LB.isLB_pull o₂.isLB _
   have hL : ((o₂.P.pull (sq2 ρ)).div o₁.P).IsLB := LB.isLB_div hLp o₁.isLB
-  have hlift : ∀ {Y : Over (Sp k)} (a t : Y ⟶ o₁.A), (lift a t).left ≫ sq2 ρ = (lift (a ≫ ρ) (t ≫ ρ)).left := by
+  have hlift
+      : ∀ {Y : Over (Sp k)} (a t : Y ⟶ o₁.A),
+        (lift a t).left ≫ sq2 ρ = (lift (a ≫ ρ) (t ≫ ρ)).left := by
     intro Y a t
     show (lift a t).left ≫ (lift (fst o₁.A o₁.A ≫ ρ) (snd o₁.A o₁.A ≫ ρ)).left = _
     rw [← Over.comp_left, comp_lift, lift_fst_assoc, lift_snd_assoc]
-  have hevL : ∀ {Y : Over (Sp k)} (a t : Y ⟶ o₁.A),
-      evc hL a t = evc o₂.isLB (a ≫ ρ) (t ≫ ρ) - evc o₁.isLB a t := by
+  have hevL
+      : ∀ {Y : Over (Sp k)} (a t : Y ⟶ o₁.A),
+        evc hL a t = evc o₂.isLB (a ≫ ρ) (t ≫ ρ) - evc o₁.isLB a t := by
     intro Y a t
     unfold GlobalTheory.AbDual.evc
-    rw [GlobalTheory.CechPic.cls_div hLp o₁.isLB hL, map_sub, GlobalTheory.CechPic.cls_pull o₂.isLB _ hLp,
-      ← GlobalTheory.CechPic.pull_comp, hlift]
+    rw [GlobalTheory.CechPic.cls_div hLp o₁.isLB hL, map_sub,
+      GlobalTheory.CechPic.cls_pull o₂.isLB _ hLp, ← GlobalTheory.CechPic.pull_comp, hlift]
   have hadd1 := (GlobalTheory.AbDual.isAdditive_iff o₁.isLB).1 hP1.1
   have hadd2 := (GlobalTheory.AbDual.isAdditive_iff o₂.isLB).1 hP2.1
   have hmulρ : ∀ {Y : Over (Sp k)} (a a' : Y ⟶ o₁.A), (a * a') ≫ ρ = (a ≫ ρ) * (a' ≫ ρ) := by
@@ -131,8 +138,9 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of :
   have hLsadd : IsAdditive (swap ((o₂.P.pull (sq2 ρ)).div o₁.P)) := by
     rw [GlobalTheory.AbDual.isAdditive_iff hsL]
     intro Y b' b'' a
-    rw [GlobalTheory.AbDual.evc_swap hL hsL, GlobalTheory.AbDual.evc_swap hL hsL, GlobalTheory.AbDual.evc_swap hL hsL, hevL, hevL, hevL, hmulρ,
-      evc_add_right o₂.isLB hP2.2.1, evc_add_right o₁.isLB hP1.2.1]
+    rw [GlobalTheory.AbDual.evc_swap hL hsL, GlobalTheory.AbDual.evc_swap hL hsL,
+      GlobalTheory.AbDual.evc_swap hL hsL, hevL, hevL, hevL, hmulρ, evc_add_right o₂.isLB hP2.2.1,
+      evc_add_right o₁.isLB hP1.2.1]
     abel
   have hz : ∀ {Y : Over (Sp k)} (z w : Y ⟶ o.A), evc hL (z ≫ ψ₁) (w ≫ ψ₁) = 0 := by
     intro Y z w
@@ -149,7 +157,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of :
   rw [evc_pow_left hL hLadd, evc_pow_right hL hLsadd, smul_smul, huniv] at key
   have hcls := hTF k o₁.A o₁.A o₁.ab o₁.ab _ hL hLadd hLsadd (c * c) (Nat.mul_pos hc hc) key
   rw [GlobalTheory.CechPic.cls_div hLp o₁.isLB hL, sub_eq_zero] at hcls
-  have hpol : LBIso o₁.P (o₂.P.pull (sq2 ρ)) := (GlobalTheory.CechPic.cls_eq_iff o₁.isLB hLp).1 hcls.symm
+  have hpol : LBIso o₁.P (o₂.P.pull (sq2 ρ)) :=
+    (GlobalTheory.CechPic.cls_eq_iff o₁.isLB hLp).1 hcls.symm
   haveI : IsIso ρ.left := ⟨⟨ρ'.left, by rw [← Over.comp_left, hrr, Over.id_left],
     by rw [← Over.comp_left, hr'r, Over.id_left]⟩⟩
   refine ⟨⟨ρ.left, sq2 ρ, ⟨IsPullback.of_horiz_isIso ⟨by simp⟩, ?_⟩, ⟨?_, ?_⟩, ?_, hpol, ?_⟩, ?_⟩
@@ -175,8 +184,8 @@ theorem UpperTheory.Gal.crystallineComparison.Mod.isoOfKer_of :
     haveI := o₁.act.hom a
     haveI := o₂.act.hom a
     have h : o₁.act.act a ≫ ρ = ρ ≫ o₂.act.act a :=
-      cancel hDiv o₁.ab hc ψ₁ ψ₁' v1 _ _ (by
-        rw [← Category.assoc, ← hact1 a, Category.assoc, hρ1, hact2 a, ← hρ1, Category.assoc])
+      cancel hDiv o₁.ab hc ψ₁ ψ₁' v1 _ _
+        (by rw [← Category.assoc, ← hact1 a, Category.assoc, hρ1, hact2 a, ← hρ1, Category.assoc])
     rw [← Over.comp_left, h, Over.comp_left]
   · intro y
     rw [← Over.comp_left, heta1 y, Category.assoc, hρ1, ← heta2 y, Category.id_comp]

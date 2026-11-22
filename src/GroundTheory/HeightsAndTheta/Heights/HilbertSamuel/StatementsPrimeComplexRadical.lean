@@ -13,8 +13,8 @@ open MvPolynomial
 noncomputable section
 
 def PrimeComplexRadical.Statement : Prop :=
-  ∀ (σ : Type) [Fintype σ] (P : Ideal (MvPolynomial σ ℤ)), P.IsPrime →
-    (P.map (MvPolynomial.map (Int.castRingHom ℂ))).IsRadical
+  ∀ (σ : Type) [Fintype σ] (P : Ideal (MvPolynomial σ ℤ)),
+    P.IsPrime → (P.map (MvPolynomial.map (Int.castRingHom ℂ))).IsRadical
 
 end
 

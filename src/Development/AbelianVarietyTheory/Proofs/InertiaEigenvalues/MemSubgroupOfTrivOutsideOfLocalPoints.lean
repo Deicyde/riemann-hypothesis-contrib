@@ -11,7 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.CmFieldAd
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin GlobalTheory.PendOf
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting GlobalTheory.RowTie GlobalTheory.SplitRead GlobalTheory.NPin
+  GlobalTheory.PendOf
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 noncomputable section
@@ -20,19 +24,22 @@ namespace GlobalTheory.TrivOutsideGen
 
 variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ}
 
-theorem coe_mul_mat (x y : GAf L n) :
-    ((x * y).1 : Matrix (Fin n) (Fin n) (AL L)) =
-      (x.1 : Matrix (Fin n) (Fin n) (AL L)) * (y.1 : Matrix (Fin n) (Fin n) (AL L)) := rfl
+theorem coe_mul_mat (x y : GAf L n)
+    : ((x * y).1 : Matrix (Fin n) (Fin n) (AL L))
+      = (x.1 : Matrix (Fin n) (Fin n) (AL L)) * (y.1 : Matrix (Fin n) (Fin n) (AL L)) :=
+  rfl
 
-theorem map_inv_mul_map (x : GAf L n) (w : HeightOneSpectrum (𝓞 (maximalRealSubfield L))) :
-    ((x⁻¹).1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w) *
-      (x.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w) = 1 := by
+theorem map_inv_mul_map (x : GAf L n) (w : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
+    : ((x⁻¹).1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w)
+        * (x.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w)
+      = 1 := by
   rw [← Matrix.map_mul, ← coe_mul_mat, inv_mul_cancel]
   exact Matrix.map_one _ (map_zero _) (map_one _)
 
-theorem map_inv_eq_one (x : GAf L n) (w : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
-    (h : (x.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w) = 1) :
-    ((x⁻¹).1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w) = 1 := by
+theorem map_inv_eq_one
+    (x : GAf L n) (w : HeightOneSpectrum (𝓞 (maximalRealSubfield L)))
+    (h : (x.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w) = 1)
+    : ((x⁻¹).1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L w) = 1 := by
   have := map_inv_mul_map x w
   rwa [h, mul_one] at this
 
@@ -64,7 +71,15 @@ theorem eq_one_of_trivOutside_empty (y : GAf L n) (hy : TrivOutside (∅ : Set _
   simp only [OneMemClass.coe_one, Units.val_one, Matrix.one_apply]
   split_ifs <;> simp
 
-theorem mem_of_trivOutside_of_local : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} (K : Subgroup (GAf L n)) (T : Finset (HeightOneSpectrum (𝓞 (maximalRealSubfield L)))) (y : GAf L n), TrivOutside (T : Set (HeightOneSpectrum (𝓞 (maximalRealSubfield L)))) y → (∀ v ∈ T, ∃ p ∈ K, TrivOutside {v} p ∧ (p.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L v) = (y.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L v)) → y ∈ K := by
+theorem mem_of_trivOutside_of_local
+    : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} (K : Subgroup (GAf L n))
+        (T : Finset (HeightOneSpectrum (𝓞 (maximalRealSubfield L)))) (y : GAf L n),
+      TrivOutside (T : Set (HeightOneSpectrum (𝓞 (maximalRealSubfield L)))) y
+        → (∀ v ∈ T, ∃ p ∈ K,
+          TrivOutside {v} p
+            ∧ (p.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L v)
+              = (y.1 : Matrix (Fin n) (Fin n) (AL L)).map (compAt L v))
+        → y ∈ K := by
   intro L _ _ _ n K T
   classical
   induction T using Finset.induction_on with

@@ -12,17 +12,23 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.ExistsMax
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 
 noncomputable section
 namespace GlobalTheory.GenericSection
 open GlobalTheory.AbLaw GlobalTheory.AbLaw.SecBC
 
-theorem exists_ker_ne_zero {R K K' : Type} [CommRing R] [Field K] [Field K'] (g : R →+* K) (g' : R →+* K')
-    (hg : Function.Injective g) {a b : ℕ} (D : Matrix (Fin b) (Fin a) R) (v : Fin a → K) (hv : v ≠ 0)
-    (h : (D.map g).mulVec v = 0) : ∃ v' : Fin a → K', v' ≠ 0 ∧ (D.map g').mulVec v' = 0 := by
+theorem exists_ker_ne_zero
+    {R K K' : Type} [CommRing R] [Field K] [Field K']
+    (g : R →+* K)
+    (g' : R →+* K') (hg : Function.Injective g)
+    {a b : ℕ}
+    (D : Matrix (Fin b) (Fin a) R) (v : Fin a → K) (hv : v ≠ 0) (h : (D.map g).mulVec v = 0)
+    : ∃ v' : Fin a → K', v' ≠ 0 ∧ (D.map g').mulVec v' = 0 := by
   by_contra hno
   push Not at hno
   have hind : LinearIndependent K' (fun j : Fin a => fun i : Fin b => (D.map g') i j) := by
@@ -41,7 +47,8 @@ theorem exists_ker_ne_zero {R K K' : Type} [CommRing R] [Field K] [Field K'] (g 
     rw [Pi.zero_apply] at this
     rw [← this]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
-  obtain ⟨e, -, he⟩ := GlobalTheory.exists_maximal_minor_ne_zero_of_linearIndependent K' b (Fin a) _ hind
+  obtain ⟨e, -, he⟩ :=
+    GlobalTheory.exists_maximal_minor_ne_zero_of_linearIndependent K' b (Fin a) _ hind
   have hdet : (D.submatrix e id).det ≠ 0 := by
     intro h0
     apply he
@@ -67,18 +74,31 @@ def zeroSec {X : Scheme.{0}} (M : LB X) : LB.Sec M where
   f := fun _ => 0
   compat := fun _ _ => by rw [map_zero, map_zero, mul_zero]
 
-theorem exists_sec_iff {X X' Y : Scheme.{0}} {L : LB Y} {p : X ⟶ Y} {R R' : Type} [CommRing R] [CommRing R']
-    {f : X ⟶ Spec (CommRingCat.of R)} (F : Perf f (L.pull p)) (g : R →+* R') {π : X' ⟶ X}
-    {f' : X' ⟶ Spec (CommRingCat.of R')} (H : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
-    {q : X' ⟶ Y} (e : q = π ≫ p) :
-    (∃ (s : (L.pull q).Sec) (j : _), s.f j ≠ 0) ↔ ∃ v : Fin F.a → R', v ≠ 0 ∧ (F.D₀.map g).mulVec v = 0 := by
+theorem exists_sec_iff
+    {X X' Y : Scheme.{0}} {L : LB Y} {p : X ⟶ Y} {R R' : Type} [CommRing R] [CommRing R']
+    {f : X ⟶ Spec (CommRingCat.of R)} (F : Perf f (L.pull p))
+    (g : R →+* R')
+    {π : X' ⟶ X} {f' : X' ⟶ Spec (CommRingCat.of R')}
+    (H : IsPullback π f' f (Spec.map (CommRingCat.ofHom g)))
+    {q : X' ⟶ Y} (e : q = π ≫ p)
+    : (∃ (s : (L.pull q).Sec) (j : _), s.f j ≠ 0)
+      ↔ ∃ v : Fin F.a → R', v ≠ 0 ∧ (F.D₀.map g).mulVec v = 0 := by
   subst e
   unfold LB.pull at F ⊢
   let c : R' →+* Γ(X', ⊤) := f'.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of R')).inv.hom
-  obtain ⟨h1, h2, h3⟩ := SecBC.rep_main (F := F) (ψ := fun _ => π ≫ p) (fun _ => rfl) g f' H c (fun _ => rfl)
-  have h0 : SecBC.Rep π (fun _ => π ≫ p) F c 0 (zeroSec (L.LinComb (fun _ : PUnit.{1} => π ≫ p) (fun _ => 1))).f := by
-    have hs := SecBC.Rep.sum (F := F) (ψ := fun _ => π ≫ p) (c := c) (fun _ => rfl) (I := Empty)
-      (w := Empty.elim) (b := Empty.elim) (fun l => l.elim) Empty.elim
+  obtain ⟨h1, h2, h3⟩ :=
+    SecBC.rep_main (F := F) (ψ := fun _ => π ≫ p) (fun _ => rfl) g f' H c (fun _ => rfl)
+  have h0 : SecBC.Rep π
+      (fun _ => π ≫ p)
+      F c 0 (zeroSec (L.LinComb (fun _ : PUnit.{1} => π ≫ p) (fun _ => 1))).f := by
+    have hs :=
+      SecBC.Rep.sum (F := F)
+        (ψ := fun _ => π ≫ p)
+        (c := c)
+        (fun _ => rfl)
+        (I := Empty) (w := Empty.elim) (b := Empty.elim)
+        (fun l => l.elim)
+        Empty.elim
     simp only [Finset.univ_eq_empty, Finset.sum_empty] at hs
     exact hs
   constructor
@@ -95,18 +115,23 @@ theorem exists_sec_iff {X X' Y : Scheme.{0}} {L : LB Y} {p : X ⟶ Y} {R R' : Ty
     apply hv0
     have hz : s = zeroSec _ := SecBC.sec_ext (fun j => hno s j)
     rw [hz] at hs
-    exact h3 v 0 (zeroSec (L.LinComb (fun _ : PUnit.{1} => π ≫ p) (fun _ => 1))) hv (Matrix.mulVec_zero _) hs h0
+    exact h3 v 0 (zeroSec (L.LinComb (fun _ : PUnit.{1} => π ≫ p) (fun _ => 1))) hv
+      (Matrix.mulVec_zero _) hs h0
 
-theorem exists_ringHom {S : Scheme.{0}} {R K : Type} [CommRing R] [Field K] (t : Sp R ⟶ S) [IsOpenImmersion t]
-    (x : Sp K ⟶ S) (h : Set.range x ⊆ Set.range t) :
-    ∃ g : R →+* K, Spec.map (CommRingCat.ofHom g) ≫ t = x := by
+theorem exists_ringHom
+    {S : Scheme.{0}} {R K : Type} [CommRing R] [Field K]
+    (t : Sp R ⟶ S) [IsOpenImmersion t]
+    (x : Sp K ⟶ S) (h : Set.range x ⊆ Set.range t)
+    : ∃ g : R →+* K, Spec.map (CommRingCat.ofHom g) ≫ t = x := by
   refine ⟨(Spec.preimage (IsOpenImmersion.lift t x h)).hom, ?_⟩
   rw [CommRingCat.ofHom_hom, Spec.map_preimage]
   exact IsOpenImmersion.lift_fac t x h
 
-theorem exists_isPullback {A S T T' : Scheme.{0}} (a : A ⟶ S) (t : T ⟶ S) (u : T' ⟶ T) (x : T' ⟶ S)
-    (h : u ≫ t = x) : ∃ π : pullback a x ⟶ pullback a t,
-      IsPullback π (pullback.snd a x) (pullback.snd a t) u ∧ pullback.fst a x = π ≫ pullback.fst a t := by
+theorem exists_isPullback
+    {A S T T' : Scheme.{0}} (a : A ⟶ S) (t : T ⟶ S) (u : T' ⟶ T) (x : T' ⟶ S) (h : u ≫ t = x)
+    : ∃ π : pullback a x ⟶ pullback a t,
+      IsPullback π (pullback.snd a x) (pullback.snd a t) u
+        ∧ pullback.fst a x = π ≫ pullback.fst a t := by
   subst h
   have hc : pullback.fst a (u ≫ t) ≫ a = (pullback.snd a (u ≫ t) ≫ u) ≫ t := by
     rw [pullback.condition, Category.assoc]
@@ -115,10 +140,17 @@ theorem exists_isPullback {A S T T' : Scheme.{0}} (a : A ⟶ S) (t : T ⟶ S) (u
   rw [pullback.lift_fst]
   exact IsPullback.of_hasPullback a (u ≫ t)
 
-theorem exists_sec_ne_zero_of_generic : Out.Laws → ∀ (S : Scheme.{0}) [IsIntegral S] (P : Out.PolAV S) (N : LB P.A.left) (K K' : Type) [Field K] [Field K'] (x : Sp K ⟶ S) (y : Sp K' ⟶ S) (s : (N.pull (pullback.fst P.A.hom x)).Sec), N.IsLB → Set.range x = {genericPoint S} → (∃ j, s.f j ≠ 0) → ∃ (s' : (N.pull (pullback.fst P.A.hom y)).Sec) (j : _), s'.f j ≠ 0 := by
+theorem exists_sec_ne_zero_of_generic
+    : Out.Laws
+      → ∀ (S : Scheme.{0}) [IsIntegral S] (P : Out.PolAV S) (N : LB P.A.left) (K K' : Type)
+          [Field K] [Field K'] (x : Sp K ⟶ S) (y : Sp K' ⟶ S)
+          (s : (N.pull (pullback.fst P.A.hom x)).Sec),
+        N.IsLB → Set.range x = {genericPoint S} → (∃ j, s.f j ≠ 0)
+          → ∃ (s' : (N.pull (pullback.fst P.A.hom y)).Sec) (j : _), s'.f j ≠ 0 := by
   intro hLaws S _ P N K K' _ _ x y s hN hx hs
-  obtain ⟨W, hW, hyW, -⟩ := exists_isAffineOpen_mem_and_subset
-    (show y (IsLocalRing.closedPoint K') ∈ (⊤ : S.Opens) from trivial)
+  obtain ⟨W, hW, hyW, -⟩ :=
+    exists_isAffineOpen_mem_and_subset (show y (IsLocalRing.closedPoint K') ∈ (⊤ : S.Opens) from
+      trivial)
   let t : Sp Γ(S, W) ⟶ S := hW.fromSpec
   have hrange : Set.range t = W := hW.range_fromSpec
   have hgen : genericPoint S ∈ (W : Set S) := by
@@ -135,7 +167,8 @@ theorem exists_sec_ne_zero_of_generic : Out.Laws → ∀ (S : Scheme.{0}) [IsInt
   obtain ⟨gx, hgx⟩ := exists_ringHom t x hxr
   obtain ⟨gy, hgy⟩ := exists_ringHom t y hyr
   have hinj : Function.Injective gx := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro r hr
     by_contra hr0
     have hne : (PrimeSpectrum.basicOpen r : Set (PrimeSpectrum Γ(S, W))).Nonempty :=
@@ -167,8 +200,9 @@ theorem exists_sec_ne_zero_of_generic : Out.Laws → ∀ (S : Scheme.{0}) [IsInt
     have := P.smoothDim
     exact SmoothOfRelativeDimension.smooth P.g P.A.hom
   have hproj : IsProjBy (pullback.snd P.A.hom t) := ⟨_, hlb, m, σ, hva⟩
-  obtain ⟨F⟩ := GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj Γ(S, W) _ (pullback.snd P.A.hom t) inferInstance hproj
-    (N.pull (pullback.fst P.A.hom t)) (LB.isLB_pull hN _)
+  obtain ⟨F⟩ :=
+    GlobalTheory.T.nonempty_perfectSectionsComplex_of_smooth_proj Γ(S, W) _ (pullback.snd P.A.hom t)
+      inferInstance hproj (N.pull (pullback.fst P.A.hom t)) (LB.isLB_pull hN _)
   obtain ⟨πx, hπx, hex⟩ := exists_isPullback P.A.hom t (Spec.map (CommRingCat.ofHom gx)) x hgx
   obtain ⟨πy, hπy, hey⟩ := exists_isPullback P.A.hom t (Spec.map (CommRingCat.ofHom gy)) y hgy
   obtain ⟨v, hv, hker⟩ := (exists_sec_iff F gx hπx hex).1 ⟨s, hs⟩

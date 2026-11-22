@@ -12,29 +12,32 @@ open Formalism.BasicNotions NumberField IsDedekindDomain GlobalTheory.Mem
 
 namespace GlobalTheory.Mem
 
-theorem exists_orthonormalBasis_adapted (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℂ E]
-    [FiniteDimensional ℂ E] (I : Type) [Fintype I] [DecidableEq I] (p : I → Submodule ℂ E)
-    (htop : (⨆ i, p i) = ⊤) (horth : ∀ i j, i ≠ j → p i ⟂ p j) :
-    ∃ (b : OrthonormalBasis (Fin (Module.finrank ℂ E)) ℂ E) (ty : Fin (Module.finrank ℂ E) → I),
-      ∀ i, Submodule.span ℂ (b '' {σ | ty σ = i}) = p i := by
+theorem exists_orthonormalBasis_adapted
+    (E : Type) [NormedAddCommGroup E] [InnerProductSpace ℂ E] [FiniteDimensional ℂ E]
+    (I : Type) [Fintype I] [DecidableEq I]
+    (p : I → Submodule ℂ E) (htop : (⨆ i, p i) = ⊤) (horth : ∀ i j, i ≠ j → p i ⟂ p j)
+    : ∃ (b : OrthonormalBasis (Fin (Module.finrank ℂ E)) ℂ E) (ty : Fin (Module.finrank ℂ E) → I),
+      ∀ i,
+        Submodule.span ℂ (b '' {σ | ty σ = i}) = p i := by
   classical
   have hV : OrthogonalFamily ℂ (fun i => p i) (fun i => (p i).subtypeₗᵢ) :=
     OrthogonalFamily.of_pairwise (fun i j h => horth i j h)
   have hint : DirectSum.IsInternal p :=
     (DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top p).2 ⟨hV.independent, htop⟩
-  let v : ∀ i, OrthonormalBasis (Fin (Module.finrank ℂ (p i))) ℂ (p i) :=
-    fun i => stdOrthonormalBasis ℂ (p i)
+  let v : ∀ i, OrthonormalBasis (Fin (Module.finrank ℂ (p i))) ℂ (p i) := fun i =>
+    stdOrthonormalBasis ℂ (p i)
   let c := hint.collectedOrthonormalBasis hV v
   have hc : ∀ a : (Σ i, Fin (Module.finrank ℂ (p i))), c a = (v a.1 a.2 : E) := by
     intro a
-    simp [c, DirectSum.IsInternal.collectedOrthonormalBasis, DirectSum.IsInternal.collectedBasis_coe]
+    simp [c, DirectSum.IsInternal.collectedOrthonormalBasis,
+      DirectSum.IsInternal.collectedBasis_coe]
   have hcard : Fintype.card (Σ i, Fin (Module.finrank ℂ (p i))) = Module.finrank ℂ E :=
     (Module.finrank_eq_card_basis c.toBasis).symm
   let e : (Σ i, Fin (Module.finrank ℂ (p i))) ≃ Fin (Module.finrank ℂ E) :=
     Fintype.equivFinOfCardEq hcard
   refine ⟨c.reindex e, fun σ => (e.symm σ).1, fun i => ?_⟩
-  have himg : (c.reindex e) '' {σ | (e.symm σ).1 = i}
-      = (p i).subtype '' Set.range (v i).toBasis := by
+  have himg
+      : (c.reindex e) '' {σ | (e.symm σ).1 = i} = (p i).subtype '' Set.range (v i).toBasis := by
     ext x
     constructor
     · rintro ⟨σ, hσ, rfl⟩

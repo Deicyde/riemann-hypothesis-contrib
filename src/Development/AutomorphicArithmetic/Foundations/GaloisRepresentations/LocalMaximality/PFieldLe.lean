@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsTopDeg
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 GlobalTheory.W1.Lef UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  GlobalTheory.W1.Lef UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma lft_uni' {ι κ : Type} [LinearOrder ι] [LinearOrder κ] (I : Finset ι) (J : Finset κ) :
@@ -171,7 +172,8 @@ private lemma edge_id' {ι κ E : Type} [LinearOrder ι] [LinearOrder κ] [AddCo
   · simp [hs]
 
 section Forms
-variable {K L : Type} [Field K] [Field L] [Algebra ℂ K] [Algebra ℂ L] [Algebra K L] [IsScalarTower ℂ K L]
+variable
+  {K L : Type} [Field K] [Field L] [Algebra ℂ K] [Algebra ℂ L] [Algebra K L] [IsScalarTower ℂ K L]
 
 private lemma mapDR_ιMulti' (q : ℕ) (v : Fin q → K) :
     mapDR ℂ K L (ExteriorAlgebra.ιMulti K q fun j => D ℂ K (v j)) =
@@ -220,20 +222,24 @@ private lemma mapC_Z' {ι : Type} [LinearOrder ι] (B : Finset ι → Subalgebra
 
 end Forms
 
-theorem UpperTheory.Gal.productCup_of_system.fieldLe_of :
-    ZFam → ZEx → ZId → PrB → YMain → GMap → LCupRel → EdgeB → TrTop → ResidueOfTraceIsFiberSum → TrLin → SysBasic → RYBasic → OmLoc → FieldLe := by
+theorem UpperTheory.Gal.productCup_of_system.fieldLe_of
+    : ZFam → ZEx → ZId → PrB → YMain → GMap → LCupRel → EdgeB → TrTop → ResidueOfTraceIsFiberSum
+      → TrLin → SysBasic → RYBasic → OmLoc
+      → FieldLe := by
   intro hZF hZEx hZId hPrB hYM hGM hLC hEB hTT hRT hTL hSB hRY hOL
   intro F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 Fx A hY a ha u hu
   have h0 : Y0 x j2 := hY.toY0
   have hcZ := h0.covZ
   have hcY := h0.covY
-  obtain ⟨τ, hτ⟩ := (GlobalTheory.T.exists_topDegreeCoefficientForm_and_eq_on_top_forms ℂ F K d (xv x) hcZ).1
+  obtain ⟨τ, hτ⟩ :=
+    (GlobalTheory.T.exists_topDegreeCoefficientForm_and_eq_on_top_forms ℂ F K d (xv x) hcZ).1
   obtain ⟨ρ, hρ⟩ := GlobalTheory.T.exists_laurentConstantTermForm_functionField ℂ F d (xv x) hcZ.pd
   obtain ⟨m, n, z, hz⟩ := hZF F K d x hcZ
   obtain ⟨c, hc, hD⟩ := hZEx F K d x hcZ τ hτ a ha (Fin m) n z hz
   obtain ⟨h, hh1, hh2, hh3⟩ := hYM F K K' d x j2 Fx A hY τ hτ a ha (Fin m) n z hz c hc hD
   have hc0 : resK inlE c ∈ ((sysZ K x a).cx n11 (sysZ K x a).mu).Z (d + 2) :=
-    (hSB d _ _ (sysZ K x a) _ (app n11 n) (app (sysZ K x a).mu z) (d + 2)).2.2.2.2.2 (Mi d) inlE c hc
+    (hSB d _ _ (sysZ K x a) _ (app n11 n) (app (sysZ K x a).mu z) (d + 2)).2.2.2.2.2 (Mi d) inlE c
+      hc
   obtain ⟨M, p, e, f, hpef, hjoin, hid⟩ := hZId F K d x hcZ τ hτ ρ hρ a ha _ hc0 hD
   choose bt hbt hbtJ hbtC hbtu using fun k => hu (p k) (f k) (hpef k).2.2
   obtain ⟨hRI, -, hRmono, hRmap, -⟩ := hRY F K K' d x j2 h0
@@ -248,8 +254,10 @@ theorem UpperTheory.Gal.productCup_of_system.fieldLe_of :
   let μ : DR ℂ K' →ₗ[ℂ] DR ℂ K' →ₗ[ℂ] DR ℂ K' := LinearMap.mul ℂ (DR ℂ K')
   let aa : Fin M → Finset (Fin (d + 1)) → DR ℂ K' := fun k I => mapDR ℂ K K' (e k I)
   let bb : Fin M → Finset (Fin (d + 1)) → DR ℂ K' := fun k I => bt k (uni I ∅)
-  have hmulm : ∀ (B : Subalgebra ℂ K') (p q : ℕ), ∀ y ∈ omB ℂ K' B p, ∀ y' ∈ omB ℂ K' B q, y * y' ∈ omB ℂ K' B (p + q) :=
-    fun B p q => (GlobalTheory.T.kahlerFormsOverSubalgebra_closure_properties ℂ K' B p q).1
+  have hmulm
+      : ∀ (B : Subalgebra ℂ K') (p q : ℕ), ∀ y ∈ omB ℂ K' B p, ∀ y' ∈ omB ℂ K' B q,
+        y * y' ∈ omB ℂ K' B (p + q) := fun B p q =>
+    (GlobalTheory.T.kahlerFormsOverSubalgebra_closure_properties ℂ K' B p q).1
   have haa : ∀ k, aa k ∈ (omCx (rB ℂ K' (xv x)) (d - a)).Z ((d : ℤ) - p k) := fun k =>
     mapC_Z' _ _ (fun I y hy => (hRmap I y hy).1) (d - a) _ _ (hpef k).2.1
   have hbb : ∀ k, bb k ∈ cechC (fun I => omB ℂ K' (rB ℂ K' (xv x) I) a) (p k) := by
@@ -258,68 +266,96 @@ theorem UpperTheory.Gal.productCup_of_system.fieldLe_of :
     have h1 := cechC_iff'.1 (Submodule.mem_inf.1 (hbt k)).1 (uni I ∅)
     have hcard : (uni I (∅ : Finset (Fin (d + 1)))).card = I.card := by simp [card_uni']
     by_cases hI : I.Nonempty ∧ (I.card : ℤ) = p k + 1
-    · have c : (uni I (∅ : Finset (Fin (d + 1)))).Nonempty ∧
-          ((uni I (∅ : Finset (Fin (d + 1)))).card : ℤ) = p k + 1 :=
+    · have c
+          : (uni I (∅ : Finset (Fin (d + 1)))).Nonempty
+            ∧ ((uni I (∅ : Finset (Fin (d + 1)))).card : ℤ) = p k + 1 :=
         ⟨Finset.card_pos.1 (by rw [hcard]; exact Finset.card_pos.2 hI.1), by rw [hcard]; exact hI.2⟩
       rw [if_pos c, lft_uni', rgt_uni', hRI] at h1
       rw [if_pos hI]
       exact h1
-    · have c : ¬ ((uni I (∅ : Finset (Fin (d + 1)))).Nonempty ∧
-          ((uni I (∅ : Finset (Fin (d + 1)))).card : ℤ) = p k + 1) := fun c =>
-        hI ⟨Finset.card_pos.1 (by rw [← hcard]; exact Finset.card_pos.2 c.1), by rw [← hcard]; exact c.2⟩
+    · have c : ¬((uni I (∅ : Finset (Fin (d + 1)))).Nonempty
+          ∧ ((uni I (∅ : Finset (Fin (d + 1)))).card : ℤ) = p k + 1) := fun c =>
+        hI ⟨
+          Finset.card_pos.1 (by rw [← hcard]; exact Finset.card_pos.2 c.1),
+          by rw [← hcard]; exact c.2
+        ⟩
       rw [if_neg c] at h1
       rw [if_neg hI]
       exact h1
-  have hcond : ∀ (I J I' : Finset (Fin (d + 1))) (s : Finset (Two d)), J.Nonempty → I'.Nonempty → s.Nonempty → I' ⊆ I →
-      s ⊆ uni I J → ∀ y ∈ omB ℂ K' (rB ℂ K' (xv x) I') (d - a), ∀ y' ∈ omB ℂ K' (RY (xv x) j2 (lft s) (rgt s)) a,
-      μ y y' ∈ omB ℂ K' (RY (xv x) j2 I J) d := by
+  have hcond
+      : ∀ (I J I' : Finset (Fin (d + 1))) (s : Finset (Two d)),
+        J.Nonempty → I'.Nonempty → s.Nonempty → I' ⊆ I → s ⊆ uni I J
+          → ∀ y ∈ omB ℂ K' (rB ℂ K' (xv x) I') (d - a),
+            ∀ y' ∈ omB ℂ K' (RY (xv x) j2 (lft s) (rgt s)) a,
+              μ y y' ∈ omB ℂ K' (RY (xv x) j2 I J) d := by
     intro I J I' s _ _ _ hI hs y hy y' hy'
     have e1 : y ∈ omB ℂ K' (RY (xv x) j2 I J) (d - a) :=
       omB_mono' ((hrm _ _ hI).trans (hrRY I J)) _ hy
     have e2 : y' ∈ omB ℂ K' (RY (xv x) j2 I J) a :=
-      omB_mono' (hRmono _ _ _ _ (by simpa only [lft_uni'] using lft_mono' hs)
-        (by simpa only [rgt_uni'] using rgt_mono' hs)) _ hy'
+      omB_mono'
+        (hRmono _ _ _ _ (by simpa only [lft_uni'] using lft_mono' hs)
+          (by simpa only [rgt_uni'] using rgt_mono' hs))
+        _ hy'
     have := hmulm _ _ _ y e1 y' e2
     rwa [hda] at this
-  have hlc : ∀ k, join μ (aa k) (fun J => bt k (uni ∅ J)) - ((-1 : ℤ) ^ p k) • edge1 (cupE μ (aa k) (bb k)) ∈
-      (sysY x j2 d).mix.B (d + 2) ∧ deltaL ℂ _ _ (cupE μ (aa k) (bb k)) = 0 := by
+  have hlc
+      : ∀ k,
+        join μ (aa k) (fun J => bt k (uni ∅ J)) - ((-1 : ℤ) ^ p k) • edge1 (cupE μ (aa k) (bb k))
+            ∈ (sysY x j2 d).mix.B (d + 2)
+          ∧ deltaL ℂ _ _ (cupE μ (aa k) (bb k)) = 0 := by
     intro k
     have hq : ((d - p k : ℕ) : ℤ) = (d : ℤ) - p k := Nat.cast_sub (hpef k).1
-    have := hLC (Fin (d + 1)) (DR ℂ K') (DR ℂ K') (DR ℂ K') μ (fun I => omB ℂ K' (rB ℂ K' (xv x) I) (d - a))
-      (fun s => omB ℂ K' (RY (xv x) j2 (lft s) (rgt s)) a) (fun I J => omB ℂ K' (RY (xv x) j2 I J) d) (d - p k) (p k)
-      hcond (aa k) (by rw [hq]; exact haa k) (bt k) (hbt k)
+    have :=
+      hLC (Fin (d + 1)) (DR ℂ K') (DR ℂ K') (DR ℂ K') μ
+        (fun I => omB ℂ K' (rB ℂ K' (xv x) I) (d - a))
+        (fun s => omB ℂ K' (RY (xv x) j2 (lft s) (rgt s)) a)
+        (fun I J => omB ℂ K' (RY (xv x) j2 I J) d)
+        (d - p k) (p k) hcond (aa k) (by rw [hq]; exact haa k) (bt k) (hbt k)
     rw [show (((d - p k : ℕ) : ℤ) + p k + 2) = (d : ℤ) + 2 by rw [hq]; ring] at this
     exact this
   have hcupZ : ∀ k, cupE μ (aa k) (bb k) ∈ (omCx (rB ℂ K' (xv x)) d).Z d := by
     intro k
-    refine Submodule.mem_inf.2 ⟨cupE_mem' μ (fun I => omB ℂ K' (rB ℂ K' (xv x) I) (d - a))
-      (fun I => omB ℂ K' (rB ℂ K' (xv x) I) a) _ ((d : ℤ) - p k) (p k) d (by ring) ?_ (aa k) (bb k)
-      (Submodule.mem_inf.1 (haa k)).1 (hbb k), (hlc k).2⟩
+    refine Submodule.mem_inf.2 ⟨
+      cupE_mem' μ
+        (fun I => omB ℂ K' (rB ℂ K' (xv x) I) (d - a))
+        (fun I => omB ℂ K' (rB ℂ K' (xv x) I) a)
+        _ ((d : ℤ) - p k) (p k) d (by ring) ?_ (aa k) (bb k) (Submodule.mem_inf.1 (haa k)).1
+        (hbb k),
+      (hlc k).2
+    ⟩
     intro s t w _ _ hsw htw y hy y' hy'
     have := hmulm _ _ _ y (omB_mono' (hrm _ _ hsw) _ hy) y' (omB_mono' (hrm _ _ htw) _ hy')
     rwa [hda] at this
   have htop : top (resK inlE c) = top c := by
     funext b
     simp only [top, resK, lft_uni', rgt_uni', Finset.map_empty]
-  have hgj : ∀ k, (fun s => gY j2 (join (TensorProduct.mk ℂ _ _) (e k) (f k) s)) =
-      join μ (aa k) (fun J => bt k (uni ∅ J)) := by
+  have hgj
+      : ∀ k,
+        (fun s => gY j2 (join (TensorProduct.mk ℂ _ _) (e k) (f k) s))
+          = join μ (aa k) (fun J => bt k (uni ∅ J)) := by
     intro k
     funext s
     simp only [join, aa, hbtJ]
     simp [gY, μ]
   let Λ : Finset (Fin (d + 1)) → DR ℂ K' := ∑ k, ((-1 : ℤ) ^ p k) • cupE μ (aa k) (bb k)
-  have hΛZ : Λ ∈ (omCx (rB ℂ K' (xv x)) d).Z d := Submodule.sum_mem _ fun k _ => zsmul_mem (hcupZ k) _
+  have hΛZ : Λ ∈ (omCx (rB ℂ K' (xv x)) d).Z d :=
+    Submodule.sum_mem _ fun k _ => zsmul_mem (hcupZ k) _
   have hy := sub_mem hΛZ hh2
   have hedge : edge1 (Λ - locCoch ℂ K' (xv x) h) ∈ (sysY x j2 d).mix.B (d + 2) := by
-    have hP : (fun s => gY j2 ((top (resK inlE c) - ∑ k, join (TensorProduct.mk ℂ _ _) (e k) (f k)) s)) =
-        (fun s => gY j2 (top c s)) - ∑ k, join μ (aa k) (fun J => bt k (uni ∅ J)) := by
+    have hP
+        : (fun s => gY j2 ((top (resK inlE c) - ∑ k, join (TensorProduct.mk ℂ _ _) (e k) (f k)) s))
+          = (fun s => gY j2 (top c s)) - ∑ k, join μ (aa k) (fun J => bt k (uni ∅ J)) := by
       funext s
       set_option synthInstance.maxHeartbeats 100000 in
         rw [htop, Pi.sub_apply, Pi.sub_apply, Finset.sum_apply, Finset.sum_apply, map_sub, map_sum]
       congr 1
       exact Finset.sum_congr rfl fun k _ => congrFun (hgj k) s
     rw [hP] at hgm
-    rw [edge_id' (fun k => (-1 : ℤ) ^ p k) (fun k => cupE μ (aa k) (bb k)) _ (fun s => gY j2 (top c s))
+    rw [edge_id'
+      (fun k => (-1 : ℤ) ^ p k)
+      (fun k => cupE μ (aa k) (bb k))
+      _
+      (fun s => gY j2 (top c s))
       (fun k => join μ (aa k) (fun J => bt k (uni ∅ J)))]
     exact sub_mem (sub_mem hh1 hgm) (Submodule.sum_mem _ fun k _ => (hlc k).1)
   have hB := hEB F K K' d x j2 h0 _ hy hedge
@@ -329,17 +365,25 @@ theorem UpperTheory.Gal.productCup_of_system.fieldLe_of :
   have hΛv : trF ℂ τ ρ (trDR ℂ K K' (Λ Finset.univ)) = ∑ e ∈ Fx, locTerm (A e) a := by
     rw [Pi.sub_apply, map_sub, map_sub, sub_eq_zero, hl, hT2] at hz0
     rw [hz0, hRT F K' d x hcY h0.red ρ hρ h, hh3]
-  have hterm : ∀ k, trF ℂ τ ρ (trDR ℂ K K' (cupE μ (aa k) (bb k) Finset.univ)) =
-      pr K τ ρ (e k) (trC (k := ℂ) (K := K) (L := K') (bb k)) := by
+  have hterm
+      : ∀ k,
+        trF ℂ τ ρ (trDR ℂ K K' (cupE μ (aa k) (bb k) Finset.univ))
+          = pr K τ ρ (e k) (trC (k := ℂ) (K := K) (L := K') (bb k)) := by
     intro k
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [cupE, map_sum, cupPair, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     simp only [μ, aa, LinearMap.mul_apply', hT1]
     simp [trC]
-  rw [alt_trace' hTL (omCx (rB ℂ K (xv x)) a) u d M p f (fun k => trC (k := ℂ) (K := K) (L := K') (bb k))
-    (fun k => pr K τ ρ (e k)) (fun k => (hpef k).1) (fun k => (hpef k).2.2) hbtC
-    (fun k y hy => hPrB F K d x hcZ τ hτ ρ hρ a (p k) ha (hpef k).1 (e k) (hpef k).2.1 y hy) hid hbtu, ← hΛv]
+  rw [alt_trace' hTL (omCx (rB ℂ K (xv x)) a) u d M p f
+      (fun k => trC (k := ℂ) (K := K) (L := K') (bb k))
+      (fun k => pr K τ ρ (e k))
+      (fun k => (hpef k).1)
+      (fun k => (hpef k).2.2)
+      hbtC
+      (fun k y hy => hPrB F K d x hcZ τ hτ ρ hρ a (p k) ha (hpef k).1 (e k) (hpef k).2.1 y hy)
+      hid hbtu,
+    ← hΛv]
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [Λ, Finset.sum_apply, Pi.smul_apply, map_sum, map_zsmul, hterm]
   refine Finset.sum_congr rfl fun k _ => ?_

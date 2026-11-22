@@ -44,16 +44,18 @@ theorem BlockGenOfModel.proof : BlockGenOfModel.Statement := by
     refine ⟨c k, hc k, fun a => ?_⟩
     rw [hnd a]
     have hda : (dd a : Ω) ≠ 0 := coe_ne_zero_of_notMem x (fun _ => j) q (hdd a)
-    have e : ((∏ a', dd a' : A) : Ω) * ((nn a : Ω) / dd a) =
-        (nn a : Ω) * ∏ a' ∈ Finset.univ.erase a, (dd a' : Ω) := by
-      rw [SubmonoidClass.coe_finsetProd, ← Finset.mul_prod_erase Finset.univ (fun a' => (dd a' : Ω))
-        (Finset.mem_univ a)]
+    have e
+        : ((∏ a', dd a' : A) : Ω) * ((nn a : Ω) / dd a)
+          = (nn a : Ω) * ∏ a' ∈ Finset.univ.erase a, (dd a' : Ω) := by
+      rw [SubmonoidClass.coe_finsetProd,
+        ← Finset.mul_prod_erase Finset.univ (fun a' => (dd a' : Ω)) (Finset.mem_univ a)]
       field_simp
     rw [e]
     exact Subalgebra.mul_mem _ (nn a).2 (Subalgebra.prod_mem _ fun i _ => (dd i).2)
 
-  have key : ∀ t ∈ (Submodule.span A D : Ideal A), ∃ w : ι k → Ω,
-      (∀ a b, y ⟨k, a⟩ * w b ∈ A) ∧ ∑ b, y ⟨k, b⟩ * w b = (t : Ω) := by
+  have key
+      : ∀ t ∈ (Submodule.span A D : Ideal A), ∃ w : ι k → Ω,
+        (∀ a b, y ⟨k, a⟩ * w b ∈ A) ∧ ∑ b, y ⟨k, b⟩ * w b = (t : Ω) := by
     intro t ht
     induction ht using Submodule.span_induction with
     | mem d hd =>
@@ -69,7 +71,8 @@ theorem BlockGenOfModel.proof : BlockGenOfModel.Statement := by
           exact Subalgebra.zero_mem _
       · simp only [Pi.single_apply, mul_ite, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
         field_simp
-    | zero => exact ⟨0, fun _ _ => by simp, by simp⟩
+    | zero =>
+      exact ⟨0, fun _ _ => by simp, by simp⟩
     | add s t _ _ hs ht =>
       obtain ⟨w, hw, hws⟩ := hs
       obtain ⟨w', hw', hwt⟩ := ht

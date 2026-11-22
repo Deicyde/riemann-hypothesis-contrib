@@ -12,14 +12,17 @@ namespace PI.UnitaryGroupMassFormula.ClassNumImQInt
 
 open NumberField Polynomial
 
-theorem adjoin_top {K : Type} [Field K] [NumberField K] (b : K)
-    (h : IntermediateField.adjoin ℚ {b} = ⊤) : Algebra.adjoin ℚ {b} = ⊤ := by
-  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic
-    (Algebra.IsAlgebraic.isAlgebraic b), h]
+theorem adjoin_top
+    {K : Type} [Field K] [NumberField K] (b : K) (h : IntermediateField.adjoin ℚ {b} = ⊤)
+    : Algebra.adjoin ℚ {b} = ⊤ := by
+  rw [← IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (Algebra.IsAlgebraic.isAlgebraic
+      b),
+    h]
   exact IntermediateField.top_toSubalgebra
 
-theorem half_integral {K : Type} [Field K] [NumberField K] (d : ℕ) (b : K) (hd : d % 4 = 3)
-    (hb : b ^ 2 = -(d : K)) : IsIntegral ℤ ((1 + b) / 2) := by
+theorem half_integral
+    {K : Type} [Field K] [NumberField K] (d : ℕ) (b : K) (hd : d % 4 = 3) (hb : b ^ 2 = -(d : K))
+    : IsIntegral ℤ ((1 + b) / 2) := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, d + 1 = 4 * k := ⟨(d + 1) / 4, by omega⟩
   have hk' : (d : K) + 1 = 4 * (k : K) := by exact_mod_cast hk
   refine ⟨X ^ 2 - X + C (k : ℤ), by monicity!, ?_⟩

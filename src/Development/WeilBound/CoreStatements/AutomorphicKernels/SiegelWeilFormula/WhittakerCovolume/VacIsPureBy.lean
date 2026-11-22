@@ -8,14 +8,18 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.KWhit
 
 open PositivityTheory.SiegelWeilFormula
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 def vac_gen {d : SD σ} (R : RD d) : Set (Mx F E d.m d.n → ℂ) :=
   {f | ∃ φ, Dense.Good φ ∧ f = genF R (fun _ => 1) (Dense.pf φ)}
@@ -37,9 +41,11 @@ theorem vac_le_span {d : SD σ} (R : RD d) : R.vac ≤ Submodule.span ℂ (vac_g
     | smul a x _ hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
   exact key
 
-theorem vac_isPureBy {d : SD σ} (R : RD d)
-    (φ : ∀ u : HeightOneSpectrum (𝓞 F), (Fin d.m × Fin d.n × Fin 2 → Fv F u) → ℂ) (hφ : Dense.Good φ) (Φ : d.Fn)
-    (h : d.T Φ = genF R (fun _ => 1) (Dense.pf φ)) : ∃ gf, IsPureBy R Φ (fun _ => 1) gf := by
+theorem vac_isPureBy
+    {d : SD σ}
+    (R : RD d) (φ : ∀ u : HeightOneSpectrum (𝓞 F), (Fin d.m × Fin d.n × Fin 2 → Fv F u) → ℂ)
+    (hφ : Dense.Good φ) (Φ : d.Fn) (h : d.T Φ = genF R (fun _ => 1) (Dense.pf φ))
+    : ∃ gf, IsPureBy R Φ (fun _ => 1) gf := by
   refine ⟨φ, fun v => hφ.1 v, hφ.2.mono fun v hv => hv, ?_⟩
   rw [h]
   rfl
@@ -53,8 +59,17 @@ theorem vacSpan : VacSpan := by
   have hpre : ∀ i : Fin k, ∃ Ψ ∈ d.sch, d.T Ψ = (gs i : Mx F E d.m d.n → ℂ) := fun i =>
     hB.2.1 _ ((hF F E σ d R).1 (hvf (vac_gen_sub R (gs i).2)))
   choose Φs hΦs hTs using hpre
-  refine ⟨k, c, Φs, fun i => ⟨hPK F E σ d R (Φs i) (hΦs i) (hTs i ▸ hvf (vac_gen_sub R (gs i).2)),
-    hTs i ▸ vac_gen_sub R (gs i).2, ?_⟩, ?_⟩
+  refine ⟨
+    k,
+    c,
+    Φs,
+    fun i => ⟨
+      hPK F E σ d R (Φs i) (hΦs i) (hTs i ▸ hvf (vac_gen_sub R (gs i).2)),
+      hTs i ▸ vac_gen_sub R (gs i).2,
+      ?_
+    ⟩,
+    ?_
+  ⟩
   · obtain ⟨φ, hφ, e⟩ := (gs i).2
     exact vac_isPureBy R φ hφ (Φs i) ((hTs i).trans e)
   · have hmem : Φ - ∑ i, c i • Φs i ∈ d.sch :=

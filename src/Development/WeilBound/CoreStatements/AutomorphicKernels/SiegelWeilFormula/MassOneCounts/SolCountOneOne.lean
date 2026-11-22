@@ -10,10 +10,13 @@ namespace PositivityTheory.SiegelWeilFormula.MOne
 
 open PositivityTheory.PfSWUS.Loc
 
-theorem card_bridge {W A R : Type} [CommRing R] (ϖ : R) (a : W → A) (ha : Function.Surjective a) (φ : W → R)
-    (hφ : Function.Surjective φ) (hker : ∀ w w', a w = a w' ↔ φ w - φ w' ∈ lev ϖ 1) (PA : A → Prop) (PR : R → Prop)
-    (hP : ∀ w, PA (a w) ↔ PR (φ w)) :
-    Nat.card {y // PA y} = Nat.card (Ideal.Quotient.mk (lev ϖ 1) '' {x | PR x}) := by
+theorem card_bridge
+    {W A R : Type} [CommRing R]
+    (ϖ : R)
+    (a : W → A) (ha : Function.Surjective a)
+    (φ : W → R) (hφ : Function.Surjective φ) (hker : ∀ w w', a w = a w' ↔ φ w - φ w' ∈ lev ϖ 1)
+    (PA : A → Prop) (PR : R → Prop) (hP : ∀ w, PA (a w) ↔ PR (φ w))
+    : Nat.card {y // PA y} = Nat.card (Ideal.Quotient.mk (lev ϖ 1) '' {x | PR x}) := by
   classical
   choose s hs using ha
   let e : A → R ⧸ lev ϖ 1 := fun y => Ideal.Quotient.mk (lev ϖ 1) (φ (s y))
@@ -38,10 +41,13 @@ theorem card_bridge {W A R : Type} [CommRing R] (ϖ : R) (a : W → A) (ha : Fun
   rw [← himg, Nat.card_image_of_injective hinj]
   rfl
 
-theorem solCount_one_one {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (j t : R) :
-    solCount σ ϖ (Matrix.of fun _ _ => j : Matrix (Fin 1) (Fin 1) R) (Matrix.of fun _ _ => t : Matrix (Fin 1) (Fin 1) R) 1 =
-      Nat.card (Ideal.Quotient.mk (lev ϖ 1) '' {x : R | Ideal.Quotient.mk (lev ϖ 1) (σ x * j * x) =
-        Ideal.Quotient.mk (lev ϖ 1) t}) := by
+theorem solCount_one_one {R : Type} [CommRing R] (σ : R →+* R) (ϖ : R) (j t : R)
+    : solCount σ ϖ (Matrix.of fun _ _ => j : Matrix (Fin 1) (Fin 1) R)
+        (Matrix.of fun _ _ => t : Matrix (Fin 1) (Fin 1) R) 1
+      = Nat.card
+        (Ideal.Quotient.mk (lev ϖ 1)
+          '' {x : R | Ideal.Quotient.mk (lev ϖ 1) (σ x * j * x) =
+            Ideal.Quotient.mk (lev ϖ 1) t}) := by
   classical
   unfold solCount
   have hinj : Function.Injective (fun y : Matrix (Fin 1) (Fin 1) (R ⧸ lev ϖ 1) => y 0 0) := by

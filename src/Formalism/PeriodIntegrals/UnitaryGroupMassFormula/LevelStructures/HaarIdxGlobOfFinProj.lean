@@ -11,21 +11,24 @@ noncomputable section
 
 namespace MassDataLevelSSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField
-  IsDedekindDomain Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge PI.MassDataKppVolLemmas
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge
+  PI.MassDataKppVolLemmas
 open Formalism.MainNotions.S (AutInst)
 open scoped TensorProduct
 
-def FinProjOpen : Prop :=
-  ∀ I : AutInst, IsOpenMap (fun h : HAd I => (splitA I.cm.sig I.J h).2)
+def FinProjOpen : Prop := ∀ I : AutInst, IsOpenMap (fun h : HAd I => (splitA I.cm.sig I.J h).2)
 
-theorem finPart_inf_one (I : AutInst) (hb : AdBridgeIso I) (s : I.Ginf) :
-    (splitA I.cm.sig I.J (toHA I hb (s, 1))).2 = 1 := by
+theorem finPart_inf_one (I : AutInst) (hb : AdBridgeIso I) (s : I.Ginf)
+    : (splitA I.cm.sig I.J (toHA I hb (s, 1))).2 = 1 := by
   apply Bridge_HA_ext
   have hB : I.fmat 1 = ofHAFin I (toHA I hb (s, 1)) := (toHA_isBridge I hb (s, 1)).2
-  have hm : ((HA.mat (Af I.F) I.cm.sig I.J ((splitA I.cm.sig I.J (toHA I hb (s, 1))).2) :
-      GL (Fin I.n) (Af I.F ⊗[I.F] I.E)) : Matrix (Fin I.n) (Fin I.n) _) =
-      (ofHAFin I (toHA I hb (s, 1))).map (swapE I) := by
+  have hm
+      : ((HA.mat (Af I.F) I.cm.sig I.J ((splitA I.cm.sig I.J (toHA I hb (s, 1))).2)
+            : GL (Fin I.n) (Af I.F ⊗[I.F] I.E))
+          : Matrix (Fin I.n) (Fin I.n) _)
+        = (ofHAFin I (toHA I hb (s, 1))).map (swapE I) := by
     ext i j
     simp only [ofHAFin, Matrix.map_apply]
     rw [← Bridge_tens_eq]
@@ -35,8 +38,8 @@ theorem finPart_inf_one (I : AutInst) (hb : AdBridgeIso I) (s : I.Ginf) :
   rw [h1, Matrix.map_one _ (map_zero _) (map_one _)]
   rfl
 
-theorem finPart_eq (I : AutInst) (hb : AdBridgeIso I) (s : I.Ginf) (x : I.Gf) :
-    (splitA I.cm.sig I.J (toHA I hb (s, x))).2 = tf I hb x := by
+theorem finPart_eq (I : AutInst) (hb : AdBridgeIso I) (s : I.Ginf) (x : I.Gf)
+    : (splitA I.cm.sig I.J (toHA I hb (s, x))).2 = tf I hb x := by
   unfold tf
   rw [show ((s, x) : I.GA) = (s, 1) * (1, x) by ext <;> simp, map_mul, map_mul, Prod.snd_mul,
     finPart_inf_one I hb s, one_mul]
@@ -46,8 +49,9 @@ theorem one_mem_Kg (I : AutInst) (g : ℕ) : (1 : I.Gf) ∈ I.Kg g := by
   show _ ∈ Formalism.UG.stabGL I.Lf
   simpa using one_mem (Formalism.UG.stabGL I.Lf)
 
-theorem level_subgroup_isOpen {D : D7} (X : HidaSetting D) (hL : X.LevelSubgroupNormalized) (hK : X.LevelSubgroupCharacter) :
-    IsOpen (X.K2 : Set X.B.I.Gf) := by
+theorem level_subgroup_isOpen
+    {D : D7} (X : HidaSetting D) (hL : X.LevelSubgroupNormalized) (hK : X.LevelSubgroupCharacter)
+    : IsOpen (X.K2 : Set X.B.I.Gf) := by
   have hg1 : 1 ≤ X.B.g := by
     rw [X.g_eq]
     exact Nat.mul_pos (D.host.g_prime 0).pos (D.host.g_prime 1).pos
@@ -61,9 +65,11 @@ theorem level_subgroup_isOpen {D : D7} (X : HidaSetting D) (hL : X.LevelSubgroup
   have h2 := hK.2.1 x hx _ (hL.1 _ hy).1
   simpa using h2
 
-theorem conjugate_level_isOpen (hP : FinProjOpen) {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I)
-    (hK : X.LevelSubgroupCharacter) (hL : X.LevelSubgroupNormalized) (w : D.what₂.Word) :
-    IsOpen (K2u X hb w) := by
+theorem conjugate_level_isOpen
+    (hP : FinProjOpen)
+    {D : D7} (X : HidaSetting D) (hb : AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter)
+    (hL : X.LevelSubgroupNormalized) (w : D.what₂.Word)
+    : IsOpen (K2u X hb w) := by
   set a := X.xu w
   have hU : IsOpen ((fun y => a * y * a⁻¹) '' X.K2) := by
     have e : (fun y => a * y * a⁻¹) '' X.K2 = (fun y => a⁻¹ * y * a) ⁻¹' X.K2 := by
@@ -75,11 +81,14 @@ theorem conjugate_level_isOpen (hP : FinProjOpen) {D : D7} (X : HidaSetting D) (
       · intro hy
         exact ⟨a⁻¹ * y * a, hy, by group⟩
     rw [e]
-    exact (level_subgroup_isOpen X hL hK).preimage ((continuous_const.mul continuous_id).mul continuous_const)
+    exact (level_subgroup_isOpen X hL hK).preimage
+      ((continuous_const.mul continuous_id).mul continuous_const)
   have hW : IsOpen ((toHA X.B.I hb) '' (Set.univ ×ˢ ((fun y => a * y * a⁻¹) '' X.K2))) :=
     (toHA X.B.I hb).toHomeomorph.isOpenMap _ (isOpen_univ.prod hU)
-  have e : K2u X hb w = (fun h : HAd X.B.I => (splitA X.B.I.cm.sig X.B.I.J h).2) ''
-      ((toHA X.B.I hb) '' (Set.univ ×ˢ ((fun y => a * y * a⁻¹) '' X.K2))) := by
+  have e
+      : K2u X hb w
+        = (fun h : HAd X.B.I => (splitA X.B.I.cm.sig X.B.I.J h).2)
+          '' ((toHA X.B.I hb) '' (Set.univ ×ˢ ((fun y => a * y * a⁻¹) '' X.K2))) := by
     have hom : ∀ k, tf X.B.I hb (a * k * a⁻¹) = finHA X hb a * finHA X hb k * (finHA X hb a)⁻¹ := by
       intro k
       show tfHom X.B.I hb (a * k * a⁻¹) = tfHom X.B.I hb a * tfHom X.B.I hb k * (tfHom X.B.I hb a)⁻¹
@@ -102,8 +111,7 @@ theorem k2uOpenH_of (hP : FinProjOpen) : ConjugateLevelOpenUnitary := by
   intro D X hb hK _ hL w
   exact (conjugate_level_isOpen hP X hb hK hL w).preimage continuous_subtype_val
 
-theorem haarIdxGlob_of_finProj (hP : FinProjOpen) : HaarIdxGlob :=
-  haarIdxGlob_of (k2uOpenH_of hP)
+theorem haarIdxGlob_of_finProj (hP : FinProjOpen) : HaarIdxGlob := haarIdxGlob_of (k2uOpenH_of hP)
 
 def EvalVOpen : Prop :=
   ∀ (I : AutInst) (v : HeightOneSpectrum (𝓞 I.F)), IsOpenMap (haMap I.cm.sig I.J (evalV I.F v))

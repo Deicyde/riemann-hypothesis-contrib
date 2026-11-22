@@ -9,24 +9,32 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.GaloisT
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys GlobalTheory.IndefiniteRowSideFullHecke.ResidualLatticeSetting
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions.BlochKatoReduction
+  Formalism.MainNotions.BlochKatoReduction.Gen GlobalTheory.TwSys
+  GlobalTheory.IndefiniteRowSideFullHecke.ResidualLatticeSetting
 
 namespace GlobalTheory.SelMatrixCompare
 
-variable {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂} (X : NTw D.R D.host D.what₂ D.LL0 N)
+variable
+  {D : Formalism.BasicNotions.D7} {N : NData D.R D.host D.what₂}
+  (X : NTw D.R D.host D.what₂ D.LL0 N)
 
-theorem l_mem_maximalIdeal (i : X.Tw) : ((X.l i : ℕ) : X.O0 i) ∈ IsLocalRing.maximalIdeal (X.O0 i) := by
+theorem l_mem_maximalIdeal (i : X.Tw)
+    : ((X.l i : ℕ) : X.O0 i) ∈ IsLocalRing.maximalIdeal (X.O0 i) := by
   intro h
   have h2 := h.map (algebraMap (X.O0 i) (X.O i))
   rw [map_natCast] at h2
   exact X.O_l i h2
 
-theorem maxLam_le (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (m : Ideal (abelian₂ X i M ι)) [hm : m.IsMaximal] :
-    maxLam X i M ι ≤ m := by
+theorem maxLam_le
+    (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (m : Ideal (abelian₂ X i M ι)) [hm : m.IsMaximal]
+    : maxLam X i M ι ≤ m := by
   classical
   have hp : (X.l i).Prime := (X.lPrime i).out
   have : NeZero (X.l i ^ M) := ⟨pow_ne_zero _ hp.ne_zero⟩
-  have h0 : (IsLocalRing.maximalIdeal (X.O0 i)).map (algebraMap (X.O0 i) (abelian₂ X i M ι)) ≤ m := by
+  have h0
+      : (IsLocalRing.maximalIdeal (X.O0 i)).map (algebraMap (X.O0 i) (abelian₂ X i M ι)) ≤ m := by
     rw [Ideal.map_le_iff_le_comap]
     have : (m.comap (algebraMap (X.O0 i) (abelian₂ X i M ι))).IsMaximal :=
       Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := X.O0 i) m
@@ -56,8 +64,8 @@ theorem maxLam_le (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (m : Ideal (abel
   convert map_one (Ideal.Quotient.mk m) using 2
   convert map_one (MonoidAlgebra.of (X.O0 i) (Del X i M ι)) using 2
 
-theorem exists_const (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (x : abelian₂ X i M ι) :
-    ∃ c : X.O0 i, x - algebraMap (X.O0 i) (abelian₂ X i M ι) c ∈ maxLam X i M ι := by
+theorem exists_const (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (x : abelian₂ X i M ι)
+    : ∃ c : X.O0 i, x - algebraMap (X.O0 i) (abelian₂ X i M ι) c ∈ maxLam X i M ι := by
   obtain ⟨F, rfl⟩ := toLam_surjective X i M ι x
   induction F using MvPolynomial.induction_on with
   | C a => exact ⟨a, by rw [MvPolynomial.algHom_C, sub_self]; exact zero_mem _⟩
@@ -74,8 +82,8 @@ theorem exists_const (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (x : abelian�
     rw [map_zero, sub_zero, map_mul]
     exact Ideal.mul_mem_left _ _ (Ideal.mem_sup_right (Ideal.subset_span ⟨q, rfl⟩))
 
-theorem mem_maxLam_iff (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (x : abelian₂ X i M ι) :
-    x ∈ maxLam X i M ι ↔ ¬ IsUnit x := by
+theorem mem_maxLam_iff (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (x : abelian₂ X i M ι)
+    : x ∈ maxLam X i M ι ↔ ¬ IsUnit x := by
   refine ⟨fun hx hu => maxLam_ne_top X i M ι (Ideal.eq_top_of_isUnit_mem _ hx hu), fun hx => ?_⟩
   obtain ⟨m, hm, hxm⟩ := exists_max_ideal_of_mem_nonunits (mem_nonunits_iff.2 hx)
   obtain ⟨c, hc⟩ := exists_const X i M ι x
@@ -89,10 +97,12 @@ theorem mem_maxLam_iff (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] (x : abelia
   have := add_mem hc h3
   rwa [sub_add_cancel] at this
 
-theorem maxLam_isMaximal (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι] : (maxLam X i M ι).IsMaximal := by
+theorem maxLam_isMaximal (i : X.Tw) (M : ℕ) (ι : Type) [Fintype ι]
+    : (maxLam X i M ι).IsMaximal := by
   obtain ⟨m, hm, hle⟩ := Ideal.exists_le_maximal _ (maxLam_ne_top X i M ι)
-  have : maxLam X i M ι = m := le_antisymm hle fun x hx =>
-    (mem_maxLam_iff X i M ι x).2 fun hu => hm.ne_top (Ideal.eq_top_of_isUnit_mem _ hx hu)
+  have : maxLam X i M ι = m :=
+    le_antisymm hle fun x hx =>
+      (mem_maxLam_iff X i M ι x).2 fun hu => hm.ne_top (Ideal.eq_top_of_isUnit_mem _ hx hu)
   rwa [this]
 
 variable {X} (bkP : BKPh X)

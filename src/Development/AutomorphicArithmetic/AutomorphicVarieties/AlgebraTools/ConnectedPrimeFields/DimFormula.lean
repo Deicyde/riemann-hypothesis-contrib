@@ -11,8 +11,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.dimFormula :
-    ∀ {R : Type} [CommRing R] [IsDomain R], HasBase R → IsNoetherianRing R ∧ ReciprocityTheory.CA.DimFormula R := by
+theorem UpperTheory.V.AlgebraTools.Conn.dimFormula
+    : ∀ {R : Type} [CommRing R] [IsDomain R],
+      HasBase R → IsNoetherianRing R ∧ ReciprocityTheory.CA.DimFormula R := by
   intro R _ _ h
   obtain ⟨A, _, _, i, hA, hinj, hf⟩ := h
   let : Algebra A R := i.toAlgebra
@@ -35,10 +36,11 @@ theorem UpperTheory.V.AlgebraTools.Conn.dimFormula :
     simp only at e1 e2
     rw [e1, e2]
     exact Order.height_le_height_apply_of_strictMono
-      (fun P : PrimeSpectrum R => (⟨P.asIdeal.comap (algebraMap A R),
-        inferInstance⟩ : PrimeSpectrum A))
-      (fun P Q hPQ => Ideal.IsIntegral.comap_lt_comap (R := A)
-        (show P.asIdeal < Q.asIdeal from hPQ)) _
+      (fun P : PrimeSpectrum R =>
+        (⟨P.asIdeal.comap (algebraMap A R), inferInstance⟩ : PrimeSpectrum A))
+      (fun P Q hPQ =>
+        Ideal.IsIntegral.comap_lt_comap (R := A) (show P.asIdeal < Q.asIdeal from hPQ))
+      _
   rw [le_antisymm h2 h1,
     ReciprocityTheory.CA.ringKrullDim_quotient_eq_quotient_comap_of_isIntegral (A := A) q,
     hA.cm.height_add_ringKrullDim_quotient,

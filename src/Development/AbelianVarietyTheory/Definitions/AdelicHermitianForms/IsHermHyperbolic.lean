@@ -16,7 +16,8 @@ def hf (σ : R →+* R) (G : Matrix (Fin n) (Fin n) R) (x y : Fin n → R) : R :
 def IsU (σ : R →+* R) (G γ : Matrix (Fin n) (Fin n) R) : Prop :=
   ∀ x y, hf σ G (γ.mulVec x) (γ.mulVec y) = hf σ G x y
 
-def tv (σ : R →+* R) (G : Matrix (Fin n) (Fin n) R) (x : Fin n → R) (t : R) : Matrix (Fin n) (Fin n) R :=
+def tv (σ : R →+* R) (G : Matrix (Fin n) (Fin n) R) (x : Fin n → R) (t : R)
+    : Matrix (Fin n) (Fin n) R :=
   1 + Matrix.of fun a b => t * x a * ∑ e, G b e * σ (x e)
 
 def TvGen (σ : R →+* R) (G : Matrix (Fin n) (Fin n) R) : Submonoid (Matrix (Fin n) (Fin n) R) :=

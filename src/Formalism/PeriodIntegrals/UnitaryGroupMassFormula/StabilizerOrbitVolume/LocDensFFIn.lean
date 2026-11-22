@@ -15,8 +15,10 @@ section matrix
 
 variable {K : Type} [Field K] {σ : K →+* K}
 
-theorem ffH_isHS (hσ : ∀ x, σ (σ x) = x) {M : ℕ} (J : Matrix (Fin M) (Fin M) K)
-    (hJ : ∀ i j, σ (J j i) = J i j) (hdet : IsUnit J.det) : IsHS σ (ffH σ J) := by
+theorem ffH_isHS
+    (hσ : ∀ x, σ (σ x) = x)
+    {M : ℕ} (J : Matrix (Fin M) (Fin M) K) (hJ : ∀ i j, σ (J j i) = J i j) (hdet : IsUnit J.det)
+    : IsHS σ (ffH σ J) := by
   refine ⟨⟨?_, ?_, ?_⟩, ?_⟩
   · intro x y z
     simp only [ffH, Pi.add_apply, mul_add, Finset.sum_add_distrib]
@@ -36,7 +38,8 @@ theorem ffH_isHS (hσ : ∀ x, σ (σ x) = x) {M : ℕ} (J : Matrix (Fin M) (Fin
     have hinv : (fun i => σ (x i)) = 0 := by
       have := congrArg (fun v => Matrix.vecMul v J⁻¹) hv
       simpa only [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv J hdet, Matrix.vecMul_one,
-        Matrix.zero_vecMul] using this
+          Matrix.zero_vecMul]
+        using this
     funext i
     exact σ.injective (by simpa using congrFun hinv i)
 
@@ -46,15 +49,19 @@ section field
 
 variable {k K : Type} [Field k] [Fintype k] [Field K] [Fintype K] [DecidableEq K] [Algebra k K]
 
-private theorem card_le_natDegree_of_eval_eq_zero {L : Type} [Field L] (P : L[X]) (hP : P ≠ 0)
-    (Z : Finset L) (hZ : ∀ z ∈ Z, P.eval z = 0) : Z.card ≤ P.natDegree := by
+private theorem card_le_natDegree_of_eval_eq_zero
+    {L : Type} [Field L] (P : L[X]) (hP : P ≠ 0) (Z : Finset L) (hZ : ∀ z ∈ Z, P.eval z = 0)
+    : Z.card ≤ P.natDegree := by
   have hsub : Z.val ⊆ P.roots := fun z hz =>
     (Polynomial.mem_roots hP).mpr (hZ z (Finset.mem_val.mp hz))
   exact (Multiset.card_le_card ((Multiset.le_iff_subset Z.nodup).mpr hsub)).trans
     (Polynomial.card_roots' P)
 
-private theorem card_le_of_pow_eq_mul_add {L : Type} [Field L] (n : ℕ) (hn : 1 < n) (b c : L)
-    (Z : Finset L) (hZ : ∀ z ∈ Z, z ^ n = b * z + c) : Z.card ≤ n := by
+private theorem card_le_of_pow_eq_mul_add
+    {L : Type} [Field L]
+    (n : ℕ) (hn : 1 < n)
+    (b c : L) (Z : Finset L) (hZ : ∀ z ∈ Z, z ^ n = b * z + c)
+    : Z.card ≤ n := by
   have hlt : (C b * X + C c : L[X]).natDegree < (X ^ n : L[X]).natDegree := by
     rw [Polynomial.natDegree_X_pow]
     exact lt_of_le_of_lt Polynomial.natDegree_linear_le hn
@@ -67,28 +74,31 @@ private theorem card_le_of_pow_eq_mul_add {L : Type} [Field L] (n : ℕ) (hn : 1
   have := card_le_natDegree_of_eval_eq_zero _ hP0 Z fun z hz => by simp [hZ z hz]
   rwa [hdeg] at this
 
-private theorem exists_algebraMap_eq_of_frobenius_fixed (d : K) (hd : d ^ Fintype.card k = d) :
-    ∃ d0 : k, algebraMap k K d0 = d := by
+private theorem exists_algebraMap_eq_of_frobenius_fixed (d : K) (hd : d ^ Fintype.card k = d)
+    : ∃ d0 : k, algebraMap k K d0 = d := by
   by_contra hne
   push_neg at hne
   have hq : 1 < Fintype.card k := Fintype.one_lt_card
   have hdS : d ∉ Finset.univ.image (algebraMap k K) := by
     simp only [Finset.mem_image, Finset.mem_univ, true_and, not_exists]
     exact hne
-  have hc := card_le_of_pow_eq_mul_add (Fintype.card k) hq 1 0
-    (Finset.cons d (Finset.univ.image (algebraMap k K)) hdS) (by
-      intro z hz
-      rw [Finset.mem_cons] at hz
-      rcases hz with h | hz
-      · rw [h, hd, one_mul, add_zero]
-      · obtain ⟨a, -, rfl⟩ := Finset.mem_image.mp hz
-        rw [← map_pow, FiniteField.pow_card, one_mul, add_zero])
+  have hc :=
+    card_le_of_pow_eq_mul_add (Fintype.card k) hq 1 0
+      (Finset.cons d (Finset.univ.image (algebraMap k K)) hdS)
+      (by
+        intro z hz
+        rw [Finset.mem_cons] at hz
+        rcases hz with h | hz
+        · rw [h, hd, one_mul, add_zero]
+        · obtain ⟨a, -, rfl⟩ := Finset.mem_image.mp hz
+          rw [← map_pow, FiniteField.pow_card, one_mul, add_zero])
   rw [Finset.card_cons, Finset.card_image_of_injective _ (algebraMap k K).injective,
-    Finset.card_univ] at hc
+      Finset.card_univ]
+    at hc
   omega
 
-theorem frob_of_ne (σ : K ≃ₐ[k] K) (h2 : finrank k K = 2) (hne : σ ≠ AlgEquiv.refl) :
-    ∀ x, σ x = x ^ Fintype.card k := by
+theorem frob_of_ne (σ : K ≃ₐ[k] K) (h2 : finrank k K = 2) (hne : σ ≠ AlgEquiv.refl)
+    : ∀ x, σ x = x ^ Fintype.card k := by
   intro x
   haveI : Module.Finite k K := Module.finite_of_finrank_pos (by omega)
   by_cases hx : ∃ a : k, algebraMap k K a = x
@@ -121,31 +131,38 @@ theorem frob_of_ne (σ : K ≃ₐ[k] K) (h2 : finrank k K = 2) (hne : σ ≠ Alg
   have hint_r : IsIntegral k x := IsIntegral.of_finite k x
   have hP0 : (minpoly k x).map (algebraMap k K) ≠ 0 :=
     Polynomial.map_ne_zero (minpoly.ne_zero hint_r)
-  have hroot : ∀ y, Polynomial.aeval y (minpoly k x) = 0 →
-      ((minpoly k x).map (algebraMap k K)).eval y = 0 := fun y hy => by
+  have hroot
+      : ∀ y,
+        Polynomial.aeval y (minpoly k x) = 0
+          → ((minpoly k x).map (algebraMap k K)).eval y = 0 := fun y hy => by
     rw [Polynomial.eval_map_algebraMap]
     exact hy
   have r1 := hroot x (minpoly.aeval k x)
-  have r2 := hroot (σ x) (by
-    rw [show σ x = (σ : K →ₐ[k] K) x from rfl, Polynomial.aeval_algHom_apply, minpoly.aeval,
-      map_zero])
-  have r3 := hroot (x ^ Fintype.card k) (by
-    rw [← Polynomial.expand_aeval, FiniteField.expand_card, map_pow, minpoly.aeval,
-      zero_pow Fintype.card_ne_zero])
+  have r2 :=
+    hroot (σ x) (by
+      rw [show σ x = (σ : K →ₐ[k] K) x from rfl, Polynomial.aeval_algHom_apply, minpoly.aeval,
+        map_zero])
+  have r3 :=
+    hroot (x ^ Fintype.card k) (by
+      rw [← Polynomial.expand_aeval, FiniteField.expand_card, map_pow, minpoly.aeval,
+        zero_pow Fintype.card_ne_zero])
   by_contra hne3
   have hcard : ({x, σ x, x ^ Fintype.card k} : Finset K).card = 3 :=
     Finset.card_eq_three.mpr ⟨x, σ x, x ^ Fintype.card k, hσx.symm, hq.symm, hne3, rfl⟩
-  have hle := card_le_natDegree_of_eval_eq_zero _ hP0 {x, σ x, x ^ Fintype.card k} (by
-    intro z hz
-    simp only [Finset.mem_insert, Finset.mem_singleton] at hz
-    rcases hz with h | h | h <;> rw [h] <;> assumption)
+  have hle :=
+    card_le_natDegree_of_eval_eq_zero _ hP0 {x, σ x, x ^ Fintype.card k} (by
+      intro z hz
+      simp only [Finset.mem_insert, Finset.mem_singleton] at hz
+      rcases hz with h | h | h <;> rw [h] <;> assumption)
   rw [hcard, Polynomial.natDegree_map] at hle
   have hdeg : (minpoly k x).natDegree ≤ finrank k K := minpoly.natDegree_le x
   omega
 
-theorem card_norm_fiber (σ : K ≃ₐ[k] K) (hfrob : ∀ x, σ x = x ^ Fintype.card k)
-    (h2 : finrank k K = 2) (d : K) (hd : σ d = d) :
-    Nat.card {t : K // t * σ t = d} = if d = 0 then 1 else Fintype.card k + 1 := by
+theorem card_norm_fiber
+    (σ : K ≃ₐ[k] K) (hfrob : ∀ x, σ x = x ^ Fintype.card k)
+    (h2 : finrank k K = 2)
+    (d : K) (hd : σ d = d)
+    : Nat.card {t : K // t * σ t = d} = if d = 0 then 1 else Fintype.card k + 1 := by
   have hq1 : 1 < Fintype.card k := Fintype.one_lt_card
   have hKcard' : Fintype.card K = Fintype.card k ^ finrank k K := Module.card_eq_pow_finrank
   have hKcard : Fintype.card K = Fintype.card k ^ 2 := by rw [hKcard', h2]
@@ -156,9 +173,11 @@ theorem card_norm_fiber (σ : K ≃ₐ[k] K) (hfrob : ∀ x, σ x = x ^ Fintype.
   let F : Finset K := Finset.univ.filter fun y : K => y ^ Fintype.card k = y
   have hsum : Fintype.card K = ∑ y ∈ F, c y := by
     rw [← Finset.card_univ]
-    exact Finset.card_eq_sum_card_fiberwise (f := fun t => t * σ t) fun t _ => by
-      simp only [F, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ, true_and]
-      rw [← hfrob, map_mul, hσσ, mul_comm]
+    exact Finset.card_eq_sum_card_fiberwise
+      (f := fun t => t * σ t)
+      fun t _ => by
+        simp only [F, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ, true_and]
+        rw [← hfrob, map_mul, hσσ, mul_comm]
   have hF : F.card ≤ Fintype.card k :=
     card_le_of_pow_eq_mul_add _ hq1 1 0 F fun z hz => by
       simp only [F, Finset.mem_filter, Finset.mem_univ, true_and] at hz
@@ -193,8 +212,7 @@ theorem card_norm_fiber (σ : K ≃ₐ[k] K) (hfrob : ∀ x, σ x = x ^ Fintype.
     have hs := Finset.add_sum_erase F c h0F
     rw [hc0] at hs
     have hn : 1 ≤ F.card := Finset.card_pos.mpr ⟨0, h0F⟩
-    have h3 : (F.card - 1) * (Fintype.card k + 1) ≤
-        (Fintype.card k - 1) * (Fintype.card k + 1) :=
+    have h3 : (F.card - 1) * (Fintype.card k + 1) ≤ (Fintype.card k - 1) * (Fintype.card k + 1) :=
       Nat.mul_le_mul_right _ (by omega)
     have h4 : (Fintype.card k - 1) * (Fintype.card k + 1) + 1 = Fintype.card k ^ 2 := by
       obtain ⟨r, hr⟩ : ∃ r, Fintype.card k = r + 1 := ⟨Fintype.card k - 1, by omega⟩

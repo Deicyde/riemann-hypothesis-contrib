@@ -6,13 +6,15 @@ public import Formalism.RealPlaceAnalysis.RealPlaceTaylor.FrobeniusBoundOfMulNea
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter Topology
+open Formalism.BasicNotions Formalism.BasicNotions.TH GlobalTheory.HolDS Matrix MeasureTheory Filter
+  Topology
 open scoped InnerProductSpace
 
 namespace GlobalTheory.HolDS
 
-theorem blockOrd_finSumFinEquiv (p q : ℕ) :
-    GlobalTheory.RealPar.BlockOrd (p := p) (q := q) finSumFinEquiv (fun i => (finSumFinEquiv.symm i).isLeft) := by
+theorem blockOrd_finSumFinEquiv (p q : ℕ)
+    : GlobalTheory.RealPar.BlockOrd (p := p) (q := q) finSumFinEquiv
+      (fun i => (finSumFinEquiv.symm i).isLeft) := by
   refine ⟨fun i => by simp, fun j => by simp, ?_⟩
   rintro (a | a) (b | b) hab
   · have : a < b := hab

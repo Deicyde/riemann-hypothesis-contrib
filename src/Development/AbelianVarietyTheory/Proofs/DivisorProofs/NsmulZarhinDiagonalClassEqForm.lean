@@ -6,32 +6,40 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.IsA
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor GlobalTheory.EndLoc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
+  GlobalTheory.EndLoc
 
 namespace GlobalTheory.ZarhinFam
 
 open GlobalTheory.CechPic GlobalTheory.AbDual
 
-theorem zClsDiag_comp_idPow {S : Scheme.{0}} {B Y : Over S} [GrpObj B] (b : Y ⟶ B) (n : ℕ) :
-    b ≫ (𝟙 B) ^ n = b ^ n := by
+theorem zClsDiag_comp_idPow {S : Scheme.{0}} {B Y : Over S} [GrpObj B] (b : Y ⟶ B) (n : ℕ)
+    : b ≫ (𝟙 B) ^ n = b ^ n := by
   induction n with
   | zero => simp only [pow_zero, MonObj.comp_one]
   | succ n ih => rw [pow_succ, pow_succ, MonObj.comp_mul, ih, Category.comp_id]
 
-theorem zClsDiag_nsmul_evc {S : Scheme.{0}} {A B Y : Over S} [GrpObj A] [GrpObj B]
-    {Q : LB (A ⊗ B).left} (hQ : Q.IsLB) (hs : IsDual B A (swap Q)) (a : Y ⟶ A) (b : Y ⟶ B) (n : ℕ) :
-    n • evc hQ a b = evc hQ a (b ^ n) := by
+theorem zClsDiag_nsmul_evc
+    {S : Scheme.{0}} {A B Y : Over S} [GrpObj A] [GrpObj B]
+    {Q : LB (A ⊗ B).left} (hQ : Q.IsLB) (hs : IsDual B A (swap Q))
+    (a : Y ⟶ A) (b : Y ⟶ B) (n : ℕ)
+    : n • evc hQ a b = evc hQ a (b ^ n) := by
   induction n with
   | zero => rw [zero_smul, pow_zero, ← evc_swap hQ hs.isLB, hs.additive.evc_one hs.isLB]
   | succ n ih =>
-    rw [succ_nsmul, ih, pow_succ, ← evc_swap hQ hs.isLB (b ^ n * b), (isAdditive_iff hs.isLB).1 hs.additive,
-      evc_swap hQ hs.isLB, evc_swap hQ hs.isLB]
+    rw [succ_nsmul, ih, pow_succ, ← evc_swap hQ hs.isLB (b ^ n * b),
+      (isAdditive_iff hs.isLB).1 hs.additive, evc_swap hQ hs.isLB, evc_swap hQ hs.isLB]
 
-theorem zClsDiag_key {h M d : ℕ} {S : Scheme.{0}} {t : S ⟶ Sp (cycAway M)} (c : SiegPre h M (zetaAway M) t)
-    {B : Over S} [GrpObj B] [IsCommMonObj B] {Q : LB (c.A ⊗ B).left} {la : c.A ⟶ B} {mu : B ⟶ c.A}
-    (hZ : ZData c d B Q la mu) {Y : Over S} (a : Y ⟶ c.A) (b : Y ⟶ B) :
-    d • pull (lift a b).left (cls Q hZ.2.1.isLB) = pull (lift a (b ≫ mu)).left (cls c.P c.isLB) := by
+theorem zClsDiag_key
+    {h M d : ℕ} {S : Scheme.{0}} {t : S ⟶ Sp (cycAway M)} (c : SiegPre h M (zetaAway M) t)
+    {B : Over S} [GrpObj B] [IsCommMonObj B]
+    {Q : LB (c.A ⊗ B).left} {la : c.A ⟶ B} {mu : B ⟶ c.A} (hZ : ZData c d B Q la mu)
+    {Y : Over S} (a : Y ⟶ c.A) (b : Y ⟶ B)
+    : d • pull (lift a b).left (cls Q hZ.2.1.isLB)
+      = pull (lift a (b ≫ mu)).left (cls c.P c.isLB) := by
   have hQ := hZ.2.1.isLB
   have e : cls c.P c.isLB = evc hQ (fst c.A c.A) (snd c.A c.A ≫ la) :=
     (cls_eq_iff c.isLB (pull_isLB hQ _)).2 hZ.2.2.2.2.2.2.2
@@ -45,11 +53,12 @@ namespace GlobalTheory.ZarhinFam
 
 open GlobalTheory.CechPic GlobalTheory.AbDual
 
-theorem zClsDiag_sum_sig {M : Type*} [AddCommMonoid M] (F : Fin 4 ⊕ Fin 4 → Fin 4 ⊕ Fin 4 → M) :
-    ∑ kl : Fin 8 × Fin 8, F (sig kl.1) (sig kl.2) = ∑ s, ∑ t, F s t := by
+theorem zClsDiag_sum_sig {M : Type*} [AddCommMonoid M] (F : Fin 4 ⊕ Fin 4 → Fin 4 ⊕ Fin 4 → M)
+    : ∑ kl : Fin 8 × Fin 8, F (sig kl.1) (sig kl.2) = ∑ s, ∑ t, F s t := by
   let e : Fin 8 ≃ Fin 4 ⊕ Fin 4 := Equiv.ofBijective sig (by decide)
   rw [Fintype.sum_prod_type]
-  exact (Finset.sum_congr rfl fun k _ => Equiv.sum_comp e (F (sig k))).trans (Equiv.sum_comp e fun s => ∑ t, F s t)
+  exact (Finset.sum_congr rfl fun k _ => Equiv.sum_comp e (F (sig k))).trans
+    (Equiv.sum_comp e fun s => ∑ t, F s t)
 
 theorem nsmul_pull_diag_zCls : ∀ (h M d : ℕ) (S : Scheme.{0}) (t : S ⟶ Sp (cycAway M)) (c : SiegPre h M (zetaAway M) t) (B : Over S) [GrpObj B] [IsCommMonObj B] (Q : LB (c.A ⊗ B).left) (la : c.A ⟶ B) (mu : B ⟶ c.A) (hZ : GlobalTheory.ZarhinFam.ZData c d B Q la mu), 0 < d → d • GlobalTheory.CechPic.pull (lift (𝟙 (GlobalTheory.ZarhinFam.Zob c.A B)) (𝟙 (GlobalTheory.ZarhinFam.Zob c.A B))).left (GlobalTheory.ZarhinFam.zCls c.A B c.isLB hZ.2.1.isLB d mu) = ∑ kl : Fin 8 × Fin 8, GlobalTheory.ZarhinFam.zW d kl.1 kl.2 • GlobalTheory.CechPic.pull (lift (GlobalTheory.ZarhinFam.zpr c.A B mu kl.1) (GlobalTheory.ZarhinFam.zpr c.A B mu kl.2)).left (GlobalTheory.CechPic.cls c.P c.isLB) := by
   intro h M d S t c B _ _ Q la mu hZ _

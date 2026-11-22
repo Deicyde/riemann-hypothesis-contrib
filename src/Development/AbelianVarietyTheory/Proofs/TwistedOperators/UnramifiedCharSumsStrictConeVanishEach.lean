@@ -14,33 +14,37 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 
 private theorem ord_zpow_twisted_operators (x : kˣ) (n : ℤ) : ord k (x ^ n) = n * ord k x := by
   let f : kˣ →* Multiplicative ℤ :=
-    MonoidHom.mk' (fun y => Multiplicative.ofAdd (ord k y)) fun a b => by
-      rw [ord_mul, ofAdd_add]
+    MonoidHom.mk' (fun y => Multiplicative.ofAdd (ord k y)) fun a b => by rw [ord_mul, ofAdd_add]
   have hf := congrArg Multiplicative.toAdd (map_zpow f x n)
   simpa [f, smul_eq_mul] using hf
 
-theorem valuation_div_zpow_ord {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k) (x : kˣ) :
-    valuation k ((x / ϖ ^ ord k x : kˣ) : k) = 1 := by
-  rw [← ord_eq_zero_iff, div_eq_mul_inv, ord_mul, ← zpow_neg, ord_zpow_twisted_operators, _root_.GlobalTheory.SmGL.ord_eq_one hϖ]
+theorem valuation_div_zpow_ord {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k) (x : kˣ)
+    : valuation k ((x / ϖ ^ ord k x : kˣ) : k) = 1 := by
+  rw [← ord_eq_zero_iff, div_eq_mul_inv, ord_mul, ← zpow_neg, ord_zpow_twisted_operators,
+    _root_.GlobalTheory.SmGL.ord_eq_one hϖ]
   ring
 
-def powHom {G : Type} [CommGroup G] (ϖ : G) (r : ℕ) :
-    Multiplicative (Fin r → ℤ) →* (Fin r → G) :=
-  MonoidHom.mk' (fun a i => ϖ ^ (Multiplicative.toAdd a) i) fun a b => by
-    funext i
-    simp [zpow_add]
+def powHom {G : Type} [CommGroup G] (ϖ : G) (r : ℕ) : Multiplicative (Fin r → ℤ) →* (Fin r → G) :=
+  MonoidHom.mk'
+    (fun a i => ϖ ^ (Multiplicative.toAdd a) i)
+    fun a b => by
+      funext i
+      simp [zpow_add]
 
-theorem eq_of_comp_powHom {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k) {r : ℕ}
-    {χ ψ : (Fin r → kˣ) →* ℂˣ} (hχ : ∀ t ∈ torusO k (Fin r), χ t = 1)
-    (hψ : ∀ t ∈ torusO k (Fin r), ψ t = 1)
-    (h : χ.comp (powHom ϖ r) = ψ.comp (powHom ϖ r)) : χ = ψ := by
+theorem eq_of_comp_powHom
+    {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k)
+    {r : ℕ} {χ ψ : (Fin r → kˣ) →* ℂˣ} (hχ : ∀ t ∈ torusO k (Fin r), χ t = 1)
+    (hψ : ∀ t ∈ torusO k (Fin r), ψ t = 1) (h : χ.comp (powHom ϖ r) = ψ.comp (powHom ϖ r))
+    : χ = ψ := by
   refine MonoidHom.ext fun t => ?_
 
   have hu : (fun i => t i / ϖ ^ ord k (t i)) ∈ torusO k (Fin r) := by
     show ∀ i, valuation k ((t i / ϖ ^ ord k (t i) : kˣ) : k) = 1
     exact fun i => valuation_div_zpow_ord hϖ (t i)
-  have ht : t = (fun i => t i / ϖ ^ ord k (t i)) *
-      powHom ϖ r (Multiplicative.ofAdd fun i => ord k (t i)) := by
+  have ht
+      : t
+        = (fun i => t i / ϖ ^ ord k (t i))
+          * powHom ϖ r (Multiplicative.ofAdd fun i => ord k (t i)) := by
     funext i
     show t i = t i / ϖ ^ ord k (t i) * ϖ ^ ord k (t i)
     rw [div_mul_cancel]
@@ -48,29 +52,37 @@ theorem eq_of_comp_powHom {ϖ : kˣ} (hϖ : valuation k (ϖ : k) = uniformizer k
   rw [MonoidHom.comp_apply, MonoidHom.comp_apply] at hp
   rw [ht, map_mul, map_mul, hχ _ hu, hψ _ hu, one_mul, one_mul, hp]
 
-theorem sum_count_eq_zero (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] (ϖ : kˣ) (hϖ : valuation k (ϖ : k) = uniformizer k) (r n : ℕ)
-    (E : Fin n → Multiset ((Fin r → kˣ) →* ℂˣ)) (c : Fin n → ℂ)
+theorem sum_count_eq_zero
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (ϖ : kˣ) (hϖ : valuation k (ϖ : k) = uniformizer k)
+    (r n : ℕ) (E : Fin n → Multiset ((Fin r → kˣ) →* ℂˣ)) (c : Fin n → ℂ)
     (hE : ∀ i, ∀ χ ∈ E i, ∀ t ∈ torusO k (Fin r), χ t = 1)
-    (h : ∀ t ∈ IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.strictCone ϖ r, ∑ i, c i * IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.charSum (E i) t = 0)
-    [DecidableEq ((Fin r → kˣ) →* ℂˣ)] (χ : (Fin r → kˣ) →* ℂˣ) :
-    ∑ i, c i * ((E i).count χ : ℂ) = 0 := by
-
-  let M : Submonoid (Multiplicative (Fin r → ℤ)) :=
-    { carrier := {a | Antitone (Multiplicative.toAdd a)}
-      mul_mem' := by
-        intro a b ha hb i j hij
-        exact add_le_add (ha hij) (hb hij)
-      one_mem' := by
-        intro i j _
-        exact le_rfl }
+    (h : ∀ t ∈ IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.strictCone ϖ r,
+      ∑ i, c i * IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.charSum (E i) t
+        = 0)
+    [DecidableEq ((Fin r → kˣ) →* ℂˣ)]
+    (χ : (Fin r → kˣ) →* ℂˣ)
+    : ∑ i, c i * ((E i).count χ : ℂ) = 0 := by
+  let M : Submonoid (Multiplicative (Fin r → ℤ)) := {
+    carrier := {a | Antitone (Multiplicative.toAdd a)}
+    mul_mem' := by
+      intro a b ha hb i j hij
+      exact add_le_add (ha hij) (hb hij)
+    one_mem' := by
+      intro i j _
+      exact le_rfl
+  }
   let φ : M →* (Fin r → kˣ) := (powHom ϖ r).comp M.subtype
 
   let t₀ : Fin r → kˣ := fun i => ϖ ^ (-((i : ℕ) : ℤ))
-  have hcone : ∀ m : M, t₀ * φ m ∈ IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.strictCone ϖ r := by
+  have hcone
+      : ∀ m : M,
+        t₀ * φ m
+          ∈ IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.strictCone ϖ r := by
     intro m
     have hm : Antitone (Multiplicative.toAdd (m : Multiplicative (Fin r → ℤ))) := m.2
-    refine ⟨fun i => -((i : ℕ) : ℤ) + Multiplicative.toAdd (m : Multiplicative (Fin r → ℤ)) i, ?_, ?_⟩
+    refine
+      ⟨fun i => -((i : ℕ) : ℤ) + Multiplicative.toAdd (m : Multiplicative (Fin r → ℤ)) i, ?_, ?_⟩
     · intro i j hij
       have h1 := hm hij.le
       have h2 : (i : ℕ) < j := hij
@@ -80,14 +92,17 @@ theorem sum_count_eq_zero (k : Type) [Field k] [ValuativeRel k] [TopologicalSpac
       show ϖ ^ (-((i : ℕ) : ℤ)) * ϖ ^ (Multiplicative.toAdd (m : Multiplicative (Fin r → ℤ)) i) = _
       rw [← zpow_add]
 
-  have hdiff : ∀ a : Multiplicative (Fin r → ℤ), ∃ m₁ m₂ : M,
-      a = (m₁ : Multiplicative (Fin r → ℤ)) * (m₂ : Multiplicative (Fin r → ℤ))⁻¹ := by
+  have hdiff
+      : ∀ a : Multiplicative (Fin r → ℤ), ∃ m₁ m₂ : M,
+        a = (m₁ : Multiplicative (Fin r → ℤ)) * (m₂ : Multiplicative (Fin r → ℤ))⁻¹ := by
     intro a
     set K : ℤ := ∑ l, |Multiplicative.toAdd a l| with hK
     have hK0 : 0 ≤ K := Finset.sum_nonneg fun l _ => abs_nonneg _
     have hKl : ∀ l, |Multiplicative.toAdd a l| ≤ K := fun l =>
-      Finset.single_le_sum (f := fun l => |Multiplicative.toAdd a l|)
-        (fun l _ => abs_nonneg _) (Finset.mem_univ l)
+      Finset.single_le_sum
+        (f := fun l => |Multiplicative.toAdd a l|)
+        (fun l _ => abs_nonneg _)
+        (Finset.mem_univ l)
     let b : Multiplicative (Fin r → ℤ) := Multiplicative.ofAdd fun i => 2 * K * (-((i : ℕ) : ℤ))
     have hb : b ∈ M := by
       intro i j hij
@@ -130,7 +145,10 @@ theorem sum_count_eq_zero (k : Type) [Field k] [ValuativeRel k] [TopologicalSpac
   have hli := (linearIndependent_monoidHom M ℂ).comp (fun ψ : S => G ψ) hinj
   rw [Fintype.linearIndependent_iff] at hli
 
-  have hsum : ∀ i t, IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.charSum (E i) t = ∑ ψ ∈ S, ((E i).count ψ : ℂ) * (ψ t : ℂ) := by
+  have hsum
+      : ∀ i t,
+        IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.charSum (E i) t
+          = ∑ ψ ∈ S, ((E i).count ψ : ℂ) * (ψ t : ℂ) := by
     intro i t
     unfold IndefiniteRowSideFullHecke.ExponentSeparationTwistedDiscreteSeries.charSum
     rw [Finset.sum_multiset_map_count]
@@ -138,8 +156,8 @@ theorem sum_count_eq_zero (k : Type) [Field k] [ValuativeRel k] [TopologicalSpac
     refine Finset.sum_subset (fun ψ hψ => Finset.mem_biUnion.2 ⟨i, Finset.mem_univ _, hψ⟩) ?_
     intro ψ _ hψ
     rw [Multiset.count_eq_zero.2 fun h' => hψ (Multiset.mem_toFinset.2 h'), Nat.cast_zero, zero_mul]
-  have hw := hli (fun ψ => (∑ i, c i * ((E i).count (ψ : (Fin r → kˣ) →* ℂˣ) : ℂ)) * (ψ.1 t₀ : ℂ))
-    (by
+  have hw :=
+    hli (fun ψ => (∑ i, c i * ((E i).count (ψ : (Fin r → kˣ) →* ℂˣ) : ℂ)) * (ψ.1 t₀ : ℂ)) (by
       funext m
       have hm := h _ (hcone m)
       simp only [hsum, Finset.mul_sum] at hm

@@ -8,8 +8,8 @@ namespace GlobalTheory.ASwap
 
 variable {A : Type} [CommRing A] [IsDomain A]
 
-noncomputable def mulMap (a b c : A) (hc : a * b = c) :
-    (A ⧸ Ideal.span {a}) →ₗ[A] (A ⧸ Ideal.span {c}) :=
+noncomputable def mulMap (a b c : A) (hc : a * b = c)
+    : (A ⧸ Ideal.span {a}) →ₗ[A] (A ⧸ Ideal.span {c}) :=
   Submodule.mapQ (Ideal.span {a}) (Ideal.span {c}) (LinearMap.lsmul A A b) (by
     intro x hx
     obtain ⟨r, rfl⟩ := Submodule.mem_span_singleton.mp hx
@@ -55,12 +55,12 @@ lemma map_mulMap_ker (a b c : A) (hc : a * b = c) :
     · change Ideal.Quotient.mk _ (b * x) = Ideal.Quotient.mk _ (x * b)
       rw [mul_comm]
 
-noncomputable def kerEquiv (a b : A) (ha : a ≠ 0) (hb : b ≠ 0) :
-    LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b) ≃ₗ[A]
-      LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a) :=
+noncomputable def kerEquiv (a b : A) (ha : a ≠ 0) (hb : b ≠ 0)
+    : LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b) ≃ₗ[A]
+        LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a) :=
   (Submodule.equivMapOfInjective _ (mulMap_injective a b (a * b) hb rfl) _).trans
-    ((LinearEquiv.ofEq _ _ (by
-        rw [map_mulMap_ker, map_mulMap_ker b a (a * b) (mul_comm b a), inf_comm])).trans
+    ((LinearEquiv.ofEq _ _
+        (by rw [map_mulMap_ker, map_mulMap_ker b a (a * b) (mul_comm b a), inf_comm])).trans
       (Submodule.equivMapOfInjective _ (mulMap_injective b a (a * b) ha (mul_comm b a)) _).symm)
 
 lemma range_lsmul_eq (a b : A) :
@@ -78,17 +78,26 @@ lemma range_lsmul_eq (a b : A) :
     exact ⟨Ideal.Quotient.mk _ x, by
         change Ideal.Quotient.mk _ (b * x) = Ideal.Quotient.mk _ (x * b); rw [mul_comm]⟩
 
-noncomputable def cokerEquiv (a b : A) :
-    ((A ⧸ Ideal.span {a}) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) ≃ₗ[A]
-      A ⧸ (Ideal.span {a} ⊔ Ideal.span {b} : Submodule A A) :=
+noncomputable def cokerEquiv (a b : A)
+    : ((A ⧸ Ideal.span {a}) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) ≃ₗ[A]
+        A ⧸ (Ideal.span {a} ⊔ Ideal.span {b} : Submodule A A) :=
   (Submodule.quotEquivOfEq _ _ (range_lsmul_eq a b)).trans
     (Submodule.quotientQuotientEquivQuotientSup _ _)
 
 end GlobalTheory.ASwap
 
-theorem GlobalTheory.kernel_cokernel_length_swap :
-    ∀ (A : Type) [CommRing A] [IsDomain A] (a b : A), a ≠ 0 → b ≠ 0 → Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) = Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a)) ∧ Module.length A ((A ⧸ Ideal.span {a}) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b)) = Module.length A ((A ⧸ Ideal.span {b}) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a)) := by
-  intro A _ _ a b ha hb
-  refine ⟨(GlobalTheory.ASwap.kerEquiv a b ha hb).length_eq, ?_⟩
-  exact ((GlobalTheory.ASwap.cokerEquiv a b).trans ((Submodule.quotEquivOfEq _ _ (sup_comm _ _)).trans
-    (GlobalTheory.ASwap.cokerEquiv b a).symm)).length_eq
+theorem GlobalTheory.kernel_cokernel_length_swap
+    : ∀ (A : Type) [CommRing A] [IsDomain A] (a b : A),
+      a ≠ 0 → b ≠ 0
+        → Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b))
+            = Module.length A (LinearMap.ker (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a))
+          ∧ Module.length A
+              ((A ⧸ Ideal.span {a}) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ Ideal.span {a}) b))
+            = Module.length A
+              ((A ⧸ Ideal.span {b}) ⧸ LinearMap.range (LinearMap.lsmul A (A ⧸ Ideal.span {b}) a)) :=
+  by
+    intro A _ _ a b ha hb
+    refine ⟨(GlobalTheory.ASwap.kerEquiv a b ha hb).length_eq, ?_⟩
+    exact ((GlobalTheory.ASwap.cokerEquiv a b).trans
+      ((Submodule.quotEquivOfEq _ _ (sup_comm _ _)).trans
+        (GlobalTheory.ASwap.cokerEquiv b a).symm)).length_eq

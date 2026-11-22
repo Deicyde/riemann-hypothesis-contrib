@@ -9,8 +9,12 @@ namespace PI.Witt
 
 variable {K V : Type} [Field K] [StarRing K] [AddCommGroup V] [Module K V]
 
-theorem riesz [FiniteDimensional K V] (B : V →ₗ⋆[K] V →ₗ[K] K) (hB : ∀ x y, star (B x y) = B y x)
-    (hnd : ∀ x, (∀ y, B x y = 0) → x = 0) (φ : V →ₗ[K] K) : ∃ v, ∀ z, B v z = φ z := by
+theorem riesz
+    [FiniteDimensional K V]
+    (B : V →ₗ⋆[K] V →ₗ[K] K)
+    (hB : ∀ x y, star (B x y) = B y x) (hnd : ∀ x, (∀ y, B x y = 0) → x = 0)
+    (φ : V →ₗ[K] K)
+    : ∃ v, ∀ z, B v z = φ z := by
   classical
   let b := Module.finBasis K V
   rcases isEmpty_or_nonempty (Fin (Module.finrank K V)) with hE | hNE

@@ -15,8 +15,8 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 abbrev unitIntervalMeasure : Measure ℝ := volume.restrict (Set.Ioc (0 : ℝ) 1)
 
-instance isProbabilityMeasure_torusProb (ι : Type*) [Fintype ι] :
-    IsProbabilityMeasure (torusProb ι) := by
+instance isProbabilityMeasure_torusProb (ι : Type*) [Fintype ι]
+    : IsProbabilityMeasure (torusProb ι) := by
   unfold torusProb; infer_instance
 
 def tmUpd (i : ι) : (ι → ℝ) × ℝ → (ι → ℝ) := fun p => update p.1 i p.2

@@ -6,18 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 noncomputable section
 
-open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi UpperTheory.V.AlgebraTools
+open ValuativeRel Matrix GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+  UpperTheory.V.AlgebraTools
 
 namespace UpperTheory.V.Z.Sym.Sig
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
 theorem val_ord (x : kˣ) : valuation k (x : k) = uniformizer k ^ ord k x := by
   have h := GlAx.val_div_ord x
   rw [Units.val_div_eq_div_val, map_div₀, GlAx.val_zpow] at h
   exact (div_eq_one_iff_eq (zpow_pos GlAx.unif_pos _).ne').1 h
 
-theorem mem_Uc {c : ℕ} {u : kˣ} : u ∈ Uc k c ↔ valuation k (u : k) = 1 ∧ valuation k ((u : k) - 1) ≤ uniformizer k ^ (c : ℤ) := by
+theorem mem_Uc {c : ℕ} {u : kˣ}
+    : u ∈ Uc k c
+      ↔ valuation k (u : k) = 1 ∧ valuation k ((u : k) - 1) ≤ uniformizer k ^ (c : ℤ) := by
   constructor
   · intro h
     refine ⟨Uc_le_Uo k c h, ?_⟩
@@ -26,27 +30,31 @@ theorem mem_Uc {c : ℕ} {u : kˣ} : u ∈ Uc k c ↔ valuation k (u : k) = 1 �
     rw [← map_one (Ideal.Quotient.mk _), Ideal.Quotient.eq, GlAx.mem_pow] at h1
     exact h1
   · rintro ⟨h1, h2⟩
-    obtain ⟨v, hv⟩ := (Valuation.Integers.isUnit_iff_valuation_eq_one (Valuation.integer.integers (valuation k))
-      (x := (⟨u, h1.le⟩ : 𝒪[k]))).2 h1
+    obtain ⟨v, hv⟩ :=
+      (Valuation.Integers.isUnit_iff_valuation_eq_one (Valuation.integer.integers (valuation k))
+        (x := (⟨u, h1.le⟩ : 𝒪[k]))).2 h1
     refine ⟨v, Units.ext ?_, Units.ext (congrArg Subtype.val hv)⟩
     change Ideal.Quotient.mk _ (v : 𝒪[k]) = Ideal.Quotient.mk _ 1
     rw [Ideal.Quotient.eq, GlAx.mem_pow, hv]
     exact h2
 
-theorem mem_Kc_of {c : ℕ} {g : GL (Fin n) k} (h : g ∈ KO k (Fin n)) (h' : GlAx.Bd c g) : g ∈ Kc k n c := by
+theorem mem_Kc_of {c : ℕ} {g : GL (Fin n) k} (h : g ∈ KO k (Fin n)) (h' : GlAx.Bd c g)
+    : g ∈ Kc k n c := by
   obtain ⟨y, rfl⟩ := h
   exact ⟨y, (GlAx.map_eq_one c y).2 h', rfl⟩
 
-theorem Kc_conj {c : ℕ} {g x : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (hx : x ∈ Kc k n c) : g * x * g⁻¹ ∈ Kc k n c := by
+theorem Kc_conj {c : ℕ} {g x : GL (Fin n) k} (hg : g ∈ KO k (Fin n)) (hx : x ∈ Kc k n c)
+    : g * x * g⁻¹ ∈ Kc k n c := by
   obtain ⟨y, rfl⟩ := hg
   obtain ⟨z, hz, rfl⟩ := hx
   exact ⟨y * z * y⁻¹, (MonoidHom.normal_ker _).conj_mem z hz y, by simp⟩
 
 theorem dg_mem_KO {s : Fin n → kˣ} (h : ∀ i, s i ∈ Uo k) : dg s ∈ KO k (Fin n) := by
-  have H : ∀ s : Fin n → kˣ, (∀ i, s i ∈ Uo k) → GlAx.Bd 0 (dg s) := fun s h => GlAx.bd_zero.2 fun i j => by
-    rw [dg, val_diagT, diagonal_apply]
-    split_ifs
-    exacts [(show valuation k (s i : k) = 1 from h i).le, zero_mem _]
+  have H : ∀ s : Fin n → kˣ, (∀ i, s i ∈ Uo k) → GlAx.Bd 0 (dg s) := fun s h =>
+    GlAx.bd_zero.2 fun i j => by
+      rw [dg, val_diagT, diagonal_apply]
+      split_ifs
+      exacts [(show valuation k (s i : k) = 1 from h i).le, zero_mem _]
   exact GlAx.mem_KO.2 ⟨H s h, by rw [dg, ← map_inv]; exact H _ fun i => inv_mem (h i)⟩
 
 theorem dg_mem_Kc {c : ℕ} {s : Fin n → kˣ} : dg s ∈ Kc k n c ↔ ∀ i, s i ∈ Uc k c := by
@@ -85,7 +93,8 @@ theorem TH_le : V.TH n ≤ V.J n := le_sup_right.trans le_sup_left
 
 theorem Nm_le : (glIwa k n).Nm V.c ≤ V.J n := le_sup_right
 
-theorem dg_mem {s : Fin n → kˣ} (h : ∀ i, s i ∈ V.H) : dg s ∈ V.J n := V.TH_le ⟨s, fun i _ => h i, rfl⟩
+theorem dg_mem {s : Fin n → kˣ} (h : ∀ i, s i ∈ V.H) : dg s ∈ V.J n :=
+  V.TH_le ⟨s, fun i _ => h i, rfl⟩
 
 theorem J_le_KO : V.J n ≤ KO k (Fin n) := by
   refine sup_le (sup_le (fun _ h => h.2) ?_) fun _ h => GlAx.Kc_le _ h.2

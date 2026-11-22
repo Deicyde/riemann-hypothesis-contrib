@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 noncomputable section
 
@@ -23,8 +25,9 @@ variable {R : Type} [CommRing R] {n : ℕ} (c : R →+* R) (J : Matrix (Fin n) (
 def fR (u v : Fin n → R) : R := u ⬝ᵥ J *ᵥ (fun i => c (v i))
 
 variable {c J}
-variable {x y : Fin n → R} (hxx : fR c J x x = 0) (hyy : fR c J y y = 0) (hxy : fR c J x y = 1)
-  (hyx : fR c J y x = -1)
+variable
+  {x y : Fin n → R}
+  (hxx : fR c J x x = 0) (hyy : fR c J y y = 0) (hxy : fR c J x y = 1) (hyx : fR c J y x = -1)
 include hxx hyy hxy hyx
 
 end Gen

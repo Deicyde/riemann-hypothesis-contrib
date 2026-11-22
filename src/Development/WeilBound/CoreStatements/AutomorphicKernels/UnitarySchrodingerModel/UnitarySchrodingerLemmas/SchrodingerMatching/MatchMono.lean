@@ -16,7 +16,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.HeightKI
 namespace PositivityTheory.PfSWUS.SwMatch
 
 theorem matchMono : PositivityTheory.PfSWUS.MatchMono :=
-  matchMono_of' psiPlaces PositivityTheory.PfSWUS.SwSpanR.realMatch PositivityTheory.PfSWUS.SwSpan.realConj PositivityTheory.PfSWUS.SwFockk.heightWN
-    PositivityTheory.PfSWUS.KFinMatch.finite_places_match GlobalTheory.CompanionTheory.IwaRedHand.mod_of_cg valueSide GlobalTheory.T.unfolding_holds GlobalTheory.T.height_K_invariance haarFam
+  matchMono_of' psiPlaces PositivityTheory.PfSWUS.SwSpanR.realMatch
+    PositivityTheory.PfSWUS.SwSpan.realConj PositivityTheory.PfSWUS.SwFockk.heightWN
+    PositivityTheory.PfSWUS.KFinMatch.finite_places_match
+    GlobalTheory.CompanionTheory.IwaRedHand.mod_of_cg valueSide GlobalTheory.T.unfolding_holds
+    GlobalTheory.T.height_K_invariance haarFam
 
 end PositivityTheory.PfSWUS.SwMatch

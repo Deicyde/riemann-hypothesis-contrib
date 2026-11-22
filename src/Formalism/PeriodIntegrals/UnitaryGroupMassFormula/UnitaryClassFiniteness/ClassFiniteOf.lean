@@ -14,41 +14,51 @@ namespace PI.UnitaryGroupMassFormula.UJClassFin
 
 open PI.UJClassFin
 
-def SigPos : Prop :=
-  ∀ (M : ℕ) (A : Matrix (Fin M) (Fin M) ℂ), HasSignature A M 0 → A.PosDef
+def SigPos : Prop := ∀ (M : ℕ) (A : Matrix (Fin M) (Fin M) ℂ), HasSignature A M 0 → A.PosDef
 
 def AdelBounds : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (L : Set (Fin M → E)),
-    (∀ a, σ a = star a) →
-    (∀ (τ : E →+* ℂ) (a : E), τ (star a) = starRingEnd ℂ (τ a)) →
-    (∀ τ : E →+* ℂ, HasSignature (J.map τ) M 0) →
-    (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x ∈ L, ∀ i, IsIntegral ℤ ((c : F) • x i)) →
-    (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((c : F) • e) ∈ L) →
-    ∃ D T c0 : ℕ, 0 < D ∧ 0 < T ∧ 0 < c0 ∧ ∀ h : HA (AF F) σ J,
-      (∀ x ∈ abelian₂ σ J L h, ∀ e : E, IsIntegral ℤ e → ((c0 : E) * e) • x ∈ abelian₂ σ J L h) ∧
-      (∃ k : ℕ, 0 < k ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((k : E) * e) ∈ abelian₂ σ J L h) ∧
-      (∀ x ∈ abelian₂ σ J L h, ∀ y ∈ abelian₂ σ J L h,
-        IsIntegral ℤ ((D : E) * PI.HermLatFin.herm (σ : E →+* E) J x y)) ∧
-      (∀ y, (∀ x ∈ abelian₂ σ J L h, IsIntegral ℤ ((D : E) * PI.HermLatFin.herm (σ : E →+* E) J x y)) →
-        (T : E) • y ∈ abelian₂ σ J L h)
+      (σ : E →ₐ[F] E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (L : Set (Fin M → E)),
+    (∀ a, σ a = star a) → (∀ (τ : E →+* ℂ) (a : E), τ (star a) = starRingEnd ℂ (τ a))
+      → (∀ τ : E →+* ℂ, HasSignature (J.map τ) M 0)
+      → (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ x ∈ L, ∀ i, IsIntegral ℤ ((c : F) • x i))
+      → (∃ c : 𝓞 F, c ≠ 0 ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((c : F) • e) ∈ L)
+      → ∃ D T c0 : ℕ,
+        0 < D ∧ 0 < T ∧ 0 < c0
+          ∧ ∀ h : HA (AF F) σ J,
+            (∀ x ∈ abelian₂ σ J L h, ∀ e : E,
+                IsIntegral ℤ e → ((c0 : E) * e) • x ∈ abelian₂ σ J L h)
+              ∧ (∃ k : ℕ,
+                0 < k ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((k : E) * e) ∈ abelian₂ σ J L h)
+              ∧ (∀ x ∈ abelian₂ σ J L h, ∀ y ∈ abelian₂ σ J L h,
+                IsIntegral ℤ ((D : E) * PI.HermLatFin.herm (σ : E →+* E) J x y))
+              ∧ (∀ y,
+                (∀ x ∈ abelian₂ σ J L h,
+                    IsIntegral ℤ ((D : E) * PI.HermLatFin.herm (σ : E →+* E) J x y))
+                  → (T : E) • y ∈ abelian₂ σ J L h)
 
 def LatFin : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] (σ : E →+* E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (D T c0 : ℕ),
-    (∀ (τ : E →+* ℂ) (a : E), τ (σ a) = starRingEnd ℂ (τ a)) →
-    (∀ τ : E →+* ℂ, (J.map τ).PosDef) → 0 < D → 0 < T → 0 < c0 →
-    ∃ S : Set (Set (Fin M → E)), S.Finite ∧ ∀ Λ : AddSubgroup (Fin M → E),
-      (∀ x ∈ Λ, ∀ e : E, IsIntegral ℤ e → ((c0 : E) * e) • x ∈ Λ) →
-      (∃ k : ℕ, 0 < k ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((k : E) * e) ∈ Λ) →
-      (∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ ((D : E) * PI.HermLatFin.herm σ J x y)) →
-      (∀ y, (∀ x ∈ Λ, IsIntegral ℤ ((D : E) * PI.HermLatFin.herm σ J x y)) → (T : E) • y ∈ Λ) →
-      ∃ s ∈ S, ∃ g : UJ σ J, (Λ : Set (Fin M → E)) =
-        (fun x => ((g : GL (Fin M) E) : Matrix (Fin M) (Fin M) E).mulVec x) '' s
+  ∀ (E : Type) [Field E] [NumberField E] (σ : E →+* E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E)
+      (D T c0 : ℕ),
+    (∀ (τ : E →+* ℂ) (a : E), τ (σ a) = starRingEnd ℂ (τ a)) → (∀ τ : E →+* ℂ, (J.map τ).PosDef)
+      → 0 < D → 0 < T → 0 < c0
+      → ∃ S : Set (Set (Fin M → E)),
+        S.Finite
+          ∧ ∀ Λ : AddSubgroup (Fin M → E),
+            (∀ x ∈ Λ, ∀ e : E, IsIntegral ℤ e → ((c0 : E) * e) • x ∈ Λ)
+              → (∃ k : ℕ, 0 < k ∧ ∀ i, ∀ e : E, IsIntegral ℤ e → Pi.single i ((k : E) * e) ∈ Λ)
+              → (∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ ((D : E) * PI.HermLatFin.herm σ J x y))
+              → (∀ y,
+                (∀ x ∈ Λ, IsIntegral ℤ ((D : E) * PI.HermLatFin.herm σ J x y)) → (T : E) • y ∈ Λ)
+              → ∃ s ∈ S, ∃ g : UJ σ J,
+                (Λ : Set (Fin M → E))
+                  = (fun x => ((g : GL (Fin M) E) : Matrix (Fin M) (Fin M) E).mulVec x) '' s
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def LamG (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (L : Set (Fin M → E)) (h : HA (AF F) σ J) :
-    AddSubgroup (Fin M → E) where
+def LamG
+    (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (L : Set (Fin M → E)) (h : HA (AF F) σ J)
+    : AddSubgroup (Fin M → E) where
   carrier := abelian₂ σ J L h
   add_mem' {x y} hx hy := by
     show (finMat σ J h⁻¹).mulVec (vinc (x + y)) ∈ latHat F E L
@@ -62,7 +72,7 @@ def LamG (σ : E →ₐ[F] E) {M : ℕ} (J : Matrix (Fin M) (Fin M) E) (L : Set 
     exact zero_mem _
   neg_mem' {x} hx := by
     show (finMat σ J h⁻¹).mulVec (vinc (-x)) ∈ latHat F E L
-    have : vinc (F := F) (-x) = -vinc x := by funext i; simp [vinc]
+    have : vinc (F := F) (-x) = - vinc x := by funext i; simp [vinc]
     rw [this, Matrix.mulVec_neg]
     exact neg_mem hx
 

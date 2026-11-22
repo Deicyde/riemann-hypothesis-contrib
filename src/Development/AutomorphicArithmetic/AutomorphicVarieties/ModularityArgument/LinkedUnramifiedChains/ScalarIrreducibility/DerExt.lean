@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
 section Cofinal
 
@@ -29,34 +31,44 @@ private theorem artinian_quot (j : ℕ) : IsArtinianRing (B ⧸ maximalIdeal B ^
     by_contra hne
     have hc' : J.comap (Ideal.Quotient.mk (maximalIdeal B ^ j)) ≠ ⊤ := fun h =>
       hne (by rw [Ideal.eq_top_iff_one]; simpa using (Ideal.eq_top_iff_one _).1 h)
-    have h1 : J.comap (Ideal.Quotient.mk (maximalIdeal B ^ j)) = P.comap (Ideal.Quotient.mk (maximalIdeal B ^ j)) :=
+    have h1
+        : J.comap (Ideal.Quotient.mk (maximalIdeal B ^ j))
+          = P.comap (Ideal.Quotient.mk (maximalIdeal B ^ j)) :=
       le_antisymm ((le_maximalIdeal hc').trans he.ge) (Ideal.comap_mono hJ.le)
     exact hJ.ne' (Ideal.comap_injective_of_surjective _ Ideal.Quotient.mk_surjective h1)
   exact IsNoetherianRing.isArtinianRing_of_krullDimLE_zero
 
-private theorem stab (I : ℕ → Ideal B) (hI : Antitone I) (j : ℕ) :
-    ∃ e, ∀ N, e ≤ N → ∀ a ∈ I e, ∃ b ∈ I N, a - b ∈ maximalIdeal B ^ j := by
+private theorem stab (I : ℕ → Ideal B) (hI : Antitone I) (j : ℕ)
+    : ∃ e, ∀ N, e ≤ N → ∀ a ∈ I e, ∃ b ∈ I N, a - b ∈ maximalIdeal B ^ j := by
   haveI := artinian_quot (B := B) j
-  let f : ℕ →o (Ideal (B ⧸ maximalIdeal B ^ j))ᵒᵈ :=
-    ⟨fun N => OrderDual.toDual ((I N).map (Ideal.Quotient.mk _)), fun a b h => Ideal.map_mono (hI h)⟩
+  let f : ℕ →o (Ideal (B ⧸ maximalIdeal B ^ j))ᵒᵈ := ⟨
+    fun N => OrderDual.toDual ((I N).map (Ideal.Quotient.mk _)),
+    fun a b h => Ideal.map_mono (hI h)
+  ⟩
   obtain ⟨e, he⟩ := IsArtinian.monotone_stabilizes f
   refine ⟨e, fun N hN a ha => ?_⟩
   have h1 : Ideal.Quotient.mk (maximalIdeal B ^ j) a ∈ (I N).map (Ideal.Quotient.mk _) := by
-    have h2 : (I e).map (Ideal.Quotient.mk (maximalIdeal B ^ j)) = (I N).map (Ideal.Quotient.mk _) := he N hN
+    have h2
+        : (I e).map (Ideal.Quotient.mk (maximalIdeal B ^ j)) = (I N).map (Ideal.Quotient.mk _) :=
+      he N hN
     rw [← h2]
     exact Ideal.mem_map_of_mem _ ha
   obtain ⟨b, hb, h3⟩ := (Ideal.mem_map_iff_of_surjective _ Ideal.Quotient.mk_surjective).1 h1
   exact ⟨b, hb, Ideal.Quotient.eq.1 h3.symm⟩
 
-private theorem cofinal [IsAdicComplete (maximalIdeal B) B] (I : ℕ → Ideal B) (hI : Antitone I)
-    (h0 : ⨅ N, I N = ⊥) (k : ℕ) : ∃ N, I N ≤ maximalIdeal B ^ k := by
+private theorem cofinal
+    [IsAdicComplete (maximalIdeal B) B]
+    (I : ℕ → Ideal B) (hI : Antitone I) (h0 : ⨅ N, I N = ⊥)
+    (k : ℕ)
+    : ∃ N, I N ≤ maximalIdeal B ^ k := by
   by_contra hcon
   push_neg at hcon
   choose e he using fun j => stab I hI (k + j)
 
   let E : ℕ → ℕ := fun j => (Finset.range (j + 1)).sup e + j
-  have hE : Monotone E := monotone_nat_of_le_succ fun j =>
-    Nat.add_le_add (Finset.sup_mono (Finset.range_mono (Nat.le_succ _))) (Nat.le_succ _)
+  have hE : Monotone E :=
+    monotone_nat_of_le_succ fun j =>
+      Nat.add_le_add (Finset.sup_mono (Finset.range_mono (Nat.le_succ _))) (Nat.le_succ _)
   have hEe : ∀ j, e j ≤ E j := fun j =>
     le_trans (Finset.le_sup (f := e) (Finset.self_mem_range_succ j)) (Nat.le_add_right _ _)
   have hEj : ∀ j, j ≤ E j := fun j => Nat.le_add_left _ _
@@ -68,8 +80,8 @@ private theorem cofinal [IsAdicComplete (maximalIdeal B) B] (I : ℕ → Ideal B
     have := add_mem (Ideal.pow_le_pow_right (Nat.le_add_right k j) hd) h
     rwa [sub_add_cancel] at this
   obtain ⟨x₀, h1, h2⟩ := SetLike.not_le_iff_exists.1 (hcon (E 0))
-  let a : ∀ j, {x // P j x} := fun j => Nat.rec ⟨x₀, h1, h2⟩
-    (fun j x => ⟨(step j x.1 x.2).choose, (step j x.1 x.2).choose_spec.1⟩) j
+  let a : ∀ j, {x // P j x} := fun j =>
+    Nat.rec ⟨x₀, h1, h2⟩ (fun j x => ⟨(step j x.1 x.2).choose, (step j x.1 x.2).choose_spec.1⟩) j
   have ha : ∀ j, (a j).1 - (a (j + 1)).1 ∈ maximalIdeal B ^ (k + j) := fun j =>
     (step j (a j).1 (a j).2).choose_spec.2
   have hchain : ∀ m n, m ≤ n → (a m).1 - (a n).1 ∈ maximalIdeal B ^ (k + m) := by
@@ -80,10 +92,12 @@ private theorem cofinal [IsAdicComplete (maximalIdeal B) B] (I : ℕ → Ideal B
       have := add_mem ih (Ideal.pow_le_pow_right (Nat.add_le_add_left hmn k) (ha n))
       rwa [sub_add_sub_cancel] at this
   have hsm : ∀ j : ℕ, (maximalIdeal B ^ j • ⊤ : Ideal B) = maximalIdeal B ^ j := fun j => by simp
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := maximalIdeal B) (M := B) inferInstance
-    (f := fun j => (a j).1) (fun {m n} hmn => by
-      rw [SModEq.sub_mem, hsm]
-      exact Ideal.pow_le_pow_right (Nat.le_add_left _ _) (hchain m n hmn))
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec (I := maximalIdeal B) (M := B) inferInstance
+      (f := fun j => (a j).1)
+      (fun {m n} hmn => by
+        rw [SModEq.sub_mem, hsm]
+        exact Ideal.pow_le_pow_right (Nat.le_add_left _ _) (hchain m n hmn))
   have hL' : ∀ j, (a j).1 - L ∈ maximalIdeal B ^ j := fun j => by
     have := SModEq.sub_mem.1 (hL j)
     simpa using this
@@ -119,10 +133,12 @@ section Der
 
 variable {O R K : Type} [CommRing O] [CommRing R] [Algebra O R] [CommRing K] [Algebra O K]
 
-private theorem kill (A : Subalgebra O R) (ξ : A →ₐ[O] K) (D : A →ₗ[O] K)
-    (hD : ∀ f g, D (f * g) = ξ f * D g + ξ g * D f) (s : Set R)
-    (h : ∀ x ∈ s, ∃ hx : x ∈ A, D ⟨x, hx⟩ = 0) {x : R} (hx : x ∈ Algebra.adjoin O s) :
-    ∃ h : x ∈ A, D ⟨x, h⟩ = 0 := by
+private theorem kill
+    (A : Subalgebra O R) (ξ : A →ₐ[O] K) (D : A →ₗ[O] K)
+    (hD : ∀ f g, D (f * g) = ξ f * D g + ξ g * D f)
+    (s : Set R) (h : ∀ x ∈ s, ∃ hx : x ∈ A, D ⟨x, hx⟩ = 0)
+    {x : R} (hx : x ∈ Algebra.adjoin O s)
+    : ∃ h : x ∈ A, D ⟨x, h⟩ = 0 := by
   have h1 : D 1 = 0 := by
     have := hD 1 1
     simp only [mul_one, map_one, one_mul] at this
@@ -152,20 +168,25 @@ end Der
 
 section Close
 
-variable {O R K : Type} [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
-  [NormedField K] [Algebra O K]
+variable
+  {O R K : Type}
+  [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R] [NormedField K] [Algebra O K]
 
-private theorem close_zero (B : Subalgebra O R) [hB : IsCO O B]
-    (hm : maximalIdeal B = (maximalIdeal R).comap (B.val : B →+* R)) (E : B →ₗ[O] K)
-    (hc : ∀ ε : ℝ, 0 < ε → ∃ k : ℕ, ∀ a ∈ maximalIdeal B ^ k, ‖E a‖ ≤ ε) (T : Set B) (hT : ∀ t ∈ T, E t = 0)
-    (hd : ∀ x : B, ∀ N : ℕ, ∃ t ∈ T, ((x - t : B) : R) ∈ maximalIdeal R ^ N) : E = 0 := by
+private theorem close_zero
+    (B : Subalgebra O R) [hB : IsCO O B]
+    (hm : maximalIdeal B = (maximalIdeal R).comap (B.val : B →+* R))
+    (E : B →ₗ[O] K) (hc : ∀ ε : ℝ, 0 < ε → ∃ k : ℕ, ∀ a ∈ maximalIdeal B ^ k, ‖E a‖ ≤ ε)
+    (T : Set B)
+    (hT : ∀ t ∈ T, E t = 0) (hd : ∀ x : B, ∀ N : ℕ, ∃ t ∈ T, ((x - t : B) : R) ∈ maximalIdeal R ^ N)
+    : E = 0 := by
   let I : ℕ → Ideal B := fun N => (maximalIdeal R ^ N).comap (B.val : B →+* R)
   have hI : Antitone I := fun a b h => Ideal.comap_mono (Ideal.pow_le_pow_right h)
   have h0 : ⨅ N, I N = ⊥ := by
     refine eq_bot_iff.2 fun x hx => ?_
-    have h1 : (x : R) ∈ ⨅ N : ℕ, maximalIdeal R ^ N := (Submodule.mem_iInf _).2 fun N =>
-      (Submodule.mem_iInf _).1 hx N
-    rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal R).ne_top, Ideal.mem_bot] at h1
+    have h1 : (x : R) ∈ ⨅ N : ℕ, maximalIdeal R ^ N :=
+      (Submodule.mem_iInf _).2 fun N => (Submodule.mem_iInf _).1 hx N
+    rw [Ideal.iInf_pow_eq_bot_of_isLocalRing _ (maximalIdeal.isMaximal R).ne_top, Ideal.mem_bot]
+      at h1
     exact Subtype.ext h1
   ext x
   by_contra hne
@@ -180,21 +201,28 @@ private theorem close_zero (B : Subalgebra O R) [hB : IsCO O B]
 end Close
 
 set_option synthInstance.maxHeartbeats 200000 in
-theorem UpperTheory.V.J.derExt :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O)) (C₀ n : ℕ), F.Ok C₀ → (n = 2 ∨ n = 3) →
-        ∀ (S : Fr.Space c.O F n), ∀ ξ : S.A →ₐ[c.O] Qbar l, ∀ D ∈ PtDer ξ (Qbar l), (∀ g i j, D (S.u.r g i j) = 0) → (∀ v i g, D (S.u.ψ v i g : S.A) = 0) → D = 0 := by
+theorem UpperTheory.V.J.derExt
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) [Fr.IsCoef l c.O] (F : Fr.Frame l (ResidueField c.O))
+        (C₀ n : ℕ),
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ (S : Fr.Space c.O F n), ∀ ξ : S.A →ₐ[c.O] Qbar l, ∀ D ∈ PtDer ξ (Qbar l),
+          (∀ g i j, D (S.u.r g i j) = 0) → (∀ v i g, D (S.u.ψ v i g : S.A) = 0) → D = 0 := by
   intro l _ c _ F C₀ n hF hn S ξ D hD hr hψ
   obtain ⟨hco, hm⟩ := Fr.co_B hF hn S
   haveI := hco
   have hD' : ∀ f g, D (f * g) = ξ f * D g + ξ g * D f := hD
 
-  have hs : ∀ x ∈ ({x | ∃ g i j, x = S.ρ.r g i j} ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)} : Set S.R),
-      ∃ hx : x ∈ S.A, D ⟨x, hx⟩ = 0 := by
+  have hs
+      : ∀ x ∈ ({x | ∃ g i j, x = S.ρ.r g i j} ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)} : Set S.R),
+        ∃ hx : x ∈ S.A,
+          D ⟨x, hx⟩ = 0 := by
     rintro x (⟨g, i, j, rfl⟩ | ⟨v, i, g, rfl⟩)
     · exact ⟨S.r_mem g i j, hr g i j⟩
     · exact ⟨S.B_le_A (S.ψ_mem v i g), hψ v i g⟩
-  have hadj : Algebra.adjoin c.O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)}) ≤
-      Algebra.adjoin c.O ({x | ∃ g i j, x = S.ρ.r g i j} ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)}) := by
+  have hadj
+      : Algebra.adjoin c.O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})
+        ≤ Algebra.adjoin c.O
+          ({x | ∃ g i j, x = S.ρ.r g i j} ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)}) := by
     refine Algebra.adjoin_le ?_
     rintro x (⟨L, -, rfl⟩ | hx)
     · refine Subalgebra.list_prod_mem _ fun y hy => ?_
@@ -203,8 +231,10 @@ theorem UpperTheory.V.J.derExt :
     · exact Algebra.subset_adjoin (Or.inr hx)
 
   have hB : D ∘ₗ S.inc.toLinearMap = 0 := by
-    refine close_zero S.B (hm.trans rfl) _ (fun ε hε => ?_)
-      {t | (t : S.R) ∈ Algebra.adjoin c.O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})} (fun t ht => ?_)
+    refine close_zero S.B (hm.trans rfl) _
+      (fun ε hε => ?_)
+      {t | (t : S.R) ∈ Algebra.adjoin c.O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})}
+      (fun t ht => ?_)
       (fun x N => ?_)
     · have hDB : D ∘ₗ S.inc.toLinearMap ∈ PtDer (ξ.comp S.inc) (Qbar l) := fun f g => by
         simpa using hD (S.inc f) (S.inc g)
@@ -216,8 +246,11 @@ theorem UpperTheory.V.J.derExt :
       exact ⟨⟨y, Fr.le_adicClosure _ hy⟩, hy, h⟩
 
   ext ⟨x, hx⟩
-  obtain ⟨_, h⟩ := kill S.A ξ D hD' ((S.B : Set S.R) ∪ {x | ∃ g i j, x = S.ρ.r g i j}) (by
-    rintro x (hx | ⟨g, i, j, rfl⟩)
-    · exact ⟨S.B_le_A hx, LinearMap.congr_fun hB ⟨x, hx⟩⟩
-    · exact ⟨S.r_mem g i j, hr g i j⟩) hx
+  obtain ⟨_, h⟩ :=
+    kill S.A ξ D hD' ((S.B : Set S.R) ∪ {x | ∃ g i j, x = S.ρ.r g i j})
+      (by
+        rintro x (hx | ⟨g, i, j, rfl⟩)
+        · exact ⟨S.B_le_A hx, LinearMap.congr_fun hB ⟨x, hx⟩⟩
+        · exact ⟨S.r_mem g i j, hr g i j⟩)
+      hx
   exact h

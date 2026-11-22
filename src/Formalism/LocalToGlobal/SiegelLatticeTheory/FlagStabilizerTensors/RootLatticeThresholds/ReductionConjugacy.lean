@@ -29,10 +29,13 @@ def TH (x : I.Gf) : (Fin I.n → I.E ⊗[I.F] Af I.F) →+ (Fin I.n → I.E ⊗[
 
 theorem TH_apply (x : I.Gf) (v : Fin I.n → I.E ⊗[I.F] Af I.F) : TH I x v = I.fmat x *ᵥ v := rfl
 
-theorem T_mem {p : ℕ} {x : I.Gf} {M : Matrix (Fin I.n) (Fin I.n) (ZMod p)} {b : Fin I.n → (Fin I.n → I.E)}
+theorem T_mem
+    {p : ℕ} {x : I.Gf} {M : Matrix (Fin I.n) (Fin I.n) (ZMod p)} {b : Fin I.n → (Fin I.n → I.E)}
     (hb : ∀ i, b i ∈ I.L)
-    (hM : ∀ i, I.fmat x *ᵥ iv I (b i) - ∑ j, (((M j i).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) ∈ Lw I w)
-    (i : Fin I.n) : I.fmat x *ᵥ iv I (b i) ∈ I.Lf := by
+    (hM : ∀ i,
+      I.fmat x *ᵥ iv I (b i) - ∑ j, (((M j i).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) ∈ Lw I w)
+    (i : Fin I.n)
+    : I.fmat x *ᵥ iv I (b i) ∈ I.Lf := by
   have hsub : Lw I w ≤ I.Lf := by
     apply Submodule.span_le.mpr
     rintro _ ⟨⟨y, hy⟩, rfl⟩
@@ -50,12 +53,16 @@ theorem T_mem {p : ℕ} {x : I.Gf} {M : Matrix (Fin I.n) (Fin I.n) (ZMod p)} {b 
   have h := add_mem (hsub (hM i)) hS
   rwa [sub_add_cancel] at h
 
-theorem red_eq {p : ℕ} {x : I.Gf} {M : Matrix (Fin I.n) (Fin I.n) (ZMod p)} {b : Fin I.n → (Fin I.n → I.E)}
-    (hM : ∀ i, I.fmat x *ᵥ iv I (b i) - ∑ j, (((M j i).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) ∈ Lw I w)
-    (i : Fin I.n) : (Lw I w).mkQ (I.fmat x *ᵥ iv I (b i)) =
-      ∑ j, (((M j i).val : ℕ) : ℤ) • (Lw I w).mkQ (iv I (b j)) := by
-  have hsum : (∑ j, (((M j i).val : ℕ) : ℤ) • (Lw I w).mkQ (iv I (b j))) =
-      (Lw I w).mkQ (∑ j, (((M j i).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j)) := by
+theorem red_eq
+    {p : ℕ} {x : I.Gf} {M : Matrix (Fin I.n) (Fin I.n) (ZMod p)} {b : Fin I.n → (Fin I.n → I.E)}
+    (hM : ∀ i,
+      I.fmat x *ᵥ iv I (b i) - ∑ j, (((M j i).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j) ∈ Lw I w)
+    (i : Fin I.n)
+    : (Lw I w).mkQ (I.fmat x *ᵥ iv I (b i))
+      = ∑ j, (((M j i).val : ℕ) : ℤ) • (Lw I w).mkQ (iv I (b j)) := by
+  have hsum
+      : (∑ j, (((M j i).val : ℕ) : ℤ) • (Lw I w).mkQ (iv I (b j)))
+        = (Lw I w).mkQ (∑ j, (((M j i).val : ℕ) : I.E ⊗[I.F] Af I.F) • iv I (b j)) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl (fun j _ => ?_)
@@ -63,23 +70,29 @@ theorem red_eq {p : ℕ} {x : I.Gf} {M : Matrix (Fin I.n) (Fin I.n) (ZMod p)} {b
   rw [hsum]
   exact (Submodule.Quotient.eq _).mpr (hM i)
 
-theorem zcoef_q (p : ℕ) (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
-    {b : Fin I.n → (Fin I.n → I.E)} (hb : IsRedBasis0 I w b) (z : Fin I.n → ℤ)
-    (hz : ∑ l, z l • (wLat0 I w).mkQ (b l) = 0) (l : Fin I.n) : ((z l : ℤ) : ZMod p) = 0 := by
+theorem zcoef_q
+    (p : ℕ) (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
+    {b : Fin I.n → (Fin I.n → I.E)} (hb : IsRedBasis0 I w b)
+    (z : Fin I.n → ℤ) (hz : ∑ l, z l • (wLat0 I w).mkQ (b l) = 0)
+    (l : Fin I.n)
+    : ((z l : ℤ) : ZMod p) = 0 := by
   refine zcoef I w p hp hcard hb z ?_ l
   have h : (wLat0 I w).mkQ (∑ l, z l • b l) = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]; simpa only [map_zsmul] using hz
+    rw [map_sum]; simpa only [map_zsmul] using hz
   exact (Submodule.Quotient.mk_eq_zero _).1 h
 
-theorem zcoef_A (p : ℕ) (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
-    {b : Fin I.n → (Fin I.n → I.E)} (hb : IsRedBasis0 I w b) (z : Fin I.n → ℤ)
-    (hz : ∑ l, z l • (Lw I w).mkQ (iv I (b l)) = 0) (l : Fin I.n) : ((z l : ℤ) : ZMod p) = 0 := by
+theorem zcoef_A
+    (p : ℕ) (hp : p.Prime) (hcard : Nat.card (𝓞 I.E ⧸ w.asIdeal) = p)
+    {b : Fin I.n → (Fin I.n → I.E)} (hb : IsRedBasis0 I w b)
+    (z : Fin I.n → ℤ) (hz : ∑ l, z l • (Lw I w).mkQ (iv I (b l)) = 0)
+    (l : Fin I.n)
+    : ((z l : ℤ) : ZMod p) = 0 := by
   refine zcoef I w p hp hcard hb z ?_ l
   refine mem_wLat0_of_iv I w p hp.pos (p_mem I w p hp hcard) _ ?_
   have h : (Lw I w).mkQ (ivH I (∑ l, z l • b l)) = 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_sum]; simpa only [map_zsmul, ivH_apply] using hz
+    rw [map_sum, map_sum]; simpa only [map_zsmul, ivH_apply] using hz
   exact (Submodule.Quotient.mk_eq_zero _).1 h
 
 end
@@ -91,10 +104,20 @@ theorem reduction_conjugacy : Formalism.L2.SG.Pf.RowDictPf.RedConj0 := by
   have : NeZero p := ⟨hp.ne_zero⟩
   obtain ⟨b, hb, hMb0⟩ := hM
   obtain ⟨b', hb', hMb0'⟩ := hM'
-  have hMb : ∀ i, I.fmat x *ᵥ iv I (b i) - ∑ j, ((((M : Matrix (Fin I.n) (Fin I.n) (ZMod p)) j i).val : ℕ) :
-      I.E ⊗[I.F] Af I.F) • iv I (b j) ∈ Lw I w := hMb0
-  have hMb' : ∀ i, I.fmat x *ᵥ iv I (b' i) - ∑ j, ((((M' : Matrix (Fin I.n) (Fin I.n) (ZMod p)) j i).val : ℕ) :
-      I.E ⊗[I.F] Af I.F) • iv I (b' j) ∈ Lw I w := hMb0'
+  have hMb
+      : ∀ i,
+        I.fmat x *ᵥ iv I (b i)
+            - ∑ j, ((((M : Matrix (Fin I.n) (Fin I.n) (ZMod p)) j i).val : ℕ) :
+              I.E ⊗[I.F] Af I.F) • iv I (b j)
+          ∈ Lw I w :=
+    hMb0
+  have hMb'
+      : ∀ i,
+        I.fmat x *ᵥ iv I (b' i)
+            - ∑ j, ((((M' : Matrix (Fin I.n) (Fin I.n) (ZMod p)) j i).val : ℕ) :
+              I.E ⊗[I.F] Af I.F) • iv I (b' j)
+          ∈ Lw I w :=
+    hMb0'
 
   choose C hC using fun i => hb.2 (b' i) (hb'.1 i)
   choose D hD using fun i => hb'.2 (b i) (hb.1 i)
@@ -113,25 +136,28 @@ theorem reduction_conjugacy : Formalism.L2.SG.Pf.RowDictPf.RedConj0 := by
     have h1 : (wLat0 I w).mkQ (b' i) = (wLat0 I w).mkQ (∑ k, CM k i • b k) :=
       (Submodule.Quotient.eq _).2 (hCz i)
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]; simp only [map_zsmul]
+    rw [h1, map_sum]; simp only [map_zsmul]
   have hqD : ∀ i, (wLat0 I w).mkQ (b i) = ∑ k, DM k i • (wLat0 I w).mkQ (b' k) := fun i => by
     have h1 : (wLat0 I w).mkQ (b i) = (wLat0 I w).mkQ (∑ k, DM k i • b' k) :=
       (Submodule.Quotient.eq _).2 (hDz i)
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]; simp only [map_zsmul]
+    rw [h1, map_sum]; simp only [map_zsmul]
   have hCDz : ∀ l i, ((((1 : Matrix (Fin I.n) (Fin I.n) ℤ) - CM * DM) l i : ℤ) : ZMod p) = 0 := by
     intro l i
-    refine zcoef_q I w p hp hcard hb (fun l => ((1 : Matrix (Fin I.n) (Fin I.n) ℤ) - CM * DM) l i) ?_ l
+    refine
+      zcoef_q I w p hp hcard hb (fun l => ((1 : Matrix (Fin I.n) (Fin I.n) ℤ) - CM * DM) l i) ?_ l
     have h2 : (wLat0 I w).mkQ (b i) = ∑ l, (CM * DM) l i • (wLat0 I w).mkQ (b l) := by
       rw [hqD i]; simp only [hqC]; exact comb _ CM DM i
-    simp only [Matrix.sub_apply, sub_smul, Finset.sum_sub_distrib, Matrix.one_apply, ite_smul, one_smul,
-      zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    simp only [Matrix.sub_apply, sub_smul, Finset.sum_sub_distrib, Matrix.one_apply, ite_smul,
+      one_smul, zero_smul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     rw [← h2, sub_self]
 
   have hTb : ∀ j, I.fmat x *ᵥ iv I (b j) ∈ I.Lf := T_mem I w hb.1 hMb
   have hTb' : ∀ j, I.fmat x *ᵥ iv I (b' j) ∈ I.Lf := T_mem I w hb'.1 hMb'
-  have hTexp : ∀ i, I.fmat x *ᵥ iv I (b' i - ∑ k, CM k i • b k) =
-      I.fmat x *ᵥ iv I (b' i) - ∑ k, CM k i • (I.fmat x *ᵥ iv I (b k)) := fun i => by
+  have hTexp
+      : ∀ i,
+        I.fmat x *ᵥ iv I (b' i - ∑ k, CM k i • b k)
+          = I.fmat x *ᵥ iv I (b' i) - ∑ k, CM k i • (I.fmat x *ᵥ iv I (b k)) := fun i => by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [← TH_apply I x, ← ivH_apply I, map_sub, map_sub, map_sum, map_sum]
     simp only [map_zsmul, ivH_apply, TH_apply]
@@ -146,25 +172,31 @@ theorem reduction_conjugacy : Formalism.L2.SG.Pf.RowDictPf.RedConj0 := by
     have hre : r • e ∈ Submodule.span (𝓞 I.E) (Set.range b) :=
       hrL (Submodule.smul_mem_pointwise_smul _ r I.L (wLat0_le I w he))
     obtain ⟨c, hc⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hre
-    have hcw : ∀ j, c j ∈ w.asIdeal := indep I w hb.1 (span_of_red I w hb) c
-      (by rw [hc, ← wLat0_eq]; exact (wLat0 I w).smul_mem r he)
+    have hcw : ∀ j, c j ∈ w.asIdeal :=
+      indep I w hb.1 (span_of_red I w hb) c
+        (by rw [hc, ← wLat0_eq]; exact (wLat0 I w).smul_mem r he)
     have h1 : Formalism.UG.inclE (F := I.F) (Af I.F) (r : I.E) • (I.fmat x *ᵥ iv I e) ∈ Lw I w := by
-      have e3 : Formalism.UG.inclE (F := I.F) (Af I.F) (r : I.E) • (I.fmat x *ᵥ iv I e) =
-          ∑ j, Formalism.UG.inclE (F := I.F) (Af I.F) (c j : I.E) • (I.fmat x *ᵥ iv I (b j)) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← Matrix.mulVec_smul, ← DictLat.iv_smulO, ← hc, ← TH_apply I x, ← ivH_apply I, map_sum, map_sum]
-        simp only [ivH_apply, DictLat.iv_smulO, TH_apply, Matrix.mulVec_smul]
+      have e3
+          : Formalism.UG.inclE (F := I.F) (Af I.F) (r : I.E) • (I.fmat x *ᵥ iv I e)
+            = ∑ j, Formalism.UG.inclE (F := I.F) (Af I.F) (c j : I.E) • (I.fmat x *ᵥ iv I (b j)) :=
+        by
+          set_option synthInstance.maxHeartbeats 100000 in
+            rw [← Matrix.mulVec_smul, ← DictLat.iv_smulO, ← hc, ← TH_apply I x, ← ivH_apply I,
+              map_sum, map_sum]
+          simp only [ivH_apply, DictLat.iv_smulO, TH_apply, Matrix.mulVec_smul]
       rw [e3]
       exact Submodule.sum_mem _ fun j _ => smul_mem_Lw I w (hcw j) (hTb j)
     have h2 := smul_mem_Lw I w hr1 (hTeL i)
-    have e4 : Formalism.UG.inclE (F := I.F) (Af I.F) (((r - 1 : 𝓞 I.E)) : I.E) =
-        Formalism.UG.inclE (F := I.F) (Af I.F) (r : I.E) - 1 := by
+    have e4
+        : Formalism.UG.inclE (F := I.F) (Af I.F) (((r - 1 : 𝓞 I.E)) : I.E)
+          = Formalism.UG.inclE (F := I.F) (Af I.F) (r : I.E) - 1 := by
       rw [sub_eq_add_neg, DictRing.incl_add, DictRing.incl_neg, DictRing.incl_one, ← sub_eq_add_neg]
     rw [e4, sub_smul, one_smul] at h2
     have h3 := sub_mem h1 h2
     rwa [sub_sub_cancel] at h3
 
-  have hqA' : ∀ j, (Lw I w).mkQ (iv I (b' j)) = ∑ l, CM l j • (Lw I w).mkQ (iv I (b l)) := fun j => by
+  have hqA'
+      : ∀ j, (Lw I w).mkQ (iv I (b' j)) = ∑ l, CM l j • (Lw I w).mkQ (iv I (b l)) := fun j => by
     have h0 : iv I (b' j) - ∑ l, CM l j • iv I (b l) ∈ Lw I w := by
       have := iv_mem_Lw I w (hCz j)
       set_option synthInstance.maxHeartbeats 100000 in
@@ -173,15 +205,22 @@ theorem reduction_conjugacy : Formalism.L2.SG.Pf.RowDictPf.RedConj0 := by
     have h1 : (Lw I w).mkQ (iv I (b' j)) = (Lw I w).mkQ (∑ l, CM l j • iv I (b l)) :=
       (Submodule.Quotient.eq _).2 h0
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]; simp only [map_zsmul]
-  have hA : ∀ i, (Lw I w).mkQ (I.fmat x *ᵥ iv I (b' i)) =
-      ∑ l, (CM * M'z) l i • (Lw I w).mkQ (iv I (b l)) := fun i => by
-    rw [red_eq I w hMb' i]; simp only [hqA']
+    rw [h1, map_sum]; simp only [map_zsmul]
+  have hA
+      : ∀ i,
+        (Lw I w).mkQ (I.fmat x *ᵥ iv I (b' i))
+          = ∑ l, (CM * M'z) l i • (Lw I w).mkQ (iv I (b l)) := fun i => by
+    rw [red_eq I w hMb' i]
+    simp only [hqA']
     exact comb (fun l => (Lw I w).mkQ (iv I (b l))) CM M'z i
-  have hB : ∀ i, (Lw I w).mkQ (I.fmat x *ᵥ iv I (b' i)) =
-      ∑ l, (Mz * CM) l i • (Lw I w).mkQ (iv I (b l)) := fun i => by
-    have h0 : I.fmat x *ᵥ iv I (b' i) =
-        I.fmat x *ᵥ iv I (b' i - ∑ k, CM k i • b k) + ∑ k, CM k i • (I.fmat x *ᵥ iv I (b k)) := by
+  have hB
+      : ∀ i,
+        (Lw I w).mkQ (I.fmat x *ᵥ iv I (b' i))
+          = ∑ l, (Mz * CM) l i • (Lw I w).mkQ (iv I (b l)) := fun i => by
+    have h0
+        : I.fmat x *ᵥ iv I (b' i)
+          = I.fmat x *ᵥ iv I (b' i - ∑ k, CM k i • b k)
+            + ∑ k, CM k i • (I.fmat x *ᵥ iv I (b k)) := by
       rw [hTexp, sub_add_cancel]
     have hz : (Lw I w).mkQ (I.fmat x *ᵥ iv I (b' i - ∑ k, CM k i • b k)) = 0 :=
       (Submodule.Quotient.mk_eq_zero _).2 (hTe i)
@@ -197,7 +236,8 @@ theorem reduction_conjugacy : Formalism.L2.SG.Pf.RowDictPf.RedConj0 := by
 
   let φ := (Int.castRingHom (ZMod p)).mapMatrix (m := Fin I.n)
   have hφ0 : ∀ X : Matrix (Fin I.n) (Fin I.n) ℤ, (∀ l i, ((X l i : ℤ) : ZMod p) = 0) → φ X = 0 := by
-    intro X hX; ext l i
+    intro X hX
+    ext l i
     simp only [φ, RingHom.mapMatrix_apply, Matrix.map_apply, Int.coe_castRingHom, Matrix.zero_apply]
     exact hX l i
   have hCD : φ CM * φ DM = 1 := by
@@ -210,12 +250,12 @@ theorem reduction_conjugacy : Formalism.L2.SG.Pf.RowDictPf.RedConj0 := by
     rwa [map_sub, map_mul, map_mul, sub_eq_zero] at h
   have hMz : φ Mz = (M : Matrix (Fin I.n) (Fin I.n) (ZMod p)) := by
     ext j i
-    simp only [φ, Mz, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Int.coe_castRingHom,
-      Int.cast_natCast, ZMod.natCast_zmod_val]
+    simp only [φ, Mz, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+      Int.coe_castRingHom, Int.cast_natCast, ZMod.natCast_zmod_val]
   have hM'z : φ M'z = (M' : Matrix (Fin I.n) (Fin I.n) (ZMod p)) := by
     ext j i
-    simp only [φ, M'z, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply, Int.coe_castRingHom,
-      Int.cast_natCast, ZMod.natCast_zmod_val]
+    simp only [φ, M'z, RingHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply,
+      Int.coe_castRingHom, Int.cast_natCast, ZMod.natCast_zmod_val]
   rw [hMz, hM'z] at hMC
   refine ⟨⟨φ CM, φ DM, hCD, hDC⟩, Units.ext ?_⟩
   show (M' : Matrix (Fin I.n) (Fin I.n) (ZMod p)) = φ DM * (M : Matrix (Fin I.n) (Fin I.n) (ZMod p)) * φ CM

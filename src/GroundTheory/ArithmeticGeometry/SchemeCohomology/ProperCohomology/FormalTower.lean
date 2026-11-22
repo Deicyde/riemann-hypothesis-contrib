@@ -17,16 +17,18 @@ open AlgebraicGeometry CategoryTheory TopologicalSpace
 
 universe c236Ext c236Scheme
 
-private noncomputable def H.linearMapV436 {X : Scheme.{c236Scheme}}
+private noncomputable def H.linearMapV436
+    {X : Scheme.{c236Scheme}}
     [HasExt.{c236Ext} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{c236Scheme})]
     (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
-    {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
+    {F G : X.Modules} (φ : F ⟶ G)
+    (n : ℕ)
+    : Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
   toFun := Sheaf.H.map.{c236Ext} (modulesAbMap φ) n
   map_add' := map_add _
   map_smul' a x := by
-    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x) =
-      a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
+    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x)
+      = a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
     rw [H.smul_def, H.smul_def, ← Sheaf.H.map_comp_apply, ← Sheaf.H.map_comp_apply,
       ← modulesAbMap_comp, ← modulesAbMap_comp, smulHom_comp]
 
@@ -46,15 +48,18 @@ noncomputable section
 
 attribute [local instance] algebraOfOver
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] (F : X.Modules) (q : ℕ)
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  (F : X.Modules) (q : ℕ)
 
-abbrev formalα (n : ℕ) : Sheaf.H.{u} (modulesAb (idealPow I F (n + 1))) q →ₗ[A]
-    Sheaf.H.{u} (modulesAb F) q :=
+abbrev formalα (n : ℕ)
+    : Sheaf.H.{u} (modulesAb (idealPow I F (n + 1))) q →ₗ[A]
+      Sheaf.H.{u} (modulesAb F) q :=
   H.linearMap A (idealPowι I F (n + 1)) q
 
-def formalK (n : ℕ) : Submodule A (Sheaf.H.{u} (modulesAb F) q) :=
-  LinearMap.range (formalα I F q n)
+def formalK (n : ℕ) : Submodule A (Sheaf.H.{u} (modulesAb F) q) := LinearMap.range (formalα I F q n)
 
 lemma formalK_antitone : Antitone (formalK I F q) := by
   refine antitone_nat_of_succ_le fun n => ?_
@@ -65,12 +70,14 @@ lemma formalK_antitone : Antitone (formalK I F q) := by
     Sheaf.H.map.{u} (modulesAbMap (idealPowι I F (n + 1 + 1))) q x
   rw [← Sheaf.H.map_comp_apply, ← modulesAbMap_comp, idealPowSucc_ι]
 
-abbrev formalβ (n : ℕ) : Sheaf.H.{u} (modulesAb F) q →ₗ[A]
-    Sheaf.H.{u} (modulesAb (quotPow I F n)) q :=
+abbrev formalβ (n : ℕ)
+    : Sheaf.H.{u} (modulesAb F) q →ₗ[A]
+      Sheaf.H.{u} (modulesAb (quotPow I F n)) q :=
   H.linearMap A (quotPowπ I F n) q
 
-abbrev formalτE (n : ℕ) : Sheaf.H.{u} (modulesAb (quotPow I F (n + 1))) q →ₗ[A]
-    Sheaf.H.{u} (modulesAb (quotPow I F n)) q :=
+abbrev formalτE (n : ℕ)
+    : Sheaf.H.{u} (modulesAb (quotPow I F (n + 1))) q →ₗ[A]
+      Sheaf.H.{u} (modulesAb (quotPow I F n)) q :=
   H.linearMap A (quotPowMap I F n) q
 
 lemma shortExact_abSC_quotPow (n : ℕ) : (abSC (quotPowSC I F n)).ShortExact :=
@@ -84,15 +91,17 @@ lemma ker_formalβ (n : ℕ) : LinearMap.ker (formalβ I F q n) = formalK I F q 
   · rintro ⟨x, rfl⟩
     exact H.map_g_map_f (S := abSC (quotPowSC I F n)) x
 
-abbrev formalδ (n : ℕ) : Sheaf.H.{u} (modulesAb (quotPow I F n)) q →ₗ[A]
-    Sheaf.H.{u} (modulesAb (idealPow I F (n + 1))) (q + 1) :=
+abbrev formalδ (n : ℕ)
+    : Sheaf.H.{u} (modulesAb (quotPow I F n)) q →ₗ[A]
+      Sheaf.H.{u} (modulesAb (idealPow I F (n + 1))) (q + 1) :=
   H.δLinear A (shortExact_abSC_quotPow I F n) q
 
 def formalQ (n : ℕ) : Submodule A (Sheaf.H.{u} (modulesAb (idealPow I F (n + 1))) (q + 1)) :=
   LinearMap.range (formalδ I F q n)
 
-def formalι (n : ℕ) : (Sheaf.H.{u} (modulesAb F) q ⧸ formalK I F q n) →ₗ[A]
-    Sheaf.H.{u} (modulesAb (quotPow I F n)) q :=
+def formalι (n : ℕ)
+    : (Sheaf.H.{u} (modulesAb F) q ⧸ formalK I F q n) →ₗ[A]
+      Sheaf.H.{u} (modulesAb (quotPow I F n)) q :=
   (formalK I F q n).liftQ (formalβ I F q n) (ker_formalβ I F q n).ge
 
 lemma formalι_injective (n : ℕ) : Function.Injective (formalι I F q n) := by

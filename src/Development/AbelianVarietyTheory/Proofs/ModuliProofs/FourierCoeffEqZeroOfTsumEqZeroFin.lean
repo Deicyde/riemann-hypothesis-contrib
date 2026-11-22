@@ -28,13 +28,13 @@ private lemma integral_Ioc_cexp_two_pi_I_int_mul (j : ℤ) :
       exact exp_int_mul_two_pi_mul_I j
     simp [h1]
 
-
 open Complex Matrix in
 open scoped ContDiff BigOperators Real in
-theorem _root_.GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin :
-    ∀ (n : ℕ) (c : (Fin n → ℤ) → ℂ), Summable (fun ν => ‖c ν‖) →
-      (∀ x : Fin n → ℝ, ∑' ν, c ν * cexp (2 * π * I * ∑ k, (ν k : ℂ) * (x k : ℂ)) = 0) →
-      ∀ ν, c ν = 0 := by
+theorem _root_.GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin
+    : ∀ (n : ℕ) (c : (Fin n → ℤ) → ℂ),
+      Summable (fun ν => ‖c ν‖)
+        → (∀ x : Fin n → ℝ, ∑' ν, c ν * cexp (2 * π * I * ∑ k, (ν k : ℂ) * (x k : ℂ)) = 0)
+        → ∀ ν, c ν = 0 := by
   intro n c hc h μ
   set m : MeasureTheory.Measure ℝ := MeasureTheory.volume.restrict (Set.Ioc (0 : ℝ) 1) with hm
   haveI : MeasureTheory.IsProbabilityMeasure m := ⟨by simp [m]⟩
@@ -47,13 +47,16 @@ theorem _root_.GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin :
     simp [Complex.mul_re]
   have hint : ∀ ν, MeasureTheory.Integrable (G ν) P := by
     intro ν
-    refine MeasureTheory.Integrable.of_bound (Continuous.aestronglyMeasurable (by fun_prop))
-      ‖c ν‖ (MeasureTheory.ae_of_all _ fun x => (hnorm ν x).le)
+    refine MeasureTheory.Integrable.of_bound (Continuous.aestronglyMeasurable (by fun_prop)) ‖c ν‖
+      (MeasureTheory.ae_of_all _ fun x => (hnorm ν x).le)
   have hval : ∀ ν, ∫ x, G ν x ∂P = if ν = μ then c ν else 0 := by
     intro ν
     simp only [G]
-    rw [MeasureTheory.integral_const_mul, MeasureTheory.integral_fintype_prod_eq_prod (E := fun _ => ℝ)
-      (μ := fun _ => m) (fun k (t : ℝ) => cexp (2 * π * I * (((ν k - μ k : ℤ)) : ℂ) * (t : ℂ)))]
+    rw [MeasureTheory.integral_const_mul,
+      MeasureTheory.integral_fintype_prod_eq_prod
+        (E := fun _ => ℝ)
+        (μ := fun _ => m)
+        (fun k (t : ℝ) => cexp (2 * π * I * (((ν k - μ k : ℤ)) : ℂ) * (t : ℂ)))]
     simp only [hm, integral_Ioc_cexp_two_pi_I_int_mul]
     by_cases hνμ : ν = μ
     · subst hνμ; simp
@@ -62,8 +65,10 @@ theorem _root_.GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin :
   have hsum : ∀ x, ∑' ν, G ν x = 0 := by
     intro x
     have hx := h x
-    have : ∀ ν, G ν x = c ν * cexp (2 * π * I * ∑ k, (ν k : ℂ) * (x k : ℂ)) *
-        cexp (-(2 * π * I * ∑ k, (μ k : ℂ) * (x k : ℂ))) := by
+    have : ∀ ν,
+        G ν x
+          = c ν * cexp (2 * π * I * ∑ k, (ν k : ℂ) * (x k : ℂ))
+            * cexp (-(2 * π * I * ∑ k, (μ k : ℂ) * (x k : ℂ))) := by
       intro ν
       simp only [G, mul_assoc]
       congr 1
@@ -74,8 +79,7 @@ theorem _root_.GlobalTheory.fourier_coeff_eq_zero_of_tsum_eq_zero_fin :
       exact Finset.sum_congr rfl fun k _ => by ring
     simp only [this]
     rw [tsum_mul_right, hx, zero_mul]
-  have key := MeasureTheory.integral_tsum_of_summable_integral_norm hint
-    (by simpa [hnorm] using hc)
+  have key := MeasureTheory.integral_tsum_of_summable_integral_norm hint (by simpa [hnorm] using hc)
   simp only [hval, hsum, MeasureTheory.integral_zero] at key
   rwa [tsum_ite_eq] at key
 

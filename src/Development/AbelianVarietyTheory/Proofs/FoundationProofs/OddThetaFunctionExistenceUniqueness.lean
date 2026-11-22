@@ -7,17 +7,20 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.HasSumLo
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.OddTheta
 
-theorem area_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) :
-    area Λ = latticeArea L := by
+theorem area_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+    : area Λ = latticeArea L := by
   have hA := latticeArea_eq L
   have hpos := latticeArea_pos L
-  have key : ∀ w₁ ∈ L.lattice, ∀ w₂ ∈ L.lattice, ∃ k : ℤ,
-      ((starRingEnd ℂ) w₁ * w₂).im = k * ((starRingEnd ℂ) L.ω₁ * L.ω₂).im := by
+  have key
+      : ∀ w₁ ∈ L.lattice, ∀ w₂ ∈ L.lattice, ∃ k : ℤ,
+        ((starRingEnd ℂ) w₁ * w₂).im = k * ((starRingEnd ℂ) L.ω₁ * L.ω₂).im := by
     intro w₁ hw₁ w₂ hw₂
     obtain ⟨m, n, rfl⟩ := PeriodPair.mem_lattice.1 hw₁
     obtain ⟨m', n', rfl⟩ := PeriodPair.mem_lattice.1 hw₂
@@ -36,8 +39,8 @@ theorem area_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔
   have hk1 : (1 : ℝ) ≤ |(k : ℝ)| := by exact_mod_cast Int.one_le_abs hk0
   exact le_mul_of_one_le_left hpos.le hk1
 
-theorem wpF_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) (z : ℂ) :
-    wpF Λ z = L.weierstrassP z := by
+theorem wpF_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) (z : ℂ)
+    : wpF Λ z = L.weierstrassP z := by
   have hs : Summable (fun l : L.lattice => 1 / (z - (l : ℂ)) ^ 2 - 1 / (l : ℂ) ^ 2) :=
     (L.hasSum_weierstrassP z).summable
   unfold wpF PeriodPair.weierstrassP
@@ -45,26 +48,35 @@ theorem wpF_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ 
     tsum_singleton (0 : L.lattice) (fun l : L.lattice => 1 / (z - (l : ℂ)) ^ 2 - 1 / (l : ℂ) ^ 2)]
   congr 1
   · simp
-  · let e : {w : ℂ // w ∈ Λ ∧ w ≠ 0} ≃ (({0} : Set L.lattice)ᶜ : Set L.lattice) :=
-      { toFun := fun w => ⟨⟨w.1, (h w.1).1 w.2.1⟩, fun hh =>
-          w.2.2 (by simpa using congrArg Subtype.val (Set.mem_singleton_iff.1 hh))⟩
-        invFun := fun l => ⟨l.1.1, (h _).2 l.1.2, fun hh =>
-          l.2 (Set.mem_singleton_iff.2 (Subtype.ext (by simpa using hh)))⟩
-        left_inv := fun _ => rfl
-        right_inv := fun _ => rfl }
+  · let e : {w : ℂ // w ∈ Λ ∧ w ≠ 0} ≃ (({0} : Set L.lattice)ᶜ : Set L.lattice) := {
+      toFun := fun w => ⟨
+        ⟨w.1, (h w.1).1 w.2.1⟩,
+        fun hh => w.2.2 (by simpa using congrArg Subtype.val (Set.mem_singleton_iff.1 hh))
+      ⟩
+      invFun := fun l => ⟨
+        l.1.1,
+        (h _).2 l.1.2,
+        fun hh => l.2 (Set.mem_singleton_iff.2 (Subtype.ext (by simpa using hh)))
+      ⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl
+    }
     exact (e.tsum_eq (fun l => 1 / (z - ((l : L.lattice) : ℂ)) ^ 2 - 1 / ((l : L.lattice) : ℂ) ^ 2))
 
-theorem law_iff (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
-    (G : ℂ → ℂ) (ω z : ℂ) :
-    U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z ↔
-      G (z + ω) = sigmaSign L ω * Complex.exp (Real.pi * latticeForm L z ω +
-        Real.pi * latticeForm L ω ω / 2) * G z := by
+theorem law_iff
+    (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) (G : ℂ → ℂ) (ω z : ℂ)
+    : U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z
+      ↔ G (z + ω)
+        = sigmaSign L ω
+          * Complex.exp (Real.pi * latticeForm L z ω + Real.pi * latticeForm L ω ω / 2) * G z := by
   have hs : (if ω / 2 ∈ Λ then (1 : ℂ) else -1) = sigmaSign L ω := by
     by_cases hw : ω / 2 ∈ Λ
     · rw [if_pos hw, sigmaSign_of_mem L ((h _).1 hw)]
     · rw [if_neg hw, sigmaSign_of_notMem L (fun hh => hw ((h _).2 hh))]
-  have hU : U1 Λ ω G z = G (z + ω) *
-      (Complex.exp (Real.pi * latticeForm L z ω + Real.pi * latticeForm L ω ω / 2))⁻¹ := by
+  have hU
+      : U1 Λ ω G z
+        = G (z + ω)
+          * (Complex.exp (Real.pi * latticeForm L z ω + Real.pi * latticeForm L ω ω / 2))⁻¹ := by
     unfold U1
     rw [area_eq L Λ h, ← Complex.exp_neg]
     congr 2
@@ -73,12 +85,17 @@ theorem law_iff (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔
   rw [hU, hs, mul_inv_eq_iff_eq_mul₀ (Complex.exp_ne_zero _)]
   constructor <;> intro hh <;> rw [hh] <;> ring
 
-theorem eq_deriv_mul (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+theorem eq_deriv_mul
+    (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
     (G : ℂ → ℂ) (hG : Differentiable ℂ G)
-    (hlaw : ∀ ω ∈ Λ, ∀ z, U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z) (z : ℂ) :
-    G z = deriv G 0 * canonicalSigma L z := by
-  have hlaw' : ∀ w ∈ L.lattice, ∀ z, G (z + w) = sigmaSign L w *
-      Complex.exp (Real.pi * latticeForm L z w + Real.pi * latticeForm L w w / 2) * G z :=
+    (hlaw : ∀ ω ∈ Λ, ∀ z, U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z)
+    (z : ℂ)
+    : G z = deriv G 0 * canonicalSigma L z := by
+  have hlaw'
+      : ∀ w ∈ L.lattice, ∀ z,
+        G (z + w)
+          = sigmaSign L w
+            * Complex.exp (Real.pi * latticeForm L z w + Real.pi * latticeForm L w w / 2) * G z :=
     fun w hw z => (law_iff L Λ h G w z).1 (hlaw w ((h w).2 hw) z)
   obtain ⟨c, hc⟩ := exists_eq_mul_canonicalSigma L hG hlaw'
   have hGf : G = fun z => c * canonicalSigma L z := funext hc
@@ -88,36 +105,57 @@ theorem eq_deriv_mul (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ �
   rw [hd]
   exact hc z
 
-theorem canonicalSigma_spec (L : PeriodPair) (Λ : AddSubgroup ℂ)
-    (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) :
-    Differentiable ℂ (canonicalSigma L) ∧ deriv (canonicalSigma L) 0 = 1 ∧
-      (∀ z, canonicalSigma L (-z) = -canonicalSigma L z) ∧
-      ∀ ω ∈ Λ, ∀ z, U1 Λ ω (canonicalSigma L) z =
-        (if ω / 2 ∈ Λ then 1 else -1) * canonicalSigma L z := by
-  refine ⟨differentiable_canonicalSigma L, (hasDerivAt_canonicalSigma_zero L).deriv,
-    canonicalSigma_neg L, ?_⟩
+theorem canonicalSigma_spec (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+    : Differentiable ℂ (canonicalSigma L) ∧ deriv (canonicalSigma L) 0 = 1
+      ∧ (∀ z, canonicalSigma L (-z) = - canonicalSigma L z)
+      ∧ ∀ ω ∈ Λ, ∀ z,
+        U1 Λ ω (canonicalSigma L) z = (if ω / 2 ∈ Λ then 1 else -1) * canonicalSigma L z := by
+  refine ⟨
+    differentiable_canonicalSigma L,
+    (hasDerivAt_canonicalSigma_zero L).deriv,
+    canonicalSigma_neg L,
+    ?_
+  ⟩
   intro ω hω z
   exact (law_iff L Λ h _ ω z).2 (canonicalSigma_add L ((h ω).1 hω) z)
 
-theorem sgStar_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice) :
-    sgStar Λ = canonicalSigma L := by
-  have hP : ∃ G : ℂ → ℂ, Differentiable ℂ G ∧ deriv G 0 = 1 ∧ (∀ z, G (-z) = -G z) ∧
-      ∀ ω ∈ Λ, ∀ z, U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z :=
+theorem sgStar_eq (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z ∈ Λ ↔ z ∈ L.lattice)
+    : sgStar Λ = canonicalSigma L := by
+  have hP
+      : ∃ G : ℂ → ℂ,
+        Differentiable ℂ G ∧ deriv G 0 = 1 ∧ (∀ z, G (-z) = - G z)
+          ∧ ∀ ω ∈ Λ, ∀ z, U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z :=
     ⟨_, canonicalSigma_spec L Λ h⟩
   unfold sgStar
   obtain ⟨hd, h1, -, hl⟩ := Classical.epsilon_spec hP
   funext z
   rw [eq_deriv_mul L Λ h _ hd hl z, h1, one_mul]
 
-theorem exists_periodPair (Λ : AddSubgroup ℂ)
-    (hΛ : ∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ Λ = AddSubgroup.closure {w₁, w₂}) :
-    ∃ L : PeriodPair, ∀ z, z ∈ Λ ↔ z ∈ L.lattice := by
+theorem exists_periodPair
+    (Λ : AddSubgroup ℂ)
+    (hΛ : ∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ Λ = AddSubgroup.closure {w₁, w₂})
+    : ∃ L : PeriodPair, ∀ z, z ∈ Λ ↔ z ∈ L.lattice := by
   obtain ⟨w₁, w₂, hind, rfl⟩ := hΛ
   refine ⟨⟨w₁, w₂, hind⟩, fun z => ?_⟩
   show z ∈ AddSubgroup.closure {w₁, w₂} ↔ z ∈ Submodule.span ℤ {w₁, w₂}
   rw [← Submodule.mem_toAddSubgroup, Submodule.span_int_eq_addSubgroupClosure]
 
-theorem sgStar_laws : ∀ (Λ : AddSubgroup ℂ), (∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ Λ = AddSubgroup.closure {w₁, w₂}) → (Differentiable ℂ (sgStar Λ) ∧ deriv (sgStar Λ) 0 = 1 ∧ (∀ z, sgStar Λ (-z) = -sgStar Λ z) ∧ ∀ ω ∈ Λ, ∀ z, U1 Λ ω (sgStar Λ) z = (if ω / 2 ∈ Λ then 1 else -1) * sgStar Λ z) ∧ (∀ z, sgStar Λ z = 0 ↔ z ∈ Λ) ∧ (∀ G : ℂ → ℂ, Differentiable ℂ G → (∀ ω ∈ Λ, ∀ z, U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z) → ∀ z, G z = deriv G 0 * sgStar Λ z) ∧ (∀ u v : ℂ, u ∉ Λ → v ∉ Λ → (wpF Λ u - wpF Λ v) * (sgStar Λ u ^ 2 * sgStar Λ v ^ 2) = -(sgStar Λ (u + v) * sgStar Λ (u - v))) ∧ ∀ c : ℂ, c ≠ 0 → ∀ z, sgStar (Λ.map (AddMonoidHom.mulLeft c)) (c * z) = c * sgStar Λ z := by
+theorem sgStar_laws
+    : ∀ (Λ : AddSubgroup ℂ),
+      (∃ w₁ w₂ : ℂ, LinearIndependent ℝ ![w₁, w₂] ∧ Λ = AddSubgroup.closure {w₁, w₂})
+        → (Differentiable ℂ (sgStar Λ) ∧ deriv (sgStar Λ) 0 = 1
+            ∧ (∀ z, sgStar Λ (-z) = - sgStar Λ z)
+            ∧ ∀ ω ∈ Λ, ∀ z, U1 Λ ω (sgStar Λ) z = (if ω / 2 ∈ Λ then 1 else -1) * sgStar Λ z)
+          ∧ (∀ z, sgStar Λ z = 0 ↔ z ∈ Λ)
+          ∧ (∀ G : ℂ → ℂ,
+            Differentiable ℂ G → (∀ ω ∈ Λ, ∀ z, U1 Λ ω G z = (if ω / 2 ∈ Λ then 1 else -1) * G z)
+              → ∀ z, G z = deriv G 0 * sgStar Λ z)
+          ∧ (∀ u v : ℂ,
+            u ∉ Λ → v ∉ Λ
+              → (wpF Λ u - wpF Λ v) * (sgStar Λ u ^ 2 * sgStar Λ v ^ 2)
+                = -(sgStar Λ (u + v) * sgStar Λ (u - v)))
+          ∧ ∀ c : ℂ,
+            c ≠ 0 → ∀ z, sgStar (Λ.map (AddMonoidHom.mulLeft c)) (c * z) = c * sgStar Λ z := by
   intro Λ hΛ
   obtain ⟨L, h⟩ := exists_periodPair Λ hΛ
   have hσ := sgStar_eq L Λ h

@@ -12,23 +12,28 @@ open ReciprocityTheory.PGsh
 
 noncomputable section
 
-private theorem key {C : Type} [Field C] [CharZero C] (v : AddValuation C (WithTop ℝ))
-    (lg P : PowerSeries C) (Ω b : C) (M : ℕ) (hM : 2 ≤ M) (β φ r : ℝ) (hβ : 0 < β)
-    (hb : v b = β) (hfac : v (M.factorial : C) = φ) (hr : v Ω = r) (hrβ : r < β)
+private theorem key
+    {C : Type} [Field C] [CharZero C]
+    (v : AddValuation C (WithTop ℝ))
+    (lg P : PowerSeries C)
+    (Ω b : C)
+    (M : ℕ) (hM : 2 ≤ M)
+    (β φ r : ℝ)
+    (hβ : 0 < β) (hb : v b = β) (hfac : v (M.factorial : C) = φ) (hr : v Ω = r) (hrβ : r < β)
     (hl0 : PowerSeries.coeff 0 lg = 0) (hl1 : PowerSeries.coeff 1 lg = 1)
-    (hlg : ∀ j, 2 ≤ j → j < M → PowerSeries.coeff j lg = 0)
-    (hsub : PowerSeries.subst P lg = b • lg) (hP0 : PowerSeries.coeff 0 P = 0)
-    (hP1 : PowerSeries.coeff 1 P = b) (hPg : ∀ j, 2 ≤ j → j < M → PowerSeries.coeff j P = 0)
-    (hu : v (PowerSeries.coeff M P) = 0) (hint : PsIsInt v (expComp Ω lg)) :
-    r - β = M * r - φ := by
+    (hlg : ∀ j, 2 ≤ j → j < M → PowerSeries.coeff j lg = 0) (hsub : PowerSeries.subst P lg = b • lg)
+    (hP0 : PowerSeries.coeff 0 P = 0) (hP1 : PowerSeries.coeff 1 P = b)
+    (hPg : ∀ j, 2 ≤ j → j < M → PowerSeries.coeff j P = 0) (hu : v (PowerSeries.coeff M P) = 0)
+    (hint : PsIsInt v (expComp Ω lg))
+    : r - β = M * r - φ := by
   have hc := PowerSeriesCoeffGaps.coeff_subst_gap lg P M hM b hl0 hl1 hlg hP0 hP1 hPg
   rw [hsub, PowerSeries.coeff_smul, smul_eq_mul] at hc
-  have hu' : PowerSeries.coeff M P = PowerSeries.coeff M lg * (b + -b ^ M) := by
+  have hu' : PowerSeries.coeff M P = PowerSeries.coeff M lg * (b + - b ^ M) := by
     linear_combination -hc
   have hMr : (2 : ℝ) ≤ M := by exact_mod_cast hM
-  have hvb : v (-b ^ M) = ((M * β : ℝ) : WithTop ℝ) := by
+  have hvb : v (- b ^ M) = ((M * β : ℝ) : WithTop ℝ) := by
     rw [v.map_neg, v.map_pow, hb, ← WithTop.coe_nsmul, nsmul_eq_mul]
-  have hd : v (b + -b ^ M) = β := PowerSeriesCoeffGaps.add_eq_of_lt v hb hvb (by nlinarith)
+  have hd : v (b + - b ^ M) = β := PowerSeriesCoeffGaps.add_eq_of_lt v hb hvb (by nlinarith)
   have hk0 : PowerSeries.coeff M lg ≠ 0 := by
     intro h0
     rw [hu', h0, zero_mul, v.map_zero] at hu

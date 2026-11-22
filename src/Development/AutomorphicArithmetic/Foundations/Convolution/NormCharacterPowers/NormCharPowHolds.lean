@@ -36,8 +36,14 @@ theorem twoParts_holds : TwoParts := twoParts classChar2 count_holds normCharPow
 
 theorem partA_holds : PartA := by
   intro E _ _ _ n P ι _ m Ps hn hm hι h
-  obtain ⟨s, -⟩ := PositivityTheory.AdelicQuotientData.jacquetShalikaRigidity E Unit ι (fun _ => n) m (fun _ => P) Ps (fun _ => hn) hm
-    (h.mono fun w ⟨C, B, h1, h2, h3⟩ => ⟨fun _ => C, B, fun _ => h1, h2, by simp [h3]⟩)
+  obtain ⟨s, -⟩ :=
+    PositivityTheory.AdelicQuotientData.jacquetShalikaRigidity E Unit ι
+      (fun _ => n)
+      m
+      (fun _ => P)
+      Ps
+      (fun _ => hn)
+      hm (h.mono fun w ⟨C, B, h1, h2, h3⟩ => ⟨fun _ => C, B, fun _ => h1, h2, by simp [h3]⟩)
   have := Fintype.card_congr s
   simp at this
   omega

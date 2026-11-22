@@ -18,17 +18,29 @@ variable {R : Type} [CommRing R]
 
 attribute [local instance] Polynomial.algebra
 
-theorem eqv_baseChange (q : ℕ) (A : Type) [CommRing A] (i : ℤ) (A' : Type) [CommRing A']
+theorem eqv_baseChange
+    (q : ℕ)
+    (A : Type) [CommRing A]
+    (i : ℤ)
+    (A' : Type) [CommRing A']
     (s : Spec (CommRingCat.of A') ⟶ Spec (CommRingCat.of A))
-    (h : Eqv _ (spMap (Polynomial.C : A' →+* Polynomial A')) (tw q i)) :
-    Eqv _ (sch.map (pullback.map (Spec.map (CommRingCat.ofHom (Polynomial.C : A →+* Polynomial A)) ≫ 𝟙 _) s (𝟙 _) s
-      (Spec.map (CommRingCat.ofHom (Polynomial.C : A →+* Polynomial A))) (𝟙 _) (𝟙 _) (by simp) (by simp))) (tw q i) := by
+    (h : Eqv _ (spMap (Polynomial.C : A' →+* Polynomial A')) (tw q i))
+    : Eqv _
+      (sch.map (pullback.map
+        (Spec.map (CommRingCat.ofHom (Polynomial.C : A →+* Polynomial A)) ≫ 𝟙 _) s (𝟙 _) s
+        (Spec.map (CommRingCat.ofHom (Polynomial.C : A →+* Polynomial A))) (𝟙 _) (𝟙 _) (by simp)
+        (by simp)))
+      (tw q i) := by
   first
   | exact @_root_.GlobalTheory.PolynomialPushoutEquivalence.main
   | exact _root_.GlobalTheory.PolynomialPushoutEquivalence.main
   | (apply _root_.GlobalTheory.PolynomialPushoutEquivalence.main <;> assumption)
   | (intros; apply _root_.GlobalTheory.PolynomialPushoutEquivalence.main <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PolynomialPushoutEquivalence.main <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.PolynomialPushoutEquivalence.main
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PolynomialPushoutEquivalence.main ..)
 
 theorem homotopy_invariance_etale : GlobalTheory.EtC.C4 := by

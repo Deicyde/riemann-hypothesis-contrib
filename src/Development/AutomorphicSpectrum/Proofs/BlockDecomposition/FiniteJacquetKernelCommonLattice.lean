@@ -17,7 +17,9 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.IsCompac
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG GlobalTheory.CompanionTheory.BZPsiPG.FibKer
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.Rodier GlobalTheory.CompanionTheory.BZPsiPG
+  GlobalTheory.CompanionTheory.BZPsiPG.FibKer
 open scoped TensorProduct
 
 noncomputable section
@@ -47,8 +49,8 @@ theorem exists_integral_mul (y : k) : ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ c
     · rw [inv_mul_cancel₀ hy0]
       exact one_mem _
 
-theorem exists_mem_Lc (n : ℕ) (y : Multiplicative (Fin n → k)) :
-    ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ y ∈ Lc n c := by
+theorem exists_mem_Lc (n : ℕ) (y : Multiplicative (Fin n → k))
+    : ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ y ∈ Lc n c := by
   choose f hf hf0 hfy using fun j => exists_integral_mul (y.toAdd j)
   refine ⟨∏ j, f j, prod_mem fun j _ => hf j, Finset.prod_ne_zero_iff.2 fun j _ => hf0 j, ?_⟩
   intro j
@@ -60,20 +62,23 @@ theorem exists_mem_Lc (n : ℕ) (y : Multiplicative (Fin n → k)) :
 
 variable {X : Type} [AddCommGroup X] [Module ℂ X]
 
-theorem twKer_Lc_mono {n : ℕ} (ρ : Representation ℂ (Multiplicative (Fin n → k)) X) (c : k) {d : k}
-    (hd : d ∈ 𝒪[k]) : twKer ρ (Lc n c) 1 ≤ twKer ρ (Lc n (c * d)) 1 := by
+theorem twKer_Lc_mono
+    {n : ℕ} (ρ : Representation ℂ (Multiplicative (Fin n → k)) X) (c : k) {d : k} (hd : d ∈ 𝒪[k])
+    : twKer ρ (Lc n c) 1 ≤ twKer ρ (Lc n (c * d)) 1 := by
   refine Submodule.span_mono ?_
   rintro w ⟨m, v, rfl⟩
   exact ⟨⟨m.1, Lc_le_Lc_mul n c hd m.2⟩, v, rfl⟩
 
-theorem exists_mem_twKer_Lc {n : ℕ} (ρ : Representation ℂ (Multiplicative (Fin n → k)) X) {x : X}
-    (hx : x ∈ twKer ρ ⊤ 1) : ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ x ∈ twKer ρ (Lc n c) 1 := by
+theorem exists_mem_twKer_Lc
+    {n : ℕ} (ρ : Representation ℂ (Multiplicative (Fin n → k)) X) {x : X} (hx : x ∈ twKer ρ ⊤ 1)
+    : ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ x ∈ twKer ρ (Lc n c) 1 := by
   induction hx using Submodule.span_induction with
   | mem w hw =>
     obtain ⟨m, v, rfl⟩ := hw
     obtain ⟨c, hc, hc0, hm⟩ := exists_mem_Lc n m.1
     exact ⟨c, hc, hc0, Submodule.subset_span ⟨⟨m.1, hm⟩, v, rfl⟩⟩
-  | zero => exact ⟨1, one_mem _, one_ne_zero, zero_mem _⟩
+  | zero =>
+    exact ⟨1, one_mem _, one_ne_zero, zero_mem _⟩
   | add a b _ _ ha hb =>
     obtain ⟨c, hc, hc0, hca⟩ := ha
     obtain ⟨d, hd, hd0, hdb⟩ := hb
@@ -84,9 +89,10 @@ theorem exists_mem_twKer_Lc {n : ℕ} (ρ : Representation ℂ (Multiplicative (
     obtain ⟨c, hc, hc0, hcb⟩ := hb
     exact ⟨c, hc, hc0, Submodule.smul_mem _ a hcb⟩
 
-theorem exists_integral_finite_twKer_Lc {n : ℕ} (ρ : Representation ℂ (Multiplicative (Fin n → k)) X)
-    {S : Set X} (hS : S.Finite) (h : ∀ x ∈ S, x ∈ twKer ρ ⊤ 1) :
-    ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ ∀ x ∈ S, x ∈ twKer ρ (Lc n c) 1 := by
+theorem exists_integral_finite_twKer_Lc
+    {n : ℕ} (ρ : Representation ℂ (Multiplicative (Fin n → k)) X)
+    {S : Set X} (hS : S.Finite) (h : ∀ x ∈ S, x ∈ twKer ρ ⊤ 1)
+    : ∃ c : k, c ∈ 𝒪[k] ∧ c ≠ 0 ∧ ∀ x ∈ S, x ∈ twKer ρ (Lc n c) 1 := by
   induction S, hS using Set.Finite.induction_on with
   | empty => exact ⟨1, one_mem _, one_ne_zero, fun x hx => absurd hx (Set.notMem_empty x)⟩
   | @insert a s _ _ ih =>
@@ -100,8 +106,11 @@ theorem exists_integral_finite_twKer_Lc {n : ℕ} (ρ : Representation ℂ (Mult
 
 end Exhaust
 
-theorem exists_Lc_finite_twKer :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) {X : Type} [AddCommGroup X] [Module ℂ X] (ρ : Representation ℂ (Multiplicative (Fin n → k)) X) (S : Set X), S.Finite → (∀ x ∈ S, x ∈ twKer ρ ⊤ 1) → ∃ c : k, c ≠ 0 ∧ ∀ x ∈ S, x ∈ twKer ρ (Lc n c) 1 := by
+theorem exists_Lc_finite_twKer
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) {X : Type} [AddCommGroup X] [Module ℂ X]
+        (ρ : Representation ℂ (Multiplicative (Fin n → k)) X) (S : Set X),
+      S.Finite → (∀ x ∈ S, x ∈ twKer ρ ⊤ 1) → ∃ c : k, c ≠ 0 ∧ ∀ x ∈ S, x ∈ twKer ρ (Lc n c) 1 := by
   intro k _ _ _ _ n X _ _ ρ S hS h
   obtain ⟨c, -, hc0, hc⟩ := exists_integral_finite_twKer_Lc ρ hS h
   exact ⟨c, hc0, hc⟩

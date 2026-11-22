@@ -9,7 +9,14 @@ open MeasureTheory GlobalTheory.SmGL GlobalTheory.PRep PositivityTheory.Rg.BcN.F
 
 namespace GlobalTheory.CompanionTheory.HeckeFix
 
-theorem hk_mem_fixed : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] (ι : Type) [Fintype ι] [DecidableEq ι] (K : Subgroup (GL ι F)) (e : GL ι F → ℂ), IsHk K e → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL ι F) V), ∀ v ∈ fixed ρ K, hk ρ K e v ∈ fixed ρ K ∧ ∀ g : GL ι F, (∀ q : GL ι F ⧸ K, e (g * q.out) = e q.out) → True := by
+theorem hk_mem_fixed
+    : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        (ι : Type) [Fintype ι] [DecidableEq ι] (K : Subgroup (GL ι F)) (e : GL ι F → ℂ),
+      IsHk K e
+        → ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL ι F) V),
+          ∀ v ∈ fixed ρ K,
+            hk ρ K e v ∈ fixed ρ K
+              ∧ ∀ g : GL ι F, (∀ q : GL ι F ⧸ K, e (g * q.out) = e q.out) → True := by
   intro F _ _ _ _ ι _ _ K e hE V _ _ ρ v hv
   refine ⟨?_, fun _ _ => trivial⟩
   have hfix : ∀ c ∈ K, ρ c v = v := by
@@ -26,8 +33,7 @@ theorem hk_mem_fixed : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpa
       intro z
       rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
     rw [← h1 x, ← h1 y, hxy]
-  have hstep : ∀ q : GL ι F ⧸ K, ρ k (e q.out • ρ q.out v) =
-      e (k • q).out • ρ (k • q).out v := by
+  have hstep : ∀ q : GL ι F ⧸ K, ρ k (e q.out • ρ q.out v) = e (k • q).out • ρ (k • q).out v := by
     intro q
     have hq : k • q = QuotientGroup.mk (k * q.out) := by
       conv_lhs => rw [← QuotientGroup.out_eq' q]
@@ -37,8 +43,9 @@ theorem hk_mem_fixed : ∀ (F : Type) [Field F] [ValuativeRel F] [TopologicalSpa
       Module.End.mul_apply, hfix c c.2]
   have hsum : ρ k (hk ρ K e v) = hk ρ K e v := by
     unfold hk
-    have h1 := AddMonoidHom.map_finsum_of_injective (ρ k : V →ₗ[ℂ] V).toAddMonoidHom hinj
-      (fun q : GL ι F ⧸ K => e q.out • ρ q.out v)
+    have h1 :=
+      AddMonoidHom.map_finsum_of_injective (ρ k : V →ₗ[ℂ] V).toAddMonoidHom hinj
+        (fun q : GL ι F ⧸ K => e q.out • ρ q.out v)
     simp only [LinearMap.toAddMonoidHom_coe] at h1
     rw [h1]
     simp only [hstep]

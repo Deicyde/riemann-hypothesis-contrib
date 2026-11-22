@@ -10,8 +10,10 @@ public import ReciprocityTheory.ResidueCardinality.ArtinOntoB
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun Formalism.L2.Host
-open PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F.RS GlobalTheory.CompanionTheory.CtS
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT GlobalTheory.LFun Formalism.L2.Host
+open PositivityTheory.Rg.Rs PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
+  PositivityTheory.Rg.BcB.G8 PositivityTheory.Rg.BcB.F.RS GlobalTheory.CompanionTheory.CtS
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -31,8 +33,9 @@ theorem unif_lt_one {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) : Valued.v ϖ
   rw [h]
   exact_mod_cast (by decide : (Multiplicative.ofAdd (-1 : ℤ)) < 1)
 
-theorem le_one_of_unif_mul {ϖ x : w.adicCompletion E} (h : IsUnifV E w ϖ)
-    (hx : Valued.v (ϖ * x) < 1) : Valued.v x ≤ 1 := by
+theorem le_one_of_unif_mul
+    {ϖ x : w.adicCompletion E} (h : IsUnifV E w ϖ) (hx : Valued.v (ϖ * x) < 1)
+    : Valued.v x ≤ 1 := by
   unfold IsUnifV at h
   rw [map_mul, h] at hx
   rcases eq_or_ne (Valued.v x) 0 with h0 | h0
@@ -46,9 +49,9 @@ theorem le_one_of_unif_mul {ϖ x : w.adicCompletion E} (h : IsUnifV E w ϖ)
     omega
   exact_mod_cast h3
 
-theorem mem_max_iff (x : w.adicCompletionIntegers E) :
-    x ∈ IsLocalRing.maximalIdeal (w.adicCompletionIntegers E) ↔
-      Valued.v (x : w.adicCompletion E) < 1 := by
+theorem mem_max_iff (x : w.adicCompletionIntegers E)
+    : x ∈ IsLocalRing.maximalIdeal (w.adicCompletionIntegers E)
+      ↔ Valued.v (x : w.adicCompletion E) < 1 := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   constructor
   · intro hx
@@ -75,18 +78,19 @@ def posR {a i : ℕ} (hi : i ≤ a) (r : Fin i) : Fin a := Fin.castLE hi r
 
 def posS {b j : ℕ} (s : Fin (b - j)) : Fin b := ⟨j + s, by have := s.2; omega⟩
 
-theorem corner_mem {ϖ : w.adicCompletion E} {a b i j : ℕ} (hi : i ≤ a)
-    (W : latD ϖ a b i j) (p : Fin i × Fin (b - j)) :
-    ϖ * W.1 (posR hi p.1) (posS p.2) ∈ w.adicCompletionIntegers E := by
+theorem corner_mem
+    {ϖ : w.adicCompletion E} {a b i j : ℕ}
+    (hi : i ≤ a) (W : latD ϖ a b i j) (p : Fin i × Fin (b - j))
+    : ϖ * W.1 (posR hi p.1) (posS p.2) ∈ w.adicCompletionIntegers E := by
   have h := W.2 (posR hi p.1) (posS p.2)
   have hc : ((posR hi p.1 : Fin a) : ℕ) < i ∧ j ≤ ((posS p.2 : Fin b) : ℕ) :=
     ⟨p.1.2, Nat.le_add_right _ _⟩
   rw [if_pos hc] at h
   exact h
 
-def cornerMap (ϖ : w.adicCompletion E) (a b i j : ℕ) (hi : i ≤ a) :
-    latD ϖ a b i j →+
-      (Fin i × Fin (b - j) → IsLocalRing.ResidueField (w.adicCompletionIntegers E)) where
+def cornerMap (ϖ : w.adicCompletion E) (a b i j : ℕ) (hi : i ≤ a)
+    : latD ϖ a b i j
+      →+ (Fin i × Fin (b - j) → IsLocalRing.ResidueField (w.adicCompletionIntegers E)) where
   toFun W p := IsLocalRing.residue _ ⟨_, corner_mem hi W p⟩
   map_zero' := by
     funext p
@@ -95,18 +99,20 @@ def cornerMap (ϖ : w.adicCompletion E) (a b i j : ℕ) (hi : i ≤ a) :
     simp only [this, map_zero, Pi.zero_apply]
   map_add' X Y := by
     funext p
-    have : (⟨_, corner_mem hi (X + Y) p⟩ : w.adicCompletionIntegers E) =
-        ⟨_, corner_mem hi X p⟩ + ⟨_, corner_mem hi Y p⟩ :=
+    have : (⟨_, corner_mem hi (X + Y) p⟩ : w.adicCompletionIntegers E)
+        = ⟨_, corner_mem hi X p⟩ + ⟨_, corner_mem hi Y p⟩ :=
       Subtype.ext (by simp [mul_add])
     simp only [this, map_add (f := _), Pi.add_apply]
 
-theorem cornerMap_apply (ϖ : w.adicCompletion E) (a b i j : ℕ) (hi : i ≤ a) (W : latD ϖ a b i j)
-    (p : Fin i × Fin (b - j)) :
-    cornerMap ϖ a b i j hi W p = IsLocalRing.residue _ ⟨_, corner_mem hi W p⟩ := rfl
+theorem cornerMap_apply
+    (ϖ : w.adicCompletion E) (a b i j : ℕ)
+    (hi : i ≤ a) (W : latD ϖ a b i j) (p : Fin i × Fin (b - j))
+    : cornerMap ϖ a b i j hi W p = IsLocalRing.residue _ ⟨_, corner_mem hi W p⟩ :=
+  rfl
 
-theorem ker_cornerMap {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) (a b i j : ℕ) (hi : i ≤ a)
-    (hj : j ≤ b) :
-    (cornerMap ϖ a b i j hi).ker = (intSub a b w).addSubgroupOf (latD ϖ a b i j) := by
+theorem ker_cornerMap
+    {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) (a b i j : ℕ) (hi : i ≤ a) (hj : j ≤ b)
+    : (cornerMap ϖ a b i j hi).ker = (intSub a b w).addSubgroupOf (latD ϖ a b i j) := by
   ext W
   rw [AddMonoidHom.mem_ker, AddSubgroup.mem_addSubgroupOf]
   constructor
@@ -133,14 +139,17 @@ theorem ker_cornerMap {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) (a b i j : 
     rw [map_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_right' (hW _ _)) (unif_lt_one h)
 
-theorem cornerMap_surjective {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) (a b i j : ℕ)
-    (hi : i ≤ a) (hj : j ≤ b) : Function.Surjective (cornerMap ϖ a b i j hi) := by
+theorem cornerMap_surjective
+    {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) (a b i j : ℕ) (hi : i ≤ a) (hj : j ≤ b)
+    : Function.Surjective (cornerMap ϖ a b i j hi) := by
   intro c
   choose x hx using fun p => IsLocalRing.residue_surjective (c p)
   have h0 := unif_ne_zero h
   let M : Matrix (Fin a) (Fin b) (w.adicCompletion E) := fun r s =>
     if hc : (r : ℕ) < i ∧ j ≤ (s : ℕ) then
-      ϖ⁻¹ * (x (⟨r, hc.1⟩, ⟨s - j, by have := s.2; omega⟩) : w.adicCompletion E) else 0
+      ϖ⁻¹ * (x (⟨r, hc.1⟩, ⟨s - j, by have := s.2; omega⟩) : w.adicCompletion E)
+    else
+      0
   have hM : M ∈ latD ϖ a b i j := by
     intro r s
     by_cases hc : (r : ℕ) < i ∧ j ≤ (s : ℕ)
@@ -165,9 +174,12 @@ theorem cornerMap_surjective {ϖ : w.adicCompletion E} (h : IsUnifV E w ϖ) (a b
   refine Prod.ext (Fin.ext rfl) (Fin.ext ?_)
   simp [posS]
 
-theorem relIndex_intSub_latD (E : Type) [Field E] [NumberField E] [IsCMField E] (a b : ℕ) (w : Pl E)
-    (ϖ : w.adicCompletion E) (h : IsUnifV E w ϖ) (i j : ℕ) (hi : i ≤ a) (hj : j ≤ b) :
-    (intSub a b w).relIndex (latD ϖ a b i j) = (qV E w) ^ (i * (b - j)) := by
+theorem relIndex_intSub_latD
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (a b : ℕ)
+    (w : Pl E) (ϖ : w.adicCompletion E) (h : IsUnifV E w ϖ)
+    (i j : ℕ) (hi : i ≤ a) (hj : j ≤ b)
+    : (intSub a b w).relIndex (latD ϖ a b i j) = (qV E w) ^ (i * (b - j)) := by
   have hcard : Nat.card (IsLocalRing.ResidueField (w.adicCompletionIntegers E)) = qV E w := by
     rw [ReciprocityTheory.Bridge.ResidueFieldCardinality.card_residue w]
     simp [qV, Ideal.absNorm_apply, Submodule.cardQuot_apply]

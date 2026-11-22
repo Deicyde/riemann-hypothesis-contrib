@@ -6,9 +6,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsToricR
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH
 open scoped CategoryTheory.Obj
 open GlobalTheory.Poinc GlobalTheory.TorusPart
 open Classical
@@ -19,22 +23,27 @@ namespace GlobalTheory.Poinc.HHFibre
 
 open GlobalTheory.ZH GlobalTheory.ZH.RatModel
 
-theorem isHom_of_pt {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {M Y : RatModel o Ω} {q : Y.Z ⟶ M.Z}
-    (hq : Y.pt ≫ q = M.pt) : M.IsHom Y (AlgHom.id o Ω) q := by
+theorem isHom_of_pt
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+    {M Y : RatModel o Ω} {q : Y.Z ⟶ M.Z} (hq : Y.pt ≫ q = M.pt)
+    : M.IsHom Y (AlgHom.id o Ω) q := by
   show Y.pt ≫ q = spMap (AlgHom.id o Ω).toRingHom ≫ M.pt
   rw [hq]
   have : spMap (AlgHom.id o Ω).toRingHom = 𝟙 _ := by
     show Spec.map (CommRingCat.ofHom (RingHom.id Ω)) = 𝟙 _
-    rw [← Spec.map_id]; rfl
+    rw [← Spec.map_id]
+    rfl
   rw [this, Category.id_comp]
 
-theorem exists_pt (X : Scheme.{0}) (w : X) : ∃ (K : Type) (_ : Field K) (y : Sp K ⟶ X),
-    y (IsLocalRing.closedPoint K) = w :=
+theorem exists_pt (X : Scheme.{0}) (w : X)
+    : ∃ (K : Type) (_ : Field K) (y : Sp K ⟶ X), y (IsLocalRing.closedPoint K) = w :=
   ⟨X.residueField w, inferInstance, X.fromSpecResidueField w, Scheme.fromSpecResidueField_apply _ _⟩
 
-theorem isUnit_of_isUnit_comap {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {M Y : RatModel o Ω}
-    {q : Y.Z ⟶ M.Z} (hq : M.IsHom Y (AlgHom.id o Ω) q) (w : Y.Z) {a : Ω} (ha : a ∈ M.O (q w))
-    (ha' : a ∈ Y.O w) (hu : IsUnit (⟨a, ha'⟩ : Y.O w)) : IsUnit (⟨a, ha⟩ : M.O (q w)) := by
+theorem isUnit_of_isUnit_comap
+    {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
+    {M Y : RatModel o Ω} {q : Y.Z ⟶ M.Z} (hq : M.IsHom Y (AlgHom.id o Ω) q) (w : Y.Z)
+    {a : Ω} (ha : a ∈ M.O (q w)) (ha' : a ∈ Y.O w) (hu : IsUnit (⟨a, ha'⟩ : Y.O w))
+    : IsUnit (⟨a, ha⟩ : M.O (q w)) := by
   obtain ⟨K, _, y, hy0⟩ := exists_pt Y.Z w
   have hy : Set.range y = {w} := hy0 ▸ range_eq_singleton y (IsLocalRing.closedPoint K)
   have hyq : Set.range (y ≫ q) = {q w} := by
@@ -51,8 +60,10 @@ theorem isUnit_of_isUnit_comap {o Ω : Type} [CommRing o] [Field Ω] [Algebra o 
   rw [e]
   exact hu
 
-theorem HH_eq_of_hom : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (S : ThetaSys o Ω) (M Y : RatModel o Ω)
-    (q : Y.Z ⟶ M.Z), Y.pt ≫ q = M.pt → M.HasDiv S.th → ∀ w : Y.Z, S.HH Y w = S.HH M (q w) := by
+theorem HH_eq_of_hom
+    : ∀ (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω] (S : ThetaSys o Ω) (M Y : RatModel o Ω)
+        (q : Y.Z ⟶ M.Z),
+      Y.pt ≫ q = M.pt → M.HasDiv S.th → ∀ w : Y.Z, S.HH Y w = S.HH M (q w) := by
   intro o Ω _ _ _ S M Y q hq hdiv w
   have hh := isHom_of_pt hq
   unfold ThetaSys.HH

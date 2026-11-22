@@ -53,7 +53,8 @@ theorem IdealHeightSpread.proof : IdealHeightSpread.Statement := by
       intro x hx hxp
       exact hx (hpP hxp)
     have hJh : J.height = p.height := (IsLocalization.height_under Q.primeCompl J).symm
-    rw [hJh, ← IsLocalization.height_map_of_disjoint P.primeCompl (S := Localization.AtPrime P) p hdisj]
+    rw [hJh,
+      ← IsLocalization.height_map_of_disjoint P.primeCompl (S := Localization.AtPrime P) p hdisj]
     exact Ideal.height_mono (Ideal.map_mono hmin.1.2)
 
 end GroundTheory.Heights₂.Heights

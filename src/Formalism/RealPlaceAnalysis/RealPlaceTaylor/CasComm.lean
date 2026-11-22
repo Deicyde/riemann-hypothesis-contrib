@@ -12,9 +12,11 @@ noncomputable section
 
 namespace Formalism.REAL
 
-theorem casComm_casK_comm {A : Type} [Ring A] {n : ℕ} (ε : Fin n → Bool)
-    (E : Fin n → Fin n → A) (hE : GlRel E) (c d : Fin n) (hcd : ε c = ε d) :
-    CasK ε E * E c d = E c d * CasK ε E :=
+theorem casComm_casK_comm
+    {A : Type} [Ring A]
+    {n : ℕ}
+    (ε : Fin n → Bool) (E : Fin n → Fin n → A) (hE : GlRel E) (c d : Fin n) (hcd : ε c = ε d)
+    : CasK ε E * E c d = E c d * CasK ε E :=
   _root_.UpperTheory.Reformulated.B.CasimirCommutation.casComm_casK_comm ε E hE c d hcd
 
 theorem casimir_central_holds : CasCentral := by

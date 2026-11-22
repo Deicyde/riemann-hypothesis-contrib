@@ -22,7 +22,13 @@ theorem a0 (p : ℕ) [Fact p.Prime] : TiltStructureStatement p := by
     rw [map_zero]
     exact (mul_eq_zero.mp h1).resolve_left hp0
   obtain ⟨pf, hpf⟩ := exists_pflat (p := p) (hv := hv)
-  exact ⟨⟨pf, hpf⟩, exists_eps (p := p) (hv := hv), hK,
-    xiNu p C v O hK, regular (p := p) (O := O) (hO := hO), flatW' (p := p) (O := O)⟩
+  exact ⟨
+    ⟨pf, hpf⟩,
+    exists_eps (p := p) (hv := hv),
+    hK,
+    xiNu p C v O hK,
+    regular (p := p) (O := O) (hO := hO),
+    flatW' (p := p) (O := O)
+  ⟩
 
 end ReciprocityTheory.PGsh

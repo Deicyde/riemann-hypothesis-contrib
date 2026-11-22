@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  NumberField IsDedekindDomain Polynomial
 
 noncomputable section
 
@@ -13,43 +16,58 @@ namespace GlobalTheory.MoveTyped
 
 open Formalism.L2.NG
 
-variable {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
+variable
+  {L : Type} [Field L] [NumberField L] [IsCMField L]
+  {n : ℕ} {W : Type} [AddCommGroup W] [Module ℂ W]
 
-theorem isSubrep_bot (ρ : Representation ℂ (GQ L n) W) :
-    IsSubrep ρ (⊥ : Submodule ℂ (GAf L n → W)) :=
-  ⟨bot_le, fun h f hf => by
+theorem isSubrep_bot (ρ : Representation ℂ (GQ L n) W)
+    : IsSubrep ρ (⊥ : Submodule ℂ (GAf L n → W)) := ⟨
+  bot_le,
+  fun h f hf => by
     rw [Submodule.mem_bot] at hf ⊢
     subst hf
-    exact map_zero _⟩
+    exact map_zero _
+⟩
 
-theorem isSubrep_sup {ρ : Representation ℂ (GQ L n) W} {X Y : Submodule ℂ (GAf L n → W)}
-    (hX : IsSubrep ρ X) (hY : IsSubrep ρ Y) : IsSubrep ρ (X ⊔ Y) :=
-  ⟨sup_le hX.le hY.le, fun h f hf => by
+theorem isSubrep_sup
+    {ρ : Representation ℂ (GQ L n) W} {X Y : Submodule ℂ (GAf L n → W)}
+    (hX : IsSubrep ρ X) (hY : IsSubrep ρ Y)
+    : IsSubrep ρ (X ⊔ Y) := ⟨
+  sup_le hX.le hY.le,
+  fun h f hf => by
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hf
     rw [map_add (f := _)]
-    exact Submodule.add_mem_sup (hX.stable h a ha) (hY.stable h b hb)⟩
+    exact Submodule.add_mem_sup (hX.stable h a ha) (hY.stable h b hb)
+⟩
 
-theorem isSubrep_inf {ρ : Representation ℂ (GQ L n) W} {X Y : Submodule ℂ (GAf L n → W)}
-    (hX : IsSubrep ρ X) (hY : IsSubrep ρ Y) : IsSubrep ρ (X ⊓ Y) :=
+theorem isSubrep_inf
+    {ρ : Representation ℂ (GQ L n) W} {X Y : Submodule ℂ (GAf L n → W)}
+    (hX : IsSubrep ρ X) (hY : IsSubrep ρ Y)
+    : IsSubrep ρ (X ⊓ Y) :=
   ⟨inf_le_right.trans hY.le, fun h f hf => ⟨hX.stable h f hf.1, hY.stable h f hf.2⟩⟩
 
-theorem sup_typed_eq_bot {ρ : Representation ℂ (GQ L n) W} {J : Subgroup (GAf L n)} {χ : J →* ℂˣ}
+theorem sup_typed_eq_bot
+    {ρ : Representation ℂ (GQ L n) W} {J : Subgroup (GAf L n)} {χ : J →* ℂˣ}
     {X Y : Submodule ℂ (GAf L n → W)} (hX : IsSubrep ρ X) (hXT : X ⊓ TypeSp ρ J χ = ⊥)
-    (hY : IsIrrRep ρ Y) (hYT : Y ⊓ TypeSp ρ J χ = ⊥) : (X ⊔ Y) ⊓ TypeSp ρ J χ = ⊥ := by
+    (hY : IsIrrRep ρ Y) (hYT : Y ⊓ TypeSp ρ J χ = ⊥)
+    : (X ⊔ Y) ⊓ TypeSp ρ J χ = ⊥ := by
   by_cases hXY : X ⊓ Y = ⊥
   · rw [eq_bot_iff]
     rintro v ⟨hv, hvT⟩
     have hvT' : v ∈ AFall L n ρ ∧ ∀ κ : J, rt L n (κ : GAf L n) v = ((χ κ : ℂˣ) : ℂ) • v := hvT
     obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.1 hv
-    have key : ∀ κ : J, rt L n (κ : GAf L n) a = ((χ κ : ℂˣ) : ℂ) • a ∧
-        rt L n (κ : GAf L n) b = ((χ κ : ℂˣ) : ℂ) • b := by
+    have key
+        : ∀ κ : J,
+          rt L n (κ : GAf L n) a = ((χ κ : ℂˣ) : ℂ) • a
+            ∧ rt L n (κ : GAf L n) b = ((χ κ : ℂˣ) : ℂ) • b := by
       intro κ
       have e := hvT'.2 κ
       rw [map_add (f := _), smul_add] at e
       have hmem : rt L n (κ : GAf L n) a - ((χ κ : ℂˣ) : ℂ) • a ∈ X ⊓ Y := by
         refine ⟨Submodule.sub_mem _ (hX.stable _ a ha) (Submodule.smul_mem _ _ ha), ?_⟩
-        have hab : rt L n (κ : GAf L n) a - ((χ κ : ℂˣ) : ℂ) • a =
-            ((χ κ : ℂˣ) : ℂ) • b - rt L n (κ : GAf L n) b := by
+        have hab
+            : rt L n (κ : GAf L n) a - ((χ κ : ℂˣ) : ℂ) • a
+              = ((χ κ : ℂˣ) : ℂ) • b - rt L n (κ : GAf L n) b := by
           rw [sub_eq_sub_iff_add_eq_add, e, add_comm]
         rw [hab]
         exact Submodule.sub_mem _ (Submodule.smul_mem _ _ hb) (hY.1.stable _ b hb)
@@ -66,15 +84,18 @@ theorem sup_typed_eq_bot {ρ : Representation ℂ (GQ L n) W} {J : Subgroup (GAf
     have hYX : Y ≤ X := hle ▸ inf_le_left
     rw [sup_eq_left.2 hYX, hXT]
 
-theorem typed_eq_bot_of_iso {ρ : Representation ℂ (GQ L n) W} {J : Subgroup (GAf L n)} {χ : J →* ℂˣ}
-    {S S' : Submodule ℂ (GAf L n → W)} (hS : IsSubrep ρ S) (hiso : IsoRep S S')
-    (h : S ⊓ TypeSp ρ J χ = ⊥) : S' ⊓ TypeSp ρ J χ = ⊥ := by
+theorem typed_eq_bot_of_iso
+    {ρ : Representation ℂ (GQ L n) W} {J : Subgroup (GAf L n)} {χ : J →* ℂˣ}
+    {S S' : Submodule ℂ (GAf L n → W)}
+    (hS : IsSubrep ρ S) (hiso : IsoRep S S') (h : S ⊓ TypeSp ρ J χ = ⊥)
+    : S' ⊓ TypeSp ρ J χ = ⊥ := by
   obtain ⟨T, hT⟩ := hiso
   rw [eq_bot_iff]
   rintro u ⟨hu, huT⟩
   have huT' : u ∈ AFall L n ρ ∧ ∀ κ : J, rt L n (κ : GAf L n) u = ((χ κ : ℂˣ) : ℂ) • u := huT
   obtain ⟨f, hfu⟩ : ∃ f : S, T f = ⟨u, hu⟩ := ⟨T.symm _, T.apply_symm_apply _⟩
-  have hf : ∀ κ : J, rt L n (κ : GAf L n) (f : GAf L n → W) = ((χ κ : ℂˣ) : ℂ) • (f : GAf L n → W) := by
+  have hf
+      : ∀ κ : J, rt L n (κ : GAf L n) (f : GAf L n → W) = ((χ κ : ℂˣ) : ℂ) • (f : GAf L n → W) := by
     intro κ
     let f' : S := ⟨rt L n (κ : GAf L n) f, hS.stable _ _ f.2⟩
     have e := hT κ f f' rfl
@@ -91,16 +112,20 @@ theorem typed_eq_bot_of_iso {ρ : Representation ℂ (GQ L n) W} {J : Subgroup (
   have := congrArg Subtype.val hfu
   simpa using this.symm
 
-theorem typed_of_isoTyp : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W]
-    [Module ℂ W] (ρ : Representation ℂ (GQ L n) W) (J : Subgroup (GAf L n)) (χ : J →* ℂˣ)
-    (S : Submodule ℂ (GAf L n → W)), Formalism.L2.NG.IsSubrep ρ S →
-    Formalism.L2.NG.isoTyp ρ S ⊓ Formalism.L2.NG.TypeSp ρ J χ ≠ ⊥ → S ⊓ Formalism.L2.NG.TypeSp ρ J χ ≠ ⊥ := by
+theorem typed_of_isoTyp
+    : ∀ {L : Type} [Field L] [NumberField L] [IsCMField L] {n : ℕ} {W : Type} [AddCommGroup W]
+        [Module ℂ W] (ρ : Representation ℂ (GQ L n) W) (J : Subgroup (GAf L n)) (χ : J →* ℂˣ)
+        (S : Submodule ℂ (GAf L n → W)),
+      Formalism.L2.NG.IsSubrep ρ S → Formalism.L2.NG.isoTyp ρ S ⊓ Formalism.L2.NG.TypeSp ρ J χ ≠ ⊥
+        → S ⊓ Formalism.L2.NG.TypeSp ρ J χ ≠ ⊥ := by
   intro L _ _ _ n W _ _ ρ J χ S hS hne h0
   apply hne
-  have hfam : ∀ S' ∈ {S' | IsIrrRep ρ S' ∧ IsoRep S S'}, S' ⊓ TypeSp ρ J χ = ⊥ :=
-    fun S' hS' => typed_eq_bot_of_iso hS hS'.2 h0
-  have fin : ∀ s : Finset (Submodule ℂ (GAf L n → W)), (↑s : Set _) ⊆ {S' | IsIrrRep ρ S' ∧ IsoRep S S'} →
-      IsSubrep ρ (⨆ i ∈ s, i) ∧ (⨆ i ∈ s, i) ⊓ TypeSp ρ J χ = ⊥ := by
+  have hfam : ∀ S' ∈ {S' | IsIrrRep ρ S' ∧ IsoRep S S'}, S' ⊓ TypeSp ρ J χ = ⊥ := fun S' hS' =>
+    typed_eq_bot_of_iso hS hS'.2 h0
+  have fin
+      : ∀ s : Finset (Submodule ℂ (GAf L n → W)),
+        (↑s : Set _) ⊆ {S' | IsIrrRep ρ S' ∧ IsoRep S S'}
+          → IsSubrep ρ (⨆ i ∈ s, i) ∧ (⨆ i ∈ s, i) ⊓ TypeSp ρ J χ = ⊥ := by
     intro s
     induction s using Finset.induction_on with
     | empty => intro _; simp [isSubrep_bot]

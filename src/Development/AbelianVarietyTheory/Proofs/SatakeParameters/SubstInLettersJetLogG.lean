@@ -12,13 +12,15 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.JetZ
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.FrobeniusOrbits GlobalTheory.TwU GlobalTheory.OnePlace Classical
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.FrobeniusOrbits GlobalTheory.TwU
+  GlobalTheory.OnePlace Classical
 
 noncomputable section
 namespace GlobalTheory.OnePlace.Letters
 
-theorem constantCoeff_jetLogG (p : ℕ) [Fact p.Prime] (n' : ℕ) {β : Type} (v : ZMod n' × β) :
-    MvPowerSeries.constantCoeff (jetLogG p n' v) = 0 := by
+theorem constantCoeff_jetLogG (p : ℕ) [Fact p.Prime] (n' : ℕ) {β : Type} (v : ZMod n' × β)
+    : MvPowerSeries.constantCoeff (jetLogG p n' v) = 0 := by
   show jetLogG p n' v 0 = 0
   unfold jetLogG
   refine Finset.sum_eq_zero fun e _ => ?_
@@ -31,41 +33,53 @@ theorem constantCoeff_jetLogG (p : ℕ) [Fact p.Prime] (n' : ℕ) {β : Type} (v
 def posEquiv (n r0 r1 : ℕ) [NeZero n] : Zidx n r0 r1 ≃ ZMod n × Fin r0 × Fin r1 where
   toFun z := (((z.1 : ℕ) : ZMod n), z.2)
   invFun v := (toFin v.1, v.2)
-  left_inv z := by
-    ext <;> simp [toFin, ZMod.val_natCast, Nat.mod_eq_of_lt z.1.2]
-  right_inv v := by
-    ext <;> simp [toFin, ZMod.natCast_zmod_val]
+  left_inv z := by ext <;> simp [toFin, ZMod.val_natCast, Nat.mod_eq_of_lt z.1.2]
+  right_inv v := by ext <;> simp [toFin, ZMod.natCast_zmod_val]
 
-theorem coeff_inLetters {n r0 r1 : ℕ} [NeZero n] {R : Type} [Semiring R] (f : MvPowerSeries (Zidx n r0 r1) R)
-    (m : ZMod n × Fin r0 × Fin r1 →₀ ℕ) :
-    MvPowerSeries.coeff m (inLetters f) = MvPowerSeries.coeff (Finsupp.mapDomain (posEquiv n r0 r1).symm m) f := rfl
+theorem coeff_inLetters
+    {n r0 r1 : ℕ} [NeZero n]
+    {R : Type} [Semiring R]
+    (f : MvPowerSeries (Zidx n r0 r1) R) (m : ZMod n × Fin r0 × Fin r1 →₀ ℕ)
+    : MvPowerSeries.coeff m (inLetters f)
+      = MvPowerSeries.coeff (Finsupp.mapDomain (posEquiv n r0 r1).symm m) f :=
+  rfl
 
-theorem inLetters_eq_rename {n r0 r1 : ℕ} [NeZero n] {R : Type} [CommRing R] (f : MvPowerSeries (Zidx n r0 r1) R) :
-    inLetters f = MvPowerSeries.rename (posEquiv n r0 r1) f := by
+theorem inLetters_eq_rename
+    {n r0 r1 : ℕ} [NeZero n] {R : Type} [CommRing R] (f : MvPowerSeries (Zidx n r0 r1) R)
+    : inLetters f = MvPowerSeries.rename (posEquiv n r0 r1) f := by
   ext m
-  have hm : m = Finsupp.mapDomain (posEquiv n r0 r1) (Finsupp.mapDomain (posEquiv n r0 r1).symm m) := by
+  have hm
+      : m = Finsupp.mapDomain (posEquiv n r0 r1) (Finsupp.mapDomain (posEquiv n r0 r1).symm m) := by
     rw [← Finsupp.mapDomain_comp, Equiv.self_comp_symm, Finsupp.mapDomain_id]
-  have h1 := MvPowerSeries.coeff_embDomain_rename (posEquiv n r0 r1).toEmbedding f
-    (Finsupp.mapDomain (posEquiv n r0 r1).symm m)
+  have h1 :=
+    MvPowerSeries.coeff_embDomain_rename (posEquiv n r0 r1).toEmbedding f
+      (Finsupp.mapDomain (posEquiv n r0 r1).symm m)
   rw [Finsupp.embDomain_eq_mapDomain] at h1
   rw [coeff_inLetters]
   conv_rhs => rw [hm]
   exact h1.symm
 
-theorem map_inLetters {n r0 r1 : ℕ} [NeZero n] {R S : Type} [CommRing R] [CommRing S] (φ : R →+* S)
-    (f : MvPowerSeries (Zidx n r0 r1) R) :
-    MvPowerSeries.map φ (inLetters f) = inLetters (MvPowerSeries.map φ f) := by
+theorem map_inLetters
+    {n r0 r1 : ℕ} [NeZero n]
+    {R S : Type} [CommRing R] [CommRing S]
+    (φ : R →+* S) (f : MvPowerSeries (Zidx n r0 r1) R)
+    : MvPowerSeries.map φ (inLetters f) = inLetters (MvPowerSeries.map φ f) := by
   ext m
   rw [MvPowerSeries.coeff_map, coeff_inLetters, coeff_inLetters, MvPowerSeries.coeff_map]
 
-theorem subst_inLetters_jetLogG {p : ℕ} [Fact p.Prime] {n' r0 r1 : ℕ} [NeZero n'] (F : MvPowerSeries (Zidx n' r0 r1) (FormalGroupSystem.K0 p)) :
-    (∀ z, MvPowerSeries.constantCoeff (jetZ p n' r0 r1 z) = 0) ∧
-    MvPowerSeries.subst (fun v : ZMod n' × Fin r0 × Fin r1 => MvPowerSeries.C (1 : ℂ_[p]) * jetLogG p n' v)
-      (MvPowerSeries.map (Formalism.L2.G.Pend.k0ToC p) (inLetters F)) =
-    MvPowerSeries.subst (jetZ p n' r0 r1) (MvPowerSeries.map (Formalism.L2.G.Pend.k0ToC p) F) := by
+theorem subst_inLetters_jetLogG
+    {p : ℕ} [Fact p.Prime]
+    {n' r0 r1 : ℕ} [NeZero n']
+    (F : MvPowerSeries (Zidx n' r0 r1) (FormalGroupSystem.K0 p))
+    : (∀ z, MvPowerSeries.constantCoeff (jetZ p n' r0 r1 z) = 0)
+      ∧ MvPowerSeries.subst
+          (fun v : ZMod n' × Fin r0 × Fin r1 => MvPowerSeries.C (1 : ℂ_[p]) * jetLogG p n' v)
+          (MvPowerSeries.map (Formalism.L2.G.Pend.k0ToC p) (inLetters F))
+        = MvPowerSeries.subst (jetZ p n' r0 r1)
+          (MvPowerSeries.map (Formalism.L2.G.Pend.k0ToC p) F) := by
   refine ⟨fun z => constantCoeff_jetLogG p n' _, ?_⟩
-  have ha : MvPowerSeries.HasSubst
-      (fun v : ZMod n' × Fin r0 × Fin r1 => MvPowerSeries.C (1 : ℂ_[p]) * jetLogG p n' v) :=
+  have ha : MvPowerSeries.HasSubst (fun v : ZMod n' × Fin r0 × Fin r1 =>
+      MvPowerSeries.C (1 : ℂ_[p]) * jetLogG p n' v) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero fun v => by
       rw [map_mul, constantCoeff_jetLogG, mul_zero]
   rw [map_inLetters, inLetters_eq_rename, MvPowerSeries.rename_eq_subst,

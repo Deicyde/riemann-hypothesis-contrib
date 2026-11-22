@@ -17,8 +17,8 @@ namespace GlobalTheory.DetSqrtCover
 
 variable {p q : ℕ}
 
-theorem exp_add_smul (X : Mat p q) (s t : ℝ) :
-    NormedSpace.exp ((s + t) • X) = NormedSpace.exp (s • X) * NormedSpace.exp (t • X) := by
+theorem exp_add_smul (X : Mat p q) (s t : ℝ)
+    : NormedSpace.exp ((s + t) • X) = NormedSpace.exp (s • X) * NormedSpace.exp (t • X) := by
   rw [add_smul]
   exact Matrix.exp_add_of_commute _ _ (((Commute.refl X).smul_left s).smul_right t)
 
@@ -37,13 +37,16 @@ theorem det_exp (X : Mat p q) : (NormedSpace.exp X).det = Complex.exp X.trace :=
     have h1 : HasDerivAt (fun s : ℝ => -((s : ℂ) * X.trace)) (-X.trace) t := by
       simpa using ((Complex.ofRealCLM.hasDerivAt (x := t)).mul_const X.trace).fun_neg
     exact ((hd t).fun_mul h1.cexp).congr_deriv (by ring)
-  have h2 := is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) 1 0
-  simp only [hf, one_smul, zero_smul, NormedSpace.exp_zero, Matrix.det_one, Complex.ofReal_one, one_mul,
-    Complex.ofReal_zero, zero_mul, neg_zero, Complex.exp_zero, Complex.exp_neg] at h2
+  have h2 :=
+    is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) 1 0
+  simp only [hf, one_smul, zero_smul, NormedSpace.exp_zero, Matrix.det_one, Complex.ofReal_one,
+      one_mul, Complex.ofReal_zero, zero_mul, neg_zero, Complex.exp_zero, Complex.exp_neg]
+    at h2
   exact (mul_inv_eq_one₀ (Complex.exp_ne_zero _)).1 h2
 
 theorem exp_mul_exp_neg (X : Mat p q) : NormedSpace.exp X * NormedSpace.exp (-X) = 1 := by
-  rw [← Matrix.exp_add_of_commute _ _ (Commute.refl X).neg_right, add_neg_cancel, NormedSpace.exp_zero]
+  rw [← Matrix.exp_add_of_commute _ _ (Commute.refl X).neg_right, add_neg_cancel,
+    NormedSpace.exp_zero]
 
 theorem exp_neg_mul_exp (X : Mat p q) : NormedSpace.exp (-X) * NormedSpace.exp X = 1 := by
   simpa using exp_mul_exp_neg (-X)
@@ -71,13 +74,14 @@ theorem expGL_mem {X : Mat p q} (hX : X ∈ upq p q) : expGL X ∈ Formalism.UG.
     rfl
   rw [GlobalTheory.RealPar.mem_Upq]
   change (NormedSpace.exp X)ᴴ * Jm p q * NormedSpace.exp X = Jm p q
-  rw [h2, Matrix.mul_assoc _ (Jm p q) (Jm p q), hJ, Matrix.mul_one, Matrix.mul_assoc, exp_neg_mul_exp, Matrix.mul_one]
+  rw [h2, Matrix.mul_assoc _ (Jm p q) (Jm p q), hJ, Matrix.mul_one, Matrix.mul_assoc,
+    exp_neg_mul_exp, Matrix.mul_one]
 
 def expHalf (X : Mat p q) : ℂˣ := Units.mk0 (Complex.exp (X.trace / 2)) (Complex.exp_ne_zero _)
 
 theorem continuous_expHalf : Continuous (expHalf : Mat p q → ℂˣ) :=
-  Units.isEmbedding_val₀.continuous_iff.2
-    (Complex.continuous_exp.comp (continuous_id.matrix_trace.div_const 2))
+  Units.isEmbedding_val₀.continuous_iff.2 (Complex.continuous_exp.comp
+    (continuous_id.matrix_trace.div_const 2))
 
 theorem expHalf_sq (X : Mat p q) : ((expHalf X : ℂˣ) : ℂ) ^ 2 = (NormedSpace.exp X).det := by
   rw [det_exp, expHalf, Units.val_mk0, sq, ← Complex.exp_add, add_halves]
@@ -85,15 +89,22 @@ theorem expHalf_sq (X : Mat p q) : ((expHalf X : ℂˣ) : ℂ) ^ 2 = (NormedSpac
 def cover (p q : ℕ) : Subgroup (GL (Ix p q) ℂ × ℂˣ) where
   carrier := {z | z.1 ∈ Formalism.UG.Upq p q ∧ (z.2 : ℂ) ^ 2 = (z.1 : Mat p q).det}
   one_mem' := ⟨one_mem _, by simp⟩
-  mul_mem' := fun {a b} ha hb => ⟨mul_mem ha.1 hb.1, by
-    simp only [Prod.snd_mul, Prod.fst_mul, Units.val_mul, Matrix.det_mul, mul_pow, ha.2, hb.2]⟩
-  inv_mem' := fun {a} ha => ⟨inv_mem ha.1, by
-    simp only [Prod.snd_inv, Prod.fst_inv, Units.val_inv_eq_inv_val, inv_pow, ha.2, Matrix.coe_units_inv,
-      Matrix.det_nonsing_inv, Ring.inverse_eq_inv']⟩
+  mul_mem' := fun {a b} ha hb => ⟨
+    mul_mem ha.1 hb.1,
+    by simp only [Prod.snd_mul, Prod.fst_mul, Units.val_mul, Matrix.det_mul, mul_pow, ha.2, hb.2]
+  ⟩
+  inv_mem' := fun {a} ha => ⟨
+    inv_mem ha.1,
+    by
+      simp only [Prod.snd_inv, Prod.fst_inv, Units.val_inv_eq_inv_val, inv_pow, ha.2,
+        Matrix.coe_units_inv, Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
+  ⟩
 
 theorem isClosed_cover : IsClosed (cover p q : Set (GL (Ix p q) ℂ × ℂˣ)) := by
-  have c1 : Continuous fun z : GL (Ix p q) ℂ × ℂˣ => (z.1 : Mat p q) := Units.continuous_val.comp continuous_fst
-  have c2 : Continuous fun z : GL (Ix p q) ℂ × ℂˣ => (z.2 : ℂ) := Units.continuous_val.comp continuous_snd
+  have c1 : Continuous fun z : GL (Ix p q) ℂ × ℂˣ => (z.1 : Mat p q) :=
+    Units.continuous_val.comp continuous_fst
+  have c2 : Continuous fun z : GL (Ix p q) ℂ × ℂˣ => (z.2 : ℂ) :=
+    Units.continuous_val.comp continuous_snd
   exact (isClosed_eq ((c1.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul c1)
     (continuous_const (y := Jm p q))).inter (isClosed_eq (c2.pow 2) c1.matrix_det)
 
@@ -108,7 +119,6 @@ instance locallyCompact_cover : LocallyCompactSpace (cover p q) := by
 instance measurable_cover : MeasurableSpace (cover p q) := borel _
 
 instance borel_cover : BorelSpace (cover p q) := ⟨rfl⟩
-
 
 open Classical in
 def expLift (X : Mat p q) : cover p q :=
@@ -129,7 +139,8 @@ def grpOf (p q : ℕ) (ν : Measure (cover p q)) [ν.IsHaarMeasure] : GrpData p 
   expt := expLift
   expt_cov X hX := by
     change ((expLift X).1.1 : Mat p q) = _
-    rw [expLift_val hX]; rfl
+    rw [expLift_val hX]
+    rfl
   expt_cont := by
     rw [Topology.IsInducing.subtypeVal.continuousOn_iff]
     exact (continuous_expGL.prodMk continuous_expHalf).continuousOn.congr fun X hX => expLift_val hX
@@ -172,9 +183,11 @@ theorem isProperMap_covU (T : GrpData p q) : IsProperMap T.covU := by
     intro z hz
     have : z ≠ 0 := by rintro rfl; simp at hz
     exact ⟨Units.mk0 z this, rfl⟩
-  have hK' : IsCompact ((fun g : Formalism.UG.Upq p q => g.1) '' K) := hK.image continuous_subtype_val
-  refine ((GlobalTheory.RealPar.SqInt.isClosedEmbedding_emb T).isCompact_preimage (hK'.prod hS)).of_isClosed_subset
-    (hK.isClosed.preimage (continuous_covU T)) fun x hx => ⟨⟨T.covU x, hx, rfl⟩, ?_⟩
+  have hK' : IsCompact ((fun g : Formalism.UG.Upq p q => g.1) '' K) :=
+    hK.image continuous_subtype_val
+  refine ((GlobalTheory.RealPar.SqInt.isClosedEmbedding_emb T).isCompact_preimage
+      (hK'.prod hS)).of_isClosed_subset (hK.isClosed.preimage (continuous_covU T)) fun x hx =>
+    ⟨⟨T.covU x, hx, rfl⟩, ?_⟩
   simpa using GlobalTheory.RealPar.Cover.norm_sq x
 
 theorem isHaarMeasure_map_covU (T : GrpData p q) : (T.haar.map T.covU).IsHaarMeasure := by
@@ -186,12 +199,14 @@ theorem isHaarMeasure_map_covU (T : GrpData p q) : (T.haar.map T.covU).IsHaarMea
   exact Measure.isHaarMeasure_map T.haar (covHom T) (continuous_covU T) (surjective_covU T)
     (isProperMap_iff_tendsto_cocompact.1 (isProperMap_covU T)).2
 
-theorem exists_grpData_map_haar : ∀ (p q : ℕ) (μ : Measure (UpqT p q)), μ.IsHaarMeasure →
-    ∃ T : GrpData p q, Measure.map T.covU T.haar = μ := by
+theorem exists_grpData_map_haar
+    : ∀ (p q : ℕ) (μ : Measure (UpqT p q)),
+      μ.IsHaarMeasure → ∃ T : GrpData p q, Measure.map T.covU T.haar = μ := by
   intro p q μ hμ
   haveI := isHaarMeasure_map_covU (grpOf p q Measure.haar)
-  obtain ⟨t, ht⟩ := GlobalTheory.CompactDualUnique.exists_eq_smul μ
-    ((grpOf p q Measure.haar).haar.map (grpOf p q Measure.haar).covU)
+  obtain ⟨t, ht⟩ :=
+    GlobalTheory.CompactDualUnique.exists_eq_smul μ
+      ((grpOf p q Measure.haar).haar.map (grpOf p q Measure.haar).covU)
   have h0 : t ≠ 0 := by
     rintro rfl
     rw [zero_smul] at ht

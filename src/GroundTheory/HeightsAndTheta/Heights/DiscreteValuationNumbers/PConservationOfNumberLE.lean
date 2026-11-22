@@ -15,8 +15,8 @@ noncomputable section
 
 universe u
 
-private theorem lt_of_add_one_le_natCast {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ (n : WithBot ℕ∞)) :
-    a < (n : WithBot ℕ∞) := by
+private theorem lt_of_add_one_le_natCast {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ (n : WithBot ℕ∞))
+    : a < (n : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot => exact WithBot.bot_lt_coe _
   | coe e =>
@@ -30,11 +30,13 @@ private theorem lt_of_add_one_le_natCast {a : WithBot ℕ∞} {n : ℕ} (h : a +
       have h'' : m + 1 ≤ n := by exact_mod_cast h'
       exact_mod_cast (show m < n by omega)
 
-private theorem special_dim_add_one_le {O : Type u} [CommRing O] [IsDomain O]
-    [IsDiscreteValuationRing O] {ϖ : O} (hϖ : Irreducible ϖ) {K : Type} {ι : K → Type}
-    (P : Ideal (MRing ι O)) [P.IsPrime] (hnt : P.comap (C : O →+* MRing ι O) = ⊥) :
-    ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P) + 1 ≤
-      ringKrullDim (MRing ι O ⧸ P) := by
+private theorem special_dim_add_one_le
+    {O : Type u} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {K : Type} {ι : K → Type} (P : Ideal (MRing ι O)) [P.IsPrime]
+    (hnt : P.comap (C : O →+* MRing ι O) = ⊥)
+    : ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P) + 1
+      ≤ ringKrullDim (MRing ι O ⧸ P) := by
   set φ : MRing ι O →+* MRing ι (IsLocalRing.ResidueField O) :=
     MvPolynomial.map (IsLocalRing.residue O) with hφdef
   have hφ : Function.Surjective φ := MvPolynomial.map_surjective _ Ideal.Quotient.mk_surjective
@@ -48,8 +50,9 @@ private theorem special_dim_add_one_le {O : Type u} [CommRing O] [IsDomain O]
   have hkg : RingHom.ker g = P ⊔ Ideal.span {(C ϖ : MRing ι O)} := by
     rw [hgdef, ← RingHom.comap_ker, Ideal.mk_ker, specialIdeal, ← hφdef,
       Ideal.comap_map_of_surjective _ hφ, ← RingHom.ker_eq_comap_bot, hker]
-  have e1 : MRing ι O ⧸ (P ⊔ Ideal.span {(C ϖ : MRing ι O)}) ≃+*
-      MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P :=
+  have e1
+      : MRing ι O ⧸ (P ⊔ Ideal.span {(C ϖ : MRing ι O)})
+        ≃+* MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P :=
     (Ideal.quotEquivOfEq hkg.symm).trans (RingHom.quotientKerEquivOfSurjective hg)
 
   set r : MRing ι O ⧸ P := Ideal.Quotient.mk P (C ϖ) with hrdef
@@ -68,10 +71,11 @@ private theorem special_dim_add_one_le {O : Type u} [CommRing O] [IsDomain O]
   have hle := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hr
   rwa [ringKrullDim_eq_of_ringEquiv e2, ringKrullDim_eq_of_ringEquiv e1] at hle
 
-theorem ConservationOfNumberLE.proof (h1 : IntNumAssoc.Statement.{u})
-    (h2 : SpecialCycleEval.Statement.{u}) (h3 : SpecialPieceRank.Statement.{u})
-    (h4 : GenericPieceRank.Statement.{u}) (h5 : SpecialIdealMultiHomog.Statement.{u}) :
-    ConservationOfNumberLE.Statement.{u} := by
+theorem ConservationOfNumberLE.proof
+    (h1 : IntNumAssoc.Statement.{u}) (h2 : SpecialCycleEval.Statement.{u})
+    (h3 : SpecialPieceRank.Statement.{u}) (h4 : GenericPieceRank.Statement.{u})
+    (h5 : SpecialIdealMultiHomog.Statement.{u})
+    : ConservationOfNumberLE.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ P d hP hnt hdim a
 
   have hPprime : P.IsPrime := hP.isPrime
@@ -80,8 +84,7 @@ theorem ConservationOfNumberLE.proof (h1 : IntNumAssoc.Statement.{u})
     have hmem : ϖ ∈ P.comap (C : O →+* MRing ι O) := h
     rw [hnt, Ideal.mem_bot] at hmem
     exact hϖ.ne_zero hmem
-  have htors : ∀ x, C ϖ * x ∈ P → x ∈ P := fun x hx =>
-    (hPprime.mem_or_mem hx).resolve_left hϖP
+  have htors : ∀ x, C ϖ * x ∈ P → x ∈ P := fun x hx => (hPprime.mem_or_mem hx).resolve_left hϖP
   have hhom : IsMultiHomogIdeal P := hP.multiHomog
 
   have hhilb : hilbFn (genFib P) = hilbFn (specialIdeal P) := by
@@ -94,8 +97,9 @@ theorem ConservationOfNumberLE.proof (h1 : IntNumAssoc.Statement.{u})
     unfold gNum intNum
     rw [hhilb]
 
-  have hsp : ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P) <
-      ((d + 1 + Fintype.card K : ℕ) : WithBot ℕ∞) :=
+  have hsp
+      : ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P)
+        < ((d + 1 + Fintype.card K : ℕ) : WithBot ℕ∞) :=
     lt_of_add_one_le_natCast ((special_dim_add_one_le hϖ P hnt).trans hdim)
   rw [hg, h1 (IsLocalRing.ResidueField O) K ι d (specialIdeal P) (h5 O K ι P hhom) hsp a]
   exact h2 O ϖ hϖ K ι P (fun V => intNum (IsLocalRing.ResidueField O) V a)

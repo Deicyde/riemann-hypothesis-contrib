@@ -13,8 +13,8 @@ namespace RestTerms
 
 open MvPolynomial
 
-theorem FlagAltCoeffInjective.proof (h1 : FlagCoeffBlockPermute.Statement) :
-    FlagAltCoeffInjective.Statement := by
+theorem FlagAltCoeffInjective.proof (h1 : FlagCoeffBlockPermute.Statement)
+    : FlagAltCoeffInjective.Statement := by
   classical
   intro f N P α hP hc τ i j hij
   simp only at hij

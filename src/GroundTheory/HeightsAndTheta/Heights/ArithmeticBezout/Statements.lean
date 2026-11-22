@@ -24,11 +24,14 @@ def IsMultiHomog (δ : ℕ) (f : MvPolynomial (Fin k × Fin n) R) : Prop :=
 def linForm (u : Fin n → R) : MvPolynomial (Fin n) R := ∑ j, C (u j) * X j
 
 def specFirstVar (u : Fin n → R) (ij : Fin (k + 1) × Fin n) : MvPolynomial (Fin k × Fin n) R :=
-  Fin.cases (motive := fun _ => MvPolynomial (Fin k × Fin n) R) (C (u ij.2))
-    (fun i => X (i, ij.2)) ij.1
+  Fin.cases
+    (motive := fun _ => MvPolynomial (Fin k × Fin n) R)
+    (C (u ij.2))
+    (fun i => X (i, ij.2))
+    ij.1
 
-def specFirst (f : MvPolynomial (Fin (k + 1) × Fin n) R) (u : Fin n → R) :
-    MvPolynomial (Fin k × Fin n) R :=
+def specFirst (f : MvPolynomial (Fin (k + 1) × Fin n) R) (u : Fin n → R)
+    : MvPolynomial (Fin k × Fin n) R :=
   bind₁ (specFirstVar u) f
 
 end Forms
@@ -40,8 +43,7 @@ variable {R : Type*} [CommRing R] {n : ℕ}
 def IsHomogIdeal (I : Ideal (MvPolynomial (Fin n) R)) : Prop :=
   ∀ f ∈ I, ∀ d, homogeneousComponent d f ∈ I
 
-def IsRelevant (I : Ideal (MvPolynomial (Fin n) R)) : Prop :=
-  ∃ j, X j ∉ I
+def IsRelevant (I : Ideal (MvPolynomial (Fin n) R)) : Prop := ∃ j, X j ∉ I
 
 structure IsProjPrime (I : Ideal (MvPolynomial (Fin n) R)) : Prop where
   isPrime : I.IsPrime
@@ -50,34 +52,32 @@ structure IsProjPrime (I : Ideal (MvPolynomial (Fin n) R)) : Prop where
 
 abbrev ProjCycle (R : Type*) [CommRing R] (n : ℕ) := Ideal (MvPolynomial (Fin n) R) →₀ ℕ
 
-
 open Classical in
-def localMult {A : Type*} [CommRing A] (J W : Ideal A) : ℕ :=
-  by
-    classical
-    exact if h : W.IsPrime then
+def localMult {A : Type*} [CommRing A] (J W : Ideal A) : ℕ := by
+  classical
+  exact
+    if h : W.IsPrime then
       haveI := h
       (Module.length (Localization.AtPrime W)
         (Localization.AtPrime W ⧸ J.map (algebraMap A (Localization.AtPrime W)))).toNat
-    else 0
+    else
+      0
 
 def relComps (J : Ideal (MvPolynomial (Fin n) R)) : Set (Ideal (MvPolynomial (Fin n) R)) :=
   {W | W ∈ J.minimalPrimes ∧ IsRelevant W}
 
-
 open Classical in
-def fundCycle [IsNoetherianRing R] (J : Ideal (MvPolynomial (Fin n) R)) : ProjCycle R n :=
-  by
-    classical
-    exact Finsupp.onFinset (J.finite_minimalPrimes_of_isNoetherianRing _).toFinset
-      (fun W => if W ∈ relComps J then localMult J W else 0)
-      (fun W hW => by
-        rw [Set.Finite.mem_toFinset]
-        by_contra h
-        exact hW (if_neg fun h' => h h'.1))
+def fundCycle [IsNoetherianRing R] (J : Ideal (MvPolynomial (Fin n) R)) : ProjCycle R n := by
+  classical
+  exact Finsupp.onFinset (J.finite_minimalPrimes_of_isNoetherianRing _).toFinset
+    (fun W => if W ∈ relComps J then localMult J W else 0)
+    (fun W hW => by
+      rw [Set.Finite.mem_toFinset]
+      by_contra h
+      exact hW (if_neg fun h' => h h'.1))
 
-def divCycle [IsNoetherianRing R] (I : Ideal (MvPolynomial (Fin n) R)) (u : Fin n → R) :
-    ProjCycle R n :=
+def divCycle [IsNoetherianRing R] (I : Ideal (MvPolynomial (Fin n) R)) (u : Fin n → R)
+    : ProjCycle R n :=
   fundCycle (I ⊔ Ideal.span {linForm u})
 
 end Proj
@@ -86,22 +86,23 @@ section ChowForm
 
 variable {F : Type*} [Field F] {n : ℕ}
 
-def incidence (I : Ideal (MvPolynomial (Fin n) F)) (k : ℕ) :
-    Set (Fin k × Fin n → AlgebraicClosure F) :=
+def incidence (I : Ideal (MvPolynomial (Fin n) F)) (k : ℕ)
+    : Set (Fin k × Fin n → AlgebraicClosure F) :=
   {u | ∃ x : Fin n → AlgebraicClosure F, x ≠ 0 ∧ (∀ g ∈ I, aeval x g = 0) ∧
     ∀ i, ∑ j, u (i, j) * x j = 0}
 
-def IsChowForm (I : Ideal (MvPolynomial (Fin n) F)) (k : ℕ)
-    (f : MvPolynomial (Fin k × Fin n) F) : Prop :=
-  f ≠ 0 ∧ ∀ g : MvPolynomial (Fin k × Fin n) F,
-    (∀ u ∈ incidence I k, aeval u g = 0) ↔ f ∣ g
+def IsChowForm (I : Ideal (MvPolynomial (Fin n) F)) (k : ℕ) (f : MvPolynomial (Fin k × Fin n) F)
+    : Prop :=
+  f ≠ 0 ∧ ∀ g : MvPolynomial (Fin k × Fin n) F, (∀ u ∈ incidence I k, aeval u g = 0) ↔ f ∣ g
 
 def chowDegree (I : Ideal (MvPolynomial (Fin n) F)) (k : ℕ) : ℕ :=
   sInf {δ | ∃ f, IsChowForm I k f ∧ IsMultiHomog δ f}
 
 def IsChowFormCycle (Z : ProjCycle F n) (k : ℕ) (f : MvPolynomial (Fin k × Fin n) F) : Prop :=
-  ∃ c : F, c ≠ 0 ∧ ∃ g : Ideal (MvPolynomial (Fin n) F) → MvPolynomial (Fin k × Fin n) F,
-    (∀ W ∈ Z.support, IsChowForm W k (g W)) ∧ f = C c * ∏ W ∈ Z.support, g W ^ Z W
+  ∃ c : F,
+    c ≠ 0
+      ∧ ∃ g : Ideal (MvPolynomial (Fin n) F) → MvPolynomial (Fin k × Fin n) F,
+        (∀ W ∈ Z.support, IsChowForm W k (g W)) ∧ f = C c * ∏ W ∈ Z.support, g W ^ Z W
 
 end ChowForm
 
@@ -109,26 +110,32 @@ section Finite
 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
-def gaussNorm (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) {ι : Type*}
-    (f : MvPolynomial ι K) : ℝ :=
-  let s : NNReal := f.support.sup fun m =>
-    ⟨NumberField.HeightOneSpectrum.adicAbv K v (f.coeff m), AbsoluteValue.nonneg _ _⟩
+def gaussNorm (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) {ι : Type*} (f : MvPolynomial ι K)
+    : ℝ :=
+  let s : NNReal :=
+    f.support.sup fun m =>
+      ⟨NumberField.HeightOneSpectrum.adicAbv K v (f.coeff m), AbsoluteValue.nonneg _ _⟩
   (s : ℝ)
 
 def integralModel (I : Ideal (MvPolynomial (Fin n) K)) : Ideal (MvPolynomial (Fin n) (𝓞 K)) :=
   I.comap (MvPolynomial.map (algebraMap (𝓞 K) K))
 
-def vertComps (I : Ideal (MvPolynomial (Fin n) K)) (u : Fin n → 𝓞 K)
-    (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) : Set (Ideal (MvPolynomial (Fin n) (𝓞 K))) :=
+def vertComps
+    (I : Ideal (MvPolynomial (Fin n) K)) (u : Fin n → 𝓞 K)
+    (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : Set (Ideal (MvPolynomial (Fin n) (𝓞 K))) :=
   {W | W ∈ relComps (integralModel I ⊔ Ideal.span {linForm u}) ∧
     W.comap (C : 𝓞 K →+* MvPolynomial (Fin n) (𝓞 K)) = v.asIdeal}
 
-def reduceMod (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) (W : Ideal (MvPolynomial (Fin n) (𝓞 K))) :
-    Ideal (MvPolynomial (Fin n) v.asIdeal.ResidueField) :=
+def reduceMod
+    (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) (W : Ideal (MvPolynomial (Fin n) (𝓞 K)))
+    : Ideal (MvPolynomial (Fin n) v.asIdeal.ResidueField) :=
   W.map (MvPolynomial.map (algebraMap (𝓞 K) v.asIdeal.ResidueField))
 
-def vertTermAt (I : Ideal (MvPolynomial (Fin n) K)) (k : ℕ) (u : Fin n → 𝓞 K)
-    (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K)) : ℝ :=
+def vertTermAt
+    (I : Ideal (MvPolynomial (Fin n) K)) (k : ℕ) (u : Fin n → 𝓞 K)
+    (v : IsDedekindDomain.HeightOneSpectrum (𝓞 K))
+    : ℝ :=
   ∑ᶠ W ∈ vertComps I u v,
     (localMult (integralModel I ⊔ Ideal.span {linForm u}) W : ℝ) *
       chowDegree (reduceMod v W) k * Real.log (Ideal.absNorm v.asIdeal)
@@ -145,23 +152,18 @@ open Matrix
 variable {n : ℕ}
 
 structure HermNorm (n : ℕ) where
-
   mat : Matrix (Fin n) (Fin n) ℂ
-
   isUnit_det : IsUnit mat.det
 
 namespace HermNorm
 
 def std (n : ℕ) : HermNorm n := ⟨1, by simp⟩
 
-def norm (h : HermNorm n) (u : Fin n → ℂ) : ℝ :=
-  √(∑ i, ‖(h.mat *ᵥ u) i‖ ^ 2)
+def norm (h : HermNorm n) (u : Fin n → ℂ) : ℝ := √(∑ i, ‖(h.mat *ᵥ u) i‖ ^ 2)
 
-def dualNorm (h : HermNorm n) (y : Fin n → ℂ) : ℝ :=
-  √(∑ i, ‖((h.matᵀ)⁻¹ *ᵥ y) i‖ ^ 2)
+def dualNorm (h : HermNorm n) (y : Fin n → ℂ) : ℝ := √(∑ i, ‖((h.matᵀ)⁻¹ *ᵥ y) i‖ ^ 2)
 
-def pointOf (h : HermNorm n) (y : EuclideanSpace ℂ (Fin n)) : Fin n → ℂ :=
-  h.matᵀ *ᵥ fun i => y i
+def pointOf (h : HermNorm n) (y : EuclideanSpace ℂ (Fin n)) : Fin n → ℂ := h.matᵀ *ᵥ fun i => y i
 
 end HermNorm
 
@@ -175,11 +177,11 @@ def mahler (h : HermNorm n) (k : ℕ) (f : MvPolynomial (Fin k × Fin n) ℂ) : 
 def fsLog (h : HermNorm n) (u : Fin n → ℂ) (y : Fin n → ℂ) : ℝ :=
   Real.log (‖∑ j, u j * y j‖ / h.dualNorm y)
 
-def coneIntegral (h : HermNorm n) (J : Ideal (MvPolynomial (Fin n) ℂ)) (e : ℕ)
-    (g : (Fin n → ℂ) → ℝ) : ℝ :=
+def coneIntegral (h : HermNorm n) (J : Ideal (MvPolynomial (Fin n) ℂ)) (e : ℕ) (g : (Fin n → ℂ) → ℝ)
+    : ℝ :=
   (∫ y in {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ q ∈ J, eval (h.pointOf y) q = 0},
-      g (h.pointOf y) ∂(Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ))) /
-    (Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)
+      g (h.pointOf y) ∂(Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)))
+    / (Measure.hausdorffMeasure ((2 * (e + 1) : ℕ) : ℝ)
       {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, e + 1 ≤ (j : ℕ) → y j = 0}).toReal
 
 def cycleIntegral (h : HermNorm n) (Z : ProjCycle ℂ n) (e : ℕ) (g : (Fin n → ℂ) → ℝ) : ℝ :=
@@ -190,9 +192,7 @@ end Arch
 section Height
 
 structure ArchData (K : Type*) [Field K] [NumberField K] (n : ℕ) where
-
   normAt : (K →+* ℂ) → HermNorm n
-
   conj_norm : ∀ σ u, (normAt (ComplexEmbedding.conjugate σ)).norm (star u) = (normAt σ).norm u
 
 def ArchData.std (K : Type*) [Field K] [NumberField K] (n : ℕ) : ArchData K n where
@@ -202,70 +202,72 @@ def ArchData.std (K : Type*) [Field K] [NumberField K] (n : ℕ) : ArchData K n 
 variable {K : Type*} [Field K] [NumberField K] {n : ℕ}
 
 def chowHt (H : ArchData K n) (k δ : ℕ) (f : MvPolynomial (Fin k × Fin n) K) : ℝ :=
-  (1 / Module.finrank ℚ K : ℝ) *
-    ((∑ᶠ v : IsDedekindDomain.HeightOneSpectrum (𝓞 K), Real.log (gaussNorm v f)) +
-      ∑ σ : K →+* ℂ, (mahler (H.normAt σ) k (f.map σ) + k * δ * (harmonic (n - 1) : ℝ) / 2))
+  (1 / Module.finrank ℚ K : ℝ)
+    * ((∑ᶠ v : IsDedekindDomain.HeightOneSpectrum (𝓞 K), Real.log (gaussNorm v f))
+      + ∑ σ : K →+* ℂ, (mahler (H.normAt σ) k (f.map σ) + k * δ * (harmonic (n - 1) : ℝ) / 2))
 
 end Height
 
 def SphereMeanLinear.Statement : Prop :=
-  ∀ (n : ℕ) (p : Fin n → ℂ), ∑ j, ‖p j‖ ^ 2 = 1 →
-    sphereMean (HermNorm.std n) 1 (fun z => Real.log ‖∑ j, z (0, j) * star (p j)‖) =
-      -(harmonic (n - 1) : ℝ) / 2
+  ∀ (n : ℕ) (p : Fin n → ℂ),
+    ∑ j, ‖p j‖ ^ 2 = 1
+      → sphereMean (HermNorm.std n) 1 (fun z => Real.log ‖∑ j, z (0, j) * star (p j)‖)
+        = -(harmonic (n - 1) : ℝ) / 2
 
 def ChowFormSection.Statement : Prop :=
   ∀ (F : Type) [Field F] [CharZero F] (n e : ℕ) (I : Ideal (MvPolynomial (Fin n) F))
-    (f : MvPolynomial (Fin (e + 1) × Fin n) F) (u : Fin n → F),
-    IsProjPrime I → IsChowForm I (e + 1) f → linForm u ∉ I →
-      IsChowFormCycle (divCycle I u) e (specFirst f u)
+      (f : MvPolynomial (Fin (e + 1) × Fin n) F) (u : Fin n → F),
+    IsProjPrime I → IsChowForm I (e + 1) f → linForm u ∉ I
+      → IsChowFormCycle (divCycle I u) e (specFirst f u)
 
 def ChowFormSectionVertical.Statement : Prop :=
   ∀ (K : Type) [Field K] [NumberField K] (n e : ℕ) (I : Ideal (MvPolynomial (Fin n) K))
-    (f : MvPolynomial (Fin (e + 1) × Fin n) K) (u : Fin n → 𝓞 K),
-    IsProjPrime I → IsChowForm I (e + 1) f → linForm (fun j => (u j : K)) ∉ I →
-      ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 K),
-        Real.log (gaussNorm v f) - Real.log (gaussNorm v (specFirst f fun j => (u j : K))) =
-          vertTermAt I (e + 1) u v
+      (f : MvPolynomial (Fin (e + 1) × Fin n) K) (u : Fin n → 𝓞 K),
+    IsProjPrime I → IsChowForm I (e + 1) f → linForm (fun j => (u j : K)) ∉ I
+      → ∀ v : IsDedekindDomain.HeightOneSpectrum (𝓞 K),
+        Real.log (gaussNorm v f) - Real.log (gaussNorm v (specFirst f fun j => (u j : K)))
+          = vertTermAt I (e + 1) u v
 
 def ChowFormSwap.Statement : Prop :=
   ∀ (F : Type) [Field F] (n k : ℕ) (I : Ideal (MvPolynomial (Fin n) F))
-    (f : MvPolynomial (Fin k × Fin n) F), IsChowForm I k f →
-      ∀ τ : Equiv.Perm (Fin k), ∃ c : F, c ^ 2 = 1 ∧ rename (Prod.map τ id) f = C c * f
+      (f : MvPolynomial (Fin k × Fin n) F),
+    IsChowForm I k f
+      → ∀ τ : Equiv.Perm (Fin k), ∃ c : F, c ^ 2 = 1 ∧ rename (Prod.map τ id) f = C c * f
 
 def MahlerSection.Statement : Prop :=
   ∀ (n e δ : ℕ) (h : HermNorm n) (Z : ProjCycle ℂ n) (f : MvPolynomial (Fin (e + 1) × Fin n) ℂ)
-    (u : Fin n → ℂ),
-    (∀ W ∈ Z.support, IsProjPrime W) → IsChowFormCycle Z (e + 1) f → IsMultiHomog δ f →
-    (∀ W ∈ Z.support, linForm u ∉ W) →
-      mahler h e (specFirst f u) =
-        mahler h (e + 1) f + δ * (harmonic (n - 1) : ℝ) / 2 + cycleIntegral h Z e (fsLog h u)
+      (u : Fin n → ℂ),
+    (∀ W ∈ Z.support, IsProjPrime W) → IsChowFormCycle Z (e + 1) f → IsMultiHomog δ f
+      → (∀ W ∈ Z.support, linForm u ∉ W)
+      → mahler h e (specFirst f u)
+        = mahler h (e + 1) f + δ * (harmonic (n - 1) : ℝ) / 2 + cycleIntegral h Z e (fsLog h u)
 
 def MahlerMul.Statement : Prop :=
-  ∀ (n k : ℕ) (h : HermNorm n) (f g : MvPolynomial (Fin k × Fin n) ℂ), f ≠ 0 → g ≠ 0 →
-    mahler h k (f * g) = mahler h k f + mahler h k g
+  ∀ (n k : ℕ) (h : HermNorm n) (f g : MvPolynomial (Fin k × Fin n) ℂ),
+    f ≠ 0 → g ≠ 0 → mahler h k (f * g) = mahler h k f + mahler h k g
 
 def ChowHeightMul.Statement : Prop :=
   ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (H : ArchData K n) (k δ₁ δ₂ : ℕ)
-    (f₁ f₂ : MvPolynomial (Fin k × Fin n) K), f₁ ≠ 0 → f₂ ≠ 0 →
-      chowHt H k (δ₁ + δ₂) (f₁ * f₂) = chowHt H k δ₁ f₁ + chowHt H k δ₂ f₂
+      (f₁ f₂ : MvPolynomial (Fin k × Fin n) K),
+    f₁ ≠ 0 → f₂ ≠ 0 → chowHt H k (δ₁ + δ₂) (f₁ * f₂) = chowHt H k δ₁ f₁ + chowHt H k δ₂ f₂
 
 def ChowHeightRecursion.Statement : Prop :=
   ∀ (K : Type) [Field K] [NumberField K] (n e δ : ℕ) (H : ArchData K n)
-    (I : Ideal (MvPolynomial (Fin n) K)) (f : MvPolynomial (Fin (e + 1) × Fin n) K)
-    (u : Fin n → 𝓞 K),
-    IsProjPrime I → IsChowForm I (e + 1) f → IsMultiHomog δ f →
-    linForm (fun j => (u j : K)) ∉ I →
-      chowHt H (e + 1) δ f =
-        chowHt H e δ (specFirst f fun j => (u j : K)) +
-          (1 / Module.finrank ℚ K : ℝ) *
-            (vertTerm I (e + 1) u -
-              ∑ σ : K →+* ℂ, cycleIntegral (H.normAt σ) (fundCycle (I.map (MvPolynomial.map σ))) e
-                (fsLog (H.normAt σ) fun j => σ (u j)))
+      (I : Ideal (MvPolynomial (Fin n) K)) (f : MvPolynomial (Fin (e + 1) × Fin n) K)
+      (u : Fin n → 𝓞 K),
+    IsProjPrime I → IsChowForm I (e + 1) f → IsMultiHomog δ f → linForm (fun j => (u j : K)) ∉ I
+      → chowHt H (e + 1) δ f
+        = chowHt H e δ (specFirst f fun j => (u j : K))
+          + (1 / Module.finrank ℚ K : ℝ)
+            * (vertTerm I (e + 1) u
+              - ∑ σ : K →+* ℂ, cycleIntegral (H.normAt σ) (fundCycle (I.map (MvPolynomial.map σ))) e
+                  (fsLog (H.normAt σ) fun j => σ (u j)))
 
 section Inhabitants
 
-theorem X_dvd_iff_constantCoeff_eq_zero {R : Type*} [CommRing R]
-    (f : MvPolynomial (Fin 1 × Fin 1) R) : X (0, 0) ∣ f ↔ constantCoeff f = 0 := by
+theorem X_dvd_iff_constantCoeff_eq_zero
+    {R : Type*} [CommRing R] (f : MvPolynomial (Fin 1 × Fin 1) R)
+    : X (0, 0) ∣ f ↔ constantCoeff f = 0 := by
   rw [X_dvd_iff_modMonomial_eq_zero]
   constructor
   · intro h
@@ -286,8 +288,8 @@ theorem X_dvd_iff_constantCoeff_eq_zero {R : Type*} [CommRing R]
       rw [hs0]
       simpa [constantCoeff_eq] using h
 
-theorem mem_incidence_point {F : Type*} [Field F] (u : Fin 1 × Fin 1 → AlgebraicClosure F) :
-    u ∈ incidence (⊥ : Ideal (MvPolynomial (Fin 1) F)) 1 ↔ u = 0 := by
+theorem mem_incidence_point {F : Type*} [Field F] (u : Fin 1 × Fin 1 → AlgebraicClosure F)
+    : u ∈ incidence (⊥ : Ideal (MvPolynomial (Fin 1) F)) 1 ↔ u = 0 := by
   constructor
   · rintro ⟨x, hx, -, hu⟩
     have hx0 : x 0 ≠ 0 := fun h => hx (funext fun j => by rw [Fin.fin_one_eq_zero j]; exact h)
@@ -303,16 +305,16 @@ theorem mem_incidence_point {F : Type*} [Field F] (u : Fin 1 × Fin 1 → Algebr
       simp [hg]
     · simp
 
-theorem isProjPrime_point (F : Type*) [Field F] :
-    IsProjPrime (⊥ : Ideal (MvPolynomial (Fin 1) F)) := by
+theorem isProjPrime_point (F : Type*) [Field F]
+    : IsProjPrime (⊥ : Ideal (MvPolynomial (Fin 1) F)) := by
   refine ⟨Ideal.isPrime_bot, ?_, ?_⟩
   · intro f hf d
     rw [Ideal.mem_bot] at hf ⊢
     simp [hf]
   · exact ⟨0, by rw [Ideal.mem_bot]; exact X_ne_zero 0⟩
 
-theorem isChowForm_point (F : Type*) [Field F] :
-    IsChowForm (⊥ : Ideal (MvPolynomial (Fin 1) F)) 1 (X (0, 0)) := by
+theorem isChowForm_point (F : Type*) [Field F]
+    : IsChowForm (⊥ : Ideal (MvPolynomial (Fin 1) F)) 1 (X (0, 0)) := by
   refine ⟨X_ne_zero _, fun g => ?_⟩
   rw [X_dvd_iff_constantCoeff_eq_zero]
   simp only [mem_incidence_point, forall_eq, aeval_zero]

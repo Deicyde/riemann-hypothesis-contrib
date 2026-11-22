@@ -10,27 +10,32 @@ open MeasureTheory Metric Set Filter Topology Complex
 open scoped ENNReal
 
 theorem finrank_real_V {n : ℕ} : Module.finrank ℝ (V n) = 2 * n := by
-  rw [← Module.finrank_mul_finrank ℝ ℂ (V n), Complex.finrank_real_complex, finrank_euclideanSpace_fin]
+  rw [← Module.finrank_mul_finrank ℝ ℂ (V n), Complex.finrank_real_complex,
+    finrank_euclideanSpace_fin]
 
 theorem mvPow : MVPowStatement := by
   intro n s hn
   haveI : Nontrivial (V n) :=
     Module.nontrivial_of_finrank_pos (R := ℝ) (by rw [finrank_real_V]; omega)
-  have hind : (ball (0 : V n) 1).indicator (fun z : V n => ‖z‖ ^ (-2 * s)) =
-      fun z => (Iio (1 : ℝ)).indicator (fun y : ℝ => y ^ (-2 * s)) ‖z‖ := by
+  have hind
+      : (ball (0 : V n) 1).indicator (fun z : V n => ‖z‖ ^ (-2 * s))
+        = fun z => (Iio (1 : ℝ)).indicator (fun y : ℝ => y ^ (-2 * s)) ‖z‖ := by
     funext z
     by_cases h : ‖z‖ < 1 <;> simp [Set.indicator, mem_ball_zero_iff, h]
   rw [← integrable_indicator_iff measurableSet_ball, hind, integrable_fun_norm_addHaar,
     finrank_real_V]
-  have hfun : (fun y : ℝ => y ^ (2 * n - 1) • (Iio (1 : ℝ)).indicator (fun y : ℝ => y ^ (-2 * s)) y) =
-      (Iio (1 : ℝ)).indicator (fun y : ℝ => y ^ (2 * n - 1) * y ^ (-2 * s)) := by
+  have hfun
+      : (fun y : ℝ => y ^ (2 * n - 1) • (Iio (1 : ℝ)).indicator (fun y : ℝ => y ^ (-2 * s)) y)
+        = (Iio (1 : ℝ)).indicator (fun y : ℝ => y ^ (2 * n - 1) * y ^ (-2 * s)) := by
     funext y
     simp only [indicator_apply, smul_eq_mul]
     split_ifs <;> simp
   rw [hfun, IntegrableOn, integrable_indicator_iff measurableSet_Iio, IntegrableOn,
     Measure.restrict_restrict measurableSet_Iio, Set.inter_comm, Set.Ioi_inter_Iio, ← IntegrableOn]
-  have hcongr : EqOn (fun y : ℝ => y ^ (2 * n - 1) * y ^ (-2 * s))
-      (fun y : ℝ => y ^ ((2 * n : ℝ) - 1 - 2 * s)) (Ioo 0 1) := by
+  have hcongr : EqOn
+      (fun y : ℝ => y ^ (2 * n - 1) * y ^ (-2 * s))
+      (fun y : ℝ => y ^ ((2 * n : ℝ) - 1 - 2 * s))
+      (Ioo 0 1) := by
     intro y hy
     have hy0 : 0 < y := hy.1
     simp only
@@ -50,7 +55,8 @@ theorem mvDiv : MVDivStatement := by
   set f : ℕ → V n → ℝ≥0∞ := fun k z => ENNReal.ofReal ((‖z‖ ^ 2 + 1 / ((k : ℝ) + 1)) ^ (-(n : ℝ)))
     with hf
   have hmeas : ∀ k, Measurable (f k) := fun k =>
-    (by fun_prop : Measurable fun z : V n => ENNReal.ofReal ((‖z‖ ^ 2 + 1 / ((k : ℝ) + 1)) ^ (-(n : ℝ))))
+    (by fun_prop
+      : Measurable fun z : V n => ENNReal.ofReal ((‖z‖ ^ 2 + 1 / ((k : ℝ) + 1)) ^ (-(n : ℝ))))
   have hmono : Monotone f := by
     intro k m hkm z
     show ENNReal.ofReal _ ≤ ENNReal.ofReal _
@@ -63,8 +69,10 @@ theorem mvDiv : MVDivStatement := by
     by_contra h
     have hlt := lt_top_iff_ne_top.mpr h
     have hint : IntegrableOn (fun z : V n => ‖z‖ ^ (-2 * (n : ℝ))) (ball 0 1) := by
-      refine ⟨(measurable_norm.pow_const _).aestronglyMeasurable,
-        (hasFiniteIntegral_iff_ofReal ?_).mpr hlt⟩
+      refine ⟨
+        (measurable_norm.pow_const _).aestronglyMeasurable,
+        (hasFiniteIntegral_iff_ofReal ?_).mpr hlt
+      ⟩
       exact ae_of_all _ fun z => Real.rpow_nonneg (norm_nonneg z) _
     exact lt_irrefl _ (hpow.mp hint)
   have hsup : ∀ z : V n, ENNReal.ofReal (‖z‖ ^ (-2 * (n : ℝ))) ≤ ⨆ k, f k z := by

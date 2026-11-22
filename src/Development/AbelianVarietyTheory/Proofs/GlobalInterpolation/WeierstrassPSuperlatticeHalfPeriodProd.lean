@@ -14,7 +14,9 @@ namespace GlobalTheory.HalfPeriodProduct
 
 open Formalism.L2.Th1.F
 
-def ind (L : PeriodPair) (x : ℂ) : ℤ := by classical exact if x ∈ L.lattice then 1 else 0
+def ind (L : PeriodPair) (x : ℂ) : ℤ := by
+  classical
+  exact if x ∈ L.lattice then 1 else 0
 
 lemma ind_neg (L : PeriodPair) (x : ℂ) : ind L (-x) = ind L x := by
   have : -x ∈ L.lattice ↔ x ∈ L.lattice := neg_mem_iff
@@ -121,47 +123,71 @@ lemma tendsto_sq_mul (M : PeriodPair) (c : ℂ) :
   field_simp
   ring
 
-theorem wp_half_period_prod (L L' : PeriodPair) (T : Finset ℂ) (w : ℂ) (hLL : L.lattice ≤ L'.lattice)
-    (hT1 : ∀ t ∈ T, t ∈ L'.lattice ∧ t ∉ L.lattice)
+theorem wp_half_period_prod
+    (L L' : PeriodPair)
+    (T : Finset ℂ) (w : ℂ)
+    (hLL : L.lattice ≤ L'.lattice) (hT1 : ∀ t ∈ T, t ∈ L'.lattice ∧ t ∉ L.lattice)
     (hT2 : ∀ t ∈ T, ∀ t' ∈ T, t - t' ∈ L.lattice → t = t')
-    (hT3 : ∀ x ∈ L'.lattice, x ∈ L.lattice ∨ ∃ t ∈ T, x - t ∈ L.lattice)
-    (hw2 : 2 * w ∈ L.lattice) (hw : w ∉ L'.lattice) (z : ℂ) (hz : z ∉ L'.lattice) :
-    (L'.weierstrassP z - L'.weierstrassP w) * ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP t) =
-      (L.weierstrassP z - L.weierstrassP w) * ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP (w + t)) := by
+    (hT3 : ∀ x ∈ L'.lattice, x ∈ L.lattice ∨ ∃ t ∈ T, x - t ∈ L.lattice) (hw2 : 2 * w ∈ L.lattice)
+    (hw : w ∉ L'.lattice)
+    (z : ℂ) (hz : z ∉ L'.lattice)
+    : (L'.weierstrassP z - L'.weierstrassP w) * ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP t)
+      = (L.weierstrassP z - L.weierstrassP w)
+        * ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP (w + t)) := by
   classical
   have hwL : w ∉ L.lattice := fun h => hw (hLL h)
   have htL : ∀ t ∈ T, t ∉ L.lattice := fun t ht => (hT1 t ht).2
-  have hwt : ∀ t ∈ T, w + t ∉ L.lattice := fun t ht h => hw (by
-    simpa using L'.lattice.sub_mem (hLL h) (hT1 t ht).1)
+  have hwt : ∀ t ∈ T, w + t ∉ L.lattice := fun t ht h =>
+    hw (by simpa using L'.lattice.sub_mem (hLL h) (hT1 t ht).1)
   set A : ℂ → ℂ := fun z => (L'.weierstrassP z - L'.weierstrassP w) *
     ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP t) with hA
   set B : ℂ → ℂ := fun z => (L.weierstrassP z - L.weierstrassP w) *
     ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP (w + t)) with hB
 
-  have mprod : ∀ (f : ℂ → ℂ → ℂ) z₀, (∀ t ∈ T, MeromorphicAt (f t) z₀) →
-      MeromorphicAt (fun z => ∏ t ∈ T, f t z) z₀ := fun f z₀ h => by
+  have mprod
+      : ∀ (f : ℂ → ℂ → ℂ) z₀,
+        (∀ t ∈ T, MeromorphicAt (f t) z₀)
+          → MeromorphicAt (fun z => ∏ t ∈ T, f t z) z₀ := fun f z₀ h => by
     have := MeromorphicAt.prod (s := T) h
     rwa [Finset.prod_fn] at this
   have mA : ∀ z₀, MeromorphicAt A z₀ := fun z₀ =>
     (order_sub L' hw z₀).1.mul (mprod _ z₀ fun t ht => (order_sub L (htL t ht) z₀).1)
   have mB : ∀ z₀, MeromorphicAt B z₀ := fun z₀ =>
     (order_sub L hwL z₀).1.mul (mprod _ z₀ fun t ht => (order_sub L (hwt t ht) z₀).1)
-  have oA : ∀ z₀, meromorphicOrderAt A z₀ = ((ind L' (z₀ + w) + ind L' (z₀ + -w) - 2 * ind L' (z₀ + 0)
-      + ∑ t ∈ T, (ind L (z₀ + t) + ind L (z₀ + -t) - 2 * ind L (z₀ + 0)) : ℤ) : WithTop ℤ) := by
+  have oA
+      : ∀ z₀,
+        meromorphicOrderAt A z₀
+          = ((ind L' (z₀ + w) + ind L' (z₀ + -w) - 2 * ind L' (z₀ + 0)
+                + ∑ t ∈ T, (ind L (z₀ + t) + ind L (z₀ + -t) - 2 * ind L (z₀ + 0))
+              : ℤ)
+            : WithTop ℤ) := by
     intro z₀
-    rw [show A = (fun z => L'.weierstrassP z - L'.weierstrassP w) *
-      (fun z => ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP t)) from rfl]
-    rw [meromorphicOrderAt_mul (order_sub L' hw z₀).1 (mprod _ z₀ fun t ht => (order_sub L (htL t ht) z₀).1),
-      meromorphicOrderAt_fun_prod (fun t ht => (order_sub L (htL t ht) z₀).1), (order_sub L' hw z₀).2,
-      Finset.sum_congr rfl (fun t ht => (order_sub L (htL t ht) z₀).2), ← WithTop.coe_sum, ← WithTop.coe_add]
-  have oB : ∀ z₀, meromorphicOrderAt B z₀ = ((ind L (z₀ + w) + ind L (z₀ + -w) - 2 * ind L (z₀ + 0)
-      + ∑ t ∈ T, (ind L (z₀ + (w + t)) + ind L (z₀ + -(w + t)) - 2 * ind L (z₀ + 0)) : ℤ) : WithTop ℤ) := by
+    rw [show A
+        = (fun z => L'.weierstrassP z - L'.weierstrassP w)
+          * (fun z => ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP t)) from
+      rfl]
+    rw [meromorphicOrderAt_mul (order_sub L' hw z₀).1
+        (mprod _ z₀ fun t ht => (order_sub L (htL t ht) z₀).1),
+      meromorphicOrderAt_fun_prod (fun t ht => (order_sub L (htL t ht) z₀).1),
+      (order_sub L' hw z₀).2, Finset.sum_congr rfl (fun t ht => (order_sub L (htL t ht) z₀).2),
+      ← WithTop.coe_sum, ← WithTop.coe_add]
+  have oB
+      : ∀ z₀,
+        meromorphicOrderAt B z₀
+          = ((ind L (z₀ + w) + ind L (z₀ + -w) - 2 * ind L (z₀ + 0)
+                + ∑ t ∈ T, (ind L (z₀ + (w + t)) + ind L (z₀ + -(w + t)) - 2 * ind L (z₀ + 0))
+              : ℤ)
+            : WithTop ℤ) := by
     intro z₀
-    rw [show B = (fun z => L.weierstrassP z - L.weierstrassP w) *
-      (fun z => ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP (w + t))) from rfl]
-    rw [meromorphicOrderAt_mul (order_sub L hwL z₀).1 (mprod _ z₀ fun t ht => (order_sub L (hwt t ht) z₀).1),
-      meromorphicOrderAt_fun_prod (fun t ht => (order_sub L (hwt t ht) z₀).1), (order_sub L hwL z₀).2,
-      Finset.sum_congr rfl (fun t ht => (order_sub L (hwt t ht) z₀).2), ← WithTop.coe_sum, ← WithTop.coe_add]
+    rw [show B
+        = (fun z => L.weierstrassP z - L.weierstrassP w)
+          * (fun z => ∏ t ∈ T, (L.weierstrassP z - L.weierstrassP (w + t))) from
+      rfl]
+    rw [meromorphicOrderAt_mul (order_sub L hwL z₀).1
+        (mprod _ z₀ fun t ht => (order_sub L (hwt t ht) z₀).1),
+      meromorphicOrderAt_fun_prod (fun t ht => (order_sub L (hwt t ht) z₀).1),
+      (order_sub L hwL z₀).2, Finset.sum_congr rfl (fun t ht => (order_sub L (hwt t ht) z₀).2),
+      ← WithTop.coe_sum, ← WithTop.coe_add]
   have cnt := ind_count L L' T hLL hT1 hT2 hT3
   have oAB : ∀ z₀, meromorphicOrderAt A z₀ = meromorphicOrderAt B z₀ := by
     intro z₀
@@ -172,21 +198,29 @@ theorem wp_half_period_prod (L L' : PeriodPair) (T : Finset ℂ) (w : ℂ) (hLL 
       rw [← ind_neg L' (z₀ + -w), cnt (-(z₀ + -w)), ind_neg]
       congr 1
       refine Finset.sum_congr rfl fun t _ => ?_
-      rw [← ind_neg L (z₀ + -w + t)]; congr 1; ring
+      rw [← ind_neg L (z₀ + -w + t)]
+      congr 1
+      ring
     have h3 := cnt (z₀ + 0)
     have h3' : ind L' (z₀ + 0) = ind L (z₀ + 0) + ∑ t ∈ T, ind L (z₀ + t) := by
       rw [← ind_neg L' (z₀ + 0), cnt (-(z₀ + 0)), ind_neg]
       congr 1
       refine Finset.sum_congr rfl fun t _ => ?_
-      rw [← ind_neg L (z₀ + t)]; congr 1; ring
+      rw [← ind_neg L (z₀ + t)]
+      congr 1
+      ring
     have h4 : ∑ t ∈ T, ind L (z₀ + w + -t) = ∑ t ∈ T, ind L (z₀ + -(w + t)) :=
-      Finset.sum_congr rfl fun t _ => ind_congr L (by
-        have e : z₀ + w + -t - (z₀ + -(w + t)) = 2 * w := by ring
-        rw [e]; exact hw2)
+      Finset.sum_congr rfl fun t _ =>
+        ind_congr L (by
+          have e : z₀ + w + -t - (z₀ + -(w + t)) = 2 * w := by ring
+          rw [e]
+          exact hw2)
     have h5 : ∑ t ∈ T, ind L (z₀ + -w + t) = ∑ t ∈ T, ind L (z₀ + (w + t)) :=
-      Finset.sum_congr rfl fun t _ => ind_congr L (by
-        have e : z₀ + -w + t - (z₀ + (w + t)) = -(2 * w) := by ring
-        rw [e]; exact L.lattice.neg_mem hw2)
+      Finset.sum_congr rfl fun t _ =>
+        ind_congr L (by
+          have e : z₀ + -w + t - (z₀ + (w + t)) = -(2 * w) := by ring
+          rw [e]
+          exact L.lattice.neg_mem hw2)
     have h6 : ∑ t ∈ T, ind L (z₀ + 0 + -t) = ∑ t ∈ T, ind L (z₀ + -t) :=
       Finset.sum_congr rfl fun t _ => by rw [add_zero]
     rw [h4] at h1
@@ -208,32 +242,42 @@ theorem wp_half_period_prod (L L' : PeriodPair) (T : Finset ℂ) (w : ℂ) (hLL 
     simp
   obtain ⟨c, hc⟩ := ellipticNoPole L F mF hper oF
 
-  have cP : ∀ (M : PeriodPair) x, x ∉ M.lattice → ContinuousAt M.weierstrassP x :=
-    fun M x hx => (M.analyticOnNhd_weierstrassP x hx).continuousAt
+  have cP : ∀ (M : PeriodPair) x, x ∉ M.lattice → ContinuousAt M.weierstrassP x := fun M x hx =>
+    (M.analyticOnNhd_weierstrassP x hx).continuousAt
   have cont : ∀ x, x ∉ L'.lattice → B x ≠ 0 → ContinuousAt F x := by
     intro x hx hBx
     have hxL : x ∉ L.lattice := fun h => hx (hLL h)
-    have cA : ContinuousAt A x := ((cP L' x hx).sub continuousAt_const).mul
-      (tendsto_finsetProd T fun t _ => (cP L x hxL).sub continuousAt_const)
-    have cB : ContinuousAt B x := ((cP L x hxL).sub continuousAt_const).mul
-      (tendsto_finsetProd T fun t _ => (cP L x hxL).sub continuousAt_const)
+    have cA : ContinuousAt A x :=
+      ((cP L' x hx).sub continuousAt_const).mul
+        (tendsto_finsetProd T fun t _ => (cP L x hxL).sub continuousAt_const)
+    have cB : ContinuousAt B x :=
+      ((cP L x hxL).sub continuousAt_const).mul
+        (tendsto_finsetProd T fun t _ => (cP L x hxL).sub continuousAt_const)
     exact cA.div cB hBx
 
   set m : ℕ := 2 * (T.card + 1)
-  have eA : ∀ x, x ^ m * A x = (x ^ 2 * (L'.weierstrassP x - L'.weierstrassP w)) *
-      ∏ t ∈ T, (x ^ 2 * (L.weierstrassP x - L.weierstrassP t)) := by
+  have eA
+      : ∀ x,
+        x ^ m * A x
+          = (x ^ 2 * (L'.weierstrassP x - L'.weierstrassP w))
+            * ∏ t ∈ T, (x ^ 2 * (L.weierstrassP x - L.weierstrassP t)) := by
     intro x; simp only [hA, m, Finset.prod_mul_distrib, Finset.prod_const]; ring
-  have eB : ∀ x, x ^ m * B x = (x ^ 2 * (L.weierstrassP x - L.weierstrassP w)) *
-      ∏ t ∈ T, (x ^ 2 * (L.weierstrassP x - L.weierstrassP (w + t))) := by
+  have eB
+      : ∀ x,
+        x ^ m * B x
+          = (x ^ 2 * (L.weierstrassP x - L.weierstrassP w))
+            * ∏ t ∈ T, (x ^ 2 * (L.weierstrassP x - L.weierstrassP (w + t))) := by
     intro x; simp only [hB, m, Finset.prod_mul_distrib, Finset.prod_const]; ring
   have tA : Tendsto (fun x => x ^ m * A x) (𝓝[≠] 0) (𝓝 1) := by
-    have := (tendsto_sq_mul L' (L'.weierstrassP w)).mul
-      (tendsto_finsetProd T fun t _ => tendsto_sq_mul L (L.weierstrassP t))
+    have :=
+      (tendsto_sq_mul L' (L'.weierstrassP w)).mul
+        (tendsto_finsetProd T fun t _ => tendsto_sq_mul L (L.weierstrassP t))
     simp only [Finset.prod_const_one, mul_one] at this
     exact this.congr fun x => (eA x).symm
   have tB : Tendsto (fun x => x ^ m * B x) (𝓝[≠] 0) (𝓝 1) := by
-    have := (tendsto_sq_mul L (L.weierstrassP w)).mul
-      (tendsto_finsetProd T fun t _ => tendsto_sq_mul L (L.weierstrassP (w + t)))
+    have :=
+      (tendsto_sq_mul L (L.weierstrassP w)).mul
+        (tendsto_finsetProd T fun t _ => tendsto_sq_mul L (L.weierstrassP (w + t)))
     simp only [Finset.prod_const_one, mul_one] at this
     exact this.congr fun x => (eB x).symm
   have evB : ∀ᶠ x in 𝓝[≠] (0 : ℂ), x ^ m * B x ≠ 0 := tB.eventually_ne one_ne_zero
@@ -253,10 +297,11 @@ theorem wp_half_period_prod (L L' : PeriodPair) (T : Finset ℂ) (w : ℂ) (hLL 
   have hc1 : c = 1 := tendsto_nhds_unique tF' tF
 
   by_cases hBz : B z = 0
-  ·
-    have hzL : z ∉ L.lattice := fun h => hz (hLL h)
-    have key : ∀ a, a ∉ L.lattice → a - w ∈ L'.lattice → L.weierstrassP z = L.weierstrassP a →
-        L'.weierstrassP z = L'.weierstrassP w := by
+  · have hzL : z ∉ L.lattice := fun h => hz (hLL h)
+    have key
+        : ∀ a,
+          a ∉ L.lattice → a - w ∈ L'.lattice → L.weierstrassP z = L.weierstrassP a
+            → L'.weierstrassP z = L'.weierstrassP w := by
       intro a ha haw he
       rcases (pInjective L z a hzL ha).1 he with h | h
       · have h' : z - w ∈ L'.lattice := by

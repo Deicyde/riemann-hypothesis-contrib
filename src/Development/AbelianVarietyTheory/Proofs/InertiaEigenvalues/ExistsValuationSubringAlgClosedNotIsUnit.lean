@@ -8,20 +8,22 @@ open scoped NNReal
 
 namespace GlobalTheory
 
-theorem exists_valuationSubring_not_isUnit_and_nonZeroDivisors_ne_zero :
-    ∀ (S : Type) [CommRing S] (u : S), ¬ IsUnit u →
-      ∃ (L : Type) (_ : Field L) (_ : IsAlgClosed L) (V : ValuationSubring L) (f : S →+* ↥V),
-        ¬ IsUnit (f u) ∧ ∀ s ∈ nonZeroDivisors S, f s ≠ 0 := by
+theorem exists_valuationSubring_not_isUnit_and_nonZeroDivisors_ne_zero
+    : ∀ (S : Type) [CommRing S] (u : S),
+      ¬ IsUnit u
+        → ∃ (L : Type) (_ : Field L) (_ : IsAlgClosed L) (V : ValuationSubring L) (f : S →+* ↥V),
+          ¬ IsUnit (f u) ∧ ∀ s ∈ nonZeroDivisors S, f s ≠ 0 := by
   intro S _ u hu
-  obtain ⟨m, hm, hum⟩ := Ideal.exists_le_maximal (Ideal.span {u})
-    (by rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨m, hm, hum⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {u}) (by rwa [Ne, Ideal.span_singleton_eq_top])
   have hum' : u ∈ m := hum (Ideal.mem_span_singleton_self u)
   haveI := hm.isPrime
   obtain ⟨q, hq, hqm⟩ := Ideal.exists_minimalPrimes_le (I := (⊥ : Ideal S)) (J := m) bot_le
   haveI hqp : q.IsPrime := hq.1.1
   let L := AlgebraicClosure (FractionRing (S ⧸ q))
-  let g : S →+* L := ((algebraMap (FractionRing (S ⧸ q)) L).comp
-    (algebraMap (S ⧸ q) (FractionRing (S ⧸ q)))).comp (Ideal.Quotient.mk q)
+  let g : S →+* L :=
+    ((algebraMap (FractionRing (S ⧸ q)) L).comp (algebraMap (S ⧸ q) (FractionRing (S ⧸ q)))).comp
+      (Ideal.Quotient.mk q)
   have hg : ∀ s, g s = 0 ↔ s ∈ q := by
     intro s
     simp only [g, RingHom.comp_apply]
@@ -31,8 +33,7 @@ theorem exists_valuationSubring_not_isUnit_and_nonZeroDivisors_ne_zero :
   have hne : m.map g.rangeRestrict ≠ ⊤ := by
     intro h
     have h1 : (1 : g.range) ∈ m.map g.rangeRestrict := h ▸ Submodule.mem_top
-    obtain ⟨x, hx, hx1⟩ :=
-      (Ideal.mem_map_iff_of_surjective _ g.rangeRestrict_surjective).1 h1
+    obtain ⟨x, hx, hx1⟩ := (Ideal.mem_map_iff_of_surjective _ g.rangeRestrict_surjective).1 h1
     have h2 : g (x - 1) = 0 := by
       have := congrArg Subtype.val hx1
       simp only [RingHom.coe_rangeRestrict, OneMemClass.coe_one] at this
@@ -43,13 +44,12 @@ theorem exists_valuationSubring_not_isUnit_and_nonZeroDivisors_ne_zero :
   obtain ⟨V, hV, hV'⟩ := Ideal.image_subset_nonunits_valuationSubring _ hne
   have hmem : ∀ s, g s ∈ V := fun s => hV (show g s ∈ g.range from ⟨s, rfl⟩)
   refine ⟨L, inferInstance, inferInstance, V, g.codRestrict V hmem, ?_, ?_⟩
-  · have h1 : g u ∈ V.nonunits :=
-      hV' ⟨g.rangeRestrict u, Ideal.mem_map_of_mem _ hum', rfl⟩
+  · have h1 : g u ∈ V.nonunits := hV' ⟨g.rangeRestrict u, Ideal.mem_map_of_mem _ hum', rfl⟩
     have h2 := (ValuationSubring.coe_mem_nonunits_iff (A := V) (a := ⟨g u, hmem u⟩)).1 h1
     exact h2
   · intro s hs h0
     have h1 : g s = 0 := congrArg Subtype.val h0
-    exact Set.disjoint_left.1 (Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes hq)
-      ((hg s).1 h1) hs
+    exact Set.disjoint_left.1 (Ideal.disjoint_nonZeroDivisors_of_mem_minimalPrimes hq) ((hg s).1 h1)
+      hs
 
 end GlobalTheory

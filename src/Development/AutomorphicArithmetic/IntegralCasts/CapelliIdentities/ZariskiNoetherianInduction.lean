@@ -4,28 +4,31 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ZariskiNoetherianInduction.noetherian_induction_zariski :
-    ∀ (k : Type) [inst : Field k] (n : ℕ) (Q : Set (Fin n → k) → Prop),
-    Q ∅ →
-      (∀ (s t : Set (Fin n → k)), s ⊆ t → Q t → Q s) →
-        (∀ (s t : Set (Fin n → k)), Q s → Q t → Q (s ∪ t)) →
-          (∀ (I : Ideal (MvPolynomial (Fin n) k)),
-              I.IsPrime →
-                ∃ g ∉ I,
-                  Q
-                    {c : Fin n → k |
-                      (∀ p ∈ I, (MvPolynomial.eval c : MvPolynomial (Fin n) k → k) p = (0 : k)) ∧
-                        (MvPolynomial.eval c : MvPolynomial (Fin n) k → k) g ≠ (0 : k)}) →
-            Q Set.univ := by
+theorem UpperTheory.Reformulated.B.ZariskiNoetherianInduction.noetherian_induction_zariski
+    : ∀ (k : Type) [inst : Field k] (n : ℕ) (Q : Set (Fin n → k) → Prop),
+      Q ∅ → (∀ (s t : Set (Fin n → k)), s ⊆ t → Q t → Q s)
+        → (∀ (s t : Set (Fin n → k)), Q s → Q t → Q (s ∪ t))
+        → (∀ (I : Ideal (MvPolynomial (Fin n) k)),
+          I.IsPrime
+            → ∃ g ∉ I,
+              Q
+                {c : Fin n → k |
+                  (∀ p ∈ I, (MvPolynomial.eval c : MvPolynomial (Fin n) k → k) p = (0 : k)) ∧
+                    (MvPolynomial.eval c : MvPolynomial (Fin n) k → k) g ≠ (0 : k)})
+        → Q Set.univ := by
   intro k inst n Q h0 hmono hunion hprime
-  have key : ∀ I : Ideal (MvPolynomial (Fin n) k),
-      Q {c : Fin n → k | ∀ p ∈ I, MvPolynomial.eval c p = 0} := by
+  have key
+      : ∀ I : Ideal (MvPolynomial (Fin n) k),
+        Q {c : Fin n → k | ∀ p ∈ I, MvPolynomial.eval c p = 0} := by
     intro I
     induction I using IsNoetherian.induction with
     | _ I ih =>
-      have step : ∀ g : MvPolynomial (Fin n) k, g ∉ I →
-          Q {c : Fin n → k | (∀ p ∈ I, MvPolynomial.eval c p = 0) ∧
-            MvPolynomial.eval c g = 0} := by
+      have step
+          : ∀ g : MvPolynomial (Fin n) k,
+            g ∉ I
+              → Q
+                {c : Fin n → k | (∀ p ∈ I, MvPolynomial.eval c p = 0) ∧
+                MvPolynomial.eval c g = 0} := by
         intro g hg
         have hlt : I < I ⊔ Ideal.span {g} := by
           refine lt_of_le_of_ne le_sup_left ?_

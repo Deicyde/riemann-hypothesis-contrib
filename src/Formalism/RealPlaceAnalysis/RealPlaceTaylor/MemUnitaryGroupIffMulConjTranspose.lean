@@ -101,8 +101,9 @@ lemma f1alg_exp_inUJ {n : ℕ} (ε : Fin n → Bool) (Y : Matrix (Fin n) (Fin n)
 
 theorem indefinite_unitary_closed : UJClosed := by
   intro n ε
-  exact isClosed_eq ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul
-    continuous_id) continuous_const
+  exact isClosed_eq
+    ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
+    continuous_const
 
 theorem exp_indefinite_unitary_holds : ExpUJ := by
   intro n ε X hX t
@@ -115,7 +116,8 @@ theorem exp_indefinite_unitary_holds : ExpUJ := by
 theorem indefinite_unitary_inv_closed : UJInv := by
   intro n ε g h
   have h2 : (Jm ε * gᴴ * Jm ε) * g = 1 := by
-    rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, h, Jm_mul_self_eq_oneRealPlaceTaylor]
+    rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc gᴴ, h,
+      Jm_mul_self_eq_oneRealPlaceTaylor]
   exact ⟨mul_eq_one_comm.mp h2, h2⟩
 
 theorem one_parameter_subgroup_holds : OneParam := by
@@ -151,20 +153,25 @@ theorem maximal_compact_facts : KFacts := by
     · rintro ⟨hJ, hu⟩
       refine ⟨hu, ?_⟩
       unfold inUJ at hJ
-      calc g * Jm ε = g * (gᴴ * Jm ε * g) := by rw [hJ]
+      calc
+        g * Jm ε
+          = g * (gᴴ * Jm ε * g) := by rw [hJ]
         _ = (g * gᴴ) * Jm ε * g := by simp only [Matrix.mul_assoc]
         _ = Jm ε * g := by rw [(mem_unitaryGroup_iff_mul_conjTranspose g).mp hu, Matrix.one_mul]
   refine ⟨h1, ?_, ?_, ?_, h5⟩
-  ·
-    have hcl : IsClosed (Kset ε) := by
+  · have hcl : IsClosed (Kset ε) := by
       have : Kset ε = {g | gᴴ * g = 1} ∩ {g | g * Jm ε = Jm ε * g} := by
         ext g
         simp only [Kset, Set.mem_setOf_eq, Set.mem_inter_iff, f1alg_unit_iff]
       rw [this]
-      exact (isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id) continuous_const).inter
-        (isClosed_eq (continuous_id.matrix_mul continuous_const) (continuous_const.matrix_mul continuous_id))
-    have hsub : Kset ε ⊆ Set.pi Set.univ (fun _ : Fin n => Set.pi Set.univ
-        (fun _ : Fin n => Metric.closedBall (0 : ℂ) 1)) := by
+      exact (isClosed_eq (continuous_id.matrix_conjTranspose.matrix_mul continuous_id)
+          continuous_const).inter
+        (isClosed_eq (continuous_id.matrix_mul continuous_const)
+          (continuous_const.matrix_mul continuous_id))
+    have hsub
+        : Kset ε
+          ⊆ Set.pi Set.univ
+            (fun _ : Fin n => Set.pi Set.univ (fun _ : Fin n => Metric.closedBall (0 : ℂ) 1)) := by
       intro g hg i _ j _
       rw [Metric.mem_closedBall, dist_zero_right]
       exact entry_norm_bound_of_unitary hg.1 i j

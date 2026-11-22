@@ -10,15 +10,16 @@ open NumberField Polynomial
 
 namespace PI.UnitaryGroupMassFormula.KerSplit
 
-theorem isIntegral_sqrt {K : Type} [Field K] (d : ℕ) (s : K) (hs : s * s = -(d : K)) :
-    IsIntegral ℤ s := by
+theorem isIntegral_sqrt {K : Type} [Field K] (d : ℕ) (s : K) (hs : s * s = -(d : K))
+    : IsIntegral ℤ s := by
   refine ⟨X ^ 2 + C (d : ℤ), monic_X_pow_add_C _ two_ne_zero, ?_⟩
   have e : (algebraMap ℤ K) (d : ℤ) = (d : K) := by simp
   rw [eval₂_add, eval₂_X_pow, eval₂_C, e]
   linear_combination hs
 
-theorem isIntegral_half {K : Type} [Field K] [CharZero K] (d : ℕ) (s : K) (hd : d % 8 = 7)
-    (hs : s * s = -(d : K)) : IsIntegral ℤ ((1 + s) / 2) := by
+theorem isIntegral_half
+    {K : Type} [Field K] [CharZero K] (d : ℕ) (s : K) (hd : d % 8 = 7) (hs : s * s = -(d : K))
+    : IsIntegral ℤ ((1 + s) / 2) := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, d + 1 = 4 * k := ⟨(d + 1) / 4, by omega⟩
   have hkK : (d : K) + 1 = 4 * (k : K) := by exact_mod_cast hk
   refine ⟨X ^ 2 - X + C (k : ℤ), ?_, ?_⟩
@@ -31,8 +32,9 @@ theorem isIntegral_half {K : Type} [Field K] [CharZero K] (d : ℕ) (s : K) (hd 
     rw [eval₂_add, eval₂_sub, eval₂_X_pow, eval₂_X, eval₂_C, e]
     linear_combination (1 / 4 : K) * hs - (1 / 4 : K) * hkK
 
-private theorem exists_isPrime_natCast_mem {K : Type} [Field K] [NumberField K] (p : ℕ) (hp : p.Prime) :
-    ∃ P : Ideal (𝓞 K), P.IsPrime ∧ ((p : ℕ) : 𝓞 K) ∈ P := by
+private theorem exists_isPrime_natCast_mem
+    {K : Type} [Field K] [NumberField K] (p : ℕ) (hp : p.Prime)
+    : ∃ P : Ideal (𝓞 K), P.IsPrime ∧ ((p : ℕ) : 𝓞 K) ∈ P := by
   have hnu : ¬ IsUnit ((p : ℕ) : 𝓞 K) := by
     rintro ⟨v, hv⟩
     have h1 : algebraMap (𝓞 K) K (↑v⁻¹ : 𝓞 K) * (p : K) = 1 := by
@@ -57,13 +59,16 @@ private theorem exists_isPrime_natCast_mem {K : Type} [Field K] [NumberField K] 
     have h7 := Int.eq_one_of_dvd_one (by positivity) h6
     have h8 : p = 1 := by exact_mod_cast h7
     exact hp.one_lt.ne' h8
-  obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 K)})
-    (by rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨M, hM, hle⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 K)})
+      (by rwa [Ne, Ideal.span_singleton_eq_top])
   exact ⟨M, hM.isPrime, hle (Ideal.subset_span (Set.mem_singleton _))⟩
 
-theorem splitsAt_two {K E : Type} [Field K] [NumberField K] [Field E] [NumberField E] [Algebra K E]
-    (cj : E ≃ₐ[ℚ] E) (d : ℕ) (s : K) (hd : d % 8 = 7) (hs : s * s = -(d : K))
-    (hcj : cj (algebraMap K E s) = -algebraMap K E s) : PI.KerIso.SplitsAt K cj 2 := by
+theorem splitsAt_two
+    {K E : Type} [Field K] [NumberField K] [Field E] [NumberField E] [Algebra K E]
+    (cj : E ≃ₐ[ℚ] E) (d : ℕ) (s : K)
+    (hd : d % 8 = 7) (hs : s * s = -(d : K)) (hcj : cj (algebraMap K E s) = - algebraMap K E s)
+    : PI.KerIso.SplitsAt K cj 2 := by
   obtain ⟨P, hP, h2P⟩ := exists_isPrime_natCast_mem (K := K) 2 Nat.prime_two
   obtain ⟨m, hm⟩ : ∃ m : ℕ, d + 1 = 8 * m := ⟨(d + 1) / 8, by omega⟩
   have hmK : (d : K) + 1 = 8 * (m : K) := by exact_mod_cast hm
@@ -73,10 +78,11 @@ theorem splitsAt_two {K E : Type} [Field K] [NumberField K] [Field E] [NumberFie
     ⟨⟨_, isIntegral_half d (-s) hd (by rw [neg_mul_neg]; exact hs)⟩, rfl⟩
   have hinj := IsFractionRing.injective (𝓞 K) K
   have hsum : aO + bO = 1 := hinj (by rw [map_add (f := _), haK, hbK, map_one]; ring)
-  have hprod : aO * bO = ((2 : ℕ) : 𝓞 K) * (m : 𝓞 K) := hinj (by
-    rw [map_mul, haK, hbK, map_mul, map_natCast, map_natCast]
-    push_cast
-    linear_combination (-1 / 4 : K) * hs + (1 / 4 : K) * hmK)
+  have hprod : aO * bO = ((2 : ℕ) : 𝓞 K) * (m : 𝓞 K) :=
+    hinj (by
+      rw [map_mul, haK, hbK, map_mul, map_natCast, map_natCast]
+      push_cast
+      linear_combination (-1 / 4 : K) * hs + (1 / 4 : K) * hmK)
   have hca : cj (algebraMap K E ((1 + s) / 2)) = algebraMap K E ((1 + -s) / 2) := by
     simp only [map_div₀, map_add (f := _), map_neg, map_one, map_ofNat, hcj]
   have hcb : cj (algebraMap K E ((1 + -s) / 2)) = algebraMap K E ((1 + s) / 2) := by
@@ -97,10 +103,12 @@ theorem splitsAt_two {K E : Type} [Field K] [NumberField K] [Field E] [NumberFie
     · rw [Ideal.eq_top_iff_one, ← hsum]
       exact P.add_mem ha hb
 
-theorem splitsAt_odd {K E : Type} [Field K] [NumberField K] [Field E] [NumberField E] [Algebra K E]
-    (cj : E ≃ₐ[ℚ] E) (d p : ℕ) (s : K) (hs : s * s = -(d : K))
-    (hcj : cj (algebraMap K E s) = -algebraMap K E s) (hp : p.Prime) (hp2 : p ≠ 2)
-    (hJ : jacobiSym (-(d : ℤ)) p = 1) : PI.KerIso.SplitsAt K cj p := by
+theorem splitsAt_odd
+    {K E : Type} [Field K] [NumberField K] [Field E] [NumberField E] [Algebra K E]
+    (cj : E ≃ₐ[ℚ] E) (d p : ℕ) (s : K)
+    (hs : s * s = -(d : K)) (hcj : cj (algebraMap K E s) = - algebraMap K E s)
+    (hp : p.Prime) (hp2 : p ≠ 2) (hJ : jacobiSym (-(d : ℤ)) p = 1)
+    : PI.KerIso.SplitsAt K cj p := by
   haveI : NeZero p := ⟨hp.ne_zero⟩
   haveI : Fact p.Prime := ⟨hp⟩
   obtain ⟨P, hP, hpP⟩ := exists_isPrime_natCast_mem (K := K) p hp
@@ -130,7 +138,7 @@ theorem splitsAt_odd {K E : Type} [Field K] [NumberField K] [Field E] [NumberFie
   have hab : ((r : 𝓞 K) + sO) * ((r : 𝓞 K) - sO) ∈ P := by
     rw [hprod]
     exact P.mul_mem_right _ hpP
-  have hnot : ¬ ((r : 𝓞 K) + sO ∈ P ∧ (r : 𝓞 K) - sO ∈ P) := by
+  have hnot : ¬((r : 𝓞 K) + sO ∈ P ∧ (r : 𝓞 K) - sO ∈ P) := by
     rintro ⟨h1, h2⟩
     have h2s : (2 : 𝓞 K) * sO ∈ P := by
       have h3 := P.sub_mem h1 h2
@@ -157,11 +165,13 @@ theorem splitsAt_odd {K E : Type} [Field K] [NumberField K] [Field E] [NumberFie
       exact h5.symm
     rw [e1]
     exact P.add_mem (P.mul_mem_left _ (P.neg_mem hdP)) (P.mul_mem_left _ hpP)
-  have hca : cj (algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) + sO))) =
-      algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) - sO)) := by
+  have hca
+      : cj (algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) + sO)))
+        = algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) - sO)) := by
     simp only [map_add (f := _), map_sub, map_neg, map_intCast, hsK, hcj, sub_eq_add_neg]
-  have hcb : cj (algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) - sO))) =
-      algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) + sO)) := by
+  have hcb
+      : cj (algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) - sO)))
+        = algebraMap K E (algebraMap (𝓞 K) K ((r : 𝓞 K) + sO)) := by
     simp only [map_add (f := _), map_sub, map_neg, map_intCast, hsK, hcj, sub_eq_add_neg, neg_neg]
   have hcoe : ∀ z : 𝓞 K, (z : K) = algebraMap (𝓞 K) K z := fun _ => rfl
   rcases hP.mem_or_mem hab with ha | hb

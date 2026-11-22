@@ -57,14 +57,18 @@ def hLin {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (x : V) : V →�
   map_add' := hh.1 x
   map_smul' a y := by simpa using hh.2.1 a x y
 
-def projE {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (δ : L) {l : ℕ} (e f : Fin l → V) (i : Fin l) :
-    Module.End L V := (s δ)⁻¹ • (hLin hh (f i)).smulRight (e i)
+def projE
+    {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (δ : L) {l : ℕ} (e f : Fin l → V) (i : Fin l)
+    : Module.End L V :=
+  (s δ)⁻¹ • (hLin hh (f i)).smulRight (e i)
 
-def projF {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (δ : L) {l : ℕ} (e f : Fin l → V) (i : Fin l) :
-    Module.End L V := δ⁻¹ • (hLin hh (e i)).smulRight (f i)
+def projF
+    {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (δ : L) {l : ℕ} (e f : Fin l → V) (i : Fin l)
+    : Module.End L V :=
+  δ⁻¹ • (hLin hh (e i)).smulRight (f i)
 
-def piece {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (δ : L) {l : ℕ} (e f : Fin l → V) :
-    Idx l → Module.End L V
+def piece {s : L →+* L} {h : V → V → L} (hh : IsHerm s h) (δ : L) {l : ℕ} (e f : Fin l → V)
+    : Idx l → Module.End L V
   | some (Sum.inl i) => projE hh δ e f i
   | none => 1 - ∑ i, (projE hh δ e f i + projF hh δ e f i)
   | some (Sum.inr i) => projF hh δ e f i

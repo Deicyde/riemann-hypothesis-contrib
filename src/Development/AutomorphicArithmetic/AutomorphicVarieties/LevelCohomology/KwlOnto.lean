@@ -12,23 +12,32 @@ public import Mathlib.RingTheory.ZMod.UnitsCyclic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.ML UpperTheory.V.X
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Odd UpperTheory.V.ML
+  UpperTheory.V.X
 
-private theorem kwl_fix {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (g : G ℚ Ω) :
-    g ∈ fixMu ℚ Ω N ↔ Chr.cls ℚ Ω N g = 1 := by
+private theorem kwl_fix
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (g : G ℚ Ω)
+    : g ∈ fixMu ℚ Ω N ↔ Chr.cls ℚ Ω N g = 1 := by
   have key : ∀ x : Ω, x ^ N = 1 → x ^ ((1 : (ZMod N)ˣ) : ZMod N).val = x := fun x hx => by
     rw [Units.val_one, ZMod.val_one_eq_one_mod, ← pow_eq_pow_mod 1 hx, pow_one]
-  refine ⟨fun h => (Chr.clsFacts ℚ Ω N).2.2.1 g 1 fun x hx => (h x hx).trans (key x hx).symm, fun h x hx => ?_⟩
+  refine ⟨
+    fun h => (Chr.clsFacts ℚ Ω N).2.2.1 g 1 fun x hx => (h x hx).trans (key x hx).symm,
+    fun h x hx => ?_
+  ⟩
   rw [Chr.cls_spec N g x hx, h, key x hx]
 
-private theorem kwl_onto {Ω : Type} [Field Ω] [inst : Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] :
-    Function.Surjective (Chr.cls ℚ Ω N) := by
+private theorem kwl_onto
+    {Ω : Type} [Field Ω] [inst : Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N]
+    : Function.Surjective (Chr.cls ℚ Ω N) := by
   have hch : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   obtain rfl : inst = DivisionRing.toRatAlgebra := Subsingleton.elim _ _
   exact (Chr.clsOnto Ω N).1
 
-private theorem kwl_pow (l : ℕ) (hl : l.Prime) (h2 : l ≠ 2) (n : ℕ) (hd : l ^ 2 ∣ l ^ (n + 2)) (u : (ZMod (l ^ (n + 2)))ˣ)
-    (hu : ZMod.unitsMap hd u = 1) : ∃ v, v ^ l = u := by
+private theorem kwl_pow
+    (l : ℕ) (hl : l.Prime) (h2 : l ≠ 2)
+    (n : ℕ) (hd : l ^ 2 ∣ l ^ (n + 2)) (u : (ZMod (l ^ (n + 2)))ˣ) (hu : ZMod.unitsMap hd u = 1)
+    : ∃ v, v ^ l = u := by
   haveI : NeZero (l ^ (n + 2)) := ⟨pow_ne_zero _ hl.ne_zero⟩
   haveI : NeZero (l ^ 2) := ⟨pow_ne_zero _ hl.ne_zero⟩
   haveI := ZMod.isCyclic_units_of_prime_pow l hl h2 (n + 2)
@@ -70,14 +79,14 @@ private theorem kwl_pow (l : ℕ) (hl : l.Prime) (h2 : l ≠ 2) (n : ℕ) (hd : 
   refine ⟨γ ^ j, ?_⟩
   rw [← zpow_natCast, ← zpow_mul, mul_comm]
 
-theorem UpperTheory.V.X.kwl :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ φ ∈ UnrHom ℚ Ω l, ∀ g ∈ fixMu ℚ Ω (l ^ 2), φ g = 0 := by
+theorem UpperTheory.V.X.kwl
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime],
+      l ≠ 2 → ∀ φ ∈ UnrHom ℚ Ω l, ∀ g ∈ fixMu ℚ Ω (l ^ 2), φ g = 0 := by
   intro Ω _ _ _ l hlf h2 φ hφ g hg
   have hl : l.Prime := hlf.out
   obtain ⟨hlc, hadd, hunr⟩ := hφ
   let ψ : G ℚ Ω →* Multiplicative (ZMod l) :=
-    MonoidHom.mk' (fun x => Multiplicative.ofAdd (φ x)) (fun a b => by
-      simp only [hadd, ofAdd_add])
+    MonoidHom.mk' (fun x => Multiplicative.ofAdd (φ x)) (fun a b => by simp only [hadd, ofAdd_add])
   have hψ : ∀ x, ψ x = Multiplicative.ofAdd (φ x) := fun x => rfl
   have hkerset : ((ψ.ker : Subgroup (G ℚ Ω)) : Set (G ℚ Ω)) = {x | φ x = 0} := by
     ext x
@@ -111,7 +120,8 @@ theorem UpperTheory.V.X.kwl :
   rw [MonoidHom.mem_ker] at h0
   have hg' : g = g * (h ^ l)⁻¹ * h ^ l := by group
   have : ψ g = 1 := by
-    rw [hg', map_mul, h0, one_mul, map_pow, hψ, ← ofAdd_nsmul, nsmul_eq_mul, ZMod.natCast_self, zero_mul]
+    rw [hg', map_mul, h0, one_mul, map_pow, hψ, ← ofAdd_nsmul, nsmul_eq_mul, ZMod.natCast_self,
+      zero_mul]
     rfl
   rw [hψ] at this
   exact this

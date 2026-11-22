@@ -10,7 +10,8 @@ public import Development.DiscreteGroups.PiInvariants.CompactSupportTwists.PiSee
 
 open UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi DiscreteGroups.T1.G
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.BcB PositivityTheory.Rg.BcB.E
+  PositivityTheory.Rg.BcB.F PositivityTheory.Rg.BcB.Desc PositivityTheory.Rg.BcB.E1
 open scoped ENNReal
 
 attribute [local instance] PositivityTheory.Rg.BcB.E.borelH
@@ -21,18 +22,22 @@ section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ} {ι : Type} [Fintype ι]
 
-private theorem test_trM (D : Dom E n 0) {Φ : Matrix ι ι (H E n 0 → ℂ)} (hΦ : IsTestM Φ) (M : Matrix ι ι ℂ) :
-    IsTestH (trM Φ M) := by
-  have h := (kerLin (ctx ratProper_holds D) (ι × ι) (fun p => Φ p.1 p.2) (fun p => M p.2 p.1)
-    (fun p => hΦ p.1 p.2)).1
+private theorem test_trM
+    (D : Dom E n 0) {Φ : Matrix ι ι (H E n 0 → ℂ)} (hΦ : IsTestM Φ) (M : Matrix ι ι ℂ)
+    : IsTestH (trM Φ M) := by
+  have h :=
+    (kerLin (ctx ratProper_holds D) (ι × ι)
+      (fun p => Φ p.1 p.2)
+      (fun p => M p.2 p.1)
+      (fun p => hΦ p.1 p.2)).1
   have e : trM Φ M = fun z => ∑ p : ι × ι, Φ p.1 p.2 z * M p.2 p.1 := by
     funext z
     simp only [trM, Fintype.sum_prod_type]
   rw [e]
   exact h
 
-private theorem measurable_cnt (D : Dom E n 0) {Ω : Set (H E n 0)} (hΩ : IsCompact Ω) :
-    Measurable (cnt (ratH E n 0) Ω) := by
+private theorem measurable_cnt (D : Dom E n 0) {Ω : Set (H E n 0)} (hΩ : IsCompact Ω)
+    : Measurable (cnt (ratH E n 0) Ω) := by
   haveI : T2Space (H E n 0) := (ctx ratProper_holds D).t2
   haveI : IsTopologicalGroup (H E n 0) := (ctx ratProper_holds D).tg
   haveI : BorelSpace (H E n 0) := ⟨rfl⟩
@@ -47,8 +52,8 @@ end SlopeTestRemainingChoices
 
 end UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi
 
-theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.halfTerm_pf :
-    Basic → GBound → Supp → Rep → Flip → DomInt → HalfTerm := by
+theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.halfTerm_pf
+    : Basic → GBound → Supp → Rep → Flip → DomInt → HalfTerm := by
   intro hB hGB hSu hRep hFl hDI E _ _ _ n ι _ s m ψ hψ x₀ hx₀
   classical
   haveI : T2Space (H E n 0) := (ctx ratProper_holds s.D).t2
@@ -74,10 +79,12 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.halfTerm_pf :
   have hcm := measurable_cnt s.D hΩ
   have hA : 0 ≤ C * ‖m.U‖ := mul_nonneg hC0 (norm_nonneg _)
   set S : Set (H E n 0) := {x | |ldet x| ≤ R + 1} with hS
-  have hSm : MeasurableSet S := (isClosed_le (continuous_abs.comp hlc) continuous_const).measurableSet
+  have hSm : MeasurableSet S :=
+    (isClosed_le (continuous_abs.comp hlc) continuous_const).measurableSet
   let F : ℝ → H E n 0 → ℂ := fun t x => ψ.1 x.1 * m.G (ac E n t * x₀) x
   let mm : H E n 0 → ℂ := fun z => m.φ z * ψ.1 (thetaA E n (x₀.1 * z.1))
-  let d : H E n 0 → ℝ := S.indicator fun x => ‖ψ.1 x.1‖ * (C * ‖m.U‖) * (cnt (ratH E n 0) Ω x).toReal
+  let d : H E n 0 → ℝ :=
+    S.indicator fun x => ‖ψ.1 x.1‖ * (C * ‖m.U‖) * (cnt (ratH E n 0) Ω x).toReal
   have hlm : Measurable (ldet : H E n 0 → ℝ) := hlc.measurable
 
   have hFj : Continuous (Function.uncurry F) := by
@@ -118,8 +125,11 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.halfTerm_pf :
         exact le_of_eq (by ring)
       · have e1 : d x = 0 := Set.indicator_of_notMem hx _
         simp [e1]
-    calc ∫⁻ x, ‖d x‖ₑ ∂s.D.ν ≤ ∫⁻ x, ENNReal.ofReal (C * ‖m.U‖) * f x ∂s.D.ν := lintegral_mono hpt
-      _ = ENNReal.ofReal (C * ‖m.U‖) * ∫⁻ x, f x ∂s.D.ν := lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+    calc
+      ∫⁻ x, ‖d x‖ₑ ∂s.D.ν
+        ≤ ∫⁻ x, ENNReal.ofReal (C * ‖m.U‖) * f x ∂s.D.ν := lintegral_mono hpt
+      _ = ENNReal.ofReal (C * ‖m.U‖) * ∫⁻ x, f x ∂s.D.ν :=
+        lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
       _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top (lt_of_le_of_lt hb' ENNReal.ofReal_lt_top)
 
   have hlx : ∀ t, ldet (ac E n t * x₀) = t := fun t => by rw [hlmul, hlac, hx₀, add_zero]
@@ -143,21 +153,28 @@ theorem UpperTheory.V.Z.Tf.GlobalTraceComparison.Pi.halfTerm_pf :
         by_contra hc
         have h1 := abs_le.1 (not_lt.1 hc)
         have h2 := abs_le.1 htx
-        have h3 : |ldet x| ≤ R + 1 := abs_le.2 ⟨by linarith [h1.1, h1.2, h2.1, h2.2, hR0], by linarith [h1.1, h1.2, h2.1, h2.2, hR0]⟩
+        have h3 : |ldet x| ≤ R + 1 :=
+          abs_le.2
+            ⟨by linarith [h1.1, h1.2, h2.1, h2.2, hR0], by linarith [h1.1, h1.2, h2.1, h2.2, hR0]⟩
         exact hx h3
       rw [e1]
       show ‖ψ.1 x.1 * m.G (ac E n t * x₀) x‖ ≤ 0
       simp [hg]
 
   obtain ⟨ψ', hψ', hθ⟩ := s.fix.2 ψ hψ
-  have hrep : ∀ (t : ℝ) (u : ℝ → ℂ), Continuous u → HasCompactSupport u →
-      ∫ x, F t x * u (ldet x) ∂s.D.ν = ∫ z, mm z * u (-(t + ldet z)) ∂s.D.μ := by
+  have hrep
+      : ∀ (t : ℝ) (u : ℝ → ℂ),
+        Continuous u → HasCompactSupport u
+          → ∫ x, F t x * u (ldet x) ∂s.D.ν = ∫ z, mm z * u (-(t + ldet z)) ∂s.D.μ := by
     intro t u hu hu'
     have h := (hRep E n ι s m ψ hψ u hu hu' (ac E n t * x₀)).2
     refine h.trans (integral_congr_ae (Eventually.of_forall fun z => ?_))
     show m.φ z * ψ.1 (thetaA E n ((ac E n t * x₀).1 * z.1)) * u (-(ldet (ac E n t * x₀) + ldet z)) =
       m.φ z * ψ.1 (thetaA E n (x₀.1 * z.1)) * u (-(t + ldet z))
-    have e : (ac E n t * x₀).1 * z.1 = splitCentre E n (t / (n * Module.finrank ℚ E)) * (x₀.1 * z.1) := by
+    have e
+        : (ac E n t * x₀).1 * z.1
+          = splitCentre E n (t / (n * Module.finrank ℚ E)) * (x₀.1 * z.1) := by
       simp only [ac, Prod.fst_mul, mul_assoc]
     rw [hlx, e, ← hθ, ← hθ, s.fix.1 ψ' hψ']
-  exact hFl (H E n 0) (H E n 0) s.D.ν s.D.μ ldet ldet F mm d hlm hlm hFj.measurable hFs hmm hdI hbd hrep
+  exact hFl (H E n 0) (H E n 0) s.D.ν s.D.μ ldet ldet F mm d hlm hlm hFj.measurable hFs hmm hdI hbd
+    hrep

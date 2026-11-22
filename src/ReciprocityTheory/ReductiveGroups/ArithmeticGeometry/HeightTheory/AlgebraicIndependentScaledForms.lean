@@ -12,48 +12,65 @@ open MvPolynomial ReciprocityTheory.MultiplicativeHeights.DerivationAlgebraicInd
 
 open MvPolynomial ReciprocityTheory.MultiplicativeHeights.DerivationAlgebraicIndependence
 
-theorem algebraicIndependent_scaledForms {K Ω : Type} [Field K] [CharZero K] [Field Ω] [Algebra K Ω] {D N : ℕ}
-    (y : Fin (N + 1) → Ω) (jc : Fin (N + 1)) (hy : y jc = 1)
-    (J : Fin D → Fin N) (δ : Fin D → Derivation K Ω Ω)
+theorem algebraicIndependent_scaledForms
+    {K Ω : Type} [Field K] [CharZero K] [Field Ω] [Algebra K Ω]
+    {D N : ℕ} (y : Fin (N + 1) → Ω) (jc : Fin (N + 1)) (hy : y jc = 1) (J : Fin D → Fin N)
+    (δ : Fin D → Derivation K Ω Ω)
     (hδ : ∀ a b, δ a (y (jc.succAbove (J b))) = if a = b then 1 else 0)
-    (ρ : Option (Fin D) → Fin (D + 2)) (hρ : Function.Injective ρ) :
-    AlgebraicIndependent K (Sum.elim
-      (fun p : Fin (D + 2) × Fin (N + 1) =>
-        (X (some p) : MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω))
-      (fun o : Option (Fin D) => X none * ∑ j, X (some (ρ o, j)) * C (y j))) := by
+    (ρ : Option (Fin D) → Fin (D + 2)) (hρ : Function.Injective ρ)
+    : AlgebraicIndependent K
+      (Sum.elim
+        (fun p : Fin (D + 2) × Fin (N + 1) =>
+          (X (some p) : MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω))
+        (fun o : Option (Fin D) => X none * ∑ j, X (some (ρ o, j)) * C (y j))) := by
   classical
-  refine algebraicIndependent_of_derivations _ (Sum.elim
-    (fun o => (pderiv o :
-      Derivation Ω (MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)
-        (MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)).restrictScalars K)
-    (fun a => coeffDer (σ := Option (Fin (D + 2) × Fin (N + 1))) (δ a))) ?_
+  refine algebraicIndependent_of_derivations _
+    (Sum.elim
+      (fun o =>
+        (pderiv o : Derivation Ω (MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)
+          (MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)).restrictScalars K)
+      (fun a => coeffDer (σ := Option (Fin (D + 2) × Fin (N + 1))) (δ a)))
+    ?_
   intro c H
-  have hZ : ∀ o, pderiv (none : Option (Fin (D + 2) × Fin (N + 1)))
-      (∑ j, X (some (ρ o, j)) * C (y j) : MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω) = 0 := by
+  have hZ
+      : ∀ o,
+        pderiv (none : Option (Fin (D + 2) × Fin (N + 1)))
+            (∑ j, X (some (ρ o, j)) * C (y j) : MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)
+          = 0 := by
     intro o; simp [pderiv_X]
-  have hpn : ∀ o, pderiv (none : Option (Fin (D + 2) × Fin (N + 1)))
-      (X none * ∑ j, X (some (ρ o, j)) * C (y j) : MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω) =
-        ∑ j, X (some (ρ o, j)) * C (y j) := by
+  have hpn
+      : ∀ o,
+        pderiv (none : Option (Fin (D + 2) × Fin (N + 1)))
+            (X none * ∑ j, X (some (ρ o, j)) * C (y j)
+              : MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)
+          = ∑ j, X (some (ρ o, j)) * C (y j) := by
     intro o; rw [Derivation.leibniz, hZ, smul_zero, zero_add, pderiv_X]; simp
-  have hcd : ∀ a o, coeffDer (σ := Option (Fin (D + 2) × Fin (N + 1))) (δ a)
-      (X none * ∑ j, X (some (ρ o, j)) * C (y j)) =
-        X none * ∑ j, X (some (ρ o, j)) * C (δ a (y j)) := by
+  have hcd
+      : ∀ a o,
+        coeffDer (σ := Option (Fin (D + 2) × Fin (N + 1))) (δ a)
+            (X none * ∑ j, X (some (ρ o, j)) * C (y j))
+          = X none * ∑ j, X (some (ρ o, j)) * C (δ a (y j)) := by
     intro a o
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [Derivation.leibniz, coeffDer_X, coeffDer_C, map_sum]
+    simp [Derivation.leibniz, coeffDer_X, coeffDer_C, map_sum]
   let M : Matrix (Option (Fin D)) (Option (Fin D))
       (MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω) := fun r o =>
     match r with
     | none => ∑ j, X (some (ρ o, j)) * C (y j)
     | some a => X none * ∑ j, X (some (ρ o, j)) * C (δ a (y j))
-  have e1 : ∑ o, c (Sum.inr o) * ∑ j, (X (some (ρ o, j)) * C (y j) :
-      MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω) = 0 := by
+  have e1
+      : ∑ o, c (Sum.inr o) * ∑ j, (X (some (ρ o, j)) * C (y j) :
+          MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)
+        = 0 := by
     have := H (Sum.inl none)
     rw [Fintype.sum_sum_type] at this
     simp only [Sum.elim_inl, Sum.elim_inr, Derivation.coe_restrictScalars, hpn] at this
     rwa [Finset.sum_eq_zero (fun p _ => by simp [pderiv_X]), zero_add] at this
-  have e2 : ∀ a, ∑ o, c (Sum.inr o) * (X none * ∑ j, (X (some (ρ o, j)) * C (δ a (y j)) :
-      MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω)) = 0 := by
+  have e2
+      : ∀ a,
+        ∑ o, c (Sum.inr o) * (X none * ∑ j, (X (some (ρ o, j)) * C (δ a (y j)) :
+            MvPolynomial (Option (Fin (D + 2) × Fin (N + 1))) Ω))
+          = 0 := by
     intro a
     have := H (Sum.inr a)
     rw [Fintype.sum_sum_type] at this
@@ -73,7 +90,8 @@ theorem algebraicIndependent_scaledForms {K Ω : Type} [Field K] [CharZero K] [F
   let pt : Option (Fin (D + 2) × Fin (N + 1)) → Ω := fun v =>
     match v with
     | none => 1
-    | some q => ∑ o : Option (Fin D), if ρ o = q.1 then
+    | some q =>
+      ∑ o : Option (Fin D), if ρ o = q.1 then
         (match o with
           | none => if q.2 = jc then 1 else 0
           | some b => (if q.2 = jc then -y (jc.succAbove (J b)) else 0) +
@@ -86,8 +104,11 @@ theorem algebraicIndependent_scaledForms {K Ω : Type} [Field K] [CharZero K] [F
     · simp
     · intro o _ ho; rw [if_neg]; exact fun h => ho (hρ h)
     · simp
-  have hpt1 : ∀ b j, pt (some (ρ (some b), j)) = (if j = jc then -y (jc.succAbove (J b)) else 0) +
-      (if j = jc.succAbove (J b) then 1 else 0) := by
+  have hpt1
+      : ∀ b j,
+        pt (some (ρ (some b), j))
+          = (if j = jc then - y (jc.succAbove (J b)) else 0)
+            + (if j = jc.succAbove (J b) then 1 else 0) := by
     intro b j
     show (∑ o : Option (Fin D), _) = _
     rw [Finset.sum_eq_single (some b)]
@@ -103,14 +124,11 @@ theorem algebraicIndependent_scaledForms {K Ω : Type} [Field K] [CharZero K] [F
     | none =>
       cases o with
       | none => simp [M, hpt0, hy]
-      | some b =>
-        simp [M, hpt1, add_mul, Finset.sum_add_distrib, hy, Matrix.one_apply]
+      | some b => simp [M, hpt1, add_mul, Finset.sum_add_distrib, hy, Matrix.one_apply]
     | some a =>
       cases o with
-      | none =>
-        simp [M, hpt0, hy, hptn, Matrix.one_apply]
-      | some b =>
-        simp [M, hpt1, add_mul, Finset.sum_add_distrib, hy, hδ, Matrix.one_apply, hptn]
+      | none => simp [M, hpt0, hy, hptn, Matrix.one_apply]
+      | some b => simp [M, hpt1, add_mul, Finset.sum_add_distrib, hy, hδ, Matrix.one_apply, hptn]
   have hdet : M.det ≠ 0 := by
     intro h0
     have := RingHom.map_det (MvPolynomial.eval pt) M
@@ -124,20 +142,19 @@ theorem algebraicIndependent_scaledForms {K Ω : Type} [Field K] [CharZero K] [F
     simpa [Fintype.sum_sum_type, hc2, pderiv_X, Pi.single_apply] using this
   · exact hc2 o
 
-theorem scalarRatio_self {Ω V : Type*} [Field Ω] [AddCommGroup V] [Module Ω V] {f : V}
-    (hf : f ≠ 0) : ratio (Ω := Ω) f f = 1 := by
+theorem scalarRatio_self {Ω V : Type*} [Field Ω] [AddCommGroup V] [Module Ω V] {f : V} (hf : f ≠ 0)
+    : ratio (Ω := Ω) f f = 1 := by
   unfold ratio
   split_ifs with h
   · have hc : f = h.choose • f := h.choose_spec
-    have h0 : (h.choose - 1) • f = 0 := by
-      rw [sub_smul, one_smul, ← hc, sub_self]
+    have h0 : (h.choose - 1) • f = 0 := by rw [sub_smul, one_smul, ← hc, sub_self]
     rcases smul_eq_zero.mp h0 with h1 | h1
     · exact sub_eq_zero.mp h1
     · exact absurd h1 hf
   · exact absurd ⟨1, (one_smul Ω f).symm⟩ h
 
-theorem optionEquivLeft_rename_some' {R S : Type*} [CommRing R] (a : MvPolynomial S R) :
-    MvPolynomial.optionEquivLeft R S (MvPolynomial.rename some a) = Polynomial.C a := by
+theorem optionEquivLeft_rename_some' {R S : Type*} [CommRing R] (a : MvPolynomial S R)
+    : MvPolynomial.optionEquivLeft R S (MvPolynomial.rename some a) = Polynomial.C a := by
   induction a using MvPolynomial.induction_on
   next r => simp [MvPolynomial.optionEquivLeft_C]
   next p q hp hq => simp [hp, hq]

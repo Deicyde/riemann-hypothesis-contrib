@@ -13,31 +13,37 @@ namespace UpperTheory.Gal.W2.Seed.TypeIdempotent
 
 variable {X M : Type} [Group X] [Group M]
 
-private theorem psi_inv (T : TyLev X M) (k : X) (hk : k ∈ T.K) (hk' : k⁻¹ ∈ T.K) :
-    (((T.ψ ⟨T.L.pr k⁻¹, T.fact.2 _ hk'⟩)⁻¹ : ℂˣ) : ℂ) = ((T.ψ ⟨T.L.pr k, T.fact.2 k hk⟩ : ℂˣ) : ℂ) := by
+private theorem psi_inv (T : TyLev X M) (k : X) (hk : k ∈ T.K) (hk' : k⁻¹ ∈ T.K)
+    : (((T.ψ ⟨T.L.pr k⁻¹, T.fact.2 _ hk'⟩)⁻¹ : ℂˣ) : ℂ)
+      = ((T.ψ ⟨T.L.pr k, T.fact.2 k hk⟩ : ℂˣ) : ℂ) := by
   have e : (⟨T.L.pr k⁻¹, T.fact.2 _ hk'⟩ : T.J) = (⟨T.L.pr k, T.fact.2 k hk⟩ : T.J)⁻¹ := by
     ext
     simp
   rw [e, map_inv, inv_inv]
 
-private theorem tf_right (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1) (y : X) (c : T.K₀) :
-    T.tf h (y * c) = T.tf h y := by
+private theorem tf_right (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1) (y : X) (c : T.K₀)
+    : T.tf h (y * c) = T.tf h y := by
   have hk : (c : X) ∈ T.K := T.le c.2
   rw [((hA X M T h hh).2 c hk y).2, T.ker c c.2]
   simp
 
-private theorem tf_left (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1) (y : X) (c : T.K₀) :
-    T.tf h ((c : X) * y) = T.tf h y := by
+private theorem tf_left (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1) (y : X) (c : T.K₀)
+    : T.tf h ((c : X) * y) = T.tf h y := by
   have hk : (c : X) ∈ T.K := T.le c.2
   rw [((hA X M T h hh).2 c hk y).1, T.ker c c.2]
   simp
 
-private theorem ty_act (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1)
-    {V : Type} [AddCommGroup V] [Module ℂ V] (Φ : X → V) (hΦ : ∀ k ∈ T.K₀, ∀ g, Φ (g * k) = Φ g) :
-    T.IsTy (hAct T.K₀ (T.tf h) Φ) := by
+private theorem ty_act
+    (hA : TfAdm)
+    (T : TyLev X M) (h : X) (hh : T.L.pr h = 1)
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (Φ : X → V) (hΦ : ∀ k ∈ T.K₀, ∀ g, Φ (g * k) = Φ g)
+    : T.IsTy (hAct T.K₀ (T.tf h) Φ) := by
   intro k hk g
-  have hF : ∀ (y : X) (c : T.K₀), (fun y => T.tf h (k⁻¹ * y) • Φ (g * y)) (y * c) =
-      (fun y => T.tf h (k⁻¹ * y) • Φ (g * y)) y := by
+  have hF
+      : ∀ (y : X) (c : T.K₀),
+        (fun y => T.tf h (k⁻¹ * y) • Φ (g * y)) (y * c)
+          = (fun y => T.tf h (k⁻¹ * y) • Φ (g * y)) y := by
     intro y c
     simp only
     rw [← mul_assoc, tf_right hA T h hh _ c, ← mul_assoc, hΦ c c.2]
@@ -49,8 +55,8 @@ private theorem ty_act (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1)
   funext x
   rw [((hA X M T h hh).2 k⁻¹ (T.K.inv_mem hk) _).1, mul_smul, psi_inv T k hk (T.K.inv_mem hk)]
 
-private theorem conv_left (hA : TfAdm) (hC : TfCen) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1) :
-    conv T.K₀ (T.tf 1) (T.tf h) = T.tf h := by
+private theorem conv_left (hA : TfAdm) (hC : TfCen) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1)
+    : conv T.K₀ (T.tf 1) (T.tf h) = T.tf h := by
   funext g
   set Φ : X → ℂ := fun y => T.tf h (y⁻¹ * g) with hΦdef
   have hTy : T.IsTy Φ := by
@@ -74,19 +80,25 @@ private theorem tf_one_one (T : TyLev X M) : T.tf 1 1 = ((T.K₀.relIndex T.K : 
   have h2 : T.ψ ⟨1, T.J.one_mem⟩ = 1 := map_one T.ψ
   simp [TyLev.tf, tyFn, dosetInd, Set.indicator_apply, h1, T.J.one_mem, h2]
 
-private theorem finsum_cosets (K K₀ : Subgroup X) (hle : K₀ ≤ K) (hi : K₀.relIndex K ≠ 0) (c : ℂ)
-    (G : X ⧸ K₀ → ℂ) (h1 : ∀ z : X ⧸ K₀, z.out ∈ K → G z = c)
-    (h0 : ∀ z : X ⧸ K₀, z.out ∉ K → G z = 0) :
-    ∑ᶠ z, G z = ((K₀.relIndex K : ℕ) : ℂ) * c := by
+private theorem finsum_cosets
+    (K K₀ : Subgroup X) (hle : K₀ ≤ K) (hi : K₀.relIndex K ≠ 0)
+    (c : ℂ) (G : X ⧸ K₀ → ℂ)
+    (h1 : ∀ z : X ⧸ K₀, z.out ∈ K → G z = c) (h0 : ∀ z : X ⧸ K₀, z.out ∉ K → G z = 0)
+    : ∑ᶠ z, G z = ((K₀.relIndex K : ℕ) : ℂ) * c := by
   let φ : K ⧸ K₀.subgroupOf K → X ⧸ K₀ :=
-    Quotient.map' (fun k : K => (k : X)) (fun a b hab => QuotientGroup.leftRel_apply.mpr (by
-      have hab' := QuotientGroup.leftRel_apply.mp hab
-      simpa [Subgroup.mem_subgroupOf] using hab'))
+    Quotient.map'
+      (fun k : K => (k : X))
+      (fun a b hab =>
+        QuotientGroup.leftRel_apply.mpr (by
+          have hab' := QuotientGroup.leftRel_apply.mp hab
+          simpa [Subgroup.mem_subgroupOf] using hab'))
   have hφ : ∀ k : K, φ (k : K ⧸ K₀.subgroupOf K) = ((k : X) : X ⧸ K₀) := fun k => rfl
   have hinj : Function.Injective φ := by
     intro a b hab
-    induction a using QuotientGroup.induction_on with | H a => ?_
-    induction b using QuotientGroup.induction_on with | H b => ?_
+    induction a using QuotientGroup.induction_on with
+    | H a => ?_
+    induction b using QuotientGroup.induction_on with
+    | H b => ?_
     rw [hφ, hφ, QuotientGroup.eq] at hab
     rw [QuotientGroup.eq]
     simpa [Subgroup.mem_subgroupOf] using hab
@@ -94,7 +106,8 @@ private theorem finsum_cosets (K K₀ : Subgroup X) (hle : K₀ ≤ K) (hi : K�
     intro z
     constructor
     · rintro ⟨w, rfl⟩
-      induction w using QuotientGroup.induction_on with | H k => ?_
+      induction w using QuotientGroup.induction_on with
+      | H k => ?_
       rw [hφ]
       obtain ⟨c, hc⟩ := QuotientGroup.mk_out_eq_mul K₀ (k : X)
       rw [hc]
@@ -116,11 +129,13 @@ private theorem finsum_cosets (K K₀ : Subgroup X) (hle : K₀ ≤ K) (hi : K�
   rw [← Nat.card_eq_fintype_card]
   rfl
 
-private theorem conv_right (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1) :
-    conv T.K₀ (T.tf h) (T.tf 1) = T.tf h := by
+private theorem conv_right (hA : TfAdm) (T : TyLev X M) (h : X) (hh : T.L.pr h = 1)
+    : conv T.K₀ (T.tf h) (T.tf 1) = T.tf h := by
   funext g
-  have hF : ∀ (y : X) (c : T.K₀), (fun y => T.tf h y * T.tf 1 (y⁻¹ * g)) (y * c) =
-      (fun y => T.tf h y * T.tf 1 (y⁻¹ * g)) y := by
+  have hF
+      : ∀ (y : X) (c : T.K₀),
+        (fun y => T.tf h y * T.tf 1 (y⁻¹ * g)) (y * c)
+          = (fun y => T.tf h y * T.tf 1 (y⁻¹ * g)) y := by
     intro y c
     simp only
     rw [tf_right hA T h hh y c, mul_inv_rev, mul_assoc,

@@ -6,7 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Unita
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj Formalism.IndefR.Lev GlobalTheory.IndefiniteRowSideFullHecke.LatticeBasisLifts GlobalTheory.GeoLevel
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+  Formalism.IndefR.Lev GlobalTheory.IndefiniteRowSideFullHecke.LatticeBasisLifts
+  GlobalTheory.GeoLevel
 open GlobalTheory.Member (FinCong IotaOK)
 open GlobalTheory.LevelCusp (IsMatch)
 open GlobalTheory.Dict (castFr)
@@ -17,16 +21,22 @@ set_option autoImplicit false
 
 namespace GlobalTheory.GeoLevel
 
-theorem det_mul_cc_det_of_isMatch {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
-    (δ : GL (Fin r) E) (h : IsMatch X X δ) :
-    (δ : Matrix (Fin r) (Fin r) E).det * IsCMField.complexConj E (δ : Matrix (Fin r) (Fin r) E).det = 1 := by
-  have hm : (δ : Matrix (Fin r) (Fin r) E)ᵀ * X.Gm *
-      ((IsCMField.complexConj E : E →+* E).mapMatrix (δ : Matrix (Fin r) (Fin r) E)) = X.Gm := by
+theorem det_mul_cc_det_of_isMatch
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {r : ℕ} (X : Data E r) (δ : GL (Fin r) E) (h : IsMatch X X δ)
+    : (δ : Matrix (Fin r) (Fin r) E).det
+        * IsCMField.complexConj E (δ : Matrix (Fin r) (Fin r) E).det
+      = 1 := by
+  have hm
+      : (δ : Matrix (Fin r) (Fin r) E)ᵀ * X.Gm
+          * ((IsCMField.complexConj E : E →+* E).mapMatrix (δ : Matrix (Fin r) (Fin r) E))
+        = X.Gm := by
     ext i j
     have := h.iso (Pi.single i 1) (Pi.single j 1)
     simp only [herm, cc, Matrix.mulVec_single_one, Matrix.col_apply] at this
-    simp only [Pi.single_apply, apply_ite, map_one, map_zero, mul_ite, ite_mul, mul_one, one_mul, mul_zero,
-      zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true] at this
+    simp only [Pi.single_apply, apply_ite, map_one, map_zero, mul_ite, ite_mul, mul_one, one_mul,
+        mul_zero, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      at this
     rw [← this]
     simp only [Matrix.mul_apply, Matrix.transpose_apply, RingHom.mapMatrix_apply, Matrix.map_apply,
       Finset.sum_mul]
@@ -40,7 +50,13 @@ theorem det_mul_cc_det_of_isMatch {E : Type} [Field E] [NumberField E] [IsCMFiel
   rw [← mul_assoc, mul_comm X.Gm.det]
   rfl
 
-theorem four_dvd_finrank_and_det_eq_pm_one : ∀ (D : D7), 4 ∣ Module.finrank ℚ D.host.E ∧ ∀ (r : ℕ) (X : Data D.host.E r) (δ : GL (Fin r) D.host.E), IsMatch X X δ → (δ : Matrix (Fin r) (Fin r) D.host.E).det = 1 ∨ ∃ m : ℕ, 0 < m ∧ (δ : Matrix (Fin r) (Fin r) D.host.E).det ^ m = 1 := by
+theorem four_dvd_finrank_and_det_eq_pm_one
+    : ∀ (D : D7),
+      4 ∣ Module.finrank ℚ D.host.E
+        ∧ ∀ (r : ℕ) (X : Data D.host.E r) (δ : GL (Fin r) D.host.E),
+          IsMatch X X δ
+            → (δ : Matrix (Fin r) (Fin r) D.host.E).det = 1
+              ∨ ∃ m : ℕ, 0 < m ∧ (δ : Matrix (Fin r) (Fin r) D.host.E).det ^ m = 1 := by
   intro D
   refine ⟨?_, fun r X δ h => ?_⟩
   · have hE : Module.finrank ℚ D.host.E = 4 * D.R.n := by

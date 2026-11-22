@@ -13,9 +13,11 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open MvPolynomial Topology
 
-theorem zeroSetIn_subset_closure_diff (hvan : VanishNearPoint.Statement) {σ : Type} [Fintype σ]
-    (I : Ideal (MvPolynomial σ ℂ)) (h : MvPolynomial σ ℂ) (hI : I.IsPrime) (hh : h ∉ I) :
-    zeroSetIn I ⊆ closure (zeroSetIn I \ {z | eval z h = 0}) := by
+theorem zeroSetIn_subset_closure_diff
+    (hvan : VanishNearPoint.Statement)
+    {σ : Type} [Fintype σ]
+    (I : Ideal (MvPolynomial σ ℂ)) (h : MvPolynomial σ ℂ) (hI : I.IsPrime) (hh : h ∉ I)
+    : zeroSetIn I ⊆ closure (zeroSetIn I \ {z | eval z h = 0}) := by
   intro z hz
   rw [mem_closure_iff_nhds]
   intro t ht
@@ -37,15 +39,18 @@ theorem zeroSetIn_subset_closure_diff (hvan : VanishNearPoint.Statement) {σ : T
     intro y hy p hp
     have := hy (rename e p) (by rw [hJ, Ideal.mem_comap, hre']; exact hp)
     rwa [eval_rename] at this
-  have hx : z ∘ e.symm ∈ zeroLocus J := hmemJ _ (by
-    rw [Function.comp_assoc, show (⇑e.symm ∘ ⇑e) = id from funext e.symm_apply_apply]
-    exact hz)
+  have hx : z ∘ e.symm ∈ zeroLocus J :=
+    hmemJ _ (by
+      rw [Function.comp_assoc, show (⇑e.symm ∘ ⇑e) = id from funext e.symm_apply_apply]
+      exact hz)
   have hcont : Continuous fun y : Fin (Fintype.card σ) → ℂ => y ∘ e :=
     continuous_pi fun i => continuous_apply _
-  have hlim : Filter.Tendsto (fun y : Fin (Fintype.card σ) → ℂ => y ∘ e) (𝓝 (z ∘ e.symm)) (𝓝 z) := by
+  have hlim
+      : Filter.Tendsto (fun y : Fin (Fintype.card σ) → ℂ => y ∘ e) (𝓝 (z ∘ e.symm)) (𝓝 z) := by
     have := hcont.tendsto (z ∘ e.symm)
     rwa [Function.comp_assoc, show (⇑e.symm ∘ ⇑e) = id from funext e.symm_apply_apply,
-      Function.comp_id] at this
+        Function.comp_id]
+      at this
   have hev : ∀ᶠ y in 𝓝 (z ∘ e.symm), y ∈ zeroLocus J → eval y (rename e h) = 0 := by
     filter_upwards [hlim ht] with y hyt hyJ
     rw [eval_rename]
@@ -56,8 +61,9 @@ theorem zeroSetIn_subset_closure_diff (hvan : VanishNearPoint.Statement) {σ : T
   rw [hJ, Ideal.mem_comap, hre'] at hmem
   exact hmem
 
-theorem NormalLocallyIrreducible.proof (hvan : VanishNearPoint.Statement)
-    (hcon : NormalComplementConnected.Statement) : NormalLocallyIrreducible.Statement := by
+theorem NormalLocallyIrreducible.proof
+    (hvan : VanishNearPoint.Statement) (hcon : NormalComplementConnected.Statement)
+    : NormalLocallyIrreducible.Statement := by
   intro σ _ I h w hI hnorm hh hw U hU
   obtain ⟨B, hBo, hwB, hBU, hpre⟩ := hcon σ I h w hI hnorm hh hw U hU
   refine ⟨B, hBo, hwB, hBU, hpre, ?_⟩

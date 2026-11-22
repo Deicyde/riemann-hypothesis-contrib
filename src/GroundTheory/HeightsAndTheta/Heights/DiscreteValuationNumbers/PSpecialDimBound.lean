@@ -15,8 +15,8 @@ noncomputable section
 
 universe u
 
-theorem withBotENat_lt_of_add_one_le {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ (n : WithBot ℕ∞)) :
-    a < (n : WithBot ℕ∞) := by
+theorem withBotENat_lt_of_add_one_le {a : WithBot ℕ∞} {n : ℕ} (h : a + 1 ≤ (n : WithBot ℕ∞))
+    : a < (n : WithBot ℕ∞) := by
   induction a using WithBot.recBotCoe with
   | bot => exact WithBot.bot_lt_coe _
   | coe e =>
@@ -46,8 +46,9 @@ theorem SpecialDimBound.proof : SpecialDimBound.Statement := by
   have hkg : RingHom.ker g = P ⊔ Ideal.span {(C ϖ : MRing ι O)} := by
     rw [hgdef, ← RingHom.comap_ker, Ideal.mk_ker, specialIdeal, ← hφdef,
       Ideal.comap_map_of_surjective _ hφ, ← RingHom.ker_eq_comap_bot, hker]
-  have e1 : MRing ι O ⧸ (P ⊔ Ideal.span {(C ϖ : MRing ι O)}) ≃+*
-      MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P :=
+  have e1
+      : MRing ι O ⧸ (P ⊔ Ideal.span {(C ϖ : MRing ι O)})
+        ≃+* MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal P :=
     (Ideal.quotEquivOfEq hkg.symm).trans (RingHom.quotientKerEquivOfSurjective hg)
 
   set r : MRing ι O ⧸ P := Ideal.Quotient.mk P (C ϖ) with hrdef

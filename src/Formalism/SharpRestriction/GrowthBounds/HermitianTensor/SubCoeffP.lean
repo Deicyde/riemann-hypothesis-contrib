@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.flipOneThree.Pf.QB
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.GradedWeylDivisibility
+  MvPolynomial Formalism.MainNotions.flipOneThree.Pf.QB
 
 theorem lamMemP : LamMemP := by
   intro K _ _ r N ν ν' νp L hνl hν'l hνpl hνp0 hνpm hPh v hv t ht
@@ -18,8 +19,8 @@ theorem lamMemP : LamMemP := by
   obtain ⟨hvw, hvi⟩ := mem_dualWeyl_iff.mp hv
   obtain ⟨htw, hti⟩ := mem_dualWeyl_iff.mp ht
   set F := lamOf K r L (blockEmb K true v * blockEmb K false t) with hF
-  have hscale : ∀ t0 : Fin (r + 1 + 1), ∀ c : K, c ≠ 0 →
-      scCol K (r + 1 + 1) t0 c F = c ^ νp t0 • F := by
+  have hscale
+      : ∀ t0 : Fin (r + 1 + 1), ∀ c : K, c ≠ 0 → scCol K (r + 1 + 1) t0 c F = c ^ νp t0 • F := by
     intro t0 c hc
     rcases midOf_cases t0 with ⟨j, rfl⟩ | ⟨hn, h0 | hl⟩
     · rw [hνpm j]

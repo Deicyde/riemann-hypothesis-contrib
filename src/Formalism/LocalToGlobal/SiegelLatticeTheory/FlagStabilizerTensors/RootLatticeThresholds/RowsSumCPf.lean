@@ -14,25 +14,30 @@ public import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.AutLzFinite
 noncomputable section
 
 open scoped Classical
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
-open Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.SpectralTiesReal
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S
+  Formalism.FourierDecayAlt Formalism.L2.SG.HidaSetting Formalism.L2.SG.Full
+open Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups
+  Formalism.L2.SG.SpectralTiesReal
 
 namespace Formalism.L2.SG.PoincareAmplitudeLowerBounds
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-open Formalism.L2.SG.DataInst Formalism.L2.SG.CntLocal Formalism.L2.SG.RowsConc Formalism.L2.SG.RealObj
+open Formalism.L2.SG.DataInst Formalism.L2.SG.CntLocal Formalism.L2.SG.RowsConc
+  Formalism.L2.SG.RealObj
 
-theorem tprod_alpD_pos (D : D7) (hk : 2 * D.R.rS + 2 + D.R.f + 5 ≤ D.R.k) (u u' : D.what₂.Word) :
-    0 < ∏' p, alpD u u' p := by
+theorem tprod_alpD_pos (D : D7) (hk : 2 * D.R.rS + 2 + D.R.f + 5 ≤ D.R.k) (u u' : D.what₂.Word)
+    : 0 < ∏' p, alpD u u' p := by
   have hP := Formalism.L2.SG.Pf.placesOver_holds D
   set s := D.R.k - 2 * D.R.rS - 2 with hs
   have hs2 : 2 ≤ s := by omega
   set a : PlF D → ℝ := fun p => (Formalism.L2.SG.DataCut.qP p ^ s)⁻¹ with ha
-  have ha0 : ∀ p, 0 ≤ a p := fun p => inv_nonneg.2 (pow_nonneg (Formalism.L2.SG.DataCut.qP_nonneg p) _)
+  have ha0 : ∀ p, 0 ≤ a p := fun p =>
+    inv_nonneg.2 (pow_nonneg (Formalism.L2.SG.DataCut.qP_nonneg p) _)
   have hsum : ∀ S : Finset (PlF D), ∑ p ∈ S, a p ≤ 3 * (D.R.f : ℝ) * ((2 : ℝ) ^ s)⁻¹ := by
     intro S
-    exact Formalism.FourierDecayAlt.P.DensitySumsAndDomination.densSum (PlF D) S Formalism.L2.SG.DataCut.qP Loc.resChar D.R.f s hs2
+    exact Formalism.FourierDecayAlt.P.DensitySumsAndDomination.densSum (PlF D) S
+      Formalism.L2.SG.DataCut.qP Loc.resChar D.R.f s hs2
       (fun p _ => ⟨(D.s.atP p).ellPrime.out, hP.1 p⟩)
       (fun m => hP.2 m _ (fun p hp => (Finset.mem_filter.1 hp).2))
   have haS : Summable a := summable_of_sum_le ha0 hsum

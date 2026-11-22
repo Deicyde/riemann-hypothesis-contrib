@@ -7,7 +7,13 @@ public import Development.AutomorphicSpectrum.Definitions.DivisibilityTowers.Com
 
 open MvPolynomial Filter Topology GlobalTheory.CompanionTheory.Ar.Top
 
-theorem RootFieldNumerics.partial_sum_ordered_bounds : ∀ (N j : ℕ) (u : Fin N → ℝ), j ≤ N → 0 < N → (∀ a b : Fin N, a ≤ b → u b ≤ u a) → 0 ≤ (∑ i ∈ Finset.univ.filter (fun i : Fin N => (i : ℕ) < j), u i) - j * ((∑ i, u i) / N) ∧ (∑ i ∈ Finset.univ.filter (fun i : Fin N => (i : ℕ) < j), u i) - j * ((∑ i, u i) / N) ≤ ∑ i, |u i| ∧ |∑ i, u i| ≤ ∑ i, |u i| := by
+theorem RootFieldNumerics.partial_sum_ordered_bounds
+    : ∀ (N j : ℕ) (u : Fin N → ℝ),
+      j ≤ N → 0 < N → (∀ a b : Fin N, a ≤ b → u b ≤ u a)
+        → 0 ≤ (∑ i ∈ Finset.univ.filter (fun i : Fin N => (i : ℕ) < j), u i) - j * ((∑ i, u i) / N)
+          ∧ (∑ i ∈ Finset.univ.filter (fun i : Fin N => (i : ℕ) < j), u i) - j * ((∑ i, u i) / N)
+            ≤ ∑ i, |u i|
+          ∧ |∑ i, u i| ≤ ∑ i, |u i| := by
   intro N j u hj hN hu
   refine ⟨?_, ?_, Finset.abs_sum_le_sum_abs _ _⟩
   all_goals
@@ -18,17 +24,18 @@ theorem RootFieldNumerics.partial_sum_ordered_bounds : ∀ (N j : ℕ) (u : Fin 
     have hNpos : (0 : ℝ) < N := by exact_mod_cast hN
     have hjN : (j : ℝ) ≤ N := by exact_mod_cast hj
     have hj0 : (0 : ℝ) ≤ j := Nat.cast_nonneg j
-  · have hcA : A.card = j := by
-      rw [hA, Fin.card_filter_val_lt]; omega
+  · have hcA : A.card = j := by rw [hA, Fin.card_filter_val_lt]; omega
     have hcB : (B.card : ℝ) = N - j := by
       have := hsplit (fun _ => 1)
-      simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one, hcA] at this
+      simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one, hcA]
+        at this
       linarith
     have key : ∑ i ∈ A, ∑ k ∈ B, u k ≤ ∑ i ∈ A, ∑ k ∈ B, u i := by
       refine Finset.sum_le_sum fun i hi => Finset.sum_le_sum fun k hk => hu i k ?_
       rw [hA, Finset.mem_filter] at hi
       rw [hB, Finset.mem_filter] at hk
-      rw [Fin.le_def]; omega
+      rw [Fin.le_def]
+      omega
     simp only [Finset.sum_const, nsmul_eq_mul, hcA, hcB, ← Finset.mul_sum] at key
     rw [hsplit u, sub_nonneg, ← mul_div_assoc, div_le_iff₀ hNpos]
     nlinarith

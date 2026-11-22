@@ -12,15 +12,19 @@ open GlobalTheory.KZ GlobalTheory.Glue GlobalTheory.K5 GlobalTheory.KummerEisens
 
 namespace GlobalTheory.LamEq
 
-theorem pow_prime_step (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (n : ℕ) (hn : 1 ≤ n) (t : ℤ) :
-    (p : ℤ) ^ (2 * n + 1) ∣ (1 + (p : ℤ) ^ n * t) ^ p - 1 - (p : ℤ) ^ (n + 1) * t := by
+theorem pow_prime_step (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (n : ℕ) (hn : 1 ≤ n) (t : ℤ)
+    : (p : ℤ) ^ (2 * n + 1) ∣ (1 + (p : ℤ) ^ n * t) ^ p - 1 - (p : ℤ) ^ (n + 1) * t := by
   obtain ⟨q, rfl⟩ : ∃ q, p = q + 2 := ⟨p - 2, by have := hp.two_le; omega⟩
   set P : ℤ := ((q + 2 : ℕ) : ℤ) with hP
-  have hexp : (1 + P ^ n * t) ^ (q + 2) =
-      ∑ i ∈ Finset.range (q + 1), (P ^ n * t) ^ (i + 2) * ((q + 2).choose (i + 2) : ℤ) + (q + 2 : ℕ) * (P ^ n * t) + 1 := by
+  have hexp
+      : (1 + P ^ n * t) ^ (q + 2)
+        = ∑ i ∈ Finset.range (q + 1), (P ^ n * t) ^ (i + 2) * ((q + 2).choose (i + 2) : ℤ)
+          + (q + 2 : ℕ) * (P ^ n * t) + 1 := by
     rw [add_comm (1 : ℤ), add_pow, Finset.sum_range_succ', Finset.sum_range_succ']
-    simp only [zero_add, one_pow, mul_one, pow_zero, Nat.choose_zero_right, Nat.choose_one_right, Nat.cast_one, pow_one]
-    push_cast; ring
+    simp only [zero_add, one_pow, mul_one, pow_zero, Nat.choose_zero_right, Nat.choose_one_right,
+      Nat.cast_one, pow_one]
+    push_cast
+    ring
   rw [hexp]
   have hPP : (q + 2 : ℕ) * (P ^ n * t) = P ^ (n + 1) * t := by rw [hP]; ring
   rw [hPP, show ∀ a b : ℤ, a + b + 1 - 1 - b = a from fun a b => by ring]
@@ -37,9 +41,11 @@ theorem pow_prime_step (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) (n : ℕ) (hn : 
     rw [mul_pow, ← pow_mul]
     exact Dvd.dvd.mul_right (pow_dvd_pow _ h3) _
 
-theorem pow_prime_pow (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2) :
-    ∀ (j n : ℕ), 1 ≤ n → ∀ t : ℤ,
-      (p : ℤ) ^ (2 * n + j) ∣ (1 + (p : ℤ) ^ n * t) ^ (p ^ j) - 1 - (p : ℤ) ^ (n + j) * t := by
+theorem pow_prime_pow (p : ℕ) (hp : p.Prime) (hp2 : p ≠ 2)
+    : ∀ (j n : ℕ),
+      1 ≤ n
+        → ∀ t : ℤ,
+          (p : ℤ) ^ (2 * n + j) ∣ (1 + (p : ℤ) ^ n * t) ^ (p ^ j) - 1 - (p : ℤ) ^ (n + j) * t := by
   intro j
   induction j with
   | zero => intro n _ t; simp
@@ -56,15 +62,25 @@ end GlobalTheory.LamEq
 
 namespace GlobalTheory.LamEq
 
-theorem aut_pow_apply {Ω : Type} [Field Ω] [Algebra ℚ Ω] (s : Ω ≃ₐ[ℚ] Ω) (z : Ω) (c : ℕ) (hc : s z = z ^ c) :
-    ∀ k : ℕ, (s ^ k) z = z ^ (c ^ k) := by
+theorem aut_pow_apply
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω] (s : Ω ≃ₐ[ℚ] Ω) (z : Ω) (c : ℕ) (hc : s z = z ^ c)
+    : ∀ k : ℕ, (s ^ k) z = z ^ (c ^ k) := by
   intro k
   induction k with
   | zero => simp
   | succ k ih => rw [pow_succ, AlgEquiv.mul_apply, hc, map_pow, ih, ← pow_mul, pow_succ]
 
-theorem lam_eq : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (L n m : ℕ), 1 ≤ m → m ≤ n → n ≤ L → ∀ s : Ω ≃ₐ[ℚ] Ω, s (zt ε p m) = zt ε p m →
-  ∀ tt tt' : ZMod (p ^ n), IsLamG ε p n m s tt → (s ^ (p ^ (L - m))) (zt ε p (L + n)) = zt ε p n ^ tt'.val * zt ε p (L + n) → tt = tt' := by
+theorem lam_eq
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∀ (L n m : ℕ),
+          1 ≤ m → m ≤ n → n ≤ L
+            → ∀ s : Ω ≃ₐ[ℚ] Ω,
+              s (zt ε p m) = zt ε p m
+                → ∀ tt tt' : ZMod (p ^ n),
+                  IsLamG ε p n m s tt
+                    → (s ^ (p ^ (L - m))) (zt ε p (L + n)) = zt ε p n ^ tt'.val * zt ε p (L + n)
+                    → tt = tt' := by
   intro Ω _ _ _ ε p hpf hp2 L n m hm1 hmn hnL s _ tt tt' hlam hL
   have hp : p.Prime := hpf.out
   haveI : NeZero p := ⟨hp.ne_zero⟩
@@ -72,7 +88,8 @@ theorem lam_eq : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ �
   obtain ⟨e, rfl⟩ : ∃ e, L = n + e := ⟨L - n, by omega⟩
   set z := zt ε p (n + e + n) with hzdef
   have hz : IsPrimitiveRoot z (p ^ (n + e + n)) := IsNTr.isPrimitiveRoot_zt ε p _
-  obtain ⟨c, -, hc⟩ := hz.eq_pow_of_pow_eq_one (ξ := s z) (by rw [← map_pow, hz.pow_eq_one, map_one])
+  obtain ⟨c, -, hc⟩ :=
+    hz.eq_pow_of_pow_eq_one (ξ := s z) (by rw [← map_pow, hz.pow_eq_one, map_one])
   have hs := aut_pow_apply s z c hc.symm
   have h2n : zt ε p (2 * n) = z ^ (p ^ e) := by
     rw [hzdef, ← IsNTr.zt_pow ε p (2 * n) e]; congr 2; omega

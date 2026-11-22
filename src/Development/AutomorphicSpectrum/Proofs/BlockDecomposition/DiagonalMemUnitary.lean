@@ -25,19 +25,26 @@ noncomputable section
 
 open Matrix Finset
 open scoped InnerProductSpace
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD GlobalTheory.CompanionTheory.RealCount GlobalTheory.CompanionTheory.RealCountG
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  GlobalTheory.CompanionTheory.RealCount GlobalTheory.CompanionTheory.RealCountG
 
 namespace GlobalTheory.CompanionTheory.RealCountG
 
-theorem hw_harm {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam)
-    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (E1 E2 : Fin n → Fin n → Module.End ℂ V)
-    (σ : Matrix.unitaryGroup (Fin n) ℂ →* (V →ₗ[ℂ] V)) (A : V →ₗ[ℂ] V) (hc : IsCoreMod (infOf lam) E1 E2 σ A)
-    (ν : Fin n → ℤ) (v : V) (hv : v ≠ 0) (hh : v ∈ hwSp E1 E2 (wtR ν)) (hdom : DomLE (wtR ν) (m0 lam)) :
-    ν ∈ harmZ lam := by
+theorem hw_harm
+    {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam)
+    (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    (E1 E2 : Fin n → Fin n → Module.End ℂ V) (σ : Matrix.unitaryGroup (Fin n) ℂ →* (V →ₗ[ℂ] V))
+    (A : V →ₗ[ℂ] V) (hc : IsCoreMod (infOf lam) E1 E2 σ A)
+    (ν : Fin n → ℤ) (v : V) (hv : v ≠ 0) (hh : v ∈ hwSp E1 E2 (wtR ν))
+    (hdom : DomLE (wtR ν) (m0 lam))
+    : ν ∈ harmZ lam := by
   obtain ⟨S, hfd, hvS, -, hKS, -⟩ := hc.der.2 v
-  have hGl : Formalism.REAL.GlRel (kF E1 E2) := GlobalTheory.CompanionTheory.RealCount.KHw.glRel_kF hc.pair
+  have hGl : Formalism.REAL.GlRel (kF E1 E2) :=
+    GlobalTheory.CompanionTheory.RealCount.KHw.glRel_kF hc.pair
   have hK : Formalism.REAL.KHighest (fun _ => true) (kF E1 E2) (wtR ν) v := hh
-  have hanti : Antitone (wtR ν) := GlobalTheory.CompanionTheory.RealCount.highestWeight_antitone_of_finiteDimensional_stable V (kF E1 E2) S (wtR ν) v hGl hfd hKS hvS hv hK
+  have hanti : Antitone (wtR ν) :=
+    GlobalTheory.CompanionTheory.RealCount.highestWeight_antitone_of_finiteDimensional_stable V
+      (kF E1 E2) S (wtR ν) v hGl hfd hKS hvS hv hK
   have hanti' : Antitone ν := fun a b hab => by
     have := hanti hab
     simpa [wtR] using this
@@ -46,9 +53,12 @@ theorem hw_harm {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam)
   have hn := GlobalTheory.T.clifford_highest_weight_vector lam V E1 E2 σ A hc ι c hcl _ x hx hxh
   exact GlobalTheory.T.harmonic_of_norm_bound lam hl ν hanti' hdom w hw hn
 
-theorem hw_stable' {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    {E1 E2 : Fin n → Fin n → Module.End ℂ V} {A : V →ₗ[ℂ] V} (hA2 : A * A = 1) (hAE : ∀ a b, A * E1 a b = E2 a b * A)
-    (μ : Fin n → ℝ) : ∀ x ∈ hwSp E1 E2 μ, A x ∈ hwSp E1 E2 μ := by
+theorem hw_stable'
+    {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {E1 E2 : Fin n → Fin n → Module.End ℂ V} {A : V →ₗ[ℂ] V}
+    (hA2 : A * A = 1) (hAE : ∀ a b, A * E1 a b = E2 a b * A)
+    (μ : Fin n → ℝ)
+    : ∀ x ∈ hwSp E1 E2 μ, A x ∈ hwSp E1 E2 μ := by
   have hk : ∀ a b (y : V), A (kF E1 E2 a b y) = kF E1 E2 a b (A y) := by
     intro a b y
     have h1 : A (E1 a b y) = E2 a b (A y) := LinearMap.congr_fun (hAE a b) y
@@ -64,24 +74,28 @@ theorem hw_stable' {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpac
   · rw [← hk, hx.1 a, map_smul]
   · rw [← hk, hx.2 a b hab he, map_zero]
 
-theorem flip_stable' {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    {σ : Matrix.unitaryGroup (Fin n) ℂ →* (V →ₗ[ℂ] V)} {A : V →ₗ[ℂ] V} (hAσ : ∀ k, A * σ k = σ k * A)
-    (E : KMod n) (T : E.V →L[ℂ] E.V) (hT : ∀ k, T * E.ρ k = E.ρ k * T) :
-    ∀ t ∈ invA σ E, flipA E A T t ∈ invA σ E := by
+theorem flip_stable'
+    {n : ℕ} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+    {σ : Matrix.unitaryGroup (Fin n) ℂ →* (V →ₗ[ℂ] V)} {A : V →ₗ[ℂ] V}
+    (hAσ : ∀ k, A * σ k = σ k * A)
+    (E : KMod n) (T : E.V →L[ℂ] E.V) (hT : ∀ k, T * E.ρ k = E.ρ k * T)
+    : ∀ t ∈ invA σ E, flipA E A T t ∈ invA σ E := by
   intro t ht k ξ
   have h1 : dualT E T (ξ ∘L E.ρ k⁻¹) = (dualT E T ξ) ∘L E.ρ k⁻¹ := by
     ext y
     have h2 := congrArg (fun S : E.V →L[ℂ] E.V => ξ (S y)) (hT k⁻¹)
-    simp only [dualT, ContinuousLinearMap.flip_apply, ContinuousLinearMap.compL_apply, ContinuousLinearMap.comp_apply]
+    simp only [dualT, ContinuousLinearMap.flip_apply, ContinuousLinearMap.compL_apply,
+      ContinuousLinearMap.comp_apply]
     exact (h2.symm)
   have h3 : flipA E A T t (ξ ∘L E.ρ k⁻¹) = A (t (dualT E T (ξ ∘L E.ρ k⁻¹))) := rfl
   have h4 : flipA E A T t ξ = A (t (dualT E T ξ)) := rfl
   rw [h3, h4, h1, ht k (dualT E T ξ)]
   exact LinearMap.congr_fun (hAσ k) _
 
-theorem dual_stable' {n : ℕ} (E : KMod n) (T : E.V →L[ℂ] E.V) (hT : ∀ k, T * E.ρ k = E.ρ k * T)
-    (G : Fin n → Fin n → Module.End ℂ (E.V →L[ℂ] ℂ)) (hG : IsDualFam E G) (μ : Fin n → ℝ) :
-    ∀ ξ ∈ hwOf G μ, (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)) ξ ∈ hwOf G μ := by
+theorem dual_stable'
+    {n : ℕ} (E : KMod n) (T : E.V →L[ℂ] E.V) (hT : ∀ k, T * E.ρ k = E.ρ k * T)
+    (G : Fin n → Fin n → Module.End ℂ (E.V →L[ℂ] ℂ)) (hG : IsDualFam E G) (μ : Fin n → ℝ)
+    : ∀ ξ ∈ hwOf G μ, (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)) ξ ∈ hwOf G μ := by
   intro ξ hξ
   have hc := GlobalTheory.T.dual_operator_commutes_lie E T hT G hG
   refine ⟨fun a => ?_, fun a b hab he => ?_⟩
@@ -91,8 +105,8 @@ theorem dual_stable' {n : ℕ} (E : KMod n) (T : E.V →L[ℂ] E.V) (hT : ∀ k,
   · show G a b (dualT E T ξ) = 0
     rw [← hc, hξ.2 a b hab he, map_zero]
 
-theorem diagonal_mem_unitary {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, ‖z a‖ = 1) :
-    (diagonal z : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ := by
+theorem diagonal_mem_unitary {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, ‖z a‖ = 1)
+    : (diagonal z : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ := by
   rw [Matrix.mem_unitaryGroup_iff, Matrix.star_eq_conjTranspose, Matrix.diagonal_conjTranspose,
     Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
   refine congrArg Matrix.diagonal (funext fun a => ?_)
@@ -100,16 +114,22 @@ theorem diagonal_mem_unitary {n : ℕ} (z : Fin n → ℂ) (hz : ∀ a, ‖z a�
   rw [Complex.mul_conj', hz a]
   simp
 
-theorem dualtr {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (E : KMod n) (T : E.V →L[ℂ] E.V) (hT : IsLefK lam E T)
-    (G : Fin n → Fin n → Module.End ℂ (E.V →L[ℂ] ℂ)) (hG : IsDualFam E G) :
-    ∀ μ ∈ harmZ lam, trOn (hwOf G (wtR μ)) (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)) = 2 ^ n := by
+theorem dualtr
+    {n : ℕ} (lam : Fin n → ℤ) (hl : Antitone lam) (E : KMod n) (T : E.V →L[ℂ] E.V)
+    (hT : IsLefK lam E T) (G : Fin n → Fin n → Module.End ℂ (E.V →L[ℂ] ℂ)) (hG : IsDualFam E G)
+    : ∀ μ ∈ harmZ lam,
+      trOn (hwOf G (wtR μ)) (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)) = 2 ^ n := by
   obtain ⟨F, hF, -, hch⟩ := GlobalTheory.T.dual_weight_trace_formula E T hT.1 G hG
   intro μ hμ
-  refine (GlobalTheory.T.harmonic_weights_coefficient lam hl F hF (fun ν => trOn (hwOf G (wtR ν)) (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)))
-    (fun z hz hinj => ?_) μ hμ).2
+  refine (GlobalTheory.T.harmonic_weights_coefficient lam hl F hF
+    (fun ν => trOn (hwOf G (wtR ν)) (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)))
+    (fun z hz hinj => ?_)
+    μ hμ).2
   have hzi : Function.Injective z := fun a b h => hinj (by simp only [h])
   have h1 := hch ⟨diagonal z, diagonal_mem_unitary z hz⟩ z rfl hzi
-  have h2 := GlobalTheory.T.twisted_trace_weyl_character lam E T hT ⟨diagonal z, diagonal_mem_unitary z hz⟩ z rfl hinj
+  have h2 :=
+    GlobalTheory.T.twisted_trace_weyl_character lam E T hT ⟨diagonal z, diagonal_mem_unitary z hz⟩ z
+      rfl hinj
   rw [← h1, h2]
 
 theorem countG : CountG := by
@@ -122,8 +142,9 @@ theorem countG : CountG := by
     refine ⟨fun a => ?_, fun a b hab he => ?_⟩
     · rw [← hint t ht, hξ.1 a, map_smul]
     · rw [← hint t ht, hξ.2 a b hab he, map_zero]
-  have hinj := GlobalTheory.T.finite_weights_invariant_hom V E1 E2 σ hc.pair hc.der E G hG hsp (harmZ lam)
-    (fun ν v hv hh hw => hw_harm lam hlam V E1 E2 σ A hc ν v hv hh (htop ν hw))
+  have hinj :=
+    GlobalTheory.T.finite_weights_invariant_hom V E1 E2 σ hc.pair hc.der E G hG hsp (harmZ lam)
+      (fun ν v hv hh hw => hw_harm lam hlam V E1 E2 σ A hc ν v hv hh (htop ν hw))
   have hext := GlobalTheory.T.exists_invariant_extending V E1 E2 σ hc.pair hc.der E G hG (harmZ lam)
   have hA : ∀ μ, ∀ x ∈ hwSp E1 E2 μ, A x ∈ hwSp E1 E2 μ := hw_stable' hc.Asq hc.AE
   have hF : ∀ t ∈ invA σ E, flipA E A T t ∈ invA σ E := flip_stable' hc.Aσ E T hT.1
@@ -133,8 +154,10 @@ theorem countG : CountG := by
   let W : ι → Type := fun i => hwOf G (wtR i.1)
   let H : ι → Type := fun i => hwSp E1 E2 (wtR i.1)
   let b : ∀ i, W i →ₗ[ℂ] W i := fun i =>
-    (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)).restrict (p := hwOf G (wtR i.1)) (q := hwOf G (wtR i.1)) (hB _)
-  let a : ∀ i, H i →ₗ[ℂ] H i := fun i => A.restrict (p := hwSp E1 E2 (wtR i.1)) (q := hwSp E1 E2 (wtR i.1)) (hA _)
+    (dualT E T : (E.V →L[ℂ] ℂ) →ₗ[ℂ] (E.V →L[ℂ] ℂ)).restrict (p := hwOf G (wtR i.1))
+      (q := hwOf G (wtR i.1)) (hB _)
+  let a : ∀ i, H i →ₗ[ℂ] H i := fun i =>
+    A.restrict (p := hwSp E1 E2 (wtR i.1)) (q := hwSp E1 E2 (wtR i.1)) (hA _)
   have e3 : ∀ i : ι, LinearMap.trace ℂ (W i) (b i) = 2 ^ n := by
     intro i
     have := htr i.1 i.2
@@ -148,12 +171,16 @@ theorem countG : CountG := by
     have := e3 i
     rw [h0, map_zero] at this
     exact (pow_ne_zero n (two_ne_zero : (2 : ℂ) ≠ 0)) this.symm
-  let R0 : invA σ E →ₗ[ℂ] (∀ i, W i →ₗ[ℂ] H i) :=
-    { toFun := fun t i => LinearMap.codRestrict (hwSp E1 E2 (wtR i.1)) (t.1 ∘ₗ (hwOf G (wtR i.1)).subtype)
+  let R0 : invA σ E →ₗ[ℂ] (∀ i, W i →ₗ[ℂ] H i) := {
+    toFun := fun t i =>
+      LinearMap.codRestrict (hwSp E1 E2 (wtR i.1)) (t.1 ∘ₗ (hwOf G (wtR i.1)).subtype)
         (fun ξ => hmaps t.1 t.2 _ ξ.1 ξ.2)
-      map_add' := fun x y => by funext i; ext ξ; rfl
-      map_smul' := fun c x => by funext i; ext ξ; rfl }
-  have hR0 : ∀ (t : invA σ E) (i : ι) (ξ : W i), ((R0 t i ξ : hwSp E1 E2 (wtR i.1)) : V) = t.1 ξ.1 := fun _ _ _ => rfl
+    map_add' := fun x y => by funext i; ext ξ; rfl
+    map_smul' := fun c x => by funext i; ext ξ; rfl
+  }
+  have hR0
+      : ∀ (t : invA σ E) (i : ι) (ξ : W i), ((R0 t i ξ : hwSp E1 E2 (wtR i.1)) : V) = t.1 ξ.1 :=
+    fun _ _ _ => rfl
   have hbij : Function.Bijective R0 := by
     constructor
     · refine (injective_iff_map_eq_zero R0).2 fun t ht => ?_
@@ -197,7 +224,8 @@ theorem countG : CountG := by
       unfold trOn; rw [dite_eq_left hF]
     have e2 : ∀ i : ι, trOn (hwSp E1 E2 (wtR i.1)) A = LinearMap.trace ℂ (H i) (a i) := by
       intro i
-      unfold trOn; rw [dite_eq_left (hA _)]
+      unfold trOn
+      rw [dite_eq_left (hA _)]
     rw [e1, htrace, hse, Finset.sum_image (fun x _ y _ h => wtR_injective h), Finset.mul_sum,
       ← Finset.sum_coe_sort (harmZ lam)]
     refine Finset.sum_congr rfl fun i _ => ?_

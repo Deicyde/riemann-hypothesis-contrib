@@ -11,12 +11,21 @@ open GlobalTheory.PolFan GlobalTheory.LocM
 
 namespace GlobalTheory.Poinc.MinSysTypeBal
 
-theorem finite_minimiser_systems_upTo_aut : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (Y : Type) [AddCommGroup Y]
-    [Module O Y] [Module.Finite O Y] [Module.Projective O Y], IsPolFanOn bar φ Y → ∀ (n N : ℕ) [NeZero N], 3 ≤ N →
-    ∀ (eb : Y ≃ₗ[ℤ] (Fin n → ℤ)), ∃ S : Finset ((Fin n → ZMod N) → Y), ∀ b ∈ balForms bar Y, (∀ x, x ≠ 0 → 0 < b x x) →
-    ∃ e : Y ≃ₗ[O] Y, ∀ μ : (Fin n → ZMod N) → Y, (∀ cl i, ((eb (μ cl) i : ℤ) : ZMod N) = cl i) →
-    (∀ cl (α : Y), (∀ i, ((eb α i : ℤ) : ZMod N) = cl i) → pull e.toLinearMap b (μ cl) (μ cl) ≤ pull e.toLinearMap b α α) →
-    μ ∈ S := by
+theorem finite_minimiser_systems_upTo_aut
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (φ : InvFun O) (Y : Type) [AddCommGroup Y]
+        [Module O Y] [Module.Finite O Y] [Module.Projective O Y],
+      IsPolFanOn bar φ Y
+        → ∀ (n N : ℕ) [NeZero N],
+          3 ≤ N
+            → ∀ (eb : Y ≃ₗ[ℤ] (Fin n → ℤ)), ∃ S : Finset ((Fin n → ZMod N) → Y),
+              ∀ b ∈ balForms bar Y,
+                (∀ x, x ≠ 0 → 0 < b x x)
+                  → ∃ e : Y ≃ₗ[O] Y, ∀ μ : (Fin n → ZMod N) → Y,
+                    (∀ cl i, ((eb (μ cl) i : ℤ) : ZMod N) = cl i)
+                      → (∀ cl (α : Y),
+                        (∀ i, ((eb α i : ℤ) : ZMod N) = cl i)
+                          → pull e.toLinearMap b (μ cl) (μ cl) ≤ pull e.toLinearMap b α α)
+                      → μ ∈ S := by
   intro O _ bar φ Y _ _ _ _ hX n N _ _ eb
   classical
   haveI : Module.Free ℤ Y := Module.Free.of_equiv eb.symm
@@ -24,14 +33,22 @@ theorem finite_minimiser_systems_upTo_aut : ∀ (O : Type) [CommRing O] (bar : O
   obtain ⟨S₀, hS₀, hfin⟩ := hX.finite
   set F := hS₀.toFinset with hF
   let ι := Σ m : Fin (F.card + 1), (Fin m.val → F)
-  let P : ι → Prop := fun i => IsCone bar φ (fun j => ((i.2 j : F) : LinearMap.BilinForm ℤ Y)) ∧
-    ∀ x, x ≠ 0 → 0 < ∑ j, ((i.2 j : F) : LinearMap.BilinForm ℤ Y) x x
+  let P : ι → Prop := fun i =>
+    IsCone bar φ (fun j => ((i.2 j : F) : LinearMap.BilinForm ℤ Y))
+      ∧ ∀ x, x ≠ 0 → 0 < ∑ j, ((i.2 j : F) : LinearMap.BilinForm ℤ Y) x x
   let T : ι → Finset ((Fin n → ZMod N) → Y) := fun i =>
-    if h : P i then Classical.choose (GlobalTheory.T.finite_minimiserSystems_posCombination_definiteSum Y n N eb i.1.val _ (fun j x y => (h.1.mem j).1 x y)
-      (fun j y => h.1.nonneg j y) h.2) else ∅
+    if h : P i then
+      Classical.choose (GlobalTheory.T.finite_minimiserSystems_posCombination_definiteSum Y n N eb
+        i.1.val _
+        (fun j x y => (h.1.mem j).1 x y)
+        (fun j y => h.1.nonneg j y)
+        h.2)
+    else
+      ∅
   refine ⟨Finset.univ.biUnion T, ?_⟩
   intro b hb hpos
-  obtain ⟨m, γ, k, cf, hcone, hk, hcf, hsum⟩ := GlobalTheory.Poinc.Cover.exists_cone O bar φ Y hX b hb hpos
+  obtain ⟨m, γ, k, cf, hcone, hk, hcf, hsum⟩ :=
+    GlobalTheory.Poinc.Cover.exists_cone O bar φ Y hX b hb hpos
   obtain ⟨e, he⟩ := hfin m γ hcone
   refine ⟨e, fun μ h1 h2 => ?_⟩
   let γ' : Fin m → F := fun j => ⟨pull e.toLinearMap (γ j), hS₀.mem_toFinset.2 (he j)⟩
@@ -63,8 +80,12 @@ theorem finite_minimiser_systems_upTo_aut : ∀ (O : Type) [CommRing O] (bar : O
     · omega
   have hmem : μ ∈ T i := by
     simp only [T, dif_pos hPi]
-    refine Classical.choose_spec (GlobalTheory.T.finite_minimiserSystems_posCombination_definiteSum Y n N eb i.1.val _ (fun j x y => (hPi.1.mem j).1 x y)
-      (fun j y => hPi.1.nonneg j y) hPi.2) (pull e.toLinearMap b) k cf hk hcf ?_ μ h1 h2
+    refine Classical.choose_spec
+      (GlobalTheory.T.finite_minimiserSystems_posCombination_definiteSum Y n N eb i.1.val _
+        (fun j x y => (hPi.1.mem j).1 x y)
+        (fun j y => hPi.1.nonneg j y)
+        hPi.2)
+      (pull e.toLinearMap b) k cf hk hcf ?_ μ h1 h2
     ext a c
     have := LinearMap.congr_fun₂ hsum (e a) (e c)
     simpa [i, γ', pull_apply, LinearMap.sum_apply] using this

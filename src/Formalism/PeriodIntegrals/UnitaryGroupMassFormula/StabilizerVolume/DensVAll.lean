@@ -10,7 +10,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume
 
 namespace PI.VolStabS
 
-theorem densV_holds : DensV :=
-  densV_of_gram (gramFilt_of (dxOpen_of secGram_holds))
+theorem densV_holds : DensV := densV_of_gram (gramFilt_of (dxOpen_of secGram_holds))
 
 end PI.VolStabS

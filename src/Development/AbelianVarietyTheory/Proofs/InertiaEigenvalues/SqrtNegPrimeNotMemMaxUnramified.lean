@@ -12,11 +12,15 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem sqrt_neg_l_not_mem_Kur : ∀ (l : ℕ) [Fact l.Prime] (y : Om l), y ^ 2 = -(l : Om l) → y ∉ MaximalUnramifiedExtension l := by
+theorem sqrt_neg_l_not_mem_Kur
+    : ∀ (l : ℕ) [Fact l.Prime] (y : Om l),
+      y ^ 2 = -(l : Om l) → y ∉ MaximalUnramifiedExtension l := by
   intro l _ y hy hK
   have hl1 : (1 : ℝ) < (l : ℝ) := Formalism.MainNotions.N.PreambleDegrees.Loc.one_lt_l
   have hl0 : (0 : ℝ) < l := by linarith

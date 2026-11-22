@@ -25,8 +25,9 @@ theorem partialBoxVolumeMonotoneStep : GjLevel := by
   obtain ⟨jj, hjj⟩ : ∃ jj : Fin n, (jj : ℕ) = j := ⟨⟨j, hj⟩, rfl⟩
   let ej : Fin n → ℝ := Pi.single jj 1
   have ej_apply : ∀ i, ej i = if i = jj then 1 else 0 := fun i => by simp [ej, Pi.single_apply]
-  have hcoord : ∀ (y : Fin n → ℝ) (m : ℤ) (i : Fin n),
-      (y + (m : ℝ) • ej) i = if i = jj then y i + m else y i := by
+  have hcoord
+      : ∀ (y : Fin n → ℝ) (m : ℤ) (i : Fin n),
+        (y + (m : ℝ) • ej) i = if i = jj then y i + m else y i := by
     intro y m i
     simp only [Pi.add_apply, Pi.smul_apply, ej_apply, smul_eq_mul]
     split_ifs <;> ring
@@ -34,12 +35,12 @@ theorem partialBoxVolumeMonotoneStep : GjLevel := by
   let S : Set (Fin n → ℝ) := boxJ n j ∩ (A + latJ n j)
   let P : ℤ → Set (Fin n → ℝ) := fun m => S ∩ {x | ⌊x jj⌋ = m}
   let Q : ℤ → Set (Fin n → ℝ) := fun m => (fun y => y + (m : ℝ) • ej) ⁻¹' P m
-  have hSm : MeasurableSet S := (measurableSet_boxJ n j).inter (hA.add_right (t := latJ n j)).measurableSet
+  have hSm : MeasurableSet S :=
+    (measurableSet_boxJ n j).inter (hA.add_right (t := latJ n j)).measurableSet
   have hPm : ∀ m, MeasurableSet (P m) := fun m =>
     hSm.inter ((Int.measurable_floor.comp (measurable_pi_apply jj)) (measurableSet_singleton m))
   have hQm : ∀ m, MeasurableSet (Q m) := fun m => (measurable_id.add_const _) (hPm m)
-  have hvol : ∀ m, volume (Q m) = volume (P m) := fun m =>
-    measure_preimage_add_right volume _ (P m)
+  have hvol : ∀ m, volume (Q m) = volume (P m) := fun m => measure_preimage_add_right volume _ (P m)
   have hsub : ∀ m, Q m ⊆ boxJ n (j + 1) ∩ (A + latJ n (j + 1)) := by
     intro m y hy
     obtain ⟨⟨hbox, hAk⟩, hfl⟩ := hy
@@ -98,7 +99,9 @@ theorem partialBoxVolumeMonotoneStep : GjLevel := by
     apply hmm'
     exact_mod_cast (by linarith : (m : ℝ) = m')
   have hcover : S ⊆ ⋃ m : ℤ, P m := fun x hx => Set.mem_iUnion.2 ⟨⌊x jj⌋, hx, rfl⟩
-  calc Gj n j A = volume S := rfl
+  calc
+    Gj n j A
+      = volume S := rfl
     _ ≤ volume (⋃ m : ℤ, P m) := measure_mono hcover
     _ ≤ ∑' m, volume (P m) := measure_iUnion_le _
     _ = ∑' m, volume (Q m) := tsum_congr fun m => (hvol m).symm

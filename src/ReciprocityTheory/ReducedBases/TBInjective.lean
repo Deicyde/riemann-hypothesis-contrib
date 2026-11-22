@@ -30,13 +30,13 @@ private lemma eq_sum_smul_gs {E : Type*} [NormedAddCommGroup E] [InnerProductSpa
   conv_lhs => rw [gramSchmidt_def'' ℝ v a]
   simp
 
-theorem det_gram_eq {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] {m : ℕ}
-    (v : Fin m → E) (hv : LinearIndependent ℝ v) :
-    (Matrix.gram ℝ v).det = ∏ j, ‖gs v j‖ ^ 2 := by
+theorem det_gram_eq
+    {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
+    {m : ℕ} (v : Fin m → E) (hv : LinearIndependent ℝ v)
+    : (Matrix.gram ℝ v).det = ∏ j, ‖gs v j‖ ^ 2 := by
   set C : Matrix (Fin m) (Fin m) ℝ := Matrix.of fun a b =>
     if b = a then (1 : ℝ) else if b < a then ⟪gs v b, v a⟫_ℝ / ‖gs v b‖ ^ 2 else 0 with hCdef
-  have hexp : ∀ a, v a = ∑ b, C a b • gs v b := fun a => by
-    simpa [C] using eq_sum_smul_gs v a
+  have hexp : ∀ a, v a = ∑ b, C a b • gs v b := fun a => by simpa [C] using eq_sum_smul_gs v a
   have hin : ∀ a b, ⟪v a, v b⟫_ℝ = ∑ c, C a c * ‖gs v c‖ ^ 2 * C b c := by
     intro a b
     rw [hexp a, hexp b]
@@ -45,7 +45,8 @@ theorem det_gram_eq {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E]
     rw [Finset.sum_eq_single c]
     · rw [real_inner_self_eq_norm_sq]; ring
     · intro d _ hdc
-      rw [gramSchmidt_orthogonal ℝ v hdc]; ring
+      rw [gramSchmidt_orthogonal ℝ v hdc]
+      ring
     · simp
   have hG : Matrix.gram ℝ v = C * Matrix.diagonal (fun c => ‖gs v c‖ ^ 2) * Cᵀ := by
     ext a b
@@ -71,7 +72,8 @@ def fB (B : Matrix (Fin d) (Fin d) ℝ) : (Fin d → ℤ) →ₗ[ℤ] EuclideanS
   toFun x := WithLp.toLp 2 (B *ᵥ toReal x)
   map_add' x y := by
     have : toReal (x + y) = toReal x + toReal y := by funext i; simp [toReal]
-    rw [this, mulVec_add]; rfl
+    rw [this, mulVec_add]
+    rfl
   map_smul' n x := by
     have : toReal (n • x) = (n : ℝ) • toReal x := by funext i; simp [toReal]
     rw [this, mulVec_smul]
@@ -81,7 +83,8 @@ def fB (B : Matrix (Fin d) (Fin d) ℝ) : (Fin d → ℤ) →ₗ[ℤ] EuclideanS
 lemma fB_apply (B : Matrix (Fin d) (Fin d) ℝ) (x : Fin d → ℤ) :
     fB B x = WithLp.toLp 2 (B *ᵥ toReal x) := rfl
 
-def TB (B : Matrix (Fin d) (Fin d) ℝ) : EuclideanSpace ℝ (Fin d) →ₗ[ℝ] EuclideanSpace ℝ (Fin d) where
+def TB (B : Matrix (Fin d) (Fin d) ℝ)
+    : EuclideanSpace ℝ (Fin d) →ₗ[ℝ] EuclideanSpace ℝ (Fin d) where
   toFun v := WithLp.toLp 2 (B *ᵥ WithLp.ofLp v)
   map_add' u v := by ext i; simp [mulVec_add]
   map_smul' r v := by ext i; simp [mulVec_smul]

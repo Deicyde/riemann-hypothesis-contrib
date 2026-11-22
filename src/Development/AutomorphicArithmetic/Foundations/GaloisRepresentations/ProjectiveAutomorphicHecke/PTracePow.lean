@@ -9,8 +9,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open Module
 universe u v
 
-theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds :
-    UpperTheory.Gal.CertificateRingHomMap.TracePow.{u} := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds
+    : UpperTheory.Gal.CertificateRingHomMap.TracePow.{u} := by
   intro F _ _ W _ _ _ q s hq hq0 hqs hinj j₀
   by_contra hcon
   push_neg at hcon
@@ -61,8 +61,9 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds :
     rw [Polynomial.aeval_eq_sum_range] at h0
     have h1 := congrArg (fun f => LinearMap.trace F (LinearMap.range q) (f * t ^ j)) h0
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_mul, map_sum, zero_mul, map_zero, smul_mul_assoc, map_smul,
-      ← pow_add, smul_eq_mul] at h1
+      simp only [Finset.sum_mul, map_sum, zero_mul, map_zero, smul_mul_assoc, map_smul, ← pow_add,
+          smul_eq_mul]
+        at h1
     simpa [ha] using h1
   have hall : ∀ n j, j₀ ≤ j + n → a j = 0 := by
     intro n
@@ -79,7 +80,7 @@ theorem UpperTheory.Gal.CertificateRingHomMap.pTracePow_holds :
       exact (mul_eq_zero.mp h).resolve_left hc0
   have ha0 : a 0 = 0 := hall j₀ 0 (by omega)
   have hne : LinearMap.range q ≠ ⊥ := fun h => hq0 (LinearMap.range_eq_bot.mp h)
-  have hpos : Module.finrank F (LinearMap.range q) ≠ 0 :=
-    fun h => hne (Submodule.finrank_eq_zero.mp h)
+  have hpos : Module.finrank F (LinearMap.range q) ≠ 0 := fun h =>
+    hne (Submodule.finrank_eq_zero.mp h)
   simp only [ha, pow_zero, LinearMap.trace_one] at ha0
   exact (Nat.cast_ne_zero.mpr hpos) ha0

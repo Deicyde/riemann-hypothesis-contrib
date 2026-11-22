@@ -26,38 +26,44 @@ private lemma posDef_of_re {m : Nat} {M : Matrix (Fin m) (Fin m) ℂ} (hH : M.Is
   Matrix.PosDef.of_dotProduct_mulVec_pos hH fun v hv =>
     Complex.pos_iff.mpr ⟨h v hv, (hH.im_star_dotProduct_mulVec_self v).symm⟩
 
-theorem goal1 :
-  ∀ {X : Type u_1} [inst : TopologicalSpace.{u_1} X] {m : Nat} (A : X → Matrix.{0, 0, 0} (Fin m) (Fin m) Complex),
-  (∀ (i j : Fin m),
-      @Continuous.{u_1, 0} X Complex inst
-        (@UniformSpace.toTopologicalSpace.{0} Complex
-          (@PseudoMetricSpace.toUniformSpace.{0} Complex
-            (@SeminormedRing.toPseudoMetricSpace.{0} Complex
-              (@SeminormedCommRing.toSeminormedRing.{0} Complex
-                (@NormedCommRing.toSeminormedCommRing.{0} Complex
-                  (@CommCStarAlgebra.toNormedCommRing.{0} Complex instCommCStarAlgebraComplex))))))
-        fun (x : X) ↦ A x i j) →
-    (∀ (x : X),
-        @Matrix.IsHermitian.{0, 0} Complex (Fin m)
-          (@InvolutiveStar.toStar.{0} Complex
-            (@StarAddMonoid.toInvolutiveStar.{0} Complex
-              (@AddCommMonoid.toAddMonoid.{0} Complex
-                (@NonUnitalNonAssocSemiring.toAddCommMonoid.{0} Complex
+theorem goal1
+    : ∀ {X : Type u_1} [inst : TopologicalSpace.{u_1} X] {m : Nat}
+        (A : X → Matrix.{0, 0, 0} (Fin m) (Fin m) Complex),
+      (∀ (i j : Fin m),
+          @Continuous.{u_1, 0} X Complex inst
+            (@UniformSpace.toTopologicalSpace.{0} Complex
+              (@PseudoMetricSpace.toUniformSpace.{0} Complex
+                (@SeminormedRing.toPseudoMetricSpace.{0} Complex
+                  (@SeminormedCommRing.toSeminormedRing.{0} Complex
+                    (@NormedCommRing.toSeminormedCommRing.{0} Complex
+                      (@CommCStarAlgebra.toNormedCommRing.{0} Complex
+                        instCommCStarAlgebraComplex))))))
+            fun (x : X) ↦ A x i j)
+        → (∀ (x : X),
+          @Matrix.IsHermitian.{0, 0} Complex (Fin m)
+            (@InvolutiveStar.toStar.{0} Complex
+              (@StarAddMonoid.toInvolutiveStar.{0} Complex
+                (@AddCommMonoid.toAddMonoid.{0} Complex
+                  (@NonUnitalNonAssocSemiring.toAddCommMonoid.{0} Complex
+                    (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring.{0} Complex
+                      (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing.{0} Complex
+                        (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{0} Complex
+                          Complex.instNonUnitalCommRing)))))
+                (@StarRing.toStarAddMonoid.{0} Complex
                   (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring.{0} Complex
                     (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing.{0} Complex
-                      (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{0} Complex Complex.instNonUnitalCommRing)))))
-              (@StarRing.toStarAddMonoid.{0} Complex
-                (@NonUnitalNonAssocRing.toNonUnitalNonAssocSemiring.{0} Complex
-                  (@NonUnitalNonAssocCommRing.toNonUnitalNonAssocRing.{0} Complex
-                    (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{0} Complex Complex.instNonUnitalCommRing)))
-                Complex.instStarRing)))
-          (A x)) →
-      ∀ (x0 : X),
-        @Matrix.PosDef.{0, 0} (Fin m) Complex Complex.instRing Complex.partialOrder Complex.instStarRing (A x0) →
-          @Filter.Eventually.{u_1} X
-            (fun (x : X) ↦
-              @Matrix.PosDef.{0, 0} (Fin m) Complex Complex.instRing Complex.partialOrder Complex.instStarRing (A x))
-            (@nhds.{u_1} X inst x0) := by
+                      (@NonUnitalCommRing.toNonUnitalNonAssocCommRing.{0} Complex
+                        Complex.instNonUnitalCommRing)))
+                  Complex.instStarRing)))
+            (A x))
+        → ∀ (x0 : X),
+          @Matrix.PosDef.{0, 0} (Fin m) Complex Complex.instRing Complex.partialOrder
+              Complex.instStarRing (A x0)
+            → @Filter.Eventually.{u_1} X
+              (fun (x : X) ↦
+                @Matrix.PosDef.{0, 0} (Fin m) Complex Complex.instRing Complex.partialOrder
+                  Complex.instStarRing (A x))
+              (@nhds.{u_1} X inst x0) := by
   intro X inst m A hA hH x0 h0
   have hAc : Continuous A := continuous_pi fun i => continuous_pi fun j => hA i j
   set K : Set (Fin m → ℂ) := Metric.sphere 0 1 with hK
@@ -69,10 +75,10 @@ theorem goal1 :
     have hy0 : y ≠ 0 := by
       rintro rfl
       simp [hK] at hy
-    have hpos : 0 < (star y ⬝ᵥ (Matrix.mulVec (A x0) y)).re :=
-      re_quad_pos h0 hy0
-    have hev := (continuousAt_const (x := (x0, y))).eventually_lt
-      ((Complex.continuous_re.comp hq).continuousAt (x := (x0, y))) hpos
+    have hpos : 0 < (star y ⬝ᵥ (Matrix.mulVec (A x0) y)).re := re_quad_pos h0 hy0
+    have hev :=
+      (continuousAt_const (x := (x0, y))).eventually_lt
+        ((Complex.continuous_re.comp hq).continuousAt (x := (x0, y))) hpos
     filter_upwards [hev] with z hz using hz
   filter_upwards [key] with x hx
   refine posDef_of_re (hH x) fun v hv => ?_

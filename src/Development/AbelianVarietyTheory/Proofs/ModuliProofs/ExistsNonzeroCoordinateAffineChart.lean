@@ -12,15 +12,18 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.SectionCoordi
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
 namespace GlobalTheory.ZM.CoordChart
 
-private theorem isIso_restrict_lemma {X Z Y : Scheme.{0}} (x : X ⟶ Z) [Mono x] (j : Y ⟶ X)
-    [IsOpenImmersion (j ≫ x)] : IsIso (x ∣_ (j ≫ x).opensRange) := by
+private theorem isIso_restrict_lemma
+    {X Z Y : Scheme.{0}} (x : X ⟶ Z) [Mono x] (j : Y ⟶ X) [IsOpenImmersion (j ≫ x)]
+    : IsIso (x ∣_ (j ≫ x).opensRange) := by
   set V := (j ≫ x).opensRange with hV
   let s : V.toScheme ⟶ X := (j ≫ x).isoOpensRange.inv ≫ j
   have hs : s ≫ x = V.ι := by
@@ -43,34 +46,40 @@ private theorem isIso_restrict_lemma {X Z Y : Scheme.{0}} (x : X ⟶ Z) [Mono x]
       Category.id_comp]
   · rw [← cancel_mono V.ι, Category.assoc, morphismRestrict_ι, reassoc_of% h1, hs, Category.id_comp]
 
-theorem isOpenImmersion_of_mono_of_local {X Z : Scheme.{0}} (x : X ⟶ Z) [Mono x]
-    (h : ∀ p : X, ∃ (Y : Scheme.{0}) (j : Y ⟶ X), IsOpenImmersion (j ≫ x) ∧
-      x p ∈ Set.range (j ≫ x)) : IsOpenImmersion x := by
+theorem isOpenImmersion_of_mono_of_local
+    {X Z : Scheme.{0}} (x : X ⟶ Z) [Mono x]
+    (h : ∀ p : X, ∃ (Y : Scheme.{0}) (j : Y ⟶ X), IsOpenImmersion (j ≫ x) ∧ x p ∈ Set.range (j ≫ x))
+    : IsOpenImmersion x := by
   choose Y j hj hp using h
   refine IsZariskiLocalAtTarget.of_range_subset_iSup (P := @IsOpenImmersion)
-    (fun p => (j p ≫ x).opensRange) ?_ (fun p => ?_)
+    (fun p => (j p ≫ x).opensRange)
+    ?_
+    (fun p => ?_)
   · rintro _ ⟨p, rfl⟩
     simp only [TopologicalSpace.Opens.coe_iSup, Set.mem_iUnion, SetLike.mem_coe]
     exact ⟨p, by rw [Scheme.Hom.mem_opensRange]; exact hp p⟩
   · have := isIso_restrict_lemma x (j p)
     infer_instance
 
-theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
-    spMap g ≫ spMap f = spMap (g.comp f) := by
+theorem spMap_comp {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C)
+    : spMap g ≫ spMap f = spMap (g.comp f) := by
   simp only [spMap, ← Spec.map_comp, CommRingCat.ofHom_comp]
 
-theorem spMap_inj {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g) :
-    f = g := by
+theorem spMap_inj {A B : Type} [CommRing A] [CommRing B] {f g : A →+* B} (h : spMap f = spMap g)
+    : f = g := by
   have e := congrArg CommRingCat.Hom.hom (Spec.map_injective h)
   simpa using e
 
-theorem exists_spMap {A B : Type} [CommRing A] [CommRing B] (y : Sp B ⟶ Sp A) :
-    ∃ f : A →+* B, y = spMap f := by
+theorem exists_spMap {A B : Type} [CommRing A] [CommRing B] (y : Sp B ⟶ Sp A)
+    : ∃ f : A →+* B, y = spMap f := by
   refine ⟨(Spec.preimage y).hom, ?_⟩
   simp only [spMap, CommRingCat.ofHom_hom, Spec.map_preimage]
 
-theorem mono_of_ring_points {A : Type} [CommRing A] {Z : Scheme.{0}} (x : Sp A ⟶ Z)
-    (h : ∀ (B : Type) [CommRing B] (f g : A →+* B), spMap f ≫ x = spMap g ≫ x → f = g) : Mono x := by
+theorem mono_of_ring_points
+    {A : Type} [CommRing A]
+    {Z : Scheme.{0}} (x : Sp A ⟶ Z)
+    (h : ∀ (B : Type) [CommRing B] (f g : A →+* B), spMap f ≫ x = spMap g ≫ x → f = g)
+    : Mono x := by
   refine ⟨fun {W} a b hab => ?_⟩
   have key : ∀ (B : Type) [CommRing B] (t : Sp B ⟶ W), t ≫ a = t ≫ b := by
     intro B _ t
@@ -81,7 +90,14 @@ theorem mono_of_ring_points {A : Type} [CommRing A] {Z : Scheme.{0}} (x : Sp A �
   exact W.affineOpenCover.openCover.hom_ext a b
     (fun k => key (W.affineOpenCover.X k) (W.affineOpenCover.openCover.f k))
 
-theorem exists_chart : ∀ (R σ : Type) [CommRing R] (I : Ideal (MvPolynomial σ R)) (Z : Scheme.{0}) (s : Z ⟶ Sp R) (M : LB Z) (th : σ → M.Sec) (i : σ), ProjRep I s M th → ∃ x : Sp (MvPolynomial σ R ⧸ (I ⊔ Ideal.span {MvPolynomial.X i - 1})) ⟶ Z, IsOpenImmersion x ∧ Set.range x = (Out.nonzeroLocus (th i) : Set Z) ∧ x ≫ s = spMap ((Ideal.Quotient.mk _).comp MvPolynomial.C) ∧ SecCoord M th x (fun a => Ideal.Quotient.mk _ (MvPolynomial.X a)) := by
+theorem exists_chart
+    : ∀ (R σ : Type) [CommRing R] (I : Ideal (MvPolynomial σ R)) (Z : Scheme.{0}) (s : Z ⟶ Sp R)
+        (M : LB Z) (th : σ → M.Sec) (i : σ),
+      ProjRep I s M th
+        → ∃ x : Sp (MvPolynomial σ R ⧸ (I ⊔ Ideal.span {MvPolynomial.X i - 1})) ⟶ Z,
+          IsOpenImmersion x ∧ Set.range x = (Out.nonzeroLocus (th i) : Set Z)
+            ∧ x ≫ s = spMap ((Ideal.Quotient.mk _).comp MvPolynomial.C)
+            ∧ SecCoord M th x (fun a => Ideal.Quotient.mk _ (MvPolynomial.X a)) := by
   intro R σ _ I Z s M th i hP
   obtain ⟨hM, hpts, hrep⟩ := hP
   set J := I ⊔ Ideal.span {MvPolynomial.X i - 1} with hJ
@@ -91,14 +107,18 @@ theorem exists_chart : ∀ (R σ : Type) [CommRing R] (I : Ideal (MvPolynomial �
     rw [← sub_eq_zero, ← map_one q, ← map_sub, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.mem_sup_right (Ideal.subset_span rfl)
 
-  have hev : ∀ F, MvPolynomial.eval₂ (q.comp MvPolynomial.C) (fun a => q (MvPolynomial.X a)) F = q F := by
+  have hev
+      : ∀ F,
+        MvPolynomial.eval₂ (q.comp MvPolynomial.C) (fun a => q (MvPolynomial.X a)) F = q F := by
     intro F
     have e : MvPolynomial.eval₂Hom (q.comp MvPolynomial.C) (fun a => q (MvPolynomial.X a)) = q :=
       MvPolynomial.ringHom_ext (fun r => by simp) (fun a => by simp)
     exact RingHom.congr_fun e F
-  obtain ⟨x, ⟨hxs, hxc⟩, -⟩ := hrep _ (q.comp MvPolynomial.C) (fun a => q (MvPolynomial.X a))
-    (by rw [Ideal.eq_top_iff_one, ← hq1]; exact Ideal.subset_span ⟨i, rfl⟩)
-    (fun F hF => by rw [hev, Ideal.Quotient.eq_zero_iff_mem]; exact Ideal.mem_sup_left hF)
+  obtain ⟨x, ⟨hxs, hxc⟩, -⟩ :=
+    hrep _ (q.comp MvPolynomial.C)
+      (fun a => q (MvPolynomial.X a))
+      (by rw [Ideal.eq_top_iff_one, ← hq1]; exact Ideal.subset_span ⟨i, rfl⟩)
+      (fun F hF => by rw [hev, Ideal.Quotient.eq_zero_iff_mem]; exact Ideal.mem_sup_left hF)
 
   have hmono : Mono x := by
     apply mono_of_ring_points
@@ -118,7 +138,9 @@ theorem exists_chart : ∀ (R σ : Type) [CommRing R] (I : Ideal (MvPolynomial �
       rw [← spMap_comp (q.comp MvPolynomial.C) f, ← spMap_comp (q.comp MvPolynomial.C) g, ← hxs,
         reassoc_of% hfg]
     have hc : f.comp q = g.comp q :=
-      MvPolynomial.ringHom_ext (fun r => by simpa using RingHom.congr_fun hb r) (fun a => by simpa using hv a)
+      MvPolynomial.ringHom_ext
+        (fun r => by simpa using RingHom.congr_fun hb r)
+        (fun a => by simpa using hv a)
     exact Ideal.Quotient.ringHom_ext hc
 
   have hsub : Set.range x ⊆ (Out.nonzeroLocus (th i) : Set Z) := by
@@ -128,15 +150,20 @@ theorem exists_chart : ∀ (R σ : Type) [CommRing R] (I : Ideal (MvPolynomial �
     rw [hq1]
     exact fun h1 => p.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 h1)
 
-  have hloc : ∀ z ∈ (Out.nonzeroLocus (th i) : Set Z), ∃ (B : Type) (_ : CommRing B)
-      (ψ : (MvPolynomial σ R ⧸ J) →+* B), IsOpenImmersion (spMap ψ ≫ x) ∧ z ∈ Set.range (spMap ψ ≫ x) := by
+  have hloc
+      : ∀ z ∈ (Out.nonzeroLocus (th i) : Set Z),
+        ∃ (B : Type) (_ : CommRing B) (ψ : (MvPolynomial σ R ⧸ J) →+* B),
+          IsOpenImmersion (spMap ψ ≫ x) ∧ z ∈ Set.range (spMap ψ ≫ x) := by
     intro z hz
-    obtain ⟨R', _, x', v', hx'o, ⟨p, rfl⟩, hx'c⟩ := (GlobalTheory.T.sectionCoordinateVector_exists_locally Z M σ th hM).2.2 z
+    obtain ⟨R', _, x', v', hx'o, ⟨p, rfl⟩, hx'c⟩ :=
+      (GlobalTheory.T.sectionCoordinateVector_exists_locally Z M σ th hM).2.2 z
     have hp : v' i ∉ p.asIdeal := (GlobalTheory.ZM.CoordMove.mem_nonzeroLocus_iff hM i p hx'c).1 hz
     have hunit : IsUnit (algebraMap R' (Localization.Away (v' i)) (v' i)) :=
       IsLocalization.Away.algebraMap_isUnit (v' i)
-    have hc1 := GlobalTheory.ZM.Coord.scale (GlobalTheory.ZM.Coord.baseChange hx'c (algebraMap R' (Localization.Away (v' i))))
-      hunit.unit⁻¹
+    have hc1 :=
+      GlobalTheory.ZM.Coord.scale
+        (GlobalTheory.ZM.Coord.baseChange hx'c (algebraMap R' (Localization.Away (v' i))))
+        hunit.unit⁻¹
     set w : σ → Localization.Away (v' i) :=
       fun a => ((hunit.unit⁻¹ : (Localization.Away (v' i))ˣ) : Localization.Away (v' i)) *
         algebraMap R' (Localization.Away (v' i)) (v' a) with hw

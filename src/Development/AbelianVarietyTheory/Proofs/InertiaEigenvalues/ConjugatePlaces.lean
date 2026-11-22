@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.NotDvdDiscrHo
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N
 
 namespace GlobalTheory.Proof.ConjugatePlaces
 
@@ -38,8 +39,9 @@ variable {H}
 theorem isConjPl_symm {w w' : HeightOneSpectrum (𝓞 H.E)} (h : IsConjPl H w w') : IsConjPl H w' w :=
   fun x y hy => (h y x (by rw [hy, conj_conj])).symm
 
-theorem isConjPl_unique {w w₁ w₂ : HeightOneSpectrum (𝓞 H.E)} (h₁ : IsConjPl H w w₁)
-    (h₂ : IsConjPl H w w₂) : w₁ = w₂ := by
+theorem isConjPl_unique
+    {w w₁ w₂ : HeightOneSpectrum (𝓞 H.E)} (h₁ : IsConjPl H w w₁) (h₂ : IsConjPl H w w₂)
+    : w₁ = w₂ := by
   ext y
   obtain ⟨x, hx⟩ := exists_conj_int H y
   have hy : (y : H.E) = H.conj (x : H.E) := by rw [hx, conj_conj]

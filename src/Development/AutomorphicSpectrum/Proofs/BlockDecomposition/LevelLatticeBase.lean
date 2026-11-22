@@ -20,19 +20,23 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
+open GroundTheory.PAdicHodge Formalism.Per6 DividedPowers CrystallineSemistableComparison
+  CrystallineSemistableComparison.Pb CrystallineSemistableComparison.Pb.Lat
 
 namespace GlobalTheory.CompanionTheory.LatCBase
 
-theorem dividedPowerFiltration_anti {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) {k s : ℕ} (h : k ≤ s) :
-    pdP δ s ≤ pdP δ k := by
+theorem dividedPowerFiltration_anti
+    {B : Type} [CommRing B] {J : Ideal B} (δ : DividedPowers J) {k s : ℕ} (h : k ≤ s)
+    : pdP δ s ≤ pdP δ k := by
   unfold CrystallineSemistableComparison.Pb.pdP
   refine Ideal.span_mono ?_
   rintro z ⟨L, hL, hs, rfl⟩
   exact ⟨L, hL, h.trans hs, rfl⟩
 
-theorem latBase_lev : ∀ {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {M : ℕ}
-    (h : LevHyp l K M) (k : ℕ), 1 ≤ k → ∀ s, k ≤ s → LatBase (lev h k).γ l s := by
+theorem latBase_lev
+    : ∀ {l : ℕ} [Fact l.Prime] {K : IntermediateField ℚ_[l] (PadicAlgCl l)} {M : ℕ}
+        (h : LevHyp l K M) (k : ℕ),
+      1 ≤ k → ∀ s, k ≤ s → LatBase (lev h k).γ l s := by
   intro l hl K M h k hk s hks
   have H := GlobalTheory.CompanionTheory.LatCHyp.hyp_k l k hk
   show CrystallineSemistableComparison.Pb.LatBase (CrystallineSemistableComparison.Pb.Lat.γ (CrystallineSemistableComparison.Pb.Lat.fk l k) (CrystallineSemistableComparison.xi0 l) l M (h.hc k)) l s

@@ -15,34 +15,55 @@ public import Development.AbelianVarietyTheory.Definitions.ModuliSpaces.Auxiliar
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
 namespace GlobalTheory.Models
 
-theorem Cpt.openImmersion_comp_structure_eq_generic {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {U : Scheme.{0}} {F O : Type}
-    [Field F] [CommRing O] {c : U ⟶ Sp F} {t : SAB H U} {β : O →+* F} (C : Cpt c t β) :
-    C.j ≫ C.s = c ≫ spMap β := by
+theorem Cpt.openImmersion_comp_structure_eq_generic
+    {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {H : Host E} {U : Scheme.{0}} {F O : Type} [Field F] [CommRing O]
+    {c : U ⟶ Sp F} {t : SAB H U} {β : O →+* F} (C : Cpt c t β)
+    : C.j ≫ C.s = c ≫ spMap β := by
   rw [Cpt.j, Category.assoc, pullback.condition, ← Category.assoc, C.jQ_over]
 
-private theorem spMap_comp_moduli_spaces {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (g : A →+* B) (g' : B →+* D) :
-    spMap (g'.comp g) = spMap g' ≫ spMap g := by
+private theorem spMap_comp_moduli_spaces
+    {A B D : Type} [CommRing A] [CommRing B] [CommRing D] (g : A →+* B) (g' : B →+* D)
+    : spMap (g'.comp g) = spMap g' ≫ spMap g := by
   unfold spMap
   rw [← Spec.map_comp]
   rfl
 
-theorem Cpt.Above.exists_lift : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (U : Scheme.{0}) (F O : Type) [Field F] [CommRing O] (c : U ⟶ Sp F) (t : SAB H U) (β : O →+* F) (U' : Scheme.{0}) (F' O' : Type) [Field F'] [CommRing O'] (c' : U' ⟶ Sp F') (t' : SAB H U') (β' : O' →+* F') (U'' : Scheme.{0}) (F'' O'' : Type) [Field F''] [CommRing O''] (c'' : U'' ⟶ Sp F'') (t'' : SAB H U'') (β'' : O'' →+* F'') (C : Cpt c t β) (C' : Cpt c' t' β') (C'' : Cpt c'' t'' β'') (b : O →+* O') (b' : O' →+* O'') (k' : F' →+* F'') (r : U' ⟶ U) (ν : SABMap t' t r) (a : C'.Above C b r ν) (r' : U'' ⟶ U') (ν' : SABMap t'' t' r') (f : C''.X ⟶ C.X) (mu : SABMap C''.t C.t f) (hf : f ≫ C.s = C''.s ≫ spMap (b'.comp b)), IsDedFrac β'' → β''.comp b' = k'.comp β' → r' ≫ c' = c'' ≫ spMap k' → C''.j ≫ f = r' ≫ r ≫ C.j → C''.m.φ ≫ mu.φ = ν'.φ ≫ ν.φ ≫ C.m.φ → ∃ (h : C''.X ⟶ C'.X) (mu' : SABMap C''.t C'.t h) (hh : h ≫ C'.s = C''.s ≫ spMap b'), h ≫ a.π = f ∧ mu'.φ ≫ a.mu.φ = mu.φ ∧ C''.j ≫ h = r' ≫ C'.j ∧ C''.m.φ ≫ mu'.φ = ν'.φ ≫ C'.m.φ ∧ (IsFinite (pullback.lift f C''.s hf) → IsFinite (pullback.lift h C''.s hh)) := by
-  intro E _ _ _ H U F O _ _ c t β U' F' O' _ _ c' t' β' U'' F'' O'' _ _ c'' t'' β'' C C' C'' b b' k' r ν a r' ν' f mu hf
-    hD hβ hc hj hφ
+theorem Cpt.Above.exists_lift
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (U : Scheme.{0})
+        (F O : Type) [Field F] [CommRing O] (c : U ⟶ Sp F) (t : SAB H U) (β : O →+* F)
+        (U' : Scheme.{0}) (F' O' : Type) [Field F'] [CommRing O'] (c' : U' ⟶ Sp F') (t' : SAB H U')
+        (β' : O' →+* F') (U'' : Scheme.{0}) (F'' O'' : Type) [Field F''] [CommRing O'']
+        (c'' : U'' ⟶ Sp F'') (t'' : SAB H U'') (β'' : O'' →+* F'') (C : Cpt c t β)
+        (C' : Cpt c' t' β') (C'' : Cpt c'' t'' β'') (b : O →+* O') (b' : O' →+* O'')
+        (k' : F' →+* F'') (r : U' ⟶ U) (ν : SABMap t' t r) (a : C'.Above C b r ν) (r' : U'' ⟶ U')
+        (ν' : SABMap t'' t' r') (f : C''.X ⟶ C.X) (mu : SABMap C''.t C.t f)
+        (hf : f ≫ C.s = C''.s ≫ spMap (b'.comp b)),
+      IsDedFrac β'' → β''.comp b' = k'.comp β' → r' ≫ c' = c'' ≫ spMap k' → C''.j ≫ f = r' ≫ r ≫ C.j
+        → C''.m.φ ≫ mu.φ = ν'.φ ≫ ν.φ ≫ C.m.φ
+        → ∃ (h : C''.X ⟶ C'.X) (mu' : SABMap C''.t C'.t h) (hh : h ≫ C'.s = C''.s ≫ spMap b'),
+          h ≫ a.π = f ∧ mu'.φ ≫ a.mu.φ = mu.φ ∧ C''.j ≫ h = r' ≫ C'.j
+            ∧ C''.m.φ ≫ mu'.φ = ν'.φ ≫ C'.m.φ
+            ∧ (IsFinite (pullback.lift f C''.s hf) → IsFinite (pullback.lift h C''.s hh)) := by
+  intro E _ _ _ H U F O _ _ c t β U' F' O' _ _ c' t' β' U'' F'' O'' _ _ c'' t'' β'' C C' C'' b b' k'
+    r ν a r' ν' f mu hf hD hβ hc hj hφ
   obtain ⟨⟨hdom, hDed⟩, -, hFrac⟩ := hD
   let _ : Algebra O'' F'' := β''.toAlgebra
   have := hdom
   have : IsDedekindDomain O'' := hDed
   have : IsFractionRing O'' F'' := hFrac
-  obtain ⟨hN, -, -, hPre, hFl, hDom, hQC⟩ := GlobalTheory.genericPart_dense_proOpen O'' F'' C''.X U'' C''.s C''.jQ C''.flat
-    C''.proj C''.jQ_open C''.jQ_dense
+  obtain ⟨hN, -, -, hPre, hFl, hDom, hQC⟩ :=
+    GlobalTheory.genericPart_dense_proOpen O'' F'' C''.X U'' C''.s C''.jQ C''.flat C''.proj
+      C''.jQ_open C''.jQ_dense
   have : IsLocallyNoetherian C''.X := hN
 
   have hbase : f ≫ C.s = (C''.s ≫ spMap b') ≫ spMap b := by
@@ -50,14 +71,18 @@ theorem Cpt.Above.exists_lift : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
   have hq : IsIntegralHom (pullback.lift a.π C'.s a.π_over) := by
     have := a.fin
     infer_instance
-  have hsq : (r' ≫ C'.j) ≫ pullback.lift a.π C'.s a.π_over = C''.j ≫ pullback.lift f (C''.s ≫ spMap b') hbase := by
+  have hsq
+      : (r' ≫ C'.j) ≫ pullback.lift a.π C'.s a.π_over
+        = C''.j ≫ pullback.lift f (C''.s ≫ spMap b') hbase := by
     apply pullback.hom_ext
     · simp only [Category.assoc, pullback.lift_fst, a.j_comm, hj]
     · simp only [Category.assoc, pullback.lift_snd]
-      rw [Cpt.openImmersion_comp_structure_eq_generic C', ← Category.assoc r', hc, Category.assoc, ← spMap_comp_moduli_spaces, ← hβ,
-        spMap_comp_moduli_spaces, ← Category.assoc C''.j, Cpt.openImmersion_comp_structure_eq_generic C'', Category.assoc]
-  obtain ⟨h, ⟨h1, h2⟩, -⟩ := GlobalTheory.existsUnique_lift_of_densePart C''.X U'' (pullback C.s (spMap b)) C'.X C''.j C''.normal
-    hPre hFl hDom hQC _ _ _ hq hsq
+      rw [Cpt.openImmersion_comp_structure_eq_generic C', ← Category.assoc r', hc, Category.assoc,
+        ← spMap_comp_moduli_spaces, ← hβ, spMap_comp_moduli_spaces, ← Category.assoc C''.j,
+        Cpt.openImmersion_comp_structure_eq_generic C'', Category.assoc]
+  obtain ⟨h, ⟨h1, h2⟩, -⟩ :=
+    GlobalTheory.existsUnique_lift_of_densePart C''.X U'' (pullback C.s (spMap b)) C'.X C''.j
+      C''.normal hPre hFl hDom hQC _ _ _ hq hsq
   have hπ : h ≫ a.π = f := by
     simpa only [Category.assoc, pullback.lift_fst] using congrArg (· ≫ pullback.fst _ _) h2
   have hh : h ≫ C'.s = C''.s ≫ spMap b' := by
@@ -81,7 +106,8 @@ theorem Cpt.Above.exists_lift : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
     have : IsProper C'.s := projProper O' C'.X C'.s C'.proj
     let p : pullback C'.s (spMap b') ⟶ pullback C.s (spMap (b'.comp b)) :=
       pullback.lift (pullback.fst _ _ ≫ a.π) (pullback.snd _ _) (by
-        rw [Category.assoc, a.π_over, ← Category.assoc, pullback.condition, Category.assoc, spMap_comp_moduli_spaces])
+        rw [Category.assoc, a.π_over, ← Category.assoc, pullback.condition, Category.assoc,
+          spMap_comp_moduli_spaces])
     have hp : pullback.lift h C''.s hh ≫ p = pullback.lift (h ≫ a.π) C''.s hf := by
       apply pullback.hom_ext
       · simp only [p, Category.assoc]
@@ -89,7 +115,8 @@ theorem Cpt.Above.exists_lift : ∀ (E : Type) [Field E] [NumberField E] [IsCMFi
       · simp only [p, Category.assoc]
         rw [pullback.lift_snd, pullback.lift_snd, pullback.lift_snd]
     have : IsSeparated p := by
-      have e : p ≫ pullback.snd C.s (spMap (b'.comp b)) = pullback.snd C'.s (spMap b') := pullback.lift_snd _ _ _
+      have e : p ≫ pullback.snd C.s (spMap (b'.comp b)) = pullback.snd C'.s (spMap b') :=
+        pullback.lift_snd _ _ _
       have : IsSeparated (p ≫ pullback.snd C.s (spMap (b'.comp b))) := by
         rw [e]
         infer_instance

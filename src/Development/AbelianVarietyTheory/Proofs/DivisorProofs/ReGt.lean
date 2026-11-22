@@ -44,8 +44,7 @@ theorem main : ∀ {z : ℂ}, (∀ (n : ℕ), ‖z ^ n - (1 : ℂ)‖ < (1 / 2 :
     induction k with
     | zero => simp
     | succ k ih =>
-      have e : z ^ (2 ^ (k + 1)) = z ^ (2 ^ k) * z ^ (2 ^ k) := by
-        rw [pow_succ, pow_mul, sq]
+      have e : z ^ (2 ^ (k + 1)) = z ^ (2 ^ k) * z ^ (2 ^ k) := by rw [pow_succ, pow_mul, sq]
       have hr := hre (2 ^ k)
       have e2 : (z ^ (2 ^ (k + 1))).im = 2 * (z ^ (2 ^ k)).re * (z ^ (2 ^ k)).im := by
         rw [e, Complex.mul_im]; ring

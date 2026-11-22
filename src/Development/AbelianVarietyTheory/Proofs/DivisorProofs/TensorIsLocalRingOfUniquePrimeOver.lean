@@ -10,11 +10,14 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem tensor_isLocalRing_of_unique_prime_over : ∀ (P T L : Type) [CommRing P] [CommRing T] [CommRing L] [Algebra P T] [Algebra P L] [IsLocalRing L] [Algebra.IsIntegral P T] (𝔐 : Ideal T) [𝔐.IsPrime],
-    𝔐.comap (algebraMap P T) = (maximalIdeal L).comap (algebraMap P L) →
-    (∀ 𝔔 : Ideal T, 𝔔.IsPrime → 𝔔.comap (algebraMap P T) = (maximalIdeal L).comap (algebraMap P L) → 𝔔 = 𝔐) →
-    (∀ y : L, ∃ a : P, y - algebraMap P L a ∈ maximalIdeal L) →
-    IsLocalRing (TensorProduct P T L) := by
+theorem tensor_isLocalRing_of_unique_prime_over
+    : ∀ (P T L : Type) [CommRing P] [CommRing T] [CommRing L] [Algebra P T] [Algebra P L]
+        [IsLocalRing L] [Algebra.IsIntegral P T] (𝔐 : Ideal T) [𝔐.IsPrime],
+      𝔐.comap (algebraMap P T) = (maximalIdeal L).comap (algebraMap P L)
+        → (∀ 𝔔 : Ideal T,
+          𝔔.IsPrime → 𝔔.comap (algebraMap P T) = (maximalIdeal L).comap (algebraMap P L) → 𝔔 = 𝔐)
+        → (∀ y : L, ∃ a : P, y - algebraMap P L a ∈ maximalIdeal L)
+        → IsLocalRing (TensorProduct P T L) := by
   intro P T L _ _ _ _ _ _ _ 𝔐 _ hM huniq hres
 
   let fκ : P →ₐ[P] L ⧸ maximalIdeal L := Algebra.ofId P _
@@ -27,18 +30,22 @@ theorem tensor_isLocalRing_of_unique_prime_over : ∀ (P T L : Type) [CommRing P
   have hker : RingHom.ker fκ = (maximalIdeal L).comap (algebraMap P L) := by
     ext a
     rw [RingHom.mem_ker, hfκ, Ideal.Quotient.eq_zero_iff_mem, Ideal.mem_comap]
-  let e : (P ⧸ RingHom.ker fκ) ≃ₐ[P] L ⧸ maximalIdeal L := Ideal.quotientKerAlgEquivOfSurjective hsurj
+  let e : (P ⧸ RingHom.ker fκ) ≃ₐ[P] L ⧸ maximalIdeal L :=
+    Ideal.quotientKerAlgEquivOfSurjective hsurj
   let q : (P ⧸ RingHom.ker fκ) →ₐ[P] T ⧸ 𝔐 :=
     Ideal.quotientMapₐ 𝔐 (Algebra.ofId P T) (le_of_eq (by rw [hker, ← hM]; rfl))
   let g : L →ₐ[P] T ⧸ 𝔐 := (q.comp e.symm.toAlgHom).comp (Ideal.Quotient.mkₐ P (maximalIdeal L))
-  have hg : ∀ a : P, ∀ y : L, y - algebraMap P L a ∈ maximalIdeal L →
-      g y = Ideal.Quotient.mk 𝔐 (algebraMap P T a) := by
+  have hg
+      : ∀ a : P, ∀ y : L,
+        y - algebraMap P L a ∈ maximalIdeal L → g y = Ideal.Quotient.mk 𝔐 (algebraMap P T a) := by
     intro a y hy
-    have h1 : Ideal.Quotient.mkₐ P (maximalIdeal L) y = Ideal.Quotient.mkₐ P (maximalIdeal L) (algebraMap P L a) := by
+    have h1
+        : Ideal.Quotient.mkₐ P (maximalIdeal L) y
+          = Ideal.Quotient.mkₐ P (maximalIdeal L) (algebraMap P L a) := by
       rw [Ideal.Quotient.mkₐ_eq_mk]; exact Ideal.Quotient.eq.mpr hy
-    have h2 : g y = g (algebraMap P L a) := by
-      simp only [g, AlgHom.comp_apply]; rw [h1]
-    rw [h2, AlgHom.commutes]; rfl
+    have h2 : g y = g (algebraMap P L a) := by simp only [g, AlgHom.comp_apply]; rw [h1]
+    rw [h2, AlgHom.commutes]
+    rfl
   let ψ : TensorProduct P T L →ₐ[P] T ⧸ 𝔐 :=
     Algebra.TensorProduct.lift (Ideal.Quotient.mkₐ P 𝔐) g (fun _ _ => Commute.all _ _)
   have hψ : ∀ t y, ψ (t ⊗ₜ[P] y) = Ideal.Quotient.mk 𝔐 t * g y := by
@@ -72,22 +79,26 @@ theorem tensor_isLocalRing_of_unique_prime_over : ∀ (P T L : Type) [CommRing P
       have : (algebraMap L (TensorProduct P T L)).comp (algebraMap P L) = algebraMap P _ := by
         ext x
         exact (Algebra.TensorProduct.includeRight : L →ₐ[P] TensorProduct P T L).commutes x
-      rw [this]; exact hp0
+      rw [this]
+      exact hp0
   have hPB : ∀ a : P, (algebraMap P T a) ⊗ₜ[P] (1 : L) = (1 : T) ⊗ₜ[P] (algebraMap P L a) := by
     intro a
     rw [Algebra.algebraMap_eq_smul_one, Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul]
   have key : ∀ 𝔫 : Ideal (TensorProduct P T L), 𝔫.IsMaximal → 𝔫 = RingHom.ker ψ := by
     intro 𝔫 h𝔫
     have hLmax : (𝔫.comap (algebraMap L (TensorProduct P T L))).IsMaximal :=
-      Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
-        (algebraMap L (TensorProduct P T L)) (by
+      Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap L (TensorProduct P T L))
+        (by
           intro x
-          exact hint.isIntegral x) 𝔫
+          exact hint.isIntegral x)
+        𝔫
     have hL : 𝔫.comap (algebraMap L (TensorProduct P T L)) = maximalIdeal L :=
       IsLocalRing.eq_maximalIdeal hLmax
     let iT : T →+* TensorProduct P T L := Algebra.TensorProduct.includeLeftRingHom
     have hiT : ∀ t, iT t = t ⊗ₜ[P] (1 : L) := fun _ => rfl
-    have hcomp : iT.comp (algebraMap P T) = (algebraMap L (TensorProduct P T L)).comp (algebraMap P L) := by
+    have hcomp
+        : iT.comp (algebraMap P T)
+          = (algebraMap L (TensorProduct P T L)).comp (algebraMap P L) := by
       ext a; simp only [RingHom.comp_apply, hiT, hmap]; exact hPB a
     have hT : 𝔫.comap iT = 𝔐 := by
       apply huniq
@@ -104,7 +115,9 @@ theorem tensor_isLocalRing_of_unique_prime_over : ∀ (P T L : Type) [CommRing P
         obtain ⟨a, ha⟩ := hres y
         have hy1 : (1 : T) ⊗ₜ[P] (y - algebraMap P L a) ∈ 𝔫 := by
           rw [← hmap, ← Ideal.mem_comap, hL]; exact ha
-        have hsplit : t ⊗ₜ[P] y - (t * algebraMap P T a) ⊗ₜ[P] (1 : L) = (t ⊗ₜ[P] (1 : L)) * ((1 : T) ⊗ₜ[P] (y - algebraMap P L a)) := by
+        have hsplit
+            : t ⊗ₜ[P] y - (t * algebraMap P T a) ⊗ₜ[P] (1 : L)
+              = (t ⊗ₜ[P] (1 : L)) * ((1 : T) ⊗ₜ[P] (y - algebraMap P L a)) := by
           rw [TensorProduct.tmul_sub, mul_sub, ← hPB]
           simp [Algebra.TensorProduct.tmul_mul_tmul]
         rw [hψ, hg a y ha, ← map_mul]

@@ -7,8 +7,9 @@ public import Mathlib.NumberTheory.Multiplicity
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem padic_val_one_add_pow_sub_one (l c m : ℕ) (hl : l.Prime) (hc : 1 ≤ c) (h2 : l = 2 → 2 ≤ c)
-    (hm : m ≠ 0) : padicValNat l ((1 + l ^ c) ^ m - 1) = c + padicValNat l m := by
+private theorem padic_val_one_add_pow_sub_one
+    (l c m : ℕ) (hl : l.Prime) (hc : 1 ≤ c) (h2 : l = 2 → 2 ≤ c) (hm : m ≠ 0)
+    : padicValNat l ((1 + l ^ c) ^ m - 1) = c + padicValNat l m := by
   simp only [Nat.padicValNat_def]
   haveI := Fact.mk hl
   have hpow1 : 1 ≤ l ^ c := Nat.one_le_pow c l hl.pos
@@ -24,8 +25,9 @@ private theorem padic_val_one_add_pow_sub_one (l c m : ℕ) (hl : l.Prime) (hc :
   rcases hl.eq_two_or_odd' with rfl | hodd
   · obtain ⟨d, rfl⟩ : ∃ d, c = d + 2 := ⟨c - 2, by have := h2 rfl; omega⟩
     have h4 : 2 ^ (d + 2) = 4 * 2 ^ d := by ring
-    have h := padicValNat.pow_two_sub_pow (x := 1 + 2 ^ (d + 2)) (y := 1) hx1 hdvd hnd
-      (n := 2 * m) (by omega) (even_two_mul m)
+    have h :=
+      padicValNat.pow_two_sub_pow (x := 1 + 2 ^ (d + 2)) (y := 1) hx1 hdvd hnd (n := 2 * m)
+        (by omega) (even_two_mul m)
     rw [one_pow] at h
     have hA : multiplicity 2 (1 + 2 ^ (d + 2) + 1) = 1 := by
       have e : 1 + 2 ^ (d + 2) + 1 = 2 * (1 + 2 * 2 ^ d) := by rw [h4]; ring
@@ -47,8 +49,9 @@ private theorem padic_val_one_add_pow_sub_one (l c m : ℕ) (hl : l.Prime) (hc :
         ⟨((1 + 2 ^ (d + 2)) ^ m + 1) / 4, by omega⟩
       rw [hq, Nat.multiplicity_mul (by norm_num) (by omega), Nat.multiplicity_self (by norm_num),
         (Nat.multiplicity_eq_zero_iff.mpr (Or.inr (Or.inr (by omega))))]
-    have hfac : (1 + 2 ^ (d + 2)) ^ (2 * m) - 1 =
-        ((1 + 2 ^ (d + 2)) ^ m - 1) * ((1 + 2 ^ (d + 2)) ^ m + 1) := by
+    have hfac
+        : (1 + 2 ^ (d + 2)) ^ (2 * m) - 1
+          = ((1 + 2 ^ (d + 2)) ^ m - 1) * ((1 + 2 ^ (d + 2)) ^ m + 1) := by
       rw [pow_mul', hb, Nat.add_sub_cancel]
       have : (b + 1) ^ 2 = b * (b + 1 + 1) + 1 := by ring
       rw [this, Nat.add_sub_cancel]
@@ -57,8 +60,11 @@ private theorem padic_val_one_add_pow_sub_one (l c m : ℕ) (hl : l.Prime) (hc :
   · have := padicValNat.pow_sub_pow hodd hx1 hdvd hnd hm
     rwa [one_pow, Nat.add_sub_cancel_left, Nat.multiplicity_prime_pow] at this
 
-theorem UpperTheory.V.ZK.Ct.lte :
-    ∀ l c ν E : ℕ, l.Prime → 1 ≤ c → (l = 2 → 2 ≤ c) → c ≤ ν → 1 ≤ E → 2 ≤ (1 + l ^ c) ^ E ∧ ((1 + l ^ c) ^ E - 1).factorization l = c + E.factorization l ∧ (((1 + l ^ c) ^ E) ^ l ^ (ν - c) - 1).factorization l = ν + E.factorization l := by
+theorem UpperTheory.V.ZK.Ct.lte
+    : ∀ l c ν E : ℕ,
+      l.Prime → 1 ≤ c → (l = 2 → 2 ≤ c) → c ≤ ν → 1 ≤ E
+        → 2 ≤ (1 + l ^ c) ^ E ∧ ((1 + l ^ c) ^ E - 1).factorization l = c + E.factorization l
+          ∧ (((1 + l ^ c) ^ E) ^ l ^ (ν - c) - 1).factorization l = ν + E.factorization l := by
   intro l c ν E hl hc h2 hcν hE
   haveI := Fact.mk hl
   have hE0 : E ≠ 0 := by omega
@@ -67,8 +73,9 @@ theorem UpperTheory.V.ZK.Ct.lte :
     exact this.trans (Nat.le_self_pow hE0 _)
   · rw [Nat.factorization_def _ hl, Nat.factorization_def _ hl]
     simpa only [← Nat.padicValNat_def] using padic_val_one_add_pow_sub_one l c E hl hc h2 hE0
-  · have hval := padic_val_one_add_pow_sub_one l c (E * l ^ (ν - c)) hl hc h2
-      (mul_ne_zero hE0 (pow_ne_zero _ hl.ne_zero))
+  · have hval :=
+      padic_val_one_add_pow_sub_one l c (E * l ^ (ν - c)) hl hc h2
+        (mul_ne_zero hE0 (pow_ne_zero _ hl.ne_zero))
     simp only [Nat.padicValNat_def] at hval
     rw [Nat.factorization_def _ hl, Nat.factorization_def _ hl, ← pow_mul, hval,
       Nat.multiplicity_mul hE0 (pow_ne_zero _ hl.ne_zero), Nat.multiplicity_prime_pow]

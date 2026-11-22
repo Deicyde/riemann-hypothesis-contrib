@@ -5,13 +5,19 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.GLRealOpen.glR_open :
-    ∀ {K : Type} [inst : CommRing K] [inst_1 : TopologicalSpace K] [IsTopologicalRing K] (R : Subring K),
-      IsOpen (↑R : Set K) → ∀ (n : ℕ), IsOpen (↑(UpperTheory.Reformulated.B.GeneralLinearGroupOverSubring.glR R n) : Set (GL (Fin n) K)) := by
+theorem UpperTheory.Reformulated.B.GLRealOpen.glR_open
+    : ∀ {K : Type} [inst : CommRing K] [inst_1 : TopologicalSpace K] [IsTopologicalRing K]
+        (R : Subring K),
+      IsOpen (↑R : Set K)
+        → ∀ (n : ℕ),
+          IsOpen
+            (↑(UpperTheory.Reformulated.B.GeneralLinearGroupOverSubring.glR R n)
+              : Set (GL (Fin n) K)) := by
   intro K _ _ _ R hR n
   have hM : IsOpen {M : Matrix (Fin n) (Fin n) K | ∀ i j, M i j ∈ R} := by
-    have e : {M : Matrix (Fin n) (Fin n) K | ∀ i j, M i j ∈ R}
-        = ⋂ i, ⋂ j, (fun M : Matrix (Fin n) (Fin n) K => M i j) ⁻¹' (R : Set K) := by
+    have e
+        : {M : Matrix (Fin n) (Fin n) K | ∀ i j, M i j ∈ R}
+          = ⋂ i, ⋂ j, (fun M : Matrix (Fin n) (Fin n) K => M i j) ⁻¹' (R : Set K) := by
       ext M
       simp only [Set.mem_setOf_eq, Set.mem_iInter, Set.mem_preimage, SetLike.mem_coe]
     rw [e]

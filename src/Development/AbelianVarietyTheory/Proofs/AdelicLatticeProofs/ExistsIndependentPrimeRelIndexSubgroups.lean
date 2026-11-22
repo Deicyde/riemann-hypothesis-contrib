@@ -10,9 +10,12 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem relIndex_eq_prime_of_generated {G : Type} [CommGroup G] {p : ℕ} (hp : p.Prime)
-    (E K : Subgroup G) (x : G) (hxE : x ∈ E) (hxK : x ∉ K) (hxp : x ^ p ∈ K)
-    (hgen : ∀ y ∈ E, ∃ k : ℕ, y / x ^ k ∈ K) : K.relIndex E = p := by
+theorem relIndex_eq_prime_of_generated
+    {G : Type} [CommGroup G]
+    {p : ℕ} (hp : p.Prime)
+    (E K : Subgroup G) (x : G)
+    (hxE : x ∈ E) (hxK : x ∉ K) (hxp : x ^ p ∈ K) (hgen : ∀ y ∈ E, ∃ k : ℕ, y / x ^ k ∈ K)
+    : K.relIndex E = p := by
   haveI : Fact p.Prime := ⟨hp⟩
   set c : E ⧸ K.subgroupOf E := QuotientGroup.mk (⟨x, hxE⟩ : E) with hc
   have ho : orderOf c = p := by
@@ -32,18 +35,21 @@ theorem relIndex_eq_prime_of_generated {G : Type} [CommGroup G] {p : ℕ} (hp : 
   rw [Subgroup.relIndex, Subgroup.index, ← ho]
   exact (orderOf_eq_card_of_forall_mem_powers hall).symm
 
-theorem exists_independent_prime_relIndex_subgroups (p : ℕ) (G ι : Type) [CommGroup G] [DecidableEq ι]
-    (U H : Subgroup G) (K : ι → Subgroup G) (good : ι → Prop) (m : ℕ) (hp : p.Prime)
-    (hH : H.relIndex U = p ^ m) (h1 : ∀ i, good i → U ⊓ H ≤ K i)
+theorem exists_independent_prime_relIndex_subgroups
+    (p : ℕ)
+    (G ι : Type) [CommGroup G] [DecidableEq ι]
+    (U H : Subgroup G) (K : ι → Subgroup G) (good : ι → Prop)
+    (m : ℕ)
+    (hp : p.Prime) (hH : H.relIndex U = p ^ m) (h1 : ∀ i, good i → U ⊓ H ≤ K i)
     (h2 : ∀ i, good i → ∀ x ∈ U, x ^ p ∈ K i)
     (h2' : ∀ i, good i → ∀ x ∈ U, x ∉ K i → ∀ y ∈ U, ∃ k : ℕ, y / x ^ k ∈ K i)
-    (h3 : ∀ x ∈ U, x ∉ H → ∃ i, good i ∧ x ∉ K i) (k : ℕ) (hk : k ≤ m) :
-    ∃ T : Finset ι, T.card = k ∧ (∀ i ∈ T, good i) ∧
-      (∀ i ∈ T, ∃ u ∈ U, u ∉ K i ∧ ∀ j ∈ T, j ≠ i → u ∈ K j) ∧
-      ∃ D : Subgroup G, (∀ x, x ∈ D ↔ ∀ i ∈ T, x ∈ K i) ∧ D.relIndex U = p ^ k := by
+    (h3 : ∀ x ∈ U, x ∉ H → ∃ i, good i ∧ x ∉ K i)
+    (k : ℕ) (hk : k ≤ m)
+    : ∃ T : Finset ι,
+      T.card = k ∧ (∀ i ∈ T, good i) ∧ (∀ i ∈ T, ∃ u ∈ U, u ∉ K i ∧ ∀ j ∈ T, j ≠ i → u ∈ K j)
+        ∧ ∃ D : Subgroup G, (∀ x, x ∈ D ↔ ∀ i ∈ T, x ∈ K i) ∧ D.relIndex U = p ^ k := by
   induction k with
-  | zero =>
-    refine ⟨∅, rfl, by simp, by simp, ⊤, by simp, by simp⟩
+  | zero => refine ⟨∅, rfl, by simp, by simp, ⊤, by simp, by simp⟩
   | succ k ih =>
     obtain ⟨T, hT, hg, hA, D, hD, hDi⟩ := ih (by omega)
     have hx : ∃ x ∈ U, x ∈ D ∧ x ∉ H := by
@@ -93,7 +99,16 @@ theorem exists_independent_prime_relIndex_subgroups (p : ℕ) (G ι : Type) [Com
           (fun y hy => h2' j hj x hxU hxj y hy.2)
       rw [← Subgroup.relIndex_inf_mul_relIndex, h5, hDi, pow_succ, mul_comm]
 
-theorem exists_indep_prime_index : ∀ (p : ℕ) (G ι : Type) [CommGroup G] [DecidableEq ι] (U H : Subgroup G) (K : ι → Subgroup G) (good : ι → Prop) (m : ℕ), p.Prime → H.relIndex U = p ^ m → (∀ i, good i → U ⊓ H ≤ K i) → (∀ i, good i → ∀ x ∈ U, x ^ p ∈ K i) → (∀ i, good i → ∀ x ∈ U, x ∉ K i → ∀ y ∈ U, ∃ k : ℕ, y / x ^ k ∈ K i) → (∀ x ∈ U, x ∉ H → ∃ i, good i ∧ x ∉ K i) → ∃ T : Finset ι, T.card = m ∧ (∀ i ∈ T, good i) ∧ ∀ i ∈ T, ∃ u ∈ U, u ∉ K i ∧ ∀ j ∈ T, j ≠ i → u ∈ K j := by
+theorem exists_indep_prime_index
+    : ∀ (p : ℕ) (G ι : Type) [CommGroup G] [DecidableEq ι] (U H : Subgroup G) (K : ι → Subgroup G)
+        (good : ι → Prop) (m : ℕ),
+      p.Prime → H.relIndex U = p ^ m → (∀ i, good i → U ⊓ H ≤ K i)
+        → (∀ i, good i → ∀ x ∈ U, x ^ p ∈ K i)
+        → (∀ i, good i → ∀ x ∈ U, x ∉ K i → ∀ y ∈ U, ∃ k : ℕ, y / x ^ k ∈ K i)
+        → (∀ x ∈ U, x ∉ H → ∃ i, good i ∧ x ∉ K i)
+        → ∃ T : Finset ι,
+          T.card = m ∧ (∀ i ∈ T, good i)
+            ∧ ∀ i ∈ T, ∃ u ∈ U, u ∉ K i ∧ ∀ j ∈ T, j ≠ i → u ∈ K j := by
   intro p G ι _ _ U H K good m hp hH h1 h2 h2' h3
   obtain ⟨T, a, b, c, -⟩ :=
     exists_independent_prime_relIndex_subgroups p G ι U H K good m hp hH h1 h2 h2' h3 m le_rfl

@@ -83,9 +83,10 @@ theorem lift_mem {h : I ⊕ J → C} (hh : ∀ n, V.Ge 0 (h n)) : X.lift h ∈ X
   exact X.Ty.add_mem (X.Ty.sum_mem fun b _ => X.teich_mem _ (hh _) _ (X.std_spec b).1)
     (X.t3 _ fun j => hh _)
 
-theorem lift_apply (h : I ⊕ J → C) (i : ℕ) (n : I ⊕ J) : X.lift h i n =
-    (∑ b, h (Sum.inl b) ^ (V.l ^ i) * X.std b i n) +
-      const0 (Sum.elim 0 (fun j => h (Sum.inr j))) i n := by
+theorem lift_apply (h : I ⊕ J → C) (i : ℕ) (n : I ⊕ J)
+    : X.lift h i n
+      = (∑ b, h (Sum.inl b) ^ (V.l ^ i) * X.std b i n)
+        + const0 (Sum.elim 0 (fun j => h (Sum.inr j))) i n := by
   simp only [lift, Pi.add_apply, Finset.sum_apply, teich]
 
 theorem lift_zero (h : I ⊕ J → C) : X.lift h 0 = h := by
@@ -96,8 +97,9 @@ theorem lift_zero (h : I ⊕ J → C) : X.lift h 0 = h := by
   | inl b' => simp [Pi.single_apply]
   | inr j => simp
 
-theorem boundS : ∀ (i s : ℕ) (x : ℕ → I ⊕ J → C), x ∈ X.Ty → (∀ j < s, x j = 0) →
-    ∀ n, V.Ge (-(i : ℝ)) (x (s + i) n) := by
+theorem boundS
+    : ∀ (i s : ℕ) (x : ℕ → I ⊕ J → C),
+      x ∈ X.Ty → (∀ j < s, x j = 0) → ∀ n, V.Ge (-(i : ℝ)) (x (s + i) n) := by
   intro i
   induction i with
   | zero =>
@@ -119,10 +121,12 @@ theorem boundS : ∀ (i s : ℕ) (x : ℕ → I ⊕ J → C), x ∈ X.Ty → (�
         rw [if_neg (lt_irrefl _), Nat.sub_self, X.lift_zero, sub_self]
     have h1 := ih (s + 1) _ hx' hz' n
     have h2 := X.bound0 (i + 1) _ hL n
-    have hsplit : x (s + (i + 1)) n =
-        (x - Vpow s (X.lift (x s))) (s + 1 + i) n + X.lift (x s) (i + 1) n := by
+    have hsplit
+        : x (s + (i + 1)) n
+          = (x - Vpow s (X.lift (x s))) (s + 1 + i) n + X.lift (x s) (i + 1) n := by
       simp only [Pi.sub_apply, Vpow]
-      rw [if_neg (by omega), show s + 1 + i - s = i + 1 by omega, show s + 1 + i = s + (i + 1) by omega]
+      rw [if_neg (by omega), show s + 1 + i - s = i + 1 by omega,
+        show s + 1 + i = s + (i + 1) by omega]
       ring
     rw [hsplit]
     exact (h1.mono (by push_cast; linarith)).add h2
@@ -138,8 +142,11 @@ def c0' (_X : Cart V d I J) (x : ℕ → I ⊕ J → C) : J → C := fun j => (V
 
 variable {X}
 
-theorem Good.bound [DecidableEq I] [Fintype I] {a : ZMod d} {u : I → C} {x : ℕ → I ⊕ J → C}
-    (h : X.Good a u x) (i : ℕ) (n : I ⊕ J) : V.Ge (-((i : ℝ) + 1)) (x (i + 2) n) := by
+theorem Good.bound
+    [DecidableEq I] [Fintype I]
+    {a : ZMod d} {u : I → C} {x : ℕ → I ⊕ J → C} (h : X.Good a u x)
+    (i : ℕ) (n : I ⊕ J)
+    : V.Ge (-((i : ℝ) + 1)) (x (i + 2) n) := by
   have hx := h.1.1
   have hF := X.F_mem _ hx
   have hζ : ∀ j, V.Ge 0 ((V.l : C) * x 1 (Sum.inr j)) := fun j => by
@@ -147,8 +154,10 @@ theorem Good.bound [DecidableEq I] [Fintype I] {a : ZMod d} {u : I → C} {x : �
     exact this
   have hw : Fs V.l x - const0 (Sum.elim 0 (fun j => (V.l : C) * x 1 (Sum.inr j))) ∈ X.Ty :=
     X.Ty.sub_mem hF (X.t3 _ hζ)
-  have hw0 : ∀ j < 1, (Fs V.l x - const0 (Sum.elim 0 (fun j => (V.l : C) * x 1 (Sum.inr j))) :
-      ℕ → I ⊕ J → C) j = 0 := by
+  have hw0
+      : ∀ j < 1,
+        (Fs V.l x - const0 (Sum.elim 0 (fun j => (V.l : C) * x 1 (Sum.inr j))) : ℕ → I ⊕ J → C) j
+          = 0 := by
     intro j hj
     obtain rfl : j = 0 := by omega
     funext m
@@ -156,35 +165,38 @@ theorem Good.bound [DecidableEq I] [Fintype I] {a : ZMod d} {u : I → C} {x : �
     | inl c => simp [Fs, const0, h.2 c]
     | inr k => simp [Fs, const0]
   have hb := X.boundS i 1 _ hw hw0 n
-  have he : (Fs V.l x - const0 (Sum.elim 0 (fun j => (V.l : C) * x 1 (Sum.inr j))) :
-      ℕ → I ⊕ J → C) (1 + i) n =
-      (V.l : C) * x (i + 2) n := by
+  have he
+      : (Fs V.l x - const0 (Sum.elim 0 (fun j => (V.l : C) * x 1 (Sum.inr j))) : ℕ → I ⊕ J → C)
+          (1 + i) n
+        = (V.l : C) * x (i + 2) n := by
     simp only [Pi.sub_apply, Fs, const0]
     rw [if_neg (by omega), sub_zero, show 1 + i + 1 = i + 2 by omega]
   rw [he] at hb
   exact hb.of_l_mul.mono (by linarith)
 
-theorem Good.bound_one {a : ZMod d} {u : I → C} {x : ℕ → I ⊕ J → C}
-    (h : X.Good a u x) (n : I ⊕ J) : V.Ge (-1) (x 1 n) := by
+theorem Good.bound_one {a : ZMod d} {u : I → C} {x : ℕ → I ⊕ J → C} (h : X.Good a u x) (n : I ⊕ J)
+    : V.Ge (-1) (x 1 n) := by
   have := X.t2 _ (X.F_mem _ h.1.1) 0 (fun i hi => absurd hi (Nat.not_lt_zero i)) n
   have h2 : V.Ge 0 ((V.l : C) * x 1 n) := this
   exact h2.of_l_mul.mono (by norm_num)
 
-theorem Good.c0'_int {a : ZMod d} {u : I → C} {x : ℕ → I ⊕ J → C}
-    (h : X.Good a u x) (j : J) : V.Ge 0 (X.c0' x j) := by
+theorem Good.c0'_int {a : ZMod d} {u : I → C} {x : ℕ → I ⊕ J → C} (h : X.Good a u x) (j : J)
+    : V.Ge 0 (X.c0' x j) := by
   have := X.t2 _ (X.F_mem _ h.1.1) 0 (fun i hi => absurd hi (Nat.not_lt_zero i)) (Sum.inr j)
   exact this
 
-theorem Good.comb {ι : Type*} (s : Finset ι) {a : ZMod d} {u : ι → I → C}
-    {x : ι → ℕ → I ⊕ J → C} {co : ι → C} (hco : ∀ k ∈ s, V.Ge 0 (co k))
-    (h : ∀ k ∈ s, X.Good a (u k) (x k)) :
-    X.Good a (∑ k ∈ s, co k • u k) (∑ k ∈ s, teich V.l (co k) (x k)) := by
+theorem Good.comb
+    {ι : Type*} (s : Finset ι)
+    {a : ZMod d} {u : ι → I → C} {x : ι → ℕ → I ⊕ J → C} {co : ι → C}
+    (hco : ∀ k ∈ s, V.Ge 0 (co k)) (h : ∀ k ∈ s, X.Good a (u k) (x k))
+    : X.Good a (∑ k ∈ s, co k • u k) (∑ k ∈ s, teich V.l (co k) (x k)) := by
   refine And.intro (And.intro ?_ (And.intro ?_ ?_)) ?_
   · exact X.Ty.sum_mem fun k hk => X.teich_mem _ (hco k hk) _ (h k hk).1.1
   · funext n
     simp only [Finset.sum_apply, teich, pow_zero, pow_one]
-    calc ∑ k ∈ s, co k * x k 0 n = ∑ k ∈ s, co k * Sum.elim (u k) 0 n :=
-          Finset.sum_congr rfl fun k hk => by rw [(h k hk).1.2.1]
+    calc
+      ∑ k ∈ s, co k * x k 0 n = ∑ k ∈ s, co k * Sum.elim (u k) 0 n :=
+        Finset.sum_congr rfl fun k hk => by rw [(h k hk).1.2.1]
       _ = _ := by cases n <;> simp [Finset.sum_apply]
   · intro i n hn
     simp only [Finset.sum_apply, teich]
@@ -193,13 +205,13 @@ theorem Good.comb {ι : Type*} (s : Finset ι) {a : ZMod d} {u : ι → I → C}
     simp only [Finset.sum_apply, teich]
     exact Finset.sum_eq_zero fun k hk => by rw [(h k hk).2 c, mul_zero]
 
-theorem scaledSecond_sum {ι : Type*} (s : Finset ι) (x : ι → ℕ → I ⊕ J → C) (co : ι → C) (b : I) :
-    X.V2 (∑ k ∈ s, teich V.l (co k) (x k)) b = ∑ k ∈ s, co k ^ (V.l ^ 2) * X.V2 (x k) b := by
+theorem scaledSecond_sum {ι : Type*} (s : Finset ι) (x : ι → ℕ → I ⊕ J → C) (co : ι → C) (b : I)
+    : X.V2 (∑ k ∈ s, teich V.l (co k) (x k)) b = ∑ k ∈ s, co k ^ (V.l ^ 2) * X.V2 (x k) b := by
   simp only [V2, Finset.sum_apply, teich, Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by ring
 
-theorem c0'_comb {ι : Type*} (s : Finset ι) (x : ι → ℕ → I ⊕ J → C) (co : ι → C) (j : J) :
-    X.c0' (∑ k ∈ s, teich V.l (co k) (x k)) j = ∑ k ∈ s, co k ^ V.l * X.c0' (x k) j := by
+theorem c0'_comb {ι : Type*} (s : Finset ι) (x : ι → ℕ → I ⊕ J → C) (co : ι → C) (j : J)
+    : X.c0' (∑ k ∈ s, teich V.l (co k) (x k)) j = ∑ k ∈ s, co k ^ V.l * X.c0' (x k) j := by
   simp only [c0', Finset.sum_apply, teich, pow_one, Finset.mul_sum]
   exact Finset.sum_congr rfl fun k _ => by ring
 

@@ -4,12 +4,14 @@ public import Development.AbelianVarietyTheory.Definitions.GaloisGeometry.HeckeC
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal GlobalTheory.StringRepresentationDecomposition
+open Formalism.BasicNotions Formalism.ConjugateSelfDual Formalism.MainNotions
+  Formalism.MainNotions.N Polynomial NumberField IsDedekindDomain ReciprocityTheory.Gal
+  GlobalTheory.StringRepresentationDecomposition
 
 namespace GlobalTheory
 
-theorem primitiveRoot_notPrimePow_map_ne_one :
-    ∀ (k : Type) [Field k] (O : Type) [CommRing O] [IsDomain O] (f : O →+* k) (ζ : O) (n : ℕ),
+theorem primitiveRoot_notPrimePow_map_ne_one
+    : ∀ (k : Type) [Field k] (O : Type) [CommRing O] [IsDomain O] (f : O →+* k) (ζ : O) (n : ℕ),
       1 < n → IsPrimitiveRoot ζ n → (¬ IsPrimePow n) → f ζ ≠ 1 := by
   intro k _ O _ _ f ζ n hn hζ hpp h1
   have hroot : IsRoot (cyclotomic n O) ζ := hζ.isRoot_cyclotomic (by omega)

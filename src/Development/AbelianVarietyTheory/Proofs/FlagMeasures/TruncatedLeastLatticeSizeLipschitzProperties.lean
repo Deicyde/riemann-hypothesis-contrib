@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TruncatedLeas
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 noncomputable section
@@ -22,8 +23,8 @@ namespace GlobalTheory.TauLipschitz
 theorem trunc_pos (I : AutInst) (hn : 1 ≤ I.n) (x : I.GA) : 0 < tau1 I x :=
   lt_min (by norm_num) ((GlobalTheory.CountSteps.steps I x 1 one_pos).2.2.2.2.2.2.2.2 hn).1
 
-theorem log_trunc_le (I : AutInst) (hn : 1 ≤ I.n) (x g : I.GA) (hg : g.2 ∈ I.Kset) :
-    Real.log (tau1 I x) - dSum I g.1 / I.f ≤ Real.log (tau1 I (x * g)) := by
+theorem log_trunc_le (I : AutInst) (hn : 1 ≤ I.n) (x g : I.GA) (hg : g.2 ∈ I.Kset)
+    : Real.log (tau1 I x) - dSum I g.1 / I.f ≤ Real.log (tau1 I (x * g)) := by
   have h := GlobalTheory.LeastVar.truncatedLeastLatticeSize_rightTranslate_lower_bound I hn x g hg
   have hx := trunc_pos I hn x
   have h2 := Real.log_le_log (mul_pos hx (Real.exp_pos _)) h

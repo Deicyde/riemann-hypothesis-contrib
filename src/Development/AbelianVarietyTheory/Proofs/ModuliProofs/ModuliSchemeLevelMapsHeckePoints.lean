@@ -14,20 +14,27 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.AllSi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 
 namespace GlobalTheory
 
-
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField in
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry NumberField in
 open scoped CategoryTheory.Obj in
-theorem _root_.GlobalTheory.moduliScheme_levelMaps_heckePoints : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.N1 := by
+theorem _root_.GlobalTheory.moduliScheme_levelMaps_heckePoints
+    : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.N1 := by
   unfold _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.N1
-  exact ⟨_root_.GlobalTheory.Moduli.moduli_scheme_exists, fun E _ _ _ H D hD =>
-    ⟨_root_.GlobalTheory.levelMaps_closed _root_.GlobalTheory.abelianSchemeLaws_all.1 E H D hD,
+  exact ⟨
+    _root_.GlobalTheory.Moduli.moduli_scheme_exists,
+    fun E _ _ _ H D hD => ⟨
+      _root_.GlobalTheory.levelMaps_closed _root_.GlobalTheory.abelianSchemeLaws_all.1 E H D hD,
       _root_.GlobalTheory.heckePoints_of_laws _root_.GlobalTheory.abelianSchemeLaws_all.1
-        _root_.GlobalTheory.AbLaw.CubeAssembly.cube_gen E H D hD⟩⟩
+        _root_.GlobalTheory.AbLaw.CubeAssembly.cube_gen E H D hD
+    ⟩
+  ⟩
 
 end GlobalTheory

@@ -7,10 +7,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp UpperTheory.V.Ws.Lk
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws GlobalTheory.GalOfCusp
+  UpperTheory.V.Ws.Lk
 
-private theorem chi_rev {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
-    (D : Raw Ω c) (pr : Bool) (i : Fin 4) : chi D pr i * chi D pr i.rev = D.th := by
+private theorem chi_rev
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {c : Coef l} (D : Raw Ω c)
+    (pr : Bool) (i : Fin 4)
+    : chi D pr i * chi D pr i.rev = D.th := by
   cases pr <;> fin_cases i
   · exact mul_one _
   · exact mul_comm _ _
@@ -21,8 +28,18 @@ private theorem chi_rev {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ �
   · exact mul_one _
   · exact mul_comm _ _
 
-theorem UpperTheory.V.Ws.Lk.cbFacts :
-    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (X : OCh T c' h), D.Good → (∀ i, IsOpen ((X.cb i).ker : Set (G T.L Ω))) ∧ (∀ i A, Raw.Away D.S A → Ine (F := T.L) A ≤ (X.cb i).ker) ∧ ∀ σ ∉ T.K.fixingSubgroup, ∀ g g' : G T.L Ω, resQ T.L g' = σ * resQ T.L g * σ⁻¹ → ∀ i : Fin 4, (X.cb i g' * X.cb i.rev g : ResidueField c'.O) * residue c'.O (chiO T.L Ω l c'.O g) ^ 3 = 1 := by
+theorem UpperTheory.V.Ws.Lk.cbFacts
+    : ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+        {D : Raw Ω c} {T : Tower D} {c' : Coef l} {h : c.O ≤ c'.O} (X : OCh T c' h),
+      D.Good
+        → (∀ i, IsOpen ((X.cb i).ker : Set (G T.L Ω)))
+          ∧ (∀ i A, Raw.Away D.S A → Ine (F := T.L) A ≤ (X.cb i).ker)
+          ∧ ∀ σ ∉ T.K.fixingSubgroup, ∀ g g' : G T.L Ω,
+            resQ T.L g' = σ * resQ T.L g * σ⁻¹
+              → ∀ i : Fin 4,
+                (X.cb i g' * X.cb i.rev g : ResidueField c'.O)
+                    * residue c'.O (chiO T.L Ω l c'.O g) ^ 3
+                  = 1 := by
   intro Ω _ _ _ l _ c D T c' h X hD
   obtain ⟨hop, -, hun⟩ := Lk.barFacts hD
   refine ⟨fun i => ?_, fun i A hA g hg => ?_, fun σ hσ g g' hgg i => ?_⟩
@@ -31,13 +48,15 @@ theorem UpperTheory.V.Ws.Lk.cbFacts :
     have h1 : IsOpen {g : G T.L Ω | Ideal.Quotient.mk (maximalIdeal c'.O ^ 1) (X.κ g : c'.O) = 1} :=
       (X.κ_cont 1).isOpen_fiber 1
     have h2 := (hop (lab T.pr i)).preimage hq
-    refine Subgroup.isOpen_of_mem_nhds _ (g := 1) (Filter.mem_of_superset ((h1.inter h2).mem_nhds ⟨?_, ?_⟩) ?_)
+    refine Subgroup.isOpen_of_mem_nhds _ (g := 1)
+      (Filter.mem_of_superset ((h1.inter h2).mem_nhds ⟨?_, ?_⟩) ?_)
     · show Ideal.Quotient.mk _ (X.κ 1 : c'.O) = 1
       rw [map_one, Units.val_one, map_one]
     · show residue c.O (D.ps (lab T.pr i) (resQ T.L 1) : c.O) = 1
       rw [map_one, map_one, Units.val_one, map_one]
     · rintro g ⟨a, b⟩
-      have a1 : (X.κ g : c'.O) - 1 ∈ maximalIdeal c'.O ^ 1 := Ideal.Quotient.eq.1 (a.trans (map_one _).symm)
+      have a1 : (X.κ g : c'.O) - 1 ∈ maximalIdeal c'.O ^ 1 :=
+        Ideal.Quotient.eq.1 (a.trans (map_one _).symm)
       rw [pow_one] at a1
       have a2 : residue c'.O (X.κ g : c'.O) = residue c'.O 1 := Ideal.Quotient.eq.2 a1
       have b1 : residue c.O (chi D T.pr i (resQ T.L g) : c.O) = 1 := b

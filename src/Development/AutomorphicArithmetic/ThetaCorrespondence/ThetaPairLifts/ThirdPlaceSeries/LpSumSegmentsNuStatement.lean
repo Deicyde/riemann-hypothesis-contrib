@@ -10,17 +10,23 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRec
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.sum_segments_langlands_at_place : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)),
-    letI := GlobalTheory.LocalData.complRel w
-    haveI := GlobalTheory.LocalData.isLocalField w
-    ∀ (h : IsPlaceOver A w) (rc : IrrGL (k := w.adicCompletion E) → WD h), _root_.UpperTheory.Zero.LLC.IsRecT h rc →
-    ∀ (l : List (Segment (w.adicCompletion E))) (c : ℝ),
-      sumList ((l.map fun Γ => Γ.nu (c : ℂ)).map fun Δ =>
-          ((rc Δ.first).lpTw (((Δ.len : ℝ) - 1) / 2)).lpChar (WD.lpSp (h := h) Δ.len)) =
-        (sumList (l.map fun Δ => ((rc Δ.first).lpTw (((Δ.len : ℝ) - 1) / 2)).lpChar (WD.lpSp (h := h) Δ.len))).lpTw c := by
+theorem _root_.GlobalTheory.T.sum_segments_langlands_at_place
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 E)),
+      letI := GlobalTheory.LocalData.complRel w
+      haveI := GlobalTheory.LocalData.isLocalField w
+      ∀ (h : IsPlaceOver A w) (rc : IrrGL (k := w.adicCompletion E) → WD h),
+        _root_.UpperTheory.Zero.LLC.IsRecT h rc
+          → ∀ (l : List (Segment (w.adicCompletion E))) (c : ℝ),
+            sumList ((l.map fun Γ => Γ.nu (c : ℂ)).map fun Δ =>
+                ((rc Δ.first).lpTw (((Δ.len : ℝ) - 1) / 2)).lpChar (WD.lpSp (h := h) Δ.len))
+              = (sumList (l.map fun Δ =>
+                  ((rc Δ.first).lpTw (((Δ.len : ℝ) - 1) / 2)).lpChar (WD.lpSp (h := h) Δ.len))).lpTw
+                c := by
   intro E Ω _ _ _ _ _ A w
   let _ := GlobalTheory.LocalData.complRel w
   have _ := GlobalTheory.LocalData.isLocalField w

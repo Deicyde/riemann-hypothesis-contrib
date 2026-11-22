@@ -9,14 +9,17 @@ public import Development.AbelianVarietyTheory.Proofs.HeightProofs.LeOfFiniteSpl
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.L2.NT Formalism.L2.TwC GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.L2.NT
+  Formalism.L2.TwC GlobalTheory.HeightCounting NumberField IsDedekindDomain Polynomial
 
 namespace GlobalTheory.SplitTower
 
-theorem splits_completely_of_intermediate :
-    ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] (p : ℕ), p.Prime →
-    ((Ideal.span {(p : ℤ)}).primesOver (𝓞 L)).ncard = Module.finrank ℚ L →
-      ∀ 𝔭 : HeightOneSpectrum (𝓞 K), (p : 𝓞 K) ∈ 𝔭.asIdeal → (𝔭.asIdeal.primesOver (𝓞 L)).ncard = Module.finrank K L := by
+theorem splits_completely_of_intermediate
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] (p : ℕ),
+      p.Prime → ((Ideal.span {(p : ℤ)}).primesOver (𝓞 L)).ncard = Module.finrank ℚ L
+        → ∀ 𝔭 : HeightOneSpectrum (𝓞 K),
+          (p : 𝓞 K) ∈ 𝔭.asIdeal → (𝔭.asIdeal.primesOver (𝓞 L)).ncard = Module.finrank K L := by
   intro K L _ _ _ _ _ p hp hcount 𝔭 hp𝔭
   rw [GlobalTheory.Bauer.ncard_eq_finrank_iff K L 𝔭]
   set P : Ideal ℤ := Ideal.span {(p : ℤ)} with hPdef

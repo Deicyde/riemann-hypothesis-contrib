@@ -144,8 +144,24 @@ private lemma spz_eval {k L B : Type} [Field k] [Field L] [Algebra k L] [CommRin
   congr 1
   exact Subtype.ext (c1 y')
 
-theorem UpperTheory.tensor_dedekind_local_uniformizer :
-    ∀ (k L B : Type) [Field k] [IsAlgClosed k] [Field L] [IsAlgClosed L] [Algebra k L] [CommRing B] [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B] [IsDedekindDomain (L ⊗[k] B)], ¬ IsField B → ¬ IsField (L ⊗[k] B) → ∀ m : Ideal (L ⊗[k] B), m.IsMaximal → ∀ a b : L ⊗[k] B, a ≠ 0 → b ≠ 0 → ∃ (π s t s' t' : L ⊗[k] B) (e e' : ℕ), π ≠ 0 ∧ s ∉ m ∧ t ∉ m ∧ s' ∉ m ∧ t' ∉ m ∧ a * s = t * π ^ e ∧ b * s' = t' * π ^ e' ∧ ∃ S : Finset L, ∀ R : Subalgebra k L, (S : Set L) ⊆ R → ∀ (φ : R →ₐ[k] k) (a₀ b₀ : B), Spz R φ a a₀ → Spz R φ b b₀ → ∃ P : IsDedekindDomain.HeightOneSpectrum B, P.intValuation a₀ = WithZero.exp (-(e : ℤ)) ∧ P.intValuation b₀ = WithZero.exp (-(e' : ℤ)) := by
+theorem UpperTheory.tensor_dedekind_local_uniformizer
+    : ∀ (k L B : Type) [Field k] [IsAlgClosed k] [Field L] [IsAlgClosed L] [Algebra k L]
+        [CommRing B] [IsDedekindDomain B] [Algebra k B] [Algebra.FiniteType k B]
+        [IsDedekindDomain (L ⊗[k] B)],
+      ¬ IsField B → ¬ IsField (L ⊗[k] B)
+        → ∀ m : Ideal (L ⊗[k] B),
+          m.IsMaximal
+            → ∀ a b : L ⊗[k] B,
+              a ≠ 0 → b ≠ 0
+                → ∃ (π s t s' t' : L ⊗[k] B) (e e' : ℕ),
+                  π ≠ 0 ∧ s ∉ m ∧ t ∉ m ∧ s' ∉ m ∧ t' ∉ m ∧ a * s = t * π ^ e ∧ b * s' = t' * π ^ e'
+                    ∧ ∃ S : Finset L, ∀ R : Subalgebra k L,
+                      (S : Set L) ⊆ R
+                        → ∀ (φ : R →ₐ[k] k) (a₀ b₀ : B),
+                          Spz R φ a a₀ → Spz R φ b b₀
+                            → ∃ P : IsDedekindDomain.HeightOneSpectrum B,
+                              P.intValuation a₀ = WithZero.exp (-(e : ℤ))
+                                ∧ P.intValuation b₀ = WithZero.exp (-(e' : ℤ)) := by
   classical
   intro k L B _ _ _ _ _ _ _ _ _ _ hB hT m hm a b ha hb
   obtain ⟨hS, hE, -⟩ := UpperTheory.specialization_tensor_ring_hom_properties k L B
@@ -188,23 +204,43 @@ theorem UpperTheory.tensor_dedekind_local_uniformizer :
     · exact ht'
     · exact hr y
   choose f hf using hE
-  refine ⟨π, s, t, s', t', e, e', hπ0, hs, ht, hs', ht', hst, hst',
-    Y.image ι ∪ U.image (fun x => (ψ x)⁻¹) ∪ E.biUnion f, ?_⟩
+  refine ⟨
+    π,
+    s,
+    t,
+    s',
+    t',
+    e,
+    e',
+    hπ0,
+    hs,
+    ht,
+    hs',
+    ht',
+    hst,
+    hst',
+    Y.image ι ∪ U.image (fun x => (ψ x)⁻¹) ∪ E.biUnion f,
+    ?_
+  ⟩
   intro R hR φ a₀ b₀ ha₀ hb₀
   have hιY : ∀ y ∈ Y, ι y ∈ R := fun y hy =>
-    hR (by simp only [Finset.coe_union, Finset.coe_image]
-           exact Or.inl (Or.inl ⟨y, hy, rfl⟩))
+    hR (by
+      simp only [Finset.coe_union, Finset.coe_image]
+      exact Or.inl (Or.inl ⟨y, hy, rfl⟩))
   have hinv : ∀ x ∈ U, (ψ x)⁻¹ ∈ R := fun x hx =>
-    hR (by simp only [Finset.coe_union, Finset.coe_image]
-           exact Or.inl (Or.inr ⟨x, hx, rfl⟩))
+    hR (by
+      simp only [Finset.coe_union, Finset.coe_image]
+      exact Or.inl (Or.inr ⟨x, hx, rfl⟩))
   have hex : ∀ x ∈ E, ∃ x₀, Spz R φ x x₀ := fun x hx =>
-    hf x R (fun l hl => hR (by
-      simp only [Finset.coe_union, Finset.coe_biUnion]
-      exact Or.inr (Set.mem_biUnion hx hl))) φ
+    hf x R
+      (fun l hl =>
+        hR (by
+          simp only [Finset.coe_union, Finset.coe_biUnion]
+          exact Or.inr (Set.mem_biUnion hx hl)))
+      φ
   let ψ₀ : B →ₐ[k] L := (ψ.restrictScalars k).comp Algebra.TensorProduct.includeRight
   have hιR : ∀ x, ψ₀ x ∈ R := by
-    have hle : Algebra.adjoin k (Y : Set B) ≤ R.comap ψ₀ :=
-      Algebra.adjoin_le fun y hy => hιY y hy
+    have hle : Algebra.adjoin k (Y : Set B) ≤ R.comap ψ₀ := Algebra.adjoin_le fun y hy => hιY y hy
     intro x
     have : x ∈ Algebra.adjoin k (Y : Set B) := by rw [hY]; trivial
     exact hle this
@@ -223,8 +259,7 @@ theorem UpperTheory.tensor_dedekind_local_uniformizer :
     obtain ⟨hxR, hφ⟩ := hev x x₀ hs₀
     have h0 : φ ⟨ψ x, hxR⟩ = 0 := hφ.trans ((hP x₀).mp hmem)
     have hne : ψ x ≠ 0 := fun h => hUm x hx ((hψ x).mp h)
-    have h1 : (⟨ψ x, hxR⟩ : R) * ⟨(ψ x)⁻¹, hinv x hx⟩ = 1 :=
-      Subtype.ext (mul_inv_cancel₀ hne)
+    have h1 : (⟨ψ x, hxR⟩ : R) * ⟨(ψ x)⁻¹, hinv x hx⟩ = 1 := Subtype.ext (mul_inv_cancel₀ hne)
     have h2 := congrArg φ h1
     rw [map_mul, h0, zero_mul, map_one] at h2
     exact zero_ne_one h2
@@ -245,12 +280,14 @@ theorem UpperTheory.tensor_dedekind_local_uniformizer :
   have hval : P.intValuation π₀ = WithZero.exp (-1 : ℤ) := by
     refine val_unif (k := k) (Y : Set B) hY χ P hP π₀ hπ₀P ?_
     intro y hyY
-    obtain ⟨r₀, hr₀⟩ := hex (r y) (by
-      simp only [E, U, Finset.mem_union, Finset.mem_image]
-      exact Or.inl (Or.inl (Or.inr ⟨y, hyY, rfl⟩)))
-    obtain ⟨w₀, hw₀⟩ := hex (w y) (by
-      simp only [E, Finset.mem_union, Finset.mem_image]
-      exact Or.inr ⟨y, hyY, rfl⟩)
+    obtain ⟨r₀, hr₀⟩ :=
+      hex (r y) (by
+        simp only [E, U, Finset.mem_union, Finset.mem_image]
+        exact Or.inl (Or.inl (Or.inr ⟨y, hyY, rfl⟩)))
+    obtain ⟨w₀, hw₀⟩ :=
+      hex (w y) (by
+        simp only [E, Finset.mem_union, Finset.mem_image]
+        exact Or.inr ⟨y, hyY, rfl⟩)
     have hrU : r y ∈ U := by
       simp only [U, Finset.mem_union, Finset.mem_image]
       exact Or.inr ⟨y, hyY, rfl⟩
@@ -271,8 +308,10 @@ theorem UpperTheory.tensor_dedekind_local_uniformizer :
     | succ n ih =>
       rw [pow_succ, pow_succ]
       exact (har _ _ _ _ ih hπ₀).2.1
-  have key : ∀ (c x u : L ⊗[k] B) (c₀ : B) (n : ℕ), Spz R φ c c₀ → x ∈ U → u ∈ U →
-      c * x = u * π ^ n → P.intValuation c₀ = WithZero.exp (-(n : ℤ)) := by
+  have key
+      : ∀ (c x u : L ⊗[k] B) (c₀ : B) (n : ℕ),
+        Spz R φ c c₀ → x ∈ U → u ∈ U → c * x = u * π ^ n
+          → P.intValuation c₀ = WithZero.exp (-(n : ℤ)) := by
     intro c x u c₀ n hc₀ hxU huU hrel
     have hUE : ∀ v ∈ U, v ∈ E := fun v hv => by
       simp only [E, Finset.mem_union]
@@ -292,5 +331,8 @@ theorem UpperTheory.tensor_dedekind_local_uniformizer :
     rw [h4, ← WithZero.exp_nsmul]
     simp
   have hmemU : s ∈ U ∧ t ∈ U ∧ s' ∈ U ∧ t' ∈ U := by simp [U]
-  exact ⟨P, key a s t a₀ e ha₀ hmemU.1 hmemU.2.1 hst,
-    key b s' t' b₀ e' hb₀ hmemU.2.2.1 hmemU.2.2.2 hst'⟩
+  exact ⟨
+    P,
+    key a s t a₀ e ha₀ hmemU.1 hmemU.2.1 hst,
+    key b s' t' b₀ e' hb₀ hmemU.2.2.1 hmemU.2.2.2 hst'
+  ⟩

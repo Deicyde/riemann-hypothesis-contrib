@@ -9,17 +9,17 @@ open scoped ComplexOrder
 
 namespace GlobalTheory
 
-theorem gaussian_pairing_moment_algebra :
-    ∀ (σ : Type) [Fintype σ] [DecidableEq σ] (S T : Matrix σ σ ℂ) (x y : σ → ℂ)
-      (t f : ℂ) (p q : σ → ℂ) (m n : Matrix σ σ ℂ),
-      Sᵀ = S → Tᵀ = T → IsUnit (1 - (t ^ 2) • (T * S)).det →
-      p = t • (f • y + T *ᵥ q) → q = t • (f • x + S *ᵥ p) →
-      m = (t * f) • (1 : Matrix σ σ ℂ) + t • vecMulVec y q + t • (T * n) →
-      n = t • vecMulVec x q + t • (S * m) →
-      (let w : σ → ℂ := (1 - (t ^ 2) • (T * S))⁻¹ *ᵥ (y + t • T *ᵥ x)
-       let u : σ → ℂ := x + t • S *ᵥ w
-       f * (x ⬝ᵥ y) + x ⬝ᵥ T *ᵥ q + y ⬝ᵥ S *ᵥ p + (S * m * Tᵀ).trace =
-         f * (u ⬝ᵥ w + t * (T * S * (1 - (t ^ 2) • (T * S))⁻¹).trace)) := by
+theorem gaussian_pairing_moment_algebra
+    : ∀ (σ : Type) [Fintype σ] [DecidableEq σ] (S T : Matrix σ σ ℂ) (x y : σ → ℂ) (t f : ℂ)
+        (p q : σ → ℂ) (m n : Matrix σ σ ℂ),
+      Sᵀ = S → Tᵀ = T → IsUnit (1 - (t ^ 2) • (T * S)).det → p = t • (f • y + T *ᵥ q)
+        → q = t • (f • x + S *ᵥ p)
+        → m = (t * f) • (1 : Matrix σ σ ℂ) + t • vecMulVec y q + t • (T * n)
+        → n = t • vecMulVec x q + t • (S * m)
+        → (let w : σ → ℂ := (1 - (t ^ 2) • (T * S))⁻¹ *ᵥ (y + t • T *ᵥ x)
+           let u : σ → ℂ := x + t • S *ᵥ w
+           f * (x ⬝ᵥ y) + x ⬝ᵥ T *ᵥ q + y ⬝ᵥ S *ᵥ p + (S * m * Tᵀ).trace
+             = f * (u ⬝ᵥ w + t * (T * S * (1 - (t ^ 2) • (T * S))⁻¹).trace)) := by
   intro σ _ _ S T x y t f p q m n hS hT hA hp hq hm hn w u
   set A : Matrix σ σ ℂ := 1 - (t ^ 2) • (T * S) with hAdef
   have hKA : A⁻¹ * A = 1 := Matrix.nonsing_inv_mul A hA
@@ -51,10 +51,13 @@ theorem gaussian_pairing_moment_algebra :
     rw [Matrix.mulVec_add, Matrix.mulVec_smul]
     module
   have hAm : A * m = (t * f) • (1 : Matrix σ σ ℂ) + t • vecMulVec (y + t • T *ᵥ x) q := by
-    have h1 : m = (t * f) • (1 : Matrix σ σ ℂ) + t • vecMulVec y q
-        + t • (T * (t • vecMulVec x q + t • (S * m))) := by rw [← hn]; exact hm
-    rw [Matrix.mul_add, Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_vecMulVec,
-      ← Matrix.mul_assoc] at h1
+    have h1
+        : m
+          = (t * f) • (1 : Matrix σ σ ℂ) + t • vecMulVec y q
+            + t • (T * (t • vecMulVec x q + t • (S * m))) := by
+      rw [← hn]; exact hm
+    rw [Matrix.mul_add, Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_vecMulVec, ← Matrix.mul_assoc]
+      at h1
     rw [hAdef, Matrix.sub_mul, Matrix.one_mul, Matrix.smul_mul, sub_eq_iff_eq_add,
       Matrix.add_vecMulVec, Matrix.smul_vecMulVec]
     refine h1.trans ?_
@@ -63,14 +66,14 @@ theorem gaussian_pairing_moment_algebra :
     have : m = A⁻¹ * (A * m) := by rw [← Matrix.mul_assoc, hKA, Matrix.one_mul]
     rw [this, hAm, Matrix.mul_add, Matrix.mul_smul, Matrix.mul_smul, Matrix.mul_one,
       Matrix.mul_vecMulVec]
-  have htr : (S * m * Tᵀ).trace
-      = (t * f) * (T * S * A⁻¹).trace + t * ((S *ᵥ w) ⬝ᵥ (T *ᵥ q)) := by
+  have htr : (S * m * Tᵀ).trace = (t * f) * (T * S * A⁻¹).trace + t * ((S *ᵥ w) ⬝ᵥ (T *ᵥ q)) := by
     rw [hmK, Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.mul_smul, Matrix.smul_mul,
-      Matrix.smul_mul, Matrix.trace_add, Matrix.trace_smul, Matrix.trace_smul,
-      Matrix.mul_vecMulVec, Matrix.vecMulVec_mul, Matrix.trace_vecMulVec, Matrix.vecMul_transpose,
-      hT, Matrix.trace_mul_comm (S * A⁻¹) T, Matrix.mul_assoc T S, smul_eq_mul, smul_eq_mul]
-  have huw : u ⬝ᵥ w = x ⬝ᵥ y + t * (x ⬝ᵥ T *ᵥ u) + t * (y ⬝ᵥ S *ᵥ w)
-      + t ^ 2 * ((S *ᵥ w) ⬝ᵥ (T *ᵥ u)) := by
+      Matrix.smul_mul, Matrix.trace_add, Matrix.trace_smul, Matrix.trace_smul, Matrix.mul_vecMulVec,
+      Matrix.vecMulVec_mul, Matrix.trace_vecMulVec, Matrix.vecMul_transpose, hT,
+      Matrix.trace_mul_comm (S * A⁻¹) T, Matrix.mul_assoc T S, smul_eq_mul, smul_eq_mul]
+  have huw
+      : u ⬝ᵥ w
+        = x ⬝ᵥ y + t * (x ⬝ᵥ T *ᵥ u) + t * (y ⬝ᵥ S *ᵥ w) + t ^ 2 * ((S *ᵥ w) ⬝ᵥ (T *ᵥ u)) := by
     have h1 : u ⬝ᵥ w = (x + t • S *ᵥ w) ⬝ᵥ (y + t • T *ᵥ u) := by rw [← hw]
     rw [h1]
     simp only [add_dotProduct, dotProduct_add, smul_dotProduct, dotProduct_smul, smul_eq_mul]

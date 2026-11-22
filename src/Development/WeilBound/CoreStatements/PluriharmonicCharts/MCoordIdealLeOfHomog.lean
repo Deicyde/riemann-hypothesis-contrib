@@ -7,7 +7,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FlagModelBaseP
 
 @[expose] public section
 
-open MvPolynomial Matrix ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial Matrix ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+  GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+  GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped Classical
 
 noncomputable section
@@ -16,22 +19,29 @@ set_option linter.unusedSectionVars false
 
 namespace PositivityTheory.Xgp.W
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Φ : Type} [Field Φ] {L : Type} [Field L]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Φ : Type} [Field Φ]
+  {L : Type} [Field L]
 
 def IsPt (y : (Σ k, ι k) → Φ) (z : (Σ k, ι k) → L) : Prop :=
   (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) ∧ ∀ f ∈ mCoordIdeal y, aeval z f = 0
 
 def HasVal (y : (Σ k, ι k) → Φ) (z : (Σ k, ι k) → L) (s : Φ) (v : L) : Prop :=
-  ∃ (d : K → ℕ) (g h : MRing ι), IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval z h ≠ 0 ∧
-    aeval y g = s * aeval y h ∧ aeval z g = v * aeval z h
+  ∃ (d : K → ℕ) (g h : MRing ι),
+    IsMultiHomog g d ∧ IsMultiHomog h d ∧ aeval z h ≠ 0 ∧ aeval y g = s * aeval y h
+      ∧ aeval z g = v * aeval z h
 
-def penCo (y : (Σ k, ι k) → Φ) (k₀ : K) (A B : ι k₀ → Φ) (t : RatFunc Φ) :
-    (Σ o : Option K, ι (o.getD k₀)) → RatFunc Φ
+def penCo (y : (Σ k, ι k) → Φ) (k₀ : K) (A B : ι k₀ → Φ) (t : RatFunc Φ)
+    : (Σ o : Option K, ι (o.getD k₀)) → RatFunc Φ
   | ⟨some k, m⟩ => algebraMap Φ (RatFunc Φ) (y ⟨k, m⟩)
   | ⟨none, m⟩ => algebraMap Φ (RatFunc Φ) (A m) + t * algebraMap Φ (RatFunc Φ) (B m)
 
-structure PenFrame (y : (Σ k, ι k) → Φ) (k₀ : K) (B : ι k₀ → Φ) (cf : Φ) (e : K → ℤ)
-    (z : (Σ k, ι k) → L) (c : ∀ k, ι k) where
+structure PenFrame
+    (y : (Σ k, ι k) → Φ)
+    (k₀ : K) (B : ι k₀ → Φ)
+    (cf : Φ) (e : K → ℤ) (z : (Σ k, ι k) → L) (c : ∀ k, ι k) where
   p : ι k₀ → Φ
   r : ι k₀ → Φ
   α : ι k₀ → Φ
@@ -59,20 +69,24 @@ structure PenFrame (y : (Σ k, ι k) → Φ) (k₀ : K) (B : ι k₀ → Φ) (cf
   hs : HasVal y z (cf * ε * γ / chartMono y c e) sv
   sv_ne : sv ≠ 0
 
-theorem aeval_eq_zero_of_mem {y : (Σ k, ι k) → Φ} {f : MRing ι} (hf : f ∈ mCoordIdeal y) : aeval y f = 0 := by
+theorem aeval_eq_zero_of_mem {y : (Σ k, ι k) → Φ} {f : MRing ι} (hf : f ∈ mCoordIdeal y)
+    : aeval y f = 0 := by
   have h0 : mConeMap y f = 0 := hf
-  have e : (eval fun _ : K => (1 : Φ)).comp (mConeMap y).toRingHom = (aeval y : MRing ι →ₐ[ℤ] Φ).toRingHom :=
+  have e
+      : (eval fun _ : K => (1 : Φ)).comp (mConeMap y).toRingHom
+        = (aeval y : MRing ι →ₐ[ℤ] Φ).toRingHom :=
     MvPolynomial.ringHom_ext (fun r => by simp) fun p => by simp [mConeMap]
   have := RingHom.congr_fun e f
   simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, h0, map_zero] at this
   exact this.symm
 
-theorem mem_iff_of_homog {y : (Σ k, ι k) → Φ} {f : MRing ι} {d : K → ℕ} (hf : IsMultiHomog f d) :
-    f ∈ mCoordIdeal y ↔ aeval y f = 0 :=
+theorem mem_iff_of_homog {y : (Σ k, ι k) → Φ} {f : MRing ι} {d : K → ℕ} (hf : IsMultiHomog f d)
+    : f ∈ mCoordIdeal y ↔ aeval y f = 0 :=
   ⟨aeval_eq_zero_of_mem, mem_mCoordIdeal_of_aeval_eq_zero y hf⟩
 
-theorem mCoordIdeal_le_of_homog {y : (Σ k, ι k) → Φ} {J : Ideal (MRing ι)}
-    (h : ∀ f d, IsMultiHomog f d → aeval y f = 0 → f ∈ J) : mCoordIdeal y ≤ J := by
+theorem mCoordIdeal_le_of_homog
+    {y : (Σ k, ι k) → Φ} {J : Ideal (MRing ι)} (h : ∀ f d, IsMultiHomog f d → aeval y f = 0 → f ∈ J)
+    : mCoordIdeal y ≤ J := by
   obtain ⟨S, hS, e⟩ := CoordinateConeArithVar.isMultiHomogIdeal y
   have hS' : ∀ f ∈ S, f ∈ mCoordIdeal y := fun f hf => by rw [e]; exact Ideal.subset_span hf
   rw [e, Ideal.span_le]
@@ -80,31 +94,46 @@ theorem mCoordIdeal_le_of_homog {y : (Σ k, ι k) → Φ} {J : Ideal (MRing ι)}
   obtain ⟨a, ha⟩ := hS f hf
   exact h f a ha (aeval_eq_zero_of_mem (hS' f hf))
 
-theorem IsPt.le {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (hz : IsPt y z) : mCoordIdeal y ≤ mCoordIdeal z :=
-  mCoordIdeal_le_of_homog fun f _ hf h0 => (mem_iff_of_homog hf).2 (hz.2 f ((mem_iff_of_homog hf).2 h0))
+theorem IsPt.le {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (hz : IsPt y z)
+    : mCoordIdeal y ≤ mCoordIdeal z :=
+  mCoordIdeal_le_of_homog fun f _ hf h0 =>
+    (mem_iff_of_homog hf).2 (hz.2 f ((mem_iff_of_homog hf).2 h0))
 
-theorem isPt_of_homog {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (h0 : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
-    (h : ∀ (f : MRing ι) d, IsMultiHomog f d → aeval y f = 0 → aeval z f = 0) : IsPt y z :=
-  ⟨h0, fun _ hf => (RingHom.mem_ker).1 (mCoordIdeal_le_of_homog
-    (J := RingHom.ker (aeval z : MRing ι →ₐ[ℤ] L)) (fun f d hd h1 => (RingHom.mem_ker).2 (h f d hd h1)) hf)⟩
+theorem isPt_of_homog
+    {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (h0 : ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+    (h : ∀ (f : MRing ι) d, IsMultiHomog f d → aeval y f = 0 → aeval z f = 0)
+    : IsPt y z := ⟨
+  h0,
+  fun _ hf =>
+    (RingHom.mem_ker).1
+      (mCoordIdeal_le_of_homog (J := RingHom.ker (aeval z : MRing ι →ₐ[ℤ] L))
+        (fun f d hd h1 => (RingHom.mem_ker).2 (h f d hd h1))
+        hf)
+⟩
 
 theorem isPt_self {y : (Σ k, ι k) → Φ} (h0 : ∀ k, ∃ i, y ⟨k, i⟩ ≠ 0) : IsPt y y :=
   ⟨h0, fun _ hf => aeval_eq_zero_of_mem hf⟩
 
-theorem IsPt.aeval_ne {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (hz : IsPt y z) {h : MRing ι} {d : K → ℕ}
-    (hh : IsMultiHomog h d) (h0 : aeval z h ≠ 0) : aeval y h ≠ 0 := fun e => h0 (hz.2 h ((mem_iff_of_homog hh).2 e))
+theorem IsPt.aeval_ne
+    {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (hz : IsPt y z)
+    {h : MRing ι} {d : K → ℕ} (hh : IsMultiHomog h d) (h0 : aeval z h ≠ 0)
+    : aeval y h ≠ 0 := fun e =>
+  h0 (hz.2 h ((mem_iff_of_homog hh).2 e))
 
-theorem isMultiHomog_X (p : Σ k, ι k) : IsMultiHomog (X p : MRing ι) (fun k => if k = p.1 then 1 else 0) :=
+theorem isMultiHomog_X (p : Σ k, ι k)
+    : IsMultiHomog (X p : MRing ι) (fun k => if k = p.1 then 1 else 0) :=
   isMultiHomog_X_single p
 
-theorem IsPt.coord_ne {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (hz : IsPt y z) {q : Σ k, ι k} (h : z q ≠ 0) :
-    y q ≠ 0 := by
+theorem IsPt.coord_ne
+    {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L} (hz : IsPt y z) {q : Σ k, ι k} (h : z q ≠ 0)
+    : y q ≠ 0 := by
   have := hz.aeval_ne (isMultiHomog_X q) (by rwa [aeval_X])
   rwa [aeval_X] at this
 
 variable {y : (Σ k, ι k) → Φ} {z : (Σ k, ι k) → L}
 
-theorem HasVal.unique (hz : IsPt y z) {s : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z s w) : v = w := by
+theorem HasVal.unique (hz : IsPt y z) {s : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z s w)
+    : v = w := by
   obtain ⟨d, g, h, hg, hh, h0, e, ev⟩ := hv
   obtain ⟨d', g', h', hg', hh', h0', e', ev'⟩ := hw
   have hsub : IsMultiHomog (g * h' - g' * h) (d + d') := by
@@ -116,7 +145,8 @@ theorem HasVal.unique (hz : IsPt y z) {s : Φ} {v w : L} (hv : HasVal y z s v) (
   have h2 : (v - w) * (aeval z h * aeval z h') = 0 := by linear_combination h1
   exact sub_eq_zero.1 ((mul_eq_zero.1 h2).resolve_right (mul_ne_zero h0 h0'))
 
-theorem HasVal.mul {s t : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z t w) : HasVal y z (s * t) (v * w) := by
+theorem HasVal.mul {s t : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z t w)
+    : HasVal y z (s * t) (v * w) := by
   obtain ⟨d, g, h, hg, hh, h0, e, ev⟩ := hv
   obtain ⟨d', g', h', hg', hh', h0', e', ev'⟩ := hw
   refine ⟨d + d', g * g', h * h', isMultiHomog_mul hg hg', isMultiHomog_mul hh hh', ?_, ?_, ?_⟩
@@ -124,11 +154,20 @@ theorem HasVal.mul {s t : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z t
   · rw [map_mul, map_mul, e, e']; ring
   · rw [map_mul, map_mul, ev, ev']; ring
 
-theorem HasVal.add {s t : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z t w) : HasVal y z (s + t) (v + w) := by
+theorem HasVal.add {s t : Φ} {v w : L} (hv : HasVal y z s v) (hw : HasVal y z t w)
+    : HasVal y z (s + t) (v + w) := by
   obtain ⟨d, g, h, hg, hh, h0, e, ev⟩ := hv
   obtain ⟨d', g', h', hg', hh', h0', e', ev'⟩ := hw
-  refine ⟨d + d', g * h' + g' * h, h * h', isMultiHomog_add (isMultiHomog_mul hg hh') ?_, isMultiHomog_mul hh hh',
-    ?_, ?_, ?_⟩
+  refine ⟨
+    d + d',
+    g * h' + g' * h,
+    h * h',
+    isMultiHomog_add (isMultiHomog_mul hg hh') ?_,
+    isMultiHomog_mul hh hh',
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · rw [add_comm]; exact isMultiHomog_mul hg' hh
   · rw [map_mul]; exact mul_ne_zero h0 h0'
   · rw [map_add (f := _), map_mul, map_mul, map_mul, e, e']; ring
@@ -144,27 +183,31 @@ theorem hasVal_one : HasVal y z 1 1 := by simpa using hasVal_intCast (y := y) (z
 theorem HasVal.neg {s : Φ} {v : L} (hv : HasVal y z s v) : HasVal y z (-s) (-v) := by
   simpa using (hasVal_intCast (y := y) (z := z) (-1)).mul hv
 
-theorem HasVal.ne_zero (hz : IsPt y z) {s : Φ} {v : L} (hv : HasVal y z s v) (h0 : v ≠ 0) : s ≠ 0 := by
+theorem HasVal.ne_zero (hz : IsPt y z) {s : Φ} {v : L} (hv : HasVal y z s v) (h0 : v ≠ 0)
+    : s ≠ 0 := by
   rintro rfl
   exact h0 (hv.unique hz hasVal_zero)
 
-theorem HasVal.inv (hz : IsPt y z) {s : Φ} {v : L} (hv : HasVal y z s v) (hv0 : v ≠ 0) : HasVal y z s⁻¹ v⁻¹ := by
+theorem HasVal.inv (hz : IsPt y z) {s : Φ} {v : L} (hv : HasVal y z s v) (hv0 : v ≠ 0)
+    : HasVal y z s⁻¹ v⁻¹ := by
   have hs := hv.ne_zero hz hv0
   obtain ⟨d, g, h, hg, hh, h0, e, ev⟩ := hv
   refine ⟨d, h, g, hh, hg, by rw [ev]; exact mul_ne_zero hv0 h0, ?_, ?_⟩
   · rw [e, inv_mul_cancel_left₀ hs]
   · rw [ev, inv_mul_cancel_left₀ hv0]
 
-theorem HasVal.sum {σ : Type} (S : Finset σ) {s : σ → Φ} {v : σ → L} (h : ∀ a ∈ S, HasVal y z (s a) (v a)) :
-    HasVal y z (∑ a ∈ S, s a) (∑ a ∈ S, v a) := by
+theorem HasVal.sum
+    {σ : Type} (S : Finset σ) {s : σ → Φ} {v : σ → L} (h : ∀ a ∈ S, HasVal y z (s a) (v a))
+    : HasVal y z (∑ a ∈ S, s a) (∑ a ∈ S, v a) := by
   induction S using Finset.induction_on with
   | empty => simpa using hasVal_zero
   | insert a S ha ih =>
     rw [Finset.sum_insert ha, Finset.sum_insert ha]
     exact (h a (Finset.mem_insert_self _ _)).add (ih fun b hb => h b (Finset.mem_insert_of_mem hb))
 
-theorem HasVal.prod {σ : Type} (S : Finset σ) {s : σ → Φ} {v : σ → L} (h : ∀ a ∈ S, HasVal y z (s a) (v a)) :
-    HasVal y z (∏ a ∈ S, s a) (∏ a ∈ S, v a) := by
+theorem HasVal.prod
+    {σ : Type} (S : Finset σ) {s : σ → Φ} {v : σ → L} (h : ∀ a ∈ S, HasVal y z (s a) (v a))
+    : HasVal y z (∏ a ∈ S, s a) (∏ a ∈ S, v a) := by
   induction S using Finset.induction_on with
   | empty => simpa using hasVal_one
   | insert a S ha ih =>
@@ -174,18 +217,20 @@ theorem HasVal.prod {σ : Type} (S : Finset σ) {s : σ → Φ} {v : σ → L} (
 theorem HasVal.pow {s : Φ} {v : L} (hv : HasVal y z s v) (n : ℕ) : HasVal y z (s ^ n) (v ^ n) := by
   simpa using HasVal.prod (Finset.range n) (s := fun _ => s) (v := fun _ => v) fun _ _ => hv
 
-theorem HasVal.zpow (hz : IsPt y z) {s : Φ} {v : L} (hv : HasVal y z s v) (h0 : v ≠ 0) (n : ℤ) :
-    HasVal y z (s ^ n) (v ^ n) := by
+theorem HasVal.zpow (hz : IsPt y z) {s : Φ} {v : L} (hv : HasVal y z s v) (h0 : v ≠ 0) (n : ℤ)
+    : HasVal y z (s ^ n) (v ^ n) := by
   cases n with
   | ofNat n => simpa using hv.pow n
   | negSucc n => simpa using (hv.pow (n + 1)).inv hz (pow_ne_zero _ h0)
 
-theorem hasVal_form (hz : IsPt y z) {g h : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d)
-    (h0 : aeval z h ≠ 0) : HasVal y z (aeval y g / aeval y h) (aeval z g / aeval z h) :=
+theorem hasVal_form
+    (hz : IsPt y z)
+    {g h : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d) (h0 : aeval z h ≠ 0)
+    : HasVal y z (aeval y g / aeval y h) (aeval z g / aeval z h) :=
   ⟨d, g, h, hg, hh, h0, (div_mul_cancel₀ _ (hz.aeval_ne hh h0)).symm, (div_mul_cancel₀ _ h0).symm⟩
 
-theorem hasVal_ratio (hz : IsPt y z) {k : K} (m c : ι k) (hc : z ⟨k, c⟩ ≠ 0) :
-    HasVal y z (y ⟨k, m⟩ / y ⟨k, c⟩) (z ⟨k, m⟩ / z ⟨k, c⟩) := by
+theorem hasVal_ratio (hz : IsPt y z) {k : K} (m c : ι k) (hc : z ⟨k, c⟩ ≠ 0)
+    : HasVal y z (y ⟨k, m⟩ / y ⟨k, c⟩) (z ⟨k, m⟩ / z ⟨k, c⟩) := by
   simpa using hasVal_form hz (isMultiHomog_X ⟨k, m⟩) (isMultiHomog_X ⟨k, c⟩) (by rwa [aeval_X])
 
 theorem hasVal_self_eq {s v : Φ} (h : HasVal y y s v) : v = s := by
@@ -227,18 +272,37 @@ theorem isLocalRing_regO (hz : IsPt y z) : IsLocalRing (regO y z) := by
   · exact Or.inr (isUnit_of_valO hz _ (by rw [map_sub, map_one, h, sub_zero]; exact one_ne_zero))
   · exact Or.inl (isUnit_of_valO hz _ h)
 
-theorem HasVal.pull {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Φ' : Type} [Field Φ']
-    {κ : K → K'} {v : (Σ k, ι k) → Σ k, ι' k} (hb : IsBlockMap κ v) (φ : Φ →+* Φ') {y' : (Σ k, ι' k) → Φ'}
-    (hy : y' ∘ v = φ ∘ y) {z' : (Σ k, ι' k) → L} {s : Φ} {w : L} (h : HasVal y (z' ∘ v) s w) :
-    HasVal y' z' (φ s) w := by
+theorem HasVal.pull
+    {K' : Type} [Fintype K']
+    {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+    {Φ' : Type} [Field Φ']
+    {κ : K → K'} {v : (Σ k, ι k) → Σ k, ι' k} (hb : IsBlockMap κ v)
+    (φ : Φ →+* Φ')
+    {y' : (Σ k, ι' k) → Φ'} (hy : y' ∘ v = φ ∘ y)
+    {z' : (Σ k, ι' k) → L} {s : Φ} {w : L} (h : HasVal y (z' ∘ v) s w)
+    : HasVal y' z' (φ s) w := by
   obtain ⟨d, g, h, hg, hh, h0, e, ev⟩ := h
-  refine ⟨_, rename v g, rename v h, CPts.isMultiHomog_rename_block hb hg, CPts.isMultiHomog_rename_block hb hh,
-    by rwa [aeval_rename], ?_, by rwa [aeval_rename, aeval_rename]⟩
+  refine ⟨
+    _,
+    rename v g,
+    rename v h,
+    CPts.isMultiHomog_rename_block hb hg,
+    CPts.isMultiHomog_rename_block hb hh,
+    by rwa [aeval_rename],
+    ?_,
+    by rwa [aeval_rename, aeval_rename]
+  ⟩
   rw [aeval_rename, aeval_rename, hy, CPts.aeval_comp_ringHom, CPts.aeval_comp_ringHom, e, map_mul]
 
-theorem IsPt.comp {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (ι' k)] {Φ' : Type} [Field Φ']
-    {κ : K → K'} {v : (Σ k, ι k) → Σ k, ι' k} (hb : IsBlockMap κ v) (φ : Φ →+* Φ') {y' : (Σ k, ι' k) → Φ'}
-    (hy : y' ∘ v = φ ∘ y) {z' : (Σ k, ι' k) → L} (hz : IsPt y' z') : IsPt y (z' ∘ v) := by
+theorem IsPt.comp
+    {K' : Type} [Fintype K']
+    {ι' : K' → Type} [∀ k, Fintype (ι' k)]
+    {Φ' : Type} [Field Φ']
+    {κ : K → K'} {v : (Σ k, ι k) → Σ k, ι' k} (hb : IsBlockMap κ v)
+    (φ : Φ →+* Φ')
+    {y' : (Σ k, ι' k) → Φ'} (hy : y' ∘ v = φ ∘ y)
+    {z' : (Σ k, ι' k) → L} (hz : IsPt y' z')
+    : IsPt y (z' ∘ v) := by
   refine isPt_of_homog (fun k => ?_) fun f d hf h0 => ?_
   · obtain ⟨i, hi⟩ := hz.1 (κ k)
     obtain ⟨⟨k', i'⟩, e⟩ := hb.2.2.2 ⟨κ k, i⟩ ⟨k, rfl⟩
@@ -249,7 +313,8 @@ theorem IsPt.comp {K' : Type} [Fintype K'] {ι' : K' → Type} [∀ k, Fintype (
     refine hz.2 _ ((mem_iff_of_homog (CPts.isMultiHomog_rename_block hb hf)).2 ?_)
     rw [aeval_rename, hy, CPts.aeval_comp_ringHom, h0, map_zero]
 
-theorem eval_map_eq_aeval (z : (Σ k, ι k) → ℂ) (f : MRing ι) : eval z (map (Int.castRingHom ℂ) f) = aeval z f := by
+theorem eval_map_eq_aeval (z : (Σ k, ι k) → ℂ) (f : MRing ι)
+    : eval z (map (Int.castRingHom ℂ) f) = aeval z f := by
   rw [eval_map, aeval_def]; rfl
 
 section Flag

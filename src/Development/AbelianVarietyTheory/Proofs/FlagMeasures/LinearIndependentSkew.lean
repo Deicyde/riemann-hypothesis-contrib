@@ -5,30 +5,37 @@ public import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.IsGau
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 namespace GlobalTheory.TwoSidedJac
 
 open Kronecker
 
-noncomputable def twoSided {a b : ℕ} (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ) :
-    Matrix (Fin a) (Fin b) ℂ →ₗ[ℂ] Matrix (Fin a) (Fin b) ℂ where
+noncomputable def twoSided {a b : ℕ} (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ)
+    : Matrix (Fin a) (Fin b) ℂ →ₗ[ℂ] Matrix (Fin a) (Fin b) ℂ where
   toFun T := A * T * B
   map_add' S T := by rw [Matrix.mul_add, Matrix.add_mul]
   map_smul' c T := by simp [Matrix.mul_smul, Matrix.smul_mul]
 
-theorem twoSided_apply {a b : ℕ} (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ)
-    (T : Matrix (Fin a) (Fin b) ℂ) : twoSided A B T = A * T * B := rfl
+theorem twoSided_apply
+    {a b : ℕ}
+    (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ) (T : Matrix (Fin a) (Fin b) ℂ)
+    : twoSided A B T = A * T * B :=
+  rfl
 
-theorem det_twoSided {a b : ℕ} (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ) :
-    LinearMap.det (twoSided A B) = A.det ^ b * B.det ^ a := by
+theorem det_twoSided {a b : ℕ} (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ)
+    : LinearMap.det (twoSided A B) = A.det ^ b * B.det ^ a := by
   rw [← LinearMap.det_toMatrix (Matrix.stdBasis ℂ (Fin a) (Fin b))]
-  have h : LinearMap.toMatrix (Matrix.stdBasis ℂ (Fin a) (Fin b))
-      (Matrix.stdBasis ℂ (Fin a) (Fin b)) (twoSided A B) = A ⊗ₖ Bᵀ := by
+  have h
+      : LinearMap.toMatrix (Matrix.stdBasis ℂ (Fin a) (Fin b)) (Matrix.stdBasis ℂ (Fin a) (Fin b))
+          (twoSided A B)
+        = A ⊗ₖ Bᵀ := by
     ext ⟨i, j⟩ ⟨k, l⟩
     rw [LinearMap.toMatrix_apply, Matrix.stdBasis_eq_single, twoSided_apply]
-    have hr : ∀ M : Matrix (Fin a) (Fin b) ℂ,
-        (Matrix.stdBasis ℂ (Fin a) (Fin b)).repr M (i, j) = M i j := by
+    have hr
+        : ∀ M : Matrix (Fin a) (Fin b) ℂ,
+          (Matrix.stdBasis ℂ (Fin a) (Fin b)).repr M (i, j) = M i j := by
       intro M
       simp [Matrix.stdBasis]
     rw [hr]
@@ -40,13 +47,13 @@ section Skew
 
 variable {a : ℕ} {ι : Type} [Fintype ι]
 
-theorem star_coe (T : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)) :
-    star (T : Matrix (Fin a) (Fin a) ℂ) = -(T : Matrix (Fin a) (Fin a) ℂ) :=
+theorem star_coe (T : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ))
+    : star (T : Matrix (Fin a) (Fin a) ℂ) = -(T : Matrix (Fin a) (Fin a) ℂ) :=
   skewAdjoint.mem_iff.mp T.2
 
 theorem linearIndependent_skew
-    (e : Module.Basis ι ℝ (skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ))) :
-    LinearIndependent ℂ (fun i => (e i : Matrix (Fin a) (Fin a) ℂ)) := by
+    (e : Module.Basis ι ℝ (skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)))
+    : LinearIndependent ℂ (fun i => (e i : Matrix (Fin a) (Fin a) ℂ)) := by
   have hR : ∀ g : ι → ℝ, ∑ i, (g i : ℂ) • (e i : Matrix (Fin a) (Fin a) ℂ) = 0 → ∀ i, g i = 0 := by
     intro g hg
     apply Fintype.linearIndependent_iff.mp e.linearIndependent g
@@ -57,7 +64,8 @@ theorem linearIndependent_skew
   have h2 : ∑ i, (starRingEnd ℂ (g i)) • (e i : Matrix (Fin a) (Fin a) ℂ) = 0 := by
     have := congrArg star hg
     simp only [star_sum, star_smul, star_coe, smul_neg, Finset.sum_neg_distrib, star_zero,
-      neg_eq_zero] at this
+        neg_eq_zero]
+      at this
     exact this
   have hre : ∀ i, 2 * (g i).re = 0 := by
     apply hR
@@ -80,11 +88,12 @@ theorem linearIndependent_skew
   · have := him i
     simpa using this
 
-theorem span_skew
-    (e : Module.Basis ι ℝ (skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ))) :
-    ⊤ ≤ Submodule.span ℂ (Set.range fun i => (e i : Matrix (Fin a) (Fin a) ℂ)) := by
-  have hS : ∀ T : Matrix (Fin a) (Fin a) ℂ, star T = -T →
-      T ∈ Submodule.span ℂ (Set.range fun i => (e i : Matrix (Fin a) (Fin a) ℂ)) := by
+theorem span_skew (e : Module.Basis ι ℝ (skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)))
+    : ⊤ ≤ Submodule.span ℂ (Set.range fun i => (e i : Matrix (Fin a) (Fin a) ℂ)) := by
+  have hS
+      : ∀ T : Matrix (Fin a) (Fin a) ℂ,
+        star T = -T
+          → T ∈ Submodule.span ℂ (Set.range fun i => (e i : Matrix (Fin a) (Fin a) ℂ)) := by
     intro T hT
     have h := congrArg Subtype.val (e.sum_repr ⟨T, skewAdjoint.mem_iff.mpr hT⟩)
     simp only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul] at h
@@ -102,11 +111,12 @@ theorem span_skew
   exact Submodule.smul_mem _ _ (Submodule.add_mem _ h1 (Submodule.smul_mem _ _ h2))
 
 theorem det_skew_eq
-    (L : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ) →ₗ[ℝ]
-      skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ))
+    (L
+      : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ) →ₗ[ℝ]
+        skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ))
     (F : Matrix (Fin a) (Fin a) ℂ →ₗ[ℂ] Matrix (Fin a) (Fin a) ℂ)
-    (h : ∀ T, (L T : Matrix (Fin a) (Fin a) ℂ) = F T) :
-    ((LinearMap.det L : ℝ) : ℂ) = LinearMap.det F := by
+    (h : ∀ T, (L T : Matrix (Fin a) (Fin a) ℂ) = F T)
+    : ((LinearMap.det L : ℝ) : ℂ) = LinearMap.det F := by
   classical
   let e := Module.finBasis ℝ (skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ))
   let e' := Module.Basis.mk (linearIndependent_skew e) (span_skew e)
@@ -115,8 +125,8 @@ theorem det_skew_eq
   have hm : LinearMap.toMatrix e' e' F = (LinearMap.toMatrix e e L).map Complex.ofRealHom := by
     ext i j
     rw [Matrix.map_apply, LinearMap.toMatrix_apply, LinearMap.toMatrix_apply, he, ← h]
-    have h1 : (L (e j) : Matrix (Fin a) (Fin a) ℂ) =
-        ∑ k, ((e.repr (L (e j)) k : ℝ) : ℂ) • e' k := by
+    have h1
+        : (L (e j) : Matrix (Fin a) (Fin a) ℂ) = ∑ k, ((e.repr (L (e j)) k : ℝ) : ℂ) • e' k := by
       have h := congrArg Subtype.val (e.sum_repr (L (e j)))
       simp only [AddSubmonoidClass.coe_finsetSum, SetLike.val_smul] at h
       rw [← h]
@@ -128,8 +138,17 @@ theorem det_skew_eq
 
 end Skew
 
-theorem real_jacobians :
-    (∀ (a b : ℕ) (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ) (L : Matrix (Fin a) (Fin b) ℂ →ₗ[ℝ] Matrix (Fin a) (Fin b) ℂ), (∀ T, L T = A * T * B) → LinearMap.det L = ‖A.det‖ ^ (2 * b) * ‖B.det‖ ^ (2 * a)) ∧ ∀ (a : ℕ) (A : Matrix (Fin a) (Fin a) ℂ) (L : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ) →ₗ[ℝ] skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)), (∀ T, ((L T : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)) : Matrix (Fin a) (Fin a) ℂ) = A * (T : Matrix (Fin a) (Fin a) ℂ) * Aᴴ) → LinearMap.det L = ‖A.det‖ ^ (2 * a) := by
+theorem real_jacobians
+    : (∀ (a b : ℕ) (A : Matrix (Fin a) (Fin a) ℂ) (B : Matrix (Fin b) (Fin b) ℂ)
+          (L : Matrix (Fin a) (Fin b) ℂ →ₗ[ℝ] Matrix (Fin a) (Fin b) ℂ),
+        (∀ T, L T = A * T * B) → LinearMap.det L = ‖A.det‖ ^ (2 * b) * ‖B.det‖ ^ (2 * a))
+      ∧ ∀ (a : ℕ) (A : Matrix (Fin a) (Fin a) ℂ)
+          (L
+            : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ) →ₗ[ℝ] skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)),
+        (∀ T,
+            ((L T : skewAdjoint.submodule ℝ (Matrix (Fin a) (Fin a) ℂ)) : Matrix (Fin a) (Fin a) ℂ)
+              = A * (T : Matrix (Fin a) (Fin a) ℂ) * Aᴴ)
+          → LinearMap.det L = ‖A.det‖ ^ (2 * a) := by
   refine ⟨fun a b A B L hL => ?_, fun a A L hL => ?_⟩
   · have : L = (twoSided A B).restrictScalars ℝ := LinearMap.ext hL
     rw [this, LinearMap.det_restrictScalars, Algebra.norm_complex_apply, det_twoSided,

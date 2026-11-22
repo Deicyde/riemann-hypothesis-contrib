@@ -6,6 +6,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 namespace CrystallineSemistableComparison.Close
 
-theorem cstSmooth_of_side (h : CrystallineSemistableComparison.Out.EtSideS) : CrystallineSemistableComparison.Out.CstSmooth := CrystallineSemistableComparison.Out.cstSmooth_of_side h
+theorem cstSmooth_of_side (h : CrystallineSemistableComparison.Out.EtSideS)
+    : CrystallineSemistableComparison.Out.CstSmooth :=
+  CrystallineSemistableComparison.Out.cstSmooth_of_side h
 
 end CrystallineSemistableComparison.Close

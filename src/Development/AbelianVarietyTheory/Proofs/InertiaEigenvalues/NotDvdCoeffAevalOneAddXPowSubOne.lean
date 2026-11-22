@@ -9,10 +9,11 @@ open scoped BigOperators
 namespace GlobalTheory
 
 open scoped BigOperators in
-private theorem C_dvd_prod_pow_sub_X_pow_sum_of_C_dvd {O σ : Type} [CommRing O] [Fintype σ] (ϖ : O)
-    (g : σ → Polynomial O) (k : σ → ℕ) (hg : ∀ q, Polynomial.C ϖ ∣ g q - Polynomial.X ^ k q)
-    (m : σ → ℕ) :
-    Polynomial.C ϖ ∣ ∏ q, g q ^ m q - Polynomial.X ^ (∑ q, m q * k q) := by
+private theorem C_dvd_prod_pow_sub_X_pow_sum_of_C_dvd
+    {O σ : Type} [CommRing O] [Fintype σ]
+    (ϖ : O) (g : σ → Polynomial O) (k : σ → ℕ) (hg : ∀ q, Polynomial.C ϖ ∣ g q - Polynomial.X ^ k q)
+    (m : σ → ℕ)
+    : Polynomial.C ϖ ∣ ∏ q, g q ^ m q - Polynomial.X ^ (∑ q, m q * k q) := by
   rw [← Ideal.mem_span_singleton, ← Ideal.Quotient.eq]
   rw [← Finset.prod_pow_eq_pow_sum, map_prod, map_prod]
   refine Finset.prod_congr rfl fun q _ => ?_
@@ -20,9 +21,10 @@ private theorem C_dvd_prod_pow_sub_X_pow_sum_of_C_dvd {O σ : Type} [CommRing O]
   rw [map_pow, hq, ← map_pow, ← pow_mul, mul_comm]
 
 open scoped BigOperators in
-private theorem C_dvd_one_add_X_pow_prime_pow_sub_one_sub_X_pow {O : Type} [CommRing O] (ϖ : O) (l e : ℕ)
-    (hl : l.Prime) (h : ϖ ∣ (l : O)) :
-    Polynomial.C ϖ ∣ (1 + Polynomial.X : Polynomial O) ^ (l ^ e) - 1 - Polynomial.X ^ (l ^ e) := by
+private theorem C_dvd_one_add_X_pow_prime_pow_sub_one_sub_X_pow
+    {O : Type} [CommRing O] (ϖ : O) (l e : ℕ) (hl : l.Prime) (h : ϖ ∣ (l : O))
+    : Polynomial.C ϖ
+      ∣ (1 + Polynomial.X : Polynomial O) ^ (l ^ e) - 1 - Polynomial.X ^ (l ^ e) := by
   rw [Polynomial.C_dvd_iff_dvd_coeff]
   intro i
   simp only [Polynomial.coeff_sub, Polynomial.coeff_one_add_X_pow, Polynomial.coeff_one,
@@ -37,10 +39,21 @@ private theorem C_dvd_one_add_X_pow_prime_pow_sub_one_sub_X_pow {O : Type} [Comm
   · simp only [h0, hN', if_false, sub_zero]
     exact h.trans (Nat.cast_dvd_cast (hl.dvd_choose_pow h0 hN'))
 
-
 open scoped BigOperators in
-theorem _root_.GlobalTheory.not_dvd_coeff_aeval_oneAddX_pow_sub_one :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O), Irreducible ϖ → ∀ (σ : Type) [Fintype σ] (l μ : ℕ), l.Prime → ϖ ∣ (l : O) → ∀ (F : MvPolynomial σ O) (e : σ → ℕ) (m₀ : σ →₀ ℕ), (∀ m : σ →₀ ℕ, m.degree ≤ ∑ q, m₀ q * l ^ e q → ϖ ^ μ ∣ F.coeff m) → ¬ ϖ ^ (μ + 1) ∣ F.coeff m₀ → (∀ m : σ →₀ ℕ, m ≠ m₀ → ∑ q, m q * l ^ e q ≤ ∑ q, m₀ q * l ^ e q → ϖ ^ (μ + 1) ∣ F.coeff m) → ¬ ϖ ^ (μ + 1) ∣ (MvPolynomial.aeval (fun q => (1 + Polynomial.X : Polynomial O) ^ (l ^ e q) - 1) F).coeff (∑ q, m₀ q * l ^ e q) := by
+theorem _root_.GlobalTheory.not_dvd_coeff_aeval_oneAddX_pow_sub_one
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (ϖ : O),
+      Irreducible ϖ
+        → ∀ (σ : Type) [Fintype σ] (l μ : ℕ),
+          l.Prime → ϖ ∣ (l : O)
+            → ∀ (F : MvPolynomial σ O) (e : σ → ℕ) (m₀ : σ →₀ ℕ),
+              (∀ m : σ →₀ ℕ, m.degree ≤ ∑ q, m₀ q * l ^ e q → ϖ ^ μ ∣ F.coeff m)
+                → ¬ ϖ ^ (μ + 1) ∣ F.coeff m₀
+                → (∀ m : σ →₀ ℕ,
+                  m ≠ m₀ → ∑ q, m q * l ^ e q ≤ ∑ q, m₀ q * l ^ e q → ϖ ^ (μ + 1) ∣ F.coeff m)
+                → ¬ ϖ ^ (μ + 1)
+                  ∣ (MvPolynomial.aeval
+                    (fun q => (1 + Polynomial.X : Polynomial O) ^ (l ^ e q) - 1)
+                    F).coeff (∑ q, m₀ q * l ^ e q) := by
   intro O _ _ _ ϖ _ σ _ l μ hl hϖl F e m₀ hlow hm₀ hoth
   classical
   set W := ∑ q, m₀ q * l ^ e q with hW
@@ -52,8 +65,14 @@ theorem _root_.GlobalTheory.not_dvd_coeff_aeval_oneAddX_pow_sub_one :
     rw [Polynomial.algebraMap_eq, Polynomial.coeff_C_mul]
   have hcong : ∀ m : σ →₀ ℕ, ϖ ∣ c m - if W = ∑ q, m q * l ^ e q then 1 else 0 := by
     intro m
-    have h := (Polynomial.C_dvd_iff_dvd_coeff _ _).1 (C_dvd_prod_pow_sub_X_pow_sum_of_C_dvd ϖ g (fun q => l ^ e q)
-      (fun q => by simpa [g] using C_dvd_one_add_X_pow_prime_pow_sub_one_sub_X_pow ϖ l (e q) hl hϖl) m) W
+    have h :=
+      (Polynomial.C_dvd_iff_dvd_coeff _ _).1
+        (C_dvd_prod_pow_sub_X_pow_sum_of_C_dvd ϖ g
+          (fun q => l ^ e q)
+          (fun q => by
+            simpa [g] using C_dvd_one_add_X_pow_prime_pow_sub_one_sub_X_pow ϖ l (e q) hl hϖl)
+          m)
+        W
     simpa [Polynomial.coeff_X_pow] using h
   have hvanish : ∀ m : σ →₀ ℕ, W < m.degree → c m = 0 := by
     intro m hm

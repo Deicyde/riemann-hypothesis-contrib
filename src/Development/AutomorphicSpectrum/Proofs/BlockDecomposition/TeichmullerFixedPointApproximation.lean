@@ -10,15 +10,21 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NormSubL
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
-open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
+open NumberField IsDedekindDomain Neutral.B1 Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.L2.Host Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations
+open GlobalTheory.HeckeGal GlobalTheory.Pst GlobalTheory.TripleGal
+  GlobalTheory.CompanionTheory.LTHodge GlobalTheory.CompanionTheory.LTPer
 open scoped Classical
 open GlobalTheory.CompanionTheory.LTPer.Tilt
 
 namespace GlobalTheory.CompanionTheory.LTPer.Tilt
 
-theorem exists_fixed_near : ∀ {l : ℕ} [Fact l.Prime] (f : ℕ) (ρ : ℝ), 0 < f → ‖(l : ℂ_[l])‖ ≤ ρ → ρ < 1 → ∀ c : ℂ_[l],
-    ‖c‖ ≤ 1 → ‖c ^ l ^ f - c‖ ≤ ρ → ∃ y : Tl l, y ^ l ^ f = y ∧ ‖sh y - c‖ ≤ ρ := by
+theorem exists_fixed_near
+    : ∀ {l : ℕ} [Fact l.Prime] (f : ℕ) (ρ : ℝ),
+      0 < f → ‖(l : ℂ_[l])‖ ≤ ρ → ρ < 1
+        → ∀ c : ℂ_[l],
+          ‖c‖ ≤ 1 → ‖c ^ l ^ f - c‖ ≤ ρ → ∃ y : Tl l, y ^ l ^ f = y ∧ ‖sh y - c‖ ≤ ρ := by
   intro l _ f ρ hf hρ hρ1 c hc hcf
   have hρ0 : 0 ≤ ρ := (norm_nonneg _).trans hρ
   obtain ⟨a, ha⟩ := exists_sh_near c hc
@@ -28,8 +34,10 @@ theorem exists_fixed_near : ∀ {l : ℕ} [Fact l.Prime] (f : ℕ) (ρ : ℝ), 0
 
   have h0 : ‖a ^ l ^ f - a‖ ≤ ρ := by
     refine norm_sub_le_of_near hρ ?_
-    have e : sh (a ^ l ^ f) - sh a =
-        (sh (a ^ l ^ f) - c ^ l ^ f) + ((c ^ l ^ f - c) + -(sh a - c)) := by ring
+    have e
+        : sh (a ^ l ^ f) - sh a
+          = (sh (a ^ l ^ f) - c ^ l ^ f) + ((c ^ l ^ f - c) + -(sh a - c)) := by
+      ring
     rw [e]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (near_pow hρ hc ha' _) ?_)
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hcf ?_)
@@ -78,7 +86,6 @@ theorem exists_fixed_near : ∀ {l : ℕ} [Fact l.Prime] (f : ℕ) (ρ : ℝ), 0
     exact tendsto_nhds_unique h1 h2
   · have e : sh y - c = (sh y - sh a) + (sh a - c) := by ring
     rw [e]
-    exact (IsUltrametricDist.norm_add_le_max _ _).trans
-      (max_le (near_of_norm_sub_le hρ hya) ha')
+    exact (IsUltrametricDist.norm_add_le_max _ _).trans (max_le (near_of_norm_sub_le hρ hya) ha')
 
 end GlobalTheory.CompanionTheory.LTPer.Tilt

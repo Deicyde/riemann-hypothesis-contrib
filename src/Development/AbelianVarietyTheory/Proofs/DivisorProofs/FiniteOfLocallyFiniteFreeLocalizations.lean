@@ -9,12 +9,22 @@ noncomputable section
 
 namespace GlobalTheory.LocFreeProj
 
-theorem finite_projective_of_locally_free : ∀ (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M], (∀ q : PrimeSpectrum R, ∃ r : R, r ∉ q.asIdeal ∧ ∃ (F : Type) (_ : AddCommGroup F) (_ : Module R F) (_ : Module (Localization.Away r) F) (_ : IsScalarTower R (Localization.Away r) F) (_ : Module.Finite (Localization.Away r) F) (_ : Module.Free (Localization.Away r) F) (ϕ : M →ₗ[R] F), IsLocalizedModule (Submonoid.powers r) ϕ) → Module.Finite R M ∧ Module.Projective R M := by
+theorem finite_projective_of_locally_free
+    : ∀ (R : Type) [CommRing R] (M : Type) [AddCommGroup M] [Module R M],
+      (∀ q : PrimeSpectrum R, ∃ r : R,
+          r ∉ q.asIdeal
+            ∧ ∃ (F : Type) (_ : AddCommGroup F) (_ : Module R F)
+                (_ : Module (Localization.Away r) F) (_ : IsScalarTower R (Localization.Away r) F)
+                (_ : Module.Finite (Localization.Away r) F)
+                (_ : Module.Free (Localization.Away r) F) (ϕ : M →ₗ[R] F),
+              IsLocalizedModule (Submonoid.powers r) ϕ)
+        → Module.Finite R M ∧ Module.Projective R M := by
   intro R _ M _ _ h
-  let s : Set R := {r | ∃ (F : Type) (_ : AddCommGroup F) (_ : Module R F)
-    (_ : Module (Localization.Away r) F) (_ : IsScalarTower R (Localization.Away r) F)
-    (_ : Module.Finite (Localization.Away r) F) (_ : Module.Free (Localization.Away r) F)
-    (ϕ : M →ₗ[R] F), IsLocalizedModule (Submonoid.powers r) ϕ}
+  let s : Set R :=
+    {r | ∃ (F : Type) (_ : AddCommGroup F) (_ : Module R F)
+      (_ : Module (Localization.Away r) F) (_ : IsScalarTower R (Localization.Away r) F)
+      (_ : Module.Finite (Localization.Away r) F) (_ : Module.Free (Localization.Away r) F)
+      (ϕ : M →ₗ[R] F), IsLocalizedModule (Submonoid.powers r) ϕ}
   have hs : Ideal.span s = ⊤ := by
     by_contra hne
     obtain ⟨m, hm, hsm⟩ := Ideal.exists_le_maximal _ hne

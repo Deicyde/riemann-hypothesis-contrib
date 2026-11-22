@@ -10,9 +10,9 @@ open Filter Topology Asymptotics
 
 universe u
 
-theorem eval_line (n : ℕ) (Δ : MvPolynomial (Fin n) ℂ) (w : V n) (t : ℂ) :
-    (MvPolynomial.aeval (fun i => Polynomial.C (w i) * Polynomial.X) Δ).eval t =
-      polyAt n Δ (t • w) := by
+theorem eval_line (n : ℕ) (Δ : MvPolynomial (Fin n) ℂ) (w : V n) (t : ℂ)
+    : (MvPolynomial.aeval (fun i => Polynomial.C (w i) * Polynomial.X) Δ).eval t
+      = polyAt n Δ (t • w) := by
   unfold polyAt
   induction Δ using MvPolynomial.induction_on with
   | C a => simp

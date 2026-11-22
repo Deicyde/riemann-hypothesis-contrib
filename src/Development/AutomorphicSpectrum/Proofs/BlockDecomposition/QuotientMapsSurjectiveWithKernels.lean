@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.GradedFi
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 namespace GlobalTheory.CompanionTheory.Untilt
 
@@ -17,43 +18,43 @@ theorem dxi_zero {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) : A.dxi n 0 = 1
   have h : A.dxi0 0 = 1 := Subtype.ext (by simp [PAlg.dxi0, dpw])
   rw [PAlg.dxi, h, map_one]
 
-theorem exists_toAcr_sub_mem {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) (z : A.Acr n) :
-    ∃ w : A.W, z - A.toAcr n w ∈ A.Fil n 1 := by
+theorem exists_toAcr_sub_mem {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) (z : A.Acr n)
+    : ∃ w : A.W, z - A.toAcr n w ∈ A.Fil n 1 := by
   have h0 : z ∈ A.Fil n 0 := by
     rw [((GlobalTheory.T.crystalline_filtration_multiplicative A).2.2.2.2.2.2.1 n)]; trivial
   obtain ⟨w, hw⟩ := (GlobalTheory.T.graded_filtration_generated_by_dividedXi A n 0).1 z h0
   refine ⟨w, ?_⟩
   simpa [dxi_zero] using hw
 
-theorem toAcr_mem_fil_iff {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) (w : A.W) :
-    A.toAcr n w ∈ A.Fil n 1 ↔ A.th w ∈ Ideal.span {(l : A.U) ^ n} := by
+theorem toAcr_mem_fil_iff {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) (w : A.W)
+    : A.toAcr n w ∈ A.Fil n 1 ↔ A.th w ∈ Ideal.span {(l : A.U) ^ n} := by
   have h := (GlobalTheory.T.graded_filtration_generated_by_dividedXi A n 0).2 w
   simpa [dxi_zero] using h
 
-theorem uToQ_surjective {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) :
-    Function.Surjective (A.uToQ n) := by
+theorem uToQ_surjective {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ)
+    : Function.Surjective (A.uToQ n) := by
   intro y
   obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective y
   obtain ⟨w, hw⟩ := exists_toAcr_sub_mem A n z
   exact ⟨A.th w, (Ideal.Quotient.eq.2 hw).symm⟩
 
-theorem ker_uToQ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) :
-    RingHom.ker (A.uToQ n) = Ideal.span {(l : A.U) ^ n} := by
+theorem ker_uToQ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ)
+    : RingHom.ker (A.uToQ n) = Ideal.span {(l : A.U) ^ n} := by
   ext x
   obtain ⟨w, rfl⟩ := Ideal.Quotient.mk_surjective x
   change A.th w ∈ _ ↔ A.th w ∈ _
   rw [RingHom.mem_ker, uToQ_th, Ideal.Quotient.eq_zero_iff_mem, toAcr_mem_fil_iff]
 
-theorem uToPQ_surjective {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ) :
-    Function.Surjective (A.uToPQ n) := by
+theorem uToPQ_surjective {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ)
+    : Function.Surjective (A.uToPQ n) := by
   intro y
   obtain ⟨z, rfl⟩ := Ideal.Quotient.mk_surjective y
   obtain ⟨w, hw⟩ := exists_toAcr_sub_mem A n z
   have h : z - A.toAcr n w ∈ A.PFil n := Ideal.mem_sup_right hw
   exact ⟨A.th w, (Ideal.Quotient.eq.2 h).symm⟩
 
-theorem ker_uToPQ {l : ℕ} [Fact l.Prime] (A : PAlg l) {n : ℕ} (hn : n ≠ 0) :
-    RingHom.ker (A.uToPQ n) = Ideal.span {(l : A.U)} := by
+theorem ker_uToPQ {l : ℕ} [Fact l.Prime] (A : PAlg l) {n : ℕ} (hn : n ≠ 0)
+    : RingHom.ker (A.uToPQ n) = Ideal.span {(l : A.U)} := by
   apply le_antisymm
   · intro x hx
     obtain ⟨w, rfl⟩ := Ideal.Quotient.mk_surjective x
@@ -78,9 +79,11 @@ theorem ker_uToPQ {l : ℕ} [Fact l.Prime] (A : PAlg l) {n : ℕ} (hn : n ≠ 0)
       ← map_natCast (Ideal.Quotient.mk (A.PFil n))]
     exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_sup_left (Ideal.mem_span_singleton_self _))
 
-theorem uToQ_main : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ), Function.Surjective (A.uToQ n) ∧
-    RingHom.ker (A.uToQ n) = Ideal.span {(l : A.U) ^ n} ∧ Function.Surjective (A.uToPQ n) ∧
-    (n ≠ 0 → RingHom.ker (A.uToPQ n) = Ideal.span {(l : A.U)}) :=
-  fun A n => ⟨uToQ_surjective A n, ker_uToQ A n, uToPQ_surjective A n, fun hn => ker_uToPQ A hn⟩
+theorem uToQ_main
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l) (n : ℕ),
+      Function.Surjective (A.uToQ n) ∧ RingHom.ker (A.uToQ n) = Ideal.span {(l : A.U) ^ n}
+        ∧ Function.Surjective (A.uToPQ n)
+        ∧ (n ≠ 0 → RingHom.ker (A.uToPQ n) = Ideal.span {(l : A.U)}) := fun A n =>
+  ⟨uToQ_surjective A n, ker_uToQ A n, uToPQ_surjective A n, fun hn => ker_uToPQ A hn⟩
 
 end GlobalTheory.CompanionTheory.Untilt

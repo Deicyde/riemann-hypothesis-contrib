@@ -8,15 +8,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.UfamCons
 
 open scoped ENNReal
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology Polynomial
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs GlobalTheory.CompanionTheory.Conc
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  GlobalTheory.CompanionTheory.Conc
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 
 namespace GlobalTheory.CompanionTheory.Conc
 
-theorem continuous_sm_of_ker : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ)
-    [MeasurableSpace (archGroup K n)] [BorelSpace (archGroup K n)] (ν : Measure (archGroup K n))
-    [ν.IsHaarMeasure] (β : archGroup K n → ℝ) (f : AdelicGLn.AdelicGL K n → ℂ),
-    Ker ν β → Continuous f → Continuous (sm ν β f) := by
+theorem continuous_sm_of_ker
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) [MeasurableSpace (archGroup K n)]
+        [BorelSpace (archGroup K n)] (ν : Measure (archGroup K n)) [ν.IsHaarMeasure]
+        (β : archGroup K n → ℝ) (f : AdelicGLn.AdelicGL K n → ℂ),
+      Ker ν β → Continuous f → Continuous (sm ν β f) := by
   intro K _ _ n _ _ ν _ β f hβ hf
   have hs : IsCompact (tsupport β) := hβ.cpt
   set F : AdelicGLn.AdelicGL K n × archGroup K n → ℂ :=
@@ -40,10 +43,11 @@ theorem continuous_sm_of_ker : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ
   have hδ : 0 < δ := div_pos hε (by linarith)
   have hopen : IsOpen {p : AdelicGLn.AdelicGL K n × archGroup K n | dist (F p) (F (x₀, p.2)) < δ} :=
     isOpen_lt (hF.dist (hF.comp (continuous_const.prodMk continuous_snd))) continuous_const
-  obtain ⟨u, v, hu, -, hxu, hsv, huv⟩ := generalized_tube_lemma (isCompact_singleton (x := x₀)) hs hopen (by
-    rintro ⟨x, y⟩ ⟨hx, -⟩
-    obtain rfl : x = x₀ := hx
-    simpa using hδ)
+  obtain ⟨u, v, hu, -, hxu, hsv, huv⟩ :=
+    generalized_tube_lemma (isCompact_singleton (x := x₀)) hs hopen (by
+      rintro ⟨x, y⟩ ⟨hx, -⟩
+      obtain rfl : x = x₀ := hx
+      simpa using hδ)
   filter_upwards [hu.mem_nhds (hxu rfl)] with x hx
   rw [e, e, dist_eq_norm, ← integral_sub (hint x) (hint x₀)]
   have hb : ‖∫ y in tsupport β, (F (x, y) - F (x₀, y)) ∂ν‖ ≤ δ * ν.real (tsupport β) := by

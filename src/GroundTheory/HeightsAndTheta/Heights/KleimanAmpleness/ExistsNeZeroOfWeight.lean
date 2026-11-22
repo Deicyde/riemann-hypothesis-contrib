@@ -20,27 +20,30 @@ namespace SegreNum
 
 section Values
 
-variable {F : Type} [Field F] {K : Type} [DecidableEq K] {ι : K → Type} {Ω : Type} [Field Ω]
-  [Algebra F Ω]
+variable
+  {F : Type} [Field F] {K : Type} [DecidableEq K] {ι : K → Type} {Ω : Type} [Field Ω] [Algebra F Ω]
 
 def vals (F : Type) [Field F] [Algebra F Ω] (y : (Σ k, ι k) → Ω) (d : K → ℕ) : Submodule F Ω :=
   (weightedHomogeneousSubmodule F (NumbersDVR.blockWeight ι) d).map (aeval y).toLinearMap
 
-theorem one_le_weight {a : (Σ k, ι k) →₀ ℕ} {v : Σ k, ι k} (hv : a v ≠ 0) :
-    1 ≤ Finsupp.weight (NumbersDVR.blockWeight ι) a v.1 := by
-  have h := Finsupp.le_weight_of_ne_zero (w := NumbersDVR.blockWeight ι) (fun _ _ => Nat.zero_le _) hv v.1
+theorem one_le_weight {a : (Σ k, ι k) →₀ ℕ} {v : Σ k, ι k} (hv : a v ≠ 0)
+    : 1 ≤ Finsupp.weight (NumbersDVR.blockWeight ι) a v.1 := by
+  have h :=
+    Finsupp.le_weight_of_ne_zero (w := NumbersDVR.blockWeight ι) (fun _ _ => Nat.zero_le _) hv v.1
   simpa [NumbersDVR.blockWeight] using h
 
-theorem eq_zero_of_weight {a : (Σ k, ι k) →₀ ℕ} (h : Finsupp.weight (NumbersDVR.blockWeight ι) a = 0) :
-    a = 0 := by
+theorem eq_zero_of_weight
+    {a : (Σ k, ι k) →₀ ℕ} (h : Finsupp.weight (NumbersDVR.blockWeight ι) a = 0)
+    : a = 0 := by
   ext v
   by_contra hv
   have h1 := one_le_weight hv
   rw [h] at h1
   simp at h1
 
-theorem exists_ne_zero_of_weight {a : (Σ k, ι k) →₀ ℕ} {k : K}
-    (h : Finsupp.weight (NumbersDVR.blockWeight ι) a k ≠ 0) : ∃ i, a ⟨k, i⟩ ≠ 0 := by
+theorem exists_ne_zero_of_weight
+    {a : (Σ k, ι k) →₀ ℕ} {k : K} (h : Finsupp.weight (NumbersDVR.blockWeight ι) a k ≠ 0)
+    : ∃ i, a ⟨k, i⟩ ≠ 0 := by
   by_contra hne
   push Not at hne
   apply h
@@ -52,10 +55,11 @@ theorem exists_ne_zero_of_weight {a : (Σ k, ι k) →₀ ℕ} {k : K}
     simp [hne i]
   · simp [NumbersDVR.blockWeight, Ne.symm hk]
 
-theorem peel {a : (Σ k, ι k) →₀ ℕ} {d : K → ℕ} {k : K}
-    (h : Finsupp.weight (NumbersDVR.blockWeight ι) a = d + Pi.single k 1) :
-    ∃ i, ∃ a' : (Σ k, ι k) →₀ ℕ, a = a' + Finsupp.single ⟨k, i⟩ 1 ∧
-      Finsupp.weight (NumbersDVR.blockWeight ι) a' = d := by
+theorem peel
+    {a : (Σ k, ι k) →₀ ℕ} {d : K → ℕ} {k : K}
+    (h : Finsupp.weight (NumbersDVR.blockWeight ι) a = d + Pi.single k 1)
+    : ∃ i, ∃ a' : (Σ k, ι k) →₀ ℕ,
+      a = a' + Finsupp.single ⟨k, i⟩ 1 ∧ Finsupp.weight (NumbersDVR.blockWeight ι) a' = d := by
   obtain ⟨i, hi⟩ := exists_ne_zero_of_weight (a := a) (k := k) (by rw [h]; simp)
   have e : a = (a - Finsupp.single ⟨k, i⟩ 1) + Finsupp.single ⟨k, i⟩ 1 :=
     (tsub_add_cancel_of_le (Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hi))).symm
@@ -64,9 +68,11 @@ theorem peel {a : (Σ k, ι k) →₀ ℕ} {d : K → ℕ} {k : K}
   rw [e, map_add (f := _), Finsupp.weight_single, one_smul] at h2
   exact add_right_cancel h2
 
-theorem vals_eq_span (y : (Σ k, ι k) → Ω) (d : K → ℕ) :
-    vals F y d = Submodule.span F {z | ∃ a : (Σ k, ι k) →₀ ℕ,
-      Finsupp.weight (NumbersDVR.blockWeight ι) a = d ∧ aeval y (monomial a (1 : F)) = z} := by
+theorem vals_eq_span (y : (Σ k, ι k) → Ω) (d : K → ℕ)
+    : vals F y d
+      = Submodule.span F
+        {z | ∃ a : (Σ k, ι k) →₀ ℕ,
+          Finsupp.weight (NumbersDVR.blockWeight ι) a = d ∧ aeval y (monomial a (1 : F)) = z} := by
   apply le_antisymm
   · rintro _ ⟨g, hg, rfl⟩
     rw [SetLike.mem_coe, mem_weightedHomogeneousSubmodule] at hg
@@ -74,29 +80,37 @@ theorem vals_eq_span (y : (Σ k, ι k) → Ω) (d : K → ℕ) :
       rw [AlgHom.toLinearMap_apply, g.as_sum, map_sum]
     refine Submodule.sum_mem _ fun a ha => ?_
     have hw := hg (mem_support_iff.mp ha)
-    have hm : monomial a (AddMonoidAlgebra.coeff g a) = AddMonoidAlgebra.coeff g a • monomial a (1 : F) := by
+    have hm
+        : monomial a (AddMonoidAlgebra.coeff g a)
+          = AddMonoidAlgebra.coeff g a • monomial a (1 : F) := by
       rw [smul_monomial, smul_eq_mul, mul_one]
     rw [hm, map_smul]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, hw, rfl⟩)
   · rw [Submodule.span_le]
     rintro _ ⟨a, ha, rfl⟩
-    exact ⟨monomial a 1, (mem_weightedHomogeneousSubmodule _ _ _ _).mpr
-      (isWeightedHomogeneous_monomial _ _ _ ha), rfl⟩
+    exact ⟨
+      monomial a 1,
+      (mem_weightedHomogeneousSubmodule _ _ _ _).mpr (isWeightedHomogeneous_monomial _ _ _ ha),
+      rfl
+    ⟩
 
-theorem mem_vals_of (y : (Σ k, ι k) → Ω) {d : K → ℕ} {a : (Σ k, ι k) →₀ ℕ}
-    (ha : Finsupp.weight (NumbersDVR.blockWeight ι) a = d) : aeval y (monomial a (1 : F)) ∈ vals F y d := by
+theorem mem_vals_of
+    (y : (Σ k, ι k) → Ω)
+    {d : K → ℕ} {a : (Σ k, ι k) →₀ ℕ} (ha : Finsupp.weight (NumbersDVR.blockWeight ι) a = d)
+    : aeval y (monomial a (1 : F)) ∈ vals F y d := by
   rw [vals_eq_span]
   exact Submodule.subset_span ⟨a, ha, rfl⟩
 
-theorem vals_mul_le (y : (Σ k, ι k) → Ω) (d e : K → ℕ) : vals F y d * vals F y e ≤ vals F y (d + e) := by
+theorem vals_mul_le (y : (Σ k, ι k) → Ω) (d e : K → ℕ)
+    : vals F y d * vals F y e ≤ vals F y (d + e) := by
   rw [vals_eq_span y d, vals_eq_span y e, Submodule.span_mul_span, Submodule.span_le]
   rintro _ ⟨_, ⟨a, ha, rfl⟩, _, ⟨b, hb, rfl⟩, rfl⟩
   show aeval y (monomial a (1 : F)) * aeval y (monomial b (1 : F)) ∈ vals F y (d + e)
   rw [← map_mul, monomial_mul, one_mul]
   exact mem_vals_of y (by rw [map_add (f := _), ha, hb])
 
-theorem vals_single_le (y : (Σ k, ι k) → Ω) (d : K → ℕ) (k : K) :
-    vals F y (d + Pi.single k 1) ≤ vals F y d * vals F y (Pi.single k 1) := by
+theorem vals_single_le (y : (Σ k, ι k) → Ω) (d : K → ℕ) (k : K)
+    : vals F y (d + Pi.single k 1) ≤ vals F y d * vals F y (Pi.single k 1) := by
   rw [vals_eq_span y (d + _), Submodule.span_le]
   rintro _ ⟨a, ha, rfl⟩
   obtain ⟨i, a', rfl, ha'⟩ := peel ha
@@ -115,8 +129,8 @@ theorem vals_zero (y : (Σ k, ι k) → Ω) : vals F y (0 : K → ℕ) = 1 := by
   · rintro rfl
     exact ⟨0, map_zero _, by simp⟩
 
-theorem vals_single (y : (Σ k, ι k) → Ω) (k : K) :
-    vals F y (Pi.single k 1) = Submodule.span F (Set.range fun i => y ⟨k, i⟩) := by
+theorem vals_single (y : (Σ k, ι k) → Ω) (k : K)
+    : vals F y (Pi.single k 1) = Submodule.span F (Set.range fun i => y ⟨k, i⟩) := by
   rw [vals_eq_span]
   congr 1
   ext z
@@ -128,12 +142,12 @@ theorem vals_single (y : (Σ k, ι k) → Ω) (k : K) :
   · rintro ⟨i, rfl⟩
     exact ⟨Finsupp.single ⟨k, i⟩ 1, by rw [Finsupp.weight_single, one_smul]; rfl, aeval_X y _⟩
 
-theorem vals_eq_prod [Fintype K] (y : (Σ k, ι k) → Ω) (d : K → ℕ) :
-    vals F y d = ∏ k, vals F y (Pi.single k 1) ^ d k := by
+theorem vals_eq_prod [Fintype K] (y : (Σ k, ι k) → Ω) (d : K → ℕ)
+    : vals F y d = ∏ k, vals F y (Pi.single k 1) ^ d k := by
   induction hn : ∑ k, d k generalizing d with
   | zero =>
-    have hd : d = 0 := funext fun k => by
-      simpa using (Finset.sum_eq_zero_iff.mp hn) k (Finset.mem_univ _)
+    have hd : d = 0 :=
+      funext fun k => by simpa using (Finset.sum_eq_zero_iff.mp hn) k (Finset.mem_univ _)
     subst hd
     simp [vals_zero]
   | succ n ih =>
@@ -159,11 +173,10 @@ theorem vals_eq_prod [Fintype K] (y : (Σ k, ι k) → Ω) (d : K → ℕ) :
     rw [Finset.prod_eq_single k (fun j _ hj => by simp [hj]) (by simp)]
     simp
 
-
 omit [DecidableEq K] in
-theorem prod_span_blocks [Fintype K] (y : (Σ k, ι k) → Ω) :
-    ∏ k, Submodule.span F (Set.range fun i => y ⟨k, i⟩) =
-      Submodule.span F (Set.range fun c : (∀ k, ι k) => ∏ k, y ⟨k, c k⟩) := by
+theorem prod_span_blocks [Fintype K] (y : (Σ k, ι k) → Ω)
+    : ∏ k, Submodule.span F (Set.range fun i => y ⟨k, i⟩)
+      = Submodule.span F (Set.range fun c : (∀ k, ι k) => ∏ k, y ⟨k, c k⟩) := by
   rw [Submodule.prod_span]
   congr 1
   ext z
@@ -175,8 +188,8 @@ theorem prod_span_blocks [Fintype K] (y : (Σ k, ι k) → Ω) :
   · rintro ⟨c, rfl⟩
     exact ⟨fun k => y ⟨k, c k⟩, fun k => ⟨c k, rfl⟩, rfl⟩
 
-theorem mapDomain_fst (a : (Σ k, ι k) →₀ ℕ) :
-    ⇑(Finsupp.mapDomain Sigma.fst a) = Finsupp.weight (NumbersDVR.blockWeight ι) a := by
+theorem mapDomain_fst (a : (Σ k, ι k) →₀ ℕ)
+    : ⇑(Finsupp.mapDomain Sigma.fst a) = Finsupp.weight (NumbersDVR.blockWeight ι) a := by
   induction a using Finsupp.induction_linear with
   | zero => simp
   | add f g hf hg => rw [Finsupp.mapDomain_add, map_add (f := _), Finsupp.coe_add, hf, hg]
@@ -185,24 +198,31 @@ theorem mapDomain_fst (a : (Σ k, ι k) →₀ ℕ) :
     ext k'
     simp [NumbersDVR.blockWeight, Pi.single_apply]
 
-
 omit [DecidableEq K] in
-theorem cone_monomial (y : (Σ k, ι k) → Ω) (a : (Σ k, ι k) →₀ ℕ) (c : F) :
-    mConeMapOver F y (monomial a c) = monomial (a.mapDomain Sigma.fst) (aeval y (monomial a c)) := by
-  have key : (monomial (a.mapDomain Sigma.fst) (1 : Ω) : MvPolynomial K Ω) =
-      a.prod fun p n => (X p.1 : MvPolynomial K Ω) ^ n := by
+theorem cone_monomial (y : (Σ k, ι k) → Ω) (a : (Σ k, ι k) →₀ ℕ) (c : F)
+    : mConeMapOver F y (monomial a c)
+      = monomial (a.mapDomain Sigma.fst) (aeval y (monomial a c)) := by
+  have key
+      : (monomial (a.mapDomain Sigma.fst) (1 : Ω) : MvPolynomial K Ω)
+        = a.prod fun p n => (X p.1 : MvPolynomial K Ω) ^ n := by
     rw [← rename_monomial, monomial_eq, map_mul, rename_C, C_1, one_mul, map_finsuppProd]
     simp [rename_X]
   rw [mConeMapOver, aeval_monomial, aeval_monomial]
-  rw [show (monomial (a.mapDomain Sigma.fst)) (algebraMap F Ω c * a.prod fun p n => y p ^ n) =
-      C (algebraMap F Ω c * a.prod fun p n => y p ^ n) * monomial (a.mapDomain Sigma.fst) (1 : Ω) by
-    rw [C_mul_monomial, mul_one], key]
-  simp only [mul_pow, Finsupp.prod_mul, MvPolynomial.algebraMap_apply, map_mul, map_finsuppProd, map_pow]
+  rw [show (monomial (a.mapDomain Sigma.fst)) (algebraMap F Ω c * a.prod fun p n => y p ^ n)
+        = C (algebraMap F Ω c * a.prod fun p n => y p ^ n)
+          * monomial (a.mapDomain Sigma.fst) (1 : Ω) by
+      rw [C_mul_monomial, mul_one],
+    key]
+  simp only [mul_pow, Finsupp.prod_mul, MvPolynomial.algebraMap_apply, map_mul, map_finsuppProd,
+    map_pow]
   ring
 
-theorem cone_of_homog [Fintype K] (y : (Σ k, ι k) → Ω) {g : MvPolynomial (Σ k, ι k) F} {d : K → ℕ}
-    (hg : IsWeightedHomogeneous (NumbersDVR.blockWeight ι) g d) :
-    mConeMapOver F y g = monomial (Finsupp.equivFunOnFinite.symm d) (aeval y g) := by
+theorem cone_of_homog
+    [Fintype K]
+    (y : (Σ k, ι k) → Ω)
+    {g : MvPolynomial (Σ k, ι k) F} {d : K → ℕ}
+    (hg : IsWeightedHomogeneous (NumbersDVR.blockWeight ι) g d)
+    : mConeMapOver F y g = monomial (Finsupp.equivFunOnFinite.symm d) (aeval y g) := by
   conv_lhs => rw [g.as_sum]
   conv_rhs => rw [g.as_sum]
   set_option synthInstance.maxHeartbeats 100000 in
@@ -210,20 +230,27 @@ theorem cone_of_homog [Fintype K] (y : (Σ k, ι k) → Ω) {g : MvPolynomial (�
   refine Finset.sum_congr rfl fun a ha => ?_
   have hA : a.mapDomain Sigma.fst = Finsupp.equivFunOnFinite.symm d := by
     ext k
-    rw [show (a.mapDomain Sigma.fst) k = _ from congrFun (mapDomain_fst a) k, hg (mem_support_iff.mp ha)]
+    rw [show (a.mapDomain Sigma.fst) k = _ from congrFun (mapDomain_fst a) k,
+      hg (mem_support_iff.mp ha)]
     simp
   rw [cone_monomial, hA]
 
-theorem mem_mIdealOver_iff [Fintype K] (y : (Σ k, ι k) → Ω) {g : MvPolynomial (Σ k, ι k) F} {d : K → ℕ}
-    (hg : IsWeightedHomogeneous (NumbersDVR.blockWeight ι) g d) :
-    g ∈ mIdealOver F y ↔ aeval y g = 0 := by
-  rw [ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.mIdealOver, RingHom.mem_ker, cone_of_homog y hg, monomial_eq_zero]
+theorem mem_mIdealOver_iff
+    [Fintype K]
+    (y : (Σ k, ι k) → Ω)
+    {g : MvPolynomial (Σ k, ι k) F} {d : K → ℕ}
+    (hg : IsWeightedHomogeneous (NumbersDVR.blockWeight ι) g d)
+    : g ∈ mIdealOver F y ↔ aeval y g = 0 := by
+  rw [ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.KH.mIdealOver, RingHom.mem_ker,
+    cone_of_homog y hg, monomial_eq_zero]
 
-theorem finrank_gradedPiece [Fintype K] (y : (Σ k, ι k) → Ω) (d : K → ℕ) :
-    Module.finrank F (NumbersDVR.gradedPiece (mIdealOver F y) d) = Module.finrank F (vals F y d) := by
+theorem finrank_gradedPiece [Fintype K] (y : (Σ k, ι k) → Ω) (d : K → ℕ)
+    : Module.finrank F (NumbersDVR.gradedPiece (mIdealOver F y) d)
+      = Module.finrank F (vals F y d) := by
   set V := weightedHomogeneousSubmodule F (NumbersDVR.blockWeight ι) d
   let P := mIdealOver F y
-  let f₁ : V →ₗ[F] MvPolynomial (Σ k, ι k) F ⧸ P := (Ideal.Quotient.mkₐ F P).toLinearMap ∘ₗ V.subtype
+  let f₁ : V →ₗ[F] MvPolynomial (Σ k, ι k) F ⧸ P :=
+    (Ideal.Quotient.mkₐ F P).toLinearMap ∘ₗ V.subtype
   let f₂ : V →ₗ[F] Ω := (aeval y).toLinearMap ∘ₗ V.subtype
   have hr₁ : LinearMap.range f₁ = NumbersDVR.gradedPiece P d := by
     rw [NumbersDVR.gradedPiece, LinearMap.range_comp, Submodule.range_subtype]
@@ -231,24 +258,28 @@ theorem finrank_gradedPiece [Fintype K] (y : (Σ k, ι k) → Ω) (d : K → ℕ
     rw [vals, LinearMap.range_comp, Submodule.range_subtype]
   have hker : LinearMap.ker f₁ = LinearMap.ker f₂ := by
     ext ⟨v, hv⟩
-    simp only [LinearMap.mem_ker, f₁, f₂, LinearMap.coe_comp, Function.comp_apply, Submodule.coe_subtype,
-      AlgHom.toLinearMap_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
+    simp only [LinearMap.mem_ker, f₁, f₂, LinearMap.coe_comp, Function.comp_apply,
+      Submodule.coe_subtype, AlgHom.toLinearMap_apply, Ideal.Quotient.mkₐ_eq_mk,
+      Ideal.Quotient.eq_zero_iff_mem]
     exact mem_mIdealOver_iff y ((mem_weightedHomogeneousSubmodule _ _ _ _).mp hv)
-  have e₁ := ((f₁.quotKerEquivRange.symm.trans (Submodule.quotEquivOfEq _ _ hker)).trans
-    f₂.quotKerEquivRange).finrank_eq
+  have e₁ :=
+    ((f₁.quotKerEquivRange.symm.trans (Submodule.quotEquivOfEq _ _ hker)).trans
+      f₂.quotKerEquivRange).finrank_eq
   rw [hr₁, hr₂] at e₁
   exact e₁
 
-theorem hilbFn_eq [Fintype K] (y : (Σ k, ι k) → Ω) (m : K → ℤ) (hm : ∀ k, 0 ≤ m k) :
-    NumbersDVR.hilbFn (mIdealOver F y) m = (Module.finrank F (vals F y fun k => (m k).toNat) : ℤ) := by
+theorem hilbFn_eq [Fintype K] (y : (Σ k, ι k) → Ω) (m : K → ℤ) (hm : ∀ k, 0 ≤ m k)
+    : NumbersDVR.hilbFn (mIdealOver F y) m
+      = (Module.finrank F (vals F y fun k => (m k).toNat) : ℤ) := by
   rw [NumbersDVR.hilbFn, if_pos hm, finrank_gradedPiece]
 
 end Values
 
 section Eventual
 
-theorem eventuallyEq_mixedDiff {K' : Type} {n : ℕ} (bs : Fin n → K' → ℤ) {h₁ h₂ : (K' → ℤ) → ℤ}
-    (h : h₁ =ᶠ[atTop] h₂) : NumbersDVR.mixedDiff bs h₁ =ᶠ[atTop] NumbersDVR.mixedDiff bs h₂ := by
+theorem eventuallyEq_mixedDiff
+    {K' : Type} {n : ℕ} (bs : Fin n → K' → ℤ) {h₁ h₂ : (K' → ℤ) → ℤ} (h : h₁ =ᶠ[atTop] h₂)
+    : NumbersDVR.mixedDiff bs h₁ =ᶠ[atTop] NumbersDVR.mixedDiff bs h₂ := by
   unfold NumbersDVR.mixedDiff
   generalize List.ofFn bs = l
   induction l with
@@ -266,12 +297,15 @@ variable {K : Type}
 
 def shiftDeg (D : Unit ⊕ K → ℤ) : K → ℤ := fun k => D (Sum.inr k) + D (Sum.inl ())
 
-theorem mixedDiff_shift {n : ℕ} (μs : Fin n → K → ℤ) (h : (K → ℤ) → ℤ) :
-    NumbersDVR.mixedDiff (fun j => IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit) (μs j)) (fun D => h (shiftDeg D)) =
-      fun D => NumbersDVR.mixedDiff μs h (shiftDeg D) := by
+theorem mixedDiff_shift {n : ℕ} (μs : Fin n → K → ℤ) (h : (K → ℤ) → ℤ)
+    : NumbersDVR.mixedDiff
+        (fun j => IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit) (μs j))
+        (fun D => h (shiftDeg D))
+      = fun D => NumbersDVR.mixedDiff μs h (shiftDeg D) := by
   unfold NumbersDVR.mixedDiff
-  have hl : List.ofFn (fun j => IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit) (μs j)) =
-      (List.ofFn μs).map (IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit)) := by
+  have hl
+      : List.ofFn (fun j => IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit) (μs j))
+        = (List.ofFn μs).map (IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit)) := by
     rw [List.map_ofFn]
     rfl
   rw [hl]
@@ -284,12 +318,13 @@ theorem mixedDiff_shift {n : ℕ} (μs : Fin n → K → ℤ) (h : (K → ℤ) �
     simp only [NumbersDVR.diffStep]
     have hs : shiftDeg (D - IndefiniteRowSideFullHecke.Kleiman2.pullDeg b) = shiftDeg D - b := by
       funext k
-      simp only [shiftDeg, Pi.sub_apply, IndefiniteRowSideFullHecke.Kleiman2.pullDeg, Sum.elim_inl, Sum.elim_inr, Pi.zero_apply]
+      simp only [shiftDeg, Pi.sub_apply, IndefiniteRowSideFullHecke.Kleiman2.pullDeg, Sum.elim_inl,
+        Sum.elim_inr, Pi.zero_apply]
       ring
     rw [hs]
 
-theorem eventually_shift_iff (f : (K → ℤ) → ℤ) (c : ℤ) :
-    (∀ᶠ D in atTop, f (shiftDeg D) = c) ↔ ∀ᶠ m in atTop, f m = c := by
+theorem eventually_shift_iff (f : (K → ℤ) → ℤ) (c : ℤ)
+    : (∀ᶠ D in atTop, f (shiftDeg D) = c) ↔ ∀ᶠ m in atTop, f m = c := by
   constructor
   · intro h
     obtain ⟨D₀, hD₀⟩ := eventually_atTop.mp h
@@ -325,12 +360,16 @@ end Eventual
 
 section Segre
 
-variable {F : Type} [Field F] {K : Type} [Fintype K] [DecidableEq K] {ι : K → Type} {Ω : Type} [Field Ω]
-  [Algebra F Ω]
+variable
+  {F : Type} [Field F]
+  {K : Type} [Fintype K] [DecidableEq K]
+  {ι : K → Type} {Ω : Type} [Field Ω] [Algebra F Ω]
 
-theorem vals_segreJoin (y : (Σ k, ι k) → Ω) (m₀ : ℕ) (m : K → ℕ) :
-    vals F (segreJoin y) (Sum.elim (fun _ => m₀) m) = vals F y (fun k => m k + m₀) := by
-  have hS : ∀ u : Unit, vals F (segreJoin y) (Pi.single (Sum.inl u) 1) = ∏ k, vals F y (Pi.single k 1) := by
+theorem vals_segreJoin (y : (Σ k, ι k) → Ω) (m₀ : ℕ) (m : K → ℕ)
+    : vals F (segreJoin y) (Sum.elim (fun _ => m₀) m) = vals F y (fun k => m k + m₀) := by
+  have hS
+      : ∀ u : Unit,
+        vals F (segreJoin y) (Pi.single (Sum.inl u) 1) = ∏ k, vals F y (Pi.single k 1) := by
     intro u
     rw [vals_single]
     simp_rw [vals_single]
@@ -344,17 +383,21 @@ theorem vals_segreJoin (y : (Σ k, ι k) → Ω) (m₀ : ℕ) (m : K → ℕ) :
   simp only [Sum.elim_inl, Sum.elim_inr, hS, hL, pow_add, Finset.prod_mul_distrib, Finset.prod_pow]
   ring
 
-theorem hilbFn_segreJoin (y : (Σ k, ι k) → Ω) (D : Unit ⊕ K → ℤ) (hD : ∀ j, 0 ≤ D j) :
-    NumbersDVR.hilbFn (mIdealOver F (segreJoin y)) D = NumbersDVR.hilbFn (mIdealOver F y) (shiftDeg D) := by
+theorem hilbFn_segreJoin (y : (Σ k, ι k) → Ω) (D : Unit ⊕ K → ℤ) (hD : ∀ j, 0 ≤ D j)
+    : NumbersDVR.hilbFn (mIdealOver F (segreJoin y)) D
+      = NumbersDVR.hilbFn (mIdealOver F y) (shiftDeg D) := by
   rw [hilbFn_eq _ _ hD, hilbFn_eq y (shiftDeg D) (fun k => add_nonneg (hD _) (hD _))]
-  have h1 : (fun j => (D j).toNat) =
-      Sum.elim (fun _ => (D (Sum.inl ())).toNat) (fun k => (D (Sum.inr k)).toNat) := by
+  have h1
+      : (fun j => (D j).toNat)
+        = Sum.elim (fun _ => (D (Sum.inl ())).toNat) (fun k => (D (Sum.inr k)).toNat) := by
     funext j
     rcases j with u | k
     · cases u
       rfl
     · rfl
-  have h2 : (fun k => (shiftDeg D k).toNat) = fun k => (D (Sum.inr k)).toNat + (D (Sum.inl ())).toNat := by
+  have h2
+      : (fun k => (shiftDeg D k).toNat)
+        = fun k => (D (Sum.inr k)).toNat + (D (Sum.inl ())).toNat := by
     funext k
     exact Int.toNat_add (hD _) (hD _)
   rw [h1, h2, vals_segreJoin]
@@ -363,16 +406,19 @@ end Segre
 
 end SegreNum
 
-
 open SegreNum in
 theorem SegreNum.proof : SegreNum.Statement := by
   intro F _ K _ _ ι _ Ω _ _ y _ n μs
   unfold NumbersDVR.intNum
-  have hE : NumbersDVR.hilbFn (mIdealOver F (segreJoin y)) =ᶠ[atTop]
-      fun D => NumbersDVR.hilbFn (mIdealOver F y) (shiftDeg D) := by
+  have hE
+      : NumbersDVR.hilbFn (mIdealOver F (segreJoin y)) =ᶠ[atTop]
+        fun D => NumbersDVR.hilbFn (mIdealOver F y) (shiftDeg D) := by
     filter_upwards [eventually_ge_atTop 0] with D hD
     exact hilbFn_segreJoin y D fun j => hD j
-  have hM := eventuallyEq_mixedDiff (fun j => IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit) (μs j)) hE
+  have hM :=
+    eventuallyEq_mixedDiff
+      (fun j => IndefiniteRowSideFullHecke.Kleiman2.pullDeg (K₁ := Unit) (μs j))
+      hE
   rw [mixedDiff_shift] at hM
   refine FieldNumbers.Relabel.eventualValue_congr fun c => ?_
   rw [← eventually_shift_iff (NumbersDVR.mixedDiff μs (NumbersDVR.hilbFn (mIdealOver F y))) c]

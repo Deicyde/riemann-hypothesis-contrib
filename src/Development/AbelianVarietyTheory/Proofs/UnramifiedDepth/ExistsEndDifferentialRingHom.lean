@@ -9,7 +9,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
+open TensorProduct IsLocalRing Matrix CategoryTheory AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2 ReciprocityTheory.ChartRestriction.G.Chart
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -83,11 +85,14 @@ private lemma endDiff_coord {g : ℕ} {V M : Type} [AddCommGroup V] [Module R₀
   exact (TensorProduct.equivFinsuppOfBasisLeft gb).symm.bijective.comp
     Finsupp.equivFunOnFinite.symm.bijective
 
-private def endDiff_IsMat {g : ℕ} {B : BX R₀} {O : LAlg R₀} (gb : Module.Basis (Fin g) R₀ B.gg)
-    (e : OEnd B O) (d : Matrix (Fin g) (Fin g) (O : Type)) : Prop :=
+private def endDiff_IsMat
+    {g : ℕ} {B : BX R₀} {O : LAlg R₀}
+    (gb : Module.Basis (Fin g) R₀ B.gg) (e : OEnd B O) (d : Matrix (Fin g) (Fin g) (O : Type))
+    : Prop :=
   ∀ {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker)
-    (m : Fin g → π.ker), (∀ k, (m k : (R : Type)) = s.1 (d k l) * i) →
-      e.f s (B.tg π hπ (gb l ⊗ₜ[R₀] i)) = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] m k)
+      (m : Fin g → π.ker),
+    (∀ k, (m k : (R : Type)) = s.1 (d k l) * i)
+      → e.f s (B.tg π hπ (gb l ⊗ₜ[R₀] i)) = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] m k)
 
 private lemma endDiff_exists {g : ℕ} {B : BX R₀} {O : LAlg R₀} (gb : Module.Basis (Fin g) R₀ B.gg)
     (e : OEnd B O) : ∃ d, endDiff_IsMat gb e d := by
@@ -154,13 +159,19 @@ private lemma endDiff_unique {g : ℕ} {B : BX R₀} {O : LAlg R₀} {gb : Modul
   have h2 := (endDiff_coord (M := Dp.π.ker) gb).1 h1
   simpa using endDiff_ηmap_inj Dp (congrFun h2 k)
 
-theorem exists_endDifferential_ringHom :
-  (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} (B : BX R₀) (O : LAlg R₀) (gb : Module.Basis (Fin g) R₀ B.gg) (O₀ : Type) [CommRing O₀] (f : O₀ → OEnd B O),
-    (∀ {R : LAlg R₀} (s : LHom O R) (x : B.G R), (f 1).f s x = x ∧ ∀ a b, (f (a + b)).f s x = (f a).f s x + (f b).f s x ∧
-      (f (a * b)).f s x = (f a).f s ((f b).f s x)) →
-    ∃ dL : O₀ →+* Matrix (Fin g) (Fin g) (O : Type), (∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker) (m : Fin g → π.ker),
-      (∀ k, (m k : (R : Type)) = s.1 (dL a k l) * i) →
-      (f a).f s (B.tg π hπ (gb l ⊗ₜ[R₀] i)) = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] m k))) := by
+theorem exists_endDifferential_ringHom
+    : (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} (B : BX R₀) (O : LAlg R₀)
+        (gb : Module.Basis (Fin g) R₀ B.gg) (O₀ : Type) [CommRing O₀] (f : O₀ → OEnd B O),
+      (∀ {R : LAlg R₀} (s : LHom O R) (x : B.G R),
+          (f 1).f s x = x
+            ∧ ∀ a b,
+              (f (a + b)).f s x = (f a).f s x + (f b).f s x
+                ∧ (f (a * b)).f s x = (f a).f s ((f b).f s x))
+        → ∃ dL : O₀ →+* Matrix (Fin g) (Fin g) (O : Type),
+          (∀ a {R S : LAlg R₀} (s : LHom O R) (π : LHom R S) (hπ : π.SqZero) (l : Fin g) (i : π.ker)
+              (m : Fin g → π.ker),
+            (∀ k, (m k : (R : Type)) = s.1 (dL a k l) * i)
+              → (f a).f s (B.tg π hπ (gb l ⊗ₜ[R₀] i)) = B.tg π hπ (∑ k, gb k ⊗ₜ[R₀] m k))) := by
   intro R₀ _ g B O gb O₀ _ f hf
   choose d hd using fun a => endDiff_exists gb (f a)
   let Dp := DualNum.dualPair O

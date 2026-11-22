@@ -16,8 +16,8 @@ open GlobalTheory.KummerEisensteinGalois
 
 namespace GlobalTheory.KummerEisensteinGalois.LevelT
 
-theorem vp_cmul {K : Type} [Field K] [CharZero K] (p : ℕ) (hp : 0 < p) (f g : ℕ → K) (r : ℕ) :
-    vp p (cmul f g) r = cmul (vp p f) (vp p g) r := by
+theorem vp_cmul {K : Type} [Field K] [CharZero K] (p : ℕ) (hp : 0 < p) (f g : ℕ → K) (r : ℕ)
+    : vp p (cmul f g) r = cmul (vp p f) (vp p g) r := by
   by_cases h : p ∣ r
   · obtain ⟨r', rfl⟩ := h
     rw [UpSplit.cmul_vp_vp p hp]
@@ -37,22 +37,26 @@ theorem vp_cmul {K : Type} [Field K] [CharZero K] (p : ℕ) (hp : 0 < p) (f g : 
       simp [vp, this]
     · simp [vp, hpi]
 
-theorem cauchyProduct_fourfold_finsetSum {K : Type} [Field K] {α : Type} (s₁ s₂ s₃ s₄ : Finset α) (f g : α → α → ℕ → K) (r : ℕ) :
-    ∑ a ∈ s₁, ∑ b ∈ s₂, ∑ c ∈ s₃, ∑ d ∈ s₄, cmul (f a b) (g c d) r =
-      cmul (fun i => ∑ a ∈ s₁, ∑ b ∈ s₂, f a b i) (fun i => ∑ c ∈ s₃, ∑ d ∈ s₄, g c d i) r := by
+theorem cauchyProduct_fourfold_finsetSum
+    {K : Type} [Field K] {α : Type} (s₁ s₂ s₃ s₄ : Finset α) (f g : α → α → ℕ → K) (r : ℕ)
+    : ∑ a ∈ s₁, ∑ b ∈ s₂, ∑ c ∈ s₃, ∑ d ∈ s₄, cmul (f a b) (g c d) r
+      = cmul (fun i => ∑ a ∈ s₁, ∑ b ∈ s₂, f a b i) (fun i => ∑ c ∈ s₃, ∑ d ∈ s₄, g c d i) r := by
   unfold cmul
   simp_rw [Finset.sum_comm (s := s₄) (t := range (r + 1))]
   simp_rw [Finset.sum_comm (s := s₃) (t := range (r + 1))]
   simp_rw [Finset.sum_comm (s := s₂) (t := range (r + 1))]
   simp_rw [Finset.sum_comm (s := s₁) (t := range (r + 1))]
   refine sum_congr rfl fun i _ => ?_
-  rw [Finset.sum_mul]; refine sum_congr rfl fun a _ => ?_
-  rw [Finset.sum_mul]; refine sum_congr rfl fun b _ => ?_
-  rw [Finset.mul_sum]; refine sum_congr rfl fun c _ => ?_
+  rw [Finset.sum_mul]
+  refine sum_congr rfl fun a _ => ?_
+  rw [Finset.sum_mul]
+  refine sum_congr rfl fun b _ => ?_
+  rw [Finset.mul_sum]
+  refine sum_congr rfl fun c _ => ?_
   rw [Finset.mul_sum]
 
-theorem dvd_castHom_val_iff {p : ℕ} [Fact p.Prime] {n : ℕ} (hn : 1 ≤ n) (x : ZMod (p ^ (n + 1))) :
-    p ∣ (ZMod.castHom (pow_dvd_pow p (Nat.le_succ n)) (ZMod (p ^ n)) x).val ↔ p ∣ x.val := by
+theorem dvd_castHom_val_iff {p : ℕ} [Fact p.Prime] {n : ℕ} (hn : 1 ≤ n) (x : ZMod (p ^ (n + 1)))
+    : p ∣ (ZMod.castHom (pow_dvd_pow p (Nat.le_succ n)) (ZMod (p ^ n)) x).val ↔ p ∣ x.val := by
   rw [ZMod.castHom_apply, ZMod.cast_eq_val, ZMod.val_natCast,
     Nat.dvd_mod_iff (dvd_pow_self p (by omega))]
 
@@ -88,7 +92,6 @@ theorem sum_preimage_fibre (p : ℕ) [Fact p.Prime] (n : ℕ) (hn : 1 ≤ n) (K 
   rw [h1, ← Finset.sum_filter, hX']
 
 end GlobalTheory.KummerEisensteinGalois.LevelT
-
 
 open GlobalTheory.KummerEisensteinGalois.LevelT in
 theorem GlobalTheory.KummerEisensteinGalois.pieceT_unitSet_level_succ : ∀ (p : ℕ) [Fact p.Prime] (N n m k : ℕ) (K : Type) [Field K] [CharZero K] (ψ : DirichletCharacter K (p ^ m)) (c d : ℤ) (w w' v v' : ℤ × ℤ) (ζ : K) (X : Finset (GL (Fin 2) (ZMod (p ^ n)))), IsPrimitiveRoot ζ (N * p ^ (n + 1)) → 0 < N → ¬ p ∣ N → 1 ≤ m → m ≤ n → 3 ≤ k → ¬ (p : ℤ) ∣ c → ¬ (p : ℤ) ∣ d → (p : ℤ) * v.1 ≡ w.1 [ZMOD N] → (p : ℤ) * v.2 ≡ w.2 [ZMOD N] → (p : ℤ) * v'.1 ≡ w'.1 [ZMOD N] → (p : ℤ) * v'.2 ≡ w'.2 [ZMOD N] → (∀ γ ∈ X, ¬ p ∣ ((γ : Matrix (Fin 2) (Fin 2) (ZMod (p ^ n))) 0 0).val ∧ ¬ p ∣ ((γ : Matrix (Fin 2) (Fin 2) (ZMod (p ^ n))) 1 0).val) → ∀ r : ℕ, pieceT N p (n + 1) m k ψ c d v v' ζ (Finset.univ.filter fun γ => Matrix.GeneralLinearGroup.map (ZMod.castHom (pow_dvd_pow p (Nat.le_succ n)) (ZMod (p ^ n))) γ ∈ X) r = vp p (pieceT N p n m k ψ c d w w' (ζ ^ p) X) r := by

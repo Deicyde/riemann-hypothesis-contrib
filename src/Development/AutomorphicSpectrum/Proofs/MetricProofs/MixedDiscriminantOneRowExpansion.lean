@@ -14,14 +14,18 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.EvalW
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights
 open scoped ComplexOrder
-open GlobalTheory.CompanionTheory.Ar.PB.FibN ReciprocityTheory.ChartRestriction.G.AI GroundTheory.Heights₂.Heights.Inter
+open GlobalTheory.CompanionTheory.Ar.PB.FibN ReciprocityTheory.ChartRestriction.G.AI
+  GroundTheory.Heights₂.Heights.Inter
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.FibN
 
-theorem pderiv_fin_prod {σ : Type*} (k : σ) : ∀ (d : ℕ) (f : Fin (d + 1) → MvPolynomial σ ℝ),
-    pderiv k (∏ r, f r) = ∑ r, pderiv k (f r) * ∏ s, f (r.succAbove s) := by
+theorem pderiv_fin_prod {σ : Type*} (k : σ)
+    : ∀ (d : ℕ) (f : Fin (d + 1) → MvPolynomial σ ℝ),
+      pderiv k (∏ r, f r) = ∑ r, pderiv k (f r) * ∏ s, f (r.succAbove s) := by
   intro d
   induction d with
   | zero => intro f; simp
@@ -42,8 +46,8 @@ theorem pderiv_fin_prod {σ : Type*} (k : σ) : ∀ (d : ℕ) (f : Fin (d + 1) �
 theorem pderiv_row_weight (c v : ℝ) : pderiv (some 0 : Option (Fin 2)) (rowW ![c, 0] v) = C c := by
   simp [rowW, pderiv_X, Pi.single_apply]
 
-theorem eval_row_weight (n : Fin 3 → ℝ) (c v : ℝ) :
-    evalW n n (rowW ![c, 0] v) = lin4 (fun i => c * n i) + C v * X none := by
+theorem eval_row_weight (n : Fin 3 → ℝ) (c v : ℝ)
+    : evalW n n (rowW ![c, 0] v) = lin4 (fun i => c * n i) + C v * X none := by
   have h : lin4 (fun i => c * n i) = C c * lin4 n := by
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [lin4, lin3, map_sum, map_mul, rename_C, rename_X, Finset.mul_sum]
@@ -52,18 +56,21 @@ theorem eval_row_weight (n : Fin 3 → ℝ) (c v : ℝ) :
   rw [h]
   simp [rowW, evalW, aeval_def, algebraMap_eq]
 
-theorem extract_one : ∀ (d : ℕ) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ) (H : Matrix (Fin d) (Fin d) ℂ)
-    (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ),
-    (∀ (c : Fin d → Fin 3 → ℝ) (v : Fin d → ℝ),
-      (d.factorial : ℂ) * mdisc (fun t => (∑ i, ((c t i : ℝ) : ℂ) • T i) + ((v t : ℝ) : ℂ) • H) =
-        L (∏ t, (lin4 (c t) + C (v t) * X none))) →
-    ∀ (c : Fin (d + 1) → ℝ) (v : Fin (d + 1) → ℝ) (n : Fin 3 → ℝ) (e : ℂ),
-      ((d + 1).factorial : ℂ) * mdisc (fun r => blk ((c r : ℂ) * e)
-        ((∑ i, ((c r * n i : ℝ) : ℂ) • T i) + ((v r : ℝ) : ℂ) • H)) =
-      e * L (evalW n n (pderiv (some 0) (∏ r, rowW ![c r, 0] (v r)))) := by
+theorem extract_one
+    : ∀ (d : ℕ) (T : Fin 3 → Matrix (Fin d) (Fin d) ℂ) (H : Matrix (Fin d) (Fin d) ℂ)
+        (L : MvPolynomial (Option (Fin 3)) ℝ →ₗ[ℝ] ℂ),
+      (∀ (c : Fin d → Fin 3 → ℝ) (v : Fin d → ℝ),
+          (d.factorial : ℂ) * mdisc (fun t => (∑ i, ((c t i : ℝ) : ℂ) • T i) + ((v t : ℝ) : ℂ) • H)
+            = L (∏ t, (lin4 (c t) + C (v t) * X none)))
+        → ∀ (c : Fin (d + 1) → ℝ) (v : Fin (d + 1) → ℝ) (n : Fin 3 → ℝ) (e : ℂ),
+          ((d + 1).factorial : ℂ) * mdisc (fun r =>
+              blk ((c r : ℂ) * e) ((∑ i, ((c r * n i : ℝ) : ℂ) • T i) + ((v r : ℝ) : ℂ) • H))
+            = e * L (evalW n n (pderiv (some 0) (∏ r, rowW ![c r, 0] (v r)))) := by
   intro d T H L hL c v n e
-  have h1 := ((GlobalTheory.T.mixed_discriminant_cofactor_expansion d).1 (fun r => (c r : ℂ) * e)
-    (fun r => (∑ i, ((c r * n i : ℝ) : ℂ) • T i) + ((v r : ℝ) : ℂ) • H))
+  have h1 :=
+    ((GlobalTheory.T.mixed_discriminant_cofactor_expansion d).1
+      (fun r => (c r : ℂ) * e)
+      (fun r => (∑ i, ((c r * n i : ℝ) : ℂ) • T i) + ((v r : ℝ) : ℂ) • H))
   refine h1.trans ?_
   set_option synthInstance.maxHeartbeats 100000 in
     rw [pderiv_fin_prod, map_sum, map_sum, Finset.mul_sum]

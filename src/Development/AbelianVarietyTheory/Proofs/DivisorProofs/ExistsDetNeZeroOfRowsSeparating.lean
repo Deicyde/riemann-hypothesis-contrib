@@ -8,10 +8,10 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory
 
-theorem exists_det_ne_zero_of_rows_separating :
-    ∀ (K : Type) [Field K] (σ : Type) (h : ℕ) (M : σ → Fin h → K),
-      (∀ a : Fin h → K, (∀ s, ∑ j, a j * M s j = 0) → a = 0) →
-      ∃ s : Fin h → σ, (Matrix.of fun i j => M (s i) j).det ≠ 0 := by
+theorem exists_det_ne_zero_of_rows_separating
+    : ∀ (K : Type) [Field K] (σ : Type) (h : ℕ) (M : σ → Fin h → K),
+      (∀ a : Fin h → K, (∀ s, ∑ j, a j * M s j = 0) → a = 0)
+        → ∃ s : Fin h → σ, (Matrix.of fun i j => M (s i) j).det ≠ 0 := by
   intro K _ σ h M hM
   have hsp : Submodule.span K (Set.range M) = ⊤ := by
     by_contra hne

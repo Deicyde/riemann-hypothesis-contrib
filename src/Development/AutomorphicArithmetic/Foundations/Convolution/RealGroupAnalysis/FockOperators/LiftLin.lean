@@ -6,7 +6,9 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
@@ -20,10 +22,16 @@ private lemma th_smul {F : Type} [Field F] [NumberField F] (c : ℂ) (a : S4 F) 
     Th (c • a).1 = c * Th a.1 :=
   tsum_mul_left
 
-theorem UpperTheory.ConvolutionTheory.R2.Fo.liftLin :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D) (M : Meas F) (π : TR.CuspSub F 2), ∀ f ∈ π.V, ∀ φ ∈ Fock D.δ,
-    (∀ f' ∈ π.V, lift W M (f + f').1 φ = lift W M f.1 φ + lift W M f'.1 φ) ∧ (∀ φ' ∈ Fock D.δ, lift W M f.1 (φ + φ') = lift W M f.1 φ + lift W M f.1 φ') ∧
-    ∀ c : ℂ, lift W M (c • f).1 φ = c • lift W M f.1 φ ∧ lift W M f.1 (c • φ) = c • lift W M f.1 φ := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.liftLin
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E) (W : Weil D)
+        (M : Meas F) (π : TR.CuspSub F 2),
+      ∀ f ∈ π.V, ∀ φ ∈ Fock D.δ,
+        (∀ f' ∈ π.V, lift W M (f + f').1 φ = lift W M f.1 φ + lift W M f'.1 φ)
+          ∧ (∀ φ' ∈ Fock D.δ, lift W M f.1 (φ + φ') = lift W M f.1 φ + lift W M f.1 φ')
+          ∧ ∀ c : ℂ,
+            lift W M (c • f).1 φ = c • lift W M f.1 φ
+              ∧ lift W M f.1 (c • φ) = c • lift W M f.1 φ := by
   intro F E _ _ _ _ _ _ _ D W M π f hf φ hφ
   have hI := fun f hf φ hφ h => (UpperTheory.ConvolutionTheory.R2.conv F E D W M π f hf φ hφ h).1
   refine ⟨fun f' hf' => ?_, fun φ' hφ' => ?_, fun c => ⟨?_, ?_⟩⟩

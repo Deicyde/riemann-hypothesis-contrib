@@ -16,8 +16,10 @@ open NumberField GlobalTheory.DegCnt
 
 namespace GlobalTheory.OrthoLattice
 
-theorem isCMField_of_star (K : Type) [Field K] [NumberField K] [StarRing K] (htc : IsTotallyComplex K)
-    (hst : ∀ (φ : K →+* ℂ) (a : K), φ (star a) = starRingEnd ℂ (φ a)) : IsCMField K := by
+theorem isCMField_of_star
+    (K : Type) [Field K] [NumberField K] [StarRing K]
+    (htc : IsTotallyComplex K) (hst : ∀ (φ : K →+* ℂ) (a : K), φ (star a) = starRingEnd ℂ (φ a))
+    : IsCMField K := by
   let φ : K →+* ℂ := Classical.choice (inferInstance : Nonempty _)
   have hmem : ∀ x : K, star x = x → x ∈ maximalRealSubfield K := fun x hx ψ => by
     have := hst ψ x
@@ -52,20 +54,24 @@ theorem isCMField_of_star (K : Type) [Field K] [NumberField K] [StarRing K] (htc
       rw [star_div₀, star_sub, star_star, star_mul, star_ofNat, hds]
       field_simp
       ring
-    have h3 : x = (⟨_, hmem _ h1⟩ : maximalRealSubfield K) • (1 : K) +
-        (⟨_, hmem _ h2⟩ : maximalRealSubfield K) • d := by
+    have h3
+        : x
+          = (⟨_, hmem _ h1⟩ : maximalRealSubfield K) • (1 : K)
+            + (⟨_, hmem _ h2⟩ : maximalRealSubfield K) • d := by
       simp only [Subfield.smul_def, smul_eq_mul]
       field_simp
       ring
     rw [h3]
     exact add_mem (Submodule.smul_mem _ _ (Submodule.subset_span ⟨0, rfl⟩))
       (Submodule.smul_mem _ _ (Submodule.subset_span ⟨1, rfl⟩))
-  have : Algebra.IsQuadraticExtension (maximalRealSubfield K) K :=
-    { finrank_eq_two' := by simpa using Module.finrank_eq_card_basis (Module.Basis.mk hli hsp) }
+  have : Algebra.IsQuadraticExtension (maximalRealSubfield K) K := {
+    finrank_eq_two' := by simpa using Module.finrank_eq_card_basis (Module.Basis.mk hli hsp)
+  }
   exact ⟨⟩
 
-theorem hasOrtho : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
-    Formalism.HermitianLatticesTheory.IsCMUnram K → HasOrtho K := by
+theorem hasOrtho
+    : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
+      Formalism.HermitianLatticesTheory.IsCMUnram K → HasOrtho K := by
   intro K _ _ st hc
   have := isCMField_of_star K hc.1 hc.2.1
   have hs : st = IsCMField.starRing K := by
@@ -80,15 +86,18 @@ theorem hasOrtho : ∀ (K : Type) [Field K] [NumberField K] [StarRing K],
   intro W _ _ _ _ _ k hk hp ⟨L, hL, hU⟩
   let φ : K →+* ℂ := Classical.choice (inferInstance : Nonempty _)
   have hnd : k.Nondegenerate := by
-    refine ⟨fun x hx => ?_, fun x hx => ?_⟩ <;>
-    · by_contra h0
-      have := hp φ x h0
-      rw [hx x] at this
-      simp at this
-  let S : Formalism.BasicNotions.HSpace K := Formalism.BasicNotions.HSpace.mk W k hk hnd (Module.finrank K W) rfl (Module.finBasis K W)
-    (fun _ => (Module.finrank K W, 0)) L hL hU
-  have hsig : S.SigOK := fun τ => GlobalTheory.Proof.GenusMassSignature.hasSignature_of_posDef
-    ((GlobalTheory.Proof.GenusMassSignature.pos_iff_posDef hc.1 hc.2.1 S τ).1 (hp τ))
+    refine ⟨fun x hx => ?_, fun x hx => ?_⟩
+      <;> · by_contra h0
+            have := hp φ x h0
+            rw [hx x] at this
+            simp at this
+  let S : Formalism.BasicNotions.HSpace K :=
+    Formalism.BasicNotions.HSpace.mk W k hk hnd (Module.finrank K W) rfl (Module.finBasis K W)
+      (fun _ => (Module.finrank K W, 0))
+      L hL hU
+  have hsig : S.SigOK := fun τ =>
+    GlobalTheory.Proof.GenusMassSignature.hasSignature_of_posDef
+      ((GlobalTheory.Proof.GenusMassSignature.pos_iff_posDef hc.1 hc.2.1 S τ).1 (hp τ))
   obtain ⟨b, hb, ho⟩ := GlobalTheory.DefiniteOrthonormal.exists_orthonormal hc S hsig fun _ => rfl
   exact ⟨_, b, hb, hb.span_eq_top_of_card_eq_finrank' (Fintype.card_fin _), rfl, ho⟩
 

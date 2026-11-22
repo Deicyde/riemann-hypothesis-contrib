@@ -9,20 +9,24 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln03.Pf
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br Formalism.ExponentWindows Formalism.ExponentWindows.G Formalism.MainNotions.N.Ln03
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.MainNotions.WachCoordinates Formalism.MainNotions.WachCoordinates.Br
+  Formalism.ExponentWindows Formalism.ExponentWindows.G Formalism.MainNotions.N.Ln03
 
-variable {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL] [TopologicalSpace LL]
-    {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n] {W : LocWach PD LL O v n}
-    [Fintype (K →ₐ[Qp] LL)]
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  {PD : PeriodData G Qp K₀ K B BdR} {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+  {v : AddValuation LL (WithTop ℚ)} {n : ℕ} [NeZero n]
+  {W : LocWach PD LL O v n} [Fintype (K →ₐ[Qp] LL)]
 
-theorem unitStep_holds {e : W.DD W.one} (hUnitGen : UnitGen W e) (hCrysOne : IsCrys PD W.one.ρ) :
-    UnitStep W e := by
+theorem unitStep_holds {e : W.DD W.one} (hUnitGen : UnitGen W e) (hCrysOne : IsCrys PD W.one.ρ)
+    : UnitStep W e := by
   have hB := unitBasis_of hUnitGen hCrysOne
   have hγ : ∀ g, W.γD W.one g e = e := hUnitGen.2.2.1
   intro i
@@ -42,8 +46,7 @@ theorem unitStep_holds {e : W.DD W.one} (hUnitGen : UnitGen W e) (hCrysOne : IsC
     obtain ⟨ε, hε, huniq⟩ := hB x
     obtain ⟨h1, h2⟩ := hx
     refine ⟨fun _ => ε, fun _ => ⟨?_, fun δ hδ => ?_⟩, ?_⟩
-    · have hx' : x = ((letE i : LetA O n) • ε) • e := by
-        rw [smul_assoc, ← hε, h1]
+    · have hx' : x = ((letE i : LetA O n) • ε) • e := by rw [smul_assoc, ← hε, h1]
       exact huniq _ hx'
     · have hx' : x = W.γE δ ε • e := by
         conv_lhs => rw [← h2 δ hδ, hε]
@@ -52,11 +55,15 @@ theorem unitStep_holds {e : W.DD W.one} (hUnitGen : UnitGen W e) (hCrysOne : IsC
     · simp only [lc, Fintype.sum_unique]
       exact hε.symm
 
-theorem splitStep_holds (hOloc : IsLocalRing O)
+theorem splitStep_holds
+    (hOloc : IsLocalRing O)
     (hOnil : ∀ c ∈ IsLocalRing.maximalIdeal O, ∃ (N : ℕ) (d : O), c ^ N = ((PD.p : ℕ) : O) * d)
-    (hs : W.s = 1) (hp2 : PD.p ≠ 2) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W) (hLem3 : Formalism.MainNotions.DeltaInvariantLattices.WachLatticeLengthLemma W)
-    (hJ : ∀ T : LocLat G Qp LL O, CrysLat PD T → ∃ M h : ZMod n → ℕ, Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T M h) :
-    SplitStep W := by
+    (hs : W.s = 1) (hp2 : PD.p ≠ 2) (hP9 : Formalism.MainNotions.DeltaInvariantLattices.P9W W)
+    (hLem3 : Formalism.MainNotions.DeltaInvariantLattices.WachLatticeLengthLemma W)
+    (hJ : ∀ T : LocLat G Qp LL O,
+      CrysLat PD T
+        → ∃ M h : ZMod n → ℕ, Formalism.MainNotions.DeltaInvariantLattices.JumpsLet W T M h)
+    : SplitStep W := by
   intro T₁ T₂ F hc₁ hc₂ hon
   obtain ⟨m₁, B₁, hB₁, -⟩ := exists_basis_Delta_fixed_mem_N hP9 hs hp2 T₁ hc₁.2.2.2
   obtain ⟨m₂, B₂, hB₂, hB₂N⟩ := exists_basis_Delta_fixed_mem_N hP9 hs hp2 T₂ hc₂.2.2.2
@@ -78,16 +85,19 @@ theorem splitStep_holds (hOloc : IsLocalRing O)
     · rw [idempotent_smul_eq_mul, ← mul_assoc, idempotent_mul_self_bis]
     · rw [map_mul, idempotent_gamma_invariant, hMγ l k δ hδ]
   choose μ hμ using fun l k => letterRing_val_surjective i _ (hM l k)
-  have hcoef : ∀ (u : Fin m₁ → k17R W i) (k : Fin m₂),
-      letterRingVal W i (k17f μ u k) = ∑ l, letterRingVal W i (u l) * M l k := by
+  have hcoef
+      : ∀ (u : Fin m₁ → k17R W i) (k : Fin m₂),
+        letterRingVal W i (k17f μ u k) = ∑ l, letterRingVal W i (u l) * M l k := by
     intro u k
     change letterRingVal W i (∑ l, u l * μ l k) = _
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [letterRing_val_mul, hμ, ← mul_assoc, letterRing_mul_idempotent]
-  have hmap : ∀ u : Fin m₁ → k17R W i, W.map F (∑ l, letterRingVal W i (u l) • B₁ l) =
-      ∑ k, letterRingVal W i (k17f μ u k) • B₂ k := by
+  have hmap
+      : ∀ u : Fin m₁ → k17R W i,
+        W.map F (∑ l, letterRingVal W i (u l) • B₁ l)
+          = ∑ k, letterRingVal W i (k17f μ u k) • B₂ k := by
     intro u
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [hcoef, Finset.sum_smul, map_sum, map_smul]
@@ -107,7 +117,9 @@ theorem splitStep_holds (hOloc : IsLocalRing O)
       simp only [hu, ← smul_smul, ← Finset.smul_sum, B₁.sum_repr]
     have h2 := hmap u
     rw [h1, map_smul, hwF] at h2
-    have h3 : k17e W i • B₂ k = ∑ k', letterRingVal W i ((Pi.single k 1 : Fin m₂ → k17R W i) k') • B₂ k' := by
+    have h3
+        : k17e W i • B₂ k
+          = ∑ k', letterRingVal W i ((Pi.single k 1 : Fin m₂ → k17R W i) k') • B₂ k' := by
       simp only [Pi.single_apply]
       simp only [apply_ite (letterRingVal W i), map_zero, letterRing_val_one, ite_smul, zero_smul]
       rw [Finset.sum_ite_eq']
@@ -124,9 +136,14 @@ theorem splitStep_holds (hOloc : IsLocalRing O)
     funext k'
     simp [Finset.sum_apply, Pi.single_apply]
   obtain ⟨C, hCl, hCr⟩ := exists_basis_of_surjective (k17f μ) hsurj
-  refine ⟨fun t => ∑ l, letterRingVal W i (C t l) • B₁ l,
+  refine ⟨
+    fun t => ∑ l, letterRingVal W i (C t l) • B₁ l,
     fun j => ∑ l, letterRingVal W i (Pi.basisFun (k17R W i) (Fin m₂) j l) • B₂ l,
-    letter_invariants_basis B₁ hB₁ i C, letter_invariants_basis B₂ hB₂ i (Pi.basisFun _ _), fun j => ?_, fun j => ?_⟩
+    letter_invariants_basis B₁ hB₁ i C,
+    letter_invariants_basis B₂ hB₂ i (Pi.basisFun _ _),
+    fun j => ?_,
+    fun j => ?_
+  ⟩
   · rw [hmap, hCl]
     simp only [Pi.basisFun_apply]
   · rw [hmap, hCr]

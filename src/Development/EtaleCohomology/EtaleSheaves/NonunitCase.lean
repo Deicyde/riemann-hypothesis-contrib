@@ -21,26 +21,35 @@ theorem mS_mul (S : Subalgebra A K) {x b : K} (hx : x ∈ mS S) (hb : b ∈ S) :
     rw [add_mul]
     exact Submodule.add_mem _ hx hy
 
-theorem unit_case (S : Subalgebra A K) {u h e : K} (hu : u ∈ S) (hh : h ∈ S) (huh : u * h = 1)
-    (he : e ∈ S) (hue : u - e ∈ mS S) (hee : e * e - e ∈ mS S) : e - 1 ∈ mS S := by
+theorem unit_case
+    (S : Subalgebra A K)
+    {u h e : K} (hu : u ∈ S) (hh : h ∈ S) (huh : u * h = 1) (he : e ∈ S) (hue : u - e ∈ mS S)
+    (hee : e * e - e ∈ mS S)
+    : e - 1 ∈ mS S := by
   have key : e - 1 = (e * e - e) * h + (u - e) * ((e - 1) * h) := by
     linear_combination (1 - e) * huh
   rw [key]
   exact Submodule.add_mem _ (mS_mul S hee hh)
     (mS_mul S hue (S.mul_mem (S.sub_mem he (S.one_mem)) hh))
 
-theorem nonunit_case (S : Subalgebra A K) {u h e : K} (hu : u ∈ S) (hh : h ∈ S) (huh : (1 - u) * h = 1)
-    (he : e ∈ S) (hue : u - e ∈ mS S) (hee : e * e - e ∈ mS S) : e ∈ mS S := by
-  have h1 := unit_case S (u := 1 - u) (e := 1 - e) (S.sub_mem S.one_mem hu) hh huh
-    (S.sub_mem S.one_mem he)
-    (by
-      have : (1 - u) - (1 - e) = (u - e) * (-1) := by ring
-      rw [this]; exact mS_mul S hue (S.neg_mem S.one_mem))
-    (by
-      have : (1 - e) * (1 - e) - (1 - e) = e * e - e := by ring
-      rw [this]; exact hee)
+theorem nonunit_case
+    (S : Subalgebra A K)
+    {u h e : K} (hu : u ∈ S) (hh : h ∈ S) (huh : (1 - u) * h = 1) (he : e ∈ S) (hue : u - e ∈ mS S)
+    (hee : e * e - e ∈ mS S)
+    : e ∈ mS S := by
+  have h1 :=
+    unit_case S (u := 1 - u) (e := 1 - e) (S.sub_mem S.one_mem hu) hh huh (S.sub_mem S.one_mem he)
+      (by
+        have : (1 - u) - (1 - e) = (u - e) * (-1) := by ring
+        rw [this]
+        exact mS_mul S hue (S.neg_mem S.one_mem))
+      (by
+        have : (1 - e) * (1 - e) - (1 - e) = e * e - e := by ring
+        rw [this]
+        exact hee)
   have : e = (1 - e - 1) * (-1) := by ring
-  rw [this]; exact mS_mul S h1 (S.neg_mem S.one_mem)
+  rw [this]
+  exact mS_mul S h1 (S.neg_mem S.one_mem)
 
 theorem AlgGlue_of (hL : IdemLift) (hF : LateralTheory.E.LZProperCut.LZHensFinite) : AlgGlue := by
   intro A _ _ _ K _ _ B C t hc hint e f hef
@@ -59,14 +68,13 @@ theorem AlgGlue_of (hL : IdemLift) (hF : LateralTheory.E.LZProperCut.LZHensFinit
   have hgR : g ∈ R := Algebra.self_mem_adjoin_singleton A g
   rcases IsLocalRing.isUnit_or_isUnit_one_sub_self (⟨g, hgR⟩ : R) with hu | hu
   · obtain ⟨v, hv⟩ := hu.exists_right_inv
-    have hv' : g * (v : K) = 1 := by
-      have := congrArg Subtype.val hv; simpa using this
+    have hv' : g * (v : K) = 1 := by have := congrArg Subtype.val hv; simpa using this
     right
     exact ⟨unit_case B hgB (hRB v.2) hv' heB hge hee, unit_case C hgC (hRC v.2) hv' hfC hgf hff⟩
   · obtain ⟨v, hv⟩ := hu.exists_right_inv
-    have hv' : (1 - g) * (v : K) = 1 := by
-      have := congrArg Subtype.val hv; simpa using this
+    have hv' : (1 - g) * (v : K) = 1 := by have := congrArg Subtype.val hv; simpa using this
     left
-    exact ⟨nonunit_case B hgB (hRB v.2) hv' heB hge hee, nonunit_case C hgC (hRC v.2) hv' hfC hgf hff⟩
+    exact
+      ⟨nonunit_case B hgB (hRB v.2) hv' heB hge hee, nonunit_case C hgC (hRC v.2) hv' hfC hgf hff⟩
 
 end LateralTheory.E.AlgGlue₂

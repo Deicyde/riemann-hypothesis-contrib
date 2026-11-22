@@ -7,49 +7,58 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsTjCorr
 
 open NumberField GlobalTheory.UPel.HT GlobalTheory.UPel.HT.ES
 
-private theorem UpperTheory.Cb.idempotent_lift_succ_pow {R : Type*} [CommRing R] (σ : R →+* R) (P : R) (I : Ideal R) (k : ℕ)
-    (a : R) (ha : a ∈ I) (h1 : P ^ (k + 1) ∣ a + σ a - 1) (h2 : P ^ (k + 1) ∣ a * σ a) :
-    ∃ a' ∈ I, P ^ (k + 2) ∣ a' + σ a' - 1 ∧ P ^ (k + 2) ∣ a' * σ a' := by
+private theorem UpperTheory.Cb.idempotent_lift_succ_pow
+    {R : Type*} [CommRing R]
+    (σ : R →+* R) (P : R) (I : Ideal R) (k : ℕ) (a : R)
+    (ha : a ∈ I) (h1 : P ^ (k + 1) ∣ a + σ a - 1) (h2 : P ^ (k + 1) ∣ a * σ a)
+    : ∃ a' ∈ I, P ^ (k + 2) ∣ a' + σ a' - 1 ∧ P ^ (k + 2) ∣ a' * σ a' := by
   obtain ⟨c, hc⟩ := h1
   obtain ⟨d, hd⟩ := h2
   refine ⟨3 * a ^ 2 - 2 * a ^ 3, ?_, ?_, ?_⟩
-  · have h3 : a ^ 2 * (3 - 2 * a) ∈ I := I.mul_mem_right _ (by
-      rw [pow_two]
-      exact I.mul_mem_left _ ha)
+  · have h3 : a ^ 2 * (3 - 2 * a) ∈ I :=
+      I.mul_mem_right _ (by
+        rw [pow_two]
+        exact I.mul_mem_left _ ha)
     have e : 3 * a ^ 2 - 2 * a ^ 3 = a ^ 2 * (3 - 2 * a) := by ring
     rw [e]
     exact h3
-  · have e1 : 3 * a ^ 2 - 2 * a ^ 3 + σ (3 * a ^ 2 - 2 * a ^ 3) - 1 =
-        -3 * (a + σ a - 1) ^ 2 - 2 * (a + σ a - 1) ^ 3 + 6 * (a * σ a) * (a + σ a - 1) := by
+  · have e1
+        : 3 * a ^ 2 - 2 * a ^ 3 + σ (3 * a ^ 2 - 2 * a ^ 3) - 1
+          = -3 * (a + σ a - 1) ^ 2 - 2 * (a + σ a - 1) ^ 3 + 6 * (a * σ a) * (a + σ a - 1) := by
       simp only [map_sub, map_mul, map_pow, map_ofNat]
       ring
     rw [e1, hc, hd]
     exact ⟨P ^ k * (-3 * c ^ 2 - 2 * P ^ (k + 1) * c ^ 3 + 6 * d * c), by ring⟩
-  · have e2 : (3 * a ^ 2 - 2 * a ^ 3) * σ (3 * a ^ 2 - 2 * a ^ 3) =
-        (a * σ a) ^ 2 * ((3 - 2 * a) * (3 - 2 * σ a)) := by
+  · have e2
+        : (3 * a ^ 2 - 2 * a ^ 3) * σ (3 * a ^ 2 - 2 * a ^ 3)
+          = (a * σ a) ^ 2 * ((3 - 2 * a) * (3 - 2 * σ a)) := by
       simp only [map_sub, map_mul, map_pow, map_ofNat]
       ring
     rw [e2, hd]
     exact ⟨P ^ k * d ^ 2 * ((3 - 2 * a) * (3 - 2 * σ a)), by ring⟩
 
-private theorem UpperTheory.Cb.exists_idempotent_lift_pow {R : Type*} [CommRing R] (σ : R →+* R) (P : R) (I : Ideal R)
-    (a : R) (ha : a ∈ I) (h1 : P ∣ a + σ a - 1) (h2 : P ∣ a * σ a) (k : ℕ) :
-    ∃ a' ∈ I, P ^ (k + 1) ∣ a' + σ a' - 1 ∧ P ^ (k + 1) ∣ a' * σ a' := by
+private theorem UpperTheory.Cb.exists_idempotent_lift_pow
+    {R : Type*} [CommRing R]
+    (σ : R →+* R) (P : R) (I : Ideal R) (a : R)
+    (ha : a ∈ I) (h1 : P ∣ a + σ a - 1) (h2 : P ∣ a * σ a)
+    (k : ℕ)
+    : ∃ a' ∈ I, P ^ (k + 1) ∣ a' + σ a' - 1 ∧ P ^ (k + 1) ∣ a' * σ a' := by
   induction k with
   | zero => exact ⟨a, ha, by simpa using h1, by simpa using h2⟩
   | succ k ih =>
     obtain ⟨b, hb, hb1, hb2⟩ := ih
     exact UpperTheory.Cb.idempotent_lift_succ_pow σ P I k b hb hb1 hb2
 
-theorem UpperTheory.Cb.exists_mem_uIdeal_idempotent_mod_prime_pow :
-    ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (r : ℤ) (w : Ideal (𝓞 D.F)) (e : ℕ), w ≠ ⊤ → uIdeal D r ≤ w → ∃ a ∈ uIdeal D r, (p : 𝓞 D.F) ^ e ∣ a + D.bar a - 1 ∧ (p : 𝓞 D.F) ^ e ∣ a * D.bar a := by
+theorem UpperTheory.Cb.exists_mem_uIdeal_idempotent_mod_prime_pow
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (r : ℤ) (w : Ideal (𝓞 D.F)) (e : ℕ),
+      w ≠ ⊤ → uIdeal D r ≤ w
+        → ∃ a ∈ uIdeal D r, (p : 𝓞 D.F) ^ e ∣ a + D.bar a - 1 ∧ (p : 𝓞 D.F) ^ e ∣ a * D.bar a := by
   intro p _ D r w e hw hle
   have hp : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp (Fact.out : p.Prime)
   set x : 𝓞 D.F := D.ω - (r : 𝓞 D.F) with hx
   set N : ℤ := r ^ 2 - D.tr * r + D.nm with hN
   set s : ℤ := D.tr - 2 * r with hs
-  have hbx : D.bar x = D.bar D.ω - (r : 𝓞 D.F) := by
-    simp [x, map_sub, map_intCast]
+  have hbx : D.bar x = D.bar D.ω - (r : 𝓞 D.F) := by simp [x, map_sub, map_intCast]
   have hxN : x * D.bar x = (N : 𝓞 D.F) := by
     rw [hbx]
     push_cast [N]
@@ -88,7 +97,8 @@ theorem UpperTheory.Cb.exists_mem_uIdeal_idempotent_mod_prime_pow :
   have h1 : (p : 𝓞 D.F) ∣ (v : 𝓞 D.F) * x + D.bar ((v : 𝓞 D.F) * x) - 1 := by
     refine ⟨-(u : 𝓞 D.F), ?_⟩
     rw [map_mul, map_intCast]
-    have e : (v : 𝓞 D.F) * x + (v : 𝓞 D.F) * D.bar x - 1 = (v : 𝓞 D.F) * (x + D.bar x) - 1 := by ring
+    have e : (v : 𝓞 D.F) * x + (v : 𝓞 D.F) * D.bar x - 1 = (v : 𝓞 D.F) * (x + D.bar x) - 1 := by
+      ring
     rw [e, hxs]
     have huv' : ((u * p + v * s : ℤ) : 𝓞 D.F) = 1 := by rw [huv]; simp
     push_cast at huv'
@@ -100,8 +110,9 @@ theorem UpperTheory.Cb.exists_mem_uIdeal_idempotent_mod_prime_pow :
     rw [e, hxN, hN']
     push_cast
     ring
-  obtain ⟨a', ha', h1', h2'⟩ := UpperTheory.Cb.exists_idempotent_lift_pow (D.bar : 𝓞 D.F →+* 𝓞 D.F) (p : 𝓞 D.F)
-    (uIdeal D r) _ ha (by simpa using h1) (by simpa using h2) e
+  obtain ⟨a', ha', h1', h2'⟩ :=
+    UpperTheory.Cb.exists_idempotent_lift_pow (D.bar : 𝓞 D.F →+* 𝓞 D.F) (p : 𝓞 D.F) (uIdeal D r) _
+      ha (by simpa using h1) (by simpa using h2) e
   refine ⟨a', ha', ?_, ?_⟩
   · exact (pow_dvd_pow _ (Nat.le_succ e)).trans (by simpa using h1')
   · exact (pow_dvd_pow _ (Nat.le_succ e)).trans (by simpa using h2')

@@ -201,18 +201,30 @@ lemma flag_ind [IsAlgClosed C] [CharZero C] (hv : v.Integers R) [Fintype F] [Dec
 
 end Gen
 
-theorem step : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable (F := F) AA.carrier → ∀ (K : Submodule F N) (t : N), t ∉ K → (∃ S : HopfOrder (C := C) R F, S.carrier = stepOrder AA.carrier K t ∧ FStable (F := F) S.carrier) ∧ stepOrder AA.carrier K t = stepOrderRes AA.carrier K t := by
+theorem step
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable (F := F) AA.carrier
+                → ∀ (K : Submodule F N) (t : N),
+                  t ∉ K
+                    → (∃ S : HopfOrder (C := C) R F,
+                        S.carrier = stepOrder AA.carrier K t ∧ FStable (F := F) S.carrier)
+                      ∧ stepOrder AA.carrier K t = stepOrderRes AA.carrier K t := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hf N _ _ _ _ AA hst K t ht
   classical
   haveI : Fintype (N ⧸ K) := Fintype.ofFinite _
   have hsurj : Function.Surjective K.mkQ := K.mkQ_surjective
-  have hne : K.mkQ t ≠ 0 := by
-    simpa [Submodule.Quotient.mk_eq_zero] using ht
+  have hne : K.mkQ t ≠ 0 := by simpa [Submodule.Quotient.mk_eq_zero] using ht
   have heq := stepOrder_eq AA.carrier K.mkQ hsurj t
   rw [K.ker_mkQ] at heq
   obtain ⟨AQ, hAQ⟩ := exists_quo hv AA K.mkQ.toAddMonoidHom hsurj
-  obtain ⟨S, hS⟩ := exists_res hv AQ
-    (LinearMap.toSpanSingleton F (N ⧸ K) (K.mkQ t)).toAddMonoidHom (span_inj hne)
+  obtain ⟨S, hS⟩ :=
+    exists_res hv AQ (LinearMap.toSpanSingleton F (N ⧸ K) (K.mkQ t)).toAddMonoidHom (span_inj hne)
   refine ⟨⟨S, ?_, ?_⟩, ?_⟩
   · rw [hS, hAQ, heq]
     rfl
@@ -224,8 +236,8 @@ theorem step : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
       change (fun x => g (a • K.mkQ x)) ∈ AA.carrier
       simpa only [map_smul] using hst a _ hg'
     · funext x
-      change g (a • LinearMap.toSpanSingleton F (N ⧸ K) (K.mkQ t) x) =
-        g (LinearMap.toSpanSingleton F (N ⧸ K) (K.mkQ t) (a • x))
+      change g (a • LinearMap.toSpanSingleton F (N ⧸ K) (K.mkQ t) x)
+        = g (LinearMap.toSpanSingleton F (N ⧸ K) (K.mkQ t) (a • x))
       rw [map_smul]
   · unfold stepOrder stepOrderRes
     ext h
@@ -234,30 +246,43 @@ theorem step : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C]
       obtain ⟨g, hg, rfl⟩ := Submodule.mem_map.mp hh
       exact ⟨g, hg.1, fun a k hk => hg.2 _ _ hk⟩
     · rintro ⟨g, hg, hgh⟩
-      obtain ⟨g', hg', hg'e⟩ := invres p C v R hv hp N AA K.toAddSubgroup
-        (Submodule.span F {t} ⊔ K).toAddSubgroup
-        (by
-          intro x hx
-          exact Submodule.mem_sup_right hx) g hg
-        (by
-          intro x hx k hk
-          obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
-          obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hy
-          rw [add_assoc, hgh a _ (K.add_mem hz hk), hgh a z hz])
+      obtain ⟨g', hg', hg'e⟩ :=
+        invres p C v R hv hp N AA K.toAddSubgroup (Submodule.span F {t} ⊔ K).toAddSubgroup
+          (by
+            intro x hx
+            exact Submodule.mem_sup_right hx)
+          g hg
+          (by
+            intro x hx k hk
+            obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.mp hx
+            obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.mp hy
+            rw [add_assoc, hgh a _ (K.add_mem hz hk), hgh a z hz])
       refine Submodule.mem_map.mpr ⟨g', hg', ?_⟩
       funext a
       show g' (a • t) = h a
       rw [hg'e (a • t) (Submodule.mem_sup_left (Submodule.mem_span_singleton.mpr ⟨a, rfl⟩))]
       simpa using hgh a 0 K.zero_mem
 
-theorem flag_colen : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable (F := F) AA.carrier → ∀ (n : ℕ) (b : Module.Basis (Fin n) F N), ∀ (cs : Fin n → NNReal) (cN : NNReal), (∀ i : Fin n, HasColen R v (stepOrder AA.carrier (flagSub b i) (b i)) (cs i)) → HasColen R v AA.carrier cN → cN ^ (p ^ f) = (∏ i, cs i) ^ Fintype.card N := by
+theorem flag_colen
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable (F := F) AA.carrier
+                → ∀ (n : ℕ) (b : Module.Basis (Fin n) F N), ∀ (cs : Fin n → NNReal) (cN : NNReal),
+                  (∀ i : Fin n, HasColen R v (stepOrder AA.carrier (flagSub b i) (b i)) (cs i))
+                    → HasColen R v AA.carrier cN
+                    → cN ^ (p ^ f) = (∏ i, cs i) ^ Fintype.card N := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hf N _ _ _ _ AA hst n b cs cN hcs hN
   have h0 : LinearMap.ker (LinearMap.id : N →ₗ[F] N) = flagSub b 0 := by
     rw [LinearMap.ker_id]
     unfold flagSub
     simp
-  have hid : HasColen R v
-      (AA.carrier.comap (LinearMap.funLeft R C (LinearMap.id : N →ₗ[F] N))) cN := by
+  have hid
+      : HasColen R v (AA.carrier.comap (LinearMap.funLeft R C (LinearMap.id : N →ₗ[F] N))) cN := by
     have he : AA.carrier.comap (LinearMap.funLeft R C (LinearMap.id : N →ₗ[F] N)) = AA.carrier := by
       ext h
       rfl

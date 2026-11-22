@@ -74,28 +74,37 @@ theorem positive_count : PosCount := by
   have hinj : Function.Injective ψ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro y hy
-    have hinr : ∀ b, ((hA.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1))
-        (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *ᵥ extZ p y) (Sum.inr b) = 0 := by
+    have hinr
+        : ∀ b,
+          ((hA.eigenvectorUnitary
+                  : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+                *ᵥ extZ p y)
+              (Sum.inr b)
+            = 0 := by
       intro b
       have := congrFun hy b
       simpa [ψ, LinearMap.funLeft_apply] using this
     have h1 := re_diag hA (extZ p y)
     rw [blockA_re k r z z' γ hs.2.1.1 _ hinr] at h1
-    have hT : (herm (Hpk k r) z z).re < 0 := by
-      have := hs.2.1.2; simp only [Tz] at this; linarith
-    have hl : (herm (Hpk k r) z z).re *
-        Complex.normSq (((hA.eigenvectorUnitary : Matrix (Fin (r + 1) ⊕ Fin (r + 1))
-          (Fin (r + 1) ⊕ Fin (r + 1)) ℂ) *ᵥ extZ p y) (Sum.inl (Fin.last r))) ≤ 0 :=
+    have hT : (herm (Hpk k r) z z).re < 0 := by have := hs.2.1.2; simp only [Tz] at this; linarith
+    have hl
+        : (herm (Hpk k r) z z).re * Complex.normSq
+            (((hA.eigenvectorUnitary
+                  : Matrix (Fin (r + 1) ⊕ Fin (r + 1)) (Fin (r + 1) ⊕ Fin (r + 1)) ℂ)
+                *ᵥ extZ p y)
+              (Sum.inl (Fin.last r)))
+          ≤ 0 :=
       mul_nonpos_of_nonpos_of_nonneg hT.le (Complex.normSq_nonneg _)
-    have hnn : ∀ i ∈ (Finset.univ : Finset (Fin (r + 1) ⊕ Fin (r + 1))),
-        0 ≤ hA.eigenvalues i * Complex.normSq (extZ p y i) := by
+    have hnn
+        : ∀ i ∈ (Finset.univ : Finset (Fin (r + 1) ⊕ Fin (r + 1))),
+          0 ≤ hA.eigenvalues i * Complex.normSq (extZ p y i) := by
       intro i _
       rw [extZ_apply]
       split_ifs with h
       · exact mul_nonneg h.le (Complex.normSq_nonneg _)
       · simp
-    have hz := (Finset.sum_eq_zero_iff_of_nonneg hnn).1
-      (le_antisymm (h1 ▸ hl) (Finset.sum_nonneg hnn))
+    have hz :=
+      (Finset.sum_eq_zero_iff_of_nonneg hnn).1 (le_antisymm (h1 ▸ hl) (Finset.sum_nonneg hnn))
     funext t
     have := hz t.1 (Finset.mem_univ _)
     rw [extZ_apply, dite_eq_left t.2] at this

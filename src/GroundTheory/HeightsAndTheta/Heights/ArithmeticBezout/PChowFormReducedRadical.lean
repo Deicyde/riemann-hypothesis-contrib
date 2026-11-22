@@ -20,18 +20,22 @@ section Helpers
 
 variable {F : Type*} [Field F] {n k : ℕ}
 
-private theorem mem_incIdeal_iff {P : Ideal (MvPolynomial (Fin n) F)} {g : MvPolynomial (Fin k × Fin n) F} :
-    g ∈ incIdeal P k ↔ ∀ u ∈ incidence P k, aeval u g = 0 := by
+private theorem mem_incIdeal_iff
+    {P : Ideal (MvPolynomial (Fin n) F)} {g : MvPolynomial (Fin k × Fin n) F}
+    : g ∈ incIdeal P k ↔ ∀ u ∈ incidence P k, aeval u g = 0 := by
   simp only [incIdeal, Submodule.mem_iInf, RingHom.mem_ker]
 
-private theorem incidence_mono {I W : Ideal (MvPolynomial (Fin n) F)} (hIW : I ≤ W)
-    {u : Fin k × Fin n → AlgebraicClosure F} (hu : u ∈ incidence W k) : u ∈ incidence I k := by
+private theorem incidence_mono
+    {I W : Ideal (MvPolynomial (Fin n) F)} (hIW : I ≤ W)
+    {u : Fin k × Fin n → AlgebraicClosure F} (hu : u ∈ incidence W k)
+    : u ∈ incidence I k := by
   obtain ⟨x, hx0, hxW, hxu⟩ := hu
   exact ⟨x, hx0, fun g hg => hxW g (hIW hg), hxu⟩
 
-private theorem exists_relComps_of_mem_incidence {J : Ideal (MvPolynomial (Fin n) F)}
-    {u : Fin k × Fin n → AlgebraicClosure F} (hu : u ∈ incidence J k) :
-    ∃ W ∈ relComps J, u ∈ incidence W k := by
+private theorem exists_relComps_of_mem_incidence
+    {J : Ideal (MvPolynomial (Fin n) F)} {u : Fin k × Fin n → AlgebraicClosure F}
+    (hu : u ∈ incidence J k)
+    : ∃ W ∈ relComps J, u ∈ incidence W k := by
   obtain ⟨x, hx0, hxJ, hxu⟩ := hu
   let φ : MvPolynomial (Fin n) F →ₐ[F] AlgebraicClosure F := aeval x
   have hP : (RingHom.ker φ).IsPrime := RingHom.ker_isPrime _
@@ -47,8 +51,9 @@ private theorem exists_relComps_of_mem_incidence {J : Ideal (MvPolynomial (Fin n
   have := RingHom.mem_ker.mp (hWP hj)
   simpa [φ] using this
 
-private theorem mem_support_fundCycle_iff {J : Ideal (MvPolynomial (Fin n) F)} (hJ : J.IsRadical)
-    {W : Ideal (MvPolynomial (Fin n) F)} : W ∈ (fundCycle J).support ↔ W ∈ relComps J := by
+private theorem mem_support_fundCycle_iff
+    {J : Ideal (MvPolynomial (Fin n) F)} (hJ : J.IsRadical) {W : Ideal (MvPolynomial (Fin n) F)}
+    : W ∈ (fundCycle J).support ↔ W ∈ relComps J := by
   classical
   rw [Finsupp.mem_support_iff]
   unfold fundCycle
@@ -63,14 +68,15 @@ private theorem mem_support_fundCycle_iff {J : Ideal (MvPolynomial (Fin n) F)} (
 
 end Helpers
 
-theorem ChowFormReduced.proof_of_prime_separate (hPrime : IncIdealPrime.Statement) (hSep : IncIdealSeparate.Statement) :
-    ChowFormReduced.Statement := by
+theorem ChowFormReduced.proof_of_prime_separate
+    (hPrime : IncIdealPrime.Statement) (hSep : IncIdealSeparate.Statement)
+    : ChowFormReduced.Statement := by
   classical
   intro F _ n k J h hJh hJr hch
-  have hproj : ∀ W ∈ (fundCycle J).support, IsProjPrime W :=
-    fun W hW => isProjPrime_of_mem_support_fundCycle hJh hW
-  have hrel : ∀ W ∈ (fundCycle J).support, W ∈ relComps J :=
-    fun W hW => (mem_support_fundCycle_iff hJr).mp hW
+  have hproj : ∀ W ∈ (fundCycle J).support, IsProjPrime W := fun W hW =>
+    isProjPrime_of_mem_support_fundCycle hJh hW
+  have hrel : ∀ W ∈ (fundCycle J).support, W ∈ relComps J := fun W hW =>
+    (mem_support_fundCycle_iff hJr).mp hW
 
   have hspan : ∀ g, h ∣ g ↔ ∀ W ∈ (fundCycle J).support, g ∈ incIdeal W k := by
     intro g
@@ -82,12 +88,14 @@ theorem ChowFormReduced.proof_of_prime_separate (hPrime : IncIdealPrime.Statemen
       obtain ⟨W, hW, huW⟩ := exists_relComps_of_mem_incidence hu
       exact mem_incIdeal_iff.mp (hg W ((mem_support_fundCycle_iff hJr).mpr hW)) u huW
 
-  have hsep : ∀ W ∈ (fundCycle J).support, ∀ W' ∈ (fundCycle J).support,
-      incIdeal W' k ≤ incIdeal W k → W' = W := by
+  have hsep
+      : ∀ W ∈ (fundCycle J).support, ∀ W' ∈ (fundCycle J).support,
+        incIdeal W' k ≤ incIdeal W k → W' = W := by
     intro W hW W' hW' hle
-    have hne : incIdeal W' k ≠ ⊥ := fun hb => hch.1 (by
-      have := (hspan h).mp dvd_rfl W' hW'
-      rwa [hb, Ideal.mem_bot] at this)
+    have hne : incIdeal W' k ≠ ⊥ := fun hb =>
+      hch.1 (by
+        have := (hspan h).mp dvd_rfl W' hW'
+        rwa [hb, Ideal.mem_bot] at this)
     have hWW' : W' ≤ W := hSep F n k W W' (hproj W hW) (hproj W' hW') hne hle
     exact le_antisymm hWW' ((hrel W hW).1.2 (hrel W' hW').1.1 hWW')
 
@@ -107,8 +115,8 @@ theorem ChowFormReduced.proof_of_prime_separate (hPrime : IncIdealPrime.Statemen
     have hinf : (fundCycle J).support.inf (fun W' => incIdeal W' k) ≤ Ideal.span {q} := by
       intro g hg
       rw [Ideal.mem_span_singleton]
-      exact dvd_trans hqh ((hspan g).mpr fun W' hW' =>
-        Finset.inf_le (f := fun W' => incIdeal W' k) hW' hg)
+      exact dvd_trans hqh
+        ((hspan g).mpr fun W' hW' => Finset.inf_le (f := fun W' => incIdeal W' k) hW' hg)
     obtain ⟨W', hW', hle⟩ := hqP.inf_le'.mp hinf
     have hW'W : W' = W := hsep W hW W' hW' (hle.trans hqle)
     rw [← hW'W]
@@ -133,8 +141,8 @@ theorem ChowFormReduced.proof_of_prime_separate (hPrime : IncIdealPrime.Statemen
     rw [hqspan W hW]
     exact Ideal.mem_span_singleton.mpr (Finset.dvd_prod_of_mem q hW)
   obtain ⟨u, hu⟩ := associated_of_dvd_dvd hdvd₁ hdvd₂
-  obtain ⟨r, hr, hur⟩ := (isUnit_iff_eq_C_of_isReduced (P := (u : MvPolynomial (Fin k × Fin n) F))).mp
-    u.isUnit
+  obtain ⟨r, hr, hur⟩ :=
+    (isUnit_iff_eq_C_of_isReduced (P := (u : MvPolynomial (Fin k × Fin n) F))).mp u.isUnit
   refine ⟨r, hr.ne_zero, q, fun W hW => ⟨(hq W hW).ne_zero, fun g => ?_⟩, ?_⟩
   · rw [← mem_incIdeal_iff, hqspan W hW, Ideal.mem_span_singleton]
   · rw [Finset.prod_congr rfl fun W hW => by rw [fundCycle_apply_of_isRadical hJr hW, pow_one],

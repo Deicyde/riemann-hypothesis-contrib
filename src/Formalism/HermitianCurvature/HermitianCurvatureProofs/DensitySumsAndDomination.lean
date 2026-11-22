@@ -10,8 +10,10 @@ noncomputable section
 open Classical
 namespace Formalism.FourierDecayAlt.P.DensitySumsAndDomination
 
-theorem psd_congr {α : Type} {Y : Finset α} {k k' : α → α → ℂ}
-    (h : ∀ x ∈ Y, ∀ y ∈ Y, k x y = k' x y) (hk : TB.PSDOn Y k) : TB.PSDOn Y k' := by
+theorem psd_congr
+    {α : Type} {Y : Finset α} {k k' : α → α → ℂ}
+    (h : ∀ x ∈ Y, ∀ y ∈ Y, k x y = k' x y) (hk : TB.PSDOn Y k)
+    : TB.PSDOn Y k' := by
   unfold TB.PSDOn at *
   have e : (Matrix.of fun x y : Y => k x y) = Matrix.of fun x y : Y => k' x y := by
     ext x y
@@ -19,25 +21,33 @@ theorem psd_congr {α : Type} {Y : Finset α} {k k' : α → α → ℂ}
     exact h x x.2 y y.2
   rwa [← e]
 
-theorem psd_smul {α : Type} {Y : Finset α} {k : α → α → ℂ} (c : ℝ) (hc : 0 ≤ c) (h : TB.PSDOn Y k) :
-    TB.PSDOn Y (fun x y => (c : ℂ) * k x y) := by
+theorem psd_smul {α : Type} {Y : Finset α} {k : α → α → ℂ} (c : ℝ) (hc : 0 ≤ c) (h : TB.PSDOn Y k)
+    : TB.PSDOn Y (fun x y => (c : ℂ) * k x y) := by
   unfold TB.PSDOn at *
   first
-    | (have e : (Matrix.of fun x y : Y => (c : ℂ) * k x y) = c • Matrix.of fun x y : Y => k x y := by
-         ext x y
-         simp [Complex.real_smul]
-       rw [e]
-       exact h.smul hc)
-    | (have e : (Matrix.of fun x y : Y => (c : ℂ) * k x y) = (c : ℂ) • Matrix.of fun x y : Y => k x y := by
-         ext x y
-         simp
-       rw [e]
-       exact h.smul (Complex.zero_le_real.mpr hc))
+  | (
+      have e : (Matrix.of fun x y : Y => (c : ℂ) * k x y) = c • Matrix.of fun x y : Y => k x y := by
+        ext x y
+        simp [Complex.real_smul]
+      rw [e]
+      exact h.smul hc
+    )
+  | (
+      have e
+          : (Matrix.of fun x y : Y => (c : ℂ) * k x y)
+            = (c : ℂ) • Matrix.of fun x y : Y => k x y := by
+        ext x y
+        simp
+      rw [e]
+      exact h.smul (Complex.zero_le_real.mpr hc)
+    )
 
 theorem domScaleTop : DomScaleTop := by
   intro E W _ D T Th lam hlam he hD
-  have hKr : ∀ j x y, (scaleTop D lam).Kr j x y =
-      if j = D.r + 1 then (lam : ℂ) * D.Kr j x y else D.Kr j x y := fun _ _ _ => rfl
+  have hKr
+      : ∀ j x y,
+        (scaleTop D lam).Kr j x y = if j = D.r + 1 then (lam : ℂ) * D.Kr j x y else D.Kr j x y :=
+    fun _ _ _ => rfl
   have he' : ∀ j, (scaleTop D lam).e j = if j = D.r + 1 then lam - 1 else D.e j := fun _ => rfl
   intro i s hs hsi hir
   obtain ⟨h1, h2, h3⟩ := hD i s hs hsi hir
@@ -45,15 +55,19 @@ theorem domScaleTop : DomScaleTop := by
   have hne : i - s ≠ D.r + 1 := by omega
   by_cases hi : i = D.r + 1
   · refine ⟨fun t ht => ?_, fun t ht t' ht' hl x hx y hy => ?_, fun S hS hSd => ?_⟩
-    · refine psd_congr (k := fun h h' => (lam : ℂ) * (Th i s t h h' - TB.blk (D.Kr i) s t t h h'))
-        (fun x _ y _ => ?_) (psd_smul lam hlam (h1 t ht))
+    · refine psd_congr
+        (k := fun h h' => (lam : ℂ) * (Th i s t h h' - TB.blk (D.Kr i) s t t h h'))
+        (fun x _ y _ => ?_)
+        (psd_smul lam hlam (h1 t ht))
       simp only [TB.blk, hKr, if_pos hi]
       ring
     · simp only [if_pos hi]
       rw [h2 t ht t' ht' hl x hx y hy]
     · refine psd_congr
-        (k := fun h h' => (lam : ℂ) * ((1 + (D.e i : ℂ)) * D.Kr (i - s) h h' - ∑ t ∈ S, Th i s t h h'))
-        (fun x _ y _ => ?_) (psd_smul lam hlam (h3 S hS hSd))
+        (k := fun h h' =>
+          (lam : ℂ) * ((1 + (D.e i : ℂ)) * D.Kr (i - s) h h' - ∑ t ∈ S, Th i s t h h'))
+        (fun x _ y _ => ?_)
+        (psd_smul lam hlam (h3 S hS hSd))
       have he2 : D.e i = 0 := by rw [hi]; exact he
       simp only [hKr, he', if_pos hi, if_neg hne]
       rw [he2, ← Finset.mul_sum]
@@ -72,7 +86,13 @@ theorem recHypScaleTop : RecHypScaleTop := by
   obtain ⟨a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18⟩ := h
   have hl1 : (1 : ℝ) ≤ max sd 1 := le_max_right _ _
   have hl0 : (0 : ℝ) ≤ max sd 1 := by linarith
-  refine ⟨⟨a1, a2, a3, a4, a5, ?_, a7, ?_, ?_, ?_, a11, a12, a13, a14, a15, a16, ?_, ?_⟩, rfl, rfl, ?_, ?_⟩
+  refine ⟨
+    ⟨a1, a2, a3, a4, a5, ?_, a7, ?_, ?_, ?_, a11, a12, a13, a14, a15, a16, ?_, ?_⟩,
+    rfl,
+    rfl,
+    ?_,
+    ?_
+  ⟩
   · intro i Y
     by_cases hit : i = D.r + 1
     · refine psd_congr (fun x _ y _ => ?_) (psd_smul _ hl0 (a6 i Y))
@@ -85,7 +105,8 @@ theorem recHypScaleTop : RecHypScaleTop := by
     apply hne
     show (if i = D.r + 1 then ((max sd 1 : ℝ) : ℂ) * D.Kr i (TB.join x s t) (TB.join y s t')
       else D.Kr i (TB.join x s t) (TB.join y s t')) = 0
-    rw [h0]; simp
+    rw [h0]
+    simp
   · intro i h1 hi
     by_cases hit : i = D.r + 1
     · simp only [scaleTop, hit, if_true]
@@ -105,8 +126,11 @@ theorem recHypScaleTop : RecHypScaleTop := by
     apply hne
     simp [scaleTop, h0]
   · refine ⟨hc1, fun Y hY R => ?_, hc3⟩
-    refine psd_congr (fun x _ y _ => ?_) (hSB _ Y (D.Kr (D.r + 1))
-      (fun p q => ∑ ρ ∈ R, c' ρ p * conj (c' ρ q)) sd (a6 _ Y) (hc2 Y hY R))
+    refine psd_congr
+      (fun x _ y _ => ?_)
+      (hSB _ Y (D.Kr (D.r + 1))
+        (fun p q => ∑ ρ ∈ R, c' ρ p * conj (c' ρ q))
+        sd (a6 _ Y) (hc2 Y hY R))
     simp [scaleTop]
   · simp [scaleTop]
   · intro i hi
@@ -117,27 +141,38 @@ theorem domAfterOfLocal : DomAfterOfLocal := by
   intro hP hS hM E W _ D h
   have key : ∀ T : TB.Tower E, ∃ Th, DomText D T Th := by
     intro T
-    have h' : ∀ i s : ℕ, ∃ Th0 : E → TB.Pt E → TB.Pt E → ℂ, 1 ≤ s → s ≤ i → i ≤ D.r + 1 →
-        (∀ t : E, TB.PSDOn (T.X (i - s)) (Th0 t)) ∧
-        (∀ t : E, t ≠ 0 →
-          TB.PSDOn (T.X (i - s)) (fun h h' => Th0 t h h' - TB.blk (D.Kr i) s t t h h')) ∧
-        (∀ t t' : E, t - t' ∈ D.La (i - s + 1) s →
-          ∀ h ∈ T.X (i - s), ∀ h' ∈ T.X (i - s), Th0 t h h' = Th0 t' h h') ∧
-        (∀ S : Finset E, (∀ t ∈ S, ∀ t' ∈ S, t - t' ∈ D.La (i - s + 1) s → t = t') →
-          TB.PSDOn (T.X (i - s))
-            (fun h h' => (1 + (D.e i : ℂ)) * D.Kr (i - s) h h' - ∑ t ∈ S, Th0 t h h')) := by
+    have h'
+        : ∀ i s : ℕ, ∃ Th0 : E → TB.Pt E → TB.Pt E → ℂ,
+          1 ≤ s → s ≤ i → i ≤ D.r + 1
+            → (∀ t : E, TB.PSDOn (T.X (i - s)) (Th0 t))
+              ∧ (∀ t : E,
+                t ≠ 0
+                  → TB.PSDOn (T.X (i - s)) (fun h h' => Th0 t h h' - TB.blk (D.Kr i) s t t h h'))
+              ∧ (∀ t t' : E,
+                t - t' ∈ D.La (i - s + 1) s
+                  → ∀ h ∈ T.X (i - s), ∀ h' ∈ T.X (i - s), Th0 t h h' = Th0 t' h h')
+              ∧ (∀ S : Finset E,
+                (∀ t ∈ S, ∀ t' ∈ S, t - t' ∈ D.La (i - s + 1) s → t = t')
+                  → TB.PSDOn (T.X (i - s))
+                    (fun h h' => (1 + (D.e i : ℂ)) * D.Kr (i - s) h h' - ∑ t ∈ S, Th0 t h h')) := by
       intro i s
       by_cases hr : 1 ≤ s ∧ s ≤ i ∧ i ≤ D.r + 1
       · obtain ⟨P, _, S, a, hok, hN, hB, hL⟩ := h T i s hr.1 hr.2.1 hr.2.2
         obtain ⟨_, _, o3, o4, o5, o6⟩ := hS _ _ a _ _ (hP _ _ _ S _ hok)
         have hL' : D.La (i - s + 1) s = (J.scaleSys a (J.prodSys S)).L := hL
-        refine ⟨(J.scaleSys a (J.prodSys S)).Th, fun _ _ _ => ⟨o4, fun t ht => ?_, fun t t' htt => ?_,
-          fun R hR => ?_⟩⟩
+        refine ⟨
+          (J.scaleSys a (J.prodSys S)).Th,
+          fun _ _ _ => ⟨o4, fun t ht => ?_, fun t t' htt => ?_, fun R hR => ?_⟩
+        ⟩
         · refine psd_congr (fun x hx y hy => ?_) (o5 t ht)
-          rw [← hN t ht x hx y hy]; rfl
+          rw [← hN t ht x hx y hy]
+          rfl
         · exact o3 t t' (hL' ▸ htt)
-        · refine psd_congr (fun x hx y hy => ?_) (o6 R (fun t ht t' ht' htt => hR t ht t' ht' (hL' ▸ htt)))
-          rw [← hB x hx y hy]; rfl
+        · refine psd_congr
+            (fun x hx y hy => ?_)
+            (o6 R (fun t ht t' ht' htt => hR t ht t' ht' (hL' ▸ htt)))
+          rw [← hB x hx y hy]
+          rfl
       · exact ⟨fun _ _ _ => 0, fun a b c => absurd ⟨a, b, c⟩ hr⟩
     choose Th0 hTh0 using h'
     exact ⟨fun i s => Th0 i s, fun i s hs hsi hi => hTh0 i s hs hsi hi⟩
@@ -149,37 +184,34 @@ theorem sq_sum (M : ℕ) : ∑ m ∈ Icc 2 (M + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹
   induction M with
   | zero => norm_num [Finset.Icc_self]
   | succ M ih =>
-    have hs : ∑ m ∈ Icc 2 (M + 1 + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹
-        = ∑ m ∈ Icc 2 (M + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹ + (((M : ℝ) + 3) ^ 2)⁻¹ := by
+    have hs
+        : ∑ m ∈ Icc 2 (M + 1 + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹
+          = ∑ m ∈ Icc 2 (M + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹ + (((M : ℝ) + 3) ^ 2)⁻¹ := by
       rw [show M + 1 + 2 = (M + 2) + 1 by omega, Finset.sum_Icc_succ_top (by omega)]
-      first
-        | (push_cast; ring)
-        | (congr 1; push_cast; ring)
+      first | (push_cast; ring) | (congr 1; push_cast; ring)
     have hc2 : ((M + 1 : ℕ) : ℝ) + 2 = (M : ℝ) + 3 := by push_cast; ring
     rw [hs, hc2]
     have h2 : (0 : ℝ) < (M : ℝ) + 2 := by positivity
     have h3 : (0 : ℝ) < (M : ℝ) + 3 := by positivity
     have h2' := h2.ne'
     have h3' := h3.ne'
-    have e : ((M : ℝ) + 2)⁻¹ - ((M : ℝ) + 3)⁻¹ - (((M : ℝ) + 3) ^ 2)⁻¹
-        = (((M : ℝ) + 2) * ((M : ℝ) + 3) ^ 2)⁻¹ := by
+    have e
+        : ((M : ℝ) + 2)⁻¹ - ((M : ℝ) + 3)⁻¹ - (((M : ℝ) + 3) ^ 2)⁻¹
+          = (((M : ℝ) + 2) * ((M : ℝ) + 3) ^ 2)⁻¹ := by
       field_simp
       ring
     have hpos : 0 ≤ (((M : ℝ) + 2) * ((M : ℝ) + 3) ^ 2)⁻¹ := by positivity
     linarith
 
-theorem pow_bd (m n : ℕ) (hm : 2 ≤ m) (hn : 2 ≤ n) :
-    (((m : ℕ) : ℝ) ^ n)⁻¹ ≤ 4 * ((2 : ℝ) ^ n)⁻¹ * (((m : ℕ) : ℝ) ^ 2)⁻¹ := by
+theorem pow_bd (m n : ℕ) (hm : 2 ≤ m) (hn : 2 ≤ n)
+    : (((m : ℕ) : ℝ) ^ n)⁻¹ ≤ 4 * ((2 : ℝ) ^ n)⁻¹ * (((m : ℕ) : ℝ) ^ 2)⁻¹ := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hn
   have hm' : (2 : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
   have hpk : (2 : ℝ) ^ k ≤ (m : ℝ) ^ k := by gcongr
-  have hL : ((m : ℝ) ^ (2 + k))⁻¹ = ((m : ℝ) ^ 2)⁻¹ * ((m : ℝ) ^ k)⁻¹ := by
-    rw [pow_add, mul_inv]
+  have hL : ((m : ℝ) ^ (2 + k))⁻¹ = ((m : ℝ) ^ 2)⁻¹ * ((m : ℝ) ^ k)⁻¹ := by rw [pow_add, mul_inv]
   have hR : 4 * ((2 : ℝ) ^ (2 + k))⁻¹ * ((m : ℝ) ^ 2)⁻¹ = ((m : ℝ) ^ 2)⁻¹ * ((2 : ℝ) ^ k)⁻¹ := by
     rw [pow_add, mul_inv]
-    first
-      | ring
-      | (norm_num; ring)
+    first | ring | (norm_num; ring)
   rw [hL, hR]
   exact mul_le_mul_of_nonneg_left (inv_anti₀ (by positivity) hpk) (by positivity)
 
@@ -190,19 +222,17 @@ theorem densSum : DensSum := by
     obtain ⟨hpr, hle⟩ := hS p hp
     have h0 : (0 : ℝ) < (l p : ℝ) := by exact_mod_cast hpr.pos
     exact inv_anti₀ (by positivity) (by gcongr)
-  have hB : ∑ p ∈ S, (((l p : ℕ) : ℝ) ^ n)⁻¹ ≤
-      (f : ℝ) * ∑ m ∈ S.image l, (((m : ℕ) : ℝ) ^ n)⁻¹ := by
+  have hB
+      : ∑ p ∈ S, (((l p : ℕ) : ℝ) ^ n)⁻¹ ≤ (f : ℝ) * ∑ m ∈ S.image l, (((m : ℕ) : ℝ) ^ n)⁻¹ := by
     rw [Finset.sum_comp (fun m : ℕ => (((m : ℕ) : ℝ) ^ n)⁻¹) l, Finset.mul_sum]
     refine Finset.sum_le_sum fun m _ => ?_
     rw [nsmul_eq_mul]
     refine mul_le_mul_of_nonneg_right ?_ (by positivity)
     have h := hf m
-    first
-      | exact_mod_cast h
-      | (norm_cast; convert h)
-      | norm_cast
-  have hC : ∑ m ∈ S.image l, (((m : ℕ) : ℝ) ^ n)⁻¹ ≤
-      ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ n)⁻¹ := by
+    first | exact_mod_cast h | (norm_cast; convert h) | norm_cast
+  have hC
+      : ∑ m ∈ S.image l, (((m : ℕ) : ℝ) ^ n)⁻¹
+        ≤ ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ n)⁻¹ := by
     apply Finset.sum_le_sum_of_subset_of_nonneg
     · intro m hm
       rw [Finset.mem_image] at hm
@@ -213,20 +243,23 @@ theorem densSum : DensSum := by
     · intro m _ _
       positivity
   have hD : ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ n)⁻¹ ≤ 3 * ((2 : ℝ) ^ n)⁻¹ := by
-    calc ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ n)⁻¹
-        ≤ ∑ m ∈ Icc 2 (S.sup l + 2), 4 * ((2 : ℝ) ^ n)⁻¹ * (((m : ℕ) : ℝ) ^ 2)⁻¹ := by
-          refine Finset.sum_le_sum fun m hm => ?_
-          exact pow_bd m n (Finset.mem_Icc.mp hm).1 hn
+    calc
+      ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ n)⁻¹
+          ≤ ∑ m ∈ Icc 2 (S.sup l + 2), 4 * ((2 : ℝ) ^ n)⁻¹ * (((m : ℕ) : ℝ) ^ 2)⁻¹ := by
+        refine Finset.sum_le_sum fun m hm => ?_
+        exact pow_bd m n (Finset.mem_Icc.mp hm).1 hn
       _ = 4 * ((2 : ℝ) ^ n)⁻¹ * ∑ m ∈ Icc 2 (S.sup l + 2), (((m : ℕ) : ℝ) ^ 2)⁻¹ := by
-          rw [Finset.mul_sum]
+        rw [Finset.mul_sum]
       _ ≤ 4 * ((2 : ℝ) ^ n)⁻¹ * (3 / 4 - (((S.sup l : ℕ) : ℝ) + 2)⁻¹) :=
-          mul_le_mul_of_nonneg_left (sq_sum _) (by positivity)
+        mul_le_mul_of_nonneg_left (sq_sum _) (by positivity)
       _ ≤ 3 * ((2 : ℝ) ^ n)⁻¹ := by
-          have h1 : 0 ≤ (((S.sup l : ℕ) : ℝ) + 2)⁻¹ := by positivity
-          have h2 : 0 ≤ ((2 : ℝ) ^ n)⁻¹ := by positivity
-          nlinarith
+        have h1 : 0 ≤ (((S.sup l : ℕ) : ℝ) + 2)⁻¹ := by positivity
+        have h2 : 0 ≤ ((2 : ℝ) ^ n)⁻¹ := by positivity
+        nlinarith
   have hf0 : (0 : ℝ) ≤ f := Nat.cast_nonneg f
-  calc ∑ p ∈ S, (q p ^ n)⁻¹ ≤ ∑ p ∈ S, (((l p : ℕ) : ℝ) ^ n)⁻¹ := Finset.sum_le_sum hA
+  calc
+    ∑ p ∈ S, (q p ^ n)⁻¹
+      ≤ ∑ p ∈ S, (((l p : ℕ) : ℝ) ^ n)⁻¹ := Finset.sum_le_sum hA
     _ ≤ (f : ℝ) * ∑ m ∈ S.image l, (((m : ℕ) : ℝ) ^ n)⁻¹ := hB
     _ ≤ (f : ℝ) * (3 * ((2 : ℝ) ^ n)⁻¹) := mul_le_mul_of_nonneg_left (hC.trans hD) hf0
     _ = 3 * (f : ℝ) * ((2 : ℝ) ^ n)⁻¹ := by ring
@@ -234,11 +267,15 @@ theorem densSum : DensSum := by
 theorem densChain : DensChain := by
   intro hSum hLe hSize P q l k r f sd hk hl hfib hsd
   have hn : 2 ≤ k - 2 * r - 2 := by omega
-  have hB : ∀ S : Finset P, ∏ p ∈ S, Real.exp (4 * (q p ^ (k - 2 * r - 2))⁻¹) ≤
-      Real.exp (12 * (f : ℝ) * ((2 : ℝ) ^ (k - 2 * r - 2))⁻¹) := by
+  have hB
+      : ∀ S : Finset P,
+        ∏ p ∈ S, Real.exp (4 * (q p ^ (k - 2 * r - 2))⁻¹)
+          ≤ Real.exp (12 * (f : ℝ) * ((2 : ℝ) ^ (k - 2 * r - 2))⁻¹) := by
     intro S
-    have h1 := hSum P S q l f (k - 2 * r - 2) hn (fun p _ => hl p)
-      (fun m => hfib m _ (fun p hp => (Finset.mem_filter.mp hp).2))
+    have h1 :=
+      hSum P S q l f (k - 2 * r - 2) hn
+        (fun p _ => hl p)
+        (fun m => hfib m _ (fun p hp => (Finset.mem_filter.mp hp).2))
     rw [← Real.exp_sum, Real.exp_le_exp, ← Finset.mul_sum]
     linarith
   have hmain : sd ≤ Real.exp (12 * (f : ℝ) * ((2 : ℝ) ^ (k - 2 * r - 2))⁻¹) := by
@@ -253,11 +290,14 @@ end Formalism.FourierDecayAlt.P.DensitySumsAndDomination
 
 namespace Formalism.FourierDecayAlt.P
 
-theorem domination_scale_top : Formalism.FourierDecayAlt.TC.DomScaleTop := DensitySumsAndDomination.domScaleTop
+theorem domination_scale_top : Formalism.FourierDecayAlt.TC.DomScaleTop :=
+  DensitySumsAndDomination.domScaleTop
 
-theorem recursion_hypothesis_scale_top : Formalism.FourierDecayAlt.TC.RecHypScaleTop := DensitySumsAndDomination.recHypScaleTop
+theorem recursion_hypothesis_scale_top : Formalism.FourierDecayAlt.TC.RecHypScaleTop :=
+  DensitySumsAndDomination.recHypScaleTop
 
-theorem domination_after_of_local : Formalism.FourierDecayAlt.TC.DomAfterOfLocal := DensitySumsAndDomination.domAfterOfLocal
+theorem domination_after_of_local : Formalism.FourierDecayAlt.TC.DomAfterOfLocal :=
+  DensitySumsAndDomination.domAfterOfLocal
 
 theorem density_sum : Formalism.FourierDecayAlt.TC.DensSum := DensitySumsAndDomination.densSum
 

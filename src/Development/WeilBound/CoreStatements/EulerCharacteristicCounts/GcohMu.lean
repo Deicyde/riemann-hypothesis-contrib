@@ -20,9 +20,10 @@ theorem gcMu : SgcMu := by
   have : NeZero (l ^ r) := ⟨pow_ne_zero _ hl.out.ne_zero⟩
   obtain ⟨e⟩ := nonempty_addEquiv_galRootsOfUnity (K := K) (Ksep := PadicAlgCl l) hn
   refine ⟨e.symm, fun g m => ?_⟩
-  have key : ∀ x : Additive (rootsOfUnity (l ^ r) (PadicAlgCl l)),
-      (galRootsOfUnity.{0} ↥K (PadicAlgCl l) (l ^ r)).ρ g x =
-        (Formalism.GaloisCohomology.cycK l K r g : ZMod (l ^ r)).val • x := by
+  have key
+      : ∀ x : Additive (rootsOfUnity (l ^ r) (PadicAlgCl l)),
+        (galRootsOfUnity.{0} ↥K (PadicAlgCl l) (l ^ r)).ρ g x
+          = (Formalism.GaloisCohomology.cycK l K r g : ZMod (l ^ r)).val • x := by
     intro x
     rw [galRootsOfUnity_ρ_apply]
     apply Additive.toMul.injective

@@ -13,11 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Isotropic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct GlobalTheory.MixModel
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 
@@ -27,13 +32,14 @@ namespace GlobalTheory.OneCosetGood
 
 variable {D : D7}
 
-theorem ell_mul {ρ : ℕ} (u : GL (Fin ρ) (AE D)) (hu : u ∈ UX D ρ) (j : Fin ρ) :
-    ∑ l, ell D ρ l * u.1 l j = ell D ρ j := by
+theorem ell_mul {ρ : ℕ} (u : GL (Fin ρ) (AE D)) (hu : u ∈ UX D ρ) (j : Fin ρ)
+    : ∑ l, ell D ρ l * u.1 l j = ell D ρ j := by
   have hu' := mem_UX.1 hu
   have hρ : 0 < ρ := Fin.pos j
   set m : Fin ρ := ⟨ρ - 1, by omega⟩ with hmdef
   have hm : m.1 + 1 = ρ := by rw [hmdef]; simp only; omega
-  have hne : ∀ b : Fin ρ, b ≠ m → ¬ (b.1 + 1 = ρ) := fun b hb h => hb (Fin.ext (by rw [hmdef]; simp only; omega))
+  have hne : ∀ b : Fin ρ, b ≠ m → ¬(b.1 + 1 = ρ) := fun b hb h =>
+    hb (Fin.ext (by rw [hmdef]; simp only; omega))
   rw [Finset.sum_eq_single m]
   · rw [show ell D ρ m = 1 from if_pos hm, one_mul]
     by_cases hj : j = m
@@ -50,17 +56,22 @@ theorem ell_mul {ρ : ℕ} (u : GL (Fin ρ) (AE D)) (hu : u ∈ UX D ρ) (j : Fi
     rw [show ell D ρ b = 0 from if_neg (hne b hb), zero_mul]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem yZero_mul {V₀ : HSp D} {ρ : ℕ} (z : Fin V₀.rank → D.host.E) (u : GL (Fin ρ) (AE D)) (hu : u ∈ UX D ρ) :
-    yZero V₀ ρ z ⬝ u.1 = yZero V₀ ρ z := by
+theorem yZero_mul
+    {V₀ : HSp D} {ρ : ℕ} (z : Fin V₀.rank → D.host.E) (u : GL (Fin ρ) (AE D)) (hu : u ∈ UX D ρ)
+    : yZero V₀ ρ z ⬝ u.1 = yZero V₀ ρ z := by
   ext k j
-  simp only [yZero, zEll, Matrix.neg_mul, Matrix.neg_apply, Matrix.mul_apply, vecMulVec_apply, neg_mul,
-    Finset.sum_neg_distrib, neg_inj]
+  simp only [yZero, zEll, Matrix.neg_mul, Matrix.neg_apply, Matrix.mul_apply, vecMulVec_apply,
+    neg_mul, Finset.sum_neg_distrib, neg_inj]
   simp_rw [mul_assoc]
   rw [← Finset.mul_sum, ell_mul u hu j]
 
-
 set_option maxHeartbeats 1000000 in
-theorem cond_red : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V₀ W W₀ : HSp D) (ρ : ℕ) (dW : HypDec W W₀ ρ) (p : Pieces V₀ W W₀ ρ ρ) (z : Fin V₀.rank → D.host.E) (P : GlobalTheory.FinPl.Pl D → Prop) (r g : GA D W), r ∈ Rgrp W (xZero dW) → Cond dW p (xZero dW) (yZero V₀ ρ z) ψ P (r * g) → Cond dW p (xZero dW) (yZero V₀ ρ z) ψ P g := by
+theorem cond_red
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V₀ W W₀ : HSp D) (ρ : ℕ) (dW : HypDec W W₀ ρ)
+        (p : Pieces V₀ W W₀ ρ ρ) (z : Fin V₀.rank → D.host.E) (P : GlobalTheory.FinPl.Pl D → Prop)
+        (r g : GA D W),
+      r ∈ Rgrp W (xZero dW) → Cond dW p (xZero dW) (yZero V₀ ρ z) ψ P (r * g)
+        → Cond dW p (xZero dW) (yZero V₀ ρ z) ψ P g := by
   intro D ψ V₀ W W₀ ρ dW p z P r g hr H
   have hr' : r⁻¹ ∈ Rgrp W (xZero dW) := inv_mem hr
   obtain ⟨u, hu, hru⟩ := hr
@@ -70,8 +81,10 @@ theorem cond_red : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V₀ W W₀ : 
   · obtain ⟨w, a, ha, hw⟩ := H.pt
     refine ⟨⟨u' * w.1, mul_mem hu' w.2⟩, a, ha, ?_⟩
     have e : mt W (r * g)⁻¹ ⬝ (xZero dW ⬝ w.1.1) = mt W g⁻¹ ⬝ (xZero dW ⬝ (u' * w.1).1) := by
-      rw [hinv, Matrix.mul_assoc, ← Matrix.mul_assoc (mt W r⁻¹), hru', Units.val_mul, Matrix.mul_assoc]
-    rw [← e]; exact hw
+      rw [hinv, Matrix.mul_assoc, ← Matrix.mul_assoc (mt W r⁻¹), hru', Units.val_mul,
+        Matrix.mul_assoc]
+    rw [← e]
+    exact hw
   · intro N hN hup hmem
     have hU := mem_UX.1 (inv_mem hu')
     have h1 : MxAt P ((u'⁻¹).1 ⬝ N) := fun i j => by
@@ -87,7 +100,8 @@ theorem cond_red : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V₀ W W₀ : 
     have h3 : mt W (r * g)⁻¹ ⬝ (xZero dW ⬝ ((u'⁻¹).1 ⬝ N)) = mt W g⁻¹ ⬝ (xZero dW ⬝ N) := by
       rw [hinv, Matrix.mul_assoc, ← Matrix.mul_assoc (mt W r⁻¹), hru']
       simp only [Matrix.mul_assoc]
-      rw [← Matrix.mul_assoc (u'.1) ((u'⁻¹).1) N, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mul]
+      rw [← Matrix.mul_assoc (u'.1) ((u'⁻¹).1) N, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mul]
     have h4 : upSum ((u'⁻¹).1 ⬝ N) = upSum N := by
       unfold upSum
       refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
@@ -98,7 +112,8 @@ theorem cond_red : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V₀ W W₀ : 
         · intro k _ hk
           rcases lt_or_gt_of_ne hk with hk | hk
           · rw [(hU i k).1 hk, zero_mul]
-          · rw [hup k j (by rw [Fin.le_iff_val_le_val]; have := Fin.lt_iff_val_lt_val.1 hk; omega), mul_zero]
+          · rw [hup k j (by rw [Fin.le_iff_val_le_val]; have := Fin.lt_iff_val_lt_val.1 hk; omega),
+              mul_zero]
         · intro h; exact absurd (Finset.mem_univ _) h
       · rfl
     rw [← h4]
@@ -110,8 +125,8 @@ theorem cond_red : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (V₀ W W₀ : 
     rw [← H.iso ξ hξ (u.1 ⬝ ξ') hP e]
     congr 1
     rw [GlobalTheory.OrientedHeis.symplO_skew (dW.incX V₀ ξ') (dW.incAdj V₀ _),
-      GlobalTheory.OrientedHeis.symplO_skew (dW.incX V₀ (u.1 ⬝ ξ')) (dW.incAdj V₀ _), HypDec.symplO_incX_incAdj,
-      HypDec.symplO_incX_incAdj, ← Matrix.mul_assoc, yZero_mul z u hu]
+      GlobalTheory.OrientedHeis.symplO_skew (dW.incX V₀ (u.1 ⬝ ξ')) (dW.incAdj V₀ _),
+      HypDec.symplO_incX_incAdj, HypDec.symplO_incX_incAdj, ← Matrix.mul_assoc, yZero_mul z u hu]
 
 end GlobalTheory.OneCosetGood
 
@@ -119,12 +134,27 @@ namespace GlobalTheory.OneCosetGood
 
 open GlobalTheory.FinPl (Lat idAt intAt grpAt InK)
 
-
 set_option maxHeartbeats 1000000 in
-theorem oneCoset_good : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (V V₀ W W₀ : HSp D) (ρ : ℕ) (dV : HypDec V V₀ ρ) (dW : HypDec W W₀ ρ) (p : Pieces V₀ W W₀ ρ ρ) (z : Fin V₀.rank → D.host.E) (LV : Lat V) (LV₀ : Lat V₀) (LW : Lat W) (LW₀ : Lat W₀) (v : GlobalTheory.FinPl.Pl D), GoodAt dV dW (xZero dW) ψ LV LV₀ LW LW₀ v → StdAt dV dW p LV LW v → (0 < ρ → ∀ a ∈ idAt D (· = v), dW.incAdj V₀ (a • yZero V₀ ρ z) ∈ latO V₀ W (LV₀ : Set _) (LW : Set _) (· = v) ↔ a ∈ intAt D (· = v)) → ∀ h ∈ grpAt W (· = v), (∀ κ, GlobalTheory.FinPl.InK W LW (· = v) κ → Cond dW p (xZero dW) (yZero V₀ ρ z) ψ (· = v) (h * κ)) → CosetAt W (Rgrp W (xZero dW)) LW v h := by
+theorem oneCoset_good
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (V V₀ W W₀ : HSp D) (ρ : ℕ) (dV : HypDec V V₀ ρ) (dW : HypDec W W₀ ρ)
+            (p : Pieces V₀ W W₀ ρ ρ) (z : Fin V₀.rank → D.host.E) (LV : Lat V) (LV₀ : Lat V₀)
+            (LW : Lat W) (LW₀ : Lat W₀) (v : GlobalTheory.FinPl.Pl D),
+          GoodAt dV dW (xZero dW) ψ LV LV₀ LW LW₀ v → StdAt dV dW p LV LW v
+            → (0 < ρ
+              → ∀ a ∈ idAt D (· = v),
+                dW.incAdj V₀ (a • yZero V₀ ρ z) ∈ latO V₀ W (LV₀ : Set _) (LW : Set _) (· = v)
+                  ↔ a ∈ intAt D (· = v))
+            → ∀ h ∈ grpAt W (· = v),
+              (∀ κ,
+                  GlobalTheory.FinPl.InK W LW (· = v) κ
+                    → Cond dW p (xZero dW) (yZero V₀ ρ z) ψ (· = v) (h * κ))
+                → CosetAt W (Rgrp W (xZero dW)) LW v h := by
   intro D ψ hψ V V₀ W W₀ ρ dV dW p z LV LV₀ LW LW₀ v hG hS hlast h hh hC
   obtain ⟨n, hnN, hnG, t, ht, htG, γ, hγ, κ, hκ, rfl⟩ :=
-    GlobalTheory.IwaPlace.iwasawa_at_place D W W₀ ρ dW LW LW₀ v (GlobalTheory.FinPl.TamePlaces.tame D v) hG.sdW hG.sdW₀ hG.monoW h hh
+    GlobalTheory.IwaPlace.iwasawa_at_place D W W₀ ρ dW LW LW₀ v
+      (GlobalTheory.FinPl.TamePlaces.tame D v) hG.sdW hG.sdW₀ hG.monoW h hh
   have hR : Rgrp W (xZero dW) = jacGrp dW := (GlobalTheory.Unf.base_point D W W₀ ρ dW).2.2.2.1
   have hr : n * dW.emb0 γ ∈ Rgrp W (xZero dW) := by
     rw [hR]
@@ -132,15 +162,23 @@ theorem oneCoset_good : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar
   have heq : n * dW.levi t * dW.emb0 γ * κ * κ⁻¹ = n * dW.emb0 γ * dW.levi t := by
     rw [mul_inv_cancel_right, mul_assoc n, ← dW.wittHyperbolic_anisotropic_commute_levi, mul_assoc]
   have hc := cond_red D ψ V₀ W W₀ ρ dW p z (· = v) _ _ hr (heq ▸ hC κ⁻¹ (inK_inv hκ))
-  have hinv := GlobalTheory.T.goodPlace_pointCondition_torus_inverseDiag_integral D ψ hψ V V₀ W W₀ ρ dV dW p LV LV₀ LW LW₀ v hG hS t ht htG hc.pt
+  have hinv :=
+    GlobalTheory.T.goodPlace_pointCondition_torus_inverseDiag_integral D ψ hψ V V₀ W W₀ ρ dV dW p LV
+      LV₀ LW LW₀ v hG hS t ht htG hc.pt
   have hint : ∀ i : Fin ρ, t.1 i i - 1 ∈ intAt D (· = v) := by
     intro i
     by_cases hi : i.1 + 1 < ρ
-    · exact GlobalTheory.T.goodPlace_shiftCondition_torus_diag_integral D ψ hψ V V₀ W W₀ ρ dV dW p LV LV₀ LW LW₀ v hG hS t ht htG hc.shift i ⟨i.1 + 1, hi⟩ rfl
-    · exact GlobalTheory.T.isotropic_condition_last_torus_diagonal_integral D ψ hψ V V₀ W W₀ ρ dV dW p z LV LV₀ LW LW₀ v hG hS hlast t ht htG hc.iso i (by omega)
-  have hK := GlobalTheory.FinPl.LeviUnitK.inK_levi D W W₀ ρ dW LW LW₀ v hG.sdW hG.monoW t ht htG (fun i => ⟨hint i, hinv i⟩)
+    · exact GlobalTheory.T.goodPlace_shiftCondition_torus_diag_integral D ψ hψ V V₀ W W₀ ρ dV dW p
+        LV LV₀ LW LW₀ v hG hS t ht htG hc.shift i ⟨i.1 + 1, hi⟩ rfl
+    · exact GlobalTheory.T.isotropic_condition_last_torus_diagonal_integral D ψ hψ V V₀ W W₀ ρ dV dW
+        p z LV LV₀ LW LW₀ v hG hS hlast t ht htG hc.iso i (by omega)
+  have hK :=
+    GlobalTheory.FinPl.LeviUnitK.inK_levi D W W₀ ρ dW LW LW₀ v hG.sdW hG.monoW t ht htG
+      (fun i => ⟨hint i, hinv i⟩)
   refine ⟨n * dW.emb0 γ, hr, ?_, dW.levi t * κ, inK_mul hK hκ, ?_⟩
-  · exact Subgroup.mul_mem _ hnG (GlobalTheory.OneCosetEmb.wittCoreEmbedding_mem_unitaryAdelicSupportedSubgroup D W W₀ ρ dW (· = v) γ hγ)
+  · exact Subgroup.mul_mem _ hnG
+      (GlobalTheory.OneCosetEmb.wittCoreEmbedding_mem_unitaryAdelicSupportedSubgroup D W W₀ ρ dW
+        (· = v) γ hγ)
   · rw [mul_assoc n (dW.levi t), ← dW.wittHyperbolic_anisotropic_commute_levi γ t]
     simp only [mul_assoc]
 

@@ -12,10 +12,12 @@ namespace GroundTheory.Heights₂.Heights.AnalyticLimit
 open ReciprocityTheory.AnForm.M (FinHolAtlas LocPot IsPotential locDens)
 
 def LocDensContOnOpen.Statement : Prop :=
-  ∀ {D : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas D X) (Yo : Set X) (th : Fin D → LocPot X)
-    (u : Fin D → X → ℝ), IsOpen Yo → (∀ i, IsPotential A (th i)) → (∀ i, A.SmoothOn Yo (u i)) →
-    ∀ j, ContinuousOn (locDens A (fun i => potForm (th i) (u i)) j)
-      ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Yo)
+  ∀ {D : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas D X) (Yo : Set X)
+      (th : Fin D → LocPot X) (u : Fin D → X → ℝ),
+    IsOpen Yo → (∀ i, IsPotential A (th i)) → (∀ i, A.SmoothOn Yo (u i))
+      → ∀ j,
+        ContinuousOn (locDens A (fun i => potForm (th i) (u i)) j)
+          ((A.chart j).target ∩ (A.chart j).symm ⁻¹' Yo)
 
 section Inhabitants
 

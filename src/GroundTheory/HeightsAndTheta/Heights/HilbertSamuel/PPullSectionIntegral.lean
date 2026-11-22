@@ -9,7 +9,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry MvPolynomial
+open ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry
+  MvPolynomial
 
 noncomputable section
 
@@ -17,9 +18,9 @@ namespace PullSectionIntegral
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
 
-theorem aeval_scale_of_isMultiHomog (y : (Σ k, ι k) → Ω) (t : K → Ω) {f : MRing ι} {e : K → ℕ}
-    (hf : IsMultiHomog f e) :
-    aeval (fun p => t p.1 * y p) f = (∏ k, t k ^ e k) * aeval y f := by
+theorem aeval_scale_of_isMultiHomog
+    (y : (Σ k, ι k) → Ω) (t : K → Ω) {f : MRing ι} {e : K → ℕ} (hf : IsMultiHomog f e)
+    : aeval (fun p => t p.1 * y p) f = (∏ k, t k ^ e k) * aeval y f := by
   simp only [aeval_def, eval₂_eq', Finset.mul_sum]
   refine Finset.sum_congr rfl fun d hd => ?_
   have hpow : ∏ p : Σ k, ι k, t p.1 ^ d p = ∏ k, t k ^ e k := by
@@ -33,10 +34,9 @@ theorem aeval_scale_of_isMultiHomog (y : (Σ k, ι k) → Ω) (t : K → Ω) {f 
   rw [hsplit, hpow]
   ring
 
-
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem eval_mConeMap (y : (Σ k, ι k) → Ω) (t : K → Ω) (f : MRing ι) :
-    eval t (mConeMap y f) = aeval (fun p => t p.1 * y p) f := by
+theorem eval_mConeMap (y : (Σ k, ι k) → Ω) (t : K → Ω) (f : MRing ι)
+    : eval t (mConeMap y f) = aeval (fun p => t p.1 * y p) f := by
   induction f using MvPolynomial.induction_on with
   | C a => simp [mConeMap]
   | add p q hp hq => simp only [map_add (f := _), hp, hq]
@@ -44,14 +44,18 @@ theorem eval_mConeMap (y : (Σ k, ι k) → Ω) (t : K → Ω) (f : MRing ι) :
     rw [map_mul, map_mul, hp]
     simp [mConeMap, mul_comm]
 
-theorem aeval_scale_eq_zero {y : (Σ k, ι k) → Ω} (t : K → Ω) {f : MRing ι} (hf : f ∈ mCoordIdeal y) :
-    aeval (fun p => t p.1 * y p) f = 0 := by
+theorem aeval_scale_eq_zero {y : (Σ k, ι k) → Ω} (t : K → Ω) {f : MRing ι} (hf : f ∈ mCoordIdeal y)
+    : aeval (fun p => t p.1 * y p) f = 0 := by
   rw [← eval_mConeMap, show mConeMap y f = 0 from hf, map_zero]
 
-theorem exists_sum_eq_one [CharZero Ω] (P : Ideal (MRing ι)) (y' : (Σ k, ι k) → Ω) (c : ∀ k, ι k)
-    (hc : ∀ k, y' ⟨k, c k⟩ = 1) (hP : ∀ f ∈ P, aeval y' f = 0) {n : ℕ} (L : Fin n → MRing ι)
-    (hL : ∀ z ∈ mcPts P, ∃ j, eval z (map (Int.castRingHom ℂ) (L j)) ≠ 0) :
-    ∃ b : Fin n → MvPolynomial (Σ k, ι k) ℚ, ∑ i, aeval y' (b i) * aeval y' (L i) = 1 := by
+theorem exists_sum_eq_one
+    [CharZero Ω]
+    (P : Ideal (MRing ι))
+    (y' : (Σ k, ι k) → Ω) (c : ∀ k, ι k) (hc : ∀ k, y' ⟨k, c k⟩ = 1)
+    (hP : ∀ f ∈ P, aeval y' f = 0)
+    {n : ℕ}
+    (L : Fin n → MRing ι) (hL : ∀ z ∈ mcPts P, ∃ j, eval z (map (Int.castRingHom ℂ) (L j)) ≠ 0)
+    : ∃ b : Fin n → MvPolynomial (Σ k, ι k) ℚ, ∑ i, aeval y' (b i) * aeval y' (L i) = 1 := by
   classical
   set φ : MvPolynomial (Σ k, ι k) ℚ →ₐ[ℚ] Ω := aeval y'
   let Lq : Fin n → MvPolynomial (Σ k, ι k) ℚ := fun i => map (algebraMap ℤ ℚ) (L i)
@@ -71,22 +75,21 @@ theorem exists_sum_eq_one [CharZero Ω] (P : Ideal (MRing ι)) (y' : (Σ k, ι k
     obtain ⟨m, hm, hJm⟩ := Ideal.exists_le_maximal J hJ
     let := Ideal.Quotient.field m
     have : Algebra.FiniteType ℚ (MvPolynomial (Σ k, ι k) ℚ ⧸ m) :=
-      Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℚ m)
-        (Ideal.Quotient.mkₐ_surjective ℚ m)
+      Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℚ m) (Ideal.Quotient.mkₐ_surjective ℚ m)
     have := finite_of_finite_type_of_isJacobsonRing ℚ (MvPolynomial (Σ k, ι k) ℚ ⧸ m)
     let ψ : (MvPolynomial (Σ k, ι k) ℚ ⧸ m) →ₐ[ℚ] ℂ := (by
       refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-      solve_by_elim* (maxDepth := 2) only [*,
-        @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+      solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
         @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
     let z : (Σ k, ι k) → ℂ := fun p => ψ (Ideal.Quotient.mk m (X p))
     have hz : ∀ g : MvPolynomial (Σ k, ι k) ℚ, ψ (Ideal.Quotient.mk m g) = aeval z g := by
       intro g
-      have : (ψ.comp (Ideal.Quotient.mkₐ ℚ m)) = aeval z := by
-        ext p; simp [z]
+      have : (ψ.comp (Ideal.Quotient.mkₐ ℚ m)) = aeval z := by ext p; simp [z]
       exact congrArg (fun F => F g) this
-    have hzZ : ∀ f : MRing ι, eval z (map (Int.castRingHom ℂ) f) =
-        ψ (Ideal.Quotient.mk m (map (algebraMap ℤ ℚ) f)) := by
+    have hzZ
+        : ∀ f : MRing ι,
+          eval z (map (Int.castRingHom ℂ) f)
+            = ψ (Ideal.Quotient.mk m (map (algebraMap ℤ ℚ) f)) := by
       intro f
       rw [hz, aeval_map_algebraMap, eval_map, aeval_def, algebraMap_int_eq]
     have hker : ∀ g ∈ RingHom.ker φ, Ideal.Quotient.mk m g = 0 := fun g hg =>
@@ -104,13 +107,17 @@ theorem exists_sum_eq_one [CharZero Ω] (P : Ideal (MRing ι)) (y' : (Σ k, ι k
         rw [hzZ, hker _ (RingHom.mem_ker.mpr hφf), map_zero]
     obtain ⟨j, hj⟩ := hL z hzP
     apply hj
-    rw [hzZ, Ideal.Quotient.eq_zero_iff_mem.mpr (hJm (Ideal.mem_sup_right
-      (Ideal.subset_span ⟨j, rfl⟩))), map_zero]
-
+    rw [hzZ,
+      Ideal.Quotient.eq_zero_iff_mem.mpr (hJm (Ideal.mem_sup_right (Ideal.subset_span ⟨j, rfl⟩))),
+      map_zero]
 
 omit [Fintype K] [∀ k, Fintype (ι k)] in
-theorem aeval_mem_of_forall [CharZero Ω] (V : Subring Ω) (hQ : ∀ r : ℚ, algebraMap ℚ Ω r ∈ V)
-    (y' : (Σ k, ι k) → Ω) (hy : ∀ p, y' p ∈ V) (b : MvPolynomial (Σ k, ι k) ℚ) : aeval y' b ∈ V := by
+theorem aeval_mem_of_forall
+    [CharZero Ω]
+    (V : Subring Ω) (hQ : ∀ r : ℚ, algebraMap ℚ Ω r ∈ V)
+    (y' : (Σ k, ι k) → Ω) (hy : ∀ p, y' p ∈ V)
+    (b : MvPolynomial (Σ k, ι k) ℚ)
+    : aeval y' b ∈ V := by
   induction b using MvPolynomial.induction_on with
   | C a => simpa using hQ a
   | add p q hp hq => rw [map_add (f := _)]; exact V.add_mem hp hq
@@ -138,8 +145,8 @@ theorem proof : PullSectionIntegral.Statement := by
   have hmax : ∀ k, ∃ c : ι k, ∀ i, V.valuation (y ⟨k, i⟩) ≤ V.valuation (y ⟨k, c⟩) := by
     intro k
     obtain ⟨i0, -⟩ := hrel k
-    obtain ⟨c, -, hc⟩ := Finset.exists_max_image Finset.univ (fun i => V.valuation (y ⟨k, i⟩))
-      ⟨i0, Finset.mem_univ _⟩
+    obtain ⟨c, -, hc⟩ :=
+      Finset.exists_max_image Finset.univ (fun i => V.valuation (y ⟨k, i⟩)) ⟨i0, Finset.mem_univ _⟩
     exact ⟨c, fun i => hc i (Finset.mem_univ _)⟩
   choose c hc using hmax
   have hc0 : ∀ k, y ⟨k, c k⟩ ≠ 0 := by
@@ -165,7 +172,8 @@ theorem proof : PullSectionIntegral.Statement := by
   have : IsIntegrallyClosedIn V.toSubring Ω := inferInstanceAs (IsIntegrallyClosedIn V Ω)
   have hxV : s * ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * ((q * e k : ℕ) : ℤ))) ∈ V.toSubring :=
     (Subring.integralClosure_le_iff (R := chartRingZ y c) (T := V.toSubring)).mpr
-      (fun r => hchart r.2) (hs c hc0)
+      (fun r => hchart r.2)
+      (hs c hc0)
   have hprod : ∏ k, y ⟨k, c k⟩ ^ (-((τ : ℤ) * ((q * e k : ℕ) : ℤ))) = (M ^ (q * τ))⁻¹ := by
     rw [← Finset.prod_pow, ← Finset.prod_inv_distrib]
     refine Finset.prod_congr rfl fun k _ => ?_
@@ -176,8 +184,12 @@ theorem proof : PullSectionIntegral.Statement := by
   set t : K → Ω := fun k => (y ⟨k, c k⟩)⁻¹
   have hP' : ∀ f ∈ mCoordIdeal y, aeval (fun p => t p.1 * y p) f = 0 := fun f hf =>
     aeval_scale_eq_zero t hf
-  obtain ⟨b, hb⟩ := exists_sum_eq_one (mCoordIdeal y) (fun p => t p.1 * y p) c
-    (fun k => inv_mul_cancel₀ (hc0 k)) hP' L hzero
+  obtain ⟨b, hb⟩ :=
+    exists_sum_eq_one (mCoordIdeal y)
+      (fun p => t p.1 * y p)
+      c
+      (fun k => inv_mul_cancel₀ (hc0 k))
+      hP' L hzero
   have hLt : ∀ i, aeval (fun p => t p.1 * y p) (L i) = M⁻¹ * aeval y (L i) := by
     intro i
     rw [aeval_scale_of_isMultiHomog y t (hL i)]
@@ -185,8 +197,9 @@ theorem proof : PullSectionIntegral.Statement := by
   have hratio' : ∀ p : Σ k, ι k, t p.1 * y p ∈ V := fun p => by
     simpa [t, div_eq_inv_mul] using hratio p
   have hMV : M / aeval y (L j) ∈ V := by
-    have hsum : M / aeval y (L j) =
-        ∑ i, aeval (fun p => t p.1 * y p) (b i) * (aeval y (L i) / aeval y (L j)) := by
+    have hsum
+        : M / aeval y (L j)
+          = ∑ i, aeval (fun p => t p.1 * y p) (b i) * (aeval y (L i) / aeval y (L j)) := by
       have := congrArg (fun w => w * (M / aeval y (L j))) hb
       simp only [one_mul, Finset.sum_mul, hLt] at this
       rw [← this]

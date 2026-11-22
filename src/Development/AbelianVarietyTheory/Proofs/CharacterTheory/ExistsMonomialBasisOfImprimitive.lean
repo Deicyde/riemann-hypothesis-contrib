@@ -10,15 +10,16 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-theorem exists_monomial_basis_of_imprimitive (k : Type) [Field k] (G : Type) [Group G] [Finite G]
-    (V : Type) [AddCommGroup V] [Module k V] [FiniteDimensional k V] (ρ : Representation k G V)
-    (T : Subgroup G) (W : Submodule k V)
-    (hind : iSupIndep (fun q : G ⧸ T => W.map (ρ q.out)))
-    (hsup : ⨆ q : G ⧸ T, W.map (ρ q.out) = ⊤)
-    (hW : ∃ (n : ℕ) (b : Module.Basis (Fin n) k W), ∀ t ∈ T, ∀ i : Fin n,
-      ∃ (j : Fin n) (c : k), ρ t (b i : V) = c • (b j : V)) :
-    ∃ (n : ℕ) (b : Module.Basis (Fin n) k V), ∀ (g : G) (i : Fin n),
-      ∃ (j : Fin n) (c : k), ρ g (b i) = c • b j := by
+theorem exists_monomial_basis_of_imprimitive
+    (k : Type) [Field k]
+    (G : Type) [Group G] [Finite G]
+    (V : Type) [AddCommGroup V] [Module k V] [FiniteDimensional k V]
+    (ρ : Representation k G V) (T : Subgroup G) (W : Submodule k V)
+    (hind : iSupIndep (fun q : G ⧸ T => W.map (ρ q.out))) (hsup : ⨆ q : G ⧸ T, W.map (ρ q.out) = ⊤)
+    (hW : ∃ (n : ℕ) (b : Module.Basis (Fin n) k W), ∀ t ∈ T, ∀ i : Fin n, ∃ (j : Fin n) (c : k),
+      ρ t (b i : V) = c • (b j : V))
+    : ∃ (n : ℕ) (b : Module.Basis (Fin n) k V), ∀ (g : G) (i : Fin n), ∃ (j : Fin n) (c : k),
+      ρ g (b i) = c • b j := by
   classical
   obtain ⟨n, b, hb⟩ := hW
   have hinj : ∀ g : G, Function.Injective (ρ g) := by

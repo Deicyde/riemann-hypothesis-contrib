@@ -13,15 +13,19 @@ open scoped InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.GodementCoeff
 
-variable {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [LocallyCompactSpace Γ]
-  [SecondCountableTopology Γ] [MeasurableSpace Γ] [BorelSpace Γ] (ν : Measure Γ) [ν.IsHaarMeasure]
-  [ν.IsMulRightInvariant] {B : Type} [NormedAddCommGroup B] [InnerProductSpace ℂ B] [CompleteSpace B]
+variable
+  {Γ : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [LocallyCompactSpace Γ]
+  [SecondCountableTopology Γ] [MeasurableSpace Γ] [BorelSpace Γ]
+  (ν : Measure Γ) [ν.IsHaarMeasure] [ν.IsMulRightInvariant]
+  {B : Type} [NormedAddCommGroup B] [InnerProductSpace ℂ B] [CompleteSpace B]
 
-private theorem integrableOn_and_setIntegral_sq_le_of_isU (ρ : Γ → (B →L[ℂ] B)) (hρ : IsU ρ) (v : B)
-    (hm : Integrable (fun g => ⟪v, ρ g v⟫_ℂ) ν) (b : B) {s : Set Γ} (hs : MeasurableSet s)
-    (hs' : ν s ≠ ⊤) :
-    IntegrableOn (fun g => ‖⟪b, ρ g v⟫_ℂ‖ ^ 2) s ν ∧
-      ∫ g in s, ‖⟪b, ρ g v⟫_ℂ‖ ^ 2 ∂ν ≤ (∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2 := by
+private theorem integrableOn_and_setIntegral_sq_le_of_isU
+    (ρ : Γ → (B →L[ℂ] B)) (hρ : IsU ρ)
+    (v : B) (hm : Integrable (fun g => ⟪v, ρ g v⟫_ℂ) ν)
+    (b : B)
+    {s : Set Γ} (hs : MeasurableSet s) (hs' : ν s ≠ ⊤)
+    : IntegrableOn (fun g => ‖⟪b, ρ g v⟫_ℂ‖ ^ 2) s ν
+      ∧ ∫ g in s, ‖⟪b, ρ g v⟫_ℂ‖ ^ 2 ∂ν ≤ (∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2 := by
   have hcont : Continuous fun g => ⟪b, ρ g v⟫_ℂ := continuous_const.inner (hρ.cont v)
   have hbd : ∀ g, ‖⟪b, ρ g v⟫_ℂ‖ ≤ ‖b‖ * ‖v‖ := fun g =>
     (norm_inner_le_norm _ _).trans (by rw [hρ.norm])
@@ -33,8 +37,9 @@ private theorem integrableOn_and_setIntegral_sq_le_of_isU (ρ : Γ → (B →L[�
   set f : Γ → ℂ := s.indicator (fun g => starRingEnd ℂ ⟪b, ρ g v⟫_ℂ) with hfdef
   have hfm : Measurable f := ((Complex.continuous_conj.comp hcont).measurable).indicator hs
   have hfi : Integrable f ν := by
-    refine (integrable_indicator_iff hs).mpr (Measure.integrableOn_of_bounded (M := ‖b‖ * ‖v‖) hs'
-      (Complex.continuous_conj.comp hcont).aestronglyMeasurable (ae_of_all _ fun g => ?_))
+    refine (integrable_indicator_iff hs).mpr
+      (Measure.integrableOn_of_bounded (M := ‖b‖ * ‖v‖) hs'
+        (Complex.continuous_conj.comp hcont).aestronglyMeasurable (ae_of_all _ fun g => ?_))
     rw [Complex.norm_conj]
     exact hbd g
   have hfeq : (fun g => ‖f g‖ ^ 2) = s.indicator (fun g => ‖⟪b, ρ g v⟫_ℂ‖ ^ 2) := by
@@ -43,7 +48,8 @@ private theorem integrableOn_and_setIntegral_sq_le_of_isU (ρ : Γ → (B →L[�
   have hf2 : Integrable (fun g => ‖f g‖ ^ 2) ν := by
     rw [hfeq]
     exact (integrable_indicator_iff hs).mpr hc2
-  have hG := GlobalTheory.CompanionTheory.Godement.norm_sq_integral_smul_le ν ρ hρ v hm f hfm hfi hf2
+  have hG :=
+    GlobalTheory.CompanionTheory.Godement.norm_sq_integral_smul_le ν ρ hρ v hm f hfm hfi hf2
   rw [hfeq, integral_indicator hs] at hG
   have hint : Integrable (fun g => f g • ρ g v) ν :=
     hfi.smul_of_top_left (memLp_top_of_bound (hρ.cont v).aestronglyMeasurable ‖v‖
@@ -72,22 +78,27 @@ private theorem integrableOn_and_setIntegral_sq_le_of_isU (ρ : Γ → (B →L[�
   · rw [← h0]
     positivity
   · have h2 : I * I ≤ I * ((∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2) := by
-      calc I * I ≤ (‖b‖ * ‖w‖) * (‖b‖ * ‖w‖) := mul_self_le_mul_self hI0 h1
+      calc
+        I * I
+          ≤ (‖b‖ * ‖w‖) * (‖b‖ * ‖w‖) := mul_self_le_mul_self hI0 h1
         _ = ‖b‖ ^ 2 * ‖w‖ ^ 2 := by ring
         _ ≤ ‖b‖ ^ 2 * (I * ∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) := by gcongr
         _ = I * ((∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2) := by ring
     exact le_of_mul_le_mul_left h2 hpos
 
-theorem sq_integrable_and_bound (ρ : Γ → (B →L[ℂ] B)) (hρ : IsU ρ) (v : B)
-    (hm : Integrable (fun g => ⟪v, ρ g v⟫_ℂ) ν) (b : B) :
-    Integrable (fun g => ‖⟪b, ρ g v⟫_ℂ‖ ^ 2) ν ∧
-      ∫ g, ‖⟪b, ρ g v⟫_ℂ‖ ^ 2 ∂ν ≤ (∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2 := by
+theorem sq_integrable_and_bound
+    (ρ : Γ → (B →L[ℂ] B)) (hρ : IsU ρ) (v : B) (hm : Integrable (fun g => ⟪v, ρ g v⟫_ℂ) ν) (b : B)
+    : Integrable (fun g => ‖⟪b, ρ g v⟫_ℂ‖ ^ 2) ν
+      ∧ ∫ g, ‖⟪b, ρ g v⟫_ℂ‖ ^ 2 ∂ν ≤ (∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2 := by
   have hK : 0 ≤ (∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2 :=
     mul_nonneg (integral_nonneg fun _ => norm_nonneg _) (sq_nonneg _)
   have hcont : Continuous fun g => ‖⟪b, ρ g v⟫_ℂ‖ ^ 2 :=
     (continuous_const.inner (hρ.cont v)).norm.pow 2
-  have key : ∀ s, MeasurableSet s → ν s ≠ ⊤ → ∫⁻ g in s, ‖‖⟪b, ρ g v⟫_ℂ‖ ^ 2‖ₑ ∂ν ≤
-      ENNReal.ofReal ((∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2) := by
+  have key
+      : ∀ s,
+        MeasurableSet s → ν s ≠ ⊤
+          → ∫⁻ g in s, ‖‖⟪b, ρ g v⟫_ℂ‖ ^ 2‖ₑ ∂ν
+            ≤ ENNReal.ofReal ((∫ g, ‖⟪v, ρ g v⟫_ℂ‖ ∂ν) * ‖b‖ ^ 2) := by
     intro s hs hs'
     obtain ⟨hi, hle⟩ := integrableOn_and_setIntegral_sq_le_of_isU ν ρ hρ v hm b hs hs'
     rw [← ofReal_integral_norm_eq_lintegral_enorm hi]

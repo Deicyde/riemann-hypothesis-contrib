@@ -11,7 +11,8 @@ set_option maxSynthPendingDepth 1
 
 namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 Filter Topology MeasureTheory
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I2 Filter Topology MeasureTheory
 
 noncomputable section
 
@@ -19,25 +20,29 @@ namespace ConstantShift
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem sheetDensity_add_const (P : Ideal (MRing ι)) {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
+theorem sheetDensity_add_const
+    (P : Ideal (MRing ι))
+    {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
     (h : ∀ j, ∃ c : ℝ, ∀ z ∈ mcPts P, φ' j z = φ j z + c)
-    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)) (g : ((Σ k, ι k) → ℂ) → ℝ)
-    (y : Fin e → ℂ) (w : ((k : K) → ι k) → ℂ) :
-    sheetDensity P Ψ φ' g y w = sheetDensity P Ψ φ g y w := by
+    (Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ))
+    (g : ((Σ k, ι k) → ℂ) → ℝ) (y : Fin e → ℂ) (w : ((k : K) → ι k) → ℂ)
+    : sheetDensity P Ψ φ' g y w = sheetDensity P Ψ φ g y w := by
   unfold sheetDensity
   split_ifs with hγ
   · congr 1
-    have hH : ∀ k, cxHessian (fun y' => φ' k (hγ.choose y')) y =
-        cxHessian (fun y' => φ k (hγ.choose y')) y := by
+    have hH
+        : ∀ k,
+          cxHessian (fun y' => φ' k (hγ.choose y')) y
+            = cxHessian (fun y' => φ k (hγ.choose y')) y := by
       intro k
       obtain ⟨c, hc⟩ := h k
       have h1 : (fun y' => φ' k (hγ.choose y')) =ᶠ[𝓝 y] fun y' => φ k (hγ.choose y') + c := by
         filter_upwards [hγ.choose_spec.2] with y' hy'
         exact hc _ hy'.2.1
-      have h2 : fderiv ℝ (fun y' => φ' k (hγ.choose y')) =ᶠ[𝓝 y]
-          fderiv ℝ (fun y' => φ k (hγ.choose y')) := by
+      have h2
+          : fderiv ℝ (fun y' => φ' k (hγ.choose y')) =ᶠ[𝓝 y]
+            fderiv ℝ (fun y' => φ k (hγ.choose y')) := by
         filter_upwards [h1.eventuallyEq_nhds] with x hx
         rw [hx.fderiv_eq, fderiv_add_const]
       unfold cxHessian
@@ -45,21 +50,23 @@ theorem sheetDensity_add_const (P : Ideal (MRing ι)) {e : ℕ} {φ φ' : Fin e 
     simp only [maDensity, hH]
   · rfl
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem ptsIntegral_add_const (P : Ideal (MRing ι)) {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
-    (h : ∀ j, ∃ c : ℝ, ∀ z ∈ mcPts P, φ' j z = φ j z + c) (g : ((Σ k, ι k) → ℂ) → ℝ) :
-    ptsIntegral P φ' g = ptsIntegral P φ g := by
+theorem ptsIntegral_add_const
+    (P : Ideal (MRing ι))
+    {e : ℕ} {φ φ' : Fin e → ((Σ k, ι k) → ℂ) → ℝ}
+    (h : ∀ j, ∃ c : ℝ, ∀ z ∈ mcPts P, φ' j z = φ j z + c)
+    (g : ((Σ k, ι k) → ℂ) → ℝ)
+    : ptsIntegral P φ' g = ptsIntegral P φ g := by
   unfold ptsIntegral
   split_ifs
   · simp only [ptsIntegralAt, sheetDensity_add_const P h]
   · rfl
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem ptsIntegral_const (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (r : ℝ) :
-    ptsIntegral P φ (fun _ => r) = r * ptsIntegral P φ (fun _ => 1) := by
-  have hs : ∀ Ψ y w, sheetDensity P Ψ φ (fun _ => r) y w = r * sheetDensity P Ψ φ (fun _ => 1) y w := by
+theorem ptsIntegral_const (P : Ideal (MRing ι)) {e : ℕ} (φ : Fin e → ((Σ k, ι k) → ℂ) → ℝ) (r : ℝ)
+    : ptsIntegral P φ (fun _ => r) = r * ptsIntegral P φ (fun _ => 1) := by
+  have hs
+      : ∀ Ψ y w, sheetDensity P Ψ φ (fun _ => r) y w = r * sheetDensity P Ψ φ (fun _ => 1) y w := by
     intro Ψ y w
     unfold sheetDensity
     split_ifs <;> simp
@@ -103,8 +110,10 @@ theorem proof : ConstantShift.Statement := by
     have hM : Fin.init (L (n + 1) ∘ σ) = M := by
       funext i
       have hv : ((σ (Fin.castSucc i) : Fin (D + 1)) : ℕ) ≠ n := fun h' => hne i (Fin.ext h')
-      have hiff : ((σ (Fin.castSucc i) : Fin (D + 1)) : ℕ) < n + 1 ↔
-          ((σ (Fin.castSucc i) : Fin (D + 1)) : ℕ) < n := by omega
+      have hiff
+          : ((σ (Fin.castSucc i) : Fin (D + 1)) : ℕ) < n + 1
+            ↔ ((σ (Fin.castSucc i) : Fin (D + 1)) : ℕ) < n := by
+        omega
       simp only [hMdef, Fin.init, Function.comp, L, hiff]
     have e0 : L n ∘ σ = Fin.snoc M A := by
       have h0 := Fin.snoc_init_self (q := L n ∘ σ)
@@ -119,15 +128,16 @@ theorem proof : ConstantShift.Statement := by
       rw [hl, hM] at h0
       exact h0.symm
     have hMs : ∀ i, IsSmoothHerm (M i) := fun i => hLs n _
-    have hmc : I P (D + 1) (Fin.snoc M (HermLine.constShift A η)) =
-        I P (D + 1) (Fin.snoc M A) - ptsIntegral P (pot M) (fun _ => η) :=
+    have hmc
+        : I P (D + 1) (Fin.snoc M (HermLine.constShift A η))
+          = I P (D + 1) (Fin.snoc M A) - ptsIntegral P (pot M) (fun _ => η) :=
       metricChange K ι I hI P D M A (fun _ => η) (fun _ _ _ => rfl) hP hMs hA contDiffOn_const
     have hint : ptsIntegral P (pot M) (fun _ => η) = η * g := by
       rw [ptsIntegral_const, hg, geomDeg]
       congr 1
       exact ptsIntegral_add_const P (fun i => hLpot n _) _
-    rw [← hI.1 P (D + 1) (L (n + 1)) σ hP (hLs (n + 1)), ← hI.1 P (D + 1) (L n) σ hP (hLs n), e0, e1,
-      hmc, hint]
+    rw [← hI.1 P (D + 1) (L (n + 1)) σ hP (hLs (n + 1)), ← hI.1 P (D + 1) (L n) σ hP (hLs n), e0,
+      e1, hmc, hint]
   have hall : ∀ n, n ≤ D + 1 → I P (D + 1) (L n) = I P (D + 1) (L 0) - n * η * g := by
     intro n
     induction n with

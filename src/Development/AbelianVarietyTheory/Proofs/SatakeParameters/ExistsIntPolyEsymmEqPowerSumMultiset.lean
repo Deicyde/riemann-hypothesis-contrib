@@ -10,11 +10,16 @@ open GlobalTheory.Cong
 namespace GlobalTheory.PowerSumPoly
 open MvPolynomial
 
-theorem exists_intPoly_psum_eq : ∀ a n : ℕ, 1 ≤ n → ∃ P : MvPolynomial (Fin (a + 1)) ℤ, ∀ s : Multiset ℂ,
-    Multiset.card s = a → MvPolynomial.aeval (fun j : Fin (a + 1) => s.esymm j) P = (s.map (· ^ n)).sum := by
+theorem exists_intPoly_psum_eq
+    : ∀ a n : ℕ,
+      1 ≤ n
+        → ∃ P : MvPolynomial (Fin (a + 1)) ℤ, ∀ s : Multiset ℂ,
+          Multiset.card s = a
+            → MvPolynomial.aeval (fun j : Fin (a + 1) => s.esymm j) P = (s.map (· ^ n)).sum := by
   intro a n _
-  obtain ⟨Q, hQ⟩ := esymmAlgHom_surjective ℤ (σ := Fin a) (n := a) (by simp)
-    ⟨psum (Fin a) ℤ n, psum_isSymmetric (Fin a) ℤ n⟩
+  obtain ⟨Q, hQ⟩ :=
+    esymmAlgHom_surjective ℤ (σ := Fin a) (n := a) (by simp)
+      ⟨psum (Fin a) ℤ n, psum_isSymmetric (Fin a) ℤ n⟩
   have hQ' : aeval (fun i : Fin a => esymm (Fin a) ℤ (i + 1)) Q = psum (Fin a) ℤ n := by
     rw [← esymmAlgHom_apply, hQ]
   refine ⟨rename Fin.succ Q, fun s hs => ?_⟩
@@ -26,12 +31,15 @@ theorem exists_intPoly_psum_eq : ∀ a n : ℕ, 1 ≤ n → ∃ P : MvPolynomial
     apply List.ext_getElem (by simp [hs])
     intro i h1 h2
     simp [f]
-  have key : aeval f (aeval (fun i : Fin a => esymm (Fin a) ℤ (i + 1)) Q) =
-      aeval (fun i : Fin a => aeval f (esymm (Fin a) ℤ (i + 1))) Q := by
+  have key
+      : aeval f (aeval (fun i : Fin a => esymm (Fin a) ℤ (i + 1)) Q)
+        = aeval (fun i : Fin a => aeval f (esymm (Fin a) ℤ (i + 1))) Q := by
     rw [← AlgHom.comp_apply, MvPolynomial.comp_aeval]
   rw [hQ'] at key
   rw [aeval_rename]
-  have lhs : (fun j : Fin (a + 1) => s.esymm j) ∘ Fin.succ = fun i : Fin a => aeval f (esymm (Fin a) ℤ (i + 1)) := by
+  have lhs
+      : (fun j : Fin (a + 1) => s.esymm j) ∘ Fin.succ
+        = fun i : Fin a => aeval f (esymm (Fin a) ℤ (i + 1)) := by
     funext i
     simp [aeval_esymm_eq_multiset_esymm, hsf]
   rw [lhs, ← key]

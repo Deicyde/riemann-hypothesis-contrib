@@ -10,14 +10,14 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.CuspGL
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.CuspGL.ipGL_charpoly_eq_finsum_mass (F : Type) [Field F] [Finite F]
-    (V : Type) [AddCommGroup V] [Module F V]
-    [FiniteDimensional F V] (φ : Module.End F V → ℂ) (s : F[X] → ℂ) :
-    _root_.GlobalTheory.CuspGL.ipGL φ (fun g => s (LinearMap.charpoly g)) =
-      ∑ᶠ P ∈ {P : F[X] | P.Monic ∧ P.natDegree = Module.finrank F V ∧ P.coeff 0 ≠ 0},
-        _root_.GlobalTheory.CuspGL.mass φ P * star (s P) := by
+theorem _root_.GlobalTheory.CuspGL.ipGL_charpoly_eq_finsum_mass
+    (F : Type) [Field F] [Finite F]
+    (V : Type) [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (φ : Module.End F V → ℂ) (s : F[X] → ℂ)
+    : _root_.GlobalTheory.CuspGL.ipGL φ (fun g => s (LinearMap.charpoly g))
+      = ∑ᶠ P ∈ {P : F[X] | P.Monic ∧ P.natDegree = Module.finrank F V ∧ P.coeff 0 ≠ 0},
+          _root_.GlobalTheory.CuspGL.mass φ P * star (s P) := by
   classical
   haveI : Finite V := Module.finite_of_finite F
   haveI : Finite (Module.End F V) :=
@@ -30,19 +30,20 @@ theorem _root_.GlobalTheory.CuspGL.ipGL_charpoly_eq_finsum_mass (F : Type) [Fiel
       true_and]
     rw [LinearMap.isUnit_iff_isUnit_det, LinearMap.det_eq_sign_charpoly_coeff, isUnit_iff_ne_zero]
     simp
-  have hset : {g : Module.End F V | IsUnit g} =
-      ⋃ P ∈ I, {g : Module.End F V | LinearMap.charpoly g = P} := by
+  have hset
+      : {g : Module.End F V | IsUnit g}
+        = ⋃ P ∈ I, {g : Module.End F V | LinearMap.charpoly g = P} := by
     ext g
-    simp only [Set.mem_setOf_eq, Set.mem_iUnion, hI, Set.mem_inter_iff, Set.mem_range,
-      exists_prop]
+    simp only [Set.mem_setOf_eq, Set.mem_iUnion, hI, Set.mem_inter_iff, Set.mem_range, exists_prop]
     rw [hunit]
     constructor
     · intro h
       exact ⟨_, ⟨h, g, rfl⟩, rfl⟩
     · rintro ⟨P, ⟨hP, _⟩, rfl⟩
       exact hP
-  have hsupp : S ∩ Function.support (fun P => _root_.GlobalTheory.CuspGL.mass φ P * star (s P)) =
-      I ∩ Function.support (fun P => _root_.GlobalTheory.CuspGL.mass φ P * star (s P)) := by
+  have hsupp
+      : S ∩ Function.support (fun P => _root_.GlobalTheory.CuspGL.mass φ P * star (s P))
+        = I ∩ Function.support (fun P => _root_.GlobalTheory.CuspGL.mass φ P * star (s P)) := by
     ext P
     simp only [hI, Set.mem_inter_iff, Function.mem_support]
     constructor
@@ -60,8 +61,9 @@ theorem _root_.GlobalTheory.CuspGL.ipGL_charpoly_eq_finsum_mass (F : Type) [Fiel
       exact ⟨hPS, hne⟩
   rw [finsum_mem_inter_support_eq _ S I hsupp]
   unfold _root_.GlobalTheory.CuspGL.ipGL _root_.GlobalTheory.CuspGL.mass
-  rw [hset, finsum_mem_biUnion ?_ ((Set.finite_range _).subset Set.inter_subset_right)
-    (fun _ _ => Set.toFinite _)]
+  rw [hset,
+    finsum_mem_biUnion ?_ ((Set.finite_range _).subset Set.inter_subset_right)
+      (fun _ _ => Set.toFinite _)]
   · refine finsum_mem_congr rfl fun P _ => ?_
     rw [finsum_mem_eq_finite_toFinset_sum _ (Set.toFinite _),
       finsum_mem_eq_finite_toFinset_sum _ (Set.toFinite _), Finset.sum_mul]

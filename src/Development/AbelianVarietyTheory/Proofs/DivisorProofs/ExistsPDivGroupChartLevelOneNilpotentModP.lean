@@ -4,13 +4,16 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.EqZeroOfFora
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 namespace GlobalTheory.AugNil
 
-theorem aeval_mem_span {A R : Type} [CommRing A] [CommRing R] [Algebra R A] {d : ℕ}
-    (x : Fin d → A) (P : MvPolynomial (Fin d) R) (h0 : MvPolynomial.constantCoeff P = 0) :
-    MvPolynomial.aeval x P ∈ Ideal.span (Set.range x) := by
+theorem aeval_mem_span
+    {A R : Type} [CommRing A] [CommRing R] [Algebra R A]
+    {d : ℕ} (x : Fin d → A) (P : MvPolynomial (Fin d) R) (h0 : MvPolynomial.constantCoeff P = 0)
+    : MvPolynomial.aeval x P ∈ Ideal.span (Set.range x) := by
   classical
   rw [MvPolynomial.aeval_def, MvPolynomial.eval₂_eq]
   refine Ideal.sum_mem _ fun m hm => ?_
@@ -28,9 +31,12 @@ theorem aeval_mem_span {A R : Type} [CommRing A] [CommRing R] [Algebra R A] {d :
   rw [hc]
   exact Ideal.mul_mem_right _ _ (Ideal.subset_span ⟨i, rfl⟩)
 
-theorem dvd_pow_of_mem_span {A : Type} [CommRing A] {d : ℕ} (x : Fin d → A) (p : A) (N₀ : ℕ)
-    (hx : ∀ i, p ∣ x i ^ N₀) (a : A) (ha : a ∈ Ideal.span (Set.range x)) :
-    p ∣ a ^ (d * N₀ + 1) := by
+theorem dvd_pow_of_mem_span
+    {A : Type} [CommRing A]
+    {d : ℕ} (x : Fin d → A)
+    (p : A) (N₀ : ℕ) (hx : ∀ i, p ∣ x i ^ N₀)
+    (a : A) (ha : a ∈ Ideal.span (Set.range x))
+    : p ∣ a ^ (d * N₀ + 1) := by
   obtain ⟨r, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun A).1 ha
   have h := Ideal.sum_pow_mem_span_pow Finset.univ (fun i => r i • x i) N₀
   rw [Finset.card_univ, Fintype.card_fin] at h
@@ -41,9 +47,10 @@ theorem dvd_pow_of_mem_span {A : Type} [CommRing A] {d : ℕ} (x : Fin d → A) 
   simp only [smul_eq_mul, mul_pow]
   exact Dvd.dvd.mul_left ((hx i).trans (pow_dvd_pow _ (Nat.le_succ _))) _
 
-theorem aug_nil : ∀ (p : ℕ) (O : Type) [CommRing O] (G : PDivGroup p O) (d : ℕ)
-    (c : QLog.Chart G d), ∃ N : ℕ, ∀ f : MvPowerSeries (Fin d) O, constantCoeff f = 0 →
-      (p : G.A 1) ∣ c.ev 1 f ^ N := by
+theorem aug_nil
+    : ∀ (p : ℕ) (O : Type) [CommRing O] (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d), ∃ N : ℕ,
+      ∀ f : MvPowerSeries (Fin d) O,
+        constantCoeff f = 0 → (p : G.A 1) ∣ c.ev 1 f ^ N := by
   intro p O _ G d c
   classical
   choose Ni hNi using c.nil 1

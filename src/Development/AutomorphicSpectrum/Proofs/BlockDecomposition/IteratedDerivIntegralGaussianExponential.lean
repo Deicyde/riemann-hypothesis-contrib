@@ -30,8 +30,8 @@ lemma integrable_gauss (m n : ℕ) :
   simp only [← Real.exp_sum, Finset.mul_sum]
 
 noncomputable def dilated (m n : ℕ) (X : Fin n → ℝ) (v : Fin m → Fin n → ℂ) (z : ℂ) : ℂ :=
-  Complex.exp ((m : ℂ) * z * ∑ j, (X j : ℂ)) *
-    Complex.exp (-(2 * Real.pi : ℂ) * ∑ a, ∑ j, Complex.exp (2 * z * X j) * ((‖v a j‖ ^ 2 : ℝ) : ℂ))
+  Complex.exp ((m : ℂ) * z * ∑ j, (X j : ℂ)) * Complex.exp
+    (-(2 * Real.pi : ℂ) * ∑ a, ∑ j, Complex.exp (2 * z * X j) * ((‖v a j‖ ^ 2 : ℝ) : ℂ))
 
 lemma differentiable_dilated (m n : ℕ) (X : Fin n → ℝ) (v : Fin m → Fin n → ℂ) :
     Differentiable ℂ (dilated m n X v) := by

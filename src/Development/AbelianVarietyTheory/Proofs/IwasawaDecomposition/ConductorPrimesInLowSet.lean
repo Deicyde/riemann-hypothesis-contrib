@@ -6,19 +6,37 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 
-theorem GlobalTheory.LamTie.cond0_primes_lowAll : ∀ (D : D7) (Z : GlobalTheory.LamTie.LamDat D), Z.Ok → Z.q0 = AbsolutelyIrreducibleSpan.q0 D → ∀ P : HeightOneSpectrum (𝓞 D.host.E), (GlobalTheory.ToricDenom.below P).asIdeal ∣ GlobalTheory.LamTie.cond0 D.host Z.w0 → ∃ p ∈ lowAll D, P ∈ placesOver D.host.E p := by
+theorem GlobalTheory.LamTie.cond0_primes_lowAll
+    : ∀ (D : D7) (Z : GlobalTheory.LamTie.LamDat D),
+      Z.Ok → Z.q0 = AbsolutelyIrreducibleSpan.q0 D
+        → ∀ P : HeightOneSpectrum (𝓞 D.host.E),
+          (GlobalTheory.ToricDenom.below P).asIdeal ∣ GlobalTheory.LamTie.cond0 D.host Z.w0
+            → ∃ p ∈ lowAll D, P ∈ placesOver D.host.E p := by
   intro D Z hZ hq P hP
-  have hPr : Prime (GlobalTheory.ToricDenom.below P).asIdeal := (GlobalTheory.ToricDenom.below P).prime
+  have hPr : Prime (GlobalTheory.ToricDenom.below P).asIdeal :=
+    (GlobalTheory.ToricDenom.below P).prime
 
-  have key : ∀ n : ℕ, ((n : GlobalTheory.CMVal.OF D.host.E) ∈ (GlobalTheory.ToricDenom.below P).asIdeal) →
-      ((n : 𝓞 D.host.E) ∈ P.asIdeal) := by
+  have key
+      : ∀ n : ℕ,
+        ((n : GlobalTheory.CMVal.OF D.host.E) ∈ (GlobalTheory.ToricDenom.below P).asIdeal)
+          → ((n : 𝓞 D.host.E) ∈ P.asIdeal) := by
     intro n hn
-    have h1 : algebraMap (GlobalTheory.CMVal.OF D.host.E) (𝓞 D.host.E) (n : GlobalTheory.CMVal.OF D.host.E) ∈ P.asIdeal := hn
+    have h1
+        : algebraMap (GlobalTheory.CMVal.OF D.host.E) (𝓞 D.host.E)
+            (n : GlobalTheory.CMVal.OF D.host.E)
+          ∈ P.asIdeal :=
+      hn
     simpa using h1
-  have key' : ∀ n : ℕ, ((n : 𝓞 D.host.E) ∈ P.asIdeal) →
-      ((n : GlobalTheory.CMVal.OF D.host.E) ∈ (GlobalTheory.ToricDenom.below P).asIdeal) := by
+  have key'
+      : ∀ n : ℕ,
+        ((n : 𝓞 D.host.E) ∈ P.asIdeal)
+          → ((n : GlobalTheory.CMVal.OF D.host.E) ∈ (GlobalTheory.ToricDenom.below P).asIdeal) := by
     intro n hn
     show algebraMap (GlobalTheory.CMVal.OF D.host.E) (𝓞 D.host.E) (n : GlobalTheory.CMVal.OF D.host.E) ∈ P.asIdeal
     simpa using hn
@@ -36,12 +54,19 @@ theorem GlobalTheory.LamTie.cond0_primes_lowAll : ∀ (D : D7) (Z : GlobalTheory
         · exact ⟨D.host.g 1, by simp [GlobalTheory.HeightCounting.lowAll], h6⟩
       · exact ⟨D.host.pde, by simp [GlobalTheory.HeightCounting.lowAll], h5⟩
     · exact ⟨D.host.pde', by simp [GlobalTheory.HeightCounting.lowAll], h4⟩
-  · have hle : (GlobalTheory.ToricDenom.below Z.w0).asIdeal ≤ (GlobalTheory.ToricDenom.below P).asIdeal :=
+  · have hle
+        : (GlobalTheory.ToricDenom.below Z.w0).asIdeal
+          ≤ (GlobalTheory.ToricDenom.below P).asIdeal :=
       Ideal.le_of_dvd h
-    have heq : (GlobalTheory.ToricDenom.below Z.w0).asIdeal = (GlobalTheory.ToricDenom.below P).asIdeal :=
-      ((GlobalTheory.ToricDenom.below Z.w0).isMaximal).eq_of_le (GlobalTheory.ToricDenom.below P).isPrime.ne_top hle
+    have heq
+        : (GlobalTheory.ToricDenom.below Z.w0).asIdeal
+          = (GlobalTheory.ToricDenom.below P).asIdeal :=
+      ((GlobalTheory.ToricDenom.below Z.w0).isMaximal).eq_of_le
+        (GlobalTheory.ToricDenom.below P).isPrime.ne_top hle
     have hw : ((Z.q0 : ℕ) : 𝓞 D.host.E) ∈ Z.w0.asIdeal := hZ.places.referencePlaceOverPrime
-    have hb : ((Z.q0 : ℕ) : GlobalTheory.CMVal.OF D.host.E) ∈ (GlobalTheory.ToricDenom.below Z.w0).asIdeal := by
+    have hb
+        : ((Z.q0 : ℕ) : GlobalTheory.CMVal.OF D.host.E)
+          ∈ (GlobalTheory.ToricDenom.below Z.w0).asIdeal := by
       show algebraMap (GlobalTheory.CMVal.OF D.host.E) (𝓞 D.host.E) ((Z.q0 : ℕ) : GlobalTheory.CMVal.OF D.host.E) ∈ Z.w0.asIdeal
       simpa using hw
     rw [heq] at hb

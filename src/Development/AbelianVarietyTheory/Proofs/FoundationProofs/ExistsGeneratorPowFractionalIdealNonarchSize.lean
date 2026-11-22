@@ -6,15 +6,21 @@ public import Formalism.PairingDivisors.StatementH
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory
 
-theorem nonarch_le_pow_of_mem_ideal_pow {K : Type} [Field K] [NumberField K] (J : Ideal (𝓞 K))
+theorem nonarch_le_pow_of_mem_ideal_pow
+    {K : Type} [Field K] [NumberField K]
+    (J : Ideal (𝓞 K))
     (v : K →*₀ ℝ) (h0 : ∀ x, 0 ≤ v x) (hadd : ∀ x y, v (x + y) ≤ max (v x) (v y))
-    (hint : ∀ c : 𝓞 K, v (c : K) ≤ 1) (M : ℝ) (hM0 : 0 ≤ M)
-    (hM : ∀ y ∈ J, v (y : K) ≤ M) (k : ℕ) : ∀ y ∈ J ^ k, v (y : K) ≤ M ^ k := by
+    (hint : ∀ c : 𝓞 K, v (c : K) ≤ 1)
+    (M : ℝ) (hM0 : 0 ≤ M) (hM : ∀ y ∈ J, v (y : K) ≤ M)
+    (k : ℕ)
+    : ∀ y ∈ J ^ k, v (y : K) ≤ M ^ k := by
   induction k with
   | zero => intro y _; simpa using hint y
   | succ k ih =>
@@ -30,23 +36,33 @@ theorem nonarch_le_pow_of_mem_ideal_pow {K : Type} [Field K] [NumberField K] (J 
       rw [this]
       exact (hadd _ _).trans (max_le ha hb)
 
-theorem exists_generator_pow_fractional_size : ∀ (K : Type) [Field K] [NumberField K] (I : Submodule (𝓞 K) K), I ≠ ⊥ → (∃ n : ℕ, 0 < n ∧ ∀ x ∈ I, (n : K) * x ∈ (algebraMap (𝓞 K) K).range) → ∃ (h : ℕ) (α : K), 0 < h ∧ α ≠ 0 ∧ ∀ v : K →*₀ ℝ, (∀ x, 0 ≤ v x) → (∀ x y, v (x + y) ≤ max (v x) (v y)) → (∀ c : 𝓞 K, v (c : K) ≤ 1) → ∀ x₀ ∈ I, (∀ x ∈ I, v x ≤ v x₀) → v α = v x₀ ^ h := by
+theorem exists_generator_pow_fractional_size
+    : ∀ (K : Type) [Field K] [NumberField K] (I : Submodule (𝓞 K) K),
+      I ≠ ⊥ → (∃ n : ℕ, 0 < n ∧ ∀ x ∈ I, (n : K) * x ∈ (algebraMap (𝓞 K) K).range)
+        → ∃ (h : ℕ) (α : K),
+          0 < h ∧ α ≠ 0
+            ∧ ∀ v : K →*₀ ℝ,
+              (∀ x, 0 ≤ v x) → (∀ x y, v (x + y) ≤ max (v x) (v y)) → (∀ c : 𝓞 K, v (c : K) ≤ 1)
+                → ∀ x₀ ∈ I, (∀ x ∈ I, v x ≤ v x₀) → v α = v x₀ ^ h := by
   intro K _ _ I hI ⟨n, hn, hnI⟩
   have hnK : (n : K) ≠ 0 := Nat.cast_ne_zero.mpr hn.ne'
-  let J : Ideal (𝓞 K) :=
-    { carrier := {c | ∃ x ∈ I, (c : K) = (n : K) * x}
-      zero_mem' := ⟨0, I.zero_mem, by simp⟩
-      add_mem' := by
-        rintro a b ⟨x, hx, ha⟩ ⟨y, hy, hb⟩
-        refine ⟨x + y, I.add_mem hx hy, ?_⟩
-        have : ((a + b : 𝓞 K) : K) = (a : K) + (b : K) := by simp
-        rw [this, ha, hb]; ring
-      smul_mem' := by
-        rintro c a ⟨x, hx, ha⟩
-        refine ⟨c • x, I.smul_mem c hx, ?_⟩
-        have : ((c • a : 𝓞 K) : K) = (c : K) * (a : K) := by simp
-        have h2 : c • x = (c : K) * x := Algebra.smul_def c x
-        rw [this, ha, h2]; ring }
+  let J : Ideal (𝓞 K) := {
+    carrier := {c | ∃ x ∈ I, (c : K) = (n : K) * x}
+    zero_mem' := ⟨0, I.zero_mem, by simp⟩
+    add_mem' := by
+      rintro a b ⟨x, hx, ha⟩ ⟨y, hy, hb⟩
+      refine ⟨x + y, I.add_mem hx hy, ?_⟩
+      have : ((a + b : 𝓞 K) : K) = (a : K) + (b : K) := by simp
+      rw [this, ha, hb]
+      ring
+    smul_mem' := by
+      rintro c a ⟨x, hx, ha⟩
+      refine ⟨c • x, I.smul_mem c hx, ?_⟩
+      have : ((c • a : 𝓞 K) : K) = (c : K) * (a : K) := by simp
+      have h2 : c • x = (c : K) * x := Algebra.smul_def c x
+      rw [this, ha, h2]
+      ring
+  }
   have hmem : ∀ x ∈ I, ∃ c ∈ J, (c : K) = (n : K) * x := by
     intro x hx
     obtain ⟨c, hc⟩ := hnI x hx
@@ -70,7 +86,8 @@ theorem exists_generator_pow_fractional_size : ∀ (K : Type) [Field K] [NumberF
   have ha0 : a ≠ 0 := by
     intro h0
     apply pow_ne_zero h hJ
-    rw [ha, h0]; simp
+    rw [ha, h0]
+    simp
   have haK : (a : K) ≠ 0 := by simpa using ha0
   refine ⟨h, (a : K) / (n : K) ^ h, hpos, div_ne_zero haK (pow_ne_zero _ hnK), ?_⟩
   intro v h0 hadd hint x₀ hx₀ hmax

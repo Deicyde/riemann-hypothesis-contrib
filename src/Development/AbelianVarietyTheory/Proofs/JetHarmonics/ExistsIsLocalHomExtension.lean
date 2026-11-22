@@ -6,13 +6,14 @@ public import Mathlib
 
 namespace GlobalTheory.LocalHomExtension
 
-theorem exists_isLocalHom_extension {A B O C : Type} [CommRing A] [IsDomain A] [IsLocalRing A]
-    [CommRing B] [IsDomain B] [IsLocalRing B] [CommRing O] [IsLocalRing O] [Field C]
-    [IsAlgClosed C] [Algebra O C] (v : Valuation C NNReal) (hv : Valuation.Integers v O)
+theorem exists_isLocalHom_extension
+    {A B O C : Type} [CommRing A] [IsDomain A] [IsLocalRing A] [CommRing B] [IsDomain B]
+    [IsLocalRing B] [CommRing O] [IsLocalRing O] [Field C] [IsAlgClosed C] [Algebra O C]
+    (v : Valuation C NNReal) (hv : Valuation.Integers v O)
     (φ : A →+* B) (hφ : Function.Injective φ) (hint : φ.IsIntegral)
     (ι : A →+* O) [IsLocalHom ι]
-    (hι : Function.Injective ((algebraMap O C).comp ι)) :
-    ∃ ι' : B →+* O, IsLocalHom ι' ∧ ι'.comp φ = ι := by
+    (hι : Function.Injective ((algebraMap O C).comp ι))
+    : ∃ ι' : B →+* O, IsLocalHom ι' ∧ ι'.comp φ = ι := by
   let : Algebra A B := φ.toAlgebra
   let : Algebra A O := ι.toAlgebra
   let : Algebra A C := ((algebraMap O C).comp ι).toAlgebra
@@ -23,8 +24,7 @@ theorem exists_isLocalHom_extension {A B O C : Type} [CommRing A] [IsDomain A] [
 
   let f : B →ₐ[A] C := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
 
   have hO : ∀ b : B, ∃ o : O, algebraMap O C o = f b := fun b => by
@@ -32,12 +32,13 @@ theorem exists_isLocalHom_extension {A B O C : Type} [CommRing A] [IsDomain A] [
     exact hv.exists_of_le_one (hv.mem_of_integral h1.tower_top)
   choose g hg using hO
   have inj := hv.hom_inj
-  let ι' : B →+* O :=
-    { toFun := g
-      map_one' := inj (by rw [hg, map_one, map_one])
-      map_mul' := fun x y => inj (by rw [hg, map_mul, map_mul, hg, hg])
-      map_zero' := inj (by rw [hg, map_zero, map_zero])
-      map_add' := fun x y => inj (by rw [hg, map_add (f := _), map_add (f := _), hg, hg]) }
+  let ι' : B →+* O := {
+    toFun := g
+    map_one' := inj (by rw [hg, map_one, map_one])
+    map_mul' := fun x y => inj (by rw [hg, map_mul, map_mul, hg, hg])
+    map_zero' := inj (by rw [hg, map_zero, map_zero])
+    map_add' := fun x y => inj (by rw [hg, map_add (f := _), map_add (f := _), hg, hg])
+  }
   have hcomp : ι'.comp φ = ι := by
     ext a
     apply inj
@@ -51,8 +52,9 @@ theorem exists_isLocalHom_extension {A B O C : Type} [CommRing A] [IsDomain A] [
   have hp : (((IsLocalRing.maximalIdeal O).comap ι').comap (algebraMap A B)).IsMaximal := by
     rw [Ideal.comap_comap, show ι'.comp (algebraMap A B) = ι from hcomp, hA]
     exact IsLocalRing.maximalIdeal.isMaximal A
-  have hpm := Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap A B)
-    (show (algebraMap A B).IsIntegral from hint) ((IsLocalRing.maximalIdeal O).comap ι') hp
+  have hpm :=
+    Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap A B)
+      (show (algebraMap A B).IsIntegral from hint) ((IsLocalRing.maximalIdeal O).comap ι') hp
   exact ((IsLocalRing.local_hom_tfae ι').out 1 5).mpr (IsLocalRing.eq_maximalIdeal hpm)
 
 end GlobalTheory.LocalHomExtension

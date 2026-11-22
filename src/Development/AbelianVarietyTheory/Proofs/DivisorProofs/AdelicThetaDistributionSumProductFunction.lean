@@ -6,12 +6,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsNatMul
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped Matrix TensorProduct
 
 namespace GlobalTheory.ThetaBox
 
-theorem thetaSum_boxFun : ∀ (F : Type) [Field F] [NumberField F] (κ κ' : Type) [Fintype κ] [Fintype κ'], ∀ φ₁ ∈ schA F κ, ∀ φ₂ ∈ schA F κ', thetaSum F (boxFun φ₁ φ₂) = thetaSum F φ₁ * thetaSum F φ₂ := by
+theorem thetaSum_boxFun
+    : ∀ (F : Type) [Field F] [NumberField F] (κ κ' : Type) [Fintype κ] [Fintype κ'],
+      ∀ φ₁ ∈ schA F κ, ∀ φ₂ ∈ schA F κ',
+        thetaSum F (boxFun φ₁ φ₂) = thetaSum F φ₁ * thetaSum F φ₂ := by
   intro F _ _ κ κ' _ _ φ₁ h₁ φ₂ h₂
   have s₁ := (thetaSum_summable_linear F κ).2.1 φ₁ h₁
   have s₂ := (thetaSum_summable_linear F κ').2.1 φ₂ h₂

@@ -24,21 +24,23 @@ noncomputable abbrev coindOne : Rep k G := Rep.of (coindOneRep k G X)
 instance : Subsingleton (⊥ : Subgroup G) :=
   ⟨fun a b => Subtype.ext <| by rw [Subgroup.mem_bot.1 a.2, Subgroup.mem_bot.1 b.2]⟩
 
-noncomputable def coindOneIsoCoind :
-    coindOne k G X ≅ coind (⊥ : Subgroup G).subtype (Rep.trivial k (⊥ : Subgroup G) X) :=
+noncomputable def coindOneIsoCoind
+    : coindOne k G X ≅ coind (⊥ : Subgroup G).subtype (Rep.trivial k (⊥ : Subgroup G) X) :=
   Rep.mkIso <| Representation.Equiv.mk
-    { toFun := fun F => ⟨F, fun g h => by rw [Subsingleton.elim g 1]; simp⟩
+    {
+      toFun := fun F => ⟨F, fun g h => by rw [Subsingleton.elim g 1]; simp⟩
       invFun := Subtype.val
       map_add' := fun _ _ => rfl
       map_smul' := fun _ _ => rfl
       left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+      right_inv := fun _ => rfl
+    }
     (fun _ => LinearMap.ext fun _ => Subtype.ext rfl)
 
 theorem isZero_coindOne (n : ℕ) : Limits.IsZero (groupCohomology (coindOne k G X) (n + 1)) :=
   (isZero_groupCohomology_succ_of_subsingleton (Rep.trivial k (⊥ : Subgroup G) X) n).of_iso
-    ((groupCohomology.functor k G (n + 1)).mapIso (coindOneIsoCoind k G X) ≪≫
-      groupCohomology.coindIso _ (n + 1))
+    ((groupCohomology.functor k G (n + 1)).mapIso (coindOneIsoCoind k G X)
+      ≪≫ groupCohomology.coindIso _ (n + 1))
 
 variable {G} (S : Subgroup G)
 
@@ -58,52 +60,63 @@ lemma cosetPart_out_mul (c : G ⧸ S) (s : S) : cosetPart S (c.out * s) = s := b
   apply Subtype.ext
   simp [cosetPart]
 
-noncomputable def resCoindOneIso :
-    res S.subtype (coindOne k G X) ≅ coindOne k S (G ⧸ S → X) :=
+noncomputable def resCoindOneIso : res S.subtype (coindOne k G X) ≅ coindOne k S (G ⧸ S → X) :=
   Rep.mkIso <| Representation.Equiv.mk
-    { toFun := fun F s c => F (c.out * s)
+    {
+      toFun := fun F s c => F (c.out * s)
       invFun := fun F x => F (cosetPart S x) x
       map_add' := fun _ _ => rfl
       map_smul' := fun _ _ => rfl
-      left_inv := fun F => funext fun x => by
-        simp only
-        rw [out_mul_cosetPart]
-      right_inv := fun F => funext fun s => funext fun c => by
-        simp only
-        rw [cosetPart_out_mul, mk_out_mul] }
-    (fun t => LinearMap.ext fun F => funext fun s => funext fun c => by
-      change F ((c.out * s) * t) = F (c.out * ((s * t : S) : G))
-      simp [mul_assoc])
+      left_inv := fun F =>
+        funext fun x => by
+          simp only
+          rw [out_mul_cosetPart]
+      right_inv := fun F =>
+        funext fun s =>
+          funext fun c => by
+            simp only
+            rw [cosetPart_out_mul, mk_out_mul]
+    }
+    (fun t =>
+      LinearMap.ext fun F =>
+        funext fun s =>
+          funext fun c => by
+            change F ((c.out * s) * t) = F (c.out * ((s * t : S) : G))
+            simp [mul_assoc])
 
-noncomputable def quotientToInvariantsCoindOneIso [S.Normal] :
-    (coindOne k G X).quotientToInvariants S ≅ coindOne k (G ⧸ S) X :=
+noncomputable def quotientToInvariantsCoindOneIso [S.Normal]
+    : (coindOne k G X).quotientToInvariants S ≅ coindOne k (G ⧸ S) X :=
   Rep.mkIso <| Representation.Equiv.mk
-    { toFun := fun F c => Quotient.liftOn' c F.1 fun x y hxy => by
-        have h := congrFun (F.2 ⟨x⁻¹ * y, QuotientGroup.leftRel_apply.1 hxy⟩) x
-        change F.1 (x * (x⁻¹ * y)) = F.1 x at h
-        simpa using h.symm
-      invFun := fun F => ⟨fun x => F x, fun s => funext fun x => by
-        change F (↑(x * (s : G)) : G ⧸ S) = F (x : G ⧸ S)
-        exact congrArg F (QuotientGroup.eq.2 (by simp))⟩
-      map_add' := fun F F' => funext fun c => by
-        induction c using QuotientGroup.induction_on; rfl
-      map_smul' := fun r F => funext fun c => by
-        induction c using QuotientGroup.induction_on; rfl
+    {
+      toFun := fun F c =>
+        Quotient.liftOn' c F.1 fun x y hxy => by
+          have h := congrFun (F.2 ⟨x⁻¹ * y, QuotientGroup.leftRel_apply.1 hxy⟩) x
+          change F.1 (x * (x⁻¹ * y)) = F.1 x at h
+          simpa using h.symm
+      invFun := fun F => ⟨
+        fun x => F x,
+        fun s =>
+          funext fun x => by
+            change F (↑(x * (s : G)) : G ⧸ S) = F (x : G ⧸ S)
+            exact congrArg F (QuotientGroup.eq.2 (by simp))
+      ⟩
+      map_add' := fun F F' => funext fun c => by induction c using QuotientGroup.induction_on; rfl
+      map_smul' := fun r F => funext fun c => by induction c using QuotientGroup.induction_on; rfl
       left_inv := fun F => Subtype.ext rfl
-      right_inv := fun F => funext fun c => by
-        induction c using QuotientGroup.induction_on; rfl }
+      right_inv := fun F => funext fun c => by induction c using QuotientGroup.induction_on; rfl
+    }
     (fun g => by
       induction g using QuotientGroup.induction_on
-      exact LinearMap.ext fun F => funext fun c => by
-        induction c using QuotientGroup.induction_on; rfl)
+      exact LinearMap.ext fun F =>
+        funext fun c => by induction c using QuotientGroup.induction_on; rfl)
 
-theorem isZero_res_coindOne (n : ℕ) :
-    Limits.IsZero (groupCohomology (res S.subtype (coindOne k G X)) (n + 1)) :=
+theorem isZero_res_coindOne (n : ℕ)
+    : Limits.IsZero (groupCohomology (res S.subtype (coindOne k G X)) (n + 1)) :=
   (isZero_coindOne k S (G ⧸ S → X) n).of_iso
     ((groupCohomology.functor k S (n + 1)).mapIso (resCoindOneIso k X S))
 
-theorem isZero_quotientToInvariants_coindOne [S.Normal] (n : ℕ) :
-    Limits.IsZero (groupCohomology ((coindOne k G X).quotientToInvariants S) (n + 1)) :=
+theorem isZero_quotientToInvariants_coindOne [S.Normal] (n : ℕ)
+    : Limits.IsZero (groupCohomology ((coindOne k G X).quotientToInvariants S) (n + 1)) :=
   (isZero_coindOne k (G ⧸ S) X n).of_iso
     ((groupCohomology.functor k (G ⧸ S) (n + 1)).mapIso (quotientToInvariantsCoindOneIso k X S))
 

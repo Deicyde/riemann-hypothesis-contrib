@@ -10,19 +10,25 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Hecke
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField GlobalTheory.ExportSeries
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain
+  NumberField GlobalTheory.ExportSeries
 open Formalism.IndefR.Links
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BaseLiftWeight
 
-theorem c_eq {D : D7} {T0 : Type} {L : LevCh D T0} {μ0 : T0} {j : Fin D.R.m} {B : Base (Vc D j) (Wc D j)}
-    (hL : L.Is μ0) (hB : B.Good) (hmu : B.mu0 = L.mu0 ((j : ℕ) + 1)) (τ : D.what₂.Tau) :
-    B.w.c τ = GlobalTheory.ConjTwist.liftC D j τ := by
+theorem c_eq
+    {D : D7} {T0 : Type} {L : LevCh D T0} {μ0 : T0} {j : Fin D.R.m} {B : Base (Vc D j) (Wc D j)}
+    (hL : L.Is μ0) (hB : B.Good) (hmu : B.mu0 = L.mu0 ((j : ℕ) + 1)) (τ : D.what₂.Tau)
+    : B.w.c τ = GlobalTheory.ConjTwist.liftC D j τ := by
   have h1 := hB.inf τ
   rw [hmu] at h1
-  have h2 := GlobalTheory.Mem.HeckeExp.hasInfExp_unique h1 (GlobalTheory.ConjRefChar.reference_lift_character_exponent_neg_base hL j τ)
+  have h2 :=
+    GlobalTheory.Mem.HeckeExp.hasInfExp_unique h1
+      (GlobalTheory.ConjRefChar.reference_lift_character_exponent_neg_base hL j τ)
   have hs := hB.sig τ
   have hp : B.w.p τ = ((Wc D j).sig (tauE D τ)).1 := congrArg Prod.fst hs
   have hq : B.w.q τ = ((Wc D j).sig (tauE D τ)).2 := congrArg Prod.snd hs
@@ -30,11 +36,19 @@ theorem c_eq {D : D7} {T0 : Type} {L : LevCh D T0} {μ0 : T0} {j : Fin D.R.m} {B
   rw [hp, hq] at h2
   have h4 : (B.w.c τ : ℚ) = (GlobalTheory.ConjTwist.liftC D j τ : ℚ) := by
     rw [h3]
-    simp only [GlobalTheory.IndefiniteRowSideFullHecke.InfinityTypes.pS, GlobalTheory.IndefiniteRowSideFullHecke.InfinityTypes.qS] at *
+    simp only [GlobalTheory.IndefiniteRowSideFullHecke.InfinityTypes.pS,
+        GlobalTheory.IndefiniteRowSideFullHecke.InfinityTypes.qS]
+      at *
     linarith
   exact_mod_cast h4
 
-theorem lam_eq : ∀ (D : D7) (T0 : Type) (L : LevCh D T0) (μ0 : T0) (j : Fin D.R.m) (B : Base (Vc D j) (Wc D j)), L.Is μ0 → B.Good → B.mu0 = L.mu0 ((j : ℕ) + 1) → (∀ τ, B.w.ap τ = aPl D j ((Wc D j).sig (tauE D τ)).1 τ) → (∀ τ, B.w.am τ = aMi D j ((Wc D j).sig (tauE D τ)).1 ((Wc D j).sig (tauE D τ)).2 τ) → B.w.lam = FWT.lamV D j := by
+theorem lam_eq
+    : ∀ (D : D7) (T0 : Type) (L : LevCh D T0) (μ0 : T0) (j : Fin D.R.m)
+        (B : Base (Vc D j) (Wc D j)),
+      L.Is μ0 → B.Good → B.mu0 = L.mu0 ((j : ℕ) + 1)
+        → (∀ τ, B.w.ap τ = aPl D j ((Wc D j).sig (tauE D τ)).1 τ)
+        → (∀ τ, B.w.am τ = aMi D j ((Wc D j).sig (tauE D τ)).1 ((Wc D j).sig (tauE D τ)).2 τ)
+        → B.w.lam = FWT.lamV D j := by
   intro D T0 L μ0 j B hL hB hmu hap ham
   funext τ
   have hs := hB.sig τ

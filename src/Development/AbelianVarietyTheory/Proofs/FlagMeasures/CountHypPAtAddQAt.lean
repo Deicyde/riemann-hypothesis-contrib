@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Statements.CuspFrameWeights.Convo
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ContDiff
 
 namespace GlobalTheory.Dec
@@ -24,12 +25,24 @@ theorem countHyp_card_places (I : AutInst) : Fintype.card (InfinitePlace I.F) = 
   exact (IsTotallyReal.finrank I.F).symm
 
 theorem countHyp_pAt_add_qAt (I : AutInst) (v : InfinitePlace I.F) : I.pAt v + I.qAt v = I.n := by
-  have h := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin I.n)))
-    (fun a => I.ε v a = true)
+  have h :=
+    Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin I.n)))
+      (fun a => I.ε v a = true)
   simp only [Bool.not_eq_true, Finset.card_univ, Fintype.card_fin] at h
   exact h
 
-theorem countHyp_numerics : ∀ (B : RowsAut) (Cg : ℝ) (n₀ : ℕ) (d : InfinitePlace B.I.F → ℝ) (p q : ℕ) (b : ℝ), 8 ≤ n₀ → CountHyp B Cg n₀ d p q b → 0 ≤ Cg ∧ 1 ≤ B.I.rd ∧ 1 ≤ B.I.f ∧ Fintype.card (InfinitePlace B.I.F) = B.I.f ∧ p + q = B.I.n ∧ 2 * q + 2 ≤ B.I.n ∧ (∀ v, rkR (B.I.ε v) = q) ∧ min p q = q ∧ 0 < (∏ v, d v) ∧ 16 ≤ bigX B b ∧ 0 < tauStar B q b ∧ (1 ≤ q → tauStar B q b < 1 / 2 ∧ (B.I.n : ℝ) ^ 19 ≤ b ^ 2) ∧ ∃ h : ℝ, h = 8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd) ∧ GapGe B h ∧ HBig B 40 h ∧ HBig B 32 h ∧ 8 * (B.I.n : ℝ) * q < h ∧ 120 * (B.I.n : ℝ) * (q : ℝ) ^ ((3 : ℝ) / 2) ≤ h ∧ 40 * (B.I.n : ℝ) ^ 2 * Real.sqrt q ≤ h := by
+theorem countHyp_numerics
+    : ∀ (B : RowsAut) (Cg : ℝ) (n₀ : ℕ) (d : InfinitePlace B.I.F → ℝ) (p q : ℕ) (b : ℝ),
+      8 ≤ n₀ → CountHyp B Cg n₀ d p q b
+        → 0 ≤ Cg ∧ 1 ≤ B.I.rd ∧ 1 ≤ B.I.f ∧ Fintype.card (InfinitePlace B.I.F) = B.I.f
+          ∧ p + q = B.I.n ∧ 2 * q + 2 ≤ B.I.n ∧ (∀ v, rkR (B.I.ε v) = q) ∧ min p q = q
+          ∧ 0 < (∏ v, d v) ∧ 16 ≤ bigX B b ∧ 0 < tauStar B q b
+          ∧ (1 ≤ q → tauStar B q b < 1 / 2 ∧ (B.I.n : ℝ) ^ 19 ≤ b ^ 2)
+          ∧ ∃ h : ℝ,
+            h = 8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd)
+              ∧ GapGe B h ∧ HBig B 40 h ∧ HBig B 32 h ∧ 8 * (B.I.n : ℝ) * q < h
+              ∧ 120 * (B.I.n : ℝ) * (q : ℝ) ^ ((3 : ℝ) / 2) ≤ h
+              ∧ 40 * (B.I.n : ℝ) ^ 2 * Real.sqrt q ≤ h := by
   intro B Cg n₀ d p q b hn₀ hC
   unfold CountHyp at hC
   obtain ⟨hDS, hSig, hn, hq2, -, -, hb, -, hlam, hg1, hgC, -, -, -, hgap⟩ := hC
@@ -79,14 +92,17 @@ theorem countHyp_numerics : ∀ (B : RowsAut) (Cg : ℝ) (n₀ : ℕ) (d : Infin
   have hP1 : 2 ≤ (Cg + 4) * Real.log (b * B.I.rd) := by nlinarith
   have hP : 2 ≤ (Cg + 4) * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd) := by
     have : (Cg + 4) * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd)
-        = ((Cg + 4) * Real.log (b * B.I.rd)) * (B.I.f : ℝ) ^ 5 := by ring
+        = ((Cg + 4) * Real.log (b * B.I.rd)) * (B.I.f : ℝ) ^ 5 := by
+      ring
     rw [this]
     nlinarith
   have hN : 0 ≤ (B.I.n : ℝ) ^ 19 := by positivity
-  have hbig : 10 ^ 15 * (B.I.n : ℝ) ^ 19 ≤
-      8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd) := by
+  have hbig
+      : 10 ^ 15 * (B.I.n : ℝ) ^ 19
+        ≤ 8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd) := by
     have : 8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd)
-        = 8 * 10 ^ 14 * (B.I.n : ℝ) ^ 19 * ((Cg + 4) * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd)) := by
+        = 8 * 10 ^ 14 * (B.I.n : ℝ) ^ 19
+          * ((Cg + 4) * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd)) := by
       ring
     rw [this]
     nlinarith
@@ -96,15 +112,39 @@ theorem countHyp_numerics : ∀ (B : RowsAut) (Cg : ℝ) (n₀ : ℕ) (d : Infin
   have hqn : (q : ℝ) ≤ B.I.n := by exact_mod_cast (show q ≤ B.I.n by omega)
   have hq0 : (0 : ℝ) ≤ q := by positivity
   have hsq : Real.sqrt q ≤ B.I.n := by
-    calc Real.sqrt q ≤ Real.sqrt ((B.I.n : ℝ) ^ 2) := Real.sqrt_le_sqrt (by nlinarith)
+    calc
+      Real.sqrt q
+        ≤ Real.sqrt ((B.I.n : ℝ) ^ 2) := Real.sqrt_le_sqrt (by nlinarith)
       _ = B.I.n := Real.sqrt_sq (by positivity)
-  have hs40 : 40 * (B.I.n : ℝ) ^ 2 * Real.sqrt q ≤
-      8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd) := by
+  have hs40
+      : 40 * (B.I.n : ℝ) ^ 2 * Real.sqrt q
+        ≤ 8 * 10 ^ 14 * (Cg + 4) * (B.I.n : ℝ) ^ 19 * (B.I.f : ℝ) ^ 5 * Real.log (b * B.I.rd) := by
     have e1 : 40 * (B.I.n : ℝ) ^ 2 * Real.sqrt q ≤ 40 * (B.I.n : ℝ) ^ 2 * B.I.n :=
       mul_le_mul_of_nonneg_left hsq (by positivity)
     have e2 : 40 * (B.I.n : ℝ) ^ 2 * B.I.n = 40 * (B.I.n : ℝ) ^ 3 := by ring
     linarith
-  refine ⟨hCg, hrd, hf, hcard, hpq, h2q, hrk, hmin, hd, hX, htpos, ?_, _, rfl, hgap, ?_, ?_, ?_, ?_, hs40⟩
+  refine ⟨
+    hCg,
+    hrd,
+    hf,
+    hcard,
+    hpq,
+    h2q,
+    hrk,
+    hmin,
+    hd,
+    hX,
+    htpos,
+    ?_,
+    _,
+    rfl,
+    hgap,
+    ?_,
+    ?_,
+    ?_,
+    ?_,
+    hs40
+  ⟩
   · intro hq1
     constructor
     · show (bigX B b)⁻¹ ^ (11 * q) < 1 / 2

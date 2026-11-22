@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.CTSmallCone
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 
 noncomputable section
 
@@ -43,7 +45,8 @@ def convSub (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V 
     simp only [map_smul, smul_eq_mul]
     exact Integrable.const_mul hv c
 
-def avg0 (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V →ₗ[ℂ] V) : convSub μ L₁ T →ₗ[ℂ] ℂ where
+def avg0 (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V →ₗ[ℂ] V)
+    : convSub μ L₁ T →ₗ[ℂ] ℂ where
   toFun v := letI : MeasurableSpace Y := borel Y; ∫ y, L₁ (T y (v : V)) ∂μ
   map_add' v w := by
     letI : MeasurableSpace Y := borel Y
@@ -59,27 +62,56 @@ def avg0 (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V →
 def avgForm (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V →ₗ[ℂ] V) : V →ₗ[ℂ] ℂ :=
   (LinearMap.exists_extend (avg0 μ L₁ T)).choose
 
-theorem avgForm_apply (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V →ₗ[ℂ] V) {v : V}
-    (hv : Conv μ L₁ T v) :
-    avgForm μ L₁ T v = (letI : MeasurableSpace Y := borel Y; ∫ y, L₁ (T y v) ∂μ) :=
+theorem avgForm_apply
+    (μ : @Measure Y (borel Y)) (L₁ : V →ₗ[ℂ] ℂ) (T : Y → V →ₗ[ℂ] V) {v : V} (hv : Conv μ L₁ T v)
+    : avgForm μ L₁ T v = (letI : MeasurableSpace Y := borel Y; ∫ y, L₁ (T y v) ∂μ) :=
   LinearMap.congr_fun (LinearMap.exists_extend (avg0 μ L₁ T)).choose_spec ⟨v, hv⟩
 
-def schrL {R : Type} [CommRing R] [Invertible (2 : R)] (ψ : AddChar R ℂ) {κ : Type} [Fintype κ]
-    (w : (κ → R) × (κ → R)) : Module.End ℂ ((κ → R) → ℂ) where
+def schrL
+    {R : Type} [CommRing R] [Invertible (2 : R)]
+    (ψ : AddChar R ℂ)
+    {κ : Type} [Fintype κ]
+    (w : (κ → R) × (κ → R))
+    : Module.End ℂ ((κ → R) → ℂ) where
   toFun := schr ψ w
   map_add' φ φ' := funext fun x => by simp only [schr, Pi.add_apply]; ring
-  map_smul' c φ := funext fun x => by simp only [schr, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]; ring
+  map_smul' c φ :=
+    funext fun x => by simp only [schr, Pi.smul_apply, smul_eq_mul, RingHom.id_apply]; ring
 
-def starFam {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {a b : ℕ}
-    {Bf : Matrix (Fin a) (Fin b ⊕ Fin b) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) → Matrix (Fin a) (Fin b ⊕ Fin b) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) → AF F} {κ : Type} [Fintype κ]
-    (dd : Darboux Bf κ) (ψ : AddChar (AF F) ℂ) (u : Fin a → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (y : Fin b → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) :
-    Module.End ℂ ((κ → AF F) → ℂ) :=
+def starFam
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {a b : ℕ}
+    {Bf : Matrix (Fin a) (Fin b ⊕ Fin b)
+        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+      → Matrix (Fin a) (Fin b ⊕ Fin b)
+        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+      → AF F}
+    {κ : Type} [Fintype κ]
+    (dd : Darboux Bf κ) (ψ : AddChar (AF F) ℂ)
+    (u : Fin a
+      → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (y : Fin b
+      → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    : Module.End ℂ ((κ → AF F) → ℂ) :=
   schrL ψ (dd.e (Matrix.vecMulVec u (Sum.elim y y)))
 
-theorem starFam_apply {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {a b : ℕ}
-    {Bf : Matrix (Fin a) (Fin b ⊕ Fin b) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) → Matrix (Fin a) (Fin b ⊕ Fin b) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) → AF F} {κ : Type} [Fintype κ]
-    (dd : Darboux Bf κ) (ψ : AddChar (AF F) ℂ) (u : Fin a → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (y : Fin b → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)) (φ : (κ → AF F) → ℂ) :
-    starFam dd ψ u y φ = dd.rho ψ (Matrix.vecMulVec u (Sum.elim y y)) φ := rfl
+theorem starFam_apply
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {a b : ℕ}
+    {Bf : Matrix (Fin a) (Fin b ⊕ Fin b)
+        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+      → Matrix (Fin a) (Fin b ⊕ Fin b)
+        (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+      → AF F}
+    {κ : Type} [Fintype κ]
+    (dd : Darboux Bf κ) (ψ : AddChar (AF F) ℂ)
+    (u : Fin a
+      → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (y : Fin b
+      → _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))
+    (φ : (κ → AF F) → ℂ)
+    : starFam dd ψ u y φ = dd.rho ψ (Matrix.vecMulVec u (Sum.elim y y)) φ :=
+  rfl
 
 end GlobalTheory.SiegelAvg
 

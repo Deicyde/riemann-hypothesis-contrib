@@ -6,8 +6,10 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.UnifAlong
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.SiegTh Classical
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.SiegTh Classical
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -15,14 +17,16 @@ noncomputable section
 
 namespace GlobalTheory.SiegTh
 
-theorem exists_openAt_of_levAt : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω]
-    (β : cycAway n →+* o) (S : ThetaSys o Ω) (u : Sp S.R ⟶ F.X) (Y X M : RatModel o Ω) (q : Y.Z ⟶ F.X)
-    (f : M.Z ⟶ X.Z) (Xab : X.Z.Opens) (d : Y.Z ⟶ X.Z), LevAt F β u Y q → X.IsHom M (AlgHom.id o Ω) f →
-    IsIso (f ∣_ Xab) → X.IsHom Y (AlgHom.id o Ω) d → IsOpenImmersion d → Set.range d ⊆ Xab →
-    ∃ (U : M.Z.Opens) (c : U.toScheme ⟶ F.X), OpenAt F β u M U c ∧ (U : Set M.Z) ⊆ f ⁻¹' Xab := by
+theorem exists_openAt_of_levAt
+    : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (o Ω : Type) [CommRing o] [Field Ω] [Algebra o Ω]
+        (β : cycAway n →+* o) (S : ThetaSys o Ω) (u : Sp S.R ⟶ F.X) (Y X M : RatModel o Ω)
+        (q : Y.Z ⟶ F.X) (f : M.Z ⟶ X.Z) (Xab : X.Z.Opens) (d : Y.Z ⟶ X.Z),
+      LevAt F β u Y q → X.IsHom M (AlgHom.id o Ω) f → IsIso (f ∣_ Xab) → X.IsHom Y (AlgHom.id o Ω) d
+        → IsOpenImmersion d → Set.range d ⊆ Xab
+        → ∃ (U : M.Z.Opens) (c : U.toScheme ⟶ F.X),
+          OpenAt F β u M U c ∧ (U : Set M.Z) ⊆ f ⁻¹' Xab := by
   intro g n F o Ω _ _ _ β S u Y X M q f Xab d hL hf hiso hd hdo hrange
-  have hid : spMap (RingHom.id Ω) = 𝟙 (Sp Ω) := by
-    rw [spMap, CommRingCat.ofHom_id, Spec.map_id]
+  have hid : spMap (RingHom.id Ω) = 𝟙 (Sp Ω) := by rw [spMap, CommRingCat.ofHom_id, Spec.map_id]
   have hf' : M.pt ≫ f = X.pt := by simpa [RatModel.IsHom, hid] using hf
   have hd' : Y.pt ≫ d = X.pt := by simpa [RatModel.IsHom, hid] using hd
   set U : M.Z.Opens := f ⁻¹ᵁ d.opensRange with hUdef
@@ -55,7 +59,8 @@ theorem exists_openAt_of_levAt : ∀ (g n : ℕ) (F : SFam g n (zetaAway n)) (o 
     have h1 : d (Y.pt w) = X.pt w := by rw [← hd']; rfl
     have h2 : f (M.pt w) = X.pt w := by rw [← hf']; rfl
     exact h1.trans h2.symm
-  · rw [Category.assoc, hs, ← hd.inducedModelMorphism_comp_structureMap, ← hf.inducedModelMorphism_comp_structureMap]
+  · rw [Category.assoc, hs, ← hd.inducedModelMorphism_comp_structureMap,
+      ← hf.inducedModelMorphism_comp_structureMap]
     simp only [← Category.assoc, he]
   · intro x hx
     have h : x ≫ e.hom = Y.pt := by

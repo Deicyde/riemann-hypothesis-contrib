@@ -14,9 +14,10 @@ noncomputable section
 universe u w
 
 def VeryAmpleDim.Statement : Prop :=
-  ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω) (e : ℕ)
-    (Nb : LineBundle k x) (r : ℕ) (h : Fin (r + 1) → Ω), IsSubvar x (primeOf (S := k) x) e →
-    IsVeryAmpleBy Nb.toSubSystem h → IsSubvar h (primeOf (S := k) h) e
+  ∀ (k : Type u) [Field k] (Ω : Type w) [Field Ω] [Algebra k Ω] (N : ℕ) (x : Fin (N + 1) → Ω)
+      (e : ℕ) (Nb : LineBundle k x) (r : ℕ) (h : Fin (r + 1) → Ω),
+    IsSubvar x (primeOf (S := k) x) e → IsVeryAmpleBy Nb.toSubSystem h
+      → IsSubvar h (primeOf (S := k) h) e
 
 end
 

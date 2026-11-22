@@ -8,8 +8,10 @@ open IsLocalRing TensorProduct
 
 namespace GlobalTheory.AdicCompleteFinite
 
-theorem isPrecomplete_of_finite {R M : Type} [CommRing R] (I : Ideal R) [IsPrecomplete I R]
-    [AddCommGroup M] [Module R M] [Module.Finite R M] : IsPrecomplete I M := by
+theorem isPrecomplete_of_finite
+    {R M : Type} [CommRing R]
+    (I : Ideal R) [IsPrecomplete I R] [AddCommGroup M] [Module R M] [Module.Finite R M]
+    : IsPrecomplete I M := by
   rw [← AdicCompletion.of_surjective_iff]
   intro y
   obtain ⟨x, rfl⟩ := AdicCompletion.ofTensorProduct_surjective_of_finite I M y
@@ -25,12 +27,17 @@ theorem isPrecomplete_of_finite {R M : Type} [CommRing R] (I : Ideal R) [IsPreco
     obtain ⟨b, hb⟩ := hy
     exact ⟨a + b, by rw [map_add (f := _), map_add (f := _), ha, hb]⟩
 
-theorem isPrecomplete_of_pow_le {S : Type} [CommRing S] {I J : Ideal S} (hIJ : I ≤ J) {k : ℕ}
-    (hk : J ^ k ≤ I) [h : IsPrecomplete I S] : IsPrecomplete J S := by
+theorem isPrecomplete_of_pow_le
+    {S : Type} [CommRing S]
+    {I J : Ideal S} (hIJ : I ≤ J)
+    {k : ℕ} (hk : J ^ k ≤ I)
+    [h : IsPrecomplete I S]
+    : IsPrecomplete J S := by
   have hk' : J ^ (k + 1) ≤ I := (Ideal.pow_le_pow_right (Nat.le_succ k)).trans hk
   refine ⟨fun f hf => ?_⟩
-  have hg : ∀ {m n : ℕ}, m ≤ n →
-      f ((k + 1) * m) ≡ f ((k + 1) * n) [SMOD (I ^ m • ⊤ : Submodule S S)] := by
+  have hg
+      : ∀ {m n : ℕ},
+        m ≤ n → f ((k + 1) * m) ≡ f ((k + 1) * n) [SMOD (I ^ m • ⊤ : Submodule S S)] := by
     intro m n hmn
     refine (hf (Nat.mul_le_mul_left (k + 1) hmn)).mono ?_
     refine Submodule.smul_mono_left ?_
@@ -41,13 +48,16 @@ theorem isPrecomplete_of_pow_le {S : Type} [CommRing S] {I J : Ideal S} (hIJ : I
   refine (hf (Nat.le_mul_of_pos_left n (Nat.succ_pos k))).trans ?_
   exact (hL n).mono (Submodule.smul_mono_left (Ideal.pow_right_mono hIJ n))
 
-theorem isAdicComplete_of_finite (R S : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
+theorem isAdicComplete_of_finite
+    (R S : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
     [IsAdicComplete (IsLocalRing.maximalIdeal R) R] [CommRing S] [IsLocalRing S] [Algebra R S]
-    [Module.Finite R S] : IsAdicComplete (IsLocalRing.maximalIdeal S) S := by
+    [Module.Finite R S]
+    : IsAdicComplete (IsLocalRing.maximalIdeal S) S := by
   haveI : IsNoetherianRing S := IsNoetherianRing.of_finite R S
   haveI : Algebra.IsIntegral R S := Algebra.IsIntegral.of_finite R S
   have hcomap : (maximalIdeal S).comap (algebraMap R S) = maximalIdeal R :=
-    eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _) (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal S))
+    eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap _ _)
+      (RingHom.Finite.to_isIntegral (RingHom.finite_algebraMap.mpr inferInstance)) (maximalIdeal S))
   have hle : (maximalIdeal R).map (algebraMap R S) ≤ maximalIdeal S :=
     Ideal.map_le_iff_le_comap.mpr hcomap.ge
   have hrad : maximalIdeal S ≤ ((maximalIdeal R).map (algebraMap R S)).radical := by

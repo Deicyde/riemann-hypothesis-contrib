@@ -23,8 +23,10 @@ theorem sigmaEntire : SigmaEntire := sigmaEntire_of sigmaProdLU
 theorem sigmaOdd : SigmaOdd := sigma_odd
 theorem sigmaZero : SigmaZero := sigmaZero_of sigmaSummable
 theorem sigmaLogDeriv : SigmaLogDeriv := sigmaLogDeriv_of sigmaProdLU sigmaSummable zetaSummable
-theorem sigmaQuasi : SigmaQuasi := sigmaQuasi_of zetaQuasi sigmaLogDeriv sigmaEntire sigmaOdd sigmaZero
-theorem sigmaSimple : SigmaSimple := sigmaSimple_of sigmaQuasi sigmaEntire (sigmaDerivZero_of sigmaProdLU)
+theorem sigmaQuasi : SigmaQuasi :=
+  sigmaQuasi_of zetaQuasi sigmaLogDeriv sigmaEntire sigmaOdd sigmaZero
+theorem sigmaSimple : SigmaSimple :=
+  sigmaSimple_of sigmaQuasi sigmaEntire (sigmaDerivZero_of sigmaProdLU)
 theorem etaEisenstein : EtaEisenstein := etaEisenstein_of zetaSummable zetaOdd
 theorem legendre : Legendre := legendre_of etaEisenstein
 

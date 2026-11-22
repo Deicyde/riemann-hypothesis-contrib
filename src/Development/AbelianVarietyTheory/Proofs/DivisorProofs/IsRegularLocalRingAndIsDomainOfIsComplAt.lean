@@ -9,18 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Regul
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc GlobalTheory.SiegJoin GlobalTheory.TChart
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg GlobalTheory.Poinc
+  GlobalTheory.SiegJoin GlobalTheory.TChart
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.TChart
 
-theorem isRegularLocalRing_and_isDomain_of_isComplAt :
-    ∀ (W : Type) [CommRing W] [IsRegularLocalRing W] (I : Type) [Fintype I] (R : Type) [CommRing R]
-      [IsLocalRing R] (ψ : MvPolynomial I W →+* R), IsComplAt ψ → IsLocalHom (ψ.comp MvPolynomial.C) →
-      IsRegularLocalRing R ∧ IsDomain R := by
+theorem isRegularLocalRing_and_isDomain_of_isComplAt
+    : ∀ (W : Type) [CommRing W] [IsRegularLocalRing W] (I : Type) [Fintype I] (R : Type)
+        [CommRing R] [IsLocalRing R] (ψ : MvPolynomial I W →+* R),
+      IsComplAt ψ → IsLocalHom (ψ.comp MvPolynomial.C) → IsRegularLocalRing R ∧ IsDomain R := by
   intro W _ _ I _ R _ _ ψ hψ _
   obtain ⟨hnoeth, -, hflat, hmap, -⟩ := hψ
   haveI : IsRegularRing W := GlobalTheory.isRegularRing_of_isRegularLocalRing W

@@ -5,7 +5,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.Interlace
 
 @[expose] public section
 
-open Matrix Formalism.YangianSpanCharacter.T Formalism.YangianSpanCharacter.Y Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr
+open Matrix Formalism.YangianSpanCharacter.T Formalism.YangianSpanCharacter.Y
+  Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr
 open Finset Formalism.FourierDecayAlt.I Formalism.FourierDecayAlt.P.Interlace
 
 namespace Formalism.FourierDecayAlt.P.Fr2
@@ -46,14 +47,19 @@ lemma qw_ne (q : ℂ → ℂ) (w : List (Letter ℂ S)) (Y : ℂ) (h0 : q Y ≠ 
       · intro e; apply hl.2; linear_combination -e
 end
 
-theorem frameAll (hS : StartFrame) (hM : StartModule) (hP : PlusStep) (hMi : MinusStep)
-    (hF : FrameFree) (hW : WordJoint) : FrameAll := by
+theorem frameAll
+    (hS : StartFrame) (hM : StartModule) (hP : PlusStep) (hMi : MinusStep) (hF : FrameFree)
+    (hW : WordJoint)
+    : FrameAll := by
   intro A S _ _ _ _ _ _ r L st w hL hst hA
   induction w with
   | nil => exact hS hM A S r L st hst
   | cons l w ih =>
     obtain ⟨hnd, hre, hpt, hpw⟩ := hA
-    have hnd' : l.intersection_update_fsHerm_neg_one ∉ w.map Letter.intersection_update_fsHerm_neg_one ∧ (w.map Letter.intersection_update_fsHerm_neg_one).Nodup := List.nodup_cons.mp (by simpa only [List.map_cons] using hnd)
+    have hnd'
+        : l.intersection_update_fsHerm_neg_one ∉ w.map Letter.intersection_update_fsHerm_neg_one
+          ∧ (w.map Letter.intersection_update_fsHerm_neg_one).Nodup :=
+      List.nodup_cons.mp (by simpa only [List.map_cons] using hnd)
     have hpw' := List.pairwise_cons.mp hpw
     have hAw : admitted st w :=
       ⟨hnd'.2, fun l' h => hre l' (by simp [h]), fun l' h => hpt l' (by simp [h]), hpw'.2⟩
@@ -62,35 +68,49 @@ theorem frameAll (hS : StartFrame) (hM : StartModule) (hP : PlusStep) (hMi : Min
     obtain ⟨p0, p1, pm1, q0, qm1⟩ := hpt l (by simp)
     have hd := hpw'.1
     have hq := (hW A S r L st w).2.2.1
-    have m0 : l.pt ∈ (ofWord L st w).inv := mem_inv L st w _ p0 (fun l' hl' =>
-      ⟨fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)⟩)
-    have m1 : l.pt + 1 ∈ (ofWord L st w).inv := mem_inv L st w _ p1 (fun l' hl' =>
-      ⟨fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' (-2) (by norm_num) (by push_cast; linear_combination e)⟩)
-    have mm1 : l.pt - 1 ∈ (ofWord L st w).inv := mem_inv L st w _ pm1 (fun l' hl' =>
-      ⟨fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 2 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)⟩)
+    have m0 : l.pt ∈ (ofWord L st w).inv :=
+      mem_inv L st w _ p0 (fun l' hl' => ⟨
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
+    have m1 : l.pt + 1 ∈ (ofWord L st w).inv :=
+      mem_inv L st w _ p1 (fun l' hl' => ⟨
+        fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' (-2) (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
+    have mm1 : l.pt - 1 ∈ (ofWord L st w).inv :=
+      mem_inv L st w _ pm1 (fun l' hl' => ⟨
+        fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 2 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
     by_cases hp : l.plus
-    · have e : ofWord L st (l :: w) = (ofWord L st w).plus L l.intersection_update_fsHerm_neg_one l.pt := by simp [ofWord, hp]
+    · have e
+          : ofWord L st (l :: w)
+            = (ofWord L st w).plus L l.intersection_update_fsHerm_neg_one l.pt := by
+        simp [ofWord, hp]
       rw [e]
       apply hP
       refine ⟨hL, ihw, hfree, hre l (by simp), m0, m1, ?_⟩
       rw [hq]
-      exact qw_ne _ _ _ q0 (fun l' hl' =>
-        ⟨fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
-         fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)⟩)
-    · have e : ofWord L st (l :: w) = (ofWord L st w).minus L l.intersection_update_fsHerm_neg_one l.pt := by simp [ofWord, hp]
+      exact qw_ne _ _ _ q0 (fun l' hl' => ⟨
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
+    · have e
+          : ofWord L st (l :: w)
+            = (ofWord L st w).minus L l.intersection_update_fsHerm_neg_one l.pt := by
+        simp [ofWord, hp]
       rw [e]
       apply hMi
       refine ⟨hL, ihw, hfree, hre l (by simp), m0, m1, mm1, ?_⟩
       rw [hq]
-      exact qw_ne _ _ _ qm1 (fun l' hl' =>
-        ⟨fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
-         fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)⟩)
+      exact qw_ne _ _ _ qm1 (fun l' hl' => ⟨
+        fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
 
 theorem frameAssemble : FrameAssemble := by
   intro hS hM hP hMi hF hW
@@ -102,13 +122,16 @@ theorem frameAssemble : FrameAssemble := by
   refine ⟨h.F_Fi, h.Fi_F, ?_, ?_, ?_⟩
   · have := h.form
     rw [w1] at this
-    rw [this]; simp only [FrameData.d, w4]
+    rw [this]
+    simp only [FrameData.d, w4]
   · intro Y hY
     have := h.frame_τ Y (by rw [w5]; exact hY)
-    rw [w2] at this; exact this
+    rw [w2] at this
+    exact this
   · intro Y hY hY1
     have := h.frame_l Y hY hY1
-    rw [w2] at this; exact this
+    rw [w2] at this
+    exact this
 
 section
 variable {A S : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S] {r : ℕ}
@@ -129,38 +152,48 @@ theorem admissible_rec_of_admissible_word : AdmRecOfAdm := by
   | nil => trivial
   | cons l w ih =>
     obtain ⟨hnd, hre, hpt, hpw⟩ := hA
-    have hnd' : l.intersection_update_fsHerm_neg_one ∉ w.map Letter.intersection_update_fsHerm_neg_one ∧ (w.map Letter.intersection_update_fsHerm_neg_one).Nodup :=
+    have hnd'
+        : l.intersection_update_fsHerm_neg_one ∉ w.map Letter.intersection_update_fsHerm_neg_one
+          ∧ (w.map Letter.intersection_update_fsHerm_neg_one).Nodup :=
       List.nodup_cons.mp (by simpa only [List.map_cons] using hnd)
     have hpw' := List.pairwise_cons.mp hpw
     have hAw : admitted st w :=
       ⟨hnd'.2, fun l' h => hre l' (by simp [h]), fun l' h => hpt l' (by simp [h]), hpw'.2⟩
     obtain ⟨p0, p1, pm1, q0, qm1⟩ := hpt l (by simp)
     have hd := hpw'.1
-    have m0 : l.pt ∈ (ofWord L st w).inv := mem_inv L st w _ p0 (fun l' hl' =>
-      ⟨fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)⟩)
-    have m1 : l.pt + 1 ∈ (ofWord L st w).inv := mem_inv L st w _ p1 (fun l' hl' =>
-      ⟨fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' (-2) (by norm_num) (by push_cast; linear_combination e)⟩)
-    have mm1 : l.pt - 1 ∈ (ofWord L st w).inv := mem_inv L st w _ pm1 (fun l' hl' =>
-      ⟨fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 2 (by norm_num) (by push_cast; linear_combination e),
-       fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)⟩)
+    have m0 : l.pt ∈ (ofWord L st w).inv :=
+      mem_inv L st w _ p0 (fun l' hl' => ⟨
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
+    have m1 : l.pt + 1 ∈ (ofWord L st w).inv :=
+      mem_inv L st w _ p1 (fun l' hl' => ⟨
+        fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' (-2) (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
+    have mm1 : l.pt - 1 ∈ (ofWord L st w).inv :=
+      mem_inv L st w _ pm1 (fun l' hl' => ⟨
+        fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 2 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
     refine ⟨ih hAw, hnd'.1, hre l (by simp), m0, m1, ?_⟩
     by_cases hp : l.plus
     · simp only [hp, if_true]
       rw [q_eq]
-      exact qw_ne _ _ _ q0 (fun l' hl' =>
-        ⟨fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
-         fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)⟩)
+      exact qw_ne _ _ _ q0 (fun l' hl' => ⟨
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' (-1) (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
     · simp only [hp]
       refine ⟨mm1, ?_⟩
       rw [q_eq]
-      exact qw_ne _ _ _ qm1 (fun l' hl' =>
-        ⟨fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
-         fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)⟩)
+      exact qw_ne _ _ _ qm1 (fun l' hl' => ⟨
+        fun e => hd l' hl' 1 (by norm_num) (by push_cast; linear_combination e),
+        fun e => hd l' hl' 0 (by norm_num) (by push_cast; linear_combination e)
+      ⟩)
 
 theorem frameRecAssemble : FrameRecAssemble := by
   intro h0 hm hp hn hf A S _ _ _ _ _ _ r L st w hL hs
@@ -176,7 +209,8 @@ theorem frameRecAssemble : FrameRecAssemble := by
       exact hp A S r L _ l.intersection_update_fsHerm_neg_one l.pt ⟨hL, hw, hfr, h3, h4, h5, h6⟩
     · simp only [hl] at h6
       simp only [ofWord, hl]
-      exact hn A S r L _ l.intersection_update_fsHerm_neg_one l.pt ⟨hL, hw, hfr, h3, h4, h5, h6.1, h6.2⟩
+      exact hn A S r L _ l.intersection_update_fsHerm_neg_one l.pt
+        ⟨hL, hw, hfr, h3, h4, h5, h6.1, h6.2⟩
 
 section
 variable {A S : Type} [Ring A] [StarRing A] [Algebra ℂ A] [Fintype S] [DecidableEq S]
@@ -221,7 +255,8 @@ theorem cDiag : CDiag := by
   intro A S _ _ _ _ _ _ r L st P κ x0 hx hxi w
   have km : ∀ f g : P → ℂ, κ f * κ g = κ (fun ρ => f ρ * g ρ) := fun f g => (map_mul κ f g).symm
   have kc : ∀ c : ℂ, algebraMap ℂ A c = κ (fun _ => c) := fun c => (AlgHom.commutes κ c).symm
-  have ks : ∀ (c : ℂ) (f : P → ℂ), c • κ f = κ (fun ρ => c * f ρ) := fun c f => (map_smul κ c f).symm
+  have ks : ∀ (c : ℂ) (f : P → ℂ), c • κ f = κ (fun ρ => c * f ρ) := fun c f =>
+    (map_smul κ c f).symm
   have k1 : (1 : A) = κ (fun _ => 1) := (map_one κ).symm
   induction w with
   | nil =>
@@ -241,27 +276,37 @@ theorem cDiag : CDiag := by
         · funext Y; simp [ofWord, hl, FrameData.minus, qw, ih']
     by_cases hp : l.plus
     · refine ⟨fun Y => ?_, fun Y => ?_, ?_⟩
-      · simp only [ofWord, hp, if_true, FrameData.plus, ihx, ins_sc, Matrix.diagonal_mul_diagonal, xs, phiL]
-        congr 1; funext e
+      · simp only [ofWord, hp, if_true, FrameData.plus, ihx, ins_sc, Matrix.diagonal_mul_diagonal,
+          xs, phiL]
+        congr 1
+        funext e
         split_ifs <;> simp [kc, km]
-      · simp only [ofWord, hp, if_true, FrameData.plus, ihxi, ins_sc, Matrix.diagonal_mul_diagonal, xs, phiL]
-        congr 1; funext e
+      · simp only [ofWord, hp, if_true, FrameData.plus, ihxi, ins_sc, Matrix.diagonal_mul_diagonal,
+          xs, phiL]
+        congr 1
+        funext e
         split_ifs <;> simp [kc, km, inv_div, mul_comm]
-      · simp only [ofWord, hp, if_true, FrameData.plus, ihx, ihxi, ihc, hq, ← Matrix.diagonal_smul, ins_diag,
-          Matrix.diagonal_mul_diagonal, cs]
-        congr 1; funext e
+      · simp only [ofWord, hp, if_true, FrameData.plus, ihx, ihxi, ihc, hq, ← Matrix.diagonal_smul,
+          ins_diag, Matrix.diagonal_mul_diagonal, cs]
+        congr 1
+        funext e
         split_ifs <;> simp [ks, km, div_eq_mul_inv]
     · have hp' : l.plus = false := by simpa using hp
       refine ⟨fun Y => ?_, fun Y => ?_, ?_⟩
-      · simp only [ofWord, hp', Bool.false_eq_true, if_false, FrameData.minus, ihx, ins_sc, Matrix.diagonal_mul_diagonal, xs, phiL]
-        congr 1; funext e
+      · simp only [ofWord, hp', Bool.false_eq_true, if_false, FrameData.minus, ihx, ins_sc,
+          Matrix.diagonal_mul_diagonal, xs, phiL]
+        congr 1
+        funext e
         split_ifs <;> simp [kc, km]
-      · simp only [ofWord, hp', Bool.false_eq_true, if_false, FrameData.minus, ihxi, ins_sc, Matrix.diagonal_mul_diagonal, xs, phiL]
-        congr 1; funext e
+      · simp only [ofWord, hp', Bool.false_eq_true, if_false, FrameData.minus, ihxi, ins_sc,
+          Matrix.diagonal_mul_diagonal, xs, phiL]
+        congr 1
+        funext e
         split_ifs <;> simp [kc, km, inv_div, mul_comm]
-      · simp only [ofWord, hp', Bool.false_eq_true, if_false, FrameData.minus, ihx, ihxi, ihc, hq, ← Matrix.diagonal_smul, ins_diag,
-          Matrix.diagonal_mul_diagonal, cs]
-        congr 1; funext e
+      · simp only [ofWord, hp', Bool.false_eq_true, if_false, FrameData.minus, ihx, ihxi, ihc, hq,
+          ← Matrix.diagonal_smul, ins_diag, Matrix.diagonal_mul_diagonal, cs]
+        congr 1
+        funext e
         split_ifs <;> simp [ks, km, div_eq_mul_inv]
 
 lemma pos_mul {a b : ℂ} (ha : Pos a) (hb : Pos b) : Pos (a * b) := by
@@ -349,20 +394,24 @@ theorem cPos : CPos := by
     have hl := him l (by simp)
     have d0 : ∀ l' ∈ w, l'.pt.im = 0 ∧ 1 < |(l.pt).re - l'.pt.re| := fun l' h =>
       ⟨him l' (by simp [h]), by have := hpw'.1 l' h; linarith⟩
-    have d1 : ∀ l' ∈ w, l'.pt.im = 0 ∧ 1 < |(l.pt + 1).re - l'.pt.re| := fun l' h =>
-      ⟨him l' (by simp [h]), by
+    have d1 : ∀ l' ∈ w, l'.pt.im = 0 ∧ 1 < |(l.pt + 1).re - l'.pt.re| := fun l' h => ⟨
+      him l' (by simp [h]),
+      by
         have := hpw'.1 l' h
         simp only [Complex.add_re, Complex.one_re]
         rcases lt_abs.mp this with g | g
         · exact lt_abs.mpr (Or.inl (by linarith))
-        · exact lt_abs.mpr (Or.inr (by linarith))⟩
-    have dm : ∀ l' ∈ w, l'.pt.im = 0 ∧ 1 < |(l.pt - 1).re - l'.pt.re| := fun l' h =>
-      ⟨him l' (by simp [h]), by
+        · exact lt_abs.mpr (Or.inr (by linarith))
+    ⟩
+    have dm : ∀ l' ∈ w, l'.pt.im = 0 ∧ 1 < |(l.pt - 1).re - l'.pt.re| := fun l' h => ⟨
+      him l' (by simp [h]),
+      by
         have := hpw'.1 l' h
         simp only [Complex.sub_re, Complex.one_re]
         rcases lt_abs.mp this with g | g
         · exact lt_abs.mpr (Or.inl (by linarith))
-        · exact lt_abs.mpr (Or.inr (by linarith))⟩
+        · exact lt_abs.mpr (Or.inr (by linarith))
+    ⟩
     simp only [cs]
     apply pos_mul ih'
     split_ifs
@@ -423,21 +472,34 @@ theorem cPosCut : CPosCut := by
   obtain ⟨him, hcut⟩ := hpts a ha
   obtain ⟨y, hy⟩ : ∃ y : ℝ, a.pt = (y : ℂ) := ⟨a.pt.re, by apply Complex.ext <;> simp [him]⟩
   have hcut' : OnCut u u' l y := by simpa [hy] using hcut
-  have hx : ∀ e : ℝ, e ∈ ({-1, 0, 1} : Finset ℝ) →
-      Pos ((-1 : ℂ) ^ (k - l) * ∏ i ∈ Finset.Icc 1 (k - 1), (((y + e : ℝ) : ℂ) + (ρ i : ℂ))) := by
+  have hx
+      : ∀ e : ℝ,
+        e ∈ ({-1, 0, 1} : Finset ℝ)
+          → Pos
+            ((-1 : ℂ) ^ (k - l) * ∏ i ∈ Finset.Icc 1 (k - 1), (((y + e : ℝ) : ℂ) + (ρ i : ℂ))) := by
     intro e he
     have := hI k u u' ρ l y hl1 hlk hint hcut' e he
-    have c : ((-1 : ℂ) ^ (k - l) * ∏ i ∈ Finset.Icc 1 (k - 1), (((y + e : ℝ) : ℂ) + (ρ i : ℂ))) =
-        (((-1 : ℝ) ^ (k - l) * xpoly k ρ (y + e) : ℝ) : ℂ) := by
+    have c
+        : ((-1 : ℂ) ^ (k - l) * ∏ i ∈ Finset.Icc 1 (k - 1), (((y + e : ℝ) : ℂ) + (ρ i : ℂ)))
+          = (((-1 : ℝ) ^ (k - l) * xpoly k ρ (y + e) : ℝ) : ℂ) := by
       unfold xpoly; push_cast; ring
-    rw [c]; exact pos_ofReal this
-  have hq : ∀ z : ℝ, 0 < qpoly k T T' u u' z →
-      Pos (-((T : ℂ) * T') * ∏ i ∈ Finset.Icc 1 k, (((z : ℝ) : ℂ) + 1 / 2 + (u i : ℂ)) * (((z : ℝ) : ℂ) + 1 / 2 + (u' i : ℂ))) := by
-    intro z hz
-    have c : (-((T : ℂ) * T') * ∏ i ∈ Finset.Icc 1 k, (((z : ℝ) : ℂ) + 1 / 2 + (u i : ℂ)) * (((z : ℝ) : ℂ) + 1 / 2 + (u' i : ℂ))) =
-        ((qpoly k T T' u u' z : ℝ) : ℂ) := by
-      unfold qpoly; push_cast; ring
-    rw [c]; exact pos_ofReal hz
+    rw [c]
+    exact pos_ofReal this
+  have hq
+      : ∀ z : ℝ,
+        0 < qpoly k T T' u u' z
+          → Pos
+            (-((T : ℂ) * T')
+              * ∏ i ∈ Finset.Icc 1 k, (((z : ℝ) : ℂ) + 1 / 2 + (u i : ℂ)) * (((z : ℝ) : ℂ) + 1 / 2 + (u' i : ℂ))) :=
+    by
+      intro z hz
+      have c
+          : (-((T : ℂ) * T')
+              * ∏ i ∈ Finset.Icc 1 k, (((z : ℝ) : ℂ) + 1 / 2 + (u i : ℂ)) * (((z : ℝ) : ℂ) + 1 / 2 + (u' i : ℂ)))
+            = ((qpoly k T T' u u' z : ℝ) : ℂ) := by
+        unfold qpoly; push_cast; ring
+      rw [c]
+      exact pos_ofReal hz
   rw [hy]
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · have := hx 0 (by simp); simpa using this
@@ -460,7 +522,8 @@ theorem q_positive_shift : Formalism.FourierDecayAlt.Fr.QPositiveShift := Fr2.qP
 
 theorem c_pos_truncated : Formalism.FourierDecayAlt.Fr.CPosCut := Fr2.cPosCut
 
-theorem admissible_rec_of_admissible : Formalism.FourierDecayAlt.Fr.AdmRecOfAdm := Fr2.admissible_rec_of_admissible_word
+theorem admissible_rec_of_admissible : Formalism.FourierDecayAlt.Fr.AdmRecOfAdm :=
+  Fr2.admissible_rec_of_admissible_word
 
 theorem frame_rec_of_steps : Formalism.FourierDecayAlt.Fr.FrameRecAssemble := Fr2.frameRecAssemble
 

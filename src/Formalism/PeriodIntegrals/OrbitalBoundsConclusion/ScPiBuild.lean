@@ -5,5 +5,4 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.TensorFrameConst
 
 @[expose] public section
 
-theorem sc_pi_construction : PI.ScPiExists.Build :=
-  PI.ScPiBuildW.Asm.build
+theorem sc_pi_construction : PI.ScPiExists.Build := PI.ScPiBuildW.Asm.build

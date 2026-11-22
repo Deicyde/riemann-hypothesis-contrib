@@ -11,20 +11,26 @@ noncomputable section
 
 namespace GlobalTheory.BalRank
 
-theorem finrank_balBil_le_of_smul_mem_range {O : Type} [CommRing O] (bar : O → O) (X Y : Type)
-    [AddCommGroup X] [Module O X] [Module.Free ℤ X] [Module.Finite ℤ X]
+theorem finrank_balBil_le_of_smul_mem_range
+    {O : Type} [CommRing O]
+    (bar : O → O)
+    (X Y : Type) [AddCommGroup X] [Module O X] [Module.Free ℤ X] [Module.Finite ℤ X]
     [AddCommGroup Y] [Module O Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
-    (f : Y →ₗ[O] X) (m : ℕ) (hm : 0 < m) (hf : ∀ x : X, m • x ∈ LinearMap.range f) :
-    Module.finrank ℤ (balBil bar X) ≤ Module.finrank ℤ (balBil bar Y) := by
+    (f : Y →ₗ[O] X) (m : ℕ) (hm : 0 < m) (hf : ∀ x : X, m • x ∈ LinearMap.range f)
+    : Module.finrank ℤ (balBil bar X) ≤ Module.finrank ℤ (balBil bar Y) := by
   let f' : Y →ₗ[ℤ] X := f.toAddMonoidHom.toIntLinearMap
   have hf' : ∀ y, f' y = f y := fun y => rfl
-  let Φ : balBil bar X →ₗ[ℤ] balBil bar Y :=
-    { toFun := fun β => ⟨(β : LinearMap.BilinForm ℤ X).compl₁₂ f' f', by
+  let Φ : balBil bar X →ₗ[ℤ] balBil bar Y := {
+    toFun := fun β => ⟨
+      (β : LinearMap.BilinForm ℤ X).compl₁₂ f' f',
+      by
         intro a y z
         have := β.2 a (f y) (f z)
-        simpa [hf', LinearMap.compl₁₂_apply, map_smul] using this⟩
-      map_add' := fun β β' => by ext; simp
-      map_smul' := fun n β => by ext; simp }
+        simpa [hf', LinearMap.compl₁₂_apply, map_smul] using this
+    ⟩
+    map_add' := fun β β' => by ext; simp
+    map_smul' := fun n β => by ext; simp
+  }
   have hinj : Function.Injective Φ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro β hβ
@@ -43,12 +49,15 @@ theorem finrank_balBil_le_of_smul_mem_range {O : Type} [CommRing O] (bar : O →
     simpa using (mul_eq_zero.mp h1).resolve_left hm'
   exact LinearMap.finrank_le_finrank_of_injective hinj
 
-theorem finrank_balBil_eq_of_finiteIndex {O : Type} [CommRing O] (bar : O → O) (X Y : Type)
-    [AddCommGroup X] [Module O X] [Module.Free ℤ X] [Module.Finite ℤ X]
+theorem finrank_balBil_eq_of_finiteIndex
+    {O : Type} [CommRing O]
+    (bar : O → O)
+    (X Y : Type) [AddCommGroup X] [Module O X] [Module.Free ℤ X] [Module.Finite ℤ X]
     [AddCommGroup Y] [Module O Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
-    (f : Y →ₗ[O] X) (m : ℕ) (hm : 0 < m) (hf : Function.Injective f)
-    (hr : ∀ x : X, m • x ∈ LinearMap.range f) :
-    Module.finrank ℤ (balBil bar Y) = Module.finrank ℤ (balBil bar X) := by
+    (f : Y →ₗ[O] X)
+    (m : ℕ) (hm : 0 < m)
+    (hf : Function.Injective f) (hr : ∀ x : X, m • x ∈ LinearMap.range f)
+    : Module.finrank ℤ (balBil bar Y) = Module.finrank ℤ (balBil bar X) := by
   let e := LinearEquiv.ofInjective f hf
   let c : X →ₗ[O] LinearMap.range f :=
     LinearMap.codRestrict (LinearMap.range f) (m • LinearMap.id) (fun x => by simpa using hr x)
@@ -58,8 +67,7 @@ theorem finrank_balBil_eq_of_finiteIndex {O : Type} [CommRing O] (bar : O → O)
     have h1 : e (g x) = c x := by simp [g]
     have h2 := congrArg Subtype.val h1
     simpa [e, c] using h2
-  have hgf : ∀ y, g (f y) = m • y := by
-    intro y; apply hf; rw [hfg, map_nsmul]
+  have hgf : ∀ y, g (f y) = m • y := by intro y; apply hf; rw [hfg, map_nsmul]
   apply le_antisymm
   · exact finrank_balBil_le_of_smul_mem_range bar Y X g m hm (fun y => ⟨f y, hgf y⟩)
   · exact finrank_balBil_le_of_smul_mem_range bar X Y f m hm hr

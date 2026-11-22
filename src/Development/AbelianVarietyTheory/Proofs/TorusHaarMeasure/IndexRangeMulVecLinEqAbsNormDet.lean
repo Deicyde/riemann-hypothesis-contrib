@@ -6,21 +6,23 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  MeasureTheory Topology
 open scoped ComplexOrder ENNReal Matrix
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
 namespace GlobalTheory
 
-
 open NumberField MeasureTheory Topology in
 open scoped ComplexOrder ENNReal Matrix in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
 omit [IsCMField E] in
-theorem _root_.GlobalTheory.index_range_mulVecLin_eq_abs_norm_det :
-    (∀ (ι : Type) [Fintype ι] [DecidableEq ι] (A : Matrix ι ι (𝓞 E)), A.det ≠ 0 →
-      (((LinearMap.range A.mulVecLin).toAddSubgroup.index : ℕ) : ℚ) =
-        |Algebra.norm ℚ ((A.det : 𝓞 E) : E)|) := by
+theorem _root_.GlobalTheory.index_range_mulVecLin_eq_abs_norm_det
+    : (∀ (ι : Type) [Fintype ι] [DecidableEq ι] (A : Matrix ι ι (𝓞 E)),
+      A.det ≠ 0
+        → (((LinearMap.range A.mulVecLin).toAddSubgroup.index : ℕ) : ℚ)
+          = |Algebra.norm ℚ ((A.det : 𝓞 E) : E)|) := by
   intro ι _ _ A hA
   classical
   set f := A.mulVecLin with hf
@@ -41,8 +43,9 @@ theorem _root_.GlobalTheory.index_range_mulVecLin_eq_abs_norm_det :
     congr 1
     ext i j
     simp [Module.Basis.toMatrix_apply, LinearMap.toMatrix_apply, e]
-  have h2 : (((b.det fun i ↦ ((b.map e i : LinearMap.range fZ) : ι → 𝓞 E)).natAbs : ℕ) : ℚ) =
-      |Algebra.norm ℚ ((A.det : 𝓞 E) : E)| := by
+  have h2
+      : (((b.det fun i ↦ ((b.map e i : LinearMap.range fZ) : ι → 𝓞 E)).natAbs : ℕ) : ℚ)
+        = |Algebra.norm ℚ ((A.det : 𝓞 E) : E)| := by
     rw [hdet, LinearMap.det_restrictScalars, hf, ← Matrix.toLin'_apply', LinearMap.det_toLin',
       Nat.cast_natAbs, Int.cast_abs, Algebra.coe_norm_int]
   exact h2

@@ -26,10 +26,11 @@ private lemma denom (c : E) : ∃ k : ℕ, 0 < k ∧ ∃ w : 𝓞 E, (w : E) = (
     push_cast
     ring
 
-theorem goal1 (M : Submodule (𝓞 E) (Fin n → E)) (hsp : Submodule.span E (M : Set (Fin n → E)) = ⊤)
-    (v : Fin n → E) : ∃ m : ℕ, 0 < m ∧ (m : 𝓞 E) • v ∈ M := by
-  have key : ∀ x ∈ Submodule.span E (M : Set (Fin n → E)),
-      ∃ m : ℕ, 0 < m ∧ (m : 𝓞 E) • x ∈ M := by
+theorem goal1
+    (M : Submodule (𝓞 E) (Fin n → E)) (hsp : Submodule.span E (M : Set (Fin n → E)) = ⊤)
+    (v : Fin n → E)
+    : ∃ m : ℕ, 0 < m ∧ (m : 𝓞 E) • v ∈ M := by
+  have key : ∀ x ∈ Submodule.span E (M : Set (Fin n → E)), ∃ m : ℕ, 0 < m ∧ (m : 𝓞 E) • x ∈ M := by
     intro x hx
     induction hx using Submodule.span_induction with
     | mem x h => exact ⟨1, one_pos, by simpa using h⟩
@@ -38,8 +39,9 @@ theorem goal1 (M : Submodule (𝓞 E) (Fin n → E)) (hsp : Submodule.span E (M 
       obtain ⟨a, ha, hax⟩ := ihx
       obtain ⟨b, hb, hby⟩ := ihy
       refine ⟨a * b, Nat.mul_pos ha hb, ?_⟩
-      have e : ((a * b : ℕ) : 𝓞 E) • (x + y)
-          = (b : 𝓞 E) • ((a : 𝓞 E) • x) + (a : 𝓞 E) • ((b : 𝓞 E) • y) := by
+      have e
+          : ((a * b : ℕ) : 𝓞 E) • (x + y)
+            = (b : 𝓞 E) • ((a : 𝓞 E) • x) + (a : 𝓞 E) • ((b : 𝓞 E) • y) := by
         rw [smul_smul, smul_smul, Nat.cast_mul, mul_comm (b : 𝓞 E), smul_add]
       rw [e]
       exact M.add_mem (M.smul_mem _ hax) (M.smul_mem _ hby)

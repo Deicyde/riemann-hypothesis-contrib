@@ -7,9 +7,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.BasisTangent
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -22,10 +25,12 @@ noncomputable section
 
 namespace GlobalTheory.CechH1Local
 
-theorem isCob_of_refine_le {Y : Scheme.{0}} {I K : Type} (Uc : I → Y.Opens) (c : C1 Uc) (hc : IsCoc Uc c)
-    (V : K → Y.Opens) (σ : K → I) (hV : ∀ p, V p ≤ Uc (σ p)) (hVt : ∀ i, Uc i ≤ ⨆ p, V p)
-    (B : ∀ p, Γ(Y, V p)) (hB : ∀ p p', rsT (c (σ p) (σ p')) (V p ⊓ V p') =
-      rsT (B p') (V p ⊓ V p') - rsT (B p) (V p ⊓ V p')) : IsCob Uc c := by
+theorem isCob_of_refine_le
+    {Y : Scheme.{0}} {I K : Type} (Uc : I → Y.Opens) (c : C1 Uc) (hc : IsCoc Uc c) (V : K → Y.Opens)
+    (σ : K → I) (hV : ∀ p, V p ≤ Uc (σ p)) (hVt : ∀ i, Uc i ≤ ⨆ p, V p) (B : ∀ p, Γ(Y, V p))
+    (hB : ∀ p p',
+      rsT (c (σ p) (σ p')) (V p ⊓ V p') = rsT (B p') (V p ⊓ V p') - rsT (B p) (V p ⊓ V p'))
+    : IsCob Uc c := by
   have hV' : ∀ p y, y ∈ V p → y ∈ Uc (σ p) := fun p y h => hV p h
   have cov : ∀ O : Y.Opens, O ≤ ⨆ p, V p → O ≤ ⨆ p, O ⊓ V p := by
     intro O hO x hx
@@ -33,43 +38,60 @@ theorem isCob_of_refine_le {Y : Scheme.{0}} {I K : Type} (Uc : I → Y.Opens) (c
     exact TopologicalSpace.Opens.mem_iSup.2 ⟨p, hx, hp⟩
   have left {a b d : Y.Opens} (h : a ≤ d) : a ⊓ b ≤ d := inf_le_left.trans h
   have right {a b d : Y.Opens} (h : b ≤ d) : a ⊓ b ≤ d := inf_le_right.trans h
-  have glue : ∀ i, ∃ t : Γ(Y, Uc i), ∀ p, rsT t (Uc i ⊓ V p) =
-      rsT (B p) (Uc i ⊓ V p) + rsT (c (σ p) i) (Uc i ⊓ V p) := by
+  have glue
+      : ∀ i, ∃ t : Γ(Y, Uc i), ∀ p,
+        rsT t (Uc i ⊓ V p) = rsT (B p) (Uc i ⊓ V p) + rsT (c (σ p) i) (Uc i ⊓ V p) := by
     intro i
-    refine exists_rsT_eq (fun p => Uc i ⊓ V p) (fun p => inf_le_left) (cov _ (hVt i)) _ fun p p' => ?_
+    refine
+      exists_rsT_eq (fun p => Uc i ⊓ V p) (fun p => inf_le_left) (cov _ (hVt i)) _ fun p p' => ?_
     have h1 := congrArg (fun s => rsT s ((Uc i ⊓ V p) ⊓ (Uc i ⊓ V p'))) (hB p p')
     have h2 := congrArg (fun s => rsT s ((Uc i ⊓ V p) ⊓ (Uc i ⊓ V p'))) (hc (σ p) (σ p') i)
     simp only [rsT_add, rsT_sub] at h1 h2 ⊢
-    simp (disch := aesop (add safe apply [le_inf, inf_le_left, inf_le_right, left, right, hV])) only [rsT_rsT] at h1 h2 ⊢
+    simp (disch := aesop (add safe apply [le_inf, inf_le_left, inf_le_right, left, right, hV]))
+      only [rsT_rsT]
+      at h1 h2 ⊢
     linear_combination h1 - h2
   choose t ht using glue
   refine ⟨t, fun i j => ?_⟩
-  refine eq_of_rsT_eq (fun p => Uc i ⊓ Uc j ⊓ V p) (fun p => inf_le_left)
-    (cov _ (inf_le_left.trans (hVt i))) _ _ fun p => ?_
+  refine eq_of_rsT_eq
+    (fun p => Uc i ⊓ Uc j ⊓ V p)
+    (fun p => inf_le_left)
+    (cov _ (inf_le_left.trans (hVt i))) _ _
+    fun p => ?_
   have h1 := congrArg (fun s => rsT s (Uc i ⊓ Uc j ⊓ V p)) (ht i p)
   have h2 := congrArg (fun s => rsT s (Uc i ⊓ Uc j ⊓ V p)) (ht j p)
   have h3 := congrArg (fun s => rsT s (Uc i ⊓ Uc j ⊓ V p)) (hc (σ p) i j)
   simp only [rsT_add, rsT_sub] at h1 h2 h3 ⊢
-  simp (disch := aesop (add safe apply [le_inf, inf_le_left, inf_le_right, left, right, hV])) only [rsT_rsT] at h1 h2 h3 ⊢
+  simp (disch := aesop (add safe apply [le_inf, inf_le_left, inf_le_right, left, right, hV]))
+    only [rsT_rsT]
+    at h1 h2 h3 ⊢
   linear_combination h1 - h2 + h3
 
-theorem rsT_field {Z : Scheme.{0}} {d : ∀ W : Z.Opens, Γ(Z, W) → Γ(Z, W)} (hd : IsField ⊤ d) {O O' : Z.Opens}
-    (h : O' ≤ O) (f : Γ(Z, O)) : rsT (d O f) O' = d O' (rsT f O') := by
+theorem rsT_field
+    {Z : Scheme.{0}} {d : ∀ W : Z.Opens, Γ(Z, W) → Γ(Z, W)} (hd : IsField ⊤ d)
+    {O O' : Z.Opens} (h : O' ≤ O) (f : Γ(Z, O))
+    : rsT (d O f) O' = d O' (rsT f O') := by
   rw [rsT_of_le h, rsT_of_le h, hd.2.2 _ _ h le_top]
 
-theorem rsT_appLE {Y X : Scheme.{0}} (π : Y ⟶ X) (V : X.Opens) {O O' : Y.Opens} (h : O ≤ π ⁻¹ᵁ V) (h' : O' ≤ O)
-    (r : Γ(X, V)) : rsT ((π.appLE V O h).hom r) O' = (π.appLE V O' (h'.trans h)).hom r := by
+theorem rsT_appLE
+    {Y X : Scheme.{0}} (π : Y ⟶ X) (V : X.Opens)
+    {O O' : Y.Opens} (h : O ≤ π ⁻¹ᵁ V) (h' : O' ≤ O)
+    (r : Γ(X, V))
+    : rsT ((π.appLE V O h).hom r) O' = (π.appLE V O' (h'.trans h)).hom r := by
   rw [rsT_of_le h']
   exact congrArg (fun φ => φ.hom r) (Scheme.Hom.appLE_map π h (homOfLE h').op)
 
-theorem rsT_unit {Z : Scheme.{0}} {T O : Z.Opens} (h : O ≤ T) (u : Γ(Z, T)ˣ) :
-    rsT u.val O * rsT u⁻¹.val O = 1 := by
+theorem rsT_unit {Z : Scheme.{0}} {T O : Z.Opens} (h : O ≤ T) (u : Γ(Z, T)ˣ)
+    : rsT u.val O * rsT u⁻¹.val O = 1 := by
   rw [← rsT_mul, Units.mul_inv, rsT_one h]
 
-theorem isCoc_dlg {Z : Scheme.{0}} (L : LB Z) (hL : L.IsLB) {d : ∀ W : Z.Opens, Γ(Z, W) → Γ(Z, W)}
-    (hd : IsField ⊤ d) {J : Type} (W : J → Z.Opens) (j : J → L.ι) (hj : ∀ i, W i ≤ L.U (j i)) :
-    IsCoc W (fun i i' => d (W i ⊓ W i') (rsT (L.g (j i) (j i')).val (W i ⊓ W i')) *
-      rsT (L.g (j i) (j i'))⁻¹.val (W i ⊓ W i')) := by
+theorem isCoc_dlg
+    {Z : Scheme.{0}} (L : LB Z) (hL : L.IsLB)
+    {d : ∀ W : Z.Opens, Γ(Z, W) → Γ(Z, W)} (hd : IsField ⊤ d)
+    {J : Type} (W : J → Z.Opens) (j : J → L.ι) (hj : ∀ i, W i ≤ L.U (j i))
+    : IsCoc W (fun i i' =>
+      d (W i ⊓ W i') (rsT (L.g (j i) (j i')).val (W i ⊓ W i'))
+        * rsT (L.g (j i) (j i'))⁻¹.val (W i ⊓ W i')) := by
   intro i i' i''
   set O := W i ⊓ W i' ⊓ W i''
   have l₁ : O ≤ W i ⊓ W i' := inf_le_left
@@ -78,9 +100,13 @@ theorem isCoc_dlg {Z : Scheme.{0}} (L : LB Z) (hL : L.IsLB) {d : ∀ W : Z.Opens
   have m₁ : W i ⊓ W i' ≤ L.U (j i) ⊓ L.U (j i') := inf_le_inf (hj i) (hj i')
   have m₂ : W i' ⊓ W i'' ≤ L.U (j i') ⊓ L.U (j i'') := inf_le_inf (hj i') (hj i'')
   have m₃ : W i ⊓ W i'' ≤ L.U (j i) ⊓ L.U (j i'') := inf_le_inf (hj i) (hj i'')
-  have k : ∀ (a b : J) (l : O ≤ W a ⊓ W b) (m : W a ⊓ W b ≤ L.U (j a) ⊓ L.U (j b)),
-      rsT (d (W a ⊓ W b) (rsT (L.g (j a) (j b)).val (W a ⊓ W b)) * rsT (L.g (j a) (j b))⁻¹.val (W a ⊓ W b)) O =
-        d O (rsT (L.g (j a) (j b)).val O) * rsT (L.g (j a) (j b))⁻¹.val O := by
+  have k
+      : ∀ (a b : J) (l : O ≤ W a ⊓ W b) (m : W a ⊓ W b ≤ L.U (j a) ⊓ L.U (j b)),
+        rsT
+            (d (W a ⊓ W b) (rsT (L.g (j a) (j b)).val (W a ⊓ W b))
+              * rsT (L.g (j a) (j b))⁻¹.val (W a ⊓ W b))
+            O
+          = d O (rsT (L.g (j a) (j b)).val O) * rsT (L.g (j a) (j b))⁻¹.val O := by
     intro a b l m
     rw [rsT_mul, rsT_field hd l, rsT_rsT m l, rsT_rsT m l]
   rw [k i i' l₁ m₁, k i' i'' l₂ m₂, k i i'' l₃ m₃]
@@ -89,9 +115,12 @@ theorem isCoc_dlg {Z : Scheme.{0}} (L : LB Z) (hL : L.IsLB) {d : ∀ W : Z.Opens
       (l₂.trans (m₂.trans inf_le_right))
   have co := congrArg (fun u => rsT (Units.val u) O) (hL.cocycle (j i) (j i') (j i''))
   simp only [Units.val_mul, rsT_mul] at co
-  have e : ∀ {T T' : Z.Opens} (h : T' ≤ T) (u : Γ(Z, T)ˣ), (res h u).val = resG Z h u.val := fun _ _ => rfl
-  have r : ∀ {T T' : Z.Opens} (h : T' ≤ T) (s : Γ(Z, T)), O ≤ T' → rsT (resG Z h s) O = rsT s O :=
-    fun h s hO => by rw [← rsT_of_le h, rsT_rsT h hO]
+  have e : ∀ {T T' : Z.Opens} (h : T' ≤ T) (u : Γ(Z, T)ˣ), (res h u).val = resG Z h u.val :=
+    fun _ _ => rfl
+  have r
+      : ∀ {T T' : Z.Opens} (h : T' ≤ T) (s : Γ(Z, T)),
+        O ≤ T' → rsT (resG Z h s) O = rsT s O := fun h s hO => by
+    rw [← rsT_of_le h, rsT_rsT h hO]
   rw [e, e, e, r _ _ T3, r _ _ T3, r _ _ T3] at co
   set a := rsT (L.g (j i) (j i')).val O
   set b := rsT (L.g (j i') (j i'')).val O

@@ -18,9 +18,10 @@ private def coverSieve {Y A B T : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y) (x : T
     · exact Or.inl ⟨h ≫ u, by simp [hu]⟩
     · exact Or.inr ⟨h ≫ v, by simp [hv]⟩
 
-private theorem coverSieve_mem {Y A B T : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y) [IsOpenImmersion a]
-    [IsOpenImmersion b] (hc : ∀ y : Y, y ∈ Set.range a ∨ y ∈ Set.range b) (x : T ⟶ Y) :
-    coverSieve a b x ∈ Scheme.etaleTopology.{0} T := by
+private theorem coverSieve_mem
+    {Y A B T : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y) [IsOpenImmersion a] [IsOpenImmersion b]
+    (hc : ∀ y : Y, y ∈ Set.range a ∨ y ∈ Set.range b) (x : T ⟶ Y)
+    : coverSieve a b x ∈ Scheme.etaleTopology.{0} T := by
   let Xs : Bool → Scheme.{0} := fun i => Bool.casesOn i B A
   let fs : ∀ i, Xs i ⟶ Y := fun i => Bool.casesOn (motive := fun i => Xs i ⟶ Y) i b a
   have hmem : Presieve.ofArrows Xs fs ∈ Scheme.precoverage @Etale Y := by
@@ -37,11 +38,14 @@ private theorem coverSieve_mem {Y A B T : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y
   · exact Or.inr ⟨h, e⟩
   · exact Or.inl ⟨h, e⟩
 
-private theorem free_hom_ext (R : Type) [CommRing R] {Y A B : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y)
-    [IsOpenImmersion a] [IsOpenImmersion b] (hc : ∀ y : Y, y ∈ Set.range a ∨ y ∈ Set.range b)
+private theorem free_hom_ext
+    (R : Type) [CommRing R]
+    {Y A B : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y) [IsOpenImmersion a] [IsOpenImmersion b]
+    (hc : ∀ y : Y, y ∈ Set.range a ∨ y ∈ Set.range b)
     {G : Shv R} (φ ψ : (free R).obj (yoneda.obj Y) ⟶ G)
     (ha : (free R).map (yoneda.map a) ≫ φ = (free R).map (yoneda.map a) ≫ ψ)
-    (hb : (free R).map (yoneda.map b) ≫ φ = (free R).map (yoneda.map b) ≫ ψ) : φ = ψ := by
+    (hb : (free R).map (yoneda.map b) ≫ φ = (free R).map (yoneda.map b) ≫ ψ)
+    : φ = ψ := by
   apply free_ext
   intro U x
   refine G.isSeparated _ (coverSieve a b x) (coverSieve_mem a b hc x) _ _ ?_
@@ -49,13 +53,17 @@ private theorem free_hom_ext (R : Type) [CommRing R] {Y A B : Scheme.{0}} (a : A
   change Sec.res g (Sec.map φ _) = Sec.res g (Sec.map ψ _)
   rw [map_res, map_res, freeGen_res]
   rcases hg with ⟨u, hu⟩ | ⟨v, hv⟩
-  · have e : (ConcreteCategory.hom ((yoneda.obj Y).map g.op)) x =
-        (ConcreteCategory.hom ((yoneda.map a).app (op V))) u := hu.symm
+  · have e
+        : (ConcreteCategory.hom ((yoneda.obj Y).map g.op)) x
+          = (ConcreteCategory.hom ((yoneda.map a).app (op V))) u :=
+      hu.symm
     rw [e, ← freeGen_map]
     change Sec.map ((free R).map (yoneda.map a) ≫ φ) _ = Sec.map ((free R).map (yoneda.map a) ≫ ψ) _
     rw [ha]
-  · have e : (ConcreteCategory.hom ((yoneda.obj Y).map g.op)) x =
-        (ConcreteCategory.hom ((yoneda.map b).app (op V))) v := hv.symm
+  · have e
+        : (ConcreteCategory.hom ((yoneda.obj Y).map g.op)) x
+          = (ConcreteCategory.hom ((yoneda.map b).app (op V))) v :=
+      hv.symm
     rw [e, ← freeGen_map]
     change Sec.map ((free R).map (yoneda.map b) ≫ φ) _ = Sec.map ((free R).map (yoneda.map b) ≫ ψ) _
     rw [hb]
@@ -63,9 +71,10 @@ private theorem free_hom_ext (R : Type) [CommRing R] {Y A B : Scheme.{0}} (a : A
 end UpperTheory.CoverSieveFree
 
 open UpperTheory.CoverSieveFree in
-theorem UpperTheory.isCovering_pair_of_isOpenImmersion_of_jointly_surjective :
-    ∀ (R : Type) [CommRing R] {Y A B : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y), IsOpenImmersion a → IsOpenImmersion b →
-       (∀ y : Y, y ∈ Set.range a ∨ y ∈ Set.range b) → Cover2 R (sch.map a) (sch.map b) := by
+theorem UpperTheory.isCovering_pair_of_isOpenImmersion_of_jointly_surjective
+    : ∀ (R : Type) [CommRing R] {Y A B : Scheme.{0}} (a : A ⟶ Y) (b : B ⟶ Y),
+      IsOpenImmersion a → IsOpenImmersion b → (∀ y : Y, y ∈ Set.range a ∨ y ∈ Set.range b)
+        → Cover2 R (sch.map a) (sch.map b) := by
   intro R _ Y A B a b ha hb hc
   have hy : ∀ {Z : Scheme.{0}} (f : Z ⟶ Y) [Mono f], Mono (sch.map f) := by
     intro Z f _

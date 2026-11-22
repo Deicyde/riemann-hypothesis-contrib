@@ -8,10 +8,10 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.SmoothPar
 
 private theorem UpperTheory.Reformulated.B.Gr28.exists_fun
     {G W : Type} [Group G] [AddCommGroup W] [_root_.Module ℂ W]
-    (H K : Subgroup G) (σ : Representation ℂ (↥H) W) (w : W)
-    (hw : ∀ h : H, (h : G) ∈ K → σ h w = w) :
-    ∃ f : G → W, f 1 = w ∧ (∀ (h : H) (g : G), f (h * g) = σ h (f g)) ∧
-      ∀ k ∈ K, ∀ g, f (g * k) = f g := by
+    (H K : Subgroup G) (σ : Representation ℂ (↥H) W)
+    (w : W) (hw : ∀ h : H, (h : G) ∈ K → σ h w = w)
+    : ∃ f : G → W,
+      f 1 = w ∧ (∀ (h : H) (g : G), f (h * g) = σ h (f g)) ∧ ∀ k ∈ K, ∀ g, f (g * k) = f g := by
   classical
   let f : G → W := fun g => if hg : ∃ h : H, (h : G)⁻¹ * g ∈ K then σ hg.choose w else 0
   have pos : ∀ (g : G) (h : H), (h : G)⁻¹ * g ∈ K → f g = σ h w := by
@@ -50,14 +50,17 @@ private theorem UpperTheory.Reformulated.B.Gr28.exists_fun
       have := K.mul_mem ha (K.inv_mem hk)
       simpa [mul_assoc] using this
 
-theorem UpperTheory.Reformulated.B.Gr28.indVec :
-    ∀ {G W : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [inst_2 : IsTopologicalGroup G] [inst_3 : AddCommGroup W]
-      [inst_4 : _root_.Module ℂ W] (H K : Subgroup G) (σ : Representation ℂ (↥H) W),
-      IsOpen (↑K : Set G) →
-        ∀ (w : W),
-          (∀ (h : ↥H), (↑h : G) ∈ K → ((σ : ↥H → W →ₗ[ℂ] W) h : W → W) w = w) →
-            ∃ (f : ↥(GlobalTheory.PRep.smoothPart (GlobalTheory.PRep.ind H σ))),
-              (↑(↑f : ↥(GlobalTheory.PRep.indSpace H σ)) : G → W) (1 : G) = w ∧ f ∈ UpperTheory.Reformulated.B.SubgroupFixedSubmodule.fixd (GlobalTheory.PRep.smInd H σ) K := by
+theorem UpperTheory.Reformulated.B.Gr28.indVec
+    : ∀ {G W : Type} [inst : Group G] [inst_1 : TopologicalSpace G] [inst_2 : IsTopologicalGroup G]
+        [inst_3 : AddCommGroup W] [inst_4 : _root_.Module ℂ W] (H K : Subgroup G)
+        (σ : Representation ℂ (↥H) W),
+      IsOpen (↑K : Set G)
+        → ∀ (w : W),
+          (∀ (h : ↥H), (↑h : G) ∈ K → ((σ : ↥H → W →ₗ[ℂ] W) h : W → W) w = w)
+            → ∃ (f : ↥(GlobalTheory.PRep.smoothPart (GlobalTheory.PRep.ind H σ))),
+              (↑(↑f : ↥(GlobalTheory.PRep.indSpace H σ)) : G → W) (1 : G) = w
+                ∧ f ∈ UpperTheory.Reformulated.B.SubgroupFixedSubmodule.fixd
+                  (GlobalTheory.PRep.smInd H σ) K := by
   intro G W _ _ _ _ _ H K σ hK w hw
   obtain ⟨f, h1, h2, h3⟩ := UpperTheory.Reformulated.B.Gr28.exists_fun H K σ w hw
   let F : GlobalTheory.PRep.indSpace H σ := ⟨f, h2⟩
@@ -67,19 +70,20 @@ theorem UpperTheory.Reformulated.B.Gr28.indVec :
     funext g
     exact h3 k hk g
   have hs : F ∈ GlobalTheory.PRep.smoothPart (GlobalTheory.PRep.ind H σ) := by
-    let T : Subgroup G :=
-      { carrier := {g | GlobalTheory.PRep.ind H σ g F = F}
-        mul_mem' := by
-          intro x y hx hy
-          simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
-          rw [hy, hx]
-        one_mem' := by simp
-        inv_mem' := by
-          intro x hx
-          simp only [Set.mem_setOf_eq] at *
-          conv_lhs => rw [← hx]
-          rw [← Module.End.mul_apply, ← map_mul]
-          simp }
+    let T : Subgroup G := {
+      carrier := {g | GlobalTheory.PRep.ind H σ g F = F}
+      mul_mem' := by
+        intro x y hx hy
+        simp only [Set.mem_setOf_eq, map_mul, Module.End.mul_apply] at *
+        rw [hy, hx]
+      one_mem' := by simp
+      inv_mem' := by
+        intro x hx
+        simp only [Set.mem_setOf_eq] at *
+        conv_lhs => rw [← hx]
+        rw [← Module.End.mul_apply, ← map_mul]
+        simp
+    }
     exact Subgroup.isOpen_mono (H₁ := K) (H₂ := T) hF hK
   refine ⟨⟨F, hs⟩, h1, ?_⟩
   intro k hk

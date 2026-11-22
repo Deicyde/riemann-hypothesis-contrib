@@ -9,7 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.IsOpen
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer GlobalTheory.MixModel GlobalTheory.Unf GlobalTheory.LatPair ValuativeRel NumberField Filter
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.FinPl GlobalTheory.MixPer
+  GlobalTheory.MixModel GlobalTheory.Unf GlobalTheory.LatPair ValuativeRel NumberField Filter
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -17,13 +20,15 @@ namespace GlobalTheory.RamLine
 
 variable {D : D7}
 
-def intRing (D : D7) : Subring (AE D) := (GlobalTheory.CharFin.hatRing D.host.F D.host.E).comap (finPart D)
+def intRing (D : D7) : Subring (AE D) :=
+  (GlobalTheory.CharFin.hatRing D.host.F D.host.E).comap (finPart D)
 
 theorem mem_intRing (z : AE D) : z ∈ intRing D ↔ finPart D z ∈ intAE D := by
   rw [GlobalTheory.IdeleParts.integralFiniteAdeles_eq_adelicCompletion_integers]
   exact Iff.rfl
 
-theorem finPart_cA (z : AE D) : finPart D (cA D z) = sigR (Af D.host.F) D.sp.cm.sig (finPart D z) := by
+theorem finPart_cA (z : AE D)
+    : finPart D (cA D z) = sigR (Af D.host.F) D.sp.cm.sig (finPart D z) := by
   induction z using TensorProduct.induction_on with
   | zero => simp only [map_zero]
   | tmul a x => rfl
@@ -56,7 +61,6 @@ variable {p} {N : ℕ}
 section Line
 
 variable {S : HSp D} [Subsingleton (Fin S.rank)] (i : Fin S.rank)
-
 
 end Line
 

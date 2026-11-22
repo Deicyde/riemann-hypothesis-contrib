@@ -13,8 +13,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-def valCentreOn {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (S : Subalgebra O A)
-    (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ S, 0 ≤ u a) : Ideal S where
+def valCentreOn
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (S : Subalgebra O A) (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ S, 0 ≤ u a)
+    : Ideal S where
   carrier := {a | 0 < u (a : A)}
   add_mem' := fun {a b} ha hb => by
     have := u.map_add (a : A) (b : A)
@@ -27,13 +29,17 @@ def valCentreOn {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (S : Subalg
     rw [u.map_mul]
     exact lt_of_lt_of_le ha (le_add_of_nonneg_left (h0 _ c.2))
 
-theorem mem_valCentreOn {O A : Type} [CommRing O] [CommRing A] [Algebra O A] (S : Subalgebra O A)
-    (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ S, 0 ≤ u a) (a : S) :
-    a ∈ valCentreOn S u h0 ↔ 0 < u (a : A) := Iff.rfl
+theorem mem_valCentreOn
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (S : Subalgebra O A) (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ S, 0 ≤ u a)
+    (a : S)
+    : a ∈ valCentreOn S u h0 ↔ 0 < u (a : A) :=
+  Iff.rfl
 
-theorem valCentreOn_isPrime {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
-    (S : Subalgebra O A) (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ S, 0 ≤ u a) :
-    (valCentreOn S u h0).IsPrime := by
+theorem valCentreOn_isPrime
+    {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
+    (S : Subalgebra O A) (u : AddValuation A (WithTop ℤ)) (h0 : ∀ a ∈ S, 0 ≤ u a)
+    : (valCentreOn S u h0).IsPrime := by
   refine ⟨?_, fun {a b} hab => ?_⟩
   · rw [Ideal.ne_top_iff_one, mem_valCentreOn]
     simp
@@ -44,11 +50,13 @@ theorem valCentreOn_isPrime {O A : Type} [CommRing O] [CommRing A] [Algebra O A]
     rw [MulMemClass.coe_mul, u.map_mul] at hab
     exact absurd hab (not_lt.2 (add_nonpos hc.1 hc.2))
 
-theorem addVal_eq_of_associated_loc {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [CommRing A] [Algebra O A] (ζ : Pts O A) (u : AddValuation A (WithTop ℤ))
-    (hz : ∀ s : As O A, s ∉ ζ.asIdeal → u (s : A) = 0) (a b : As O A)
-    (hab : Associated (algebraMap (As O A) (Loc ζ) a) (algebraMap (As O A) (Loc ζ) b)) :
-    u (a : A) = u (b : A) := by
+theorem addVal_eq_of_associated_loc
+    {O A : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A]
+    (ζ : Pts O A) (u : AddValuation A (WithTop ℤ))
+    (hz : ∀ s : As O A, s ∉ ζ.asIdeal → u (s : A) = 0)
+    (a b : As O A)
+    (hab : Associated (algebraMap (As O A) (Loc ζ) a) (algebraMap (As O A) (Loc ζ) b))
+    : u (a : A) = u (b : A) := by
   obtain ⟨w, hw⟩ := hab
   obtain ⟨⟨s, t⟩, hst⟩ := IsLocalization.surj ζ.asIdeal.primeCompl (w : Loc ζ)
   have ht : IsUnit (algebraMap (As O A) (Loc ζ) t) := IsLocalization.map_units _ t
@@ -66,12 +74,19 @@ theorem addVal_eq_of_associated_loc {O A : Type} [CommRing O] [IsDomain O] [IsDi
   rw [hz _ c.2, hz _ hs, hz _ t.2] at h3
   simpa using h3
 
-theorem exists_pt_ord_eq_addValuation : ∀ (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A] [Algebra O A] (ϖ : O), IsUnif (A := A) ϖ → ∀ [∀ ζ : Pts O A, IsDVRAt ζ] (u : AddValuation A (WithTop ℤ)), (∀ a ∈ As O A, 0 ≤ u a) → 0 < u (algebraMap O A ϖ) → (∃ a, u a = 1) → ∃ ζ : Pts O A, ∀ a, ord ϖ ζ a = u a := by
+theorem exists_pt_ord_eq_addValuation
+    : ∀ (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CommRing A]
+        [Algebra O A] (ϖ : O),
+      IsUnif (A := A) ϖ
+        → ∀ [∀ ζ : Pts O A, IsDVRAt ζ] (u : AddValuation A (WithTop ℤ)),
+          (∀ a ∈ As O A, 0 ≤ u a) → 0 < u (algebraMap O A ϖ) → (∃ a, u a = 1)
+            → ∃ ζ : Pts O A, ∀ a, ord ϖ ζ a = u a := by
   intro O A _ _ _ _ _ ϖ h hD u h0 hϖ h1
   haveI hP := valCentreOn_isPrime (As O A) u h0
   have hcm : ((valCentreOn (As O A) u h0).comap (algebraMap O (As O A))).IsMaximal := by
-    have hle : IsLocalRing.maximalIdeal O ≤
-        (valCentreOn (As O A) u h0).comap (algebraMap O (As O A)) := by
+    have hle
+        : IsLocalRing.maximalIdeal O
+          ≤ (valCentreOn (As O A) u h0).comap (algebraMap O (As O A)) := by
       rw [h.irreducible.maximalIdeal_eq, Ideal.span_singleton_le_iff_mem, Ideal.mem_comap,
         mem_valCentreOn]
       exact hϖ
@@ -96,8 +111,9 @@ theorem exists_pt_ord_eq_addValuation : ∀ (O A : Type) [CommRing O] [IsDomain 
   have hπpos : 0 < u (π : A) := by
     by_contra hc
     exact hπ.not_isUnit ((IsLocalization.AtPrime.isUnit_to_map_iff (Loc ζ) ζ.asIdeal π).2 hc)
-  have key : ∀ a : As O A, (vL ζ a = ⊤ ∧ u (a : A) = ⊤) ∨
-      ∃ n : ℕ, vL ζ a = n ∧ u (a : A) = n • u (π : A) := by
+  have key
+      : ∀ a : As O A,
+        (vL ζ a = ⊤ ∧ u (a : A) = ⊤) ∨ ∃ n : ℕ, vL ζ a = n ∧ u (a : A) = n • u (π : A) := by
     intro a
     by_cases ha : algebraMap (As O A) (Loc ζ) a = 0
     · refine Or.inl ⟨(vL_eq_top_iff ζ a).2 ha, ?_⟩
@@ -131,8 +147,9 @@ theorem exists_pt_ord_eq_addValuation : ∀ (O A : Type) [CommRing O] [IsDomain 
   have hM0 : 0 < M := by
     rw [← hM] at hπpos
     exact_mod_cast hπpos
-  have key2 : ∀ x : A, (ord ϖ ζ x = ⊤ ∧ u x = ⊤) ∨
-      ∃ z : ℤ, ord ϖ ζ x = z ∧ u x = ((z * M : ℤ) : WithTop ℤ) := by
+  have key2
+      : ∀ x : A,
+        (ord ϖ ζ x = ⊤ ∧ u x = ⊤) ∨ ∃ z : ℤ, ord ϖ ζ x = z ∧ u x = ((z * M : ℤ) : WithTop ℤ) := by
     intro x
     obtain ⟨k, hk⟩ := h.denom x
     have e1 := ord_pow_smul ζ h k x

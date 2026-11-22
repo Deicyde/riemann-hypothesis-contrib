@@ -7,11 +7,14 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 namespace KStar.Tree
 
-private theorem squareTopTwistPlaces_coprime_splitPlaces {S A : Type} [CommRing A] [IsLocalRing A] [Ring S] [Algebra A S] {r : ℕ}
-    (f f' : S →ₐ[A] Matrix (Fin r) (Fin r) A) (hf : Function.Surjective f)
+private theorem squareTopTwistPlaces_coprime_splitPlaces
+    {S A : Type} [CommRing A] [IsLocalRing A] [Ring S] [Algebra A S]
+    {r : ℕ} (f f' : S →ₐ[A] Matrix (Fin r) (Fin r) A) (hf : Function.Surjective f)
     (hf' : Function.Surjective f') (U U' : Matrix (Fin r) (Fin r) A)
-    (h : ∀ z, (f z * U).trace = (f' z * U').trace) (z₀ : S) (u : A) (hz : f' z₀ = u • f z₀)
-    (hu : IsUnit (f z₀).det) : (u ^ r - 1) • U = 0 := by
+    (h : ∀ z, (f z * U).trace = (f' z * U').trace)
+    (z₀ : S) (u : A) (hz : f' z₀ = u • f z₀)
+    (hu : IsUnit (f z₀).det)
+    : (u ^ r - 1) • U = 0 := by
   classical
   let c : Ideal A := (Submodule.span A {U}).annihilator
   have hc : ∀ a, a ∈ c ↔ a • U = 0 := fun a => Submodule.mem_annihilator_span_singleton U a
@@ -23,7 +26,8 @@ private theorem squareTopTwistPlaces_coprime_splitPlaces {S A : Type} [CommRing 
     obtain ⟨q, hq⟩ := hf (Matrix.single j b 1)
     have h1 := h (p * z * q)
     rw [map_mul, map_mul, map_mul, map_mul, hz, hp, hq, Matrix.single_mul_mul_single,
-      Matrix.trace_single_mul] at h1
+        Matrix.trace_single_mul]
+      at h1
     simpa using h1
   rw [← hc]
   by_cases htop : c = ⊤
@@ -42,14 +46,15 @@ private theorem squareTopTwistPlaces_coprime_splitPlaces {S A : Type} [CommRing 
     ext i j
     simp [π]
   choose s hs using fun i j : Fin r => hf' (Matrix.single i j 1)
-  let L : Matrix (Fin r) (Fin r) (A ⧸ c) →ₗ[A ⧸ c] Matrix (Fin r) (Fin r) (A ⧸ c) :=
-    { toFun := fun y => ∑ i, ∑ j, y i j • π (f (s i j))
-      map_add' := by
-        intro x y
-        simp [add_smul, Finset.sum_add_distrib]
-      map_smul' := by
-        intro a y
-        simp [Finset.smul_sum, mul_smul] }
+  let L : Matrix (Fin r) (Fin r) (A ⧸ c) →ₗ[A ⧸ c] Matrix (Fin r) (Fin r) (A ⧸ c) := {
+    toFun := fun y => ∑ i, ∑ j, y i j • π (f (s i j))
+    map_add' := by
+      intro x y
+      simp [add_smul, Finset.sum_add_distrib]
+    map_smul' := by
+      intro a y
+      simp [Finset.smul_sum, mul_smul]
+  }
   have hL : ∀ z, L (π (f' z)) = π (f z) := by
     intro z
     have h0 : f' (z - ∑ i, ∑ j, f' z i j • s i j) = 0 := by
@@ -81,31 +86,37 @@ private theorem squareTopTwistPlaces_coprime_splitPlaces {S A : Type} [CommRing 
   rw [Fintype.card_fin] at hd
   exact hu'.mul_right_cancel (by rw [one_mul]; exact hd.symm)
 
-theorem twist_smul_eq_zero (Γ A : Type) [Group Γ] [CommRing A] [IsLocalRing A] (r : ℕ)
-    (T : Γ →* Matrix (Fin r) (Fin r) A) (χ : Γ →* A) (hspan : Submodule.span A (Set.range T) = ⊤)
-    (U U' : Matrix (Fin r) (Fin r) A) (hU : ∀ g, (T g * U).trace = χ g * (T g * U').trace) (g₀ : Γ) :
-    (χ g₀ ^ r - 1) • U = 0 := by
+theorem twist_smul_eq_zero
+    (Γ A : Type) [Group Γ] [CommRing A] [IsLocalRing A]
+    (r : ℕ) (T : Γ →* Matrix (Fin r) (Fin r) A)
+    (χ : Γ →* A)
+    (hspan : Submodule.span A (Set.range T) = ⊤)
+    (U U' : Matrix (Fin r) (Fin r) A) (hU : ∀ g, (T g * U).trace = χ g * (T g * U').trace)
+    (g₀ : Γ)
+    : (χ g₀ ^ r - 1) • U = 0 := by
   classical
-  let T' : Γ →* Matrix (Fin r) (Fin r) A :=
-    { toFun := fun g => χ g • T g
-      map_one' := by simp
-      map_mul' := by
-        intro g h
-        simp [mul_smul, smul_comm (χ h) (χ g)] }
+  let T' : Γ →* Matrix (Fin r) (Fin r) A := {
+    toFun := fun g => χ g • T g
+    map_one' := by simp
+    map_mul' := by
+      intro g h
+      simp [mul_smul, smul_comm (χ h) (χ g)]
+  }
   let f : MonoidAlgebra A Γ →ₐ[A] Matrix (Fin r) (Fin r) A := MonoidAlgebra.lift A _ Γ T
   let f' : MonoidAlgebra A Γ →ₐ[A] Matrix (Fin r) (Fin r) A := MonoidAlgebra.lift A _ Γ T'
   have e : ∀ g, f (MonoidAlgebra.of A Γ g) = T g := fun g => MonoidAlgebra.lift_of _ _
   have e' : ∀ g, f' (MonoidAlgebra.of A Γ g) = χ g • T g := fun g => MonoidAlgebra.lift_of _ _
-  have surj : ∀ F : MonoidAlgebra A Γ →ₐ[A] Matrix (Fin r) (Fin r) A,
-      (∀ g, ∃ z, F z = T g) → Function.Surjective F := by
+  have surj
+      : ∀ F : MonoidAlgebra A Γ →ₐ[A] Matrix (Fin r) (Fin r) A,
+        (∀ g, ∃ z, F z = T g) → Function.Surjective F := by
     intro F hF
     have : LinearMap.range F.toLinearMap = ⊤ := by
       rw [eq_top_iff, ← hspan, Submodule.span_le]
       rintro _ ⟨g, rfl⟩
       exact hF g
     exact LinearMap.range_eq_top.mp this
-  refine squareTopTwistPlaces_coprime_splitPlaces f f' (surj f fun g => ⟨_, e g⟩) (surj f' fun g => ?_) U U' ?_
-    (MonoidAlgebra.of A Γ g₀) (χ g₀) (by rw [e, e']) ?_
+  refine squareTopTwistPlaces_coprime_splitPlaces f f' (surj f fun g => ⟨_, e g⟩)
+    (surj f' fun g => ?_) U U' ?_ (MonoidAlgebra.of A Γ g₀) (χ g₀) (by rw [e, e']) ?_
   · refine ⟨χ g⁻¹ • MonoidAlgebra.of A Γ g, ?_⟩
     rw [map_smul, e', smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
   · intro z

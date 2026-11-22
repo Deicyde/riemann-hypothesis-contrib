@@ -4,16 +4,19 @@ public import Development.EtaleCohomology.TateTwists.EtaleInjectiveResolutionBas
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.ResBasicPf
 
 variable {R : Type} [CommRing R]
 
-noncomputable def descH {F G : Shv R} (φ : F ⟶ G) :
-    InjectiveResolution.Hom (injectiveResolution F) (injectiveResolution G) φ :=
-  ⟨InjectiveResolution.desc φ (injectiveResolution G) (injectiveResolution F),
-    HomologicalComplex.congr_hom (InjectiveResolution.desc_commutes φ (injectiveResolution G) (injectiveResolution F)) 0⟩
+noncomputable def descH {F G : Shv R} (φ : F ⟶ G)
+    : InjectiveResolution.Hom (injectiveResolution F) (injectiveResolution G) φ := ⟨
+  InjectiveResolution.desc φ (injectiveResolution G) (injectiveResolution F),
+  HomologicalComplex.congr_hom
+    (InjectiveResolution.desc_commutes φ (injectiveResolution G) (injectiveResolution F)) 0
+⟩
 
 lemma resMap_eq {F G : Shv R} (φ : F ⟶ G) : resMap R φ = (descH φ).hom' := rfl
 
@@ -61,6 +64,7 @@ lemma ι_nat {F G : Shv R} (φ : F ⟶ G) : resι R F ≫ (resMap R φ).f 0 = φ
 end LateralTheory.EtaleFoundations.ResBasicPf
 
 open LateralTheory.EtaleFoundations.ResBasicPf in
-theorem LateralTheory.EtaleFoundations.etaleSheaf_injectiveResolution_properties_of_mathlib : LateralTheory.EtaleFoundations.EtaleInjectiveResolutionBasicProperties := by
+theorem LateralTheory.EtaleFoundations.etaleSheaf_injectiveResolution_properties_of_mathlib
+    : LateralTheory.EtaleFoundations.EtaleInjectiveResolutionBasicProperties := by
   intro R _ F
   exact ⟨kinj F, inj F, ge F, qis F, rfl, mono F, dzero F, fun G φ => ⟨aug_nat φ, ι_nat φ⟩⟩

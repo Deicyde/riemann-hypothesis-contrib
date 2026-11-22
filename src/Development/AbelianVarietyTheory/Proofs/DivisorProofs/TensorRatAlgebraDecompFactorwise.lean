@@ -8,13 +8,16 @@ open scoped TensorProduct
 
 namespace GlobalTheory
 
-theorem tensor_decomp_factorwise : ∀ (S F B : Type) [Field S] [CharZero S] [Field F] [Algebra ℚ F] [FiniteDimensional ℚ F] [Ring B]
-    [Algebra F B] [Algebra ℚ B] [IsScalarTower ℚ F B],
-    ∃ (ι : Type) (_ : Fintype ι) (L : ι → Type) (_ : ∀ i, Field (L i)) (_ : ∀ i, CharZero (L i))
-      (_ : ∀ i, Algebra F (L i)) (Φ : S ⊗[ℚ] B ≃+* ((i : ι) → L i ⊗[F] B)) (ψ : S ⊗[ℚ] F ≃+* ((i : ι) → L i)),
-      (∀ b : B, Φ ((1 : S) ⊗ₜ[ℚ] b) = fun i => (1 : L i) ⊗ₜ[F] b) ∧
-      (∀ z : S ⊗[ℚ] F, Φ (Algebra.TensorProduct.map (AlgHom.id S S) (IsScalarTower.toAlgHom ℚ F B) z) =
-        fun i => algebraMap (L i) (L i ⊗[F] B) (ψ z i)) := by
+theorem tensor_decomp_factorwise
+    : ∀ (S F B : Type) [Field S] [CharZero S] [Field F] [Algebra ℚ F] [FiniteDimensional ℚ F]
+        [Ring B] [Algebra F B] [Algebra ℚ B] [IsScalarTower ℚ F B],
+      ∃ (ι : Type) (_ : Fintype ι) (L : ι → Type) (_ : ∀ i, Field (L i)) (_ : ∀ i, CharZero (L i))
+          (_ : ∀ i, Algebra F (L i)) (Φ : S ⊗[ℚ] B ≃+* ((i : ι) → L i ⊗[F] B))
+          (ψ : S ⊗[ℚ] F ≃+* ((i : ι) → L i)),
+        (∀ b : B, Φ ((1 : S) ⊗ₜ[ℚ] b) = fun i => (1 : L i) ⊗ₜ[F] b)
+          ∧ (∀ z : S ⊗[ℚ] F,
+            Φ (Algebra.TensorProduct.map (AlgHom.id S S) (IsScalarTower.toAlgHom ℚ F B) z)
+              = fun i => algebraMap (L i) (L i ⊗[F] B) (ψ z i)) := by
   intro S F B _ _ _ _ _ _ _ _ _
   haveI hEt : Algebra.Etale ℚ F := by
     haveI : Algebra.IsSeparable ℚ F := inferInstance
@@ -42,8 +45,8 @@ theorem tensor_decomp_factorwise : ∀ (S F B : Type) [Field S] [CharZero S] [Fi
   let Φ : S ⊗[ℚ] B ≃+* ((i : I) → L i ⊗[F] B) :=
     (Algebra.TensorProduct.comm ℚ S B).toRingEquiv.trans <| c.toRingEquiv.trans <|
       (Algebra.TensorProduct.congr (AlgEquiv.refl : B ≃ₐ[F] B) φ).toRingEquiv.trans <|
-      (Algebra.TensorProduct.piRight F F B L).toRingEquiv.trans
-      (AlgEquiv.piCongrRight fun i => Algebra.TensorProduct.comm F B (L i)).toRingEquiv
+        (Algebra.TensorProduct.piRight F F B L).toRingEquiv.trans
+          (AlgEquiv.piCongrRight fun i => Algebra.TensorProduct.comm F B (L i)).toRingEquiv
   have hΦ : ∀ (s : S) (b : B), Φ (s ⊗ₜ b) = fun i => ψ (s ⊗ₜ 1) i ⊗ₜ[F] b := by
     intro s b
     have hc : c (b ⊗ₜ s) = b ⊗ₜ ((1 : F) ⊗ₜ s) :=

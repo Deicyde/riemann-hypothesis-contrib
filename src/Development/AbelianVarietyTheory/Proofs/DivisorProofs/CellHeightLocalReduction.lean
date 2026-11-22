@@ -22,17 +22,21 @@ end Alg
 
 section Main
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {N c : ℕ} {m : Fin c → ℕ}
 
-theorem isClosed_parab (e : (Σ a, Fin (m a)) ≃ Fin N) : IsClosed (parab k e : Set (GL (Fin N) k)) := by
+theorem isClosed_parab (e : (Σ a, Fin (m a)) ≃ Fin N)
+    : IsClosed (parab k e : Set (GL (Fin N) k)) := by
   obtain ⟨_, _⟩ := GlobalTheory.SplitWeil.Model.secondCountable_and_t2_local_field (k := k)
-  have : (parab k e : Set (GL (Fin N) k)) = ⋂ i, ⋂ j, ⋂ _ : blk e j < blk e i, {g : GL (Fin N) k | g.val i j = 0} := by
+  have : (parab k e : Set (GL (Fin N) k))
+      = ⋂ i, ⋂ j, ⋂ _ : blk e j < blk e i, {g : GL (Fin N) k | g.val i j = 0} := by
     ext g
     simp only [SetLike.mem_coe, mem_parab, Set.mem_iInter, Set.mem_ofPred_eq]
   rw [this]
-  exact isClosed_iInter fun i => isClosed_iInter fun j => isClosed_iInter fun _ =>
-    isClosed_eq (Units.continuous_val.matrix_elem i j) continuous_const
+  exact isClosed_iInter fun i =>
+    isClosed_iInter fun j =>
+      isClosed_iInter fun _ => isClosed_eq (Units.continuous_val.matrix_elem i j) continuous_const
 
 end Main
 

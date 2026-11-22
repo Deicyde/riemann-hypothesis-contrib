@@ -9,10 +9,13 @@ open Polynomial IsLocalRing
 
 namespace GlobalTheory.UnitLemma.InvolRes
 
-theorem residue_pow_and_roots : ∀ (S : Type) [CommRing S] [IsLocalRing S] [Finite (ResidueField S)] (M : ℕ),
-    Nat.card (ResidueField S) = M ^ 2 → ∀ τ : S →+* S, (∀ x, τ (τ x) = x) →
-    (∃ x, residue S (τ x) ≠ residue S x) →
-    (∀ x, residue S (τ x) = residue S x ^ M) ∧ ∀ w : S, w ^ (M ^ 2 - 1) = 1 → τ w = w ^ M := by
+theorem residue_pow_and_roots
+    : ∀ (S : Type) [CommRing S] [IsLocalRing S] [Finite (ResidueField S)] (M : ℕ),
+      Nat.card (ResidueField S) = M ^ 2
+        → ∀ τ : S →+* S,
+          (∀ x, τ (τ x) = x) → (∃ x, residue S (τ x) ≠ residue S x)
+            → (∀ x, residue S (τ x) = residue S x ^ M)
+              ∧ ∀ w : S, w ^ (M ^ 2 - 1) = 1 → τ w = w ^ M := by
   intro S _ _ _ M hM τ hττ hne
   let e : S ≃+* S := RingEquiv.ofRingHom τ τ (RingHom.ext hττ) (RingHom.ext hττ)
   let s := ResidueField.mapEquiv e
@@ -20,11 +23,14 @@ theorem residue_pow_and_roots : ∀ (S : Type) [CommRing S] [IsLocalRing S] [Fin
   obtain ⟨p, hp⟩ := CharP.exists (ResidueField S)
   haveI := hp
   haveI : Fact p.Prime := ⟨CharP.char_is_prime (ResidueField S) p⟩
-  obtain ⟨-, hsq⟩ := GlobalTheory.UnitLemma.UnrExt.invol_eq_pow p hM s (fun x => by
-    obtain ⟨x, rfl⟩ := residue_surjective x
-    rw [hs, hs, hττ]) (by
-    obtain ⟨x, hx⟩ := hne
-    exact ⟨residue S x, by rw [hs]; exact hx⟩)
+  obtain ⟨-, hsq⟩ :=
+    GlobalTheory.UnitLemma.UnrExt.invol_eq_pow p hM s
+      (fun x => by
+        obtain ⟨x, rfl⟩ := residue_surjective x
+        rw [hs, hs, hττ])
+      (by
+        obtain ⟨x, hx⟩ := hne
+        exact ⟨residue S x, by rw [hs]; exact hx⟩)
   have h1 : ∀ x, residue S (τ x) = residue S x ^ M := fun x => by rw [← hs, hsq]
   refine ⟨h1, fun w hw => ?_⟩
   have hcard2 : 2 ≤ M ^ 2 := by
@@ -34,7 +40,8 @@ theorem residue_pow_and_roots : ∀ (S : Type) [CommRing S] [IsLocalRing S] [Fin
   have hNk : (N : ResidueField S) ≠ 0 := by
     haveI := Fintype.ofFinite (ResidueField S)
     have h0 : ((N + 1 : ℕ) : ResidueField S) = 0 := by
-      rw [show N + 1 = M ^ 2 by omega, ← hM, Nat.card_eq_fintype_card, FiniteField.cast_card_eq_zero]
+      rw [show N + 1 = M ^ 2 by omega, ← hM, Nat.card_eq_fintype_card,
+        FiniteField.cast_card_eq_zero]
     intro h
     simp [h] at h0
   refine GlobalTheory.UnitLemma.UnrExt.root_unique (residue S) (ker_residue) (X ^ N - 1 : S[X])

@@ -17,20 +17,30 @@ def partnerU {n : ℕ} (k : Fin (n / 2)) : Fin n :=
   if h : k.val + 1 < n / 2 then lo (⟨k.val + 1, h⟩ : Fin (n / 2)) else (lo k).rev
 
 def simpleU {n : ℕ} (k : Fin (n / 2)) : Equiv.Perm (Fin n) :=
-  if k.val + 1 < n / 2 then Equiv.swap (lo k) (partnerU k) * Equiv.swap (lo k).rev (partnerU k).rev
-  else Equiv.swap (lo k) (lo k).rev
+  if k.val + 1 < n / 2 then
+    Equiv.swap (lo k) (partnerU k) * Equiv.swap (lo k).rev (partnerU k).rev
+  else
+    Equiv.swap (lo k) (lo k).rev
 
 def actU {n : ℕ} (k : Fin (n / 2)) (α : Fin (n / 2) → ℂˣ) : Fin (n / 2) → ℂˣ :=
   if h : k.val + 1 < n / 2 then α ∘ Equiv.swap k ⟨k.val + 1, h⟩ else Function.update α k (α k)⁻¹
 
 def cSimpleU (q : ℕ) {n : ℕ} (k : Fin (n / 2)) (α : Fin (n / 2) → ℂˣ) : ℂ :=
-  if h : k.val + 1 < n / 2 then cSL ((q : ℂ) ^ 2) ((α k : ℂ) / α ⟨k.val + 1, h⟩)
-  else if Even n then cSL q (α k) else cSU q (α k)
+  if h : k.val + 1 < n / 2 then
+    cSL ((q : ℂ) ^ 2) ((α k : ℂ) / α ⟨k.val + 1, h⟩)
+  else if Even n then
+    cSL q (α k)
+  else
+    cSU q (α k)
 
-theorem IsWeylRep.inv {R : Type} [CommRing R] {n : ℕ} {v : Equiv.Perm (Fin n)} {y : GL (Fin n) R}
-    (hy : IsWeylRep v y) : IsWeylRep v⁻¹ y⁻¹ := by
-  have key : ∀ i j, ((y⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i (v j) *
-      (y : Matrix (Fin n) (Fin n) R) (v j) j = if i = j then 1 else 0 := by
+theorem IsWeylRep.inv
+    {R : Type} [CommRing R] {n : ℕ} {v : Equiv.Perm (Fin n)} {y : GL (Fin n) R} (hy : IsWeylRep v y)
+    : IsWeylRep v⁻¹ y⁻¹ := by
+  have key
+      : ∀ i j,
+        ((y⁻¹ : GL (Fin n) R) : Matrix (Fin n) (Fin n) R) i (v j)
+            * (y : Matrix (Fin n) (Fin n) R) (v j) j
+          = if i = j then 1 else 0 := by
     intro i j
     have h := congrFun (congrFun (Units.inv_mul y) i) j
     rw [Matrix.mul_apply, Finset.sum_eq_single (v j)] at h

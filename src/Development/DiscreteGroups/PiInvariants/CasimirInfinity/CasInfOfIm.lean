@@ -93,16 +93,22 @@ private lemma coshT_bump (c : ℂ) (hc : c.im = 0) (φ : ContDiffBump (0 : ℝ))
     push_cast
     ring
 
-theorem bump_one (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im = 0) :
-    ∃ (g : ℝ → ℝ) (T : ℝ), 0 ≤ T ∧ IsBump g T ∧ ∏ i, coshT g (c i) = 1 := by
+theorem bump_one (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im = 0)
+    : ∃ (g : ℝ → ℝ) (T : ℝ), 0 ≤ T ∧ IsBump g T ∧ ∏ i, coshT g (c i) = 1 := by
   have hM : 0 ≤ ∑ i, ‖c i ^ (1 / 2 : ℂ)‖ := Finset.sum_nonneg fun i _ => norm_nonneg _
-  let φ : ContDiffBump (0 : ℝ) :=
-    ⟨1 / (2 * (∑ i, ‖c i ^ (1 / 2 : ℂ)‖ + 1)), 1 / (∑ i, ‖c i ^ (1 / 2 : ℂ)‖ + 1), by positivity,
-      one_div_lt_one_div_of_lt (by positivity) (by linarith)⟩
+  let φ : ContDiffBump (0 : ℝ) := ⟨
+    1 / (2 * (∑ i, ‖c i ^ (1 / 2 : ℂ)‖ + 1)),
+    1 / (∑ i, ‖c i ^ (1 / 2 : ℂ)‖ + 1),
+    by positivity,
+    one_div_lt_one_div_of_lt (by positivity) (by linarith)
+  ⟩
   have hr : ∀ i, φ.rOut * ‖c i ^ (1 / 2 : ℂ)‖ < 1 := by
     intro i
     have hle : ‖c i ^ (1 / 2 : ℂ)‖ ≤ ∑ i, ‖c i ^ (1 / 2 : ℂ)‖ :=
-      Finset.single_le_sum (f := fun i => ‖c i ^ (1 / 2 : ℂ)‖) (fun j _ => norm_nonneg _) (Finset.mem_univ i)
+      Finset.single_le_sum
+        (f := fun i => ‖c i ^ (1 / 2 : ℂ)‖)
+        (fun j _ => norm_nonneg _)
+        (Finset.mem_univ i)
     show 1 / (∑ i, ‖c i ^ (1 / 2 : ℂ)‖ + 1) * _ < 1
     rw [div_mul_eq_mul_div, one_mul, div_lt_one (by positivity)]
     linarith
@@ -134,13 +140,16 @@ theorem bump_one (ι : Type) [Fintype ι] (c : ι → ℂ) (hc : ∀ i, (c i).im
           inv_mul_cancel₀ (by exact_mod_cast hN.ne'), Real.rpow_neg_one, inv_mul_cancel₀ hP.ne']
       rw [e, Complex.ofReal_one]
 
-theorem phiOf_cs {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) (M : KMod n) (Tθ : M.V →L[ℂ] M.V)
-    (k : Mat n → (M.V →L[ℂ] M.V)) (val : Inf n → ℂ) (T : ℝ) (h : IsMult μ M k val T) :
-    Continuous (phiOf M Tθ k) ∧ HasCompactSupport (phiOf M Tθ k) := by
+theorem phiOf_cs
+    {n : ℕ} [MeasurableSpace (G n)]
+    (μ : Measure (G n))
+    (M : KMod n) (Tθ : M.V →L[ℂ] M.V) (k : Mat n → (M.V →L[ℂ] M.V))
+    (val : Inf n → ℂ) (T : ℝ) (h : IsMult μ M k val T)
+    : Continuous (phiOf M Tθ k) ∧ HasCompactSupport (phiOf M Tθ k) := by
   obtain ⟨m, c, w, g, ks, hks, hk, -⟩ := h
   have hkc : ContinuousOn k (GLs n) :=
-    (continuousOn_finsetSum Finset.univ fun i _ => ((hks i).2.1.continuousOn).const_smul (c i)).congr
-      fun y hy => hk y hy
+    (continuousOn_finsetSum Finset.univ fun i _ =>
+      ((hks i).2.1.continuousOn).const_smul (c i)).congr fun y hy => hk y hy
   let L : (M.V →L[ℂ] M.V) →ₗ[ℂ] ℂ :=
     (LinearMap.trace ℂ M.V).comp ((ContinuousLinearMap.coeLM ℂ).comp (LinearMap.mulRight ℂ Tθ))
   have hLc : Continuous L := L.continuous_of_finiteDimensional
@@ -168,41 +177,55 @@ theorem phiOf_cs {n : ℕ} [MeasurableSpace (G n)] (μ : Measure (G n)) (M : KMo
         rw [e]
         exact (isClosed_eq (continuous_fst.mul continuous_snd) continuous_const).inter
           (isClosed_eq (continuous_snd.mul continuous_fst) continuous_const)
-    have hterm : ∀ p : Mat n × Mat n, ∀ a b, ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2 ≤
-        ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) := by
+    have hterm
+        : ∀ p : Mat n × Mat n, ∀ a b,
+          ‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2 ≤ ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) := by
       intro p a b
-      refine le_trans ?_ (Finset.single_le_sum (f := fun a => ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2))
-        (fun a _ => by positivity) (Finset.mem_univ a))
-      exact Finset.single_le_sum (f := fun b => (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2)) (fun b _ => by positivity)
+      refine le_trans ?_
+        (Finset.single_le_sum
+          (f := fun a => ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2))
+          (fun a _ => by positivity)
+          (Finset.mem_univ a))
+      exact Finset.single_le_sum
+        (f := fun b => (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2))
+        (fun b _ => by positivity)
         (Finset.mem_univ b)
     let R₀ : ℝ := ∑ i, |R i|
     let K : Set (Mat n × Mat n) := {p | 1 + ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) ≤ Real.exp R₀}
     have hK : IsCompact K := by
-      have h1 : IsCompact (Set.univ.pi fun _ : Fin n => Set.univ.pi fun _ : Fin n =>
-          Metric.closedBall (0 : ℂ) (Real.exp R₀ + 1) : Set (Mat n)) :=
+      have h1 : IsCompact
+          (Set.univ.pi fun _ : Fin n =>
+              Set.univ.pi fun _ : Fin n => Metric.closedBall (0 : ℂ) (Real.exp R₀ + 1)
+            : Set (Mat n)) :=
         isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_closedBall _ _
       refine (h1.prod h1).of_isClosed_subset ?_ ?_
-      · refine isClosed_le (continuous_const.add (continuous_finsetSum _ fun a _ =>
-          continuous_finsetSum _ fun b _ => ?_)) continuous_const
-        exact ((continuous_fst.matrix_elem a b).norm.pow 2).add ((continuous_snd.matrix_elem a b).norm.pow 2)
+      · refine isClosed_le
+          (continuous_const.add (continuous_finsetSum _ fun a _ =>
+            continuous_finsetSum _ fun b _ => ?_))
+          continuous_const
+        exact ((continuous_fst.matrix_elem a b).norm.pow 2).add
+          ((continuous_snd.matrix_elem a b).norm.pow 2)
       · intro p hp
         have hp' : 1 + ∑ a, ∑ b, (‖p.1 a b‖ ^ 2 + ‖p.2 a b‖ ^ 2) ≤ Real.exp R₀ := hp
-        refine ⟨fun a _ b _ => ?_, fun a _ b _ => ?_⟩ <;>
-          simp only [Metric.mem_closedBall, dist_zero_right] <;>
-          nlinarith [hterm p a b, norm_nonneg (p.1 a b), norm_nonneg (p.2 a b),
-            sq_nonneg (‖p.1 a b‖ - 1), sq_nonneg (‖p.2 a b‖ - 1)]
+        refine ⟨fun a _ b _ => ?_, fun a _ b _ => ?_⟩
+          <;> simp only [Metric.mem_closedBall, dist_zero_right]
+          <;> nlinarith [hterm p a b, norm_nonneg (p.1 a b), norm_nonneg (p.2 a b),
+                sq_nonneg (‖p.1 a b‖ - 1), sq_nonneg (‖p.2 a b‖ - 1)]
     refine HasCompactSupport.intro (hemb.isCompact_preimage hK) fun y hy => ?_
     have hlg : R₀ < lg (y : Mat n) := by
       unfold lg
       rw [Real.lt_log_iff_exp_lt (by positivity)]
-      have hy' : ¬ (1 + ∑ a, ∑ b, (‖(y : Mat n) a b‖ ^ 2 + ‖((y⁻¹ : G n) : Mat n) a b‖ ^ 2) ≤ Real.exp R₀) := hy
+      have hy' : ¬(1 + ∑ a, ∑ b, (‖(y : Mat n) a b‖ ^ 2 + ‖((y⁻¹ : G n) : Mat n) a b‖ ^ 2)
+          ≤ Real.exp R₀) :=
+        hy
       rw [Matrix.coe_units_inv] at hy'
       exact not_le.1 hy'
     have hk0 : k (y : Mat n) = 0 := by
       rw [hk _ (hval y)]
       refine Finset.sum_eq_zero fun i _ => ?_
-      have hRi : R i ≤ R₀ := (le_abs_self _).trans
-        (Finset.single_le_sum (f := fun i => |R i|) (fun j _ => abs_nonneg _) (Finset.mem_univ i))
+      have hRi : R i ≤ R₀ :=
+        (le_abs_self _).trans
+          (Finset.single_le_sum (f := fun i => |R i|) (fun j _ => abs_nonneg _) (Finset.mem_univ i))
       rw [hR i _ (hval y) (lt_of_le_of_lt hRi hlg), smul_zero]
     rw [hphi]
     simp [hk0]

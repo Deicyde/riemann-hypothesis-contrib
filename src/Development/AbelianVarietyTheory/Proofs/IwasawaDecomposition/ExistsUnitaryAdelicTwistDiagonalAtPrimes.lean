@@ -6,7 +6,10 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsPtO
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.TopCh GlobalTheory.Mem.ColAd Matrix
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col
+  Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem
+  GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC GlobalTheory.Mem.Col2.TopCh
+  GlobalTheory.Mem.ColAd Matrix
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
 
@@ -18,7 +21,6 @@ section Diag
 
 variable {E : Type} [Field E]
 
-
 open Classical in
 def dEnt (n : ℕ) (π : E) (i : Fin n) : E := if i.1 + 1 = n then (if π = 0 then 1 else π) else 1
 
@@ -29,17 +31,33 @@ theorem dEnt_ne (n : ℕ) (π : E) (i : Fin n) : dEnt n π i ≠ 0 := by
 def dAut (n : ℕ) (π : E) : (Fin n → E) ≃ₗ[E] (Fin n → E) :=
   LinearEquiv.piCongrRight fun i => LinearEquiv.smulOfNeZero E E (dEnt n π i) (dEnt_ne n π i)
 
-theorem dAut_apply (n : ℕ) (π : E) (x : Fin n → E) (i : Fin n) : dAut n π x i = dEnt n π i * x i := rfl
+theorem dAut_apply (n : ℕ) (π : E) (x : Fin n → E) (i : Fin n) : dAut n π x i = dEnt n π i * x i :=
+  rfl
 
 end Diag
 
-theorem exists_tw : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (hc : CMData F E) (n : ℕ) [NeZero n] (ST SG Q : Finset (HeightOneSpectrum (𝓞 E))), (∀ P ∈ Q, P ∉ ST ∧ P ∉ SG ∧ conjPrime₂ P ∉ ST ∧ conjPrime₂ P ∉ SG ∧ conjPrime₂ P ∉ Q) → ∀ (π : 𝓞 E), (∀ P ∈ Q, π ∉ P.asIdeal) → ∃ t : GL (Fin n) (AfE F E), t ∈ K1 hc n ST SG ∧ (∀ (P : Q) (i j : Fin n), adAt F P.1 (t.1 i j) = algebraMap E _ (if i = j then (if i.1 + 1 = n then (π : E) else 1) else 0)) ∧ ∀ w : HeightOneSpectrum (𝓞 E), w ∉ Q → conjPrime₂ w ∉ Q → ∀ i j : Fin n, adAt F w (t.1 i j) = if i = j then 1 else 0 := by
+theorem exists_tw
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (hc : CMData F E) (n : ℕ) [NeZero n] (ST SG Q : Finset (HeightOneSpectrum (𝓞 E))),
+      (∀ P ∈ Q, P ∉ ST ∧ P ∉ SG ∧ conjPrime₂ P ∉ ST ∧ conjPrime₂ P ∉ SG ∧ conjPrime₂ P ∉ Q)
+        → ∀ (π : 𝓞 E),
+          (∀ P ∈ Q, π ∉ P.asIdeal)
+            → ∃ t : GL (Fin n) (AfE F E),
+              t ∈ K1 hc n ST SG
+                ∧ (∀ (P : Q) (i j : Fin n),
+                  adAt F P.1 (t.1 i j)
+                    = algebraMap E _ (if i = j then (if i.1 + 1 = n then (π : E) else 1) else 0))
+                ∧ ∀ w : HeightOneSpectrum (𝓞 E),
+                  w ∉ Q → conjPrime₂ w ∉ Q
+                    → ∀ i j : Fin n, adAt F w (t.1 i j) = if i = j then 1 else 0 := by
   intro F E _ _ _ _ _ _ hc n _ ST SG Q hQ π hπ
   classical
   have hQc : ∀ P ∈ Q, conjPrime₂ P ∉ Q := fun P hP => (hQ P hP).2.2.2.2
-  have hπ0 : ∀ P ∈ Q, (π : E) ≠ 0 := fun P hP h => hπ P hP (by
-    have : π = 0 := RingOfIntegers.coe_eq_zero_iff.1 h
-    rw [this]; exact P.asIdeal.zero_mem)
+  have hπ0 : ∀ P ∈ Q, (π : E) ≠ 0 := fun P hP h =>
+    hπ P hP (by
+      have : π = 0 := RingOfIntegers.coe_eq_zero_iff.1 h
+      rw [this]
+      exact P.asIdeal.zero_mem)
   have hval : ∀ P ∈ Q, ∀ i : Fin n, P.valuation E (dEnt n (π : E) i) = 1 := by
     intro P hP i
     unfold dEnt
@@ -48,28 +66,42 @@ theorem exists_tw : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Number
     · exact le_antisymm (HeightOneSpectrum.valuation_le_one _ π)
         (not_lt.1 fun h => hπ P hP ((HeightOneSpectrum.valuation_lt_one_iff_mem _ _).1 h))
     · exact map_one _
-  have hfr : ∀ P ∈ Q, CharValCompare.IsFr P (Formalism.UG.CS.globLat (1 : GL (Fin n) (AfE F E)) (stdLat E n))
-      (dAut n (π : E)) := by
+  have hfr
+      : ∀ P ∈ Q,
+        CharValCompare.IsFr P (Formalism.UG.CS.globLat (1 : GL (Fin n) (AfE F E)) (stdLat E n))
+          (dAut n (π : E)) := by
     intro P hP x
     rw [globLat_one_std]
     show _ ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (stdLat E n) ↔ x ∈ Formalism.HermitianLatticesTheory.localization₂ P.asIdeal (stdLat E n)
     rw [mem_localization_standardLattice, mem_localization_standardLattice]
     simp only [dAut_apply, CharValCompare.intAt_iff, map_mul, hval P hP, one_mul]
-  obtain ⟨g, hg, c1, c2, c3⟩ := PtExist.exists_modify (hc := hc) hQc (one_mem (UAd hc n)) (fun _ => dAut n (π : E)) hfr
+  obtain ⟨g, hg, c1, c2, c3⟩ :=
+    PtExist.exists_modify (hc := hc) hQc (one_mem (UAd hc n)) (fun _ => dAut n (π : E)) hfr
 
   have hST : ∀ P ∈ ST, P ∉ Q ∧ conjPrime₂ P ∉ Q := fun P hP =>
     ⟨fun h => (hQ P h).1 hP, fun h => (hQ _ h).2.2.1 (by rw [CharValCompare.conjP_conjP]; exact hP)⟩
-  have hSG : ∀ P ∈ SG, P ∉ Q ∧ conjPrime₂ P ∉ Q := fun P hP =>
-    ⟨fun h => (hQ P h).2.1 hP, fun h => (hQ _ h).2.2.2.1 (by rw [CharValCompare.conjP_conjP]; exact hP)⟩
-  let p : DecoF E n ST SG ∅ :=
-    ⟨(⟨decoRaw ST SG (1 : GL (Fin n) (AfE F E)),
-      decorated_lattice_exists hc n ST SG 1 (one_mem _)⟩, fun P => Finset.notMem_empty _ P.2 |>.elim),
-      fun P => Finset.notMem_empty _ P.2 |>.elim⟩
+  have hSG : ∀ P ∈ SG, P ∉ Q ∧ conjPrime₂ P ∉ Q := fun P hP => ⟨
+    fun h => (hQ P h).2.1 hP,
+    fun h => (hQ _ h).2.2.2.1 (by rw [CharValCompare.conjP_conjP]; exact hP)
+  ⟩
+  let p : DecoF E n ST SG ∅ := ⟨
+    (
+      ⟨decoRaw ST SG (1 : GL (Fin n) (AfE F E)), decorated_lattice_exists hc n ST SG 1 (one_mem _)⟩,
+      fun P => Finset.notMem_empty _ P.2 |>.elim
+    ),
+    fun P => Finset.notMem_empty _ P.2 |>.elim
+  ⟩
   have hb : IsPtOf hc 1 p := by
     apply (PtDeco.isPtOf_iff_decoRaw F E hc n ST SG ∅ 1 p rfl).2
     exact ⟨one_mem _, rfl⟩
   have hpt : IsPtOf hc g p := by
-    refine ⟨hg, ?_, fun P x hx i hi => ?_, fun w x hx i => ?_, fun P => absurd P.2 (Finset.notMem_empty _)⟩
+    refine ⟨
+      hg,
+      ?_,
+      fun P x hx i hi => ?_,
+      fun w x hx i => ?_,
+      fun P => absurd P.2 (Finset.notMem_empty _)
+    ⟩
     · exact c1
     · rw [c3 P.1 (hST P.1 P.2).1 (hST P.1 P.2).2 x i]
       exact hb.f P x hx i hi
@@ -88,30 +120,47 @@ theorem exists_tw : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Number
     by_cases h : i = j
     · subst h; simp
     · simp [h]
-  · have e1 : ∀ i j, adAt F w (((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) i j) =
-        if i = j then 1 else 0 := by
+  · have e1
+        : ∀ i j,
+          adAt F w (((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) i j)
+            = if i = j then 1 else 0 := by
       intro i j
       have h := c3 w hw hw' (Pi.single j 1) i
-      have hv : (fun k => Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) ((Pi.single j (1 : E) : Fin n → E) k)) =
-          Pi.single j 1 := by
+      have hv
+          : (fun k =>
+              Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F)
+                ((Pi.single j (1 : E) : Fin n → E) k))
+            = Pi.single j 1 := by
         ext k
         by_cases hk : k = j
         · subst hk; simp
         · simp [hk]
-      have h' : adAt F w ((((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) *ᵥ Pi.single j 1) i) =
-          adAt F w ((((1⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) *ᵥ Pi.single j 1) i) := by
+      have h'
+          : adAt F w
+              ((((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) *ᵥ Pi.single j 1)
+                i)
+            = adAt F w
+              ((((1⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) *ᵥ Pi.single j 1)
+                i) := by
         rw [← hv]; exact h
       rw [inv_one, Units.val_one, Matrix.one_mulVec, Matrix.mulVec_single_one] at h'
-      have h'' : adAt F w (((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) i j) =
-          adAt F w ((Pi.single j 1 : Fin n → AfE F E) i) := h'
+      have h''
+          : adAt F w (((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) i j)
+            = adAt F w ((Pi.single j 1 : Fin n → AfE F E) i) :=
+        h'
       rw [h'', Pi.single_apply]
       by_cases hij : i = j
       · subst hij; simp
       · simp [hij]
-    have hMi : (((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E))).map (adAt F w) = 1 := by
+    have hMi
+        : (((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E))).map (adAt F w)
+          = 1 := by
       ext a b
       rw [Matrix.map_apply, e1, Matrix.one_apply]
-    have hgg : (g : Matrix (Fin n) (Fin n) (AfE F E)) * ((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E)) = 1 := by
+    have hgg
+        : (g : Matrix (Fin n) (Fin n) (AfE F E))
+            * ((g⁻¹ : GL (Fin n) (AfE F E)) : Matrix (Fin n) (Fin n) (AfE F E))
+          = 1 := by
       rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
     have hM : (g : Matrix (Fin n) (Fin n) (AfE F E)).map (adAt F w) = 1 := by
       have h := congrArg (fun M => M.map (adAt F w)) hgg

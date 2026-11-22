@@ -24,8 +24,7 @@ section Lin
 
 variable {K : Type} [NormedField K] {τ : Type}
 
-theorem iter_one (σ : K →+* K) (k : ℕ) : σ^[k] 1 = 1 :=
-  Function.iterate_fixed (map_one σ) k
+theorem iter_one (σ : K →+* K) (k : ℕ) : σ^[k] 1 = 1 := Function.iterate_fixed (map_one σ) k
 
 theorem univ_two : (Finset.univ : Finset (ZMod 2)) = {0, 1} := by decide
 
@@ -54,8 +53,8 @@ end Lin
 
 section Log
 
-theorem at_variable_artin_hasse_eq_one_log {K τ : Type} [Field K] [DecidableEq τ] (l : ℕ) (x : τ) :
-    at1 x (lgF K l) = oneLog l x := by
+theorem at_variable_artin_hasse_eq_one_log {K τ : Type} [Field K] [DecidableEq τ] (l : ℕ) (x : τ)
+    : at1 x (lgF K l) = oneLog l x := by
   ext n
   unfold at1
   rw [PowerSeries.coeff_subst_single]
@@ -91,17 +90,19 @@ theorem OneLetterHalf_of : MeanSimeqL → OneLetterHalf := by
   have hl : 2 ≤ l := hp.two_le
   have hlK : (l : K0) ≠ 0 := by exact_mod_cast hp.ne_zero
   obtain ⟨hrefl, hsymm, htrans, -, -⟩ := Formalism.InvariantFactorPaths.G7.Top.simeqRules K0 Unit
-  have hST : ShiftType l σ (fun _ : ZMod 2 => (lgF K0 l : MvPowerSeries Unit K0)) :=
-    fun _ => FormalExponential.ip_lgF l σ hl hlK
-  have h1 := hM K0 l 2 σ hU le_rfl (by decide) F hF be0 hF1 hF2 Unit _ _ (owOK_two σ)
-    (trDual_two σ) ζ hζ Unit _ hST
-  have hX : constantCoeff (PowerSeries.X : MvPowerSeries Unit K0) = 0 :=
-    PowerSeries.constantCoeff_X
+  have hST : ShiftType l σ (fun _ : ZMod 2 => (lgF K0 l : MvPowerSeries Unit K0)) := fun _ =>
+    FormalExponential.ip_lgF l σ hl hlK
+  have h1 :=
+    hM K0 l 2 σ hU le_rfl (by decide) F hF be0 hF1 hF2 Unit _ _ (owOK_two σ) (trDual_two σ) ζ hζ
+      Unit _ hST
+  have hX : constantCoeff (PowerSeries.X : MvPowerSeries Unit K0) = 0 := PowerSeries.constantCoeff_X
   have hlog : PowerSeries.subst (PowerSeries.X : MvPowerSeries Unit K0) (lgF K0 l) = lgF K0 l :=
     PowerSeries.X_subst _
-  have h2 : subst (fun _ : ZMod 2 => (lgF K0 l : MvPowerSeries Unit K0))
-      (beTil (d := 2) l σ be0 (fun _ : Unit => (1 : K0)) (fun _ => 1)) =
-      subst (fun _ : Fin 2 => (PowerSeries.X : PowerSeries K0)) be0 := by
+  have h2
+      : subst
+          (fun _ : ZMod 2 => (lgF K0 l : MvPowerSeries Unit K0))
+          (beTil (d := 2) l σ be0 (fun _ : Unit => (1 : K0)) (fun _ => 1))
+        = subst (fun _ : Fin 2 => (PowerSeries.X : PowerSeries K0)) be0 := by
     rw [subst_tilde K0 l 2 σ hl be0 Unit _ _ Unit _ (fun _ => cc_lgF hl)]
     rw [Finset.univ_unique, Finset.sum_singleton, linEL_two, linOL_two]
     have h3 := addC_log exponential_specification hl hX hX be0
@@ -112,16 +113,20 @@ theorem OneLetterHalf_of : MeanSimeqL → OneLetterHalf := by
     fin_cases i <;> rfl
   rw [h2] at h1
   have h4 := B4.simeq_sub_zero (htrans _ _ _ hph (hsymm _ _ h1))
-  have h5 := Formalism.InvariantFactorPaths.G7.Top.lamModule K0 Unit l σ hp hU.2.2.1 hU.2.2.2.2 _ 2
-    (by
-      intro h
-      have := Nat.le_of_dvd (by norm_num) h
-      have := hU.2.1
-      omega) h4
+  have h5 :=
+    Formalism.InvariantFactorPaths.G7.Top.lamModule K0 Unit l σ hp hU.2.2.1 hU.2.2.2.2 _ 2
+      (by
+        intro h
+        have := Nat.le_of_dvd (by norm_num) h
+        have := hU.2.1
+        omega)
+      h4
   unfold Simeq at h5 ⊢
   have h2K : (2 : K0) ≠ 0 := two_ne_zero
-  have e : ∀ B : MvPowerSeries Unit K0, (ph : MvPowerSeries Unit K0) - MvPowerSeries.C ((2 : K0)⁻¹) * B =
-      MvPowerSeries.C (((2 : ℕ) : K0)⁻¹) * (MvPowerSeries.C (2 : K0) * ph - B) - 0 := by
+  have e
+      : ∀ B : MvPowerSeries Unit K0,
+        (ph : MvPowerSeries Unit K0) - MvPowerSeries.C ((2 : K0)⁻¹) * B
+          = MvPowerSeries.C (((2 : ℕ) : K0)⁻¹) * (MvPowerSeries.C (2 : K0) * ph - B) - 0 := by
     intro B
     rw [sub_zero, mul_sub, ← mul_assoc, ← map_mul]
     simp [h2K]

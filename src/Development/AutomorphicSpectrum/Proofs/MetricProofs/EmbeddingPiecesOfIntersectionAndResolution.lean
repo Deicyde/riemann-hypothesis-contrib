@@ -19,13 +19,15 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.ResolutionExis
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology NumberField
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.ArakelovGeometry Filter Topology NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-theorem embeddingPieces_of_resK (hA : ArithIntersectionSystemStatement)
-    (hR : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement) :
-    GroundTheory.Heights₂.Heights.HilbertSamuel.EmbeddingPieces.Statement :=
+theorem embeddingPieces_of_resK
+    (hA : ArithIntersectionSystemStatement)
+    (hR : ReciprocityTheory.ChartRestriction.G.Geo.ResK.ResKStatement)
+    : GroundTheory.Heights₂.Heights.HilbertSamuel.EmbeddingPieces.Statement :=
   have hInt : PtsIntegrableStatement := GlobalTheory.T.points_integrable_of_resolution_statement hR
   have hRes : ResExistsStatement := GlobalTheory.T.resolution_exists_of_resolution_statement hR
   GroundTheory.Heights₂.Heights.HilbertSamuel.EmbeddingPieces.proof

@@ -11,9 +11,9 @@ open scoped RealInnerProductSpace FourierTransform
 
 namespace GlobalTheory
 
-theorem fourier_prod_coord_complex (I : Type) [Fintype I] (f : I → ℂ → ℂ)
-    (_hf : ∀ i, Integrable (f i)) (l : EuclideanSpace ℂ I) :
-    𝓕 (fun w : EuclideanSpace ℂ I => ∏ i, f i (w i)) l = ∏ i, 𝓕 (f i) (l i) := by
+theorem fourier_prod_coord_complex
+    (I : Type) [Fintype I] (f : I → ℂ → ℂ) (_hf : ∀ i, Integrable (f i)) (l : EuclideanSpace ℂ I)
+    : 𝓕 (fun w : EuclideanSpace ℂ I => ∏ i, f i (w i)) l = ∏ i, 𝓕 (f i) (l i) := by
   simp only [Real.fourier_eq']
   rw [← integral_fintype_prod_volume_eq_prod,
     ← (volume_preserving_ofLp_complex I).integral_comp

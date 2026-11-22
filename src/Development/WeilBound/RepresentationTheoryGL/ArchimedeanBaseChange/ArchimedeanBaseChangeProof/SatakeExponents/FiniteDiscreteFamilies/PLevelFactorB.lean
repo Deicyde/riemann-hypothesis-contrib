@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.T2SpaceGener
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SmGL.DepthZero GlobalTheory.LocLanglands.SphFac
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SmGL.DepthZero
+  GlobalTheory.LocLanglands.SphFac
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -21,15 +22,18 @@ namespace LevelFixedParabolic
 
 section Gen
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n : Type} [Fintype n] [DecidableEq n]
-  {α : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)]
+  {α : Type} {m : α → Type}
+  [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)] [∀ a, DecidableEq (m a)]
 
-theorem fixed_ne_bot_mono {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] {ρ : Representation ℂ G V}
-    {H K : Subgroup G} (hle : H ≤ K) (h : fixed ρ K ≠ ⊥) : fixed ρ H ≠ ⊥ := by
+theorem fixed_ne_bot_mono
+    {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+    {ρ : Representation ℂ G V} {H K : Subgroup G} (hle : H ≤ K) (h : fixed ρ K ≠ ⊥)
+    : fixed ρ H ≠ ⊥ := by
   obtain ⟨v, hv, hv0⟩ := (Submodule.ne_bot_iff _).1 h
   exact (Submodule.ne_bot_iff _).2 ⟨v, fun g => hv ⟨g.1, hle g.2⟩, hv0⟩
-
 
 variable (k n) in
 def coreH (K : Subgroup (GL n k)) : Subgroup (GL n k) :=
@@ -39,11 +43,15 @@ theorem coreH_le (K : Subgroup (GL n k)) : coreH k n K ≤ K := by
   rintro _ ⟨y, hy, rfl⟩
   exact Subgroup.mem_subgroupOf.1 (Subgroup.normalCore_le _ hy)
 
-theorem conj_mem_coreH (K : Subgroup (GL n k)) {c : GL n k} (hc : c ∈ KO k n) {x : GL n k}
-    (hx : x ∈ coreH k n K) : c⁻¹ * x * c ∈ coreH k n K := by
+theorem conj_mem_coreH
+    (K : Subgroup (GL n k)) {c : GL n k} (hc : c ∈ KO k n) {x : GL n k} (hx : x ∈ coreH k n K)
+    : c⁻¹ * x * c ∈ coreH k n K := by
   obtain ⟨y, hy, rfl⟩ := hx
-  refine ⟨(⟨c, hc⟩ : KO k n)⁻¹ * y * (⟨c, hc⟩ : KO k n)⁻¹⁻¹,
-    (Subgroup.normalCore_normal _).conj_mem y hy _, ?_⟩
+  refine ⟨
+    (⟨c, hc⟩ : KO k n)⁻¹ * y * (⟨c, hc⟩ : KO k n)⁻¹⁻¹,
+    (Subgroup.normalCore_normal _).conj_mem y hy _,
+    ?_
+  ⟩
   simp
 
 theorem KO_le_coreH {K : Subgroup (GL n k)} (hK : KO k n ≤ K) : KO k n ≤ coreH k n K := by
@@ -53,8 +61,8 @@ theorem KO_le_coreH {K : Subgroup (GL n k)} (hK : KO k n ≤ K) : KO k n ≤ cor
     Subgroup.normal_le_normalCore.2 (by rw [htop])
   exact Subgroup.mem_map.2 ⟨⟨x, hx⟩, hc (Subgroup.mem_top _), rfl⟩
 
-theorem isOpen_coreH {K : Subgroup (GL n k)} (hK : IsOpen (K : Set (GL n k))) :
-    IsOpen (coreH k n K : Set (GL n k)) := by
+theorem isOpen_coreH {K : Subgroup (GL n k)} (hK : IsOpen (K : Set (GL n k)))
+    : IsOpen (coreH k n K : Set (GL n k)) := by
   haveI : CompactSpace (KO k n) := isCompact_iff_compactSpace.1 GlobalTheory.SplitFlip.isCompact_KO
   have hU : IsOpen ((K.subgroupOf (KO k n) : Subgroup (KO k n)) : Set (KO k n)) :=
     hK.preimage continuous_subtype_val
@@ -76,30 +84,33 @@ theorem isOpen_coreH {K : Subgroup (GL n k)} (hK : IsOpen (K : Set (GL n k))) :
     rw [hts] at this
     exact this
 
-
 variable (k) in
 def Ki (e : (Σ a, m a) ≃ n) (H : Subgroup (GL n k)) (a : α) : Subgroup (GL (m a) k) :=
   H.comap ((leviEmb k e).comp (MonoidHom.mulSingle (fun b => GL (m b) k) a)) ⊓ KO k (m a)
 
-theorem isOpen_Ki (e : (Σ a, m a) ≃ n) {H : Subgroup (GL n k)} (hH : IsOpen (H : Set (GL n k))) (a : α) :
-    IsOpen (Ki k e H a : Set (GL (m a) k)) := by
+theorem isOpen_Ki
+    (e : (Σ a, m a) ≃ n) {H : Subgroup (GL n k)} (hH : IsOpen (H : Set (GL n k))) (a : α)
+    : IsOpen (Ki k e H a : Set (GL (m a) k)) := by
   have hc : Continuous ((leviEmb k e).comp (MonoidHom.mulSingle (fun b => GL (m b) k) a)) :=
     (continuous_leviEmb k e).comp (continuous_mulSingle (A := fun b => GL (m b) k) a)
   exact (hH.preimage hc).inter GlobalTheory.SplitFlip.isOpen_KO
 
-theorem KO_le_Ki (e : (Σ a, m a) ≃ n) {H : Subgroup (GL n k)} (hH : KO k n ≤ H) (a : α) :
-    KO k (m a) ≤ Ki k e H a := by
+theorem KO_le_Ki (e : (Σ a, m a) ≃ n) {H : Subgroup (GL n k)} (hH : KO k n ≤ H) (a : α)
+    : KO k (m a) ≤ Ki k e H a := by
   intro x hx
-  refine Subgroup.mem_inf.2 ⟨Subgroup.mem_comap.2 (hH (leviEmb_mem_KO' (g := Pi.mulSingle a x) e fun b => ?_)), hx⟩
+  refine Subgroup.mem_inf.2
+    ⟨Subgroup.mem_comap.2 (hH (leviEmb_mem_KO' (g := Pi.mulSingle a x) e fun b => ?_)), hx⟩
   by_cases hb : b = a
   · subst hb; simpa using hx
   · rw [Pi.mulSingle_eq_of_ne hb]; exact one_mem _
 
-theorem exists_fixed_of_parInd_H (e : (Σ a, m a) ≃ n) {W : Type} [AddCommGroup W] [Module ℂ W]
-    (ρ : Representation ℂ (Levi k m) W) (H : Subgroup (GL n k))
-    (hH : ∀ c ∈ KO k n, ∀ x ∈ H, c⁻¹ * x * c ∈ H)
-    {f : IndSp e ρ} (hf : f ∈ fixed (parInd e ρ) H) (h0 : f ≠ 0) :
-    ∃ w : W, w ≠ 0 ∧ ∀ g : Levi k m, (∀ a, g a ∈ KO k (m a)) → leviEmb k e g ∈ H → ρ g w = w := by
+theorem exists_fixed_of_parInd_H
+    (e : (Σ a, m a) ≃ n)
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ (Levi k m) W)
+    (H : Subgroup (GL n k)) (hH : ∀ c ∈ KO k n, ∀ x ∈ H, c⁻¹ * x * c ∈ H)
+    {f : IndSp e ρ} (hf : f ∈ fixed (parInd e ρ) H) (h0 : f ≠ 0)
+    : ∃ w : W, w ≠ 0 ∧ ∀ g : Levi k m, (∀ a, g a ∈ KO k (m a)) → leviEmb k e g ∈ H → ρ g w = w := by
   obtain ⟨x, hx⟩ : ∃ x, f.1.1 x ≠ 0 := by
     by_contra! h
     exact h0 (Subtype.ext (Subtype.ext (funext h)))
@@ -120,10 +131,13 @@ theorem exists_fixed_of_parInd_H (e : (Σ a, m a) ≃ n) {W : Type} [AddCommGrou
   rw [← h1, ← h3]
   group
 
-theorem exists_fixed_factor (e : (Σ a, m a) ≃ n) {X : α → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
+theorem exists_fixed_factor
+    (e : (Σ a, m a) ≃ n)
+    {X : α → Type} [∀ a, AddCommGroup (X a)] [∀ a, Module ℂ (X a)]
     (σ : ∀ a, Representation ℂ (GL (m a) k) (X a)) (H : Subgroup (GL n k))
-    (hH : ∀ c ∈ KO k n, ∀ x ∈ H, c⁻¹ * x * c ∈ H)
-    (hv : fixed (multiProd e σ) H ≠ ⊥) (a : α) : fixed (σ a) (Ki k e H a) ≠ ⊥ := by
+    (hH : ∀ c ∈ KO k n, ∀ x ∈ H, c⁻¹ * x * c ∈ H) (hv : fixed (multiProd e σ) H ≠ ⊥)
+    (a : α)
+    : fixed (σ a) (Ki k e H a) ≠ ⊥ := by
   obtain ⟨f, hf, hf0⟩ := (Submodule.ne_bot_iff _).1 hv
   obtain ⟨w, hw0, hw⟩ := exists_fixed_of_parInd_H e (piTensor σ) H hH hf hf0
   obtain ⟨φ, hφ⟩ := exists_contract_ne_zero hw0 a
@@ -144,12 +158,21 @@ theorem levelFactor : LevelFactor := by
   intro E _ _ _ w c n N h K hK
   have hKO : ∀ m, GlobalTheory.LFun.KGL w (n := m) = KO (w.adicCompletion E) (Fin m) := fun m =>
     (GlobalTheory.SmGL.SphCompletion.KO_completion w m).symm
-  refine ⟨Ki (m := fun i => Fin (N i)) (w.adicCompletion E) (stdBlocks N h) (coreH (w.adicCompletion E) (Fin n) K),
-    fun i => isOpen_Ki (stdBlocks N h) (isOpen_coreH hK) i, fun hle i => ?_, fun σ hσ i => ?_⟩
+  refine ⟨
+    Ki
+      (m := fun i => Fin (N i))
+      (w.adicCompletion E) (stdBlocks N h) (coreH (w.adicCompletion E) (Fin n) K),
+    fun i => isOpen_Ki (stdBlocks N h) (isOpen_coreH hK) i,
+    fun hle i => ?_,
+    fun σ hσ i => ?_
+  ⟩
   · rw [hKO n] at hle
     rw [hKO (N i)]
     exact KO_le_Ki (stdBlocks N h) (KO_le_coreH hle) i
-  · exact exists_fixed_factor (stdBlocks N h) (fun i => (σ i).ρ) _ (fun c hc x hx => conj_mem_coreH K hc hx)
+  · exact exists_fixed_factor (stdBlocks N h)
+      (fun i => (σ i).ρ)
+      _
+      (fun c hc x hx => conj_mem_coreH K hc hx)
       (fixed_ne_bot_mono (coreH_le K) hσ) i
 
 end PositivityTheory.Rg.BcB.F.F5

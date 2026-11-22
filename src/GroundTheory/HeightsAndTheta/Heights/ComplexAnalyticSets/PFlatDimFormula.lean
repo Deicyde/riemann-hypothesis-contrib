@@ -25,8 +25,8 @@ theorem FlatDimFormula.proof : FlatDimFormula.Statement := by
     IsLocalRing.of_surjective' (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
   have hmap : (maximalIdeal B).map (Ideal.Quotient.mk I) = maximalIdeal (B ⧸ I) :=
     IsLocalRing.map_maximalIdeal_of_surjective _ Ideal.Quotient.mk_surjective
-  have key := Ideal.height_eq_height_add_of_liesOver_of_hasGoingDown
-    (maximalIdeal A) (maximalIdeal B)
+  have key :=
+    Ideal.height_eq_height_add_of_liesOver_of_hasGoingDown (maximalIdeal A) (maximalIdeal B)
   rw [← hI, hmap] at key
   rw [← IsLocalRing.maximalIdeal_height_eq_ringKrullDim (R := B),
     ← IsLocalRing.maximalIdeal_height_eq_ringKrullDim (R := A),

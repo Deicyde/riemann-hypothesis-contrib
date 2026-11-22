@@ -11,16 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.LeviModul
 
 noncomputable section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.LinRed
+open Matrix Formalism.REAL Formalism.MainNotions.S GlobalTheory.FlagMeas GlobalTheory.RealInd
+  GlobalTheory.LinRed
 open scoped InnerProductSpace
 
 namespace GlobalTheory.LeviDense
 
 variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [CompleteSpace V]
 
-private theorem exists_iteratedDeriv_inner_semigroup_eq {T : ℝ → V →L[ℂ] V} (hT : ∀ s t, T (s + t) = T s ∘L T t)
-    {S : Submodule ℂ V} (hd : ∀ v ∈ S, ∃ v' ∈ S, HasDerivAt (fun t => T t v) v' 0) (w : V) (k : ℕ) :
-    ∀ v ∈ S, ∃ u ∈ S, iteratedDeriv k (fun t => ⟪w, T t v⟫_ℂ) = fun t => ⟪w, T t u⟫_ℂ := by
+private theorem exists_iteratedDeriv_inner_semigroup_eq
+    {T : ℝ → V →L[ℂ] V} (hT : ∀ s t, T (s + t) = T s ∘L T t)
+    {S : Submodule ℂ V} (hd : ∀ v ∈ S, ∃ v' ∈ S, HasDerivAt (fun t => T t v) v' 0)
+    (w : V) (k : ℕ)
+    : ∀ v ∈ S, ∃ u ∈ S, iteratedDeriv k (fun t => ⟪w, T t v⟫_ℂ) = fun t => ⟪w, T t u⟫_ℂ := by
   induction k with
   | zero => intro v hv; exact ⟨v, hv, by simp⟩
   | succ k ih =>
@@ -40,10 +43,12 @@ private theorem exists_iteratedDeriv_inner_semigroup_eq {T : ℝ → V →L[ℂ]
     obtain ⟨u, hu, hk⟩ := ih v' hv'
     exact ⟨u, hu, by rw [iteratedDeriv_succ', hderiv, hk]⟩
 
-theorem oneParameter_mem_closure {T : ℝ → V →L[ℂ] V} (h0 : T 0 = 1) (hT : ∀ s t, T (s + t) = T s ∘L T t)
+theorem oneParameter_mem_closure
+    {T : ℝ → V →L[ℂ] V} (h0 : T 0 = 1) (hT : ∀ s t, T (s + t) = T s ∘L T t)
     {S : Submodule ℂ V} (hd : ∀ v ∈ S, ∃ v' ∈ S, HasDerivAt (fun t => T t v) v' 0)
-    (ha : ∀ v ∈ S, ∀ w, AnalyticOnNhd ℝ (fun t => ⟪w, T t v⟫_ℂ) Set.univ) (t : ℝ) :
-    ∀ v ∈ S.topologicalClosure, T t v ∈ S.topologicalClosure := by
+    (ha : ∀ v ∈ S, ∀ w, AnalyticOnNhd ℝ (fun t => ⟪w, T t v⟫_ℂ) Set.univ)
+    (t : ℝ)
+    : ∀ v ∈ S.topologicalClosure, T t v ∈ S.topologicalClosure := by
   have key : ∀ v ∈ S, T t v ∈ S.topologicalClosure := by
     intro v hv
     rw [← Submodule.orthogonal_orthogonal_eq_closure, Submodule.mem_orthogonal]
@@ -58,8 +63,9 @@ theorem oneParameter_mem_closure {T : ℝ → V →L[ℂ] V} (h0 : T 0 = 1) (hT 
     have htop : analyticOrderAt (fun s => ⟪w, T s v⟫_ℂ) 0 = ⊤ := by
       by_contra hne
       obtain ⟨m, hm⟩ := ENat.ne_top_iff_exists.1 hne
-      have hle := (natCast_le_analyticOrderAt_iff_iteratedDeriv_eq_zero (n := m + 1)
-        (hf 0 (Set.mem_univ _))).2 (fun i _ => hall i)
+      have hle :=
+        (natCast_le_analyticOrderAt_iff_iteratedDeriv_eq_zero (n := m + 1)
+          (hf 0 (Set.mem_univ _))).2 (fun i _ => hall i)
       rw [← hm] at hle
       have : m + 1 ≤ m := by exact_mod_cast hle
       omega
@@ -74,22 +80,27 @@ theorem oneParameter_mem_closure {T : ℝ → V →L[ℂ] V} (h0 : T 0 = 1) (hT 
 section
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra
 
-private theorem mul_Jm_comm_of_unitary_of_preserves {n : ℕ} (ε : Fin n → Bool) {A : Matrix (Fin n) (Fin n) ℂ}
-    (hu : A ∈ Matrix.unitaryGroup (Fin n) ℂ) (hJ : Aᴴ * Formalism.REAL.Jm ε * A = Formalism.REAL.Jm ε) :
-    A * Formalism.REAL.Jm ε = Formalism.REAL.Jm ε * A := by
+private theorem mul_Jm_comm_of_unitary_of_preserves
+    {n : ℕ} (ε : Fin n → Bool)
+    {A : Matrix (Fin n) (Fin n) ℂ} (hu : A ∈ Matrix.unitaryGroup (Fin n) ℂ)
+    (hJ : Aᴴ * Formalism.REAL.Jm ε * A = Formalism.REAL.Jm ε)
+    : A * Formalism.REAL.Jm ε = Formalism.REAL.Jm ε * A := by
   have h2 : A * Aᴴ = 1 := by
     rw [← Matrix.star_eq_conjTranspose]
     exact Matrix.mem_unitaryGroup_iff.1 hu
-  calc A * Formalism.REAL.Jm ε = A * (Aᴴ * Formalism.REAL.Jm ε * A) := by rw [hJ]
+  calc
+    A * Formalism.REAL.Jm ε
+      = A * (Aᴴ * Formalism.REAL.Jm ε * A) := by rw [hJ]
     _ = (A * Aᴴ) * Formalism.REAL.Jm ε * A := by simp only [Matrix.mul_assoc]
     _ = Formalism.REAL.Jm ε * A := by rw [h2, Matrix.one_mul]
 
 end
 
-
 omit [CompleteSpace V] in
-theorem isKFinOn_of_isKFinIn {n : ℕ} {ε : Fin n → Bool} {M : Subgroup (UJ ε)}
-    {σ : Matrix (Fin n) (Fin n) ℂ → (V →L[ℂ] V)} {v : V} (h : IsKFinIn M σ v) : IsKFinOn (mats M) σ v := by
+theorem isKFinOn_of_isKFinIn
+    {n : ℕ} {ε : Fin n → Bool} {M : Subgroup (UJ ε)} {σ : Matrix (Fin n) (Fin n) ℂ → (V →L[ℂ] V)}
+    {v : V} (h : IsKFinIn M σ v)
+    : IsKFinOn (mats M) σ v := by
   obtain ⟨U, hU, hv, hk⟩ := h
   refine ⟨U, hU, hv, ?_⟩
   rintro _ ⟨⟨g, hgM, rfl⟩, hgu⟩ w hw

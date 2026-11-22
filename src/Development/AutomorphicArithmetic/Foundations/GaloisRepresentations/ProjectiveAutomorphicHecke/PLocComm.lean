@@ -5,17 +5,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal UpperTheory.Gal.CertificateRingHomMap
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU GlobalTheory.PRep Formalism.L2.Host GlobalTheory.HeckeGal
+  UpperTheory.Gal.CertificateRingHomMap
 open scoped Classical
 
 namespace UpperTheory.Gal.CertificateRingHomMap.LocalCommutativity
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {n : ℕ}
 
-private theorem rel (k : GUf E n) (u : Plc E) :
-    ((comp (cj u) k).val.map (conjLoc (GlobalTheory.SplitPts.conjE E) u))ᵀ * (comp u k).val =
-      pLoc E u (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E ((sim k : AfQˣ) : AfQ)) •
-        (1 : Matrix (Fin n) (Fin n) (u.adicCompletion E)) := by
+private theorem rel (k : GUf E n) (u : Plc E)
+    : ((comp (cj u) k).val.map (conjLoc (GlobalTheory.SplitPts.conjE E) u))ᵀ * (comp u k).val
+      = pLoc E u (GroundTheory.Global.AdeleBaseChange.finiteAdeleMap ℚ E ((sim k : AfQˣ) : AfQ))
+        • (1 : Matrix (Fin n) (Fin n) (u.adicCompletion E)) := by
   have h := mem_Sim.1 k.2
   have h2 := congrArg (RingHom.mapMatrix (pLoc E u)) h
   rw [map_mul] at h2
@@ -23,12 +25,15 @@ private theorem rel (k : GUf E n) (u : Plc E) :
   ext i j
   by_cases hij : i = j <;> simp [hij, Matrix.one_apply, sim]
 
-private theorem gu_ext {a b : GUf E n} (hs : sim a = sim b) (hc : ∀ u, comp u a = comp u b) : a = b := by
+private theorem gu_ext {a b : GUf E n} (hs : sim a = sim b) (hc : ∀ u, comp u a = comp u b)
+    : a = b := by
   refine Subtype.ext (Prod.ext (Units.ext (GlobalTheory.SplitPts.matAf_ext fun u => ?_)) hs)
   exact congrArg Units.val (hc u)
 
-private theorem comm_scalar {R : Type} [CommRing R] (M X : Matrix (Fin n) (Fin n) R)
-    (ho : ∀ i j, i ≠ j → M i j = 0) (hd : ∀ i j, M i i = M j j) : M * X = X * M := by
+private theorem comm_scalar
+    {R : Type} [CommRing R]
+    (M X : Matrix (Fin n) (Fin n) R) (ho : ∀ i j, i ≠ j → M i j = 0) (hd : ∀ i j, M i i = M j j)
+    : M * X = X * M := by
   have e : M = Matrix.diagonal (fun i => M i i) := by
     ext i j
     by_cases hij : i = j
@@ -40,8 +45,8 @@ private theorem comm_scalar {R : Type} [CommRing R] (M X : Matrix (Fin n) (Fin n
 end UpperTheory.Gal.CertificateRingHomMap.LocalCommutativity
 
 open UpperTheory.Gal.CertificateRingHomMap.LocalCommutativity in
-theorem UpperTheory.Gal.CertificateRingHomMap.pLocComm_of :
-    UpperTheory.Gal.CertificateRingHomMap.LocComm := by
+theorem UpperTheory.Gal.CertificateRingHomMap.pLocComm_of
+    : UpperTheory.Gal.CertificateRingHomMap.LocComm := by
   intro E _ _ _ n w hw
   obtain ⟨hne, hund, hover⟩ := GlobalTheory.SplitPts.over_split hw
   have hcc : cj (cj w) = w := GlobalTheory.SplitPts.conjSrc_conjSrc_cm w

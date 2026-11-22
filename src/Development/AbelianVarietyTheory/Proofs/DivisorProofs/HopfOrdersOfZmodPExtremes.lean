@@ -17,19 +17,26 @@ open scoped TensorProduct
 
 namespace GlobalTheory.OriginPrimes
 
-theorem origin_primes : ∀ (A' : Type) [CommRing A'] [HenselianLocalRing A'] [IsSepClosed (ResidueField A')]
-    (𝔭 : Ideal A') [𝔭.IsPrime] (E : Type) [CommRing E] [Algebra (Polynomial A') E]
-    [Algebra.Etale (Polynomial A') E] (Q : Ideal E) [Q.IsPrime],
-    Q.comap (algebraMap (Polynomial A') E) = GlobalTheory.KeyOriginCut.originIdeal A' →
-    (𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C)).IsPrime := by
+theorem origin_primes
+    : ∀ (A' : Type) [CommRing A'] [HenselianLocalRing A'] [IsSepClosed (ResidueField A')]
+        (𝔭 : Ideal A') [𝔭.IsPrime] (E : Type) [CommRing E] [Algebra (Polynomial A') E]
+        [Algebra.Etale (Polynomial A') E] (Q : Ideal E) [Q.IsPrime],
+      Q.comap (algebraMap (Polynomial A') E) = GlobalTheory.KeyOriginCut.originIdeal A'
+        → (𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp
+          Polynomial.C)).IsPrime := by
   intro A' _ _ _ 𝔭 _ E _ _ _ Q _ hQ
-  obtain ⟨S, _, _, _, _, f, hfi, hker⟩ := GlobalTheory.T.exists_normal_local_domain_over_henselian_prime A' 𝔭
+  obtain ⟨S, _, _, _, _, f, hfi, hker⟩ :=
+    GlobalTheory.T.exists_normal_local_domain_over_henselian_prime A' 𝔭
   obtain ⟨hXi, hOp, hOc, hOu⟩ := GlobalTheory.T.origin_ideal_unique_prime_over A' S f hfi
   letI : Algebra (Polynomial A') (Polynomial S) := (Polynomial.mapRingHom f).toAlgebra
   haveI : Algebra.IsIntegral (Polynomial A') (Polynomial S) := ⟨hXi⟩
-  have hmax : (maximalIdeal (Localization.AtPrime Q)).comap
-      (algebraMap (Polynomial A') (Localization.AtPrime Q)) = GlobalTheory.KeyOriginCut.originIdeal A' := by
-    have h0 : (maximalIdeal (Localization.AtPrime Q)).comap (algebraMap E (Localization.AtPrime Q)) = Q :=
+  have hmax
+      : (maximalIdeal (Localization.AtPrime Q)).comap
+          (algebraMap (Polynomial A') (Localization.AtPrime Q))
+        = GlobalTheory.KeyOriginCut.originIdeal A' := by
+    have h0
+        : (maximalIdeal (Localization.AtPrime Q)).comap (algebraMap E (Localization.AtPrime Q))
+          = Q :=
       Localization.AtPrime.under_maximalIdeal (I := Q)
     rw [IsScalarTower.algebraMap_eq (Polynomial A') E (Localization.AtPrime Q), ← Ideal.comap_comap,
       h0, hQ]
@@ -44,28 +51,41 @@ theorem origin_primes : ∀ (A' : Type) [CommRing A'] [HenselianLocalRing A'] [I
   have hkerX : RingHom.ker (algebraMap (Polynomial A') (Polynomial S)) = 𝔭.map Polynomial.C := by
     change RingHom.ker (Polynomial.mapRingHom f) = _
     rw [Polynomial.ker_mapRingHom, hker]
-  have hJ : 𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C) =
-      (𝔭.map Polynomial.C).map (algebraMap (Polynomial A') (Localization.AtPrime Q)) := by
+  have hJ
+      : 𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C)
+        = (𝔭.map Polynomial.C).map (algebraMap (Polynomial A') (Localization.AtPrime Q)) := by
     rw [Ideal.map_map]
-  let g : Localization.AtPrime Q →+* TensorProduct (Polynomial A') (Polynomial S) (Localization.AtPrime Q) :=
+  let g
+      : Localization.AtPrime Q
+        →+* TensorProduct (Polynomial A') (Polynomial S) (Localization.AtPrime Q) :=
     (Algebra.TensorProduct.includeRight : Localization.AtPrime Q →ₐ[Polynomial A'] _).toRingHom
-  have hg0 : ∀ y ∈ 𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C), g y = 0 := by
+  have hg0
+      : ∀ y ∈ 𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C),
+        g y = 0 := by
     rw [hJ]
-    have hle : (𝔭.map Polynomial.C).map (algebraMap (Polynomial A') (Localization.AtPrime Q)) ≤ RingHom.ker g := by
+    have hle
+        : (𝔭.map Polynomial.C).map (algebraMap (Polynomial A') (Localization.AtPrime Q))
+          ≤ RingHom.ker g := by
       rw [Ideal.map_le_iff_le_comap]
       intro m hm
       rw [Ideal.mem_comap, RingHom.mem_ker]
       change (Algebra.TensorProduct.includeRight : Localization.AtPrime Q →ₐ[Polynomial A'] _)
-        (algebraMap (Polynomial A') (Localization.AtPrime Q) m) = 0
+          (algebraMap (Polynomial A') (Localization.AtPrime Q) m)
+        = 0
       rw [AlgHom.commutes, Algebra.TensorProduct.algebraMap_apply]
       have : algebraMap (Polynomial A') (Polynomial S) m = 0 := by
         rw [← RingHom.mem_ker, hkerX]; exact hm
       rw [this, TensorProduct.zero_tmul]
     exact fun y hy => hle hy
-  have hg1 : ∀ y, g y = 0 → y ∈ 𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C) := by
+  have hg1
+      : ∀ y,
+        g y = 0
+          → y
+            ∈ 𝔭.map ((algebraMap (Polynomial A') (Localization.AtPrime Q)).comp Polynomial.C) := by
     intro y hy
     rw [hJ]
-    exact GlobalTheory.T.flat_tensor_kernel_mem_map_ideal (Polynomial A') (Polynomial S) (Localization.AtPrime Q) _ hkerX y hy
+    exact GlobalTheory.T.flat_tensor_kernel_mem_map_ideal (Polynomial A') (Polynomial S)
+      (Localization.AtPrime Q) _ hkerX y hy
   refine ⟨?_, ?_⟩
   · intro htop
     have h1 := hg0 1 (by rw [htop]; exact Submodule.mem_top)

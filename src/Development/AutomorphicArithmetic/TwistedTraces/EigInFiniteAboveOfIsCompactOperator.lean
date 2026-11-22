@@ -6,11 +6,19 @@ public import Mathlib.Analysis.InnerProductSpace.Spectrum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.eigIn_finite_above_of_isCompactOperator :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (W : Submodule ℂ H) (A : H →L[ℂ] H), IsClosed (W : Set H) → IsSelfAdjoint A → (∀ v ∈ W, A v ∈ W) → IsCompactOperator (A ∘L prj W) → ∀ η : ℝ, 0 < η → {x : ℝ | η < x ∧ eigIn W A x ≠ ⊥}.Finite ∧ ∀ x : ℝ, η < x → FiniteDimensional ℂ (eigIn W A x) := by
+theorem UpperTheory.eigIn_finite_above_of_isCompactOperator
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (W : Submodule ℂ H) (A : H →L[ℂ] H),
+      IsClosed (W : Set H) → IsSelfAdjoint A → (∀ v ∈ W, A v ∈ W) → IsCompactOperator (A ∘L prj W)
+        → ∀ η : ℝ,
+          0 < η
+            → {x : ℝ | η < x ∧ eigIn W A x ≠ ⊥}.Finite
+              ∧ ∀ x : ℝ, η < x → FiniteDimensional ℂ (eigIn W A x) := by
   intro H _ _ _ W A hW hA hAW hC η hη
   have hWc : W.topologicalClosure = W := hW.submodule_topologicalClosure_eq
   have hPW : ∀ v, prj W v ∈ W := by
@@ -23,8 +31,7 @@ theorem UpperTheory.eigIn_finite_above_of_isCompactOperator :
     exact this w (W.le_topologicalClosure hw)
   have hfix : ∀ w ∈ W, prj W w = w := by
     intro w hw
-    refine Submodule.eq_starProjection_of_mem_orthogonal
-      (W.le_topologicalClosure hw) ?_
+    refine Submodule.eq_starProjection_of_mem_orthogonal (W.le_topologicalClosure hw) ?_
     simp
   have hmem : ∀ x : ℝ, ∀ w, w ∈ eigIn W A x ↔ w ∈ W ∧ A w = (x : ℂ) • w := by
     intro x w
@@ -43,8 +50,9 @@ theorem UpperTheory.eigIn_finite_above_of_isCompactOperator :
       rw [← inner_conj_symm, this, inner_conj_symm]
     rw [h1, h2]
     exact hA.isSymmetric _ _
-  have hle : ∀ x : ℝ, eigIn W A x ≤
-      Module.End.eigenspace ((A ∘L prj W : H →L[ℂ] H) : H →ₗ[ℂ] H) (x : ℂ) := by
+  have hle
+      : ∀ x : ℝ,
+        eigIn W A x ≤ Module.End.eigenspace ((A ∘L prj W : H →L[ℂ] H) : H →ₗ[ℂ] H) (x : ℂ) := by
     intro x w hw
     obtain ⟨hwW, hwA⟩ := (hmem x w).1 hw
     rw [Module.End.mem_eigenspace_iff]
@@ -52,8 +60,9 @@ theorem UpperTheory.eigIn_finite_above_of_isCompactOperator :
     rw [hfix w hwW, hwA]
   have hfin := GroundTheory.Automorphic.CompactSelfAdjoint.finite_eigenvalues_norm_ge hC hB hη
   refine ⟨?_, ?_⟩
-  · refine Set.Finite.of_finite_image (f := fun x : ℝ => (x : ℂ)) (hfin.subset ?_)
-      (Complex.ofReal_injective.injOn)
+  · refine Set.Finite.of_finite_image
+      (f := fun x : ℝ => (x : ℂ))
+      (hfin.subset ?_) (Complex.ofReal_injective.injOn)
     rintro _ ⟨x, ⟨hx, hne⟩, rfl⟩
     refine ⟨?_, ?_⟩
     · obtain ⟨w, hw, hw0⟩ := (Submodule.ne_bot_iff _).1 hne

@@ -9,8 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.FiniteInt
 
 open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
 
-theorem UpperTheory.isFinite_fromNormalization_of_perfectField :
-    ∀ (k : Type) [Field k] [PerfectField k] {D T : Scheme.{0}} (t : T ⟶ Sp k) [LocallyOfFiniteType t] (f : D ⟶ T) [LocallyOfFiniteType f] [QuasiCompact f] [QuasiSeparated f] [IsIntegral D], IsFinite f.fromNormalization := by
+theorem UpperTheory.isFinite_fromNormalization_of_perfectField
+    : ∀ (k : Type) [Field k] [PerfectField k] {D T : Scheme.{0}} (t : T ⟶ Sp k)
+        [LocallyOfFiniteType t] (f : D ⟶ T) [LocallyOfFiniteType f] [QuasiCompact f]
+        [QuasiSeparated f] [IsIntegral D],
+      IsFinite f.fromNormalization := by
   intro k _ _ D T t _ f _ _ _ _
   rw [isFinite_iff]
   refine ⟨inferInstance, fun U hU => ?_⟩
@@ -37,27 +40,31 @@ theorem UpperTheory.isFinite_fromNormalization_of_perfectField :
       letI : Algebra k Γ(T, U) := kA.toAlgebra
       haveI : Algebra.FiniteType k Γ(T, U) := hkA
       haveI : IsNoetherianRing Γ(T, U) := Algebra.FiniteType.isNoetherianRing k Γ(T, U)
-      have heq : (D.germToFunctionField (f ⁻¹ᵁ U)).hom.comp (f.app U).hom =
-          (D.germToFunctionField V).hom.comp (f.appLE U V hVle).hom := by
+      have heq
+          : (D.germToFunctionField (f ⁻¹ᵁ U)).hom.comp (f.app U).hom
+            = (D.germToFunctionField V).hom.comp (f.appLE U V hVle).hom := by
         rw [← CommRingCat.hom_comp, ← CommRingCat.hom_comp]
         congr 1
         simp [Scheme.Hom.appLE]
       let φ : Γ(T, U) →+* D.functionField :=
         (D.germToFunctionField V).hom.comp (f.appLE U V hVle).hom
       letI : Algebra Γ(T, U) D.functionField := φ.toAlgebra
-      have h1 : (D.germToFunctionField V).hom.EssFiniteType := GlobalTheory.essFiniteType_germ hV _ _
+      have h1 : (D.germToFunctionField V).hom.EssFiniteType :=
+        GlobalTheory.essFiniteType_germ hV _ _
       have h2 : (f.appLE U V hVle).hom.EssFiniteType :=
         (LocallyOfFiniteType.finiteType_appLE f hU hV hVle).essFiniteType
       haveI : Algebra.EssFiniteType Γ(T, U) D.functionField := h2.comp h1
       haveI := UpperTheory.module_finite_integralClosure_of_finiteType_perfect k Γ(T, U) D.functionField
-      let ψ : Γ(D, f ⁻¹ᵁ U) →ₐ[Γ(T, U)] D.functionField :=
-        { (D.germToFunctionField (f ⁻¹ᵁ U)).hom with
-          commutes' := fun a => by
-            change (D.germToFunctionField (f ⁻¹ᵁ U)).hom ((f.app U).hom a) = φ a
-            exact congrArg (fun g => g a) heq }
-      exact GlobalTheory.finite_integralClosure_of_family (ι := Unit) (L := fun _ => D.functionField)
-        (fun _ => ψ) (fun b hb => D.germToFunctionField_injective (f ⁻¹ᵁ U)
-          (by rw [map_zero]; exact hb ()))
+      let ψ : Γ(D, f ⁻¹ᵁ U) →ₐ[Γ(T, U)] D.functionField := {
+        (D.germToFunctionField (f ⁻¹ᵁ U)).hom with
+        commutes' := fun a => by
+          change (D.germToFunctionField (f ⁻¹ᵁ U)).hom ((f.app U).hom a) = φ a
+          exact congrArg (fun g => g a) heq
+      }
+      exact GlobalTheory.finite_integralClosure_of_family (ι := Unit)
+        (L := fun _ => D.functionField)
+        (fun _ => ψ)
+        (fun b hb => D.germToFunctionField_injective (f ⁻¹ᵁ U) (by rw [map_zero]; exact hb ()))
   rw [CommRingCat.hom_comp]
   refine RingHom.Finite.comp ?_ ?_
   · exact RingHom.Finite.of_surjective _

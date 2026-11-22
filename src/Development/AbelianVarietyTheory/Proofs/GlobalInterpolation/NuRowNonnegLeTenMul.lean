@@ -7,12 +7,13 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.OneLeL
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem nuRow_zero_le (D : D7) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau) (hk : 0 < D.R.k) :
-    nuRow D u j τ 0 ≤ ((((D.hcW u τ).u ⟨0, hk⟩ : ℚ)) : ℝ) + wSz D j τ := by
+theorem nuRow_zero_le (D : D7) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Tau) (hk : 0 < D.R.k)
+    : nuRow D u j τ 0 ≤ ((((D.hcW u τ).u ⟨0, hk⟩ : ℚ)) : ℝ) + wSz D j τ := by
   unfold nuRow srcPar
   rw [dite_eq_left hk]
   have h1 : 1 ≤ D.R.N j := by unfold Ranks.N; omega
@@ -21,7 +22,13 @@ theorem nuRow_zero_le (D : D7) (u : D.what₂.Word) (j : ℕ) (τ : D.what₂.Ta
   push_cast
   linarith
 
-theorem nuRow_nonneg_le_ten_mul : ∀ (eps : ℝ) (Fm : FamP eps), (∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ u, ∀ j ∈ SizeData₂.lifts (Fm.D x i), ∀ τ, ∀ l < (Fm.D x i).R.N (j - 1), 0 ≤ nuRow (Fm.D x i) u j τ l ∧ nuRow (Fm.D x i) u j τ l ≤ 10 * x * (Fm.L x i).sc.b) := by
+theorem nuRow_nonneg_le_ten_mul
+    : ∀ (eps : ℝ) (Fm : FamP eps),
+      (∃ x0 : ℝ, ∀ x ≥ x0,
+        Fm.x1 < x
+          → ∀ i : Fm.Ix x, ∀ u, ∀ j ∈ SizeData₂.lifts (Fm.D x i), ∀ τ, ∀ l < (Fm.D x i).R.N (j - 1),
+            0 ≤ nuRow (Fm.D x i) u j τ l
+              ∧ nuRow (Fm.D x i) u j τ l ≤ 10 * x * (Fm.L x i).sc.b) := by
   intro eps Fm
   obtain ⟨x0, h⟩ := GlobalTheory.HCEntries.entries eps Fm
   refine ⟨x0, fun x hx hx1 i u j hj τ l hl => ?_⟩

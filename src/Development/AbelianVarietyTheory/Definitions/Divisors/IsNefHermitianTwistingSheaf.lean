@@ -12,7 +12,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open GlobalTheory.CechPic GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ProjSpace
 
@@ -28,10 +29,12 @@ variable {A u hu}
 
 end Two
 
-
 omit [IsIntegral X] in
-theorem isNef_of_small {D : ℕ} (hX : IsArithVar p D) (L : HermLB p) (hs : L.SemiPos D) (hf : ArInt.NefFib L)
-    (hg : ∀ x : X, ∃ u ∈ L.smallSec, x ∈ nonzeroLocus u) : L.IsNef D := by
+theorem isNef_of_small
+    {D : ℕ} (hX : IsArithVar p D)
+    (L : HermLB p)
+    (hs : L.SemiPos D) (hf : ArInt.NefFib L) (hg : ∀ x : X, ∃ u ∈ L.smallSec, x ∈ nonzeroLocus u)
+    : L.IsNef D := by
   refine ⟨hs, ?_, ?_⟩
   · exact hf
   · intro Z i _ _ _ hc hd
@@ -39,7 +42,9 @@ theorem isNef_of_small {D : ℕ} (hX : IsArithVar p D) (L : HermLB p) (hs : L.Se
     obtain ⟨u, hu, ha⟩ := hg (i (genericPoint Z))
     have hgen : genericPoint Z ∈ nonzeroLocus (GlobalTheory.secPull u i) := by
       rw [GlobalTheory.nonzeroLocus_secPull]; exact ha
-    have h0 : ∀ σ (y : CxPts (i ≫ p) σ), y ∈ ptsIn _ σ (nonzeroLocus (GlobalTheory.secPull u i)) := fun σ y => by
+    have h0
+        : ∀ σ (y : CxPts (i ≫ p) σ),
+          y ∈ ptsIn _ σ (nonzeroLocus (GlobalTheory.secPull u i)) := fun σ y => by
       refine mem_ptsIn.2 ?_
       have key : ∀ y : Sp ℂ ⟶ Z, y (IsLocalRing.closedPoint ℂ) = genericPoint Z := fun y =>
         GlobalTheory.HtSelfInter.eq_genericPoint hZ (Scheme.SpecToEquivOfField ℂ Z y).2.hom.charZero
@@ -48,12 +53,13 @@ theorem isNef_of_small {D : ℕ} (hX : IsArithVar p D) (L : HermLB p) (hs : L.Se
     refine ⟨_, isRatSec_ratOfSec _ hgen, ?_⟩
     rw [HermLB.curveDeg_sec i u hgen h0]
     refine sub_nonneg.2 (le_trans (b := 0) ?_ ?_)
-    · refine finsum_induction (· ≤ (0 : ℝ)) le_rfl (fun _ _ => add_nonpos) fun σ =>
-        finsum_induction (· ≤ (0 : ℝ)) le_rfl (fun _ _ => add_nonpos) fun y => ?_
-      exact div_nonpos_of_nonpos_of_nonneg (Real.log_nonpos (Weight.nsq_nonneg _ _ _) (hu σ _)) zero_le_two
+    · refine finsum_induction (· ≤ (0 : ℝ)) le_rfl
+        (fun _ _ => add_nonpos)
+        fun σ => finsum_induction (· ≤ (0 : ℝ)) le_rfl (fun _ _ => add_nonpos) fun y => ?_
+      exact div_nonpos_of_nonpos_of_nonneg (Real.log_nonpos (Weight.nsq_nonneg _ _ _) (hu σ _))
+        zero_le_two
     · exact finsum_nonneg fun z =>
         mul_nonneg (Int.cast_nonneg (mult_divOfSec_nonneg z)) (Real.log_natCast_nonneg _)
-
 
 section IntValues
 

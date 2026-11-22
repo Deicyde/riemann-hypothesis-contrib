@@ -9,23 +9,25 @@ namespace PI
 
 open Finset
 
-theorem lp_shift_sum (d : ℕ) [NeZero d] (xs : ZMod d → ℕ → ℝ) :
-    ∑ s, ∑ i ∈ range d, xs (s - (i : ZMod d)) i = ∑ s, ∑ i ∈ range d, xs s i := by
+theorem lp_shift_sum (d : ℕ) [NeZero d] (xs : ZMod d → ℕ → ℝ)
+    : ∑ s, ∑ i ∈ range d, xs (s - (i : ZMod d)) i = ∑ s, ∑ i ∈ range d, xs s i := by
   rw [Finset.sum_comm]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   exact Fintype.sum_equiv (Equiv.subRight (i : ZMod d)) _ _ (fun s => rfl)
 
-theorem lp_feasible_le (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (hl : 2 ≤ l)
-    {y : ℝ} (hy : y ∈ lpFeasible l d Ds) : y ≤ (∑ s, Ds s) / ((l : ℝ) + 1) := by
+theorem lp_feasible_le
+    (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (hl : 2 ≤ l) {y : ℝ} (hy : y ∈ lpFeasible l d Ds)
+    : y ≤ (∑ s, Ds s) / ((l : ℝ) + 1) := by
   obtain ⟨xs, h0, hsupp, hc, rfl⟩ := hy
   have hl1 : (1 : ℝ) ≤ (l : ℝ) := by exact_mod_cast (by omega : 1 ≤ l)
-  have hsum : ∑ s, ((∑ i ∈ range d, (l : ℝ) ^ i * xs s i) +
-      (∑ i ∈ range d, xs (s - (i : ZMod d)) i)) ≤ ∑ s, Ds s :=
+  have hsum
+      : ∑ s, ((∑ i ∈ range d, (l : ℝ) ^ i * xs s i) +
+          (∑ i ∈ range d, xs (s - (i : ZMod d)) i))
+        ≤ ∑ s, Ds s :=
     Finset.sum_le_sum fun s _ => hc s
   rw [Finset.sum_add_distrib, lp_shift_sum] at hsum
-  have hlow : (l : ℝ) * ∑ s, ∑ i ∈ range d, xs s i ≤
-      ∑ s, ∑ i ∈ range d, (l : ℝ) ^ i * xs s i := by
+  have hlow : (l : ℝ) * ∑ s, ∑ i ∈ range d, xs s i ≤ ∑ s, ∑ i ∈ range d, (l : ℝ) ^ i * xs s i := by
     rw [Finset.mul_sum]
     refine Finset.sum_le_sum fun s _ => ?_
     rw [Finset.mul_sum]
@@ -40,8 +42,8 @@ theorem lp_feasible_le (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (hl : 2 ≤ 
   rw [le_div_iff₀ (by positivity)]
   nlinarith [hsum, hlow]
 
-theorem lp_zero_mem (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (hD : ∀ s, 0 ≤ Ds s) :
-    (0 : ℝ) ∈ lpFeasible l d Ds :=
+theorem lp_zero_mem (l d : ℕ) [NeZero d] (Ds : ZMod d → ℝ) (hD : ∀ s, 0 ≤ Ds s)
+    : (0 : ℝ) ∈ lpFeasible l d Ds :=
   ⟨fun _ _ => 0, fun _ _ => le_rfl, fun _ _ _ => rfl, fun s => by simpa using hD s, by simp⟩
 
 theorem lpLower_main : LpLower := by
@@ -57,8 +59,9 @@ theorem lpLower_main : LpLower := by
     have : (l : ℝ) ^ 2 - 1 = ((l : ℝ) - 1) * ((l : ℝ) + 1) := by ring
     rw [this]
     exact mul_ne_zero h2 h1
-  have hid : (l : ℝ) / ((l : ℝ) ^ 2 - 1) * (∑ s, Ds s) - (∑ s, Ds s) / ((l : ℝ) + 1) =
-      (∑ s, Ds s) / ((l : ℝ) ^ 2 - 1) := by
+  have hid
+      : (l : ℝ) / ((l : ℝ) ^ 2 - 1) * (∑ s, Ds s) - (∑ s, Ds s) / ((l : ℝ) + 1)
+        = (∑ s, Ds s) / ((l : ℝ) ^ 2 - 1) := by
     have h4 : (l : ℝ) ^ 2 - 1 = ((l : ℝ) - 1) * ((l : ℝ) + 1) := by ring
     rw [h4]
     field_simp

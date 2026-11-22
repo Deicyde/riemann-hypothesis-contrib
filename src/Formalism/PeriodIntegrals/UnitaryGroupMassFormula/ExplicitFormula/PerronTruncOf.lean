@@ -54,8 +54,9 @@ theorem perronTrunc_of {C : ℝ} (hK : PerronKernel) (hS : PerronSumBound C) : P
     · rw [LSeries.term_of_ne_zero hn, Complex.ofReal_div, Complex.ofReal_cpow (Nat.cast_nonneg _)]
       push_cast
       rfl
-  have hterm : ∀ (n : ℕ) (s : ℂ), s.re = c →
-      ‖LSeries.term a s n‖ ≤ ArithmeticFunction.vonMangoldt n / (n : ℝ) ^ c := by
+  have hterm
+      : ∀ (n : ℕ) (s : ℂ),
+        s.re = c → ‖LSeries.term a s n‖ ≤ ArithmeticFunction.vonMangoldt n / (n : ℝ) ^ c := by
     intro n s hs
     rw [LSeries.norm_term_eq, hs]
     split_ifs with hn
@@ -71,54 +72,66 @@ theorem perronTrunc_of {C : ℝ} (hK : PerronKernel) (hS : PerronSumBound C) : P
     rw [hre, abs_of_pos hc0] at h
     exact h
 
-  have hDC := intervalIntegral.hasSum_integral_of_dominated_convergence (μ := MeasureTheory.volume)
-    (a := -T) (b := T)
-    (F := fun (n : ℕ) (t : ℝ) => LSeries.term a ((c : ℂ) + t * I) n *
-      ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)))
-    (f := fun t : ℝ => LSeries a ((c : ℂ) + t * I) * ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)))
-    (fun n _ => ArithmeticFunction.vonMangoldt n / (n : ℝ) ^ c * (u ^ c / c))
-    (fun n => by
-      rcases eq_or_ne n 0 with rfl | hn
-      · simp only [LSeries.term_zero, zero_mul]
-        exact MeasureTheory.aestronglyMeasurable_const
-      · simp only [LSeries.term_of_ne_zero hn]
-        apply Measurable.aestronglyMeasurable
-        fun_prop)
-    (fun n => Filter.Eventually.of_forall (fun t _ => by
-      rw [norm_mul]
-      exact mul_le_mul (hterm n _ (hre t)) (hkern t) (norm_nonneg _)
-        (div_nonneg ArithmeticFunction.vonMangoldt_nonneg (by positivity))))
-    (Filter.Eventually.of_forall (fun t _ => hΛsum.mul_right _))
-    intervalIntegrable_const
-    (Filter.Eventually.of_forall (fun t _ => by
-      have hsum : LSeriesSummable a ((c : ℂ) + t * I) :=
-        Summable.of_norm_bounded hΛsum (fun n => hterm n _ (hre t))
-      exact hsum.hasSum.mul_right _))
+  have hDC :=
+    intervalIntegral.hasSum_integral_of_dominated_convergence (μ := MeasureTheory.volume) (a := -T)
+      (b := T)
+      (F := fun (n : ℕ) (t : ℝ) =>
+        LSeries.term a ((c : ℂ) + t * I) n * ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)))
+      (f := fun t : ℝ =>
+        LSeries a ((c : ℂ) + t * I) * ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)))
+      (fun n _ => ArithmeticFunction.vonMangoldt n / (n : ℝ) ^ c * (u ^ c / c))
+      (fun n => by
+        rcases eq_or_ne n 0 with rfl | hn
+        · simp only [LSeries.term_zero, zero_mul]
+          exact MeasureTheory.aestronglyMeasurable_const
+        · simp only [LSeries.term_of_ne_zero hn]
+          apply Measurable.aestronglyMeasurable
+          fun_prop)
+      (fun n =>
+        Filter.Eventually.of_forall (fun t _ => by
+          rw [norm_mul]
+          exact mul_le_mul (hterm n _ (hre t)) (hkern t) (norm_nonneg _)
+            (div_nonneg ArithmeticFunction.vonMangoldt_nonneg (by positivity))))
+      (Filter.Eventually.of_forall (fun t _ => hΛsum.mul_right _)) intervalIntegrable_const
+      (Filter.Eventually.of_forall (fun t _ => by
+        have hsum : LSeriesSummable a ((c : ℂ) + t * I) :=
+          Summable.of_norm_bounded hΛsum (fun n => hterm n _ (hre t))
+        exact hsum.hasSum.mul_right _))
 
-  have hG : HasSum (fun n : ℕ => a n * perronK (u / n) c T)
-      ((1 / (2 * Real.pi) : ℂ) * ∫ t : ℝ in (-T)..T, LSeries a ((c : ℂ) + t * I) *
-        ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I))) := by
-    have hfun : (fun n : ℕ => a n * perronK (u / n) c T) = fun n : ℕ => (1 / (2 * Real.pi) : ℂ) *
-        ∫ t : ℝ in (-T)..T, LSeries.term a ((c : ℂ) + t * I) n *
-          ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)) := by
+  have hG : HasSum
+      (fun n : ℕ => a n * perronK (u / n) c T)
+      ((1 / (2 * Real.pi) : ℂ)
+        * ∫ t : ℝ in (-T)..T, LSeries a ((c : ℂ) + t * I) *
+          ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I))) := by
+    have hfun
+        : (fun n : ℕ => a n * perronK (u / n) c T)
+          = fun n : ℕ =>
+            (1 / (2 * Real.pi) : ℂ)
+              * ∫ t : ℝ in (-T)..T, LSeries.term a ((c : ℂ) + t * I) n *
+                  ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)) := by
       funext n
       rcases eq_or_ne n 0 with rfl | hn
       · simp [ha0, LSeries.term_zero]
-      · have h1 : (∫ t : ℝ in (-T)..T, LSeries.term a ((c : ℂ) + t * I) n *
-              ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I))) =
-            a n * ∫ t : ℝ in (-T)..T, ((u / n : ℝ) : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I) := by
-          rw [← intervalIntegral.integral_const_mul]
-          congr 1
-          funext t
-          exact term_mul_kernel a u hu0 n hn _
+      · have h1
+            : (∫ t : ℝ in (-T)..T, LSeries.term a ((c : ℂ) + t * I) n *
+                ((u : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I)))
+              = a n
+                * ∫ t : ℝ in (-T)..T, ((u / n : ℝ) : ℂ) ^ ((c : ℂ) + t * I) / ((c : ℂ) + t * I) :=
+          by
+            rw [← intervalIntegral.integral_const_mul]
+            congr 1
+            funext t
+            exact term_mul_kernel a u hu0 n hn _
         rw [h1, perronK]
         ring
     rw [hfun]
     exact hDC.mul_left _
 
-  have hind : HasSum (fun n : ℕ => a n * (if 1 ≤ u / n then (1 : ℂ) else 0))
+  have hind : HasSum
+      (fun n : ℕ => a n * (if 1 ≤ u / n then (1 : ℂ) else 0))
       (∑ n ∈ Finset.Icc 1 ⌊u⌋₊, a n) := by
-    have h : HasSum (fun n : ℕ => a n * (if 1 ≤ u / n then (1 : ℂ) else 0))
+    have h : HasSum
+        (fun n : ℕ => a n * (if 1 ≤ u / n then (1 : ℂ) else 0))
         (∑ n ∈ Finset.Icc 1 ⌊u⌋₊, a n * (if 1 ≤ u / n then (1 : ℂ) else 0)) := by
       apply hasSum_sum_of_ne_finset_zero
       intro n hn
@@ -132,7 +145,7 @@ theorem perronTrunc_of {C : ℝ} (hK : PerronKernel) (hS : PerronSumBound C) : P
           have h1 := Nat.lt_floor_add_one u
           have h2 : (⌊u⌋₊ : ℝ) + 1 ≤ n := by exact_mod_cast hn
           linarith
-        have h3 : ¬ (1 ≤ u / n) := by
+        have h3 : ¬(1 ≤ u / n) := by
           rw [not_le, div_lt_one (by linarith)]
           exact hlt
         simp [h3]
@@ -148,17 +161,18 @@ theorem perronTrunc_of {C : ℝ} (hK : PerronKernel) (hS : PerronSumBound C) : P
     simp [h4]
   have hdiff := hind.sub hG
   rw [← hdiff.tsum_eq]
-  calc _ ≤ ∑' n : ℕ, ArithmeticFunction.vonMangoldt n * (u / n) ^ c * kb T (u / n) := by
-        apply tsum_of_norm_bounded hSs.hasSum
-        intro n
-        rw [← mul_sub, norm_mul]
-        rcases eq_or_ne n 0 with rfl | hn
-        · simp [ha0]
-        · have hy : 0 < u / n := div_pos hu0 (by exact_mod_cast Nat.pos_of_ne_zero hn)
-          have h1 := kernel_le_kb hK (u / n) c T hy hc0 hT0
-          rw [norm_sub_rev] at h1
-          rw [mul_assoc]
-          exact mul_le_mul (ha n) h1 (norm_nonneg _) ArithmeticFunction.vonMangoldt_nonneg
+  calc
+    _ ≤ ∑' n : ℕ, ArithmeticFunction.vonMangoldt n * (u / n) ^ c * kb T (u / n) := by
+      apply tsum_of_norm_bounded hSs.hasSum
+      intro n
+      rw [← mul_sub, norm_mul]
+      rcases eq_or_ne n 0 with rfl | hn
+      · simp [ha0]
+      · have hy : 0 < u / n := div_pos hu0 (by exact_mod_cast Nat.pos_of_ne_zero hn)
+        have h1 := kernel_le_kb hK (u / n) c T hy hc0 hT0
+        rw [norm_sub_rev] at h1
+        rw [mul_assoc]
+        exact mul_le_mul (ha n) h1 (norm_nonneg _) ArithmeticFunction.vonMangoldt_nonneg
     _ ≤ _ := hSle
 
 end PI.EF.PK

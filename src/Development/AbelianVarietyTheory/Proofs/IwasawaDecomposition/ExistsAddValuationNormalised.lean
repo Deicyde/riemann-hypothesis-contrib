@@ -13,9 +13,10 @@ open scoped Formalism.Per
 
 namespace GlobalTheory.MemLoc
 
-theorem _root_.GlobalTheory.MemLoc.exists_addValuation_normalised : ∀ (l : ℕ) [Fact l.Prime], ∀ LL : _root_.Formalism.BasicNotions.Loc.FinExt l,
-    ∃ v : AddValuation ↥LL.1 (WithTop ℚ), v (l : ↥LL.1) = 1 ∧
-      ∀ x : ↥LL.1, 0 ≤ v x ↔ x ∈ _root_.Formalism.BasicNotions.Loc.OL LL := by
+theorem _root_.GlobalTheory.MemLoc.exists_addValuation_normalised
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ LL : _root_.Formalism.BasicNotions.Loc.FinExt l,
+      ∃ v : AddValuation ↥LL.1 (WithTop ℚ),
+        v (l : ↥LL.1) = 1 ∧ ∀ x : ↥LL.1, 0 ≤ v x ↔ x ∈ _root_.Formalism.BasicNotions.Loc.OL LL := by
   intro l _ LL
   have hprime : l.Prime := Fact.out
   have hnorm : ‖(l : PadicAlgCl l)‖ = (l : ℝ)⁻¹ := by
@@ -33,9 +34,10 @@ theorem _root_.GlobalTheory.MemLoc.exists_addValuation_normalised : ∀ (l : ℕ
     show v ((l : ↥LL.1) : PadicAlgCl l) = 1
     rw [hcast]
     obtain ⟨q, hvq, hlog⟩ := hv _ (norm_pos_iff.1 hl0)
-    have hq : q = 1 := Rat.cast_injective (by
-      have := mul_right_cancel₀ hL.ne (hlog.symm.trans (one_mul _).symm)
-      simpa using this)
+    have hq : q = 1 :=
+      Rat.cast_injective (by
+        have := mul_right_cancel₀ hL.ne (hlog.symm.trans (one_mul _).symm)
+        simpa using this)
     rw [hvq, hq]
     rfl
   · show 0 ≤ v (x : PadicAlgCl l) ↔ x ∈ integralClosure ℤ_[l] LL.1

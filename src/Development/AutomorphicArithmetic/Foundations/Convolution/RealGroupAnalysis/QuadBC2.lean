@@ -17,7 +17,8 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory
-open Neutral.B1 Formalism.L2.Host GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Published UpperTheory.ConvolutionTheory.R2
+open Neutral.B1 Formalism.L2.Host GlobalTheory.CuspRep UpperTheory.V UpperTheory.V.Published
+  UpperTheory.ConvolutionTheory.R2
 
 theorem UpperTheory.ConvolutionTheory.R2.quadBC2 : UpperTheory.V.Z.Bc.QuadBC2 := by
   intro F E _ _ _ _ _ _ _ h2 π hreg
@@ -36,6 +37,10 @@ theorem UpperTheory.ConvolutionTheory.R2.quadBC2 : UpperTheory.V.Z.Bc.QuadBC2 :=
       rw [← exp F E D W M π f hf φ hφ h, ← hΦ, hm]
       simp [WE]
     obtain ⟨P, hP⟩ := irr F E D W M π hreg h0 hne
-    exact ⟨P, fun τ m hm => ⟨hm.1, fun u Φ hΦ => cap F E D W M π τ m hm u Φ (hP hΦ)⟩,
-      split F E D W M π h0 P hP, unr F E D W M π h0 P hP⟩
+    exact ⟨
+      P,
+      fun τ m hm => ⟨hm.1, fun u Φ hΦ => cap F E D W M π τ m hm u Φ (hP hΦ)⟩,
+      split F E D W M π h0 P hP,
+      unr F E D W M π h0 P hP
+    ⟩
   · exact Or.inl ⟨W.η, W.quad, dih F E D W M π hreg h0⟩

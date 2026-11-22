@@ -4,10 +4,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
-private theorem card_le_level (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N]
-    (T : Finset (DirichletCharacter O N)) : T.card ≤ N := by
+private theorem card_le_level
+    (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N] (T : Finset (DirichletCharacter O N))
+    : T.card ≤ N := by
   classical
   have hli := linearIndependent_monoidHom (ZMod N) O
   let g : T → (ZMod N →* O) := fun χ => (χ.1 : MulChar (ZMod N) O).toMonoidHom
@@ -22,9 +24,12 @@ private theorem card_le_level (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [Ne
   rw [Module.finrank_fintype_fun_eq_card, ZMod.card, Fintype.card_coe] at hT
   exact hT
 
-theorem UpperTheory.V.HV.xCard :
-    ∀ (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N], (∀ T : Finset (DirichletCharacter O N), T.card ≤ N) ∧
-      ∀ (M : ℕ), 0 < M → ∀ T : Finset (DirichletCharacter O N), (∀ ψ ∈ T, ψ.conductor ∣ M) → T.card ≤ M := by
+theorem UpperTheory.V.HV.xCard
+    : ∀ (O : Type) [CommRing O] [IsDomain O] (N : ℕ) [NeZero N],
+      (∀ T : Finset (DirichletCharacter O N), T.card ≤ N)
+        ∧ ∀ (M : ℕ),
+          0 < M
+            → ∀ T : Finset (DirichletCharacter O N), (∀ ψ ∈ T, ψ.conductor ∣ M) → T.card ≤ M := by
   intro O _ _ N _
   refine ⟨card_le_level O N, ?_⟩
   intro M hM T hT
@@ -41,7 +46,10 @@ theorem UpperTheory.V.HV.xCard :
     rw [← DirichletCharacter.changeLevel_trans]
     exact hχ₀
   let f : DirichletCharacter O N → DirichletCharacter O g := fun ψ =>
-    if h : ∃ ψ₀ : DirichletCharacter O g, ψ = DirichletCharacter.changeLevel hgN ψ₀ then h.choose else 1
+    if h : ∃ ψ₀ : DirichletCharacter O g, ψ = DirichletCharacter.changeLevel hgN ψ₀ then
+      h.choose
+    else
+      1
   have hf : ∀ ψ ∈ T, ψ = DirichletCharacter.changeLevel hgN (f ψ) := by
     intro ψ hψ
     have h := hex ψ hψ
@@ -50,6 +58,8 @@ theorem UpperTheory.V.HV.xCard :
   have hinj : Set.InjOn f T := by
     intro a ha b hb hab
     rw [hf a ha, hf b hb, hab]
-  calc T.card = (T.image f).card := (Finset.card_image_of_injOn hinj).symm
+  calc
+    T.card
+      = (T.image f).card := (Finset.card_image_of_injOn hinj).symm
     _ ≤ g := card_le_level O g _
     _ ≤ M := hgM

@@ -27,16 +27,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RepMemSm
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.Core.Rk GlobalTheory.Core.Mi
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.S
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes MeasureTheory IsDedekindDomain
+  NumberField Matrix Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum
+  Formalism.IndefR.AutomorphicEvaluation Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.RowDict
+  Formalism.L2.SG.RowsJoinPinned GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf
+  GlobalTheory.Core.Rk GlobalTheory.Core.Mi
 open scoped TensorProduct InnerProductSpace Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Core.Mi.SeeHH
 
-theorem inner_antiunitary_swap {E F : Type*} [NormedAddCommGroup E] [InnerProductSpace ℂ E] [NormedAddCommGroup F]
-    [InnerProductSpace ℂ F] (U : E ≃ₗᵢ⋆[ℂ] F) (x y : E) : ⟪U x, U y⟫_ℂ = ⟪y, x⟫_ℂ := by
-  have hI : ∀ z : E, U (Complex.I • z) = (-Complex.I) • U z := by
-    intro z; rw [map_smulₛₗ]; simp
+theorem inner_antiunitary_swap
+    {E F : Type*}
+    [NormedAddCommGroup E] [InnerProductSpace ℂ E] [NormedAddCommGroup F] [InnerProductSpace ℂ F]
+    (U : E ≃ₗᵢ⋆[ℂ] F) (x y : E)
+    : ⟪U x, U y⟫_ℂ = ⟪y, x⟫_ℂ := by
+  have hI : ∀ z : E, U (Complex.I • z) = (-Complex.I) • U z := by intro z; rw [map_smulₛₗ]; simp
   have h1 : ‖U x + U y‖ = ‖y + x‖ := by rw [← map_add (f := _), U.norm_map, add_comm]
   have h2 : ‖U x - U y‖ = ‖y - x‖ := by rw [← map_sub, U.norm_map, norm_sub_rev]
   have h3 : ‖U x - Complex.I • U y‖ = ‖y - Complex.I • x‖ := by
@@ -44,13 +53,15 @@ theorem inner_antiunitary_swap {E F : Type*} [NormedAddCommGroup E] [InnerProduc
       rw [map_add (f := _), hI, neg_smul, sub_eq_add_neg]
     have e2 : y - Complex.I • x = (-Complex.I) • (x + Complex.I • y) := by
       rw [smul_add, smul_smul, neg_mul, Complex.I_mul_I, neg_neg, one_smul, neg_smul]; abel
-    rw [e1, U.norm_map, e2, norm_smul]; simp
+    rw [e1, U.norm_map, e2, norm_smul]
+    simp
   have h4 : ‖U x + Complex.I • U y‖ = ‖y + Complex.I • x‖ := by
     have e1 : U x + Complex.I • U y = U (x - Complex.I • y) := by
       rw [map_sub, hI, neg_smul, sub_neg_eq_add]
     have e2 : y + Complex.I • x = Complex.I • (x - Complex.I • y) := by
       rw [smul_sub, smul_smul, Complex.I_mul_I, neg_smul, one_smul, sub_neg_eq_add]; abel
-    rw [e1, U.norm_map, e2, norm_smul]; simp
+    rw [e1, U.norm_map, e2, norm_smul]
+    simp
   rw [inner_eq_sum_norm_sq_div_four (U x) (U y), inner_eq_sum_norm_sq_div_four y x]
   simp only [RCLike.I_to_complex]
   rw [h1, h2, h3, h4]
@@ -59,28 +70,32 @@ end GlobalTheory.Core.Mi.SeeHH
 
 namespace GlobalTheory.Core.Mi.SeeHH
 
-theorem star_toLp_eq {D : D7} (X : HidaSetting D) {f : X.B.I.GA → ℂ} (hm : MemLp f 2 (muX X))
-    (hs : MemLp (fun x => star (f x)) 2 (muX X)) :
-    star (hm.toLp f) = hs.toLp (fun x => star (f x)) := by
+theorem star_toLp_eq
+    {D : D7} (X : HidaSetting D)
+    {f : X.B.I.GA → ℂ} (hm : MemLp f 2 (muX X)) (hs : MemLp (fun x => star (f x)) 2 (muX X))
+    : star (hm.toLp f) = hs.toLp (fun x => star (f x)) := by
   apply Lp.ext
   filter_upwards [Lp.coeFn_star (hm.toLp f), hm.coeFn_toLp, hs.coeFn_toLp] with x a1 a2 a3
   rw [a1, a3, Pi.star_apply, a2]
 
-theorem re_fix_of_row {D : D7} (X : HidaSetting D) {f : X.B.I.GA → ℂ} (hf : RowFun X f) (hm : MemLp f 2 (muX X)) :
-    X.B.Re (star (hm.toLp f)) = star (hm.toLp f) := by
+theorem re_fix_of_row
+    {D : D7} (X : HidaSetting D) {f : X.B.I.GA → ℂ} (hf : RowFun X f) (hm : MemLp f 2 (muX X))
+    : X.B.Re (star (hm.toLp f)) = star (hm.toLp f) := by
   have hs : MemLp (fun x => star (f x)) 2 (muX X) := hm.star
   rw [star_toLp_eq X hm hs]
   have hK := Formalism.L2.SG.Closed.level_subgroup_is_group X
   have hKL := Formalism.L2.SG.Closed.level_subgroup_properties X
-  have hKM : MeasurableSet X.K2 := (Formalism.L2.SG.PoincareInHH.Cut.level_subgroup_isClopen X hK hKL).isOpen.measurableSet
+  have hKM : MeasurableSet X.K2 :=
+    (Formalism.L2.SG.PoincareInHH.Cut.level_subgroup_isClopen X hK hKL).isOpen.measurableSet
   have hvol : (X.B.μf X.K2).toReal ≠ 0 := ENNReal.toReal_ne_zero.2 ⟨hKL.2.2.1.ne', hKL.2.2.2.ne⟩
   refine Formalism.L2.SG.Pf.idempotent_fixes_invariant_L2 X (fun x => star (f x)) ?_ ?_ hs ?_
   · exact (continuous_star.comp hf.cont).measurable
   · intro γ hγ y
     rw [hf.left γ hγ y]
   · refine Filter.Eventually.of_forall fun y => ?_
-    have hfun : (fun g => X.B.e g * star (f (y * (1, g)))) =
-        X.K2.indicator (fun _ => star (f y) / ((X.B.μf X.K2).toReal : ℂ)) := by
+    have hfun
+        : (fun g => X.B.e g * star (f (y * (1, g))))
+          = X.K2.indicator (fun _ => star (f y) / ((X.B.μf X.K2).toReal : ℂ)) := by
       funext g
       rw [X.e_eq g]
       by_cases hg : g ∈ X.K2
@@ -105,22 +120,28 @@ end GlobalTheory.Core.Mi.SeeHH
 
 namespace GlobalTheory.Core.Mi.SeeHH
 
-theorem real_shift {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D)
-    {S : D.what₂.Tau → SPar} (M : DSModel (D.sp.Y 0) S) (J : Set (GA D (D.sp.Y 0))) (χ : GA D (D.sp.Y 0) → ℂ)
-    (t : GA D (D.sp.Y 0)) (ht : t ∈ GfC (D.sp.Y 0)) (hR : RealSplit X h θ) (v₀ : M.Vec) (g : X.B.I.Ginf) :
-    ∃ a : D.what₂.Tau → Matrix (Fin (D.sp.Y 0).rank) (Fin (D.sp.Y 0).rank) ℂ,
-      (∀ τ, a τ ∈ Formalism.QuantumDeterminants.UH (gramAt D (D.sp.Y 0) τ)) ∧
-      (∀ τ, (iotaX X h (atTau θ (D.sp.Y 0) τ (a τ))).1 (X.pl.symm τ) = g (X.pl.symm τ)) ∧
-      ∃ w : M.Vec, (∀ τ, (w τ : M.H τ) = M.rep τ (a τ) (v₀ τ : M.H τ)) ∧
-        ∀ U ∈ Mult θ M J χ, ∀ x, U v₀ ((iotaX X h).symm (x * (g, 1)) * t) = U w ((iotaX X h).symm x * t) := by
+theorem real_shift
+    {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D)
+    {S : D.what₂.Tau → SPar} (M : DSModel (D.sp.Y 0) S)
+    (J : Set (GA D (D.sp.Y 0))) (χ : GA D (D.sp.Y 0) → ℂ)
+    (t : GA D (D.sp.Y 0)) (ht : t ∈ GfC (D.sp.Y 0))
+    (hR : RealSplit X h θ) (v₀ : M.Vec) (g : X.B.I.Ginf)
+    : ∃ a : D.what₂.Tau → Matrix (Fin (D.sp.Y 0).rank) (Fin (D.sp.Y 0).rank) ℂ,
+      (∀ τ, a τ ∈ Formalism.QuantumDeterminants.UH (gramAt D (D.sp.Y 0) τ))
+        ∧ (∀ τ, (iotaX X h (atTau θ (D.sp.Y 0) τ (a τ))).1 (X.pl.symm τ) = g (X.pl.symm τ))
+        ∧ ∃ w : M.Vec,
+          (∀ τ, (w τ : M.H τ) = M.rep τ (a τ) (v₀ τ : M.H τ))
+            ∧ ∀ U ∈ Mult θ M J χ, ∀ x,
+              U v₀ ((iotaX X h).symm (x * (g, 1)) * t) = U w ((iotaX X h).symm x * t) := by
   classical
   choose a ha hb using fun τ => hR.2.2.2 τ (g (X.pl.symm τ))
   have hsm : ∀ τ, M.rep τ (a τ) (v₀ τ : M.H τ) ∈ M.sm τ := fun τ =>
     GlobalTheory.SmoothStable.rep_mem_sm D (D.sp.Y 0) S M τ (a τ) (ha τ) _ (v₀ τ).2
   let gs : Finset D.what₂.Tau → X.B.I.GA := fun s => ((fun v => if X.pl v ∈ s then g v else 1), 1)
   let ws : Finset D.what₂.Tau → M.Vec := fun s τ => if τ ∈ s then ⟨_, hsm τ⟩ else v₀ τ
-  have key : ∀ s : Finset D.what₂.Tau, ∀ U ∈ Mult θ M J χ, ∀ x,
-      U v₀ ((iotaX X h).symm (x * gs s) * t) = U (ws s) ((iotaX X h).symm x * t) := by
+  have key
+      : ∀ s : Finset D.what₂.Tau, ∀ U ∈ Mult θ M J χ, ∀ x,
+        U v₀ ((iotaX X h).symm (x * gs s) * t) = U (ws s) ((iotaX X h).symm x * t) := by
     intro s
     induction s using Finset.induction_on with
     | empty =>
@@ -137,8 +158,9 @@ theorem real_shift {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.Ins
         by_cases hσ : σ = τ
         · subst hσ; simp [ws]
         · simp [ws, hσ, Function.update_of_ne hσ]
-      have hE := Formalism.IndefR.Eqv.KerDiag.mult_equiv θ M J χ hU τ (ha τ) (ws s) ⟨_, hsm τ⟩
-        (by simp only [hws])
+      have hE :=
+        Formalism.IndefR.Eqv.KerDiag.mult_equiv θ M J χ hU τ (ha τ) (ws s) ⟨_, hsm τ⟩
+          (by simp only [hws])
       have hmul : iotaX X h (atTau θ (D.sp.Y 0) τ (a τ)) * gs s = gs (insert τ s) := by
         refine Prod.ext (funext fun v => ?_) ?_
         · simp only [gs, Prod.fst_mul, Pi.mul_apply]
@@ -155,42 +177,62 @@ theorem real_shift {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.Ins
       show U v₀ ((iotaX X h).symm (x * gs (insert τ s)) * t) =
         U (ws s) ((iotaX X h).symm x * t * atTau θ (D.sp.Y 0) τ (a τ))
       rw [mul_assoc, ← GlobalTheory.HeckeParts.comm_atTau ht τ (a τ), ← mul_assoc]
-      have hι : (iotaX X h).symm x * atTau θ (D.sp.Y 0) τ (a τ) =
-          (iotaX X h).symm (x * iotaX X h (atTau θ (D.sp.Y 0) τ (a τ))) := by
+      have hι
+          : (iotaX X h).symm x * atTau θ (D.sp.Y 0) τ (a τ)
+            = (iotaX X h).symm (x * iotaX X h (atTau θ (D.sp.Y 0) τ (a τ))) := by
         rw [map_mul, ContinuousMulEquiv.symm_apply_apply]
       rw [hι, ← ih U hU, mul_assoc, hmul]
   have eu : gs Finset.univ = (g, 1) := Prod.ext (funext fun v => by simp [gs]) rfl
   refine ⟨a, ha, hb, ws Finset.univ, fun τ => by simp [ws], fun U hU x => ?_⟩
   rw [← key Finset.univ U hU x, eu]
 
-theorem coef_eq {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D)
-    {S : D.what₂.Tau → SPar} (M : DSModel (D.sp.Y 0) S) (v₀ : M.Vec) (hCV : ConjVec X h θ M v₀) (g : X.B.I.Ginf)
-    (a : D.what₂.Tau → Matrix (Fin (D.sp.Y 0).rank) (Fin (D.sp.Y 0).rank) ℂ)
+theorem coef_eq
+    {D : D7} (X : HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D)
+    {S : D.what₂.Tau → SPar} (M : DSModel (D.sp.Y 0) S) (v₀ : M.Vec) (hCV : ConjVec X h θ M v₀)
+    (g : X.B.I.Ginf) (a : D.what₂.Tau → Matrix (Fin (D.sp.Y 0).rank) (Fin (D.sp.Y 0).rank) ℂ)
     (ha : ∀ τ, a τ ∈ Formalism.QuantumDeterminants.UH (gramAt D (D.sp.Y 0) τ))
     (hb : ∀ τ, (iotaX X h (atTau θ (D.sp.Y 0) τ (a τ))).1 (X.pl.symm τ) = g (X.pl.symm τ))
-    (w : M.Vec) (hw : ∀ τ, (w τ : M.H τ) = M.rep τ (a τ) (v₀ τ : M.H τ)) :
-    ∏ τ, ⟪(w τ : M.H τ), (v₀ τ : M.H τ)⟫_ℂ = Formalism.L2.SG.ProjRows.mInf X.B.I X.B.σ X.B.w g := by
+    (w : M.Vec) (hw : ∀ τ, (w τ : M.H τ) = M.rep τ (a τ) (v₀ τ : M.H τ))
+    : ∏ τ, ⟪(w τ : M.H τ), (v₀ τ : M.H τ)⟫_ℂ
+      = Formalism.L2.SG.ProjRows.mInf X.B.I X.B.σ X.B.w g := by
   obtain ⟨c, hc1, hc2⟩ := hCV
-  have e : ∀ τ, ⟪(w τ : M.H τ), (v₀ τ : M.H τ)⟫_ℂ =
-      ⟪X.B.w (X.pl.symm τ), X.B.σ (X.pl.symm τ) (uMat (g (X.pl.symm τ))) (X.B.w (X.pl.symm τ))⟫_ℂ := by
-    intro τ
-    rw [← inner_antiunitary_swap (c τ) (v₀ τ : M.H τ) (w τ : M.H τ), hw τ,
-      hc1 τ (a τ) (ha τ), hb τ, hc2 τ]
+  have e
+      : ∀ τ,
+        ⟪(w τ : M.H τ), (v₀ τ : M.H τ)⟫_ℂ
+          = ⟪X.B.w (X.pl.symm τ), X.B.σ (X.pl.symm τ) (uMat (g (X.pl.symm τ))) (X.B.w (X.pl.symm τ))⟫_ℂ :=
+    by
+      intro τ
+      rw [← inner_antiunitary_swap (c τ) (v₀ τ : M.H τ) (w τ : M.H τ), hw τ, hc1 τ (a τ) (ha τ),
+        hb τ, hc2 τ]
   simp_rw [e]
   exact Fintype.prod_equiv X.pl.symm _ _ (fun _ => rfl)
 
 end GlobalTheory.Core.Mi.SeeHH
 
-
 open GlobalTheory.Core.Mi.SeeHH in
-theorem GlobalTheory.Core.Mi.SeeHH.conj_evS_mem_HHX : GlobalTheory.Published.CuspRapidDecay → ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D) (S : D.what₂.Tau → SPar) (M : DSModel (D.sp.Y 0) S) (J : Set (GA D (D.sp.Y 0))) (χ : GA D (D.sp.Y 0) → ℂ) (t : GA D (D.sp.Y 0)) (v₀ : M.Vec), S = parB (Ptw D) 0 → IsInfFam θ → GlobalTheory.Count.GapGe X.B (100 * (D.R.r : ℝ) ^ 4) → IdE X → Matches X h J χ t → ConjVec X h θ M v₀ → ∀ T ∈ MultT θ M J χ, ∀ φ : L2X X, (φ : X.B.I.GA → ℂ) =ᵐ[muX X] evS X h t (T (PiTensorProduct.tprod ℂ v₀)) → star φ ∈ HHX X := by
+theorem GlobalTheory.Core.Mi.SeeHH.conj_evS_mem_HHX
+    : GlobalTheory.Published.CuspRapidDecay
+      → ∀ (D : D7) (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+          (h : X.B.I = Formalism.L2.SG.InstExistsPf.instOf D) (θ : InfFam D)
+          (S : D.what₂.Tau → SPar) (M : DSModel (D.sp.Y 0) S) (J : Set (GA D (D.sp.Y 0)))
+          (χ : GA D (D.sp.Y 0) → ℂ) (t : GA D (D.sp.Y 0)) (v₀ : M.Vec),
+        S = parB (Ptw D) 0 → IsInfFam θ → GlobalTheory.Count.GapGe X.B (100 * (D.R.r : ℝ) ^ 4)
+          → IdE X → Matches X h J χ t → ConjVec X h θ M v₀
+          → ∀ T ∈ MultT θ M J χ, ∀ φ : L2X X,
+            (φ : X.B.I.GA → ℂ) =ᵐ[muX X] evS X h t (T (PiTensorProduct.tprod ℂ v₀))
+              → star φ ∈ HHX X := by
   intro hP D X h θ S M J χ t v₀ hS hθ hGap hIdE hMat hCV T hT φ hφ
   obtain ⟨-, -, -, -, -, hL⟩ := GlobalTheory.T.discreteSeriesTestData_of_noncompactGaps D X hGap
   have hR := GlobalTheory.T.modelIdentification_respects_real_and_finite D X h θ hθ hIdE
   have hTm : PiTensorProduct.lift.symm T ∈ Mult θ M J χ := (mem_multT θ M J χ T).1 hT
-  obtain ⟨hRow, hMem⟩ := GlobalTheory.T.translateToSecondModel_cuspFormMap_value_automorphic hP D X h θ S M J χ t hθ hMat T hT (PiTensorProduct.tprod ℂ v₀)
-  have hfx : ∀ x, evS X h t (T (PiTensorProduct.tprod ℂ v₀)) x =
-      (PiTensorProduct.lift.symm T) v₀ ((iotaX X h).symm x * t) := fun x => rfl
+  obtain ⟨hRow, hMem⟩ :=
+    GlobalTheory.T.translateToSecondModel_cuspFormMap_value_automorphic hP D X h θ S M J χ t hθ hMat
+      T hT (PiTensorProduct.tprod ℂ v₀)
+  have hfx
+      : ∀ x,
+        evS X h t (T (PiTensorProduct.tprod ℂ v₀)) x
+          = (PiTensorProduct.lift.symm T) v₀ ((iotaX X h).symm x * t) := fun x =>
+    rfl
   generalize PiTensorProduct.lift.symm T = U at hTm hfx
   generalize evS X h t (T (PiTensorProduct.tprod ℂ v₀)) = f at hRow hMem hφ hfx
   have hφ' : φ = hMem.toLp f := Lp.ext (hφ.trans hMem.coeFn_toLp.symm)
@@ -199,8 +241,10 @@ theorem GlobalTheory.Core.Mi.SeeHH.conj_evS_mem_HHX : GlobalTheory.Published.Cus
     intro g
     rw [Formalism.IndefR.RationalEmbedding.iota_rat]
     exact GlobalTheory.Mem.SJ.SchurMove.castGA_mem_GFset _ _
-  obtain ⟨κ, hκ⟩ := GlobalTheory.Mem.SJ.HaarMove.schur_of_bridge M θ J χ (fun μ 𝓕 => GlobalTheory.MultFinite.schurMult hP μ 𝓕) hθ
-    X.B.I X.B.μf X.B.fund X.B.fund_spec (iotaX X h) hι t U hTm U hTm
+  obtain ⟨κ, hκ⟩ :=
+    GlobalTheory.Mem.SJ.HaarMove.schur_of_bridge M θ J χ
+      (fun μ 𝓕 => GlobalTheory.MultFinite.schurMult hP μ 𝓕)
+      hθ X.B.I X.B.μf X.B.fund X.B.fund_spec (iotaX X h) hι t U hTm U hTm
   have hv₀ : ∏ τ, ⟪(v₀ τ : M.H τ), (v₀ τ : M.H τ)⟫_ℂ = 1 := by
     obtain ⟨c, -, hc2⟩ := hCV
     refine Finset.prod_eq_one fun τ _ => ?_
@@ -228,8 +272,9 @@ theorem GlobalTheory.Core.Mi.SeeHH.conj_evS_mem_HHX : GlobalTheory.Published.Cus
     obtain ⟨a, ha, hb, w, hw, hsh⟩ := real_shift X h θ M J χ t hMat.1 hR v₀ g
     have hco := coef_eq X h θ M v₀ hCV g a ha hb w hw
     have hRg := Formalism.L2.SG.EvalTReg.reg_toLp_X X (fun x => star (f x)) hinv hs (g, 1)
-    have hpair : ⟪hs.toLp (fun x => star (f x)), X.B.R (g, 1) (hs.toLp (fun x => star (f x)))⟫_ℂ =
-        ∫ x, star (U w ((iotaX X h).symm x * t)) * U v₀ ((iotaX X h).symm x * t) ∂(muX X) := by
+    have hpair
+        : ⟪hs.toLp (fun x => star (f x)), X.B.R (g, 1) (hs.toLp (fun x => star (f x)))⟫_ℂ
+          = ∫ x, star (U w ((iotaX X h).symm x * t)) * U v₀ ((iotaX X h).symm x * t) ∂(muX X) := by
       rw [MeasureTheory.L2.inner_def]
       refine integral_congr_ae ?_
       filter_upwards [hs.coeFn_toLp, hRg] with x a1 a2

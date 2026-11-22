@@ -153,7 +153,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.WeilCharSurj
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry NumberField MonObj ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.LocM GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+open CategoryTheory AlgebraicGeometry NumberField MonObj ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj Formalism.L2.Geo GlobalTheory.LocM
+  GlobalTheory.ShFam GlobalTheory.ShFam.Pad
 open Formalism.MainNotions.DIV.Cons (intO SCF)
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -163,9 +166,11 @@ noncomputable section
 
 namespace GlobalTheory.WeilTorsChar
 
-theorem exists_mulEquiv_points {S S' : Scheme.{0}} (f : S' ⟶ S) (G : Over S) (G' : Over S') [GrpObj G] [GrpObj G']
-    (φ : G'.left ⟶ G.left) (h : IsGrpPullback G' G f φ) (T : Over S') :
-    ∃ Φ : (T ⟶ G') ≃* (Over.mk (T.hom ≫ f) ⟶ G), ∀ x, (Φ x).left = x.left ≫ φ := by
+theorem exists_mulEquiv_points
+    {S S' : Scheme.{0}} (f : S' ⟶ S) (G : Over S) (G' : Over S') [GrpObj G] [GrpObj G']
+    (φ : G'.left ⟶ G.left) (h : IsGrpPullback G' G f φ)
+    (T : Over S')
+    : ∃ Φ : (T ⟶ G') ≃* (Over.mk (T.hom ≫ f) ⟶ G), ∀ x, (Φ x).left = x.left ≫ φ := by
   let F : (T ⟶ G') → (Over.mk (T.hom ≫ f) ⟶ G) := fun x =>
     Over.homMk (x.left ≫ φ) (by
       change (x.left ≫ φ) ≫ G.hom = T.hom ≫ f

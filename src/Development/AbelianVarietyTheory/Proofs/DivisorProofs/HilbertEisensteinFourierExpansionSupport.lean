@@ -14,18 +14,27 @@ noncomputable section
 
 open NumberField
 open scoped nonZeroDivisors
-open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization (Emb Frac qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion qClass qRel)
+open GlobalTheory.IndefiniteRowSideFullHecke.OmegaFactorization
+  (Emb Frac qPow upperHalf cK omegaFactor IsPartialZeta HasExpansion qClass qRel)
 open GlobalTheory.PairFourier (pairPt pairCoef qClass_eq tsum_natCast_eq pairPt_ne_zero)
 
 namespace GlobalTheory.HilbFam
 
-theorem fourier_with_support :
-    ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (𝔞 𝔟 : Frac F) (G : (Emb F → ℂ) → ℂ),
-      HasExpansion 𝔞 𝔟 k G → ∃ (Z : ℂ → ℂ) (a : F → ℂ), IsPartialZeta (ClassGroup.mk F 𝔞)⁻¹ Z ∧
-        a 0 = (2 : ℂ)⁻¹ ^ Module.finrank ℚ F * Z (1 - (k : ℂ)) ∧ (∀ ξ, ξ ≠ 0 → ∃ n : ℤ, a ξ = n) ∧
-        (∀ ξ, ξ ≠ 0 → a ξ ≠ 0 → ξ ∈ ((𝔞 * 𝔟 : Frac F) : FractionalIdeal (𝓞 F)⁰ F) ∧ ∀ i : Emb F, 0 < i ξ) ∧
-        ∀ w ∈ upperHalf F, HasSum (fun ξ : F ↦ a ξ * qPow ξ w)
-          ((cK F k : ℂ) * G w / (omegaFactor 𝔞 : ℂ) ^ k) := by
+theorem fourier_with_support
+    : ∀ (F : Type) [Field F] [NumberField F] [IsTotallyReal F] (k : ℕ) (𝔞 𝔟 : Frac F)
+        (G : (Emb F → ℂ) → ℂ),
+      HasExpansion 𝔞 𝔟 k G
+        → ∃ (Z : ℂ → ℂ) (a : F → ℂ),
+          IsPartialZeta (ClassGroup.mk F 𝔞)⁻¹ Z
+            ∧ a 0 = (2 : ℂ)⁻¹ ^ Module.finrank ℚ F * Z (1 - (k : ℂ))
+            ∧ (∀ ξ, ξ ≠ 0 → ∃ n : ℤ, a ξ = n)
+            ∧ (∀ ξ,
+              ξ ≠ 0 → a ξ ≠ 0
+                → ξ ∈ ((𝔞 * 𝔟 : Frac F) : FractionalIdeal (𝓞 F)⁰ F) ∧ ∀ i : Emb F, 0 < i ξ)
+            ∧ ∀ w ∈ upperHalf F,
+              HasSum
+                (fun ξ : F ↦ a ξ * qPow ξ w)
+                ((cK F k : ℂ) * G w / (omegaFactor 𝔞 : ℂ) ^ k) := by
   classical
   intro F _ _ _ k 𝔞 𝔟 G hG
   obtain ⟨Z, hZ, hE⟩ := hG
@@ -33,8 +42,9 @@ theorem fourier_with_support :
   let p : Quotient (qRel 𝔞 𝔟) → F := fun c ↦ (pairPt 𝔞 𝔟 c : F)
   let a' : F → ℂ := fun ξ ↦ ∑' c : p ⁻¹' {ξ}, (pairCoef 𝔞 𝔟 k c : ℂ)
   have ha' : ∀ ξ, a' ξ = ∑' c : p ⁻¹' {ξ}, (pairCoef 𝔞 𝔟 k c : ℂ) := fun _ ↦ rfl
-  have hfib : ∀ (z : Emb F → ℂ) (ξ : F) (c : p ⁻¹' {ξ}),
-      qClass 𝔞 𝔟 k z c = (pairCoef 𝔞 𝔟 k c : ℂ) * qPow ξ z := by
+  have hfib
+      : ∀ (z : Emb F → ℂ) (ξ : F) (c : p ⁻¹' {ξ}),
+        qClass 𝔞 𝔟 k z c = (pairCoef 𝔞 𝔟 k c : ℂ) * qPow ξ z := by
     rintro z ξ ⟨c, hc⟩
     rw [Set.mem_preimage, Set.mem_singleton_iff] at hc
     subst hc
@@ -43,8 +53,8 @@ theorem fourier_with_support :
   · show a' 0 + (if (0 : F) = 0 then C else 0) = C
     rw [if_pos rfl]
     have : IsEmpty (p ⁻¹' {0}) :=
-      ⟨fun ⟨c, hc⟩ ↦ pairPt_ne_zero 𝔞 𝔟 c
-        (Subtype.ext (Set.mem_singleton_iff.1 (Set.mem_preimage.1 hc)))⟩
+      ⟨fun ⟨c, hc⟩ ↦
+        pairPt_ne_zero 𝔞 𝔟 c (Subtype.ext (Set.mem_singleton_iff.1 (Set.mem_preimage.1 hc)))⟩
     rw [ha']
     simp only [tsum_empty, zero_add]
   · intro ξ hξ
@@ -88,8 +98,8 @@ theorem fourier_with_support :
       split_ifs with h
       · subst h; simp [qPow]
       · simp
-    have hv : (cK F k : ℂ) * G z / (omegaFactor 𝔞 : ℂ) ^ k =
-        (∑' c, qClass 𝔞 𝔟 k z c) + C := by rw [heq]; ring
+    have hv : (cK F k : ℂ) * G z / (omegaFactor 𝔞 : ℂ) ^ k = (∑' c, qClass 𝔞 𝔟 k z c) + C := by
+      rw [heq]; ring
     show HasSum (fun ξ : F ↦ (a' ξ + if ξ = 0 then C else 0) * qPow ξ z)
       ((cK F k : ℂ) * G z / (omegaFactor 𝔞 : ℂ) ^ k)
     rw [hv]

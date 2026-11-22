@@ -17,7 +17,8 @@ def pInt (p : ℕ) [Fact p.Prime] (K : Type) [Field K] : Subring K where
     rintro x y ⟨D, hD, hx⟩ ⟨E, hE, hy⟩
     refine ⟨D * E, fun h => ((Fact.out : p.Prime).dvd_mul.1 h).elim hD hE, ?_⟩
     have : ((D * E : ℕ) : K) * (x * y) = ((D : K) * x) * ((E : K) * y) := by push_cast; ring
-    rw [this]; exact hx.mul hy
+    rw [this]
+    exact hx.mul hy
   one_mem' := ⟨1, (Fact.out : p.Prime).not_dvd_one, by simpa using isIntegral_one⟩
   add_mem' := by
     rintro x y ⟨D, hD, hx⟩ ⟨E, hE, hy⟩
@@ -143,7 +144,5 @@ lemma binom_first (Q : ℤ) (k : ℕ) (x t : ℤ) :
   have := congrArg (Int.cast : ℤ → K) hy
   push_cast at this ⊢
   linear_combination this
-
-
 
 end GlobalTheory.EisCong

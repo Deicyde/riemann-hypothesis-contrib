@@ -8,8 +8,9 @@ noncomputable section
 
 namespace Formalism.MainNotions.G.SymmetricFormBlocks
 
-theorem inl_ne {N r t : ℕ} (a b : ℕ) (ha : a < N) (hb : b < N) (hab : a ≠ b) (c c' : Fin r) :
-    (Sum.inl (Formalism.GM.M.finPos N a, c) : Formalism.GM.M.BVar N r t) ≠ Sum.inl (Formalism.GM.M.finPos N b, c') := by
+theorem inl_ne {N r t : ℕ} (a b : ℕ) (ha : a < N) (hb : b < N) (hab : a ≠ b) (c c' : Fin r)
+    : (Sum.inl (Formalism.GM.M.finPos N a, c) : Formalism.GM.M.BVar N r t)
+      ≠ Sum.inl (Formalism.GM.M.finPos N b, c') := by
   intro h
   have h2 := congrArg Fin.val (Prod.mk.inj (Sum.inl.inj h)).1
   simp only [Formalism.GM.M.finPos] at h2
@@ -36,7 +37,8 @@ theorem commCondition : RestTieComm := by
     (fun c c' => inl_ne _ _ (hpN i) (hpN i') (fun h => hne (by omega)) c c')
     _ _ _ _ _ _ x
 
-theorem symmCondition (C0 CE1 CE2 : ℝ) (X : Formalism.MainNotions.flipOneThree.Inst) : RestSymm C0 CE1 CE2 X :=
+theorem symmCondition (C0 CE1 CE2 : ℝ) (X : Formalism.MainNotions.flipOneThree.Inst)
+    : RestSymm C0 CE1 CE2 X :=
   restSymm_of commCondition C0 CE1 CE2 X
 
 end Formalism.MainNotions.G.SymmetricFormBlocks

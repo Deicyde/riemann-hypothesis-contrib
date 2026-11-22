@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 private lemma wd_apply' {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module ℂ E]
@@ -37,15 +38,20 @@ private lemma wd_tail {ι E : Type} [LinearOrder ι] [AddCommGroup E] [Module �
       omega
     simp [this]
 
-theorem UpperTheory.Gal.productCup_of_system.edgeInj_of :
-    WdUni → EdgeInj := by
+theorem UpperTheory.Gal.productCup_of_system.edgeInj_of : WdUni → EdgeInj := by
   intro hU ι E _ _ _ _ G d x hx hB
   obtain ⟨y, hyC, hy⟩ := hB
   have hxC := hx.1
   have hxd : deltaL ℂ ι E x = 0 := hx.2
   have hy' : wd (fun _ => (1 : Module.End ℂ E)) y = edge1 x := hy
-  have hyC' : ∀ s, y s ∈ (if (s.card : ℤ) = ((d : ℤ) + 2 - 1) then
-      mixF (fun I J => G (uni I J)) s else ⊥) := fun s => hyC s (Set.mem_univ s)
+  have hyC'
+      : ∀ s,
+        y s
+          ∈ (if (s.card : ℤ) = ((d : ℤ) + 2 - 1) then
+               mixF (fun I J => G (uni I J)) s
+             else
+               ⊥) := fun s =>
+    hyC s (Set.mem_univ s)
   have hxC' : ∀ I, x I ∈ (if I.Nonempty ∧ (I.card : ℤ) = (d : ℤ) + 1 then G (uni I ∅) else ⊥) :=
     fun I => hxC I (Set.mem_univ I)
   have hUn := hU ι ι E (fun _ => 1)
@@ -58,7 +64,7 @@ theorem UpperTheory.Gal.productCup_of_system.edgeInj_of :
     have := hxC' I
     rw [if_neg (fun h => hI h.2)] at this
     simpa using this
-  have hy0 : ∀ s, ¬ ((lft s).Nonempty ∧ (rgt s).Nonempty) → y s = 0 := by
+  have hy0 : ∀ s, ¬((lft s).Nonempty ∧ (rgt s).Nonempty) → y s = 0 := by
     intro s h
     have := hyC' s
     split_ifs at this
@@ -112,8 +118,7 @@ theorem UpperTheory.Gal.productCup_of_system.edgeInj_of :
         have := hc (lft s) ∅
         rw [hs'] at this
         simpa using this
-      have hval : (e + ((-1 : ℤ) ^ d) • y) s = x (lft s) := by
-        simp [e, hr0, hys]
+      have hval : (e + ((-1 : ℤ) ^ d) • y) s = x (lft s) := by simp [e, hr0, hys]
       rw [hval]
       split_ifs with h
       · have := hxC' (lft s)
@@ -131,8 +136,7 @@ theorem UpperTheory.Gal.productCup_of_system.edgeInj_of :
           refine ⟨Finset.card_pos.1 ?_, hsc⟩
           omega
         simp [this]
-    · have hval : (e + ((-1 : ℤ) ^ d) • y) s = ((-1 : ℤ) ^ d) • y s := by
-        simp [e, hr0]
+    · have hval : (e + ((-1 : ℤ) ^ d) • y) s = ((-1 : ℤ) ^ d) • y s := by simp [e, hr0]
       rw [hval]
       by_cases hcs : (s.card : ℤ) = (d : ℤ) + 2 - 1
       · by_cases hlr : (lft s).Nonempty ∧ (rgt s).Nonempty
@@ -152,15 +156,17 @@ theorem UpperTheory.Gal.productCup_of_system.edgeInj_of :
     funext s
     simp [hwe]
   · intro J
-    have h1 : y (uni ∅ J) = 0 := hy0 _ (fun h => by
-      have := h.1
-      rw [hl] at this
-      simp at this)
+    have h1 : y (uni ∅ J) = 0 :=
+      hy0 _ (fun h => by
+        have := h.1
+        rw [hl] at this
+        simp at this)
     have h2 : x ∅ = 0 := hx0 ∅ (by simp; omega)
     simp [he, h1, h2]
   · intro I
-    have h1 : y (uni I ∅) = 0 := hy0 _ (fun h => by
-      have := h.2
-      rw [hr] at this
-      simp at this)
+    have h1 : y (uni I ∅) = 0 :=
+      hy0 _ (fun h => by
+        have := h.2
+        rw [hr] at this
+        simp at this)
     simp [he, h1]

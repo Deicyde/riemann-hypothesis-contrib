@@ -8,8 +8,9 @@ open IsLocalRing
 
 namespace GlobalTheory
 
-def compositeValuationSubring {L : Type*} [Field L] (W : ValuationSubring L)
-    (V : ValuationSubring (ResidueField W)) : ValuationSubring L where
+def compositeValuationSubring
+    {L : Type*} [Field L] (W : ValuationSubring L) (V : ValuationSubring (ResidueField W))
+    : ValuationSubring L where
   toSubring := (V.toSubring.comap (residue W)).map W.subtype
   mem_or_inv_mem' := by
     intro x
@@ -44,28 +45,34 @@ def compositeValuationSubring {L : Type*} [Field L] (W : ValuationSubring L)
       rw [h0]
       exact V.zero_mem
 
-theorem mem_compositeValuationSubring {L : Type*} [Field L] (W : ValuationSubring L)
-    (V : ValuationSubring (ResidueField W)) (x : L) :
-    x ∈ compositeValuationSubring W V ↔ ∃ h : x ∈ W, residue W ⟨x, h⟩ ∈ V := by
+theorem mem_compositeValuationSubring
+    {L : Type*} [Field L] (W : ValuationSubring L) (V : ValuationSubring (ResidueField W)) (x : L)
+    : x ∈ compositeValuationSubring W V ↔ ∃ h : x ∈ W, residue W ⟨x, h⟩ ∈ V := by
   constructor
   · rintro ⟨y, hy, rfl⟩
     exact ⟨y.2, hy⟩
   · rintro ⟨h, hV⟩
     exact ⟨⟨x, h⟩, hV, rfl⟩
 
-theorem compositeValuationSubring_le {L : Type*} [Field L] (W : ValuationSubring L)
-    (V : ValuationSubring (ResidueField W)) : compositeValuationSubring W V ≤ W :=
-  fun x hx => ((mem_compositeValuationSubring W V x).1 hx).1
+theorem compositeValuationSubring_le
+    {L : Type*} [Field L] (W : ValuationSubring L) (V : ValuationSubring (ResidueField W))
+    : compositeValuationSubring W V ≤ W := fun x hx =>
+  ((mem_compositeValuationSubring W V x).1 hx).1
 
-theorem exists_valuationSubring_le_dominating {O L : Type*} [CommRing O] [IsLocalRing O]
-    [Field L] (g : O →+* L) (W : ValuationSubring L) (hg : ∀ x, g x ∈ W) :
-    ∃ W' : ValuationSubring L, W' ≤ W ∧ (∀ x : O, g x ∈ W') ∧
-      ∀ x ∈ maximalIdeal O, g x ∈ W'.nonunits := by
+theorem exists_valuationSubring_le_dominating
+    {O L : Type*} [CommRing O] [IsLocalRing O] [Field L]
+    (g : O →+* L) (W : ValuationSubring L) (hg : ∀ x, g x ∈ W)
+    : ∃ W' : ValuationSubring L,
+      W' ≤ W ∧ (∀ x : O, g x ∈ W') ∧ ∀ x ∈ maximalIdeal O, g x ∈ W'.nonunits := by
   let g' : O →+* W := g.codRestrict W.toSubring hg
   let f : O →+* ResidueField W := (residue W).comp g'
   obtain ⟨V, hV, hloc⟩ := IsLocalRing.exists_factor_valuationRing f
-  refine ⟨compositeValuationSubring W V, compositeValuationSubring_le W V, fun x =>
-    (mem_compositeValuationSubring W V _).2 ⟨hg x, hV x⟩, fun x hx => ?_⟩
+  refine ⟨
+    compositeValuationSubring W V,
+    compositeValuationSubring_le W V,
+    fun x => (mem_compositeValuationSubring W V _).2 ⟨hg x, hV x⟩,
+    fun x hx => ?_
+  ⟩
   rw [ValuationSubring.mem_nonunits_iff_or]
   rcases eq_or_ne (g x) 0 with h0 | h0
   · exact Or.inl h0
@@ -80,12 +87,13 @@ theorem exists_valuationSubring_le_dominating {O L : Type*} [CommRing O] [IsLoca
     isUnit_iff_exists_inv.2 ⟨⟨_, hres⟩, Subtype.ext hmul⟩
   exact (mem_maximalIdeal x).1 hx (hloc.1 x hu)
 
-theorem exists_valuationSubring_le_dominating_of_fractionField :
-    ∀ (O F L : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F]
-      [Algebra O F] [IsFractionRing O F] [Field L] (ι : F →+* L) (W : ValuationSubring L),
-      (∀ x, ι x ∈ W) → ∃ W' : ValuationSubring L, W' ≤ W ∧
-        (∀ x : O, ι (algebraMap O F x) ∈ W') ∧
-        ∀ x ∈ IsLocalRing.maximalIdeal O, ι (algebraMap O F x) ∈ W'.nonunits := by
+theorem exists_valuationSubring_le_dominating_of_fractionField
+    : ∀ (O F L : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field F] [Algebra O F]
+        [IsFractionRing O F] [Field L] (ι : F →+* L) (W : ValuationSubring L),
+      (∀ x, ι x ∈ W)
+        → ∃ W' : ValuationSubring L,
+          W' ≤ W ∧ (∀ x : O, ι (algebraMap O F x) ∈ W')
+            ∧ ∀ x ∈ IsLocalRing.maximalIdeal O, ι (algebraMap O F x) ∈ W'.nonunits := by
   intro O F L _ _ _ _ _ _ _ ι W hW
   exact exists_valuationSubring_le_dominating (ι.comp (algebraMap O F)) W fun x => hW _
 

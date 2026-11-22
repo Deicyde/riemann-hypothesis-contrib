@@ -8,11 +8,12 @@ namespace GlobalTheory.CompanionTheory.Ggeo.ClearDenominators
 
 open Polynomial
 
-theorem exists_common_denominator {o K : Type} [CommRing o] [Field K] [Algebra o K]
+theorem exists_common_denominator
+    {o K : Type} [CommRing o] [Field K] [Algebra o K]
     (A : Subalgebra o K) (R : Subring K)
     (hfrac : ∀ r ∈ R, ∃ u ∈ A, ∃ v ∈ A, v ≠ 0 ∧ v⁻¹ ∈ R ∧ r = u / v)
-    (s : Finset K) (hs : ∀ x ∈ s, x ∈ R) :
-    ∃ w ∈ A, w ≠ 0 ∧ w⁻¹ ∈ R ∧ ∀ x ∈ s, w * x ∈ A := by
+    (s : Finset K) (hs : ∀ x ∈ s, x ∈ R)
+    : ∃ w ∈ A, w ≠ 0 ∧ w⁻¹ ∈ R ∧ ∀ x ∈ s, w * x ∈ A := by
   classical
   revert hs
   refine Finset.induction_on s ?_ ?_
@@ -23,8 +24,7 @@ theorem exists_common_denominator {o K : Type} [CommRing o] [Field K] [Algebra o
     · intro x hx
       simp at hx
   · intro a t _ ih hs
-    obtain ⟨w, hwA, hw0, hwR, hw⟩ :=
-      ih (fun x hx => hs x (Finset.mem_insert_of_mem hx))
+    obtain ⟨w, hwA, hw0, hwR, hw⟩ := ih (fun x hx => hs x (Finset.mem_insert_of_mem hx))
     obtain ⟨u, huA, v, hvA, hv0, hvR, hav⟩ := hfrac a (hs a (Finset.mem_insert_self a t))
     refine ⟨w * v, mul_mem hwA hvA, mul_ne_zero hw0 hv0, ?_, ?_⟩
     · rw [mul_inv]
@@ -33,7 +33,9 @@ theorem exists_common_denominator {o K : Type} [CommRing o] [Field K] [Algebra o
       rcases Finset.mem_insert.mp hx with hxa | hxt
       · have key : w * v * x = w * u := by
           rw [hxa, hav, div_eq_mul_inv]
-          calc w * v * (u * v⁻¹) = w * u * (v * v⁻¹) := by ring
+          calc
+            w * v * (u * v⁻¹)
+              = w * u * (v * v⁻¹) := by ring
             _ = w * u := by rw [mul_inv_cancel₀ hv0, mul_one]
         rw [key]
         exact mul_mem hwA huA
@@ -41,10 +43,10 @@ theorem exists_common_denominator {o K : Type} [CommRing o] [Field K] [Algebra o
         rw [key]
         exact mul_mem hvA (hw x hxt)
 
-theorem exists_mul_isIntegral :
-    ∀ {o K : Type} [CommRing o] [Field K] [Algebra o K] (A : Subalgebra o K) (R : Subring K),
-      (∀ a ∈ A, a ∈ R) → (∀ r ∈ R, ∃ u ∈ A, ∃ v ∈ A, v ≠ 0 ∧ v⁻¹ ∈ R ∧ r = u / v) →
-      ∀ (t : K), IsIntegral R t → ∃ v ∈ A, v ≠ 0 ∧ v⁻¹ ∈ R ∧ IsIntegral A (v * t) := by
+theorem exists_mul_isIntegral
+    : ∀ {o K : Type} [CommRing o] [Field K] [Algebra o K] (A : Subalgebra o K) (R : Subring K),
+      (∀ a ∈ A, a ∈ R) → (∀ r ∈ R, ∃ u ∈ A, ∃ v ∈ A, v ≠ 0 ∧ v⁻¹ ∈ R ∧ r = u / v)
+        → ∀ (t : K), IsIntegral R t → ∃ v ∈ A, v ≠ 0 ∧ v⁻¹ ∈ R ∧ IsIntegral A (v * t) := by
   intro o K _ _ _ A R _ hfrac t ht
   classical
   obtain ⟨p, hpm, hp⟩ := ht
@@ -57,8 +59,8 @@ theorem exists_mul_isIntegral :
     rw [Polynomial.coeff_map]
     exact (p.coeff i).2
   generalize p.map (algebraMap R K) = P at hPm hP hPR
-  obtain ⟨w, hwA, hw0, hwR, hw⟩ := exists_common_denominator A R hfrac
-    ((Finset.range (P.natDegree + 1)).image P.coeff) (by
+  obtain ⟨w, hwA, hw0, hwR, hw⟩ :=
+    exists_common_denominator A R hfrac ((Finset.range (P.natDegree + 1)).image P.coeff) (by
       intro x hx
       obtain ⟨i, -, rfl⟩ := Finset.mem_image.mp hx
       exact hPR i)

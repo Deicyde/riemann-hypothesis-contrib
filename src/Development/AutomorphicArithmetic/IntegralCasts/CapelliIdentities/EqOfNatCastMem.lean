@@ -4,14 +4,17 @@ public import Mathlib
 
 @[expose] public section
 
-@[reducible] noncomputable def UpperTheory.Reformulated.B.Yza3.Pl :
-    Type :=
-    IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers ℚ)
+@[reducible]
+noncomputable def UpperTheory.Reformulated.B.Yza3.Pl : Type :=
+  IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers ℚ)
 
-noncomputable def UpperTheory.Reformulated.B.Yza3.normV.{u_1} :
-    {F : Type u_1} → [inst : Field F] → IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F) → ℕ :=
-    fun {F : Type u_1} [Field F] (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) ↦
-      Nat.card (NumberField.RingOfIntegers F ⧸ v.asIdeal)
+noncomputable def UpperTheory.Reformulated.B.Yza3.normV.{u_1}
+    : {F : Type u_1} → [inst : Field F]
+      → IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)
+      → ℕ :=
+  fun {F : Type u_1} [Field F]
+      (v : IsDedekindDomain.HeightOneSpectrum (NumberField.RingOfIntegers F)) ↦
+    Nat.card (NumberField.RingOfIntegers F ⧸ v.asIdeal)
 
 namespace UpperTheory.Reformulated.B.Yza3
 
@@ -59,14 +62,19 @@ private lemma eq_of_natCast_mem {p : ℕ} (hp : p.Prime) (v v' : Pl)
   exact IsDedekindDomain.HeightOneSpectrum.ext ((key v h).trans (key v' h').symm)
 
 open NumberField in
-theorem htc_places :
-    ∀ (w : UpperTheory.Reformulated.B.Yza3.Pl),
-      UpperTheory.Reformulated.B.Yza3.normV w ≠ (0 : ℕ) ∧
-        (∀ (v : UpperTheory.Reformulated.B.Yza3.Pl), v ≠ w → (↑(UpperTheory.Reformulated.B.Yza3.normV w) : NumberField.RingOfIntegers ℚ) ∉ v.asIdeal) ∧
-          ∀ (p : ℕ),
-            Nat.Prime p →
-              ∀ (v v' : UpperTheory.Reformulated.B.Yza3.Pl),
-                (↑p : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal → (↑p : NumberField.RingOfIntegers ℚ) ∈ v'.asIdeal → v = v' := by
+theorem htc_places
+    : ∀ (w : UpperTheory.Reformulated.B.Yza3.Pl),
+      UpperTheory.Reformulated.B.Yza3.normV w ≠ (0 : ℕ)
+        ∧ (∀ (v : UpperTheory.Reformulated.B.Yza3.Pl),
+          v ≠ w
+            → (↑(UpperTheory.Reformulated.B.Yza3.normV w) : NumberField.RingOfIntegers ℚ)
+              ∉ v.asIdeal)
+        ∧ ∀ (p : ℕ),
+          Nat.Prime p
+            → ∀ (v v' : UpperTheory.Reformulated.B.Yza3.Pl),
+              (↑p : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal
+                → (↑p : NumberField.RingOfIntegers ℚ) ∈ v'.asIdeal
+                → v = v' := by
   intro w
   obtain ⟨p, hp, hw⟩ := exists_prime_gen w
   have hnorm : normV w = p := by

@@ -15,8 +15,10 @@ open MvPolynomial
 
 universe u
 
-theorem BlowUpHorizontalMult.proof (hmin : BlowUpHorizontalMinimal.Statement.{u})
-    (hchart : BlowUpHorizontalChartLength.Statement.{u}) : BlowUpHorizontalMult.Statement.{u} := by
+theorem BlowUpHorizontalMult.proof
+    (hmin : BlowUpHorizontalMinimal.Statement.{u})
+    (hchart : BlowUpHorizontalChartLength.Statement.{u})
+    : BlowUpHorizontalMult.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ J _ P n hP N u hu hex hloc c x hx hxP W hW hϖW
   have hm := hmin O ϖ hϖ K ι J P n hP N u hu hex hloc c x hx hxP W hW hϖW
   obtain ⟨hWp, hBW, hrel⟩ := le_and_isRelevant_of_divCycle_ne_zero hW
@@ -28,7 +30,9 @@ theorem BlowUpHorizontalMult.proof (hmin : BlowUpHorizontalMinimal.Statement.{u}
     exact hW rfl
   have hch := hchart O ϖ hϖ K ι J P n hP N u hu hex hloc c x hx hxP W hW hϖW hWp
   have := hWp
-  have hp := PolynomialLocalizedLength.full (MRing ι O) (W.comap (liftForm (ι := ι) (J := J) (R := O))) (P ⊔ Ideal.span {x})
+  have hp :=
+    PolynomialLocalizedLength.full (MRing ι O) (W.comap (liftForm (ι := ι) (J := J) (R := O)))
+      (P ⊔ Ideal.span {x})
   unfold divCycle
   rw [dite_eq_left ⟨hm, hrel₀⟩, dite_eq_left hcond]
   congr 2

@@ -9,9 +9,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open Matrix
 open scoped ComplexOrder
 
-theorem UpperTheory.V.KT.mink3 :
-    ∀ (R : Type) [Ring R] [Module.Free ℤ R] [Module.Finite ℤ R] (H : Subgroup Rˣ), Finite H →
-    Nat.card H ≤ 3 ^ Module.finrank ℤ R := by
+theorem UpperTheory.V.KT.mink3
+    : ∀ (R : Type) [Ring R] [Module.Free ℤ R] [Module.Finite ℤ R] (H : Subgroup Rˣ),
+      Finite H → Nat.card H ≤ 3 ^ Module.finrank ℤ R := by
   intro R _ _ _ H hH
   let f : H → R := fun h => ((h : Rˣ) : R)
   have hinj : Function.Injective f := by
@@ -24,10 +24,8 @@ theorem UpperTheory.V.KT.mink3 :
       rw [hx, nsmul_eq_mul, Nat.cast_ofNat]
     let u : H := h2⁻¹ * h1
     have hu : f u = 1 + 3 * (f h2⁻¹ * x) := by
-      have e : f u = f h2⁻¹ * f h1 := by
-        simp [f, u]
-      have e2 : f h2⁻¹ * f h2 = 1 := by
-        simp [f]
+      have e : f u = f h2⁻¹ * f h1 := by simp [f, u]
+      have e2 : f h2⁻¹ * f h2 = 1 := by simp [f]
       rw [e, ha, mul_add, e2]
       congr 1
       noncomm_ring

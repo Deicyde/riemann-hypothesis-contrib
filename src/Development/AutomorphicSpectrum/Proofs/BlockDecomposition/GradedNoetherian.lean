@@ -18,12 +18,12 @@ variable {R : Type} [CommRing R] {M : ℕ → Type} [∀ e, AddCommGroup (M e)] 
 def shiftOp (T : ∀ e, M e →ₗ[R] M (e + 1)) : Module.End R (⨁ e, M e) :=
   DirectSum.toModule R ℕ _ (fun e => DirectSum.lof R ℕ M (e + 1) ∘ₗ T e)
 
-theorem shiftOp_lof (T : ∀ e, M e →ₗ[R] M (e + 1)) (e : ℕ) (x : M e) :
-    shiftOp T (DirectSum.lof R ℕ M e x) = DirectSum.lof R ℕ M (e + 1) (T e x) := by
+theorem shiftOp_lof (T : ∀ e, M e →ₗ[R] M (e + 1)) (e : ℕ) (x : M e)
+    : shiftOp T (DirectSum.lof R ℕ M e x) = DirectSum.lof R ℕ M (e + 1) (T e x) := by
   simp only [shiftOp, DirectSum.toModule_lof, LinearMap.comp_apply]
 
-theorem shiftOp_succ (T : ∀ e, M e →ₗ[R] M (e + 1)) (y : ⨁ e, M e) (e : ℕ) :
-    shiftOp T y (e + 1) = T e (y e) := by
+theorem shiftOp_succ (T : ∀ e, M e →ₗ[R] M (e + 1)) (y : ⨁ e, M e) (e : ℕ)
+    : shiftOp T y (e + 1) = T e (y e) := by
   induction y using DirectSum.induction_on with
   | zero => simp
   | of i x =>
@@ -33,8 +33,7 @@ theorem shiftOp_succ (T : ∀ e, M e →ₗ[R] M (e + 1)) (y : ⨁ e, M e) (e : 
     · rw [DirectSum.of_eq_of_ne _ _ _ (by omega), DirectSum.of_eq_of_ne _ _ _ (by omega), map_zero]
   | add a b ha hb => simp only [map_add (f := _), DirectSum.add_apply, ha, hb]
 
-theorem shiftOp_zero (T : ∀ e, M e →ₗ[R] M (e + 1)) (y : ⨁ e, M e) :
-    shiftOp T y 0 = 0 := by
+theorem shiftOp_zero (T : ∀ e, M e →ₗ[R] M (e + 1)) (y : ⨁ e, M e) : shiftOp T y 0 = 0 := by
   induction y using DirectSum.induction_on with
   | zero => simp
   | of i x =>
@@ -45,16 +44,19 @@ theorem shiftOp_zero (T : ∀ e, M e →ₗ[R] M (e + 1)) (y : ⨁ e, M e) :
 theorem eventually_zero (f : ⨁ e, M e) : ∃ n : ℕ, ∀ e, n ≤ e → f e = 0 := by
   induction f using DirectSum.induction_on with
   | zero => exact ⟨0, fun _ _ => rfl⟩
-  | of i x =>
-    refine ⟨i + 1, fun e he => DirectSum.of_eq_of_ne _ _ _ (by omega)⟩
+  | of i x => refine ⟨i + 1, fun e he => DirectSum.of_eq_of_ne _ _ _ (by omega)⟩
   | add a b ha hb =>
     obtain ⟨n, hn⟩ := ha
     obtain ⟨m, hm⟩ := hb
-    exact ⟨max n m, fun e he => by
-      rw [DirectSum.add_apply, hn e (le_of_max_le_left he), hm e (le_of_max_le_right he), add_zero]⟩
+    exact ⟨
+      max n m,
+      fun e he => by
+        rw [DirectSum.add_apply, hn e (le_of_max_le_left he), hm e (le_of_max_le_right he),
+          add_zero]
+    ⟩
 
-theorem lof_mem {L : ∀ e, Submodule R (M e)} (i : ℕ) {x : M i} (hx : x ∈ L i) (j : ℕ) :
-    DirectSum.lof R ℕ M i x j ∈ L j := by
+theorem lof_mem {L : ∀ e, Submodule R (M e)} (i : ℕ) {x : M i} (hx : x ∈ L i) (j : ℕ)
+    : DirectSum.lof R ℕ M i x j ∈ L j := by
   rw [DirectSum.lof_eq_of]
   by_cases h : i = j
   · subst h; simpa [DirectSum.of_eq_same] using hx
@@ -75,8 +77,9 @@ theorem gradedNoeth : GradedNoeth := by
   have hSset : ∀ a, a ∈ (Sset : Set (Module.End R (⨁ e, M e))) → ∃ i, shiftOp (T i) = a := by
     intro a ha
     simpa [Sset] using ha
-  have hcomm : ∀ a ∈ (Sset : Set (Module.End R (⨁ e, M e))),
-      ∀ b ∈ (Sset : Set (Module.End R (⨁ e, M e))), a * b = b * a := by
+  have hcomm
+      : ∀ a ∈ (Sset : Set (Module.End R (⨁ e, M e))), ∀ b ∈ (Sset : Set (Module.End R (⨁ e, M e))),
+        a * b = b * a := by
     intro a ha b hb
     obtain ⟨i, rfl⟩ := hSset a ha
     obtain ⟨j, rfl⟩ := hSset b hb
@@ -95,8 +98,7 @@ theorem gradedNoeth : GradedNoeth := by
   choose gens hgens using hfin
   let G0 : Set (⨁ e, M e) :=
     ⋃ e ∈ Finset.range (d + 1), DirectSum.lof R ℕ M e '' (gens e : Set (M e))
-  have hG0 : G0.Finite :=
-    (Finset.finite_toSet _).biUnion fun e _ => (Finset.finite_toSet _).image _
+  have hG0 : G0.Finite := (Finset.finite_toSet _).biUnion fun e _ => (Finset.finite_toSet _).image _
   let P : Submodule S (⨁ e, M e) := Submodule.span S G0
   have hbase : ∀ e, e ≤ d → ∀ m : M e, DirectSum.lof R ℕ M e m ∈ P := by
     intro e he m
@@ -116,12 +118,14 @@ theorem gradedNoeth : GradedNoeth := by
       · exact hbase _ he
       · intro m
         have hm : m ∈ ⨆ i, LinearMap.range (T i e) := by rw [hgen e (by omega)]; trivial
-        refine Submodule.iSup_induction _ (motive := fun m => DirectSum.lof R ℕ M (e + 1) m ∈ P)
+        refine Submodule.iSup_induction _
+          (motive := fun m => DirectSum.lof R ℕ M (e + 1) m ∈ P)
           hm ?_ ?_ ?_
         · intro i x hx
           obtain ⟨y, rfl⟩ := hx
-          have h1 : DirectSum.lof R ℕ M (e + 1) (T i e y) =
-              (⟨shiftOp (T i), hEmem i⟩ : S) • DirectSum.lof R ℕ M e y :=
+          have h1
+              : DirectSum.lof R ℕ M (e + 1) (T i e y)
+                = (⟨shiftOp (T i), hEmem i⟩ : S) • DirectSum.lof R ℕ M e y :=
             (shiftOp_lof (T i) e y).symm
           rw [h1]
           exact P.smul_mem _ (ih y)
@@ -158,14 +162,15 @@ theorem gradedNoeth : GradedNoeth := by
       intro y hy e
       rw [Module.End.mul_apply]
       exact hx _ (hx' y hy) e
-  let N : Submodule S (⨁ e, M e) :=
-    { carrier := {y | ∀ e, y e ∈ L e}
-      add_mem' := fun {a b} ha hb e => by
-        rw [DirectSum.add_apply]; exact (L e).add_mem (ha e) (hb e)
-      zero_mem' := fun e => by rw [DirectSum.zero_apply]; exact zero_mem _
-      smul_mem' := fun s y hy => hstab s.1 s.2 y hy }
-  have hQ : ∀ e, ∀ x ∈ S, ∃ c : R, ∀ y : ⨁ e, M e, (∀ e', y e' ∈ L e') →
-      x y (e + 1) - c • y (e + 1) ∈ ⨆ i, (L e).map (T i e) := by
+  let N : Submodule S (⨁ e, M e) := {
+    carrier := {y | ∀ e, y e ∈ L e}
+    add_mem' := fun {a b} ha hb e => by rw [DirectSum.add_apply]; exact (L e).add_mem (ha e) (hb e)
+    zero_mem' := fun e => by rw [DirectSum.zero_apply]; exact zero_mem _
+    smul_mem' := fun s y hy => hstab s.1 s.2 y hy
+  }
+  have hQ
+      : ∀ e, ∀ x ∈ S, ∃ c : R, ∀ y : ⨁ e, M e,
+        (∀ e', y e' ∈ L e') → x y (e + 1) - c • y (e + 1) ∈ ⨆ i, (L e).map (T i e) := by
     intro e x hx
     induction hx using Algebra.adjoin_induction with
     | mem x hx =>
@@ -197,17 +202,18 @@ theorem gradedNoeth : GradedNoeth := by
   choose nf hnf using (eventually_zero : ∀ f : ⨁ e, M e, ∃ n : ℕ, ∀ e, n ≤ e → f e = 0)
   refine ⟨F.sup nf, fun e he => le_antisymm (iSup_le fun i => hL i e) ?_⟩
   intro x hx
-  let Ne : Submodule S (⨁ e, M e) :=
-    { carrier := {y | y ∈ N ∧ y (e + 1) ∈ ⨆ i, (L e).map (T i e)}
-      add_mem' := fun {a b} ha hb => ⟨N.add_mem ha.1 hb.1, by
-        rw [DirectSum.add_apply]; exact Submodule.add_mem _ ha.2 hb.2⟩
-      zero_mem' := ⟨N.zero_mem, by rw [DirectSum.zero_apply]; exact zero_mem _⟩
-      smul_mem' := fun s y hy => by
-        obtain ⟨c, hc⟩ := hQ e s.1 s.2
-        refine ⟨N.smul_mem s hy.1, ?_⟩
-        have h3 := Submodule.add_mem _ (hc y hy.1) (Submodule.smul_mem _ c hy.2)
-        rw [sub_add_cancel] at h3
-        exact h3 }
+  let Ne : Submodule S (⨁ e, M e) := {
+    carrier := {y | y ∈ N ∧ y (e + 1) ∈ ⨆ i, (L e).map (T i e)}
+    add_mem' := fun {a b} ha hb =>
+      ⟨N.add_mem ha.1 hb.1, by rw [DirectSum.add_apply]; exact Submodule.add_mem _ ha.2 hb.2⟩
+    zero_mem' := ⟨N.zero_mem, by rw [DirectSum.zero_apply]; exact zero_mem _⟩
+    smul_mem' := fun s y hy => by
+      obtain ⟨c, hc⟩ := hQ e s.1 s.2
+      refine ⟨N.smul_mem s hy.1, ?_⟩
+      have h3 := Submodule.add_mem _ (hc y hy.1) (Submodule.smul_mem _ c hy.2)
+      rw [sub_add_cancel] at h3
+      exact h3
+  }
   have hNle : N ≤ Ne := by
     rw [← hF, Submodule.span_le]
     intro f hf

@@ -10,8 +10,11 @@ set_option linter.style.haveILetI false
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Act
 
@@ -47,7 +50,8 @@ theorem absConv : AbsConv := by
   have cn : Continuous nb := kunf.continuous_nb hnb
   have cφ : Continuous (phz d f s₁ z) := continuous_phz d hf.cont s₁ z
   set m : (Fin L.n → AE F E) × nA σ d.Y d.b → d.G := fun p => nb p.2 * (uM p.1 * x) with hm
-  have cm : Continuous m := (cn.comp continuous_snd).mul ((cu.comp continuous_fst).mul continuous_const)
+  have cm : Continuous m :=
+    (cn.comp continuous_snd).mul ((cu.comp continuous_fst).mul continuous_const)
   have hKc : IsCompact (closure 𝓤 ×ˢ closure 𝓖) := hc𝓤.prod hc𝓖
   obtain ⟨u, hu, hub⟩ := (hmaj z hz).1 (m '' (closure 𝓤 ×ˢ closure 𝓖)) (hKc.image cm)
   have hψ := GlobalTheory.StdCharWeilDatum.isCharAF d.ok.good.std
@@ -64,28 +68,37 @@ theorem absConv : AbsConv := by
       rcases hp with hp | hp
       · exact Or.inl ⟨hp, Set.mem_univ _⟩
       · exact Or.inr ⟨Set.mem_univ _, hp⟩
-    · have eU : (closure 𝓤)ᶜ ∩ 𝓤 = ∅ := (show Disjoint (closure 𝓤)ᶜ 𝓤 from
-        Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓤)ᶜ) (h' : y ∈ 𝓤) => hy (subset_closure h')).inter_eq
-      have eG : (closure 𝓖)ᶜ ∩ 𝓖 = ∅ := (show Disjoint (closure 𝓖)ᶜ 𝓖 from
-        Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓖)ᶜ) (h' : y ∈ 𝓖) => hy (subset_closure h')).inter_eq
+    · have eU : (closure 𝓤)ᶜ ∩ 𝓤 = ∅ :=
+        (show Disjoint (closure 𝓤)ᶜ 𝓤 from
+          Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓤)ᶜ) (h' : y ∈ 𝓤) =>
+            hy (subset_closure h')).inter_eq
+      have eG : (closure 𝓖)ᶜ ∩ 𝓖 = ∅ :=
+        (show Disjoint (closure 𝓖)ᶜ 𝓖 from
+          Set.disjoint_left.2 fun y (hy : y ∈ (closure 𝓖)ᶜ) (h' : y ∈ 𝓖) =>
+            hy (subset_closure h')).inter_eq
       refine measure_union_null ?_ ?_
-      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eU, measure_empty, zero_mul]
-      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eG, measure_empty, mul_zero]
+      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eU,
+          measure_empty, zero_mul]
+      · rw [Measure.prod_prod, Measure.restrict_apply isClosed_closure.measurableSet.compl, eG,
+          measure_empty, mul_zero]
   have hbd : ∀ q : Cs d, ∀ᵐ p ∂μ, ‖kq L f s₁ z nb T uM (rep q) x p‖ ≤ |u q| * |Mψ| := by
     intro q
     filter_upwards [hS] with p hp
     simp only [kq, norm_mul]
-    refine mul_le_mul ((hub (m p) ⟨p, hp, rfl⟩ q).trans (le_abs_self _)) ((hMψ p.2 hp.2).trans (le_abs_self _))
-      (norm_nonneg _) (abs_nonneg _)
+    refine mul_le_mul ((hub (m p) ⟨p, hp, rfl⟩ q).trans (le_abs_self _))
+      ((hMψ p.2 hp.2).trans (le_abs_self _)) (norm_nonneg _) (abs_nonneg _)
   have hcq : ∀ q : Cs d, Continuous (kq L f s₁ z nb T uM (rep q) x) := fun q =>
     (cφ.comp (continuous_const.mul cm)).mul (cψ.comp continuous_snd)
   have hint : ∀ q : Cs d, Integrable (kq L f s₁ z nb T uM (rep q) x) μ := fun q =>
     Integrable.of_bound (hcq q).aestronglyMeasurable _ (hbd q)
   refine ⟨hint, ?_⟩
-  refine Summable.of_nonneg_of_le (fun q => integral_nonneg fun p => norm_nonneg _) (fun q => ?_)
+  refine Summable.of_nonneg_of_le
+    (fun q => integral_nonneg fun p => norm_nonneg _)
+    (fun q => ?_)
     ((hu.abs.mul_right |Mψ|).mul_right (μ.real Set.univ))
-  calc ∫ p, ‖kq L f s₁ z nb T uM (rep q) x p‖ ∂μ ≤ ∫ _p, |u q| * |Mψ| ∂μ :=
-        integral_mono_ae (hint q).norm (integrable_const _) (hbd q)
+  calc
+    ∫ p, ‖kq L f s₁ z nb T uM (rep q) x p‖ ∂μ
+      ≤ ∫ _p, |u q| * |Mψ| ∂μ := integral_mono_ae (hint q).norm (integrable_const _) (hbd q)
     _ = |u q| * |Mψ| * μ.real Set.univ := by rw [integral_const, smul_eq_mul, mul_comm]
 
 end PositivityTheory.SiegelWeilFormula.Act

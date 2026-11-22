@@ -24,9 +24,10 @@ theorem kset_open (I : AutInst) : IsOpen I.Kset := by
 
 theorem ksub_coe (I : AutInst) : ((Ksub I : Subgroup I.Gf) : Set I.Gf) = I.Kset := rfl
 
-theorem sigmaFinite_of_K (I : AutInst) (μ : Measure I.Gf) (hμ : μ.IsHaarMeasure)
-    (hKc : IsCompact I.Kset) (hQ : ∃ s : Set I.Gf, s.Countable ∧ ∀ x : I.Gf, ∃ y ∈ s, y⁻¹ * x ∈ I.Kset) :
-    SigmaFinite μ := by
+theorem sigmaFinite_of_K
+    (I : AutInst) (μ : Measure I.Gf) (hμ : μ.IsHaarMeasure) (hKc : IsCompact I.Kset)
+    (hQ : ∃ s : Set I.Gf, s.Countable ∧ ∀ x : I.Gf, ∃ y ∈ s, y⁻¹ * x ∈ I.Kset)
+    : SigmaFinite μ := by
   haveI := hμ
   obtain ⟨s, hs, hcov⟩ := hQ
   refine Measure.sigmaFinite_of_countable (S := (fun y => (fun x => y * x) '' I.Kset) '' s)
@@ -40,12 +41,13 @@ theorem sigmaFinite_of_K (I : AutInst) (μ : Measure I.Gf) (hμ : μ.IsHaarMeasu
     obtain ⟨y, hy, hyx⟩ := hcov x
     exact Set.mem_biUnion hy ⟨y⁻¹ * x, hyx, mul_inv_cancel_left y x⟩
 
-theorem adUnimod_of (hA : KgSubgroup) (hC : KCompact) (hQ : KCountable) (hI : IndexEq) :
-    PI.AdUnimod := by
+theorem adUnimod_of (hA : KgSubgroup) (hC : KCompact) (hQ : KCountable) (hI : IndexEq)
+    : PI.AdUnimod := by
   intro I μ hμ
   haveI := sigmaFinite_of_K I μ hμ (hC I) (hQ I)
   choose U hU using fun n : ℕ => hA I (n + 1) (by omega)
-  refine PI.UnimodIdxWork.unimodIdx_main I.Gf μ hμ U (fun n => ?_) (fun V hV => ?_) (Ksub I) ?_ ?_ (hI I)
+  refine
+    PI.UnimodIdxWork.unimodIdx_main I.Gf μ hμ U (fun n => ?_) (fun V hV => ?_) (Ksub I) ?_ ?_ (hI I)
   · rw [hU n]
     exact I.topf_open (n + 1) (by omega)
   · obtain ⟨g, hg1, hgV⟩ := I.topf_basis V hV

@@ -25,10 +25,12 @@ noncomputable section
 
 namespace PIW.MassDataColumns
 
-private theorem haar_subgroup_eq_index_mul_of_open_le {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [MeasurableSpace G] [BorelSpace G] (μ : MeasureTheory.Measure G) [μ.IsMulLeftInvariant]
-    (K K' : Subgroup G) (hle : K' ≤ K) (hK' : IsOpen (K' : Set G)) [Finite (K ⧸ K'.subgroupOf K)] :
-    μ K = (Nat.card (K ⧸ K'.subgroupOf K) : ENNReal) * μ K' := by
+private theorem haar_subgroup_eq_index_mul_of_open_le
+    {G : Type}
+    [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+    (μ : MeasureTheory.Measure G) [μ.IsMulLeftInvariant]
+    (K K' : Subgroup G) (hle : K' ≤ K) (hK' : IsOpen (K' : Set G)) [Finite (K ⧸ K'.subgroupOf K)]
+    : μ K = (Nat.card (K ⧸ K'.subgroupOf K) : ENNReal) * μ K' := by
   classical
   haveI := Fintype.ofFinite (K ⧸ K'.subgroupOf K)
   set S : K ⧸ K'.subgroupOf K → Set G := fun q => (fun h => ((q.out : K) : G)⁻¹ * h) ⁻¹' (K' : Set G) with hS
@@ -51,13 +53,17 @@ private theorem haar_subgroup_eq_index_mul_of_open_le {G : Type} [Group G] [Topo
     intro q q' hqq'
     refine Set.disjoint_left.2 fun x hx hx' => hqq' ?_
     rw [hS, Set.mem_preimage] at hx hx'
-    rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q', QuotientGroup.eq, Subgroup.mem_subgroupOf]
+    rw [← QuotientGroup.out_eq' q, ← QuotientGroup.out_eq' q', QuotientGroup.eq,
+      Subgroup.mem_subgroupOf]
     simp only [Subgroup.coe_mul, Subgroup.coe_inv]
-    have h2 : ((q.out : K) : G)⁻¹ * ((q'.out : K) : G) =
-        (((q.out : K) : G)⁻¹ * x) * (((q'.out : K) : G)⁻¹ * x)⁻¹ := by group
+    have h2
+        : ((q.out : K) : G)⁻¹ * ((q'.out : K) : G)
+          = (((q.out : K) : G)⁻¹ * x) * (((q'.out : K) : G)⁻¹ * x)⁻¹ := by
+      group
     rw [h2]
     exact K'.mul_mem hx (K'.inv_mem hx')
-  have hmeas : ∀ q, MeasurableSet (S q) := fun q => (hK'.preimage (continuous_const.mul continuous_id)).measurableSet
+  have hmeas : ∀ q, MeasurableSet (S q) := fun q =>
+    (hK'.preimage (continuous_const.mul continuous_id)).measurableSet
   rw [hunion, MeasureTheory.measure_iUnion hdisj hmeas, tsum_fintype]
   have hS' : ∀ q, μ (S q) = μ K' := fun q => MeasureTheory.measure_preimage_mul μ _ _
   simp only [hS', Finset.sum_const, Finset.card_univ, nsmul_eq_mul, Nat.card_eq_fintype_card]
@@ -77,24 +83,30 @@ theorem haar_ratio_eq_relIndex : HaarRatio := by
 end PIW.MassDataColumns
 
 open PIW.MassDataColumns in
-theorem massDataColumns_of' (hAI : ∀ I : Formalism.MainNotions.S.AutInst, Formalism.L2.SG.AdBridge.AdBridgeIso I)
+theorem massDataColumns_of'
+    (hAI : ∀ I : Formalism.MainNotions.S.AutInst, Formalism.L2.SG.AdBridge.AdBridgeIso I)
     (hGF : ∀ I : Formalism.MainNotions.S.AutInst, Formalism.L2.SG.AdBridge.AdBridgeGF I)
-    (hAK : ∀ I : Formalism.MainNotions.S.AutInst, Formalism.L2.SG.AdBridge.AdBridgeK I) (hN : NeatKuStep) (hF : ClassFinStep)
-    (hE : FinHAHomeo) (hK2 : LevelOpenCompact) (hKc : KsetCompactAll) (hInf : InfHAHomeo) (hHS : HStepInf)
-    (hHC : HinfCompactBundle) :
-    ∀ {D : Formalism.BasicNotions.D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I)
-      (hK : X.LevelSubgroupCharacter) (FdN FdN' : Set X.B.I.Ginf) (u u' : D.what₂.Word)
-      (X0 : Fin (2 * D.R.rS + 2) → Fin X.B.I.n → X.B.I.E)
-      (L : Formalism.L2.SG.TypedSets.LocIn (Formalism.L2.SG.TypedSets.TypX X)) (A : Formalism.L2.SG.TypedSets.AnIn),
+    (hAK : ∀ I : Formalism.MainNotions.S.AutInst, Formalism.L2.SG.AdBridge.AdBridgeK I)
+    (hN : NeatKuStep) (hF : ClassFinStep) (hE : FinHAHomeo) (hK2 : LevelOpenCompact)
+    (hKc : KsetCompactAll) (hInf : InfHAHomeo) (hHS : HStepInf) (hHC : HinfCompactBundle)
+    : ∀ {D : Formalism.BasicNotions.D7} (X : Formalism.L2.SG.HidaSetting.HidaSetting D)
+        (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (hK : X.LevelSubgroupCharacter)
+        (FdN FdN' : Set X.B.I.Ginf) (u u' : D.what₂.Word)
+        (X0 : Fin (2 * D.R.rS + 2) → Fin X.B.I.n → X.B.I.E)
+        (L : Formalism.L2.SG.TypedSets.LocIn (Formalism.L2.SG.TypedSets.TypX X))
+        (A : Formalism.L2.SG.TypedSets.AnIn),
       Formalism.L2.SG.TypedSets.InColumnsAt X hb hK FdN FdN' u u' X0 L A := by
   have hO : OpenCompactStep := openCompactStep_of hE hK2 hKc
   have hG : IdxGroupStep := idxGroupStep_of (kfBridgeStep_of_adBridgeK hAK)
   have hU : UnfoldGenStep :=
     unfoldGenStep_of MassDataMassesW.massUnfoldGen_holds (hinfCompact_of hAI hInf hHS hHC)
       MassDataMassesW.fdExistsH_holds MassDataMassesW.volHTie_holds
-  have hC : ClassCountStep' := classCountStep_of class_sets_equal_card stabilizers_trivial_of_neat hU hG hO
+  have hC : ClassCountStep' :=
+    classCountStep_of class_sets_equal_card stabilizers_trivial_of_neat hU hG hO
   have hCount : IdxCountStep :=
-    idxCountStep_of_modelAll (hModelAll_of (hAdaptAll_of adapted_basis_every_place) level_clause_adapted_basis)
+    idxCountStep_of_modelAll (hModelAll_of (hAdaptAll_of adapted_basis_every_place)
+      level_clause_adapted_basis)
   intro D X hb hK FdN FdN' u u' X0 L A
   exact massDataColumns_of (colsDimStep_of' hGF hN hF hC)
-    (colsIdxStep_of haar_ratio_eq_relIndex hG (idxTopStep_of hO) hCount) X hb hK FdN FdN' u u' X0 L A
+    (colsIdxStep_of haar_ratio_eq_relIndex hG (idxTopStep_of hO) hCount) X hb hK FdN FdN' u u' X0 L
+    A

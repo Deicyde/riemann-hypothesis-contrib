@@ -14,8 +14,10 @@ public import CompanionTheory.AutomorphicTheory.UnitriangularMeasure.AdeleCoordi
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open GlobalTheory.Doubling (absE)
 open GlobalTheory.UAut GlobalTheory.SiegelSet GlobalTheory.ThK.SquareIntegrability
 
@@ -31,16 +33,30 @@ section Transfer
 
 variable (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-def toE : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))ˣ →* IdeleGroup E :=
-  Units.map (adeleTensorAlgEquivLeft F E : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E) →ₐ[AF F] AdeleRing (𝓞 E) E).toMonoidHom
+def toE
+    : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))ˣ
+      →* IdeleGroup E :=
+  Units.map
+    (adeleTensorAlgEquivLeft F E
+      : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E) →ₐ[AF F] AdeleRing (𝓞 E) E).toMonoidHom
 
-theorem absE_eq_ideleModule (x : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))ˣ) :
-    (absE F E x : ℝ) = (IdeleGroup.ideleModule E (toE F E x) : ℝ) := by
-  rw [← GroundTheory.Automorphic.EllipticTorus.ideleModule_ideleNorm (K := F), ← GlobalTheory.ModuAdele.modu_norm_eq_absE]
-  have h2 : ∀ u : (AF F)ˣ, (((adeleClass F).modu u : ℝ≥0) : ℝ) = (IdeleGroup.ideleModule F u : ℝ) := fun u => by
+theorem absE_eq_ideleModule
+    (x : (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))ˣ)
+    : (absE F E x : ℝ) = (IdeleGroup.ideleModule E (toE F E x) : ℝ) := by
+  rw [← GroundTheory.Automorphic.EllipticTorus.ideleModule_ideleNorm (K := F),
+    ← GlobalTheory.ModuAdele.modu_norm_eq_absE]
+  have h2
+      : ∀ u : (AF F)ˣ,
+        (((adeleClass F).modu u : ℝ≥0) : ℝ) = (IdeleGroup.ideleModule F u : ℝ) := fun u => by
     change (distribHaarChar (AdeleRing (𝓞 F) F) u : ℝ) = _
     exact GlobalTheory.ModuAdele.distribHaarChar_adeleRing F u
-  have h3 : Units.map (Algebra.norm (AF F) : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E) →* AF F) x = ideleNorm F E (toE F E x) := by
+  have h3
+      : Units.map
+          (Algebra.norm (AF F)
+            : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)
+              →* AF F)
+          x
+        = ideleNorm F E (toE F E x) := by
     ext
     simp [toE, ideleNorm, Algebra.norm_eq_of_algEquiv]
   rw [h2, h3]

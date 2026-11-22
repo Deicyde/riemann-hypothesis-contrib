@@ -9,7 +9,9 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.Exists
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta
+  Formalism.IndefR.Datum MeasureTheory NumberField Matrix
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -17,24 +19,41 @@ noncomputable section
 
 namespace GlobalTheory.AdelicIntegrable
 
-theorem integrable_of_rapid_decay : ∀ (D : D7) (a b : ℕ) (μ : Measure (Mx D a b)), μ.IsAddHaarMeasure → ∀ θ : InfFam D, IsInfFam θ → ∀ f : Mx D a b → ℂ, Continuous f → ∀ K : Set (Matrix (Fin a) (Fin b) (Af D.host.F ⊗[D.host.F] D.host.E)), IsCompact K → (∀ y : Mx D a b, y.map (finPart D) ∉ K → f y = 0) → (∀ N : ℕ, ∃ C : ℝ, ∀ y : Mx D a b, (1 + ∑ τ, ∑ i, ∑ j, ‖θ τ (infPart D (y i j))‖) ^ N * ‖f y‖ ≤ C) → Integrable f μ := by
+theorem integrable_of_rapid_decay
+    : ∀ (D : D7) (a b : ℕ) (μ : Measure (Mx D a b)),
+      μ.IsAddHaarMeasure
+        → ∀ θ : InfFam D,
+          IsInfFam θ
+            → ∀ f : Mx D a b → ℂ,
+              Continuous f
+                → ∀ K : Set (Matrix (Fin a) (Fin b) (Af D.host.F ⊗[D.host.F] D.host.E)),
+                  IsCompact K → (∀ y : Mx D a b, y.map (finPart D) ∉ K → f y = 0)
+                    → (∀ N : ℕ, ∃ C : ℝ, ∀ y : Mx D a b,
+                      (1 + ∑ τ, ∑ i, ∑ j, ‖θ τ (infPart D (y i j))‖) ^ N * ‖f y‖ ≤ C)
+                    → Integrable f μ := by
   intro D a b μ hμ θ hθ f hf K hK hKf hdec
   obtain ⟨i1, i2, i3, i4, -, -⟩ := GlobalTheory.MixModel.lattice_Mx D a b
   haveI : BorelSpace (Mx D a b) := ⟨rfl⟩
   obtain ⟨σ, hσ⟩ := GlobalTheory.RealLineAt.exists_inverse_chart hθ
 
   let π : Mx D a b → (Fin a → Fin b → D.what₂.Tau → ℂ) := fun y i j τ => θ τ (infPart D (y i j))
-  have hπc : Continuous π := continuous_pi fun i => continuous_pi fun j => continuous_pi fun τ =>
-    (GlobalTheory.FockCompare.continuous_comp hθ τ).comp ((continuous_apply j).comp (continuous_apply i))
+  have hπc : Continuous π :=
+    continuous_pi fun i =>
+      continuous_pi fun j =>
+        continuous_pi fun τ =>
+          (GlobalTheory.FockCompare.continuous_comp hθ τ).comp
+            ((continuous_apply j).comp (continuous_apply i))
   have hπm : Measurable π := hπc.measurable
 
   let s : (Fin a → Fin b → D.what₂.Tau → ℂ) → Mx D a b := fun c => Matrix.of fun i j => σ (c i j)
   have hπs : ∀ c y, π (s c + y) = c + π y := by
-    intro c y; funext i j τ
+    intro c y
+    funext i j τ
     show θ τ (infPart D (σ (c i j) + y i j)) = c i j τ + θ τ (infPart D (y i j))
     rw [RingHom.map_add (f := _), RingHom.map_add (f := _), hσ.comp]
   have hfs : ∀ c (y : Mx D a b), (s c + y).map (finPart D) = y.map (finPart D) := by
-    intro c y; ext i j
+    intro c y
+    ext i j
     show finPart D (σ (c i j) + y i j) = finPart D (y i j)
     rw [RingHom.map_add (f := _), hσ.fin, zero_add]
   let S : Set (Mx D a b) := {y | y.map (finPart D) ∈ K}
@@ -62,7 +81,10 @@ theorem integrable_of_rapid_decay : ∀ (D : D7) (a b : ℕ) (μ : Measure (Mx D
     rintro y ⟨hyA, hyS⟩ i - j -
     refine hCK i j _ ⟨_, hyS, rfl⟩ fun ρ => le_trans ?_ (hR _ hyA)
     exact (norm_le_pi_norm (π y i j) ρ).trans ((norm_le_pi_norm (π y i) j).trans (norm_le_pi_norm (π y) i))
-  have hνe : ν = ν.addHaarScalarFactor Measure.addHaar • (Measure.addHaar : Measure (Fin a → Fin b → D.what₂.Tau → ℂ)) :=
+  have hνe
+      : ν
+        = ν.addHaarScalarFactor Measure.addHaar
+          • (Measure.addHaar : Measure (Fin a → Fin b → D.what₂.Tau → ℂ)) :=
     Measure.isAddLeftInvariant_eq_smul ν Measure.addHaar
 
   set N : ℕ := Module.finrank ℝ (Fin a → Fin b → D.what₂.Tau → ℂ) + 1 with hN
@@ -70,28 +92,38 @@ theorem integrable_of_rapid_decay : ∀ (D : D7) (a b : ℕ) (μ : Measure (Mx D
   let G : (Fin a → Fin b → D.what₂.Tau → ℂ) → ℝ := fun x => C * (1 + ‖x‖) ^ (-(N : ℝ))
   have hGv : Integrable G (Measure.addHaar : Measure (Fin a → Fin b → D.what₂.Tau → ℂ)) :=
     (integrable_one_add_norm (by rw [hN]; push_cast; linarith)).const_mul C
-  have hGν : Integrable G ν := by
-    rw [hνe]; exact hGv.smul_measure ENNReal.coe_ne_top
+  have hGν : Integrable G ν := by rw [hνe]; exact hGv.smul_measure ENNReal.coe_ne_top
   have hGπ : Integrable (G ∘ π) (μ.restrict S) :=
     (integrable_map_measure hGν.aestronglyMeasurable hπm.aemeasurable).1 hGν
   have hbound : ∀ y, ‖f y‖ ≤ G (π y) := by
     intro y
     have hsum : ‖π y‖ ≤ ∑ τ, ∑ i, ∑ j, ‖θ τ (infPart D (y i j))‖ := by
-      refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun i => (pi_norm_le_iff_of_nonneg (by positivity)).2
-        fun j => (pi_norm_le_iff_of_nonneg (by positivity)).2 fun τ => ?_
-      refine le_trans ?_ (Finset.single_le_sum (f := fun τ => ∑ i, ∑ j, ‖θ τ (infPart D (y i j))‖)
-        (fun _ _ => by positivity) (Finset.mem_univ τ))
-      refine le_trans ?_ (Finset.single_le_sum (f := fun i => ∑ j, ‖θ τ (infPart D (y i j))‖)
-        (fun _ _ => by positivity) (Finset.mem_univ i))
-      exact Finset.single_le_sum (f := fun j => ‖θ τ (infPart D (y i j))‖) (fun _ _ => by positivity)
+      refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun i =>
+        (pi_norm_le_iff_of_nonneg (by positivity)).2 fun j =>
+          (pi_norm_le_iff_of_nonneg (by positivity)).2 fun τ => ?_
+      refine le_trans ?_
+        (Finset.single_le_sum
+          (f := fun τ => ∑ i, ∑ j, ‖θ τ (infPart D (y i j))‖)
+          (fun _ _ => by positivity)
+          (Finset.mem_univ τ))
+      refine le_trans ?_
+        (Finset.single_le_sum
+          (f := fun i => ∑ j, ‖θ τ (infPart D (y i j))‖)
+          (fun _ _ => by positivity)
+          (Finset.mem_univ i))
+      exact Finset.single_le_sum
+        (f := fun j => ‖θ τ (infPart D (y i j))‖)
+        (fun _ _ => by positivity)
         (Finset.mem_univ j)
     have h1 : 0 < 1 + ‖π y‖ := by positivity
     have h2 : (1 + ‖π y‖) ^ N ≤ (1 + ∑ τ, ∑ i, ∑ j, ‖θ τ (infPart D (y i j))‖) ^ N :=
       pow_le_pow_left₀ h1.le (by linarith) N
     have h3 := hC y
-    have h4 : (1 + ‖π y‖) ^ N * ‖f y‖ ≤ C := le_trans (mul_le_mul_of_nonneg_right h2 (norm_nonneg _)) h3
+    have h4 : (1 + ‖π y‖) ^ N * ‖f y‖ ≤ C :=
+      le_trans (mul_le_mul_of_nonneg_right h2 (norm_nonneg _)) h3
     show ‖f y‖ ≤ C * (1 + ‖π y‖) ^ (-(N : ℝ))
-    rw [Real.rpow_neg h1.le, Real.rpow_natCast, ← div_eq_mul_inv, le_div_iff₀ (pow_pos h1 N), mul_comm]
+    rw [Real.rpow_neg h1.le, Real.rpow_natCast, ← div_eq_mul_inv, le_div_iff₀ (pow_pos h1 N),
+      mul_comm]
     exact h4
   have hfS : IntegrableOn f S μ :=
     hGπ.mono' hf.aestronglyMeasurable.restrict (Filter.Eventually.of_forall hbound)

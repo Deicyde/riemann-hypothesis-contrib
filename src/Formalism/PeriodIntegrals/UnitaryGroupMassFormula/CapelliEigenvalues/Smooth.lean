@@ -17,22 +17,32 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 theorem smooth_right_action : SmRight := by
   intro k r ε lam Hs _ _ σ hσ v hv c hc
-  have key : ∀ g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
-      gᴴ * Hpk k r * g = Hpk k r → (g * c)ᴴ * Hpk k r * (g * c) = Hpk k r := by
+  have key
+      : ∀ g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+        gᴴ * Hpk k r * g = Hpk k r → (g * c)ᴴ * Hpk k r * (g * c) = Hpk k r := by
     intro g hg
     have h2 : cᴴ * Hpk k r * c = Hpk k r := hc
     rw [Matrix.conjTranspose_mul]
-    calc cᴴ * gᴴ * Hpk k r * (g * c) = cᴴ * (gᴴ * Hpk k r * g) * c := by
-          simp only [Matrix.mul_assoc]
+    calc
+      cᴴ * gᴴ * Hpk k r * (g * c)
+        = cᴴ * (gᴴ * Hpk k r * g) * c := by simp only [Matrix.mul_assoc]
       _ = Hpk k r := by rw [hg, h2]
   intro g₀ hg₀
   obtain ⟨U, F, hUo, hgU, hF, hEq⟩ := hv (g₀ * c) (key g₀ hg₀)
-  let L := LinearMap.toContinuousLinearMap
-    (LinearMap.mulRight ℝ c : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ →ₗ[ℝ] _)
-  refine ⟨(fun g => g * c) ⁻¹' U, fun g => F (g * c),
-    hUo.preimage (continuous_id.matrix_mul continuous_const), hgU, ?_, ?_⟩
-  · have h := hF.comp (L.contDiff.contDiffOn (s := (fun g => g * c) ⁻¹' U))
-      (fun g hg => by show g * c ∈ U; exact hg)
+  let L :=
+    LinearMap.toContinuousLinearMap
+      (LinearMap.mulRight ℝ c : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ →ₗ[ℝ] _)
+  refine ⟨
+    (fun g => g * c) ⁻¹' U,
+    fun g => F (g * c),
+    hUo.preimage (continuous_id.matrix_mul continuous_const),
+    hgU,
+    ?_,
+    ?_
+  ⟩
+  · have h :=
+      hF.comp (L.contDiff.contDiffOn (s := (fun g => g * c) ⁻¹' U))
+        (fun g hg => by show g * c ∈ U; exact hg)
     refine h.congr fun g _ => ?_
     show F (g * c) = F (g * c)
     rfl
@@ -74,7 +84,8 @@ theorem smooth_translation : SmTrans := by
   intro k r ε Hs _ _ σ Wp Wq _ _ _ _ _ _ P₀ hP P Q hQ
   have hdet : IsUnit P₀.det := (Matrix.isUnit_iff_isUnit_det P₀).mp hP.1.1
   have hw : ∀ w, Formalism.REAL.SmoothOnGV ε (fun x => σ (P₀⁻¹ * x * P₀) (Q w)) := fun w =>
-    Formalism.QuantumDeterminants.ioh_smooth ε (Hpk k r) P₀ P₀⁻¹ (fun g => σ g (Q w))
+    Formalism.QuantumDeterminants.ioh_smooth ε (Hpk k r) P₀ P₀⁻¹
+      (fun g => σ g (Q w))
       (Matrix.mul_nonsing_inv P₀ hdet) hP.1.2.symm (hQ w)
   exact ⟨fun w => hw w, coef_smoothOnGV ε _ P Q hw⟩
 

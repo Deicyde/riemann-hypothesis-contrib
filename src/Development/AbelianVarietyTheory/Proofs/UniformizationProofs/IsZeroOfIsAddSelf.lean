@@ -20,7 +20,9 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.GtPointsCompare
 
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.IndefiniteRowSideFullHecke.TorusPointForms
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.DVR ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.IndefiniteRowSideFullHecke.TorusPointForms
 
 section Cast
 
@@ -28,26 +30,30 @@ variable {X Y : Scheme.{0}} {L : LB X} {K : Type} [Fintype K] {φ φ' : K → (Y
 
 def castGen (h : φ = φ') (t : LB.Gen (LB.LinComb L φ ε)) : LB.Gen (LB.LinComb L φ' ε) := h ▸ t
 
-theorem castGen_isGen (h : φ = φ') {t : LB.Gen (LB.LinComb L φ ε)} (ht : t.IsGen) :
-    (castGen h t).IsGen := by
+theorem castGen_isGen (h : φ = φ') {t : LB.Gen (LB.LinComb L φ ε)} (ht : t.IsGen)
+    : (castGen h t).IsGen := by
   subst h; exact ht
 
-theorem castGen_castGen (h : φ = φ') (h' : φ' = φ) (t : LB.Gen (LB.LinComb L φ ε)) :
-    castGen h' (castGen h t) = t := by
+theorem castGen_castGen (h : φ = φ') (h' : φ' = φ) (t : LB.Gen (LB.LinComb L φ ε))
+    : castGen h' (castGen h t) = t := by
   subst h; rfl
 
-theorem corr_castGen {K' : Type} [Fintype K'] {ψ : K' → (Y ⟶ X)} {δ : K' → ℤ} (h : φ = φ')
-    (t : LB.Gen (LB.LinComb L φ ε)) (u : LB.Gen (LB.LinComb L ψ δ)) :
-    LB.Gen.Corr L _ _ _ _ (castGen h t) u ↔ LB.Gen.Corr L _ _ _ _ t u := by
+theorem corr_castGen
+    {K' : Type} [Fintype K']
+    {ψ : K' → (Y ⟶ X)} {δ : K' → ℤ}
+    (h : φ = φ') (t : LB.Gen (LB.LinComb L φ ε)) (u : LB.Gen (LB.LinComb L ψ δ))
+    : LB.Gen.Corr L _ _ _ _ (castGen h t) u ↔ LB.Gen.Corr L _ _ _ _ t u := by
   subst h; rfl
 
-theorem corr_mul_castGen {K' : Type} [Fintype K'] {ψ : K' → (Y ⟶ X)} {δ : K' → ℤ}
-    {φ₁ φ₁' φ₂ φ₂' : K → (Y ⟶ X)} (h : φ = φ') (h₁ : φ₁ = φ₁') (h₂ : φ₂ = φ₂')
-    (t : LB.Gen (LB.LinComb L φ ε)) (c : LB.Gen (LB.LinComb L ψ δ))
-    (t₁ : LB.Gen (LB.LinComb L φ₁ ε)) (t₂ : LB.Gen (LB.LinComb L φ₂ ε)) :
-    LB.Gen.Corr L _ _ _ _ (LB.mulGen L _ _ _ _ (castGen h t) c)
-        (LB.mulGen L _ _ _ _ (castGen h₁ t₁) (castGen h₂ t₂)) ↔
-      LB.Gen.Corr L _ _ _ _ (LB.mulGen L _ _ _ _ t c) (LB.mulGen L _ _ _ _ t₁ t₂) := by
+theorem corr_mul_castGen
+    {K' : Type} [Fintype K']
+    {ψ : K' → (Y ⟶ X)} {δ : K' → ℤ} {φ₁ φ₁' φ₂ φ₂' : K → (Y ⟶ X)}
+    (h : φ = φ') (h₁ : φ₁ = φ₁') (h₂ : φ₂ = φ₂') (t : LB.Gen (LB.LinComb L φ ε))
+    (c : LB.Gen (LB.LinComb L ψ δ)) (t₁ : LB.Gen (LB.LinComb L φ₁ ε))
+    (t₂ : LB.Gen (LB.LinComb L φ₂ ε))
+    : LB.Gen.Corr L _ _ _ _ (LB.mulGen L _ _ _ _ (castGen h t) c)
+        (LB.mulGen L _ _ _ _ (castGen h₁ t₁) (castGen h₂ t₂))
+      ↔ LB.Gen.Corr L _ _ _ _ (LB.mulGen L _ _ _ _ t c) (LB.mulGen L _ _ _ _ t₁ t₂) := by
   subst h h₁ h₂; rfl
 
 end Cast
@@ -58,41 +64,45 @@ variable (F : Type) [Field F] [Algebra (FractionRing R) F]
 theorem oφ_eq (b : TF (R := R) F ⟶ D.P.A) (χ : D.X) : oφ D b χ = DegPre.gtφ D F b χ := by
   have : padd D.P.A b (cPt D _ χ) = padd D.P.A (DegPre.cF D F χ) b := mul_comm b (cPt D _ χ)
   unfold oφ DegPre.gtφ
-  rw [this]; rfl
+  rw [this]
+  rfl
 
-theorem corr_one_of_mult (b : TF (R := R) F ⟶ D.P.A)
-    (s : LB.Gen (LB.LinComb D.P.L (DegPre.gtφ D F b 0) DegPre.gtε))
+theorem corr_one_of_mult
+    (b : TF (R := R) F ⟶ D.P.A) (s : LB.Gen (LB.LinComb D.P.L (DegPre.gtφ D F b 0) DegPre.gtε))
     (s' : LB.Gen (LB.LinComb D.P.L (DegPre.gtφ D F b (0 + 0)) DegPre.gtε)) (hs : HEq s' s)
     (m : LB.Gen.Corr D.P.L _ _ _ _
       (LB.mulGen D.P.L _ _ _ _ s' (DegPre.cubAt D F (DegPre.cF D F 0) (DegPre.cF D F 0) b))
-      (LB.mulGen D.P.L _ _ _ _ s s)) :
-    LB.Gen.Corr D.P.L _ _ _ _ s (LB.oneGen D.P.L) := by
+      (LB.mulGen D.P.L _ _ _ _ s s))
+    : LB.Gen.Corr D.P.L _ _ _ _ s (LB.oneGen D.P.L) := by
   revert s'
   rw [add_zero (0 : D.X)]
   intro s' hs m
   obtain rfl := eq_of_heq hs
   refine corr_of_val D.P.isLB fun y J hJ => Eq.trans ?_ (val_one _).symm
   have C : IsCub (th D (T := TF (R := R) F) y J) := isCub_cubV D.cub hJ
-  have e := ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) rfl (val_cubAt hJ _ _ _))).symm.trans
+  have e :=
+    ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) rfl (val_cubAt hJ _ _ _))).symm.trans
       ((val_corr hJ m _).trans (val_mul hJ _ _ _))
   have z : DegPre.cF D F 0 = 1 := cPoint_zero _
   rw [z, C.face] at e
   exact (mul_left_cancel e).symm
 
 def ptEquiv : GtPt D F ≃ GtPtF D F where
-  toFun g :=
-    { b := g.base
-      s := fun χ => castGen (oφ_eq D F g.base χ) (g.form χ)
-      isGen := fun χ => castGen_isGen _ (g.form_gen χ)
-      s_zero := corr_one_of_mult D F g.base _ (castGen (oφ_eq D F g.base (0 + 0)) (g.form (0 + 0)))
-        (by rw [add_zero (0 : D.X)])
-        ((corr_mul_castGen _ _ _ _ _ _ _).2 (g.form_mul 0 0))
-      mult := fun χ χ' => (corr_mul_castGen _ _ _ _ _ _ _).2 (g.form_mul χ χ') }
-  invFun g :=
-    { base := g.b
-      form := fun χ => castGen (oφ_eq D F g.b χ).symm (g.s χ)
-      form_gen := fun χ => castGen_isGen _ (g.isGen χ)
-      form_mul := fun χ χ' => (corr_mul_castGen _ _ _ _ _ _ _).2 (g.mult χ χ') }
+  toFun g := {
+    b := g.base
+    s := fun χ => castGen (oφ_eq D F g.base χ) (g.form χ)
+    isGen := fun χ => castGen_isGen _ (g.form_gen χ)
+    s_zero :=
+      corr_one_of_mult D F g.base _ (castGen (oφ_eq D F g.base (0 + 0)) (g.form (0 + 0)))
+        (by rw [add_zero (0 : D.X)]) ((corr_mul_castGen _ _ _ _ _ _ _).2 (g.form_mul 0 0))
+    mult := fun χ χ' => (corr_mul_castGen _ _ _ _ _ _ _).2 (g.form_mul χ χ')
+  }
+  invFun g := {
+    base := g.b
+    form := fun χ => castGen (oφ_eq D F g.b χ).symm (g.s χ)
+    form_gen := fun χ => castGen_isGen _ (g.isGen χ)
+    form_mul := fun χ χ' => (corr_mul_castGen _ _ _ _ _ _ _).2 (g.mult χ χ')
+  }
   left_inv g := by
     obtain ⟨b, s, h₁, h₂⟩ := g
     dsimp only
@@ -109,16 +119,15 @@ variable {D F}
 theorem isZero_iff (g : GtPt D F) : (ptEquiv D F g).IsZero ↔ g.IsZero :=
   and_congr Iff.rfl (forall_congr' fun _ => corr_castGen _ _ _)
 
-theorem isAdd_iff (g g' h : GtPt D F) :
-    (ptEquiv D F g).IsAdd (ptEquiv D F g') (ptEquiv D F h) ↔ g.IsAdd g' h :=
+theorem isAdd_iff (g g' h : GtPt D F)
+    : (ptEquiv D F g).IsAdd (ptEquiv D F g') (ptEquiv D F h) ↔ g.IsAdd g' h :=
   and_congr Iff.rfl (forall_congr' fun _ => corr_mul_castGen _ _ _ _ _ _ _)
 
-theorem isIota_iff (y : D.X) (g : GtPt D F) :
-    GtPtF.IsIota y (ptEquiv D F g) ↔ GtPt.IsIo y g :=
+theorem isIota_iff (y : D.X) (g : GtPt D F) : GtPtF.IsIota y (ptEquiv D F g) ↔ GtPt.IsIo y g :=
   and_congr Iff.rfl (forall_congr' fun _ => corr_castGen _ _ _)
 
-theorem isNsmul_iff (k : ℕ) (g h : GtPt D F) :
-    GtPtF.IsNsmul k (ptEquiv D F g) (ptEquiv D F h) ↔ g.IsNsmul k h := by
+theorem isNsmul_iff (k : ℕ) (g h : GtPt D F)
+    : GtPtF.IsNsmul k (ptEquiv D F g) (ptEquiv D F h) ↔ g.IsNsmul k h := by
   constructor
   · rintro ⟨gs, h0, hs, hl⟩
     have key : ∀ (i : ℕ) (hi : i < k + 1), g.IsNsmul i ((ptEquiv D F).symm (gs ⟨i, hi⟩)) := by
@@ -149,9 +158,9 @@ theorem isNsmul_iff (k : ℕ) (g h : GtPt D F) :
 
 variable (D F)
 
-theorem exists_nsmul_iff (k : ℕ) (y : D.X) (g : GtPt D F) :
-    (∃ h : GtPtF D F, GtPtF.IsNsmul k (ptEquiv D F g) h ∧ GtPtF.IsIota y h) ↔
-      ∃ h : GtPt D F, g.IsNsmul k h ∧ GtPt.IsIo y h := by
+theorem exists_nsmul_iff (k : ℕ) (y : D.X) (g : GtPt D F)
+    : (∃ h : GtPtF D F, GtPtF.IsNsmul k (ptEquiv D F g) h ∧ GtPtF.IsIota y h)
+      ↔ ∃ h : GtPt D F, g.IsNsmul k h ∧ GtPt.IsIo y h := by
   constructor
   · rintro ⟨h, h₁, h₂⟩
     obtain ⟨w, rfl⟩ := (ptEquiv D F).surjective h
@@ -166,9 +175,12 @@ theorem qkPt_ext {k : ℕ} {q q' : QkPt D F k} (h₁ : q.y = q'.y) (h₂ : q.g =
   obtain rfl : g = g' := h₂
   rfl
 
-def pairEquivOf (k : ℕ) (e : GtPt D F ≃ GtPtF D F)
-    (H : ∀ y g, (∃ h : GtPtF D F, GtPtF.IsNsmul k (e g) h ∧ GtPtF.IsIota y h) ↔
-      ∃ h : GtPt D F, g.IsNsmul k h ∧ GtPt.IsIo y h) : QPair D F k ≃ QkPt D F k where
+def pairEquivOf
+    (k : ℕ) (e : GtPt D F ≃ GtPtF D F)
+    (H : ∀ y g,
+      (∃ h : GtPtF D F, GtPtF.IsNsmul k (e g) h ∧ GtPtF.IsIota y h)
+        ↔ ∃ h : GtPt D F, g.IsNsmul k h ∧ GtPt.IsIo y h)
+    : QPair D F k ≃ QkPt D F k where
   toFun p := ⟨p.1.1, e p.1.2, (H _ _).2 p.2⟩
   invFun q := ⟨(q.y, e.symm q.g), (H _ _).1 (by rw [Equiv.apply_symm_apply]; exact q.eq)⟩
   left_inv p := Subtype.ext (Prod.ext rfl (Equiv.symm_apply_apply e p.1.2))
@@ -179,8 +191,8 @@ def pairEquiv (k : ℕ) : QPair D F k ≃ QkPt D F k :=
 
 variable {D F}
 
-theorem rel_iff {k : ℕ} (p p' : QPair D F k) :
-    QkPt.Equiv D F (pairEquiv D F k p) (pairEquiv D F k p') ↔ QRel D F k p p' := by
+theorem rel_iff {k : ℕ} (p p' : QPair D F k)
+    : QkPt.Equiv D F (pairEquiv D F k p) (pairEquiv D F k p') ↔ QRel D F k p p' := by
   constructor
   · rintro ⟨z, hz, h, hi, ha⟩
     obtain ⟨w, rfl⟩ := (ptEquiv D F).surjective h

@@ -12,16 +12,19 @@ namespace AAInvW
 
 open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.C3
 
-theorem inUH_mul {n : ℕ} {H a b : Matrix (Fin n) (Fin n) ℂ} (ha : inUH H a) (hb : inUH H b) :
-    inUH H (a * b) := by
+theorem inUH_mul {n : ℕ} {H a b : Matrix (Fin n) (Fin n) ℂ} (ha : inUH H a) (hb : inUH H b)
+    : inUH H (a * b) := by
   have ha' : aᴴ * H * a = H := ha
   have hb' : bᴴ * H * b = H := hb
   show (a * b)ᴴ * H * (a * b) = H
   rw [Matrix.conjTranspose_mul]
-  calc bᴴ * aᴴ * H * (a * b) = bᴴ * (aᴴ * H * a) * b := by simp only [Matrix.mul_assoc]
+  calc
+    bᴴ * aᴴ * H * (a * b)
+      = bᴴ * (aᴴ * H * a) * b := by simp only [Matrix.mul_assoc]
     _ = H := by rw [ha', hb']
 
-theorem operators_commute_translations_of_left_right (hL : LeftAA) (hR : RightAA) (hS : SsetUH) : OperatorsCommuteTranslations := by
+theorem operators_commute_translations_of_left_right (hL : LeftAA) (hR : RightAA) (hS : SsetUH)
+    : OperatorsCommuteTranslations := by
   unfold OperatorsCommuteTranslations
   intro E _ _ k r z z' m hm u ell f _ _ hf s hs s' hs' g hg
   have hsg : inUH (Hpk k r) (s * g) := inUH_mul (hS k r z s hs) hg

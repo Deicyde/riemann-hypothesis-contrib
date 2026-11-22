@@ -8,20 +8,25 @@ open Formalism.FourierDecayAlt
 
 namespace Formalism.FourierDecayAlt.P.CutMP.JA.SSn.Geom
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH Formalism.FourierDecayAlt.P.AdmissibleLieWords
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.P.BetaSesquilinearity PI.UnitaryCorollaryDerivatives.CRH
+  Formalism.FourierDecayAlt.P.AdmissibleLieWords
 open scoped ComplexConjugate Matrix
 
 noncomputable section
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
-theorem bd_of_ubl {k r : ℕ} {F : Type} [NormedAddCommGroup F] [NormedSpace ℂ F]
-    (z z' : Fin (2 * r + k + 1) → ℂ) (φ : B.Mat k r → F) (e γ : ℕ) (Bg : ℝ)
-    (hBg : (e : ℝ) + γ ≤ Bg) (ε : ℝ)
-    (h0 : ∃ C0 : ℝ, ∀ g ∈ geG k r z z' ε, ‖φ g‖ ≤ C0) (hU : ∀ n : ℕ, UBL φ (geG k r z z' ε) n e γ) (m : ℕ) :
-    ∃ C : ℝ, ∀ u w : List (B.Mat k r),
-      (∀ X ∈ u, B.unitLie k r X) → (∀ X ∈ w, B.unitLie k r X) → u.length + w.length ≤ m →
-      ∀ g ∈ B.GV k r, ε ≤ Gf k r z z' g → ‖B.dLR u w φ g‖ ≤ C * B.gN g ^ (Bg * m) := by
+theorem bd_of_ubl
+    {k r : ℕ} {F : Type} [NormedAddCommGroup F] [NormedSpace ℂ F]
+    (z z' : Fin (2 * r + k + 1) → ℂ) (φ : B.Mat k r → F)
+    (e γ : ℕ) (Bg : ℝ) (hBg : (e : ℝ) + γ ≤ Bg)
+    (ε : ℝ)
+    (h0 : ∃ C0 : ℝ, ∀ g ∈ geG k r z z' ε, ‖φ g‖ ≤ C0) (hU : ∀ n : ℕ, UBL φ (geG k r z z' ε) n e γ)
+    (m : ℕ)
+    : ∃ C : ℝ, ∀ u w : List (B.Mat k r),
+      (∀ X ∈ u, B.unitLie k r X) → (∀ X ∈ w, B.unitLie k r X) → u.length + w.length ≤ m
+        → ∀ g ∈ B.GV k r, ε ≤ Gf k r z z' g → ‖B.dLR u w φ g‖ ≤ C * B.gN g ^ (Bg * m) := by
   rcases Nat.eq_zero_or_pos m with hm | hm
   · subst hm
     obtain ⟨C0, hC0⟩ := h0
@@ -63,12 +68,15 @@ theorem geometry_assembly_holds : GeomAssemble := by
   obtain ⟨s1, s2, s3⟩ := hS _ _ _ _ hk hz hz'
   obtain ⟨C0, hC0⟩ := hB0 _ _ _ _ hk hz hz'
   have hr0 : (0 : ℝ) ≤ S.G.r := Nat.cast_nonneg _
-  have hBg : ∀ e γ : ℕ, e ≤ 4 * (S.G.r + 1) → γ ≤ 2 * (S.G.r + 1) → (e : ℝ) + γ ≤ Cb * ((S.G.r : ℝ) + 1) := by
+  have hBg
+      : ∀ e γ : ℕ,
+        e ≤ 4 * (S.G.r + 1) → γ ≤ 2 * (S.G.r + 1) → (e : ℝ) + γ ≤ Cb * ((S.G.r : ℝ) + 1) := by
     intro e γ he hγ
     have he' : (e : ℝ) ≤ 4 * ((S.G.r : ℝ) + 1) := by exact_mod_cast he
     have hγ' : (γ : ℝ) ≤ 2 * ((S.G.r : ℝ) + 1) := by exact_mod_cast hγ
     nlinarith
-  have hpos : ∀ ε : ℝ, 0 < ε → ∀ g ∈ geG S.G.k S.G.r Bs.z Bs.z' ε, g ∈ posG S.G.k S.G.r Bs.z Bs.z' :=
+  have hpos
+      : ∀ ε : ℝ, 0 < ε → ∀ g ∈ geG S.G.k S.G.r Bs.z Bs.z' ε, g ∈ posG S.G.k S.G.r Bs.z Bs.z' :=
     fun ε hε g hg => ⟨hg.1, lt_of_lt_of_le hε hg.2⟩
   refine ⟨s1, s2, s3, ?_, ?_, ?_, ?_, ?_⟩
   · intro p hp g hg
@@ -76,13 +84,16 @@ theorem geometry_assembly_holds : GeomAssemble := by
     exact ⟨h1, h2, hEi _ _ _ _ hk hz hz' _ hp.1 _ hp.2.1 _ hp.2.2.1 _ hp.2.2.2 g hg⟩
   · intro ε hε m
     obtain ⟨⟨e, γ, he, hγ, hu⟩, -, -⟩ := hU _ _ _ _ hk hz hz' ε hε
-    exact bd_of_ubl Bs.z Bs.z' _ e γ _ (hBg e γ he hγ) ε ⟨C0, fun g hg => (hC0 g (hpos ε hε g hg)).1⟩ hu m
+    exact bd_of_ubl Bs.z Bs.z' _ e γ _ (hBg e γ he hγ) ε
+      ⟨C0, fun g hg => (hC0 g (hpos ε hε g hg)).1⟩ hu m
   · intro ε hε m
     obtain ⟨-, ⟨e, γ, he, hγ, hu⟩, -⟩ := hU _ _ _ _ hk hz hz' ε hε
-    exact bd_of_ubl Bs.z Bs.z' _ e γ _ (hBg e γ he hγ) ε ⟨C0, fun g hg => (hC0 g (hpos ε hε g hg)).2.1⟩ hu m
+    exact bd_of_ubl Bs.z Bs.z' _ e γ _ (hBg e γ he hγ) ε
+      ⟨C0, fun g hg => (hC0 g (hpos ε hε g hg)).2.1⟩ hu m
   · intro ε hε m
     obtain ⟨-, -, ⟨e, γ, he, hγ, hu⟩⟩ := hU _ _ _ _ hk hz hz' ε hε
-    exact bd_of_ubl Bs.z Bs.z' _ e γ _ (hBg e γ he hγ) ε ⟨C0, fun g hg => (hC0 g (hpos ε hε g hg)).2.2⟩ hu m
+    exact bd_of_ubl Bs.z Bs.z' _ e γ _ (hBg e γ he hγ) ε
+      ⟨C0, fun g hg => (hC0 g (hpos ε hε g hg)).2.2⟩ hu m
   · intro q hq
     have hTT : (D.parOf S v).TT = Tz S.G.k S.G.r Bs.z * Tz S.G.k S.G.r Bs.z' := by
       show (D.parOf S v).T * (D.parOf S v).T' = _

@@ -8,19 +8,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.LiteratureR
 
 open UpperTheory.V.Cj.A
 
-theorem UpperTheory.V.Cj.A.fwdStep :
-    FwdStep := by
+theorem UpperTheory.V.Cj.A.fwdStep : FwdStep := by
   intro Γ V S I _ _ _ _ _ d G hY r hr C hC q k u hu hcl hvan
   classical
-  have hex : ∀ y : List I, y.length = k + 1 → ∃ η : G.Om q, G.dOm q η = u y ∧
-      ∀ s, ∀ p ∈ {p | ∀ i ∈ y, p ∈ C i s}, (η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p = 0 := by
+  have hex
+      : ∀ y : List I,
+        y.length = k + 1
+          → ∃ η : G.Om q,
+            G.dOm q η = u y
+              ∧ ∀ s, ∀ p ∈ {p | ∀ i ∈ y, p ∈ C i s},
+                (η : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p = 0 := by
     intro y hy
     obtain ⟨i0, t, rfl⟩ : ∃ i t, y = i :: t := by
       cases y with
       | nil => simp at hy
       | cons i t => exact ⟨i, t, rfl⟩
-    refine relPrim Γ V S d G hY (fun s => {p | ∀ i ∈ i0 :: t, p ∈ C i s}) (fun s => ⟨?_, ?_⟩) q
-      (u (i0 :: t)) (hcl _ hy) ?_
+    refine relPrim Γ V S d G hY
+      (fun s => {p | ∀ i ∈ i0 :: t, p ∈ C i s})
+      (fun s => ⟨?_, ?_⟩)
+      q (u (i0 :: t)) (hcl _ hy) ?_
     · intro a ha b hb t1 t2 h1 h2 h i hi
       exact hC.convex i s (ha i hi) (hb i hi) h1 h2 h
     · intro p hp
@@ -28,7 +34,9 @@ theorem UpperTheory.V.Cj.A.fwdStep :
     · intro s p hp
       exact hvan _ hy s p (Set.mem_univ _) hp
   choose η hη using hex
-  have hηc : ∀ (y y' : List I) (h : y.length = k + 1) (h' : y'.length = k + 1), y = y' → η y h = η y' h' := by
+  have hηc
+      : ∀ (y y' : List I) (h : y.length = k + 1) (h' : y'.length = k + 1),
+        y = y' → η y h = η y' h' := by
     rintro y _ h h' rfl
     rfl
   let g : List I → Γ := fun x => (x.head?.map r).getD 1
@@ -38,8 +46,16 @@ theorem UpperTheory.V.Cj.A.fwdStep :
     | nil => exact absurd rfl hx
     | cons i t => simp [g, hr]
   have hlen : ∀ x : List I, (x.map ((g x)⁻¹ • ·)).length = x.length := fun x => List.length_map ..
-  refine ⟨fun x => if h : x.length = k + 1 then
-      G.act q (g x) (η (x.map ((g x)⁻¹ • ·)) ((hlen x).trans h)) else 0, ?_, ?_, ?_⟩
+  refine ⟨
+    fun x =>
+      if h : x.length = k + 1 then
+        G.act q (g x) (η (x.map ((g x)⁻¹ • ·)) ((hlen x).trans h))
+      else
+        0,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · intro γ x hx
     have hx' : (x.map (γ • ·)).length = k + 1 := by simpa using hx
     have hne : x ≠ [] := by

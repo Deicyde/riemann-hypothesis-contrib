@@ -10,12 +10,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DvdOfForallC
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory IsLocalRing ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.TorRef GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory IsLocalRing ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.TorRef GlobalTheory.Poinc
 
 namespace GlobalTheory.Poinc
 
-theorem dvd_of_forall_mem_span_sup_pow {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    {x y : V} (hx : x ≠ 0) (h : ∀ e, y ∈ Ideal.span {x} ⊔ maximalIdeal V ^ e) : x ∣ y := by
+theorem dvd_of_forall_mem_span_sup_pow
+    {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    {x y : V} (hx : x ≠ 0) (h : ∀ e, y ∈ Ideal.span {x} ⊔ maximalIdeal V ^ e)
+    : x ∣ y := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
   obtain ⟨k, hk⟩ := IsDiscreteValuationRing.associated_pow_irreducible hx hϖ
   have hs : Ideal.span {x} = maximalIdeal V ^ k := by
@@ -25,7 +30,16 @@ theorem dvd_of_forall_mem_span_sup_pow {V : Type} [CommRing V] [IsDomain V] [IsD
   rw [← hs, sup_idem] at this
   exact Ideal.mem_span_singleton.mp this
 
-theorem mem_span_sup_pow_of_forall_complete_dvr : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsIntegrallyClosed O] [CharZero O] [Algebra.EssFiniteType ℤ O] (g : O) (b : ℕ → O), g ≠ 0 → (∀ m n, m ≤ n → b m - b n ∈ maximalIdeal O ^ m) → (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V], IsAdicComplete (maximalIdeal V) V → ∀ ρ : O →+* V, Function.Injective ρ → IsLocalHom ρ → ∀ e, ρ (b e) ∈ Ideal.span {ρ g} ⊔ maximalIdeal V ^ e) → ∀ n, b n ∈ Ideal.span {g} ⊔ maximalIdeal O ^ n := by
+theorem mem_span_sup_pow_of_forall_complete_dvr
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsLocalRing O] [IsIntegrallyClosed O] [CharZero O]
+        [Algebra.EssFiniteType ℤ O] (g : O) (b : ℕ → O),
+      g ≠ 0 → (∀ m n, m ≤ n → b m - b n ∈ maximalIdeal O ^ m)
+        → (∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CharZero V],
+          IsAdicComplete (maximalIdeal V) V
+            → ∀ ρ : O →+* V,
+              Function.Injective ρ → IsLocalHom ρ
+                → ∀ e, ρ (b e) ∈ Ideal.span {ρ g} ⊔ maximalIdeal V ^ e)
+        → ∀ n, b n ∈ Ideal.span {g} ⊔ maximalIdeal O ^ n := by
   intro O _ _ _ _ _ _ g b hg hb hV n
   haveI : IsNoetherianRing O := Algebra.EssFiniteType.isNoetherianRing ℤ O
   set m := maximalIdeal O with hm
@@ -42,10 +56,11 @@ theorem mem_span_sup_pow_of_forall_complete_dvr : ∀ (O : Type) [CommRing O] [I
   have hmR : maximalIdeal R = m.map ι := AdicCompletion.maximalIdeal_eq_map
 
   have hc : IsAdicComplete (m.map ι) R := AdicCompletion.isAdicComplete_self m fg
-  obtain ⟨F, hF⟩ := IsPrecomplete.prec hc.toIsPrecomplete (f := fun k => ι (b k)) (by
-    intro k l hkl
-    rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, ← map_sub, ← Ideal.map_pow]
-    exact Ideal.mem_map_of_mem _ (hb k l hkl))
+  obtain ⟨F, hF⟩ :=
+    IsPrecomplete.prec hc.toIsPrecomplete (f := fun k => ι (b k)) (by
+      intro k l hkl
+      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, ← map_sub, ← Ideal.map_pow]
+      exact Ideal.mem_map_of_mem _ (hb k l hkl))
   have hF' : ∀ k, ι (b k) - F ∈ maximalIdeal R ^ k := by
     intro k
     have := hF k
@@ -71,8 +86,7 @@ theorem mem_span_sup_pow_of_forall_complete_dvr : ∀ (O : Type) [CommRing O] [I
         rw [Ideal.map_pow]
         exact Ideal.pow_right_mono (Ideal.map_le_iff_le_comap.mpr hmap) e
       exact hle (Ideal.mem_map_of_mem _ (hF' e))
-    have : ρ' F = ρ (b e) - ρ' (ι (b e) - F) := by
-      simp [ρ, map_sub]
+    have : ρ' F = ρ (b e) - ρ' (ι (b e) - F) := by simp [ρ, map_sub]
     rw [this]
     exact Ideal.sub_mem _ h1 (Ideal.mem_sup_right h2)
 

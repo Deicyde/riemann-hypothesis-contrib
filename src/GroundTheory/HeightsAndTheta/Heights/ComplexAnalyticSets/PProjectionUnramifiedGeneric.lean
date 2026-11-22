@@ -16,8 +16,8 @@ noncomputable section
 
 namespace ProjectionUnramifiedGeneric
 
-theorem pderiv_inr_rename_inl {α β : Type} (b : β) (a : MvPolynomial α ℂ) :
-    pderiv (Sum.inr b) (rename (Sum.inl : α → α ⊕ β) a) = 0 := by
+theorem pderiv_inr_rename_inl {α β : Type} (b : β) (a : MvPolynomial α ℂ)
+    : pderiv (Sum.inr b) (rename (Sum.inl : α → α ⊕ β) a) = 0 := by
   classical
   induction a using MvPolynomial.induction_on with
   | C c => simp
@@ -28,14 +28,16 @@ theorem proof : ProjectionUnramifiedGeneric.Statement := by
   classical
   intro α β _ _ Q r q t hQ hint hqQ htQ hgen
   let L := FractionRing (MvPolynomial (α ⊕ β) ℂ ⧸ Q)
-  let φ : MvPolynomial (α ⊕ β) ℂ →+* L := (algebraMap (MvPolynomial (α ⊕ β) ℂ ⧸ Q) L).comp (Ideal.Quotient.mk Q)
+  let φ : MvPolynomial (α ⊕ β) ℂ →+* L :=
+    (algebraMap (MvPolynomial (α ⊕ β) ℂ ⧸ Q) L).comp (Ideal.Quotient.mk Q)
   have hφ : ∀ p, φ p = 0 ↔ p ∈ Q := by
     intro p
     have hinj := IsFractionRing.injective (MvPolynomial (α ⊕ β) ℂ ⧸ Q) L
     simp only [φ, RingHom.comp_apply]
     rw [← Ideal.Quotient.eq_zero_iff_mem, ← map_zero (algebraMap (MvPolynomial (α ⊕ β) ℂ ⧸ Q) L)]
     exact hinj.eq_iff
-  let ι : MvPolynomial α ℂ →+* MvPolynomial (α ⊕ β) ℂ := (rename Sum.inl : MvPolynomial α ℂ →ₐ[ℂ] MvPolynomial (α ⊕ β) ℂ).toRingHom
+  let ι : MvPolynomial α ℂ →+* MvPolynomial (α ⊕ β) ℂ :=
+    (rename Sum.inl : MvPolynomial α ℂ →ₐ[ℂ] MvPolynomial (α ⊕ β) ℂ).toRingHom
 
   let D : (β → L) → MvPolynomial (α ⊕ β) ℂ → L := fun c p => ∑ b, φ (pderiv (Sum.inr b) p) * c b
   have hDadd : ∀ c p p', D c (p + p') = D c p + D c p' := by
@@ -60,17 +62,20 @@ theorem proof : ProjectionUnramifiedGeneric.Statement := by
   have hDι : ∀ c a, D c (ι a) = 0 := by
     intro c a
     simp [D, ι, pderiv_inr_rename_inl]
-  have hDpoly : ∀ c b (G : Polynomial (MvPolynomial α ℂ)),
-      D c (G.eval₂ ι (X (Sum.inr b))) =
-        φ ((Polynomial.derivative G).eval₂ ι (X (Sum.inr b))) * c b := by
+  have hDpoly
+      : ∀ c b (G : Polynomial (MvPolynomial α ℂ)),
+        D c (G.eval₂ ι (X (Sum.inr b)))
+          = φ ((Polynomial.derivative G).eval₂ ι (X (Sum.inr b))) * c b := by
     intro c b G
     induction G using Polynomial.induction_on with
     | C a => simp [hDι]
-    | add f g hf hg => simp only [Polynomial.eval₂_add, hDadd, hf, hg, Polynomial.derivative_add,
-        map_add, add_mul]
+    | add f g hf hg =>
+      simp only [Polynomial.eval₂_add, hDadd, hf, hg, Polynomial.derivative_add, map_add, add_mul]
     | monomial n a h =>
-      have e : (Polynomial.C a * Polynomial.X ^ (n + 1) : Polynomial (MvPolynomial α ℂ)) =
-          Polynomial.C a * Polynomial.X ^ n * Polynomial.X := by ring
+      have e
+          : (Polynomial.C a * Polynomial.X ^ (n + 1) : Polynomial (MvPolynomial α ℂ))
+            = Polynomial.C a * Polynomial.X ^ n * Polynomial.X := by
+        ring
       rw [e, Polynomial.eval₂_mul, hDmul, h, Polynomial.eval₂_X, hDX]
       simp only [Polynomial.derivative_mul, Polynomial.derivative_X, Polynomial.eval₂_add,
         Polynomial.eval₂_mul, Polynomial.eval₂_one, Polynomial.eval₂_X, map_add, map_mul, mul_one]
@@ -96,8 +101,9 @@ theorem proof : ProjectionUnramifiedGeneric.Statement := by
     set y : L := φ (X (Sum.inr b))
     set Fb : Polynomial L := F.map (φ.comp ι)
     have hFb0 : Fb ≠ 0 := (hFm.map _).ne_zero
-    have hev : ∀ G : Polynomial (MvPolynomial α ℂ),
-        φ (G.eval₂ ι (X (Sum.inr b))) = (G.map (φ.comp ι)).eval y := by
+    have hev
+        : ∀ G : Polynomial (MvPolynomial α ℂ),
+          φ (G.eval₂ ι (X (Sum.inr b))) = (G.map (φ.comp ι)).eval y := by
       intro G
       rw [Polynomial.eval_map, Polynomial.hom_eval₂]
     have hroot : Fb.IsRoot y := by
@@ -113,7 +119,8 @@ theorem proof : ProjectionUnramifiedGeneric.Statement := by
     have hG' : φ ((Polynomial.derivative G).eval₂ ι (X (Sum.inr b))) ≠ 0 := by
       have e : Polynomial.derivative G = Polynomial.derivative^[k] F := by
         rw [show k = (k - 1) + 1 from (Nat.sub_add_cancel hk).symm, Function.iterate_succ_apply']
-      rw [e, hev, ← Polynomial.iterate_derivative_map, Polynomial.eval_iterate_derivative_rootMultiplicity]
+      rw [e, hev, ← Polynomial.iterate_derivative_map,
+        Polynomial.eval_iterate_derivative_rootMultiplicity]
       have : CharZero L := charZero_of_injective_ringHom (φ.comp MvPolynomial.C).injective
       rw [nsmul_eq_mul]
       exact mul_ne_zero (Nat.cast_ne_zero.2 (Nat.factorial_ne_zero _))
@@ -124,7 +131,8 @@ theorem proof : ProjectionUnramifiedGeneric.Statement := by
 
   let M : Matrix (Fin r) β L := Matrix.of fun j b => φ (pderiv (Sum.inr b) (q j))
   have hMinj : Function.Injective M.mulVecLin := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro c hc
     apply hker c
     intro j
@@ -152,8 +160,10 @@ theorem proof : ProjectionUnramifiedGeneric.Statement := by
       convert hw using 2
       ext p p'
       simp [RingHom.mapMatrix_apply]
-    have hsub : Matrix.mulVec (Matrix.of fun p p' => eval w (pderiv (Sum.inr (J p')) (q (I p))))
-        (fun p => v (Sum.inr (J p))) = 0 := by
+    have hsub
+        : Matrix.mulVec (Matrix.of fun p p' => eval w (pderiv (Sum.inr (J p')) (q (I p))))
+            (fun p => v (Sum.inr (J p)))
+          = 0 := by
       funext p
       have h1 := hv (I p)
       rw [Fintype.sum_sum_type] at h1

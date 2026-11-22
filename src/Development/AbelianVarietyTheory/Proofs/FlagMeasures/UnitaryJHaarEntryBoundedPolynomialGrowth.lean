@@ -16,52 +16,73 @@ namespace GlobalTheory.UJGrowth
 
 variable {n : ℕ} {ε : Fin n → Bool}
 
-def ent (g : Formalism.REAL.UJ ε) : Fin n → Fin n → ℂ := Matrix.of.symm (Formalism.MainNotions.S.uMat g)
+def ent (g : Formalism.REAL.UJ ε) : Fin n → Fin n → ℂ :=
+  Matrix.of.symm (Formalism.MainNotions.S.uMat g)
 
 theorem ent_closedEmb : Topology.IsClosedEmbedding (ent (ε := ε)) :=
   (Formalism.REAL.isClosedEmbeddingMatrix n ε).1
 
-theorem mem_closedBall_iff_entries {x y : Fin n → Fin n → ℂ} {R : ℝ} (hR : 0 ≤ R) :
-    x ∈ closedBall y R ↔ ∀ i j, ‖x i j - y i j‖ ≤ R := by
+theorem mem_closedBall_iff_entries {x y : Fin n → Fin n → ℂ} {R : ℝ} (hR : 0 ≤ R)
+    : x ∈ closedBall y R ↔ ∀ i j, ‖x i j - y i j‖ ≤ R := by
   rw [mem_closedBall, dist_eq_norm, pi_norm_le_iff_of_nonneg hR]
   exact forall_congr' fun i => pi_norm_le_iff_of_nonneg hR
 
-theorem mem_closedBall_zero_iff_entries {x : Fin n → Fin n → ℂ} {R : ℝ} (hR : 0 ≤ R) :
-    x ∈ closedBall 0 R ↔ ∀ i j, ‖x i j‖ ≤ R := by
+theorem mem_closedBall_zero_iff_entries {x : Fin n → Fin n → ℂ} {R : ℝ} (hR : 0 ≤ R)
+    : x ∈ closedBall 0 R ↔ ∀ i j, ‖x i j‖ ≤ R := by
   rw [mem_closedBall_iff_entries hR]
   simp
 
-theorem uMat_inv_mul' (g : Formalism.REAL.UJ ε) : Formalism.MainNotions.S.uMat g⁻¹ * Formalism.MainNotions.S.uMat g = 1 := by
-  rw [← show Formalism.MainNotions.S.uMat (g⁻¹ * g) = Formalism.MainNotions.S.uMat g⁻¹ * Formalism.MainNotions.S.uMat g from rfl, inv_mul_cancel]
+theorem uMat_inv_mul' (g : Formalism.REAL.UJ ε)
+    : Formalism.MainNotions.S.uMat g⁻¹ * Formalism.MainNotions.S.uMat g = 1 := by
+  rw [← show Formalism.MainNotions.S.uMat (g⁻¹ * g)
+        = Formalism.MainNotions.S.uMat g⁻¹ * Formalism.MainNotions.S.uMat g from
+      rfl,
+    inv_mul_cancel]
   rfl
 
-theorem uMat_mul_inv' (g : Formalism.REAL.UJ ε) : Formalism.MainNotions.S.uMat g * Formalism.MainNotions.S.uMat g⁻¹ = 1 := by
-  rw [← show Formalism.MainNotions.S.uMat (g * g⁻¹) = Formalism.MainNotions.S.uMat g * Formalism.MainNotions.S.uMat g⁻¹ from rfl, mul_inv_cancel]
+theorem uMat_mul_inv' (g : Formalism.REAL.UJ ε)
+    : Formalism.MainNotions.S.uMat g * Formalism.MainNotions.S.uMat g⁻¹ = 1 := by
+  rw [← show Formalism.MainNotions.S.uMat (g * g⁻¹)
+        = Formalism.MainNotions.S.uMat g * Formalism.MainNotions.S.uMat g⁻¹ from
+      rfl,
+    mul_inv_cancel]
   rfl
 
-theorem uMat_inv_eq (g : Formalism.REAL.UJ ε) :
-    Formalism.MainNotions.S.uMat g⁻¹ = Formalism.REAL.Jm ε * (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε := by
-  have hf : (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε * Formalism.MainNotions.S.uMat g = Formalism.REAL.Jm ε := g.2
-  have h1 : (Formalism.REAL.Jm ε * (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε) * Formalism.MainNotions.S.uMat g = 1 := by
-    rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc (Formalism.MainNotions.S.uMat g)ᴴ, hf,
-      Formalism.REAL.Jm_mul_self]
-  calc Formalism.MainNotions.S.uMat g⁻¹
-      = ((Formalism.REAL.Jm ε * (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε) * Formalism.MainNotions.S.uMat g) * Formalism.MainNotions.S.uMat g⁻¹ := by
-        rw [h1, Matrix.one_mul]
+theorem uMat_inv_eq (g : Formalism.REAL.UJ ε)
+    : Formalism.MainNotions.S.uMat g⁻¹
+      = Formalism.REAL.Jm ε * (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε := by
+  have hf
+      : (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε * Formalism.MainNotions.S.uMat g
+        = Formalism.REAL.Jm ε :=
+    g.2
+  have h1
+      : (Formalism.REAL.Jm ε * (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε)
+          * Formalism.MainNotions.S.uMat g
+        = 1 := by
+    rw [Matrix.mul_assoc, Matrix.mul_assoc, ← Matrix.mul_assoc (Formalism.MainNotions.S.uMat g)ᴴ,
+      hf, Formalism.REAL.Jm_mul_self]
+  calc
+    Formalism.MainNotions.S.uMat g⁻¹
+        = ((Formalism.REAL.Jm ε * (Formalism.MainNotions.S.uMat g)ᴴ * Formalism.REAL.Jm ε)
+            * Formalism.MainNotions.S.uMat g)
+          * Formalism.MainNotions.S.uMat g⁻¹ := by
+      rw [h1, Matrix.one_mul]
     _ = _ := by rw [Matrix.mul_assoc, uMat_mul_inv', Matrix.mul_one]
 
-theorem norm_inv_entry (g : Formalism.REAL.UJ ε) (i j : Fin n) :
-    ‖Formalism.MainNotions.S.uMat g⁻¹ i j‖ = ‖Formalism.MainNotions.S.uMat g j i‖ := by
+theorem norm_inv_entry (g : Formalism.REAL.UJ ε) (i j : Fin n)
+    : ‖Formalism.MainNotions.S.uMat g⁻¹ i j‖ = ‖Formalism.MainNotions.S.uMat g j i‖ := by
   rw [uMat_inv_eq]
   unfold Formalism.REAL.Jm
   rw [Matrix.mul_diagonal, Matrix.diagonal_mul, Matrix.conjTranspose_apply]
   split_ifs <;> simp
 
-theorem small_ball {S : Subgroup (Formalism.REAL.UJ ε)} {μ : Measure (Formalism.REAL.UJ ε)}
+theorem small_ball
+    {S : Subgroup (Formalism.REAL.UJ ε)} {μ : Measure (Formalism.REAL.UJ ε)}
     (hμ : Formalism.L2.SG.RealObj.IsHaarLoc (S : Set (Formalism.REAL.UJ ε)) μ)
-    {R δ : ℝ} (hR : 0 ≤ R) (hδ : 0 ≤ δ) (h : (n : ℝ) * (R * (2 * δ)) ≤ 1) (x : Fin n → Fin n → ℂ) :
-    μ (ent ⁻¹' (closedBall 0 R ∩ closedBall x δ)) ≤
-      μ (ent ⁻¹' closedBall (ent (1 : Formalism.REAL.UJ ε)) 1) := by
+    {R δ : ℝ} (hR : 0 ≤ R) (hδ : 0 ≤ δ) (h : (n : ℝ) * (R * (2 * δ)) ≤ 1)
+    (x : Fin n → Fin n → ℂ)
+    : μ (ent ⁻¹' (closedBall 0 R ∩ closedBall x δ))
+      ≤ μ (ent ⁻¹' closedBall (ent (1 : Formalism.REAL.UJ ε)) 1) := by
   by_cases hex : ∃ s ∈ ent ⁻¹' (closedBall 0 R ∩ closedBall x δ), s ∈ S
   · obtain ⟨s, ⟨hs1, hs2⟩, hs⟩ := hex
     have hme : MeasurableEmbedding (fun t : Formalism.REAL.UJ ε => s * t) :=
@@ -76,37 +97,54 @@ theorem small_ball {S : Subgroup (Formalism.REAL.UJ ε)} {μ : Measure (Formalis
       linarith [mem_closedBall.1 ht2, mem_closedBall.1 hs2]
     rw [Set.mem_preimage, mem_closedBall_iff_entries zero_le_one]
     intro i j
-    have e : Formalism.MainNotions.S.uMat t = Formalism.MainNotions.S.uMat s⁻¹ * Formalism.MainNotions.S.uMat (s * t) := by
-      rw [show Formalism.MainNotions.S.uMat (s * t) = Formalism.MainNotions.S.uMat s * Formalism.MainNotions.S.uMat t from rfl, ← Matrix.mul_assoc,
-        uMat_inv_mul', Matrix.one_mul]
-    have e2 : Formalism.MainNotions.S.uMat t - 1 =
-        Formalism.MainNotions.S.uMat s⁻¹ * (Formalism.MainNotions.S.uMat (s * t) - Formalism.MainNotions.S.uMat s) := by
+    have e
+        : Formalism.MainNotions.S.uMat t
+          = Formalism.MainNotions.S.uMat s⁻¹ * Formalism.MainNotions.S.uMat (s * t) := by
+      rw [show Formalism.MainNotions.S.uMat (s * t)
+            = Formalism.MainNotions.S.uMat s * Formalism.MainNotions.S.uMat t from
+          rfl,
+        ← Matrix.mul_assoc, uMat_inv_mul', Matrix.one_mul]
+    have e2
+        : Formalism.MainNotions.S.uMat t - 1
+          = Formalism.MainNotions.S.uMat s⁻¹
+            * (Formalism.MainNotions.S.uMat (s * t) - Formalism.MainNotions.S.uMat s) := by
       rw [Matrix.mul_sub, ← e, uMat_inv_mul']
-    have e3 : ent t i j - ent (1 : Formalism.REAL.UJ ε) i j = (Formalism.MainNotions.S.uMat t - 1) i j := rfl
+    have e3
+        : ent t i j - ent (1 : Formalism.REAL.UJ ε) i j
+          = (Formalism.MainNotions.S.uMat t - 1) i j :=
+      rfl
     rw [e3, e2, Matrix.mul_apply]
     refine (norm_sum_le _ _).trans ?_
-    have hb : ∀ l ∈ (Finset.univ : Finset (Fin n)),
-        ‖Formalism.MainNotions.S.uMat s⁻¹ i l * (Formalism.MainNotions.S.uMat (s * t) - Formalism.MainNotions.S.uMat s) l j‖ ≤ R * (2 * δ) :=
-      fun l _ => by
-        rw [norm_mul]
-        refine mul_le_mul ?_ ?_ (norm_nonneg _) hR
-        · rw [norm_inv_entry]
-          exact (mem_closedBall_zero_iff_entries hR).1 hs1 l i
-        · exact (mem_closedBall_iff_entries (by linarith)).1 h1 l j
+    have hb
+        : ∀ l ∈ (Finset.univ : Finset (Fin n)),
+          ‖Formalism.MainNotions.S.uMat s⁻¹ i l * (Formalism.MainNotions.S.uMat (s * t) - Formalism.MainNotions.S.uMat s) l j‖
+            ≤ R * (2 * δ) := fun l _ => by
+      rw [norm_mul]
+      refine mul_le_mul ?_ ?_ (norm_nonneg _) hR
+      · rw [norm_inv_entry]
+        exact (mem_closedBall_zero_iff_entries hR).1 hs1 l i
+      · exact (mem_closedBall_iff_entries (by linarith)).1 h1 l j
     refine (Finset.sum_le_card_nsmul _ _ _ hb).trans ?_
     simpa using h
-  · rw [measure_mono_null (t := (S : Set (Formalism.REAL.UJ ε))ᶜ) (fun s hs hS => hex ⟨s, hs, hS⟩) hμ.2.2.1]
+  · rw [measure_mono_null (t := (S : Set (Formalism.REAL.UJ ε))ᶜ)
+      (fun s hs hS => hex ⟨s, hs, hS⟩)
+      hμ.2.2.1]
     exact zero_le
 
 end GlobalTheory.UJGrowth
 
 namespace GlobalTheory.UJGrowth
 
-theorem growth : ∀ {n : ℕ} (ε : Fin n → Bool) (S : Subgroup (Formalism.REAL.UJ ε)),
-    IsClosed (S : Set (Formalism.REAL.UJ ε)) → ∀ μ : Measure (Formalism.REAL.UJ ε),
-    Formalism.L2.SG.RealObj.IsHaarLoc (S : Set (Formalism.REAL.UJ ε)) μ → IsFiniteMeasureOnCompacts μ →
-    ∃ (C : ℝ) (D : ℕ), ∀ R : ℝ, 1 ≤ R →
-      μ {g : Formalism.REAL.UJ ε | ∀ i j, ‖Formalism.MainNotions.S.uMat g i j‖ ≤ R} ≤ ENNReal.ofReal (C * R ^ D) := by
+theorem growth
+    : ∀ {n : ℕ} (ε : Fin n → Bool) (S : Subgroup (Formalism.REAL.UJ ε)),
+      IsClosed (S : Set (Formalism.REAL.UJ ε))
+        → ∀ μ : Measure (Formalism.REAL.UJ ε),
+          Formalism.L2.SG.RealObj.IsHaarLoc (S : Set (Formalism.REAL.UJ ε)) μ
+            → IsFiniteMeasureOnCompacts μ
+            → ∃ (C : ℝ) (D : ℕ), ∀ R : ℝ,
+              1 ≤ R
+                → μ {g : Formalism.REAL.UJ ε | ∀ i j, ‖Formalism.MainNotions.S.uMat g i j‖ ≤ R}
+                  ≤ ENNReal.ofReal (C * R ^ D) := by
   intro n ε S _ μ hμ hfin
   haveI := hμ.1
   have hemb : Topology.IsClosedEmbedding (ent (ε := ε)) := ent_closedEmb
@@ -128,19 +166,21 @@ theorem growth : ∀ {n : ℕ} (ε : Fin n → Bool) (S : Subgroup (Formalism.RE
   have hδ0 : 0 < δ := by positivity
   have hδ1 : δ ≤ 1 := inv_le_one_of_one_le₀ hp
   have hcond : (n : ℝ) * (R * (2 * δ)) ≤ 1 := by
-    have e : (n : ℝ) * (R * (2 * δ)) = n / N := by
-      rw [hδ]; field_simp
+    have e : (n : ℝ) * (R * (2 * δ)) = n / N := by rw [hδ]; field_simp
     rw [e, div_le_one (by linarith)]
     linarith
   have hsb : ∀ x, ν (closedBall 0 R ∩ closedBall x δ) ≤ M := fun x => by
     rw [hνA _ (measurableSet_closedBall.inter measurableSet_closedBall)]
     exact small_ball hμ (by linarith) hδ0.le hcond x
-  have hset : {g : Formalism.REAL.UJ ε | ∀ i j, ‖Formalism.MainNotions.S.uMat g i j‖ ≤ R} = ent ⁻¹' closedBall 0 R := by
+  have hset
+      : {g : Formalism.REAL.UJ ε | ∀ i j, ‖Formalism.MainNotions.S.uMat g i j‖ ≤ R}
+        = ent ⁻¹' closedBall 0 R := by
     ext g
     rw [Set.mem_preimage, mem_closedBall_zero_iff_entries (by linarith)]
     rfl
   rw [hset, ← hνA _ measurableSet_closedBall]
-  let W : Set ((Fin n → Fin n → ℂ) × (Fin n → Fin n → ℂ)) := {p | p.1 ∈ closedBall 0 R ∧ dist p.1 p.2 ≤ δ}
+  let W : Set ((Fin n → Fin n → ℂ) × (Fin n → Fin n → ℂ)) :=
+    {p | p.1 ∈ closedBall 0 R ∧ dist p.1 p.2 ≤ δ}
   have hW : MeasurableSet W :=
     ((isClosed_closedBall.preimage continuous_fst).inter
       (isClosed_le continuous_dist continuous_const)).measurableSet
@@ -165,31 +205,36 @@ theorem growth : ∀ {n : ℕ} (ε : Fin n → Bool) (S : Subgroup (Formalism.RE
       exact hsb x
     · have : (fun s => (s, x)) ⁻¹' W = ∅ := by
         ext s
-        simp only [W, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, mem_closedBall]
+        simp only [W, Set.mem_preimage, Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false,
+          mem_closedBall]
         rintro ⟨h1, h2⟩
         apply hx
         have := dist_triangle_left x 0 s
-        rw [mem_closedBall]; linarith
+        rw [mem_closedBall]
+        linarith
       simp [this]
-  rw [e1, Measure.addHaar_closedBall lam _ hδ0.le, Measure.addHaar_closedBall lam _ (by linarith)] at e2
+  rw [e1, Measure.addHaar_closedBall lam _ hδ0.le, Measure.addHaar_closedBall lam _ (by linarith)]
+    at e2
   have hb0 : 0 < (lam (ball 0 1)).toReal :=
     ENNReal.toReal_pos (measure_ball_pos lam _ one_pos).ne' measure_ball_lt_top.ne
-  have e3 := ENNReal.toReal_mono (ENNReal.mul_ne_top hMf
-    (ENNReal.mul_ne_top ENNReal.ofReal_ne_top measure_ball_lt_top.ne)) e2
+  have e3 :=
+    ENNReal.toReal_mono
+      (ENNReal.mul_ne_top hMf (ENNReal.mul_ne_top ENNReal.ofReal_ne_top measure_ball_lt_top.ne)) e2
   simp only [ENNReal.toReal_mul] at e3
   rw [ENNReal.toReal_ofReal (by positivity), ENNReal.toReal_ofReal (by positivity)] at e3
   have e4 : δ ^ d * (ν (closedBall 0 R)).toReal ≤ M.toReal * (2 * R) ^ d := by
     refine le_of_mul_le_mul_right ?_ hb0
-    calc _ = δ ^ d * (lam (ball 0 1)).toReal * (ν (closedBall 0 R)).toReal := by ring
+    calc
+      _ = δ ^ d * (lam (ball 0 1)).toReal * (ν (closedBall 0 R)).toReal := by ring
       _ ≤ _ := e3
       _ = _ := by ring
   have e5 : M.toReal * (2 * R) ^ d = δ ^ d * (M.toReal * (4 * N) ^ d * R ^ (2 * d)) := by
     have : 2 * R = δ * (4 * N) * R ^ 2 := by rw [hδ]; field_simp; ring
-    rw [this, mul_pow, mul_pow, pow_mul]; ring
+    rw [this, mul_pow, mul_pow, pow_mul]
+    ring
   rw [e5] at e4
   have e6 := le_of_mul_le_mul_left e4 (by positivity)
-  have hνf : ν (closedBall 0 R) ≠ ⊤ := by
-    rw [hνA _ measurableSet_closedBall]; exact (hcpt _ _).ne
+  have hνf : ν (closedBall 0 R) ≠ ⊤ := by rw [hνA _ measurableSet_closedBall]; exact (hcpt _ _).ne
   rw [← ENNReal.ofReal_toReal hνf]
   exact ENNReal.ofReal_le_ofReal e6
 

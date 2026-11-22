@@ -5,7 +5,8 @@ public import ReciprocityTheory.DualLattices.PSerFrobStatement
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
@@ -42,27 +43,42 @@ private lemma pSerOf_trunc {R₀ : Type} [CommRing R₀] {g : ℕ} (N : ℕ) (G�
           (pow_eq_zero_of_le hi (ha i))
       rw [MvPolynomial.aeval_monomial, Finsupp.prod_fintype _ _ (by simp), hz, mul_zero]
 
-theorem pSerFrob_of_invariance :
-  (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀) (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
-    (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a) ∧
-    ((∀ i, IsNilpotent (a i)) → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'), φ (nEval f a) = nEval f (fun i => φ (a i))) ∧
-      nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a))) →
-  (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g) (n : ℕ) (S : Type) [CommRing S] [Algebra R₀ S], (n : S) = 0 → ∀ a e : Fin g → S, (∀ i, IsNilpotent (a i)) →
-    (∀ i j, e i * e j = 0) → nsmulF ch.F (a + e) n = nsmulF ch.F a n) →
-  (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] (g N : ℕ) (G : MvPolynomial (Fin g) R₀),
-    (∀ (S : Type) [CommRing S] [Algebra R₀ S], (p : S) = 0 → ∀ a e : Fin g → S, (∀ i, a i ^ N = 0) → (∀ i j, e i * e j = 0) →
-      MvPolynomial.aeval (a + e) G = MvPolynomial.aeval a G) →
-    ∀ m : Fin g →₀ ℕ, (∀ i, m i < N) → (∃ i, ¬ p ∣ m i) → ∃ r : R₀, AddMonoidAlgebra.coeff G m = p * r) →
-  (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} (K : LAlg R₀) (ch : FormalChartAtZero B K g), PSerFrobStatement p K ch) := by
+theorem pSerFrob_of_invariance
+    : (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀)
+          (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
+        (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a)
+          ∧ ((∀ i, IsNilpotent (a i))
+            → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'),
+                φ (nEval f a) = nEval f (fun i => φ (a i)))
+              ∧ nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a)))
+      → (∀ {R₀ : Type} [CommRing R₀] {g : ℕ} {B : BX R₀} {K : LAlg R₀}
+          (ch : FormalChartAtZero B K g) (n : ℕ) (S : Type) [CommRing S] [Algebra R₀ S],
+        (n : S) = 0
+          → ∀ a e : Fin g → S,
+            (∀ i, IsNilpotent (a i)) → (∀ i j, e i * e j = 0)
+              → nsmulF ch.F (a + e) n = nsmulF ch.F a n)
+      → (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] (g N : ℕ) (G : MvPolynomial (Fin g) R₀),
+        (∀ (S : Type) [CommRing S] [Algebra R₀ S],
+            (p : S) = 0
+              → ∀ a e : Fin g → S,
+                (∀ i, a i ^ N = 0) → (∀ i j, e i * e j = 0)
+                  → MvPolynomial.aeval (a + e) G = MvPolynomial.aeval a G)
+          → ∀ m : Fin g →₀ ℕ,
+            (∀ i, m i < N) → (∃ i, ¬ p ∣ m i) → ∃ r : R₀, AddMonoidAlgebra.coeff G m = p * r)
+      → (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} (K : LAlg R₀)
+          (ch : FormalChartAtZero B K g),
+        PSerFrobStatement p K ch) := by
   intro hev hinv hcoef R₀ _ p _ g B K ch N
   classical
-
-  have hnil : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a b : Fin g → S),
-      (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i)) → ∀ k, IsNilpotent (fAdd ch.F a b k) := by
+  have hnil
+      : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a b : Fin g → S),
+        (∀ i, IsNilpotent (a i)) → (∀ i, IsNilpotent (b i))
+          → ∀ k, IsNilpotent (fAdd ch.F a b k) := by
     intro S _ _ a b ha hb k
     have h0 : algebraMap R₀ S (MvPowerSeries.coeff 0 (ch.F k)) = 0 := by
-      have h1 := ((hev (ch.F k) S (Sum.elim (0 : Fin g → S) (0 : Fin g → S))).2
-        (by rintro (i | i) <;> simp)).2
+      have h1 :=
+        ((hev (ch.F k) S (Sum.elim (0 : Fin g → S) (0 : Fin g → S))).2
+          (by rintro (i | i) <;> simp)).2
       have h2 : nEval (ch.F k) (Sum.elim (0 : Fin g → S) (0 : Fin g → S)) = 0 :=
         congrFun (ch.F_unit S 0 (by simp)) k
       have h3 : Ideal.span (Set.range (Sum.elim (0 : Fin g → S) (0 : Fin g → S))) = ⊥ := by
@@ -77,24 +93,28 @@ theorem pSerFrob_of_invariance :
       rintro _ ⟨i | i, rfl⟩
       exacts [mem_nilradical.2 (ha i), mem_nilradical.2 (hb i)]
     exact mem_nilradical.1 (h2 h1)
-  have hnil' : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S),
-      (∀ i, IsNilpotent (a i)) → ∀ n k, IsNilpotent (nsmulF ch.F a n k) := by
+  have hnil'
+      : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S),
+        (∀ i, IsNilpotent (a i)) → ∀ n k, IsNilpotent (nsmulF ch.F a n k) := by
     intro S _ _ a ha n
     induction n with
     | zero => intro k; simp [nsmulF]
     | succ n ih => exact hnil S _ _ ih ha
-  have hnat : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
-      (φ : S →ₐ[R₀] S') (a : Fin g → S), (∀ i, IsNilpotent (a i)) → ∀ n k,
-      φ (nsmulF ch.F a n k) = nsmulF ch.F (fun i => φ (a i)) n k := by
+  have hnat
+      : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (S' : Type) [CommRing S'] [Algebra R₀ S']
+          (φ : S →ₐ[R₀] S') (a : Fin g → S),
+        (∀ i, IsNilpotent (a i))
+          → ∀ n k, φ (nsmulF ch.F a n k) = nsmulF ch.F (fun i => φ (a i)) n k := by
     intro S _ _ S' _ _ φ a ha n
     induction n with
     | zero => intro k; simp [nsmulF]
     | succ n ih =>
       intro k
-      have h1 := ((hev (ch.F k) S (Sum.elim (nsmulF ch.F a n) a)).2
-        (by rintro (i | i); exacts [hnil' S a ha n i, ha i])).1 S' φ
-      change φ (nEval (ch.F k) (Sum.elim (nsmulF ch.F a n) a)) =
-        nEval (ch.F k) (Sum.elim (nsmulF ch.F (fun i => φ (a i)) n) (fun i => φ (a i)))
+      have h1 :=
+        ((hev (ch.F k) S (Sum.elim (nsmulF ch.F a n) a)).2
+          (by rintro (i | i); exacts [hnil' S a ha n i, ha i])).1 S' φ
+      change φ (nEval (ch.F k) (Sum.elim (nsmulF ch.F a n) a))
+        = nEval (ch.F k) (Sum.elim (nsmulF ch.F (fun i => φ (a i)) n) (fun i => φ (a i)))
       rw [h1]
       congr 1
       funext i
@@ -105,13 +125,17 @@ theorem pSerFrob_of_invariance :
   let I : Ideal (MvPolynomial (Fin g) R₀) :=
     Ideal.span (Set.range fun j : Fin g => (MvPolynomial.X j : MvPolynomial (Fin g) R₀) ^ (N + 1))
   let x : Fin g → MvPolynomial (Fin g) R₀ ⧸ I := fun j => Ideal.Quotient.mk I (MvPolynomial.X j)
-  have hx : ∀ j, IsNilpotent (x j) := fun j => ⟨N + 1, by
-    change Ideal.Quotient.mk I (MvPolynomial.X j) ^ (N + 1) = 0
-    rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]
-    exact Ideal.subset_span ⟨j, rfl⟩⟩
+  have hx : ∀ j, IsNilpotent (x j) := fun j => ⟨
+    N + 1,
+    by
+      change Ideal.Quotient.mk I (MvPolynomial.X j) ^ (N + 1) = 0
+      rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]
+      exact Ideal.subset_span ⟨j, rfl⟩
+  ⟩
   choose G₁ hG₁ using fun k => Ideal.Quotient.mk_surjective (nsmulF ch.F x p k)
-  have huniv : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S),
-      (∀ i, a i ^ (N + 1) = 0) → ∀ k, nsmulF ch.F a p k = MvPolynomial.aeval a (G₁ k) := by
+  have huniv
+      : ∀ (S : Type) [CommRing S] [Algebra R₀ S] (a : Fin g → S),
+        (∀ i, a i ^ (N + 1) = 0) → ∀ k, nsmulF ch.F a p k = MvPolynomial.aeval a (G₁ k) := by
     intro S _ _ a ha k
     let φ : (MvPolynomial (Fin g) R₀ ⧸ I) →ₐ[R₀] S :=
       Ideal.Quotient.liftₐ I (MvPolynomial.aeval a) (by

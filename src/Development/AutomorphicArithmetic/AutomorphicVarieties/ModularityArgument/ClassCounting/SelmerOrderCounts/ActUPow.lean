@@ -6,20 +6,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.ZK UpperTheory.V.ZK.Ct
 
-private theorem dat_g_pow_apply_ofMul_eq_actU_inv_pow {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
-    (γ : F ≃ₐ[L] F) (a : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)) (hD : IsDat γ a D)
-    (k : ℕ) (α : Fˣ) :
-    (D.g ^ k) (Additive.ofMul α) = Additive.ofMul (actU (γ⁻¹ ^ k) α) := by
+private theorem dat_g_pow_apply_ofMul_eq_actU_inv_pow
+    {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+    (γ : F ≃ₐ[L] F) (a : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ))
+    (hD : IsDat γ a D)
+    (k : ℕ) (α : Fˣ)
+    : (D.g ^ k) (Additive.ofMul α) = Additive.ofMul (actU (γ⁻¹ ^ k) α) := by
   induction k generalizing α with
   | zero => simp [actU]; rfl
   | succ k ih =>
     rw [pow_succ, Module.End.mul_apply, hD.g_eq, ih]
     congr 1
 
-private theorem dat_nm_apply_ofMul_eq_ofMul_nrm {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
-    (γ : F ≃ₐ[L] F) (a : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)) (hD : IsDat γ a D)
-    (α : Fˣ) :
-    D.nm (Additive.ofMul α) = Additive.ofMul (nrm γ a α) := by
+private theorem dat_nm_apply_ofMul_eq_ofMul_nrm
+    {L F : Type} [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+    (γ : F ≃ₐ[L] F) (a : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ))
+    (hD : IsDat γ a D)
+    (α : Fˣ)
+    : D.nm (Additive.ofMul α) = Additive.ofMul (nrm γ a α) := by
   simp only [Dat.nm, LinearMap.sum_apply, LinearMap.smul_apply, nrm, ofMul_prod, ofMul_pow, hD.n_eq,
     hD.a_eq, dat_g_pow_apply_ofMul_eq_actU_inv_pow γ a D hD]
   refine Finset.sum_congr rfl fun j hj => ?_
@@ -32,8 +36,14 @@ private theorem dat_nm_apply_ofMul_eq_ofMul_nrm {L F : Type} [Field L] [NumberFi
   push_cast
   exact natCast_zsmul _ _
 
-theorem UpperTheory.V.ZK.Ct.fewLe :
-    ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F] (γ : F ≃ₐ[L] F) (a s q B : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)), IsDat γ a D → Few γ a s q B → ∀ f : D.W →ₗ[ℤ] Additive Fˣ ⧸ mt (Additive Fˣ) q, (∀ y : D.U, f (Submodule.Quotient.mk y) = Submodule.Quotient.mk ((s : ℤ) • D.nm y)) → Finite D.W → Nat.card (LinearMap.range f) ≤ B := by
+theorem UpperTheory.V.ZK.Ct.fewLe
+    : ∀ (L F : Type) [Field L] [NumberField L] [Field F] [NumberField F] [Algebra L F]
+        (γ : F ≃ₐ[L] F) (a s q B : ℕ) (D : Dat (Additive Fˣ) (HeightOneSpectrum (𝓞 F) →₀ ℤ)),
+      IsDat γ a D → Few γ a s q B
+        → ∀ f : D.W →ₗ[ℤ] Additive Fˣ ⧸ mt (Additive Fˣ) q,
+          (∀ y : D.U, f (Submodule.Quotient.mk y) = Submodule.Quotient.mk ((s : ℤ) • D.nm y))
+            → Finite D.W
+            → Nat.card (LinearMap.range f) ≤ B := by
   intro L F _ _ _ _ _ γ a s q B D hD hF f hf hW
   classical
   haveI : Finite (LinearMap.range f) := Finite.of_surjective _ f.surjective_rangeRestrict

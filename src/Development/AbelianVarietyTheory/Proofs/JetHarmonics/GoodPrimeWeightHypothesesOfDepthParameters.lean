@@ -10,16 +10,28 @@ public import Development.AbelianVarietyTheory.Proofs.JetHarmonics.FirstRowsBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth GlobalTheory.RunDepth
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.FormalSeriesBounds GlobalTheory.GoodDepth
+  GlobalTheory.RunDepth
 
 namespace GlobalTheory.GoodDepth
 
-theorem goodPage_run : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm) (hK : DV.KapDef D) (T : Core D), T.Q.Pins → 10 ≤ Pm.CnW → 3 ≤ L.sc.x ^ (L.sc.ez / 5) → 3 ≤ L.sc.x → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b → Real.log D.R.k ≤ L.sc.L → ∀ j : ℕ, InR D j →
-  GoodPage (numOf D L) j (T.Q.Dw j) (fun z => DV.tauEmb D (plOf D z)) (wtA (lR Tp hK j)) Tp.nWn Tp.TO 100 L.sc.b L.sc.L := by
+theorem goodPage_run
+    : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D L) (Tp : ParamsT D L Pm)
+        (hK : DV.KapDef D) (T : Core D),
+      T.Q.Pins → 10 ≤ Pm.CnW → 3 ≤ L.sc.x ^ (L.sc.ez / 5) → 3 ≤ L.sc.x
+        → (D.R.k : ℝ) * L.sc.b' ≤ L.sc.b → Real.log D.R.k ≤ L.sc.L
+        → ∀ j : ℕ,
+          InR D j
+            → GoodPage (numOf D L) j (T.Q.Dw j)
+              (fun z => DV.tauEmb D (plOf D z))
+              (wtA (lR Tp hK j)) Tp.nWn Tp.TO 100 L.sc.b L.sc.L := by
   intro D L Pm Tp hK T hP hC h5 hx hkb hlog j hj
   obtain ⟨hfirst, hw⟩ := GlobalTheory.T.firstRows_bound_and_sizes_bounds D L Pm Tp hK j hj hx hkb
   obtain ⟨hr0, hr1⟩ := GlobalTheory.T.weight_rest_degree_after_gaps_bounds D L Pm Tp hK T hP j hj
-  have hgap := fun z => GlobalTheory.T.realPlaceWeightRowGap_mul_bounds_size D L Pm Tp hK j hj z (hw z).1
+  have hgap := fun z =>
+    GlobalTheory.T.realPlaceWeightRowGap_mul_bounds_size D L Pm Tp hK j hj z (hw z).1
   have hj1 : 1 ≤ j := hj.1
   have hj2 : j ≤ D.R.m := hj.2
   have hm2 := D.R.two_le_m
@@ -45,8 +57,25 @@ theorem goodPage_run : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D
     unfold NumDatum.w NumDatum.eQ wj
     rw [dite_eq_left h1, dite_eq_left h2]
     rfl
-  refine ⟨⟨((Tp.Dp : ℝ) + 4) / Tp.TO, ?_, fun z => lt_of_lt_of_le hw'' (hw z).1, fun z => (hgap z).1,
-    fun z => (hgap z).2, ⟨by positivity, ?_⟩, ?_, hr0, hr1⟩, fun τ _ => hfirst τ, ?_, ?_, hlog, ?_, ?_⟩
+  refine ⟨
+    ⟨
+      ((Tp.Dp : ℝ) + 4) / Tp.TO,
+      ?_,
+      fun z => lt_of_lt_of_le hw'' (hw z).1,
+      fun z => (hgap z).1,
+      fun z => (hgap z).2,
+      ⟨by positivity, ?_⟩,
+      ?_,
+      hr0,
+      hr1
+    ⟩,
+    fun τ _ => hfirst τ,
+    ?_,
+    ?_,
+    hlog,
+    ?_,
+    ?_
+  ⟩
   · exact_mod_cast TO_pos Tp
   · rw [div_le_one hTpos]
     exact_mod_cast (by omega : Tp.Dp + 4 ≤ Tp.TO)
@@ -71,8 +100,7 @@ theorem goodPage_run : ∀ (D : D7) (L : SizeData₂ D) (Pm : ParameterChoice' D
     exact Real.rpow_le_rpow_of_exponent_le L.sc.one_lt_alt.le (by linarith)
   · intro p hp hin
     by_contra h
-    have hin' : D.host.cls p = PrimeClass.inertClass ∨
-        D.host.cls p = PrimeClass.signal := hin
+    have hin' : D.host.cls p = PrimeClass.inertClass ∨ D.host.cls p = PrimeClass.signal := hin
     have hne2 : p ≠ 2 := by
       rintro rfl
       have e : D.host.cls 2 = PrimeClass.ram2 := primeClass_two D.host.toHostRaw

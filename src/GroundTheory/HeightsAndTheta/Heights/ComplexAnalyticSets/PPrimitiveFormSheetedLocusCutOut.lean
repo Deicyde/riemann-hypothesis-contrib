@@ -11,17 +11,28 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem PrimitiveFormSheetedLocusCutOut.proof (hfac : PrimitiveFormFullRootFactor.Statement)
-    (hiff : PrimitiveFormSheetedIffRootFull.Statement) : PrimitiveFormSheetedLocusCutOut.Statement := by
+theorem PrimitiveFormSheetedLocusCutOut.proof
+    (hfac : PrimitiveFormFullRootFactor.Statement)
+    (hiff : PrimitiveFormSheetedIffRootFull.Statement)
+    : PrimitiveFormSheetedLocusCutOut.Statement := by
   intro σ _ X w d A hX hiso ℓ N a δ q ha hδ hq hδ0 hP hsep hQ
   obtain ⟨W, B, C, E, hW, hwW, hB, hwB, han, hCE, hroot⟩ :=
     hfac σ X w d A hX hiso ℓ N a δ q ha hδ hq hδ0 hP hsep hQ
   have hBn : ∀ᶠ z in 𝓝 w, A z ∈ B := A.continuous.continuousAt.preimage_mem_nhds (hB.mem_nhds hwB)
-  have hc : ∀ F : (Fin d → ℂ) → ℂ → ℂ, AnalyticAt ℂ (fun u : (Fin d → ℂ) × ℂ => F u.1 u.2) (A w, ℓ w) →
-      AnalyticAt ℂ (fun z => F (A z) (ℓ z)) w := fun F hF =>
+  have hc
+      : ∀ F : (Fin d → ℂ) → ℂ → ℂ,
+        AnalyticAt ℂ (fun u : (Fin d → ℂ) × ℂ => F u.1 u.2) (A w, ℓ w)
+          → AnalyticAt ℂ (fun z => F (A z) (ℓ z)) w := fun F hF =>
     (show AnalyticAt ℂ (fun u : (Fin d → ℂ) × ℂ => F u.1 u.2) ((A.prod ℓ) w) from hF).comp
       ((A.prod ℓ).analyticAt w)
-  refine ⟨fun z => C (A z) (ℓ z), fun z => E (A z) (ℓ z), hc C (han _ hwB _).1, hc E (han _ hwB _).2, ?_, ?_⟩
+  refine ⟨
+    fun z => C (A z) (ℓ z),
+    fun z => E (A z) (ℓ z),
+    hc C (han _ hwB _).1,
+    hc E (han _ hwB _).2,
+    ?_,
+    ?_
+  ⟩
   · filter_upwards [hBn, hP] with z hz hPz hzX
     rw [hCE _ hz]
     exact hPz hzX

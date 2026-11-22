@@ -16,13 +16,15 @@ noncomputable section
 variable {e : ℕ} {X : Type} [TopologicalSpace X] [T2Space X] [CompactSpace X]
 
 omit [T2Space X] [CompactSpace X] in
-theorem restrOpen_source' (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) {V : Set X} (hV : IsOpen V) :
-    (ψ.restrOpen V hV).source = ψ.source ∩ V := by
+theorem restrOpen_source' (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) {V : Set X} (hV : IsOpen V)
+    : (ψ.restrOpen V hV).source = ψ.source ∩ V := by
   rfl
 
 omit [T2Space X] [CompactSpace X] in
-theorem isCompatChart_restrOpen {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)}
-    (hψ : IsCompatChart A ψ) {V : Set X} (hV : IsOpen V) : IsCompatChart A (ψ.restrOpen V hV) := by
+theorem isCompatChart_restrOpen
+    {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorph X (Fin e → ℂ)} (hψ : IsCompatChart A ψ)
+    {V : Set X} (hV : IsOpen V)
+    : IsCompatChart A (ψ.restrOpen V hV) := by
   intro j
   obtain ⟨h1, h2⟩ := hψ j
   refine ⟨h1.mono ?_, h2.mono ?_⟩
@@ -33,15 +35,22 @@ theorem isCompatChart_restrOpen {A : FinHolAtlas e X} {ψ : OpenPartialHomeomorp
     have h' : y ∈ ψ.target ∩ ψ.symm ⁻¹' V := hy1
     exact ⟨h'.1, hy2⟩
 
-theorem pl_exists_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X → ℂ) {r : ℕ}
-    (m : Fin r → ℕ) (W : Fin r → Set X) (B : ∀ k, FinHolAtlas e (W k)) (hL : IsPotential A L)
-    (hs : IsSection A L s) (hSNC : IsSNC A L s m W) (hB : ∀ k, HoloMap (B k) A Subtype.val)
-    (Φ : Fin e → LocPot X) (hΦ : ∀ k, IsPotential A (Φ k)) (x : X) :
-    ∃ ψ' : OpenPartialHomeomorph X (Fin (e + 1) → ℂ), IsCompatChart A ψ' ∧ x ∈ ψ'.source ∧
-      ∀ v : X → ℝ, A.Smooth v → tsupport v ⊆ ψ'.source →
-        mInt A (Fin.cons (LocPot.ofFun v) Φ) (logNormSec L s) =
-          ∑ k, (m k : ℝ) * mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
-            (v ∘ Subtype.val) - mInt A (Fin.cons L Φ) v := by
+theorem pl_exists_chart
+    (A : FinHolAtlas (e + 1) X)
+    (L : LocPot X) (s : X → X → ℂ)
+    {r : ℕ} (m : Fin r → ℕ) (W : Fin r → Set X) (B : ∀ k, FinHolAtlas e (W k))
+    (hL : IsPotential A L) (hs : IsSection A L s) (hSNC : IsSNC A L s m W)
+    (hB : ∀ k, HoloMap (B k) A Subtype.val)
+    (Φ : Fin e → LocPot X) (hΦ : ∀ k, IsPotential A (Φ k))
+    (x : X)
+    : ∃ ψ' : OpenPartialHomeomorph X (Fin (e + 1) → ℂ),
+      IsCompatChart A ψ' ∧ x ∈ ψ'.source
+        ∧ ∀ v : X → ℝ,
+          A.Smooth v → tsupport v ⊆ ψ'.source
+            → mInt A (Fin.cons (LocPot.ofFun v) Φ) (logNormSec L s)
+              = ∑ k, (m k : ℝ) * mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
+                  (v ∘ Subtype.val)
+                - mInt A (Fin.cons L Φ) v := by
   classical
   obtain ⟨ψ, hψ, hx, hψL, σ, -, hWψ, u, hu, hu0, hsu⟩ := hSNC x
   have hsu' : ∀ y ∈ ψ.source, s x y = u y * ∏ k, (σ k).elim 1 (fun i => ψ y i ^ m k) := by
@@ -50,8 +59,10 @@ theorem pl_exists_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X 
     congr 1
     refine Finset.prod_congr rfl fun k _ => ?_
     rcases σ k with _ | i <;> rfl
-  obtain ⟨V, hVdef⟩ : ∃ V : Set X, V = ψ.source ∩ (⋂ k, (Φ k).U x) ∩
-      ⋂ k, (if x ∈ W k then Set.univ else (W k)ᶜ) := ⟨_, rfl⟩
+  obtain ⟨V, hVdef⟩
+      : ∃ V : Set X,
+        V = ψ.source ∩ (⋂ k, (Φ k).U x) ∩ ⋂ k, (if x ∈ W k then Set.univ else (W k)ᶜ) :=
+    ⟨_, rfl⟩
   have hVo : IsOpen V := by
     rw [hVdef]
     refine (ψ.open_source.inter (isOpen_iInter_of_finite fun k => (Φ k).isOpen_U x)).inter
@@ -68,10 +79,13 @@ theorem pl_exists_chart (A : FinHolAtlas (e + 1) X) (L : LocPot X) (s : X → X 
   refine ⟨ψ.restrOpen V hVo, isCompatChart_restrOpen hψ hVo, ?_, fun v hv hvV => ?_⟩
   · rw [restrOpen_source']
     exact ⟨hx, hxV⟩
-  · have hvV' : tsupport v ⊆ V := hvV.trans (by rw [restrOpen_source']; exact Set.inter_subset_right)
+  · have hvV' : tsupport v ⊆ V :=
+      hvV.trans (by rw [restrOpen_source']; exact Set.inter_subset_right)
     refine pl_good A L s m W B hL hs hSNC hB Φ hΦ x ψ hψ hψL σ hWψ u hu hu0 hsu' hVo
       (fun p hp => by rw [hVdef] at hp; exact hp.1.1)
-      (fun k p hp => by rw [hVdef] at hp; exact Set.mem_iInter.1 hp.1.2 k) (fun k hk => ?_) hv hvV'
+      (fun k p hp => by rw [hVdef] at hp; exact Set.mem_iInter.1 hp.1.2 k)
+      (fun k hk => ?_)
+      hv hvV'
     ext p
     simp only [Set.mem_inter_iff, Set.mem_empty_iff_false, iff_false, not_and]
     intro hp hpW
@@ -84,8 +98,11 @@ theorem pl_global : PoincareLelongStatement := by
   intro e X _ _ _ A L s r m W B hL hs hSNC hB v hv Φ hΦ
   classical
   choose ψ hψ hxψ hpl using fun x => pl_exists_chart A L s m W B hL hs hSNC hB Φ hΦ x
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun x => (ψ x).source)
-    (fun x => (ψ x).open_source) (fun x _ => Set.mem_iUnion.2 ⟨x, hxψ x⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun x => (ψ x).source)
+      (fun x => (ψ x).open_source)
+      (fun x _ => Set.mem_iUnion.2 ⟨x, hxψ x⟩)
   have hcov : ∀ y, ∃ i, y ∈ (ψ (t.equivFin.symm i : X)).source := by
     intro y
     obtain ⟨x, hxt, hy⟩ := Set.mem_iUnion₂.1 (ht (Set.mem_univ y))
@@ -99,9 +116,12 @@ theorem pl_global : PoincareLelongStatement := by
     have h1 : A.Smooth (P.χ j) := smoothOn_of_compatible ⟨hAC.2, hAC.1⟩ isOpen_univ (P.smooth j)
     rw [hf]
     exact smoothOn_mul h1 hv
-  have hfpl : ∀ j, mInt A (Fin.cons (LocPot.ofFun (f j)) Φ) (logNormSec L s) =
-      ∑ k, (m k : ℝ) * mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
-        (f j ∘ Subtype.val) - mInt A (Fin.cons L Φ) (f j) := by
+  have hfpl
+      : ∀ j,
+        mInt A (Fin.cons (LocPot.ofFun (f j)) Φ) (logNormSec L s)
+          = ∑ k, (m k : ℝ) * mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
+              (f j ∘ Subtype.val)
+            - mInt A (Fin.cons L Φ) (f j) := by
     intro j
     obtain ⟨i, hi⟩ := hAC2 j
     refine hpl (t.equivFin.symm i : X) (f j) (hfs j) ?_
@@ -123,15 +143,22 @@ theorem pl_global : PoincareLelongStatement := by
   have hΦB : ∀ k i, IsPotential (B k) ((Φ i).pullback Subtype.val continuous_subtype_val) :=
     fun k i => isPotentialPullback A (B k) Subtype.val (hB k) (Φ i) (hΦ i)
   have hc : ∀ j, Continuous (f j) := fun j => smooth_continuous (hfs j)
-  have hk : ∀ k, mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
-      ((fun p => ∑ j ∈ Finset.univ, f j p) ∘ Subtype.val) =
-      ∑ j, mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
-        (f j ∘ Subtype.val) := fun k =>
-    mInt_sum_cont (B k) _ (hΦB k) Finset.univ (fun j => f j ∘ Subtype.val)
+  have hk
+      : ∀ k,
+        mInt (B k)
+            (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
+            ((fun p => ∑ j ∈ Finset.univ, f j p) ∘ Subtype.val)
+          = ∑ j, mInt (B k) (fun i => (Φ i).pullback Subtype.val continuous_subtype_val)
+              (f j ∘ Subtype.val) := fun k =>
+    mInt_sum_cont (B k) _ (hΦB k) Finset.univ
+      (fun j => f j ∘ Subtype.val)
       (fun j => (hc j).comp continuous_subtype_val)
-  rw [hvsum, lhs_sum A L s (fun Φ' hΦ' => logNormIntegrable A L s m W hL hs hSNC Φ' hΦ') Φ hΦ
-    Finset.univ f hfs, mInt_sum_cont A (Fin.cons L Φ) hpot Finset.univ f hc,
-    Finset.sum_congr rfl fun j _ => hfpl j, Finset.sum_sub_distrib]
+  rw [hvsum,
+    lhs_sum A L s
+      (fun Φ' hΦ' => logNormIntegrable A L s m W hL hs hSNC Φ' hΦ')
+      Φ hΦ Finset.univ f hfs,
+    mInt_sum_cont A (Fin.cons L Φ) hpot Finset.univ f hc, Finset.sum_congr rfl fun j _ => hfpl j,
+    Finset.sum_sub_distrib]
   congr 1
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k _ => ?_

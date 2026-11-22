@@ -9,11 +9,14 @@ public import Development.WeilBound.CoreStatements.AbelianHeightsDuality.Abelian
 
 namespace AbelianDeRhamStructureFromPages.Adrs
 
-theorem abelianDeRhamStructure_of_page (P : FubiniStudyChowHeightFormula₂.Hdr.AbelianDeRhamPage) : GlobalTheory.Published.AbelianDeRhamStructure :=
+theorem abelianDeRhamStructure_of_page (P : FubiniStudyChowHeightFormula₂.Hdr.AbelianDeRhamPage)
+    : GlobalTheory.Published.AbelianDeRhamStructure :=
   let hL := GlobalTheory.SmoothLift.crystallineSmoothLift_of_relations
   let hH := FubiniStudyChowHeightFormula₂.Hdr.abelianHodgeDeRham_of_page P
-  ⟨GlobalTheory.Proof.abelianDeRhamFree_of_hodge hL hH,
+  ⟨
+    GlobalTheory.Proof.abelianDeRhamFree_of_hodge hL hH,
     GlobalTheory.T.abelian_hodge_de_rham_of_crystalline_lift hL hH,
-    GlobalTheory.AbelianBaseChange.abelianDeRham_baseChange_of_smoothLift hL hH⟩
+    GlobalTheory.AbelianBaseChange.abelianDeRham_baseChange_of_smoothLift hL hH
+  ⟩
 
 end AbelianDeRhamStructureFromPages.Adrs

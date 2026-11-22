@@ -4,10 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qj19.lin_bound.{u_1} :
-    ∀ {ι : Type u_1} [Fintype ι] [DecidableEq ι] (L : Matrix ι ι ℂ →ₗ[ℂ] ℂ),
-    ∃ (K : ℝ),
-      (0 : ℝ) ≤ K ∧ ∀ (B : Matrix ι ι ℂ) (C : ℝ), (∀ (i j : ι), ‖B i j‖ ≤ C) → ‖(L : Matrix ι ι ℂ → ℂ) B‖ ≤ K * C := by
+theorem UpperTheory.Reformulated.B.Qj19.lin_bound.{u_1}
+    : ∀ {ι : Type u_1} [Fintype ι] [DecidableEq ι] (L : Matrix ι ι ℂ →ₗ[ℂ] ℂ), ∃ (K : ℝ),
+      (0 : ℝ) ≤ K
+        ∧ ∀ (B : Matrix ι ι ℂ) (C : ℝ),
+          (∀ (i j : ι), ‖B i j‖ ≤ C) → ‖(L : Matrix ι ι ℂ → ℂ) B‖ ≤ K * C := by
   intro ι _ _ L
   refine ⟨∑ i, ∑ j, ‖L (Matrix.single i j 1)‖, by positivity, fun B C hB => ?_⟩
   have h : L B = ∑ i, ∑ j, B i j * L (Matrix.single i j 1) := by

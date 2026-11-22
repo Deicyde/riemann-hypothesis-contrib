@@ -13,8 +13,8 @@ section Quad
 variable {F : Type} [Field F] {n m : ℕ}
 
 private abbrev Quad (F : Type) (n m : ℕ) :=
-  Matrix (Fin n) (Fin n) F × (Fin m → Matrix (Fin n) (Fin n) F) × (Fin m → Matrix (Fin n) (Fin n) F) ×
-    Matrix (Fin n) (Fin n) F
+  Matrix (Fin n) (Fin n) F × (Fin m → Matrix (Fin n) (Fin n) F) × (Fin m → Matrix (Fin n) (Fin n) F)
+    × Matrix (Fin n) (Fin n) F
 
 end Quad
 

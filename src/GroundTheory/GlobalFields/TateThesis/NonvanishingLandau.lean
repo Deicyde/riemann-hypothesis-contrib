@@ -18,7 +18,6 @@ variable {K : Type*} [Field K] [NumberField K]
 
 open IdeleGroup
 
-
 variable (K) in
 theorem continuedDedekindZeta_neg_two : continuedDedekindZeta K (-2) = 0 := by
   rw [continuedDedekindZeta_of_ne_zero K (by norm_num), normalizedDedekindZeta]
@@ -39,11 +38,10 @@ namespace HeckeCharacter
 
 variable (χ : HeckeCharacter K)
 
-def twistCoeff (t : ℝ) (J : Ideal (𝓞 K)) : ℂ :=
-  χ.coeff J * (absNorm J : ℂ) ^ (-((t : ℂ) * I))
+def twistCoeff (t : ℝ) (J : Ideal (𝓞 K)) : ℂ := χ.coeff J * (absNorm J : ℂ) ^ (-((t : ℂ) * I))
 
-theorem twistCoeff_mul (t : ℝ) (A B : Ideal (𝓞 K)) :
-    χ.twistCoeff t (A * B) = χ.twistCoeff t A * χ.twistCoeff t B := by
+theorem twistCoeff_mul (t : ℝ) (A B : Ideal (𝓞 K))
+    : χ.twistCoeff t (A * B) = χ.twistCoeff t A * χ.twistCoeff t B := by
   rw [twistCoeff, twistCoeff, twistCoeff, coeff_mul, map_mul, Nat.cast_mul,
     natCast_mul_natCast_cpow]
   ring
@@ -51,8 +49,7 @@ theorem twistCoeff_mul (t : ℝ) (A B : Ideal (𝓞 K)) :
 theorem twistCoeff_top (t : ℝ) : χ.twistCoeff t ⊤ = 1 := by
   rw [twistCoeff, coeff_top, absNorm_top, Nat.cast_one, one_cpow, one_mul]
 
-theorem twistCoeff_bot (t : ℝ) : χ.twistCoeff t ⊥ = 0 := by
-  rw [twistCoeff, coeff_bot, zero_mul]
+theorem twistCoeff_bot (t : ℝ) : χ.twistCoeff t ⊥ = 0 := by rw [twistCoeff, coeff_bot, zero_mul]
 
 theorem norm_twistCoeff_le (t : ℝ) (J : Ideal (𝓞 K)) : ‖χ.twistCoeff t J‖ ≤ 1 := by
   by_cases hJ : J = ⊥
@@ -62,8 +59,8 @@ theorem norm_twistCoeff_le (t : ℝ) (J : Ideal (𝓞 K)) : ‖χ.twistCoeff t J
   rw [twistCoeff, norm_mul, norm_natCast_cpow_neg_mul_I hN, mul_one]
   exact χ.norm_coeff_le J
 
-theorem hasSum_twistCoeff (t : ℝ) {s : ℂ} (hs : 1 < s.re) :
-    HasSum (fun J ↦ χ.twistCoeff t J * (absNorm J : ℂ) ^ (-s)) (χ.LFunction (s + t * I)) := by
+theorem hasSum_twistCoeff (t : ℝ) {s : ℂ} (hs : 1 < s.re)
+    : HasSum (fun J ↦ χ.twistCoeff t J * (absNorm J : ℂ) ^ (-s)) (χ.LFunction (s + t * I)) := by
   have hs' : 1 < (s + t * I).re := by simpa using hs
   refine (χ.hasSum_LFunction hs').congr_fun fun J ↦ ?_
   by_cases hJ : J = ⊥
@@ -72,17 +69,21 @@ theorem hasSum_twistCoeff (t : ℝ) {s : ℂ} (hs : 1 < s.re) :
   rw [twistCoeff, neg_add, cpow_add _ _ hN]
   ring
 
-theorem twistCoeff_asIdeal_of_not_dvd (t : ℝ) {v : HeightOneSpectrum (𝓞 K)}
-    (hv : ¬ v.asIdeal ∣ χ.conductor) {π : (v.adicCompletion K)ˣ}
-    (hπ : Valued.v (π : v.adicCompletion K) = WithZero.exp (-1 : ℤ)) :
-    χ.twistCoeff t v.asIdeal = χ.toIdele (finiteEmbedding v π) *
-      ((ideleModule K (finiteEmbedding v π) : ℝ) : ℂ) ^ ((t : ℂ) * I) :=
+theorem twistCoeff_asIdeal_of_not_dvd
+    (t : ℝ)
+    {v : HeightOneSpectrum (𝓞 K)} (hv : ¬ v.asIdeal ∣ χ.conductor)
+    {π : (v.adicCompletion K)ˣ} (hπ : Valued.v (π : v.adicCompletion K) = WithZero.exp (-1 : ℤ))
+    : χ.twistCoeff t v.asIdeal
+      = χ.toIdele (finiteEmbedding v π)
+        * ((ideleModule K (finiteEmbedding v π) : ℝ) : ℂ) ^ ((t : ℂ) * I) :=
   χ.coeff_mul_cpow_eq hv hπ t
 
-theorem exists_real_twistCoeff (t : ℝ)
+theorem exists_real_twistCoeff
+    (t : ℝ)
     (hsq : ∀ x : IdeleGroup K,
       ((χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)) ^ 2 = 1)
-    (J : Ideal (𝓞 K)) : ∃ r : ℝ, χ.twistCoeff t J = r := by
+    (J : Ideal (𝓞 K))
+    : ∃ r : ℝ, χ.twistCoeff t J = r := by
   induction J using UniqueFactorizationMonoid.induction_on_prime with
   | h₁ => exact ⟨0, by rw [Ideal.zero_eq_bot, twistCoeff_bot, ofReal_zero]⟩
   | h₂ x hx => exact ⟨1, by rw [Ideal.isUnit_iff.1 hx, twistCoeff_top, ofReal_one]⟩
@@ -101,21 +102,23 @@ theorem exists_real_twistCoeff (t : ℝ)
       · exact ⟨r, by rw [h, one_mul]⟩
       · exact ⟨-r, by rw [h, ofReal_neg, neg_one_mul]⟩
 
-def twistCoeffRe (t : ℝ) (J : Ideal (𝓞 K)) : ℝ :=
-  (χ.twistCoeff t J).re
+def twistCoeffRe (t : ℝ) (J : Ideal (𝓞 K)) : ℝ := (χ.twistCoeff t J).re
 
-theorem ofReal_twistCoeffRe (t : ℝ)
+theorem ofReal_twistCoeffRe
+    (t : ℝ)
     (hsq : ∀ x : IdeleGroup K,
       ((χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)) ^ 2 = 1)
-    (J : Ideal (𝓞 K)) : (χ.twistCoeffRe t J : ℂ) = χ.twistCoeff t J := by
+    (J : Ideal (𝓞 K))
+    : (χ.twistCoeffRe t J : ℂ) = χ.twistCoeff t J := by
   obtain ⟨r, hr⟩ := χ.exists_real_twistCoeff t hsq J
   rw [twistCoeffRe, hr, ofReal_re]
 
-theorem continuation_ne_zero_of_sq_eq_one (t : ℝ)
+theorem continuation_ne_zero_of_sq_eq_one
+    (t : ℝ)
     (hsq : ∀ x : IdeleGroup K,
       ((χ.toIdele x : ℂ) * ((ideleModule K x : ℝ) : ℂ) ^ ((t : ℂ) * I)) ^ 2 = 1)
-    {G : ℂ → ℂ} (hG : Differentiable ℂ G) (hGL : ∀ s : ℂ, 1 < s.re → G s = χ.LFunction s) :
-    G (1 + t * I) ≠ 0 := by
+    {G : ℂ → ℂ} (hG : Differentiable ℂ G) (hGL : ∀ s : ℂ, 1 < s.re → G s = χ.LFunction s)
+    : G (1 + t * I) ≠ 0 := by
   intro hG0
   classical
   set ψ : Ideal (𝓞 K) → ℝ := χ.twistCoeffRe t with hψ_def
@@ -130,8 +133,10 @@ theorem continuation_ne_zero_of_sq_eq_one (t : ℝ)
     rw [← Real.norm_eq_abs, ← Complex.norm_real, hψc]
     exact χ.norm_twistCoeff_le t A
 
-  have hψL : ∀ s : ℂ, 1 < s.re →
-      ∑' J, (ψ J : ℂ) * (absNorm J : ℂ) ^ (-s) = χ.LFunction (s + t * I) := fun s hs ↦ by
+  have hψL
+      : ∀ s : ℂ,
+        1 < s.re
+          → ∑' J, (ψ J : ℂ) * (absNorm J : ℂ) ^ (-s) = χ.LFunction (s + t * I) := fun s hs ↦ by
     simp only [hψc]
     exact (χ.hasSum_twistCoeff t hs).tsum_eq
 
@@ -173,17 +178,18 @@ theorem continuation_ne_zero_of_sq_eq_one (t : ℝ)
       rw [Set.mem_ofPred_eq, h, one_re] at hs
       exact lt_irrefl _ hs
     have hs' : 1 < (s + t * I).re := by simpa using hs
-    rw [hF_def, Function.update_of_ne hs1, LSeries,
-      (hasSum_LSeries_term_divisorSum hψb hs).tsum_eq, hψL s hs, continuedDedekindZeta_eq K hs]
+    rw [hF_def, Function.update_of_ne hs1, LSeries, (hasSum_LSeries_term_divisorSum hψb hs).tsum_eq,
+      hψL s hs, continuedDedekindZeta_eq K hs]
     simp only [hg₁_def]
     rw [hGL _ hs']
     ring
   have habs : LSeries.abscissaOfAbsConv (divisorSumCoeff ψ) ≤ ((1 : ℝ) : EReal) :=
     LSeries.abscissaOfAbsConv_le_of_forall_lt_LSeriesSummable fun y hy ↦
       (hasSum_LSeries_term_divisorSum hψb (by simpa using hy)).summable
-  have hpos := LSeries.positive_of_differentiable_of_eqOn
-    (fun n ↦ divisorSumCoeff_nonneg hψmul hψ1 hψb n)
-    (by rw [divisorSumCoeff_one, hψ1, ofReal_one]; exact zero_lt_one) hFdiff habs hFL (-2)
+  have hpos :=
+    LSeries.positive_of_differentiable_of_eqOn
+      (fun n ↦ divisorSumCoeff_nonneg hψmul hψ1 hψb n)
+      (by rw [divisorSumCoeff_one, hψ1, ofReal_one]; exact zero_lt_one) hFdiff habs hFL (-2)
   rw [hF2] at hpos
   exact lt_irrefl _ hpos
 

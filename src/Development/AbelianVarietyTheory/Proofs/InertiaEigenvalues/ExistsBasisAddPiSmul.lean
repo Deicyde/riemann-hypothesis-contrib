@@ -8,13 +8,27 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoordAp
 
 @[expose] public section
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.NB GlobalTheory.CycFr GlobalTheory.WachTie
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc GlobalTheory.NB GlobalTheory.CycFr GlobalTheory.WachTie
 
 namespace GlobalTheory.WachTie
 
-
 open PowerSeries in
-theorem _root_.GlobalTheory.WachTie.exists_invariant_basis : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B] [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR] {PD : _root_.Formalism.WeaklyAdmissibleFiltrations.PeriodData G Qp K₀ K B BdR} {LL O : Type} [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL] {v : AddValuation LL (WithTop ℚ)} {n : ℕ} (W : _root_.Formalism.BasicNotions.LocWach PD LL O v n) (T : _root_.Formalism.BasicNotions.LocLat G Qp LL O) {r : ℕ}, IsUnit (W.DelF.card : O) → Nonempty (Module.Basis (Fin r) (_root_.Formalism.BasicNotions.LetA O n) ↥(W.N T)) → ∃ b : Module.Basis (Fin r) (_root_.Formalism.BasicNotions.LetA O n) ↥(W.N T), ∀ k, (b k : W.DD T) ∈ W.NΔ T := by
+theorem _root_.GlobalTheory.WachTie.exists_invariant_basis
+    : ∀ {G : Type} [Group G] [TopologicalSpace G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
+        [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K] {B BdR : Type}
+        [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+        [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+        [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+        {PD : _root_.Formalism.WeaklyAdmissibleFiltrations.PeriodData G Qp K₀ K B BdR} {LL O : Type}
+        [Field LL] [Algebra Qp LL] [CommRing O] [Algebra O LL] [TopologicalSpace LL]
+        {v : AddValuation LL (WithTop ℚ)} {n : ℕ}
+        (W : _root_.Formalism.BasicNotions.LocWach PD LL O v n)
+        (T : _root_.Formalism.BasicNotions.LocLat G Qp LL O) {r : ℕ},
+      IsUnit (W.DelF.card : O)
+        → Nonempty (Module.Basis (Fin r) (_root_.Formalism.BasicNotions.LetA O n) ↥(W.N T))
+        → ∃ b : Module.Basis (Fin r) (_root_.Formalism.BasicNotions.LetA O n) ↥(W.N T), ∀ k,
+          (b k : W.DD T) ∈ W.NΔ T := by
   intro G _ _ Qp K₀ K _ _ _ _ _ _ _ B BdR _ _ _ _ _ _ _ _ _ _ _ PD LL O _ _ _ _ _ v n W T r hu ⟨b⟩
   classical
   have hmul : ∀ g ∈ W.DelF, ∀ δ ∈ W.DelF, g * δ ∈ W.DelF := by
@@ -47,7 +61,11 @@ theorem _root_.GlobalTheory.WachTie.exists_invariant_basis : ∀ {G : Type} [Gro
     rw [havg]
     exact Submodule.smul_of_tower_mem _ _ (Submodule.sum_mem _ fun δ _ => W.N_Γ T δ x hx)
   open Pointwise in
-  have hQ : ∀ x ∈ W.N T, avg x - x ∈ (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • W.N T := by
+  have hQ
+      : ∀ x ∈ W.N T,
+        avg x - x
+          ∈ (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n)
+            • W.N T := by
     intro x hx
     have hsplit : avg x - x = (↑hu.unit⁻¹ : O) • ∑ δ ∈ W.DelF, (W.γD T δ x - x) := by
       rw [havg, Finset.sum_sub_distrib, Finset.sum_const, smul_sub, ← Nat.cast_smul_eq_nsmul O,
@@ -57,15 +75,19 @@ theorem _root_.GlobalTheory.WachTie.exists_invariant_basis : ∀ {G : Type} [Gro
     obtain ⟨y, hy, hxy⟩ := W.N_π T δ x hx
     rw [hxy]
     exact Submodule.smul_mem_pointwise_smul _ _ _ hy
-  have hb : ∀ k, ∃ y : W.N T, (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • y =
-      (⟨avg (b k), hN _ (b k).2⟩ : W.N T) - b k := by
+  have hb
+      : ∀ k, ∃ y : W.N T,
+        (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • y
+          = (⟨avg (b k), hN _ (b k).2⟩ : W.N T) - b k := by
     intro k
     open Pointwise in
     obtain ⟨y, hy, hxy⟩ := (Submodule.mem_smul_pointwise_iff_exists _ _ _).1 (hQ _ (b k).2)
     exact ⟨⟨y, hy⟩, Subtype.ext (by simpa using hxy)⟩
   choose y hy using hb
-  let g : W.N T →ₗ[_root_.Formalism.BasicNotions.LetA O n] W.N T := b.constr (_root_.Formalism.BasicNotions.LetA O n) y
-  let f : W.N T →ₗ[_root_.Formalism.BasicNotions.LetA O n] W.N T := LinearMap.id + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • g
+  let g : W.N T →ₗ[_root_.Formalism.BasicNotions.LetA O n] W.N T :=
+    b.constr (_root_.Formalism.BasicNotions.LetA O n) y
+  let f : W.N T →ₗ[_root_.Formalism.BasicNotions.LetA O n] W.N T :=
+    LinearMap.id + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • g
   have hf : ∀ k, f (b k) = ⟨avg (b k), hN _ (b k).2⟩ := by
     intro k
     simp only [f, g, LinearMap.add_apply, LinearMap.id_apply, LinearMap.smul_apply,
@@ -75,16 +97,28 @@ theorem _root_.GlobalTheory.WachTie.exists_invariant_basis : ∀ {G : Type} [Gro
     haveI := Module.Free.of_basis b
     haveI := Module.Finite.of_basis b
     rw [LinearMap.isUnit_iff_isUnit_det, ← LinearMap.det_toMatrix b]
-    have hM : LinearMap.toMatrix b b f = 1 + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • LinearMap.toMatrix b b g := by
+    have hM
+        : LinearMap.toMatrix b b f
+          = 1
+            + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n)
+              • LinearMap.toMatrix b b g := by
       simp [f, map_add (f := _), LinearMap.toMatrix_id]
     rw [hM, Pi.isUnit_iff]
     intro i
     rw [PowerSeries.isUnit_iff_constantCoeff]
     let ψ : _root_.Formalism.BasicNotions.LetA O n →+* O :=
       (PowerSeries.constantCoeff (R := O)).comp (Pi.evalRingHom (fun _ : ZMod n => O⟦X⟧) i)
-    change IsUnit (ψ (Matrix.det (1 + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • LinearMap.toMatrix b b g)))
+    change IsUnit (ψ (Matrix.det
+      (1
+        + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n)
+          • LinearMap.toMatrix b b g)))
     rw [RingHom.map_det]
-    have h2 : ψ.mapMatrix (1 + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n) • LinearMap.toMatrix b b g) = 1 := by
+    have h2
+        : ψ.mapMatrix
+            (1
+              + (_root_.Formalism.BasicNotions.letπ : _root_.Formalism.BasicNotions.LetA O n)
+                • LinearMap.toMatrix b b g)
+          = 1 := by
       ext p q
       simp [ψ, _root_.Formalism.BasicNotions.letπ, Matrix.one_apply]
       split_ifs <;> simp

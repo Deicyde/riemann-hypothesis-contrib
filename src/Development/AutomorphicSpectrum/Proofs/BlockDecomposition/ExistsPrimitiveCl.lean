@@ -6,7 +6,9 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory Limits AlgebraicGeometry Opposite GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite GroundTheory.PAdicHodge
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.E GlobalTheory.EtC
 
 noncomputable section
 
@@ -43,20 +45,19 @@ theorem exists_primitive_cl (n : ℕ) : ∃ η : PadicAlgCl l, IsPrimitiveRoot �
   obtain ⟨η, hη⟩ := IsAlgClosed.exists_root _ hdeg
   exact ⟨η, Polynomial.isRoot_cyclotomic_iff.1 hη⟩
 
-theorem exists_lift (n : ℕ) :
-    ∃ ρ : PadicAlgCl l, IsPrimitiveRoot ρ (l ^ n) ∧ clToC l ρ = rootSeq l n := by
+theorem exists_lift (n : ℕ)
+    : ∃ ρ : PadicAlgCl l, IsPrimitiveRoot ρ (l ^ n) ∧ clToC l ρ = rootSeq l n := by
   obtain ⟨η, hη⟩ := exists_primitive_cl (l := l) n
   have hinj : Function.Injective (clToC l) := (clToC l).injective
-  have hη' : IsPrimitiveRoot (clToC l η) (l ^ n) :=
-    (IsPrimitiveRoot.map_iff_of_injective hinj).2 hη
+  have hη' : IsPrimitiveRoot (clToC l η) (l ^ n) := (IsPrimitiveRoot.map_iff_of_injective hinj).2 hη
   obtain ⟨i, -, hi⟩ := hη'.eq_pow_of_pow_eq_one (GroundTheory.PAdicHodge.rootSeq_pow (p := l) n)
   refine ⟨η ^ i, ?_, by rw [map_pow, hi]⟩
   rw [← IsPrimitiveRoot.map_iff_of_injective hinj, map_pow, hi]
   exact seq_primitive n
 
-theorem prim_of_primitive {q : ℕ} (hq : q ≠ 0) {F : Type} [Field F] [CharZero F] {ρ : F}
-    (h : IsPrimitiveRoot ρ q) :
-    IsUnit ((q : ℕ) : F) ∧ Polynomial.aeval ρ (Polynomial.cyclotomic q ℤ) = 0 := by
+theorem prim_of_primitive
+    {q : ℕ} (hq : q ≠ 0) {F : Type} [Field F] [CharZero F] {ρ : F} (h : IsPrimitiveRoot ρ q)
+    : IsUnit ((q : ℕ) : F) ∧ Polynomial.aeval ρ (Polynomial.cyclotomic q ℤ) = 0 := by
   refine ⟨isUnit_iff_ne_zero.2 (Nat.cast_ne_zero.2 hq), ?_⟩
   rw [Polynomial.aeval_def, Polynomial.eval₂_eq_eval_map, Polynomial.map_cyclotomic]
   exact h.isRoot_cyclotomic (Nat.pos_of_ne_zero hq)
@@ -64,8 +65,10 @@ theorem prim_of_primitive {q : ℕ} (hq : q ≠ 0) {F : Type} [Field F] [CharZer
 theorem rootsEx : CrystallineSemistableComparison.E.RootsEx := by
   intro l _
   choose ρ hρ using fun n => exists_lift (l := l) n
-  exact ⟨⟨fun n => Subtype.mk (ρ n)
-      (prim_of_primitive (pow_ne_zero n (Fact.out : l.Prime).ne_zero) (hρ n).1),
-    fun n => (hρ n).2⟩⟩
+  exact ⟨⟨
+    fun n =>
+      Subtype.mk (ρ n) (prim_of_primitive (pow_ne_zero n (Fact.out : l.Prime).ne_zero) (hρ n).1),
+    fun n => (hρ n).2
+  ⟩⟩
 
 end GlobalTheory.CompanionTheory.RootsC

@@ -4,9 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qh17.conj_of_sq_neg :
-    ∀ {t : ℂ} {r : ℝ},
-    r < (0 : ℝ) → t ^ (2 : ℕ) = (↑r : ℂ) → (starRingEnd ℂ : ℂ → ℂ) t = -t := by
+theorem UpperTheory.Reformulated.B.Qh17.conj_of_sq_neg
+    : ∀ {t : ℂ} {r : ℝ}, r < (0 : ℝ) → t ^ (2 : ℕ) = (↑r : ℂ) → (starRingEnd ℂ : ℂ → ℂ) t = -t := by
   intro t r hr h
   have h1 : t.re * t.re - t.im * t.im = r := by
     have := congrArg Complex.re h

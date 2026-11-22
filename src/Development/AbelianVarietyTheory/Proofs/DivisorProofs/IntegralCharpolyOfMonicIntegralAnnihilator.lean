@@ -7,22 +7,28 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Charp
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 open Polynomial
 
 namespace GlobalTheory.AV.AbVar
 
-theorem int_of_charpoly_rat_of_monic_annihilator : ∀ (k V : Type) [Field k] [Algebra ℚ k] [AddCommGroup V] [Module k V] [Module.Finite k V] (φ : V →ₗ[k] V) (P : Polynomial ℚ) (Q : Polynomial ℤ), Q.Monic → Polynomial.aeval φ Q = 0 → P.map (algebraMap ℚ k) = φ.charpoly → ∃ P₀ : Polynomial ℤ, P₀.map (algebraMap ℤ ℚ) = P := by
+theorem int_of_charpoly_rat_of_monic_annihilator
+    : ∀ (k V : Type) [Field k] [Algebra ℚ k] [AddCommGroup V] [Module k V] [Module.Finite k V]
+        (φ : V →ₗ[k] V) (P : Polynomial ℚ) (Q : Polynomial ℤ),
+      Q.Monic → Polynomial.aeval φ Q = 0 → P.map (algebraMap ℚ k) = φ.charpoly
+        → ∃ P₀ : Polynomial ℤ, P₀.map (algebraMap ℤ ℚ) = P := by
   intro k V _ _ _ _ _ φ P Q hQ hφ hP
   have hinj : Function.Injective (algebraMap ℚ k) := (algebraMap ℚ k).injective
-  have hPm : P.Monic := Polynomial.monic_of_injective hinj (by rw [hP]; exact LinearMap.charpoly_monic φ)
+  have hPm : P.Monic :=
+    Polynomial.monic_of_injective hinj (by rw [hP]; exact LinearMap.charpoly_monic φ)
   set Qq : ℚ[X] := Q.map (algebraMap ℤ ℚ) with hQq
   have hmap : Qq.map (algebraMap ℚ k) = Q.map (algebraMap ℤ k) := by
     rw [hQq, Polynomial.map_map, ← IsScalarTower.algebraMap_eq]
-  have hG : aeval φ (Q.map (algebraMap ℤ k)) = 0 := by
-    rw [aeval_map_algebraMap]; exact hφ
+  have hG : aeval φ (Q.map (algebraMap ℤ k)) = 0 := by rw [aeval_map_algebraMap]; exact hφ
   have hd := GlobalTheory.CharpolyDvd.charpoly_dvd_pow_finrank φ _ hG
   rw [← hP, ← hmap, ← Polynomial.map_pow, Polynomial.map_dvd_map' (algebraMap ℚ k)] at hd
   have hd' : P ∣ (Q ^ Module.finrank k V).map (algebraMap ℤ ℚ) := by

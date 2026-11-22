@@ -28,8 +28,8 @@ theorem qB_mem_ainf (q : ℚ_[l]) : qB l q ∈ Ainf' l := by
   set u := PadicInt.unitCoeff hs
   set n := (s : ℤ_[l]).valuation
   have hl0 : (l : ℚ_[l]) ≠ 0 := Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero
-  have e : IsLocalization.mk' ℚ_[l] z s =
-      algebraMap ℤ_[l] ℚ_[l] (z * ↑u⁻¹) * ((l : ℚ_[l])⁻¹) ^ n := by
+  have e
+      : IsLocalization.mk' ℚ_[l] z s = algebraMap ℤ_[l] ℚ_[l] (z * ↑u⁻¹) * ((l : ℚ_[l])⁻¹) ^ n := by
     rw [IsLocalization.mk'_eq_iff_eq_mul, hsu]
     simp only [map_mul, map_pow, map_natCast]
     have hx : ((l : ℚ_[l])⁻¹) ^ n * (l : ℚ_[l]) ^ n = 1 := by

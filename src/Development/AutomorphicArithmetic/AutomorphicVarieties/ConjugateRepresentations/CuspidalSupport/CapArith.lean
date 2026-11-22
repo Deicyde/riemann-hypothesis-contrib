@@ -8,15 +8,20 @@ open Polynomial
 
 namespace UpperTheory.V.Cj.S
 
-private theorem eq_of_prod_eq (m n : Multiset ℂ) (h : ∀ u : ℂ, (m.map (u + ·)).prod = (n.map (u + ·)).prod) : m = n := by
-  have key : ∀ (k : Multiset ℂ) (u : ℂ),
-      (((k.map fun x => -x).map fun x => X - C x).prod).eval u = (k.map (u + ·)).prod := by
+private theorem eq_of_prod_eq
+    (m n : Multiset ℂ) (h : ∀ u : ℂ, (m.map (u + ·)).prod = (n.map (u + ·)).prod)
+    : m = n := by
+  have key
+      : ∀ (k : Multiset ℂ) (u : ℂ),
+        (((k.map fun x => -x).map fun x => X - C x).prod).eval u = (k.map (u + ·)).prod := by
     intro k u
     rw [eval_multiset_prod, Multiset.map_map, Multiset.map_map]
     congr 1
     refine Multiset.map_congr rfl fun x _ => ?_
     simp
-  have hp : ((m.map fun x => -x).map fun x => X - C x).prod = ((n.map fun x => -x).map fun x => X - C x).prod :=
+  have hp
+      : ((m.map fun x => -x).map fun x => X - C x).prod
+        = ((n.map fun x => -x).map fun x => X - C x).prod :=
     Polynomial.funext fun u => by rw [key, key, h]
   have hr := congrArg Polynomial.roots hp
   rw [roots_multiset_prod_X_sub_C, roots_multiset_prod_X_sub_C] at hr

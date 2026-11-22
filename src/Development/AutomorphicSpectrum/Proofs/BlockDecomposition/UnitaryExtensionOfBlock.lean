@@ -14,10 +14,11 @@ def frameEquiv (D m : ℕ) : FrameIdx D m ≃ Fin D ⊕ (Fin m ⊕ Fin D) :=
   ofLex.trans (Equiv.sumCongr (Equiv.refl _)
     (ofLex.trans (Equiv.sumCongr (Equiv.refl _) OrderDual.ofDual)))
 
-theorem block_zero {D m : ℕ} (b b' : Matrix (Fin D) (Fin D) ℂ) (t : Matrix (Fin m) (Fin m) ℂ)
-    (hb : b.BlockTriangular id) (ht : t.BlockTriangular id)
-    (hb' : ∀ x y, x < y → b' x y = 0) (p q : FrameIdx D m) (hqp : q < p) :
-    (fromBlocks b 0 0 (fromBlocks t 0 0 b')) (frameEquiv D m p) (frameEquiv D m q) = 0 := by
+theorem block_zero
+    {D m : ℕ}
+    (b b' : Matrix (Fin D) (Fin D) ℂ) (t : Matrix (Fin m) (Fin m) ℂ) (hb : b.BlockTriangular id)
+    (ht : t.BlockTriangular id) (hb' : ∀ x y, x < y → b' x y = 0) (p q : FrameIdx D m) (hqp : q < p)
+    : (fromBlocks b 0 0 (fromBlocks t 0 0 b')) (frameEquiv D m p) (frameEquiv D m q) = 0 := by
   obtain ⟨p, rfl⟩ := toLex.surjective p
   obtain ⟨q, rfl⟩ := toLex.surjective q
   rcases p with a | u <;> rcases q with c | v
@@ -37,14 +38,16 @@ theorem block_zero {D m : ℕ} (b b' : Matrix (Fin D) (Fin D) ℂ) (t : Matrix (
       have h'' : OrderDual.ofDual u < OrderDual.ofDual v := h'
       simpa [frameEquiv] using hb' _ _ h''
 
-theorem unitary_of_blocks {n D m : ℕ} (C H : Matrix (Fin n) (Fin D) ℂ)
-    (G : Matrix (Fin n) (Fin m) ℂ)
-    (hCC : Cᴴ * C = 1) (hCG : Cᴴ * G = 0) (hCH : Cᴴ * H = 0) (hGG : Gᴴ * G = 1)
-    (hGH : Gᴴ * H = 0) (hHH : Hᴴ * H = 1) (hcard : D + (m + D) = n) :
-    ∃ U ∈ Matrix.unitaryGroup (Fin n) ℂ, ∀ (s : Matrix (Fin n) (Fin n) ℂ)
-      (b b' : Matrix (Fin D) (Fin D) ℂ) (t : Matrix (Fin m) (Fin m) ℂ),
-      s * C = C * b → s * G = G * t → s * H = H * b' → b.BlockTriangular id →
-      t.BlockTriangular id → (∀ x y, x < y → b' x y = 0) → (Uᴴ * s * U).BlockTriangular id := by
+theorem unitary_of_blocks
+    {n D m : ℕ} (C H : Matrix (Fin n) (Fin D) ℂ) (G : Matrix (Fin n) (Fin m) ℂ) (hCC : Cᴴ * C = 1)
+    (hCG : Cᴴ * G = 0) (hCH : Cᴴ * H = 0) (hGG : Gᴴ * G = 1) (hGH : Gᴴ * H = 0) (hHH : Hᴴ * H = 1)
+    (hcard : D + (m + D) = n)
+    : ∃ U ∈ Matrix.unitaryGroup (Fin n) ℂ,
+      ∀ (s : Matrix (Fin n) (Fin n) ℂ) (b b' : Matrix (Fin D) (Fin D) ℂ)
+          (t : Matrix (Fin m) (Fin m) ℂ),
+        s * C = C * b → s * G = G * t → s * H = H * b' → b.BlockTriangular id → t.BlockTriangular id
+          → (∀ x y, x < y → b' x y = 0)
+          → (Uᴴ * s * U).BlockTriangular id := by
   have hGC : Gᴴ * C = 0 := by
     have := congrArg conjTranspose hCG
     simpa [conjTranspose_mul] using this
@@ -58,8 +61,8 @@ theorem unitary_of_blocks {n D m : ℕ} (C H : Matrix (Fin n) (Fin D) ℂ)
   have hE : Eᴴ * E = 1 := by
     rw [hEdef, conjTranspose_fromCols_eq_fromRows_conjTranspose,
       conjTranspose_fromCols_eq_fromRows_conjTranspose, fromRows_mul_fromCols, fromRows_mul,
-      fromRows_mul, mul_fromCols, mul_fromCols, mul_fromCols, fromRows_fromCols_eq_fromBlocks,
-      hCC, hCG, hCH, hGC, hGG, hGH, hHC, hHG, hHH, fromCols_zero, fromRows_zero, fromBlocks_one,
+      fromRows_mul, mul_fromCols, mul_fromCols, mul_fromCols, fromRows_fromCols_eq_fromBlocks, hCC,
+      hCG, hCH, hGC, hGG, hGH, hHC, hHG, hHH, fromCols_zero, fromRows_zero, fromBlocks_one,
       fromBlocks_one]
   have hT : Fintype.card (FrameIdx D m) = n := by
     rw [← hcard]
@@ -78,25 +81,27 @@ theorem unitary_of_blocks {n D m : ℕ} (C H : Matrix (Fin n) (Fin D) ℂ)
       simp
     have hΔ : Eᴴ * s * E = fromBlocks b 0 0 (fromBlocks t 0 0 b') := by
       rw [Matrix.mul_assoc, hs, ← Matrix.mul_assoc, hE, Matrix.one_mul]
-    have hM : (E.submatrix id g)ᴴ * s * E.submatrix id g =
-        (fromBlocks b 0 0 (fromBlocks t 0 0 b')).submatrix g g := by
+    have hM
+        : (E.submatrix id g)ᴴ * s * E.submatrix id g
+          = (fromBlocks b 0 0 (fromBlocks t 0 0 b')).submatrix g g := by
       rw [← hΔ, submatrix_mul _ _ g id g Function.bijective_id,
-        submatrix_mul _ _ g id id Function.bijective_id, submatrix_id_id,
-        conjTranspose_submatrix]
+        submatrix_mul _ _ g id id Function.bijective_id, submatrix_id_id, conjTranspose_submatrix]
     rw [hM]
     intro x y hxy
-    exact block_zero b b' t hb ht hb' _ _ ((Fintype.orderIsoFinOfCardEq (FrameIdx D m) hT).lt_iff_lt.2 hxy)
+    exact block_zero b b' t hb ht hb' _ _
+      ((Fintype.orderIsoFinOfCardEq (FrameIdx D m) hT).lt_iff_lt.2 hxy)
 
-theorem unitary_adapted_triangularises : ∀ {n D m : ℕ} (J : Matrix (Fin n) (Fin n) ℂ)
-    (J' : Matrix (Fin m) (Fin m) ℂ) (C : Matrix (Fin n) (Fin D) ℂ) (R : Matrix (Fin n) (Fin m) ℂ),
-    J * J = 1 → Jᴴ = J → Cᴴ * C = 1 → Cᴴ * J * C = 0 → Rᴴ * R = 1 → J * R = R * J' →
-    Cᴴ * R = 0 → C * Cᴴ + J * C * Cᴴ * J + R * Rᴴ = 1 →
-    ∀ U₀ ∈ Matrix.unitaryGroup (Fin m) ℂ, ∃ U ∈ Matrix.unitaryGroup (Fin n) ℂ,
-      ∀ (s : Matrix (Fin n) (Fin n) ℂ) (b b' : Matrix (Fin D) (Fin D) ℂ)
-        (t : Matrix (Fin m) (Fin m) ℂ),
-        s * C = C * b → s * (R * U₀) = (R * U₀) * t → s * (J * C) = (J * C) * b' →
-        b.BlockTriangular id → t.BlockTriangular id → (∀ x y, x < y → b' x y = 0) →
-        (Uᴴ * s * U).BlockTriangular id := by
+theorem unitary_adapted_triangularises
+    : ∀ {n D m : ℕ} (J : Matrix (Fin n) (Fin n) ℂ) (J' : Matrix (Fin m) (Fin m) ℂ)
+        (C : Matrix (Fin n) (Fin D) ℂ) (R : Matrix (Fin n) (Fin m) ℂ),
+      J * J = 1 → Jᴴ = J → Cᴴ * C = 1 → Cᴴ * J * C = 0 → Rᴴ * R = 1 → J * R = R * J' → Cᴴ * R = 0
+        → C * Cᴴ + J * C * Cᴴ * J + R * Rᴴ = 1
+        → ∀ U₀ ∈ Matrix.unitaryGroup (Fin m) ℂ, ∃ U ∈ Matrix.unitaryGroup (Fin n) ℂ,
+          ∀ (s : Matrix (Fin n) (Fin n) ℂ) (b b' : Matrix (Fin D) (Fin D) ℂ)
+              (t : Matrix (Fin m) (Fin m) ℂ),
+            s * C = C * b → s * (R * U₀) = (R * U₀) * t → s * (J * C) = (J * C) * b'
+              → b.BlockTriangular id → t.BlockTriangular id → (∀ x y, x < y → b' x y = 0)
+              → (Uᴴ * s * U).BlockTriangular id := by
   intro n D m J J' C R hJJ hJh hCC hCJC hRR hJR hCR hsum U₀ hU₀
   have hU : U₀ᴴ * U₀ = 1 := (Matrix.mem_unitaryGroup_iff').1 hU₀
   have hRC : Rᴴ * C = 0 := by
@@ -105,12 +110,10 @@ theorem unitary_adapted_triangularises : ∀ {n D m : ℕ} (J : Matrix (Fin n) (
   have hRJ : Rᴴ * J = J'ᴴ * Rᴴ := by
     have := congrArg conjTranspose hJR
     simpa [conjTranspose_mul, hJh] using this
-  have t1 : trace (C * Cᴴ) = (D : ℂ) := by
-    rw [trace_mul_comm, hCC, trace_one]; simp
+  have t1 : trace (C * Cᴴ) = (D : ℂ) := by rw [trace_mul_comm, hCC, trace_one]; simp
   have t2 : trace (J * C * Cᴴ * J) = (D : ℂ) := by
     rw [trace_mul_comm, ← Matrix.mul_assoc, ← Matrix.mul_assoc, hJJ, Matrix.one_mul, t1]
-  have t3 : trace (R * Rᴴ) = (m : ℂ) := by
-    rw [trace_mul_comm, hRR, trace_one]; simp
+  have t3 : trace (R * Rᴴ) = (m : ℂ) := by rw [trace_mul_comm, hRR, trace_one]; simp
   have hcard : D + (m + D) = n := by
     have h := congrArg trace hsum
     rw [trace_add, trace_add, t1, t2, t3, trace_one] at h

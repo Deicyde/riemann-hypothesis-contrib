@@ -9,14 +9,16 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaShiftProofs.ExistsFin
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory NumberField IsDedekindDomain IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj
-open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open GlobalTheory.CharDepth TensorProduct
 
 namespace GlobalTheory.CharDepth
 
-theorem nonempty_valExt :
-    ∀ (T : CDVR) (p : ℕ) [Fact p.Prime], ¬ IsUnit (p : T.V) → Nonempty (ValExt T p) := by
+theorem nonempty_valExt
+    : ∀ (T : CDVR) (p : ℕ) [Fact p.Prime], ¬ IsUnit (p : T.V) → Nonempty (ValExt T p) := by
   intro T p hp hu
   have hp0 : (p : T.V) ≠ 0 := Nat.cast_ne_zero.2 hp.out.ne_zero
   have hp1 : (1 : ℝ) < p := by exact_mod_cast hp.out.one_lt
@@ -34,8 +36,7 @@ theorem nonempty_valExt :
   have hmem : ∀ x : C, ‖x‖ ≤ 1 → x ∈ v.integer := fun x hx => by
     change ‖x‖₊ ≤ 1
     exact_mod_cast hx
-  have hpO : ‖algebraMap v.integer C (p : v.integer)‖ < 1 := by
-    rw [map_natCast, hCp']; exact hr1
+  have hpO : ‖algebraMap v.integer C (p : v.integer)‖ < 1 := by rw [map_natCast, hCp']; exact hr1
   haveI : Fact (¬ IsUnit (p : v.integer)) :=
     ⟨fun h => hpO.ne ((NormIntegers.isUnit_iff_norm_eq_one hO).1 h)⟩
   haveI := NormIntegers.isAdicComplete_span_singleton hO hpO
@@ -63,10 +64,20 @@ theorem nonempty_valExt :
     have h' : vV T.V (p : T.Fr) = 0 := by exact_mod_cast h
     rw [h', zpow_zero, hCp] at hzp
     exact hr1.ne hzp
-  refine ⟨{ C := C, v := v, O := v.integer, ints := hO, ι := ι, ι_local := hι,
-            ιF := algebraMap T.Fr C, comp := fun _ => rfl, val := fun x hx => ?_ }⟩
+  refine ⟨{
+    C := C
+    v := v
+    O := v.integer
+    ints := hO
+    ι := ι
+    ι_local := hι
+    ιF := algebraMap T.Fr C
+    comp := fun _ => rfl
+    val := fun x hx => ?_
+  }⟩
   change ‖algebraMap T.Fr C x‖ = ‖(p : C)‖ ^ _
-  rw [← map_natCast (algebraMap T.Fr C) p, hzp, ArcQ.norm_map_eq_zpow_vV (algebraMap T.Fr C) hf hπ hx,
-    ← Real.rpow_intCast, ← Real.rpow_intCast, ← Real.rpow_mul (norm_nonneg _), mul_div_cancel₀ _ he]
+  rw [← map_natCast (algebraMap T.Fr C) p, hzp,
+    ArcQ.norm_map_eq_zpow_vV (algebraMap T.Fr C) hf hπ hx, ← Real.rpow_intCast, ← Real.rpow_intCast,
+    ← Real.rpow_mul (norm_nonneg _), mul_div_cancel₀ _ he]
 
 end GlobalTheory.CharDepth

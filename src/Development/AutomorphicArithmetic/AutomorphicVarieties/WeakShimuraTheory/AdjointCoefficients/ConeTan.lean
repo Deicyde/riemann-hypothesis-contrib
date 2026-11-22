@@ -4,26 +4,31 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.WeakShimura
 
 @[expose] public section
 
-open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open IsLocalRing UpperTheory.V UpperTheory.V.Alg UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws
 
-private theorem exProj {k W : Type} [Field k] [AddCommGroup W] [Module k W] (b n : Submodule k W)
-    (h : IsCompl b n) : ∃ P : W →ₗ[k] W, (∀ x, P x ∈ n) ∧ ∀ x, P x - x ∈ b := by
+private theorem exProj
+    {k W : Type} [Field k] [AddCommGroup W] [Module k W] (b n : Submodule k W) (h : IsCompl b n)
+    : ∃ P : W →ₗ[k] W, (∀ x, P x ∈ n) ∧ ∀ x, P x - x ∈ b := by
   refine ⟨n.projection b h.symm, fun x => Submodule.projection_apply_mem _ x, fun x => ?_⟩
   have e := Submodule.projection_add_projection_eq_self h.symm x
   have hm : b.projection n h x ∈ b := Submodule.projection_apply_mem _ x
   have : n.projection b h.symm x - x = -(b.projection n h x) := by
-    calc n.projection b h.symm x - x
+    calc
+      n.projection b h.symm x - x
         = n.projection b h.symm x - (n.projection b h.symm x + b.projection n h x) := by rw [e]
       _ = -(b.projection n h x) := by abel
   rw [this]
   exact b.neg_mem hm
 
-private theorem dimLem {k W T H A : Type} [Field k] [AddCommGroup W] [Module k W] [Module.Finite k W]
-    [AddCommGroup T] [Module k T] [AddCommGroup H] [Module k H] [AddCommGroup A] [Module k A] [Module.Finite k A]
-    (t H0 : Submodule k W) (e : T →ₗ[k] W ⧸ t) (j : LinearMap.ker e →ₗ[k] A) (hj : Function.Injective j)
-    (q : T →ₗ[k] H) (hq : Function.Surjective q) (f : W →ₗ[k] T) (hf : ∀ X, q (f X) = 0)
-    (h0 : LinearMap.ker f ≤ H0) :
-    Module.finrank k H + Module.finrank k t ≤ Module.finrank k A + Module.finrank k H0 := by
+private theorem dimLem
+    {k W T H A : Type} [Field k] [AddCommGroup W] [Module k W] [Module.Finite k W] [AddCommGroup T]
+    [Module k T] [AddCommGroup H] [Module k H] [AddCommGroup A] [Module k A] [Module.Finite k A]
+    (t H0 : Submodule k W) (e : T →ₗ[k] W ⧸ t) (j : LinearMap.ker e →ₗ[k] A)
+    (hj : Function.Injective j)
+    (q : T →ₗ[k] H) (hq : Function.Surjective q)
+    (f : W →ₗ[k] T) (hf : ∀ X, q (f X) = 0) (h0 : LinearMap.ker f ≤ H0)
+    : Module.finrank k H + Module.finrank k t ≤ Module.finrank k A + Module.finrank k H0 := by
   haveI hK : Module.Finite k (LinearMap.ker e) := Module.Finite.of_injective j hj
   haveI hT : Module.Finite k T := by
     rw [← Module.rank_lt_aleph0_iff, ← LinearMap.rank_range_add_rank_ker e]
@@ -43,12 +48,17 @@ private theorem dimLem {k W T H A : Type} [Field k] [AddCommGroup W] [Module k W
   have r9 := Submodule.finrank_mono h0
   omega
 
-theorem UpperTheory.V.Ws.X1.coneTan :
-    ∀ {k G W V : Type} [Field k] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module k W] [Module.Finite k W] {Gv : V → Type} [∀ v, Group (Gv v)] (loc : ∀ v, Gv v →* G) (ρ : Representation k G W) (b n : V → Submodule k W) (g0 : G) (t : Submodule k W), (∀ X, IsLocallyConstant fun g => ρ g X) → (∀ v s, ∀ X ∈ b v, ρ (loc v s) X ∈ b v) → (∀ v, IsCompl (b v) (n v)) → Module.Finite k (TanC loc ρ b n g0 t) → Module.finrank k (Fr.H1C loc ρ b) + Module.finrank k t ≤ Module.finrank k (TanC loc ρ b n g0 t) + Module.finrank k (Fr.coneH0 ρ b) := by
+theorem UpperTheory.V.Ws.X1.coneTan
+    : ∀ {k G W V : Type} [Field k] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module k W]
+        [Module.Finite k W] {Gv : V → Type} [∀ v, Group (Gv v)] (loc : ∀ v, Gv v →* G)
+        (ρ : Representation k G W) (b n : V → Submodule k W) (g0 : G) (t : Submodule k W),
+      (∀ X, IsLocallyConstant fun g => ρ g X) → (∀ v s, ∀ X ∈ b v, ρ (loc v s) X ∈ b v)
+        → (∀ v, IsCompl (b v) (n v)) → Module.Finite k (TanC loc ρ b n g0 t)
+        → Module.finrank k (Fr.H1C loc ρ b) + Module.finrank k t
+          ≤ Module.finrank k (TanC loc ρ b n g0 t) + Module.finrank k (Fr.coneH0 ρ b) := by
   intro k G W V _ _ _ _ _ _ Gv _ loc ρ b n g0 t hlc hstab hcompl hfin
   choose P hPn hPb using fun v => exProj (b v) (n v) (hcompl v)
-  have hPb' : ∀ v x, x - P v x ∈ b v := fun v x => by
-    simpa using (b v).neg_mem (hPb v x)
+  have hPb' : ∀ v x, x - P v x ∈ b v := fun v x => by simpa using (b v).neg_mem (hPb v x)
   have hloc : ∀ v (s : Gv v) (y : W), y ∈ b v → ρ (loc v s) y - y ∈ b v := fun v s y hy =>
     (b v).sub_mem (hstab v s y hy) hy
   set S : Submodule k ((G → W) × (V → W)) :=
@@ -64,9 +74,10 @@ theorem UpperTheory.V.Ws.X1.coneTan :
       refine ⟨⟨hz1, hz2, fun v s => ?_⟩, ?_⟩
       · have h1 := hz3 v s
         have h2 := hloc v s _ (hPb v (x v))
-        have e : c (loc v s) - (ρ (loc v s) (P v (x v)) - P v (x v)) =
-            (c (loc v s) - (ρ (loc v s) (x v) - x v)) -
-              (ρ (loc v s) (P v (x v) - x v) - (P v (x v) - x v)) := by
+        have e
+            : c (loc v s) - (ρ (loc v s) (P v (x v)) - P v (x v))
+              = (c (loc v s) - (ρ (loc v s) (x v) - x v))
+                - (ρ (loc v s) (P v (x v) - x v) - (P v (x v) - x v)) := by
           rw [map_sub]; abel
         simp only at h1 ⊢
         rw [e]
@@ -87,21 +98,23 @@ theorem UpperTheory.V.Ws.X1.coneTan :
       abel
     · intro v s
       have h2 := hloc v s _ (hPb' v X)
-      have e : (ρ (loc v s) X - X) - (ρ (loc v s) (P v X) - P v X) =
-          ρ (loc v s) (X - P v X) - (X - P v X) := by
+      have e
+          : (ρ (loc v s) X - X) - (ρ (loc v s) (P v X) - P v X)
+            = ρ (loc v s) (X - P v X) - (X - P v X) := by
         rw [map_sub]; abel
       simp only
       rw [e]
       exact h2
     · simp [Submodule.mem_pi, hPn]
-  let f : W →ₗ[k] S :=
-    { toFun := fun X => ⟨_, fmem X⟩
-      map_add' := fun X Y => by
-        apply Subtype.ext
-        ext s <;> simp <;> abel
-      map_smul' := fun a X => by
-        apply Subtype.ext
-        ext s <;> simp [smul_sub] }
+  let f : W →ₗ[k] S := {
+    toFun := fun X => ⟨_, fmem X⟩
+    map_add' := fun X Y => by
+      apply Subtype.ext
+      ext s <;> simp <;> abel
+    map_smul' := fun a X => by
+      apply Subtype.ext
+      ext s <;> simp [smul_sub]
+  }
   have hf : ∀ X, q (f X) = 0 := by
     intro X
     simp only [q, LinearMap.comp_apply, Submodule.mkQ_apply]

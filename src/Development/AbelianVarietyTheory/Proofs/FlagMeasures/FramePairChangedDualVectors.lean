@@ -15,13 +15,17 @@ namespace GlobalTheory.HL.ToC
 
 section
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E]
-  [TopologicalSpace E] [MeasurableSpace E] {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
+  {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
+  {M : Model F E} {V : Type} [AddCommGroup V] [Module E V]
   {H : HermSp M V} {r k : ℕ}
 
-def swapEs (Fr : LocNG.FrameD H r) (es₂ : Fin r → V) (h1 : ∀ i j, H.h (es₂ i) (es₂ j) = 0)
+def swapEs
+    (Fr : LocNG.FrameD H r) (es₂ : Fin r → V) (h1 : ∀ i j, H.h (es₂ i) (es₂ j) = 0)
     (h2 : ∀ i j : Fin r, H.h (Fr.f i.castSucc) (es₂ j) = if i = j then 1 else 0)
-    (h3 : ∀ i, H.h (es₂ i) (Fr.f (Fin.last r)) = 0) : LocNG.FrameD H r :=
+    (h3 : ∀ i, H.h (es₂ i) (Fr.f (Fin.last r)) = 0)
+    : LocNG.FrameD H r :=
   ⟨Fr.f, es₂, Fr.T, Fr.h_iso, Fr.h_zz, h1, h2, h3⟩
 
 lemma mem_img (g : V ≃ₗ[E] V) (Λ : Submodule M.L.O V) (x : V) :
@@ -80,19 +84,31 @@ lemma pulled (S : Frames M.L r k) (e : V ≃ₗ[E] S.V) (he : ∀ x y, S.h (e x)
 
 variable {P : LocNG.FPair H r} {S : Frames M.L r k}
 
-def pair₂ (c : WCoord P S) : LocNG.FPair H r :=
-  ⟨swapEs P.A (fun a => c.e.symm (S.es a))
-      (pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso).1
-      (pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso).2.1
-      (pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso).2.2,
-    swapEs P.B (fun a => c.e.symm (S.es' a))
-      (pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso').1
-      (pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso').2.1
-      (pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso').2.2⟩
+def pair₂ (c : WCoord P S) : LocNG.FPair H r := ⟨
+  swapEs P.A
+    (fun a => c.e.symm (S.es a))
+    (pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso).1
+    (pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso).2.1
+    (pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso).2.2,
+  swapEs P.B
+    (fun a => c.e.symm (S.es' a))
+    (pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso').1
+    (pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso').2.1
+    (pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso').2.2
+⟩
 
-def coord₂ (c : WCoord P S) : Coord (pair₂ c) S :=
-  ⟨c.e, c.h_eq, c.f_eq, c.f'_eq, fun a => (c.e.apply_symm_apply _).symm,
-    fun a => (c.e.apply_symm_apply _).symm, c.T_eq, c.T'_eq, c.gg_none, c.gg_some⟩
+def coord₂ (c : WCoord P S) : Coord (pair₂ c) S := ⟨
+  c.e,
+  c.h_eq,
+  c.f_eq,
+  c.f'_eq,
+  fun a => (c.e.apply_symm_apply _).symm,
+  fun a => (c.e.apply_symm_apply _).symm,
+  c.T_eq,
+  c.T'_eq,
+  c.gg_none,
+  c.gg_some
+⟩
 
 def datEq (c : WCoord P S) : LocNG.Datum P ≃ LocNG.Datum (pair₂ c) where
   toFun d := ⟨d.L, d.L', d.hL, d.hL', d.io, d.io_L⟩
@@ -100,7 +116,21 @@ def datEq (c : WCoord P S) : LocNG.Datum P ≃ LocNG.Datum (pair₂ c) where
   left_inv _ := rfl
   right_inv _ := rfl
 
-theorem std_swap : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ) (Fr : LocNG.FrameD H r) (es₂ : Fin r → V) (h1 : ∀ i j, H.h (es₂ i) (es₂ j) = 0) (h2 : ∀ i j : Fin r, H.h (Fr.f i.castSucc) (es₂ j) = if i = j then 1 else 0) (h3 : ∀ i, H.h (es₂ i) (Fr.f (Fin.last r)) = 0), Fr.T ≠ 0 → ∀ L : Submodule M.L.O (H.Wb Fr.f), Fr.IsInner L → ∃ m ∈ Fr.N, (∀ b, m (Fr.f b) = Fr.f b) ∧ (⟨Fr.f, es₂, Fr.T, Fr.h_iso, Fr.h_zz, h1, h2, h3⟩ : LocNG.FrameD H r).LamStd L = LocNG.img m (Fr.LamStd L) :=
+theorem std_swap
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r : ℕ)
+            (Fr : LocNG.FrameD H r) (es₂ : Fin r → V) (h1 : ∀ i j, H.h (es₂ i) (es₂ j) = 0)
+            (h2 : ∀ i j : Fin r, H.h (Fr.f i.castSucc) (es₂ j) = if i = j then 1 else 0)
+            (h3 : ∀ i, H.h (es₂ i) (Fr.f (Fin.last r)) = 0),
+          Fr.T ≠ 0
+            → ∀ L : Submodule M.L.O (H.Wb Fr.f),
+              Fr.IsInner L
+                → ∃ m ∈ Fr.N,
+                  (∀ b, m (Fr.f b) = Fr.f b)
+                    ∧ (⟨Fr.f, es₂, Fr.T, Fr.h_iso, Fr.h_zz, h1, h2, h3⟩ : LocNG.FrameD H r).LamStd L
+                      = LocNG.img m (Fr.LamStd L) :=
   GlobalTheory.T.standardLattice_dualVectors_change_unipotent
 
 lemma inv_fix {m : V ≃ₗ[E] V} {x : V} (hx : m x = x) : m⁻¹ x = x := by
@@ -130,17 +160,47 @@ lemma side_iff (hM : M.OK) (Fr : LocNG.FrameD H r) (es₂ : Fin r → V) (h1 : �
 
 end
 
-theorem changed_duals : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E), M.OK → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ) (P : LocNG.FPair H r), ∀ (S : Frames M.L r k) (c : WCoord P S), ∃ (P₂ : LocNG.FPair H r) (c₂ : Coord P₂ S) (φ : LocNG.Datum P ≃ LocNG.Datum P₂), c₂.e = c.e ∧ P₂.St = P.St ∧ P₂.K0 = P.K0 ∧ P₂.UW0 = P.UW0 ∧ P₂.Hp = P.Hp ∧ (P₂.PrimeTo ↔ P.PrimeTo) ∧ (∀ d, c₂.dat (φ d) = c.dat d) ∧ (∀ d t, LocNG.IsTermOver P d t ↔ LocNG.IsTermOver P₂ (φ d) t) ∧ (∀ d t, LocNG.IsTermOver P d t → LocNG.om P₂ t = LocNG.om P t) ∧ ∀ g d d', LocNG.Datum.Moves g d d' ↔ LocNG.Datum.Moves g (φ d) (φ d') := by
+theorem changed_duals
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] {E : Type} [CommRing E]
+        [Algebra F E] [TopologicalSpace E] [MeasurableSpace E] (M : Model F E),
+      M.OK
+        → ∀ {V : Type} [AddCommGroup V] [Module E V] (H : HermSp M V) (r k : ℕ)
+            (P : LocNG.FPair H r),
+          ∀ (S : Frames M.L r k) (c : WCoord P S),
+            ∃ (P₂ : LocNG.FPair H r) (c₂ : Coord P₂ S) (φ : LocNG.Datum P ≃ LocNG.Datum P₂),
+              c₂.e = c.e ∧ P₂.St = P.St ∧ P₂.K0 = P.K0 ∧ P₂.UW0 = P.UW0 ∧ P₂.Hp = P.Hp
+                ∧ (P₂.PrimeTo ↔ P.PrimeTo) ∧ (∀ d, c₂.dat (φ d) = c.dat d)
+                ∧ (∀ d t, LocNG.IsTermOver P d t ↔ LocNG.IsTermOver P₂ (φ d) t)
+                ∧ (∀ d t, LocNG.IsTermOver P d t → LocNG.om P₂ t = LocNG.om P t)
+                ∧ ∀ g d d', LocNG.Datum.Moves g d d' ↔ LocNG.Datum.Moves g (φ d) (φ d') := by
   intro F _ _ _ E _ _ _ _ M hM V _ _ H r k P S c
   have hTA : P.A.T ≠ 0 := by rw [← c.T_eq]; exact S.T.ne_zero
   have hTB : P.B.T ≠ 0 := by rw [← c.T'_eq]; exact S.T'.ne_zero
   have pA := pulled S c.e c.h_eq P.A.f S.f S.es c.f_eq S.dual S.iso
   have pB := pulled S c.e c.h_eq P.B.f S.f' S.es' c.f'_eq S.dual' S.iso'
-  have kA : ∀ n ∈ P.A.N, ∀ b a, H.h (n ((pair₂ c).A.f b)) ((pair₂ c).A.es a) = H.h (n (P.A.f b)) (P.A.es a) :=
+  have kA
+      : ∀ n ∈ P.A.N, ∀ b a,
+        H.h (n ((pair₂ c).A.f b)) ((pair₂ c).A.es a) = H.h (n (P.A.f b)) (P.A.es a) :=
     fun n hn b a => pair_eq hM P.A _ pA.1 pA.2.1 pA.2.2 hTA hn b a
-  have kB : ∀ n ∈ P.B.N, ∀ b a, H.h (n ((pair₂ c).B.f b)) ((pair₂ c).B.es a) = H.h (n (P.B.f b)) (P.B.es a) :=
+  have kB
+      : ∀ n ∈ P.B.N, ∀ b a,
+        H.h (n ((pair₂ c).B.f b)) ((pair₂ c).B.es a) = H.h (n (P.B.f b)) (P.B.es a) :=
     fun n hn b a => pair_eq hM P.B _ pB.1 pB.2.1 pB.2.2 hTB hn b a
-  refine ⟨pair₂ c, coord₂ c, datEq c, rfl, rfl, ?_, rfl, rfl, Iff.rfl, fun d => rfl, ?_, ?_, fun g d d' => Iff.rfl⟩
+  refine ⟨
+    pair₂ c,
+    coord₂ c,
+    datEq c,
+    rfl,
+    rfl,
+    ?_,
+    rfl,
+    rfl,
+    Iff.rfl,
+    fun d => rfl,
+    ?_,
+    ?_,
+    fun g d d' => Iff.rfl
+  ⟩
   · unfold LocNG.FPair.K0
     congr 1
     ext s
@@ -156,15 +216,19 @@ theorem changed_duals : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSp
       rw [kA s hs'.1 b a, kB s hs'.2 b a]
       exact h a b
   · intro d t
-    exact and_congr Iff.rfl (and_congr Iff.rfl
-      (and_congr (side_iff hM P.A _ pA.1 pA.2.1 pA.2.2 hTA d.L d.hL t.f t.abelian₂)
-        (and_congr (side_iff hM P.B _ pB.1 pB.2.1 pB.2.2 hTB d.L' d.hL' t.f' t.abelian₂) Iff.rfl)))
+    exact and_congr Iff.rfl
+      (and_congr Iff.rfl
+        (and_congr (side_iff hM P.A _ pA.1 pA.2.1 pA.2.2 hTA d.L d.hL t.f t.abelian₂)
+          (and_congr (side_iff hM P.B _ pB.1 pB.2.1 pB.2.2 hTB d.L' d.hL' t.f' t.abelian₂)
+            Iff.rfl)))
   · rintro d t ⟨-, -, ⟨n, hn, hf, -⟩, ⟨n', hn', hf', -⟩, -⟩
     have e1 : (pair₂ c).A.coefSum t.f = P.A.coefSum t.f := by
-      unfold LocNG.FrameD.coefSum; rw [hf]
+      unfold LocNG.FrameD.coefSum
+      rw [hf]
       exact Finset.sum_congr rfl fun a _ => kA n hn a.succ a
     have e2 : (pair₂ c).B.coefSum t.f' = P.B.coefSum t.f' := by
-      unfold LocNG.FrameD.coefSum; rw [hf']
+      unfold LocNG.FrameD.coefSum
+      rw [hf']
       exact Finset.sum_congr rfl fun a _ => kB n' hn' a.succ a
     unfold LocNG.om LocNG.FrameD.psiOf
     rw [e1, e2]

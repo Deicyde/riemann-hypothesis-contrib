@@ -14,9 +14,11 @@ open MvPolynomial IsLocalRing
 
 noncomputable section
 
-theorem isDiscreteValuationRing_localization_of_height_eq_one {A : Type*} [CommRing A] [IsDomain A]
-    [IsNoetherianRing A] [IsIntegrallyClosed A] (q : Ideal A) [q.IsPrime] (hq : q.height = 1) :
-    IsDiscreteValuationRing (Localization.AtPrime q) := by
+theorem isDiscreteValuationRing_localization_of_height_eq_one
+    {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    (q : Ideal A) [q.IsPrime]
+    (hq : q.height = 1)
+    : IsDiscreteValuationRing (Localization.AtPrime q) := by
   have hbot : q ≠ ⊥ := by
     intro h
     rw [← Ideal.height_eq_zero_iff_eq_bot] at h
@@ -38,8 +40,10 @@ theorem isDiscreteValuationRing_localization_of_height_eq_one {A : Type*} [CommR
     · exact And.intro (isField_iff_maximalIdeal_eq.not.mp hnf) inferInstance
     have : P.IsPrime := hP.2
     exact IsLocalRing.eq_maximalIdeal (this.isMaximal_of_ne_bot hP.1)
-  have h3 : IsIntegrallyClosed (Localization.AtPrime q) ∧
-      ∃! P : Ideal (Localization.AtPrime q), P ≠ ⊥ ∧ P.IsPrime := And.intro inferInstance huniq
+  have h3
+      : IsIntegrallyClosed (Localization.AtPrime q)
+        ∧ ∃! P : Ideal (Localization.AtPrime q), P ≠ ⊥ ∧ P.IsPrime :=
+    And.intro inferInstance huniq
   exact ((IsDiscreteValuationRing.TFAE (Localization.AtPrime q) hnf).out 1 4).mpr h3
 
 theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement := by
@@ -50,18 +54,25 @@ theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement :=
     Algebra.FiniteType.of_surjective (Ideal.Quotient.mkₐ ℂ P) (Ideal.Quotient.mkₐ_surjective ℂ P)
   have : IsNoetherianRing (MvPolynomial σ ℂ ⧸ P) := Algebra.FiniteType.isNoetherianRing ℂ _
   have : FiniteRingKrullDim (MvPolynomial σ ℂ ⧸ P) :=
-    finiteRingKrullDim_iff_ne_bot_and_top.mpr ⟨by rw [hdimP]; exact WithBot.natCast_ne_bot _, by
-      rw [hdimP]
-      rw [← WithBot.coe_natCast, Ne, WithBot.coe_eq_top]
-      exact ENat.natCast_ne_top _⟩
+    finiteRingKrullDim_iff_ne_bot_and_top.mpr ⟨
+      by rw [hdimP]; exact WithBot.natCast_ne_bot _,
+      by
+        rw [hdimP]
+        rw [← WithBot.coe_natCast, Ne, WithBot.coe_eq_top]
+        exact ENat.natCast_ne_top _
+    ⟩
   set q : Ideal (MvPolynomial σ ℂ ⧸ P) := Q.map π with hqdef
   have : q.IsPrime := Ideal.isPrime_map_quotientMk_of_isPrime hPQ
   have hmem : ∀ r, π r ∈ q ↔ r ∈ Q := fun r => by
     rw [← Ideal.mem_comap, hqdef, Ideal.comap_map_mk hPQ]
 
-  obtain ⟨s, hs⟩ := ReciprocityTheory.ChartRestriction.G.Geo.DimF.exists_height_of_isMaximal_of_field ℂ (MvPolynomial σ ℂ ⧸ P)
-  have key := ReciprocityTheory.ChartRestriction.G.Geo.DimF.dim_quot_add_height (A := MvPolynomial σ ℂ ⧸ P)
-    (fun M N hM hN => (hs M hM).trans (hs N hN).symm) q
+  obtain ⟨s, hs⟩ :=
+    ReciprocityTheory.ChartRestriction.G.Geo.DimF.exists_height_of_isMaximal_of_field ℂ
+      (MvPolynomial σ ℂ ⧸ P)
+  have key :=
+    ReciprocityTheory.ChartRestriction.G.Geo.DimF.dim_quot_add_height (A := MvPolynomial σ ℂ ⧸ P)
+      (fun M N hM hN => (hs M hM).trans (hs N hN).symm)
+      q
   rw [ringKrullDim_eq_of_ringEquiv (DoubleQuot.quotQuotEquivQuotOfLE hPQ), hdimQ, hdimP] at key
   obtain ⟨n, hn⟩ : ∃ n : ℕ, q.height = n :=
     ⟨q.height.toNat, (ENat.natCast_toNat (Ideal.height_ne_top Ideal.IsPrime.ne_top')).symm⟩
@@ -77,15 +88,22 @@ theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement :=
     isDiscreteValuationRing_localization_of_height_eq_one q hht
   have hinj : Function.Injective (algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q)) :=
     IsLocalization.injective (Localization.AtPrime q) q.primeCompl_le_nonZeroDivisors
-  have hmax : ∀ y, algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) y ∈ maximalIdeal (Localization.AtPrime q) ↔ y ∈ q := fun y =>
+  have hmax
+      : ∀ y,
+        algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) y
+            ∈ maximalIdeal (Localization.AtPrime q)
+          ↔ y ∈ q := fun y =>
     IsLocalization.AtPrime.to_map_mem_maximal_iff (Localization.AtPrime q) q y
 
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible (Localization.AtPrime q)
   obtain ⟨⟨a₀, s₀⟩, hs₀⟩ := IsLocalization.mk'_surjective q.primeCompl ϖ
   obtain ⟨g, rfl⟩ := Ideal.Quotient.mk_surjective a₀
   have hgirr : Irreducible (algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π g)) := by
-    have h1 : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π g) = ϖ * algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) s₀ := by
-      rw [← hs₀]; exact (IsLocalization.mk'_spec (Localization.AtPrime q) (Ideal.Quotient.mk P g) s₀).symm
+    have h1
+        : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π g)
+          = ϖ * algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) s₀ := by
+      rw [← hs₀]
+      exact (IsLocalization.mk'_spec (Localization.AtPrime q) (Ideal.Quotient.mk P g) s₀).symm
     rw [h1]
     exact (irreducible_mul_isUnit (IsLocalization.map_units (Localization.AtPrime q) s₀)).mpr hϖ
   have hgQ : g ∈ Q := by
@@ -96,8 +114,12 @@ theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement :=
     rw [Ne, ← map_zero (algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q)), hinj.eq_iff]
     intro h
     exact hxP (Ideal.Quotient.eq_zero_iff_mem.mp h)
-  obtain ⟨k, u, hu⟩ := IsDiscreteValuationRing.eq_unit_mul_pow_irreducible (R := Localization.AtPrime q) hx0 hgirr
-  have hxmax : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π x) ∈ maximalIdeal (Localization.AtPrime q) := (hmax _).mpr ((hmem x).mpr hxQ)
+  obtain ⟨k, u, hu⟩ :=
+    IsDiscreteValuationRing.eq_unit_mul_pow_irreducible (R := Localization.AtPrime q) hx0 hgirr
+  have hxmax
+      : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π x)
+        ∈ maximalIdeal (Localization.AtPrime q) :=
+    (hmax _).mpr ((hmem x).mpr hxQ)
   have hk : 0 < k := by
     rcases Nat.eq_zero_or_pos k with h | h
     · rw [h, pow_zero, mul_one] at hu
@@ -105,7 +127,10 @@ theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement :=
       exact absurd u.isUnit hxmax
     · exact h
   obtain ⟨⟨c, d⟩, hcd⟩ := IsLocalization.mk'_surjective q.primeCompl (u : (Localization.AtPrime q))
-  have hcu : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) c = (u : (Localization.AtPrime q)) * algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) d := by
+  have hcu
+      : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) c
+        = (u : (Localization.AtPrime q))
+          * algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) d := by
     rw [← hcd]; exact (IsLocalization.mk'_spec (Localization.AtPrime q) c d).symm
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective c
   obtain ⟨b, hb⟩ := Ideal.Quotient.mk_surjective (d : MvPolynomial σ ℂ ⧸ P)
@@ -122,14 +147,20 @@ theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement :=
     change π (b * x - a * g ^ k) = 0
     apply hinj
     simp only [map_zero, map_sub, map_mul, map_pow]
-    change algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (Ideal.Quotient.mk P b) * _ - algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (Ideal.Quotient.mk P a) * _ = 0
+    change algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (Ideal.Quotient.mk P b) * _
+        - algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (Ideal.Quotient.mk P a) * _
+      = 0
     rw [hb, hcu, hu]
     ring
 
-  have hunif := (IsDiscreteValuationRing.irreducible_iff_uniformizer (R := Localization.AtPrime q) _).mp hgirr
+  have hunif :=
+    (IsDiscreteValuationRing.irreducible_iff_uniformizer (R := Localization.AtPrime q) _).mp hgirr
   have hgen : ∀ p ∈ Q, ∃ t : MvPolynomial σ ℂ, t ∉ Q ∧ t * p ∈ P ⊔ Ideal.span {g} := by
     intro p hp
-    have hpm : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π p) ∈ maximalIdeal (Localization.AtPrime q) := (hmax _).mpr ((hmem p).mpr hp)
+    have hpm
+        : algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π p)
+          ∈ maximalIdeal (Localization.AtPrime q) :=
+      (hmax _).mpr ((hmem p).mpr hp)
     rw [hunif] at hpm
     obtain ⟨y, hy⟩ := Ideal.mem_span_singleton'.mp hpm
     obtain ⟨⟨c', d'⟩, hcd'⟩ := IsLocalization.mk'_surjective q.primeCompl y
@@ -145,10 +176,13 @@ theorem NormalCodimOneUniformiser.proof : NormalCodimOneUniformiser.Statement :=
         change π (t * p - c₁ * g) = 0
         apply hinj
         simp only [map_zero, map_sub, map_mul]
-        change algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (Ideal.Quotient.mk P t) * _ - _ = 0
-        have hspec : IsLocalization.mk' (Localization.AtPrime q) (Ideal.Quotient.mk P c₁) d' *
-            algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) d' =
-            algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π c₁) :=
+        change
+          algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (Ideal.Quotient.mk P t) * _ - _
+            = 0
+        have hspec
+            : IsLocalization.mk' (Localization.AtPrime q) (Ideal.Quotient.mk P c₁) d'
+                * algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) d'
+              = algebraMap (MvPolynomial σ ℂ ⧸ P) (Localization.AtPrime q) (π c₁) :=
           IsLocalization.mk'_spec _ _ _
         dsimp only at hcd'
         rw [ht, ← hy, ← hcd', ← hspec]

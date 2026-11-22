@@ -9,13 +9,18 @@ public import Formalism.RealPlaceAnalysis.FinalF
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec GlobalTheory.DSId
 open scoped InnerProductSpace ComplexOrder ContDiff
 
 namespace GlobalTheory.Dec
 
-theorem locDec_of_decGap_gapGe : DecGap → ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ), IsDSData B d → GapGe B h →
-    (∀ v, 120 * (B.I.n : ℝ) * ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h) → LocDec B h := by
+theorem locDec_of_decGap_gapGe
+    : DecGap
+      → ∀ (B : RowsAut) (d : InfinitePlace B.I.F → ℝ) (h : ℝ),
+        IsDSData B d → GapGe B h
+          → (∀ v, 120 * (B.I.n : ℝ) * ((rkR (B.I.ε v) : ℕ) : ℝ) ^ ((3 : ℝ) / 2) ≤ h)
+          → LocDec B h := by
   intro hD B d h hds hgap hh v g
   obtain ⟨h1, h2, h3, -⟩ := hds v
   have hw : B.w v ∈ lowKSub (B.I.ε v) (B.lam v) (B.σ v) := h3.2

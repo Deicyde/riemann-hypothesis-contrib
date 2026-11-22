@@ -46,8 +46,8 @@ namespace Formalism.ELL
 
 open Formalism.ELL.unitAtAlt
 
-theorem modelUnit_of (hL : Formalism.ELL.ModelLegendre.{u}) (hD : Formalism.ELL.ModelDeuring.{u}) :
-    Formalism.ELL.ModelUnit.{u} := by
+theorem modelUnit_of (hL : Formalism.ELL.ModelLegendre.{u}) (hD : Formalism.ELL.ModelDeuring.{u})
+    : Formalism.ELL.ModelUnit.{u} := by
   intro K _ _ _ j hj
   rcases two_or_three (K := K) with h2 | h3
   · obtain ⟨l, hl, _hl1, hc, hΔ⟩ := hL K h2 j hj

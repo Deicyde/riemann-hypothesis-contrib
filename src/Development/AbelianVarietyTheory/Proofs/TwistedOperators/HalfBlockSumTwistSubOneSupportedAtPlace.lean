@@ -8,23 +8,46 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DiagonalBloc
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 
 namespace GlobalTheory.TwistBlockK
 
-theorem atK_sub_one : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {d : ℕ} (v : Pl (F := F)) (g : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) (Y : Matrix (Fin d) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))),
-  At (evFin F v) (g - 1) → At (evFin F v) Y → At (evFin F v) ((⅟(2 : AF F) • ((g).toBlocks₁₁ + (g).toBlocks₁₂ + (g).toBlocks₂₁ + (g).toBlocks₂₂) +
-      Y * (⅟(2 : AF F) • ((g).toBlocks₁₁ + (g).toBlocks₁₂ - (g).toBlocks₂₁ - (g).toBlocks₂₂))) - 1) := by
+theorem atK_sub_one
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {d : ℕ}
+        (v : Pl (F := F))
+        (g : Matrix (Fin d ⊕ Fin d) (Fin d ⊕ Fin d)
+          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E)))
+        (Y : Matrix (Fin d) (Fin d)
+          (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))),
+      At (evFin F v) (g - 1) → At (evFin F v) Y
+        → At (evFin F v)
+          ((⅟(2 : AF F) • ((g).toBlocks₁₁ + (g).toBlocks₁₂ + (g).toBlocks₂₁ + (g).toBlocks₂₂)
+              + Y
+                * (⅟(2 : AF F)
+                  • ((g).toBlocks₁₁ + (g).toBlocks₁₂ - (g).toBlocks₂₁ - (g).toBlocks₂₂)))
+            - 1) := by
   intro F E _ _ _ _ _ d v g Y hg hY u hu
   have hgu := hg u hu
   have hYu : u • Y = 0 := hY u hu
   rw [smul_sub, sub_eq_zero] at hgu
-  have h11 : u • g.toBlocks₁₁ = u • (1 : Matrix (Fin d) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) := by
+  have h11
+      : u • g.toBlocks₁₁
+        = u
+          • (1 : Matrix (Fin d) (Fin d)
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+              (E := E))) := by
     ext i j
     have := congrFun (congrFun hgu (Sum.inl i)) (Sum.inl j)
     simpa [Matrix.toBlocks₁₁, Matrix.one_apply] using this
-  have h22 : u • g.toBlocks₂₂ = u • (1 : Matrix (Fin d) (Fin d) (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F) (E := E))) := by
+  have h22
+      : u • g.toBlocks₂₂
+        = u
+          • (1 : Matrix (Fin d) (Fin d)
+            (_root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.AE (F := F)
+              (E := E))) := by
     ext i j
     have := congrFun (congrFun hgu (Sum.inr i)) (Sum.inr j)
     simpa [Matrix.toBlocks₂₂, Matrix.one_apply] using this

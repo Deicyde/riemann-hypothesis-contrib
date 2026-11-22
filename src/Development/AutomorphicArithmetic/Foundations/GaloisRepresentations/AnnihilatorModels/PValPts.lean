@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open CategoryTheory AlgebraicGeometry TensorProduct
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.valPts_of :
-    ValPts := by
+theorem UpperTheory.Gal.crystallineComparison.valPts_of : ValPts := by
   intro R S V _ _ _ _ _ _ _ _
   have hinj : Function.Injective (IsScalarTower.toAlgHom R V (FractionRing V)) :=
     IsFractionRing.injective V (FractionRing V)

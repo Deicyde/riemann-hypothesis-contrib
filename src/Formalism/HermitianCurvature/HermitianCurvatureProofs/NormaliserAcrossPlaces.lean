@@ -7,16 +7,18 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.RegularityAt
 
 namespace Formalism.FourierDecayAlt.P.CutBP2
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TBB Formalism.QuantumDeterminants MeasureTheory
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.TBB Formalism.QuantumDeterminants
+  MeasureTheory
 
 noncomputable section
 
 section hs
 
-variable {Wp Wq Wq' Wq'' : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
-  [NormedAddCommGroup Wq'] [InnerProductSpace ℂ Wq'] [FiniteDimensional ℂ Wq']
-  [NormedAddCommGroup Wq''] [InnerProductSpace ℂ Wq''] [FiniteDimensional ℂ Wq'']
+variable
+  {Wp Wq Wq' Wq'' : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
+  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] [NormedAddCommGroup Wq']
+  [InnerProductSpace ℂ Wq'] [FiniteDimensional ℂ Wq'] [NormedAddCommGroup Wq'']
+  [InnerProductSpace ℂ Wq''] [FiniteDimensional ℂ Wq'']
 
 lemma hs_le_of_adj_sh (X : Wq →L[ℂ] Wp) (A : Wq' →L[ℂ] Wq) (A' : Wq'' →L[ℂ] Wq) (K : ℝ)
     (h : ∀ v : Wq, ‖v‖ ^ 2 ≤
@@ -45,9 +47,9 @@ end hs
 
 section sh
 
-variable {P : M.Par} {Wp Wq Wq' : Type}
-  [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [FiniteDimensional ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+variable
+  {P : M.Par} {Wp Wq Wq' : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
+  [FiniteDimensional ℂ Wp] [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
   [NormedAddCommGroup Wq'] [InnerProductSpace ℂ Wq'] [FiniteDimensional ℂ Wq']
   {u u' : ℕ → ℝ}
 
@@ -151,30 +153,38 @@ lemma big_sh (p : KB.Pl P Wp Wq) (q : KB.Pl (shP P u u') Wp Wq') (f : B.Mat P.k 
 end sh
 
 theorem normaliser_across_places : NormAtShOfAmaps := by
-  intro P Wp Wq Wqp Wqm _ _ _ _ _ _ _ _ _ _ _ _ up up' um um' p pp pm f Ap Am ApPt AmPt b n₀ p₀
-    hz hz' hzm hzm' hA
+  intro P Wp Wq Wqp Wqm _ _ _ _ _ _ _ _ _ _ _ _ up up' um um' p pp pm f Ap Am ApPt AmPt b n₀ p₀ hz
+    hz' hzm hzm' hA
   obtain ⟨hAp, hAm, hadj, hnp, hnm⟩ := hA
-  refine ⟨fun γ hγ hG => ?_, fun c => big_sh p pp f Ap ApPt n₀ p₀ hz hz' hAp hnp c,
-    fun c => big_sh p pm f Am AmPt n₀ p₀ hzm hzm' hAm hnm c⟩
-  rw [Formalism.FourierDecayAlt.P.TBBx2.Tri.Ew_top p f hγ, ew_sh p pp hz hz' _ hγ, ew_sh p pm hzm hzm' _ hγ,
-    V_fpmSh p pp f Ap ApPt p₀ hz hz' hγ hG (hAp γ hγ hG),
+  refine ⟨
+    fun γ hγ hG => ?_,
+    fun c => big_sh p pp f Ap ApPt n₀ p₀ hz hz' hAp hnp c,
+    fun c => big_sh p pm f Am AmPt n₀ p₀ hzm hzm' hAm hnm c
+  ⟩
+  rw [Formalism.FourierDecayAlt.P.TBBx2.Tri.Ew_top p f hγ, ew_sh p pp hz hz' _ hγ,
+    ew_sh p pm hzm hzm' _ hγ, V_fpmSh p pp f Ap ApPt p₀ hz hz' hγ hG (hAp γ hγ hG),
     V_fpmSh p pm f Am AmPt p₀ hzm hzm' hγ hG (hAm γ hγ hG),
-    Formalism.FourierDecayAlt.P.TBBx4.hsVec_real_smul_sq, Formalism.FourierDecayAlt.P.TBBx4.hsVec_real_smul_sq]
-  have hX := hs_le_of_adj_sh (p.V f γ) (ApPt γ) (AmPt γ)
-    ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀) (hadj γ hγ hG)
+    Formalism.FourierDecayAlt.P.TBBx4.hsVec_real_smul_sq,
+    Formalism.FourierDecayAlt.P.TBBx4.hsVec_real_smul_sq]
+  have hX :=
+    hs_le_of_adj_sh (p.V f γ) (ApPt γ) (AmPt γ) ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀)
+      (hadj γ hγ hG)
   set nn := Real.sqrt (nPt P.k P.r (TTp p) γ) * Real.sqrt (nPt P.k P.r (TTp p) γ) with hnn_def
   set a1 := ‖B.hsVec ((p.V f γ).comp (ApPt γ))‖ ^ 2 with ha1
   set a2 := ‖B.hsVec ((p.V f γ).comp (AmPt γ))‖ ^ 2 with ha2
   have hnn : 0 ≤ nn := mul_self_nonneg _
   have hcanc : (Gp p γ)⁻¹ ^ (2 * p₀) * (Gp p γ ^ p₀) ^ 2 = 1 := by
     rw [← pow_mul, mul_comm p₀ 2, inv_pow, inv_mul_cancel₀ (pow_ne_zero _ hG.ne')]
-  have e : (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) *
-      (nn * ((Gp p γ ^ p₀) ^ 2 * a1) + nn * ((Gp p γ ^ p₀) ^ 2 * a2)) =
-      nn * ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (a1 + a2)) := by
-    rw [show (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀) *
-        (nn * ((Gp p γ ^ p₀) ^ 2 * a1) + nn * ((Gp p γ ^ p₀) ^ 2 * a2)) =
-        nn * ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (a1 + a2)) *
-          ((Gp p γ)⁻¹ ^ (2 * p₀) * (Gp p γ ^ p₀) ^ 2) by ring, hcanc, mul_one]
+  have e
+      : (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+          * (nn * ((Gp p γ ^ p₀) ^ 2 * a1) + nn * ((Gp p γ ^ p₀) ^ 2 * a2))
+        = nn * ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (a1 + a2)) := by
+    rw [show (3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (Gp p γ)⁻¹ ^ (2 * p₀)
+            * (nn * ((Gp p γ ^ p₀) ^ 2 * a1) + nn * ((Gp p γ ^ p₀) ^ 2 * a2))
+          = nn * ((3 * b) ^ (2 * n₀) * (Tq p / Gp p γ) ^ n₀ * (a1 + a2))
+            * ((Gp p γ)⁻¹ ^ (2 * p₀) * (Gp p γ ^ p₀) ^ 2) by
+        ring,
+      hcanc, mul_one]
   rw [e]
   exact mul_le_mul_of_nonneg_left hX hnn
 

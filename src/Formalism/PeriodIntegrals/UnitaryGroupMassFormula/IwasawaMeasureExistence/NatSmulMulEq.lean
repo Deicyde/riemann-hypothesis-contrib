@@ -26,8 +26,8 @@ theorem mem_Bx {N : ℕ} (hN : 0 < N) {a : Af I.F} (ha : N • a ∈ Ohat I.F) :
   refine ⟨N • a, ha, ?_⟩
   have hN0 : (N : I.F) ≠ 0 := by exact_mod_cast hN.ne'
   simp only
-  rw [nsmul_eq_mul, ← mul_assoc, ← map_natCast (algebraMap I.F (Af I.F)), ← map_mul, inv_mul_cancel₀ hN0,
-    map_one, one_mul]
+  rw [nsmul_eq_mul, ← mul_assoc, ← map_natCast (algebraMap I.F (Af I.F)), ← map_mul,
+    inv_mul_cancel₀ hN0, map_one, one_mul]
 
 end Cpt
 

@@ -12,8 +12,8 @@ namespace GroundTheory.Heights₂.Heights.HilbertSamuel
 
 open ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem GenDegGeomDeg.proof (hDG : GroundTheory.Heights₂.Heights.Inter.DegreeGeneric.Statement) :
-    GenDegGeomDeg.Statement := by
+theorem GenDegGeomDeg.proof (hDG : GroundTheory.Heights₂.Heights.Inter.DegreeGeneric.Statement)
+    : GenDegGeomDeg.Statement := by
   intro K _ ι _ Ω _ y D A hV hA
   classical
   have h := hDG K ι (mCoordIdeal y) D (fun _ => A) hV (fun _ => hA)

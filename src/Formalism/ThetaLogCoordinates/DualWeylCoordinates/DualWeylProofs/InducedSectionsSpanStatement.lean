@@ -59,8 +59,9 @@ lemma qh_span_transfer (T : Submodule R (GLCoord R n)) (u : GLCoord R n)
   have hle : Submodule.span R S ≤ T.comap L := Submodule.span_le.mpr (fun x hx => h x hx)
   exact hle hQ
 
-private theorem antitone_of_step_lemma {n : ℕ} (g : Fin n → ℤ) (h : ∀ l j : Fin n, (j : ℕ) = l + 1 → g j ≤ g l) :
-    Antitone g := by
+private theorem antitone_of_step_lemma
+    {n : ℕ} (g : Fin n → ℤ) (h : ∀ l j : Fin n, (j : ℕ) = l + 1 → g j ≤ g l)
+    : Antitone g := by
   intro a b hab
   obtain ⟨a, ha⟩ := a
   obtain ⟨b, hb⟩ := b
@@ -81,9 +82,11 @@ theorem highest_weight_corollary_one : InducedSectionsSpanStatement := by
       obtain ⟨k, Q, hk, hfQ, hQ⟩ := qh_reduce mu f hf
       rw [Formalism.GradedWeylDivisibility.standardMonomialSpanDomain R n n] at hQ
       rw [SetLike.mem_coe, hfQ]
-      refine qh_span_transfer (Submodule.span R (Set.range fun I : TIdx mu => mapCoord R (brk mu I))) _ _ ?_ Q hQ
+      refine qh_span_transfer
+        (Submodule.span R (Set.range fun I : TIdx mu => mapCoord R (brk mu I))) _ _ ?_ Q hQ
       rintro x ⟨K, sz, hsz, I, hsh, rfl⟩
-      exact qh_bidet_mem hmu k (hk _) sz hsz I (fun t => by rw [hsh]; exact Int.toNat_of_nonneg (hk t))
+      exact qh_bidet_mem hmu k (hk _) sz hsz I
+        (fun t => by rw [hsh]; exact Int.toNat_of_nonneg (hk t))
     · exact qh_span_le (by rintro _ ⟨I, rfl⟩; exact qh_brk_mem hmu I)
   · intro hmu
     ext f
@@ -99,7 +102,9 @@ theorem highest_weight_corollary_one : InducedSectionsSpanStatement := by
         simp
       apply hmu
       have hInt := Formalism.GradedWeylDivisibility.leadInterlaced R n n _ Q hQ hQ0
-      have hcol := Formalism.GradedWeylDivisibility.colSums R n n _ Q hQ _ (MonomialOrder.degree_mem_support (m := Formalism.GradedWeylDivisibility.colLex n n) hQ0)
+      have hcol :=
+        Formalism.GradedWeylDivisibility.colSums R n n _ Q hQ _
+          (MonomialOrder.degree_mem_support (m := Formalism.GradedWeylDivisibility.colLex n n) hQ0)
       set m := (Formalism.GradedWeylDivisibility.colLex n n).degree Q
       apply antitone_of_step_lemma mu
       intro l j hlj

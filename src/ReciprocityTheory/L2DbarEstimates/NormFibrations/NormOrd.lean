@@ -15,15 +15,15 @@ open Filter Topology
 
 def NormOrdStatement : Prop :=
   ∀ (n : ℕ) (M : Type u) [TopologicalSpace M] (z : M → V n) (f : M → ℂ) (x : M) (m : ℕ),
-    IsLocalHomeomorph z → Holo n z f → VanishesBeyond n z f x m →
-    Norm.VanishOrder n z f x (m + 1)
+    IsLocalHomeomorph z → Holo n z f → VanishesBeyond n z f x m → Norm.VanishOrder n z f x (m + 1)
 
 theorem normOrd : NormOrdStatement.{u} := by
   intro n M _ z f x m hz hf hv
   obtain ⟨e, he, hx⟩ := exists_chart n z hz x
   have hzx : z x ∈ e.target := by rw [he hx]; exact e.map_source hx
-  obtain ⟨C, hC⟩ := Y.bound_of_iteratedFDeriv_eq_zero (f ∘ e.symm) e.target (z x)
-    e.open_target hzx (hf e he) m (hv e he hx)
+  obtain ⟨C, hC⟩ :=
+    Y.bound_of_iteratedFDeriv_eq_zero (f ∘ e.symm) e.target (z x) e.open_target hzx (hf e he) m
+      (hv e he hx)
   have h1 : ∀ᶠ y in 𝓝 x, ‖(f ∘ e.symm) (z y)‖ ≤ C * ‖z y - z x‖ ^ (m + 1) :=
     hz.continuous.continuousAt.tendsto.eventually hC
   have h2 : ∀ᶠ y in 𝓝 x, y ∈ e.source := e.open_source.mem_nhds hx

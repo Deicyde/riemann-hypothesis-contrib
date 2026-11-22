@@ -23,8 +23,9 @@ end
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma apply_self_ne_zero_of_PD {h : V →ₗ⋆[K] V →ₗ[K] K}
     (hpd : _root_.GlobalTheory.Mass.PD h) {x : V} (hx : x ≠ 0) : h x x ≠ 0 := by
   unfold _root_.GlobalTheory.Mass.PD at hpd
@@ -35,8 +36,9 @@ private lemma apply_self_ne_zero_of_PD {h : V →ₗ⋆[K] V →ₗ[K] K}
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma nondegenerate_of_PD {h : V →ₗ⋆[K] V →ₗ[K] K}
     (hpd : _root_.GlobalTheory.Mass.PD h) : h.Nondegenerate :=
   ⟨fun x hx => by_contra fun h0 => apply_self_ne_zero_of_PD hpd h0 (hx x),
@@ -44,8 +46,9 @@ private lemma nondegenerate_of_PD {h : V →ₗ⋆[K] V →ₗ[K] K}
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma idxN_dual_hRes_ne_zero_of_isIntLat [FiniteDimensional K V] {h : V →ₗ⋆[K] V →ₗ[K] K}
     (hK : _root_.Formalism.HermitianLatticesTheory.IsCMUnram K) (hs : h.IsSymm) (hpd : _root_.GlobalTheory.Mass.PD h)
     (W : Submodule K V) {A : Submodule (𝓞 K) W}
@@ -59,8 +62,9 @@ private lemma idxN_dual_hRes_ne_zero_of_isIntLat [FiniteDimensional K V] {h : V 
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma index_sup_map_le_lemma_2 {W₁ W₂ : Submodule K V} {A₁ A₁' : Submodule (𝓞 K) W₁}
     {A₂ A₂' : Submodule (𝓞 K) W₂}
     (hn : _root_.GlobalTheory.Mass.idxN A₁' A₁ * _root_.GlobalTheory.Mass.idxN A₂' A₂ ≠ 0) :
@@ -112,8 +116,9 @@ private lemma index_sup_map_le_lemma_2 {W₁ W₂ : Submodule K V} {A₁ A₁' :
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma le_dual_of_apply_mem_one (h : V →ₗ⋆[K] V →ₗ[K] K) {L : Submodule (𝓞 K) V}
     (hL : ∀ x ∈ L, ∀ y ∈ L, h x y ∈ (1 : Submodule (𝓞 K) K)) : L ≤ _root_.Formalism.HermitianLatticesTheory.dual h L := by
   intro y hy
@@ -123,8 +128,9 @@ private lemma le_dual_of_apply_mem_one (h : V →ₗ⋆[K] V →ₗ[K] K) {L : S
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma apply_mem_one_of_isIntLat {h : V →ₗ⋆[K] V →ₗ[K] K} {L : Submodule (𝓞 K) V}
     (hL : _root_.GlobalTheory.Mass.IsIntLat h L) :
     ∀ x ∈ L, ∀ y ∈ L, h x y ∈ (1 : Submodule (𝓞 K) K) := by
@@ -135,24 +141,27 @@ private lemma apply_mem_one_of_isIntLat {h : V →ₗ⋆[K] V →ₗ[K] K} {L : 
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma mem_latIn_iff {W : Submodule K V} {L : Submodule (𝓞 K) V}
     {x : W} : x ∈ _root_.GlobalTheory.Mass.latIn W L ↔ (x : V) ∈ L := by
   unfold _root_.GlobalTheory.Mass.latIn; exact Iff.rfl
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma hRes_apply (h : V →ₗ⋆[K] V →ₗ[K] K) (W : Submodule K V)
     (x y : W) : _root_.GlobalTheory.Mass.hRes h W x y = h x y := by
   unfold _root_.GlobalTheory.Mass.hRes; rfl
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma apply_eq_zero_of_mem_perp {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm)
     {W : Submodule K V} {x w : V} (hx : x ∈ W) (hw : w ∈ _root_.GlobalTheory.Mass.perp h W) :
     h w x = 0 := by
@@ -160,8 +169,9 @@ private lemma apply_eq_zero_of_mem_perp {h : V →ₗ⋆[K] V →ₗ[K] K} (hs :
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
 private lemma le_sup_map_dual_latIn_perp {h : V →ₗ⋆[K] V →ₗ[K] K} (hs : h.IsSymm) {W : Submodule K V}
     (hc : IsCompl W (_root_.GlobalTheory.Mass.perp h W)) {L : Submodule (𝓞 K) V}
     (hL : ∀ x ∈ L, ∀ y ∈ L, h x y ∈ (1 : Submodule (𝓞 K) K)) :
@@ -191,62 +201,96 @@ private lemma le_sup_map_dual_latIn_perp {h : V →ₗ⋆[K] V →ₗ[K] K} (hs 
 
 open NumberField Matrix in
 open scoped ENNReal Classical in
-variable {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] in
-theorem _root_.GlobalTheory.Mass.Glue.main : ∀ (K V : Type) [Field K] [NumberField K]
-    [StarRing K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V]
-    [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K), _root_.Formalism.HermitianLatticesTheory.IsCMUnram K → h.IsSymm →
-    _root_.GlobalTheory.Mass.PD h → ∀ (U : Submodule K V) (A : Submodule (𝓞 K) U)
-    (B : Submodule (𝓞 K) (_root_.GlobalTheory.Mass.perp h U)) (e e' : ℕ),
-    _root_.GlobalTheory.Mass.IsIntLat (_root_.GlobalTheory.Mass.hRes h U) A →
-    _root_.GlobalTheory.Mass.IsIntLat (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B →
-    (∃ t : Finset ↥U, t.card ≤ e ∧ _root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A =
-      A ⊔ Submodule.span (𝓞 K) (t : Set _)) →
-    (∃ t : Finset ↥(_root_.GlobalTheory.Mass.perp h U), t.card ≤ e' ∧
-      _root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B =
-        B ⊔ Submodule.span (𝓞 K) (t : Set _)) →
-    {L : Submodule (𝓞 K) V | _root_.GlobalTheory.Mass.IsIntLat h L ∧ _root_.GlobalTheory.Mass.latIn U L = A ∧
-      _root_.GlobalTheory.Mass.latIn (_root_.GlobalTheory.Mass.perp h U) L = B}.encard ≤
-      (((_root_.GlobalTheory.Mass.discN (_root_.GlobalTheory.Mass.hRes h U) A *
-        _root_.GlobalTheory.Mass.discN
-          (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B) ^ (e + e') : ℕ) : ℕ∞) := by
+variable
+  {K V : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V]
+  [IsScalarTower (𝓞 K) K V] in
+theorem _root_.GlobalTheory.Mass.Glue.main
+    : ∀ (K V : Type) [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+        [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (h : V →ₗ⋆[K] V →ₗ[K] K),
+      _root_.Formalism.HermitianLatticesTheory.IsCMUnram K → h.IsSymm
+        → _root_.GlobalTheory.Mass.PD h
+        → ∀ (U : Submodule K V) (A : Submodule (𝓞 K) U)
+            (B : Submodule (𝓞 K) (_root_.GlobalTheory.Mass.perp h U)) (e e' : ℕ),
+          _root_.GlobalTheory.Mass.IsIntLat (_root_.GlobalTheory.Mass.hRes h U) A
+            → _root_.GlobalTheory.Mass.IsIntLat
+              (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B
+            → (∃ t : Finset ↥U,
+              t.card ≤ e
+                ∧ _root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U)
+                    A
+                  = A ⊔ Submodule.span (𝓞 K) (t : Set _))
+            → (∃ t : Finset ↥(_root_.GlobalTheory.Mass.perp h U),
+              t.card ≤ e'
+                ∧ _root_.Formalism.HermitianLatticesTheory.dual
+                    (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B
+                  = B ⊔ Submodule.span (𝓞 K) (t : Set _))
+            → {L : Submodule (𝓞 K) V | _root_.GlobalTheory.Mass.IsIntLat h L ∧ _root_.GlobalTheory.Mass.latIn U L = A ∧
+                _root_.GlobalTheory.Mass.latIn (_root_.GlobalTheory.Mass.perp h U) L = B}.encard
+              ≤ (((_root_.GlobalTheory.Mass.discN (_root_.GlobalTheory.Mass.hRes h U) A
+                      * _root_.GlobalTheory.Mass.discN
+                        (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B)
+                    ^ (e + e')
+                  : ℕ)
+                : ℕ∞) := by
   intro K V _ _ _ _ _ _ _ _ h hK hs hpd U A B e e' hA hB ⟨t, ht, htA⟩ ⟨t', ht', htB⟩
   have hc := ((_root_.GlobalTheory.Mass.Witt.witt_definite K V h hK hs hpd).2 U).1
   have hdA := idxN_dual_hRes_ne_zero_of_isIntLat hK hs hpd U hA
   have hdB := idxN_dual_hRes_ne_zero_of_isIntLat hK hs hpd _ hB
   unfold _root_.GlobalTheory.Mass.discN
-  obtain ⟨hle, hne⟩ := index_sup_map_le_lemma_2 (A₁ := A) (A₁' := _root_.Formalism.HermitianLatticesTheory.dual _ A) (A₂ := B)
-    (A₂' := _root_.Formalism.HermitianLatticesTheory.dual _ B) (mul_ne_zero hdA hdB)
-  have hXY : A.map (U.subtype.restrictScalars (𝓞 K)) ⊔
-      B.map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)) ≤
-      (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A).map (U.subtype.restrictScalars (𝓞 K)) ⊔
-      (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B).map
-        ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)) :=
+  obtain ⟨hle, hne⟩ :=
+    index_sup_map_le_lemma_2 (A₁ := A) (A₁' := _root_.Formalism.HermitianLatticesTheory.dual _ A)
+      (A₂ := B) (A₂' := _root_.Formalism.HermitianLatticesTheory.dual _ B) (mul_ne_zero hdA hdB)
+  have hXY
+      : A.map (U.subtype.restrictScalars (𝓞 K))
+          ⊔ B.map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K))
+        ≤ (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A).map
+            (U.subtype.restrictScalars (𝓞 K))
+          ⊔ (_root_.Formalism.HermitianLatticesTheory.dual
+              (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B).map
+            ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)) :=
     sup_le_sup (Submodule.map_mono (le_dual_of_apply_mem_one _ (apply_mem_one_of_isIntLat hA)))
       (Submodule.map_mono (le_dual_of_apply_mem_one _ (apply_mem_one_of_isIntLat hB)))
   have hT : (t.image Subtype.val ∪ t'.image Subtype.val).card ≤ e + e' :=
     (Finset.card_union_le _ _).trans
       (add_le_add (Finset.card_image_le.trans ht) (Finset.card_image_le.trans ht'))
-  have hY : (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A).map
-      (U.subtype.restrictScalars (𝓞 K)) ⊔
-      (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B).map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)) =
-      (A.map (U.subtype.restrictScalars (𝓞 K)) ⊔
-        B.map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K))) ⊔
-      Submodule.span (𝓞 K) ((t.image Subtype.val ∪ t'.image Subtype.val : Finset V) : Set V) := by
+  have hY
+      : (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A).map
+            (U.subtype.restrictScalars (𝓞 K))
+          ⊔ (_root_.Formalism.HermitianLatticesTheory.dual
+              (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B).map
+            ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K))
+        = (A.map (U.subtype.restrictScalars (𝓞 K))
+            ⊔ B.map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)))
+          ⊔ Submodule.span (𝓞 K)
+            ((t.image Subtype.val ∪ t'.image Subtype.val : Finset V) : Set V) := by
     rw [Finset.coe_union, Finset.coe_image, Finset.coe_image, Submodule.span_union, htA, htB,
       Submodule.map_sup, Submodule.map_sup, Submodule.map_span, Submodule.map_span]
     exact sup_sup_sup_comm _ _ _ _
-  have hcount := ((_root_.GlobalTheory.Mass.LatticeGens.gens_and_count K V _ _ hXY hne).2 (e + e') _
-    hT hY).1
-  have hpow : ((_root_.GlobalTheory.Mass.idxN
-      ((_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A).map (U.subtype.restrictScalars (𝓞 K)) ⊔
-        (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B).map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)))
-      (A.map (U.subtype.restrictScalars (𝓞 K)) ⊔
-        B.map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K))) ^ (e + e')
-        : ℕ) : ℕ∞) ≤
-      (((_root_.GlobalTheory.Mass.idxN (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U) A) A *
-        _root_.GlobalTheory.Mass.idxN (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h
-          (_root_.GlobalTheory.Mass.perp h U)) B) B) ^ (e + e') : ℕ) : ℕ∞) := by
+  have hcount :=
+    ((_root_.GlobalTheory.Mass.LatticeGens.gens_and_count K V _ _ hXY hne).2 (e + e') _ hT hY).1
+  have hpow
+      : ((_root_.GlobalTheory.Mass.idxN
+                ((_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U)
+                    A).map (U.subtype.restrictScalars (𝓞 K))
+                  ⊔ (_root_.Formalism.HermitianLatticesTheory.dual
+                      (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B).map
+                    ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)))
+                (A.map (U.subtype.restrictScalars (𝓞 K))
+                  ⊔ B.map ((_root_.GlobalTheory.Mass.perp h U).subtype.restrictScalars (𝓞 K)))
+              ^ (e + e')
+            : ℕ)
+          : ℕ∞)
+        ≤ (((_root_.GlobalTheory.Mass.idxN
+                  (_root_.Formalism.HermitianLatticesTheory.dual (_root_.GlobalTheory.Mass.hRes h U)
+                    A)
+                  A
+                * _root_.GlobalTheory.Mass.idxN
+                  (_root_.Formalism.HermitianLatticesTheory.dual
+                    (_root_.GlobalTheory.Mass.hRes h (_root_.GlobalTheory.Mass.perp h U)) B)
+                  B)
+              ^ (e + e')
+            : ℕ)
+          : ℕ∞) := by
     exact_mod_cast Nat.pow_le_pow_left hle (e + e')
   refine le_trans (Set.encard_le_encard ?_) (hcount.trans hpow)
   rintro L ⟨hL, hLU, hLP⟩

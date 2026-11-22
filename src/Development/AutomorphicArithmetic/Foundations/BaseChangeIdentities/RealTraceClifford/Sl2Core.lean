@@ -10,17 +10,19 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
-private theorem sl2Core {V : Type} [AddCommGroup V] [Module ℂ V] (E G A B : Module.End ℂ V)
+private theorem sl2Core
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (E G A B : Module.End ℂ V)
     (S : Submodule ℂ V) (hfin : FiniteDimensional ℂ S)
-    (hEG : ∀ v, E (G v) = G (E v) + A v - B v)
-    (hAG : ∀ v, A (G v) = G (A v) - G v)
-    (hBG : ∀ v, B (G v) = G (B v) + G v)
-    (hS : ∀ v ∈ S, G v ∈ S) (α β : ℂ) (x : V) (hxS : x ∈ S) (hx : x ≠ 0)
-    (hA : A x = α • x) (hB : B x = β • x) (hE : E x = 0) :
-    ∃ m : ℕ, α - β = (m : ℂ) := by
+    (hEG : ∀ v, E (G v) = G (E v) + A v - B v) (hAG : ∀ v, A (G v) = G (A v) - G v)
+    (hBG : ∀ v, B (G v) = G (B v) + G v) (hS : ∀ v ∈ S, G v ∈ S)
+    (α β : ℂ) (x : V)
+    (hxS : x ∈ S) (hx : x ≠ 0) (hA : A x = α • x) (hB : B x = β • x) (hE : E x = 0)
+    : ∃ m : ℕ, α - β = (m : ℂ) := by
   classical
   let v : ℕ → V := fun k => (G ^ k) x
   have hv0 : v 0 = x := by simp [v]
@@ -97,8 +99,12 @@ private theorem sl2Core {V : Type} [AddCommGroup V] [Module ℂ V] (E G A B : Mo
   have := (mul_eq_zero.mp hc).resolve_left hm1
   linear_combination this
 
-theorem UpperTheory.RealTr.hwDom :
-    ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V] (F : Fin n → Fin n → Module.End ℂ V), UF F → ∀ S : Submodule ℂ V, FiniteDimensional ℂ S → Stb F S → ∀ (ν : Wt n), ∀ x ∈ S, x ≠ 0 → x ∈ hw F ν → Dom ν := by
+theorem UpperTheory.RealTr.hwDom
+    : ∀ (n : ℕ) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+        (F : Fin n → Fin n → Module.End ℂ V),
+      UF F
+        → ∀ S : Submodule ℂ V,
+          FiniteDimensional ℂ S → Stb F S → ∀ (ν : Wt n), ∀ x ∈ S, x ≠ 0 → x ∈ hw F ν → Dom ν := by
   intro n V _ _ F hUF S hfin hStb ν x hxS hx hxw
   have hk : KHighest (fun _ => true) F ν x := hxw
   have hgl : GlRel F := hUF.gl
@@ -115,7 +121,8 @@ theorem UpperTheory.RealTr.hwDom :
   have hAG : ∀ v, F a a (F b a v) = F b a (F a a v) - F b a v := by
     intro v
     have h := LinearMap.congr_fun (hgl a a b a) v
-    simp only [if_neg hne, if_true, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply] at h
+    simp only [if_neg hne, if_true, LinearMap.sub_apply, Module.End.mul_apply, LinearMap.zero_apply]
+      at h
     rw [← sub_eq_zero]
     rw [← sub_eq_zero] at h
     convert h using 1
@@ -124,14 +131,16 @@ theorem UpperTheory.RealTr.hwDom :
     intro v
     have h := LinearMap.congr_fun (hgl b b b a) v
     simp only [if_neg hne, if_neg hne.symm, if_true, LinearMap.sub_apply, Module.End.mul_apply,
-      LinearMap.zero_apply] at h
+        LinearMap.zero_apply]
+      at h
     rw [← sub_eq_zero]
     rw [← sub_eq_zero] at h
     convert h using 1
     abel
   have hS : ∀ v ∈ S, F b a v ∈ S := fun v hv => hStb b a v hv
-  obtain ⟨m, hm⟩ := sl2Core (F a b) (F b a) (F a a) (F b b) S hfin hEG hAG hBG hS
-    (ν a : ℂ) (ν b : ℂ) x hxS hx (hk.1 a) (hk.1 b) (hk.2 a b hab rfl)
+  obtain ⟨m, hm⟩ :=
+    sl2Core (F a b) (F b a) (F a a) (F b b) S hfin hEG hAG hBG hS (ν a : ℂ) (ν b : ℂ) x hxS hx
+      (hk.1 a) (hk.1 b) (hk.2 a b hab rfl)
   refine ⟨m, ?_⟩
   apply Complex.ofReal_injective
   push_cast

@@ -16,7 +16,7 @@ variable {n : ℕ}
 
 def ExplicitFunctionSquareIntegrable : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (T : KType ε (lowK ε lam)) (μ : Fin n → ℤ),
-    IsHCParam lam → IsMu lam μ → ∀ ν : Measure (UJ ε), ν.IsHaarMeasure →
-      MemLp (fun g : UJ ε => PsiM T μ (toM g)) 2 ν
+    IsHCParam lam → IsMu lam μ
+      → ∀ ν : Measure (UJ ε), ν.IsHaarMeasure → MemLp (fun g : UJ ε => PsiM T μ (toM g)) 2 ν
 
 end PositivityTheory.RgDs

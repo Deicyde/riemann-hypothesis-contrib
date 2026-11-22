@@ -11,10 +11,11 @@ open _root_.Neutral.B1 ReciprocityTheory.DiscreteGroups.LocalClassField Polynomi
 variable {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[p] (PadicAlgCl p)}
 
 noncomputable def sigO (σ : GK p K) : Obar p →+* Obar p :=
-  ((σ : PadicAlgCl p →+* PadicAlgCl p).comp (Obar p).subtype).codRestrict (Obar p)
-    (fun x => mem_Obar_iff.2 (by
+  ((σ : PadicAlgCl p →+* PadicAlgCl p).comp (Obar p).subtype).codRestrict (Obar p) (fun x =>
+    mem_Obar_iff.2 (by
       change ‖σ (x : PadicAlgCl p)‖ ≤ 1
-      rw [norm_GK]; exact norm_le_one x))
+      rw [norm_GK]
+      exact norm_le_one x))
 
 theorem coe_sigO (σ : GK p K) (x : Obar p) : ((sigO σ x : Obar p) : PadicAlgCl p) = σ x := rfl
 
@@ -29,7 +30,8 @@ noncomputable def sigBar (σ : GK p K) : kbar p →+* kbar p :=
 
 theorem sigBar_res (σ : GK p K) (x : Obar p) : sigBar σ (res x) = res (sigO σ x) := rfl
 
-theorem sigBar_red (σ : GK p K) {x : PadicAlgCl p} (hx : ‖x‖ ≤ 1) : sigBar σ (red x) = red (σ x) := by
+theorem sigBar_red (σ : GK p K) {x : PadicAlgCl p} (hx : ‖x‖ ≤ 1)
+    : sigBar σ (red x) = red (σ x) := by
   rw [red_of_le hx, sigBar_res, ← red_coe, coe_sigO]
 
 theorem sigBar_of_mem (σ : GK p K) {c : kbar p} (hc : c ∈ resK p K) : sigBar σ c = c := by
@@ -40,14 +42,19 @@ theorem sigBar_of_mem (σ : GK p K) {c : kbar p} (hc : c ∈ resK p K) : sigBar 
   rw [coe_sigO]
   exact σ.commutes ⟨x, hx⟩
 
-theorem pow_pow_succ_sub {R : Type*} [Monoid R] {q n : ℕ} (hq : 0 < q) {c : R} (h : c ^ (q ^ n - 1) = 1) :
-    c ^ (q ^ n) = c := by
+theorem pow_pow_succ_sub
+    {R : Type*} [Monoid R] {q n : ℕ} (hq : 0 < q) {c : R} (h : c ^ (q ^ n - 1) = 1)
+    : c ^ (q ^ n) = c := by
   have h1 : 1 ≤ q ^ n := Nat.one_le_pow _ _ hq
   have : q ^ n = (q ^ n - 1) + 1 := by omega
   rw [this, pow_succ, h, one_mul]
 
-theorem exists_pow_of_GK (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 < n) (σ : GK p K)
-    {ζ : PadicAlgCl p} (hζ : ζ ^ (qK p K ^ n - 1) = 1) : ∃ i < n, σ ζ = ζ ^ (qK p K ^ i) := by
+theorem exists_pow_of_GK
+    (hK : FiniteDimensional ℚ_[p] K)
+    {n : ℕ} (hn : 0 < n)
+    (σ : GK p K)
+    {ζ : PadicAlgCl p} (hζ : ζ ^ (qK p K ^ n - 1) = 1)
+    : ∃ i < n, σ ζ = ζ ^ (qK p K ^ i) := by
   obtain ⟨f, hf, hqf⟩ := qK_eq_pow K hK
   have hq := one_lt_qK K hK
   set q := qK p K with hqdef
@@ -55,8 +62,7 @@ theorem exists_pow_of_GK (hK : FiniteDimensional ℚ_[p] K) {n : ℕ} (hn : 0 < 
   have hm0 : q ^ n - 1 ≠ 0 := by rintro h; exact hnd (h ▸ dvd_zero p)
   have h1 := norm_eq_one_of_pow hm0 hζ
   set c := red ζ with hc
-  have hcn : c ^ (q ^ n) = c := by
-    rw [hc, ← red_pow h1.le, pow_pow_succ_sub (by omega) hζ]
+  have hcn : c ^ (q ^ n) = c := by rw [hc, ← red_pow h1.le, pow_pow_succ_sub (by omega) hζ]
   have : ExpChar (kbar p) p := ExpChar.prime Fact.out
   let φ : kbar p →+* kbar p := iterateFrobenius (kbar p) p f
   have hφ : ∀ x, φ x = x ^ q := fun x => by rw [hqf]; rfl
@@ -108,18 +114,25 @@ theorem le_Kn (n : ℕ) : K ≤ Kn p K n := le_sup_left
 theorem mem_Kn_of_pow {n : ℕ} {ζ : PadicAlgCl p} (hζ : ζ ^ (qK p K ^ n - 1) = 1) : ζ ∈ Kn p K n :=
   (le_sup_right : _ ≤ Kn p K n) (IntermediateField.subset_adjoin _ _ hζ)
 
-theorem Kn_le {n : ℕ} {S : IntermediateField ℚ_[p] (PadicAlgCl p)} (h1 : K ≤ S)
-    (h2 : ∀ ζ : PadicAlgCl p, ζ ^ (qK p K ^ n - 1) = 1 → ζ ∈ S) : Kn p K n ≤ S :=
+theorem Kn_le
+    {n : ℕ} {S : IntermediateField ℚ_[p] (PadicAlgCl p)}
+    (h1 : K ≤ S) (h2 : ∀ ζ : PadicAlgCl p, ζ ^ (qK p K ^ n - 1) = 1 → ζ ∈ S)
+    : Kn p K n ≤ S :=
   sup_le h1 (IntermediateField.adjoin_le_iff.2 h2)
 
-theorem map_mem_Kn (n : ℕ) (σ : GK p K) {x : PadicAlgCl p} (hx : x ∈ Kn p K n) : σ x ∈ Kn p K n := by
-  have h : Kn p K n ≤ (Kn p K n).comap ((σ.restrictScalars ℚ_[p] : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p) :
-      PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p) := by
+theorem map_mem_Kn (n : ℕ) (σ : GK p K) {x : PadicAlgCl p} (hx : x ∈ Kn p K n)
+    : σ x ∈ Kn p K n := by
+  have h
+      : Kn p K n
+        ≤ (Kn p K n).comap
+          ((σ.restrictScalars ℚ_[p] : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p)
+            : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p) := by
     apply Kn_le
     · intro y hy
       change σ y ∈ Kn p K n
       have : σ y = y := σ.commutes ⟨y, hy⟩
-      rw [this]; exact le_Kn K n hy
+      rw [this]
+      exact le_Kn K n hy
     · intro ζ hζ
       change σ ζ ∈ Kn p K n
       apply mem_Kn_of_pow
@@ -127,18 +140,22 @@ theorem map_mem_Kn (n : ℕ) (σ : GK p K) {x : PadicAlgCl p} (hx : x ∈ Kn p K
   exact h hx
 
 noncomputable def eqField (σ τ : GK p K) : IntermediateField ℚ_[p] (PadicAlgCl p) where
-  toSubalgebra := AlgHom.equalizer
-    ((σ.restrictScalars ℚ_[p] : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p) : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p)
-    ((τ.restrictScalars ℚ_[p] : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p) : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p)
+  toSubalgebra :=
+    AlgHom.equalizer
+      ((σ.restrictScalars ℚ_[p] : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p)
+        : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p)
+      ((τ.restrictScalars ℚ_[p] : PadicAlgCl p ≃ₐ[ℚ_[p]] PadicAlgCl p)
+        : PadicAlgCl p →ₐ[ℚ_[p]] PadicAlgCl p)
   inv_mem' := by
     intro x hx
     have hx' : σ x = τ x := hx
     change σ x⁻¹ = τ x⁻¹
     rw [map_inv₀, map_inv₀, hx']
 
-theorem eqOn_Kn {n : ℕ} {σ τ : GK p K}
-    (h : ∀ ζ : PadicAlgCl p, ζ ^ (qK p K ^ n - 1) = 1 → σ ζ = τ ζ) {x : PadicAlgCl p} (hx : x ∈ Kn p K n) :
-    σ x = τ x := by
+theorem eqOn_Kn
+    {n : ℕ} {σ τ : GK p K} (h : ∀ ζ : PadicAlgCl p, ζ ^ (qK p K ^ n - 1) = 1 → σ ζ = τ ζ)
+    {x : PadicAlgCl p} (hx : x ∈ Kn p K n)
+    : σ x = τ x := by
   have h1 : Kn p K n ≤ eqField K σ τ := by
     apply Kn_le
     · intro y hy

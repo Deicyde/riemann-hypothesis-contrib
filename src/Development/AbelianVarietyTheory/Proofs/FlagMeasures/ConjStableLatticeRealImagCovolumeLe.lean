@@ -7,22 +7,28 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAddFun
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.RadCov
 
 namespace GlobalTheory.ReImLattice
 
 section General
 
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
-  [MeasurableSpace E] [BorelSpace E]
+variable
+  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E] [MeasurableSpace E]
+  [BorelSpace E]
 
-theorem covolume_prod (μ : Measure E) [μ.IsAddHaarMeasure] (L L' : Submodule ℤ E)
-    [DiscreteTopology L] [DiscreteTopology L'] [IsZLattice ℝ L] [IsZLattice ℝ L'] :
-    ZLattice.covolume (L.prod L') (μ.prod μ) = ZLattice.covolume L μ * ZLattice.covolume L' μ := by
-  have hD : IsAddFundamentalDomain (L.prod L') (latticeDomain L ×ˢ latticeDomain L')
-      (μ.prod μ) := by
-    refine IsAddFundamentalDomain.mk' ((measurableSet_latticeDomain L).prod
-      (measurableSet_latticeDomain L')).nullMeasurableSet fun x => ?_
+theorem covolume_prod
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (L L' : Submodule ℤ E)
+    [DiscreteTopology L] [DiscreteTopology L'] [IsZLattice ℝ L] [IsZLattice ℝ L']
+    : ZLattice.covolume (L.prod L') (μ.prod μ)
+      = ZLattice.covolume L μ * ZLattice.covolume L' μ := by
+  have hD
+      : IsAddFundamentalDomain (L.prod L') (latticeDomain L ×ˢ latticeDomain L') (μ.prod μ) := by
+    refine IsAddFundamentalDomain.mk'
+      ((measurableSet_latticeDomain L).prod (measurableSet_latticeDomain L')).nullMeasurableSet
+      fun x => ?_
     obtain ⟨a, ha, hu⟩ := existsUnique_add_mem_latticeDomain L x.1
     obtain ⟨a', ha', hu'⟩ := existsUnique_add_mem_latticeDomain L' x.2
     refine ⟨⟨(a, a'), a.2, a'.2⟩, ⟨?_, ?_⟩, ?_⟩
@@ -37,12 +43,14 @@ theorem covolume_prod (μ : Measure E) [μ.IsAddHaarMeasure] (L L' : Submodule �
     ZLattice.covolume_eq_measure_fundamentalDomain _ _ (isAddFundamentalDomain_latticeDomain L μ),
     ZLattice.covolume_eq_measure_fundamentalDomain _ _ (isAddFundamentalDomain_latticeDomain L' μ)]
 
-theorem reflection_stable (μ : Measure E) [μ.IsAddHaarMeasure] (M : Submodule ℤ (E × E))
-    [DiscreteTopology M] [IsZLattice ℝ M] (hM : ∀ p ∈ M, (p.1, -p.2) ∈ M) (A B : Submodule ℤ E)
-    (hA : ∀ y, y ∈ A ↔ (y, (0 : E)) ∈ M) (hB : ∀ y, y ∈ B ↔ ((0 : E), y) ∈ M) :
-    (∃ _ : DiscreteTopology A, IsZLattice ℝ A) ∧ (∃ _ : DiscreteTopology B, IsZLattice ℝ B) ∧
-      ZLattice.covolume A μ * ZLattice.covolume B μ ≤
-        2 ^ Module.finrank ℝ E * ZLattice.covolume M (μ.prod μ) := by
+theorem reflection_stable
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (M : Submodule ℤ (E × E)) [DiscreteTopology M] [IsZLattice ℝ M]
+    (hM : ∀ p ∈ M, (p.1, -p.2) ∈ M)
+    (A B : Submodule ℤ E) (hA : ∀ y, y ∈ A ↔ (y, (0 : E)) ∈ M) (hB : ∀ y, y ∈ B ↔ ((0 : E), y) ∈ M)
+    : (∃ _ : DiscreteTopology A, IsZLattice ℝ A) ∧ (∃ _ : DiscreteTopology B, IsZLattice ℝ B)
+      ∧ ZLattice.covolume A μ * ZLattice.covolume B μ
+        ≤ 2 ^ Module.finrank ℝ E * ZLattice.covolume M (μ.prod μ) := by
   have h2A : ∀ p ∈ M, p.1 + p.1 ∈ A := fun p hp => by
     rw [hA]
     have := M.add_mem hp (hM p hp)
@@ -63,8 +71,9 @@ theorem reflection_stable (μ : Measure E) [μ.IsAddHaarMeasure] (M : Submodule 
       (f := fun x : B => (⟨(0, x.1), (hB _).1 x.2⟩ : M))
       ((continuous_const.prodMk continuous_subtype_val).subtype_mk _)
       (fun x y h => Subtype.ext (congrArg (fun z : M => z.1.2) h))
-  have key : ∀ (C : Submodule ℤ E) (f : E × E →ₗ[ℝ] E), Function.Surjective f →
-      (∀ p ∈ M, f p + f p ∈ C) → Submodule.span ℝ (C : Set E) = ⊤ := by
+  have key
+      : ∀ (C : Submodule ℤ E) (f : E × E →ₗ[ℝ] E),
+        Function.Surjective f → (∀ p ∈ M, f p + f p ∈ C) → Submodule.span ℝ (C : Set E) = ⊤ := by
     intro C f hf hC
     rw [eq_top_iff, ← LinearMap.range_eq_top.2 hf, LinearMap.range_eq_map,
       ← IsZLattice.span_top (K := ℝ) (L := M), Submodule.map_span, Submodule.span_le]
@@ -79,14 +88,16 @@ theorem reflection_stable (μ : Measure E) [μ.IsAddHaarMeasure] (M : Submodule 
     simpa using this
   rw [← covolume_prod μ A B, covolume_eq_relIndex_mul_of_haar (μ.prod μ) _ M hle]
   refine mul_le_mul_of_nonneg_right ?_ (ZLattice.covolume_pos M (μ.prod μ)).le
-  let f : M.toAddSubgroup →+ A :=
-    { toFun := fun p => ⟨p.1.1 + p.1.1, h2A _ p.2⟩
-      map_zero' := by ext; simp
-      map_add' := fun p q => by ext; simp; abel }
+  let f : M.toAddSubgroup →+ A := {
+    toFun := fun p => ⟨p.1.1 + p.1.1, h2A _ p.2⟩
+    map_zero' := by ext; simp
+    map_add' := fun p q => by ext; simp; abel
+  }
   have hK : (nsmulAddMonoidHom (α := A) 2).range.index = 2 ^ Module.finrank ℝ E := by
     rw [AddSubgroup.index_range_nsmul, ZLattice.rank ℝ A]
-  have hc : (A.prod B).toAddSubgroup.addSubgroupOf M.toAddSubgroup =
-      (nsmulAddMonoidHom (α := A) 2).range.comap f := by
+  have hc
+      : (A.prod B).toAddSubgroup.addSubgroupOf M.toAddSubgroup
+        = (nsmulAddMonoidHom (α := A) 2).range.comap f := by
     ext p
     simp only [AddSubgroup.mem_addSubgroupOf, Submodule.mem_toAddSubgroup, Submodule.mem_prod,
       AddSubgroup.mem_comap, AddMonoidHom.mem_range, nsmulAddMonoidHom_apply]
@@ -114,21 +125,24 @@ theorem reflection_stable (μ : Measure E) [μ.IsAddHaarMeasure] (M : Submodule 
 
 end General
 
-noncomputable def reImEquiv (ι κ : Type) [Fintype ι] [Fintype κ] :
-    ((ι → κ → ℝ) × (ι → κ → ℝ)) ≃L[ℝ] (ι → κ → ℂ) :=
-  LinearEquiv.toContinuousLinearEquiv
-    { toFun := fun p v i => ⟨p.1 v i, p.2 v i⟩
-      invFun := fun z => (fun v i => (z v i).re, fun v i => (z v i).im)
-      map_add' := fun p q => by ext v i; apply Complex.ext <;> simp
-      map_smul' := fun c p => by ext v i; apply Complex.ext <;> simp
-      left_inv := fun p => rfl
-      right_inv := fun z => rfl }
+noncomputable def reImEquiv (ι κ : Type) [Fintype ι] [Fintype κ]
+    : ((ι → κ → ℝ) × (ι → κ → ℝ)) ≃L[ℝ] (ι → κ → ℂ) :=
+  LinearEquiv.toContinuousLinearEquiv {
+    toFun := fun p v i => ⟨p.1 v i, p.2 v i⟩
+    invFun := fun z => (fun v i => (z v i).re, fun v i => (z v i).im)
+    map_add' := fun p q => by ext v i; apply Complex.ext <;> simp
+    map_smul' := fun c p => by ext v i; apply Complex.ext <;> simp
+    left_inv := fun p => rfl
+    right_inv := fun z => rfl
+  }
 
-theorem reImEquiv_apply {ι κ : Type} [Fintype ι] [Fintype κ] (p : (ι → κ → ℝ) × (ι → κ → ℝ))
-    (v : ι) (i : κ) : reImEquiv ι κ p v i = ⟨p.1 v i, p.2 v i⟩ := rfl
+theorem reImEquiv_apply
+    {ι κ : Type} [Fintype ι] [Fintype κ] (p : (ι → κ → ℝ) × (ι → κ → ℝ)) (v : ι) (i : κ)
+    : reImEquiv ι κ p v i = ⟨p.1 v i, p.2 v i⟩ :=
+  rfl
 
-theorem measurePreserving_reImEquiv (ι κ : Type) [Fintype ι] [Fintype κ] :
-    MeasurePreserving (reImEquiv ι κ) (Measure.prod volume volume) volume := by
+theorem measurePreserving_reImEquiv (ι κ : Type) [Fintype ι] [Fintype κ]
+    : MeasurePreserving (reImEquiv ι κ) (Measure.prod volume volume) volume := by
   have h1 := (volume_measurePreserving_arrowProdEquivProdArrow (κ → ℝ) (κ → ℝ) ι).symm
   have h2 := (volume_measurePreserving_arrowProdEquivProdArrow ℝ ℝ κ).symm
   have h3 := Complex.volume_preserving_equiv_real_prod.symm
@@ -136,22 +150,36 @@ theorem measurePreserving_reImEquiv (ι κ : Type) [Fintype ι] [Fintype κ] :
   have h5 := volume_preserving_pi (ι := ι) (fun _ => h4.comp h2)
   exact h5.comp h1
 
-theorem real_imag_covolume_le : ∀ (ι κ : Type) [Fintype ι] [Fintype κ] (L : Submodule ℤ (ι → κ → ℂ)) [DiscreteTopology L] [IsZLattice ℝ L], (∀ z ∈ L, (fun v i => starRingEnd ℂ (z v i)) ∈ L) → ∀ A B : Submodule ℤ (ι → κ → ℝ), (∀ y, y ∈ A ↔ (fun v i => (y v i : ℂ)) ∈ L) → (∀ y, y ∈ B ↔ (fun v i => Complex.I * (y v i : ℂ)) ∈ L) → (∃ _ : DiscreteTopology A, IsZLattice ℝ A) ∧ (∃ _ : DiscreteTopology B, IsZLattice ℝ B) ∧ ZLattice.covolume A volume * ZLattice.covolume B volume ≤ 2 ^ (Fintype.card ι * Fintype.card κ) * ZLattice.covolume L volume := by
+theorem real_imag_covolume_le
+    : ∀ (ι κ : Type) [Fintype ι] [Fintype κ] (L : Submodule ℤ (ι → κ → ℂ)) [DiscreteTopology L]
+        [IsZLattice ℝ L],
+      (∀ z ∈ L, (fun v i => starRingEnd ℂ (z v i)) ∈ L)
+        → ∀ A B : Submodule ℤ (ι → κ → ℝ),
+          (∀ y, y ∈ A ↔ (fun v i => (y v i : ℂ)) ∈ L)
+            → (∀ y, y ∈ B ↔ (fun v i => Complex.I * (y v i : ℂ)) ∈ L)
+            → (∃ _ : DiscreteTopology A, IsZLattice ℝ A)
+              ∧ (∃ _ : DiscreteTopology B, IsZLattice ℝ B)
+              ∧ ZLattice.covolume A volume * ZLattice.covolume B volume
+                ≤ 2 ^ (Fintype.card ι * Fintype.card κ) * ZLattice.covolume L volume := by
   intro ι κ _ _ L _ _ hL A B hA hB
   have hmem : ∀ p, p ∈ ZLattice.comap ℝ L (reImEquiv ι κ).toLinearMap ↔ reImEquiv ι κ p ∈ L :=
     fun p => Iff.rfl
-  have h := reflection_stable volume (ZLattice.comap ℝ L (reImEquiv ι κ).toLinearMap)
-    (fun p hp => by
-      rw [hmem] at hp ⊢
-      convert hL _ hp using 1
-      ext v i; apply Complex.ext <;> simp [reImEquiv_apply]) A B
-    (fun y => by
-      rw [hA, hmem]
-      congr! 1)
-    (fun y => by
-      rw [hB, hmem]
-      congr! 1
-      ext v i; apply Complex.ext <;> simp [reImEquiv_apply])
+  have h :=
+    reflection_stable volume (ZLattice.comap ℝ L (reImEquiv ι κ).toLinearMap)
+      (fun p hp => by
+        rw [hmem] at hp ⊢
+        convert hL _ hp using 1
+        ext v i
+        apply Complex.ext <;> simp [reImEquiv_apply])
+      A B
+      (fun y => by
+        rw [hA, hmem]
+        congr! 1)
+      (fun y => by
+        rw [hB, hmem]
+        congr! 1
+        ext v i
+        apply Complex.ext <;> simp [reImEquiv_apply])
   haveI : (volume : Measure (κ → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   haveI : (volume : Measure (ι → κ → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   haveI : (volume : Measure (κ → ℝ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _

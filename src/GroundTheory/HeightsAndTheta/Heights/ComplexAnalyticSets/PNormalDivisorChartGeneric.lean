@@ -16,8 +16,10 @@ noncomputable section
 
 namespace NormalDivisorChartGeneric
 
-theorem ringKrullDim_le_of_injective_isIntegral {R S : Type*} [CommRing R] [CommRing S] (f : R →+* S)
-    (hinj : Function.Injective f) (hint : f.IsIntegral) : ringKrullDim R ≤ ringKrullDim S := by
+theorem ringKrullDim_le_of_injective_isIntegral
+    {R S : Type*} [CommRing R] [CommRing S]
+    (f : R →+* S) (hinj : Function.Injective f) (hint : f.IsIntegral)
+    : ringKrullDim R ≤ ringKrullDim S := by
   let : Algebra R S := f.toAlgebra
   have : Algebra.IsIntegral R S := ⟨hint⟩
   refine iSup_le fun l => ?_
@@ -31,15 +33,19 @@ theorem ringKrullDim_le_of_injective_isIntegral {R S : Type*} [CommRing R] [Comm
   obtain ⟨L, hlen, -, -⟩ := Ideal.exists_ltSeries_of_hasGoingUp l P
   exact le_iSup_of_le L (by rw [hlen])
 
-theorem isIntegral_mk_comp_rename {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
-    (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J) {B : Ideal (MvPolynomial (Fin n ⊕ Fin M.m) ℂ)} (hB : M.ideal ≤ B) :
-    ((Ideal.Quotient.mk B).comp (rename (Sum.inl : Fin n → Fin n ⊕ Fin M.m)).toRingHom).IsIntegral := by
+theorem isIntegral_mk_comp_rename
+    {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
+    (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J)
+    {B : Ideal (MvPolynomial (Fin n ⊕ Fin M.m) ℂ)} (hB : M.ideal ≤ B)
+    : ((Ideal.Quotient.mk B).comp
+      (rename (Sum.inl : Fin n → Fin n ⊕ Fin M.m)).toRingHom).IsIntegral := by
   set f := (Ideal.Quotient.mk B).comp (rename (Sum.inl : Fin n → Fin n ⊕ Fin M.m)).toRingHom with hf
   let : Algebra (MvPolynomial (Fin n) ℂ) (MvPolynomial (Fin n ⊕ Fin M.m) ℂ ⧸ B) := f.toAlgebra
   have hX : ∀ s, IsIntegral (MvPolynomial (Fin n) ℂ) (Ideal.Quotient.mk B (X s)) := by
     rintro (i | i)
-    · have h : Ideal.Quotient.mk B (X (Sum.inl i)) =
-          algebraMap (MvPolynomial (Fin n) ℂ) (MvPolynomial (Fin n ⊕ Fin M.m) ℂ ⧸ B) (X i) := by
+    · have h
+          : Ideal.Quotient.mk B (X (Sum.inl i))
+            = algebraMap (MvPolynomial (Fin n) ℂ) (MvPolynomial (Fin n ⊕ Fin M.m) ℂ ⧸ B) (X i) := by
         show _ = f (X i)
         simp [hf]
       rw [h]
@@ -54,8 +60,9 @@ theorem isIntegral_mk_comp_rename {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ
   show IsIntegral (MvPolynomial (Fin n) ℂ) (Ideal.Quotient.mk B p)
   induction p using MvPolynomial.induction_on with
   | C a =>
-    have h : Ideal.Quotient.mk B (C a) =
-        algebraMap (MvPolynomial (Fin n) ℂ) (MvPolynomial (Fin n ⊕ Fin M.m) ℂ ⧸ B) (C a) := by
+    have h
+        : Ideal.Quotient.mk B (C a)
+          = algebraMap (MvPolynomial (Fin n) ℂ) (MvPolynomial (Fin n ⊕ Fin M.m) ℂ ⧸ B) (C a) := by
       show _ = f (C a)
       simp [hf]
     rw [h]
@@ -67,7 +74,8 @@ theorem isIntegral_mk_comp_rename {n : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ
     rw [map_mul]
     exact hp.mul (hX s)
 
-theorem proof (hUp : NormalModelDivisorChartGeneric.Statement) : NormalDivisorChartGeneric.Statement := by
+theorem proof (hUp : NormalModelDivisorChartGeneric.Statement)
+    : NormalDivisorChartGeneric.Statement := by
   intro n d J u M hJ hdim hu
   obtain ⟨B, hleB, hdimB, hB⟩ := hUp n d J u M hJ hdim hu
   refine ⟨B.comap (rename (Sum.inl : Fin n → Fin n ⊕ Fin M.m)).toRingHom, ?_, ?_, ?_⟩

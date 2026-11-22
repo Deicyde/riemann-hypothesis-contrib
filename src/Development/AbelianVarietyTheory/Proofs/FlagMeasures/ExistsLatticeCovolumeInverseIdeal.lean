@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.TranslatedLat
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.OrbitTerm Module
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas GlobalTheory.FlagBase GlobalTheory.OrbitTerm Module
 open scoped nonZeroDivisors
 
 noncomputable section
@@ -24,8 +25,8 @@ def lat (I : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) (Fin 1 → E) :
 theorem mem_lat (I : FractionalIdeal (𝓞 E)⁰ E) (y : Fin 1 → E) : y ∈ lat E I ↔ y 0 ∈ I := by
   simp [lat]
 
-theorem lat_eq_map (I : FractionalIdeal (𝓞 E)⁰ E) :
-    lat E I = (I : Submodule (𝓞 E) E).map (LinearMap.single (𝓞 E) (fun _ : Fin 1 => E) 0) := by
+theorem lat_eq_map (I : FractionalIdeal (𝓞 E)⁰ E)
+    : lat E I = (I : Submodule (𝓞 E) E).map (LinearMap.single (𝓞 E) (fun _ : Fin 1 => E) 0) := by
   ext y
   rw [mem_lat, Submodule.mem_map]
   constructor
@@ -37,14 +38,17 @@ theorem lat_eq_map (I : FractionalIdeal (𝓞 E)⁰ E) :
   · rintro ⟨x, hx, rfl⟩
     simpa using hx
 
-theorem isLattice_lat (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0) : Submodule.IsLattice E (lat E I) := by
+theorem isLattice_lat (I : FractionalIdeal (𝓞 E)⁰ E) (hI : I ≠ 0)
+    : Submodule.IsLattice E (lat E I) := by
   apply Submodule.IsLattice.of_fg
   rw [lat_eq_map]
   exact (FractionalIdeal.fg_of_isNoetherianRing le_rfl I).map _
 
-theorem latAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal (𝓞 E)⁰ E)ˣ) :
-    latAt E 1 (lat E I.1) (oneInf E 1) = Submodule.span ℤ (Set.range
-      ((Pi.basis fun _ : Fin 1 => mixedEmbedding.fractionalIdealLatticeBasis E I).map (mix E 1))) := by
+theorem latAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal (𝓞 E)⁰ E)ˣ)
+    : latAt E 1 (lat E I.1) (oneInf E 1)
+      = Submodule.span ℤ
+        (Set.range ((Pi.basis fun _ : Fin 1 => mixedEmbedding.fractionalIdealLatticeBasis E I).map
+          (mix E 1))) := by
   set B := mixedEmbedding.fractionalIdealLatticeBasis E I
 
   let φ : mixedEmbedding.mixedSpace E →ₗ[ℤ] VecInf E 1 :=
@@ -52,8 +56,10 @@ theorem latAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal 
       (AddMonoidHom.single (fun _ : Fin 1 => mixedEmbedding.mixedSpace E) 0)).toIntLinearMap
   have hφ : ∀ z, φ z = mix E 1 (Pi.single 0 z) := fun _ => rfl
 
-  have key : ∀ (y : Fin 1 → E) (w : InfinitePlace E),
-      (Matrix.of (oneInf E 1 w))⁻¹ *ᵥ (fun a => w.embedding (y a)) = φ (mixedEmbedding E (y 0)) w := by
+  have key
+      : ∀ (y : Fin 1 → E) (w : InfinitePlace E),
+        (Matrix.of (oneInf E 1 w))⁻¹ *ᵥ (fun a => w.embedding (y a))
+          = φ (mixedEmbedding E (y 0)) w := by
     intro y w
     rw [of_oneInf, inv_one, one_mulVec, hφ]
     funext a
@@ -69,7 +75,8 @@ theorem latAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal 
     · rintro ⟨_, ⟨k, rfl⟩, rfl⟩
       exact ⟨⟨0, k⟩, by simp [hφ, Basis.map_apply, Pi.basis_apply]⟩
 
-  have hspan : Submodule.span ℤ (mixedEmbedding E '' (I.1 : Set E)) = Submodule.span ℤ (Set.range B) := by
+  have hspan
+      : Submodule.span ℤ (mixedEmbedding E '' (I.1 : Set E)) = Submodule.span ℤ (Set.range B) := by
     conv_rhs => rw [← Submodule.span_eq (Submodule.span ℤ (Set.range B))]
     congr 1
     ext x
@@ -84,10 +91,10 @@ theorem latAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal 
   · rintro ⟨t, ht, rfl⟩
     exact ⟨fun _ => t, (mem_lat E _ _).2 ht, funext fun w => key _ w⟩
 
-theorem covAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal (𝓞 E)⁰ E)ˣ) :
-    covAt E 1 (latAt E 1 (lat E I.1) (oneInf E 1)) =
-      (FractionalIdeal.absNorm I.1 : ℝ) * Formalism.HermitianLatticesTheory.vInv E ^ Formalism.HermitianLatticesTheory.fDeg E := by
-
+theorem covAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal (𝓞 E)⁰ E)ˣ)
+    : covAt E 1 (latAt E 1 (lat E I.1) (oneInf E 1))
+      = (FractionalIdeal.absNorm I.1 : ℝ)
+        * Formalism.HermitianLatticesTheory.vInv E ^ Formalism.HermitianLatticesTheory.fDeg E := by
   have hO := volume_fd_intB E 1
   rw [mul_one, intB, volume_fd_map, pow_one, measureReal_def] at hO
 
@@ -95,20 +102,31 @@ theorem covAt_lat [_root_.NumberField.IsTotallyComplex E] (I : (FractionalIdeal 
     mixedEmbedding.volume_fundamentalDomain_fractionalIdealLatticeBasis, ENNReal.toReal_mul,
     ENNReal.toReal_ofReal (Rat.cast_nonneg.mpr (FractionalIdeal.absNorm_nonneg _)), hO]
 
-theorem covolume_inv_ideal : ∀ (E : Type) [Field E] [NumberField E], IsTotallyComplex E → ∀ 𝔞 : Ideal (𝓞 E), 𝔞 ≠ ⊥ → ∃ Λ₀ : Submodule (𝓞 E) (Fin 1 → E), (∀ y, y ∈ Λ₀ ↔ ∀ t ∈ 𝔞, (t : E) * y 0 ∈ (algebraMap (𝓞 E) E).range) ∧ Submodule.IsLattice E Λ₀ ∧ covAt E 1 (latAt E 1 Λ₀ (oneInf E 1)) = Formalism.HermitianLatticesTheory.vInv E ^ Formalism.HermitianLatticesTheory.fDeg E / (Ideal.absNorm 𝔞 : ℝ) := by
+theorem covolume_inv_ideal
+    : ∀ (E : Type) [Field E] [NumberField E],
+      IsTotallyComplex E
+        → ∀ 𝔞 : Ideal (𝓞 E),
+          𝔞 ≠ ⊥
+            → ∃ Λ₀ : Submodule (𝓞 E) (Fin 1 → E),
+              (∀ y, y ∈ Λ₀ ↔ ∀ t ∈ 𝔞, (t : E) * y 0 ∈ (algebraMap (𝓞 E) E).range)
+                ∧ Submodule.IsLattice E Λ₀
+                ∧ covAt E 1 (latAt E 1 Λ₀ (oneInf E 1))
+                  = Formalism.HermitianLatticesTheory.vInv E
+                      ^ Formalism.HermitianLatticesTheory.fDeg E
+                    / (Ideal.absNorm 𝔞 : ℝ) := by
   intro E _ _ hE 𝔞 h𝔞
-  have hne : (𝔞 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
-    rwa [Ne, FractionalIdeal.coeIdeal_eq_zero]
+  have hne : (𝔞 : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by rwa [Ne, FractionalIdeal.coeIdeal_eq_zero]
 
-  let J : (FractionalIdeal (𝓞 E)⁰ E)ˣ := Units.mk0 (𝔞 : FractionalIdeal (𝓞 E)⁰ E)⁻¹ (inv_ne_zero hne)
+  let J : (FractionalIdeal (𝓞 E)⁰ E)ˣ :=
+    Units.mk0 (𝔞 : FractionalIdeal (𝓞 E)⁰ E)⁻¹ (inv_ne_zero hne)
   refine ⟨lat E J.1, fun y => ?_, isLattice_lat E J.1 (inv_ne_zero hne), ?_⟩
   · rw [mem_lat]
     change y 0 ∈ (𝔞 : FractionalIdeal (𝓞 E)⁰ E)⁻¹ ↔ _
     rw [FractionalIdeal.mem_inv_iff hne]
     constructor
     · intro h t ht
-      obtain ⟨r, hr⟩ := (FractionalIdeal.mem_one_iff _).1
-        (h (t : E) (FractionalIdeal.mem_coeIdeal_of_mem _ ht))
+      obtain ⟨r, hr⟩ :=
+        (FractionalIdeal.mem_one_iff _).1 (h (t : E) (FractionalIdeal.mem_coeIdeal_of_mem _ ht))
       exact ⟨r, by rw [hr, mul_comm]⟩
     · intro h x hx
       obtain ⟨t, ht, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hx

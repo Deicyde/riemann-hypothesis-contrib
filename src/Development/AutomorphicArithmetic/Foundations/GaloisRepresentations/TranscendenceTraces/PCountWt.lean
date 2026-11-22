@@ -5,10 +5,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-private theorem isLC_sum {X ι : Type*} [TopologicalSpace X] (s : Finset ι) (f : ι → X → ℤ)
-    (h : ∀ j, IsLocallyConstant (f j)) : IsLocallyConstant (fun t => ∑ j ∈ s, f j t) := by
+private theorem isLC_sum
+    {X ι : Type*} [TopologicalSpace X]
+    (s : Finset ι)
+    (f : ι → X → ℤ) (h : ∀ j, IsLocallyConstant (f j))
+    : IsLocallyConstant (fun t => ∑ j ∈ s, f j t) := by
   classical
   induction s using Finset.induction_on with
   | empty =>
@@ -18,12 +22,15 @@ private theorem isLC_sum {X ι : Type*} [TopologicalSpace X] (s : Finset ι) (f 
     simp only [Finset.sum_insert ha]
     exact (h a).add ih
 
-private theorem key {T Z S : Scheme.{0}} {p : Z ⟶ S} {π : T ⟶ S} {ι : Type} [Fintype ι] [IsFinite p]
-    (hFib : FibFin) (σ : ι → (T ⟶ Z)) (m : ι → ℤ) (w : Wt Z) (hC : Counts p π σ m w) (A : Sq p)
-    (φ : A.V → ℤ) (Ω : Type) [Field Ω] [IsAlgClosed Ω] {U1 : Scheme.{0}} (f : U1 ⟶ T) (g : U1 ⟶ A.U)
-    (hfg : f ≫ π = g ≫ A.u) (τ : ι → (U1 ⟶ A.V)) (hτv : ∀ j, τ j ≫ A.v = f ≫ σ j)
-    (hτr : ∀ j, τ j ≫ A.r = g) (x1 : gp Ω ⟶ U1) :
-    ∑ j, m j * φ (τ j (pt x1)) = ∑ᶠ z ∈ fib A.r (x1 ≫ g), w Ω (z ≫ A.v) * φ (pt z) := by
+private theorem key
+    {T Z S : Scheme.{0}} {p : Z ⟶ S} {π : T ⟶ S} {ι : Type} [Fintype ι] [IsFinite p]
+    (hFib : FibFin)
+    (σ : ι → (T ⟶ Z)) (m : ι → ℤ) (w : Wt Z) (hC : Counts p π σ m w)
+    (A : Sq p) (φ : A.V → ℤ)
+    (Ω : Type) [Field Ω] [IsAlgClosed Ω]
+    {U1 : Scheme.{0}} (f : U1 ⟶ T) (g : U1 ⟶ A.U) (hfg : f ≫ π = g ≫ A.u) (τ : ι → (U1 ⟶ A.V))
+    (hτv : ∀ j, τ j ≫ A.v = f ≫ σ j) (hτr : ∀ j, τ j ≫ A.r = g) (x1 : gp Ω ⟶ U1)
+    : ∑ j, m j * φ (τ j (pt x1)) = ∑ᶠ z ∈ fib A.r (x1 ≫ g), w Ω (z ≫ A.v) * φ (pt z) := by
   classical
   haveI : IsFinite A.r := A.finite
   have hfin := hFib A.r Ω (x1 ≫ g)
@@ -40,8 +47,7 @@ private theorem key {T Z S : Scheme.{0}} {p : Z ⟶ S} {π : T ⟶ S} {ι : Type
       · rw [Category.assoc, hτr, hz']
     · intro h
       rw [← h, Category.assoc, Category.assoc, hτv]
-  have hw : ∀ z ∈ fib A.r (x1 ≫ g),
-      w Ω (z ≫ A.v) = ∑ j, if x1 ≫ τ j = z then m j else 0 := by
+  have hw : ∀ z ∈ fib A.r (x1 ≫ g), w Ω (z ≫ A.v) = ∑ j, if x1 ≫ τ j = z then m j else 0 := by
     intro z hz
     have hz' : z ≫ A.r = x1 ≫ g := hz
     have hsq : (z ≫ A.v) ≫ p = (x1 ≫ f) ≫ π := by
@@ -50,10 +56,10 @@ private theorem key {T Z S : Scheme.{0}} {p : Z ⟶ S} {π : T ⟶ S} {ι : Type
     apply Finset.sum_congr rfl
     intro j _
     by_cases h : x1 ≫ τ j = z
-    · rw [Set.indicator_of_mem
-        (show j ∈ {j | (x1 ≫ f) ≫ σ j = z ≫ A.v} from (hiff z hz j).mpr h) m, if_pos h]
+    · rw [Set.indicator_of_mem (show j ∈ {j | (x1 ≫ f) ≫ σ j = z ≫ A.v} from (hiff z hz j).mpr h) m,
+        if_pos h]
     · rw [Set.indicator_of_notMem
-        (show j ∉ {j | (x1 ≫ f) ≫ σ j = z ≫ A.v} from fun h' => h ((hiff z hz j).mp h')) m,
+          (show j ∉ {j | (x1 ≫ f) ≫ σ j = z ≫ A.v} from fun h' => h ((hiff z hz j).mp h')) m,
         if_neg h]
   rw [finsum_mem_eq_finite_toFinset_sum _ hfin]
   rw [Finset.sum_congr rfl
@@ -66,8 +72,7 @@ private theorem key {T Z S : Scheme.{0}} {p : Z ⟶ S} {π : T ⟶ S} {ι : Type
   simp only [ite_mul, zero_mul]
   rw [Finset.sum_ite_eq, if_pos (hfin.mem_toFinset.mpr (hmem j)), pt_comp]
 
-theorem UpperTheory.Gal.TranscendenceTraces.countWt_of :
-    PtEx → PtLift → FibFin → CountWt := by
+theorem UpperTheory.Gal.TranscendenceTraces.countWt_of : PtEx → PtLift → FibFin → CountWt := by
   intro hPE hPL hFib T Z S p π _ _ _ ι _ σ m w hσ hC
   classical
   haveI := Fintype.ofFinite ι
@@ -85,7 +90,8 @@ theorem UpperTheory.Gal.TranscendenceTraces.countWt_of :
   have hτr : ∀ j, τ j ≫ A.r = g := fun j => A.pb.lift_snd _ _ _
   let χ : ↥(pullback π A.u) → ℤ := fun t => ∑ j, m j * φ (τ j t)
   have hχ : IsLocallyConstant χ :=
-    isLC_sum Finset.univ (fun j t => m j * φ (τ j t))
+    isLC_sum Finset.univ
+      (fun j t => m j * φ (τ j t))
       (fun j => (hφ.comp_continuous (τ j).continuous).comp (fun a => m j * a))
   have hconst : ∀ t1 t2, g t1 = g t2 → χ t1 = χ t2 := by
     intro t1 t2 h

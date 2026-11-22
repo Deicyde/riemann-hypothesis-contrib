@@ -9,8 +9,8 @@ open Formalism.BasicNotions
 
 namespace GlobalTheory
 
-theorem thick_density_le (D : D7) (L : SizeData₂ D) (h8 : 8 * D.host.Lw < D.R.n) :
-    L.de2 ≤ 1 / (4 * (D.host.Lw : ℝ)) := by
+theorem thick_density_le (D : D7) (L : SizeData₂ D) (h8 : 8 * D.host.Lw < D.R.n)
+    : L.de2 ≤ 1 / (4 * (D.host.Lw : ℝ)) := by
   have hn : D.R.n0 ≤ D.R.n := by
     have h : addOrderOf D.R.toFrame.a0 ≤ Fintype.card D.R.toFrame.A := addOrderOf_le_card_univ
     rw [D.R.toFrame.card_A] at h
@@ -28,8 +28,7 @@ theorem thick_density_le (D : D7) (L : SizeData₂ D) (h8 : 8 * D.host.Lw < D.R.
     have : s * (4 * Lw) = 4 * Lw * s := by ring
     omega
   have hN3 : 3 ≤ N := by
-    have : 2 ≤ (n - 1) / (4 * Lw) := by
-      rw [Nat.le_div_iff_mul_le (by omega)]; omega
+    have : 2 ≤ (n - 1) / (4 * Lw) := by rw [Nat.le_div_iff_mul_le (by omega)]; omega
     omega
   have hne : ¬ Finset.range N ⊆ D.host.T2 := by
     intro hs
@@ -38,9 +37,9 @@ theorem thick_density_le (D : D7) (L : SizeData₂ D) (h8 : 8 * D.host.Lw < D.R.
     have h2 : 2 ∈ D.host.T2 := hs (Finset.mem_range.2 (by omega))
     have hnr := D.host.second_set_no_relation
     have hL2' : (2 : ℤ) ≤ (Lw : ℤ) := by exact_mod_cast hL2
-    exact hnr 0 h0 1 h1 2 h2 (by norm_num) (by norm_num) (by norm_num) 1 2
-      (by norm_num) (by simp; omega) (by norm_num) (by rw [abs_of_pos (by norm_num)]; exact hL2')
-      (by norm_num) (by norm_num)
+    exact hnr 0 h0 1 h1 2 h2 (by norm_num) (by norm_num) (by norm_num) 1 2 (by norm_num)
+      (by simp; omega) (by norm_num) (by rw [abs_of_pos (by norm_num)]; exact hL2') (by norm_num)
+      (by norm_num)
   have hcard : D.host.T2.card ≤ (n - 1) / (4 * Lw) := by
     have h1 : D.host.T2.card ≤ N := by simpa using Finset.card_le_card hsub
     have h2 : D.host.T2.card ≠ N := by

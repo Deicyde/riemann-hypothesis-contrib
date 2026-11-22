@@ -19,7 +19,8 @@ open Formalism.BasicNotions
 
 def TopsF {eps : ℝ} (Fm : FamP eps) : Prop := ChosenTT Fm ∧ ∃ Cb : ℝ, 0 < Cb ∧ ChosenBad Fm Cb
 
-theorem topsF_of_chosenE {eps : ℝ} (Fm : FamP eps) {C0 CH : ℝ} (h : ChosenE Fm C0 CH) : TopsF Fm := by
+theorem topsF_of_chosenE {eps : ℝ} (Fm : FamP eps) {C0 CH : ℝ} (h : ChosenE Fm C0 CH)
+    : TopsF Fm := by
   obtain ⟨C5, c6, Cb, -, -, hCb, -, hTT, hBad, -⟩ := h
   exact ⟨hTT, Cb, hCb, hBad⟩
 
@@ -83,7 +84,8 @@ theorem admissible_tops_mertens {eps : ℝ} (Fm : FamP eps) (h : TopsF Fm) : G.A
   have hxb : xb ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
   have hx1' : Fm.x1 + 1 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx
   have hx1 : Fm.x1 < x := by linarith
-  have hxc : (16 * Cb + 2) ^ (3 / eps) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
+  have hxc : (16 * Cb + 2) ^ (3 / eps) ≤ x :=
+    le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
   obtain ⟨hT1, hT2⟩ := hTT x hxa i
   have hB := hBad x hxb i
   unfold ChBad_at at hB
@@ -98,36 +100,41 @@ theorem admissible_tops_mertens {eps : ℝ} (Fm : FamP eps) (h : TopsF Fm) : G.A
     rw [hLx, hLe]
     have hc : (0 : ℝ) ≤ 16 * Cb + 2 := by linarith
     have hne : eps ≠ 0 := he.ne'
-    have hm : 3 / eps * (eps / 3) = 1 := by
-      first
-      | (field_simp; ring)
-      | field_simp
-    calc 16 * Cb + 2 = ((16 * Cb + 2) ^ (3 / eps)) ^ (eps / 3) := by
-          rw [← Real.rpow_mul hc, hm, Real.rpow_one]
+    have hm : 3 / eps * (eps / 3) = 1 := by first | (field_simp; ring) | field_simp
+    calc
+      16 * Cb + 2
+        = ((16 * Cb + 2) ^ (3 / eps)) ^ (eps / 3) := by rw [← Real.rpow_mul hc, hm, Real.rpow_one]
       _ ≤ x ^ (eps / 3) := Real.rpow_le_rpow (by positivity) hxc (by positivity)
-  have hS := sum_log_div_le_two_mul_mul_add_two (largeOrderResiduePrimes (Fm.L x i)) ((Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3)) hT0
-    (fun p hp => by
-      simp only [largeOrderResiduePrimes, Finset.mem_filter, Finset.mem_range] at hp
-      exact ⟨hp.2.1.one_lt.le, hp.1⟩)
-  have hBTT : AuxBlock8.BTT (Fm.D x i) (Fm.L x i) (Fm.Gx x i) ≤
-      ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p * ((badTops (Fm.Gx x i) p).card : ℝ) := by
-    unfold AuxBlock8.BTT
-    apply Finset.sum_le_sum_of_subset_of_nonneg
-    · intro p hp
-      simp only [AuxBlock8.primesResidueBelow, largeOrderResiduePrimes, Finset.mem_filter, Finset.mem_range] at hp ⊢
-      exact ⟨hp.1.1, hp.1.2.1, hp.1.2.2.2, hp.2⟩
-    · intro p _ _
-      have hl : 0 ≤ Real.log (p : ℝ) := by
-        rcases Nat.eq_zero_or_pos p with h0 | h0
-        · simp [h0]
-        · exact Real.log_nonneg (by exact_mod_cast h0)
-      exact mul_nonneg (div_nonneg hl (Nat.cast_nonneg p)) (Nat.cast_nonneg _)
+  have hS :=
+    sum_log_div_le_two_mul_mul_add_two (largeOrderResiduePrimes (Fm.L x i))
+      ((Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3)) hT0
+      (fun p hp => by
+        simp only [largeOrderResiduePrimes, Finset.mem_filter, Finset.mem_range] at hp
+        exact ⟨hp.2.1.one_lt.le, hp.1⟩)
+  have hBTT
+      : AuxBlock8.BTT (Fm.D x i) (Fm.L x i) (Fm.Gx x i)
+        ≤ ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p * ((badTops (Fm.Gx x i) p).card : ℝ) :=
+    by
+      unfold AuxBlock8.BTT
+      apply Finset.sum_le_sum_of_subset_of_nonneg
+      · intro p hp
+        simp only [AuxBlock8.primesResidueBelow, largeOrderResiduePrimes, Finset.mem_filter,
+            Finset.mem_range]
+          at hp ⊢
+        exact ⟨hp.1.1, hp.1.2.1, hp.1.2.2.2, hp.2⟩
+      · intro p _ _
+        have hl : 0 ≤ Real.log (p : ℝ) := by
+          rcases Nat.eq_zero_or_pos p with h0 | h0
+          · simp [h0]
+          · exact Real.log_nonneg (by exact_mod_cast h0)
+        exact mul_nonneg (div_nonneg hl (Nat.cast_nonneg p)) (Nat.cast_nonneg _)
   have hdn : 0 ≤ (Fm.L x i).sc.delta1 * (Fm.D x i).R.n := by
     have hc0 : (0 : ℝ) ≤ ((Fm.D x i).host.TT.card : ℝ) := Nat.cast_nonneg _
     linarith
   have hA : 0 < (Fm.L x i).sc.x ^ (-2 : ℝ) := by positivity
-  have hpow : (Fm.L x i).sc.x ^ (-2 + (Fm.L x i).sc.eps) =
-      (Fm.L x i).sc.x ^ (-2 : ℝ) * ((Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3)) ^ 3 := by
+  have hpow
+      : (Fm.L x i).sc.x ^ (-2 + (Fm.L x i).sc.eps)
+        = (Fm.L x i).sc.x ^ (-2 : ℝ) * ((Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3)) ^ 3 := by
     have h3 : (Fm.L x i).sc.eps = (Fm.L x i).sc.eps / 3 * ((3 : ℕ) : ℝ) := by push_cast; ring
     rw [Real.rpow_add hy0, ← Real.rpow_natCast, ← Real.rpow_mul hy0.le, ← h3]
   unfold AuxBlock8.adm2
@@ -137,12 +144,11 @@ theorem admissible_tops_mertens {eps : ℝ} (Fm : FamP eps) (h : TopsF Fm) : G.A
   obtain ⟨A, hAe⟩ : ∃ A, A = (Fm.L x i).sc.x ^ (-2 : ℝ) := ⟨_, rfl⟩
   rw [← hTe] at hS hTbig hT0 ⊢
   rw [← hAe] at hA hB ⊢
-  have k1 : 16 * Cb * (T + 2) ≤ T ^ 2 := by
-    nlinarith [mul_le_mul_of_nonneg_right hTbig hT0]
-  have k2 := mul_le_mul_of_nonneg_left k1
-    (div_nonneg (mul_nonneg (mul_nonneg hdn hA.le) hT0) (by norm_num : (0 : ℝ) ≤ 2))
-  have k3 := mul_le_mul_of_nonneg_left hS
-    (mul_nonneg (by positivity : (0 : ℝ) ≤ 4 * (Cb * A)) hdn)
+  have k1 : 16 * Cb * (T + 2) ≤ T ^ 2 := by nlinarith [mul_le_mul_of_nonneg_right hTbig hT0]
+  have k2 :=
+    mul_le_mul_of_nonneg_left k1
+      (div_nonneg (mul_nonneg (mul_nonneg hdn hA.le) hT0) (by norm_num : (0 : ℝ) ≤ 2))
+  have k3 := mul_le_mul_of_nonneg_left hS (mul_nonneg (by positivity : (0 : ℝ) ≤ 4 * (Cb * A)) hdn)
   have k4 := mul_le_mul_of_nonneg_right hT1 (by positivity : (0 : ℝ) ≤ A * T ^ 3)
   linarith [hBTT, hB, k2, k3, k4]
 

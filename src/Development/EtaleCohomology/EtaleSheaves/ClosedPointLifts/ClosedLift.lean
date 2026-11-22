@@ -22,7 +22,9 @@ theorem closedLift : LeafClosedLift := by
     rw [← Set.range_eq_univ, Scheme.Pullback.range_fst, Set.eq_univ_iff_forall]
     intro y
     simp only [Set.mem_preimage]
-    have hy : (Spec.map (CommRingCat.ofHom (IsLocalRing.residue A))).base y = IsLocalRing.closedPoint A := by
+    have hy
+        : (Spec.map (CommRingCat.ofHom (IsLocalRing.residue A))).base y
+          = IsLocalRing.closedPoint A := by
       have : y = IsLocalRing.closedPoint (IsLocalRing.ResidueField A) := Subsingleton.elim _ _
       subst this
       exact IsLocalRing.comap_closedPoint (IsLocalRing.residue A)

@@ -8,18 +8,24 @@ open IsLocalRing Polynomial
 
 namespace GlobalTheory
 
-theorem conductor_prod_fst (R S' S : Type) [CommRing R] [CommRing S'] [CommRing S]
-    (e : S ≃+* R × S') (d : S)
-    (hd : ∀ c : FractionRing S, IsIntegral S c →
-      ∃ s : S, algebraMap S (FractionRing S) s = algebraMap S (FractionRing S) d * c) :
-    ∀ c : FractionRing R, IsIntegral R c →
-      ∃ s : R, algebraMap R (FractionRing R) s = algebraMap R (FractionRing R) (e d).1 * c := by
+theorem conductor_prod_fst
+    (R S' S : Type) [CommRing R] [CommRing S'] [CommRing S]
+    (e : S ≃+* R × S')
+    (d : S)
+    (hd : ∀ c : FractionRing S,
+      IsIntegral S c
+        → ∃ s : S, algebraMap S (FractionRing S) s = algebraMap S (FractionRing S) d * c)
+    : ∀ c : FractionRing R,
+      IsIntegral R c
+        → ∃ s : R, algebraMap R (FractionRing R) s = algebraMap R (FractionRing R) (e d).1 * c := by
   intro c hc
   let g : S →+* FractionRing R × FractionRing S' :=
     (RingHom.prodMap (algebraMap R (FractionRing R)) (algebraMap S' (FractionRing S'))).comp
       e.toRingHom
-  have hgx : ∀ x : S, g x = (algebraMap R (FractionRing R) (e x).1,
-      algebraMap S' (FractionRing S') (e x).2) := fun x => rfl
+  have hgx
+      : ∀ x : S,
+        g x = (algebraMap R (FractionRing R) (e x).1, algebraMap S' (FractionRing S') (e x).2) :=
+    fun x => rfl
   have hg : ∀ y : nonZeroDivisors S, IsUnit (g y) := by
     intro y
     rw [hgx, Prod.isUnit_iff]
@@ -43,8 +49,10 @@ theorem conductor_prod_fst (R S' S : Type) [CommRing R] [CommRing S'] [CommRing 
       have := (mul_right_mem_nonZeroDivisors_eq_zero_iff y.2).mp h0
       have := congrArg (fun w => (e w).2) this
       simpa using this
-    exact ⟨IsLocalization.map_units (FractionRing R) (⟨_, h1⟩ : nonZeroDivisors R),
-      IsLocalization.map_units (FractionRing S') (⟨_, h2⟩ : nonZeroDivisors S')⟩
+    exact ⟨
+      IsLocalization.map_units (FractionRing R) (⟨_, h1⟩ : nonZeroDivisors R),
+      IsLocalization.map_units (FractionRing S') (⟨_, h2⟩ : nonZeroDivisors S')
+    ⟩
   let Θ : FractionRing S →+* FractionRing R × FractionRing S' := IsLocalization.lift hg
   have hΘ : ∀ x : S, Θ (algebraMap S (FractionRing S) x) = g x := fun x =>
     IsLocalization.lift_eq hg x
@@ -85,28 +93,29 @@ theorem conductor_prod_fst (R S' S : Type) [CommRing R] [CommRing S'] [CommRing 
     have hcs := IsLocalization.mk'_spec (FractionRing R) a b
     rw [← hu.mul_left_inj, hs2]
     rw [hgx, hgx]
-    simp only [b', RingEquiv.apply_symm_apply, Prod.mk_mul_mk, map_zero, map_one, mul_one,
-      zero_mul]
+    simp only [b', RingEquiv.apply_symm_apply, Prod.mk_mul_mk, map_zero, map_one, mul_one, zero_mul]
     rw [hcs]
   have hf : Function.Surjective ((RingHom.fst R S').comp e.toRingHom) := by
     intro r
     exact ⟨e.symm (r, 0), by simp⟩
   have hc' : IsIntegral S c' := by
     obtain ⟨p, hpm, hp⟩ := hc
-    obtain ⟨q, hqmap, -, hqm⟩ := lifts_and_natDegree_eq_and_monic
-      (f := (RingHom.fst R S').comp e.toRingHom) (p := p)
-      ((lifts_iff_coeff_lifts p).mpr (fun n => hf _)) hpm
+    obtain ⟨q, hqmap, -, hqm⟩ :=
+      lifts_and_natDegree_eq_and_monic (f := (RingHom.fst R S').comp e.toRingHom) (p := p)
+        ((lifts_iff_coeff_lifts p).mpr (fun n => hf _)) hpm
     refine ⟨X * q, monic_X.mul hqm, ?_⟩
     apply hΘinj
     rw [Polynomial.hom_eval₂, map_zero, hΘc, eval₂_mul, eval₂_X]
-    have hfst : (RingHom.fst (FractionRing R) (FractionRing S')).comp
-        (Θ.comp (algebraMap S (FractionRing S))) =
-        (algebraMap R (FractionRing R)).comp ((RingHom.fst R S').comp e.toRingHom) := by
+    have hfst
+        : (RingHom.fst (FractionRing R) (FractionRing S')).comp
+            (Θ.comp (algebraMap S (FractionRing S)))
+          = (algebraMap R (FractionRing R)).comp ((RingHom.fst R S').comp e.toRingHom) := by
       ext x
       simp [hΘ, hgx]
     have h1 : (eval₂ (Θ.comp (algebraMap S (FractionRing S))) (c, 0) q).1 = 0 := by
-      have := Polynomial.hom_eval₂ q (Θ.comp (algebraMap S (FractionRing S)))
-        (RingHom.fst (FractionRing R) (FractionRing S')) (c, 0)
+      have :=
+        Polynomial.hom_eval₂ q (Θ.comp (algebraMap S (FractionRing S)))
+          (RingHom.fst (FractionRing R) (FractionRing S')) (c, 0)
       simp only [RingHom.coe_fst] at this
       rw [this, hfst, ← eval₂_map, hqmap]
       exact hp

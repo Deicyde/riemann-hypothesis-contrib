@@ -13,7 +13,8 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW
 open scoped TensorProduct
 
 theorem lcscPolish_holds : LCSCPolish := fun Y _ _ _ _ => TopoPolish.polish_of_lcsc Y

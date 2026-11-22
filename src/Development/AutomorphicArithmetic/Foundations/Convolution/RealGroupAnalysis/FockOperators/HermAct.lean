@@ -6,15 +6,19 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.RealGrou
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Fo
 open scoped Classical
 
 namespace UpperTheory.ConvolutionTheory.R2.Fo.HermitianActionFixed
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (D : Dat F E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (D : Dat F E)
 
-private noncomputable def st (X : Matrix (Fin 2) (Fin 2) (A E)) : Matrix (Fin 2) (Fin 2) (A E) := (X.map D.bar)ᵀ
+private noncomputable def st (X : Matrix (Fin 2) (Fin 2) (A E)) : Matrix (Fin 2) (Fin 2) (A E) :=
+  (X.map D.bar)ᵀ
 
 private theorem st_mul (X Y : Matrix (Fin 2) (Fin 2) (A E)) : st D (X * Y) = st D Y * st D X := by
   simp only [st, Matrix.map_mul, Matrix.transpose_mul]
@@ -31,8 +35,8 @@ private theorem mkE_of_fixed {z : A E} (h : D.bar z = z) : D.mkE (D.co z 0) 0 = 
   rw [D.mkE_base]
   exact (D.eq_am_of_bar_eq h).symm
 
-private theorem herm_unherm {X : Matrix (Fin 2) (Fin 2) (A E)} (h : st D X = X) :
-    D.herm (D.unherm X) = X := by
+private theorem herm_unherm {X : Matrix (Fin 2) (Fin 2) (A E)} (h : st D X = X)
+    : D.herm (D.unherm X) = X := by
   have e : ∀ i j, D.bar (X j i) = X i j := fun i j => congrFun (congrFun h i) j
   ext i j
   fin_cases i <;> fin_cases j
@@ -55,9 +59,12 @@ private theorem am_eps : am E (eps F) = eps E := by
 end UpperTheory.ConvolutionTheory.R2.Fo.HermitianActionFixed
 
 open UpperTheory.ConvolutionTheory.R2.Fo.HermitianActionFixed in
-theorem UpperTheory.ConvolutionTheory.R2.Fo.hermAct :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E), (∀ h v, D.herm (D.act h v) = h.val * D.herm v * (h.val.map D.bar)ᵀ) ∧ (∀ u t, D.bar (D.mkE u t) = D.mkE u (-t)) ∧
-    (∀ z, D.mkE (D.co z 0) (D.co z 1) = z) ∧ ∀ u t : A F, (D.mkE u t).2 = 0 → u.2 = 0 ∧ t.2 = 0 := by
+theorem UpperTheory.ConvolutionTheory.R2.Fo.hermAct
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] (D : Dat F E),
+      (∀ h v, D.herm (D.act h v) = h.val * D.herm v * (h.val.map D.bar)ᵀ)
+        ∧ (∀ u t, D.bar (D.mkE u t) = D.mkE u (-t)) ∧ (∀ z, D.mkE (D.co z 0) (D.co z 1) = z)
+        ∧ ∀ u t : A F, (D.mkE u t).2 = 0 → u.2 = 0 ∧ t.2 = 0 := by
   intro F E _ _ _ _ _ _ _ D
   refine ⟨fun h v => ?_, D.bar_mkE, D.mkE_co, fun u t h0 => ?_⟩
   · change D.herm (D.unherm (h.val * D.herm v * st D h.val)) = h.val * D.herm v * st D h.val
@@ -69,4 +76,7 @@ theorem UpperTheory.ConvolutionTheory.R2.Fo.hermAct :
       rw [eps_mul_snd, h0]
       rfl
     obtain ⟨hu, ht⟩ := D.mkE_inj h1
-    exact ⟨(eps_mul_snd u).symm.trans (congrArg Prod.snd hu), (eps_mul_snd t).symm.trans (congrArg Prod.snd ht)⟩
+    exact ⟨
+      (eps_mul_snd u).symm.trans (congrArg Prod.snd hu),
+      (eps_mul_snd t).symm.trans (congrArg Prod.snd ht)
+    ⟩

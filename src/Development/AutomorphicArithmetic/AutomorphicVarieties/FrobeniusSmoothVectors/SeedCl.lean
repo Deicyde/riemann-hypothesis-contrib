@@ -12,20 +12,41 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal IsLocalRing UpperTheory.V.HV
+  UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Pr UpperTheory.V.Fr UpperTheory.V
 
-private theorem km_mono {Ω C : Type} [Field Ω] [CharZero Ω] [Monoid C] {m n : ℕ} (h : m ∣ n) {χ : G ℚ Ω →* C}
-    (hχ : Af.KillsMu m χ) : Af.KillsMu n χ := fun s hs => hχ s fun ζ hζ => hs ζ (by
-  obtain ⟨k, rfl⟩ := h
-  rw [pow_mul, hζ, one_pow])
+private theorem km_mono
+    {Ω C : Type} [Field Ω] [CharZero Ω] [Monoid C]
+    {m n : ℕ} (h : m ∣ n)
+    {χ : G ℚ Ω →* C} (hχ : Af.KillsMu m χ)
+    : Af.KillsMu n χ := fun s hs =>
+  hχ s fun ζ hζ =>
+    hs ζ (by
+      obtain ⟨k, rfl⟩ := h
+      rw [pow_mul, hζ, one_pow])
 
-private theorem split_of {Ω : Type} [Field Ω] [CharZero Ω] {l : ℕ} [Fact l.Prime] {N w : ℕ} (hw : w ≡ 1 [MOD N])
-    {χ : G ℚ Ω →* (Qbar l)ˣ} (hχ : Af.KillsMu N χ) : Sd.SplitAt N w χ :=
-  ⟨hχ, fun s hs => hχ s fun ζ hζ => by
-    rw [hs ζ hζ, pow_eq_pow_mod w hζ, hw, ← pow_eq_pow_mod 1 hζ, pow_one]⟩
+private theorem split_of
+    {Ω : Type} [Field Ω] [CharZero Ω]
+    {l : ℕ} [Fact l.Prime]
+    {N w : ℕ} (hw : w ≡ 1 [MOD N])
+    {χ : G ℚ Ω →* (Qbar l)ˣ} (hχ : Af.KillsMu N χ)
+    : Sd.SplitAt N w χ := ⟨
+  hχ,
+  fun s hs =>
+    hχ s fun ζ hζ => by rw [hs ζ hζ, pow_eq_pow_mod w hζ, hw, ← pow_eq_pow_mod 1 hζ, pow_one]
+⟩
 
-theorem UpperTheory.V.Fr.seed_cl :
-    ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) [CharP (ResidueField c.O) l] (η : G ℚ Ω →* ℤˣ) (Ψ : G ℚ Ω →* c.Oˣ) (σ : G ℚ Ω) (B : ValuationSubring Ω) (M : ℕ) (Hb : Subgroup (G ℚ Ω)), Gen l η Ψ σ B M Hb → ∃ Q : ℕ, Q ≠ 0 ∧ ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] [Algebra L Ω] (w : ℕ), IsAbelianGalois ℚ L → galOf ℚ L Ω = upl Ω L ⊓ η.ker → FrobeniusWitnessPrime l η Ψ M w → w ≡ 1 [MOD Q] → upl Ω L ≤ Hth Ω l w → (∃ s ∈ galOf ℚ L Ω, barChar c.O Ψ s ^ 2 ≠ 1) → SeedClause c η Ψ σ L := by
+theorem UpperTheory.V.Fr.seed_cl
+    : ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (c : Coef l)
+        [CharP (ResidueField c.O) l] (η : G ℚ Ω →* ℤˣ) (Ψ : G ℚ Ω →* c.Oˣ) (σ : G ℚ Ω)
+        (B : ValuationSubring Ω) (M : ℕ) (Hb : Subgroup (G ℚ Ω)),
+      Gen l η Ψ σ B M Hb
+        → ∃ Q : ℕ,
+          Q ≠ 0
+            ∧ ∀ (L : Type) [Field L] [NumberField L] [IsCMField L] [Algebra L Ω] (w : ℕ),
+              IsAbelianGalois ℚ L → galOf ℚ L Ω = upl Ω L ⊓ η.ker → FrobeniusWitnessPrime l η Ψ M w
+                → w ≡ 1 [MOD Q] → upl Ω L ≤ Hth Ω l w → (∃ s ∈ galOf ℚ L Ω, barChar c.O Ψ s ^ 2 ≠ 1)
+                → SeedClause c η Ψ σ L := by
   intro Ω _ _ _ l _ c _ η Ψ σ B M Hb hG
   have hlp : l.Prime := Fact.out
   obtain ⟨a, hηa, hΨa⟩ := hG.cyc
@@ -46,7 +67,8 @@ theorem UpperTheory.V.Fr.seed_cl :
   have hη'ker : η'.ker = η.ker := by
     ext s
     simp only [MonoidHom.mem_ker]
-    exact map_eq_one_iff _ (Units.map_injective (f := (Int.castRingHom (Qbar l)).toMonoidHom) Int.cast_injective)
+    exact map_eq_one_iff _
+      (Units.map_injective (f := (Int.castRingHom (Qbar l)).toMonoidHom) Int.cast_injective)
   have hφK : Af.KillsMu (M ^ a * l) φ := by
     intro s hs
     have h1 : barChar c.O Ψ s = 1 := km_mono (dvd_mul_right _ _) hΨa s hs
@@ -80,15 +102,19 @@ theorem UpperTheory.V.Fr.seed_cl :
     rcases mul_self_eq_one_iff.1 hsq with h | h
     · exact absurd (hT (by rw [map_one]; exact Units.ext h)) hne
     · exact Units.ext (by rw [h, Units.val_neg, Units.val_one])
-  have happ : ∀ s, (GlobalTheory.GalOfCusp.cycBar ℚ Ω l ^ j * χ') s =
-      (GlobalTheory.GalOfCusp.cycBar ℚ Ω l) s ^ j * T ((Units.map ↑(residue c.O)) (Ψ s) * ((omO Ω l c.O) s ^ j)⁻¹) :=
-    fun s => rfl
+  have happ
+      : ∀ s,
+        (GlobalTheory.GalOfCusp.cycBar ℚ Ω l ^ j * χ') s
+          = (GlobalTheory.GalOfCusp.cycBar ℚ Ω l) s ^ j
+            * T ((Units.map ↑(residue c.O)) (Ψ s) * ((omO Ω l c.O) s ^ j)⁻¹) := fun s =>
+    rfl
   have hord : ¬ l ∣ orderOf χ' := by
     classical
     haveI := Fintype.ofFinite (ResidueField c.O)
-    have hpow : χ' ^ Fintype.card (ResidueField c.O)ˣ = 1 := MonoidHom.ext fun s => by
-      show (T (φ s)) ^ Fintype.card (ResidueField c.O)ˣ = 1
-      rw [← map_pow, pow_card_eq_one, map_one]
+    have hpow : χ' ^ Fintype.card (ResidueField c.O)ˣ = 1 :=
+      MonoidHom.ext fun s => by
+        show (T (φ s)) ^ Fintype.card (ResidueField c.O)ˣ = 1
+        rw [← map_pow, pow_card_eq_one, map_one]
     intro hd
     have hd2 := hd.trans (orderOf_dvd_of_pow_eq_one hpow)
     obtain ⟨n, -, hcard⟩ := FiniteField.card (ResidueField c.O) l
@@ -115,9 +141,38 @@ theorem UpperTheory.V.Fr.seed_cl :
   have hLK : galOf ℚ L Ω ≤ galOf ℚ K Ω := by
     rw [hKη, hLgal]
     exact inf_le_right
-  refine ⟨K, iK, nK, aK, N, w, χ', η', θ, j, ?_, ?_, hord, fun s => rfl, fun s => happ s ▸ hTa (Ψ s) j s, ?_⟩
-  · refine ⟨hG.cc, ⟨hG.odd, Nat.pos_of_ne_zero hN0, hlN, hw.prime, hwN, hθ1, hθl, hθw⟩, hK2, hKc, hLab, hLK,
-      by rw [hη'ker, hKη], split_of hwQ hη'N, split_of hwQ hχN, ?_, ?_, ?_⟩
+  refine ⟨
+    K,
+    iK,
+    nK,
+    aK,
+    N,
+    w,
+    χ',
+    η',
+    θ,
+    j,
+    ?_,
+    ?_,
+    hord,
+    fun s => rfl,
+    fun s => happ s ▸ hTa (Ψ s) j s,
+    ?_
+  ⟩
+  · refine ⟨
+      hG.cc,
+      ⟨hG.odd, Nat.pos_of_ne_zero hN0, hlN, hw.prime, hwN, hθ1, hθl, hθw⟩,
+      hK2,
+      hKc,
+      hLab,
+      hLK,
+      by rw [hη'ker, hKη],
+      split_of hwQ hη'N,
+      split_of hwQ hχN,
+      ?_,
+      ?_,
+      ?_
+    ⟩
     · rw [hθker, hLgal]
       exact inf_le_left.trans hLth
     · rw [hχ, hφ, hG.even, (sc_om Ω l c.O).2 σ hG.cc, one_mul, ← inv_pow, inv_neg_one, map_pow, hT1]
@@ -127,8 +182,7 @@ theorem UpperTheory.V.Fr.seed_cl :
     apply hG.g4
     intro s hs
     rw [Subgroup.mem_inf, MonoidHom.mem_ker, MonoidHom.mem_ker] at hs
-    have h1 : χ' s = 1 := by
-      rw [hχ, hφ, hs.1, hs.2, one_pow, inv_one, mul_one, map_one]
+    have h1 : χ' s = 1 := by rw [hχ, hφ, hs.1, hs.2, one_pow, inv_one, mul_one, map_one]
     rw [heq] at h1
     rw [← hη'ker]
     exact h1

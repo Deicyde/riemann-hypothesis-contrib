@@ -8,13 +8,18 @@ namespace GlobalTheory.ClosedStatement
 
 open Ideal Module
 
-theorem main {R A : Type} [CommRing R] [CommRing A] (f : R →+* A) (m : Ideal R)
-    [hm : Ideal.IsMaximal m] (hne : Ideal.map f m ≠ ⊤) :
-    ∃ (ι : Type) (b : ι → A) (i₀ : ι), b i₀ = (1 : A) ∧
-      (∀ x : A, ∃ a : ι →₀ R, (x - Finsupp.sum a fun (i : ι) (y : R) ↦ (f : R → A) y * b i)
-        ∈ Ideal.map f m) ∧
-      ∀ a : ι →₀ R, (Finsupp.sum a fun (i : ι) (y : R) ↦ (f : R → A) y * b i) ∈ Ideal.map f m →
-        ∀ i : ι, (a : ι → R) i ∈ m := by
+theorem main
+    {R A : Type} [CommRing R] [CommRing A]
+    (f : R →+* A)
+    (m : Ideal R) [hm : Ideal.IsMaximal m]
+    (hne : Ideal.map f m ≠ ⊤)
+    : ∃ (ι : Type) (b : ι → A) (i₀ : ι),
+      b i₀ = (1 : A)
+        ∧ (∀ x : A, ∃ a : ι →₀ R,
+          (x - Finsupp.sum a fun (i : ι) (y : R) ↦ (f : R → A) y * b i) ∈ Ideal.map f m)
+        ∧ ∀ a : ι →₀ R,
+          (Finsupp.sum a fun (i : ι) (y : R) ↦ (f : R → A) y * b i) ∈ Ideal.map f m
+            → ∀ i : ι, (a : ι → R) i ∈ m := by
   classical
   letI : Algebra R A := f.toAlgebra
   letI : Field (R ⧸ m) := Ideal.Quotient.field m
@@ -27,8 +32,10 @@ theorem main {R A : Type} [CommRing R] [CommRing A] (f : R →+* A) (m : Ideal R
   have h1mem : (1 : A ⧸ Ideal.map (algebraMap R A) m) ∈ hli.extend (Set.subset_univ _) :=
     Basis.subset_extend hli rfl
   let b : ↥(hli.extend (Set.subset_univ _)) → A := fun i =>
-    if (i : A ⧸ Ideal.map (algebraMap R A) m) = 1 then 1
-    else (Ideal.Quotient.mk_surjective (i : A ⧸ Ideal.map (algebraMap R A) m)).choose
+    if (i : A ⧸ Ideal.map (algebraMap R A) m) = 1 then
+      1
+    else
+      (Ideal.Quotient.mk_surjective (i : A ⧸ Ideal.map (algebraMap R A) m)).choose
   have hb : ∀ i, Ideal.Quotient.mk (Ideal.map (algebraMap R A) m) (b i) = v i := by
     intro i
     rw [Basis.coe_extend]
@@ -36,10 +43,12 @@ theorem main {R A : Type} [CommRing R] [CommRing A] (f : R →+* A) (m : Ideal R
     split_ifs with h
     · rw [map_one, h]
     · exact (Ideal.Quotient.mk_surjective _).choose_spec
-  have key : ∀ a : ↥(hli.extend (Set.subset_univ _)) →₀ R,
-      Ideal.Quotient.mk (Ideal.map (algebraMap R A) m)
-        (Finsupp.sum a fun i y ↦ (algebraMap R A) y * b i) =
-      Finsupp.linearCombination (R ⧸ m) v (a.mapRange (Ideal.Quotient.mk m) (map_zero _)) := by
+  have key
+      : ∀ a : ↥(hli.extend (Set.subset_univ _)) →₀ R,
+        Ideal.Quotient.mk (Ideal.map (algebraMap R A) m)
+            (Finsupp.sum a fun i y ↦ (algebraMap R A) y * b i)
+          = Finsupp.linearCombination (R ⧸ m) v
+            (a.mapRange (Ideal.Quotient.mk m) (map_zero _)) := by
     intro a
     rw [Finsupp.linearCombination_apply, Finsupp.sum_mapRange_index (by simp), map_finsuppSum]
     refine Finsupp.sum_congr (fun i _ => ?_)
@@ -55,8 +64,9 @@ theorem main {R A : Type} [CommRing R] [CommRing A] (f : R →+* A) (m : Ideal R
       · exact (Ideal.Quotient.mk_surjective c).choose_spec
     refine ⟨(v.repr (Ideal.Quotient.mk _ x)).mapRange g (by simp [g]), ?_⟩
     rw [← Ideal.Quotient.eq_zero_iff_mem, map_sub, key]
-    have hc : ∀ c : ↥(hli.extend (Set.subset_univ _)) →₀ R ⧸ m,
-        (c.mapRange g (by simp [g])).mapRange (Ideal.Quotient.mk m) (map_zero _) = c := by
+    have hc
+        : ∀ c : ↥(hli.extend (Set.subset_univ _)) →₀ R ⧸ m,
+          (c.mapRange g (by simp [g])).mapRange (Ideal.Quotient.mk m) (map_zero _) = c := by
       intro c; ext i; simp [hg]
     rw [hc, Basis.linearCombination_repr, sub_self]
   · intro a ha i

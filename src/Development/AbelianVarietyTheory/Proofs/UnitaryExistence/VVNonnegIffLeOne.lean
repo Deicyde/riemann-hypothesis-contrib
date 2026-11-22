@@ -20,8 +20,9 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
 
 section Valuations
 
-variable {V K : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K]
+variable
+  {V K : Type}
+  [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
 
 theorem vV_nonneg_iff_le_one (x : K) (hx : x ≠ 0) : 0 ≤ vV V x ↔ valV V x ≤ 1 := by
   rw [← WithZero.log_le_log (valV_ne_zero (V := V) hx) one_ne_zero, WithZero.log_one, vV]
@@ -42,7 +43,8 @@ theorem vV_pos {v : V} (h0 : v ≠ 0) (h : v ∈ maximalIdeal V) : 0 < vV V (alg
   have h2 : valV V (algebraMap V K v) < 1 := (HeightOneSpectrum.valuation_lt_one_iff_mem _ v).2 h
   have := (WithZero.log_lt_log (valV_ne_zero (V := V) h1) one_ne_zero).2 h2
   simp only [WithZero.log_one] at this
-  simp only [vV]; omega
+  simp only [vV]
+  omega
 
 theorem vV_zpow (x : K) (n : ℤ) : vV V (x ^ n) = n * vV V x := by
   simp only [vV, map_zpow₀, WithZero.log_zpow, smul_eq_mul]
@@ -55,21 +57,28 @@ theorem vV_of_isUnit {v : V} (h : IsUnit v) : vV V (algebraMap V K v) = 0 := by
   rw [map_units_inv, ← zpow_neg_one, vV_zpow] at h2
   omega
 
-variable {W L : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field L] [Algebra W L]
-  [IsFractionRing W L]
+variable
+  {W L : Type}
+  [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field L] [Algebra W L] [IsFractionRing W L]
 
-theorem finite_of_scale [IsAdicComplete (maximalIdeal V) V] (i : K →+* L) {r : ℕ} (hr : 0 < r)
-    (hi : ∀ z, vV W (i z) = (r : ℤ) * vV V z) (h' : Finite (ResidueField W)) : i.Finite := by
+theorem finite_of_scale
+    [IsAdicComplete (maximalIdeal V) V]
+    (i : K →+* L)
+    {r : ℕ} (hr : 0 < r) (hi : ∀ z, vV W (i z) = (r : ℤ) * vV V z)
+    (h' : Finite (ResidueField W))
+    : i.Finite := by
   have hint : ∀ a : V, ∃ v : W, algebraMap W L v = i (algebraMap V K a) := fun a =>
-    (mem_range_iff _).2 (by rw [hi]; exact mul_nonneg (by positivity) ((mem_range_iff _).1 ⟨a, rfl⟩))
+    (mem_range_iff _).2
+      (by rw [hi]; exact mul_nonneg (by positivity) ((mem_range_iff _).1 ⟨a, rfl⟩))
   choose g0 hg0 using hint
   have hinj := IsFractionRing.injective W L
-  let g : V →+* W :=
-    { toFun := g0
-      map_one' := hinj (by simp [hg0])
-      map_mul' := fun a b => hinj (by simp [hg0])
-      map_zero' := hinj (by simp [hg0])
-      map_add' := fun a b => hinj (by simp [hg0]) }
+  let g : V →+* W := {
+    toFun := g0
+    map_one' := hinj (by simp [hg0])
+    map_mul' := fun a b => hinj (by simp [hg0])
+    map_zero' := hinj (by simp [hg0])
+    map_add' := fun a b => hinj (by simp [hg0])
+  }
   have hg : ∀ a, algebraMap W L (g a) = i (algebraMap V K a) := hg0
   letI : Algebra V W := g.toAlgebra
   letI : Algebra K L := i.toAlgebra
@@ -106,12 +115,15 @@ theorem finite_of_scale [IsAdicComplete (maximalIdeal V) V] (i : K →+* L) {r :
     have : Finite (W ⧸ maximalIdeal W) := h'
     exact Ideal.finite_quotient_pow (IsNoetherian.noetherian _) n
   have : Module.Finite V (W ⧸ (maximalIdeal V).map (algebraMap V W)) := Module.Finite.of_finite
-  have : Module.Finite V W := GlobalTheory.FormalIsogeny.finite_of_finite_quotient_map (maximalIdeal V)
+  have : Module.Finite V W :=
+    GlobalTheory.FormalIsogeny.finite_of_finite_quotient_map (maximalIdeal V)
   exact Module.Finite.of_isLocalization V W (nonZeroDivisors V)
 
 end Valuations
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} (Xo : Moduli Dw l) (c : Coeff l)
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  (Xo : Moduli Dw l) (c : Coeff l)
 
 end GlobalTheory.IntegralFrameAllCompare

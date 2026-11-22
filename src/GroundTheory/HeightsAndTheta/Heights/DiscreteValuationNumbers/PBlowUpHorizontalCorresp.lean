@@ -13,21 +13,24 @@ open MvPolynomial
 
 universe u
 
-theorem finsum_eq_finsum_mem_of_support_subset' {α : Type*} (f : α → ℤ) {s : Set α}
-    (h : Function.support f ⊆ s) : ∑ᶠ i, f i = ∑ᶠ i ∈ s, f i := by
+theorem finsum_eq_finsum_mem_of_support_subset'
+    {α : Type*} (f : α → ℤ) {s : Set α} (h : Function.support f ⊆ s)
+    : ∑ᶠ i, f i = ∑ᶠ i ∈ s, f i := by
   rw [finsum_mem_def, Set.indicator_eq_self.2 h]
 
-theorem BlowUpHorizontalCorresp.proof (hsat : BlowUpHorizontalSat.Statement.{u})
-    (hmult : BlowUpHorizontalMult.Statement.{u}) (hlift : BlowUpHorizontalLift.Statement.{u})
-    (hstrict : BlowUpHorizontalStrict.Statement.{u}) : BlowUpHorizontalCorresp.Statement.{u} := by
+theorem BlowUpHorizontalCorresp.proof
+    (hsat : BlowUpHorizontalSat.Statement.{u}) (hmult : BlowUpHorizontalMult.Statement.{u})
+    (hlift : BlowUpHorizontalLift.Statement.{u}) (hstrict : BlowUpHorizontalStrict.Statement.{u})
+    : BlowUpHorizontalCorresp.Statement.{u} := by
   intro O _ _ _ ϖ hϖ K _ _ ι _ J _ P n hP N u hu hex hloc c x hx hxP
   have sat := hsat O ϖ hϖ K ι J P n hP N u hu hex hloc c x hx hxP
   have mult := hmult O ϖ hϖ K ι J P n hP N u hu hex hloc c x hx hxP
   have lift := hlift O ϖ hϖ K ι J P n hP N u hu hex hloc c x hx hxP
   have strict := hstrict O ϖ hϖ K ι J P n hP N u hu hex hloc c x hx hxP
-  have hC : ∀ W : Ideal (MRing (extIdx ι J) O),
-      (C ϖ : MRing ι O) ∈ W.comap (liftForm (ι := ι) (J := J) (R := O)) ↔
-        (C ϖ : MRing (extIdx ι J) O) ∈ W := by
+  have hC
+      : ∀ W : Ideal (MRing (extIdx ι J) O),
+        (C ϖ : MRing ι O) ∈ W.comap (liftForm (ι := ι) (J := J) (R := O))
+          ↔ (C ϖ : MRing (extIdx ι J) O) ∈ W := by
     intro W
     rw [Ideal.mem_comap]
     simp [liftForm]
@@ -47,8 +50,8 @@ theorem BlowUpHorizontalCorresp.proof (hsat : BlowUpHorizontalSat.Statement.{u})
     intro W hW
     rw [Function.mem_support] at hW
     exact ⟨fun h0 => hW (by rw [h0, zero_mul]), fun hc => hW (by simp only [if_pos hc, mul_zero])⟩
-  refine finsum_mem_eq_of_bijOn (fun W => W.comap (liftForm (ι := ι) (J := J) (R := O)))
-    ⟨?_, ?_, ?_⟩ ?_
+  refine
+    finsum_mem_eq_of_bijOn (fun W => W.comap (liftForm (ι := ι) (J := J) (R := O))) ⟨?_, ?_, ?_⟩ ?_
   · intro W hW
     exact ⟨by rw [mult W hW.1 hW.2]; exact hW.1, fun h => hW.2 ((hC W).1 h)⟩
   · intro W₁ h₁ W₂ h₂ he

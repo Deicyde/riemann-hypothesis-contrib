@@ -24,16 +24,19 @@ theorem altIdentity : AltIdentity := by
   have heK : ∀ κ ∈ K, e * π κ = e := by
     intro κ hκ
     have h1 := hKe' κ⁻¹ (K.inv_mem hκ)
-    calc e * π κ = star (π κ⁻¹ * e) := by rw [star_mul, hes, hstar, inv_inv]
+    calc
+      e * π κ
+        = star (π κ⁻¹ * e) := by rw [star_mul, hes, hstar, inv_inv]
       _ = e := by rw [h1, hes]
   let f : G → (H →L[ℂ] H) := fun a => e * π a * e
   let Y : Submodule ℂ (H →L[ℂ] H) := Submodule.span ℂ (Set.range fun a => π a * e)
   have hY1 : ∀ a, ∀ y ∈ Y, π a * y ∈ Y := by
     intro a y hy
-    have : Y ≤ Y.comap (LinearMap.mulLeft ℂ (π a)) := Submodule.span_le.mpr (by
-      rintro _ ⟨b, rfl⟩
-      show π a * (π b * e) ∈ Y
-      exact Submodule.subset_span ⟨a * b, by simp only [map_mul, mul_assoc]⟩)
+    have : Y ≤ Y.comap (LinearMap.mulLeft ℂ (π a)) :=
+      Submodule.span_le.mpr (by
+        rintro _ ⟨b, rfl⟩
+        show π a * (π b * e) ∈ Y
+        exact Submodule.subset_span ⟨a * b, by simp only [map_mul, mul_assoc]⟩)
     exact this hy
   have hSm : ∀ y ∈ Y, ∃ U : Subgroup G, IsOpen (U : Set G) ∧ ∀ u ∈ U, π u * y = y := by
     intro y hy
@@ -41,17 +44,20 @@ theorem altIdentity : AltIdentity := by
     | mem x hx =>
       obtain ⟨a, rfl⟩ := hx
       refine ⟨K.comap (MulAut.conj a⁻¹).toMonoidHom, ?_, fun u hu => ?_⟩
-      · have : ((K.comap (MulAut.conj a⁻¹).toMonoidHom : Subgroup G) : Set G) =
-            (fun h => a⁻¹ * h * a) ⁻¹' (K : Set G) := by
+      · have : ((K.comap (MulAut.conj a⁻¹).toMonoidHom : Subgroup G) : Set G)
+            = (fun h => a⁻¹ * h * a) ⁻¹' (K : Set G) := by
           ext h; simp
         rw [this]
         exact hKo.preimage ((continuous_const.mul continuous_id).mul continuous_const)
       · have hu' : a⁻¹ * u * a ∈ K := by simpa [MulAut.conj_apply] using hu
-        calc π u * (π a * e) = π (u * a) * e := by rw [map_mul, mul_assoc]
+        calc
+          π u * (π a * e)
+            = π (u * a) * e := by rw [map_mul, mul_assoc]
           _ = π (a * (a⁻¹ * u * a)) * e := by rw [show a * (a⁻¹ * u * a) = u * a by group]
           _ = π a * (π (a⁻¹ * u * a) * e) := by rw [map_mul, mul_assoc]
           _ = π a * e := by rw [hKe' _ hu']
-    | zero => exact ⟨⊤, by simp, fun u _ => by simp⟩
+    | zero =>
+      exact ⟨⊤, by simp, fun u _ => by simp⟩
     | add x z _ _ hx hz =>
       obtain ⟨U₁, h1o, h1⟩ := hx
       obtain ⟨U₂, h2o, h2⟩ := hz
@@ -68,7 +74,9 @@ theorem altIdentity : AltIdentity := by
     | add x z _ _ hx hz => rw [add_mul, hx, hz]
     | smul c x _ hx => rw [smul_mul_assoc, hx]
   have heY : e ∈ Y := Submodule.subset_span ⟨1, by simp⟩
-  have hE : ∀ Z : Submodule ℂ (H →L[ℂ] H), Z ≤ Y → (∀ a, ∀ z ∈ Z, π a * z ∈ Z) → ∀ z ∈ Z, e * z ∈ Z := by
+  have hE
+      : ∀ Z : Submodule ℂ (H →L[ℂ] H),
+        Z ≤ Y → (∀ a, ∀ z ∈ Z, π a * z ∈ Z) → ∀ z ∈ Z, e * z ∈ Z := by
     intro Z hZY hZ z hz
     obtain ⟨U, hUo, hU⟩ := hSm z (hZY hz)
     exact alt_avg K hKc π e heK hfix Z (fun κ _ => hZ κ) z hz U hUo hU
@@ -79,12 +87,14 @@ theorem altIdentity : AltIdentity := by
     | mem x hx =>
       obtain ⟨a, rfl⟩ := hx
       show π a * e * y ∈ Y
-      rw [mul_assoc]; exact hY1 a _ (hYE y hy)
+      rw [mul_assoc]
+      exact hY1 a _ (hYE y hy)
     | zero => simp
     | add x z _ _ hx hz => rw [add_mul]; exact Y.add_mem hx hz
     | smul c x _ hx => rw [smul_mul_assoc]; exact Y.smul_mem c hx
-  have hword : ∀ Z : Submodule ℂ (H →L[ℂ] H), Z ≤ Y → (∀ a, ∀ z ∈ Z, π a * z ∈ Z) →
-      ∀ l : List G, ∀ z ∈ Z, (l.map f).prod * z ∈ Z := by
+  have hword
+      : ∀ Z : Submodule ℂ (H →L[ℂ] H),
+        Z ≤ Y → (∀ a, ∀ z ∈ Z, π a * z ∈ Z) → ∀ l : List G, ∀ z ∈ Z, (l.map f).prod * z ∈ Z := by
     intro Z hZY hZ l
     induction l with
     | nil => intro z hz; simpa using hz
@@ -102,14 +112,17 @@ theorem altIdentity : AltIdentity := by
     intro l
     induction l with
     | nil => simp
-    | cons a l ih => simp [List.reverse_cons, List.map_append, List.prod_append, star_mul, ih, hfstar]
-  have hterm : ∀ σ : Equiv.Perm (Fin (n + 1)),
-      (List.ofFn fun i => e * π (g (σ i)) * e) = (List.ofFn fun i => g (σ i)).map f := by
+    | cons a l ih =>
+      simp [List.reverse_cons, List.map_append, List.prod_append, star_mul, ih, hfstar]
+  have hterm
+      : ∀ σ : Equiv.Perm (Fin (n + 1)),
+        (List.ofFn fun i => e * π (g (σ i)) * e) = (List.ofFn fun i => g (σ i)).map f := by
     intro σ; rw [List.map_ofFn]; rfl
   set S := ∑ σ : Equiv.Perm (Fin (n + 1)), ((Equiv.Perm.sign σ : ℤ) : ℂ) •
     (List.ofFn fun i => e * π (g (σ i)) * e).prod with hSdef
-  have hSZ : ∀ Z : Submodule ℂ (H →L[ℂ] H), Z ≤ Y → (∀ a, ∀ z ∈ Z, π a * z ∈ Z) →
-      ∀ z ∈ Z, S * z ∈ Z ∧ star S * z ∈ Z := by
+  have hSZ
+      : ∀ Z : Submodule ℂ (H →L[ℂ] H),
+        Z ≤ Y → (∀ a, ∀ z ∈ Z, π a * z ∈ Z) → ∀ z ∈ Z, S * z ∈ Z ∧ star S * z ∈ Z := by
     intro Z hZY hZ z hz
     constructor
     · rw [hSdef, Finset.sum_mul]
@@ -163,7 +176,9 @@ theorem altIdentity : AltIdentity := by
     have hbe : b * e = b := by rw [hb, mul_assoc, hYe y hy]
     have hbu : b * (c - z • e) = e := by rw [hb, mul_assoc, hyu, hee]
     have h1 : b * (c - z • (1 : H →L[ℂ] H)) = e := by
-      calc b * (c - z • (1 : H →L[ℂ] H)) = b * c - z • b := by rw [mul_sub, mul_smul_comm, mul_one]
+      calc
+        b * (c - z • (1 : H →L[ℂ] H))
+          = b * c - z • b := by rw [mul_sub, mul_smul_comm, mul_one]
         _ = b * c - z • (b * e) := by rw [hbe]
         _ = b * (c - z • e) := by rw [mul_sub, mul_smul_comm]
         _ = e := hbu
@@ -180,9 +195,11 @@ theorem altIdentity : AltIdentity := by
       have := congrArg star hL
       rwa [star_mul, hv, star_one] at this
     have hLR : L = star L := by
-      calc L = L * ((c - z • (1 : H →L[ℂ] H)) * star L) := by rw [hR, mul_one]
+      calc
+        L = L * ((c - z • (1 : H →L[ℂ] H)) * star L) := by rw [hR, mul_one]
         _ = star L := by rw [← mul_assoc, hL, one_mul]
-    have hunit : IsUnit (c - z • (1 : H →L[ℂ] H)) := ⟨⟨c - z • 1, L, by rw [hLR]; exact hR, hL⟩, rfl⟩
+    have hunit : IsUnit (c - z • (1 : H →L[ℂ] H)) :=
+      ⟨⟨c - z • 1, L, by rw [hLR]; exact hR, hL⟩, rfl⟩
     apply spectrum.mem_iff.mp hz
     rw [Algebra.algebraMap_eq_smul_one, ← neg_sub]
     exact hunit.neg
@@ -197,19 +214,24 @@ theorem altIdentity : AltIdentity := by
       exact ⟨π a * y, hY1 a y hy, by simp [mul_assoc]⟩
     · rintro ⟨y, hy, hyu⟩
       exact hnotl y hy hyu
-  obtain ⟨Y', hZY', hmax⟩ := zorn_le_nonempty₀ s (by
-    intro C hCs hC Z0 hZ0C
-    refine ⟨sSup C, ⟨sSup_le fun Z hZ => (hCs hZ).1, ?_, ?_⟩, fun Z hZ => le_sSup hZ⟩
-    · intro a x hx
-      obtain ⟨Z, hZ, hxZ⟩ := (Submodule.mem_sSup_of_directed ⟨Z0, hZ0C⟩ hC.directedOn).mp hx
-      exact le_sSup hZ ((hCs hZ).2.1 a x hxZ)
-    · intro he'
-      obtain ⟨Z, hZ, hxZ⟩ := (Submodule.mem_sSup_of_directed ⟨Z0, hZ0C⟩ hC.directedOn).mp he'
-      exact (hCs hZ).2.2 hxZ) _ hZ0
+  obtain ⟨Y', hZY', hmax⟩ :=
+    zorn_le_nonempty₀ s
+      (by
+        intro C hCs hC Z0 hZ0C
+        refine ⟨sSup C, ⟨sSup_le fun Z hZ => (hCs hZ).1, ?_, ?_⟩, fun Z hZ => le_sSup hZ⟩
+        · intro a x hx
+          obtain ⟨Z, hZ, hxZ⟩ := (Submodule.mem_sSup_of_directed ⟨Z0, hZ0C⟩ hC.directedOn).mp hx
+          exact le_sSup hZ ((hCs hZ).2.1 a x hxZ)
+        · intro he'
+          obtain ⟨Z, hZ, hxZ⟩ := (Submodule.mem_sSup_of_directed ⟨Z0, hZ0C⟩ hC.directedOn).mp he'
+          exact (hCs hZ).2.2 hxZ)
+      _ hZ0
   obtain ⟨hY'Y, hY'G, heY'⟩ := hmax.prop
   have hY'E : ∀ x ∈ Y', e * x ∈ Y' := hE Y' hY'Y hY'G
-  have hq := alt_quot K N hN π e hKe' hee Y Y' le_rfl heY hY1 hYE hSm hY'Y hY'G hY'E heY'
-    (fun Z hZY hZG heZ hle => hmax.le_of_ge ⟨hZY, hZG, heZ⟩ hle) (n + 1) hd g
+  have hq :=
+    alt_quot K N hN π e hKe' hee Y Y' le_rfl heY hY1 hYE hSm hY'Y hY'G hY'E heY'
+      (fun Z hZY hZG heZ hle => hmax.le_of_ge ⟨hZY, hZG, heZ⟩ hle)
+      (n + 1) hd g
   rw [← hSdef, hSe] at hq
   have hcY' : c ∈ Y' := (hSZ Y' hY'Y hY'G S hq).2
   have huY' : c - z • e ∈ Y' := by

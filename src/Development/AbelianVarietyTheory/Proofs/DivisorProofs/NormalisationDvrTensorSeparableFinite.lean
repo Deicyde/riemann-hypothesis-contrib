@@ -12,19 +12,20 @@ set_option maxHeartbeats 1000000
 
 namespace GlobalTheory.NormFin
 
-theorem main : ∀ (S K L D : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S]
-    [Field K] [Algebra S K] [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
-    [FiniteDimensional K L] [Algebra.IsSeparable K L] [CommRing D] [IsDomain D] [IsDiscreteValuationRing D]
-    [Algebra S D] [Module.Finite S D] [FaithfulSMul S D],
-    Module.Finite D (integralClosure D (TensorProduct S D L)) := by
+theorem main
+    : ∀ (S K L D : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S] [Field K]
+        [Algebra S K] [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L]
+        [IsScalarTower S K L] [FiniteDimensional K L] [Algebra.IsSeparable K L] [CommRing D]
+        [IsDomain D] [IsDiscreteValuationRing D] [Algebra S D] [Module.Finite S D]
+        [FaithfulSMul S D],
+      Module.Finite D (integralClosure D (TensorProduct S D L)) := by
   intro S K L D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
   classical
   let K' := FractionRing D
   haveI : IsScalarTower S D K' := inferInstance
-  have hSK' : Function.Injective (algebraMap S K') :=
-    by
-      rw [IsScalarTower.algebraMap_eq S D K']
-      exact (IsFractionRing.injective D K').comp (FaithfulSMul.algebraMap_injective S D)
+  have hSK' : Function.Injective (algebraMap S K') := by
+    rw [IsScalarTower.algebraMap_eq S D K']
+    exact (IsFractionRing.injective D K').comp (FaithfulSMul.algebraMap_injective S D)
   letI : Algebra K K' := (IsFractionRing.lift hSK' : K →+* K').toAlgebra
   haveI : IsScalarTower S K K' :=
     IsScalarTower.of_algebraMap_eq (fun x => (IsFractionRing.lift_algebraMap hSK' x).symm)
@@ -48,24 +49,28 @@ theorem main : ∀ (S K L D : Type) [CommRing S] [IsDomain S] [IsDiscreteValuati
       | zero => simp
       | tmul a b => rfl
       | add x y hx hy => simp only [map_add (f := _), hx, hy]
-    rw [h2]; exact h1
-  let ι : K' ⊗[S] L ≃ₐ[K] K' ⊗[K] L := (IsLocalization.algebraTensorEquiv (nonZeroDivisors S) K K' L).symm
+    rw [h2]
+    exact h1
+  let ι : K' ⊗[S] L ≃ₐ[K] K' ⊗[K] L :=
+    (IsLocalization.algebraTensorEquiv (nonZeroDivisors S) K K' L).symm
   have hι : ∀ (a : K') (b : L), ι (a ⊗ₜ[S] b) = a ⊗ₜ[K] b := by
     intro a b
     rw [AlgEquiv.symm_apply_eq]
     rfl
-  let Ψ : D ⊗[S] L →ₐ[D] K' ⊗[K] L :=
-    { (ι.toRingEquiv.toRingHom.comp Φ.toRingHom) with
-      commutes' := fun d => by
-        show ι (Φ (d ⊗ₜ[S] 1)) = (algebraMap D K' d) ⊗ₜ[K] 1
-        rw [Algebra.TensorProduct.map_tmul]
-        exact hι _ _ }
+  let Ψ : D ⊗[S] L →ₐ[D] K' ⊗[K] L := {
+    (ι.toRingEquiv.toRingHom.comp Φ.toRingHom) with
+    commutes' := fun d => by
+      show ι (Φ (d ⊗ₜ[S] 1)) = (algebraMap D K' d) ⊗ₜ[K] 1
+      rw [Algebra.TensorProduct.map_tmul]
+      exact hι _ _
+  }
   have hΨ : Function.Injective Ψ := ι.injective.comp hΦ
   let M := integralClosure D (D ⊗[S] L)
-  let lin : M →ₗ[D] integralClosure D (K' ⊗[K] L) :=
-    { toFun := fun x => ⟨Ψ (x : D ⊗[S] L), (show IsIntegral D (x : D ⊗[S] L) from x.2).map Ψ⟩
-      map_add' := fun x y => Subtype.ext (map_add Ψ (x : D ⊗[S] L) y)
-      map_smul' := fun r x => Subtype.ext (map_smul Ψ r (x : D ⊗[S] L)) }
+  let lin : M →ₗ[D] integralClosure D (K' ⊗[K] L) := {
+    toFun := fun x => ⟨Ψ (x : D ⊗[S] L), (show IsIntegral D (x : D ⊗[S] L) from x.2).map Ψ⟩
+    map_add' := fun x y => Subtype.ext (map_add Ψ (x : D ⊗[S] L) y)
+    map_smul' := fun r x => Subtype.ext (map_smul Ψ r (x : D ⊗[S] L))
+  }
   exact Module.Finite.of_injective lin (fun x y h => Subtype.ext (hΨ (congrArg Subtype.val h)))
 
 end GlobalTheory.NormFin

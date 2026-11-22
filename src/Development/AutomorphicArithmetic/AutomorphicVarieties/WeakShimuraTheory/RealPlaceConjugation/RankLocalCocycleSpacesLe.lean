@@ -11,11 +11,15 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement
+  UpperTheory.V.Ws UpperTheory.V.Two
 open scoped Classical
 
-private theorem lc_of_open {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A] (ψ : Γ →* A)
-    (h : IsOpen (ψ.ker : Set Γ)) : IsLocallyConstant ψ :=
+private theorem lc_of_open
+    {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A]
+    (ψ : Γ →* A) (h : IsOpen (ψ.ker : Set Γ))
+    : IsLocallyConstant ψ :=
   _root_.UpperTheory.Reformulated.B.LocallyConstantOpenPreimage.lc_of_open ψ h
 
 private def scalRep {k Γ : Type} [Field k] [Group Γ] (γ : Γ →* kˣ) : Representation k Γ k where
@@ -23,8 +27,18 @@ private def scalRep {k Γ : Type} [Field k] [Group Γ] (γ : Γ →* kˣ) : Repr
   map_one' := by ext; simp
   map_mul' g h := by ext; simp [mul_comm]
 
-theorem UpperTheory.V.Ws.rank_localCocycleSpaces_le :
-    CohomologyHyp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ (T : Tower D) (g : ℕ), (plDvd T.F (prodS D)).ncard ≤ g → Nat.card T.ι ≤ g ∧ ∀ w, Module.rank (ResidueField c.O) (∀ v, (T.fr ∅).Zloc (residue c.O) ((T.fr ∅).Gv v) w) ≤ T.d + (2 * g : ℕ) := by
+theorem UpperTheory.V.Ws.rank_localCocycleSpaces_le
+    : CohomologyHyp
+      → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l}
+          (D : Raw Ω c),
+        D.Good
+          → ∀ (T : Tower D) (g : ℕ),
+            (plDvd T.F (prodS D)).ncard ≤ g
+              → Nat.card T.ι ≤ g
+                ∧ ∀ w,
+                  Module.rank (ResidueField c.O)
+                      (∀ v, (T.fr ∅).Zloc (residue c.O) ((T.fr ∅).Gv v) w)
+                    ≤ T.d + (2 * g : ℕ) := by
   intro P Ω _ _ _ l hl c D hD T g hg
   haveI : IsAlgClosure T.F Ω :=
     ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) T.F⟩
@@ -45,7 +59,8 @@ theorem UpperTheory.V.Ws.rank_localCocycleSpaces_le :
     haveI := hfin.to_subtype
     refine le_trans ?_ hg
     rw [← Nat.card_coe_set_eq]
-    exact Nat.card_le_card_of_injective (fun v => (⟨pl v, hmem v⟩ : plDvd T.F (prodS D)))
+    exact Nat.card_le_card_of_injective
+      (fun v => (⟨pl v, hmem v⟩ : plDvd T.F (prodS D)))
       fun a b h => hinj (congrArg Subtype.val h)
   refine ⟨hcard, fun w => ?_⟩
   have hl0 : ((l : ℕ) : ResidueField c.O) = 0 := by
@@ -56,13 +71,20 @@ theorem UpperTheory.V.Ws.rank_localCocycleSpaces_le :
   haveI : Finite (ResidueField c.O) := (UpperTheory.V.abelian₂.dvr_finite l c.O).2.1
   have hlc : IsLocallyConstant (T.rbU w) :=
     lc_of_open _ (Subgroup.isOpen_mono (fun x hx => hK2 w x (hK1 x hx)) hKo)
-  have hv : ∀ v : T.ι, CardLe ((T.fr ∅).Zloc (residue c.O) ((T.fr ∅).Gv v) w)
-      (Nat.card (ResidueField c.O) ^ (2 + locDeg (pl v))) := fun v => by
-    have h := card_localCocycles_le_of_place_above_prime P.loc.lf P.loc.lt P.loc.le T.F Ω l (ResidueField c.O) (ResidueField c.O)
-      (fun m => by rw [nsmul_eq_mul, hl0, zero_mul]) (T.pl v) (pl v)
-      (scalRep ((T.rbU w).comp (Dec (F := T.F) (T.pl v)).subtype)) (hpl v).1 (hpl v).2
-      (fun m => (hlc.comp_continuous continuous_subtype_val).comp fun u => (u : ResidueField c.O) • m)
-    exact h.of_injective (fun z => ⟨z.1, z.2.1, z.2.2, fun _ h => h.elim⟩)
+  have hv
+      : ∀ v : T.ι,
+        CardLe ((T.fr ∅).Zloc (residue c.O) ((T.fr ∅).Gv v) w)
+          (Nat.card (ResidueField c.O) ^ (2 + locDeg (pl v))) := fun v => by
+    have h :=
+      card_localCocycles_le_of_place_above_prime P.loc.lf P.loc.lt P.loc.le T.F Ω l
+        (ResidueField c.O) (ResidueField c.O)
+        (fun m => by rw [nsmul_eq_mul, hl0, zero_mul])
+        (T.pl v) (pl v) (scalRep ((T.rbU w).comp (Dec (F := T.F) (T.pl v)).subtype)) (hpl v).1
+        (hpl v).2
+        (fun m =>
+          (hlc.comp_continuous continuous_subtype_val).comp fun u => (u : ResidueField c.O) • m)
+    exact h.of_injective
+      (fun z => ⟨z.1, z.2.1, z.2.2, fun _ h => h.elim⟩)
       fun a b h => Subtype.ext (Subtype.mk.inj h)
   haveI : Fintype T.ι := Fintype.ofFinite _
   haveI : Finite (T.fr ∅).ι := T.fin
@@ -70,7 +92,8 @@ theorem UpperTheory.V.Ws.rank_localCocycleSpaces_le :
     have h1 := sum_local_degree_above_l_le_finrank T.F l (Finset.univ.map ⟨pl, hinj⟩)
     rw [Finset.sum_map] at h1
     simp only [Function.Embedding.coeFn_mk, (hpl _).2, if_true] at h1
-    rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card, smul_eq_mul]
+    rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card,
+      smul_eq_mul]
     have : T.d = Module.finrank ℚ T.F := rfl
     omega
   have hC : CardLe (∀ v : T.ι, (T.fr ∅).Zloc (residue c.O) ((T.fr ∅).Gv v) w)

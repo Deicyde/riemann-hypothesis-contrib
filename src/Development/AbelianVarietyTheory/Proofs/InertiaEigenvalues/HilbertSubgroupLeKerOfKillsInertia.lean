@@ -9,25 +9,30 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.InertiaEl
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Neutral.HilbertClassField
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Neutral.HilbertClassField
 open Pointwise
 
 namespace GlobalTheory.HilbertKill
 
-theorem hilbertSubgroup_le_ker : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (Av : HeightOneSpectrum (𝓞 E) → ValuationSubring Ω), (∀ v, IsPlaceOver (Av v) v) →
-    ∀ (M : Type) [AddCommGroup M] (z : G E Ω → M), (∀ g h, z (g * h) = z g + z h) →
-    IsLocallyConstant z → (∀ v, ∀ σ ∈ Ine (F := E) (Av v), z σ = 0) →
-    (∀ c : Ω ≃ₐ[E] Ω, IsComplexConjugation c → z c = 0) →
-    ∀ σ ∈ hilbertSubgroup E Ω, z σ = 0 := by
+theorem hilbertSubgroup_le_ker
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (Av : HeightOneSpectrum (𝓞 E) → ValuationSubring Ω),
+      (∀ v, IsPlaceOver (Av v) v)
+        → ∀ (M : Type) [AddCommGroup M] (z : G E Ω → M),
+          (∀ g h, z (g * h) = z g + z h) → IsLocallyConstant z
+            → (∀ v, ∀ σ ∈ Ine (F := E) (Av v), z σ = 0)
+            → (∀ c : Ω ≃ₐ[E] Ω, IsComplexConjugation c → z c = 0)
+            → ∀ σ ∈ hilbertSubgroup E Ω, z σ = 0 := by
   intro E Ω _ _ _ _ _ Av hAv M _ z hz hlc hIne hC
-  let f : G E Ω →* Multiplicative M :=
-    { toFun := fun g => Multiplicative.ofAdd (z g)
-      map_one' := by
-        have h := hz 1 1
-        rw [mul_one, left_eq_add] at h
-        simp [h]
-      map_mul' := fun g h => by simp [hz] }
+  let f : G E Ω →* Multiplicative M := {
+    toFun := fun g => Multiplicative.ofAdd (z g)
+    map_one' := by
+      have h := hz 1 1
+      rw [mul_one, left_eq_add] at h
+      simp [h]
+    map_mul' := fun g h => by simp [hz]
+  }
   have hf : ∀ g, g ∈ f.ker ↔ z g = 0 := fun g => by
     rw [MonoidHom.mem_ker]
     show Multiplicative.ofAdd (z g) = 1 ↔ _

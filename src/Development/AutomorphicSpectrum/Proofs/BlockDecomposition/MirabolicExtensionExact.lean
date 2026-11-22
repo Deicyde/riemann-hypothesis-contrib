@@ -7,15 +7,18 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Subsingl
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibOrd
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.BZMir GlobalTheory.BZMir.Leib
+  GlobalTheory.RgGu.Leib GlobalTheory.CompanionTheory.LeibOrd
 open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.LeibOrd
 
-theorem ses_of_subQuot {G V₁ V₂ V₃ : Type} [Group G] [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂]
-    [Module ℂ V₂] [AddCommGroup V₃] [Module ℂ V₃] {ρ₁ : Representation ℂ G V₁} {ρ₂ : Representation ℂ G V₂}
-    {ρ₃ : Representation ℂ G V₃} (S : Subrepresentation ρ₂) (e₁ : (subQuot S ⊥).Equiv ρ₁)
-    (e₂ : (subQuot ⊤ S).Equiv ρ₃) : Ses ρ₁ ρ₂ ρ₃ := by
+theorem ses_of_subQuot
+    {G V₁ V₂ V₃ : Type} [Group G] [AddCommGroup V₁] [Module ℂ V₁] [AddCommGroup V₂] [Module ℂ V₂]
+    [AddCommGroup V₃] [Module ℂ V₃]
+    {ρ₁ : Representation ℂ G V₁} {ρ₂ : Representation ℂ G V₂} {ρ₃ : Representation ℂ G V₃}
+    (S : Subrepresentation ρ₂) (e₁ : (subQuot S ⊥).Equiv ρ₁) (e₂ : (subQuot ⊤ S).Equiv ρ₃)
+    : Ses ρ₁ ρ₂ ρ₃ := by
   let p : Submodule ℂ S.toSubmodule :=
     (⊥ : Subrepresentation ρ₂).toSubmodule.comap S.toSubmodule.subtype
   have hp : p = ⊥ := by
@@ -23,10 +26,11 @@ theorem ses_of_subQuot {G V₁ V₂ V₃ : Type} [Group G] [AddCommGroup V₁] [
     intro s hs
     exact (Submodule.mem_bot ℂ).2 (Subtype.ext hs)
   let q : S.toSubmodule ≃ₗ[ℂ] (S.toSubmodule ⧸ p) :=
-    LinearEquiv.ofBijective p.mkQ ⟨by
-      rw [← LinearMap.ker_eq_bot, Submodule.ker_mkQ]; exact hp, p.mkQ_surjective⟩
-  have hq : ∀ (x : G) (w : S.toSubmodule ⧸ p),
-      (q.symm (subQuot S ⊥ x w) : V₂) = ρ₂ x (q.symm w : V₂) := by
+    LinearEquiv.ofBijective p.mkQ
+      ⟨by rw [← LinearMap.ker_eq_bot, Submodule.ker_mkQ]; exact hp, p.mkQ_surjective⟩
+  have hq
+      : ∀ (x : G) (w : S.toSubmodule ⧸ p),
+        (q.symm (subQuot S ⊥ x w) : V₂) = ρ₂ x (q.symm w : V₂) := by
     intro x w
     obtain ⟨s, rfl⟩ := q.surjective w
     have : subQuot S ⊥ x (q s) = q (S.toRepresentation x s) := rfl
@@ -67,8 +71,10 @@ theorem ses_of_subQuot {G V₁ V₂ V₃ : Type} [Group G] [AddCommGroup V₁] [
       refine ⟨e₁ (q ⟨v, hvS⟩), ?_⟩
       rw [hf1, e₁.symm_apply_apply, q.symm_apply_apply]
 
-theorem ses_of_mext (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
-    (n : ℕ) (A B C : MRep k n) : MExt A B C → Ses A.ρ B.ρ C.ρ := by
+theorem ses_of_mext
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (n : ℕ) (A B C : MRep k n)
+    : MExt A B C → Ses A.ρ B.ρ C.ρ := by
   rintro ⟨S, ⟨e₁⟩, ⟨e₂⟩⟩
   exact ses_of_subQuot S e₁ e₂
 

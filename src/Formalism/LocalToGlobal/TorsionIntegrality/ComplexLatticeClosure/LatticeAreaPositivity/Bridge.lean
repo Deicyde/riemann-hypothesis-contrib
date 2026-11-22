@@ -34,8 +34,9 @@ theorem is_lattice_closure_holds : IsLatClosure := by
     intro s t h
     have h1 := congrArg Complex.re h
     have h2 := congrArg Complex.im h
-    simp only [Complex.add_re, Complex.add_im, Complex.real_smul, Complex.re_ofReal_mul, Complex.im_ofReal_mul,
-      Complex.zero_re, Complex.zero_im] at h1 h2
+    simp only [Complex.add_re, Complex.add_im, Complex.real_smul, Complex.re_ofReal_mul,
+        Complex.im_ofReal_mul, Complex.zero_re, Complex.zero_im]
+      at h1 h2
     constructor
     · have : s * (a.re * b.im - a.im * b.re) = 0 := by linear_combination b.im * h1 - b.re * h2
       exact (mul_eq_zero.mp this).resolve_right hD
@@ -45,7 +46,8 @@ theorem is_lattice_closure_holds : IsLatClosure := by
 
 theorem is_lattice_smul_holds : IsLatSmul := by
   rintro Λ c hc ⟨L, rfl⟩
-  have h1 : L.lattice.toAddSubgroup = AddSubgroup.closure {L.ω₁, L.ω₂} := Submodule.span_int_eq_addSubgroupClosure _
+  have h1 : L.lattice.toAddSubgroup = AddSubgroup.closure {L.ω₁, L.ω₂} :=
+    Submodule.span_int_eq_addSubgroupClosure _
   have h0 : c • AddSubgroup.closure {L.ω₁, L.ω₂} = AddSubgroup.closure {c • L.ω₁, c • L.ω₂} := by
     change AddSubgroup.map (DistribSMul.toAddMonoidHom ℂ c) _ = _
     rw [AddMonoidHom.map_closure, Set.image_pair]
@@ -55,26 +57,31 @@ theorem is_lattice_smul_holds : IsLatSmul := by
   have hpos := F.areaPos L
   unfold F.area at hpos
   have h2 : ((starRingEnd ℂ) L.ω₁ * L.ω₂).im ≠ 0 := abs_pos.mp hpos
-  have h3 : (starRingEnd ℂ) (c • L.ω₁) * (c • L.ω₂) = ((Complex.normSq c : ℝ) : ℂ) * ((starRingEnd ℂ) L.ω₁ * L.ω₂) := by
+  have h3
+      : (starRingEnd ℂ) (c • L.ω₁) * (c • L.ω₂)
+        = ((Complex.normSq c : ℝ) : ℂ) * ((starRingEnd ℂ) L.ω₁ * L.ω₂) := by
     rw [smul_eq_mul, smul_eq_mul, map_mul, Complex.normSq_eq_conj_mul_self]
     ring
   rw [h3, Complex.im_ofReal_mul]
   exact mul_ne_zero (Complex.normSq_pos.mpr hc).ne' h2
 
-theorem sqrt_choice (s : ℂ) (d : ℕ) (hs : s ^ 2 = -(d : ℂ)) :
-    s = Complex.I * ((Real.sqrt d : ℝ) : ℂ) ∨ -s = Complex.I * ((Real.sqrt d : ℝ) : ℂ) := by
+theorem sqrt_choice (s : ℂ) (d : ℕ) (hs : s ^ 2 = -(d : ℂ))
+    : s = Complex.I * ((Real.sqrt d : ℝ) : ℂ) ∨ -s = Complex.I * ((Real.sqrt d : ℝ) : ℂ) := by
   have h1 : (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) ^ 2 = -(d : ℂ) := by
     rw [mul_pow, Complex.I_sq, ← Complex.ofReal_pow, Real.sq_sqrt (Nat.cast_nonneg d)]
     push_cast
     ring
-  have h2 : (s - Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (s + Complex.I * ((Real.sqrt d : ℝ) : ℂ)) = 0 := by
+  have h2
+      : (s - Complex.I * ((Real.sqrt d : ℝ) : ℂ)) * (s + Complex.I * ((Real.sqrt d : ℝ) : ℂ))
+        = 0 := by
     linear_combination hs - h1
   rcases mul_eq_zero.mp h2 with h | h
   · exact Or.inl (by linear_combination h)
   · exact Or.inr (by linear_combination -h)
 
-theorem half_integral (K : Type) [Field K] [NumberField K] (d : ℕ) (hd4 : d % 4 = 3) (y : K) (hy : y ^ 2 = -(d : K)) :
-    IsIntegral ℤ ((1 + y) / 2) := by
+theorem half_integral
+    (K : Type) [Field K] [NumberField K] (d : ℕ) (hd4 : d % 4 = 3) (y : K) (hy : y ^ 2 = -(d : K))
+    : IsIntegral ℤ ((1 + y) / 2) := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, d = 4 * k + 3 := ⟨d / 4, by omega⟩
   have hkK : (d : K) = 4 * (k : K) + 3 := by rw [hk]; push_cast; ring
   refine ⟨X ^ 2 - X + C ((k : ℤ) + 1), ?_, ?_⟩
@@ -83,8 +90,12 @@ theorem half_integral (K : Type) [Field K] [NumberField K] (d : ℕ) (hd4 : d % 
     push_cast
     linear_combination (1 / 4 : K) * hy - (1 / 4 : K) * hkK
 
-theorem latI_hasCM (K : Type) [Field K] [NumberField K] (d : ℕ) (hd4 : d % 4 = 3) (x : K) (hx : x ^ 2 = -(d : K))
-    (φ : K →+* ℂ) (𝔞 : Ideal (𝓞 K)) (δ : ℂ) : HasCM d (latI φ 𝔞 δ) := by
+theorem latI_hasCM
+    (K : Type) [Field K] [NumberField K]
+    (d : ℕ) (hd4 : d % 4 = 3)
+    (x : K) (hx : x ^ 2 = -(d : K))
+    (φ : K →+* ℂ) (𝔞 : Ideal (𝓞 K)) (δ : ℂ)
+    : HasCM d (latI φ 𝔞 δ) := by
   obtain ⟨y, hy, hφy⟩ : ∃ y : K, y ^ 2 = -(d : K) ∧ φ y = Complex.I * ((Real.sqrt d : ℝ) : ℂ) := by
     have hs : (φ x) ^ 2 = -(d : ℂ) := by rw [← map_pow, hx, map_neg, map_natCast]
     rcases sqrt_choice _ d hs with h | h

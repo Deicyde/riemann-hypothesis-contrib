@@ -25,30 +25,43 @@ public import Development.AbelianVarietyTheory.Proofs.UnramifiedDepth.ExistsFree
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry TensorProduct Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  TensorProduct Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF
+  ReciprocityTheory.ChartRestriction.G.Pdiv.AvDefs
 open ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.Be2 GlobalTheory.ChF
 open ReciprocityTheory.ChartRestriction.G.Chart (sp spMap)
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.ChF
 
-private theorem ofNat_succ_fin (n : ℕ) [NeZero n] (k : ℕ) :
-    Fin.ofNat n (k + 1) = Fin.ofNat n k + 1 := by
+private theorem ofNat_succ_fin (n : ℕ) [NeZero n] (k : ℕ)
+    : Fin.ofNat n (k + 1) = Fin.ofNat n k + 1 := by
   ext
   simp [Fin.add_def, Fin.ofNat]
 
-private theorem exp_bound (p : ℕ) [Fact p.Prime] (h : ℕ) (a b c : ℕ → ℕ) (D : ℕ)
-    (hab : ∀ n, a n + b n = h) (hbc : ∀ n, b n ≤ c n) (hD : ∀ n, c n ≤ D) :
-    (h : ℝ) / (p - 1) - ∑' n : ℕ, (p : ℝ) ^ (-((n : ℝ) + 1)) * (a n : ℝ) ≤
-      ∑' n : ℕ, (p : ℝ) ^ (-((n : ℝ) + 1)) * (c n : ℝ) := by
+private theorem exp_bound
+    (p : ℕ) [Fact p.Prime]
+    (h : ℕ) (a b c : ℕ → ℕ) (D : ℕ)
+    (hab : ∀ n, a n + b n = h) (hbc : ∀ n, b n ≤ c n) (hD : ∀ n, c n ≤ D)
+    : (h : ℝ) / (p - 1) - ∑' n : ℕ, (p : ℝ) ^ (-((n : ℝ) + 1)) * (a n : ℝ)
+      ≤ ∑' n : ℕ, (p : ℝ) ^ (-((n : ℝ) + 1)) * (c n : ℝ) := by
   have hp0 : (0 : ℝ) ≤ p := Nat.cast_nonneg _
-  have sa := summable_geom_p (p := p) (fun n => (a n : ℝ)) (fun _ => Nat.cast_nonneg _) h
-    (fun n => by exact_mod_cast (hab n ▸ Nat.le_add_right _ _ : a n ≤ h))
-  have sc := summable_geom_p (p := p) (fun n => (c n : ℝ)) (fun _ => Nat.cast_nonneg _) D
-    (fun n => by exact_mod_cast hD n)
-  have sh := summable_geom_p (p := p) (fun _ => (h : ℝ)) (fun _ => Nat.cast_nonneg _) h
-    (fun _ => le_rfl)
+  have sa :=
+    summable_geom_p (p := p)
+      (fun n => (a n : ℝ))
+      (fun _ => Nat.cast_nonneg _)
+      h
+      (fun n => by exact_mod_cast (hab n ▸ Nat.le_add_right _ _ : a n ≤ h))
+  have sc :=
+    summable_geom_p (p := p)
+      (fun n => (c n : ℝ))
+      (fun _ => Nat.cast_nonneg _)
+      D
+      (fun n => by exact_mod_cast hD n)
+  have sh :=
+    summable_geom_p (p := p) (fun _ => (h : ℝ)) (fun _ => Nat.cast_nonneg _) h (fun _ => le_rfl)
   have e : (h : ℝ) / (p - 1) = ∑' n : ℕ, (p : ℝ) ^ (-((n : ℝ) + 1)) * (h : ℝ) := by
     rw [tsum_mul_right, tsum_geom_p]; ring
   rw [e, ← Summable.tsum_sub sh sa]
@@ -59,11 +72,17 @@ private theorem exp_bound (p : ℕ) [Fact p.Prime] (h : ℕ) (a b c : ℕ → �
   have h2 : (b n : ℝ) ≤ c n := by exact_mod_cast hbc n
   linarith
 
-private theorem eigDim_le (C : Type) [Field C] {O OE : Type} [CommRing O] [Algebra O C] [CommRing OE]
-    {d : ℕ} (ρ : OE → Matrix (Fin d) (Fin d) O) (τ : OE →+* C) : eigDim C ρ τ ≤ d := by
+private theorem eigDim_le
+    (C : Type) [Field C]
+    {O OE : Type} [CommRing O] [Algebra O C] [CommRing OE]
+    {d : ℕ} (ρ : OE → Matrix (Fin d) (Fin d) O)
+    (τ : OE →+* C)
+    : eigDim C ρ τ ≤ d := by
   unfold eigDim
-  simpa using Submodule.finrank_le (⨅ a : OE, Module.End.eigenspace
-    (Matrix.toLin' ((ρ a).map (algebraMap O C))) (τ a))
+  simpa using
+    Submodule.finrank_le
+      (⨅ a : OE, Module.End.eigenspace
+        (Matrix.toLin' ((ρ a).map (algebraMap O C))) (τ a))
 
 theorem linDat_unram_bound : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C], v.Integers O → ∀ [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [Algebra ℤ_[p] O] (OE : Type) [CommRing OE] [IsDedekindDomain OE] [CharZero OE] [Module.Free ℤ OE] [Module.Finite ℤ OE] [StarRing OE] (cp : O), HodgeTateSetting p v O (ℤ_[p] ⊗[ℤ] OE) (sigE p OE) cp → ∀ (g : ℕ) (H : HodgeTateDatum p g v O (ℤ_[p] ⊗[ℤ] OE) (sigE p OE) cp) (d r m : ℕ) (A : Matrix (Fin d) (Fin r) O) (B : Matrix (Fin g) (Fin d) O) (ρG : OE →+* Matrix (Fin d) (Fin d) O) (N : OE →+* Matrix (Fin r) (Fin r) ℤ) (s : Fin m → Fin d → O), LinDat H A B ρG N s → ∀ [IsLocalRing O], p ≠ 2 → ¬ ((p : ℤ) ∣ Algebra.discr ℤ (Module.Free.chooseBasis ℤ OE)) → ∀ (w : PlaceU p OE) [NeZero w.n] (t : Fin w.n ≃ Emb (O := O) w.e), (∀ (j : Fin w.n) (a : OE), ((t (j + 1) : Emb (O := O) w.e) : OE →+* O) a - (((t j : Emb (O := O) w.e) : OE →+* O) a) ^ p ∈ IsLocalRing.maximalIdeal O) → ∀ (rk : (OE →+* O) → ℕ) (W : ∀ τ : OE →+* O, Fin (rk τ) → Fin d → O), (∀ τ, EigB ρG τ (W τ)) → ∀ j : Fin w.n, ∃ xs : NNReal, HasLen v O ((Fin (rk ((t j : Emb (O := O) w.e) : OE →+* O)) → O) ⧸ Submodule.span O (Set.range fun k => Pdiv.ChartF.res (W ((t j : Emb (O := O) w.e) : OE →+* O)) (s k))) xs ∧ v (algebraMap O C (p : O)) ^ (∑' n : ℕ, ((p : ℝ) ^ (-((n : ℝ) + 1))) * (rk (((t (j + Fin.ofNat w.n (n + 1)) : Emb (O := O) w.e) : OE →+* O).comp ((starRingAut : RingAut OE) : OE ≃+* OE).toRingHom) : ℝ)) ≤ xs := by
   intro p _ C _ _ _ v O _ _ hv _ _ _ OE _ _ _ _ _ _ cp hS g H d r m A B ρG N s hL _ hp2 hdisc w _ t ht

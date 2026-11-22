@@ -13,15 +13,17 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.FirstMini
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.ClosedModes
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem exists_lt_mul_of_lt {s a : ℝ} (ha : 0 ≤ a) (hs : s < a) :
-    ∃ θ : ℝ, 0 < θ ∧ θ < 1 ∧ s < θ * a := by
+theorem exists_lt_mul_of_lt {s a : ℝ} (ha : 0 ≤ a) (hs : s < a)
+    : ∃ θ : ℝ, 0 < θ ∧ θ < 1 ∧ s < θ * a := by
   rcases ha.eq_or_lt with h | h
   · subst h
     exact ⟨1 / 2, by norm_num, by norm_num, by simpa using hs⟩
@@ -40,9 +42,8 @@ theorem modeHalf_closed : (∀ (r : ℕ) (X : Data E r), ModeHalfStatement X) :=
   obtain ⟨θ, hθ0, hθ1, hνθ⟩ := exists_lt_mul_of_lt ha hν
   exact ModeDecay.fj_eq_zero_of_decay fj_norm_mul_exp_le_sup_flow
     ClosedDiscontinuity.propDisc_and_la1GG.2 r X la F (θ * a) hF
-    (pnorm_le_exp_neg_tt_near_cusp
-      (MajNear.maj_near_orth MajorantContinuity.majorant_continuity.1) maj_lact_rmul
-      NormFactor.nfac_transform r X la F ps a hF hps ha hmean θ (θ * a) hθ0 hθ1 rfl)
+    (pnorm_le_exp_neg_tt_near_cusp (MajNear.maj_near_orth MajorantContinuity.majorant_continuity.1)
+      maj_lact_rmul NormFactor.nfac_transform r X la F ps a hF hps ha hmean θ (θ * a) hθ0 hθ1 rfl)
     ξ hξ ν hνθ x hx
 
 end GlobalTheory.ClosedModes

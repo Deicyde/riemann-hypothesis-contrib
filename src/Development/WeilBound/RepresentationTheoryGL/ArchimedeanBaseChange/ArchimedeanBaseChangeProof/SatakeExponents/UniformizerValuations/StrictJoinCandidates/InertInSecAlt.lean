@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.LocalAlg
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical
 
 namespace PositivityTheory.Rg.BcB.F.FX

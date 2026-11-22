@@ -12,13 +12,21 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.IsImmer
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc GlobalTheory.Ex.OneGen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.ZM GlobalTheory.ZH GlobalTheory.UMin GlobalTheory.UPoinc
+  GlobalTheory.Ex.OneGen
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
-theorem GlobalTheory.UMin.symTup_div_pow_isUnit_of_dvd : ∀ (k Ω : Type) [CommRing k] [Field Ω] [Algebra k Ω] (A : Subalgebra k Ω) [IsLocalRing A] (N : ℕ) (c : Fin N → Ω) (a j : Fin N), c a ≠ 0 → (∀ b, c b / c a ∈ A) → symTup c j ≠ 0 → (∀ b, symTup c b / symTup c j ∈ A) → symTup c j / c a ^ N.factorial ≠ 0 ∧ symTup c j / c a ^ N.factorial ∈ A ∧ (symTup c j / c a ^ N.factorial)⁻¹ ∈ A := by
+theorem GlobalTheory.UMin.symTup_div_pow_isUnit_of_dvd
+    : ∀ (k Ω : Type) [CommRing k] [Field Ω] [Algebra k Ω] (A : Subalgebra k Ω) [IsLocalRing A]
+        (N : ℕ) (c : Fin N → Ω) (a j : Fin N),
+      c a ≠ 0 → (∀ b, c b / c a ∈ A) → symTup c j ≠ 0 → (∀ b, symTup c b / symTup c j ∈ A)
+        → symTup c j / c a ^ N.factorial ≠ 0 ∧ symTup c j / c a ^ N.factorial ∈ A
+          ∧ (symTup c j / c a ^ N.factorial)⁻¹ ∈ A := by
   intro k Ω _ _ _ A _ N c a j hca hcb hj hjb
   have hpow : c a ^ N.factorial ≠ 0 := pow_ne_zero _ hca
   let d : Fin N → A := fun b => ⟨c b / c a, hcb b⟩
@@ -37,8 +45,7 @@ theorem GlobalTheory.UMin.symTup_div_pow_isUnit_of_dvd : ∀ (k Ω : Type) [Comm
   rw [Fintype.card_fin] at hk2
   let j' : Fin N := ⟨k0 - 1, by omega⟩
   have hk0 : (j' : ℕ) + 1 = k0 := by show k0 - 1 + 1 = k0; omega
-  have hu : IsUnit (symTup d j') := by
-    unfold symTup; rw [hk0]; exact hku.pow _
+  have hu : IsUnit (symTup d j') := by unfold symTup; rw [hk0]; exact hku.pow _
   let x : A := ⟨symTup c j / c a ^ N.factorial, by rw [hd j]; exact (symTup d j).2⟩
   let z : A := ⟨symTup c j' / symTup c j, hjb j'⟩
   have hxz : symTup d j' = x * z := by

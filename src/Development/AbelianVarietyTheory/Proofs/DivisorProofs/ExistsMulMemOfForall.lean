@@ -8,13 +8,16 @@ namespace GlobalTheory.MultipleMembershipForAll
 
 open IsLocalRing
 
-theorem exists_mul_mem_of_forall {S : Type} [CommRing S] (Q I : Ideal S) [hQp : Q.IsPrime]
-    (hQ : Q.FG) (h : ∀ x ∈ Q, ∃ g ∉ Q, g * x ∈ I) : ∃ g ∉ Q, ∀ x ∈ Q, g * x ∈ I := by
+theorem exists_mul_mem_of_forall
+    {S : Type} [CommRing S]
+    (Q I : Ideal S) [hQp : Q.IsPrime]
+    (hQ : Q.FG) (h : ∀ x ∈ Q, ∃ g ∉ Q, g * x ∈ I)
+    : ∃ g ∉ Q, ∀ x ∈ Q, g * x ∈ I := by
   classical
   obtain ⟨s, hs⟩ := hQ
 
-  suffices H : ∀ s' : Finset S, (s' : Set S) ⊆ Q →
-      ∃ g ∉ Q, ∀ x ∈ Ideal.span (s' : Set S), g * x ∈ I by
+  suffices H
+      : ∀ s' : Finset S, (s' : Set S) ⊆ Q → ∃ g ∉ Q, ∀ x ∈ Ideal.span (s' : Set S), g * x ∈ I by
     obtain ⟨g, hg, hgI⟩ := H s (by rw [← hs]; exact Submodule.subset_span)
     exact ⟨g, hg, fun x hx => hgI x (by rw [hs]; exact hx)⟩
   intro s'
@@ -37,12 +40,14 @@ theorem exists_mul_mem_of_forall {S : Type} [CommRing S] (Q I : Ideal S) [hQp : 
     rw [e1]
     exact I.add_mem (I.mul_mem_left _ hgaI) (I.mul_mem_left _ (hgI z hz))
 
-theorem main : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Ideal S)
-    [inst_2 : Ideal.IsPrime Q], ∃ (h : ℕ) (f : Fin h → S), ∃ g ∉ Q, (∀ (j : Fin h), f j ∈ Q) ∧
-    (∀ x ∈ Q, g * x ∈ Ideal.span (Set.range f)) ∧
-    h = Submodule.spanFinrank (IsLocalRing.maximalIdeal (Localization.AtPrime Q)) ∧
-    ∀ (a : Fin h → S), ∀ u ∉ Q, u * ∑ j : Fin h, a j * f j ∈ Q ^ (2 : ℕ) →
-      ∀ (j : Fin h), a j ∈ Q := by
+theorem main
+    : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Ideal S)
+        [inst_2 : Ideal.IsPrime Q],
+      ∃ (h : ℕ) (f : Fin h → S), ∃ g ∉ Q,
+        (∀ (j : Fin h), f j ∈ Q) ∧ (∀ x ∈ Q, g * x ∈ Ideal.span (Set.range f))
+          ∧ h = Submodule.spanFinrank (IsLocalRing.maximalIdeal (Localization.AtPrime Q))
+          ∧ ∀ (a : Fin h → S), ∀ u ∉ Q,
+            u * ∑ j : Fin h, a j * f j ∈ Q ^ (2 : ℕ) → ∀ (j : Fin h), a j ∈ Q := by
   intro S _ _ Q _
   classical
   let R := Localization.AtPrime Q
@@ -64,7 +69,8 @@ theorem main : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Idea
     rw [← hxs (e j)] at h
     exact (IsLocalization.AtPrime.mk'_mem_maximal_iff R Q _ _).mp h
 
-  have hspan : Ideal.span (Set.range fun j => algebraMap S R (f j)) = IsLocalRing.maximalIdeal R := by
+  have hspan
+      : Ideal.span (Set.range fun j => algebraMap S R (f j)) = IsLocalRing.maximalIdeal R := by
     apply le_antisymm
     · rw [Ideal.span_le]
       rintro _ ⟨j, rfl⟩
@@ -82,7 +88,8 @@ theorem main : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Idea
       change algebraMap S R y ∈ Ideal.span (Set.range fun j => algebraMap S R (f j))
       rw [hspan]
       exact (IsLocalization.AtPrime.to_map_mem_maximal_iff R Q _).mpr hy
-    obtain ⟨g, hg, hgy⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff Q.primeCompl R _ _).mp hmem
+    obtain ⟨g, hg, hgy⟩ :=
+      (IsLocalization.algebraMap_mem_map_algebraMap_iff Q.primeCompl R _ _).mp hmem
     exact ⟨g, hg, hgy⟩
   obtain ⟨g, hg, hgQ⟩ := exists_mul_mem_of_forall Q _ (IsNoetherian.noetherian Q) hloc
   refine ⟨t.card, f, g, hg, hfQ, hgQ, htcard, ?_⟩
@@ -105,16 +112,18 @@ theorem main : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Idea
     rwa [← mul_assoc, hv, one_mul] at h2
   let N : Ideal R := Ideal.span (((Finset.univ.erase j0).image E : Finset R) : Set R)
   have hEN : ∀ j, j ≠ j0 → E j ∈ N := fun j hj =>
-    Ideal.subset_span (Finset.mem_coe.mpr
-      (Finset.mem_image_of_mem E (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ _⟩)))
+    Ideal.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem E
+      (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ _⟩)))
   have hrest : ∑ j ∈ Finset.univ.erase j0, algebraMap S R (a j) * E j ∈ N :=
     Ideal.sum_mem _ fun j hj => Ideal.mul_mem_left _ _ (hEN j (Finset.ne_of_mem_erase hj))
   have hj0mem : E j0 ∈ N ⊔ m * m := by
-    have hsplit := Finset.add_sum_erase Finset.univ (fun j => algebraMap S R (a j) * E j)
-      (Finset.mem_univ j0)
+    have hsplit :=
+      Finset.add_sum_erase Finset.univ (fun j => algebraMap S R (a j) * E j) (Finset.mem_univ j0)
     have h2 : algebraMap S R (a j0) * E j0 ∈ N ⊔ m * m := by
-      have h3 : algebraMap S R (a j0) * E j0 = ∑ j, algebraMap S R (a j) * E j -
-          ∑ j ∈ Finset.univ.erase j0, algebraMap S R (a j) * E j := by
+      have h3
+          : algebraMap S R (a j0) * E j0
+            = ∑ j, algebraMap S R (a j) * E j
+              - ∑ j ∈ Finset.univ.erase j0, algebraMap S R (a j) * E j := by
         rw [← hsplit]; ring
       rw [h3]
       exact Ideal.sub_mem _ (Ideal.mem_sup_right (by rwa [← sq])) (Ideal.mem_sup_left hrest)
@@ -123,15 +132,17 @@ theorem main : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Idea
     rwa [← mul_assoc, hv, one_mul] at h4
   have hle : m ≤ N ⊔ m • m := by
     rw [Ideal.smul_eq_mul]
-    calc m = Ideal.span (Set.range E) := hspan.symm
+    calc
+      m = Ideal.span (Set.range E) := hspan.symm
       _ ≤ N ⊔ m * m := by
         rw [Ideal.span_le]
         rintro _ ⟨j, rfl⟩
         by_cases hj : j = j0
         · subst hj; exact hj0mem
         · exact Ideal.mem_sup_left (hEN j hj)
-  have hmN : m ≤ N := Submodule.le_of_le_smul_of_le_jacobson_bot (IsNoetherian.noetherian m)
-    (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hle
+  have hmN : m ≤ N :=
+    Submodule.le_of_le_smul_of_le_jacobson_bot (IsNoetherian.noetherian m)
+      (IsLocalRing.jacobson_eq_maximalIdeal ⊥ bot_ne_top).ge hle
   have hNm : N ≤ m := by
     rw [Ideal.span_le]
     intro y hy
@@ -139,7 +150,9 @@ theorem main : ∀ (S : Type) [inst : CommRing S] [IsNoetherianRing S] (Q : Idea
     rw [← hspan]
     exact Ideal.subset_span ⟨j, rfl⟩
   have hcard : m.spanFinrank ≤ t.card - 1 := by
-    calc m.spanFinrank = N.spanFinrank := by rw [le_antisymm hmN hNm]
+    calc
+      m.spanFinrank
+        = N.spanFinrank := by rw [le_antisymm hmN hNm]
       _ ≤ (((Finset.univ.erase j0).image E : Finset R) : Set R).ncard :=
         Submodule.spanFinrank_span_le_ncard_of_finite (Finset.finite_toSet _)
       _ = ((Finset.univ.erase j0).image E).card := Set.ncard_coe_finset _

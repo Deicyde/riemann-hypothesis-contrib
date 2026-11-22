@@ -10,7 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsExponentia
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
 open Matrix
 open scoped ComplexOrder Topology
@@ -20,12 +23,20 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem intPsd_common_kernel_of_sum_not_posDef : ∀ (a g rk : ℕ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ), (∀ k, ((B k).map (Int.cast : ℤ → ℝ)).PosSemidef) → (∀ k (j l : Fin g), (rk ≤ j.val ∨ rk ≤ l.val) → B k j l = 0) → ¬ (((∑ k, B k).map (Int.cast : ℤ → ℝ)).submatrix (Subtype.val : {j : Fin g // j.val < rk} → Fin g) Subtype.val).PosDef → ∃ v : Fin g → ℤ, v ≠ 0 ∧ (∀ j : Fin g, rk ≤ j.val → v j = 0) ∧ ∀ k, (B k).mulVec v = 0 := by
+theorem intPsd_common_kernel_of_sum_not_posDef
+    : ∀ (a g rk : ℕ) (B : Fin a → Matrix (Fin g) (Fin g) ℤ),
+      (∀ k, ((B k).map (Int.cast : ℤ → ℝ)).PosSemidef)
+        → (∀ k (j l : Fin g), (rk ≤ j.val ∨ rk ≤ l.val) → B k j l = 0)
+        → ¬(((∑ k, B k).map (Int.cast : ℤ → ℝ)).submatrix
+          (Subtype.val : {j : Fin g // j.val < rk} → Fin g) Subtype.val).PosDef
+        → ∃ v : Fin g → ℤ,
+          v ≠ 0 ∧ (∀ j : Fin g, rk ≤ j.val → v j = 0) ∧ ∀ k, (B k).mulVec v = 0 := by
   intro a g rk B hpsd hsupp hnot
   set S : Matrix (Fin g) (Fin g) ℤ := ∑ k, B k with hS
   let e : {j : Fin g // j.val < rk} → Fin g := Subtype.val
-  have hcast : ∀ (M : Matrix (Fin g) (Fin g) ℤ) (u : Fin g → ℤ) (i : Fin g),
-      ((M.map (Int.cast : ℤ → ℝ)) *ᵥ (fun j => (u j : ℝ))) i = (((M *ᵥ u) i : ℤ) : ℝ) := by
+  have hcast
+      : ∀ (M : Matrix (Fin g) (Fin g) ℤ) (u : Fin g → ℤ) (i : Fin g),
+        ((M.map (Int.cast : ℤ → ℝ)) *ᵥ (fun j => (u j : ℝ))) i = (((M *ᵥ u) i : ℤ) : ℝ) := by
     intro M u i
     simp [mulVec, dotProduct]
   have hSmap : S.map (Int.cast : ℤ → ℝ) = ∑ k, (B k).map (Int.cast : ℤ → ℝ) := by
@@ -46,8 +57,10 @@ theorem intPsd_common_kernel_of_sum_not_posDef : ∀ (a g rk : ℕ) (B : Fin a �
       exact hdet (exists_mulVec_eq_zero_iff.1 ⟨x, hx, hk⟩)
   have hdetZ : (S.submatrix e e).det = 0 := by
     have h := (Int.castRingHom ℝ).map_det (S.submatrix e e)
-    have h2 : (Int.castRingHom ℝ).mapMatrix (S.submatrix e e)
-        = (S.map (Int.cast : ℤ → ℝ)).submatrix e e := rfl
+    have h2
+        : (Int.castRingHom ℝ).mapMatrix (S.submatrix e e)
+          = (S.map (Int.cast : ℤ → ℝ)).submatrix e e :=
+      rfl
     rw [h2, hdetR, eq_intCast] at h
     exact_mod_cast h
   obtain ⟨w, hw0, hw⟩ := exists_mulVec_eq_zero_iff.2 hdetZ
@@ -87,8 +100,7 @@ theorem intPsd_common_kernel_of_sum_not_posDef : ∀ (a g rk : ℕ) (B : Fin a �
       (posSemidef_iff_dotProduct_mulVec.1 (hpsd k)).2 vR
     have hsum : ∑ k, star vR ⬝ᵥ (((B k).map (Int.cast : ℤ → ℝ)) *ᵥ vR) = 0 := by
       rw [← dotProduct_sum, ← sum_mulVec, ← hSmap]
-      have : (S.map (Int.cast : ℤ → ℝ)) *ᵥ vR = 0 := by
-        funext i; rw [hcast, hSv]; simp
+      have : (S.map (Int.cast : ℤ → ℝ)) *ᵥ vR = 0 := by funext i; rw [hcast, hSv]; simp
       rw [this, dotProduct_zero]
     have hk0 := (Finset.sum_eq_zero_iff_of_nonneg (fun k _ => hQnn k)).1 hsum k (Finset.mem_univ _)
     have hker := (hpsd k).dotProduct_mulVec_zero_iff.1 hk0

@@ -7,4 +7,5 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.SesquilinearRowS
 
 @[expose] public section
 
-theorem split_row_iso : PI.SplitRow.SplitRow := PI.SRW.splitRow_of_iso PI.SRW.measure_isomorphism_at_infinity
+theorem split_row_iso : PI.SplitRow.SplitRow :=
+  PI.SRW.splitRow_of_iso PI.SRW.measure_isomorphism_at_infinity

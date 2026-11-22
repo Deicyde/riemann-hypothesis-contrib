@@ -4,10 +4,9 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.Qk9.tri_diag :
-    ∀ {R : Type} [inst : CommRing R] {n : ℕ}
-    (A B : Matrix (Fin n) (Fin n) R),
-    A.BlockTriangular id → B.BlockTriangular id → ∀ (i : Fin n), (A * B) i i = A i i * B i i := by
+theorem UpperTheory.Reformulated.B.Qk9.tri_diag
+    : ∀ {R : Type} [inst : CommRing R] {n : ℕ} (A B : Matrix (Fin n) (Fin n) R),
+      A.BlockTriangular id → B.BlockTriangular id → ∀ (i : Fin n), (A * B) i i = A i i * B i i := by
   intro R _ n A B hA hB i
   rw [Matrix.mul_apply]
   refine Finset.sum_eq_single i ?_ ?_

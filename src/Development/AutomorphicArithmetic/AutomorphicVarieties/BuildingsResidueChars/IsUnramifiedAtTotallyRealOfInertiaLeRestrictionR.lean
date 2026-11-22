@@ -7,15 +7,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.UnitaryBC UpperTheory.V
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.UnitaryBC UpperTheory.V
 open UpperTheory.V.W (Plc Lp resP)
 
-theorem UpperTheory.isUnramifiedAt_totallyReal_of_inertia_le_restriction_range :
-    ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω], (∀ (A : ValuationSubring Ω) (v : Plc (Lp L)), IsPlaceOver A v → Ine (F := Lp L) A ≤ (resP L Ω).range) → ∀ w : Plc L, Algebra.IsUnramifiedAt (𝓞 (Lp L)) w.asIdeal := by
+theorem UpperTheory.isUnramifiedAt_totallyReal_of_inertia_le_restriction_range
+    : ∀ (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
+        [IsAlgClosure L Ω],
+      (∀ (A : ValuationSubring Ω) (v : Plc (Lp L)),
+          IsPlaceOver A v → Ine (F := Lp L) A ≤ (resP L Ω).range)
+        → ∀ w : Plc L, Algebra.IsUnramifiedAt (𝓞 (Lp L)) w.asIdeal := by
   intro L Ω _ _ _ _ _ _ h w
   obtain ⟨A, hA⟩ := exists_valuationSubring_over (Ω := Ω) w
-  let v : Plc (Lp L) := ⟨w.asIdeal.comap (algebraMap (𝓞 (Lp L)) (𝓞 L)), inferInstance, by
-    exact Ideal.IsMaximal.ne_bot_of_isIntegral_int (Ideal.comap (algebraMap (𝓞 (Lp L)) (𝓞 L)) w.asIdeal)⟩
+  let v : Plc (Lp L) := ⟨
+    w.asIdeal.comap (algebraMap (𝓞 (Lp L)) (𝓞 L)),
+    inferInstance,
+    by
+      exact Ideal.IsMaximal.ne_bot_of_isIntegral_int (Ideal.comap (algebraMap (𝓞 (Lp L)) (𝓞 L))
+        w.asIdeal)
+  ⟩
   have hv : IsPlaceOver A v := by
     intro x
     have h1 := hA (algebraMap (𝓞 (Lp L)) (𝓞 L) x)

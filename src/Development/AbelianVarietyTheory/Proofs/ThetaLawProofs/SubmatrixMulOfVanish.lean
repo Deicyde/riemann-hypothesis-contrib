@@ -14,8 +14,6 @@ variable {R Ix : Type} [CommRing R] [Fintype Ix] [DecidableEq Ix]
 def HasDeg (deg : Ix → ℕ) (k : ℤ) (X : Matrix Ix Ix R) : Prop :=
   ∀ p q, (deg p : ℤ) ≠ deg q + k → X p q = 0
 
-
-
 variable {R Ix : Type} [CommRing R] [Fintype Ix] [DecidableEq Ix] in
 private lemma submatrix_mul_eq_of_vanishing_off {ι κ : Type} (X Y : Matrix Ix Ix R) (Q : Ix → Prop)
     [DecidablePred Q] (f : ι → Ix) (g : κ → Ix) (hX : ∀ i r, ¬ Q r → X (f i) r = 0) :
@@ -165,12 +163,13 @@ private lemma det_even_submatrix_homotopy_product_eq_one (deg : Ix → ℕ) (D h
       ⟨fun i => hd (by rw [← i.2]; exact i.1.2)⟩
     exact Matrix.det_isEmpty
 
-
 variable {R Ix : Type} [CommRing R] [Fintype Ix] [DecidableEq Ix] in
-theorem _root_.GlobalTheory.TorsionUnique.torsSq_unique : ∀ (R Ix : Type) [CommRing R] [Fintype Ix] [DecidableEq Ix]
-    (deg : Ix → ℕ) (D : Matrix Ix Ix R) (t t' : R),
-    _root_.GlobalTheory.KeyKa.IsCx deg D → _root_.GlobalTheory.KeyKa.TorsSq deg D t →
-      _root_.GlobalTheory.KeyKa.TorsSq deg D t' → t = t' ∧ IsUnit t := by
+theorem _root_.GlobalTheory.TorsionUnique.torsSq_unique
+    : ∀ (R Ix : Type) [CommRing R] [Fintype Ix] [DecidableEq Ix] (deg : Ix → ℕ) (D : Matrix Ix Ix R)
+        (t t' : R),
+      _root_.GlobalTheory.KeyKa.IsCx deg D → _root_.GlobalTheory.KeyKa.TorsSq deg D t
+        → _root_.GlobalTheory.KeyKa.TorsSq deg D t'
+        → t = t' ∧ IsUnit t := by
   intro R Ix _ _ _ deg D t t' hDiff H H'
   obtain ⟨h, hh, hc, e, rfl⟩ := H
   obtain ⟨h', hh', hc', e', rfl⟩ := H'
@@ -180,13 +179,17 @@ theorem _root_.GlobalTheory.TorsionUnique.torsSq_unique : ∀ (R Ix : Type) [Com
   have hD : _root_.GlobalTheory.TorsionUnique.HasDeg deg (-1) D := fun p q hpq => hD0 p q (by omega)
   have hd : _root_.GlobalTheory.TorsionUnique.HasDeg deg 1 h := fun p q hpq => hh p q (by omega)
   have hd' : _root_.GlobalTheory.TorsionUnique.HasDeg deg 1 h' := fun p q hpq => hh' p q (by omega)
-  have hprod : ∀ g : Matrix Ix Ix R, _root_.GlobalTheory.TorsionUnique.HasDeg deg 1 g →
-      ((D + g).submatrix (Subtype.val : {p // Even (deg p)} → Ix) (fun p => (e' p : Ix))
-        * (D + h).submatrix (fun p => (e' p : Ix)) Subtype.val)
-        = ((D + g) * (D + h)).submatrix (Subtype.val : {p // Even (deg p)} → Ix)
-          (Subtype.val : {p // Even (deg p)} → Ix) := by
+  have hprod
+      : ∀ g : Matrix Ix Ix R,
+        _root_.GlobalTheory.TorsionUnique.HasDeg deg 1 g
+          → ((D + g).submatrix (Subtype.val : {p // Even (deg p)} → Ix) (fun p => (e' p : Ix))
+              * (D + h).submatrix (fun p => (e' p : Ix)) Subtype.val)
+            = ((D + g) * (D + h)).submatrix (Subtype.val : {p // Even (deg p)} → Ix)
+              (Subtype.val : {p // Even (deg p)} → Ix) := by
     intro g hg
-    rw [submatrix_mul_eq_of_vanishing_off (D + g) (D + h) (fun r => ¬ Even (deg r)) _ _
+    rw [submatrix_mul_eq_of_vanishing_off (D + g) (D + h)
+      (fun r => ¬ Even (deg r))
+      _ _
       (fun i r hr => by
         rw [not_not] at hr
         rw [Matrix.add_apply, apply_eq_zero_of_hasDeg_odd_of_even_even hD (Or.inr rfl) i.2 hr,
@@ -207,12 +210,15 @@ theorem _root_.GlobalTheory.TorsionUnique.torsSq_unique : ∀ (R Ix : Type) [Com
     rw [← Matrix.det_mul, hprod h' hd']
     exact det_even_submatrix_homotopy_product_eq_one deg D h h' hD hDD hd hd' hc hc'
   have hba : b = a := by
-    calc b = b * (a * c) := by rw [hac, mul_one]
+    calc
+      b = b * (a * c) := by rw [hac, mul_one]
       _ = a * (b * c) := by ring
       _ = a := by rw [hbc, mul_one]
-  have hsq : ∀ (g : Matrix Ix Ix R) (f : {p // Even (deg p)} ≃ {p // ¬ Even (deg p)}),
-      ((g.submatrix (fun p : {p // Even (deg p)} => (p : Ix)) fun p => (f p : Ix)).det) ^ 2
-        = ((g.submatrix (fun p : {p // Even (deg p)} => (p : Ix)) fun p => (e' p : Ix)).det) ^ 2 := by
+  have hsq
+      : ∀ (g : Matrix Ix Ix R) (f : {p // Even (deg p)} ≃ {p // ¬ Even (deg p)}),
+        ((g.submatrix (fun p : {p // Even (deg p)} => (p : Ix)) fun p => (f p : Ix)).det) ^ 2
+          = ((g.submatrix (fun p : {p // Even (deg p)} => (p : Ix)) fun p => (e' p : Ix)).det)
+            ^ 2 := by
     intro g f
     have : g.submatrix (fun p : {p // Even (deg p)} => (p : Ix)) (fun p => (f p : Ix))
         = (g.submatrix (fun p : {p // Even (deg p)} => (p : Ix)) fun p => (e' p : Ix)).submatrix id

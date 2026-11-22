@@ -10,13 +10,13 @@ open NumberField Complex ReciprocityTheory.ChartRestriction.G.I2
 
 namespace GlobalTheory
 
-theorem exists_short_integral_rational_basis :
-    (∀ (E : Type) [Field E] [NumberField E] [IsCMField E], ∃ (n : ℕ) (ω : Fin n → 𝓞 E),
-      (∀ j (σ : E →+* ℂ), ‖σ (ω j)‖ ≤ omStar (E := E)) ∧
-      ∀ α : 𝓞 E, (α : E) ∈ Submodule.span ℚ (Set.range fun j => (ω j : E))) →
-    (∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
-      ∃ ω : Fin (Module.finrank ℚ E) → 𝓞 E, LinearIndependent ℚ (fun j => (ω j : E)) ∧
-        ∀ j (τ : E →+* ℂ), ‖τ (ω j : E)‖ ≤ omStar (E := E)) := by
+theorem exists_short_integral_rational_basis
+    : (∀ (E : Type) [Field E] [NumberField E] [IsCMField E], ∃ (n : ℕ) (ω : Fin n → 𝓞 E),
+        (∀ j (σ : E →+* ℂ), ‖σ (ω j)‖ ≤ omStar (E := E))
+          ∧ ∀ α : 𝓞 E, (α : E) ∈ Submodule.span ℚ (Set.range fun j => (ω j : E)))
+      → (∀ (E : Type) [Field E] [NumberField E] [IsCMField E], ∃ ω : Fin (Module.finrank ℚ E) → 𝓞 E,
+        LinearIndependent ℚ (fun j => (ω j : E))
+          ∧ ∀ j (τ : E →+* ℂ), ‖τ (ω j : E)‖ ≤ omStar (E := E)) := by
   intro hex E _ _ _
   classical
   obtain ⟨n, ω, hωB, hsp⟩ := hex E

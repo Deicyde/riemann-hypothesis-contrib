@@ -9,10 +9,11 @@ open IsLocalRing TensorProduct Pointwise
 
 namespace GlobalTheory
 
-def idealTransform (S : Type) [CommRing S] (I : Ideal S) (A : Type) [CommRing A] [Algebra S A] :
-    Subalgebra S (FractionRing S ⊗[S] A) where
-  carrier := {z | ∃ k : ℕ, ∀ a ∈ I ^ k,
-    a • z ∈ (Algebra.TensorProduct.includeRight : A →ₐ[S] FractionRing S ⊗[S] A).range}
+def idealTransform (S : Type) [CommRing S] (I : Ideal S) (A : Type) [CommRing A] [Algebra S A]
+    : Subalgebra S (FractionRing S ⊗[S] A) where
+  carrier :=
+    {z | ∃ k : ℕ, ∀ a ∈ I ^ k,
+      a • z ∈ (Algebra.TensorProduct.includeRight : A →ₐ[S] FractionRing S ⊗[S] A).range}
   mul_mem' := by
     rintro z w ⟨k, hk⟩ ⟨l, hl⟩
     refine ⟨k + l, fun a ha => ?_⟩
@@ -30,11 +31,16 @@ def idealTransform (S : Type) [CommRing S] (I : Ideal S) (A : Type) [CommRing A]
   algebraMap_mem' := by
     intro r
     refine ⟨0, fun a _ => ?_⟩
-    exact ⟨algebraMap S A (a * r), by simp [Algebra.algebraMap_eq_smul_one, Algebra.TensorProduct.one_def, smul_tmul', mul_smul]⟩
+    exact ⟨
+      algebraMap S A (a * r),
+      by simp [Algebra.algebraMap_eq_smul_one, Algebra.TensorProduct.one_def, smul_tmul', mul_smul]
+    ⟩
 
-theorem mem_idealTransform_of_forall_smul_mem {S : Type} [CommRing S] [IsNoetherianRing S]
-    {I : Ideal S} {A : Type} [CommRing A] [Algebra S A] (z : FractionRing S ⊗[S] A)
-    (h : ∀ a ∈ I, a • z ∈ idealTransform S I A) : z ∈ idealTransform S I A := by
+theorem mem_idealTransform_of_forall_smul_mem
+    {S : Type} [CommRing S] [IsNoetherianRing S]
+    {I : Ideal S} {A : Type} [CommRing A] [Algebra S A]
+    (z : FractionRing S ⊗[S] A) (h : ∀ a ∈ I, a • z ∈ idealTransform S I A)
+    : z ∈ idealTransform S I A := by
   let R := (Algebra.TensorProduct.includeRight : A →ₐ[S] FractionRing S ⊗[S] A).range
   let Q : Ideal S := Submodule.comap (LinearMap.toSpanSingleton S _ z) (Subalgebra.toSubmodule R)
   have hQ : ∀ a, a ∈ Q ↔ a • z ∈ R := fun a => by simp [Q]

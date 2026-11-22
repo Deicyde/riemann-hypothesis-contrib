@@ -10,10 +10,12 @@ open scoped InnerProductSpace Kronecker
 
 namespace GlobalTheory.CompanionTheory.WedgeSplitCasimir
 
-theorem jW_mul_transpose (n m : ℕ) (J J' : Sub n m) (s s' : Fin n) :
-    (jW n m * (jW n m)ᵀ) (J, s) (J', s') =
-      if s ∉ J.1 ∧ s' ∉ J'.1 ∧ insert s J.1 = insert s' J'.1 then
-        (-1) ^ (J.1.filter fun a => a < s).card * (-1) ^ (J'.1.filter fun a => a < s').card else 0 := by
+theorem jW_mul_transpose (n m : ℕ) (J J' : Sub n m) (s s' : Fin n)
+    : (jW n m * (jW n m)ᵀ) (J, s) (J', s')
+      = if s ∉ J.1 ∧ s' ∉ J'.1 ∧ insert s J.1 = insert s' J'.1 then
+          (-1) ^ (J.1.filter fun a => a < s).card * (-1) ^ (J'.1.filter fun a => a < s').card
+        else
+          0 := by
   rw [Matrix.mul_apply]
   simp only [Matrix.transpose_apply, jW]
   by_cases hs : s ∈ J.1
@@ -30,15 +32,18 @@ theorem jW_mul_transpose (n m : ℕ) (J J' : Sub n m) (s s' : Fin n) :
     · intro h
       exact absurd (Finset.mem_univ _) h
 
-theorem anticomm {n : ℕ} (J J' : Finset (Fin n)) (s s' : Fin n) :
-    (if s ∈ J' ∧ s' ∉ J'.erase s ∧ J = insert s' (J'.erase s) then
-        (-1 : ℂ) ^ ((J'.erase s).filter fun c => c < s').card * (-1) ^ ((J'.erase s).filter fun c => c < s).card
-      else 0) =
-    (if J = J' ∧ s = s' then 1 else 0) -
-      if s ∉ J ∧ s' ∉ J' ∧ insert s J = insert s' J' then
-        (-1) ^ (J.filter fun a => a < s).card * (-1) ^ (J'.filter fun a => a < s').card else 0 := by
-  have sq : ∀ a : ℕ, (-1 : ℂ) ^ a * (-1) ^ a = 1 := fun a => by
-    rw [← mul_pow]; simp
+theorem anticomm {n : ℕ} (J J' : Finset (Fin n)) (s s' : Fin n)
+    : (if s ∈ J' ∧ s' ∉ J'.erase s ∧ J = insert s' (J'.erase s) then
+         (-1 : ℂ) ^ ((J'.erase s).filter fun c => c < s').card
+           * (-1) ^ ((J'.erase s).filter fun c => c < s).card
+       else
+         0)
+      = (if J = J' ∧ s = s' then 1 else 0)
+        - if s ∉ J ∧ s' ∉ J' ∧ insert s J = insert s' J' then
+            (-1) ^ (J.filter fun a => a < s).card * (-1) ^ (J'.filter fun a => a < s').card
+          else
+            0 := by
+  have sq : ∀ a : ℕ, (-1 : ℂ) ^ a * (-1) ^ a = 1 := fun a => by rw [← mul_pow]; simp
   by_cases hss : s = s'
   · subst hss
     by_cases hs : s ∈ J'
@@ -77,11 +82,21 @@ theorem anticomm {n : ℕ} (J J' : Finset (Fin n)) (s s' : Fin n) :
       refine ⟨hs, fun h => h2 (Finset.mem_of_mem_erase h), ?_⟩
       rw [← Finset.erase_insert h1, h3, Finset.erase_insert_of_ne (Ne.symm hss)]
 
-theorem wedgeQ : StdD → (∀ (k r m : ℕ) (a b : Fin (2 * r + k + 1)) (J J' : Sub (2 * r + k + 1) m), (wedge k r m).dC (Matrix.single a b 1) J J' = if b ∈ J'.1 ∧ a ∉ J'.1.erase b ∧ J.1 = insert a (J'.1.erase b) then (-1) ^ ((J'.1.erase b).filter fun c => c < a).card * (-1) ^ ((J'.1.erase b).filter fun c => c < b).card else 0) → WedgeQ := by
+theorem wedgeQ
+    : StdD
+      → (∀ (k r m : ℕ) (a b : Fin (2 * r + k + 1)) (J J' : Sub (2 * r + k + 1) m),
+        (wedge k r m).dC (Matrix.single a b 1) J J'
+          = if b ∈ J'.1 ∧ a ∉ J'.1.erase b ∧ J.1 = insert a (J'.1.erase b) then
+              (-1) ^ ((J'.1.erase b).filter fun c => c < a).card
+                * (-1) ^ ((J'.1.erase b).filter fun c => c < b).card
+            else
+              0)
+      → WedgeQ := by
   intro hS hW k r m
   ext ⟨J, s⟩ ⟨J', s'⟩
-  have h1 : qMat (wedge k r m) (vr k r false) (J, s) (J', s') =
-      (wedge k r m).dC (Matrix.single s' s 1) J J' := by
+  have h1
+      : qMat (wedge k r m) (vr k r false) (J, s) (J', s')
+        = (wedge k r m).dC (Matrix.single s' s 1) J J' := by
     simp only [qMat, Matrix.sum_apply, Matrix.kroneckerMap_apply, (hS k r _).1]
     rw [Finset.sum_eq_single s', Finset.sum_eq_single s]
     · simp

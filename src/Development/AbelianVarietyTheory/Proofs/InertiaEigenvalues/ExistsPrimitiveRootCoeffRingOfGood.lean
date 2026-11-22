@@ -5,12 +5,14 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.DataNLoc
 
 @[expose] public section
 
-open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+open PowerSeries Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions
+  Formalism.BasicNotions.Loc
 
 namespace GlobalTheory
 
-theorem exists_primitiveRoot_coeffRing_of_good {l : ℕ} [Fact l.Prime] (K LL : FinExt l)
-    (h : Good K 1 LL) : ∃ ζ : ↥(OL LL), IsPrimitiveRoot ζ l := by
+theorem exists_primitiveRoot_coeffRing_of_good
+    {l : ℕ} [Fact l.Prime] (K LL : FinExt l) (h : Good K 1 LL)
+    : ∃ ζ : ↥(OL LL), IsPrimitiveRoot ζ l := by
   have hl : 0 < l := (Fact.out : l.Prime).pos
   have hdeg : (Polynomial.cyclotomic l (Om l)).degree ≠ 0 :=
     (Polynomial.degree_cyclotomic_pos l (Om l) hl).ne'
@@ -28,7 +30,9 @@ theorem exists_primitiveRoot_coeffRing_of_good {l : ℕ} [Fact l.Prime] (K LL : 
     IsPrimitiveRoot.of_map_of_injective (f := LL.1.val) hζ Subtype.val_injective
   have hint : IsIntegral ℤ_[l] (⟨z, hLL⟩ : ↥LL.1) :=
     IsIntegral.of_pow hl (by rw [hζ'.pow_eq_one]; exact isIntegral_one)
-  exact ⟨⟨⟨z, hLL⟩, hint⟩,
-    IsPrimitiveRoot.of_map_of_injective (f := (OL LL).val) hζ' Subtype.val_injective⟩
+  exact ⟨
+    ⟨⟨z, hLL⟩, hint⟩,
+    IsPrimitiveRoot.of_map_of_injective (f := (OL LL).val) hζ' Subtype.val_injective
+  ⟩
 
 end GlobalTheory

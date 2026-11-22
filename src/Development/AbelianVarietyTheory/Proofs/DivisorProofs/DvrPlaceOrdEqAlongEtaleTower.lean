@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MapComapMaxi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -27,16 +29,15 @@ theorem isUnit_iff (E : Place c) (x : E.ring) : IsUnit x ↔ (x : K) ≠ 0 ∧ E
   · intro hx
     exact ⟨fun h => hx.ne_zero (Subtype.ext h), E.ord_eq_zero hx⟩
   · rintro ⟨h0, h1⟩
-    have hm : (x : K)⁻¹ ∈ E.ring := by
-      rw [← E.ord_nonneg_iff (inv_ne_zero h0), E.ord_inv, h1]; simp
+    have hm : (x : K)⁻¹ ∈ E.ring := by rw [← E.ord_nonneg_iff (inv_ne_zero h0), E.ord_inv, h1]; simp
     exact IsUnit.of_mul_eq_one ⟨_, hm⟩ (Subtype.ext (mul_inv_cancel₀ h0))
 
 def incl (E : Place c) {T : Subring K} (h : E.Contains T) : T →+* E.ring :=
   T.subtype.codRestrict E.ring fun x => h x x.2
 
-theorem isLocalization (E : Place c) {T : Subring K} (h : E.IsPrimeOf T) :
-    letI := (incl E h.1).toAlgebra
-    IsLocalization ((IsUnit.submonoid E.ring).comap (incl E h.1)) E.ring := by
+theorem isLocalization (E : Place c) {T : Subring K} (h : E.IsPrimeOf T)
+    : letI := (incl E h.1).toAlgebra
+      IsLocalization ((IsUnit.submonoid E.ring).comap (incl E h.1)) E.ring := by
   letI := (incl E h.1).toAlgebra
   refine ⟨fun y => y.2, fun z => ?_, fun {x y} e => ⟨1, ?_⟩⟩
   · obtain ⟨a, ha, b, hb, hb0, hbo, e⟩ := h.2 z z.2
@@ -52,15 +53,17 @@ namespace GlobalTheory.FieldPair.UnramOrd
 
 variable {k K : Type} [Field k] [Field K] {c : k →+* K}
 
-theorem mem_comap_iff (E : Place c) {T : Subring K} (h : E.Contains T) (y : T) :
-    y ∈ (IsLocalRing.maximalIdeal E.ring).comap (incl E h) ↔ (y : K) = 0 ∨ E.ord y ≠ 0 := by
+theorem mem_comap_iff (E : Place c) {T : Subring K} (h : E.Contains T) (y : T)
+    : y ∈ (IsLocalRing.maximalIdeal E.ring).comap (incl E h) ↔ (y : K) = 0 ∨ E.ord y ≠ 0 := by
   rw [Ideal.mem_comap, IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, isUnit_iff]
   change ¬((y : K) ≠ 0 ∧ E.ord y = 0) ↔ _
   tauto
 
-theorem le_of_isPrimeOf (E : Place c) {T : Subring K} (h : E.IsPrimeOf T) (Q : Ideal T) [hQp : Q.IsPrime]
-    (hQ : Q ≠ ⊥) (hle : Q ≤ (IsLocalRing.maximalIdeal E.ring).comap (incl E h.1)) :
-    (IsLocalRing.maximalIdeal E.ring).comap (incl E h.1) ≤ Q := by
+theorem le_of_isPrimeOf
+    (E : Place c)
+    {T : Subring K} (h : E.IsPrimeOf T) (Q : Ideal T) [hQp : Q.IsPrime]
+    (hQ : Q ≠ ⊥) (hle : Q ≤ (IsLocalRing.maximalIdeal E.ring).comap (incl E h.1))
+    : (IsLocalRing.maximalIdeal E.ring).comap (incl E h.1) ≤ Q := by
   obtain ⟨x, hxQ, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hQ
   have hx0' : (x : K) ≠ 0 := fun e => hx0 (Subtype.ext e)
   intro y hy
@@ -82,7 +85,8 @@ theorem le_of_isPrimeOf (E : Place c) {T : Subring K} (h : E.IsPrimeOf T) (Q : I
   have e' : y ^ n * ⟨b, hb⟩ = ⟨a, ha⟩ * x := by
     apply Subtype.ext
     simp only [Subring.coe_mul, SubmonoidClass.coe_pow]
-    rw [← e]; field_simp
+    rw [← e]
+    field_simp
   have hbQ : (⟨b, hb⟩ : T) ∉ Q := by
     intro hbq
     rcases (mem_comap_iff E h.1 _).1 (hle hbq) with h' | h'
@@ -95,21 +99,23 @@ end GlobalTheory.FieldPair.UnramOrd
 
 namespace GlobalTheory.FieldPair.UnramOrd
 
-theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ)
-    (R : Subring K) (T : Subring L)
-    (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T) (P : Place cL) (P0 : Place cK),
-  IsEtTower cK R cL T ι ψ τ → P.IsPrimeOf T → P0.IsPrimeOf R →
-  (∀ g : R, g ≠ 0 → (P0.ord (g : K) = 0 ↔ P.ord (ι g : L) = 0)) →
-  ∀ g : R, g ≠ 0 → P.ord (ι g : L) = P0.ord (g : K) := by
+theorem ord_eq_of_etTower
+    : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+* K) (cL : ℂ →+* L) (r : ℕ) (R : Subring K)
+        (T : Subring L) (ι : R →+* T) (ψ : T →+* R) (τ : Fin r → T) (P : Place cL) (P0 : Place cK),
+      IsEtTower cK R cL T ι ψ τ → P.IsPrimeOf T → P0.IsPrimeOf R
+        → (∀ g : R, g ≠ 0 → (P0.ord (g : K) = 0 ↔ P.ord (ι g : L) = 0))
+        → ∀ g : R, g ≠ 0 → P.ord (ι g : L) = P0.ord (g : K) := by
   intro K L _ _ cK cL r R T ι ψ τ P P0 hE hP hP0 hz
   have hinj : Function.Injective ι := fun a b e => by
     have := congrArg ψ e
     rwa [hE.retr, hE.retr] at this
-  have hιK : ∀ g : R, (g : K) ≠ 0 → ((ι g : T) : L) ≠ 0 := fun g hg e => hg (by
-    have : ι g = ι 0 := by rw [map_zero]; exact Subtype.ext e
-    rw [hinj this]; rfl)
-  have hz' : ∀ g : R, (g : K) ≠ 0 → (P0.ord (g : K) = 0 ↔ P.ord (ι g : L) = 0) :=
-    fun g hg => hz g fun e => hg (by rw [e]; rfl)
+  have hιK : ∀ g : R, (g : K) ≠ 0 → ((ι g : T) : L) ≠ 0 := fun g hg e =>
+    hg (by
+      have : ι g = ι 0 := by rw [map_zero]; exact Subtype.ext e
+      rw [hinj this]
+      rfl)
+  have hz' : ∀ g : R, (g : K) ≠ 0 → (P0.ord (g : K) = 0 ↔ P.ord (ι g : L) = 0) := fun g hg =>
+    hz g fun e => hg (by rw [e]; rfl)
   letI : Algebra ℂ R := (cK.codRestrict R hE.base.const_mem).toAlgebra
   haveI : Algebra.EssFiniteType ℂ R := hE.base.essFiniteType
   haveI : IsNoetherianRing R := Algebra.EssFiniteType.isNoetherianRing ℂ R
@@ -149,7 +155,8 @@ theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+*
     rw [mem_comap_iff P0 hP0.1, mem_comap_iff P hP.1]
     by_cases hg : (g : K) = 0
     · have : g = 0 := Subtype.ext hg
-      subst this; simp
+      subst this
+      simp
     · simp only [hg, hιK g hg, false_or]
       exact not_congr (hz' g hg)
 
@@ -157,11 +164,13 @@ theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+*
   obtain ⟨π, hπR, b, hbR, hb0, hbo, eπ⟩ := hP0.2 t t.2
   have ht0 : (t : K) ≠ 0 := fun e => ht.ne_zero (Subtype.ext e)
   have hπ0 : π ≠ 0 := by rw [← eπ]; exact mul_ne_zero ht0 hb0
-  have hπo : P0.ord π = 1 := by
-    rw [← eπ, P0.ord_mul ht0 hb0, hbo, P0.ord_irreducible ht, add_zero]
+  have hπo : P0.ord π = 1 := by rw [← eπ, P0.ord_mul ht0 hb0, hbo, P0.ord_irreducible ht, add_zero]
   let π' : R := ⟨π, hπR⟩
-  have hdiv : ∀ g : R, (g : K) ≠ 0 → ∀ k : ℕ, (k : ℤ) ≤ P0.ord g →
-      ∃ a b : R, (b : K) ≠ 0 ∧ P0.ord b = 0 ∧ g * b = a * π' ^ k := by
+  have hdiv
+      : ∀ g : R,
+        (g : K) ≠ 0
+          → ∀ k : ℕ,
+            (k : ℤ) ≤ P0.ord g → ∃ a b : R, (b : K) ≠ 0 ∧ P0.ord b = 0 ∧ g * b = a * π' ^ k := by
     intro g hg k hk
     have hπk : (π : K) ^ k ≠ 0 := pow_ne_zero _ hπ0
     have hf0 : (g : K) / π ^ k ≠ 0 := div_ne_zero hg hπk
@@ -174,7 +183,8 @@ theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+*
     show (g : K) * b = a * π ^ k
     rw [← e]
     field_simp
-  have hπp : π' ∈ p := (mem_comap_iff P0 hP0.1 π').2 (Or.inr (by rw [show ((π' : R) : K) = π from rfl, hπo]; simp))
+  have hπp : π' ∈ p :=
+    (mem_comap_iff P0 hP0.1 π').2 (Or.inr (by rw [show ((π' : R) : K) = π from rfl, hπo]; simp))
 
   have hq' : q.comap (algebraMap A T) = Ideal.map (MvPolynomial.C : R →+* A) p := by
     have hle : Ideal.map (MvPolynomial.C : R →+* A) p ≤ q.comap (algebraMap A T) := by
@@ -189,8 +199,9 @@ theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+*
     haveI : (Ideal.map (MvPolynomial.C : R →+* A) p).IsPrime := by
       rw [← Ideal.mk_ker (I := p), ← MvPolynomial.ker_map]
       exact RingHom.ker_isPrime _
-    obtain ⟨Q, hQq, hQp, hQl⟩ := Ideal.exists_ideal_le_liesOver_of_le
-      (p := Ideal.map (MvPolynomial.C : R →+* A) p) (q := q.comap (algebraMap A T)) q hle
+    obtain ⟨Q, hQq, hQp, hQl⟩ :=
+      Ideal.exists_ideal_le_liesOver_of_le (p := Ideal.map (MvPolynomial.C : R →+* A) p)
+        (q := q.comap (algebraMap A T)) q hle
     have hQ0 : Q ≠ ⊥ := by
       intro hQ
       have hm : MvPolynomial.C π' ∈ Q.comap (algebraMap A T) := by
@@ -205,8 +216,9 @@ theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+*
     exact hQl.over.symm
 
   have hspan : IsLocalRing.maximalIdeal P.ring ≤ Ideal.span {j (ι π')} := by
-    have e1 : (IsLocalRing.maximalIdeal P.ring).comap (algebraMap A P.ring) =
-        q.comap (algebraMap A T) := by
+    have e1
+        : (IsLocalRing.maximalIdeal P.ring).comap (algebraMap A P.ring)
+          = q.comap (algebraMap A T) := by
       rw [IsScalarTower.algebraMap_eq A T P.ring, ← Ideal.comap_comap]
       rfl
     rw [← hmax, e1, hq', Ideal.map_map, Ideal.map_le_iff_le_comap]
@@ -257,14 +269,18 @@ theorem ord_eq_of_etTower : ∀ {K L : Type} [Field K] [Field L] (cK : ℂ →+*
   have hao : P0.ord a = 0 := by
     have := congrArg P0.ord eK
     rw [P0.ord_mul hg0 hb0, P0.ord_mul ha0 (pow_ne_zero _ hπ0), P0.ord_pow, hπo, hbo,
-      Int.toNat_of_nonneg hgn] at this
+        Int.toNat_of_nonneg hgn]
+      at this
     linarith
-  have eL : ((ι g : T) : L) * ((ι b : T) : L) = ((ι a : T) : L) * ((ι π' : T) : L) ^ (P0.ord g).toNat := by
+  have eL
+      : ((ι g : T) : L) * ((ι b : T) : L)
+        = ((ι a : T) : L) * ((ι π' : T) : L) ^ (P0.ord g).toNat := by
     have := congrArg (fun x : R => ((ι x : T) : L)) e
     simpa using this
   have := congrArg P.ord eL
   rw [P.ord_mul (hιK g hg0) (hιK b hb0), P.ord_mul (hιK a ha0) (pow_ne_zero _ (hιK π' hπ0)),
-    P.ord_pow, hπ1, (hz' b hb0).1 hbo, (hz' a ha0).1 hao, Int.toNat_of_nonneg hgn] at this
+      P.ord_pow, hπ1, (hz' b hb0).1 hbo, (hz' a ha0).1 hao, Int.toNat_of_nonneg hgn]
+    at this
   linarith
 
 end GlobalTheory.FieldPair.UnramOrd

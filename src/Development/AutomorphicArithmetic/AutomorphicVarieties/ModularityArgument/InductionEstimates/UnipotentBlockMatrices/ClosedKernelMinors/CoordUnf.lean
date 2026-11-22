@@ -8,32 +8,40 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private theorem iter3 {B C : Type} [MeasurableSpace B] [MeasurableSpace C] (κ : Measure B) (l : Measure C)
-    [SFinite κ] [SFinite l] (f : ℝ × B × C → ℝ≥0∞) (hf : Measurable f) :
-    ∫⁻ q, f q ∂((volume : Measure ℝ).withDensity fun t => ENNReal.ofReal (Real.exp (-4 * t))).prod (κ.prod l) =
-      ∫⁻ t : ℝ, (∫⁻ k, ∫⁻ X, f (t, k, X) ∂l ∂κ) * ENNReal.ofReal (Real.exp (-4 * t)) := by
+private theorem iter3
+    {B C : Type} [MeasurableSpace B] [MeasurableSpace C]
+    (κ : Measure B) (l : Measure C) [SFinite κ] [SFinite l]
+    (f : ℝ × B × C → ℝ≥0∞) (hf : Measurable f)
+    : ∫⁻ q, f q ∂((volume : Measure ℝ).withDensity fun t => ENNReal.ofReal (Real.exp (-4 * t))).prod (κ.prod l)
+      = ∫⁻ t : ℝ, (∫⁻ k, ∫⁻ X, f (t, k, X) ∂l ∂κ) * ENNReal.ofReal (Real.exp (-4 * t)) := by
   rw [lintegral_prod _ hf.aemeasurable,
     lintegral_withDensity_eq_lintegral_mul _ (by fun_prop) hf.lintegral_prod_right']
   refine lintegral_congr fun t => ?_
-  rw [Pi.mul_apply, mul_comm, lintegral_prod (fun y => f (t, y)) (hf.comp measurable_prodMk_left).aemeasurable]
+  rw [Pi.mul_apply, mul_comm,
+    lintegral_prod (fun y => f (t, y)) (hf.comp measurable_prodMk_left).aemeasurable]
 
-private theorem oms5 (A B C : Type) [TopologicalSpace A] [TopologicalSpace B] [TopologicalSpace C] [MeasurableSpace A]
-    [MeasurableSpace B] [MeasurableSpace C] [OpensMeasurableSpace A] [OpensMeasurableSpace B] [OpensMeasurableSpace C]
-    [SecondCountableTopology A] [SecondCountableTopology C] : OpensMeasurableSpace (A × A × ℝ × B × C) := inferInstance
+private theorem oms5
+    (A B C : Type)
+    [TopologicalSpace A] [TopologicalSpace B] [TopologicalSpace C] [MeasurableSpace A]
+    [MeasurableSpace B] [MeasurableSpace C] [OpensMeasurableSpace A] [OpensMeasurableSpace B]
+    [OpensMeasurableSpace C] [SecondCountableTopology A] [SecondCountableTopology C]
+    : OpensMeasurableSpace (A × A × ℝ × B × C) :=
+  inferInstance
 
 variable {K : Type} [Field K] [NumberField K]
 
 private theorem nn_add (X Y : UPos (2 + 2) 2 → 𝔸[K]) : nn (X + Y) = nn X * nn Y :=
   Subtype.ext (unipGL_add X Y)
 
-private theorem nn_zero : nn (0 : UPos (2 + 2) 2 → 𝔸[K]) = 1 :=
-  Subtype.ext unipGL_zero
+private theorem nn_zero : nn (0 : UPos (2 + 2) 2 → 𝔸[K]) = 1 := Subtype.ext unipGL_zero
 
 private theorem nn_cont : Continuous (nn : (UPos (2 + 2) 2 → 𝔸[K]) → G1 K (2 + 2)) :=
   continuous_unipGL.subtype_mk _
@@ -53,29 +61,36 @@ private theorem pt_meas : Measurable (pt : Par K → G1 K (2 + 2)) := by
   haveI i9 : OpensMeasurableSpace (Par K) := oms5 _ _ _
   exact pt_cont.measurable
 
-private theorem inv_eq (ξ : UPos (2 + 2) 2 → 𝔸[K]) (a b : G1 K 2) :
-    (nn ξ * lv a b 0)⁻¹ = lv a⁻¹ b⁻¹ 0 * nn (-ξ) := by
+private theorem inv_eq (ξ : UPos (2 + 2) 2 → 𝔸[K]) (a b : G1 K 2)
+    : (nn ξ * lv a b 0)⁻¹ = lv a⁻¹ b⁻¹ 0 * nn (-ξ) := by
   obtain ⟨-, hm, h1, -⟩ := blkLaws (K := K)
   refine inv_eq_of_mul_eq_one_right ?_
-  rw [mul_assoc, ← mul_assoc (lv a b 0), hm, mul_inv_cancel, mul_inv_cancel, add_zero, h1, one_mul, ← nn_add,
-    add_neg_cancel, nn_zero]
+  rw [mul_assoc, ← mul_assoc (lv a b 0), hm, mul_inv_cancel, mul_inv_cancel, add_zero, h1, one_mul,
+    ← nn_add, add_neg_cancel, nn_zero]
 
-private theorem unfX (Φ : G1 K (2 + 2) → ℝ≥0∞) (hΦ : Measurable Φ) (a b m₁ m₂ : G1 K 2) (t : ℝ) (k : G1 K (2 + 2)) :
-    ∫⁻ X, Φ (nn X * lv (a⁻¹ * m₁) (b⁻¹ * m₂) t * k) ∂unipMeasure K (2 + 2) 2 =
-      ∫⁻ X, ∑' ξ : unipLattice K (2 + 2) 2, Φ ((nn ξ.1 * lv a b 0)⁻¹ * (nn X * lv m₁ m₂ t * k))
-        ∂(unipMeasure K (2 + 2) 2).restrict (unipFundamentalDomain K (2 + 2) 2) := by
+private theorem unfX
+    (Φ : G1 K (2 + 2) → ℝ≥0∞) (hΦ : Measurable Φ) (a b m₁ m₂ : G1 K 2) (t : ℝ) (k : G1 K (2 + 2))
+    : ∫⁻ X, Φ (nn X * lv (a⁻¹ * m₁) (b⁻¹ * m₂) t * k) ∂unipMeasure K (2 + 2) 2
+      = ∫⁻ X, ∑' ξ : unipLattice K (2 + 2) 2, Φ ((nn ξ.1 * lv a b 0)⁻¹ * (nn X * lv m₁ m₂ t * k))
+          ∂(unipMeasure K (2 + 2) 2).restrict (unipFundamentalDomain K (2 + 2) 2) := by
   obtain ⟨e, he, hme⟩ := adMeas a⁻¹ b⁻¹ 0
   obtain ⟨-, hm, -⟩ := blkLaws (K := K)
   rw [mul_zero, Real.exp_zero, ENNReal.ofReal_one, one_smul] at hme
-  have hmeas : ∀ c : G1 K (2 + 2), Measurable fun X : UPos (2 + 2) 2 → 𝔸[K] => Φ (c * (nn X * lv m₁ m₂ t * k)) :=
-    fun c => hΦ.comp (continuous_const.mul ((nn_cont.mul continuous_const).mul continuous_const)).measurable
-  have h1 : ∀ X, Φ (nn X * lv (a⁻¹ * m₁) (b⁻¹ * m₂) t * k) = Φ (lv a⁻¹ b⁻¹ 0 * (nn (e X) * lv m₁ m₂ t * k)) := by
+  have hmeas
+      : ∀ c : G1 K (2 + 2),
+        Measurable fun X : UPos (2 + 2) 2 → 𝔸[K] => Φ (c * (nn X * lv m₁ m₂ t * k)) := fun c =>
+    hΦ.comp (continuous_const.mul ((nn_cont.mul continuous_const).mul continuous_const)).measurable
+  have h1
+      : ∀ X,
+        Φ (nn X * lv (a⁻¹ * m₁) (b⁻¹ * m₂) t * k)
+          = Φ (lv a⁻¹ b⁻¹ 0 * (nn (e X) * lv m₁ m₂ t * k)) := by
     intro X
     have : lv (a⁻¹ * m₁) (b⁻¹ * m₂) t = lv a⁻¹ b⁻¹ 0 * lv m₁ m₂ t := by rw [hm, zero_add]
     rw [this, ← mul_assoc (nn X), he]
     simp only [mul_assoc]
   simp only [h1]
-  have hec : Measurable (e : (UPos (2 + 2) 2 → 𝔸[K]) → (UPos (2 + 2) 2 → 𝔸[K])) := e.continuous.measurable
+  have hec : Measurable (e : (UPos (2 + 2) 2 → 𝔸[K]) → (UPos (2 + 2) 2 → 𝔸[K])) :=
+    e.continuous.measurable
   rw [← lintegral_map (hmeas _) hec, hme,
     isAddFundamentalDomain_unipFundamentalDomain.lintegral_eq_tsum',
     lintegral_tsum fun ξ => (hmeas _).aemeasurable]
@@ -84,15 +99,19 @@ private theorem unfX (Φ : G1 K (2 + 2) → ℝ≥0∞) (hΦ : Measurable Φ) (a
   rw [this, inv_eq, nn_add]
   simp only [mul_assoc]
 
-private theorem sum_one (E : Set (G1 K (2 + 2))) (hE : ∀ x : G1 K (2 + 2), ∃! γ : PK K, γ • x ∈ E)
-    (Ψ : G1 K (2 + 2) → ℝ≥0∞) (hΨ : ∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g) (y : G1 K (2 + 2)) :
-    ∑' a : Gam K 2, ∑' b : Gam K 2, ∑' ξ : unipLattice K (2 + 2) 2,
-      E.indicator Ψ ((nn ξ.1 * lv a b 0)⁻¹ * y) = Ψ y := by
+private theorem sum_one
+    (E : Set (G1 K (2 + 2))) (hE : ∀ x : G1 K (2 + 2), ∃! γ : PK K, γ • x ∈ E)
+    (Ψ : G1 K (2 + 2) → ℝ≥0∞) (hΨ : ∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g)
+    (y : G1 K (2 + 2))
+    : ∑' a : Gam K 2, ∑' b : Gam K 2, ∑' ξ : unipLattice K (2 + 2) 2,
+        E.indicator Ψ ((nn ξ.1 * lv a b 0)⁻¹ * y)
+      = Ψ y := by
   obtain ⟨-, hP, hinj, -⟩ := pkLaws (K := K)
   obtain ⟨δ, hδ, hu⟩ := hE y
   obtain ⟨ξ₀, a₀, b₀, h0⟩ := (hP _).1 ((PK K).inv_mem δ.2)
-  have key : ∀ (a b : Gam K 2) (ξ : unipLattice K (2 + 2) 2), ¬ (a = a₀ ∧ b = b₀ ∧ ξ = ξ₀) →
-      E.indicator Ψ ((nn ξ.1 * lv a b 0)⁻¹ * y) = 0 := by
+  have key
+      : ∀ (a b : Gam K 2) (ξ : unipLattice K (2 + 2) 2),
+        ¬(a = a₀ ∧ b = b₀ ∧ ξ = ξ₀) → E.indicator Ψ ((nn ξ.1 * lv a b 0)⁻¹ * y) = 0 := by
     intro a b ξ hne
     refine indicator_of_notMem (fun hm => hne ?_) _
     have := hu ⟨_, (PK K).inv_mem ((hP _).2 ⟨ξ, a, b, rfl⟩)⟩ hm
@@ -105,11 +124,15 @@ private theorem sum_one (E : Set (G1 K (2 + 2))) (hE : ∀ x : G1 K (2 + 2), ∃
   exact (indicator_of_mem hδ _).trans (hΨ _ δ.2 _)
 
 set_option synthInstance.maxHeartbeats 400000 in
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.coordUnf :
-    ∀ {K : Type} [Field K] [NumberField K] (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure] (κ : Measure (KG K (2 + 2))) [κ.IsHaarMeasure] (E : Set (G1 K (2 + 2))), MeasurableSet E → (∀ x : G1 K (2 + 2), ∃! γ : PK K, γ • x ∈ E) →
-      ∀ Ψ : G1 K (2 + 2) → ℝ≥0∞, Measurable Ψ → (∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g) →
-        ∫⁻ m₁, ∫⁻ m₂, ∫⁻ t : ℝ, ∫⁻ k : KG K (2 + 2), ∫⁻ X, E.indicator Ψ (nn X * lv m₁ m₂ t * k) * ENNReal.ofReal (Real.exp (-4 * t))
-          ∂unipMeasure K (2 + 2) 2 ∂κ ∂volume ∂μ₂ ∂μ₂ = ∫⁻ p, Ψ (pt p) ∂parM μ₂ κ := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.coordUnf
+    : ∀ {K : Type} [Field K] [NumberField K] (μ₂ : Measure (G1 K 2)) [μ₂.IsHaarMeasure]
+        (κ : Measure (KG K (2 + 2))) [κ.IsHaarMeasure] (E : Set (G1 K (2 + 2))),
+      MeasurableSet E → (∀ x : G1 K (2 + 2), ∃! γ : PK K, γ • x ∈ E)
+        → ∀ Ψ : G1 K (2 + 2) → ℝ≥0∞,
+          Measurable Ψ → (∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g)
+            → ∫⁻ m₁, ∫⁻ m₂, ∫⁻ t : ℝ, ∫⁻ k : KG K (2 + 2), ∫⁻ X, E.indicator Ψ (nn X * lv m₁ m₂ t * k) * ENNReal.ofReal (Real.exp (-4 * t))
+                ∂unipMeasure K (2 + 2) 2 ∂κ ∂volume ∂μ₂ ∂μ₂
+              = ∫⁻ p, Ψ (pt p) ∂parM μ₂ κ := by
   intro K _ _ μ₂ _ κ _ E hEm hE Ψ hΨm hΨ
   haveI : CompactSpace (KG K (2 + 2)) :=
     isCompact_iff_compactSpace.1 ((blkLaws (K := K)).2.2.2.2.2.2.2.2.2.2.2 (2 + 2)).1

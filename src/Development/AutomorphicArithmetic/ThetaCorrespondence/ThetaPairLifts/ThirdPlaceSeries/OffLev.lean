@@ -13,24 +13,79 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 set_option synthInstance.maxHeartbeats 200000
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.LocMod GlobalTheory.MiS ValuativeRel
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Lev
+  Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.SeeSaw
+  GlobalTheory.SplitWeil GlobalTheory.RootEx GlobalTheory.StepData GlobalTheory.LocMod
+  GlobalTheory.MiS ValuativeRel
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Fam
 namespace GlobalTheory.RowLevel
-theorem off_lev_alt : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L) (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Yd : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Yd cX) (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word) (f : _root_.GlobalTheory.Fam.FamilyCharacter W u), _root_.GlobalTheory.Fam.PackageHypotheses W → f.RowOK → ∀ v : VCom f.c, v.Is → _root_.GlobalTheory.Fam.CommutingVectorTie f v → ∀ (n : ℕ) (G : Fin n → GLoc v) (pl : Fin n ≃ (_root_.GlobalTheory.Fam.pk_z W).Pg), GPin G → _root_.GlobalTheory.Fam.LocalGroupReading f G pl → ∀ t (w : VTup (f.t t)) (F : GlobalTheory.QPl.QFam v (f.t t)), (f.t t).Is → F.Pins w → _root_.GlobalTheory.Fam.QLevAlt f F → (∀ i, (G i).Chars (f.t t)) → ∀ j, j < D.R.m → ∀ κ, GlobalTheory.FinPl.InK _ (v.N j) (offP v w) κ → (f.g.b j)⁻¹ * κ * f.g.b j ∈ levS _ ((_root_.GlobalTheory.Fam.pk_z W).βY j) ((_root_.GlobalTheory.Fam.pk_z W).datYt t j (_root_.GlobalTheory.Fam.complexLevelStructure W)) ∧ levChi _ ((_root_.GlobalTheory.Fam.pk_z W).βY j) ((_root_.GlobalTheory.Fam.pk_z W).datYt t j (_root_.GlobalTheory.Fam.complexLevelStructure W)) ((f.g.b j)⁻¹ * κ * f.g.b j) = 1 := by
+theorem off_lev_alt
+    : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L)
+        (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Yd : DivX D)
+        (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Yd cX)
+        (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word)
+        (f : _root_.GlobalTheory.Fam.FamilyCharacter W u),
+      _root_.GlobalTheory.Fam.PackageHypotheses W → f.RowOK
+        → ∀ v : VCom f.c,
+          v.Is → _root_.GlobalTheory.Fam.CommutingVectorTie f v
+            → ∀ (n : ℕ) (G : Fin n → GLoc v) (pl : Fin n ≃ (_root_.GlobalTheory.Fam.pk_z W).Pg),
+              GPin G → _root_.GlobalTheory.Fam.LocalGroupReading f G pl
+                → ∀ t (w : VTup (f.t t)) (F : GlobalTheory.QPl.QFam v (f.t t)),
+                  (f.t t).Is → F.Pins w → _root_.GlobalTheory.Fam.QLevAlt f F
+                    → (∀ i, (G i).Chars (f.t t))
+                    → ∀ j,
+                      j < D.R.m
+                        → ∀ κ,
+                          GlobalTheory.FinPl.InK _ (v.N j) (offP v w) κ
+                            → (f.g.b j)⁻¹ * κ * f.g.b j
+                                ∈ levS _ ((_root_.GlobalTheory.Fam.pk_z W).βY j)
+                                  ((_root_.GlobalTheory.Fam.pk_z W).datYt t j
+                                    (_root_.GlobalTheory.Fam.complexLevelStructure W))
+                              ∧ levChi _ ((_root_.GlobalTheory.Fam.pk_z W).βY j)
+                                  ((_root_.GlobalTheory.Fam.pk_z W).datYt t j
+                                    (_root_.GlobalTheory.Fam.complexLevelStructure W))
+                                  ((f.g.b j)⁻¹ * κ * f.g.b j)
+                                = 1 := by
   intro D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl hGP hGR t w F ht hFP hQL hch j hj κ hκ
   have hlev := W.Q.charW.base.lev
   refine conj_mem_off (hlev.βY j hj) (hv.sd j hj) _ ?_ (hV.b j ▸ hv.b j)
-    (fun p hp => hV.moves j hj _ fun q hq => hq ▸ hp.1) hκ
+    (fun p hp => hV.moves j hj _ fun q hq => hq ▸ hp.1)
+    hκ
   rintro PP (h | h) ho
   · exact ho.1 ((hV.gP _).2 ⟨PP, h, rfl⟩)
   · obtain ⟨e, he⟩ := hQL.places
     obtain ⟨i, hi⟩ := e.surjective ⟨PP, h⟩
     refine ho.2 ((hFP.places _).2 ⟨i, ?_⟩)
     rw [(he i).2, hi]
-theorem top_lev_alt : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L) (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Yd : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Yd cX) (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word) (f : _root_.GlobalTheory.Fam.FamilyCharacter W u), _root_.GlobalTheory.Fam.PackageHypotheses W → f.RowOK → ∀ v : VCom f.c, v.Is → _root_.GlobalTheory.Fam.CommutingVectorTie f v → ∀ (n : ℕ) (G : Fin n → GLoc v) (pl : Fin n ≃ (_root_.GlobalTheory.Fam.pk_z W).Pg), GPin G → _root_.GlobalTheory.Fam.LocalGroupReading f G pl → ∀ t (w : VTup (f.t t)) (F : GlobalTheory.QPl.QFam v (f.t t)), (f.t t).Is → F.Pins w → _root_.GlobalTheory.Fam.QLevAlt f F → (∀ i, (G i).Chars (f.t t)) → ∀ κ, GlobalTheory.FinPl.InK f.c.T v.NT (· ∈ v.tP) κ → f.g.bT⁻¹ * κ * f.g.bT ∈ levS _ (_root_.GlobalTheory.Fam.pk_z W).βX (datXP (_root_.GlobalTheory.Fam.pk_z W) (_root_.GlobalTheory.Fam.complexLevelStructure W) t) ∧ levChi _ (_root_.GlobalTheory.Fam.pk_z W).βX (datXP (_root_.GlobalTheory.Fam.pk_z W) (_root_.GlobalTheory.Fam.complexLevelStructure W) t) (f.g.bT⁻¹ * κ * f.g.bT) = 1 := by
+theorem top_lev_alt
+    : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L)
+        (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Yd : DivX D)
+        (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Yd cX)
+        (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word)
+        (f : _root_.GlobalTheory.Fam.FamilyCharacter W u),
+      _root_.GlobalTheory.Fam.PackageHypotheses W → f.RowOK
+        → ∀ v : VCom f.c,
+          v.Is → _root_.GlobalTheory.Fam.CommutingVectorTie f v
+            → ∀ (n : ℕ) (G : Fin n → GLoc v) (pl : Fin n ≃ (_root_.GlobalTheory.Fam.pk_z W).Pg),
+              GPin G → _root_.GlobalTheory.Fam.LocalGroupReading f G pl
+                → ∀ t (w : VTup (f.t t)) (F : GlobalTheory.QPl.QFam v (f.t t)),
+                  (f.t t).Is → F.Pins w → _root_.GlobalTheory.Fam.QLevAlt f F
+                    → (∀ i, (G i).Chars (f.t t))
+                    → ∀ κ,
+                      GlobalTheory.FinPl.InK f.c.T v.NT (· ∈ v.tP) κ
+                        → f.g.bT⁻¹ * κ * f.g.bT ∈ levS _ (_root_.GlobalTheory.Fam.pk_z W).βX
+                            (datXP (_root_.GlobalTheory.Fam.pk_z W)
+                              (_root_.GlobalTheory.Fam.complexLevelStructure W) t)
+                          ∧ levChi _ (_root_.GlobalTheory.Fam.pk_z W).βX
+                              (datXP (_root_.GlobalTheory.Fam.pk_z W)
+                                (_root_.GlobalTheory.Fam.complexLevelStructure W) t)
+                              (f.g.bT⁻¹ * κ * f.g.bT)
+                            = 1 := by
   intro D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl hGP hGR t w F ht hFP hQL hch κ hκ
   have hlev := W.Q.charW.base.lev
   refine conj_mem_off hlev.βX hv.sdT _ ?_ (hV.bT.1 ▸ hv.bT) (fun p _ => hV.bT.2 ▸ hV.movesT _) hκ
@@ -38,7 +93,9 @@ theorem top_lev_alt : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Fo
   · exact Finset.disjoint_left.1 hv.disj ((hV.gP _).2 ⟨PP, h, rfl⟩) ho
   · have h1 := (hV.tP _).1 ho
     refine (hlev.Q_off t PP h).2 u ?_
-    have h2 : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∈ PP.asIdeal := h1
+    have h2
+        : algebraMap (𝓞 D.host.F) (𝓞 D.host.E) (((D.mem u).A.T : ℕ) : 𝓞 D.host.F) ∈ PP.asIdeal :=
+      h1
     rwa [map_natCast] at h2
 section Loc
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
@@ -158,12 +215,53 @@ theorem g_lev_alt {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.
       exact (Fintype.prod_equiv pl _ _ fun i => rfl).symm
     rw [e1, e2, e3, mul_one, ← Finset.prod_mul_distrib, Units.coe_prod]
     exact Finset.prod_congr rfl fun i _ => congrArg Units.val (hlam i).symm
-theorem main_alt_alt : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L) (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Yd : DivX D) (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Yd cX) (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word) (f : _root_.GlobalTheory.Fam.FamilyCharacter W u), _root_.GlobalTheory.Fam.PackageHypotheses W → f.RowOK → ∀ v : VCom f.c, v.Is → _root_.GlobalTheory.Fam.CommutingVectorTie f v → ∀ (n : ℕ) (G : Fin n → GLoc v) (pl : Fin n ≃ (_root_.GlobalTheory.Fam.pk_z W).Pg), GPin G → _root_.GlobalTheory.Fam.LocalGroupReading f G pl → ∀ t (w : VTup (f.t t)) (F : GlobalTheory.QPl.QFam v (f.t t)), (f.t t).Is → F.Pins w → _root_.GlobalTheory.Fam.QLevAlt f F → (∀ i, (G i).Chars (f.t t)) → (∀ j, j < D.R.m → ∀ (X : (f.t t).CC j) x, ∀ a ∈ GinfC _, (∀ i, (F.Q i).Typed j (rTrans (a * v.b j) (X.1 x))) ∧ ∀ κ, GlobalTheory.FinPl.InK _ (v.N j) (offP v w) κ → rTrans κ (rTrans (a * v.b j) (X.1 x)) = rTrans (a * v.b j) (X.1 x)) ∧ (∀ j, j + 1 < D.R.m → ∀ k ∈ v.JG (j + 1), ∃ a : ℂ, a ≠ 0 ∧ (∀ g, GlobalTheory.FinPl.Vac f.c.ψ _ _ (v.N j) (v.N (j + 1)) (· ∈ v.gP) g → (f.t t).om j (1, k) (comb f.c.ψ _ _ (v.eG j) g) = a⁻¹ • comb f.c.ψ _ _ (v.eG j) g) ∧ (j + 1 + 1 < D.R.m → ∀ g, GlobalTheory.FinPl.Vac f.c.ψ _ _ (v.N (j + 1)) (v.N (j + 1 + 1)) (· ∈ v.gP) g → (f.t t).om (j + 1) (k, 1) (comb f.c.ψ _ _ (v.eG (j + 1)) g) = a • comb f.c.ψ _ _ (v.eG (j + 1)) g) ∧ ∀ (X : (f.t t).CC (j + 1)) x, rTrans k (rTrans (v.b (j + 1)) (X.1 x)) = a • rTrans (v.b (j + 1)) (X.1 x)) ∧ TopSph (t := f.t t) v := by
+theorem main_alt_alt
+    : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : Formalism.MainNotions.G.Inst D L)
+        (Gl : Formalism.MainNotions.G.LatInst D) (Kc : Formalism.MainNotions.G.Consts) (Yd : DivX D)
+        (cX : ExtraC) (ex : Extra D L hT Gi Gl Kc Yd cX)
+        (W : _root_.GlobalTheory.MiS.RealPackAlt ex) (u : D.what₂.Word)
+        (f : _root_.GlobalTheory.Fam.FamilyCharacter W u),
+      _root_.GlobalTheory.Fam.PackageHypotheses W → f.RowOK
+        → ∀ v : VCom f.c,
+          v.Is → _root_.GlobalTheory.Fam.CommutingVectorTie f v
+            → ∀ (n : ℕ) (G : Fin n → GLoc v) (pl : Fin n ≃ (_root_.GlobalTheory.Fam.pk_z W).Pg),
+              GPin G → _root_.GlobalTheory.Fam.LocalGroupReading f G pl
+                → ∀ t (w : VTup (f.t t)) (F : GlobalTheory.QPl.QFam v (f.t t)),
+                  (f.t t).Is → F.Pins w → _root_.GlobalTheory.Fam.QLevAlt f F
+                    → (∀ i, (G i).Chars (f.t t))
+                    → (∀ j,
+                        j < D.R.m
+                          → ∀ (X : (f.t t).CC j) x, ∀ a ∈ GinfC _,
+                            (∀ i, (F.Q i).Typed j (rTrans (a * v.b j) (X.1 x)))
+                              ∧ ∀ κ,
+                                GlobalTheory.FinPl.InK _ (v.N j) (offP v w) κ
+                                  → rTrans κ (rTrans (a * v.b j) (X.1 x))
+                                    = rTrans (a * v.b j) (X.1 x))
+                      ∧ (∀ j,
+                        j + 1 < D.R.m
+                          → ∀ k ∈ v.JG (j + 1), ∃ a : ℂ,
+                            a ≠ 0
+                              ∧ (∀ g,
+                                GlobalTheory.FinPl.Vac f.c.ψ _ _ (v.N j) (v.N (j + 1)) (· ∈ v.gP) g
+                                  → (f.t t).om j (1, k) (comb f.c.ψ _ _ (v.eG j) g)
+                                    = a⁻¹ • comb f.c.ψ _ _ (v.eG j) g)
+                              ∧ (j + 1 + 1 < D.R.m
+                                → ∀ g,
+                                  GlobalTheory.FinPl.Vac f.c.ψ _ _ (v.N (j + 1)) (v.N (j + 1 + 1))
+                                      (· ∈ v.gP) g
+                                    → (f.t t).om (j + 1) (k, 1) (comb f.c.ψ _ _ (v.eG (j + 1)) g)
+                                      = a • comb f.c.ψ _ _ (v.eG (j + 1)) g)
+                              ∧ ∀ (X : (f.t t).CC (j + 1)) x,
+                                rTrans k (rTrans (v.b (j + 1)) (X.1 x))
+                                  = a • rTrans (v.b (j + 1)) (X.1 x))
+                      ∧ TopSph (t := f.t t) v := by
   intro D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl hGP hGR t w F ht hFP hQL hch
   have hθ : IsInfFam f.c.θ := W.Q.charW.base.models.inf
   have hc : IsStdChar D f.c.ψ (-1) := W.Q.stdChar
-  have hGLv := fun j (hj : j + 1 < D.R.m) k hk a ha => _root_.GlobalTheory.RowLevel.g_lev_alt hv hV hGP hGR t (j + 1) hj k hk a ha
-  refine ⟨fun j hj X x a ha => ⟨fun i => ?_, fun κ hκ => ?_⟩, fun j hj k hk => ?_, fun X x κ hκ => ?_⟩
+  have hGLv := fun j (hj : j + 1 < D.R.m) k hk a ha =>
+    _root_.GlobalTheory.RowLevel.g_lev_alt hv hV hGP hGR t (j + 1) hj k hk a ha
+  refine
+    ⟨fun j hj X x a ha => ⟨fun i => ?_, fun κ hκ => ?_⟩, fun j hj k hk => ?_, fun X x κ hκ => ?_⟩
   · intro d h y
     have hKO := (F.Q i).le j d h y.2
     have hm := (hQL.mid i j d h hj y.1 hKO)
@@ -171,15 +269,20 @@ theorem main_alt_alt : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : F
       GlobalTheory.WeilProduct.mem_GfC_of_suppAt (F.Q i).q.split ((F.Q i).gl_loc j d h y.1).1
     rw [hV.b j, rTrans_lev hθ _ _ _ _ X.2 x ha hgf ((hm.1).2 y.2), hm.2 y.2]
   · have hκf : κ ∈ GfC _ := GlobalTheory.LevelCut.mem_GfC_of_grpAt _ _ κ hκ.1
-    have ho := _root_.GlobalTheory.RowLevel.off_lev_alt D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl hGP hGR t w F ht hFP hQL hch j hj κ hκ
+    have ho :=
+      _root_.GlobalTheory.RowLevel.off_lev_alt D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl
+        hGP hGR t w F ht hFP hQL hch j hj κ hκ
     rw [hV.b j, rTrans_lev hθ _ _ _ _ X.2 x ha hκf ho.1, ho.2, one_smul]
   · obtain ⟨r, hr⟩ := D.R.m_even
-    have third : ∀ (X : (f.t t).CC (j + 1)) x (a : ℂ), GLam G (j + 1) k a →
-        rTrans k (rTrans (v.b (j + 1)) (X.1 x)) = a • rTrans (v.b (j + 1)) (X.1 x) := by
+    have third
+        : ∀ (X : (f.t t).CC (j + 1)) x (a : ℂ),
+          GLam G (j + 1) k a
+            → rTrans k (rTrans (v.b (j + 1)) (X.1 x)) = a • rTrans (v.b (j + 1)) (X.1 x) := by
       intro X x a hga
       have hkf : k ∈ GfC _ := GlobalTheory.LevelCut.mem_GfC_of_grpAt _ _ k ((hv.JG (j + 1) hj).1 hk)
       have ho := hGLv j hj k hk a hga
-      rw [hV.b (j + 1), rightTranslate_level_conj_acts_by_character_finite hθ _ _ _ _ X.2 x hkf ho.1, ho.2]
+      rw [hV.b (j + 1),
+        rightTranslate_level_conj_acts_by_character_finite hθ _ _ _ _ X.2 x hkf ho.1, ho.2]
     have uniq : ∀ a a', GLam G (j + 1) k a → GLam G (j + 1) k a' → a = a' := fun a a' h h' =>
       (hGLv j hj k hk a h).2.symm.trans (hGLv j hj k hk a' h').2
     rcases Nat.even_or_odd j with ⟨q, hq⟩ | ⟨q, hq⟩
@@ -192,15 +295,21 @@ theorem main_alt_alt : ∀ (D : D7) (L : SizeData₂ D) (hT : GatTies D) (Gi : F
       exact hlaw'
     · obtain ⟨j₀, rfl⟩ : ∃ j₀, j = j₀ + 1 := ⟨2 * q, by omega⟩
       obtain ⟨σ, hσ⟩ : ∃ σ, j₀ + 2 * (σ + 1) + 2 = D.R.m := ⟨(D.R.m - j₀ - 4) / 2, by omega⟩
-      have LL := GlobalTheory.RowLevel.Std.lift_laws D f.c v n G hc hv hGP (f.t t) ht hch j₀ (σ + 1) hσ
+      have LL :=
+        GlobalTheory.RowLevel.Std.lift_laws D f.c v n G hc hv hGP (f.t t) ht hch j₀ (σ + 1) hσ
       obtain ⟨a, ha0, hga, hlaw⟩ := (LL.2.2 (by omega)).1 k hk
       refine ⟨a, ha0, hlaw, fun hj2 => ?_, fun X x => third X x a hga⟩
-      have LL' := GlobalTheory.RowLevel.Std.lift_laws D f.c v n G hc hv hGP (f.t t) ht hch (j₀ + 1 + 1) σ (by omega)
+      have LL' :=
+        GlobalTheory.RowLevel.Std.lift_laws D f.c v n G hc hv hGP (f.t t) ht hch (j₀ + 1 + 1) σ
+          (by omega)
       obtain ⟨a', -, hga', hlaw'⟩ := LL'.2.1 k hk
       rw [uniq a a' hga hga']
       exact hlaw'
   · have hκf : κ ∈ GfC _ := GlobalTheory.LevelCut.mem_GfC_of_grpAt _ _ κ hκ.1
-    have ho := _root_.GlobalTheory.RowLevel.top_lev_alt D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl hGP hGR t w F ht hFP hQL hch κ hκ
-    rw [hV.bT.1, rightTranslate_level_conj_acts_by_character_finite hθ _ _ _ _ X.2 x hκf ho.1, ho.2, one_smul]
+    have ho :=
+      _root_.GlobalTheory.RowLevel.top_lev_alt D L hT Gi Gl Kc Yd cX ex W u f hP hR v hv hV n G pl
+        hGP hGR t w F ht hFP hQL hch κ hκ
+    rw [hV.bT.1, rightTranslate_level_conj_acts_by_character_finite hθ _ _ _ _ X.2 x hκf ho.1, ho.2,
+      one_smul]
 end GlobalTheory.RowLevel
 end

@@ -16,14 +16,15 @@ namespace GlobalTheory.OrbDesc
 
 variable {H : Type} [Group H]
 
-theorem mk_out_of_le {T P L : Subgroup H} (hTP : T ≤ P) (x : H) :
-    DoubleCoset.mk P L (Quotient.out (DoubleCoset.mk T L x)) = DoubleCoset.mk P L x := by
+theorem mk_out_of_le {T P L : Subgroup H} (hTP : T ≤ P) (x : H)
+    : DoubleCoset.mk P L (Quotient.out (DoubleCoset.mk T L x)) = DoubleCoset.mk P L x := by
   obtain ⟨t, ht, l, hl, h⟩ := DoubleCoset.mk_out_eq_mul T L x
   rw [h, DoubleCoset.eq]
   exact ⟨t⁻¹, P.inv_mem (hTP ht), l⁻¹, L.inv_mem hl, by group⟩
 
-theorem locPart_inf_conj {T P L : Subgroup H} (hTP : T ≤ P) {p : H} (hp : p ∈ P) (y : H) :
-    GlobalTheory.LKLoc.locPart T (P ⊓ L.map (MulAut.conj y).toMonoidHom) p = GlobalTheory.LKLoc.locPart T L (p * y) := by
+theorem locPart_inf_conj {T P L : Subgroup H} (hTP : T ≤ P) {p : H} (hp : p ∈ P) (y : H)
+    : GlobalTheory.LKLoc.locPart T (P ⊓ L.map (MulAut.conj y).toMonoidHom) p
+      = GlobalTheory.LKLoc.locPart T L (p * y) := by
   unfold GlobalTheory.LKLoc.locPart
   ext g
   simp only [Subgroup.mem_inf, Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
@@ -36,12 +37,14 @@ theorem locPart_inf_conj {T P L : Subgroup H} (hTP : T ≤ P) {p : H} (hp : p �
     rw [e]
     exact P.mul_mem (P.mul_mem (P.inv_mem hp) (hTP hg)) hp
 
-theorem dsum_eq_zero_of_par (H : Type) [Group H] (T P L U : Subgroup H) (Ψ : H → ℂ) (hTP : T ≤ P)
-    (hT : ∀ s ∈ T, ∀ t ∈ T, s * t = t * s) (hΨl : ∀ t ∈ T, ∀ x, Ψ (t * x) = Ψ x)
-    (hΨr : ∀ l ∈ L, ∀ x, Ψ (x * l) = Ψ x)
-    (hy : ∀ y : H, dsum T (P ⊓ L.map (MulAut.conj y).toMonoidHom) U
-      (fun x => if x ∈ P then Ψ (x * y) else 0) = 0) :
-    dsum T L U Ψ = 0 := by
+theorem dsum_eq_zero_of_par
+    (H : Type) [Group H]
+    (T P L U : Subgroup H) (Ψ : H → ℂ) (hTP : T ≤ P) (hT : ∀ s ∈ T, ∀ t ∈ T, s * t = t * s)
+    (hΨl : ∀ t ∈ T, ∀ x, Ψ (t * x) = Ψ x) (hΨr : ∀ l ∈ L, ∀ x, Ψ (x * l) = Ψ x)
+    (hy : ∀ y : H,
+      dsum T (P ⊓ L.map (MulAut.conj y).toMonoidHom) U (fun x => if x ∈ P then Ψ (x * y) else 0)
+        = 0)
+    : dsum T L U Ψ = 0 := by
   set F : DoubleCoset.Quotient (T : Set H) (L : Set H) → ℂ := fun q => wt T L U Ψ (Quotient.out q) with hF
   set π : DoubleCoset.Quotient (T : Set H) (L : Set H) → DoubleCoset.Quotient (P : Set H) (L : Set H) :=
     fun q => DoubleCoset.mk P L (Quotient.out q) with hπ
@@ -50,8 +53,9 @@ theorem dsum_eq_zero_of_par (H : Type) [Group H] (T P L U : Subgroup H) (Ψ : H 
   by_cases hfin : (Function.support F).Finite
   swap
   · exact finsum_of_infinite_support hfin
-  rw [finsum_eq_sum F hfin, ← Finset.sum_fiberwise_of_maps_to (g := π)
-    (t := hfin.toFinset.image π) (fun _ h => Finset.mem_image_of_mem _ h)]
+  rw [finsum_eq_sum F hfin,
+    ← Finset.sum_fiberwise_of_maps_to (g := π) (t := hfin.toFinset.image π)
+      (fun _ h => Finset.mem_image_of_mem _ h)]
   refine Finset.sum_eq_zero fun r _ => ?_
   obtain ⟨y, rfl⟩ : ∃ y, DoubleCoset.mk P L y = r := ⟨Quotient.out r, DoubleCoset.out_eq' _⟩
   set Ly := P ⊓ L.map (MulAut.conj y).toMonoidHom with hLy
@@ -111,8 +115,7 @@ theorem dsum_eq_zero_of_par (H : Type) [Group H] (T P L U : Subgroup H) (Ψ : H 
         group
   have hGA : ∑ᶠ q, G q = ∑ᶠ q ∈ A, G q := by
     rw [← finsum_mem_inter_support, Set.inter_eq_right.2 hsuppG, finsum_mem_support]
-  rw [← h0, hGA, finsum_mem_congr rfl hGF,
-    ← finsum_mem_image hinj, himg]
+  rw [← h0, hGA, finsum_mem_congr rfl hGF, ← finsum_mem_image hinj, himg]
   refine (finsum_mem_eq_sum_of_inter_support_eq F ?_).symm
   ext q
   simp [Finset.mem_filter, Set.Finite.mem_toFinset]

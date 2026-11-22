@@ -8,7 +8,8 @@ public import GroundTheory.AutomorphicForms.CompactAbelianCharacters
 
 noncomputable section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology GroundTheory.Global GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm Ad3 Ad3.GA
+open NumberField IsDedekindDomain MeasureTheory Matrix Filter Topology GroundTheory.Global
+  GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm Ad3 Ad3.GA
 open GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.CompactAbelianFourier
 open scoped NumberField.AdeleRing ComplexConjugate Pointwise
 
@@ -17,8 +18,9 @@ namespace GlobalTheory.CompanionTheory.AdelicFourier
 variable {K : Type*} [Field K] [NumberField K] {ι : Type*} [Fintype ι]
 
 theorem isClosed_vecLattice : IsClosed (vecLattice K ι : Set (ι → 𝔸[K])) := by
-  have h : (vecLattice K ι : Set (ι → 𝔸[K])) =
-      Set.univ.pi (fun _ => (AdeleRing.principalSubgroup (𝓞 K) K : Set 𝔸[K])) := by
+  have h
+      : (vecLattice K ι : Set (ι → 𝔸[K]))
+        = Set.univ.pi (fun _ => (AdeleRing.principalSubgroup (𝓞 K) K : Set 𝔸[K])) := by
     ext x
     simp only [SetLike.mem_coe, mem_vecLattice, Set.mem_pi, Set.mem_univ, true_implies,
       AdeleRing.principalSubgroup, Subring.coe_toAddSubgroup, RingHom.coe_range, Set.mem_range]
@@ -43,8 +45,9 @@ theorem continuous_toQuot : Continuous (toQuot : (ι → 𝔸[K]) → VecQuot K 
 
 instance : CompactSpace ((ι → 𝔸[K]) ⧸ vecLattice K ι) := by
   refine ⟨?_⟩
-  have hs : (Set.univ : Set ((ι → 𝔸[K]) ⧸ vecLattice K ι)) =
-      (QuotientAddGroup.mk : (ι → 𝔸[K]) → _) '' closure (vecDomain K ι) := by
+  have hs
+      : (Set.univ : Set ((ι → 𝔸[K]) ⧸ vecLattice K ι))
+        = (QuotientAddGroup.mk : (ι → 𝔸[K]) → _) '' closure (vecDomain K ι) := by
     symm
     refine Set.eq_univ_of_forall fun q => ?_
     obtain ⟨x, rfl⟩ := QuotientAddGroup.mk_surjective q
@@ -56,8 +59,7 @@ instance : CompactSpace ((ι → 𝔸[K]) ⧸ vecLattice K ι) := by
   rw [hs]
   exact isCompact_closure_vecDomain.image continuous_quot_mk
 
-instance : T2Space (VecQuot K ι) :=
-  (inferInstance : T2Space ((ι → 𝔸[K]) ⧸ vecLattice K ι))
+instance : T2Space (VecQuot K ι) := (inferInstance : T2Space ((ι → 𝔸[K]) ⧸ vecLattice K ι))
 
 theorem toQuot_add (x y : ι → 𝔸[K]) : toQuot (x + y) = toQuot x * toQuot y := rfl
 
@@ -67,32 +69,37 @@ theorem toQuot_of_mem {x : ι → 𝔸[K]} (hx : x ∈ vecLattice K ι) : toQuot
   unfold toQuot
   rw [(QuotientAddGroup.eq_zero_iff x).2 hx, ofAdd_zero]
 
-theorem addChar_sum {A σ : Type*} [AddCommMonoid A] (φ : AddChar A Circle) (s : Finset σ)
-    (v : σ → A) : φ (∑ i ∈ s, v i) = ∏ i ∈ s, φ (v i) := by
+theorem addChar_sum
+    {A σ : Type*} [AddCommMonoid A] (φ : AddChar A Circle) (s : Finset σ) (v : σ → A)
+    : φ (∑ i ∈ s, v i) = ∏ i ∈ s, φ (v i) := by
   classical
   refine Finset.induction_on s ?_ ?_
   · simp
   · intro a s ha ih
     rw [Finset.sum_insert ha, Finset.prod_insert ha, AddChar.map_add_eq_mul, ih]
 
-theorem exists_pair_of_char (χ : VecQuot K ι →ₜ* Circle) :
-    ∃ ξ : ι → K, ∀ x, χ (toQuot x) = adelicChar K (pair ξ x) := by
+theorem exists_pair_of_char (χ : VecQuot K ι →ₜ* Circle)
+    : ∃ ξ : ι → K, ∀ x, χ (toQuot x) = adelicChar K (pair ξ x) := by
   classical
-  let Φ : AddChar (ι → 𝔸[K]) Circle :=
-    { toFun := fun x => χ (toQuot x)
-      map_zero_eq_one' := by rw [toQuot_zero, map_one]
-      map_add_eq_mul' := fun x y => by rw [toQuot_add, map_mul] }
+  let Φ : AddChar (ι → 𝔸[K]) Circle := {
+    toFun := fun x => χ (toQuot x)
+    map_zero_eq_one' := by rw [toQuot_zero, map_one]
+    map_add_eq_mul' := fun x y => by rw [toQuot_add, map_mul]
+  }
   have hΦ : Continuous Φ := χ.continuous.comp continuous_toQuot
-  have hi : ∀ i, ∃ ξ : K, ∀ a : 𝔸[K], Φ (Pi.single i a) = adelicChar K (algebraMap K 𝔸[K] ξ * a) := by
+  have hi
+      : ∀ i, ∃ ξ : K, ∀ a : 𝔸[K], Φ (Pi.single i a) = adelicChar K (algebraMap K 𝔸[K] ξ * a) := by
     intro i
-    let χi : AddChar 𝔸[K] Circle :=
-      { toFun := fun a => Φ (Pi.single i a)
-        map_zero_eq_one' := by rw [Pi.single_zero, AddChar.map_zero_eq_one]
-        map_add_eq_mul' := fun x y => by rw [Pi.single_add, AddChar.map_add_eq_mul] }
-    have hχi : Continuous χi := hΦ.comp (continuous_pi fun j => by
-      by_cases h : j = i
-      · subst h; simp only [Pi.single_eq_same]; exact continuous_id
-      · simpa [Pi.single_eq_of_ne h] using continuous_const)
+    let χi : AddChar 𝔸[K] Circle := {
+      toFun := fun a => Φ (Pi.single i a)
+      map_zero_eq_one' := by rw [Pi.single_zero, AddChar.map_zero_eq_one]
+      map_add_eq_mul' := fun x y => by rw [Pi.single_add, AddChar.map_add_eq_mul]
+    }
+    have hχi : Continuous χi :=
+      hΦ.comp (continuous_pi fun j => by
+        by_cases h : j = i
+        · subst h; simp only [Pi.single_eq_same]; exact continuous_id
+        · simpa [Pi.single_eq_of_ne h] using continuous_const)
     have hK : ∀ k : K, χi (algebraMap K 𝔸[K] k) = 1 := fun k => by
       have hm : (Pi.single i (algebraMap K 𝔸[K] k) : ι → 𝔸[K]) ∈ vecLattice K ι := by
         refine ⟨Pi.single i k, ?_⟩
@@ -112,9 +119,9 @@ theorem exists_pair_of_char (χ : VecQuot K ι →ₜ* Circle) :
   rw [addChar_sum, pair, addChar_sum]
   exact Finset.prod_congr rfl fun i _ => hξ i (x i)
 
-theorem continuous_descend {f : (ι → 𝔸[K]) → ℂ} (hc : Continuous f)
-    (hper : ∀ ξ ∈ vecLattice K ι, ∀ x, f (ξ + x) = f x) :
-    ∃ φ : C(VecQuot K ι, ℂ), ∀ x, φ (toQuot x) = conj (f x) := by
+theorem continuous_descend
+    {f : (ι → 𝔸[K]) → ℂ} (hc : Continuous f) (hper : ∀ ξ ∈ vecLattice K ι, ∀ x, f (ξ + x) = f x)
+    : ∃ φ : C(VecQuot K ι, ℂ), ∀ x, φ (toQuot x) = conj (f x) := by
   have hs : ∀ a b : ι → 𝔸[K], (QuotientAddGroup.leftRel (vecLattice K ι)) a b → f a = f b := by
     intro a b hab
     rw [QuotientAddGroup.leftRel_apply] at hab
@@ -125,19 +132,23 @@ theorem continuous_descend {f : (ι → 𝔸[K]) → ℂ} (hc : Continuous f)
   refine ⟨⟨fun q => conj (Quotient.liftOn' (Multiplicative.toAdd q) f hs), ?_⟩, fun x => rfl⟩
   exact Complex.continuous_conj.comp ((hc.quotient_liftOn' hs).comp continuous_toAdd)
 
-theorem eq_zero_of_vecCoeff_eq_zero {f : (ι → 𝔸[K]) → ℂ} (hc : Continuous f)
-    (hper : ∀ ξ ∈ vecLattice K ι, ∀ x, f (ξ + x) = f x) (h0 : ∀ ξ, vecCoeff f ξ = 0) : f = 0 := by
+theorem eq_zero_of_vecCoeff_eq_zero
+    {f : (ι → 𝔸[K]) → ℂ} (hc : Continuous f) (hper : ∀ ξ ∈ vecLattice K ι, ∀ x, f (ξ + x) = f x)
+    (h0 : ∀ ξ, vecCoeff f ξ = 0)
+    : f = 0 := by
   classical
-  obtain ⟨C0, hC0⟩ := (isCompact_closure_vecDomain (K := K) (ι := ι)).exists_bound_of_continuousOn
-    hc.continuousOn
+  obtain ⟨C0, hC0⟩ :=
+    (isCompact_closure_vecDomain (K := K) (ι := ι)).exists_bound_of_continuousOn hc.continuousOn
   have hDfin : vecMeasure K ι (vecDomain K ι) < ⊤ := by
     rw [vecMeasure_vecDomain]; exact ENNReal.one_lt_top
-  have hint : ∀ ψ : C(VecQuot K ι, ℂ),
-      IntegrableOn (fun x => f x * ψ (toQuot x)) (vecDomain K ι) (vecMeasure K ι) := by
+  have hint
+      : ∀ ψ : C(VecQuot K ι, ℂ),
+        IntegrableOn (fun x => f x * ψ (toQuot x)) (vecDomain K ι) (vecMeasure K ι) := by
     intro ψ
-    have hcψ : Continuous fun x => f x * ψ (toQuot x) := hc.mul (ψ.continuous.comp continuous_toQuot)
-    obtain ⟨C, hC⟩ := (isCompact_closure_vecDomain (K := K) (ι := ι)).exists_bound_of_continuousOn
-      hcψ.continuousOn
+    have hcψ : Continuous fun x => f x * ψ (toQuot x) :=
+      hc.mul (ψ.continuous.comp continuous_toQuot)
+    obtain ⟨C, hC⟩ :=
+      (isCompact_closure_vecDomain (K := K) (ι := ι)).exists_bound_of_continuousOn hcψ.continuousOn
     exact Measure.integrableOn_of_bounded (M := C) hDfin.ne hcψ.aestronglyMeasurable
       ((ae_restrict_iff' measurableSet_vecDomain).2
         (Filter.Eventually.of_forall fun x hx => hC x (subset_closure hx)))
@@ -147,7 +158,7 @@ theorem eq_zero_of_vecCoeff_eq_zero {f : (ι → 𝔸[K]) → ℂ} (hc : Continu
     intro χ
     obtain ⟨ξ, hξ⟩ := exists_pair_of_char χ
     have h1 := h0 (-ξ)
-    have hp : ∀ x, -pair (-ξ) x = pair ξ x := by
+    have hp : ∀ x, - pair (-ξ) x = pair ξ x := by
       intro x
       simp [pair, Finset.sum_neg_distrib]
     simp only [vecCoeff, hp] at h1
@@ -164,8 +175,9 @@ theorem eq_zero_of_vecCoeff_eq_zero {f : (ι → 𝔸[K]) → ℂ} (hc : Continu
     congr 1
     funext x
     ring
-  have hspan : ∀ ψ ∈ Submodule.span ℂ
-      (Set.range (charCM : (VecQuot K ι →ₜ* Circle) → C(VecQuot K ι, ℂ))), Λ ψ = 0 := by
+  have hspan
+      : ∀ ψ ∈ Submodule.span ℂ (Set.range (charCM : (VecQuot K ι →ₜ* Circle) → C(VecQuot K ι, ℂ))),
+        Λ ψ = 0 := by
     intro ψ hψ
     induction hψ using Submodule.span_induction with
     | mem x hx =>
@@ -178,23 +190,29 @@ theorem eq_zero_of_vecCoeff_eq_zero {f : (ι → 𝔸[K]) → ℂ} (hc : Continu
   have hCpos : 0 < C := by positivity
   have hbound : ∀ ψ : C(VecQuot K ι, ℂ), ‖Λ ψ‖ ≤ C * ‖ψ‖ := by
     intro ψ
-    have h := norm_setIntegral_le_of_norm_le_const hDfin (C := C * ‖ψ‖)
-      (f := fun x => f x * ψ (toQuot x)) (fun x hx => by
-        rw [norm_mul]
-        exact mul_le_mul ((hC0 x (subset_closure hx)).trans (by linarith [le_abs_self C0]))
-          (ψ.norm_coe_le_norm _) (norm_nonneg _) hCpos.le)
+    have h :=
+      norm_setIntegral_le_of_norm_le_const hDfin (C := C * ‖ψ‖)
+        (f := fun x => f x * ψ (toQuot x))
+        (fun x hx => by
+          rw [norm_mul]
+          exact mul_le_mul ((hC0 x (subset_closure hx)).trans (by linarith [le_abs_self C0]))
+            (ψ.norm_coe_le_norm _) (norm_nonneg _) hCpos.le)
     simpa [Measure.real, vecMeasure_vecDomain] using h
   obtain ⟨φ, hφ⟩ := continuous_descend hc hper
   have hΛφ : Λ φ = 0 := by
-    have hmem : φ ∈ closure ((Submodule.span ℂ
-        (Set.range (charCM : (VecQuot K ι →ₜ* Circle) → C(VecQuot K ι, ℂ))) : Set C(VecQuot K ι, ℂ))) := by
+    have hmem
+        : φ ∈ closure
+          ((Submodule.span ℂ (Set.range (charCM : (VecQuot K ι →ₜ* Circle) → C(VecQuot K ι, ℂ)))
+            : Set C(VecQuot K ι, ℂ))) := by
       rw [← Submodule.topologicalClosure_coe, span_charCM_dense]
       trivial
     refine norm_le_zero_iff.1 (le_of_forall_pos_le_add fun δ hδ => ?_)
     obtain ⟨ψ, hψ, hd⟩ := Metric.mem_closure_iff.1 hmem (δ / C) (div_pos hδ hCpos)
     have e : Λ φ = Λ (φ - ψ) + Λ ψ := by rw [← hΛadd, sub_add_cancel]
     rw [e, hspan ψ hψ, add_zero, zero_add]
-    calc ‖Λ (φ - ψ)‖ ≤ C * ‖φ - ψ‖ := hbound _
+    calc
+      ‖Λ (φ - ψ)‖
+        ≤ C * ‖φ - ψ‖ := hbound _
       _ ≤ C * (δ / C) := by
         rw [← dist_eq_norm]
         exact mul_le_mul_of_nonneg_left hd.le hCpos.le
@@ -211,8 +229,11 @@ theorem eq_zero_of_vecCoeff_eq_zero {f : (ι → 𝔸[K]) → ℂ} (hc : Continu
       exact hsq
     exact_mod_cast h3
   have hint2 : IntegrableOn (fun x => Complex.normSq (f x)) (vecDomain K ι) (vecMeasure K ι) := by
-    refine IntegrableOn.congr_fun (f := fun x => ‖f x * φ (toQuot x)‖) (hint φ).norm
-      (fun x _ => ?_) measurableSet_vecDomain
+    refine IntegrableOn.congr_fun
+      (f := fun x => ‖f x * φ (toQuot x)‖)
+      (hint φ).norm
+      (fun x _ => ?_)
+      measurableSet_vecDomain
     dsimp only
     rw [hφ, Complex.mul_conj, Complex.norm_real, Real.norm_of_nonneg (Complex.normSq_nonneg _)]
   have hae : (fun x => Complex.normSq (f x)) =ᵐ[(vecMeasure K ι).restrict (vecDomain K ι)] 0 :=

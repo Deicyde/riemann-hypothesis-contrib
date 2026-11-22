@@ -6,15 +6,19 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open Finset in
-theorem exists_weight_idempotent (L : Type) [Field L] [CharZero L] (G : Type) [Group G] [Finite G]
-    (V : Type) [AddCommGroup V] [Module L V] (ρ : Representation L G V) (B T : Subgroup G)
-    (lam : B →* Lˣ) (v : V) (hB : B.Normal) (hv : v ≠ 0)
-    (hlam : ∀ b : B, ρ b v = (lam b : L) • v)
-    (hT : ∀ g : G, g ∈ T ↔ ∀ b b' : B, (b' : G) = g⁻¹ * b * g → lam b' = lam b) :
-    ∃ e : Module.End L V, e ≠ 0 ∧ e * e = e ∧ (∀ b : B, ρ b * e = (lam b : L) • e) ∧
-      (∀ t ∈ T, ρ t * e = e * ρ t) ∧ ∀ g ∉ T, e * ρ g * e = 0 := by
+theorem exists_weight_idempotent
+    (L : Type) [Field L] [CharZero L]
+    (G : Type) [Group G] [Finite G]
+    (V : Type) [AddCommGroup V] [Module L V]
+    (ρ : Representation L G V)
+    (B T : Subgroup G) (lam : B →* Lˣ)
+    (v : V)
+    (hB : B.Normal) (hv : v ≠ 0) (hlam : ∀ b : B, ρ b v = (lam b : L) • v)
+    (hT : ∀ g : G, g ∈ T ↔ ∀ b b' : B, (b' : G) = g⁻¹ * b * g → lam b' = lam b)
+    : ∃ e : Module.End L V,
+      e ≠ 0 ∧ e * e = e ∧ (∀ b : B, ρ b * e = (lam b : L) • e) ∧ (∀ t ∈ T, ρ t * e = e * ρ t)
+        ∧ ∀ g ∉ T, e * ρ g * e = 0 := by
   classical
   letI : Fintype B := Fintype.ofFinite B
   have hc : (Fintype.card B : L) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
@@ -89,8 +93,9 @@ theorem exists_weight_idempotent (L : Type) [Field L] [CharZero L] (G : Type) [G
         rfl
       simp only [this]
       rw [← Finset.sum_smul, h0, zero_smul]
-    calc e * ρ g * e = (Fintype.card B : L)⁻¹ • (s * ρ g * e) := by
-          rw [← smul_mul_assoc, ← smul_mul_assoc]
+    calc
+      e * ρ g * e
+        = (Fintype.card B : L)⁻¹ • (s * ρ g * e) := by rw [← smul_mul_assoc, ← smul_mul_assoc]
       _ = 0 := by rw [this, smul_zero]
 
 end GlobalTheory

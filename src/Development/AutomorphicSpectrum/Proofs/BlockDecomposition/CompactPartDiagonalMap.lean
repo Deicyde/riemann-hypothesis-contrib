@@ -10,10 +10,11 @@ open scoped Classical
 
 namespace GlobalTheory.CompanionTheory.CptDiag
 
-theorem isCompact_closure_zpowers_image {G G' : Type} [Group G] [Group G'] [TopologicalSpace G] [TopologicalSpace G']
-    [T2Space G'] (φ : G →* G') (hφ : Continuous φ) (t : G)
-    (ht : IsCompact (closure (Subgroup.zpowers t : Set G))) :
-    IsCompact (closure (Subgroup.zpowers (φ t) : Set G')) := by
+theorem isCompact_closure_zpowers_image
+    {G G' : Type} [Group G] [Group G'] [TopologicalSpace G] [TopologicalSpace G'] [T2Space G']
+    (φ : G →* G') (hφ : Continuous φ)
+    (t : G) (ht : IsCompact (closure (Subgroup.zpowers t : Set G)))
+    : IsCompact (closure (Subgroup.zpowers (φ t) : Set G')) := by
   have hK : IsCompact (φ '' closure (Subgroup.zpowers t : Set G)) := ht.image hφ
   refine hK.of_isClosed_subset isClosed_closure ?_
   refine closure_minimal ?_ hK.isClosed
@@ -21,7 +22,11 @@ theorem isCompact_closure_zpowers_image {G G' : Type} [Group G] [Group G'] [Topo
   obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
   exact ⟨t ^ k, subset_closure (Subgroup.zpow_mem_zpowers t k), map_zpow φ t k⟩
 
-theorem cptPart_diag : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H] (Z : Subgroup H), cptPart (Z.map ((MonoidHom.id H).prod (MonoidHom.id H))) = (cptPart Z).map ((MonoidHom.id H).prod (MonoidHom.id H)) := by
+theorem cptPart_diag
+    : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [T2Space H]
+        (Z : Subgroup H),
+      cptPart (Z.map ((MonoidHom.id H).prod (MonoidHom.id H)))
+        = (cptPart Z).map ((MonoidHom.id H).prod (MonoidHom.id H)) := by
   intro H _ _ _ _ Z
   unfold cptPart
   rw [MonoidHom.map_closure]

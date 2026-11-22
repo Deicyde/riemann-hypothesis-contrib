@@ -17,15 +17,21 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ReadT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX NumberField IsDedekindDomain
+  GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.TypeRec.factG
 
 namespace GlobalTheory.FrobSame
 
 open Polynomial
 
-theorem multiset_eq_of_esymm {s t : Multiset ℂ} {r : ℕ} (hs : Multiset.card s = r) (ht : Multiset.card t = r)
-    (h : ∀ k, 1 ≤ k → k ≤ r → s.esymm k = t.esymm k) : s = t := by
+theorem multiset_eq_of_esymm
+    {s t : Multiset ℂ} {r : ℕ} (hs : Multiset.card s = r) (ht : Multiset.card t = r)
+    (h : ∀ k, 1 ≤ k → k ≤ r → s.esymm k = t.esymm k)
+    : s = t := by
   have hall : ∀ k, s.esymm k = t.esymm k := by
     intro k
     rcases Nat.eq_zero_or_pos k with rfl | hk
@@ -43,7 +49,19 @@ end GlobalTheory.FrobSame
 
 namespace GlobalTheory.FrobSame
 
-theorem frobEig_eq_of_eig_eq : ∀ (D : D7) (cf : CharFrame D) (Rw : RowSide D) (Sb : Finset (PlE D.host)) (eig : ℕ → D.what₂.FT → ℕ → PlE D.host → ↥D.LL0), GlobalTheory.TwInputs.EigTrue D cf Rw Sb eig → GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.GoodRowCuspParam D Rw → ∀ (j : ℕ), 1 ≤ j → j ≤ D.R.m → ∀ σ σ' : D.what₂.FT, D.what₂.isot j σ ≠ ⊥ → D.nd.goodRow σ → D.what₂.isot j σ' ≠ ⊥ → D.nd.goodRow σ' → ∀ P : PlE D.host, IsSplitPl D.host P → P ∉ Sb → (∀ k, 1 ≤ k → k ≤ D.R.r → eig j σ' k P = eig j σ k P) → D.naut.frobEig (Rw.locR σ' P) = D.naut.frobEig (Rw.locR σ P) := by
+theorem frobEig_eq_of_eig_eq
+    : ∀ (D : D7) (cf : CharFrame D) (Rw : RowSide D) (Sb : Finset (PlE D.host))
+        (eig : ℕ → D.what₂.FT → ℕ → PlE D.host → ↥D.LL0),
+      GlobalTheory.TwInputs.EigTrue D cf Rw Sb eig
+        → GlobalTheory.IndefiniteRowSideFullHecke.CMTypeEmbeddings.GoodRowCuspParam D Rw
+        → ∀ (j : ℕ),
+          1 ≤ j → j ≤ D.R.m
+            → ∀ σ σ' : D.what₂.FT,
+              D.what₂.isot j σ ≠ ⊥ → D.nd.goodRow σ → D.what₂.isot j σ' ≠ ⊥ → D.nd.goodRow σ'
+                → ∀ P : PlE D.host,
+                  IsSplitPl D.host P → P ∉ Sb
+                    → (∀ k, 1 ≤ k → k ≤ D.R.r → eig j σ' k P = eig j σ k P)
+                    → D.naut.frobEig (Rw.locR σ' P) = D.naut.frobEig (Rw.locR σ P) := by
   intro D cf Rw Sb eig hE hC j hj1 hjm σ σ' hσ hgσ hσ' hgσ' P hP hPS heq
   obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
   have hi : i < D.R.m := by omega
@@ -58,11 +76,17 @@ theorem frobEig_eq_of_eig_eq : ∀ (D : D7) (cf : CharFrame D) (Rw : RowSide D) 
   have hq0 : ((Formalism.ConjugateSelfDual.normV P : ℕ) : ℂ) ≠ 0 := by
     have e : Formalism.ConjugateSelfDual.normV P = Ideal.absNorm P.asIdeal := by
       rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]; rfl
-    rw [e]; exact_mod_cast GlobalTheory.GalChar.absNorm_ne_zero P
-  let f : ℂ → ℂ := fun a => a⁻¹ * (((cf.mu0 ⟨i, hi⟩).val P : ℂˣ) : ℂ)⁻¹ * (((Formalism.ConjugateSelfDual.normV P : ℕ) : ℂ) ^ (D.R.nV / 2))⁻¹
+    rw [e]
+    exact_mod_cast GlobalTheory.GalChar.absNorm_ne_zero P
+  let f : ℂ → ℂ := fun a =>
+    a⁻¹ * (((cf.mu0 ⟨i, hi⟩).val P : ℂˣ) : ℂ)⁻¹
+      * (((Formalism.ConjugateSelfDual.normV P : ℕ) : ℂ) ^ (D.R.nV / 2))⁻¹
   have hfi : Function.Injective f := by
     intro a b hab
-    have hc : (((cf.mu0 ⟨i, hi⟩).val P : ℂˣ) : ℂ)⁻¹ * (((Formalism.ConjugateSelfDual.normV P : ℕ) : ℂ) ^ (D.R.nV / 2))⁻¹ ≠ 0 :=
+    have hc
+        : (((cf.mu0 ⟨i, hi⟩).val P : ℂˣ) : ℂ)⁻¹
+            * (((Formalism.ConjugateSelfDual.normV P : ℕ) : ℂ) ^ (D.R.nV / 2))⁻¹
+          ≠ 0 :=
       mul_ne_zero (inv_ne_zero (Units.ne_zero _)) (inv_ne_zero (pow_ne_zero _ hq0))
     simp only [f, mul_assoc] at hab
     exact inv_injective (mul_right_cancel₀ hc hab)

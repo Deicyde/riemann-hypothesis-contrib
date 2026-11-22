@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FiniteAffine
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Limits Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.CechPic
 
 set_option autoImplicit false
@@ -17,12 +18,13 @@ noncomputable section
 
 namespace GlobalTheory.GenFinite
 
-theorem finiteDimensional_of_trdeg_eq (F A B K L : Type) [Field F] [CommRing A] [IsDomain A]
-    [CommRing B] [IsDomain B] [Field K] [Field L] [Algebra F A] [Algebra A B] [Algebra F B]
-    [IsScalarTower F A B] [Algebra A K] [Algebra B L] [Algebra K L] [Algebra A L]
-    [IsScalarTower A K L] [IsScalarTower A B L] [IsFractionRing A K] [IsFractionRing B L]
-    [Algebra.FiniteType A B] (n : ℕ) (hA : Algebra.trdeg F A = n) (hB : Algebra.trdeg F B = n) :
-    FiniteDimensional K L := by
+theorem finiteDimensional_of_trdeg_eq
+    (F A B K L : Type) [Field F] [CommRing A] [IsDomain A] [CommRing B] [IsDomain B] [Field K]
+    [Field L] [Algebra F A] [Algebra A B] [Algebra F B] [IsScalarTower F A B] [Algebra A K]
+    [Algebra B L] [Algebra K L] [Algebra A L] [IsScalarTower A K L] [IsScalarTower A B L]
+    [IsFractionRing A K] [IsFractionRing B L] [Algebra.FiniteType A B]
+    (n : ℕ) (hA : Algebra.trdeg F A = n) (hB : Algebra.trdeg F B = n)
+    : FiniteDimensional K L := by
   letI : Algebra F K := ((algebraMap A K).comp (algebraMap F A)).toAlgebra
   letI : Algebra F L := ((algebraMap B L).comp (algebraMap F B)).toAlgebra
   haveI : IsScalarTower F A K := IsScalarTower.of_algebraMap_eq' rfl
@@ -71,10 +73,14 @@ end GlobalTheory.GenFinite
 
 namespace GlobalTheory.GenFinite
 
-theorem trdeg_affineOpen_eq (F : Type) [Field F] {Y : Scheme.{0}} [IsIntegral Y]
-    (q : Y ⟶ Sp F) [LocallyOfFiniteType q] {U : Y.Opens} (hU : IsAffineOpen U)
-    (hne : (U : Set Y).Nonempty) [Algebra F Γ(Y, U)] [Algebra.FiniteType F Γ(Y, U)] (n : ℕ)
-    (hn : topologicalKrullDim Y = n) : Algebra.trdeg F Γ(Y, U) = n := by
+theorem trdeg_affineOpen_eq
+    (F : Type) [Field F]
+    {Y : Scheme.{0}} [IsIntegral Y]
+    (q : Y ⟶ Sp F) [LocallyOfFiniteType q]
+    {U : Y.Opens} (hU : IsAffineOpen U) (hne : (U : Set Y).Nonempty)
+    [Algebra F Γ(Y, U)] [Algebra.FiniteType F Γ(Y, U)]
+    (n : ℕ) (hn : topologicalKrullDim Y = n)
+    : Algebra.trdeg F Γ(Y, U) = n := by
   haveI : Nonempty U := ⟨⟨hne.some, hne.some_mem⟩⟩
   obtain ⟨d, h₁, h₂⟩ := exists_ringKrullDim_eq_and_trdeg_eq F Γ(Y, U)
   have e : topologicalKrullDim (U : Set Y) = d := by
@@ -85,18 +91,24 @@ theorem trdeg_affineOpen_eq (F : Type) [Field F] {Y : Scheme.{0}} [IsIntegral Y]
   have hd : d = n := by exact_mod_cast e.symm
   rw [h₂, hd]
 
-theorem residueDegree_genericPoint_ne_zero : ∀ (F : Type) [Field F] (M W : Scheme.{0}) [IsIntegral M] [IsIntegral W] (p : W ⟶ Sp F) (f : M ⟶ W) (n : ℕ), LocallyOfFiniteType p → LocallyOfFiniteType f → Surjective f → topologicalKrullDim M = n → topologicalKrullDim W = n → f.residueDegree (genericPoint M) ≠ 0 := by
+theorem residueDegree_genericPoint_ne_zero
+    : ∀ (F : Type) [Field F] (M W : Scheme.{0}) [IsIntegral M] [IsIntegral W] (p : W ⟶ Sp F)
+        (f : M ⟶ W) (n : ℕ),
+      LocallyOfFiniteType p → LocallyOfFiniteType f → Surjective f → topologicalKrullDim M = n
+        → topologicalKrullDim W = n
+        → f.residueDegree (genericPoint M) ≠ 0 := by
   intro F _ M W _ _ p f n hp hf hs hM hW
   have hη : f (genericPoint M) = genericPoint W := by
     have := (genericPoint_spec M).image f.continuous
     rw [Set.image_univ, f.surjective.range_eq, closure_univ] at this
     exact this.eq (genericPoint_spec W)
-  obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ := W.isBasis_affineOpens.exists_subset_of_mem_open
-    (Set.mem_univ (genericPoint W)) isOpen_univ
+  obtain ⟨_, ⟨V, hV, rfl⟩, hxV, -⟩ :=
+    W.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ (genericPoint W)) isOpen_univ
   have hV : IsAffineOpen V := hV
   have hx : f (genericPoint M) ∈ V := hη ▸ hxV
-  obtain ⟨_, ⟨U, hU, rfl⟩, hy, hUV⟩ := M.isBasis_affineOpens.exists_subset_of_mem_open
-    (show genericPoint M ∈ f ⁻¹ᵁ V from hx) (f ⁻¹ᵁ V).isOpen
+  obtain ⟨_, ⟨U, hU, rfl⟩, hy, hUV⟩ :=
+    M.isBasis_affineOpens.exists_subset_of_mem_open (show genericPoint M ∈ f ⁻¹ᵁ V from hx)
+      (f ⁻¹ᵁ V).isOpen
   have hU : IsAffineOpen U := hU
   haveI : Nonempty V := ⟨⟨_, hx⟩⟩
   haveI : Nonempty U := ⟨⟨_, hy⟩⟩
@@ -121,8 +133,9 @@ theorem residueDegree_genericPoint_ne_zero : ∀ (F : Type) [Field F] (M W : Sch
     (f.appLE V U e ≫ M.evaluation U _ hy).hom.toAlgebra
   haveI : IsScalarTower Γ(W, V) Γ(M, U) (M.residueField (genericPoint M)) :=
     IsScalarTower.of_algebraMap_eq' rfl
-  have nat : f.appLE V U e ≫ M.evaluation U _ hy =
-      W.evaluation V _ hx ≫ f.residueFieldMap (genericPoint M) := by
+  have nat
+      : f.appLE V U e ≫ M.evaluation U _ hy
+        = W.evaluation V _ hx ≫ f.residueFieldMap (genericPoint M) := by
     rw [Scheme.evaluation_naturality f _ hx, Scheme.Hom.appLE, Category.assoc]
     congr 1
     simp only [Scheme.evaluation]
@@ -132,8 +145,9 @@ theorem residueDegree_genericPoint_ne_zero : ∀ (F : Type) [Field F] (M W : Sch
     IsScalarTower.of_algebraMap_eq' congr($(nat).hom)
   haveI := GenFiniteEtale.isFractionRing_eval W hV hη hx
   haveI := GenFiniteEtale.isFractionRing_eval M hU rfl hy
-  have := finiteDimensional_of_trdeg_eq F Γ(W, V) Γ(M, U) (W.residueField (f (genericPoint M)))
-    (M.residueField (genericPoint M)) n hA hB
+  have :=
+    finiteDimensional_of_trdeg_eq F Γ(W, V) Γ(M, U) (W.residueField (f (genericPoint M)))
+      (M.residueField (genericPoint M)) n hA hB
   change Module.finrank (W.residueField (f (genericPoint M))) (M.residueField (genericPoint M)) ≠ 0
   exact Module.finrank_pos.ne'
 

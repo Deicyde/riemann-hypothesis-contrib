@@ -15,9 +15,10 @@ namespace PI.GGConvScalarW
 
 open Formalism.L2.SG.GGMirabolic
 
-theorem convScalar_of (h1 : RepGamConj) (h2 : RepGamComm) (h3 : QIdem) (h4 : GenericIff) (h5 : RankLeOne)
-    (h6 : SchurC) (h7 : TraceRepGam) (h8 : IdemTrace) (h9 : DimPos) (hm : GelfandGraevMultOne) :
-    ConvScalar := by
+theorem convScalar_of
+    (h1 : RepGamConj) (h2 : RepGamComm) (h3 : QIdem) (h4 : GenericIff) (h5 : RankLeOne)
+    (h6 : SchurC) (h7 : TraceRepGam) (h8 : IdemTrace) (h9 : DimPos) (hm : GelfandGraevMultOne)
+    : ConvScalar := by
   intro F _ _ k ψ₀ hψ V _ _ _ π hπ
   have hu : IsUni k (1 : GL (Fin k) F) :=
     ⟨fun i => by simp, fun i j hij => by simp [Matrix.one_apply_ne (ne_of_gt hij)]⟩
@@ -34,8 +35,8 @@ theorem convScalar_of (h1 : RepGamConj) (h2 : RepGamComm) (h3 : QIdem) (h4 : Gen
         simp [Matrix.one_apply_ne hij]
       · rfl
     rw [hs, AddChar.map_zero_eq_one]
-  have hgam : gam ψ₀ (1 : GL (Fin k) F) =
-      (cardU F k : ℂ)⁻¹ * (Fintype.card (GL (Fin k) F) : ℂ) := by
+  have hgam
+      : gam ψ₀ (1 : GL (Fin k) F) = (cardU F k : ℂ)⁻¹ * (Fintype.card (GL (Fin k) F) : ℂ) := by
     unfold gam
     simp [hpsi1]
   have hG0 : (Fintype.card (GL (Fin k) F) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
@@ -72,9 +73,10 @@ theorem convScalar_of (h1 : RepGamConj) (h2 : RepGamComm) (h3 : QIdem) (h4 : Gen
       · exact absurd h hd0
     rw [hc0, zero_smul, smul_zero]
 
-theorem convScalarOfLit_of (h1 : RepGamConj) (h2 : RepGamComm) (h3 : QIdem) (h4 : GenericIff)
-    (h5 : RankLeOne) (h6 : SchurC) (h7 : TraceRepGam) (h8 : IdemTrace) (h9 : DimPos) :
-    ConvScalarOfLit := by
+theorem convScalarOfLit_of
+    (h1 : RepGamConj) (h2 : RepGamComm) (h3 : QIdem) (h4 : GenericIff) (h5 : RankLeOne)
+    (h6 : SchurC) (h7 : TraceRepGam) (h8 : IdemTrace) (h9 : DimPos)
+    : ConvScalarOfLit := by
   exact fun hm => convScalar_of h1 h2 h3 h4 h5 h6 h7 h8 h9 hm
 
 end PI.GGConvScalarW

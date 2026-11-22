@@ -16,10 +16,11 @@ noncomputable section
 
 namespace GlobalTheory.LatOrb.Stab
 
-theorem polyStable {O K : Type} [CommRing O] [Field K] [Algebra O K] {n : ℕ}
-    (γ : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K))
-    (hM : ∀ v ∈ M, γ *ᵥ v ∈ M) (r : O[X]) :
-    ∀ v ∈ M, aeval γ (r.map (algebraMap O K)) *ᵥ v ∈ M := by
+theorem polyStable
+    {O K : Type} [CommRing O] [Field K] [Algebra O K]
+    {n : ℕ} (γ : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K)) (hM : ∀ v ∈ M, γ *ᵥ v ∈ M)
+    (r : O[X])
+    : ∀ v ∈ M, aeval γ (r.map (algebraMap O K)) *ᵥ v ∈ M := by
   induction r using Polynomial.induction_on' with
   | add p q hp hq =>
     intro v hv
@@ -35,21 +36,23 @@ theorem polyStable {O K : Type} [CommRing O] [Field K] [Algebra O K] {n : ℕ}
         rw [pow_succ, ← Matrix.mulVec_mulVec]
         exact ih _ (hM v hv)
     rw [Polynomial.map_monomial, aeval_monomial, ← Matrix.mulVec_mulVec,
-      Algebra.algebraMap_eq_smul_one, Matrix.smul_mulVec, Matrix.one_mulVec,
-      algebraMap_smul]
+      Algebra.algebraMap_eq_smul_one, Matrix.smul_mulVec, Matrix.one_mulVec, algebraMap_smul]
     exact M.smul_mem a (hpow v hv)
 
 end GlobalTheory.LatOrb.Stab
 
 namespace GlobalTheory.LatOrb.Stab
 
-theorem exists_unit_eq_matLat : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [Field K] [Algebra O K] [IsFractionRing O K]
-    (n : ℕ) (P₀ : O[X]), IsCoprime P₀ (derivative P₀) →
-    ∀ γ : Matrix (Fin n) (Fin n) K, γ.charpoly = P₀.map (algebraMap O K) →
-    ∀ M₁ M₂ : Submodule O (Fin n → K), IsLatV O M₁ → IsLatV O M₂ →
-    (∀ v ∈ M₁, γ *ᵥ v ∈ M₁) → (∀ v ∈ M₂, γ *ᵥ v ∈ M₂) →
-    ∃ p : K[X], IsUnit (aeval γ p) ∧ M₂ = matLat O (aeval γ p) M₁ := by
+theorem exists_unit_eq_matLat
+    : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [Field K] [Algebra O K] [IsFractionRing O K]
+        (n : ℕ) (P₀ : O[X]),
+      IsCoprime P₀ (derivative P₀)
+        → ∀ γ : Matrix (Fin n) (Fin n) K,
+          γ.charpoly = P₀.map (algebraMap O K)
+            → ∀ M₁ M₂ : Submodule O (Fin n → K),
+              IsLatV O M₁ → IsLatV O M₂ → (∀ v ∈ M₁, γ *ᵥ v ∈ M₁) → (∀ v ∈ M₂, γ *ᵥ v ∈ M₂)
+                → ∃ p : K[X], IsUnit (aeval γ p) ∧ M₂ = matLat O (aeval γ p) M₁ := by
   intro O K _ _ _ _ _ _ _ n P₀ hcop γ hchar M₁ M₂ hL₁ hL₂ hs₁ hs₂
   have hsep : γ.charpoly.Separable := by rw [hchar]; exact Polynomial.Separable.map hcop
   obtain ⟨v₀, hv₀⟩ := GlobalTheory.T.exists_cyclicVector_of_separable_charpoly' n γ hsep
@@ -77,10 +80,11 @@ theorem exists_unit_eq_matLat : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDi
     rw [← hf]
     exact (minpoly.dvd_iff).1 h1
 
-  let φ : A →ₗ[K] (Fin n → K) :=
-    { toFun := fun a => (a : Matrix (Fin n) (Fin n) K) *ᵥ v₀
-      map_add' := fun a b => by simp [Matrix.add_mulVec]
-      map_smul' := fun c a => by simp [Matrix.smul_mulVec] }
+  let φ : A →ₗ[K] (Fin n → K) := {
+    toFun := fun a => (a : Matrix (Fin n) (Fin n) K) *ᵥ v₀
+    map_add' := fun a b => by simp [Matrix.add_mulVec]
+    map_smul' := fun c a => by simp [Matrix.smul_mulVec]
+  }
   have hφ : ∀ a : A, φ a = (a : Matrix (Fin n) (Fin n) K) *ᵥ v₀ := fun _ => rfl
   have hinj : Function.Injective φ := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
@@ -110,17 +114,18 @@ theorem exists_unit_eq_matLat : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDi
   have latJ : ∀ M, IsLatV O M → GlobalTheory.UnitLemma.IsLat O K (J M) := by
     intro M hM
     refine ⟨hM.1.map _, ?_⟩
-    have hcoe : ((J M : Submodule O A) : Set A) = (e.symm : (Fin n → K) →ₗ[K] A) '' (M : Set _) := by
+    have hcoe
+        : ((J M : Submodule O A) : Set A) = (e.symm : (Fin n → K) →ₗ[K] A) '' (M : Set _) := by
       ext y; simp [J, Submodule.mem_map]; rfl
     rw [hcoe, Submodule.span_image, hM.2, Submodule.map_top, LinearEquiv.range]
-  have stJ : ∀ M, (∀ v ∈ M, γ *ᵥ v ∈ M) →
-      ∀ a ∈ integralClosure O A, ∀ y ∈ J M, a * y ∈ J M := by
+  have stJ : ∀ M, (∀ v ∈ M, γ *ᵥ v ∈ M) → ∀ a ∈ integralClosure O A, ∀ y ∈ J M, a * y ∈ J M := by
     intro M hM a ha y hy
     have hint : IsIntegral O (a : Matrix (Fin n) (Fin n) K) :=
       (ha : IsIntegral O a).map (A.val.restrictScalars O)
     obtain ⟨p, hp⟩ := (memA _).1 a.2
     rw [← hp] at hint
-    obtain ⟨r, hr⟩ := GlobalTheory.T.integral_aeval_eq_aeval_map_of_coprime_charpoly n P₀ hcop γ hchar p hint
+    obtain ⟨r, hr⟩ :=
+      GlobalTheory.T.integral_aeval_eq_aeval_map_of_coprime_charpoly n P₀ hcop γ hchar p hint
     rw [memJ] at hy ⊢
     change ((a : Matrix (Fin n) (Fin n) K) * (y : Matrix (Fin n) (Fin n) K)) *ᵥ v₀ ∈ M
     rw [← Matrix.mulVec_mulVec, ← hp, hr]
@@ -129,8 +134,11 @@ theorem exists_unit_eq_matLat : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDi
     GlobalTheory.UnitLemma.PrincipalLatDVR.isPrincipalIdealRing_integralClosure (E := K)
   set Λ : Submodule O A := Subalgebra.toSubmodule (integralClosure O A)
 
-  have back : ∀ M (c : Aˣ), J M = GlobalTheory.UnitLemma.mulLat O (c : A) Λ →
-      M = matLat O ((c : A) : Matrix (Fin n) (Fin n) K) (Λ.map (eO : A →ₗ[O] (Fin n → K))) := by
+  have back
+      : ∀ M (c : Aˣ),
+        J M = GlobalTheory.UnitLemma.mulLat O (c : A) Λ
+          → M
+            = matLat O ((c : A) : Matrix (Fin n) (Fin n) K) (Λ.map (eO : A →ₗ[O] (Fin n → K))) := by
     intro M c hc
     ext v
     obtain ⟨y, rfl⟩ := hsurj v
@@ -141,19 +149,23 @@ theorem exists_unit_eq_matLat : ∀ {O K : Type} [CommRing O] [IsDomain O] [IsDi
     constructor
     · rintro ⟨l, hl, rfl⟩
       refine ⟨eO l, ⟨l, hl, rfl⟩, ?_⟩
-      change ((c : A) : Matrix (Fin n) (Fin n) K) *ᵥ ((l : Matrix (Fin n) (Fin n) K) *ᵥ v₀) =
-        (((c : A) * l : A) : Matrix (Fin n) (Fin n) K) *ᵥ v₀
-      rw [Matrix.mulVec_mulVec]; rfl
+      change ((c : A) : Matrix (Fin n) (Fin n) K) *ᵥ ((l : Matrix (Fin n) (Fin n) K) *ᵥ v₀)
+        = (((c : A) * l : A) : Matrix (Fin n) (Fin n) K) *ᵥ v₀
+      rw [Matrix.mulVec_mulVec]
+      rfl
     · rintro ⟨_, ⟨l, hl, rfl⟩, hv⟩
       refine ⟨l, hl, hinj ?_⟩
       rw [← hv]
-      change (((c : A) * l : A) : Matrix (Fin n) (Fin n) K) *ᵥ v₀ =
-        ((c : A) : Matrix (Fin n) (Fin n) K) *ᵥ ((l : Matrix (Fin n) (Fin n) K) *ᵥ v₀)
-      rw [Matrix.mulVec_mulVec]; rfl
+      change (((c : A) * l : A) : Matrix (Fin n) (Fin n) K) *ᵥ v₀
+        = ((c : A) : Matrix (Fin n) (Fin n) K) *ᵥ ((l : Matrix (Fin n) (Fin n) K) *ᵥ v₀)
+      rw [Matrix.mulVec_mulVec]
+      rfl
   obtain ⟨a₁, h₁⟩ :=
-    GlobalTheory.UnitLemma.PrincipalLat.eq_mulLat_of_isPrincipalIdealRing (E := K) (J M₁) (latJ M₁ hL₁) (stJ M₁ hs₁)
+    GlobalTheory.UnitLemma.PrincipalLat.eq_mulLat_of_isPrincipalIdealRing (E := K) (J M₁)
+      (latJ M₁ hL₁) (stJ M₁ hs₁)
   obtain ⟨a₂, h₂⟩ :=
-    GlobalTheory.UnitLemma.PrincipalLat.eq_mulLat_of_isPrincipalIdealRing (E := K) (J M₂) (latJ M₂ hL₂) (stJ M₂ hs₂)
+    GlobalTheory.UnitLemma.PrincipalLat.eq_mulLat_of_isPrincipalIdealRing (E := K) (J M₂)
+      (latJ M₂ hL₂) (stJ M₂ hs₂)
   obtain ⟨p, hp⟩ := (memA _).1 ((a₂ * a₁⁻¹ : Aˣ) : A).2
   refine ⟨p, ?_, ?_⟩
   · rw [hp]; exact (Units.isUnit (a₂ * a₁⁻¹)).map A.val

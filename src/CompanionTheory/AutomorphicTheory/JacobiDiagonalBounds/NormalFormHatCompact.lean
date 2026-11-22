@@ -10,7 +10,8 @@ namespace Formalism.FourierDecayAlt.P.NormalFormRelations
 
 theorem normal_form_hat_compact : CompanionTheory.NFCpt.NFTieHatC := by
   intro Cb
-  obtain ⟨Cc, H⟩ := nfTieGen_of Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.gauge_construction_holds Cb
+  obtain ⟨Cc, H⟩ :=
+    nfTieGen_of Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.gauge_construction_holds Cb
   refine ⟨Cc, fun Wp Wq _ _ _ _ _ _ P p hInD => ?_⟩
   obtain ⟨e, L, h1, h2, h3, h4⟩ := H Wp Wq P p hInD
   refine ⟨e, L, h1, h2, h3, fun Y w hw ee Q Lq hS => ?_⟩

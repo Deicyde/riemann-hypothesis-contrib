@@ -8,15 +8,18 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.Local
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 set_option maxHeartbeats 800000 in
-theorem UpperTheory.Gal.InertialTypesAlt.cuspIne :
-    TameRead → TypeChar → NameOf → BaseQ → CuspIne := by
+theorem UpperTheory.Gal.InertialTypesAlt.cuspIne
+    : TameRead → TypeChar → NameOf → BaseQ → CuspIne := by
   intro hT hC hN hB
   intro E Ω _ _ _ _ _ A v h g _ i hi Θ hΘ e y c hy hdz hreg htr rc hrc f hf hdiv t ϖ hϖ z hz
   obtain ⟨a, ha, hL⟩ := hrc
@@ -30,12 +33,14 @@ theorem UpperTheory.Gal.InertialTypesAlt.cuspIne :
   haveI : Finite 𝓀[HeightOneSpectrum.adicCompletion E v] :=
     Nat.finite_of_card_ne_zero (by rw [hcard]; exact (Fact.out : g.Prime).ne_zero)
   obtain ⟨θ, hθ, hreg', hnames⟩ :=
-    hN g y.fst hn 𝓀[HeightOneSpectrum.adicCompletion E v] D.K (IsLocalRing.ResidueField A) hrank r e ι Θ hΘ c hreg
+    hN g y.fst hn 𝓀[HeightOneSpectrum.adicCompletion E v] D.K (IsLocalRing.ResidueField A) hrank r e
+      ι Θ hΘ c hreg
   have hcls : GlobalTheory.LocLanglands.cls y.snd.rep = y := by
     unfold GlobalTheory.LocLanglands.cls
     exact IrrGL.of_rep y
   have hy' : (GlobalTheory.LocLanglands.cls y.snd.rep).IsCusp := by rw [hcls]; exact hy
-  have hdz' : UpperTheory.Zero.LLC.DZ (GlobalTheory.LocLanglands.cls y.snd.rep) := by rw [hcls]; exact hdz
+  have hdz' : UpperTheory.Zero.LLC.DZ (GlobalTheory.LocLanglands.cls y.snd.rep) := by
+    rw [hcls]; exact hdz
   obtain ⟨τ, hcusp, hinfl⟩ :=
     (UpperTheory.Zero.LLC.typeEx E Ω A v h g i hi y.fst hn y.snd.rep).1 hy' hdz'
   have hchar := hC E v g i hi r y τ hcusp hinfl

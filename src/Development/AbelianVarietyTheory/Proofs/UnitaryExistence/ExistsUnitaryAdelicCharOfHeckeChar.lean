@@ -15,20 +15,28 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FinitePar
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.L2.Theta
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Pj
 open scoped TensorProduct Matrix Topology
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Member
 
 namespace GlobalTheory.Member
 
-theorem continuous_det_matHom (D : D7) (V : HSp D) :
-    Continuous fun g : GA D V => Matrix.GeneralLinearGroup.det (matHom V g) := by
+theorem continuous_det_matHom (D : D7) (V : HSp D)
+    : Continuous fun g : GA D V => Matrix.GeneralLinearGroup.det (matHom V g) := by
   haveI := Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.Unfold.isTopRing (F := D.host.F) (E := D.host.E)
   have hm : Continuous fun g : GA D V => matHom V g := continuous_subtype_val
   exact Matrix.GeneralLinearGroup.continuous_det.comp hm
 
-theorem exists_muVal : ∀ (D : D7) (V : HSp D), ∀ χ : (AE D)ˣ →* Circle, IsHeckeChar D χ → (∀ a, χ (idF D a) = 1) → ∃ mu : GA D V → ℂ, MuVal V χ mu ∧ (∀ g g', mu (g * g') = mu g * mu g') ∧ (∀ g, ‖mu g‖ = 1) ∧ (∀ γ ∈ GQ V, mu γ = 1) ∧ Continuous mu := by
+theorem exists_muVal
+    : ∀ (D : D7) (V : HSp D), ∀ χ : (AE D)ˣ →* Circle,
+      IsHeckeChar D χ → (∀ a, χ (idF D a) = 1)
+        → ∃ mu : GA D V → ℂ,
+          MuVal V χ mu ∧ (∀ g g', mu (g * g') = mu g * mu g') ∧ (∀ g, ‖mu g‖ = 1)
+            ∧ (∀ γ ∈ GQ V, mu γ = 1) ∧ Continuous mu := by
   intro D V χ hχ hF
   obtain ⟨hex, huniq, hrat, hmul⟩ := GlobalTheory.Member.isDetRoot_laws D V
   choose r hr using hex
@@ -47,7 +55,8 @@ theorem exists_muVal : ∀ (D : D7) (V : HSp D), ∀ χ : (AE D)ˣ →* Circle, 
     rw [map_one] at hU
     have hW : χ ⁻¹' U ∈ 𝓝 (1 : (AE D)ˣ) := hχ.1.continuousAt.preimage_mem_nhds (by rwa [map_one])
     obtain ⟨N, hN, hNW⟩ := GlobalTheory.Member.exists_root_near_one D _ hW
-    have hN' : (fun g : GA D V => Matrix.GeneralLinearGroup.det (matHom V g)) ⁻¹' N ∈ 𝓝 (1 : GA D V) :=
+    have hN'
+        : (fun g : GA D V => Matrix.GeneralLinearGroup.det (matHom V g)) ⁻¹' N ∈ 𝓝 (1 : GA D V) :=
       (continuous_det_matHom D V).continuousAt.preimage_mem_nhds (by rwa [map_one, map_one])
     refine Filter.mem_map.2 (Filter.mem_of_superset hN' ?_)
     intro g hg

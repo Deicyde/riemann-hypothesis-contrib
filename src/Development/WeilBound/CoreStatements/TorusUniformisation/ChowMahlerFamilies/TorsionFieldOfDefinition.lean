@@ -20,13 +20,16 @@ public import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.Abe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.Xgn.TorsionFieldOfDefinition
 
-theorem exists_field_alg (C : Type) [CommRing C] [Algebra ℚ C] [Module.Finite ℚ C] :
-    ∃ F : IntermediateField ℚ ℂ, FiniteDimensional ℚ F ∧ ∀ (ψ : C →+* ℂ) (c : C), ψ c ∈ F := by
+theorem exists_field_alg (C : Type) [CommRing C] [Algebra ℚ C] [Module.Finite ℚ C]
+    : ∃ F : IntermediateField ℚ ℂ, FiniteDimensional ℚ F ∧ ∀ (ψ : C →+* ℂ) (c : C), ψ c ∈ F := by
   classical
   have hint : ∀ c : C, IsIntegral ℚ c := fun c => Algebra.IsIntegral.isIntegral c
   let bs := Module.finBasis ℚ C
@@ -53,10 +56,11 @@ theorem exists_field_alg (C : Type) [CommRing C] [Algebra ℚ C] [Module.Finite 
     rw [map_rat_smul]
     exact IntermediateField.smul_mem _ (IntermediateField.subset_adjoin ℚ _ (hroot ψ i))
 
-theorem exists_field_ring (L : Type) [Field L] [NumberField L] (B : Type) [CommRing B]
-    (φ : L →+* B) (hφ : φ.Finite) :
-    ∃ F : IntermediateField ℚ ℂ, FiniteDimensional ℚ F ∧ (∀ (σ : L →+* ℂ) (c : L), σ c ∈ F) ∧
-      ∀ (ψ : B →+* ℂ) (c : B), ψ c ∈ F := by
+theorem exists_field_ring
+    (L : Type) [Field L] [NumberField L] (B : Type) [CommRing B] (φ : L →+* B) (hφ : φ.Finite)
+    : ∃ F : IntermediateField ℚ ℂ,
+      FiniteDimensional ℚ F ∧ (∀ (σ : L →+* ℂ) (c : L), σ c ∈ F)
+        ∧ ∀ (ψ : B →+* ℂ) (c : B), ψ c ∈ F := by
   letI : Algebra L B := φ.toAlgebra
   letI : Algebra ℚ B := (φ.comp (algebraMap ℚ L)).toAlgebra
   haveI : IsScalarTower ℚ L B := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
@@ -66,14 +70,19 @@ theorem exists_field_ring (L : Type) [Field L] [NumberField L] (B : Type) [CommR
   obtain ⟨F₂, hF₂, h₂⟩ := exists_field_alg B
   haveI := hF₁
   haveI := hF₂
-  exact ⟨F₁ ⊔ F₂, inferInstance, fun σ c => le_sup_left (a := F₁) (h₁ σ c),
-    fun ψ c => le_sup_right (a := F₁) (h₂ ψ c)⟩
+  exact ⟨
+    F₁ ⊔ F₂,
+    inferInstance,
+    fun σ c => le_sup_left (a := F₁) (h₁ σ c),
+    fun ψ c => le_sup_right (a := F₁) (h₂ ψ c)
+  ⟩
 
-theorem exists_field_scheme (L : Type) [Field L] [NumberField L] (σ : L →+* ℂ) (W : Scheme.{0})
-    (p : W ⟶ Sp L) [IsFinite p] :
-    ∃ (F : IntermediateField ℚ ℂ) (_ : FiniteDimensional ℚ F) (e : L →+* F),
-      (∀ x, ((e x : F) : ℂ) = σ x) ∧ ∀ w : Sp ℂ ⟶ W, w ≫ p = spMap σ →
-        ∃ y : Sp F ⟶ W, y ≫ p = spMap e ∧ spMap (algebraMap F ℂ) ≫ y = w := by
+theorem exists_field_scheme
+    (L : Type) [Field L] [NumberField L] (σ : L →+* ℂ) (W : Scheme.{0}) (p : W ⟶ Sp L) [IsFinite p]
+    : ∃ (F : IntermediateField ℚ ℂ) (_ : FiniteDimensional ℚ F) (e : L →+* F),
+      (∀ x, ((e x : F) : ℂ) = σ x)
+        ∧ ∀ w : Sp ℂ ⟶ W,
+          w ≫ p = spMap σ → ∃ y : Sp F ⟶ W, y ≫ p = spMap e ∧ spMap (algebraMap F ℂ) ≫ y = w := by
   haveI : IsAffine W := isAffine_of_isAffineHom p
   obtain ⟨q, hq⟩ : ∃ q : CommRingCat.of L ⟶ Γ(W, ⊤), Spec.map q = W.isoSpec.inv ≫ p :=
     ⟨_, Spec.map_preimage _⟩
@@ -105,8 +114,9 @@ theorem exists_field_scheme (L : Type) [Field L] [NumberField L] (σ : L →+* �
 
 end PositivityTheory.Xgn.TorsionFieldOfDefinition
 
-private theorem comp_mulN_lemma {S : Scheme} {G : Over S} [GrpObj G] {X : Over S} (x : X ⟶ G) (n : ℕ) :
-    x ≫ mulN G n = x ^ n := by
+private theorem comp_mulN_lemma
+    {S : Scheme} {G : Over S} [GrpObj G] {X : Over S} (x : X ⟶ G) (n : ℕ)
+    : x ≫ mulN G n = x ^ n := by
   induction n with
   | zero =>
     rw [pow_zero, Hom.one_def]
@@ -117,7 +127,15 @@ private theorem comp_mulN_lemma {S : Scheme} {G : Over S} [GrpObj G] {X : Over S
     show x ≫ (CartesianMonoidalCategory.lift (mulN G k) (𝟙 G) ≫ μ) = _
     rw [← Category.assoc, CartesianMonoidalCategory.comp_lift, Category.comp_id]
 
-theorem PositivityTheory.Xgn.torsion_field_of_definition : ∀ (L : Type) [Field L] [NumberField L] (σ : L →+* ℂ) (P : Out.PolAV (Sp L)) (n : ℕ), 0 < n → ∃ (F : IntermediateField ℚ ℂ) (_ : FiniteDimensional ℚ F) (e : L →+* F), (∀ x, ((e x : F) : ℂ) = σ x) ∧ ∀ x : Over.mk (spMap σ) ⟶ P.A, x ^ n = 1 → ∃ y : Sp F ⟶ P.A.left, y ≫ P.A.hom = spMap e ∧ spMap (algebraMap F ℂ) ≫ y = x.left := by
+theorem PositivityTheory.Xgn.torsion_field_of_definition
+    : ∀ (L : Type) [Field L] [NumberField L] (σ : L →+* ℂ) (P : Out.PolAV (Sp L)) (n : ℕ),
+      0 < n
+        → ∃ (F : IntermediateField ℚ ℂ) (_ : FiniteDimensional ℚ F) (e : L →+* F),
+          (∀ x, ((e x : F) : ℂ) = σ x)
+            ∧ ∀ x : Over.mk (spMap σ) ⟶ P.A,
+              x ^ n = 1
+                → ∃ y : Sp F ⟶ P.A.left,
+                  y ≫ P.A.hom = spMap e ∧ spMap (algebraMap F ℂ) ≫ y = x.left := by
   intro L _ _ σ P n hn
   haveI := P.isAb.comm
   haveI := P.isAb.smooth
@@ -128,7 +146,8 @@ theorem PositivityTheory.Xgn.torsion_field_of_definition : ∀ (L : Type) [Field
     rwa [map_natCast] at h1
   haveI hfin : IsFinite (torsion P.A n).hom := GlobalTheory.GrpTangent.isFinite_torsion P.A hu
   obtain ⟨F, hF, e, he, hlift⟩ :=
-    PositivityTheory.Xgn.TorsionFieldOfDefinition.exists_field_scheme L σ (torsion P.A n).left (torsion P.A n).hom
+    PositivityTheory.Xgn.TorsionFieldOfDefinition.exists_field_scheme L σ (torsion P.A n).left
+      (torsion P.A n).hom
   refine ⟨F, hF, e, he, fun x hx => ?_⟩
   have hx' : x ≫ mulN P.A n = (toUnit _ ≫ η : Over.mk (spMap σ) ⟶ P.A) := by
     rw [comp_mulN_lemma, hx, Hom.one_def]

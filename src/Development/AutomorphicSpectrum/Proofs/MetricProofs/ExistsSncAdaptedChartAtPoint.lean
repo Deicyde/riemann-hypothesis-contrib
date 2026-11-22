@@ -7,18 +7,33 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.ContDiffAtOfIsPote
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
 
 namespace GlobalTheory.CompanionTheory.Ar.PB.LocalForm
 
-theorem holoOn_coord {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X)
-    (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (hψ : IsCompatChart A ψ) (i : Fin e) :
-    A.HoloOn ψ.source (fun y => ψ y i) := by
+theorem holoOn_coord
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    (A : FinHolAtlas e X) (ψ : OpenPartialHomeomorph X (Fin e → ℂ)) (hψ : IsCompatChart A ψ)
+    (i : Fin e)
+    : A.HoloOn ψ.source (fun y => ψ y i) := by
   intro j z hz
   exact (analyticAt_pi_iff.1 ((hψ j).1 z hz)) i
 
-theorem exists_local_form : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ) (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X), IsSNC A L s m W → ∀ x, ∃ (φ : OpenPartialHomeomorph X (Fin e → ℂ)) (S : Finset (Fin e)) (μ : Fin e → ℕ) (v : X → ℂ), IsCompatChart A φ ∧ x ∈ φ.source ∧ Metric.closedBall (0 : Fin e → ℂ) 2 ⊆ φ.target ∧ φ x = 0 ∧ φ.source ⊆ L.U x ∧ (∀ i ∈ S, 1 ≤ μ i) ∧ A.HoloOn φ.source v ∧ (∀ y ∈ φ.source, v y ≠ 0) ∧ ∀ y ∈ φ.source, s x y = v y * ∏ i ∈ S, φ y i ^ μ i := by
+theorem exists_local_form
+    : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ)
+        (nb : ℕ) (m : Fin nb → ℕ) (W : Fin nb → Set X),
+      IsSNC A L s m W
+        → ∀ x,
+          ∃ (φ : OpenPartialHomeomorph X (Fin e → ℂ)) (S : Finset (Fin e)) (μ : Fin e → ℕ)
+              (v : X → ℂ),
+            IsCompatChart A φ ∧ x ∈ φ.source ∧ Metric.closedBall (0 : Fin e → ℂ) 2 ⊆ φ.target
+              ∧ φ x = 0 ∧ φ.source ⊆ L.U x ∧ (∀ i ∈ S, 1 ≤ μ i) ∧ A.HoloOn φ.source v
+              ∧ (∀ y ∈ φ.source, v y ≠ 0) ∧ ∀ y ∈ φ.source, s x y = v y * ∏ i ∈ S, φ y i ^ μ i := by
   intro e X _ A L s nb m W hsnc x
   obtain ⟨ψ, hψ, hxψ, hψU, σ, hinj, -, u, hu, hu0, hs⟩ := hsnc x
   obtain ⟨c, hc⟩ : ∃ c, c = ψ x := ⟨_, rfl⟩
@@ -70,9 +85,12 @@ theorem exists_local_form : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : F
     exact hmem
 
   let g : Fin nb → X → ℂ := fun k y => (σ k).elim 1 (fun i => ψ y i ^ m k)
-  have hg : ∀ k y, (match σ k with
-      | some i => ψ y i ^ m k
-      | none => 1) = g k y := by
+  have hg
+      : ∀ k y,
+        (match σ k with
+            | some i => ψ y i ^ m k
+            | none => 1)
+          = g k y := by
     intro k y
     simp only [g]
     cases σ k <;> rfl
@@ -87,8 +105,9 @@ theorem exists_local_form : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : F
   let μ : Fin e → ℕ := fun i => ∑ k, if σ k = some i then m k else 0
   have hμ : ∀ k i, σ k = some i → μ i = m k := by
     intro k i hk
-    refine (Finset.sum_eq_single k (fun b _ hb => if_neg fun h => hb (hinj _ _ i h hk))
-      (by simp)).trans (if_pos hk)
+    refine
+      (Finset.sum_eq_single k (fun b _ hb => if_neg fun h => hb (hinj _ _ i h hk)) (by simp)).trans
+        (if_pos hk)
   have hKS : ∀ y, ∏ k ∈ K, g k y = ∏ i ∈ S, ψ y i ^ μ i := by
     intro y
     refine Finset.prod_bij (fun k hk => Classical.choose (Finset.mem_filter.1 hk).2) ?_ ?_ ?_ ?_
@@ -113,8 +132,7 @@ theorem exists_local_form : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : F
         rw [hi, hμ k i hi]
         rfl
       exact key _ h1
-  let T : Finset (Fin nb) := Finset.univ.filter
-    (fun k => ¬ ∃ i, σ k = some i ∧ c i = 0 ∧ 1 ≤ m k)
+  let T : Finset (Fin nb) := Finset.univ.filter (fun k => ¬ ∃ i, σ k = some i ∧ c i = 0 ∧ 1 ≤ m k)
   let C : ℂ := ((r : ℂ) / 3) ^ (∑ i ∈ S, μ i)
   have hC : C ≠ 0 := pow_ne_zero _ (div_ne_zero hrC (by norm_num))
   refine ⟨φ, S, μ, fun y => u y * C * ∏ k ∈ T, g k y, hφc, hxφ, htarget, ?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -152,8 +170,8 @@ theorem exists_local_form : ∀ (e : ℕ) (X : Type) [TopologicalSpace X] (A : F
     have hsplit : ∏ k, g k y = (∏ k ∈ K, g k y) * ∏ k ∈ T, g k y :=
       (Finset.prod_filter_mul_prod_filter_not _ _ _).symm
     have hmono : ∏ i ∈ S, ψ y i ^ μ i = C * ∏ i ∈ S, φ y i ^ μ i := by
-      rw [Finset.prod_congr rfl (fun i hi => by rw [hcoord i hi, mul_pow]),
-        Finset.prod_mul_distrib, Finset.prod_pow_eq_pow_sum]
+      rw [Finset.prod_congr rfl (fun i hi => by rw [hcoord i hi, mul_pow]), Finset.prod_mul_distrib,
+        Finset.prod_pow_eq_pow_sum]
     have h2 : s x y = u y * ∏ k, g k y := by
       rw [hs y hy1]
       congr 1

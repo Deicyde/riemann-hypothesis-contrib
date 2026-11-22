@@ -12,12 +12,14 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 open MvPolynomial
 
-theorem ringKrullDim_quotient_le_comap_add_one {K : Type} [Fintype K] {ι : K → Type}
-    [∀ k, Fintype (ι k)] {J : Type} {R : Type*} [CommRing R] [IsNoetherianRing R]
-    (G' : Ideal (MRing (extIdx ι J) R)) [G'.IsPrime] (j₀ : J)
-    (hY : ∀ j, j ≠ j₀ → (newVar j : MRing (extIdx ι J) R) ∈ G') :
-    ringKrullDim (MRing (extIdx ι J) R ⧸ G') ≤
-      ringKrullDim (MRing ι R ⧸ G'.comap (liftForm (J := J) (ι := ι) (R := R))) + 1 := by
+theorem ringKrullDim_quotient_le_comap_add_one
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {J : Type} {R : Type*} [CommRing R] [IsNoetherianRing R]
+    (G' : Ideal (MRing (extIdx ι J) R)) [G'.IsPrime]
+    (j₀ : J) (hY : ∀ j, j ≠ j₀ → (newVar j : MRing (extIdx ι J) R) ∈ G')
+    : ringKrullDim (MRing (extIdx ι J) R ⧸ G')
+      ≤ ringKrullDim (MRing ι R ⧸ G'.comap (liftForm (J := J) (ι := ι) (R := R))) + 1 := by
   set G := G'.comap (liftForm (J := J) (ι := ι) (R := R)) with hGdef
   let φ : (MRing ι R ⧸ G) →+* (MRing (extIdx ι J) R ⧸ G') :=
     Ideal.quotientMap G' (liftForm (J := J) (ι := ι) (R := R)).toRingHom le_rfl
@@ -53,14 +55,18 @@ theorem ringKrullDim_quotient_le_comap_add_one {K : Type} [Fintype K] {ι : K �
         rw [map_mul, ha, map_mul]
         congr 1
         simp [ψ, φ, Ideal.quotientMap_mk, liftForm, rename_X]
-  calc ringKrullDim (MRing (extIdx ι J) R ⧸ G')
+  calc
+    ringKrullDim (MRing (extIdx ι J) R ⧸ G')
       ≤ ringKrullDim (Polynomial (MRing ι R ⧸ G)) := ringKrullDim_le_of_surjective ψ hψ
     _ = ringKrullDim (MRing ι R ⧸ G) + 1 := Polynomial.ringKrullDim_of_isNoetherianRing
 
-theorem mem_minimalPrimes_of_ringKrullDim {A : Type*} [CommRing A] (P G : Ideal A) [P.IsPrime]
-    [G.IsPrime] (s : A) (hsP : s ∉ P) (N : ℕ) (hP : ringKrullDim (A ⧸ P) = (N : WithBot ℕ∞))
-    (hle : P ⊔ Ideal.span {s} ≤ G) (hG : (N : WithBot ℕ∞) ≤ ringKrullDim (A ⧸ G) + 1) :
-    G ∈ (P ⊔ Ideal.span {s}).minimalPrimes := by
+theorem mem_minimalPrimes_of_ringKrullDim
+    {A : Type*} [CommRing A]
+    (P G : Ideal A) [P.IsPrime] [G.IsPrime]
+    (s : A) (hsP : s ∉ P)
+    (N : ℕ) (hP : ringKrullDim (A ⧸ P) = (N : WithBot ℕ∞))
+    (hle : P ⊔ Ideal.span {s} ≤ G) (hG : (N : WithBot ℕ∞) ≤ ringKrullDim (A ⧸ G) + 1)
+    : G ∈ (P ⊔ Ideal.span {s}).minimalPrimes := by
   refine ⟨⟨inferInstance, hle⟩, fun Q hQ hQG => ?_⟩
   have : Q.IsPrime := hQ.1
   by_contra hGQ
@@ -69,7 +75,9 @@ theorem mem_minimalPrimes_of_ringKrullDim {A : Type*} [CommRing A] (P G : Ideal 
   have h1 := DimStrictDrop.proof A Q G (lt_of_le_not_ge hQG hGQ)
   have h2 := DimStrictDrop.proof A P Q hPQ
   have h3 : (N : WithBot ℕ∞) + 1 ≤ (N : WithBot ℕ∞) :=
-    calc (N : WithBot ℕ∞) + 1 ≤ ringKrullDim (A ⧸ G) + 1 + 1 := by gcongr
+    calc
+      (N : WithBot ℕ∞) + 1
+        ≤ ringKrullDim (A ⧸ G) + 1 + 1 := by gcongr
       _ ≤ ringKrullDim (A ⧸ Q) + 1 := by gcongr
       _ ≤ N := hP ▸ h2
   have h4 : ((N + 1 : ℕ) : WithBot ℕ∞) ≤ (N : WithBot ℕ∞) := by exact_mod_cast h3

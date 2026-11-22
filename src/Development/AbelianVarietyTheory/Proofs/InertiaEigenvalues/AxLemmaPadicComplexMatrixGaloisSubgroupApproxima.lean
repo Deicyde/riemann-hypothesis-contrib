@@ -6,17 +6,27 @@ public import Development.AbelianVarietyTheory.CrystallinePeriods.RingBasics
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Pst GlobalTheory.PMon
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Pst GlobalTheory.PMon
 open scoped Formalism.Per
 
 namespace GlobalTheory.AxLemma
 
-theorem ax_lemma_matrix : ∀ (l : ℕ) [Fact l.Prime] , ∃ c : ℝ, 0 < c ∧ ∀ (n : Type) [Fintype n] [DecidableEq n] (K : FinExt l) (H : Subgroup ↥(GK K)) (Y : Matrix n n ℂ_[l]) (r : ℝ), 0 < r → (∀ g ∈ H, ∀ i j, ‖(Y.map (Formalism.Per.σC (g : GQ l)) - Y) i j‖ ≤ r) → ∃ Z : Matrix n n ℂ_[l], (∀ g ∈ H, Z.map (Formalism.Per.σC (g : GQ l)) = Z) ∧ ∀ i j, ‖(Y - Z) i j‖ ≤ c * r := by
+theorem ax_lemma_matrix
+    : ∀ (l : ℕ) [Fact l.Prime], ∃ c : ℝ,
+      0 < c
+        ∧ ∀ (n : Type) [Fintype n] [DecidableEq n] (K : FinExt l) (H : Subgroup ↥(GK K))
+            (Y : Matrix n n ℂ_[l]) (r : ℝ),
+          0 < r → (∀ g ∈ H, ∀ i j, ‖(Y.map (Formalism.Per.σC (g : GQ l)) - Y) i j‖ ≤ r)
+            → ∃ Z : Matrix n n ℂ_[l],
+              (∀ g ∈ H, Z.map (Formalism.Per.σC (g : GQ l)) = Z)
+                ∧ ∀ i j, ‖(Y - Z) i j‖ ≤ c * r := by
   intro l _
   obtain ⟨c, hc, hax⟩ := ax_lemma_complete l
   refine ⟨c, hc, fun n _ _ K H Y r hr hY => ?_⟩
-  have hent : ∀ i j, ∃ z : Om l, (∀ g ∈ H.map (GK K).subtype, g z = z) ∧
-      ‖Y i j - (z : ℂ_[l])‖ ≤ c * r := by
+  have hent
+      : ∀ i j, ∃ z : Om l,
+        (∀ g ∈ H.map (GK K).subtype, g z = z) ∧ ‖Y i j - (z : ℂ_[l])‖ ≤ c * r := by
     intro i j
     refine hax (H.map (GK K).subtype) (Y i j) r hr ?_
     rintro g' ⟨g, hg, rfl⟩

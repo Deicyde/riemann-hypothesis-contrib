@@ -6,5 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GaussManinPe
 
 @[expose] public section
 
-theorem GlobalTheory.PeriodFamily.periodComparison_holds : GlobalTheory.Published.PeriodComparison :=
-  GlobalTheory.PeriodFamily.periodComparison_of_gaussManinPeriods GlobalTheory.PeriodFamily.gaussManinPeriods_holds
+theorem GlobalTheory.PeriodFamily.periodComparison_holds
+    : GlobalTheory.Published.PeriodComparison :=
+  GlobalTheory.PeriodFamily.periodComparison_of_gaussManinPeriods
+    GlobalTheory.PeriodFamily.gaussManinPeriods_holds

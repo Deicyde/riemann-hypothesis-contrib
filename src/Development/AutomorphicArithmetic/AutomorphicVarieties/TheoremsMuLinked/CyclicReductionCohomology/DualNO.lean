@@ -12,44 +12,65 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th GlobalTheory.GalOfCusp
+open IsLocalRing Matrix Filter NumberField IsDedekindDomain Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV
+  UpperTheory.V.Th GlobalTheory.GalOfCusp
 
-private theorem cnt {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M] [Finite M]
-    (ρ : Representation R Γ M) (c : Γ) (hc : c * c = 1) (h2 : IsUnit (2 : R)) (Z : AddSubgroup (Γ → M)) (hf : Finite Z)
-    (hB : (Bl ρ).toAddSubgroup ≤ Z) (hZ : ∀ z ∈ Z, ∀ g h, z (g * h) = z g + ρ g (z h)) (K : ℕ)
-    (h : {z | z ∈ Z ∧ z c = 0}.ncard ≤ {z | z ∈ Bl ρ ∧ z c = 0}.ncard * K) : Nat.card Z ≤ Nat.card (Bl ρ) * K := by
+private theorem cnt
+    {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M] [Finite M]
+    (ρ : Representation R Γ M)
+    (c : Γ) (hc : c * c = 1)
+    (h2 : IsUnit (2 : R))
+    (Z : AddSubgroup (Γ → M)) (hf : Finite Z) (hB : (Bl ρ).toAddSubgroup ≤ Z)
+    (hZ : ∀ z ∈ Z, ∀ g h, z (g * h) = z g + ρ g (z h))
+    (K : ℕ) (h : {z | z ∈ Z ∧ z c = 0}.ncard ≤ {z | z ∈ Bl ρ ∧ z c = 0}.ncard * K)
+    : Nat.card Z ≤ Nat.card (Bl ρ) * K := by
   obtain ⟨c1, c2, c3⟩ := cCount R Γ M ρ c hc h2
   have c1 := c1 Z hf hB hZ
   haveI : Nonempty {m : M // ρ c m = m} := ⟨⟨0, map_zero _⟩⟩
   have hp : 0 < Nat.card {m : M // ρ c m = m} := Nat.card_pos
   refine Nat.le_of_mul_le_mul_right ?_ hp
   rw [c1, ← c2, ← c3]
-  calc _ ≤ ({z | z ∈ Bl ρ ∧ z c = 0}.ncard * K) * (Nat.card (Bl ρ) * Nat.card ρ.invariants) := Nat.mul_le_mul_right _ h
+  calc
+    _ ≤ ({z | z ∈ Bl ρ ∧ z c = 0}.ncard * K) * (Nat.card (Bl ρ) * Nat.card ρ.invariants) :=
+      Nat.mul_le_mul_right _ h
     _ = _ := by ring
 
-private theorem sec {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} (h : G.Hom G0) : Function.Surjective h.p₀ := by
+private theorem sec {l : ℕ} [Fact l.Prime] {L : Loc} {G G0 : Glob l L} (h : G.Hom G0)
+    : Function.Surjective h.p₀ := by
   intro g0
   obtain ⟨g, hg⟩ := h.surj g0
   refine ⟨⟨g, ?_⟩, Subtype.ext hg⟩
   rw [MonoidHom.mem_ker, ← h.η, hg]
   exact g0.2
 
-private theorem red_mul {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O) :
-    red m (A * B) = red m A * red m B := Matrix.map_mul
+private theorem red_mul
+    {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (A B : Matrix (Fin n) (Fin n) O)
+    : red m (A * B) = red m A * red m B :=
+  Matrix.map_mul
 
-private theorem red_one {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) :
-    red m (1 : Matrix (Fin n) (Fin n) O) = 1 := Matrix.map_one _ (map_zero _) (map_one _)
+private theorem red_one {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ)
+    : red m (1 : Matrix (Fin n) (Fin n) O) = 1 :=
+  Matrix.map_one _ (map_zero _) (map_one _)
 
-private theorem red_unit {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (P : GL (Fin n) O) :
-    IsUnit (red m (P : Matrix (Fin n) (Fin n) O)) :=
-  ⟨⟨red m P, red m (P⁻¹ : GL (Fin n) O), by rw [← red_mul, P.mul_inv, red_one], by rw [← red_mul, P.inv_mul, red_one]⟩, rfl⟩
+private theorem red_unit {O : Type} [CommRing O] [IsLocalRing O] {n : ℕ} (m : ℕ) (P : GL (Fin n) O)
+    : IsUnit (red m (P : Matrix (Fin n) (Fin n) O)) := ⟨
+  ⟨
+    red m P,
+    red m (P⁻¹ : GL (Fin n) O),
+    by rw [← red_mul, P.mul_inv, red_one],
+    by rw [← red_mul, P.inv_mul, red_one]
+  ⟩,
+  rfl
+⟩
 
-private theorem tr_comm {R : Type} [CommRing R] {n : ℕ} (A B Y : Matrix (Fin n) (Fin n) R) (h : B * A = 1) (k : ℕ) :
-    ((A * Y * B - Y) * A ^ k).trace = 0 := by
+private theorem tr_comm
+    {R : Type} [CommRing R] {n : ℕ} (A B Y : Matrix (Fin n) (Fin n) R) (h : B * A = 1) (k : ℕ)
+    : ((A * Y * B - Y) * A ^ k).trace = 0 := by
   have hc : B * A ^ k * A = A ^ k := by
     rw [Matrix.mul_assoc, ← pow_succ, pow_succ', ← Matrix.mul_assoc, h, Matrix.one_mul]
-  rw [Matrix.sub_mul, Matrix.trace_sub, Matrix.mul_assoc, Matrix.mul_assoc, Matrix.trace_mul_comm A, Matrix.mul_assoc, hc,
-    sub_self]
+  rw [Matrix.sub_mul, Matrix.trace_sub, Matrix.mul_assoc, Matrix.mul_assoc, Matrix.trace_mul_comm A,
+    Matrix.mul_assoc, hc, sub_self]
 
 theorem UpperTheory.V.Th.dualNO :
     ∀ (l : ℕ) [Fact l.Prime] (L : Loc) (G0 : Glob l L) (T : TWGrp G0) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] [Algebra ℤ_[l] O] (n : ℕ) (y : Pt G0.frame O n), l ≠ 2 → G0.ε G0.c = -1 → PhiCond G0.Γ l → (∀ g : G0.G₀, (g : G0.Γ) ∈ PL l T.H.toSubgroup → y.ρ g = 1) → DetO y (Set.range T.sg) → ∃ C : ℕ, ∀ m, ∀ᶠ N in atTop, ∀ rep' : Representation O (T.GN N).Γ (Mm O n m), IsAd1 (T.h N) y m rep' → Finite (Zl rep') → {z | z ∈ Zl rep' ∧ ∀ j, ∃ Y, z (T.ph N j) = rep' (T.ph N j) Y - Y ∧ z (T.ta N j) = rep' (T.ta N j) Y - Y}.ncard ≤ Nat.card (Bl rep') * Nat.card (ResidueField O) ^ C := by

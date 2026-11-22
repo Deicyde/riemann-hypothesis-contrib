@@ -14,7 +14,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.B2x6
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 variable {k r' : ℕ}
 
@@ -449,7 +450,8 @@ end Formalism.FourierDecayAlt.P.B2x6
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x6
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2 Formalism.FourierDecayAlt.P.B2x6
 
 theorem unipotent_heisenberg_decomposition : Formalism.FourierDecayAlt.B2.NDecomp := by
   intro k r'
@@ -478,8 +480,9 @@ theorem unipotent_recursion_of_parts : Formalism.FourierDecayAlt.B2.AssembleNRec
   have h4 : ∀ b ∈ ιLev k 1 r' '' Nset k r', (μHeis k r').map (conjM b) = μHeis k r' := by
     rintro b ⟨n, hn, rfl⟩
     exact hConjM k r' n hn.1
-  have h := hS k (1 + r') (Hset k r') (ιLev k 1 r' '' Nset k r') (μHeis k r') (μ'.map (levM k r')) rho
-    (hHC k r').2 hL.1 h1 h2 rho_cont h3 (hHH k r') hL.2 h4
+  have h :=
+    hS k (1 + r') (Hset k r') (ιLev k 1 r' '' Nset k r') (μHeis k r') (μ'.map (levM k r')) rho
+      (hHC k r').2 hL.1 h1 h2 rho_cont h3 (hHH k r') hL.2 h4
   rw [hD k r']
   exact h.2
 
@@ -525,8 +528,10 @@ theorem unipotent_haar_of_parts : Formalism.FourierDecayAlt.B2.AssembleHaarN := 
     exact ⟨_, hR k r' μ' h'⟩
 
 theorem unipotent_haar_recursion : Formalism.FourierDecayAlt.B2.NRecHaar :=
-  unipotent_recursion_of_parts semidirect_product_haar levi_haar_measure_exists unipotent_radical_closed heisenberg_subgroup_closed heisenberg_haar_measure
-    heisenberg_conjugation_by_levi heisenberg_levi_conjugation_measure unipotent_heisenberg_decomposition
+  unipotent_recursion_of_parts semidirect_product_haar levi_haar_measure_exists
+    unipotent_radical_closed heisenberg_subgroup_closed heisenberg_haar_measure
+    heisenberg_conjugation_by_levi heisenberg_levi_conjugation_measure
+    unipotent_heisenberg_decomposition
 
 theorem unipotent_haar_exists : Formalism.FourierDecayAlt.B2.HaarNExists :=
   unipotent_haar_of_parts unipotent_haar_recursion unipotent_haar_base_case

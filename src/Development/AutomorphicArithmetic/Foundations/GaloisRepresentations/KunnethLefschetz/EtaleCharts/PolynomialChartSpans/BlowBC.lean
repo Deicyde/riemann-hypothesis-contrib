@@ -11,7 +11,8 @@ set_option backward.isDefEq.respectTransparency false
 
 noncomputable section
 
-open CategoryTheory Limits AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.Onto TopologicalSpace
+open CategoryTheory Limits AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto TopologicalSpace
 
 namespace UpperTheory.Gal.KunnethLefschetz.G
 
@@ -39,9 +40,11 @@ private lemma iso_pb {π : Y ⟶ Z} {π' : Y' ⟶ Z'} {a : Z' ⟶ Z} {c : Y' ⟶
     (by rw [R2.lift_fst]; exact Rect) (R2.lift_snd _ _ comm) R2
   exact sq.isIso_snd_of_isIso
 
-private def secPb (D : E.LineData Y) (c : Y' ⟶ Y) (C : Y.Opens) (σ : (C : Scheme.{0}) ⟶ D.Y) (hσ : σ ≫ D.f = C.ι) :
-    ((c ⁻¹ᵁ C : Y'.Opens) : Scheme.{0}) ⟶ (D.pb c).Y :=
-  pullback.lift (f := D.f) (g := c) ((c ∣_ C) ≫ σ) (c ⁻¹ᵁ C).ι (by rw [Category.assoc, hσ, morphismRestrict_ι])
+private def secPb
+    (D : E.LineData Y) (c : Y' ⟶ Y) (C : Y.Opens) (σ : (C : Scheme.{0}) ⟶ D.Y) (hσ : σ ≫ D.f = C.ι)
+    : ((c ⁻¹ᵁ C : Y'.Opens) : Scheme.{0}) ⟶ (D.pb c).Y :=
+  pullback.lift (f := D.f) (g := c) ((c ∣_ C) ≫ σ) (c ⁻¹ᵁ C).ι
+    (by rw [Category.assoc, hσ, morphismRestrict_ι])
 
 private lemma secPb_f (D : E.LineData Y) (c : Y' ⟶ Y) (C : Y.Opens) (σ : (C : Scheme.{0}) ⟶ D.Y) (hσ : σ ≫ D.f = C.ι) :
     secPb D c C σ hσ ≫ (D.pb c).f = (c ⁻¹ᵁ C).ι := pullback.lift_snd _ _ _
@@ -140,11 +143,15 @@ private lemma hle_pb {π : Y ⟶ Z} {π' : Y' ⟶ Z'} {a : Z' ⟶ Z} {c : Y' ⟶
   rw [h2]
   exact h1
 
-private def chartPb {K K' : Type} [CommRing K] [CommRing K'] (φ : K →+* K') {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
-    {π : Y ⟶ Z} {d : ℕ} {q' : Z' ⟶ Spec (CommRingCat.of K')} {i' : W' ⟶ Z'} {π' : Y' ⟶ Z'} {a : Z' ⟶ Z} {b : W' ⟶ W}
-    {c : Y' ⟶ Y} (hq : IsPullback a q' q (Spec.map (CommRingCat.ofHom φ))) (hb : IsPullback b i' i a)
-    (hc : IsPullback c π' π a) (hi : IsClosedImmersion i) {V : Z.Opens} (B : CrystallineSemistableComparison.Onto.BChart q i π d V) :
-    CrystallineSemistableComparison.Onto.BChart q' i' π' d (a ⁻¹ᵁ V) where
+private def chartPb
+    {K K' : Type} [CommRing K] [CommRing K']
+    (φ : K →+* K')
+    {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {d : ℕ}
+    {q' : Z' ⟶ Spec (CommRingCat.of K')} {i' : W' ⟶ Z'} {π' : Y' ⟶ Z'} {a : Z' ⟶ Z} {b : W' ⟶ W}
+    {c : Y' ⟶ Y} (hq : IsPullback a q' q (Spec.map (CommRingCat.ofHom φ)))
+    (hb : IsPullback b i' i a) (hc : IsPullback c π' π a) (hi : IsClosedImmersion i)
+    {V : Z.Opens} (B : CrystallineSemistableComparison.Onto.BChart q i π d V)
+    : CrystallineSemistableComparison.Onto.BChart q' i' π' d (a ⁻¹ᵁ V) where
   affine := (hE_pb φ hq B).1
   n := B.n
   x := fun s => (a.app V).hom (B.x s)
@@ -157,8 +164,9 @@ private def chartPb {K K' : Type} [CommRing K] [CommRing K'] (φ : K →+* K') {
     rw [ker_pb hb V B.affine (hE_pb φ hq B).1 _ B.ker, ← Set.range_comp]
     rfl
   C := fun k => c ⁻¹ᵁ B.C k
-  C_aff := fun k => (presBC π π' a c hc V (B.C k) (B.C_le k) B.affine (B.C_aff k) (hE_pb φ hq B).1 (hle_pb hc (B.C_le k))
-    (Fin d) (B.u k) _ (B.surj k) (B.rel k)).1
+  C_aff := fun k =>
+    (presBC π π' a c hc V (B.C k) (B.C_le k) B.affine (B.C_aff k) (hE_pb φ hq B).1
+      (hle_pb hc (B.C_le k)) (Fin d) (B.u k) _ (B.surj k) (B.rel k)).1
   C_le := fun k => hle_pb hc (B.C_le k)
   C_cover := fun y hy => by
     have h2 : a (π' y) = π (c y) := by rw [← Scheme.Hom.comp_apply, ← Scheme.Hom.comp_apply, hc.w]
@@ -169,11 +177,13 @@ private def chartPb {K K' : Type} [CommRing K] [CommRing K'] (φ : K →+* K') {
     obtain ⟨k, h3⟩ := Opens.mem_iSup.1 (B.C_cover h1)
     exact Opens.mem_iSup.2 ⟨k, h3⟩
   u := fun k j => (c.app (B.C k)).hom (B.u k j)
-  surj := fun k => (presBC π π' a c hc V (B.C k) (B.C_le k) B.affine (B.C_aff k) (hE_pb φ hq B).1 (hle_pb hc (B.C_le k))
-    (Fin d) (B.u k) _ (B.surj k) (B.rel k)).2.1
+  surj := fun k =>
+    (presBC π π' a c hc V (B.C k) (B.C_le k) B.affine (B.C_aff k) (hE_pb φ hq B).1
+      (hle_pb hc (B.C_le k)) (Fin d) (B.u k) _ (B.surj k) (B.rel k)).2.1
   rel := fun k => by
-    rw [(presBC π π' a c hc V (B.C k) (B.C_le k) B.affine (B.C_aff k) (hE_pb φ hq B).1 (hle_pb hc (B.C_le k))
-      (Fin d) (B.u k) _ (B.surj k) (B.rel k)).2.2, rel_pb]
+    rw [(presBC π π' a c hc V (B.C k) (B.C_le k) B.affine (B.C_aff k) (hE_pb φ hq B).1
+        (hle_pb hc (B.C_le k)) (Fin d) (B.u k) _ (B.surj k) (B.rel k)).2.2,
+      rel_pb]
   inter := fun k j => by
     rw [← Scheme.Hom.preimage_basicOpen, ← B.inter]
     rfl
@@ -196,7 +206,8 @@ theorem blowBC : BlowBC := by
     iso := iso_pb hc B.U B.iso
     unit := fun {V} e he => by
       apply B.unit
-      have : ((show V ⟶ pullback D.f c from e) ≫ pullback.fst D.f c) ≫ D.f ≫ π = (e ≫ (D.pb c).f ≫ π') ≫ a := by
+      have : ((show V ⟶ pullback D.f c from e) ≫ pullback.fst D.f c) ≫ D.f ≫ π
+          = (e ≫ (D.pb c).f ≫ π') ≫ a := by
         have h1 : pullback.fst D.f c ≫ D.f = pullback.snd D.f c ≫ c := pullback.condition
         simp only [Category.assoc]
         rw [reassoc_of% h1, hc.w]
@@ -222,6 +233,7 @@ theorem blowBC : BlowBC := by
     f_σ := fun α k => by
       refine (congrArg B.f (secPb_fst D c _ _ _)).trans ?_
       rw [B.f_nat, B.f_σ]
-      exact eqn_pb hc _ _ _ _ _ }⟩
+      exact eqn_pb hc _ _ _ _ _
+  }⟩
 
 end UpperTheory.Gal.KunnethLefschetz.G

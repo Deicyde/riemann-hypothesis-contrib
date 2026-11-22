@@ -85,8 +85,9 @@ private lemma exists_neg_one {R : Type} [Field R] (a : ℕ) :
       exact ⟨2 * j, by rw [pow_mul, hj]⟩
 
 section
-variable {E : Type} [Field E] [NumberField E] (s : E) (d : ℕ) (hd : d.Prime) (h3 : 3 < d)
-  (hs : s ^ 2 = -(d : E))
+variable
+  {E : Type} [Field E] [NumberField E]
+  (s : E) (d : ℕ) (hd : d.Prime) (h3 : 3 < d) (hs : s ^ 2 = -(d : E))
 include hd h3 hs
 
 omit hd in
@@ -215,11 +216,13 @@ private lemma two_pow_norm (h4 : 4 ∣ Module.finrank ℚ E) (y : E) (a : ℕ) (
 end
 end UpperTheory.RootOfUnityNormQuadraticSubfield
 
-theorem UpperTheory.norm_root_of_unity_quadratic_subfield :
-    ∀ (E : Type) [Field E] [NumberField E] (s : E) (d : ℕ), d.Prime → 3 < d → s ^ 2 = -(d : E) → 4 ∣ Module.finrank ℚ E →
-      ∀ z : E, (∃ m : ℕ, 0 < m ∧ z ^ m = 1) → Algebra.norm ℚ⟮s⟯ z = 1 := by
+theorem UpperTheory.norm_root_of_unity_quadratic_subfield
+    : ∀ (E : Type) [Field E] [NumberField E] (s : E) (d : ℕ),
+      d.Prime → 3 < d → s ^ 2 = -(d : E) → 4 ∣ Module.finrank ℚ E
+        → ∀ z : E, (∃ m : ℕ, 0 < m ∧ z ^ m = 1) → Algebra.norm ℚ⟮s⟯ z = 1 := by
   intro E _ _ s d hd h3 hs h4 z ⟨m, hm, hz⟩
   obtain ⟨a, o, ho, rfl⟩ := Nat.exists_eq_two_pow_mul_odd hm.ne'
   apply UpperTheory.RootOfUnityNormQuadraticSubfield.odd_root s d hd h3 hs _ o ho
   rw [← map_pow]
-  exact UpperTheory.RootOfUnityNormQuadraticSubfield.two_pow_norm s d hd h3 hs h4 _ a (by rw [← pow_mul, mul_comm, hz])
+  exact UpperTheory.RootOfUnityNormQuadraticSubfield.two_pow_norm s d hd h3 hs h4 _ a
+    (by rw [← pow_mul, mul_comm, hz])

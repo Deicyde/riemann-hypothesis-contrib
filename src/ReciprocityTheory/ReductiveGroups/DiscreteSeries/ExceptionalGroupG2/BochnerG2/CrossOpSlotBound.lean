@@ -17,14 +17,18 @@ variable {n : ℕ}
 
 section Slot
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M} {lam : Fin n → ℝ}
 
-theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {k : ℕ} (i : Fin k) {P : Big n k M} (hP : P ∈ ncV ε V k)
-    (hperp : ∀ F ∈ ncV ε V k, (∀ κ, slice i κ F ∈ Wm ε E V) → inner ℂ F P = 0) :
-    ∀ κ, slice i κ P ∈ Wp ε E V := by
+theorem position_perp
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {k : ℕ} (i : Fin k)
+    {P : Big n k M}
+    (hP : P ∈ ncV ε V k) (hperp : ∀ F ∈ ncV ε V k, (∀ κ, slice i κ F ∈ Wm ε E V) → inner ℂ F P = 0)
+    : ∀ κ, slice i κ P ∈ Wp ε E V := by
   classical
   intro κ
   rw [slice_eq_slt]
@@ -34,8 +38,7 @@ theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW �
   · obtain ⟨xm, hxm, xp, hxp, hdec⟩ := ncV_one_decomp hE hU hV hmono hh hbig hx
     let F : Big n k M :=
       WithLp.toLp 2 (fun κ' => if (slRest i κ').2 = r then xm (fun _ => κ' i) else 0)
-    have hFapp : ∀ κ', F κ' = if (slRest i κ').2 = r then xm (fun _ => κ' i) else 0 :=
-      fun κ' => rfl
+    have hFapp : ∀ κ', F κ' = if (slRest i κ').2 = r then xm (fun _ => κ' i) else 0 := fun κ' => rfl
     have hsltF : ∀ r', slt i r' F = if r' = r then xm else 0 := by
       intro r'
       apply PiLp.ext
@@ -80,10 +83,12 @@ theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW �
       · exact hxm
       · exact Submodule.zero_mem _
     have h0 := hperp F hFm hslF
-    rw [slt_inner_eq_sum i F P, Finset.sum_eq_single r
-      (fun r' _ hr' => by rw [hsltF, if_neg hr', inner_zero_left])
-      (fun h => absurd (Finset.mem_univ r) h), hsltF, if_pos rfl, hdec, inner_add_right,
-      Wm_perp_Wp hU hxm hxp, add_zero] at h0
+    rw [slt_inner_eq_sum i F P,
+        Finset.sum_eq_single r
+          (fun r' _ hr' => by rw [hsltF, if_neg hr', inner_zero_left])
+          (fun h => absurd (Finset.mem_univ r) h),
+        hsltF, if_pos rfl, hdec, inner_add_right, Wm_perp_Wp hU hxm hxp, add_zero]
+      at h0
     have hxm0 : xm = 0 := inner_self_eq_zero.mp h0
     rw [hdec, hxm0, zero_add]
     exact hxp
@@ -102,10 +107,13 @@ theorem position_perp (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW �
     rw [hz]
     exact Submodule.zero_mem _
 
-theorem crossOp_position_bound (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
-    (hmono : StrictAnti lam) {h : ℝ} (hh : GapAtLeast ε lam h)
-    (hbig : 2 * (n : ℝ) < h) {k : ℕ} (i : Fin k) {P : Big n k M} (hP : ∀ κ, slice i κ P ∈ Wp ε E V) :
-    2 * (h - n + 1) * ‖P‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
+theorem crossOp_position_bound
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : IsKIrrHW ε E (lowK ε lam) V)
+    (hmono : StrictAnti lam)
+    {h : ℝ} (hh : GapAtLeast ε lam h) (hbig : 2 * (n : ℝ) < h)
+    {k : ℕ} (i : Fin k)
+    {P : Big n k M} (hP : ∀ κ, slice i κ P ∈ Wp ε E V)
+    : 2 * (h - n + 1) * ‖P‖ ^ 2 ≤ 2 * RCLike.re (inner ℂ (crossOp ε E k i P) P) := by
   classical
   have hslt : ∀ r, slt i r P ∈ Wp ε E V := by
     intro r
@@ -119,8 +127,8 @@ theorem crossOp_position_bound (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hV : I
       rw [@norm_sq_eq_re_inner ℂ, slt_inner_eq_sum i P P, map_sum]
     refine Finset.sum_congr rfl fun r _ => ?_
     rw [@norm_sq_eq_re_inner ℂ]
-  have h2 : inner ℂ (crossOp ε E k i P) P =
-      ∑ r, inner ℂ (crossOp ε E 1 0 (slt i r P)) (slt i r P) := by
+  have h2
+      : inner ℂ (crossOp ε E k i P) P = ∑ r, inner ℂ (crossOp ε E 1 0 (slt i r P)) (slt i r P) := by
     rw [slt_inner_eq_sum i]
     simp only [slt_crossOp]
   set_option synthInstance.maxHeartbeats 100000 in

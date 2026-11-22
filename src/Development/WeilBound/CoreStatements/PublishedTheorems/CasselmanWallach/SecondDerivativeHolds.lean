@@ -15,16 +15,19 @@ namespace HilbertSchmidtNorm
 variable {n : ℕ}
 
 attribute [local instance] Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra in
-theorem hasDerivAt_entry (g X Y : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) (i j : Fin n) :
-    HasDerivAt (fun s : ℝ => (g * NormedSpace.exp (s • X) * Y) i j)
+theorem hasDerivAt_entry (g X Y : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) (i j : Fin n)
+    : HasDerivAt
+      (fun s : ℝ => (g * NormedSpace.exp (s • X) * Y) i j)
       ((g * NormedSpace.exp (t • X) * X * Y) i j) t := by
   have h := ((hasDerivAt_exp_smul_const (𝕂 := ℝ) X t).const_mul g).mul_const Y
-  let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ℂ :=
-    { toFun := fun x => x i j
-      map_add' := fun x y => rfl
-      map_smul' := fun c x => rfl }
+  let L : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ℂ := {
+    toFun := fun x => x i j
+    map_add' := fun x y => rfl
+    map_smul' := fun c x => rfl
+  }
   have h2 := (LinearMap.toContinuousLinearMap L).hasFDerivAt.comp_hasDerivAt t h
-  have e : (g * NormedSpace.exp (t • X) * X * Y) i j = L (g * (NormedSpace.exp (t • X) * X) * Y) := by
+  have e
+      : (g * NormedSpace.exp (t • X) * X * Y) i j = L (g * (NormedSpace.exp (t • X) * X) * Y) := by
     show _ = (g * (NormedSpace.exp (t • X) * X) * Y) i j
     rw [mul_assoc g]
   rw [e]
@@ -39,17 +42,20 @@ theorem hilbert_schmidt_mul_le (g X : Matrix (Fin n) (Fin n) ℂ) : hs2 (g * X) 
     have h1 : ‖(g * X) i j‖ ≤ ∑ k, ‖g i k‖ * ‖X k j‖ := by
       rw [Matrix.mul_apply]
       exact (norm_sum_le _ _).trans (le_of_eq (by simp))
-    calc ‖(g * X) i j‖ ^ 2 ≤ (∑ k, ‖g i k‖ * ‖X k j‖) ^ 2 := by gcongr
+    calc
+      ‖(g * X) i j‖ ^ 2
+        ≤ (∑ k, ‖g i k‖ * ‖X k j‖) ^ 2 := by gcongr
       _ ≤ _ := Finset.sum_mul_sq_le_sq_mul_sq _ _ _
   unfold hs2
-  calc ∑ i, ∑ j, ‖(g * X) i j‖ ^ 2 ≤ ∑ i, ∑ j, (∑ k, ‖g i k‖ ^ 2) * (∑ k, ‖X k j‖ ^ 2) :=
-        Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => key i j
+  calc
+    ∑ i, ∑ j, ‖(g * X) i j‖ ^ 2 ≤ ∑ i, ∑ j, (∑ k, ‖g i k‖ ^ 2) * (∑ k, ‖X k j‖ ^ 2) :=
+      Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => key i j
     _ = (∑ i, ∑ k, ‖g i k‖ ^ 2) * ∑ j, ∑ k, ‖X k j‖ ^ 2 := by
-        rw [Finset.sum_mul]; simp_rw [Finset.mul_sum]
+      rw [Finset.sum_mul]; simp_rw [Finset.mul_sum]
     _ = _ := by rw [Finset.sum_comm (f := fun j k => ‖X k j‖ ^ 2)]
 
-theorem abs_two_inner_le (M N : Matrix (Fin n) (Fin n) ℂ) :
-    |∑ i, ∑ j, 2 * inner ℝ (M i j) (N i j)| ≤ hs2 M + hs2 N := by
+theorem abs_two_inner_le (M N : Matrix (Fin n) (Fin n) ℂ)
+    : |∑ i, ∑ j, 2 * inner ℝ (M i j) (N i j)| ≤ hs2 M + hs2 N := by
   unfold hs2
   rw [← Finset.sum_add_distrib]
   refine (Finset.abs_sum_le_sum_abs _ _).trans (Finset.sum_le_sum fun i _ => ?_)
@@ -59,28 +65,34 @@ theorem abs_two_inner_le (M N : Matrix (Fin n) (Fin n) ℂ) :
   rw [abs_mul, abs_two]
   nlinarith [sq_nonneg (‖M i j‖ - ‖N i j‖)]
 
-theorem hasDerivAt_entry1 (g X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) (i j : Fin n) :
-    HasDerivAt (fun s : ℝ => (g * NormedSpace.exp (s • X)) i j)
+theorem hasDerivAt_entry1 (g X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) (i j : Fin n)
+    : HasDerivAt
+      (fun s : ℝ => (g * NormedSpace.exp (s • X)) i j)
       ((g * NormedSpace.exp (t • X) * X) i j) t := by
   simpa using hasDerivAt_entry g X 1 t i j
 
-theorem hd1 (g X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) :
-    HasDerivAt (fun s : ℝ => hs2 (g * NormedSpace.exp (s • X)))
-      (∑ i, ∑ j, 2 * inner ℝ ((g * NormedSpace.exp (t • X)) i j) ((g * NormedSpace.exp (t • X) * X) i j)) t := by
+theorem hd1 (g X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ)
+    : HasDerivAt
+      (fun s : ℝ => hs2 (g * NormedSpace.exp (s • X)))
+      (∑ i, ∑ j, 2 * inner ℝ ((g * NormedSpace.exp (t • X)) i j) ((g * NormedSpace.exp (t • X) * X) i j))
+      t := by
   unfold hs2
   refine HasDerivAt.fun_sum fun i _ => HasDerivAt.fun_sum fun j _ => ?_
   exact (hasDerivAt_entry1 g X t i j).norm_sq
 
-theorem hd2 (g X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) :
-    HasDerivAt (fun s : ℝ => ∑ i, ∑ j, 2 * inner ℝ ((g * NormedSpace.exp (s • X)) i j)
-        ((g * NormedSpace.exp (s • X) * X) i j))
+theorem hd2 (g X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ)
+    : HasDerivAt
+      (fun s : ℝ =>
+        ∑ i, ∑ j, 2 * inner ℝ ((g * NormedSpace.exp (s • X)) i j)
+          ((g * NormedSpace.exp (s • X) * X) i j))
       (∑ i, ∑ j, 2 * (inner ℝ ((g * NormedSpace.exp (t • X)) i j) ((g * NormedSpace.exp (t • X) * X * X) i j) +
-        inner ℝ ((g * NormedSpace.exp (t • X) * X) i j) ((g * NormedSpace.exp (t • X) * X) i j))) t := by
+        inner ℝ ((g * NormedSpace.exp (t • X) * X) i j) ((g * NormedSpace.exp (t • X) * X) i j)))
+      t := by
   refine HasDerivAt.fun_sum fun i _ => HasDerivAt.fun_sum fun j _ => ?_
   exact ((hasDerivAt_entry1 g X t i j).inner ℝ (hasDerivAt_entry g X X t i j)).const_mul 2
 
-theorem L1 (r : ℕ) (u : ℝ) (hu : 1 ≤ u) :
-    ((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1) * u ^ 2 ≤ r * u ^ r := by
+theorem L1 (r : ℕ) (u : ℝ) (hu : 1 ≤ u)
+    : ((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1) * u ^ 2 ≤ r * u ^ r := by
   rcases r with _ | _ | k
   · simp
   · simp; linarith
@@ -114,10 +126,14 @@ theorem heightFunctionalStatement_of_pairingProperties : B2 := by
       ((g * NormedSpace.exp ((0:ℝ) • X) * X) i j)) with hH2
   have d1 : ∀ t, HasDerivAt h (h' t) t := fun t => hd1 g X t
   have d2 : HasDerivAt h' H2 0 := hd2 g X 0
-  refine ⟨fun t => r * (1 + h t) ^ (r - 1) * h' t,
+  refine ⟨
+    fun t => r * (1 + h t) ^ (r - 1) * h' t,
     r * (((r - 1 : ℕ) : ℝ) * (1 + h 0) ^ (r - 1 - 1) * h' 0) * h' 0 + r * (1 + h 0) ^ (r - 1) * H2,
-    fun t => ((d1 t).const_add 1).pow r, (((d1 0).const_add 1).pow (r - 1)).const_mul (r : ℝ) |>.mul d2, ?_⟩
-  have e0 : NormedSpace.exp ((0:ℝ) • X) = 1 := by simp
+    fun t => ((d1 t).const_add 1).pow r,
+    (((d1 0).const_add 1).pow (r - 1)).const_mul (r : ℝ) |>.mul d2,
+    ?_
+  ⟩
+  have e0 : NormedSpace.exp ((0 : ℝ) • X) = 1 := by simp
   have hg := hilbert_schmidt_nonneg_alt g
   have h0 : h 0 = hs2 g := by simp [hh]
   have hp : |h' 0| ≤ A * hs2 g := by
@@ -130,8 +146,9 @@ theorem heightFunctionalStatement_of_pairingProperties : B2 := by
     have k2 := abs_two_inner_le (g * X) (g * X)
     have k3 := hilbert_schmidt_mul_le g X
     have k4 := hilbert_schmidt_mul_le g (X * X)
-    have : H2 = (∑ i, ∑ j, 2 * inner ℝ (g i j) ((g * (X * X)) i j)) +
-        ∑ i, ∑ j, 2 * inner ℝ ((g * X) i j) ((g * X) i j) := by
+    have : H2
+        = (∑ i, ∑ j, 2 * inner ℝ (g i j) ((g * (X * X)) i j))
+          + ∑ i, ∑ j, 2 * inner ℝ ((g * X) i j) ((g * X) i j) := by
       simp only [hH2, e0, mul_one, mul_add, Finset.sum_add_distrib, mul_assoc]
     rw [this]
     refine (abs_add_le _ _).trans ?_
@@ -147,14 +164,17 @@ theorem heightFunctionalStatement_of_pairingProperties : B2 := by
     have : |h' 0| ≤ A * u := hp.trans (by nlinarith)
     exact sq_le_sq' (by linarith [neg_abs_le (h' 0)]) (le_trans (le_abs_self _) this)
   have t1 : r * (((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1) * h' 0) * h' 0 ≤ r * A ^ 2 * (r * u ^ r) := by
-    calc r * (((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1) * h' 0) * h' 0
+    calc
+      r * (((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1) * h' 0) * h' 0
         = r * (((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1)) * h' 0 ^ 2 := by ring
       _ ≤ r * (((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1)) * (A * u) ^ 2 := by gcongr
       _ = r * A ^ 2 * (((r - 1 : ℕ) : ℝ) * u ^ (r - 1 - 1) * u ^ 2) := by ring
       _ ≤ r * A ^ 2 * (r * u ^ r) := mul_le_mul_of_nonneg_left (L1 r u hu1) (by positivity)
   have t2 : r * u ^ (r - 1) * H2 ≤ Bc * (r * u ^ r) := by
     have hH : H2 ≤ Bc * u := (le_abs_self _).trans (hpp.trans (by nlinarith))
-    calc r * u ^ (r - 1) * H2 ≤ r * u ^ (r - 1) * (Bc * u) := by gcongr
+    calc
+      r * u ^ (r - 1) * H2
+        ≤ r * u ^ (r - 1) * (Bc * u) := by gcongr
       _ = Bc * (r * u ^ (r - 1) * u) := by ring
       _ ≤ Bc * (r * u ^ r) := mul_le_mul_of_nonneg_left (L2 r u) (by rw [hBc]; positivity)
   nlinarith

@@ -14,31 +14,34 @@ open scoped Pointwise
 
 section Space
 
-variable (X : Type*) [TopologicalSpace X] (R E : Type*) [Semiring R] [AddCommMonoid E]
-  [Module R E]
+variable (X : Type*) [TopologicalSpace X] (R E : Type*) [Semiring R] [AddCommMonoid E] [Module R E]
 
 def locallyConstantCompactSupport : Submodule R (X → E) where
   carrier := {f | IsLocallyConstant f ∧ HasCompactSupport f}
   add_mem' {f g} hf hg := ⟨hf.1.comp₂ hg.1 (· + ·), hf.2.add hg.2⟩
   zero_mem' := ⟨IsLocallyConstant.const 0, HasCompactSupport.zero⟩
-  smul_mem' c f hf := ⟨hf.1.comp (c • ·), hf.2.mono fun x hx => by
-    by_contra h
-    exact hx (by simp [Function.notMem_support.1 h])⟩
+  smul_mem' c f hf := ⟨
+    hf.1.comp (c • ·),
+    hf.2.mono fun x hx => by
+      by_contra h
+      exact hx (by simp [Function.notMem_support.1 h])
+  ⟩
 
 variable {X R E}
 
-theorem mem_locallyConstantCompactSupport {f : X → E} :
-    f ∈ locallyConstantCompactSupport X R E ↔ IsLocallyConstant f ∧ HasCompactSupport f :=
+theorem mem_locallyConstantCompactSupport {f : X → E}
+    : f ∈ locallyConstantCompactSupport X R E ↔ IsLocallyConstant f ∧ HasCompactSupport f :=
   Iff.rfl
 
-theorem indicator_mem_locallyConstantCompactSupport [T2Space X] {U : Set X} (hc : IsCompact U)
-    (ho : IsOpen U) (e : E) :
-    U.indicator (fun _ => e) ∈ locallyConstantCompactSupport X R E := by
+theorem indicator_mem_locallyConstantCompactSupport
+    [T2Space X] {U : Set X} (hc : IsCompact U) (ho : IsOpen U) (e : E)
+    : U.indicator (fun _ => e) ∈ locallyConstantCompactSupport X R E := by
   refine ⟨?_, HasCompactSupport.intro hc fun x hx => Set.indicator_of_notMem hx _⟩
   exact (LocallyConstant.indicator (LocallyConstant.const X e) ⟨hc.isClosed, ho⟩).isLocallyConstant
 
-theorem range_finite_of_mem_locallyConstantCompactSupport {f : X → E}
-    (hf : f ∈ locallyConstantCompactSupport X R E) : (range f).Finite := by
+theorem range_finite_of_mem_locallyConstantCompactSupport
+    {f : X → E} (hf : f ∈ locallyConstantCompactSupport X R E)
+    : (range f).Finite := by
   have : CompactSpace (tsupport f) := isCompact_iff_compactSpace.1 hf.2
   have h1 : (range fun x : tsupport f => f x).Finite :=
     (hf.1.comp_continuous continuous_subtype_val).range_finite
@@ -49,8 +52,9 @@ theorem range_finite_of_mem_locallyConstantCompactSupport {f : X → E}
   · rw [image_eq_zero_of_notMem_tsupport hx]
     exact mem_insert _ _
 
-theorem isCompact_isOpen_fiber {f : X → E} (hf : f ∈ locallyConstantCompactSupport X R E)
-    {v : E} (hv : v ≠ 0) : IsCompact {x | f x = v} ∧ IsOpen {x | f x = v} := by
+theorem isCompact_isOpen_fiber
+    {f : X → E} (hf : f ∈ locallyConstantCompactSupport X R E) {v : E} (hv : v ≠ 0)
+    : IsCompact {x | f x = v} ∧ IsOpen {x | f x = v} := by
   refine ⟨hf.2.of_isClosed_subset (hf.1.isClosed_fiber v) fun x hx => ?_, hf.1.isOpen_fiber v⟩
   refine subset_tsupport f ?_
   have hx : f x = v := hx
@@ -62,34 +66,38 @@ section Group
 
 variable {G : Type*} [Group G] {E : Type*}
 
-theorem mk_eq_iff_mem_out_smul (K : Subgroup G) (x : G ⧸ K) (y : G) :
-    (y : G ⧸ K) = x ↔ y ∈ x.out • (K : Set G) := by
+theorem mk_eq_iff_mem_out_smul (K : Subgroup G) (x : G ⧸ K) (y : G)
+    : (y : G ⧸ K) = x ↔ y ∈ x.out • (K : Set G) := by
   conv_lhs => rw [← QuotientGroup.out_eq' x]
   rw [eq_comm, QuotientGroup.eq, mem_leftCoset_iff, SetLike.mem_coe]
 
-theorem apply_eq_of_mem_smul {K : Subgroup G} {f : G → E}
-    (hK : ∀ g, ∀ k ∈ K, f (g * k) = f g) {g y : G} (hy : y ∈ g • (K : Set G)) : f y = f g := by
+theorem apply_eq_of_mem_smul
+    {K : Subgroup G} {f : G → E} (hK : ∀ g, ∀ k ∈ K, f (g * k) = f g)
+    {g y : G} (hy : y ∈ g • (K : Set G))
+    : f y = f g := by
   obtain ⟨k, hk, rfl⟩ := Set.mem_smul_set.1 hy
   exact hK g k hk
 
-variable [TopologicalSpace G] [IsTopologicalGroup G] {R : Type*} [Semiring R] [AddCommMonoid E]
-  [Module R E]
+variable
+  [TopologicalSpace G] [IsTopologicalGroup G]
+  {R : Type*} [Semiring R] [AddCommMonoid E] [Module R E]
 
-theorem mem_locallyConstantCompactSupport_of_forall_mul_right (K : OpenSubgroup G)
-    {f : G → E} (hf : HasCompactSupport f) (hK : ∀ g, ∀ k ∈ K, f (g * k) = f g) :
-    f ∈ locallyConstantCompactSupport G R E := by
+theorem mem_locallyConstantCompactSupport_of_forall_mul_right
+    (K : OpenSubgroup G) {f : G → E} (hf : HasCompactSupport f) (hK : ∀ g, ∀ k ∈ K, f (g * k) = f g)
+    : f ∈ locallyConstantCompactSupport G R E := by
   refine ⟨(IsLocallyConstant.iff_exists_open f).2 fun g => ?_, hf⟩
   refine ⟨g • (K : Set G), K.isOpen.smul g, ?_, fun y hy => apply_eq_of_mem_smul hK hy⟩
   exact Set.mem_smul_set.2 ⟨1, K.one_mem, mul_one g⟩
 
-theorem finite_image_mk_tsupport (K : OpenSubgroup G) {f : G → E} (hf : HasCompactSupport f) :
-    (QuotientGroup.mk '' tsupport f : Set (G ⧸ (K : Subgroup G))).Finite :=
+theorem finite_image_mk_tsupport (K : OpenSubgroup G) {f : G → E} (hf : HasCompactSupport f)
+    : (QuotientGroup.mk '' tsupport f : Set (G ⧸ (K : Subgroup G))).Finite :=
   (hf.image QuotientGroup.continuous_mk).finite_of_discrete
 
-theorem eq_sum_indicator_coset (K : OpenSubgroup G) {f : G → E} (hf : HasCompactSupport f)
-    (hK : ∀ g, ∀ k ∈ K, f (g * k) = f g) :
-    f = ∑ x ∈ (finite_image_mk_tsupport K hf).toFinset,
-      (x.out • (K : Set G)).indicator (fun _ => f x.out) := by
+theorem eq_sum_indicator_coset
+    (K : OpenSubgroup G) {f : G → E} (hf : HasCompactSupport f) (hK : ∀ g, ∀ k ∈ K, f (g * k) = f g)
+    : f
+      = ∑ x ∈ (finite_image_mk_tsupport K hf).toFinset,
+        (x.out • (K : Set G)).indicator (fun _ => f x.out) := by
   classical
   funext y
   rw [Finset.sum_apply]
@@ -101,7 +109,8 @@ theorem eq_sum_indicator_coset (K : OpenSubgroup G) {f : G → E} (hf : HasCompa
       exact apply_eq_of_mem_smul hK hmem
     · intro b _ hb
       exact Set.indicator_of_notMem
-        (fun h => hb ((mk_eq_iff_mem_out_smul (K : Subgroup G) b y).2 h).symm) _
+        (fun h => hb ((mk_eq_iff_mem_out_smul (K : Subgroup G) b y).2 h).symm)
+        _
     · intro h
       exact absurd hy h
   · rw [Finset.sum_eq_zero]
@@ -113,8 +122,8 @@ theorem eq_sum_indicator_coset (K : OpenSubgroup G) {f : G → E} (hf : HasCompa
 
 variable [LocallyCompactSpace G] [T2Space G] [TotallyDisconnectedSpace G]
 
-theorem exists_forall_mul_right {f : G → E} (hf : f ∈ locallyConstantCompactSupport G R E) :
-    ∃ K : OpenSubgroup G, IsCompact (K : Set G) ∧ ∀ g, ∀ k ∈ K, f (g * k) = f g := by
+theorem exists_forall_mul_right {f : G → E} (hf : f ∈ locallyConstantCompactSupport G R E)
+    : ∃ K : OpenSubgroup G, IsCompact (K : Set G) ∧ ∀ g, ∀ k ∈ K, f (g * k) = f g := by
   let W : Set (G × G) := {p | f (p.1 * p.2) = f p.1}
   have hW : IsOpen W := by
     have hF : IsLocallyConstant fun p : G × G => (f (p.1 * p.2), f p.1) :=
@@ -137,8 +146,8 @@ theorem exists_forall_mul_right {f : G → E} (hf : f ∈ locallyConstantCompact
     rw [mul_inv_cancel_right, image_eq_zero_of_notMem_tsupport hg] at this
     exact h this.symm
 
-theorem exists_forall_mul_left {f : G → E} (hf : f ∈ locallyConstantCompactSupport G R E) :
-    ∃ K : OpenSubgroup G, IsCompact (K : Set G) ∧ ∀ k ∈ K, ∀ g, f (k * g) = f g := by
+theorem exists_forall_mul_left {f : G → E} (hf : f ∈ locallyConstantCompactSupport G R E)
+    : ∃ K : OpenSubgroup G, IsCompact (K : Set G) ∧ ∀ k ∈ K, ∀ g, f (k * g) = f g := by
   have hf' : (fun g => f g⁻¹) ∈ locallyConstantCompactSupport G R E :=
     ⟨hf.1.comp_continuous continuous_inv, hf.2.comp_homeomorph (Homeomorph.inv G)⟩
   obtain ⟨K, hKc, hK⟩ := exists_forall_mul_right hf'
@@ -146,10 +155,9 @@ theorem exists_forall_mul_left {f : G → E} (hf : f ∈ locallyConstantCompactS
   have := hK g⁻¹ k⁻¹ (inv_mem hk)
   simpa [mul_inv_rev] using this
 
-theorem exists_forall_mul_left_mul_right {f : G → E}
-    (hf : f ∈ locallyConstantCompactSupport G R E) :
-    ∃ K : OpenSubgroup G, IsCompact (K : Set G) ∧
-      ∀ k ∈ K, ∀ g, ∀ k' ∈ K, f (k * g * k') = f g := by
+theorem exists_forall_mul_left_mul_right {f : G → E} (hf : f ∈ locallyConstantCompactSupport G R E)
+    : ∃ K : OpenSubgroup G,
+      IsCompact (K : Set G) ∧ ∀ k ∈ K, ∀ g, ∀ k' ∈ K, f (k * g * k') = f g := by
   obtain ⟨K₁, h₁, hK₁⟩ := exists_forall_mul_right hf
   obtain ⟨K₂, -, hK₂⟩ := exists_forall_mul_left hf
   refine ⟨K₁ ⊓ K₂, isCompact_inf_left h₁, fun k hk g k' hk' => ?_⟩

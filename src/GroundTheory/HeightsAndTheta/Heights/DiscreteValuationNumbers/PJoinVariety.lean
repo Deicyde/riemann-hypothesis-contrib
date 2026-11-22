@@ -25,8 +25,7 @@ def varEquiv : Option (Σ k, ι k) ≃ (Σ k : K ⊕ Unit, Sum.elim ι ptIdx k) 
   invFun
     | ⟨.inl k, i⟩ => some ⟨k, i⟩
     | ⟨.inr _, _⟩ => none
-  left_inv := by
-    rintro (_ | ⟨k, i⟩) <;> rfl
+  left_inv := by rintro (_ | ⟨k, i⟩) <;> rfl
   right_inv := by
     rintro ⟨(k | u), i⟩
     · rfl
@@ -38,14 +37,15 @@ def varEquiv : Option (Σ k, ι k) ≃ (Σ k : K ⊕ Unit, Sum.elim ι ptIdx k) 
 theorem liftVar_injective : Function.Injective (liftVar (ι := ι) ptIdx) :=
   (varEquiv (ι := ι)).injective.comp (Option.some_injective _)
 
-def retr (F : Type) [Field F] :
-    MvPolynomial (Σ k : K ⊕ Unit, Sum.elim ι ptIdx k) F →ₐ[F] MvPolynomial (Σ k, ι k) F :=
-  aeval fun t => match t with
+def retr (F : Type) [Field F]
+    : MvPolynomial (Σ k : K ⊕ Unit, Sum.elim ι ptIdx k) F →ₐ[F] MvPolynomial (Σ k, ι k) F :=
+  aeval fun t =>
+    match t with
     | ⟨.inl k, i⟩ => X ⟨k, i⟩
     | ⟨.inr _, _⟩ => 1
 
-theorem retr_rename (F : Type) [Field F] (p : MvPolynomial (Σ k, ι k) F) :
-    retr F (rename (liftVar (ι := ι) ptIdx) p) = p := by
+theorem retr_rename (F : Type) [Field F] (p : MvPolynomial (Σ k, ι k) F)
+    : retr F (rename (liftVar (ι := ι) ptIdx) p) = p := by
   have : (retr F).comp (rename (liftVar (ι := ι) ptIdx)) = AlgHom.id F _ := by
     ext ⟨k, i⟩
     simp [retr, liftVar]
@@ -59,10 +59,12 @@ theorem JoinVariety.proof : JoinVariety.Statement := by
   obtain ⟨⟨hprime, ⟨S0, hS0, hspan⟩, hrel⟩, hdim⟩ := hV
   set V' := V.map (rename (liftVar (ι := ι) ptIdx))
 
-  let Φ : Polynomial (MvPolynomial (Σ k, ι k) F) ≃ₐ[F] MvPolynomial (Σ k : K ⊕ Unit, Sum.elim ι ptIdx k) F :=
+  let Φ
+      : Polynomial (MvPolynomial (Σ k, ι k) F) ≃ₐ[F] MvPolynomial (Σ k : K ⊕ Unit, Sum.elim ι ptIdx k) F :=
     (optionEquivLeft F (Σ k, ι k)).symm.trans (renameEquiv F varEquiv)
-  have hΦC : (Φ : Polynomial (MvPolynomial (Σ k, ι k) F) →+* _).comp Polynomial.C =
-      (rename (liftVar (ι := ι) ptIdx) : MvPolynomial (Σ k, ι k) F →ₐ[F] _).toRingHom := by
+  have hΦC
+      : (Φ : Polynomial (MvPolynomial (Σ k, ι k) F) →+* _).comp Polynomial.C
+        = (rename (liftVar (ι := ι) ptIdx) : MvPolynomial (Σ k, ι k) F →ₐ[F] _).toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro r
       have h1 : (optionEquivLeft F (Σ k, ι k)).symm (Polynomial.C (C r)) = C r := by
@@ -76,7 +78,12 @@ theorem JoinVariety.proof : JoinVariety.Statement := by
       show renameEquiv F varEquiv ((optionEquivLeft F (Σ k, ι k)).symm (Polynomial.C (X s))) = _
       rw [h1]
       simp [varEquiv]
-  have hV' : V' = (V.map (Polynomial.C : MvPolynomial (Σ k, ι k) F →+* Polynomial (MvPolynomial (Σ k, ι k) F))).map (Φ : Polynomial (MvPolynomial (Σ k, ι k) F) →+* _) := by
+  have hV'
+      : V'
+        = (V.map
+            (Polynomial.C
+              : MvPolynomial (Σ k, ι k) F →+* Polynomial (MvPolynomial (Σ k, ι k) F))).map
+          (Φ : Polynomial (MvPolynomial (Σ k, ι k) F) →+* _) := by
     rw [Ideal.map_map, hΦC]
     rfl
 
@@ -99,8 +106,10 @@ theorem JoinVariety.proof : JoinVariety.Statement := by
       obtain ⟨m0, hm0, rfl⟩ := Finset.mem_image.mp hm
       cases k with
       | inl k =>
-        change ∑ i : ι k, (Finsupp.mapDomain (liftVar (ι := ι) ptIdx) m0)
-          (liftVar (ι := ι) ptIdx ⟨k, i⟩) = a k
+        change
+          ∑ i : ι k, (Finsupp.mapDomain (liftVar (ι := ι) ptIdx) m0)
+              (liftVar (ι := ι) ptIdx ⟨k, i⟩)
+            = a k
         simp only [Finsupp.mapDomain_apply_of_injective liftVar_injective]
         exact ha m0 hm0 k
       | inr u =>
@@ -119,12 +128,13 @@ theorem JoinVariety.proof : JoinVariety.Statement := by
       have := hmem _ h
       rw [Ideal.eq_top_iff_one]
       simpa [retr] using this
-  · have e1 : (ReciprocityTheory.ChartRestriction.G.Geo.MRingOver F (Sum.elim ι ptIdx) ⧸ V') ≃+*
-        Polynomial (MvPolynomial (Σ k, ι k) F ⧸ V) :=
+  · have e1
+        : (ReciprocityTheory.ChartRestriction.G.Geo.MRingOver F (Sum.elim ι ptIdx) ⧸ V')
+          ≃+* Polynomial (MvPolynomial (Σ k, ι k) F ⧸ V) :=
       (Ideal.quotientEquiv _ _ Φ.toRingEquiv hV').symm.trans
         (Ideal.polynomialQuotientEquivQuotientPolynomial V).symm
-    refine (ringKrullDim_eq_of_ringEquiv
-      (S := Polynomial (MvPolynomial (Σ k, ι k) F ⧸ V)) e1).trans ?_
+    refine (ringKrullDim_eq_of_ringEquiv (S := Polynomial (MvPolynomial (Σ k, ι k) F ⧸ V)) e1).trans
+      ?_
     rw [Polynomial.ringKrullDim_of_isNoetherianRing]
     change ringKrullDim (ReciprocityTheory.ChartRestriction.G.Geo.MRingOver F ι ⧸ V) + 1 = _
     rw [hdim, Fintype.card_sum, Fintype.card_unit]

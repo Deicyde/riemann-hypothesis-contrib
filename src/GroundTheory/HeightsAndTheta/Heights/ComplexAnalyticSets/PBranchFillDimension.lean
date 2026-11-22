@@ -21,16 +21,20 @@ noncomputable section
 
 namespace BranchFillDimension
 
-theorem hausdorffMeasure_pos_of_isOpen {d : ℕ} {V : Set (Fin d → ℂ)} (hV : IsOpen V)
-    (hne : V.Nonempty) : 0 < μH[((2 * d : ℕ) : ℝ)] V := by
+theorem hausdorffMeasure_pos_of_isOpen
+    {d : ℕ} {V : Set (Fin d → ℂ)} (hV : IsOpen V) (hne : V.Nonempty)
+    : 0 < μH[((2 * d : ℕ) : ℝ)] V := by
   have hr : Module.finrank ℝ (Fin d → ℂ) = 2 * d := by
     simp [Module.finrank_pi_fintype, Complex.finrank_real_complex, mul_comm]
   rw [← hr]
   exact hV.measure_pos _ hne
 
-theorem not_open_subset_image {k d : ℕ} (hkd : k < d) {U : Set (Fin k → ℂ)} (hU : IsOpen U)
-    {F : (Fin k → ℂ) → Fin d → ℂ} (hF : DifferentiableOn ℂ F U) {V : Set (Fin d → ℂ)}
-    (hV : IsOpen V) (hne : V.Nonempty) : ¬ V ⊆ F '' U := by
+theorem not_open_subset_image
+    {k d : ℕ} (hkd : k < d)
+    {U : Set (Fin k → ℂ)} (hU : IsOpen U)
+    {F : (Fin k → ℂ) → Fin d → ℂ} (hF : DifferentiableOn ℂ F U)
+    {V : Set (Fin d → ℂ)} (hV : IsOpen V) (hne : V.Nonempty)
+    : ¬ V ⊆ F '' U := by
   intro hsub
   let T : (Fin d → ℂ) →L[ℂ] (Fin k → ℂ) :=
     ContinuousLinearMap.pi fun i => ContinuousLinearMap.proj (Fin.castLE hkd.le i)
@@ -50,8 +54,7 @@ theorem not_open_subset_image {k d : ℕ} (hkd : k < d) {U : Set (Fin k → ℂ)
     have hfd : fderiv ℂ (F ∘ T) u = (fderiv ℂ F (T u)).comp T := by
       rw [fderiv_comp u ((hF (T u) hu).differentiableAt (hU.mem_nhds hu)) T.differentiableAt,
         T.fderiv]
-    have h0 : (Pi.single ⟨k, hkd⟩ (1 : ℂ) : Fin d → ℂ) = 0 :=
-      hinj (by rw [hfd]; simp [hTe])
+    have h0 : (Pi.single ⟨k, hkd⟩ (1 : ℂ) : Fin d → ℂ) = 0 := hinj (by rw [hfd]; simp [hTe])
     have := congrFun h0 ⟨k, hkd⟩
     simp at this
   have hnull := CriticalImageNull.proof d d (T ⁻¹' U) (F ∘ T) hU' hg
@@ -65,18 +68,22 @@ theorem not_open_subset_image {k d : ℕ} (hkd : k < d) {U : Set (Fin k → ℂ)
     simp only [Function.comp_apply, hext]
   exact (hausdorffMeasure_pos_of_isOpen hV hne).ne' (measure_mono_null hsub' hnull)
 
-theorem of_fin (hHF : HolomorphicFibreInfinite.Statement) (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ))
-    (h : MvPolynomial (Fin n) ℂ) (w : Fin n → ℂ) (k : ℕ) (r : ℝ) (φ : (Fin k → ℂ) → Fin n → ℂ)
-    (B : Set (Fin n → ℂ)) (hJ : J.IsPrime) (hh : h ∉ J) (hw : w ∈ zeroLocus J)
+theorem of_fin
+    (hHF : HolomorphicFibreInfinite.Statement)
+    (n : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (h : MvPolynomial (Fin n) ℂ) (w : Fin n → ℂ)
+    (k : ℕ)
+    (r : ℝ) (φ : (Fin k → ℂ) → Fin n → ℂ) (B : Set (Fin n → ℂ))
+    (hJ : J.IsPrime) (hh : h ∉ J) (hw : w ∈ zeroLocus J)
     (hφd : DifferentiableOn ℂ φ (Metric.ball 0 r)) (hφi : Set.InjOn φ (Metric.ball 0 r))
     (hφm : Set.MapsTo φ (Metric.ball 0 r) (zeroLocus J)) (hB : B ∈ 𝓝 w)
-    (hcov : (zeroLocus J ∩ B) \ {z | eval z h = 0} ⊆ φ '' Metric.ball 0 r) :
-    ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (k : ℕ) := by
+    (hcov : (zeroLocus J ∩ B) \ {z | eval z h = 0} ⊆ φ '' Metric.ball 0 r)
+    : ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (k : ℕ) := by
   obtain ⟨d, hd⟩ : ∃ d : ℕ, ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = d := by
     have h0 : 0 ≤ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) := ringKrullDim_nonneg_of_nontrivial
     have h1 := ringKrullDim_quotient_le J
     rw [MvPolynomial.ringKrullDim_of_isNoetherianRing_of_finite, ringKrullDim_eq_zero_of_field,
-      Nat.card_eq_fintype_card, Fintype.card_fin, zero_add] at h1
+        Nat.card_eq_fintype_card, Fintype.card_fin, zero_add]
+      at h1
     generalize ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = x at h0 h1 ⊢
     induction x using WithBot.recBotCoe with
     | bot => simp at h0
@@ -87,12 +94,17 @@ theorem of_fin (hHF : HolomorphicFibreInfinite.Statement) (n : ℕ) (J : Ideal (
         have h2 : ((⊤ : ℕ∞) : WithBot ℕ∞) ≤ ((n : ℕ∞) : WithBot ℕ∞) := h1
         exact absurd (WithBot.coe_le_coe.1 h2) (by simp)
       | coe m => exact ⟨m, rfl⟩
-  obtain ⟨A, hA⟩ := GroundTheory.Heights₂.Heights.ComplexSets.LinearNoetherNormalization.proof n d J hd
+  obtain ⟨A, hA⟩ :=
+    GroundTheory.Heights₂.Heights.ComplexSets.LinearNoetherNormalization.proof n d J hd
   let π : (Fin n → ℂ) → Fin d → ℂ := fun z => A.mulVec z
-  have hπe : (fun z : Fin n → ℂ => fun i => eval z (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i)) = π := by
+  have hπe
+      : (fun z : Fin n → ℂ => fun i =>
+          eval z (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A i))
+        = π := by
     funext z i
     simp [π, GroundTheory.Heights₂.Heights.ComplexSets.linPoly, Matrix.mulVec, dotProduct]
-  have hπd : Differentiable ℂ π := (LinearMap.toContinuousLinearMap (Matrix.mulVecLin A)).differentiable
+  have hπd : Differentiable ℂ π :=
+    (LinearMap.toContinuousLinearMap (Matrix.mulVecLin A)).differentiable
   obtain ⟨z0, ⟨hz0, hhz0⟩, hz0B⟩ : ∃ z0, (z0 ∈ zeroLocus J ∧ eval z0 h ≠ 0) ∧ z0 ∈ interior B := by
     have hfreq : ∃ᶠ y in 𝓝 w, y ∈ zeroLocus J ∧ eval y h ≠ 0 := by
       intro hev
@@ -101,10 +113,12 @@ theorem of_fin (hHF : HolomorphicFibreInfinite.Statement) (n : ℕ) (J : Ideal (
     exact (hfreq.and_eventually (interior_mem_nhds.2 hB)).exists
   have hUo : IsOpen (interior B ∩ {z | eval z h ≠ 0}) :=
     isOpen_interior.inter (isOpen_ne_fun (MvPolynomial.continuous_eval h) continuous_const)
-  have hnb := FiniteMapOpen.proof n d J (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A) hJ hA.injective
-    hA.finite z0 hz0 _ (hUo.mem_nhds ⟨hz0B, hhz0⟩)
+  have hnb :=
+    FiniteMapOpen.proof n d J (GroundTheory.Heights₂.Heights.ComplexSets.linPoly A) hJ hA.injective
+      hA.finite z0 hz0 _ (hUo.mem_nhds ⟨hz0B, hhz0⟩)
   rw [hπe] at hnb
-  have hsub : π '' (zeroLocus J ∩ (interior B ∩ {z | eval z h ≠ 0})) ⊆ (π ∘ φ) '' Metric.ball 0 r := by
+  have hsub
+      : π '' (zeroLocus J ∩ (interior B ∩ {z | eval z h ≠ 0})) ⊆ (π ∘ φ) '' Metric.ball 0 r := by
     rintro _ ⟨z, ⟨hzZ, hzB, hzh⟩, rfl⟩
     obtain ⟨t, ht, rfl⟩ := hcov ⟨⟨hzZ, interior_subset hzB⟩, hzh⟩
     exact ⟨t, ht, rfl⟩
@@ -117,25 +131,27 @@ theorem of_fin (hHF : HolomorphicFibreInfinite.Statement) (n : ℕ) (J : Ideal (
     obtain ⟨y, hy⟩ := hHF k d _ (π ∘ φ) hlt Metric.isOpen_ball hΔ (hπd.comp_differentiableOn hφd)
     have hfin := (GroundTheory.Heights₂.Heights.ComplexSets.FibreBound.proof n d J A hJ hd hA y).2.1
     apply hy
-    have hmaps : φ '' {t | t ∈ Metric.ball 0 r ∧ (π ∘ φ) t = y} ⊆
-        GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y := by
+    have hmaps
+        : φ '' {t | t ∈ Metric.ball 0 r ∧ (π ∘ φ) t = y}
+          ⊆ GroundTheory.Heights₂.Heights.ComplexSets.fibre J A y := by
       rintro _ ⟨t, ⟨ht, hty⟩, rfl⟩
       exact ⟨hφm ht, hty⟩
     exact Set.Finite.of_finite_image (hfin.subset hmaps) (hφi.mono fun t ht => ht.1)
   have hge : d ≤ k := by
     by_contra hlt
     push Not at hlt
-    exact not_open_subset_image hlt Metric.isOpen_ball (hπd.comp_differentiableOn hφd) isOpen_interior
-      ⟨_, mem_interior_iff_mem_nhds.2 hnb⟩ (interior_subset.trans hsub)
+    exact not_open_subset_image hlt Metric.isOpen_ball (hπd.comp_differentiableOn hφd)
+      isOpen_interior ⟨_, mem_interior_iff_mem_nhds.2 hnb⟩ (interior_subset.trans hsub)
   rw [hd, le_antisymm hge hle]
 
 end BranchFillDimension
 
-theorem BranchFillDimension.proof (hHF : HolomorphicFibreInfinite.Statement) :
-    BranchFillDimension.Statement := by
+theorem BranchFillDimension.proof (hHF : HolomorphicFibreInfinite.Statement)
+    : BranchFillDimension.Statement := by
   intro σ _ I h w k r φ B hI hh hw hφd hφi hφm hB hcov
   let e : σ ≃ Fin (Fintype.card σ) := Fintype.equivFin σ
-  let ψ : MvPolynomial σ ℂ ≃+* MvPolynomial (Fin (Fintype.card σ)) ℂ := (renameEquiv ℂ e).toRingEquiv
+  let ψ : MvPolynomial σ ℂ ≃+* MvPolynomial (Fin (Fintype.card σ)) ℂ :=
+    (renameEquiv ℂ e).toRingEquiv
   have hψ : ∀ q, ψ q = rename e q := fun _ => rfl
   have hψs : ∀ q, ψ.symm q = rename e.symm q := fun _ => rfl
   let J : Ideal (MvPolynomial (Fin (Fintype.card σ)) ℂ) := I.comap ψ.symm
@@ -160,7 +176,9 @@ theorem BranchFillDimension.proof (hHF : HolomorphicFibreInfinite.Statement) :
     · intro hz q hq
       rw [← ψ.apply_symm_apply q, heval]
       exact hz _ ((hmemJ q).1 hq)
-  have hdim : ringKrullDim (MvPolynomial σ ℂ ⧸ I) = ringKrullDim (MvPolynomial (Fin (Fintype.card σ)) ℂ ⧸ J) :=
+  have hdim
+      : ringKrullDim (MvPolynomial σ ℂ ⧸ I)
+        = ringKrullDim (MvPolynomial (Fin (Fintype.card σ)) ℂ ⧸ J) :=
     ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv I J ψ (Ideal.comap_symm (I := I) ψ))
   rw [hdim]
   refine BranchFillDimension.of_fin hHF _ J (ψ h) (L w) k r (L ∘ φ) (M ⁻¹' B) hJ ?_ ((hZ w).2 hw)

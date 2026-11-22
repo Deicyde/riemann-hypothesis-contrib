@@ -14,15 +14,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchem
 
 set_option autoImplicit false
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open scoped TensorProduct
 
 namespace UpperTheory.LatticeTracePullback
 
-private theorem eq_of_geom {T Y Z : Scheme.{0}} (π : Y ⟶ Z) [Etale π] (f g : T ⟶ Y) (h : f ≫ π = g ≫ π)
-    (hg : ∀ (k : Type) [Field k] [IsAlgClosed k] (t : Spec (CommRingCat.of k) ⟶ T), t ≫ f = t ≫ g) : f = g := by
+private theorem eq_of_geom
+    {T Y Z : Scheme.{0}} (π : Y ⟶ Z) [Etale π]
+    (f g : T ⟶ Y) (h : f ≫ π = g ≫ π)
+    (hg : ∀ (k : Type) [Field k] [IsAlgClosed k] (t : Spec (CommRingCat.of k) ⟶ T), t ≫ f = t ≫ g)
+    : f = g := by
   set L := pullback.lift f g h with hL
   set Δ := pullback.diagonal π with hΔ
   have hLf : L ≫ pullback.fst π π = f := by rw [hL]; erw [pullback.lift_fst]
@@ -30,11 +36,15 @@ private theorem eq_of_geom {T Y Z : Scheme.{0}} (π : Y ⟶ Z) [Etale π] (f g :
   have hΔf : Δ ≫ pullback.fst π π = 𝟙 Y := by rw [hΔ]; erw [pullback.diagonal_fst]
   have hΔg : Δ ≫ pullback.snd π π = 𝟙 Y := by rw [hΔ]; erw [pullback.diagonal_snd]
   have e1 : pullback.fst L Δ ≫ f = pullback.snd L Δ := by
-    calc pullback.fst L Δ ≫ f = pullback.fst L Δ ≫ L ≫ pullback.fst π π := by rw [hLf]
+    calc
+      pullback.fst L Δ ≫ f
+        = pullback.fst L Δ ≫ L ≫ pullback.fst π π := by rw [hLf]
       _ = pullback.snd L Δ ≫ Δ ≫ pullback.fst π π := by rw [pullback.condition_assoc]
       _ = pullback.snd L Δ := by rw [hΔf, Category.comp_id]
   have e2 : pullback.fst L Δ ≫ g = pullback.snd L Δ := by
-    calc pullback.fst L Δ ≫ g = pullback.fst L Δ ≫ L ≫ pullback.snd π π := by rw [hLg]
+    calc
+      pullback.fst L Δ ≫ g
+        = pullback.fst L Δ ≫ L ≫ pullback.snd π π := by rw [hLg]
       _ = pullback.snd L Δ ≫ Δ ≫ pullback.snd π π := by rw [pullback.condition_assoc]
       _ = pullback.snd L Δ := by rw [hΔg, Category.comp_id]
   have hsurj : Surjective (pullback.fst L Δ) := by
@@ -53,8 +63,7 @@ private theorem eq_of_geom {T Y Z : Scheme.{0}} (π : Y ⟶ Z) [Etale π] (f g :
     let pt : Spec (CommRingCat.of K) := IsLocalRing.closedPoint K
     refine ⟨q pt, ?_⟩
     have hq : q ≫ pullback.fst L Δ = t := pullback.lift_fst _ _ _
-    have h1 : (pullback.fst L Δ) (q pt) = t pt := by
-      rw [← Scheme.Hom.comp_apply, hq]
+    have h1 : (pullback.fst L Δ) (q pt) = t pt := by rw [← Scheme.Hom.comp_apply, hq]
     rw [h1]
     have h2 : t pt ∈ Set.range (T.fromSpecResidueField x) :=
       ⟨_, (Scheme.Hom.comp_apply _ _ pt).symm⟩
@@ -63,9 +72,13 @@ private theorem eq_of_geom {T Y Z : Scheme.{0}} (π : Y ⟶ Z) [Etale π] (f g :
     (isIso_iff_isOpenImmersion_and_surjective _).mpr ⟨inferInstance, hsurj⟩
   exact (cancel_epi (pullback.fst L Δ)).1 (e1.trans e2.symm)
 
-private theorem lat_step {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} (L : Link D G) (h : G.GAf)
-    {c d : ℕ} (hd0 : 0 < d) (hd : d.Coprime p) (hlat : ∀ v ∈ LaHat D, ∃ v' ∈ LaHat D, L.actG h v' = c • v)
-    (x : D.La) (hx : ∃ v ∈ LaHat D, L.actG h (inAf D x) = inAf D 0 + d • v) : ∃ u : D.La, c • x = d • u := by
+private theorem lat_step
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} {G : HTGroup p} (L : Link D G) (h : G.GAf)
+    {c d : ℕ}
+    (hd0 : 0 < d) (hd : d.Coprime p) (hlat : ∀ v ∈ LaHat D, ∃ v' ∈ LaHat D, L.actG h v' = c • v)
+    (x : D.La) (hx : ∃ v ∈ LaHat D, L.actG h (inAf D x) = inAf D 0 + d • v)
+    : ∃ u : D.La, c • x = d • u := by
   obtain ⟨v, hv, hxv⟩ := hx
   obtain ⟨v', hv', hv'eq⟩ := hlat v hv
   have hin : ∀ (k : ℕ) (y : D.La), inAf D (k • y) = k • inAf D y := by
@@ -86,7 +99,8 @@ private theorem lat_step {p : ℕ} [Fact p.Prime] {D : Datum p} {G : HTGroup p} 
       rw [hin, map_nsmul, map_nsmul, hxv, hv'eq, smul_comm]
     have e2 := congrArg (L.actG h⁻¹) e1
     rwa [hinv, hinv] at e2
-  exact GlobalTheory.T.exists_latticeVector_eq_nsmul_of_adelic_nsmul p D d hd0 hd (GlobalTheory.T.int_dvd_of_eq_nat_mul_integralAdeleAwayFromP p d hd0 hd) (c • x) ⟨v', hv', key⟩
+  exact GlobalTheory.T.exists_latticeVector_eq_nsmul_of_adelic_nsmul p D d hd0 hd
+    (GlobalTheory.T.int_dvd_of_eq_nat_mul_integralAdeleAwayFromP p d hd0 hd) (c • x) ⟨v', hv', key⟩
 
 end UpperTheory.LatticeTracePullback
 
@@ -111,8 +125,7 @@ theorem UpperTheory.trace_pullback_identity : TrBack := by
   haveI := hψ
   have ker : ∀ (T' : Over X) (y : T' ⟶ o'.A), y ≫ ψ = 1 → y ^ c = 1 := by
     intro T' y hy
-    have hyd : y ^ d = 1 := by
-      rw [← comp_id_pow, ← hψψ', ← Category.assoc, hy, MonObj.one_comp]
+    have hyd : y ^ d = 1 := by rw [← comp_id_pow, ← hψψ', ← Category.assoc, hy, MonObj.one_comp]
     have hunit : IsUnit ((d : ℕ) : Γ(X, ⊤)) := by
       have h1 : IsUnit ((d : ℕ) : R) := by
         have : IsUnit ((d : ℕ) : ℚ) := (Nat.cast_ne_zero.mpr hd0.ne').isUnit
@@ -139,7 +152,8 @@ theorem UpperTheory.trace_pullback_identity : TrBack := by
         have := I'.add d 0 0
         rw [add_zero] at this
         exact mul_eq_left.mp this.symm
-      have hx := (hiff d hd0 hd a 0).1 (by rw [ha, Category.assoc, hy, MonObj.comp_one]; exact h0''.symm)
+      have hx :=
+        (hiff d hd0 hd a 0).1 (by rw [ha, Category.assoc, hy, MonObj.comp_one]; exact h0''.symm)
       obtain ⟨w, hw⟩ := UpperTheory.LatticeTracePullback.lat_step L h hd0 hd hlat a hx
       have hpowev : ∀ m : ℕ, I'.ev d (m • a) = (I'.ev d a) ^ m := by
         intro m
@@ -153,13 +167,15 @@ theorem UpperTheory.trace_pullback_identity : TrBack := by
       have := congrArg Over.Hom.left hk
       simpa only [Over.comp_left, Over.homMk_left, u] using this
   obtain ⟨hfl, hsu, hqc⟩ := SiegUniqBase.flat_surjective_qc_pow X o.A o.ab d hd0
-  obtain ⟨⟨χ, hχm, hχ⟩, _⟩ := GlobalTheory.exists_monHom_factor_of_flat_surjective X o.A o.A o'.A
-    (𝟙 o.A ^ d) (ψ' ≫ 𝟙 o'.A ^ c) inferInstance inferInstance hfl hsu hqc (by
-      intro T' x hx
-      rw [comp_id_pow] at hx
-      have hy : (x ≫ ψ') ≫ ψ = 1 := by rw [Category.assoc, hψ'ψ, comp_id_pow, hx]
-      rw [← Category.assoc, comp_id_pow]
-      exact ker T' _ hy)
+  obtain ⟨⟨χ, hχm, hχ⟩, _⟩ :=
+    GlobalTheory.exists_monHom_factor_of_flat_surjective X o.A o.A o'.A (𝟙 o.A ^ d)
+      (ψ' ≫ 𝟙 o'.A ^ c) inferInstance inferInstance hfl hsu hqc
+      (by
+        intro T' x hx
+        rw [comp_id_pow] at hx
+        have hy : (x ≫ ψ') ≫ ψ = 1 := by rw [Category.assoc, hψ'ψ, comp_id_pow, hx]
+        rw [← Category.assoc, comp_id_pow]
+        exact ker T' _ hy)
   refine ⟨χ, hχm, ?_, ?_⟩
   · apply (cancel_epi (𝟙 o'.A ^ d)).1
     rw [← Category.assoc, id_pow_comp ψ d, Category.assoc, hχ, ← Category.assoc, hψψ']

@@ -14,9 +14,14 @@ open CategoryTheory AlgebraicGeometry GlobalTheory.LogCris CrystallineSemistable
 
 namespace CrystallineSemistableComparison.Om.Glob
 
-abbrev pullM {K : Type} [CommRing K] {X Y : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of K)} {p : Y ⟶ Spec (CommRingCat.of K)}
-    (u : X ⟶ Y) (hu : u ≫ p = q) (a : ℕ) :=
-  (HT.smS u hu).sq (a := thFil _ (a : ℤ)) (b := thFil _ ((a : ℤ) + 1)) (a' := thFil _ (a : ℤ)) (b' := thFil _ ((a : ℤ) + 1))
-    (fun _ _ hx => hx) fun _ _ hx => hx
+abbrev pullM
+    {K : Type} [CommRing K]
+    {X Y : Scheme.{0}} {q : X ⟶ Spec (CommRingCat.of K)} {p : Y ⟶ Spec (CommRingCat.of K)}
+    (u : X ⟶ Y) (hu : u ≫ p = q)
+    (a : ℕ) :=
+  (HT.smS u hu).sq (a := thFil _ (a : ℤ)) (b := thFil _ ((a : ℤ) + 1)) (a' := thFil _ (a : ℤ))
+    (b' := thFil _ ((a : ℤ) + 1))
+    (fun _ _ hx => hx)
+    fun _ _ hx => hx
 
 end CrystallineSemistableComparison.Om.Glob

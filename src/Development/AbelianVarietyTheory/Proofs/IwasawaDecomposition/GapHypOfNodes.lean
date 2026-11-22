@@ -7,13 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Event
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.Mem GlobalTheory.Mem.Top
+open Formalism.BasicNotions Formalism.MainNotions GlobalTheory.EX GlobalTheory.Mem
+  GlobalTheory.Mem.Top
 
 namespace GlobalTheory.Mem.Top.NodeGap
 
-theorem gapHyp_of_nodes (D : D7) (hm : 1801 ≤ D.R.m) (h : ℕ) (hh : 16 * (D.R.r : ℝ) ^ 19 ≤ (h : ℝ))
-    (hb : ∀ τ, ∃ b1 : ℤ, ∀ j : Fin D.R.m, (D.hc τ).b j = (b1 : ℚ) + (j.1 : ℚ) * (h : ℚ)) :
-    Formalism.L2.SG.ConcreteSettingExists.GapHyp D := by
+theorem gapHyp_of_nodes
+    (D : D7) (hm : 1801 ≤ D.R.m)
+    (h : ℕ) (hh : 16 * (D.R.r : ℝ) ^ 19 ≤ (h : ℝ))
+    (hb : ∀ τ, ∃ b1 : ℤ, ∀ j : Fin D.R.m, (D.hc τ).b j = (b1 : ℚ) + (j.1 : ℚ) * (h : ℚ))
+    : Formalism.L2.SG.ConcreteSettingExists.GapHyp D := by
   refine ⟨?_, ?_⟩
   · have h1 := D.R.m_add_three_le_k
     show 1801 ≤ D.R.k + D.R.m - 1
@@ -26,7 +29,8 @@ theorem gapHyp_of_nodes (D : D7) (hm : 1801 ≤ D.R.m) (h : ℕ) (hh : 16 * (D.R
     push_cast
     linarith
 
-private theorem ev_mono_of_forall_imp {p q : Ctx → Prop} (h : ∀ K, p K → q K) (hp : Ev p) : Ev q := by
+private theorem ev_mono_of_forall_imp {p q : Ctx → Prop} (h : ∀ K, p K → q K) (hp : Ev p)
+    : Ev q := by
   unfold Ev at hp ⊢
   obtain ⟨w, hw, H⟩ := hp
   refine ⟨w, hw, fun eps C8 a b c d => ?_⟩
@@ -39,7 +43,9 @@ private theorem ev_mono_of_forall_imp {p q : Ctx → Prop} (h : ∀ K, p K → q
   obtain ⟨x0, H4⟩ := H3 ch hch
   exact ⟨x0, fun K k1 k2 k3 k4 k5 => h K (H4 K k1 k2 k3 k4 k5)⟩
 
-theorem ev_gapHyp : Ev fun K => ∀ X : Stages, K.Over X.B.toPre → Formalism.L2.SG.ConcreteSettingExists.GapHyp X.toD7 := by
+theorem ev_gapHyp
+    : Ev fun K =>
+      ∀ X : Stages, K.Over X.B.toPre → Formalism.L2.SG.ConcreteSettingExists.GapHyp X.toD7 := by
   refine ev_mono_of_forall_imp ?_ (ev_nodes 16 19 1801)
   intro K hK X hX
   obtain ⟨hm, h, hh, hb⟩ := hK X hX

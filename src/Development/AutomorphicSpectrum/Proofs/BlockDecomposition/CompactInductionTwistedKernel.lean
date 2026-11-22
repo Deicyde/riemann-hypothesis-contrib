@@ -12,15 +12,19 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.PRep.CIndKer
 
-variable {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [AddCommGroup W] [Module ℂ W]
+variable
+  {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W] [Module ℂ W]
 
-theorem exists_cut (H : Subgroup G)
-    (hbasis : ∀ O : Set G, O ∈ 𝓝 (1 : G) → ∃ K : Subgroup G, IsOpen (K : Set G) ∧
-      IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
-    (σ : Representation ℂ H W) (S : Set G) (hl : ∀ h ∈ H, ∀ g, h * g ∈ S ↔ g ∈ S)
+theorem exists_cut
+    (H : Subgroup G)
+    (hbasis : ∀ O : Set G,
+      O ∈ 𝓝 (1 : G)
+        → ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
+    (σ : Representation ℂ H W)
+    (S : Set G) (hl : ∀ h ∈ H, ∀ g, h * g ∈ S ↔ g ∈ S)
     (K₀ : Subgroup G) (hK₀ : IsOpen (K₀ : Set G)) (hr : ∀ k ∈ K₀, ∀ g, g * k ∈ S ↔ g ∈ S)
-    (v : cIndSpace H σ) : ∃ w : cIndSpace H σ, ∀ g, w.1.1.1 g = S.indicator v.1.1.1 g := by
+    (v : cIndSpace H σ)
+    : ∃ w : cIndSpace H σ, ∀ g, w.1.1.1 g = S.indicator v.1.1.1 g := by
   classical
   have hvo : IsOpen {g : G | ind H σ g v.1.1 = v.1.1} := v.1.2
   obtain ⟨K₁, hK₁o, -, hK₁⟩ := hbasis _ (hvo.mem_nhds (by simp))
@@ -45,21 +49,24 @@ theorem exists_cut (H : Subgroup G)
     · rw [Set.indicator_of_mem ((hr x hx.1 g).2 hg), Set.indicator_of_mem hg, hinv g x hx.2]
     · rw [Set.indicator_of_notMem (fun h' => hg ((hr x hx.1 g).1 h')), Set.indicator_of_notMem hg]
   obtain ⟨C, hC, hsupp⟩ := v.2
-  refine ⟨⟨⟨⟨S.indicator v.1.1.1, hind⟩, hsm⟩, C, hC, fun g hg => hsupp g fun h0 => hg ?_⟩,
-    fun g => rfl⟩
+  refine
+    ⟨⟨⟨⟨S.indicator v.1.1.1, hind⟩, hsm⟩, C, hC, fun g hg => hsupp g fun h0 => hg ?_⟩, fun g => rfl⟩
   show S.indicator v.1.1.1 g = 0
   by_cases hgS : g ∈ S
   · rw [Set.indicator_of_mem hgS, h0]
   · rw [Set.indicator_of_notMem hgS]
 
-theorem cut_mem (H U : Subgroup G)
-    (hbasis : ∀ O : Set G, O ∈ 𝓝 (1 : G) → ∃ K : Subgroup G, IsOpen (K : Set G) ∧
-      IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
-    (σ : Representation ℂ H W) (S : Set G) (hl : ∀ h ∈ H, ∀ g, h * g ∈ S ↔ g ∈ S)
+theorem cut_mem
+    (H U : Subgroup G)
+    (hbasis : ∀ O : Set G,
+      O ∈ 𝓝 (1 : G)
+        → ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
+    (σ : Representation ℂ H W)
+    (S : Set G) (hl : ∀ h ∈ H, ∀ g, h * g ∈ S ↔ g ∈ S)
     (K₀ : Subgroup G) (hK₀ : IsOpen (K₀ : Set G)) (hr : ∀ k ∈ K₀, ∀ g, g * k ∈ S ↔ g ∈ S)
-    (hu : ∀ u ∈ U, ∀ g, g * u ∈ S ↔ g ∈ S) (y : cIndSpace H σ)
-    (hy : y ∈ twKer (cInd H σ) U 1) :
-    ∃ z ∈ twKer (cInd H σ) U 1, ∀ g, z.1.1.1 g = S.indicator y.1.1.1 g := by
+    (hu : ∀ u ∈ U, ∀ g, g * u ∈ S ↔ g ∈ S)
+    (y : cIndSpace H σ) (hy : y ∈ twKer (cInd H σ) U 1)
+    : ∃ z ∈ twKer (cInd H σ) U 1, ∀ g, z.1.1.1 g = S.indicator y.1.1.1 g := by
   classical
   unfold twKer at hy
   induction hy using Submodule.span_induction with
@@ -68,8 +75,9 @@ theorem cut_mem (H U : Subgroup G)
     obtain ⟨w, hw⟩ := exists_cut H hbasis σ S hl K₀ hK₀ hr v
     refine ⟨cInd H σ (n : G) w - w, Submodule.subset_span ⟨n, w, by simp⟩, fun g => ?_⟩
     have e1 : (cInd H σ (n : G) w - w).1.1.1 g = w.1.1.1 (g * n) - w.1.1.1 g := rfl
-    have e2 : (cInd H σ (n : G) v - (((1 : U →* ℂˣ) n : ℂˣ) : ℂ) • v).1.1.1
-        = fun x => v.1.1.1 (x * n) - v.1.1.1 x := by
+    have e2
+        : (cInd H σ (n : G) v - (((1 : U →* ℂˣ) n : ℂˣ) : ℂ) • v).1.1.1
+          = fun x => v.1.1.1 (x * n) - v.1.1.1 x := by
       funext x
       simp only [MonoidHom.one_apply, Units.val_one, one_smul]
       rfl
@@ -128,8 +136,8 @@ theorem dc_right (H K : Subgroup G) (c : G) : ∀ x ∈ K, ∀ g, g * x ∈ dc H
   · rintro ⟨b, k, hk, rfl⟩
     exact ⟨b, k * x, mul_mem hk hx, by group⟩
 
-theorem dc_unip (H U K : Subgroup G) [U.Normal] (hUH : U ≤ H) (c : G) :
-    ∀ u ∈ U, ∀ g, g * u ∈ dc H K c ↔ g ∈ dc H K c := by
+theorem dc_unip (H U K : Subgroup G) [U.Normal] (hUH : U ≤ H) (c : G)
+    : ∀ u ∈ U, ∀ g, g * u ∈ dc H K c ↔ g ∈ dc H K c := by
   have key : ∀ u ∈ U, ∀ g, g ∈ dc H K c → g * u ∈ dc H K c := by
     rintro u hu g ⟨b, k, hk, rfl⟩
     have hw : (c * k) * u * (c * k)⁻¹ ∈ U := ‹U.Normal›.conj_mem u hu _
@@ -141,12 +149,18 @@ theorem dc_unip (H U K : Subgroup G) [U.Normal] (hUH : U ≤ H) (c : G) :
   have := key u⁻¹ (inv_mem hu) _ h
   simpa using this
 
-theorem local_gen (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representation ℂ H W)
-    (hσ : IsSmooth σ) (c : G) (n : H) (hn : (n : G) ∈ U) (a : W) :
-    ∃ O ∈ 𝓝 (1 : G), ∀ K : Subgroup G, IsOpen (K : Set G) → IsCompact (K : Set G) →
-      (K : Set G) ⊆ O → ∃ y ∈ twKer (cInd H σ) U 1,
-        (∀ (b : H), ∀ k ∈ K, y.1.1.1 ((b : G) * c * k) = σ b (σ n a - a)) ∧
-        ∀ g, g ∉ dc H K c → y.1.1.1 g = 0 := by
+theorem local_gen
+    (H U : Subgroup G) [U.Normal]
+    (hUH : U ≤ H)
+    (σ : Representation ℂ H W) (hσ : IsSmooth σ)
+    (c : G)
+    (n : H) (hn : (n : G) ∈ U)
+    (a : W)
+    : ∃ O ∈ 𝓝 (1 : G), ∀ K : Subgroup G,
+      IsOpen (K : Set G) → IsCompact (K : Set G) → (K : Set G) ⊆ O
+        → ∃ y ∈ twKer (cInd H σ) U 1,
+          (∀ (b : H), ∀ k ∈ K, y.1.1.1 ((b : G) * c * k) = σ b (σ n a - a))
+            ∧ ∀ g, g ∉ dc H K c → y.1.1.1 g = 0 := by
   obtain ⟨O₁, hO₁, e⟩ := isOpen_induced_iff.1 (hσ a)
   have fix : ∀ h : H, (h : G) ∈ O₁ → σ h a = a := fun h hh => by
     have h' : h ∈ (Subtype.val ⁻¹' O₁ : Set H) := hh
@@ -164,14 +178,22 @@ theorem local_gen (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representa
   have m2 : (fun k : G => (n : G)⁻¹ * (c * k * c⁻¹) * n * (c * k * c⁻¹)⁻¹) ⁻¹' O₁ ∈ 𝓝 (1 : G) :=
     (hO₁.preimage hc2).mem_nhds (by simpa using h1)
   refine ⟨_, Filter.inter_mem m1 m2, fun K hKo hKc hKO => ?_⟩
-  obtain ⟨B, hB1, hB0⟩ := GlobalTheory.CompanionTheory.BZMirOnto.exists_bump H σ K hKo hKc c a
-    (fun b x hx hb => fix b (by rw [hb]; exact (hKO hx).1))
+  obtain ⟨B, hB1, hB0⟩ :=
+    GlobalTheory.CompanionTheory.BZMirOnto.exists_bump H σ K hKo hKc c a
+      (fun b x hx hb => fix b (by rw [hb]; exact (hKO hx).1))
   have hu : c⁻¹ * (n : G) * c⁻¹⁻¹ ∈ U := ‹U.Normal›.conj_mem _ hn _
   have hu' : c⁻¹ * (n : G) * c ∈ U := by simpa using hu
-  refine ⟨cInd H σ (c⁻¹ * (n : G) * c) B - B,
-    Submodule.subset_span ⟨⟨_, hu'⟩, B, by simp only [MonoidHom.one_apply, Units.val_one, one_smul]⟩, fun b k hk => ?_, fun g hg => ?_⟩
-  · have e1 : (cInd H σ (c⁻¹ * (n : G) * c) B - B).1.1.1 ((b : G) * c * k)
-        = B.1.1.1 ((b : G) * c * k * (c⁻¹ * (n : G) * c)) - B.1.1.1 ((b : G) * c * k) := rfl
+  refine ⟨
+    cInd H σ (c⁻¹ * (n : G) * c) B - B,
+    Submodule.subset_span
+      ⟨⟨_, hu'⟩, B, by simp only [MonoidHom.one_apply, Units.val_one, one_smul]⟩,
+    fun b k hk => ?_,
+    fun g hg => ?_
+  ⟩
+  · have e1
+        : (cInd H σ (c⁻¹ * (n : G) * c) B - B).1.1.1 ((b : G) * c * k)
+          = B.1.1.1 ((b : G) * c * k * (c⁻¹ * (n : G) * c)) - B.1.1.1 ((b : G) * c * k) :=
+      rfl
     set κ : G := c * k * c⁻¹ with hκ
     have hm : κ * (n : G) * κ⁻¹ ∈ U := ‹U.Normal›.conj_mem _ hn _
     have ht : (n : G)⁻¹ * κ * n * κ⁻¹ ∈ U := by
@@ -190,17 +212,24 @@ theorem local_gen (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representa
       group
     rw [e1, e2, hB1 _ _ hk, hB1 _ _ hk, hmt, map_mul, map_mul, Module.End.mul_apply,
       Module.End.mul_apply, hfix, map_sub]
-  · have e1 : (cInd H σ (c⁻¹ * (n : G) * c) B - B).1.1.1 g
-        = B.1.1.1 (g * (c⁻¹ * (n : G) * c)) - B.1.1.1 g := rfl
+  · have e1
+        : (cInd H σ (c⁻¹ * (n : G) * c) B - B).1.1.1 g
+          = B.1.1.1 (g * (c⁻¹ * (n : G) * c)) - B.1.1.1 g :=
+      rfl
     rw [e1, hB0 _ (fun h => hg ?_), hB0 _ hg, sub_zero]
     exact (dc_unip H U K hUH c _ hu' g).1 h
 
-theorem local_all (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representation ℂ H W)
-    (hσ : IsSmooth σ) (c : G) (x : W) (hx : x ∈ twKer σ (U.subgroupOf H) 1) :
-    ∃ O ∈ 𝓝 (1 : G), ∀ K : Subgroup G, IsOpen (K : Set G) → IsCompact (K : Set G) →
-      (K : Set G) ⊆ O → ∃ y ∈ twKer (cInd H σ) U 1,
-        (∀ (b : H), ∀ k ∈ K, y.1.1.1 ((b : G) * c * k) = σ b x) ∧
-        ∀ g, g ∉ dc H K c → y.1.1.1 g = 0 := by
+theorem local_all
+    (H U : Subgroup G) [U.Normal]
+    (hUH : U ≤ H)
+    (σ : Representation ℂ H W) (hσ : IsSmooth σ)
+    (c : G)
+    (x : W) (hx : x ∈ twKer σ (U.subgroupOf H) 1)
+    : ∃ O ∈ 𝓝 (1 : G), ∀ K : Subgroup G,
+      IsOpen (K : Set G) → IsCompact (K : Set G) → (K : Set G) ⊆ O
+        → ∃ y ∈ twKer (cInd H σ) U 1,
+          (∀ (b : H), ∀ k ∈ K, y.1.1.1 ((b : G) * c * k) = σ b x)
+            ∧ ∀ g, g ∉ dc H K c → y.1.1.1 g = 0 := by
   unfold twKer at hx
   induction hx using Submodule.span_induction with
   | mem x hx =>
@@ -208,8 +237,11 @@ theorem local_all (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representa
     have := local_gen H U hUH σ hσ c n.1 (Subgroup.mem_subgroupOf.1 n.2) v
     simpa using this
   | zero =>
-    exact ⟨Set.univ, Filter.univ_mem, fun K _ _ _ => ⟨0, Submodule.zero_mem _,
-      fun b k _ => by rw [map_zero]; rfl, fun g _ => rfl⟩⟩
+    exact ⟨
+      Set.univ,
+      Filter.univ_mem,
+      fun K _ _ _ => ⟨0, Submodule.zero_mem _, fun b k _ => by rw [map_zero]; rfl, fun g _ => rfl⟩
+    ⟩
   | add p q _ _ hp hq =>
     obtain ⟨O₁, h₁, P₁⟩ := hp
     obtain ⟨O₂, h₂, P₂⟩ := hq
@@ -217,8 +249,10 @@ theorem local_all (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representa
     obtain ⟨y₁, m₁, a₁, b₁⟩ := P₁ K hKo hKc (hKO.trans Set.inter_subset_left)
     obtain ⟨y₂, m₂, a₂, b₂⟩ := P₂ K hKo hKc (hKO.trans Set.inter_subset_right)
     refine ⟨y₁ + y₂, Submodule.add_mem _ m₁ m₂, fun b k hk => ?_, fun g hg => ?_⟩
-    · have e : (y₁ + y₂).1.1.1 ((b : G) * c * k)
-          = y₁.1.1.1 ((b : G) * c * k) + y₂.1.1.1 ((b : G) * c * k) := rfl
+    · have e
+          : (y₁ + y₂).1.1.1 ((b : G) * c * k)
+            = y₁.1.1.1 ((b : G) * c * k) + y₂.1.1.1 ((b : G) * c * k) :=
+        rfl
       rw [e, a₁ b k hk, a₂ b k hk, map_add (f := _)]
     · have e : (y₁ + y₂).1.1.1 g = y₁.1.1.1 g + y₂.1.1.1 g := rfl
       rw [e, b₁ g hg, b₂ g hg, add_zero]
@@ -232,17 +266,24 @@ theorem local_all (H U : Subgroup G) [U.Normal] (hUH : U ≤ H) (σ : Representa
     · have e : (t • y).1.1.1 g = t • y.1.1.1 g := rfl
       rw [e, b g hg, smul_zero]
 
-theorem mem_twKer_cInd : ∀ {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup W] [Module ℂ W] (H U : Subgroup G) [U.Normal], U ≤ H →
-    (∀ O : Set G, O ∈ nhds (1 : G) → ∃ K : Subgroup G, IsOpen (K : Set G) ∧
-      IsCompact (K : Set G) ∧ (K : Set G) ⊆ O) →
-    ∀ (σ : Representation ℂ H W), IsSmooth σ → ∀ f : cIndSpace H σ,
-      (∀ g, f.1.1.1 g ∈ twKer σ (U.subgroupOf H) 1) → f ∈ twKer (cInd H σ) U 1 := by
+theorem mem_twKer_cInd
+    : ∀ {G W : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup W]
+        [Module ℂ W] (H U : Subgroup G) [U.Normal],
+      U ≤ H
+        → (∀ O : Set G,
+          O ∈ nhds (1 : G)
+            → ∃ K : Subgroup G, IsOpen (K : Set G) ∧ IsCompact (K : Set G) ∧ (K : Set G) ⊆ O)
+        → ∀ (σ : Representation ℂ H W),
+          IsSmooth σ
+            → ∀ f : cIndSpace H σ,
+              (∀ g, f.1.1.1 g ∈ twKer σ (U.subgroupOf H) 1) → f ∈ twKer (cInd H σ) U 1 := by
   intro G W _ _ _ _ _ H U _ hUH hbasis σ hσ f hf
   classical
   have hfo : IsOpen {g : G | ind H σ g f.1.1 = f.1.1} := f.1.2
-  have hloc : ∀ c : G, ∃ K : Subgroup G, IsOpen (K : Set G) ∧
-      ∃ y ∈ twKer (cInd H σ) U 1, ∀ g, y.1.1.1 g = (dc H K c).indicator f.1.1.1 g := by
+  have hloc
+      : ∀ c : G, ∃ K : Subgroup G,
+        IsOpen (K : Set G)
+          ∧ ∃ y ∈ twKer (cInd H σ) U 1, ∀ g, y.1.1.1 g = (dc H K c).indicator f.1.1.1 g := by
     intro c
     obtain ⟨O, hO, P⟩ := local_all H U hUH σ hσ c _ (hf c)
     obtain ⟨K, hKo, hKc, hKO⟩ := hbasis _ (Filter.inter_mem hO (hfo.mem_nhds (by simp)))
@@ -256,23 +297,38 @@ theorem mem_twKer_cInd : ∀ {G W : Type} [Group G] [TopologicalSpace G] [IsTopo
       rw [h1 b k hk, mul_assoc, f.1.1.2 b, e]
     · rw [Set.indicator_of_notMem hg, h0 g hg]
   choose K hKo y hyY hy using hloc
-  have key : ∀ t : Finset G, ∃ S : Set G, (∀ h ∈ H, ∀ g, h * g ∈ S ↔ g ∈ S) ∧
-      (∀ u ∈ U, ∀ g, g * u ∈ S ↔ g ∈ S) ∧
-      (∃ K₀ : Subgroup G, IsOpen (K₀ : Set G) ∧ ∀ k ∈ K₀, ∀ g, g * k ∈ S ↔ g ∈ S) ∧
-      (∀ c ∈ t, ∀ k ∈ K c, c * k ∈ S) ∧
-      ∃ z ∈ twKer (cInd H σ) U 1, ∀ g, z.1.1.1 g = S.indicator f.1.1.1 g := by
+  have key
+      : ∀ t : Finset G, ∃ S : Set G,
+        (∀ h ∈ H, ∀ g, h * g ∈ S ↔ g ∈ S) ∧ (∀ u ∈ U, ∀ g, g * u ∈ S ↔ g ∈ S)
+          ∧ (∃ K₀ : Subgroup G, IsOpen (K₀ : Set G) ∧ ∀ k ∈ K₀, ∀ g, g * k ∈ S ↔ g ∈ S)
+          ∧ (∀ c ∈ t, ∀ k ∈ K c, c * k ∈ S)
+          ∧ ∃ z ∈ twKer (cInd H σ) U 1, ∀ g, z.1.1.1 g = S.indicator f.1.1.1 g := by
     intro t
     induction t using Finset.induction_on with
     | empty =>
-      exact ⟨∅, by simp, by simp, ⟨⊤, by simp, by simp⟩, by simp, 0, Submodule.zero_mem _,
-        fun g => by simp⟩
+      exact ⟨
+        ∅,
+        by simp,
+        by simp,
+        ⟨⊤, by simp, by simp⟩,
+        by simp,
+        0,
+        Submodule.zero_mem _,
+        fun g => by simp
+      ⟩
     | insert c t _ ih =>
       obtain ⟨S, hl, hu, ⟨K₀, hK₀, hr⟩, hcov, z, hz, ez⟩ := ih
       obtain ⟨z', hz', ez'⟩ := cut_mem H U hbasis σ S hl K₀ hK₀ hr hu (y c) (hyY c)
-      refine ⟨S ∪ dc H (K c) c, fun h hh g => ?_, fun u hu' g => ?_,
+      refine ⟨
+        S ∪ dc H (K c) c,
+        fun h hh g => ?_,
+        fun u hu' g => ?_,
         ⟨K₀ ⊓ K c, by rw [Subgroup.coe_inf]; exact hK₀.inter (hKo c), fun k hk g => ?_⟩,
-        fun c' hc' k hk => ?_, z + y c - z',
-        Submodule.sub_mem _ (Submodule.add_mem _ hz (hyY c)) hz', fun g => ?_⟩
+        fun c' hc' k hk => ?_,
+        z + y c - z',
+        Submodule.sub_mem _ (Submodule.add_mem _ hz (hyY c)) hz',
+        fun g => ?_
+      ⟩
       · simp only [Set.mem_union, hl h hh g, dc_left H (K c) c h hh g]
       · simp only [Set.mem_union, hu u hu' g, dc_unip H U (K c) hUH c u hu' g]
       · simp only [Set.mem_union, hr k hk.1 g, dc_right H (K c) c k hk.2 g]
@@ -282,15 +338,16 @@ theorem mem_twKer_cInd : ∀ {G W : Type} [Group G] [TopologicalSpace G] [IsTopo
       · have e : (z + y c - z').1.1.1 g = z.1.1.1 g + (y c).1.1.1 g - z'.1.1.1 g := rfl
         have hyc : (y c).1.1.1 = (dc H (K c) c).indicator f.1.1.1 := funext (hy c)
         rw [e, ez, ez', hyc]
-        by_cases h1 : g ∈ S <;> by_cases h2 : g ∈ dc H (K c) c <;>
-          simp [Set.indicator, h1, h2]
+        by_cases h1 : g ∈ S <;> by_cases h2 : g ∈ dc H (K c) c <;> simp [Set.indicator, h1, h2]
   obtain ⟨C, hC, hsupp⟩ := f.2
-  obtain ⟨t, -, ht⟩ := hC.elim_nhds_subcover (fun c => (fun x => c * x) '' (K c : Set G))
-    (fun c _ => by
-      have : (fun x => c⁻¹ * x) ⁻¹' (K c : Set G) ∈ 𝓝 c :=
-        ((hKo c).preimage (continuous_const.mul continuous_id)).mem_nhds (by simp [one_mem])
-      filter_upwards [this] with x hx
-      exact ⟨c⁻¹ * x, hx, by group⟩)
+  obtain ⟨t, -, ht⟩ :=
+    hC.elim_nhds_subcover
+      (fun c => (fun x => c * x) '' (K c : Set G))
+      (fun c _ => by
+        have : (fun x => c⁻¹ * x) ⁻¹' (K c : Set G) ∈ 𝓝 c :=
+          ((hKo c).preimage (continuous_const.mul continuous_id)).mem_nhds (by simp [one_mem])
+        filter_upwards [this] with x hx
+        exact ⟨c⁻¹ * x, hx, by group⟩)
   obtain ⟨S, hl, -, -, hcov, z, hz, ez⟩ := key t
   have hfz : f = z := by
     refine Subtype.ext (Subtype.ext (Subtype.ext (funext fun g => ?_)))

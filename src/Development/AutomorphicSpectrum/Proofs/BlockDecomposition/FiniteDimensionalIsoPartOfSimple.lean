@@ -12,20 +12,27 @@ namespace GlobalTheory.CompanionTheory.AdmGL
 
 variable {K : Type} [Group K] {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
-def isoPart (π : K →* (H →L[ℂ] H)) {W : Type} [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ K W) :
-    Submodule ℂ H :=
+def isoPart
+    (π : K →* (H →L[ℂ] H)) {W : Type} [AddCommGroup W] [Module ℂ W] (ρ : Representation ℂ K W)
+    : Submodule ℂ H :=
   ⨆ (T : W →ₗ[ℂ] H) (_ : ∀ k w, T (ρ k w) = π k (T w)), LinearMap.range T
 
-theorem range_le_isoPart (π : K →* (H →L[ℂ] H)) {W : Type} [AddCommGroup W] [Module ℂ W]
-    (ρ : Representation ℂ K W) {T : W →ₗ[ℂ] H} (hT : ∀ k w, T (ρ k w) = π k (T w)) :
-    LinearMap.range T ≤ isoPart π ρ := by
+theorem range_le_isoPart
+    (π : K →* (H →L[ℂ] H))
+    {W : Type} [AddCommGroup W] [Module ℂ W]
+    (ρ : Representation ℂ K W)
+    {T : W →ₗ[ℂ] H} (hT : ∀ k w, T (ρ k w) = π k (T w))
+    : LinearMap.range T ≤ isoPart π ρ := by
   unfold isoPart
-  exact le_iSup₂_of_le (f := fun (T : W →ₗ[ℂ] H) (_ : ∀ k w, T (ρ k w) = π k (T w)) => LinearMap.range T)
+  exact le_iSup₂_of_le
+    (f := fun (T : W →ₗ[ℂ] H) (_ : ∀ k w, T (ρ k w) = π k (T w)) => LinearMap.range T)
     T hT le_rfl
 
-theorem starProjection_comm {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v‖ = ‖v‖) (R : Submodule ℂ H)
-    [FiniteDimensional ℂ R] (hR : ∀ k, ∀ w ∈ R, π k w ∈ R) (k : K) (x : H) :
-    R.starProjection (π k x) = π k (R.starProjection x) := by
+theorem starProjection_comm
+    {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v‖ = ‖v‖)
+    (R : Submodule ℂ H) [FiniteDimensional ℂ R]
+    (hR : ∀ k, ∀ w ∈ R, π k w ∈ R) (k : K) (x : H)
+    : R.starProjection (π k x) = π k (R.starProjection x) := by
   have hinner : ∀ u v, ⟪π k u, π k v⟫_ℂ = ⟪u, v⟫_ℂ := fun u v =>
     (⟨(π k : H →ₗ[ℂ] H), hπ k⟩ : H →ₗᵢ[ℂ] H).inner_map_map u v
   have hsurj : ∀ w ∈ R, ∃ w' ∈ R, π k w' = w := by
@@ -42,10 +49,11 @@ theorem starProjection_comm {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π 
 
 variable [CompleteSpace H]
 
-theorem isoPart_le_sup {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v‖ = ‖v‖) {W : Type} [AddCommGroup W]
-    [Module ℂ W] [FiniteDimensional ℂ W] (ρ : Representation ℂ K W) (W' : Submodule ℂ W)
-    (hW : ∀ k, W' ≤ W'.comap (ρ k)) :
-    isoPart π ρ ≤ isoPart π (ρ.subrepresentation W' hW) ⊔ isoPart π (ρ.quotient W' hW) := by
+theorem isoPart_le_sup
+    {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v‖ = ‖v‖)
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (ρ : Representation ℂ K W) (W' : Submodule ℂ W) (hW : ∀ k, W' ≤ W'.comap (ρ k))
+    : isoPart π ρ ≤ isoPart π (ρ.subrepresentation W' hW) ⊔ isoPart π (ρ.quotient W' hW) := by
   refine iSup₂_le fun T hT => ?_
   let R : Submodule ℂ H := W'.map T
   have hRinv : ∀ k, ∀ w ∈ R, π k w ∈ R := by
@@ -71,22 +79,27 @@ theorem isoPart_le_sup {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v�
   have hQ : ∀ k w, Q (ρ.quotient W' hW k w) = π k (Q w) := by
     intro k w
     induction w using Submodule.Quotient.induction_on with
-    | H v =>
-      rw [Representation.quotient_apply, Submodule.mapQ_apply, hQmk, hQmk, hT, hP, map_sub]
+    | H v => rw [Representation.quotient_apply, Submodule.mapQ_apply, hQmk, hQmk, hT, hP, map_sub]
   have h2 := range_le_isoPart π (ρ.quotient W' hW) hQ
   rintro _ ⟨v, rfl⟩
   rw [show T v = R.starProjection (T v) + (T v - R.starProjection (T v)) by abel]
   exact Submodule.add_mem_sup (h1 (hRle (R.starProjection_apply_mem (T v))))
     (h2 ⟨Submodule.Quotient.mk v, hQmk v⟩)
 
-theorem finiteDimensional_isoPart_of_simple {π : K →* (H →L[ℂ] H)}
-    (hadm : ∀ S : Submodule ℂ H, FiniteDimensional ℂ S → (∀ k, ∀ w ∈ S, π k w ∈ S) →
-      (∀ S' : Submodule ℂ H, S' ≤ S → (∀ k, ∀ w ∈ S', π k w ∈ S') → S' = ⊥ ∨ S' = S) →
-      FiniteDimensional ℂ (sSup {S' | ∃ T : H →ₗ[ℂ] H, S' = S.map T ∧
-        ∀ k, ∀ w ∈ S, T (π k w) = π k (T w)} : Submodule ℂ H))
-    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] (ρ : Representation ℂ K W)
-    (hs : ∀ W' : Submodule ℂ W, (∀ k, W' ≤ W'.comap (ρ k)) → W' = ⊥ ∨ W' = ⊤) :
-    FiniteDimensional ℂ (isoPart π ρ) := by
+theorem finiteDimensional_isoPart_of_simple
+    {π : K →* (H →L[ℂ] H)}
+    (hadm : ∀ S : Submodule ℂ H,
+      FiniteDimensional ℂ S → (∀ k, ∀ w ∈ S, π k w ∈ S)
+        → (∀ S' : Submodule ℂ H, S' ≤ S → (∀ k, ∀ w ∈ S', π k w ∈ S') → S' = ⊥ ∨ S' = S)
+        → FiniteDimensional ℂ
+          (sSup
+              {S' | ∃ T : H →ₗ[ℂ] H, S' = S.map T ∧
+                ∀ k, ∀ w ∈ S, T (π k w) = π k (T w)}
+            : Submodule ℂ H))
+    {W : Type} [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+    (ρ : Representation ℂ K W)
+    (hs : ∀ W' : Submodule ℂ W, (∀ k, W' ≤ W'.comap (ρ k)) → W' = ⊥ ∨ W' = ⊤)
+    : FiniteDimensional ℂ (isoPart π ρ) := by
   classical
   by_cases h0 : ∀ T : W →ₗ[ℂ] H, (∀ k w, T (ρ k w) = π k (T w)) → T = 0
   · have hbot : isoPart π ρ = ⊥ := by
@@ -99,8 +112,9 @@ theorem finiteDimensional_isoPart_of_simple {π : K →* (H →L[ℂ] H)}
   have hinj : Function.Injective T₀ := by
     rw [← LinearMap.ker_eq_bot]
     rcases hs (LinearMap.ker T₀) (fun k v hv => by
-      simp only [Submodule.mem_comap, LinearMap.mem_ker] at hv ⊢
-      rw [hT₀, hv, map_zero]) with h | h
+        simp only [Submodule.mem_comap, LinearMap.mem_ker] at hv ⊢
+        rw [hT₀, hv, map_zero])
+      with h | h
     · exact h
     · exact absurd (LinearMap.ker_eq_top.1 h) hne
   let S : Submodule ℂ H := LinearMap.range T₀
@@ -110,9 +124,10 @@ theorem finiteDimensional_isoPart_of_simple {π : K →* (H →L[ℂ] H)}
   have hSirr : ∀ S' : Submodule ℂ H, S' ≤ S → (∀ k, ∀ w ∈ S', π k w ∈ S') → S' = ⊥ ∨ S' = S := by
     intro S' hle hinv
     rcases hs (S'.comap T₀) (fun k v hv => by
-      simp only [Submodule.mem_comap] at hv ⊢
-      rw [hT₀]
-      exact hinv k _ hv) with h | h
+        simp only [Submodule.mem_comap] at hv ⊢
+        rw [hT₀]
+        exact hinv k _ hv)
+      with h | h
     · left
       rw [eq_bot_iff]
       intro w hw
@@ -144,29 +159,35 @@ theorem finiteDimensional_isoPart_of_simple {π : K →* (H →L[ℂ] H)}
   · rintro k _ ⟨v, rfl⟩
     rw [← hT₀, hT', hT', hT]
 
-theorem finiteDimensional_isoPart {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v‖ = ‖v‖)
-    (hadm : ∀ S : Submodule ℂ H, FiniteDimensional ℂ S → (∀ k, ∀ w ∈ S, π k w ∈ S) →
-      (∀ S' : Submodule ℂ H, S' ≤ S → (∀ k, ∀ w ∈ S', π k w ∈ S') → S' = ⊥ ∨ S' = S) →
-      FiniteDimensional ℂ (sSup {S' | ∃ T : H →ₗ[ℂ] H, S' = S.map T ∧
-        ∀ k, ∀ w ∈ S, T (π k w) = π k (T w)} : Submodule ℂ H))
-    (d : ℕ) : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] (ρ : Representation ℂ K W),
+theorem finiteDimensional_isoPart
+    {π : K →* (H →L[ℂ] H)} (hπ : ∀ k v, ‖π k v‖ = ‖v‖)
+    (hadm : ∀ S : Submodule ℂ H,
+      FiniteDimensional ℂ S → (∀ k, ∀ w ∈ S, π k w ∈ S)
+        → (∀ S' : Submodule ℂ H, S' ≤ S → (∀ k, ∀ w ∈ S', π k w ∈ S') → S' = ⊥ ∨ S' = S)
+        → FiniteDimensional ℂ
+          (sSup
+              {S' | ∃ T : H →ₗ[ℂ] H, S' = S.map T ∧
+                ∀ k, ∀ w ∈ S, T (π k w) = π k (T w)}
+            : Submodule ℂ H))
+    (d : ℕ)
+    : ∀ (W : Type) [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] (ρ : Representation ℂ K W),
       Module.finrank ℂ W = d → FiniteDimensional ℂ (isoPart π ρ) := by
   induction d using Nat.strong_induction_on with
   | _ d ih =>
-  intro W _ _ _ ρ hd
-  by_cases hs : ∀ W' : Submodule ℂ W, (∀ k, W' ≤ W'.comap (ρ k)) → W' = ⊥ ∨ W' = ⊤
-  · exact finiteDimensional_isoPart_of_simple hadm ρ hs
-  push Not at hs
-  obtain ⟨W', hW, hbot, htop⟩ := hs
-  have h1 : Module.finrank ℂ W' < d := hd ▸ Submodule.finrank_lt htop
-  have h2 : Module.finrank ℂ (W ⧸ W') < d := by
-    have hsum := Submodule.finrank_quotient_add_finrank W'
-    have hpos : 0 < Module.finrank ℂ W' :=
-      Nat.pos_of_ne_zero fun h => hbot (Submodule.finrank_eq_zero.1 h)
-    omega
-  have := ih _ h1 W' (ρ.subrepresentation W' hW) rfl
-  have := ih _ h2 (W ⧸ W') (ρ.quotient W' hW) rfl
-  exact Submodule.finiteDimensional_of_le (isoPart_le_sup hπ ρ W' hW)
+    intro W _ _ _ ρ hd
+    by_cases hs : ∀ W' : Submodule ℂ W, (∀ k, W' ≤ W'.comap (ρ k)) → W' = ⊥ ∨ W' = ⊤
+    · exact finiteDimensional_isoPart_of_simple hadm ρ hs
+    push Not at hs
+    obtain ⟨W', hW, hbot, htop⟩ := hs
+    have h1 : Module.finrank ℂ W' < d := hd ▸ Submodule.finrank_lt htop
+    have h2 : Module.finrank ℂ (W ⧸ W') < d := by
+      have hsum := Submodule.finrank_quotient_add_finrank W'
+      have hpos : 0 < Module.finrank ℂ W' :=
+        Nat.pos_of_ne_zero fun h => hbot (Submodule.finrank_eq_zero.1 h)
+      omega
+    have := ih _ h1 W' (ρ.subrepresentation W' hW) rfl
+    have := ih _ h2 (W ⧸ W') (ρ.quotient W' hW) rfl
+    exact Submodule.finiteDimensional_of_le (isoPart_le_sup hπ ρ W' hW)
 
 end GlobalTheory.CompanionTheory.AdmGL
 

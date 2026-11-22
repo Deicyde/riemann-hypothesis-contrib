@@ -5,17 +5,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 @[expose] public section
 
-private theorem UpperTheory.Reformulated.B.LevelOfCongruence.level {C R T : Type} [CommRing C] [CommRing R] [CommRing T]
+private theorem UpperTheory.Reformulated.B.LevelOfCongruence.level
+    {C R T : Type} [CommRing C] [CommRing R] [CommRing T]
     (a : C →+* R) (f : C →+* T) (M : Ideal R) (K : Ideal T)
-    (hd : ∀ r : R, ∃ c, r - a c ∈ M) (hk : ∀ c, a c ∈ M → f c ∈ K) :
-    ∃ g : R →+* T ⧸ K, ∀ r c, r - a c ∈ M → g r = Ideal.Quotient.mk K (f c) := by
+    (hd : ∀ r : R, ∃ c, r - a c ∈ M) (hk : ∀ c, a c ∈ M → f c ∈ K)
+    : ∃ g : R →+* T ⧸ K, ∀ r c, r - a c ∈ M → g r = Ideal.Quotient.mk K (f c) := by
   have hs : Function.Surjective ((Ideal.Quotient.mk M).comp a) := by
     intro y
     obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective y
     obtain ⟨c, hc⟩ := hd r
     exact ⟨c, (Ideal.Quotient.eq.2 hc).symm⟩
-  have hker : RingHom.ker ((Ideal.Quotient.mk M).comp a) ≤
-      RingHom.ker ((Ideal.Quotient.mk K).comp f) := by
+  have hker
+      : RingHom.ker ((Ideal.Quotient.mk M).comp a)
+        ≤ RingHom.ker ((Ideal.Quotient.mk K).comp f) := by
     intro c hc
     rw [RingHom.mem_ker, RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem] at hc ⊢
     exact hk c hc
@@ -24,12 +26,15 @@ private theorem UpperTheory.Reformulated.B.LevelOfCongruence.level {C R T : Type
   rw [RingHom.comp_apply, Ideal.Quotient.eq.2 hc]
   exact RingHom.liftOfSurjective_comp_apply _ hs ⟨_, hker⟩ c
 
-theorem UpperTheory.Reformulated.B.LevelOfCongruence.cu_ex :
-    ∀ {C R : Type} [inst : CommRing C] [inst_1 : CommRing R] [inst_2 : Algebra C R] [inst_3 : IsLocalRing R] {x : Ideal C},
-      UpperTheory.V.CA.IsCplAt x R →
-        ∀ {T : Type} [inst_4 : CommRing T] (J : Ideal T) [IsAdicComplete J T] (f : C →+* T),
-          x ≤ Ideal.comap f J →
-            ∃ (F : R →+* T), F.comp (Algebra.algebraMap C R) = f ∧ IsLocalRing.maximalIdeal R ≤ Ideal.comap F J := by
+theorem UpperTheory.Reformulated.B.LevelOfCongruence.cu_ex
+    : ∀ {C R : Type} [inst : CommRing C] [inst_1 : CommRing R] [inst_2 : Algebra C R]
+        [inst_3 : IsLocalRing R] {x : Ideal C},
+      UpperTheory.V.CA.IsCplAt x R
+        → ∀ {T : Type} [inst_4 : CommRing T] (J : Ideal T) [IsAdicComplete J T] (f : C →+* T),
+          x ≤ Ideal.comap f J
+            → ∃ (F : R →+* T),
+              F.comp (Algebra.algebraMap C R) = f
+                ∧ IsLocalRing.maximalIdeal R ≤ Ideal.comap F J := by
   intro C R _ _ _ _ x h T _ J _ f hx
   have hk : ∀ (n : ℕ) (c : C), algebraMap C R c ∈ IsLocalRing.maximalIdeal R ^ n → f c ∈ J ^ n := by
     intro n c hc
@@ -53,6 +58,6 @@ theorem UpperTheory.Reformulated.B.LevelOfCongruence.cu_ex :
     exact hg n _ c (by simp)
   · intro r hr
     have h0 := IsAdicComplete.mk_liftRingHom J g hc 1 r
-    rw [hg 1 r 0 (by simpa using hr), map_zero, map_zero, Ideal.Quotient.eq_zero_iff_mem,
-      pow_one] at h0
+    rw [hg 1 r 0 (by simpa using hr), map_zero, map_zero, Ideal.Quotient.eq_zero_iff_mem, pow_one]
+      at h0
     exact h0

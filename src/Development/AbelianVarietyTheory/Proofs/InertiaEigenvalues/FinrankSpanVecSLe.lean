@@ -8,7 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Potenti
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass Formalism.MainNotions.PairedCharacterCondition GlobalTheory.Pass.LocDual GlobalTheory.Pass.LocDual.OneX
+open Formalism Formalism.MainNotions Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Module GlobalTheory.Pass
+  Formalism.MainNotions.PairedCharacterCondition GlobalTheory.Pass.LocDual
+  GlobalTheory.Pass.LocDual.OneX
 
 noncomputable section
 
@@ -24,11 +28,12 @@ def vecS : (Fin a → Fin n → K) →ₛₗ[φ] (Fin a → Fin n → L) where
 
 variable {φ a n}
 
-theorem vecS_apply (v : Fin a → Fin n → K) (b : Fin a) (j : Fin n) : vecS φ a n v b j = φ (v b j) := rfl
+theorem vecS_apply (v : Fin a → Fin n → K) (b : Fin a) (j : Fin n) : vecS φ a n v b j = φ (v b j) :=
+  rfl
 
-theorem span_vecS_span (S : Set (Fin a → Fin n → K)) :
-    Submodule.span L (vecS φ a n '' (Submodule.span K S : Set (Fin a → Fin n → K))) =
-      Submodule.span L (vecS φ a n '' S) := by
+theorem span_vecS_span (S : Set (Fin a → Fin n → K))
+    : Submodule.span L (vecS φ a n '' (Submodule.span K S : Set (Fin a → Fin n → K)))
+      = Submodule.span L (vecS φ a n '' S) := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨v, hv, rfl⟩
@@ -39,11 +44,13 @@ theorem span_vecS_span (S : Set (Fin a → Fin n → K)) :
     | smul c x _ hx => rw [map_smulₛₗ]; exact Submodule.smul_mem _ _ hx
   · exact Submodule.span_mono (Set.image_mono Submodule.subset_span)
 
-theorem finrank_span_vecS_le (W : Submodule K (Fin a → Fin n → K)) :
-    finrank L (Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K)))) ≤ finrank K W := by
+theorem finrank_span_vecS_le (W : Submodule K (Fin a → Fin n → K))
+    : finrank L (Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K)))) ≤ finrank K W := by
   let b := Module.finBasis K W
   let g : Fin (Module.finrank K W) → (Fin a → Fin n → L) := fun i => vecS φ a n (b i)
-  have hle : Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K))) ≤ Submodule.span L (Set.range g) := by
+  have hle
+      : Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K)))
+        ≤ Submodule.span L (Set.range g) := by
     rw [Submodule.span_le]
     rintro _ ⟨w, hw, rfl⟩
     have h : w = ∑ i, b.repr ⟨w, hw⟩ i • (b i : Fin a → Fin n → K) := by
@@ -65,17 +72,18 @@ theorem finrank_span_vecS_le (W : Submodule K (Fin a → Fin n → K)) :
 theorem span_vecS_top : Submodule.span L (Set.range (vecS φ a n)) = ⊤ := by
   rw [eq_top_iff]
   intro u _
-  have e : u = ∑ b, ∑ j, u b j • vecS φ a n (fun b'' j'' => if b'' = b ∧ j'' = j then 1 else 0) := by
+  have e
+      : u = ∑ b, ∑ j, u b j • vecS φ a n (fun b'' j'' => if b'' = b ∧ j'' = j then 1 else 0) := by
     funext b' j'
-    simp only [Finset.sum_apply, Pi.smul_apply, vecS_apply, smul_eq_mul, apply_ite φ, map_one, map_zero, mul_ite,
-      mul_one, mul_zero, ite_and]
+    simp only [Finset.sum_apply, Pi.smul_apply, vecS_apply, smul_eq_mul, apply_ite φ, map_one,
+      map_zero, mul_ite, mul_one, mul_zero, ite_and]
     simp [Finset.sum_ite_eq]
   rw [e]
-  exact Submodule.sum_mem _ fun b _ => Submodule.sum_mem _ fun j _ =>
-    Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
+  exact Submodule.sum_mem _ fun b _ =>
+    Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨_, rfl⟩)
 
-theorem isCompl_span_vecS {W W' : Submodule K (Fin a → Fin n → K)} (h : IsCompl W W') :
-    IsCompl (Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K))))
+theorem isCompl_span_vecS {W W' : Submodule K (Fin a → Fin n → K)} (h : IsCompl W W')
+    : IsCompl (Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K))))
       (Submodule.span L (vecS φ a n '' (W' : Set (Fin a → Fin n → K)))) := by
   set A := Submodule.span L (vecS φ a n '' (W : Set (Fin a → Fin n → K)))
   set B := Submodule.span L (vecS φ a n '' (W' : Set (Fin a → Fin n → K)))
@@ -92,38 +100,51 @@ theorem isCompl_span_vecS {W W' : Submodule K (Fin a → Fin n → K)} (h : IsCo
   have h3 := Submodule.finrank_add_eq_of_isCompl h
   have h4 := Submodule.finrank_sup_add_finrank_inf_eq A B
   rw [hsup, finrank_top] at h4
-  have hK : finrank K (Fin a → Fin n → K) = a * n := by
-    rw [Module.finrank_pi_fintype]; simp
-  have hL : finrank L (Fin a → Fin n → L) = a * n := by
-    rw [Module.finrank_pi_fintype]; simp
-  have hinf : A ⊓ B = ⊥ := by
-    rw [← Submodule.finrank_eq_zero]; omega
+  have hK : finrank K (Fin a → Fin n → K) = a * n := by rw [Module.finrank_pi_fintype]; simp
+  have hL : finrank L (Fin a → Fin n → L) = a * n := by rw [Module.finrank_pi_fintype]; simp
+  have hinf : A ⊓ B = ⊥ := by rw [← Submodule.finrank_eq_zero]; omega
   exact ⟨disjoint_iff.2 hinf, codisjoint_iff.2 hsup⟩
 
 end VecGen
 
-
 set_option maxHeartbeats 1000000 in
 set_option synthInstance.maxHeartbeats 400000 in
-theorem isSummandTw_XG : ∀ (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
-    (hw : w ∈ placesOver D.host.E (D.nd.l i)) (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)))
-    (Xs : Set (D.nd.X i)) (hr : GoodR D.nd i r) {a : ℕ} (x : Fin a → ↥Xs)
-    (Y : Submodule (D.nd.O i) (Fin a → Fin D.R.nV → KK D.nd i))
-    (hst : ∀ γ : GE D.nd, ∀ y ∈ Y, actK i r Xs x γ y ∈ Y),
-    (∃ C : Submodule (KK D.nd i) (Fin a → Fin D.R.nV → KK D.nd i),
-    (∀ γ : GE D.nd, ∀ v ∈ C, actK i r Xs x γ v ∈ C) ∧
-    IsCompl (Submodule.span (KK D.nd i) (Y : Set (Fin a → Fin D.R.nV → KK D.nd i))) C) →
-    IsSummandTw i w hw r Xs (XG i w hw r Xs hr x Y hst) := by
+theorem isSummandTw_XG
+    : ∀ (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
+        (hw : w ∈ placesOver D.host.E (D.nd.l i))
+        (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))) (Xs : Set (D.nd.X i))
+        (hr : GoodR D.nd i r) {a : ℕ} (x : Fin a → ↥Xs)
+        (Y : Submodule (D.nd.O i) (Fin a → Fin D.R.nV → KK D.nd i))
+        (hst : ∀ γ : GE D.nd, ∀ y ∈ Y, actK i r Xs x γ y ∈ Y),
+      (∃ C : Submodule (KK D.nd i) (Fin a → Fin D.R.nV → KK D.nd i),
+          (∀ γ : GE D.nd, ∀ v ∈ C, actK i r Xs x γ v ∈ C)
+            ∧ IsCompl (Submodule.span (KK D.nd i) (Y : Set (Fin a → Fin D.R.nV → KK D.nd i))) C)
+        → IsSummandTw i w hw r Xs (XG i w hw r Xs hr x Y hst) := by
   intro D i w hw r Xs hr a x Y hst ⟨C, hC, hYC⟩
-  have hspan : spanL i w hw Y = Submodule.span _ (vecS (Br.toLLK (D.nbr i w hw)) a D.R.nV ''
-      (Submodule.span (KK D.nd i) (Y : Set (Fin a → Fin D.R.nV → KK D.nd i)) : Set (Fin a → Fin D.R.nV → KK D.nd i))) := by
+  have hspan
+      : spanL i w hw Y
+        = Submodule.span _
+          (vecS (Br.toLLK (D.nbr i w hw)) a D.R.nV
+            '' (Submodule.span (KK D.nd i) (Y : Set (Fin a → Fin D.R.nV → KK D.nd i))
+              : Set (Fin a → Fin D.R.nV → KK D.nd i))) := by
     rw [span_vecS_span]; rfl
-  refine ⟨a, x, (spanL i w hw Y).subtype, Subtype.val_injective, fun g v => rfl,
-    Submodule.span _ (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i))), ?_, ?_⟩
+  refine ⟨
+    a,
+    x,
+    (spanL i w hw Y).subtype,
+    Subtype.val_injective,
+    fun g v => rfl,
+    Submodule.span _ (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i))),
+    ?_,
+    ?_
+  ⟩
   · intro g u hu
-    have hle : Submodule.span (Br.LL D.nbr i w hw) (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i))) ≤
-        (Submodule.span (Br.LL D.nbr i w hw) (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i)))).comap
-          ((sumG i w hw r Xs hr x).ρ g) := by
+    have hle
+        : Submodule.span (Br.LL D.nbr i w hw)
+            (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i)))
+          ≤ (Submodule.span (Br.LL D.nbr i w hw)
+              (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i)))).comap
+            ((sumG i w hw r Xs hr x).ρ g) := by
       refine Submodule.span_le.2 ?_
       rintro _ ⟨v, hv, rfl⟩
       show (sumG i w hw r Xs hr x).ρ g (vecL i w hw v) ∈
@@ -132,7 +153,8 @@ theorem isSummandTw_XG : ∀ (D : D7) (i : D.nd.Loc) (w : HeightOneSpectrum (�
       exact Submodule.subset_span ⟨_, hC _ v hv, rfl⟩
     exact hle hu
   · have key : IsCompl (spanL i w hw Y)
-        (Submodule.span (Br.LL D.nbr i w hw) (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i)))) := by
+        (Submodule.span (Br.LL D.nbr i w hw)
+          (vecL i w hw '' (C : Set (Fin a → Fin D.R.nV → KK D.nd i)))) := by
       rw [hspan]
       exact isCompl_span_vecS hYC
     convert key using 1

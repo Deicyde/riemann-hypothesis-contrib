@@ -5,13 +5,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.trCompQ_of :
-    TrHl → TrComp → WtComp → TrCompQ := by
+theorem UpperTheory.Gal.TranscendenceTraces.trCompQ_of : TrHl → TrComp → WtComp → TrCompQ := by
   intro hHl hC hWC l _ n i W Z S r p _ _ w' w hr hp hl
-  have hlZ : IsUnit ((l : ℕ) : Γ(Z, ⊤)) := by
-    simpa using hl.map p.appTop.hom
+  have hlZ : IsUnit ((l : ℕ) : Γ(Z, ⊤)) := by simpa using hl.map p.appTop.hom
   have hcomp : trHl l (r ≫ p) (Wt.mul r w' w) n i = trHl l p w n i ∘ₗ trHl l r w' n i := by
     apply LinearMap.ext
     intro x

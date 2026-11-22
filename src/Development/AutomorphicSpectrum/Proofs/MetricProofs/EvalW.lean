@@ -25,7 +25,8 @@ def lin4 (n : Fin 3 → ℝ) : MvPolynomial (Option (Fin 3)) ℝ := rename some 
 def rowW (u : Fin 2 → ℝ) (v : ℝ) : MvPolynomial (Option (Fin 2)) ℝ :=
   C (u 0) * X (some 0) + C (u 1) * X (some 1) + C v * X none
 
-def evalW (n₀ n₁ : Fin 3 → ℝ) : MvPolynomial (Option (Fin 2)) ℝ →ₐ[ℝ] MvPolynomial (Option (Fin 3)) ℝ :=
+def evalW (n₀ n₁ : Fin 3 → ℝ)
+    : MvPolynomial (Option (Fin 2)) ℝ →ₐ[ℝ] MvPolynomial (Option (Fin 3)) ℝ :=
   aeval fun j => Option.elim j (X none) ![lin4 n₀, lin4 n₁]
 
 end

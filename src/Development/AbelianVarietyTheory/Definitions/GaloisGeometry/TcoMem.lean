@@ -13,7 +13,9 @@ open KaehlerDifferential GlobalTheory.CechDR
 
 namespace GlobalTheory.PD
 
-variable (k K : Type) [Field k] [Field K] [Algebra k K] {F : Type} [Field F] [Algebra k F] [Algebra F K] [IsScalarTower k F K]
+variable
+  (k K : Type) [Field k] [Field K] [Algebra k K]
+  {F : Type} [Field F] [Algebra k F] [Algebra F K] [IsScalarTower k F K]
   {d : ℕ} (x : Fin (d + 1) → F)
 
 theorem tco_mem (j : Fin d) : algebraMap F K (x j.succ / x 0) ∈ rB k K x {0} := by
@@ -26,6 +28,7 @@ theorem tco_mem (j : Fin d) : algebraMap F K (x j.succ / x 0) ∈ rB k K x {0} :
 
 def fib : Type := {e : rB k K x {0} →ₐ[k] k // ∀ j, e ⟨_, tco_mem k K x j⟩ = 0}
 
-def locCoch (h : K) : Finset (Fin (d + 1)) → DR k K := fun s => if s = Finset.univ then h • vol0 k K x else 0
+def locCoch (h : K) : Finset (Fin (d + 1)) → DR k K := fun s =>
+  if s = Finset.univ then h • vol0 k K x else 0
 
 end GlobalTheory.PD

@@ -7,23 +7,30 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Abe
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory CartesianMonoidalCategory MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR GlobalTheory.AbCoh
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry KaehlerDifferential MonoidalCategory
+  CartesianMonoidalCategory MonObj TensorProduct
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR GlobalTheory.AbCoh
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
 
 namespace GlobalTheory.AbCoh
 
-theorem ofForm_injective_of_H0Const (R : Type) [CommRing R] (C : Type) [Category.{0} C]
-    (F : C ⥤ CommAlgCat.{0} R) (hF : CohomZeroIsConstants F) : Function.Injective (ofForm F) := by
+theorem ofForm_injective_of_H0Const
+    (R : Type) [CommRing R]
+    (C : Type) [Category.{0} C]
+    (F : C ⥤ CommAlgCat.{0} R) (hF : CohomZeroIsConstants F)
+    : Function.Injective (ofForm F) := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro ω hω
   obtain ⟨g, hg, hD⟩ := (ofForm_eq_zero (F := F)).1 hω
   have h0 : d0 F g = 0 := by
     funext T T' φ
     have e : d0 F g T T' φ = g T' - mp F φ (g T) := rfl
-    rw [e, ← hg φ, sub_self]; rfl
+    rw [e, ← hg φ, sub_self]
+    rfl
   obtain ⟨r, hr, -⟩ := hF g h0
   refine Subtype.ext (Subtype.ext (funext fun T ↦ ?_))
   rw [← hD T, hr T]

@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GoodT
 
 noncomputable section
 namespace GlobalTheory.MemN
-open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
+open Formalism.BasicNotions GlobalTheory.Mem GlobalTheory.MemN NumberField IsDedekindDomain
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
 
 theorem shaOK_shaTrue (B : Pre) : ShaOK B (GaloisStage.shaTrue B.host) := by
   refine ⟨fun p _ => GaloisStage.lData B.host p, ?_⟩

@@ -14,9 +14,12 @@ section Lin
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-theorem exists_common_eigenvector (h : ι → ℕ) (hinj : Function.Injective h) (W : Submodule ℂ (ι → ℂ))
-    (hW : W ≠ ⊥) : ∃ w₀ ∈ W, w₀ ≠ 0 ∧ ∀ A : Matrix ι ι ℂ, A.BlockTriangular h → (∀ w ∈ W, A *ᵥ w ∈ W) →
-      ∃ c : ℂ, A *ᵥ w₀ = c • w₀ := by
+theorem exists_common_eigenvector
+    (h : ι → ℕ) (hinj : Function.Injective h) (W : Submodule ℂ (ι → ℂ)) (hW : W ≠ ⊥)
+    : ∃ w₀ ∈ W,
+      w₀ ≠ 0
+        ∧ ∀ A : Matrix ι ι ℂ,
+          A.BlockTriangular h → (∀ w ∈ W, A *ᵥ w ∈ W) → ∃ c : ℂ, A *ᵥ w₀ = c • w₀ := by
   classical
   have hex : ∃ n : ℕ, ∃ w ∈ W, w ≠ 0 ∧ ∀ i, n ≤ h i → w i = 0 := by
     obtain ⟨w, hw, hw0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hW
@@ -93,14 +96,18 @@ theorem perp_ne_bot (T : Submodule ℂ (ι → ℂ)) (hT : T ≠ ⊤) : perp T �
 
 omit [DecidableEq ι] in
 open ComplexOrder in
-theorem eq_zero_of_mem_perp {T : Submodule ℂ (ι → ℂ)} {y : ι → ℂ} (h1 : y ∈ T) (h2 : y ∈ perp T) : y = 0 :=
+theorem eq_zero_of_mem_perp {T : Submodule ℂ (ι → ℂ)} {y : ι → ℂ} (h1 : y ∈ T) (h2 : y ∈ perp T)
+    : y = 0 :=
   dotProduct_star_self_eq_zero.1 (h2 y h1)
 
-theorem eq_top_of_minimal {G : Type} (A : G → Matrix ι ι ℂ) (hadj : ∀ g, ∃ g', A g' = (A g)ᴴ)
+theorem eq_top_of_minimal
+    {G : Type} (A : G → Matrix ι ι ℂ) (hadj : ∀ g, ∃ g', A g' = (A g)ᴴ)
     (N : Submodule ℂ (ι → ℂ))
-    (hN : ∀ W : Submodule ℂ (ι → ℂ), W ≠ ⊥ → (∀ g, ∀ w ∈ W, A g *ᵥ w ∈ W) →
-      (∀ U : Submodule ℂ (ι → ℂ), U ≠ ⊥ → (∀ g, ∀ w ∈ U, A g *ᵥ w ∈ U) → U ≤ W → U = W) → W ≤ N) :
-    N = ⊤ := by
+    (hN : ∀ W : Submodule ℂ (ι → ℂ),
+      W ≠ ⊥ → (∀ g, ∀ w ∈ W, A g *ᵥ w ∈ W)
+        → (∀ U : Submodule ℂ (ι → ℂ), U ≠ ⊥ → (∀ g, ∀ w ∈ U, A g *ᵥ w ∈ U) → U ≤ W → U = W)
+        → W ≤ N)
+    : N = ⊤ := by
   set T : Submodule ℂ (ι → ℂ) := sSup {W | (∀ g, ∀ w ∈ W, A g *ᵥ w ∈ W) ∧ W ≤ N} with hT
   have hTN : T ≤ N := sSup_le fun W hW => hW.2
   have hTs : ∀ g, ∀ w ∈ T, A g *ᵥ w ∈ T := by
@@ -118,11 +125,14 @@ theorem eq_top_of_minimal {G : Type} (A : G → Matrix ι ι ℂ) (hadj : ∀ g,
     exact hw _ (hTs g' x hx)
   by_contra hne
   have hTne : T ≠ ⊤ := fun e => hne (top_le_iff.1 (e ▸ hTN))
-  obtain ⟨W, ⟨hW0, hWs, hWP⟩, hmin⟩ := (wellFounded_lt (α := Submodule ℂ (ι → ℂ))).has_min
-    {W | W ≠ ⊥ ∧ (∀ g, ∀ w ∈ W, A g *ᵥ w ∈ W) ∧ W ≤ perp T} ⟨perp T, perp_ne_bot T hTne, hPs, le_rfl⟩
-  have hWN : W ≤ N := hN W hW0 hWs fun U hU0 hUs hUW => by
-    by_contra hUne
-    exact hmin U ⟨hU0, hUs, hUW.trans hWP⟩ (lt_of_le_of_ne hUW hUne)
+  obtain ⟨W, ⟨hW0, hWs, hWP⟩, hmin⟩ :=
+    (wellFounded_lt (α := Submodule ℂ (ι → ℂ))).has_min
+      {W | W ≠ ⊥ ∧ (∀ g, ∀ w ∈ W, A g *ᵥ w ∈ W) ∧ W ≤ perp T}
+      ⟨perp T, perp_ne_bot T hTne, hPs, le_rfl⟩
+  have hWN : W ≤ N :=
+    hN W hW0 hWs fun U hU0 hUs hUW => by
+      by_contra hUne
+      exact hmin U ⟨hU0, hUs, hUW.trans hWP⟩ (lt_of_le_of_ne hUW hUne)
   have hWT : W ≤ T := le_sSup ⟨hWs, hWN⟩
   apply hW0
   rw [eq_bot_iff]
@@ -130,8 +140,11 @@ theorem eq_top_of_minimal {G : Type} (A : G → Matrix ι ι ℂ) (hadj : ∀ g,
   exact eq_zero_of_mem_perp (hWT hy) (hWP hy)
 
 omit [DecidableEq ι] in
-theorem integral_mem_of_forall_mem {X : Type} [MeasurableSpace X] (μ : Measure X) (W : Submodule ℂ (ι → ℂ))
-    (f : X → ι → ℂ) (hf : Integrable f μ) (hW : ∀ x, f x ∈ W) : ∫ x, f x ∂μ ∈ W := by
+theorem integral_mem_of_forall_mem
+    {X : Type} [MeasurableSpace X]
+    (μ : Measure X) (W : Submodule ℂ (ι → ℂ)) (f : X → ι → ℂ)
+    (hf : Integrable f μ) (hW : ∀ x, f x ∈ W)
+    : ∫ x, f x ∂μ ∈ W := by
   rw [← Subspace.forall_mem_dualAnnihilator_apply_eq_zero_iff]
   intro φ hφ
   rw [Submodule.mem_dualAnnihilator] at hφ
@@ -189,13 +202,16 @@ theorem goodPI_of (hS : SmallPI) : GoodPI := by
     obtain ⟨c, hc⟩ := hφ k
     have e1 : E (ρ k *ᵥ w₀) = ∑ i, c i • θ i := by
       rw [hE, ← integral_mul_right_eq_self _ k⁻¹]
-      have : ∀ x : K, e (x * k⁻¹) • (ρ ((x * k⁻¹ : K) : G) *ᵥ (ρ k *ᵥ w₀)) =
-          ∑ i, c i • (φ i x • (ρ x *ᵥ w₀)) := by
+      have : ∀ x : K,
+          e (x * k⁻¹) • (ρ ((x * k⁻¹ : K) : G) *ᵥ (ρ k *ᵥ w₀))
+            = ∑ i, c i • (φ i x • (ρ x *ᵥ w₀)) := by
         intro x
         rw [mulVec_mulVec, ← map_mul, hc, Finset.sum_smul]
         simp [smul_smul]
       simp only [this]
-      rw [integral_finsetSum (f := fun i (x : K) => c i • (φ i x • (ρ x *ᵥ w₀))) _
+      rw [integral_finsetSum
+        (f := fun i (x : K) => c i • (φ i x • (ρ x *ᵥ w₀)))
+        _
         fun i _ => (hint i).smul (c i)]
       simp only [integral_smul, hθ]
     show E (ρ k *ᵥ w₀) ∈ Y
@@ -205,7 +221,10 @@ theorem goodPI_of (hS : SmallPI) : GoodPI := by
     have := finrank_range_le_card (R := ℂ) θ
     rwa [Fintype.card_fin] at this
   intro w hw
-  exact hS (ι → ℂ) W Y hYW E (fun w hw => hEY hw) M
-    (lt_of_le_of_lt (Nat.pow_le_pow_left hrk 2) hM) _ (fun i w hw => by simpa using hWs (g i) w hw) w hw
+  exact hS (ι → ℂ) W Y hYW E
+    (fun w hw => hEY hw)
+    M (lt_of_le_of_lt (Nat.pow_le_pow_left hrk 2) hM) _
+    (fun i w hw => by simpa using hWs (g i) w hw)
+    w hw
 
 end CompanionTheory.D.gk.admitted

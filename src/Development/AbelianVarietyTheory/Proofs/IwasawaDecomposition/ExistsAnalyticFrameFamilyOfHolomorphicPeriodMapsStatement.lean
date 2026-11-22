@@ -8,9 +8,13 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.PtEqO
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric GlobalTheory.LieBase
+open AlgebraicGeometry CategoryTheory MvPolynomial NumberField
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.Toroidal
+  GlobalTheory.ShFam GlobalTheory.ProjVar GlobalTheory.FlagBundle GlobalTheory.GoodMetric
+  GlobalTheory.LieBase
 open Classical
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
+  GlobalTheory.ChartGlue GlobalTheory.FlagBundle GlobalTheory.HermFrame
 open GlobalTheory.PointChern Filter Topology
 open scoped Matrix
 

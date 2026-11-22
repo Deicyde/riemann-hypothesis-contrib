@@ -9,8 +9,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open Polynomial UpperTheory.V.Z.Sym.Wt
 
-theorem UpperTheory.V.Z.Sym.Wt.trProd :
-    UpperTheory.V.Z.Sym.Wt.TrProd := by
+theorem UpperTheory.V.Z.Sym.Wt.trProd : UpperTheory.V.Z.Sym.Wt.TrProd := by
   classical
   intro K _ d n g
   rw [trace_blocks n (sbs g).toLinearMap (mRep d n g) (fun P => rfl)]

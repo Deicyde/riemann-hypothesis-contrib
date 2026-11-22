@@ -12,13 +12,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
+open NumberField Matrix MeasureTheory Filter Topology Formalism.L2.Host GlobalTheory.CuspRep
+  GlobalTheory.GKCoh GlobalTheory.UnitaryBC UpperTheory.V.Af UpperTheory.V.AlgRepEndIrreducible
 open UpperTheory.V.Lit UpperTheory.V.Lit.Geo UpperTheory.V.Lit.Bor UpperTheory.V.Lit.Dr
 open scoped TensorProduct GlobalTheory.CuspRep.CuspidalL2GL
 open UpperTheory.V.Cj UpperTheory.V.Cj.H
 
-theorem UpperTheory.V.Cj.H.fnProj0 :
-    UpperTheory.V.Cj.H.FnProj0 := by
+theorem UpperTheory.V.Cj.H.fnProj0 : UpperTheory.V.Cj.H.FnProj0 := by
   intro E _ _ _ a ha μ _ _ n e he c
   obtain ⟨P, Q, S, hP, hQ, hS, hres, hker, hlim⟩ := casimir_resolvent_projection E a ha μ n e he c
   obtain ⟨P', hP'⟩ := opLift E a ha μ P hP
@@ -34,8 +34,17 @@ theorem UpperTheory.V.Cj.H.fnProj0 :
     have h := (c1 φ ψ 1 (-1) (hG φ hφ).2.1 (hG ψ hψ).2.1).2
     simpa only [one_smul, neg_smul, sub_eq_add_neg] using h
   have oS := fun k => opComm E a ha μ (S k) (hS k) (S' k) (hS' k)
-  refine ⟨P', Q', S', opComm E a ha μ P hP P' hP', fun k => opComm E a ha μ (Q k) (hQ k) (Q' k) (hQ' k), oS,
-    fun k φ hφ => ?_, fun φ hφ => ?_, opLim E a ha μ Q P hQ hP hlim Q' P' hQ' hP'⟩
+  refine ⟨
+    P',
+    Q',
+    S',
+    opComm E a ha μ P hP P' hP',
+    fun k => opComm E a ha μ (Q k) (hQ k) (Q' k) (hQ' k),
+    oS,
+    fun k φ hφ => ?_,
+    fun φ hφ => ?_,
+    opLim E a ha μ Q P hQ hP hlim Q' P' hQ' hP'
+  ⟩
   · rw [hA2 (S' k) (oS k) φ hφ]
     have h1 := hQ' k φ hφ
     have h2 := hS' k _ (hA1 φ hφ)

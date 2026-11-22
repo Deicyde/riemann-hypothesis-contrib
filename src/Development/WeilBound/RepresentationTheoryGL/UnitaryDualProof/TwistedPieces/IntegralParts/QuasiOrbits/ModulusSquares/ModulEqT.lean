@@ -13,23 +13,29 @@ open Matrix Module ValuativeRel MeasureTheory GroundTheory.Automorphic.GLnLocal
 
 namespace PositivityTheory.RgUd.TP.Nil.Orb.Mod
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.T.Nil.Orb PositivityTheory.RgUd.T.Nil.Orb.BModbound
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil PositivityTheory.RgUd.T.Nil.Orb
+  PositivityTheory.RgUd.T.Nil.Orb.BModbound
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-theorem modul_eqT (hratio : RatioP k n) (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z)
+theorem modul_eqT
+    (hratio : RatioP k n)
+    (Z : Subalgebra k (Matrix (Fin n) (Fin n) k)) (hZ : CR Z)
     (τ : Matrix (Fin n) (Fin n) k →ₗ[k] k) (hτ : IsTau Z τ)
-    (c : Matrix (Fin n) (Fin n) k) (hc : c ∈ Z) (p : Sp k n) (hp : p.1 ∈ Bz Z)
-    (g : GL (Fin n) k) (hg : g ∈ Gz Z) (t : k) (ht : t ≠ 0)
-    (hgx : g.val * (p.1 - c) * g⁻¹.val = t • (p.1 - c)) (hgv : g.val *ᵥ p.2 = p.2) :
-    ∃ (K L : Subgroup (GL (Fin n) k)) (u : kˣ),
-      (u : k) = LinearMap.det ((adL g).restrict (cS_inv Z (p.1 - c) p.2 g hg t ht hgx hgv)) ∧
-      K ≤ GzS Z ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k))) ∧
-      IsCompact (K : Set (GL (Fin n) k)) ∧
-      IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k))) ∧
-      L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K ∧
-      L.Normal' (K.map (MulAut.conj g).toMonoidHom) ∧
-      modul (stab Z p) K L g = (GlobalTheory.SplitWeil.nabs k u)⁻¹ := by
+    (c : Matrix (Fin n) (Fin n) k) (hc : c ∈ Z)
+    (p : Sp k n) (hp : p.1 ∈ Bz Z)
+    (g : GL (Fin n) k) (hg : g ∈ Gz Z)
+    (t : k) (ht : t ≠ 0) (hgx : g.val * (p.1 - c) * g⁻¹.val = t • (p.1 - c))
+    (hgv : g.val *ᵥ p.2 = p.2)
+    : ∃ (K L : Subgroup (GL (Fin n) k)) (u : kˣ),
+      (u : k) = LinearMap.det ((adL g).restrict (cS_inv Z (p.1 - c) p.2 g hg t ht hgx hgv))
+        ∧ K ≤ GzS Z ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k)))
+        ∧ IsCompact (K : Set (GL (Fin n) k))
+        ∧ IsOpen (((↑) : GzS Z → GL (Fin n) k) ⁻¹' (L : Set (GL (Fin n) k)))
+        ∧ L ≤ K ⊓ K.map (MulAut.conj g).toMonoidHom ∧ L.Normal' K
+        ∧ L.Normal' (K.map (MulAut.conj g).toMonoidHom)
+        ∧ modul (stab Z p) K L g = (GlobalTheory.SplitWeil.nabs k u)⁻¹ := by
   classical
   obtain ⟨m, hm1, hlev⟩ := exists_level (k := k) (n := n) g
   set x := p.1 - c with hxdef
@@ -51,8 +57,9 @@ theorem modul_eqT (hratio : RatioP k n) (Z : Subalgebra k (Matrix (Fin n) (Fin n
     rw [inv_inv]
     have h1 : g⁻¹.val * (g.val * x * g⁻¹.val) * g.val = x := adL_inv_adL g x
     rw [hgx, Matrix.mul_smul, Matrix.smul_mul] at h1
-    calc g⁻¹.val * x * g.val = t⁻¹ • (t • (g⁻¹.val * x * g.val)) := by
-          rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
+    calc
+      g⁻¹.val * x * g.val
+        = t⁻¹ • (t • (g⁻¹.val * x * g.val)) := by rw [smul_smul, inv_mul_cancel₀ ht, one_smul]
       _ = t⁻¹ • x := by rw [h1]
   have hgv' : g⁻¹.val *ᵥ v = v := by
     conv_lhs => rw [← hgv]
@@ -116,20 +123,29 @@ theorem modul_eqT (hratio : RatioP k n) (Z : Subalgebra k (Matrix (Fin n) (Fin n
     obtain ⟨u, hu⟩ := sI _ (mem_cj.1 hy)
     refine ⟨g * u * g⁻¹, ?_⟩
     rw [Units.val_mul, Units.val_mul, hu, mul_add, add_mul, mul_one, Units.mul_inv, adL_adL_inv]
-  have hmulJ : ∀ u : GL (Fin n) k, u ∈ Gz Z → u ∈ integralGL k n → g⁻¹ * u * g ∈ integralGL k n →
-      ∀ y ∈ I ⊓ I', u.val * y ∈ I ⊓ I' := by
+  have hmulJ
+      : ∀ u : GL (Fin n) k,
+        u ∈ Gz Z → u ∈ integralGL k n → g⁻¹ * u * g ∈ integralGL k n
+          → ∀ y ∈ I ⊓ I', u.val * y ∈ I ⊓ I' := by
     intro u hG h1 h2 y hy
     rw [AddSubgroup.mem_inf] at hy ⊢
     obtain ⟨hy1, hy2⟩ := hy
-    refine ⟨mem_lat.2 ⟨(mem_C_iff Z _).2 (Bz_mul Z hG (hIB _ hy1)), ent_mul (ent_integral h1) (mem_lat.1 hy1).2⟩, ?_⟩
+    refine ⟨
+      mem_lat.2
+        ⟨(mem_C_iff Z _).2 (Bz_mul Z hG (hIB _ hy1)), ent_mul (ent_integral h1) (mem_lat.1 hy1).2⟩,
+      ?_
+    ⟩
     rw [mem_cj] at hy2 ⊢
     have e : g⁻¹.val * (u.val * y) * g.val = (g⁻¹ * u * g).val * (g⁻¹.val * y * g.val) := by
       simp only [Units.val_mul, mul_assoc, Units.mul_inv_cancel_left]
     rw [e]
     have hw : g⁻¹ * u * g ∈ GzS Z := (GzS Z).mul_mem ((GzS Z).mul_mem hginv hG) hg
-    exact mem_lat.2 ⟨(mem_C_iff Z _).2 (Bz_mul Z hw (hIB _ hy2)), ent_mul (ent_integral h2) (mem_lat.1 hy2).2⟩
-  have hmulJs : ∀ u : GL (Fin n) k, u ∈ Gz Z → u.val * x = x * u.val → u ∈ integralGL k n →
-      g⁻¹ * u * g ∈ integralGL k n → ∀ y ∈ Is ⊓ I's, u.val * y ∈ Is ⊓ I's := by
+    exact mem_lat.2
+      ⟨(mem_C_iff Z _).2 (Bz_mul Z hw (hIB _ hy2)), ent_mul (ent_integral h2) (mem_lat.1 hy2).2⟩
+  have hmulJs
+      : ∀ u : GL (Fin n) k,
+        u ∈ Gz Z → u.val * x = x * u.val → u ∈ integralGL k n → g⁻¹ * u * g ∈ integralGL k n
+          → ∀ y ∈ Is ⊓ I's, u.val * y ∈ Is ⊓ I's := by
     intro u hG hux h1 h2 y hy
     rw [AddSubgroup.mem_inf, mIs, mI's] at hy ⊢
     have hJ := hmulJ u hG h1 h2 y (AddSubgroup.mem_inf.2 ⟨hy.1.1, hy.2.1⟩)
@@ -167,25 +183,47 @@ theorem modul_eqT (hratio : RatioP k n) (Z : Subalgebra k (Matrix (Fin n) (Fin n
     relIndex_eq I' (I ⊓ I') K' (K ⊓ K') inf_le_right mK' mL sI' hmK'
   have e3 : (K ⊓ K' ⊓ S).relIndex (K ⊓ S) = (Is ⊓ I's).relIndex Is :=
     relIndex_eq Is (Is ⊓ I's) (K ⊓ S) (K ⊓ K' ⊓ S) inf_le_left mKS mLS
-      (fun y hy => sI y ((mIs y).1 hy).1) hmKS
+      (fun y hy => sI y ((mIs y).1 hy).1)
+      hmKS
   have e4 : (K ⊓ K' ⊓ S).relIndex (K' ⊓ S) = (Is ⊓ I's).relIndex I's :=
     relIndex_eq I's (Is ⊓ I's) (K' ⊓ S) (K ⊓ K' ⊓ S) inf_le_right mK'S mLS
-      (fun y hy => sI' y ((mI's y).1 hy).1) hmK'S
+      (fun y hy => sI' y ((mI's y).1 hy).1)
+      hmK'S
   have hCinv := cC_inv Z g hg
   have hSinv := cS_inv Z x v g hg t ht hgx hgv
-  obtain ⟨nC1, -, rC⟩ := hratio C γ hγ0 (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g C hCinv)) I I'
-    (fun y => mem_lat) (mem_cj_iff_exists g C hCinv γ)
-  obtain ⟨nS1, nS2, rS⟩ := hratio (cS Z x v) γ hγ0
-    (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g _ hSinv)) Is I's
-    (fun y => mem_lat) (mem_cj_iff_exists g _ hSinv γ)
-  have dC : distribHaarChar k (LinearEquiv.det (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g C hCinv))) = 1 :=
+  obtain ⟨nC1, -, rC⟩ :=
+    hratio C γ hγ0 (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g C hCinv)) I I'
+      (fun y => mem_lat)
+      (mem_cj_iff_exists g C hCinv γ)
+  obtain ⟨nS1, nS2, rS⟩ :=
+    hratio (cS Z x v) γ hγ0 (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g _ hSinv)) Is I's
+      (fun y => mem_lat)
+      (mem_cj_iff_exists g _ hSinv γ)
+  have dC
+      : distribHaarChar k
+          (LinearEquiv.det (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g C hCinv)))
+        = 1 :=
     haar_eq_one_of_sq _
-      (Units.ext (by rw [Units.val_pow_eq_pow_val, det_ofInjectiveEndo, Units.val_one]; exact det_C_sq Z τ hτ g hg))
+      (Units.ext (by
+        rw [Units.val_pow_eq_pow_val, det_ofInjectiveEndo, Units.val_one]
+        exact det_C_sq Z τ hτ g hg))
   rw [dC, NNReal.coe_one] at rC
-  refine ⟨K, K ⊓ K', LinearEquiv.det (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g _ hSinv)),
-    det_ofInjectiveEndo g _ hSinv, inf_le_right, ?_, ?_, ?_, le_rfl, ?_, ?_, ?_⟩
-  · have : ((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k)) =
-        ((↑) : GzS Z → GL (Fin n) k) ⁻¹' (congruenceSubgroup k n m : Set (GL (Fin n) k)) := by
+  refine ⟨
+    K,
+    K ⊓ K',
+    LinearEquiv.det (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g _ hSinv)),
+    det_ofInjectiveEndo g _ hSinv,
+    inf_le_right,
+    ?_,
+    ?_,
+    ?_,
+    le_rfl,
+    ?_,
+    ?_,
+    ?_
+  ⟩
+  · have : ((↑) : GzS Z → GL (Fin n) k) ⁻¹' (K : Set (GL (Fin n) k))
+        = ((↑) : GzS Z → GL (Fin n) k) ⁻¹' (congruenceSubgroup k n m : Set (GL (Fin n) k)) := by
       ext h
       simp only [Set.mem_preimage, SetLike.mem_coe, hKdef, Subgroup.mem_inf]
       exact ⟨fun hh => hh.1, fun hh => ⟨hh, h.2⟩⟩
@@ -193,11 +231,14 @@ theorem modul_eqT (hratio : RatioP k n) (Z : Subalgebra k (Matrix (Fin n) (Fin n
     exact (isOpen_congruenceSubgroup k n m).preimage continuous_subtype_val
   · rw [hKdef, Subgroup.coe_inf]
     exact (isCompact_congruenceSubgroup k n m).inter_right (isClosed_Gz Z)
-  · have : ((↑) : GzS Z → GL (Fin n) k) ⁻¹' ((K ⊓ K' : Subgroup (GL (Fin n) k)) : Set (GL (Fin n) k)) =
-        ((↑) : GzS Z → GL (Fin n) k) ⁻¹' (congruenceSubgroup k n m : Set (GL (Fin n) k)) ∩
-          (fun h : GzS Z => g⁻¹ * (h : GL (Fin n) k) * g) ⁻¹' (congruenceSubgroup k n m : Set (GL (Fin n) k)) := by
+  · have : ((↑) : GzS Z → GL (Fin n) k)
+          ⁻¹' ((K ⊓ K' : Subgroup (GL (Fin n) k)) : Set (GL (Fin n) k))
+        = ((↑) : GzS Z → GL (Fin n) k) ⁻¹' (congruenceSubgroup k n m : Set (GL (Fin n) k))
+          ∩ (fun h : GzS Z => g⁻¹ * (h : GL (Fin n) k) * g)
+            ⁻¹' (congruenceSubgroup k n m : Set (GL (Fin n) k)) := by
       ext h
-      have h2 : g⁻¹ * (h : GL (Fin n) k) * g ∈ GzS Z := (GzS Z).mul_mem ((GzS Z).mul_mem hginv h.2) hg
+      have h2 : g⁻¹ * (h : GL (Fin n) k) * g ∈ GzS Z :=
+        (GzS Z).mul_mem ((GzS Z).mul_mem hginv h.2) hg
       simp only [Set.mem_preimage, Set.mem_inter_iff, SetLike.mem_coe, Subgroup.mem_inf]
       rw [memK', hKdef, Subgroup.mem_inf, Subgroup.mem_inf]
       exact ⟨fun hh => ⟨hh.1.1, hh.2.1⟩, fun hh => ⟨⟨hh.1, h.2⟩, ⟨hh.2, h2⟩⟩⟩
@@ -213,13 +254,17 @@ theorem modul_eqT (hratio : RatioP k n) (Z : Subalgebra k (Matrix (Fin n) (Fin n
     rw [e]
     obtain ⟨hG, -, hint⟩ := hKint a ha
     have hw : g⁻¹ * a * g ∈ GzS Z := (GzS Z).mul_mem ((GzS Z).mul_mem hginv hG) hg
-    exact ⟨conj_mem_congruenceSubgroup k n hint hb2.1,
-      (GzS Z).mul_mem ((GzS Z).mul_mem hw hb2.2) ((GzS Z).inv_mem hw)⟩
+    exact ⟨
+      conj_mem_congruenceSubgroup k n hint hb2.1,
+      (GzS Z).mul_mem ((GzS Z).mul_mem hw hb2.2) ((GzS Z).inv_mem hw)
+    ⟩
   · intro a ha b hb
     refine ⟨?_, K'.mul_mem (K'.mul_mem ha hb.2) (K'.inv_mem ha)⟩
     obtain ⟨hG, hint, -⟩ := hK'int a ha
-    exact ⟨conj_mem_congruenceSubgroup k n hint hb.1.1,
-      (GzS Z).mul_mem ((GzS Z).mul_mem hG hb.1.2) ((GzS Z).inv_mem hG)⟩
+    exact ⟨
+      conj_mem_congruenceSubgroup k n hint hb.1.1,
+      (GzS Z).mul_mem ((GzS Z).mul_mem hG hb.1.2) ((GzS Z).inv_mem hG)
+    ⟩
   · unfold modul
     rw [e1, e2, e3, e4]
     set N : ℝ := (distribHaarChar k (LinearEquiv.det (LinearEquiv.ofInjectiveEndo _ (adL_restrict_inj g _ hSinv))) : ℝ)

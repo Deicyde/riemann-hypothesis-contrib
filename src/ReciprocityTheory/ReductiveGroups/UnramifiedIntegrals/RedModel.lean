@@ -43,12 +43,16 @@ theorem twentySeven_mem_Kur : (27 : ℂ_[l]) ∈ MaximalUnramifiedExtension l :=
 theorem ofNat_1728_mem_Kur : (1728 : ℂ_[l]) ∈ MaximalUnramifiedExtension l := by
   exact_mod_cast natCast_mem (MaximalUnramifiedExtension l) 1728
 
-theorem model_generic (h5 : 5 ≤ l) (a b J : ℂ_[l]) (ha : a ≠ 0) (hb : b ≠ 0)
-    (hD : a ^ 3 - 27 * b ^ 2 ≠ 0) (hJe : J = 1728 * a ^ 3 / (a ^ 3 - 27 * b ^ 2))
-    (hJ : J ∈ MaximalUnramifiedExtension l) (hJ1 : ‖J‖ ≤ 1) (m n : ℤ) (hm : ‖J‖ = (l : ℝ) ^ (3 * m))
-    (hn : ‖J - 1728‖ = (l : ℝ) ^ (2 * n)) :
-    ∃ g2 g3 : ℂ_[l], g2 ∈ MaximalUnramifiedExtension l ∧ g3 ∈ MaximalUnramifiedExtension l ∧ ‖g2‖ ≤ 1 ∧ ‖g3‖ ≤ 1 ∧ ‖g2 ^ 3 - 27 * g3 ^ 2‖ = 1 ∧
-      ∃ lam : ℂ_[l], lam ≠ 0 ∧ g2 = lam ^ 4 * a ∧ g3 = lam ^ 6 * b := by
+theorem model_generic
+    (h5 : 5 ≤ l)
+    (a b J : ℂ_[l]) (ha : a ≠ 0) (hb : b ≠ 0) (hD : a ^ 3 - 27 * b ^ 2 ≠ 0)
+    (hJe : J = 1728 * a ^ 3 / (a ^ 3 - 27 * b ^ 2)) (hJ : J ∈ MaximalUnramifiedExtension l)
+    (hJ1 : ‖J‖ ≤ 1)
+    (m n : ℤ) (hm : ‖J‖ = (l : ℝ) ^ (3 * m)) (hn : ‖J - 1728‖ = (l : ℝ) ^ (2 * n))
+    : ∃ g2 g3 : ℂ_[l],
+      g2 ∈ MaximalUnramifiedExtension l ∧ g3 ∈ MaximalUnramifiedExtension l ∧ ‖g2‖ ≤ 1 ∧ ‖g3‖ ≤ 1
+        ∧ ‖g2 ^ 3 - 27 * g3 ^ 2‖ = 1
+        ∧ ∃ lam : ℂ_[l], lam ≠ 0 ∧ g2 = lam ^ 4 * a ∧ g3 = lam ^ 6 * b := by
   have hp : l.Prime := Fact.out
   have hx : (0 : ℝ) < (l : ℝ) := by exact_mod_cast hp.pos
   have hl0 : (l : ℂ_[l]) ≠ 0 := by
@@ -66,32 +70,27 @@ theorem model_generic (h5 : 5 ≤ l) (a b J : ℂ_[l]) (ha : a ≠ 0) (hb : b �
     have := norm_1728_eq_one l h5
     rw [h, norm_zero] at this
     exact zero_ne_one this
-  have hJs : J - 1728 = 1728 * 27 * b ^ 2 / (a ^ 3 - 27 * b ^ 2) := by
-    rw [hJe]; field_simp; ring
+  have hJs : J - 1728 = 1728 * 27 * b ^ 2 / (a ^ 3 - 27 * b ^ 2) := by rw [hJe]; field_simp; ring
   have hJs0 : J - 1728 ≠ 0 := by
     rw [hJs]
     exact div_ne_zero (mul_ne_zero (mul_ne_zero h1728 h27) (pow_ne_zero _ hb)) hD
   set c : ℂ_[l] := 27 * J / (J - 1728) with hc
-  have hcab : c = a ^ 3 / b ^ 2 := by
-    rw [hc, hJs, hJe]; field_simp
-  have hc27 : c - 27 = 27 * 1728 / (J - 1728) := by
-    rw [hc]; field_simp; ring
+  have hcab : c = a ^ 3 / b ^ 2 := by rw [hc, hJs, hJe]; field_simp
+  have hc27 : c - 27 = 27 * 1728 / (J - 1728) := by rw [hc]; field_simp; ring
   set t : ℂ_[l] := (l : ℂ_[l]) ^ (m - n) with ht
   have ht0 : t ≠ 0 := zpow_ne_zero _ hl0
   set X : ℝ := (l : ℝ) ^ m with hX
   set Y : ℝ := (l : ℝ) ^ n with hY
   have hX0 : 0 < X := zpow_pos hx _
   have hY0 : 0 < Y := zpow_pos hx _
-  have hm' : ‖J‖ = X ^ 3 := by
-    rw [hm, mul_comm, zpow_mul]; norm_cast
-  have hn' : ‖J - 1728‖ = Y ^ 2 := by
-    rw [hn, mul_comm, zpow_mul]; norm_cast
-  have htn : ‖t‖ = Y / X := by
-    rw [ht, norm_zpow, red_norm_l, inv_zpow', neg_sub, zpow_sub₀ hx.ne']
+  have hm' : ‖J‖ = X ^ 3 := by rw [hm, mul_comm, zpow_mul]; norm_cast
+  have hn' : ‖J - 1728‖ = Y ^ 2 := by rw [hn, mul_comm, zpow_mul]; norm_cast
+  have htn : ‖t‖ = Y / X := by rw [ht, norm_zpow, red_norm_l, inv_zpow', neg_sub, zpow_sub₀ hx.ne']
   have hcn : ‖c‖ = X ^ 3 / Y ^ 2 := by
     rw [hc, norm_div, norm_mul, norm_twentySeven_padicComplex_eq_one l h5, hm', hn', one_mul]
   have hc27n : ‖c - 27‖ = 1 / Y ^ 2 := by
-    rw [hc27, norm_div, norm_mul, norm_twentySeven_padicComplex_eq_one l h5, norm_1728_eq_one l h5, hn', one_mul]
+    rw [hc27, norm_div, norm_mul, norm_twentySeven_padicComplex_eq_one l h5, norm_1728_eq_one l h5,
+      hn', one_mul]
   have hdisc : (t ^ 2 * c) ^ 3 - 27 * (t ^ 3 * c) ^ 2 = t ^ 6 * c ^ 2 * (c - 27) := by ring
   have hdn : ‖(t ^ 2 * c) ^ 3 - 27 * (t ^ 3 * c) ^ 2‖ = 1 := by
     rw [hdisc, norm_mul, norm_mul, norm_pow, norm_pow, htn, hcn, hc27n]
@@ -101,7 +100,8 @@ theorem model_generic (h5 : 5 ≤ l) (a b J : ℂ_[l]) (ha : a ≠ 0) (hb : b �
       rw [norm_mul, norm_pow, htn, hcn, hm']
       field_simp
     rw [← pow_le_one_iff_of_nonneg (norm_nonneg _) (three_ne_zero)]
-    rw [h]; exact hJ1
+    rw [h]
+    exact hJ1
   have hg3 : ‖t ^ 3 * c‖ ≤ 1 := by
     have h : ‖t ^ 3 * c‖ ^ 2 = ‖J - 1728‖ := by
       rw [norm_mul, norm_pow, htn, hcn, hn']
@@ -110,8 +110,10 @@ theorem model_generic (h5 : 5 ≤ l) (a b J : ℂ_[l]) (ha : a ≠ 0) (hb : b �
     rw [h]
     rw [sub_eq_add_neg]
     refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hJ1 ?_)
-    rw [norm_neg]; exact (norm_1728_eq_one l h5).le
-  have htK : t ∈ MaximalUnramifiedExtension l := zpow_mem (natCast_mem (MaximalUnramifiedExtension l) l) _
+    rw [norm_neg]
+    exact (norm_1728_eq_one l h5).le
+  have htK : t ∈ MaximalUnramifiedExtension l :=
+    zpow_mem (natCast_mem (MaximalUnramifiedExtension l) l) _
   have hcK : c ∈ MaximalUnramifiedExtension l :=
     div_mem (mul_mem (twentySeven_mem_Kur l) hJ) (sub_mem hJ (ofNat_1728_mem_Kur l))
   obtain ⟨lam, hlam⟩ := IsAlgClosed.exists_pow_nat_eq (t * a / b) (show 0 < 2 by norm_num)
@@ -120,20 +122,36 @@ theorem model_generic (h5 : 5 ≤ l) (a b J : ℂ_[l]) (ha : a ≠ 0) (hb : b �
     rw [h] at hlam
     have : t * a / b ≠ 0 := div_ne_zero (mul_ne_zero ht0 ha) hb
     exact this (by rw [← hlam]; simp)
-  refine ⟨t ^ 2 * c, t ^ 3 * c, mul_mem (pow_mem htK _) hcK, mul_mem (pow_mem htK _) hcK,
-    hg2, hg3, hdn, lam, hlam0, ?_, ?_⟩
+  refine ⟨
+    t ^ 2 * c,
+    t ^ 3 * c,
+    mul_mem (pow_mem htK _) hcK,
+    mul_mem (pow_mem htK _) hcK,
+    hg2,
+    hg3,
+    hdn,
+    lam,
+    hlam0,
+    ?_,
+    ?_
+  ⟩
   · have : lam ^ 4 = (lam ^ 2) ^ 2 := by ring
-    rw [this, hlam, hcab]; field_simp
+    rw [this, hlam, hcab]
+    field_simp
   · have : lam ^ 6 = (lam ^ 2) ^ 3 := by ring
-    rw [this, hlam, hcab]; field_simp
+    rw [this, hlam, hcab]
+    field_simp
 
 end SlopeTestRemainingChoices
 
-theorem model_of_valDiv (L : PeriodPair) (l : ℕ) [Fact l.Prime] (h5 : 5 ≤ l) (ι : ℂ ≃+* ℂ_[l])
-    (hJ : ι (jInv L) ∈ MaximalUnramifiedExtension l) (hJ1 : ‖ι (jInv L)‖ ≤ 1)
+theorem model_of_valDiv
+    (L : PeriodPair)
+    (l : ℕ) [Fact l.Prime]
+    (h5 : 5 ≤ l)
+    (ι : ℂ ≃+* ℂ_[l]) (hJ : ι (jInv L) ∈ MaximalUnramifiedExtension l) (hJ1 : ‖ι (jInv L)‖ ≤ 1)
     (h3 : ι (jInv L) ≠ 0 → ∃ m : ℤ, ‖ι (jInv L)‖ = (l : ℝ) ^ (3 * m))
-    (h2 : ι (jInv L) ≠ 1728 → ∃ m : ℤ, ‖ι (jInv L) - 1728‖ = (l : ℝ) ^ (2 * m)) :
-    ∃ g2 g3, IsGoodModel l L ι g2 g3 := by
+    (h2 : ι (jInv L) ≠ 1728 → ∃ m : ℤ, ‖ι (jInv L) - 1728‖ = (l : ℝ) ^ (2 * m))
+    : ∃ g2 g3, IsGoodModel l L ι g2 g3 := by
   have hD0 : L.g₂ ^ 3 - 27 * L.g₃ ^ 2 ≠ 0 := discNeZero L
   have hD : (ι L.g₂) ^ 3 - 27 * (ι L.g₃) ^ 2 ≠ 0 := by
     intro h
@@ -154,7 +172,8 @@ theorem model_of_valDiv (L : PeriodPair) (l : ℕ) [Fact l.Prime] (h5 : 5 ≤ l)
   · have hb : ι L.g₃ ≠ 0 := by
       intro hb
       apply hD
-      rw [ha, hb]; ring
+      rw [ha, hb]
+      ring
     obtain ⟨lam, hlam⟩ := IsAlgClosed.exists_pow_nat_eq (ι L.g₃)⁻¹ (show 0 < 6 by norm_num)
     have hlam0 : lam ≠ 0 := by
       intro h

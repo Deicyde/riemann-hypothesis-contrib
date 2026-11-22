@@ -9,19 +9,19 @@ namespace ReciprocityTheory.ChartRestriction.G.AI.I1.SwapLoc
 
 open ReciprocityTheory.ChartRestriction.G.AI
 
-theorem length_localizedModule_quot_eq {R T : Type*} [CommRing R] [CommRing T] [Algebra R T]
-    (S : Submonoid R) (V : Ideal R) (x : R)
-    (hS : ∀ s ∈ S, IsUnit (algebraMap R T s))
+theorem length_localizedModule_quot_eq
+    {R T : Type*} [CommRing R] [CommRing T] [Algebra R T]
+    (S : Submonoid R) (V : Ideal R)
+    (x : R) (hS : ∀ s ∈ S, IsUnit (algebraMap R T s))
     (hsurj : ∀ y : T, ∃ r : R, ∃ s ∈ S, algebraMap R T r = y * algebraMap R T s)
-    (hker : ∀ r : R, algebraMap R T r = 0 → ∃ s ∈ S, s * r ∈ V)
-    (hV : ∀ v ∈ V, algebraMap R T v = 0) :
-    Module.length (Localization S) (LocalizedModule S (R ⧸ (V ⊔ Ideal.span {x}))) =
-      Module.length T (T ⧸ Ideal.span {algebraMap R T x}) := by
+    (hker : ∀ r : R, algebraMap R T r = 0 → ∃ s ∈ S, s * r ∈ V) (hV : ∀ v ∈ V, algebraMap R T v = 0)
+    : Module.length (Localization S) (LocalizedModule S (R ⧸ (V ⊔ Ideal.span {x})))
+      = Module.length T (T ⧸ Ideal.span {algebraMap R T x}) := by
   classical
-  let φ : Localization S →+* T := IsLocalization.lift (M := S) (S := Localization S)
-    (fun s : S => hS s.1 s.2)
-  have hφ : ∀ r : R, φ (algebraMap R (Localization S) r) = algebraMap R T r :=
-    fun r => IsLocalization.lift_eq _ r
+  let φ : Localization S →+* T :=
+    IsLocalization.lift (M := S) (S := Localization S) (fun s : S => hS s.1 s.2)
+  have hφ : ∀ r : R, φ (algebraMap R (Localization S) r) = algebraMap R T r := fun r =>
+    IsLocalization.lift_eq _ r
   have hφs : Function.Surjective φ := by
     intro y
     obtain ⟨r, s, hs, h⟩ := hsurj y
@@ -34,8 +34,8 @@ theorem length_localizedModule_quot_eq {R T : Type*} [CommRing R] [CommRing T] [
   set J : Ideal T := Ideal.span {algebraMap R T x}
   have hI : ∀ a ∈ I, (Algebra.ofId R (T ⧸ J)) a = 0 := by
     intro a ha
-    rw [Algebra.ofId_apply, IsScalarTower.algebraMap_apply R T (T ⧸ J), Ideal.Quotient.algebraMap_eq,
-      Ideal.Quotient.eq_zero_iff_mem]
+    rw [Algebra.ofId_apply, IsScalarTower.algebraMap_apply R T (T ⧸ J),
+      Ideal.Quotient.algebraMap_eq, Ideal.Quotient.eq_zero_iff_mem]
     refine Submodule.mem_sup.mp ha |>.elim fun v ⟨hv, y, hy, e⟩ => ?_
     rw [← e, map_add (f := _), hV v hv, zero_add]
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hy
@@ -82,28 +82,34 @@ theorem length_localizedModule_quot_eq {R T : Type*} [CommRing R] [CommRing T] [
   rw [e.length_eq]
   exact Module.length_eq_of_surjective hφs
 
-def IsLocData (R T : Type*) [CommRing R] [CommRing T] [Algebra R T] (S : Submonoid R)
-    (V : Ideal R) : Prop :=
-  (∀ s ∈ S, IsUnit (algebraMap R T s)) ∧
-  (∀ y : T, ∃ r : R, ∃ s ∈ S, algebraMap R T r = y * algebraMap R T s) ∧
-  (∀ r : R, algebraMap R T r = 0 → ∃ s ∈ S, s * r ∈ V) ∧
-  (∀ v ∈ V, algebraMap R T v = 0)
+def IsLocData (R T : Type*) [CommRing R] [CommRing T] [Algebra R T] (S : Submonoid R) (V : Ideal R)
+    : Prop :=
+  (∀ s ∈ S, IsUnit (algebraMap R T s))
+    ∧ (∀ y : T, ∃ r : R, ∃ s ∈ S, algebraMap R T r = y * algebraMap R T s)
+    ∧ (∀ r : R, algebraMap R T r = 0 → ∃ s ∈ S, s * r ∈ V) ∧ (∀ v ∈ V, algebraMap R T v = 0)
 
-theorem isLocData_atPrime_quot {R : Type*} [CommRing R] (V Z : Ideal R) [Z.IsPrime]
-    (hVZ : V ≤ Z) [(Z.map (Ideal.Quotient.mk V)).IsPrime] :
-    IsLocData R (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) Z.primeCompl V := by
+theorem isLocData_atPrime_quot
+    {R : Type*} [CommRing R]
+    (V Z : Ideal R) [Z.IsPrime]
+    (hVZ : V ≤ Z)
+    [(Z.map (Ideal.Quotient.mk V)).IsPrime]
+    : IsLocData R (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) Z.primeCompl V := by
   have hcm : Ideal.comap (Ideal.Quotient.mk V) (Z.map (Ideal.Quotient.mk V)) = Z := by
     rw [Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective, ← RingHom.ker_eq_comap_bot,
       Ideal.mk_ker, sup_eq_left.2 hVZ]
   have hmem : ∀ s : R, Ideal.Quotient.mk V s ∈ Z.map (Ideal.Quotient.mk V) ↔ s ∈ Z := fun s => by
     rw [← Ideal.mem_comap, hcm]
-  have halg : ∀ r : R, algebraMap R (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) r =
-      algebraMap (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) (Ideal.Quotient.mk V r) :=
-    fun r => by rw [IsScalarTower.algebraMap_apply R (R ⧸ V), Ideal.Quotient.algebraMap_eq]
+  have halg
+      : ∀ r : R,
+        algebraMap R (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) r
+          = algebraMap (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V)))
+            (Ideal.Quotient.mk V r) := fun r => by
+    rw [IsScalarTower.algebraMap_apply R (R ⧸ V), Ideal.Quotient.algebraMap_eq]
   refine ⟨fun s hs => ?_, fun y => ?_, fun r hr => ?_, fun v hv => ?_⟩
   · rw [halg]
     exact IsLocalization.map_units _
-      (⟨Ideal.Quotient.mk V s, fun h' => hs ((hmem s).1 h')⟩ : (Z.map (Ideal.Quotient.mk V)).primeCompl)
+      (⟨Ideal.Quotient.mk V s, fun h' => hs ((hmem s).1 h')⟩
+        : (Z.map (Ideal.Quotient.mk V)).primeCompl)
   · obtain ⟨⟨x, m⟩, rfl⟩ := IsLocalization.mk'_surjective (Z.map (Ideal.Quotient.mk V)).primeCompl y
     obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective x
     obtain ⟨t, ht⟩ := Ideal.Quotient.mk_surjective (m : R ⧸ V)
@@ -130,16 +136,19 @@ section LocData
 
 variable {R T : Type*} [CommRing R] [CommRing T] [Algebra R T] {S : Submonoid R} {V : Ideal R}
 
-theorem IsLocData.not_mem_of_isPrime (h : IsLocData R T S V) {P : Ideal T} [hP : P.IsPrime]
-    {s : R} (hs : s ∈ S) : algebraMap R T s ∉ P := by
+theorem IsLocData.not_mem_of_isPrime
+    (h : IsLocData R T S V) {P : Ideal T} [hP : P.IsPrime] {s : R} (hs : s ∈ S)
+    : algebraMap R T s ∉ P := by
   intro hmem
   exact hP.ne_top (Ideal.eq_top_of_isUnit_mem _ hmem (h.1 s hs))
 
-theorem IsLocData.atPrime (h : IsLocData R T S V) (P : Ideal T) [hP : P.IsPrime] :
-    IsLocData R (Localization.AtPrime P) (P.comap (algebraMap R T)).primeCompl V := by
-  have halg : ∀ r : R, algebraMap R (Localization.AtPrime P) r =
-      algebraMap T (Localization.AtPrime P) (algebraMap R T r) :=
-    fun r => IsScalarTower.algebraMap_apply R T _ r
+theorem IsLocData.atPrime (h : IsLocData R T S V) (P : Ideal T) [hP : P.IsPrime]
+    : IsLocData R (Localization.AtPrime P) (P.comap (algebraMap R T)).primeCompl V := by
+  have halg
+      : ∀ r : R,
+        algebraMap R (Localization.AtPrime P) r
+          = algebraMap T (Localization.AtPrime P) (algebraMap R T r) := fun r =>
+    IsScalarTower.algebraMap_apply R T _ r
   refine ⟨fun s hs => ?_, fun y => ?_, fun r hr => ?_, fun v hv => ?_⟩
   · rw [halg]
     exact IsLocalization.map_units _ (⟨algebraMap R T s, hs⟩ : P.primeCompl)
@@ -175,9 +184,10 @@ theorem IsLocData.atPrime (h : IsLocData R T S V) (P : Ideal T) [hP : P.IsPrime]
       · exact h.not_mem_of_isPrime hs' hm'
   · rw [halg, h.2.2.2 v hv, map_zero]
 
-theorem IsLocData.quot (h : IsLocData R T S V) (P : Ideal T) :
-    IsLocData R (T ⧸ P) S (P.comap (algebraMap R T)) := by
-  refine ⟨fun s hs => (h.1 s hs).map (Ideal.Quotient.mk P), fun y => ?_, fun r hr => ?_, fun v hv => ?_⟩
+theorem IsLocData.quot (h : IsLocData R T S V) (P : Ideal T)
+    : IsLocData R (T ⧸ P) S (P.comap (algebraMap R T)) := by
+  refine
+    ⟨fun s hs => (h.1 s hs).map (Ideal.Quotient.mk P), fun y => ?_, fun r hr => ?_, fun v hv => ?_⟩
   · obtain ⟨y', rfl⟩ := Ideal.Quotient.mk_surjective y
     obtain ⟨r, s, hs, hrs⟩ := h.2.1 y'
     refine ⟨r, s, hs, ?_⟩
@@ -188,8 +198,11 @@ theorem IsLocData.quot (h : IsLocData R T S V) (P : Ideal T) :
   · rw [← Ideal.Quotient.mk_algebraMap, Ideal.Quotient.eq_zero_iff_mem]
     exact hv
 
-theorem IsLocData.le_of_comap_le (h : IsLocData R T S V) {P P' : Ideal T} [hP' : P'.IsPrime]
-    (hle : P.comap (algebraMap R T) ≤ P'.comap (algebraMap R T)) : P ≤ P' := by
+theorem IsLocData.le_of_comap_le
+    (h : IsLocData R T S V)
+    {P P' : Ideal T} [hP' : P'.IsPrime]
+    (hle : P.comap (algebraMap R T) ≤ P'.comap (algebraMap R T))
+    : P ≤ P' := by
   intro y hy
   obtain ⟨r, s, hs, hrs⟩ := h.2.1 y
   have hr : r ∈ P.comap (algebraMap R T) := by
@@ -201,82 +214,98 @@ theorem IsLocData.le_of_comap_le (h : IsLocData R T S V) {P P' : Ideal T} [hP' :
   · exact h1
   · exact absurd h1 (h.not_mem_of_isPrime hs)
 
-theorem IsLocData.length_eq (h : IsLocData R T S V) (x : R) :
-    Module.length (Localization S) (LocalizedModule S (R ⧸ (V ⊔ Ideal.span {x}))) =
-      Ring.ord T (algebraMap R T x) := by
+theorem IsLocData.length_eq (h : IsLocData R T S V) (x : R)
+    : Module.length (Localization S) (LocalizedModule S (R ⧸ (V ⊔ Ideal.span {x})))
+      = Ring.ord T (algebraMap R T x) := by
   unfold Ring.ord
   exact length_localizedModule_quot_eq S V x h.1 h.2.1 h.2.2.1 h.2.2.2
 
 end LocData
 
-
 open Classical in
-noncomputable def lenAt {R : Type*} [CommRing R] (J W : Ideal R) : ℕ∞ :=
-  by
-    classical
-    exact if h : W.IsPrime then
+noncomputable def lenAt {R : Type*} [CommRing R] (J W : Ideal R) : ℕ∞ := by
+  classical
+  exact
+    if h : W.IsPrime then
       haveI := h
       Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J))
-    else 0
+    else
+      0
 
-theorem lenAt_eq {R : Type*} [CommRing R] (J W : Ideal R) [hW : W.IsPrime] :
-    lenAt J W = Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J)) := by
+theorem lenAt_eq {R : Type*} [CommRing R] (J W : Ideal R) [hW : W.IsPrime]
+    : lenAt J W
+      = Module.length (Localization.AtPrime W) (LocalizedModule W.primeCompl (R ⧸ J)) := by
   rw [lenAt, dite_eq_left hW]
 
-theorem length_quot_ne_top_of_mem_minimalPrimes {A : Type*} [CommRing A] [IsNoetherianRing A]
-    [IsLocalRing A] (I : Ideal A) (hm : IsLocalRing.maximalIdeal A ∈ I.minimalPrimes) :
-    Module.length A (A ⧸ I) ≠ ⊤ := by
+theorem length_quot_ne_top_of_mem_minimalPrimes
+    {A : Type*} [CommRing A] [IsNoetherianRing A] [IsLocalRing A]
+    (I : Ideal A) (hm : IsLocalRing.maximalIdeal A ∈ I.minimalPrimes)
+    : Module.length A (A ⧸ I) ≠ ⊤ := by
   haveI := IsLocalRing.quotient_artinian_of_mem_minimalPrimes_of_isLocalRing I hm
   rw [Module.length_eq_of_surjective (S := A) (R := A ⧸ I) (M := A ⧸ I)
     (by rw [Ideal.Quotient.algebraMap_eq]; exact Ideal.Quotient.mk_surjective)]
   exact Module.length_ne_top
 
-theorem exists_prime_comap_atPrime_quot {R : Type*} [CommRing R] (V Z : Ideal R)
-    [(Z.map (Ideal.Quotient.mk V)).IsPrime] (Q : Ideal R) (hQ : Q.IsPrime) (hVQ : V ≤ Q)
-    (hQZ : Q ≤ Z) :
-    ∃ p : Ideal (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))), p.IsPrime ∧
-      p.comap (algebraMap R _) = Q := by
+theorem exists_prime_comap_atPrime_quot
+    {R : Type*} [CommRing R]
+    (V Z : Ideal R) [(Z.map (Ideal.Quotient.mk V)).IsPrime]
+    (Q : Ideal R) (hQ : Q.IsPrime) (hVQ : V ≤ Q) (hQZ : Q ≤ Z)
+    : ∃ p : Ideal (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))),
+      p.IsPrime ∧ p.comap (algebraMap R _) = Q := by
   haveI := hQ
   haveI hQV : (Q.map (Ideal.Quotient.mk V)).IsPrime :=
     Ideal.map_isPrime_of_surjective Ideal.Quotient.mk_surjective (by rw [Ideal.mk_ker]; exact hVQ)
   have hd : Disjoint ((Z.map (Ideal.Quotient.mk V)).primeCompl : Set (R ⧸ V))
       (Q.map (Ideal.Quotient.mk V) : Set (R ⧸ V)) :=
     Set.disjoint_left.2 fun x hx hxQ => hx (Ideal.map_mono hQZ hxQ)
-  refine ⟨(Q.map (Ideal.Quotient.mk V)).map
+  refine ⟨
+    (Q.map (Ideal.Quotient.mk V)).map
       (algebraMap (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V)))),
-    IsLocalization.isPrime_of_isPrime_disjoint _ _ _ hQV hd, ?_⟩
+    IsLocalization.isPrime_of_isPrime_disjoint _ _ _ hQV hd,
+    ?_
+  ⟩
   rw [IsScalarTower.algebraMap_eq R (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))),
     ← Ideal.comap_comap]
-  have hcm := IsLocalization.under_map_of_isPrime_disjoint (Z.map (Ideal.Quotient.mk V)).primeCompl
-    (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) hQV hd
+  have hcm :=
+    IsLocalization.under_map_of_isPrime_disjoint (Z.map (Ideal.Quotient.mk V)).primeCompl
+      (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))) hQV hd
   rw [show Ideal.comap (algebraMap (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))))
-      (Ideal.map (algebraMap (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))))
-        (Q.map (Ideal.Quotient.mk V))) = Q.map (Ideal.Quotient.mk V) from hcm]
+        (Ideal.map (algebraMap (R ⧸ V) (Localization.AtPrime (Z.map (Ideal.Quotient.mk V))))
+          (Q.map (Ideal.Quotient.mk V)))
+      = Q.map (Ideal.Quotient.mk V) from
+    hcm]
   rw [Ideal.Quotient.algebraMap_eq, Ideal.comap_map_of_surjective _ Ideal.Quotient.mk_surjective,
     ← RingHom.ker_eq_comap_bot, Ideal.mk_ker, sup_eq_left.2 hVQ]
 
 section Local
 
-variable {R : Type*} [CommRing R] {A : Type*} [CommRing A] [Algebra R A] {S : Submonoid R}
-  {V Z : Ideal R} [Z.IsPrime]
+variable
+  {R : Type*} [CommRing R]
+  {A : Type*} [CommRing A] [Algebra R A]
+  {S : Submonoid R} {V Z : Ideal R} [Z.IsPrime]
 
-theorem IsLocData.comap_le (h : IsLocData R A Z.primeCompl V) (p : Ideal A) [p.IsPrime] :
-    p.comap (algebraMap R A) ≤ Z := by
+theorem IsLocData.comap_le (h : IsLocData R A Z.primeCompl V) (p : Ideal A) [p.IsPrime]
+    : p.comap (algebraMap R A) ≤ Z := by
   intro r hr
   by_contra hz
   exact h.not_mem_of_isPrime (show r ∈ Z.primeCompl from hz) hr
 
-theorem IsLocData.le_comap (h : IsLocData R A S V) (p : Ideal A) :
-    V ≤ p.comap (algebraMap R A) := by
+theorem IsLocData.le_comap (h : IsLocData R A S V) (p : Ideal A)
+    : V ≤ p.comap (algebraMap R A) := by
   intro v hv
   rw [Ideal.mem_comap, h.2.2.2 v hv]
   exact p.zero_mem
 
-theorem IsLocData.eq_of_comap_eq (h : IsLocData R A S V) {p p' : Ideal A} [p.IsPrime]
-    [p'.IsPrime] (e : p.comap (algebraMap R A) = p'.comap (algebraMap R A)) : p = p' := le_antisymm (h.le_of_comap_le e.le) (h.le_of_comap_le e.ge)
+theorem IsLocData.eq_of_comap_eq
+    (h : IsLocData R A S V)
+    {p p' : Ideal A} [p.IsPrime] [p'.IsPrime]
+    (e : p.comap (algebraMap R A) = p'.comap (algebraMap R A))
+    : p = p' :=
+  le_antisymm (h.le_of_comap_le e.le) (h.le_of_comap_le e.ge)
 
-theorem IsLocData.map_eq_zero_iff [hV : V.IsPrime] (h : IsLocData R A Z.primeCompl V)
-    (hVZ : V ≤ Z) (r : R) : algebraMap R A r = 0 ↔ r ∈ V := by
+theorem IsLocData.map_eq_zero_iff
+    [hV : V.IsPrime] (h : IsLocData R A Z.primeCompl V) (hVZ : V ≤ Z) (r : R)
+    : algebraMap R A r = 0 ↔ r ∈ V := by
   constructor
   · intro h0
     obtain ⟨s, hs, hsr⟩ := h.2.2.1 r h0
@@ -285,21 +314,25 @@ theorem IsLocData.map_eq_zero_iff [hV : V.IsPrime] (h : IsLocData R A Z.primeCom
     · exact h1
   · exact h.2.2.2 r
 
-theorem IsLocData.comap_maximalIdeal [IsLocalRing A] (h : IsLocData R A Z.primeCompl V)
-    (hex : ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Z) :
-    (IsLocalRing.maximalIdeal A).comap (algebraMap R A) = Z := by
+theorem IsLocData.comap_maximalIdeal
+    [IsLocalRing A]
+    (h : IsLocData R A Z.primeCompl V)
+    (hex : ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Z)
+    : (IsLocalRing.maximalIdeal A).comap (algebraMap R A) = Z := by
   obtain ⟨p, hp, hpZ⟩ := hex
   apply le_antisymm (h.comap_le _)
   rw [← hpZ]
   exact Ideal.comap_mono (IsLocalRing.le_maximalIdeal hp.ne_top)
 
-theorem IsLocData.height_eq_one_iff [IsDomain A] [IsNoetherianRing A] [V.IsPrime]
+theorem IsLocData.height_eq_one_iff
+    [IsDomain A] [IsNoetherianRing A] [V.IsPrime]
     (h : IsLocData R A Z.primeCompl V) (hVZ : V ≤ Z)
-    (hex : ∀ Q : Ideal R, Q.IsPrime → V ≤ Q → Q ≤ Z →
-      ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Q)
-    {f : R} (hfV : f ∉ V) (p : Ideal A) [hp : p.IsPrime] :
-    (p.height = 1 ∧ algebraMap R A f ∈ p) ↔
-      p.comap (algebraMap R A) ∈ (V ⊔ Ideal.span {f}).minimalPrimes := by
+    (hex : ∀ Q : Ideal R,
+      Q.IsPrime → V ≤ Q → Q ≤ Z → ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Q)
+    {f : R} (hfV : f ∉ V)
+    (p : Ideal A) [hp : p.IsPrime]
+    : (p.height = 1 ∧ algebraMap R A f ∈ p)
+      ↔ p.comap (algebraMap R A) ∈ (V ⊔ Ideal.span {f}).minimalPrimes := by
   have hf0 : algebraMap R A f ≠ 0 := fun e => hfV ((h.map_eq_zero_iff hVZ f).mp e)
   have hpb : ∀ q : Ideal A, q.IsPrime → algebraMap R A f ∈ q → 1 ≤ q.height := by
     intro q hq hfq
@@ -308,8 +341,7 @@ theorem IsLocData.height_eq_one_iff [IsDomain A] [IsNoetherianRing A] [V.IsPrime
     intro h0
     rw [Ideal.height_eq_zero_iff_eq_bot] at h0
     exact hf0 (by rw [← Ideal.mem_bot, ← h0]; exact hfq)
-  have hsup : ∀ q : Ideal A, algebraMap R A f ∈ q →
-      V ⊔ Ideal.span {f} ≤ q.comap (algebraMap R A) :=
+  have hsup : ∀ q : Ideal A, algebraMap R A f ∈ q → V ⊔ Ideal.span {f} ≤ q.comap (algebraMap R A) :=
     fun q hq => sup_le (h.le_comap q) (Ideal.span_le.mpr (by simpa using hq))
   constructor
   · rintro ⟨h1, hfp⟩
@@ -317,8 +349,7 @@ theorem IsLocData.height_eq_one_iff [IsDomain A] [IsNoetherianRing A] [V.IsPrime
     obtain ⟨q, hq, rfl⟩ := hex Q hQ (le_sup_left.trans hQle) (hQp.trans (h.comap_le p))
     haveI := hq
     have hqp : q ≤ p := h.le_of_comap_le hQp
-    have hfq : algebraMap R A f ∈ q :=
-      hQle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
+    have hfq : algebraMap R A f ∈ q := hQle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
     rcases hqp.lt_or_eq with hlt | heq
     · exfalso
       have h3 := Ideal.height_add_one_le_of_lt_of_isPrime hlt
@@ -340,11 +371,13 @@ theorem IsLocData.height_eq_one_iff [IsDomain A] [IsNoetherianRing A] [V.IsPrime
     have := hmin.2 ⟨Ideal.comap_isPrime _ _, hsup q hfq⟩ (Ideal.comap_mono hqp)
     exact h.le_of_comap_le this
 
-theorem IsLocData.maximalIdeal_mem_minimalPrimes [IsLocalRing A]
-    (h : IsLocData R A Z.primeCompl V) (hZex : ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Z)
-    {f t : R} (hZ : Z ∈ (V ⊔ Ideal.span {f} ⊔ Ideal.span {t}).minimalPrimes) :
-    IsLocalRing.maximalIdeal A ∈
-      (Ideal.span {algebraMap R A f, algebraMap R A t}).minimalPrimes := by
+theorem IsLocData.maximalIdeal_mem_minimalPrimes
+    [IsLocalRing A]
+    (h : IsLocData R A Z.primeCompl V)
+    (hZex : ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Z)
+    {f t : R} (hZ : Z ∈ (V ⊔ Ideal.span {f} ⊔ Ideal.span {t}).minimalPrimes)
+    : IsLocalRing.maximalIdeal A
+      ∈ (Ideal.span {algebraMap R A f, algebraMap R A t}).minimalPrimes := by
   have hc := h.comap_maximalIdeal hZex
   have hfZ : f ∈ Z :=
     hZ.1.2 (Ideal.mem_sup_left (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f)))
@@ -354,33 +387,41 @@ theorem IsLocData.maximalIdeal_mem_minimalPrimes [IsLocalRing A]
     intro x hx
     rcases hx with rfl | rfl
     · show f ∈ (IsLocalRing.maximalIdeal A).comap (algebraMap R A)
-      rw [hc]; exact hfZ
+      rw [hc]
+      exact hfZ
     · show t ∈ (IsLocalRing.maximalIdeal A).comap (algebraMap R A)
-      rw [hc]; exact htZ
+      rw [hc]
+      exact htZ
   · haveI := hq
     have hfq : algebraMap R A f ∈ q := hqle (Ideal.subset_span (Set.mem_insert _ _))
-    have htq : algebraMap R A t ∈ q :=
-      hqle (Ideal.subset_span (Set.mem_insert_of_mem _ rfl))
+    have htq : algebraMap R A t ∈ q := hqle (Ideal.subset_span (Set.mem_insert_of_mem _ rfl))
     have hZq : Z ≤ q.comap (algebraMap R A) :=
-      hZ.2 ⟨Ideal.comap_isPrime _ _, sup_le (sup_le (h.le_comap q)
-        (Ideal.span_le.mpr (by simpa using hfq))) (Ideal.span_le.mpr (by simpa using htq))⟩
+      hZ.2
+        ⟨
+          Ideal.comap_isPrime _ _,
+          sup_le (sup_le (h.le_comap q) (Ideal.span_le.mpr (by simpa using hfq)))
+            (Ideal.span_le.mpr (by simpa using htq))
+        ⟩
         (h.comap_le q)
     exact h.le_of_comap_le (hc ▸ hZq)
 
-theorem IsLocData.ringKrullDim_eq_two [IsDomain A] [IsNoetherianRing A] [IsLocalRing A]
-    [V.IsPrime] (h : IsLocData R A Z.primeCompl V) (hVZ : V ≤ Z)
-    (hex : ∀ Q : Ideal R, Q.IsPrime → V ≤ Q → Q ≤ Z →
-      ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Q)
+theorem IsLocData.ringKrullDim_eq_two
+    [IsDomain A] [IsNoetherianRing A] [IsLocalRing A] [V.IsPrime]
+    (h : IsLocData R A Z.primeCompl V) (hVZ : V ≤ Z)
+    (hex : ∀ Q : Ideal R,
+      Q.IsPrime → V ≤ Q → Q ≤ Z → ∃ p : Ideal A, p.IsPrime ∧ p.comap (algebraMap R A) = Q)
     {f t : R} (hfV : f ∉ V) (hZ : Z ∈ (V ⊔ Ideal.span {f} ⊔ Ideal.span {t}).minimalPrimes)
-    (hft : ∀ W ∈ (V ⊔ Ideal.span {f}).minimalPrimes, W ≤ Z → t ∉ W) : ringKrullDim A = 2 := by
+    (hft : ∀ W ∈ (V ⊔ Ideal.span {f}).minimalPrimes, W ≤ Z → t ∉ W)
+    : ringKrullDim A = 2 := by
   classical
   have hZex := hex Z ‹_› hVZ le_rfl
   have hm := h.maximalIdeal_mem_minimalPrimes hZex hZ
   have hc := h.comap_maximalIdeal hZex
   rw [← IsLocalRing.maximalIdeal_height_eq_ringKrullDim]
   have hle : (IsLocalRing.maximalIdeal A).height ≤ 2 := by
-    have := Ideal.height_le_card_of_mem_minimalPrimes_span_finset
-      (s := {algebraMap R A f, algebraMap R A t}) (by simpa using hm)
+    have :=
+      Ideal.height_le_card_of_mem_minimalPrimes_span_finset
+        (s := {algebraMap R A f, algebraMap R A t}) (by simpa using hm)
     exact this.trans (by exact_mod_cast Finset.card_le_two)
   have hfZ : V ⊔ Ideal.span {f} ≤ Z := le_sup_left.trans hZ.1.2
   obtain ⟨W, hW, hWZ⟩ := Ideal.exists_minimalPrimes_le hfZ
@@ -389,13 +430,16 @@ theorem IsLocData.ringKrullDim_eq_two [IsDomain A] [IsNoetherianRing A] [IsLocal
   have hf0 : algebraMap R A f ≠ 0 := fun e => hfV ((h.map_eq_zero_iff hVZ f).mp e)
   have hfp : algebraMap R A f ∈ p := by
     show f ∈ p.comap (algebraMap R A)
-    rw [hpW]; exact hW.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
+    rw [hpW]
+    exact hW.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self f))
   have htp : algebraMap R A t ∉ p := by
     show t ∉ p.comap (algebraMap R A)
-    rw [hpW]; exact hft W hW hWZ
+    rw [hpW]
+    exact hft W hW hWZ
   have htm : algebraMap R A t ∈ IsLocalRing.maximalIdeal A := by
     show t ∈ (IsLocalRing.maximalIdeal A).comap (algebraMap R A)
-    rw [hc]; exact hZ.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self t))
+    rw [hc]
+    exact hZ.1.2 (Ideal.mem_sup_right (Ideal.mem_span_singleton_self t))
   have hbot : (⊥ : Ideal A) < p :=
     bot_lt_iff_ne_bot.mpr fun e => hf0 (by rw [← Ideal.mem_bot, ← e]; exact hfp)
   have hpm : p < IsLocalRing.maximalIdeal A :=

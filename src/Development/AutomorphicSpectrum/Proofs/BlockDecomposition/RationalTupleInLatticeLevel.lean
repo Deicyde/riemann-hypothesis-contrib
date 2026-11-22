@@ -17,8 +17,12 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC GlobalTheory.CompanionTheory.SiegelND
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.CompanionTheory.SiegelND.Integ GlobalTheory.CompanionTheory.SiegelND.Integ.Hua
@@ -27,30 +31,37 @@ open GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl GlobalTheory.CompanionTheo
 
 namespace GlobalTheory.CompanionTheory.SiegelND.Integ.Weyl.RatMem
 
-theorem exists_nat_mul_mem (F : Type) [Field F] [NumberField F] (x : F) :
-    ∃ m : ℕ, 0 < m ∧ ∃ r : 𝓞 F, (r : F) = (m : F) * x :=
+theorem exists_nat_mul_mem (F : Type) [Field F] [NumberField F] (x : F)
+    : ∃ m : ℕ, 0 < m ∧ ∃ r : 𝓞 F, (r : F) = (m : F) * x :=
   _root_.UpperTheory.Reformulated.B.ExistsNatMulMem.exists_nat_mul_mem F x
 
-theorem repr_inclR {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d : ℕ}
-    (b : Module.Basis (Fin d) F E) (x : E) (k : Fin d) :
-    (Algebra.TensorProduct.basis (Af F) b).repr (inclR (Af F) x) k
+theorem repr_inclR
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (x : E) (k : Fin d)
+    : (Algebra.TensorProduct.basis (Af F) b).repr (inclR (Af F) x) k
       = algebraMap F (Af F) (b.repr x k) := by
   have h : inclR (Af F) x = (1 : Af F) ⊗ₜ[F] x := rfl
   rw [h, Algebra.TensorProduct.basis_repr_tmul]
   simp
 
-theorem natCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℕ) (z : E) :
-    (n : E) * z = (n : F) • z := by
+theorem natCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℕ) (z : E)
+    : (n : E) * z = (n : F) • z := by
   rw [Algebra.smul_def, map_natCast]
 
-theorem intCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℤ) (z : E) :
-    (n : E) * z = (n : F) • z := by
+theorem intCast_mul_eq_smul {F E : Type} [Field F] [Field E] [Algebra F E] (n : ℤ) (z : E)
+    : (n : E) * z = (n : F) • z := by
   rw [Algebra.smul_def, map_intCast]
 
-theorem exists_clear_family {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] {d : ℕ} (b : Module.Basis (Fin d) F E) {ι : Type} [Fintype ι] (e : ι → E) :
-    ∃ D : ℕ, 0 < D ∧ ∀ (t : ι) (o : 𝓞 E) (k : Fin d),
-      ∃ r : 𝓞 F, (r : F) = b.repr ((D : E) * (e t * (o : E))) k := by
+theorem exists_clear_family
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    {ι : Type} [Fintype ι]
+    (e : ι → E)
+    : ∃ D : ℕ,
+      0 < D
+        ∧ ∀ (t : ι) (o : 𝓞 E) (k : Fin d), ∃ r : 𝓞 F,
+          (r : F) = b.repr ((D : E) * (e t * (o : E))) k := by
   classical
   let B := RingOfIntegers.basis E
   choose m hm hr using fun p : ι × Module.Free.ChooseBasisIndex ℤ (𝓞 E) × Fin d =>
@@ -77,8 +88,9 @@ theorem exists_clear_family {F E : Type} [Field F] [NumberField F] [Field E] [Nu
     rw [show (o : E) = algebraMap (𝓞 E) E o from rfl, ← h3]
     refine Finset.sum_congr rfl fun l _ => ?_
     simp [zsmul_eq_mul]
-  have hsum : (D : E) * (e t * (o : E))
-      = ∑ l, ((B.repr o l : ℤ) : F) • ((D : E) * (e t * (B l : E))) := by
+  have hsum
+      : (D : E) * (e t * (o : E))
+        = ∑ l, ((B.repr o l : ℤ) : F) • ((D : E) * (e t * (B l : E))) := by
     rw [ho, Finset.mul_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [← intCast_mul_eq_smul]
@@ -88,16 +100,19 @@ theorem exists_clear_family {F E : Type} [Field F] [NumberField F] [Field E] [Nu
   have h4 : ((∑ l, (B.repr o l) • r l : 𝓞 F) : F) = ∑ l, ((B.repr o l : ℤ) : F) * (r l : F) := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [show ((∑ l, (B.repr o l) • r l : 𝓞 F) : F)
-      = algebraMap (𝓞 F) F (∑ l, (B.repr o l) • r l) from rfl, map_sum]
+            = algebraMap (𝓞 F) F (∑ l, (B.repr o l) • r l) from
+          rfl,
+        map_sum]
     refine Finset.sum_congr rfl fun l _ => ?_
     simp [zsmul_eq_mul]
   rw [h4]
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [map_smul, Finsupp.smul_apply, smul_eq_mul, hr']
 
-theorem ratTuple_mem_latN : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (d : ℕ) (b : Module.Basis (Fin d) F E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (n N : ℕ), 0 < N →
-    ∃ s : ℕ, 0 < s ∧ ∀ ρ : Fin M → Fin n → 𝓞 E, ratTuple J s ρ ∈ latN b n M N := by
+theorem ratTuple_mem_latN
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (d : ℕ)
+        (b : Module.Basis (Fin d) F E) (M : ℕ) (J : Matrix (Fin M) (Fin M) E) (n N : ℕ),
+      0 < N → ∃ s : ℕ, 0 < s ∧ ∀ ρ : Fin M → Fin n → 𝓞 E, ratTuple J s ρ ∈ latN b n M N := by
   intro F E _ _ _ _ _ d b M J n N hN
   obtain ⟨D, hD0, hD⟩ := exists_clear_family b (fun p : Fin M × Fin M => J⁻¹ p.1 p.2)
   refine ⟨N * D, Nat.mul_pos hN hD0, fun ρ => ?_⟩
@@ -110,13 +125,14 @@ theorem ratTuple_mem_latN : ∀ (F E : Type) [Field F] [NumberField F] [Field E]
       (inclR (Af F) (((N * D : ℕ) : E) *
         (J⁻¹ *ᵥ fun i => algebraMap (𝓞 E) E (ρ i a)) j)) k = _
     rw [repr_inclR]
-    have h1 : ((N * D : ℕ) : E) * (J⁻¹ *ᵥ fun i => algebraMap (𝓞 E) E (ρ i a)) j
-        = (N : F) • ∑ i, (D : E) * (J⁻¹ j i * (ρ i a : E)) := by
+    have h1
+        : ((N * D : ℕ) : E) * (J⁻¹ *ᵥ fun i => algebraMap (𝓞 E) E (ρ i a)) j
+          = (N : F) • ∑ i, (D : E) * (J⁻¹ j i * (ρ i a : E)) := by
       rw [← natCast_mul_eq_smul, Nat.cast_mul, Matrix.mulVec, dotProduct, ← Finset.mul_sum,
         mul_assoc]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_smul, Finsupp.smul_apply, smul_eq_mul, map_sum, Finsupp.finsetSum_apply,
-      map_mul, map_natCast]
+      rw [h1, map_smul, Finsupp.smul_apply, smul_eq_mul, map_sum, Finsupp.finsetSum_apply, map_mul,
+        map_natCast]
     congr 2
     set_option synthInstance.maxHeartbeats 100000 in
       rw [show ((∑ i, r i : 𝓞 F) : F) = algebraMap (𝓞 F) F (∑ i, r i) from rfl, map_sum]

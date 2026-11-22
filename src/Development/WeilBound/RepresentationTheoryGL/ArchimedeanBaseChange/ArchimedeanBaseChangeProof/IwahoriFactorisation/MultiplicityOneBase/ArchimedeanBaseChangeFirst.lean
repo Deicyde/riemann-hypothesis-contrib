@@ -28,17 +28,26 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UnitLemmaUnr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 
-theorem PositivityTheory.Rg.Bc.ArchbcB.B.archimedean_base_change_first : PositivityTheory.Rg.Bc.ArchbcB.B.M1 := by
+theorem PositivityTheory.Rg.Bc.ArchbcB.B.archimedean_base_change_first
+    : PositivityTheory.Rg.Bc.ArchbcB.B.M1 := by
   intro E _ _ _ hE w hw n a b hab Q₁ Q₂ hm₁ hm₂ hd₁ hd₂ hsep hc₁ hc₂
-  obtain ⟨K, e, he1, he2, he3, he4⟩ := GlobalTheory.T.exists_unramifiedQuadraticDatum_at_inertPlace E hE w hw
+  obtain ⟨K, e, he1, he2, he3, he4⟩ :=
+    GlobalTheory.T.exists_unramifiedQuadraticDatum_at_inertPlace E hE w hw
   have hs₁ : Q₁.Separable := hsep.of_mul_left
   have hs₂ : Q₂.Separable := hsep.of_mul_right
-  obtain ⟨B₁, hg₁, hP₁, hst₁⟩ := GlobalTheory.T.inertPlace_stableTwistedOrbital_unit_eq_latticeSum E hE w hw K e he1 he2 he3 he4 a Q₁ hm₁ hd₁ hs₁ hc₁
-  obtain ⟨B₂, hg₂, hP₂, hst₂⟩ := GlobalTheory.T.inertPlace_stableTwistedOrbital_unit_eq_latticeSum E hE w hw K e he1 he2 he3 he4 b Q₂ hm₂ hd₂ hs₂ hc₂
-  have hk := GlobalTheory.T.inertPlace_kappaOrbital_unit_eq_signedLatticeSum E hE w hw K e he1 he2 he3 he4 n Q₁ Q₂ hm₁ hm₂ (by omega) hsep hc₁ hc₂ B₁ B₂ hg₁ hg₂ hP₁ hP₂
+  obtain ⟨B₁, hg₁, hP₁, hst₁⟩ :=
+    GlobalTheory.T.inertPlace_stableTwistedOrbital_unit_eq_latticeSum E hE w hw K e he1 he2 he3 he4
+      a Q₁ hm₁ hd₁ hs₁ hc₁
+  obtain ⟨B₂, hg₂, hP₂, hst₂⟩ :=
+    GlobalTheory.T.inertPlace_stableTwistedOrbital_unit_eq_latticeSum E hE w hw K e he1 he2 he3 he4
+      b Q₂ hm₂ hd₂ hs₂ hc₂
+  have hk :=
+    GlobalTheory.T.inertPlace_kappaOrbital_unit_eq_signedLatticeSum E hE w hw K e he1 he2 he3 he4 n
+      Q₁ Q₂ hm₁ hm₂ (by omega) hsep hc₁ hc₂ B₁ B₂ hg₁ hg₂ hP₁ hP₂
   have hsepP : (B₁.P * B₂.P).Separable := by
     rw [hP₁, hP₂, ← Polynomial.map_mul]
     exact hsep.map
@@ -52,7 +61,8 @@ theorem PositivityTheory.Rg.Bc.ArchbcB.B.archimedean_base_change_first : Positiv
       Polynomial.natDegree_map_eq_of_injective e.symm.injective _
     rw [h1, h2, Polynomial.resultant_map_map]
     simp
-  rw [PositivityTheory.BcbA.Ties.unit_product_indicator_twist E hE a b w hw Q₁ Q₂ hs₁ hs₂, hst₁, hst₂, hk, ← Rat.cast_mul, ← hid, Rat.cast_mul]
+  rw [PositivityTheory.BcbA.Ties.unit_product_indicator_twist E hE a b w hw Q₁ Q₂ hs₁ hs₂, hst₁,
+    hst₂, hk, ← Rat.cast_mul, ← hid, Rat.cast_mul]
   congr 1
   rw [hv]
   unfold delta absHalf

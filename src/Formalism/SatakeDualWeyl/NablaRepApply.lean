@@ -12,9 +12,11 @@ open Matrix TensorProduct
 
 namespace Formalism.UG
 
-def nablaRep (O : Type) [CommRing O] (n : Type) [Fintype n] [DecidableEq n] (k : ℕ) :
-    Representation O (GL n O) (nabla O n k) where
-  toFun g := (polyAct O n g).toLinearMap.restrict (fun P hP => Formalism.UG.P.nabla_subspace_stable O n k g P hP)
+def nablaRep (O : Type) [CommRing O] (n : Type) [Fintype n] [DecidableEq n] (k : ℕ)
+    : Representation O (GL n O) (nabla O n k) where
+  toFun g :=
+    (polyAct O n g).toLinearMap.restrict
+      (fun P hP => Formalism.UG.P.nabla_subspace_stable O n k g P hP)
   map_one' := by
     apply LinearMap.ext
     intro P
@@ -30,9 +32,12 @@ def nablaRep (O : Type) [CommRing O] (n : Type) [Fintype n] [DecidableEq n] (k :
     rw [(Formalism.UG.P.polynomial_action_mul_holds O n g h).1]
     rfl
 
-def ratEquiv {F E : Type} [Field F] [CommRing E] [Algebra F E] {n : Type} [Fintype n]
-    [DecidableEq n] (σ : E →ₐ[F] E) (J : Matrix n n E) (R : Type) [CommRing R] [Algebra F R]
-    [Nontrivial R] : UJ (σ : E →+* E) J ≃* ratPts σ J R :=
+def ratEquiv
+    {F E : Type} [Field F] [CommRing E] [Algebra F E]
+    {n : Type} [Fintype n] [DecidableEq n]
+    (σ : E →ₐ[F] E) (J : Matrix n n E)
+    (R : Type) [CommRing R] [Algebra F R] [Nontrivial R]
+    : UJ (σ : E →+* E) J ≃* ratPts σ J R :=
   Subgroup.equivMapOfInjective (UJ (σ : E →+* E) J) (bc (inclE (F := F) R))
     (Formalism.UG.P.UG_inclusion_injective F E n R inferInstance)
 

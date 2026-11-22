@@ -13,24 +13,34 @@ namespace Formalism.L2.PairingIndexBounds.PowerSeriesNecessity
 
 variable {p : ℕ} [Fact p.Prime]
 
-theorem latAt_smul (X : Sys p) (j : ℕ) (c : X.Lv.comp j) (γ : (X.Lv.lev j c).Γ) (L : (X.Pj j).Tup) (v : X.Pl) :
-    X.latAt v j ((X.Lv.lev j c).smul γ L) =
-      (X.latAt v j L).map ((Matrix.mulVecLin (gamAt X j c γ v : Matrix _ _ (X.G.P.Qq v))).restrictScalars (X.G.P.W v)) := by
+theorem latAt_smul
+    (X : Sys p) (j : ℕ) (c : X.Lv.comp j) (γ : (X.Lv.lev j c).Γ) (L : (X.Pj j).Tup) (v : X.Pl)
+    : X.latAt v j ((X.Lv.lev j c).smul γ L)
+      = (X.latAt v j L).map
+        ((Matrix.mulVecLin (gamAt X j c γ v : Matrix _ _ (X.G.P.Qq v))).restrictScalars
+          (X.G.P.W v)) := by
   cases j <;> rfl
 
-theorem map_map_inv {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Qq] {k : ℕ} (A : GL (Fin k) Qq)
-    (M : Submodule W (Fin k → Qq)) :
-    (M.map ((Matrix.mulVecLin (A : Matrix (Fin k) (Fin k) Qq)).restrictScalars W)).map
-      ((Matrix.mulVecLin ((A⁻¹ : GL (Fin k) Qq) : Matrix (Fin k) (Fin k) Qq)).restrictScalars W) = M := by
+theorem map_map_inv
+    {W Qq : Type} [CommRing W] [Field Qq] [Algebra W Qq]
+    {k : ℕ} (A : GL (Fin k) Qq) (M : Submodule W (Fin k → Qq))
+    : (M.map ((Matrix.mulVecLin (A : Matrix (Fin k) (Fin k) Qq)).restrictScalars W)).map
+        ((Matrix.mulVecLin ((A⁻¹ : GL (Fin k) Qq) : Matrix (Fin k) (Fin k) Qq)).restrictScalars W)
+      = M := by
   rw [← Submodule.map_comp]
-  have hid : ((Matrix.mulVecLin ((A⁻¹ : GL (Fin k) Qq) : Matrix (Fin k) (Fin k) Qq)).restrictScalars W).comp
-      ((Matrix.mulVecLin (A : Matrix (Fin k) (Fin k) Qq)).restrictScalars W) = LinearMap.id := by
+  have hid
+      : ((Matrix.mulVecLin ((A⁻¹ : GL (Fin k) Qq) : Matrix (Fin k) (Fin k) Qq)).restrictScalars
+          W).comp ((Matrix.mulVecLin (A : Matrix (Fin k) (Fin k) Qq)).restrictScalars W)
+        = LinearMap.id := by
     refine LinearMap.ext fun x => ?_
     simp [Matrix.mulVec_mulVec]
   rw [hid, Submodule.map_id]
 
-def frmMove (X : Sys p) {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup} (γ : (X.Lv.lev j La.1).Γ)
-    (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ : Frm X j La La') : Frm X j (La.1, L0) La' where
+def frmMove
+    (X : Sys p)
+    {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup}
+    (γ : (X.Lv.lev j La.1).Γ) (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ : Frm X j La La')
+    : Frm X j (La.1, L0) La' where
   g := fun v => (gamAt X j La.1 γ v)⁻¹ * φ.g v
   g' := φ.g'
   hg := fun v => by
@@ -40,8 +50,11 @@ def frmMove (X : Sys p) {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj
     rw [Units.val_mul, ← colSpan_mul, ← h1, map_map_inv]
   hg' := φ.hg'
 
-def frmBack (X : Sys p) {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup} (γ : (X.Lv.lev j La.1).Γ)
-    (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ0 : Frm X j (La.1, L0) La') : Frm X j La La' where
+def frmBack
+    (X : Sys p)
+    {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup}
+    (γ : (X.Lv.lev j La.1).Γ) (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ0 : Frm X j (La.1, L0) La')
+    : Frm X j La La' where
   g := fun v => gamAt X j La.1 γ v * φ0.g v
   g' := φ0.g'
   hg := fun v => by
@@ -50,9 +63,11 @@ def frmBack (X : Sys p) {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj
     rw [h, latAt_smul, h1, colSpan_mul, Units.val_mul]
   hg' := φ0.hg'
 
-theorem frmMove_frmBack (X : Sys p) {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup}
-    (γ : (X.Lv.lev j La.1).Γ) (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ0 : Frm X j (La.1, L0) La') :
-    frmMove X γ h (frmBack X γ h φ0) = φ0 := by
+theorem frmMove_frmBack
+    (X : Sys p)
+    {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup}
+    (γ : (X.Lv.lev j La.1).Γ) (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ0 : Frm X j (La.1, L0) La')
+    : frmMove X γ h (frmBack X γ h φ0) = φ0 := by
   cases φ0 with
   | mk g g' hg hg' =>
     unfold frmMove frmBack
@@ -60,17 +75,21 @@ theorem frmMove_frmBack (X : Sys p) {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)}
     funext v
     exact inv_mul_cancel_left _ _
 
-theorem subst_invF_actS (X : Sys p) (Kc : Type) [Field Kc] [Algebra (Formalism.MainNotions.FormalGroupSystem.K0 p) Kc] [Algebra X.G.Kf Kc] {j : ℕ}
-    {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup} (γ : (X.Lv.lev j La.1).Γ)
-    (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ : Frm X j La La') (z : X.ZA j) :
-    MvPowerSeries.subst (invF Kc φ) (actS X Kc j (gamAt X j La.1 γ) z) = invF Kc (frmMove X γ h φ) z := by
+theorem subst_invF_actS
+    (X : Sys p) (Kc : Type)
+    [Field Kc] [Algebra (Formalism.MainNotions.FormalGroupSystem.K0 p) Kc] [Algebra X.G.Kf Kc]
+    {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup} (γ : (X.Lv.lev j La.1).Γ)
+    (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ : Frm X j La La') (z : X.ZA j)
+    : MvPowerSeries.subst (invF Kc φ) (actS X Kc j (gamAt X j La.1 γ) z)
+      = invF Kc (frmMove X γ h φ) z := by
   have hI : MvPowerSeries.HasSubst (invF Kc φ) := by apply hasSubst_invF
   rcases z with ⟨v, s, a, b⟩
   have hQ : Qi Kc (frmMove X γ h φ) v s = Qi Kc φ v s := by
     unfold Qi
     rfl
-  have hm : ∀ A B : Matrix (Fin ((X.Pj j).m + 1)) (Fin ((X.Pj j).m + 1)) (X.G.P.Qq v),
-      mAt X Kc j v s (A * B) = mAt X Kc j v s A * mAt X Kc j v s B := by
+  have hm
+      : ∀ A B : Matrix (Fin ((X.Pj j).m + 1)) (Fin ((X.Pj j).m + 1)) (X.G.P.Qq v),
+        mAt X Kc j v s (A * B) = mAt X Kc j v s A * mAt X Kc j v s B := by
     intro A B
     unfold mAt
     rw [Matrix.map_mul, Matrix.submatrix_mul_equiv]
@@ -99,10 +118,12 @@ theorem subst_invF_actS (X : Sys p) (Kc : Type) [Field Kc] [Algebra (Formalism.M
     rw [mul_inv_rev, inv_inv, Units.val_mul, hm, Matrix.mul_apply]
     exact Finset.sum_congr rfl fun _ _ => mul_comm _ _
 
-theorem thA_SA (X : Sys p) (Kc : Type) [Field Kc] [Algebra (Formalism.MainNotions.FormalGroupSystem.K0 p) Kc] [Algebra X.G.Kf Kc] {j : ℕ}
-    {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup} (γ : (X.Lv.lev j La.1).Γ)
-    (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ : Frm X j La La') (f : MvPowerSeries (X.ZA j) Kc) :
-    thA Kc φ (SA X Kc j (gamAt X j La.1 γ) f) = thA Kc (frmMove X γ h φ) f := by
+theorem thA_SA
+    (X : Sys p) (Kc : Type)
+    [Field Kc] [Algebra (Formalism.MainNotions.FormalGroupSystem.K0 p) Kc] [Algebra X.G.Kf Kc]
+    {j : ℕ} {La : X.Lt j} {La' : X.Lt (j + 1)} {L0 : (X.Pj j).Tup} (γ : (X.Lv.lev j La.1).Γ)
+    (h : La.2 = (X.Lv.lev j La.1).smul γ L0) (φ : Frm X j La La') (f : MvPowerSeries (X.ZA j) Kc)
+    : thA Kc φ (SA X Kc j (gamAt X j La.1 γ) f) = thA Kc (frmMove X γ h φ) f := by
   have hI : MvPowerSeries.HasSubst (invF Kc φ) := by apply hasSubst_invF
   have hA : MvPowerSeries.HasSubst (actS X Kc j (gamAt X j La.1 γ)) := by apply hasSubst_actS
   unfold thA SA

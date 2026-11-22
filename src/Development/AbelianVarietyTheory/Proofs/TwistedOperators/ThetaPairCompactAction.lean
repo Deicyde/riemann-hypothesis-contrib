@@ -37,11 +37,11 @@ def zeroOn (S : Submodule ℂ (SchwartzMap Y ℂ)) (P : Finset Y) : Submodule �
     intro c a ha y hy
     simp [ha y hy]
 
-theorem exists_finset_sep (S : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteDimensional ℂ S] :
-    ∃ P : Finset Y, ∀ s ∈ S, (∀ y ∈ P, s y = 0) → s = 0 := by
+theorem exists_finset_sep (S : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteDimensional ℂ S]
+    : ∃ P : Finset Y, ∀ s ∈ S, (∀ y ∈ P, s y = 0) → s = 0 := by
   classical
-  obtain ⟨P, -, hmin⟩ := (measure fun P : Finset Y => Module.finrank ℂ (zeroOn S P)).wf.has_min Set.univ
-    ⟨∅, trivial⟩
+  obtain ⟨P, -, hmin⟩ :=
+    (measure fun P : Finset Y => Module.finrank ℂ (zeroOn S P)).wf.has_min Set.univ ⟨∅, trivial⟩
   refine ⟨P, fun s hs h0 => ?_⟩
   by_contra hne
   obtain ⟨y, hy⟩ : ∃ y, s y ≠ 0 := by
@@ -55,15 +55,18 @@ theorem exists_finset_sep (S : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteDimensi
     exact hy (hmem y (Finset.mem_insert_self y P))
   exact hmin (insert y P) trivial (Submodule.finrank_lt_finrank_of_lt hlt)
 
-theorem sub_mem_of_hasDerivAt (S T : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteDimensional ℂ S]
-    (c d : ℝ → SchwartzMap Y ℂ) (hc : ∀ u, c u ∈ S) (hd : ∀ t, d t ∈ T)
-    (hder : ∀ y t, HasDerivAt (fun u => c u y) (d t y) t) : c 1 - c 0 ∈ T := by
+theorem sub_mem_of_hasDerivAt
+    (S T : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteDimensional ℂ S]
+    (c d : ℝ → SchwartzMap Y ℂ)
+    (hc : ∀ u, c u ∈ S) (hd : ∀ t, d t ∈ T) (hder : ∀ y t, HasDerivAt (fun u => c u y) (d t y) t)
+    : c 1 - c 0 ∈ T := by
   classical
   obtain ⟨P, hP⟩ := exists_finset_sep S
-  let E : S →ₗ[ℂ] (P → ℂ) :=
-    { toFun := fun s p => (s : SchwartzMap Y ℂ) p
-      map_add' := by intro a b; funext p; simp
-      map_smul' := by intro a b; funext p; simp }
+  let E : S →ₗ[ℂ] (P → ℂ) := {
+    toFun := fun s p => (s : SchwartzMap Y ℂ) p
+    map_add' := by intro a b; funext p; simp
+    map_smul' := by intro a b; funext p; simp
+  }
   have hE : LinearMap.ker E = ⊥ := by
     rw [LinearMap.ker_eq_bot']
     intro s hs
@@ -73,17 +76,22 @@ theorem sub_mem_of_hasDerivAt (S T : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteD
   have hCd : ∀ t, HasDerivAt C (fun p => d t p) t := fun t => hasDerivAt_pi.2 fun p => hder p t
   have hLC : ∀ u, L (C u) = ⟨c u, hc u⟩ := fun u => LinearMap.congr_fun hL ⟨c u, hc u⟩
   let ev : SchwartzMap Y ℂ → Y → ℂ := fun g y => g y
-  have hcomp : ∀ φ : (P → ℂ) →ₗ[ℂ] ℂ, ∀ t, HasDerivAt (fun u => φ (C u)) (φ (fun p => d t p)) t := fun φ t => by
-    have h := (((LinearMap.toContinuousLinearMap φ).restrictScalars ℝ).hasFDerivAt (x := C t)).comp_hasDerivAt t (hCd t)
+  have hcomp
+      : ∀ φ : (P → ℂ) →ₗ[ℂ] ℂ, ∀ t,
+        HasDerivAt (fun u => φ (C u)) (φ (fun p => d t p)) t := fun φ t => by
+    have h :=
+      (((LinearMap.toContinuousLinearMap φ).restrictScalars ℝ).hasFDerivAt
+        (x := C t)).comp_hasDerivAt t (hCd t)
     simpa [Function.comp_def] using h
 
   have hdS : ∀ t, ((L (fun p => d t p) : S) : SchwartzMap Y ℂ) = d t := by
     intro t
     ext y
-    let evy : S →ₗ[ℂ] ℂ :=
-      { toFun := fun s => (s : SchwartzMap Y ℂ) y
-        map_add' := by intro a b; simp
-        map_smul' := by intro a b; simp }
+    let evy : S →ₗ[ℂ] ℂ := {
+      toFun := fun s => (s : SchwartzMap Y ℂ) y
+      map_add' := by intro a b; simp
+      map_smul' := by intro a b; simp
+    }
     have h1 := hcomp (evy ∘ₗ L) t
     have h2 : (fun u => (evy ∘ₗ L) (C u)) = fun u => c u y := by
       funext u
@@ -107,7 +115,8 @@ theorem sub_mem_of_hasDerivAt (S T : Submodule ℂ (SchwartzMap Y ℂ)) [FiniteD
         show φ (T'.mkQ (L (fun p => d t p))) = 0
         rw [Submodule.mkQ_apply, (Submodule.Quotient.mk_eq_zero T').2 (hdT t), map_zero]
       rwa [h0] at this
-    have hconst := is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) 1 0
+    have hconst :=
+      is_const_of_deriv_eq_zero (fun t => (hg t).differentiableAt) (fun t => (hg t).deriv) 1 0
     have e1 : ∀ u, ψ (C u) = φ (Submodule.Quotient.mk ⟨c u, hc u⟩) := fun u => by
       show φ (T'.mkQ (L (C u))) = _
       rw [hLC u]

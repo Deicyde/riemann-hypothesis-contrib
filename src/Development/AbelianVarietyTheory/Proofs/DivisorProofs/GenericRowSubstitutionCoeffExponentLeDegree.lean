@@ -12,9 +12,14 @@ open MvPolynomial Formalism.GradedWeylDivisibility GlobalTheory.GenCoef
 
 namespace GlobalTheory.GenSubDeg
 
-theorem genSub_coeff_le : ∀ (O : Type) [CommRing O] (N : ℕ) (D : ℕ) (f : MvPolynomial (Fin N × Fin N) O), f.totalDegree ≤ D → ∀ m, (GlobalTheory.HighWt.genSub O N f).coeff m ≠ 0 → ∀ v, m v ≤ D := by
+theorem genSub_coeff_le
+    : ∀ (O : Type) [CommRing O] (N : ℕ) (D : ℕ) (f : MvPolynomial (Fin N × Fin N) O),
+      f.totalDegree ≤ D → ∀ m, (GlobalTheory.HighWt.genSub O N f).coeff m ≠ 0 → ∀ v, m v ≤ D := by
   intro O _ N D f hf m hm v
-  have hg : ∀ i : Fin N × Fin N, (∑ b : Fin N, (X (i.1, b) * C (X (b, i.2)) : MvPolynomial (Fin N × Fin N) (MvPolynomial (Fin N × Fin N) O))).totalDegree ≤ 1 := by
+  have hg
+      : ∀ i : Fin N × Fin N,
+        (∑ b : Fin N, (X (i.1, b) * C (X (b, i.2)) : MvPolynomial (Fin N × Fin N) (MvPolynomial (Fin N × Fin N) O))).totalDegree
+          ≤ 1 := by
     intro i
     refine totalDegree_finsetSum_le fun b _ => ?_
     refine (totalDegree_mul _ _).trans ?_

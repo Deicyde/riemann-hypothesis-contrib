@@ -6,12 +6,27 @@ public import GroundTheory.HeightsAndTheta.Heights.DiscreteValuationNumbers.Stat
 
 @[expose] public section
 
-open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num GlobalTheory.CompanionTheory.Ar.Top GroundTheory.Heights₂.Heights.ModelLeaves
-open ReciprocityTheory.ChartRestriction.G.Geo (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle chartRing)
+open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num
+  GlobalTheory.CompanionTheory.Ar.Top GroundTheory.Heights₂.Heights.ModelLeaves
+open ReciprocityTheory.ChartRestriction.G.Geo
+  (HermLine IsSmoothHerm IsArithVar IsHorizontal mcPts mCoordIdeal IsIntersectionFamily
+    IsIntersectionSystem IntersectionSystem ptsIntegral geoNum charOf recR arInt ChartBundle
+    chartRing)
 
 namespace GlobalTheory.CompanionTheory.Ar.Num
 
-theorem co_series_three_step : (∀ (Sg : Type) [Fintype Sg] [DecidableEq Sg] (φ : Equiv.Perm Sg) (p k : ℕ), 2 ≤ p → 1 ≤ k → ∀ (La : Sg → ℝ) (τ : Sg), ∑ σ, co φ p k τ σ * La σ = (∑' n : ℕ, ((p : ℝ) ^ k)⁻¹ ^ (n + 1) * La ((φ ^ (n + 1)) τ)) - La τ / ((p : ℝ) - 1)) ∧ (∀ (Sg : Type) (φ : Equiv.Perm Sg) (p k : ℕ), 2 ≤ p → ∀ (La : Sg → ℝ) (q : ℕ → Sg → ℝ), (∀ r τ, q r τ = ((p : ℝ) ^ ((r + 1) * k))⁻¹ * La ((φ ^ (r + 1)) τ) + q (r + 1) τ) → (∀ r τ, q (r + 1) τ = ((p : ℝ) ^ k)⁻¹ * q r (φ τ)) → ∀ τ, (p : ℝ) ^ k * q 0 τ = q 0 (φ τ) + La (φ τ)) := by
+theorem co_series_three_step
+    : (∀ (Sg : Type) [Fintype Sg] [DecidableEq Sg] (φ : Equiv.Perm Sg) (p k : ℕ),
+        2 ≤ p → 1 ≤ k
+          → ∀ (La : Sg → ℝ) (τ : Sg),
+            ∑ σ, co φ p k τ σ * La σ
+              = (∑' n : ℕ, ((p : ℝ) ^ k)⁻¹ ^ (n + 1) * La ((φ ^ (n + 1)) τ)) - La τ / ((p : ℝ) - 1))
+      ∧ (∀ (Sg : Type) (φ : Equiv.Perm Sg) (p k : ℕ),
+        2 ≤ p
+          → ∀ (La : Sg → ℝ) (q : ℕ → Sg → ℝ),
+            (∀ r τ, q r τ = ((p : ℝ) ^ ((r + 1) * k))⁻¹ * La ((φ ^ (r + 1)) τ) + q (r + 1) τ)
+              → (∀ r τ, q (r + 1) τ = ((p : ℝ) ^ k)⁻¹ * q r (φ τ))
+              → ∀ τ, (p : ℝ) ^ k * q 0 τ = q 0 (φ τ) + La (φ τ)) := by
   refine ⟨?_, ?_⟩
   · intro Sg _ _ φ p k hp hk La τ
     have hp1 : (1 : ℝ) < (p : ℝ) := by exact_mod_cast (by omega : 1 < p)
@@ -22,7 +37,8 @@ theorem co_series_three_step : (∀ (Sg : Type) [Fintype Sg] [DecidableEq Sg] (�
     have hr1 : r < 1 := inv_lt_one_of_one_lt₀ hpk1
     have hgeo : Summable (fun n : ℕ => r ^ (n + 1)) :=
       (summable_nat_add_iff 1).mpr (summable_geometric_of_lt_one hr0 hr1)
-    have hterm : ∀ σ n, returnTerm φ p k τ σ n = if (φ ^ (n + 1)) τ = σ then r ^ (n + 1) else 0 := by
+    have hterm
+        : ∀ σ n, returnTerm φ p k τ σ n = if (φ ^ (n + 1)) τ = σ then r ^ (n + 1) else 0 := by
       intro σ n
       simp only [returnTerm, one_div, hr]
     have hsum : ∀ σ, Summable (returnTerm φ p k τ σ) := by
@@ -33,9 +49,10 @@ theorem co_series_three_step : (∀ (Sg : Type) [Fintype Sg] [DecidableEq Sg] (�
       split_ifs
       · rw [Real.norm_of_nonneg (pow_nonneg hr0 _)]
       · simpa using pow_nonneg hr0 (n + 1)
-    have hsum' : ∀ σ, Summable (fun n => returnTerm φ p k τ σ n * La σ) :=
-      fun σ => (hsum σ).mul_right _
-    have hinner : ∀ n : ℕ, ∑ σ, returnTerm φ p k τ σ n * La σ = r ^ (n + 1) * La ((φ ^ (n + 1)) τ) := by
+    have hsum' : ∀ σ, Summable (fun n => returnTerm φ p k τ σ n * La σ) := fun σ =>
+      (hsum σ).mul_right _
+    have hinner
+        : ∀ n : ℕ, ∑ σ, returnTerm φ p k τ σ n * La σ = r ^ (n + 1) * La ((φ ^ (n + 1)) τ) := by
       intro n
       rw [Finset.sum_eq_single ((φ ^ (n + 1)) τ)]
       · rw [hterm, if_pos rfl]
@@ -43,8 +60,9 @@ theorem co_series_three_step : (∀ (Sg : Type) [Fintype Sg] [DecidableEq Sg] (�
         rw [hterm, if_neg (Ne.symm hb), zero_mul]
       · intro h
         exact absurd (Finset.mem_univ _) h
-    have hswap : ∑ σ, (∑' n, returnTerm φ p k τ σ n) * La σ =
-        ∑' n : ℕ, r ^ (n + 1) * La ((φ ^ (n + 1)) τ) := by
+    have hswap
+        : ∑ σ, (∑' n, returnTerm φ p k τ σ n) * La σ
+          = ∑' n : ℕ, r ^ (n + 1) * La ((φ ^ (n + 1)) τ) := by
       simp_rw [← tsum_mul_right]
       rw [← Summable.tsum_finsetSum (fun σ _ => hsum' σ)]
       exact tsum_congr hinner

@@ -14,23 +14,37 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.NadelVanish
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh GlobalTheory.Discrepancy GlobalTheory.LogPair
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.CechPic GlobalTheory.QCoh
+  GlobalTheory.Discrepancy GlobalTheory.LogPair
 
 set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory
 
-theorem isZero_cechH_nonzeroLocus_of_eventually_twist : ∀ (X : Scheme.{0}) (F : X.Modules) [F.IsQuasicoherent] (L : LB X), L.IsLB → ∀ (σ : L.Sec)
-    {ι : Type} [LinearOrder ι] [Fintype ι] (U : ι → X.Opens),
-    (∀ s : Finset ι, s.Nonempty → IsAffineOpen (⨅ i ∈ s, U i)) → ∀ n : ℕ,
-    (∀ᶠ c : ℕ in atTop, IsZero (cechH ℤ (twistZ F L c) ⊤ U n)) → IsZero (cechH ℤ F (nonzeroLocus σ) U n) := by
+theorem isZero_cechH_nonzeroLocus_of_eventually_twist
+    : ∀ (X : Scheme.{0}) (F : X.Modules) [F.IsQuasicoherent] (L : LB X),
+      L.IsLB
+        → ∀ (σ : L.Sec) {ι : Type} [LinearOrder ι] [Fintype ι] (U : ι → X.Opens),
+          (∀ s : Finset ι, s.Nonempty → IsAffineOpen (⨅ i ∈ s, U i))
+            → ∀ n : ℕ,
+              (∀ᶠ c : ℕ in atTop, IsZero (cechH ℤ (twistZ F L c) ⊤ U n))
+                → IsZero (cechH ℤ F (nonzeroLocus σ) U n) := by
   intro X F _ L hL σ ι _ _ U hU n h
   obtain ⟨μ, ρ, h₁, h₂, h₃, h₄⟩ := GlobalTheory.T.cech_twist_nonzero_locus_maps X F L hL σ U hU
-  exact GlobalTheory.T.cech_complex_direct_limit (fun c => cechCube ℤ (twistZ F L c) ⊤ U) (cechCube ℤ F (nonzeroLocus σ) U) μ ρ h₁ h₂ h₃ h₄ n h
+  exact GlobalTheory.T.cech_complex_direct_limit
+    (fun c => cechCube ℤ (twistZ F L c) ⊤ U)
+    (cechCube ℤ F (nonzeroLocus σ) U) μ ρ h₁ h₂ h₃ h₄ n h
 
-theorem subsingleton_cohOn_nonzeroLocus_of_eventually_twist : ∀ (X : Scheme.{0}) [CompactSpace X] [X.IsSeparated] (F : X.Modules) [F.IsQuasicoherent] (L : LB X), L.IsLB → ∀ (σ : L.Sec) (i : ℕ), (∀ᶠ c : ℕ in atTop, Subsingleton (coh (twist F (lbPow L c)) i)) → Subsingleton (cohOn F (nonzeroLocus σ) i) := by
+theorem subsingleton_cohOn_nonzeroLocus_of_eventually_twist
+    : ∀ (X : Scheme.{0}) [CompactSpace X] [X.IsSeparated] (F : X.Modules) [F.IsQuasicoherent]
+        (L : LB X),
+      L.IsLB
+        → ∀ (σ : L.Sec) (i : ℕ),
+          (∀ᶠ c : ℕ in atTop, Subsingleton (coh (twist F (lbPow L c)) i))
+            → Subsingleton (cohOn F (nonzeroLocus σ) i) := by
   intro X _ _ F _ L hL σ i h
   obtain ⟨κ, hκ, T, c, hT, -, hTc, hcov⟩ :=
     Twist.exists_finite_affine_chart_cover hL (W := ⊤) (isCompact_univ (X := X))
@@ -44,7 +58,9 @@ theorem subsingleton_cohOn_nonzeroLocus_of_eventually_twist : ∀ (X : Scheme.{0
     have hle : ⨅ b ∈ s, T b ≤ L.U (c a) := (biInf_le T ha).trans (hTc a)
     have e := Twist.basicOpen_resG_zfun (Twist.zofSec σ) (c a) hle
     rw [Twist.nonzeroLocus_zofSec hL] at e
-    have e' : cechOpen (nonzeroLocus σ) T s = X.basicOpen (resG X hle (Twist.zfun (Twist.zofSec σ) (c a))) := by
+    have e'
+        : cechOpen (nonzeroLocus σ) T s
+          = X.basicOpen (resG X hle (Twist.zfun (Twist.zofSec σ) (c a))) := by
       rw [e, cechOpen, inf_comm]
     rw [e']
     exact (hsep s ⟨a, ha⟩).basicOpen _

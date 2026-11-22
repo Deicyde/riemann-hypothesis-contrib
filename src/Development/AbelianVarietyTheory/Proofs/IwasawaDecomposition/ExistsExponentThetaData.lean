@@ -10,7 +10,8 @@ namespace GlobalTheory.MemN
 open Formalism.BasicNotions GlobalTheory.Mem NumberField IsDedekindDomain
 
 section
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
   {LL0 : IntermediateField ℚ what₂.LL} {nd : NData R H what₂} (tw : NTw R H what₂ LL0 nd)
 
 def nexpOfEmpty [IsEmpty tw.Tw] (e : G0g nd → ↥LL0) : NExp R H what₂ LL0 nd tw where
@@ -112,9 +113,11 @@ def nthOfEmpty [IsEmpty tw.Tw] (Y : NExp R H what₂ LL0 nd tw) : NTh R H what�
 
 end
 
-theorem exists_nexp_nth_of_isEmpty (B : Base) (C : Cols B) (W : RowsRest B C) (nd : NData B.R B.host W.what₂)
-    (tw : NTw B.R B.host W.what₂ B.LL0 nd) (h : IsEmpty tw.Tw) (e : G0g nd → ↥B.LL0) :
-    ∃ Y : NExp B.R B.host W.what₂ B.LL0 nd tw, Y.eLL0 = e ∧ Nonempty (NTh B.R B.host W.what₂ B.LL0 nd tw Y) :=
+theorem exists_nexp_nth_of_isEmpty
+    (B : Base) (C : Cols B) (W : RowsRest B C) (nd : NData B.R B.host W.what₂)
+    (tw : NTw B.R B.host W.what₂ B.LL0 nd) (h : IsEmpty tw.Tw) (e : G0g nd → ↥B.LL0)
+    : ∃ Y : NExp B.R B.host W.what₂ B.LL0 nd tw,
+      Y.eLL0 = e ∧ Nonempty (NTh B.R B.host W.what₂ B.LL0 nd tw Y) :=
   ⟨nexpOfEmpty tw e, rfl, ⟨nthOfEmpty tw _⟩⟩
 
 end GlobalTheory.MemN

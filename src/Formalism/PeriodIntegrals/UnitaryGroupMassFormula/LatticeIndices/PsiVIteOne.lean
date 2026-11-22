@@ -8,14 +8,16 @@ noncomputable section
 
 namespace MassDataIdxSteps
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField
-  IsDedekindDomain Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge MassDataIdxStIm MassDataIdxRed MassDataIdxSpl Matrix
-  MassDataIdxFrA MassDataIdxAdA
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures Formalism.L2.SG.TypedSets MeasureTheory NumberField IsDedekindDomain
+  Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.AdBridge MassDataIdxStIm
+  MassDataIdxRed MassDataIdxSpl Matrix MassDataIdxFrA MassDataIdxAdA
 open scoped TensorProduct
 
 section Loc
 
-variable {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p)
+variable
+  {D : D7} (X : HidaSetting D) (p : TypX X) (θ : TpX X p ≃ₐ[FpX X p] FpX X p × FpX X p)
   (Q : GL (IdxD D) (FpX X p))
 
 def colV : IdxD D → Formalism.L2.SG.HidaSetting.VA X.B.I
@@ -34,33 +36,42 @@ def sgnV : IdxD D → FpX X p
   | Sum.inr (Sum.inl (Sum.inr _)) => -1
   | _ => 1
 
-theorem fin_dir (hθ : IsSplitEquiv X p θ) (hL : LatBasis X p θ (reindex₂ X p Q)) (x y : Formalism.L2.SG.HidaSetting.VA X.B.I)
-    (h : ZMod' X.B.I X.B.g (hA X.B.I x y)) :
-    ∃ z : OvA X p, crd2 X p θ Q (PI.FinKW.vecV X.B.I p.1 x) ⬝ᵥ crd1 X p θ Q (PI.FinKW.vecV X.B.I p.1 y) =
-      ((gOf p : ℕ) : FpX X p) * (z : FpX X p) := by
+theorem fin_dir
+    (hθ : IsSplitEquiv X p θ) (hL : LatBasis X p θ (reindex₂ X p Q))
+    (x y : Formalism.L2.SG.HidaSetting.VA X.B.I) (h : ZMod' X.B.I X.B.g (hA X.B.I x y))
+    : ∃ z : OvA X p,
+      crd2 X p θ Q (PI.FinKW.vecV X.B.I p.1 x) ⬝ᵥ crd1 X p θ Q (PI.FinKW.vecV X.B.I p.1 y)
+        = ((gOf p : ℕ) : FpX X p) * (z : FpX X p) := by
   obtain ⟨z, hz⟩ := cong_dir X p θ Q hθ hL x y 0 (by simpa using h)
   exact ⟨z, by simpa using hz⟩
 
-theorem fin_sym (hθ : IsSplitEquiv X p θ) (hL : LatBasis X p θ (reindex₂ X p Q)) (x y : Formalism.L2.SG.HidaSetting.VA X.B.I)
-    (h : ZMod' X.B.I X.B.g (hA X.B.I y x)) :
-    ∃ z : OvA X p, crd2 X p θ Q (PI.FinKW.vecV X.B.I p.1 x) ⬝ᵥ crd1 X p θ Q (PI.FinKW.vecV X.B.I p.1 y) =
-      ((gOf p : ℕ) : FpX X p) * (z : FpX X p) := by
+theorem fin_sym
+    (hθ : IsSplitEquiv X p θ) (hL : LatBasis X p θ (reindex₂ X p Q))
+    (x y : Formalism.L2.SG.HidaSetting.VA X.B.I) (h : ZMod' X.B.I X.B.g (hA X.B.I y x))
+    : ∃ z : OvA X p,
+      crd2 X p θ Q (PI.FinKW.vecV X.B.I p.1 x) ⬝ᵥ crd1 X p θ Q (PI.FinKW.vecV X.B.I p.1 y)
+        = ((gOf p : ℕ) : FpX X p) * (z : FpX X p) := by
   obtain ⟨z, hz⟩ := cong_sym X p θ Q hθ hL x y 0 (by simpa using h)
   exact ⟨z, by simpa using hz⟩
 
-theorem psiV_ite_one (c : Prop) [Decidable c] :
-    θ (PI.FinKW.psiV X.B.I p.1 (if c then 1 else 0)) = if c then 1 else 0 := by
+theorem psiV_ite_one (c : Prop) [Decidable c]
+    : θ (PI.FinKW.psiV X.B.I p.1 (if c then 1 else 0)) = if c then 1 else 0 := by
   split_ifs <;> simp
 
-theorem rc_cong (hθ : IsSplitEquiv X p θ) (hε : θ (epsP X p) = (1, 0)) (hL : LatBasis X p θ (reindex₂ X p Q))
-    (s t : IdxD D) :
-    ∃ z : OvA X p, sgnV X p s * (crd2 X p θ Q (PI.FinKW.vecV X.B.I p.1 (rowV X s)) ⬝ᵥ
-      crd1 X p θ Q (PI.FinKW.vecV X.B.I p.1 (colV X t))) =
-      (1 : Matrix (IdxD D) (IdxD D) (FpX X p)) s t + ((gOf p : ℕ) : FpX X p) * (z : FpX X p) := by
+theorem rc_cong
+    (hθ : IsSplitEquiv X p θ) (hε : θ (epsP X p) = (1, 0)) (hL : LatBasis X p θ (reindex₂ X p Q))
+    (s t : IdxD D)
+    : ∃ z : OvA X p,
+      sgnV X p s
+          * (crd2 X p θ Q (PI.FinKW.vecV X.B.I p.1 (rowV X s))
+            ⬝ᵥ crd1 X p θ Q (PI.FinKW.vecV X.B.I p.1 (colV X t)))
+        = (1 : Matrix (IdxD D) (IdxD D) (FpX X p)) s t
+          + ((gOf p : ℕ) : FpX X p) * (z : FpX X p) := by
   have hg := X.gramIntegral
   have hz := X.formsAtZero
   have hW := X.weightVectorsIntegral
-  rcases s with a | ((i | u) | c) <;> rcases t with b | ((j | v) | c') <;> simp only [rowV, colV, sgnV, one_mul]
+  rcases s with a | ((i | u) | c) <;> rcases t with b | ((j | v) | c')
+    <;> simp only [rowV, colV, sgnV, one_mul]
   · obtain ⟨z, e⟩ := cong_sym X p θ Q hθ hL _ _ _ (hg b a).2.2
     refine ⟨z, ?_⟩
     rw [e, psiV_ite_one]

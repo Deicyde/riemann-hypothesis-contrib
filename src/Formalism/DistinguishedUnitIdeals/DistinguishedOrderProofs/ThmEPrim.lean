@@ -18,10 +18,12 @@ theorem lt_parM (ℓ hh g : ℕ) (hℓ : 2 ≤ ℓ) : hh + 2 * g < (ℓ - 1) * p
   unfold parM
   have hm : 0 < ℓ - 1 := by omega
   first
-    | exact Nat.lt_mul_div_succ _ hm
-    | (have h1 := Nat.div_add_mod (hh + 2 * g) (ℓ - 1)
-       have h2 := Nat.mod_lt (hh + 2 * g) hm
-       nlinarith)
+  | exact Nat.lt_mul_div_succ _ hm
+  | (
+      have h1 := Nat.div_add_mod (hh + 2 * g) (ℓ - 1)
+      have h2 := Nat.mod_lt (hh + 2 * g) hm
+      nlinarith
+    )
 
 section shape
 variable {O : Type} [CommRing O]
@@ -29,15 +31,15 @@ variable {O : Type} [CommRing O]
 def QQ (l : O) (x : PowerSeries O) (d : ℕ) : Prop :=
   ∃ v a : PowerSeries O, IsUnit v ∧ x = v * X ^ d + C l * a
 
-theorem QQ.mul {l : O} {x y : PowerSeries O} {d d' : ℕ} (hx : QQ l x d) (hy : QQ l y d') :
-    QQ l (x * y) (d + d') := by
+theorem QQ.mul {l : O} {x y : PowerSeries O} {d d' : ℕ} (hx : QQ l x d) (hy : QQ l y d')
+    : QQ l (x * y) (d + d') := by
   obtain ⟨v, a, hv, rfl⟩ := hx
   obtain ⟨w, b, hw, rfl⟩ := hy
   refine ⟨v * w, v * X ^ d * b + a * (w * X ^ d') + C l * a * b, hv.mul hw, ?_⟩
   ring
 
-theorem QQ.pow {l : O} {x : PowerSeries O} {d : ℕ} (hx : QQ l x d) (m : ℕ) :
-    QQ l (x ^ m) (d * m) := by
+theorem QQ.pow {l : O} {x : PowerSeries O} {d : ℕ} (hx : QQ l x d) (m : ℕ)
+    : QQ l (x ^ m) (d * m) := by
   induction m with
   | zero => exact ⟨1, 0, isUnit_one, by simp⟩
   | succ m ih =>
@@ -45,19 +47,20 @@ theorem QQ.pow {l : O} {x : PowerSeries O} {d : ℕ} (hx : QQ l x d) (m : ℕ) :
     have h := ih.mul hx
     rwa [show d * m + d = d * (m + 1) by ring] at h
 
-theorem QQ.unit_mul {l : O} {x u : PowerSeries O} {d : ℕ} (hu : IsUnit u) (hx : QQ l x d) :
-    QQ l (u * x) d := by
+theorem QQ.unit_mul {l : O} {x u : PowerSeries O} {d : ℕ} (hu : IsUnit u) (hx : QQ l x d)
+    : QQ l (u * x) d := by
   obtain ⟨v, a, hv, rfl⟩ := hx
   exact ⟨u * v, u * a, hu.mul hv, by ring⟩
 
-theorem QQ.map {l : O} (f : PowerSeries O →ₐ[O] PowerSeries O) {x : PowerSeries O} {e d : ℕ}
-    (hf : QQ l (f X) e) (hx : QQ l x d) : QQ l (f x) (e * d) := by
+theorem QQ.map
+    {l : O}
+    (f : PowerSeries O →ₐ[O] PowerSeries O)
+    {x : PowerSeries O} {e d : ℕ} (hf : QQ l (f X) e) (hx : QQ l x d)
+    : QQ l (f x) (e * d) := by
   obtain ⟨v, a, hv, rfl⟩ := hx
   obtain ⟨w, b, hw, hwb⟩ := QQ.unit_mul (hv.map f) (hf.pow d)
   have hC : f (C l) = C l := by
-    first
-      | exact f.commutes l
-      | simpa [PowerSeries.algebraMap_eq] using f.commutes l
+    first | exact f.commutes l | simpa [PowerSeries.algebraMap_eq] using f.commutes l
   refine ⟨w, b + f a, hw, ?_⟩
   rw [map_add (f := _), map_mul, map_mul, map_pow, hC, hwb]
   ring
@@ -72,8 +75,8 @@ theorem QQ_φX {B : Base O} (h3 : B.E3) (h1 : 1 ≤ B.ℓ) : QQ (B.ℓ : O) (B.�
   rw [hu, mul_assoc]
   exact h
 
-theorem QQ_it {B : Base O} (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (s : ℕ) :
-    QQ (B.ℓ : O) ((⇑B.φ)^[s] X) (B.ℓ ^ s) := by
+theorem QQ_it {B : Base O} (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (s : ℕ)
+    : QQ (B.ℓ : O) ((⇑B.φ)^[s] X) (B.ℓ ^ s) := by
   induction s with
   | zero => exact ⟨1, 0, isUnit_one, by simp⟩
   | succ s ih =>
@@ -83,17 +86,14 @@ theorem QQ_it {B : Base O} (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (s : ℕ) :
 
 theorem p_eq (B : Base O) (s : ℕ) : B.p s = (⇑B.φ)^[s] X + C (B.ℓ : O) := by
   have hC : ∀ c : O, B.φ (C c) = C c := fun c => by
-    first
-      | exact B.φ.commutes c
-      | simpa [PowerSeries.algebraMap_eq] using B.φ.commutes c
+    first | exact B.φ.commutes c | simpa [PowerSeries.algebraMap_eq] using B.φ.commutes c
   unfold Base.p Base.q
   induction s with
   | zero => simp
   | succ s ih =>
     rw [Function.iterate_succ_apply', ih, Function.iterate_succ_apply', map_add (f := _), hC]
 
-theorem QQ_p {B : Base O} (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (s : ℕ) :
-    QQ (B.ℓ : O) (B.p s) (B.ℓ ^ s) := by
+theorem QQ_p {B : Base O} (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (s : ℕ) : QQ (B.ℓ : O) (B.p s) (B.ℓ ^ s) := by
   obtain ⟨v, a, hv, ha⟩ := QQ_it h3 h1 s
   exact ⟨v, a + 1, hv, by rw [p_eq, ha]; ring⟩
 
@@ -103,10 +103,13 @@ theorem isUnit_one_add [IsLocalRing O] {l : O} (hl : ¬ IsUnit l) (c : O) : IsUn
   have h2 : ¬ IsUnit (-(l * c)) := by rwa [IsUnit.neg_iff]
   exact IsLocalRing.nonunits_add h h2 (by simp)
 
-theorem prep [IsLocalRing O] {l : O} (hl : ¬ IsUnit l) [IsAdicComplete (Ideal.span {l}) O]
-    {x : PowerSeries O} {d : ℕ} (hx : QQ l x d) :
-    ∃ (E : Polynomial O) (u : PowerSeries O), E.Monic ∧ E.natDegree = d ∧
-      (∀ i < d, l ∣ E.coeff i) ∧ IsUnit u ∧ x = u * (E : PowerSeries O) := by
+theorem prep
+    [IsLocalRing O]
+    {l : O} (hl : ¬ IsUnit l) [IsAdicComplete (Ideal.span {l}) O]
+    {x : PowerSeries O} {d : ℕ} (hx : QQ l x d)
+    : ∃ (E : Polynomial O) (u : PowerSeries O),
+      E.Monic ∧ E.natDegree = d ∧ (∀ i < d, l ∣ E.coeff i) ∧ IsUnit u
+        ∧ x = u * (E : PowerSeries O) := by
   obtain ⟨v, a, hv, rfl⟩ := hx
   obtain ⟨vi, hvi⟩ := hv.exists_right_inv
   have hI : Ideal.span {l} ≠ ⊤ := Ideal.span_singleton_ne_top hl
@@ -144,20 +147,27 @@ theorem prep [IsLocalRing O] {l : O} (hl : ¬ IsUnit l) [IsAdicComplete (Ideal.s
       have := hm.coeff_natDegree
       rwa [hnd] at this
     have h3 := congrArg (coeff d) hE
-    rw [Polynomial.coeff_coe, hcd, hg, add_mul, map_add (f := _),
-      coeff_X_pow_mul', if_pos le_rfl, Nat.sub_self, mul_assoc, coeff_C_mul,
-      coeff_zero_eq_constantCoeff_apply] at h3
-    have h4 : constantCoeff q = 1 + l * (-(coeff d (vi * a * q))) := by
-      rw [h3]; ring
+    rw [Polynomial.coeff_coe, hcd, hg, add_mul, map_add (f := _), coeff_X_pow_mul', if_pos le_rfl,
+        Nat.sub_self, mul_assoc, coeff_C_mul, coeff_zero_eq_constantCoeff_apply]
+      at h3
+    have h4 : constantCoeff q = 1 + l * (-(coeff d (vi * a * q))) := by rw [h3]; ring
     rw [h4]
     exact isUnit_one_add hl _
   obtain ⟨qi, hqi⟩ := hq.exists_right_inv
-  refine ⟨Polynomial.X ^ d - r, v * qi, hm, hnd, fun i hi => ?_,
-    hv.mul (IsUnit.of_mul_eq_one q (by rw [mul_comm]; exact hqi)), ?_⟩
+  refine ⟨
+    Polynomial.X ^ d - r,
+    v * qi,
+    hm,
+    hnd,
+    fun i hi => ?_,
+    hv.mul (IsUnit.of_mul_eq_one q (by rw [mul_comm]; exact hqi)),
+    ?_
+  ⟩
   · have := hdv.coeff_f_sub_r_mem (i := i) (by rwa [hord])
     rw [Ideal.mem_span_singleton] at this
-    have e : coeff i ((X : PowerSeries O) ^ d - (r : PowerSeries O)) =
-        (Polynomial.X ^ d - r : Polynomial O).coeff i := by
+    have e
+        : coeff i ((X : PowerSeries O) ^ d - (r : PowerSeries O))
+          = (Polynomial.X ^ d - r : Polynomial O).coeff i := by
       rw [← Polynomial.coeff_coe, Polynomial.coe_sub, Polynomial.coe_pow, Polynomial.coe_X]
     rwa [e] at this
   · rw [hE, hg]
@@ -168,8 +178,10 @@ end shape
 section dvr
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-theorem pshape {B : Base O} (hl : ¬ IsUnit (B.ℓ : O)) [IsAdicComplete (Ideal.span {(B.ℓ : O)}) O]
-    (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (ell : ℕ) : B.PShape ell := by
+theorem pshape
+    {B : Base O} (hl : ¬ IsUnit (B.ℓ : O)) [IsAdicComplete (Ideal.span {(B.ℓ : O)}) O]
+    (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (ell : ℕ)
+    : B.PShape ell := by
   intro s _
   obtain ⟨E, u, hm, hd, hc, hu, hp⟩ := prep hl (QQ_p h3 h1 s)
   refine ⟨E, u, hm, hd, hc, ?_, hu, hp⟩
@@ -177,31 +189,31 @@ theorem pshape {B : Base O} (hl : ¬ IsUnit (B.ℓ : O)) [IsAdicComplete (Ideal.
   have h0 : constantCoeff (B.p s) = (B.ℓ : O) := by
     rw [p_eq, hw]
     simp
-  rw [hp, map_mul, ← coeff_zero_eq_constantCoeff_apply (E : PowerSeries O),
-    Polynomial.coeff_coe] at h0
+  rw [hp, map_mul, ← coeff_zero_eq_constantCoeff_apply (E : PowerSeries O), Polynomial.coeff_coe]
+    at h0
   have hu0 : IsUnit (constantCoeff u) := isUnit_iff_constantCoeff.1 hu
   exact ⟨hu0.unit, by rw [IsUnit.unit_spec, mul_comm]; exact h0⟩
 
-noncomputable def itAlg (f : PowerSeries O →ₐ[O] PowerSeries O) :
-    ℕ → (PowerSeries O →ₐ[O] PowerSeries O)
+noncomputable def itAlg (f : PowerSeries O →ₐ[O] PowerSeries O)
+    : ℕ → (PowerSeries O →ₐ[O] PowerSeries O)
   | 0 => AlgHom.id O _
   | k + 1 => f.comp (itAlg f k)
 
-theorem itAlg_apply (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a : PowerSeries O) :
-    itAlg f k a = (⇑f)^[k] a := by
+theorem itAlg_apply (f : PowerSeries O →ₐ[O] PowerSeries O) (k : ℕ) (a : PowerSeries O)
+    : itAlg f k a = (⇑f)^[k] a := by
   induction k with
   | zero => rfl
   | succ k ih =>
     rw [Function.iterate_succ_apply', ← ih]
     rfl
 
-theorem basePhiFree {B : Base O} (hl : ¬ IsUnit (B.ℓ : O))
-    [IsAdicComplete (Ideal.span {(B.ℓ : O)}) O] (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (k : ℕ) :
-    (∀ a : PowerSeries O, ∃ a' : Fin (B.ℓ ^ k) → PowerSeries O,
-      a = ∑ t : Fin (B.ℓ ^ k), X ^ (t : ℕ) * (⇑B.φ)^[k] (a' t)) ∧
-    ∀ a' : Fin (B.ℓ ^ k) → PowerSeries O,
-      ∑ t : Fin (B.ℓ ^ k), X ^ (t : ℕ) * (⇑B.φ)^[k] (a' t) = 0 →
-      ∀ t, a' t = 0 := by
+theorem basePhiFree
+    {B : Base O} (hl : ¬ IsUnit (B.ℓ : O)) [IsAdicComplete (Ideal.span {(B.ℓ : O)}) O]
+    (h3 : B.E3) (h1 : 1 ≤ B.ℓ) (k : ℕ)
+    : (∀ a : PowerSeries O, ∃ a' : Fin (B.ℓ ^ k) → PowerSeries O,
+        a = ∑ t : Fin (B.ℓ ^ k), X ^ (t : ℕ) * (⇑B.φ)^[k] (a' t))
+      ∧ ∀ a' : Fin (B.ℓ ^ k) → PowerSeries O,
+        ∑ t : Fin (B.ℓ ^ k), X ^ (t : ℕ) * (⇑B.φ)^[k] (a' t) = 0 → ∀ t, a' t = 0 := by
   obtain ⟨E, u, hm, hdeg, hc, hu, hPe'⟩ := prep hl (QQ_it h3 h1 k)
   set d := B.ℓ ^ k with hd
   have hd1 : 1 ≤ d := Nat.one_le_pow _ _ h1
@@ -224,27 +236,32 @@ theorem basePhiFree {B : Base O} (hl : ¬ IsUnit (B.ℓ : O))
     have hE0 : (E : PowerSeries O) = 0 := (hu.mul_right_eq_zero).mp h0
     rw [Polynomial.coe_eq_zero_iff] at hE0
     exact hE.monic.ne_zero hE0
-  have hdiv : ∀ F : PowerSeries O, ∃ (q : PowerSeries O) (r : Polynomial O),
-      r.degree < d ∧ F = φ X * q + r := by
+  have hdiv
+      : ∀ F : PowerSeries O, ∃ (q : PowerSeries O) (r : Polynomial O),
+        r.degree < d ∧ F = φ X * q + r := by
     intro F
     obtain ⟨q, r, hr, hF⟩ := exists_div_of_isDistinguishedAt hI hE F
     refine ⟨↑hu.unit⁻¹ * q, r, by rwa [hdeg] at hr, ?_⟩
     have hinv : u * ↑hu.unit⁻¹ = 1 := hu.mul_val_inv
     rw [hPe]
     linear_combination hF - ((E : PowerSeries O) * q) * hinv
-  have huniq : ∀ (a : Fin d → O) (q : PowerSeries O),
-      ∑ i, C (a i) * X ^ (i : ℕ) = φ X * q → ∀ i, a i = 0 := by
+  have huniq
+      : ∀ (a : Fin d → O) (q : PowerSeries O),
+        ∑ i, C (a i) * X ^ (i : ℕ) = φ X * q → ∀ i, a i = 0 := by
     intro a q hq j
-    have hr : (∑ i : Fin d, Polynomial.C (a i) * Polynomial.X ^ (i : ℕ) : Polynomial O).degree
-        < E.natDegree := by rw [hdeg]; exact Polynomial.degree_sum_fin_lt a
-    have h0 := eq_zero_of_isDistinguishedAt_mul hI hE (q := u * q) hr (by
-      rw [coe_sum_fin, hq, hPe]
-      ring)
+    have hr
+        : (∑ i : Fin d, Polynomial.C (a i) * Polynomial.X ^ (i : ℕ) : Polynomial O).degree
+          < E.natDegree := by
+      rw [hdeg]; exact Polynomial.degree_sum_fin_lt a
+    have h0 :=
+      eq_zero_of_isDistinguishedAt_mul hI hE (q := u * q) hr (by
+        rw [coe_sum_fin, hq, hPe]
+        ring)
     have := coeff_sum_fin a j
     rw [h0, Polynomial.coeff_zero] at this
     exact this.symm
-  have hkrull : ∀ x : PowerSeries O, (∀ N : ℕ, φ X ^ N ∣ x) → x = 0 :=
-    fun x hx => eq_zero_of_forall_pow_dvd hPnu hx
+  have hkrull : ∀ x : PowerSeries O, (∀ N : ℕ, φ X ^ N ∣ x) → x = 0 := fun x hx =>
+    eq_zero_of_forall_pow_dvd hPnu hx
   constructor
   · intro a
     obtain ⟨α, hα⟩ := exists_sum_algHom_mul_X_pow φ d hdiv hkrull a
@@ -267,31 +284,35 @@ variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 theorem dvd_ell {ϖ : O} {ℓ e : ℕ} (he : 1 ≤ e) (h : Associated (ℓ : O) (ϖ ^ e)) : ϖ ∣ (ℓ : O) := by
   exact (dvd_pow_self ϖ (by omega)).trans h.symm.dvd
 
-theorem ell_ne {ϖ : O} (hϖ : Irreducible ϖ) {ℓ e : ℕ} (h : Associated (ℓ : O) (ϖ ^ e)) :
-    (ℓ : O) ≠ 0 := by
+theorem ell_ne {ϖ : O} (hϖ : Irreducible ϖ) {ℓ e : ℕ} (h : Associated (ℓ : O) (ϖ ^ e))
+    : (ℓ : O) ≠ 0 := by
   exact h.ne_zero_iff.mpr (pow_ne_zero _ hϖ.ne_zero)
 
-theorem ell_nonunit {ϖ : O} (hϖ : Irreducible ϖ) {ℓ e : ℕ} (he : 1 ≤ e)
-    (h : Associated (ℓ : O) (ϖ ^ e)) : ¬ IsUnit (ℓ : O) := by
+theorem ell_nonunit
+    {ϖ : O} (hϖ : Irreducible ϖ) {ℓ e : ℕ} (he : 1 ≤ e) (h : Associated (ℓ : O) (ϖ ^ e))
+    : ¬ IsUnit (ℓ : O) := by
   exact fun hu => hϖ.not_isUnit (isUnit_of_dvd_unit (dvd_ell he h) hu)
 
-theorem pshape' {B : Base O} {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e) (ell : ℕ) :
-    B.PShape ell := by
+theorem pshape' {B : Base O} {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e) (ell : ℕ)
+    : B.PShape ell := by
   haveI := hB.complete
   exact pshape (ell_nonunit hϖ hB.one_le_e hB.assoc) hB.e3 (by have := hB.three_le; omega) ell
 
-theorem unitDist {B : Base O} {ϖ : O} (hd : ϖ ∣ (B.ℓ : O)) {ell : ℕ} (hP : B.PShape ell) (s : ℕ)
-    (hs : s < ell) : UnitDist ϖ (B.ℓ ^ s) (B.p s) := by
+theorem unitDist
+    {B : Base O} {ϖ : O} (hd : ϖ ∣ (B.ℓ : O)) {ell : ℕ} (hP : B.PShape ell) (s : ℕ) (hs : s < ell)
+    : UnitDist ϖ (B.ℓ ^ s) (B.p s) := by
   obtain ⟨E, u, hm, hdeg, hdvd, -, hu, hp⟩ := hP s hs
   refine ⟨u, E, hu, { mem := fun {n} hn => ?_, monic := hm }, hdeg, hp⟩
   rw [Ideal.mem_span_singleton]
   exact hd.trans (hdvd n (hdeg ▸ hn))
 
-theorem p_sub_mem {B : Base O} (h3 : B.E3) (hℓ : 2 ≤ B.ℓ) {s s' : ℕ} (hs : s < s') :
-    ∃ d : PowerSeries O, B.p s' = d * B.p s + C (B.ℓ : O) := by
+theorem p_sub_mem {B : Base O} (h3 : B.E3) (hℓ : 2 ≤ B.ℓ) {s s' : ℕ} (hs : s < s')
+    : ∃ d : PowerSeries O, B.p s' = d * B.p s + C (B.ℓ : O) := by
   obtain ⟨u, hu⟩ := h3
-  have hit : ∀ k, (⇑B.φ)^[k + 1] X =
-      (⇑B.φ)^[k] (u : PowerSeries O) * (⇑B.φ)^[k] X * (⇑B.φ)^[k] B.q ^ (B.ℓ - 1) := by
+  have hit
+      : ∀ k,
+        (⇑B.φ)^[k + 1] X
+          = (⇑B.φ)^[k] (u : PowerSeries O) * (⇑B.φ)^[k] X * (⇑B.φ)^[k] B.q ^ (B.ℓ - 1) := by
     intro k
     rw [Function.iterate_succ_apply, hu, ← itAlg_apply, map_mul, map_mul, map_pow, itAlg_apply,
       itAlg_apply, itAlg_apply]
@@ -309,17 +330,21 @@ theorem p_sub_mem {B : Base O} (h3 : B.E3) (hℓ : 2 ≤ B.ℓ) {s s' : ℕ} (hs
   rw [p_eq B s', hd]
   ring
 
-theorem coprimeRat_lt {B : Base O} {ϖ : O} {e : ℕ} (ha : Associated (B.ℓ : O) (ϖ ^ e)) (h3 : B.E3)
-    (hℓ : 2 ≤ B.ℓ) {s s' : ℕ} (hs : s < s') :
-    ∃ a a' : PowerSeries O, a * B.p s + a' * B.p s' = C (ϖ ^ e) := by
+theorem coprimeRat_lt
+    {B : Base O} {ϖ : O} {e : ℕ} (ha : Associated (B.ℓ : O) (ϖ ^ e)) (h3 : B.E3) (hℓ : 2 ≤ B.ℓ)
+    {s s' : ℕ} (hs : s < s')
+    : ∃ a a' : PowerSeries O, a * B.p s + a' * B.p s' = C (ϖ ^ e) := by
   obtain ⟨d, hd⟩ := p_sub_mem h3 hℓ hs
   obtain ⟨u, hu⟩ := ha
   refine ⟨-(C (u : O) * d), C (u : O), ?_⟩
   rw [← hu, map_mul, hd]
   ring
 
-theorem constant_model_setting {B : Base O} {ϖ : O} {e : ℕ} (he : 1 ≤ e) (ha : Associated (B.ℓ : O) (ϖ ^ e))
-    (h3 : B.E3) (hℓ : 2 ≤ B.ℓ) {ell : ℕ} (hP : B.PShape ell) : DistinguishedFamily ϖ B.ℓ ell B.p := by
+theorem constant_model_setting
+    {B : Base O} {ϖ : O} {e : ℕ}
+    (he : 1 ≤ e) (ha : Associated (B.ℓ : O) (ϖ ^ e)) (h3 : B.E3) (hℓ : 2 ≤ B.ℓ)
+    {ell : ℕ} (hP : B.PShape ell)
+    : DistinguishedFamily ϖ B.ℓ ell B.p := by
   refine ⟨fun s hs => unitDist (dvd_ell he ha) hP s hs, fun s _ s' _ hne => ?_⟩
   rcases lt_or_gt_of_ne hne with h | h
   · obtain ⟨a, a', h'⟩ := coprimeRat_lt ha h3 hℓ h
@@ -327,21 +352,24 @@ theorem constant_model_setting {B : Base O} {ϖ : O} {e : ℕ} (he : 1 ≤ e) (h
   · obtain ⟨a, a', h'⟩ := coprimeRat_lt ha h3 hℓ h
     exact ⟨e, a', a, by rw [add_comm]; exact h'⟩
 
-theorem baseGood {B : Base O} {ϖ : O} {e : ℕ} (hB : PrimBase B ϖ e) {g hh : ℕ}
-    (hg : g ≤ hh) (j : ℕ) : B.Good j (parM B.ℓ hh g) g := by
+theorem baseGood {B : Base O} {ϖ : O} {e : ℕ} (hB : PrimBase B ϖ e) {g hh : ℕ} (hg : g ≤ hh) (j : ℕ)
+    : B.Good j (parM B.ℓ hh g) g := by
   have hM := lt_parM B.ℓ hh g (by have := hB.three_le; omega)
   exact base_ring_good_holds O B j _ g hB.e3 hB.e4 (le_of_lt (lt_of_le_of_lt (by omega) hM))
 
 end ring
 
 section lat
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {B : Base O} {n : ℕ}
-  [NeZero n]
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {B : Base O} {n : ℕ} [NeZero n]
 
-theorem latGood {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
+theorem latGood
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {e : ℕ} (hB : PrimBase B ϖ e)
     {Cu : Cuts n} {j g G hh sig ellmax : ℕ} (hN : PrimNum B.ℓ Cu j g G hh sig ellmax)
-    {V : Type} [AddCommGroup V] [Module (PowerSeries O) V] {L : Lat B n V}
-    (hL : PrimLat L Cu j G hh) : L.Good Cu j (parM B.ℓ hh g) g sig := by
+    {V : Type} [AddCommGroup V] [Module (PowerSeries O) V]
+    {L : Lat B n V} (hL : PrimLat L Cu j G hh)
+    : L.Good Cu j (parM B.ℓ hh g) g sig := by
   classical
   have hd := dvd_ell hB.one_le_e hB.assoc
   obtain ⟨u₁, hu₁⟩ := one_add_unit_pow_formula O ϖ B hϖ hd hB.prime hB.three_le hB.e4
@@ -350,8 +378,11 @@ theorem latGood {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
     if ∃ c ∈ Cu.cuts, ∃ k : ℕ, 1 ≤ k ∧ k ≤ j ∧ i = c + (k : ZMod n) then G else hh
   refine good_lattice_holds O ϖ B u₁ n Cu j (parM B.ℓ hh g) g G sig Mi V L hϖ hd
     (ell_ne hϖ hB.assoc) hB.prime hB.three_le hN.one_le_j hB.e3 hu₁ hN.G_le_g hN.sigOK hL.p9
-    (fun i => ?_) (fun i => ?_) (fun c hc k hk1 hk2 => ?_) hL.pullFree
-    (completion_holds O B n V L hB.complete hL.free) (X_regular_on_lattice O B n V L hL.free) hL.ltors
+    (fun i => ?_)
+    (fun i => ?_)
+    (fun c hc k hk1 hk2 => ?_)
+    hL.pullFree (completion_holds O B n V L hB.complete hL.free)
+    (X_regular_on_lattice O B n V L hL.free) hL.ltors
   · by_cases h : ∃ c ∈ Cu.cuts, ∃ k : ℕ, 1 ≤ k ∧ k ≤ j ∧ i = c + (k : ZMod n)
     · simp only [Mi]
       rw [if_pos h]
@@ -370,20 +401,28 @@ theorem latGood {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
     simp only [Mi]
     rw [if_pos h]
 
-theorem unit_phiIt {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀] {L₀ : Lat B n V₀}
-    {e₀ : V₀} (h : ∀ i, L₀.φ i e₀ = e₀) (i : ZMod n) (k : ℕ) (a : PowerSeries O) :
-    L₀.phiIt i k (a • e₀) = (⇑B.φ)^[k] a • e₀ := by
+theorem unit_phiIt
+    {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀]
+    {L₀ : Lat B n V₀} {e₀ : V₀} (h : ∀ i, L₀.φ i e₀ = e₀)
+    (i : ZMod n) (k : ℕ) (a : PowerSeries O)
+    : L₀.phiIt i k (a • e₀) = (⇑B.φ)^[k] a • e₀ := by
   induction k with
   | zero => rfl
   | succ k ih =>
     first
-      | rw [Lat.phiIt, ih, L₀.φ_semi, h, Function.iterate_succ_apply']
-      | (simp only [Lat.phiIt]
-         rw [ih, L₀.φ_semi, h, Function.iterate_succ_apply'])
+    | rw [Lat.phiIt, ih, L₀.φ_semi, h, Function.iterate_succ_apply']
+    | (
+        simp only [Lat.phiIt]
+        rw [ih, L₀.φ_semi, h, Function.iterate_succ_apply']
+      )
 
-theorem unit_phiFree {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
-    {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀] {L₀ : Lat B n V₀} {e₀ : V₀}
-    (hU : PrimUnit L₀ e₀) (i : ZMod n) (k : ℕ) : L₀.PhiFree i k := by
+theorem unit_phiFree
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {e : ℕ} (hB : PrimBase B ϖ e)
+    {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀]
+    {L₀ : Lat B n V₀} {e₀ : V₀} (hU : PrimUnit L₀ e₀)
+    (i : ZMod n) (k : ℕ)
+    : L₀.PhiFree i k := by
   haveI := hB.complete
   have hl := ell_nonunit hϖ hB.one_le_e hB.assoc
   have h1 : 1 ≤ B.ℓ := by have := hB.three_le; omega
@@ -401,8 +440,10 @@ theorem unit_phiFree {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B 
   have := hfree a' (hU.tors _ hz) t
   rw [← ha' t, this, zero_smul]
 
-theorem unit_xReg {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀] {L₀ : Lat B n V₀}
-    {e₀ : V₀} (hU : PrimUnit L₀ e₀) : L₀.XReg := by
+theorem unit_xReg
+    {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀]
+    {L₀ : Lat B n V₀} {e₀ : V₀} (hU : PrimUnit L₀ e₀)
+    : L₀.XReg := by
   intro i v hv hXv
   rw [hU.N_eq i, Submodule.mem_span_singleton] at hv
   obtain ⟨a, rfl⟩ := hv
@@ -411,49 +452,110 @@ theorem unit_xReg {V₀ : Type} [AddCommGroup V₀] [Module (PowerSeries O) V₀
   · exact absurd h PowerSeries.X_ne_zero
   · rw [h, zero_smul]
 
-theorem extGood {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
-    {Cu : Cuts n} {j g G rr : ℕ} (hG : G ≤ g) (M : ℕ) {H : ZMod n → ℕ → ℕ}
-    {V₂ V₀ : Type} [AddCommGroup V₂] [Module (PowerSeries O) V₂] [AddCommGroup V₀]
-    [Module (PowerSeries O) V₀] {L₂ : Lat B n V₂} {L₀ : Lat B n V₀} {e₀ : V₀}
-    (hU : PrimUnit L₀ e₀) {Y : Ext L₂ L₀} (hY : PrimExt Y e₀ Cu j G rr H) :
-    Y.Good e₀ Cu (LamOf B Cu H) j M g rr := by
-  have hsat := saturation_first_form_holds O ϖ B j M g hϖ (dvd_ell hB.one_le_e hB.assoc) (ell_ne hϖ hB.assoc)
-    hB.e3
-  exact ⟨hY.lift, hY.p9, extension_complete_holds O B n V₂ V₀ L₂ L₀ Y hY.p6 (unit_xReg hU),
-    fun c hc => lattice_induction_lemma_holds O B n j M g G Y.VY Y.LY c (by omega) (hY.frobeniusBounded_after c hc),
+theorem extGood
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {e : ℕ} (hB : PrimBase B ϖ e)
+    {Cu : Cuts n} {j g G rr : ℕ} (hG : G ≤ g)
+    (M : ℕ)
+    {H : ZMod n → ℕ → ℕ} {V₂ V₀ : Type}
+    [AddCommGroup V₂] [Module (PowerSeries O) V₂] [AddCommGroup V₀] [Module (PowerSeries O) V₀]
+    {L₂ : Lat B n V₂} {L₀ : Lat B n V₀} {e₀ : V₀} (hU : PrimUnit L₀ e₀)
+    {Y : Ext L₂ L₀} (hY : PrimExt Y e₀ Cu j G rr H)
+    : Y.Good e₀ Cu (LamOf B Cu H) j M g rr := by
+  have hsat :=
+    saturation_first_form_holds O ϖ B j M g hϖ (dvd_ell hB.one_le_e hB.assoc) (ell_ne hϖ hB.assoc)
+      hB.e3
+  exact ⟨
+    hY.lift,
+    hY.p9,
+    extension_complete_holds O B n V₂ V₀ L₂ L₀ Y hY.p6 (unit_xReg hU),
+    fun c hc =>
+      lattice_induction_lemma_holds O B n j M g G Y.VY Y.LY c (by omega)
+        (hY.frobeniusBounded_after c hc),
     fun c hc => saturation_holds_alt O B n j _ Y.VY Y.LY c hsat (hY.pullFree c hc),
-    fun c hc => pullback_lemma_holds O B n Y.VY Y.LY c (Cu.ell c) (H c) (H c) (hY.frobeniusCobounded_arc c hc)
-      (fun _ _ => le_rfl),
-    fun c _ => extension_generated_holds O B n V₂ V₀ L₂ L₀ Y _ _ _ hY.p6 (unit_phiFree hϖ hB hU _ _)⟩
+    fun c hc =>
+      pullback_lemma_holds O B n Y.VY Y.LY c (Cu.ell c) (H c) (H c) (hY.frobeniusCobounded_arc c hc)
+        (fun _ _ => le_rfl),
+    fun c _ => extension_generated_holds O B n V₂ V₀ L₂ L₀ Y _ _ _ hY.p6 (unit_phiFree hϖ hB hU _ _)
+  ⟩
 
 end lat
 
 section arc
-variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {B : Base O} {n : ℕ}
-  {V₁ V₂ : Type} [AddCommGroup V₁] [Module (PowerSeries O) V₁] [AddCommGroup V₂]
-  [Module (PowerSeries O) V₂] {L₁ : Lat B n V₁} {L₂ : Lat B n V₂}
+variable
+  {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  {B : Base O} {n : ℕ} {V₁ V₂ : Type}
+  [AddCommGroup V₁] [Module (PowerSeries O) V₁] [AddCommGroup V₂] [Module (PowerSeries O) V₂]
+  {L₁ : Lat B n V₁} {L₂ : Lat B n V₂}
 
-theorem arcHyp {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
-    {h : LatHom L₁ L₂} {c : ZMod n} {ell ellmax : ℕ} (hell : ell ≤ ellmax) {H : ℕ → ℕ}
-    {g sig rr kap : ℕ}
-    (hA : PrimArc h c ell H g sig rr (parA sig rr g ellmax) kap ϖ) :
-    ArcHyp h c ell (Formalism.ExponentWindows.abelian₂ B.p H ell) g sig rr (parA sig rr g ellmax) kap ϖ := by
+theorem arcHyp
+    {ϖ : O} (hϖ : Irreducible ϖ)
+    {e : ℕ} (hB : PrimBase B ϖ e)
+    {h : LatHom L₁ L₂} {c : ZMod n} {ell ellmax : ℕ} (hell : ell ≤ ellmax)
+    {H : ℕ → ℕ} {g sig rr kap : ℕ} (hA : PrimArc h c ell H g sig rr (parA sig rr g ellmax) kap ϖ)
+    : ArcHyp h c ell (Formalism.ExponentWindows.abelian₂ B.p H ell) g sig rr (parA sig rr g ellmax)
+      kap ϖ := by
   obtain ⟨r₁, r₂, S₁, S₂, m, b, kind, U₁, U₂, PP, PP', hP⟩ := hA
   have hℓ : 2 ≤ B.ℓ := by have := hB.three_le; omega
   have hsh : B.PShape ell := pshape' hϖ hB ell
   have hMS : LevelModelSetting ϖ B.ℓ ell B.p H b kind U₁ U₂ :=
     ⟨hℓ, constant_model_setting hB.one_le_e hB.assoc hB.e3 hℓ hsh, hP.sat₁, hP.sat₂, hP.b_le_H⟩
-  refine ⟨r₁, r₂, S₁, S₂, m, H, b, kind, U₁, U₂, PP, PP', rfl, hP.p4c₁, hP.p4c₂, hP.equiv₁,
-    hP.equiv₂, hP.k2iii, hP.rd₁, hP.rd₂, hP.k3a2, hP.k3a4, hP.dcFix, hP.partner₁, hP.partner₂,
-    hP.p3₁, hP.p3₂, hP.p4a₁, hP.p4a₂, hP.p4b₁, hP.p4b₂, hP.bridge₁, hP.bridge₂, hP.mapFl, hP.p4d,
-    hP.ppval, hMS, hP.lLift, ?_⟩
+  refine ⟨
+    r₁,
+    r₂,
+    S₁,
+    S₂,
+    m,
+    H,
+    b,
+    kind,
+    U₁,
+    U₂,
+    PP,
+    PP',
+    rfl,
+    hP.p4c₁,
+    hP.p4c₂,
+    hP.equiv₁,
+    hP.equiv₂,
+    hP.k2iii,
+    hP.rd₁,
+    hP.rd₂,
+    hP.k3a2,
+    hP.k3a4,
+    hP.dcFix,
+    hP.partner₁,
+    hP.partner₂,
+    hP.p3₁,
+    hP.p3₂,
+    hP.p4a₁,
+    hP.p4a₂,
+    hP.p4b₁,
+    hP.p4b₂,
+    hP.bridge₁,
+    hP.bridge₂,
+    hP.mapFl,
+    hP.p4d,
+    hP.ppval,
+    hMS,
+    hP.lLift,
+    ?_
+  ⟩
   rcases hP.word with hW | hW | hW | hW | hW
   · exact Or.inl hW
   · exact Or.inr (Or.inl hW)
   · exact Or.inr (Or.inr (Or.inl hW))
   · obtain ⟨s₀, s₁, h0, h1, h2, h3, h4⟩ := hW
-    exact Or.inr (Or.inr (Or.inr (Or.inl ⟨s₀, s₁, h0, h1, h2, h3, h4,
-      (word_constants_holds O ϖ hϖ B.ℓ ell B.p b hℓ hMS.2.1 s₀ s₁ h0 h1).1⟩)))
+    exact Or.inr (Or.inr (Or.inr (Or.inl ⟨
+      s₀,
+      s₁,
+      h0,
+      h1,
+      h2,
+      h3,
+      h4,
+      (word_constants_holds O ϖ hϖ B.ℓ ell B.p b hℓ hMS.2.1 s₀ s₁ h0 h1).1
+    ⟩)))
   · obtain ⟨s₀, s₁, h0, h1, h2, h3, h4, h5, h6⟩ := hW
     have hb : 1 ≤ b s₀ := by
       have := hP.g_lt_b s₀ (by omega) (by rw [h3]; decide)
@@ -463,12 +565,21 @@ theorem arcHyp {ϖ : O} (hϖ : Irreducible ϖ) {e : ℕ} (hB : PrimBase B ϖ e)
       unfold parA
       omega
     have hC : CLift B.ℓ (parA sig rr g ellmax) (U₁ s₁) (U₂ s₁) m.prL :=
-      lemma_C_full_holds lemma_C_valuation_real O ϖ hϖ B e hB.one_le_e hB.assoc n V₁ V₂ L₁ L₂ h c ell _
-        r₁ r₂ S₁ S₂ m H b kind U₁ U₂ g sig rr _ rfl hsh hMS hP.rd₁ hP.rd₂ hP.partner₁ hP.partner₂
-        hP.p3₁ hP.p3₂ hP.p4a₁ hP.p4a₂ hP.bridge₁ hP.bridge₂ hP.flReg hP.mapFl hP.p4d s₀ s₁ h0 h1
-        h2 h3 h4 (hP.cMap s₁ h1 h2) hle h6 h5
-    exact Or.inr (Or.inr (Or.inr (Or.inr ⟨s₀, s₁, h0, h1, h2, h3, h4, hC,
-      (word_constants_holds O ϖ hϖ B.ℓ ell B.p b hℓ hMS.2.1 s₀ s₁ h0 h1).2 hb⟩)))
+      lemma_C_full_holds lemma_C_valuation_real O ϖ hϖ B e hB.one_le_e hB.assoc n V₁ V₂ L₁ L₂ h c
+        ell _ r₁ r₂ S₁ S₂ m H b kind U₁ U₂ g sig rr _ rfl hsh hMS hP.rd₁ hP.rd₂ hP.partner₁
+        hP.partner₂ hP.p3₁ hP.p3₂ hP.p4a₁ hP.p4a₂ hP.bridge₁ hP.bridge₂ hP.flReg hP.mapFl hP.p4d s₀
+        s₁ h0 h1 h2 h3 h4 (hP.cMap s₁ h1 h2) hle h6 h5
+    exact Or.inr (Or.inr (Or.inr (Or.inr ⟨
+      s₀,
+      s₁,
+      h0,
+      h1,
+      h2,
+      h3,
+      h4,
+      hC,
+      (word_constants_holds O ϖ hϖ B.ℓ ell B.p b hℓ hMS.2.1 s₀ s₁ h0 h1).2 hb
+    ⟩)))
 
 end arc
 
@@ -479,21 +590,23 @@ namespace Formalism.ExponentWindows.E
 open PowerSeries
 
 theorem theorem_E_primitive_form : ThmEPrim := by
-  intro O _ _ _ ϖ hϖ B e n _ Cu H j g G hh sig rr kap ellmax V₁ V₂ V₀ _ _ _ _ _ _ L₁ L₂ L₀ e₀ h
-    Zf₁ Zf₂ hB hN hL₁ hL₂ hU hBK hA κ hκ
+  intro O _ _ _ ϖ hϖ B e n _ Cu H j g G hh sig rr kap ellmax V₁ V₂ V₀ _ _ _ _ _ _ L₁ L₂ L₀ e₀ h Zf₁
+    Zf₂ hB hN hL₁ hL₂ hU hBK hA κ hκ
   have hM1 : 1 ≤ parM B.ℓ hh g := by
     unfold parM
     exact Nat.le_add_left 1 _
   refine theorem_E_full_form O ϖ hϖ B n Cu (LamOf B Cu H) j (parM B.ℓ hh g) g sig rr
     (parA sig rr g ellmax) kap V₁ V₂ V₀ L₁ L₂ L₀ e₀ h Zf₁ Zf₂ hM1 (Prim.baseGood hB hN.g_le_h j)
-    (Prim.latGood hϖ hB hN hL₁) (Prim.latGood hϖ hB hN hL₂) hN.j_le_ell hU.φ_fix hU.γ_fix
-    hBK.smul hBK.rho (fun κ hκ => ?_) ?_ (fun c hc => ?_) κ hκ
+    (Prim.latGood hϖ hB hN hL₁) (Prim.latGood hϖ hB hN hL₂) hN.j_le_ell hU.φ_fix hU.γ_fix hBK.smul
+    hBK.rho
+    (fun κ hκ => ?_)
+    ?_
+    (fun c hc => ?_)
+    κ hκ
   · obtain ⟨Y, hrep, hY⟩ := hBK.ext κ hκ
     exact ⟨Y, hrep, Prim.extGood hϖ hB hN.G_le_g _ hU hY⟩
   · unfold parA
-    first
-      | omega
-      | nlinarith [Nat.zero_le (2 * g * ellmax)]
+    first | omega | nlinarith [Nat.zero_le (2 * g * ellmax)]
   · exact Prim.arcHyp hϖ hB (hN.ell_le c hc) (hA c hc)
 
 end Formalism.ExponentWindows.E

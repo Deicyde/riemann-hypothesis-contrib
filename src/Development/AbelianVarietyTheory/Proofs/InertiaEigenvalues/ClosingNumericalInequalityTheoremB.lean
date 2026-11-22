@@ -11,12 +11,25 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-theorem closing_numerical_inequality :
-    ∀ (CA C b l S η Rw Tb Vd : ℝ) (f r t m p : ℕ), 13 * max CA 0 ≤ C → 260 * f ^ 2 * t ^ 2 * (r + t) ≤ p → 1 ≤ t → 1 ≤ f → m ≤ r → 3 ≤ l → 0 ≤ S → 0 ≤ η → 0 < b → 1 < Real.log b → Rw ≤ max CA 0 * (3 * (f : ℝ) * r * (4 * b / l + 2 * S + 2 * Real.logb l (2 * b) + 1 + η + t) + 6 * (f : ℝ) * m * (2 * b + 1)) + f → Tb ≤ 240 * (t : ℝ) ^ 2 * (f : ℝ) ^ 2 * ((r : ℝ) + t) * Real.log b → Vd ≤ 4 * ((r : ℝ) + t) * t → Rw + Tb + Vd ≤ C * f * (r * (b / l + S + t + η + Real.log b) + m * b) + (p : ℝ) * Real.log b := by
+theorem closing_numerical_inequality
+    : ∀ (CA C b l S η Rw Tb Vd : ℝ) (f r t m p : ℕ),
+      13 * max CA 0 ≤ C → 260 * f ^ 2 * t ^ 2 * (r + t) ≤ p → 1 ≤ t → 1 ≤ f → m ≤ r → 3 ≤ l → 0 ≤ S
+        → 0 ≤ η → 0 < b → 1 < Real.log b
+        → Rw
+          ≤ max CA 0
+              * (3 * (f : ℝ) * r * (4 * b / l + 2 * S + 2 * Real.logb l (2 * b) + 1 + η + t)
+                + 6 * (f : ℝ) * m * (2 * b + 1))
+            + f
+        → Tb ≤ 240 * (t : ℝ) ^ 2 * (f : ℝ) ^ 2 * ((r : ℝ) + t) * Real.log b
+        → Vd ≤ 4 * ((r : ℝ) + t) * t
+        → Rw + Tb + Vd
+          ≤ C * f * (r * (b / l + S + t + η + Real.log b) + m * b) + (p : ℝ) * Real.log b := by
   intro CA C b l S η Rw Tb Vd f r t m p hC hp ht hf hm hl hS hη hb hL hRw hTb hVd
   have hK : 0 ≤ max CA 0 := le_max_right _ _
   have hpR : (260 : ℝ) * (f : ℝ) ^ 2 * (t : ℝ) ^ 2 * ((r : ℝ) + t) ≤ (p : ℝ) := by exact_mod_cast hp
@@ -48,8 +61,9 @@ theorem closing_numerical_inequality :
   have h4x : 4 * b / l = 4 * x := by rw [hxdef]; ring
   rw [h4x] at hRw
 
-  have hinner : 3 * (r : ℝ) * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (m : ℝ) * (2 * b + 1)
-      ≤ 13 * ((r : ℝ) * (x + S + t + η + L) + m * b) := by
+  have hinner
+      : 3 * (r : ℝ) * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (m : ℝ) * (2 * b + 1)
+        ≤ 13 * ((r : ℝ) * (x + S + t + η + L) + m * b) := by
     nlinarith [mul_nonneg hr0 hx, mul_nonneg hr0 hS, mul_nonneg hr0 (sub_nonneg.2 htR),
       mul_nonneg hr0 hη, mul_nonneg hr0 (sub_nonneg.2 hlam), mul_nonneg hr0 (by linarith : (0:ℝ) ≤ L),
       mul_nonneg hm0 hb.le]
@@ -57,27 +71,41 @@ theorem closing_numerical_inequality :
     have : 0 ≤ x + S + t + η + L := by linarith
     exact add_nonneg (mul_nonneg hr0 this) (mul_nonneg hm0 hb.le)
   have hf0 : (0 : ℝ) ≤ f := by linarith
-  have hmain : max CA 0 * (3 * (f : ℝ) * r * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (f : ℝ) * m * (2 * b + 1))
-      ≤ C * f * ((r : ℝ) * (x + S + t + η + L) + m * b) := by
-    have e : 3 * (f : ℝ) * r * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (f : ℝ) * m * (2 * b + 1)
-        = f * (3 * (r : ℝ) * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (m : ℝ) * (2 * b + 1)) := by ring
+  have hmain
+      : max CA 0
+          * (3 * (f : ℝ) * r * (4 * x + 2 * S + 2 * lam + 1 + η + t)
+            + 6 * (f : ℝ) * m * (2 * b + 1))
+        ≤ C * f * ((r : ℝ) * (x + S + t + η + L) + m * b) := by
+    have e
+        : 3 * (f : ℝ) * r * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (f : ℝ) * m * (2 * b + 1)
+          = f
+            * (3 * (r : ℝ) * (4 * x + 2 * S + 2 * lam + 1 + η + t)
+              + 6 * (m : ℝ) * (2 * b + 1)) := by
+      ring
     rw [e]
-    calc max CA 0 * (f * (3 * (r : ℝ) * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (m : ℝ) * (2 * b + 1)))
-        ≤ max CA 0 * (f * (13 * ((r : ℝ) * (x + S + t + η + L) + m * b))) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hinner hf0) hK
+    calc
+      max CA 0
+            * (f
+              * (3 * (r : ℝ) * (4 * x + 2 * S + 2 * lam + 1 + η + t) + 6 * (m : ℝ) * (2 * b + 1)))
+          ≤ max CA 0 * (f * (13 * ((r : ℝ) * (x + S + t + η + L) + m * b))) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hinner hf0) hK
       _ = (13 * max CA 0) * (f * ((r : ℝ) * (x + S + t + η + L) + m * b)) := by ring
       _ ≤ C * (f * ((r : ℝ) * (x + S + t + η + L) + m * b)) :=
-          mul_le_mul_of_nonneg_right hC (mul_nonneg hf0 hB)
+        mul_le_mul_of_nonneg_right hC (mul_nonneg hf0 hB)
       _ = C * f * ((r : ℝ) * (x + S + t + η + L) + m * b) := by ring
 
   set Q : ℝ := (f : ℝ) ^ 2 * (t : ℝ) ^ 2 * ((r : ℝ) + t) with hQ
   have hQe : Q = (f : ℝ) ^ 2 * ((t : ℝ) ^ 2 * ((r : ℝ) + t)) := by rw [hQ]; ring
   have ht2 : (1 : ℝ) ≤ (t : ℝ) ^ 2 := by
-    calc (1 : ℝ) = 1 * 1 := by ring
+    calc
+      (1 : ℝ)
+        = 1 * 1 := by ring
       _ ≤ (t : ℝ) * t := mul_le_mul htR htR zero_le_one (by linarith)
       _ = (t : ℝ) ^ 2 := by ring
   have hf2 : (f : ℝ) ≤ (f : ℝ) ^ 2 := by
-    calc (f : ℝ) = f * 1 := by ring
+    calc
+      (f : ℝ)
+        = f * 1 := by ring
       _ ≤ (f : ℝ) * f := mul_le_mul_of_nonneg_left hfR hf0
       _ = (f : ℝ) ^ 2 := by ring
   have hrt : (1 : ℝ) ≤ (r : ℝ) + t := by linarith
@@ -88,10 +116,15 @@ theorem closing_numerical_inequality :
   have hVQ : 4 * ((r : ℝ) + t) * t ≤ 4 * Q := by
     have h1 : ((r : ℝ) + t) * t ≤ (t : ℝ) ^ 2 * ((r : ℝ) + t) := by
       have : ((r : ℝ) + t) * t = ((r : ℝ) + t) * t * 1 := by ring
-      calc ((r : ℝ) + t) * t ≤ ((r : ℝ) + t) * (t * t) :=
-            mul_le_mul_of_nonneg_left (by
-              calc (t : ℝ) = t * 1 := by ring
-                _ ≤ (t : ℝ) * t := mul_le_mul_of_nonneg_left htR (by linarith)) (by linarith)
+      calc
+        ((r : ℝ) + t) * t ≤ ((r : ℝ) + t) * (t * t) :=
+          mul_le_mul_of_nonneg_left
+            (by
+              calc
+                (t : ℝ)
+                  = t * 1 := by ring
+                _ ≤ (t : ℝ) * t := mul_le_mul_of_nonneg_left htR (by linarith))
+            (by linarith)
         _ = (t : ℝ) ^ 2 * ((r : ℝ) + t) := by ring
     have hf1 : (1 : ℝ) ≤ (f : ℝ) ^ 2 := hfR.trans hf2
     have h2 : (t : ℝ) ^ 2 * ((r : ℝ) + t) ≤ Q := by

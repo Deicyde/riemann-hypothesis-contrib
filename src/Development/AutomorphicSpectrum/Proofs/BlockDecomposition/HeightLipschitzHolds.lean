@@ -14,8 +14,7 @@ theorem htLip : PositivityTheory.RgEis.HtLip := by
   obtain ⟨M, hM⟩ := (hK.mul hC).exists_bound_of_continuousOn hη.cont.continuousOn
   refine ⟨M, fun g u hu => ?_⟩
   obtain ⟨p, hp, k, hk, rfl⟩ := hI g
-  have h1 : η (p * k * u) = η p + η (k * u) := by
-    rw [mul_assoc]; exact hη.left p hp _
+  have h1 : η (p * k * u) = η p + η (k * u) := by rw [mul_assoc]; exact hη.left p hp _
   have h2 : η (p * k) = η p + η k := hη.left p hp k
   have h3 : η (1 : G) = 0 := by
     have := hη.left 1 P.one_mem 1

@@ -54,9 +54,11 @@ theorem hGamDom : GamDom := GlobalTheory.CompanionTheory.GamDomProof.gamDom
 theorem hKHWExists : KHWExists := GlobalTheory.CompanionTheory.KHighestExists.khwExists
 theorem hLowSpan : LowSpan := GlobalTheory.CompanionTheory.KLowSpan.lowSpan_holds
 theorem hHWMap : HWMap := GlobalTheory.CompanionTheory.DSICHWMap.hwMap_of_lowSpan hLowSpan
-theorem hPRV : PRV := GlobalTheory.CompanionTheory.ChainHighest.aux₃ hFRel hGFacts hGamDom hKHWExists hHWMap
+theorem hPRV : PRV :=
+  GlobalTheory.CompanionTheory.ChainHighest.aux₃ hFRel hGFacts hGamDom hKHWExists hHWMap
 theorem hAlgCore : AlgCore := algCore_of hFRel hBdFacts hCO hZetaHW hWLem hNormLt hAdj hPRV
-theorem hAlgCoreSub : AlgCoreSub := GlobalTheory.CompanionTheory.DSCoreSub.algCoreSub_of_algCore hAlgCore
+theorem hAlgCoreSub : AlgCoreSub :=
+  GlobalTheory.CompanionTheory.DSCoreSub.algCoreSub_of_algCore hAlgCore
 theorem hSmLin : SmLin := GlobalTheory.CompanionTheory.DSSmLin.smLin
 theorem hSmBracket : SmBracket := GlobalTheory.CompanionTheory.SmBracket.smBracket_of hSmLin
 theorem hSmMod : SmMod := GlobalTheory.CompanionTheory.SmoothModule.smMod hSmLin hSmBracket
@@ -66,11 +68,13 @@ theorem hKFinStab : KFinStab := GlobalTheory.CompanionTheory.KFinStab.kFinStab
 theorem hKExp : KExp := GlobalTheory.CompanionTheory.DSICKExp.kExp
 theorem hStabLink : StabLink := GlobalTheory.CompanionTheory.DSStabLink.stabLink hKExp
 theorem hWtLink : WtLink := GlobalTheory.CompanionTheory.WtLinkPf.wtLink
-theorem hHWofType : HWofType := GlobalTheory.CompanionTheory.DSHighestOfKType.hwOfType hStabLink hWtLink
-theorem hTypeOfHW : TypeOfHW := GlobalTheory.CompanionTheory.DSKType.typeOfHW hLowSpan hStabLink hWtLink
+theorem hHWofType : HWofType :=
+  GlobalTheory.CompanionTheory.DSHighestOfKType.hwOfType hStabLink hWtLink
+theorem hTypeOfHW : TypeOfHW :=
+  GlobalTheory.CompanionTheory.DSKType.typeOfHW hLowSpan hStabLink hWtLink
 
 theorem discrete_series_infinitesimal_character : PI.DSInfCharCap.DSInfCharCap :=
-  dsInfCharCap_of hAlgCoreSub hSmMod hActQ hSpread CompanionTheory.D.gk.admitted.kFin_mem_smoothVecs hKFinStab hStabLink
-    hHWofType hTypeOfHW
+  dsInfCharCap_of hAlgCoreSub hSmMod hActQ hSpread CompanionTheory.D.gk.admitted.kFin_mem_smoothVecs
+    hKFinStab hStabLink hHWofType hTypeOfHW
 
 end CompanionTheory.D.DSIC

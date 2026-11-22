@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 section SlopeTestRemainingChoices
@@ -70,17 +71,14 @@ private lemma wd_compl_lev [Fintype σ] {Q : Finset σ} {w : σ → Module.End �
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.Gal.productCup_of_system.filtrationCocycleLiftCriterion_of_wdBasic :
-    WdBasic → FiltrationCocycleLiftCriterion := by
+theorem UpperTheory.Gal.productCup_of_system.filtrationCocycleLiftCriterion_of_wdBasic
+    : WdBasic → FiltrationCocycleLiftCriterion := by
   rintro hB σ E _ _ _ _ A w Q d n hW hQE c0 hc0 hl0 hq0 ⟨y, hy, hly, hdy⟩
   have hcw : ∀ P P' : Finset σ, ∀ i j, Commute (wOn P w i) (wOn P' w j) := by
     intro P P' i j
     unfold wOn
     split_ifs
-    all_goals first
-      | exact hW.1 i j
-      | exact Commute.zero_right _
-      | exact Commute.zero_left _
+    all_goals first | exact hW.1 i j | exact Commute.zero_right _ | exact Commute.zero_left _
   have hsplit : ∀ x, wd w x = wd (wOn Q w) x + wd (wOn Qᶜ w) x := by
     intro x
     have hw : w = wOn Q w + wOn Qᶜ w := by
@@ -90,17 +88,21 @@ theorem UpperTheory.Gal.productCup_of_system.filtrationCocycleLiftCriterion_of_w
     rw [(hB σ E A (wOn Q w)).2.2.1 (wOn Qᶜ w), LinearMap.add_apply]
   have hRR : ∀ x, wd (wOn Qᶜ w) (wd (wOn Qᶜ w) x) = 0 := (hB σ E A (wOn Qᶜ w)).1 (hcw Qᶜ Qᶜ)
   have hQR : ∀ x, wd (wOn Q w) (wd (wOn Qᶜ w) x) + wd (wOn Qᶜ w) (wd (wOn Q w) x) = 0 :=
-    (hB σ E A (wOn Q w)).2.2.2.1 (wOn Qᶜ w) (hcw Q Qᶜ) (fun i => by by_cases hi : i ∈ Q <;> simp [wOn, hi])
+    (hB σ E A (wOn Q w)).2.2.2.1 (wOn Qᶜ w) (hcw Q Qᶜ)
+      (fun i => by by_cases hi : i ∈ Q <;> simp [wOn, hi])
   have levZero : ∀ (m : ℤ) (x : Finset σ → E), m < 0 → Lev Q (· = m) x → x = 0 := by
     intro m x hm hx
     funext s
     exact hx s (fun h => by
       have h' : (((s ∩ Q).card : ℕ) : ℤ) = m := h
       omega)
-  have key : ∀ j : ℕ, ∀ m : ℤ, m < j → m < d → ∀ ck yk : Finset σ → E,
-      ck ∈ (acx A w).C n → Lev Q (· < d) (ck - c0) → yk ∈ (acx A w).C n → Lev Q (· = m) yk →
-      wd w ck = -wd (wOn Qᶜ w) yk → wd (wOn Q w) (wd (wOn Qᶜ w) yk) = 0 →
-      ∃ c ∈ (acx A w).Z n, Lev Q (· < d) (c - c0) := by
+  have key
+      : ∀ j : ℕ, ∀ m : ℤ,
+        m < j → m < d
+          → ∀ ck yk : Finset σ → E,
+            ck ∈ (acx A w).C n → Lev Q (· < d) (ck - c0) → yk ∈ (acx A w).C n → Lev Q (· = m) yk
+              → wd w ck = - wd (wOn Qᶜ w) yk → wd (wOn Q w) (wd (wOn Qᶜ w) yk) = 0
+              → ∃ c ∈ (acx A w).Z n, Lev Q (· < d) (c - c0) := by
     intro j
     induction j with
     | zero =>
@@ -113,22 +115,24 @@ theorem UpperTheory.Gal.productCup_of_system.filtrationCocycleLiftCriterion_of_w
       rw [hd, hy0, map_zero, neg_zero]
     | succ j ih =>
       intro m hm hmd ck yk hck hlk hyk hly hd hqr
-      have hmem : -wd (wOn Qᶜ w) yk ∈ (acx A w).C (n + 1) :=
+      have hmem : - wd (wOn Qᶜ w) yk ∈ (acx A w).C (n + 1) :=
         Submodule.neg_mem _ (wd_wOn_mem hW Qᶜ hyk)
-      have hlev : Lev Q (· = m) (-wd (wOn Qᶜ w) yk) := by
+      have hlev : Lev Q (· = m) (- wd (wOn Qᶜ w) yk) := by
         intro s hs
         rw [Pi.neg_apply, wd_compl_lev hly s hs, neg_zero]
-      have hdq : wd (wOn Q w) (-wd (wOn Qᶜ w) yk) = 0 := by rw [map_neg, hqr, neg_zero]
+      have hdq : wd (wOn Q w) (- wd (wOn Qᶜ w) yk) = 0 := by rw [map_neg, hqr, neg_zero]
       obtain ⟨y', hy', hly', hdy'⟩ := hQE (n + 1) m hmd _ hmem hlev hdq
       rw [add_sub_cancel_right] at hy'
       refine ih (m - 1) (by push_cast at hm; omega) (by omega) (ck - y') y'
         (Submodule.sub_mem _ hck hy') ?_ hy' hly' ?_ ?_
       · intro s hs
         have h1 := hlk s hs
-        have h2 := hly' s (fun h => hs (by
-          have h' : (((s ∩ Q).card : ℕ) : ℤ) = m - 1 := h
-          show (((s ∩ Q).card : ℕ) : ℤ) < d
-          omega))
+        have h2 :=
+          hly' s (fun h =>
+            hs (by
+              have h' : (((s ∩ Q).card : ℕ) : ℤ) = m - 1 := h
+              show (((s ∩ Q).card : ℕ) : ℤ) < d
+              omega))
         simp only [Pi.sub_apply] at h1 ⊢
         rw [h2, sub_zero]
         exact h1
@@ -140,10 +144,12 @@ theorem UpperTheory.Gal.productCup_of_system.filtrationCocycleLiftCriterion_of_w
   refine key d.toNat (d - 1) (by have := Int.self_le_toNat d; omega) (by omega) (c0 - y) y
     (Submodule.sub_mem _ hc0 hy) ?_ hy hly ?_ ?_
   · intro s hs
-    have h2 := hly s (fun h => hs (by
-      have h' : (((s ∩ Q).card : ℕ) : ℤ) = d - 1 := h
-      show (((s ∩ Q).card : ℕ) : ℤ) < d
-      omega))
+    have h2 :=
+      hly s (fun h =>
+        hs (by
+          have h' : (((s ∩ Q).card : ℕ) : ℤ) = d - 1 := h
+          show (((s ∩ Q).card : ℕ) : ℤ) < d
+          omega))
     simp only [Pi.sub_apply]
     rw [h2]
     abel

@@ -13,8 +13,9 @@ open NumberField IsDedekindDomain
 namespace GlobalTheory.QuadSymbol
 
 open NumberField IsDedekindDomain in
-private theorem linearIndependent_one_of_notMem_range {K L : Type} [Field K] [Field L] [Algebra K L]
-    {θ : L} (hθ : θ ∉ Set.range (algebraMap K L)) : LinearIndependent K ![(1 : L), θ] := by
+private theorem linearIndependent_one_of_notMem_range
+    {K L : Type} [Field K] [Field L] [Algebra K L] {θ : L} (hθ : θ ∉ Set.range (algebraMap K L))
+    : LinearIndependent K ![(1 : L), θ] := by
   rw [LinearIndependent.pair_iff]
   intro s t hst
   rw [Algebra.smul_def, Algebra.smul_def, mul_one] at hst
@@ -30,23 +31,22 @@ private theorem linearIndependent_one_of_notMem_range {K L : Type} [Field K] [Fi
     linear_combination -hst
 
 open NumberField IsDedekindDomain in
-private theorem exists_basis_one_sqrt_nonsquare_of_finrank_two (K L : Type) [Field K] [CharZero K] [Field L]
-    [Algebra K L] (h2 : Module.finrank K L = 2) :
-    ∃ (e : Module.Basis (Fin 2) K L) (δ : K), e 0 = 1 ∧ e 1 * e 1 = algebraMap K L δ ∧
-      ¬ IsSquare δ := by
+private theorem exists_basis_one_sqrt_nonsquare_of_finrank_two
+    (K L : Type) [Field K] [CharZero K] [Field L] [Algebra K L] (h2 : Module.finrank K L = 2)
+    : ∃ (e : Module.Basis (Fin 2) K L) (δ : K),
+      e 0 = 1 ∧ e 1 * e 1 = algebraMap K L δ ∧ ¬ IsSquare δ := by
   obtain ⟨θ, hθ⟩ : ∃ θ : L, θ ∉ Set.range (algebraMap K L) := by
     by_contra hcon
     push_neg at hcon
-    have hbot : (⊥ : Subalgebra K L) = ⊤ :=
-      eq_top_iff.mpr fun x _ => Algebra.mem_bot.mpr (hcon x)
+    have hbot : (⊥ : Subalgebra K L) = ⊤ := eq_top_iff.mpr fun x _ => Algebra.mem_bot.mpr (hcon x)
     have := Subalgebra.bot_eq_top_iff_finrank_eq_one.mp hbot
     omega
-  let B := basisOfLinearIndependentOfCardEqFinrank (linearIndependent_one_of_notMem_range hθ)
-    (by simp [h2])
+  let B :=
+    basisOfLinearIndependentOfCardEqFinrank (linearIndependent_one_of_notMem_range hθ)
+      (by simp [h2])
   have hB : ∀ i, B i = ![(1 : L), θ] i := fun i => by
     simp [B, coe_basisOfLinearIndependentOfCardEqFinrank]
-  have hθθ : θ * θ = algebraMap K L (B.repr (θ * θ) 0) +
-      algebraMap K L (B.repr (θ * θ) 1) * θ := by
+  have hθθ : θ * θ = algebraMap K L (B.repr (θ * θ) 0) + algebraMap K L (B.repr (θ * θ) 1) * θ := by
     conv_lhs => rw [← B.sum_repr (θ * θ)]
     rw [Fin.sum_univ_two, hB, hB, Algebra.smul_def, Algebra.smul_def]
     simp
@@ -60,16 +60,24 @@ private theorem exists_basis_one_sqrt_nonsquare_of_finrank_two (K L : Type) [Fie
     rw [← map_ofNat (algebraMap K L) 2, ← map_mul, div_mul_cancel₀ p two_ne_zero]
   have hδeq : algebraMap K L (q + p ^ 2 / 4) = algebraMap K L q + algebraMap K L (p / 2) ^ 2 := by
     rw [show q + p ^ 2 / 4 = q + (p / 2) ^ 2 by ring, map_add (f := _), map_pow]
-  refine ⟨basisOfLinearIndependentOfCardEqFinrank (linearIndependent_one_of_notMem_range hθ')
-    (by simp [h2]), q + p ^ 2 / 4, ?_, ?_, ?_⟩
+  refine ⟨
+    basisOfLinearIndependentOfCardEqFinrank (linearIndependent_one_of_notMem_range hθ')
+      (by simp [h2]),
+    q + p ^ 2 / 4,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · simp [coe_basisOfLinearIndependentOfCardEqFinrank]
   · simp only [coe_basisOfLinearIndependentOfCardEqFinrank, Matrix.cons_val_one,
       Matrix.cons_val_zero]
     rw [hδeq]
     linear_combination hθθ - θ * hp2
   · rintro ⟨c, hc⟩
-    have hsq : (θ - algebraMap K L (p / 2) - algebraMap K L c) *
-        (θ - algebraMap K L (p / 2) + algebraMap K L c) = 0 := by
+    have hsq
+        : (θ - algebraMap K L (p / 2) - algebraMap K L c)
+            * (θ - algebraMap K L (p / 2) + algebraMap K L c)
+          = 0 := by
       have hc' := congrArg (algebraMap K L) hc
       rw [hδeq, map_mul] at hc'
       linear_combination hθθ - θ * hp2 + hc'
@@ -78,8 +86,9 @@ private theorem exists_basis_one_sqrt_nonsquare_of_finrank_two (K L : Type) [Fie
     · exact hθ' ⟨-c, by rw [map_neg]; linear_combination -h⟩
 
 open NumberField IsDedekindDomain in
-private theorem exists_sq_sub_mul_sq_of_isSquare {K : Type} [Field K] [CharZero K] {d : K}
-    (hd : d ≠ 0) (hsq : IsSquare d) (x : K) : ∃ a b : K, x = a ^ 2 - d * b ^ 2 := by
+private theorem exists_sq_sub_mul_sq_of_isSquare
+    {K : Type} [Field K] [CharZero K] {d : K} (hd : d ≠ 0) (hsq : IsSquare d) (x : K)
+    : ∃ a b : K, x = a ^ 2 - d * b ^ 2 := by
   obtain ⟨c, rfl⟩ := hsq
   have hc : c ≠ 0 := by rintro rfl; simp at hd
   refine ⟨(x + 1) / 2, (x - 1) / (2 * c), ?_⟩
@@ -87,9 +96,11 @@ private theorem exists_sq_sub_mul_sq_of_isSquare {K : Type} [Field K] [CharZero 
   ring
 
 open NumberField IsDedekindDomain in
-private theorem exists_place_notMem_not_isSquare (F : Type) [Field F] [NumberField F] (δ : F)
-    (hδ0 : δ ≠ 0) (hδ : ¬ IsSquare δ) (S₀ : Finset (HeightOneSpectrum (𝓞 F))) :
-    ∃ v, v ∉ S₀ ∧ ¬ IsSquare (algebraMap F (v.adicCompletion F) δ) := by
+private theorem exists_place_notMem_not_isSquare
+    (F : Type) [Field F] [NumberField F]
+    (δ : F) (hδ0 : δ ≠ 0) (hδ : ¬ IsSquare δ)
+    (S₀ : Finset (HeightOneSpectrum (𝓞 F)))
+    : ∃ v, v ∉ S₀ ∧ ¬ IsSquare (algebraMap F (v.adicCompletion F) δ) := by
   classical
   by_contra hcon
   push_neg at hcon
@@ -97,16 +108,19 @@ private theorem exists_place_notMem_not_isSquare (F : Type) [Field F] [NumberFie
   have hidx := (_root_.GlobalTheory.QNorm.two_pow_le_index_locNorm F δ S₀ hδ0).1
   haveI : (_root_.GlobalTheory.QNorm.locNorm F δ S₀).FiniteIndex := ⟨hidx⟩
   haveI := Fintype.ofFinite (Fˣ ⧸ _root_.GlobalTheory.QNorm.locNorm F δ S₀)
-  let X : Finset Fˣ := insert d
-    (Finset.univ.image fun q : Fˣ ⧸ _root_.GlobalTheory.QNorm.locNorm F δ S₀ => q.out)
+  let X : Finset Fˣ :=
+    insert d (Finset.univ.image fun q : Fˣ ⧸ _root_.GlobalTheory.QNorm.locNorm F δ S₀ => q.out)
   obtain ⟨S₁, -, hS₁⟩ := _root_.GlobalTheory.QNorm.exists_superset_mem_sUnits F X S₀
-  obtain ⟨S, hS₁S, hadm⟩ := _root_.GlobalTheory.QNorm.exists_admissible_superset_finite_places F (S₁ ∪ S₀)
+  obtain ⟨S, hS₁S, hadm⟩ :=
+    _root_.GlobalTheory.QNorm.exists_admissible_superset_finite_places F (S₁ ∪ S₀)
   have hmem : ∀ x ∈ X, x ∈ _root_.GlobalTheory.QNorm.sUnits F S :=
     hS₁ S (Finset.union_subset_left hS₁S)
   have hdδ : (d : F) = δ := rfl
-  refine _root_.GlobalTheory.QNorm.sUnits_sup_locNorm_ne_top F d S hadm (hmem d (Finset.mem_insert_self _ _))
-    (by rwa [hdδ]) ?_
-  have hle : _root_.GlobalTheory.QNorm.locNorm F δ S₀ ≤ _root_.GlobalTheory.QNorm.locNorm F (d : F) S := by
+  refine _root_.GlobalTheory.QNorm.sUnits_sup_locNorm_ne_top F d S hadm
+    (hmem d (Finset.mem_insert_self _ _)) (by rwa [hdδ]) ?_
+  have hle
+      : _root_.GlobalTheory.QNorm.locNorm F δ S₀
+        ≤ _root_.GlobalTheory.QNorm.locNorm F (d : F) S := by
     intro x hx
     rw [hdδ]
     unfold _root_.GlobalTheory.QNorm.locNorm at hx ⊢
@@ -121,31 +135,37 @@ private theorem exists_place_notMem_not_isSquare (F : Type) [Field F] [NumberFie
   rw [eq_top_iff]
   intro t _
   obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul (_root_.GlobalTheory.QNorm.locNorm F δ S₀) t
-  have ht : t = (QuotientGroup.mk t : Fˣ ⧸ _root_.GlobalTheory.QNorm.locNorm F δ S₀).out * (h : Fˣ)⁻¹ := by
+  have ht
+      : t
+        = (QuotientGroup.mk t : Fˣ ⧸ _root_.GlobalTheory.QNorm.locNorm F δ S₀).out
+          * (h : Fˣ)⁻¹ := by
     rw [hh]; group
   rw [ht]
-  exact Subgroup.mul_mem _ (Subgroup.mem_sup_left (hmem _ (Finset.mem_insert_of_mem
-    (Finset.mem_image_of_mem _ (Finset.mem_univ _)))))
+  exact Subgroup.mul_mem _
+    (Subgroup.mem_sup_left (hmem _
+      (Finset.mem_insert_of_mem (Finset.mem_image_of_mem _ (Finset.mem_univ _)))))
     (Subgroup.mem_sup_right (hle (Subgroup.inv_mem _ h.2)))
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.QuadSymbol.exists_almostNorm_etaProd_eq_neg_one :
-    ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
-      [Algebra.IsQuadraticExtension K L],
+theorem _root_.GlobalTheory.QuadSymbol.exists_almostNorm_etaProd_eq_neg_one
+    : ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
+        [Algebra.IsQuadraticExtension K L],
       ∃ (x : _root_.GlobalTheory.QuadSymbol.FinFam K) (y : _root_.GlobalTheory.QuadSymbol.InfFam K),
-        _root_.GlobalTheory.QuadSymbol.AlmostNorm K L x ∧ _root_.GlobalTheory.QuadSymbol.etaProd K L x y = -1 := by
+        _root_.GlobalTheory.QuadSymbol.AlmostNorm K L x
+          ∧ _root_.GlobalTheory.QuadSymbol.etaProd K L x y = -1 := by
   intro K L _ _ _ _ _ _
   classical
-  obtain ⟨e, δ, he0, he1, hδ⟩ := exists_basis_one_sqrt_nonsquare_of_finrank_two K L
-    (Algebra.IsQuadraticExtension.finrank_eq_two K L)
+  obtain ⟨e, δ, he0, he1, hδ⟩ :=
+    exists_basis_one_sqrt_nonsquare_of_finrank_two K L
+      (Algebra.IsQuadraticExtension.finrank_eq_two K L)
   have hδ0 : δ ≠ 0 := by
     rintro rfl
     exact hδ ⟨0, by simp⟩
   obtain ⟨v, -, hv⟩ := exists_place_notMem_not_isSquare K δ hδ0 hδ ∅
-  obtain ⟨x, hx0, hx⟩ := _root_.GlobalTheory.QNorm.exists_local_nonnorm K v _
-    ((map_ne_zero _).mpr hδ0) hv
-  have hnot : Units.mk0 x hx0 ∉ _root_.GlobalTheory.QuadSymbol.normGroup K L (v.adicCompletion K) := by
+  obtain ⟨x, hx0, hx⟩ :=
+    _root_.GlobalTheory.QNorm.exists_local_nonnorm K v _ ((map_ne_zero _).mpr hδ0) hv
+  have hnot
+      : Units.mk0 x hx0 ∉ _root_.GlobalTheory.QuadSymbol.normGroup K L (v.adicCompletion K) := by
     rw [_root_.GlobalTheory.QuadSymbol.mem_normGroup_iff_form e he0 he1]
     exact hx
   refine ⟨Pi.mulSingle v (Units.mk0 x hx0), 1, ?_, ?_⟩

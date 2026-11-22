@@ -18,13 +18,14 @@ open GlobalTheory.CompanionTheory.Ar.Num
 
 variable {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω]
 
-theorem mem_dotDual_iff (R : Subalgebra o Ω) {m : ℕ} {L : AddSubgroup (Fin m → Ω)}
-    {v : Fin m → Ω} : v ∈ dotDual R L ↔ ∀ l ∈ L, l ⬝ᵥ v ∈ R := by
+theorem mem_dotDual_iff (R : Subalgebra o Ω) {m : ℕ} {L : AddSubgroup (Fin m → Ω)} {v : Fin m → Ω}
+    : v ∈ dotDual R L ↔ ∀ l ∈ L, l ⬝ᵥ v ∈ R := by
   simp only [dotDual, AddSubgroup.mem_iInf, AddSubgroup.mem_comap]
   rfl
 
-theorem std_le_dual (R : Subalgebra o Ω) {m : ℕ} {A : AddSubgroup (Fin m → Ω)}
-    (h : A ≤ stdLat R (Fin m)) : stdLat R (Fin m) ≤ dotDual R A := by
+theorem std_le_dual
+    (R : Subalgebra o Ω) {m : ℕ} {A : AddSubgroup (Fin m → Ω)} (h : A ≤ stdLat R (Fin m))
+    : stdLat R (Fin m) ≤ dotDual R A := by
   intro v hv
   rw [mem_dotDual_iff]
   intro l hl
@@ -33,9 +34,11 @@ theorem std_le_dual (R : Subalgebra o Ω) {m : ℕ} {A : AddSubgroup (Fin m → 
   show ∑ i, l i * v i ∈ R
   exact sum_mem fun i _ => R.mul_mem (hl' i) (hv' i)
 
-theorem smul_mem_std (R : Subalgebra o Ω) {m : ℕ} {A : AddSubgroup (Fin m → Ω)} {w : Ω}
-    (h : mulLat w (stdLat R (Fin m)) ≤ A) {v : Fin m → Ω} (hv : v ∈ dotDual R A) :
-    w • v ∈ stdLat R (Fin m) := by
+theorem smul_mem_std
+    (R : Subalgebra o Ω)
+    {m : ℕ} {A : AddSubgroup (Fin m → Ω)} {w : Ω} (h : mulLat w (stdLat R (Fin m)) ≤ A)
+    {v : Fin m → Ω} (hv : v ∈ dotDual R A)
+    : w • v ∈ stdLat R (Fin m) := by
   classical
   rw [LatticeGoodness.mem_stdLat]
   intro j
@@ -49,19 +52,20 @@ theorem smul_mem_std (R : Subalgebra o Ω) {m : ℕ} {A : AddSubgroup (Fin m →
   have h2 := (mem_dotDual_iff R).1 hv _ h1
   simpa [smul_dotProduct] using h2
 
-theorem core (R : Subalgebra o Ω) {a b c : ℕ} (W : AddSubgroup (Fin a → Ω))
-    (O : AddSubgroup (Fin c → Ω)) (Gam : AddSubgroup ((Fin a → Ω) × (Fin b → Ω)))
-    (Del : AddSubgroup ((Fin b → Ω) × (Fin c → Ω))) (H : AddSubgroup (Fin b → Ω)) (w : Ω)
-    (hw0 : w ≠ 0) (fW : LocFree R a W) (fO : LocFree R c O) (fH : LocFree R b H)
-    (hstd : stdLat R (Fin b) ≤ H) (hwv : ∀ v ∈ H, w • v ∈ stdLat R (Fin b))
+theorem core
+    (R : Subalgebra o Ω)
+    {a b c : ℕ} (W : AddSubgroup (Fin a → Ω)) (O : AddSubgroup (Fin c → Ω))
+    (Gam : AddSubgroup ((Fin a → Ω) × (Fin b → Ω))) (Del : AddSubgroup ((Fin b → Ω) × (Fin c → Ω)))
+    (H : AddSubgroup (Fin b → Ω))
+    (w : Ω) (hw0 : w ≠ 0)
+    (fW : LocFree R a W) (fO : LocFree R c O) (fH : LocFree R b H) (hstd : stdLat R (Fin b) ≤ H)
+    (hwv : ∀ v ∈ H, w • v ∈ stdLat R (Fin b))
     (fIm : LocFree R c ((Del ⊓ H.prod ⊤).map (AddMonoidHom.snd _ _)))
     (sG : ∀ x ∈ R, ∀ v ∈ Gam, x • v ∈ Gam) (sD : ∀ x ∈ R, ∀ v ∈ Del, x • v ∈ Del)
     (g1 : ∀ x, (∃ y, (x, y) ∈ Gam) ↔ w • x ∈ W) (g2 : ∀ y, (0, y) ∈ Gam ↔ y ∈ stdLat R _)
-    (g3 : ∀ x, (x, 0) ∈ Gam ↔ x ∈ W)
-    (d1 : ∀ y, (∃ z, (y, z) ∈ Del) ↔ w • y ∈ stdLat R _) (d3 : ∀ z, (0, z) ∈ Del ↔ z ∈ O)
-    (d4 : ∀ y, (y, 0) ∈ Del ↔ ∃ x, (x, y) ∈ Gam) :
-    LocFree R a ((Gam ⊓ (⊤ : AddSubgroup _).prod H).map (AddMonoidHom.fst _ _)) := by
-
+    (g3 : ∀ x, (x, 0) ∈ Gam ↔ x ∈ W) (d1 : ∀ y, (∃ z, (y, z) ∈ Del) ↔ w • y ∈ stdLat R _)
+    (d3 : ∀ z, (0, z) ∈ Del ↔ z ∈ O) (d4 : ∀ y, (y, 0) ∈ Del ↔ ∃ x, (x, y) ∈ Gam)
+    : LocFree R a ((Gam ⊓ (⊤ : AddSubgroup _).prod H).map (AddMonoidHom.fst _ _)) := by
   have hK : LocFree R b ((Del ⊓ H.prod ⊤).comap (AddMonoidHom.inl _ _)) := by
     refine (LocFreeSchanuel.main R b c H _ O (Del ⊓ H.prod ⊤) fH fIm fO ?_ ?_ ?_ ?_ ?_).2
     · intro x hx v hv
@@ -69,7 +73,10 @@ theorem core (R : Subalgebra o Ω) {a b c : ℕ} (W : AddSubgroup (Fin a → Ω)
       refine AddSubgroup.mem_inf.2 ⟨sD x hx v h1, AddSubgroup.mem_prod.2 ⟨?_, trivial⟩⟩
       exact fH.1 x hx _ (AddSubgroup.mem_prod.1 h2).1
     · intro v z h
-      exact ⟨(AddSubgroup.mem_prod.1 (AddSubgroup.mem_inf.1 h).2).1, AddSubgroup.mem_map.2 ⟨(v, z), h, rfl⟩⟩
+      exact ⟨
+        (AddSubgroup.mem_prod.1 (AddSubgroup.mem_inf.1 h).2).1,
+        AddSubgroup.mem_map.2 ⟨(v, z), h, rfl⟩
+      ⟩
     · intro v hv
       obtain ⟨z, hz⟩ := (d1 v).2 (hwv v hv)
       exact ⟨z, AddSubgroup.mem_inf.2 ⟨hz, AddSubgroup.mem_prod.2 ⟨hv, trivial⟩⟩⟩
@@ -82,36 +89,45 @@ theorem core (R : Subalgebra o Ω) {a b c : ℕ} (W : AddSubgroup (Fin a → Ω)
     · intro z hz
       obtain ⟨⟨v, z'⟩, h, rfl⟩ := AddSubgroup.mem_map.1 hz
       exact ⟨v, h⟩
-  have sG' : ∀ x ∈ R, ∀ v ∈ Gam ⊓ (⊤ : AddSubgroup _).prod H, x • v ∈ Gam ⊓ (⊤ : AddSubgroup _).prod H := by
+  have sG'
+      : ∀ x ∈ R, ∀ v ∈ Gam ⊓ (⊤ : AddSubgroup _).prod H,
+        x • v ∈ Gam ⊓ (⊤ : AddSubgroup _).prod H := by
     intro x hx v hv
     obtain ⟨h1, h2⟩ := AddSubgroup.mem_inf.1 hv
-    exact AddSubgroup.mem_inf.2 ⟨sG x hx v h1, AddSubgroup.mem_prod.2
-      ⟨trivial, fH.1 x hx _ (AddSubgroup.mem_prod.1 h2).2⟩⟩
+    exact AddSubgroup.mem_inf.2
+      ⟨sG x hx v h1, AddSubgroup.mem_prod.2 ⟨trivial, fH.1 x hx _ (AddSubgroup.mem_prod.1 h2).2⟩⟩
 
   have hG' : LocFree R (a + b) (Gam ⊓ (⊤ : AddSubgroup _).prod H) := by
-    have e1 : (Gam ⊓ (⊤ : AddSubgroup _).prod H).comap
-        (LinearMap.inl Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom = W := by
+    have e1
+        : (Gam ⊓ (⊤ : AddSubgroup _).prod H).comap
+            (LinearMap.inl Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom
+          = W := by
       ext x
       constructor
       · intro h
         exact (g3 x).1 (AddSubgroup.mem_inf.1 h).1
       · intro h
         exact AddSubgroup.mem_inf.2 ⟨(g3 x).2 h, AddSubgroup.mem_prod.2 ⟨trivial, H.zero_mem⟩⟩
-    have e2 : (Gam ⊓ (⊤ : AddSubgroup _).prod H).map
-        (LinearMap.snd Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom =
-        (Del ⊓ H.prod ⊤).comap (AddMonoidHom.inl _ _) := by
+    have e2
+        : (Gam ⊓ (⊤ : AddSubgroup _).prod H).map
+            (LinearMap.snd Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom
+          = (Del ⊓ H.prod ⊤).comap (AddMonoidHom.inl _ _) := by
       ext y
       constructor
       · intro h
         obtain ⟨⟨x, y'⟩, hxy, rfl⟩ := AddSubgroup.mem_map.1 h
         obtain ⟨h1, h2⟩ := AddSubgroup.mem_inf.1 hxy
-        exact AddSubgroup.mem_inf.2 ⟨(d4 y').2 ⟨x, h1⟩,
-          AddSubgroup.mem_prod.2 ⟨(AddSubgroup.mem_prod.1 h2).2, trivial⟩⟩
+        exact AddSubgroup.mem_inf.2
+          ⟨(d4 y').2 ⟨x, h1⟩, AddSubgroup.mem_prod.2 ⟨(AddSubgroup.mem_prod.1 h2).2, trivial⟩⟩
       · intro h
         obtain ⟨h1, h2⟩ := AddSubgroup.mem_inf.1 h
         obtain ⟨x, hx⟩ := (d4 y).1 h1
-        exact AddSubgroup.mem_map.2 ⟨(x, y), AddSubgroup.mem_inf.2 ⟨hx,
-          AddSubgroup.mem_prod.2 ⟨trivial, (AddSubgroup.mem_prod.1 h2).1⟩⟩, rfl⟩
+        exact AddSubgroup.mem_map.2 ⟨
+          (x, y),
+          AddSubgroup.mem_inf.2
+            ⟨hx, AddSubgroup.mem_prod.2 ⟨trivial, (AddSubgroup.mem_prod.1 h2).1⟩⟩,
+          rfl
+        ⟩
     exact LocFreeExt.main R (LinearMap.inl Ω _ _) (LinearMap.snd Ω _ _) LinearMap.inl_injective
       LinearMap.snd_surjective (LinearMap.range_inl Ω _ _) _ a b sG' (e1 ▸ fW) (e2 ▸ hK)
 
@@ -127,7 +143,9 @@ theorem core (R : Subalgebra o Ω) {a b c : ℕ} (W : AddSubgroup (Fin a → Ω)
   have fDiv : LocFree R a (Gam.map (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom) :=
     eF ▸ LatticeGoodness.locFree_divLat R hw0 fW
   have hGam : LocFree R (b + a) Gam := by
-    have e1 : Gam.comap (LinearMap.inr Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom = stdLat R (Fin b) := by
+    have e1
+        : Gam.comap (LinearMap.inr Ω (Fin a → Ω) (Fin b → Ω)).toAddMonoidHom
+          = stdLat R (Fin b) := by
       ext y
       exact g2 y
     exact LocFreeExt.main R (LinearMap.inr Ω _ _) (LinearMap.fst Ω _ _) LinearMap.inr_injective
@@ -137,9 +155,10 @@ theorem core (R : Subalgebra o Ω) {a b c : ℕ} (W : AddSubgroup (Fin a → Ω)
   have hfin : Module.finrank Ω (LinearMap.ker (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω))) = b := by
     rw [← LinearMap.range_inr, LinearMap.finrank_range_of_inj LinearMap.inr_injective,
       Module.finrank_fin_fun]
-  obtain ⟨ρ, hρ1, hρ2, hρ3⟩ := (GlobalTheory.T.locally_free_summand_criterion R (LinearMap.ker (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω)))
-    (b + a) a Gam hGam).1
-    ((LatticeGoodness.locFree_map_mkQ_iff R _ LinearMap.fst_surjective Gam).2 fDiv)
+  obtain ⟨ρ, hρ1, hρ2, hρ3⟩ :=
+    (GlobalTheory.T.locally_free_summand_criterion R
+        (LinearMap.ker (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω))) (b + a) a Gam hGam).1
+      ((LatticeGoodness.locFree_map_mkQ_iff R _ LinearMap.fst_surjective Gam).2 fDiv)
   have hS : Summand (Gam ⊓ (⊤ : AddSubgroup _).prod H)
       (LinearMap.ker (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω))) := by
     refine ⟨ρ, hρ1, hρ2, fun v hv => ?_⟩
@@ -149,12 +168,19 @@ theorem core (R : Subalgebra o Ω) {a b c : ℕ} (W : AddSubgroup (Fin a → Ω)
     apply (g2 _).1
     have : ((0 : Fin a → Ω), (ρ v).2) = ρ v := by rw [← h2]
     rwa [this]
-  have hfinal := ((GlobalTheory.T.locally_free_summand_criterion R (LinearMap.ker (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω)))
-    (a + b) a _ hG').2 hS).2
+  have hfinal :=
+    ((GlobalTheory.T.locally_free_summand_criterion R
+      (LinearMap.ker (LinearMap.fst Ω (Fin a → Ω) (Fin b → Ω))) (a + b) a _ hG').2 hS).2
   rw [hfin, Nat.add_sub_cancel] at hfinal
   exact (LatticeGoodness.locFree_map_mkQ_iff R _ LinearMap.fst_surjective _).1 hfinal
 
-theorem main : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {F : Type} [Zero F] [One F] [Fintype F] {n : ℕ} {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData Ω F n Sg r s) (R : Subalgebra o Ω) (p : ℕ) (w : Ω) (χ : Sg → F → Ω), CharData R p w χ → D.Base R p w → D.Good₁ R p χ → D.Good₂ R p χ → (∀ τ, mulLat w (stdLat R _) ≤ D.af R p (χ τ)) → ∀ τ, LocFree R (r τ) (D.kerH R p τ (χ τ)) := by
+theorem main
+    : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {F : Type} [Zero F] [One F] [Fintype F]
+        {n : ℕ} {Sg : Type} {r s : Sg → ℕ} (D : LieLatticeData Ω F n Sg r s) (R : Subalgebra o Ω)
+        (p : ℕ) (w : Ω) (χ : Sg → F → Ω),
+      CharData R p w χ → D.Base R p w → D.Good₁ R p χ → D.Good₂ R p χ
+        → (∀ τ, mulLat w (stdLat R _) ≤ D.af R p (χ τ))
+        → ∀ τ, LocFree R (r τ) (D.kerH R p τ (χ τ)) := by
   intro o Ω _ _ _ F _ _ _ n Sg r s D R p w χ hC hB hG₁ hG₂ hw τ
   have hw0 : w ≠ 0 := by
     obtain ⟨c, -, hc⟩ := hC.2.2.1
@@ -166,7 +192,11 @@ theorem main : ∀ {o Ω : Type} [CommRing o] [Field Ω] [Algebra o Ω] {F : Typ
   obtain ⟨g1, g2, g3⟩ := hB.gam τ
   obtain ⟨d1, -, d3, d4⟩ := hB.del τ
   exact core R (D.W τ) (D.omHT τ) (D.Gam τ) (D.Del τ) (D.hh R p (χ τ)) w hw0 fW fO fH
-    (std_le_dual R hle) (fun v hv => smul_mem_std R (hw τ) hv) (hG₂.im τ)
-    (fun x hx => (hB.stable τ x hx).1) (fun x hx => (hB.stable τ x hx).2.1) g1 g2 g3 d1 d3 d4
+    (std_le_dual R hle)
+    (fun v hv => smul_mem_std R (hw τ) hv)
+    (hG₂.im τ)
+    (fun x hx => (hB.stable τ x hx).1)
+    (fun x hx => (hB.stable τ x hx).2.1)
+    g1 g2 g3 d1 d3 d4
 
 end GlobalTheory.CompanionTheory.Ar.Num.LatticeGoodness.KerFree

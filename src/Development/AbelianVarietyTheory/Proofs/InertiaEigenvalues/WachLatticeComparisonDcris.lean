@@ -7,14 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CmpIsoO
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices
 
 noncomputable section
 
 namespace GlobalTheory.NL.CmpCris
 
-theorem wachLattice_comparison_dcris (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
-    (Cm : CmpOf D.loc D.locA HW F) : P3 D HW F Cm := by
+theorem wachLattice_comparison_dcris
+    (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
+    (Cm : CmpOf D.loc D.locA HW F)
+    : P3 D HW F Cm := by
   intro l _ K s LL h T hT
   obtain ⟨h1, h2, -, h4⟩ := cmp_iso D HW F Cm l K s LL h T hT
   refine ⟨fun x hx => ?_, h2, fun x k hk => h4 x k hk⟩

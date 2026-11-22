@@ -30,8 +30,8 @@ theorem IntNorm_proof : IntNorm := by
   exact_mod_cast h
 
 theorem EigenFrame_of (hB : GramBasic) (hC : EigenCompat) : EigenFrame := by
-  intro a b c d ha hd lam hlam hcm n _ _ h Λ g hg p _ ι hidx J _ v hv H _ _ N0 N1 A u hA Xo T T' chi chi'
-    hadj hpres hchi' hT hT' hsep hnorm
+  intro a b c d ha hd lam hlam hcm n _ _ h Λ g hg p _ ι hidx J _ v hv H _ _ N0 N1 A u hA Xo T T' chi
+    chi' hadj hpres hchi' hT hT' hsep hnorm
   have hth0 : ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) ≠ 0 := by
     have h1 : Complex.I * ((Real.sqrt d : ℝ) : ℂ) ≠ 0 := by
       refine mul_ne_zero Complex.I_ne_zero ?_
@@ -39,24 +39,42 @@ theorem EigenFrame_of (hB : GramBasic) (hC : EigenCompat) : EigenFrame := by
       exact_mod_cast h2.ne'
     exact (map_ne_zero_iff ι ι.injective).2 h1
   generalize hth : ι (Complex.I * ((Real.sqrt d : ℝ) : ℂ)) = th at hth0 hnorm ⊢
-  have hBx := fun x y => hB a b c d ha hd lam hlam hcm n h Λ g hg p ι hidx J v hv
-    (fun j => A j x) (fun j => A j y) (fun j => hA j x) (fun j => hA j y)
+  have hBx := fun x y =>
+    hB a b c d ha hd lam hlam hcm n h Λ g hg p ι hidx J v hv
+      (fun j => A j x)
+      (fun j => A j y)
+      (fun j => hA j x)
+      (fun j => hA j y)
   rw [hth] at hBx
-  obtain ⟨BB, hBB⟩ : ∃ BB : ((Bool × H) × Fin N0 × Fin N1) → ((Bool × H) × Fin N0 × Fin N1) → ℂ_[p],
-      ∀ x y, BB x y = ∑ j, ∑ k, A j x * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * A k y :=
+  obtain ⟨BB, hBB⟩
+      : ∃ BB : ((Bool × H) × Fin N0 × Fin N1) → ((Bool × H) × Fin N0 × Fin N1) → ℂ_[p], ∀ x y,
+        BB x y = ∑ j, ∑ k, A j x * ι (hOK (cmL a b d ha hd lam hlam) h (v j) (v k)) * A k y :=
     ⟨_, fun _ _ => rfl⟩
   simp only [← hBB] at hBx hnorm
   have hcomp : ∀ e x y, ‖(chi e x.1 - chi' e y.1) * BB x y‖ ≤ ‖th‖ := by
     intro e x y
-    obtain ⟨ε, hε, heq⟩ := hC a b c d ha hd lam hlam hcm n h Λ g hg p ι hidx J v hv (T e) (T' e) (hadj e)
-      (hpres e) (fun j => A j x) (fun j => A j y) (chi e x.1) (chi' e y.1) (fun j => hA j x)
-      (fun j => hA j y) (hchi' e y.1) (hT e x) (hT' e y)
+    obtain ⟨ε, hε, heq⟩ :=
+      hC a b c d ha hd lam hlam hcm n h Λ g hg p ι hidx J v hv (T e) (T' e) (hadj e) (hpres e)
+        (fun j => A j x)
+        (fun j => A j y)
+        (chi e x.1) (chi' e y.1)
+        (fun j => hA j x)
+        (fun j => hA j y)
+        (hchi' e y.1) (hT e x) (hT' e y)
     rw [hBB, heq, hth, norm_mul]
     exact mul_le_of_le_one_right (norm_nonneg _) hε
-  obtain ⟨q1, hq1, hsplit⟩ := Formalism.L2.Th1.G.eigenSplit ℂ_[p] ((Bool × H) × Fin N0 × Fin N1) (Bool × H) Xo
-    (fun x => x.1) (fun τ => (!τ.1, τ.2)) BB th chi chi' hth0 (fun x y => (hBx x y).1) hcomp hsep
-  have main : ∀ x y, ∃ e : ℂ_[p], ‖e‖ ≤ 1 ∧
-      BB x y = (if x.1.2 = y.1.2 ∧ x.2 = y.2 ∧ x.1.1 ≠ y.1.1 then u x.1.2 else 0) + th * e := by
+  obtain ⟨q1, hq1, hsplit⟩ :=
+    Formalism.L2.Th1.G.eigenSplit ℂ_[p] ((Bool × H) × Fin N0 × Fin N1) (Bool × H) Xo
+      (fun x => x.1)
+      (fun τ => (!τ.1, τ.2))
+      BB th chi chi' hth0
+      (fun x y => (hBx x y).1)
+      hcomp hsep
+  have main
+      : ∀ x y, ∃ e : ℂ_[p],
+        ‖e‖ ≤ 1
+          ∧ BB x y
+            = (if x.1.2 = y.1.2 ∧ x.2 = y.2 ∧ x.1.1 ≠ y.1.1 then u x.1.2 else 0) + th * e := by
     intro x y
     by_cases hxy : y.1 = (!x.1.1, x.1.2)
     · obtain ⟨⟨bx, t⟩, ab⟩ := x
@@ -94,14 +112,18 @@ theorem EigenFrame_of (hB : GramBasic) (hC : EigenCompat) : EigenFrame := by
   exact (hBB x y).symm.trans (hqe x y)
 
 theorem EigenFrameE_of (hF : EigenFrame) (hS : SepPairs) (hN : IntNorm) : EigenFrameE := by
-  intro a b c d ha hd lam hlam hcm n _ _ h Λ g hg p _ ι hidx J _ v hv hpd E _ _ _ cE s δ hδ hcδ hsδ hcc hss
-    hsc H _ _ emb hinj hembδ hembt hKur act hadj hpres N0 N1 A u hA heig hnorm
+  intro a b c d ha hd lam hlam hcm n _ _ h Λ g hg p _ ι hidx J _ v hv hpd E _ _ _ cE s δ hδ hcδ hsδ
+    hcc hss hsc H _ _ emb hinj hembδ hembt hKur act hadj hpres N0 N1 A u hA heig hnorm
   have hp2 : p ≠ 2 := by
     obtain ⟨_, _, h8, _⟩ := hcm
     omega
   refine hF a b c d ha hd lam hlam hcm n h Λ g hg p ι hidx J v hv H N0 N1 A u hA
-    {ee : 𝓞 E × 𝓞 E // (ee.2 : E) = cE (ee.1 : E)} (fun ee => act ee.1.1) (fun ee => act ee.1.2)
-    (fun ee τ => emb τ (ee.1.1 : E)) (fun ee τ => emb τ (ee.1.2 : E)) ?_ ?_ ?_ ?_ ?_ ?_ hnorm
+    {ee : 𝓞 E × 𝓞 E // (ee.2 : E) = cE (ee.1 : E)}
+    (fun ee => act ee.1.1)
+    (fun ee => act ee.1.2)
+    (fun ee τ => emb τ (ee.1.1 : E))
+    (fun ee τ => emb τ (ee.1.2 : E))
+    ?_ ?_ ?_ ?_ ?_ ?_ hnorm
   · intro ee x y
     exact hadj ee.1.1 ee.1.2 ee.2 x y
   · intro ee

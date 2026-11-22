@@ -8,7 +8,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.RankPosO
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.SmGL GlobalTheory.DiscSpec
+  GlobalTheory.CompanionTheory.CTFin PositivityTheory.Rg.Rs
 open PositivityTheory.Rg.BcB.E PositivityTheory.Rg.BcB.SpectralAccumulation
 open GlobalTheory.CompanionTheory.EGlue
 
@@ -16,13 +17,17 @@ namespace GlobalTheory.CompanionTheory.EGlue.PairSl
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {a b : ℕ}
 
-theorem exists_slices (U₁ : Submodule ℂ (Sm E a)) (U₂ : Submodule ℂ (Sm E b)) (F : H E a b → ℂ)
-    (hF : F ∈ pairSpace U₁ U₂) :
-    (∀ m₂, ∃ φ ∈ U₁, φ.1 = fun x => F (x, m₂)) ∧ (∀ m₁, ∃ φ ∈ U₂, φ.1 = fun x => F (m₁, x)) := by
+theorem exists_slices
+    (U₁ : Submodule ℂ (Sm E a)) (U₂ : Submodule ℂ (Sm E b)) (F : H E a b → ℂ)
+    (hF : F ∈ pairSpace U₁ U₂)
+    : (∀ m₂, ∃ φ ∈ U₁, φ.1 = fun x => F (x, m₂)) ∧ (∀ m₁, ∃ φ ∈ U₂, φ.1 = fun x => F (m₁, x)) := by
   induction hF using Submodule.span_induction with
   | mem F h =>
     obtain ⟨φ₁, h₁, φ₂, h₂, rfl⟩ := h
-    refine ⟨fun m₂ => ⟨φ₂.1 m₂ • φ₁, U₁.smul_mem _ h₁, ?_⟩, fun m₁ => ⟨φ₁.1 m₁ • φ₂, U₂.smul_mem _ h₂, ?_⟩⟩
+    refine ⟨
+      fun m₂ => ⟨φ₂.1 m₂ • φ₁, U₁.smul_mem _ h₁, ?_⟩,
+      fun m₁ => ⟨φ₁.1 m₁ • φ₂, U₂.smul_mem _ h₂, ?_⟩
+    ⟩
     · funext x
       simp [mul_comm]
     · funext x

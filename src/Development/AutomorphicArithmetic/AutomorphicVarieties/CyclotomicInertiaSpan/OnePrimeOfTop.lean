@@ -6,7 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PlacesOfRat
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
 
 namespace UpperTheory.V
 
@@ -16,7 +17,9 @@ namespace B1
 
 section Cyc
 
-variable (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (N : ℕ) [NeZero N]
+variable
+  (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+  (N : ℕ) [NeZero N]
 
 include F in
 theorem natCard_roots : Nat.card (rootsOfUnity N Ω) = N := by
@@ -36,24 +39,28 @@ theorem cycN_spec (g : G F Ω) {ζ : Ω} (h : ζ ^ N = 1) : g ζ = ζ ^ (cycN F 
     rw [mem_rootsOfUnity]
     ext
     simp [h]
-  have key := modularCyclotomicCharacter.spec Ω (natCard_roots F Ω N)
-    (MulSemiringAction.toRingAut (G F Ω) Ω g) hu
+  have key :=
+    modularCyclotomicCharacter.spec Ω (natCard_roots F Ω N)
+      (MulSemiringAction.toRingAut (G F Ω) Ω g) hu
   simpa [cycN] using key
 
-theorem cycN_eq_iff (g : G F Ω) (b : (ZMod N)ˣ) :
-    cycN F Ω N g = b ↔ ∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ ^ (b : ZMod N).val := by
+theorem cycN_eq_iff (g : G F Ω) (b : (ZMod N)ˣ)
+    : cycN F Ω N g = b ↔ ∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ ^ (b : ZMod N).val := by
   constructor
   · rintro rfl ζ hζ
     exact cycN_spec F Ω N g hζ
   · intro hb
-    have hz : ∀ t ∈ rootsOfUnity N Ω, (MulSemiringAction.toRingAut (G F Ω) Ω g) (t : Ω) = (t : Ω) ^ (b : ZMod N).val := by
+    have hz
+        : ∀ t ∈ rootsOfUnity N Ω,
+          (MulSemiringAction.toRingAut (G F Ω) Ω g) (t : Ω) = (t : Ω) ^ (b : ZMod N).val := by
       intro t ht
       have ht' : (t : Ω) ^ N = 1 := by
         rw [mem_rootsOfUnity] at ht
         simpa using congrArg Units.val ht
       simpa using hb t ht'
-    have := modularCyclotomicCharacter.unique Ω (natCard_roots F Ω N)
-      (MulSemiringAction.toRingAut (G F Ω) Ω g) hz
+    have :=
+      modularCyclotomicCharacter.unique Ω (natCard_roots F Ω N)
+        (MulSemiringAction.toRingAut (G F Ω) Ω g) hz
     ext
     exact this.symm
 
@@ -63,7 +70,6 @@ section Coord
 
 variable (n q d : ℕ) [Fact q.Prime] [Fact d.Prime]
 
-
 end Coord
 
 end B1
@@ -72,11 +78,15 @@ namespace AbF
 
 open B1
 
-def U (A : AbF) (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] : Subgroup (G ℚ Ω) := A.H.comap (cycN ℚ Ω A.m)
+def U (A : AbF) (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] : Subgroup (G ℚ Ω) :=
+  A.H.comap (cycN ℚ Ω A.m)
 
-def comp (A B : AbF) : AbF :=
-  ⟨Nat.lcm A.m B.m, Nat.lcm_pos A.pos B.pos,
-    A.H.comap (ZMod.unitsMap (Nat.dvd_lcm_left _ _)) ⊓ B.H.comap (ZMod.unitsMap (Nat.dvd_lcm_right _ _))⟩
+def comp (A B : AbF) : AbF := ⟨
+  Nat.lcm A.m B.m,
+  Nat.lcm_pos A.pos B.pos,
+  A.H.comap (ZMod.unitsMap (Nat.dvd_lcm_left _ _))
+    ⊓ B.H.comap (ZMod.unitsMap (Nat.dvd_lcm_right _ _))
+⟩
 
 end AbF
 

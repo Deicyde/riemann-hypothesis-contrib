@@ -10,13 +10,16 @@ public import Formalism.LocalToGlobal.Columns.ChainTopLawTw
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker GlobalTheory.Mem.Col2 GlobalTheory.TopStep
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.L2.Col Formalism.L2.DIV
+  Formalism.L2.Ker GlobalTheory.Mem.Col2 GlobalTheory.TopStep
 
 namespace GlobalTheory.BlockDecompositionK1
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {P : HeightOneSpectrum (𝓞 E)}
 
-theorem reduction_eq_zero_of_integral_absNorm_pow_inv_mul {c : ℕ} {a : E} (h : IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * a)) : redP P a = 0 := by
+theorem reduction_eq_zero_of_integral_absNorm_pow_inv_mul
+    {c : ℕ} {a : E} (h : IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * a))
+    : redP P a = 0 := by
   apply redP_eq_zero_of_div
   have hq := qOf_ne_zero (P := P)
   have h2 := (intAt_pow (intAt_nat (P := P) (qOf P)) c).mul h
@@ -24,12 +27,14 @@ theorem reduction_eq_zero_of_integral_absNorm_pow_inv_mul {c : ℕ} {a : E} (h :
   rw [pow_succ]
   field_simp
 
-theorem intAt_inv_of_isUnit {a : E} (ha : IntAt P a) (hu : IsUnit (redP P a)) : a ≠ 0 ∧ IntAt P a⁻¹ := by
+theorem intAt_inv_of_isUnit {a : E} (ha : IntAt P a) (hu : IsUnit (redP P a))
+    : a ≠ 0 ∧ IntAt P a⁻¹ := by
   obtain ⟨r, s, hs, h⟩ := id ha
   have hsp := reduction_spec P hs h
   have hr : r ∉ P.asIdeal := fun hr => by
     rw [Ideal.Quotient.eq_zero_iff_mem.2 hr] at hsp
-    have hs0 : (Ideal.Quotient.mk P.asIdeal) s ≠ 0 := fun h0 => hs (Ideal.Quotient.eq_zero_iff_mem.1 h0)
+    have hs0 : (Ideal.Quotient.mk P.asIdeal) s ≠ 0 := fun h0 =>
+      hs (Ideal.Quotient.eq_zero_iff_mem.1 h0)
     exact hs0 ((hu.mul_left_eq_zero).1 hsp)
   have hr0 : algebraMap (𝓞 E) E r ≠ 0 := by
     rw [Ne, FaithfulSMul.algebraMap_eq_zero_iff]
@@ -45,14 +50,18 @@ theorem intAt_inv_of_isUnit {a : E} (ha : IntAt P a) (hu : IsUnit (redP P a)) : 
   rw [eq_div_iff hr0, ← h]
   field_simp
 
-theorem mulVec_mem_stdAt {n : ℕ} {M : Matrix (Fin n) (Fin n) E} (hM : ∀ i l, IntAt P (M i l)) {x : Sp E n}
-    (hx : x ∈ stdAt E n P) : M.mulVec x ∈ stdAt E n P :=
+theorem mulVec_mem_stdAt
+    {n : ℕ} {M : Matrix (Fin n) (Fin n) E} (hM : ∀ i l, IntAt P (M i l))
+    {x : Sp E n} (hx : x ∈ stdAt E n P)
+    : M.mulVec x ∈ stdAt E n P :=
   mem_stdAt.2 fun i => by
     show IntAt P (∑ l, M i l * x l)
     exact intAt_sum _ fun l _ => (hM i l).mul (mem_stdAt.1 hx l)
 
-theorem exists_glint_of_matrix {n : ℕ} (A : Matrix (Fin n) (Fin n) E) (hA : ∀ i l, IntAt P (A i l))
-    (hd : IsUnit (redP P A.det)) : ∃ j : GLint E n P, ∀ x, j.1 x = A.mulVec x := by
+theorem exists_glint_of_matrix
+    {n : ℕ}
+    (A : Matrix (Fin n) (Fin n) E) (hA : ∀ i l, IntAt P (A i l)) (hd : IsUnit (redP P A.det))
+    : ∃ j : GLint E n P, ∀ x, j.1 x = A.mulVec x := by
   obtain ⟨hne, hinv⟩ := intAt_inv_of_isUnit (det_int hA).1 hd
   have hU : IsUnit A.det := isUnit_iff_ne_zero.2 hne
   let I : Invertible A := Matrix.invertibleOfIsUnitDet A hU
@@ -79,18 +88,24 @@ theorem exists_glint_of_matrix {n : ℕ} (A : Matrix (Fin n) (Fin n) E) (hA : �
   · rw [hf]
     exact mulVec_mem_stdAt hA h
 
-theorem inv_extI_mul_mem {N n : ℕ} (hN : N = n + 1) (c : ℕ) (g : GLint E N P) (j : GLint E n P)
+theorem inv_extI_mul_mem
+    {N n : ℕ} (hN : N = n + 1)
+    (c : ℕ)
+    (g : GLint E N P) (j : GLint E n P)
     (hj : ∀ i l, j.1 (Pi.single l 1) i = g.1 (Pi.single (Br.iC hN l) 1) (Br.iC hN i))
     (hB : ∀ i : Fin n, IntAt P (((qOf P : E) ^ c)⁻¹ * g.1 (Pi.single (Br.iL hN) 1) (Br.iC hN i)))
     (hC : ∀ l : Fin n, IntAt P (((qOf P : E) ^ c)⁻¹ * g.1 (Pi.single (Br.iC hN l) 1) (Br.iL hN)))
-    (hD : IntAt P (((qOf P : E) ^ c)⁻¹ * (g.1 (Pi.single (Br.iL hN) 1) (Br.iL hN) - 1))) :
-    (extI hN P j)⁻¹ * g ∈ prinCong N P c := by
+    (hD : IntAt P (((qOf P : E) ^ c)⁻¹ * (g.1 (Pi.single (Br.iL hN) 1) (Br.iL hN) - 1)))
+    : (extI hN P j)⁻¹ * g ∈ prinCong N P c := by
   subst hN
   rw [inv_mul_mem_prinCong]
   intro x hx
   have hxi := mem_stdAt.1 hx
-  have eg : ∀ i, g.1 x i = ∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) i +
-      x (Fin.last n) * g.1 (Pi.single (Fin.last n) 1) i := fun i => by
+  have eg
+      : ∀ i,
+        g.1 x i
+          = ∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) i
+            + x (Fin.last n) * g.1 (Pi.single (Fin.last n) 1) i := fun i => by
     have := apply_eq_sum (g.1 : Sp E (n + 1) →ₗ[E] Sp E (n + 1)) x i
     rw [Fin.sum_univ_castSucc] at this
     exact this
@@ -103,18 +118,25 @@ theorem inv_extI_mul_mem {N n : ℕ} (hN : N = n + 1) (c : ℕ) (g : GLint E N P
       rw [Units.val_one, one_mul] at this
       exact this
     rw [e, eg]
-    have e2 : ((qOf P : E) ^ c)⁻¹ * (∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) (Fin.last n) +
-        x (Fin.last n) * g.1 (Pi.single (Fin.last n) 1) (Fin.last n) - x (Fin.last n)) =
-        ∑ l : Fin n, x l.castSucc * (((qOf P : E) ^ c)⁻¹ * g.1 (Pi.single l.castSucc 1) (Fin.last n)) +
-        x (Fin.last n) * (((qOf P : E) ^ c)⁻¹ * (g.1 (Pi.single (Fin.last n) 1) (Fin.last n) - 1)) := by
-      rw [show ∑ l : Fin n, x l.castSucc * (((qOf P : E) ^ c)⁻¹ * g.1 (Pi.single l.castSucc 1) (Fin.last n)) =
-          ((qOf P : E) ^ c)⁻¹ * ∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) (Fin.last n) by
+    have e2
+        : ((qOf P : E) ^ c)⁻¹
+            * (∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) (Fin.last n)
+              + x (Fin.last n) * g.1 (Pi.single (Fin.last n) 1) (Fin.last n) - x (Fin.last n))
+          = ∑ l : Fin n, x l.castSucc * (((qOf P : E) ^ c)⁻¹ * g.1 (Pi.single l.castSucc 1) (Fin.last n))
+            + x (Fin.last n)
+              * (((qOf P : E) ^ c)⁻¹ * (g.1 (Pi.single (Fin.last n) 1) (Fin.last n) - 1)) := by
+      rw [show
+          ∑ l : Fin n, x l.castSucc * (((qOf P : E) ^ c)⁻¹ * g.1 (Pi.single l.castSucc 1) (Fin.last n))
+            = ((qOf P : E) ^ c)⁻¹
+              * ∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) (Fin.last n) by
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl fun l _ => by ring]
       ring
     rw [e2]
     exact IntAt.add (intAt_sum _ fun l _ => (hxi _).mul (hC l)) ((hxi _).mul hD)
-  · have e : sumE rfl j.1 1 x i.castSucc = ∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) i.castSucc := by
+  · have e
+        : sumE rfl j.1 1 x i.castSucc
+          = ∑ l : Fin n, x l.castSucc * g.1 (Pi.single l.castSucc 1) i.castSucc := by
       have h1 := congrFun (prH_sumE (rfl : n + 1 = n + 1) j.1 1 x) i
       rw [prH_apply] at h1
       have h2 := apply_eq_sum (j.1 : Sp E n →ₗ[E] Sp E n) (prH E rfl x) i
@@ -124,21 +146,33 @@ theorem inv_extI_mul_mem {N n : ℕ} (hN : N = n + 1) (c : ℕ) (g : GLint E N P
     rw [e, eg, add_sub_cancel_left, mul_left_comm]
     exact (hxi _).mul (hB i)
 
-theorem det_last {κ : Type} [CommRing κ] {n : ℕ} (R : Matrix (Fin (n + 1)) (Fin (n + 1)) κ)
-    (h0 : ∀ l : Fin n, R (Fin.last n) l.castSucc = 0) (h1 : R (Fin.last n) (Fin.last n) = 1) :
-    R.det = (R.submatrix Fin.castSucc Fin.castSucc).det := by
+theorem det_last
+    {κ : Type} [CommRing κ]
+    {n : ℕ} (R : Matrix (Fin (n + 1)) (Fin (n + 1)) κ)
+    (h0 : ∀ l : Fin n, R (Fin.last n) l.castSucc = 0) (h1 : R (Fin.last n) (Fin.last n) = 1)
+    : R.det = (R.submatrix Fin.castSucc Fin.castSucc).det := by
   rw [Matrix.det_succ_row R (Fin.last n), Fin.sum_univ_castSucc]
-  simp only [h0, mul_zero, zero_mul, Finset.sum_const_zero, zero_add, h1, mul_one, Fin.succAbove_last, Fin.val_last]
+  simp only [h0, mul_zero, zero_mul, Finset.sum_const_zero, zero_add, h1, mul_one,
+    Fin.succAbove_last, Fin.val_last]
   rw [Even.neg_one_pow ⟨n, rfl⟩, one_mul]
 
-theorem coarse_two {r b n : ℕ} (hn : n = r + b) (k : Fin n) : coarse r [b] k.1 = if k.1 < r then 0 else 1 := by
+theorem coarse_two {r b n : ℕ} (hn : n = r + b) (k : Fin n)
+    : coarse r [b] k.1 = if k.1 < r then 0 else 1 := by
   split_ifs with h
   · exact coarse_of_lt h
   · rw [coarse_of_le (Nat.not_lt.1 h)]
     simp only [blkIdx]
     rw [if_pos (by have := k.2; omega)]
 
-theorem exists_block_of_twisted_k1 : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) {N n : ℕ} (hN : N = n + 1) (r b c : ℕ), n = r + b → ∀ g : GLint E N P, g ∈ twK1H P N r (c + 1) → ∃ j : GLint E n P, redGL n P j ∈ HQ (𝓞 E ⧸ P.asIdeal) n r b ∧ (extI hN P j)⁻¹ * g ∈ prinCong N P (c + 1) := by
+theorem exists_block_of_twisted_k1
+    : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) {N n : ℕ}
+        (hN : N = n + 1) (r b c : ℕ),
+      n = r + b
+        → ∀ g : GLint E N P,
+          g ∈ twK1H P N r (c + 1)
+            → ∃ j : GLint E n P,
+              redGL n P j ∈ HQ (𝓞 E ⧸ P.asIdeal) n r b
+                ∧ (extI hN P j)⁻¹ * g ∈ prinCong N P (c + 1) := by
   intro E _ _ _ P N n hN r b c hn g hg
   subst hN
   obtain ⟨-, hT1, hT2⟩ := isKOneType_of_mem_kOne P g hg
@@ -147,12 +181,18 @@ theorem exists_block_of_twisted_k1 : ∀ {E : Type} [Field E] [NumberField E] [S
   have hlast : (Fin.last n).1 + 1 = n + 1 := by simp
   have hC' : ∀ i : Fin n, ¬ (i.castSucc : Fin (n + 1)).1 + 1 = n + 1 := fun i h => by
     simp only [Fin.coe_castSucc] at h; omega
-  have hB : ∀ i : Fin n, IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * g.1 (Pi.single (Br.iL rfl) 1) (Br.iC rfl i)) :=
+  have hB
+      : ∀ i : Fin n,
+        IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * g.1 (Pi.single (Br.iL rfl) 1) (Br.iC rfl i)) :=
     fun i => hT1 _ _ (iff_of_false (hC' i) (not_not.2 hlast))
-  have hC : ∀ l : Fin n, IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * g.1 (Pi.single (Br.iC rfl l) 1) (Br.iL rfl)) :=
+  have hC
+      : ∀ l : Fin n,
+        IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * g.1 (Pi.single (Br.iC rfl l) 1) (Br.iL rfl)) :=
     fun l => hT1 _ _ (iff_of_true hlast (hC' l))
-  have hD : IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * (g.1 (Pi.single (Br.iL rfl) 1) (Br.iL rfl) - 1)) := hT2 _ hlast
-  let A : Matrix (Fin n) (Fin n) E := Matrix.of fun i l => g.1 (Pi.single (Br.iC rfl l) 1) (Br.iC rfl i)
+  have hD : IntAt P (((qOf P : E) ^ (c + 1))⁻¹ * (g.1 (Pi.single (Br.iL rfl) 1) (Br.iL rfl) - 1)) :=
+    hT2 _ hlast
+  let A : Matrix (Fin n) (Fin n) E :=
+    Matrix.of fun i l => g.1 (Pi.single (Br.iC rfl l) 1) (Br.iC rfl i)
   have hAint : ∀ i l, IntAt P (A i l) := fun i l => glint_entry g _ _
   have hdet : IsUnit (redP P A.det) := by
     rw [redP_det A hAint]
@@ -168,7 +208,9 @@ theorem exists_block_of_twisted_k1 : ∀ {E : Type} [Field E] [NumberField E] [S
       rw [reduction_sub (glint_entry g _ _) intAt_one, reduction_one₂, sub_eq_zero] at h
       exact h
   obtain ⟨j, hj⟩ := exists_glint_of_matrix A hAint hdet
-  have hj' : ∀ i l, j.1 (Pi.single l 1) i = g.1 (Pi.single (Br.iC rfl l) 1) (Br.iC rfl i) := fun i l => by
+  have hj'
+      : ∀ i l,
+        j.1 (Pi.single l 1) i = g.1 (Pi.single (Br.iC rfl l) 1) (Br.iC rfl i) := fun i l => by
     rw [hj]
     simp [Matrix.mulVec_single_one, A]
   refine ⟨j, ?_, inv_extI_mul_mem rfl (c + 1) g j hj' hB hC hD⟩
@@ -191,7 +233,8 @@ theorem exists_block_of_twisted_k1 : ∀ {E : Type} [Field E] [NumberField E] [S
     GlobalTheory.LastSteps.mem_sclLat.2 fun k => by
       by_cases hk : k = Br.iC rfl l
       · subst hk
-        have : ¬ (r ≤ (Br.iC (rfl : n + 1 = n + 1) l).1 ∧ (Br.iC (rfl : n + 1 = n + 1) l).1 < n + 1) := fun h => by
+        have : ¬(r ≤ (Br.iC (rfl : n + 1 = n + 1) l).1
+            ∧ (Br.iC (rfl : n + 1 = n + 1) l).1 < n + 1) := fun h => by
           have := h.1; simp [Br.iC] at this; omega
         simp only [if_neg this, zpow_zero, inv_one, one_mul, Pi.single_eq_same]
         exact intAt_one

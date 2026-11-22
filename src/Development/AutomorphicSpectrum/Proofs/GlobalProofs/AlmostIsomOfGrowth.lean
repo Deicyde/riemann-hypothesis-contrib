@@ -7,7 +7,9 @@ public import GroundTheory.HeightsAndTheta.Theta.EisensteinZeta.MirabolicInducti
 
 @[expose] public section
 
-open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂ GlobalTheory.CompanionTheory.Hypotheses₂.HCA
+open Matrix Formalism.REAL Formalism.MainNotions.S Formalism.L2.Theta GlobalTheory.LinRed
+  GlobalTheory.FlagMeas GlobalTheory.RealInd GlobalTheory.CompanionTheory.Hypotheses₂
+  GlobalTheory.CompanionTheory.Hypotheses₂.HCA
 open scoped InnerProductSpace ContDiff
 
 noncomputable section
@@ -18,7 +20,8 @@ open MeasureTheory GroundTheory.Heights₂.Theta.SecondKind
 
 section Abstract
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type*} [Group G] [TopologicalSpace G] [MeasurableSpace G] [BorelSpace G]
   {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
 def avgForm (μ : Measure G) (φ : G → ℝ) (ρ : G → (H →L[ℂ] H)) (x y : H) : ℂ :=
@@ -49,7 +52,8 @@ theorem avg_self (x : H) : avgForm μ φ ρ x x = ((∫ g, φ g * ‖ρ g x‖ ^
   push_cast
   rfl
 
-variable (hφ : Continuous φ) (hφ0 : ∀ g, 0 < φ g) (hρ : ∀ v, Continuous fun g => ρ g v)
+variable
+  (hφ : Continuous φ) (hφ0 : ∀ g, 0 < φ g) (hρ : ∀ v, Continuous fun g => ρ g v)
   (hB : Integrable B μ) (hb : ∀ g x y, φ g * (‖ρ g x‖ * ‖ρ g y‖) ≤ B g * (‖x‖ * ‖y‖))
 
 include hφ hφ0 hρ hB hb
@@ -66,41 +70,50 @@ theorem integrable_sq (x : H) : Integrable (fun g => φ g * ‖ρ g x‖ ^ 2) μ
   · rw [Real.norm_of_nonneg (mul_nonneg (hφ0 g).le (sq_nonneg _)), sq]
     exact hb g x x
 
-theorem avg_add (x y z : H) :
-    avgForm μ φ ρ x (y + z) = avgForm μ φ ρ x y + avgForm μ φ ρ x z := by
+theorem avg_add (x y z : H) : avgForm μ φ ρ x (y + z) = avgForm μ φ ρ x y + avgForm μ φ ρ x z := by
   simp only [avgForm, map_add (f := _), inner_add_right, mul_add]
   exact integral_add (integrable_avg hφ hφ0 hρ hB hb x y) (integrable_avg hφ hφ0 hρ hB hb x z)
 
 theorem avg_norm_le (x y : H) : ‖avgForm μ φ ρ x y‖ ≤ (∫ g, B g ∂μ) * ‖x‖ * ‖y‖ := by
-  have h := norm_integral_le_of_norm_le (μ := μ)
-    (f := fun g => (φ g : ℂ) * ⟪ρ g x, ρ g y⟫_ℂ) (hB.mul_const (‖x‖ * ‖y‖)) (.of_forall fun g => by
-      rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (hφ0 g).le]
-      exact (mul_le_mul_of_nonneg_left (norm_inner_le_norm _ _) (hφ0 g).le).trans (hb g x y))
+  have h :=
+    norm_integral_le_of_norm_le (μ := μ)
+      (f := fun g => (φ g : ℂ) * ⟪ρ g x, ρ g y⟫_ℂ)
+      (hB.mul_const (‖x‖ * ‖y‖))
+      (.of_forall fun g => by
+        rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (hφ0 g).le]
+        exact (mul_le_mul_of_nonneg_left (norm_inner_le_norm _ _) (hφ0 g).le).trans (hb g x y))
   rw [integral_mul_const] at h
   rw [mul_assoc]
   exact h
 
-theorem avg_lower (hφI : Integrable φ μ) {S : Set G} (hS : MeasurableSet S) {D : ℝ} (hD : 0 < D)
-    (hDS : ∀ g ∈ S, ∀ x, ‖x‖ ≤ D * ‖ρ g x‖) (x : H) :
-    (∫ g in S, φ g ∂μ) / D ^ 2 * ‖x‖ ^ 2 ≤ (avgForm μ φ ρ x x).re := by
+theorem avg_lower
+    (hφI : Integrable φ μ)
+    {S : Set G} (hS : MeasurableSet S)
+    {D : ℝ} (hD : 0 < D) (hDS : ∀ g ∈ S, ∀ x, ‖x‖ ≤ D * ‖ρ g x‖)
+    (x : H)
+    : (∫ g in S, φ g ∂μ) / D ^ 2 * ‖x‖ ^ 2 ≤ (avgForm μ φ ρ x x).re := by
   have hI := integrable_sq hφ hφ0 hρ hB hb x
   rw [avg_self, Complex.ofReal_re]
-  calc (∫ g in S, φ g ∂μ) / D ^ 2 * ‖x‖ ^ 2 = ∫ g in S, φ g * (‖x‖ ^ 2 / D ^ 2) ∂μ := by
-        rw [integral_mul_const]; ring
+  calc
+    (∫ g in S, φ g ∂μ) / D ^ 2 * ‖x‖ ^ 2
+      = ∫ g in S, φ g * (‖x‖ ^ 2 / D ^ 2) ∂μ := by rw [integral_mul_const]; ring
     _ ≤ ∫ g in S, φ g * ‖ρ g x‖ ^ 2 ∂μ := by
-        refine setIntegral_mono_on (hφI.integrableOn.mul_const _) hI.integrableOn hS fun g hg => ?_
-        refine mul_le_mul_of_nonneg_left ?_ (hφ0 g).le
-        rw [div_le_iff₀ (by positivity)]
-        have := pow_le_pow_left₀ (norm_nonneg _) (hDS g hg x) 2
-        rw [mul_pow] at this
-        linarith
+      refine setIntegral_mono_on (hφI.integrableOn.mul_const _) hI.integrableOn hS fun g hg => ?_
+      refine mul_le_mul_of_nonneg_left ?_ (hφ0 g).le
+      rw [div_le_iff₀ (by positivity)]
+      have := pow_le_pow_left₀ (norm_nonneg _) (hDS g hg x) 2
+      rw [mul_pow] at this
+      linarith
     _ ≤ ∫ g, φ g * ‖ρ g x‖ ^ 2 ∂μ :=
-        setIntegral_le_integral hI (.of_forall fun g => mul_nonneg (hφ0 g).le (sq_nonneg _))
+      setIntegral_le_integral hI (.of_forall fun g => mul_nonneg (hφ0 g).le (sq_nonneg _))
 
-theorem avg_growth [MeasurableMul G] [μ.IsMulRightInvariant]
-    (hmul : ∀ g g', ρ (g * g') = (ρ g).comp (ρ g')) (h : G) {c : ℝ}
-    (hφc : ∀ g, φ (g * h⁻¹) ≤ c * φ g) (x : H) :
-    (avgForm μ φ ρ (ρ h x) (ρ h x)).re ≤ c * (avgForm μ φ ρ x x).re := by
+theorem avg_growth
+    [MeasurableMul G] [μ.IsMulRightInvariant]
+    (hmul : ∀ g g', ρ (g * g') = (ρ g).comp (ρ g'))
+    (h : G)
+    {c : ℝ} (hφc : ∀ g, φ (g * h⁻¹) ≤ c * φ g)
+    (x : H)
+    : (avgForm μ φ ρ (ρ h x) (ρ h x)).re ≤ c * (avgForm μ φ ρ x x).re := by
   have hI := integrable_sq hφ hφ0 hρ hB hb x
   rw [avg_self, avg_self, Complex.ofReal_re, Complex.ofReal_re]
   have e : ∫ g, φ g * ‖ρ g (ρ h x)‖ ^ 2 ∂μ = ∫ g, φ (g * h⁻¹) * ‖ρ g x‖ ^ 2 ∂μ := by
@@ -126,23 +139,31 @@ theorem wt_eq_hs_sq (g : Matrix (Fin n) (Fin n) ℂ) : wt g = UnitaryRecombinati
 theorem hs_le_mnorm (X : Matrix (Fin n) (Fin n) ℂ) : UnitaryRecombination.hs X ≤ mnorm X := by
   have hm : 0 ≤ mnorm X := Finset.sum_nonneg fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _
   have hij : ∀ i j, ‖X i j‖ ≤ mnorm X := fun i j =>
-    (Finset.single_le_sum (f := fun b => ‖X i b‖) (fun _ _ => norm_nonneg _) (Finset.mem_univ j)).trans
-      (Finset.single_le_sum (f := fun a => ∑ b, ‖X a b‖)
-        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _) (Finset.mem_univ i))
+    (Finset.single_le_sum
+        (f := fun b => ‖X i b‖)
+        (fun _ _ => norm_nonneg _)
+        (Finset.mem_univ j)).trans
+      (Finset.single_le_sum
+        (f := fun a => ∑ b, ‖X a b‖)
+        (fun _ _ => Finset.sum_nonneg fun _ _ => norm_nonneg _)
+        (Finset.mem_univ i))
   refine (sq_le_sq₀ (UnitaryRecombination.hs_nonneg X) hm).1 ?_
   rw [UnitaryRecombination.hs_sq]
-  calc ∑ i, ∑ j, ‖X i j‖ ^ 2 ≤ ∑ i, ∑ j, ‖X i j‖ * mnorm X :=
-        Finset.sum_le_sum fun i _ => Finset.sum_le_sum fun j _ => by
+  calc
+    ∑ i, ∑ j, ‖X i j‖ ^ 2 ≤ ∑ i, ∑ j, ‖X i j‖ * mnorm X :=
+      Finset.sum_le_sum fun i _ =>
+        Finset.sum_le_sum fun j _ => by
           rw [sq]; exact mul_le_mul_of_nonneg_left (hij i j) (norm_nonneg _)
     _ = mnorm X ^ 2 := by
-        simp only [← Finset.sum_mul]
-        rw [sq]; rfl
+      simp only [← Finset.sum_mul]
+      rw [sq]
+      rfl
 
 theorem continuous_wt : Continuous (wt : Matrix (Fin n) (Fin n) ℂ → ℝ) :=
-  Complex.continuous_re.comp ((continuous_id.matrix_conjTranspose.matrix_mul continuous_id).matrix_trace)
+  Complex.continuous_re.comp ((continuous_id.matrix_conjTranspose.matrix_mul
+    continuous_id).matrix_trace)
 
-theorem wt_one : wt (1 : Matrix (Fin n) (Fin n) ℂ) = n := by
-  simp [wt]
+theorem wt_one : wt (1 : Matrix (Fin n) (Fin n) ℂ) = n := by simp [wt]
 
 section L2
 
@@ -150,21 +171,23 @@ open scoped Matrix.Norms.L2Operator
 
 theorem wt_mul_le (A h : Matrix (Fin n) (Fin n) ℂ) : wt (A * h) ≤ wt A * ‖h‖ ^ 2 := by
   rw [wt_eq_hs_sq, wt_eq_hs_sq, ← mul_pow]
-  exact pow_le_pow_left₀ (UnitaryRecombination.hs_nonneg _) (UnitaryRecombination.hs_mul_right_le A h) 2
+  exact pow_le_pow_left₀ (UnitaryRecombination.hs_nonneg _)
+    (UnitaryRecombination.hs_mul_right_le A h) 2
 
-theorem norm_exp_smul_le (hn : 0 < n) (X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) :
-    ‖NormedSpace.exp (t • X)‖ ≤ Real.exp (|t| * mnorm X) := by
+theorem norm_exp_smul_le (hn : 0 < n) (X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ)
+    : ‖NormedSpace.exp (t • X)‖ ≤ Real.exp (|t| * mnorm X) := by
   haveI : Nonempty (Fin n) := ⟨⟨0, hn⟩⟩
   haveI : NormOneClass (Matrix (Fin n) (Fin n) ℂ) :=
     ⟨by rw [← l2_opNorm_toEuclideanCLM, map_one]; exact norm_one⟩
   refine (PI.IwaMeasEx.Gauge.ZetaZeros.norm_exp_le' _).trans (Real.exp_le_exp.2 ?_)
   rw [norm_smul, Real.norm_eq_abs]
-  exact mul_le_mul_of_nonneg_left ((UnitaryRecombination.opNorm_le_hs X).trans (hs_le_mnorm X)) (abs_nonneg _)
+  exact mul_le_mul_of_nonneg_left ((UnitaryRecombination.opNorm_le_hs X).trans (hs_le_mnorm X))
+    (abs_nonneg _)
 
 end L2
 
-theorem wt_mul_exp_le (hn : 0 < n) (A X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ) :
-    wt (A * NormedSpace.exp (t • X)) ≤ wt A * Real.exp (2 * (|t| * mnorm X)) := by
+theorem wt_mul_exp_le (hn : 0 < n) (A X : Matrix (Fin n) (Fin n) ℂ) (t : ℝ)
+    : wt (A * NormedSpace.exp (t • X)) ≤ wt A * Real.exp (2 * (|t| * mnorm X)) := by
   open scoped Matrix.Norms.L2Operator in
   refine (wt_mul_le _ _).trans (mul_le_mul_of_nonneg_left ?_ ?_)
   · rw [two_mul, Real.exp_add, ← sq]
@@ -180,14 +203,20 @@ theorem wt_pos {ε : Fin n → Bool} (hn : 0 < n) (g : UJ ε) : 0 < wt (uMat g) 
     exact hne (Matrix.ext h)
   rw [wt_eq_hs_sq, UnitaryRecombination.hs_sq]
   have h1 : 0 < ‖uMat g i j‖ ^ 2 := by positivity
-  have h2 := Finset.single_le_sum (f := fun b => ‖uMat g i b‖ ^ 2) (fun _ _ => sq_nonneg _)
-    (Finset.mem_univ j)
-  have h3 := Finset.single_le_sum (f := fun a => ∑ b, ‖uMat g a b‖ ^ 2)
-    (fun _ _ => Finset.sum_nonneg fun _ _ => sq_nonneg _) (Finset.mem_univ i)
+  have h2 :=
+    Finset.single_le_sum
+      (f := fun b => ‖uMat g i b‖ ^ 2)
+      (fun _ _ => sq_nonneg _)
+      (Finset.mem_univ j)
+  have h3 :=
+    Finset.single_le_sum
+      (f := fun a => ∑ b, ‖uMat g a b‖ ^ 2)
+      (fun _ _ => Finset.sum_nonneg fun _ _ => sq_nonneg _)
+      (Finset.mem_univ i)
   exact h1.trans_le (h2.trans h3)
 
-theorem exists_uMat_eq {ε : Fin n → Bool} {c : Matrix (Fin n) (Fin n) ℂ} (hc : c ∈ UJset ε) :
-    ∃ h : UJ ε, uMat h = c := by
+theorem exists_uMat_eq {ε : Fin n → Bool} {c : Matrix (Fin n) (Fin n) ℂ} (hc : c ∈ UJset ε)
+    : ∃ h : UJ ε, uMat h = c := by
   have hc' : cᴴ * Jm ε * c = Jm ε := hc
   have hl : (Jm ε * cᴴ * Jm ε) * c = 1 := by
     rw [mul_assoc (Jm ε * cᴴ), mul_assoc (Jm ε), ← mul_assoc cᴴ, hc', Jm_mul_self]
@@ -198,17 +227,37 @@ theorem continuous_uMat {ε : Fin n → Bool} : Continuous (uMat : UJ ε → Mat
 
 end Mat
 
-theorem almostIsom_of_growth {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
-    (hrep : Formalism.QuantumDeterminants.IsCRepOn (UJset ε) π) (hc : ∀ v, ContinuousOn (fun g => π g v) (UJset ε))
+theorem almostIsom_of_growth
+    {n : ℕ} {ε : Fin n → Bool} {H : Type}
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    {π : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+    (hrep : Formalism.QuantumDeterminants.IsCRepOn (UJset ε) π)
+    (hc : ∀ v, ContinuousOn (fun g => π g v) (UJset ε))
     (hg : ∃ C b : ℝ, 0 < C ∧ 0 ≤ b ∧ ∀ g ∈ UJset ε, ∀ x, ‖π g x‖ ≤ C * wt g ^ b * ‖x‖)
-    (hv : ∃ b : ℝ, 0 ≤ b ∧ ∀ b' : ℝ, b ≤ b' →
-      MeasureTheory.Integrable (fun g : UJ ε => wt (uMat g) ^ (-b')) (Formalism.REAL.muG ε).inv) :
-    AlmostIsom (UJset ε) π := by
+    (hv : ∃ b : ℝ,
+      0 ≤ b
+        ∧ ∀ b' : ℝ,
+          b ≤ b'
+            → MeasureTheory.Integrable
+              (fun g : UJ ε => wt (uMat g) ^ (-b'))
+              (Formalism.REAL.muG ε).inv)
+    : AlmostIsom (UJset ε) π := by
   rcases Nat.eq_zero_or_pos n with rfl | hn
-  · refine ⟨fun x y => ⟪x, y⟫_ℂ, 1, 1, 0, one_pos, zero_le_one, le_rfl,
-      fun x y z => inner_add_right _ _ _, fun c x y => inner_smul_right _ _ _,
-      fun x y => (inner_conj_symm y x).symm, fun x => ?_, fun x y => ?_, fun X _ t x => ?_⟩
+  · refine ⟨
+      fun x y => ⟪x, y⟫_ℂ,
+      1,
+      1,
+      0,
+      one_pos,
+      zero_le_one,
+      le_rfl,
+      fun x y z => inner_add_right _ _ _,
+      fun c x y => inner_smul_right _ _ _,
+      fun x y => (inner_conj_symm y x).symm,
+      fun x => ?_,
+      fun x y => ?_,
+      fun X _ t x => ?_
+    ⟩
     · rw [one_mul]
       exact (inner_self_eq_norm_sq (𝕜 := ℂ) x).ge
     · rw [one_mul]
@@ -242,15 +291,16 @@ theorem almostIsom_of_growth {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedA
       rw [← Real.rpow_add (hwp g), ← Real.rpow_add (hwp g), hb']
       congr 1
       ring
-    calc φ g * (‖ρ g x‖ * ‖ρ g y‖)
-        ≤ φ g * ((C * wt (uMat g) ^ b * ‖x‖) * (C * wt (uMat g) ^ b * ‖y‖)) :=
-          mul_le_mul_of_nonneg_left (mul_le_mul h1 h2 (norm_nonneg _) (by positivity)) (hφ0 g).le
+    calc
+      φ g * (‖ρ g x‖ * ‖ρ g y‖)
+          ≤ φ g * ((C * wt (uMat g) ^ b * ‖x‖) * (C * wt (uMat g) ^ b * ‖y‖)) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul h1 h2 (norm_nonneg _) (by positivity)) (hφ0 g).le
       _ = C ^ 2 * (φ g * (wt (uMat g) ^ b * wt (uMat g) ^ b)) * (‖x‖ * ‖y‖) := by ring
       _ = Bf g * (‖x‖ * ‖y‖) := by rw [e]
 
   let S : Set (UJ ε) := {g | wt (uMat g) < n + 1} ∩ {g | wt (uMat g⁻¹) < n + 1}
-  have hSo : IsOpen S := (isOpen_lt hw continuous_const).inter
-    (isOpen_lt (hw.comp continuous_inv) continuous_const)
+  have hSo : IsOpen S :=
+    (isOpen_lt hw continuous_const).inter (isOpen_lt (hw.comp continuous_inv) continuous_const)
   have hS1 : (1 : UJ ε) ∈ S := by
     have h1 : wt (uMat (1 : UJ ε)) = n := wt_one
     refine ⟨?_, ?_⟩
@@ -264,8 +314,7 @@ theorem almostIsom_of_growth {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedA
   have hDS : ∀ g ∈ S, ∀ x, ‖x‖ ≤ D * ‖ρ g x‖ := by
     intro g hgS x
     have e : π (uMat g⁻¹) (π (uMat g) x) = x := by
-      have h1 : π (uMat g⁻¹ * uMat g) = (π (uMat g⁻¹)).comp (π (uMat g)) :=
-        hrep.2 _ (g⁻¹).2 _ g.2
+      have h1 : π (uMat g⁻¹ * uMat g) = (π (uMat g⁻¹)).comp (π (uMat g)) := hrep.2 _ (g⁻¹).2 _ g.2
       have h2 : uMat g⁻¹ * uMat g = 1 := by
         show uMat (g⁻¹ * g) = 1
         rw [inv_mul_cancel]
@@ -277,20 +326,29 @@ theorem almostIsom_of_growth {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedA
     refine h3.trans ?_
     refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
     rw [hDdef]
-    exact mul_le_mul_of_nonneg_left
-      (Real.rpow_le_rpow (hwp _).le (le_of_lt hgS.2) hb) hC.le
+    exact mul_le_mul_of_nonneg_left (Real.rpow_le_rpow (hwp _).le (le_of_lt hgS.2) hb) hC.le
   have hmS : 0 < ∫ g in S, φ g ∂(Formalism.REAL.muG ε).inv := by
-    rw [MeasureTheory.setIntegral_pos_iff_support_of_nonneg_ae
-      (.of_forall fun g => (hφ0 g).le) hφI.integrableOn]
-    have hsupp : Function.support φ = Set.univ :=
-      Set.eq_univ_of_forall fun g => (hφ0 g).ne'
+    rw [MeasureTheory.setIntegral_pos_iff_support_of_nonneg_ae (.of_forall fun g => (hφ0 g).le)
+      hφI.integrableOn]
+    have hsupp : Function.support φ = Set.univ := Set.eq_univ_of_forall fun g => (hφ0 g).ne'
     rw [hsupp, Set.univ_inter]
     exact hSo.measure_pos _ ⟨1, hS1⟩
-  refine ⟨avgForm (Formalism.REAL.muG ε).inv φ ρ, (∫ g in S, φ g ∂(Formalism.REAL.muG ε).inv) / D ^ 2,
-    ∫ g, Bf g ∂(Formalism.REAL.muG ε).inv, 2 * b', by positivity,
-    MeasureTheory.integral_nonneg fun g => mul_nonneg (sq_nonneg _) (Real.rpow_pos_of_pos (hwp g) _).le,
-    by positivity, avg_add hφ hφ0 hρ hB hbd, avg_smul, avg_conj,
-    avg_lower hφ hφ0 hρ hB hbd hφI hSo.measurableSet hD hDS, avg_norm_le hφ hφ0 hρ hB hbd, ?_⟩
+  refine ⟨
+    avgForm (Formalism.REAL.muG ε).inv φ ρ,
+    (∫ g in S, φ g ∂(Formalism.REAL.muG ε).inv) / D ^ 2,
+    ∫ g, Bf g ∂(Formalism.REAL.muG ε).inv,
+    2 * b',
+    by positivity,
+    MeasureTheory.integral_nonneg fun g =>
+      mul_nonneg (sq_nonneg _) (Real.rpow_pos_of_pos (hwp g) _).le,
+    by positivity,
+    avg_add hφ hφ0 hρ hB hbd,
+    avg_smul,
+    avg_conj,
+    avg_lower hφ hφ0 hρ hB hbd hφI hSo.measurableSet hD hDS,
+    avg_norm_le hφ hφ0 hρ hB hbd,
+    ?_
+  ⟩
   intro X hX t x
   obtain ⟨h, hh⟩ := exists_uMat_eq (hX t)
   have hmul : ∀ g g', ρ (g * g') = (ρ g).comp (ρ g') := fun g g' => hrep.2 _ g.2 _ g'.2
@@ -308,12 +366,13 @@ theorem almostIsom_of_growth {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedA
       rw [Real.exp_neg, ← div_eq_mul_inv, div_le_iff₀ (Real.exp_pos _)]
       exact h1
     have h5 : 0 < wt (uMat g) * Real.exp (-l) := mul_pos (hwp g) (Real.exp_pos _)
-    calc φ (g * h⁻¹) ≤ (wt (uMat g) * Real.exp (-l)) ^ (-b') :=
-          Real.rpow_le_rpow_of_nonpos h5 h4 (by linarith)
+    calc
+      φ (g * h⁻¹)
+        ≤ (wt (uMat g) * Real.exp (-l)) ^ (-b') := Real.rpow_le_rpow_of_nonpos h5 h4 (by linarith)
       _ = Real.exp (b' * l) * φ g := by
-          rw [Real.mul_rpow (hwp g).le (Real.exp_pos _).le, ← Real.exp_mul, mul_comm]
-          congr 2
-          ring
+        rw [Real.mul_rpow (hwp g).le (Real.exp_pos _).le, ← Real.exp_mul, mul_comm]
+        congr 2
+        ring
   have key := avg_growth (μ := (Formalism.REAL.muG ε).inv) hφ hφ0 hρ hB hbd hmul h hφc x
   have e : ρ h = π (NormedSpace.exp (t • X)) := by
     simp only [ρ]

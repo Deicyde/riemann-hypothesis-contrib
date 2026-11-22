@@ -14,15 +14,23 @@ namespace GlobalTheory.Mem.Col2.PtUniq
 
 open Formalism.L2.Col Formalism.L2.DIV GlobalTheory.Mem.Col2
 
-theorem mem_iff_hatL {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    {n : ℕ} {N : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsLattice E N) (v : Sp E n) :
-    v ∈ N ↔ (fun i => Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (v i)) ∈ Formalism.L2.Herm.hatL (F := F) N := by
-  exact ⟨Formalism.L2.GlobalTheoryTheory.Br.latS_of_mem (F := F) N v,
-    Formalism.L2.GlobalTheoryTheory.Br.latLocGlob_main (F := F) N (Module.Finite.iff_fg.2 hN.fg) v⟩
+theorem mem_iff_hatL
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
+    {n : ℕ} {N : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsLattice E N) (v : Sp E n)
+    : v ∈ N
+      ↔ (fun i => Formalism.UG.inclE (F := F) (FiniteAdeleRing (𝓞 F) F) (v i))
+        ∈ Formalism.L2.Herm.hatL (F := F) N := by
+  exact ⟨
+    Formalism.L2.GlobalTheoryTheory.Br.latS_of_mem (F := F) N v,
+    Formalism.L2.GlobalTheoryTheory.Br.latLocGlob_main (F := F) N (Module.Finite.iff_fg.2 hN.fg) v
+  ⟩
 
-theorem isPtOf_unique : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    (hc : Formalism.BasicNotions.CMData F E) {n : ℕ} {ST SG Q : Finset (HeightOneSpectrum (𝓞 E))} (g : GL (Fin n) (Formalism.L2.DIV.AfE F E))
-    (p p' : Formalism.L2.Col.DecoF E n ST SG Q), GlobalTheory.Mem.Col2.IsPtOf hc g p → GlobalTheory.Mem.Col2.IsPtOf hc g p' → p = p' := by
+theorem isPtOf_unique
+    : ∀ {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
+        (hc : Formalism.BasicNotions.CMData F E) {n : ℕ}
+        {ST SG Q : Finset (HeightOneSpectrum (𝓞 E))} (g : GL (Fin n) (Formalism.L2.DIV.AfE F E))
+        (p p' : Formalism.L2.Col.DecoF E n ST SG Q),
+      GlobalTheory.Mem.Col2.IsPtOf hc g p → GlobalTheory.Mem.Col2.IsPtOf hc g p' → p = p' := by
   intro F E _ _ _ _ _ _ hc n ST SG Q g p p' h h'
   have hN : p.deco.1.N = p'.deco.1.N := by
     ext v

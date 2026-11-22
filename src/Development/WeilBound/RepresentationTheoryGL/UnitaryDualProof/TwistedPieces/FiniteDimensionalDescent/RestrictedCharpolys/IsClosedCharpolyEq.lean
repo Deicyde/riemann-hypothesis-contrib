@@ -13,33 +13,46 @@ open Matrix Polynomial Set
 
 namespace PositivityTheory.RgUd.TP.Desc.Restr.Ppull2
 
-open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc PositivityTheory.RgUd.TP.Desc.Restr
+open PositivityTheory.RgUd.T PositivityTheory.RgUd.TP PositivityTheory.RgUd.TP.Desc
+  PositivityTheory.RgUd.TP.Desc.Restr
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-theorem isClosed_charpoly_eq {N : ℕ} (c : k[X]) : IsClosed {A : Matrix (Fin N) (Fin N) k | A.charpoly = c} := by
-  have hc : ∀ (i : ℕ) (A : Matrix (Fin N) (Fin N) k), A.charpoly.coeff i =
-      MvPolynomial.eval (fun p : Fin N × Fin N => A p.1 p.2)
-        (MvPolynomial.map (Int.castRingHom k) ((Matrix.charpoly.univ ℤ (Fin N)).coeff i)) := by
+theorem isClosed_charpoly_eq {N : ℕ} (c : k[X])
+    : IsClosed {A : Matrix (Fin N) (Fin N) k | A.charpoly = c} := by
+  have hc
+      : ∀ (i : ℕ) (A : Matrix (Fin N) (Fin N) k),
+        A.charpoly.coeff i
+          = MvPolynomial.eval
+            (fun p : Fin N × Fin N => A p.1 p.2)
+            (MvPolynomial.map (Int.castRingHom k) ((Matrix.charpoly.univ ℤ (Fin N)).coeff i)) := by
     intro i A
-    have h := Matrix.charpoly.univ_map_eval₂Hom (Fin N) (Int.castRingHom k) (fun p : Fin N × Fin N => A p.1 p.2)
+    have h :=
+      Matrix.charpoly.univ_map_eval₂Hom (Fin N) (Int.castRingHom k)
+        (fun p : Fin N × Fin N => A p.1 p.2)
     have hA : Matrix.of (Function.curry (fun p : Fin N × Fin N => A p.1 p.2)) = A := by
       ext a b
       rfl
     rw [hA] at h
     rw [← h, Polynomial.coeff_map, MvPolynomial.coe_eval₂Hom, MvPolynomial.eval₂_eq_eval_map]
-  have hset : {A : Matrix (Fin N) (Fin N) k | A.charpoly = c} = ⋂ i : ℕ, {A | A.charpoly.coeff i = c.coeff i} := by
+  have hset
+      : {A : Matrix (Fin N) (Fin N) k | A.charpoly = c}
+        = ⋂ i : ℕ, {A | A.charpoly.coeff i = c.coeff i} := by
     ext A
     simp only [Set.mem_setOf_eq, Set.mem_iInter]
     exact ⟨fun h i => by rw [h], fun h => Polynomial.ext h⟩
   rw [hset]
   refine isClosed_iInter fun i => ?_
   simp only [hc]
-  exact isClosed_eq ((MvPolynomial.continuous_eval _).comp
-    (continuous_pi fun p => continuous_id.matrix_elem p.1 p.2)) continuous_const
+  exact isClosed_eq
+    ((MvPolynomial.continuous_eval _).comp
+      (continuous_pi fun p => continuous_id.matrix_elem p.1 p.2))
+    continuous_const
 
-theorem conj_mem_Bz {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {g : GL (Fin n) k} (hg : g ∈ Gz Z)
-    {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z) : g.val * x * g⁻¹.val ∈ Bz Z := by
+theorem conj_mem_Bz
+    {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {g : GL (Fin n) k} (hg : g ∈ Gz Z)
+    {x : Matrix (Fin n) (Fin n) k} (hx : x ∈ Bz Z)
+    : g.val * x * g⁻¹.val ∈ Bz Z := by
   have hg' : ∀ a ∈ Z, a * g.val = g.val * a := hg
   have hx' : ∀ a ∈ Z, a * x = x * a := hx
   show ∀ a ∈ Z, a * (g.val * x * g⁻¹.val) = g.val * x * g⁻¹.val * a
@@ -48,7 +61,9 @@ theorem conj_mem_Bz {n : ℕ} {Z : Subalgebra k (Matrix (Fin n) (Fin n) k)} {g :
     have e := congrArg (fun m => g⁻¹.val * m * g⁻¹.val) (hg' a ha)
     simp only [mul_assoc, Units.mul_inv, mul_one, Units.inv_mul_cancel_left] at e
     exact e.symm
-  calc a * (g.val * x * g⁻¹.val) = a * g.val * x * g⁻¹.val := by simp only [mul_assoc]
+  calc
+    a * (g.val * x * g⁻¹.val)
+      = a * g.val * x * g⁻¹.val := by simp only [mul_assoc]
     _ = g.val * (a * x) * g⁻¹.val := by rw [hg' a ha]; simp only [mul_assoc]
     _ = g.val * x * (a * g⁻¹.val) := by rw [hx' a ha]; simp only [mul_assoc]
     _ = g.val * x * g⁻¹.val * a := by rw [hi]; simp only [mul_assoc]
@@ -64,9 +79,10 @@ theorem pullPieces : PullPieces k := by
       rfl
     rw [hS]
     exact isClosed_biInter fun a _ =>
-      isClosed_eq (continuous_const.matrix_mul continuous_id) (continuous_id.matrix_mul continuous_const)
-  obtain ⟨P, hP0, hP⟩ : ∃ P : k[X], P ≠ 0 ∧
-      ∀ x : Matrix (Fin n) (Fin n) k, x.charpoly = χ → aeval (φ x) P = 0 := by
+      isClosed_eq (continuous_const.matrix_mul continuous_id)
+        (continuous_id.matrix_mul continuous_const)
+  obtain ⟨P, hP0, hP⟩
+      : ∃ P : k[X], P ≠ 0 ∧ ∀ x : Matrix (Fin n) (Fin n) k, x.charpoly = χ → aeval (φ x) P = 0 := by
     by_cases hχ : χ = 0
     · exact ⟨1, one_ne_zero, fun x hx => absurd (hx.trans hχ) (Matrix.charpoly_monic x).ne_zero⟩
     rcases Nat.eq_zero_or_pos N with hN | hN
@@ -75,7 +91,11 @@ theorem pullPieces : PullPieces k := by
       ext i j
       exact i.elim0
     · obtain ⟨hq, -⟩ := Ppull2A.choose_zero hD hN
-      refine ⟨expand k q χ, ?_, fun x hx => Ppull2A.aeval_expand hD hN χ x (hx ▸ Matrix.aeval_self_charpoly x)⟩
+      refine ⟨
+        expand k q χ,
+        ?_,
+        fun x hx => Ppull2A.aeval_expand hD hN χ x (hx ▸ Matrix.aeval_self_charpoly x)
+      ⟩
       rwa [Ne, Polynomial.expand_eq_zero (by omega)]
   obtain ⟨l, hnd, hl⟩ := Ppull2A.finite_charpoly N P hP0
   refine ⟨l, fun h => ?_⟩
@@ -86,18 +106,27 @@ theorem pullPieces : PullPieces k := by
   let mj : Fin l.length → ℕ := fun j => M (L j) (hLm j)
   let G : (Σ j : Fin l.length, Fin (mj j)) → Set (Matrix (Fin n) (Fin n) k) := fun s =>
     {x | x ∈ Bz Z ∧ x.charpoly = χ ∧ (φ x).charpoly = L s.1 ∧ φ x ∈ F' (L s.1) (hLm s.1) s.2}
-  have memG : ∀ s x, x ∈ G s ↔ (x ∈ Bz Z ∧ x.charpoly = χ ∧ (φ x).charpoly = L s.1 ∧
-      φ x ∈ F' (L s.1) (hLm s.1) s.2) := fun _ _ => Iff.rfl
-  have hGc : ∀ s, IsClosed (G s) ∧ G s ⊆ Bz Z ∧
-      ∀ g ∈ Gz Z, ∀ x ∈ G s, (g : Matrix (Fin n) (Fin n) k) * x * ((g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) ∈ G s := by
+  have memG
+      : ∀ s x,
+        x ∈ G s
+          ↔ (x ∈ Bz Z ∧ x.charpoly = χ ∧ (φ x).charpoly = L s.1 ∧ φ x ∈ F' (L s.1) (hLm s.1) s.2) :=
+    fun _ _ => Iff.rfl
+  have hGc
+      : ∀ s,
+        IsClosed (G s) ∧ G s ⊆ Bz Z
+          ∧ ∀ g ∈ Gz Z, ∀ x ∈ G s,
+            (g : Matrix (Fin n) (Fin n) k) * x * ((g⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k)
+              ∈ G s := by
     rintro ⟨j, i⟩
     refine ⟨?_, fun x hx => ((memG _ x).1 hx).1, ?_⟩
-    · exact (hBz Z).inter ((isClosed_charpoly_eq χ).inter
-        (((isClosed_charpoly_eq _).preimage hD.emb.continuous).inter
-          (((hP' _ _).1 i).1.preimage hD.emb.continuous)))
+    · exact (hBz Z).inter
+        ((isClosed_charpoly_eq χ).inter
+          (((isClosed_charpoly_eq _).preimage hD.emb.continuous).inter
+            (((hP' _ _).1 i).1.preimage hD.emb.continuous)))
     · intro g hg x hx
       obtain ⟨hxB, hxc, hxφc, hxF⟩ := (memG _ x).1 hx
-      let g' : GL (Fin N) k := Units.map (φ : Matrix (Fin n) (Fin n) k →* Matrix (Fin N) (Fin N) k) g
+      let g' : GL (Fin N) k :=
+        Units.map (φ : Matrix (Fin n) (Fin n) k →* Matrix (Fin N) (Fin N) k) g
       have hg' : g' ∈ Gz Z' := (hD.gz g').2 ⟨g, hg, rfl⟩
       have hφ : φ (g.val * x * g⁻¹.val) = g'.val * φ x * g'⁻¹.val := by
         rw [map_mul, map_mul]
@@ -145,11 +174,17 @@ theorem pullPieces : PullPieces k := by
       refine Or.inl ⟨c, hc, fun x hx => ?_⟩
       obtain ⟨m, hm⟩ := hnil (φ x) ((memG _ x).1 hx).2.2.2
       exact ⟨m, hD.inj (by rw [map_pow, map_sub, hm, map_zero])⟩
-    · refine Or.inr ⟨N', S, hS, by rw [← hD.mu]; exact hmu, fun hv =>
-        Ppull2B.fibVan_pull hD _ _ (fun x hx => ((memG _ x).1 hx).2.2.2) (hV hv)⟩
+    · refine Or.inr ⟨
+        N',
+        S,
+        hS,
+        by rw [← hD.mu]; exact hmu,
+        fun hv => Ppull2B.fibVan_pull hD _ _ (fun x hx => ((memG _ x).1 hx).2.2.2) (hV hv)
+      ⟩
   refine ⟨∑ j, mj j, fun t => G (finSigmaFinEquiv.symm t), ?_, fun t => hGg _⟩
   unfold IsPieces
-  refine ⟨fun t => hGc _, fun t t' htt => hGd _ _ (fun h => htt (finSigmaFinEquiv.symm.injective h)), ?_⟩
+  refine
+    ⟨fun t => hGc _, fun t t' htt => hGd _ _ (fun h => htt (finSigmaFinEquiv.symm.injective h)), ?_⟩
   intro x hx hc
   obtain ⟨s, hs⟩ := hGcov x hx hc
   exact ⟨finSigmaFinEquiv s, by simpa using hs⟩

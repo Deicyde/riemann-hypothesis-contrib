@@ -85,16 +85,19 @@ theorem SerreVanish.full : SerreVanish.Statement.{u, v} :=
 theorem SerreOnto.full : SerreOnto.Statement.{u, v} :=
   SerreOnto.proof CechExact.full SerreFree.full SerreVanish.full
 
-theorem SerreTail.full : SerreTail.Statement.{u, v} := SerreTail.proof SerreFinite.full SerreOnto.full
+theorem SerreTail.full : SerreTail.Statement.{u, v} :=
+  SerreTail.proof SerreFinite.full SerreOnto.full
 
 theorem Extension.full : Extension.Statement.{u, v, w} := Extension.proof
 theorem Generated.full : Generated.Statement.{u, w} := Generated.proof Extension.full
-theorem TwistFinite.full : TwistFinite.Statement.{u, w} := TwistFinite.proof Extension.full SerreFinite.full
+theorem TwistFinite.full : TwistFinite.Statement.{u, w} :=
+  TwistFinite.proof Extension.full SerreFinite.full
 theorem TwistSections.full : TwistSections.Statement.{u, w} := TwistSections.proof SerreOnto.full
 theorem ProjDegreePositive.full : ProjDegreePositive.Statement.{u} := ProjDegreePositive.proof
 theorem HilbertPositive.full : HilbertPositive.Statement.{u, w} :=
   HilbertPositive.proof ProjDegreePositive.full TwistSections.full
-theorem PrimeFiltration.Point.full : PrimeFiltration.Point.Statement.{u, w} := PrimeFiltration.Point.proof
+theorem PrimeFiltration.Point.full : PrimeFiltration.Point.Statement.{u, w} :=
+  PrimeFiltration.Point.proof
 theorem PrimeFiltration.Restrict.full : PrimeFiltration.Restrict.Statement.{u, w} :=
   PrimeFiltration.Restrict.proof
 
@@ -106,22 +109,26 @@ theorem SubvarDrop.full : SubvarDrop.Statement.{u, w} := SubvarDrop.proof
 theorem TwistVanish.assembled (hS : TwistSplit.Statement.{u, w}) : TwistVanish.Statement.{u, w} :=
   TwistVanish.proof Extension.full SerreVanish.full hS
 
-theorem NefRestrict.assembled (hRL : RestrLenRestrict.Statement.{u, w}) : NefRestrict.Statement.{u, w} :=
+theorem NefRestrict.assembled (hRL : RestrLenRestrict.Statement.{u, w})
+    : NefRestrict.Statement.{u, w} :=
   NefRestrict.proof RestrictTwist.full hRL
 
-theorem SectionCount.Drop.assembled (hF : SectionCount.Drop.Filt.Statement.{u, w})
-    (hT : SectionCount.Drop.Term.Statement.{u, w}) (hH : SectionCount.Drop.HilbW.Statement.{u, w})
-    (hR : GenericPointSectionInput.Statement.{u, w}) : SectionCount.Drop.Statement.{u, w} :=
+theorem SectionCount.Drop.assembled
+    (hF : SectionCount.Drop.Filt.Statement.{u, w}) (hT : SectionCount.Drop.Term.Statement.{u, w})
+    (hH : SectionCount.Drop.HilbW.Statement.{u, w}) (hR : GenericPointSectionInput.Statement.{u, w})
+    : SectionCount.Drop.Statement.{u, w} :=
   SectionCount.Drop.proof hF hT hH hR
 
-theorem SectionCount.assembled (hTop : SectionCount.Top.Statement.{u, w})
-    (hF : SectionCount.Drop.Filt.Statement.{u, w}) (hT : SectionCount.Drop.Term.Statement.{u, w})
-    (hH : SectionCount.Drop.HilbW.Statement.{u, w}) (hR : GenericPointSectionInput.Statement.{u, w}) :
-    SectionCount.Statement.{u, w} :=
+theorem SectionCount.assembled
+    (hTop : SectionCount.Top.Statement.{u, w}) (hF : SectionCount.Drop.Filt.Statement.{u, w})
+    (hT : SectionCount.Drop.Term.Statement.{u, w}) (hH : SectionCount.Drop.HilbW.Statement.{u, w})
+    (hR : GenericPointSectionInput.Statement.{u, w})
+    : SectionCount.Statement.{u, w} :=
   SectionCount.proof hTop (SectionCount.Drop.assembled hF hT hH hR)
 
-theorem StepThree.assembled (hL : StepThree.OnW.Lift.Statement.{u, w})
-    (hG : StepThree.OnW.Gen.Statement.{u, w}) : StepThree.Statement.{u, w} :=
+theorem StepThree.assembled
+    (hL : StepThree.OnW.Lift.Statement.{u, w}) (hG : StepThree.OnW.Gen.Statement.{u, w})
+    : StepThree.Statement.{u, w} :=
   StepThree.proof StepThree.Away.full (StepThree.OnW.proof hL hG)
 
 end GroundTheory.Heights₂.Heights.Kleiman

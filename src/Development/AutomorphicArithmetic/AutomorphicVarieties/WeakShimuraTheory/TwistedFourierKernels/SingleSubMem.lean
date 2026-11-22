@@ -7,15 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Polynomial UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Ws.H5
 
-private theorem comap_max {B Q : Type} [CommRing B] [IsLocalRing B] [CommGroup Q] [Finite Q]
-    (M : Ideal (MonoidAlgebra B Q)) [M.IsMaximal] :
-    M.comap (algebraMap B (MonoidAlgebra B Q)) = maximalIdeal B :=
+private theorem comap_max
+    {B Q : Type} [CommRing B] [IsLocalRing B] [CommGroup Q] [Finite Q]
+    (M : Ideal (MonoidAlgebra B Q)) [M.IsMaximal]
+    : M.comap (algebraMap B (MonoidAlgebra B Q)) = maximalIdeal B :=
   eq_maximalIdeal (Ideal.isMaximal_under_of_isIntegral_of_isMaximal (R := B) M)
 
-private theorem single_sub_mem {l : ℕ} (hl : l.Prime) {B Q : Type} [CommRing B] [IsLocalRing B]
-    [CommGroup Q] [Finite Q] (hB : ((l : ℕ) : B) ∈ maximalIdeal B) (hQ : IsPGroup l Q)
-    (M : Ideal (MonoidAlgebra B Q)) [hM : M.IsMaximal] (z : Q) :
-    (MonoidAlgebra.single z 1 - 1 : MonoidAlgebra B Q) ∈ M := by
+private theorem single_sub_mem
+    {l : ℕ} (hl : l.Prime)
+    {B Q : Type} [CommRing B] [IsLocalRing B] [CommGroup Q] [Finite Q]
+    (hB : ((l : ℕ) : B) ∈ maximalIdeal B) (hQ : IsPGroup l Q)
+    (M : Ideal (MonoidAlgebra B Q)) [hM : M.IsMaximal]
+    (z : Q)
+    : (MonoidAlgebra.single z 1 - 1 : MonoidAlgebra B Q) ∈ M := by
   haveI : Fact l.Prime := ⟨hl⟩
   obtain ⟨k, hk⟩ := hQ z
   have hlM : ((l : ℕ) : MonoidAlgebra B Q) ∈ M := by
@@ -35,29 +39,40 @@ private theorem single_sub_mem {l : ℕ} (hl : l.Prime) {B Q : Type} [CommRing B
       exact ringChar.charP _
   rw [← Ideal.Quotient.eq_zero_iff_mem]
   have h0 : (Ideal.Quotient.mk M (MonoidAlgebra.single z 1 - 1)) ^ l ^ k = 0 := by
-    rw [map_sub, map_one, sub_pow_char_pow, one_pow, ← map_pow, MonoidAlgebra.single_pow, one_pow, hk,
-      ← MonoidAlgebra.one_def, map_one, sub_self]
+    rw [map_sub, map_one, sub_pow_char_pow, one_pow, ← map_pow, MonoidAlgebra.single_pow, one_pow,
+      hk, ← MonoidAlgebra.one_def, map_one, sub_self]
   exact (pow_eq_zero_iff (pow_ne_zero k hl.ne_zero)).mp h0
 
-private theorem sub_aug_mem {B Q : Type} [CommRing B] [CommGroup Q]
+private theorem sub_aug_mem
+    {B Q : Type} [CommRing B] [CommGroup Q]
     (M : Ideal (MonoidAlgebra B Q))
-    (h : ∀ z : Q, (MonoidAlgebra.single z 1 - 1 : MonoidAlgebra B Q) ∈ M) (x : MonoidAlgebra B Q) :
-    x - algebraMap B (MonoidAlgebra B Q) (MonoidAlgebra.lift B B Q 1 x) ∈ M := by
+    (h : ∀ z : Q, (MonoidAlgebra.single z 1 - 1 : MonoidAlgebra B Q) ∈ M)
+    (x : MonoidAlgebra B Q)
+    : x - algebraMap B (MonoidAlgebra B Q) (MonoidAlgebra.lift B B Q 1 x) ∈ M := by
   induction x using MonoidAlgebra.induction_linear with
   | zero => simp
   | add x y hx hy =>
     rw [map_add (f := _), map_add (f := _), add_sub_add_comm]
     exact M.add_mem hx hy
   | single g b =>
-    have e : MonoidAlgebra.single g b - algebraMap B (MonoidAlgebra B Q) (MonoidAlgebra.lift B B Q 1 (MonoidAlgebra.single g b)) =
-        algebraMap B (MonoidAlgebra B Q) b * (MonoidAlgebra.single g 1 - 1) := by
+    have e
+        : MonoidAlgebra.single g b - algebraMap B (MonoidAlgebra B Q)
+            (MonoidAlgebra.lift B B Q 1 (MonoidAlgebra.single g b))
+          = algebraMap B (MonoidAlgebra B Q) b * (MonoidAlgebra.single g 1 - 1) := by
       rw [MonoidAlgebra.lift_single]
       simp [mul_sub, MonoidAlgebra.single_mul_single, MonoidAlgebra.one_def]
     rw [e]
     exact M.mul_mem_left _ (h g)
 
-theorem UpperTheory.V.Ws.H5.grpCO :
-    ∀ (l : ℕ) [Fact l.Prime] (O B : Type) [CommRing O] [IsLocalRing O] [CommRing B] [Algebra O B] [IsCO O B], ((l : ℕ) : B) ∈ maximalIdeal B → ∀ (Q : Type) [CommGroup Q] [Finite Q], IsPGroup l Q → ∃ _ : IsCO O (MonoidAlgebra B Q), ∀ z : Q, (MonoidAlgebra.single z 1 - 1 : MonoidAlgebra B Q) ∈ maximalIdeal (MonoidAlgebra B Q) := by
+theorem UpperTheory.V.Ws.H5.grpCO
+    : ∀ (l : ℕ) [Fact l.Prime] (O B : Type) [CommRing O] [IsLocalRing O] [CommRing B] [Algebra O B]
+        [IsCO O B],
+      ((l : ℕ) : B) ∈ maximalIdeal B
+        → ∀ (Q : Type) [CommGroup Q] [Finite Q],
+          IsPGroup l Q
+            → ∃ _ : IsCO O (MonoidAlgebra B Q), ∀ z : Q,
+              (MonoidAlgebra.single z 1 - 1 : MonoidAlgebra B Q)
+                ∈ maximalIdeal (MonoidAlgebra B Q) := by
   intro l _ O B _ _ _ _ _ hB Q _ _ hQ
   have hl : l.Prime := Fact.out
   let aug : MonoidAlgebra B Q →+* B := (MonoidAlgebra.lift B B Q 1).toRingHom
@@ -85,14 +100,19 @@ theorem UpperTheory.V.Ws.H5.grpCO :
     apply IsLocalRing.of_unique_max_ideal
     refine ⟨RingHom.ker φ, hM0, fun M hM => ?_⟩
     exact (hM0.eq_of_le hM.ne_top (hle M hM)).symm
-  have hres : ∀ x : MonoidAlgebra B Q, ∃ a : O, x - algebraMap O _ a ∈ maximalIdeal (MonoidAlgebra B Q) := by
+  have hres
+      : ∀ x : MonoidAlgebra B Q, ∃ a : O,
+        x - algebraMap O _ a ∈ maximalIdeal (MonoidAlgebra B Q) := by
     intro x
     obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) (aug x)
     refine ⟨a, ?_⟩
     have h3 : x - algebraMap B _ (aug x) ∈ maximalIdeal (MonoidAlgebra B Q) :=
       sub_aug_mem _ (single_sub_mem hl hB hQ _) x
-    have h4 : algebraMap B (MonoidAlgebra B Q) (aug x - algebraMap O B a) ∈ maximalIdeal (MonoidAlgebra B Q) := by
-      have : aug x - algebraMap O B a ∈ (maximalIdeal (MonoidAlgebra B Q)).comap (algebraMap B _) := by
+    have h4
+        : algebraMap B (MonoidAlgebra B Q) (aug x - algebraMap O B a)
+          ∈ maximalIdeal (MonoidAlgebra B Q) := by
+      have : aug x - algebraMap O B a
+          ∈ (maximalIdeal (MonoidAlgebra B Q)).comap (algebraMap B _) := by
         rw [comap_max]
         exact ha
       exact this

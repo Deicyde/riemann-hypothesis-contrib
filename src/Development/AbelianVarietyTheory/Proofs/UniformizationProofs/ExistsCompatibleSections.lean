@@ -5,27 +5,33 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Exist
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  GlobalTheory.AbLaw
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SecLifts
 
-theorem mk_mem_ker_factor {R : Type} [CommRing R] {I J : Ideal R} (h : I ≤ J) (x : R) :
-    Ideal.Quotient.mk I x ∈ RingHom.ker (Ideal.Quotient.factor h) ↔ x ∈ J := by
+theorem mk_mem_ker_factor {R : Type} [CommRing R] {I J : Ideal R} (h : I ≤ J) (x : R)
+    : Ideal.Quotient.mk I x ∈ RingHom.ker (Ideal.Quotient.factor h) ↔ x ∈ J := by
   rw [RingHom.mem_ker, Ideal.Quotient.factor_mk, Ideal.Quotient.eq_zero_iff_mem]
 
-theorem exists_closedFibre (V : Type) [CommRing V] (I : Ideal V)
-    (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (V ⧸ I ^ (e + 1)))))
+theorem exists_closedFibre
+    (V : Type) [CommRing V]
+    (I : Ideal V) (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (V ⧸ I ^ (e + 1)))))
     (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left)
     (hβ : ∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans V I e))
     (N : ∀ e, LB (Y e).left) (v : ∀ e, LB.Iso (N e) ((N (e + 1)).pull (β e)))
-    (hN : ∀ e, (N e).IsLB ∧ (v e).IsGen) (e : ℕ) :
-    ∃ j : (Y 0).left ⟶ (Y (e + 1)).left,
-      IsPullback j (Y 0).hom (Y (e + 1)).hom (Spec.map (CommRingCat.ofHom (Ideal.Quotient.factor
-        (Ideal.pow_le_pow_right (by omega) : I ^ (e + 1 + 1) ≤ I ^ (0 + 1))))) ∧
-      ∃ w : LB.Iso (N 0) ((N (e + 1)).pull j), w.IsGen := by
+    (hN : ∀ e, (N e).IsLB ∧ (v e).IsGen)
+    (e : ℕ)
+    : ∃ j : (Y 0).left ⟶ (Y (e + 1)).left,
+      IsPullback j (Y 0).hom (Y (e + 1)).hom
+          (Spec.map (CommRingCat.ofHom (Ideal.Quotient.factor
+            (Ideal.pow_le_pow_right (by omega) : I ^ (e + 1 + 1) ≤ I ^ (0 + 1)))))
+        ∧ ∃ w : LB.Iso (N 0) ((N (e + 1)).pull j), w.IsGen := by
   induction e with
   | zero => exact ⟨β 0, hβ 0, v 0, (hN 0).2⟩
   | succ e ih =>
@@ -38,24 +44,44 @@ theorem exists_closedFibre (V : Type) [CommRing V] (I : Ideal V)
     rw [thickTrans, ← Spec.map_comp, ← CommRingCat.ofHom_comp, Ideal.Quotient.factor_comp] at h
     exact h
 
-theorem exists_compatible_sections : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (V ⧸ (IsLocalRing.maximalIdeal V) ^ (e + 1))))) (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left), (∀ e, IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans V (IsLocalRing.maximalIdeal V) e)) → (∀ e, Flat (Y e).hom) → ∀ (N : ∀ e, LB (Y e).left) (v : ∀ e, LB.Iso (N e) ((N (e + 1)).pull (β e))), (∀ e, (N e).IsLB ∧ (v e).IsGen) → FirstCohomologyVanishes (N 0) → ∀ s₀ : LB.Sec (N 0), ∃ s : ∀ e, LB.Sec (N e), s 0 = s₀ ∧ ∀ e, (∀ z (k : (N (e + 1)).ι) (k' : (N e).ι), (β e) z ∈ (N (e + 1)).U k → z ∈ (N e).U k' → gs (β e) z _ ((s (e + 1)).f k) = (Geo.Tor.gw (v e) (𝟙 _) z k k').val * gs (𝟙 _) z _ ((s e).f k')) := by
+theorem exists_compatible_sections
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        (Y : ∀ e : ℕ, Over (Spec (CommRingCat.of (V ⧸ (IsLocalRing.maximalIdeal V) ^ (e + 1)))))
+        (β : ∀ e, (Y e).left ⟶ (Y (e + 1)).left),
+      (∀ e,
+          IsPullback (β e) (Y e).hom (Y (e + 1)).hom (thickTrans V (IsLocalRing.maximalIdeal V) e))
+        → (∀ e, Flat (Y e).hom)
+        → ∀ (N : ∀ e, LB (Y e).left) (v : ∀ e, LB.Iso (N e) ((N (e + 1)).pull (β e))),
+          (∀ e, (N e).IsLB ∧ (v e).IsGen) → FirstCohomologyVanishes (N 0)
+            → ∀ s₀ : LB.Sec (N 0), ∃ s : ∀ e, LB.Sec (N e),
+              s 0 = s₀
+                ∧ ∀ e,
+                  (∀ z (k : (N (e + 1)).ι) (k' : (N e).ι),
+                    (β e) z ∈ (N (e + 1)).U k → z ∈ (N e).U k'
+                      → gs (β e) z _ ((s (e + 1)).f k)
+                        = (Geo.Tor.gw (v e) (𝟙 _) z k k').val * gs (𝟙 _) z _ ((s e).f k')) := by
   intro V _ _ _ Y β hβ hfl N v hN h1 s₀
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
   have hm : IsLocalRing.maximalIdeal V = Ideal.span {ϖ} := hϖ.maximalIdeal_eq
   have hmem : ∀ (n : ℕ) (x : V), x ∈ IsLocalRing.maximalIdeal V ^ n ↔ ϖ ^ n ∣ x := fun n x => by
     rw [hm, Ideal.span_singleton_pow, Ideal.mem_span_singleton]
-  have step : ∀ e (s' : LB.Sec (N e)), ∃ s : LB.Sec (N (e + 1)),
-      ∀ z (k : (N (e + 1)).ι) (k' : (N e).ι), (β e) z ∈ (N (e + 1)).U k → z ∈ (N e).U k' →
-        gs (β e) z _ (s.f k) = (Geo.Tor.gw (v e) (𝟙 _) z k k').val * gs (𝟙 _) z _ (s'.f k') := by
+  have step
+      : ∀ e (s' : LB.Sec (N e)), ∃ s : LB.Sec (N (e + 1)), ∀ z (k : (N (e + 1)).ι) (k' : (N e).ι),
+        (β e) z ∈ (N (e + 1)).U k → z ∈ (N e).U k'
+          → gs (β e) z _ (s.f k)
+            = (Geo.Tor.gw (v e) (𝟙 _) z k k').val * gs (𝟙 _) z _ (s'.f k') := by
     intro e s'
     obtain ⟨j, hj, w, hw⟩ := exists_closedFibre V _ Y β hβ N v hN e
-    refine GlobalTheory.T.exists_sec_lift_alt _ _ _ _ _ (Ideal.Quotient.mk _ (ϖ ^ (e + 1))) (Ideal.Quotient.factor_surjective _)
-      (Ideal.Quotient.factor_surjective _) ?_ ?_ ?_ ?_ _ _ _ _ _ _ j (β e) (hfl (e + 1)) hj (hβ e)
-      (N (e + 1)) (N 0) w (hN (e + 1)).1 (hN 0).1 hw h1 (N e) (v e) (hN e).1 (hN e).2 s'
+    refine GlobalTheory.T.exists_sec_lift_alt _ _ _ _ _ (Ideal.Quotient.mk _ (ϖ ^ (e + 1)))
+      (Ideal.Quotient.factor_surjective _) (Ideal.Quotient.factor_surjective _) ?_ ?_ ?_ ?_ _ _ _ _
+      _ _ j (β e) (hfl (e + 1)) hj (hβ e) (N (e + 1)) (N 0) w (hN (e + 1)).1 (hN 0).1 hw h1 (N e)
+      (v e) (hN e).1 (hN e).2 s'
     · refine ⟨e + 1 + 1, ?_⟩
-      have hle : RingHom.ker (Ideal.Quotient.factor
-        (Ideal.pow_le_pow_right (by omega) : IsLocalRing.maximalIdeal V ^ (e + 1 + 1) ≤
-          IsLocalRing.maximalIdeal V ^ (0 + 1))) ≤ (IsLocalRing.maximalIdeal V).map (Ideal.Quotient.mk _) := by
+      have hle
+          : RingHom.ker (Ideal.Quotient.factor
+              (Ideal.pow_le_pow_right (by omega)
+                : IsLocalRing.maximalIdeal V ^ (e + 1 + 1) ≤ IsLocalRing.maximalIdeal V ^ (0 + 1)))
+            ≤ (IsLocalRing.maximalIdeal V).map (Ideal.Quotient.mk _) := by
         intro x hx
         obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
         rw [mk_mem_ker_factor, zero_add, pow_one] at hx
@@ -74,8 +100,8 @@ theorem exists_compatible_sections : ∀ (V : Type) [CommRing V] [IsDomain V] [I
       exact pow_dvd_pow ϖ (by omega)
     · intro x
       obtain ⟨x, rfl⟩ := Ideal.Quotient.mk_surjective x
-      rw [mk_mem_ker_factor, ← map_mul, Ideal.Quotient.eq_zero_iff_mem, hmem, hmem, zero_add, pow_one, pow_succ,
-        mul_dvd_mul_iff_left (pow_ne_zero _ hϖ.ne_zero)]
+      rw [mk_mem_ker_factor, ← map_mul, Ideal.Quotient.eq_zero_iff_mem, hmem, hmem, zero_add,
+        pow_one, pow_succ, mul_dvd_mul_iff_left (pow_ne_zero _ hϖ.ne_zero)]
   choose L hL using step
   exact ⟨fun e => Nat.rec (motive := fun e => LB.Sec (N e)) s₀ L e, rfl, fun e => hL e _⟩
 

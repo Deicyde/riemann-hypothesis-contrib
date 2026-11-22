@@ -8,9 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA
 
-theorem UpperTheory.V.PropA.twist :
-    ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] (g : Module.End ℤ_[l] X) (a : ℤ_[l]), (l : ℤ_[l]) ∣ a - 1 →
-      Unip g → Unip (a • g) := by
+theorem UpperTheory.V.PropA.twist
+    : ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] (g : Module.End ℤ_[l] X)
+        (a : ℤ_[l]),
+      (l : ℤ_[l]) ∣ a - 1 → Unip g → Unip (a • g) := by
   intro l _ X _ _ g a ha hg
   obtain ⟨N, hN⟩ := hg
   obtain ⟨c, hc⟩ := ha

@@ -10,11 +10,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Finit
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst Polynomial Module Matrix UpperTheory.V.W UpperTheory.V.Hi
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst Polynomial Module Matrix
+  UpperTheory.V.W UpperTheory.V.Hi
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
-    ∀ {Γ I W : Type} [Group Γ] [Group I] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W] {n : ℕ} (i : I →* Γ) (ρ : Γ →* Module.End ℂ W) (μ : Fin n → Γ →* ℂˣ), (∀ σ s, ∃ t, σ * i s = i t * σ) → (Set.range fun s => ρ (i s)).Finite → (∀ σ, (ρ σ).charpoly = ∏ j, (X - C (μ j σ : ℂ))) → (∀ j k, j ≠ k → ∃ s, μ j (i s) ≠ μ k (i s)) → (∀ N : Module.End ℂ W, IsNilpotent N → (∀ s, ρ (i s) * N = N * ρ (i s)) → N = 0) ∧ ∀ j, (∃ y : W, y ≠ 0 ∧ ∀ s, ρ (i s) y = (μ j (i s) : ℂ) • y) ∧ ∀ y : W, (∀ s, ρ (i s) y = (μ j (i s) : ℂ) • y) → ∀ σ, ρ σ y = (μ j σ : ℂ) • y := by
+theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters
+    : ∀ {Γ I W : Type} [Group Γ] [Group I] [AddCommGroup W] [Module ℂ W] [FiniteDimensional ℂ W]
+        {n : ℕ} (i : I →* Γ) (ρ : Γ →* Module.End ℂ W) (μ : Fin n → Γ →* ℂˣ),
+      (∀ σ s, ∃ t, σ * i s = i t * σ) → (Set.range fun s => ρ (i s)).Finite
+        → (∀ σ, (ρ σ).charpoly = ∏ j, (X - C (μ j σ : ℂ)))
+        → (∀ j k, j ≠ k → ∃ s, μ j (i s) ≠ μ k (i s))
+        → (∀ N : Module.End ℂ W, IsNilpotent N → (∀ s, ρ (i s) * N = N * ρ (i s)) → N = 0)
+          ∧ ∀ j,
+            (∃ y : W, y ≠ 0 ∧ ∀ s, ρ (i s) y = (μ j (i s) : ℂ) • y)
+              ∧ ∀ y : W, (∀ s, ρ (i s) y = (μ j (i s) : ℂ) • y) → ∀ σ, ρ σ y = (μ j σ : ℂ) • y := by
   intro Γ I W _ _ _ _ _ n i ρ μ hnorm hfin hchar hdist
   classical
   have htr : ∀ σ, LinearMap.trace ℂ W (ρ σ) = ∑ j, (μ j σ : ℂ) := by
@@ -24,8 +35,8 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
       exact Splits.prod (fun j _ => Splits.X_sub_C _)
     have hr := Polynomial.roots_multiset_prod_X_sub_C (Finset.univ.val.map fun j => (μ j σ : ℂ))
     simp only [Multiset.map_map, Function.comp_def] at hr
-    rw [Module.End.trace_eq_sum_roots_charpoly_of_splits hs, hchar, Finset.prod_eq_multiset_prod, hr,
-      Finset.sum_eq_multiset_sum]
+    rw [Module.End.trace_eq_sum_roots_charpoly_of_splits hs, hchar, Finset.prod_eq_multiset_prod,
+      hr, Finset.sum_eq_multiset_sum]
   have hK : ∀ u : I, ρ (i u) = 1 → ∀ k, μ k (i u) = 1 := by
     intro u hu k
     have hroot : (ρ (i u)).charpoly.IsRoot (μ k (i u) : ℂ) := by
@@ -35,8 +46,7 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
     obtain ⟨v, hv⟩ := hroot.exists_hasEigenvector
     have h1 := hv.apply_eq_smul
     rw [hu, Module.End.one_apply] at h1
-    have h2 : ((μ k (i u) : ℂ) - 1) • v = 0 := by
-      rw [sub_smul, ← h1, one_smul, sub_self]
+    have h2 : ((μ k (i u) : ℂ) - 1) • v = 0 := by rw [sub_smul, ← h1, one_smul, sub_self]
     have h3 := (smul_eq_zero.mp h2).resolve_right hv.2
     ext
     simpa [sub_eq_zero] using h3
@@ -49,8 +59,8 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
     exact (inv_mul_eq_one.mp h2).symm
   set U : I →* (Module.End ℂ W)ˣ := (ρ.comp i).toHomUnits with hU
   have hUval : ∀ s, ((U s : (Module.End ℂ W)ˣ) : Module.End ℂ W) = ρ (i s) := fun s => rfl
-  have hKU : ∀ s s', U s = U s' → ∀ k, μ k (i s) = μ k (i s') :=
-    fun s s' h k => hK' s s' (by rw [← hUval, ← hUval, h]) k
+  have hKU : ∀ s s', U s = U s' → ∀ k, μ k (i s) = μ k (i s') := fun s s' h k =>
+    hK' s s' (by rw [← hUval, ← hUval, h]) k
   have hfinU : (Set.range U).Finite := by
     refine (hfin.preimage (Function.Injective.injOn (fun a b h => Units.ext h))).subset ?_
     rintro x ⟨s, rfl⟩
@@ -62,20 +72,23 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
   have hpreval : ∀ h : U.range, (((h : (Module.End ℂ W)ˣ)) : Module.End ℂ W) = ρ (i (pre h)) := by
     intro h
     rw [← hUval, hpre]
-  let ψ : Fin n → U.range →* ℂˣ := fun k =>
-    { toFun := fun h => μ k (i (pre h))
-      map_one' := by
-        have : U (pre 1) = U 1 := by rw [hpre, map_one]; rfl
-        show μ k (i (pre 1)) = 1
-        rw [hKU _ _ this k, map_one, map_one]
-      map_mul' := fun a b => by
-        have : U (pre (a * b)) = U (pre a * pre b) := by rw [map_mul, hpre, hpre, hpre]; rfl
-        show μ k (i (pre (a * b))) = μ k (i (pre a)) * μ k (i (pre b))
-        rw [hKU _ _ this k, map_mul, map_mul] }
+  let ψ : Fin n → U.range →* ℂˣ := fun k => {
+    toFun := fun h => μ k (i (pre h))
+    map_one' := by
+      have : U (pre 1) = U 1 := by rw [hpre, map_one]; rfl
+      show μ k (i (pre 1)) = 1
+      rw [hKU _ _ this k, map_one, map_one]
+    map_mul' := fun a b => by
+      have : U (pre (a * b)) = U (pre a * pre b) := by rw [map_mul, hpre, hpre, hpre]; rfl
+      show μ k (i (pre (a * b))) = μ k (i (pre a)) * μ k (i (pre b))
+      rw [hKU _ _ this k, map_mul, map_mul]
+  }
   have hψ : ∀ k (h : U.range), ψ k h = μ k (i (pre h)) := fun k h => rfl
   have hψU : ∀ k s, ψ k ⟨U s, s, rfl⟩ = μ k (i s) := fun k s => hKU _ _ (hpre _) k
-  have horth : ∀ k m, ∑ h : U.range, (((ψ m * (ψ k)⁻¹) h : ℂˣ) : ℂ) =
-      if m = k then (Fintype.card U.range : ℂ) else 0 := by
+  have horth
+      : ∀ k m,
+        ∑ h : U.range, (((ψ m * (ψ k)⁻¹) h : ℂˣ) : ℂ)
+          = if m = k then (Fintype.card U.range : ℂ) else 0 := by
     intro k m
     split_ifs with hmk
     · subst hmk
@@ -94,15 +107,16 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
     ∑ h : U.range, ((((ψ k)⁻¹ h : ℂˣ)) : ℂ) • (((h : (Module.End ℂ W)ˣ)) : Module.End ℂ W)
   let E : Fin n → W → Prop := fun k y => ∀ s, ρ (i s) y = (μ k (i s) : ℂ) • y
   have hcard0 : (Fintype.card U.range : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hact : ∀ k y, E k y → ∀ h : U.range,
-      ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W) y = (ψ k h : ℂ) • y := by
+  have hact
+      : ∀ k y,
+        E k y → ∀ h : U.range, ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W) y = (ψ k h : ℂ) • y := by
     intro k y hy h
     rw [hpreval, hy, hψ]
   have hPE : ∀ k y, E k y → ∀ m, P m y = if m = k then (Fintype.card U.range : ℂ) • y else 0 := by
     intro k y hy m
     have h1 : P m y = (∑ h : U.range, (((ψ k * (ψ m)⁻¹) h : ℂˣ) : ℂ)) • y := by
-      simp only [P, LinearMap.sum_apply, LinearMap.smul_apply, hact k y hy,
-        smul_smul, Finset.sum_smul]
+      simp only [P, LinearMap.sum_apply, LinearMap.smul_apply, hact k y hy, smul_smul,
+        Finset.sum_smul]
       refine Finset.sum_congr rfl fun h _ => ?_
       rw [MonoidHom.mul_apply, Units.val_mul, mul_comm]
     rw [h1, horth m k]
@@ -115,34 +129,42 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
     let g : U.range := ⟨U s, s, rfl⟩
     let F : U.range → Module.End ℂ W := fun h' =>
       (((ψ k)⁻¹ h' : ℂˣ) : ℂ) • ((h' : (Module.End ℂ W)ˣ) : Module.End ℂ W)
-    have key : ∀ h : U.range, (((ψ k)⁻¹ h : ℂˣ) : ℂ) •
-        (ρ (i s) * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W)) = (μ k (i s) : ℂ) • F (g * h) := by
+    have key
+        : ∀ h : U.range,
+          (((ψ k)⁻¹ h : ℂˣ) : ℂ) • (ρ (i s) * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W))
+            = (μ k (i s) : ℂ) • F (g * h) := by
       intro h
-      have e1 : (((ψ k)⁻¹ (g * h) : ℂˣ) : ℂ) =
-          (((ψ k g)⁻¹ : ℂˣ) : ℂ) * (((ψ k)⁻¹ h : ℂˣ) : ℂ) := by
-        rw [MonoidHom.inv_apply, MonoidHom.inv_apply, map_mul, _root_.mul_inv_rev, Units.val_mul, mul_comm]
-      have e2 : (((g * h : U.range) : (Module.End ℂ W)ˣ) : Module.End ℂ W) =
-          ρ (i s) * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W) := rfl
+      have e1 : (((ψ k)⁻¹ (g * h) : ℂˣ) : ℂ) = (((ψ k g)⁻¹ : ℂˣ) : ℂ) * (((ψ k)⁻¹ h : ℂˣ) : ℂ) := by
+        rw [MonoidHom.inv_apply, MonoidHom.inv_apply, map_mul, _root_.mul_inv_rev, Units.val_mul,
+          mul_comm]
+      have e2
+          : (((g * h : U.range) : (Module.End ℂ W)ˣ) : Module.End ℂ W)
+            = ρ (i s) * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W) :=
+        rfl
       have e3 : (μ k (i s) : ℂ) * (((ψ k g)⁻¹ : ℂˣ) : ℂ) = 1 := by
         rw [show ψ k g = μ k (i s) from hψU k s, ← Units.val_mul, mul_inv_cancel, Units.val_one]
       show _ = (μ k (i s) : ℂ) • ((((ψ k)⁻¹ (g * h) : ℂˣ) : ℂ) •
         (((g * h : U.range) : (Module.End ℂ W)ˣ) : Module.End ℂ W))
       rw [e1, e2, smul_smul, ← mul_assoc, e3, one_mul]
-    calc ρ (i s) * P k = ∑ h : U.range, (((ψ k)⁻¹ h : ℂˣ) : ℂ) •
-          (ρ (i s) * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W)) := by
-          simp only [P, Finset.mul_sum, mul_smul_comm]
+    calc
+      ρ (i s) * P k
+          = ∑ h : U.range, (((ψ k)⁻¹ h : ℂˣ) : ℂ) •
+            (ρ (i s) * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W)) := by
+        simp only [P, Finset.mul_sum, mul_smul_comm]
       _ = ∑ h : U.range, (μ k (i s) : ℂ) • F (g * h) := Finset.sum_congr rfl fun h _ => key h
       _ = (μ k (i s) : ℂ) • ∑ h : U.range, F h := by
-          rw [← Finset.smul_sum]
-          congr 1
-          exact Equiv.sum_comp (Equiv.mulLeft g) F
+        rw [← Finset.smul_sum]
+        congr 1
+        exact Equiv.sum_comp (Equiv.mulLeft g) F
   have htrP : ∀ k, LinearMap.trace ℂ W (P k) = (Fintype.card U.range : ℂ) := by
     intro k
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [P, map_sum, map_smul, hpreval, htr, smul_eq_mul, Finset.mul_sum]
     rw [Finset.sum_comm]
-    have h1 : ∀ m, ∑ h : U.range, (((ψ k)⁻¹ h : ℂˣ) : ℂ) * (μ m (i (pre h)) : ℂ) =
-        if m = k then (Fintype.card U.range : ℂ) else 0 := by
+    have h1
+        : ∀ m,
+          ∑ h : U.range, (((ψ k)⁻¹ h : ℂˣ) : ℂ) * (μ m (i (pre h)) : ℂ)
+            = if m = k then (Fintype.card U.range : ℂ) else 0 := by
       intro m
       rw [← horth k m]
       refine Finset.sum_congr rfl fun h _ => ?_
@@ -171,7 +193,8 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
     have h1 := congrArg (P j) hg
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_zero] at h1
-    simp only [map_smul, hPE', smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true] at h1
+    simp only [map_smul, hPE', smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+      at h1
     rw [smul_smul] at h1
     have h2 := (smul_eq_zero.mp h1).resolve_right (hw j)
     exact (mul_eq_zero.mp h2).resolve_right hcard0
@@ -189,7 +212,8 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
       set_option synthInstance.maxHeartbeats 100000 in
         rw [map_sum] at h1
       simp only [map_smul, hb, hPE', smul_ite, smul_zero, Finset.sum_ite_eq, Finset.mem_univ,
-        if_true] at h1
+          if_true]
+        at h1
       rw [hPE k y hy m, if_neg hm, smul_smul] at h1
       have h2 := (smul_eq_zero.mp h1).resolve_right (hw m)
       exact (mul_eq_zero.mp h2).resolve_right hcard0
@@ -211,7 +235,8 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
       induction q with
       | zero => simp
       | succ q ih =>
-        rw [pow_succ N q, Module.End.mul_apply, ha, map_smul, ih, smul_smul, pow_succ' a q, mul_comm]
+        rw [pow_succ N q, Module.End.mul_apply, ha, map_smul, ih, smul_smul, pow_succ' a q,
+          mul_comm]
     have h0 := hpow p
     rw [hp, LinearMap.zero_apply] at h0
     have ha0 : a ^ p = 0 := (smul_eq_zero.mp h0.symm).resolve_right (hw k)
@@ -226,7 +251,9 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
       intro z hz s
       obtain ⟨t, ht⟩ := hnorm σ⁻¹ s
       have e1 : i s * σ = σ * i t := by
-        calc i s * σ = σ * (σ⁻¹ * i s) * σ := by group
+        calc
+          i s * σ
+            = σ * (σ⁻¹ * i s) * σ := by group
           _ = σ * (i t * σ⁻¹) * σ := by rw [ht]
           _ = σ * i t := by group
       have e2 : μ j (i t) = μ j (i s) := by
@@ -239,8 +266,10 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
       refine LinearMap.ext fun z => ?_
       have hz := hspan j _ (hPzE j z)
       rw [Module.End.mul_apply, LinearMap.smul_apply, hz, map_smul, hcy, smul_comm]
-    have htrσ : ∀ h : U.range, LinearMap.trace ℂ W (ρ σ * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W)) =
-        ∑ m, (μ m σ : ℂ) * (μ m (i (pre h)) : ℂ) := by
+    have htrσ
+        : ∀ h : U.range,
+          LinearMap.trace ℂ W (ρ σ * ((h : (Module.End ℂ W)ˣ) : Module.End ℂ W))
+            = ∑ m, (μ m σ : ℂ) * (μ m (i (pre h)) : ℂ) := by
       intro h
       rw [hpreval, ← map_mul, htr]
       simp [Units.val_mul]
@@ -248,10 +277,13 @@ theorem UpperTheory.inertia_eigenvector_extends_of_distinct_characters :
       rw [hσP, map_smul, htrP, smul_eq_mul]
     have htr2 : LinearMap.trace ℂ W (ρ σ * P j) = (μ j σ : ℂ) * (Fintype.card U.range : ℂ) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [P, Finset.mul_sum, mul_smul_comm, map_sum, map_smul, htrσ, smul_eq_mul, Finset.mul_sum]
+        simp only [P, Finset.mul_sum, mul_smul_comm, map_sum, map_smul, htrσ, smul_eq_mul,
+          Finset.mul_sum]
       rw [Finset.sum_comm]
-      have h1 : ∀ m, ∑ h : U.range, (((ψ j)⁻¹ h : ℂˣ) : ℂ) * ((μ m σ : ℂ) * (μ m (i (pre h)) : ℂ)) =
-          (μ m σ : ℂ) * (if m = j then (Fintype.card U.range : ℂ) else 0) := by
+      have h1
+          : ∀ m,
+            ∑ h : U.range, (((ψ j)⁻¹ h : ℂˣ) : ℂ) * ((μ m σ : ℂ) * (μ m (i (pre h)) : ℂ))
+              = (μ m σ : ℂ) * (if m = j then (Fintype.card U.range : ℂ) else 0) := by
         intro m
         rw [← horth j m, Finset.mul_sum]
         refine Finset.sum_congr rfl fun h _ => ?_

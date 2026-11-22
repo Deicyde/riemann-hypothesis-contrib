@@ -18,6 +18,7 @@ open CategoryTheory Limits AlgebraicGeometry
 
 namespace CrystallineSemistableComparison.HT
 
-theorem hodgeTate_of_etale_side (h : EtSideS) : HodgeTateMapExists := ht_of lvEx kFin dlog_class_exists_unique kTop h
+theorem hodgeTate_of_etale_side (h : EtSideS) : HodgeTateMapExists :=
+  ht_of lvEx kFin dlog_class_exists_unique kTop h
 
 end CrystallineSemistableComparison.HT

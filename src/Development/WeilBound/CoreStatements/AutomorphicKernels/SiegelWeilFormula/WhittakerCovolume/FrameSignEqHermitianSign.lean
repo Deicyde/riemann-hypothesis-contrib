@@ -7,16 +7,22 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.KWhit
 
 open PositivityTheory.SiegelWeilFormula
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem rel_sigma_sigma (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) (x : E) : σ (σ x) = x := by
+theorem rel_sigma_sigma
+    (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) (x : E)
+    : σ (σ x) = x := by
   let τ : E →+* ℂ := (IsAlgClosed.lift (R := ℚ) (S := E) (M := ℂ) : E →ₐ[ℚ] ℂ).toRingHom
   apply τ.injective
   rw [h.2.2.2, h.2.2.2, star_star]
@@ -25,22 +31,28 @@ theorem rel_cA_incM {a b : Type} (X : Matrix a b E) : (incM F X).map (cA σ) = i
   ext i j
   simp [incM, cA, inclR, Algebra.TensorProduct.map_tmul]
 
-theorem rel_frame (d : SD σ) (ε : ℤˣ)
-    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0) (y : d.G) :
-    (inFrame d.b y)ᵀ * Matrix.fromBlocks 0 1 (((ε : ℤ) : AE F E) • 1) 0 * (inFrame d.b y).map (cA σ) =
-      Matrix.fromBlocks 0 1 (((ε : ℤ) : AE F E) • 1) 0 := by
+theorem rel_frame
+    (d : SD σ) (ε : ℤˣ)
+    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0)
+    (y : d.G)
+    : (inFrame d.b y)ᵀ * Matrix.fromBlocks 0 1 (((ε : ℤ) : AE F E) • 1) 0
+        * (inFrame d.b y).map (cA σ)
+      = Matrix.fromBlocks 0 1 (((ε : ℤ) : AE F E) • 1) 0 := by
   have e1 : (incM F d.b.1).map (cA σ) = incM F (d.b.1.map σ) := by
     ext i j
     simp [incM, cA, inclR, Algebra.TensorProduct.map_tmul]
   have e2 : dbl (incM F d.Y.J) = incM F (dbl d.Y.J) := by
     simp [dbl, incM, Matrix.fromBlocks_map, Matrix.map_neg]
-  have key : incM F (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ) =
-      (incM F d.b.1)ᵀ * incM F (dbl d.Y.J) * incM F (d.b.1.map σ) := by
+  have key
+      : incM F (d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ)
+        = (incM F d.b.1)ᵀ * incM F (dbl d.Y.J) * incM F (d.b.1.map σ) := by
     simp only [incM, Matrix.map_mul, Matrix.transpose_map]
-  have hF : (incM F d.b.1)ᵀ * dbl (incM F d.Y.J) * (incM F d.b.1).map (cA σ) =
-      Matrix.fromBlocks 0 1 (((ε : ℤ) : AE F E) • 1) 0 := by
+  have hF
+      : (incM F d.b.1)ᵀ * dbl (incM F d.Y.J) * (incM F d.b.1).map (cA σ)
+        = Matrix.fromBlocks 0 1 (((ε : ℤ) : AE F E) • 1) 0 := by
     rw [e1, e2, ← key, hε]
-    simp only [incM, Matrix.fromBlocks_map, Matrix.map_zero _ (map_zero _), Matrix.map_one _ (map_zero _) (map_one _)]
+    simp only [incM, Matrix.fromBlocks_map, Matrix.map_zero _ (map_zero _),
+      Matrix.map_one _ (map_zero _) (map_one _)]
     congr 1
     ext i j
     simp only [Matrix.map_apply, Matrix.smul_apply, Matrix.one_apply]
@@ -50,9 +62,11 @@ theorem rel_frame (d : SD σ) (ε : ℤˣ)
   rw [← hF]
   exact this
 
-theorem rel_nA_cond (d : SD σ) (ε : ℤˣ)
-    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0) (β : nA σ d.Y d.b) :
-    β.1ᵀ + ((ε : ℤ) : AE F E) • β.1.map (cA σ) = 0 := by
+theorem rel_nA_cond
+    (d : SD σ) (ε : ℤˣ)
+    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0)
+    (β : nA σ d.Y d.b)
+    : β.1ᵀ + ((ε : ℤ) : AE F E) • β.1.map (cA σ) = 0 := by
   obtain ⟨β, hβ⟩ := β
   show βᵀ + ((ε : ℤ) : AE F E) • β.map (cA σ) = 0
   induction hβ using AddSubgroup.closure_induction with
@@ -60,50 +74,63 @@ theorem rel_nA_cond (d : SD σ) (ε : ℤˣ)
     obtain ⟨y, hy⟩ := hx
     have h := rel_frame d ε hε y
     rw [hy] at h
-    simp only [Matrix.fromBlocks_transpose, Matrix.fromBlocks_map, Matrix.fromBlocks_multiply, Matrix.transpose_zero,
-      Matrix.transpose_one, Matrix.map_zero _ (map_zero (cA σ)), Matrix.map_one _ (map_zero (cA σ)) (map_one (cA σ)),
-      Matrix.zero_mul, Matrix.mul_zero, add_zero, zero_add, Matrix.mul_one, Matrix.one_mul,
-      Matrix.fromBlocks_inj] at h
+    simp only [Matrix.fromBlocks_transpose, Matrix.fromBlocks_map, Matrix.fromBlocks_multiply,
+        Matrix.transpose_zero, Matrix.transpose_one, Matrix.map_zero _ (map_zero (cA σ)),
+        Matrix.map_one _ (map_zero (cA σ)) (map_one (cA σ)), Matrix.zero_mul, Matrix.mul_zero,
+        add_zero, zero_add, Matrix.mul_one, Matrix.one_mul, Matrix.fromBlocks_inj]
+      at h
     rw [add_comm]
     have h4 := h.2.2.2
     rw [Matrix.smul_mul, Matrix.one_mul] at h4
     exact h4
-  | zero => simp
+  | zero =>
+    simp
   | add x y _ _ hx hy =>
     rw [Matrix.transpose_add, Matrix.map_add _ (map_add (cA σ)), smul_add]
-    calc _ = (xᵀ + ((ε : ℤ) : AE F E) • x.map (cA σ)) + (yᵀ + ((ε : ℤ) : AE F E) • y.map (cA σ)) := by abel
+    calc
+      _ = (xᵀ + ((ε : ℤ) : AE F E) • x.map (cA σ)) + (yᵀ + ((ε : ℤ) : AE F E) • y.map (cA σ)) := by
+        abel
       _ = 0 := by rw [hx, hy, add_zero]
   | neg x _ hx =>
     rw [Matrix.transpose_neg, Matrix.map_neg _ (map_neg (cA σ)), smul_neg, ← neg_add, hx, neg_zero]
 
-theorem frame_sign_eq_hermitian_sign (d : SD σ) (hσ : ∀ x, σ (σ x) = x) (ε : ℤˣ)
-    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0) (c : E)
-    (hc : d.Y.J.map σ = c • d.Y.Jᵀ) (i : Fin d.n) : ((ε : ℤ) : E) = c := by
+theorem frame_sign_eq_hermitian_sign
+    (d : SD σ)
+    (hσ : ∀ x, σ (σ x) = x)
+    (ε : ℤˣ) (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0)
+    (c : E) (hc : d.Y.J.map σ = c • d.Y.Jᵀ)
+    (i : Fin d.n)
+    : ((ε : ℤ) : E) = c := by
   have hD : (dbl d.Y.J).map σ = c • (dbl d.Y.J)ᵀ := by
     simp only [dbl, Matrix.fromBlocks_map, Matrix.fromBlocks_transpose, Matrix.fromBlocks_smul, hc,
-      Matrix.map_neg _ (map_neg σ), Matrix.map_zero _ (map_zero σ), Matrix.transpose_zero, Matrix.transpose_neg,
-      smul_zero, smul_neg]
+      Matrix.map_neg _ (map_neg σ), Matrix.map_zero _ (map_zero σ), Matrix.transpose_zero,
+      Matrix.transpose_neg, smul_zero, smul_neg]
   have hbb : (d.b.1.map σ).map σ = d.b.1 := by
     ext i j
     simp [hσ]
   have h1 := congrArg σ.mapMatrix hε
   simp only [map_mul, AlgHom.mapMatrix_apply, hD, hbb] at h1
   have h2 := congrArg Matrix.transpose h1
-  simp only [Matrix.transpose_mul, Matrix.transpose_smul, Matrix.transpose_transpose, Matrix.mul_smul,
-    Matrix.smul_mul, Matrix.transpose_map] at h2
+  simp only [Matrix.transpose_mul, Matrix.transpose_smul, Matrix.transpose_transpose,
+      Matrix.mul_smul, Matrix.smul_mul, Matrix.transpose_map]
+    at h2
   rw [← Matrix.mul_assoc, hε] at h2
   have := congrFun (congrFun h2 (Sum.inr i)) (Sum.inl i)
   simp [Matrix.fromBlocks_map] at this
   have hε2 : ((ε : ℤ) : E) * ((ε : ℤ) : E) = 1 := by
     rw [← Int.cast_mul, ← Units.val_mul, Int.units_mul_self]
     simp
-  calc ((ε : ℤ) : E) = ((ε : ℤ) : E) * (c * ((ε : ℤ) : E)) := by rw [this, mul_one]
+  calc
+    ((ε : ℤ) : E)
+      = ((ε : ℤ) : E) * (c * ((ε : ℤ) : E)) := by rw [this, mul_one]
     _ = c * (((ε : ℤ) : E) * ((ε : ℤ) : E)) := by ring
     _ = c := by rw [hε2, mul_one]
 
-theorem rel_sign (d : SD σ) (ε : ℤˣ)
-    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0) :
-    ((∀ i j, σ (d.Y.J j i) = -d.Y.J i j) → ε = -1) ∧ ((∀ i j, σ (d.Y.J j i) = d.Y.J i j) → ε = 1) := by
+theorem rel_sign
+    (d : SD σ) (ε : ℤˣ)
+    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0)
+    : ((∀ i j, σ (d.Y.J j i) = - d.Y.J i j) → ε = -1)
+      ∧ ((∀ i j, σ (d.Y.J j i) = d.Y.J i j) → ε = 1) := by
   have hσ := rel_sigma_sigma d.ok.good.cm
   have i : Fin d.n := ⟨0, d.ok.hn⟩
   constructor
@@ -114,7 +141,8 @@ theorem rel_sign (d : SD σ) (ε : ℤˣ)
     have := frame_sign_eq_hermitian_sign d hσ ε hε 1 (by ext a b; simp [h b a]) i
     exact Units.ext (Int.cast_injective (α := E) (by simpa using this))
 
-theorem rel_anti (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ) : ∃ η : E, η ≠ 0 ∧ σ η = -η := by
+theorem rel_anti (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    : ∃ η : E, η ≠ 0 ∧ σ η = -η := by
   have hσ := rel_sigma_sigma h
   obtain ⟨x, hx⟩ : ∃ x, σ x ≠ x := by
     by_contra hc
@@ -130,9 +158,10 @@ theorem rel_anti (h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.
   refine ⟨x - σ x, sub_ne_zero.mpr (Ne.symm hx), ?_⟩
   rw [map_sub, hσ, neg_sub]
 
-theorem rel_eta (d : SD σ) (ε : ℤˣ)
-    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0) :
-    ∃ η : E, η ≠ 0 ∧ σ η = -(((ε : ℤ) : E) * η) ∧ ∀ i j, σ (η * d.A.J j i) = η * d.A.J i j := by
+theorem rel_eta
+    (d : SD σ) (ε : ℤˣ)
+    (hε : d.b.1ᵀ * dbl d.Y.J * d.b.1.map σ = Matrix.fromBlocks 0 1 (((ε : ℤ) : E) • 1) 0)
+    : ∃ η : E, η ≠ 0 ∧ σ η = -(((ε : ℤ) : E) * η) ∧ ∀ i j, σ (η * d.A.J j i) = η * d.A.J i j := by
   rcases d.ok.sign with ⟨hA, hY⟩ | ⟨hA, hY⟩
   · have he := (rel_sign d ε hε).1 hY
     subst he

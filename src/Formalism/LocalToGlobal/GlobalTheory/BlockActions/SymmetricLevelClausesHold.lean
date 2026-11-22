@@ -7,6 +7,8 @@ public import Formalism.LocalToGlobal.GlobalTheory.BlockActions.FormsExtendHolds
 
 namespace Formalism.L2.GlobalTheoryTheory.Br
 
-theorem symmetric_level_clauses_hold : ClassMapPropertiesOfSymmetricForms := symmetric_clauses_of_four class_injective_holds stabiliser_bijective_holds forms_extend_holds norm_bound_holds
+theorem symmetric_level_clauses_hold : ClassMapPropertiesOfSymmetricForms :=
+  symmetric_clauses_of_four class_injective_holds stabiliser_bijective_holds forms_extend_holds
+    norm_bound_holds
 
 end Formalism.L2.GlobalTheoryTheory.Br

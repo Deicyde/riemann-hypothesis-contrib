@@ -13,8 +13,8 @@ namespace GroundTheory.Heights₂.Heights
 
 open ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem DualTopStandard.proof (hBC : DualStdBaseChange.Statement) (hGL : GrassLinesProj.Statement) :
-    DualTopStandard.Statement := by
+theorem DualTopStandard.proof (hBC : DualStdBaseChange.Statement) (hGL : GrassLinesProj.Statement)
+    : DualTopStandard.Statement := by
   intro K _ _ i T _ _ b hb II hi hII
   rw [hBC K i T b hb II hi hII]
   obtain ⟨m, rfl⟩ : ∃ m, i = m + 1 := ⟨i - 1, by omega⟩

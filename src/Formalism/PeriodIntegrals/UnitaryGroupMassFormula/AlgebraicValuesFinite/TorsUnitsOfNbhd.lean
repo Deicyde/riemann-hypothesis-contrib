@@ -14,18 +14,24 @@ namespace PI.AlgValsFin.W
 
 def ufinSub (L : Type) [Field L] [NumberField L] : Subgroup (Ideles L) where
   carrier := UFin L
-  one_mem' := ⟨rfl, fun v => by
-    show Valued.v (1 : v.adicCompletion L) = 1
-    exact map_one _⟩
-  mul_mem' := fun {a b} ha hb => ⟨by
-    change (a : AdeleRing (𝓞 L) L).1 * (b : AdeleRing (𝓞 L) L).1 = 1
-    rw [ha.1, hb.1, mul_one],
-    fun v => by rw [comp_mul, map_mul, ha.2 v, hb.2 v, mul_one]⟩
+  one_mem' := ⟨
+    rfl,
+    fun v => by
+      show Valued.v (1 : v.adicCompletion L) = 1
+      exact map_one _
+  ⟩
+  mul_mem' := fun {a b} ha hb => ⟨
+    by
+      change (a : AdeleRing (𝓞 L) L).1 * (b : AdeleRing (𝓞 L) L).1 = 1
+      rw [ha.1, hb.1, mul_one],
+    fun v => by rw [comp_mul, map_mul, ha.2 v, hb.2 v, mul_one]
+  ⟩
   inv_mem' := fun {a} ha => by
     refine ⟨?_, fun v => ?_⟩
     · have e : (a : AdeleRing (𝓞 L) L).1 * (a⁻¹ : Ideles L).val.1 = 1 := by
         change ((a * a⁻¹ : Ideles L) : AdeleRing (𝓞 L) L).1 = 1
-        rw [mul_inv_cancel]; rfl
+        rw [mul_inv_cancel]
+        rfl
       rw [ha.1, one_mul] at e
       exact e
     · have e := congrArg Valued.v (comp_mul_inv L a v)
@@ -34,37 +40,43 @@ def ufinSub (L : Type) [Field L] [NumberField L] : Subgroup (Ideles L) where
 
 variable {L : Type} [Field L] [NumberField L]
 
-theorem pow_close (S : Finset (HeightOneSpectrum (𝓞 L))) (n : ℕ) :
-    ∃ M : ℕ, 0 < M ∧ ∀ y ∈ UFin L, ∀ v ∈ S,
-      Valued.v (((y ^ M : Ideles L) : AdeleRing (𝓞 L) L).2 v - 1) ≤ WithZero.exp (-(n : ℤ)) := by
+theorem pow_close (S : Finset (HeightOneSpectrum (𝓞 L))) (n : ℕ)
+    : ∃ M : ℕ,
+      0 < M
+        ∧ ∀ y ∈ UFin L, ∀ v ∈ S,
+          Valued.v (((y ^ M : Ideles L) : AdeleRing (𝓞 L) L).2 v - 1)
+            ≤ WithZero.exp (-(n : ℤ)) := by
   choose N hNpos hN using fun v : HeightOneSpectrum (𝓞 L) => exists_pow_close v n
   refine ⟨∏ v ∈ S, N v, Finset.prod_pos fun v _ => hNpos v, fun y hy v hv => ?_⟩
   obtain ⟨r, hr⟩ : N v ∣ ∏ w ∈ S, N w := Finset.dvd_prod_of_mem N hv
-  have hcomp : ((y ^ (∏ w ∈ S, N w) : Ideles L) : AdeleRing (𝓞 L) L).2 v =
-      ((y : AdeleRing (𝓞 L) L).2 v) ^ (∏ w ∈ S, N w) := by
+  have hcomp
+      : ((y ^ (∏ w ∈ S, N w) : Ideles L) : AdeleRing (𝓞 L) L).2 v
+        = ((y : AdeleRing (𝓞 L) L).2 v) ^ (∏ w ∈ S, N w) := by
     rw [← evF_val, ← evF_val, map_pow, Units.val_pow_eq_pow_val]
   rw [hcomp, hr, pow_mul]
   have hy1 : Valued.v ((y : AdeleRing (𝓞 L) L).2 v) = 1 := hy.2 v
-  have hx1 : Valued.v (((y : AdeleRing (𝓞 L) L).2 v) ^ N v) ≤ 1 := by
-    rw [map_pow, hy1, one_pow]
-  calc Valued.v ((((y : AdeleRing (𝓞 L) L).2 v) ^ N v) ^ r - 1)
+  have hx1 : Valued.v (((y : AdeleRing (𝓞 L) L).2 v) ^ N v) ≤ 1 := by rw [map_pow, hy1, one_pow]
+  calc
+    Valued.v ((((y : AdeleRing (𝓞 L) L).2 v) ^ N v) ^ r - 1)
       = Valued.v ((((y : AdeleRing (𝓞 L) L).2 v) ^ N v) ^ r - 1 ^ r) := by rw [one_pow]
     _ ≤ Valued.v (((y : AdeleRing (𝓞 L) L).2 v) ^ N v - 1) :=
-        val_pow_sub_le v hx1 (by rw [map_one]) r
+      val_pow_sub_le v hx1 (by rw [map_one]) r
     _ ≤ WithZero.exp (-(n : ℤ)) := hN v _ hy1
 
-theorem torsUnits_of_nbhd (L : Type) [Field L] [NumberField L]
-    (hnb : ∀ W : Set (Ideles L), IsOpen W → (1 : Ideles L) ∈ W →
-      ∃ (S : Finset (HeightOneSpectrum (𝓞 L))) (n : ℕ), ∀ x ∈ UFin L,
-        (∀ v ∈ S, Valued.v ((x : AdeleRing (𝓞 L) L).2 v - 1) ≤ WithZero.exp (-(n : ℤ))) → x ∈ W) :
-    TorsUnits L := by
+theorem torsUnits_of_nbhd
+    (L : Type) [Field L] [NumberField L]
+    (hnb : ∀ W : Set (Ideles L),
+      IsOpen W → (1 : Ideles L) ∈ W
+        → ∃ (S : Finset (HeightOneSpectrum (𝓞 L))) (n : ℕ), ∀ x ∈ UFin L,
+          (∀ v ∈ S, Valued.v ((x : AdeleRing (𝓞 L) L).2 v - 1) ≤ WithZero.exp (-(n : ℤ))) → x ∈ W)
+    : TorsUnits L := by
   intro χ
   set W : Set (Ideles L) := χ.1 ⁻¹' {u : ℂˣ | ‖(u : ℂ) - 1‖ < 1} with hW
   have hWo : IsOpen W := by
     refine IsOpen.preimage χ.2.1 ?_
-    exact isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const)) continuous_const
-  have hW1 : (1 : Ideles L) ∈ W := by
-    simp [hW]
+    exact isOpen_lt (continuous_norm.comp (Units.continuous_val.sub continuous_const))
+      continuous_const
+  have hW1 : (1 : Ideles L) ∈ W := by simp [hW]
   obtain ⟨S, n, hSn⟩ := hnb W hWo hW1
   obtain ⟨M, hM, hclose⟩ := pow_close (L := L) S n
   refine ⟨M, hM, fun x hx => ?_⟩

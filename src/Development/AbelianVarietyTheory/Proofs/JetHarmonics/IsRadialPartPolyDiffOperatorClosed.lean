@@ -11,18 +11,22 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.LiftCapelliO
 
 namespace GlobalTheory.HatNF
 
-open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
+open Formalism.FourierDecayAlt Formalism.FourierDecayAlt.R Formalism.FourierDecayAlt.Wd
+  Formalism.FourierDecayAlt.Fr Formalism.REAL Formalism.QuantumDeterminants MeasureTheory
 
 noncomputable section
 
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
   [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
 
 end
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma polyOp_mono' {n n' κ κ' : ℕ} {Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq} (h : _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n κ Θ)
     (hn : n ≤ n') (hκ : κ ≤ κ') : _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n' κ' Θ := by
   unfold _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp at h ⊢
@@ -31,30 +35,38 @@ private lemma polyOp_mono' {n n' κ κ' : ℕ} {Θ : _root_.Formalism.FourierDec
   exact ⟨hlen.trans hn, Q, ⟨q, hq.trans hκ, hQ⟩, hc, hca⟩
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma polyOp_nil (n κ : ℕ) : _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n κ ([] : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq) := by
   unfold _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp
   simp
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma opApply_nil (F : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp) (g : _root_.Formalism.FourierDecayAlt.B.Mat k r) :
     _root_.Formalism.FourierDecayAlt.B.opApply ([] : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq) F g = 0 := by
   simp [_root_.Formalism.FourierDecayAlt.B.opApply]
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma polyOp_of_polyOp_cons {n κ : ℕ} {T : _root_.Formalism.FourierDecayAlt.B.DTerm k r Wp Wq} {Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq}
     (h : _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n κ (T :: Θ)) : _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n κ Θ := by
   unfold _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp at h ⊢
   exact fun T' hT' => h T' (by simp [hT'])
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma totalDegree_lin_le_one {N : ℕ} (X : Matrix (Fin N) (Fin N) ℂ) (i : _root_.PI.UnitaryGroupMassFormula.UsCompose.Vr N) :
     (_root_.PI.UnitaryGroupMassFormula.UsCompose.lin X i).totalDegree ≤ 1 := by
   rcases i with x | x <;>
@@ -63,8 +75,10 @@ private lemma totalDegree_lin_le_one {N : ℕ} (X : Matrix (Fin N) (Fin N) ℂ) 
     exact (totalDegree_mul _ _).trans (by simp [totalDegree_C, totalDegree_X])
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma totalDegree_pderiv_add_one_le_of_ne_zero {σ : Type*} (q : MvPolynomial σ ℂ) (i : σ)
     (h : pderiv i q ≠ 0) : (pderiv i q).totalDegree + 1 ≤ q.totalDegree := by
   have hne : (pderiv i q).support.Nonempty :=
@@ -81,8 +95,10 @@ private lemma totalDegree_pderiv_add_one_le_of_ne_zero {σ : Type*} (q : MvPolyn
   rwa [Finsupp.sum_add_index' (fun _ => rfl) (fun _ _ _ => rfl), Finsupp.sum_single_index rfl] at this
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma totalDegree_dP_le {N : ℕ} (X : Matrix (Fin N) (Fin N) ℂ)
     (q : MvPolynomial (_root_.PI.UnitaryGroupMassFormula.UsCompose.Vr N) ℂ) : (_root_.PI.UnitaryGroupMassFormula.UsCompose.dP X q).totalDegree ≤ q.totalDegree := by
   unfold _root_.PI.UnitaryGroupMassFormula.UsCompose.dP
@@ -93,8 +109,10 @@ private lemma totalDegree_dP_le {N : ℕ} (X : Matrix (Fin N) (Fin N) ℂ)
       ((Nat.add_le_add_left (totalDegree_lin_le_one X i) _).trans (totalDegree_pderiv_add_one_le_of_ne_zero q i h))
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma exists_isPolyDeg_hasDerivAt_comp_crv {X : _root_.Formalism.FourierDecayAlt.B.Mat k r} {κ : ℕ} {Q : _root_.Formalism.FourierDecayAlt.B.Mat k r → ℂ}
     (hQ : _root_.Formalism.FourierDecayAlt.U.IsPolyDeg κ Q) : ∃ Q' : _root_.Formalism.FourierDecayAlt.B.Mat k r → ℂ, _root_.Formalism.FourierDecayAlt.U.IsPolyDeg κ Q' ∧
       ∀ g, HasDerivAt (fun t => Q (_root_.Formalism.FourierDecayAlt.P.BetaSesquilinearity.crv (false, X) g t)) (Q' g) 0 := by
@@ -122,8 +140,10 @@ private lemma ckOn_rightWordDeriv_of_forall_inLie {F : _root_.Formalism.FourierD
     simpa [_root_.Formalism.FourierDecayAlt.B.Rw] using this
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma opApply_cons' (T : _root_.Formalism.FourierDecayAlt.B.DTerm k r Wp Wq) (Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq)
     (F : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp) (g : _root_.Formalism.FourierDecayAlt.B.Mat k r) :
     _root_.Formalism.FourierDecayAlt.B.opApply (T :: Θ) F g = (T.coef g) (_root_.Formalism.FourierDecayAlt.B.Rw T.word F g) + _root_.Formalism.FourierDecayAlt.B.opApply Θ F g := by
@@ -180,8 +200,10 @@ private lemma polyOp_deriv_lemma_10 {X : _root_.Formalism.FourierDecayAlt.B.Mat 
       abel
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma polyOp_word_lemma_6 {κ : ℕ} : ∀ (u : List (_root_.Formalism.FourierDecayAlt.B.Mat k r)), (∀ X ∈ u, _root_.Formalism.FourierDecayAlt.B.inLie k r X) →
     ∀ (Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq) (n : ℕ), _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n κ Θ → ∃ Θ' : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq,
       _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp (n + u.length) κ Θ' ∧ ∀ F : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp,
@@ -203,8 +225,10 @@ private lemma polyOp_word_lemma_6 {κ : ℕ} : ∀ (u : List (_root_.Formalism.F
       exact (hD2 F hF g hg).deriv
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma exists_polyOp_opApply_eq_smul {κa : ℕ} {Pf : _root_.Formalism.FourierDecayAlt.B.Mat k r → ℂ} (hP : _root_.Formalism.FourierDecayAlt.U.IsPolyDeg κa Pf) :
     ∀ (Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq) (n κ : ℕ), _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n κ Θ → ∃ Θ' : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq,
       _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp n (κa + κ) Θ' ∧ ∀ (F : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp) g,
@@ -229,16 +253,20 @@ private lemma exists_polyOp_opApply_eq_smul {κa : ℕ} {Pf : _root_.Formalism.F
       simp [_root_.GlobalTheory.HatNF.PolyComp.scalTerm, smul_add, mul_smul]
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma opApply_append' (Θ₁ Θ₂ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq)
     (F : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp) (g : _root_.Formalism.FourierDecayAlt.B.Mat k r) :
     _root_.Formalism.FourierDecayAlt.B.opApply (Θ₁ ++ Θ₂) F g = _root_.Formalism.FourierDecayAlt.B.opApply Θ₁ F g + _root_.Formalism.FourierDecayAlt.B.opApply Θ₂ F g := by
   simp [_root_.Formalism.FourierDecayAlt.B.opApply]
 
 open MvPolynomial in
-variable {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp]
-  [NormedAddCommGroup Wq] [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] {k r : ℕ} in
+variable
+  {Wp Wq : Type} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+  [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq]
+  {k r : ℕ} in
 private lemma polyOp_comp_lemma_2 {o₂ κ₁ κ₂ : ℕ} {Θb : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq} (hb : _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp o₂ κ₂ Θb) :
     ∀ (Θa : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq) (o₁ : ℕ), _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp o₁ κ₁ Θa → ∃ Θ : _root_.Formalism.FourierDecayAlt.B.DiffOp k r Wp Wq,
       _root_.Formalism.FourierDecayAlt.P.CutMP.PolyOp (o₁ + o₂) (κ₁ + κ₂) Θ ∧ ∀ F : _root_.Formalism.FourierDecayAlt.B.Mat k r → Wq →L[ℂ] Wp,
@@ -261,30 +289,47 @@ private lemma polyOp_comp_lemma_2 {o₂ κ₁ κ₂ : ℕ} {Θb : _root_.Formali
     · rw [opApply_append', opApply_cons', hE2 F g, ← hE1 F hF g hg, hEr F hF g hg, hc]
       simp
 
-
 open MeasureTheory in
-theorem _root_.GlobalTheory.HatNF.polyLift_closed : ∀ (Wp Wq : Type) [NormedAddCommGroup Wp]
-    [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
-    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq] (P : _root_.Formalism.FourierDecayAlt.M.Par)
-    (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData P.k P.r Wp Wq), _root_.GlobalTheory.HatNF.PolyLift P Bs 0 0 1 ∧
-      (∀ o o' κ κ' a, o ≤ o' → κ ≤ κ' → _root_.GlobalTheory.HatNF.PolyLift P Bs o κ a →
-        _root_.GlobalTheory.HatNF.PolyLift P Bs o' κ' a) ∧
-      ∀ o₁ κ₁ o₂ κ₂ a b, _root_.GlobalTheory.HatNF.PolyLift P Bs o₁ κ₁ a →
-        _root_.GlobalTheory.HatNF.PolyLift P Bs o₂ κ₂ b →
-        _root_.GlobalTheory.HatNF.PolyLift P Bs (o₁ + o₂) (κ₁ + κ₂) (a * b) := by
+theorem _root_.GlobalTheory.HatNF.polyLift_closed
+    : ∀ (Wp Wq : Type) [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+        [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wp] [FiniteDimensional ℂ Wq]
+        (P : _root_.Formalism.FourierDecayAlt.M.Par)
+        (Bs : _root_.Formalism.FourierDecayAlt.B.RealPlaceData P.k P.r Wp Wq),
+      _root_.GlobalTheory.HatNF.PolyLift P Bs 0 0 1
+        ∧ (∀ o o' κ κ' a,
+          o ≤ o' → κ ≤ κ' → _root_.GlobalTheory.HatNF.PolyLift P Bs o κ a
+            → _root_.GlobalTheory.HatNF.PolyLift P Bs o' κ' a)
+        ∧ ∀ o₁ κ₁ o₂ κ₂ a b,
+          _root_.GlobalTheory.HatNF.PolyLift P Bs o₁ κ₁ a
+            → _root_.GlobalTheory.HatNF.PolyLift P Bs o₂ κ₂ b
+            → _root_.GlobalTheory.HatNF.PolyLift P Bs (o₁ + o₂) (κ₁ + κ₂) (a * b) := by
   intro Wp Wq _ _ _ _ _ _ P Bs
   refine ⟨?_, ?_, ?_⟩
   · refine ⟨[_root_.GlobalTheory.HatNF.PolyComp.scalTerm (fun _ => 1) [] (by simp)], ?_, ?_⟩
     · intro Tm hTm
       simp only [List.mem_singleton] at hTm
       subst hTm
-      refine ⟨by simp [_root_.GlobalTheory.HatNF.PolyComp.scalTerm], fun _ => 1, ?_, fun _ => rfl, fun _ => rfl⟩
+      refine ⟨
+        by simp [_root_.GlobalTheory.HatNF.PolyComp.scalTerm],
+        fun _ => 1,
+        ?_,
+        fun _ => rfl,
+        fun _ => rfl
+      ⟩
       exact ⟨MvPolynomial.C 1, by simp, fun g => by simp⟩
     · intro F _ Φ hΦ
-      have hF : _root_.Formalism.FourierDecayAlt.B.opApply [_root_.GlobalTheory.HatNF.PolyComp.scalTerm (Wp := Wp) (Wq := Wq) (fun _ => 1) []
-          (by simp)] F = F := by
+      have hF
+          : _root_.Formalism.FourierDecayAlt.B.opApply
+              [
+                _root_.GlobalTheory.HatNF.PolyComp.scalTerm (Wp := Wp) (Wq := Wq)
+                  (fun _ => 1)
+                  [] (by simp)
+              ]
+              F
+            = F := by
         funext g
-        simp [_root_.Formalism.FourierDecayAlt.B.opApply, _root_.Formalism.FourierDecayAlt.B.Rw, _root_.GlobalTheory.HatNF.PolyComp.scalTerm]
+        simp [_root_.Formalism.FourierDecayAlt.B.opApply, _root_.Formalism.FourierDecayAlt.B.Rw,
+          _root_.GlobalTheory.HatNF.PolyComp.scalTerm]
       rw [hF]
       exact hΦ
   · rintro o o' κ κ' a ho hκ ⟨Θ, hΘ, hR⟩
@@ -294,16 +339,20 @@ theorem _root_.GlobalTheory.HatNF.polyLift_closed : ∀ (Wp Wq : Type) [NormedAd
     refine ⟨Θ, hJ, ?_⟩
     unfold _root_.Formalism.FourierDecayAlt.TL.RadIs at hRa hRb ⊢
     intro F hF Φ hΦ
-    have hsmooth : _root_.Formalism.FourierDecayAlt.B.CkOn ⊤ (_root_.Formalism.FourierDecayAlt.B.GV P.k P.r) F := by
+    have hsmooth : _root_.Formalism.FourierDecayAlt.B.CkOn ⊤
+        (_root_.Formalism.FourierDecayAlt.B.GV P.k P.r) F := by
       unfold _root_.Formalism.FourierDecayAlt.KB.CptCoef at hF
       exact hF.1
-    have hsm : _root_.Formalism.FourierDecayAlt.B.SmoothCoef (_root_.Formalism.FourierDecayAlt.C6.domL Bs ∅) Θb :=
+    have hsm : _root_.Formalism.FourierDecayAlt.B.SmoothCoef
+        (_root_.Formalism.FourierDecayAlt.C6.domL Bs ∅) Θb :=
       (_root_.GlobalTheory.HatNF.polyOp_ok P.k P.r Wp Wq o₂ κ₂ Θb hJb).1 _
     have h2 := hRa _ (_root_.Formalism.FourierDecayAlt.P.TLB.cpt_op hF hsm) _ (hRb F hF Φ hΦ)
     unfold _root_.Formalism.FourierDecayAlt.Top.IsRadOf at h2 ⊢
     intro x hx
     rw [show (a * b).1 Φ = a.1 (b.1 Φ) from rfl, h2 x hx]
     unfold _root_.Formalism.FourierDecayAlt.Q.resG
-    rw [_root_.Formalism.FourierDecayAlt.P.JCx2.sq_jf_congr Bs (fun g hg => (hE F hsmooth g hg).symm) (_root_.Formalism.FourierDecayAlt.P.TLB.wCell_gv Bs hx)]
+    rw [_root_.Formalism.FourierDecayAlt.P.JCx2.sq_jf_congr Bs
+      (fun g hg => (hE F hsmooth g hg).symm)
+      (_root_.Formalism.FourierDecayAlt.P.TLB.wCell_gv Bs hx)]
 
 end GlobalTheory.HatNF

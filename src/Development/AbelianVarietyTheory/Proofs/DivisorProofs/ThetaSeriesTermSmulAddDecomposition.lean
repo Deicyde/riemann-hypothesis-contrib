@@ -9,14 +9,22 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory
 
-theorem theta_term_smul_add (O : Type) [CommRing O] (N : GlobalTheory.Ex.NumD O) (S : Subring O) (m : ℕ) (h : N.Gt)
-    (y : N.X) (hy : h ^ m = N.io y)
-    (hθ : ∀ x ∈ Subgroup.closure (Set.range N.c ∪ {h.b}), ∀ x' ∈ Subgroup.closure (Set.range N.c ∪ {h.b}),
-      ∀ x'' ∈ Subgroup.closure (Set.range N.c ∪ {h.b}),
-        (N.θ x x' x'' : O) ∈ S ∧ (((N.θ x x' x'')⁻¹ : Oˣ) : O) ∈ S)
-    (hσ : ∀ x ∈ Subgroup.closure (Set.range N.c ∪ {h.b}), (N.σ x : O) ∈ S ∧ (((N.σ x)⁻¹ : Oˣ) : O) ∈ S)
-    (a b : N.X) : ∃ w : Oˣ, (w : O) ∈ S ∧
-      N.ψ (m • a + b) * h.s (m • a + b) = w * N.ψ a ^ (m ^ 2) * N.τ a (m • b + y) * (N.ψ b * h.s b) := by
+theorem theta_term_smul_add
+    (O : Type) [CommRing O]
+    (N : GlobalTheory.Ex.NumD O)
+    (S : Subring O)
+    (m : ℕ) (h : N.Gt) (y : N.X) (hy : h ^ m = N.io y)
+    (hθ : ∀ x ∈ Subgroup.closure (Set.range N.c ∪ {h.b}),
+      ∀ x' ∈ Subgroup.closure (Set.range N.c ∪ {h.b}),
+        ∀ x'' ∈ Subgroup.closure (Set.range N.c ∪ {h.b}),
+          (N.θ x x' x'' : O) ∈ S ∧ (((N.θ x x' x'')⁻¹ : Oˣ) : O) ∈ S)
+    (hσ : ∀ x ∈ Subgroup.closure (Set.range N.c ∪ {h.b}),
+      (N.σ x : O) ∈ S ∧ (((N.σ x)⁻¹ : Oˣ) : O) ∈ S)
+    (a b : N.X)
+    : ∃ w : Oˣ,
+      (w : O) ∈ S
+        ∧ N.ψ (m • a + b) * h.s (m • a + b)
+          = w * N.ψ a ^ (m ^ 2) * N.τ a (m • b + y) * (N.ψ b * h.s b) := by
   set H := Subgroup.closure (Set.range N.c ∪ {h.b}) with hH
   set T := S.toSubmonoid.units with hT
   set π : Oˣ →* Oˣ ⧸ T := QuotientGroup.mk' T with hπ
@@ -86,13 +94,24 @@ theorem theta_term_smul_add (O : Type) [CommRing O] (N : GlobalTheory.Ex.NumD O)
       exact Finset.prod_eq_one fun i _ => θ1 _ (by rw [one_mul]; exact pow_mem Hb i) _ Hb _ (Hc a)
     rw [hc, mul_one] at this
     exact this.symm
-  refine ⟨N.ψ (m • a + b) * h.s (m • a + b) / (N.ψ a ^ (m ^ 2) * N.τ a (m • b + y) * (N.ψ b * h.s b)), ?_, ?_⟩
-  · have e : π (N.ψ (m • a + b) * h.s (m • a + b) / (N.ψ a ^ (m ^ 2) * N.τ a (m • b + y) * (N.ψ b * h.s b))) = 1 := by
-      rw [map_div, div_eq_one, map_mul, map_mul, map_mul, map_mul, map_pow, fadd, Sadd, fsmul, Bsmul, Br, Bsmulr,
-        Ssmul, Spow]
+  refine ⟨
+    N.ψ (m • a + b) * h.s (m • a + b) / (N.ψ a ^ (m ^ 2) * N.τ a (m • b + y) * (N.ψ b * h.s b)),
+    ?_,
+    ?_
+  ⟩
+  · have e
+        : π
+            (N.ψ (m • a + b) * h.s (m • a + b)
+              / (N.ψ a ^ (m ^ 2) * N.τ a (m • b + y) * (N.ψ b * h.s b)))
+          = 1 := by
+      rw [map_div, div_eq_one, map_mul, map_mul, map_mul, map_mul, map_pow, fadd, Sadd, fsmul,
+        Bsmul, Br, Bsmulr, Ssmul, Spow]
       ac_rfl
     exact ((Submonoid.mem_units_iff _ _).1 ((QuotientGroup.eq_one_iff _).1 e)).1
-  · exact (fun (L X Y Z : Oˣ) => show L = L / (X * Y * Z) * X * Y * Z by
-      rw [mul_assoc (L / (X * Y * Z)) X Y, mul_assoc (L / (X * Y * Z)) (X * Y) Z, div_mul_cancel]) _ _ _ _
+  · exact (fun (L X Y Z : Oˣ) =>
+        show L = L / (X * Y * Z) * X * Y * Z by
+          rw [mul_assoc (L / (X * Y * Z)) X Y, mul_assoc (L / (X * Y * Z)) (X * Y) Z,
+            div_mul_cancel])
+      _ _ _ _
 
 end GlobalTheory

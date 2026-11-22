@@ -13,7 +13,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LogTensorIde
 @[expose] public section
 
 open scoped TensorProduct NNReal ENNReal Matrix
-open NumberField MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet GlobalTheory.ResLine GlobalTheory.ResidueEisenstein
+open NumberField MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU
+  GlobalTheory.SiegelSet GlobalTheory.ResLine GlobalTheory.ResidueEisenstein
 open GlobalTheory.Doubling (absE)
 open Formalism.UG (cT bc)
 
@@ -27,9 +29,9 @@ section Help
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem det_bc {k : ℕ} (γ : GL (Fin k) E) :
-    Matrix.GeneralLinearGroup.det (bc (inclR (F := F) (AF F)) γ : GL (Fin k) (AF F ⊗[F] E)) =
-      Units.map (inclR (F := F) (AF F)).toMonoidHom (Matrix.GeneralLinearGroup.det γ) :=
+theorem det_bc {k : ℕ} (γ : GL (Fin k) E)
+    : Matrix.GeneralLinearGroup.det (bc (inclR (F := F) (AF F)) γ : GL (Fin k) (AF F ⊗[F] E))
+      = Units.map (inclR (F := F) (AF F)).toMonoidHom (Matrix.GeneralLinearGroup.det γ) :=
   Units.ext (RingHom.map_det _ _).symm
 
 theorem absE_pos (x : (AF F ⊗[F] E)ˣ) : 0 < (absE F E x : ℝ) := by
@@ -39,7 +41,35 @@ theorem absE_pos (x : (AF F ⊗[F] E)ˣ) : 0 < (absE F E x : ℝ) := by
 
 end Help
 
-theorem glOne_finvol : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (k : ℕ), LocallyCompactSpace ((absE F E).comp (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker ∧ SecondCountableTopology ((absE F E).comp (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker ∧ DiscreteTopology ((bc (inclR (F := F) (AF F)) : GL (Fin k) E →* GL (Fin k) (AF F ⊗[F] E)).range.subgroupOf ((absE F E).comp (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker) ∧ ∀ [MeasurableSpace (GL (Fin k) (AF F ⊗[F] E))] [BorelSpace (GL (Fin k) (AF F ⊗[F] E))] (π : Measure ((absE F E).comp (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker) (DM : Set ((absE F E).comp (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker), π.IsHaarMeasure → IsFundamentalDomain ((bc (inclR (F := F) (AF F)) : GL (Fin k) E →* GL (Fin k) (AF F ⊗[F] E)).range.subgroupOf ((absE F E).comp (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker) DM π → π DM ≠ ⊤ := by
+theorem glOne_finvol
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (k : ℕ),
+          LocallyCompactSpace ((absE F E).comp
+              (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker
+            ∧ SecondCountableTopology ((absE F E).comp
+              (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker
+            ∧ DiscreteTopology
+              ((bc (inclR (F := F) (AF F))
+                  : GL (Fin k) E →* GL (Fin k) (AF F ⊗[F] E)).range.subgroupOf
+                ((absE F E).comp
+                  (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker)
+            ∧ ∀ [MeasurableSpace (GL (Fin k) (AF F ⊗[F] E))] [BorelSpace (GL (Fin k) (AF F ⊗[F] E))]
+                (π : Measure ((absE F E).comp
+                  (Matrix.GeneralLinearGroup.det : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker)
+                (DM : Set ((absE F E).comp
+                  (Matrix.GeneralLinearGroup.det
+                    : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker),
+              π.IsHaarMeasure
+                → IsFundamentalDomain
+                  ((bc (inclR (F := F) (AF F))
+                      : GL (Fin k) E →* GL (Fin k) (AF F ⊗[F] E)).range.subgroupOf
+                    ((absE F E).comp
+                      (Matrix.GeneralLinearGroup.det
+                        : GL (Fin k) (AF F ⊗[F] E) →* (AF F ⊗[F] E)ˣ)).ker)
+                  DM π
+                → π DM ≠ ⊤ := by
   intro F E _ _ _ _ _ σ hCM k
   haveI : IsTotallyComplex E := hCM.2.1
   obtain ⟨hTR, hT2⟩ := GlobalTheory.StdPar.ring_facts (F := F) (E := E)
@@ -49,7 +79,8 @@ theorem glOne_finvol : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   haveI : LocallyCompactSpace (GL (Fin k) (AF F ⊗[F] E)) := hemb.locallyCompactSpace
   haveI : SecondCountableTopology (GL (Fin k) (AF F ⊗[F] E)) := hemb.isEmbedding.secondCountableTopology
   haveI : T2Space (GL (Fin k) (AF F ⊗[F] E)) := hemb.isEmbedding.t2Space
-  have hcont : Continuous fun g : GL (Fin k) (AF F ⊗[F] E) => absE F E (Matrix.GeneralLinearGroup.det g) :=
+  have hcont
+      : Continuous fun g : GL (Fin k) (AF F ⊗[F] E) => absE F E (Matrix.GeneralLinearGroup.det g) :=
     GlobalTheory.Doubling.continuous_absE.comp Matrix.GeneralLinearGroup.continuous_det
   have hcl : IsClosed (H : Set (GL (Fin k) (AF F ⊗[F] E))) := isClosed_eq hcont continuous_const
   haveI : LocallyCompactSpace H := hcl.isClosedEmbedding_subtypeVal.locallyCompactSpace
@@ -64,7 +95,8 @@ theorem glOne_finvol : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
       (f := fun x : Γ.subgroupOf H => (⟨x.1.1, hΓΛ x.2⟩ : latR F E k))
       ((continuous_subtype_val.comp continuous_subtype_val).subtype_mk _)
       (fun x y h => by
-        apply Subtype.ext; apply Subtype.ext
+        apply Subtype.ext
+        apply Subtype.ext
         exact congrArg (fun z : latR F E k => (z : GL (Fin k) (AF F ⊗[F] E))) h)
   · intro _ _ π DM hπ hDM
     rcases Nat.eq_zero_or_pos k with rfl | hk
@@ -72,9 +104,13 @@ theorem glOne_finvol : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
       haveI : CompactSpace H := inferInstance
       exact ((measure_mono (Set.subset_univ DM)).trans_lt (isCompact_univ.measure_lt_top)).ne
     obtain ⟨a, ha, hs⟩ := GlobalTheory.T.log_tensorIdeleAbs_det_expScalarCentre_eq_mul F E k hk
-    let s : GL (Fin k) (AF F ⊗[F] E) → ℝ := fun g => Real.log (absE F E (Matrix.GeneralLinearGroup.det g) : ℝ) / a
-    refine GlobalTheory.T.finiteCovolume_kernel_of_split_central_oneParam _ H Γ (latR F E k) s (cR F E k) ?_ ?_ (continuous_cR k) (cR_add k) (cR_comm k) ?_ ?_ hΓH rfl
-      inferInstance (fun ν D hν hD => GlobalTheory.T.finite_covolume_GL_adelicTensor_rationalTimesExpInt F E k ν D hν hD) π DM hπ hDM
+    let s : GL (Fin k) (AF F ⊗[F] E) → ℝ := fun g =>
+      Real.log (absE F E (Matrix.GeneralLinearGroup.det g) : ℝ) / a
+    refine GlobalTheory.T.finiteCovolume_kernel_of_split_central_oneParam _ H Γ (latR F E k) s
+      (cR F E k) ?_ ?_ (continuous_cR k) (cR_add k) (cR_comm k) ?_ ?_ hΓH rfl inferInstance
+      (fun ν D hν hD =>
+        GlobalTheory.T.finite_covolume_GL_adelicTensor_rationalTimesExpInt F E k ν D hν hD)
+      π DM hπ hDM
     · exact ((NNReal.continuous_coe.comp hcont).log fun g => (absE_pos _).ne').div_const _
     · intro g h
       simp only [s, map_mul, NNReal.coe_mul]

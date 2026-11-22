@@ -13,9 +13,12 @@ namespace GlobalTheory.DivPtLocal.Count
 
 variable {E : Type} [Field E] [NumberField E] (w : IsDedekindDomain.HeightOneSpectrum (𝓞 E))
 
-def red (N m n : ℕ) : ↥(locDiv w N m n) →+
-    (Fin m → Fin n → (w.adicCompletionIntegers E ⧸ Ideal.span {((N : ℕ) : w.adicCompletionIntegers E)})) where
-  toFun X i j := Ideal.Quotient.mk _ (⟨(N : w.adicCompletion E) * X.1 i j, X.2 i j⟩ : w.adicCompletionIntegers E)
+def red (N m n : ℕ)
+    : ↥(locDiv w N m n)
+      →+ (Fin m → Fin n
+        → (w.adicCompletionIntegers E ⧸ Ideal.span {((N : ℕ) : w.adicCompletionIntegers E)})) where
+  toFun X i j :=
+    Ideal.Quotient.mk _ (⟨(N : w.adicCompletion E) * X.1 i j, X.2 i j⟩ : w.adicCompletionIntegers E)
   map_zero' := by
     funext i j
     rw [Pi.zero_apply, Pi.zero_apply, ← map_zero (Ideal.Quotient.mk _)]
@@ -38,8 +41,11 @@ theorem red_surjective {N : ℕ} (hN : 0 < N) (m n : ℕ) : Function.Surjective 
   intro Y
   have hN' := natCast_ne_zero w hN
   choose Z hZ using fun i j => Ideal.Quotient.mk_surjective (Y i j)
-  have key : ∀ i j, (N : w.adicCompletion E) * ((N : w.adicCompletion E)⁻¹ * (Z i j : w.adicCompletion E))
-      = Z i j := fun i j => by rw [← mul_assoc, mul_inv_cancel₀ hN', one_mul]
+  have key
+      : ∀ i j,
+        (N : w.adicCompletion E) * ((N : w.adicCompletion E)⁻¹ * (Z i j : w.adicCompletion E))
+          = Z i j := fun i j => by
+    rw [← mul_assoc, mul_inv_cancel₀ hN', one_mul]
   refine ⟨⟨Matrix.of fun i j => (N : w.adicCompletion E)⁻¹ * (Z i j : w.adicCompletion E), ?_⟩, ?_⟩
   · intro i j
     rw [Matrix.of_apply, key]
@@ -51,8 +57,8 @@ theorem red_surjective {N : ℕ} (hN : 0 < N) (m n : ℕ) : Function.Surjective 
     apply Subtype.ext
     exact key i j
 
-theorem ker_red {N : ℕ} (hN : 0 < N) (m n : ℕ) :
-    (red w N m n).ker = (locInt w m n).addSubgroupOf (locDiv w N m n) := by
+theorem ker_red {N : ℕ} (hN : 0 < N) (m n : ℕ)
+    : (red w N m n).ker = (locInt w m n).addSubgroupOf (locDiv w N m n) := by
   have hN' := natCast_ne_zero w hN
   ext X
   rw [AddMonoidHom.mem_ker, AddSubgroup.mem_addSubgroupOf, mem_locInt]
@@ -71,12 +77,16 @@ theorem ker_red {N : ℕ} (hN : 0 < N) (m n : ℕ) :
     apply Subtype.ext
     simp
 
-theorem card_locQ (E : Type) [Field E] [NumberField E] (w : IsDedekindDomain.HeightOneSpectrum (𝓞 E))
-    (N m n : ℕ) (hN : 0 < N) :
-    Nat.card (GlobalTheory.DivPtLocal.LocQ w N m n) =
-      Nat.card (w.adicCompletionIntegers E ⧸ Ideal.span {((N : ℕ) : w.adicCompletionIntegers E)}) ^ (m * n) := by
-  have e := (QuotientAddGroup.quotientAddEquivOfEq (ker_red w hN m n).symm).trans
-    (QuotientAddGroup.quotientKerEquivOfSurjective (red w N m n) (red_surjective w hN m n))
+theorem card_locQ
+    (E : Type) [Field E] [NumberField E]
+    (w : IsDedekindDomain.HeightOneSpectrum (𝓞 E))
+    (N m n : ℕ) (hN : 0 < N)
+    : Nat.card (GlobalTheory.DivPtLocal.LocQ w N m n)
+      = Nat.card (w.adicCompletionIntegers E ⧸ Ideal.span {((N : ℕ) : w.adicCompletionIntegers E)})
+        ^ (m * n) := by
+  have e :=
+    (QuotientAddGroup.quotientAddEquivOfEq (ker_red w hN m n).symm).trans
+      (QuotientAddGroup.quotientKerEquivOfSurjective (red w N m n) (red_surjective w hN m n))
   rw [Nat.card_congr e.toEquiv, Nat.card_fun, Nat.card_fun, ← pow_mul]
   simp [mul_comm]
 

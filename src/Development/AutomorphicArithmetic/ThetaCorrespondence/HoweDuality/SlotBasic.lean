@@ -8,8 +8,13 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.HoweDuality.
 open scoped TensorProduct
 open UpperTheory.Lit.HoweDuality
 
-theorem UpperTheory.Lit.HoweDuality.slotFacts :
-    ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀] {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] (i : ι), (⨆ r : M₀ × (∀ j, M j), LinearMap.range (intersection_update_fsHerm_neg_one i r)) = ⊤ ∧ ∀ (g : Module.End ℂ (M i)) (r : M₀ × (∀ j, M j)) (x : M i), factorOp i g (intersection_update_fsHerm_neg_one i r x) = intersection_update_fsHerm_neg_one i r (g x) := by
+theorem UpperTheory.Lit.HoweDuality.slotFacts
+    : ∀ {ι : Type} [Fintype ι] [DecidableEq ι] {M₀ : Type} [AddCommGroup M₀] [Module ℂ M₀]
+        {M : ι → Type} [∀ i, AddCommGroup (M i)] [∀ i, Module ℂ (M i)] (i : ι),
+      (⨆ r : M₀ × (∀ j, M j), LinearMap.range (intersection_update_fsHerm_neg_one i r)) = ⊤
+        ∧ ∀ (g : Module.End ℂ (M i)) (r : M₀ × (∀ j, M j)) (x : M i),
+          factorOp i g (intersection_update_fsHerm_neg_one i r x)
+            = intersection_update_fsHerm_neg_one i r (g x) := by
   intro ι _ _ M₀ _ _ M _ _ i
   refine ⟨?_, ?_⟩
   · rw [Submodule.eq_top_iff']

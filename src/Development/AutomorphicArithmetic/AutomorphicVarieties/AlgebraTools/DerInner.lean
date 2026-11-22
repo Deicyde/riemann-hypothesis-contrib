@@ -6,12 +6,15 @@ public import Mathlib
 
 open Polynomial Matrix IsLocalRing TensorProduct
 
-theorem UpperTheory.V.AlgebraTools.der_inner :
-    ∀ {K E : Type} [CommRing K] [Ring E] [Algebra K E] {σ : Type} [Fintype σ] [DecidableEq σ] (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)] (j : (∀ s, Matrix (d s) (d s) K) →ₐ[K] E) (D : (∀ s, Matrix (d s) (d s) K) →ₗ[K] E), (∀ x y, D (x * y) = D x * j y + j x * D y) → ∃ Y : E, ∀ x, D x = Y * j x - j x * Y := by
+theorem UpperTheory.V.AlgebraTools.der_inner
+    : ∀ {K E : Type} [CommRing K] [Ring E] [Algebra K E] {σ : Type} [Fintype σ] [DecidableEq σ]
+        (d : σ → Type) [∀ s, Fintype (d s)] [∀ s, DecidableEq (d s)] [∀ s, Nonempty (d s)]
+        (j : (∀ s, Matrix (d s) (d s) K) →ₐ[K] E) (D : (∀ s, Matrix (d s) (d s) K) →ₗ[K] E),
+      (∀ x y, D (x * y) = D x * j y + j x * D y) → ∃ Y : E, ∀ x, D x = Y * j x - j x * Y := by
   intro K E _ _ _ σ _ _ d _ _ _ j D hD
   let i0 : ∀ s, d s := fun s => Classical.arbitrary (d s)
-  let u : ∀ s, d s → d s → (∀ s, Matrix (d s) (d s) K) :=
-    fun s p q => Pi.single s (Matrix.single p q (1 : K))
+  let u : ∀ s, d s → d s → (∀ s, Matrix (d s) (d s) K) := fun s p q =>
+    Pi.single s (Matrix.single p q (1 : K))
   have hsame : ∀ s (p q r w : d s), u s p q * u s r w = if q = r then u s p w else 0 := by
     intro s p q r w
     simp only [u, ← Pi.single_mul]
@@ -61,8 +64,9 @@ theorem UpperTheory.V.AlgebraTools.der_inner :
         rw [hne t s _ _ _ _ (Ne.symm hs), map_zero, zero_mul]
       · intro h
         exact absurd (Finset.mem_univ _) h
-    have hS1 : ∑ s, ∑ k, j (u s k (i0 s)) * D (u s (i0 s) k * u t p q)
-        = j (u t p (i0 t)) * D (u t (i0 t) q) := by
+    have hS1
+        : ∑ s, ∑ k, j (u s k (i0 s)) * D (u s (i0 s) k * u t p q)
+          = j (u t p (i0 t)) * D (u t (i0 t) q) := by
       rw [Finset.sum_eq_single t]
       · rw [Finset.sum_eq_single p]
         · rw [hsame, if_pos rfl]
@@ -80,8 +84,10 @@ theorem UpperTheory.V.AlgebraTools.der_inner :
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [← map_sum]
       rw [hone, map_one]
-    have e : a * j (u t p q) = ∑ s, ∑ k, (j (u s k (i0 s)) * D (u s (i0 s) k * u t p q)
-        - j (u s k (i0 s)) * j (u s (i0 s) k) * D (u t p q)) := by
+    have e
+        : a * j (u t p q)
+          = ∑ s, ∑ k, (j (u s k (i0 s)) * D (u s (i0 s) k * u t p q)
+            - j (u s k (i0 s)) * j (u s (i0 s) k) * D (u t p q)) := by
       simp only [a, Finset.sum_mul]
       refine Finset.sum_congr rfl fun s _ => Finset.sum_congr rfl fun k _ => ?_
       rw [hD]
@@ -90,8 +96,10 @@ theorem UpperTheory.V.AlgebraTools.der_inner :
     simp only [Finset.sum_sub_distrib, ← Finset.sum_mul, hS1, hS2, one_mul]
     abel
   refine ⟨-a, fun x => ?_⟩
-  have hlin : D = (LinearMap.mulRight K a).comp j.toLinearMap
-      - (LinearMap.mulLeft K a).comp j.toLinearMap := by
+  have hlin
+      : D
+        = (LinearMap.mulRight K a).comp j.toLinearMap
+          - (LinearMap.mulLeft K a).comp j.toLinearMap := by
     refine (Pi.basis fun s => Matrix.stdBasis K (d s) (d s)).ext fun ji => ?_
     obtain ⟨t, p, q⟩ := ji
     rw [Pi.basis_apply, Matrix.stdBasis_eq_single]
@@ -100,6 +108,7 @@ theorem UpperTheory.V.AlgebraTools.der_inner :
     exact key t p q
   have hx := LinearMap.congr_fun hlin x
   simp only [LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.mulRight_apply,
-    LinearMap.mulLeft_apply, AlgHom.toLinearMap_apply] at hx
+      LinearMap.mulLeft_apply, AlgHom.toLinearMap_apply]
+    at hx
   rw [hx]
   noncomm_ring

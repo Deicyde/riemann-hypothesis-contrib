@@ -11,14 +11,19 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.Ia
 @[expose] public section
 
 open scoped Classical ENNReal
-open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc GlobalTheory.Unfold
+open NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.HidaSetting Formalism.L2.SG.TermOp
+  Formalism.L2.SG.Full Formalism.L2.SG.RowsConc Formalism.L2.SG.NGData Formalism.L2.SG.TermLoc
+  GlobalTheory.Unfold
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.FlagBaseChange
 
-theorem isUnit_frFac {D : D7} {T : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T) (Z : LocDat D) (p : PlF D)
-    (A : LocNG.FrameD (locH Z p) D.R.rS) (hA : A.f = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a))
-    (b : Fin D.R.rS) : IsUnit (frFac Z.δ p b.castSucc) := by
+theorem isUnit_frFac
+    {D : D7} {T : D.host.E}
+    (G : LFlag (D.sp.Y 0) D.R.rS T) (Z : LocDat D) (p : PlF D) (A : LocNG.FrameD (locH Z p) D.R.rS)
+    (hA : A.f = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a)) (b : Fin D.R.rS)
+    : IsUnit (frFac Z.δ p b.castSucc) := by
   rcases A with ⟨f, es, T0, h1, h2, h3, h4, h5⟩
   dsimp only at hA
   subst hA
@@ -27,7 +32,13 @@ theorem isUnit_frFac {D : D7} {T : D.host.E} (G : LFlag (D.sp.Y 0) D.R.rS T) (Z 
   rw [if_pos rfl, (locH Z p).h_smul_left] at hb
   exact ⟨⟨_, _, hb, (mul_comm _ _).trans hb⟩, rfl⟩
 
-theorem span_bcP_Xa_eq_Fj : ∀ (D : D7) (T : D.host.E) (G : LFlag (D.sp.Y 0) D.R.rS T) (Z : LocDat D) (A : ∀ p : PlF D, LocNG.FrameD (locH Z p) D.R.rS), (∀ p, (A p).f = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a)) → ∀ (p : PlF D) (j : ℕ), Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (G.fl.Xa j : Set (VS D).V)) = (A p).Fj j := by
+theorem span_bcP_Xa_eq_Fj
+    : ∀ (D : D7) (T : D.host.E) (G : LFlag (D.sp.Y 0) D.R.rS T) (Z : LocDat D)
+        (A : ∀ p : PlF D, LocNG.FrameD (locH Z p) D.R.rS),
+      (∀ p, (A p).f = fun a => frFac Z.δ p a • baseChange₂ D p (frame G a))
+        → ∀ (p : PlF D) (j : ℕ),
+          Submodule.span (D.s.atP p).Ep (baseChange₂ D p '' (G.fl.Xa j : Set (VS D).V))
+            = (A p).Fj j := by
   intro D T G Z A hA p j
   unfold LocNG.FrameD.Fj LocNG.FrameD.e FlagG.Xa
   apply le_antisymm
@@ -38,8 +49,9 @@ theorem span_bcP_Xa_eq_Fj : ∀ (D : D7) (T : D.host.E) (G : LFlag (D.sp.Y 0) D.
     | mem y hy =>
       obtain ⟨i, hi, rfl⟩ := hy
       obtain ⟨u, hu⟩ := GlobalTheory.FlagBaseChange.isUnit_frFac G Z p (A p) (hA p) i
-      have hmem : (A p).f i.castSucc ∈
-          Submodule.span (D.s.atP p).Ep ((fun a : Fin D.R.rS => (A p).f a.castSucc) '' {a : Fin D.R.rS | (a : ℕ) < j}) :=
+      have hmem
+          : (A p).f i.castSucc ∈ Submodule.span (D.s.atP p).Ep
+            ((fun a : Fin D.R.rS => (A p).f a.castSucc) '' {a : Fin D.R.rS | (a : ℕ) < j}) :=
         Submodule.subset_span ⟨i, hi, rfl⟩
       have hf : (A p).f i.castSucc = frFac Z.δ p i.castSucc • baseChange₂ D p (G.fl.e i) := by
         rw [hA p]

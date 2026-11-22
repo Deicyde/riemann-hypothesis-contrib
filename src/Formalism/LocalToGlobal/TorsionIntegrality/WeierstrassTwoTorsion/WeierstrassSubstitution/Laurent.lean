@@ -14,24 +14,28 @@ namespace Formalism.L2.Th1.A
 
 variable {R : Type u} [CommRing R]
 
-theorem dL_coeff (f : LaurentSeries R) (n : ℤ) :
-    (dL f).coeff n = ((n + 1 : ℤ) : R) * f.coeff (n + 1) := by
+theorem dL_coeff (f : LaurentSeries R) (n : ℤ)
+    : (dL f).coeff n = ((n + 1 : ℤ) : R) * f.coeff (n + 1) := by
   show (LaurentSeries.hasseDeriv R 1 f).coeff n = _
   rw [LaurentSeries.hasseDeriv_coeff]
   simp [Ring.choose_one_right, zsmul_eq_mul]
 
-theorem uPow_mul_coeff (m n : ℤ) (f : LaurentSeries R) :
-    (uPow m * f).coeff n = f.coeff (n - m) := by
+theorem uPow_mul_coeff (m n : ℤ) (f : LaurentSeries R)
+    : (uPow m * f).coeff n = f.coeff (n - m) := by
   first
-    | (have h := HahnSeries.coeff_single_mul_add (r := (1 : R)) (x := f) (a := n - m) (b := m)
-       rw [sub_add_cancel, one_mul] at h
-       exact h)
-    | (have h := HahnSeries.single_mul_coeff_add (r := (1 : R)) (x := f) (a := n - m) (b := m)
-       rw [sub_add_cancel, one_mul] at h
-       exact h)
+  | (
+      have h := HahnSeries.coeff_single_mul_add (r := (1 : R)) (x := f) (a := n - m) (b := m)
+      rw [sub_add_cancel, one_mul] at h
+      exact h
+    )
+  | (
+      have h := HahnSeries.single_mul_coeff_add (r := (1 : R)) (x := f) (a := n - m) (b := m)
+      rw [sub_add_cancel, one_mul] at h
+      exact h
+    )
 
-theorem C_mul_coeff (r : R) (f : LaurentSeries R) (n : ℤ) :
-    (HahnSeries.C r * f).coeff n = r * f.coeff n := by
+theorem C_mul_coeff (r : R) (f : LaurentSeries R) (n : ℤ)
+    : (HahnSeries.C r * f).coeff n = r * f.coeff n := by
   rw [HahnSeries.C_mul_eq_smul]
   first | rw [HahnSeries.coeff_smul, smul_eq_mul] | rw [HahnSeries.smul_coeff, smul_eq_mul] | simp
 
@@ -40,12 +44,14 @@ theorem toL_coeff_nat (f : R⟦X⟧) (n : ℕ) : (toL f).coeff (n : ℤ) = coeff
 
 theorem toL_coeff_neg (f : R⟦X⟧) {n : ℤ} (hn : n < 0) : (toL f).coeff n = 0 := by
   first
-    | (rw [PowerSeries.coeff_coe, if_pos hn])
-    | (simp only [toL, HahnSeries.ofPowerSeries_apply]
-       rw [HahnSeries.embDomain_notin_range]
-       rintro ⟨k, hk⟩
-       simp at hk
-       omega)
+  | (rw [PowerSeries.coeff_coe, if_pos hn])
+  | (
+      simp only [toL, HahnSeries.ofPowerSeries_apply]
+      rw [HahnSeries.embDomain_notin_range]
+      rintro ⟨k, hk⟩
+      simp at hk
+      omega
+    )
 
 theorem uPow_zero : (uPow 0 : LaurentSeries R) = 1 := rfl
 
@@ -73,27 +79,27 @@ theorem uPow_natCast (n : ℕ) : (uPow (n : ℤ) : LaurentSeries R) = toL (X ^ n
   | succ k ih => rw [Nat.cast_succ, uPow_add, ih, uPow_one, ← map_mul, pow_succ]
 
 theorem toL_C (r : R) : toL (C r) = (HahnSeries.C r : LaurentSeries R) := by
-  first
-    | exact HahnSeries.ofPowerSeries_C r
-    | simp [toL]
+  first | exact HahnSeries.ofPowerSeries_C r | simp [toL]
 
 theorem toL_injective : Function.Injective (toL : R⟦X⟧ → LaurentSeries R) := by
   exact HahnSeries.ofPowerSeries_injective
 
-theorem exists_uPow_mul_toL (f : LaurentSeries R) :
-    ∃ (m : ℤ) (F : R⟦X⟧), f = uPow m * toL F := by
+theorem exists_uPow_mul_toL (f : LaurentSeries R) : ∃ (m : ℤ) (F : R⟦X⟧), f = uPow m * toL F := by
   refine ⟨f.order, f.powerSeriesPart, ?_⟩
   first
-    | exact (LaurentSeries.single_order_mul_powerSeriesPart f).symm
-    | (show f = uPow f.order * HahnSeries.ofPowerSeries ℤ R f.powerSeriesPart
-       rw [LaurentSeries.ofPowerSeries_powerSeriesPart]
-       change f = uPow f.order * (uPow (-f.order) * f)
-       rw [← mul_assoc, uPow_mul_neg, one_mul])
+  | exact (LaurentSeries.single_order_mul_powerSeriesPart f).symm
+  | (
+      show f = uPow f.order * HahnSeries.ofPowerSeries ℤ R f.powerSeriesPart
+      rw [LaurentSeries.ofPowerSeries_powerSeriesPart]
+      change f = uPow f.order * (uPow (-f.order) * f)
+      rw [← mul_assoc, uPow_mul_neg, one_mul]
+    )
 
-theorem dL_uPow_mul (m : ℤ) (f : LaurentSeries R) :
-    dL (uPow m * f) = uPow m * dL f + HahnSeries.C ((m : ℤ) : R) * uPow (m - 1) * f := by
+theorem dL_uPow_mul (m : ℤ) (f : LaurentSeries R)
+    : dL (uPow m * f) = uPow m * dL f + HahnSeries.C ((m : ℤ) : R) * uPow (m - 1) * f := by
   rw [show HahnSeries.C ((m : ℤ) : R) * uPow (m - 1) * f
-      = HahnSeries.C ((m : ℤ) : R) * (uPow (m - 1) * f) from mul_assoc _ _ _]
+      = HahnSeries.C ((m : ℤ) : R) * (uPow (m - 1) * f) from
+    mul_assoc _ _ _]
   ext n
   first | rw [HahnSeries.add_coeff] | rw [HahnSeries.coeff_add] | rw [HahnSeries.add_coeff']
   rw [dL_coeff, uPow_mul_coeff, uPow_mul_coeff, dL_coeff, C_mul_coeff, uPow_mul_coeff]
@@ -128,8 +134,9 @@ theorem dL_mul (f g : LaurentSeries R) : dL (f * g) = f * dL g + g * dL f := by
     rw [← uPow_add]; congr 1; ring
   have h2 : (uPow (m + k - 1) : LaurentSeries R) = uPow m * uPow (k - 1) := by
     rw [← uPow_add]; congr 1; ring
-  have h3 : (HahnSeries.C (((m + k : ℤ)) : R) : LaurentSeries R)
-      = HahnSeries.C ((m : ℤ) : R) + HahnSeries.C ((k : ℤ) : R) := by
+  have h3
+      : (HahnSeries.C (((m + k : ℤ)) : R) : LaurentSeries R)
+        = HahnSeries.C ((m : ℤ) : R) + HahnSeries.C ((k : ℤ) : R) := by
     rw [Int.cast_add, map_add (f := _)]
   rw [e, dL_uPow_mul, dL_toL, Derivation.leibniz]
   simp only [dL_uPow_mul, dL_toL, Derivation.leibniz, smul_eq_mul, map_add (f := _), map_mul]
@@ -138,8 +145,8 @@ theorem dL_mul (f g : LaurentSeries R) : dL (f * g) = f * dL g + g * dL f := by
     + (HahnSeries.C ((m : ℤ) : R) * toL F * toL G) * h1
     + (HahnSeries.C ((k : ℤ) : R) * toL F * toL G) * h2
 
-theorem dL_uPow (n : ℤ) :
-    dL (uPow n : LaurentSeries R) = HahnSeries.C ((n : ℤ) : R) * uPow (n - 1) := by
+theorem dL_uPow (n : ℤ)
+    : dL (uPow n : LaurentSeries R) = HahnSeries.C ((n : ℤ) : R) * uPow (n - 1) := by
   have h1 : dL (1 : LaurentSeries R) = 0 := by
     have h := dL_toL (R := R) 1
     rwa [map_one, Derivation.map_one_eq_zero, map_zero] at h
@@ -155,22 +162,27 @@ theorem dL_one : dL (1 : LaurentSeries R) = 0 := by
   have h := dL_C (R := R) 1
   rwa [map_one] at h
 
-def derivationOfLeibniz {k A M : Type*} [CommSemiring k] [CommSemiring A] [AddCommGroup M]
-    [Algebra k A] [Module A M] [Module k M] (D : A → M)
-    (hadd : ∀ a b, D (a + b) = D a + D b) (hsmul : ∀ (r : k) (a : A), D (r • a) = r • D a)
-    (hmul : ∀ a b, D (a * b) = a • D b + b • D a) : Derivation k A M :=
+def derivationOfLeibniz
+    {k A M : Type*}
+    [CommSemiring k] [CommSemiring A] [AddCommGroup M] [Algebra k A] [Module A M] [Module k M]
+    (D : A → M) (hadd : ∀ a b, D (a + b) = D a + D b)
+    (hsmul : ∀ (r : k) (a : A), D (r • a) = r • D a) (hmul : ∀ a b, D (a * b) = a • D b + b • D a)
+    : Derivation k A M :=
   Derivation.mk' { toFun := D, map_add' := hadd, map_smul' := hsmul } hmul
 
 def dLDR (R : Type u) [CommRing R] : Derivation R (LaurentSeries R) (LaurentSeries R) :=
-  derivationOfLeibniz (fun f => dL f) (fun a b => map_add dL a b)
+  derivationOfLeibniz
+    (fun f => dL f)
+    (fun a b => map_add dL a b)
     (fun r f => by
       rw [Algebra.smul_def, HahnSeries.algebraMap_apply', ← HahnSeries.C_mul_eq_smul]
       change dL (toL (C r) * f) = _
       rw [toL_C, dL_mul, dL_C, mul_zero, add_zero])
     (fun f g => by rw [smul_eq_mul, smul_eq_mul, dL_mul])
 
-theorem isDer_dL : (∀ a b : LaurentSeries R, dL (a + b) = dL a + dL b) ∧
-    (∀ a b : LaurentSeries R, dL (a * b) = a * dL b + b * dL a) := by
+theorem isDer_dL
+    : (∀ a b : LaurentSeries R, dL (a + b) = dL a + dL b)
+      ∧ (∀ a b : LaurentSeries R, dL (a * b) = a * dL b + b * dL a) := by
   exact ⟨fun a b => map_add dL a b, dL_mul⟩
 
 end Formalism.L2.Th1.A

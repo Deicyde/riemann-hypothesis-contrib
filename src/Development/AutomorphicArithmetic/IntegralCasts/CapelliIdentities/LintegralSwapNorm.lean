@@ -5,22 +5,20 @@ public import Mathlib
 @[expose] public section
 
 open MeasureTheory in
-theorem UpperTheory.Reformulated.B.Qf2.lintegral_swap_norm :
-    ∀ {X T : Type} [inst : Group X]
-    [inst_1 : TopologicalSpace X] [IsTopologicalGroup X] [LocallyCompactSpace X] [T2Space X] [SecondCountableTopology X]
-    [inst_6 : MeasurableSpace X] [BorelSpace X] [inst_8 : Group T] [inst_9 : TopologicalSpace T] [IsTopologicalGroup T]
-    [LocallyCompactSpace T] [T2Space T] [SecondCountableTopology T] [inst_14 : MeasurableSpace T] [BorelSpace T]
-    (μ : MeasureTheory.Measure X) [μ.IsHaarMeasure] (ν : MeasureTheory.Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant]
-    (i : T →* X),
-    Continuous (⇑i : T → X) →
-      ∀ {a b Ψ : X → ENNReal},
-        Measurable a →
-          Measurable b →
-            Measurable Ψ →
-              (∀ (t : T) (x : X), Ψ ((i : T → X) t * x) = Ψ x) →
-                (∀ (x : X), ∫⁻ (t : T), a ((i : T → X) t * x) ∂ν = (1 : ENNReal)) →
-                  (∀ (x : X), ∫⁻ (t : T), b ((i : T → X) t * x) ∂ν = (1 : ENNReal)) →
-                    ∫⁻ (x : X), Ψ x * a x ∂μ = ∫⁻ (x : X), Ψ x * b x ∂μ := by
+theorem UpperTheory.Reformulated.B.Qf2.lintegral_swap_norm
+    : ∀ {X T : Type} [inst : Group X] [inst_1 : TopologicalSpace X] [IsTopologicalGroup X]
+        [LocallyCompactSpace X] [T2Space X] [SecondCountableTopology X] [inst_6 : MeasurableSpace X]
+        [BorelSpace X] [inst_8 : Group T] [inst_9 : TopologicalSpace T] [IsTopologicalGroup T]
+        [LocallyCompactSpace T] [T2Space T] [SecondCountableTopology T]
+        [inst_14 : MeasurableSpace T] [BorelSpace T] (μ : MeasureTheory.Measure X) [μ.IsHaarMeasure]
+        (ν : MeasureTheory.Measure T) [ν.IsHaarMeasure] [ν.IsInvInvariant] (i : T →* X),
+      Continuous (⇑i : T → X)
+        → ∀ {a b Ψ : X → ENNReal},
+          Measurable a → Measurable b → Measurable Ψ
+            → (∀ (t : T) (x : X), Ψ ((i : T → X) t * x) = Ψ x)
+            → (∀ (x : X), ∫⁻ (t : T), a ((i : T → X) t * x) ∂ν = (1 : ENNReal))
+            → (∀ (x : X), ∫⁻ (t : T), b ((i : T → X) t * x) ∂ν = (1 : ENNReal))
+            → ∫⁻ (x : X), Ψ x * a x ∂μ = ∫⁻ (x : X), Ψ x * b x ∂μ := by
   intro X T _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ _ ν _ _ i hi a b Ψ ha hb hΨ hinv hA hB
   have him : Measurable (i : T → X) := hi.measurable
   have m1 : Measurable (fun p : X × T => i p.2 * p.1) :=
@@ -46,10 +44,11 @@ theorem UpperTheory.Reformulated.B.Qf2.lintegral_swap_norm :
     refine lintegral_congr fun x => ?_
     simp only [hinv, map_inv, inv_mul_cancel_left]
     ring
-  calc ∫⁻ x, Ψ x * a x ∂μ = ∫⁻ x, ∫⁻ t, Ψ x * a x * b (i t * x) ∂ν ∂μ :=
-        lintegral_congr fun x => (e1 x).symm
+  calc
+    ∫⁻ x, Ψ x * a x ∂μ
+      = ∫⁻ x, ∫⁻ t, Ψ x * a x * b (i t * x) ∂ν ∂μ := lintegral_congr fun x => (e1 x).symm
     _ = ∫⁻ t, ∫⁻ x, Ψ x * a x * b (i t * x) ∂μ ∂ν := lintegral_lintegral_swap f1.aemeasurable
     _ = ∫⁻ t, ∫⁻ x, Ψ x * b x * a (i t⁻¹ * x) ∂μ ∂ν := lintegral_congr e3
     _ = ∫⁻ x, ∫⁻ t, Ψ x * b x * a (i t⁻¹ * x) ∂ν ∂μ :=
-        (lintegral_lintegral_swap f2.aemeasurable).symm
+      (lintegral_lintegral_swap f2.aemeasurable).symm
     _ = ∫⁻ x, Ψ x * b x ∂μ := lintegral_congr e2

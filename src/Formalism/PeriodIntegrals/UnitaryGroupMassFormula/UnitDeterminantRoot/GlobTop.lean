@@ -50,23 +50,28 @@ lemma ne_bot_of_smul {F : IntermediateField ℚ ℂ} {S T : Submodule (𝓞 F) �
   exact mul_ne_zero hc hx0 h2
 
 theorem globalLUnit_of
-    (hV1 : ∀ (F : IntermediateField ℚ ℂ) (m : Type) [Fintype m] [DecidableEq m] (Λ Λ' : AddSubgroup (m → ℂ))
-      (c : ℂ), (∀ x ∈ Λ, c • x ∈ Λ') → span (𝓞 F) {c ^ Fintype.card m} * vol F Λ ≤ vol F Λ')
+    (hV1 : ∀ (F : IntermediateField ℚ ℂ) (m : Type) [Fintype m] [DecidableEq m]
+        (Λ Λ' : AddSubgroup (m → ℂ)) (c : ℂ),
+      (∀ x ∈ Λ, c • x ∈ Λ') → span (𝓞 F) {c ^ Fintype.card m} * vol F Λ ≤ vol F Λ')
     (hV2 : ∀ (F : IntermediateField ℚ ℂ) (m : Type) [Fintype m] [DecidableEq m]
-      (δ : (m → ℂ) ≃ₗ[ℂ] (m → ℂ)) (Λ : AddSubgroup (m → ℂ)),
-      vol F (UnitDetRootDefs.imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λ) =
-        span (𝓞 F) {LinearMap.det (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ))} * vol F Λ)
+        (δ : (m → ℂ) ≃ₗ[ℂ] (m → ℂ)) (Λ : AddSubgroup (m → ℂ)),
+      vol F (UnitDetRootDefs.imgLat (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ)) Λ)
+        = span (𝓞 F) {LinearMap.det (δ : (m → ℂ) →ₗ[ℂ] (m → ℂ))} * vol F Λ)
     (hV3 : ∀ (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0)
-      (m : Type) [Fintype m] [DecidableEq m], UnitDetRootDefs.CmOK a b c d →
-      vol (KF b d) (UnitDetRootDefs.stdLat (UnitDetRootDefs.cmL a b d ha hd lam hlam) m) ≤ span (𝓞 (KF b d)) {lam ^ Fintype.card m})
+        (m : Type) [Fintype m] [DecidableEq m],
+      UnitDetRootDefs.CmOK a b c d
+        → vol (KF b d) (UnitDetRootDefs.stdLat (UnitDetRootDefs.cmL a b d ha hd lam hlam) m)
+          ≤ span (𝓞 (KF b d)) {lam ^ Fintype.card m})
     (hV4 : ∀ (a : ℕ) (b c : ℤ) (d : ℕ) (ha : 0 < a) (hd : 0 < d) (lam : ℂ) (hlam : lam ≠ 0)
-      (m : Type) [Fintype m] [DecidableEq m], UnitDetRootDefs.CmOK a b c d →
-      vol (KF b d) (UnitDetRootDefs.stdLat (UnitDetRootDefs.cmL a b d ha hd lam hlam) m) ≠ ⊥) :
-    GlobalLUnit := by
+        (m : Type) [Fintype m] [DecidableEq m],
+      UnitDetRootDefs.CmOK a b c d
+        → vol (KF b d) (UnitDetRootDefs.stdLat (UnitDetRootDefs.cmL a b d ha hd lam hlam) m) ≠ ⊥)
+    : GlobalLUnit := by
   intro a b c d ha hd lam hlam m _ _ Λa hH
   obtain ⟨hok, -, -, hi1, hi2⟩ := hH
-  have : FiniteDimensional ℚ (KF b d) := IntermediateField.adjoin.finiteDimensional (theta_isIntegral hok)
-  have : NumberField (KF b d) := { }
+  have : FiniteDimensional ℚ (KF b d) :=
+    IntermediateField.adjoin.finiteDimensional (theta_isIntegral hok)
+  have : NumberField (KF b d) := {}
   set F := KF b d with hFdef
   set Lt := UnitDetRootDefs.stdLat (UnitDetRootDefs.cmL a b d ha hd lam hlam) m with hLt
   set N1 := UnitDetRootDefs.relIdx Lt Λa with hN1
@@ -84,15 +89,17 @@ theorem globalLUnit_of
   have hA0 : vol F Λa ≠ ⊥ := ne_bot_of_smul (pow_ne_zero _ hN20) hA2 hL0
   have hAle : vol F Λa ≤ span (𝓞 F) {lam ^ e / (N1 : ℂ) ^ e} := by
     intro x hx
-    obtain ⟨o, ho⟩ := mem_span_singleton.mp (hLle (hA1 (mul_mem_mul (mem_span_singleton_self _) hx)))
+    obtain ⟨o, ho⟩ :=
+      mem_span_singleton.mp (hLle (hA1 (mul_mem_mul (mem_span_singleton_self _) hx)))
     rw [mem_span_singleton]
     refine ⟨o, ?_⟩
     rw [Algebra.smul_def] at ho ⊢
     rw [mul_div_assoc', div_eq_iff (pow_ne_zero _ hN10)]
     linear_combination ho
   obtain ⟨y1, hy1, e1⟩ := sub_pow_principal F (vol F Lt) hL0 (lam ^ e) (pow_ne_zero _ hlam) hLle
-  obtain ⟨y2, hy2, e2⟩ := sub_pow_principal F (vol F Λa) hA0 (lam ^ e / (N1 : ℂ) ^ e)
-    (div_ne_zero (pow_ne_zero _ hlam) (pow_ne_zero _ hN10)) hAle
+  obtain ⟨y2, hy2, e2⟩ :=
+    sub_pow_principal F (vol F Λa) hA0 (lam ^ e / (N1 : ℂ) ^ e)
+      (div_ne_zero (pow_ne_zero _ hlam) (pow_ne_zero _ hN10)) hAle
   have hy1' : (y1 : ℂ) ≠ 0 := fun h0 => hy1 (Subtype.ext h0)
   have hy2' : (y2 : ℂ) ≠ 0 := fun h0 => hy2 (Subtype.ext h0)
   set α := (lam ^ e) ^ h * (y1 : ℂ) with hα
@@ -119,10 +126,10 @@ theorem globalLUnit_of
     hvi ▸ hV1 F m _ _ _ hk2
   have j1 := sub_pow_le F i1 h
   have j2 := sub_pow_le F i2 h
-  rw [mul_pow, mul_pow, span_single_pow, span_single_pow, e1, e2, span_single_mul,
-    span_single_mul] at j1
-  rw [mul_pow, mul_pow, span_single_pow, span_single_pow, e1, e2, span_single_mul,
-    span_single_mul] at j2
+  rw [mul_pow, mul_pow, span_single_pow, span_single_pow, e1, e2, span_single_mul, span_single_mul]
+    at j1
+  rw [mul_pow, mul_pow, span_single_pow, span_single_pow, e1, e2, span_single_mul, span_single_mul]
+    at j2
   have hkc : ((k : ℂ) ^ e) ^ h = ((k ^ (e * h) : ℕ) : ℂ) := by push_cast; rw [pow_mul]
   rw [hkc] at j1 j2
   have hl : ¬ l ∣ k ^ (e * h) := fun hd' => hk ((Fact.out : l.Prime).dvd_of_dvd_pow hd')

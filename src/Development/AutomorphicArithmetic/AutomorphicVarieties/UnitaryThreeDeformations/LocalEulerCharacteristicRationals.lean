@@ -5,12 +5,14 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg UpperTheory.V.UnitaryThreeInertia Module
+open Matrix IsLocalRing ReciprocityTheory.Gal UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Alg
+  UpperTheory.V.UnitaryThreeInertia Module
 
-private noncomputable def subquotEquiv {R R' X : Type*} [CommRing R] [CommRing R'] [AddCommGroup X]
-    [Module R X] [Module R' X] (Z B : Submodule R X) (Z' B' : Submodule R' X)
-    (hZ : ∀ x, x ∈ Z ↔ x ∈ Z') (hB : ∀ x, x ∈ B ↔ x ∈ B') :
-    (Z ⧸ B.comap Z.subtype) ≃ (Z' ⧸ B'.comap Z'.subtype) :=
+private noncomputable def subquotEquiv
+    {R R' X : Type*} [CommRing R] [CommRing R'] [AddCommGroup X] [Module R X] [Module R' X]
+    (Z B : Submodule R X) (Z' B' : Submodule R' X)
+    (hZ : ∀ x, x ∈ Z ↔ x ∈ Z') (hB : ∀ x, x ∈ B ↔ x ∈ B')
+    : (Z ⧸ B.comap Z.subtype) ≃ (Z' ⧸ B'.comap Z'.subtype) :=
   Quotient.congr (Equiv.subtypeEquivRight hZ) fun a b => by
     rw [Submodule.quotientRel_def, Submodule.quotientRel_def]
     exact hB _
@@ -18,14 +20,17 @@ private noncomputable def subquotEquiv {R R' X : Type*} [CommRing R] [CommRing R
 private theorem ef_eq_one (v : Pl) : v.asIdeal.ramificationIdx ℤ * v.asIdeal.inertiaDeg ℤ = 1 := by
   classical
   haveI : Fintype ((v.asIdeal.under ℤ).primesOver (NumberField.RingOfIntegers ℚ)) := Fintype.ofFinite _
-  have hsum := Ideal.sum_ramification_inertia_eq_finrank (v.asIdeal.under ℤ) (NumberField.RingOfIntegers ℚ)
+  have hsum :=
+    Ideal.sum_ramification_inertia_eq_finrank (v.asIdeal.under ℤ) (NumberField.RingOfIntegers ℚ)
   rw [NumberField.RingOfIntegers.rank, Module.finrank_self] at hsum
   have hmem : v.asIdeal ∈ (v.asIdeal.under ℤ).primesOver (NumberField.RingOfIntegers ℚ) :=
     ⟨inferInstance, ⟨rfl⟩⟩
-  have hle := Finset.single_le_sum
-    (f := fun q : (v.asIdeal.under ℤ).primesOver (NumberField.RingOfIntegers ℚ) =>
-      q.1.ramificationIdx ℤ * q.1.inertiaDeg ℤ) (fun _ _ => Nat.zero_le _)
-    (Finset.mem_univ (⟨v.asIdeal, hmem⟩ : (v.asIdeal.under ℤ).primesOver _))
+  have hle :=
+    Finset.single_le_sum
+      (f := fun q : (v.asIdeal.under ℤ).primesOver (NumberField.RingOfIntegers ℚ) =>
+        q.1.ramificationIdx ℤ * q.1.inertiaDeg ℤ)
+      (fun _ _ => Nat.zero_le _)
+      (Finset.mem_univ (⟨v.asIdeal, hmem⟩ : (v.asIdeal.under ℤ).primesOver _))
   have he := Ideal.ramificationIdx_pos (R := ℤ) v.asIdeal
   have hf := Ideal.inertiaDeg_pos v.asIdeal ℤ
   simp only at hle
@@ -33,22 +38,29 @@ private theorem ef_eq_one (v : Pl) : v.asIdeal.ramificationIdx ℤ * v.asIdeal.i
   have := Nat.mul_pos he hf
   omega
 
-theorem UpperTheory.local_euler_characteristic_rationals :
-    LocalFiniteness → LocalEulerChar → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (k M : Type) [Field k] [Finite k] [CharP k l] [AddCommGroup M] [Module k M] [Finite M] [TopologicalSpace M] [DiscreteTopology M] (A : ValuationSubring Ω) (v : Pl) (ρ : Representation k (Dec (F := ℚ) A) M),
-        Formalism.ConjugateSelfDual.IsPlaceOver A v → ContAction ρ →
-        Module.Finite k (H1 ρ) ∧ Module.Finite k (H2 ρ) ∧
-          (((l : ℕ) : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal → finrank k (H1 ρ) = finrank k (H0 ρ) + finrank k (H2 ρ) + finrank k M) ∧
-          (((l : ℕ) : NumberField.RingOfIntegers ℚ) ∉ v.asIdeal → finrank k (H1 ρ) = finrank k (H0 ρ) + finrank k (H2 ρ)) := by
+theorem UpperTheory.local_euler_characteristic_rationals
+    : LocalFiniteness → LocalEulerChar
+      → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime] (k M : Type)
+          [Field k] [Finite k] [CharP k l] [AddCommGroup M] [Module k M] [Finite M]
+          [TopologicalSpace M] [DiscreteTopology M] (A : ValuationSubring Ω) (v : Pl)
+          (ρ : Representation k (Dec (F := ℚ) A) M),
+        Formalism.ConjugateSelfDual.IsPlaceOver A v → ContAction ρ
+          → Module.Finite k (H1 ρ) ∧ Module.Finite k (H2 ρ)
+            ∧ (((l : ℕ) : NumberField.RingOfIntegers ℚ) ∈ v.asIdeal
+              → finrank k (H1 ρ) = finrank k (H0 ρ) + finrank k (H2 ρ) + finrank k M)
+            ∧ (((l : ℕ) : NumberField.RingOfIntegers ℚ) ∉ v.asIdeal
+              → finrank k (H1 ρ) = finrank k (H0 ρ) + finrank k (H2 ρ)) := by
   intro hFin hEC Ω _ _ _ l _ k M _ _ _ _ _ _ _ _ A v ρ hv hc
   classical
   haveI : CharP k (l ^ 1) := by rw [pow_one]; infer_instance
   let φ : ZMod (l ^ 1) →+* k := ZMod.castHom (dvd_refl _) k
   letI : Module (ZMod (l ^ 1)) M := Module.compHom M φ
   haveI : LinearMap.CompatibleSMul M M (ZMod (l ^ 1)) k := ⟨fun f c x => f.map_smul (φ c) x⟩
-  let ρ' : Representation (ZMod (l ^ 1)) (Dec (F := ℚ) A) M :=
-    { toFun := fun g => (ρ g).restrictScalars (ZMod (l ^ 1))
-      map_one' := by ext x; simp
-      map_mul' := fun g h => by ext x; simp }
+  let ρ' : Representation (ZMod (l ^ 1)) (Dec (F := ℚ) A) M := {
+    toFun := fun g => (ρ g).restrictScalars (ZMod (l ^ 1))
+    map_one' := by ext x; simp
+    map_mul' := fun g h => by ext x; simp
+  }
   have hc' : ContAction ρ' := hc
   have hF := hFin ℚ Ω l 1 M A ρ' v one_pos hv hc'
   have hE := hEC ℚ Ω l 1 M A ρ' v one_pos hv hc'

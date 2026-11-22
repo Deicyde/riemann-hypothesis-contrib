@@ -14,14 +14,18 @@ namespace Formalism.L2.G.Model.TS
 
 open Formalism.GradedWeylDivisibility
 
-theorem hw_dom {B : Type} [CommRing B] [IsDomain B] {r n : ℕ} (ν : Fin n → ℕ) (hnr : n ≤ r)
-    (f : MvPolynomial (Fin r × Fin n) B) (hf : f ∈ dualWeyl B r n ν) :
-    ∀ m ∈ f.support, ∀ k : ℕ,
-      (∑ a : Fin r with a.val < k, rowDeg m a) ≤ ∑ a : Fin r with a.val < k, rowNu (r := r) ν a := by
+theorem hw_dom
+    {B : Type} [CommRing B] [IsDomain B]
+    {r n : ℕ}
+    (ν : Fin n → ℕ) (hnr : n ≤ r) (f : MvPolynomial (Fin r × Fin n) B) (hf : f ∈ dualWeyl B r n ν)
+    : ∀ m ∈ f.support, ∀ k : ℕ,
+      (∑ a : Fin r with a.val < k, rowDeg m a)
+        ≤ ∑ a : Fin r with a.val < k, rowNu (r := r) ν a := by
   classical
   rw [standardMonomialSpanDomain B r n ν] at hf
-  have key : ∀ m ∈ f.support, ∀ k : ℕ,
-      (∑ a : Fin r with a.val < k, rowDeg m a) ≤ ∑ t : Fin n with t.val < k, ν t := by
+  have key
+      : ∀ m ∈ f.support, ∀ k : ℕ,
+        (∑ a : Fin r with a.val < k, rowDeg m a) ≤ ∑ t : Fin n with t.val < k, ν t := by
     induction hf using Submodule.span_induction with
     | mem x hx =>
       obtain ⟨K, sz, hsz, I, hshape, rfl⟩ := hx
@@ -44,10 +48,13 @@ theorem hw_dom {B : Type} [CommRing B] [IsDomain B] {r n : ℕ} (ν : Fin n → 
   rw [rowNu_partial_sum ν hnr k]
   exact key m hm k
 
-theorem hw_kill {B : Type} [CommRing B] [IsDomain B] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
-    (G : MvPolynomial (Fin r × Fin n) B) (hG : G ∈ dualWeyl B r n ν)
-    (hGh : IsWeightedHomogeneous (rowW r n) G (rowNu (r := r) ν))
-    (a b : Fin r) (hab : a < b) (k : ℕ) (hk : 1 ≤ k) : rowDiv B a b k G = 0 := by
+theorem hw_kill
+    {B : Type} [CommRing B] [IsDomain B]
+    {r n : ℕ}
+    (hn : n ≤ r) (ν : Fin n → ℕ) (G : MvPolynomial (Fin r × Fin n) B) (hG : G ∈ dualWeyl B r n ν)
+    (hGh : IsWeightedHomogeneous (rowW r n) G (rowNu (r := r) ν)) (a b : Fin r) (hab : a < b)
+    (k : ℕ) (hk : 1 ≤ k)
+    : rowDiv B a b k G = 0 := by
   classical
   have hGp : IsWeightedHomogeneous (lehwP a) G
       ((∑ a' : Fin r with a'.val < a.val + 1, rowNu (r := r) ν a' : ℕ) : ℤ) := by
@@ -57,21 +64,24 @@ theorem hw_kill {B : Type} [CommRing B] [IsDomain B] {r n : ℕ} (hn : n ≤ r) 
     congr 1
     refine Finset.sum_congr rfl fun a' _ => ?_
     rw [← lehw_weight_rowW, hm']
-  have hsh := lehw_rowDiv_shift B (lehwP a) 1 a b (highestWeightCount_self_eq_succ_of_lt hab) _ k G hGp
+  have hsh :=
+    lehw_rowDiv_shift B (lehwP a) 1 a b (highestWeightCount_self_eq_succ_of_lt hab) _ k G hGp
   have hmem := rowDivStable B r n ν a b k G hG
   by_contra hne
   obtain ⟨m, hm⟩ := ne_zero_iff.mp hne
   have h1 := hsh hm
   rw [lehw_weight_P] at h1
   have h2 := hw_dom ν hn _ hmem m (mem_support_iff.mpr hm) (a.val + 1)
-  have h3 : ((∑ a' : Fin r with a'.val < a.val + 1, rowDeg m a' : ℕ) : ℤ) ≤
-      ((∑ a' : Fin r with a'.val < a.val + 1, rowNu (r := r) ν a' : ℕ) : ℤ) := by exact_mod_cast h2
+  have h3
+      : ((∑ a' : Fin r with a'.val < a.val + 1, rowDeg m a' : ℕ) : ℤ)
+        ≤ ((∑ a' : Fin r with a'.val < a.val + 1, rowNu (r := r) ν a' : ℕ) : ℤ) := by
+    exact_mod_cast h2
   have hk' : (1 : ℤ) ≤ k := by exact_mod_cast hk
   rw [h1] at h3
   linarith
 
-theorem eval_idFrame_hw (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    eval (idFrame R r n) (hw R hn ν) = 1 := by
+theorem eval_idFrame_hw (R : Type) [CommRing R] {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : eval (idFrame R r n) (hw R hn ν) = 1 := by
   unfold hw
   rw [map_prod]
   refine Finset.prod_eq_one fun s _ => ?_
@@ -88,8 +98,8 @@ theorem fock_pairing_highest_weight_proof : FockPairingHighestWeight := by
   have hG : G ∈ dualWeyl K r n ν := dualWeylRowGraded K r n ν _ F hF
   have hGh : IsWeightedHomogeneous (rowW r n) G (rowNu (r := r) ν) :=
     weightedHomogeneousComponent_isWeightedHomogeneous _ _
-  obtain ⟨c, hc⟩ := hwLine K r n hn ν hν G hG
-    (fun a b hab k hk => hw_kill hn ν G hG hGh a b hab k hk)
+  obtain ⟨c, hc⟩ :=
+    hwLine K r n hn ν hν G hG (fun a b hab k hk => hw_kill hn ν G hG hGh a b hab k hk)
   have hHW := hwRowWeight K r n hn ν hν
   have h1 : fockR (hw K hn ν) F = fockR (hw K hn ν) G := by
     unfold fockR
@@ -117,12 +127,15 @@ theorem fock_pairing_highest_weight_proof : FockPairingHighestWeight := by
     intro h0
     rw [h0, zero_mul, hev1] at eH
     exact one_ne_zero eH
-  have hcoef : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν) = c * AddMonoidAlgebra.coeff (hw K hn ν) (lhwline_mnu hn ν) := by
-    have e : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν) = AddMonoidAlgebra.coeff G (lhwline_mnu hn ν) := by
+  have hcoef
+      : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν)
+        = c * AddMonoidAlgebra.coeff (hw K hn ν) (lhwline_mnu hn ν) := by
+    have e
+        : AddMonoidAlgebra.coeff F (lhwline_mnu hn ν)
+          = AddMonoidAlgebra.coeff G (lhwline_mnu hn ν) := by
       rw [hGdef, coeff_weightedHomogeneousComponent, if_pos (hHW (mem_support_iff.mp hDmem))]
     rw [e, hc, coeff_smul, smul_eq_mul]
-  have hevF : eval (idFrame K r n) F = c := by
-    rw [eF, hcoef, mul_assoc, ← eH, hev1, mul_one]
+  have hevF : eval (idFrame K r n) F = c := by rw [eF, hcoef, mul_assoc, ← eH, hev1, mul_one]
   rw [h1, h2, hevF]
 
 end Formalism.L2.G.Model.TS

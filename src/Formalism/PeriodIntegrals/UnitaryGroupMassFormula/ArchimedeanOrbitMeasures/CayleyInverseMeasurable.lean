@@ -40,19 +40,21 @@ theorem cayCand_mem (g : UpqT P Q) : cayCand P Q g ∈ lieU P Q := by
       exact hu.star
     show Xᴴ * J + J * X = 0
     have key : (G + 1)ᴴ * (Xᴴ * J + J * X) * (G + 1) = 0 := by
-      have e1 : (G + 1)ᴴ * (Xᴴ * J + J * X) * (G + 1) =
-          (X * (G + 1))ᴴ * J * (G + 1) + (G + 1)ᴴ * J * (X * (G + 1)) := by
+      have e1
+          : (G + 1)ᴴ * (Xᴴ * J + J * X) * (G + 1)
+            = (X * (G + 1))ᴴ * J * (G + 1) + (G + 1)ᴴ * J * (X * (G + 1)) := by
         rw [Matrix.conjTranspose_mul]
         noncomm_ring
       have hJ : Jᴴ = J := Jpq_conjTranspose P Q
       have h2 : ((1 : Mat) + 1)ᴴ = 1 + 1 := by simp
       rw [e1, hXG, Matrix.conjTranspose_mul, h2, Matrix.conjTranspose_sub, Matrix.conjTranspose_add,
         Matrix.conjTranspose_one]
-      have e2 : (Gᴴ - 1) * (1 + 1) * J * (G + 1) + (Gᴴ + 1) * J * ((1 + 1) * (G - 1)) =
-          (1 + 1) * ((1 + 1) * (Gᴴ * J * G - J)) := by noncomm_ring
+      have e2
+          : (Gᴴ - 1) * (1 + 1) * J * (G + 1) + (Gᴴ + 1) * J * ((1 + 1) * (G - 1))
+            = (1 + 1) * ((1 + 1) * (Gᴴ * J * G - J)) := by
+        noncomm_ring
       rw [e2, hU, sub_self, Matrix.mul_zero, Matrix.mul_zero]
-    have e3 : Xᴴ * J + J * X =
-        ((G + 1)ᴴ)⁻¹ * ((G + 1)ᴴ * (Xᴴ * J + J * X) * (G + 1)) * K := by
+    have e3 : Xᴴ * J + J * X = ((G + 1)ᴴ)⁻¹ * ((G + 1)ᴴ * (Xᴴ * J + J * X) * (G + 1)) * K := by
       rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hu', Matrix.one_mul,
         Matrix.mul_assoc, hGK, Matrix.mul_one]
     rw [e3, key, Matrix.mul_zero, Matrix.zero_mul]
@@ -73,15 +75,19 @@ theorem cayley_inverse_iff : CayInvIff := by
   set G := UpqT.mat g with hG
   set Y : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ := (X : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ)
   rw [two_eq] at h
-  have h4 : (G + 1) * ((2 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) - Y) =
-      (4 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) := by
+  have h4
+      : (G + 1) * ((2 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) - Y)
+        = (4 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) := by
     rw [add_mul, one_mul, h, show (4 : ℂ) = 2 + 2 by norm_num, add_smul]
     abel
-  have hB : (G + 1) * ((1 / 4 : ℂ) • ((2 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) - Y)) = 1 := by
+  have hB
+      : (G + 1) * ((1 / 4 : ℂ) • ((2 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) - Y))
+        = 1 := by
     rw [Matrix.mul_smul, h4, smul_smul]
     norm_num
   have hu : IsUnit (G + 1).det := Matrix.isUnit_det_of_right_inverse hB
-  have hGY : G * Y = (2 : ℂ) • G - ((2 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) + Y) := by
+  have hGY
+      : G * Y = (2 : ℂ) • G - ((2 : ℂ) • (1 : Matrix (Fin P ⊕ Fin Q) (Fin P ⊕ Fin Q) ℂ) + Y) := by
     rw [← h, Matrix.mul_sub, Matrix.mul_smul, Matrix.mul_one]
     abel
   have hXY : (G + 1) * Y = (2 : ℂ) • (G - 1) := by
@@ -107,8 +113,10 @@ theorem cayley_inverse_measurable : CayInvMeas := by
     have hd : Continuous fun g : O => (UpqT.mat (g : UpqT P Q) + 1).det :=
       hdet.comp continuous_subtype_val
     have hinv : Continuous fun g : O => (UpqT.mat (g : UpqT P Q) + 1)⁻¹ := by
-      have e : (fun g : O => (UpqT.mat (g : UpqT P Q) + 1)⁻¹) =
-          fun g : O => ((UpqT.mat (g : UpqT P Q) + 1).det)⁻¹ • (UpqT.mat (g : UpqT P Q) + 1).adjugate := by
+      have e
+          : (fun g : O => (UpqT.mat (g : UpqT P Q) + 1)⁻¹)
+            = fun g : O =>
+              ((UpqT.mat (g : UpqT P Q) + 1).det)⁻¹ • (UpqT.mat (g : UpqT P Q) + 1).adjugate := by
         funext g
         rw [Matrix.inv_def, Ring.inverse_eq_inv']
       rw [e]
@@ -127,7 +135,7 @@ theorem cayley_inverse_measurable : CayInvMeas := by
     by_cases hg : g ∈ O
     · exact Set.piecewise_eq_of_mem _ _ _ hg
     · rw [Set.piecewise_eq_of_notMem _ _ _ hg]
-      have hg' : ¬IsUnit (UpqT.mat g + 1).det := fun hu => hg hu.ne_zero
+      have hg' : ¬ IsUnit (UpqT.mat g + 1).det := fun hu => hg hu.ne_zero
       rw [cayInv_eq]
       apply Subtype.ext
       show 0 = (1 + 1) * (UpqT.mat g + 1)⁻¹ * (UpqT.mat g - 1)

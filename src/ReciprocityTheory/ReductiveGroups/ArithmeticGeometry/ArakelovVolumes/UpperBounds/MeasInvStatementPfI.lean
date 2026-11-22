@@ -10,7 +10,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.MI
 
-open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData ReciprocityTheory.ChartRestriction.G.AR.Inst
+open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.FD.FrameDegreeData
+  ReciprocityTheory.ChartRestriction.G.AR.Inst
 open scoped ComplexConjugate
 
 noncomputable section
@@ -21,7 +23,8 @@ variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data 
 
 def Jd : Matrix (Fin r) (Fin r) ℂ := diagonal fun a => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)
 
-def gramT (β : Matrix (Fin r) (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ := βᵀ * Jd X * β.map (starRingEnd ℂ)
+def gramT (β : Matrix (Fin r) (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ :=
+  βᵀ * Jd X * β.map (starRingEnd ℂ)
 
 def CmatSet : Set (Frame X.Ψ r) :=
   {β | ∀ τ a b, (b < a → β τ a b = 0) ∧ (a = b → 1 ≤ ‖β τ a b‖ ∧ ‖β τ a b‖ ≤ 2) ∧ (a < b → ‖β τ a b‖ ≤ 1)}
@@ -164,8 +167,9 @@ private lemma mem_dom_rmul {y b : Frame X.Ψ r} (hy : y ∈ X.dom) (hb : b ∈ B
     have h3 := hpos i
     nlinarith
 
-theorem Wf_rmul_UF {y : Frame X.Ψ r} (hy : y ∈ X.dom) {y' : UpI X.Ψ r → ℂ} (hy' : ∀ τ b, y' (dI τ b) ≠ 0) :
-    Wf X (rmul y (UF X y')) = (Cy X.Ψ r).indicator 1 (Lβ (β0 X y) y') := by
+theorem Wf_rmul_UF
+    {y : Frame X.Ψ r} (hy : y ∈ X.dom) {y' : UpI X.Ψ r → ℂ} (hy' : ∀ τ b, y' (dI τ b) ≠ 0)
+    : Wf X (rmul y (UF X y')) = (Cy X.Ψ r).indicator 1 (Lβ (β0 X y) y') := by
   have hb := UF_mem X hy'
   have hdom : rmul y (UF X y') ∈ X.dom := mem_dom_rmul X hy hb
   have hb' := hb
@@ -176,28 +180,39 @@ theorem Wf_rmul_UF {y : Frame X.Ψ r} (hy : y ∈ X.dom) {y' : UpI X.Ψ r → �
     constructor
     · rintro ⟨-, β, hβ, hg⟩
       have hU : ∀ τ, (mat (UF X y') τ).BlockTriangular id := fun τ a c h => (hb' τ).2 a c h
-      have hD : ∀ τ, ∃ D : Fin r → ℂ, (∀ a, ‖D a‖ = 1) ∧
-          mat β τ = diagonal D * (β0 X y τ * mat (UF X y') τ) := by
+      have hD
+          : ∀ τ, ∃ D : Fin r → ℂ,
+            (∀ a, ‖D a‖ = 1) ∧ mat β τ = diagonal D * (β0 X y τ * mat (UF X y') τ) := by
         intro τ
-        refine gram_upper_unique (ε := fun a => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)) (fun a => sgn_mul_self X.p0 a)
+        refine gram_upper_unique
+          (ε := fun a => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ))
+          (fun a => sgn_mul_self X.p0 a)
           ((hβu τ).mul (hU τ)) (CmatSet_upper X hβ τ) ?_ (CmatSet_det X hβ τ) ?_
         · rw [Matrix.det_mul]
           exact mul_ne_zero (β0_det X hy τ) (hb' τ).1
         · exact (hg τ).symm.trans (gram_rmul_eq X hy τ)
       choose D hD1 hD2 using hD
-      have e : (fun τ => (β0 X y τ * Umat y' τ : Matrix (Fin r) (Fin r) ℂ)) =
-          fun τ => (diagonal (fun a => conj (D τ a)) * mat β τ : Matrix (Fin r) (Fin r) ℂ) := by
+      have e
+          : (fun τ => (β0 X y τ * Umat y' τ : Matrix (Fin r) (Fin r) ℂ))
+            = fun τ => (diagonal (fun a => conj (D τ a)) * mat β τ : Matrix (Fin r) (Fin r) ℂ) := by
         funext τ
         have h1 : (fun a => conj (D τ a) * D τ a) = fun _ => (1 : ℂ) := by
           funext a
           rw [mul_comm, Complex.mul_conj, Complex.normSq_eq_norm_sq, hD1 τ a]
           norm_num
-        rw [hD2 τ, ← Matrix.mul_assoc, Matrix.diagonal_mul_diagonal, h1, Matrix.diagonal_one, Matrix.one_mul]
+        rw [hD2 τ, ← Matrix.mul_assoc, Matrix.diagonal_mul_diagonal, h1, Matrix.diagonal_one,
+          Matrix.one_mul]
         rfl
       rw [e]
-      exact CmatSet_diag_smul X (D := fun τ a => conj (D τ a)) hβ (fun τ a => by simpa using hD1 τ a)
+      exact
+        CmatSet_diag_smul X (D := fun τ a => conj (D τ a)) hβ (fun τ a => by simpa using hD1 τ a)
     · intro h
-      exact ⟨hdom, fun τ => (β0 X y τ * Umat y' τ : Matrix (Fin r) (Fin r) ℂ), h, fun τ => gram_rmul_eq X hy τ⟩
+      exact ⟨
+        hdom,
+        fun τ => (β0 X y τ * Umat y' τ : Matrix (Fin r) (Fin r) ℂ),
+        h,
+        fun τ => gram_rmul_eq X hy τ
+      ⟩
   unfold Wf
   by_cases h : Lβ (β0 X y) y' ∈ Cy X.Ψ r
   · have h2 := key.2 h
@@ -231,7 +246,8 @@ lemma rmul_invF {y b : Frame X.Ψ r} (hb : b ∈ Bor X.Ψ r) : rmul (rmul y b) (
   rw [Matrix.mul_assoc, Matrix.mul_nonsing_inv _ (isUnit_iff_ne_zero.2 hd), Matrix.mul_one]
   rfl
 
-theorem Wf_rmul_not_dom {y b : Frame X.Ψ r} (hy : y ∉ X.dom) (hb : b ∈ Bor X.Ψ r) : Wf X (rmul y b) = 0 := by
+theorem Wf_rmul_not_dom {y b : Frame X.Ψ r} (hy : y ∉ X.dom) (hb : b ∈ Bor X.Ψ r)
+    : Wf X (rmul y b) = 0 := by
   unfold Wf
   have h : rmul y b ∉ SW X := by
     rintro ⟨h1, -⟩

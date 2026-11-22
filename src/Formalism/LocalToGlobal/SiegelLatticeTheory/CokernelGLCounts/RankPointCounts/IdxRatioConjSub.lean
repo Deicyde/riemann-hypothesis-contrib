@@ -37,7 +37,8 @@ theorem cj_self {s : G} {X : Subgroup G} (hs : s ∈ X) : cj s X = X := by
   · intro h
     exact X.mul_mem (X.mul_mem hs h) (X.inv_mem hs)
 
-theorem relIndex_cj (s : G) (X Y : Subgroup G) : (cj s X).relIndex (cj s Y) = X.relIndex Y := Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj s⁻¹).injective
+theorem relIndex_cj (s : G) (X Y : Subgroup G) : (cj s X).relIndex (cj s Y) = X.relIndex Y :=
+  Subgroup.relIndex_map_map_of_injective _ _ (MulAut.conj s⁻¹).injective
 
 theorem idxRatio_self (A : Subgroup G) : IdxRatio A A = 1 := by
   simp [IdxRatio, Subgroup.relIndex_self]
@@ -55,8 +56,8 @@ theorem dcMap_surjective (hπ : ∀ a : A, π a = a) : Function.Surjective (dcMa
   obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective q
   exact ⟨a, by simp [dcMap, hπ]⟩
 
-theorem dcMap_eq_iff (k k' : K) :
-    dcMap A π H k = dcMap A π H k' ↔ ∃ n ∈ π.ker, ∃ h ∈ H, k' = n * k * h := by
+theorem dcMap_eq_iff (k k' : K)
+    : dcMap A π H k = dcMap A π H k' ↔ ∃ n ∈ π.ker, ∃ h ∈ H, k' = n * k * h := by
   unfold dcMap
   rw [QuotientGroup.eq, Subgroup.mem_map]
   constructor
@@ -70,9 +71,10 @@ theorem dcMap_eq_iff (k k' : K) :
     rw [map_mul, map_mul, hn, one_mul]
     group
 
-theorem card_dc (hπ : ∀ a : A, π a = a) :
-    Nat.card (Quotient (Setoid.ker (dcMap A π H))) = (H.map π).index := by
-  rw [Subgroup.index, Nat.card_congr (Setoid.quotientKerEquivOfSurjective _ (dcMap_surjective A π H hπ))]
+theorem card_dc (hπ : ∀ a : A, π a = a)
+    : Nat.card (Quotient (Setoid.ker (dcMap A π H))) = (H.map π).index := by
+  rw [Subgroup.index,
+    Nat.card_congr (Setoid.quotientKerEquivOfSurjective _ (dcMap_surjective A π H hπ))]
 
 end Dc
 

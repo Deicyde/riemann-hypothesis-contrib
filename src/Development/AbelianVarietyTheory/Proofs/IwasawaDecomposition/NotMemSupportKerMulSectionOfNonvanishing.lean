@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Twist
 @[expose] public section
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace Filter
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.QCoh GlobalTheory.CechPic GlobalTheory.Twist
 set_option autoImplicit false
 noncomputable section
@@ -22,8 +23,9 @@ open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 
 namespace GlobalTheory.KernelCut
 
-private theorem subsingleton_kernel_sections_of_app_injective {Y : Scheme.{0}} {M N : Y.Modules} (φ : M ⟶ N)
-    (V : Y.Opens) (hφ : ∀ t, φ.app V t = 0 → t = 0) : Subsingleton Γ(kernel φ, V) := by
+private theorem subsingleton_kernel_sections_of_app_injective
+    {Y : Scheme.{0}} {M N : Y.Modules} (φ : M ⟶ N) (V : Y.Opens) (hφ : ∀ t, φ.app V t = 0 → t = 0)
+    : Subsingleton Γ(kernel φ, V) := by
   have hmono : Mono ((kernel.ι φ).app V) := by
     have h1 : Mono ((Scheme.Modules.toPresheaf Y).map (kernel.ι φ)) := inferInstance
     exact (NatTrans.mono_iff_mono_app _).1 h1 (Opposite.op V)
@@ -38,8 +40,10 @@ private theorem subsingleton_kernel_sections_of_app_injective {Y : Scheme.{0}} {
     exact h2
   exact ⟨fun a b => by rw [key a, key b]⟩
 
-private theorem notMem_support_of_subsingleton_sections {Y : Scheme.{0}} (K : Y.Modules) {x : Y} (W : Y.Opens)
-    (hxW : x ∈ W) (h : ∀ V : Y.Opens, V ≤ W → Subsingleton Γ(K, V)) : x ∉ support K := by
+private theorem notMem_support_of_subsingleton_sections
+    {Y : Scheme.{0}} (K : Y.Modules)
+    {x : Y} (W : Y.Opens) (hxW : x ∈ W) (h : ∀ V : Y.Opens, V ≤ W → Subsingleton Γ(K, V))
+    : x ∉ support K := by
   unfold support
   simp only [Set.mem_ofPred_eq, not_nontrivial_iff_subsingleton]
   have key : ∀ c : K.presheaf.stalk x, c = 0 := by
@@ -50,7 +54,10 @@ private theorem notMem_support_of_subsingleton_sections {Y : Scheme.{0}} (K : Y.
     rw [Subsingleton.elim (K.presheaf.map (homOfLE (inf_le_left : U ⊓ W ≤ U)).op t) 0, map_zero]
   exact ⟨fun a b => by rw [key a, key b]⟩
 
-theorem notMem_support_kernel_cutHom : ∀ {Y : Scheme.{0}} {L : LB Y} (hL : L.IsLB) (s : L.Sec) (G : Y.Modules) [G.IsQuasicoherent], ∀ x ∈ Out.nonzeroLocus s, x ∉ support (kernel (cutHom G hL s)) := by
+theorem notMem_support_kernel_cutHom
+    : ∀ {Y : Scheme.{0}} {L : LB Y} (hL : L.IsLB) (s : L.Sec) (G : Y.Modules) [G.IsQuasicoherent],
+      ∀ x ∈ Out.nonzeroLocus s,
+        x ∉ support (kernel (cutHom G hL s)) := by
   intro Y L hL s G _ x hx
   have hx' : x ∈ ⨆ k, Y.basicOpen (s.f k) := by
     unfold Out.nonzeroLocus at hx
@@ -64,8 +71,8 @@ theorem notMem_support_kernel_cutHom : ∀ {Y : Scheme.{0}} {L : LB Y} (hL : L.I
   have hmb := isMulBy_cutHom G hL s
   obtain ⟨e, he⟩ := hmb k V hVU
   have hunit : IsUnit (resG Y hVU (s.f k)) := by
-    have h3 := isUnit_resG_zfun (zofSec s) k hVU
-      (by rw [nonzeroLocus_zofSec hL s]; exact hV.trans hle)
+    have h3 :=
+      isUnit_resG_zfun (zofSec s) k hVU (by rw [nonzeroLocus_zofSec hL s]; exact hV.trans hle)
     simpa using h3
   refine subsingleton_kernel_sections_of_app_injective _ V fun t ht => ?_
   rw [he] at ht

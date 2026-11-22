@@ -65,13 +65,17 @@ theorem th0Class_of (hb : SgStarBasic) (hq : SgStarQuasi) : ThetaZeroClass := by
   intro L t ω z hω ht
   have hs : sgStar L t ≠ 0 := fun h0 => ht (((hb L).2.2.1 t).1 h0)
   have hc : semiChar L ω ≠ 0 := by unfold semiChar; split_ifs <;> norm_num
-  have key : Complex.exp ((Real.pi : ℂ) * herm L (z + t) ω + (Real.pi : ℂ) * herm L ω ω / 2)
-        * Complex.exp (-(Real.pi : ℂ) * herm L z (t + ω))
-      = Complex.exp (-(Real.pi : ℂ) * herm L z t)
-        * Complex.exp ((Real.pi : ℂ) * herm L t ω + (Real.pi : ℂ) * herm L ω ω / 2) := by
-    rw [← Complex.exp_add, ← Complex.exp_add]; congr 1
-    rw [herm_add_left, herm_add_right]; ring
-  rw [thetaZero_periodLattice_eq L (t + ω) z, thetaZero_periodLattice_eq L t z, ← add_assoc, hq L ω (z + t) hω, hq L ω t hω,
+  have key
+      : Complex.exp ((Real.pi : ℂ) * herm L (z + t) ω + (Real.pi : ℂ) * herm L ω ω / 2)
+          * Complex.exp (-(Real.pi : ℂ) * herm L z (t + ω))
+        = Complex.exp (-(Real.pi : ℂ) * herm L z t)
+          * Complex.exp ((Real.pi : ℂ) * herm L t ω + (Real.pi : ℂ) * herm L ω ω / 2) := by
+    rw [← Complex.exp_add, ← Complex.exp_add]
+    congr 1
+    rw [herm_add_left, herm_add_right]
+    ring
+  rw [thetaZero_periodLattice_eq L (t + ω) z, thetaZero_periodLattice_eq L t z, ← add_assoc,
+    hq L ω (z + t) hω, hq L ω t hω,
     div_eq_div_iff (mul_ne_zero (mul_ne_zero hc (Complex.exp_ne_zero _)) hs) hs]
   linear_combination (semiChar L ω * sgStar L (z + t) * sgStar L t) * key
 
@@ -81,8 +85,7 @@ theorem th0Basic_of (hb : SgStarBasic) (hq : SgStarQuasi) (hi : AltEInt) : Theta
   have h2 : (t + t) / 2 = t := by ring
   rw [h2] at hn ⊢
   have hs : sgStar L t ≠ 0 := fun h0 => hn (((hb L).2.2.1 t).1 h0)
-  have hχ : semiChar L (t + t) = -1 := by
-    rw [semiChar, if_neg (by rw [h2]; exact hn)]
+  have hχ : semiChar L (t + t) = -1 := by rw [semiChar, if_neg (by rw [h2]; exact hn)]
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · have hd := (hb L).1
     show Differentiable ℂ (fun z => opU L t (sgStar L) z / opU L t (sgStar L) 0)
@@ -92,15 +95,19 @@ theorem th0Basic_of (hb : SgStarBasic) (hq : SgStarQuasi) (hi : AltEInt) : Theta
     exact div_self ((th0Const_of hb L t).2 hn)
   · intro z
     rw [thetaZero_periodLattice_eq L t (-z), thetaZero_periodLattice_eq L t z]
-    have h1 : sgStar L (-z + t) = -sgStar L (z - t) := by
+    have h1 : sgStar L (-z + t) = - sgStar L (z - t) := by
       rw [show -z + t = -(z - t) by ring]; exact (hb L).2.1 _
     have h3 := hq L (t + t) (z - t) hω
     rw [show z - t + (t + t) = z + t by ring, hχ] at h3
-    have key : Complex.exp (-(Real.pi : ℂ) * herm L (-z) t)
-        = Complex.exp ((Real.pi : ℂ) * herm L (z - t) (t + t) + (Real.pi : ℂ) * herm L (t + t) (t + t) / 2)
-          * Complex.exp (-(Real.pi : ℂ) * herm L z t) := by
-      rw [← Complex.exp_add]; congr 1
-      simp only [herm, map_add (f := _), map_neg, map_sub]; ring
+    have key
+        : Complex.exp (-(Real.pi : ℂ) * herm L (-z) t)
+          = Complex.exp
+              ((Real.pi : ℂ) * herm L (z - t) (t + t) + (Real.pi : ℂ) * herm L (t + t) (t + t) / 2)
+            * Complex.exp (-(Real.pi : ℂ) * herm L z t) := by
+      rw [← Complex.exp_add]
+      congr 1
+      simp only [herm, map_add (f := _), map_neg, map_sub]
+      ring
     rw [h1, h3]
     linear_combination (-sgStar L (z - t) / sgStar L t) * key
   · intro z
@@ -108,23 +115,28 @@ theorem th0Basic_of (hb : SgStarBasic) (hq : SgStarQuasi) (hi : AltEInt) : Theta
     simp [Complex.exp_ne_zero, hs]
   · intro ω hω' z
     obtain ⟨k, hk⟩ := hi L ω (t + t) hω' hω
-    have he : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE L ω (t + t) : ℂ))
-        = Complex.exp (-((Real.pi : ℂ) * Complex.I * (altE L ω (t + t) : ℂ))) := by
+    have he
+        : Complex.exp ((Real.pi : ℂ) * Complex.I * (altE L ω (t + t) : ℂ))
+          = Complex.exp (-((Real.pi : ℂ) * Complex.I * (altE L ω (t + t) : ℂ))) := by
       rw [hk]; push_cast; exact (exp_pi_int k).symm
     have hsw := herm_sub_swap L (t + t) ω
-    have key : Complex.exp ((Real.pi : ℂ) * herm L (z + t) ω + (Real.pi : ℂ) * herm L ω ω / 2)
-          * Complex.exp (-(Real.pi : ℂ) * herm L (z + ω) t)
-        = Complex.exp ((Real.pi : ℂ) * Complex.I * (altE L ω (t + t) : ℂ))
-          * Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2)
-          * Complex.exp (-(Real.pi : ℂ) * herm L z t) := by
-      rw [he]; simp only [← Complex.exp_add]; congr 1
+    have key
+        : Complex.exp ((Real.pi : ℂ) * herm L (z + t) ω + (Real.pi : ℂ) * herm L ω ω / 2)
+            * Complex.exp (-(Real.pi : ℂ) * herm L (z + ω) t)
+          = Complex.exp ((Real.pi : ℂ) * Complex.I * (altE L ω (t + t) : ℂ))
+            * Complex.exp ((Real.pi : ℂ) * herm L z ω + (Real.pi : ℂ) * herm L ω ω / 2)
+            * Complex.exp (-(Real.pi : ℂ) * herm L z t) := by
+      rw [he]
+      simp only [← Complex.exp_add]
+      congr 1
       simp only [herm, map_add (f := _)] at hsw ⊢
       linear_combination ((Real.pi : ℂ) / 2) * hsw
-    rw [thetaZero_periodLattice_eq L t (z + ω), thetaZero_periodLattice_eq L t z, show z + ω + t = (z + t) + ω by ring, hq L ω (z + t) hω']
+    rw [thetaZero_periodLattice_eq L t (z + ω), thetaZero_periodLattice_eq L t z,
+      show z + ω + t = (z + t) + ω by ring, hq L ω (z + t) hω']
     linear_combination (semiChar L ω * sgStar L (z + t) / sgStar L t) * key
 
-theorem th0LogDeriv_of (hl : SigmaLogDeriv) (he : EtaSplit) (hzq : ZetaQuasi)
-    (hzo : ZetaOdd) : ThetaZeroLogDerivative := by
+theorem th0LogDeriv_of (hl : SigmaLogDeriv) (he : EtaSplit) (hzq : ZetaQuasi) (hzo : ZetaOdd)
+    : ThetaZeroLogDerivative := by
   intro L ω₀ z hω hn hzt
   obtain ⟨t, rfl⟩ : ∃ t, ω₀ = t + t := ⟨ω₀ / 2, by ring⟩
   have h2 : (t + t) / 2 = t := by ring
@@ -138,27 +150,39 @@ theorem th0LogDeriv_of (hl : SigmaLogDeriv) (he : EtaSplit) (hzq : ZetaQuasi)
     have := (hl L (z + t) hzt).comp z ((hasDerivAt_id' z).add_const t)
     rw [mul_one] at this
     exact this
-  have hg : HasDerivAt (fun w : ℂ => -(s2 L) * (w + t) ^ 2 / 2
-        + (-(Real.pi : ℂ) * herm L w t - (Real.pi : ℂ) * herm L t t / 2))
+  have hg : HasDerivAt
+      (fun w : ℂ =>
+        -(s2 L) * (w + t) ^ 2 / 2 + (-(Real.pi : ℂ) * herm L w t - (Real.pi : ℂ) * herm L t t / 2))
       (-(s2 L) * (z + t) - (Real.pi : ℂ) * (conj t / (area L : ℂ))) z := by
-    have e1 := ((((hasDerivAt_id' z).add_const t).mul ((hasDerivAt_id' z).add_const t)).const_mul
-      (-(s2 L))).div_const 2
-    have e2 := (((hasDerivAt_id' z).mul_const (conj t / (area L : ℂ))).const_mul
-      (-(Real.pi : ℂ))).sub_const ((Real.pi : ℂ) * herm L t t / 2)
+    have e1 :=
+      ((((hasDerivAt_id' z).add_const t).mul ((hasDerivAt_id' z).add_const t)).const_mul
+        (-(s2 L))).div_const 2
+    have e2 :=
+      (((hasDerivAt_id' z).mul_const (conj t / (area L : ℂ))).const_mul (-(Real.pi : ℂ))).sub_const
+        ((Real.pi : ℂ) * herm L t t / 2)
     refine ((e1.add e2).congr_deriv (by ring)).congr_of_eventuallyEq
       (Filter.Eventually.of_forall fun w => ?_)
-    simp only [Pi.add_apply, Pi.mul_apply, herm]; ring
+    simp only [Pi.add_apply, Pi.mul_apply, herm]
+    ring
   have hfull := (hd1.mul hg.cexp).div_const (opU L t (sgStar L) 0)
-  have hfun : th0 L t = fun w => wSigma L (w + t) * Complex.exp (-(s2 L) * (w + t) ^ 2 / 2
-      + (-(Real.pi : ℂ) * herm L w t - (Real.pi : ℂ) * herm L t t / 2)) / opU L t (sgStar L) 0 := by
+  have hfun
+      : th0 L t
+        = fun w =>
+          wSigma L (w + t)
+            * Complex.exp
+              (-(s2 L) * (w + t) ^ 2 / 2
+                + (-(Real.pi : ℂ) * herm L w t - (Real.pi : ℂ) * herm L t t / 2))
+            / opU L t (sgStar L) 0 := by
     funext w
     simp only [th0]
     congr 1
     simp only [opU, sgStar]
-    rw [Complex.exp_add]; ring
+    rw [Complex.exp_add]
+    ring
   rw [hfun]
   refine hfull.congr_deriv ?_
   beta_reduce
-  rw [hζ]; ring
+  rw [hζ]
+  ring
 
 end Formalism.L2.Th1.F

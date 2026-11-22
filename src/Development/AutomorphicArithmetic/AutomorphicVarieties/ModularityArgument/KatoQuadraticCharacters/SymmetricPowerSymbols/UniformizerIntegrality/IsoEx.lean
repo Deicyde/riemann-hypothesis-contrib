@@ -7,15 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym UpperTheory.V.Z.Kato.Sym.PT
 
-theorem UpperTheory.V.Z.Kato.Sym.PT.isoEx :
-    UpperTheory.V.Z.Kato.Sym.PT.IsoEx := by
+theorem UpperTheory.V.Z.Kato.Sym.PT.isoEx : UpperTheory.V.Z.Kato.Sym.PT.IsoEx := by
   intro Ω _ _ _ ε X M
   let L := topL X M
-  let L' : IntermediateField Ω X.K :=
-    { L with algebraMap_mem' := fun c => algebraMap_mem_lev X _ c }
+  let L' : IntermediateField Ω X.K := {
+    L with
+    algebraMap_mem' := fun c => algebraMap_mem_lev X _ c
+  }
   let F : IntermediateField Ω X.K := IntermediateField.adjoin Ω {X.jK}
-  have hFL : F ≤ L' :=
-    IntermediateField.adjoin_simple_le_iff.mpr (jK_mem_lev X _)
+  have hFL : F ≤ L' := IntermediateField.adjoin_simple_le_iff.mpr (jK_mem_lev X _)
   have hle : F.toSubfield ≤ L := fun x hx => hFL hx
   letI : Algebra F L := (Subfield.inclusion hle).toAlgebra
   haveI : IsScalarTower F L X.K :=

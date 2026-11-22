@@ -5,13 +5,22 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Conti
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta GlobalTheory.Mem.Th MeasureTheory IsDedekindDomain NumberField Matrix
+  Formalism.IndefR.Datum
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.Mem.Isom
 
-theorem haar_fd_phi : ∀ (D : D7) (V V' : HSp D) (I : GlobalTheory.Mem.Isom.IsoMat V V') (S : HSp D) (μ : Measure (WO S V')) (𝓕 : Set (WO S V')), μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL V' S) 𝓕 μ → ∃ (ν : Measure (WO S V)) (𝓖 : Set (WO S V)), ν.IsAddHaarMeasure ∧ IsAddFundamentalDomain (ratL V S) 𝓖 ν ∧ ∀ u : WO S V → ENNReal, ∫⁻ w in 𝓕, u ((I.phi S).symm w) ∂μ = ∫⁻ w in 𝓖, u w ∂ν := by
+theorem haar_fd_phi
+    : ∀ (D : D7) (V V' : HSp D) (I : GlobalTheory.Mem.Isom.IsoMat V V') (S : HSp D)
+        (μ : Measure (WO S V')) (𝓕 : Set (WO S V')),
+      μ.IsAddHaarMeasure → IsAddFundamentalDomain (ratL V' S) 𝓕 μ
+        → ∃ (ν : Measure (WO S V)) (𝓖 : Set (WO S V)),
+          ν.IsAddHaarMeasure ∧ IsAddFundamentalDomain (ratL V S) 𝓖 ν
+            ∧ ∀ u : WO S V → ENNReal, ∫⁻ w in 𝓕, u ((I.phi S).symm w) ∂μ = ∫⁻ w in 𝓖, u w ∂ν := by
   intro D V V' I S μ 𝓕 hμ h𝓕
   haveI hB : BorelSpace (WO S V) := ⟨rfl⟩
   haveI hB' : BorelSpace (WO S V') := ⟨rfl⟩
@@ -32,14 +41,21 @@ theorem haar_fd_phi : ∀ (D : D7) (V V' : HSp D) (I : GlobalTheory.Mem.Isom.Iso
       have h2 : ratW V S z = x := hz
       rw [h2] at h1
       exact h1.symm
-  let m : WO S V ≃ᵐ WO S V' :=
-    { toEquiv := (I.phi S).toEquiv
-      measurable_toFun := hc.measurable
-      measurable_invFun := hcs.measurable }
+  let m : WO S V ≃ᵐ WO S V' := {
+    toEquiv := (I.phi S).toEquiv
+    measurable_toFun := hc.measurable
+    measurable_invFun := hcs.measurable
+  }
   have hmp : MeasurePreserving m (μ.map m.symm) μ :=
     (MeasurePreserving.symm m.symm ⟨m.symm.measurable, rfl⟩)
   have hmp' : MeasurePreserving (I.phi S) (μ.map (I.phi S).symm) μ := hmp
-  refine ⟨μ.map (I.phi S).symm, I.phi S ⁻¹' 𝓕, AddEquiv.isAddHaarMeasure_map μ (I.phi S).symm hcs (by simpa using hc), ?_, ?_⟩
+  refine ⟨
+    μ.map (I.phi S).symm,
+    I.phi S ⁻¹' 𝓕,
+    AddEquiv.isAddHaarMeasure_map μ (I.phi S).symm hcs (by simpa using hc),
+    ?_,
+    ?_
+  ⟩
   · let f : ratL V' S → ratL V S := fun y => ⟨(I.phi S).symm y, (hrat _).1 (by simpa using y.2)⟩
     have hf : Function.Bijective f := by
       constructor
@@ -51,7 +67,8 @@ theorem haar_fd_phi : ∀ (D : D7) (V V' : HSp D) (I : GlobalTheory.Mem.Isom.Iso
     intro y x
     simp [f, AddSubgroup.vadd_def]
   · intro u
-    have := hmp'.setLIntegral_comp_preimage_emb m.measurableEmbedding (fun b => u ((I.phi S).symm b)) 𝓕
+    have :=
+      hmp'.setLIntegral_comp_preimage_emb m.measurableEmbedding (fun b => u ((I.phi S).symm b)) 𝓕
     simpa using this.symm
 
 end GlobalTheory.Mem.Isom

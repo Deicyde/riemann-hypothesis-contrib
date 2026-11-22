@@ -8,13 +8,14 @@ namespace GroundTheory.Global
 
 open Matrix
 
-theorem exists_rat_intertwiner {ι J : Type*} [Fintype ι] [DecidableEq ι]
-    (A A' : J → Matrix ι ι ℚ) (P : Matrix ι ι ℝ) (hP : P.det ≠ 0)
-    (h : ∀ j, P * (A j).map (Rat.cast : ℚ → ℝ) = (A' j).map (Rat.cast : ℚ → ℝ) * P) :
-    ∃ Q : Matrix ι ι ℚ, Q.det ≠ 0 ∧ ∀ j, Q * A j = A' j * Q := by
-
-  obtain ⟨V, hV⟩ : ∃ V : Submodule ℚ ℝ,
-      V = Submodule.span ℚ (Set.range fun p : ι × ι => P p.1 p.2) := ⟨_, rfl⟩
+theorem exists_rat_intertwiner
+    {ι J : Type*} [Fintype ι] [DecidableEq ι]
+    (A A' : J → Matrix ι ι ℚ) (P : Matrix ι ι ℝ)
+    (hP : P.det ≠ 0) (h : ∀ j, P * (A j).map (Rat.cast : ℚ → ℝ) = (A' j).map (Rat.cast : ℚ → ℝ) * P)
+    : ∃ Q : Matrix ι ι ℚ, Q.det ≠ 0 ∧ ∀ j, Q * A j = A' j * Q := by
+  obtain ⟨V, hV⟩
+      : ∃ V : Submodule ℚ ℝ, V = Submodule.span ℚ (Set.range fun p : ι × ι => P p.1 p.2) :=
+    ⟨_, rfl⟩
   have : Module.Finite ℚ V := hV ▸ Module.Finite.span_of_finite ℚ (Set.finite_range _)
   obtain ⟨κ, _, ⟨c⟩⟩ : ∃ (κ : Type) (_ : Fintype κ), Nonempty (Module.Basis κ ℚ V) :=
     ⟨_, inferInstance, ⟨Module.Free.chooseBasis ℚ V⟩⟩
@@ -38,35 +39,46 @@ theorem exists_rat_intertwiner {ι J : Type*} [Fintype ι] [DecidableEq ι]
   have hB : ∀ k j, Bm k * A j = A' j * Bm k := by
     intro k j
     have hsum : ∑ k, (c k : ℝ) • (Bm k * A j - A' j * Bm k).map (Rat.cast : ℚ → ℝ) = 0 := by
-      have hmap : ∀ X Y : Matrix ι ι ℚ, (X * Y).map (Rat.cast : ℚ → ℝ) =
-          X.map (Rat.cast : ℚ → ℝ) * Y.map (Rat.cast : ℚ → ℝ) := fun X Y =>
-        Matrix.map_mul (f := Rat.castHom ℝ)
-      have hsub : ∀ X Y : Matrix ι ι ℚ, (X - Y).map (Rat.cast : ℚ → ℝ) =
-          X.map (Rat.cast : ℚ → ℝ) - Y.map (Rat.cast : ℚ → ℝ) := fun X Y => by
+      have hmap
+          : ∀ X Y : Matrix ι ι ℚ,
+            (X * Y).map (Rat.cast : ℚ → ℝ) = X.map (Rat.cast : ℚ → ℝ) * Y.map (Rat.cast : ℚ → ℝ) :=
+        fun X Y => Matrix.map_mul (f := Rat.castHom ℝ)
+      have hsub
+          : ∀ X Y : Matrix ι ι ℚ,
+            (X - Y).map (Rat.cast : ℚ → ℝ)
+              = X.map (Rat.cast : ℚ → ℝ) - Y.map (Rat.cast : ℚ → ℝ) := fun X Y => by
         ext; simp
-      have e1 : ∑ k, (c k : ℝ) • ((Bm k).map (Rat.cast : ℚ → ℝ) * (A j).map (Rat.cast : ℚ → ℝ)) =
-          P * (A j).map (Rat.cast : ℚ → ℝ) := by
+      have e1
+          : ∑ k, (c k : ℝ) • ((Bm k).map (Rat.cast : ℚ → ℝ) * (A j).map (Rat.cast : ℚ → ℝ))
+            = P * (A j).map (Rat.cast : ℚ → ℝ) := by
         rw [hP_eq, Finset.sum_mul]
         simp only [Matrix.smul_mul]
-      have e2 : ∑ k, (c k : ℝ) • ((A' j).map (Rat.cast : ℚ → ℝ) * (Bm k).map (Rat.cast : ℚ → ℝ)) =
-          (A' j).map (Rat.cast : ℚ → ℝ) * P := by
+      have e2
+          : ∑ k, (c k : ℝ) • ((A' j).map (Rat.cast : ℚ → ℝ) * (Bm k).map (Rat.cast : ℚ → ℝ))
+            = (A' j).map (Rat.cast : ℚ → ℝ) * P := by
         rw [hP_eq, Finset.mul_sum]
         simp only [Matrix.mul_smul]
       simp only [hsub, hmap, smul_sub, Finset.sum_sub_distrib, e1, e2, h j, sub_self]
     ext a b
     have hab := congrFun (congrFun hsum a) b
     simp only [Matrix.sum_apply, Matrix.smul_apply, Matrix.map_apply, smul_eq_mul,
-      Matrix.zero_apply] at hab
-    have := Fintype.linearIndependent_iff.1 hli (fun k => (Bm k * A j - A' j * Bm k) a b)
-      (by simpa only [hcast, mul_comm] using hab) k
+        Matrix.zero_apply]
+      at hab
+    have :=
+      Fintype.linearIndependent_iff.1 hli
+        (fun k => (Bm k * A j - A' j * Bm k) a b)
+        (by simpa only [hcast, mul_comm] using hab) k
     rwa [Matrix.sub_apply, sub_eq_zero] at this
 
   clear_value Bm
-  obtain ⟨Mx, hMx⟩ : ∃ Mx : Matrix ι ι (MvPolynomial κ ℚ),
-      Mx = Matrix.of fun a b => ∑ k, MvPolynomial.X k * MvPolynomial.C (Bm k a b) := ⟨_, rfl⟩
-  have hev : ∀ (t : κ → ℝ),
-      (MvPolynomial.aeval t : MvPolynomial κ ℚ →ₐ[ℚ] ℝ).mapMatrix Mx =
-        Matrix.of fun a b => ∑ k, t k * algebraMap ℚ ℝ (Bm k a b) := by
+  obtain ⟨Mx, hMx⟩
+      : ∃ Mx : Matrix ι ι (MvPolynomial κ ℚ),
+        Mx = Matrix.of fun a b => ∑ k, MvPolynomial.X k * MvPolynomial.C (Bm k a b) :=
+    ⟨_, rfl⟩
+  have hev
+      : ∀ (t : κ → ℝ),
+        (MvPolynomial.aeval t : MvPolynomial κ ℚ →ₐ[ℚ] ℝ).mapMatrix Mx
+          = Matrix.of fun a b => ∑ k, t k * algebraMap ℚ ℝ (Bm k a b) := by
     intro t
     ext a b
     rw [AlgHom.mapMatrix_apply, Matrix.map_apply, Matrix.of_apply]
@@ -94,12 +106,13 @@ theorem exists_rat_intertwiner {ι J : Type*} [Fintype ι] [DecidableEq ι]
       rw [Matrix.sum_apply, Matrix.of_apply]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Matrix.smul_apply, smul_eq_mul, Algebra.algebraMap_self, RingHom.id_apply]
-    have hevq : (MvPolynomial.eval q).mapMatrix Mx =
-        Matrix.of fun a b => ∑ k, q k * algebraMap ℚ ℚ (Bm k a b) := by
+    have hevq
+        : (MvPolynomial.eval q).mapMatrix Mx
+          = Matrix.of fun a b => ∑ k, q k * algebraMap ℚ ℚ (Bm k a b) := by
       ext a b
       set_option synthInstance.maxHeartbeats 100000 in
         rw [RingHom.mapMatrix_apply, Matrix.map_apply, hMx, Matrix.of_apply, Matrix.of_apply,
-        map_sum]
+          map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [map_mul, MvPolynomial.eval_X, MvPolynomial.eval_C, Algebra.algebraMap_self,
         RingHom.id_apply]

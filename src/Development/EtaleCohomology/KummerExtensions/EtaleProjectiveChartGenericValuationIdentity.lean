@@ -116,35 +116,47 @@ private lemma units_mul_relation_rearrange_commRing {R R' : Type*} [CommRing R] 
   subst h1 h2 h3
   rw [← map_pow, ← map_mul, h]
 
-theorem _root_.SchemeAppLEComposition.Cb.etale_projective_chart_generic_valuation_identity :
-    LateralTheory.EtaleTrace.Cov.ChartGenVal := by
+theorem _root_.SchemeAppLEComposition.Cb.etale_projective_chart_generic_valuation_identity
+    : LateralTheory.EtaleTrace.Cov.ChartGenVal := by
   intro k _ X _ p N w i hi U hx φ hφ hη n hn f hf m g hg h
   have hf' : f ∈ homogeneousSubmodule (Fin (N + 1)) k (n • 1) := by simpa using hf
   have hg' : g ∈ homogeneousSubmodule (Fin (N + 1)) k ((m * n) • 1) := by simpa using hg
-  have hall : ∀ z : U.toScheme, z ∈ LateralTheory.EtaleTrace.Cov.chartMor i U hx φ ⁻¹ᵁ
-      Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i) := by
+  have hall
+      : ∀ z : U.toScheme,
+        z ∈ LateralTheory.EtaleTrace.Cov.chartMor i U hx φ
+          ⁻¹ᵁ Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i) := by
     intro z
-    change Proj.awayι _ (MvPolynomial.X i) hx zero_lt_one _ ∈
-      Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i)
+    change Proj.awayι _ (MvPolynomial.X i) hx zero_lt_one _
+      ∈ Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i)
     rw [← Proj.opensRange_awayι _ _ hx zero_lt_one]
     exact ⟨_, rfl⟩
-  have hc : ∀ c, U.toScheme.presheaf.germ _ ⟨genericPoint X, hη⟩ (hall _)
-      ((LateralTheory.EtaleTrace.Cov.chartMor i U hx φ).app _ (Proj.awayToSection _ (MvPolynomial.X i) c)) =
-      (U.ι.stalkMap ⟨genericPoint X, hη⟩).hom (X.presheaf.germ U (U.ι ⟨genericPoint X, hη⟩) hη (φ c)) :=
-    fun c => (chart_germ _ hx zero_lt_one (U.topIso.inv.hom.comp φ) c _ (hall _)).trans (top_germ U _ _)
-  have hs : ∀ (W : (Proj (homogeneousSubmodule (Fin (N + 1)) k)).Opens) (hW : LateralTheory.EtaleTrace.Cov.chartMor i U hx φ ⟨genericPoint X, hη⟩ ∈ W) (s : Γ(Proj (homogeneousSubmodule (Fin (N + 1)) k), W)),
-      (LateralTheory.EtaleTrace.Cov.chartMor i U hx φ |>.stalkMap ⟨genericPoint X, hη⟩).hom ((Proj (homogeneousSubmodule (Fin (N + 1)) k)).presheaf.germ W _ hW s) =
-        U.toScheme.presheaf.germ (LateralTheory.EtaleTrace.Cov.chartMor i U hx φ ⁻¹ᵁ W) ⟨genericPoint X, hη⟩ hW
-          ((LateralTheory.EtaleTrace.Cov.chartMor i U hx φ).app W s) :=
+  have hc
+      : ∀ c,
+        U.toScheme.presheaf.germ _ ⟨genericPoint X, hη⟩ (hall _)
+            ((LateralTheory.EtaleTrace.Cov.chartMor i U hx φ).app _
+              (Proj.awayToSection _ (MvPolynomial.X i) c))
+          = (U.ι.stalkMap ⟨genericPoint X, hη⟩).hom
+            (X.presheaf.germ U (U.ι ⟨genericPoint X, hη⟩) hη (φ c)) := fun c =>
+    (chart_germ _ hx zero_lt_one (U.topIso.inv.hom.comp φ) c _ (hall _)).trans (top_germ U _ _)
+  have hs
+      : ∀ (W : (Proj (homogeneousSubmodule (Fin (N + 1)) k)).Opens)
+          (hW : LateralTheory.EtaleTrace.Cov.chartMor i U hx φ ⟨genericPoint X, hη⟩ ∈ W)
+          (s : Γ(Proj (homogeneousSubmodule (Fin (N + 1)) k), W)),
+        (LateralTheory.EtaleTrace.Cov.chartMor i U hx φ |>.stalkMap ⟨genericPoint X, hη⟩).hom
+            ((Proj (homogeneousSubmodule (Fin (N + 1)) k)).presheaf.germ W _ hW s)
+          = U.toScheme.presheaf.germ (LateralTheory.EtaleTrace.Cov.chartMor i U hx φ ⁻¹ᵁ W)
+            ⟨genericPoint X, hη⟩ hW ((LateralTheory.EtaleTrace.Cov.chartMor i U hx φ).app W s) :=
     fun W hW s => Scheme.Hom.germ_stalkMap_apply _ W _ hW s
   have hE := (alg_generic X _).symm.trans (hφ (genericPoint X) hη n f hf')
   have hB := (alg_generic X _).symm.trans (hφ (genericPoint X) hη (m * n) g hg')
   let J : X.functionField →+* U.toScheme.presheaf.stalk ⟨genericPoint X, hη⟩ :=
     (U.ι.stalkMap ⟨genericPoint X, hη⟩).hom
   refine alg_id J hi (n := n) (m := m) ?_
-  exact units_mul_relation_rearrange_commRing (LateralTheory.EtaleTrace.Cov.chartMor i U hx φ |>.stalkMap ⟨genericPoint X, hη⟩).hom
-    (proj_germ_id _ hx hf hf' hg hg' _ h (hall ⟨genericPoint X, hη⟩))
-    (hs _ h _) ((hs _ _ _).trans ((hc _).trans (congrArg J hE))) ((hs _ _ _).trans ((hc _).trans (congrArg J hB)))
+  exact units_mul_relation_rearrange_commRing
+    (LateralTheory.EtaleTrace.Cov.chartMor i U hx φ |>.stalkMap ⟨genericPoint X, hη⟩).hom
+    (proj_germ_id _ hx hf hf' hg hg' _ h (hall ⟨genericPoint X, hη⟩)) (hs _ h _)
+    ((hs _ _ _).trans ((hc _).trans (congrArg J hE)))
+    ((hs _ _ _).trans ((hc _).trans (congrArg J hB)))
 
 end SchemeAppLEComposition.Cb
 end

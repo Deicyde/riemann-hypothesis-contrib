@@ -16,11 +16,12 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.DegCnt.Unimod
 
-variable {K V : Type} [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-  [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+variable
+  {K V : Type}
+  [Field K] [NumberField K] [AddCommGroup V] [Module K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
 
-theorem exists_mul_mem {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤) (x : V) :
-    ∃ N : ℤ, N ≠ 0 ∧ N • x ∈ A := by
+theorem exists_mul_mem {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤) (x : V)
+    : ∃ N : ℤ, N ≠ 0 ∧ N • x ∈ A := by
   first
   | exact @_root_.GlobalTheory.IntMulIntegral.main
   | exact _root_.GlobalTheory.IntMulIntegral.main
@@ -29,18 +30,24 @@ theorem exists_mul_mem {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Se
   | (intros; apply @_root_.GlobalTheory.IntMulIntegral.main <;> first | assumption | infer_instance)
   | (intros; exact _root_.GlobalTheory.IntMulIntegral.main ..)
 
-theorem exists_mul_le {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤)
-    {B : Submodule (𝓞 K) V} (hB : B.FG) : ∃ N : ℤ, N ≠ 0 ∧ ∀ x ∈ B, N • x ∈ A := by
+theorem exists_mul_le
+    {A : Submodule (𝓞 K) V} (hA : Submodule.span K (A : Set V) = ⊤)
+    {B : Submodule (𝓞 K) V} (hB : B.FG)
+    : ∃ N : ℤ, N ≠ 0 ∧ ∀ x ∈ B, N • x ∈ A := by
   first
   | exact @_root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le
   | exact _root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le
   | (apply _root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le <;> assumption)
   | (intros; apply _root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply @_root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.IntegerMultipleIntegral.exists_int_smul_le ..)
 
-theorem finite_between {Λ : Submodule (𝓞 K) V} (hΛ : Λ.FG) {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0) :
-    {M : Submodule (𝓞 K) V | (∀ x ∈ Λ, a • x ∈ M) ∧ ∀ x ∈ M, b • x ∈ Λ}.Finite := by
+theorem finite_between {Λ : Submodule (𝓞 K) V} (hΛ : Λ.FG) {a b : ℤ} (ha : a ≠ 0) (hb : b ≠ 0)
+    : {M : Submodule (𝓞 K) V | (∀ x ∈ Λ, a • x ∈ M) ∧ ∀ x ∈ M, b • x ∈ Λ}.Finite := by
   haveI : Module.Finite (𝓞 K) Λ := Module.Finite.iff_fg.2 hΛ
   haveI : Module.Finite ℤ Λ := Module.Finite.trans (𝓞 K) Λ
   let P : Submodule ℤ Λ := LinearMap.range (LinearMap.lsmul ℤ Λ (b * a))
@@ -54,8 +61,9 @@ theorem finite_between {Λ : Submodule (𝓞 K) V} (hΛ : Λ.FG) {a b : ℤ} (ha
     exact (Submodule.Quotient.mk_eq_zero _).2 ⟨x, rfl⟩
   let f : Submodule (𝓞 K) V → Set (Λ ⧸ P) := fun M =>
     {q | ∃ x ∈ M, ∃ h : b • x ∈ Λ, P.mkQ ⟨b • x, h⟩ = q}
-  have key : ∀ M M' : Submodule (𝓞 K) V, (∀ x ∈ M, b • x ∈ Λ) → (∀ x ∈ Λ, a • x ∈ M') →
-      f M = f M' → M ≤ M' := by
+  have key
+      : ∀ M M' : Submodule (𝓞 K) V,
+        (∀ x ∈ M, b • x ∈ Λ) → (∀ x ∈ Λ, a • x ∈ M') → f M = f M' → M ≤ M' := by
     intro M M' hM hM' e x hx
     have : P.mkQ ⟨b • x, hM x hx⟩ ∈ f M' := e ▸ ⟨x, hx, hM x hx, rfl⟩
     obtain ⟨y, hy, hy', h⟩ := this
@@ -66,15 +74,15 @@ theorem finite_between {Λ : Submodule (𝓞 K) V} (hΛ : Λ.FG) {a b : ℤ} (ha
     have h3 := smul_right_injective V (by exact_mod_cast hb : (b : K) ≠ 0) h2
     have h4 : x = y - a • (z : V) := by
       have h3' : a • (z : V) = y - x := h3
-      rw [h3']; abel
+      rw [h3']
+      abel
     rw [h4]
     exact M'.sub_mem hy (hM' _ z.2)
   refine Set.Finite.of_finite_image (f := f) (Set.toFinite _) ?_
   intro M hM M' hM' e
   exact le_antisymm (key M M' hM.2 hM'.1 e) (key M' M hM'.2 hM.1 e.symm)
 
-theorem mem_smul_iff (g : V ≃ₗ[K] V) (Λ : Submodule (𝓞 K) V) (x : V) :
-    x ∈ g • Λ ↔ g⁻¹ x ∈ Λ := by
+theorem mem_smul_iff (g : V ≃ₗ[K] V) (Λ : Submodule (𝓞 K) V) (x : V) : x ∈ g • Λ ↔ g⁻¹ x ∈ Λ := by
   rw [Submodule.mem_smul_pointwise_iff_exists]
   constructor
   · rintro ⟨y, hy, rfl⟩
@@ -82,8 +90,8 @@ theorem mem_smul_iff (g : V ≃ₗ[K] V) (Λ : Submodule (𝓞 K) V) (x : V) :
   · intro h
     exact ⟨_, h, by simp⟩
 
-theorem isLattice_smul (g : V ≃ₗ[K] V) {Λ : Submodule (𝓞 K) V} (hΛ : Submodule.IsFullLattice K Λ) :
-    Submodule.IsFullLattice K (g • Λ) := by
+theorem isLattice_smul (g : V ≃ₗ[K] V) {Λ : Submodule (𝓞 K) V} (hΛ : Submodule.IsFullLattice K Λ)
+    : Submodule.IsFullLattice K (g • Λ) := by
   letI := hΛ
   refine { toIsLattice := ⟨hΛ.fg.map _, ?_⟩, span_eq_top := ?_ }
   · intro s hs hli
@@ -92,16 +100,19 @@ theorem isLattice_smul (g : V ≃ₗ[K] V) {Λ : Submodule (𝓞 K) V} (hΛ : Su
     change Submodule.span K ((g : V →ₗ[K] V) '' (Λ : Set V)) = ⊤
     rw [← Submodule.map_span, Submodule.IsFullLattice.span_eq_top, Submodule.map_top]
     exact LinearMap.range_eq_top.mpr g.surjective
-theorem relIndex_ne_zero (G : Subgroup (V ≃ₗ[K] V)) {Λ Λ' : Submodule (𝓞 K) V}
-    (hΛ : Submodule.IsFullLattice K Λ) (hΛ' : Submodule.IsFullLattice K Λ') :
-    (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ).relIndex
-      (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ') ≠ 0 := by
+theorem relIndex_ne_zero
+    (G : Subgroup (V ≃ₗ[K] V))
+    {Λ Λ' : Submodule (𝓞 K) V}
+    (hΛ : Submodule.IsFullLattice K Λ) (hΛ' : Submodule.IsFullLattice K Λ')
+    : (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ).relIndex (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ')
+      ≠ 0 := by
   letI := hΛ
   letI := hΛ'
   obtain ⟨a, ha, h₁⟩ := exists_mul_le (Submodule.IsFullLattice.span_eq_top (A := K) (M := Λ)) hΛ'.fg
   obtain ⟨b, hb, h₂⟩ := exists_mul_le (Submodule.IsFullLattice.span_eq_top (A := K) (M := Λ')) hΛ.fg
   set H := G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ' with hH
-  have e : (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ).relIndex H = (MulAction.stabilizer H Λ).index := by
+  have e
+      : (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ).relIndex H = (MulAction.stabilizer H Λ).index := by
     rw [Subgroup.relIndex]
     congr 1
     ext g
@@ -122,9 +133,10 @@ theorem relIndex_ne_zero (G : Subgroup (V ≃ₗ[K] V)) {Λ Λ' : Submodule (�
     rw [← hg', map_zsmul]
     exact h₂ _ hx'
 
-theorem exists_den {s : V ≃ₗ[K] V} {n : ℕ} (hs : ((s : V →ₗ[K] V) - 1) ^ n = 0)
-    {Λ : Submodule (𝓞 K) V} (hΛ : Submodule.IsFullLattice K Λ) :
-    ∃ N : ℤ, N ≠ 0 ∧ ∀ m : ℕ, ∀ x ∈ Λ, N • (s ^ m) x ∈ Λ := by
+theorem exists_den
+    {s : V ≃ₗ[K] V} {n : ℕ} (hs : ((s : V →ₗ[K] V) - 1) ^ n = 0)
+    {Λ : Submodule (𝓞 K) V} (hΛ : Submodule.IsFullLattice K Λ)
+    : ∃ N : ℤ, N ≠ 0 ∧ ∀ m : ℕ, ∀ x ∈ Λ, N • (s ^ m) x ∈ Λ := by
   let u : V →ₗ[K] V := (s : V →ₗ[K] V) - 1
   let B : Submodule (𝓞 K) V := ⨆ i : Fin (n + 1), Λ.map ((u ^ (i : ℕ)).restrictScalars (𝓞 K))
   have hB : B.FG := Submodule.fg_iSup _ fun i => hΛ.fg.map _
@@ -155,8 +167,9 @@ theorem exists_den {s : V ≃ₗ[K] V} {n : ℕ} (hs : ((s : V →ₗ[K] V) - 1)
   obtain ⟨N, hN, h⟩ := exists_mul_le (Submodule.IsFullLattice.span_eq_top (A := K) (M := Λ)) hB
   exact ⟨N, hN, fun m x hx => h _ (hp m x hx)⟩
 
-theorem inf_stab_smul {Γ X : Type} [Group Γ] [MulAction Γ X] (G : Subgroup Γ) {s : Γ} (hs : s ∈ G) (x : X) :
-    G ⊓ MulAction.stabilizer Γ (s • x) = MulAut.conj s • (G ⊓ MulAction.stabilizer Γ x) := by
+theorem inf_stab_smul
+    {Γ X : Type} [Group Γ] [MulAction Γ X] (G : Subgroup Γ) {s : Γ} (hs : s ∈ G) (x : X)
+    : G ⊓ MulAction.stabilizer Γ (s • x) = MulAut.conj s • (G ⊓ MulAction.stabilizer Γ x) := by
   ext g
   rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
   simp only [Subgroup.mem_inf, MulAction.mem_stabilizer_iff, MulAut.smul_def, MulAut.conj_inv_apply]
@@ -171,13 +184,28 @@ theorem inf_stab_smul {Γ X : Type} [Group Γ] [MulAction Γ X] (G : Subgroup Γ
     · rw [mul_smul, mul_smul, inv_smul_eq_iff] at h2
       exact h2
 
-theorem invVol_smul : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (G : Subgroup (V ≃ₗ[K] V)) (n : ℕ), (∀ s ∈ G, ((s : V →ₗ[K] V) - 1) ^ n = 0) → ∀ Λ Λ' : Submodule (𝓞 K) V, Submodule.IsFullLattice K Λ → Submodule.IsFullLattice K Λ' → (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ).relIndex (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ') ≠ 0 ∧ ∀ s ∈ G, GlobalTheory.HL.invVol (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ') (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) (s • Λ)) = GlobalTheory.HL.invVol (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ') (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ) := by
+theorem invVol_smul
+    : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+        [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (G : Subgroup (V ≃ₗ[K] V)) (n : ℕ),
+      (∀ s ∈ G, ((s : V →ₗ[K] V) - 1) ^ n = 0)
+        → ∀ Λ Λ' : Submodule (𝓞 K) V,
+          Submodule.IsFullLattice K Λ → Submodule.IsFullLattice K Λ'
+            → (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ).relIndex
+                  (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ')
+                ≠ 0
+              ∧ ∀ s ∈ G,
+                GlobalTheory.HL.invVol (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ')
+                    (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) (s • Λ))
+                  = GlobalTheory.HL.invVol (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ')
+                    (G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) Λ) := by
   intro K V _ _ _ _ _ _ _ G n hG Λ Λ' hΛ hΛ'
   refine ⟨relIndex_ne_zero G hΛ hΛ', fun s hs => ?_⟩
   let S : Submodule (𝓞 K) V → Subgroup (V ≃ₗ[K] V) := fun M =>
     G ⊓ MulAction.stabilizer (V ≃ₗ[K] V) M
-  have main : ∀ A B C : Submodule (𝓞 K) V, Submodule.IsFullLattice K A → Submodule.IsFullLattice K B →
-      Submodule.IsFullLattice K C → _ := fun A B C hA hB hC =>
+  have main
+      : ∀ A B C : Submodule (𝓞 K) V,
+        Submodule.IsFullLattice K A → Submodule.IsFullLattice K B → Submodule.IsFullLattice K C
+          → _ := fun A B C hA hB hC =>
     GlobalTheory.HL.invVol_mul_pos_le_conj (S A) (S B) (S C) (relIndex_ne_zero G hA hB)
       (relIndex_ne_zero G hB hA) (relIndex_ne_zero G hA hC) (relIndex_ne_zero G hC hA)
   set d : ℝ := GlobalTheory.HL.invVol (S Λ) (S (s • Λ)) with hd
@@ -198,8 +226,9 @@ theorem invVol_smul : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V
   obtain ⟨b, hb, h₂⟩ := exists_den (hG s hs) hΛ
   obtain ⟨a, ha, h₁⟩ := exists_den (hG s⁻¹ (G.inv_mem hs)) hΛ
   have hfin := finite_between hΛ.fg ha hb
-  have hmaps : ∀ m : ℕ, s ^ m • Λ ∈
-      {M : Submodule (𝓞 K) V | (∀ x ∈ Λ, a • x ∈ M) ∧ ∀ x ∈ M, b • x ∈ Λ} := by
+  have hmaps
+      : ∀ m : ℕ,
+        s ^ m • Λ ∈ {M : Submodule (𝓞 K) V | (∀ x ∈ Λ, a • x ∈ M) ∧ ∀ x ∈ M, b • x ∈ Λ} := by
     intro m
     refine ⟨fun x hx => ?_, fun x hx => ?_⟩
     · rw [mem_smul_iff, map_zsmul, ← inv_pow]

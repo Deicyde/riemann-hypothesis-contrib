@@ -14,7 +14,8 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 noncomputable section
 
 open NumberField IsDedekindDomain Matrix
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.Rg.Rs
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -34,8 +35,8 @@ theorem strSat : StrSat := by
     · simp at hsum
       omega
     · exact h
-  have hex : ∀ s : ℝ, ∃ χ : Formalism.L2.Host.HChar E, χ.IsAbsPow s :=
-    fun s => ⟨_, GlobalTheory.HeckeGal.Model.absPow_isAbsPow E s⟩
+  have hex : ∀ s : ℝ, ∃ χ : Formalism.L2.Host.HChar E, χ.IsAbsPow s := fun s =>
+    ⟨_, GlobalTheory.HeckeGal.Model.absPow_isAbsPow E s⟩
   choose χ0 hχ0 using hex
   classical
   let μ : ℝ → Formalism.L2.Host.HChar E := fun s =>
@@ -53,9 +54,13 @@ theorem strSat : StrSat := by
     rw [spehExp_injective d h.choose_spec]
   filter_upwards [GlobalTheory.SpehPair.eventually_spherical hV] with w hw
   have hsph := hw (σ w) (hloc w)
-  obtain ⟨T, hT⟩ := GlobalTheory.SatInd.exists_hasSatGL_of_isIrreducible (σ w).smooth (σ w).irred hsph
-  obtain ⟨τ, hτ, -⟩ := GlobalTheory.CuspRep.LocEx.exists_isLocComp PositivityTheory.Rg.HF.GL.automorphicFormsFiniteGL E a P w
-  have hS := PositivityTheory.Rg.Rs.ascSeed_holds2.2 E N a d V P hN hV hPu hPn hA w τ (σ w) hτ (hloc w)
+  obtain ⟨T, hT⟩ :=
+    GlobalTheory.SatInd.exists_hasSatGL_of_isIrreducible (σ w).smooth (σ w).irred hsph
+  obtain ⟨τ, hτ, -⟩ :=
+    GlobalTheory.CuspRep.LocEx.exists_isLocComp PositivityTheory.Rg.HF.GL.automorphicFormsFiniteGL E
+      a P w
+  have hS :=
+    PositivityTheory.Rg.Rs.ascSeed_holds2.2 E N a d V P hN hV hPu hPn hA w τ (σ w) hτ (hloc w)
   obtain ⟨B, hB, hBT⟩ := GlobalTheory.SpehPair.exists_sat_twist hd hτ hS hT μ hμ
   have hsum : ∑ k : Fin d, B k.rev = T := by
     rw [← hBT]

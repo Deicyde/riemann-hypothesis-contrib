@@ -7,7 +7,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR
 
-open MeasureTheory Filter Topology ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y
+open MeasureTheory Filter Topology ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y
 open scoped ENNReal
 
 noncomputable section

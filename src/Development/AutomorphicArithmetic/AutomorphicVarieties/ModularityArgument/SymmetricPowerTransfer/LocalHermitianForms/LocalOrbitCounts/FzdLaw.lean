@@ -6,17 +6,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc UpperTheory.V.Z.Sym.Glob
 
-private theorem isIntegral_entry_zero_zero_of_mem_kd {O K : Type} [CommRing O] [Field K] [Algebra O K] {Δ : K} {t : DX Δ}
-    (ht : t ∈ KD Δ O) :
-    IsIntegral O (((t : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) 0 0) := by
+private theorem isIntegral_entry_zero_zero_of_mem_kd
+    {O K : Type} [CommRing O] [Field K] [Algebra O K] {Δ : K} {t : DX Δ} (ht : t ∈ KD Δ O)
+    : IsIntegral O (((t : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) 0 0) := by
   rw [KD, Subgroup.mem_subgroupOf, MonoidHom.mem_range] at ht
   obtain ⟨N, hN⟩ := ht
   rw [← hN, Matrix.GeneralLinearGroup.map_apply]
   exact (N.1 0 0).2
 
-private theorem inv_mul_scal_entry_zero_zero_eq {K : Type} [Field K] {Δ : K} {z z' : Kˣ} {s s' : DX Δ}
-    (hs : IsScal z s) (hs' : IsScal z' s') :
-    (((s'⁻¹ * s : DX Δ) : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) 0 0
+private theorem inv_mul_scal_entry_zero_zero_eq
+    {K : Type} [Field K] {Δ : K} {z z' : Kˣ} {s s' : DX Δ} (hs : IsScal z s) (hs' : IsScal z' s')
+    : (((s'⁻¹ * s : DX Δ) : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) 0 0
       = algebraMap K (Lsq K Δ) ((z' : K)⁻¹ * z) := by
   have e : s = s' * (s'⁻¹ * s) := by group
   have hmat : Glob.mt s = Glob.mt s' * Glob.mt (s'⁻¹ * s) := by
@@ -46,7 +46,9 @@ theorem UpperTheory.V.Z.Sym.Loc.fzdLaw : UpperTheory.V.Z.Sym.Loc.FzdLaw := by
       refine ⟨z, Matrix.GeneralLinearGroup.ext fun i j => ?_⟩
       have h := congrFun (congrFun hs i) j
       rw [show (((s : DX Δ) : GL (Fin 2) (Lsq K Δ)) : Matrix (Fin 2) (Fin 2) (Lsq K Δ)) i j
-        = Glob.mt s i j from rfl, h]
+            = Glob.mt s i j from
+          rfl,
+        h]
       simp [Matrix.scalar_apply]
     have e : g = s * (s⁻¹ * g) := by group
     rw [e]
@@ -73,9 +75,11 @@ theorem UpperTheory.V.Z.Sym.Loc.fzdLaw : UpperTheory.V.Z.Sym.Loc.FzdLaw := by
     let f : K →ₐ[O] Lsq K Δ := IsScalarTower.toAlgHom O K (Lsq K Δ)
     have hf : Function.Injective f := (algebraMap K (Lsq K Δ)).injective
     rw [show algebraMap K (Lsq K Δ) ((z' : K)⁻¹ * z) = f ((z' : K)⁻¹ * z) from rfl,
-      isIntegral_algHom_iff f hf, IsIntegrallyClosed.isIntegral_iff (K := K)] at i1
+        isIntegral_algHom_iff f hf, IsIntegrallyClosed.isIntegral_iff (K := K)]
+      at i1
     rw [show algebraMap K (Lsq K Δ) ((z : K)⁻¹ * z') = f ((z : K)⁻¹ * z') from rfl,
-      isIntegral_algHom_iff f hf, IsIntegrallyClosed.isIntegral_iff (K := K)] at i2
+        isIntegral_algHom_iff f hf, IsIntegrallyClosed.isIntegral_iff (K := K)]
+      at i2
     obtain ⟨a, ha⟩ := i1
     obtain ⟨b, hb⟩ := i2
     have hab : a * b = 1 := by
@@ -83,7 +87,9 @@ theorem UpperTheory.V.Z.Sym.Loc.fzdLaw : UpperTheory.V.Z.Sym.Loc.FzdLaw := by
       rw [map_mul, ha, hb, map_one]
       field_simp
     have hu := hχ ⟨a, b, hab, by rw [mul_comm]; exact hab⟩
-    have hmap : (Units.map (algebraMap O K : O →* K)) ⟨a, b, hab, by rw [mul_comm]; exact hab⟩
-        = z'⁻¹ * z := Units.ext (by simp [ha])
+    have hmap
+        : (Units.map (algebraMap O K : O →* K)) ⟨a, b, hab, by rw [mul_comm]; exact hab⟩
+          = z'⁻¹ * z :=
+      Units.ext (by simp [ha])
     rw [hmap, map_mul, map_inv, inv_mul_eq_one] at hu
     rw [hu]

@@ -12,11 +12,11 @@ universe u
 
 variable {O : Type u} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] {ϖ : O}
 
-theorem adjoinRoot_unramified (hϖ : Irreducible ϖ) {f : O[X]} (hf : f.Monic)
-    (hirr : Irreducible (f.map (residue O))) :
-    ∃ (_ : IsDomain (AdjoinRoot f)) (_ : IsDiscreteValuationRing (AdjoinRoot f)),
-      Irreducible (algebraMap O (AdjoinRoot f) ϖ) ∧
-        Nat.card (ResidueField (AdjoinRoot f)) = Nat.card (ResidueField O) ^ f.natDegree := by
+theorem adjoinRoot_unramified
+    (hϖ : Irreducible ϖ) {f : O[X]} (hf : f.Monic) (hirr : Irreducible (f.map (residue O)))
+    : ∃ (_ : IsDomain (AdjoinRoot f)) (_ : IsDiscreteValuationRing (AdjoinRoot f)),
+      Irreducible (algebraMap O (AdjoinRoot f) ϖ)
+        ∧ Nat.card (ResidueField (AdjoinRoot f)) = Nat.card (ResidueField O) ^ f.natDegree := by
   classical
   have : Fact (Irreducible (f.map (residue O))) := ⟨hirr⟩
   have hfirr : Irreducible f := Monic.irreducible_of_irreducible_map (residue O) f hf hirr
@@ -32,10 +32,12 @@ theorem adjoinRoot_unramified (hϖ : Irreducible ϖ) {f : O[X]} (hf : f.Monic)
   have huniq : ∀ M : Ideal (AdjoinRoot f), M.IsMaximal → M = J := by
     intro M hM
     letI : M.IsMaximal := hM
-    have h1 := Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
-      (algebraMap O (AdjoinRoot f)) (by
-        intro x
-        exact IsIntegral.of_finite O x) M
+    have h1 :=
+      Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap O (AdjoinRoot f))
+        (by
+          intro x
+          exact IsIntegral.of_finite O x)
+        M
     have h2 : J ≤ M := by
       rw [Ideal.map_le_iff_le_comap, ← AdjoinRoot.algebraMap_eq, eq_maximalIdeal h1]
     exact (hJ.eq_of_le hM.ne_top h2).symm
@@ -43,8 +45,7 @@ theorem adjoinRoot_unramified (hϖ : Irreducible ϖ) {f : O[X]} (hf : f.Monic)
   have hmJ : maximalIdeal (AdjoinRoot f) = J := (eq_maximalIdeal hJ).symm
   have hm : maximalIdeal (AdjoinRoot f) = Ideal.span {algebraMap O (AdjoinRoot f) ϖ} := by
     rw [hmJ]
-    simp only [J, hϖ.maximalIdeal_eq, Ideal.map_span, Set.image_singleton,
-      AdjoinRoot.algebraMap_eq]
+    simp only [J, hϖ.maximalIdeal_eq, Ideal.map_span, Set.image_singleton, AdjoinRoot.algebraMap_eq]
   have hne : algebraMap O (AdjoinRoot f) ϖ ≠ 0 := by
     intro h
     exact hϖ.ne_zero (FaithfulSMul.algebraMap_injective O (AdjoinRoot f) (by simpa using h))

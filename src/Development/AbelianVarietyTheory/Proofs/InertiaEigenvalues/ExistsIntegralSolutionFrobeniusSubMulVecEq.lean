@@ -17,11 +17,12 @@ def backPoly {k : Type*} [Field k] (q n : ℕ) (c : ℕ → k) (j : ℕ) : k[X] 
 
 theorem backPoly_zero {k : Type*} [Field k] (q n : ℕ) (c : ℕ → k) : backPoly q n c 0 = X := rfl
 
-theorem backPoly_succ {k : Type*} [Field k] (q n : ℕ) (c : ℕ → k) (j : ℕ) :
-    backPoly q n c (j + 1) = backPoly q n c j ^ q - C (c (n - j)) * X := rfl
+theorem backPoly_succ {k : Type*} [Field k] (q n : ℕ) (c : ℕ → k) (j : ℕ)
+    : backPoly q n c (j + 1) = backPoly q n c j ^ q - C (c (n - j)) * X :=
+  rfl
 
-theorem backPoly_natDegree {k : Type*} [Field k] {q : ℕ} (hq : 2 ≤ q) (n : ℕ) (c : ℕ → k) :
-    ∀ j, 1 ≤ (backPoly q n c j).natDegree := by
+theorem backPoly_natDegree {k : Type*} [Field k] {q : ℕ} (hq : 2 ≤ q) (n : ℕ) (c : ℕ → k)
+    : ∀ j, 1 ≤ (backPoly q n c j).natDegree := by
   intro j
   induction j with
   | zero => simp [backPoly_zero]
@@ -29,15 +30,19 @@ theorem backPoly_natDegree {k : Type*} [Field k] {q : ℕ} (hq : 2 ≤ q) (n : �
     have h1 : (C (c (n - j)) * X : k[X]).natDegree ≤ 1 := by
       refine (natDegree_C_mul_le _ _).trans ?_
       simp
-    have h2 : 2 ≤ (backPoly q n c j ^ q).natDegree := by
-      rw [natDegree_pow]; nlinarith
+    have h2 : 2 ≤ (backPoly q n c j ^ q).natDegree := by rw [natDegree_pow]; nlinarith
     rw [backPoly_succ, natDegree_sub_eq_left_of_natDegree_lt (by omega)]
     omega
 
-theorem exists_sub_eq_inv {k : Type*} [Field k] [IsAlgClosed k] {V : Type*} [AddCommGroup V] [Module k V]
-    [FiniteDimensional k V] {q : ℕ} (hq : 2 ≤ q) (ψ : V →+ V)
-    (hψ : ∀ (c : k) (x : V), ψ (c ^ q • x) = c • ψ x) (z : V) : ∃ y, y - ψ y = z := by
-  obtain ⟨m, ⟨c, hrel⟩, -⟩ := GroundTheory.PAdicHodge.SemilinearResidue.exists_rel (k := k) (fun i => (⇑ψ)^[i] z)
+theorem exists_sub_eq_inv
+    {k : Type*} [Field k] [IsAlgClosed k]
+    {V : Type*} [AddCommGroup V] [Module k V] [FiniteDimensional k V]
+    {q : ℕ} (hq : 2 ≤ q)
+    (ψ : V →+ V) (hψ : ∀ (c : k) (x : V), ψ (c ^ q • x) = c • ψ x)
+    (z : V)
+    : ∃ y, y - ψ y = z := by
+  obtain ⟨m, ⟨c, hrel⟩, -⟩ :=
+    GroundTheory.PAdicHodge.SemilinearResidue.exists_rel (k := k) (fun i => (⇑ψ)^[i] z)
   cases m with
   | zero => exact ⟨0, by simpa using hrel.symm⟩
   | succ n =>
@@ -67,17 +72,23 @@ theorem exists_sub_eq_inv {k : Type*} [Field k] [IsAlgClosed k] {V : Type*} [Add
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp_rw [hψ, hit]
-    have hA : ∑ i ∈ range n, u (i + 1) ^ q • (⇑ψ)^[i + 1] z
-        = ∑ i ∈ range n, (u i + c (i + 1) * t) • (⇑ψ)^[i + 1] z :=
+    have hA
+        : ∑ i ∈ range n, u (i + 1) ^ q • (⇑ψ)^[i + 1] z
+          = ∑ i ∈ range n, (u i + c (i + 1) * t) • (⇑ψ)^[i + 1] z :=
       sum_congr rfl (fun i hi => by rw [hs i hi])
     rw [sum_range_succ (fun i => u i • (⇑ψ)^[i + 1] z), hn, hrel, smul_sum, sum_range_succ' _ n,
       sum_range_succ' (fun i => t • c i • (⇑ψ)^[i] z) n, hA, h0]
-    simp only [Function.iterate_zero, id, smul_smul, add_smul, sum_add_distrib, one_smul, mul_comm t]
+    simp only [Function.iterate_zero, id, smul_smul, add_smul, sum_add_distrib, one_smul,
+      mul_comm t]
     abel
 
-theorem exists_sol {F : Type*} [Field F] [IsAlgClosed F] (p : ℕ) [hp : Fact p.Prime] [CharP F p] {m : Type*}
-    [Fintype m] {e : ℕ} (he : 0 < e) (A : Matrix m m F) (b : m → F) :
-    ∃ x : m → F, ∀ i, x i ^ p ^ e - A.mulVec x i = b i := by
+theorem exists_sol
+    {F : Type*} [Field F] [IsAlgClosed F]
+    (p : ℕ) [hp : Fact p.Prime] [CharP F p]
+    {m : Type*} [Fintype m]
+    {e : ℕ} (he : 0 < e)
+    (A : Matrix m m F) (b : m → F)
+    : ∃ x : m → F, ∀ i, x i ^ p ^ e - A.mulVec x i = b i := by
   have : ExpChar F p := ExpChar.prime hp.out
   have hq : 2 ≤ p ^ e := GroundTheory.PAdicHodge.SemilinearResidue.two_le_pow he
   let r : F ≃+* F := (iterateFrobeniusEquiv F p e).symm
@@ -87,11 +98,14 @@ theorem exists_sol {F : Type*} [Field F] [IsAlgClosed F] (p : ℕ) [hp : Fact p.
   have hr' : ∀ a : F, r (a ^ p ^ e) = a := fun a => by
     rw [← iterateFrobeniusEquiv_def]
     exact (iterateFrobeniusEquiv F p e).symm_apply_apply a
-  let ψ : (m → F) →+ (m → F) := AddMonoidHom.mk' (fun y => A.mulVec (fun i => r (y i))) (fun y y' => by
-    rw [← Matrix.mulVec_add]
-    congr 1
-    funext i
-    simp)
+  let ψ : (m → F) →+ (m → F) :=
+    AddMonoidHom.mk'
+      (fun y => A.mulVec (fun i => r (y i)))
+      (fun y y' => by
+        rw [← Matrix.mulVec_add]
+        congr 1
+        funext i
+        simp)
   have hψ : ∀ (c : F) (x : m → F), ψ (c ^ p ^ e • x) = c • ψ x := by
     intro c x
     change A.mulVec _ = c • A.mulVec _
@@ -104,10 +118,14 @@ theorem exists_sol {F : Type*} [Field F] [IsAlgClosed F] (p : ℕ) [hp : Fact p.
   rw [hr, ← hy]
   rfl
 
-theorem lang_onto : ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [IsAlgClosed F] (p : ℕ)
-    [Fact p.Prime] [CharP F p] (m : Type) [Fintype m] [DecidableEq m] (e : ℕ), 0 < e → ∀ A : Matrix m m F,
-    (∀ i j, ‖A i j‖ ≤ 1) → ∀ b : m → F, Integral b →
-      ∃ x : m → F, Integral x ∧ ∀ i, x i ^ p ^ e - A.mulVec x i = b i := by
+theorem lang_onto
+    : ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [IsAlgClosed F] (p : ℕ)
+        [Fact p.Prime] [CharP F p] (m : Type) [Fintype m] [DecidableEq m] (e : ℕ),
+      0 < e
+        → ∀ A : Matrix m m F,
+          (∀ i j, ‖A i j‖ ≤ 1)
+            → ∀ b : m → F,
+              Integral b → ∃ x : m → F, Integral x ∧ ∀ i, x i ^ p ^ e - A.mulVec x i = b i := by
   intro F _ _ _ p _ _ m _ _ e he A hA b hb
   obtain ⟨x, hx⟩ := exists_sol p he A b
   refine ⟨x, ?_, hx⟩
@@ -121,7 +139,9 @@ theorem lang_onto : ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDis
     simp only [Matrix.mulVec, dotProduct]
     refine IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (norm_nonneg _) (fun j _ => ?_)
     rw [norm_mul]
-    calc ‖A i j‖ * ‖x j‖ ≤ 1 * ‖x j‖ := mul_le_mul_of_nonneg_right (hA i j) (norm_nonneg _)
+    calc
+      ‖A i j‖ * ‖x j‖
+        ≤ 1 * ‖x j‖ := mul_le_mul_of_nonneg_right (hA i j) (norm_nonneg _)
       _ ≤ ‖x i‖ := by rw [one_mul]; exact hi j (mem_univ _)
   have h2 : x i ^ p ^ e = b i + A.mulVec x i := by rw [← hx i]; ring
   have h3 : ‖x i‖ ^ p ^ e ≤ ‖x i‖ := by

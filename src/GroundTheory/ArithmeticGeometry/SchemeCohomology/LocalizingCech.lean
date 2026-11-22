@@ -16,24 +16,29 @@ universe u
 
 variable {X : TopCat.{u}} {P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}} {R : Type u} [CommRing R]
 
-
 variable (P) in
 structure LocalizingAction (D : R → Opens X) where
-
   act : R → ∀ W : Opens X, P.obj (op W) →+ P.obj (op W)
-  res_act : ∀ (r : R) {V W : Opens X} (h : V ≤ W) (x : P.obj (op W)),
-    res P h (act r W x) = act r V (res P h x)
+  res_act
+    : ∀ (r : R) {V W : Opens X} (h : V ≤ W) (x : P.obj (op W)),
+      res P h (act r W x) = act r V (res P h x)
   act_mul : ∀ (a b : R) (W : Opens X) (x : P.obj (op W)), act (a * b) W x = act a W (act b W x)
   act_add : ∀ (a b : R) (W : Opens X) (x : P.obj (op W)), act (a + b) W x = act a W x + act b W x
   act_one : ∀ (W : Opens X) (x : P.obj (op W)), act 1 W x = x
   bijective : ∀ (g : R) (W : Opens X), W ≤ D g → Function.Bijective (act g W)
-  kill : ∀ (s t : R) {W W' : Opens X}, W = D s → W' = D (s * t) → ∀ (h : W' ≤ W)
-    (x : P.obj (op W)), res P h x = 0 → ∃ N : ℕ, act (t ^ N) W x = 0
-  lift : ∀ (s t : R) {W W' : Opens X}, W = D s → W' = D (s * t) → ∀ (h : W' ≤ W)
-    (y : P.obj (op W')), ∃ (N : ℕ) (x : P.obj (op W)), res P h x = act (t ^ N) W' y
+  kill
+    : ∀ (s t : R) {W W' : Opens X},
+      W = D s → W' = D (s * t)
+        → ∀ (h : W' ≤ W) (x : P.obj (op W)), res P h x = 0 → ∃ N : ℕ, act (t ^ N) W x = 0
+  lift
+    : ∀ (s t : R) {W W' : Opens X},
+      W = D s → W' = D (s * t)
+        → ∀ (h : W' ≤ W) (y : P.obj (op W')), ∃ (N : ℕ) (x : P.obj (op W)),
+          res P h x = act (t ^ N) W' y
   D_mul : ∀ s t : R, D (s * t) = D s ⊓ D t
-  cover : ∀ (g : R) {ι : Type u} [Fintype ι] (h : ι → R) (N : ℕ), D g ≤ ⨆ i, D (h i) →
-    ∃ (L : ℕ) (c : ι → R), g ^ L = ∑ i, c i * h i ^ N
+  cover
+    : ∀ (g : R) {ι : Type u} [Fintype ι] (h : ι → R) (N : ℕ),
+      D g ≤ ⨆ i, D (h i) → ∃ (L : ℕ) (c : ι → R), g ^ L = ∑ i, c i * h i ^ N
 
 variable {D : R → Opens X} (A : LocalizingAction P D)
 
@@ -116,13 +121,15 @@ lemma inter_cons_eq {m : ℕ} (j : ι) (I : Fin (m + 1) → ι) :
   rw [inter_eq_prod A h, Fin.prod_univ_succ, mul_comm]
   simp
 
-theorem exists_d_eq_pow_smul [Fintype ι] {n : ℕ} (σ : Cochain P (D ∘ h) (n + 1))
-    (hσ : d P (D ∘ h) (n + 1) σ = 0) (j : ι) :
-    ∃ (N : ℕ) (τ : Cochain P (D ∘ h) n), d P (D ∘ h) n τ = actC A (D ∘ h) (h j ^ N) (n + 1) σ := by
+theorem exists_d_eq_pow_smul
+    [Fintype ι] {n : ℕ} (σ : Cochain P (D ∘ h) (n + 1)) (hσ : d P (D ∘ h) (n + 1) σ = 0) (j : ι)
+    : ∃ (N : ℕ) (τ : Cochain P (D ∘ h) n),
+      d P (D ∘ h) n τ = actC A (D ∘ h) (h j ^ N) (n + 1) σ := by
   classical
-  have hlift : ∀ I : Fin (n + 1) → ι, ∃ (N : ℕ) (x : P.obj (op (inter (D ∘ h) I))),
-      res P (le_cons _ j I) x = A.act (h j ^ N) _ (σ (Fin.cons j I)) :=
-    fun I => A.lift _ (h j) (inter_eq_prod A h I) (inter_cons_eq A h j I) _ _
+  have hlift
+      : ∀ I : Fin (n + 1) → ι, ∃ (N : ℕ) (x : P.obj (op (inter (D ∘ h) I))),
+        res P (le_cons _ j I) x = A.act (h j ^ N) _ (σ (Fin.cons j I)) := fun I =>
+    A.lift _ (h j) (inter_eq_prod A h I) (inter_cons_eq A h j I) _ _
   choose N x hx using hlift
   obtain ⟨N0, hN0⟩ : ∃ N0, ∀ I, N I ≤ N0 :=
     ⟨Finset.univ.sup N, fun I => Finset.le_sup (Finset.mem_univ I)⟩
@@ -131,34 +138,41 @@ theorem exists_d_eq_pow_smul [Fintype ι] {n : ℕ} (σ : Cochain P (D ∘ h) (n
     intro I
     change res P _ (A.act (h j ^ (N0 - N I)) _ (x I)) = _
     rw [A.res_act, hx, ← A.act_mul, ← pow_add, Nat.sub_add_cancel (hN0 I)]
-  have hdef : ∀ J : Fin (n + 2) → ι,
-      res P (le_cons _ j J) (d P _ n τ0 J - A.act (h j ^ N0) _ (σ J)) = 0 := by
+  have hdef
+      : ∀ J : Fin (n + 2) → ι,
+        res P (le_cons _ j J) (d P _ n τ0 J - A.act (h j ^ N0) _ (σ J)) = 0 := by
     intro J
     have hcoc := congrFun hσ (Fin.cons j J)
     rw [d_apply, Fin.sum_univ_succ, Pi.zero_apply] at hcoc
-    have e1 : ∀ k : Fin (n + 2), res P (le_cons _ j J) (((-1 : ℤ) ^ (k : ℕ)) •
-        res P (inter_le_comp _ J k.succAbove) (τ0 (J ∘ k.succAbove))) =
-        ((-1 : ℤ) ^ (k : ℕ)) • A.act (h j ^ N0) _
-          (res P (le_cons_comp _ j J k) (σ (Fin.cons j (J ∘ k.succAbove)))) := by
+    have e1
+        : ∀ k : Fin (n + 2),
+          res P (le_cons _ j J)
+              (((-1 : ℤ) ^ (k : ℕ)) • res P (inter_le_comp _ J k.succAbove) (τ0 (J ∘ k.succAbove)))
+            = ((-1 : ℤ) ^ (k : ℕ)) • A.act (h j ^ N0) _
+              (res P (le_cons_comp _ j J k) (σ (Fin.cons j (J ∘ k.succAbove)))) := by
       intro k
-      rw [map_zsmul, res_res,
-        ← res_res P (le_cons_comp _ j J k) (le_cons _ j (J ∘ k.succAbove)), hτ0, A.res_act]
-    have e0 : res P (le_cons _ j J) (σ J) = ∑ k : Fin (n + 2), ((-1 : ℤ) ^ (k : ℕ)) •
-        res P (le_cons_comp _ j J k) (σ (Fin.cons j (J ∘ k.succAbove))) := by
+      rw [map_zsmul, res_res, ← res_res P (le_cons_comp _ j J k) (le_cons _ j (J ∘ k.succAbove)),
+        hτ0, A.res_act]
+    have e0
+        : res P (le_cons _ j J) (σ J)
+          = ∑ k : Fin (n + 2), ((-1 : ℤ) ^ (k : ℕ)) •
+            res P (le_cons_comp _ j J k) (σ (Fin.cons j (J ∘ k.succAbove))) := by
       rw [Fin.val_zero, pow_zero, one_smul,
-        res_congr P _ σ (cons_comp_succAbove_zero j J) _ (le_cons _ j J)] at hcoc
+          res_congr P _ σ (cons_comp_succAbove_zero j J) _ (le_cons _ j J)]
+        at hcoc
       rw [eq_neg_of_add_eq_zero_left hcoc, ← Finset.sum_neg_distrib]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [Fin.val_succ, pow_succ, mul_neg_one, neg_smul, neg_neg,
         res_congr P _ σ (cons_comp_succAbove_succ j J k) _ (le_cons_comp _ j J k)]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sub, d_apply, map_sum, A.res_act, sub_eq_zero, Finset.sum_congr rfl (fun k _ => e1 k),
-      e0, map_sum]
+        e0, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul]
-  have hkill : ∀ J : Fin (n + 2) → ι, ∃ M : ℕ,
-      A.act (h j ^ M) _ (d P _ n τ0 J - A.act (h j ^ N0) _ (σ J)) = 0 :=
-    fun J => A.kill _ (h j) (inter_eq_prod A h J) (inter_cons_eq A h j J) (le_cons _ j J) _ (hdef J)
+  have hkill
+      : ∀ J : Fin (n + 2) → ι, ∃ M : ℕ,
+        A.act (h j ^ M) _ (d P _ n τ0 J - A.act (h j ^ N0) _ (σ J)) = 0 := fun J =>
+    A.kill _ (h j) (inter_eq_prod A h J) (inter_cons_eq A h j J) (le_cons _ j J) _ (hdef J)
   choose M hM using hkill
   obtain ⟨M0, hM0⟩ : ∃ M0, ∀ J, M J ≤ M0 :=
     ⟨Finset.univ.sup M, fun J => Finset.le_sup (Finset.mem_univ J)⟩
@@ -170,10 +184,9 @@ theorem exists_d_eq_pow_smul [Fintype ι] {n : ℕ} (σ : Cochain P (D ∘ h) (n
   rw [map_sub, sub_eq_zero, ← A.act_mul, ← pow_add] at hMJ
   exact hMJ
 
-
 include A in
-theorem cechAcyclic_of_localizingAction [Finite ι] (g : R) (hcov : ⨆ i, D (h i) = D g) :
-    CechAcyclic P (D ∘ h) := by
+theorem cechAcyclic_of_localizingAction [Finite ι] (g : R) (hcov : ⨆ i, D (h i) = D g)
+    : CechAcyclic P (D ∘ h) := by
   classical
   have := Fintype.ofFinite ι
   intro n σ hσ

@@ -5,10 +5,13 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.HasInfExp
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -16,23 +19,35 @@ open GlobalTheory.SquareComm
 
 namespace GlobalTheory.RealQuot
 
-theorem simpleQuot_iso_of_intertwined : ∀ (ι Fm Q Q' Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Q'] [Module ℂ Q'] [AddCommGroup Pi] [Module ℂ Pi]
-  (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) (ρ' : ι → Module.End ℂ Q') (C' : Submodule ℂ Q') (σ : ι → Module.End ℂ Pi)
-  (β : Fm → Q →ₗ[ℂ] Pi) (β₁ : Q' →ₗ[ℂ] Pi),
-  (∀ f i, β f ∘ₗ ρ i = σ i ∘ₗ β f) → (∀ i, β₁ ∘ₗ ρ' i = σ i ∘ₗ β₁) →
-  (∀ f, GlobalTheory.RealQuot.rad ρ C ≤ LinearMap.ker (β f)) → GlobalTheory.RealQuot.rad ρ' C' ≤ LinearMap.ker β₁ → β₁ ≠ 0 →
-  (⨆ f, LinearMap.range (β f)) = ⊤ →
-  (∀ N : Submodule ℂ Q, GlobalTheory.RealQuot.IsStab ρ N → GlobalTheory.RealQuot.rad ρ C ≤ N → N = GlobalTheory.RealQuot.rad ρ C ∨ N = ⊤) →
-  (∀ N : Submodule ℂ Q', GlobalTheory.RealQuot.IsStab ρ' N → GlobalTheory.RealQuot.rad ρ' C' ≤ N → N = GlobalTheory.RealQuot.rad ρ' C' ∨ N = ⊤) →
-  (∀ N : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N → ∃ N' : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N' ∧ IsCompl N N') →
-  ∃ e : (Q ⧸ GlobalTheory.RealQuot.rad ρ C) ≃ₗ[ℂ] (Q' ⧸ GlobalTheory.RealQuot.rad ρ' C'),
-    ∀ i, e.toLinearMap ∘ₗ GlobalTheory.RealQuot.radAct ρ C i = GlobalTheory.RealQuot.radAct ρ' C' i ∘ₗ e.toLinearMap := by
+theorem simpleQuot_iso_of_intertwined
+    : ∀ (ι Fm Q Q' Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Q'] [Module ℂ Q']
+        [AddCommGroup Pi] [Module ℂ Pi] (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q)
+        (ρ' : ι → Module.End ℂ Q') (C' : Submodule ℂ Q') (σ : ι → Module.End ℂ Pi)
+        (β : Fm → Q →ₗ[ℂ] Pi) (β₁ : Q' →ₗ[ℂ] Pi),
+      (∀ f i, β f ∘ₗ ρ i = σ i ∘ₗ β f) → (∀ i, β₁ ∘ₗ ρ' i = σ i ∘ₗ β₁)
+        → (∀ f, GlobalTheory.RealQuot.rad ρ C ≤ LinearMap.ker (β f))
+        → GlobalTheory.RealQuot.rad ρ' C' ≤ LinearMap.ker β₁ → β₁ ≠ 0
+        → (⨆ f, LinearMap.range (β f)) = ⊤
+        → (∀ N : Submodule ℂ Q,
+          GlobalTheory.RealQuot.IsStab ρ N → GlobalTheory.RealQuot.rad ρ C ≤ N
+            → N = GlobalTheory.RealQuot.rad ρ C ∨ N = ⊤)
+        → (∀ N : Submodule ℂ Q',
+          GlobalTheory.RealQuot.IsStab ρ' N → GlobalTheory.RealQuot.rad ρ' C' ≤ N
+            → N = GlobalTheory.RealQuot.rad ρ' C' ∨ N = ⊤)
+        → (∀ N : Submodule ℂ Pi,
+          GlobalTheory.RealQuot.IsStab σ N
+            → ∃ N' : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N' ∧ IsCompl N N')
+        → ∃ e : (Q ⧸ GlobalTheory.RealQuot.rad ρ C) ≃ₗ[ℂ] (Q' ⧸ GlobalTheory.RealQuot.rad ρ' C'),
+          ∀ i,
+            e.toLinearMap ∘ₗ GlobalTheory.RealQuot.radAct ρ C i
+              = GlobalTheory.RealQuot.radAct ρ' C' i ∘ₗ e.toLinearMap := by
   intro ι Fm Q Q' Pi _ _ _ _ _ _ ρ C ρ' C' σ β β₁ hβ hβ₁ hkβ hkβ₁ hβ₁0 hspan hQ hQ' hss
   set R := rad ρ C with hRdef
   set R' := rad ρ' C' with hR'def
 
-  have kerStab : ∀ {X : Type} [AddCommGroup X] [Module ℂ X] (τ : ι → Module.End ℂ X) (g : X →ₗ[ℂ] Pi),
-      (∀ i, g ∘ₗ τ i = σ i ∘ₗ g) → IsStab τ (LinearMap.ker g) := by
+  have kerStab
+      : ∀ {X : Type} [AddCommGroup X] [Module ℂ X] (τ : ι → Module.End ℂ X) (g : X →ₗ[ℂ] Pi),
+        (∀ i, g ∘ₗ τ i = σ i ∘ₗ g) → IsStab τ (LinearMap.ker g) := by
     intro X _ _ τ g hg i x hx
     rw [LinearMap.mem_ker] at hx ⊢
     rw [← LinearMap.comp_apply, hg i, LinearMap.comp_apply, hx, map_zero]
@@ -79,7 +94,8 @@ theorem simpleQuot_iso_of_intertwined : ∀ (ι Fm Q Q' Pi : Type) [AddCommGroup
   have hPσ : ∀ i y, P (σ i y) = σ i (P y) := by
     intro i y
     obtain ⟨u, hu, n, hn, rfl⟩ := hdec y
-    rw [map_add (f := _), map_add (f := _), map_add (f := _), hPU _ (hUs i u hu), hPN _ (hN's i n hn), hPU u hu, hPN n hn, add_zero, add_zero]
+    rw [map_add (f := _), map_add (f := _), map_add (f := _), hPU _ (hUs i u hu),
+      hPN _ (hN's i n hn), hPU u hu, hPN n hn, add_zero, add_zero]
 
   obtain ⟨f, hf⟩ : ∃ f, P ∘ₗ β f ≠ 0 := by
     by_contra hall
@@ -89,7 +105,8 @@ theorem simpleQuot_iso_of_intertwined : ∀ (ι Fm Q Q' Pi : Type) [AddCommGroup
       obtain ⟨u, hu, n, hn, he⟩ := hdec (β f x)
       have h0 : P (β f x) = 0 := by rw [← LinearMap.comp_apply, hall f, LinearMap.zero_apply]
       rw [he, map_add (f := _), hPU u hu, hPN n hn, add_zero] at h0
-      rw [he, h0, zero_add]; exact hn
+      rw [he, h0, zero_add]
+      exact hn
     have hN'top : N' = ⊤ := eq_top_iff.2 (hspan ▸ iSup_le hle)
     have hU0 : U = ⊥ := by
       have := hc.inf_eq_bot
@@ -101,7 +118,8 @@ theorem simpleQuot_iso_of_intertwined : ∀ (ι Fm Q Q' Pi : Type) [AddCommGroup
     exact this
   set γ := P ∘ₗ β f with hγdef
   have hγi : ∀ i, γ ∘ₗ ρ i = σ i ∘ₗ γ := by
-    intro i; ext x
+    intro i
+    ext x
     show P (β f (ρ i x)) = σ i (P (β f x))
     have h := LinearMap.congr_fun (hβ f i) x
     simp only [LinearMap.comp_apply] at h
@@ -129,16 +147,21 @@ theorem simpleQuot_iso_of_intertwined : ∀ (ι Fm Q Q' Pi : Type) [AddCommGroup
       exact this
   let φ := R.liftQ γ hRγ
   let ψ := R'.liftQ β₁ hkβ₁
-  have hφi : Function.Injective φ := LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ hkerγ.le)
-  have hψi : Function.Injective ψ := LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ hkerβ₁.le)
+  have hφi : Function.Injective φ :=
+    LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ hkerγ.le)
+  have hψi : Function.Injective ψ :=
+    LinearMap.ker_eq_bot.1 (Submodule.ker_liftQ_eq_bot _ _ _ hkerβ₁.le)
   have hrφ : LinearMap.range φ = LinearMap.range ψ := by
     rw [Submodule.range_liftQ, Submodule.range_liftQ, hrangeγ]
   let e : (Q ⧸ R) ≃ₗ[ℂ] (Q' ⧸ R') :=
-    (LinearEquiv.ofInjective φ hφi).trans ((LinearEquiv.ofEq _ _ hrφ).trans (LinearEquiv.ofInjective ψ hψi).symm)
+    (LinearEquiv.ofInjective φ hφi).trans
+      ((LinearEquiv.ofEq _ _ hrφ).trans (LinearEquiv.ofInjective ψ hψi).symm)
   have he : ∀ x, ψ (e x) = φ x := by
     intro x
-    have h1 := LinearEquiv.ofInjective_apply (f := ψ) (h := hψi)
-      ((LinearEquiv.ofInjective ψ hψi).symm ((LinearEquiv.ofEq _ _ hrφ) (LinearEquiv.ofInjective φ hφi x)))
+    have h1 :=
+      LinearEquiv.ofInjective_apply (f := ψ) (h := hψi)
+        ((LinearEquiv.ofInjective ψ hψi).symm
+          ((LinearEquiv.ofEq _ _ hrφ) (LinearEquiv.ofInjective φ hφi x)))
     rw [LinearEquiv.apply_symm_apply] at h1
     exact h1.symm
   refine ⟨e, fun i => ?_⟩

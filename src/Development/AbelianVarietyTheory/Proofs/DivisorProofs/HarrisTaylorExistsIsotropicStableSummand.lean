@@ -20,20 +20,55 @@ set_option autoImplicit false
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.UPel.Sm GlobalTheory.Cris GlobalTheory.DeRham
 open scoped TensorProduct
 
 namespace GlobalTheory.HTSummand
 
-theorem exists_summand : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R] (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (C C₀ : Type) [CommRing C] [IsLocalRing C] [IsArtinianRing C] [CommRing C₀] (π : C →+* C₀), Function.Surjective π → ∀ (hsq : RingHom.ker π ^ 2 = 0) (tR : R →+* C) (o₀ : GlobalTheory.UPel.HT.Obj b N (spMap π ≫ spMap tR)), ∃ E : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A), (∃ M : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A), IsCompl E M) ∧ (∀ y : HdR o₀.A, y ∈ Fil o₀.A ↔ ∃ d ∈ E, (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ hsq) rfl o₀.A).Corr d y) ∧ (∀ (c : D.O), ∀ d ∈ E, (haveI := o₀.act.hom (c); push (divided₂ hsq) (spMap π) (o₀.act.act (c)) (d)) ∈ E) ∧ (∀ φ : Crys (divided₂ hsq) (spMap π) o₀.A →ₗ[C] Crys (divided₂ hsq) (spMap π) o₀.A →ₗ[C] C, GlobalTheory.AbDual.IsCorrForm (divided₂ hsq) (spMap π) o₀.A o₀.A o₀.P φ → ∀ x ∈ E, ∀ y ∈ E, φ x y = 0) ∧ (∀ d : Crys (divided₂ hsq) (spMap π) o₀.A, (haveI := o₀.act.hom (algebraMap (𝓞 D.F) D.O D.ω); push (divided₂ hsq) (spMap π) (o₀.act.act (algebraMap (𝓞 D.F) D.O D.ω)) (d)) - tR b.ρ • d ∈ E → ∃ w : Fin D.a → Crys (divided₂ hsq) (spMap π) o₀.A, (∀ i (c : 𝓞 D.F), (haveI := o₀.act.hom (algebraMap (𝓞 D.F) D.O c); push (divided₂ hsq) (spMap π) (o₀.act.act (algebraMap (𝓞 D.F) D.O c)) (w i)) - tR (b.t i c) • w i ∈ E) ∧ d - ∑ i, w i ∈ E) := by
+theorem exists_summand
+    : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.Datum p) (R : Type) [CommRing R]
+        (b : GlobalTheory.UPel.HT.Base D R) (N : ℕ) (C C₀ : Type) [CommRing C] [IsLocalRing C]
+        [IsArtinianRing C] [CommRing C₀] (π : C →+* C₀),
+      Function.Surjective π
+        → ∀ (hsq : RingHom.ker π ^ 2 = 0) (tR : R →+* C)
+            (o₀ : GlobalTheory.UPel.HT.Obj b N (spMap π ≫ spMap tR)),
+          ∃ E : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A),
+            (∃ M : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A), IsCompl E M)
+              ∧ (∀ y : HdR o₀.A,
+                y ∈ Fil o₀.A
+                  ↔ ∃ d ∈ E,
+                    (GlobalTheory.Published.GrothendieckMessing.crysRedMor (divided₂ hsq) rfl
+                      o₀.A).Corr d y)
+              ∧ (∀ (c : D.O), ∀ d ∈ E,
+                (haveI := o₀.act.hom (c); push (divided₂ hsq) (spMap π) (o₀.act.act (c)) (d)) ∈ E)
+              ∧ (∀ φ
+                  : Crys (divided₂ hsq) (spMap π) o₀.A →ₗ[C] Crys (divided₂ hsq) (spMap π) o₀.A →ₗ[C] C,
+                GlobalTheory.AbDual.IsCorrForm (divided₂ hsq) (spMap π) o₀.A o₀.A o₀.P φ
+                  → ∀ x ∈ E, ∀ y ∈ E, φ x y = 0)
+              ∧ (∀ d : Crys (divided₂ hsq) (spMap π) o₀.A,
+                (haveI := o₀.act.hom (algebraMap (𝓞 D.F) D.O D.ω)
+                 push (divided₂ hsq) (spMap π) (o₀.act.act (algebraMap (𝓞 D.F) D.O D.ω)) (d))
+                      - tR b.ρ • d
+                    ∈ E
+                  → ∃ w : Fin D.a → Crys (divided₂ hsq) (spMap π) o₀.A,
+                    (∀ i (c : 𝓞 D.F),
+                        (haveI := o₀.act.hom (algebraMap (𝓞 D.F) D.O c)
+                         push (divided₂ hsq) (spMap π) (o₀.act.act (algebraMap (𝓞 D.F) D.O c))
+                           (w i))
+                            - tR (b.t i c) • w i
+                          ∈ E)
+                      ∧ d - ∑ i, w i ∈ E) := by
   intro p _ D R _ b N C C₀ _ _ _ _ π hπ hsq tR o₀
   obtain ⟨red, hfin, hproj, hsurj, hker, hcorr, hpush, E', M', hE'M', hE'⟩ :=
     GlobalTheory.CrysRed.exists_crysRed C C₀ π hπ hsq o₀.A o₀.ab D.O o₀.act
   haveI := hfin
   haveI := hproj
-  obtain ⟨φ₀, hφ₀, huniq, hadj, φ', hφ', hrel⟩ := GlobalTheory.HTDefLift.exists_crysForm p D R b N C C₀ π hπ hsq tR o₀
+  obtain ⟨φ₀, hφ₀, huniq, hadj, φ', hφ', hrel⟩ :=
+    GlobalTheory.HTDefLift.exists_crysForm p D R b N C C₀ π hπ hsq tR o₀
   obtain ⟨hskew, hbij⟩ := GlobalTheory.HTPerf.skew_bijective p D R b N C C₀ π hπ hsq tR o₀ φ₀ hφ₀
   haveI : Nontrivial C₀ := by
     by_contra hn
@@ -42,20 +77,32 @@ theorem exists_summand : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.
     rw [ht, ← Ideal.one_eq_top, one_pow] at hsq
     exact one_ne_zero hsq
   haveI : IsLocalRing C₀ := IsLocalRing.of_surjective' π hπ
-  have hlagr := GlobalTheory.HTLagr.fil_lagrangian p D R b N C₀ _ o₀ φ' (GlobalTheory.AbelianDim.exists_relDim C₀ o₀.A o₀.ab) hφ'
-  have hlie := GlobalTheory.HTSummand.lie_mod_fil p D R b N C₀ (π.comp tR) _ (GlobalTheory.Cris.spMap_comp tR π).symm o₀
-  have hprojF := GlobalTheory.T.crystal_projective_over_tensor_ringOfIntegers D.F C C₀ π hπ hsq o₀.A o₀.ab D.O o₀.act
+  have hlagr :=
+    GlobalTheory.HTLagr.fil_lagrangian p D R b N C₀ _ o₀ φ'
+      (GlobalTheory.AbelianDim.exists_relDim C₀ o₀.A o₀.ab) hφ'
+  have hlie :=
+    GlobalTheory.HTSummand.lie_mod_fil p D R b N C₀ (π.comp tR) _
+      (GlobalTheory.Cris.spMap_comp tR π).symm o₀
+  have hprojF :=
+    GlobalTheory.T.crystal_projective_over_tensor_ringOfIntegers D.F C C₀ π hπ hsq o₀.A o₀.ab D.O
+      o₀.act
   have hI2 : RingHom.ker π ^ 2 = ⊥ := hsq
   let F : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A) := (Fil o₀.A).comap red
-  have hredI : ∀ x ∈ RingHom.ker π • (⊤ : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A)), red x = 0 := by
+  have hredI
+      : ∀ x ∈ RingHom.ker π • (⊤ : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A)),
+        red x = 0 := by
     intro x hx
     refine Submodule.smul_induction_on hx (fun r hr n _ ↦ ?_) (fun x y hx hy ↦ ?_)
     · rw [LinearMap.map_smulₛₗ, RingHom.mem_ker.1 hr, zero_smul]
     · rw [map_add (f := _), hx, hy, add_zero]
-  have hIF : RingHom.ker π • (⊤ : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A)) ≤ F := fun x hx ↦ by
+  have hIF
+      : RingHom.ker π • (⊤ : Submodule C (Crys (divided₂ hsq) (spMap π) o₀.A)) ≤ F := fun x hx ↦ by
     show red x ∈ Fil o₀.A
-    rw [hredI x hx]; exact zero_mem _
-  have hFstab : ∀ (c : D.O), ∀ x ∈ F, GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act c x ∈ F := by
+    rw [hredI x hx]
+    exact zero_mem _
+  have hFstab
+      : ∀ (c : D.O), ∀ x ∈ F,
+        GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act c x ∈ F := by
     intro c x hx
     show red _ ∈ Fil o₀.A
     rw [hpush]
@@ -78,13 +125,27 @@ theorem exists_summand : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.
     have hx' : x = d + (x - d) := by abel
     rw [hx']
     exact Submodule.add_mem_sup hd (hker _ (by rw [map_sub, he, sub_self]))
-  have hFlie : ∀ d, GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act (algebraMap (𝓞 D.F) D.O D.ω) d - tR b.ρ • d ∈ F →
-      ∃ w : Fin D.a → Crys (divided₂ hsq) (spMap π) o₀.A, (∀ i (c : 𝓞 D.F),
-        GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act (algebraMap (𝓞 D.F) D.O c) (w i) - tR (b.t i c) • w i ∈ F) ∧
-        d - ∑ i, w i ∈ F := by
+  have hFlie
+      : ∀ d,
+        GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act (algebraMap (𝓞 D.F) D.O D.ω)
+                d
+              - tR b.ρ • d
+            ∈ F
+          → ∃ w : Fin D.a → Crys (divided₂ hsq) (spMap π) o₀.A,
+            (∀ i (c : 𝓞 D.F),
+                GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act
+                      (algebraMap (𝓞 D.F) D.O c) (w i)
+                    - tR (b.t i c) • w i
+                  ∈ F)
+              ∧ d - ∑ i, w i ∈ F := by
     intro d hd
-    have hd' : red (GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act (algebraMap (𝓞 D.F) D.O D.ω) d - tR b.ρ • d)
-        ∈ Fil o₀.A := hd
+    have hd'
+        : red
+            (GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act
+                (algebraMap (𝓞 D.F) D.O D.ω) d
+              - tR b.ρ • d)
+          ∈ Fil o₀.A :=
+      hd
     rw [map_sub, LinearMap.map_smulₛₗ, hpush] at hd'
     obtain ⟨w₀, hw₀, hsum⟩ := hlie (red d) hd'
     choose w hw using fun i ↦ hsurj (w₀ i)
@@ -97,11 +158,19 @@ theorem exists_summand : ∀ (p : ℕ) [Fact p.Prime] (D : GlobalTheory.UPel.HT.
         rw [map_sub, map_sum]
       simp only [hw]
       exact hsum
-  obtain ⟨E, ⟨M, hEM⟩, hEF, hstab, hiso, hlieE⟩ := GlobalTheory.T.exists_lagrangian_lift_lie_squareZero_harrisTaylor p D R b C (RingHom.ker π) hI2 tR
-    (Crys (divided₂ hsq) (spMap π) o₀.A) (GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act) hprojF φ₀ hskew hbij hadj
-    F hIF hFstab hFiso hFlagr ⟨E', M', hE'M', hE'F⟩ hFlie
-  refine ⟨E, ⟨M, hEM⟩, fun y ↦ ⟨fun hy ↦ ?_, fun ⟨d, hd, hc⟩ ↦ ?_⟩, fun c d hd ↦ hstab c d hd,
-    fun φ hφ x hx y hy ↦ by rw [huniq φ hφ]; exact hiso x hx y hy, fun d hd ↦ hlieE d hd⟩
+  obtain ⟨E, ⟨M, hEM⟩, hEF, hstab, hiso, hlieE⟩ :=
+    GlobalTheory.T.exists_lagrangian_lift_lie_squareZero_harrisTaylor p D R b C (RingHom.ker π) hI2
+      tR (Crys (divided₂ hsq) (spMap π) o₀.A)
+      (GlobalTheory.HTSummand.crysAct (divided₂ hsq) (spMap π) o₀.act) hprojF φ₀ hskew hbij hadj F
+      hIF hFstab hFiso hFlagr ⟨E', M', hE'M', hE'F⟩ hFlie
+  refine ⟨
+    E,
+    ⟨M, hEM⟩,
+    fun y ↦ ⟨fun hy ↦ ?_, fun ⟨d, hd, hc⟩ ↦ ?_⟩,
+    fun c d hd ↦ hstab c d hd,
+    fun φ hφ x hx y hy ↦ by rw [huniq φ hφ]; exact hiso x hx y hy,
+    fun d hd ↦ hlieE d hd
+  ⟩
   · obtain ⟨x, rfl⟩ := hsurj y
     have hx : x ∈ F := hy
     rw [← hEF] at hx

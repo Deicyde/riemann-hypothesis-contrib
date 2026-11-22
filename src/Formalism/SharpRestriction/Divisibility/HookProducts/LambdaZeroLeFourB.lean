@@ -12,7 +12,8 @@ namespace Formalism.MainNotions.DIV.HookProducts.FunSharp
 
 open Formalism.BasicNotions Formalism.MainNotions
 
-theorem lambda_zero_le_four_b {D : D7} (L : SizeData₂ D) (hS : SizesAt L) : lam0 D ≤ 4 * L.sc.b := by
+theorem lambda_zero_le_four_b {D : D7} (L : SizeData₂ D) (hS : SizesAt L)
+    : lam0 D ≤ 4 * L.sc.b := by
   obtain ⟨-, -, hK, hKR, hT, -, -, -, -, -, -, -, -, hEta, hNodes, -, -, -, -, -, hG, -, -⟩ := hS
   have hx1 : 1 < L.sc.x := L.sc.one_lt_alt
   have hθ : 0 ≤ szTh L := by unfold szTh; have := L.sc.eps_pos; positivity
@@ -58,8 +59,7 @@ theorem lambda_zero_le_four_b {D : D7} (L : SizeData₂ D) (hS : SizesAt L) : la
     rcases Nat.eq_zero_or_pos D.R.m with h | h
     · rw [h, Nat.cast_zero, div_zero]; linarith
     · exact div_le_self (by linarith) (by exact_mod_cast h)
-  have hQ : L.sc.x ^ szTh L * R ^ 19 * F ^ 5 * L.sc.L ≤ L.sc.b :=
-    (hNodes.2.2.1.trans hηm).trans hηb
+  have hQ : L.sc.x ^ szTh L * R ^ 19 * F ^ 5 * L.sc.L ≤ L.sc.b := (hNodes.2.2.1.trans hηm).trans hηb
 
   have hF5 : F ≤ F ^ 5 := le_self_pow₀ hF1 (by norm_num)
   have hR19 : R ^ 2 ≤ R ^ 19 := pow_le_pow_right₀ hR1 (by norm_num)
@@ -75,13 +75,17 @@ theorem lambda_zero_le_four_b {D : D7} (L : SizeData₂ D) (hS : SizesAt L) : la
   have hg1 : (1 : ℝ) ≤ D.host.g 0 := by exact_mod_cast (D.host.g_prime 0).one_lt.le
   have hlog0 : 0 ≤ Real.log (2 * (D.host.g 0 : ℝ)) := Real.log_nonneg (by linarith)
   have hY : ∀ i, (D.host.g i : ℝ) ≤ 2 * (D.host.g 0 : ℝ) := fun i => (hG i 0).2.1
-  have h0 := Formalism.MainNotions.DIV.Proofs.ScaledLatticeNorms.scaled_lattice_nonzero_holds D (D.host.g 0 : ℝ) hY
+  have h0 :=
+    Formalism.MainNotions.DIV.Proofs.ScaledLatticeNorms.scaled_lattice_nonzero_holds D
+      (D.host.g 0 : ℝ) hY
   have hlog : Real.log (2 * (D.host.g 0 : ℝ)) ≤ 1 + A := by
     rw [Real.log_mul (by norm_num) hg0.ne']
     have h2 : Real.log 2 < 1 := by have := Real.log_two_lt_d9; linarith
     have h3 : Real.log (D.host.g 0 : ℝ) ≤ A := (hG 0 0).2.2
     linarith
-  calc lam0 D ≤ 2 * F * R ^ 2 * Real.log (2 * (D.host.g 0 : ℝ)) := h0
+  calc
+    lam0 D
+      ≤ 2 * F * R ^ 2 * Real.log (2 * (D.host.g 0 : ℝ)) := h0
     _ ≤ 2 * F * R ^ 2 * (1 + A) := mul_le_mul_of_nonneg_left hlog (by positivity)
     _ = 2 * (F * R ^ 2) + 2 * (F * R ^ 2 * A) := by ring
     _ ≤ 4 * L.sc.b := by linarith

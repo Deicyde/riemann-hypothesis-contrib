@@ -18,11 +18,13 @@ def trInv (g : GL n R) : GL n R where
   val_inv := by rw [← Matrix.transpose_mul]; simp
   inv_val := by rw [← Matrix.transpose_mul]; simp
 
-@[simp] theorem trInv_val (g : GL n R) :
-    (trInv g : Matrix n n R) = ((g⁻¹ : GL n R) : Matrix n n R)ᵀ := rfl
+@[simp]
+theorem trInv_val (g : GL n R) : (trInv g : Matrix n n R) = ((g⁻¹ : GL n R) : Matrix n n R)ᵀ := rfl
 
-@[simp] theorem trInv_inv_val (g : GL n R) :
-    (((trInv g)⁻¹ : GL n R) : Matrix n n R) = (g : Matrix n n R)ᵀ := rfl
+@[simp]
+theorem trInv_inv_val (g : GL n R)
+    : (((trInv g)⁻¹ : GL n R) : Matrix n n R) = (g : Matrix n n R)ᵀ :=
+  rfl
 
 theorem trInv_trInv (g : GL n R) : trInv (trInv g) = g := by
   apply Units.ext
@@ -32,8 +34,8 @@ theorem trInv_mul (g h : GL n R) : trInv (g * h) = trInv g * trInv h := by
   apply Units.ext
   simp only [trInv_val, Units.val_mul, _root_.mul_inv_rev, Matrix.transpose_mul]
 
-theorem map_trInv (f : R →+* S) (g : GL n R) :
-    GeneralLinearGroup.map f (trInv g) = trInv (GeneralLinearGroup.map f g) := by
+theorem map_trInv (f : R →+* S) (g : GL n R)
+    : GeneralLinearGroup.map f (trInv g) = trInv (GeneralLinearGroup.map f g) := by
   apply Units.ext
   simp [GeneralLinearGroup.map, Matrix.transpose_map]
 
@@ -42,7 +44,6 @@ end Group
 section Twisted
 
 variable {m : ℕ} {R S : Type*} [CommRing R] [CommRing S]
-
 
 variable (R) in
 def Jmat (m : ℕ) : Matrix (Fin m) (Fin m) R := fun i j => if j = i.rev then 1 else 0
@@ -67,9 +68,9 @@ theorem Jmat_map (f : R →+* S) (m : ℕ) : (Jmat (R := R) m).map f = Jmat (R :
   simp only [Jmat, Matrix.map_apply]
   split_ifs <;> simp
 
-
 variable (R) in
-def Jgl (m : ℕ) : GL (Fin m) R := ⟨Jmat (R := R) m, Jmat (R := R) m, Jmat_mul_Jmat (R := R) m, Jmat_mul_Jmat (R := R) m⟩
+def Jgl (m : ℕ) : GL (Fin m) R :=
+  ⟨Jmat (R := R) m, Jmat (R := R) m, Jmat_mul_Jmat (R := R) m, Jmat_mul_Jmat (R := R) m⟩
 
 theorem Jgl_mul_Jgl : Jgl (R := R) m * Jgl (R := R) m = 1 := Units.ext (Jmat_mul_Jmat (R := R) m)
 
@@ -77,24 +78,26 @@ theorem trInv_Jgl : trInv (Jgl (R := R) m) = Jgl (R := R) m := Units.ext (Jmat_t
 
 def theta (g : GL (Fin m) R) : GL (Fin m) R := Jgl (R := R) m * trInv g * Jgl (R := R) m
 
-theorem theta_val (g : GL (Fin m) R) : (theta g : Matrix (Fin m) (Fin m) R) =
-    Jmat (R := R) m * ((g⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)ᵀ * Jmat (R := R) m := rfl
+theorem theta_val (g : GL (Fin m) R)
+    : (theta g : Matrix (Fin m) (Fin m) R)
+      = Jmat (R := R) m * ((g⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)ᵀ * Jmat (R := R) m :=
+  rfl
 
-theorem theta_inv_val (g : GL (Fin m) R) :
-    (((theta g)⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R) =
-      Jmat (R := R) m * (g : Matrix (Fin m) (Fin m) R)ᵀ * Jmat (R := R) m := by
+theorem theta_inv_val (g : GL (Fin m) R)
+    : (((theta g)⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)
+      = Jmat (R := R) m * (g : Matrix (Fin m) (Fin m) R)ᵀ * Jmat (R := R) m := by
   rw [Matrix.mul_assoc]; rfl
 
 theorem theta_theta (g : GL (Fin m) R) : theta (theta g) = g := by
   have hJ : ∀ x : GL (Fin m) R, Jgl (R := R) m * (Jgl (R := R) m * x) = x := fun x => by
     rw [← mul_assoc, Jgl_mul_Jgl (R := R), one_mul]
-  simp only [theta, trInv_mul, trInv_Jgl (R := R), trInv_trInv, mul_assoc, Jgl_mul_Jgl (R := R), mul_one, hJ]
+  simp only [theta, trInv_mul, trInv_Jgl (R := R), trInv_trInv, mul_assoc, Jgl_mul_Jgl (R := R),
+    mul_one, hJ]
 
 theorem theta_mul (g h : GL (Fin m) R) : theta (g * h) = theta g * theta h := by
   have hJ : ∀ x : GL (Fin m) R, Jgl (R := R) m * (Jgl (R := R) m * x) = x := fun x => by
     rw [← mul_assoc, Jgl_mul_Jgl (R := R), one_mul]
   simp only [theta, trInv_mul, mul_assoc, hJ]
-
 
 variable (m R) in
 def thetaAut : MulAut (GL (Fin m) R) where
@@ -103,7 +106,6 @@ def thetaAut : MulAut (GL (Fin m) R) where
   left_inv := theta_theta (R := R)
   right_inv := theta_theta (R := R)
   map_mul' := theta_mul
-
 
 variable (m R) in
 def sgnAct : ℤˣ →* MulAut (GL (Fin m) R) where
@@ -119,19 +121,21 @@ def sgnAct : ℤˣ →* MulAut (GL (Fin m) R) where
       ext1 g
       exact (theta_theta (R := R) g).symm
 
-@[simp] theorem sgnAct_one (g : GL (Fin m) R) : sgnAct (m := m) (R := R) 1 g = g := by simp
+@[simp]
+theorem sgnAct_one (g : GL (Fin m) R) : sgnAct (m := m) (R := R) 1 g = g := by simp
 
-@[simp] theorem sgnAct_neg_one (g : GL (Fin m) R) : sgnAct (m := m) (R := R) (-1) g = theta g := by
+@[simp]
+theorem sgnAct_neg_one (g : GL (Fin m) R) : sgnAct (m := m) (R := R) (-1) g = theta g := by
   have h : ((-1 : ℤˣ) = 1) = False := by decide
   show (if (-1 : ℤˣ) = 1 then 1 else thetaAut (m := m) (R := R)) g = theta g
   simp only [h, if_false]
   rfl
 
-
 variable (m R) in
 abbrev GG : Type _ := GL (Fin m) R ⋊[sgnAct (m := m) (R := R)] ℤˣ
 
-def GG.mat (x : GG (m := m) (R := R)) : Matrix (Fin m) (Fin m) R := (x.left : Matrix (Fin m) (Fin m) R)
+def GG.mat (x : GG (m := m) (R := R)) : Matrix (Fin m) (Fin m) R :=
+  (x.left : Matrix (Fin m) (Fin m) R)
 
 abbrev GG.ofGL : GL (Fin m) R →* GG (m := m) (R := R) := SemidirectProduct.inl
 
@@ -140,8 +144,8 @@ abbrev GG.nu : GG (m := m) (R := R) →* ℤˣ := SemidirectProduct.rightHom
 theorem map_Jgl (f : R →+* S) : GeneralLinearGroup.map f (Jgl (R := R) m) = Jgl (R := S) m :=
   Units.ext (Jmat_map (R := R) (S := S) f m)
 
-theorem map_theta (f : R →+* S) (g : GL (Fin m) R) :
-    GeneralLinearGroup.map f (theta g) = theta (GeneralLinearGroup.map f g) := by
+theorem map_theta (f : R →+* S) (g : GL (Fin m) R)
+    : GeneralLinearGroup.map f (theta g) = theta (GeneralLinearGroup.map f g) := by
   simp only [theta, map_mul, map_trInv, map_Jgl (R := R) (S := S)]
 
 def GG.map (f : R →+* S) : GG (m := m) (R := R) →* GG (m := m) (R := S) :=
@@ -152,41 +156,45 @@ def GG.map (f : R →+* S) : GG (m := m) (R := R) →* GG (m := m) (R := S) :=
     · simp
     · simpa using map_theta f g)
 
-@[simp] theorem GG.map_mat (f : R →+* S) (x : GG (m := m) (R := R)) : (GG.map f x).mat = x.mat.map f := rfl
+@[simp]
+theorem GG.map_mat (f : R →+* S) (x : GG (m := m) (R := R)) : (GG.map f x).mat = x.mat.map f := rfl
 
-@[simp] theorem GG.map_right (f : R →+* S) (x : GG (m := m) (R := R)) : (GG.map f x).right = x.right := rfl
+@[simp]
+theorem GG.map_right (f : R →+* S) (x : GG (m := m) (R := R)) : (GG.map f x).right = x.right := rfl
 
 def thetaLie (X : Matrix (Fin m) (Fin m) R) : Matrix (Fin m) (Fin m) R :=
   -(Jmat (R := R) m * Xᵀ * Jmat (R := R) m)
 
 def GG.adFun (x : GG (m := m) (R := R)) (X : Matrix (Fin m) (Fin m) R) : Matrix (Fin m) (Fin m) R :=
-  x.mat * (if x.right = 1 then X else thetaLie X) *
-    ((x.left⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)
+  x.mat * (if x.right = 1 then X else thetaLie X)
+    * ((x.left⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)
 
-private theorem jmat_mul_jmat_mul (Y : Matrix (Fin m) (Fin m) R) :
-    Jmat (R := R) m * (Jmat (R := R) m * Y) = Y := by
+private theorem jmat_mul_jmat_mul (Y : Matrix (Fin m) (Fin m) R)
+    : Jmat (R := R) m * (Jmat (R := R) m * Y) = Y := by
   rw [← Matrix.mul_assoc, Jmat_mul_Jmat, Matrix.one_mul]
 
-private theorem thetaLie_thetaLie (X : Matrix (Fin m) (Fin m) R) :
-    thetaLie (thetaLie X) = X := by
+private theorem thetaLie_thetaLie (X : Matrix (Fin m) (Fin m) R) : thetaLie (thetaLie X) = X := by
   simp only [thetaLie, Matrix.transpose_neg, Matrix.transpose_mul, Jmat_transpose,
     Matrix.transpose_transpose, Matrix.mul_neg, Matrix.neg_mul, neg_neg, Matrix.mul_assoc,
     jmat_mul_jmat_mul, Jmat_mul_Jmat, Matrix.mul_one]
 
-private theorem theta_conj_thetaLie_eq_thetaLie_conj (b : GL (Fin m) R) (X : Matrix (Fin m) (Fin m) R) :
-    (theta b : Matrix (Fin m) (Fin m) R) * (thetaLie X *
-        (((theta b)⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)) =
-      thetaLie ((b : Matrix (Fin m) (Fin m) R) * (X * ((b⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R))) := by
+private theorem theta_conj_thetaLie_eq_thetaLie_conj
+    (b : GL (Fin m) R) (X : Matrix (Fin m) (Fin m) R)
+    : (theta b : Matrix (Fin m) (Fin m) R)
+        * (thetaLie X * (((theta b)⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R))
+      = thetaLie
+        ((b : Matrix (Fin m) (Fin m) R)
+          * (X * ((b⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R))) := by
   simp only [theta_val, theta_inv_val, thetaLie, Matrix.transpose_mul, Jmat_transpose,
     Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc, jmat_mul_jmat_mul]
 
-theorem GG.adFun_mul (x y : GG (m := m) (R := R)) (X : Matrix (Fin m) (Fin m) R) :
-    (x * y).adFun X = x.adFun (y.adFun X) := by
+theorem GG.adFun_mul (x y : GG (m := m) (R := R)) (X : Matrix (Fin m) (Fin m) R)
+    : (x * y).adFun X = x.adFun (y.adFun X) := by
   obtain ⟨a, s⟩ := x
   obtain ⟨b, t⟩ := y
   have hn : ((-1 : ℤˣ) = 1) = False := by decide
-  rcases Int.units_eq_one_or s with rfl | rfl <;> rcases Int.units_eq_one_or t with rfl | rfl <;>
-    simp only [GG.adFun, GG.mat, SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+  rcases Int.units_eq_one_or s with rfl | rfl <;> rcases Int.units_eq_one_or t with rfl | rfl
+    <;> simp only [GG.adFun, GG.mat, SemidirectProduct.mul_left, SemidirectProduct.mul_right,
       sgnAct_one, sgnAct_neg_one, hn, if_true, if_false, mul_one, one_mul, neg_mul_neg,
       Units.val_mul, _root_.mul_inv_rev, Matrix.mul_assoc]
   · rw [← theta_conj_thetaLie_eq_thetaLie_conj]
@@ -194,17 +202,17 @@ theorem GG.adFun_mul (x y : GG (m := m) (R := R)) (X : Matrix (Fin m) (Fin m) R)
   · rw [← theta_conj_thetaLie_eq_thetaLie_conj, thetaLie_thetaLie]
     simp only [Matrix.mul_assoc]
 
-
 variable (m R) in
 def GG.ad : Representation R (GG (m := m) (R := R)) (Matrix (Fin m) (Fin m) R) where
-  toFun x :=
-    { toFun := x.adFun
-      map_add' := fun X Y => by
-        unfold GG.adFun thetaLie
-        split_ifs <;> simp [Matrix.mul_add, Matrix.add_mul, add_comm]
-      map_smul' := fun a X => by
-        unfold GG.adFun thetaLie
-        split_ifs <;> simp }
+  toFun x := {
+    toFun := x.adFun
+    map_add' := fun X Y => by
+      unfold GG.adFun thetaLie
+      split_ifs <;> simp [Matrix.mul_add, Matrix.add_mul, add_comm]
+    map_smul' := fun a X => by
+      unfold GG.adFun thetaLie
+      split_ifs <;> simp
+  }
   map_one' := by
     ext1 X
     simp [GG.adFun, GG.mat]
@@ -212,23 +220,26 @@ def GG.ad : Representation R (GG (m := m) (R := R)) (Matrix (Fin m) (Fin m) R) w
     ext1 X
     exact GG.adFun_mul x y X
 
-@[simp] theorem GG.ad_apply (x : GG (m := m) (R := R)) (X : Matrix (Fin m) (Fin m) R) :
-    GG.ad (m := m) (R := R) x X = x.adFun X := rfl
+@[simp]
+theorem GG.ad_apply (x : GG (m := m) (R := R)) (X : Matrix (Fin m) (Fin m) R)
+    : GG.ad (m := m) (R := R) x X = x.adFun X :=
+  rfl
 
 variable {G : Type*} [Group G]
 
 def conjBy (h : GL (Fin m) R) (r : G →* GG (m := m) (R := R)) : G →* GG (m := m) (R := R) :=
   (MulAut.conj (GG.ofGL h)).toMonoidHom.comp r
 
-def glPart (η : G →* ℤˣ) (r : G →* GG (m := m) (R := R)) (hr : ∀ g, (r g).right = η g) :
-    η.ker →* GL (Fin m) R where
+def glPart (η : G →* ℤˣ) (r : G →* GG (m := m) (R := R)) (hr : ∀ g, (r g).right = η g)
+    : η.ker →* GL (Fin m) R where
   toFun g := (r g).left
   map_one' := by simp
   map_mul' g h := by
     have hg : (r g).right = 1 := (hr g).trans g.2
     simp [hg]
 
-def adRep (r : G →* GG (m := m) (R := R)) : Representation R G (Matrix (Fin m) (Fin m) R) := (GG.ad (m := m) (R := R)).comp r
+def adRep (r : G →* GG (m := m) (R := R)) : Representation R G (Matrix (Fin m) (Fin m) R) :=
+  (GG.ad (m := m) (R := R)).comp r
 
 end Twisted
 
@@ -243,9 +254,10 @@ def wt (i j : Fin 3) : ℤ := wt1 i - wt1 j
 def torGL (t : Rˣ) : GL (Fin 3) R where
   val := Matrix.diagonal fun i => ((t ^ wt1 i : Rˣ) : R)
   inv := Matrix.diagonal fun i => (((t ^ wt1 i)⁻¹ : Rˣ) : R)
-  val_inv := by rw [Matrix.diagonal_mul_diagonal]; simp only [Units.mul_inv]; exact Matrix.diagonal_one
-  inv_val := by rw [Matrix.diagonal_mul_diagonal]; simp only [Units.inv_mul]; exact Matrix.diagonal_one
-
+  val_inv := by
+    rw [Matrix.diagonal_mul_diagonal]; simp only [Units.mul_inv]; exact Matrix.diagonal_one
+  inv_val := by
+    rw [Matrix.diagonal_mul_diagonal]; simp only [Units.inv_mul]; exact Matrix.diagonal_one
 
 variable (R) in
 def tor : Rˣ →* GL (Fin 3) R where
@@ -257,16 +269,16 @@ def tor : Rˣ →* GL (Fin 3) R where
     apply Units.ext
     simp [torGL, mul_zpow, Matrix.diagonal_mul_diagonal]
 
-theorem tor_val (t : Rˣ) : (tor R t : Matrix (Fin 3) (Fin 3) R) =
-    Matrix.diagonal fun i => ((t ^ wt1 i : Rˣ) : R) := rfl
+theorem tor_val (t : Rˣ)
+    : (tor R t : Matrix (Fin 3) (Fin 3) R) = Matrix.diagonal fun i => ((t ^ wt1 i : Rˣ) : R) :=
+  rfl
 
 theorem theta_tor (t : Rˣ) : theta (tor R t) = tor R t := by
   apply Units.ext
   rw [theta_val, ← map_inv, tor_val, tor_val]
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, wt1, Matrix.diagonal, Fin.rev]
-
+  fin_cases i <;> fin_cases j
+    <;> simp [Matrix.mul_apply, Fin.sum_univ_three, Jmat, wt1, Matrix.diagonal, Fin.rev]
 
 variable (R) in
 def gw (j : ℤ) : Submodule R (Matrix (Fin 3) (Fin 3) R) where
@@ -274,7 +286,6 @@ def gw (j : ℤ) : Submodule R (Matrix (Fin 3) (Fin 3) R) where
   add_mem' := fun hX hY a b h => by simp [hX a b h, hY a b h]
   zero_mem' := fun _ _ _ => rfl
   smul_mem' := fun c X hX a b h => by simp [hX a b h]
-
 
 variable (R) in
 def unitaryThreeTorusLieAlgebra : Submodule R (Matrix (Fin 3) (Fin 3) R) :=
@@ -300,9 +311,14 @@ def r0 (η : G →* ℤˣ) (Ψ : G →* Rˣ) : G →* GG (m := 3) (R := R) where
     · rcases Int.units_eq_one_or (η g) with hg | hg <;> simp [hg, theta_tor]
     · simp
 
-@[simp] theorem unitaryThreeReflection_right (η : G →* ℤˣ) (Ψ : G →* Rˣ) (g : G) : (r0 η Ψ g).right = η g := rfl
+@[simp]
+theorem unitaryThreeReflection_right (η : G →* ℤˣ) (Ψ : G →* Rˣ) (g : G) : (r0 η Ψ g).right = η g :=
+  rfl
 
-@[simp] theorem unitaryThreeReflection_left (η : G →* ℤˣ) (Ψ : G →* Rˣ) (g : G) : (r0 η Ψ g).left = tor R (Ψ g) := rfl
+@[simp]
+theorem unitaryThreeReflection_left (η : G →* ℤˣ) (Ψ : G →* Rˣ) (g : G)
+    : (r0 η Ψ g).left = tor R (Ψ g) :=
+  rfl
 
 end Three
 

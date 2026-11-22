@@ -13,9 +13,11 @@ open MvPolynomial NumberField IsDedekindDomain
 
 noncomputable section
 
-theorem vertComps_finite {K : Type*} [Field K] [NumberField K] {n : ℕ}
-    (I : Ideal (MvPolynomial (Fin n) K)) (u : Fin n → 𝓞 K) (v : HeightOneSpectrum (𝓞 K)) :
-    (vertComps I u v).Finite :=
+theorem vertComps_finite
+    {K : Type*} [Field K] [NumberField K]
+    {n : ℕ} (I : Ideal (MvPolynomial (Fin n) K)) (u : Fin n → 𝓞 K)
+    (v : HeightOneSpectrum (𝓞 K))
+    : (vertComps I u v).Finite :=
   (Ideal.finite_minimalPrimes_of_isNoetherianRing _ _).subset fun _ hW => hW.1.1
 
 theorem VertTermEq.proof : VertTermEq.Statement := by

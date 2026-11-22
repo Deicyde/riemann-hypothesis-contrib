@@ -42,33 +42,52 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsLineSe
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Set Filter Topology MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic GlobalTheory.ChartGlue GlobalTheory.Mix
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.CxPts GlobalTheory.Points GlobalTheory.CechPic
+  GlobalTheory.ChartGlue GlobalTheory.Mix
 set_option autoImplicit false
 noncomputable section
 namespace GlobalTheory.TwistMove
 
-theorem exists_generating_secs_tens_lbPow {F : Type} [Field F] {X : Scheme.{0}} (p : X ⟶ Sp F)
-    (H : LB X) (N : ℕ) (s : Fin (N + 1) → H.Sec) (hH : H.IsLB) (hs : AbLaw.VeryAmpleBy p H s)
-    (M : LB X) (hM : M.IsLB) : ∃ m₀ : ℕ, ∀ m : ℕ, m₀ ≤ m →
-      ∃ (n : ℕ) (u : Fin n → (CechPic.tens M (lbPow H m)).Sec), ⨆ i, nonzeroLocus (u i) = ⊤ := by
+theorem exists_generating_secs_tens_lbPow
+    {F : Type} [Field F]
+    {X : Scheme.{0}} (p : X ⟶ Sp F) (H : LB X)
+    (N : ℕ) (s : Fin (N + 1) → H.Sec)
+    (hH : H.IsLB) (hs : AbLaw.VeryAmpleBy p H s)
+    (M : LB X) (hM : M.IsLB)
+    : ∃ m₀ : ℕ, ∀ m : ℕ,
+      m₀ ≤ m
+        → ∃ (n : ℕ) (u : Fin n → (CechPic.tens M (lbPow H m)).Sec),
+          ⨆ i, nonzeroLocus (u i) = ⊤ := by
   obtain ⟨t₀, ht⟩ := GlobalTheory.TwistGen.twist_generated F X p H N s hH hs M hM
   refine ⟨t₀.toNat, fun m hm => ?_⟩
   obtain ⟨n, u, hu⟩ := ht m (by omega)
   have hP : (lbPow H m).IsLB := DVR.linComb_isLB H hH _ _
   have hT : (CechPic.tens M (lbPow H m)).IsLB := isLB_tens hM hP
-  have e : cls (AbLaw.tw M H m) (AbLaw.isLB_tw hM hH _) =
-      cls M hM - cls (AbLaw.pw H (-(m : ℤ))) (AbLaw.isLB_pw hH _) :=
+  have e
+      : cls (AbLaw.tw M H m) (AbLaw.isLB_tw hM hH _)
+        = cls M hM - cls (AbLaw.pw H (-(m : ℤ))) (AbLaw.isLB_pw hH _) :=
     cls_div hM (AbLaw.isLB_pw hH _) (AbLaw.isLB_tw hM hH _)
   have e' : cls (AbLaw.tw M H m) (AbLaw.isLB_tw hM hH _) = cls _ hT := by
-    rw [e, GlobalTheory.AmpleStabFinite.cls_pw hH, cls_tens hM hP, cls_lbPow hH, neg_zsmul, natCast_zsmul,
-      sub_neg_eq_add]
+    rw [e, GlobalTheory.AmpleStabFinite.cls_pw hH, cls_tens hM hP, cls_lbPow hH, neg_zsmul,
+      natCast_zsmul, sub_neg_eq_add]
   obtain ⟨v, hv⟩ := exists_generating_secs_of_cls_eq _ _ _ _ hT e' _ u hu
   exact ⟨_, v, hv⟩
 
-theorem exists_twist_generated_sec_nonzero : ∀ (F : Type) [Field F] [Infinite F] (X : Scheme.{0}) (p : X ⟶ Sp F), IsProjOver p → ∀ (B : LB X), B.IsLB → ∀ S : Set X, S.Finite → ∃ (A : LB X) (_ : A.IsLB) (a : A.Sec), (∃ (n : ℕ) (u : Fin n → A.Sec), ⨆ i, nonzeroLocus (u i) = ⊤) ∧ (∃ (n : ℕ) (u : Fin n → (CechPic.tens B A).Sec), ⨆ i, nonzeroLocus (u i) = ⊤) ∧ ∀ z ∈ S, z ∈ nonzeroLocus a := by
+theorem exists_twist_generated_sec_nonzero
+    : ∀ (F : Type) [Field F] [Infinite F] (X : Scheme.{0}) (p : X ⟶ Sp F),
+      IsProjOver p
+        → ∀ (B : LB X),
+          B.IsLB
+            → ∀ S : Set X,
+              S.Finite
+                → ∃ (A : LB X) (_ : A.IsLB) (a : A.Sec),
+                  (∃ (n : ℕ) (u : Fin n → A.Sec), ⨆ i, nonzeroLocus (u i) = ⊤)
+                    ∧ (∃ (n : ℕ) (u : Fin n → (CechPic.tens B A).Sec), ⨆ i, nonzeroLocus (u i) = ⊤)
+                    ∧ ∀ z ∈ S, z ∈ nonzeroLocus a := by
   intro F _ _ X p hp B hB S hS
   haveI : AlgebraicGeometry.IsNoetherian X := isNoetherian_of_isProjOver hp
   obtain ⟨N, ι, hι, e⟩ := hp

@@ -6,10 +6,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.TorsionBoun
 
 open CategoryTheory UpperTheory.V.KH
 
-theorem UpperTheory.V.KH.fullEnum :
-    ∀ (ι : Type) [Finite ι] (b : Set (ι →₀ ℤ)), LinearIndepOn ℤ id b →
-      (∀ k : ι, ∃ n : ℤ, n ≠ 0 ∧ n • Finsupp.single k (1 : ℤ) ∈ Submodule.span ℤ b) →
-      ∃ v : ι → (ι →₀ ℤ), LinearIndependent ℤ v ∧ Set.range v = b := by
+theorem UpperTheory.V.KH.fullEnum
+    : ∀ (ι : Type) [Finite ι] (b : Set (ι →₀ ℤ)),
+      LinearIndepOn ℤ id b
+        → (∀ k : ι, ∃ n : ℤ, n ≠ 0 ∧ n • Finsupp.single k (1 : ℤ) ∈ Submodule.span ℤ b)
+        → ∃ v : ι → (ι →₀ ℤ), LinearIndependent ℤ v ∧ Set.range v = b := by
   intro ι _ b hb hn
   have hli : LinearIndependent ℤ (fun x : b => (x : ι →₀ ℤ)) := hb
   haveI : Finite b := hli.finite
@@ -25,7 +26,8 @@ theorem UpperTheory.V.KH.fullEnum :
     intro s c hs i hi
     have := congrArg (fun f : ι →₀ ℤ => f i) hs
     simp only [Finsupp.finsetSum_apply, Finsupp.smul_apply, Finsupp.single_apply, smul_eq_mul,
-      Finsupp.coe_zero, Pi.zero_apply] at this
+        Finsupp.coe_zero, Pi.zero_apply]
+      at this
     rw [Finset.sum_eq_single i] at this
     · simp only [if_true, mul_one] at this
       rcases mul_eq_zero.1 this with h | h
@@ -36,8 +38,7 @@ theorem UpperTheory.V.KH.fullEnum :
     · intro h
       exact absurd hi h
   let w : ι → Submodule.span ℤ b := fun k => ⟨n k • Finsupp.single k (1 : ℤ), hmem k⟩
-  have hw : LinearIndependent ℤ w :=
-    LinearIndependent.of_comp (Submodule.span ℤ b).subtype hind
+  have hw : LinearIndependent ℤ w := LinearIndependent.of_comp (Submodule.span ℤ b).subtype hind
   have h2 : Fintype.card ι ≤ Fintype.card b := by
     have := hw.fintype_card_le_finrank
     rw [finrank_span_set_eq_card hb, Set.toFinset_card] at this

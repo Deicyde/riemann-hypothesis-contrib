@@ -14,8 +14,8 @@ open Finset InnerProductSpace
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] {d : ℕ}
 
 def IsRed (b : Fin d → E) : Prop :=
-  LinearIndependent ℝ b ∧ (∀ i j : Fin d, j < i → |mu b i j| ≤ 1 / 2) ∧
-    (∀ i j : Fin d, i.val = j.val + 1 → ‖gs b j‖ ^ 2 ≤ 2 * ‖gs b i‖ ^ 2)
+  LinearIndependent ℝ b ∧ (∀ i j : Fin d, j < i → |mu b i j| ≤ 1 / 2)
+    ∧ (∀ i j : Fin d, i.val = j.val + 1 → ‖gs b j‖ ^ 2 ≤ 2 * ‖gs b i‖ ^ 2)
 
 lemma nu_sub (b : Fin d → E) (c w : Fin d → ℝ) (N : ℝ) (j : Fin d) :
     nu b (fun l => c l - N * w l) j = nu b c j - N * nu b w j := by

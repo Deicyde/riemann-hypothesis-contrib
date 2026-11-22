@@ -6,8 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSm
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-theorem UpperTheory.V.Fr.pr_count :
-    ∀ {K G W V T : Type} [Field K] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module K W] [Module.Finite K W] [AddCommGroup T] [Module K T] [Module.Finite K T] {Gv : V → Type} [∀ v, Group (Gv v)] (loc : ∀ v, Gv v →* G) (ρ : Representation K G W) (b : V → Submodule K W) (φ : T →ₗ[K] (G → W)), (∀ v Y, (∀ s, ρ (loc v s) Y - Y ∈ b v) → Y ∈ b v) → (∀ x ∈ Z1C loc ρ b, ∃ D X, ∀ s, φ D s = x.1 s + (ρ s X - X)) → Module.finrank K (H1C loc ρ b) ≤ Module.finrank K T ∧ ∀ (X₀ : W) (D₀ : T), X₀ ≠ 0 → (∀ s, φ D₀ s = ρ s X₀ - X₀) → Module.finrank K (H1C loc ρ b) + 1 ≤ Module.finrank K T + Module.finrank K (coneH0 ρ b) := by
+theorem UpperTheory.V.Fr.pr_count
+    : ∀ {K G W V T : Type} [Field K] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module K W]
+        [Module.Finite K W] [AddCommGroup T] [Module K T] [Module.Finite K T] {Gv : V → Type}
+        [∀ v, Group (Gv v)] (loc : ∀ v, Gv v →* G) (ρ : Representation K G W)
+        (b : V → Submodule K W) (φ : T →ₗ[K] (G → W)),
+      (∀ v Y, (∀ s, ρ (loc v s) Y - Y ∈ b v) → Y ∈ b v)
+        → (∀ x ∈ Z1C loc ρ b, ∃ D X, ∀ s, φ D s = x.1 s + (ρ s X - X))
+        → Module.finrank K (H1C loc ρ b) ≤ Module.finrank K T
+          ∧ ∀ (X₀ : W) (D₀ : T),
+            X₀ ≠ 0 → (∀ s, φ D₀ s = ρ s X₀ - X₀)
+              → Module.finrank K (H1C loc ρ b) + 1
+                ≤ Module.finrank K T + Module.finrank K (coneH0 ρ b) := by
   intro K G W V T _ _ _ _ _ _ _ _ _ Gv _ loc ρ b φ hA hB
   let cob : W →ₗ[K] (G → W) := LinearMap.pi (fun s => ρ s - LinearMap.id)
   have hcob : ∀ X s, cob X s = ρ s X - X := fun X s => rfl
@@ -15,7 +25,8 @@ theorem UpperTheory.V.Fr.pr_count :
   let f : T →ₗ[K] (G → W) ⧸ C := C.mkQ ∘ₗ φ
   let Ψ : Z1C loc ρ b →ₗ[K] (G → W) ⧸ C :=
     C.mkQ ∘ₗ (LinearMap.fst K (G → W) (V → W)) ∘ₗ (Z1C loc ρ b).subtype
-  have hle : Submodule.comap (Z1C loc ρ b).subtype (continuousCoboundaries1 ρ b) ≤ LinearMap.ker Ψ := by
+  have hle
+      : Submodule.comap (Z1C loc ρ b).subtype (continuousCoboundaries1 ρ b) ≤ LinearMap.ker Ψ := by
     rintro ⟨x, hx⟩ hxB
     rw [Submodule.mem_comap] at hxB
     obtain ⟨X, hX, -⟩ := hxB
@@ -23,7 +34,8 @@ theorem UpperTheory.V.Fr.pr_count :
     show C.mkQ x.1 = 0
     rw [Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
     exact ⟨X, funext fun s => ((hX s).trans (hcob X s).symm).symm⟩
-  have hker : LinearMap.ker Ψ ≤ Submodule.comap (Z1C loc ρ b).subtype (continuousCoboundaries1 ρ b) := by
+  have hker
+      : LinearMap.ker Ψ ≤ Submodule.comap (Z1C loc ρ b).subtype (continuousCoboundaries1 ρ b) := by
     rintro ⟨x, hx⟩ hk
     rw [LinearMap.mem_ker] at hk
     change C.mkQ x.1 = 0 at hk

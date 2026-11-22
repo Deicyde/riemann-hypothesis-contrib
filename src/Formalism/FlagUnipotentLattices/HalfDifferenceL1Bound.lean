@@ -23,5 +23,4 @@ def Ydat (n f : ℕ) (rd g b : ℝ) : ℝ := (n : ℝ) * f * rd * g * b
 
 def epsN (c : ℝ) (n f : ℕ) : ℝ := c / ((n : ℝ) ^ 8 * (f : ℝ) ^ 2)
 
-
 end Formalism.HermitianLatticeCounting.S7

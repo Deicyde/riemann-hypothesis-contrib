@@ -9,10 +9,10 @@ open IsLocalRing
 
 namespace GlobalTheory.CompleteNakayamaLocal
 
-theorem exists_fg_sup_pow_eq_top {B R : Type} [CommRing B] [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] [Algebra B R]
-    (hres : Module.Finite B (R ⧸ maximalIdeal R)) (n : ℕ) :
-    ∃ P : Submodule B R, P.FG ∧ P ⊔ (maximalIdeal R ^ n).restrictScalars B = ⊤ := by
+theorem exists_fg_sup_pow_eq_top
+    {B R : Type} [CommRing B] [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [Algebra B R]
+    (hres : Module.Finite B (R ⧸ maximalIdeal R)) (n : ℕ)
+    : ∃ P : Submodule B R, P.FG ∧ P ⊔ (maximalIdeal R ^ n).restrictScalars B = ⊤ := by
   obtain ⟨T, hT⟩ := (Module.Finite.fg_top (R := B) (M := R ⧸ maximalIdeal R))
   choose lift hlift using fun x : R ⧸ maximalIdeal R => Ideal.Quotient.mk_surjective x
 
@@ -21,9 +21,10 @@ theorem exists_fg_sup_pow_eq_top {B R : Type} [CommRing B] [CommRing R] [IsLocal
     intro r _
     have hr : Ideal.Quotient.mk (maximalIdeal R) r ∈ Submodule.span B (T : Set _) := by
       rw [hT]; trivial
-    have hmap : Submodule.span B (T : Set (R ⧸ maximalIdeal R)) =
-        (Submodule.span B (lift '' (T : Set _))).map
-          (Ideal.Quotient.mkₐ B (maximalIdeal R)).toLinearMap := by
+    have hmap
+        : Submodule.span B (T : Set (R ⧸ maximalIdeal R))
+          = (Submodule.span B (lift '' (T : Set _))).map
+            (Ideal.Quotient.mkₐ B (maximalIdeal R)).toLinearMap := by
       rw [Submodule.map_span, ← Set.image_comp]
       congr 1
       ext x
@@ -44,8 +45,9 @@ theorem exists_fg_sup_pow_eq_top {B R : Type} [CommRing B] [CommRing R] [IsLocal
     have hGf : G.Finite := ((T.finite_toSet.image _).image2 _ gens.finite_toSet)
     refine ⟨P ⊔ Submodule.span B G, hP.sup (Submodule.fg_def.2 ⟨G, hGf, rfl⟩), ?_⟩
 
-    have key : ∀ y ∈ maximalIdeal R ^ n, ∀ r : R,
-        r * y ∈ Submodule.span B G ⊔ (maximalIdeal R ^ (n + 1)).restrictScalars B := by
+    have key
+        : ∀ y ∈ maximalIdeal R ^ n, ∀ r : R,
+          r * y ∈ Submodule.span B G ⊔ (maximalIdeal R ^ (n + 1)).restrictScalars B := by
       intro y hy
       rw [← hgens] at hy
       induction hy using Submodule.span_induction with
@@ -79,11 +81,12 @@ theorem exists_fg_sup_pow_eq_top {B R : Type} [CommRing B] [CommRing R] [IsLocal
     rw [Submodule.mem_sup]
     refine ⟨p + a, Submodule.add_mem_sup hp ha, c, hc, by ring⟩
 
-theorem finite_of_maximalIdeal_le_radical : ∀ (B R : Type) [CommRing B] [IsLocalRing B]
-    [IsNoetherianRing B] [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (ψ : B →+* R),
-    IsAdicComplete (maximalIdeal B) B → IsLocalHom ψ →
-    maximalIdeal R ≤ ((maximalIdeal B).map ψ).radical → ((residue R).comp ψ).Finite →
-    ψ.Finite := by
+theorem finite_of_maximalIdeal_le_radical
+    : ∀ (B R : Type) [CommRing B] [IsLocalRing B] [IsNoetherianRing B] [CommRing R] [IsLocalRing R]
+        [IsNoetherianRing R] (ψ : B →+* R),
+      IsAdicComplete (maximalIdeal B) B → IsLocalHom ψ
+        → maximalIdeal R ≤ ((maximalIdeal B).map ψ).radical → ((residue R).comp ψ).Finite
+        → ψ.Finite := by
   intro B R _ _ _ _ _ _ ψ hB hψ hrad hres
   letI : Algebra B R := ψ.toAlgebra
   set J : Ideal R := (maximalIdeal B).map (algebraMap B R) with hJdef

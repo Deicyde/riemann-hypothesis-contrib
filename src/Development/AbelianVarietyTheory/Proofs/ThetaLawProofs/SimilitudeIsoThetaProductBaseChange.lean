@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.IndepOnEmpt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyKa
@@ -25,36 +27,46 @@ open GlobalTheory.KeyKa
 noncomputable section
 namespace GlobalTheory.KeyRow
 
-theorem comb_push {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G'] {f : S' ⟶ S}
-    {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) {T : Over S} {T' : Over S'} (ψ : T'.left ⟶ T.left)
-    (hψ : ψ ≫ T.hom = T'.hom ≫ f) {n : ℕ} (p : Fin n → (T ⟶ G)) (p' : Fin n → (T' ⟶ G'))
-    (hp : ∀ c, (p' c).left ≫ φ = ψ ≫ (p c).left) (a : Fin n → ℤ) (ξ : 𝟙_ (Over S) ⟶ G) (ξ' : 𝟙_ (Over S') ⟶ G')
-    (hξ : ξ'.left ≫ φ = f ≫ ξ.left) :
-    ((List.ofFn fun c => p' c ^ a c).prod * (toUnit _ ≫ ξ')).left ≫ φ =
-      ψ ≫ ((List.ofFn fun c => p c ^ a c).prod * (toUnit _ ≫ ξ)).left := by
+theorem comb_push
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    {T : Over S} {T' : Over S'} (ψ : T'.left ⟶ T.left) (hψ : ψ ≫ T.hom = T'.hom ≫ f)
+    {n : ℕ} (p : Fin n → (T ⟶ G)) (p' : Fin n → (T' ⟶ G'))
+    (hp : ∀ c, (p' c).left ≫ φ = ψ ≫ (p c).left) (a : Fin n → ℤ)
+    (ξ : 𝟙_ (Over S) ⟶ G) (ξ' : 𝟙_ (Over S') ⟶ G') (hξ : ξ'.left ≫ φ = f ≫ ξ.left)
+    : ((List.ofFn fun c => p' c ^ a c).prod * (toUnit _ ≫ ξ')).left ≫ φ
+      = ψ ≫ ((List.ofFn fun c => p c ^ a c).prod * (toUnit _ ≫ ξ)).left := by
   let U : Over.mk (T'.hom ≫ f) ⟶ T := Over.homMk ψ hψ
   have e₁ : ∀ c, pushHom h T' (p' c) = preHom U (p c) := fun c => Over.OverMorphism.ext (hp c)
   have t : ∀ {B : Scheme.{0}} (V : Over B), (toUnit V).left = V.hom := fun V =>
     (Category.comp_id _).symm.trans (Over.w (toUnit V))
-  have e₂ : pushHom h T' (toUnit _ ≫ ξ') = preHom U (toUnit _ ≫ ξ) := Over.OverMorphism.ext (by
-    show ((toUnit T').left ≫ ξ'.left) ≫ φ = ψ ≫ (toUnit T).left ≫ ξ.left
-    rw [Category.assoc, hξ, t, t]
-    exact (Category.assoc _ _ _).symm.trans ((congrArg (· ≫ ξ.left) hψ.symm).trans (Category.assoc _ _ _)))
-  have e : pushHom h T' ((List.ofFn fun c => p' c ^ a c).prod * (toUnit _ ≫ ξ')) =
-      preHom U ((List.ofFn fun c => p c ^ a c).prod * (toUnit _ ≫ ξ)) := by
+  have e₂ : pushHom h T' (toUnit _ ≫ ξ') = preHom U (toUnit _ ≫ ξ) :=
+    Over.OverMorphism.ext (by
+      show ((toUnit T').left ≫ ξ'.left) ≫ φ = ψ ≫ (toUnit T).left ≫ ξ.left
+      rw [Category.assoc, hξ, t, t]
+      exact (Category.assoc _ _ _).symm.trans
+        ((congrArg (· ≫ ξ.left) hψ.symm).trans (Category.assoc _ _ _)))
+  have e
+      : pushHom h T' ((List.ofFn fun c => p' c ^ a c).prod * (toUnit _ ≫ ξ'))
+        = preHom U ((List.ofFn fun c => p c ^ a c).prod * (toUnit _ ≫ ξ)) := by
     rw [map_mul, map_mul, map_list_prod, map_list_prod, List.map_ofFn, List.map_ofFn, e₂]
     congr 3
     funext c
     simp only [Function.comp_apply, map_zpow, e₁]
   exact congrArg (fun z => z.left) e
 
-theorem cancel_units {A K κ : Type} [CommRing A] [Fintype K] [Fintype κ] [DecidableEq κ] {N m : ℕ} (s : K → Aˣ)
-    (t : κ → Aˣ) (v : Aˣ) (x : K → A) (c : (κ → Fin N) → A) (y : κ → Fin N → A)
-    (h : ∏ r, (s r ^ 1).val * x r = (((∏ r, s r ^ (1 : ℤ)) * ∏ k, t k ^ (-(m : ℤ))) * v).val *
-      ∑ I, c I * ∏ k, (t k ^ m).val * y k (I k)) :
-    ∏ r, x r = v.val * ∑ I, c I * ∏ k, y k (I k) := by
-  simp only [pow_one, zpow_one, zpow_neg, zpow_natCast, Finset.prod_mul_distrib, Finset.prod_inv_distrib,
-    ← Units.coe_prod, mul_left_comm _ (∏ k, t k ^ m).val, ← Finset.mul_sum] at h
+theorem cancel_units
+    {A K κ : Type} [CommRing A] [Fintype K] [Fintype κ] [DecidableEq κ]
+    {N m : ℕ}
+    (s : K → Aˣ) (t : κ → Aˣ) (v : Aˣ) (x : K → A) (c : (κ → Fin N) → A) (y : κ → Fin N → A)
+    (h : ∏ r, (s r ^ 1).val * x r
+      = (((∏ r, s r ^ (1 : ℤ)) * ∏ k, t k ^ (-(m : ℤ))) * v).val
+        * ∑ I, c I * ∏ k, (t k ^ m).val * y k (I k))
+    : ∏ r, x r = v.val * ∑ I, c I * ∏ k, y k (I k) := by
+  simp only [pow_one, zpow_one, zpow_neg, zpow_natCast, Finset.prod_mul_distrib,
+      Finset.prod_inv_distrib, ← Units.coe_prod, mul_left_comm _ (∏ k, t k ^ m).val,
+      ← Finset.mul_sum]
+    at h
   refine (Units.mul_right_inj (∏ r, s r)).1 (h.trans ?_)
   rw [← _root_.mul_assoc, ← _root_.mul_assoc, ← Units.val_mul, ← Units.val_mul]
   congr 2

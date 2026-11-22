@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix UpperTheory.V.Weyl
 
-theorem UpperTheory.V.Weyl.rtrMul :
-    ∀ (n : ℕ), (∀ f : Pol n, rtr 1 f = f) ∧ ∀ (g h : Matrix (Fin n) (Fin n) ℂ) (f : Pol n), rtr (g * h) f = rtr g (rtr h f) := by
+theorem UpperTheory.V.Weyl.rtrMul
+    : ∀ (n : ℕ),
+      (∀ f : Pol n, rtr 1 f = f)
+        ∧ ∀ (g h : Matrix (Fin n) (Fin n) ℂ) (f : Pol n), rtr (g * h) f = rtr g (rtr h f) := by
   intro n
   constructor
   · intro f
@@ -24,12 +26,17 @@ theorem UpperTheory.V.Weyl.rtrMul :
       rw [AlgHom.comp_apply]
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [rtr, MvPolynomial.aeval_X, map_sum]
-      have hx : ∀ x, (MvPolynomial.aeval (fun ij : Fin n × Fin n => ∑ k, MvPolynomial.X (ij.1, k) *
-          MvPolynomial.C (g k ij.2)) : MvPolynomial (Fin n × Fin n) ℂ →ₐ[ℂ] MvPolynomial (Fin n × Fin n) ℂ)
-          (MvPolynomial.X (i, x) * MvPolynomial.C (h x j)) =
-          ∑ k, MvPolynomial.X (i, k) * MvPolynomial.C (g k x * h x j) := by
+      have hx
+          : ∀ x,
+            (MvPolynomial.aeval (fun ij : Fin n × Fin n =>
+                    ∑ k, MvPolynomial.X (ij.1, k) *
+                      MvPolynomial.C (g k ij.2))
+                  : MvPolynomial (Fin n × Fin n) ℂ →ₐ[ℂ] MvPolynomial (Fin n × Fin n) ℂ)
+                (MvPolynomial.X (i, x) * MvPolynomial.C (h x j))
+              = ∑ k, MvPolynomial.X (i, k) * MvPolynomial.C (g k x * h x j) := by
         intro x
-        rw [map_mul, MvPolynomial.aeval_X, MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq, Finset.sum_mul]
+        rw [map_mul, MvPolynomial.aeval_X, MvPolynomial.aeval_C, MvPolynomial.algebraMap_eq,
+          Finset.sum_mul]
         simp only [mul_assoc, ← map_mul]
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [hx, Matrix.mul_apply, map_sum, Finset.mul_sum]

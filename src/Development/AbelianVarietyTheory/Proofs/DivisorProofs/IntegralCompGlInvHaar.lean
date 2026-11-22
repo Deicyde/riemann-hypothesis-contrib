@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DistribHaarC
 @[expose] public section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK
 open GlobalTheory.Doubling (absE)
 
 noncomputable section
@@ -21,12 +23,15 @@ namespace GlobalTheory.SiegelCov
 
 section Gen
 
-open MeasureTheory Topology Matrix NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.ModuLR
+open MeasureTheory Topology Matrix NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.GaugeEx GlobalTheory.ModuLR
 
-theorem chi_adele (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ] [DecidableEq κ]
-    (M : Matrix κ κ (AF F)) (hM : IsUnit M.det) :
-    (addEquivAddHaarChar (mulVecCE M hM) : ℝ) =
-      (modu (Ainf F) (fstA F M.det) : ℝ) * ∏ᶠ v, ‖evalV F v (sndA F M.det)‖ := by
+theorem chi_adele
+    (F : Type) [Field F] [NumberField F]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    (M : Matrix κ κ (AF F)) (hM : IsUnit M.det)
+    : (addEquivAddHaarChar (mulVecCE M hM) : ℝ)
+      = (modu (Ainf F) (fstA F M.det) : ℝ) * ∏ᶠ v, ‖evalV F v (sndA F M.det)‖ := by
   classical
   let Mi : Matrix κ κ (Ainf F) := (fstA F).toRingHom.mapMatrix M
   let Mf : Matrix κ κ (Af F) := (sndA F).toRingHom.mapMatrix M
@@ -35,35 +40,48 @@ theorem chi_adele (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ] 
   have hMi : IsUnit Mi.det := hi ▸ hM.map (fstA F)
   have hMf : IsUnit Mf.det := hf ▸ hM.map (sndA F)
   let j : (κ → Ainf F) × (κ → Af F) →+ (κ → AF F) := zipHom κ (Ainf F) (Af F)
-  have hj : IsOpenEmbedding j := GlobalTheory.T.isOpenEmbedding_pairOfTuplesToTupleOfPairs κ (Ainf F) (Af F)
-  have s1 : addEquivAddHaarChar (mulVecCE M hM) =
-      addEquivAddHaarChar (prodCE (mulVecCE Mi hMi) (mulVecCE Mf hMf)) :=
-    GlobalTheory.T.addEquivAddHaarChar_eq_of_isOpenEmbedding_restrict _ _ j hj (mulVecCE M hM) (prodCE (mulVecCE Mi hMi) (mulVecCE Mf hMf)) fun p => by
-      funext i
-      show (M *ᵥ j p) i = ((Mi *ᵥ p.1) i, (Mf *ᵥ p.2) i)
-      have e1 : fstA F ((M *ᵥ j p) i) = (Mi *ᵥ p.1) i := by
-        rw [show (fstA F) ((M *ᵥ j p) i) = (fstA F).toRingHom ((M *ᵥ j p) i) from rfl, RingHom.map_mulVec]
+  have hj : IsOpenEmbedding j :=
+    GlobalTheory.T.isOpenEmbedding_pairOfTuplesToTupleOfPairs κ (Ainf F) (Af F)
+  have s1
+      : addEquivAddHaarChar (mulVecCE M hM)
+        = addEquivAddHaarChar (prodCE (mulVecCE Mi hMi) (mulVecCE Mf hMf)) :=
+    GlobalTheory.T.addEquivAddHaarChar_eq_of_isOpenEmbedding_restrict _ _ j hj (mulVecCE M hM)
+      (prodCE (mulVecCE Mi hMi) (mulVecCE Mf hMf))
+      fun p => by
+        funext i
+        show (M *ᵥ j p) i = ((Mi *ᵥ p.1) i, (Mf *ᵥ p.2) i)
+        have e1 : fstA F ((M *ᵥ j p) i) = (Mi *ᵥ p.1) i := by
+          rw [show (fstA F) ((M *ᵥ j p) i) = (fstA F).toRingHom ((M *ᵥ j p) i) from rfl,
+            RingHom.map_mulVec]
+          rfl
+        have e2 : sndA F ((M *ᵥ j p) i) = (Mf *ᵥ p.2) i := by
+          rw [show (sndA F) ((M *ᵥ j p) i) = (sndA F).toRingHom ((M *ᵥ j p) i) from rfl,
+            RingHom.map_mulVec]
+          rfl
+        rw [← e1, ← e2]
         rfl
-      have e2 : sndA F ((M *ᵥ j p) i) = (Mf *ᵥ p.2) i := by
-        rw [show (sndA F) ((M *ᵥ j p) i) = (sndA F).toRingHom ((M *ᵥ j p) i) from rfl, RingHom.map_mulVec]
-        rfl
-      rw [← e1, ← e2]
-      rfl
   haveI : IsArtinianRing (Ainf F) := inferInstanceAs (IsArtinianRing (∀ v : InfinitePlace F, v.Completion))
   haveI : IsReduced (Ainf F) := inferInstanceAs (IsReduced (∀ v : InfinitePlace F, v.Completion))
   have s2 : addEquivAddHaarChar (mulVecCE Mi hMi) = modu (Ainf F) Mi.det :=
-    GlobalTheory.T.addEquivAddHaarChar_mulVec_artinian_reduced (Ainf F) inferInstance inferInstance κ Mi hMi
+    GlobalTheory.T.addEquivAddHaarChar_mulVec_artinian_reduced (Ainf F) inferInstance inferInstance
+      κ Mi hMi
   rw [s1, GlobalTheory.T.addEquivAddHaarChar_prodCongr, NNReal.coe_mul, s2, chi_Af F Mf hMf, hi, hf]
 
-theorem addEquivAddHaarChar_mulVecCE_adele (F : Type) [Field F] [NumberField F] {κ : Type} [Fintype κ]
-    [DecidableEq κ] (M : Matrix κ κ (AF F)) (hM : IsUnit M.det) :
-    addEquivAddHaarChar (mulVecCE M hM) = distribHaarChar (AF F) hM.unit := by
+theorem addEquivAddHaarChar_mulVecCE_adele
+    (F : Type) [Field F] [NumberField F]
+    {κ : Type} [Fintype κ] [DecidableEq κ]
+    (M : Matrix κ κ (AF F)) (hM : IsUnit M.det)
+    : addEquivAddHaarChar (mulVecCE M hM) = distribHaarChar (AF F) hM.unit := by
   let N : Matrix Unit Unit (AF F) := fun _ _ => M.det
   have hdet : N.det = M.det := Matrix.det_unique N
   have hN : IsUnit N.det := hdet ▸ hM
-  have htr := GlobalTheory.ModuLR.addEquivAddHaarChar_transport (GlobalTheory.ModuNorm.evalUnitCE (AF F)) (mulVecCE N hN)
-  have hext : ((GlobalTheory.ModuNorm.evalUnitCE (AF F)).symm.trans (mulVecCE N hN)).trans (GlobalTheory.ModuNorm.evalUnitCE (AF F)) =
-      GlobalTheory.ModuNorm.mulUnitCE hM.unit := by
+  have htr :=
+    GlobalTheory.ModuLR.addEquivAddHaarChar_transport (GlobalTheory.ModuNorm.evalUnitCE (AF F))
+      (mulVecCE N hN)
+  have hext
+      : ((GlobalTheory.ModuNorm.evalUnitCE (AF F)).symm.trans (mulVecCE N hN)).trans
+          (GlobalTheory.ModuNorm.evalUnitCE (AF F))
+        = GlobalTheory.ModuNorm.mulUnitCE hM.unit := by
     ext x
     show (N *ᵥ fun _ => x) () = M.det * x
     simp [Matrix.mulVec, dotProduct, N]
@@ -111,25 +129,31 @@ theorem continuous_vecCoord_symm : Continuous (vecCoord F E n).symm := by
     IsModuleTopology.continuous_of_linearMap (tensBasis F E).equivFun.symm.toLinearMap
   exact continuous_pi fun i => hb.comp (continuous_pi fun k => continuous_apply (i, k))
 
-def vecCoordCE : (Fin n → AE F E) ≃ₜ+ (Fin n × Fin (Module.finrank F E) → AF F) :=
-  { (vecCoord F E n).toAddEquiv with
-    continuous_toFun := continuous_vecCoord F E n
-    continuous_invFun := continuous_vecCoord_symm F E n }
+def vecCoordCE : (Fin n → AE F E) ≃ₜ+ (Fin n × Fin (Module.finrank F E) → AF F) := {
+  (vecCoord F E n).toAddEquiv with
+  continuous_toFun := continuous_vecCoord F E n
+  continuous_invFun := continuous_vecCoord_symm F E n
+}
 
 end Coord
 
 end GlobalTheory.SiegelCov
 
-
 open GlobalTheory.GaugeEx in
-theorem GlobalTheory.SiegelCov.integral_mulVec_inv : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ)
-    (μ : @Measure (Fin n → AE F E) (borel _)), GlobalTheory.SiegelAvg.IsHaarB μ →
-    ∀ (t : GL (Fin n) (AE F E)) (f : (Fin n → AE F E) → ℂ),
-      (letI : MeasurableSpace (Fin n → AE F E) := borel _; Integrable f μ) →
-      (letI : MeasurableSpace (Fin n → AE F E) := borel _;
-        ∫ y, f (((t⁻¹ : GL (Fin n) (AE F E)) : Matrix (Fin n) (Fin n) (AE F E)) *ᵥ y) ∂μ) =
-        (((adeleClass F).modu (Units.map (Algebra.norm (AF F) : AE F E →* AF F) (Matrix.GeneralLinearGroup.det t)) : ℝ) : ℂ) *
-          (letI : MeasurableSpace (Fin n → AE F E) := borel _; ∫ y, f y ∂μ) := by
+theorem GlobalTheory.SiegelCov.integral_mulVec_inv
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (n : ℕ)
+        (μ : @Measure (Fin n → AE F E) (borel _)),
+      GlobalTheory.SiegelAvg.IsHaarB μ
+        → ∀ (t : GL (Fin n) (AE F E)) (f : (Fin n → AE F E) → ℂ),
+          (letI : MeasurableSpace (Fin n → AE F E) := borel _; Integrable f μ)
+            → (letI : MeasurableSpace (Fin n → AE F E) := borel _
+               ∫ y, f (((t⁻¹ : GL (Fin n) (AE F E)) : Matrix (Fin n) (Fin n) (AE F E)) *ᵥ y) ∂μ)
+              = (((adeleClass F).modu
+                      (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
+                        (Matrix.GeneralLinearGroup.det t))
+                    : ℝ)
+                  : ℂ)
+                * (letI : MeasurableSpace (Fin n → AE F E) := borel _; ∫ y, f y ∂μ) := by
   intro F E _ _ _ _ _ n μ hμ t f _
   letI : MeasurableSpace (Fin n → AE F E) := borel _
   haveI : BorelSpace (Fin n → AE F E) := ⟨rfl⟩
@@ -152,15 +176,20 @@ theorem GlobalTheory.SiegelCov.integral_mulVec_inv : ∀ (F E : Type) [Field F] 
   set Λ := LinearMap.toMatrix' ((GlobalTheory.SiegelCov.vecCoord F E n).toLinearMap ∘ₗ
     (Matrix.toLin' T).restrictScalars (AF F) ∘ₗ (GlobalTheory.SiegelCov.vecCoord F E n).symm.toLinearMap) with hΛdef
   have hdet : Λ.det = Algebra.norm (AF F) T.det := by
-    rw [LinearMap.det_toMatrix', LinearMap.det_conj, LinearMap.det_restrictScalars, LinearMap.det_toLin']
+    rw [LinearMap.det_toMatrix', LinearMap.det_conj, LinearMap.det_restrictScalars,
+      LinearMap.det_toLin']
   have hΛ : IsUnit Λ.det := hdet ▸ hT.map (Algebra.norm (AF F))
   have hc : GlobalTheory.ModuLR.mulVecCE Λ hΛ = (Φ.symm.trans L).trans Φ := by
     ext x
     rw [GlobalTheory.ModuLR.mulVecCE_apply, LinearMap.toMatrix'_mulVec]
     rfl
   have hχ : addEquivAddHaarChar L = distribHaarChar (AF F) hΛ.unit := by
-    rw [← GlobalTheory.SiegelCov.addEquivAddHaarChar_mulVecCE_adele, hc, GlobalTheory.ModuLR.addEquivAddHaarChar_transport]
-  have hu : hΛ.unit = (Units.map (Algebra.norm (AF F) : AE F E →* AF F) (Matrix.GeneralLinearGroup.det t))⁻¹ := by
+    rw [← GlobalTheory.SiegelCov.addEquivAddHaarChar_mulVecCE_adele, hc,
+      GlobalTheory.ModuLR.addEquivAddHaarChar_transport]
+  have hu
+      : hΛ.unit
+        = (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
+          (Matrix.GeneralLinearGroup.det t))⁻¹ := by
     ext
     rw [IsUnit.unit_spec, hdet, hTdef]
     simp [Matrix.GeneralLinearGroup.val_det_apply]
@@ -168,12 +197,17 @@ theorem GlobalTheory.SiegelCov.integral_mulVec_inv : ∀ (F E : Type) [Field F] 
   set c := addEquivAddHaarChar L with hcdef
   have hc0 : c ≠ 0 := (addEquivAddHaarChar_pos L).ne'
   have hmap : μ.map L = c⁻¹ • μ := by
-    calc μ.map L = (c⁻¹ * c) • μ.map L := by rw [inv_mul_cancel₀ hc0, one_smul]
+    calc
+      μ.map L
+        = (c⁻¹ * c) • μ.map L := by rw [inv_mul_cancel₀ hc0, one_smul]
       _ = c⁻¹ • μ := by rw [mul_smul, key]
   have hint : ∫ y, f (T *ᵥ y) ∂μ = ∫ y, f y ∂(μ.map L) :=
     (integral_map_equiv L.toHomeomorph.toMeasurableEquiv f).symm
-  have hmodu : ((adeleClass F).modu (Units.map (Algebra.norm (AF F) : AE F E →* AF F)
-      (Matrix.GeneralLinearGroup.det t)) : ℝ≥0) = c⁻¹ := by
+  have hmodu
+      : ((adeleClass F).modu
+            (Units.map (Algebra.norm (AF F) : AE F E →* AF F) (Matrix.GeneralLinearGroup.det t))
+          : ℝ≥0)
+        = c⁻¹ := by
     rw [hχ, hu, map_inv, inv_inv]
     rfl
   show ∫ y, f (T *ᵥ y) ∂μ = _

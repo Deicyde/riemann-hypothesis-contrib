@@ -10,13 +10,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing Polynomial Matrix UpperTheory.V
 
-theorem UpperTheory.V.Ws.exists_noncommuting_images_in_finiteIndex_normal_subgroup :
-    ∀ (K k B G : Type) [Field K] [IsAlgClosed K] [Field k] [CommRing B] [Group G] (r : G →* Matrix (Fin 4) (Fin 4) K)
-      (j : B →+* K) (φ : B →+* k) (χ : Fin 4 → G →* kˣ), Function.Injective j →
-      (∀ g, ∃ p : B[X], p.map j = (r g).charpoly ∧ p.map φ = ∏ i, (X - C (χ i g : k))) →
-      Submodule.span K (Set.range r) = ⊤ → (∃ s t, ∀ n : ℕ, 0 < n → n ≤ 4 → (χ s / χ t) ^ n ≠ 1) →
-      ∀ (Z : Subgroup G) [Z.Normal] (u : G), u ∈ Z → (∀ d : ℕ, 0 < d → (r u ^ d).charpoly.Separable) →
-      ∀ N : Subgroup Z, N.Normal → N.FiniteIndex → ∃ g ∈ N, ∃ h ∈ N, r g * r h ≠ r h * r g := by
+theorem UpperTheory.V.Ws.exists_noncommuting_images_in_finiteIndex_normal_subgroup
+    : ∀ (K k B G : Type) [Field K] [IsAlgClosed K] [Field k] [CommRing B] [Group G]
+        (r : G →* Matrix (Fin 4) (Fin 4) K) (j : B →+* K) (φ : B →+* k) (χ : Fin 4 → G →* kˣ),
+      Function.Injective j
+        → (∀ g, ∃ p : B[X], p.map j = (r g).charpoly ∧ p.map φ = ∏ i, (X - C (χ i g : k)))
+        → Submodule.span K (Set.range r) = ⊤ → (∃ s t, ∀ n : ℕ, 0 < n → n ≤ 4 → (χ s / χ t) ^ n ≠ 1)
+        → ∀ (Z : Subgroup G) [Z.Normal] (u : G),
+          u ∈ Z → (∀ d : ℕ, 0 < d → (r u ^ d).charpoly.Separable)
+            → ∀ N : Subgroup Z,
+              N.Normal → N.FiniteIndex → ∃ g ∈ N, ∃ h ∈ N, r g * r h ≠ r h * r g := by
   intro K k B G _ _ _ _ _ r j φ χ hj hpoly hspan hst Z _ u huZ hsep N hN hfi
   haveI := hN
   by_contra hcon
@@ -35,8 +38,9 @@ theorem UpperTheory.V.Ws.exists_noncommuting_images_in_finiteIndex_normal_subgro
     obtain ⟨g', hg', rfl⟩ := N'.normalCore_le hg
     obtain ⟨h', hh', rfl⟩ := N'.normalCore_le hh
     exact hcon g' hg' h' hh'
-  obtain ⟨b, π, _, hmono, htrans⟩ := AlgebraTools.monomialOfComm K G 4 r hspan N'.normalCore hcomm
-    ⟨u ^ N.index, hcore, by rw [map_pow]; exact hsep _ hd0⟩
+  obtain ⟨b, π, _, hmono, htrans⟩ :=
+    AlgebraTools.monomialOfComm K G 4 r hspan N'.normalCore hcomm
+      ⟨u ^ N.index, hcore, by rw [map_pow]; exact hsep _ hd0⟩
   have hred := AlgebraTools.monomialRed K k B G 4 r j φ χ hj hpoly b π hmono htrans
   obtain ⟨s, t, hst'⟩ := hst
   have hle : π.ker ≤ (χ s / χ t).ker := by

@@ -7,9 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVa
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  IsLocalRing Polynomial UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement UpperTheory.V.Ws
 
-private theorem az_intIff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
+private theorem az_intIff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l)
+    : IsIntegral ℤ_[l] x ↔ ‖x‖ ≤ 1 := by
   have hi : IsIntegral ℚ_[l] x := Algebra.IsIntegral.isIntegral x
   have h0 : ‖x‖ = spectralValue (minpoly ℚ_[l] x) := rfl
   rw [h0, spectralValue_le_one_iff (minpoly.monic hi)]
@@ -25,14 +28,15 @@ private theorem az_intIff {l : ℕ} [Fact l.Prime] (x : PadicAlgCl l) : IsIntegr
 
 open Cardinal in
 private theorem az_card (l : ℕ) [Fact l.Prime] : #(PadicAlgCl l) = 𝔠 := by
-  have h1 : #ℚ_[l] ≤ #(CauSeq ℚ (padicNorm l)) :=
-    mk_le_of_surjective (f := (Quotient.mk'' : CauSeq ℚ (padicNorm l) → ℚ_[l])) Quotient.mk''_surjective
+  have h1 : # ℚ_[l] ≤ #(CauSeq ℚ (padicNorm l)) :=
+    mk_le_of_surjective (f := (Quotient.mk'' : CauSeq ℚ (padicNorm l) → ℚ_[l]))
+      Quotient.mk''_surjective
   have h2 : #(CauSeq ℚ (padicNorm l)) ≤ #(ℕ → ℚ) := mk_subtype_le _
   have h3 : #(ℕ → ℚ) = 𝔠 := by simp
   apply le_antisymm
   · refine (Algebra.IsAlgebraic.cardinalMk_le_max ℚ_[l] (PadicAlgCl l)).trans ?_
     exact max_le (h1.trans (h2.trans h3.le)) aleph0_le_continuum
-  · have h : 𝔠 ≤ #ℚ_[l] := continuum_le_cardinal_of_nontriviallyNormedField ℚ_[l]
+  · have h : 𝔠 ≤ # ℚ_[l] := continuum_le_cardinal_of_nontriviallyNormedField ℚ_[l]
     exact h.trans (mk_le_of_injective (algebraMap ℚ_[l] (PadicAlgCl l)).injective)
 
 private noncomputable def azV (l : ℕ) [Fact l.Prime] : ValuationSubring (PadicAlgCl l) :=
@@ -55,11 +59,26 @@ private theorem azA_loc {l : ℕ} [Fact l.Prime] (c : Coef l) : IsLocalHom (azA 
     (coefSup l).2.2.2 c y ((az_intIff _).2 ((mem_azV _).1 y.2)) ⟨1, x, h0, hy'⟩
   exact IsUnit.of_mul_eq_one_right (⟨y, hm⟩ : c.O) (Subtype.ext hy')
 
-theorem UpperTheory.V.Ws.ambZero :
-    ∀ (l : ℕ) [Fact l.Prime], (∃ (𝔞 : Amb l) (e : 𝔞.K ≃+* PadicAlgCl l), 𝔞.IsZero e) ∧ Nonempty (PadicAlgCl l ≃+* ℂ) := by
+theorem UpperTheory.V.Ws.ambZero
+    : ∀ (l : ℕ) [Fact l.Prime],
+      (∃ (𝔞 : Amb l) (e : 𝔞.K ≃+* PadicAlgCl l), 𝔞.IsZero e) ∧ Nonempty (PadicAlgCl l ≃+* ℂ) := by
   intro l hl
-  refine ⟨⟨{ K := PadicAlgCl l, V := azV l, a := azA, compat := fun _ _ _ _ => rfl, loc := azA_loc, alg := fun x => ?_ },
-    RingEquiv.refl _, fun _ _ => rfl, mem_azV⟩, ?_⟩
+  refine ⟨
+    ⟨
+      {
+        K := PadicAlgCl l
+        V := azV l
+        a := azA
+        compat := fun _ _ _ _ => rfl
+        loc := azA_loc
+        alg := fun x => ?_
+      },
+      RingEquiv.refl _,
+      fun _ _ => rfl,
+      mem_azV
+    ⟩,
+    ?_
+  ⟩
   · obtain ⟨c, -⟩ := (coefSup l).2.1 1 (by rw [Nat.dvd_one]; exact hl.out.ne_one)
     obtain ⟨c', -, hx⟩ := (coefSup l).2.2.1 c x ((az_intIff _).2 ((mem_azV _).1 x.2))
     refine ⟨c', ⟨x, hx⟩, ?_⟩

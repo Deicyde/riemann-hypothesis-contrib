@@ -15,13 +15,19 @@ variable {N r K : ℕ}
 def prodFrom (r K n0 : ℕ) (B : Fin N → ℕ) (s : ℕ) : ℕ :=
   ∏ i : Fin N, if s ≤ i.val ∧ i.val < n0 then Nat.choose (B i + (r + K) - 1) (r + K - 1) else 1
 
-theorem prodFrom_succ (n0 : ℕ) (B : Fin N → ℕ) (s : ℕ) (hs : s < N) (hsn : s < n0) :
-    prodFrom r K n0 B s = Nat.choose (B ⟨s, hs⟩ + (r + K) - 1) (r + K - 1) * prodFrom r K n0 B (s + 1) := by
+theorem prodFrom_succ (n0 : ℕ) (B : Fin N → ℕ) (s : ℕ) (hs : s < N) (hsn : s < n0)
+    : prodFrom r K n0 B s
+      = Nat.choose (B ⟨s, hs⟩ + (r + K) - 1) (r + K - 1) * prodFrom r K n0 B (s + 1) := by
   classical
   unfold prodFrom
-  have hpt : ∀ i : Fin N, (if s ≤ i.val ∧ i.val < n0 then Nat.choose (B i + (r + K) - 1) (r + K - 1) else 1) =
-      (if i = ⟨s, hs⟩ then Nat.choose (B ⟨s, hs⟩ + (r + K) - 1) (r + K - 1) else 1) *
-      (if s + 1 ≤ i.val ∧ i.val < n0 then Nat.choose (B i + (r + K) - 1) (r + K - 1) else 1) := by
+  have hpt
+      : ∀ i : Fin N,
+        (if s ≤ i.val ∧ i.val < n0 then Nat.choose (B i + (r + K) - 1) (r + K - 1) else 1)
+          = (if i = ⟨s, hs⟩ then Nat.choose (B ⟨s, hs⟩ + (r + K) - 1) (r + K - 1) else 1)
+            * (if s + 1 ≤ i.val ∧ i.val < n0 then
+                 Nat.choose (B i + (r + K) - 1) (r + K - 1)
+               else
+                 1) := by
     intro i
     by_cases he : i = ⟨s, hs⟩
     · subst he
@@ -31,7 +37,7 @@ theorem prodFrom_succ (n0 : ℕ) (B : Fin N → ℕ) (s : ℕ) (hs : s < N) (hsn
       by_cases h1 : s ≤ i.val ∧ i.val < n0
       · rw [if_pos h1, if_pos ⟨by omega, h1.2⟩]
       · rw [if_neg h1, if_neg (by omega)]
-  rw [Finset.prod_congr rfl fun i _ => hpt i, Finset.prod_mul_distrib, Finset.prod_ite_eq' ]
+  rw [Finset.prod_congr rfl fun i _ => hpt i, Finset.prod_mul_distrib, Finset.prod_ite_eq']
   simp
 
 theorem prodFrom_self_eq_one (n0 : ℕ) (B : Fin N → ℕ) : prodFrom r K n0 B n0 = 1 := by
@@ -40,13 +46,19 @@ theorem prodFrom_self_eq_one (n0 : ℕ) (B : Fin N → ℕ) : prodFrom r K n0 B 
   rw [if_neg (by omega)]
 
 section
-variable {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ} {p : ℕ}
+variable
+  {n0 : ℕ} {LL : Letters (Fin N)} {B : Fin N → ℕ} {od : Fin N → Fin N} {bb : Fin N → ℝ} {a La : ℝ}
+  {p : ℕ}
 
 open Classical in
-theorem pre_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFamilyLowerSet D) (h5 : GenericProjectionCriterion D)
-    (H : HypT N n0 r K LL B od bb a La p) (hfin : (SAll (r := r) (K := K) LL n0 B).Finite) :
-    ∀ (u s : ℕ) (hsu : s + u = n0) (μ0 : Fin (N + 1) → Fin (r + K) → ℤ), VP LL n0 B s μ0 →
-      (Af hfin s μ0).card = stCount (r + K) (μ0 ⟨s, by have := H.hN; omega⟩) * prodFrom r K n0 B s := by
+theorem pre_count
+    (D : Formalism.BasicNotions.D7)
+    (h3 : admB3 D) (h4 : ColumnFamilyLowerSet D) (h5 : GenericProjectionCriterion D)
+    (H : HypT N n0 r K LL B od bb a La p) (hfin : (SAll (r := r) (K := K) LL n0 B).Finite)
+    : ∀ (u s : ℕ) (hsu : s + u = n0) (μ0 : Fin (N + 1) → Fin (r + K) → ℤ),
+      VP LL n0 B s μ0
+        → (Af hfin s μ0).card
+          = stCount (r + K) (μ0 ⟨s, by have := H.hN; omega⟩) * prodFrom r K n0 B s := by
   have hN := H.hN
   have hn : 0 < r + K := by have := H.r1; omega
   intro u
@@ -93,8 +105,10 @@ theorem pre_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
       rw [Af_card_sum hfin s hs μ0 _ ?_]
       · refine Finset.sum_congr rfl fun la' hla' => ?_
         rw [Finset.mem_filter] at hla'
-        have hst : StepOK LL n0 B ⟨s, hs⟩ (μ0 (⟨s, hs⟩ : Fin N).castSucc) la' :=
-          ⟨fun _ => by rw [if_neg (by simp [hvec])]; exact hla'.2, fun h => absurd h (by simp only; omega)⟩
+        have hst : StepOK LL n0 B ⟨s, hs⟩ (μ0 (⟨s, hs⟩ : Fin N).castSucc) la' := ⟨
+          fun _ => by rw [if_neg (by simp [hvec])]; exact hla'.2,
+          fun h => absurd h (by simp only; omega)
+        ⟩
         have hv' := vp_update hs hv la' (dom_of_strip_down hla'.2 hlad) hst
         rw [ih (s + 1) (by omega) _ hv']
         congr 2
@@ -111,7 +125,10 @@ theorem pre_count (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFam
 
 end
 
-theorem path_weight_eq_rank (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 : ColumnFamilyLowerSet D) (h5 : GenericProjectionCriterion D) : PathWeightEqRank := by
+theorem path_weight_eq_rank
+    (D : Formalism.BasicNotions.D7)
+    (h3 : admB3 D) (h4 : ColumnFamilyLowerSet D) (h5 : GenericProjectionCriterion D)
+    : PathWeightEqRank := by
   classical
   intro N n0 r K _ _ LL B od bb a La p H
   have hfin := finite_SAll H
@@ -128,7 +145,8 @@ theorem path_weight_eq_rank (D : Formalism.BasicNotions.D7) (h3 : admB3 D) (h4 :
     rw [ht0]
     exact ((sp_iff H q.1).1 hq.1).1
   rw [Set.ncard_eq_toFinset_card _ hfin, ← hA, h]
-  have h0 : stCount (r + K) ((fun _ => 0 : Fin (N + 1) → Fin (r + K) → ℤ) ⟨0, by omega⟩) = 1 := stCount_zero D h3 (r + K)
+  have h0 : stCount (r + K) ((fun _ => 0 : Fin (N + 1) → Fin (r + K) → ℤ) ⟨0, by omega⟩) = 1 :=
+    stCount_zero D h3 (r + K)
   rw [h0, one_mul]
   unfold prodFrom rkA
   refine Finset.prod_congr rfl fun i _ => ?_

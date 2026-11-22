@@ -12,21 +12,23 @@ namespace PI.SqPair.LCP
 
 variable {R : Type} [CommRing R] [IsDomain R]
 
-theorem sel_main (σ : R ≃+* R) (ϖ : R) (hϖ0 : ϖ ≠ 0) (hϖ : ¬ IsUnit ϖ) (hσϖ : σ ϖ = ϖ)
+theorem sel_main
+    (σ : R ≃+* R) (ϖ : R) (hϖ0 : ϖ ≠ 0) (hϖ : ¬ IsUnit ϖ) (hσϖ : σ ϖ = ϖ)
     (hval : ∀ x : R, x ≠ 0 → ∃ n : ℕ, ∃ u : R, IsUnit u ∧ x = ϖ ^ n * u)
     {ι : Type} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (A A' h : Matrix ι ι R) (hA : IsUnit A.det) (hA' : IsUnit A'.det) (k : ℕ)
-    (hrel : (h.map σ)ᵀ * A * h = ϖ ^ (2 * k) • A') :
-    ∃ (m : ℕ) (h₁ : Matrix ι ι R), h = ϖ ^ m • h₁ ∧ m ≤ k ∧
-      (h₁.map σ)ᵀ * A * h₁ = ϖ ^ (2 * (k - m)) • A' ∧
-      ((m = k ∧ IsUnit h₁.det) ∨
-       (m < k ∧ ∃ (g₁ : Matrix ι ι R) (j : ι) (y : ι → R),
-          g₁ * h₁ = ϖ ^ (2 * (k - m)) • 1 ∧ h₁ * g₁ = ϖ ^ (2 * (k - m)) • 1 ∧
-          (∃ i, IsUnit ((h₁ *ᵥ Pi.single j 1) i)) ∧
-          (fun l => σ ((h₁ *ᵥ Pi.single j 1) l)) ⬝ᵥ (A *ᵥ y) = 1 ∧
-          (fun l => σ ((h₁ *ᵥ Pi.single j 1) l)) ⬝ᵥ (A *ᵥ (h₁ *ᵥ Pi.single j 1)) =
-            ϖ ^ (2 * (k - m)) * A' j j ∧
-          ϖ ^ (2 * (k - m)) • y = h₁ *ᵥ (g₁ *ᵥ y))) := by
+    (A A' h : Matrix ι ι R) (hA : IsUnit A.det) (hA' : IsUnit A'.det)
+    (k : ℕ) (hrel : (h.map σ)ᵀ * A * h = ϖ ^ (2 * k) • A')
+    : ∃ (m : ℕ) (h₁ : Matrix ι ι R),
+      h = ϖ ^ m • h₁ ∧ m ≤ k ∧ (h₁.map σ)ᵀ * A * h₁ = ϖ ^ (2 * (k - m)) • A'
+        ∧ ((m = k ∧ IsUnit h₁.det)
+          ∨ (m < k
+            ∧ ∃ (g₁ : Matrix ι ι R) (j : ι) (y : ι → R),
+              g₁ * h₁ = ϖ ^ (2 * (k - m)) • 1 ∧ h₁ * g₁ = ϖ ^ (2 * (k - m)) • 1
+                ∧ (∃ i, IsUnit ((h₁ *ᵥ Pi.single j 1) i))
+                ∧ (fun l => σ ((h₁ *ᵥ Pi.single j 1) l)) ⬝ᵥ (A *ᵥ y) = 1
+                ∧ (fun l => σ ((h₁ *ᵥ Pi.single j 1) l)) ⬝ᵥ (A *ᵥ (h₁ *ᵥ Pi.single j 1))
+                  = ϖ ^ (2 * (k - m)) * A' j j
+                ∧ ϖ ^ (2 * (k - m)) • y = h₁ *ᵥ (g₁ *ᵥ y))) := by
   have hc : ∀ n : ℕ, ϖ ^ n ≠ 0 := fun n => pow_ne_zero n hϖ0
   have hh : h ≠ 0 := by
     rintro rfl

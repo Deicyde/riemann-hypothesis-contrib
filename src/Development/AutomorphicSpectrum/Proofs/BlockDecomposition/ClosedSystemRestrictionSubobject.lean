@@ -10,7 +10,8 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProjectiveCohomol
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE
 
 namespace GlobalTheory.CompanionTheory.GE.ImageOpen
 
@@ -125,7 +126,32 @@ lemma isQuasicoherent_powSub {A : Type} [CommRing A] [IsNoetherianRing A] (I : I
     ((powSub I M (n + 1) : Subobject M) : Y.Modules).IsQuasicoherent :=
   (closedSys_pow I M).qcoh n
 
-theorem image_on_open : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}} [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (O : X.Opens), letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ (X ↘ Spec (.of A))⟩; ∀ {P : X.Modules} {E : (O : Scheme.{0}).Modules}, IsCoherent P → IsCoherent E → ∀ f : P.restrict O.ι ⟶ E, Epi f → ∀ S : ℕ → Subobject E, ClosedSys I E S → ∀ Sb : ℕ → Subobject P, (∀ e (W : (O : Scheme.{0}).Opens), IsAffineOpen W → ∀ x : Γ(P, O.ι ''ᵁ W), x ∈ secs (Sb e) (O.ι ''ᵁ W) ↔ f.app W ((P.restrictAppIso O.ι W).inv x) ∈ secs (S e) W) → ∀ Bb : Subobject P, (Bb : X.Modules).IsQuasicoherent → (∀ e, Bb ⊔ powSub I P (e + 1) = Sb e) → ∃ B : Subobject E, (B : (O : Scheme.{0}).Modules).IsQuasicoherent ∧ (∀ e, B ⊔ powSub I E (e + 1) = S e) ∧ ∀ (W : (O : Scheme.{0}).Opens), IsAffineOpen W → secs B W = (fun x => f.app W ((P.restrictAppIso O.ι W).inv x)) '' secs Bb (O.ι ''ᵁ W) := by
+theorem image_on_open
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] [IsProper (X ↘ Spec (.of A))] (O : X.Opens),
+      letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ (X ↘ Spec (.of A))⟩
+      ∀ {P : X.Modules} {E : (O : Scheme.{0}).Modules},
+        IsCoherent P → IsCoherent E
+          → ∀ f : P.restrict O.ι ⟶ E,
+            Epi f
+              → ∀ S : ℕ → Subobject E,
+                ClosedSys I E S
+                  → ∀ Sb : ℕ → Subobject P,
+                    (∀ e (W : (O : Scheme.{0}).Opens),
+                        IsAffineOpen W
+                          → ∀ x : Γ(P, O.ι ''ᵁ W),
+                            x ∈ secs (Sb e) (O.ι ''ᵁ W)
+                              ↔ f.app W ((P.restrictAppIso O.ι W).inv x) ∈ secs (S e) W)
+                      → ∀ Bb : Subobject P,
+                        (Bb : X.Modules).IsQuasicoherent → (∀ e, Bb ⊔ powSub I P (e + 1) = Sb e)
+                          → ∃ B : Subobject E,
+                            (B : (O : Scheme.{0}).Modules).IsQuasicoherent
+                              ∧ (∀ e, B ⊔ powSub I E (e + 1) = S e)
+                              ∧ ∀ (W : (O : Scheme.{0}).Opens),
+                                IsAffineOpen W
+                                  → secs B W
+                                    = (fun x => f.app W ((P.restrictAppIso O.ι W).inv x))
+                                      '' secs Bb (O.ι ''ᵁ W) := by
   intro A _ _ I X _ _ O
   letI : (O : Scheme.{0}).Over (Spec (.of A)) := ⟨O.ι ≫ (X ↘ Spec (.of A))⟩
   intro P E hP hE f hf S hS Sb hSb Bb hBb hBS
@@ -139,8 +165,11 @@ theorem image_on_open : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Id
   let g : (Bb : X.Modules).restrict O.ι ⟶ E := (Scheme.Modules.restrictFunctor O.ι).map Bb.arrow ≫ f
   let B : Subobject E := Subobject.mk (kernel.ι (cokernel.π g))
   have hBq : (B : (O : Scheme.{0}).Modules).IsQuasicoherent := isQuasicoherent_image g
-  have hsecs : ∀ (W : (O : Scheme.{0}).Opens), IsAffineOpen W → secs B W =
-      (fun x => f.app W ((P.restrictAppIso O.ι W).inv x)) '' secs Bb (O.ι ''ᵁ W) := by
+  have hsecs
+      : ∀ (W : (O : Scheme.{0}).Opens),
+        IsAffineOpen W
+          → secs B W
+            = (fun x => f.app W ((P.restrictAppIso O.ι W).inv x)) '' secs Bb (O.ι ''ᵁ W) := by
     intro W hW
     rw [secs_image g W hW]
     ext y
@@ -171,9 +200,13 @@ theorem image_on_open : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Id
     rw [← hBS e, (supsecs hP.1 Bb (powSub I P (e + 1)) hBb (isQuasicoherent_powSub I P e)).2 _ hW']
       at hx
     obtain ⟨s, hs, t, ht, hst⟩ := hx
-    refine ⟨f.app W ((P.restrictAppIso O.ι W).inv s), (hsecs W hW).symm ▸ ⟨s, hs, rfl⟩,
+    refine ⟨
+      f.app W ((P.restrictAppIso O.ι W).inv s),
+      (hsecs W hW).symm ▸ ⟨s, hs, rfl⟩,
       f.app W ((P.restrictAppIso O.ι W).inv t),
-      map_mem_secs_powSub I O hP.1 hE.1 f (e + 1) W hW t ht, ?_⟩
+      map_mem_secs_powSub I O hP.1 hE.1 f (e + 1) W hW t ht,
+      ?_
+    ⟩
     rw [← map_add (f := _), ← map_add (f := _), ← hst]
     rfl
 

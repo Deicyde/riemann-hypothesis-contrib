@@ -12,14 +12,17 @@ namespace GlobalTheory.K5.ResidueIndep
 
 open Polynomial
 
-theorem field_indep {k : Type} [Field k] (p : ℕ) [hp : Fact p.Prime] [CharP k p] (K : Subfield k)
-    (N : ℕ) (t : k) (ha : t ^ p ^ N ∈ K) (hna : ∀ b ∈ K, b ^ p ≠ t ^ p ^ N)
-    (c : ℕ → k) (hc : ∀ j < p ^ N, c j ∈ K)
-    (hs : ∑ j ∈ Finset.range (p ^ N), c j * t ^ j = 0) : ∀ j < p ^ N, c j = 0 := by
+theorem field_indep
+    {k : Type} [Field k]
+    (p : ℕ) [hp : Fact p.Prime] [CharP k p]
+    (K : Subfield k) (N : ℕ) (t : k) (ha : t ^ p ^ N ∈ K) (hna : ∀ b ∈ K, b ^ p ≠ t ^ p ^ N)
+    (c : ℕ → k) (hc : ∀ j < p ^ N, c j ∈ K) (hs : ∑ j ∈ Finset.range (p ^ N), c j * t ^ j = 0)
+    : ∀ j < p ^ N, c j = 0 := by
   classical
   haveI : ExpChar K p := ExpChar.prime hp.out
-  obtain ⟨n, y, hf⟩ := (minpoly.natSepDegree_eq_one_iff_eq_X_pow_sub_C (F := K) p (x := t)).1
-    ((minpoly.natSepDegree_eq_one_iff_pow_mem (F := K) p (x := t)).2 ⟨N, ⟨⟨_, ha⟩, rfl⟩⟩)
+  obtain ⟨n, y, hf⟩ :=
+    (minpoly.natSepDegree_eq_one_iff_eq_X_pow_sub_C (F := K) p (x := t)).1
+      ((minpoly.natSepDegree_eq_one_iff_pow_mem (F := K) p (x := t)).2 ⟨N, ⟨⟨_, ha⟩, rfl⟩⟩)
   have hy : t ^ p ^ n = (y : k) := by
     have := minpoly.aeval K t
     rw [hf] at this
@@ -52,8 +55,7 @@ theorem field_indep {k : Type} [Field k] (p : ℕ) [hp : Fact p.Prime] [CharP k 
     have h4 : p ^ n < p ^ N := by exact_mod_cast h3
     exact absurd (Nat.pow_le_pow_right hp.out.pos hNn) (not_le.2 h4)
   intro j hj
-  have h1 : P.coeff j = c' j := by
-    simp [P, coeff_monomial, Finsupp.single_apply] <;> omega
+  have h1 : P.coeff j = c' j := by simp [P, coeff_monomial, Finsupp.single_apply] <;> omega
   rw [hP0, coeff_zero] at h1
   have h2 := congrArg Subtype.val h1
   simp only [c', dif_pos hj] at h2
@@ -61,9 +63,9 @@ theorem field_indep {k : Type} [Field k] (p : ℕ) [hp : Fact p.Prime] [CharP k 
 
 variable {p : ℕ} [hp : Fact p.Prime] {Ω : Type} [Field Ω] [Algebra (O0 p) Ω]
 
-theorem mem_rad_iff (h : IsClo p Ω) (x : integralClosure (O0 p) Ω) :
-    x ∈ (Ideal.span {(p : integralClosure (O0 p) Ω)}).radical ↔
-      ∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((x : Ω) ^ m / (p : Ω)) := by
+theorem mem_rad_iff (h : IsClo p Ω) (x : integralClosure (O0 p) Ω)
+    : x ∈ (Ideal.span {(p : integralClosure (O0 p) Ω)}).radical
+      ↔ ∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((x : Ω) ^ m / (p : Ω)) := by
   haveI := Basic.charZero_of_isClo h
   have hp0 : (p : Ω) ≠ 0 := by exact_mod_cast hp.out.ne_zero
   constructor
@@ -80,18 +82,20 @@ theorem mem_rad_iff (h : IsClo p Ω) (x : integralClosure (O0 p) Ω) :
     push_cast
     field_simp
 
-theorem isInt_inv (h : IsClo p Ω) (x : Ω)
-    (hx : ¬ ∃ m : ℕ, 0 < m ∧ IsInt (p := p) (x ^ m / (p : Ω))) : x ≠ 0 ∧ IsInt (p := p) x⁻¹ := by
+theorem isInt_inv (h : IsClo p Ω) (x : Ω) (hx : ¬ ∃ m : ℕ, 0 < m ∧ IsInt (p := p) (x ^ m / (p : Ω)))
+    : x ≠ 0 ∧ IsInt (p := p) x⁻¹ := by
   haveI := Basic.charZero_of_isClo h
   have hp0 : (p : Ω) ≠ 0 := by exact_mod_cast hp.out.ne_zero
-  have hpi : IsIntegral (O0 p) (p : Ω) := by exact_mod_cast Basic.isInt_intCast (p := p) (Ω := Ω) (p : ℤ)
+  have hpi : IsIntegral (O0 p) (p : Ω) := by
+    exact_mod_cast Basic.isInt_intCast (p := p) (Ω := Ω) (p : ℤ)
   have hx0 : x ≠ 0 := by
     rintro rfl
     exact hx ⟨1, one_pos, by simpa [IsInt] using isIntegral_zero⟩
   refine ⟨hx0, ?_⟩
-  have hIntegral : ∃ (a : ℤ) (b : ℕ), 0 < b ∧
-      IsIntegral (O0 p) (x ^ b / (p : Ω) ^ a) ∧
-      IsIntegral (O0 p) ((p : Ω) ^ a / x ^ b) := by
+  have hIntegral
+      : ∃ (a : ℤ) (b : ℕ),
+        0 < b ∧ IsIntegral (O0 p) (x ^ b / (p : Ω) ^ a)
+          ∧ IsIntegral (O0 p) ((p : Ω) ^ a / x ^ b) := by
     obtain ⟨hdom, hdvr, hirr⟩ := completed_laurent_isDVR p
     have hmax : IsLocalRing.maximalIdeal (O0 p) = Ideal.span {(p : O0 p)} :=
       (IsDiscreteValuationRing.irreducible_iff_uniformizer _).1 hirr
@@ -123,8 +127,8 @@ theorem isInt_inv (h : IsClo p Ω) (x : Ω)
     rw [this]
     exact IsIntegral.mul h2 (hpi.pow n)
 
-theorem rad_isMaximal (h : IsClo p Ω) :
-    (Ideal.span {(p : integralClosure (O0 p) Ω)}).radical.IsMaximal := by
+theorem rad_isMaximal (h : IsClo p Ω)
+    : (Ideal.span {(p : integralClosure (O0 p) Ω)}).radical.IsMaximal := by
   haveI := Basic.charZero_of_isClo h
   have hp0 : (p : Ω) ≠ 0 := by exact_mod_cast hp.out.ne_zero
   rw [Ideal.isMaximal_iff]
@@ -136,23 +140,32 @@ theorem rad_isMaximal (h : IsClo p Ω) :
   · intro J x _ hx hxJ
     rw [mem_rad_iff h] at hx
     obtain ⟨h0, h1⟩ := isInt_inv h _ hx
-    have : (1 : integralClosure (O0 p) Ω) = ⟨_, h1⟩ * x :=
-      Subtype.ext (inv_mul_cancel₀ h0).symm
+    have : (1 : integralClosure (O0 p) Ω) = ⟨_, h1⟩ * x := Subtype.ext (inv_mul_cancel₀ h0).symm
     rw [this]
     exact J.mul_mem_left _ hxJ
 
-theorem residue_indep : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
-  ∀ E : Subfield Ω, Set.range (algebraMap (O0 p) Ω) ⊆ (E : Set Ω) →
-  (∀ y ∈ E, IsInt (p := p) y →
-    ¬ ∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((y ^ p - algebraMap (O0 p) Ω (qO p)) ^ m / (p : Ω))) →
-  ∀ (T : Tower p Ω) (N : ℕ) (d : ℕ → Ω), (∀ j < p ^ N, d j ∈ E ∧ IsInt (p := p) (d j)) →
-  (∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((∑ j ∈ Finset.range (p ^ N), d j * T.qq N ^ j) ^ m / (p : Ω))) →
-  ∀ j < p ^ N, ∃ m : ℕ, 0 < m ∧ IsInt (p := p) (d j ^ m / (p : Ω)) := by
+theorem residue_indep
+    : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+      IsClo p Ω
+        → ∀ E : Subfield Ω,
+          Set.range (algebraMap (O0 p) Ω) ⊆ (E : Set Ω)
+            → (∀ y ∈ E,
+              IsInt (p := p) y
+                → ¬ ∃ m : ℕ,
+                  0 < m ∧ IsInt (p := p) ((y ^ p - algebraMap (O0 p) Ω (qO p)) ^ m / (p : Ω)))
+            → ∀ (T : Tower p Ω) (N : ℕ) (d : ℕ → Ω),
+              (∀ j < p ^ N, d j ∈ E ∧ IsInt (p := p) (d j))
+                → (∃ m : ℕ,
+                  0 < m
+                    ∧ IsInt (p := p) ((∑ j ∈ Finset.range (p ^ N), d j * T.qq N ^ j) ^ m / (p : Ω)))
+                → ∀ j < p ^ N, ∃ m : ℕ, 0 < m ∧ IsInt (p := p) (d j ^ m / (p : Ω)) := by
   intro p hp Ω _ _ h E hE hq T N d hd hs
   classical
   set M := (Ideal.span {(p : integralClosure (O0 p) Ω)}).radical with hM
-  have hmem : ∀ x : integralClosure (O0 p) Ω, Ideal.Quotient.mk M x = 0 ↔
-      ∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((x : Ω) ^ m / (p : Ω)) := fun x => by
+  have hmem
+      : ∀ x : integralClosure (O0 p) Ω,
+        Ideal.Quotient.mk M x = 0
+          ↔ ∃ m : ℕ, 0 < m ∧ IsInt (p := p) ((x : Ω) ^ m / (p : Ω)) := fun x => by
     rw [Ideal.Quotient.eq_zero_iff_mem, hM, mem_rad_iff h]
   haveI : M.IsMaximal := rad_isMaximal h
   letI : Field (integralClosure (O0 p) Ω ⧸ M) := Ideal.Quotient.field M
@@ -160,18 +173,19 @@ theorem residue_indep : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alg
     rw [CharP.charP_iff_prime_eq_zero hp.out, ← map_natCast (Ideal.Quotient.mk M),
       Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.le_radical (Ideal.mem_span_singleton_self _)
-  let K : Subfield (integralClosure (O0 p) Ω ⧸ M) :=
-    { (E.toSubring.comap (integralClosure (O0 p) Ω).val.toRingHom).map (Ideal.Quotient.mk M) with
-      inv_mem' := by
-        rintro _ ⟨y, hy, rfl⟩
-        by_cases h0 : Ideal.Quotient.mk M y = 0
-        · exact ⟨0, E.zero_mem, by rw [h0, inv_zero, map_zero]⟩
-        · obtain ⟨h1, h2⟩ := isInt_inv h (y : Ω) (fun hh => h0 ((hmem y).2 hh))
-          refine ⟨⟨_, h2⟩, E.inv_mem hy, ?_⟩
-          refine eq_inv_of_mul_eq_one_left ?_
-          rw [← map_mul, ← map_one (Ideal.Quotient.mk M)]
-          congr 1
-          exact Subtype.ext (inv_mul_cancel₀ h1) }
+  let K : Subfield (integralClosure (O0 p) Ω ⧸ M) := {
+    (E.toSubring.comap (integralClosure (O0 p) Ω).val.toRingHom).map (Ideal.Quotient.mk M) with
+    inv_mem' := by
+      rintro _ ⟨y, hy, rfl⟩
+      by_cases h0 : Ideal.Quotient.mk M y = 0
+      · exact ⟨0, E.zero_mem, by rw [h0, inv_zero, map_zero]⟩
+      · obtain ⟨h1, h2⟩ := isInt_inv h (y : Ω) (fun hh => h0 ((hmem y).2 hh))
+        refine ⟨⟨_, h2⟩, E.inv_mem hy, ?_⟩
+        refine eq_inv_of_mul_eq_one_left ?_
+        rw [← map_mul, ← map_one (Ideal.Quotient.mk M)]
+        congr 1
+        exact Subtype.ext (inv_mul_cancel₀ h1)
+  }
   have hqi : IsIntegral (O0 p) (T.qq N) :=
     IsIntegral.of_pow (pow_pos hp.out.pos N) (by rw [Basic.qq_pow]; exact isIntegral_algebraMap)
   let t : integralClosure (O0 p) Ω := ⟨_, hqi⟩
@@ -179,29 +193,41 @@ theorem residue_indep : ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Alg
     rw [← Basic.qq_pow T N]; rfl
   let d' : ℕ → integralClosure (O0 p) Ω := fun j => if hj : j < p ^ N then ⟨d j, (hd j hj).2⟩ else 0
   have hd' : ∀ j < p ^ N, (d' j : Ω) = d j := fun j hj => by simp only [d', dif_pos hj]
-  have key := field_indep p K N (Ideal.Quotient.mk M t)
-    ⟨t ^ p ^ N, by
-      show ((t ^ p ^ N : integralClosure (O0 p) Ω) : Ω) ∈ E
-      rw [ht]; exact hE ⟨_, rfl⟩, map_pow _ _ _⟩
-    (by
-      rintro _ ⟨y, hy, rfl⟩ hb
-      refine hq y hy y.2 ?_
-      rw [← ht]
-      have hz : Ideal.Quotient.mk M (y ^ p - t ^ p ^ N) = 0 := by
-        rw [RingHom.map_sub, RingHom.map_pow, RingHom.map_pow, hb, sub_self]
-      have := (hmem (y ^ p - t ^ p ^ N)).1 hz
-      exact this)
-    (fun j => Ideal.Quotient.mk M (d' j))
-    (fun j hj => ⟨d' j, by
-      show (d' j : Ω) ∈ E
-      rw [hd' j hj]; exact (hd j hj).1, rfl⟩)
-    (by
-      have e : ((∑ j ∈ Finset.range (p ^ N), d' j * t ^ j : integralClosure (O0 p) Ω) : Ω) =
-          ∑ j ∈ Finset.range (p ^ N), d j * T.qq N ^ j := by
-        push_cast
-        exact Finset.sum_congr rfl fun j hj => by rw [hd' j (Finset.mem_range.1 hj)]
-      have := (hmem _).2 (e ▸ hs)
-      set_option synthInstance.maxHeartbeats 100000 in
+  have key :=
+    field_indep p K N (Ideal.Quotient.mk M t)
+      ⟨
+        t ^ p ^ N,
+        by
+          show ((t ^ p ^ N : integralClosure (O0 p) Ω) : Ω) ∈ E
+          rw [ht]
+          exact hE ⟨_, rfl⟩,
+        map_pow _ _ _
+      ⟩
+      (by
+        rintro _ ⟨y, hy, rfl⟩ hb
+        refine hq y hy y.2 ?_
+        rw [← ht]
+        have hz : Ideal.Quotient.mk M (y ^ p - t ^ p ^ N) = 0 := by
+          rw [RingHom.map_sub, RingHom.map_pow, RingHom.map_pow, hb, sub_self]
+        have := (hmem (y ^ p - t ^ p ^ N)).1 hz
+        exact this)
+      (fun j => Ideal.Quotient.mk M (d' j))
+      (fun j hj => ⟨
+        d' j,
+        by
+          show (d' j : Ω) ∈ E
+          rw [hd' j hj]
+          exact (hd j hj).1,
+        rfl
+      ⟩)
+      (by
+        have e
+            : ((∑ j ∈ Finset.range (p ^ N), d' j * t ^ j : integralClosure (O0 p) Ω) : Ω)
+              = ∑ j ∈ Finset.range (p ^ N), d j * T.qq N ^ j := by
+          push_cast
+          exact Finset.sum_congr rfl fun j hj => by rw [hd' j (Finset.mem_range.1 hj)]
+        have := (hmem _).2 (e ▸ hs)
+        set_option synthInstance.maxHeartbeats 100000 in
         simpa only [map_sum, map_mul, map_pow] using this)
   intro j hj
   rw [← hd' j hj]

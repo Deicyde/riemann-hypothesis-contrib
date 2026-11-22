@@ -24,21 +24,25 @@ section Gen
 
 variable {C : Type} [Field C] {V : VF C}
 
-theorem frob_mv {σ : Type} {A B : MvPowerSeries σ C} (hA : IntS V A) (hB : IntS V B) (μ : σ →₀ ℕ) :
-    V.MM (coeff μ ((A + B) ^ V.l - A ^ V.l - B ^ V.l)) := by
-  have e : (A + B) ^ V.l - A ^ V.l - B ^ V.l = MvPowerSeries.C (V.l : C) *
-      ∑ k ∈ Finset.Ioo 0 V.l, A ^ k * B ^ (V.l - k) * MvPowerSeries.C ((V.l.choose k / V.l : ℕ) : C) := by
-    rw [add_pow_prime_eq' V.l_prime A B]
-    simp only [map_natCast]
-    ring
+theorem frob_mv {σ : Type} {A B : MvPowerSeries σ C} (hA : IntS V A) (hB : IntS V B) (μ : σ →₀ ℕ)
+    : V.MM (coeff μ ((A + B) ^ V.l - A ^ V.l - B ^ V.l)) := by
+  have e
+      : (A + B) ^ V.l - A ^ V.l - B ^ V.l
+        = MvPowerSeries.C (V.l : C)
+          * ∑ k ∈ Finset.Ioo 0 V.l, A ^ k * B ^ (V.l - k) * MvPowerSeries.C ((V.l.choose k / V.l : ℕ) : C) :=
+    by
+      rw [add_pow_prime_eq' V.l_prime A B]
+      simp only [map_natCast]
+      ring
   set_option synthInstance.maxHeartbeats 100000 in
     rw [e, coeff_C_mul, map_sum, mul_comm]
   refine ValuationNonnegativity.mm_mul_int (VF.Ge.sum fun k _ => ?_) FrobP.mm_l
   rw [coeff_mul_C]
   exact VF.Ge.mul_int (intS_mul (intS_pow hA k) (intS_pow hB _) μ) (VF.ge_natCast _)
 
-theorem frob_sum {σ ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C) (hf : ∀ i, IntS V (f i))
-    (μ : σ →₀ ℕ) : V.MM (coeff μ ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l)) := by
+theorem frob_sum
+    {σ ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C) (hf : ∀ i, IntS V (f i)) (μ : σ →₀ ℕ)
+    : V.MM (coeff μ ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l)) := by
   induction s using Finset.induction_on with
   | empty =>
     rw [Finset.sum_empty, Finset.sum_empty, zero_pow V.l_prime.ne_zero, sub_zero, map_zero]
@@ -46,29 +50,31 @@ theorem frob_sum {σ ι : Type} (s : Finset ι) (f : ι → MvPowerSeries σ C) 
   | insert b s hb ih =>
     rw [Finset.sum_insert hb, Finset.sum_insert hb]
     have hS : IntS V (∑ i ∈ s, f i) := intS_sum _ fun i _ => hf i
-    have e : (f b + ∑ i ∈ s, f i) ^ V.l - (f b ^ V.l + ∑ i ∈ s, f i ^ V.l) =
-        ((f b + ∑ i ∈ s, f i) ^ V.l - f b ^ V.l - (∑ i ∈ s, f i) ^ V.l) +
-          ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l) := by ring
+    have e
+        : (f b + ∑ i ∈ s, f i) ^ V.l - (f b ^ V.l + ∑ i ∈ s, f i ^ V.l)
+          = ((f b + ∑ i ∈ s, f i) ^ V.l - f b ^ V.l - (∑ i ∈ s, f i) ^ V.l)
+            + ((∑ i ∈ s, f i) ^ V.l - ∑ i ∈ s, f i ^ V.l) := by
+      ring
     rw [e, map_add (f := _)]
     exact ValuationNonnegativity.mm_add (frob_mv (hf b) hS μ) ih
 
-theorem monomial_pow' {σ : Type} (β : σ →₀ ℕ) (a : C) :
-    ∀ n : ℕ, (monomial β a) ^ n = monomial (n • β) (a ^ n)
+theorem monomial_pow' {σ : Type} (β : σ →₀ ℕ) (a : C)
+    : ∀ n : ℕ, (monomial β a) ^ n = monomial (n • β) (a ^ n)
   | 0 => by
     ext μ
     rw [pow_zero, zero_smul, pow_zero, coeff_one, coeff_monomial]
-  | n + 1 => by
-    rw [pow_succ, monomial_pow' β a n, monomial_mul_monomial, succ_nsmul, pow_succ]
+  | n + 1 => by rw [pow_succ, monomial_pow' β a n, monomial_mul_monomial, succ_nsmul, pow_succ]
 
-def divL {σ : Type} (l : ℕ) (α : σ →₀ ℕ) : σ →₀ ℕ := Finsupp.mapRange (fun n => n / l) (Nat.zero_div l) α
+def divL {σ : Type} (l : ℕ) (α : σ →₀ ℕ) : σ →₀ ℕ :=
+  Finsupp.mapRange (fun n => n / l) (Nat.zero_div l) α
 
-theorem divL_apply {σ : Type} (l : ℕ) (α : σ →₀ ℕ) (t : σ) : divL l α t = α t / l := by
-  simp [divL]
+theorem divL_apply {σ : Type} (l : ℕ) (α : σ →₀ ℕ) (t : σ) : divL l α t = α t / l := by simp [divL]
 
-theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ →₀ ℕ) :
-    V.MM (coeff α (F ^ V.l) - if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0) := by
+theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ →₀ ℕ)
+    : V.MM (coeff α (F ^ V.l) - if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0) := by
   have hl0 : 0 < V.l := V.l_prime.pos
-  obtain ⟨P, hPdef⟩ : ∃ P : MvPowerSeries σ C, P = ∑ β ∈ Finset.Iic α, monomial β (coeff β F) := ⟨_, rfl⟩
+  obtain ⟨P, hPdef⟩ : ∃ P : MvPowerSeries σ C, P = ∑ β ∈ Finset.Iic α, monomial β (coeff β F) :=
+    ⟨_, rfl⟩
   have hmon : ∀ β, IntS V (monomial β (coeff β F)) := fun β μ => by
     rw [coeff_monomial]
     split_ifs
@@ -90,8 +96,9 @@ theorem frobPowMv {σ : Type} (F : MvPowerSeries σ C) (hF : IntS V F) (α : σ 
       rw [hc, zero_mul]
     rwa [map_sub, sub_eq_zero] at h0
   have e2 := frob_sum (Finset.Iic α) (fun β => monomial β (coeff β F)) hmon α
-  have e3 : coeff α (∑ β ∈ Finset.Iic α, (monomial β (coeff β F)) ^ V.l) =
-      if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0 := by
+  have e3
+      : coeff α (∑ β ∈ Finset.Iic α, (monomial β (coeff β F)) ^ V.l)
+        = if ∀ t, V.l ∣ α t then coeff (divL V.l α) F ^ V.l else 0 := by
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
     simp only [monomial_pow', coeff_monomial]
@@ -136,8 +143,10 @@ end Slice
 
 section FBs
 
-variable {C : Type} [Field C] [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ}
-  (Y : FBChart C V O dd)
+variable
+  {C : Type} [Field C] [CharZero C]
+  {V : VF C} {O : Type} [CommRing O] [StarRing O]
+  {dd : ℕ} (Y : FBChart C V O dd)
 
 end FBs
 

@@ -13,7 +13,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 @[expose] public section
 
 noncomputable section
-open NumberField IsDedekindDomain Formalism.HermitianLatticesTheory Formalism.L2.Col GlobalTheory.InertExchange
+open NumberField IsDedekindDomain Formalism.HermitianLatticesTheory Formalism.L2.Col
+  GlobalTheory.InertExchange
 open Classical
 
 namespace GlobalTheory.InertExchange
@@ -22,9 +23,9 @@ open Module
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
 
-private theorem isFullLattice_of_unimodular {L : Submodule (𝓞 E) (Sp E n)}
-    (hL : Submodule.IsLattice E L) (hu : IsUnimodular (hStd E n) L) :
-    Submodule.IsFullLattice E L := by
+private theorem isFullLattice_of_unimodular
+    {L : Submodule (𝓞 E) (Sp E n)} (hL : Submodule.IsLattice E L) (hu : IsUnimodular (hStd E n) L)
+    : Submodule.IsFullLattice E L := by
   let := hL
   refine { span_eq_top := ?_ }
   let W := Submodule.span E (L : Set (Sp E n))
@@ -44,45 +45,71 @@ private theorem isFullLattice_of_unimodular {L : Submodule (𝓞 E) (Sp E n)}
     intro y hy
     apply hStd_mem_one_symm
     have hxy : hStd E n (e x) y = 0 :=
-      congrArg (fun f : Module.Dual E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hx)
+      congrArg
+        (fun f : Module.Dual E W => f ⟨y, Submodule.subset_span hy⟩)
+        (LinearMap.mem_ker.mp hx)
     simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxy]
   let i : E →ₗ[𝓞 E] L :=
     ((LinearMap.toSpanSingleton E _ (e x)).restrictScalars (𝓞 E)).codRestrict L hsmul
   let : Module.Finite (𝓞 E) L := Module.Finite.iff_fg.mpr hL.fg
-  let : Module.Finite (𝓞 E) E := Module.Finite.of_injective i fun a b hab =>
-    smul_left_injective E (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+  let : Module.Finite (𝓞 E) E :=
+    Module.Finite.of_injective i fun a b hab =>
+      smul_left_injective E
+        (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+        (congrArg Subtype.val hab)
   exact RingOfIntegers.not_isField E
     (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 E) E) (Field.toIsField E))
 
-
-theorem exchange : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} (P : HeightOneSpectrum (𝓞 E)),
-  conjPrime₂ P = P → (∃ x : 𝓞 E, cO E x - x ∉ P.asIdeal) →
-  ∀ (X Z : Submodule (𝓞 E) (Sp E n)), Submodule.IsLattice E X → Submodule.IsLattice E Z →
-    IsUnimodular (hStd E n) X → IsUnimodular (hStd E n) Z →
-    (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Z) →
-    ∃ σ : Submodule (𝓞 E) (Sp E n) → Submodule (𝓞 E) (Sp E n), σ X = Z ∧ σ Z = X ∧
-      (∀ Y : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y) →
-        Submodule.IsLattice E (σ Y) ∧ IsUnimodular (hStd E n) (σ Y) ∧ ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X (σ Y)) ∧
-      (∀ Y' : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E Y' → IsUnimodular (hStd E n) Y' → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y') →
-        ∃ Y : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E Y ∧ IsUnimodular (hStd E n) Y ∧
-          (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y) ∧ σ Y = Y') ∧
-      (∀ Y Y' : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y) → Submodule.IsLattice E Y' → IsUnimodular (hStd E n) Y' → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y') → σ Y = σ Y' → Y = Y') ∧
-      ∀ (s : List ℕ) (Y Y' : Submodule (𝓞 E) (Sp E n)), Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y) → Submodule.IsLattice E Y' → IsUnimodular (hStd E n) Y' → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y') →
-        (IsInertNbr P.asIdeal s (σ Y) (σ Y') ↔ IsInertNbr P.asIdeal s Y Y') := by
+theorem exchange
+    : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ} (P : HeightOneSpectrum (𝓞 E)),
+      conjPrime₂ P = P → (∃ x : 𝓞 E, cO E x - x ∉ P.asIdeal)
+        → ∀ (X Z : Submodule (𝓞 E) (Sp E n)),
+          Submodule.IsLattice E X → Submodule.IsLattice E Z → IsUnimodular (hStd E n) X
+            → IsUnimodular (hStd E n) Z → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Z)
+            → ∃ σ : Submodule (𝓞 E) (Sp E n) → Submodule (𝓞 E) (Sp E n),
+              σ X = Z ∧ σ Z = X
+                ∧ (∀ Y : Submodule (𝓞 E) (Sp E n),
+                  Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y
+                    → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y)
+                    → Submodule.IsLattice E (σ Y) ∧ IsUnimodular (hStd E n) (σ Y)
+                      ∧ ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X (σ Y))
+                ∧ (∀ Y' : Submodule (𝓞 E) (Sp E n),
+                  Submodule.IsLattice E Y' → IsUnimodular (hStd E n) Y'
+                    → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y')
+                    → ∃ Y : Submodule (𝓞 E) (Sp E n),
+                      Submodule.IsLattice E Y ∧ IsUnimodular (hStd E n) Y
+                        ∧ (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y) ∧ σ Y = Y')
+                ∧ (∀ Y Y' : Submodule (𝓞 E) (Sp E n),
+                  Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y
+                    → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y)
+                    → Submodule.IsLattice E Y' → IsUnimodular (hStd E n) Y'
+                    → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y') → σ Y = σ Y'
+                    → Y = Y')
+                ∧ ∀ (s : List ℕ) (Y Y' : Submodule (𝓞 E) (Sp E n)),
+                  Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y
+                    → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y)
+                    → Submodule.IsLattice E Y' → IsUnimodular (hStd E n) Y'
+                    → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X Y')
+                    → (IsInertNbr P.asIdeal s (σ Y) (σ Y') ↔ IsInertNbr P.asIdeal s Y Y') := by
   intro E _ _ _ n P hP hin X Z hXl hZl hXu hZu hXZ
-  obtain ⟨g, hg, hgX, hgZ⟩ := GlobalTheory.T.cartan_exchange_unimodular_inert_prime n P hP hin X Z hXl hZl hXu hZu hXZ
+  obtain ⟨g, hg, hgX, hgZ⟩ :=
+    GlobalTheory.T.cartan_exchange_unimodular_inert_prime n P hP hin X Z hXl hZl hXu hZu hXZ
   have hcc : ∀ Q : HeightOneSpectrum (𝓞 E), conjPrime₂ (conjPrime₂ Q) = Q := fun Q => by
     apply HeightOneSpectrum.ext
     ext r
     change cO E (cO E r) ∈ Q.asIdeal ↔ r ∈ Q.asIdeal
     rw [cO_cO]
-  have locg : ∀ (h : Sp E n ≃ₗ[E] Sp E n) (Q : HeightOneSpectrum (𝓞 E)) (M N : Submodule (𝓞 E) (Sp E n)),
-      localization₂ Q.asIdeal M = localization₂ Q.asIdeal N → localization₂ Q.asIdeal (gmap h M) = localization₂ Q.asIdeal (gmap h N) := by
+  have locg
+      : ∀ (h : Sp E n ≃ₗ[E] Sp E n) (Q : HeightOneSpectrum (𝓞 E)) (M N : Submodule (𝓞 E) (Sp E n)),
+        localization₂ Q.asIdeal M = localization₂ Q.asIdeal N
+          → localization₂ Q.asIdeal (gmap h M) = localization₂ Q.asIdeal (gmap h N) := by
     intro h Q M N e
     ext x
     rw [mem_localization_gmap, mem_localization_gmap, e]
-  have locg_inv : ∀ (h : Sp E n ≃ₗ[E] Sp E n) (Q : HeightOneSpectrum (𝓞 E)) (M N : Submodule (𝓞 E) (Sp E n)),
-      localization₂ Q.asIdeal (gmap h M) = localization₂ Q.asIdeal (gmap h N) → localization₂ Q.asIdeal M = localization₂ Q.asIdeal N := by
+  have locg_inv
+      : ∀ (h : Sp E n ≃ₗ[E] Sp E n) (Q : HeightOneSpectrum (𝓞 E)) (M N : Submodule (𝓞 E) (Sp E n)),
+        localization₂ Q.asIdeal (gmap h M) = localization₂ Q.asIdeal (gmap h N)
+          → localization₂ Q.asIdeal M = localization₂ Q.asIdeal N := by
     intro h Q M N e
     ext x
     have h1 := (mem_localization_gmap Q h M (h x)).symm
@@ -96,16 +123,23 @@ theorem exchange : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : �
     have e : g⁻¹ = g.symm := rfl
     rw [e, LinearEquiv.symm_symm, LinearEquiv.symm_apply_apply]
   have hginv : g⁻¹ ∈ UF E n := inv_mem hg
-  have unimodG : ∀ (h : Sp E n ≃ₗ[E] Sp E n), h ∈ UF E n → ∀ M : Submodule (𝓞 E) (Sp E n),
-      IsUnimodular (hStd E n) M → IsUnimodular (hStd E n) (gmap h M) := by
+  have unimodG
+      : ∀ (h : Sp E n ≃ₗ[E] Sp E n),
+        h ∈ UF E n
+          → ∀ M : Submodule (𝓞 E) (Sp E n),
+            IsUnimodular (hStd E n) M → IsUnimodular (hStd E n) (gmap h M) := by
     intro h hh M hM
     have hM' : dual (hStd E n) M = M := hM
     show dual (hStd E n) (gmap h M) = gmap h M
     rw [dual_gmap h hh, hM']
-  have unimod : ∀ A B C : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E A → Submodule.IsLattice E B →
-      Submodule.IsLattice E C → IsUnimodular (hStd E n) B → IsUnimodular (hStd E n) C →
-      localization₂ P.asIdeal A = localization₂ P.asIdeal B → (∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → localization₂ Q.asIdeal A = localization₂ Q.asIdeal C) →
-      IsUnimodular (hStd E n) A := by
+  have unimod
+      : ∀ A B C : Submodule (𝓞 E) (Sp E n),
+        Submodule.IsLattice E A → Submodule.IsLattice E B → Submodule.IsLattice E C
+          → IsUnimodular (hStd E n) B → IsUnimodular (hStd E n) C
+          → localization₂ P.asIdeal A = localization₂ P.asIdeal B
+          → (∀ Q : HeightOneSpectrum (𝓞 E),
+            Q ≠ P → localization₂ Q.asIdeal A = localization₂ Q.asIdeal C)
+          → IsUnimodular (hStd E n) A := by
     intro A B C hA hB hC hBu hCu hAP hAQ
     have hBu' : dual (hStd E n) B = B := hBu
     have hCu' : dual (hStd E n) C = C := hCu
@@ -114,14 +148,21 @@ theorem exchange : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : �
     intro Q
     by_cases hQ : Q = P
     · rw [hQ]
-      have h1 : localization₂ (conjPrime₂ P).asIdeal A = localization₂ (conjPrime₂ P).asIdeal B := by rw [hP]; exact hAP
+      have h1
+          : localization₂ (conjPrime₂ P).asIdeal A = localization₂ (conjPrime₂ P).asIdeal B := by
+        rw [hP]; exact hAP
       rw [GlobalTheory.T.localization_hermitianDual_eq P A B hA hB h1, hBu', hAP]
     · have hQ' : conjPrime₂ Q ≠ P := fun h => hQ (by rw [← hcc Q, h, hP])
       rw [GlobalTheory.T.localization_hermitianDual_eq Q A C hA hC (hAQ _ hQ'), hCu', hAQ Q hQ]
-  have patch_lat_loc : ∀ (h : Sp E n ≃ₗ[E] Sp E n), h ∈ UF E n →
-      ∀ Y : Submodule (𝓞 E) (Sp E n), Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y →
-      Submodule.IsLattice E (patchAt P (gmap h Y) Y) ∧ ∀ Q : HeightOneSpectrum (𝓞 E),
-        localization₂ Q.asIdeal (patchAt P (gmap h Y) Y) = localization₂ Q.asIdeal (if Q = P then gmap h Y else Y) := by
+  have patch_lat_loc
+      : ∀ (h : Sp E n ≃ₗ[E] Sp E n),
+        h ∈ UF E n
+          → ∀ Y : Submodule (𝓞 E) (Sp E n),
+            Submodule.IsLattice E Y → IsUnimodular (hStd E n) Y
+              → Submodule.IsLattice E (patchAt P (gmap h Y) Y)
+                ∧ ∀ Q : HeightOneSpectrum (𝓞 E),
+                  localization₂ Q.asIdeal (patchAt P (gmap h Y) Y)
+                    = localization₂ Q.asIdeal (if Q = P then gmap h Y else Y) := by
     intro h hh Y hY hu
     exact GlobalTheory.T.submodulePatchAtPrime_isLattice_locP P (gmap h Y) Y
       (isFullLattice_of_unimodular (gmap_lattice h Y hY) (unimodG h hh Y hu))
@@ -147,7 +188,8 @@ theorem exchange : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : �
     show Submodule.IsLattice E (patchAt P (gmap g Y) Y) ∧ IsUnimodular (hStd E n) (patchAt P (gmap g Y) Y) ∧
       ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → SameAt Q X (patchAt P (gmap g Y) Y)
     refine ⟨latσ Y hYl hYu, ?_, ?_⟩
-    · refine unimod _ (gmap g Y) X (latσ Y hYl hYu) (gmap_lattice g Y hYl) hXl (unimodG g hg Y hYu) hXu ?_ ?_
+    · refine unimod _ (gmap g Y) X (latσ Y hYl hYu) (gmap_lattice g Y hYl) hXl (unimodG g hg Y hYu)
+        hXu ?_ ?_
       · rw [locσ Y hYl hYu P, if_pos rfl]
       · intro Q hQ
         rw [locσ Y hYl hYu Q, if_neg hQ]
@@ -159,7 +201,8 @@ theorem exchange : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : �
   · intro Y' hl' hu' hS'
     obtain ⟨hYl, hYloc⟩ := patch_lat_loc g⁻¹ hginv Y' hl' hu'
     have hYu : IsUnimodular (hStd E n) (patchAt P (gmap g⁻¹ Y') Y') := by
-      refine unimod _ (gmap g⁻¹ Y') Y' hYl (gmap_lattice _ _ hl') hl' (unimodG _ hginv Y' hu') hu' ?_ ?_
+      refine unimod _ (gmap g⁻¹ Y') Y' hYl (gmap_lattice _ _ hl') hl' (unimodG _ hginv Y' hu') hu'
+        ?_ ?_
       · rw [hYloc P, if_pos rfl]
       · intro Q hQ
         rw [hYloc Q, if_neg hQ]
@@ -194,44 +237,69 @@ theorem exchange : ∀ {E : Type} [Field E] [NumberField E] [StarRing E] {n : �
     show IsInertNbr P.asIdeal s (patchAt P (gmap g Y) Y) (patchAt P (gmap g Y') Y') ↔ IsInertNbr P.asIdeal s Y Y'
     have hAl := gmap_lattice g Y hYl
     have hBl := gmap_lattice g Y' hY'l
-    have hAA' := GlobalTheory.T.sameAt_of_localization_eq P (gmap g Y) _ hAl (latσ Y hYl hYu) (by rw [locσ Y hYl hYu P, if_pos rfl])
-    have hBB' := GlobalTheory.T.sameAt_of_localization_eq P (gmap g Y') _ hBl (latσ Y' hY'l hY'u) (by rw [locσ Y' hY'l hY'u P, if_pos rfl])
-    have hAB : ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P → localization₂ Q.asIdeal (gmap g Y) = localization₂ Q.asIdeal (gmap g Y') :=
+    have hAA' :=
+      GlobalTheory.T.sameAt_of_localization_eq P (gmap g Y) _ hAl (latσ Y hYl hYu)
+        (by rw [locσ Y hYl hYu P, if_pos rfl])
+    have hBB' :=
+      GlobalTheory.T.sameAt_of_localization_eq P (gmap g Y') _ hBl (latσ Y' hY'l hY'u)
+        (by rw [locσ Y' hY'l hY'u P, if_pos rfl])
+    have hAB
+        : ∀ Q : HeightOneSpectrum (𝓞 E),
+          Q ≠ P → localization₂ Q.asIdeal (gmap g Y) = localization₂ Q.asIdeal (gmap g Y') :=
       fun Q hQ => locg g Q Y Y' ((hYS Q hQ).localization_eq.trans (hY'S Q hQ).localization_eq.symm)
-    have hA'B' : ∀ Q : HeightOneSpectrum (𝓞 E), Q ≠ P →
-        localization₂ Q.asIdeal (patchAt P (gmap g Y) Y) = localization₂ Q.asIdeal (patchAt P (gmap g Y') Y') := by
+    have hA'B'
+        : ∀ Q : HeightOneSpectrum (𝓞 E),
+          Q ≠ P
+            → localization₂ Q.asIdeal (patchAt P (gmap g Y) Y)
+              = localization₂ Q.asIdeal (patchAt P (gmap g Y') Y') := by
       intro Q hQ
-      rw [locσ Y hYl hYu Q, locσ Y' hY'l hY'u Q, if_neg hQ, if_neg hQ, (hYS Q hQ).localization_eq, (hY'S Q hQ).localization_eq]
-    obtain ⟨k1, hk1, hk1'⟩ := GlobalTheory.T.exists_prime_pow_smul_le_of_localizations_eq_away P _ _ hAl hBl hAB
-    obtain ⟨k2, hk2, hk2'⟩ := GlobalTheory.T.exists_prime_pow_smul_le_of_localizations_eq_away P _ _ (latσ Y hYl hYu) (latσ Y' hY'l hY'u) hA'B'
+      rw [locσ Y hYl hYu Q, locσ Y' hY'l hY'u Q, if_neg hQ, if_neg hQ, (hYS Q hQ).localization_eq,
+        (hY'S Q hQ).localization_eq]
+    obtain ⟨k1, hk1, hk1'⟩ :=
+      GlobalTheory.T.exists_prime_pow_smul_le_of_localizations_eq_away P _ _ hAl hBl hAB
+    obtain ⟨k2, hk2, hk2'⟩ :=
+      GlobalTheory.T.exists_prime_pow_smul_le_of_localizations_eq_away P _ _ (latσ Y hYl hYu)
+        (latσ Y' hY'l hY'u) hA'B'
     obtain ⟨a, ha, a', ha', h1, h2⟩ := hAA'
     obtain ⟨b, hb, b', hb', h3, h4⟩ := hBB'
     have hα0 : a * a' * b * b' ∉ P.asIdeal :=
-      Formalism.L2.DIV.lc_mul_notMem P (Formalism.L2.DIV.lc_mul_notMem P (Formalism.L2.DIV.lc_mul_notMem P ha ha') hb) hb'
+      Formalism.L2.DIV.lc_mul_notMem P
+        (Formalism.L2.DIV.lc_mul_notMem P (Formalism.L2.DIV.lc_mul_notMem P ha ha') hb) hb'
     obtain ⟨t, p, hp, e⟩ := P.isMaximal.exists_inv hα0
     have hgeom := geom_sum_mul p (k1 + k2)
-    have hgd : t * (∑ i ∈ Finset.range (k1 + k2), p ^ i) * (a * a' * b * b') + p ^ (k1 + k2) = 1 := by
+    have hgd
+        : t * (∑ i ∈ Finset.range (k1 + k2), p ^ i) * (a * a' * b * b') + p ^ (k1 + k2) = 1 := by
       linear_combination (∑ i ∈ Finset.range (k1 + k2), p ^ i) * e - hgeom
     have hδ : p ^ (k1 + k2) ∈ P.asIdeal ^ (k1 + k2) := Ideal.pow_mem_pow hp _
     set S := ∑ i ∈ Finset.range (k1 + k2), p ^ i
     have rAA' : HiRel (t * S * (a * a' * b * b')) (gmap g Y) (patchAt P (gmap g Y) Y) := by
       refine ⟨fun x hx => ?_, fun x hx => ?_⟩
-      · have : (t * S * (a * a' * b * b')) • x = (t * S * a * b * b') • (a' • x) := by rw [smul_smul]; congr 1; ring
-        rw [this]; exact Submodule.smul_mem _ _ (h2 x hx)
-      · have : (t * S * (a * a' * b * b')) • x = (t * S * a' * b * b') • (a • x) := by rw [smul_smul]; congr 1; ring
-        rw [this]; exact Submodule.smul_mem _ _ (h1 x hx)
+      · have : (t * S * (a * a' * b * b')) • x = (t * S * a * b * b') • (a' • x) := by
+          rw [smul_smul]; congr 1; ring
+        rw [this]
+        exact Submodule.smul_mem _ _ (h2 x hx)
+      · have : (t * S * (a * a' * b * b')) • x = (t * S * a' * b * b') • (a • x) := by
+          rw [smul_smul]; congr 1; ring
+        rw [this]
+        exact Submodule.smul_mem _ _ (h1 x hx)
     have rBB' : HiRel (t * S * (a * a' * b * b')) (gmap g Y') (patchAt P (gmap g Y') Y') := by
       refine ⟨fun x hx => ?_, fun x hx => ?_⟩
-      · have : (t * S * (a * a' * b * b')) • x = (t * S * a * a' * b) • (b' • x) := by rw [smul_smul]; congr 1; ring
-        rw [this]; exact Submodule.smul_mem _ _ (h4 x hx)
-      · have : (t * S * (a * a' * b * b')) • x = (t * S * a * a' * b') • (b • x) := by rw [smul_smul]; congr 1; ring
-        rw [this]; exact Submodule.smul_mem _ _ (h3 x hx)
+      · have : (t * S * (a * a' * b * b')) • x = (t * S * a * a' * b) • (b' • x) := by
+          rw [smul_smul]; congr 1; ring
+        rw [this]
+        exact Submodule.smul_mem _ _ (h4 x hx)
+      · have : (t * S * (a * a' * b * b')) • x = (t * S * a * a' * b') • (b • x) := by
+          rw [smul_smul]; congr 1; ring
+        rw [this]
+        exact Submodule.smul_mem _ _ (h3 x hx)
     have le1 : P.asIdeal ^ (k1 + k2) ≤ P.asIdeal ^ k1 := Ideal.pow_le_pow_right (by omega)
     have le2 : P.asIdeal ^ (k1 + k2) ≤ P.asIdeal ^ k2 := Ideal.pow_le_pow_right (by omega)
     have rAB : HiRel (p ^ (k1 + k2)) (gmap g Y) (gmap g Y') :=
-      HiRel.of_ideal ((Submodule.smul_mono_left le1).trans hk1) ((Submodule.smul_mono_left le1).trans hk1') hδ
+      HiRel.of_ideal ((Submodule.smul_mono_left le1).trans hk1)
+        ((Submodule.smul_mono_left le1).trans hk1') hδ
     have rA'B' : HiRel (p ^ (k1 + k2)) (patchAt P (gmap g Y) Y) (patchAt P (gmap g Y') Y') :=
-      HiRel.of_ideal ((Submodule.smul_mono_left le2).trans hk2) ((Submodule.smul_mono_left le2).trans hk2') hδ
+      HiRel.of_ideal ((Submodule.smul_mono_left le2).trans hk2)
+        ((Submodule.smul_mono_left le2).trans hk2') hδ
     constructor
     · intro h
       have h5 := isInertNbr_par hgd rAA'.symm rBB'.symm rA'B' rAB h

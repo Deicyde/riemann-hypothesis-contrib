@@ -17,14 +17,18 @@ namespace OverUnique
 
 open GroundTheory.Heights₂.Heights.LowerBoundFree
 
-variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
+variable
+  {K : Type} [Fintype K]
+  {ι : K → Type} [∀ k, Fintype (ι k)]
+  {Ω : Type} [Field Ω]
   {F : Type} [Field F] [NumberField F]
 
 theorem evC_eq_aeval (z : (Σ k, ι k) → ℂ) (g : MRing ι) : evC z g = aeval z g := by
   have h : algebraMap ℤ ℂ = Int.castRingHom ℂ := RingHom.ext_int _ _
   simp only [evC, eval_map, aeval_def, h]
 
-theorem homog_X [DecidableEq K] (p : Σ k, ι k) : IsMultiHomog (X p : MRing ι) (Pi.single p.1 1) := by
+theorem homog_X [DecidableEq K] (p : Σ k, ι k)
+    : IsMultiHomog (X p : MRing ι) (Pi.single p.1 1) := by
   classical
   intro m hm k
   rw [support_X, Finset.mem_singleton] at hm
@@ -33,20 +37,23 @@ theorem homog_X [DecidableEq K] (p : Σ k, ι k) : IsMultiHomog (X p : MRing ι)
   by_cases h : k = k0
   · subst h
     simp [Finsupp.single_apply]
-  · have h' : ∀ i : ι k, ¬ ((⟨k0, i0⟩ : Σ k, ι k) = ⟨k, i⟩) := fun i e => h (congrArg Sigma.fst e).symm
+  · have h' : ∀ i : ι k, ¬((⟨k0, i0⟩ : Σ k, ι k) = ⟨k, i⟩) := fun i e =>
+      h (congrArg Sigma.fst e).symm
     simp [Finsupp.single_apply, h', h]
 
-theorem homog_sub {g h : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d) :
-    IsMultiHomog (g - h) d := by
+theorem homog_sub {g h : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) (hh : IsMultiHomog h d)
+    : IsMultiHomog (g - h) d := by
   rw [sub_eq_add_neg]
   refine isMultiHomog_add hg ?_
   intro m hm
   exact hh m (by simpa using hm)
 
-theorem exists_form (c : ∀ k, ι k) (G : MRing ι) :
-    ∃ (D : K → ℕ) (H M : MRing ι), IsMultiHomog H D ∧ IsMultiHomog M D ∧
-      ∀ (L : Type) [Field L] (w : (Σ k, ι k) → L), (∀ k, w ⟨k, c k⟩ ≠ 0) →
-        aeval w M ≠ 0 ∧ aeval w H = aeval w M * aeval (fun p => w p / w ⟨p.1, c p.1⟩) G := by
+theorem exists_form (c : ∀ k, ι k) (G : MRing ι)
+    : ∃ (D : K → ℕ) (H M : MRing ι),
+      IsMultiHomog H D ∧ IsMultiHomog M D
+        ∧ ∀ (L : Type) [Field L] (w : (Σ k, ι k) → L),
+          (∀ k, w ⟨k, c k⟩ ≠ 0)
+            → aeval w M ≠ 0 ∧ aeval w H = aeval w M * aeval (fun p => w p / w ⟨p.1, c p.1⟩) G := by
   classical
   induction G using MvPolynomial.induction_on with
   | C a =>
@@ -59,9 +66,14 @@ theorem exists_form (c : ∀ k, ι k) (G : MRing ι) :
   | add p q hp hq =>
     obtain ⟨D₁, H₁, M₁, h₁, m₁, e₁⟩ := hp
     obtain ⟨D₂, H₂, M₂, h₂, m₂, e₂⟩ := hq
-    refine ⟨D₁ + D₂, H₁ * M₂ + H₂ * M₁, M₁ * M₂,
+    refine ⟨
+      D₁ + D₂,
+      H₁ * M₂ + H₂ * M₁,
+      M₁ * M₂,
       isMultiHomog_add (isMultiHomog_mul h₁ m₂) (by rw [add_comm D₁]; exact isMultiHomog_mul h₂ m₁),
-      isMultiHomog_mul m₁ m₂, fun L _ w hw => ?_⟩
+      isMultiHomog_mul m₁ m₂,
+      fun L _ w hw => ?_
+    ⟩
     obtain ⟨n₁, f₁⟩ := e₁ L w hw
     obtain ⟨n₂, f₂⟩ := e₂ L w hw
     refine ⟨by rw [map_mul]; exact mul_ne_zero n₁ n₂, ?_⟩
@@ -83,21 +95,26 @@ theorem exists_form (c : ∀ k, ι k) (G : MRing ι) :
 
 variable {y : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ}
 
-theorem aeval_eq_zero {P : MRing ι} {d : K → ℕ} (hz : z ∈ mcPts (mCoordIdeal y)) (hP : IsMultiHomog P d)
-    (h0 : aeval y P = 0) : aeval z P = 0 := by
+theorem aeval_eq_zero
+    {P : MRing ι} {d : K → ℕ}
+    (hz : z ∈ mcPts (mCoordIdeal y)) (hP : IsMultiHomog P d) (h0 : aeval y P = 0)
+    : aeval z P = 0 := by
   rw [← evC_eq_aeval]
   exact hz.2 _ (mem_mCoordIdeal_of_aeval_eq_zero y hP h0)
 
-theorem chart_ne {k : K} {i : ι k} (hz : z ∈ mcPts (mCoordIdeal y)) (h : z ⟨k, i⟩ ≠ 0) : y ⟨k, i⟩ ≠ 0 := by
+theorem chart_ne {k : K} {i : ι k} (hz : z ∈ mcPts (mCoordIdeal y)) (h : z ⟨k, i⟩ ≠ 0)
+    : y ⟨k, i⟩ ≠ 0 := by
   classical
   intro h0
   apply h
   have := aeval_eq_zero hz (homog_X (⟨k, i⟩ : Σ k, ι k)) (by rw [aeval_X]; exact h0)
   simpa using this
 
-theorem chart_ker (hz : z ∈ mcPts (mCoordIdeal y)) {c : ∀ k, ι k} (hc : ∀ k, z ⟨k, c k⟩ ≠ 0)
-    (hy : ∀ k, y ⟨k, c k⟩ ≠ 0) {G : MRing ι} (h0 : aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = 0) :
-    aeval (fun p => z p / z ⟨p.1, c p.1⟩) G = 0 := by
+theorem chart_ker
+    (hz : z ∈ mcPts (mCoordIdeal y))
+    {c : ∀ k, ι k} (hc : ∀ k, z ⟨k, c k⟩ ≠ 0) (hy : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    {G : MRing ι} (h0 : aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = 0)
+    : aeval (fun p => z p / z ⟨p.1, c p.1⟩) G = 0 := by
   obtain ⟨D, H, M, h, m, e⟩ := exists_form c G
   obtain ⟨-, fy⟩ := e Ω y hy
   obtain ⟨nz, fz⟩ := e ℂ z hc
@@ -106,11 +123,14 @@ theorem chart_ker (hz : z ∈ mcPts (mCoordIdeal y)) {c : ∀ k, ι k} (hc : ∀
   rw [fz] at this
   exact (mul_eq_zero.mp this).resolve_left nz
 
-theorem exists_intHom (φ : F →+* Ω) (hz : z ∈ mcPts (mCoordIdeal y)) {c : ∀ k, ι k}
-    (hc : ∀ k, z ⟨k, c k⟩ ≠ 0) (hy : ∀ k, y ⟨k, c k⟩ ≠ 0)
-    (hG : ∀ a : 𝓞 F, ∃ G : MRing ι, aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = φ (a : F)) :
-    ∃ τ : 𝓞 F →+* ℂ, ∀ (a : 𝓞 F) (G : MRing ι), aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = φ (a : F) →
-      τ a = aeval (fun p => z p / z ⟨p.1, c p.1⟩) G := by
+theorem exists_intHom
+    (φ : F →+* Ω)
+    (hz : z ∈ mcPts (mCoordIdeal y))
+    {c : ∀ k, ι k} (hc : ∀ k, z ⟨k, c k⟩ ≠ 0) (hy : ∀ k, y ⟨k, c k⟩ ≠ 0)
+    (hG : ∀ a : 𝓞 F, ∃ G : MRing ι, aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = φ (a : F))
+    : ∃ τ : 𝓞 F →+* ℂ, ∀ (a : 𝓞 F) (G : MRing ι),
+      aeval (fun p => y p / y ⟨p.1, c p.1⟩) G = φ (a : F)
+        → τ a = aeval (fun p => z p / z ⟨p.1, c p.1⟩) G := by
   set v : (Σ k, ι k) → Ω := fun p => y p / y ⟨p.1, c p.1⟩ with hv
   set u : (Σ k, ι k) → ℂ := fun p => z p / z ⟨p.1, c p.1⟩ with hu
   let A : MRing ι →ₐ[ℤ] Ω := aeval v
@@ -123,11 +143,11 @@ theorem exists_intHom (φ : F →+* Ω) (hz : z ∈ mcPts (mCoordIdeal y)) {c : 
     have h1 : aeval v G = 0 := congrArg Subtype.val hGk
     exact chart_ker hz hc hy h1
   let l : A.range →+* ℂ := RingHom.liftOfSurjective ψ hs ⟨ψ', hker⟩
-  have hl : ∀ G, l (ψ G) = ψ' G := fun G =>
-    RingHom.liftOfRightInverse_comp_apply ψ _ _ ⟨ψ', hker⟩ G
-  let ρ : 𝓞 F →+* A.range := (φ.comp (algebraMap (𝓞 F) F)).codRestrict A.range (fun a => by
-    obtain ⟨G, hG'⟩ := hG a
-    exact ⟨G, hG'⟩)
+  have hl : ∀ G, l (ψ G) = ψ' G := fun G => RingHom.liftOfRightInverse_comp_apply ψ _ _ ⟨ψ', hker⟩ G
+  let ρ : 𝓞 F →+* A.range :=
+    (φ.comp (algebraMap (𝓞 F) F)).codRestrict A.range (fun a => by
+      obtain ⟨G, hG'⟩ := hG a
+      exact ⟨G, hG'⟩)
   refine ⟨l.comp ρ, fun a G h => ?_⟩
   have : ρ a = ψ G := Subtype.ext h.symm
   rw [RingHom.comp_apply, this, hl]
@@ -143,11 +163,14 @@ theorem intHom_injective (τ : 𝓞 F →+* ℂ) : Function.Injective τ := by
 
 end OverUnique
 
-
 open OverUnique GroundTheory.Heights₂.Heights.LowerBoundFree in
-theorem existsUnique_ptOver (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
-    (F : Type) [Field F] [NumberField F] (y : (Σ k, ι k) → Ω) (φ : F →+* Ω) (hO : OverInt y φ) :
-    ∀ z ∈ mcPts (mCoordIdeal y), ∃! σ : F →+* ℂ, PtOver y φ σ z := by
+theorem existsUnique_ptOver
+    (K : Type) [Fintype K]
+    (ι : K → Type) [∀ k, Fintype (ι k)]
+    (Ω : Type) [Field Ω]
+    (F : Type) [Field F] [NumberField F]
+    (y : (Σ k, ι k) → Ω) (φ : F →+* Ω) (hO : OverInt y φ)
+    : ∀ z ∈ mcPts (mCoordIdeal y), ∃! σ : F →+* ℂ, PtOver y φ σ z := by
   classical
   intro z hz
   choose c hc using hz.1
@@ -163,8 +186,7 @@ theorem existsUnique_ptOver (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fin
   have hσ : ∀ a : 𝓞 F, σ (a : F) = τ a := fun a => IsFractionRing.lift_algebraMap hinj a
   refine ⟨σ, ⟨hz, fun a d g h hg hh he => ?_⟩, fun σ' hσ' => ?_⟩
   · obtain ⟨a₁, a₂, ha₂, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 F) a
-    have ha₂' : algebraMap (𝓞 F) F a₂ ≠ 0 := by
-      simpa using nonZeroDivisors.ne_zero ha₂
+    have ha₂' : algebraMap (𝓞 F) F a₂ ≠ 0 := by simpa using nonZeroDivisors.ne_zero ha₂
     obtain ⟨G₁, e₁⟩ := hG a₁
     obtain ⟨G₂, e₂⟩ := hG a₂
     obtain ⟨D₁, H₁, M₁, h₁, m₁, f₁⟩ := exists_form c G₁
@@ -185,7 +207,8 @@ theorem existsUnique_ptOver (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fin
       ring
     have h1 := aeval_eq_zero hz hP h0
     simp only [map_sub, map_mul, z₁, z₂, ← hτ a₁ G₁ e₁, ← hτ a₂ G₂ e₂, ← evC_eq_aeval z g,
-      ← evC_eq_aeval z h, ← hσ] at h1
+        ← evC_eq_aeval z h, ← hσ]
+      at h1
     have hs₂ : σ (algebraMap (𝓞 F) F a₂) ≠ 0 := by simpa using ha₂'
     rw [map_div₀]
     have hM : aeval z M₁ * aeval z M₂ ≠ 0 := mul_ne_zero nz₁ nz₂

@@ -7,9 +7,11 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AdditiveVal
 
 open UpperTheory.V UpperTheory.V.PropA
 
-theorem UpperTheory.V.PropA.powIn :
-    ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X] (w : Module.End ℤ_[l] X),
-      (∀ k n : ℕ, InPow k (w - 1) → InPow k (w ^ n - 1)) ∧ (InPow 1 (w - 1) → InPow 2 (w ^ l - 1)) := by
+theorem UpperTheory.V.PropA.powIn
+    : ∀ (l : ℕ) [Fact l.Prime] (X : Type) [AddCommGroup X] [Module ℤ_[l] X]
+        (w : Module.End ℤ_[l] X),
+      (∀ k n : ℕ, InPow k (w - 1) → InPow k (w ^ n - 1))
+        ∧ (InPow 1 (w - 1) → InPow 2 (w ^ l - 1)) := by
   intro l _ X _ _ w
   refine ⟨?_, ?_⟩
   · intro k n H x

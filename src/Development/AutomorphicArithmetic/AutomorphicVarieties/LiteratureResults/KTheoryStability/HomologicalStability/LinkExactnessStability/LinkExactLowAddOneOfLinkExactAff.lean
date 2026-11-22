@@ -11,8 +11,8 @@ open GlobalTheory.SeqCx Matrix
 
 namespace GlobalTheory
 
-theorem low_union_aff_subset_low_succ (R : Type) [CommRing R] (n : ℕ) :
-    low R n ∪ aff R n n ⊆ low R (n + 1) := by
+theorem low_union_aff_subset_low_succ (R : Type) [CommRing R] (n : ℕ)
+    : low R n ∪ aff R n n ⊆ low R (n + 1) := by
   intro x hx
   rcases hx with hx | hx
   · intro i hi
@@ -21,17 +21,19 @@ theorem low_union_aff_subset_low_succ (R : Type) [CommRing R] (n : ℕ) :
     have := hx i (by omega)
     simpa [Finsupp.single_apply, show n ≠ i by omega] using this
 
-theorem linkExactLow_succ_of_linkExactAff : ∀ (R : Type) [CommRing R] (s n : ℕ),
-    LinkExactAff R s n → LinkExactLow R s (n + 1) := by
+theorem linkExactLow_succ_of_linkExactAff
+    : ∀ (R : Type) [CommRing R] (s n : ℕ), LinkExactAff R s n → LinkExactLow R s (n + 1) := by
   intro R _ s n h τ hτ p hp
-  have hsub : SubClosed (uniM R (ℕ →₀ R)) := (T.subClosed_and_perm_and_linearEquiv_invariant_uniM R (ℕ →₀ R)).1
+  have hsub : SubClosed (uniM R (ℕ →₀ R)) :=
+    (T.subClosed_and_perm_and_linearEquiv_invariant_uniM R (ℕ →₀ R)).1
   apply exactAt_of_links (ℕ →₀ R) _ (low R n ∪ aff R n n)
   · intro l hl l' hl'
     refine ⟨fun x hx => hl.1 x (hl'.subset hx), hsub _ hl.2 _ ?_⟩
     simpa using hl'
   · intro τ1 hτ1 hlen
-    have heq : linkIn (linkIn (uniM R (ℕ →₀ R)) (low R (n + 1)) τ) (low R n ∪ aff R n n) τ1 =
-        linkIn (uniM R (ℕ →₀ R)) (low R n ∪ aff R n n) (τ ++ τ1) := by
+    have heq
+        : linkIn (linkIn (uniM R (ℕ →₀ R)) (low R (n + 1)) τ) (low R n ∪ aff R n n) τ1
+          = linkIn (uniM R (ℕ →₀ R)) (low R n ∪ aff R n n) (τ ++ τ1) := by
       ext w
       constructor
       · rintro ⟨hw, -, h2⟩
@@ -52,7 +54,8 @@ end GlobalTheory
 
 section
 open GlobalTheory.SeqCx Matrix
-theorem _root_.GlobalTheory.T.linkExactLow_add_one_of_linkExactAff : ∀ (R : Type) [CommRing R] (s n : ℕ), LinkExactAff R s n → LinkExactLow R s (n + 1) := by
+theorem _root_.GlobalTheory.T.linkExactLow_add_one_of_linkExactAff
+    : ∀ (R : Type) [CommRing R] (s n : ℕ), LinkExactAff R s n → LinkExactLow R s (n + 1) := by
   first
   | exact @GlobalTheory.linkExactLow_succ_of_linkExactAff
   | exact @GlobalTheory.low_union_aff_subset_low_succ

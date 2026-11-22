@@ -16,12 +16,16 @@ open Matrix IsLocalRing UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa
 section SlopeTestRemainingChoices
 open UpperTheory.V.CA
 
-private theorem tr_of_map {n : ℕ} {A G K : Type} [CommRing A] [Group G] [CommRing K] (hn : 1 ≤ n)
-    (D : GDet n A G) (f : A →+* K) (ρ : G →* Matrix (Fin n) (Fin n) K) (h : D.map f = GDet.ofRep ρ) (g : G) :
-    f (D.tr (MonoidAlgebra.single g 1)) = (ρ g).trace := by
+private theorem tr_of_map
+    {n : ℕ} {A G K : Type} [CommRing A] [Group G] [CommRing K]
+    (hn : 1 ≤ n)
+    (D : GDet n A G) (f : A →+* K) (ρ : G →* Matrix (Fin n) (Fin n) K) (h : D.map f = GDet.ofRep ρ)
+    (g : G)
+    : f (D.tr (MonoidAlgebra.single g 1)) = (ρ g).trace := by
   obtain ⟨-, -, hm, -⟩ := UpperTheory.V.CA.d_gmap D
   have e1 := (hm f (MonoidAlgebra.single g 1)).2 1
-  have hs : (MonoidAlgebra.mapRingHom G f) (MonoidAlgebra.single g 1) = MonoidAlgebra.single g 1 := by
+  have hs
+      : (MonoidAlgebra.mapRingHom G f) (MonoidAlgebra.single g 1) = MonoidAlgebra.single g 1 := by
     simp [MonoidAlgebra.mapRingHom]
   rw [hs, h] at e1
   have e2 : (GDet.ofRep ρ).tr (MonoidAlgebra.single g 1) = (ρ g).trace := by
@@ -32,9 +36,11 @@ private theorem tr_of_map {n : ℕ} {A G K : Type} [CommRing A] [Group G] [CommR
   unfold GDet.tr
   rw [← e1, e2]
 
-private theorem span_of_gram {n : ℕ} {K : Type} [Field K] (s : Set (Matrix (Fin n) (Fin n) K))
-    (x y : Fin (n * n) → Matrix (Fin n) (Fin n) K) (hx : ∀ a, x a ∈ s)
-    (hdet : Matrix.det (Matrix.of fun a b => (x a * y b).trace) ≠ 0) : Submodule.span K s = ⊤ := by
+private theorem span_of_gram
+    {n : ℕ} {K : Type} [Field K]
+    (s : Set (Matrix (Fin n) (Fin n) K)) (x y : Fin (n * n) → Matrix (Fin n) (Fin n) K)
+    (hx : ∀ a, x a ∈ s) (hdet : Matrix.det (Matrix.of fun a b => (x a * y b).trace) ≠ 0)
+    : Submodule.span K s = ⊤ := by
   have hli : LinearIndependent K x := by
     rw [Fintype.linearIndependent_iff]
     intro c hc
@@ -56,10 +62,11 @@ private theorem span_of_gram {n : ℕ} {K : Type} [Field K] (s : Set (Matrix (Fi
     rintro _ ⟨a, rfl⟩
     exact hx a
 
-private theorem discSt_iff {n : ℕ} {A G K : Type} [CommRing A] [Group G] [Field K]
+private theorem discSt_iff
+    {n : ℕ} {A G K : Type} [CommRing A] [Group G] [Field K]
     (D : GDet n A G) (f : A →+* K) (ρ : G →* Matrix (Fin n) (Fin n) K) (h : D.map f = GDet.ofRep ρ)
-    (Q : Ideal A) (hQ : ∀ b, f b = 0 ↔ b ∈ Q) :
-    DiscSt D Q ↔ Submodule.span K (Set.range ρ) = ⊤ := by
+    (Q : Ideal A) (hQ : ∀ b, f b = 0 ↔ b ∈ Q)
+    : DiscSt D Q ↔ Submodule.span K (Set.range ρ) = ⊤ := by
   rcases Nat.eq_zero_or_pos n with hn | hn
   · subst hn
     haveI : IsEmpty (Fin (0 * 0)) := ⟨fun i => Fin.elim0 i⟩
@@ -70,12 +77,14 @@ private theorem discSt_iff {n : ℕ} {A G K : Type} [CommRing A] [Group G] [Fiel
       refine ⟨fun _ => 1, fun _ => 1, ?_⟩
       rw [Matrix.det_isEmpty, ← hQ, map_one]
       exact one_ne_zero
-  · have key : ∀ g h' : Fin (n * n) → G,
-        (Matrix.of fun i j => D.tr (MonoidAlgebra.single (g i * h' j) 1)).det ∉ Q ↔
-          (Matrix.of fun i j => (ρ (g i) * ρ (h' j)).trace).det ≠ 0 := by
+  · have key
+        : ∀ g h' : Fin (n * n) → G,
+          (Matrix.of fun i j => D.tr (MonoidAlgebra.single (g i * h' j) 1)).det ∉ Q
+            ↔ (Matrix.of fun i j => (ρ (g i) * ρ (h' j)).trace).det ≠ 0 := by
       intro g h'
-      have hm : f.mapMatrix (Matrix.of fun i j => D.tr (MonoidAlgebra.single (g i * h' j) 1)) =
-          Matrix.of fun i j => (ρ (g i) * ρ (h' j)).trace := by
+      have hm
+          : f.mapMatrix (Matrix.of fun i j => D.tr (MonoidAlgebra.single (g i * h' j) 1))
+            = Matrix.of fun i j => (ρ (g i) * ρ (h' j)).trace := by
         ext i j
         simp [tr_of_map hn D f ρ h, map_mul]
       have e := hQ (Matrix.of fun i j => D.tr (MonoidAlgebra.single (g i * h' j) 1)).det
@@ -91,23 +100,30 @@ private theorem discSt_iff {n : ℕ} {A G K : Type} [CommRing A] [Group G] [Fiel
       choose gg hgg using hx
       refine ⟨fun i => gg (finProdFinEquiv.symm i), fun i => gg (finProdFinEquiv.symm i), ?_⟩
       rw [key]
-      have hr : (Matrix.of fun i j => (ρ (gg (finProdFinEquiv.symm i)) * ρ (gg (finProdFinEquiv.symm j))).trace) =
-          Matrix.reindex finProdFinEquiv finProdFinEquiv (Matrix.of fun a b => (x a * x b).trace) := by
+      have hr
+          : (Matrix.of fun i j =>
+              (ρ (gg (finProdFinEquiv.symm i)) * ρ (gg (finProdFinEquiv.symm j))).trace)
+            = Matrix.reindex finProdFinEquiv finProdFinEquiv
+              (Matrix.of fun a b => (x a * x b).trace) := by
         ext i j
         simp [hgg]
       rw [hr, Matrix.det_reindex_self]
       exact hd
 
-private theorem irr_iff_span {n : ℕ} {G K : Type} [Group G] [Field K] [IsAlgClosed K]
-    (ρ : G →* Matrix (Fin n) (Fin n) K) :
-    UpperTheory.V.U3.MatIrr ⊤ ρ ↔ Submodule.span K (Set.range ρ) = ⊤ := by
+private theorem irr_iff_span
+    {n : ℕ} {G K : Type} [Group G] [Field K] [IsAlgClosed K] (ρ : G →* Matrix (Fin n) (Fin n) K)
+    : UpperTheory.V.U3.MatIrr ⊤ ρ ↔ Submodule.span K (Set.range ρ) = ⊤ := by
   rw [← (UpperTheory.V.AlgebraTools.irred_iff_span (RingHom.id K) ρ).1]
   exact ⟨fun h N hN => h N fun g _ => hN g, fun h N hN => h N fun g => hN g (Subgroup.mem_top g)⟩
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Pa.Det.discStIff :
-    ∀ {n : ℕ} {R G κ : Type} [CommRing R] [Group G] [Field κ] [IsAlgClosed κ] (D : GDet n R G) (f : R →+* κ), DiscSt D (RingHom.ker f) ↔ ∃ ρ : G →* Matrix (Fin n) (Fin n) κ, UpperTheory.V.U3.MatIrr ⊤ ρ ∧ D.map f = GDet.ofRep ρ := by
+theorem UpperTheory.V.Pa.Det.discStIff
+    : ∀ {n : ℕ} {R G κ : Type} [CommRing R] [Group G] [Field κ] [IsAlgClosed κ] (D : GDet n R G)
+        (f : R →+* κ),
+      DiscSt D (RingHom.ker f)
+        ↔ ∃ ρ : G →* Matrix (Fin n) (Fin n) κ,
+          UpperTheory.V.U3.MatIrr ⊤ ρ ∧ D.map f = GDet.ofRep ρ := by
   intro n R G κ _ _ _ _ D f
   have hQ : ∀ b, f b = 0 ↔ b ∈ RingHom.ker f := fun b => RingHom.mem_ker.symm
   constructor

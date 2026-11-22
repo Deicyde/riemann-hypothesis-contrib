@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CartierDivis
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 
 set_option autoImplicit false
 
@@ -52,8 +54,8 @@ theorem mult_sub'' (D E : CartierDiv Z) (z : Z) : (D - E).mult z = D.mult z - E.
   rw [sub_add_cancel] at h
   omega
 
-theorem ord_nonneg_of_regAt' {f : Z.functionField} {z : Z} (hf : RegAt z f) (h0 : f ≠ 0) :
-    0 ≤ Scheme.ord f z := by
+theorem ord_nonneg_of_regAt' {f : Z.functionField} {z : Z} (hf : RegAt z f) (h0 : f ≠ 0)
+    : 0 ≤ Scheme.ord f z := by
   by_cases hz : Order.coheight z = 1
   · obtain ⟨a, rfl⟩ := hf
     have ha : a ≠ 0 := fun h => h0 (by rw [h, map_zero])
@@ -61,28 +63,46 @@ theorem ord_nonneg_of_regAt' {f : Z.functionField} {z : Z} (hf : RegAt z f) (h0 
     exact Nat.cast_nonneg _
   · exact (Scheme.ord_eq_zero_of_coheight_neq_one hz _).ge
 
-theorem regAt_functionFieldMap' {X : Scheme.{0}} [IsIntegral X] (q : Z ⟶ X) [IsDominant q] (y : Z)
-    {f : X.functionField} (h : RegAt (q y) f) : RegAt y (functionFieldMap q f) := by
+theorem regAt_functionFieldMap'
+    {X : Scheme.{0}} [IsIntegral X]
+    (q : Z ⟶ X) [IsDominant q]
+    (y : Z)
+    {f : X.functionField} (h : RegAt (q y) f)
+    : RegAt y (functionFieldMap q f) := by
   obtain ⟨a, rfl⟩ := h
   exact ⟨q.stalkMap y a, (functionFieldMap_algebraMap q y a).symm⟩
 
 end GlobalTheory.Discrepancy.CoeffPlaces
 
-
 open GlobalTheory.Discrepancy.CoeffPlaces in
-theorem GlobalTheory.Discrepancy.neg_one_lt_discrep_add_ord_of_logRes : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ) (n : ℕ), IsProjOver p → topologicalKrullDim X = n → ∀ (η : RatForms p n) (m : ℕ) (g f : X.functionFieldˣ) (Y : Scheme.{0}) [IsIntegral Y] [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y) (B : Closeds Y) (y : X) (σ : Y), η ≠ 0 → 0 < m → IsLogRes p n η m (CartierDiv.principal g) s K B → (∀ y', s y' ∈ (CartierDiv.principal f).supp → y' ∈ B) → RegAt y (f : X.functionField) → Scheme.ord ((fnPull s f : Y.functionFieldˣ) : Y.functionField) σ = 1 → (pullCart s (CartierDiv.principal g) - m • K).mult σ = m → (∀ v : Y, v ≠ σ → s v ⤳ y → (pullCart s (CartierDiv.principal g) - m • K).mult v < m) → ∀ E : DivOver p, E.Through y → -1 < discrep E η m g + E.ord f := by
+theorem GlobalTheory.Discrepancy.neg_one_lt_discrep_add_ord_of_logRes
+    : ∀ (X : Scheme.{0}) [IsIntegral X] [IsLocallyNoetherian X] (p : X ⟶ Sp ℂ) (n : ℕ),
+      IsProjOver p → topologicalKrullDim X = n
+        → ∀ (η : RatForms p n) (m : ℕ) (g f : X.functionFieldˣ) (Y : Scheme.{0}) [IsIntegral Y]
+            [IsLocallyNoetherian Y] (s : Y ⟶ X) [IsDominant s] (K : CartierDiv Y) (B : Closeds Y)
+            (y : X) (σ : Y),
+          η ≠ 0 → 0 < m → IsLogRes p n η m (CartierDiv.principal g) s K B
+            → (∀ y', s y' ∈ (CartierDiv.principal f).supp → y' ∈ B) → RegAt y (f : X.functionField)
+            → Scheme.ord ((fnPull s f : Y.functionFieldˣ) : Y.functionField) σ = 1
+            → (pullCart s (CartierDiv.principal g) - m • K).mult σ = m
+            → (∀ v : Y, v ≠ σ → s v ⤳ y → (pullCart s (CartierDiv.principal g) - m • K).mult v < m)
+            → ∀ E : DivOver p, E.Through y → -1 < discrep E η m g + E.ord f := by
   intro X _ _ p n hproj _ η m g f Y _ _ s _ K B y σ hη hm hres hfB hfy hσ1 hσm hlt E hE
   haveI : IsProper p := GlobalTheory.CommonModel.isProper_of_isProjOver hproj
   haveI : IsProper (s ≫ p) := GlobalTheory.CommonModel.isProper_of_isProjOver hres.proj
   haveI : IsProper s := IsProper.of_comp s p
   haveI := hres.smooth
-  obtain ⟨E', hE'E⟩ := GlobalTheory.T.exists_primeDivisor_over_source_birational ℂ X Y p s hres.bir E
-  obtain ⟨y', rfl, hE'⟩ := GlobalTheory.T.divisor_center_proper_lift ℂ X Y p s hres.bir inferInstance E' E hE'E _ hE
+  obtain ⟨E', hE'E⟩ :=
+    GlobalTheory.T.exists_primeDivisor_over_source_birational ℂ X Y p s hres.bir E
+  obtain ⟨y', rfl, hE'⟩ :=
+    GlobalTheory.T.divisor_center_proper_lift ℂ X Y p s hres.bir inferInstance E' E hE'E _ hE
   have hη' : EtaleKlt.ratPull p s n η ≠ 0 := fun h0 =>
-    hη ((GlobalTheory.T.rationalTopFormPullback_bijective_birational ℂ X Y p s hres.bir n).1 (h0.trans (map_zero _).symm))
+    hη ((GlobalTheory.T.rationalTopFormPullback_bijective_birational ℂ X Y p s hres.bir n).1
+      (h0.trans (map_zero _).symm))
   set F := pullCart s (CartierDiv.principal f) with hFdef
   set G := pullCart s (CartierDiv.principal g) with hGdef
-  have hFsupp : F.supp ≤ B := fun v hv => hfB v ((GlobalTheory.T.cartierDivisorPullback_support_and_effective X Y s _).1 v hv)
+  have hFsupp : F.supp ≤ B := fun v hv =>
+    hfB v ((GlobalTheory.T.cartierDivisorPullback_support_and_effective X Y s _).1 v hv)
   have e : G - m • F - m • K = (G - m • K) + -(m • F) := by abel
   have hsupp : (G - m • F - m • K).supp ≤ B := by
     rw [e]
@@ -111,15 +131,17 @@ theorem GlobalTheory.Discrepancy.neg_one_lt_discrep_add_ord_of_logRes : ∀ (X :
       have h2 : (0 : ℤ) ≤ m * Scheme.ord ((fnPull s f : Y.functionFieldˣ) : Y.functionField) w :=
         mul_nonneg (Int.natCast_nonneg m) h0
       linarith
-  have hcrit := (GlobalTheory.T.klt_of_snc_coefficients ℂ Y (s ≫ p) n (EtaleKlt.ratPull p s n η) hη' K (G - m • F) m B hm
-    hres.div hres.snc hsupp y' _ hEqn E' hE').1 hlt'
-  have hd : discrep E' (EtaleKlt.ratPull p s n η) m (fnPull s g / fnPull s f ^ m) =
-      discrep E η m g + E.ord f := by
+  have hcrit :=
+    (GlobalTheory.T.klt_of_snc_coefficients ℂ Y (s ≫ p) n (EtaleKlt.ratPull p s n η) hη' K
+      (G - m • F) m B hm hres.div hres.snc hsupp y' _ hEqn E' hE').1 hlt'
+  have hd
+      : discrep E' (EtaleKlt.ratPull p s n η) m (fnPull s g / fnPull s f ^ m)
+        = discrep E η m g + E.ord f := by
     simp only [discrep]
     have hform := GlobalTheory.T.form_order_birational_pullback ℂ X Y p s hres.bir E' E hE'E n η hη
     change E'.formOrd (EtaleKlt.ratPull p s n η) = E.formOrd η at hform
-    rw [hform, div_eq_mul_inv (fnPull s g), E'.ord_mul, E'.ord_inv,
-      E'.ord_pow, GlobalTheory.T.ord_functionField_pullback_primeDivisor_over ℂ X Y p s hres.bir E' E hE'E g,
+    rw [hform, div_eq_mul_inv (fnPull s g), E'.ord_mul, E'.ord_inv, E'.ord_pow,
+      GlobalTheory.T.ord_functionField_pullback_primeDivisor_over ℂ X Y p s hres.bir E' E hE'E g,
       GlobalTheory.T.ord_functionField_pullback_primeDivisor_over ℂ X Y p s hres.bir E' E hE'E f]
     have hm' : (m : ℚ) ≠ 0 := by exact_mod_cast hm.ne'
     push_cast

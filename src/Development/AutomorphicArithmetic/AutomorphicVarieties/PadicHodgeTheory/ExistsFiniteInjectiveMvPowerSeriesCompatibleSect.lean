@@ -9,9 +9,11 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsSys
 
 open IsLocalRing UpperTheory.V.Alg
 
-private theorem finite_quotient_of_pow_le {A S : Type} [CommRing A] [CommRing S] [Algebra A S]
-    [IsNoetherianRing S] {I J : Ideal S} (h : ∀ s : S, ∃ a : A, s - algebraMap A S a ∈ I) {N : ℕ}
-    (hN : I ^ N ≤ J) : Module.Finite A (S ⧸ J) := by
+private theorem finite_quotient_of_pow_le
+    {A S : Type} [CommRing A] [CommRing S] [Algebra A S] [IsNoetherianRing S]
+    {I J : Ideal S} (h : ∀ s : S, ∃ a : A, s - algebraMap A S a ∈ I)
+    {N : ℕ} (hN : I ^ N ≤ J)
+    : Module.Finite A (S ⧸ J) := by
   have key : ∀ N : ℕ, ∃ F : Submodule A S, F.FG ∧ F ⊔ (I ^ N).restrictScalars A = ⊤ := by
     intro N
     induction N with
@@ -39,10 +41,12 @@ private theorem finite_quotient_of_pow_le {A S : Type} [CommRing A] [CommRing S]
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 (hF'.ge (Submodule.mem_top (x := s)))
   exact ⟨⟨y, hy⟩, Ideal.Quotient.eq.2 (by simpa using hN hz)⟩
 
-private theorem injective_of_ringKrullDim_eq {A S : Type} [CommRing A] [IsDomain A] [CommRing S]
-    [Algebra A S] [Module.Finite A S] {n : ℕ} (hA : ringKrullDim A = n) (hS : ringKrullDim S = n) :
-    Function.Injective (algebraMap A S) := by
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+private theorem injective_of_ringKrullDim_eq
+    {A S : Type} [CommRing A] [IsDomain A] [CommRing S] [Algebra A S] [Module.Finite A S]
+    {n : ℕ} (hA : ringKrullDim A = n) (hS : ringKrullDim S = n)
+    : Function.Injective (algebraMap A S) := by
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro r hr
   by_contra hr0
   letI : Algebra (A ⧸ Ideal.span {r}) S :=
@@ -54,26 +58,31 @@ private theorem injective_of_ringKrullDim_eq {A S : Type} [CommRing A] [IsDomain
   have h1 : ringKrullDim S ≤ ringKrullDim (A ⧸ Ideal.span {r}) :=
     Order.krullDim_le_of_strictMono (PrimeSpectrum.comap (algebraMap (A ⧸ Ideal.span {r}) S))
       fun _ _ hpq => Ideal.IsIntegral.comap_lt_comap (R := A ⧸ Ideal.span {r}) hpq
-  have h2 := ringKrullDim_succ_le_of_surjective
-    (Ideal.Quotient.mk (Ideal.span {r})) Ideal.Quotient.mk_surjective
-    (mem_nonZeroDivisors_of_ne_zero hr0)
-    (Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self r))
+  have h2 :=
+    ringKrullDim_succ_le_of_surjective (Ideal.Quotient.mk (Ideal.span {r}))
+      Ideal.Quotient.mk_surjective (mem_nonZeroDivisors_of_ne_zero hr0)
+      (Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.mem_span_singleton_self r))
   have h3 : ringKrullDim S + 1 ≤ ringKrullDim A := (add_le_add_left h1 1).trans h2
   rw [hA, hS] at h3
   norm_cast at h3
   omega
 
 open MvPowerSeries GlobalTheory in
-theorem UpperTheory.exists_finite_injective_mvPowerSeries_compatible_section :
-    ∀ (O S : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CommRing S] [IsDomain S] [Algebra O S] [IsCO O S] (x : S →ₐ[O] O), ∃ (d : ℕ) (F : MvPowerSeries (Fin d) O →ₐ[O] S), Function.Injective F ∧ F.toRingHom.Finite ∧ ringKrullDim S = (d + 1 : ℕ) ∧ ∀ g, x (F g) = MvPowerSeries.constantCoeff g := by
+theorem UpperTheory.exists_finite_injective_mvPowerSeries_compatible_section
+    : ∀ (O S : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CommRing S] [IsDomain S] [Algebra O S] [IsCO O S]
+        (x : S →ₐ[O] O),
+      ∃ (d : ℕ) (F : MvPowerSeries (Fin d) O →ₐ[O] S),
+        Function.Injective F ∧ F.toRingHom.Finite ∧ ringKrullDim S = (d + 1 : ℕ)
+          ∧ ∀ g, x (F g) = MvPowerSeries.constantCoeff g := by
   intro O S _ _ _ _ _ _ _ hS x
   have hc : IsAdicComplete (maximalIdeal S) S := IsCO.complete (O := O)
   have hl : IsLocalHom (algebraMap O S) := IsCO.isLocalHom
   have hn : IsNoetherianRing S := hS.toIsNoetherian
   obtain ⟨p, hp⟩ := IsDiscreteValuationRing.exists_irreducible O
   have hm := hp.maximalIdeal_eq
-  have hloc : ∀ a ∈ maximalIdeal O, algebraMap O S a ∈ maximalIdeal S :=
-    fun a ha h => ha (IsLocalHom.map_nonunit a h)
+  have hloc : ∀ a ∈ maximalIdeal O, algebraMap O S a ∈ maximalIdeal S := fun a ha h =>
+    ha (IsLocalHom.map_nonunit a h)
   have hpm : p ∈ maximalIdeal O := hm ▸ Ideal.mem_span_singleton_self p
   have hp0 : algebraMap O S p ≠ 0 := fun h => hp.ne_zero (by simpa using congrArg x h)
   have hx : ∀ s ∈ maximalIdeal S, x s ∈ maximalIdeal O := fun s hs => by
@@ -90,15 +99,15 @@ theorem UpperTheory.exists_finite_injective_mvPowerSeries_compatible_section :
   have hA : IsAdicComplete (maximalIdeal A) A := (co_mvps O O (Fin n)).complete
   have hle : (maximalIdeal A).map (algebraMap A S) ≤ maximalIdeal S := by
     refine Ideal.map_le_iff_le_comap.2 fun g hg => ?_
-    have h4 := algHom_sub_constantCoeff_mem φ (K := maximalIdeal S)
-      (fun j => hφX j ▸ hz j) g
+    have h4 := algHom_sub_constantCoeff_mem φ (K := maximalIdeal S) (fun j => hφX j ▸ hz j) g
     have h5 := FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.1 hg
     have h7 := add_mem h4 (hloc _ h5)
     rwa [sub_add_cancel] at h7
   have hC : ∀ a : O, algebraMap A S (C a) = algebraMap O S a := fun a => mvEvalAdic_C _ z hz a
   have hCm : ∀ a ∈ maximalIdeal O, algebraMap O S a ∈ (maximalIdeal A).map (algebraMap A S) :=
-    fun a ha => hC a ▸ Ideal.mem_map_of_mem (algebraMap A S)
-      (FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.2 (by simpa using ha))
+    fun a ha =>
+      hC a ▸ Ideal.mem_map_of_mem (algebraMap A S)
+        (FormalIsogeny.mem_maximalIdeal_iff_constantCoeff.2 (by simpa using ha))
   have hge : maximalIdeal S ^ N ≤ (maximalIdeal A).map (algebraMap A S) := by
     refine hN.trans (Ideal.span_le.2 ?_)
     rintro _ (rfl | ⟨i, rfl⟩)
@@ -121,6 +130,5 @@ theorem UpperTheory.exists_finite_injective_mvPowerSeries_compatible_section :
   · rw [FormalIsogeny.ringKrullDim_mvPowerSeries, IsDiscreteValuationRing.ringKrullDim_eq_one,
       Nat.card_eq_fintype_card, Fintype.card_fin, add_comm]
     norm_cast
-  · have h := algHom_sub_constantCoeff_mem (x.comp φ) (K := ⊥) (fun j => by
-      simp [hφX, z]) g
+  · have h := algHom_sub_constantCoeff_mem (x.comp φ) (K := ⊥) (fun j => by simp [hφX, z]) g
     simpa [sub_eq_zero] using h

@@ -14,7 +14,8 @@ public import GroundTheory.GlobalFields.TateThesis.RootNumberLocalPlace
 noncomputable section
 
 open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.Z.Gam
-open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+open GlobalTheory.CuspRep GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil
+  GlobalTheory.LocGL
 open scoped Classical
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -31,13 +32,21 @@ private theorem exists_unr {ξ : kˣ →* ℂˣ} (h : IsUnram ξ) : ∃ a : ℂ�
   have h0 : x ≠ 0 := fun e => ValuativeRel.uniformizer_ne_zero (R := k) (by rw [← hx, e, map_zero])
   exact ⟨_, eq_unrChar h (ϖ := Units.mk0 x h0) hx⟩
 
-private theorem exists_family {n : ℕ} {s : Multiset (IrrGL (k := k))} (h1 : ∀ y ∈ s, y.1 = 1) (hn : (s.map Sigma.fst).sum = n)
-    (hu : ∀ ξ ∈ chars s, IsUnram ξ) : ∃ α : Fin n → ℂˣ,
-      s = Finset.univ.val.map fun i => IrrGL.ofChar (unrChar k (α i)) (isSmoothChar_of_isUnram (isUnram_unrChar k (α i))) := by
+private theorem exists_family
+    {n : ℕ} {s : Multiset (IrrGL (k := k))}
+    (h1 : ∀ y ∈ s, y.1 = 1) (hn : (s.map Sigma.fst).sum = n) (hu : ∀ ξ ∈ chars s, IsUnram ξ)
+    : ∃ α : Fin n → ℂˣ,
+      s = Finset.univ.val.map fun i =>
+        IrrGL.ofChar (unrChar k (α i)) (isSmoothChar_of_isUnram (isUnram_unrChar k (α i))) := by
   have hc : Multiset.card s = n := by
-    rw [← hn, Multiset.map_congr rfl h1, Multiset.map_const', Multiset.sum_replicate, smul_eq_mul, mul_one]
+    rw [← hn, Multiset.map_congr rfl h1, Multiset.map_const', Multiset.sum_replicate, smul_eq_mul,
+      mul_one]
   obtain ⟨x, rfl⟩ := GlobalTheory.RoadU.PlainChars.exists_fin_enum s hc
-  have key : ∀ i, ∃ a : ℂˣ, x i = IrrGL.ofChar (unrChar k a) (isSmoothChar_of_isUnram (isUnram_unrChar k a)) := fun i => by
+  have key
+      : ∀ i, ∃ a : ℂˣ,
+        x i
+          = IrrGL.ofChar (unrChar k a)
+            (isSmoothChar_of_isUnram (isUnram_unrChar k a)) := fun i => by
     have hm : x i ∈ Finset.univ.val.map x := Multiset.mem_map_of_mem _ (Finset.mem_univ i)
     obtain ⟨θ, hθ, e⟩ := GlobalTheory.RoadU.PlainChars.exists_eq_ofChar (x i) (h1 _ hm)
     obtain ⟨a, rfl⟩ := exists_unr (hu θ ⟨hθ, e ▸ hm⟩)
@@ -58,7 +67,11 @@ theorem winSph : WinSph := by
   have hq : GroundTheory.LocalField.residueCard (v.adicCompletion K) = Ideal.absNorm v.asIdeal :=
     GroundTheory.Global.residueCard_adicCompletion
   obtain ⟨e⟩ := unlFull (v.adicCompletion K) n σ.V σ.ρ _ _ hs (hq ▸ hl)
-  exact ⟨_, (CG.hasSat_mk π v _).2 (GlobalTheory.HeightCounting.Blocks.hasSatGL_locRep hσ
-    (GlobalTheory.PrinSat.hasSatGL_of_equiv e (GlobalTheory.PrinSat.hasSatGL_prinSeries v α)))⟩
+  exact ⟨
+    _,
+    (CG.hasSat_mk π v _).2
+      (GlobalTheory.HeightCounting.Blocks.hasSatGL_locRep hσ
+        (GlobalTheory.PrinSat.hasSatGL_of_equiv e (GlobalTheory.PrinSat.hasSatGL_prinSeries v α)))
+  ⟩
 
 end UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter

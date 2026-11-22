@@ -7,8 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.HasseN
 @[expose] public section
 
 open UpperTheory.V.Z.Sym.Loc in
-private theorem hs_eq_one_iff {K : Type} [Field K] (d x : K) :
-    hs d x = 1 ↔ ∃ a b : K, x = a ^ 2 - d * b ^ 2 := by
+private theorem hs_eq_one_iff {K : Type} [Field K] (d x : K)
+    : hs d x = 1 ↔ ∃ a b : K, x = a ^ 2 - d * b ^ 2 := by
   unfold hs
   constructor
   · intro h
@@ -18,9 +18,9 @@ private theorem hs_eq_one_iff {K : Type} [Field K] (d x : K) :
   · rintro ⟨a, b, e⟩
     exact if_pos ⟨a, b, e.symm⟩
 
-theorem UpperTheory.V.Z.Sym.Glob.hsHasse :
-    UpperTheory.V.Z.Sym.Glob.HsHasse := by
+theorem UpperTheory.V.Z.Sym.Glob.hsHasse : UpperTheory.V.Z.Sym.Glob.HsHasse := by
   intro F _ _ d x hd hx hr hf
   rw [hs_eq_one_iff]
-  exact GlobalTheory.QNorm.hasseNormSt F d x hd hx (fun σ => (hs_eq_one_iff _ _).1 (hr σ))
+  exact GlobalTheory.QNorm.hasseNormSt F d x hd hx
+    (fun σ => (hs_eq_one_iff _ _).1 (hr σ))
     (fun v => (hs_eq_one_iff _ _).1 (hf v))

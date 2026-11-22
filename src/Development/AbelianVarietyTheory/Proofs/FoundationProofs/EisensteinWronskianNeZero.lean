@@ -18,8 +18,7 @@ private lemma qParam_add_one (z : ℂ) : 𝕢 1 (z + 1) = 𝕢 1 z := by
   simp only [Periodic.qParam, Complex.ofReal_one, div_one, mul_add, mul_one, Complex.exp_add,
     Complex.exp_two_pi_mul_I]
 
-private def Good (G : ℍ → ℂ) : Prop :=
-  Periodic (G ∘ ofComplex) 1 ∧ MDiff G ∧ IsBoundedAtImInfty G
+private def Good (G : ℍ → ℂ) : Prop := Periodic (G ∘ ofComplex) 1 ∧ MDiff G ∧ IsBoundedAtImInfty G
 
 private lemma good_of_hasSum {G : ℍ → ℂ} {c : ℕ → ℂ}
     (hG : ∀ τ : ℍ, HasSum (fun m ↦ c m • 𝕢 1 τ ^ m) (G τ)) (hol : MDiff G) : Good G := by
@@ -81,8 +80,7 @@ private lemma coeff_Df {w : ℤ} (f : ModularForm 𝒮ℒ w) (m : ℕ) :
     (qExpansion 1 (D f)).coeff m = (m : ℂ) * (qExpansion 1 f).coeff m :=
   coeff_of_hasSum (good_Df f) (hasSum_Df f) m
 
-private noncomputable def wr : ℍ → ℂ :=
-  (2 : ℂ) • (⇑E₄ * D E₆) - (3 : ℂ) • (⇑E₆ * D E₄)
+private noncomputable def wr : ℍ → ℂ := (2 : ℂ) • (⇑E₄ * D E₆) - (3 : ℂ) • (⇑E₆ * D E₄)
 
 private lemma good_wr : Good wr :=
   (((good_f E₄).mul (good_Df E₆)).smul _).sub (((good_f E₆).mul (good_Df E₄)).smul _)
@@ -162,8 +160,8 @@ private lemma wr_ne_zero (τ : ℍ) : wr τ ≠ 0 := by
   rw [← hcΔ]
   exact mul_ne_zero hc0 (discriminant_ne_zero τ)
 
-theorem wronskian_E₄_E₆_ne_zero : ∀ τ : ℍ,
-    2 * E₄ τ * deriv (⇑E₆ ∘ ofComplex) τ - 3 * E₆ τ * deriv (⇑E₄ ∘ ofComplex) τ ≠ 0 := by
+theorem wronskian_E₄_E₆_ne_zero
+    : ∀ τ : ℍ, 2 * E₄ τ * deriv (⇑E₆ ∘ ofComplex) τ - 3 * E₆ τ * deriv (⇑E₄ ∘ ofComplex) τ ≠ 0 := by
   intro τ h
   apply wr_ne_zero τ
   simp only [wr, Pi.sub_apply, Pi.smul_apply, Pi.mul_apply, smul_eq_mul,

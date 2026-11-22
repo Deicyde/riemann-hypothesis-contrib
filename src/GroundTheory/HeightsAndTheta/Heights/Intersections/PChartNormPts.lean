@@ -12,28 +12,35 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 theorem ChartNormPts.proof : ChartNormPts.Statement := by
   intro K _ ι _ K' _ ι' _ κ v P' G j hv hP' hj z' hw hz1
   classical
   have hcast : ∀ p : MRing ι', eval z' (map (Int.castRingHom ℂ) p) = aeval z' p := fun p => by
     rw [eval_map, aeval_def, algebraMap_int_eq]
-  have hcoef : (eval₂Hom (Int.castRingHom ℂ) fun p => z' (v p)) =
-      (aeval (z' ∘ v) : MRing ι →ₐ[ℤ] ℂ).toRingHom := by
+  have hcoef
+      : (eval₂Hom (Int.castRingHom ℂ) fun p => z' (v p))
+        = (aeval (z' ∘ v) : MRing ι →ₐ[ℤ] ℂ).toRingHom := by
     ext c
     · simp
     · simp
-  have hφ : (algebraMap G.Φ G.Φ').comp (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom =
-      (aeval (G.x' ∘ v) : MRing ι →ₐ[ℤ] G.Φ').toRingHom := by
+  have hφ
+      : (algebraMap G.Φ G.Φ').comp (aeval G.x : MRing ι →ₐ[ℤ] G.Φ).toRingHom
+        = (aeval (G.x' ∘ v) : MRing ι →ₐ[ℤ] G.Φ').toRingHom := by
     ext c
     · simp
     · simp [G.compat]
   rw [hφ, hcoef]
   constructor
   · intro hz F hF
-    have hH : ChartNormPts.homogenise v (fun q : Σ k : FibreBlock κ, ι' k.1 => (⟨q.1.1, q.2⟩ : Σ k', ι' k'))
-        (fun q => ⟨q.1.1, j q.1⟩) F ∈ P' := by
+    have hH
+        : ChartNormPts.homogenise v
+            (fun q : Σ k : FibreBlock κ, ι' k.1 => (⟨q.1.1, q.2⟩ : Σ k', ι' k'))
+            (fun q => ⟨q.1.1, j q.1⟩)
+            F
+          ∈ P' := by
       rw [← G.genericFibre_ker_target, RingHom.mem_ker]
       show aeval G.x' _ = 0
       rw [ChartNormPts.aeval_homogenise_div v _ _ F G.x' fun q => hj q.1, hF, mul_zero]
@@ -61,22 +68,29 @@ theorem ChartNormPts.proof : ChartNormPts.Statement := by
     obtain ⟨a, ha⟩ := hS g hg
     let σ : (Σ k', ι' k') → MvPolynomial (Σ k : FibreBlock κ, ι' k.1) (MRing ι) := fun q' =>
       if h : q'.1 ∈ Set.range κ then C (X (hv.2.2.2 q' h).choose) else X ⟨⟨q'.1, h⟩, q'.2⟩
-    have hcomp : ∀ {R : Type} [CommRing R] (ψ : MvPolynomial (Σ k : FibreBlock κ, ι' k.1) (MRing ι) →+* R),
-        ψ (aeval σ g) = aeval (fun q' => ψ (σ q')) g := fun ψ =>
+    have hcomp
+        : ∀ {R : Type} [CommRing R] (ψ : MvPolynomial (Σ k : FibreBlock κ, ι' k.1) (MRing ι) →+* R),
+          ψ (aeval σ g) = aeval (fun q' => ψ (σ q')) g := fun ψ =>
       comp_aeval_apply (f := σ) ψ.toIntAlgHom g
     have h1 := hF (aeval σ g)
     rw [← coe_eval₂Hom, ← coe_eval₂Hom, hcomp, hcomp] at h1
     let c : K' → G.Φ' := fun k' => if h : k' ∈ Set.range κ then 1 else (G.x' ⟨k', j ⟨k', h⟩⟩)⁻¹
-    have hx : (fun q' => eval₂Hom (aeval (G.x' ∘ v) : MRing ι →ₐ[ℤ] G.Φ').toRingHom
-        (fun q => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, j q.1⟩) (σ q')) = fun q' => c q'.1 * G.x' q' := by
+    have hx
+        : (fun q' =>
+            eval₂Hom (aeval (G.x' ∘ v) : MRing ι →ₐ[ℤ] G.Φ').toRingHom
+              (fun q => G.x' ⟨q.1.1, q.2⟩ / G.x' ⟨q.1.1, j q.1⟩)
+              (σ q'))
+          = fun q' => c q'.1 * G.x' q' := by
       funext q'
       by_cases h : q'.1 ∈ Set.range κ
       · simp only [σ, c, dif_pos h, coe_eval₂Hom, eval₂_C, one_mul]
         simp [(hv.2.2.2 q' h).choose_spec]
       · simp only [σ, c, dif_neg h, coe_eval₂Hom, eval₂_X]
         rw [div_eq_inv_mul]
-    have hz : (fun q' => eval₂Hom (aeval (z' ∘ v) : MRing ι →ₐ[ℤ] ℂ).toRingHom
-        (fun q => z' ⟨q.1.1, q.2⟩) (σ q')) = z' := by
+    have hz
+        : (fun q' =>
+            eval₂Hom (aeval (z' ∘ v) : MRing ι →ₐ[ℤ] ℂ).toRingHom (fun q => z' ⟨q.1.1, q.2⟩) (σ q'))
+          = z' := by
       funext q'
       by_cases h : q'.1 ∈ Set.range κ
       · simp only [σ, dif_pos h, coe_eval₂Hom, eval₂_C]

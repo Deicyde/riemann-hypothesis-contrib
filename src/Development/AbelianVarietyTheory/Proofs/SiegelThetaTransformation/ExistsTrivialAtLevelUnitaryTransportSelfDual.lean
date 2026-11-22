@@ -10,8 +10,12 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.HalfOneAddSqrtNegIsInte
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain NumberField Matrix Complex
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr GlobalTheory.Ker
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.L2.Pj MeasureTheory IsDedekindDomain
+  NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory
+  GlobalTheory.ThFr GlobalTheory.Ker
 open GlobalTheory.SW hiding Level
 open GlobalTheory.Dict (hx pv)
 open ReciprocityTheory.ChartRestriction.G.I2 (polyDeriv)
@@ -26,23 +30,27 @@ section General
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {n : ℕ}
 
-theorem glue_map (c : E ≃ₐ[F] E) (e : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E) :
-    (glue e γ).map (sg (FiniteAdeleRing (𝓞 F) F) c) = glue e (γ.map c) := by
+theorem glue_map (c : E ≃ₐ[F] E) (e : FiniteAdeleRing (𝓞 F) F) (γ : Matrix (Fin n) (Fin n) E)
+    : (glue e γ).map (sg (FiniteAdeleRing (𝓞 F) F) c) = glue e (γ.map c) := by
   ext i j
   by_cases h : i = j
   · subst h
     simp [glue, fm, sg]
   · simp [glue, fm, sg, Matrix.one_apply_ne h]
 
-theorem mul_glue_sub_one {e α : FiniteAdeleRing (𝓞 F) F} (h : α * e = 0) (γ : Matrix (Fin n) (Fin n) E) (i j : Fin n) :
-    (α ⊗ₜ[F] (1 : E) : RA F E) * (glue e γ - 1) i j = 0 := by
+theorem mul_glue_sub_one
+    {e α : FiniteAdeleRing (𝓞 F) F} (h : α * e = 0) (γ : Matrix (Fin n) (Fin n) E) (i j : Fin n)
+    : (α ⊗ₜ[F] (1 : E) : RA F E) * (glue e γ - 1) i j = 0 := by
   have h0 : (α ⊗ₜ[F] (1 : E) : RA F E) * (e ⊗ₜ[F] (1 : E)) = 0 := by
     rw [Algebra.TensorProduct.tmul_mul_tmul, h, TensorProduct.zero_tmul]
   simp only [glue, Matrix.sub_apply, Matrix.add_apply, Matrix.smul_apply, smul_eq_mul]
   linear_combination (fm F γ i j - (1 : Matrix (Fin n) (Fin n) (RA F E)) i j) * h0
 
-theorem mul_idem_eq_zero {k M : ℕ} (hk : k.Coprime M) {v : HeightOneSpectrum (𝓞 F)} (hv : (M : 𝓞 F) ∈ v.asIdeal)
-    {α : FiniteAdeleRing (𝓞 F) F} (hα : ∀ v', v' ≠ v → α v' = 0) : α * idem F k = 0 := by
+theorem mul_idem_eq_zero
+    {k M : ℕ} (hk : k.Coprime M)
+    {v : HeightOneSpectrum (𝓞 F)} (hv : (M : 𝓞 F) ∈ v.asIdeal)
+    {α : FiniteAdeleRing (𝓞 F) F} (hα : ∀ v', v' ≠ v → α v' = 0)
+    : α * idem F k = 0 := by
   refine DFunLike.ext _ _ fun w => ?_
   change α w * idem F k w = 0
   by_cases h : w = v
@@ -56,21 +64,28 @@ theorem mul_idem_eq_zero {k M : ℕ} (hk : k.Coprime M) {v : HeightOneSpectrum (
 
 end General
 
-theorem finPart_cA (D : D7) (x : AE D) :
-    finPart D (cA D x) = sg (FiniteAdeleRing (𝓞 D.host.F) D.host.F) (GlobalTheory.Member.cF D) (finPart D x) :=
+theorem finPart_cA (D : D7) (x : AE D)
+    : finPart D (cA D x)
+      = sg (FiniteAdeleRing (𝓞 D.host.F) D.host.F) (GlobalTheory.Member.cF D) (finPart D x) :=
   GlobalTheory.UnitarySplit.map_sig (sndA D.host.F) D.sp.cm.sig x
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_trivAt_isMov : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ M : ℕ, 0 < M → ∀ Λ ∈ Vset D.host.E S.rank M, ∃ h ∈ GfC S, TrivAt S (Ideal.span {(M : 𝓞 D.host.F)}) h ∧ IsMov (fmtC S h) (stdL D.host.E S.rank) Λ := by
+theorem exists_trivAt_isMov
+    : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ M : ℕ,
+      0 < M
+        → ∀ Λ ∈ Vset D.host.E S.rank M, ∃ h ∈ GfC S,
+          TrivAt S (Ideal.span {(M : 𝓞 D.host.F)}) h
+            ∧ IsMov (fmtC S h) (stdL D.host.E S.rank) Λ := by
   rintro D S T C M - Λ ⟨-, hU', k, hk0, hkM, h1, h2⟩
-  have hU : (⟨Λ⟩ : GenLat D.host.E S.rank).Unimod := (GlobalTheory.Dict.GenLatCmp.unimod_iff Λ).2 hU'
+  have hU : (⟨Λ⟩ : GenLat D.host.E S.rank).Unimod :=
+    (GlobalTheory.Dict.GenLatCmp.unimod_iff Λ).2 hU'
   have h₁ : ∀ x ∈ Λ, k • x ∈ stdL D.host.E S.rank := fun x hx => by
     rw [← Nat.cast_smul_eq_nsmul D.host.E]; exact h1 x hx
   have h₂ : ∀ x ∈ stdL D.host.E S.rank, k • x ∈ Λ := fun x hx => by
     rw [← Nat.cast_smul_eq_nsmul D.host.E]; exact h2 x hx
-  obtain ⟨k', γ, hk', hγ, h₃, h₄⟩ := GlobalTheory.AdaptUnitary.exists_unitary_adapted D.host.E (hostOfRecord D) S.rank ⟨Λ⟩ k hU hk0
-    (by rw [GlobalTheory.Dict.GenLatCmp.std_eq, span_smul_le_iff]; exact h₂) k hk0
+  obtain ⟨k', γ, hk', hγ, h₃, h₄⟩ :=
+    GlobalTheory.AdaptUnitary.exists_unitary_adapted D.host.E (hostOfRecord D) S.rank ⟨Λ⟩ k hU hk0
+      (by rw [GlobalTheory.Dict.GenLatCmp.std_eq, span_smul_le_iff]; exact h₂) k hk0
   rw [GlobalTheory.Dict.GenLatCmp.std_eq] at h₃ h₄
   set c := GlobalTheory.Member.cF D with hc
   have c2 : ∀ x, c (c x) = x := fun x => star_star x
@@ -83,7 +98,8 @@ theorem exists_trivAt_isMov : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ M : 
   have hδc : γᵀ.map c = δ := rfl
   have h₅ : ∀ x ∈ stdL D.host.E S.rank, k' • δ *ᵥ x ∈ Λ := fun x hx => by
     obtain ⟨w, hw, e⟩ := h₄ x hx
-    rwa [← Nat.cast_smul_eq_nsmul D.host.E, ← Matrix.mulVec_smul, e, Matrix.mulVec_mulVec, hδγ, Matrix.one_mulVec]
+    rwa [← Nat.cast_smul_eq_nsmul D.host.E, ← Matrix.mulVec_smul, e, Matrix.mulVec_mulVec, hδγ,
+      Matrix.one_mulVec]
   have h₆ : ∀ x ∈ Λ, k' • γ *ᵥ x ∈ stdL D.host.E S.rank := fun x hx => by
     rw [← Nat.cast_smul_eq_nsmul D.host.E]
     exact h₃ x hx
@@ -91,12 +107,13 @@ theorem exists_trivAt_isMov : ∀ (D : D7) (S T : HSp D) (C : Ctx S T), ∀ M : 
   have t1 : γᵀ * δᵀ = 1 := by rw [← Matrix.transpose_mul, hδγ, Matrix.transpose_one]
   have t2 : δᵀ * γᵀ = 1 := by rw [← Matrix.transpose_mul, hγδ, Matrix.transpose_one]
   obtain ⟨-, -, -, lift, -⟩ := GlobalTheory.UnitarySplit.real_finite_split D S
-  obtain ⟨h, hh, eh⟩ := lift ⟨glue (idem _ k) γᵀ, glue (idem _ k) δᵀ, glue_mul he t1, glue_mul he t2⟩ (by
-    rw [C.m.gS, Matrix.transpose_one]
-    refine isUnA_of c ?_
-    change ((glue (idem _ k) γᵀ).map _)ᵀ * glue (idem _ k) γᵀ = 1
-    rw [glue_map_sg, hδc]
-    exact glue_mul he t2)
+  obtain ⟨h, hh, eh⟩ :=
+    lift ⟨glue (idem _ k) γᵀ, glue (idem _ k) δᵀ, glue_mul he t1, glue_mul he t2⟩ (by
+      rw [C.m.gS, Matrix.transpose_one]
+      refine isUnA_of c ?_
+      change ((glue (idem _ k) γᵀ).map _)ᵀ * glue (idem _ k) γᵀ = 1
+      rw [glue_map_sg, hδc]
+      exact glue_mul he t2)
   have e1 : fmt S h = glue (idem _ k) γᵀ := congrArg Units.val eh
   have e2 : fmtC S h = glue (idem _ k) δ := by
     rw [← hδc, ← glue_map, ← e1]

@@ -7,21 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PushInvertibl
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 open Topology
 
 namespace GlobalTheory.CompanionTheory.Ar.CptLift
 
-theorem isCptGen_of_smooth_of_surjective : ∀ (K : Type) [Field K] (X₀ X' : Scheme.{0}) (Ω : Type) [Field Ω]
-    (ξ : Spec (CommRingCat.of Ω) ⟶ X₀) (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (π : X' ⟶ X₀)
-    (s' : X' ⟶ Spec (CommRingCat.of K)), Smooth s' → ξ' ≫ π = ξ → IsCptGen ξ →
-    Function.Surjective (π.stalkMap (genPt ξ')).hom → IsCptGen ξ' := by
+theorem isCptGen_of_smooth_of_surjective
+    : ∀ (K : Type) [Field K] (X₀ X' : Scheme.{0}) (Ω : Type) [Field Ω]
+        (ξ : Spec (CommRingCat.of Ω) ⟶ X₀) (ξ' : Spec (CommRingCat.of Ω) ⟶ X') (π : X' ⟶ X₀)
+        (s' : X' ⟶ Spec (CommRingCat.of K)),
+      Smooth s' → ξ' ≫ π = ξ → IsCptGen ξ → Function.Surjective (π.stalkMap (genPt ξ')).hom
+        → IsCptGen ξ' := by
   intro K _ X₀ X' Ω _ ξ ξ' π s' hs hc hξ hsurj
   subst hc
   have hd : ∀ x : X', IsDomain (X'.presheaf.stalk x) := fun x =>
     GroundTheory.Arith.SchemeCoh.isDomain_stalk_of_smooth_field s' x
-  have hcomp : (Scheme.stalkClosedPointTo (ξ' ≫ π)).hom =
-      (Scheme.stalkClosedPointTo ξ').hom.comp (π.stalkMap (genPt ξ')).hom :=
+  have hcomp
+      : (Scheme.stalkClosedPointTo (ξ' ≫ π)).hom
+        = (Scheme.stalkClosedPointTo ξ').hom.comp (π.stalkMap (genPt ξ')).hom :=
     congrArg (fun t => t.hom) (Scheme.stalkClosedPointTo_comp ξ' π)
   have hbij : Function.Bijective (Scheme.stalkClosedPointTo ξ').hom := by
     have hb := hξ.bij

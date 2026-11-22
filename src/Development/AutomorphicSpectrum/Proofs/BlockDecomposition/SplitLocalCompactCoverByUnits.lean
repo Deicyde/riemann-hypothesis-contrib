@@ -14,39 +14,43 @@ namespace GlobalTheory.CompanionTheory.WeilSiegel.Free.CoverS
 
 section Split
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU NumberField IsDedekindDomain
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU NumberField
+  IsDedekindDomain
 open scoped TensorProduct NNReal
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {σ : E →ₐ[F] E} {v : HeightOneSpectrum (𝓞 F)} {M : ℕ}
 
 def comp (τ : E →ₐ[F] Fv F v) (X : Fin 1 → Fin M → Fv F v ⊗[F] E) : Fin 1 → Fin M → Fv F v :=
   fun p k => splitProj τ (X p k)
 
 theorem continuous_comp (τ : E →ₐ[F] Fv F v) : Continuous (comp (M := M) τ) :=
-  continuous_pi fun p => continuous_pi fun k =>
-    (continuous_splitProj τ).comp ((continuous_apply k).comp (continuous_apply p))
+  continuous_pi fun p =>
+    continuous_pi fun k =>
+      (continuous_splitProj τ).comp ((continuous_apply k).comp (continuous_apply p))
 
-def glue (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (Y Z : Fin 1 → Fin M → Fv F v) :
-    Fin 1 → Fin M → Fv F v ⊗[F] E :=
-  fun p k => (splitAlgEquiv h τ).symm (Y p k, Z p k)
+def glue (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (Y Z : Fin 1 → Fin M → Fv F v)
+    : Fin 1 → Fin M → Fv F v ⊗[F] E := fun p k =>
+  (splitAlgEquiv h τ).symm (Y p k, Z p k)
 
-theorem continuous_glue (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) :
-    Continuous fun W : (Fin 1 → Fin M → Fv F v) × (Fin 1 → Fin M → Fv F v) => glue h τ W.1 W.2 :=
-  continuous_pi fun p => continuous_pi fun k => (continuous_splitAlgEquiv_symm h τ).comp (by fun_prop)
+theorem continuous_glue (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v)
+    : Continuous fun W : (Fin 1 → Fin M → Fv F v) × (Fin 1 → Fin M → Fv F v) => glue h τ W.1 W.2 :=
+  continuous_pi fun p =>
+    continuous_pi fun k => (continuous_splitAlgEquiv_symm h τ).comp (by fun_prop)
 
-theorem comp_glue_left (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (Y Z : Fin 1 → Fin M → Fv F v) :
-    comp τ (glue h τ Y Z) = Y := by
+theorem comp_glue_left (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (Y Z : Fin 1 → Fin M → Fv F v)
+    : comp τ (glue h τ Y Z) = Y := by
   funext p k
   simp [comp, glue]
 
-theorem comp_glue_right (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (Y Z : Fin 1 → Fin M → Fv F v) :
-    comp (τ.comp σ) (glue h τ Y Z) = Z := by
+theorem comp_glue_right (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (Y Z : Fin 1 → Fin M → Fv F v)
+    : comp (τ.comp σ) (glue h τ Y Z) = Z := by
   funext p k
   simp [comp, glue]
 
-theorem glue_comp (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (X : Fin 1 → Fin M → Fv F v ⊗[F] E) :
-    glue h τ (comp τ X) (comp (τ.comp σ) X) = X := by
+theorem glue_comp (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (X : Fin 1 → Fin M → Fv F v ⊗[F] E)
+    : glue h τ (comp τ X) (comp (τ.comp σ) X) = X := by
   funext p k
   exact split_ext h τ (by simp [comp, glue]) (by simp [comp, glue])
 
@@ -61,7 +65,8 @@ theorem isOpen_unitVecs (τ : E →ₐ[F] Fv F v) : IsOpen (unitVecs (M := M) σ
     exact this
   exact (hS.preimage (continuous_comp τ)).inter (hS.preimage (continuous_comp (τ.comp σ)))
 
-theorem isCompact_unitVecs (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) : IsCompact (unitVecs (M := M) σ τ) := by
+theorem isCompact_unitVecs (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v)
+    : IsCompact (unitVecs (M := M) σ τ) := by
   haveI : ProperSpace (Fv F v) := GlobalTheory.AdelicUnitaryTop.properSpace_adicCompletion F v
   have hS : IsCompact (Metric.sphere (0 : Fin 1 → Fin M → Fv F v) 1) := isCompact_sphere _ _
   have := (hS.prod hS).image (continuous_glue h τ)
@@ -75,17 +80,26 @@ theorem isCompact_unitVecs (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) : IsCo
     · rw [comp_glue_left]; simpa using h1
     · rw [comp_glue_right]; simpa using h2
 
-theorem comp_ne_zero_of_free (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v)
-    {X : Fin 1 → Fin M → Fv F v ⊗[F] E} (hX : LinearIndependent (Fv F v ⊗[F] E) X) : comp τ X ≠ 0 := by
+theorem comp_ne_zero_of_free
+    (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v)
+    {X : Fin 1 → Fin M → Fv F v ⊗[F] E} (hX : LinearIndependent (Fv F v ⊗[F] E) X)
+    : comp τ X ≠ 0 := by
   intro h0
-  have h1 := Fintype.linearIndependent_iff.1 hX (fun _ => splitIdem h τ) (by
-    funext k
-    have e : splitProj τ (X 0 k) = 0 := congrFun (congrFun h0 0) k
-    simpa using (splitProj_eq_zero_iff h τ _).1 e) 0
+  have h1 :=
+    Fintype.linearIndependent_iff.1 hX
+      (fun _ => splitIdem h τ)
+      (by
+        funext k
+        have e : splitProj τ (X 0 k) = 0 := congrFun (congrFun h0 0) k
+        simpa using (splitProj_eq_zero_iff h τ _).1 e)
+      0
   simpa using congrArg (splitProj τ) h1
 
-theorem proj_eq_zero_of_smul (ρ : E →ₐ[F] Fv F v) {X : Fin 1 → Fin M → Fv F v ⊗[F] E}
-    {c : Fv F v ⊗[F] E} (hc : ∀ k, c * X 0 k = 0) (hρ : comp ρ X ≠ 0) : splitProj ρ c = 0 := by
+theorem proj_eq_zero_of_smul
+    (ρ : E →ₐ[F] Fv F v)
+    {X : Fin 1 → Fin M → Fv F v ⊗[F] E} {c : Fv F v ⊗[F] E}
+    (hc : ∀ k, c * X 0 k = 0) (hρ : comp ρ X ≠ 0)
+    : splitProj ρ c = 0 := by
   by_contra hne
   refine hρ ?_
   funext p k
@@ -94,17 +108,19 @@ theorem proj_eq_zero_of_smul (ρ : E →ₐ[F] Fv F v) {X : Fin 1 → Fin M → 
   rw [map_mul, map_zero] at this
   exact (mul_eq_zero.1 this).resolve_left hne
 
-theorem free_of_comp_ne_zero (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v)
-    {X : Fin 1 → Fin M → Fv F v ⊗[F] E} (h1 : comp τ X ≠ 0) (h2 : comp (τ.comp σ) X ≠ 0) :
-    LinearIndependent (Fv F v ⊗[F] E) X := by
+theorem free_of_comp_ne_zero
+    (h : IsCMExt F E σ)
+    (τ : E →ₐ[F] Fv F v)
+    {X : Fin 1 → Fin M → Fv F v ⊗[F] E} (h1 : comp τ X ≠ 0) (h2 : comp (τ.comp σ) X ≠ 0)
+    : LinearIndependent (Fv F v ⊗[F] E) X := by
   refine Fintype.linearIndependent_iff.2 fun g hg i => ?_
   obtain rfl : i = 0 := Subsingleton.elim _ _
   have hc : ∀ k, g 0 * X 0 k = 0 := fun k => by simpa using congrFun hg k
   exact split_ext h τ (by simpa using proj_eq_zero_of_smul τ hc h1)
     (by simpa using proj_eq_zero_of_smul (τ.comp σ) hc h2)
 
-theorem unitVecs_subset_free (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) :
-    unitVecs (M := M) σ τ ⊆ {X | LinearIndependent (Fv F v ⊗[F] E) X} := by
+theorem unitVecs_subset_free (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v)
+    : unitVecs (M := M) σ τ ⊆ {X | LinearIndependent (Fv F v ⊗[F] E) X} := by
   rintro X ⟨h1, h2⟩
   refine free_of_comp_ne_zero h τ (fun e => ?_) (fun e => ?_)
   · rw [e, norm_zero] at h1; exact zero_ne_one h1
@@ -119,11 +135,15 @@ theorem exists_entry_norm (hM : 0 < M) (Y : Fin 1 → Fin M → Fv F v) : ∃ p 
   have e2 : ‖Y p‖₊ = ‖Y p k‖₊ := by rw [Pi.nnnorm_def]; exact hk
   exact congrArg NNReal.toReal (e1.trans e2).symm
 
-theorem exists_scale {ϖ : Fv F v} (hϖ : ‖ϖ‖ = (Ideal.absNorm v.asIdeal : ℝ)⁻¹) (hM : 0 < M)
-    {Y : Fin 1 → Fin M → Fv F v} (hY : Y ≠ 0) :
-    ∃ (j : ℤ) (Y' : Fin 1 → Fin M → Fv F v), ‖Y'‖ = 1 ∧ ‖Y‖ = ‖ϖ‖ ^ j ∧ ∀ p k, Y p k = ϖ ^ j * Y' p k := by
+theorem exists_scale
+    {ϖ : Fv F v} (hϖ : ‖ϖ‖ = (Ideal.absNorm v.asIdeal : ℝ)⁻¹)
+    (hM : 0 < M)
+    {Y : Fin 1 → Fin M → Fv F v} (hY : Y ≠ 0)
+    : ∃ (j : ℤ) (Y' : Fin 1 → Fin M → Fv F v),
+      ‖Y'‖ = 1 ∧ ‖Y‖ = ‖ϖ‖ ^ j ∧ ∀ p k, Y p k = ϖ ^ j * Y' p k := by
   have hq : 1 < (Ideal.absNorm v.asIdeal : ℝ) := by
-    have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h => v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
+    have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h =>
+      v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
     have h0 : Ideal.absNorm v.asIdeal ≠ 0 := fun h => v.ne_bot (Ideal.absNorm_eq_zero_iff.1 h)
     exact_mod_cast (by omega : 1 < Ideal.absNorm v.asIdeal)
   have hq0 : (Ideal.absNorm v.asIdeal : ℝ) ≠ 0 := by positivity
@@ -151,18 +171,21 @@ def mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ) : (Fv 
   inv_val := by
     rw [← map_mul, Prod.mk_mul_mk, Units.inv_mul, Units.inv_mul, Prod.mk_one_one, map_one]
 
-theorem splitProj_mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ) :
-    splitProj τ (mkU h τ a b : Fv F v ⊗[F] E) = a := splitProj_symm h τ _
+theorem splitProj_mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ)
+    : splitProj τ (mkU h τ a b : Fv F v ⊗[F] E) = a :=
+  splitProj_symm h τ _
 
-theorem splitProj_comp_mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ) :
-    splitProj (τ.comp σ) (mkU h τ a b : Fv F v ⊗[F] E) = b := splitProj_comp_symm h τ _
+theorem splitProj_comp_mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ)
+    : splitProj (τ.comp σ) (mkU h τ a b : Fv F v ⊗[F] E) = b :=
+  splitProj_comp_symm h τ _
 
-theorem nnnorm_norm_mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ) :
-    ‖Algebra.norm (Fv F v) (mkU h τ a b : Fv F v ⊗[F] E)‖₊ = ‖(a : Fv F v)‖₊ * ‖(b : Fv F v)‖₊ := by
+theorem nnnorm_norm_mkU (h : IsCMExt F E σ) (τ : E →ₐ[F] Fv F v) (a b : (Fv F v)ˣ)
+    : ‖Algebra.norm (Fv F v) (mkU h τ a b : Fv F v ⊗[F] E)‖₊
+      = ‖(a : Fv F v)‖₊ * ‖(b : Fv F v)‖₊ := by
   rw [GlobalTheory.SplitInterDet.norm_eq_split h τ, splitProj_mkU, splitProj_comp_mkU, nnnorm_mul]
 
-theorem summable_pow {t : ℝ≥0} (ht0 : t ≠ 0) (ht : t < 1) (k : ℕ) {n : ℕ} (hn : n ≠ 0) :
-    Summable fun i : ℕ × ℕ => (t ^ ((i.1 : ℤ) - k) * t ^ ((i.2 : ℤ) - k)) ^ n := by
+theorem summable_pow {t : ℝ≥0} (ht0 : t ≠ 0) (ht : t < 1) (k : ℕ) {n : ℕ} (hn : n ≠ 0)
+    : Summable fun i : ℕ × ℕ => (t ^ ((i.1 : ℤ) - k) * t ^ ((i.2 : ℤ) - k)) ^ n := by
   rw [← NNReal.summable_coe]
   have h0 : (t : ℝ) ≠ 0 := by exact_mod_cast ht0
   have h1 : (t : ℝ) < 1 := by exact_mod_cast ht
@@ -179,35 +202,42 @@ theorem summable_pow {t : ℝ≥0} (ht0 : t ≠ 0) (ht : t < 1) (k : ℕ) {n : �
   rw [e, e]
   ring
 
-theorem neg_lt_of_norm_lt {ϖ : Fv F v} (hϖ : ‖ϖ‖ = (Ideal.absNorm v.asIdeal : ℝ)⁻¹) {x : ℝ} {j : ℤ} {k : ℕ}
-    (e : x = ‖ϖ‖ ^ j) (hx : x < (Ideal.absNorm v.asIdeal : ℝ) ^ k) : -(k : ℤ) < j := by
+theorem neg_lt_of_norm_lt
+    {ϖ : Fv F v} (hϖ : ‖ϖ‖ = (Ideal.absNorm v.asIdeal : ℝ)⁻¹)
+    {x : ℝ} {j : ℤ} {k : ℕ} (e : x = ‖ϖ‖ ^ j) (hx : x < (Ideal.absNorm v.asIdeal : ℝ) ^ k)
+    : -(k : ℤ) < j := by
   have hq : 1 < (Ideal.absNorm v.asIdeal : ℝ) := by
-    have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h => v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
+    have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h =>
+      v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
     have h0 : Ideal.absNorm v.asIdeal ≠ 0 := fun h => v.ne_bot (Ideal.absNorm_eq_zero_iff.1 h)
     exact_mod_cast (by omega : 1 < Ideal.absNorm v.asIdeal)
   rw [e, hϖ, inv_zpow', ← zpow_natCast] at hx
   have := (zpow_lt_zpow_iff_right₀ hq).1 hx
   omega
 
-theorem cover (h : IsCMExt F E σ) (hM : 2 ≤ M) (τ : E →ₐ[F] Fv F v)
-    {A : Set (Fin 1 → Fin M → Fv F v ⊗[F] E)} (hA : IsCompact A) :
-    ∃ (ι : Type) (_ : Countable ι) (P : Set (Fin 1 → Fin M → Fv F v ⊗[F] E)) (u : ι → (Fv F v ⊗[F] E)ˣ),
-      IsCompact P ∧ IsOpen P ∧ P ⊆ {X | LinearIndependent (Fv F v ⊗[F] E) X} ∧
-      Summable (fun i => ‖Algebra.norm (Fv F v) (u i : Fv F v ⊗[F] E)‖₊ ^ (M - 1)) ∧
-      A ∩ {X | LinearIndependent (Fv F v ⊗[F] E) X} ⊆
-        ⋃ i, (fun (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (p : Fin 1) (k : Fin M) =>
-          (u i : Fv F v ⊗[F] E) * X p k) '' P := by
+theorem cover
+    (h : IsCMExt F E σ) (hM : 2 ≤ M) (τ : E →ₐ[F] Fv F v)
+    {A : Set (Fin 1 → Fin M → Fv F v ⊗[F] E)} (hA : IsCompact A)
+    : ∃ (ι : Type) (_ : Countable ι) (P : Set (Fin 1 → Fin M → Fv F v ⊗[F] E))
+        (u : ι → (Fv F v ⊗[F] E)ˣ),
+      IsCompact P ∧ IsOpen P ∧ P ⊆ {X | LinearIndependent (Fv F v ⊗[F] E) X}
+        ∧ Summable (fun i => ‖Algebra.norm (Fv F v) (u i : Fv F v ⊗[F] E)‖₊ ^ (M - 1))
+        ∧ A ∩ {X | LinearIndependent (Fv F v ⊗[F] E) X}
+          ⊆ ⋃ i, (fun (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (p : Fin 1) (k : Fin M) =>
+              (u i : Fv F v ⊗[F] E) * X p k) '' P := by
   have hex : ∃ ϖ : Fv F v, ‖ϖ‖ = (Ideal.absNorm v.asIdeal : ℝ)⁻¹ := by
     obtain ⟨π, hπ⟩ := v.valuation_exists_uniformizer F
     have hv : Valued.v ((π : F) : v.adicCompletion F) = WithZero.exp (-1) := by
       rw [v.valuedAdicCompletion_eq_valuation']; exact hπ
     refine ⟨((π : F) : v.adicCompletion F), ?_⟩
-    rw [FinitePlace.norm_def, hv, WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero, NNReal.coe_zpow]
+    rw [FinitePlace.norm_def, hv, WithZeroMulInt.toNNReal_neg_apply _ WithZero.exp_ne_zero,
+      NNReal.coe_zpow]
     rw [WithZero.log_exp, zpow_neg_one]
     rfl
   obtain ⟨ϖ, hϖ⟩ := hex
   have hq : 1 < (Ideal.absNorm v.asIdeal : ℝ) := by
-    have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h => v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
+    have h1 : Ideal.absNorm v.asIdeal ≠ 1 := fun h =>
+      v.isPrime.ne_top (Ideal.absNorm_eq_one_iff.1 h)
     have h0 : Ideal.absNorm v.asIdeal ≠ 0 := fun h => v.ne_bot (Ideal.absNorm_eq_zero_iff.1 h)
     exact_mod_cast (by omega : 1 < Ideal.absNorm v.asIdeal)
   have hq0 : (Ideal.absNorm v.asIdeal : ℝ) ≠ 0 := by positivity
@@ -218,17 +248,28 @@ theorem cover (h : IsCMExt F E σ) (hM : 2 ≤ M) (τ : E →ₐ[F] Fv F v)
     rw [← NNReal.coe_lt_coe, coe_nnnorm, hϖ, NNReal.coe_one]
     exact inv_lt_one_of_one_lt₀ hq
   obtain ⟨C1, hC1⟩ := hA.exists_bound_of_continuousOn (continuous_comp (M := M) τ).continuousOn
-  obtain ⟨C2, hC2⟩ := hA.exists_bound_of_continuousOn (continuous_comp (M := M) (τ.comp σ)).continuousOn
+  obtain ⟨C2, hC2⟩ :=
+    hA.exists_bound_of_continuousOn (continuous_comp (M := M) (τ.comp σ)).continuousOn
   obtain ⟨k, hk⟩ := pow_unbounded_of_one_lt (max C1 C2) hq
   let w : (Fv F v)ˣ := Units.mk0 ϖ hϖ0
-  refine ⟨ℕ × ℕ, inferInstance, unitVecs σ τ, fun i => mkU h τ (w ^ ((i.1 : ℤ) - k)) (w ^ ((i.2 : ℤ) - k)),
-    isCompact_unitVecs h τ, isOpen_unitVecs τ, unitVecs_subset_free h τ, ?_, ?_⟩
+  refine ⟨
+    ℕ × ℕ,
+    inferInstance,
+    unitVecs σ τ,
+    fun i => mkU h τ (w ^ ((i.1 : ℤ) - k)) (w ^ ((i.2 : ℤ) - k)),
+    isCompact_unitVecs h τ,
+    isOpen_unitVecs τ,
+    unitVecs_subset_free h τ,
+    ?_,
+    ?_
+  ⟩
   · refine (summable_pow (nnnorm_ne_zero_iff.2 hϖ0) hlt k (n := M - 1) (by omega)).congr fun i => ?_
     rw [nnnorm_norm_mkU]
     simp [w, Units.val_zpow_eq_zpow_val, nnnorm_zpow]
   · rintro X ⟨hXA, hXf⟩
     obtain ⟨j1, Y1, n1, e1, f1⟩ := exists_scale hϖ (by omega) (comp_ne_zero_of_free h τ hXf)
-    obtain ⟨j2, Y2, n2, e2, f2⟩ := exists_scale hϖ (by omega) (comp_ne_zero_of_free h (τ.comp σ) hXf)
+    obtain ⟨j2, Y2, n2, e2, f2⟩ :=
+      exists_scale hϖ (by omega) (comp_ne_zero_of_free h (τ.comp σ) hXf)
     have b1 := neg_lt_of_norm_lt hϖ e1 ((hC1 X hXA).trans_lt ((le_max_left _ _).trans_lt hk))
     have b2 := neg_lt_of_norm_lt hϖ e2 ((hC2 X hXA).trans_lt ((le_max_right _ _).trans_lt hk))
     have c1 : (((j1 + k).toNat : ℤ) - k) = j1 := by omega
@@ -253,13 +294,29 @@ end Split
 
 section Main
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 open GlobalTheory.CompanionTheory.WeilSiegel.Frame GlobalTheory.CompanionTheory.WeilSiegel.Free
 
-theorem exists_cover : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (M : ℕ), 2 ≤ M → ∀ (v : HeightOneSpectrum (𝓞 F)) (τ : E →ₐ[F] Fv F v), ∀ A : Set (Fin 1 → Fin M → Fv F v ⊗[F] E), IsCompact A → ∃ (ι : Type) (_ : Countable ι) (P : Set (Fin 1 → Fin M → Fv F v ⊗[F] E)) (u : ι → (Fv F v ⊗[F] E)ˣ), IsCompact P ∧ IsOpen P ∧ P ⊆ {X : Fin 1 → Fin M → Fv F v ⊗[F] E | LinearIndependent (Fv F v ⊗[F] E) X} ∧ Summable (fun i => ‖Algebra.norm (Fv F v) (u i : Fv F v ⊗[F] E)‖₊ ^ (M - 1)) ∧ A ∩ {X : Fin 1 → Fin M → Fv F v ⊗[F] E | LinearIndependent (Fv F v ⊗[F] E) X} ⊆ ⋃ i, (fun (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (p : Fin 1) (k : Fin M) => (u i : Fv F v ⊗[F] E) * X p k) '' P := by
-  intro F E _ _ _ _ _ σ hE M hM v τ A hA
-  exact cover hE hM τ hA
+theorem exists_cover
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (M : ℕ),
+          2 ≤ M
+            → ∀ (v : HeightOneSpectrum (𝓞 F)) (τ : E →ₐ[F] Fv F v), ∀ A : Set (Fin 1 → Fin M → Fv F v ⊗[F] E),
+              IsCompact A
+                → ∃ (ι : Type) (_ : Countable ι) (P : Set (Fin 1 → Fin M → Fv F v ⊗[F] E))
+                    (u : ι → (Fv F v ⊗[F] E)ˣ),
+                  IsCompact P ∧ IsOpen P
+                    ∧ P ⊆ {X : Fin 1 → Fin M → Fv F v ⊗[F] E | LinearIndependent (Fv F v ⊗[F] E) X}
+                    ∧ Summable (fun i => ‖Algebra.norm (Fv F v) (u i : Fv F v ⊗[F] E)‖₊ ^ (M - 1))
+                    ∧ A ∩ {X : Fin 1 → Fin M → Fv F v ⊗[F] E | LinearIndependent (Fv F v ⊗[F] E) X}
+                      ⊆ ⋃ i, (fun (X : Fin 1 → Fin M → Fv F v ⊗[F] E) (p : Fin 1) (k : Fin M) => (u i : Fv F v ⊗[F] E) * X p k) '' P :=
+  by
+    intro F E _ _ _ _ _ σ hE M hM v τ A hA
+    exact cover hE hM τ hA
 
 end Main
 

@@ -14,15 +14,18 @@ open CategoryTheory Limits
 
 universe u
 
-variable {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [CompactSpace G] [TotallyDisconnectedSpace G] (A : Rep.{u} k G) [IsDiscreteRep A]
-  (N : Subgroup G) [N.Normal] (hN : IsClosed (N : Set G))
+variable
+  {k G : Type u} [CommRing k] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CompactSpace G]
+  [TotallyDisconnectedSpace G]
+  (A : Rep.{u} k G) [IsDiscreteRep A]
+  (N : Subgroup G) [N.Normal]
+  (hN : IsClosed (N : Set G))
 
-theorem fiveTerm_exact :
-    Function.Injective (cohomologyInfl A N 1).hom ∧
-      LinearMap.range (cohomologyInfl A N 1).hom = LinearMap.ker (cohomologyResInv A N) ∧
-      LinearMap.range (cohomologyResInv A N) = LinearMap.ker (transgression A N hN) ∧
-      LinearMap.range (transgression A N hN) = LinearMap.ker (cohomologyInfl A N 2).hom := by
+theorem fiveTerm_exact
+    : Function.Injective (cohomologyInfl A N 1).hom
+      ∧ LinearMap.range (cohomologyInfl A N 1).hom = LinearMap.ker (cohomologyResInv A N)
+      ∧ LinearMap.range (cohomologyResInv A N) = LinearMap.ker (transgression A N hN)
+      ∧ LinearMap.range (transgression A N hN) = LinearMap.ker (cohomologyInfl A N 2).hom := by
   refine ⟨cohomologyInfl_one_injective A N, ?_, ?_, ?_⟩
   · ext h
     constructor
@@ -47,12 +50,11 @@ theorem fiveTerm_exact :
     · intro ht
       exact exists_transgression_eq A N hN t ht
 
-
 include hN in
-theorem infRes_exact {q : ℕ} (hq : q ≠ 0)
-    (hA : ∀ i, 0 < i → i < q → IsZero (cohomology (Rep.res N.subtype A) i)) :
-    Function.Injective (cohomologyInfl A N q).hom ∧
-      LinearMap.range (cohomologyInfl A N q).hom = LinearMap.ker (cohomologyRes A N q).hom :=
+theorem infRes_exact
+    {q : ℕ} (hq : q ≠ 0) (hA : ∀ i, 0 < i → i < q → IsZero (cohomology (Rep.res N.subtype A) i))
+    : Function.Injective (cohomologyInfl A N q).hom
+      ∧ LinearMap.range (cohomologyInfl A N q).hom = LinearMap.ker (cohomologyRes A N q).hom :=
   ⟨cohomologyInfl_injective hN hq hA, range_cohomologyInfl_eq_ker_cohomologyRes hN hq hA⟩
 
 end GroundTheory.ProfCoh

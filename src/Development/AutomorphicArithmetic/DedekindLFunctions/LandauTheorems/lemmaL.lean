@@ -14,8 +14,9 @@ noncomputable section
 
 namespace Deduction
 
-theorem lemmaL (F : CharFamily) {θ δ : ℝ} (hθ : 0 < θ) (hθ1 : θ < 1) (hδ : 0 < δ) (h : WindowHyp F θ δ) :
-    ZeroFree F θ := by
+theorem lemmaL
+    (F : CharFamily) {θ δ : ℝ} (hθ : 0 < θ) (hθ1 : θ < 1) (hδ : 0 < δ) (h : WindowHyp F θ δ)
+    : ZeroFree F θ := by
   intro i s hs hzero
   obtain ⟨Φ, hP⟩ := poleData F
   have hZ := landau_window hP hθ hθ1 hδ (windowHypU_of_windowHyp F hδ h)

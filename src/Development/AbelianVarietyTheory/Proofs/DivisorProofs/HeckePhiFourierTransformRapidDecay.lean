@@ -12,9 +12,9 @@ open scoped ContDiff FourierTransform
 
 namespace GlobalTheory.HeckeTwo.HDecay
 
-theorem fourier_decay_of_iteratedDeriv {f : ℝ → ℂ} (hf : ContDiff ℝ ∞ f)
-    (hi : ∀ n : ℕ, Integrable (iteratedDeriv n f)) (N : ℕ) :
-    ∃ C : ℝ, ∀ ν : ℝ, ‖𝓕 f ν‖ ≤ C * (1 + |ν|) ^ (-(N : ℝ)) := by
+theorem fourier_decay_of_iteratedDeriv
+    {f : ℝ → ℂ} (hf : ContDiff ℝ ∞ f) (hi : ∀ n : ℕ, Integrable (iteratedDeriv n f)) (N : ℕ)
+    : ∃ C : ℝ, ∀ ν : ℝ, ‖𝓕 f ν‖ ≤ C * (1 + |ν|) ^ (-(N : ℝ)) := by
   have hbound : ∀ (u : ℝ → ℂ) (ν : ℝ), ‖𝓕 u ν‖ ≤ ∫ t, ‖u t‖ := by
     intro u ν
     rw [Real.fourier_real_eq]
@@ -29,7 +29,9 @@ theorem fourier_decay_of_iteratedDeriv {f : ℝ → ℂ} (hf : ContDiff ℝ ∞ 
   have h2 : (2 * Real.pi) ^ N * (|ν| ^ N * ‖𝓕 f ν‖) ≤ B := by
     have := hbound (iteratedDeriv N f) ν
     rw [Real.fourier_iteratedDeriv (N := ⊤) hf (fun n _ => hi n) le_top] at this
-    have e : ‖(2 * (Real.pi : ℂ) * I * (ν : ℂ)) ^ N • 𝓕 f ν‖ = (2 * Real.pi) ^ N * (|ν| ^ N * ‖𝓕 f ν‖) := by
+    have e
+        : ‖(2 * (Real.pi : ℂ) * I * (ν : ℂ)) ^ N • 𝓕 f ν‖
+          = (2 * Real.pi) ^ N * (|ν| ^ N * ‖𝓕 f ν‖) := by
       rw [norm_smul, norm_pow]
       simp only [norm_mul, Complex.norm_ofNat, Complex.norm_real, Real.norm_eq_abs, Complex.norm_I,
         abs_of_pos Real.pi_pos, mul_one]
@@ -39,20 +41,25 @@ theorem fourier_decay_of_iteratedDeriv {f : ℝ → ℂ} (hf : ContDiff ℝ ∞ 
   have hx : 0 ≤ |ν| := abs_nonneg ν
   have hq : 0 ≤ ‖𝓕 f ν‖ := norm_nonneg _
   have hpi : 0 < (2 * Real.pi) ^ N := by positivity
-  have h3 : |ν| ^ N * ‖𝓕 f ν‖ ≤ B / (2 * Real.pi) ^ N := by
-    rw [le_div_iff₀ hpi]; linarith
+  have h3 : |ν| ^ N * ‖𝓕 f ν‖ ≤ B / (2 * Real.pi) ^ N := by rw [le_div_iff₀ hpi]; linarith
   have h4 : (1 + |ν|) ^ N ≤ 2 ^ N * (1 + |ν| ^ N) := by
     rcases le_total 1 |ν| with h | h
-    · calc (1 + |ν|) ^ N ≤ (2 * |ν|) ^ N := by gcongr; linarith
+    · calc
+        (1 + |ν|) ^ N
+          ≤ (2 * |ν|) ^ N := by gcongr; linarith
         _ = 2 ^ N * |ν| ^ N := by rw [mul_pow]
         _ ≤ 2 ^ N * (1 + |ν| ^ N) := by gcongr; linarith
-    · calc (1 + |ν|) ^ N ≤ (2 : ℝ) ^ N := by gcongr; linarith
+    · calc
+        (1 + |ν|) ^ N
+          ≤ (2 : ℝ) ^ N := by gcongr; linarith
         _ ≤ 2 ^ N * (1 + |ν| ^ N) := by
           have : 0 ≤ |ν| ^ N := by positivity
           nlinarith [pow_pos (two_pos : (0:ℝ) < 2) N]
   have hpos : 0 < (1 + |ν|) ^ N := by positivity
   rw [Real.rpow_neg (by positivity), Real.rpow_natCast, ← div_eq_mul_inv, le_div_iff₀ hpos]
-  calc ‖𝓕 f ν‖ * (1 + |ν|) ^ N ≤ ‖𝓕 f ν‖ * (2 ^ N * (1 + |ν| ^ N)) := by gcongr
+  calc
+    ‖𝓕 f ν‖ * (1 + |ν|) ^ N
+      ≤ ‖𝓕 f ν‖ * (2 ^ N * (1 + |ν| ^ N)) := by gcongr
     _ = 2 ^ N * (‖𝓕 f ν‖ + |ν| ^ N * ‖𝓕 f ν‖) := by ring
     _ ≤ 2 ^ N * (A + B / (2 * Real.pi) ^ N) := by gcongr
 
@@ -88,20 +95,19 @@ theorem sq_add_sq_pos (hy : y ≠ 0) (t : ℝ) : 0 < t ^ 2 + y ^ 2 := by
   have : 0 < y ^ 2 := lt_of_le_of_ne (sq_nonneg y) (Ne.symm (pow_ne_zero 2 hy))
   positivity
 
-theorem hasDerivAt_gI (hy : y ≠ 0) (t : ℝ) : HasDerivAt (gI y) (-(gI y t) ^ 2) t := by
+theorem hasDerivAt_gI (hy : y ≠ 0) (t : ℝ) : HasDerivAt (gI y) (- (gI y t) ^ 2) t := by
   have h1 : HasDerivAt (fun s : ℝ => (s : ℂ) + (y : ℂ) * I) 1 t := by
     simpa using ((hasDerivAt_id t).ofReal_comp).add_const ((y : ℂ) * I)
   refine (h1.inv (add_I_ne hy t)).congr_deriv ?_
   simp [gI, div_eq_mul_inv, inv_pow]
 
-theorem hasDerivAt_hI (hy : y ≠ 0) (t : ℝ) : HasDerivAt (hI y) (-(hI y t) ^ 2) t := by
+theorem hasDerivAt_hI (hy : y ≠ 0) (t : ℝ) : HasDerivAt (hI y) (- (hI y t) ^ 2) t := by
   have h1 : HasDerivAt (fun s : ℝ => (s : ℂ) - (y : ℂ) * I) 1 t := by
     simpa using ((hasDerivAt_id t).ofReal_comp).sub_const ((y : ℂ) * I)
   refine (h1.inv (sub_I_ne hy t)).congr_deriv ?_
   simp [hI, div_eq_mul_inv, inv_pow]
 
-theorem gI_add_hI (hy : y ≠ 0) (t : ℝ) :
-    gI y t + hI y t = ((2 * t / (t ^ 2 + y ^ 2) : ℝ) : ℂ) := by
+theorem gI_add_hI (hy : y ≠ 0) (t : ℝ) : gI y t + hI y t = ((2 * t / (t ^ 2 + y ^ 2) : ℝ) : ℂ) := by
   have h1 := add_I_ne hy t
   have h2 := sub_I_ne hy t
   have h3 : ((t ^ 2 + y ^ 2 : ℝ) : ℂ) ≠ 0 := by exact_mod_cast (sq_add_sq_pos hy t).ne'
@@ -115,8 +121,8 @@ theorem gI_add_hI (hy : y ≠ 0) (t : ℝ) :
   push_cast
   ring
 
-theorem hasDerivAt_eF (hy : y ≠ 0) (t : ℝ) :
-    HasDerivAt (eF σ y) (-σ * (gI y t + hI y t) * eF σ y t) t := by
+theorem hasDerivAt_eF (hy : y ≠ 0) (t : ℝ)
+    : HasDerivAt (eF σ y) (-σ * (gI y t + hI y t) * eF σ y t) t := by
   have hpos := sq_add_sq_pos hy t
   have hL : HasDerivAt (fun s : ℝ => Real.log (s ^ 2 + y ^ 2)) (2 * t / (t ^ 2 + y ^ 2)) t := by
     have := ((hasDerivAt_pow 2 t).add_const (y ^ 2)).log hpos.ne'
@@ -128,8 +134,8 @@ theorem hasDerivAt_eF (hy : y ≠ 0) (t : ℝ) :
   simp only [eF]
   ring
 
-theorem hasDerivAt_wF (hy : y ≠ 0) (a b : ℕ) (t : ℝ) :
-    HasDerivAt (wF σ y a b)
+theorem hasDerivAt_wF (hy : y ≠ 0) (a b : ℕ) (t : ℝ)
+    : HasDerivAt (wF σ y a b)
       (-((a : ℂ) + 2 + σ) * wF σ y (a + 1) b t - ((b : ℂ) + σ) * wF σ y a (b + 1) t) t := by
   have hg := (hasDerivAt_gI hy t).pow (a + 2)
   have hh : HasDerivAt (fun s => hI y s ^ b) (-(b : ℂ) * hI y t ^ (b + 1)) t := by
@@ -156,14 +162,15 @@ def wSpan : Submodule ℂ (ℝ → ℂ) := Submodule.span ℂ (Set.range fun p :
 
 variable {σ y}
 
-theorem wSpan_deriv (hy : y ≠ 0) {F : ℝ → ℂ} (hF : F ∈ wSpan σ y) :
-    Differentiable ℝ F ∧ deriv F ∈ wSpan σ y := by
+theorem wSpan_deriv (hy : y ≠ 0) {F : ℝ → ℂ} (hF : F ∈ wSpan σ y)
+    : Differentiable ℝ F ∧ deriv F ∈ wSpan σ y := by
   induction hF using Submodule.span_induction with
   | mem F hF =>
     obtain ⟨⟨a, b⟩, rfl⟩ := hF
     refine ⟨fun t => (hasDerivAt_wF σ hy a b t).differentiableAt, ?_⟩
-    have e : deriv (wF σ y a b) =
-        (-((a : ℂ) + 2 + σ)) • wF σ y (a + 1) b - ((b : ℂ) + σ) • wF σ y a (b + 1) := by
+    have e
+        : deriv (wF σ y a b)
+          = (-((a : ℂ) + 2 + σ)) • wF σ y (a + 1) b - ((b : ℂ) + σ) • wF σ y a (b + 1) := by
       funext t
       rw [(hasDerivAt_wF σ hy a b t).deriv]
       simp
@@ -236,8 +243,9 @@ theorem wF_integrable (hy : y ≠ 0) (hσ : 0 < σ.re) (a b : ℕ) : Integrable 
       rw [add_mul, one_mul, inv_mul_eq_div, add_div, div_self hy2.ne']
       have : 0 ≤ t ^ 2 / y ^ 2 := by positivity
       nlinarith
-    calc (t ^ 2 + y ^ 2)⁻¹ = (1 + (y ^ 2)⁻¹) * ((1 + (y ^ 2)⁻¹) * (t ^ 2 + y ^ 2))⁻¹ := by
-          field_simp
+    calc
+      (t ^ 2 + y ^ 2)⁻¹
+        = (1 + (y ^ 2)⁻¹) * ((1 + (y ^ 2)⁻¹) * (t ^ 2 + y ^ 2))⁻¹ := by field_simp
       _ ≤ (1 + (y ^ 2)⁻¹) * (1 + t ^ 2)⁻¹ := by gcongr
   have hE : ‖eF σ y t‖ ≤ Real.exp (-σ.re * Real.log (y ^ 2)) := by
     rw [eF, Complex.norm_exp]
@@ -248,17 +256,19 @@ theorem wF_integrable (hy : y ≠ 0) (hσ : 0 < σ.re) (a b : ℕ) : Integrable 
     have hlog : Real.log (y ^ 2) ≤ Real.log (t ^ 2 + y ^ 2) :=
       Real.log_le_log hy2 (by nlinarith [sq_nonneg t])
     nlinarith
-  calc ‖wF σ y a b t‖ = ‖gI y t‖ ^ 2 * ‖gI y t‖ ^ a * ‖hI y t‖ ^ b * ‖eF σ y t‖ := by
-        simp only [wF, norm_mul, norm_pow]
-        ring
-    _ ≤ ((1 + (y ^ 2)⁻¹) * (1 + t ^ 2)⁻¹) * |y|⁻¹ ^ a * |y|⁻¹ ^ b *
-          Real.exp (-σ.re * Real.log (y ^ 2)) := by gcongr
+  calc
+    ‖wF σ y a b t‖ = ‖gI y t‖ ^ 2 * ‖gI y t‖ ^ a * ‖hI y t‖ ^ b * ‖eF σ y t‖ := by
+      simp only [wF, norm_mul, norm_pow]
+      ring
+    _ ≤ ((1 + (y ^ 2)⁻¹) * (1 + t ^ 2)⁻¹) * |y|⁻¹ ^ a * |y|⁻¹ ^ b
+        * Real.exp (-σ.re * Real.log (y ^ 2)) := by
+      gcongr
     _ = K * (1 + t ^ 2)⁻¹ := by
-        rw [hK]
-        ring
+      rw [hK]
+      ring
 
-theorem wSpan_integrable (hy : y ≠ 0) (hσ : 0 < σ.re) {F : ℝ → ℂ} (hF : F ∈ wSpan σ y) :
-    Integrable F := by
+theorem wSpan_integrable (hy : y ≠ 0) (hσ : 0 < σ.re) {F : ℝ → ℂ} (hF : F ∈ wSpan σ y)
+    : Integrable F := by
   induction hF using Submodule.span_induction with
   | mem F hF =>
     obtain ⟨⟨a, b⟩, rfl⟩ := hF
@@ -293,11 +303,18 @@ end GlobalTheory.HeckeTwo.HDecay
 
 namespace GlobalTheory.HeckeTwo
 
-theorem hTrans_rapid_decay : ∀ (σ : ℂ), 0 < σ.re → ∀ (y : ℝ), y ≠ 0 → ∀ (N : ℕ), ∃ C : ℝ, ∀ ν : ℝ,
-    ‖GlobalTheory.HeckeTwo.hTrans σ ν y‖ ≤ C * (1 + |ν|) ^ (-(N : ℝ)) := by
+theorem hTrans_rapid_decay
+    : ∀ (σ : ℂ),
+      0 < σ.re
+        → ∀ (y : ℝ),
+          y ≠ 0
+            → ∀ (N : ℕ), ∃ C : ℝ, ∀ ν : ℝ,
+              ‖GlobalTheory.HeckeTwo.hTrans σ ν y‖ ≤ C * (1 + |ν|) ^ (-(N : ℝ)) := by
   intro σ hσ y hy N
-  obtain ⟨C, hC⟩ := HDecay.fourier_decay_of_iteratedDeriv (HDecay.contDiff_wF hy)
-    (fun n => HDecay.wSpan_integrable hy hσ (HDecay.iteratedDeriv_mem hy n)) N
+  obtain ⟨C, hC⟩ :=
+    HDecay.fourier_decay_of_iteratedDeriv (HDecay.contDiff_wF hy)
+      (fun n => HDecay.wSpan_integrable hy hσ (HDecay.iteratedDeriv_mem hy n))
+      N
   exact ⟨C, fun ν => by rw [HDecay.hTrans_eq_fourier hy ν]; exact hC ν⟩
 
 end GlobalTheory.HeckeTwo

@@ -9,7 +9,12 @@ open Formalism.BasicNotions.TH GlobalTheory.FockAlg GlobalTheory.RealLift Global
 
 namespace GlobalTheory.HoweR
 
-theorem chain_length_le_finrank_add_one : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (G U C : Submodule ℂ V), FiniteDimensional ℂ U → G ≤ U ⊔ C → ∀ (m : ℕ) (N : Fin m → Submodule ℂ V), StrictMono N → (∀ k, C ≤ N k) → (∀ k l, k < l → ∃ v ∈ N l, v ∈ G ∧ v ∉ N k) → m ≤ Module.finrank ℂ U + 1 := by
+theorem chain_length_le_finrank_add_one
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (G U C : Submodule ℂ V),
+      FiniteDimensional ℂ U → G ≤ U ⊔ C
+        → ∀ (m : ℕ) (N : Fin m → Submodule ℂ V),
+          StrictMono N → (∀ k, C ≤ N k) → (∀ k l, k < l → ∃ v ∈ N l, v ∈ G ∧ v ∉ N k)
+            → m ≤ Module.finrank ℂ U + 1 := by
   intro V _ _ G U C hU hGUC m N hN hC hsep
   let g : Fin m → Submodule ℂ U := fun k => (N k).comap U.subtype
   have hg : StrictMono g := by

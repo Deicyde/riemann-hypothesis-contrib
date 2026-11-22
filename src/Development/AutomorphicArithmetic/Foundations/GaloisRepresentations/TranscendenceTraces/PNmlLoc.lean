@@ -5,10 +5,10 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Gal.TranscendenceTraces
 
-theorem UpperTheory.Gal.TranscendenceTraces.nmlLoc_of :
-    NmlInt → NmlNoeth → NmlLoc := by
+theorem UpperTheory.Gal.TranscendenceTraces.nmlLoc_of : NmlInt → NmlNoeth → NmlLoc := by
   intro hI hN S hS h
   rcases h with h | h
   · haveI := h

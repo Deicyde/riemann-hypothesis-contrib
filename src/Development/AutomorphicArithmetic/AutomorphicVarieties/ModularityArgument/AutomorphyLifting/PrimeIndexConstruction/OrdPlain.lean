@@ -9,16 +9,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.CuspRep
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N GlobalTheory.CuspRep
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 namespace UpperTheory.V.Z.Win.Birth
 
-private theorem real_core (t L A B : ℝ) (m0 m1 s : ℤ) (ht0 : 0 < t) (ht1 : t < 1)
-    (h1 : A * B * t ^ (s + 1) = 1) (h2 : L * t ^ m0 = 1) (h3 : L ^ 2 = t * A ^ 2)
-    (h4 : A * t = B ∨ B * t = A) (h5 : m1 + 2 ≤ m0) (h6 : m0 + m1 = s) : False := by
+private theorem real_core
+    (t L A B : ℝ) (m0 m1 s : ℤ)
+    (ht0 : 0 < t) (ht1 : t < 1) (h1 : A * B * t ^ (s + 1) = 1) (h2 : L * t ^ m0 = 1)
+    (h3 : L ^ 2 = t * A ^ 2) (h4 : A * t = B ∨ B * t = A) (h5 : m1 + 2 ≤ m0) (h6 : m0 + m1 = s)
+    : False := by
   have hL : L ≠ 0 := by
     rintro rfl
     simp at h2
@@ -48,8 +52,11 @@ private theorem real_core (t L A B : ℝ) (m0 m1 s : ℤ) (ht0 : 0 < t) (ht1 : t
     have := inj _ _ e e0
     omega
 
-private theorem norm_q {F : Type} [Field F] [NumberField F] {l : ℕ} [hl : Fact l.Prime] (w : Pl F)
-    (hw : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal) : 0 < ‖(normV w : Qbar l)‖ ∧ ‖(normV w : Qbar l)‖ < 1 := by
+private theorem norm_q
+    {F : Type} [Field F] [NumberField F]
+    {l : ℕ} [hl : Fact l.Prime]
+    (w : Pl F) (hw : ((l : ℕ) : 𝓞 F) ∈ w.asIdeal)
+    : 0 < ‖(normV w : Qbar l)‖ ∧ ‖(normV w : Qbar l)‖ < 1 := by
   have e : normV w = Ideal.absNorm w.asIdeal := by
     simp [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
   have h1 : 1 < normV w := by
@@ -68,8 +75,9 @@ private theorem norm_q {F : Type} [Field F] [NumberField F] {l : ℕ} [hl : Fact
   rw [← map_natCast (algebraMap ℚ_[l] (Qbar l)), norm_algebraMap']
   exact_mod_cast Padic.norm_intCast_lt_one_iff.2 (Int.natCast_dvd_natCast.2 hd)
 
-private theorem norm_of_near {K : Type} [NormedField K] [IsUltrametricDist K] {x a : K} (h : ‖x - a‖ < 1)
-    (ha : ‖a‖ = 1) : ‖x‖ = 1 := by
+private theorem norm_of_near
+    {K : Type} [NormedField K] [IsUltrametricDist K] {x a : K} (h : ‖x - a‖ < 1) (ha : ‖a‖ = 1)
+    : ‖x‖ = 1 := by
   have e : x = (x - a) + a := by ring
   rw [e, IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm (by rw [ha]; exact h.ne), ha]
   exact max_eq_right h.le
@@ -97,8 +105,12 @@ theorem ordPlain : OrdPlain := by
       simp [normV, Ideal.absNorm_apply, Submodule.cardQuot_apply]
     rw [e]
     exact NumberField.HeightOneSpectrum.one_lt_absNorm v
-  have hlam : ∃ lam : ℂ, HasU v (π.locRep v) (c v) lam ∧ lam ≠ 0 ∧ (((l : ℕ) : 𝓞 F) ∈ v.asIdeal →
-      ‖ι.symm lam‖ * ‖(normV v : Qbar l)‖ ^ m v 0 = 1 ∧ m v 1 + 2 ≤ m v 0 ∧ m v 0 + m v 1 = s) := by
+  have hlam
+      : ∃ lam : ℂ,
+        HasU v (π.locRep v) (c v) lam ∧ lam ≠ 0
+          ∧ (((l : ℕ) : 𝓞 F) ∈ v.asIdeal
+            → ‖ι.symm lam‖ * ‖(normV v : Qbar l)‖ ^ m v 0 = 1 ∧ m v 1 + 2 ≤ m v 0
+              ∧ m v 0 + m v 1 = s) := by
     by_cases hl : ((l : ℕ) : 𝓞 F) ∈ v.asIdeal
     · obtain ⟨hc1, h12, hs, ha, ⟨lam, hlU, hnear⟩, -⟩ := h.above v hl
       have e := norm_of_near hnear ha
@@ -139,7 +151,8 @@ theorem ordPlain : OrdPlain := by
       rw [map_mul, norm_mul]
     have hqn : ‖ι.symm ((normV v : ℕ) : ℂ)‖ = ‖(normV v : Qbar l)‖ := by rw [map_natCast]
     refine (real_core ‖(normV v : Qbar l)‖ ‖ι.symm lam‖ ‖ι.symm ((ψ 0 (atFin v (unif v)) : ℂˣ) : ℂ)‖
-      ‖ι.symm ((ψ 1 (atFin v (unif v)) : ℂˣ) : ℂ)‖ (m v 0) (m v 1) s ht0 ht1 ?_ hn ?_ ?_ h12 hs).elim
+      ‖ι.symm ((ψ 1 (atFin v (unif v)) : ℂˣ) : ℂ)‖ (m v 0) (m v 1) s ht0 ht1 ?_ hn ?_ ?_ h12
+      hs).elim
     · have e := congrArg (fun z : ℂ => ‖ι.symm z‖) hNe
       simp only [map_pow, norm_pow, map_one, norm_one] at e
       have e2 := (pow_eq_one_iff_of_nonneg (norm_nonneg _) hN0.ne').1 e
@@ -153,8 +166,8 @@ theorem ordPlain : OrdPlain := by
       rcases fin2 i j hij with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
       · exact Or.inl e
       · exact Or.inr e
-  · have hram : Ine (F := F) A ≤ ξ.ker := hI A hA (fun y hy => by
-      rw [← hprod, hun y hy, hu01 y hy, one_mul])
+  · have hram : Ine (F := F) A ≤ ξ.ker :=
+      hI A hA (fun y hy => by rw [← hprod, hun y hy, hu01 y hy, one_mul])
     rcases (h.ram v A hA).1 hram with h0 | h0
     · exact absurd h0 hc
     · exact absurd h0 hl

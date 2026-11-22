@@ -69,26 +69,44 @@ private lemma det_eq_one_of_upUni {n : ℕ} {U : Matrix (Fin n) (Fin n) ℂ}
   rw [det_of_upperTriangular (fun i j h => hU.1 i j h)]
   simp [hU.2]
 
-
 open Matrix in
-theorem _root_.GlobalTheory.WigSh.OmLeftN.omg_mul_left (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ)
-    (g n : _root_.Formalism.FourierDecayAlt.Q.Mx k r) (hz : _root_.Formalism.QuantumDeterminants.inWb k r z)
-    (hn : n ∈ _root_.Formalism.QuantumDeterminants.Nset k r) :
-    _root_.GlobalTheory.WigSh.omg k r z z' (n * g) = _root_.GlobalTheory.WigSh.omg k r z z' g := by
+theorem _root_.GlobalTheory.WigSh.OmLeftN.omg_mul_left
+    (k r : ℕ) (z z' : Fin (2 * r + k + 1) → ℂ) (g n : _root_.Formalism.FourierDecayAlt.Q.Mx k r)
+    (hz : _root_.Formalism.QuantumDeterminants.inWb k r z)
+    (hn : n ∈ _root_.Formalism.QuantumDeterminants.Nset k r)
+    : _root_.GlobalTheory.WigSh.omg k r z z' (n * g)
+      = _root_.GlobalTheory.WigSh.omg k r z z' g := by
   obtain ⟨U, hU, hnF⟩ := _root_.GlobalTheory.LeadingMinorInv.exists_N k r z hz n hn
-  have hnU : nᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * n = _root_.Formalism.QuantumDeterminants.Hpk k r := ((_root_.PI.QuotSetU.UnitaryGroupMassFormula.SW.mem_Nset_iff n).1 hn).1
-  have hQ : _root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z =
-      _root_.Formalism.QuantumDeterminants.Hpk k r * (n * g)ᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z * U := by
-    have key : nᴴ * (_root_.Formalism.QuantumDeterminants.Hpk k r * (n * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z)) =
-        _root_.Formalism.QuantumDeterminants.Hpk k r * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z := by
+  have hnU
+      : nᴴ * _root_.Formalism.QuantumDeterminants.Hpk k r * n
+        = _root_.Formalism.QuantumDeterminants.Hpk k r :=
+    ((_root_.PI.QuotSetU.UnitaryGroupMassFormula.SW.mem_Nset_iff n).1 hn).1
+  have hQ
+      : _root_.Formalism.QuantumDeterminants.Hpk k r * gᴴ
+          * _root_.Formalism.QuantumDeterminants.Hpk k r
+          * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z
+        = _root_.Formalism.QuantumDeterminants.Hpk k r * (n * g)ᴴ
+          * _root_.Formalism.QuantumDeterminants.Hpk k r
+          * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z * U := by
+    have key
+        : nᴴ
+            * (_root_.Formalism.QuantumDeterminants.Hpk k r
+              * (n * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z))
+          = _root_.Formalism.QuantumDeterminants.Hpk k r
+            * _root_.GlobalTheory.LeadingMinorInv.flagMat k r z := by
       simp only [← Matrix.mul_assoc, hnU]
     rw [conjTranspose_mul]
     simp only [Matrix.mul_assoc]
     rw [← hnF, key]
-  rw [rW_mulVec_adjugate_zhat_single_last, rW_mulVec_adjugate_zhat_single_last, gram_eq_upper_bounds, gram_eq_upper_bounds, mulVec_mulVec, mulVec_mulVec, hQ,
+  rw [rW_mulVec_adjugate_zhat_single_last, rW_mulVec_adjugate_zhat_single_last,
+    gram_eq_upper_bounds, gram_eq_upper_bounds, mulVec_mulVec, mulVec_mulVec, hQ,
     mul_adjugate_conjTranspose_eq_of_det_eq_one _ _ _ (det_eq_one_of_upUni hU)]
 
-theorem omg_left_N : ∀ (k r : ℕ) (z z' : (Fin (2 * r + k + 1) → ℂ)) (g m : Mx k r), inWb k r z → inWb k r z' → g ∈ UH (Hpk k r) → m ∈ Formalism.QuantumDeterminants.Nset k r → GlobalTheory.WigSh.omg k r z z' (m⁻¹ * g) = GlobalTheory.WigSh.omg k r z z' g :=
-  fun k r z z' g m hz _ _ hm => omg_mul_left k r z z' g m⁻¹ hz ((unipotent_subgroup_holds k r).2.2 m hm)
+theorem omg_left_N
+    : ∀ (k r : ℕ) (z z' : (Fin (2 * r + k + 1) → ℂ)) (g m : Mx k r),
+      inWb k r z → inWb k r z' → g ∈ UH (Hpk k r) → m ∈ Formalism.QuantumDeterminants.Nset k r
+        → GlobalTheory.WigSh.omg k r z z' (m⁻¹ * g)
+          = GlobalTheory.WigSh.omg k r z z' g := fun k r z z' g m hz _ _ hm =>
+  omg_mul_left k r z z' g m⁻¹ hz ((unipotent_subgroup_holds k r).2.2 m hm)
 
 end GlobalTheory.WigSh.OmLeftN

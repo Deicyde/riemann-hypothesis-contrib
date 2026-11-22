@@ -9,12 +9,16 @@ open UpperTheory.HF
 open NumberField IntermediateField Ideal Formalism.FrobeniusOrbits Formalism.HC
 open scoped Pointwise
 
-theorem UpperTheory.HF.frobG_spec :
-    ∀ (φ : Frame) (H : HostAx φ) (p : ℕ) [Fact p.Prime], ¬ p ∣ H.condN →
-      (∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E), IsArithFrobAt ℤ σ P ↔ H.galE σ = H.frobG p) ∧
-      (((H.frobG p).1.2 : ℤˣ) : ℤ) = jacobiSym (-(H.d : ℤ)) p ∧ (((H.frobG p).1.1 : ℤˣ) : ℤ) = H.psAt p ∧
-      (H.frobG p ∉ φ.Psi ↔ H.Inert p) ∧ (H.frobG p ∈ φ.Psi ↔ jacobiSym (-(H.d : ℤ)) p = 1) ∧
-      ∃ v : (ZMod (2 ^ (φ.e + 2)))ˣ, (v : ZMod (2 ^ (φ.e + 2))) = (p : ZMod _) ∧ φ.hH (H.frobG p).2 = hcl φ.e v := by
+theorem UpperTheory.HF.frobG_spec
+    : ∀ (φ : Frame) (H : HostAx φ) (p : ℕ) [Fact p.Prime],
+      ¬ p ∣ H.condN
+        → (∀ (P : Ideal (𝓞 H.E)) [P.IsPrime] [P.LiesOver (span {(p : ℤ)})] (σ : H.E ≃ₐ[ℚ] H.E),
+            IsArithFrobAt ℤ σ P ↔ H.galE σ = H.frobG p)
+          ∧ (((H.frobG p).1.2 : ℤˣ) : ℤ) = jacobiSym (-(H.d : ℤ)) p
+          ∧ (((H.frobG p).1.1 : ℤˣ) : ℤ) = H.psAt p ∧ (H.frobG p ∉ φ.Psi ↔ H.Inert p)
+          ∧ (H.frobG p ∈ φ.Psi ↔ jacobiSym (-(H.d : ℤ)) p = 1)
+          ∧ ∃ v : (ZMod (2 ^ (φ.e + 2)))ˣ,
+            (v : ZMod (2 ^ (φ.e + 2))) = (p : ZMod _) ∧ φ.hH (H.frobG p).2 = hcl φ.e v := by
   intro φ H p hpr hnd
   have hp : Nat.Coprime p H.condN := (Nat.Prime.coprime_iff_not_dvd hpr.out).2 hnd
   have hodd : p % 2 = 1 := H.odd_of_coprime hp
@@ -51,8 +55,7 @@ theorem UpperTheory.HF.frobG_spec :
     · rintro ⟨-, h⟩
       rw [h]
       decide
-  · have hc2 : Nat.Coprime p (2 ^ (φ.e + 2)) :=
-      Nat.Coprime.coprime_dvd_right H.tower_dvd_condN hp
+  · have hc2 : Nat.Coprime p (2 ^ (φ.e + 2)) := Nat.Coprime.coprime_dvd_right H.tower_dvd_condN hp
     refine ⟨ZMod.unitOfCoprime p hc2, by simp, ?_⟩
     rw [hF]
     apply H.art_h

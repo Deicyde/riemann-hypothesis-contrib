@@ -9,7 +9,8 @@ open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC
 
 namespace LateralTheory.E.ProdAcycPf
 
-theorem zero_acyc (H : LateralTheory.E.t_E2Cut.Hyp) (q : ℕ) (A : Type) [CommRing A] [Subsingleton A] : Acyc q (sp A) := by
+theorem zero_acyc (H : LateralTheory.E.t_E2Cut.Hyp) (q : ℕ) (A : Type) [CommRing A] [Subsingleton A]
+    : Acyc q (sp A) := by
   intro n i hn
   refine ⟨fun x y => ?_⟩
   have h0 : ∀ x : Ht q (sp A) n i, x = 0 := by
@@ -22,11 +23,13 @@ theorem zero_acyc (H : LateralTheory.E.t_E2Cut.Hyp) (q : ℕ) (A : Type) [CommRi
     rw [← hy, hx, map_zero]
   rw [h0 x, h0 y]
 
-def Bin : Prop := LateralTheory.E.t_E2Cut.Hyp → ∀ (q : ℕ) (A R0 R1 : Type) [CommRing A] [CommRing R0] [CommRing R1],
-  Nonempty (A ≃+* R0 × R1) → Acyc q (sp R0) → Acyc q (sp R1) → Acyc q (sp A)
+def Bin : Prop :=
+  LateralTheory.E.t_E2Cut.Hyp
+    → ∀ (q : ℕ) (A R0 R1 : Type) [CommRing A] [CommRing R0] [CommRing R1],
+      Nonempty (A ≃+* R0 × R1) → Acyc q (sp R0) → Acyc q (sp R1) → Acyc q (sp A)
 
-def splitFirst (n : ℕ) (R : Fin (n + 1) → Type) [∀ k, CommRing (R k)] :
-    (∀ k, R k) ≃+* R 0 × ∀ k : Fin n, R k.succ where
+def splitFirst (n : ℕ) (R : Fin (n + 1) → Type) [∀ k, CommRing (R k)]
+    : (∀ k, R k) ≃+* R 0 × ∀ k : Fin n, R k.succ where
   toFun f := (f 0, fun k => f k.succ)
   invFun p := Fin.cons p.1 p.2
   left_inv f := Fin.cons_self_tail f

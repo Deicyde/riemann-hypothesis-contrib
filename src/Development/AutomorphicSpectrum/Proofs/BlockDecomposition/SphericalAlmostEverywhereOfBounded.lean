@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Event
 
 noncomputable section
 
-open NumberField IsDedekindDomain Filter GlobalTheory.CuspRep GlobalTheory.LFun Formalism.L2.Host PositivityTheory.jumpWindows
+open NumberField IsDedekindDomain Filter GlobalTheory.CuspRep GlobalTheory.LFun Formalism.L2.Host
+  PositivityTheory.jumpWindows
 
 namespace GlobalTheory.CompanionTheory.StrongMultOne
 
@@ -17,19 +18,20 @@ theorem spherical_almost_everywhere_of_bounded : G1 → AlmostEverywhereSpherica
   have hex : ∀ v : π.V, ∃ y : XB E a, (y : GA E a → ℂ) = v.1.1 := fun v =>
     (g1 E a π hN v.1 v.2).imp fun _ h => h.1
   choose f hf using hex
-  let ι : π.V →ₗ[ℂ] XB E a :=
-    { toFun := f
-      map_add' := fun u v => by
-        refine DFunLike.coe_injective ?_
-        rw [BoundedContinuousFunction.coe_add, hf, hf, hf]
-        rfl
-      map_smul' := fun c v => by
-        refine DFunLike.coe_injective ?_
-        funext g
-        rw [hf]
-        change _ = c • f v g
-        rw [congrFun (hf v) g]
-        rfl }
+  let ι : π.V →ₗ[ℂ] XB E a := {
+    toFun := f
+    map_add' := fun u v => by
+      refine DFunLike.coe_injective ?_
+      rw [BoundedContinuousFunction.coe_add, hf, hf, hf]
+      rfl
+    map_smul' := fun c v => by
+      refine DFunLike.coe_injective ?_
+      funext g
+      rw [hf]
+      change _ = c • f v g
+      rw [congrFun (hf v) g]
+      rfl
+  }
   have hι : ∀ v, (ι v : GA E a → ℂ) = v.1.1 := hf
   filter_upwards [AeFix.eventually_mem_fixed E a π ⟨φ, hφ⟩] with w hw B hB
   by_cases h0 : x = 0

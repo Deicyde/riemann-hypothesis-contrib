@@ -6,13 +6,21 @@ public import Development.EtaleCohomology.TateTwists.EtaleTensorTripleProductOfF
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 open scoped DirectSum TensorProduct
 
 namespace LateralTheory.EtaleFoundations.TensTriFamPf
 
 def SecGlue : Prop :=
-  ∀ (R : Type) [CommRing R] (F : Shv R) (U : Scheme.{0}), (∀ a b : Sec F U, (Loc U fun _ g => Sec.res g a = Sec.res g b) → a = b) ∧ ∀ (S : Sieve U), S ∈ Scheme.etaleTopology U → ∀ s : ∀ (V : Scheme.{0}) (g : V ⟶ U), S.arrows g → Sec F V, (∀ (V W : Scheme.{0}) (g : V ⟶ U) (k : W ⟶ V) (hg : S.arrows g), Sec.res k (s V g hg) = s W (k ≫ g) (S.downward_closed hg k)) → ∃ a : Sec F U, ∀ V g hg, Sec.res g a = s V g hg
+  ∀ (R : Type) [CommRing R] (F : Shv R) (U : Scheme.{0}),
+    (∀ a b : Sec F U, (Loc U fun _ g => Sec.res g a = Sec.res g b) → a = b)
+      ∧ ∀ (S : Sieve U),
+        S ∈ Scheme.etaleTopology U
+          → ∀ s : ∀ (V : Scheme.{0}) (g : V ⟶ U), S.arrows g → Sec F V,
+            (∀ (V W : Scheme.{0}) (g : V ⟶ U) (k : W ⟶ V) (hg : S.arrows g),
+                Sec.res k (s V g hg) = s W (k ≫ g) (S.downward_closed hg k))
+              → ∃ a : Sec F U, ∀ V g hg, Sec.res g a = s V g hg
 
 variable {R : Type} [CommRing R]
 
@@ -70,18 +78,22 @@ lemma lift_single (τ : Pair I J T) (U : Scheme.{0}) (s t st : ℤ) (h1 : s + t 
   rw [← DirectSum.lof_eq_of (ULift.{1} R)]
   simp only [Pair.lift, DirectSum.toModule_lof, TensorProduct.lift.tmul]
 
-noncomputable def Bp (μ' : Pair J K M) (ν' : Pair I M L) (V : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w)
-    (p : {p : ℤ × ℤ // p.1 + p.2 = st}) :
-    Sec (I.X p.1.1) V →ₗ[ULift.{1} R] Sec (J.X p.1.2) V →ₗ[ULift.{1} R] (Sec (K.X u) V →ₗ[ULift.{1} R] Sec (L.X w) V) :=
+noncomputable def Bp
+    (μ' : Pair J K M) (ν' : Pair I M L) (V : Scheme.{0})
+    (st u w : ℤ) (h2 : st + u = w) (p : {p : ℤ × ℤ // p.1 + p.2 = st})
+    : Sec (I.X p.1.1) V →ₗ[ULift.{1} R] Sec (J.X p.1.2) V →ₗ[ULift.{1} R] (Sec (K.X u) V →ₗ[ULift.{1} R] Sec (L.X w) V) :=
   LinearMap.mk₂ (ULift.{1} R)
-    (fun a b => (ν'.mul V p.1.1 (p.1.2 + u) w (by have := p.2; omega) a) ∘ₗ (μ'.mul V p.1.2 u (p.1.2 + u) rfl b))
+    (fun a b =>
+      (ν'.mul V p.1.1 (p.1.2 + u) w (by have := p.2; omega) a)
+        ∘ₗ (μ'.mul V p.1.2 u (p.1.2 + u) rfl b))
     (fun a a' b => LinearMap.ext fun c => by simp)
     (fun r a b => LinearMap.ext fun c => by simp)
     (fun a b b' => LinearMap.ext fun c => by simp)
     (fun r a b => LinearMap.ext fun c => by simp)
 
-noncomputable def B (μ' : Pair J K M) (ν' : Pair I M L) (V : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w) :
-    Tens I J V st →ₗ[ULift.{1} R] (Sec (K.X u) V →ₗ[ULift.{1} R] Sec (L.X w) V) :=
+noncomputable def B
+    (μ' : Pair J K M) (ν' : Pair I M L) (V : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w)
+    : Tens I J V st →ₗ[ULift.{1} R] (Sec (K.X u) V →ₗ[ULift.{1} R] Sec (L.X w) V) :=
   DirectSum.toModule _ _ _ fun p => TensorProduct.lift (Bp μ' ν' V st u w h2 p)
 
 lemma B_single (μ' : Pair J K M) (ν' : Pair I M L) (V : Scheme.{0}) (s t st u w : ℤ) (h1 : s + t = st)
@@ -138,8 +150,12 @@ lemma exists_m (hg : SecGlue) (τ : Pair I J T) (hτ : τ.IsTensor) (μ' : Pair 
   apply B_wd hg τ hτ μ' ν'
   rw [lift_res, (hP W (k ≫ g) hk).choose_spec, hx, res_comp]
 
-noncomputable def mraw (hg : SecGlue) (τ : Pair I J T) (hτ : τ.IsTensor) (μ' : Pair J K M) (ν' : Pair I M L)
-    (U : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w) (a : Sec (T.X st) U) (c : Sec (K.X u) U) : Sec (L.X w) U :=
+noncomputable def mraw
+    (hg : SecGlue)
+    (τ : Pair I J T) (hτ : τ.IsTensor)
+    (μ' : Pair J K M) (ν' : Pair I M L)
+    (U : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w) (a : Sec (T.X st) U) (c : Sec (K.X u) U)
+    : Sec (L.X w) U :=
   (exists_m hg τ hτ μ' ν' U st u w h2 a c).choose
 
 variable (hg : SecGlue) (τ : Pair I J T) (hτ : τ.IsTensor) (μ' : Pair J K M) (ν' : Pair I M L)
@@ -198,18 +214,19 @@ lemma mraw_eq (U : Scheme.{0}) (s t u st tu w : ℤ) (h1 : s + t = st) (h2 : st 
   rw [res_id, res_id] at h
   rw [h, B_single]
 
-noncomputable def mfam (U : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w) :
-    Sec (T.X st) U →ₗ[ULift.{1} R] Sec (K.X u) U →ₗ[ULift.{1} R] Sec (L.X w) U :=
-  LinearMap.mk₂ (ULift.{1} R) (mraw hg τ hτ μ' ν' U st u w h2)
-    (mraw_add_a hg τ hτ μ' ν') (mraw_smul_a hg τ hτ μ' ν') (mraw_add_c hg τ hτ μ' ν') (mraw_smul_c hg τ hτ μ' ν')
+noncomputable def mfam (U : Scheme.{0}) (st u w : ℤ) (h2 : st + u = w)
+    : Sec (T.X st) U →ₗ[ULift.{1} R] Sec (K.X u) U →ₗ[ULift.{1} R] Sec (L.X w) U :=
+  LinearMap.mk₂ (ULift.{1} R) (mraw hg τ hτ μ' ν' U st u w h2) (mraw_add_a hg τ hτ μ' ν')
+    (mraw_smul_a hg τ hτ μ' ν') (mraw_add_c hg τ hτ μ' ν') (mraw_smul_c hg τ hτ μ' ν')
 
 end
 
 end LateralTheory.EtaleFoundations.TensTriFamPf
 
-
 open LateralTheory.EtaleFoundations.TensTriFamPf in
-theorem LateralTheory.EtaleFoundations.etale_tensor_triple_product_family_of_gluing (hglue : SecGlue) : LateralTheory.EtaleFoundations.EtaleTensorTripleProductFamilyExists := by
+theorem LateralTheory.EtaleFoundations.etale_tensor_triple_product_family_of_gluing
+    (hglue : SecGlue)
+    : LateralTheory.EtaleFoundations.EtaleTensorTripleProductFamilyExists := by
   intro R _ I J K T τ hτ M L μ' ν'
   refine ⟨fun U st u w h2 => mfam hglue τ hτ μ' ν' U st u w h2, ?_, ?_⟩
   · intro V U g s t w h a b

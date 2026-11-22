@@ -31,22 +31,24 @@ private lemma sub_projection_mem' {p q : Submodule ℂ V} (h : IsCompl p q) (v :
     (Submodule.IsCompl.projection_eq_self_iff h _).mpr
       (Submodule.IsCompl.projection_apply_mem h v), sub_self]
 
-
 variable {V : Type} [AddCommGroup V] [Module ℂ V] in
-theorem _root_.GlobalTheory.ClassFin.exists_reynolds_of_completelyReducible (V : Type) [AddCommGroup V] [Module ℂ V]
-    (S : Set (V →ₗ[ℂ] V)) :
-    (∀ U : Submodule ℂ V, (∀ s ∈ S, ∀ v ∈ U, (s : V → V) v ∈ U) →
-      ∃ U' : Submodule ℂ V, (∀ s ∈ S, ∀ v ∈ U', (s : V → V) v ∈ U') ∧ IsCompl U U') →
-    ∃ Rey : V →ₗ[ℂ] V,
-      (∀ v : V, ∀ s ∈ S, (s : V → V) ((Rey : V → V) v) = (Rey : V → V) v) ∧
-      (∀ v : V, (∀ s ∈ S, (s : V → V) v = v) → (Rey : V → V) v = v) ∧
-      (∀ v : V, ∀ s ∈ S, (Rey : V → V) ((s : V → V) v) = (Rey : V → V) v) ∧
-      (∀ v : V, v - (Rey : V → V) v ∈
-        Submodule.span ℂ {x : V | ∃ s ∈ S, ∃ w : V, x = (s : V → V) w - w}) ∧
-      (∀ T : V →ₗ[ℂ] V, (∀ s ∈ S, ∀ v : V, (T : V → V) ((s : V → V) v) = (s : V → V) ((T : V → V) v)) →
-        ∀ v : V, (Rey : V → V) ((T : V → V) v) = (T : V → V) ((Rey : V → V) v)) ∧
-      ∀ U : Submodule ℂ V, (∀ s ∈ S, ∀ v ∈ U, (s : V → V) v ∈ U) →
-        ∀ v ∈ U, (Rey : V → V) v ∈ U := by
+theorem _root_.GlobalTheory.ClassFin.exists_reynolds_of_completelyReducible
+    (V : Type) [AddCommGroup V] [Module ℂ V] (S : Set (V →ₗ[ℂ] V))
+    : (∀ U : Submodule ℂ V,
+        (∀ s ∈ S, ∀ v ∈ U, (s : V → V) v ∈ U)
+          → ∃ U' : Submodule ℂ V, (∀ s ∈ S, ∀ v ∈ U', (s : V → V) v ∈ U') ∧ IsCompl U U')
+      → ∃ Rey : V →ₗ[ℂ] V,
+        (∀ v : V, ∀ s ∈ S, (s : V → V) ((Rey : V → V) v) = (Rey : V → V) v)
+          ∧ (∀ v : V, (∀ s ∈ S, (s : V → V) v = v) → (Rey : V → V) v = v)
+          ∧ (∀ v : V, ∀ s ∈ S, (Rey : V → V) ((s : V → V) v) = (Rey : V → V) v)
+          ∧ (∀ v : V,
+            v - (Rey : V → V) v
+              ∈ Submodule.span ℂ {x : V | ∃ s ∈ S, ∃ w : V, x = (s : V → V) w - w})
+          ∧ (∀ T : V →ₗ[ℂ] V,
+            (∀ s ∈ S, ∀ v : V, (T : V → V) ((s : V → V) v) = (s : V → V) ((T : V → V) v))
+              → ∀ v : V, (Rey : V → V) ((T : V → V) v) = (T : V → V) ((Rey : V → V) v))
+          ∧ ∀ U : Submodule ℂ V,
+            (∀ s ∈ S, ∀ v ∈ U, (s : V → V) v ∈ U) → ∀ v ∈ U, (Rey : V → V) v ∈ U := by
   intro hS
   let W : Submodule ℂ V := Submodule.span ℂ {x : V | ∃ s ∈ S, ∃ w : V, x = (s : V → V) w - w}
   have hWgen : ∀ s ∈ S, ∀ w, (s : V → V) w - w ∈ W := fun s hs w =>
@@ -58,7 +60,8 @@ theorem _root_.GlobalTheory.ClassFin.exists_reynolds_of_completelyReducible (V :
       obtain ⟨s, hs, w, rfl⟩ := hx
       rw [map_sub, hT s hs]
       exact hWgen s hs (T w)
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [map_add (f := _)]
       exact W.add_mem hx hy
@@ -75,18 +78,20 @@ theorem _root_.GlobalTheory.ClassFin.exists_reynolds_of_completelyReducible (V :
         abel
       rw [e]
       exact W.sub_mem (W.add_mem (hWgen s hs _) (hWgen s' hs' w)) (hWgen s hs w)
-    | zero => simp
+    | zero =>
+      simp
     | add x y _ _ hx hy =>
       rw [map_add (f := _)]
       exact W.add_mem hx hy
     | smul a x _ hx =>
       rw [map_smul]
       exact W.smul_mem a hx
-  let Fix : Submodule ℂ V :=
-    { carrier := {x | ∀ s ∈ S, (s : V → V) x = x}
-      add_mem' := fun ha hb s hs => by simp [map_add (f := _), ha s hs, hb s hs]
-      zero_mem' := fun s _ => map_zero s
-      smul_mem' := fun c x hx s hs => by simp [map_smul, hx s hs] }
+  let Fix : Submodule ℂ V := {
+    carrier := {x | ∀ s ∈ S, (s : V → V) x = x}
+    add_mem' := fun ha hb s hs => by simp [map_add (f := _), ha s hs, hb s hs]
+    zero_mem' := fun s _ => map_zero s
+    smul_mem' := fun c x hx s hs => by simp [map_smul, hx s hs]
+  }
   have hFixW : ∀ v ∈ Fix, v ∈ W → v = 0 := by
     intro v hvF hvW
     have hZS : ∀ s ∈ S, ∀ x ∈ Fix ⊓ W, (s : V → V) x ∈ Fix ⊓ W := by
@@ -115,7 +120,8 @@ theorem _root_.GlobalTheory.ClassFin.exists_reynolds_of_completelyReducible (V :
   let P := W'.projection W hWW'.symm
   have hPfix : ∀ v ∈ Fix, P v = v := by
     intro v hv
-    have hd : v - P v ∈ Fix := Fix.sub_mem hv (hW'Fix _ (Submodule.IsCompl.projection_apply_mem _ v))
+    have hd : v - P v ∈ Fix :=
+      Fix.sub_mem hv (hW'Fix _ (Submodule.IsCompl.projection_apply_mem _ v))
     exact (sub_eq_zero.mp (hFixW _ hd (sub_projection_mem' hWW'.symm v))).symm
   have hPT : ∀ T : V →ₗ[ℂ] V, (∀ s ∈ S, ∀ v, T (s v) = s (T v)) → ∀ v, P (T v) = T (P v) := by
     intro T hT v
@@ -123,9 +129,15 @@ theorem _root_.GlobalTheory.ClassFin.exists_reynolds_of_completelyReducible (V :
     have hTx : T x ∈ Fix := fun s hs => by rw [← hT s hs, hW'Fix x hx s hs]
     rw [← hPfix _ hTx]
     exact Submodule.IsCompl.projection_apply_mem _ _
-  refine ⟨P, fun v s hs => hW'Fix _ (Submodule.IsCompl.projection_apply_mem _ v) s hs,
-    fun v hv => hPfix v hv, fun v s hs => ?_, fun v => sub_projection_mem' hWW'.symm v,
-    hPT, fun U hU v hv => ?_⟩
+  refine ⟨
+    P,
+    fun v s hs => hW'Fix _ (Submodule.IsCompl.projection_apply_mem _ v) s hs,
+    fun v hv => hPfix v hv,
+    fun v s hs => ?_,
+    fun v => sub_projection_mem' hWW'.symm v,
+    hPT,
+    fun U hU v hv => ?_
+  ⟩
   · have h0 : P ((s : V → V) v - v) = 0 :=
       (Submodule.IsCompl.projection_apply_eq_zero_iff _).mpr (hWgen s hs v)
     rw [map_sub, sub_eq_zero] at h0

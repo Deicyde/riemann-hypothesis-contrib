@@ -11,13 +11,13 @@ open PositivityTheory.Rg.Tf.Loc (twConj)
 
 namespace GlobalTheory.CompanionTheory.EllProp
 
-theorem twConj_twConj {G : Type*} [Group G] (θ : Monoid.End G) (x g d : G) :
-    twConj θ x (twConj θ g d) = twConj θ (g * x) d := by
+theorem twConj_twConj {G : Type*} [Group G] (θ : Monoid.End G) (x g d : G)
+    : twConj θ x (twConj θ g d) = twConj θ (g * x) d := by
   simp only [twConj, map_mul]
   group
 
-theorem orbit_preimage_eq {G : Type*} [Group G] (θ : Monoid.End G) (g d : G) (C : Set G) :
-    {x | twConj θ x (twConj θ g d) ∈ C} = (fun y => g⁻¹ * y) '' {y | twConj θ y d ∈ C} := by
+theorem orbit_preimage_eq {G : Type*} [Group G] (θ : Monoid.End G) (g d : G) (C : Set G)
+    : {x | twConj θ x (twConj θ g d) ∈ C} = (fun y => g⁻¹ * y) '' {y | twConj θ y d ∈ C} := by
   ext x
   simp only [Set.mem_setOf_eq, Set.mem_image, twConj_twConj]
   constructor

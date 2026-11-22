@@ -13,12 +13,12 @@ namespace GlobalTheory.Cyc
 
 open IsLocalRing
 
-theorem modEq_of_pow_modEq_pow_sub_one (l n a b : ℕ) (hl : 2 ≤ l) (hn : 0 < n)
-    (h : l ^ a ≡ l ^ b [MOD l ^ n - 1]) : a ≡ b [MOD n] := by
+theorem modEq_of_pow_modEq_pow_sub_one
+    (l n a b : ℕ) (hl : 2 ≤ l) (hn : 0 < n) (h : l ^ a ≡ l ^ b [MOD l ^ n - 1])
+    : a ≡ b [MOD n] := by
   rcases Nat.lt_or_ge 1 n with h1 | h1
   · have hpos : 1 ≤ l ^ n := Nat.one_le_pow _ _ (by omega)
-    have hone : l ^ n ≡ 1 [MOD l ^ n - 1] :=
-      ((Nat.modEq_iff_dvd' hpos).2 dvd_rfl).symm
+    have hone : l ^ n ≡ 1 [MOD l ^ n - 1] := ((Nat.modEq_iff_dvd' hpos).2 dvd_rfl).symm
     have hred : ∀ c : ℕ, l ^ c ≡ l ^ (c % n) [MOD l ^ n - 1] := by
       intro c
       conv_lhs => rw [← Nat.div_add_mod c n, pow_add, pow_mul]
@@ -34,17 +34,16 @@ theorem modEq_of_pow_modEq_pow_sub_one (l n a b : ℕ) (hl : 2 ≤ l) (hn : 0 < 
       rw [pow_one] at h3
       rw [pow_succ]
       omega
-    have h5 : l ^ (a % n) ≡ l ^ (b % n) [MOD l ^ n - 1] :=
-      ((hred a).symm.trans h).trans (hred b)
+    have h5 : l ^ (a % n) ≡ l ^ (b % n) [MOD l ^ n - 1] := ((hred a).symm.trans h).trans (hred b)
     have h6 := Nat.ModEq.eq_of_lt_of_lt h5 (hlt a) (hlt b)
     exact Nat.pow_right_injective hl h6
   · obtain rfl : n = 1 := by omega
     exact Nat.modEq_one
 
-theorem exists_frobenius_and_exponent_modEq (l : ℕ) [Fact l.Prime] :
-    (∃ φ : GQ l, ∀ n : ℕ, 0 < n → ∀ x : Om l, x ^ l ^ n = x → φ x = x ^ l) ∧
-    ∀ n a b : ℕ, 0 < n → (∀ x : Om l, x ^ l ^ n = x → x ^ l ^ a = x ^ l ^ b) →
-      a ≡ b [MOD n] := by
+theorem exists_frobenius_and_exponent_modEq (l : ℕ) [Fact l.Prime]
+    : (∃ φ : GQ l, ∀ n : ℕ, 0 < n → ∀ x : Om l, x ^ l ^ n = x → φ x = x ^ l)
+      ∧ ∀ n a b : ℕ,
+        0 < n → (∀ x : Om l, x ^ l ^ n = x → x ^ l ^ a = x ^ l ^ b) → a ≡ b [MOD n] := by
   have hp : l.Prime := Fact.out
   have hgt : ∀ n : ℕ, 0 < n → 1 < l ^ n := fun n hn => Nat.one_lt_pow hn.ne' hp.one_lt
   constructor
@@ -52,8 +51,9 @@ theorem exists_frobenius_and_exponent_modEq (l : ℕ) [Fact l.Prime] :
     have : NeZero l := ⟨hp.ne_zero⟩
     have hcard : Nat.card (ℤ_[l] ⧸ maximalIdeal ℤ_[l]) = l := by
       rw [Nat.card_congr e.toEquiv, Nat.card_zmod]
-    obtain ⟨φ, hφ⟩ := GlobalTheory.MemLoc.exists_algEquiv_rootOfUnity_eq_pow ℤ_[l] ℚ_[l]
-      (Finite.of_equiv _ e.symm.toEquiv) (Om l)
+    obtain ⟨φ, hφ⟩ :=
+      GlobalTheory.MemLoc.exists_algEquiv_rootOfUnity_eq_pow ℤ_[l] ℚ_[l]
+        (Finite.of_equiv _ e.symm.toEquiv) (Om l)
     rw [hcard] at hφ
     refine ⟨φ, fun n hn x hx => ?_⟩
     by_cases h0 : x = 0

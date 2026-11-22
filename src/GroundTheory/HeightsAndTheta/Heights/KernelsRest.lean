@@ -19,15 +19,16 @@ def antisym {ι : Type*} [Fintype ι] [DecidableEq ι] (H : MvPolynomial ι ℚ)
   ∑ w : Equiv.Perm ι, ((Equiv.Perm.sign w : ℤ) : ℚ) • rename w H
 
 def frobDim {r : ℕ} (la : Fin r → ℕ) : ℚ :=
-  ((∑ a, la a).factorial : ℚ) *
-      (∏ a : Fin r, ∏ b : Fin r,
-        if a < b then ((la a + (r - 1 - a) : ℕ) : ℚ) - ((la b + (r - 1 - b) : ℕ) : ℚ) else 1) /
-    ∏ a : Fin r, ((la a + (r - 1 - a)).factorial : ℚ)
+  ((∑ a, la a).factorial : ℚ)
+    * (∏ a : Fin r, ∏ b : Fin r,
+        if a < b then ((la a + (r - 1 - a) : ℕ) : ℚ) - ((la b + (r - 1 - b) : ℕ) : ℚ) else 1)
+    / ∏ a : Fin r, ((la a + (r - 1 - a)).factorial : ℚ)
 
 def FrobeniusRectangleBound.Statement : Prop :=
-  ∀ (r s : ℕ) (ν : Fin r → ℕ), Antitone ν →
-    frobDim (fun a => s + ν a) ≤
-      ((r * s + ∑ a, ν a).choose (∑ a, ν a) : ℚ) * frobDim (fun _ : Fin r => s) * frobDim ν
+  ∀ (r s : ℕ) (ν : Fin r → ℕ),
+    Antitone ν
+      → frobDim (fun a => s + ν a)
+        ≤ ((r * s + ∑ a, ν a).choose (∑ a, ν a) : ℚ) * frobDim (fun _ : Fin r => s) * frobDim ν
 
 abbrev RootPoly (f j k : ℕ) : Type := MvPolynomial (Fin f × (Fin j ⊕ Fin k)) ℝ
 
@@ -53,18 +54,23 @@ def fibre : RootPoly f j k :=
         vandermonde (fun b : Fin k => (X (τ, Sum.inr b) : RootPoly f j k))
 
 structure IsFlagIntegral (I : RootPoly f j k →ₗ[ℝ] ℝ) : Prop where
-  kills : ∀ (m : ℕ) (τ : Fin f) (G : RootPoly f j k), 1 ≤ m → m ≤ flagDim f j k →
-    G.IsHomogeneous (flagDim f j k - m) → I (rootPsum f j k m τ * G) = 0
+  kills
+    : ∀ (m : ℕ) (τ : Fin f) (G : RootPoly f j k),
+      1 ≤ m → m ≤ flagDim f j k → G.IsHomogeneous (flagDim f j k - m)
+        → I (rootPsum f j k m τ * G) = 0
   ne_zero : ∃ G : RootPoly f j k, G.IsHomogeneous (flagDim f j k) ∧ I G ≠ 0
 
 def IsPowerSumDecomposition (F : RootPoly f j k) (Q : Fin f → ℕ → RootPoly f j k) : Prop :=
-  (∀ τ m, 1 ≤ m → m ≤ j + k → (Q τ m).IsHomogeneous (flagDim f j k + 1 - m)) ∧
-    F = ∑ τ : Fin f, ∑ m ∈ Finset.Icc 1 (j + k), rootPsum f j k m τ * Q τ m
+  (∀ τ m, 1 ≤ m → m ≤ j + k → (Q τ m).IsHomogeneous (flagDim f j k + 1 - m))
+    ∧ F = ∑ τ : Fin f, ∑ m ∈ Finset.Icc 1 (j + k), rootPsum f j k m τ * Q τ m
 
-def restAt (I : RootPoly f j k →ₗ[ℝ] ℝ) (vol : ℝ) (φ : ℕ → ℕ → Fin f → Fin f × Bool)
-    (Q : Fin f → ℕ → RootPoly f j k) (p : ℕ) : ℝ :=
-  log p * vol * ∑ τ : Fin f, ∑ m ∈ Finset.Icc 2 (j + k), ∑' n : ℕ,
-    (((p : ℝ) ^ ((n + 1) * m))⁻¹ * m * I (lieClass f j k (m - 1) (φ p (n + 1) τ) * Q τ m))
+def restAt
+    (I : RootPoly f j k →ₗ[ℝ] ℝ) (vol : ℝ) (φ : ℕ → ℕ → Fin f → Fin f × Bool)
+    (Q : Fin f → ℕ → RootPoly f j k) (p : ℕ)
+    : ℝ :=
+  log p * vol
+    * ∑ τ : Fin f, ∑ m ∈ Finset.Icc 2 (j + k), ∑' n : ℕ,
+      (((p : ℝ) ^ ((n + 1) * m))⁻¹ * m * I (lieClass f j k (m - 1) (φ p (n + 1) τ) * Q τ m))
 
 end
 

@@ -15,7 +15,8 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LocDensDivJacN
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.LowerBoundFree
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv.Push
 
@@ -23,34 +24,40 @@ section FibreMeas
 
 variable {e : ℕ}
 
-theorem fibSum_eq_sub_of_finite {O : Set (Fin e → ℂ)} {Q : (Fin e → ℂ) → (Fin e → ℂ)}
-    (h : (Fin e → ℂ) → ℝ) (y : Fin e → ℂ) (hy : (O ∩ Q ⁻¹' {y}).Finite) :
-    fibSum O Q (fun u => max (h u) 0) y - fibSum O Q (fun u => max (-h u) 0) y = fibSum O Q h y := by
+theorem fibSum_eq_sub_of_finite
+    {O : Set (Fin e → ℂ)} {Q : (Fin e → ℂ) → (Fin e → ℂ)}
+    (h : (Fin e → ℂ) → ℝ)
+    (y : Fin e → ℂ) (hy : (O ∩ Q ⁻¹' {y}).Finite)
+    : fibSum O Q (fun u => max (h u) 0) y - fibSum O Q (fun u => max (- h u) 0) y
+      = fibSum O Q h y := by
   unfold fibSum
   rw [← finsum_mem_sub_distrib _ _ hy]
   refine finsum_mem_congr rfl fun u _ => ?_
   rw [← sub_div, max_zero_sub_max_neg_zero_eq_self]
 
-theorem aemeasurable_fibSum_of_nonneg {O : Set (Fin e → ℂ)} (hO : IsOpen O)
+theorem aemeasurable_fibSum_of_nonneg
+    {O : Set (Fin e → ℂ)} (hO : IsOpen O)
     {Q : (Fin e → ℂ) → (Fin e → ℂ)}
-    (hQ : ∀ u ∈ O, AnalyticAt ℂ Q u ∧
-      LinearMap.det (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0)
+    (hQ : ∀ u ∈ O,
+      AnalyticAt ℂ Q u ∧ LinearMap.det (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0)
     {h : (Fin e → ℂ) → ℝ} (hh : ∀ u, 0 ≤ h u) (hm : Measurable h)
-    (hfin : ∀ᵐ y, (O ∩ Q ⁻¹' {y}).Finite) : AEMeasurable (fibSum O Q h) := by
-  have h1 := (LintegralFibSum.lintegral_fibSum_open hO hQ hh
-    (hm.comp measurable_subtype_coe) hfin).1
+    (hfin : ∀ᵐ y, (O ∩ Q ⁻¹' {y}).Finite)
+    : AEMeasurable (fibSum O Q h) := by
+  have h1 :=
+    (LintegralFibSum.lintegral_fibSum_open hO hQ hh (hm.comp measurable_subtype_coe) hfin).1
   refine h1.ennreal_toReal.congr (Eventually.of_forall fun y => ?_)
   exact ENNReal.toReal_ofReal (LintegralFibSum.fibSum_nonneg _ _ hh y)
 
-theorem aestronglyMeasurable_fibSum {O : Set (Fin e → ℂ)} (hO : IsOpen O)
+theorem aestronglyMeasurable_fibSum
+    {O : Set (Fin e → ℂ)} (hO : IsOpen O)
     {Q : (Fin e → ℂ) → (Fin e → ℂ)}
-    (hQ : ∀ u ∈ O, AnalyticAt ℂ Q u ∧
-      LinearMap.det (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0)
+    (hQ : ∀ u ∈ O,
+      AnalyticAt ℂ Q u ∧ LinearMap.det (fderiv ℂ Q u : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0)
     {h : (Fin e → ℂ) → ℝ} (hm : AEStronglyMeasurable h (volume.restrict O))
-    (hfin : ∀ᵐ y, (O ∩ Q ⁻¹' {y}).Finite) : AEStronglyMeasurable (fibSum O Q h) volume := by
+    (hfin : ∀ᵐ y, (O ∩ Q ⁻¹' {y}).Finite)
+    : AEStronglyMeasurable (fibSum O Q h) volume := by
   have hmm : Measurable (hm.mk h) := hm.stronglyMeasurable_mk.measurable
-  have hae : ∀ᵐ u, u ∈ O → h u = hm.mk h u :=
-    (ae_restrict_iff' hO.measurableSet).mp hm.ae_eq_mk
+  have hae : ∀ᵐ u, u ∈ O → h u = hm.mk h u := (ae_restrict_iff' hO.measurableSet).mp hm.ae_eq_mk
   have hnull : volume (O ∩ {u | h u ≠ hm.mk h u}) = 0 := by
     refine measure_mono_null ?_ (ae_iff.mp hae)
     rintro u ⟨huO, hne⟩ hu
@@ -61,8 +68,10 @@ theorem aestronglyMeasurable_fibSum {O : Set (Fin e → ℂ)} (hO : IsOpen O)
     exact ((hQ u hu.1).1.differentiableAt.restrictScalars ℝ).differentiableWithinAt
   have hp : AEMeasurable (fibSum O Q fun u => max (hm.mk h u) 0) :=
     aemeasurable_fibSum_of_nonneg hO hQ (fun u => le_max_right _ _) (hmm.max measurable_const) hfin
-  have hn : AEMeasurable (fibSum O Q fun u => max (-hm.mk h u) 0) :=
-    aemeasurable_fibSum_of_nonneg hO hQ (fun u => le_max_right _ _) (hmm.neg.max measurable_const) hfin
+  have hn : AEMeasurable (fibSum O Q fun u => max (- hm.mk h u) 0) :=
+    aemeasurable_fibSum_of_nonneg hO hQ
+      (fun u => le_max_right _ _)
+      (hmm.neg.max measurable_const) hfin
   refine (hp.sub hn).aestronglyMeasurable.congr ?_
   filter_upwards [hfin, measure_eq_zero_iff_ae_notMem.mp himg] with y hy hyn
   show fibSum O Q (fun u => max (hm.mk h u) 0) y - fibSum O Q (fun u => max (-hm.mk h u) 0) y = _
@@ -76,7 +85,24 @@ theorem aestronglyMeasurable_fibSum {O : Set (Fin e → ℂ)} (hO : IsOpen O)
 
 end FibreMeas
 
-theorem aestronglyMeasurable_fibreSum_pushDens : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X) (Φ : Fin e → LocPot X) (q : X → Fin e → ℂ) (S : Set X) (G : X → ℝ), (∀ j, volume ((A.chart j).target ∩ (A.chart j).symm ⁻¹' S) = 0) → (∀ x ∉ S, ∀ j, x ∈ (A.chart j).source → AnalyticAt ℂ (q ∘ (A.chart j).symm) (A.chart j x) ∧ LinearMap.det (fderiv ℂ (q ∘ (A.chart j).symm) (A.chart j x) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ)) ≠ 0) → (∀ y, (q ⁻¹' {y} \ S).Finite) → (∀ x ∉ S, ∀ i k, x ∈ (A.chart k).source → ContDiffAt ℝ 2 ((Φ i).φ x ∘ (A.chart k).symm) (A.chart k x)) → (∀ j, AEStronglyMeasurable (fun u => G ((A.chart j).symm u) * locDens A Φ j u) (volume.restrict (A.chart j).target)) → AEStronglyMeasurable (fun y => ∑ᶠ x ∈ q ⁻¹' {y} \ S, G x * pushDens A Φ q x) volume := by
+theorem aestronglyMeasurable_fibreSum_pushDens
+    : ∀ {e : ℕ} {X : Type} [TopologicalSpace X] [CompactSpace X] [T2Space X] (A : FinHolAtlas e X)
+        (Φ : Fin e → LocPot X) (q : X → Fin e → ℂ) (S : Set X) (G : X → ℝ),
+      (∀ j, volume ((A.chart j).target ∩ (A.chart j).symm ⁻¹' S) = 0)
+        → (∀ x ∉ S, ∀ j,
+          x ∈ (A.chart j).source
+            → AnalyticAt ℂ (q ∘ (A.chart j).symm) (A.chart j x)
+              ∧ LinearMap.det
+                  (fderiv ℂ (q ∘ (A.chart j).symm) (A.chart j x) : (Fin e → ℂ) →ₗ[ℂ] (Fin e → ℂ))
+                ≠ 0)
+        → (∀ y, (q ⁻¹' {y} \ S).Finite)
+        → (∀ x ∉ S, ∀ i k,
+          x ∈ (A.chart k).source → ContDiffAt ℝ 2 ((Φ i).φ x ∘ (A.chart k).symm) (A.chart k x))
+        → (∀ j,
+          AEStronglyMeasurable
+            (fun u => G ((A.chart j).symm u) * locDens A Φ j u)
+            (volume.restrict (A.chart j).target))
+        → AEStronglyMeasurable (fun y => ∑ᶠ x ∈ q ⁻¹' {y} \ S, G x * pushDens A Φ q x) volume := by
   intro e X _ _ _ A Φ q S G hS hq hfin hsm hG
   classical
   obtain ⟨Pt⟩ := existsPartition A
@@ -87,8 +113,8 @@ theorem aestronglyMeasurable_fibreSum_pushDens : ∀ {e : ℕ} {X : Type} [Topol
     refine addHaar_image_eq_zero_of_differentiableOn_of_addHaar_eq_zero volume ?_ ?_
     · intro u hu
       exact (hu.1.2.1.differentiableAt.restrictScalars ℝ).differentiableWithinAt
-    · exact measure_mono_null
-        (Set.inter_subset_inter_left _ fun u (hu : u ∈ goodT A q j) => hu.1) (hS j)
+    · exact measure_mono_null (Set.inter_subset_inter_left _ fun u (hu : u ∈ goodT A q j) => hu.1)
+        (hS j)
   have hfinj : ∀ j, ∀ᵐ y, (goodT A q j ∩ (q ∘ (A.chart j).symm) ⁻¹' {y}).Finite := by
     intro j
     filter_upwards [measure_eq_zero_iff_ae_notMem.mp (hN j)] with y hy
@@ -102,13 +128,15 @@ theorem aestronglyMeasurable_fibreSum_pushDens : ∀ {e : ℕ} {X : Type} [Topol
   have hjm : ∀ j, AEStronglyMeasurable (hj j) (volume.restrict (goodT A q j)) := fun j =>
     (((hχc j).aestronglyMeasurable (A.chart j).open_target.measurableSet).mul (hG j)).mono_measure
       (Measure.restrict_mono (by exact fun u hu => hu.1) le_rfl)
-  have hsum := sum_fibSum_ae A q S hN hq hfin Pt hj (fun x => G x * pushDens A Φ q x) (by
-    intro j x hx hxS
-    have hd := locDens_div_jacN A Φ q S hq hsm j hx hxS
-    simp only [hhj, (A.chart j).left_inv hx]
-    rw [← hd]
-    ring)
+  have hsum :=
+    sum_fibSum_ae A q S hN hq hfin Pt hj (fun x => G x * pushDens A Φ q x) (by
+      intro j x hx hxS
+      have hd := locDens_div_jacN A Φ q S hq hsm j hx hxS
+      simp only [hhj, (A.chart j).left_inv hx]
+      rw [← hd]
+      ring)
   exact (Finset.aestronglyMeasurable_fun_sum Finset.univ fun j _ =>
-    aestronglyMeasurable_fibSum (isOpen_goodT A q j) (fun u hu => hu.2) (hjm j) (hfinj j)).congr hsum
+      aestronglyMeasurable_fibSum (isOpen_goodT A q j) (fun u hu => hu.2) (hjm j) (hfinj j)).congr
+    hsum
 
 end GlobalTheory.CompanionTheory.Ar.Giv.Push

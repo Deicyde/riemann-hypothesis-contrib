@@ -9,24 +9,44 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem mem_of_pow_mem_of_integrally_closed {Ω : Type} [Field Ω] (R : Subring Ω)
-    (hR : ∀ z : Ω, IsIntegral R z → z ∈ R) {z : Ω} {m : ℕ} (hm : 0 < m) (h : z ^ m ∈ R) :
-    z ∈ R := by
-  refine hR z ⟨Polynomial.X ^ m - Polynomial.C ⟨z ^ m, h⟩, Polynomial.monic_X_pow_sub_C _ hm.ne', ?_⟩
+theorem mem_of_pow_mem_of_integrally_closed
+    {Ω : Type} [Field Ω]
+    (R : Subring Ω) (hR : ∀ z : Ω, IsIntegral R z → z ∈ R)
+    {z : Ω} {m : ℕ} (hm : 0 < m) (h : z ^ m ∈ R)
+    : z ∈ R := by
+  refine hR z
+    ⟨Polynomial.X ^ m - Polynomial.C ⟨z ^ m, h⟩, Polynomial.monic_X_pow_sub_C _ hm.ne', ?_⟩
   simp only [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C]
   exact sub_eq_zero.2 rfl
 
-theorem valuation_pow_zpow_eq_of_mul_eq {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
+theorem valuation_pow_zpow_eq_of_mul_eq
+    {F : Type} [Field F] [NumberField F]
+    (v : HeightOneSpectrum (𝓞 F))
     {π α : F} {n k : ℤ} {m M : ℕ} (hπ : v.valuation F π = WithZero.exp (-1 : ℤ))
-    (hα : v.valuation F α = WithZero.exp (-k)) (h : n * M = m * k) :
-    v.valuation F ((π ^ n) ^ M) = v.valuation F (α ^ m) := by
+    (hα : v.valuation F α = WithZero.exp (-k)) (h : n * M = m * k)
+    : v.valuation F ((π ^ n) ^ M) = v.valuation F (α ^ m) := by
   rw [map_pow, map_zpow₀, hπ, map_pow, hα, ← WithZero.exp_zsmul, ← WithZero.exp_nsmul,
     ← WithZero.exp_nsmul]
   congr 1
   simp only [smul_eq_mul, nsmul_eq_mul]
   linear_combination -h
 
-theorem exists_global_generator : ∀ (F Ω X : Type) [Field F] [NumberField F] [Field Ω] (φ : F →+* Ω) (R : X → Subring Ω) (s : X → Ω) (pl : X → Option (HeightOneSpectrum (𝓞 F))) (r : HeightOneSpectrum (𝓞 F) →₀ ℚ), (∀ x, ∀ z : Ω, IsIntegral (R x) z → z ∈ R x) → (∀ x, pl x = none → (∀ a : F, φ a ∈ R x) ∧ s x ∈ R x ∧ s x ≠ 0 ∧ (s x)⁻¹ ∈ R x) → (∀ x v, pl x = some v → (∀ a : F, v.valuation F a ≤ 1 → φ a ∈ R x) ∧ ∃ (m : ℕ) (n : ℤ) (π : F), 0 < m ∧ (n : ℚ) = m * r v ∧ v.valuation F π = WithZero.exp (-1 : ℤ) ∧ s x ≠ 0 ∧ s x ^ m / φ π ^ n ∈ R x ∧ φ π ^ n / s x ^ m ∈ R x) → ∃ (M : ℕ) (α : F), 0 < M ∧ α ≠ 0 ∧ (∀ v : HeightOneSpectrum (𝓞 F), ∃ n : ℤ, (n : ℚ) = M * r v ∧ v.valuation F α = WithZero.exp (-n)) ∧ ∀ x, s x ^ M / φ α ∈ R x ∧ φ α / s x ^ M ∈ R x := by
+theorem exists_global_generator
+    : ∀ (F Ω X : Type) [Field F] [NumberField F] [Field Ω] (φ : F →+* Ω) (R : X → Subring Ω)
+        (s : X → Ω) (pl : X → Option (HeightOneSpectrum (𝓞 F))) (r : HeightOneSpectrum (𝓞 F) →₀ ℚ),
+      (∀ x, ∀ z : Ω, IsIntegral (R x) z → z ∈ R x)
+        → (∀ x, pl x = none → (∀ a : F, φ a ∈ R x) ∧ s x ∈ R x ∧ s x ≠ 0 ∧ (s x)⁻¹ ∈ R x)
+        → (∀ x v,
+          pl x = some v
+            → (∀ a : F, v.valuation F a ≤ 1 → φ a ∈ R x)
+              ∧ ∃ (m : ℕ) (n : ℤ) (π : F),
+                0 < m ∧ (n : ℚ) = m * r v ∧ v.valuation F π = WithZero.exp (-1 : ℤ) ∧ s x ≠ 0
+                  ∧ s x ^ m / φ π ^ n ∈ R x ∧ φ π ^ n / s x ^ m ∈ R x)
+        → ∃ (M : ℕ) (α : F),
+          0 < M ∧ α ≠ 0
+            ∧ (∀ v : HeightOneSpectrum (𝓞 F), ∃ n : ℤ,
+              (n : ℚ) = M * r v ∧ v.valuation F α = WithZero.exp (-n))
+            ∧ ∀ x, s x ^ M / φ α ∈ R x ∧ φ α / s x ^ M ∈ R x := by
   intro F Ω X _ _ _ φ R s pl r hR hgen hsp
   obtain ⟨M, α, hM, hα0, hval⟩ := exists_pow_principal F r
   refine ⟨M, α, hM, hα0, hval, fun x => ?_⟩

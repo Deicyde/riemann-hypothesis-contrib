@@ -10,7 +10,8 @@ set_option linter.overlappingInstances false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -19,36 +20,46 @@ namespace ReciprocityTheory.ChartRestriction.G.DVR.TG
 
 open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out IsLocalRing
 
-variable {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R] {I : Ideal R} {D : DegData R I}
-  {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R] [IsLocalRing R]
+  {I : Ideal R} {D : DegData R I} {A : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G]
 
-
 set_option maxHeartbeats 1000000 in
-theorem leading_expansion_term_ne_zero [IsDiscreteValuationRing R] (hI : I = maximalIdeal R) (U : Unif I D A G) (s : H0 U.LG.L 1)
-    (hs : NonzeroOnSpecial U s) (g : ∀ α, D.toPre.SecB 1 α) (hexp : U.ExpandsAt 0 1 s g)
-    (hv : ∀ mu, mu ≠ 0 → ∀ j, (pullback.fst D.toPre.P.A.hom (thick R I 0)).app _ ((g mu).f j) = 0) :
-    ¬ ∀ j, (pullback.fst D.toPre.P.A.hom (thick R I 0)).app _ ((g 0).f j) = 0 := by
+theorem leading_expansion_term_ne_zero
+    [IsDiscreteValuationRing R]
+    (hI : I = maximalIdeal R)
+    (U : Unif I D A G) (s : H0 U.LG.L 1) (hs : NonzeroOnSpecial U s)
+    (g : ∀ α, D.toPre.SecB 1 α) (hexp : U.ExpandsAt 0 1 s g)
+    (hv : ∀ mu, mu ≠ 0 → ∀ j, (pullback.fst D.toPre.P.A.hom (thick R I 0)).app _ ((g mu).f j) = 0)
+    : ¬ ∀ j, (pullback.fst D.toPre.P.A.hom (thick R I 0)).app _ ((g 0).f j) = 0 := by
   intro h0
   subst hI
 
-  have hloc : ∀ {X : Scheme.{0}} {W : X.Opens} (y : Γ(X, W)),
-      (∀ x ∈ W, ∃ V : X.Opens, ∃ hV : V ≤ W, x ∈ V ∧ (X.presheaf.map (homOfLE hV).op).hom y = 0) →
-        y = 0 := by
+  have hloc
+      : ∀ {X : Scheme.{0}} {W : X.Opens} (y : Γ(X, W)),
+        (∀ x ∈ W, ∃ V : X.Opens, ∃ hV : V ≤ W, x ∈ V ∧ (X.presheaf.map (homOfLE hV).op).hom y = 0)
+          → y = 0 := by
     intro X W y h
     choose V hV hxV hy using h
-    refine TopCat.Sheaf.eq_of_locally_eq' X.sheaf (fun p : W => V p.1 p.2) W
-      (fun p => homOfLE (hV p.1 p.2)) ?_ y 0 ?_
+    refine TopCat.Sheaf.eq_of_locally_eq' X.sheaf
+      (fun p : W => V p.1 p.2)
+      W
+      (fun p => homOfLE (hV p.1 p.2))
+      ?_ y 0 ?_
     · intro x hx
       exact TopologicalSpace.Opens.mem_iSup.mpr ⟨⟨x, hx⟩, hxV x hx⟩
     · intro p
       exact (hy p.1 p.2).trans (map_zero _).symm
 
-  have hvan : ∀ (α : D.toPre.X) (j : Fin 4 → D.toPre.P.L.ι),
-      ((U.gt 0).pG.left.app (D.toPre.P.L.wchart (D.toPre.famφB α) j)).hom ((g α).f j) = 0 := by
+  have hvan
+      : ∀ (α : D.toPre.X) (j : Fin 4 → D.toPre.P.L.ι),
+        ((U.gt 0).pG.left.app (D.toPre.P.L.wchart (D.toPre.famφB α) j)).hom ((g α).f j) = 0 := by
     intro α j
-    have hz : ((pullback.fst D.toPre.P.A.hom (thick R (maximalIdeal R) 0)).app
-        ((D.toPre.P.L.LinComb (D.toPre.famφB α) (DegPre.famε 1)).U j)).hom ((g α).f j) = 0 := by
+    have hz
+        : ((pullback.fst D.toPre.P.A.hom (thick R (maximalIdeal R) 0)).app
+            ((D.toPre.P.L.LinComb (D.toPre.famφB α) (DegPre.famε 1)).U j)).hom ((g α).f j)
+          = 0 := by
       by_cases hα : α = 0
       · subst hα
         exact h0 j
@@ -63,28 +74,42 @@ theorem leading_expansion_term_ne_zero [IsDiscreteValuationRing R] (hI : I = max
   choose ch hch using fun y : D.toPre.P.A.left => WeightPf.exists_chart D.toPre.P.L D.toPre.P.isLB y
   apply hj
   refine hloc _ fun x hx => ?_
-  refine ⟨U.expW 0 (fun _ => ch ((U.gt 0).pG.left.base x), fun _ => j 0) j S
+  refine ⟨
+    U.expW 0 (fun _ => ch ((U.gt 0).pG.left.base x), fun _ => j 0) j S
       (fun α i => ch (((U.gt 0).pG.left ≫ D.toPre.famφB α i).base x))
       (fun α i => ch ((D.toPre.Oφ (U.gt 0).pG α i).base x)),
-    inf_le_left.trans inf_le_right, ?_, ?_⟩
-  · refine TopologicalSpace.Opens.mem_inf.mpr ⟨TopologicalSpace.Opens.mem_inf.mpr
-      ⟨TopologicalSpace.Opens.mem_inf.mpr ⟨?_, ?_⟩, hx⟩, ?_⟩
+    inf_le_left.trans inf_le_right,
+    ?_,
+    ?_
+  ⟩
+  · refine TopologicalSpace.Opens.mem_inf.mpr
+      ⟨TopologicalSpace.Opens.mem_inf.mpr ⟨TopologicalSpace.Opens.mem_inf.mpr ⟨?_, ?_⟩, hx⟩, ?_⟩
     · exact Set.mem_iInter.mpr fun _ => hch _
     · exact Set.mem_iInter.mpr fun _ => Set.mem_iInter.mp hx 0
-    · exact WeightPf.mem_finset_inf S _ x fun α _ => TopologicalSpace.Opens.mem_inf.mpr
-        ⟨Set.mem_iInter.mpr fun i => hch _, Set.mem_iInter.mpr fun i => hch _⟩
-  · have e := hS (fun _ => ch ((U.gt 0).pG.left.base x), fun _ => j 0) j
-      (fun α i => ch (((U.gt 0).pG.left ≫ D.toPre.famφB α i).base x))
-      (fun α i => ch ((D.toPre.Oφ (U.gt 0).pG α i).base x)) rfl (by
-        intro a b hab
-        rcases a with _ | a | a <;> rcases b with _ | b | b <;>
-          exact congrArg (fun f => ch (f.base x)) hab)
-    rw [Finset.sum_eq_zero (fun α _ => by rw [hvan, map_zero, zero_mul]), ← Units.val_pow_eq_pow_val] at e
+    · exact WeightPf.mem_finset_inf S _ x fun α _ =>
+        TopologicalSpace.Opens.mem_inf.mpr
+          ⟨Set.mem_iInter.mpr fun i => hch _, Set.mem_iInter.mpr fun i => hch _⟩
+  · have e :=
+      hS (fun _ => ch ((U.gt 0).pG.left.base x), fun _ => j 0) j
+        (fun α i => ch (((U.gt 0).pG.left ≫ D.toPre.famφB α i).base x))
+        (fun α i => ch ((D.toPre.Oφ (U.gt 0).pG α i).base x))
+        rfl
+        (by
+          intro a b hab
+          rcases a with _ | a | a <;> rcases b with _ | b | b
+            <;> exact congrArg (fun f => ch (f.base x)) hab)
+    rw [Finset.sum_eq_zero (fun α _ => by rw [hvan, map_zero, zero_mul]),
+        ← Units.val_pow_eq_pow_val]
+      at e
     exact (Units.mul_right_eq_zero _).mp e
 
-theorem generates_of_ne (hLaws : Laws) [IsDiscreteValuationRing R] (hI : I = maximalIdeal R)
-    (t : D.toPre.SecB 1 0) (ht : ¬ ∀ j, (pullback.fst D.toPre.P.A.hom (thick R I 0)).app _ (t.f j) = 0) :
-    SecBGenerates 1 0 t := by
+theorem generates_of_ne
+    (hLaws : Laws)
+    [IsDiscreteValuationRing R]
+    (hI : I = maximalIdeal R)
+    (t : D.toPre.SecB 1 0)
+    (ht : ¬ ∀ j, (pullback.fst D.toPre.P.A.hom (thick R I 0)).app _ (t.f j) = 0)
+    : SecBGenerates 1 0 t := by
   unfold SecBGenerates
   intro s'
   obtain ⟨c₀, c', h, h0⟩ := secB_rank_one (hLaws := hLaws) (t := t) (s' := s')

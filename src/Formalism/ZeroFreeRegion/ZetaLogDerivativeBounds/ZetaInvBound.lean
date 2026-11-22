@@ -94,13 +94,15 @@ theorem zetaInvBound_statement : ZetaInvBound := by
   have hinv := eq_inv_of_mul_eq_one_right hL
   rw [← norm_inv, ← hinv]
   have hσ : 0 < s.re - 1 := by linarith
-  have hsum1 : Summable fun n : ℕ => ((n : ℝ) + 1) ^ (-(s.re - 1) - 1) := summable_shift (by linarith)
+  have hsum1 : Summable fun n : ℕ => ((n : ℝ) + 1) ^ (-(s.re - 1) - 1) :=
+    summable_shift (by linarith)
   have hs1 : Summable fun n => ‖term (1 : ℕ → ℂ) s n‖ := by
     rw [← summable_nat_add_iff 1]
     simpa only [norm_term_one_succ] using hsum1
   have hsμ : Summable fun n => ‖term (fun n => ((moebius n : ℤ) : ℂ)) s n‖ :=
     Summable.of_nonneg_of_le (fun _ => norm_nonneg _) (norm_term_moebius_le s) hs1
-  calc ‖LSeries (fun n => ((moebius n : ℤ) : ℂ)) s‖
+  calc
+    ‖LSeries (fun n => ((moebius n : ℤ) : ℂ)) s‖
       ≤ ∑' n, ‖term (fun n => ((moebius n : ℤ) : ℂ)) s n‖ := norm_tsum_le_tsum_norm hsμ
     _ ≤ ∑' n, ‖term (1 : ℕ → ℂ) s n‖ := Summable.tsum_le_tsum (norm_term_moebius_le s) hsμ hs1
     _ = ∑' n : ℕ, ((n : ℝ) + 1) ^ (-(s.re - 1) - 1) := by

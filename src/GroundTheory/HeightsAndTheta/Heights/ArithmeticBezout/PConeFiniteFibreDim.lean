@@ -25,20 +25,25 @@ open scoped Matrix
 
 noncomputable section
 
-theorem exists_mem_zeroSet_mulVec_eq {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)}
-    {B : Matrix (Fin d) (Fin n) ℂ} (hB : ComplexSets.IsFiniteProjection J B) (x : Fin d → ℂ) :
-    ∃ z ∈ ComplexSets.zeroSet J, B *ᵥ z = x := by
+theorem exists_mem_zeroSet_mulVec_eq
+    {n d : ℕ} {J : Ideal (MvPolynomial (Fin n) ℂ)} {B : Matrix (Fin d) (Fin n) ℂ}
+    (hB : ComplexSets.IsFiniteProjection J B) (x : Fin d → ℂ)
+    : ∃ z ∈ ComplexSets.zeroSet J, B *ᵥ z = x := by
   let _ : Algebra (MvPolynomial (Fin d) ℂ) (MvPolynomial (Fin n) ℂ ⧸ J) :=
     (ComplexSets.projHom J B).toRingHom.toAlgebra
   have _ : Algebra.IsIntegral (MvPolynomial (Fin d) ℂ) (MvPolynomial (Fin n) ℂ ⧸ J) :=
     ⟨fun y => hB.finite.to_isIntegral y⟩
   have _ : (RingHom.ker (eval x)).IsMaximal :=
     RingHom.ker_isMaximal_of_surjective _ fun c => ⟨C c, eval_C c⟩
-  obtain ⟨Q, hQ, hQP⟩ := Ideal.exists_ideal_over_maximal_of_isIntegral
-    (S := MvPolynomial (Fin n) ℂ ⧸ J) (RingHom.ker (eval x)) (by
-      intro q hq
-      have hq0 : q = 0 := hB.injective (by rw [RingHom.mem_ker] at hq; exact hq.trans (map_zero _).symm)
-      rw [hq0]; exact Ideal.zero_mem _)
+  obtain ⟨Q, hQ, hQP⟩ :=
+    Ideal.exists_ideal_over_maximal_of_isIntegral (S := MvPolynomial (Fin n) ℂ ⧸ J)
+      (RingHom.ker (eval x))
+      (by
+        intro q hq
+        have hq0 : q = 0 :=
+          hB.injective (by rw [RingHom.mem_ker] at hq; exact hq.trans (map_zero _).symm)
+        rw [hq0]
+        exact Ideal.zero_mem _)
   have hQ' : (Q.comap (Ideal.Quotient.mk J)).IsMaximal :=
     Ideal.comap_isMaximal_of_surjective _ Ideal.Quotient.mk_surjective
   obtain ⟨z, hz⟩ := MvPolynomial.isMaximal_iff_eq_vanishingIdeal_singleton.1 hQ'
@@ -49,8 +54,9 @@ theorem exists_mem_zeroSet_mulVec_eq {n d : ℕ} {J : Ideal (MvPolynomial (Fin n
   · have hi : X i - C (x i) ∈ RingHom.ker (eval x) := by simp [RingHom.mem_ker]
     rw [← hQP, Ideal.mem_comap] at hi
     change ComplexSets.projHom J B (X i - C (x i)) ∈ Q at hi
-    have h1 : ComplexSets.projHom J B (X i - C (x i)) =
-        Ideal.Quotient.mk J (ComplexSets.linPoly B i - C (x i)) := by
+    have h1
+        : ComplexSets.projHom J B (X i - C (x i))
+          = Ideal.Quotient.mk J (ComplexSets.linPoly B i - C (x i)) := by
       simp [ComplexSets.projHom, ComplexSets.pullback]
     rw [h1, hmem, map_sub, eval_C, sub_eq_zero] at hi
     rw [← hi]
@@ -82,14 +88,15 @@ theorem ConeFiniteFibreDim.proof : ConeFiniteFibreDim.Statement := by
     ComplexSets.FiniteProjectionsContainOpen.proof ComplexSets.ConeAvoidsFinite.proof
       ComplexSets.FiniteProjHomInjective.proof ComplexSets.ConeAvoidsOpen.proof
       (ComplexSets.ConeAvoidsExists.proof ComplexSets.LeadIdealDim.proof
-        ComplexSets.LinearFormCut.proof ComplexSets.HomogDimZeroPow.proof) n (m + k) J inferInstance hd
+        ComplexSets.LinearFormCut.proof ComplexSets.HomogDimZeroPow.proof)
+      n (m + k) J inferInstance hd
 
   set N : Matrix (Fin n) (Fin n) ℂ := (h.mat)ᵀ⁻¹
   have hdet : IsUnit (h.mat)ᵀ.det := by rw [Matrix.det_transpose]; exact h.isUnit_det
   have hMN : (h.mat)ᵀ * N = 1 := Matrix.mul_nonsing_inv _ hdet
 
-  let blk : ((Fin m × Fin n) ⊕ (Fin k × Fin n) → ℂ) → Matrix (Fin (m + k)) (Fin n) ℂ :=
-    fun v i j => Fin.addCases (motive := fun _ => ℂ) (fun a => v (.inl (a, j))) (fun b => v (.inr (b, j))) i
+  let blk : ((Fin m × Fin n) ⊕ (Fin k × Fin n) → ℂ) → Matrix (Fin (m + k)) (Fin n) ℂ := fun v i j =>
+    Fin.addCases (motive := fun _ => ℂ) (fun a => v (.inl (a, j))) (fun b => v (.inr (b, j))) i
   let g : Fin (m + k) × Fin n → MvPolynomial ((Fin m × Fin n) ⊕ (Fin k × Fin n)) ℂ := fun ij =>
     ∑ l, Fin.addCases (motive := fun _ => MvPolynomial ((Fin m × Fin n) ⊕ (Fin k × Fin n)) ℂ)
       (fun a => X (.inl (a, l))) (fun b => X (.inr (b, l))) ij.1 * C (N l ij.2)
@@ -107,7 +114,8 @@ theorem ConeFiniteFibreDim.proof : ConeFiniteFibreDim.Statement := by
   have hP0 : bind₁ g p ≠ 0 := by
     intro h0'
     let v₀ : (Fin m × Fin n) ⊕ (Fin k × Fin n) → ℂ :=
-      Sum.elim (fun aj => (A₀ * (h.mat)ᵀ) (Fin.castAdd k aj.1) aj.2)
+      Sum.elim
+        (fun aj => (A₀ * (h.mat)ᵀ) (Fin.castAdd k aj.1) aj.2)
         (fun bj => (A₀ * (h.mat)ᵀ) (Fin.natAdd m bj.1) bj.2)
     have hv₀ : blk v₀ = A₀ * (h.mat)ᵀ := by
       ext i j
@@ -117,11 +125,13 @@ theorem ConeFiniteFibreDim.proof : ConeFiniteFibreDim.Statement := by
     exact hp this.symm
 
   have h1 := ConeFibreDegree.ae_eval_ne_zero_univ _ hP0
-  have h2 := (volume_measurePreserving_sumPiEquivProdPi_symm
-    (fun _ : (Fin m × Fin n) ⊕ (Fin k × Fin n) => ℂ)).quasiMeasurePreserving.ae h1
+  have h2 :=
+    (volume_measurePreserving_sumPiEquivProdPi_symm (fun _ : (Fin m × Fin n) ⊕ (Fin k × Fin n) =>
+      ℂ)).quasiMeasurePreserving.ae h1
   have h3 := Measure.ae_ae_of_ae_prod h2
-  have h4 : ∀ᵐ a : Fin m × Fin n → ℂ, ∃ b : Fin k × Fin n → ℂ,
-      eval ((MeasurableEquiv.sumPiEquivProdPi _).symm (a, b)) (bind₁ g p) ≠ 0 :=
+  have h4
+      : ∀ᵐ a : Fin m × Fin n → ℂ, ∃ b : Fin k × Fin n → ℂ,
+        eval ((MeasurableEquiv.sumPiEquivProdPi _).symm (a, b)) (bind₁ g p) ≠ 0 :=
     h3.mono fun a ha => ha.exists
   have h5 := (measurePreserving_curry_matrix m n).symm.quasiMeasurePreserving.ae h4
   have _ : (ae (volume : Measure (Fin m → Fin n → ℂ))).NeBot := by
@@ -139,11 +149,14 @@ theorem ConeFiniteFibreDim.proof : ConeFiniteFibreDim.Statement := by
 
   obtain ⟨w, hw⟩ := hπ.exists
   apply hw
-  have key : ∀ c : ℂ, ∃ y : EuclideanSpace ℂ (Fin n), (y ∈ coneSet h J ∧ linProj π y = w) ∧
-      (blk v *ᵥ fun j => y j) (Fin.natAdd m ⟨0, hk⟩) = c := by
+  have key
+      : ∀ c : ℂ, ∃ y : EuclideanSpace ℂ (Fin n),
+        (y ∈ coneSet h J ∧ linProj π y = w)
+          ∧ (blk v *ᵥ fun j => y j) (Fin.natAdd m ⟨0, hk⟩) = c := by
     intro c
-    obtain ⟨z, hz, hBz⟩ := exists_mem_zeroSet_mulVec_eq hfin
-      (Fin.addCases (motive := fun _ => ℂ) (fun a => w a) (fun _ => c))
+    obtain ⟨z, hz, hBz⟩ :=
+      exists_mem_zeroSet_mulVec_eq hfin
+        (Fin.addCases (motive := fun _ => ℂ) (fun a => w a) (fun _ => c))
     rw [← Matrix.mulVec_mulVec] at hBz
     have hpt : h.pointOf (WithLp.toLp 2 (N *ᵥ z)) = z := by
       simp [HermNorm.pointOf, Matrix.mulVec_mulVec, hMN]
@@ -157,8 +170,7 @@ theorem ConeFiniteFibreDim.proof : ConeFiniteFibreDim.Statement := by
       rw [Fin.addCases_right] at this
       exact this
   choose y hy hyc using key
-  have hinj : Function.Injective y := fun c₁ c₂ he => by
-    rw [← hyc c₁, ← hyc c₂, he]
+  have hinj : Function.Injective y := fun c₁ c₂ he => by rw [← hyc c₁, ← hyc c₂, he]
   exact (Set.infinite_of_injective_forall_mem hinj hy).encard_eq
 
 end

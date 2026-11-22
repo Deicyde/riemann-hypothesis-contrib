@@ -12,8 +12,7 @@ open LateralTheory.E.E4 LateralTheory.E.LeafClosedSH0Pf
 
 theorem emptySec : LeafEmptySec := by
   intro R _ F X hX
-  have hb : (⊥ : Sieve X) ∈ Scheme.etaleTopology X := by
-    exact Scheme.bot_mem_grothendieckTopology X
+  have hb : (⊥ : Sieve X) ∈ Scheme.etaleTopology X := by exact Scheme.bot_mem_grothendieckTopology X
   have hT := Sheaf.isTerminalOfBotCover F X hb
   have hZ : IsZero (F.obj.obj (op X)) := hT.isZero
   exact (ModuleCat.isZero_iff_subsingleton.mp hZ)

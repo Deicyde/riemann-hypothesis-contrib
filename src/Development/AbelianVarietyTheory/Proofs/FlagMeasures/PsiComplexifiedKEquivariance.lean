@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IwasawaInt
 
 @[expose] public section
 
-open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
+open MeasureTheory Matrix Finset Formalism.MainNotions.S Formalism.REAL
+  Formalism.QuantumDeterminants GlobalTheory.Count GlobalTheory.Dec
 open scoped InnerProductSpace ComplexOrder
 
 noncomputable section
@@ -43,7 +44,9 @@ lemma KC_conjT {ε : Fin n → Bool} {a : Matrix (Fin n) (Fin n) ℂ} (ha : a �
   simp only [Matrix.conjTranspose_mul, Jm_conjTranspose] at h
   exact h.symm
 
-variable {ε : Fin n → Bool} {abelian₂ : Fin n → ℝ} {W : Type} [NormedAddCommGroup W] [InnerProductSpace ℂ W]
+variable
+  {ε : Fin n → Bool} {abelian₂ : Fin n → ℝ} {W : Type}
+  [NormedAddCommGroup W] [InnerProductSpace ℂ W]
   {τ : Matrix (Fin n) (Fin n) ℂ → (W →L[ℂ] W)} {w : W}
 
 lemma tau_diag (hτ : IsTau ε abelian₂ τ w) (r : Fin n → ℝ) :
@@ -163,7 +166,8 @@ lemma scalar_eq {lam : Fin n → ℝ} (hlam : IsHCParam lam) (ε : Fin n → Boo
 theorem psEquiv_of (hT : PhiTri) (hP : PhiPos) (hI : IwasawaKC) (hH : IwasawaInt) : PsEquiv := by
   intro n ε lam W _ _ τ w hlam hτ x y hx hy
   have hyd := (Matrix.isUnit_iff_isUnit_det y).1 hy.1
-  have hx' : (y * x * yᴴ).PosDef := hx.mul_mul_conjTranspose_same (Matrix.vecMul_injective_of_isUnit hy.1)
+  have hx' : (y * x * yᴴ).PosDef :=
+    hx.mul_mul_conjTranspose_same (Matrix.vecMul_injective_of_isUnit hy.1)
   obtain ⟨κ, β, hκ, -⟩ := hI n ε
   have hmem : ∀ k : KG ε, y⁻¹ * toMK k ∈ KC ε := fun k => KC_mul (KC_inv hy) (FormF.K_KC k.2)
   ext u
@@ -171,22 +175,33 @@ theorem psEquiv_of (hT : PhiTri) (hP : PhiPos) (hI : IwasawaKC) (hH : IwasawaInt
   have hadj : ∀ a : W, ⟪v, τ y a⟫_ℂ = ⟪τ yᴴ v, a⟫_ℂ := fun a => by
     rw [hτ.2.2.2.1 _ (KC_conjT hy), Matrix.conjTranspose_conjTranspose]
   rw [ContinuousLinearMap.comp_apply, ContinuousLinearMap.comp_apply, hadj,
-    FormF.psEntry hP n ε lam W τ w hτ.1 (tau_cont hτ) _ hx', FormF.psEntry hP n ε lam W τ w hτ.1 (tau_cont hτ) _ hx]
+    FormF.psEntry hP n ε lam W τ w hτ.1 (tau_cont hτ) _ hx',
+    FormF.psEntry hP n ε lam W τ w hτ.1 (tau_cont hτ) _ hx]
   congr 1
-  have hF : ContinuousOn (fun k : Matrix (Fin n) (Fin n) ℂ =>
-      Phi lam (k⁻¹ * x * k) * (⟪τ yᴴ v, τ k w⟫_ℂ * ⟪τ k w, τ yᴴ u⟫_ℂ)) (Kset ε) := by
-    refine ContinuousOn.mul ?_ ((ContinuousOn.inner (𝕜 := ℂ) continuousOn_const (tau_cont hτ w)).mul
-      (ContinuousOn.inner (𝕜 := ℂ) (tau_cont hτ w) continuousOn_const))
-    refine ContinuousOn.congr (f := fun k => Phi lam (kᴴ * x * k)) ?_ fun k hk => by simp only [FormF.K_inv hk]
+  have hF : ContinuousOn
+      (fun k : Matrix (Fin n) (Fin n) ℂ =>
+        Phi lam (k⁻¹ * x * k) * (⟪τ yᴴ v, τ k w⟫_ℂ * ⟪τ k w, τ yᴴ u⟫_ℂ))
+      (Kset ε) := by
+    refine ContinuousOn.mul ?_
+      ((ContinuousOn.inner (𝕜 := ℂ) continuousOn_const (tau_cont hτ w)).mul
+        (ContinuousOn.inner (𝕜 := ℂ) (tau_cont hτ w) continuousOn_const))
+    refine ContinuousOn.congr
+      (f := fun k => Phi lam (kᴴ * x * k))
+      ?_
+      fun k hk => by simp only [FormF.K_inv hk]
     unfold Phi
     refine continuousOn_finsetProd _ fun i _ => ContinuousOn.zpow₀ ?_ _ fun k hk => Or.inl ?_
     · unfold leadMinor
       exact (((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul
         continuous_id).matrix_submatrix _ _).matrix_det.continuousOn
-    · exact (hP n lam _ (hx.conjTranspose_mul_mul_same
-        (Matrix.mulVec_injective_of_isUnit (FormF.K_KC hk).1))).1 i
-  rw [← hH n ε y⁻¹ (fun k => κ (y⁻¹ * toMK k)) (fun k => β (y⁻¹ * toMK k)) (KC_inv hy)
-    (fun k => hκ _ (hmem k)) _ hF]
+    · exact (hP n lam _
+        (hx.conjTranspose_mul_mul_same (Matrix.mulVec_injective_of_isUnit (FormF.K_KC hk).1))).1 i
+  rw [← hH n ε y⁻¹
+    (fun k => κ (y⁻¹ * toMK k))
+    (fun k => β (y⁻¹ * toMK k))
+    (KC_inv hy)
+    (fun k => hκ _ (hmem k))
+    _ hF]
   congr 1
   funext k
   obtain ⟨h1, h2, h3, h4, h5⟩ := hκ _ (hmem k)
@@ -199,8 +214,7 @@ theorem psEquiv_of (hT : PhiTri) (hP : PhiPos) (hI : IwasawaKC) (hH : IwasawaInt
   have hc : cᴴ = b * gᴴ * y := by
     rw [← FormF.K_inv h1]
     apply Matrix.inv_eq_left_inv
-    have : gᴴ * y * c * b = 1 := by
-      rw [Matrix.mul_assoc, Matrix.mul_assoc, ← hg, hgg]
+    have : gᴴ * y * c * b = 1 := by rw [Matrix.mul_assoc, Matrix.mul_assoc, ← hg, hgg]
     have := mul_eq_one_comm.1 this
     simpa only [Matrix.mul_assoc] using this
   have hz : c⁻¹ * x * c = b * (g⁻¹ * (y * x * yᴴ) * g) * bᴴ := by
@@ -213,9 +227,10 @@ theorem psEquiv_of (hT : PhiTri) (hP : PhiPos) (hI : IwasawaKC) (hH : IwasawaInt
   have hne : ∀ l, b l l ≠ 0 := fun l => (h4 l).ne'
   have hΩ : g⁻¹ * (y * x * yᴴ) * g ∈ Omega n := by
     rw [FormF.K_inv hk]
-    exact (hP n lam _ (hx'.conjTranspose_mul_mul_same
-        (Matrix.mulVec_injective_of_isUnit (FormF.K_KC hk).1))).1
-  have hΦ := (hT n lam b _ bᴴ h3 (fun i j h => by simp [h3 j i h]) (fun l => ⟨hne l, by simp [hne l]⟩) hΩ).2
+    exact (hP n lam _
+      (hx'.conjTranspose_mul_mul_same (Matrix.mulVec_injective_of_isUnit (FormF.K_KC hk).1))).1
+  have hΦ :=
+    (hT n lam b _ bᴴ h3 (fun i j h => by simp [h3 j i h]) (fun l => ⟨hne l, by simp [hne l]⟩) hΩ).2
   have hw : τ g w = ((∏ l, ‖b l l‖ ^ (-(lowK ε lam l)) : ℝ) : ℂ) • τ y (τ c w) := by
     conv_lhs => rw [hg]
     rw [hτ.2.1.2 _ hy _ (KC_mul (FormF.K_KC h1) h2), hτ.2.1.2 _ (FormF.K_KC h1) _ h2]
@@ -226,6 +241,8 @@ theorem psEquiv_of (hT : PhiTri) (hP : PhiPos) (hI : IwasawaKC) (hH : IwasawaInt
   simp only [Matrix.conjTranspose_apply]
   linear_combination (-(Phi lam (g⁻¹ * (y * x * yᴴ) * g) * (⟪τ yᴴ v, τ c w⟫_ℂ * ⟪τ c w, τ yᴴ u⟫_ℂ))) * hs
 
-theorem psEquiv : PsEquiv := psEquiv_of GlobalTheory.PhiTriangular.phiTri GlobalTheory.Dec.phiPos GlobalTheory.Dec.iwasawaKC GlobalTheory.IwaInt.iwasawaInt
+theorem psEquiv : PsEquiv :=
+  psEquiv_of GlobalTheory.PhiTriangular.phiTri GlobalTheory.Dec.phiPos GlobalTheory.Dec.iwasawaKC
+    GlobalTheory.IwaInt.iwasawaInt
 
 end GlobalTheory.Dec.Equivar

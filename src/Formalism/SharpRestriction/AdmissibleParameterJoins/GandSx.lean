@@ -9,15 +9,19 @@ noncomputable section
 
 namespace Formalism.MainNotions.J
 
-open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions.G Formalism.MainNotions.WeilJacquetShalikaLaw
+open Formalism.BasicNotions Formalism.BasicNotions.DV Formalism.MainNotions.G
+  Formalism.MainNotions.WeilJacquetShalikaLaw
 
 variable {D : D7} {L : SizeData₂ D}
 
-theorem sumFE_atG_le {K : Consts} {lev : LevelData D} {Xe : ErrX D} {ce : ErrC} {C1 : ℝ} (hF : L.FDef)
-    (hE : ErrDefs D L Xe lev K ce) (hC1 : 0 ≤ C1) (hC : 2 * C1 ≤ ce.g) (i : Fin 2) (w : D.what₂.places.Pl)
-    (hwi : D.what₂.places.resChar w = D.host.g i) (u : D.what₂.Word) (hw : D.what₂.places.resChar w ≠ (D.mem u).A.T) :
-    ∑ j ∈ SizeData₂.lifts D, (L.F j w - L.E u j w) ≤
-      -(∑ j ∈ Formalism.MainNotions.LiftErrorLocal.lifts D, vNN Xe i u j w) - C1 * Formalism.MainNotions.LiftErrorLocal.errC D L := by
+theorem sumFE_atG_le
+    {K : Consts} {lev : LevelData D} {Xe : ErrX D} {ce : ErrC} {C1 : ℝ}
+    (hF : L.FDef) (hE : ErrDefs D L Xe lev K ce) (hC1 : 0 ≤ C1) (hC : 2 * C1 ≤ ce.g)
+    (i : Fin 2) (w : D.what₂.places.Pl) (hwi : D.what₂.places.resChar w = D.host.g i)
+    (u : D.what₂.Word) (hw : D.what₂.places.resChar w ≠ (D.mem u).A.T)
+    : ∑ j ∈ SizeData₂.lifts D, (L.F j w - L.E u j w)
+      ≤ -(∑ j ∈ Formalism.MainNotions.LiftErrorLocal.lifts D, vNN Xe i u j w)
+        - C1 * Formalism.MainNotions.LiftErrorLocal.errC D L := by
   have hg : D.what₂.places.resChar w ∈ L.gTypes := by
     rw [hwi]
     unfold SizeData₂.gTypes
@@ -45,13 +49,17 @@ theorem sumFE_atG_le {K : Consts} {lev : LevelData D} {Xe : ErrX D} {ce : ErrC} 
   have hη := L.etaSz_pos.le
   have hN0 : 0 ≤ Nm D := by unfold Nm; positivity
   have ht : (D.R.t : ℝ) ≤ Nm D := by
-    have h1 : D.R.t + 1 ≤ D.R.m * (D.R.t + 1) := Nat.le_mul_of_pos_left _ (by have := D.R.two_le_m; omega)
+    have h1 : D.R.t + 1 ≤ D.R.m * (D.R.t + 1) :=
+      Nat.le_mul_of_pos_left _ (by have := D.R.two_le_m; omega)
     have h2 : D.R.t ≤ D.R.N D.R.m := by unfold Ranks.N; omega
     unfold Nm
     exact_mod_cast h2
-  have hA0 : 0 ≤ A := mul_nonneg (Nat.cast_nonneg _) (add_nonneg (sq_nonneg _) (mul_nonneg (sq_nonneg _) hη))
+  have hA0 : 0 ≤ A :=
+    mul_nonneg (Nat.cast_nonneg _) (add_nonneg (sq_nonneg _) (mul_nonneg (sq_nonneg _) hη))
   have hBA : B ≤ 2 * A := by
-    have h3 : Nm D * (Nm D + D.R.t) + (D.R.m : ℝ) ^ 2 * L.etaSz ≤ 2 * (Nm D ^ 2 + (D.R.m : ℝ) ^ 2 * L.etaSz) := by
+    have h3
+        : Nm D * (Nm D + D.R.t) + (D.R.m : ℝ) ^ 2 * L.etaSz
+          ≤ 2 * (Nm D ^ 2 + (D.R.m : ℝ) ^ 2 * L.etaSz) := by
       nlinarith [mul_le_mul_of_nonneg_left ht hN0, mul_nonneg (sq_nonneg (D.R.m : ℝ)) hη]
     have h4 := mul_le_mul_of_nonneg_left h3 (Nat.cast_nonneg D.R.f : (0 : ℝ) ≤ (D.R.f : ℝ))
     rw [hA, hB]
@@ -59,16 +67,19 @@ theorem sumFE_atG_le {K : Consts} {lev : LevelData D} {Xe : ErrX D} {ce : ErrC} 
   have hcard : ((SizeData₂.lifts D).card : ℝ) = D.R.m := by
     unfold SizeData₂.lifts
     simp
-  have hsum : ∑ j ∈ SizeData₂.lifts D, (L.F j w - L.E u j w) =
-      -(∑ j ∈ SizeData₂.lifts D, vNN Xe i u j w) - (D.R.m : ℝ) * (ce.g * A) - (D.R.m : ℝ) * vDG D u w := by
-    have : ∀ j ∈ SizeData₂.lifts D, L.F j w - L.E u j w = -vNN Xe i u j w - (ce.g * A + vDG D u w) := by
+  have hsum
+      : ∑ j ∈ SizeData₂.lifts D, (L.F j w - L.E u j w)
+        = -(∑ j ∈ SizeData₂.lifts D, vNN Xe i u j w) - (D.R.m : ℝ) * (ce.g * A)
+          - (D.R.m : ℝ) * vDG D u w := by
+    have : ∀ j ∈ SizeData₂.lifts D,
+        L.F j w - L.E u j w = - vNN Xe i u j w - (ce.g * A + vDG D u w) := by
       intro j hj
       rw [hFj j hj, hEj j hj]
       unfold EatG
       rw [hA]
       ring
-    rw [Finset.sum_congr rfl this, Finset.sum_sub_distrib, Finset.sum_neg_distrib, Finset.sum_const, nsmul_eq_mul,
-      hcard]
+    rw [Finset.sum_congr rfl this, Finset.sum_sub_distrib, Finset.sum_neg_distrib, Finset.sum_const,
+      nsmul_eq_mul, hcard]
     ring
   have hEr : Formalism.MainNotions.LiftErrorLocal.errC D L = (D.R.m : ℝ) * B := by
     unfold Formalism.MainNotions.LiftErrorLocal.errC

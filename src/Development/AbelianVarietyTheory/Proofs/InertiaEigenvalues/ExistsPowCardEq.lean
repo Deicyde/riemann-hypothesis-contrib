@@ -8,9 +8,10 @@ namespace GlobalTheory.CardinalPower
 
 open IntermediateField
 
-theorem exists_pow_card_eq {K L : Type} [Field K] [Fintype K] [Field L] [Algebra K L]
-    [Algebra.IsAlgebraic K L] (σ : Gal(L/K)) (X : Finset L) :
-    ∃ i : ℕ, ∀ x ∈ X, (σ : L → L) x = x ^ Fintype.card K ^ i := by
+theorem exists_pow_card_eq
+    {K L : Type} [Field K] [Fintype K] [Field L] [Algebra K L] [Algebra.IsAlgebraic K L]
+    (σ : Gal(L/K)) (X : Finset L)
+    : ∃ i : ℕ, ∀ x ∈ X, (σ : L → L) x = x ^ Fintype.card K ^ i := by
   classical
   let M : IntermediateField K L := adjoin K (X : Set L)
   haveI : FiniteDimensional K M :=

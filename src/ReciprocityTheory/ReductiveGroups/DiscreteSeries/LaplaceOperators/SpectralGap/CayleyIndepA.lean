@@ -43,16 +43,17 @@ variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 
 section Conj
 
-variable (σ₁ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) {a b : Matrix (Fin n) (Fin n) ℂ}
-  (hrep : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ₁)
-  (hab : a * b = 1) (hba : b * a = 1) (ha : a ∈ Formalism.REAL.Kset ε) (hb : b ∈ Formalism.REAL.Kset ε)
+variable
+  (σ₁ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+  {a b : Matrix (Fin n) (Fin n) ℂ}
+  (hrep : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ₁) (hab : a * b = 1)
+  (hba : b * a = 1) (ha : a ∈ Formalism.REAL.Kset ε) (hb : b ∈ Formalism.REAL.Kset ε)
 
 include hrep hab ha hb in
 lemma ab_cancel (x : H) : σ₁ a (σ₁ b x) = x := by
   have h := hrep.1.2 a (kset_uj ha) b (kset_uj hb)
   rw [hab, hrep.1.1] at h
   rw [← ContinuousLinearMap.comp_apply, ← h, ContinuousLinearMap.one_apply]
-
 
 include hrep ha hb in
 lemma conj_apply {g : Matrix (Fin n) (Fin n) ℂ} (hg : g ∈ Formalism.MainNotions.S.UJset ε) (x : H) :
@@ -77,9 +78,11 @@ namespace ReciprocityTheory.ChartRestriction.DS.Lap.CayleyIndepA
 
 variable {n : ℕ} {ε : Fin n → Bool}
 variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-variable (σ₁ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) {a b : Matrix (Fin n) (Fin n) ℂ}
-  (hrep : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ₁)
-  (hab : a * b = 1) (hba : b * a = 1) (ha : a ∈ Formalism.REAL.Kset ε) (hb : b ∈ Formalism.REAL.Kset ε)
+variable
+  (σ₁ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+  {a b : Matrix (Fin n) (Fin n) ℂ}
+  (hrep : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) σ₁) (hab : a * b = 1)
+  (hba : b * a = 1) (ha : a ∈ Formalism.REAL.Kset ε) (hb : b ∈ Formalism.REAL.Kset ε)
 
 include hrep hab hba ha hb in
 lemma urep_conj : Formalism.MainNotions.S.IsURepOn (Formalism.MainNotions.S.UJset ε) (fun g => σ₁ (b * g * a)) := by
@@ -182,6 +185,5 @@ lemma ktype_iff (μ : Fin n → ℝ) (S : Submodule ℂ H) :
       ⟨σ₁ b v, hs b hb v hvS, ne_a σ₁ hrep hb hv0, wt12 σ₁ hrep hab ha hb hwt⟩, ?_⟩
     intro μ' u huS hu0 hwu
     exact hdom μ' (σ₁ a u) (hs a ha u huS) (ne_a σ₁ hrep ha hu0) (wt21 σ₁ hrep hab ha hb hwu)
-
 
 end ReciprocityTheory.ChartRestriction.DS.Lap.CayleyIndepA

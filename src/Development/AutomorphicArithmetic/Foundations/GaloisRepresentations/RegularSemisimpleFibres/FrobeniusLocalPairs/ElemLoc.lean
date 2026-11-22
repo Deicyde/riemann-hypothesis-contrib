@@ -13,6 +13,6 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.TwistedL
 @[expose] public section
 
 open UpperTheory.Gal.InertialTypesAlt.L in
-theorem UpperTheory.Gal.InertialTypesAlt.L.elemLoc :
-    UpperTheory.Gal.InertialTypesAlt.L.ElemLoc := elemLoc_of suppE oneField reps normOpen normDiag align volRatio
-  (fun E _ _ _ _ n r h0 h1 => UpperTheory.ConvolutionTheory.Loc.ballSub E n r h0 h1)
+theorem UpperTheory.Gal.InertialTypesAlt.L.elemLoc : UpperTheory.Gal.InertialTypesAlt.L.ElemLoc :=
+  elemLoc_of suppE oneField reps normOpen normDiag align volRatio
+    (fun E _ _ _ _ n r h0 h1 => UpperTheory.ConvolutionTheory.Loc.ballSub E n r h0 h1)

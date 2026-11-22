@@ -7,33 +7,44 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 open scoped MatrixGroups Matrix
 open GlobalTheory.KZ GlobalTheory.K4 UpperTheory.V.Z.Kato.Sym
 
-private theorem pow_mod_eq_pow_of_pow_eq_one' {F : Type} [Field F] {z : F} {m : ℕ} (h : z ^ m = 1) (k : ℕ) :
-    z ^ (k % m) = z ^ k := by
+private theorem pow_mod_eq_pow_of_pow_eq_one'
+    {F : Type} [Field F] {z : F} {m : ℕ} (h : z ^ m = 1) (k : ℕ)
+    : z ^ (k % m) = z ^ k := by
   conv_rhs => rw [← Nat.mod_add_div k m, pow_add, pow_mul, h, one_pow, mul_one]
 
-private theorem rt_add {F : Type} [Field F] {ζ : F} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m) (i j : ZMod m) :
-    ζ ^ (i + j).val = ζ ^ i.val * ζ ^ j.val := by
+private theorem rt_add
+    {F : Type} [Field F] {ζ : F} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m) (i j : ZMod m)
+    : ζ ^ (i + j).val = ζ ^ i.val * ζ ^ j.val := by
   haveI : NeZero m := ⟨hm.ne'⟩
   rw [ZMod.val_add, pow_mod_eq_pow_of_pow_eq_one' h.pow_eq_one, pow_add]
 
-private theorem rt_mul {F : Type} [Field F] {z : F} {m : ℕ} (h : z ^ m = 1) (i j : ZMod m) :
-    z ^ (i * j).val = (z ^ i.val) ^ j.val := by
+private theorem rt_mul {F : Type} [Field F] {z : F} {m : ℕ} (h : z ^ m = 1) (i j : ZMod m)
+    : z ^ (i * j).val = (z ^ i.val) ^ j.val := by
   rw [ZMod.val_mul, pow_mod_eq_pow_of_pow_eq_one' h, pow_mul]
 
-private theorem rt_inj {F : Type} [Field F] {ζ : F} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m) {i j : ZMod m}
-    (e : ζ ^ i.val = ζ ^ j.val) : i = j := by
+private theorem rt_inj
+    {F : Type} [Field F]
+    {ζ : F} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m)
+    {i j : ZMod m} (e : ζ ^ i.val = ζ ^ j.val)
+    : i = j := by
   haveI : NeZero m := ⟨hm.ne'⟩
   exact ZMod.val_injective m (h.pow_inj (ZMod.val_lt i) (ZMod.val_lt j) e)
 
-private theorem rt_ex {F : Type} [Field F] {ζ : F} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m) {z : F}
-    (hz : z ^ m = 1) : ∃ i : ZMod m, z = ζ ^ i.val := by
+private theorem rt_ex
+    {F : Type} [Field F]
+    {ζ : F} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m)
+    {z : F} (hz : z ^ m = 1)
+    : ∃ i : ZMod m, z = ζ ^ i.val := by
   haveI : NeZero m := ⟨hm.ne'⟩
   obtain ⟨k, hk, hk'⟩ := h.eq_pow_of_pow_eq_one hz
   refine ⟨(k : ZMod m), ?_⟩
   rw [ZMod.val_natCast, Nat.mod_eq_of_lt hk, hk']
 
-private theorem cyc_spec {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ζ : Ω} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m)
-    (s : Ω ≃ₐ[ℚ] Ω) : ∀ z : Ω, z ^ m = 1 → s z = z ^ (cyc m s).val := by
+private theorem cyc_spec
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ζ : Ω} {m : ℕ} (hm : 0 < m) (h : IsPrimitiveRoot ζ m)
+    (s : Ω ≃ₐ[ℚ] Ω)
+    : ∀ z : Ω, z ^ m = 1 → s z = z ^ (cyc m s).val := by
   have hsm : (s ζ) ^ m = 1 := by rw [← map_pow, h.pow_eq_one, map_one]
   obtain ⟨k, hk⟩ := rt_ex hm h hsm
   have hex : ∃ y : ZMod m, ∀ z : Ω, z ^ m = 1 → s z = z ^ y.val := by
@@ -43,8 +54,7 @@ private theorem cyc_spec {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ζ : Ω} {m : 
   unfold cyc
   exact Classical.epsilon_spec hex
 
-theorem UpperTheory.V.Z.Kato.Sym.lgB :
-    UpperTheory.V.Z.Kato.Sym.LgB := by
+theorem UpperTheory.V.Z.Kato.Sym.lgB : UpperTheory.V.Z.Kato.Sym.LgB := by
   intro Ω _ _ _ ε X m hm
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   have hζΩ : IsPrimitiveRoot (eOm ε (1 / (m : ℚ))) m := isPrimitiveRoot_eOm ε hm.ne'

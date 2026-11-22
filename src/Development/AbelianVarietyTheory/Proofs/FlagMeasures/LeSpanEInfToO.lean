@@ -8,9 +8,11 @@ open NumberField
 
 namespace GlobalTheory.SpanInfDenominators
 
-theorem exists_smul_mem {E : Type} [Field E] [NumberField E] {V : Type} [AddCommGroup V] [Module E V]
-    [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V] (Λ : Submodule (𝓞 E) V) (x : V)
-    (hx : x ∈ Submodule.span E (Λ : Set V)) : ∃ c : 𝓞 E, c ≠ 0 ∧ c • x ∈ Λ := by
+theorem exists_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {V : Type} [AddCommGroup V] [Module E V] [Module (𝓞 E) V] [IsScalarTower (𝓞 E) E V]
+    (Λ : Submodule (𝓞 E) V) (x : V) (hx : x ∈ Submodule.span E (Λ : Set V))
+    : ∃ c : 𝓞 E, c ≠ 0 ∧ c • x ∈ Λ := by
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by rw [one_smul]; exact hy⟩
   | zero => exact ⟨1, one_ne_zero, by rw [smul_zero]; exact Λ.zero_mem⟩
@@ -36,9 +38,11 @@ theorem exists_smul_mem {E : Type} [Field E] [NumberField E] {V : Type} [AddComm
     rw [key]
     exact Λ.smul_mem n hcy
 
-theorem le_spanE_inf_toO {E : Type} [Field E] [NumberField E] [StarRing E] {S : Formalism.BasicNotions.HSpace E}
-    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (U : Submodule E S.V) :
-    U ≤ Formalism.MainNotions.S.Lat.spanE S (Λ ⊓ Formalism.MainNotions.S.Lat.toO S U) := by
+theorem le_spanE_inf_toO
+    {E : Type} [Field E] [NumberField E] [StarRing E]
+    {S : Formalism.BasicNotions.HSpace E}
+    (Λ : Submodule (𝓞 E) S.V) (hΛ : Submodule.IsFullLattice E Λ) (U : Submodule E S.V)
+    : U ≤ Formalism.MainNotions.S.Lat.spanE S (Λ ⊓ Formalism.MainNotions.S.Lat.toO S U) := by
   intro x hx
   have hxs : x ∈ Submodule.span E (Λ : Set S.V) := by
     rw [hΛ.span_eq_top]

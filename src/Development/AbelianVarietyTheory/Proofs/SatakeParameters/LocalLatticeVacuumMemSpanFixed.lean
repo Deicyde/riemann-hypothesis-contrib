@@ -10,11 +10,18 @@ open Matrix
 
 namespace GlobalTheory.Hk3
 
-theorem locVac_mem_span_vac : ∀ (L : Type) [Field L] [CharZero L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L] (ϖ : L) (σ : L →+* L) (q : ℕ) (δ : L)
-    (n n' : ℕ) (JS : GL (Fin n) L) (JT : GL (Fin n') L) (ψ : AddChar L ℂ) (M : Type) [AddCommGroup M] [Module ℂ M]
-    (ρ : Matrix (Fin n') (Fin n) L → Module.End ℂ M)
-    (ω : Formalism.UG.UJ σ (JS : Matrix (Fin n) (Fin n) L) × Formalism.UG.UJ σ (JT : Matrix (Fin n') (Fin n') L) →* Module.End ℂ M), GlobalTheory.Hk3.LocPair ϖ σ q δ JS JT ψ ρ ω → ∀ s : M, GlobalTheory.Hk3.LocVac ρ s →
-    Submodule.span ℂ (Set.range fun x => ρ x s) = ⊤ → ∀ w : M, GlobalTheory.Hk3.LocVac ρ w → w ∈ Submodule.span ℂ {s} := by
+theorem locVac_mem_span_vac
+    : ∀ (L : Type) [Field L] [CharZero L] [Valued L (WithZero (Multiplicative ℤ))] [CompleteSpace L]
+        (ϖ : L) (σ : L →+* L) (q : ℕ) (δ : L) (n n' : ℕ) (JS : GL (Fin n) L) (JT : GL (Fin n') L)
+        (ψ : AddChar L ℂ) (M : Type) [AddCommGroup M] [Module ℂ M]
+        (ρ : Matrix (Fin n') (Fin n) L → Module.End ℂ M)
+        (ω : Formalism.UG.UJ σ (JS : Matrix (Fin n) (Fin n) L)
+            × Formalism.UG.UJ σ (JT : Matrix (Fin n') (Fin n') L)
+          →* Module.End ℂ M),
+      GlobalTheory.Hk3.LocPair ϖ σ q δ JS JT ψ ρ ω
+        → ∀ s : M,
+          GlobalTheory.Hk3.LocVac ρ s → Submodule.span ℂ (Set.range fun x => ρ x s) = ⊤
+            → ∀ w : M, GlobalTheory.Hk3.LocVac ρ w → w ∈ Submodule.span ℂ {s} := by
   intro L _ _ _ _ ϖ σ q δ n n' JS JT ψ M _ _ ρ ω hP s hvac hspan w hw
   classical
   have hind := locVac_span_classes_indep L ϖ σ q δ n n' JS JT ψ M ρ ω hP s hvac
@@ -25,22 +32,27 @@ theorem locVac_mem_span_vac : ∀ (L : Type) [Field L] [CharZero L] [Valued L (W
   have hψinv : ∀ a, ψ a * ψ (-a) = 1 := fun a => by
     rw [← AddChar.map_add_eq_mul, add_neg_cancel, AddChar.map_zero_eq_one]
   have hΛ : intMatSub (L := L) n n' = HoweDuality.intMat L n' n := AddSubgroup.ext fun _ => Iff.rfl
-  have hshift : ∀ x u, u ∈ intMatSub (L := L) n n' →
-      ρ (x + u) s = ψ (-((locH σ δ JS JT x u + σ (locH σ δ JS JT x u)) / 2)) • ρ x s := by
+  have hshift
+      : ∀ x u,
+        u ∈ intMatSub (L := L) n n'
+          → ρ (x + u) s = ψ (-((locH σ δ JS JT x u + σ (locH σ δ JS JT x u)) / 2)) • ρ x s := by
     intro x u hu
     have h1 : ρ x s = ψ ((locH σ δ JS JT x u + σ (locH σ δ JS JT x u)) / 2) • ρ (x + u) s := by
       have := congrArg (fun f => f s) (hρ x u)
       simp only [Module.End.mul_apply, LinearMap.smul_apply] at this
       rwa [hvac u hu] at this
     rw [h1, smul_smul, mul_comm, hψinv, one_smul]
-  have heig : ∀ x u, u ∈ intMatSub (L := L) n n' →
-      ρ u (ρ x s) = ψ (locH σ δ JS JT u x + σ (locH σ δ JS JT u x)) • ρ x s := by
+  have heig
+      : ∀ x u,
+        u ∈ intMatSub (L := L) n n'
+          → ρ u (ρ x s) = ψ (locH σ δ JS JT u x + σ (locH σ δ JS JT u x)) • ρ x s := by
     intro x u hu
     have := congrArg (fun f => f s) (hρ u x)
     simp only [Module.End.mul_apply, LinearMap.smul_apply] at this
     rw [this, add_comm u x, hshift x u hu, smul_smul, ← AddChar.map_add_eq_mul]
     congr 2
-    rw [hA u x, hA x u]; ring
+    rw [hA u x, hA x u]
+    ring
   set Λ := HoweDuality.intMat L n' n with hΛdef
   set V : Matrix (Fin n') (Fin n) L ⧸ Λ → Submodule ℂ M := fun c => Submodule.span ℂ {ρ c.out s} with hVdef
   have hVind : iSupIndep V := by
@@ -49,7 +61,9 @@ theorem locVac_mem_span_vac : ∀ (L : Type) [Field L] [CharZero L] [Valued L (W
     exact Submodule.subset_span ⟨c.out, QuotientAddGroup.out_eq' c, rfl⟩
   have hmemV : ∀ x, ρ x s ∈ V (QuotientAddGroup.mk x) := by
     intro x
-    have hm : -(QuotientAddGroup.mk x : Matrix (Fin n') (Fin n) L ⧸ Λ).out + x ∈ intMatSub (L := L) n n' := by
+    have hm
+        : -(QuotientAddGroup.mk x : Matrix (Fin n') (Fin n) L ⧸ Λ).out + x
+          ∈ intMatSub (L := L) n n' := by
       rw [hΛ]
       exact QuotientAddGroup.eq.mp (by rw [QuotientAddGroup.out_eq'])
     have := hshift (QuotientAddGroup.mk x : Matrix (Fin n') (Fin n) L ⧸ Λ).out _ hm
@@ -91,7 +105,8 @@ theorem locVac_mem_span_vac : ∀ (L : Type) [Field L] [CharZero L] [Valued L (W
         rw [hsum]
         refine Submodule.neg_mem _ (Submodule.sum_mem _ fun d hd => ?_)
         have hdc : d ≠ c := Finset.ne_of_mem_erase hd
-        exact Submodule.mem_iSup_of_mem d (Submodule.mem_iSup_of_mem hdc (Submodule.smul_mem _ _ (hf d)))
+        exact Submodule.mem_iSup_of_mem d
+          (Submodule.mem_iSup_of_mem hdc (Submodule.smul_mem _ _ (hf d)))
       have hz : (χ c u - 1) • f c = 0 := by
         have := (iSupIndep_def.mp hVind c)
         rw [Submodule.disjoint_def] at this
@@ -110,6 +125,7 @@ theorem locVac_mem_span_vac : ∀ (L : Type) [Field L] [CharZero L] [Valued L (W
   have := hf 0
   change f 0 ∈ Submodule.span ℂ {ρ (0 : Matrix (Fin n') (Fin n) L ⧸ Λ).out s} at this
   rw [hout] at this
-  rw [hw0]; exact this
+  rw [hw0]
+  exact this
 
 end GlobalTheory.Hk3

@@ -21,8 +21,9 @@ theorem PolynomialChartInjective.full : PolynomialChartInjective.Statement := by
   set F : (σ → ℂ) → Fin (k + 1) → ℂ := fun z j ↦ eval z (g j) with hF
   set L : (σ → ℂ) →L[ℂ] (Fin (k + 1) → ℂ) :=
     ContinuousLinearMap.pi fun j ↦ fderiv ℂ (fun z : σ → ℂ ↦ eval z (g j)) w with hL
-  have hFL : HasStrictFDerivAt F L w := hasStrictFDerivAt_pi.2 fun j ↦
-    (AnalyticOnNhd.eval_mvPolynomial (𝕜 := ℂ) (g j) w trivial).hasStrictFDerivAt
+  have hFL : HasStrictFDerivAt F L w :=
+    hasStrictFDerivAt_pi.2 fun j ↦
+      (AnalyticOnNhd.eval_mvPolynomial (𝕜 := ℂ) (g j) w trivial).hasStrictFDerivAt
   set r : Fin (k + 1) → σ → ℂ :=
     Fin.cons (fun i ↦ eval w (pderiv i t)) (fun j i ↦ eval w (pderiv i (f j))) with hr
   have hrow : ∀ j i, fderiv ℂ (fun z : σ → ℂ ↦ eval z (g j)) w (Pi.single i 1) = r j i := by
@@ -32,12 +33,14 @@ theorem PolynomialChartInjective.full : PolynomialChartInjective.Statement := by
   have hspan : Submodule.span ℂ (Set.range r) = ⊤ :=
     hlin.span_eq_top_of_card_eq_finrank' (by simp [Module.finrank_fintype_fun_eq_card, hk])
   have hinj : Function.Injective L := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro v hv
-    let ψ : (σ → ℂ) →ₗ[ℂ] ℂ :=
-      { toFun := fun u ↦ ∑ i, u i * v i
-        map_add' := fun a b ↦ by simp [add_mul, Finset.sum_add_distrib]
-        map_smul' := fun c a ↦ by simp [Finset.mul_sum, mul_assoc] }
+    let ψ : (σ → ℂ) →ₗ[ℂ] ℂ := {
+      toFun := fun u ↦ ∑ i, u i * v i
+      map_add' := fun a b ↦ by simp [add_mul, Finset.sum_add_distrib]
+      map_smul' := fun c a ↦ by simp [Finset.mul_sum, mul_assoc]
+    }
     have hker : Submodule.span ℂ (Set.range r) ≤ LinearMap.ker ψ := by
       rw [Submodule.span_le]
       rintro _ ⟨j, rfl⟩

@@ -10,7 +10,6 @@ open PositivityTheory.Rg.Rsw
 
 namespace GlobalTheory.CompanionTheory.HeckeEtaExist
 
-theorem heckeEta : HeckeEta :=
-  GlobalTheory.RawLift.exists_hecke_resEta
+theorem heckeEta : HeckeEta := GlobalTheory.RawLift.exists_hecke_resEta
 
 end GlobalTheory.CompanionTheory.HeckeEtaExist

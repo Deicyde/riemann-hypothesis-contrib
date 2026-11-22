@@ -10,12 +10,11 @@ namespace GlobalTheory
 
 open intervalIntegral Filter Topology
 
-theorem bichar_deriv_contDiff (k : ℕ) (Q : (Fin k → ℝ) → ℝ → ℂ)
-    (hQ : Continuous (Function.uncurry Q))
-    (hs : ∀ t s s', Q t (s + s') = Q t s * Q t s')
-    (ht : ∀ t t' s, Q (t + t') s = Q t s * Q t' s)
-    (h0 : ∀ t, Q t 0 = 1) :
-    ContDiff ℝ ∞ (fun t => deriv (Q t) 0) := by
+theorem bichar_deriv_contDiff
+    (k : ℕ) (Q : (Fin k → ℝ) → ℝ → ℂ)
+    (hQ : Continuous (Function.uncurry Q)) (hs : ∀ t s s', Q t (s + s') = Q t s * Q t s')
+    (ht : ∀ t t' s, Q (t + t') s = Q t s * Q t' s) (h0 : ∀ t, Q t 0 = 1)
+    : ContDiff ℝ ∞ (fun t => deriv (Q t) 0) := by
   have hQt : ∀ t, Continuous (Q t) := fun t =>
     hQ.comp (continuous_const.prodMk continuous_id : Continuous fun s : ℝ => (t, s))
   set g : (Fin k → ℝ) → ℝ → ℂ := fun t δ => ∫ r in (0:ℝ)..δ, Q t r with hgdef
@@ -23,8 +22,8 @@ theorem bichar_deriv_contDiff (k : ℕ) (Q : (Fin k → ℝ) → ℝ → ℂ)
     ((hQt t).integral_hasStrictDerivAt 0 x).hasDerivAt
   have hid : ∀ t s δ, Q t s * g t δ = g t (s + δ) - g t s := by
     intro t s δ
-    have hint : ∀ a b : ℝ, IntervalIntegrable (Q t) MeasureTheory.volume a b :=
-      fun a b => (hQt t).intervalIntegrable a b
+    have hint : ∀ a b : ℝ, IntervalIntegrable (Q t) MeasureTheory.volume a b := fun a b =>
+      (hQt t).intervalIntegrable a b
     simp only [hgdef]
     rw [integral_interval_sub_left (hint _ _) (hint _ _)]
     have h1 : ∫ x in (0:ℝ)..δ, Q t (x + s) = ∫ x in s..s + δ, Q t x := by
@@ -33,15 +32,15 @@ theorem bichar_deriv_contDiff (k : ℕ) (Q : (Fin k → ℝ) → ℝ → ℂ)
     rw [← h1]
     simp_rw [hs, intervalIntegral.integral_mul_const]
     ring
-  have hder : ∀ t δ, g t δ ≠ 0 → ∀ s,
-      HasDerivAt (Q t) ((Q t (s + δ) - Q t s) / g t δ) s := by
+  have hder : ∀ t δ, g t δ ≠ 0 → ∀ s, HasDerivAt (Q t) ((Q t (s + δ) - Q t s) / g t δ) s := by
     intro t δ hδ s
     have heq : Q t = fun u => (g t (u + δ) - g t u) / g t δ := by
       funext u; rw [← hid t u δ, mul_div_cancel_right₀ _ hδ]
     have ha : HasDerivAt (fun u => g t (u + δ)) (Q t (s + δ)) s :=
       HasDerivAt.comp_add_const s δ (hg t (s + δ))
-    have h1 : HasDerivAt (fun u => (g t (u + δ) - g t u) / g t δ)
-        ((Q t (s + δ) - Q t s) / g t δ) s := (ha.sub (hg t s)).div_const _
+    have h1
+        : HasDerivAt (fun u => (g t (u + δ) - g t u) / g t δ) ((Q t (s + δ) - Q t s) / g t δ) s :=
+      (ha.sub (hg t s)).div_const _
     rwa [← heq] at h1
   have hex : ∀ t, ∃ δ, g t δ ≠ 0 := by
     intro t
@@ -58,7 +57,8 @@ theorem bichar_deriv_contDiff (k : ℕ) (Q : (Fin k → ℝ) → ℝ → ℂ)
     have e : Q (t + t') = Q t * Q t' := funext fun s => by rw [Pi.mul_apply, ht]
     have hm := (hd t).mul (hd t')
     rw [← e] at hm
-    rw [hm.deriv, h0, h0]; ring
+    rw [hm.deriv, h0, h0]
+    ring
   let c : (Fin k → ℝ) →+ ℂ := AddMonoidHom.mk' (fun t => deriv (Q t) 0) hadd
   have hQ0 : ∀ s, Q 0 s = 1 := by
     intro s
@@ -74,17 +74,17 @@ theorem bichar_deriv_contDiff (k : ℕ) (Q : (Fin k → ℝ) → ℝ → ℂ)
     hgc.continuousAt.eventually_ne (by rw [hg01]; exact one_ne_zero)
   have hc0 : ContinuousAt c 0 := by
     have hQ1 : Continuous fun t => Q t 1 :=
-      hQ.comp (continuous_id.prodMk continuous_const : Continuous fun t => (t, (1:ℝ)))
+      hQ.comp (continuous_id.prodMk continuous_const : Continuous fun t => (t, (1 : ℝ)))
     have hf : ContinuousAt (fun t => (Q t 1 - 1) / g t 1) 0 :=
-      ((hQ1.sub continuous_const).continuousAt).div hgc.continuousAt (by rw [hg01]; exact one_ne_zero)
+      ((hQ1.sub continuous_const).continuousAt).div hgc.continuousAt
+        (by rw [hg01]; exact one_ne_zero)
     refine hf.congr ?_
     filter_upwards [hne] with t htne
     have := (hder t 1 htne 0).deriv
     simp only [zero_add, h0] at this
     simp [c, this]
   have hcc : Continuous c := continuous_of_continuousAt_zero c hc0
-  have : (fun t => deriv (Q t) 0) = ⇑(c.toRealLinearMap hcc) := by
-    funext t; simp [c]
+  have : (fun t => deriv (Q t) 0) = ⇑(c.toRealLinearMap hcc) := by funext t; simp [c]
   rw [this]
   exact (c.toRealLinearMap hcc).contDiff
 

@@ -56,12 +56,11 @@ lemma appLE_congr_hom {X Z : Scheme.{u}} {g g' : X ⟶ Z} (hg : g = g') {U : Z.O
 variable (A)
 variable {n m : ℕ}
 
-abbrev segreChart (k : Fin (n + 1)) (l : Fin (m + 1)) :
-    (projectiveSpace A (n * m + n + m)).Opens :=
+abbrev segreChart (k : Fin (n + 1)) (l : Fin (m + 1)) : (projectiveSpace A (n * m + n + m)).Opens :=
   Proj.basicOpen (grading A _) (X (segreIndex n m (k, l)))
 
-def segreZeta (k : Fin (n + 1)) (l : Fin (m + 1)) (a : Fin (n + 1)) (b : Fin (m + 1)) :
-    Γ(segreChart A k l, ⊤) :=
+def segreZeta (k : Fin (n + 1)) (l : Fin (m + 1)) (a : Fin (n + 1)) (b : Fin (m + 1))
+    : Γ(segreChart A k l, ⊤) :=
   (segreChart A k l).ι.appLE (segreChart A k l) ⊤ (Scheme.Opens.ι_preimage_self _).ge
     (chartHom (segreIndex n m (k, l)) (X (segreIndex n m (a, b))))
 
@@ -72,12 +71,12 @@ def segreChartConst (k : Fin (n + 1)) (l : Fin (m + 1)) : A →+* Γ(segreChart 
   ((segreChart A k l).ι.appLE (segreChart A k l) ⊤ (Scheme.Opens.ι_preimage_self _).ge).hom.comp
     ((chartHom (segreIndex n m (k, l))).comp C)
 
-def retrRing₁ (k : Fin (n + 1)) (l : Fin (m + 1)) :
-    MvPolynomial (Fin (n + 1)) A →+* Γ(segreChart A k l, ⊤) :=
+def retrRing₁ (k : Fin (n + 1)) (l : Fin (m + 1))
+    : MvPolynomial (Fin (n + 1)) A →+* Γ(segreChart A k l, ⊤) :=
   eval₂Hom (segreChartConst A k l) fun a => segreZeta A k l a l
 
-def retrRing₂ (k : Fin (n + 1)) (l : Fin (m + 1)) :
-    MvPolynomial (Fin (m + 1)) A →+* Γ(segreChart A k l, ⊤) :=
+def retrRing₂ (k : Fin (n + 1)) (l : Fin (m + 1))
+    : MvPolynomial (Fin (m + 1)) A →+* Γ(segreChart A k l, ⊤) :=
   eval₂Hom (segreChartConst A k l) fun b => segreZeta A k l k b
 
 lemma retrRing₁_irrelevant (k : Fin (n + 1)) (l : Fin (m + 1)) :
@@ -91,7 +90,8 @@ lemma retrRing₂_irrelevant (k : Fin (n + 1)) (l : Fin (m + 1)) :
 def segreRetr (k : Fin (n + 1)) (l : Fin (m + 1)) : (segreChart A k l).toScheme ⟶ prodP A n m :=
   pullback.lift
     (Proj.fromOfGlobalSections (grading A n) (retrRing₁ A k l) (retrRing₁_irrelevant A k l))
-    (Proj.fromOfGlobalSections (grading A m) (retrRing₂ A k l) (retrRing₂_irrelevant A k l)) (by
+    (Proj.fromOfGlobalSections (grading A m) (retrRing₂ A k l) (retrRing₂_irrelevant A k l))
+    (by
       rw [fromOfGlobalSections_toSpecBase, fromOfGlobalSections_toSpecBase]
       congr 3
       ext r
@@ -211,17 +211,18 @@ lemma segre_resLE_comp_segreRetr (k : Fin (n + 1)) (l : Fin (m + 1)) :
       rw [segre_resLE_appTop_chart A k l (X_mem _), segreRing_X, segreU_self, one_mul]
       rfl
 
-
 variable (n m) in
 instance isClosedImmersion_segre : IsClosedImmersion (segre A n m) := by
   rw [IsZariskiLocalAtTarget.iff_of_iSup_eq_top (P := @IsClosedImmersion)
-    (fun c => Proj.basicOpen (grading A (n * m + n + m)) (X c)) iSup_basicOpen_X]
+    (fun c => Proj.basicOpen (grading A (n * m + n + m)) (X c))
+    iSup_basicOpen_X]
   intro c
   obtain ⟨⟨k, l⟩, rfl⟩ := (segreIndex n m).surjective c
   rw [← Scheme.Hom.resLE_eq_morphismRestrict]
-  suffices key : ∀ (V : (prodP A n m).Opens) (_ : V = segreOpen A k l)
-      (e : V ≤ segre A n m ⁻¹ᵁ segreChart A k l),
-      IsClosedImmersion ((segre A n m).resLE (segreChart A k l) V e) from
+  suffices key
+      : ∀ (V : (prodP A n m).Opens) (_ : V = segreOpen A k l)
+          (e : V ≤ segre A n m ⁻¹ᵁ segreChart A k l),
+        IsClosedImmersion ((segre A n m).resLE (segreChart A k l) V e) from
     key _ (preimage_segreChart A k l) le_rfl
   rintro _ rfl _
   have hrange : Set.range (segreRetr A k l) ⊆ Set.range (segreOpen A k l).ι := by
@@ -231,20 +232,21 @@ instance isClosedImmersion_segre : IsClosedImmersion (segre A n m) := by
       rw [segreRetr_preimage]
       trivial
     exact this
-  have : IsAffine (segreChart A k l).toScheme :=
-    Proj.isAffineOpen_basicOpen _ _ (X_mem _) one_pos
-  have hσρ : (segre A n m).resLE (segreChart A k l) (segreOpen A k l)
-      (preimage_segreChart A k l).ge ≫
-        IsOpenImmersion.lift (segreOpen A k l).ι (segreRetr A k l) hrange = 𝟙 _ := by
+  have : IsAffine (segreChart A k l).toScheme := Proj.isAffineOpen_basicOpen _ _ (X_mem _) one_pos
+  have hσρ
+      : (segre A n m).resLE (segreChart A k l) (segreOpen A k l) (preimage_segreChart A k l).ge
+          ≫ IsOpenImmersion.lift (segreOpen A k l).ι (segreRetr A k l) hrange
+        = 𝟙 _ := by
     rw [← cancel_mono (segreOpen A k l).ι, Category.assoc, IsOpenImmersion.lift_fac,
       Category.id_comp]
     exact segre_resLE_comp_segreRetr A k l
-  have : IsClosedImmersion ((segre A n m).resLE (segreChart A k l) (segreOpen A k l)
-      (preimage_segreChart A k l).ge ≫
-        IsOpenImmersion.lift (segreOpen A k l).ι (segreRetr A k l) hrange) := by
+  have : IsClosedImmersion
+      ((segre A n m).resLE (segreChart A k l) (segreOpen A k l) (preimage_segreChart A k l).ge
+        ≫ IsOpenImmersion.lift (segreOpen A k l).ι (segreRetr A k l) hrange) := by
     rw [hσρ]
     infer_instance
-  exact IsClosedImmersion.of_comp _ (IsOpenImmersion.lift (segreOpen A k l).ι (segreRetr A k l) hrange)
+  exact IsClosedImmersion.of_comp _
+    (IsOpenImmersion.lift (segreOpen A k l).ι (segreRetr A k l) hrange)
 
 end ProjSpace
 end

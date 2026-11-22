@@ -4,8 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.V.Th.fNil :
-    ∀ (K S : Type) [CommRing K] [IsDomain K] [CommRing S] (f : K →+* S) (n N q : ℕ) (α : Fin n → K) (U : Fin n → S), (∀ k, (U k - f (α k)) ^ N = 0) → ¬ (∀ i i', i ≠ i' → α i ≠ α i' ∧ α i ≠ (q : K) * α i') → (∏ i : Fin n, ∏ i' ∈ Finset.univ.erase i, (U i - U i') * (U i - (q : S) * U i')) ^ (2 * N) = 0 := by
+theorem UpperTheory.V.Th.fNil
+    : ∀ (K S : Type) [CommRing K] [IsDomain K] [CommRing S] (f : K →+* S) (n N q : ℕ)
+        (α : Fin n → K) (U : Fin n → S),
+      (∀ k, (U k - f (α k)) ^ N = 0) → ¬(∀ i i', i ≠ i' → α i ≠ α i' ∧ α i ≠ (q : K) * α i')
+        → (∏ i : Fin n, ∏ i' ∈ Finset.univ.erase i, (U i - U i') * (U i - (q : S) * U i')) ^ (2 * N)
+          = 0 := by
   intro K S _ _ _ f n N q α U hU hne
   simp only [not_forall] at hne
   obtain ⟨i, i', hii', hα⟩ := hne
@@ -37,10 +41,12 @@ theorem UpperTheory.V.Th.fNil :
     rcases hcase with h | h
     · rw [h, zero_mul]
     · rw [h, mul_zero]
-  have hdvd : (U i - U i') * (U i - (q : S) * U i') ∣
-      ∏ j : Fin n, ∏ j' ∈ Finset.univ.erase j, (U j - U j') * (U j - (q : S) * U j') :=
-    (Finset.dvd_prod_of_mem (fun j' => (U i - U j') * (U i - (q : S) * U j'))
-      (Finset.mem_erase.2 ⟨hii'.symm, Finset.mem_univ _⟩)).trans
+  have hdvd
+      : (U i - U i') * (U i - (q : S) * U i')
+        ∣ ∏ j : Fin n, ∏ j' ∈ Finset.univ.erase j, (U j - U j') * (U j - (q : S) * U j') :=
+    (Finset.dvd_prod_of_mem
+        (fun j' => (U i - U j') * (U i - (q : S) * U j'))
+        (Finset.mem_erase.2 ⟨hii'.symm, Finset.mem_univ _⟩)).trans
       (Finset.dvd_prod_of_mem
         (fun j => ∏ j' ∈ Finset.univ.erase j, (U j - U j') * (U j - (q : S) * U j'))
         (Finset.mem_univ i))

@@ -31,12 +31,9 @@ public import Formalism.LocalToGlobal.PairingIndexBounds.SplitPairEquations.Inte
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.HeightShare.star_sqrt_neg :
-    ∀ {D : Formalism.BasicNotions.D7} (x : D.host.E) (n : ℕ),
-    (0 : ℕ) < n →
-      x ^ (2 : ℕ) = -(↑n : D.host.E) →
-        Star.star x =
-          -x := by
+theorem UpperTheory.Reformulated.B.HeightShare.star_sqrt_neg
+    : ∀ {D : Formalism.BasicNotions.D7} (x : D.host.E) (n : ℕ),
+      (0 : ℕ) < n → x ^ (2 : ℕ) = -(↑n : D.host.E) → Star.star x = -x := by
   intro D x n hn hx
   haveI := D.host.isCMField_hostE
   have hc : D.host.φ₀ (star x) = starRingEnd ℂ (D.host.φ₀ x) :=

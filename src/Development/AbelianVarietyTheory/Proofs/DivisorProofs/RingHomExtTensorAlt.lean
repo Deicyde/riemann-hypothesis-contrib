@@ -8,10 +8,11 @@ namespace GlobalTheory.TensorRingHomExtensionality
 
 open scoped TensorProduct
 
-theorem ringHom_ext_tensor {R S B C : Type} [CommRing R] [CommRing S] [CommRing B] [CommRing C]
-    [Algebra R S] [Algebra R B] (φ ψ : TensorProduct R S B →+* C)
-    (h₁ : ∀ s : S, φ (s ⊗ₜ[R] (1 : B)) = ψ (s ⊗ₜ[R] (1 : B)))
-    (h₂ : ∀ b : B, φ ((1 : S) ⊗ₜ[R] b) = ψ ((1 : S) ⊗ₜ[R] b)) : φ = ψ := by
+theorem ringHom_ext_tensor
+    {R S B C : Type} [CommRing R] [CommRing S] [CommRing B] [CommRing C] [Algebra R S] [Algebra R B]
+    (φ ψ : TensorProduct R S B →+* C) (h₁ : ∀ s : S, φ (s ⊗ₜ[R] (1 : B)) = ψ (s ⊗ₜ[R] (1 : B)))
+    (h₂ : ∀ b : B, φ ((1 : S) ⊗ₜ[R] b) = ψ ((1 : S) ⊗ₜ[R] b))
+    : φ = ψ := by
   refine RingHom.ext fun x => ?_
   induction x using TensorProduct.induction_on with
   | zero => rw [map_zero, map_zero]

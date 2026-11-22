@@ -50,8 +50,8 @@ theorem isUnit_iff_norm_eq_one (x : O) : IsUnit x ↔ ‖(x : C)‖ = 1 := by
 
 variable (p : ℕ)
 
-theorem mem_span_pow_iff (n : ℕ) (x : O) :
-    x ∈ (span {(p : O)} ^ n • ⊤ : Submodule O O) ↔ ‖(x : C)‖ ≤ ‖(p : C)‖ ^ n := by
+theorem mem_span_pow_iff (n : ℕ) (x : O)
+    : x ∈ (span {(p : O)} ^ n • ⊤ : Submodule O O) ↔ ‖(x : C)‖ ≤ ‖(p : C)‖ ^ n := by
   rw [smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow, Ideal.mem_span_singleton,
     dvd_iff_norm_le]
   push_cast
@@ -59,15 +59,15 @@ theorem mem_span_pow_iff (n : ℕ) (x : O) :
 
 variable [hp : Fact (‖(p : C)‖ < 1)]
 
-instance : Fact ¬IsUnit (p : O) :=
-  ⟨by rw [isUnit_iff_norm_eq_one]; exact_mod_cast hp.out.ne⟩
+instance : Fact ¬ IsUnit (p : O) := ⟨by rw [isUnit_iff_norm_eq_one]; exact_mod_cast hp.out.ne⟩
 
 instance [CompleteSpace C] : IsAdicComplete (span {(p : O)}) O where
   haus' x hx := by
     have ht := tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg (p : C)) hp.out
-    have : ‖(x : C)‖ ≤ 0 := ge_of_tendsto' ht fun n => by
-      have := hx n
-      rwa [SModEq.zero, mem_span_pow_iff] at this
+    have : ‖(x : C)‖ ≤ 0 :=
+      ge_of_tendsto' ht fun n => by
+        have := hx n
+        rwa [SModEq.zero, mem_span_pow_iff] at this
     exact Subtype.ext (norm_le_zero_iff.1 this)
   prec' f hf := by
     have ht := tendsto_pow_atTop_nhds_zero_of_lt_one (norm_nonneg (p : C)) hp.out
@@ -82,8 +82,7 @@ instance [CompleteSpace C] : IsAdicComplete (span {(p : O)}) O where
     refine ⟨⟨L, (mem_iff L).2 hL1⟩, fun n => ?_⟩
     rw [SModEq.sub_mem, mem_span_pow_iff]
     have : dist (f n : C) L ≤ ‖(p : C)‖ ^ n :=
-      le_of_tendsto (tendsto_const_nhds.dist hL)
-        (eventually_atTop.2 ⟨n, fun m hm => h1 n m hm⟩)
+      le_of_tendsto (tendsto_const_nhds.dist hL) (eventually_atTop.2 ⟨n, fun m hm => h1 n m hm⟩)
     rw [dist_eq_norm] at this
     exact_mod_cast this
 
@@ -108,11 +107,10 @@ omit hp in
 instance [IsAlgClosed C] : IsAlgClosed (FractionRing O) :=
   IsAlgClosed.of_ringEquiv C _ (FractionRing.algEquiv O C).symm.toRingEquiv
 
-@[simp] theorem awayEquiv_algebraMap [CharZero C] [NeZero p] (x : O) :
-    awayEquiv O p (algebraMap O _ x) = (x : C) := (awayEquiv O p).commutes x
-
-
-
+@[simp]
+theorem awayEquiv_algebraMap [CharZero C] [NeZero p] (x : O)
+    : awayEquiv O p (algebraMap O _ x) = (x : C) :=
+  (awayEquiv O p).commutes x
 
 section Action
 
@@ -121,7 +119,6 @@ variable (G : Type v) [Monoid G] [MulSemiringAction G C] [IsIsometricSMul G C]
 omit hp in
 theorem norm_smul_eq (g : G) (x : C) : ‖g • x‖ = ‖x‖ := by
   simpa using (isometry_smul C g).dist_eq x 0
-
 
 omit hp in
 instance : MulSemiringAction G O where
@@ -133,7 +130,6 @@ instance : MulSemiringAction G O where
   smul_one g := Subtype.ext (smul_one g)
   smul_mul g x y := Subtype.ext (smul_mul' g (x : C) y)
 
-
 end Action
 
 end IsUnitBall
@@ -142,13 +138,12 @@ section Completion
 
 open UniformSpace
 
-variable (G : Type v) [Monoid G] (E : Type u) [NormedField E] [MulSemiringAction G E]
-  [IsIsometricSMul G E]
+variable
+  (G : Type v) [Monoid G] (E : Type u) [NormedField E] [MulSemiringAction G E] [IsIsometricSMul G E]
 
-instance (priority := 100) uniformContinuousConstSMul_of_isIsometricSMul :
-    UniformContinuousConstSMul G E :=
+instance (priority := 100) uniformContinuousConstSMul_of_isIsometricSMul
+    : UniformContinuousConstSMul G E :=
   ⟨fun g => (isometry_smul E g).uniformContinuous⟩
-
 
 open UniformSpace in
 instance completionMulSemiringAction : MulSemiringAction G (Completion E) where
@@ -159,8 +154,8 @@ instance completionMulSemiringAction : MulSemiringAction G (Completion E) where
       (isClosed_eq ((continuous_fst.fun_mul continuous_snd).fun_const_smul g)
         ((continuous_fst.fun_const_smul g).fun_mul (continuous_snd.fun_const_smul g)))
       fun a b => ?_
-    rw [← Completion.coe_mul, ← Completion.coe_smul, ← Completion.coe_smul,
-      ← Completion.coe_smul, smul_mul', Completion.coe_mul]
+    rw [← Completion.coe_mul, ← Completion.coe_smul, ← Completion.coe_smul, ← Completion.coe_smul,
+      smul_mul', Completion.coe_mul]
 
 open UniformSpace in
 instance completionIsIsometricSMul : IsIsometricSMul G (Completion E) :=
@@ -175,7 +170,8 @@ variable (p : ℕ) [Fact p.Prime]
 instance : IsUnitBall (PadicComplexInt p) :=
   ⟨fun x => by
     rw [PadicComplexInt, Valuation.mem_valuationSubring_iff, PadicComplex.norm_eq_norm,
-      Valuation.norm_def, ← NNReal.coe_one, NNReal.coe_le_coe, (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl),
+      Valuation.norm_def, ← NNReal.coe_one, NNReal.coe_le_coe,
+      (show Valuation.RankLeOne.hom' Valued.v = MonoidWithZeroHom.ValueGroup₀.embedding from rfl),
       Valuation.embedding_restrict]⟩
 
 instance : Fact (‖(p : ℂ_[p])‖ < 1) :=
@@ -184,16 +180,20 @@ instance : Fact (‖(p : ℂ_[p])‖ < 1) :=
       ← map_natCast (algebraMap ℚ_[p] (PadicAlgCl p))]
     exact (PadicAlgCl.norm_extends p p).trans_lt Padic.norm_p_lt_one⟩
 
-instance (K : Type*) [Field K] [Algebra ℚ_[p] K] [Algebra K (PadicAlgCl p)]
-    [IsScalarTower ℚ_[p] K (PadicAlgCl p)] :
-    IsIsometricSMul (PadicAlgCl p ≃ₐ[K] PadicAlgCl p) (PadicAlgCl p) :=
-  ⟨fun g => Isometry.of_dist_eq fun x y => by
-    rw [dist_eq_norm, dist_eq_norm, ← smul_sub]
-    exact (spectralNorm_eq_of_equiv (g.restrictScalars ℚ_[p]) (x - y)).symm⟩
+instance
+    (K : Type*)
+    [Field K] [Algebra ℚ_[p] K] [Algebra K (PadicAlgCl p)] [IsScalarTower ℚ_[p] K (PadicAlgCl p)]
+    : IsIsometricSMul (PadicAlgCl p ≃ₐ[K] PadicAlgCl p) (PadicAlgCl p) :=
+  ⟨fun g =>
+    Isometry.of_dist_eq fun x y => by
+      rw [dist_eq_norm, dist_eq_norm, ← smul_sub]
+      exact (spectralNorm_eq_of_equiv (g.restrictScalars ℚ_[p]) (x - y)).symm⟩
 
-theorem padicComplex_smul_coe {K : Type*} [Field K] [Algebra ℚ_[p] K] [Algebra K (PadicAlgCl p)]
-    [IsScalarTower ℚ_[p] K (PadicAlgCl p)] (g : PadicAlgCl p ≃ₐ[K] PadicAlgCl p)
-    (x : PadicAlgCl p) : g • (x : ℂ_[p]) = (g x : PadicAlgCl p) :=
+theorem padicComplex_smul_coe
+    {K : Type*}
+    [Field K] [Algebra ℚ_[p] K] [Algebra K (PadicAlgCl p)] [IsScalarTower ℚ_[p] K (PadicAlgCl p)]
+    (g : PadicAlgCl p ≃ₐ[K] PadicAlgCl p) (x : PadicAlgCl p)
+    : g • (x : ℂ_[p]) = (g x : PadicAlgCl p) :=
   (UniformSpace.Completion.coe_smul g x).symm
 
 end PadicComplex

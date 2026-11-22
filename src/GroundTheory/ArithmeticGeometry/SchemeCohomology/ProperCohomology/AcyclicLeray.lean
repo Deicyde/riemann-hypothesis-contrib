@@ -19,7 +19,8 @@ universe w w' u
 
 section Top
 
-variable {X : TopCat.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
+variable
+  {X : TopCat.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u})]
   {ι : Type w} (U : ι → Opens X)
 
 def HAcyclicOn (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}) : Prop :=
@@ -67,56 +68,67 @@ lemma injectiveSequence_hAcyclicOn
 
 variable (hU : iSup U = ⊤)
 
-def cechHEquivOfAcyclic : ∀ (n : ℕ) (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}),
-    HAcyclicOn.{w, w'} U G → (cechH G.obj U n ≃+ Sheaf.H.{w'} G n)
+def cechHEquivOfAcyclic
+    : ∀ (n : ℕ) (G : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}),
+      HAcyclicOn.{w, w'} U G → (cechH G.obj U n ≃+ Sheaf.H.{w'} G n)
   | 0, G, _ => cechHZeroEquivH G U hU
-  | 1, G, hG => cechHOneEquiv (S := injectiveSequence G) U hU (injectiveSequence_shortExact G)
+  | 1, G, hG =>
+    cechHOneEquiv (S := injectiveSequence G) U hU (injectiveSequence_shortExact G)
       (injectiveSequence_isCechShortExact_of_acyclic U G hG) (injectiveSequence_cechAcyclic G U)
-  | m + 2, G, hG => cechHEquivStep (S := injectiveSequence G) U (injectiveSequence_shortExact G)
+  | m + 2, G, hG =>
+    cechHEquivStep (S := injectiveSequence G) U (injectiveSequence_shortExact G)
       (injectiveSequence_isCechShortExact_of_acyclic U G hG) (injectiveSequence_cechAcyclic G U) m
       (cechHEquivOfAcyclic (m + 1) _ (injectiveSequence_hAcyclicOn U G hG))
 
-theorem cechHEquivOfAcyclic_naturality : ∀ (n : ℕ)
-    {G G' : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}}
-    (hG : HAcyclicOn.{w, w'} U G) (hG' : HAcyclicOn.{w, w'} U G') (φ : G ⟶ G')
-    (x : cechH G.obj U n),
-    cechHEquivOfAcyclic U hU n G' hG' (cechHMap U φ.hom n x) =
-      Sheaf.H.map.{w'} φ n (cechHEquivOfAcyclic U hU n G hG x)
+theorem cechHEquivOfAcyclic_naturality
+    : ∀ (n : ℕ) {G G' : Sheaf (Opens.grothendieckTopology X) AddCommGrpCat.{u}}
+        (hG : HAcyclicOn.{w, w'} U G) (hG' : HAcyclicOn.{w, w'} U G') (φ : G ⟶ G')
+        (x : cechH G.obj U n),
+      cechHEquivOfAcyclic U hU n G' hG' (cechHMap U φ.hom n x)
+        = Sheaf.H.map.{w'} φ n (cechHEquivOfAcyclic U hU n G hG x)
   | 0, _, _, _, _, φ, x => cechHZeroEquivH_naturality U φ hU x
   | 1, G, G', hG, hG', φ, x =>
-      cechHOneEquiv_naturality (S := injectiveSequence G) (S' := injectiveSequence G') U hU
-        (injectiveSequence_shortExact G) (injectiveSequence_isCechShortExact_of_acyclic U G hG)
-        (injectiveSequence_cechAcyclic G U) (injectiveSequence_shortExact G')
-        (injectiveSequence_isCechShortExact_of_acyclic U G' hG') (injectiveSequence_cechAcyclic G' U)
-        (injectiveSequenceMap φ) x
+    cechHOneEquiv_naturality (S := injectiveSequence G) (S' := injectiveSequence G') U hU
+      (injectiveSequence_shortExact G) (injectiveSequence_isCechShortExact_of_acyclic U G hG)
+      (injectiveSequence_cechAcyclic G U) (injectiveSequence_shortExact G')
+      (injectiveSequence_isCechShortExact_of_acyclic U G' hG') (injectiveSequence_cechAcyclic G' U)
+      (injectiveSequenceMap φ) x
   | m + 2, G, G', hG, hG', φ, x =>
-      cechHEquivStep_naturality (S := injectiveSequence G) (S' := injectiveSequence G') U
-        (injectiveSequence_shortExact G) (injectiveSequence_isCechShortExact_of_acyclic U G hG)
-        (injectiveSequence_cechAcyclic G U) (injectiveSequence_shortExact G')
-        (injectiveSequence_isCechShortExact_of_acyclic U G' hG') (injectiveSequence_cechAcyclic G' U)
-        (injectiveSequenceMap φ) m
-        (cechHEquivOfAcyclic U hU (m + 1) _ (injectiveSequence_hAcyclicOn U G hG))
-        (cechHEquivOfAcyclic U hU (m + 1) _ (injectiveSequence_hAcyclicOn U G' hG'))
-        (fun y => cechHEquivOfAcyclic_naturality (m + 1) (injectiveSequence_hAcyclicOn U G hG)
-          (injectiveSequence_hAcyclicOn U G' hG') (injectiveSequenceMap φ).τ₃ y) x
+    cechHEquivStep_naturality (S := injectiveSequence G) (S' := injectiveSequence G') U
+      (injectiveSequence_shortExact G) (injectiveSequence_isCechShortExact_of_acyclic U G hG)
+      (injectiveSequence_cechAcyclic G U) (injectiveSequence_shortExact G')
+      (injectiveSequence_isCechShortExact_of_acyclic U G' hG') (injectiveSequence_cechAcyclic G' U)
+      (injectiveSequenceMap φ) m
+      (cechHEquivOfAcyclic U hU (m + 1) _ (injectiveSequence_hAcyclicOn U G hG))
+      (cechHEquivOfAcyclic U hU (m + 1) _ (injectiveSequence_hAcyclicOn U G' hG'))
+      (fun y =>
+        cechHEquivOfAcyclic_naturality (m + 1) (injectiveSequence_hAcyclicOn U G hG)
+          (injectiveSequence_hAcyclicOn U G' hG') (injectiveSequenceMap φ).τ₃ y)
+      x
 
 end Top
 
 section Scheme
 
-variable {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
-  {ι : Type w} (U : ι → X.Opens) (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
+variable
+  {X : Scheme.{u}} [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
+  {ι : Type w} (U : ι → X.Opens)
+  (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
 
-def cechHLinearEquivHOfAcyclic (hU : iSup U = ⊤) (F : X.Modules)
-    (hF : HAcyclicOn.{w, w'} (X := X.toTopCat) U (modulesAb F)) (n : ℕ) :
-    cechH (modulesAb F).obj U n ≃ₗ[A] Sheaf.H.{w'} (modulesAb F) n :=
+def cechHLinearEquivHOfAcyclic
+    (hU : iSup U = ⊤)
+    (F : X.Modules) (hF : HAcyclicOn.{w, w'} (X := X.toTopCat) U (modulesAb F))
+    (n : ℕ)
+    : cechH (modulesAb F).obj U n ≃ₗ[A] Sheaf.H.{w'} (modulesAb F) n :=
   (cechHEquivOfAcyclic (X := X.toTopCat) U hU n (modulesAb F) hF).toLinearEquiv fun a x =>
     cechHEquivOfAcyclic_naturality (X := X.toTopCat) U hU n hF hF
       (modulesAbMap (smulHom F (algebraMap A Γ(X, ⊤) a))) x
 
-variable [∀ V : X.Opens,
+variable
+  [∀ V : X.Opens,
     HasExt.{w'} (Sheaf ((Opens.grothendieckTopology X.toTopCat).over V) AddCommGrpCat.{u})]
-  [∀ V : X.Opens, HasExt.{w'} (Sheaf (Opens.grothendieckTopology V.toScheme.toTopCat) AddCommGrpCat.{u})]
+  [∀ V : X.Opens,
+    HasExt.{w'} (Sheaf (Opens.grothendieckTopology V.toScheme.toTopCat) AddCommGrpCat.{u})]
 
 lemma hAcyclicOn_of_restrict (F : X.Modules)
     (h : ∀ (n : ℕ) (i : Fin (n + 1) → ι) (q : ℕ),
@@ -130,25 +142,28 @@ end Scheme
 
 section Pushforward
 
-variable {X X' : Scheme.{u}} (ψ : X' ⟶ X) (A : Type u) [CommRing A] [X.Over (Spec (.of A))]
-  [X'.Over (Spec (.of A))] [ψ.IsOver (Spec (.of A))]
+variable
+  {X X' : Scheme.{u}} (ψ : X' ⟶ X)
+  (A : Type u)
+  [CommRing A] [X.Over (Spec (.of A))] [X'.Over (Spec (.of A))] [ψ.IsOver (Spec (.of A))]
   [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{u})]
   [HasExt.{w'} (Sheaf (Opens.grothendieckTopology X'.toTopCat) AddCommGrpCat.{u})]
   [∀ V : X'.Opens,
     HasExt.{w'} (Sheaf ((Opens.grothendieckTopology X'.toTopCat).over V) AddCommGrpCat.{u})]
-  [∀ V : X'.Opens, HasExt.{w'} (Sheaf (Opens.grothendieckTopology V.toScheme.toTopCat) AddCommGrpCat.{u})]
+  [∀ V : X'.Opens,
+    HasExt.{w'} (Sheaf (Opens.grothendieckTopology V.toScheme.toTopCat) AddCommGrpCat.{u})]
   {ι : Type w} (V : ι → X.Opens) (hV : iSup V = ⊤)
   (hVaff : ∀ (n : ℕ) (i : Fin (n + 1) → ι), IsAffineOpen (⨅ a, V (i a)))
 
 attribute [local instance] algebraOfOver
 
-def HLinearEquivPushforwardOfAcyclic (G : X'.Modules)
-    [((Scheme.Modules.pushforward ψ).obj G).IsQuasicoherent]
+def HLinearEquivPushforwardOfAcyclic
+    (G : X'.Modules) [((Scheme.Modules.pushforward ψ).obj G).IsQuasicoherent]
     (hG : ∀ (n : ℕ) (i : Fin (n + 1) → ι) (q : ℕ),
       Subsingleton (Sheaf.H.{w'} (modulesAb (G.restrict (ψ ⁻¹ᵁ ⨅ a, V (i a)).ι)) (q + 1)))
-    (p : ℕ) :
-    Sheaf.H.{w'} (modulesAb G) p ≃ₗ[A]
-      Sheaf.H.{w'} (modulesAb ((Scheme.Modules.pushforward ψ).obj G)) p :=
+    (p : ℕ)
+    : Sheaf.H.{w'} (modulesAb G) p ≃ₗ[A]
+        Sheaf.H.{w'} (modulesAb ((Scheme.Modules.pushforward ψ).obj G)) p :=
   have hV' : iSup (fun j => ψ ⁻¹ᵁ V j) = ⊤ := by
     rw [← Scheme.Hom.preimage_iSup, hV]
     rfl
@@ -159,8 +174,8 @@ def HLinearEquivPushforwardOfAcyclic (G : X'.Modules)
       have h1 := hG n i q
       rw [e] at h1
       exact h1
-  (cechHLinearEquivHOfAcyclic (fun j => ψ ⁻¹ᵁ V j) A hV' G hG' p).symm ≪≫ₗ
-    (cechHPushforwardLinearEquiv ψ A G V p).symm ≪≫ₗ cechHLinearEquivH V hV hVaff A _ p
+  (cechHLinearEquivHOfAcyclic (fun j => ψ ⁻¹ᵁ V j) A hV' G hG' p).symm
+    ≪≫ₗ (cechHPushforwardLinearEquiv ψ A G V p).symm ≪≫ₗ cechHLinearEquivH V hV hVaff A _ p
 
 end Pushforward
 

@@ -15,12 +15,17 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Admiss
 @[expose] public section
 
 open scoped InnerProductSpace TensorProduct
-open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.MainNotions Formalism.DivisionValues Formalism.L2
+  Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Rows Formalism.L2.Theta Formalism.IndefR
+  Formalism.IndefR.Cx Formalism.IndefR.Links
 open Formalism.IndefR.Mult Formalism.IndefR.Datum MeasureTheory NumberField IsDedekindDomain
-open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict Formalism.L2.SG.PoincareInHH.PoincareSetting
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS GlobalTheory.Core.Mi
+open Formalism.L2.SG.RowsJoinPinned Formalism.L2.SG.RowDict
+  Formalism.L2.SG.PoincareInHH.PoincareSetting
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Unf GlobalTheory.MiS
+  GlobalTheory.Core.Mi
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing GlobalTheory.FinPl
+open GlobalTheory.MiTop GlobalTheory.SeeSaw GlobalTheory.Fam ValuativeRel IsLocalRing
+  GlobalTheory.FinPl
 
 noncomputable section
 
@@ -31,37 +36,53 @@ open Formalism.L2.Forms GlobalTheory.Core.Rk.Top
 
 variable {D : D7}
 
-theorem chain_cast {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCParam R} {C C' : ColumnChain R ι hc} (hC : C = C')
-    (ψ : C.cls 0 → C.Y 0 → ℂ) (φ : C'.cls 0 → C'.Y 0 → ℂ) (h : HEq ψ φ) :
-    (Eq.rec (motive := fun C _ => C.cls R.m → C.Y R.m → ℂ) (C.col ψ) hC) = C'.col φ := by
+theorem chain_cast
+    {R : Ranks} {ι : Type} [Fintype ι]
+    {hc : ι → HCParam R} {C C' : ColumnChain R ι hc}
+    (hC : C = C') (ψ : C.cls 0 → C.Y 0 → ℂ) (φ : C'.cls 0 → C'.Y 0 → ℂ) (h : HEq ψ φ)
+    : (Eq.rec (motive := fun C _ => C.cls R.m → C.Y R.m → ℂ) (C.col ψ) hC) = C'.col φ := by
   subst hC; cases h; rfl
 
-theorem rec_chain {R : Ranks} {ι : Type} [Fintype ι] {hc : ι → HCParam R} (C : ColumnChain R ι hc)
-    (ψ : C.cls 0 → C.Y 0 → ℂ) {a b : ℕ} (h : a = b) :
-    Eq.rec (motive := fun n _ => C.cls n → C.Y n → ℂ) (Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap a ψ) h = Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap b ψ := by
+theorem rec_chain
+    {R : Ranks} {ι : Type} [Fintype ι]
+    {hc : ι → HCParam R} (C : ColumnChain R ι hc) (ψ : C.cls 0 → C.Y 0 → ℂ)
+    {a b : ℕ} (h : a = b)
+    : Eq.rec
+        (motive := fun n _ => C.cls n → C.Y n → ℂ)
+        (Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap a ψ) h
+      = Formalism.ThetaLiftIndependence.chainOpM C.wt C.Kmap b ψ := by
   subst h; rfl
 
-variable {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Yd : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX} {W : RealPack ex} {u : D.what₂.Word}
+variable
+  {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Yd : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Yd cX} {W : RealPack ex} {u : D.what₂.Word}
 
 end GlobalTheory.MiTop.TailColumnRecursion
 
 namespace GlobalTheory.MiTop.TailColumnRecursion
 open Classical
-open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev
+open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR.Lev
 variable {D : D7}
 
-theorem reads_uniq {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C} {Pm : PeriodMap D.R C}
+theorem reads_uniq
+    {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C}
+    {Pm : PeriodMap D.R C}
     {M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A Pm}
     {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))} (K : ClassesAtPrimes M bad)
-    {S : D.what₂.Tau → SPar} {MX : DSModel D.sp.X' S} (eW : Pm.Wrow ≃ₗ[ℂ] (M.clsP → FrP D → ℂ))
-    (j : SmT MX →ₗ[ℂ] (FrP D → ℂ)) (x : GA D D.sp.X') (jM : Pm.Mt →ₗ⋆[ℂ] Pm.Wrow)
-    (hval : ∀ z ∈ M.ptC, ∀ c, eW z c ∈ LinearMap.range j)
-    (hjM : ∀ F, jM F ∈ M.ptC) (hper : ∀ w F, Pm.period w F = M.ipP (jM F) w)
-    (hpos : ∀ z ∈ M.ptC, M.ipP z z = 0 → z = 0)
+    {S : D.what₂.Tau → SPar} {MX : DSModel D.sp.X' S}
+    (eW : Pm.Wrow ≃ₗ[ℂ] (M.clsP → FrP D → ℂ)) (j : SmT MX →ₗ[ℂ] (FrP D → ℂ))
+    (x : GA D D.sp.X')
+    (jM : Pm.Mt →ₗ⋆[ℂ] Pm.Wrow)
+    (hval : ∀ z ∈ M.ptC, ∀ c, eW z c ∈ LinearMap.range j) (hjM : ∀ F, jM F ∈ M.ptC)
+    (hper : ∀ w F, Pm.period w F = M.ipP (jM F) w) (hpos : ∀ z ∈ M.ptC, M.ipP z z = 0 → z = 0)
     {G G' : Pm.Mt} {f : SmT MX →ₗ[ℂ] (GA D D.sp.X' → ℂ)}
-    (h1 : ReadsG K eW j x G f) (h2 : ReadsG K eW j x G' f) : ∀ w, Pm.period w G = Pm.period w G' := by
-  have hcard : ∀ c, (Nat.card (M.stabilizer₂ c) : ℂ) ≠ 0 := fun c => Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+    (h1 : ReadsG K eW j x G f) (h2 : ReadsG K eW j x G' f)
+    : ∀ w, Pm.period w G = Pm.period w G' := by
+  have hcard : ∀ c, (Nat.card (M.stabilizer₂ c) : ℂ) ≠ 0 := fun c =>
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   have hsingle : ∀ c v, Pm.period (eW.symm (Pi.single c (j v))) (G - G') = 0 := by
     intro c v
     obtain ⟨h, hh⟩ := GlobalTheory.Core.Rk.Top.Model.hasMat_exists (K.y c)
@@ -92,36 +113,58 @@ end GlobalTheory.MiTop.TailColumnRecursion
 
 namespace GlobalTheory.MiTop.TailColumnRecursion
 open Classical
-open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev
+open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR.Lev
 variable {D : D7}
 
-theorem fic_val {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))}
-    (S : StepLevel D.host.F D.host.E (sigD D) (gramP D) 1 D.R.f bad) (lam : D.what₂.Tau → DomWeight (D.R.N D.R.m - 1))
-    {κ : Type} (yc : κ → Formalism.UG.UPts (sigD D) (gramP D) (FiniteAdeleRing (𝓞 D.host.F) D.host.F)) (z : κ → FrP D → ℂ)
-    (hz : z ∈ FiC S (Formalism.L2.Forms.embT D) lam yc) (c : κ) : z c ∈ ValC (gramC (gramP D) (Formalism.L2.Forms.embT D)) lam := by
+theorem fic_val
+    {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))}
+    (S : StepLevel D.host.F D.host.E (sigD D) (gramP D) 1 D.R.f bad)
+    (lam : D.what₂.Tau → DomWeight (D.R.N D.R.m - 1))
+    {κ : Type}
+    (yc : κ → Formalism.UG.UPts (sigD D) (gramP D) (FiniteAdeleRing (𝓞 D.host.F) D.host.F))
+    (z : κ → FrP D → ℂ) (hz : z ∈ FiC S (Formalism.L2.Forms.embT D) lam yc) (c : κ)
+    : z c ∈ ValC (gramC (gramP D) (Formalism.L2.Forms.embT D)) lam := by
   obtain ⟨g, hg, rfl⟩ := Submodule.mem_map.1 hz
   exact (Submodule.mem_pi.1 (Submodule.mem_inf.1 hg).2) (yc c) (Set.mem_univ _)
 
-theorem pos_core {κ : Type} [Fintype κ] {n : ℕ} (lam : D.what₂.Tau → DomWeight n) (N : κ → ℕ) (hN : ∀ c, N c ≠ 0)
+theorem pos_core
+    {κ : Type} [Fintype κ]
+    {n : ℕ} (lam : D.what₂.Tau → DomWeight n)
+    (N : κ → ℕ) (hN : ∀ c, N c ≠ 0)
     (P : κ → MvPolynomial (D.what₂.Tau × Fin n × Fin n) ℂ)
-    (h : ∑ c, ((N c : ℕ) : ℂ)⁻¹ * Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c) = 0) : ∀ c, P c = 0 := by
+    (h
+      : ∑ c, ((N c : ℕ) : ℂ)⁻¹ * Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)
+        = 0)
+    : ∀ c, P c = 0 := by
   by_contra hne
   push Not at hne
   obtain ⟨c0, hc0⟩ := hne
   have hre := congrArg Complex.re h
   rw [Complex.re_sum, Complex.zero_re] at hre
-  have hterm : ∀ c, (((N c : ℕ) : ℂ)⁻¹ * Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)).re =
-      ((N c : ℝ))⁻¹ * (Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)).re := by
+  have hterm
+      : ∀ c,
+        (((N c : ℕ) : ℂ)⁻¹
+            * Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)).re
+          = ((N c : ℝ))⁻¹
+            * (Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)).re := by
     intro c
     rw [show ((N c : ℕ) : ℂ)⁻¹ = ((((N c : ℝ))⁻¹ : ℝ) : ℂ) by push_cast; rfl, Complex.re_ofReal_mul]
   simp only [hterm] at hre
-  have hnn : ∀ c, 0 ≤ ((N c : ℝ))⁻¹ * (Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)).re := by
+  have hnn
+      : ∀ c,
+        0 ≤ ((N c : ℝ))⁻¹
+          * (Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c) (P c)).re := by
     intro c
     refine mul_nonneg (by positivity) ?_
     by_cases hp : P c = 0
     · rw [hp]; simp [Formalism.MainNotions.product_first_zeroth_parts.nfAll, Formalism.REAL.fockF]
     · exact (GlobalTheory.LvT.PendExample.nfAll_pos lam hp).le
-  have hpos : 0 < ((N c0 : ℝ))⁻¹ * (Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c0) (P c0)).re := by
+  have hpos
+      : 0
+        < ((N c0 : ℝ))⁻¹
+          * (Formalism.MainNotions.product_first_zeroth_parts.nfAll lam (P c0) (P c0)).re := by
     have : (0 : ℝ) < N c0 := by exact_mod_cast Nat.pos_of_ne_zero (hN c0)
     exact mul_pos (inv_pos.mpr this) (GlobalTheory.LvT.PendExample.nfAll_pos lam hc0)
   have := Finset.sum_pos' (fun c _ => hnn c) ⟨c0, Finset.mem_univ _, hpos⟩
@@ -131,18 +174,24 @@ end GlobalTheory.MiTop.TailColumnRecursion
 
 namespace GlobalTheory.MiTop.TailColumnRecursion
 open Classical
-open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev
+open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR.Lev
 variable {D : D7}
 
 section G
-variable {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C} {Pm : PeriodMap D.R C}
-    {M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A Pm}
-    {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))} {K : ClassesAtPrimes M bad} {okW : D.what₂.places.Pl → Prop}
+variable
+  {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C}
+  {Pm : PeriodMap D.R C}
+  {M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A Pm}
+  {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))}
+  {K : ClassesAtPrimes M bad} {okW : D.what₂.places.Pl → Prop}
 
-
-open Formalism.BasicNotions.DV Formalism.MainNotions.G Formalism.MainNotions.WeilJacquetShalikaLaw in
-theorem eW_rep_G (V : ValuationAtPrimes K okW) (o : FrP D) (z : Pm.Wrow) (hz : z ∈ M.ptC) (c : M.clsP) :
-    ∃ Q ∈ CSpan M.sg, V.eW z c = fnOf _ (shiftOf (sgTG M)) (fun τ => (o.1 τ)⁻¹) Q := by
+open Formalism.BasicNotions.DV Formalism.MainNotions.G
+  Formalism.MainNotions.WeilJacquetShalikaLaw in
+theorem eW_rep_G
+    (V : ValuationAtPrimes K okW) (o : FrP D) (z : Pm.Wrow) (hz : z ∈ M.ptC) (c : M.clsP)
+    : ∃ Q ∈ CSpan M.sg, V.eW z c = fnOf _ (shiftOf (sgTG M)) (fun τ => (o.1 τ)⁻¹) Q := by
   have hF := (V.ptC z).1 hz
   obtain ⟨g, hg, hres⟩ := Submodule.mem_map.1 hF
   have hval := (Submodule.mem_pi.1 (Submodule.mem_inf.1 hg).2) (K.y c) (Set.mem_univ _)
@@ -152,8 +201,7 @@ theorem eW_rep_G (V : ValuationAtPrimes K okW) (o : FrP D) (z : Pm.Wrow) (hz : z
     unfold sgTG at hQ0
     rw [this] at hQ0
     exact hQ0
-  have he : V.eW z c = fnOf _ (shiftOf (sgTG M)) 1 Q0 := by
-    rw [hfn, ← hres]; rfl
+  have he : V.eW z c = fnOf _ (shiftOf (sgTG M)) 1 Q0 := by rw [hfn, ← hres]; rfl
   have hM : ∀ τ, IsUnit ((o.1 τ)⁻¹).det := fun τ => by
     rw [Matrix.det_nonsing_inv]; exact (o.2 τ).ringInverse
   refine ⟨_, ?_, he.trans (fnOf_change _ _ _ _ hM Q0)⟩
@@ -164,7 +212,10 @@ theorem pos_G (V : ValuationAtPrimes K okW) : ∀ z ∈ M.ptC, M.ipP z z = 0 →
   obtain ⟨o, ho⟩ := GlobalTheory.PerRed.exists_orthonormal_frame₂ D
   choose P hP hPe using eW_rep_G V o z hz
   have hN : ∀ c, Nat.card (M.stabilizer₂ c) ≠ 0 := fun c => Nat.card_pos.ne'
-  have hPz := pos_core M.sg (fun c => Nat.card (M.stabilizer₂ c)) hN P ((V.ipP o ho z z P P hP hP hPe hPe).symm.trans h0)
+  have hPz :=
+    pos_core M.sg
+      (fun c => Nat.card (M.stabilizer₂ c))
+      hN P ((V.ipP o ho z z P P hP hP hPe hPe).symm.trans h0)
   apply V.eW.injective
   rw [map_zero]
   funext c
@@ -173,14 +224,18 @@ theorem pos_G (V : ValuationAtPrimes K okW) : ∀ z ∈ M.ptC, M.ipP z z = 0 →
 
 end G
 
-theorem pos_0 {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i} (T : FormsTiedSym D u Ch chOf) :
-    ∀ z ∈ (D.fm u).ptC, (D.fm u).ipP z z = 0 → z = 0 := by
+theorem pos_0
+    {u : D.what₂.Word} {Ch : ℕ → Type} {chOf : ∀ i, (D.mem u).C.cls i → Ch i}
+    (T : FormsTiedSym D u Ch chOf)
+    : ∀ z ∈ (D.fm u).ptC, (D.fm u).ipP z z = 0 → z = 0 := by
   intro z hz h0
   obtain ⟨o, ho⟩ := GlobalTheory.PerRed.exists_orthonormal_frame₂ D
   choose P hP hPe using GlobalTheory.PerRed.eW_rep_o T o z hz
   have hN : ∀ c, Nat.card ((D.fm u).stabilizer₂ c) ≠ 0 := fun c => Nat.card_pos.ne'
-  have hPz := pos_core (D.fm u).sg (fun c => Nat.card ((D.fm u).stabilizer₂ c)) hN P
-    ((T.valP.ipP o ho z z P P hP hP hPe hPe).symm.trans h0)
+  have hPz :=
+    pos_core (D.fm u).sg
+      (fun c => Nat.card ((D.fm u).stabilizer₂ c))
+      hN P ((T.valP.ipP o ho z z P P hP hP hPe hPe).symm.trans h0)
   apply T.valP.eW.injective
   rw [map_zero]
   funext c
@@ -191,16 +246,22 @@ end GlobalTheory.MiTop.TailColumnRecursion
 
 namespace GlobalTheory.MiTop.TailColumnRecursion
 open Classical
-open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.IndefR.Lev
+open Formalism.L2.Forms GlobalTheory.Core.Rk.Top Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.IndefR.Lev
 variable {D : D7}
 
 theorem domWeight_ext {n : ℕ} : ∀ a b : DomWeight n, a.w = b.w → a = b := by
   rintro ⟨a, _⟩ ⟨b, _⟩ h; cases h; rfl
 
-theorem sg_eq {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C} {Pm : PeriodMap D.R C}
+theorem sg_eq
+    {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)} {A : ColumnsAtT D.R C}
+    {Pm : PeriodMap D.R C}
     {M : MemberForms D.what₂.LL D.what₂.embLL D.what₂.places D.what₂.Tau (D.hcW u) C A Pm}
-    {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))} {K : ClassesAtPrimes M bad} {okW : D.what₂.places.Pl → Prop}
-    (V : ValuationAtPrimes K okW) {K0 : ClsPTied u} (V0 : ValPTied u K0) : sgTG M = sgT u := by
+    {bad : Set (IsDedekindDomain.HeightOneSpectrum (𝓞 D.host.F))} {K : ClassesAtPrimes M bad}
+    {okW : D.what₂.places.Pl → Prop} (V : ValuationAtPrimes K okW)
+    {K0 : ClsPTied u} (V0 : ValPTied u K0)
+    : sgTG M = sgT u := by
   funext τ
   unfold sgTG sgT
   congr 1
@@ -210,15 +271,23 @@ theorem sg_eq {u : D.what₂.Word} {C : ColumnChain D.R D.what₂.Tau (D.hcW u)}
   have b := V0.sg τ i
   exact_mod_cast a.trans b.symm
 
-theorem referenceTuple_familyPeriod_eq_period (u : D.what₂.Word) (μ : D.what₂.Tup) (h0 : μ = D.what₂.mu0)
-    (ψ0 : (D.chTw u μ).cls 0 → (D.chTw u μ).Y 0 → ℂ) (φ : D.what₂.Mu u) (hφ : HEq ψ0 (D.eMu u φ).1)
+theorem referenceTuple_familyPeriod_eq_period
+    (u : D.what₂.Word) (μ : D.what₂.Tup)
+    (h0 : μ = D.what₂.mu0) (ψ0 : (D.chTw u μ).cls 0 → (D.chTw u μ).Y 0 → ℂ)
+    (φ : D.what₂.Mu u) (hφ : HEq ψ0 (D.eMu u φ).1)
     (G1 G0 : D.what₂.Amb μ)
-    (hu : ∀ w, (D.mem u).P.period w ((D.eMt u).symm (Eq.rec (motive := fun ν _ => D.what₂.Amb ν) G1 h0)) =
-      (D.mem u).P.period w ((D.eMt u).symm (Eq.rec (motive := fun ν _ => D.what₂.Amb ν) G0 h0))) :
-    (D.mem u).P.Ptil (Eq.rec (motive := fun C _ => C.cls D.R.m → C.Y D.R.m → ℂ)
-        (Eq.rec (motive := fun ν _ => (D.chTw u ν).cls D.R.m → (D.chTw u ν).Y D.R.m → ℂ) ((D.chTw u μ).col ψ0) h0)
-        (D.memberColumns_twistedChain_base u))
-      ((D.eMt u).symm (Eq.rec (motive := fun ν _ => D.what₂.Amb ν) G1 h0)) = D.what₂.perCol u μ φ G0 := by
+    (hu : ∀ w,
+      (D.mem u).P.period w ((D.eMt u).symm (Eq.rec (motive := fun ν _ => D.what₂.Amb ν) G1 h0))
+        = (D.mem u).P.period w ((D.eMt u).symm (Eq.rec (motive := fun ν _ => D.what₂.Amb ν) G0 h0)))
+    : (D.mem u).P.Ptil
+        (Eq.rec
+          (motive := fun C _ => C.cls D.R.m → C.Y D.R.m → ℂ)
+          (Eq.rec
+            (motive := fun ν _ => (D.chTw u ν).cls D.R.m → (D.chTw u ν).Y D.R.m → ℂ)
+            ((D.chTw u μ).col ψ0) h0)
+          (D.memberColumns_twistedChain_base u))
+        ((D.eMt u).symm (Eq.rec (motive := fun ν _ => D.what₂.Amb ν) G1 h0))
+      = D.what₂.perCol u μ φ G0 := by
   subst h0
   rw [D.perCol_base_eq_PtilCol, PeriodMap.PtilCol, PeriodMap.Ptil, PeriodMap.Ptil]
   simp only at hu ⊢

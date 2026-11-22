@@ -13,26 +13,33 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.PartialC
 noncomputable section
 
 open scoped Matrix NNReal ENNReal ComplexConjugate TensorProduct Topology
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory Filter
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.MixModel
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory Filter
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.MixModel
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
-open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
+open GlobalTheory.StdUnn PositivityTheory.GramSchwartzFunctions
+  PositivityTheory.GramSchwartzFunctions.BC PositivityTheory.PfSWUS PositivityTheory.Rg.Rsw
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.CompanionTheory.FJE.Transport
 
 open GlobalTheory.StdUnn.Model (submatrix_fromBlocks_mul)
-open GlobalTheory.CompanionTheory.ThTw (block_mul₂ bl_add mat_nzx_sh block_matrix_injective adj_sub')
-open GlobalTheory.CompanionTheory.PcB (mat_mul' rational_map_block_matrix rat_one' rat_zero' rat_neg')
+open GlobalTheory.CompanionTheory.ThTw
+  (block_mul₂ bl_add mat_nzx_sh block_matrix_injective adj_sub')
+open GlobalTheory.CompanionTheory.PcB
+  (mat_mul' rational_map_block_matrix rat_one' rat_zero' rat_neg')
 open GlobalTheory.CompanionTheory.FourierN (mat_injective)
 
 variable {D : D7} {n ρ p : ℕ} {hn : ρ + p = n}
 
-theorem adelicConjTranspose_blockMatrixTwoByTwoFin {k : ℕ} (a b c d : Mx D k k) :
-    adj (blk4 a b c d) = blk4 (adj a) (adj c) (adj b) (adj d) := by
+theorem adelicConjTranspose_blockMatrixTwoByTwoFin {k : ℕ} (a b c d : Mx D k k)
+    : adj (blk4 a b c d) = blk4 (adj a) (adj c) (adj b) (adj d) := by
   simp only [adj, blk4]
-  rw [← Matrix.submatrix_map, Matrix.transpose_submatrix, Matrix.fromBlocks_map, Matrix.fromBlocks_transpose]
+  rw [← Matrix.submatrix_map, Matrix.transpose_submatrix, Matrix.fromBlocks_map,
+    Matrix.fromBlocks_transpose]
 
 theorem block_matrix_diagonal_one_eq_one {k : ℕ} : blk4 (1 : Mx D k k) 0 0 1 = 1 := by
   simp only [blk4, Matrix.fromBlocks_one, Matrix.submatrix_one_equiv]
@@ -41,21 +48,28 @@ theorem jr_eq {k : ℕ} : JR (AF D.host.F) (Jst D k) = (blk4 0 1 (-1) 0 : Mx D (
   show rat (blk4 0 1 (-1) 0) = _
   rw [rational_map_block_matrix, rat_one', rat_zero', rat_neg', rat_one']
 
-theorem rel_left {k : ℕ} (g : G D k) {a b c d : Mx D k k} (h : mat g = blk4 a b c d) :
-    adj d ⬝ a - adj b ⬝ c = 1 ∧ adj a ⬝ c = adj c ⬝ a ∧ adj b ⬝ d = adj d ⬝ b ∧ adj a ⬝ d - adj c ⬝ b = 1 := by
+theorem rel_left {k : ℕ} (g : G D k) {a b c d : Mx D k k} (h : mat g = blk4 a b c d)
+    : adj d ⬝ a - adj b ⬝ c = 1 ∧ adj a ⬝ c = adj c ⬝ a ∧ adj b ⬝ d = adj d ⬝ b
+      ∧ adj a ⬝ d - adj c ⬝ b = 1 := by
   have h2 : adj (mat g) * JR (AF D.host.F) (Jst D k) * mat g = JR (AF D.host.F) (Jst D k) := g.2
-  rw [jr_eq, h, adelicConjTranspose_blockMatrixTwoByTwoFin, submatrix_fromBlocks_mul, submatrix_fromBlocks_mul] at h2
+  rw [jr_eq, h, adelicConjTranspose_blockMatrixTwoByTwoFin, submatrix_fromBlocks_mul,
+      submatrix_fromBlocks_mul]
+    at h2
   obtain ⟨e1, e2, e3, e4⟩ := block_matrix_injective h2
-  simp only [Matrix.mul_zero, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_neg, add_zero, zero_add, Matrix.neg_mul] at e1 e2 e3 e4
+  simp only [Matrix.mul_zero, Matrix.zero_mul, Matrix.mul_one, Matrix.mul_neg, add_zero, zero_add,
+      Matrix.neg_mul]
+    at e1 e2 e3 e4
   refine ⟨?_, (neg_add_eq_zero.1 e1).symm, (neg_add_eq_zero.1 e4).symm, ?_⟩
   · have : adj d ⬝ a - adj b ⬝ c = -(-(adj d ⬝ a) + adj b ⬝ c) := by abel
     rw [this, e3, neg_neg]
   · rw [sub_eq_neg_add, e2]
 
-theorem rel_right {k : ℕ} (g : G D k) {a b c d : Mx D k k} (h : mat g = blk4 a b c d) :
-    a ⬝ adj d - b ⬝ adj c = 1 ∧ c ⬝ adj d = d ⬝ adj c ∧ b ⬝ adj a = a ⬝ adj b ∧ d ⬝ adj a - c ⬝ adj b = 1 := by
+theorem rel_right {k : ℕ} (g : G D k) {a b c d : Mx D k k} (h : mat g = blk4 a b c d)
+    : a ⬝ adj d - b ⬝ adj c = 1 ∧ c ⬝ adj d = d ⬝ adj c ∧ b ⬝ adj a = a ⬝ adj b
+      ∧ d ⬝ adj a - c ⬝ adj b = 1 := by
   obtain ⟨l1, l2, l3, l4⟩ := rel_left g h
-  have hL : (blk4 (adj d) (-adj b) (-adj c) (adj a) : Mx D (k + k) (k + k)) * blk4 a b c d = 1 := by
+  have hL
+      : (blk4 (adj d) (- adj b) (- adj c) (adj a) : Mx D (k + k) (k + k)) * blk4 a b c d = 1 := by
     rw [submatrix_fromBlocks_mul, ← block_matrix_diagonal_one_eq_one]
     congr 1
     · rw [Matrix.neg_mul, ← sub_eq_add_neg, l1]
@@ -66,51 +80,61 @@ theorem rel_right {k : ℕ} (g : G D k) {a b c d : Mx D k k} (h : mat g = blk4 a
   rw [submatrix_fromBlocks_mul, ← block_matrix_diagonal_one_eq_one] at hR
   obtain ⟨e1, e2, e3, e4⟩ := block_matrix_injective hR
   simp only [Matrix.mul_neg] at e1 e2 e3 e4
-  refine ⟨by rw [sub_eq_add_neg, e1], sub_eq_zero.1 (by rw [sub_eq_add_neg, e3]),
-    (neg_add_eq_zero.1 e2).symm, by rw [sub_eq_neg_add, e4]⟩
+  refine ⟨
+    by rw [sub_eq_add_neg, e1],
+    sub_eq_zero.1 (by rw [sub_eq_add_neg, e3]),
+    (neg_add_eq_zero.1 e2).symm,
+    by rw [sub_eq_neg_add, e4]
+  ⟩
 
-theorem exists_rat_blocks {k : ℕ} (γ : G D k) (h : γ ∈ GF D k) :
-    ∃ a b c d : Matrix (Fin k) (Fin k) D.host.E, mat γ = blk4 (rat a) (rat b) (rat c) (rat d) := by
+theorem exists_rat_blocks {k : ℕ} (γ : G D k) (h : γ ∈ GF D k)
+    : ∃ a b c d : Matrix (Fin k) (Fin k) D.host.E,
+      mat γ = blk4 (rat a) (rat b) (rat c) (rat d) := by
   obtain ⟨x, -, hxe⟩ := h
   have hm : mat γ = rat x.1 := (congrArg Units.val hxe).symm
-  refine ⟨(x.1.submatrix finSumFinEquiv finSumFinEquiv).toBlocks₁₁,
+  refine ⟨
+    (x.1.submatrix finSumFinEquiv finSumFinEquiv).toBlocks₁₁,
     (x.1.submatrix finSumFinEquiv finSumFinEquiv).toBlocks₁₂,
     (x.1.submatrix finSumFinEquiv finSumFinEquiv).toBlocks₂₁,
-    (x.1.submatrix finSumFinEquiv finSumFinEquiv).toBlocks₂₂, ?_⟩
+    (x.1.submatrix finSumFinEquiv finSumFinEquiv).toBlocks₂₂,
+    ?_
+  ⟩
   rw [hm, ← rational_map_block_matrix]
   congr 1
-  simp only [blk4, Matrix.fromBlocks_toBlocks, Matrix.submatrix_submatrix, Equiv.self_comp_symm, Matrix.submatrix_id_id]
+  simp only [blk4, Matrix.fromBlocks_toBlocks, Matrix.submatrix_submatrix, Equiv.self_comp_symm,
+    Matrix.submatrix_id_id]
 
-theorem comb_sub (a b : Mx D ρ p) (P Q R S U V : Mx D p p) :
-    (a ⬝ P - b ⬝ Q) ⬝ R + (b ⬝ S - a ⬝ U) ⬝ V = a ⬝ (P ⬝ R - U ⬝ V) + b ⬝ (S ⬝ V - Q ⬝ R) := by
+theorem comb_sub (a b : Mx D ρ p) (P Q R S U V : Mx D p p)
+    : (a ⬝ P - b ⬝ Q) ⬝ R + (b ⬝ S - a ⬝ U) ⬝ V = a ⬝ (P ⬝ R - U ⬝ V) + b ⬝ (S ⬝ V - Q ⬝ R) := by
   simp only [Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_assoc]
   abel
 
-theorem comb_add (a b : Mx D ρ p) (P Q R S U V : Mx D p p) :
-    (a ⬝ P + b ⬝ Q) ⬝ R - (a ⬝ S + b ⬝ U) ⬝ V = a ⬝ (P ⬝ R - S ⬝ V) + b ⬝ (Q ⬝ R - U ⬝ V) := by
+theorem comb_add (a b : Mx D ρ p) (P Q R S U V : Mx D p p)
+    : (a ⬝ P + b ⬝ Q) ⬝ R - (a ⬝ S + b ⬝ U) ⬝ V = a ⬝ (P ⬝ R - S ⬝ V) + b ⬝ (Q ⬝ R - U ⬝ V) := by
   simp only [Matrix.add_mul, Matrix.mul_sub, Matrix.mul_assoc]
   abel
 
 theorem cont_rmul (c : Mx D p p) : Continuous fun v : Mx D ρ p => v ⬝ c :=
   continuous_id.matrix_mul continuous_const
 
-theorem cont_sub {X : Type*} [TopologicalSpace X] {f g : X → Mx D ρ p} (hf : Continuous f) (hg : Continuous g) :
-    Continuous fun v => f v - g v := by
+theorem cont_sub
+    {X : Type*} [TopologicalSpace X] {f g : X → Mx D ρ p} (hf : Continuous f) (hg : Continuous g)
+    : Continuous fun v => f v - g v := by
   have h₁ : IsTopologicalRing (AE D) := inferInstance
   have h₂ : IsTopologicalAddGroup (AE D) := inferInstance
   have h₃ : ContinuousSub (AE D) := IsTopologicalAddGroup.to_continuousSub
   exact continuous_matrix fun i j => (hf.matrix_elem i j).sub (hg.matrix_elem i j)
 
-theorem cont_add {X : Type*} [TopologicalSpace X] {f g : X → Mx D ρ p} (hf : Continuous f) (hg : Continuous g) :
-    Continuous fun v => f v + g v :=
+theorem cont_add
+    {X : Type*} [TopologicalSpace X] {f g : X → Mx D ρ p} (hf : Continuous f) (hg : Continuous g)
+    : Continuous fun v => f v + g v :=
   continuous_matrix fun i j => (hf.matrix_elem i j).add (hg.matrix_elem i j)
 
-def tEquiv (a b c d : Mx D p p)
-    (l1 : adj d ⬝ a - adj b ⬝ c = 1) (l2 : adj a ⬝ c = adj c ⬝ a) (l3 : adj b ⬝ d = adj d ⬝ b)
-    (l4 : adj a ⬝ d - adj c ⬝ b = 1)
-    (r1 : a ⬝ adj d - b ⬝ adj c = 1) (r2 : c ⬝ adj d = d ⬝ adj c) (r3 : b ⬝ adj a = a ⬝ adj b)
-    (r4 : d ⬝ adj a - c ⬝ adj b = 1) :
-    (Mx D ρ p × Mx D ρ p) ≃ₜ+ (Mx D ρ p × Mx D ρ p) where
+def tEquiv
+    (a b c d : Mx D p p) (l1 : adj d ⬝ a - adj b ⬝ c = 1) (l2 : adj a ⬝ c = adj c ⬝ a)
+    (l3 : adj b ⬝ d = adj d ⬝ b) (l4 : adj a ⬝ d - adj c ⬝ b = 1) (r1 : a ⬝ adj d - b ⬝ adj c = 1)
+    (r2 : c ⬝ adj d = d ⬝ adj c) (r3 : b ⬝ adj a = a ⬝ adj b) (r4 : d ⬝ adj a - c ⬝ adj b = 1)
+    : (Mx D ρ p × Mx D ρ p) ≃ₜ+ (Mx D ρ p × Mx D ρ p) where
   toFun v := (v.1 ⬝ adj d - v.2 ⬝ adj c, v.2 ⬝ adj a - v.1 ⬝ adj b)
   invFun v := (v.1 ⬝ a + v.2 ⬝ c, v.1 ⬝ b + v.2 ⬝ d)
   left_inv v := by
@@ -142,53 +166,63 @@ def tEquiv (a b c d : Mx D p p)
     · exact cont_add ((cont_rmul _).comp continuous_fst) ((cont_rmul _).comp continuous_snd)
     · exact cont_add ((cont_rmul _).comp continuous_fst) ((cont_rmul _).comp continuous_snd)
 
-
 set_option maxHeartbeats 1000000 in
-theorem emb_conj (M : Maps D hn) (g : G D p) {a b c d : Mx D p p} (hg : mat g = blk4 a b c d)
+theorem emb_conj
+    (M : Maps D hn)
+    (g : G D p)
+    {a b c d : Mx D p p} (hg : mat g = blk4 a b c d)
     (z' : hermA D ρ) (x y x' y' : Mx D ρ p)
-    (h1 : y' ⬝ a + x' ⬝ c = y) (h2 : y' ⬝ b + x' ⬝ d = x)
-    (h3 : adj x' = a ⬝ adj x - b ⬝ adj y) (h4 : adj y' = d ⬝ adj y - c ⬝ adj x)
-    (h5 : z'.1 - x' ⬝ (d ⬝ adj y - c ⬝ adj x) = -(x ⬝ adj y)) :
-    M.emb g * (M.nzx 0 x * M.sh y) = M.nzx z' x' * M.sh y' * M.emb g := by
+    (h1 : y' ⬝ a + x' ⬝ c = y) (h2 : y' ⬝ b + x' ⬝ d = x) (h3 : adj x' = a ⬝ adj x - b ⬝ adj y)
+    (h4 : adj y' = d ⬝ adj y - c ⬝ adj x) (h5 : z'.1 - x' ⬝ (d ⬝ adj y - c ⬝ adj x) = -(x ⬝ adj y))
+    : M.emb g * (M.nzx 0 x * M.sh y) = M.nzx z' x' * M.sh y' * M.emb g := by
   have hE := M.emb_mat g _ _ _ _ hg
   apply mat_injective
-  rw [mat_mul' (M.emb g), mat_mul' _ (M.emb g), mat_nzx_sh, mat_nzx_sh, hE, submatrix_fromBlocks_mul, submatrix_fromBlocks_mul]
-  simp only [Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, block_mul₂, bl_add, Matrix.one_mul, Matrix.mul_one,
-    Matrix.mul_neg, Matrix.neg_mul, neg_zero, h1, h2, h3, h4, h5, neg_sub, AddSubgroup.coe_zero, zero_sub,
-    sub_eq_add_neg (a ⬝ adj x), sub_eq_add_neg (c ⬝ adj x)]
+  rw [mat_mul' (M.emb g), mat_mul' _ (M.emb g), mat_nzx_sh, mat_nzx_sh, hE,
+    submatrix_fromBlocks_mul, submatrix_fromBlocks_mul]
+  simp only [Matrix.mul_zero, Matrix.zero_mul, add_zero, zero_add, block_mul₂, bl_add,
+    Matrix.one_mul, Matrix.mul_one, Matrix.mul_neg, Matrix.neg_mul, neg_zero, h1, h2, h3, h4, h5,
+    neg_sub, AddSubgroup.coe_zero, zero_sub, sub_eq_add_neg (a ⬝ adj x), sub_eq_add_neg (c ⬝ adj x)]
 
 def zTv (a b c d : Mx D p p) (x y : Mx D ρ p) : Mx D ρ ρ :=
-  x ⬝ ((adj c ⬝ b) ⬝ adj y) + y ⬝ ((adj b ⬝ c) ⬝ adj x) - x ⬝ ((adj a ⬝ c) ⬝ adj x) - y ⬝ ((adj b ⬝ d) ⬝ adj y)
+  x ⬝ ((adj c ⬝ b) ⬝ adj y) + y ⬝ ((adj b ⬝ c) ⬝ adj x) - x ⬝ ((adj a ⬝ c) ⬝ adj x)
+    - y ⬝ ((adj b ⬝ d) ⬝ adj y)
 
-theorem zTv_herm {a b c d : Mx D p p} (l2 : adj a ⬝ c = adj c ⬝ a) (l3 : adj b ⬝ d = adj d ⬝ b) (x y : Mx D ρ p) :
-    adj (zTv a b c d x y) = zTv a b c d x y := by
+theorem zTv_herm
+    {a b c d : Mx D p p} (l2 : adj a ⬝ c = adj c ⬝ a) (l3 : adj b ⬝ d = adj d ⬝ b) (x y : Mx D ρ p)
+    : adj (zTv a b c d x y) = zTv a b c d x y := by
   simp only [zTv, adj_sub', adj_add, adj_mul, adj_adj, ← l2, ← l3]
   simp only [Matrix.mul_assoc]
   abel
 
-theorem zTv_eq {a b c d : Mx D p p} (l4 : adj a ⬝ d - adj c ⬝ b = 1) (x y : Mx D ρ p) :
-    zTv a b c d x y - (x ⬝ adj a - y ⬝ adj b) ⬝ (d ⬝ adj y - c ⬝ adj x) = -(x ⬝ adj y) := by
+theorem zTv_eq {a b c d : Mx D p p} (l4 : adj a ⬝ d - adj c ⬝ b = 1) (x y : Mx D ρ p)
+    : zTv a b c d x y - (x ⬝ adj a - y ⬝ adj b) ⬝ (d ⬝ adj y - c ⬝ adj x) = -(x ⬝ adj y) := by
   have e : ∀ w : Mx D p ρ, adj a ⬝ (d ⬝ w) = w + adj c ⬝ (b ⬝ w) := fun w => by
-    rw [← Matrix.mul_assoc, sub_eq_iff_eq_add.1 l4, Matrix.add_mul, Matrix.one_mul, Matrix.mul_assoc]
+    rw [← Matrix.mul_assoc, sub_eq_iff_eq_add.1 l4, Matrix.add_mul, Matrix.one_mul,
+      Matrix.mul_assoc]
   simp only [zTv, Matrix.sub_mul, Matrix.mul_sub, Matrix.mul_assoc, e, Matrix.mul_add]
   abel
 
-theorem rational_map_sub {k l : ℕ} (u v : Matrix (Fin k) (Fin l) D.host.E) : rat (D := D) (u - v) = rat u - rat v := by
+theorem rational_map_sub {k l : ℕ} (u v : Matrix (Fin k) (Fin l) D.host.E)
+    : rat (D := D) (u - v) = rat u - rat v := by
   ext i j
   exact map_sub (incA D) _ _
 
-theorem rational_map_add {k l : ℕ} (u v : Matrix (Fin k) (Fin l) D.host.E) : rat (D := D) (u + v) = rat u + rat v := by
+theorem rational_map_add {k l : ℕ} (u v : Matrix (Fin k) (Fin l) D.host.E)
+    : rat (D := D) (u + v) = rat u + rat v := by
   ext i j
   exact map_add (incA D) _ _
 
-theorem transport {D : D7} {n ρ p : ℕ} {hn : ρ + p = n} (M : Maps D hn) (γ : G D p) (hγ : γ ∈ GF D p) :
-    ∃ T : (Mx D ρ p × Mx D ρ p) ≃ₜ+ (Mx D ρ p × Mx D ρ p),
+theorem transport
+    {D : D7} {n ρ p : ℕ} {hn : ρ + p = n} (M : Maps D hn) (γ : G D p) (hγ : γ ∈ GF D p)
+    : ∃ T : (Mx D ρ p × Mx D ρ p) ≃ₜ+ (Mx D ρ p × Mx D ρ p),
       (∀ ξ₁ ξ₂ : Matrix (Fin ρ) (Fin p) D.host.E, ∃ ξ₁' ξ₂' : Matrix (Fin ρ) (Fin p) D.host.E,
-        T (GlobalTheory.CompanionTheory.FJE.rt ξ₁, GlobalTheory.CompanionTheory.FJE.rt ξ₂) = (GlobalTheory.CompanionTheory.FJE.rt ξ₁', GlobalTheory.CompanionTheory.FJE.rt ξ₂')) ∧
-      (∀ ξ₁ ξ₂ : Matrix (Fin ρ) (Fin p) D.host.E, ∃ ξ₁' ξ₂' : Matrix (Fin ρ) (Fin p) D.host.E,
-        T.symm (GlobalTheory.CompanionTheory.FJE.rt ξ₁, GlobalTheory.CompanionTheory.FJE.rt ξ₂) = (GlobalTheory.CompanionTheory.FJE.rt ξ₁', GlobalTheory.CompanionTheory.FJE.rt ξ₂')) ∧
-      ∀ y x : Mx D ρ p, ∃ z' : hermA D ρ,
-        M.emb γ * (M.nzx 0 x * M.sh y) = M.nzx z' (T (y, x)).2 * M.sh (T (y, x)).1 * M.emb γ := by
+          T (GlobalTheory.CompanionTheory.FJE.rt ξ₁, GlobalTheory.CompanionTheory.FJE.rt ξ₂)
+            = (GlobalTheory.CompanionTheory.FJE.rt ξ₁', GlobalTheory.CompanionTheory.FJE.rt ξ₂'))
+        ∧ (∀ ξ₁ ξ₂ : Matrix (Fin ρ) (Fin p) D.host.E, ∃ ξ₁' ξ₂' : Matrix (Fin ρ) (Fin p) D.host.E,
+          T.symm (GlobalTheory.CompanionTheory.FJE.rt ξ₁, GlobalTheory.CompanionTheory.FJE.rt ξ₂)
+            = (GlobalTheory.CompanionTheory.FJE.rt ξ₁', GlobalTheory.CompanionTheory.FJE.rt ξ₂'))
+        ∧ ∀ y x : Mx D ρ p, ∃ z' : hermA D ρ,
+          M.emb γ * (M.nzx 0 x * M.sh y) = M.nzx z' (T (y, x)).2 * M.sh (T (y, x)).1 * M.emb γ := by
   obtain ⟨a, b, c, d, hm⟩ := exists_rat_blocks γ hγ
   obtain ⟨l1, l2, l3, l4⟩ := rel_left γ hm
   obtain ⟨r1, r2, r3, r4⟩ := rel_right γ hm

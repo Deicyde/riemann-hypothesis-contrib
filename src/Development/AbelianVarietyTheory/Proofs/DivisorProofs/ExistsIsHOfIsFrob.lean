@@ -10,9 +10,10 @@ open GlobalTheory GlobalTheory.DI
 
 namespace GlobalTheory.DI
 
-theorem exists_isH_of_isFrob : ∀ {K Kt : Type} [CommRing K] [CommRing Kt] (p : ℕ) [Fact p.Prime] [CharP K p]
-    (π : Kt →+* K) (F F' : Kt →+* Kt), IsFlatLift p π → IsFrob p π F → IsFrob p π F' →
-    ∃ h, IsH p π F F' h := by
+theorem exists_isH_of_isFrob
+    : ∀ {K Kt : Type} [CommRing K] [CommRing Kt] (p : ℕ) [Fact p.Prime] [CharP K p] (π : Kt →+* K)
+        (F F' : Kt →+* Kt),
+      IsFlatLift p π → IsFrob p π F → IsFrob p π F' → ∃ h, IsH p π F F' h := by
   intro K Kt _ _ p _ _ π F F' hL hF hF'
   have hex : ∀ z, ∃ w, F' z = F z + p * w := by
     intro z
@@ -31,7 +32,9 @@ theorem exists_isH_of_isFrob : ∀ {K Kt : Type} [CommRing K] [CommRing Kt] (p :
     intro z z'
     obtain ⟨w, h1⟩ := hex z
     obtain ⟨w', h2⟩ := hex z'
-    rw [hg z w h1, hg z' w' h2, hg (z + z') (w + w') (by rw [map_add (f := _), map_add (f := _), h1, h2]; ring), map_add (f := _)]
+    rw [hg z w h1, hg z' w' h2,
+      hg (z + z') (w + w') (by rw [map_add (f := _), map_add (f := _), h1, h2]; ring),
+      map_add (f := _)]
   have hgp : ∀ y, g (p * y) = 0 := by
     intro y
     obtain ⟨w, h1⟩ := hex y
@@ -41,8 +44,8 @@ theorem exists_isH_of_isFrob : ∀ {K Kt : Type} [CommRing K] [CommRing Kt] (p :
     intro z z'
     obtain ⟨w, h1⟩ := hex z
     obtain ⟨w', h2⟩ := hex z'
-    rw [hg z w h1, hg z' w' h2, hg (z * z') (w * F z' + F z * w' + p * w * w')
-      (by rw [map_mul, map_mul, h1, h2]; ring)]
+    rw [hg z w h1, hg z' w' h2,
+      hg (z * z') (w * F z' + F z * w' + p * w * w') (by rw [map_mul, map_mul, h1, h2]; ring)]
     simp only [map_add (f := _), map_mul, map_natCast, CharP.cast_eq_zero, zero_mul, add_zero]
     rw [hF z, hF z']
     ring
@@ -51,21 +54,25 @@ theorem exists_isH_of_isFrob : ∀ {K Kt : Type} [CommRing K] [CommRing Kt] (p :
     obtain ⟨y, hy⟩ := (hL.ker (z - z')).1 (by rw [map_sub, hzz, sub_self])
     have : z = z' + p * y := by rw [← hy]; ring
     rw [this, hgadd, hgp, add_zero]
-  let φ : K →+ K := AddMonoidHom.mk' (fun x => g (Function.surjInv hL.surj x)) (by
-    intro a b
-    show g _ = g _ + g _
-    rw [← hgadd]
-    apply hwd
-    rw [map_add (f := _), Function.surjInv_eq hL.surj, Function.surjInv_eq hL.surj, Function.surjInv_eq hL.surj])
+  let φ : K →+ K :=
+    AddMonoidHom.mk' (fun x => g (Function.surjInv hL.surj x)) (by
+      intro a b
+      show g _ = g _ + g _
+      rw [← hgadd]
+      apply hwd
+      rw [map_add (f := _), Function.surjInv_eq hL.surj, Function.surjInv_eq hL.surj,
+        Function.surjInv_eq hL.surj])
   have hφ : ∀ z, φ (π z) = g z := by
     intro z
     show g _ = g _
     exact hwd _ _ (Function.surjInv_eq hL.surj _)
-  obtain ⟨f, hfs, hfD⟩ := GlobalTheory.T.frobeniusDerivation_factors_through_kaehler (M := K) p φ (by
-    intro a b
-    obtain ⟨z, rfl⟩ := hL.surj a
-    obtain ⟨z', rfl⟩ := hL.surj b
-    rw [← map_mul, hφ, hφ, hφ, hgmul, smul_eq_mul, smul_eq_mul]; ring)
+  obtain ⟨f, hfs, hfD⟩ :=
+    GlobalTheory.T.frobeniusDerivation_factors_through_kaehler (M := K) p φ (by
+      intro a b
+      obtain ⟨z, rfl⟩ := hL.surj a
+      obtain ⟨z', rfl⟩ := hL.surj b
+      rw [← map_mul, hφ, hφ, hφ, hgmul, smul_eq_mul, smul_eq_mul]
+      ring)
   refine ⟨f, fun c v => by rw [hfs, smul_eq_mul], fun z w hzw => ?_⟩
   rw [hfD, hφ, hg z w hzw]
 

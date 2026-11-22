@@ -13,8 +13,9 @@ def IsIntP {p : ℕ} [Fact p.Prime] (x : ℂ_[p]) : Prop := ‖x‖ ≤ 1
 def IntegralMv {σ : Type*} {p : ℕ} [Fact p.Prime] (F : MvPowerSeries σ ℂ_[p]) : Prop :=
   ∀ n, IsIntP (MvPowerSeries.coeff n F)
 
-def expMv {σ : Type*} {p : ℕ} [Fact p.Prime] (F : MvPowerSeries σ ℂ_[p]) : MvPowerSeries σ ℂ_[p] :=
-  fun α => ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1),
+def expMv {σ : Type*} {p : ℕ} [Fact p.Prime] (F : MvPowerSeries σ ℂ_[p])
+    : MvPowerSeries σ ℂ_[p] := fun α =>
+  ∑ n ∈ Finset.range ((α.sum fun _ k => k) + 1),
     MvPowerSeries.coeff α (F ^ n) / (n.factorial : ℂ_[p])
 
 def Wp (p : ℕ) [Fact p.Prime] : Subring ℂ_[p] :=

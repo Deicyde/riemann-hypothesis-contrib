@@ -16,18 +16,22 @@ variable {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDime
 
 variable {k : ℕ}
 
-theorem lowK_allPos (lam : Fin k → ℝ) (a : Fin k) :
-    Formalism.QuantumDeterminants.lowK (allPos k) lam a = lam a - (((k : ℝ) - 1) / 2 - (a : ℕ)) := by
+theorem lowK_allPos (lam : Fin k → ℝ) (a : Fin k)
+    : Formalism.QuantumDeterminants.lowK (allPos k) lam a
+      = lam a - (((k : ℝ) - 1) / 2 - (a : ℕ)) := by
   have h1 : (Finset.univ.filter fun b : Fin k => a < b) = Finset.Ioi a := by ext b; simp
   have h2 : (Finset.univ.filter fun b : Fin k => b < a) = Finset.Iio a := by ext b; simp
   have h3 : (a : ℕ) + 1 ≤ k := a.2
-  simp only [allPos, Formalism.QuantumDeterminants.lowK, Formalism.REAL.rhoN, Formalism.REAL.rhoC, Pi.sub_apply, Pi.add_apply, ne_eq, not_true_eq_false,
-    and_false, and_true, Finset.filter_false, Finset.card_empty, h1, h2, Fin.card_Ioi, Fin.card_Iio]
+  simp only [allPos, Formalism.QuantumDeterminants.lowK, Formalism.REAL.rhoN, Formalism.REAL.rhoC,
+    Pi.sub_apply, Pi.add_apply, ne_eq, not_true_eq_false, and_false, and_true, Finset.filter_false,
+    Finset.card_empty, h1, h2, Fin.card_Ioi, Fin.card_Iio]
   rw [show k - 1 - (a : ℕ) = k - ((a : ℕ) + 1) by omega, Nat.cast_sub h3]
-  push_cast; ring
+  push_cast
+  ring
 
-theorem lowK_neg_rev (u : Fin k → ℝ) :
-    Formalism.QuantumDeterminants.lowK (allPos k) (fun i => -u (Fin.rev i)) = fun a => -Formalism.QuantumDeterminants.lowK (allPos k) u (Fin.rev a) := by
+theorem lowK_neg_rev (u : Fin k → ℝ)
+    : Formalism.QuantumDeterminants.lowK (allPos k) (fun i => - u (Fin.rev i))
+      = fun a => - Formalism.QuantumDeterminants.lowK (allPos k) u (Fin.rev a) := by
   funext a
   rw [lowK_allPos, lowK_allPos, Fin.val_rev, Nat.cast_sub a.2]
   push_cast

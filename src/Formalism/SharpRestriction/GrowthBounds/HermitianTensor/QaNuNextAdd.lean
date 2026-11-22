@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.GradedWeylDivisibility MvPolynomial
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.GradedWeylDivisibility
+  MvPolynomial
 
 theorem intCapP : IntCapP := by
   intro O K _ _ _ hinj k ν F hF hco
@@ -19,8 +20,9 @@ theorem intCapP : IntCapP := by
     obtain ⟨u, hu, rfl⟩ := MvPolynomial.mem_coeffs_iff.mp hc
     exact hco u
   subst hG
-  have hcomm : ∀ (l j : Fin k) (p : MvPolynomial (Fin k × Fin k) O),
-      map (algebraMap O K) (colAddGen O l j p) = colAddGen K l j (map (algebraMap O K) p) := by
+  have hcomm
+      : ∀ (l j : Fin k) (p : MvPolynomial (Fin k × Fin k) O),
+        map (algebraMap O K) (colAddGen O l j p) = colAddGen K l j (map (algebraMap O K) p) := by
     intro l j p
     induction p using MvPolynomial.induction_on
     next a => simp [colAddGen]
@@ -31,8 +33,10 @@ theorem intCapP : IntCapP := by
       simp only [colAddGen, aeval_X]
       split_ifs <;> simp
   refine Submodule.mem_map.mpr ⟨G, ?_, ?_⟩
-  · simp only [dualWeyl, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply,
-      sub_eq_zero, AlgHom.toLinearMap_apply, mem_weightedHomogeneousSubmodule] at hF ⊢
+  · simp only [dualWeyl, Submodule.mem_inf, Submodule.mem_iInf, LinearMap.mem_ker,
+        LinearMap.sub_apply, sub_eq_zero, AlgHom.toLinearMap_apply,
+        mem_weightedHomogeneousSubmodule]
+      at hF ⊢
     obtain ⟨h1, h2⟩ := hF
     refine ⟨?_, ?_⟩
     · intro d hd
@@ -40,11 +44,10 @@ theorem intCapP : IntCapP := by
     · intro l j hlj
       apply MvPolynomial.map_injective _ hinj
       rw [hcomm, map_rename, h2 l j hlj]
-  · first
-      | rfl
-      | simp [MvPolynomial.mapAlgHom]
+  · first | rfl | simp [MvPolynomial.mapAlgHom]
 
-theorem qa_nuNext_add {n : ℕ} (ν ν' : Fin n → ℕ) (s : Fin n) : nuNext (ν + ν') s = nuNext ν s + nuNext ν' s := by
+theorem qa_nuNext_add {n : ℕ} (ν ν' : Fin n → ℕ) (s : Fin n)
+    : nuNext (ν + ν') s = nuNext ν s + nuNext ν' s := by
   unfold nuNext
   split_ifs <;> simp
 
@@ -64,7 +67,8 @@ theorem hwMulP : HwMulP := by
     have h1 := qa_nuNext_le ν hν s
     have h2 := qa_nuNext_le ν' hν' s
     omega
-  · have key : ∀ (m : ℕ) (h1 : m ≤ k) (h2 : m ≤ k), eval (idPoint A k k) (lpMinor A m h1 h2) = 1 := by
+  · have key
+        : ∀ (m : ℕ) (h1 : m ≤ k) (h2 : m ≤ k), eval (idPoint A k k) (lpMinor A m h1 h2) = 1 := by
       intro m h1 h2
       rw [lpMinor, RingHom.map_det]
       convert (Matrix.det_one : (1 : Matrix (Fin m) (Fin m) A).det = 1)

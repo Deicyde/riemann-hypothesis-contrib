@@ -6,19 +6,21 @@ public import Mathlib
 
 namespace GlobalTheory
 
-
 open Algebra in
-theorem isAlgebraic_of_subring_isAlgebraic {L : Type} [Field L] [Algebra ℂ L]
+theorem isAlgebraic_of_subring_isAlgebraic
+    {L : Type} [Field L] [Algebra ℂ L]
     (S : Subalgebra ℂ L) (B : Subring L) (z : L)
-    (hB : ∀ b ∈ B, IsAlgebraic S b) (hz : IsAlgebraic B z) : IsAlgebraic S z := by
+    (hB : ∀ b ∈ B, IsAlgebraic S b) (hz : IsAlgebraic B z)
+    : IsAlgebraic S z := by
   set T := adjoin ℂ ((S : Set L) ∪ (B : Set L)) with hT
   have hBT : ∀ b ∈ B, b ∈ T := fun b hb => subset_adjoin (Or.inr hb)
-  let f : B →+* T :=
-    { toFun := fun b => ⟨b.1, hBT b.1 b.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let f : B →+* T := {
+    toFun := fun b => ⟨b.1, hBT b.1 b.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   let _ : Algebra B T := f.toAlgebra
   have : IsScalarTower B T L := .of_algebraMap_eq fun _ => rfl
   have hinj : Function.Injective (algebraMap B T) := by

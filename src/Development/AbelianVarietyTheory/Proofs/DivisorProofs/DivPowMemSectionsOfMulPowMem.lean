@@ -10,14 +10,19 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace Filter Topology
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.ArInt GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.VolBr
 
 namespace GlobalTheory.VolBr
 
-theorem Pair.div_pow_mem_H_of_mul_pow : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
-    IsArithVar p D → ∀ (P : Pair p), ∀ (b : ℕ) (s t : X.functionField), P.Good D b s t → ∀ (N m : ℕ)
-    (u : X.functionField), u ∈ P.H N m → u * t ^ N / s ^ m ∈ P.H 0 (b * N) → u / s ^ m ∈ P.H N 0 := by
+theorem Pair.div_pow_mem_H_of_mul_pow
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) [IsIntegral X] (p : X ⟶ Sp k) (D : ℕ),
+      IsArithVar p D
+        → ∀ (P : Pair p), ∀ (b : ℕ) (s t : X.functionField),
+          P.Good D b s t
+            → ∀ (N m : ℕ) (u : X.functionField),
+              u ∈ P.H N m → u * t ^ N / s ^ m ∈ P.H 0 (b * N) → u / s ^ m ∈ P.H N 0 := by
   intro k _ X _ p D _ P b s t hG N m u hu hut x i j hi hj
   let O : Subring X.functionField := (algebraMap (X.presheaf.stalk x) X.functionField).range
   have hO : ∀ f, RegAt x f ↔ f ∈ O := fun f => Iff.rfl
@@ -31,8 +36,9 @@ theorem Pair.div_pow_mem_H_of_mul_pow : ∀ (k : Type) [CommRing k] (X : Scheme.
   have hreg : ∀ g ∈ O, g * P.loc (-1) b t i j / P.loc 0 1 s i j ∈ O → g / P.loc 0 1 s i j ∈ O :=
     fun g hg h => (hO _).1 (hG.reg x i j hi hj g ((hO _).2 hg) ((hO _).2 h))
   have hg : P.loc N m u i j ∈ O := (hO _).1 (hu x i j hi hj)
-  have e1 : P.loc N m u i j * P.loc (-1) b t i j ^ N / P.loc 0 1 s i j ^ m =
-      P.loc 0 ((b * N : ℕ) : ℤ) (u * t ^ N / s ^ m) i j := by
+  have e1
+      : P.loc N m u i j * P.loc (-1) b t i j ^ N / P.loc 0 1 s i j ^ m
+        = P.loc 0 ((b * N : ℕ) : ℤ) (u * t ^ N / s ^ m) i j := by
     simp only [loc, zpow_zero, zpow_one, mul_one, zpow_natCast, zpow_neg, mul_pow, inv_pow]
     push_cast
     rw [← zpow_natCast, ← zpow_natCast, ← zpow_natCast]

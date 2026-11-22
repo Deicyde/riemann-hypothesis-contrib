@@ -6,21 +6,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
+open NumberField IsDedekindDomain Polynomial UpperTheory.V UpperTheory.V.Z.Gam
+  UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-private theorem rootBounds {q x a b : ℝ} {f : ℕ} (hf : 0 < f) (hq : 0 < q) (hx : 0 ≤ x)
-    (h1 : ((q ^ f : ℝ)) ^ a < x ^ f) (h2 : x ^ f < ((q ^ f : ℝ)) ^ b) :
-    q ^ a < x ∧ x < q ^ b := by
+private theorem rootBounds
+    {q x a b : ℝ} {f : ℕ} (hf : 0 < f) (hq : 0 < q) (hx : 0 ≤ x) (h1 : ((q ^ f : ℝ)) ^ a < x ^ f)
+    (h2 : x ^ f < ((q ^ f : ℝ)) ^ b)
+    : q ^ a < x ∧ x < q ^ b := by
   have e : ∀ c : ℝ, ((q ^ f : ℝ)) ^ c = (q ^ c) ^ f := by
     intro c
-    rw [← Real.rpow_natCast q f, ← Real.rpow_mul hq.le, mul_comm, Real.rpow_mul hq.le, Real.rpow_natCast]
+    rw [← Real.rpow_natCast q f, ← Real.rpow_mul hq.le, mul_comm, Real.rpow_mul hq.le,
+      Real.rpow_natCast]
   rw [e] at h1 h2
   exact ⟨lt_of_pow_lt_pow_left₀ f hx h1, lt_of_pow_lt_pow_left₀ f (Real.rpow_nonneg hq.le _) h2⟩
 
-theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winInd :
-    UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.WinInd := by
+theorem UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.winInd
+    : UpperTheory.V.Z.ImaginaryQuadraticEtaCharacter.WinInd := by
   intro K M _ _ _ _ _ _ _ h2 P π hsys t v hw
   refine ⟨indTor K M h2 P π hsys v fun w => ⟨(hw w).1.1, (hw w).2⟩, fun s hs ξ hξ => ?_⟩
   have hs' : ∀ w : GroundTheory.Global.SemiLocal.PlacesOver M v, ∃ s', SuppAt π w.1 s' := fun w =>

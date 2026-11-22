@@ -7,18 +7,27 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Classical ComplexOrder
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl GlobalTheory.Cont
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.AStep
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem holPhi (H : Hyps) {d : SD σ} (R : RD d) (w : InfinitePlace F) {nb lam 𝓖}
-    (hc : CoefData (σ := σ) (Y := d.Y) d.b nb lam 𝓖) (T : nF σ d.Y d.b) (A : d.G → ℂ) (hAc : Continuous A)
-    (hAi : ∀ γ ∈ rat2 σ d.Y, ∀ g, A (γ * g) = A g) (pp qq : ℕ) (e : ℤ)
-    (hA : ∀ g, IsHolW pp qq e fun y => A (g * R.ι w y)) (x' : d.G) :
-    IsHolW pp qq e fun y => fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w y) := by
+theorem holPhi
+    (H : Hyps)
+    {d : SD σ} (R : RD d)
+    (w : InfinitePlace F)
+    {nb lam 𝓖} (hc : CoefData (σ := σ) (Y := d.Y) d.b nb lam 𝓖)
+    (T : nF σ d.Y d.b)
+    (A : d.G → ℂ) (hAc : Continuous A) (hAi : ∀ γ ∈ rat2 σ d.Y, ∀ g, A (γ * g) = A g)
+    (pp qq : ℕ) (e : ℤ) (hA : ∀ g, IsHolW pp qq e fun y => A (g * R.ι w y))
+    (x' : d.G)
+    : IsHolW pp qq e fun y => fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w y) := by
   have hc' := hc
   obtain ⟨hN, -, -, h1⟩ := hc'
   have hσ := kfour.sigma_sigma_of_good d.ok.good
@@ -28,7 +37,8 @@ theorem holPhi (H : Hyps) {d : SD σ} (R : RD d) (w : InfinitePlace F) {nb lam �
   have := hTG
   have hψ := GlobalTheory.StdCharWeilDatum.isCharAF d.ok.good.std
   have hnbc := kfour.nb_continuous hσ d.ok.frame hN
-  let u : nA σ d.Y d.b → ℂ := fun β => d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T.1.1 * β.1))))
+  let u : nA σ d.Y d.b → ℂ := fun β =>
+    d.B.ψ (-(Algebra.trace (AF F) (AE F E) (Matrix.trace (T.1.1 * β.1))))
   have huc : Continuous u := kfour.continuous_chr hψ.1 T.1.1
   let γf : nA σ d.Y d.b → nA σ d.Y d.b := fun β => Classical.choose (hKc β)
   have hγ : ∀ β, γf β ∈ nF σ d.Y d.b ∧ γf β + β ∈ K := fun β => Classical.choose_spec (hKc β)
@@ -37,7 +47,8 @@ theorem holPhi (H : Hyps) {d : SD σ} (R : RD d) (w : InfinitePlace F) {nb lam �
     intro β g
     show A (nb (γf β + β) * x' * g) = _
     rw [KSing.nb_add d hN, mul_assoc, mul_assoc, hAi _ (KSing.nb_rat d hN (hγ β).1)]
-  have : IsFiniteMeasure (lam.restrict 𝓖) := ⟨by rw [Measure.restrict_apply_univ, h1]; exact ENNReal.one_lt_top⟩
+  have : IsFiniteMeasure (lam.restrict 𝓖) :=
+    ⟨by rw [Measure.restrict_apply_univ, h1]; exact ENNReal.one_lt_top⟩
   have hC : IsCompact ((fun k => nb k * x') '' K) := hK.image (hnbc.mul continuous_const)
   have hmeas : ∀ y, AEStronglyMeasurable (fun β => A (c β * R.ι w y) * u β) (lam.restrict 𝓖) := by
     intro y
@@ -45,41 +56,67 @@ theorem holPhi (H : Hyps) {d : SD σ} (R : RD d) (w : InfinitePlace F) {nb lam �
       funext fun β => by rw [key]
     rw [e]
     exact ((hAc.comp (hnbc.mul continuous_const)).mul huc).aestronglyMeasurable
-  have := H.holT.2 d.n pp qq e d.G (R.ι w) (R.cont w) A hAc hA (nA σ d.Y d.b) (lam.restrict 𝓖) c u _ hC
-    (fun β => ⟨_, (hγ β).2, rfl⟩) (fun β => (hψ.2.1 _).le) hmeas
+  have :=
+    H.holT.2 d.n pp qq e d.G (R.ι w) (R.cont w) A hAc hA (nA σ d.Y d.b) (lam.restrict 𝓖) c u _ hC
+      (fun β => ⟨_, (hγ β).2, rfl⟩)
+      (fun β => (hψ.2.1 _).le)
+      hmeas
   convert this using 2 with y
   simp only [fc]
   congr 1
   funext β
   rw [key]
 
-theorem holCoef_pf (H : Hyps) {d : SD σ} (R : RD d) (L : LD d) (w : InfinitePlace F) {nb lam 𝓖}
-    (hc : CoefData (σ := σ) (Y := d.Y) d.b nb lam 𝓖) {T : nF σ d.Y d.b}
-    {T' : nF σ L.Y L.b} (hT : L.IsSub T T') (A : d.G → ℂ) (hAc : Continuous A) (hAi : ∀ γ ∈ rat2 σ d.Y, ∀ g, A (γ * g) = A g)
-    (pp qq : ℕ) (e : ℤ) (hpq : pp = d.m ∧ qq = 0 ∨ pp = 0 ∧ qq = d.m) (hA : ∀ g, IsHolW pp qq e fun y => A (g * R.ι w y)) :
-    (∀ τ (y : GR d.n), IsDil (Pi.single L.i₀ 1) τ y → ∀ x,
-      fc d.B.ψ d.b nb lam 𝓖 A T (R.ι w y * x) = Complex.exp (τ * d.m) * fc d.B.ψ d.b nb lam 𝓖 A T x) ∧
-    ∀ uM ν 𝓤, L.UData uM ν 𝓤 → ∀ u x, fc d.B.ψ d.b nb lam 𝓖 A T (uM u * x) = fc d.B.ψ d.b nb lam 𝓖 A T x := by
+theorem holCoef_pf
+    (H : Hyps)
+    {d : SD σ} (R : RD d) (L : LD d)
+    (w : InfinitePlace F)
+    {nb lam 𝓖} (hc : CoefData (σ := σ) (Y := d.Y) d.b nb lam 𝓖)
+    {T : nF σ d.Y d.b} {T' : nF σ L.Y L.b} (hT : L.IsSub T T')
+    (A : d.G → ℂ) (hAc : Continuous A) (hAi : ∀ γ ∈ rat2 σ d.Y, ∀ g, A (γ * g) = A g)
+    (pp qq : ℕ) (e : ℤ) (hpq : pp = d.m ∧ qq = 0 ∨ pp = 0 ∧ qq = d.m)
+    (hA : ∀ g, IsHolW pp qq e fun y => A (g * R.ι w y))
+    : (∀ τ (y : GR d.n),
+        IsDil (Pi.single L.i₀ 1) τ y
+          → ∀ x,
+            fc d.B.ψ d.b nb lam 𝓖 A T (R.ι w y * x)
+              = Complex.exp (τ * d.m) * fc d.B.ψ d.b nb lam 𝓖 A T x)
+      ∧ ∀ uM ν 𝓤,
+        L.UData uM ν 𝓤
+          → ∀ u x, fc d.B.ψ d.b nb lam 𝓖 A T (uM u * x) = fc d.B.ψ d.b nb lam 𝓖 A T x := by
   have hc' := hc
   obtain ⟨hN, -, -, -⟩ := hc'
   have hr : ∀ l, betaW d R w T L.i₀ l = 0 := fun l => by
     simp [betaW, SD.cw, Matrix.map_apply, (hT.1 l).1]
   have hcol : ∀ k, betaW d R w T k L.i₀ = 0 := fun k => by
     simp [betaW, SD.cw, Matrix.map_apply, (hT.1 k).2]
-  have hchar : ∀ x' : d.G, (∀ y', x' * R.ι w y' = R.ι w y' * x') → ∀ (h : Matrix (Fin d.n) (Fin d.n) ℂ) (xN y : GR d.n),
-      h.IsHermitian → mR xN = nU h → fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w (xN * y)) =
-        Complex.exp (Complex.I * (betaW d R w T * h).trace) * fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w y) := by
+  have hchar
+      : ∀ x' : d.G,
+        (∀ y', x' * R.ι w y' = R.ι w y' * x')
+          → ∀ (h : Matrix (Fin d.n) (Fin d.n) ℂ) (xN y : GR d.n),
+            h.IsHermitian → mR xN = nU h
+              → fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w (xN * y))
+                = Complex.exp (Complex.I * (betaW d R w T * h).trace)
+                  * fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w y) := by
     intro x' hx' h xN y hh hxN
     obtain ⟨β₁, hι, hBw, hBu, hBf⟩ := nbw1 d R w hN xN h hxN
     rw [map_mul, ← mul_assoc, hx' xN, hι, mul_assoc, KSing.fc_shift d hc A hAi T β₁,
       character_w1_trace_exp d R w T β₁ h hh hBw hBu hBf]
-  have hright : ∀ x' : d.G, (∀ y', x' * R.ι w y' = R.ι w y' * x') → ∀ (a a' : Matrix (Fin d.n) (Fin d.n) ℂ)
-      (xx y : GR d.n), mR xx = Matrix.fromBlocks a 0 0 a' → aᴴ * betaW d R w T * a = betaW d R w T →
-      fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w (xx * y)) = F0 pp qq e xx * fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w y) :=
-    fun x' hx' => H.holT.1 d.n pp qq e _ (holPhi H R w hc T A hAc hAi pp qq e hA x') (betaW d R w T) (hchar x' hx')
-  have hleft : ∀ (a a' : Matrix (Fin d.n) (Fin d.n) ℂ) (xx : GR d.n), mR xx = Matrix.fromBlocks a 0 0 a' →
-      aᴴ * betaW d R w T * a = betaW d R w T →
-      ∀ x, fc d.B.ψ d.b nb lam 𝓖 A T (R.ι w xx * x) = F0 pp qq e xx * fc d.B.ψ d.b nb lam 𝓖 A T x := by
+  have hright
+      : ∀ x' : d.G,
+        (∀ y', x' * R.ι w y' = R.ι w y' * x')
+          → ∀ (a a' : Matrix (Fin d.n) (Fin d.n) ℂ) (xx y : GR d.n),
+            mR xx = Matrix.fromBlocks a 0 0 a' → aᴴ * betaW d R w T * a = betaW d R w T
+              → fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w (xx * y))
+                = F0 pp qq e xx * fc d.B.ψ d.b nb lam 𝓖 A T (x' * R.ι w y) := fun x' hx' =>
+    H.holT.1 d.n pp qq e _ (holPhi H R w hc T A hAc hAi pp qq e hA x') (betaW d R w T)
+      (hchar x' hx')
+  have hleft
+      : ∀ (a a' : Matrix (Fin d.n) (Fin d.n) ℂ) (xx : GR d.n),
+        mR xx = Matrix.fromBlocks a 0 0 a' → aᴴ * betaW d R w T * a = betaW d R w T
+          → ∀ x,
+            fc d.B.ψ d.b nb lam 𝓖 A T (R.ι w xx * x)
+              = F0 pp qq e xx * fc d.B.ψ d.b nb lam 𝓖 A T x := by
     intro a a' xx hxx hs x
     obtain ⟨x', y₀, rfl, hx'⟩ := decW_pf R w x
     rw [← mul_assoc, ← hx' xx, mul_assoc, ← map_mul, hright x' hx' a a' xx y₀ hxx hs]
@@ -90,7 +127,8 @@ theorem holCoef_pf (H : Hyps) {d : SD σ} (R : RD d) (L : LD d) (w : InfinitePla
     rcases hpq with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> simp
   · have h0 := Krd.zeta_ne R.hζ
     refine (H.uEx F E σ d R L).2 uM ν 𝓤 hu w _ (fcCont d hc T A hAc hAi)
-      (fun u hu' x => (H.fcConj F E σ d L nb lam 𝓖 hc).2 uM ν 𝓤 hu T T' hT A hAc hAi u hu' x) ?_ u x
+      (fun u hu' x => (H.fcConj F E σ d L nb lam 𝓖 hc).2 uM ν 𝓤 hu T T' hT A hAc hAi u hu' x)
+      ?_ u x
     intro u y huy x
     rw [huy]
     obtain ⟨a', ha'⟩ := hu.1 u
@@ -107,11 +145,15 @@ theorem holCoef_pf (H : Hyps) {d : SD σ} (R : RD d) (L : LD d) (w : InfinitePla
       simp only [← Matrix.mul_assoc, Krd.dZ_mul_inv h0, Matrix.one_mul]
       rw [Matrix.mul_assoc, Krd.dZ_mul_inv h0, Matrix.mul_one]
     rw [← huy, ha'] at hmy
-    have hy : mR y = Matrix.fromBlocks (1 + M) 0 0 ((R.ζ • (1 : Matrix (Fin d.n) (Fin d.n) ℂ)) * d.cw w a' *
-        (R.ζ⁻¹ • (1 : Matrix (Fin d.n) (Fin d.n) ℂ))) := by
+    have hy
+        : mR y
+          = Matrix.fromBlocks (1 + M) 0 0
+            ((R.ζ • (1 : Matrix (Fin d.n) (Fin d.n) ℂ)) * d.cw w a'
+              * (R.ζ⁻¹ • (1 : Matrix (Fin d.n) (Fin d.n) ℂ))) := by
       rw [hmy, hMdef]
       simp [dZ, SD.cw, Matrix.fromBlocks_map, Matrix.fromBlocks_multiply, Matrix.map_add (f := _)]
-    rw [hleft _ _ y hy (stab_row L.i₀ M hM _ hr hcol) x, weight_factor_det_one pp qq e y _ _ hy (det_row L.i₀ M hM hM0), one_mul]
+    rw [hleft _ _ y hy (stab_row L.i₀ M hM _ hr hcol) x,
+      weight_factor_det_one pp qq e y _ _ hy (det_row L.i₀ M hM hM0), one_mul]
 
 end PositivityTheory.SiegelWeilFormula.AStep
 

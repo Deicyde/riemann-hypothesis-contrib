@@ -7,9 +7,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing MvPowerSeries UpperTheory.V.Alg
 
-theorem UpperTheory.V.Alg.co_sqz :
-    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (M : Type) [AddCommGroup M] [Module R M] [Module Rᵐᵒᵖ M] [IsCentralScalar R M] [Module O M] [IsScalarTower O R M] [Module.Finite R M] [Algebra O (TrivSqZeroExt R M)],
-      (∀ c : O, algebraMap O (TrivSqZeroExt R M) c = TrivSqZeroExt.inl (algebraMap O R c)) → IsCO O (TrivSqZeroExt R M) := by
+theorem UpperTheory.V.Alg.co_sqz
+    : ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R]
+        (M : Type) [AddCommGroup M] [Module R M] [Module Rᵐᵒᵖ M] [IsCentralScalar R M] [Module O M]
+        [IsScalarTower O R M] [Module.Finite R M] [Algebra O (TrivSqZeroExt R M)],
+      (∀ c : O, algebraMap O (TrivSqZeroExt R M) c = TrivSqZeroExt.inl (algebraMap O R c))
+        → IsCO O (TrivSqZeroExt R M) := by
   intro O _ _ R _ _ _ M _ _ _ _ _ _ _ _ hO
   haveI : IsLocalRing (TrivSqZeroExt R M) :=
     IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun a => by

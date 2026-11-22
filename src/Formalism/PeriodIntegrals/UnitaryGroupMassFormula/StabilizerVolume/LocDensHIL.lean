@@ -14,20 +14,25 @@ namespace PI.VolStabS
 namespace IdxLW
 
 open scoped TensorProduct
-open NumberField IsDedekindDomain MeasureTheory Topology Filter Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsLocalRing
+open NumberField IsDedekindDomain MeasureTheory Topology Filter
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes IsLocalRing
 
 variable {F : Type} [Field F] [NumberField F] (v : HeightOneSpectrum (𝓞 F))
 
-theorem index_maxIdeal :
-    (maximalIdeal (v.adicCompletionIntegers F)).toAddSubgroup.index = Nat.card (𝓞 F ⧸ v.asIdeal) := by
+theorem index_maxIdeal
+    : (maximalIdeal (v.adicCompletionIntegers F)).toAddSubgroup.index
+      = Nat.card (𝓞 F ⧸ v.asIdeal) := by
   rw [← ReciprocityTheory.Bridge.ResidueFieldCardinality.card_residue v]
   rfl
 
 variable {E : Type} [Field E] [Algebra F E] {d : ℕ} (b : Module.Basis (Fin d) F E) (a M : ℕ)
 
 def crdL : latSub b v a M →+ (Fin a × Fin M × Fin d → v.adicCompletionIntegers F) where
-  toFun x q := ⟨(Algebra.TensorProduct.basis (Fv F v) b).repr ((x : Fin a → Fin M → Fv F v ⊗[F] E)
-    q.1 q.2.1) q.2.2, x.2 q.1 q.2.1 q.2.2⟩
+  toFun x q := ⟨
+    (Algebra.TensorProduct.basis (Fv F v) b).repr ((x : Fin a → Fin M → Fv F v ⊗[F] E) q.1 q.2.1)
+      q.2.2,
+    x.2 q.1 q.2.1 q.2.2
+  ⟩
   map_zero' := by
     funext q
     apply Subtype.ext
@@ -50,20 +55,21 @@ theorem crdL_surj : Function.Surjective (crdL v b a M) := by
   apply Subtype.ext
   exact hx q.1 q.2.1 q.2.2
 
-theorem crd_smul' (s : Fv F v) (y : Fv F v ⊗[F] E) (k : Fin d) :
-    (Algebra.TensorProduct.basis (Fv F v) b).repr (s • y) k =
-      s * (Algebra.TensorProduct.basis (Fv F v) b).repr y k := by
+theorem crd_smul' (s : Fv F v) (y : Fv F v ⊗[F] E) (k : Fin d)
+    : (Algebra.TensorProduct.basis (Fv F v) b).repr (s • y) k
+      = s * (Algebra.TensorProduct.basis (Fv F v) b).repr y k := by
   simp [map_smul, Finsupp.smul_apply, smul_eq_mul]
 
-theorem addSubgroupOf_eq :
-    (lamF b v a M 0).addSubgroupOf (latSub b v a M) =
-      (AddSubgroup.pi Set.univ fun _ : Fin a × Fin M × Fin d =>
+theorem addSubgroupOf_eq
+    : (lamF b v a M 0).addSubgroupOf (latSub b v a M)
+      = (AddSubgroup.pi Set.univ fun _ : Fin a × Fin M × Fin d =>
         (maximalIdeal (v.adicCompletionIntegers F)).toAddSubgroup).comap (crdL v b a M) := by
   have hv := unifV_val v
   have h0 := (unifV_spec v).1
   ext x
   rw [AddSubgroup.mem_addSubgroupOf, AddSubgroup.mem_comap, AddSubgroup.mem_pi]
-  simp only [Set.mem_univ, true_implies, Submodule.mem_toAddSubgroup, ReciprocityTheory.Aut.mem_maxIdeal_iff]
+  simp only [Set.mem_univ, true_implies, Submodule.mem_toAddSubgroup,
+    ReciprocityTheory.Aut.mem_maxIdeal_iff]
   constructor
   · intro hx q
     simp only [lamF, mem_smulSub, zero_add, pow_one] at hx
@@ -73,11 +79,14 @@ theorem addSubgroupOf_eq :
     rw [← hpx]
     simp only [Pi.smul_apply]
     rw [crd_smul', map_mul, hv]
-    have hp' : Valued.v ((Algebra.TensorProduct.basis (Fv F v) b).repr (p q.1 q.2.1) q.2.2) ≤ 1 := by
+    have hp'
+        : Valued.v ((Algebra.TensorProduct.basis (Fv F v) b).repr (p q.1 q.2.1) q.2.2) ≤ 1 := by
       have h := hp q.1 q.2.1 q.2.2
       rwa [IsDedekindDomain.HeightOneSpectrum.mem_adicCompletionIntegers] at h
-    calc WithZero.exp (-1 : ℤ) * Valued.v ((Algebra.TensorProduct.basis (Fv F v) b).repr
-          (p q.1 q.2.1) q.2.2) ≤ WithZero.exp (-1 : ℤ) * 1 := by gcongr
+    calc
+      WithZero.exp (-1 : ℤ)
+          * Valued.v ((Algebra.TensorProduct.basis (Fv F v) b).repr (p q.1 q.2.1) q.2.2)
+        ≤ WithZero.exp (-1 : ℤ) * 1 := by gcongr
       _ < 1 := by rw [mul_one]; decide
   · intro hx
     simp only [lamF, mem_smulSub, zero_add, pow_one]
@@ -87,7 +96,8 @@ theorem addSubgroupOf_eq :
       simp only [Pi.smul_apply]
       rw [crd_smul', map_mul, map_inv₀, hv]
       have := ReciprocityTheory.Aut.val_le_exp_neg_one_of_lt_one v (hx (i, j, k))
-      calc (WithZero.exp (-1 : ℤ))⁻¹ * Valued.v ((Algebra.TensorProduct.basis (Fv F v) b).repr
+      calc
+        (WithZero.exp (-1 : ℤ))⁻¹ * Valued.v ((Algebra.TensorProduct.basis (Fv F v) b).repr
             ((x : Fin a → Fin M → Fv F v ⊗[F] E) i j) k)
           ≤ (WithZero.exp (-1 : ℤ))⁻¹ * WithZero.exp (-1 : ℤ) := by gcongr; exact this
         _ = 1 := inv_mul_cancel₀ (WithZero.exp_ne_zero)

@@ -6,17 +6,22 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomolog
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 namespace GlobalTheory.BSP
 
-theorem qmap_comp {l : ℕ} {R : Type} [CommRing R] {B C D : Obj l R} (h : Hom B C) (h₂ : Hom C D) (m : ℕ) :
-    qmap (h₂.comp h) m = (qmap h₂ m).comp (qmap h m) :=
+theorem qmap_comp
+    {l : ℕ} {R : Type} [CommRing R] {B C D : Obj l R} (h : Hom B C) (h₂ : Hom C D) (m : ℕ)
+    : qmap (h₂.comp h) m = (qmap h₂ m).comp (qmap h m) :=
   Ideal.Quotient.ringHom_ext (RingHom.ext fun _ => rfl)
 
-theorem stable_comp : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (B C D : Obj l R) (h : Hom B C)
-    (h₂ : Hom C D), Stable h → Stable h₂ → Stable (h₂.comp h) := by
+theorem stable_comp
+    : ∀ (l : ℕ) [Fact l.Prime] (R : Type) [CommRing R] (B C D : Obj l R) (h : Hom B C)
+        (h₂ : Hom C D),
+      Stable h → Stable h₂ → Stable (h₂.comp h) := by
   intro l _ R _ B C D h h₂ s s₂
   refine ⟨fun m => ?_, fun B' k => ?_⟩
   · rw [qmap_comp]

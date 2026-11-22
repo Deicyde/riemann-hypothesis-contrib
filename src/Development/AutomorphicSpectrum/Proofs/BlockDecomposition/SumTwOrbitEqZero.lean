@@ -7,7 +7,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.FourierTr
 
 @[expose] public section
 
-open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.SplitWeil GlobalTheory.CompanionTheory.MirFourier ValuativeRel
+open Matrix GlobalTheory.PRep GlobalTheory.BZMir GlobalTheory.SplitWeil
+  GlobalTheory.CompanionTheory.MirFourier ValuativeRel
 open scoped Topology
 
 noncomputable section
@@ -16,12 +17,15 @@ namespace GlobalTheory.CompanionTheory.FiniteFourier
 
 open GlobalTheory.CompanionTheory.TwistedAverage
 
-theorem sum_twOrbit_eq_zero {G V : Type} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V) (hρ : IsSmooth ρ) (L : Subgroup G)
-    (hL : IsCompact (L : Set G)) (L₁ : Subgroup L) (hL₁ : IsOpen (L₁ : Set L)) (v : V)
-    (hv : ∀ x ∈ L₁, ρ (x : G) v = v) (θ : L →* ℂˣ) (hθ : ∀ x ∈ L₁, θ x = 1)
-    (hk : v ∈ twKer ρ L θ) [L₁.Normal] [Fintype (L ⧸ L₁)] :
-    ∑ q : L ⧸ L₁, twOrbit ρ L θ v q.out = 0 := by
+theorem sum_twOrbit_eq_zero
+    {G V : Type}
+    [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V]
+    (ρ : Representation ℂ G V) (hρ : IsSmooth ρ)
+    (L : Subgroup G) (hL : IsCompact (L : Set G)) (L₁ : Subgroup L) (hL₁ : IsOpen (L₁ : Set L))
+    (v : V) (hv : ∀ x ∈ L₁, ρ (x : G) v = v)
+    (θ : L →* ℂˣ) (hθ : ∀ x ∈ L₁, θ x = 1) (hk : v ∈ twKer ρ L θ)
+    [L₁.Normal] [Fintype (L ⧸ L₁)]
+    : ∑ q : L ⧸ L₁, twOrbit ρ L θ v q.out = 0 := by
   classical
   have : CompactSpace L := isCompact_iff_compactSpace.mp hL
   have hle : L₁ ≤ θ.ker := fun x hx => hθ x hx
@@ -37,14 +41,29 @@ theorem sum_twOrbit_eq_zero {G V : Type} [CommGroup G] [TopologicalSpace G] [IsT
   have : Fintype (L₁ ⧸ C.subgroupOf L₁) := Fintype.ofFinite _
   have h0 := hsum C (hCM.trans inf_le_left)
   rw [sum_out_refine (hCM.trans inf_le_right) (twOrbit ρ L θ v)
-    (fun x k hk => twOrbit_mul_right ρ L θ v x k ⟨hv k hk, hθ k hk⟩)] at h0
+      (fun x k hk => twOrbit_mul_right ρ L θ v x k ⟨hv k hk, hθ k hk⟩)]
+    at h0
   rw [← Nat.cast_smul_eq_nsmul ℂ, smul_eq_zero] at h0
   rcases h0 with h0 | h0
   · exact absurd h0 (Nat.cast_ne_zero.2 Fintype.card_ne_zero)
   · exact h0
 
-theorem eq_zero_of_twKer :
-    ∀ {G V : Type} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ G V), IsSmooth ρ → ∀ (L : Subgroup G), IsCompact (L : Set G) → ∀ (L₁ : Subgroup L), IsOpen (L₁ : Set L) → ∀ (v : V), (∀ x ∈ L₁, ρ (x : G) v = v) → ∀ {ι : Type} (R : Finset ι), R.Nonempty → ∀ (χ : ι → (L →* ℂˣ)), (∀ a ∈ R, ∀ x ∈ L₁, χ a x = 1) → (∀ a ∈ R, v ∈ twKer ρ L (χ a)) → (∀ x : L, x ∉ L₁ → ∑ a ∈ R, (((χ a x)⁻¹ : ℂˣ) : ℂ) = 0) → v = 0 := by
+theorem eq_zero_of_twKer
+    : ∀ {G V : Type} [CommGroup G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+        [Module ℂ V] (ρ : Representation ℂ G V),
+      IsSmooth ρ
+        → ∀ (L : Subgroup G),
+          IsCompact (L : Set G)
+            → ∀ (L₁ : Subgroup L),
+              IsOpen (L₁ : Set L)
+                → ∀ (v : V),
+                  (∀ x ∈ L₁, ρ (x : G) v = v)
+                    → ∀ {ι : Type} (R : Finset ι),
+                      R.Nonempty
+                        → ∀ (χ : ι → (L →* ℂˣ)),
+                          (∀ a ∈ R, ∀ x ∈ L₁, χ a x = 1) → (∀ a ∈ R, v ∈ twKer ρ L (χ a))
+                            → (∀ x : L, x ∉ L₁ → ∑ a ∈ R, (((χ a x)⁻¹ : ℂˣ) : ℂ) = 0)
+                            → v = 0 := by
   intro G V _ _ _ _ _ ρ hρ L hL L₁ hL₁ v hv ι R hR χ hχ hker hsum
   classical
   have : CompactSpace L := isCompact_iff_compactSpace.mp hL
@@ -73,8 +92,11 @@ theorem eq_zero_of_twKer :
     simp only [twOrbit]
     rw [hχ a ha _ hone, hv _ hone]
     simp
-  rw [Finset.sum_eq_single (1 : L ⧸ L₁) (fun q _ hq => hoff q hq)
-    (fun h => absurd (Finset.mem_univ _) h), hmain] at h0
+  rw [Finset.sum_eq_single (1 : L ⧸ L₁)
+        (fun q _ hq => hoff q hq)
+        (fun h => absurd (Finset.mem_univ _) h),
+      hmain]
+    at h0
   rw [← Nat.cast_smul_eq_nsmul ℂ, smul_eq_zero] at h0
   rcases h0 with h0 | h0
   · exact absurd h0 (Nat.cast_ne_zero.2 hR.card_pos.ne')

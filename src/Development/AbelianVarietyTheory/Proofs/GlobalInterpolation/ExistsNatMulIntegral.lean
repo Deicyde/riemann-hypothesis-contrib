@@ -9,16 +9,22 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.Exists
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions Formalism.L2.Th1.H GlobalTheory.ThetaMove GlobalTheory.IndefiniteRowSideFullHecke.IndexExponentDegree
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.HermitianLatticesTheory
+  Formalism.L2.DIV Formalism.L2.Col Formalism.L2.Ker Formalism.MainNotions Formalism.L2.Th1.H
+  GlobalTheory.ThetaMove GlobalTheory.IndefiniteRowSideFullHecke.IndexExponentDegree
 
 namespace GlobalTheory.ThetaMove.CommonRef
 
 section
 
-variable {E : Type} [Field E] [NumberField E] {W : Type} [AddCommGroup W] [Module (𝓞 E) W] [Module E W] [IsScalarTower (𝓞 E) E W]
+variable
+  {E : Type} [Field E] [NumberField E]
+  {W : Type} [AddCommGroup W] [Module (𝓞 E) W] [Module E W] [IsScalarTower (𝓞 E) E W]
 
-theorem exists_nat_mul_integral (a : E) : ∃ n : ℕ, 0 < n ∧ ∃ r : 𝓞 E, (n : E) * a = algebraMap (𝓞 E) E r := by
-  have ha : IsAlgebraic ℤ a := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic a)
+theorem exists_nat_mul_integral (a : E)
+    : ∃ n : ℕ, 0 < n ∧ ∃ r : 𝓞 E, (n : E) * a = algebraMap (𝓞 E) E r := by
+  have ha : IsAlgebraic ℤ a :=
+    (IsFractionRing.isAlgebraic_iff ℤ ℚ E).2 (Algebra.IsAlgebraic.isAlgebraic a)
   obtain ⟨y, hy, hint⟩ := ha.exists_integral_multiple
   refine ⟨y.natAbs, Int.natAbs_pos.2 hy, ?_⟩
   have h2 : IsIntegral ℤ ((y.natAbs : E) * a) := by
@@ -60,35 +66,56 @@ theorem full_of_span {M : Submodule (𝓞 E) W} (hM : Submodule.span E (M : Set 
     exact M.smul_mem _ hx
 
 omit [Module E W] [IsScalarTower (𝓞 E) E W] in
-theorem exists_nat_smul_le {M N : Submodule (𝓞 E) W} (hM : Full M) (hN : N.FG) :
-    ∃ m : ℕ, 0 < m ∧ ∀ x ∈ N, (m : 𝓞 E) • x ∈ M := by
+theorem exists_nat_smul_le {M N : Submodule (𝓞 E) W} (hM : Full M) (hN : N.FG)
+    : ∃ m : ℕ, 0 < m ∧ ∀ x ∈ N, (m : 𝓞 E) • x ∈ M := by
   first
   | exact @_root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg
   | exact _root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg
-  | (apply _root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg <;> assumption)
-  | (intros; apply _root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg <;> first | assumption | infer_instance)
+  | (
+      apply _root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg
+        <;> assumption
+    )
+  | (
+      intros
+      apply _root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg
+        <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.FinitelyGeneratedNatMultiple.exists_nat_smul_mem_of_fg ..)
 
-theorem smul_mem_locP {M N : Submodule (𝓞 E) W} {m : ℕ} (h : ∀ x ∈ N, (m : 𝓞 E) • x ∈ M) (Q : HeightOneSpectrum (𝓞 E))
-    {x : W} (hx : x ∈ localization₂ Q.asIdeal N) : (m : E) • x ∈ localization₂ Q.asIdeal M := by
+theorem smul_mem_locP
+    {M N : Submodule (𝓞 E) W} {m : ℕ} (h : ∀ x ∈ N, (m : 𝓞 E) • x ∈ M)
+    (Q : HeightOneSpectrum (𝓞 E))
+    {x : W} (hx : x ∈ localization₂ Q.asIdeal N)
+    : (m : E) • x ∈ localization₂ Q.asIdeal M := by
   obtain ⟨s, hs, hx⟩ := hx
   refine ⟨s, hs, ?_⟩
   have := h _ hx
   rwa [smul_comm, Nat.cast_smul_eq_nsmul, ← Nat.cast_smul_eq_nsmul E] at this
 
-theorem mem_localization_of_inv_smul_mem {M N : Submodule (𝓞 E) W} {m : ℕ} (hm : 0 < m) (h : ∀ x ∈ N, (m : 𝓞 E) • x ∈ M)
-    (Q : HeightOneSpectrum (𝓞 E)) {x : W} (hx : (m : E)⁻¹ • x ∈ localization₂ Q.asIdeal N) : x ∈ localization₂ Q.asIdeal M := by
+theorem mem_localization_of_inv_smul_mem
+    {M N : Submodule (𝓞 E) W} {m : ℕ} (hm : 0 < m) (h : ∀ x ∈ N, (m : 𝓞 E) • x ∈ M)
+    (Q : HeightOneSpectrum (𝓞 E))
+    {x : W} (hx : (m : E)⁻¹ • x ∈ localization₂ Q.asIdeal N)
+    : x ∈ localization₂ Q.asIdeal M := by
   have hmE : (m : E) ≠ 0 := by exact_mod_cast hm.ne'
   have := smul_mem_locP h Q hx
   rwa [smul_smul, mul_inv_cancel₀ hmE, one_smul] at this
 
-theorem dom_twO [StarRing E] (S : Finset (HeightOneSpectrum (𝓞 E))) {M N : Submodule (𝓞 E) W} {m : ℕ} (hm : 0 < m)
-    (h₁ : ∀ x ∈ N, (m : 𝓞 E) • x ∈ M) (h₂ : ∀ x ∈ M, (m : 𝓞 E) • x ∈ N)
-    (hQ : ∀ Q : HeightOneSpectrum (𝓞 E), Q ∉ S → conjPrime₂ Q ∉ S → localization₂ Q.asIdeal M = localization₂ Q.asIdeal N) :
-    Dom S M (twist₂ N m (expS S)) ∧ Dom S (twist₂ N m fun Q => -expS S Q) M := by
+theorem dom_twO
+    [StarRing E]
+    (S : Finset (HeightOneSpectrum (𝓞 E)))
+    {M N : Submodule (𝓞 E) W} {m : ℕ}
+    (hm : 0 < m) (h₁ : ∀ x ∈ N, (m : 𝓞 E) • x ∈ M) (h₂ : ∀ x ∈ M, (m : 𝓞 E) • x ∈ N)
+    (hQ : ∀ Q : HeightOneSpectrum (𝓞 E),
+      Q ∉ S → conjPrime₂ Q ∉ S → localization₂ Q.asIdeal M = localization₂ Q.asIdeal N)
+    : Dom S M (twist₂ N m (expS S)) ∧ Dom S (twist₂ N m fun Q => - expS S Q) M := by
   have hb := expS_bound S
-  have hb' : ∀ Q, -1 ≤ -expS S Q ∧ -expS S Q ≤ 1 := fun Q => by have := hb Q; omega
+  have hb' : ∀ Q, -1 ≤ - expS S Q ∧ - expS S Q ≤ 1 := fun Q => by have := hb Q; omega
   refine ⟨⟨fun P hP x hx => ?_, fun Q hS x hx => ?_⟩, fun P hP x hx => ?_, fun Q hS x hx => ?_⟩
   · rw [mem_localization_twist N hm hb] at hx
     have e : expS S P = 1 := by simp [expS, hP]
@@ -117,7 +144,14 @@ theorem dom_twO [StarRing E] (S : Finset (HeightOneSpectrum (𝓞 E))) {M N : Su
 
 end
 
-theorem common_refinement : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) (M₁ M₂ : Submodule (𝓞 E) (Sp E n)) (S : Finset (HeightOneSpectrum (𝓞 E))), (∀ P ∈ S, conjPrime₂ P ∉ S) → IsSdLat M₁ → IsSdLat M₂ → (∀ Q : HeightOneSpectrum (𝓞 E), Q ∉ S → conjPrime₂ Q ∉ S → localization₂ Q.asIdeal M₁ = localization₂ Q.asIdeal M₂) → ∃ F G : Submodule (𝓞 E) (Sp E n), IsSdLat F ∧ IsSdLat G ∧ Dom S M₁ F ∧ Dom S M₂ F ∧ Dom S G M₁ ∧ Dom S G M₂ := by
+theorem common_refinement
+    : ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) (M₁ M₂ : Submodule (𝓞 E) (Sp E n))
+        (S : Finset (HeightOneSpectrum (𝓞 E))),
+      (∀ P ∈ S, conjPrime₂ P ∉ S) → IsSdLat M₁ → IsSdLat M₂
+        → (∀ Q : HeightOneSpectrum (𝓞 E),
+          Q ∉ S → conjPrime₂ Q ∉ S → localization₂ Q.asIdeal M₁ = localization₂ Q.asIdeal M₂)
+        → ∃ F G : Submodule (𝓞 E) (Sp E n),
+          IsSdLat F ∧ IsSdLat G ∧ Dom S M₁ F ∧ Dom S M₂ F ∧ Dom S G M₁ ∧ Dom S G M₂ := by
   intro E _ _ _ n M₁ M₂ S hS h₁ h₂ hQ
   have hfull (L : Submodule (𝓞 E) (Sp E n)) (hL : IsSdLat L) : Full L := by
     apply full_of_span
@@ -137,13 +171,18 @@ theorem common_refinement : ∀ (E : Type) [Field E] [NumberField E] [StarRing E
       intro y hy
       apply hStd_mem_one_symm
       have hxy : hStd E n (e x) y = 0 :=
-        congrArg (fun f : Module.Dual E W => f ⟨y, Submodule.subset_span hy⟩) (LinearMap.mem_ker.mp hx)
+        congrArg
+          (fun f : Module.Dual E W => f ⟨y, Submodule.subset_span hy⟩)
+          (LinearMap.mem_ker.mp hx)
       simp [LinearMap.map_smulₛₗ, LinearMap.smul_apply, hxy]
     let i : E →ₗ[𝓞 E] L :=
       ((LinearMap.toSpanSingleton E _ (e x)).restrictScalars (𝓞 E)).codRestrict L hsmul
     let : Module.Finite (𝓞 E) L := Module.Finite.iff_fg.mpr hL.1.fg
-    let : Module.Finite (𝓞 E) E := Module.Finite.of_injective i fun a b hab =>
-      smul_left_injective E (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero)) (congrArg Subtype.val hab)
+    let : Module.Finite (𝓞 E) E :=
+      Module.Finite.of_injective i fun a b hab =>
+        smul_left_injective E
+          (fun hzero => hx₀ (e.map_eq_zero_iff.mp hzero))
+          (congrArg Subtype.val hab)
     exact RingOfIntegers.not_isField E
       (isField_of_isIntegral_of_isField (IsFractionRing.injective (𝓞 E) E) (Field.toIsField E))
   obtain ⟨a, ha, hA⟩ := exists_nat_smul_le (hfull M₁ h₁) h₂.1.fg

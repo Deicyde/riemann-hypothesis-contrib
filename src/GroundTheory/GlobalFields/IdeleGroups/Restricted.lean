@@ -14,26 +14,34 @@ noncomputable section
 
 namespace RestrictedProduct
 
-variable {ι : Type*} {R : ι → Type*} [∀ i, Monoid (R i)] [∀ i, TopologicalSpace (R i)]
-  {S : ι → Type*} [∀ i, SetLike (S i) (R i)] [∀ i, SubmonoidClass (S i) (R i)] {B : Π i, S i}
+variable
+  {ι : Type*} {R : ι → Type*} [∀ i, Monoid (R i)] [∀ i, TopologicalSpace (R i)]
+  {S : ι → Type*} [∀ i, SetLike (S i) (R i)] [∀ i, SubmonoidClass (S i) (R i)]
+  {B : Π i, S i}
 
-theorem continuous_unitsEquiv_symm :
-    Continuous (_root_.RestrictedProduct.unitsEquiv R (B := B) (𝓕 := cofinite)).symm := by
+theorem continuous_unitsEquiv_symm
+    : Continuous (_root_.RestrictedProduct.unitsEquiv R (B := B) (𝓕 := cofinite)).symm := by
   rw [Units.continuous_iff]
   constructor
-  · exact _root_.RestrictedProduct.mapAlong_continuous (fun i ↦ (R i)ˣ) R id tendsto_id
+  · exact _root_.RestrictedProduct.mapAlong_continuous
+      (fun i ↦ (R i)ˣ)
+      R id tendsto_id
       (A₁ := fun i ↦ ((Submonoid.ofClass (B i)).units : Set (R i)ˣ))
       (A₂ := fun i ↦ (B i : Set (R i)))
-      (fun i (u : (R i)ˣ) ↦ (u : R i)) (.of_forall fun _ _ hu ↦ hu.1)
+      (fun i (u : (R i)ˣ) ↦ (u : R i))
+      (.of_forall fun _ _ hu ↦ hu.1)
       (fun _ ↦ Units.continuous_val)
-  · exact _root_.RestrictedProduct.mapAlong_continuous (fun i ↦ (R i)ˣ) R id tendsto_id
+  · exact _root_.RestrictedProduct.mapAlong_continuous
+      (fun i ↦ (R i)ˣ)
+      R id tendsto_id
       (A₁ := fun i ↦ ((Submonoid.ofClass (B i)).units : Set (R i)ˣ))
       (A₂ := fun i ↦ (B i : Set (R i)))
-      (fun i (u : (R i)ˣ) ↦ ((u⁻¹ : (R i)ˣ) : R i)) (.of_forall fun _ _ hu ↦ hu.2)
+      (fun i (u : (R i)ˣ) ↦ ((u⁻¹ : (R i)ˣ) : R i))
+      (.of_forall fun _ _ hu ↦ hu.2)
       (fun _ ↦ Units.continuous_coe_inv)
 
-theorem continuous_unitsEquiv (hBopen : ∀ i, IsOpen (B i : Set (R i))) :
-    Continuous (_root_.RestrictedProduct.unitsEquiv R (B := B) (𝓕 := cofinite)) := by
+theorem continuous_unitsEquiv (hBopen : ∀ i, IsOpen (B i : Set (R i)))
+    : Continuous (_root_.RestrictedProduct.unitsEquiv R (B := B) (𝓕 := cofinite)) := by
   refine continuous_iff_continuousAt.2 fun x ↦ ?_
   set T : Set ι :=
     {i | _root_.RestrictedProduct.unitsEquiv R x i ∈ (Submonoid.ofClass (B i)).units} with hTdef
@@ -49,9 +57,10 @@ theorem continuous_unitsEquiv (hBopen : ∀ i, IsOpen (B i : Set (R i))) :
     simp only [U, Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_preimage, ← forall_and]
     exact forall_congr' fun i ↦ ⟨fun h hi ↦ h hi, fun h hi ↦ h hi⟩
   have hxU : x ∈ U := fun i hi ↦ hi
-  let G : U → Πʳ i, [(R i)ˣ, (Submonoid.ofClass (B i)).units]_[𝓟 T] :=
-    fun y ↦ ⟨fun i ↦ _root_.RestrictedProduct.unitsEquiv R y.1 i,
-      eventually_principal.2 fun i hi ↦ y.2 i hi⟩
+  let G : U → Πʳ i, [(R i)ˣ, (Submonoid.ofClass (B i)).units]_[𝓟 T] := fun y ↦ ⟨
+    fun i ↦ _root_.RestrictedProduct.unitsEquiv R y.1 i,
+    eventually_principal.2 fun i hi ↦ y.2 i hi
+  ⟩
   have hG : Continuous G := by
     rw [_root_.RestrictedProduct.continuous_rng_of_principal]
     refine continuous_pi fun i ↦ ?_
@@ -62,8 +71,8 @@ theorem continuous_unitsEquiv (hBopen : ∀ i, IsOpen (B i : Set (R i))) :
     exact (_root_.RestrictedProduct.continuous_inclusion hT).comp hG
   exact hFU.continuousAt (hUo.mem_nhds hxU)
 
-def continuousUnitsEquiv (hBopen : ∀ i, IsOpen (B i : Set (R i))) :
-    (Πʳ i, [R i, B i])ˣ ≃ₜ* Πʳ i, [(R i)ˣ, (Submonoid.ofClass (B i)).units] where
+def continuousUnitsEquiv (hBopen : ∀ i, IsOpen (B i : Set (R i)))
+    : (Πʳ i, [R i, B i])ˣ ≃ₜ* Πʳ i, [(R i)ˣ, (Submonoid.ofClass (B i)).units] where
   toMulEquiv := _root_.RestrictedProduct.unitsEquiv R
   continuous_toFun := continuous_unitsEquiv hBopen
   continuous_invFun := continuous_unitsEquiv_symm
@@ -74,37 +83,40 @@ namespace IdeleGroup
 
 variable (K : Type*) [Field K] [NumberField K]
 
-theorem isOpen_units_adicCompletionIntegers (v : HeightOneSpectrum (𝓞 K)) :
-    IsOpen ((Submonoid.ofClass (v.adicCompletionIntegers K)).units :
-      Set (v.adicCompletion K)ˣ) :=
+theorem isOpen_units_adicCompletionIntegers (v : HeightOneSpectrum (𝓞 K))
+    : IsOpen ((Submonoid.ofClass (v.adicCompletionIntegers K)).units : Set (v.adicCompletion K)ˣ) :=
   Submonoid.isOpen_units (Valued.isOpen_valuationSubring (v.adicCompletion K))
 
-def finiteUnitsEquiv :
-    (FiniteAdeleRing (𝓞 K) K)ˣ ≃ₜ* Πʳ v : HeightOneSpectrum (𝓞 K),
-      [(v.adicCompletion K)ˣ, (Submonoid.ofClass (v.adicCompletionIntegers K)).units] :=
-  RestrictedProduct.continuousUnitsEquiv (R := fun v : HeightOneSpectrum (𝓞 K) ↦ v.adicCompletion K)
+def finiteUnitsEquiv
+    : (FiniteAdeleRing (𝓞 K) K)ˣ
+      ≃ₜ* Πʳ v : HeightOneSpectrum (𝓞 K),
+        [(v.adicCompletion K)ˣ, (Submonoid.ofClass (v.adicCompletionIntegers K)).units] :=
+  RestrictedProduct.continuousUnitsEquiv
+    (R := fun v : HeightOneSpectrum (𝓞 K) ↦ v.adicCompletion K)
     (B := fun v ↦ v.adicCompletionIntegers K)
     (fun v ↦ Valued.isOpen_valuationSubring (v.adicCompletion K))
 
-def prodRestrictedEquiv :
-    𝔸[K]ˣ ≃ₜ* (InfiniteAdeleRing K)ˣ × Πʳ v : HeightOneSpectrum (𝓞 K),
-      [(v.adicCompletion K)ˣ, (Submonoid.ofClass (v.adicCompletionIntegers K)).units] :=
-  (ContinuousMulEquiv.prodUnits (InfiniteAdeleRing K) (FiniteAdeleRing (𝓞 K) K)).trans
-    { toMulEquiv := MulEquiv.prodCongr (MulEquiv.refl _) (finiteUnitsEquiv K).toMulEquiv
-      continuous_toFun :=
-        continuous_fst.prodMk ((finiteUnitsEquiv K).continuous.comp continuous_snd)
-      continuous_invFun :=
-        continuous_fst.prodMk ((finiteUnitsEquiv K).symm.continuous.comp continuous_snd) }
+def prodRestrictedEquiv
+    : 𝔸[K]ˣ
+      ≃ₜ* (InfiniteAdeleRing K)ˣ
+        × Πʳ v : HeightOneSpectrum (𝓞 K),
+          [(v.adicCompletion K)ˣ, (Submonoid.ofClass (v.adicCompletionIntegers K)).units] :=
+  (ContinuousMulEquiv.prodUnits (InfiniteAdeleRing K) (FiniteAdeleRing (𝓞 K) K)).trans {
+    toMulEquiv := MulEquiv.prodCongr (MulEquiv.refl _) (finiteUnitsEquiv K).toMulEquiv
+    continuous_toFun := continuous_fst.prodMk ((finiteUnitsEquiv K).continuous.comp continuous_snd)
+    continuous_invFun :=
+      continuous_fst.prodMk ((finiteUnitsEquiv K).symm.continuous.comp continuous_snd)
+  }
 
 @[simp]
-theorem prodRestrictedEquiv_apply_fst (x : 𝔸[K]ˣ) :
-    ((prodRestrictedEquiv K x).1 : InfiniteAdeleRing K) = (x : 𝔸[K]).1 :=
+theorem prodRestrictedEquiv_apply_fst (x : 𝔸[K]ˣ)
+    : ((prodRestrictedEquiv K x).1 : InfiniteAdeleRing K) = (x : 𝔸[K]).1 :=
   rfl
 
 @[simp]
-theorem prodRestrictedEquiv_apply_snd (x : 𝔸[K]ˣ) (v : HeightOneSpectrum (𝓞 K)) :
-    (((prodRestrictedEquiv K x).2 v : (v.adicCompletion K)ˣ) : v.adicCompletion K) =
-      (x : 𝔸[K]).2 v :=
+theorem prodRestrictedEquiv_apply_snd (x : 𝔸[K]ˣ) (v : HeightOneSpectrum (𝓞 K))
+    : (((prodRestrictedEquiv K x).2 v : (v.adicCompletion K)ˣ) : v.adicCompletion K)
+      = (x : 𝔸[K]).2 v :=
   rfl
 
 end IdeleGroup

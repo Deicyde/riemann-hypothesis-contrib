@@ -9,13 +9,15 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Discret
 
 open scoped ENNReal NNReal
 open NumberField IsDedekindDomain Matrix MeasureTheory Filter Topology Polynomial
-open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs GlobalTheory.CompanionTheory.Conc
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.AutomorphicForm
+open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
+  GlobalTheory.CompanionTheory.Conc
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.AutomorphicForm
 
 namespace GlobalTheory.CompanionTheory.Conc.BesselPt
 
-theorem sq_tsum_le {ι : Type*} (t : ι → ℝ≥0) (k : ℕ) (h : (Function.support t).encard ≤ k) :
-    (∑' i, (t i : ℝ≥0∞)) ^ 2 ≤ k * ∑' i, (t i : ℝ≥0∞) ^ 2 := by
+theorem sq_tsum_le {ι : Type*} (t : ι → ℝ≥0) (k : ℕ) (h : (Function.support t).encard ≤ k)
+    : (∑' i, (t i : ℝ≥0∞)) ^ 2 ≤ k * ∑' i, (t i : ℝ≥0∞) ^ 2 := by
   have hfin : (Function.support t).Finite := Set.finite_of_encard_le_coe h
   set S := hfin.toFinset with hS
   have hcard : S.card ≤ k := by
@@ -35,9 +37,11 @@ theorem sq_tsum_le {ι : Type*} (t : ι → ℝ≥0) (k : ℕ) (h : (Function.su
     exact h5.trans (by gcongr)
   exact_mod_cast h3
 
-theorem sq_lintegral_mul_le {X : Type*} [MeasurableSpace X] (ν : Measure X) {f g : X → ℝ≥0∞}
-    (hf : AEMeasurable f ν) (hg : AEMeasurable g ν) :
-    (∫⁻ a, f a * g a ∂ν) ^ 2 ≤ (∫⁻ a, f a ^ 2 ∂ν) * ∫⁻ a, g a ^ 2 ∂ν := by
+theorem sq_lintegral_mul_le
+    {X : Type*} [MeasurableSpace X]
+    (ν : Measure X)
+    {f g : X → ℝ≥0∞} (hf : AEMeasurable f ν) (hg : AEMeasurable g ν)
+    : (∫⁻ a, f a * g a ∂ν) ^ 2 ≤ (∫⁻ a, f a ^ 2 ∂ν) * ∫⁻ a, g a ^ 2 ∂ν := by
   have h := ENNReal.lintegral_mul_le_Lp_mul_Lq ν Real.HolderConjugate.two_two hf hg
   simp only [Pi.mul_apply, ENNReal.rpow_ofNat] at h
   refine (pow_le_pow_left' h 2).trans (le_of_eq ?_)
@@ -45,40 +49,52 @@ theorem sq_lintegral_mul_le {X : Type*} [MeasurableSpace X] (ν : Measure X) {f 
     ← ENNReal.rpow_mul]
   norm_num
 
-theorem encard_support_le {G : Type*} [Group G] [TopologicalSpace G] (Γ : Subgroup G) (α : G → ℂ) (x w : G)
-    (k : ℕ)
-    (hk : {γ : G | γ ∈ Γ ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k) :
-    (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊).encard ≤ k := by
-  rcases (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊).eq_empty_or_nonempty with h0 | ⟨γ₀, h₀⟩
+theorem encard_support_le
+    {G : Type*} [Group G] [TopologicalSpace G]
+    (Γ : Subgroup G) (α : G → ℂ) (x w : G) (k : ℕ)
+    (hk : {γ : G | γ ∈ Γ ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k)
+    : (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊).encard ≤ k := by
+  rcases (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊).eq_empty_or_nonempty with
+    h0 | ⟨γ₀, h₀⟩
   · simp [h0]
   refine le_trans ?_ hk
-  have hinj : Set.InjOn (fun γ : Γ => (γ : G) * (γ₀ : G)⁻¹)
+  have hinj : Set.InjOn
+      (fun γ : Γ => (γ : G) * (γ₀ : G)⁻¹)
       (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊) := by
     intro a _ b _ hab
     exact Subtype.ext (mul_right_cancel hab)
   rw [← hinj.encard_image]
   refine Set.encard_le_encard ?_
   rintro _ ⟨γ, hγ, rfl⟩
-  have mem : ∀ c : Γ, c ∈ (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊) →
-      x⁻¹ * ((c : G) * w) ∈ tsupport α := fun c hc => by
+  have mem
+      : ∀ c : Γ,
+        c ∈ (Function.support fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊)
+          → x⁻¹ * ((c : G) * w) ∈ tsupport α := fun c hc => by
     apply subset_tsupport
     simpa [Function.mem_support] using hc
   refine ⟨Γ.mul_mem γ.2 (Γ.inv_mem γ₀.2), _, mem γ hγ, _, mem γ₀ h₀, ?_⟩
   group
 
-variable {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+variable
+  {G : Type*}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
 
-theorem sq_lintegral_le (μ : Measure G) [μ.IsMulLeftInvariant] (Γ : Subgroup G) [Countable Γ] {F : Set G}
-    (hF : IsFundamentalDomain Γ F μ) {α ψ : G → ℂ} (hα : Continuous α) (hψ : Continuous ψ)
-    (hinv : ∀ γ ∈ Γ, ∀ g, ψ (γ * g) = ψ g) (hn : (∫⁻ x in F, ‖ψ x‖ₑ ^ 2 ∂μ) = 1) (x : G) (k : ℕ)
-    (hk : {γ : G | γ ∈ Γ ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k) :
-    (∫⁻ y, ‖α y‖ₑ * ‖ψ (x * y)‖ₑ ∂μ) ^ 2 ≤ k * ∫⁻ y, ‖α y‖ₑ ^ 2 ∂μ := by
+theorem sq_lintegral_le
+    (μ : Measure G) [μ.IsMulLeftInvariant]
+    (Γ : Subgroup G) [Countable Γ]
+    {F : Set G} (hF : IsFundamentalDomain Γ F μ)
+    {α ψ : G → ℂ} (hα : Continuous α) (hψ : Continuous ψ) (hinv : ∀ γ ∈ Γ, ∀ g, ψ (γ * g) = ψ g)
+    (hn : (∫⁻ x in F, ‖ψ x‖ₑ ^ 2 ∂μ) = 1)
+    (x : G) (k : ℕ)
+    (hk : {γ : G | γ ∈ Γ ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k)
+    : (∫⁻ y, ‖α y‖ₑ * ‖ψ (x * y)‖ₑ ∂μ) ^ 2 ≤ k * ∫⁻ y, ‖α y‖ₑ ^ 2 ∂μ := by
   set a : G → ℝ≥0∞ := fun w => ‖α (x⁻¹ * w)‖ₑ with ha
   have ham : Measurable a := (hα.comp (continuous_const.mul continuous_id)).enorm.measurable
   have hψm : Measurable fun w => ‖ψ w‖ₑ := hψ.enorm.measurable
-  have htr : ∀ γ : Γ, Measurable fun w => a ((γ : G) * w) :=
-    fun γ => ham.comp (measurable_const_mul _)
-  have e1 : ∫⁻ y, ‖α y‖ₑ * ‖ψ (x * y)‖ₑ ∂μ = ∫⁻ w in F, (∑' γ : Γ, a ((γ : G) * w)) * ‖ψ w‖ₑ ∂μ := by
+  have htr : ∀ γ : Γ, Measurable fun w => a ((γ : G) * w) := fun γ =>
+    ham.comp (measurable_const_mul _)
+  have e1
+      : ∫⁻ y, ‖α y‖ₑ * ‖ψ (x * y)‖ₑ ∂μ = ∫⁻ w in F, (∑' γ : Γ, a ((γ : G) * w)) * ‖ψ w‖ₑ ∂μ := by
     have h1 := lintegral_mul_left_eq_self (μ := μ) (fun w => a w * ‖ψ w‖ₑ) x
     simp only [ha, inv_mul_cancel_left] at h1
     rw [h1, hF.lintegral_eq_tsum'', ← lintegral_tsum]
@@ -104,12 +120,18 @@ theorem sq_lintegral_le (μ : Measure G) [μ.IsMulLeftInvariant] (Γ : Subgroup 
   have := sq_tsum_le (fun γ : Γ => ‖α (x⁻¹ * ((γ : G) * w))‖₊) k (encard_support_le Γ α x w k hk)
   simpa [ha, enorm_eq_nnnorm] using this
 
-theorem pointwise (μ : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ] (Γ : Subgroup G) [Countable Γ]
-    {α : G → ℂ} {δ : ℝ} {F : Set G} (hα : Continuous α) (hc : HasCompactSupport α) (hδ : 0 < δ)
-    (hF : IsFundamentalDomain Γ F μ) : ∃ C₀ : ℝ, ∀ ψ : G → ℂ, Continuous ψ → (∀ γ ∈ Γ, ∀ g, ψ (γ * g) = ψ g) →
-      (∃ s : ℂ, δ ≤ ‖s‖ ∧ ∀ x, ∫ y, α y * ψ (x * y) ∂μ = s * ψ x) → (∫⁻ x in F, ‖ψ x‖ₑ ^ 2 ∂μ) = 1 →
-      ∀ (x : G) (k : ℕ), {γ : G | γ ∈ Γ ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k →
-        ‖ψ x‖ ^ 2 ≤ C₀ * k := by
+theorem pointwise
+    (μ : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCompacts μ]
+    (Γ : Subgroup G) [Countable Γ]
+    {α : G → ℂ} {δ : ℝ} {F : Set G}
+    (hα : Continuous α) (hc : HasCompactSupport α) (hδ : 0 < δ) (hF : IsFundamentalDomain Γ F μ)
+    : ∃ C₀ : ℝ, ∀ ψ : G → ℂ,
+      Continuous ψ → (∀ γ ∈ Γ, ∀ g, ψ (γ * g) = ψ g)
+        → (∃ s : ℂ, δ ≤ ‖s‖ ∧ ∀ x, ∫ y, α y * ψ (x * y) ∂μ = s * ψ x)
+        → (∫⁻ x in F, ‖ψ x‖ₑ ^ 2 ∂μ) = 1
+        → ∀ (x : G) (k : ℕ),
+          {γ : G | γ ∈ Γ ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k
+            → ‖ψ x‖ ^ 2 ≤ C₀ * k := by
   refine ⟨(δ ^ 2)⁻¹ * (∫⁻ y, ‖α y‖ₑ ^ 2 ∂μ).toReal, ?_⟩
   rintro ψ hψ hinv ⟨s, hs, hrep⟩ hn x k hk
   have hA : (∫⁻ y, ‖α y‖ₑ ^ 2 ∂μ) ≠ ⊤ := by
@@ -137,13 +159,20 @@ theorem pointwise (μ : Measure G) [μ.IsMulLeftInvariant] [IsFiniteMeasureOnCom
 
 end GlobalTheory.CompanionTheory.Conc.BesselPt
 
-
 open GlobalTheory.CompanionTheory.Conc.BesselPt in
-theorem GlobalTheory.CompanionTheory.Conc.besselPt : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (N : ℕ) [MeasurableSpace (GA E N)] [BorelSpace (GA E N)] (μ : Measure (GA E N)) [μ.IsHaarMeasure] (α : GA E N → ℂ) (δ : ℝ) (F : Set (GA E N)), Continuous α → HasCompactSupport α → 0 < δ →
-  IsFundamentalDomain (latticeGL E N) F μ → ∃ C₀ : ℝ, ∀ ψ : GA E N → ℂ, Continuous ψ → (∀ γ ∈ latticeGL E N, ∀ g, ψ (γ * g) = ψ g) →
-  (∃ s : ℂ, δ ≤ ‖s‖ ∧ ∀ x, ∫ y, α y * ψ (x * y) ∂μ = s * ψ x) → (∫⁻ x in F, ‖ψ x‖ₑ ^ 2 ∂μ) = 1 →
-  ∀ (x : GA E N) (k : ℕ), {γ : GA E N | γ ∈ latticeGL E N ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard ≤ k →
-    ‖ψ x‖ ^ 2 ≤ C₀ * k := by
+theorem GlobalTheory.CompanionTheory.Conc.besselPt
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (N : ℕ)
+        [MeasurableSpace (GA E N)] [BorelSpace (GA E N)] (μ : Measure (GA E N)) [μ.IsHaarMeasure]
+        (α : GA E N → ℂ) (δ : ℝ) (F : Set (GA E N)),
+      Continuous α → HasCompactSupport α → 0 < δ → IsFundamentalDomain (latticeGL E N) F μ
+        → ∃ C₀ : ℝ, ∀ ψ : GA E N → ℂ,
+          Continuous ψ → (∀ γ ∈ latticeGL E N, ∀ g, ψ (γ * g) = ψ g)
+            → (∃ s : ℂ, δ ≤ ‖s‖ ∧ ∀ x, ∫ y, α y * ψ (x * y) ∂μ = s * ψ x)
+            → (∫⁻ x in F, ‖ψ x‖ₑ ^ 2 ∂μ) = 1
+            → ∀ (x : GA E N) (k : ℕ),
+              {γ : GA E N | γ ∈ latticeGL E N ∧ ∃ a ∈ tsupport α, ∃ b ∈ tsupport α, γ = x * a * b⁻¹ * x⁻¹}.encard
+                  ≤ k
+                → ‖ψ x‖ ^ 2 ≤ C₀ * k := by
   intro E _ _ _ N _ _ μ _ α δ F hα hc hδ hF
   haveI : Countable (latticeGL E N) := GlobalTheory.DiscreteUnit.countable_latticeGL
   exact pointwise μ (latticeGL E N) hα hc hδ hF

@@ -14,20 +14,20 @@ namespace GroundTheory.LocalField
 
 open ValuativeRel IsLocalRing
 
-variable {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L] [FiniteDimensional K L]
+variable
+  {K L : Type*} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L] [FiniteDimensional K L]
 
-theorem coe_tateNorm_integerUnits [IsGalois K L] (u : 𝒪[L]ˣ) :
-    (((tateNorm (L ≃ₐ[K] L) 𝒪[L]ˣ u : 𝒪[L]ˣ) : 𝒪[L]) : L) =
-      algebraMap K L (Algebra.norm K ((u : 𝒪[L]) : L)) := by
+theorem coe_tateNorm_integerUnits [IsGalois K L] (u : 𝒪[L]ˣ)
+    : (((tateNorm (L ≃ₐ[K] L) 𝒪[L]ˣ u : 𝒪[L]ˣ) : 𝒪[L]) : L)
+      = algebraMap K L (Algebra.norm K ((u : 𝒪[L]) : L)) := by
   rw [Algebra.norm_eq_prod_automorphisms, tateNorm_apply, Units.coe_prod]
   push_cast
   rfl
 
-theorem exists_eq_of_forall_smul_eq [IsGalois K L] {x : 𝒪[L]ˣ}
-    (hx : ∀ σ : L ≃ₐ[K] L, σ • x = x) :
-    ∃ w : 𝒪[K]ˣ, algebraMap K L ((w : 𝒪[K]) : K) = ((x : 𝒪[L]) : L) := by
+theorem exists_eq_of_forall_smul_eq [IsGalois K L] {x : 𝒪[L]ˣ} (hx : ∀ σ : L ≃ₐ[K] L, σ • x = x)
+    : ∃ w : 𝒪[K]ˣ, algebraMap K L ((w : 𝒪[K]) : K) = ((x : 𝒪[L]) : L) := by
   have hfix : ((x : 𝒪[L]) : L) ∈ (⊥ : IntermediateField K L) :=
     (IsGalois.mem_bot_iff_fixed _).2 fun σ ↦ by
       have := congrArg (fun u : 𝒪[L]ˣ ↦ ((u : 𝒪[L]) : L)) (hx σ)
@@ -52,8 +52,8 @@ theorem exists_eq_of_forall_smul_eq [IsGalois K L] {x : 𝒪[L]ˣ}
   · ext
     simp [hc0]
 
-theorem subsingleton_tateZero_integerUnits [IsGalois K L] [IsUnramified K L] :
-    Subsingleton (TateZero (L ≃ₐ[K] L) 𝒪[L]ˣ) := by
+theorem subsingleton_tateZero_integerUnits [IsGalois K L] [IsUnramified K L]
+    : Subsingleton (TateZero (L ≃ₐ[K] L) 𝒪[L]ˣ) := by
   rw [subsingleton_tateZero_iff]
   intro x hx
   obtain ⟨w, hw⟩ := exists_eq_of_forall_smul_eq (K := K) (L := L) hx
@@ -61,9 +61,9 @@ theorem subsingleton_tateZero_integerUnits [IsGalois K L] [IsUnramified K L] :
   refine ⟨v, Units.ext (Subtype.ext ?_)⟩
   rw [coe_tateNorm_integerUnits, ← hw, ← coe_norm_integer, coe_normIntegerUnits_eq]
 
-theorem subsingleton_tateNegOne_integerUnits [IsGalois K L] [IsCyclic (L ≃ₐ[K] L)]
-    [IsUnramified K L] :
-    Subsingleton (TateNegOne (L ≃ₐ[K] L) 𝒪[L]ˣ) := by
+theorem subsingleton_tateNegOne_integerUnits
+    [IsGalois K L] [IsCyclic (L ≃ₐ[K] L)] [IsUnramified K L]
+    : Subsingleton (TateNegOne (L ≃ₐ[K] L) 𝒪[L]ˣ) := by
   rw [subsingleton_tateNegOne_iff]
   intro x hx
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := L ≃ₐ[K] L)

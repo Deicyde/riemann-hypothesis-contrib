@@ -16,8 +16,9 @@ private def Pm (a b : k) : Matrix (Fin 2 ⊕ Fin 2) (Fin 4) k :=
   Matrix.of (Sum.elim ![![0, a, 0, a], ![b, 0, -b, 0]] ![![0, -1, 0, 1], ![1, 0, 1, 0]])
 
 private def Qm (a b : k) : Matrix (Fin 4) (Fin 2 ⊕ Fin 2) k :=
-  Matrix.of ![Sum.elim ![0, (2 * b)⁻¹] ![0, 2⁻¹], Sum.elim ![(2 * a)⁻¹, 0] ![-2⁻¹, 0],
-    Sum.elim ![0, -(2 * b)⁻¹] ![0, 2⁻¹], Sum.elim ![(2 * a)⁻¹, 0] ![2⁻¹, 0]]
+  Matrix.of
+    ![Sum.elim ![0, (2 * b)⁻¹] ![0, 2⁻¹], Sum.elim ![(2 * a)⁻¹, 0] ![-2⁻¹, 0],
+      Sum.elim ![0, -(2 * b)⁻¹] ![0, 2⁻¹], Sum.elim ![(2 * a)⁻¹, 0] ![2⁻¹, 0]]
 
 private def J4 (k : Type) [Field k] : M4 k := !![0, 0, 0, 1; 0, 0, 1, 0; 0, -1, 0, 0; -1, 0, 0, 0]
 
@@ -91,8 +92,7 @@ private lemma gsp {a b ν : k} (h2 : (2 : k) ≠ 0) (ha : a ≠ 0) (hb : b ≠ 0
 
 end
 
-theorem UpperTheory.symmetric_square_mixed_exists :
-    UpperTheory.V.Sd.S2.MixEx := by
+theorem UpperTheory.symmetric_square_mixed_exists : UpperTheory.V.Sd.S2.MixEx := by
   intro k Γ₀ Γ _ _ _ j t α β ρ μ h2 hj hi ht hsq hdet hαβ
   have ha := α.ne_zero
   have hb := β.ne_zero
@@ -101,22 +101,31 @@ theorem UpperTheory.symmetric_square_mixed_exists :
   let r : j.range →* GL (Fin 2) k := ρ.comp e.symm.toMonoidHom
   have hr : ∀ h, r (e h) = ρ h := fun h => by simp [r]
   obtain ⟨I, hI1, hI2⟩ := UpperTheory.V.AlgebraTools.indTwo j.range t hi ht r
-  have hS := UpperTheory.V.AlgebraTools.indSymp j.range t hi ht r μ I (by
-    intro h
-    obtain ⟨h, rfl⟩ := e.surjective h
-    rw [hr, he, ← hdet, Matrix.GeneralLinearGroup.val_det_apply]) hI1 hI2
-  let M : Γ →* M4 k :=
-    { toFun := fun g => Qm (α : k) β * (I g : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k) * Pm (α : k) β
-      map_one' := by rw [map_one, Units.val_one, Matrix.mul_one, QP h2 ha hb]
-      map_mul' := by
-        intro x y
-        rw [map_mul, Units.val_mul]
-        calc _ = Qm (α : k) β * (I x : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k) * (Pm (α : k) β * Qm (α : k) β) *
-              (I y : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k) * Pm (α : k) β := by
-                rw [PQ h2 ha hb]; simp only [Matrix.mul_assoc, Matrix.one_mul]
-          _ = _ := by simp only [Matrix.mul_assoc] }
-  have hM : ∀ g, ((M.toHomUnits g : GL (Fin 4) k) : M4 k) =
-      Qm (α : k) β * (I g : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k) * Pm (α : k) β := fun g => rfl
+  have hS :=
+    UpperTheory.V.AlgebraTools.indSymp j.range t hi ht r μ I
+      (by
+        intro h
+        obtain ⟨h, rfl⟩ := e.surjective h
+        rw [hr, he, ← hdet, Matrix.GeneralLinearGroup.val_det_apply])
+      hI1 hI2
+  let M : Γ →* M4 k := {
+    toFun := fun g => Qm (α : k) β * (I g : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k) * Pm (α : k) β
+    map_one' := by rw [map_one, Units.val_one, Matrix.mul_one, QP h2 ha hb]
+    map_mul' := by
+      intro x y
+      rw [map_mul, Units.val_mul]
+      calc
+        _ = Qm (α : k) β * (I x : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k)
+            * (Pm (α : k) β * Qm (α : k) β) * (I y : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k)
+            * Pm (α : k) β := by
+          rw [PQ h2 ha hb]; simp only [Matrix.mul_assoc, Matrix.one_mul]
+        _ = _ := by simp only [Matrix.mul_assoc]
+  }
+  have hM
+      : ∀ g,
+        ((M.toHomUnits g : GL (Fin 4) k) : M4 k)
+          = Qm (α : k) β * (I g : Matrix (Fin 2 ⊕ Fin 2) (Fin 2 ⊕ Fin 2) k) * Pm (α : k) β :=
+    fun g => rfl
   refine ⟨M.toHomUnits, ⟨h2, hj, hi, ht, hsq, ?_, ?_⟩, ?_⟩
   · intro h h' hh
     have := hI1 (e h) (e h') hh

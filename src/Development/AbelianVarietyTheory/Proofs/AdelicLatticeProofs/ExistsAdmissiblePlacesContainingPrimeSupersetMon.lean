@@ -12,9 +12,11 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem exists_admissiblePlaces_superset_and_mono : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F], 0 < p →
-    (∀ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∃ S, S₀ ⊆ S ∧ AdmP p F S) ∧
-      ∀ S T : Finset (HeightOneSpectrum (𝓞 F)), S ⊆ T → AdmP p F S → AdmP p F T := by
+theorem exists_admissiblePlaces_superset_and_mono
+    : ∀ (p : ℕ) (F : Type) [Field F] [NumberField F],
+      0 < p
+        → (∀ S₀ : Finset (HeightOneSpectrum (𝓞 F)), ∃ S, S₀ ⊆ S ∧ AdmP p F S)
+          ∧ ∀ S T : Finset (HeightOneSpectrum (𝓞 F)), S ⊆ T → AdmP p F S → AdmP p F T := by
   intro p F _ _ hp
   refine ⟨fun S₀ => ?_, fun S T hST h => ⟨h.1.mono hST, fun v hv => h.2 v fun a => hv (hST a)⟩⟩
   have hp0 : (p : F) ≠ 0 := Nat.cast_ne_zero.2 hp.ne'

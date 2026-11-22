@@ -21,12 +21,12 @@ variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G)
 noncomputable abbrev resBarResolution : ProjectiveResolution (Rep.trivial k S k) :=
   (resFunctor S.subtype).mapProjectiveResolution (barResolution k G)
 
-noncomputable def barHomotopyEquiv :
-    HomotopyEquiv (barResolution k S).complex (resBarResolution (k := k) S).complex :=
+noncomputable def barHomotopyEquiv
+    : HomotopyEquiv (barResolution k S).complex (resBarResolution (k := k) S).complex :=
   ProjectiveResolution.homotopyEquiv _ _
 
-noncomputable def shapiroCochainsHomotopyEquiv (B : Rep.{u} k S) :
-    HomotopyEquiv (inhomogeneousCochains B) (inhomogeneousCochains (coind S.subtype B)) :=
+noncomputable def shapiroCochainsHomotopyEquiv (B : Rep.{u} k S)
+    : HomotopyEquiv (inhomogeneousCochains B) (inhomogeneousCochains (coind S.subtype B)) :=
   (HomotopyEquiv.ofIso (inhomogeneousCochainsIso B)).trans
     ((linearYonedaObjHomotopyEquiv (barHomotopyEquiv (k := k) S) B).symm.trans
       ((HomotopyEquiv.ofIso (linearYonedaObjResProjectiveResolutionIso (barResolution k G) B)).trans
@@ -43,8 +43,8 @@ lemma shapiroCochains_hom_f_apply (B : Rep.{u} k S) (n : ℕ) (x : (Fin n → S)
   simp
   rfl
 
-noncomputable def trivialToInvariant (B : Rep.{u} k S) (c : B) (hc : ∀ s : S, B.ρ s c = c) :
-    Rep.trivial k S k ⟶ B :=
+noncomputable def trivialToInvariant (B : Rep.{u} k S) (c : B) (hc : ∀ s : S, B.ρ s c = c)
+    : Rep.trivial k S k ⟶ B :=
   Rep.ofHom ⟨LinearMap.toSpanSingleton k B c, fun s => by ext; simp [hc]⟩
 
 lemma freeLift_const_eq (B : Rep.{u} k S) (c : B) (hc : ∀ s : S, B.ρ s c = c) :
@@ -81,35 +81,37 @@ open scoped Classical
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G)
 
-
 open scoped Classical in
 noncomputable def toResCoind (B : Rep.{u} k S) : B ⟶ res S.subtype (coind S.subtype B) :=
-  Rep.ofHom ⟨LinearMap.codRestrict _
-    (LinearMap.pi fun g : G => if h : g ∈ S then B.ρ ⟨g, h⟩ else 0) (fun b => by
-      rw [Representation.mem_coindV]
-      intro s x
-      by_cases hx : x ∈ S
-      · have hsx : (S.subtype s) * x ∈ S := S.mul_mem s.2 hx
-        simp only [LinearMap.pi_apply, dif_pos hx, dif_pos hsx]
-        rw [← Module.End.mul_apply, ← map_mul]
-        rfl
-      · have hsx : (S.subtype s) * x ∉ S := fun h => hx (by
-          simpa using S.mul_mem (S.inv_mem s.2) h)
-        simp only [LinearMap.pi_apply, dif_neg hx, dif_neg hsx, LinearMap.zero_apply, map_zero]),
-    fun s => LinearMap.ext fun b => Subtype.ext (funext fun x => by
-      by_cases hx : x ∈ S
-      · have hxs : x * (S.subtype s) ∈ S := S.mul_mem hx s.2
-        change (if h : x ∈ S then B.ρ ⟨x, h⟩ else 0) (B.ρ s b) =
-          (if h : x * (S.subtype s) ∈ S then B.ρ ⟨x * (S.subtype s), h⟩ else 0) b
-        rw [dif_pos hx, dif_pos hxs, ← Module.End.mul_apply, ← map_mul]
-        rfl
-      · have hxs : x * (S.subtype s) ∉ S := fun h => hx (by
-          simpa using S.mul_mem h (S.inv_mem s.2))
-        change (if h : x ∈ S then B.ρ ⟨x, h⟩ else 0) (B.ρ s b) =
-          (if h : x * (S.subtype s) ∈ S then B.ρ ⟨x * (S.subtype s), h⟩ else 0) b
-        rw [dif_neg hx, dif_neg hxs]
-        rfl)⟩
-
+  Rep.ofHom ⟨
+    LinearMap.codRestrict _ (LinearMap.pi fun g : G => if h : g ∈ S then B.ρ ⟨g, h⟩ else 0)
+      (fun b => by
+        rw [Representation.mem_coindV]
+        intro s x
+        by_cases hx : x ∈ S
+        · have hsx : (S.subtype s) * x ∈ S := S.mul_mem s.2 hx
+          simp only [LinearMap.pi_apply, dif_pos hx, dif_pos hsx]
+          rw [← Module.End.mul_apply, ← map_mul]
+          rfl
+        · have hsx : (S.subtype s) * x ∉ S := fun h =>
+            hx (by simpa using S.mul_mem (S.inv_mem s.2) h)
+          simp only [LinearMap.pi_apply, dif_neg hx, dif_neg hsx, LinearMap.zero_apply, map_zero]),
+    fun s =>
+      LinearMap.ext fun b =>
+        Subtype.ext (funext fun x => by
+          by_cases hx : x ∈ S
+          · have hxs : x * (S.subtype s) ∈ S := S.mul_mem hx s.2
+            change (if h : x ∈ S then B.ρ ⟨x, h⟩ else 0) (B.ρ s b)
+              = (if h : x * (S.subtype s) ∈ S then B.ρ ⟨x * (S.subtype s), h⟩ else 0) b
+            rw [dif_pos hx, dif_pos hxs, ← Module.End.mul_apply, ← map_mul]
+            rfl
+          · have hxs : x * (S.subtype s) ∉ S := fun h =>
+              hx (by simpa using S.mul_mem h (S.inv_mem s.2))
+            change (if h : x ∈ S then B.ρ ⟨x, h⟩ else 0) (B.ρ s b)
+              = (if h : x * (S.subtype s) ∈ S then B.ρ ⟨x * (S.subtype s), h⟩ else 0) b
+            rw [dif_neg hx, dif_neg hxs]
+            rfl)
+  ⟩
 
 open scoped Classical in
 lemma toResCoind_apply (B : Rep.{u} k S) (b : B) (x : G) :
@@ -118,7 +120,6 @@ lemma toResCoind_apply (B : Rep.{u} k S) (b : B) (x : G) :
   split_ifs <;> rfl
 
 variable [Fintype G] [Fintype S]
-
 
 open scoped Classical in
 lemma sum_toResCoind (B : Rep.{u} k S) (b : B) (g : G) :
@@ -161,11 +162,10 @@ section TateMap
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G) [Fintype G] [Fintype S]
 
-noncomputable def tateShapiroMap (B : Rep.{u} k S) :
-    tateComplex B ⟶ tateComplex (coind S.subtype B) :=
+noncomputable def tateShapiroMap (B : Rep.{u} k S)
+    : tateComplex B ⟶ tateComplex (coind S.subtype B) :=
   CochainComplex.ConnectData.map _ _ (chainsMap S.subtype (toResCoind S B))
     (shapiroCochainsHomotopyEquiv S B).hom (shapiro_comm_zero S B)
-
 
 omit [Fintype G] [Fintype S] in
 lemma toResCoind_naturality {B B' : Rep.{u} k S} (φ : B ⟶ B') :
@@ -179,12 +179,10 @@ lemma toResCoind_naturality {B B' : Rep.{u} k S} (φ : B ⟶ B') :
   · exact hom_comm_apply φ _ _
   · exact map_zero _
 
-
 omit [Fintype G] [Fintype S] in
 lemma freeLift_comp_hom {H : Type u} [Group H] {B B' : Rep.{u} k H} (φ : B ⟶ B') {α : Type u}
     (x : α → B) : freeLift k H B x ≫ φ = freeLift k H B' (fun a => φ.hom (x a)) :=
   free_ext _ _ _ _ _ fun i => by simp
-
 
 omit [Fintype G] [Fintype S] in
 lemma shapiroCochains_naturality {B B' : Rep.{u} k S} (φ : B ⟶ B') :
@@ -225,15 +223,14 @@ lemma isIso_homologyMap_tateShapiroMap_of_pos (B : Rep.{u} k S) (n : ℕ) [NeZer
     (inferInstance : IsIso ((shapiroCochainsHomotopyEquiv S B).toHomologyIso n).hom)
   infer_instance
 
-noncomputable def tateShapiroMapShortComplex (X : ShortComplex (Rep.{u} k S)) :
-    X.map (tateComplexFunctor k S) ⟶
-      (X.map (coindFunctor k S.subtype)).map (tateComplexFunctor k G) where
+noncomputable def tateShapiroMapShortComplex (X : ShortComplex (Rep.{u} k S))
+    : X.map (tateComplexFunctor k S)
+      ⟶ (X.map (coindFunctor k S.subtype)).map (tateComplexFunctor k G) where
   τ₁ := tateShapiroMap S X.X₁
   τ₂ := tateShapiroMap S X.X₂
   τ₃ := tateShapiroMap S X.X₃
   comm₁₂ := tateShapiroMap_naturality S X.f
   comm₂₃ := tateShapiroMap_naturality S X.g
-
 
 omit [Fintype S] in
 lemma shortExact_map_coindFunctor {X : ShortComplex (Rep.{u} k S)} (hX : X.ShortExact) :
@@ -261,10 +258,10 @@ section Shift
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G) [Fintype G] [Fintype S]
 
-noncomputable def coindNormLift (M : Rep.{u} k S) (φ : M.V →ₗ[k] M.V) :
-    (coind S.subtype M).V →ₗ[k] (coind S.subtype M).V :=
-  (toResCoind S M).hom.toLinearMap ∘ₗ φ ∘ₗ
-    (LinearMap.proj (1 : G) ∘ₗ (Representation.coindV S.subtype M.ρ).subtype)
+noncomputable def coindNormLift (M : Rep.{u} k S) (φ : M.V →ₗ[k] M.V)
+    : (coind S.subtype M).V →ₗ[k] (coind S.subtype M).V :=
+  (toResCoind S M).hom.toLinearMap ∘ₗ φ
+    ∘ₗ (LinearMap.proj (1 : G) ∘ₗ (Representation.coindV S.subtype M.ρ).subtype)
 
 lemma sum_coindNormLift (M : Rep.{u} k S) (φ : M.V →ₗ[k] M.V)
     (hφ : ∀ m : M, ∑ s : S, M.ρ s (φ (M.ρ s⁻¹ m)) = m) (f : coind S.subtype M) :
@@ -293,10 +290,10 @@ lemma sum_coindNormLift (M : Rep.{u} k S) (φ : M.V →ₗ[k] M.V)
   congr 2
   exact f.2 s⁻¹ x
 
-theorem tateAcyclic_coind_of_sum_eq (M : Rep.{u} k S) (φ : M.V →ₗ[k] M.V)
-    (hφ : ∀ m : M, ∑ s : S, M.ρ s (φ (M.ρ s⁻¹ m)) = m) : TateAcyclic (coind S.subtype M) :=
+theorem tateAcyclic_coind_of_sum_eq
+    (M : Rep.{u} k S) (φ : M.V →ₗ[k] M.V) (hφ : ∀ m : M, ∑ s : S, M.ρ s (φ (M.ρ s⁻¹ m)) = m)
+    : TateAcyclic (coind S.subtype M) :=
   tateAcyclic_of_sum_eq _ (coindNormLift S M φ) (sum_coindNormLift S M φ hφ)
-
 
 omit [Fintype G] in
 lemma fromCoindRes_id_surjective (B : Rep.{u} k S) :
@@ -316,7 +313,6 @@ noncomputable abbrev coindBotShiftShortComplex (B : Rep.{u} k S) : ShortComplex 
   ShortComplex.mk (kernel.ι (fromCoindRes B LinearMap.id)) (fromCoindRes B LinearMap.id)
     (kernel.condition _)
 
-
 omit [Fintype G] in
 lemma coindBotShiftShortComplex_shortExact (B : Rep.{u} k S) :
     (coindBotShiftShortComplex S B).ShortExact := by
@@ -324,10 +320,11 @@ lemma coindBotShiftShortComplex_shortExact (B : Rep.{u} k S) :
     (Rep.epi_iff_surjective _).2 (fromCoindRes_id_surjective S B)
   exact { exact := ShortComplex.exact_of_f_is_kernel _ (kernelIsKernel _) }
 
-theorem isIso_homologyMap_tateShapiroMap (B : Rep.{u} k S) (n : ℤ) :
-    IsIso (HomologicalComplex.homologyMap (tateShapiroMap S B) n) := by
-  suffices h : ∀ m : ℕ, ∀ B : Rep.{u} k S,
-      IsIso (HomologicalComplex.homologyMap (tateShapiroMap S B) (1 - m)) by
+theorem isIso_homologyMap_tateShapiroMap (B : Rep.{u} k S) (n : ℤ)
+    : IsIso (HomologicalComplex.homologyMap (tateShapiroMap S B) n) := by
+  suffices h
+      : ∀ m : ℕ, ∀ B : Rep.{u} k S,
+        IsIso (HomologicalComplex.homologyMap (tateShapiroMap S B) (1 - m)) by
     rcases le_or_gt n 1 with hn | hn
     · obtain ⟨m, rfl⟩ : ∃ m : ℕ, n = 1 - m := ⟨(1 - n).toNat, by omega⟩
       exact h m B
@@ -347,12 +344,14 @@ theorem isIso_homologyMap_tateShapiroMap (B : Rep.{u} k S) (n : ℤ) :
       rw [e]
       exact ih _
     have hδ1 := isIso_δ_of_tateAcyclic hX (tateAcyclic_coind_bot _) (1 - ((m + 1 : ℕ) : ℤ))
-    have hδ2 := isIso_δ_of_tateAcyclic (shortExact_map_coindFunctor S hX)
-      (tateAcyclic_coind_of_sum_eq S _ _ (sum_coindBotProj _)) (1 - ((m + 1 : ℕ) : ℤ))
+    have hδ2 :=
+      isIso_δ_of_tateAcyclic (shortExact_map_coindFunctor S hX)
+        (tateAcyclic_coind_of_sum_eq S _ _ (sum_coindBotProj _)) (1 - ((m + 1 : ℕ) : ℤ))
     have key := tateShapiroMap_δ S hX (1 - ((m + 1 : ℕ) : ℤ))
-    have h4 : IsIso (TateCohomology.δ hX (1 - ((m + 1 : ℕ) : ℤ)) ≫
-        HomologicalComplex.homologyMap (tateShapiroMap S (coindBotShiftShortComplex S B).X₁)
-          ((1 - ((m + 1 : ℕ) : ℤ)) + 1)) := @IsIso.comp_isIso _ _ _ _ _ _ _ hδ1 h1
+    have h4 : IsIso
+        (TateCohomology.δ hX (1 - ((m + 1 : ℕ) : ℤ)) ≫ HomologicalComplex.homologyMap
+          (tateShapiroMap S (coindBotShiftShortComplex S B).X₁) ((1 - ((m + 1 : ℕ) : ℤ)) + 1)) :=
+      @IsIso.comp_isIso _ _ _ _ _ _ _ hδ1 h1
     rw [key] at h4
     exact @IsIso.of_isIso_comp_right _ _ _ _ _ _ _ hδ2 h4
 
@@ -364,27 +363,28 @@ section Main
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G) [Fintype G] [Fintype S]
 
-noncomputable def tateShapiroNatIso (n : ℤ) :
-    tateCohomologyFunctor (R := k) (G := S) n ≅
-      coindFunctor k S.subtype ⋙ tateCohomologyFunctor n :=
+noncomputable def tateShapiroNatIso (n : ℤ)
+    : tateCohomologyFunctor (R := k) (G := S) n
+      ≅ coindFunctor k S.subtype ⋙ tateCohomologyFunctor n :=
   NatIso.ofComponents
-    (fun B => @asIso _ _ _ _ (HomologicalComplex.homologyMap (tateShapiroMap S B) n)
-      (isIso_homologyMap_tateShapiroMap S B n))
+    (fun B =>
+      @asIso _ _ _ _ (HomologicalComplex.homologyMap (tateShapiroMap S B) n)
+        (isIso_homologyMap_tateShapiroMap S B n))
     fun {B B'} f => by
-      change HomologicalComplex.homologyMap (tateComplex.map f) n ≫
-          HomologicalComplex.homologyMap (tateShapiroMap S B') n =
-        HomologicalComplex.homologyMap (tateShapiroMap S B) n ≫
-          HomologicalComplex.homologyMap (tateComplex.map (coindMap S.subtype f)) n
+      change HomologicalComplex.homologyMap (tateComplex.map f) n
+          ≫ HomologicalComplex.homologyMap (tateShapiroMap S B') n
+        = HomologicalComplex.homologyMap (tateShapiroMap S B) n
+          ≫ HomologicalComplex.homologyMap (tateComplex.map (coindMap S.subtype f)) n
       rw [← HomologicalComplex.homologyMap_comp, ← HomologicalComplex.homologyMap_comp,
         tateShapiroMap_naturality]
 
-noncomputable def tateCoindNatIso (n : ℤ) :
-    coindFunctor k S.subtype ⋙ tateCohomologyFunctor n ≅
-      tateCohomologyFunctor (R := k) (G := S) n :=
+noncomputable def tateCoindNatIso (n : ℤ)
+    : coindFunctor k S.subtype ⋙ tateCohomologyFunctor n
+      ≅ tateCohomologyFunctor (R := k) (G := S) n :=
   (tateShapiroNatIso S n).symm
 
-noncomputable def tateCoindIso (B : Rep.{u} k S) (n : ℤ) :
-    tateCohomology (coind S.subtype B) n ≅ tateCohomology B n :=
+noncomputable def tateCoindIso (B : Rep.{u} k S) (n : ℤ)
+    : tateCohomology (coind S.subtype B) n ≅ tateCohomology B n :=
   (tateCoindNatIso S n).app B
 
 lemma homologyMap_tateShapiroMap_comp_tateCoindIso_hom (B : Rep.{u} k S) (n : ℤ) :
@@ -397,17 +397,15 @@ section Ind
 
 variable {k G : Type u} [CommRing k] [Group G] (S : Subgroup G) [Fintype G] [Fintype S]
 
-
 open scoped Classical in
-noncomputable def tateIndNatIso (n : ℤ) :
-    indFunctor k S.subtype ⋙ tateCohomologyFunctor n ≅
-      tateCohomologyFunctor (R := k) (G := S) n :=
+noncomputable def tateIndNatIso (n : ℤ)
+    : indFunctor k S.subtype ⋙ tateCohomologyFunctor n
+      ≅ tateCohomologyFunctor (R := k) (G := S) n :=
   Functor.isoWhiskerRight (indCoindNatIso k S) (tateCohomologyFunctor n) ≪≫ tateCoindNatIso S n
 
-noncomputable def tateIndIso (B : Rep.{u} k S) (n : ℤ) :
-    tateCohomology (ind S.subtype B) n ≅ tateCohomology B n :=
+noncomputable def tateIndIso (B : Rep.{u} k S) (n : ℤ)
+    : tateCohomology (ind S.subtype B) n ≅ tateCohomology B n :=
   (tateIndNatIso S n).app B
-
 
 end Ind
 

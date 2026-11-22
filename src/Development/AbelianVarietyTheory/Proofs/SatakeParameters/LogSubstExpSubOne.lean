@@ -35,8 +35,10 @@ variable {A : Subring K}
 theorem finsum_mem' {ι : Type} {f : ι → K} (h : ∀ i, f i ∈ A) : ∑ᶠ i, f i ∈ A :=
   finsum_induction (fun x => x ∈ A) A.zero_mem (fun _ _ => A.add_mem) h
 
-theorem subst_mem {ι : Type} {a : ι → MvPowerSeries κ K} (ha : HasSubst a) (hA : ∀ i, a i ∈ intS A κ)
-    {E : MvPowerSeries ι K} (hE : E ∈ intS A ι) : subst a E ∈ intS A κ := by
+theorem subst_mem
+    {ι : Type} {a : ι → MvPowerSeries κ K} (ha : HasSubst a) (hA : ∀ i, a i ∈ intS A κ)
+    {E : MvPowerSeries ι K} (hE : E ∈ intS A ι)
+    : subst a E ∈ intS A κ := by
   intro n
   rw [coeff_subst ha]
   refine finsum_mem' fun d => ?_

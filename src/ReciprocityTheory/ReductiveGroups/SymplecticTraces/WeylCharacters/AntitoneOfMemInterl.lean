@@ -14,21 +14,22 @@ theorem wdenSucc : WdenSuccStatement := by
   intro K _ n t
   unfold wden
   rw [Fin.prod_univ_castSucc]
-  have hlast : ∀ j : Fin (n + 1), ¬ (Fin.last n < j) := fun j => not_lt.mpr (Fin.le_last j)
+  have hlast : ∀ j : Fin (n + 1), ¬(Fin.last n < j) := fun j => not_lt.mpr (Fin.le_last j)
   simp only [hlast, if_false, Finset.prod_const_one, mul_one]
   simp only [Fin.prod_univ_castSucc, Fin.castSucc_lt_castSucc_iff, Fin.castSucc_lt_last, if_true]
   rw [Finset.prod_mul_distrib]
 
-theorem prod_zpow_eq {K : Type*} [Field K] {y : K} (hy : y ≠ 0) {ι : Type*} (s : Finset ι) (f : ι → ℤ) :
-    ∏ i ∈ s, y ^ f i = y ^ (∑ i ∈ s, f i) := by
+theorem prod_zpow_eq
+    {K : Type*} [Field K] {y : K} (hy : y ≠ 0) {ι : Type*} (s : Finset ι) (f : ι → ℤ)
+    : ∏ i ∈ s, y ^ f i = y ^ (∑ i ∈ s, f i) := by
   classical
   refine Finset.induction_on s (by simp) ?_
   intro i s hi ih
   rw [prod_insert hi, sum_insert hi, ih, zpow_add₀ hy]
 
-theorem tele_nat {K : Type*} [Field K] {t y : K} (ht : t ≠ 0) (hy : y ≠ 0) (c e : ℤ) (k : ℕ) :
-    (t - y) * ∑ m ∈ Icc c (c - 1 + k), t ^ (m + e) * y ^ (c - 1 + k - m) =
-      t ^ (c - 1 + k + 1 + e) - y ^ (c - 1 + k - c + 1) * t ^ (c + e) := by
+theorem tele_nat {K : Type*} [Field K] {t y : K} (ht : t ≠ 0) (hy : y ≠ 0) (c e : ℤ) (k : ℕ)
+    : (t - y) * ∑ m ∈ Icc c (c - 1 + k), t ^ (m + e) * y ^ (c - 1 + k - m)
+      = t ^ (c - 1 + k + 1 + e) - y ^ (c - 1 + k - c + 1) * t ^ (c + e) := by
   induction k with
   | zero =>
     have h0 : Icc c (c - 1 + ((0 : ℕ) : ℤ)) = ∅ := Finset.Icc_eq_empty (by push_cast; omega)
@@ -46,10 +47,13 @@ theorem tele_nat {K : Type*} [Field K] {t y : K} (ht : t ≠ 0) (hy : y ≠ 0) (
     rw [hI, sum_insert hnot]
     have hz : c - 1 + (k : ℤ) + 1 - (c - 1 + (k : ℤ) + 1) = 0 := by ring
     rw [hz, zpow_zero, mul_one]
-    have hs : ∑ m ∈ Icc c (c - 1 + (k : ℤ)), t ^ (m + e) * y ^ (c - 1 + (k : ℤ) + 1 - m) =
-        y * ∑ m ∈ Icc c (c - 1 + (k : ℤ)), t ^ (m + e) * y ^ (c - 1 + (k : ℤ) - m) := by
-      rw [mul_sum]; refine sum_congr rfl fun m _ => ?_
-      rw [show c - 1 + (k : ℤ) + 1 - m = (c - 1 + (k : ℤ) - m) + 1 by ring, zpow_add_one₀ hy]; ring
+    have hs
+        : ∑ m ∈ Icc c (c - 1 + (k : ℤ)), t ^ (m + e) * y ^ (c - 1 + (k : ℤ) + 1 - m)
+          = y * ∑ m ∈ Icc c (c - 1 + (k : ℤ)), t ^ (m + e) * y ^ (c - 1 + (k : ℤ) - m) := by
+      rw [mul_sum]
+      refine sum_congr rfl fun m _ => ?_
+      rw [show c - 1 + (k : ℤ) + 1 - m = (c - 1 + (k : ℤ) - m) + 1 by ring, zpow_add_one₀ hy]
+      ring
     rw [hs, mul_add, mul_left_comm, ih]
     have e1 : t ^ (c - 1 + (k : ℤ) + 1 + 1 + e) = t ^ (c - 1 + (k : ℤ) + 1 + e) * t := by
       rw [← zpow_add_one₀ ht]; congr 1; ring
@@ -61,14 +65,16 @@ theorem tele_nat {K : Type*} [Field K] {t y : K} (ht : t ≠ 0) (hy : y ≠ 0) (
     generalize t ^ (c + e) = C
     ring
 
-theorem tele {K : Type*} [Field K] {t y : K} (ht : t ≠ 0) (hy : y ≠ 0) (c b e : ℤ) (h : c ≤ b + 1) :
-    (t - y) * ∑ m ∈ Icc c b, t ^ (m + e) * y ^ (b - m) = t ^ (b + 1 + e) - y ^ (b - c + 1) * t ^ (c + e) := by
+theorem tele {K : Type*} [Field K] {t y : K} (ht : t ≠ 0) (hy : y ≠ 0) (c b e : ℤ) (h : c ≤ b + 1)
+    : (t - y) * ∑ m ∈ Icc c b, t ^ (m + e) * y ^ (b - m)
+      = t ^ (b + 1 + e) - y ^ (b - c + 1) * t ^ (c + e) := by
   obtain ⟨k, hk⟩ : ∃ k : ℕ, b = c - 1 + k := ⟨(b - c + 1).toNat, by omega⟩
   subst hk
   exact tele_nat ht hy c e k
 
-theorem antitone_of_mem_interl {n : ℕ} {lam : Fin (n + 1) → ℤ} (hlam : Antitone lam) {mu : Fin n → ℤ}
-    (hmu : mu ∈ interl lam) : Antitone mu := by
+theorem antitone_of_mem_interl
+    {n : ℕ} {lam : Fin (n + 1) → ℤ} (hlam : Antitone lam) {mu : Fin n → ℤ} (hmu : mu ∈ interl lam)
+    : Antitone mu := by
   have h := Fintype.mem_piFinset.mp hmu
   intro i j hij
   rcases eq_or_lt_of_le hij with hij | hij
@@ -109,8 +115,10 @@ theorem altBranch : AltBranchStatement := by
       have hk' := Fin.is_le k
       simp only [U, Matrix.of_apply, if_neg hk]
       rw [if_neg (by simp only [Fin.val_last]; omega), mul_zero]
-  have hMU_cs : ∀ i (j : Fin n), (M * U) i j.castSucc =
-      t i ^ a j.castSucc - y ^ (a j.castSucc - a j.succ) * t i ^ a j.succ := by
+  have hMU_cs
+      : ∀ i (j : Fin n),
+        (M * U) i j.castSucc
+          = t i ^ a j.castSucc - y ^ (a j.castSucc - a j.succ) * t i ^ a j.succ := by
     intro i j
     have hne : j.castSucc ≠ j.succ := by simp [Fin.ext_iff]
     rw [Matrix.mul_apply, Fintype.sum_eq_add j.castSucc j.succ hne]
@@ -118,11 +126,17 @@ theorem altBranch : AltBranchStatement := by
       have hU1 : U j.castSucc j.castSucc = 1 := by simp [U]
       have hU2 : U j.succ j.castSucc = -(y ^ (a j.castSucc - a j.succ)) := by
         simp only [U, Matrix.of_apply]; rw [if_neg hne.symm, if_pos h2]
-      rw [hU1, hU2]; simp only [M, Matrix.of_apply]; ring
+      rw [hU1, hU2]
+      simp only [M, Matrix.of_apply]
+      ring
     · rintro k ⟨hk1, hk2⟩
       simp only [U, Matrix.of_apply, if_neg hk1]
       rw [if_neg, mul_zero]
-      intro h; apply hk2; ext; simp only [Fin.val_castSucc, Fin.val_succ] at h ⊢; omega
+      intro h
+      apply hk2
+      ext
+      simp only [Fin.val_castSucc, Fin.val_succ] at h ⊢
+      omega
 
   have hrow : ∀ j : Fin n, (M * U) (Fin.last n) j.castSucc = 0 := by
     intro j
@@ -130,8 +144,9 @@ theorem altBranch : AltBranchStatement := by
 
   set S : Matrix (Fin n) (Fin n) K := Matrix.of fun i j =>
     ∑ m ∈ Icc (lam j.succ) (lam j.castSucc), t i.castSucc ^ (m + delta n j) * y ^ (lam j.castSucc - m) with hS
-  have hminor : (M * U).submatrix Fin.castSucc Fin.castSucc =
-      Matrix.of fun i j => (t i.castSucc - y) * S i j := by
+  have hminor
+      : (M * U).submatrix Fin.castSucc Fin.castSucc
+        = Matrix.of fun i j => (t i.castSucc - y) * S i j := by
     ext i j
     simp only [Matrix.submatrix_apply, Matrix.of_apply, hMU_cs, S]
     rw [tele (ht _) hy (lam j.succ) (lam j.castSucc) (delta n j)
@@ -139,38 +154,48 @@ theorem altBranch : AltBranchStatement := by
     rw [hexp1, hexp2]
     congr 2
     ring
-  have hSdet : S.det = ∑ mu ∈ interl lam,
-      (∏ j : Fin n, y ^ (lam j.castSucc - mu j)) * alt n (mu + delta n) (fun i => t i.castSucc) := by
+  have hSdet
+      : S.det
+        = ∑ mu ∈ interl lam,
+          (∏ j : Fin n, y ^ (lam j.castSucc - mu j)) * alt n (mu + delta n) (fun i => t i.castSucc) := by
     rw [← Matrix.det_transpose]
-    have hT : S.transpose = fun j => ∑ m ∈ Icc (lam j.succ) (lam j.castSucc),
-        (fun i => t i.castSucc ^ (m + delta n j) * y ^ (lam j.castSucc - m)) := by
+    have hT
+        : S.transpose
+          = fun j =>
+            ∑ m ∈ Icc (lam j.succ) (lam j.castSucc),
+              (fun i => t i.castSucc ^ (m + delta n j) * y ^ (lam j.castSucc - m)) := by
       ext j i; simp [S, Matrix.transpose_apply, Finset.sum_apply]
     rw [hT]
-    have := (Matrix.detRowAlternating (R := K) (n := Fin n)).toMultilinearMap.map_sum_finset
-      (fun j m => fun i => t i.castSucc ^ (m + delta n j) * y ^ (lam j.castSucc - m))
-      (fun j => Icc (lam j.succ) (lam j.castSucc))
+    have :=
+      (Matrix.detRowAlternating (R := K) (n := Fin n)).toMultilinearMap.map_sum_finset
+        (fun j m => fun i => t i.castSucc ^ (m + delta n j) * y ^ (lam j.castSucc - m))
+        (fun j => Icc (lam j.succ) (lam j.castSucc))
     refine (this.trans ?_)
     refine sum_congr rfl fun mu _ => ?_
     show Matrix.det (Matrix.of fun j i => t i.castSucc ^ (mu j + delta n j) * y ^ (lam j.castSucc - mu j)) = _
     rw [← Matrix.det_transpose]
-    have hT2 : Matrix.transpose (Matrix.of fun j i => t i.castSucc ^ (mu j + delta n j) * y ^ (lam j.castSucc - mu j) :
-        Matrix (Fin n) (Fin n) K) =
-        Matrix.of fun i j => y ^ (lam j.castSucc - mu j) * t i.castSucc ^ ((mu + delta n) j) := by
+    have hT2
+        : Matrix.transpose
+            (Matrix.of fun j i => t i.castSucc ^ (mu j + delta n j) * y ^ (lam j.castSucc - mu j)
+              : Matrix (Fin n) (Fin n) K)
+          = Matrix.of fun i j =>
+            y ^ (lam j.castSucc - mu j) * t i.castSucc ^ ((mu + delta n) j) := by
       ext i j; simp [Matrix.transpose_apply, mul_comm]
     rw [hT2]
-    have hmr := Matrix.det_mul_row (fun j => y ^ (lam j.castSucc - mu j))
-      (Matrix.of fun i j => t i.castSucc ^ (mu + delta n) j)
+    have hmr :=
+      Matrix.det_mul_row
+        (fun j => y ^ (lam j.castSucc - mu j))
+        (Matrix.of fun i j => t i.castSucc ^ (mu + delta n) j)
     simp only [Matrix.of_apply] at hmr
     rw [hmr]
     rfl
 
-  have hdet : alt (n + 1) a t = (M * U).det := by
-    rw [Matrix.det_mul, hU, mul_one]; rfl
+  have hdet : alt (n + 1) a t = (M * U).det := by rw [Matrix.det_mul, hU, mul_one]; rfl
   rw [hdet, Matrix.det_succ_row _ (Fin.last n), Fin.sum_univ_castSucc]
-  simp only [hrow, mul_zero, zero_mul, Finset.sum_const_zero, zero_add, Fin.succAbove_last, hMU_last]
+  simp only [hrow, mul_zero, zero_mul, Finset.sum_const_zero, zero_add, Fin.succAbove_last,
+    hMU_last]
   rw [hminor, Matrix.det_mul_column, hSdet, Fin.val_last]
-  have hsign : ((-1 : K) ^ (n + n)) = 1 := by
-    rw [← two_mul, pow_mul]; simp
+  have hsign : ((-1 : K) ^ (n + n)) = 1 := by rw [← two_mul, pow_mul]; simp
   rw [hsign, one_mul, hexpl, mul_sum, mul_sum, mul_sum]
   refine sum_congr rfl fun mu _ => ?_
   rw [prod_zpow_eq hy]

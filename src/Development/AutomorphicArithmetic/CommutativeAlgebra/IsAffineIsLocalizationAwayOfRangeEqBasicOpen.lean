@@ -6,11 +6,12 @@ public import Mathlib
 
 open CategoryTheory Limits AlgebraicGeometry
 
-theorem UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen :
-    ∀ {U W : Scheme.{0}} [IsAffine U] (a : W ⟶ U) [IsOpenImmersion a] (t : Γ(U, ⊤)),
-        Set.range a = (U.basicOpen t : Set U) →
-        IsAffine W ∧ (∀ x : Γ(W, ⊤), ∃ (k : ℕ) (y : Γ(U, ⊤)), a.appTop.hom t ^ k * x = a.appTop.hom y) ∧
-          ∀ y : Γ(U, ⊤), a.appTop.hom y = 0 → ∃ k : ℕ, t ^ k * y = 0 := by
+theorem UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen
+    : ∀ {U W : Scheme.{0}} [IsAffine U] (a : W ⟶ U) [IsOpenImmersion a] (t : Γ(U, ⊤)),
+      Set.range a = (U.basicOpen t : Set U)
+        → IsAffine W
+          ∧ (∀ x : Γ(W, ⊤), ∃ (k : ℕ) (y : Γ(U, ⊤)), a.appTop.hom t ^ k * x = a.appTop.hom y)
+          ∧ ∀ y : Γ(U, ⊤), a.appTop.hom y = 0 → ∃ k : ℕ, t ^ k * y = 0 := by
   intro U W _ a _ t h
   have hr : Set.range a = Set.range (U.basicOpen t).ι := by
     rw [Scheme.Opens.range_ι]
@@ -19,8 +20,8 @@ theorem UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen :
   have hfac : χ.hom ≫ (U.basicOpen t).ι = a := IsOpenImmersion.isoOfRangeEq_hom_fac a _ hr
   haveI : IsAffine (U.basicOpen t) := (isAffineOpen_top U).basicOpen t
   have hW : IsAffine W := IsAffine.of_isIso χ.hom
-  have happ : ∀ r, a.appTop.hom r =
-      χ.hom.appTop.hom (algebraMap Γ(U, ⊤) Γ(U.basicOpen t, ⊤) r) := by
+  have happ
+      : ∀ r, a.appTop.hom r = χ.hom.appTop.hom (algebraMap Γ(U, ⊤) Γ(U.basicOpen t, ⊤) r) := by
     intro r
     rw [← hfac, Scheme.Hom.comp_appTop]
     rfl
@@ -37,8 +38,9 @@ theorem UpperTheory.isAffine_isLocalizationAway_of_range_eq_basicOpen :
     obtain ⟨⟨ℓ, m⟩, hℓ⟩ := IsLocalization.surj (Submonoid.powers t) (χ.inv.appTop.hom x)
     obtain ⟨k, hk⟩ := m.2
     have hk' : t ^ k = (m : Γ(U, ⊤)) := hk
-    have hℓ' : χ.inv.appTop.hom x * algebraMap Γ(U, ⊤) Γ(U.basicOpen t, ⊤) (t ^ k) =
-        algebraMap Γ(U, ⊤) Γ(U.basicOpen t, ⊤) ℓ := by
+    have hℓ'
+        : χ.inv.appTop.hom x * algebraMap Γ(U, ⊤) Γ(U.basicOpen t, ⊤) (t ^ k)
+          = algebraMap Γ(U, ⊤) Γ(U.basicOpen t, ⊤) ℓ := by
       rw [hk']
       exact hℓ
     refine ⟨k, ℓ, ?_⟩

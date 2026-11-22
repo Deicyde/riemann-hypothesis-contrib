@@ -12,10 +12,13 @@ namespace PositivityTheory.RgUd.T.Nil.Asm
 
 open PositivityTheory.RgUd.T PositivityTheory.RgUd.T.Nil
 
-variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
+variable
+  (k : Type)
+  [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
 
-theorem nilpB_of (fourP : FourP (k := k)) (orbP : OrbP (k := k)) (locQ : LocQ (k := k)) (baseP : BaseP (k := k)) :
-    NilpB (k := k) := by
+theorem nilpB_of
+    (fourP : FourP (k := k)) (orbP : OrbP (k := k)) (locQ : LocQ (k := k)) (baseP : BaseP (k := k))
+    : NilpB (k := k) := by
   unfold NilpB
   intro n Z hCR hH
   by_cases hd : dB0 Z = 0
@@ -34,8 +37,8 @@ theorem nilpB_of (fourP : FourP (k := k)) (orbP : OrbP (k := k)) (locQ : LocQ (k
   have hξK := hP ξ hξ hinv (hH ξ hξB hinv)
   have hc : 1 < (nabs k t)⁻¹ := one_lt_inv_iff₀.2 ⟨ht0, ht1⟩
   have key : ξ ∈ (supportedIn (UU : Set (Sp k n))).dualAnnihilator := by
-    refine bez _ (pull Z t) (pull Z t⁻¹) (pull_inv Z hCR t).1 (pull_inv Z hCR t).2 ?_
-      ((nabs k t)⁻¹) hc (dB0 Z) a ha ξ ?_ ?_
+    refine bez _ (pull Z t) (pull Z t⁻¹) (pull_inv Z hCR t).1 (pull_inv Z hCR t).2 ?_ ((nabs k t)⁻¹)
+      hc (dB0 Z) a ha ξ ?_ ?_
     · intro m hm
       rw [Submodule.mem_dualAnnihilator] at hm ⊢
       exact pull_kills Z hCR t m hm
@@ -45,11 +48,14 @@ theorem nilpB_of (fourP : FourP (k := k)) (orbP : OrbP (k := k)) (locQ : LocQ (k
       refine (hF4 _ (prod_supp Z hCR t _ a ξ hξB)).2 ?_
       intro f hf
       have hfu : f ∈ supportedIn (Set.univ : Set (Sp k n)) :=
-        (show f ∈ supportedIn (Set.univ : Set (Sp k n)) ↔
-            (IsLocallyConstant f ∧ HasCompactSupport f) ∧ Function.support f ⊆ Set.univ from Iff.rfl).2
-          ⟨((show f ∈ supportedIn (UU : Set (Sp k n)) ↔
-            (IsLocallyConstant f ∧ HasCompactSupport f) ∧ Function.support f ⊆ UU from Iff.rfl).1 hf).1,
-            Set.subset_univ _⟩
+        (show f ∈ supportedIn (Set.univ : Set (Sp k n))
+              ↔ (IsLocallyConstant f ∧ HasCompactSupport f) ∧ Function.support f ⊆ Set.univ from
+            Iff.rfl).2 ⟨
+          ((show f ∈ supportedIn (UU : Set (Sp k n))
+              ↔ (IsLocallyConstant f ∧ HasCompactSupport f) ∧ Function.support f ⊆ UU from
+            Iff.rfl).1 hf).1,
+          Set.subset_univ _
+        ⟩
       rw [four_prod Z hCR 𝓕 hF1 hF5 hF6 t a ξ hξB f hfu]
       exact hFξ f hf
   exact (Submodule.mem_dualAnnihilator ξ).1 key

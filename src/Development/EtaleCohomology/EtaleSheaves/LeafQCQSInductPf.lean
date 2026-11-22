@@ -5,8 +5,8 @@ public import Development.EtaleCohomology.EtaleSheaves.LeafObjFPPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4 LateralTheory.E.LeafDescendVCut LateralTheory.E.LeafDescendFPPf
-  LateralTheory.E.LeafObjFPPf
+open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
+  LateralTheory.E.LeafDescendVCut LateralTheory.E.LeafDescendFPPf LateralTheory.E.LeafObjFPPf
 
 namespace LateralTheory.E.LeafQCQSInductPf
 
@@ -67,10 +67,12 @@ lemma mem_V {X : Scheme.{0}} (L : List X.Opens) (x : X) :
   simp
 
 section
-variable {S : Scheme.{0}} [IsAffine S] (P : ∀ {X : Scheme.{0}}, (X ⟶ S) → Prop)
+variable
+  {S : Scheme.{0}} [IsAffine S]
+  (P : ∀ {X : Scheme.{0}}, (X ⟶ S) → Prop)
   (hA : ∀ {X : Scheme.{0}} (f : X ⟶ S), IsAffine X → FP f → P f)
-  (hG : ∀ {X : Scheme.{0}} (f : X ⟶ S), FP f → ∀ (U V : X.Opens), U ⊔ V = ⊤ →
-      P (U.ι ≫ f) → P (V.ι ≫ f) → P ((U ⊓ V).ι ≫ f) → P f)
+  (hG : ∀ {X : Scheme.{0}} (f : X ⟶ S),
+    FP f → ∀ (U V : X.Opens), U ⊔ V = ⊤ → P (U.ι ≫ f) → P (V.ι ≫ f) → P ((U ⊓ V).ι ≫ f) → P f)
 include hA hG
 
 lemma glue_step {X : Scheme.{0}} (f : X ⟶ S) (hf : FP f) (U : X.Opens) (L' : List X.Opens)
@@ -98,10 +100,12 @@ lemma glue_step {X : Scheme.{0}} (f : X ⟶ S) (hf : FP f) (U : X.Opens) (L' : L
 end
 
 section
-variable {S : Scheme.{0}} [IsAffine S] (P : ∀ {X : Scheme.{0}}, (X ⟶ S) → Prop)
+variable
+  {S : Scheme.{0}} [IsAffine S]
+  (P : ∀ {X : Scheme.{0}}, (X ⟶ S) → Prop)
   (hA : ∀ {X : Scheme.{0}} (f : X ⟶ S), IsAffine X → FP f → P f)
-  (hG : ∀ {X : Scheme.{0}} (f : X ⟶ S), FP f → ∀ (U V : X.Opens), U ⊔ V = ⊤ →
-      P (U.ι ≫ f) → P (V.ι ≫ f) → P ((U ⊓ V).ι ≫ f) → P f)
+  (hG : ∀ {X : Scheme.{0}} (f : X ⟶ S),
+    FP f → ∀ (U V : X.Opens), U ⊔ V = ⊤ → P (U.ι ≫ f) → P (V.ι ≫ f) → P ((U ⊓ V).ι ≫ f) → P f)
 include hA hG
 
 lemma empty_case {X : Scheme.{0}} (f : X ⟶ S) (hf : FP f) (hc : Cov X []) : P f := by

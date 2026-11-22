@@ -7,16 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConvEqOneOfF
 
 @[expose] public section
 
-open CategoryTheory Coalgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.HTPair
+open CategoryTheory Coalgebra GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup
+  GlobalTheory.HTPair
 open scoped TensorProduct
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.torsion_fibreDim_quotient_pDivGroupLevel :
-    ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] (G : PDivGroup p O) (k m : ℕ),
-      1 ≤ k → ∀ (B : Type) [CommRing B] [HopfAlgebra O B] [IsCocomm O B] [Module.Finite O B]
-        [Module.Projective O B] (j : B →ₐc[O] G.A (k + m)) (ρ : G.A (k + m) →ₗ[O] B),
-        (∀ b, ρ (j b) = b) → torsionIdeal (R := O) (A := G.A (k + m)) p ≤ kerIdeal j →
-        ∀ q : PrimeSpectrum O,
-          fibreDim (B ⧸ torsionIdeal (R := O) (A := B) (p ^ m)) q = p ^ (m * G.height) := by
+theorem _root_.GlobalTheory.T.torsion_fibreDim_quotient_pDivGroupLevel
+    : ∀ (p : ℕ) [Fact p.Prime] (O : Type) [CommRing O] (G : PDivGroup p O) (k m : ℕ),
+      1 ≤ k
+        → ∀ (B : Type) [CommRing B] [HopfAlgebra O B] [IsCocomm O B] [Module.Finite O B]
+            [Module.Projective O B] (j : B →ₐc[O] G.A (k + m)) (ρ : G.A (k + m) →ₗ[O] B),
+          (∀ b, ρ (j b) = b) → torsionIdeal (R := O) (A := G.A (k + m)) p ≤ kerIdeal j
+            → ∀ q : PrimeSpectrum O,
+              fibreDim (B ⧸ torsionIdeal (R := O) (A := B) (p ^ m)) q = p ^ (m * G.height) := by
   intro p _ O _ G k m hk B _ _ _ _ _ j ρ hρ hj q
   obtain ⟨r, μ, hr, hker, hμ, hμq⟩ := G.exists_mulPow_fibreRank_eq p O k m
   let jₗ := (j : B →ₐ[O] G.A (k + m)).toLinearMap
@@ -27,8 +29,7 @@ theorem _root_.GlobalTheory.T.torsion_fibreDim_quotient_pDivGroupLevel :
   have hjq : fibreRank jₗ q = fibreDim B q :=
     (FibreRanks.fibre_ranks O B (G.A (k + m)) (G.A (k + m)) jₗ).1 ρ hρ q
   have hlevel := fibreDim_eq_ker_mul_range j q
-  rw [show fibreRank (j : B →ₐ[O] G.A (k + m)).toLinearMap q = _ from hjq, G.fibreDim_eq]
-    at hlevel
+  rw [show fibreRank (j : B →ₐ[O] G.A (k + m)).toLinearMap q = _ from hjq, G.fibreDim_eq] at hlevel
   have hres := fibreDim_eq_ker_mul_range (r.comp j) q
   rw [G.fibreDim_eq] at hres
   have hle : RingHom.ker r ≤ kerIdeal j := by
@@ -41,9 +42,9 @@ theorem _root_.GlobalTheory.T.torsion_fibreDim_quotient_pDivGroupLevel :
     have hcomap : RingHom.ker φ = J.comap (r : G.A (k + m) →ₐ[O] G.A k) := by
       ext a
       simp [φ, RingHom.mem_ker, Ideal.Quotient.eq_zero_iff_mem]
-    rw [hcomap, show J = Ideal.map (r : G.A (k + m) →ₐ[O] G.A k) (kerIdeal j) from
-      kerIdeal_comp r j, Ideal.comap_map_of_surjective (r : G.A (k + m) →ₐ[O] G.A k) hr,
-      sup_eq_left]
+    rw [hcomap,
+      show J = Ideal.map (r : G.A (k + m) →ₐ[O] G.A k) (kerIdeal j) from kerIdeal_comp r j,
+      Ideal.comap_map_of_surjective (r : G.A (k + m) →ₐ[O] G.A k) hr, sup_eq_left]
     exact hle
   let e : (G.A (k + m) ⧸ kerIdeal j) ≃ₗ[O] (G.A k ⧸ J) :=
     ((Ideal.quotientEquivAlgOfEq O hkerφ).symm.trans

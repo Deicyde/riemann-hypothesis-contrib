@@ -5,14 +5,16 @@ public import ReciprocityTheory.DualLattices.PSerFrobStatement
 
 @[expose] public section
 
-open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
+open TensorProduct IsLocalRing Matrix ReciprocityTheory.PGsh ReciprocityTheory.PGsh.Up
+  ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Be2
 
 namespace GlobalTheory
 
-private def btPolySub (p : ℕ) (g : ℕ) (W : Type) [CommRing W] :
-    Subalgebra W (MvPolynomial (Fin g) W) where
-  carrier := {q | ∀ m : Fin g →₀ ℕ, (∃ i, ¬ p ∣ m i) →
-    AddMonoidAlgebra.coeff q m ∈ Ideal.span {(p : W)}}
+private def btPolySub (p : ℕ) (g : ℕ) (W : Type) [CommRing W]
+    : Subalgebra W (MvPolynomial (Fin g) W) where
+  carrier :=
+    {q | ∀ m : Fin g →₀ ℕ, (∃ i, ¬ p ∣ m i) →
+      AddMonoidAlgebra.coeff q m ∈ Ideal.span {(p : W)}}
   add_mem' := by
     intro a b ha hb m hm
     rw [AddMonoidAlgebra.coeff_add, Finsupp.add_apply]
@@ -84,16 +86,25 @@ private lemma btPoly_nil {R₀ : Type} [CommRing R₀]
       exact hn i
     exact h3 h2
 
-theorem fAdd_nsmulF_eq_eval_poly_frob :
-  (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀) (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
-    (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a) ∧
-    ((∀ i, IsNilpotent (a i)) → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'), φ (nEval f a) = nEval f (fun i => φ (a i))) ∧
-      nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a))) →
-  (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} (K : LAlg R₀) (ch : FormalChartAtZero B K g), PSerFrobStatement p K ch) →
-  (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} {K : LAlg R₀} (ch : FormalChartAtZero B K g) (W : Type) [CommRing W] [Algebra R₀ W] (c : Fin g → W),
-    (∀ i, IsNilpotent (c i)) → ∀ N : ℕ, ∃ Γ : Fin g → MvPolynomial (Fin g) W,
-      (∀ k m, (∃ i, ¬ p ∣ m i) → AddMonoidAlgebra.coeff (Γ k) m ∈ Ideal.span {(p : W)}) ∧
-      ∀ y : Fin g → W, (∀ i, y i ^ N = 0) → fAdd ch.F c (nsmulF ch.F y p) = fun k => MvPolynomial.eval y (Γ k)) := by
+theorem fAdd_nsmulF_eq_eval_poly_frob
+    : (∀ {R₀ : Type} [CommRing R₀] {ι : Type} [Fintype ι] [DecidableEq ι] (f : MvPowerSeries ι R₀)
+          (S : Type) [CommRing S] [Algebra R₀ S] (a : ι → S),
+        (∀ N : ℕ, (∀ i, a i ^ N = 0) → nEval f a = tEval N f a)
+          ∧ ((∀ i, IsNilpotent (a i))
+            → (∀ (S' : Type) [CommRing S'] [Algebra R₀ S'] (φ : S →ₐ[R₀] S'),
+                φ (nEval f a) = nEval f (fun i => φ (a i)))
+              ∧ nEval f a - algebraMap R₀ S (MvPowerSeries.coeff 0 f) ∈ Ideal.span (Set.range a)))
+      → (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} (K : LAlg R₀)
+          (ch : FormalChartAtZero B K g),
+        PSerFrobStatement p K ch)
+      → (∀ {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] {g : ℕ} {B : BX R₀} {K : LAlg R₀}
+          (ch : FormalChartAtZero B K g) (W : Type) [CommRing W] [Algebra R₀ W] (c : Fin g → W),
+        (∀ i, IsNilpotent (c i))
+          → ∀ N : ℕ, ∃ Γ : Fin g → MvPolynomial (Fin g) W,
+            (∀ k m, (∃ i, ¬ p ∣ m i) → AddMonoidAlgebra.coeff (Γ k) m ∈ Ideal.span {(p : W)})
+              ∧ ∀ y : Fin g → W,
+                (∀ i, y i ^ N = 0)
+                  → fAdd ch.F c (nsmulF ch.F y p) = fun k => MvPolynomial.eval y (Γ k)) := by
   intro H1 H2 R₀ _ p _ g B K ch W _ _ c hc N
   obtain ⟨G, hG, hGe⟩ := H2 p K ch N
   let I : Ideal (MvPolynomial (Fin g) R₀) := Ideal.span (Set.range fun j => MvPolynomial.X j ^ N)
@@ -101,7 +112,8 @@ theorem fAdd_nsmulF_eq_eval_poly_frob :
   have hx : ∀ j, x j ^ N = 0 := fun j => by
     rw [← map_pow, Ideal.Quotient.eq_zero_iff_mem]
     exact Ideal.subset_span ⟨j, rfl⟩
-  have hae : (MvPolynomial.aeval x : MvPolynomial (Fin g) R₀ →ₐ[R₀] _) = Ideal.Quotient.mkₐ R₀ I := by
+  have hae
+      : (MvPolynomial.aeval x : MvPolynomial (Fin g) R₀ →ₐ[R₀] _) = Ideal.Quotient.mkₐ R₀ I := by
     ext j; simp [x]
   have hnil : ∀ k, IsNilpotent (Ideal.Quotient.mk I (G k)) := fun k => by
     have := btPoly_nil (fun f S _ _ a ha => ((H1 f S a).2 ha).2) ch _ x (fun i => ⟨N, hx i⟩) p k
@@ -114,8 +126,8 @@ theorem fAdd_nsmulF_eq_eval_poly_frob :
   refine ⟨fun k => tEval (max M₁ M₂) (ch.F k) z, fun k => ?_, fun y hy => ?_⟩
   · change tEval (max M₁ M₂) (ch.F k) z ∈ btPolySub p g W
     unfold tEval
-    refine Subalgebra.sum_mem _ fun e _ => Subalgebra.mul_mem _ ?_
-      (Subalgebra.prod_mem _ fun i _ => Subalgebra.pow_mem _ ?_ _)
+    refine Subalgebra.sum_mem _ fun e _ =>
+      Subalgebra.mul_mem _ ?_ (Subalgebra.prod_mem _ fun i _ => Subalgebra.pow_mem _ ?_ _)
     · rw [IsScalarTower.algebraMap_apply R₀ W]
       exact Subalgebra.algebraMap_mem _ _
     · rcases i with i | i
@@ -133,10 +145,13 @@ theorem fAdd_nsmulF_eq_eval_poly_frob :
         rintro _ ⟨j, rfl⟩
         simp [RingHom.mem_ker, hy j]
       exact this hq
-    have e1 := btPoly_map_tEval (max M₁ M₂) (ch.F k)
-      ((MvPolynomial.aeval y : MvPolynomial (Fin g) W →ₐ[W] W).restrictScalars R₀) z
-    have e2 : (fun i => ((MvPolynomial.aeval y : MvPolynomial (Fin g) W →ₐ[W] W).restrictScalars R₀)
-        (z i)) = Sum.elim c (fun k => MvPolynomial.aeval y (G k)) := by
+    have e1 :=
+      btPoly_map_tEval (max M₁ M₂) (ch.F k)
+        ((MvPolynomial.aeval y : MvPolynomial (Fin g) W →ₐ[W] W).restrictScalars R₀) z
+    have e2
+        : (fun i =>
+            ((MvPolynomial.aeval y : MvPolynomial (Fin g) W →ₐ[W] W).restrictScalars R₀) (z i))
+          = Sum.elim c (fun k => MvPolynomial.aeval y (G k)) := by
       funext i
       rcases i with i | i
       · simp [z]

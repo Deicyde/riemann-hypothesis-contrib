@@ -8,37 +8,41 @@ noncomputable section
 
 namespace PI.VolStabS
 
-open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField IsDedekindDomain MeasureTheory PI.VolFromSW
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub NumberField
+  IsDedekindDomain MeasureTheory PI.VolFromSW
 open scoped TensorProduct ENNReal NNReal Pointwise
 
 section AbstractU
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+variable
+  {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
   [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
 
-theorem meas_avg (H : Subgroup G) (ν : Measure H) [SFinite ν] {f : G → ℝ≥0∞} (hf : Measurable f) :
-    Measurable (fun g : G => ∫⁻ h, f (g * (h : G)) ∂ν) := by
+theorem meas_avg (H : Subgroup G) (ν : Measure H) [SFinite ν] {f : G → ℝ≥0∞} (hf : Measurable f)
+    : Measurable (fun g : G => ∫⁻ h, f (g * (h : G)) ∂ν) := by
   have hc : Continuous (fun p : G × H => p.1 * (p.2 : G)) :=
     continuous_fst.mul (continuous_subtype_val.comp continuous_snd)
   exact (hf.comp hc.measurable).lintegral_prod_right'
 
-theorem avg_mul_mem (H : Subgroup G) (ν : Measure H) [ν.IsMulLeftInvariant] (f : G → ℝ≥0∞)
-    (g : G) (k : H) : ∫⁻ h, f (g * k * (h : G)) ∂ν = ∫⁻ h, f (g * (h : G)) ∂ν := by
+theorem avg_mul_mem
+    (H : Subgroup G) (ν : Measure H) [ν.IsMulLeftInvariant] (f : G → ℝ≥0∞) (g : G) (k : H)
+    : ∫⁻ h, f (g * k * (h : G)) ∂ν = ∫⁻ h, f (g * (h : G)) ∂ν := by
   have := lintegral_mul_left_eq_self (μ := ν) (fun h : H => f (g * (h : G))) k
   simpa [mul_assoc] using this
 
-theorem avg_out (H : Subgroup G) (ν : Measure H) [ν.IsMulLeftInvariant] (f : G → ℝ≥0∞) (g : G) :
-    ∫⁻ h, f ((g : G ⧸ H).out * (h : G)) ∂ν = ∫⁻ h, f (g * (h : G)) ∂ν := by
+theorem avg_out (H : Subgroup G) (ν : Measure H) [ν.IsMulLeftInvariant] (f : G → ℝ≥0∞) (g : G)
+    : ∫⁻ h, f ((g : G ⧸ H).out * (h : G)) ∂ν = ∫⁻ h, f (g * (h : G)) ∂ν := by
   obtain ⟨k, hk⟩ := QuotientGroup.mk_out_eq_mul H g
   rw [hk]
   exact avg_mul_mem H ν f g k
 
-theorem meas_avg_q (H : Subgroup G) (ν : Measure H) [SFinite ν] [ν.IsMulLeftInvariant]
-    {f : G → ℝ≥0∞} (hf : Measurable f) :
-    Measurable (fun q : G ⧸ H => ∫⁻ h, f (q.out * (h : G)) ∂ν) := by
+theorem meas_avg_q
+    (H : Subgroup G) (ν : Measure H) [SFinite ν] [ν.IsMulLeftInvariant]
+    {f : G → ℝ≥0∞} (hf : Measurable f)
+    : Measurable (fun q : G ⧸ H => ∫⁻ h, f (q.out * (h : G)) ∂ν) := by
   apply measurable_from_quotient.2
-  have : ((fun q : G ⧸ H => ∫⁻ h, f (q.out * (h : G)) ∂ν) ∘ Quotient.mk'') =
-      fun g => ∫⁻ h, f (g * (h : G)) ∂ν := by
+  have : ((fun q : G ⧸ H => ∫⁻ h, f (q.out * (h : G)) ∂ν) ∘ Quotient.mk'')
+      = fun g => ∫⁻ h, f (g * (h : G)) ∂ν := by
     funext g
     exact avg_out H ν f g
   rw [this]
@@ -52,12 +56,17 @@ theorem meas_smul_q (H : Subgroup G) (g : G) : Measurable (fun q : G ⧸ H => g 
   rw [this]
   exact measurable_quotient_mk''.comp (measurable_const_mul g)
 
-theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G) [μ.IsHaarMeasure]
-    (ν : Measure H) [ν.IsHaarMeasure] (ρ' : Measure (G ⧸ H))
+theorem induced_eq
+    (H : Subgroup G) (hcl : IsClosed (H : Set G))
+    (μ : Measure G) [μ.IsHaarMeasure]
+    (ν : Measure H) [ν.IsHaarMeasure]
+    (ρ' : Measure (G ⧸ H))
     (hinv : ∀ (g : G) (s : Set (G ⧸ H)), MeasurableSet s → ρ' ((fun y => g • y) ⁻¹' s) = ρ' s)
-    (hfin : ∀ K : Set (G ⧸ H), IsCompact K → ρ' K < ⊤) (hne : ρ' ≠ 0) :
-    ∃ c : ℝ≥0∞, c ≠ 0 ∧ c ≠ ⊤ ∧ ∀ f : G → ℝ≥0∞, Measurable f →
-      ∫⁻ g, f g ∂μ = c * ∫⁻ q, ∫⁻ h, f (q.out * (h : G)) ∂ν ∂ρ' := by
+    (hfin : ∀ K : Set (G ⧸ H), IsCompact K → ρ' K < ⊤) (hne : ρ' ≠ 0)
+    : ∃ c : ℝ≥0∞,
+      c ≠ 0 ∧ c ≠ ⊤
+        ∧ ∀ f : G → ℝ≥0∞,
+          Measurable f → ∫⁻ g, f g ∂μ = c * ∫⁻ q, ∫⁻ h, f (q.out * (h : G)) ∂ν ∂ρ' := by
   classical
   have : LocallyCompactSpace H := hcl.isClosedEmbedding_subtypeVal.locallyCompactSpace
   have : SecondCountableTopology H := Topology.IsEmbedding.subtypeVal.secondCountableTopology
@@ -66,8 +75,9 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
   have hmulc : ∀ x : G, Measurable (fun h : H => x * (h : G)) := fun x =>
     (continuous_const.mul continuous_subtype_val).measurable
   set κ : G ⧸ H → Measure G := fun q => ν.map (fun h : H => q.out * (h : G)) with hκdef
-  have hκA : ∀ (q : G ⧸ H) (A : Set G), MeasurableSet A →
-      κ q A = ∫⁻ h, A.indicator 1 (q.out * (h : G)) ∂ν := by
+  have hκA
+      : ∀ (q : G ⧸ H) (A : Set G),
+        MeasurableSet A → κ q A = ∫⁻ h, A.indicator 1 (q.out * (h : G)) ∂ν := by
     intro q A hA
     rw [← lintegral_indicator_one hA, hκdef]
     exact lintegral_map (measurable_one.indicator hA) (hmulc _)
@@ -79,8 +89,8 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
     rw [e]
     exact meas_avg_q H ν (measurable_one.indicator hA)
   set m : Measure G := ρ'.bind κ with hmdef
-  have hmf : ∀ f : G → ℝ≥0∞, Measurable f →
-      ∫⁻ g, f g ∂m = ∫⁻ q, ∫⁻ h, f (q.out * (h : G)) ∂ν ∂ρ' := by
+  have hmf
+      : ∀ f : G → ℝ≥0∞, Measurable f → ∫⁻ g, f g ∂m = ∫⁻ q, ∫⁻ h, f (q.out * (h : G)) ∂ν ∂ρ' := by
     intro f hf
     rw [hmdef, Measure.lintegral_bind hκ.aemeasurable hf.aemeasurable]
     apply lintegral_congr
@@ -91,8 +101,9 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
     ext s hs
     rw [Measure.map_apply (meas_smul_q H g) hs]
     exact hinv g s hs
-  have hmA : ∀ A : Set G, MeasurableSet A →
-      m A = ∫⁻ q, ∫⁻ h, A.indicator 1 (q.out * (h : G)) ∂ν ∂ρ' := by
+  have hmA
+      : ∀ A : Set G,
+        MeasurableSet A → m A = ∫⁻ q, ∫⁻ h, A.indicator 1 (q.out * (h : G)) ∂ν ∂ρ' := by
     intro A hA
     rw [← lintegral_indicator_one hA]
     exact hmf _ (measurable_one.indicator hA)
@@ -102,8 +113,10 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
     ext A hA
     rw [Measure.map_apply (measurable_const_mul g) hA, hmA _ (hA.preimage (measurable_const_mul g)),
       hmA A hA]
-    have e : ∀ q : G ⧸ H, ∫⁻ h, ((fun x => g * x) ⁻¹' A).indicator 1 (q.out * (h : G)) ∂ν =
-        (fun q' : G ⧸ H => ∫⁻ h, A.indicator 1 (q'.out * (h : G)) ∂ν) (g • q) := by
+    have e
+        : ∀ q : G ⧸ H,
+          ∫⁻ h, ((fun x => g * x) ⁻¹' A).indicator 1 (q.out * (h : G)) ∂ν
+            = (fun q' : G ⧸ H => ∫⁻ h, A.indicator 1 (q'.out * (h : G)) ∂ν) (g • q) := by
       intro q
       have h1 : g • q = ((g * q.out : G) : G ⧸ H) := by
         conv_lhs => rw [← QuotientGroup.out_eq' q]
@@ -120,10 +133,10 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
     constructor
     intro K hK
     set S : Set H := (Subtype.val : H → G) ⁻¹' (K⁻¹ * K) with hSdef
-    have hS : IsCompact S :=
-      hcl.isClosedEmbedding_subtypeVal.isCompact_preimage (hK.inv.mul hK)
-    have hbound : ∀ q : G ⧸ H, κ q K ≤ ((QuotientGroup.mk : G → G ⧸ H) '' K).indicator
-        (fun _ => ν S) q := by
+    have hS : IsCompact S := hcl.isClosedEmbedding_subtypeVal.isCompact_preimage (hK.inv.mul hK)
+    have hbound
+        : ∀ q : G ⧸ H,
+          κ q K ≤ ((QuotientGroup.mk : G → G ⧸ H) '' K).indicator (fun _ => ν S) q := by
       intro q
       rw [hκdef, Measure.map_apply (hmulc _) hK.isClosed.measurableSet]
       by_cases hq : q ∈ (QuotientGroup.mk : G → G ⧸ H) '' K
@@ -131,13 +144,14 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
         obtain ⟨k, hk, rfl⟩ := hq
         obtain ⟨h0, hh0⟩ := QuotientGroup.mk_out_eq_mul H k
         rw [hh0]
-        calc ν ((fun h : H => k * h0 * (h : G)) ⁻¹' K) ≤ ν ((fun h : H => h0 * h) ⁻¹' S) := by
-              apply measure_mono
-              intro h hh
-              have hh' : k * (h0 : G) * (h : G) ∈ K := hh
-              show ((h0 * h : H) : G) ∈ K⁻¹ * K
-              rw [Subgroup.coe_mul]
-              exact ⟨k⁻¹, Set.inv_mem_inv.2 hk, k * h0 * h, hh', by group⟩
+        calc
+          ν ((fun h : H => k * h0 * (h : G)) ⁻¹' K) ≤ ν ((fun h : H => h0 * h) ⁻¹' S) := by
+            apply measure_mono
+            intro h hh
+            have hh' : k * (h0 : G) * (h : G) ∈ K := hh
+            show ((h0 * h : H) : G) ∈ K⁻¹ * K
+            rw [Subgroup.coe_mul]
+            exact ⟨k⁻¹, Set.inv_mem_inv.2 hk, k * h0 * h, hh', by group⟩
           _ = ν S := measure_preimage_mul ν h0 S
       · rw [Set.indicator_of_notMem hq]
         apply le_of_eq
@@ -150,11 +164,13 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
         rw [QuotientGroup.eq]
         simp
     rw [hmdef, Measure.bind_apply hK.isClosed.measurableSet hκ.aemeasurable]
-    calc ∫⁻ q, κ q K ∂ρ' ≤ ∫⁻ q, ((QuotientGroup.mk : G → G ⧸ H) '' K).indicator
-          (fun _ => ν S) q ∂ρ' := lintegral_mono hbound
+    calc
+      ∫⁻ q, κ q K ∂ρ'
+          ≤ ∫⁻ q, ((QuotientGroup.mk : G → G ⧸ H) '' K).indicator
+            (fun _ => ν S) q ∂ρ' :=
+        lintegral_mono hbound
       _ ≤ ν S * ρ' ((QuotientGroup.mk : G → G ⧸ H) '' K) := lintegral_indicator_const_le _ _
-      _ < ⊤ := ENNReal.mul_lt_top hS.measure_lt_top
-          (hfin _ (hK.image QuotientGroup.continuous_mk))
+      _ < ⊤ := ENNReal.mul_lt_top hS.measure_lt_top (hfin _ (hK.image QuotientGroup.continuous_mk))
   have hm : m = Measure.haarScalarFactor m μ • μ := Measure.isMulLeftInvariant_eq_smul m μ
   set c : ℝ≥0 := Measure.haarScalarFactor m μ with hcdef
   have hmne : m ≠ 0 := by
@@ -163,8 +179,7 @@ theorem induced_eq (H : Subgroup G) (hcl : IsClosed (H : Set G)) (μ : Measure G
     simp only [Set.indicator_univ, Pi.one_apply, lintegral_const, one_mul, lintegral_one] at hu
     rw [h0, Measure.coe_zero, Pi.zero_apply] at hu
     have hν : ν Set.univ ≠ 0 := isOpen_univ.measure_ne_zero ν Set.univ_nonempty
-    have hρ : ρ' Set.univ ≠ 0 := by
-      intro h; exact hne (Measure.measure_univ_eq_zero.1 h)
+    have hρ : ρ' Set.univ ≠ 0 := by intro h; exact hne (Measure.measure_univ_eq_zero.1 h)
     exact mul_ne_zero hν hρ hu.symm
   have hc0 : (c : ℝ≥0∞) ≠ 0 := by
     intro h0
@@ -182,20 +197,26 @@ end AbstractU
 
 section OrbitU
 
-variable {G X : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
-  [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-  [MulAction G X] [TopologicalSpace X] [MeasurableSpace X]
+variable
+  {G X : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+  [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [MulAction G X]
+  [TopologicalSpace X] [MeasurableSpace X]
 
-theorem weil_orbit_u (x0 : X) (hcl : IsClosed (MulAction.stabilizer G x0 : Set G))
+theorem weil_orbit_u
+    (x0 : X) (hcl : IsClosed (MulAction.stabilizer G x0 : Set G))
     (μ : Measure G) [μ.IsHaarMeasure]
     (νX : Measure X) (hnull : νX {y | ¬ ∃ g : G, g • x0 = y} = 0)
     (hinv : ∀ (g : G) (s : Set X), MeasurableSet s → νX ((fun y => g • y) ⁻¹' s) = νX s)
     (hfin : ∀ K : Set X, IsCompact K → νX K < ⊤) (hne : νX ≠ 0)
     (hemb : MeasurableEmbedding (fun q : G ⧸ MulAction.stabilizer G x0 => q.out • x0))
-    (hcont : Continuous (fun q : G ⧸ MulAction.stabilizer G x0 => q.out • x0)) :
-    ∃ μ' : Measure (MulAction.stabilizer G x0), μ'.IsHaarMeasure ∧
-      ∀ f : G → ℝ≥0∞, Measurable f → ∀ s : X → G, (∀ y, (∃ g : G, g • x0 = y) → s y • x0 = y) →
-        ∫⁻ g, f g ∂μ = ∫⁻ y, ∫⁻ h', f (s y * (h' : G)) ∂μ' ∂νX := by
+    (hcont : Continuous (fun q : G ⧸ MulAction.stabilizer G x0 => q.out • x0))
+    : ∃ μ' : Measure (MulAction.stabilizer G x0),
+      μ'.IsHaarMeasure
+        ∧ ∀ f : G → ℝ≥0∞,
+          Measurable f
+            → ∀ s : X → G,
+              (∀ y, (∃ g : G, g • x0 = y) → s y • x0 = y)
+                → ∫⁻ g, f g ∂μ = ∫⁻ y, ∫⁻ h', f (s y * (h' : G)) ∂μ' ∂νX := by
   classical
   have : LocallyCompactSpace (MulAction.stabilizer G x0) :=
     hcl.isClosedEmbedding_subtypeVal.locallyCompactSpace
@@ -215,8 +236,9 @@ theorem weil_orbit_u (x0 : X) (hcl : IsClosed (MulAction.stabilizer G x0 : Set G
     convert hnull using 2
     ext y
     simp only [Set.mem_ofPred_eq, hrange]
-  have hρ'inv : ∀ (g : G) (s : Set (G ⧸ MulAction.stabilizer G x0)), MeasurableSet s →
-      ρ' ((fun y => g • y) ⁻¹' s) = ρ' s := by
+  have hρ'inv
+      : ∀ (g : G) (s : Set (G ⧸ MulAction.stabilizer G x0)),
+        MeasurableSet s → ρ' ((fun y => g • y) ⁻¹' s) = ρ' s := by
     intro g s hs
     rw [hρ'def, hemb.comap_apply, hemb.comap_apply]
     have himg : ι '' ((fun y => g • y) ⁻¹' s) = (fun y => g • y) ⁻¹' (ι '' s) := by
@@ -242,12 +264,14 @@ theorem weil_orbit_u (x0 : X) (hcl : IsClosed (MulAction.stabilizer G x0 : Set G
     apply hne
     rw [← hmap, h0, Measure.map_zero]
   set ν : Measure (MulAction.stabilizer G x0) := Measure.haar with hνdef
-  obtain ⟨c, hc0, hctop, hF⟩ := induced_eq (MulAction.stabilizer G x0) hcl μ ν ρ' hρ'inv hρ'fin hρ'ne
+  obtain ⟨c, hc0, hctop, hF⟩ :=
+    induced_eq (MulAction.stabilizer G x0) hcl μ ν ρ' hρ'inv hρ'fin hρ'ne
   refine ⟨c • ν, Measure.IsHaarMeasure.smul ν hc0 hctop, ?_⟩
   intro f hf s hs
   rw [hF f hf]
-  have hin : ∀ q : G ⧸ MulAction.stabilizer G x0, ∫⁻ h', f (s (ι q) * (h' : G)) ∂(c • ν) =
-      c * ∫⁻ h, f (q.out * (h : G)) ∂ν := by
+  have hin
+      : ∀ q : G ⧸ MulAction.stabilizer G x0,
+        ∫⁻ h', f (s (ι q) * (h' : G)) ∂(c • ν) = c * ∫⁻ h, f (q.out * (h : G)) ∂ν := by
     intro q
     rw [lintegral_smul_measure, smul_eq_mul]
     congr 1
@@ -256,8 +280,10 @@ theorem weil_orbit_u (x0 : X) (hcl : IsClosed (MulAction.stabilizer G x0 : Set G
       rw [MulAction.mem_stabilizer_iff, mul_smul, hsq, inv_smul_smul]
     have hsk : s (ι q) = q.out * (q.out⁻¹ * s (ι q)) := by group
     rw [hsk]
-    have := lintegral_mul_left_eq_self (μ := ν)
-      (fun h : MulAction.stabilizer G x0 => f (q.out * (h : G))) ⟨q.out⁻¹ * s (ι q), hk⟩
+    have :=
+      lintegral_mul_left_eq_self (μ := ν)
+        (fun h : MulAction.stabilizer G x0 => f (q.out * (h : G)))
+        ⟨q.out⁻¹ * s (ι q), hk⟩
     simpa [mul_assoc] using this
   rw [← hmap, hemb.lintegral_map]
   simp_rw [hin]
@@ -265,8 +291,9 @@ theorem weil_orbit_u (x0 : X) (hcl : IsClosed (MulAction.stabilizer G x0 : Set G
 
 end OrbitU
 
-theorem exStab_of_U (hW : SecCtblW) (hP : LCSCPolish) (hO : OrbTup) (hI : NuInv) (hF : NuFin)
-    (hN : NuNeZero) : ExStab := by
+theorem exStab_of_U
+    (hW : SecCtblW) (hP : LCSCPolish) (hO : OrbTup) (hI : NuInv) (hF : NuFin) (hN : NuNeZero)
+    : ExStab := by
   intro F E _ _ _ _ _ σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ μ hμ νX hν
   have : FiniteDimensional F E := Module.finite_of_finrank_pos (by rw [hCM.2.2.1]; norm_num)
   have := secCtblG_of hW F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet
@@ -279,11 +306,12 @@ theorem exStab_of_U (hW : SecCtblW) (hP : LCSCPolish) (hO : OrbTup) (hI : NuInv)
     intro hg
     exact hy (hO F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet y hg)
   obtain ⟨hemb, hcont⟩ := orbEmb_of hW hP F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet
-  obtain ⟨μ', h1, h2⟩ := weil_orbit_u (G := HA (AF F) σ J) (ratTup (AF F) X0)
-    (stabClosed_holds F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet) μ νX hnull
-    (hI F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ νX hν)
-    (hF F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ νX hν)
-    (hN F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ νX hν) hemb hcont
+  obtain ⟨μ', h1, h2⟩ :=
+    weil_orbit_u (G := HA (AF F) σ J) (ratTup (AF F) X0)
+      (stabClosed_holds F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet) μ νX hnull
+      (hI F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ νX hν)
+      (hF F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ νX hν)
+      (hN F E σ hCM M J hJ ha hc a ha1 ha2 X0 hT hdet ψ hψ νX hν) hemb hcont
   exact ⟨μ', h1, hnull, fun f hf s hs => h2 f hf s hs⟩
 
 end PI.VolStabS

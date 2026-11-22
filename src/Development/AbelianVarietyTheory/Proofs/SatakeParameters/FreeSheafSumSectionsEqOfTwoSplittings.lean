@@ -86,45 +86,56 @@ private lemma injective_of_pullback_lift_apply_eq_of_isIso {Z X V : Scheme.{0}} 
     rfl
   exact key _ _ hjj
 
-
 open CategoryTheory Limits AlgebraicGeometry in
-theorem _root_.GlobalTheory.EtC.Tr.sum_sections_eq_of_two_splittings : ∀ (R : Type) [CommRing R] {Z X V : Scheme.{0}} {f : Z ⟶ X} {y : V ⟶ X}
-    {m m' : ℕ} {s : Fin m → (V ⟶ Z)} {s' : Fin m' → (V ⟶ Z)}, _root_.GlobalTheory.EtC.Tr.SplitBy f y s → _root_.GlobalTheory.EtC.Tr.SplitBy f y s' →
-    ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s j)) = ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s' j)) := by
+theorem _root_.GlobalTheory.EtC.Tr.sum_sections_eq_of_two_splittings
+    : ∀ (R : Type) [CommRing R] {Z X V : Scheme.{0}} {f : Z ⟶ X} {y : V ⟶ X} {m m' : ℕ}
+        {s : Fin m → (V ⟶ Z)} {s' : Fin m' → (V ⟶ Z)},
+      _root_.GlobalTheory.EtC.Tr.SplitBy f y s → _root_.GlobalTheory.EtC.Tr.SplitBy f y s'
+        → ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s j))
+          = ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s' j)) := by
   intro R _ Z X V f y m m' s s' hs hs'
   obtain ⟨hc, hi⟩ := hs
   obtain ⟨hc', hi'⟩ := hs'
-  let T : Sieve V :=
-    { arrows := fun W v => (_root_.GlobalTheory.EtC.free R).map (yoneda.map v) ≫
-          ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s j)) =
-        (_root_.GlobalTheory.EtC.free R).map (yoneda.map v) ≫
-          ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s' j))
-      downward_closed := by
-        intro W W' v hv g
-        rw [Functor.map_comp, Functor.map_comp, Category.assoc, Category.assoc, hv] }
-  refine _root_.GlobalTheory.EtC.Tr.free_hom_ext_of_covering R (_root_.GlobalTheory.EtC.Tr.freeSch R Z) _ _ T ?_ (fun W v hv => hv)
+  let T : Sieve V := {
+    arrows := fun W v =>
+      (_root_.GlobalTheory.EtC.free R).map (yoneda.map v)
+          ≫ ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s j))
+        = (_root_.GlobalTheory.EtC.free R).map (yoneda.map v)
+          ≫ ∑ j, (_root_.GlobalTheory.EtC.free R).map (yoneda.map (s' j))
+    downward_closed := by
+      intro W W' v hv g
+      rw [Functor.map_comp, Functor.map_comp, Category.assoc, Category.assoc, hv]
+  }
+  refine _root_.GlobalTheory.EtC.Tr.free_hom_ext_of_covering R
+    (_root_.GlobalTheory.EtC.Tr.freeSch R Z) _ _ T ?_ (fun W v hv => hv)
   apply Scheme.zariskiTopology_le_etaleTopology
   choose K A hKA using fun (x : ↥V) (j : Fin m) =>
     exists_pullback_lift_apply_eq_of_isIso_sigmaDesc hc' ((pullback.lift (s j) (𝟙 V) (by simp [hc j]) : V ⟶ pullback f y) x)
   choose K' A' hKA' using fun (x : ↥V) (k : Fin m') =>
     exists_pullback_lift_apply_eq_of_isIso_sigmaDesc hc ((pullback.lift (s' k) (𝟙 V) (by simp [hc' k]) : V ⟶ pullback f y) x)
   have hopen := isOpenImmersion_pullback_lift_of_isIso_sigmaDesc hc'
-  let U : ↥V → V.Opens := fun x =>
-    ⟨⋂ j, (pullback.lift (s j) (𝟙 V) (by simp [hc j]) : V ⟶ pullback f y) ⁻¹'
-        Set.range (pullback.lift (s' (K x j)) (𝟙 V) (by simp [hc' (K x j)]) : V ⟶ pullback f y),
-      isOpen_iInter_of_finite fun j =>
-        (Scheme.Hom.isOpenEmbedding _).isOpen_range.preimage (Scheme.Hom.continuous _)⟩
+  let U : ↥V → V.Opens := fun x => ⟨
+    ⋂ j, (pullback.lift (s j) (𝟙 V) (by simp [hc j]) : V ⟶ pullback f y) ⁻¹'
+       Set.range (pullback.lift (s' (K x j)) (𝟙 V) (by simp [hc' (K x j)]) : V ⟶ pullback f y),
+    isOpen_iInter_of_finite fun j =>
+      (Scheme.Hom.isOpenEmbedding _).isOpen_range.preimage (Scheme.Hom.continuous _)
+  ⟩
   have hxU : ∀ x, x ∈ U x := fun x => Set.mem_iInter.mpr fun j => ⟨A x j, hKA x j⟩
   have hagree : ∀ x, T ((U x).ι) := by
     intro x
     have hinj := injective_of_pullback_lift_apply_eq_of_isIso hc hc' x (K x) (A x) (hKA x)
     have hinj' := injective_of_pullback_lift_apply_eq_of_isIso hc' hc x (K' x) (A' x) (hKA' x)
-    have hbij : Function.Bijective (K x) := (Fintype.bijective_iff_injective_and_card _).mpr
-      ⟨hinj, le_antisymm (Fintype.card_le_of_injective _ hinj) (Fintype.card_le_of_injective _ hinj')⟩
+    have hbij : Function.Bijective (K x) :=
+      (Fintype.bijective_iff_injective_and_card _).mpr ⟨
+        hinj,
+        le_antisymm (Fintype.card_le_of_injective _ hinj) (Fintype.card_le_of_injective _ hinj')
+      ⟩
     have hsec : ∀ j, (U x).ι ≫ s j = (U x).ι ≫ s' (K x j) := by
       intro j
-      have hr : Set.range ⇑((U x).ι ≫ (pullback.lift (s j) (𝟙 V) (by simp [hc j]) : V ⟶ pullback f y)) ⊆
-          Set.range (pullback.lift (s' (K x j)) (𝟙 V) (by simp [hc' (K x j)]) : V ⟶ pullback f y) := by
+      have hr
+          : Set.range ⇑((U x).ι ≫ (pullback.lift (s j) (𝟙 V) (by simp [hc j]) : V ⟶ pullback f y))
+            ⊆ Set.range
+              (pullback.lift (s' (K x j)) (𝟙 V) (by simp [hc' (K x j)]) : V ⟶ pullback f y) := by
         rintro _ ⟨w, rfl⟩
         have hw : (U x).ι w ∈ U x := by
           have hw' : (U x).ι w ∈ Set.range (U x).ι := ⟨w, rfl⟩
@@ -148,8 +159,13 @@ theorem _root_.GlobalTheory.EtC.Tr.sum_sections_eq_of_two_splittings : ∀ (R : 
       Equiv.ofBijective_apply, hsec j]
   rw [show Scheme.zariskiTopology = Scheme.grothendieckTopology @IsOpenImmersion from rfl,
     Scheme.mem_grothendieckTopology_iff]
-  refine ⟨Scheme.Cover.mkOfCovers V (fun x => (U x : Scheme.{0})) (fun x => (U x).ι)
-    (fun x => ⟨x, ⟨x, hxU x⟩, rfl⟩), ?_⟩
+  refine ⟨
+    Scheme.Cover.mkOfCovers V
+      (fun x => (U x : Scheme.{0}))
+      (fun x => (U x).ι)
+      (fun x => ⟨x, ⟨x, hxU x⟩, rfl⟩),
+    ?_
+  ⟩
   rintro W _ ⟨x⟩
   exact hagree x
 

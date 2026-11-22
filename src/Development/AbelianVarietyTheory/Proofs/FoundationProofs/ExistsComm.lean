@@ -13,15 +13,16 @@ namespace GlobalTheory.CommutingExistence
 
 variable {k : Type} [Field k]
 
-theorem trace_two (A : Matrix (Fin 2) (Fin 2) k) (h1 : A.det = 1) (h2 : (A - 1).det = 0) :
-    A 0 0 + A 1 1 = 2 := by
+theorem trace_two (A : Matrix (Fin 2) (Fin 2) k) (h1 : A.det = 1) (h2 : (A - 1).det = 0)
+    : A 0 0 + A 1 1 = 2 := by
   rw [Matrix.det_fin_two] at h1 h2
   simp at h2
   linear_combination h1 - h2
 
-theorem mul_nil (A B : Matrix (Fin 2) (Fin 2) k) (hA : A.det = 1) (hB : B.det = 1)
-    (hA' : (A - 1).det = 0) (hB' : (B - 1).det = 0) (hAB : (A * B - 1).det = 0) :
-    (A - 1) * (B - 1) = 0 := by
+theorem mul_nil
+    (A B : Matrix (Fin 2) (Fin 2) k) (hA : A.det = 1) (hB : B.det = 1) (hA' : (A - 1).det = 0)
+    (hB' : (B - 1).det = 0) (hAB : (A * B - 1).det = 0)
+    : (A - 1) * (B - 1) = 0 := by
   have tA := trace_two A hA hA'
   have tB := trace_two B hB hB'
   have tAB := trace_two (A * B) (by rw [Matrix.det_mul, hA, hB, mul_one]) hAB
@@ -45,21 +46,22 @@ theorem mul_nil (A B : Matrix (Fin 2) (Fin 2) k) (hA : A.det = 1) (hB : B.det = 
   have f10 : A 1 0 * a - x * B 1 0 = 0 := by
     apply pow_eq_zero_iff (two_ne_zero) |>.mp
     linear_combination B 1 0 ^ 2 * e1 + A 1 0 ^ 2 * e2 - A 1 0 * B 1 0 * e3
-  have f11 : A 1 0 * B 0 1 + x * a = 0 := by
-    linear_combination e3 - f00
+  have f11 : A 1 0 * B 0 1 + x * a = 0 := by linear_combination e3 - f00
   ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Matrix.mul_apply, Fin.sum_univ_two, hx, hx', ha, ha']
+  fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, hx, hx', ha, ha']
   · linear_combination f00
   · linear_combination f01
   · linear_combination f10
   · linear_combination f11
 
-theorem exists_comm [IsAlgClosed k] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin 2) k) (H : Subgroup Γ)
+theorem exists_comm
+    [IsAlgClosed k]
+    {Γ : Type} [Group Γ]
+    (ρ : Γ →* GL (Fin 2) k) (H : Subgroup Γ)
     (hdet : ∀ s ∈ H, (ρ s : Matrix (Fin 2) (Fin 2) k).det = 1)
     (hirr : ∀ V : Submodule k (Fin 2 → k),
-      (∀ g ∈ H, ∀ v ∈ V, (ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v ∈ V) → V = ⊥ ∨ V = ⊤) :
-    ∃ φ ∈ ⁅H, H⁆, ((ρ φ : Matrix (Fin 2) (Fin 2) k) - 1).det ≠ 0 := by
+      (∀ g ∈ H, ∀ v ∈ V, (ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v ∈ V) → V = ⊥ ∨ V = ⊤)
+    : ∃ φ ∈ ⁅H, H⁆, ((ρ φ : Matrix (Fin 2) (Fin 2) k) - 1).det ≠ 0 := by
   by_contra hcon
   push Not at hcon
   have hle : ⁅H, H⁆ ≤ H := by
@@ -74,17 +76,18 @@ theorem exists_comm [IsAlgClosed k] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin
     convert h2 using 1
     rw [commutatorElement_def]
     group
-  let F : Submodule k (Fin 2 → k) :=
-    { carrier := {v | ∀ φ ∈ ⁅H, H⁆, (ρ φ : Matrix (Fin 2) (Fin 2) k) *ᵥ v = v}
-      add_mem' := by
-        intro a b ha hb φ hφ
-        rw [Matrix.mulVec_add, ha φ hφ, hb φ hφ]
-      zero_mem' := by
-        intro φ _
-        simp
-      smul_mem' := by
-        intro c a ha φ hφ
-        rw [Matrix.mulVec_smul, ha φ hφ] }
+  let F : Submodule k (Fin 2 → k) := {
+    carrier := {v | ∀ φ ∈ ⁅H, H⁆, (ρ φ : Matrix (Fin 2) (Fin 2) k) *ᵥ v = v}
+    add_mem' := by
+      intro a b ha hb φ hφ
+      rw [Matrix.mulVec_add, ha φ hφ, hb φ hφ]
+    zero_mem' := by
+      intro φ _
+      simp
+    smul_mem' := by
+      intro c a ha φ hφ
+      rw [Matrix.mulVec_smul, ha φ hφ]
+  }
   have hF : ∀ v, v ∈ F ↔ ∀ φ ∈ ⁅H, H⁆, (ρ φ : Matrix (Fin 2) (Fin 2) k) *ᵥ v = v := fun _ => Iff.rfl
   have hFinv : ∀ g ∈ H, ∀ v ∈ F, (ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v ∈ F := by
     intro g hg v hv
@@ -102,9 +105,10 @@ theorem exists_comm [IsAlgClosed k] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin
       have : ((ρ ψ : Matrix (Fin 2) (Fin 2) k) - 1) *ᵥ w ∈ F := by
         rw [hF]
         intro φ hφ
-        have h0 := mul_nil (ρ φ : Matrix (Fin 2) (Fin 2) k) (ρ ψ : Matrix (Fin 2) (Fin 2) k)
-          (hdet _ (hle hφ)) (hdet _ (hle hψ)) (hcon _ hφ) (hcon _ hψ)
-          (by rw [← Units.val_mul, ← map_mul]; exact hcon _ (Subgroup.mul_mem _ hφ hψ))
+        have h0 :=
+          mul_nil (ρ φ : Matrix (Fin 2) (Fin 2) k) (ρ ψ : Matrix (Fin 2) (Fin 2) k)
+            (hdet _ (hle hφ)) (hdet _ (hle hψ)) (hcon _ hφ) (hcon _ hψ)
+            (by rw [← Units.val_mul, ← map_mul]; exact hcon _ (Subgroup.mul_mem _ hφ hψ))
         rw [Matrix.mulVec_mulVec]
         congr 1
         rw [sub_mul, one_mul, sub_eq_zero] at h0
@@ -114,11 +118,15 @@ theorem exists_comm [IsAlgClosed k] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin
     · intro w
       rw [h]
       trivial
-  have hcomm : ∀ g ∈ H, ∀ g' ∈ H, ∀ v, (ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ ((ρ g' : Matrix (Fin 2) (Fin 2) k) *ᵥ v) =
-      (ρ g' : Matrix (Fin 2) (Fin 2) k) *ᵥ ((ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v) := by
+  have hcomm
+      : ∀ g ∈ H, ∀ g' ∈ H, ∀ v,
+        (ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ ((ρ g' : Matrix (Fin 2) (Fin 2) k) *ᵥ v)
+          = (ρ g' : Matrix (Fin 2) (Fin 2) k) *ᵥ ((ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v) := by
     intro g hg g' hg' v
-    have h1 := (hF _).1 (hFtop ((ρ g' : Matrix (Fin 2) (Fin 2) k) *ᵥ ((ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v))) _
-      (Subgroup.commutator_mem_commutator hg hg')
+    have h1 :=
+      (hF _).1
+        (hFtop ((ρ g' : Matrix (Fin 2) (Fin 2) k) *ᵥ ((ρ g : Matrix (Fin 2) (Fin 2) k) *ᵥ v))) _
+        (Subgroup.commutator_mem_commutator hg hg')
     rw [← h1]
     simp only [Matrix.mulVec_mulVec, ← Units.val_mul, ← map_mul]
     congr 3
@@ -129,32 +137,39 @@ theorem exists_comm [IsAlgClosed k] {Γ : Type} [Group Γ] (ρ : Γ →* GL (Fin
     obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue (Matrix.toLin' (ρ g : Matrix (Fin 2) (Fin 2) k))
     refine ⟨c, ?_⟩
     rcases hirr (Module.End.eigenspace (Matrix.toLin' (ρ g : Matrix (Fin 2) (Fin 2) k)) c) (by
-      intro g' hg' v hv
-      rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply] at hv ⊢
-      rw [hcomm g hg g' hg', hv, Matrix.mulVec_smul]) with h | h
+        intro g' hg' v hv
+        rw [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply] at hv ⊢
+        rw [hcomm g hg g' hg', hv, Matrix.mulVec_smul])
+      with h | h
     · exact absurd h (Module.End.hasEigenvalue_iff.1 hc)
     · intro v
       have : v ∈ Module.End.eigenspace (Matrix.toLin' (ρ g : Matrix (Fin 2) (Fin 2) k)) c := by
         rw [h]; trivial
       rwa [Module.End.mem_eigenspace_iff, Matrix.toLin'_apply] at this
   rcases hirr (Submodule.span k {(![1, 0] : Fin 2 → k)}) (by
-    intro g hg v hv
-    obtain ⟨c, hc⟩ := hscal g hg
-    rw [hc]
-    exact Submodule.smul_mem _ _ hv) with h | h
+      intro g hg v hv
+      obtain ⟨c, hc⟩ := hscal g hg
+      rw [hc]
+      exact Submodule.smul_mem _ _ hv)
+    with h | h
   · rw [Submodule.span_singleton_eq_bot] at h
     have := congrFun h 0
     simp at this
-  · have : (![0, 1] : Fin 2 → k) ∈ Submodule.span k {(![1, 0] : Fin 2 → k)} := by
-      rw [h]; trivial
+  · have : (![0, 1] : Fin 2 → k) ∈ Submodule.span k {(![1, 0] : Fin 2 → k)} := by rw [h]; trivial
     obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.1 this
     have := congrFun hc 1
     simp at this
 
-theorem main (l : ℕ) [Fact (Nat.Prime l)] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
-    (S : Finset GlobalTheory.Ord2.Pl) (A : ValuationSubring Ω) (W : GlobalTheory.Ord2.R2 Ω l) (h : GlobalTheory.Ord2.Nf e S A W) :
-    ∃ φ ∈ ⁅GlobalTheory.Ord2.H0g W, GlobalTheory.Ord2.H0g W⁆,
-      Matrix.det (GlobalTheory.Ord2.mat W φ - (1 : Matrix (Fin 2) (Fin 2) (Formalism.ConjugateSelfDual.Qbar l))) ≠ (0 : Formalism.ConjugateSelfDual.Qbar l) := by
+theorem main
+    (l : ℕ) [Fact (Nat.Prime l)]
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (e : ℕ) (S : Finset GlobalTheory.Ord2.Pl) (A : ValuationSubring Ω)
+    (W : GlobalTheory.Ord2.R2 Ω l) (h : GlobalTheory.Ord2.Nf e S A W)
+    : ∃ φ ∈ ⁅GlobalTheory.Ord2.H0g W, GlobalTheory.Ord2.H0g W⁆,
+      Matrix.det
+          (GlobalTheory.Ord2.mat W φ
+            - (1 : Matrix (Fin 2) (Fin 2) (Formalism.ConjugateSelfDual.Qbar l)))
+        ≠ (0 : Formalism.ConjugateSelfDual.Qbar l) := by
   refine exists_comm W (GlobalTheory.Ord2.H0g W) ?_ ?_
   · intro s hs
     have h1 : GlobalTheory.Ord2.dt W s = 1 := hs.2

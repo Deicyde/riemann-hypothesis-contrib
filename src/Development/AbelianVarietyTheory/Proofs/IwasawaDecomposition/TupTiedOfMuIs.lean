@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.ResCh
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.Inhab Formalism.L2.Host
+  GlobalTheory.EX GlobalTheory.EX.OB GlobalTheory.Mem GlobalTheory.Mem.Top NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory.Mem.Top.TupTie
 
@@ -19,14 +21,14 @@ def Good (F : Type) [Field F] [NumberField F] [Algebra F L] (χ : HChar L) : Pro
 
 variable {F : Type} [Field F] [NumberField F] [Algebra F L]
 
-theorem resFin_mul (χ χ' : HChar L) (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ) :
-    (χ * χ').resFin v k = χ.resFin v k * χ'.resFin v k := by
+theorem resFin_mul (χ χ' : HChar L) (v : HeightOneSpectrum (𝓞 F)) (k : Fˣ)
+    : (χ * χ').resFin v k = χ.resFin v k * χ'.resFin v k := by
   simp only [HChar.resFin, MonoidHom.finsetProd_apply, ← Finset.prod_mul_distrib]
   rfl
 
 omit [NumberField F] in
-theorem resInf_mul (χ χ' : HChar L) (v : InfinitePlace F) (k : Fˣ) :
-    (χ * χ').resInf v k = χ.resInf v k * χ'.resInf v k := by
+theorem resInf_mul (χ χ' : HChar L) (v : InfinitePlace F) (k : Fˣ)
+    : (χ * χ').resInf v k = χ.resInf v k * χ'.resInf v k := by
   simp only [HChar.resInf, MonoidHom.finsetProd_apply, ← Finset.prod_mul_distrib]
   rfl
 
@@ -50,7 +52,8 @@ theorem Good.mul {χ χ' : HChar L} (h : Good F χ) (h' : Good F χ') : Good F (
 
 end
 
-theorem good_set {B : Base} (f : Fr B.toPre) (T : TwDat B) {χ : HChar B.host.E} (h : χ ∈ T.set f) : Good B.host.F χ := by
+theorem good_set {B : Base} (f : Fr B.toPre) (T : TwDat B) {χ : HChar B.host.E} (h : χ ∈ T.set f)
+    : Good B.host.F χ := by
   have hd : Good B.host.F f.del := ⟨f.isDel.fin, f.isDel.triv, f.isDel.tame⟩
   have hd' : Good B.host.F f.del' := ⟨f.isDel'.fin, f.isDel'.triv, f.isDel'.tame⟩
   rcases h with (rfl | rfl | rfl) | ⟨w, rfl⟩

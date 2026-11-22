@@ -73,97 +73,104 @@ private lemma UpperTheory.Reformulated.B.RangeExtension.finiteRing_sq_sub_mul_sq
   obtain ⟨z, hz⟩ := hmem
   exact ⟨Spec.map g z, by rw [← Scheme.Hom.comp_apply]; exact hz⟩
 
-theorem UpperTheory.Reformulated.B.RangeExtension.mem_range :
-    ∀ {X : AlgebraicGeometry.Scheme} {Ω : Type} [inst : Field Ω]
-      {ξ :
-        @Quiver.Hom AlgebraicGeometry.Scheme
+theorem UpperTheory.Reformulated.B.RangeExtension.mem_range
+    : ∀ {X : AlgebraicGeometry.Scheme} {Ω : Type} [inst : Field Ω]
+        {ξ : @Quiver.Hom AlgebraicGeometry.Scheme
           (@CategoryTheory.ReflQuiver.toQuiver AlgebraicGeometry.Scheme
-            (@CategoryTheory.catToReflQuiver AlgebraicGeometry.Scheme AlgebraicGeometry.Scheme.instCategory))
+            (@CategoryTheory.catToReflQuiver AlgebraicGeometry.Scheme
+              AlgebraicGeometry.Scheme.instCategory))
           (AlgebraicGeometry.Spec (@CommRingCat.of Ω (@Field.toCommRing Ω inst))) X},
-      @GlobalTheory.CompanionTheory.Ar.IsCptGen X Ω inst ξ →
-        ∀ {U : X.Opens},
-          @AlgebraicGeometry.IsAffineOpen X U →
-            ∀ {R : Type} [inst_1 : CommRing R]
-              (φ :
-                @RingHom R Ω
-                  (@Semiring.toNonAssocSemiring R (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_1)))
+      @GlobalTheory.CompanionTheory.Ar.IsCptGen X Ω inst ξ
+        → ∀ {U : X.Opens},
+          @AlgebraicGeometry.IsAffineOpen X U
+            → ∀ {R : Type} [inst_1 : CommRing R]
+                (φ : @RingHom R Ω
+                  (@Semiring.toNonAssocSemiring R
+                    (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_1)))
                   (@Semiring.toNonAssocSemiring Ω
-                    (@DivisionSemiring.toSemiring Ω (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst)))))
-              (x :
-                @Quiver.Hom AlgebraicGeometry.Scheme
+                    (@DivisionSemiring.toSemiring Ω
+                      (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst)))))
+                (x : @Quiver.Hom AlgebraicGeometry.Scheme
                   (@CategoryTheory.ReflQuiver.toQuiver AlgebraicGeometry.Scheme
-                    (@CategoryTheory.catToReflQuiver AlgebraicGeometry.Scheme AlgebraicGeometry.Scheme.instCategory))
+                    (@CategoryTheory.catToReflQuiver AlgebraicGeometry.Scheme
+                      AlgebraicGeometry.Scheme.instCategory))
                   (AlgebraicGeometry.Spec (@CommRingCat.of R inst_1)) X),
               @Eq
                   (@Quiver.Hom AlgebraicGeometry.Scheme
                     (@CategoryTheory.CategoryStruct.toQuiver AlgebraicGeometry.Scheme
                       (@CategoryTheory.Category.toCategoryStruct AlgebraicGeometry.Scheme
                         AlgebraicGeometry.Scheme.instCategory))
-                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp Ω (@Field.toCommRing Ω inst)) X)
+                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp Ω (@Field.toCommRing Ω inst))
+                    X)
                   (@CategoryTheory.CategoryStruct.comp AlgebraicGeometry.Scheme
                     (@CategoryTheory.Category.toCategoryStruct AlgebraicGeometry.Scheme
                       AlgebraicGeometry.Scheme.instCategory)
-                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp Ω (@Field.toCommRing Ω inst)) (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R inst_1) X
-                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap R Ω inst_1 (@Field.toCommRing Ω inst) φ) x)
-                  ξ →
-                (∀ (z : ↥(AlgebraicGeometry.Spec (@CommRingCat.of R inst_1))),
-                    @Membership.mem (↥X) X.Opens
+                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp Ω (@Field.toCommRing Ω inst))
+                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp R inst_1) X
+                    (@ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap R Ω inst_1
+                      (@Field.toCommRing Ω inst) φ)
+                    x)
+                  ξ
+                → (∀ (z : ↥(AlgebraicGeometry.Spec (@CommRingCat.of R inst_1))),
+                  @Membership.mem (↥X) X.Opens
+                    (@SetLike.instMembership X.Opens (↥X)
+                      (@TopologicalSpace.Opens.instSetLike (↥X)
+                        (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier
+                          CommRingCat CommRingCat.instCategory X.toSheafedSpace)))
+                    U (x z))
+                → ∀ (q : @GlobalTheory.CompanionTheory.Ar.Cpt X Ω inst ξ),
+                  @Membership.mem (↥X) X.Opens
                       (@SetLike.instMembership X.Opens (↥X)
                         (@TopologicalSpace.Opens.instSetLike (↥X)
-                          (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier CommRingCat
-                            CommRingCat.instCategory X.toSheafedSpace)))
-                      U (x z)) →
-                  ∀ (q : @GlobalTheory.CompanionTheory.Ar.Cpt X Ω inst ξ),
-                    @Membership.mem (↥X) X.Opens
-                        (@SetLike.instMembership X.Opens (↥X)
-                          (@TopologicalSpace.Opens.instSetLike (↥X)
-                            (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier CommRingCat
-                              CommRingCat.instCategory X.toSheafedSpace)))
-                        U
-                        (@Subtype.val (↥X)
-                          (fun (p : ↥X) ↦
-                            @Specializes (↥X)
-                              (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier CommRingCat
-                                CommRingCat.instCategory X.toSheafedSpace)
-                              (@GlobalTheory.CompanionTheory.Ar.genPt X Ω inst ξ) p)
-                          q) →
-                      (∀ (a : R),
-                          @Membership.mem Ω
-                            (@Subring Ω
-                              (@NonAssocCommRing.toNonAssocRing Ω
-                                (@CommRing.toNonAssocCommRing Ω (@Field.toCommRing Ω inst))))
-                            (@SetLike.instMembership
-                              (@Subring Ω
-                                (@NonAssocCommRing.toNonAssocRing Ω
-                                  (@CommRing.toNonAssocCommRing Ω (@Field.toCommRing Ω inst))))
-                              Ω
-                              (@Subring.instSetLike Ω
-                                (@NonAssocCommRing.toNonAssocRing Ω
-                                  (@CommRing.toNonAssocCommRing Ω (@Field.toCommRing Ω inst)))))
-                            (@GlobalTheory.CompanionTheory.Ar.regAt X Ω inst ξ q)
-                            (@DFunLike.coe
-                              (@RingHom R Ω
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_1)))
-                                (@Semiring.toNonAssocSemiring Ω
-                                  (@DivisionSemiring.toSemiring Ω
-                                    (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst)))))
-                              R (fun (x : R) ↦ Ω)
-                              (@RingHom.instFunLike R Ω
-                                (@Semiring.toNonAssocSemiring R
-                                  (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_1)))
-                                (@Semiring.toNonAssocSemiring Ω
-                                  (@DivisionSemiring.toSemiring Ω
-                                    (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst)))))
-                              φ a)) →
-                        @Membership.mem (↥X) (Set ↥X) (@Set.instMembership ↥X)
-                          (@Set.range ↥X ↥(AlgebraicGeometry.Spec (@CommRingCat.of R inst_1)) ⇑x)
-                          (@Subtype.val (↥X)
-                            (fun (p : ↥X) ↦
-                              @Specializes (↥X)
-                                (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier CommRingCat
-                                  CommRingCat.instCategory X.toSheafedSpace)
-                                (@GlobalTheory.CompanionTheory.Ar.genPt X Ω inst ξ) p)
-                            q) := by
+                          (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier
+                            CommRingCat CommRingCat.instCategory X.toSheafedSpace)))
+                      U
+                      (@Subtype.val (↥X)
+                        (fun (p : ↥X) ↦
+                          @Specializes (↥X)
+                            (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier
+                              CommRingCat CommRingCat.instCategory X.toSheafedSpace)
+                            (@GlobalTheory.CompanionTheory.Ar.genPt X Ω inst ξ) p)
+                        q)
+                    → (∀ (a : R),
+                      @Membership.mem Ω
+                        (@Subring Ω
+                          (@NonAssocCommRing.toNonAssocRing Ω
+                            (@CommRing.toNonAssocCommRing Ω (@Field.toCommRing Ω inst))))
+                        (@SetLike.instMembership
+                          (@Subring Ω
+                            (@NonAssocCommRing.toNonAssocRing Ω
+                              (@CommRing.toNonAssocCommRing Ω (@Field.toCommRing Ω inst))))
+                          Ω
+                          (@Subring.instSetLike Ω
+                            (@NonAssocCommRing.toNonAssocRing Ω
+                              (@CommRing.toNonAssocCommRing Ω (@Field.toCommRing Ω inst)))))
+                        (@GlobalTheory.CompanionTheory.Ar.regAt X Ω inst ξ q)
+                        (@DFunLike.coe
+                          (@RingHom R Ω
+                            (@Semiring.toNonAssocSemiring R
+                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_1)))
+                            (@Semiring.toNonAssocSemiring Ω
+                              (@DivisionSemiring.toSemiring Ω
+                                (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst)))))
+                          R
+                          (fun (x : R) ↦ Ω)
+                          (@RingHom.instFunLike R Ω
+                            (@Semiring.toNonAssocSemiring R
+                              (@CommSemiring.toSemiring R (@CommRing.toCommSemiring R inst_1)))
+                            (@Semiring.toNonAssocSemiring Ω
+                              (@DivisionSemiring.toSemiring Ω
+                                (@Semifield.toDivisionSemiring Ω (@Field.toSemifield Ω inst)))))
+                          φ a))
+                    → @Membership.mem (↥X) (Set ↥X) (@Set.instMembership ↥X)
+                      (@Set.range ↥X ↥(AlgebraicGeometry.Spec (@CommRingCat.of R inst_1)) ⇑x)
+                      (@Subtype.val (↥X)
+                        (fun (p : ↥X) ↦
+                          @Specializes (↥X)
+                            (@AlgebraicGeometry.SheafedSpace.instTopologicalSpaceCarrierCarrier
+                              CommRingCat CommRingCat.instCategory X.toSheafedSpace)
+                            (@GlobalTheory.CompanionTheory.Ar.genPt X Ω inst ξ) p)
+                        q) := by
   intro X Ω _ ξ hξ U hU R _ φ x hx hxU q hqU hreg
-  exact UpperTheory.Reformulated.B.RangeExtension.finiteRing_sq_sub_mul_sq_eq_of_card hU φ x hx hxU q.1 q.2 hqU (hξ.inj q) hreg
+  exact UpperTheory.Reformulated.B.RangeExtension.finiteRing_sq_sub_mul_sq_eq_of_card hU φ x hx hxU
+    q.1 q.2 hqU (hξ.inj q) hreg

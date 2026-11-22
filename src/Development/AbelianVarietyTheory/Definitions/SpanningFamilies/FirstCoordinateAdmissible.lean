@@ -17,8 +17,7 @@ noncomputable section
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-def IsType (Ψ : Finset (E →+* ℂ)) : Prop :=
-  ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ
+def IsType (Ψ : Finset (E →+* ℂ)) : Prop := ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ
 
 def ccT {α β : Type} (A : Matrix α β E) : Matrix β α E := (A.map cc)ᵀ
 
@@ -62,15 +61,15 @@ def hFac (γ : M2 E N) (Z : CM Ψ N N) (z z' : CM Ψ n N) : ℂ :=
 
 def TransH (γ : M2 E N) (φ ψ : Matrix (Fin n) (Fin N) E → ℂ) : Prop :=
   ∀ Z ∈ Hn Ψ N, ∀ z z' : CM Ψ n N,
-    thH Ψ ψ (hAct Ψ γ Z) (fun τ => Matrix.of fun k => (hDen' Ψ γ Z τ)⁻¹ *ᵥ z τ k)
-      (fun τ => Matrix.of fun k => z' τ k ᵥ* (hDen Ψ γ Z τ)⁻¹) = hFac Ψ γ Z z z' * thH Ψ φ Z z z'
-
+    thH Ψ ψ (hAct Ψ γ Z)
+        (fun τ => Matrix.of fun k => (hDen' Ψ γ Z τ)⁻¹ *ᵥ z τ k)
+        (fun τ => Matrix.of fun k => z' τ k ᵥ* (hDen Ψ γ Z τ)⁻¹)
+      = hFac Ψ γ Z z z' * thH Ψ φ Z z z'
 
 open Classical in
-def weil (γ : M2 E N) (φ : Matrix (Fin n) (Fin N) E → ℂ) : Matrix (Fin n) (Fin N) E → ℂ :=
-  by
-    classical
-    exact if h : ∃ ψ, IsSB ψ ∧ TransH Ψ γ φ ψ then h.choose else 0
+def weil (γ : M2 E N) (φ : Matrix (Fin n) (Fin N) E → ℂ) : Matrix (Fin n) (Fin N) E → ℂ := by
+  classical
+  exact if h : ∃ ψ, IsSB ψ ∧ TransH Ψ γ φ ψ then h.choose else 0
 
 def botSpan (γ : M2 E N) : Submodule E (Fin N ⊕ Fin N → E) :=
   Submodule.span E (Set.range fun a : Fin N => γ (Sum.inr a))
@@ -84,10 +83,10 @@ def eisTerm (γ : M2 E N) (φ : Matrix (Fin n) (Fin N) E → ℂ) (Z : CM Ψ N N
 def eis (φ : Matrix (Fin n) (Fin N) E → ℂ) (Z : CM Ψ N N) (z z' : CM Ψ n N) : ℂ :=
   ∑' U : Lag E N, eisTerm Ψ U.2.choose φ Z z z'
 
-def heisH (d b : Matrix (Fin n) (Fin N) E) (φ : Matrix (Fin n) (Fin N) E → ℂ) :
-    Matrix (Fin n) (Fin N) E → ℂ := fun x =>
-  φ (x - d) * cexp (Real.pi * I *
-    ((Algebra.trace ℚ E (∑ k, ∑ a, b k a * (2 * cc (x k a) - cc (d k a))) : ℚ) : ℂ))
+def heisH (d b : Matrix (Fin n) (Fin N) E) (φ : Matrix (Fin n) (Fin N) E → ℂ)
+    : Matrix (Fin n) (Fin N) E → ℂ := fun x =>
+  φ (x - d) * cexp
+    (Real.pi * I * ((Algebra.trace ℚ E (∑ k, ∑ a, b k a * (2 * cc (x k a) - cc (d k a))) : ℚ) : ℂ))
 
 def chiH (β : Matrix (Fin N) (Fin N) E) (x : Matrix (Fin n) (Fin N) E) : ℂ :=
   cexp (2 * Real.pi * I * ∑ τ : Ψ, τ.1 (x * β * ccT x).trace)
@@ -99,12 +98,15 @@ abbrev QI (E : Type) [Field E] [NumberField E] (N : ℕ) : Type := Fin N × Fin 
 def ofQ (m : Matrix (Fin n) (QI E N) ℚ) : Matrix (Fin n) (Fin N) E :=
   Matrix.of fun k a => ∑ j, m k (a, j) • Module.finBasis ℚ E j
 
-def tauOf (Z : CM Ψ N N) : Matrix (QI E N) (QI E N) ℂ := Matrix.of fun p q => ∑ τ : Ψ,
-  (τ.1 (Module.finBasis ℚ E p.2) * Z τ p.1 q.1 * conj (τ.1 (Module.finBasis ℚ E q.2)) +
-    τ.1 (Module.finBasis ℚ E q.2) * Z τ q.1 p.1 * conj (τ.1 (Module.finBasis ℚ E p.2)))
+def tauOf (Z : CM Ψ N N) : Matrix (QI E N) (QI E N) ℂ :=
+  Matrix.of fun p q =>
+    ∑ τ : Ψ,
+      (τ.1 (Module.finBasis ℚ E p.2) * Z τ p.1 q.1 * conj (τ.1 (Module.finBasis ℚ E q.2)) +
+        τ.1 (Module.finBasis ℚ E q.2) * Z τ q.1 p.1 * conj (τ.1 (Module.finBasis ℚ E p.2)))
 
-def zetaOf (z z' : CM Ψ n N) : Fin n → QI E N → ℂ := fun k p => ∑ τ : Ψ,
-  (τ.1 (Module.finBasis ℚ E p.2) * z τ k p.1 + z' τ k p.1 * conj (τ.1 (Module.finBasis ℚ E p.2)))
+def zetaOf (z z' : CM Ψ n N) : Fin n → QI E N → ℂ := fun k p =>
+  ∑ τ : Ψ,
+    (τ.1 (Module.finBasis ℚ E p.2) * z τ k p.1 + z' τ k p.1 * conj (τ.1 (Module.finBasis ℚ E p.2)))
 
 abbrev Lt (E : Type) [Field E] [NumberField E] (m : ℕ) : Type := Submodule (𝓞 E) (Fin m → E)
 
@@ -117,8 +119,8 @@ def Agree {m : ℕ} (M : ℕ) (Λ Λ' : Lt E m) : Prop :=
 def Vset (E : Type) [Field E] [NumberField E] [IsCMField E] (n M : ℕ) : Set (Lt E n) :=
   {Λ | Λ.FG ∧ (∀ x, x ∈ Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm 1 x y)) ∧ Agree M Λ (stdL E n)}
 
-def DH (E : Type) [Field E] [NumberField E] [IsCMField E] (n M : ℕ) :
-    Set (Matrix (Fin n) (Fin n) E) :=
+def DH (E : Type) [Field E] [NumberField E] [IsCMField E] (n M : ℕ)
+    : Set (Matrix (Fin n) (Fin n) E) :=
   {h | ccT h * h = 1 ∧ ∃ s : ℕ, 0 < s ∧ s.Coprime M ∧
     ∃ y : Matrix (Fin n) (Fin n) E, IntM y ∧ (s : E) • (h - 1) = (M : E) • y}
 
@@ -142,12 +144,13 @@ abbrev Fam (E : Type) [Field E] [NumberField E] (n N : ℕ) : Type :=
 
 structure admitted (M R : ℕ) (φ : Fam E n N) : Prop where
   pos : 0 < M ∧ 0 < R
-  equiv : ∀ h ∈ DH E n M, ∀ Λ ∈ Vset E n M, ∀ Λ' ∈ Vset E n M, Moves h Λ Λ' →
-    ∀ x, φ Λ' (h * x) = φ Λ x
+  equiv
+    : ∀ h ∈ DH E n M, ∀ Λ ∈ Vset E n M, ∀ Λ' ∈ Vset E n M, Moves h Λ Λ' → ∀ x, φ Λ' (h * x) = φ Λ x
   supp : ∀ Λ ∈ Vset E n M, ∀ x, φ Λ x ≠ 0 → ColsIn Λ ((R : E) • x)
   per : ∀ Λ ∈ Vset E n M, ∀ x y, ColsIn Λ y → φ Λ (x + (R : E) • y) = φ Λ x
-  loc : ∀ Λ ∈ Vset E n M, ∀ Λ' ∈ Vset E n M, Agree (R * M) Λ Λ' → ∀ x,
-    ColsIn Λ ((R : E) • x) → ColsIn Λ' ((R : E) • x) → φ Λ x = φ Λ' x
+  loc
+    : ∀ Λ ∈ Vset E n M, ∀ Λ' ∈ Vset E n M,
+      Agree (R * M) Λ Λ' → ∀ x, ColsIn Λ ((R : E) • x) → ColsIn Λ' ((R : E) • x) → φ Λ x = φ Λ' x
 
 def swDiff (M : ℕ) (φ : Fam E n N) (Z : CM Ψ N N) : ℂ :=
   classSum M fun Λ => thH Ψ (φ Λ) Z 0 0 - eis Ψ (φ Λ) Z 0 0
@@ -155,17 +158,20 @@ def swDiff (M : ℕ) (φ : Fam E n N) (Z : CM Ψ N N) : ℂ :=
 def swd (M : ℕ) (φ : Fam E n N) (Z : CM Ψ N N) (z z' : CM Ψ n N) : ℂ :=
   classSum M fun Λ => thH Ψ (φ Λ) Z z z' - eis Ψ (φ Λ) Z z z'
 
-
 open Classical in
 def twist (R : ℕ) (𝔛 : Lt E N) (φ : Fam E n N) : Fam E n N := by
   classical
-  exact fun Λ x => if h : (∀ ξ ∈ 𝔛, (R : E) • (x *ᵥ ξ) ∈ Λ) ∧
-      ∃ s : ℕ, s ≡ 1 [MOD R ^ 2] ∧ ∀ v ∈ stdL E N, (s : E) • v ∈ 𝔛 then
-    φ Λ ((h.2.choose : E) • x) else 0
+  exact fun Λ x =>
+    if h
+        : (∀ ξ ∈ 𝔛, (R : E) • (x *ᵥ ξ) ∈ Λ)
+          ∧ ∃ s : ℕ, s ≡ 1 [MOD R ^ 2] ∧ ∀ v ∈ stdL E N, (s : E) • v ∈ 𝔛 then
+      φ Λ ((h.2.choose : E) • x)
+    else
+      0
 
 def gidx (𝔛 : Lt E N) : ℝ :=
-  ((stdL E N).toAddSubgroup.relIndex 𝔛.toAddSubgroup : ℝ) /
-    (𝔛.toAddSubgroup.relIndex (stdL E N).toAddSubgroup : ℝ)
+  ((stdL E N).toAddSubgroup.relIndex 𝔛.toAddSubgroup : ℝ)
+    / (𝔛.toAddSubgroup.relIndex (stdL E N).toAddSubgroup : ℝ)
 
 def Nb (M : ℕ) (P : Ideal (𝓞 E)) (Λ : Lt E n) : Set (Lt E n) :=
   {Λ' | Λ' ∈ Vset E n M ∧ P • Λ ≤ Λ' ∧
@@ -175,8 +181,8 @@ def conjI (P : Ideal (𝓞 E)) : Ideal (𝓞 E) :=
   Ideal.span {a | ∃ b ∈ P, ((a : 𝓞 E) : E) = cc ((b : 𝓞 E) : E)}
 
 def GoodPrime (m q : ℕ) (P : Ideal (𝓞 E)) : Prop :=
-  q.Prime ∧ q.Coprime m ∧ Ideal.absNorm P = q ∧ IsCoprime P (conjI P) ∧
-    ¬ (q : ℤ) ∣ 2 * NumberField.discr E
+  q.Prime ∧ q.Coprime m ∧ Ideal.absNorm P = q ∧ IsCoprime P (conjI P)
+    ∧ ¬ (q : ℤ) ∣ 2 * NumberField.discr E
 
 def dropZ (Z : CM Ψ (N + 1) (N + 1)) : CM Ψ N N := fun τ => (Z τ).submatrix Fin.succ Fin.succ
 
@@ -188,7 +194,8 @@ def pushZ (Z : CM Ψ N N) (v : Fin N → E) (t : ℝ) : CM Ψ N N := fun τ =>
 
 namespace Base
 
-theorem isType_data {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r) : IsType X.Ψ := X.cmType
+theorem isType_data {r : ℕ} (X : ReciprocityTheory.ChartRestriction.G.FD.Data E r) : IsType X.Ψ :=
+  X.cmType
 
 theorem map_cc (τ : E →+* ℂ) (t : E) : τ (cc t) = conj (τ t) := by
   simp [cc, IsCMField.complexEmbedding_complexConj]
@@ -202,42 +209,63 @@ theorem isIntegral_cc {x : E} (hx : IsIntegral ℤ x) : IsIntegral ℤ (cc x) :=
 theorem ccT_one {α : Type} [DecidableEq α] : ccT (1 : Matrix α α E) = 1 := by
   ext i j; by_cases h : i = j <;> simp [ccT, cc, Matrix.one_apply, h, eq_comm]
 
-theorem ccT_ccT {α β : Type} (A : Matrix α β E) : ccT (ccT A) = A := by
-  ext i j; simp [ccT, cc]
+theorem ccT_ccT {α β : Type} (A : Matrix α β E) : ccT (ccT A) = A := by ext i j; simp [ccT, cc]
 
-theorem ccT_mul {α β γ : Type} [Fintype β] (A : Matrix α β E) (B : Matrix β γ E) :
-    ccT (A * B) = ccT B * ccT A := by
+theorem ccT_mul {α β γ : Type} [Fintype β] (A : Matrix α β E) (B : Matrix β γ E)
+    : ccT (A * B) = ccT B * ccT A := by
   ext i j; simp [ccT, cc, Matrix.mul_apply, mul_comm]
 
-theorem one_mem_DH (M : ℕ) : (1 : Matrix (Fin n) (Fin n) E) ∈ DH E n M :=
-  ⟨by rw [ccT_one, one_mul], 1, one_pos, Nat.coprime_one_left M, 0, fun _ _ => isIntegral_zero,
-    by simp⟩
+theorem one_mem_DH (M : ℕ) : (1 : Matrix (Fin n) (Fin n) E) ∈ DH E n M := ⟨
+  by rw [ccT_one, one_mul],
+  1,
+  one_pos,
+  Nat.coprime_one_left M,
+  0,
+  fun _ _ => isIntegral_zero,
+  by simp
+⟩
 
-theorem ccT_mem_DH {M : ℕ} {h : Matrix (Fin n) (Fin n) E} (hh : h ∈ DH E n M) :
-    ccT h ∈ DH E n M := by
+theorem ccT_mem_DH {M : ℕ} {h : Matrix (Fin n) (Fin n) E} (hh : h ∈ DH E n M)
+    : ccT h ∈ DH E n M := by
   obtain ⟨hu, s, hs, hsM, y, hy, e⟩ := hh
-  refine ⟨by rw [ccT_ccT]; exact mul_eq_one_comm.1 hu, s, hs, hsM, ccT y,
-    fun i j => isIntegral_cc (hy j i), ?_⟩
+  refine ⟨
+    by rw [ccT_ccT]; exact mul_eq_one_comm.1 hu,
+    s,
+    hs,
+    hsM,
+    ccT y,
+    fun i j => isIntegral_cc (hy j i),
+    ?_
+  ⟩
   ext i j
   have := congrArg cc (congrFun (congrFun e j) i)
   by_cases hij : i = j
   · subst hij; simpa [ccT, cc] using this
   · simpa [ccT, cc, Matrix.one_apply, hij, Ne.symm hij] using this
 
-theorem mul_mem_DH {M : ℕ} {h g : Matrix (Fin n) (Fin n) E} (hh : h ∈ DH E n M)
-    (hg : g ∈ DH E n M) : h * g ∈ DH E n M := by
+theorem mul_mem_DH {M : ℕ} {h g : Matrix (Fin n) (Fin n) E} (hh : h ∈ DH E n M) (hg : g ∈ DH E n M)
+    : h * g ∈ DH E n M := by
   obtain ⟨hu, s, hs, hsM, y, hy, e⟩ := hh
   obtain ⟨gu, t, ht, htM, w, hw, f⟩ := hg
-  refine ⟨?_, s * t, Nat.mul_pos hs ht, Nat.Coprime.mul_left hsM htM,
-    (M : E) • (y * w) + (t : E) • y + (s : E) • w, fun i j => ?_, ?_⟩
+  refine ⟨
+    ?_,
+    s * t,
+    Nat.mul_pos hs ht,
+    Nat.Coprime.mul_left hsM htM,
+    (M : E) • (y * w) + (t : E) • y + (s : E) • w,
+    fun i j => ?_,
+    ?_
+  ⟩
   · rw [ccT_mul, Matrix.mul_assoc, ← Matrix.mul_assoc (ccT h), hu, one_mul, gu]
   · simp only [Matrix.add_apply, Matrix.smul_apply, smul_eq_mul, Matrix.mul_apply]
     have c : ∀ k : ℕ, IsIntegral ℤ (k : E) := fun k => by
       simpa using isIntegral_algebraMap (R := ℤ) (A := E) (x := (k : ℤ))
-    exact (((c M).mul (IsIntegral.sum _ fun k _ => (hy i k).mul (hw k j))).add
-      ((c t).mul (hy i j))).add ((c s).mul (hw i j))
-  · have : ((s * t : ℕ) : E) • (h * g - 1) = ((s : E) • (h - 1)) * ((t : E) • (g - 1)) +
-        (t : E) • ((s : E) • (h - 1)) + (s : E) • ((t : E) • (g - 1)) := by
+    exact
+      (((c M).mul (IsIntegral.sum _ fun k _ => (hy i k).mul (hw k j))).add ((c t).mul (hy i j))).add
+        ((c s).mul (hw i j))
+  · have : ((s * t : ℕ) : E) • (h * g - 1)
+        = ((s : E) • (h - 1)) * ((t : E) • (g - 1)) + (t : E) • ((s : E) • (h - 1))
+          + (s : E) • ((t : E) • (g - 1)) := by
       simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, Nat.cast_mul, mul_comm (t : E) s,
         ← smul_add]
       congr 1
@@ -245,37 +273,38 @@ theorem mul_mem_DH {M : ℕ} {h g : Matrix (Fin n) (Fin n) E} (hh : h ∈ DH E n
     rw [this, e, f]
     simp only [Matrix.smul_mul, Matrix.mul_smul, smul_smul, smul_add, mul_comm (M : E)]
 
-
 omit [IsCMField E] in
 theorem moves_one (Λ : Lt E n) : Moves 1 Λ Λ := fun v => by rw [Matrix.one_mulVec]
 
-
 omit [IsCMField E] in
-theorem moves_mul {h g : Matrix (Fin n) (Fin n) E} {Λ Λ' Λ'' : Lt E n} (h1 : Moves g Λ Λ')
-    (h2 : Moves h Λ' Λ'') : Moves (h * g) Λ Λ'' := fun v => by
+theorem moves_mul
+    {h g : Matrix (Fin n) (Fin n) E} {Λ Λ' Λ'' : Lt E n} (h1 : Moves g Λ Λ') (h2 : Moves h Λ' Λ'')
+    : Moves (h * g) Λ Λ'' := fun v => by
   rw [h1, h2, Matrix.mulVec_mulVec]
 
-theorem moves_ccT {h : Matrix (Fin n) (Fin n) E} (hu : ccT h * h = 1) {Λ Λ' : Lt E n}
-    (h1 : Moves h Λ Λ') : Moves (ccT h) Λ' Λ := fun v => by
+theorem moves_ccT
+    {h : Matrix (Fin n) (Fin n) E} (hu : ccT h * h = 1) {Λ Λ' : Lt E n} (h1 : Moves h Λ Λ')
+    : Moves (ccT h) Λ' Λ := fun v => by
   rw [h1, Matrix.mulVec_mulVec, mul_eq_one_comm.1 hu, Matrix.one_mulVec]
 
-theorem cls_eq_iff {M : ℕ} (Λ Λ' : Vset E n M) :
-    (Quot.mk _ Λ : Cls E n M) = Quot.mk _ Λ' ↔ ∃ h ∈ DH E n M, Moves h Λ.1 Λ'.1 := by
-  have : Equivalence fun Λ Λ' : Vset E n M => ∃ h ∈ DH E n M, Moves h Λ.1 Λ'.1 :=
-    ⟨fun Λ => ⟨1, one_mem_DH M, moves_one _⟩,
-      fun ⟨h, hh, m⟩ => ⟨ccT h, ccT_mem_DH hh, moves_ccT hh.1 m⟩,
-      fun ⟨g, hg, m⟩ ⟨h, hh, m'⟩ => ⟨h * g, mul_mem_DH hh hg, moves_mul m m'⟩⟩
+theorem cls_eq_iff {M : ℕ} (Λ Λ' : Vset E n M)
+    : (Quot.mk _ Λ : Cls E n M) = Quot.mk _ Λ' ↔ ∃ h ∈ DH E n M, Moves h Λ.1 Λ'.1 := by
+  have : Equivalence fun Λ Λ' : Vset E n M => ∃ h ∈ DH E n M, Moves h Λ.1 Λ'.1 := ⟨
+    fun Λ => ⟨1, one_mem_DH M, moves_one _⟩,
+    fun ⟨h, hh, m⟩ => ⟨ccT h, ccT_mem_DH hh, moves_ccT hh.1 m⟩,
+    fun ⟨g, hg, m⟩ ⟨h, hh, m'⟩ => ⟨h * g, mul_mem_DH hh hg, moves_mul m m'⟩
+  ⟩
   exact Quot.eq.trans this.eqvGen_iff
 
-theorem classSum_congr {M : ℕ} {f g : Lt E n → ℂ} (h : ∀ Λ ∈ Vset E n M, f Λ = g Λ) :
-    classSum M f = classSum M g :=
+theorem classSum_congr {M : ℕ} {f g : Lt E n → ℂ} (h : ∀ Λ ∈ Vset E n M, f Λ = g Λ)
+    : classSum M f = classSum M g :=
   finsum_congr fun c => by rw [h _ (Quot.out c).2]
 
-
 omit [IsCMField E] in
-theorem expo_eq_trace (x : Matrix (Fin n) (Fin N) E) (Z : CM Ψ N N) (z z' : CM Ψ n N) :
-    expo Ψ x Z z z' = ∑ τ : Ψ, ((x.map τ.1 * Z τ * (x.map τ.1)ᴴ).trace +
-      (x.map τ.1 * (z τ)ᵀ).trace + (z' τ * (x.map τ.1)ᴴ).trace) := by
+theorem expo_eq_trace (x : Matrix (Fin n) (Fin N) E) (Z : CM Ψ N N) (z z' : CM Ψ n N)
+    : expo Ψ x Z z z'
+      = ∑ τ : Ψ, ((x.map τ.1 * Z τ * (x.map τ.1)ᴴ).trace +
+        (x.map τ.1 * (z τ)ᵀ).trace + (z' τ * (x.map τ.1)ᴴ).trace) := by
   unfold expo
   refine Finset.sum_congr rfl fun τ _ => ?_
   simp only [Matrix.trace, ← Finset.sum_add_distrib]
@@ -284,7 +313,6 @@ theorem expo_eq_trace (x : Matrix (Fin n) (Fin N) E) (Z : CM Ψ N N) (z z' : CM 
   rfl
 
 theorem swd_zero (M : ℕ) (φ : Fam E n N) (Z : CM Ψ N N) : swd Ψ M φ Z 0 0 = swDiff Ψ M φ Z := rfl
-
 
 omit [IsCMField E] in
 theorem mem_stdL {m : ℕ} (x : Fin m → E) : x ∈ stdL E m ↔ ∀ a, IsIntegral ℤ (x a) := by
@@ -297,12 +325,15 @@ theorem mem_stdL {m : ℕ} (x : Fin m → E) : x ∈ stdL E m ↔ ∀ a, IsInteg
       by_cases h : a = b
       · subst h; simpa using isIntegral_one
       · simpa [Pi.single_apply, h] using isIntegral_zero
-    | zero => intro a; exact isIntegral_zero
-    | add x y _ _ hx hy => intro a; exact (hx a).add (hy a)
+    | zero =>
+      intro a; exact isIntegral_zero
+    | add x y _ _ hx hy =>
+      intro a; exact (hx a).add (hy a)
     | smul c x _ hx =>
       intro a
       have : (c • x) a = (c : E) * x a := rfl
-      rw [this]; exact c.isIntegral_coe.mul (hx a)
+      rw [this]
+      exact c.isIntegral_coe.mul (hx a)
   · intro hx
     have : x = ∑ a, (⟨x a, hx a⟩ : 𝓞 E) • (Pi.single a 1 : Fin m → E) := by
       ext b
@@ -322,8 +353,15 @@ theorem herm_one {m : ℕ} (x y : Fin m → E) : herm 1 x y = ∑ a, x a * cc (y
   rw [Finset.sum_eq_single a] <;> simp +contextual [Matrix.one_apply, eq_comm]
 
 theorem stdL_mem_Vset (n M : ℕ) : stdL E n ∈ Vset E n M := by
-  refine ⟨Submodule.fg_span (Set.finite_range _), fun x => ⟨fun hx y hy => ?_, fun h => ?_⟩,
-    1, one_pos, Nat.coprime_one_left M, by simp, by simp⟩
+  refine ⟨
+    Submodule.fg_span (Set.finite_range _),
+    fun x => ⟨fun hx y hy => ?_, fun h => ?_⟩,
+    1,
+    one_pos,
+    Nat.coprime_one_left M,
+    by simp,
+    by simp
+  ⟩
   · rw [herm_one]
     rw [mem_stdL] at hx hy
     exact IsIntegral.sum _ fun a _ => (hx a).mul (isIntegral_cc (hy a))
@@ -335,16 +373,17 @@ theorem stdL_mem_Vset (n M : ℕ) : stdL E n ∈ Vset E n M := by
     · intro b _ hb; simp [hb, cc]
     · simp
 
-
 omit [IsCMField E] in
-theorem nat_smul_mem {m : ℕ} (Λ : Lt E m) (s : ℕ) {v : Fin m → E} (hv : v ∈ Λ) :
-    (s : E) • v ∈ Λ := by
+theorem nat_smul_mem {m : ℕ} (Λ : Lt E m) (s : ℕ) {v : Fin m → E} (hv : v ∈ Λ)
+    : (s : E) • v ∈ Λ := by
   rw [Nat.cast_smul_eq_nsmul]; exact Λ.toAddSubgroup.nsmul_mem hv s
 
-
 omit [IsCMField E] in
-theorem mem_of_coprime {m : ℕ} (Λ : Lt E m) {s R : ℕ} (h : s.Coprime R) {v : Fin m → E}
-    (h1 : (s : E) • v ∈ Λ) (h2 : (R : E) • v ∈ Λ) : v ∈ Λ := by
+theorem mem_of_coprime
+    {m : ℕ} (Λ : Lt E m)
+    {s R : ℕ} (h : s.Coprime R)
+    {v : Fin m → E} (h1 : (s : E) • v ∈ Λ) (h2 : (R : E) • v ∈ Λ)
+    : v ∈ Λ := by
   obtain ⟨a, b, hab⟩ : IsCoprime (s : ℤ) (R : ℤ) := Nat.isCoprime_iff_coprime.2 h
   have e : v = a • ((s : E) • v) + b • ((R : E) • v) := by
     rw [← Int.cast_smul_eq_zsmul E, ← Int.cast_smul_eq_zsmul E, smul_smul, smul_smul, ← add_smul]
@@ -352,8 +391,6 @@ theorem mem_of_coprime {m : ℕ} (Λ : Lt E m) {s R : ℕ} (h : s.Coprime R) {v 
     rw [this, one_smul]
   rw [e]
   exact Λ.add_mem (Λ.toAddSubgroup.zsmul_mem h1 a) (Λ.toAddSubgroup.zsmul_mem h2 b)
-
-
 
 omit [NumberField E] [IsCMField E] in
 theorem I_mem_Hn : (fun _ => I • (1 : Matrix (Fin N) (Fin N) ℂ) : CM Ψ N N) ∈ Hn Ψ N := by
@@ -363,19 +400,21 @@ theorem I_mem_Hn : (fun _ => I • (1 : Matrix (Fin N) (Fin N) ℂ) : CM Ψ N N)
     rw [conjTranspose_smul, conjTranspose_one, ← sub_smul, smul_smul]
     have : (2 * I)⁻¹ * (I - star I) = 1 := by
       have : star I = -I := conj_I
-      rw [this]; field_simp; ring
+      rw [this]
+      field_simp
+      ring
     rw [this, one_smul]
   simpa [this] using Matrix.PosDef.one
 
-theorem ccT_J : ccT (Matrix.J (Fin N) E) = -Matrix.J (Fin N) E := by
+theorem ccT_J : ccT (Matrix.J (Fin N) E) = - Matrix.J (Fin N) E := by
   have : (Matrix.J (Fin N) E).map cc = Matrix.J (Fin N) E := by
     ext (i | i) (j | j) <;> by_cases h : i = j <;> simp [Matrix.J, cc, h]
   rw [ccT, this, Matrix.J_transpose]
 
 theorem one_mem_UU : (1 : M2 E N) ∈ UU E N := by
   change ccT _ * _ * _ = _
-  rw [ccT_one]; simp
-
+  rw [ccT_one]
+  simp
 
 omit [IsCMField E] in
 theorem transH_one (φ : Matrix (Fin n) (Fin N) E → ℂ) : TransH Ψ (1 : M2 E N) φ φ := by
@@ -393,31 +432,30 @@ theorem transH_one (φ : Matrix (Fin n) (Fin N) E → ℂ) : TransH Ψ (1 : M2 E
   · funext τ; ext k i; simp [d2]
   · funext τ; ext k i; simp [d1]
 
-
 omit [IsCMField E] in
 theorem gidx_stdL : gidx (stdL E N) = 1 := by simp [gidx]
 
-
 omit [IsCMField E] in
-theorem thH_deg_zero (φ : Matrix (Fin n) (Fin 0) E → ℂ) (Z : CM Ψ 0 0) (z z' : CM Ψ n 0) :
-    thH Ψ φ Z z z' = φ 0 := by
+theorem thH_deg_zero (φ : Matrix (Fin n) (Fin 0) E → ℂ) (Z : CM Ψ 0 0) (z z' : CM Ψ n 0)
+    : thH Ψ φ Z z z' = φ 0 := by
   unfold thH
   rw [tsum_eq_single 0 fun x hx => (hx (Subsingleton.elim _ _)).elim]
   simp [expo, dotProduct]
 
-
 omit [IsCMField E] in
 theorem weil_deg_zero (γ : M2 E 0) (φ : Matrix (Fin n) (Fin 0) E → ℂ) : weil Ψ γ φ 0 = φ 0 := by
   have f : ∀ Z z z', hFac Ψ γ Z (n := n) z z' = 1 := fun Z z z' => by simp [hFac, dotProduct]
-  have h : ∃ ψ, IsSB ψ ∧ TransH Ψ γ φ ψ :=
-    ⟨φ, ⟨1, one_pos, fun _ _ _ i => i.elim0, fun _ _ _ => congrArg φ (Subsingleton.elim _ _)⟩,
-      fun Z _ z z' => by rw [f, thH_deg_zero, thH_deg_zero, one_mul]⟩
+  have h : ∃ ψ, IsSB ψ ∧ TransH Ψ γ φ ψ := ⟨
+    φ,
+    ⟨1, one_pos, fun _ _ _ i => i.elim0, fun _ _ _ => congrArg φ (Subsingleton.elim _ _)⟩,
+    fun Z _ z z' => by rw [f, thH_deg_zero, thH_deg_zero, one_mul]
+  ⟩
   have := h.choose_spec.2 _ (I_mem_Hn Ψ) 0 0
   rw [f, thH_deg_zero, thH_deg_zero, one_mul] at this
   rw [weil, dite_eq_left h, this]
 
-theorem eis_deg_zero (φ : Matrix (Fin n) (Fin 0) E → ℂ) (Z : CM Ψ 0 0) (z z' : CM Ψ n 0) :
-    eis Ψ φ Z z z' = φ 0 := by
+theorem eis_deg_zero (φ : Matrix (Fin n) (Fin 0) E → ℂ) (Z : CM Ψ 0 0) (z z' : CM Ψ n 0)
+    : eis Ψ φ Z z z' = φ 0 := by
   let U : Lag E 0 := ⟨_, 1, one_mem_UU, rfl⟩
   unfold eis
   rw [tsum_eq_single U fun V hV => (hV (Subtype.ext (Subsingleton.elim _ _))).elim]

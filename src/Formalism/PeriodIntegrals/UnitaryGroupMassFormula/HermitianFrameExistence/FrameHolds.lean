@@ -31,12 +31,17 @@ theorem frame_holds : PI.ScPiExists.Frame := by
     show min ((k - 1) + 2 * ((i.val - (k - 1)) / 2) + 1) (I.n - 1) = i.val
     omega
   obtain ⟨σ, hσ⟩ := hσ
-  obtain ⟨w, hw1, hw2⟩ := frame_core (I.ε v) hn σ hσ (fun a => rv I v (e a))
-    (fun a => rv I v (f a)) (rv I v z) (t : ℝ) (by exact_mod_cast ht)
-    (fun a b => by rw [hJ_rv, hee a b, map_zero]) (fun a b => by rw [hJ_rv, hff a b, map_zero])
-    (fun a b => by rw [hJ_rv, hef a b]; split_ifs <;> simp)
-    (fun a => by rw [hJ_rv, (hz a).1, map_zero]) (fun a => by rw [hJ_rv, (hz a).2, map_zero])
-    (by rw [hJ_rv, hzz]; simp)
+  obtain ⟨w, hw1, hw2⟩ :=
+    frame_core (I.ε v) hn σ hσ
+      (fun a => rv I v (e a))
+      (fun a => rv I v (f a))
+      (rv I v z) (t : ℝ) (by exact_mod_cast ht)
+      (fun a b => by rw [hJ_rv, hee a b, map_zero])
+      (fun a b => by rw [hJ_rv, hff a b, map_zero])
+      (fun a b => by rw [hJ_rv, hef a b]; split_ifs <;> simp)
+      (fun a => by rw [hJ_rv, (hz a).1, map_zero])
+      (fun a => by rw [hJ_rv, (hz a).2, map_zero])
+      (by rw [hJ_rv, hzz]; simp)
   exact ⟨w, hw1, hw2⟩
 
 end PI.ScPiFrameW

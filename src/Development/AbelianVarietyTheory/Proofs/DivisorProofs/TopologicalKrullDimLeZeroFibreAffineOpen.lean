@@ -8,21 +8,29 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HasPointClos
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.HSAmp
 
 set_option autoImplicit false
 
 namespace GlobalTheory.MixHt
 
-theorem dim_le_zero_of_fib_of_subset_affine : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k), GlobalTheory.MixHt.IsAmb p → ∀ (ℓ : ℕ) (U : X.Opens) (C : Set X), ℓ.Prime → IsAffineOpen U → IsIrreducible C → IsClosed C → C ⊆ GlobalTheory.HSAmp.fib X ℓ → C ⊆ (U : Set X) → topologicalKrullDim C ≤ 0 := by
+theorem dim_le_zero_of_fib_of_subset_affine
+    : ∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k),
+      GlobalTheory.MixHt.IsAmb p
+        → ∀ (ℓ : ℕ) (U : X.Opens) (C : Set X),
+          ℓ.Prime → IsAffineOpen U → IsIrreducible C → IsClosed C → C ⊆ GlobalTheory.HSAmp.fib X ℓ
+            → C ⊆ (U : Set X)
+            → topologicalKrullDim C ≤ 0 := by
   intro k _ X p h ℓ U C hℓ hU hC hCc hfib hCU
   obtain ⟨η, hη⟩ := QuasiSober.sober hC hCc
   set Y := GlobalTheory.MixHt.clo η
   set i := GlobalTheory.MixHt.cloι η
   have hgen : i (genericPoint Y) = η := GlobalTheory.MixHt.cloι_genericPoint η
   have hrange : i '' Set.univ = C := by
-    rw [← (genericPoint_spec Y).def, ← i.isClosedEmbedding.closure_image_eq, Set.image_singleton, hgen, hη.def]
+    rw [← (genericPoint_spec Y).def, ← i.isClosedEmbedding.closure_image_eq, Set.image_singleton,
+      hgen, hη.def]
   have htop : i ⁻¹ᵁ U = ⊤ := by
     refine top_unique fun y _ => ?_
     exact hCU (hrange ▸ Set.mem_image_of_mem i (Set.mem_univ y))
@@ -65,8 +73,10 @@ theorem dim_le_zero_of_fib_of_subset_affine : ∀ (k : Type) [CommRing k] (X : S
   have hR : IsField R := isField_of_isIntegral_of_isField' (Field.toIsField (ZMod ℓ))
 
   have hdimY : topologicalKrullDim ((⊤ : Y.Opens) : Set Y) = 0 := by
-    rw [topologicalKrullDim_eq_of_isEmbedding hV.fromSpec.isOpenEmbedding.isEmbedding hV.range_fromSpec]
-    exact (PrimeSpectrum.topologicalKrullDim_eq_ringKrullDim (R := R)).trans (ringKrullDim_eq_zero_of_isField hR)
+    rw [topologicalKrullDim_eq_of_isEmbedding hV.fromSpec.isOpenEmbedding.isEmbedding
+      hV.range_fromSpec]
+    exact (PrimeSpectrum.topologicalKrullDim_eq_ringKrullDim (R := R)).trans
+      (ringKrullDim_eq_zero_of_isField hR)
   rw [← hrange, GlobalTheory.MixHt.DimBasic.dim_image i.isClosedEmbedding.isEmbedding]
   rw [TopologicalSpace.Opens.coe_top] at hdimY
   exact hdimY.le

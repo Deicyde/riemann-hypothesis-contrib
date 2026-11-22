@@ -10,15 +10,15 @@ open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4 Order
 
 namespace LateralTheory.E.LeafStalkSmoothClosedPf
 
-theorem coheight_le_topDim {X : Scheme.{0}} (x : X) :
-    (coheight x : WithBot ℕ∞) ≤ topologicalKrullDim X := by
+theorem coheight_le_topDim {X : Scheme.{0}} (x : X)
+    : (coheight x : WithBot ℕ∞) ≤ topologicalKrullDim X := by
   let := specializationOrder X
-  have h := coheight_le_krullDim
-    (irreducibleSetEquivPoints.symm x : TopologicalSpace.IrreducibleCloseds X)
+  have h :=
+    coheight_le_krullDim (irreducibleSetEquivPoints.symm x : TopologicalSpace.IrreducibleCloseds X)
   rwa [coheight_orderIso] at h
 
-theorem stalk_not_isField {X : Scheme.{0}} [IsIntegral X] (y : X) (hy : y ≠ genericPoint X) :
-    ¬ IsField (X.presheaf.stalk y) := by
+theorem stalk_not_isField {X : Scheme.{0}} [IsIntegral X] (y : X) (hy : y ≠ genericPoint X)
+    : ¬ IsField (X.presheaf.stalk y) := by
   intro hF
   let := hF.toField
   have h0 : ringKrullDim (X.presheaf.stalk y) = 0 := ringKrullDim_eq_zero_of_field _
@@ -29,9 +29,11 @@ theorem stalk_not_isField {X : Scheme.{0}} [IsIntegral X] (y : X) (hy : y ≠ ge
   have h2 : genericPoint X ≤ y := hc h1
   exact hy (Specializes.antisymm (h2 : y ⤳ genericPoint X) (h1 : genericPoint X ⤳ y)).eq
 
-theorem stalk_dvr {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X] (y : X)
-    (hn : IsIntegrallyClosed (X.presheaf.stalk y)) (hd : topologicalKrullDim X = 1)
-    (hy : y ≠ genericPoint X) : IsDiscreteValuationRing (X.presheaf.stalk y) := by
+theorem stalk_dvr
+    {X : Scheme.{0}} [IsIntegral X] [IsLocallyNoetherian X]
+    (y : X) (hn : IsIntegrallyClosed (X.presheaf.stalk y))
+    (hd : topologicalKrullDim X = 1) (hy : y ≠ genericPoint X)
+    : IsDiscreteValuationRing (X.presheaf.stalk y) := by
   have hc : coheight y ≤ 1 := by
     have := (coheight_le_topDim y).trans hd.le
     exact_mod_cast this
@@ -51,7 +53,8 @@ theorem LeafStalkSmoothClosed_of : LateralTheory.E.LeafSmoothOfNormalPf.LeafStal
   algebraize [(c.stalkMap y).hom]
   let p : Spec (CommRingCat.of Ω) := c y
   let K' := (Spec.structureSheaf Ω).presheaf.stalk p
-  let e : Ω ≃ₐ[Ω] K' := IsLocalization.atUnits _ p.asIdeal.primeCompl
+  let e : Ω ≃ₐ[Ω] K' :=
+    IsLocalization.atUnits _ p.asIdeal.primeCompl
       (fun x hx ↦ by aesop (add simp IsUnit.mem_submonoid_iff))
   have : Algebra.IsAlgebraic Ω K' := .of_injective e.symm.toAlgHom e.symm.injective
   let : Field K' := (e.toRingEquiv.symm.isField (Field.toIsField Ω)).toField

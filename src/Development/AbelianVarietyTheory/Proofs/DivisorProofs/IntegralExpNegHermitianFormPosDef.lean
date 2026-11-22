@@ -42,17 +42,19 @@ lemma quad_eq {n : ℕ} (H C : Matrix (Fin n) (Fin n) ℂ) (hC : H.transpose = C
   rw [Complex.mul_conj, Complex.normSq_eq_norm_sq, Complex.ofReal_re]
   simp [Matrix.toLpLin_apply, Matrix.mulVec, dotProduct]
 
-theorem exists_eq_conjTranspose_mul_self {n : ℕ} {T : Matrix (Fin n) (Fin n) ℂ}
-    (hT : T.PosSemidef) : ∃ B : Matrix (Fin n) (Fin n) ℂ, T = B.conjTranspose * B := by
+theorem exists_eq_conjTranspose_mul_self {n : ℕ} {T : Matrix (Fin n) (Fin n) ℂ} (hT : T.PosSemidef)
+    : ∃ B : Matrix (Fin n) (Fin n) ℂ, T = B.conjTranspose * B := by
   open scoped MatrixOrder in
   have h0 : 0 ≤ T := Matrix.nonneg_iff_posSemidef.mpr hT
   have hs : (CFC.sqrt T).PosSemidef := Matrix.nonneg_iff_posSemidef.mp (CFC.sqrt_nonneg T)
   exact ⟨CFC.sqrt T, by rw [hs.1.eq, CFC.sqrt_mul_sqrt_self T h0]⟩
 
-theorem integral_exp_neg_herm : ∀ (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ), H.PosDef →
-    Integrable (fun w : V n => Real.exp (-(∑ j, ∑ l, H j l * w j * (starRingEnd ℂ) (w l)).re)) ∧
-    ∫ w : V n, Real.exp (-(∑ j, ∑ l, H j l * w j * (starRingEnd ℂ) (w l)).re) =
-      Real.pi ^ n / H.det.re := by
+theorem integral_exp_neg_herm
+    : ∀ (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ),
+      H.PosDef
+        → Integrable (fun w : V n => Real.exp (-(∑ j, ∑ l, H j l * w j * (starRingEnd ℂ) (w l)).re))
+          ∧ ∫ w : V n, Real.exp (-(∑ j, ∑ l, H j l * w j * (starRingEnd ℂ) (w l)).re)
+            = Real.pi ^ n / H.det.re := by
   intro n H hH
   have hT : H.transpose.PosDef := Matrix.PosDef.transpose_iff.mpr hH
   obtain ⟨C, hC⟩ := exists_eq_conjTranspose_mul_self hT.posSemidef
@@ -67,22 +69,23 @@ theorem integral_exp_neg_herm : ∀ (n : ℕ) (H : Matrix (Fin n) (Fin n) ℂ), 
     have := hH.det_pos
     rwa [hdetC, Complex.zero_lt_real] at this
   set g : V n → ℝ := fun v => Real.exp (-1 * ‖v‖ ^ 2) with hg
-  have hf : (fun w : V n => Real.exp (-(∑ j, ∑ l, H j l * w j * (starRingEnd ℂ) (w l)).re)) =
-      fun w => g (L w) := by
+  have hf
+      : (fun w : V n => Real.exp (-(∑ j, ∑ l, H j l * w j * (starRingEnd ℂ) (w l)).re))
+        = fun w => g (L w) := by
     funext w
     rw [quad_eq H C hC w, hg]
     simp [hL]
-  have hmap := Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (V n)) (f := L)
-    (by rw [hdetL]; exact hpos.ne')
+  have hmap :=
+    Measure.map_linearMap_addHaar_eq_smul_addHaar (volume : Measure (V n)) (f := L)
+      (by rw [hdetL]; exact hpos.ne')
   have hG : ∫ v : V n, g v = Real.pi ^ n := by
     rw [hg, GaussianFourier.integral_rexp_neg_mul_sq_norm one_pos, finrank_V, div_one]
     rw [show ((2 * n : ℕ) : ℝ) / 2 = (n : ℝ) by push_cast; ring, Real.rpow_natCast]
   have hgc : Continuous g := by rw [hg]; fun_prop
   have hI : ∫ w : V n, g (L w) = Real.pi ^ n / H.det.re := by
-    rw [← integral_map (L.continuous_of_finiteDimensional.aemeasurable)
-      hgc.aestronglyMeasurable, hmap, integral_smul_measure, hG, hdetL, hdetH,
-      ENNReal.toReal_ofReal (abs_nonneg _), abs_of_pos (inv_pos.mpr hpos), smul_eq_mul,
-      div_eq_inv_mul]
+    rw [← integral_map (L.continuous_of_finiteDimensional.aemeasurable) hgc.aestronglyMeasurable,
+      hmap, integral_smul_measure, hG, hdetL, hdetH, ENNReal.toReal_ofReal (abs_nonneg _),
+      abs_of_pos (inv_pos.mpr hpos), smul_eq_mul, div_eq_inv_mul]
   rw [hf]
   refine ⟨Integrable.of_integral_ne_zero ?_, hI⟩
   rw [hI, hdetH]

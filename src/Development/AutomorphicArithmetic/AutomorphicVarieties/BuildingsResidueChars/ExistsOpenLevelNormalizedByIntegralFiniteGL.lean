@@ -6,15 +6,18 @@ public import Mathlib.Topology.Algebra.OpenSubgroup
 
 @[expose] public section
 
-open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
+open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
 open scoped TensorProduct
 attribute [local instance 100] LieRing.ofAssociativeRing
 
-private theorem exists_normal_open_level_subgroup {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    (H L : Subgroup G) (hHc : IsCompact (H : Set G)) (hHo : IsOpen (H : Set G))
-    (hL : IsOpen (L : Set G)) :
-    ∃ L' : Subgroup G, IsOpen (L' : Set G) ∧ L' ≤ L ∧ (∀ k ∈ H, ∀ u ∈ L', k⁻¹ * u * k ∈ L') ∧
-      ∃ t : Finset G, ∀ k ∈ H, ∃ c ∈ t, c⁻¹ * k ∈ L' := by
+private theorem exists_normal_open_level_subgroup
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (H L : Subgroup G)
+    (hHc : IsCompact (H : Set G)) (hHo : IsOpen (H : Set G)) (hL : IsOpen (L : Set G))
+    : ∃ L' : Subgroup G,
+      IsOpen (L' : Set G) ∧ L' ≤ L ∧ (∀ k ∈ H, ∀ u ∈ L', k⁻¹ * u * k ∈ L')
+        ∧ ∃ t : Finset G, ∀ k ∈ H, ∃ c ∈ t, c⁻¹ * k ∈ L' := by
   classical
   haveI : CompactSpace H := isCompact_iff_compactSpace.1 hHc
   have hNo : IsOpen ((L.subgroupOf H : Subgroup H) : Set H) := hL.preimage continuous_subtype_val
@@ -37,14 +40,25 @@ private theorem exists_normal_open_level_subgroup {G : Type*} [Group G] [Topolog
     letI := Fintype.ofFinite (H ⧸ (L.subgroupOf H).normalCore)
     refine ⟨Finset.univ.image (fun q : H ⧸ (L.subgroupOf H).normalCore => ((q.out : H) : G)), ?_⟩
     intro k hk
-    refine ⟨(((QuotientGroup.mk ⟨k, hk⟩ : H ⧸ (L.subgroupOf H).normalCore).out : H) : G),
-      Finset.mem_image_of_mem _ (Finset.mem_univ _), ?_⟩
-    have := QuotientGroup.eq.1
-      (QuotientGroup.out_eq' (QuotientGroup.mk ⟨k, hk⟩ : H ⧸ (L.subgroupOf H).normalCore))
+    refine ⟨
+      (((QuotientGroup.mk ⟨k, hk⟩ : H ⧸ (L.subgroupOf H).normalCore).out : H) : G),
+      Finset.mem_image_of_mem _ (Finset.mem_univ _),
+      ?_
+    ⟩
+    have :=
+      QuotientGroup.eq.1 (QuotientGroup.out_eq'
+        (QuotientGroup.mk ⟨k, hk⟩ : H ⧸ (L.subgroupOf H).normalCore))
     exact ⟨_, this, by simp⟩
 
-theorem UpperTheory.exists_open_level_normalized_by_integralFiniteGL :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (L : Subgroup (AdelicGLn.FiniteAdelicGL K n)), IsOpen (L : Set (AdelicGLn.FiniteAdelicGL K n)) → ∃ L' : Subgroup (AdelicGLn.FiniteAdelicGL K n), IsOpen (L' : Set (AdelicGLn.FiniteAdelicGL K n)) ∧ L' ≤ L ∧ (∀ k ∈ AdelicGLn.integralFiniteGL K n, ∀ u ∈ L', k⁻¹ * u * k ∈ L') ∧ ∃ t : Finset (AdelicGLn.FiniteAdelicGL K n), ∀ k ∈ AdelicGLn.integralFiniteGL K n, ∃ c ∈ t, c⁻¹ * k ∈ L' := by
+theorem UpperTheory.exists_open_level_normalized_by_integralFiniteGL
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (L : Subgroup (AdelicGLn.FiniteAdelicGL K n)),
+      IsOpen (L : Set (AdelicGLn.FiniteAdelicGL K n))
+        → ∃ L' : Subgroup (AdelicGLn.FiniteAdelicGL K n),
+          IsOpen (L' : Set (AdelicGLn.FiniteAdelicGL K n)) ∧ L' ≤ L
+            ∧ (∀ k ∈ AdelicGLn.integralFiniteGL K n, ∀ u ∈ L', k⁻¹ * u * k ∈ L')
+            ∧ ∃ t : Finset (AdelicGLn.FiniteAdelicGL K n), ∀ k ∈ AdelicGLn.integralFiniteGL K n,
+              ∃ c ∈ t,
+                c⁻¹ * k ∈ L' := by
   intro K _ _ n L hL
   exact exists_normal_open_level_subgroup _ L (AdelicGLn.isCompact_integralFiniteGL K n)
     (AdelicGLn.isOpen_integralFiniteGL K n) hL

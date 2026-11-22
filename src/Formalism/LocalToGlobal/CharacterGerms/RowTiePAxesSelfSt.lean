@@ -16,8 +16,9 @@ open Formalism.IncomingBounds ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ 
 
 variable {C : Type} [Field C]
 
-theorem van_sum {τ ι : Type} {T : Set τ} (s : Finset ι) (f : ι → MvPowerSeries τ C) (hf : ∀ i ∈ s, Van T (f i)) :
-    Van T (∑ i ∈ s, f i) := by
+theorem van_sum
+    {τ ι : Type} {T : Set τ} (s : Finset ι) (f : ι → MvPowerSeries τ C) (hf : ∀ i ∈ s, Van T (f i))
+    : Van T (∑ i ∈ s, f i) := by
   intro ν hν
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
@@ -31,7 +32,8 @@ theorem van_X {τ : Type} {T : Set τ} {q : τ} (hq : q ∈ T) : Van T (X q : Mv
     exact hν q (by rw [h]; simp) hq
   · rfl
 
-theorem van_univ {τ : Type} {f : MvPowerSeries τ C} (hf : constantCoeff f = 0) : Van Set.univ f := by
+theorem van_univ {τ : Type} {f : MvPowerSeries τ C} (hf : constantCoeff f = 0)
+    : Van Set.univ f := by
   intro ν hν
   have h0 : ν = 0 := by
     ext w
@@ -43,10 +45,10 @@ theorem van_univ {τ : Type} {f : MvPowerSeries τ C} (hf : constantCoeff f = 0)
 
 variable [CharZero C] {V : VF C} {O : Type} [CommRing O] [StarRing O] {dd : ℕ}
 
-theorem constantCoeff_inCol (col : Fin 2) (f : MvPowerSeries (Fin dd) C) (hf : constantCoeff f = 0) :
-    constantCoeff (inCol col f) = 0 := by
-  have hb : MvPowerSeries.HasSubst
-      (fun x : Fin dd => (MvPowerSeries.X (col, x) : MvPowerSeries (Fin 2 × Fin dd) C)) :=
+theorem constantCoeff_inCol (col : Fin 2) (f : MvPowerSeries (Fin dd) C) (hf : constantCoeff f = 0)
+    : constantCoeff (inCol col f) = 0 := by
+  have hb : MvPowerSeries.HasSubst (fun x : Fin dd =>
+      (MvPowerSeries.X (col, x) : MvPowerSeries (Fin 2 × Fin dd) C)) :=
     MvPowerSeries.hasSubst_of_constantCoeff_zero (fun x => by simp)
   unfold inCol
   rw [MvPowerSeries.constantCoeff_subst hb, finsum_eq_single _ 0]
@@ -56,15 +58,19 @@ theorem constantCoeff_inCol (col : Fin 2) (f : MvPowerSeries (Fin dd) C) (hf : c
       by_contra h
       push_neg at h
       exact hd (Finsupp.ext h)
-    have h0 : constantCoeff (d.prod fun s e => (MvPowerSeries.X (col, s) : MvPowerSeries (Fin 2 × Fin dd) C) ^ e) = 0 := by
+    have h0
+        : constantCoeff (d.prod fun s e =>
+            (MvPowerSeries.X (col, s) : MvPowerSeries (Fin 2 × Fin dd) C) ^ e)
+          = 0 := by
       rw [Finsupp.prod, map_prod]
       apply Finset.prod_eq_zero (Finsupp.mem_support_iff.mpr hi)
       rw [map_pow, MvPowerSeries.constantCoeff_X, zero_pow hi]
     rw [h0, smul_zero]
 
-theorem van_hCol (col g : Fin 2) (h : PS C 2 dd)
-    (hh : ∀ e : Fin 2 × Fin dd →₀ ℕ, (∀ s ∈ e.support, s.1 ≠ g) → coeff e h = 0) :
-    Van {w : Fin 2 × (Fin 2 × Fin dd) | w.1 = g} (hCol col h) := by
+theorem van_hCol
+    (col g : Fin 2) (h : PS C 2 dd)
+    (hh : ∀ e : Fin 2 × Fin dd →₀ ℕ, (∀ s ∈ e.support, s.1 ≠ g) → coeff e h = 0)
+    : Van {w : Fin 2 × (Fin 2 × Fin dd) | w.1 = g} (hCol col h) := by
   unfold hCol
   refine Van.subst {s : Fin 2 × Fin dd | s.1 = g} (fun _ => constantCoeff_X _) ?_ ?_
   · intro s hs
@@ -72,8 +78,8 @@ theorem van_hCol (col g : Fin 2) (h : PS C 2 dd)
   · intro e he
     exact hh e he
 
-theorem gauge_axes (Y : FBChart C V O dd) (g : Fin 2) :
-    ∀ e : Fin 2 × Fin dd →₀ ℕ, (∀ s ∈ e.support, s.1 ≠ g) → coeff e Y.h = 0 := by
+theorem gauge_axes (Y : FBChart C V O dd) (g : Fin 2)
+    : ∀ e : Fin 2 × Fin dd →₀ ℕ, (∀ s ∈ e.support, s.1 ≠ g) → coeff e Y.h = 0 := by
   fin_cases g
   · refine coeff_of_ev_zero Y.h 0 ![0, pt C dd 0] rfl ?_ Y.gauge.ax0
     intro g' hg'

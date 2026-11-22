@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Finr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
 
 namespace GlobalTheory.HubLoc
 
@@ -38,15 +39,17 @@ private lemma natLog_le_add_two_mul_of_le_two_pow_mul_exp {l m k : ℕ} {L : ℝ
   have : ((Nat.log l m : ℝ) - k) * Real.log 2 ≤ L := by linarith
   nlinarith
 
-
 open NumberField IsDedekindDomain Module in
-theorem _root_.GlobalTheory.HubLoc.torsionExponent_le_twentyFive_mul :
-    ∀ (l N : ℕ) (L : ℝ), 2 ≤ l → 1 ≤ N → 1 ≤ L →
-      ((5 + Nat.log l (2 * (⌊2 * Real.exp L⌋₊ + 1)) +
-        N * (4 + 2 * Nat.log l (2 * (⌊2 * Real.exp L⌋₊ + 1))) : ℕ) : ℝ) ≤ 25 * N * L := by
+theorem _root_.GlobalTheory.HubLoc.torsionExponent_le_twentyFive_mul
+    : ∀ (l N : ℕ) (L : ℝ),
+      2 ≤ l → 1 ≤ N → 1 ≤ L
+        → ((5 + Nat.log l (2 * (⌊2 * Real.exp L⌋₊ + 1))
+                + N * (4 + 2 * Nat.log l (2 * (⌊2 * Real.exp L⌋₊ + 1)))
+              : ℕ)
+            : ℝ)
+          ≤ 25 * N * L := by
   intro l N L hl hN hL
-  have hfl : ((⌊2 * Real.exp L⌋₊ : ℕ) : ℝ) ≤ 2 * Real.exp L :=
-    Nat.floor_le (by positivity)
+  have hfl : ((⌊2 * Real.exp L⌋₊ : ℕ) : ℝ) ≤ 2 * Real.exp L := Nat.floor_le (by positivity)
   have he : 1 ≤ Real.exp L := Real.one_le_exp (by linarith)
   have hm : ((2 * (⌊2 * Real.exp L⌋₊ + 1) : ℕ) : ℝ) ≤ 2 ^ 3 * Real.exp L := by
     push_cast
@@ -59,8 +62,7 @@ theorem _root_.GlobalTheory.HubLoc.torsionExponent_le_twentyFive_mul :
   have hNL : (1 : ℝ) ≤ N * L := one_le_mul_of_one_le_of_one_le hN' hL
   have hL1 : L ≤ N * L := by nlinarith
   have hN1 : (N : ℝ) ≤ N * L := by nlinarith
-  have hA : (N : ℝ) * K ≤ N * (3 + 2 * L) := by
-    apply mul_le_mul_of_nonneg_left hK; positivity
+  have hA : (N : ℝ) * K ≤ N * (3 + 2 * L) := by apply mul_le_mul_of_nonneg_left hK; positivity
   nlinarith
 
 end GlobalTheory.HubLoc

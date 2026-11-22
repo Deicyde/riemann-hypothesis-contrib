@@ -11,11 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CardMul
 
 noncomputable section
 
-open GlobalTheory.LiftLeaf GlobalTheory.TwSys GlobalTheory.TwAll Formalism.BasicNotions Formalism.MainNotions Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain
+open GlobalTheory.LiftLeaf GlobalTheory.TwSys GlobalTheory.TwAll Formalism.BasicNotions
+  Formalism.MainNotions Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField
+  IsDedekindDomain
 
 namespace GlobalTheory.IdemAlg
 
-variable {D : D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
+variable
+  {D : D7} {N : NData D.R D.host D.what₂} {X : NTw D.R D.host D.what₂ D.LL0 N}
   (Y : NExp D.R D.host D.what₂ D.LL0 N X)
 
 theorem card_eq : D.what₂.restRowsFiniteGroupCard = Nat.card (G0g N) := by
@@ -25,10 +28,10 @@ theorem card_eq : D.what₂.restRowsFiniteGroupCard = Nat.card (G0g N) := by
   change _ = ∏ _y : N.PlG k, Nat.card (GL (Fin D.R.r) (ZMod (D.host.g k)))
   rw [Finset.prod_const, Finset.card_univ, N.card_PlG k]
 
-theorem idem_integral (i : X.Tw) (b : Bool) :
-    ∃ c : MonoidAlgebra (X.O i) (G0g N),
-      MonoidAlgebra.map (algebraMap (X.O i) (FractionRing (X.O i))).toAddMonoidHom c =
-        ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) • Y.eAlg i b := by
+theorem idem_integral (i : X.Tw) (b : Bool)
+    : ∃ c : MonoidAlgebra (X.O i) (G0g N),
+      MonoidAlgebra.map (algebraMap (X.O i) (FractionRing (X.O i))).toAddMonoidHom c
+        = ((D.what₂.restRowsFiniteGroupCard : ℕ) : FractionRing (X.O i)) • Y.eAlg i b := by
   have : CharZero (FractionRing (X.O0 i)) := charZero_of_injective_ringHom (X.emb0 i).injective
   have : CharZero (X.O0 i) := (algebraMap (X.O0 i) (FractionRing (X.O0 i))).charZero
   have : CharZero (X.O i) := charZero_of_injective_ringHom (X.O_inj i)
@@ -44,7 +47,9 @@ theorem idem_integral (i : X.Tw) (b : Bool) :
   rw [hc, Nat.card_eq_fintype_card]
   simp [hcc]
 
-theorem admALG_of_commG : ∀ D : D7, CommG D → IntegralHeckeForms.GroupAlgebraIntegrality D.nexp := fun D h =>
-  (GlobalTheory.TwistInputsTest.admissibleGoodIdempotent_iff_reduced D.nexp).2 fun i hi b => ⟨idem_integral D.nexp i b, h i hi b⟩
+theorem admALG_of_commG
+    : ∀ D : D7, CommG D → IntegralHeckeForms.GroupAlgebraIntegrality D.nexp := fun D h =>
+  (GlobalTheory.TwistInputsTest.admissibleGoodIdempotent_iff_reduced D.nexp).2 fun i hi b =>
+    ⟨idem_integral D.nexp i b, h i hi b⟩
 
 end GlobalTheory.IdemAlg

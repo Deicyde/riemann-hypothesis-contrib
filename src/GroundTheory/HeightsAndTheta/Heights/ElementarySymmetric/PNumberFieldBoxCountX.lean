@@ -15,7 +15,7 @@ set_option maxSynthPendingDepth 1
 namespace GroundTheory.Heights₂.Heights.Targets
 
 theorem NumberFieldBoxCount.proof_closed : NumberFieldBoxCount.Statement :=
-  NumberFieldBoxCount.proof LatticeImageZLattice.proof CovolumeRelIndex.proof EmbeddingSumPlaces.proof
-    (MixedBoxCount.proof LatticeCountVolume.proof)
+  NumberFieldBoxCount.proof LatticeImageZLattice.proof CovolumeRelIndex.proof
+    EmbeddingSumPlaces.proof (MixedBoxCount.proof LatticeCountVolume.proof)
 
 end GroundTheory.Heights₂.Heights.Targets

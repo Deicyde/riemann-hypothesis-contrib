@@ -76,23 +76,22 @@ lemma exists_six : ∃ (σ : ℍ) (u : SL(2, ℤ)), u • σ = σ ∧
     rw [this, one_mul]
     exact hp
 
-theorem elliptic_of_zero : ∀ τ₀ : ℍ,
-    (E₆ τ₀ = 0 → ∃ u : SL(2, ℤ), u • τ₀ = τ₀ ∧ IsPrimitiveRoot (denom (u : GL (Fin 2) ℝ) τ₀) 4) ∧
-    (E₄ τ₀ = 0 → ∃ u : SL(2, ℤ), u • τ₀ = τ₀ ∧
-      IsPrimitiveRoot (denom (u : GL (Fin 2) ℝ) τ₀) 6) := by
+theorem elliptic_of_zero
+    : ∀ τ₀ : ℍ,
+      (E₆ τ₀ = 0 → ∃ u : SL(2, ℤ), u • τ₀ = τ₀ ∧ IsPrimitiveRoot (denom (u : GL (Fin 2) ℝ) τ₀) 4)
+        ∧ (E₄ τ₀ = 0
+          → ∃ u : SL(2, ℤ), u • τ₀ = τ₀ ∧ IsPrimitiveRoot (denom (u : GL (Fin 2) ℝ) τ₀) 6) := by
   intro τ₀
   constructor
   · intro h
     obtain ⟨σ, u, hu, hp⟩ := exists_four
-    have h0 : E₆ σ = 0 := eq_zero_of_fix E₆ u σ hu (by
-      rw [Ne, hp.zpow_eq_one_iff_dvd]; norm_num)
+    have h0 : E₆ σ = 0 := eq_zero_of_fix E₆ u σ hu (by rw [Ne, hp.zpow_eq_one_iff_dvd]; norm_num)
     obtain ⟨γ, rfl⟩ := GlobalTheory.T.j_invariant_equal_sl2_orbit τ₀ σ (by rw [h, h0]; ring)
     obtain ⟨h1, h2⟩ := conj_fix γ u σ hu
     exact ⟨_, h1, h2 ▸ hp⟩
   · intro h
     obtain ⟨σ, u, hu, hp⟩ := exists_six
-    have h0 : E₄ σ = 0 := eq_zero_of_fix E₄ u σ hu (by
-      rw [Ne, hp.zpow_eq_one_iff_dvd]; norm_num)
+    have h0 : E₄ σ = 0 := eq_zero_of_fix E₄ u σ hu (by rw [Ne, hp.zpow_eq_one_iff_dvd]; norm_num)
     obtain ⟨γ, rfl⟩ := GlobalTheory.T.j_invariant_equal_sl2_orbit τ₀ σ (by rw [h, h0]; ring)
     obtain ⟨h1, h2⟩ := conj_fix γ u σ hu
     exact ⟨_, h1, h2 ▸ hp⟩

@@ -14,8 +14,8 @@ section LocS
 
 variable {R : Type*} [CommRing R]
 
-def locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submodule R W) :
-    Submodule R W where
+def locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submodule R W)
+    : Submodule R W where
   carrier := {x | ∃ s ∈ S, s • x ∈ L}
   zero_mem' := ⟨1, S.one_mem, by simp⟩
   add_mem' := by
@@ -31,8 +31,9 @@ def locS {W : Type*} [AddCommGroup W] [Module R W] (S : Submonoid R) (L : Submod
     rw [smul_comm]
     exact L.smul_mem r hx
 
-def localization₂ {W : Type*} [AddCommGroup W] [Module R W] (p : Ideal R) [p.IsPrime] (L : Submodule R W) :
-    Submodule R W :=
+def localization₂
+    {W : Type*} [AddCommGroup W] [Module R W] (p : Ideal R) [p.IsPrime] (L : Submodule R W)
+    : Submodule R W :=
   locS p.primeCompl L
 
 end LocS
@@ -69,7 +70,8 @@ def stabL (M : Submodule (𝓞 E) (Sp E n)) : Subgroup (Sp E n ≃ₗ[E] Sp E n)
     rw [show a (a⁻¹ x) = x from LinearEquiv.apply_symm_apply a x] at h
     exact h.symm
 
-def stdAt (P : HeightOneSpectrum (𝓞 E)) : Submodule (𝓞 E) (Sp E n) := localization₂ P.asIdeal (stdLat E n)
+def stdAt (P : HeightOneSpectrum (𝓞 E)) : Submodule (𝓞 E) (Sp E n) :=
+  localization₂ P.asIdeal (stdLat E n)
 
 def GLint (P : HeightOneSpectrum (𝓞 E)) : Subgroup (Sp E n ≃ₗ[E] Sp E n) := stabL E n (stdAt E n P)
 
@@ -81,7 +83,8 @@ section Groups
 
 variable (k : Type) [CommRing k] (n c : ℕ)
 
-def atN {k : Type} [CommRing k] {N : ℕ} (v : Fin N → k) (i : ℕ) : k := if h : i < N then v ⟨i, h⟩ else 0
+def atN {k : Type} [CommRing k] {N : ℕ} (v : Fin N → k) (i : ℕ) : k :=
+  if h : i < N then v ⟨i, h⟩ else 0
 
 def eN (N i : ℕ) : Fin N → k := fun l => if l.1 = i then 1 else 0
 
@@ -97,28 +100,34 @@ def inX : (Fin n → k) →ₗ[k] (Fin (n + c) → k) :=
   LinearMap.pi fun l => if h : l.1 < n then LinearMap.proj ⟨l.1, h⟩ else 0
 
 def R1cond (r : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) : Prop :=
-  (∀ i, ∀ v ∈ Ufl k n c i, r v ∈ Ufl k n c i) ∧ r (eN k (n + c) n) = eN k (n + c) n ∧
-    ∀ i, r (eN k (n + c) (n + i)) - eN k (n + c) (n + i) ∈ Ufl k n c i
+  (∀ i, ∀ v ∈ Ufl k n c i, r v ∈ Ufl k n c i) ∧ r (eN k (n + c) n) = eN k (n + c) n
+    ∧ ∀ i, r (eN k (n + c) (n + i)) - eN k (n + c) (n + i) ∈ Ufl k n c i
 
 variable {k n c} in
-theorem R1cond.mul {r s : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : R1cond k n c r) (hs : R1cond k n c s) :
-    R1cond k n c (r * s) := by
+theorem R1cond.mul
+    {r s : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)} (hr : R1cond k n c r) (hs : R1cond k n c s)
+    : R1cond k n c (r * s) := by
   refine ⟨fun i v hv => hr.1 i _ (hs.1 i v hv), ?_, fun i => ?_⟩
   · show r (s _) = _
     rw [hs.2.1, hr.2.1]
-  · have h1 : (r * s) (eN k (n + c) (n + i)) - eN k (n + c) (n + i) =
-        r (s (eN k (n + c) (n + i)) - eN k (n + c) (n + i)) + (r (eN k (n + c) (n + i)) - eN k (n + c) (n + i)) := by
+  · have h1
+        : (r * s) (eN k (n + c) (n + i)) - eN k (n + c) (n + i)
+          = r (s (eN k (n + c) (n + i)) - eN k (n + c) (n + i))
+            + (r (eN k (n + c) (n + i)) - eN k (n + c) (n + i)) := by
       rw [map_sub]
       show r (s _) - _ = _
       abel
     rw [h1]
     exact add_mem (hr.1 i _ (hs.2.2 i)) (hr.2.2 i)
 
-theorem R1cond_one : R1cond k n c 1 :=
-  ⟨fun _ _ hv => hv, rfl, fun i => by
+theorem R1cond_one : R1cond k n c 1 := ⟨
+  fun _ _ hv => hv,
+  rfl,
+  fun i => by
     show eN k (n + c) (n + i) - eN k (n + c) (n + i) ∈ _
     rw [sub_self]
-    exact zero_mem _⟩
+    exact zero_mem _
+⟩
 
 def R1 : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) where
   carrier := {r | R1cond k n c r ∧ R1cond k n c r⁻¹}
@@ -128,11 +137,14 @@ def R1 : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) where
 
 variable {k n c}
 
-def Cbe (J : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))) (h : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) :
-    Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) :=
+def Cbe
+    (J : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)))
+    (h : (Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))
+    : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)) :=
   R1 k n c ⊓ J.comap (MulAut.conj h⁻¹).toMonoidHom
 
-def prX (C : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k))) : Subgroup ((Fin n → k) ≃ₗ[k] (Fin n → k)) where
+def prX (C : Subgroup ((Fin (n + c) → k) ≃ₗ[k] (Fin (n + c) → k)))
+    : Subgroup ((Fin n → k) ≃ₗ[k] (Fin n → k)) where
   carrier := {g | ∃ r ∈ C, ∀ x, r (inX k n c x) = inX k n c (g x)}
   one_mem' := ⟨1, C.one_mem, fun _ => rfl⟩
   mul_mem' := by
@@ -157,13 +169,14 @@ namespace LocE
 
 open Loc
 
-variable {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K] (P : HeightOneSpectrum (𝓞 E)) (q : ℕ)
-
-
+variable
+  {E K : Type} [Field E] [NumberField E] [StarRing E] [Field K]
+  (P : HeightOneSpectrum (𝓞 E)) (q : ℕ)
 
 def sclLat (N : ℕ) (e : ℕ → ℤ) : Submodule (𝓞 E) (Sp E N) :=
   (stdAt E N P).comap
-    ((LinearMap.pi fun l : Fin N => ((q : E) ^ e l.1)⁻¹ • (LinearMap.proj l : Sp E N →ₗ[E] E)).restrictScalars (𝓞 E))
+    ((LinearMap.pi fun l : Fin N =>
+      ((q : E) ^ e l.1)⁻¹ • (LinearMap.proj l : Sp E N →ₗ[E] E)).restrictScalars (𝓞 E))
 
 def scE (n : ℕ) (ex : ℕ → ℕ) (l : ℕ) : ℤ := if l < n then 0 else (ex (l - n) : ℤ)
 
@@ -173,7 +186,8 @@ section AtQ
 
 variable (ξ : (𝓞 E ⧸ P.asIdeal)ˣ →* Kˣ)
 
-def parL (kj n c : ℕ) : Submodule (𝓞 E) (Sp E (n + c)) := sclLat P q (n + c) fun l => if kj ≤ l ∧ l < n then 1 else 0
+def parL (kj n c : ℕ) : Submodule (𝓞 E) (Sp E (n + c)) :=
+  sclLat P q (n + c) fun l => if kj ≤ l ∧ l < n then 1 else 0
 
 def JQ (kj n c : ℕ) : Subgroup (Sp E (n + c) ≃ₗ[E] Sp E (n + c)) :=
   stabL E (n + c) (stdAt E (n + c) P) ⊓ stabL E (n + c) (parL P q kj n c)
@@ -189,23 +203,30 @@ section Target
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
 def Bdd (P : HeightOneSpectrum (𝓞 E)) (N c j : ℕ) (h : Sp E (N + c) ≃ₗ[E] Sp E (N + c)) : Prop :=
-  ∀ x ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0, h⁻¹ x ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 ∧
-    (((Ideal.absNorm P.asIdeal : ℕ) : E) ^ j) • h x ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+  ∀ x ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0,
+    h⁻¹ x ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+      ∧ (((Ideal.absNorm P.asIdeal : ℕ) : E) ^ j) • h x
+        ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
 
 def NF (P : HeightOneSpectrum (𝓞 E)) (N c j : ℕ) (h : Sp E (N + c) ≃ₗ[E] Sp E (N + c)) : Prop :=
-  ∃ (n : ℕ → ℤ) (z : Sp E N), (∀ i, -(j : ℤ) ≤ n i ∧ n i ≤ 0) ∧ z ∈ stdAt E N P ∧
-    ∀ v : Sp E (N + c), h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0 ↔
-      (∀ l : Fin N, IntAt P (v (Fin.castAdd _ l) - Loc.atN v N * z l)) ∧
-        ∀ i : Fin c, IntAt P ((((Ideal.absNorm P.asIdeal : ℕ) : E) ^ n i.1)⁻¹ * v (Fin.natAdd _ i))
+  ∃ (n : ℕ → ℤ) (z : Sp E N),
+    (∀ i, -(j : ℤ) ≤ n i ∧ n i ≤ 0) ∧ z ∈ stdAt E N P
+      ∧ ∀ v : Sp E (N + c),
+        h⁻¹ v ∈ LocE.lamY P (Ideal.absNorm P.asIdeal) N c 0
+          ↔ (∀ l : Fin N, IntAt P (v (Fin.castAdd _ l) - Loc.atN v N * z l))
+            ∧ ∀ i : Fin c,
+              IntAt P ((((Ideal.absNorm P.asIdeal : ℕ) : E) ^ n i.1)⁻¹ * v (Fin.natAdd _ i))
 
 end Target
 
 def TwNormLat : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [StarRing E] (P : HeightOneSpectrum (𝓞 E)) (N c kj j : ℕ),
-    (Ideal.absNorm P.asIdeal).Prime → ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2 →
-    ∀ h : Sp E (N + c) ≃ₗ[E] Sp E (N + c), Bdd P N c j h →
-      ∃ r ∈ Loc.R1 E N c, ∃ κ ∈ LocE.JQ P (Ideal.absNorm P.asIdeal) kj N c,
-        Bdd P N c j (r * h * κ) ∧ NF P N c j (r * h * κ) ∧
-          Loc.prX (Loc.Cbe (LocE.JQ P (Ideal.absNorm P.asIdeal) kj N c) (r * h * κ)) ≤ GLint E N P
+    (Ideal.absNorm P.asIdeal).Prime → ((Ideal.absNorm P.asIdeal : ℕ) : 𝓞 E) ∉ P.asIdeal ^ 2
+      → ∀ h : Sp E (N + c) ≃ₗ[E] Sp E (N + c),
+        Bdd P N c j h
+          → ∃ r ∈ Loc.R1 E N c, ∃ κ ∈ LocE.JQ P (Ideal.absNorm P.asIdeal) kj N c,
+            Bdd P N c j (r * h * κ) ∧ NF P N c j (r * h * κ)
+              ∧ Loc.prX (Loc.Cbe (LocE.JQ P (Ideal.absNorm P.asIdeal) kj N c) (r * h * κ))
+                ≤ GLint E N P
 
 end PI.TwNormLat

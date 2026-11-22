@@ -7,7 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Polynomial
 open GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Published
 
 namespace UpperTheory.CBC
@@ -46,10 +48,16 @@ end Cusp
 variable {M : Type} [Field M] [NumberField M]
 
 def IsGalAd (σ : M ≃+* M) (s : Ad M ≃+* Ad M) : Prop :=
-  Continuous s ∧ (∀ x : M, s (algebraMap M (Ad M) x) = algebraMap M (Ad M) (σ x)) ∧ ∀ x, (s x).2 = conjFin σ x.2
+  Continuous s ∧ (∀ x : M, s (algebraMap M (Ad M) x) = algebraMap M (Ad M) (σ x))
+    ∧ ∀ x, (s x).2 = conjFin σ x.2
 
 def Cusp.ConjIso {n : ℕ} (P : Cusp M n) (σ : M ≃+* M) : Prop :=
-  ∀ s : Ad M ≃+* Ad M, IsGalAd σ s → ∃ P' : Cusp M n,
-    P'.space = (fun f : GA M n → ℂ => fun g => f (Matrix.GeneralLinearGroup.map s.toRingHom g)) '' P.space ∧ P'.Iso P
+  ∀ s : Ad M ≃+* Ad M,
+    IsGalAd σ s
+      → ∃ P' : Cusp M n,
+        P'.space
+            = (fun f : GA M n → ℂ => fun g => f (Matrix.GeneralLinearGroup.map s.toRingHom g))
+              '' P.space
+          ∧ P'.Iso P
 
 end UpperTheory.CBC

@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.BlochKa
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 noncomputable section
 
@@ -21,32 +22,38 @@ variable {l : ℕ} [Fact l.Prime]
 
 section Cob
 
-variable {G : Type} [Group G] [TopologicalSpace G] {K₀ K : Type} [Field K₀] [Field K]
-    [Algebra ℚ_[l] K₀] [Algebra ℚ_[l] K] [Algebra K₀ K] [IsScalarTower ℚ_[l] K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra ℚ_[l] B] [Algebra K₀ B] [IsScalarTower ℚ_[l] K₀ B]
-    [Algebra ℚ_[l] BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower ℚ_[l] K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower ℚ_[l] K₀ BdR]
-    (PD : PeriodData G ℚ_[l] K₀ K B BdR)
+variable
+  {G : Type} [Group G] [TopologicalSpace G]
+  {K₀ K : Type} [Field K₀] [Field K] [Algebra ℚ_[l] K₀] [Algebra ℚ_[l] K] [Algebra K₀ K]
+  [IsScalarTower ℚ_[l] K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra ℚ_[l] B] [Algebra K₀ B]
+  [IsScalarTower ℚ_[l] K₀ B] [Algebra ℚ_[l] BdR] [Algebra K₀ BdR] [Algebra K BdR]
+  [IsScalarTower ℚ_[l] K BdR] [IsScalarTower K₀ K BdR] [IsScalarTower ℚ_[l] K₀ BdR]
+  (PD : PeriodData G ℚ_[l] K₀ K B BdR)
 
-theorem cyclotomicTwist_differential_apply {LL : Type} [Field LL] [Algebra ℚ_[l] LL] (f : G → LL) (x : G × G) :
-    ReciprocityTheory.Def.d1 (charRep (cycLL PD LL)) f x =
-      algebraMap ℚ_[l] LL (PD.χ x.1 : ℚ_[l]) * f x.2 - f (x.1 * x.2) + f x.1 := by
+theorem cyclotomicTwist_differential_apply
+    {LL : Type} [Field LL] [Algebra ℚ_[l] LL] (f : G → LL) (x : G × G)
+    : ReciprocityTheory.Def.d1 (charRep (cycLL PD LL)) f x
+      = algebraMap ℚ_[l] LL (PD.χ x.1 : ℚ_[l]) * f x.2 - f (x.1 * x.2) + f x.1 := by
   simp [ReciprocityTheory.Def.d1, charRep, cycLL, Algebra.smul_def]
 
-theorem cobL_iff_trace {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
-    [FiniteDimensional ℚ_[l] LL] [IsModuleTopology ℚ_[l] LL] (z : G × G → LL) :
-    CobL PD z ↔ ∀ c : LL, CobL PD (fun x => Algebra.trace ℚ_[l] LL (c * z x)) := by
+theorem cobL_iff_trace
+    {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] [FiniteDimensional ℚ_[l] LL]
+    [IsModuleTopology ℚ_[l] LL]
+    (z : G × G → LL)
+    : CobL PD z ↔ ∀ c : LL, CobL PD (fun x => Algebra.trace ℚ_[l] LL (c * z x)) := by
   haveI : ContinuousAdd LL := IsModuleTopology.toContinuousAdd ℚ_[l] LL
   haveI : ContinuousSMul ℚ_[l] LL := IsModuleTopology.toContinuousSMul ℚ_[l] LL
   constructor
   · rintro ⟨f, hf, rfl⟩ c
     refine ⟨fun g => Algebra.trace ℚ_[l] LL (c * f g), ?_, ?_⟩
-    · exact (IsModuleTopology.continuous_of_linearMap
-        ((Algebra.trace ℚ_[l] LL).comp (LinearMap.mulLeft ℚ_[l] c))).comp hf
+    · exact (IsModuleTopology.continuous_of_linearMap ((Algebra.trace ℚ_[l] LL).comp
+        (LinearMap.mulLeft ℚ_[l] c))).comp hf
     · funext x
       rw [cyclotomicTwist_differential_apply, cyclotomicTwist_differential_apply]
-      have e1 : c * (algebraMap ℚ_[l] LL (PD.χ x.1 : ℚ_[l]) * f x.2 - f (x.1 * x.2) + f x.1) =
-          (PD.χ x.1 : ℚ_[l]) • (c * f x.2) - c * f (x.1 * x.2) + c * f x.1 := by
+      have e1
+          : c * (algebraMap ℚ_[l] LL (PD.χ x.1 : ℚ_[l]) * f x.2 - f (x.1 * x.2) + f x.1)
+            = (PD.χ x.1 : ℚ_[l]) • (c * f x.2) - c * f (x.1 * x.2) + c * f x.1 := by
         rw [Algebra.smul_def]; ring
       rw [e1, map_add (f := _), map_sub, map_smul, smul_eq_mul]
       simp
@@ -60,7 +67,10 @@ theorem cobL_iff_trace {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [TopologicalS
     · funext x
       rw [cyclotomicTwist_differential_apply]
       have hz : z x = ∑ i, (d.repr (z x) i) • d i := (d.sum_repr (z x)).symm
-      have hc : ∀ i, d.repr (z x) i = (PD.χ x.1 : ℚ_[l]) * f (b i) x.2 - f (b i) (x.1 * x.2) + f (b i) x.1 := by
+      have hc
+          : ∀ i,
+            d.repr (z x) i
+              = (PD.χ x.1 : ℚ_[l]) * f (b i) x.2 - f (b i) (x.1 * x.2) + f (b i) x.1 := by
         intro i
         rw [LinearMap.BilinForm.dualBasis_repr_apply, Algebra.traceForm_apply, mul_comm,
           ← congrFun (hf (b i)).2 x, cyclotomicTwist_differential_apply]
@@ -75,27 +85,34 @@ section Main
 
 variable (P : LocPrime l) {K : FinExt l}
 
-def trPair {LL V V' : Type} [Field LL] [Algebra ℚ_[l] LL]
-    [AddCommGroup V] [Module LL V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] LL V]
-    [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V'] [IsScalarTower ℚ_[l] LL V']
-    (Pr : V →ₗ[LL] V' →ₗ[LL] LL) : V →ₗ[ℚ_[l]] V' →ₗ[ℚ_[l]] ℚ_[l] :=
-  LinearMap.mk₂ ℚ_[l] (fun x y => Algebra.trace ℚ_[l] LL (Pr x y))
+def trPair
+    {LL V V' : Type} [Field LL] [Algebra ℚ_[l] LL] [AddCommGroup V] [Module LL V] [Module ℚ_[l] V]
+    [IsScalarTower ℚ_[l] LL V] [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V']
+    [IsScalarTower ℚ_[l] LL V']
+    (Pr : V →ₗ[LL] V' →ₗ[LL] LL)
+    : V →ₗ[ℚ_[l]] V' →ₗ[ℚ_[l]] ℚ_[l] :=
+  LinearMap.mk₂ ℚ_[l]
+    (fun x y => Algebra.trace ℚ_[l] LL (Pr x y))
     (fun x x' y => by simp)
     (fun c x y => by simp [LinearMap.map_smul_of_tower])
     (fun x y y' => by simp)
     (fun c x y => by simp [LinearMap.map_smul_of_tower])
 
-theorem trPair_apply {LL V V' : Type} [Field LL] [Algebra ℚ_[l] LL]
-    [AddCommGroup V] [Module LL V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] LL V]
-    [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V'] [IsScalarTower ℚ_[l] LL V']
-    (Pr : V →ₗ[LL] V' →ₗ[LL] LL) (x : V) (y : V') :
-    trPair Pr x y = Algebra.trace ℚ_[l] LL (Pr x y) := rfl
+theorem trPair_apply
+    {LL V V' : Type} [Field LL] [Algebra ℚ_[l] LL] [AddCommGroup V] [Module LL V] [Module ℚ_[l] V]
+    [IsScalarTower ℚ_[l] LL V] [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V']
+    [IsScalarTower ℚ_[l] LL V']
+    (Pr : V →ₗ[LL] V' →ₗ[LL] LL) (x : V) (y : V')
+    : trPair Pr x y = Algebra.trace ℚ_[l] LL (Pr x y) :=
+  rfl
 
-theorem isDual1_trPair {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [FiniteDimensional ℚ_[l] LL]
+theorem isDual1_trPair
+    {LL : Type} [Field LL] [Algebra ℚ_[l] LL] [FiniteDimensional ℚ_[l] LL]
     {V V' : Type} [AddCommGroup V] [Module LL V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] LL V]
     [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V'] [IsScalarTower ℚ_[l] LL V']
-    {ρ : Representation LL ↥(GK K) V} {ρ' : Representation LL ↥(GK K) V'} {Pr : V →ₗ[LL] V' →ₗ[LL] LL}
-    (hP : IsDual1 (P.PD K) ρ ρ' Pr) : IsDual1 (P.PD K) (resQ ρ) (resQ ρ') (trPair Pr) := by
+    {ρ : Representation LL ↥(GK K) V} {ρ' : Representation LL ↥(GK K) V'}
+    {Pr : V →ₗ[LL] V' →ₗ[LL] LL} (hP : IsDual1 (P.PD K) ρ ρ' Pr)
+    : IsDual1 (P.PD K) (resQ ρ) (resQ ρ') (trPair Pr) := by
   have hB := traceForm_nondegenerate ℚ_[l] LL
   obtain ⟨h1, h2, h3, h4⟩ := hP
   refine ⟨fun g x y => ?_, fun x hx => h2 x fun y => ?_, fun y hy => h3 y fun x => ?_, ?_⟩
@@ -120,8 +137,10 @@ namespace GlobalTheory
 
 open GlobalTheory.PstCoeff GlobalTheory.BkCoeff
 
-theorem bkACore_of_rationalDuality (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K : FinExt l)
-    (h : GlobalTheory.Published.BlochKato.RationalDuality (P.PD K)) : bkACore (P.PD K) := by
+theorem bkACore_of_rationalDuality
+    (l : ℕ) [Fact l.Prime]
+    (P : LocPrime l) (K : FinExt l) (h : GlobalTheory.Published.BlochKato.RationalDuality (P.PD K))
+    : bkACore (P.PD K) := by
   intro LL _ _ _ O _ _ hO A A' Pr hdR hP
   obtain ⟨-, hfin, hmt, htr, -⟩ := hO
   haveI := hfin
@@ -137,19 +156,29 @@ theorem bkACore_of_rationalDuality (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K 
   haveI : ContinuousConstSMul ℚ_[l] A'.V := ⟨fun c => by
     have hc : Continuous fun x : A'.V => algebraMap ℚ_[l] LL c • x := continuous_const_smul _
     simpa only [algebraMap_smul] using hc⟩
-  have key := h A.V A'.V (resQ A.ρ) (resQ A'.ρ) (trPair Pr) A.cont A'.cont
-    ((isDR_resQ_iff P A.ρ).mpr hdR) (isDual1_trPair P hP)
-  have cupS : ∀ (c : LL) (a : ↥(GK K) → A.V) (b : ↥(GK K) → A'.V),
-      cupL (resQ A'.ρ) (trPair Pr) a (c • b) = fun x => Algebra.trace ℚ_[l] LL (c * cupL A'.ρ Pr a b x) := by
-    intro c a b; funext x
+  have key :=
+    h A.V A'.V (resQ A.ρ) (resQ A'.ρ) (trPair Pr) A.cont A'.cont ((isDR_resQ_iff P A.ρ).mpr hdR)
+      (isDual1_trPair P hP)
+  have cupS
+      : ∀ (c : LL) (a : ↥(GK K) → A.V) (b : ↥(GK K) → A'.V),
+        cupL (resQ A'.ρ) (trPair Pr) a (c • b)
+          = fun x => Algebra.trace ℚ_[l] LL (c * cupL A'.ρ Pr a b x) := by
+    intro c a b
+    funext x
     simp [cupL, trPair_apply]
-  have cupS' : ∀ (c : LL) (a : ↥(GK K) → A.V) (b : ↥(GK K) → A'.V),
-      cupL (resQ A'.ρ) (trPair Pr) (c • a) b = fun x => Algebra.trace ℚ_[l] LL (c * cupL A'.ρ Pr a b x) := by
-    intro c a b; funext x
+  have cupS'
+      : ∀ (c : LL) (a : ↥(GK K) → A.V) (b : ↥(GK K) → A'.V),
+        cupL (resQ A'.ρ) (trPair Pr) (c • a) b
+          = fun x => Algebra.trace ℚ_[l] LL (c * cupL A'.ρ Pr a b x) := by
+    intro c a b
+    funext x
     simp [cupL, trPair_apply]
-  have cup1 : ∀ (a : ↥(GK K) → A.V) (b : ↥(GK K) → A'.V),
-      cupL (resQ A'.ρ) (trPair Pr) a b = fun x => Algebra.trace ℚ_[l] LL (1 * cupL A'.ρ Pr a b x) := by
-    intro a b; funext x
+  have cup1
+      : ∀ (a : ↥(GK K) → A.V) (b : ↥(GK K) → A'.V),
+        cupL (resQ A'.ρ) (trPair Pr) a b
+          = fun x => Algebra.trace ℚ_[l] LL (1 * cupL A'.ρ Pr a b x) := by
+    intro a b
+    funext x
     simp [cupL, trPair_apply]
   refine ⟨fun a ha => ?_, fun b hb => ?_⟩
   · rw [← mem_finiteCocycles_restrictScalars_Ql P, (key.1 a ha)]
@@ -158,9 +187,12 @@ theorem bkACore_of_rationalDuality (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K 
       rw [cobL_iff_trace]
       intro c
       rw [← cupS]
-      exact H (c • b) ((mem_finiteCocycles_restrictScalars_Ql P _ _).mpr ((finiteCocycles (P.PD K) A'.ρ).smul_mem c hb))
+      exact H (c • b)
+        ((mem_finiteCocycles_restrictScalars_Ql P _ _).mpr
+          ((finiteCocycles (P.PD K) A'.ρ).smul_mem c hb))
     · intro H b hb
-      have := (cobL_iff_trace (P.PD K) _).mp (H b ((mem_finiteCocycles_restrictScalars_Ql P _ _).mp hb)) 1
+      have :=
+        (cobL_iff_trace (P.PD K) _).mp (H b ((mem_finiteCocycles_restrictScalars_Ql P _ _).mp hb)) 1
       rwa [← cup1] at this
   · rw [← mem_finiteCocycles_restrictScalars_Ql P, (key.2 b hb)]
     constructor
@@ -168,9 +200,12 @@ theorem bkACore_of_rationalDuality (l : ℕ) [Fact l.Prime] (P : LocPrime l) (K 
       rw [cobL_iff_trace]
       intro c
       rw [← cupS']
-      exact H (c • a) ((mem_finiteCocycles_restrictScalars_Ql P _ _).mpr ((finiteCocycles (P.PD K) A.ρ).smul_mem c ha))
+      exact H (c • a)
+        ((mem_finiteCocycles_restrictScalars_Ql P _ _).mpr
+          ((finiteCocycles (P.PD K) A.ρ).smul_mem c ha))
     · intro H a ha
-      have := (cobL_iff_trace (P.PD K) _).mp (H a ((mem_finiteCocycles_restrictScalars_Ql P _ _).mp ha)) 1
+      have :=
+        (cobL_iff_trace (P.PD K) _).mp (H a ((mem_finiteCocycles_restrictScalars_Ql P _ _).mp ha)) 1
       rwa [← cup1] at this
 
 end GlobalTheory

@@ -5,13 +5,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open NumberField IsDedekindDomain Matrix Polynomial Filter Topology
-open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
+open GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions
+  GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT GlobalTheory.LFun
 open PositivityTheory.Rg.BcB.G8
 open UpperTheory.V.Af.Bc (cPl)
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm UpperTheory.V.Z.Tf.GaloisFromTraceFormula
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
+  UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm UpperTheory.V.Z.Tf.GaloisFromTraceFormula
 
-theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.regOf :
-    MWAt → DualWt → RegOf := by
+theorem UpperTheory.V.Z.Tf.GaloisFromTraceFormula.regOf : MWAt → DualWt → RegOf := by
   intro mw dw E _ _ _ n l D hD τ
   have hτ := hD τ
   rcases InfinitePlace.embedding_mk_eq τ with h | h

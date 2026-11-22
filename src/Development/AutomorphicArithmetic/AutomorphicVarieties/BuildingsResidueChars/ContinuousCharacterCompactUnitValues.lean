@@ -5,11 +5,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsRe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Module TensorProduct
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Module TensorProduct
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.Pst.DpstMap GlobalTheory.GalOfCusp
 
-private theorem norm_le_one {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField K]
-    (ψ : Γ →* Kˣ) (hψ : Continuous fun s => (ψ s : K)) (s : Γ) : ‖(ψ s : K)‖ ≤ 1 := by
+private theorem norm_le_one
+    {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField K]
+    (ψ : Γ →* Kˣ) (hψ : Continuous fun s => (ψ s : K))
+    (s : Γ)
+    : ‖(ψ s : K)‖ ≤ 1 := by
   obtain ⟨C, hC⟩ := (isCompact_range hψ.norm).bddAbove
   by_contra hlt
   obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt C (not_le.1 hlt)
@@ -17,15 +21,17 @@ private theorem norm_le_one {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [Comp
   simp only [map_pow, Units.val_pow_eq_pow_val, norm_pow] at this
   exact absurd hn (not_lt.2 this)
 
-private theorem norm_eq_one {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField K]
-    (ψ : Γ →* Kˣ) (hψ : Continuous fun s => (ψ s : K)) (s : Γ) : ‖(ψ s : K)‖ = 1 := by
+private theorem norm_eq_one
+    {Γ K : Type} [Group Γ] [TopologicalSpace Γ] [CompactSpace Γ] [NormedField K]
+    (ψ : Γ →* Kˣ) (hψ : Continuous fun s => (ψ s : K))
+    (s : Γ)
+    : ‖(ψ s : K)‖ = 1 := by
   refine le_antisymm (norm_le_one ψ hψ s) ?_
   have h := norm_le_one ψ hψ s⁻¹
   rw [map_inv, Units.val_inv_eq_inv_val, norm_inv] at h
   exact (inv_le_one₀ (norm_pos_iff.2 (ψ s).ne_zero)).1 h
 
-theorem UpperTheory.continuous_character_compact_unit_values :
-    UpperTheory.V.Af.Wd.CharEnd := by
+theorem UpperTheory.continuous_character_compact_unit_values : UpperTheory.V.Af.Wd.CharEnd := by
   intro F Ω _ _ _ _ _ l hl ι w A h hw ψ a hψ hσ
   haveI : CompactSpace (Dec (F := F) A) := isCompact_iff_compactSpace.1 (isClosed_Dec A).isCompact
   have hq1 : 1 < normV w := GlobalTheory.WeilDeligne.one_lt_normV w

@@ -12,37 +12,41 @@ namespace GroundTheory.Global
 
 noncomputable section
 
-theorem Subgroup.subset_of_isPreconnected {G : Type*} [Group G] [TopologicalSpace G]
-    [IsTopologicalGroup G] (H : Subgroup G) (hH : IsOpen (H : Set G)) {s : Set G}
-    (hs : IsPreconnected s) (h1 : (1 : G) ∈ s) : s ⊆ H :=
+theorem Subgroup.subset_of_isPreconnected
+    {G : Type*} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (H : Subgroup G) (hH : IsOpen (H : Set G))
+    {s : Set G} (hs : IsPreconnected s) (h1 : (1 : G) ∈ s)
+    : s ⊆ H :=
   hs.subset_isClopen ⟨H.isClosed_of_isOpen hH, hH⟩ ⟨1, h1, H.one_mem⟩
 
-theorem Subgroup.mem_of_isOpen_of_pos (H : Subgroup ℝˣ) (hH : IsOpen (H : Set ℝˣ)) {r : ℝˣ}
-    (hr : 0 < (r : ℝ)) : r ∈ H := by
+theorem Subgroup.mem_of_isOpen_of_pos
+    (H : Subgroup ℝˣ) (hH : IsOpen (H : Set ℝˣ)) {r : ℝˣ} (hr : 0 < (r : ℝ))
+    : r ∈ H := by
   let f : ℝ → ℝˣ := fun t ↦ Units.mk0 (Real.exp t) (Real.exp_ne_zero t)
   have hf : Continuous f := Units.isEmbedding_val₀.isInducing.continuous_iff.2 Real.continuous_exp
-  have hsub := Subgroup.subset_of_isPreconnected H hH (isPreconnected_range hf)
-    ⟨0, Units.ext (by simp [f])⟩
+  have hsub :=
+    Subgroup.subset_of_isPreconnected H hH (isPreconnected_range hf) ⟨0, Units.ext (by simp [f])⟩
   exact hsub ⟨Real.log r, Units.ext (Real.exp_log hr)⟩
 
-theorem Subgroup.mem_of_isOpen_complexUnits (H : Subgroup ℂˣ) (hH : IsOpen (H : Set ℂˣ)) (z : ℂˣ) :
-    z ∈ H :=
+theorem Subgroup.mem_of_isOpen_complexUnits (H : Subgroup ℂˣ) (hH : IsOpen (H : Set ℂˣ)) (z : ℂˣ)
+    : z ∈ H :=
   Subgroup.subset_of_isPreconnected H hH isPreconnected_univ (Set.mem_univ 1) (Set.mem_univ z)
 
 variable {K : Type*} [Field K] [NumberField K]
 
 open IdeleGroup
 
-theorem infiniteEmbedding_mem_of_isOpen_of_isReal (H : Subgroup (IdeleGroup K))
-    (hH : IsOpen (H : Set (IdeleGroup K))) {w : InfinitePlace K} (hw : w.IsReal)
+theorem infiniteEmbedding_mem_of_isOpen_of_isReal
+    (H : Subgroup (IdeleGroup K)) (hH : IsOpen (H : Set (IdeleGroup K)))
+    {w : InfinitePlace K} (hw : w.IsReal)
     {a : (w.Completion)ˣ}
-    (ha : 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw (a : w.Completion)) :
-    infiniteEmbedding w a ∈ H := by
+    (ha : 0 < InfinitePlace.Completion.extensionEmbeddingOfIsReal hw (a : w.Completion))
+    : infiniteEmbedding w a ∈ H := by
   let Hr : Subgroup ℝˣ := (H.comap (infiniteEmbedding w)).comap (realUnitsHom hw).toMonoidHom
   have hopen : IsOpen (Hr : Set ℝˣ) :=
     (hH.preimage (continuous_infiniteEmbedding w)).preimage (realUnitsHom hw).continuous
-  let r : ℝˣ := Units.map (InfinitePlace.Completion.ringEquivRealOfIsReal hw :
-    w.Completion →+* ℝ).toMonoidHom a
+  let r : ℝˣ :=
+    Units.map (InfinitePlace.Completion.ringEquivRealOfIsReal hw : w.Completion →+* ℝ).toMonoidHom a
   have hr : 0 < (r : ℝ) := by
     change 0 < InfinitePlace.Completion.ringEquivRealOfIsReal hw (a : w.Completion)
     rw [InfinitePlace.Completion.ringEquivRealOfIsReal_apply]
@@ -51,21 +55,24 @@ theorem infiniteEmbedding_mem_of_isOpen_of_isReal (H : Subgroup (IdeleGroup K))
   rw [← realUnitsHom_surjective hw a]
   exact hmem
 
-theorem infiniteEmbedding_mem_of_isOpen_of_isComplex (H : Subgroup (IdeleGroup K))
-    (hH : IsOpen (H : Set (IdeleGroup K))) {w : InfinitePlace K} (hw : w.IsComplex)
-    (a : (w.Completion)ˣ) : infiniteEmbedding w a ∈ H := by
+theorem infiniteEmbedding_mem_of_isOpen_of_isComplex
+    (H : Subgroup (IdeleGroup K)) (hH : IsOpen (H : Set (IdeleGroup K)))
+    {w : InfinitePlace K} (hw : w.IsComplex) (a : (w.Completion)ˣ)
+    : infiniteEmbedding w a ∈ H := by
   let Hc : Subgroup ℂˣ := (H.comap (infiniteEmbedding w)).comap (complexUnitsHom hw).toMonoidHom
   have hopen : IsOpen (Hc : Set ℂˣ) :=
     (hH.preimage (continuous_infiniteEmbedding w)).preimage (complexUnitsHom hw).continuous
-  have hmem := Subgroup.mem_of_isOpen_complexUnits Hc hopen
-    (Units.map (InfinitePlace.Completion.ringEquivComplexOfIsComplex hw :
-      w.Completion →+* ℂ).toMonoidHom a)
+  have hmem :=
+    Subgroup.mem_of_isOpen_complexUnits Hc hopen
+      (Units.map
+        (InfinitePlace.Completion.ringEquivComplexOfIsComplex hw : w.Completion →+* ℂ).toMonoidHom
+        a)
   rw [← complexUnitsHom_surjective hw a]
   exact hmem
 
-theorem Modulus.exists_congruenceSubgroup_le (H : Subgroup (IdeleGroup K))
-    (hH : IsOpen (H : Set (IdeleGroup K))) :
-    ∃ 𝔪 : Modulus K, 𝔪.real = Set.univ ∧ 𝔪.congruenceSubgroup ≤ H := by
+theorem Modulus.exists_congruenceSubgroup_le
+    (H : Subgroup (IdeleGroup K)) (hH : IsOpen (H : Set (IdeleGroup K)))
+    : ∃ 𝔪 : Modulus K, 𝔪.real = Set.univ ∧ 𝔪.congruenceSubgroup ≤ H := by
   classical
   have hWf : (H.comap ofFinite : Set (FiniteAdeleRing (𝓞 K) K)ˣ) ∈ 𝓝 1 :=
     (hH.preimage continuous_ofFinite).mem_nhds (by simp [H.one_mem])
@@ -82,9 +89,10 @@ theorem Modulus.exists_congruenceSubgroup_le (H : Subgroup (IdeleGroup K))
   obtain ⟨hf, hi⟩ := 𝔪.mem_congruenceSubgroup.1 hx
   rw [← ofFinite_mul_ofInfinite x]
   refine H.mul_mem ?_ ?_
-  · have : toFinite K x ∈ finiteLevel n := mem_finiteLevel.2 fun v ↦ by
-      rw [finiteComponent_toFinite]
-      exact unitsLevel_antitone v (hle v) (hf v)
+  · have : toFinite K x ∈ finiteLevel n :=
+      mem_finiteLevel.2 fun v ↦ by
+        rw [finiteComponent_toFinite]
+        exact unitsLevel_antitone v (hle v) (hf v)
     exact hsub this
   · rw [ofInfinite_eq_prod]
     refine Subgroup.prod_mem H fun w _ ↦ ?_
@@ -92,15 +100,16 @@ theorem Modulus.exists_congruenceSubgroup_le (H : Subgroup (IdeleGroup K))
     · exact infiniteEmbedding_mem_of_isOpen_of_isReal H hH hw (hi ⟨w, hw⟩ (Set.mem_univ _))
     · exact infiniteEmbedding_mem_of_isOpen_of_isComplex H hH hw _
 
-theorem IdeleClassGroup.exists_map_congruenceSubgroup_le (H : Subgroup (IdeleClassGroup K))
-    (hH : IsOpen (H : Set (IdeleClassGroup K))) :
-    ∃ 𝔪 : Modulus K, 𝔪.real = Set.univ ∧ 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) ≤ H := by
-  obtain ⟨𝔪, h𝔪, hle⟩ := Modulus.exists_congruenceSubgroup_le (H.comap (IdeleClassGroup.mk K))
-    (hH.preimage (IdeleClassGroup.continuous_mk K))
+theorem IdeleClassGroup.exists_map_congruenceSubgroup_le
+    (H : Subgroup (IdeleClassGroup K)) (hH : IsOpen (H : Set (IdeleClassGroup K)))
+    : ∃ 𝔪 : Modulus K, 𝔪.real = Set.univ ∧ 𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) ≤ H := by
+  obtain ⟨𝔪, h𝔪, hle⟩ :=
+    Modulus.exists_congruenceSubgroup_le (H.comap (IdeleClassGroup.mk K))
+      (hH.preimage (IdeleClassGroup.continuous_mk K))
   exact ⟨𝔪, h𝔪, Subgroup.map_le_iff_le_comap.2 hle⟩
 
-theorem Modulus.isOpen_map_congruenceSubgroup (𝔪 : Modulus K) :
-    IsOpen (𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) : Set (IdeleClassGroup K)) := by
+theorem Modulus.isOpen_map_congruenceSubgroup (𝔪 : Modulus K)
+    : IsOpen (𝔪.congruenceSubgroup.map (IdeleClassGroup.mk K) : Set (IdeleClassGroup K)) := by
   rw [Subgroup.coe_map]
   exact IdeleClassGroup.isOpenMap_mk K _ 𝔪.isOpen_congruenceSubgroup
 

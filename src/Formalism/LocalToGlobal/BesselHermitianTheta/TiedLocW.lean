@@ -9,7 +9,9 @@ public import Formalism.LocalToGlobal.BesselHermitianTheta.TiedKfin
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice MeasureTheory
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  MeasureTheory
 open scoped TensorProduct
 
 namespace Formalism.L2.Theta

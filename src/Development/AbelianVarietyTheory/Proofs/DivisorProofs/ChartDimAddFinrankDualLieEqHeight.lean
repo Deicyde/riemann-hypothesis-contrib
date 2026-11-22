@@ -11,16 +11,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PdDivGroupCh
 
 set_option autoImplicit false
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 open TensorProduct
 
 namespace GlobalTheory.PDivGroup.DimSum
 
-theorem baseChange_bijective_of_ker {O : Type} [CommRing O] {M N : Type} [AddCommGroup M] [Module O M]
-    [AddCommGroup N] [Module O N] (k : Type) [CommRing k] [Algebra O k] (a : O)
-    (ha : algebraMap O k a = 0) (f : M →ₗ[O] N) (hf : Function.Surjective f)
-    (hfa : ∀ v, f (a • v) = 0) (hk : ∀ w, f w = 0 → ∃ v, w = a • v) :
-    Function.Bijective (f.baseChange k) := by
+theorem baseChange_bijective_of_ker
+    {O : Type} [CommRing O]
+    {M N : Type} [AddCommGroup M] [Module O M] [AddCommGroup N] [Module O N]
+    (k : Type) [CommRing k] [Algebra O k]
+    (a : O) (ha : algebraMap O k a = 0)
+    (f : M →ₗ[O] N)
+    (hf : Function.Surjective f) (hfa : ∀ v, f (a • v) = 0) (hk : ∀ w, f w = 0 → ∃ v, w = a • v)
+    : Function.Bijective (f.baseChange k) := by
   rw [LinearMap.baseChange_eq_ltensor]
   refine ⟨?_, LinearMap.lTensor_surjective k hf⟩
   have hex : Function.Exact (a • LinearMap.id : M →ₗ[O] M) f := by
@@ -36,16 +41,20 @@ theorem baseChange_bijective_of_ker {O : Type} [CommRing O] {M N : Type} [AddCom
     refine TensorProduct.ext' fun c m => ?_
     rw [LinearMap.lTensor_tmul, LinearMap.smul_apply, LinearMap.id_apply, ← TensorProduct.smul_tmul,
       Algebra.smul_def, ha, zero_mul, TensorProduct.zero_tmul, LinearMap.zero_apply]
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro x hx
   obtain ⟨y, rfl⟩ := (hex' x).1 hx
   rw [hz, LinearMap.zero_apply]
 
 open GlobalTheory.PDiv Module
 
-theorem finrank_cot_baseChange_one {p : ℕ} {O : Type} [CommRing O] (H : PDivGroup p O) (k : Type)
-    [Field k] [Algebra O k] (hp : algebraMap O k p = 0) :
-    finrank k (Cot k (k ⊗[O] H.A 1)) = finrank k (k ⊗[O] H.omega) := by
+theorem finrank_cot_baseChange_one
+    {p : ℕ} {O : Type} [CommRing O]
+    (H : PDivGroup p O)
+    (k : Type) [Field k] [Algebra O k]
+    (hp : algebraMap O k p = 0)
+    : finrank k (Cot k (k ⊗[O] H.A 1)) = finrank k (k ⊗[O] H.omega) := by
   have h1 : Function.Bijective ((H.omegaLevel 1).baseChange k) :=
     baseChange_bijective_of_ker k (p : O) hp (H.omegaLevel 1) (H.omegaLevel_surjective 1)
       (fun v => by
@@ -59,32 +68,36 @@ theorem finrank_cot_baseChange_one {p : ℕ} {O : Type} [CommRing O] (H : PDivGr
   let e2 := LinearEquiv.ofBijective _ (liftSemi_toBaseChange_cot_bijective O k (H.A 1))
   exact (e1.trans e2).finrank_eq.symm
 
-theorem finrank_cot_congr {k X Y : Type} [Field k] [CommRing X] [CommRing Y] [Bialgebra k X]
-    [Bialgebra k Y] (e : X ≃ₐc[k] Y) : finrank k (Cot k X) = finrank k (Cot k Y) := by
+theorem finrank_cot_congr
+    {k X Y : Type} [Field k] [CommRing X] [CommRing Y] [Bialgebra k X] [Bialgebra k Y]
+    (e : X ≃ₐc[k] Y)
+    : finrank k (Cot k X) = finrank k (Cot k Y) := by
   have h1 : (e.symm : Y →ₐc[k] X).comp (e : X →ₐc[k] Y) = BialgHom.id k X :=
     BialgHom.ext fun x => e.symm_apply_apply x
   have h2 : (e : X →ₐc[k] Y).comp (e.symm : Y →ₐc[k] X) = BialgHom.id k Y :=
     BialgHom.ext fun x => e.apply_symm_apply x
-  refine (LinearEquiv.ofLinear (cotMap (e : X →ₐc[k] Y)) (cotMap (e.symm : Y →ₐc[k] X)) ?_ ?_).finrank_eq
+  refine (LinearEquiv.ofLinear (cotMap (e : X →ₐc[k] Y)) (cotMap (e.symm : Y →ₐc[k] X)) ?_
+    ?_).finrank_eq
   · rw [← cotMap_comp, h2, cotMap_id]
   · rw [← cotMap_comp, h1, cotMap_id]
 
 end GlobalTheory.PDivGroup.DimSum
 
-
 open Module PDiv in
-theorem GlobalTheory.PDivGroup.chart_dim_add_finrank_dual_lie : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C]
-    [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C]
-    [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O →
-    ∀ (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d),
-      d + Module.finrank O G.dual.Lie = G.height := by
+theorem GlobalTheory.PDivGroup.chart_dim_add_finrank_dual_lie
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (G : PDivGroup p O) (d : ℕ) (c : QLog.Chart G d),
+          d + Module.finrank O G.dual.Lie = G.height := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv G d c
   haveI : ValuationRing O := ValuationRing.of_integers v hv
   let k := IsLocalRing.ResidueField O
   have hpk : algebraMap O k p = 0 := by
     change IsLocalRing.residue O p = 0
     rw [IsLocalRing.residue_eq_zero_iff]
-    exact (Fact.out : ¬IsUnit (p : O))
+    exact (Fact.out : ¬ IsUnit (p : O))
   have hpk' : ((p : ℕ) : k) = 0 := by rw [← map_natCast (algebraMap O k), hpk]
   obtain ⟨hbij, -⟩ := GlobalTheory.T.pdDivGroupChart_forms_basis_and_differential p C v O hv G d c
   let eG : (Fin d → O) ≃ₗ[O] G.omega := LinearEquiv.ofBijective _ hbij
@@ -100,7 +113,8 @@ theorem GlobalTheory.PDivGroup.chart_dim_add_finrank_dual_lie : ∀ (p : ℕ) [F
     rw [(LinearEquiv.ofBijective _ ((G.baseChange k).omegaLevel_one_bijective hpk')).finrank_eq]
     exact (DimSum.finrank_cot_baseChange_one G k hpk).trans (Module.finrank_baseChange)
   have hB : finrank k (G.baseChange k).dual.omega = finrank O G.dual.omega := by
-    rw [(LinearEquiv.ofBijective _ ((G.baseChange k).dual.omegaLevel_one_bijective hpk')).finrank_eq]
+    rw [(LinearEquiv.ofBijective _
+      ((G.baseChange k).dual.omegaLevel_one_bijective hpk')).finrank_eq]
     refine (DimSum.finrank_cot_congr (CartierDual.baseChange O k (G.A 1))).symm.trans ?_
     exact (DimSum.finrank_cot_baseChange_one G.dual k hpk).trans (Module.finrank_baseChange)
   rw [hLie, ← hd, ← hA, ← hB]

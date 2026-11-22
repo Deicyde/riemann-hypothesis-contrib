@@ -16,8 +16,10 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AbelianScheme
 
 noncomputable section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct
 open GlobalTheory.ZM
 
@@ -25,8 +27,8 @@ namespace GlobalTheory.OddDescent
 
 open CechPic
 
-theorem dense_of_denseP {R : Type} [CommRing R] {P : Set (Ideal R)} (h : DenseP P) :
-    Dense {p : PrimeSpectrum R | p.asIdeal ∈ P} := by
+theorem dense_of_denseP {R : Type} [CommRing R] {P : Set (Ideal R)} (h : DenseP P)
+    : Dense {p : PrimeSpectrum R | p.asIdeal ∈ P} := by
   rw [dense_iff_closure_eq, ← PrimeSpectrum.zeroLocus_vanishingIdeal_eq_closure]
   have hv : PrimeSpectrum.vanishingIdeal {p : PrimeSpectrum R | p.asIdeal ∈ P} = ⊥ := by
     rw [eq_bot_iff]
@@ -36,17 +38,21 @@ theorem dense_of_denseP {R : Type} [CommRing R] {P : Set (Ideal R)} (h : DenseP 
     exact (PrimeSpectrum.mem_vanishingIdeal _ _).1 hf ⟨p, hpp⟩ hp
   rw [hv, PrimeSpectrum.zeroLocus_bot]
 
-theorem mem_range_spMap {R K : Type} [CommRing R] [Field K] (x : R →+* K) (p : PrimeSpectrum R)
-    (h : RingHom.ker x = p.asIdeal) : p ∈ Set.range (spMap x) := by
+theorem mem_range_spMap
+    {R K : Type} [CommRing R] [Field K]
+    (x : R →+* K) (p : PrimeSpectrum R) (h : RingHom.ker x = p.asIdeal)
+    : p ∈ Set.range (spMap x) := by
   refine ⟨(⟨⊥, Ideal.isPrime_bot⟩ : PrimeSpectrum K), ?_⟩
   apply PrimeSpectrum.ext
   change (PrimeSpectrum.comap x ⟨⊥, Ideal.isPrime_bot⟩).asIdeal = p.asIdeal
   rw [PrimeSpectrum.comap_asIdeal, ← h, RingHom.ker_eq_comap_bot]
 
-private theorem pow_left_comp_eq_of_isGrpPullback {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
-    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ) {T : Over S'} (x : T ⟶ G')
-    (x₀ : Over.mk (T.hom ≫ f) ⟶ G) (hx : x₀.left = x.left ≫ φ) (m : ℕ) :
-    (x ^ m).left ≫ φ = (x₀ ^ m).left := by
+private theorem pow_left_comp_eq_of_isGrpPullback
+    {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+    {f : S' ⟶ S} {φ : G'.left ⟶ G.left} (h : IsGrpPullback G' G f φ)
+    {T : Over S'} (x : T ⟶ G') (x₀ : Over.mk (T.hom ≫ f) ⟶ G) (hx : x₀.left = x.left ≫ φ)
+    (m : ℕ)
+    : (x ^ m).left ≫ φ = (x₀ ^ m).left := by
   induction m with
   | zero =>
     let y₀ : Over.mk (T.hom ≫ f) ⟶ G :=
@@ -60,15 +66,15 @@ private theorem pow_left_comp_eq_of_isGrpPullback {S S' : Scheme.{0}} {G : Over 
     have h1 : y₀ = 1 := mul_eq_left.mp hy
     simp only [pow_zero]
     exact congrArg CommaMorphism.left h1
-  | succ n ih =>
-    rw [pow_succ, pow_succ, h.2 T (x ^ n) x (x₀ ^ n) x₀ ih.symm hx]
+  | succ n ih => rw [pow_succ, pow_succ, h.2 T (x ^ n) x (x₀ ^ n) x₀ ih.symm hx]
 
 section Pull
-variable {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G'] {f : S' ⟶ S}
-  {φ : G'.left ⟶ G.left}
+variable
+  {S S' : Scheme.{0}} {G : Over S} {G' : Over S'} [GrpObj G] [GrpObj G']
+  {f : S' ⟶ S} {φ : G'.left ⟶ G.left}
 
-theorem pow_left_comp (h : IsGrpPullback G' G f φ) (m : ℕ) :
-    ((𝟙 G') ^ m).left ≫ φ = φ ≫ ((𝟙 G) ^ m).left := by
+theorem pow_left_comp (h : IsGrpPullback G' G f φ) (m : ℕ)
+    : ((𝟙 G') ^ m).left ≫ φ = φ ≫ ((𝟙 G) ^ m).left := by
   let ψ : Over.mk (G'.hom ≫ f) ⟶ G := Over.homMk φ h.1.w
   have e1 := pow_left_comp_eq_of_isGrpPullback h (𝟙 G') ψ (by simp [ψ]) m
   rw [e1]
@@ -76,9 +82,11 @@ theorem pow_left_comp (h : IsGrpPullback G' G f φ) (m : ℕ) :
   rw [← e2, Over.comp_left]
   rfl
 
-private theorem eq_inv_of_left_eq_inv_comp_of_isGrpPullback (h : IsGrpPullback G' G f φ) {T : Over S'} (x : T ⟶ G')
-    (x₀ : Over.mk (T.hom ≫ f) ⟶ G) (hx : x₀.left = x.left ≫ φ) (y₀ : Over.mk (T.hom ≫ f) ⟶ G)
-    (hy : y₀.left = (x⁻¹).left ≫ φ) : y₀ = x₀⁻¹ := by
+private theorem eq_inv_of_left_eq_inv_comp_of_isGrpPullback
+    (h : IsGrpPullback G' G f φ)
+    {T : Over S'} (x : T ⟶ G') (x₀ : Over.mk (T.hom ≫ f) ⟶ G) (hx : x₀.left = x.left ≫ φ)
+    (y₀ : Over.mk (T.hom ≫ f) ⟶ G) (hy : y₀.left = (x⁻¹).left ≫ φ)
+    : y₀ = x₀⁻¹ := by
   apply eq_inv_of_mul_eq_one_left
   ext1
   rw [h.2 T x⁻¹ x y₀ x₀ hy hx, inv_mul_cancel]
@@ -86,20 +94,24 @@ private theorem eq_inv_of_left_eq_inv_comp_of_isGrpPullback (h : IsGrpPullback G
   simp only [pow_zero] at e
   exact e
 
-theorem inv_left_comp (h : IsGrpPullback G' G f φ) :
-    (GrpObj.inv : G' ⟶ G').left ≫ φ = φ ≫ (GrpObj.inv : G ⟶ G).left := by
+theorem inv_left_comp (h : IsGrpPullback G' G f φ)
+    : (GrpObj.inv : G' ⟶ G').left ≫ φ = φ ≫ (GrpObj.inv : G ⟶ G).left := by
   let ψ : Over.mk (G'.hom ≫ f) ⟶ G := Over.homMk φ h.1.w
   let y₀ : Over.mk (G'.hom ≫ f) ⟶ G :=
     Over.homMk ((GrpObj.inv : G' ⟶ G').left ≫ φ) (by
       rw [Category.assoc, h.1.w, ← Category.assoc, Over.w]
       rfl)
-  have e := eq_inv_of_left_eq_inv_comp_of_isGrpPullback h (𝟙 G') ψ (by simp [ψ]) y₀ (by simp [y₀, GrpObj.inv_eq_inv])
-  have e2 : ψ ≫ (GrpObj.inv : G ⟶ G) = ψ⁻¹ := by rw [GrpObj.inv_eq_inv, GrpObj.comp_inv, Category.comp_id]
+  have e :=
+    eq_inv_of_left_eq_inv_comp_of_isGrpPullback h (𝟙 G') ψ (by simp [ψ]) y₀
+      (by simp [y₀, GrpObj.inv_eq_inv])
+  have e2 : ψ ≫ (GrpObj.inv : G ⟶ G) = ψ⁻¹ := by
+    rw [GrpObj.inv_eq_inv, GrpObj.comp_inv, Category.comp_id]
   change y₀.left = ψ.left ≫ (GrpObj.inv : G ⟶ G).left
   rw [← Over.comp_left, e2, e]
 
-private theorem pic_eq_zero_of_pull_ι_eq_zero_of_opens_eq_whole {X : Scheme.{0}} (V : X.Opens) (hV : V = ⊤)
-    (c : CechPic.Pic X) (h : CechPic.pull V.ι c = 0) : c = 0 := by
+private theorem pic_eq_zero_of_pull_ι_eq_zero_of_opens_eq_whole
+    {X : Scheme.{0}} (V : X.Opens) (hV : V = ⊤) (c : CechPic.Pic X) (h : CechPic.pull V.ι c = 0)
+    : c = 0 := by
   subst hV
   have e := congrArg (CechPic.pull X.topIso.inv) h
   rw [← CechPic.pull_comp, Scheme.toIso_inv_ι, CechPic.pull_id, map_zero] at e
@@ -107,62 +119,82 @@ private theorem pic_eq_zero_of_pull_ι_eq_zero_of_opens_eq_whole {X : Scheme.{0}
 
 end Pull
 
-theorem pull_inv_cls_of_sym {K : Type} [Field K] (A : Over (Sp K)) [GrpObj A] {L : LB A.left} (hL : L.IsLB)
-    (h : Out.Sym A L) : CechPic.pull (GrpObj.inv : A ⟶ A).left (cls L hL) = cls L hL := by
+theorem pull_inv_cls_of_sym
+    {K : Type} [Field K]
+    (A : Over (Sp K)) [GrpObj A]
+    {L : LB A.left} (hL : L.IsLB) (h : Out.Sym A L)
+    : CechPic.pull (GrpObj.inv : A ⟶ A).left (cls L hL) = cls L hL := by
   obtain ⟨U, hU, t, ht⟩ := h (Classical.arbitrary _)
   have hpt : ∀ a b : ↥(Sp K), a = b := fun a b => @Subsingleton.elim (PrimeSpectrum K) _ a b
   have hV : A.hom ⁻¹ᵁ U = ⊤ := by
     refine eq_top_iff.2 fun y _ => ?_
     rw [Scheme.Hom.mem_preimage, hpt (A.hom y) (Classical.arbitrary _)]
     exact hU
-  have hN := LB.isLB_linComb hL ![(A.hom ⁻¹ᵁ U).ι ≫ (GrpObj.inv : A ⟶ A).left, (A.hom ⁻¹ᵁ U).ι] ![1, -1]
+  have hN :=
+    LB.isLB_linComb hL ![(A.hom ⁻¹ᵁ U).ι ≫ (GrpObj.inv : A ⟶ A).left, (A.hom ⁻¹ᵁ U).ι] ![1, -1]
   have h0 := (cls_eq_zero_iff hN).2 ⟨t, ht⟩
   rw [cls_linComb hL] at h0
-  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, one_smul,
-    neg_smul, pull_comp] at h0
+  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, one_smul, neg_smul,
+      pull_comp]
+    at h0
   rw [← sub_eq_add_neg, ← map_sub] at h0
   exact sub_eq_zero.1 (pic_eq_zero_of_pull_ι_eq_zero_of_opens_eq_whole _ hV _ h0)
 
-theorem sym_of_pull_inv_cls {S : Scheme.{0}} (A : Over S) [GrpObj A] {L : LB A.left} (hL : L.IsLB)
-    (h : CechPic.pull (GrpObj.inv : A ⟶ A).left (cls L hL) = cls L hL) : Out.Sym A L := by
+theorem sym_of_pull_inv_cls
+    {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    {L : LB A.left} (hL : L.IsLB) (h : CechPic.pull (GrpObj.inv : A ⟶ A).left (cls L hL) = cls L hL)
+    : Out.Sym A L := by
   unfold Out.Sym
   intro s
   refine ⟨⊤, by simp, ?_⟩
-  have hN := LB.isLB_linComb hL ![(A.hom ⁻¹ᵁ ⊤).ι ≫ (GrpObj.inv : A ⟶ A).left, (A.hom ⁻¹ᵁ ⊤).ι] ![1, -1]
+  have hN :=
+    LB.isLB_linComb hL ![(A.hom ⁻¹ᵁ ⊤).ι ≫ (GrpObj.inv : A ⟶ A).left, (A.hom ⁻¹ᵁ ⊤).ι] ![1, -1]
   refine (cls_eq_zero_iff hN).1 ?_
   rw [cls_linComb hL]
-  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, one_smul,
-    neg_smul, pull_comp, h]
+  simp only [Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, one_smul, neg_smul,
+    pull_comp, h]
   exact add_neg_cancel _
 
-theorem eSec_inv {S : Scheme.{0}} (A : Over S) [GrpObj A] :
-    eSec A ≫ (GrpObj.inv : A ⟶ A).left = eSec A := by
+theorem eSec_inv {S : Scheme.{0}} (A : Over S) [GrpObj A]
+    : eSec A ≫ (GrpObj.inv : A ⟶ A).left = eSec A := by
   unfold eSec
   rw [← Over.comp_left, GrpObj.one_inv]
 
-theorem linComb_eq_prod {S : Scheme.{0}} {A T : Over S} [GrpObj A] [IsCommMonObj A] {n : ℕ}
-    (y : Fin n → (T ⟶ A)) (a : Fin n → ℕ) : Out.linComb y a = ∏ i, y i ^ a i := by
+theorem linComb_eq_prod
+    {S : Scheme.{0}} {A T : Over S} [GrpObj A] [IsCommMonObj A]
+    {n : ℕ} (y : Fin n → (T ⟶ A)) (a : Fin n → ℕ)
+    : Out.linComb y a = ∏ i, y i ^ a i := by
   unfold Out.linComb
   exact List.prod_ofFn
 
-theorem comp_linComb {S : Scheme.{0}} {A T T' : Over S} [GrpObj A] {n : ℕ} (u : T' ⟶ T)
-    (y : Fin n → (T ⟶ A)) (a : Fin n → ℕ) : u ≫ Out.linComb y a = Out.linComb (fun i => u ≫ y i) a := by
+theorem comp_linComb
+    {S : Scheme.{0}} {A T T' : Over S} [GrpObj A]
+    {n : ℕ}
+    (u : T' ⟶ T) (y : Fin n → (T ⟶ A)) (a : Fin n → ℕ)
+    : u ≫ Out.linComb y a = Out.linComb (fun i => u ≫ y i) a := by
   unfold Out.linComb
-  let ψ : (T ⟶ A) →* (T' ⟶ A) :=
-    { toFun := fun g => u ≫ g, map_one' := MonObj.comp_one u,
-      map_mul' := fun g₁ g₂ => MonObj.comp_mul u g₁ g₂ }
+  let ψ : (T ⟶ A) →* (T' ⟶ A) := {
+    toFun := fun g => u ≫ g
+    map_one' := MonObj.comp_one u
+    map_mul' := fun g₁ g₂ => MonObj.comp_mul u g₁ g₂
+  }
   change ψ (List.ofFn fun i => y i ^ a i).prod = _
   rw [map_list_prod, List.map_ofFn]
   congr 2
   funext i
   exact MonObj.comp_pow (y i) (a i) u
 
-theorem exists_torsionHom {S : Scheme.{0}} {A T : Over S} [GrpObj A] [IsCommMonObj A] {n m : ℕ} [NeZero m]
-    (y : Fin n → (T ⟶ A)) (hy : ∀ i, y i ^ m = 1) :
-    ∃ i : Multiplicative (Fin n → ZMod m) →* (T ⟶ A),
+theorem exists_torsionHom
+    {S : Scheme.{0}} {A T : Over S} [GrpObj A] [IsCommMonObj A]
+    {n m : ℕ} [NeZero m]
+    (y : Fin n → (T ⟶ A)) (hy : ∀ i, y i ^ m = 1)
+    : ∃ i : Multiplicative (Fin n → ZMod m) →* (T ⟶ A),
       (∀ c, i c = Out.linComb y fun k => (c.toAdd k).val) ∧ ∀ c, i c ^ m = 1 := by
-  refine ⟨{ toFun := fun c => ∏ k, y k ^ (c.toAdd k).val, map_one' := ?_, map_mul' := ?_ },
-    fun c => (linComb_eq_prod y _).symm, fun c => ?_⟩
+  refine ⟨
+    { toFun := fun c => ∏ k, y k ^ (c.toAdd k).val, map_one' := ?_, map_mul' := ?_ },
+    fun c => (linComb_eq_prod y _).symm,
+    fun c => ?_
+  ⟩
   · simp
   · intro c c'
     simp only [toAdd_mul, Pi.add_apply]
@@ -174,39 +206,58 @@ theorem exists_torsionHom {S : Scheme.{0}} {A T : Over S} [GrpObj A] [IsCommMonO
     refine Finset.prod_eq_one fun k _ => ?_
     rw [← _root_.pow_mul, _root_.mul_comm, _root_.pow_mul, hy k, _root_.one_pow]
 
-theorem comp_id_pow {S : Scheme.{0}} {A T : Over S} [GrpObj A] (x : T ⟶ A) (m : ℕ) :
-    x ≫ (𝟙 A) ^ m = x ^ m := by
+theorem comp_id_pow {S : Scheme.{0}} {A T : Over S} [GrpObj A] (x : T ⟶ A) (m : ℕ)
+    : x ≫ (𝟙 A) ^ m = x ^ m := by
   rw [MonObj.comp_pow, Category.comp_id]
 
-theorem id_pow_inv {S : Scheme.{0}} (A : Over S) [GrpObj A] (m : ℕ) :
-    ((𝟙 A) ^ m).left ≫ (GrpObj.inv : A ⟶ A).left = (GrpObj.inv : A ⟶ A).left ≫ ((𝟙 A) ^ m).left := by
+theorem id_pow_inv {S : Scheme.{0}} (A : Over S) [GrpObj A] (m : ℕ)
+    : ((𝟙 A) ^ m).left ≫ (GrpObj.inv : A ⟶ A).left
+      = (GrpObj.inv : A ⟶ A).left ≫ ((𝟙 A) ^ m).left := by
   rw [← Over.comp_left, ← Over.comp_left, MonObj.comp_pow, Category.comp_id, GrpObj.inv_eq_inv,
     GrpObj.comp_inv, Category.comp_id, inv_pow]
 
-theorem pull_inv_cls_of_fibres (hsee : ∀ (R : Type) [CommRing R] [IsReduced R] (A : Over (Sp R)) [GrpObj A] (M N : LB A.left) (Sg : Set (Sp R)), IsAbelianScheme A → M.IsLB → Out.RelAmple A M → N.IsLB → Dense Sg → Out.Rigidified A N → (∀ p ∈ Sg, ∃ (K : Type) (_ : Field K) (x : Sp K ⟶ Sp R) (X : Scheme.{0}) (φ : X ⟶ A.left) (π : X ⟶ Sp K), p ∈ Set.range x ∧ IsPullback φ π A.hom x ∧ ∃ t : (N.pull φ).Gen, t.IsGen) → ∃ t : N.Gen, t.IsGen)
-    {R : Type} [CommRing R] [IsReduced R] (A : Over (Sp R)) [GrpObj A] {M N : LB A.left} {Sg : Set (Sp R)}
-    (hA : IsAbelianScheme A) (hM : M.IsLB) (hamp : Out.RelAmple A M) (hN : N.IsLB) (hSg : Dense Sg)
-    (h : ∀ p ∈ Sg, ∃ (K : Type) (_ : Field K) (x : Sp K ⟶ Sp R) (B : Over (Sp K)) (_ : GrpObj B)
-      (φ : B.left ⟶ A.left), p ∈ Set.range x ∧ IsGrpPullback B A x φ ∧
-        CechPic.pull (GrpObj.inv : B ⟶ B).left (CechPic.pull φ (cls N hN)) = CechPic.pull φ (cls N hN)) :
-    CechPic.pull (GrpObj.inv : A ⟶ A).left (cls N hN) = cls N hN := by
+theorem pull_inv_cls_of_fibres
+    (hsee : ∀ (R : Type) [CommRing R] [IsReduced R] (A : Over (Sp R)) [GrpObj A] (M N : LB A.left)
+        (Sg : Set (Sp R)),
+      IsAbelianScheme A → M.IsLB → Out.RelAmple A M → N.IsLB → Dense Sg → Out.Rigidified A N
+        → (∀ p ∈ Sg,
+          ∃ (K : Type) (_ : Field K) (x : Sp K ⟶ Sp R) (X : Scheme.{0}) (φ : X ⟶ A.left)
+              (π : X ⟶ Sp K),
+            p ∈ Set.range x ∧ IsPullback φ π A.hom x ∧ ∃ t : (N.pull φ).Gen, t.IsGen)
+        → ∃ t : N.Gen, t.IsGen)
+    {R : Type} [CommRing R] [IsReduced R]
+    (A : Over (Sp R)) [GrpObj A]
+    {M N : LB A.left} {Sg : Set (Sp R)}
+    (hA : IsAbelianScheme A) (hM : M.IsLB) (hamp : Out.RelAmple A M)
+    (hN : N.IsLB)
+    (hSg : Dense Sg)
+    (h : ∀ p ∈ Sg,
+      ∃ (K : Type) (_ : Field K) (x : Sp K ⟶ Sp R) (B : Over (Sp K)) (_ : GrpObj B)
+          (φ : B.left ⟶ A.left),
+        p ∈ Set.range x ∧ IsGrpPullback B A x φ
+          ∧ CechPic.pull (GrpObj.inv : B ⟶ B).left (CechPic.pull φ (cls N hN))
+            = CechPic.pull φ (cls N hN))
+    : CechPic.pull (GrpObj.inv : A ⟶ A).left (cls N hN) = cls N hN := by
   have hN' := LB.isLB_linComb hN ![(GrpObj.inv : A ⟶ A).left, 𝟙 A.left] ![1, -1]
-  have hc : ∀ {Y : Scheme.{0}} (r : Y ⟶ A.left), pull r (cls _ hN') =
-      pull (r ≫ (GrpObj.inv : A ⟶ A).left) (cls N hN) - pull r (cls N hN) := by
+  have hc
+      : ∀ {Y : Scheme.{0}} (r : Y ⟶ A.left),
+        pull r (cls _ hN')
+          = pull (r ≫ (GrpObj.inv : A ⟶ A).left) (cls N hN) - pull r (cls N hN) := by
     intro Y r
     rw [cls_linComb hN, Fin.sum_univ_two]
-    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, one_smul, neg_smul, pull_id, map_add (f := _), map_neg,
-      ← pull_comp, sub_eq_add_neg]
+    simp only [Matrix.cons_val_zero, Matrix.cons_val_one, one_smul, neg_smul, pull_id,
+      map_add (f := _), map_neg, ← pull_comp, sub_eq_add_neg]
   have hR : Out.Rigidified A (LB.LinComb N ![(GrpObj.inv : A ⟶ A).left, 𝟙 A.left] ![1, -1]) := by
     unfold Out.Rigidified
     refine (cls_eq_zero_iff (pull_isLB hN' _)).1 ?_
     rw [cls_pull hN', hc, eSec_inv, sub_self]
-  obtain ⟨t, ht⟩ := hsee R A M _ Sg hA hM hamp hN' hSg hR (by
-    intro p hp
-    obtain ⟨K, hK, x, B, hB, φ, hpx, hφ, he⟩ := h p hp
-    refine ⟨K, hK, x, B.left, φ, B.hom, hpx, hφ.1, ?_⟩
-    refine (cls_eq_zero_iff (pull_isLB hN' φ)).1 ?_
-    rw [cls_pull hN', hc, ← inv_left_comp hφ, pull_comp, he, sub_self])
+  obtain ⟨t, ht⟩ :=
+    hsee R A M _ Sg hA hM hamp hN' hSg hR (by
+      intro p hp
+      obtain ⟨K, hK, x, B, hB, φ, hpx, hφ, he⟩ := h p hp
+      refine ⟨K, hK, x, B.left, φ, B.hom, hpx, hφ.1, ?_⟩
+      refine (cls_eq_zero_iff (pull_isLB hN' φ)).1 ?_
+      rw [cls_pull hN', hc, ← inv_left_comp hφ, pull_comp, he, sub_self])
   have h0 := (cls_eq_zero_iff hN').2 ⟨t, ht⟩
   rw [cls_linComb hN, Fin.sum_univ_two] at h0
   simp only [Matrix.cons_val_zero, Matrix.cons_val_one, one_smul, neg_smul, pull_id] at h0

@@ -9,5 +9,6 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.HasseOrderBound.
 @[expose] public section
 
 theorem hasse_order_bound : PI.HasseOrdBd :=
-  PI.HasseOrdBdW.hasseOrdBd_of PI.HasseOrdBdW.compositionalInverseSymm PI.HasseOrdBdW.orthogonalSplitPolarizationVanishes PI.HasseOrdBdW.addPreservesExpCongruence
+  PI.HasseOrdBdW.hasseOrdBd_of PI.HasseOrdBdW.compositionalInverseSymm
+    PI.HasseOrdBdW.orthogonalSplitPolarizationVanishes PI.HasseOrdBdW.addPreservesExpCongruence
     PI.HasseOrdBdW.expCongruenceExtendsToSum

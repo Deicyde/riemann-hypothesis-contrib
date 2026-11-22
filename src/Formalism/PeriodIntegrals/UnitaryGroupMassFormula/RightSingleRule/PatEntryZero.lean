@@ -18,9 +18,10 @@ namespace Formalism.FourierDecayAlt.Q.QRR
 variable {k r : ℕ}
 
 def Pat (k r : ℕ) (l : Fin r) (Z : Mx k r) : Prop :=
-  ∀ i j : Fin (2 * r + k + 1), Z i j ≠ 0 →
-    (i.val = l.val ∧ l.val < j.val ∧ j.val ≤ 2 * r + k - l.val) ∨
-    (j.val = 2 * r + k - l.val ∧ l.val ≤ i.val ∧ i.val < 2 * r + k - l.val)
+  ∀ i j : Fin (2 * r + k + 1),
+    Z i j ≠ 0
+      → (i.val = l.val ∧ l.val < j.val ∧ j.val ≤ 2 * r + k - l.val)
+        ∨ (j.val = 2 * r + k - l.val ∧ l.val ≤ i.val ∧ i.val < 2 * r + k - l.val)
 
 def dag (k r : ℕ) (Z : Mx k r) : Mx k r := (Hpk k r)⁻¹ * Zᴴ * Hpk k r
 
@@ -333,11 +334,14 @@ lemma rdV_eq {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (z : Fin (2 
   rw [hfun]
   exact ((hasDerivAt_psi z hz X).smul_const (f g)).deriv
 
-theorem lam {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (z : Fin (2 * r + k + 1) → ℂ)
-    (hz : inWb k r z) (l : Fin r) (D : Set (Mx k r)) (f : Mx k r → E) (hR : RightEq k r z l.castSucc D f)
-    (g : Mx k r) (hg : g ∈ Glev k r l.castSucc ∩ D) (Z : Mx k r) (hZ : Pat k r l Z) :
-    RdV (hpart1 (Hpk k r) Z) f g + Complex.I • RdV (hpart2 (Hpk k r) Z) f g =
-      (ell k r z Z + star (ell k r z (dag k r Z))) • f g := by
+theorem lam
+    {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    (z : Fin (2 * r + k + 1) → ℂ) (hz : inWb k r z)
+    (l : Fin r) (D : Set (Mx k r)) (f : Mx k r → E) (hR : RightEq k r z l.castSucc D f)
+    (g : Mx k r) (hg : g ∈ Glev k r l.castSucc ∩ D)
+    (Z : Mx k r) (hZ : Pat k r l Z)
+    : RdV (hpart1 (Hpk k r) Z) f g + Complex.I • RdV (hpart2 (Hpk k r) Z) f g
+      = (ell k r z Z + star (ell k r z (dag k r Z))) • f g := by
   have hP := skew_hpart1 Z
   have hQ := skew_hpart2 Z
   have hI : Complex.I * (1 / (2 * Complex.I)) = 1 / 2 := by
@@ -348,20 +352,25 @@ theorem lam {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] (z : Fin (2 *
     unfold hpart1 hpart2
     rw [smul_smul, hI]
     module
-  have hZ2 : dag k r Z = -hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z := by
+  have hZ2 : dag k r Z = - hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z := by
     conv_lhs => rw [hZ1]
     rw [dag_add, dag_smul, hP, hQ, Complex.star_def, Complex.conj_I, neg_smul, smul_neg, neg_neg]
-  have hE : ell k r z Z = ell k r z (hpart1 (Hpk k r) Z) + Complex.I * ell k r z (hpart2 (Hpk k r) Z) := by
+  have hE
+      : ell k r z Z
+        = ell k r z (hpart1 (Hpk k r) Z) + Complex.I * ell k r z (hpart2 (Hpk k r) Z) := by
     conv_lhs => rw [hZ1]
     rw [ell_add, ell_smul]
-  have hE2 : ell k r z (dag k r Z) =
-      -ell k r z (hpart1 (Hpk k r) Z) + Complex.I * ell k r z (hpart2 (Hpk k r) Z) := by
-    rw [hZ2, show -hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z =
-      (-1 : ℂ) • hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z by rw [neg_one_smul],
+  have hE2
+      : ell k r z (dag k r Z)
+        = - ell k r z (hpart1 (Hpk k r) Z) + Complex.I * ell k r z (hpart2 (Hpk k r) Z) := by
+    rw [hZ2,
+      show - hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z
+          = (-1 : ℂ) • hpart1 (Hpk k r) Z + Complex.I • hpart2 (Hpk k r) Z by
+        rw [neg_one_smul],
       ell_add, ell_smul, ell_smul]
     ring
-  rw [rdV_eq z hz l D f hR g hg _ (pat_hpart1 hZ) hP, rdV_eq z hz l D f hR g hg _ (pat_hpart2 hZ) hQ,
-    hE, hE2, smul_smul, ← add_smul]
+  rw [rdV_eq z hz l D f hR g hg _ (pat_hpart1 hZ) hP,
+    rdV_eq z hz l D f hR g hg _ (pat_hpart2 hZ) hQ, hE, hE2, smul_smul, ← add_smul]
   congr 1
   rw [Complex.star_def]
   simp only [map_add (f := _), map_mul, map_neg, Complex.conj_I]

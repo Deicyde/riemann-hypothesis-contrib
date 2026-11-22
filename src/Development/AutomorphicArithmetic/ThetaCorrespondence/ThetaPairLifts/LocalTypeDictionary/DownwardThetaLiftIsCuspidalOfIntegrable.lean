@@ -16,9 +16,14 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.WeilTenso
 @[expose] public section
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 noncomputable section
 namespace GlobalTheory.DnCusp
 variable {D : D7}
@@ -88,17 +93,70 @@ theorem downward_theta_lift_isCuspidal_of_integrable (s1 : _root_.GlobalTheory.F
     exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h0 (fun n => bot_le) hψb
   exact GlobalTheory.CuspLimit.isCuspFun_of_tendsto D (G.P i).V N ψ L
     (fun n => ⟨(hψ n).1.cont, (hψ n).1.left, (hψ n).2⟩) haut.cont haut.left ht
-theorem downward_theta_lift_isCuspidal : GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal → _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (D : D7), GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D → ∀ (G₀ : Type) [Group G₀] [Fintype G₀] (Pl0 T : Type) (A : FamIn D.what₂.LL G₀ Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (G : GlobalTheory.Grid.GridPre R), GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.RowBase R → G.Is → ∀ i, i < D.R.m → ∀ Φ, IsThetaFunO R.ψ (GlobalTheory.Grid.neg (G.P (i + 1)).V) (G.P i).V Φ → ∀ φ, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.IsCuspOfType R.θ (G.P (i + 1)) φ → (∀ h, IntegrableOn (fun g => thetaKO (G.dn i).ω g h Φ * φ g) (G.mP (i + 1)).fd (G.mP (i + 1)).ν) → IsCuspFun (G.P i).V (fun h => ∫ g in (G.mP (i + 1)).fd, thetaKO (G.dn i).ω g h Φ * φ g ∂(G.mP (i + 1)).ν) :=
-  _root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal_of_integrable _root_.GlobalTheory.T.twisted_form_downward_growth_bound _root_.GlobalTheory.T.twisted_form_downward_approximation
+theorem downward_theta_lift_isCuspidal
+    : GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal
+      → _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ (D : D7),
+        GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D
+          → ∀ (G₀ : Type) [Group G₀] [Fintype G₀] (Pl0 T : Type)
+              (A : FamIn D.what₂.LL G₀ Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+              [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (G : GlobalTheory.Grid.GridPre R),
+            GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.RowBase R → G.Is
+              → ∀ i,
+                i < D.R.m
+                  → ∀ Φ,
+                    IsThetaFunO R.ψ (GlobalTheory.Grid.neg (G.P (i + 1)).V) (G.P i).V Φ
+                      → ∀ φ,
+                        GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.IsCuspOfType
+                            R.θ (G.P (i + 1)) φ
+                          → (∀ h,
+                            IntegrableOn
+                              (fun g => thetaKO (G.dn i).ω g h Φ * φ g)
+                              (G.mP (i + 1)).fd (G.mP (i + 1)).ν)
+                          → IsCuspFun (G.P i).V (fun h =>
+                            ∫ g in (G.mP (i + 1)).fd, thetaKO (G.dn i).ω g h Φ * φ g ∂(G.mP (i + 1)).ν) :=
+  _root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal_of_integrable
+    _root_.GlobalTheory.T.twisted_form_downward_growth_bound
+    _root_.GlobalTheory.T.twisted_form_downward_approximation
 end GlobalTheory.DnCusp
 end
 end
 
 section
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField MeasureTheory GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.StdFrames GlobalTheory.RowClaim GlobalTheory.FlipRun
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.twisted_downward_theta_lift_isCuspidal : GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal → _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (D : D7), GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D → ∀ (G₀ : Type) [Group G₀] [Fintype G₀] (Pl0 T : Type) (A : FamIn D.what₂.LL G₀ Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (G : GlobalTheory.Grid.GridPre R), GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.RowBase R → G.Is → ∀ i, i < D.R.m → ∀ Φ, IsThetaFunO R.ψ (GlobalTheory.Grid.neg (G.P (i + 1)).V) (G.P i).V Φ → ∀ φ, GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.IsCuspOfType R.θ (G.P (i + 1)) φ → (∀ h, IntegrableOn (fun g => thetaKO (G.dn i).ω g h Φ * φ g) (G.mP (i + 1)).fd (G.mP (i + 1)).ν) → IsCuspFun (G.P i).V (fun h => ∫ g in (G.mP (i + 1)).fd, thetaKO (G.dn i).ω g h Φ * φ g ∂(G.mP (i + 1)).ν) := by
-  first | exact @_root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal | exact _root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal | (intros; apply _root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal <;> assumption)
+theorem _root_.GlobalTheory.T.twisted_downward_theta_lift_isCuspidal
+    : GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.LiftsCuspidal
+      → _root_.GlobalTheory.FunPr.ThetaLocalInputs
+      → ∀ (D : D7),
+        GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.Sizes D
+          → ∀ (G₀ : Type) [Group G₀] [Fintype G₀] (Pl0 T : Type)
+              (A : FamIn D.what₂.LL G₀ Pl0 T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks]
+              [Algebra Ks D.what₂.LL] (R : RealDat D A Ks) (G : GlobalTheory.Grid.GridPre R),
+            GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.RowBase R → G.Is
+              → ∀ i,
+                i < D.R.m
+                  → ∀ Φ,
+                    IsThetaFunO R.ψ (GlobalTheory.Grid.neg (G.P (i + 1)).V) (G.P i).V Φ
+                      → ∀ φ,
+                        GlobalTheory.IndefiniteRowSideFullHecke.CuspAlongSmoothLifts.IsCuspOfType
+                            R.θ (G.P (i + 1)) φ
+                          → (∀ h,
+                            IntegrableOn
+                              (fun g => thetaKO (G.dn i).ω g h Φ * φ g)
+                              (G.mP (i + 1)).fd (G.mP (i + 1)).ν)
+                          → IsCuspFun (G.P i).V (fun h =>
+                            ∫ g in (G.mP (i + 1)).fd, thetaKO (G.dn i).ω g h Φ * φ g ∂(G.mP (i + 1)).ν) :=
+  by
+    first
+    | exact @_root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal
+    | exact _root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal
+    | (intros; apply _root_.GlobalTheory.DnCusp.downward_theta_lift_isCuspidal <;> assumption)
 end

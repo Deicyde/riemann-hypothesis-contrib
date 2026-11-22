@@ -12,10 +12,11 @@ open scoped WithZero TensorProduct
 
 namespace GlobalTheory.CNorm
 
-theorem exists_place_valuation_aut (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E]
-    [Algebra F E] (σ : E ≃ₐ[F] E) (w : HeightOneSpectrum (𝓞 E)) :
-    ∃ w' : HeightOneSpectrum (𝓞 E), w'.under (𝓞 F) = w.under (𝓞 F) ∧
-      ∀ y : E, w'.valuation E y = w.valuation E (σ y) := by
+theorem exists_place_valuation_aut
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E ≃ₐ[F] E) (w : HeightOneSpectrum (𝓞 E))
+    : ∃ w' : HeightOneSpectrum (𝓞 E),
+      w'.under (𝓞 F) = w.under (𝓞 F) ∧ ∀ y : E, w'.valuation E y = w.valuation E (σ y) := by
   set e : 𝓞 E ≃+* 𝓞 E := RingOfIntegers.mapRingEquiv σ.toRingEquiv with he
   have hc : ∀ x : 𝓞 E, ((e x : 𝓞 E) : E) = σ (x : E) := fun x => rfl
   have hfix : ∀ a : 𝓞 F, e (algebraMap (𝓞 F) (𝓞 E) a) = algebraMap (𝓞 F) (𝓞 E) a := by
@@ -31,7 +32,14 @@ theorem exists_place_valuation_aut (F E : Type) [Field F] [NumberField F] [Field
   · intro y
     exact valuation_of_eq_comap σ.toRingEquiv w _ rfl y
 
-theorem sUnits_over_and_aut : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [IsGalois F E] (S : Finset (HeightOneSpectrum (𝓞 F))) (SE : Finset (HeightOneSpectrum (𝓞 E))), (∀ w : HeightOneSpectrum (𝓞 E), w ∈ SE ↔ w.under (𝓞 F) ∈ S) → (∀ x : Fˣ, Units.map (algebraMap F E : F →* E) x ∈ sUnits E SE ↔ x ∈ sUnits F S) ∧ ∀ (τ : E ≃ₐ[F] E) (y : Eˣ), y ∈ sUnits E SE → Units.map (τ : E →* E) y ∈ sUnits E SE := by
+theorem sUnits_over_and_aut
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        [IsGalois F E] (S : Finset (HeightOneSpectrum (𝓞 F)))
+        (SE : Finset (HeightOneSpectrum (𝓞 E))),
+      (∀ w : HeightOneSpectrum (𝓞 E), w ∈ SE ↔ w.under (𝓞 F) ∈ S)
+        → (∀ x : Fˣ, Units.map (algebraMap F E : F →* E) x ∈ sUnits E SE ↔ x ∈ sUnits F S)
+          ∧ ∀ (τ : E ≃ₐ[F] E) (y : Eˣ),
+            y ∈ sUnits E SE → Units.map (τ : E →* E) y ∈ sUnits E SE := by
   intro F E _ _ _ _ _ _ S SE hS
   obtain ⟨-, hup, hval⟩ := places_over F E
   refine ⟨fun x => ⟨fun h => ?_, fun h => ?_⟩, fun σ y hy => ?_⟩

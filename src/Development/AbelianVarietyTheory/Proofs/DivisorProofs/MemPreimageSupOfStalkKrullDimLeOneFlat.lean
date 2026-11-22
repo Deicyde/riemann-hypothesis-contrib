@@ -7,15 +7,21 @@ public import Development.AbelianVarietyTheory.Definitions.ThetaMetrics.IsAmpleL
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.EndOnTorsion
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.EndOnTorsion
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.CodimOne
 
-theorem mem_preimage_sup_of_ringKrullDim_stalk_le_one :
-    ∀ (X S : Scheme.{0}) [IsIntegral S] (f : X ⟶ S) [Flat f] [GeometricallyIntegral f] (V : X.Opens) (U : S.Opens), (∀ s : S, ∃ x ∈ V, f x = s) → (U : Set S).Nonempty → (∀ z : X, ringKrullDim ((X).presheaf.stalk z) ≤ 1 → z ∈ f ⁻¹ᵁ U ⊔ V) := by
+theorem mem_preimage_sup_of_ringKrullDim_stalk_le_one
+    : ∀ (X S : Scheme.{0}) [IsIntegral S] (f : X ⟶ S) [Flat f] [GeometricallyIntegral f]
+        (V : X.Opens) (U : S.Opens),
+      (∀ s : S, ∃ x ∈ V, f x = s) → (U : Set S).Nonempty
+        → (∀ z : X, ringKrullDim ((X).presheaf.stalk z) ≤ 1 → z ∈ f ⁻¹ᵁ U ⊔ V) := by
   intro X S _ f _ _ V U hV hU z hz
   by_contra hzm
   have hzU : f z ∉ U := fun h => hzm (Or.inl h)
@@ -48,7 +54,9 @@ theorem mem_preimage_sup_of_ringKrullDim_stalk_le_one :
     have a := Order.coheight_add_one_le h1
     have b := Order.coheight_add_one_le h2
     have : (1 : ℕ∞) + 1 ≤ Order.coheight ζ + 1 + 1 := by gcongr; exact le_add_self
-    calc (2 : ℕ∞) = 1 + 1 := by norm_num
+    calc
+      (2 : ℕ∞)
+        = 1 + 1 := by norm_num
       _ ≤ Order.coheight ζ + 1 + 1 := this
       _ ≤ Order.coheight ξ + 1 := by gcongr
       _ ≤ Order.coheight z := a

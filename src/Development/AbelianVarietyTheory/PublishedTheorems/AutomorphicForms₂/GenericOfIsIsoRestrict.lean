@@ -13,12 +13,11 @@ open CategoryTheory AlgebraicGeometry TopologicalSpace
 
 namespace GlobalTheory.Published
 
-
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
-theorem _root_.GlobalTheory.Published.generic_of_isIso_restrict {X X' : Scheme.{0}} [IsIntegral X]
-    [IsIntegral X'] (π : X' ⟶ X) (U : X.Opens)
-    (hU : (U : Set X).Nonempty) [IsIso (π ∣_ U)] :
-    π (genericPoint X') = genericPoint X ∧ π.residueDegree (genericPoint X') = 1 := by
+theorem _root_.GlobalTheory.Published.generic_of_isIso_restrict
+    {X X' : Scheme.{0}} [IsIntegral X] [IsIntegral X']
+    (π : X' ⟶ X) (U : X.Opens) (hU : (U : Set X).Nonempty) [IsIso (π ∣_ U)]
+    : π (genericPoint X') = genericPoint X ∧ π.residueDegree (genericPoint X') = 1 := by
   have hrange : (U : Set X) ⊆ Set.range π := by
     intro y hy
     obtain ⟨x, hx⟩ := (ConcreteCategory.bijective_of_isIso ((π ∣_ U).base)).2 ⟨y, hy⟩
@@ -42,15 +41,17 @@ theorem _root_.GlobalTheory.Published.generic_of_isIso_restrict {X X' : Scheme.{
     rw [Scheme.Opens.range_ι]; exact hmem
   have h1 := _root_.GlobalTheory.CurveDegreesCompare.residueDegree_comp (π ∣_ U) U.ι x
   have h2 := _root_.GlobalTheory.CurveDegreesCompare.residueDegree_comp (π ⁻¹ᵁ U).ι π x
-  rw [morphismRestrict_ι, h2, _root_.GlobalTheory.CurveDegreesCompare.residueDegree_of_isOpenImmersion (π ⁻¹ᵁ U).ι,
-    _root_.GlobalTheory.CurveDegreesCompare.residueDegree_of_isOpenImmersion U.ι,
-    _root_.GlobalTheory.CurveDegreesCompare.residueDegree_of_isOpenImmersion (π ∣_ U), hx] at h1
+  rw [morphismRestrict_ι, h2,
+      _root_.GlobalTheory.CurveDegreesCompare.residueDegree_of_isOpenImmersion (π ⁻¹ᵁ U).ι,
+      _root_.GlobalTheory.CurveDegreesCompare.residueDegree_of_isOpenImmersion U.ι,
+      _root_.GlobalTheory.CurveDegreesCompare.residueDegree_of_isOpenImmersion (π ∣_ U), hx]
+    at h1
   simpa using h1
 
-
 open CategoryTheory AlgebraicGeometry TopologicalSpace in
-theorem _root_.GlobalTheory.Published.arBirational_of_arProj (H : _root_.GlobalTheory.Published.ArProj) :
-    _root_.GlobalTheory.Published.ArBirational := by
+theorem _root_.GlobalTheory.Published.arBirational_of_arProj
+    (H : _root_.GlobalTheory.Published.ArProj)
+    : _root_.GlobalTheory.Published.ArBirational := by
   intro k _ X X' _ _ p p' D hp hp' _ _ π hπ U hU hiso L a hL
   obtain ⟨hgen, hdeg⟩ := _root_.GlobalTheory.Published.generic_of_isIso_restrict π U hU
   have := (H k X X' p p' D hp hp' π hπ hgen (by rw [hdeg]; exact one_ne_zero)).1 L a hL

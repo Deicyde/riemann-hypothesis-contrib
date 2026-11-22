@@ -21,7 +21,8 @@ open Formalism.L2.Th1.H (localStandard kappaExists)
 
 theorem frameExistsH : FrameExistsH := FrP.hermFrame_holds
 
-theorem uniformGaussModels_fact_variant : ThetaFourthPowerShapeNormalised := theta_kappa_shape_holds localStandard kappaExists
+theorem uniformGaussModels_fact_variant : ThetaFourthPowerShapeNormalised :=
+  theta_kappa_shape_holds localStandard kappaExists
 
 theorem frobExistsH : FrobExistsH := by
   intro l _ hl

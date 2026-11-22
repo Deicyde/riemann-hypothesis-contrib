@@ -9,14 +9,18 @@ noncomputable section
 
 namespace Formalism.L2.Pj
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps ReciprocityTheory.ChartRestriction.G.Geo.Tor TensorProduct
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.WeightAlgebra Formalism.MainNotions.Gaps.EtaleWeightGaps
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor TensorProduct
 
 section Gen
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-  {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : Host E} {Dw : Datum H} {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
 
-def evCAlg (hG : GenFrEx Xo c) (hT : GenFromTest Xo c hG) (Z : Comp Xo c) : Rul Xo c →ₐ[c.F] Om Z where
+def evCAlg (hG : GenFrEx Xo c) (hT : GenFromTest Xo c hG) (Z : Comp Xo c)
+    : Rul Xo c →ₐ[c.F] Om Z where
   toFun := evC hG Z
   map_one' := evalAt_one _ _ (genFr hG Z) (hT Z)
   map_mul' f g := evalAt_mul _ _ f g (genFr hG Z)
@@ -35,8 +39,12 @@ end Gen
 
 section Rec
 
-variable {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ} (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO))
-  (N : ℕ) (Ω : Type) [CommRing Ω] [Algebra B.KO Ω] (gF : X.Forms →ₐ[B.KO] Ω)
+variable
+  {D : D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+  (X : PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO))
+  (N : ℕ)
+  (Ω : Type) [CommRing Ω] [Algebra B.KO Ω]
+  (gF : X.Forms →ₐ[B.KO] Ω)
 
 abbrev RZ : Type := Kp X la N ⊗[X.Kl la] (X.Kl la ⊗[B.KO] Ω)
 
@@ -52,10 +60,12 @@ lemma rzMap_emb (F : X.Forms) :
 
 variable {wL : WeightFamilies.Wt D j} (w : Fin N → B.Cusp j wL)
 
-abbrev RZs : Type := Localization.Away (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))
+abbrev RZs : Type :=
+  Localization.Away (rzMap X la N Ω gF (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0))
 
 def lwZ : Lw X la w →+* RZs X la N Ω gF w :=
-  Localization.awayMap (rzMap X la N Ω gF).toRingHom (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0)
+  Localization.awayMap (rzMap X la N Ω gF).toRingHom
+    (Formalism.MainNotions.Gaps.EtaleWeightGaps.sec X la w 0)
 
 lemma lwZ_alg (r : Rp X la N) :
     lwZ X la N Ω gF w (algebraMap (Rp X la N) (Lw X la w) r) =
@@ -68,8 +78,8 @@ def phiZ : ↥(Frac0 X la w) →ₐ[Kp X la N] RZs X la N Ω gF w where
   toRingHom := (lwZ X la N Ω gF w).comp (Frac0 X la w).val.toRingHom
   commutes' k := by
     show lwZ X la N Ω gF w (algebraMap (Kp X la N) (Lw X la w) k) = _
-    rw [IsScalarTower.algebraMap_apply (Kp X la N) (Rp X la N) (Lw X la w), lwZ_alg, AlgHom.commutes,
-      ← IsScalarTower.algebraMap_apply]
+    rw [IsScalarTower.algebraMap_apply (Kp X la N) (Rp X la N) (Lw X la w), lwZ_alg,
+      AlgHom.commutes, ← IsScalarTower.algebraMap_apply]
 
 lemma phiZ_apply (x : ↥(Frac0 X la w)) : phiZ X la N Ω gF w x = lwZ X la N Ω gF w (x : Lw X la w) := rfl
 
@@ -77,8 +87,10 @@ end Rec
 
 section Inst
 
-variable {D : D7} {T : Top D} (j : ℕ)
-  (hG : GenFrEx (T.Q.Xo j) T.Q.c) (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) (Z : Comp (T.Q.Xo j) T.Q.c)
+variable
+  {D : D7} {T : Top D}
+  (j : ℕ) (hG : GenFrEx (T.Q.Xo j) T.Q.c)
+  (hT : GenFromTest (T.Q.Xo j) T.Q.c hG) (Z : Comp (T.Q.Xo j) T.Q.c)
 
 def formsEvR : AddMonoidAlgebra (T.R j) (Deg D j) →ₐ[T.Q.c.F] Om Z :=
   AddMonoidAlgebra.liftNCAlgHom (evCAlg hG hT Z) 1 (fun _ _ => Commute.all _ _)

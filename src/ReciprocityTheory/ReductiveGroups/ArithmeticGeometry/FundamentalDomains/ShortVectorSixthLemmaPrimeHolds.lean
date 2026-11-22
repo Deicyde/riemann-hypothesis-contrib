@@ -20,12 +20,15 @@ namespace ReciprocityTheory.ChartRestriction.G.FD
 variable {E : Type} [Field E] [NumberField E] [NumberField.IsCMField E]
 
 theorem flowCoefficientDecay : FlowCoefficientDecay (E := E) :=
-  flow_coefficient_decay_holds unipotent_vector_group unipotent_lattice_lift fourier_coefficients_holds fourier_coefficient_support_holds holomorphic_periodicity_extension
+  flow_coefficient_decay_holds unipotent_vector_group unipotent_lattice_lift
+    fourier_coefficients_holds fourier_coefficient_support_holds holomorphic_periodicity_extension
 
 theorem coefficientIndex_lowerBound : CoefficientIndexLowerBound (E := E) :=
-  coefficient_index_lower_bound unipotent_lattice_lift fourier_coefficient_support_holds nonvanishing_coefficient_positivity
+  coefficient_index_lower_bound unipotent_lattice_lift fourier_coefficient_support_holds
+    nonvanishing_coefficient_positivity
 
 theorem coefficientHeight_bound : CoefficientHeightBound (E := E) :=
-  coefficient_height_bound_of_lift_support_positivity unipotent_lattice_lift fourier_coefficient_support_holds nonvanishing_coefficient_positivity
+  coefficient_height_bound_of_lift_support_positivity unipotent_lattice_lift
+    fourier_coefficient_support_holds nonvanishing_coefficient_positivity
 
 end ReciprocityTheory.ChartRestriction.G.FD

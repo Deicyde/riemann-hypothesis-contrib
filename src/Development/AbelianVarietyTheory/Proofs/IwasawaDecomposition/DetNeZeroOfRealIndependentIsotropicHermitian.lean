@@ -6,30 +6,40 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.SpanP
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj GlobalTheory GlobalTheory.Toroidal GlobalTheory.ShFam GlobalTheory.ShFam.Pad
+  GlobalTheory.ShFam.Hor GlobalTheory.ShFam.Hor.LogCh
 open scoped Matrix CategoryTheory.Obj Topology
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory
 
-theorem det_ne_zero_of_real_indep_isotropic : ∀ (g : ℕ) (Hm : Matrix (Fin g) (Fin g) ℂ) (E : Fin g → Fin g → ℂ), (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) → LinearIndependent ℝ E → (∀ i j, (hermForm Hm (E i) (E j)).im = 0) → (Matrix.of fun k i => E i k).det ≠ 0 := by
+theorem det_ne_zero_of_real_indep_isotropic
+    : ∀ (g : ℕ) (Hm : Matrix (Fin g) (Fin g) ℂ) (E : Fin g → Fin g → ℂ),
+      (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) → LinearIndependent ℝ E
+        → (∀ i j, (hermForm Hm (E i) (E j)).im = 0)
+        → (Matrix.of fun k i => E i k).det ≠ 0 := by
   intro g Hm E hpos hind him
-  have hL : ∀ (a : Fin g → ℝ) (w : Fin g → ℂ), hermForm Hm (∑ i, (a i : ℂ) • E i) w
-      = ∑ i, (a i : ℂ) * hermForm Hm (E i) w := by
+  have hL
+      : ∀ (a : Fin g → ℝ) (w : Fin g → ℂ),
+        hermForm Hm (∑ i, (a i : ℂ) • E i) w = ∑ i, (a i : ℂ) * hermForm Hm (E i) w := by
     intro a w
     simp only [hermForm, sum_dotProduct, smul_dotProduct, smul_eq_mul]
-  have hR : ∀ (b : Fin g → ℝ) (z : Fin g → ℂ), hermForm Hm z (∑ j, (b j : ℂ) • E j)
-      = ∑ j, (b j : ℂ) * hermForm Hm z (E j) := by
+  have hR
+      : ∀ (b : Fin g → ℝ) (z : Fin g → ℂ),
+        hermForm Hm z (∑ j, (b j : ℂ) • E j) = ∑ j, (b j : ℂ) * hermForm Hm z (E j) := by
     intro b z
     have hs : star (∑ j, (b j : ℂ) • E j) = ∑ j, (b j : ℂ) • star (E j) := by
       rw [star_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       ext k
       simp
-    simp only [hermForm, hs, Matrix.mulVec_sum, Matrix.mulVec_smul, dotProduct_sum, dotProduct_smul, smul_eq_mul]
-  have him0 : ∀ a b : Fin g → ℝ,
-      (hermForm Hm (∑ i, (a i : ℂ) • E i) (∑ j, (b j : ℂ) • E j)).im = 0 := by
+    simp only [hermForm, hs, Matrix.mulVec_sum, Matrix.mulVec_smul, dotProduct_sum, dotProduct_smul,
+      smul_eq_mul]
+  have him0
+      : ∀ a b : Fin g → ℝ, (hermForm Hm (∑ i, (a i : ℂ) • E i) (∑ j, (b j : ℂ) • E j)).im = 0 := by
     intro a b
     rw [hL]
     simp only [hR, Finset.mul_sum, Complex.im_sum]
@@ -51,7 +61,9 @@ theorem det_ne_zero_of_real_indep_isotropic : ∀ (g : ℕ) (Hm : Matrix (Fin g)
   have hC : LinearIndependent ℂ E := by
     rw [Fintype.linearIndependent_iff]
     intro c hc
-    have hsplit : (∑ i, (((c i).re : ℝ) : ℂ) • E i) + Complex.I • (∑ i, (((c i).im : ℝ) : ℂ) • E i) = 0 := by
+    have hsplit
+        : (∑ i, (((c i).re : ℝ) : ℂ) • E i) + Complex.I • (∑ i, (((c i).im : ℝ) : ℂ) • E i)
+          = 0 := by
       rw [← hc, Finset.smul_sum, ← Finset.sum_add_distrib]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [smul_smul, ← add_smul]

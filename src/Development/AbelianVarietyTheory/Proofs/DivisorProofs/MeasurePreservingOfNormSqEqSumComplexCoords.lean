@@ -10,17 +10,18 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-private theorem measurePreserving_piCurry_symm_fin_two (ι : Type) [Fintype ι] :
-    MeasurePreserving (MeasurableEquiv.piCurry (fun (_ : ι) (_ : Fin 2) => ℝ)).symm
-      volume volume := by
+private theorem measurePreserving_piCurry_symm_fin_two (ι : Type) [Fintype ι]
+    : MeasurePreserving (MeasurableEquiv.piCurry (fun (_ : ι) (_ : Fin 2) => ℝ)).symm volume
+      volume := by
   classical
   refine ⟨(MeasurableEquiv.piCurry _).symm.measurable, ?_⟩
   symm
   rw [volume_pi]
   refine Measure.pi_eq fun s hs => ?_
   rw [(MeasurableEquiv.piCurry _).symm.map_apply]
-  have hpre : (MeasurableEquiv.piCurry (fun (_ : ι) (_ : Fin 2) => ℝ)).symm ⁻¹' Set.univ.pi s =
-      Set.univ.pi fun i => Set.univ.pi fun k => s ⟨i, k⟩ := by
+  have hpre
+      : (MeasurableEquiv.piCurry (fun (_ : ι) (_ : Fin 2) => ℝ)).symm ⁻¹' Set.univ.pi s
+        = Set.univ.pi fun i => Set.univ.pi fun k => s ⟨i, k⟩ := by
     ext x
     simp [Set.mem_pi, Sigma.forall, MeasurableEquiv.coe_piCurry_symm, Sigma.uncurry]
   rw [hpre, volume_pi_pi]
@@ -29,8 +30,10 @@ private theorem measurePreserving_piCurry_symm_fin_two (ι : Type) [Fintype ι] 
 
 theorem measurePreserving_of_norm_sq_eq_sum_complex_coords
     (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-    [MeasurableSpace V] [BorelSpace V] (ι : Type) [Fintype ι] (e : V ≃L[ℝ] (ι → ℂ))
-    (he : ∀ v, ‖v‖ ^ 2 = ∑ i, ‖e v i‖ ^ 2) : MeasurePreserving e volume volume := by
+    [MeasurableSpace V] [BorelSpace V]
+    (ι : Type) [Fintype ι]
+    (e : V ≃L[ℝ] (ι → ℂ)) (he : ∀ v, ‖v‖ ^ 2 = ∑ i, ‖e v i‖ ^ 2)
+    : MeasurePreserving e volume volume := by
   classical
   let Φ : (ι → ℂ) ≃ₗ[ℝ] EuclideanSpace ℝ (Σ _ : ι, Fin 2) :=
     (LinearEquiv.piCongrRight fun _ => Complex.basisOneI.equivFun).trans
@@ -45,18 +48,19 @@ theorem measurePreserving_of_norm_sq_eq_sum_complex_coords
       Matrix.cons_val_one, Real.norm_eq_abs, sq_abs]
     rw [Complex.sq_norm, Complex.normSq_apply]
     ring
-  let F : V ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Σ _ : ι, Fin 2) :=
-    { toLinearEquiv := e.toLinearEquiv.trans Φ
-      norm_map' := fun v => by
-        have h : ‖Φ (e v)‖ ^ 2 = ‖v‖ ^ 2 := by rw [hΦ, he]
-        exact (pow_left_inj₀ (norm_nonneg _) (norm_nonneg _) two_ne_zero).1 h }
+  let F : V ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Σ _ : ι, Fin 2) := {
+    toLinearEquiv := e.toLinearEquiv.trans Φ
+    norm_map' := fun v => by
+      have h : ‖Φ (e v)‖ ^ 2 = ‖v‖ ^ 2 := by rw [hΦ, he]
+      exact (pow_left_inj₀ (norm_nonneg _) (norm_nonneg _) two_ne_zero).1 h
+  }
   let G : (ι → ℂ) ≃ᵐ EuclideanSpace ℝ (Σ _ : ι, Fin 2) :=
     (MeasurableEquiv.piCongrRight fun _ => Complex.measurableEquivPi).trans
-      ((MeasurableEquiv.piCurry fun (_ : ι) (_ : Fin 2) => ℝ).symm.trans
-        (MeasurableEquiv.toLp 2 _))
+      ((MeasurableEquiv.piCurry fun (_ : ι) (_ : Fin 2) => ℝ).symm.trans (MeasurableEquiv.toLp 2 _))
   have hG : MeasurePreserving G volume volume :=
-    (PiLp.volume_preserving_toLp _).comp ((measurePreserving_piCurry_symm_fin_two ι).comp
-      (volume_preserving_pi fun _ => Complex.volume_preserving_equiv_pi))
+    (PiLp.volume_preserving_toLp _).comp
+      ((measurePreserving_piCurry_symm_fin_two ι).comp
+        (volume_preserving_pi fun _ => Complex.volume_preserving_equiv_pi))
   have hFG : (F : V → EuclideanSpace ℝ (Σ _ : ι, Fin 2)) = G ∘ e := by
     funext v
     rfl

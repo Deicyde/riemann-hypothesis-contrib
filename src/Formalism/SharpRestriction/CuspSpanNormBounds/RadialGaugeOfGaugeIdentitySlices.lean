@@ -40,7 +40,8 @@ section PartSl1
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 section Head
 
@@ -48,7 +49,8 @@ variable (k j r' : ℕ)
 
 variable {k j r'}
 
-variable (z z' : Fin (2 * (j + r') + k + 1) → ℂ) (h : Matrix (Fin j) (Fin j) ℂ)
+variable
+  (z z' : Fin (2 * (j + r') + k + 1) → ℂ) (h : Matrix (Fin j) (Fin j) ℂ)
   (g : Matrix (Fin (2 * r' + k + 1)) (Fin (2 * r' + k + 1)) ℂ)
 
 end Head
@@ -61,7 +63,8 @@ section PartSl2
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -71,7 +74,8 @@ section PartSl3
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Formalism.MainNotions.S.GramWordSpace Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Formalism.MainNotions.S.GramWordSpace Matrix
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -81,7 +85,8 @@ section PartT22
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -103,7 +108,8 @@ section PartT22b
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
@@ -115,13 +121,15 @@ section PartBlk
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 section GlobalTheory
 
 variable {k j r' : ℕ}
 
-variable (o o' : Matrix (Fin (2 * (j + r') + k + 1)) (Fin (2 * (j + r') + k + 1)) ℂ)
+variable
+  (o o' : Matrix (Fin (2 * (j + r') + k + 1)) (Fin (2 * (j + r') + k + 1)) ℂ)
   (g g' : Matrix (Fin (2 * r' + k + 1)) (Fin (2 * r' + k + 1)) ℂ)
 
 end GlobalTheory
@@ -134,7 +142,8 @@ section PartLv
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 section Lv
 
@@ -150,7 +159,8 @@ section PartHd
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -171,7 +181,8 @@ section PartBc
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 variable {k r' : ℕ}
 
@@ -183,7 +194,8 @@ section PartSlI
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -208,7 +220,8 @@ section PartSlJ
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -221,7 +234,8 @@ section PartRp
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -249,7 +263,8 @@ noncomputable section PartWd2
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -294,7 +309,8 @@ noncomputable section PartWd4
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -304,7 +320,8 @@ noncomputable section PartWd6
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -317,7 +334,8 @@ noncomputable section PartWd8
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA
 open scoped ContDiff
 
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
@@ -360,7 +378,8 @@ section PartLc
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.UnitaryLevelOperators Matrix
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.UnitaryLevelOperators Matrix
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -372,7 +391,8 @@ section PartFr1
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.LevR
 
 section Abstract
 
@@ -390,7 +410,8 @@ section PartFr2
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR Formalism.MainNotions.InterlacingSignCuts
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.LevR Formalism.MainNotions.InterlacingSignCuts
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -416,7 +437,9 @@ section PartFr5
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Polynomial Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR Formalism.MainNotions.S.UnitaryLevelOperators
+open Polynomial Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR
+  Formalism.MainNotions.S.UnitaryLevelOperators
 
 section Rat
 
@@ -426,8 +449,9 @@ end Rat
 
 section Ee
 
-variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E] {B : Base E} {r : ℕ} (C : Ctx B r)
-  (SS : Fin B.k0 → (Fin (r + 1) → ℂ) → E →L[ℂ] E)
+variable
+  {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+  {B : Base E} {r : ℕ} (C : Ctx B r) (SS : Fin B.k0 → (Fin (r + 1) → ℂ) → E →L[ℂ] E)
 
 variable {C SS}
 
@@ -459,7 +483,8 @@ section PartFr9
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA Formalism.MainNotions.S.LevR Formalism.MainNotions.S.UnitaryLevelOperators
+open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+  Formalism.MainNotions.S.LevR Formalism.MainNotions.S.UnitaryLevelOperators
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -514,19 +539,27 @@ open Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions
 attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 theorem lb_haarG : Formalism.FourierDecayAlt.B2.HaarGExists :=
-  (Formalism.FourierDecayAlt.P.group_measure_from_diagonal Formalism.REAL.uJEmb Formalism.REAL.unimodular Formalism.REAL.ballFinite Formalism.REAL.volGrowth
-    Formalism.QuantumDeterminants.hpkFacts Formalism.QuantumDeterminants.uHConj Formalism.FourierDecayAlt.P.haar_measure_unique_up_to_scalar Formalism.FourierDecayAlt.P.unitary_group_closed).1
+  (Formalism.FourierDecayAlt.P.group_measure_from_diagonal Formalism.REAL.uJEmb
+    Formalism.REAL.unimodular Formalism.REAL.ballFinite Formalism.REAL.volGrowth
+    Formalism.QuantumDeterminants.hpkFacts Formalism.QuantumDeterminants.uHConj
+    Formalism.FourierDecayAlt.P.haar_measure_unique_up_to_scalar
+    Formalism.FourierDecayAlt.P.unitary_group_closed).1
 
 def lbHaarUp : Prop :=
-  (∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (μ : Measure (Mt k r)), inWb k r z → 0 < Tz k r z →
-    Formalism.MainNotions.S.IsHaarOn (UWset k r z) μ → Formalism.FourierDecayAlt.B.IsHaarOn (UWset k r z) μ) ∧
-  ∀ (k r : ℕ) (μ : Measure (Mt k r)), Formalism.MainNotions.S.IsHaarOn (Nset k r) μ → Formalism.FourierDecayAlt.B.IsHaarOn (Nset k r) μ
+  (∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (μ : Measure (Mt k r)),
+      inWb k r z → 0 < Tz k r z → Formalism.MainNotions.S.IsHaarOn (UWset k r z) μ
+        → Formalism.FourierDecayAlt.B.IsHaarOn (UWset k r z) μ)
+    ∧ ∀ (k r : ℕ) (μ : Measure (Mt k r)),
+      Formalism.MainNotions.S.IsHaarOn (Nset k r) μ
+        → Formalism.FourierDecayAlt.B.IsHaarOn (Nset k r) μ
 
 def lbRepOfHC : Prop :=
-  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-    (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)), inWb k r z → 0 < Tz k r z →
-    Formalism.MainNotions.S.IsHCTypeW k r z u π →
-      IsCRepOn (UWset k r z) π ∧ (∀ h ∈ UWset k r z, ∀ v, ‖π h v‖ = ‖v‖) ∧ ContinuousOn π (UWset k r z)
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ) (H : Type) [NormedAddCommGroup H]
+      [InnerProductSpace ℂ H]
+      (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)),
+    inWb k r z → 0 < Tz k r z → Formalism.MainNotions.S.IsHCTypeW k r z u π
+      → IsCRepOn (UWset k r z) π ∧ (∀ h ∈ UWset k r z, ∀ v, ‖π h v‖ = ‖v‖)
+        ∧ ContinuousOn π (UWset k r z)
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -546,7 +579,8 @@ section PartLb6
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.QuantumDeterminants Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -558,7 +592,8 @@ open MeasureTheory
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.QuantumDeterminants Formalism.MainNotions Formalism.MainNotions.S Formalism.MainNotions.S.TopsChoicePartA
+open Formalism.QuantumDeterminants Formalism.MainNotions Formalism.MainNotions.S
+  Formalism.MainNotions.S.TopsChoicePartA
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -575,7 +610,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt.TA Formalism.MainNotions.InterlacingSignCuts
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms
+  Formalism.FourierDecayAlt.TA Formalism.MainNotions.InterlacingSignCuts
 
 attribute [local instance] Classical.propDecidable
 
@@ -606,7 +642,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.MainNotions.InterlacingSignCuts
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms
+  Formalism.MainNotions.InterlacingSignCuts
 
 section Lattices
 
@@ -645,7 +682,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.MainNotions.InterlacingSignCuts
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.MainNotions.InterlacingSignCuts
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -662,26 +700,39 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt.TA Formalism.MainNotions.InterlacingSignCuts
+open Formalism.BasicNotions Formalism.QuantumDeterminants Formalism.MainNotions.S
+  Formalism.MainNotions.S.LocalFrameAxioms Formalism.FourierDecayAlt.TA
+  Formalism.MainNotions.InterlacingSignCuts
 
 attribute [local instance] Classical.propDecidable
 
-def ThmAHyp (D : D7) (C : ℝ) (Kst : ℕ) (δ : D.host.E) (T T' : ℝ) (x : D.what₂.Tau → LocalDataRealPlace D) (L : LatticeDataWithDual D) (Kd : KernelData D)
+def ThmAHyp
+    (D : D7)
+    (C : ℝ) (Kst : ℕ) (δ : D.host.E) (T T' : ℝ) (x : D.what₂.Tau → LocalDataRealPlace D)
+    (L : LatticeDataWithDual D) (Kd : KernelData D)
     (B : D.what₂.Tau → LocBessel D.R.k D.R.rS)
-    (f : ∀ v, Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ → ((B v).Wq →L[ℂ] (B v).Wp))
-    (μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ) : Prop :=
-  4 ≤ Kst ∧ 1 ≤ D.host.v ∧ PsiAx D δ ∧ LatAx D δ L ∧ FrameAx D δ L B ∧ ArithAxF D L Kd ∧
-    (∀ v, LocMatch D T T' (x v) (B v) ∧ IsKFinCoefH (B v).σ (f v) ∧
-      IsSection D.R.k D.R.rS (B v).z (B v).z' (μsec v)) ∧
-    (∀ v, InterlaceS (k_le_nS D) (x v).u (x v).lam ∧ InterlaceS (k_le_nS D) (x v).u' (x v).lam) ∧
-    (∀ v, (x v).u ≠ (x v).u') ∧
-    (∀ v, GapAtLeast (epsSH D.R) (x v).lam
-      (C * (D.R.m : ℝ) ^ ((9 : ℝ) / 2) * (Nlet D Kst * (D.R.r : ℝ) ^ 2 + (D.R.r : ℝ) ^ 3))) ∧
-    (∀ v, IsCutS (x v).u (x v).u' (Set.Icc (x v).a (x v).b)) ∧
-    (∀ v, (x v).a ≤ (x v).a1 ∧ (x v).a1 ≤ (x v).b1 ∧ (x v).b1 ≤ (x v).b ∧
-      Nlet D Kst ^ 3 / 2 ≤ (x v).b1 - (x v).a1) ∧
-    (∀ v, C * ((D.R.k : ℝ) * Nlet D Kst * ((D.R.rS : ℝ) + 1) ^ 2 +
-        Nlet D Kst ^ 2 * ((D.R.rS : ℝ) + 1) ^ 2 + Nlet D Kst ^ 3) ≤ (x v).b - (x v).a)
+    (f : ∀ v,
+      Matrix (Fin (2 * D.R.rS + D.R.k + 1)) (Fin (2 * D.R.rS + D.R.k + 1)) ℂ
+        → ((B v).Wq →L[ℂ] (B v).Wp))
+    (μsec : D.what₂.Tau → ℂ → Matrix (Fin (D.R.k + 1)) (Fin (D.R.k + 1)) ℂ)
+    : Prop :=
+  4 ≤ Kst ∧ 1 ≤ D.host.v ∧ PsiAx D δ ∧ LatAx D δ L ∧ FrameAx D δ L B ∧ ArithAxF D L Kd
+    ∧ (∀ v,
+      LocMatch D T T' (x v) (B v) ∧ IsKFinCoefH (B v).σ (f v)
+        ∧ IsSection D.R.k D.R.rS (B v).z (B v).z' (μsec v))
+    ∧ (∀ v, InterlaceS (k_le_nS D) (x v).u (x v).lam ∧ InterlaceS (k_le_nS D) (x v).u' (x v).lam)
+    ∧ (∀ v, (x v).u ≠ (x v).u')
+    ∧ (∀ v,
+      GapAtLeast (epsSH D.R) (x v).lam
+        (C * (D.R.m : ℝ) ^ ((9 : ℝ) / 2) * (Nlet D Kst * (D.R.r : ℝ) ^ 2 + (D.R.r : ℝ) ^ 3)))
+    ∧ (∀ v, IsCutS (x v).u (x v).u' (Set.Icc (x v).a (x v).b))
+    ∧ (∀ v,
+      (x v).a ≤ (x v).a1 ∧ (x v).a1 ≤ (x v).b1 ∧ (x v).b1 ≤ (x v).b
+        ∧ Nlet D Kst ^ 3 / 2 ≤ (x v).b1 - (x v).a1)
+    ∧ (∀ v,
+      C * ((D.R.k : ℝ) * Nlet D Kst * ((D.R.rS : ℝ) + 1) ^ 2
+          + Nlet D Kst ^ 2 * ((D.R.rS : ℝ) + 1) ^ 2 + Nlet D Kst ^ 3)
+        ≤ (x v).b - (x v).a)
 
 end Formalism.MainNotions.BridgeLemma₅
 
@@ -712,7 +763,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.BridgeLemma₅
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms Formalism.MainNotions.InterlacingSignCuts
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.MainNotions.S.LocalFrameAxioms
+  Formalism.MainNotions.InterlacingSignCuts
 
 attribute [local instance] Classical.propDecidable
 

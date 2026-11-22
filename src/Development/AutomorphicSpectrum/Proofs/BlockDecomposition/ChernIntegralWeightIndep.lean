@@ -31,16 +31,18 @@ public import ReciprocityTheory.AnalyticForms.PotentialTheory.ProjectiveLinePart
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (nonzeroLocus)
 open GlobalTheory GlobalTheory.Cartier GlobalTheory.ProjVar GlobalTheory.CxPts
 open ReciprocityTheory.AnForm.M
 
 namespace GlobalTheory.CompanionTheory.ChernMass
 
-theorem chernInt_eq_of_isCInf : ∀ (Y : Var ℂ) (L : LB Y.X) (φ ψ : Weight Y.str (RingHom.id ℂ) L),
-    φ.IsCInf → ψ.IsCInf →
-      φ.chernInt Y.dim Set.univ (fun _ => 1) = ψ.chernInt Y.dim Set.univ (fun _ => 1) := by
+theorem chernInt_eq_of_isCInf
+    : ∀ (Y : Var ℂ) (L : LB Y.X) (φ ψ : Weight Y.str (RingHom.id ℂ) L),
+      φ.IsCInf → ψ.IsCInf
+        → φ.chernInt Y.dim Set.univ (fun _ => 1) = ψ.chernInt Y.dim Set.univ (fun _ => 1) := by
   intro Y L φ ψ hφ hψ
   have := CxPts.compactSpace (RingHom.id ℂ) Y.isProjOver
   have := CxPts.t2Space_cxPts_of_isProjOver (RingHom.id ℂ) Y.isProjOver
@@ -70,8 +72,16 @@ theorem chernInt_eq_of_isCInf : ∀ (Y : Var ℂ) (L : LB Y.X) (φ ψ : Weight Y
     isPotentialAdd _ _ _ (Weight.isPotential_locPot sφ) (isPotential_ofFun _ _ hvs)
   have hS : SameForm R.finAtlas ψ.locPot (φ.locPot + LocPot.ofFun v) :=
     ψ.sameForm_of_re (R := R) hA hQ fun x => by
-      refine ⟨pick φ.isLB x, mem_pick φ.isLB x, _, isOpen_ptsIn _, mem_pick φ.isLB x, fun _ => 0,
-        fun _ => differentiableOn_const (0 : ℂ), fun z hz => ?_⟩
+      refine ⟨
+        pick φ.isLB x,
+        mem_pick φ.isLB x,
+        _,
+        isOpen_ptsIn _,
+        mem_pick φ.isLB x,
+        fun _ => 0,
+        fun _ => differentiableOn_const (0 : ℂ),
+        fun z hz => ?_
+      ⟩
       have := hdiff _ z hz
       show ψ.φ _ z / 2 = (φ.φ _ z / 2 + v z) + _
       rw [← this]
@@ -82,7 +92,10 @@ theorem chernInt_eq_of_isCInf : ∀ (Y : Var ℂ) (L : LB Y.X) (φ ψ : Weight Y
     (Weight.chernInt_eq_mInt R hψ measurable_const).2
       (GlobalTheory.Published.ChernDegreeComplexModel.integrable Y ψ hψ),
     SameForm.mInt_eq (fun _ => hS) _]
-  exact (massIndep R.finAtlas (fun _ => φ.locPot) (fun _ => v)
-    (fun _ => Weight.isPotential_locPot sφ) (fun _ => hvs)).symm
+  exact (massIndep R.finAtlas
+    (fun _ => φ.locPot)
+    (fun _ => v)
+    (fun _ => Weight.isPotential_locPot sφ)
+    (fun _ => hvs)).symm
 
 end GlobalTheory.CompanionTheory.ChernMass

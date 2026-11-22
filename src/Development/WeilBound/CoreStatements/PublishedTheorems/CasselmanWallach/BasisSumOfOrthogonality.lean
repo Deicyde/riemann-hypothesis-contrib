@@ -39,7 +39,8 @@ lemma phi_eq {s : ℕ} {R x : ℝ} (hx : 0 ≤ x) (hxR : x < R) :
   have := inv_anti₀ h1 h2
   linarith
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V} {ι : Type} {b : Module.Basis ι ℂ V} {μ : ι → ℝ}
 
 lemma beta_add (A B : Module.End ℂ V) (v w : V) :
@@ -130,7 +131,8 @@ lemma key {κ c x₀ R : ℝ} {s : ℕ}
 
 end FormEigenMonotone
 
-theorem basis_form_sum_of_gain : A0 → FunctionalCalculusLaws → A12 → BasisSumAsFormValues → A13 := by
+theorem basis_form_sum_of_gain
+    : A0 → FunctionalCalculusLaws → A12 → BasisSumAsFormValues → A13 := by
   intro hA0 hA11 hA12 hA13a
   unfold A0 FunctionalCalculusLaws A12 BasisSumAsFormValues A13 ForBas ForMod at *
   intro n ε V i1 i2 E hM ι b μ hEB κ hκ c hc
@@ -146,70 +148,83 @@ theorem basis_form_sum_of_gain : A0 → FunctionalCalculusLaws → A12 → Basis
   · have hSe : ∀ i ∈ S, False := fun i hi => by
       have := (hS i).1 hi
       linarith [hEB.nonneg i]
-    rw [Finset.sum_eq_zero (s := S) (f := fun i => phiR s R (μ i) * ‖f (b i)‖ ^ 2)
+    rw [Finset.sum_eq_zero (s := S)
+        (f := fun i => phiR s R (μ i) * ‖f (b i)‖ ^ 2)
         (fun i hi => (hSe i hi).elim),
-      Finset.sum_eq_zero (s := S) (f := fun i => phiR s R (μ i) *
-        (∑ p ∈ nc ε, ‖f ((E p.1 p.2) (b i))‖ ^ 2 - (μ i - κ) * ‖f (b i)‖ ^ 2))
+      Finset.sum_eq_zero (s := S)
+        (f := fun i =>
+          phiR s R (μ i) * (∑ p ∈ nc ε, ‖f ((E p.1 p.2) (b i))‖ ^ 2 - (μ i - κ) * ‖f (b i)‖ ^ 2))
         (fun i hi => (hSe i hi).elim)]
     linarith
   · have hφS : ∀ i ∉ S, phiR s R (μ i) = 0 := fun i hi =>
       FormEigenMonotone.phi_zero hR (not_lt.mp fun h => hi ((hS i).2 h))
     obtain ⟨T', hST', hT'⟩ := hA13a n ε V E hM ι b μ hEB (phiR s R) S hφS
     have key1 := hT' f
-    have hstep : ∀ ν ∈ Finset.image μ T',
-        (phiR s R ν * (ν - κ + c) - (if ν < x₀ then x₀ + |κ| + c else 0)) *
-          ∑ j ∈ T' with μ j = ν, ‖f (b j)‖ ^ 2 ≤
-        (beta ε E (fc b μ (phiR s R)) (∑ j ∈ T' with μ j = ν, (starRingEnd ℂ) (f (b j)) • b j)
-            (∑ j ∈ T' with μ j = ν, (starRingEnd ℂ) (f (b j)) • b j)).re := by
+    have hstep
+        : ∀ ν ∈ Finset.image μ T',
+          (phiR s R ν * (ν - κ + c) - (if ν < x₀ then x₀ + |κ| + c else 0))
+              * ∑ j ∈ T' with μ j = ν, ‖f (b j)‖ ^ 2
+            ≤ (beta ε E (fc b μ (phiR s R)) (∑ j ∈ T' with μ j = ν, (starRingEnd ℂ) (f (b j)) • b j)
+              (∑ j ∈ T' with μ j = ν, (starRingEnd ℂ) (f (b j)) • b j)).re := by
       intro ν hν
       obtain ⟨j0, -, rfl⟩ := Finset.mem_image.1 hν
-      have hEig := FormEigenMonotone.eig_fib hEB.eig (μ j0) (T'.filter fun j => μ j = μ j0)
-        (fun j hj => (Finset.mem_filter.1 hj).2) (fun j => (starRingEnd ℂ) (f (b j)))
+      have hEig :=
+        FormEigenMonotone.eig_fib hEB.eig (μ j0) (T'.filter fun j => μ j = μ j0)
+          (fun j hj => (Finset.mem_filter.1 hj).2)
+          (fun j => (starRingEnd ℂ) (f (b j)))
       beta_reduce at hEig
-      have hk := FormEigenMonotone.key (b := b) (μ := μ) hA0' hmono hadd hconst hb12 hc hR (μ j0)
-        (hEB.nonneg j0) _ hEig
+      have hk :=
+        FormEigenMonotone.key (b := b) (μ := μ) hA0' hmono hadd hconst hb12 hc hR (μ j0)
+          (hEB.nonneg j0) _ hEig
       rw [FormEigenMonotone.norm_fib hEB.on f] at hk
       linarith
-    have hsum1 : ∑ ν ∈ Finset.image μ T', (phiR s R ν * (ν - κ + c) - (if ν < x₀ then x₀ + |κ| + c else 0)) *
-          ∑ j ∈ T' with μ j = ν, ‖f (b j)‖ ^ 2
-        = ∑ j ∈ T', (phiR s R (μ j) * (μ j - κ + c) - (if μ j < x₀ then x₀ + |κ| + c else 0)) *
-          ‖f (b j)‖ ^ 2 := by
+    have hsum1
+        : ∑ ν ∈ Finset.image μ T', (phiR s R ν * (ν - κ + c) - (if ν < x₀ then x₀ + |κ| + c else 0)) *
+            ∑ j ∈ T' with μ j = ν, ‖f (b j)‖ ^ 2
+          = ∑ j ∈ T', (phiR s R (μ j) * (μ j - κ + c) - (if μ j < x₀ then x₀ + |κ| + c else 0)) *
+            ‖f (b j)‖ ^ 2 := by
       apply Finset.sum_image'
       intro i _
       beta_reduce
       rw [Finset.mul_sum]
       refine Finset.sum_congr rfl fun j hj => ?_
       rw [(Finset.mem_filter.1 hj).2]
-    have e := Finset.sum_subset hST' (f := fun j => phiR s R (μ j) * (μ j - κ + c) * ‖f (b j)‖ ^ 2)
-      (fun j _ hj => by simp only [hφS j hj, zero_mul])
-    have hsplit : ∑ j ∈ T', (phiR s R (μ j) * (μ j - κ + c) - (if μ j < x₀ then x₀ + |κ| + c else 0)) *
-          ‖f (b j)‖ ^ 2
-        = ∑ j ∈ S, phiR s R (μ j) * (μ j - κ) * ‖f (b j)‖ ^ 2 +
-            c * ∑ j ∈ S, phiR s R (μ j) * ‖f (b j)‖ ^ 2
-          - ∑ j ∈ T', (if μ j < x₀ then x₀ + |κ| + c else 0) * ‖f (b j)‖ ^ 2 := by
+    have e :=
+      Finset.sum_subset hST'
+        (f := fun j => phiR s R (μ j) * (μ j - κ + c) * ‖f (b j)‖ ^ 2)
+        (fun j _ hj => by simp only [hφS j hj, zero_mul])
+    have hsplit
+        : ∑ j ∈ T', (phiR s R (μ j) * (μ j - κ + c) - (if μ j < x₀ then x₀ + |κ| + c else 0)) *
+            ‖f (b j)‖ ^ 2
+          = ∑ j ∈ S, phiR s R (μ j) * (μ j - κ) * ‖f (b j)‖ ^ 2
+            + c * ∑ j ∈ S, phiR s R (μ j) * ‖f (b j)‖ ^ 2
+            - ∑ j ∈ T', (if μ j < x₀ then x₀ + |κ| + c else 0) * ‖f (b j)‖ ^ 2 := by
       simp only [sub_mul, Finset.sum_sub_distrib]
       congr 1
       rw [← e, Finset.mul_sum, ← Finset.sum_add_distrib]
       exact Finset.sum_congr rfl fun j _ => by ring
-    have hTb2 : ∑ j ∈ T', (if μ j < x₀ then x₀ + |κ| + c else 0) * ‖f (b j)‖ ^ 2
-        ≤ (x₀ + |κ| + c) * ∑ i ∈ T, ‖f (b i)‖ ^ 2 := by
+    have hTb2
+        : ∑ j ∈ T', (if μ j < x₀ then x₀ + |κ| + c else 0) * ‖f (b j)‖ ^ 2
+          ≤ (x₀ + |κ| + c) * ∑ i ∈ T, ‖f (b i)‖ ^ 2 := by
       rw [Finset.mul_sum]
-      calc ∑ j ∈ T', (if μ j < x₀ then x₀ + |κ| + c else 0) * ‖f (b j)‖ ^ 2
-          = ∑ j ∈ T' with μ j < x₀, (x₀ + |κ| + c) * ‖f (b j)‖ ^ 2 := by
-            rw [Finset.sum_filter]
-            exact Finset.sum_congr rfl fun j _ => by split_ifs <;> simp
+      calc
+        ∑ j ∈ T', (if μ j < x₀ then x₀ + |κ| + c else 0) * ‖f (b j)‖ ^ 2
+            = ∑ j ∈ T' with μ j < x₀, (x₀ + |κ| + c) * ‖f (b j)‖ ^ 2 := by
+          rw [Finset.sum_filter]
+          exact Finset.sum_congr rfl fun j _ => by split_ifs <;> simp
         _ ≤ ∑ i ∈ T, (x₀ + |κ| + c) * ‖f (b i)‖ ^ 2 := by
-            apply Finset.sum_le_sum_of_subset_of_nonneg
-            · intro j hj
-              exact (hT j).2 (Finset.mem_filter.1 hj).2
-            · intro j _ _
-              exact mul_nonneg hK (by positivity)
+          apply Finset.sum_le_sum_of_subset_of_nonneg
+          · intro j hj
+            exact (hT j).2 (Finset.mem_filter.1 hj).2
+          · intro j _ _
+            exact mul_nonneg hK (by positivity)
     have hle := Finset.sum_le_sum hstep
     rw [hsum1, hsplit, ← key1] at hle
-    have hR2 : ∑ i ∈ S, phiR s R (μ i) *
-          (∑ p ∈ nc ε, ‖f ((E p.1 p.2) (b i))‖ ^ 2 - (μ i - κ) * ‖f (b i)‖ ^ 2)
-        = ∑ i ∈ S, phiR s R (μ i) * ∑ p ∈ nc ε, ‖f ((E p.1 p.2) (b i))‖ ^ 2
-          - ∑ i ∈ S, phiR s R (μ i) * (μ i - κ) * ‖f (b i)‖ ^ 2 := by
+    have hR2
+        : ∑ i ∈ S, phiR s R (μ i) *
+            (∑ p ∈ nc ε, ‖f ((E p.1 p.2) (b i))‖ ^ 2 - (μ i - κ) * ‖f (b i)‖ ^ 2)
+          = ∑ i ∈ S, phiR s R (μ i) * ∑ p ∈ nc ε, ‖f ((E p.1 p.2) (b i))‖ ^ 2
+            - ∑ i ∈ S, phiR s R (μ i) * (μ i - κ) * ‖f (b i)‖ ^ 2 := by
       rw [← Finset.sum_sub_distrib]
       exact Finset.sum_congr rfl fun i _ => by ring
     rw [hR2]

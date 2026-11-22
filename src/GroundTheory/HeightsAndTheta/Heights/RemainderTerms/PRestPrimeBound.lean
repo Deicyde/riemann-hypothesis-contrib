@@ -12,9 +12,10 @@ namespace GroundTheory.Heights₂.Heights
 
 namespace RestTerms
 
-theorem RestPrimeBound.proof (h₁ : RestPrimeBoundOfFactor.Statement)
-    (h₂ : SameFactorBound.Statement) (h₃ : OtherFactorBound.Statement) :
-    RestPrimeBound.Statement := by
+theorem RestPrimeBound.proof
+    (h₁ : RestPrimeBoundOfFactor.Statement) (h₂ : SameFactorBound.Statement)
+    (h₃ : OtherFactorBound.Statement)
+    : RestPrimeBound.Statement := by
   intro f r a c B₀ hf hr ha hB
   obtain ⟨_, hQex, hsame⟩ := h₂ f r a c hf hr ha
   obtain ⟨_, _, hother⟩ := h₃ f r a c hf hr ha

@@ -12,9 +12,11 @@ namespace GlobalTheory.ComplexEmbedding
 
 open Cardinal IsLocalRing
 
-theorem exists_digits_of_dvr (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    (ϖ : V) (hϖ : Irreducible ϖ) (s : ResidueField V → V) (hs : ∀ r, residue V (s r) = r) :
-    ∀ (n : ℕ) (x : V), ∃ f : Fin n → ResidueField V,
+theorem exists_digits_of_dvr
+    (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+    (ϖ : V) (hϖ : Irreducible ϖ)
+    (s : ResidueField V → V) (hs : ∀ r, residue V (s r) = r)
+    : ∀ (n : ℕ) (x : V), ∃ f : Fin n → ResidueField V,
       x - ∑ i : Fin n, s (f i) * ϖ ^ (i : ℕ) ∈ maximalIdeal V ^ n := by
   intro n
   induction n with
@@ -29,8 +31,9 @@ theorem exists_digits_of_dvr (V : Type) [CommRing V] [IsDomain V] [IsDiscreteVal
     refine ⟨Fin.snoc f (residue V y), ?_⟩
     rw [Fin.sum_univ_castSucc]
     simp only [Fin.snoc_castSucc, Fin.snoc_last, Fin.coe_castSucc, Fin.val_last]
-    have hxy : x - (∑ i : Fin n, s (f i) * ϖ ^ (i : ℕ) + s (residue V y) * ϖ ^ n) =
-        ϖ ^ n * (y - s (residue V y)) := by
+    have hxy
+        : x - (∑ i : Fin n, s (f i) * ϖ ^ (i : ℕ) + s (residue V y) * ϖ ^ n)
+          = ϖ ^ n * (y - s (residue V y)) := by
       rw [← sub_sub, hy]; ring
     rw [hxy, pow_succ]
     have hϖm : ϖ ∈ maximalIdeal V := (mem_maximalIdeal _).2 hϖ.not_isUnit
@@ -38,8 +41,10 @@ theorem exists_digits_of_dvr (V : Type) [CommRing V] [IsDomain V] [IsDiscreteVal
       rw [← residue_eq_zero_iff, map_sub, hs, sub_self]
     exact Ideal.mul_mem_mul (Ideal.pow_mem_pow hϖm n) hym
 
-theorem countable_quotient_pow_of_dvr (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    [Countable (ResidueField V)] (n : ℕ) : Countable (V ⧸ maximalIdeal V ^ n) := by
+theorem countable_quotient_pow_of_dvr
+    (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Countable (ResidueField V)]
+    (n : ℕ)
+    : Countable (V ⧸ maximalIdeal V ^ n) := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
   let s : ResidueField V → V := Function.surjInv (residue_surjective (R := V))
   have hs : ∀ r, residue V (s r) = r := Function.surjInv_eq _
@@ -51,8 +56,9 @@ theorem countable_quotient_pow_of_dvr (V : Type) [CommRing V] [IsDomain V] [IsDi
     exact ⟨f, (Ideal.Quotient.eq.2 hf).symm⟩
   exact hsurj.countable
 
-theorem mk_le_continuum_of_countable_residueField (V : Type) [CommRing V] [IsDomain V]
-    [IsDiscreteValuationRing V] [Countable (ResidueField V)] : #V ≤ 𝔠 := by
+theorem mk_le_continuum_of_countable_residueField
+    (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Countable (ResidueField V)]
+    : #V ≤ 𝔠 := by
   let f : V → ∀ n : ℕ, V ⧸ maximalIdeal V ^ n := fun x n => Ideal.Quotient.mk _ x
   have hinj : Function.Injective f := by
     intro x y hxy
@@ -62,14 +68,15 @@ theorem mk_le_continuum_of_countable_residueField (V : Type) [CommRing V] [IsDom
     exact sub_eq_zero.1 this
   refine (mk_le_of_injective hinj).trans ?_
   rw [mk_pi]
-  refine (prod_le_prod _ (fun _ => ℵ₀) fun n =>
-    haveI := countable_quotient_pow_of_dvr V n; mk_le_aleph0).trans ?_
+  refine (prod_le_prod _
+    (fun _ => ℵ₀)
+    fun n => haveI := countable_quotient_pow_of_dvr V n; mk_le_aleph0).trans ?_
   simp
 
-theorem exists_embedding_fractionField_of_finite :
-    ∀ (K : Type) [Field K] [NumberField K] (σ : K →+* ℂ) (T T' : CDVR) (g : T.V →+* T'.V),
-      Function.Injective g → g.Finite → Countable (IsLocalRing.ResidueField T.V) →
-      ∀ io : K →+* T'.Fr, ∃ ι : T'.Fr →+* ℂ, ι.comp io = σ := by
+theorem exists_embedding_fractionField_of_finite
+    : ∀ (K : Type) [Field K] [NumberField K] (σ : K →+* ℂ) (T T' : CDVR) (g : T.V →+* T'.V),
+      Function.Injective g → g.Finite → Countable (IsLocalRing.ResidueField T.V)
+        → ∀ io : K →+* T'.Fr, ∃ ι : T'.Fr →+* ℂ, ι.comp io = σ := by
   intro K _ _ σ T T' g _ hfin hc io
   have hV : #T.V ≤ 𝔠 := mk_le_continuum_of_countable_residueField T.V
   letI : Algebra T.V T'.V := g.toAlgebra

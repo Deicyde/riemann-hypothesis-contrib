@@ -8,13 +8,16 @@ open MvPolynomial
 
 namespace GlobalTheory
 
-theorem exists_weightedHomogenisation {L : Type} [Field L] (Q : Subring L) (r : ℕ)
-    (z : Fin (r + 1) → Q) (wt : Fin (r + 1) → ℕ) (hwt : wt 0 = 1) (hz : (z 0 : L) ≠ 0)
-    (P : MvPolynomial (Fin r) Q) :
-    ∃ (N : ℕ) (F : MvPolynomial (Fin (r + 1)) Q), F.IsWeightedHomogeneous wt N ∧
-      ((MvPolynomial.eval z F : Q) : L) = (z 0 : L) ^ N *
-        MvPolynomial.eval₂ Q.subtype (fun i => (z i.succ : L) / (z 0 : L) ^ wt i.succ) P ∧
-      ∀ α, ∃ β, F.coeff β = P.coeff α := by
+theorem exists_weightedHomogenisation
+    {L : Type} [Field L]
+    (Q : Subring L) (r : ℕ) (z : Fin (r + 1) → Q) (wt : Fin (r + 1) → ℕ)
+    (hwt : wt 0 = 1) (hz : (z 0 : L) ≠ 0) (P : MvPolynomial (Fin r) Q)
+    : ∃ (N : ℕ) (F : MvPolynomial (Fin (r + 1)) Q),
+      F.IsWeightedHomogeneous wt N
+        ∧ ((MvPolynomial.eval z F : Q) : L)
+          = (z 0 : L) ^ N
+            * MvPolynomial.eval₂ Q.subtype (fun i => (z i.succ : L) / (z 0 : L) ^ wt i.succ) P
+        ∧ ∀ α, ∃ β, F.coeff β = P.coeff α := by
   classical
   let d : (Fin r →₀ ℕ) → ℕ := fun α => ∑ i, α i * wt i.succ
   let N : ℕ := P.support.sup d
@@ -37,8 +40,9 @@ theorem exists_weightedHomogenisation {L : Type} [Field L] (Q : Subring L) (r : 
     rw [eval_monomial, Finsupp.prod_fintype _ _ (by simp), Fin.prod_univ_succ]
     have h1 : (z 0 : L) ^ N = (z 0 : L) ^ (N - d α) * (z 0 : L) ^ d α := by
       rw [← pow_add, Nat.sub_add_cancel (hd α hα)]
-    have h2 : (z 0 : L) ^ d α * ∏ i, ((z i.succ : L) / (z 0 : L) ^ wt i.succ) ^ α i
-        = ∏ i, (z i.succ : L) ^ α i := by
+    have h2
+        : (z 0 : L) ^ d α * ∏ i, ((z i.succ : L) / (z 0 : L) ^ wt i.succ) ^ α i
+          = ∏ i, (z i.succ : L) ^ α i := by
       simp only [d]
       rw [← Finset.prod_pow_eq_pow_sum, ← Finset.prod_mul_distrib]
       refine Finset.prod_congr rfl fun i _ => ?_

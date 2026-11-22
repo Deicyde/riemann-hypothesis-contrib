@@ -64,11 +64,13 @@ public import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.Admiss
 namespace CompanionTheory.RgExh
 
 theorem dsExhaust : GlobalTheory.Dec.DSExhaust :=
-  Fin.exhaustion_finite_length Hk.infinitesimal_character_shift Hk.hecke_algebra_exhaustion (Dec.decay_estimate Hk.infinitesimal_character_shift) U.far_regular_exhaustion
+  Fin.exhaustion_finite_length Hk.infinitesimal_character_shift Hk.hecke_algebra_exhaustion
+    (Dec.decay_estimate Hk.infinitesimal_character_shift) U.far_regular_exhaustion
 
 theorem discreteSeriesClassification : GlobalTheory.Published.DiscreteSeriesClassification :=
   Fin.discreteSeriesClassification_of dsExhaust
 
-theorem discreteSeriesCover : GlobalTheory.Published.DiscreteSeriesCover := Fin.discreteSeriesCover_of dsExhaust
+theorem discreteSeriesCover : GlobalTheory.Published.DiscreteSeriesCover :=
+  Fin.discreteSeriesCover_of dsExhaust
 
 end CompanionTheory.RgExh

@@ -6,7 +6,9 @@ public import Development.EtaleCohomology.EtaleTrace.LRingPf
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.EtaleTrace CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz UpperTheory.Gal.KunnethLefschetz.Di
+open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC LateralTheory.EtaleTrace
+  CrystallineSemistableComparison CrystallineSemistableComparison.Onto
+  UpperTheory.Gal.KunnethLefschetz UpperTheory.Gal.KunnethLefschetz.Di
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.KunnethLefschetz.Di.PPBQOf
@@ -55,19 +57,23 @@ private lemma sum2 {A : Type*} [AddCommMonoid A] (M : ℕ) (f : Fin (M + 2) → 
 end UpperTheory.Gal.KunnethLefschetz.Di.PPBQOf
 
 open UpperTheory.Gal.KunnethLefschetz.Di.PPBQOf in
-theorem UpperTheory.Gal.KunnethLefschetz.Di.pBQOf_holds :
-    UpperTheory.Gal.KunnethLefschetz.Di.PBQOf := by
+theorem UpperTheory.Gal.KunnethLefschetz.Di.pBQOf_holds
+    : UpperTheory.Gal.KunnethLefschetz.Di.PBQOf := by
   intro l _ hR hneg N hN E Z r hZ ξ hPBV
   have hE := LateralTheory.EtaleTrace.LRingPf.unit_pull l r hZ
   obtain ⟨M, rfl⟩ : ∃ M, N = M + 2 := ⟨N - 2, by omega⟩
-  have key : ∀ (n : ℤ) (a : ∀ j : Fin (M + 2), V l Z (n - 2 * ((j : ℕ) : ℤ))), n ≤ 3 →
-      (∑ j : Fin (M + 2), cupV l E (sub_add_cancel n (2 * ((j : ℕ) : ℤ)))
-          (pb l r (n - 2 * ((j : ℕ) : ℤ)) (a j)) (powV l ξ (j : ℕ))) =
-        cupV l E (sub_add_cancel n (2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)))
-          (pb l r (n - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (a 0)) (powV l ξ ((0 : Fin (M + 2)) : ℕ)) +
-        cupV l E (sub_add_cancel n (2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)))
-          (pb l r (n - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)) (a 1)) (powV l ξ ((1 : Fin (M + 2)) : ℕ)) :=
-    fun n a hn => sum2 M _ fun j hj => tneg hneg r (by omega) _ _ _
+  have key
+      : ∀ (n : ℤ) (a : ∀ j : Fin (M + 2), V l Z (n - 2 * ((j : ℕ) : ℤ))),
+        n ≤ 3
+          → (∑ j : Fin (M + 2), cupV l E (sub_add_cancel n (2 * ((j : ℕ) : ℤ)))
+                (pb l r (n - 2 * ((j : ℕ) : ℤ)) (a j)) (powV l ξ (j : ℕ)))
+            = cupV l E (sub_add_cancel n (2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)))
+                (pb l r (n - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (a 0))
+                (powV l ξ ((0 : Fin (M + 2)) : ℕ))
+              + cupV l E (sub_add_cancel n (2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)))
+                (pb l r (n - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)) (a 1))
+                (powV l ξ ((1 : Fin (M + 2)) : ℕ)) := fun n a hn =>
+    sum2 M _ fun j hj => tneg hneg r (by omega) _ _ _
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro n
     rw [eq_top_iff]
@@ -79,22 +85,29 @@ theorem UpperTheory.Gal.KunnethLefschetz.Di.pBQOf_holds :
   · intro z
     obtain ⟨a, ha⟩ := (hPBV 0).2 z
     have hz := ha.symm.trans (key 0 a (by norm_num))
-    rw [tneg (a := 0 - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)) hneg r (by norm_num [Fin.val_one]) _ _ _, add_zero,
-      t0 (j := ((0 : Fin (M + 2)) : ℕ)) (a := 0 - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (n := 0)
-        hR r hE ξ (by simp) _ (by simp)] at hz
+    rw [tneg (a := 0 - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)) hneg r (by norm_num [Fin.val_one]) _ _ _,
+        add_zero,
+        t0 (j := ((0 : Fin (M + 2)) : ℕ)) (a := 0 - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (n := 0) hR r
+          hE ξ (by simp) _ (by simp)]
+      at hz
     exact ⟨_, hz⟩
   · intro z
     obtain ⟨a, ha⟩ := (hPBV 2).2 z
     have hz := ha.symm.trans (key 2 a (by norm_num))
-    rw [t0 (j := ((0 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (n := 2)
-        hR r hE ξ (by simp) _ (by simp),
-      t1 (j := ((1 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ))
-        hR r hE ξ (by simp [Fin.val_one]) _ (by norm_num [Fin.val_one])] at hz
+    rw [t0 (j := ((0 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (n := 2) hR r
+          hE ξ (by simp) _ (by simp),
+        t1 (j := ((1 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)) hR r hE ξ
+          (by simp [Fin.val_one]) _ (by norm_num [Fin.val_one])]
+      at hz
     exact ⟨_, _, hz⟩
   · intro u v huv
     let a : ∀ j : Fin (M + 2), V l Z (2 - 2 * ((j : ℕ) : ℤ)) := fun j =>
-      if h0 : (j : ℕ) = 0 then tr (by rw [h0]; norm_num) u
-      else if h1 : (j : ℕ) = 1 then tr (by rw [h1]; norm_num) v else 0
+      if h0 : (j : ℕ) = 0 then
+        tr (by rw [h0]; norm_num) u
+      else if h1 : (j : ℕ) = 1 then
+        tr (by rw [h1]; norm_num) v
+      else
+        0
     have ha0 : a 0 = tr (by simp) u := by simp [a]
     have ha1 : a 1 = tr (by norm_num [Fin.val_one]) v := by simp [a, Fin.val_one]
     have hzero : a = 0 := by
@@ -103,10 +116,10 @@ theorem UpperTheory.Gal.KunnethLefschetz.Di.pBQOf_holds :
       rw [key 2 a (by norm_num), key 2 0 (by norm_num)]
       simp only [Pi.zero_apply, map_zero, LinearMap.zero_apply, add_zero]
       rw [ha0, ha1,
-        t0 (j := ((0 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (n := 2)
-          hR r hE ξ (by simp) _ (by simp),
-        t1 (j := ((1 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ))
-          hR r hE ξ (by simp [Fin.val_one]) _ (by norm_num [Fin.val_one]),
+        t0 (j := ((0 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((0 : Fin (M + 2)) : ℕ) : ℤ)) (n := 2) hR r
+          hE ξ (by simp) _ (by simp),
+        t1 (j := ((1 : Fin (M + 2)) : ℕ)) (a := 2 - 2 * (((1 : Fin (M + 2)) : ℕ) : ℤ)) hR r hE ξ
+          (by simp [Fin.val_one]) _ (by norm_num [Fin.val_one]),
         tr_tr, tr_tr, tr_self, tr_self]
       exact huv
     have h1 := congrFun hzero 1

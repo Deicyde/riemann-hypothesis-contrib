@@ -4,16 +4,21 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem clMapBasic_mem {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K'] (τ : K ≃+* K')
-    (I : Ideal (𝓞 K)) (y : 𝓞 K') :
-    y ∈ I.map (RingOfIntegers.mapRingEquiv τ) ↔ ∃ x ∈ I, RingOfIntegers.mapRingEquiv τ x = y :=
+private theorem clMapBasic_mem
+    {K K' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
+    (τ : K ≃+* K') (I : Ideal (𝓞 K)) (y : 𝓞 K')
+    : y ∈ I.map (RingOfIntegers.mapRingEquiv τ) ↔ ∃ x ∈ I, RingOfIntegers.mapRingEquiv τ x = y :=
   Ideal.mem_map_iff_of_surjective _ (RingOfIntegers.mapRingEquiv τ).surjective
 
-private theorem clMapBasic_lemma {K K' K'' : Type} [Field K] [NumberField K] [Field K'] [NumberField K']
-    [Field K''] [NumberField K''] (τ : K ≃+* K') (τ' : K' ≃+* K'') (c : ClassGroup (𝓞 K)) :
-    clMap (τ.trans τ') c = clMap τ' (clMap τ c) := by
+private theorem clMapBasic_lemma
+    {K K' K'' : Type}
+    [Field K] [NumberField K] [Field K'] [NumberField K'] [Field K''] [NumberField K'']
+    (τ : K ≃+* K') (τ' : K' ≃+* K'') (c : ClassGroup (𝓞 K))
+    : clMap (τ.trans τ') c = clMap τ' (clMap τ c) := by
   obtain ⟨I, rfl⟩ := ClassGroup.mk0_surjective c
   rw [class_map_mk0, class_map_mk0, class_map_mk0]
   congr 1
@@ -27,8 +32,8 @@ private theorem clMapBasic_lemma {K K' K'' : Type} [Field K] [NumberField K] [Fi
   · rintro ⟨z, hz, rfl⟩
     obtain ⟨x, hx, rfl⟩ := (clMapBasic_mem τ _ _).mp hz
     exact ⟨x, hx, rfl⟩
-private theorem clMap_refl_apply {K : Type} [Field K] [NumberField K] (c : ClassGroup (𝓞 K)) :
-    clMap (RingEquiv.refl K) c = c := by
+private theorem clMap_refl_apply {K : Type} [Field K] [NumberField K] (c : ClassGroup (𝓞 K))
+    : clMap (RingEquiv.refl K) c = c := by
   obtain ⟨I, rfl⟩ := ClassGroup.mk0_surjective c
   rw [class_map_mk0]
   congr 1
@@ -42,10 +47,14 @@ private theorem clMap_refl_apply {K : Type} [Field K] [NumberField K] (c : Class
   · intro hy
     exact ⟨y, hy, rfl⟩
 
-theorem UpperTheory.V.Kum.clMapBasic :
-    ∀ (K K' K'' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [Field K''] [NumberField K''] (τ : K ≃+* K') (τ' : K' ≃+* K''),
-    (∀ c, clMap (RingEquiv.refl K) c = c) ∧ (∀ c, clMap (τ.trans τ') c = clMap τ' (clMap τ c)) ∧ Function.Bijective (clMap τ) ∧
-    ∀ (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 K')), (∀ x, x ∈ v.asIdeal ↔ RingOfIntegers.mapRingEquiv τ x ∈ w.asIdeal) → clMap τ (primeCl v) = primeCl w := by
+theorem UpperTheory.V.Kum.clMapBasic
+    : ∀ (K K' K'' : Type) [Field K] [NumberField K] [Field K'] [NumberField K'] [Field K'']
+        [NumberField K''] (τ : K ≃+* K') (τ' : K' ≃+* K''),
+      (∀ c, clMap (RingEquiv.refl K) c = c) ∧ (∀ c, clMap (τ.trans τ') c = clMap τ' (clMap τ c))
+        ∧ Function.Bijective (clMap τ)
+        ∧ ∀ (v : HeightOneSpectrum (𝓞 K)) (w : HeightOneSpectrum (𝓞 K')),
+          (∀ x, x ∈ v.asIdeal ↔ RingOfIntegers.mapRingEquiv τ x ∈ w.asIdeal)
+            → clMap τ (primeCl v) = primeCl w := by
   intro K K' K'' _ _ _ _ _ _ τ τ'
   refine ⟨clMap_refl_apply, clMapBasic_lemma τ τ', ?_, ?_⟩
   · have hl : ∀ c, clMap τ.symm (clMap τ c) = c := by

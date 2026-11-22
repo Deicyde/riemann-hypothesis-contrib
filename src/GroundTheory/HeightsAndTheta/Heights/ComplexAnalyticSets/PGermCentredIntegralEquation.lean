@@ -15,10 +15,11 @@ noncomputable section
 
 namespace CentredIntegralEquation
 
-theorem exists_monic_map_eq_X_pow {R B K : Type*} [CommRing R] [CommRing B] [Field K] [Algebra R B]
-    [Module.Finite R B] (ε : R →+* K) (κ : K →+* R) (hεκ : ∀ c, ε (κ c) = c) (x : B)
-    (hx : ∀ c : K, c ≠ 0 → ∀ y : B, IsUnit (algebraMap R B (κ c) + x * y)) :
-    ∃ Q : R[X], Q.Monic ∧ aeval x Q = 0 ∧ Q.map ε = X ^ Q.natDegree := by
+theorem exists_monic_map_eq_X_pow
+    {R B K : Type*} [CommRing R] [CommRing B] [Field K] [Algebra R B] [Module.Finite R B]
+    (ε : R →+* K) (κ : K →+* R) (hεκ : ∀ c, ε (κ c) = c)
+    (x : B) (hx : ∀ c : K, c ≠ 0 → ∀ y : B, IsUnit (algebraMap R B (κ c) + x * y))
+    : ∃ Q : R[X], Q.Monic ∧ aeval x Q = 0 ∧ Q.map ε = X ^ Q.natDegree := by
   classical
   have : Nontrivial R := ε.domain_nontrivial
   obtain ⟨χ, hχm, hχ⟩ := (Algebra.IsIntegral.isIntegral (R := R) x)
@@ -32,8 +33,8 @@ theorem exists_monic_map_eq_X_pow {R B K : Type*} [CommRing R] [CommRing B] [Fie
   have hεκ' : ε.comp κ = RingHom.id K := RingHom.ext hεκ
   set e := χ - X ^ a * u.map κ with he
   have hemap : e.map ε = 0 := by
-    rw [he, Polynomial.map_sub, Polynomial.map_mul, Polynomial.map_pow, Polynomial.map_X, Polynomial.map_map, hεκ',
-      Polynomial.map_id, hfac]
+    rw [he, Polynomial.map_sub, Polynomial.map_mul, Polynomial.map_pow, Polynomial.map_X,
+      Polynomial.map_map, hεκ', Polynomial.map_id, hfac]
     simp
   set J : Ideal B := (RingHom.ker ε).map (algebraMap R B)
   have heJ : aeval x e ∈ J := by
@@ -45,31 +46,33 @@ theorem exists_monic_map_eq_X_pow {R B K : Type*} [CommRing R] [CommRing B] [Fie
 
   obtain ⟨r, hr⟩ := X_dvd_sub_C (p := u.map κ)
   have ht : IsUnit (aeval x (u.map κ)) := by
-    have h1 : u.map κ = C (κ (u.coeff 0)) + X * r := by
-      rw [← hr, coeff_map]; ring
+    have h1 : u.map κ = C (κ (u.coeff 0)) + X * r := by rw [← hr, coeff_map]; ring
     rw [h1, map_add (f := _), aeval_C, map_mul, aeval_X]
     exact hx _ hu0 _
   have hxa : x ^ a ∈ J := by
     obtain ⟨v, hv⟩ := ht
-    have h2 : x ^ a * aeval x (u.map κ) = -aeval x e := by
+    have h2 : x ^ a * aeval x (u.map κ) = - aeval x e := by
       have := hχ
       rw [← aeval_def] at this
-      rw [show χ = X ^ a * u.map κ + e by rw [he]; ring, map_add (f := _), map_mul, map_pow, aeval_X] at this
+      rw [show χ = X ^ a * u.map κ + e by rw [he]; ring, map_add (f := _), map_mul, map_pow,
+          aeval_X]
+        at this
       linear_combination this
-    have h3 : x ^ a = -aeval x e * ↑v⁻¹ := by
-      rw [← h2, ← hv, mul_assoc, Units.mul_inv, mul_one]
+    have h3 : x ^ a = - aeval x e * ↑v⁻¹ := by rw [← h2, ← hv, mul_assoc, Units.mul_inv, mul_one]
     rw [h3]
     exact J.mul_mem_right _ (J.neg_mem heJ)
   set y := x ^ (a + 1)
   have hy : y ∈ J := by
     show x ^ (a + 1) ∈ J
-    rw [pow_succ]; exact J.mul_mem_right _ hxa
+    rw [pow_succ]
+    exact J.mul_mem_right _ hxa
   have hrange : LinearMap.range (LinearMap.mulLeft R y) ≤ RingHom.ker ε • ⊤ := by
     rintro _ ⟨b, rfl⟩
     rw [Ideal.smul_top_eq_map]
     exact J.mul_mem_right b hy
   obtain ⟨q, hqm, -, hqc, hq0⟩ :=
-    LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero R (LinearMap.mulLeft R y) _ hrange
+    LinearMap.exists_monic_and_natDegree_eq_and_coeff_mem_pow_and_aeval_eq_zero R
+      (LinearMap.mulLeft R y) _ hrange
   have hqy : aeval y q = 0 := by
     have := congrArg (fun f : Module.End R B => f 1) hq0
     rw [show (LinearMap.mulLeft R y) = Algebra.lmul R B y from rfl, aeval_algHom_apply] at this
@@ -77,15 +80,18 @@ theorem exists_monic_map_eq_X_pow {R B K : Type*} [CommRing R] [CommRing B] [Fie
   have hqmap : q.map ε = X ^ q.natDegree := by
     conv_lhs => rw [hqm.as_sum]
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum, add_eq_left]
+      rw [Polynomial.map_add (f := _), Polynomial.map_pow, Polynomial.map_X, Polynomial.map_sum,
+        add_eq_left]
     refine Finset.sum_eq_zero fun k hk => ?_
     have hk' : q.natDegree - k ≠ 0 := by have := Finset.mem_range.1 hk; omega
     have : q.coeff k ∈ RingHom.ker ε := Ideal.pow_le_self hk' (hqc k)
     rw [RingHom.mem_ker] at this
     simp [this]
-  have hQm : (q.comp (X ^ (a + 1))).Monic := hqm.comp (monic_X_pow _) (by rw [natDegree_X_pow]; omega)
+  have hQm : (q.comp (X ^ (a + 1))).Monic :=
+    hqm.comp (monic_X_pow _) (by rw [natDegree_X_pow]; omega)
   have hQ : (q.comp (X ^ (a + 1))).map ε = X ^ (q.natDegree * (a + 1)) := by
-    rw [Polynomial.map_comp, hqmap, Polynomial.map_pow, Polynomial.map_X, X_pow_comp, ← pow_mul, mul_comm]
+    rw [Polynomial.map_comp, hqmap, Polynomial.map_pow, Polynomial.map_X, X_pow_comp, ← pow_mul,
+      mul_comm]
   refine ⟨q.comp (X ^ (a + 1)), hQm, ?_, ?_⟩
   · rw [aeval_comp, map_pow, aeval_X]; exact hqy
   · rw [← hQm.natDegree_map ε, hQ, natDegree_X_pow]
@@ -107,12 +113,13 @@ def constGerm (w : σ → ℂ) : ℂ →+* holGerms w where
 
 theorem germEval_constGerm (w : σ → ℂ) (c : ℂ) : germEval w (constGerm w c) = c := rfl
 
-theorem germEval_pull {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) (w : σ → ℂ) (r : holGerms (A w)) :
-    germEval w (pull A w r) = germEval (A w) r := by
+theorem germEval_pull {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) (w : σ → ℂ) (r : holGerms (A w))
+    : germEval w (pull A w r) = germEval (A w) r := by
   conv_rhs => rw [← toGerm_rep r]
   rfl
 
-theorem isUnit_of_germEval_ne_zero {w : σ → ℂ} (s : holGerms w) (hs : germEval w s ≠ 0) : IsUnit s := by
+theorem isUnit_of_germEval_ne_zero {w : σ → ℂ} (s : holGerms w) (hs : germEval w s ≠ 0)
+    : IsUnit s := by
   obtain ⟨u, rfl⟩ := toGerm_surjective w s
   rw [germEval_toGerm] at hs
   have hu : AnalyticAt ℂ u.1 w := u.2
@@ -122,20 +129,23 @@ theorem isUnit_of_germEval_ne_zero {w : σ → ℂ} (s : holGerms w) (hs : germE
   refine Germ.coe_eq.2 ((hu.continuousAt.eventually_ne hs).mono fun z hz => ?_)
   exact mul_inv_cancel₀ hz
 
-theorem toGerm_monic_expr {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) (w : σ → ℂ) (x : anFun w) (n : ℕ)
-    (c : Fin n → anFun (A w)) :
-    toGerm w (x ^ n + ∑ j, compA A w (c j) * x ^ (j : ℕ)) =
-      toGerm w x ^ n + ∑ j, pull A w (toGerm (A w) (c j)) * toGerm w x ^ (j : ℕ) := by
+theorem toGerm_monic_expr
+    {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ))
+    (w : σ → ℂ) (x : anFun w)
+    (n : ℕ) (c : Fin n → anFun (A w))
+    : toGerm w (x ^ n + ∑ j, compA A w (c j) * x ^ (j : ℕ))
+      = toGerm w x ^ n + ∑ j, pull A w (toGerm (A w) (c j)) * toGerm w x ^ (j : ℕ) := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_add (f := _), map_sum, map_mul, map_pow, pull_toGerm]
+  simp [map_add (f := _), map_sum, map_mul, map_pow, pull_toGerm]
 
-theorem coe_monic_expr {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ)) (w : σ → ℂ) (x : anFun w) (n : ℕ)
-    (c : Fin n → anFun (A w)) :
-    ((x ^ n + ∑ j, compA A w (c j) * x ^ (j : ℕ) : anFun w) : (σ → ℂ) → ℂ) =
-      fun z => x.1 z ^ n + ∑ j, (c j).1 (A z) * x.1 z ^ (j : ℕ) := by
+theorem coe_monic_expr
+    {d : ℕ} (A : (σ → ℂ) →L[ℂ] (Fin d → ℂ))
+    (w : σ → ℂ) (x : anFun w)
+    (n : ℕ) (c : Fin n → anFun (A w))
+    : ((x ^ n + ∑ j, compA A w (c j) * x ^ (j : ℕ) : anFun w) : (σ → ℂ) → ℂ)
+      = fun z => x.1 z ^ n + ∑ j, (c j).1 (A z) * x.1 z ^ (j : ℕ) := by
   funext z
   simp [compA, Finset.sum_apply]
-
 
 set_option maxHeartbeats 1000000 in
 set_option synthInstance.maxHeartbeats 400000 in
@@ -143,23 +153,28 @@ theorem proof : CentredIntegralEquation.Statement := by
   classical
   intro σ _ w k p d A hp hcoord hpoly g hg
   set I := holGermIdeal w p
-  let _ : Algebra (holGerms (A w)) (holGerms w ⧸ I) := ((Ideal.Quotient.mk I).comp (pull A w)).toAlgebra
-  have halg : ∀ r, algebraMap (holGerms (A w)) (holGerms w ⧸ I) r = Ideal.Quotient.mk I (pull A w r) :=
+  let _ : Algebra (holGerms (A w)) (holGerms w ⧸ I) :=
+    ((Ideal.Quotient.mk I).comp (pull A w)).toAlgebra
+  have halg
+      : ∀ r, algebraMap (holGerms (A w)) (holGerms w ⧸ I) r = Ideal.Quotient.mk I (pull A w r) :=
     fun _ => rfl
 
-  have hcl : ∀ (u : anFun w) (f : (σ → ℂ) → ℂ), u.1 = f →
-      (Ideal.Quotient.mk I (toGerm w u) = 0 ↔ IsGermCombination w p f) := by
+  have hcl
+      : ∀ (u : anFun w) (f : (σ → ℂ) → ℂ),
+        u.1 = f → (Ideal.Quotient.mk I (toGerm w u) = 0 ↔ IsGermCombination w p f) := by
     rintro u f rfl
     rw [Ideal.Quotient.eq_zero_iff_mem]
     exact toGerm_mem_iff hp u
 
-  have hev : ∀ (x : anFun w) (n : ℕ) (c : Fin n → anFun (A w)),
-      aeval (Ideal.Quotient.mk I (toGerm w x)) (X ^ n + ∑ j : Fin n, C (toGerm (A w) (c j)) * X ^ (j : ℕ)) =
-        Ideal.Quotient.mk I (toGerm w (x ^ n + ∑ j, compA A w (c j) * x ^ (j : ℕ))) := by
+  have hev
+      : ∀ (x : anFun w) (n : ℕ) (c : Fin n → anFun (A w)),
+        aeval (Ideal.Quotient.mk I (toGerm w x))
+            (X ^ n + ∑ j : Fin n, C (toGerm (A w) (c j)) * X ^ (j : ℕ))
+          = Ideal.Quotient.mk I (toGerm w (x ^ n + ∑ j, compA A w (c j) * x ^ (j : ℕ))) := by
     intro x n c
     rw [toGerm_monic_expr]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_mul, map_pow, aeval_X, aeval_C, halg]
+    simp only [map_add (f := _), map_sum, map_mul, map_pow, aeval_X, aeval_C, halg]
   set zc : σ → anFun w := fun i => mkA (fun z => z i)
     ((ContinuousLinearMap.proj (R := ℂ) (φ := fun _ : σ => ℂ) i).analyticAt w)
   set cz : σ → holGerms w ⧸ I := fun i => Ideal.Quotient.mk I (toGerm w (zc i))
@@ -191,8 +206,8 @@ theorem proof : CentredIntegralEquation.Statement := by
     have hv : (u - v).1 = fun z => u.1 z - ∑ m ∈ t, a m (A z) * ∏ i, z i ^ m i := by
       funext z
       simp only [v, AddSubgroupClass.coe_sub, AddSubmonoidClass.coe_finsetSum, MulMemClass.coe_mul,
-        SubmonoidClass.coe_finsetProd, SubmonoidClass.coe_pow, Pi.sub_apply, Finset.sum_apply, Pi.mul_apply,
-        Finset.prod_apply, Pi.pow_apply]
+        SubmonoidClass.coe_finsetProd, SubmonoidClass.coe_pow, Pi.sub_apply, Finset.sum_apply,
+        Pi.mul_apply, Finset.prod_apply, Pi.pow_apply]
       congr 1
       refine Finset.sum_congr rfl fun m hm => ?_
       simp [compA, mkA, a', zc, hm]
@@ -202,8 +217,10 @@ theorem proof : CentredIntegralEquation.Statement := by
     rw [h1]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [v, map_sum, map_mul, map_prod, map_pow, ← pull_toGerm]
-    refine Subalgebra.sum_mem _ fun m _ => Subalgebra.mul_mem _ ?_ (Subalgebra.prod_mem _ fun i _ =>
-      Subalgebra.pow_mem _ (Algebra.subset_adjoin (Set.mem_range_self i)) _)
+    refine Subalgebra.sum_mem _ fun m _ =>
+      Subalgebra.mul_mem _ ?_
+        (Subalgebra.prod_mem _ fun i _ =>
+          Subalgebra.pow_mem _ (Algebra.subset_adjoin (Set.mem_range_self i)) _)
     rw [← halg]
     exact Subalgebra.algebraMap_mem _ _
   have : Module.Finite (holGerms (A w)) (holGerms w ⧸ I) := by
@@ -214,17 +231,24 @@ theorem proof : CentredIntegralEquation.Statement := by
   set gA : anFun w := mkA g hg
   set gcl : holGerms w ⧸ I := Ideal.Quotient.mk I (toGerm w gA)
   set xB := gcl - algebraMap (holGerms (A w)) (holGerms w ⧸ I) (constGerm (A w) (g w))
-  have hx : ∀ c : ℂ, c ≠ 0 → ∀ y : holGerms w ⧸ I,
-      IsUnit (algebraMap (holGerms (A w)) (holGerms w ⧸ I) (constGerm (A w) c) + xB * y) := by
+  have hx
+      : ∀ c : ℂ,
+        c ≠ 0
+          → ∀ y : holGerms w ⧸ I,
+            IsUnit (algebraMap (holGerms (A w)) (holGerms w ⧸ I) (constGerm (A w) c) + xB * y) := by
     intro c hc y
     obtain ⟨t, rfl⟩ := Ideal.Quotient.mk_surjective y
-    have e : algebraMap (holGerms (A w)) (holGerms w ⧸ I) (constGerm (A w) c) + xB * Ideal.Quotient.mk I t =
-        Ideal.Quotient.mk I (pull A w (constGerm (A w) c) +
-          (toGerm w gA - pull A w (constGerm (A w) (g w))) * t) := by
+    have e
+        : algebraMap (holGerms (A w)) (holGerms w ⧸ I) (constGerm (A w) c)
+            + xB * Ideal.Quotient.mk I t
+          = Ideal.Quotient.mk I
+            (pull A w (constGerm (A w) c)
+              + (toGerm w gA - pull A w (constGerm (A w) (g w))) * t) := by
       simp only [xB, gcl, halg, map_add (f := _), map_mul, map_sub]
     rw [e]
     refine (isUnit_of_germEval_ne_zero _ ?_).map _
-    simp only [map_add (f := _), map_mul, map_sub, germEval_pull, germEval_constGerm, germEval_toGerm]
+    simp only [map_add (f := _), map_mul, map_sub, germEval_pull, germEval_constGerm,
+      germEval_toGerm]
     simpa [gA, mkA] using hc
   obtain ⟨Q, hQm, hQ0, hQmap⟩ :=
     exists_monic_map_eq_X_pow (germEval (A w)) (constGerm (A w)) (germEval_constGerm _) xB hx
@@ -235,8 +259,8 @@ theorem proof : CentredIntegralEquation.Statement := by
     rw [aeval_comp, map_sub, aeval_X, aeval_C]
     exact hQ0
   have hFmap : F.map (germEval (A w)) = (X - C (g w)) ^ Q.natDegree := by
-    rw [Polynomial.map_comp, hQmap, Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, germEval_constGerm,
-      X_pow_comp]
+    rw [Polynomial.map_comp, hQmap, Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C,
+      germEval_constGerm, X_pow_comp]
   have hdeg : F.natDegree = Q.natDegree := by
     rw [← hFm.natDegree_map (germEval (A w)), hFmap, sub_eq_add_neg, ← C_neg, natDegree_pow_X_add_C]
   set n := F.natDegree
@@ -257,7 +281,7 @@ theorem proof : CentredIntegralEquation.Statement := by
     conv_lhs at h => rw [hFm.as_sum]
     have hd : F.natDegree = Q.natDegree := hdeg
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [Polynomial.map_sum, eval_finsetSum, hd, hdeg] using h
+    simpa [Polynomial.map_sum, eval_finsetSum, hd, hdeg] using h
 
 end CentredIntegralEquation
 

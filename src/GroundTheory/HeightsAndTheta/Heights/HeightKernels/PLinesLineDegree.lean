@@ -18,15 +18,16 @@ namespace KLinesLineDegree
 
 variable {K : Type} [Field K] {n : ℕ}
 
-theorem genIndex_map_of_injective {G G' : Type*} [AddCommGroup G] [AddCommGroup G'] (f : G →+ G')
-    (hf : Function.Injective f) (A B : AddSubgroup G) :
-    genIndex (A.map f) (B.map f) = genIndex A B := by
+theorem genIndex_map_of_injective
+    {G G' : Type*} [AddCommGroup G] [AddCommGroup G']
+    (f : G →+ G') (hf : Function.Injective f)
+    (A B : AddSubgroup G)
+    : genIndex (A.map f) (B.map f) = genIndex A B := by
   unfold genIndex
   rw [AddSubgroup.relIndex_map_map_of_injective _ _ hf,
     AddSubgroup.relIndex_map_map_of_injective _ _ hf]
 
 end KLinesLineDegree
-
 
 end
 

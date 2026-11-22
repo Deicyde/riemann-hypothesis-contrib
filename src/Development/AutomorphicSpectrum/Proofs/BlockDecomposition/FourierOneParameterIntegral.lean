@@ -8,12 +8,13 @@ open MeasureTheory
 
 namespace GlobalTheory.CompanionTheory.OneParamFourier
 
-variable {A : Type} [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A]
-  [MeasurableSpace A] [BorelSpace A]
+variable
+  {A : Type}
+  [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [MeasurableSpace A] [BorelSpace A]
 
-theorem integral_translate_mul_char (lam : Measure A) [lam.IsAddHaarMeasure] (H : A → ℂ)
-    (χ : AddChar A ℂ) (a : A) :
-    ∫ b, H (b + a) * χ b ∂lam = χ (-a) * ∫ b, H b * χ b ∂lam := by
+theorem integral_translate_mul_char
+    (lam : Measure A) [lam.IsAddHaarMeasure] (H : A → ℂ) (χ : AddChar A ℂ) (a : A)
+    : ∫ b, H (b + a) * χ b ∂lam = χ (-a) * ∫ b, H b * χ b ∂lam := by
   have h := integral_add_right_eq_self (μ := lam) (fun b => H b * χ (b + -a)) a
   simp only [add_neg_cancel_right] at h
   rw [h, ← integral_const_mul]
@@ -21,17 +22,21 @@ theorem integral_translate_mul_char (lam : Measure A) [lam.IsAddHaarMeasure] (H 
   simp only [AddChar.map_add_eq_mul]
   ring
 
-theorem integrable_mul_char {lam : Measure A} {H : A → ℂ} (hH : Integrable H lam)
-    {χ : AddChar A ℂ} (hχ : Continuous χ) (hn : ∀ x, ‖χ x‖ = 1) :
-    Integrable (fun b => H b * χ b) lam := by
+theorem integrable_mul_char
+    {lam : Measure A} {H : A → ℂ} (hH : Integrable H lam)
+    {χ : AddChar A ℂ} (hχ : Continuous χ) (hn : ∀ x, ‖χ x‖ = 1)
+    : Integrable (fun b => H b * χ b) lam := by
   refine hH.mono (hH.aestronglyMeasurable.mul hχ.aestronglyMeasurable)
     (Filter.Eventually.of_forall fun b => ?_)
   simp [hn]
 
-theorem integrable_uncurry_translate (lam : Measure A) [lam.IsAddHaarMeasure] [SFinite lam]
-    (c : ℝ →+ A) (hc : Continuous c) {G : A → ℂ} (hG : Continuous G) (hGi : Integrable G lam)
-    {χ : AddChar A ℂ} (hχ : Continuous χ) (hn : ∀ x, ‖χ x‖ = 1) (K : ℂ) (s : ℝ) :
-    Integrable (Function.uncurry fun (u : ℝ) (b : A) => K * G (b + c u) * χ b)
+theorem integrable_uncurry_translate
+    (lam : Measure A) [lam.IsAddHaarMeasure] [SFinite lam]
+    (c : ℝ →+ A) (hc : Continuous c)
+    {G : A → ℂ} (hG : Continuous G) (hGi : Integrable G lam)
+    {χ : AddChar A ℂ} (hχ : Continuous χ) (hn : ∀ x, ‖χ x‖ = 1)
+    (K : ℂ) (s : ℝ)
+    : Integrable (Function.uncurry fun (u : ℝ) (b : A) => K * G (b + c u) * χ b)
       ((volume.restrict (Set.uIoc 0 s)).prod lam) := by
   have hcont : Continuous (Function.uncurry fun (u : ℝ) (b : A) => K * G (b + c u) * χ b) := by
     unfold Function.uncurry
@@ -43,8 +48,10 @@ theorem integrable_uncurry_translate (lam : Measure A) [lam.IsAddHaarMeasure] [S
   · have h1 : Integrable (fun b => G (b + c u)) lam := hGi.comp_add_right (c u)
     have h2 := integrable_mul_char (h1.const_mul K) hχ hn
     simpa [Function.uncurry, mul_assoc] using h2
-  · have hconst : ∀ u : ℝ, ∫ b, ‖Function.uncurry (fun (u : ℝ) (b : A) => K * G (b + c u) * χ b) (u, b)‖ ∂lam
-        = ‖K‖ * ∫ b, ‖G b‖ ∂lam := by
+  · have hconst
+        : ∀ u : ℝ,
+          ∫ b, ‖Function.uncurry (fun (u : ℝ) (b : A) => K * G (b + c u) * χ b) (u, b)‖ ∂lam
+            = ‖K‖ * ∫ b, ‖G b‖ ∂lam := by
       intro u
       have h := integral_add_right_eq_self (μ := lam) (fun b => ‖G b‖) (c u)
       rw [← h, ← integral_const_mul]
@@ -53,18 +60,20 @@ theorem integrable_uncurry_translate (lam : Measure A) [lam.IsAddHaarMeasure] [S
     simp_rw [hconst]
     exact integrable_const _
 
-theorem integral_mul_char_eq_of_hasDerivAt (A : Type) [AddCommGroup A] [TopologicalSpace A]
-    [IsTopologicalAddGroup A] [MeasurableSpace A] [BorelSpace A] (lam : Measure A)
-    [lam.IsAddHaarMeasure] [SFinite lam] (c : ℝ →+ A) (hc : Continuous c) (F G : A → ℂ)
+theorem integral_mul_char_eq_of_hasDerivAt
+    (A : Type) [AddCommGroup A] [TopologicalSpace A] [IsTopologicalAddGroup A] [MeasurableSpace A]
+    [BorelSpace A]
+    (lam : Measure A) [lam.IsAddHaarMeasure] [SFinite lam]
+    (c : ℝ →+ A) (hc : Continuous c)
+    (F G : A → ℂ)
     (hF : Continuous F) (hG : Continuous G) (hFi : Integrable F lam) (hGi : Integrable G lam)
-    (χ : AddChar A ℂ) (hχ : Continuous χ) (hn : ∀ x, ‖χ x‖ = 1) (f : ℝ)
-    (hf : ∀ s : ℝ, χ (c s) = Complex.exp (-(2 * Real.pi * Complex.I * ((s * f : ℝ) : ℂ))))
+    (χ : AddChar A ℂ) (hχ : Continuous χ) (hn : ∀ x, ‖χ x‖ = 1)
+    (f : ℝ) (hf : ∀ s : ℝ, χ (c s) = Complex.exp (-(2 * Real.pi * Complex.I * ((s * f : ℝ) : ℂ))))
     (hd : ∀ (b : A) (s : ℝ),
-      HasDerivAt (fun t : ℝ => F (b + c t)) (2 * Real.pi * Complex.I * G (b + c s)) s) :
-    ∫ b, G b * χ b ∂lam = (f : ℂ) * ∫ b, F b * χ b ∂lam := by
+      HasDerivAt (fun t : ℝ => F (b + c t)) (2 * Real.pi * Complex.I * G (b + c s)) s)
+    : ∫ b, G b * χ b ∂lam = (f : ℂ) * ∫ b, F b * χ b ∂lam := by
   set K : ℂ := 2 * Real.pi * Complex.I with hK
-  have hK0 : K ≠ 0 := by
-    simp [hK, Real.pi_ne_zero, Complex.I_ne_zero]
+  have hK0 : K ≠ 0 := by simp [hK, Real.pi_ne_zero, Complex.I_ne_zero]
   set e : ℝ → ℂ := fun u => Complex.exp (K * ((u * f : ℝ) : ℂ)) with he
   have hχe : ∀ s : ℝ, χ (-(c s)) = e s := by
     intro s
@@ -83,14 +92,16 @@ theorem integral_mul_char_eq_of_hasDerivAt (A : Type) [AddCommGroup A] [Topologi
     have hftc : ∀ b : A, F (b + c s) - F b = ∫ u in (0 : ℝ)..s, K * G (b + c u) := by
       intro b
       have hcu : Continuous fun u : ℝ => K * G (b + c u) := by fun_prop
-      have := intervalIntegral.integral_eq_sub_of_hasDerivAt (a := 0) (b := s)
-        (f := fun t : ℝ => F (b + c t)) (f' := fun u => K * G (b + c u))
-        (fun x _ => hd b x) (hcu.intervalIntegrable _ _)
+      have :=
+        intervalIntegral.integral_eq_sub_of_hasDerivAt (a := 0) (b := s)
+          (f := fun t : ℝ => F (b + c t))
+          (f' := fun u => K * G (b + c u))
+          (fun x _ => hd b x)
+          (hcu.intervalIntegrable _ _)
       simpa using this.symm
-    have hswap := intervalIntegral_integral_swap
-      (integrable_uncurry_translate lam c hc hG hGi hχ hn K s)
-    have h1 : ∫ b, F (b + c s) * χ b ∂lam = e s * Fh := by
-      rw [integral_translate_mul_char, hχe]
+    have hswap :=
+      intervalIntegral_integral_swap (integrable_uncurry_translate lam c hc hG hGi hχ hn K s)
+    have h1 : ∫ b, F (b + c s) * χ b ∂lam = e s * Fh := by rw [integral_translate_mul_char, hχe]
     have hi1 : Integrable (fun b => F (b + c s) * χ b) lam :=
       integrable_mul_char (hFi.comp_add_right (c s)) hχ hn
     have hi2 : Integrable (fun b => F b * χ b) lam := integrable_mul_char hFi hχ hn

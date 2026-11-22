@@ -13,12 +13,16 @@ noncomputable section
 
 namespace GlobalTheory.TypeLeaf
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.MainNotions.ArithmeticCylinders Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.MainNotions.ArithmeticCylinders Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Polynomial NumberField IsDedekindDomain
 open GlobalTheory.TameLabels
 
-private theorem pow_pow_factorization_mul_inv_val_eq_self {K : Type} [Field K] {l : ℕ} [Fact l.Prime] [CharP K l] (y : K) (n : ℕ)
-    (hy : y ^ n = 1) :
-    y ^ (l ^ n.factorization l * (((l ^ n.factorization l : ℕ) : ZMod (n / l ^ n.factorization l))⁻¹).val) = y := by
+private theorem pow_pow_factorization_mul_inv_val_eq_self
+    {K : Type} [Field K] {l : ℕ} [Fact l.Prime] [CharP K l] (y : K) (n : ℕ) (hy : y ^ n = 1)
+    : y ^ (l ^ n.factorization l
+        * (((l ^ n.factorization l : ℕ) : ZMod (n / l ^ n.factorization l))⁻¹).val)
+      = y := by
   have hl : l.Prime := Fact.out
   rcases Nat.eq_zero_or_pos n with h0 | hpos
   · subst h0
@@ -45,14 +49,20 @@ private theorem pow_pow_factorization_mul_inv_val_eq_self {K : Type} [Field K] {
     exact ZMod.coe_mul_inv_eq_one q hcop
   have hdvd : orderOf y ∣ m := orderOf_dvd_of_pow_eq_one hym
   have hmod' := hmod.of_dvd hdvd
-  calc y ^ (q * ((q : ZMod m)⁻¹).val) = y ^ ((q * ((q : ZMod m)⁻¹).val) % orderOf y) := (pow_mod_orderOf _ _).symm
+  calc
+    y ^ (q * ((q : ZMod m)⁻¹).val)
+      = y ^ ((q * ((q : ZMod m)⁻¹).val) % orderOf y) := (pow_mod_orderOf _ _).symm
     _ = y ^ (1 % orderOf y) := by rw [hmod']
     _ = y := by rw [pow_mod_orderOf, pow_one]
 
-theorem map_primeToPart_fbar {g l : ℕ} [Fact g.Prime] [Fact l.Prime] {K : Type} [Field K] [CharP K l]
-    (ι : Formalism.CyclotomicNorms.Fbar g →* K) (x : Formalism.CyclotomicNorms.Fbar g) : ι (Formalism.CyclotomicNorms.primeToPart l x) = ι x := by
+theorem map_primeToPart_fbar
+    {g l : ℕ} [Fact g.Prime] [Fact l.Prime]
+    {K : Type} [Field K] [CharP K l]
+    (ι : Formalism.CyclotomicNorms.Fbar g →* K) (x : Formalism.CyclotomicNorms.Fbar g)
+    : ι (Formalism.CyclotomicNorms.primeToPart l x) = ι x := by
   unfold Formalism.CyclotomicNorms.primeToPart
   rw [map_pow]
-  exact pow_pow_factorization_mul_inv_val_eq_self _ _ (by rw [← map_pow, pow_orderOf_eq_one, map_one])
+  exact pow_pow_factorization_mul_inv_val_eq_self _ _
+    (by rw [← map_pow, pow_orderOf_eq_one, map_one])
 
 end GlobalTheory.TypeLeaf

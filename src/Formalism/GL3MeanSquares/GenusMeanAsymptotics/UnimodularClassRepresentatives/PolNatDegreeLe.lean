@@ -13,8 +13,8 @@ variable {n : Type*} [Fintype n] [DecidableEq n]
 
 namespace Node
 
-theorem div_mem (hS : IsLocUnif S ϖ) : ∀ (l : ℕ) (f : K), f ∈ S → star f = f →
-    f * (ϖ⁻¹) ^ (l + 1) ∉ S → ϖ ^ l * f⁻¹ ∈ S := by
+theorem div_mem (hS : IsLocUnif S ϖ)
+    : ∀ (l : ℕ) (f : K), f ∈ S → star f = f → f * (ϖ⁻¹) ^ (l + 1) ∉ S → ϖ ^ l * f⁻¹ ∈ S := by
   intro l
   induction l with
   | zero =>
@@ -27,18 +27,16 @@ theorem div_mem (hS : IsLocUnif S ϖ) : ∀ (l : ℕ) (f : K), f ∈ S → star 
     rcases hS.dv f hf hs with h | h
     · rw [pow_succ, mul_assoc]
       exact S.mul_mem (S.pow_mem hS.mem _) (S.mul_mem hS.mem h)
-    · have hgs : star (f * ϖ⁻¹) = f * ϖ⁻¹ := by
-        rw [star_mul', star_inv₀, hS.fix, hs]
-      have hgn : f * ϖ⁻¹ * (ϖ⁻¹) ^ (l + 1) ∉ S := by
-        rwa [mul_assoc, ← pow_succ']
+    · have hgs : star (f * ϖ⁻¹) = f * ϖ⁻¹ := by rw [star_mul', star_inv₀, hS.fix, hs]
+      have hgn : f * ϖ⁻¹ * (ϖ⁻¹) ^ (l + 1) ∉ S := by rwa [mul_assoc, ← pow_succ']
       have := ih (f * ϖ⁻¹) h hgs hgn
       rw [mul_inv, inv_inv] at this
       have e : ϖ ^ (l + 1) * f⁻¹ = ϖ ^ l * (f⁻¹ * ϖ) := by ring
       rw [e]
       exact this
 
-theorem exists_pow (hS : IsLocUnif S ϖ) {ι : Type*} (s : Finset ι) (a : ι → K) :
-    ∃ l : ℕ, ∀ i ∈ s, ϖ ^ l * a i ∈ S := by
+theorem exists_pow (hS : IsLocUnif S ϖ) {ι : Type*} (s : Finset ι) (a : ι → K)
+    : ∃ l : ℕ, ∀ i ∈ s, ϖ ^ l * a i ∈ S := by
   choose L hL using hS.arch
   refine ⟨∑ i ∈ s, L (a i), fun i hi => ?_⟩
   have hle : L (a i) ≤ ∑ j ∈ s, L (a j) :=
@@ -61,22 +59,24 @@ theorem pol_natDegree_le (A B : Matrix n n K) : (pol A B).natDegree ≤ Fintype.
 
 end Node
 
-theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [DecidableEq n] :
-    ∃ l : ℕ, ∀ X : Matrix n n K, Ent S X → X.det ≠ 0 → X.det⁻¹ ∈ S →
-      ∃ c ∈ S, c + star c = 1 ∧ ∃ W' : Matrix n n K, Ent S W' ∧
-        (c • (1 : Matrix n n K) + star c • X) * W' = ϖ ^ l • (1 : Matrix n n K) := by
+theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [DecidableEq n]
+    : ∃ l : ℕ, ∀ X : Matrix n n K,
+      Ent S X → X.det ≠ 0 → X.det⁻¹ ∈ S
+        → ∃ c ∈ S,
+          c + star c = 1
+            ∧ ∃ W' : Matrix n n K,
+              Ent S W'
+                ∧ (c • (1 : Matrix n n K) + star c • X) * W' = ϖ ^ l • (1 : Matrix n n K) := by
   obtain ⟨τ, hτS, hτ⟩ := hS.tr
   obtain ⟨θ, hθS, hθs, hθ0⟩ := hS.skew
   have hdetS : ∀ M : Matrix n n K, Ent S M → M.det ∈ S := by
     intro M hM
-    have e : M = S.subtype.mapMatrix (Matrix.of fun i j => (⟨M i j, hM i j⟩ : S)) := by
-      ext i j; rfl
+    have e : M = S.subtype.mapMatrix (Matrix.of fun i j => (⟨M i j, hM i j⟩ : S)) := by ext i j; rfl
     rw [e, ← RingHom.map_det]
     exact SetLike.coe_mem _
   have hadjS : ∀ M : Matrix n n K, Ent S M → Ent S M.adjugate := by
     intro M hM i j
-    have e : M = S.subtype.mapMatrix (Matrix.of fun i j => (⟨M i j, hM i j⟩ : S)) := by
-      ext i j; rfl
+    have e : M = S.subtype.mapMatrix (Matrix.of fun i j => (⟨M i j, hM i j⟩ : S)) := by ext i j; rfl
     rw [e, ← RingHom.map_adjugate]
     exact SetLike.coe_mem _
   have hnot : ϖ⁻¹ ∉ S := by
@@ -108,15 +108,19 @@ theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [
     refine lt_of_le_of_lt (Polynomial.degree_le_of_natDegree_le h1) ?_
     simp only [s, Finset.card_range]
     exact_mod_cast Nat.lt_succ_self _
-  have hReval : ∀ c : K, star c = 1 - c →
-      R.eval c = (c • (1 : Matrix n n K) + star c • X).det *
-        star ((c • (1 : Matrix n n K) + star c • X).det) := by
+  have hReval
+      : ∀ c : K,
+        star c = 1 - c
+          → R.eval c
+            = (c • (1 : Matrix n n K) + star c • X).det
+              * star ((c • (1 : Matrix n n K) + star c • X).det) := by
     intro c hc
     rw [Polynomial.eval_mul, Node.pol_eval, Node.pol_eval, ← Matrix.det_conjTranspose]
     congr 2
     · rw [hc, smul_sub, sub_smul, one_smul]; abel
     · simp only [conjTranspose_add, conjTranspose_smul, conjTranspose_one, star_star]
-      rw [hc, smul_sub, sub_smul, one_smul]; abel
+      rw [hc, smul_sub, sub_smul, one_smul]
+      abel
   have hR1 : R.eval 1 = star X.det := by
     simp only [R]
     rw [Polynomial.eval_mul, Node.pol_eval, Node.pol_eval]
@@ -129,8 +133,7 @@ theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [
   have hR1S : (R.eval 1)⁻¹ ∈ S := by
     rw [hR1, ← star_inv₀]
     exact hS.star_mem _ hdi
-  have hR10 : R.eval 1 ≠ 0 := by
-    rw [hR1]; exact star_ne_zero.mpr hX0
+  have hR10 : R.eval 1 ≠ 0 := by rw [hR1]; exact star_ne_zero.mpr hX0
   have hMS : ∀ k, Ent S (v k • (1 : Matrix n n K) + star (v k) • X) := by
     intro k i j
     simp only [Matrix.add_apply, Matrix.smul_apply, Matrix.one_apply, smul_eq_mul]
@@ -143,8 +146,9 @@ theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [
     push_neg at hcon
     apply hnot
     have h1 : R.eval 1 * ϖ⁻¹ ∈ S := by
-      have e : R.eval 1 * ϖ⁻¹ =
-          ∑ k ∈ s, (R.eval (v k) * (ϖ⁻¹) ^ (l + 1)) * (ϖ ^ l * (Lagrange.basis s v k).eval 1) := by
+      have e
+          : R.eval 1 * ϖ⁻¹
+            = ∑ k ∈ s, (R.eval (v k) * (ϖ⁻¹) ^ (l + 1)) * (ϖ ^ l * (Lagrange.basis s v k).eval 1) := by
         rw [hsum, Finset.sum_mul]
         refine Finset.sum_congr rfl fun k _ => ?_
         have e1 : ϖ ^ l * (ϖ⁻¹) ^ (l + 1) = ϖ⁻¹ := by
@@ -152,8 +156,7 @@ theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [
         linear_combination (-(Polynomial.eval (v k) R * Polynomial.eval 1 (Lagrange.basis s v k))) * e1
       rw [e]
       exact S.sum_mem fun k hk => S.mul_mem (hcon k hk) (hl k hk)
-    have e2 : ϖ⁻¹ = (R.eval 1)⁻¹ * (R.eval 1 * ϖ⁻¹) := by
-      field_simp
+    have e2 : ϖ⁻¹ = (R.eval 1)⁻¹ * (R.eval 1 * ϖ⁻¹) := by field_simp
     rw [e2]
     exact S.mul_mem hR1S h1
   obtain ⟨k, hk, hkn⟩ := hex
@@ -161,13 +164,10 @@ theorem exists_node [CharZero K] (hS : IsLocUnif S ϖ) (n : Type*) [Fintype n] [
   have hfk : R.eval (v k) = M.det * star M.det := hReval (v k) (hvs k)
   have hfS : R.eval (v k) ∈ S := by
     rw [hfk]; exact S.mul_mem (hdetS M (hMS k)) (hS.star_mem _ (hdetS M (hMS k)))
-  have hfs : star (R.eval (v k)) = R.eval (v k) := by
-    rw [hfk, star_mul', star_star, mul_comm]
-  have hf0 : R.eval (v k) ≠ 0 := by
-    intro h0; apply hkn; rw [h0, zero_mul]; exact S.zero_mem
+  have hfs : star (R.eval (v k)) = R.eval (v k) := by rw [hfk, star_mul', star_star, mul_comm]
+  have hf0 : R.eval (v k) ≠ 0 := by intro h0; apply hkn; rw [h0, zero_mul]; exact S.zero_mem
   have hdiv := Node.div_mem hS l _ hfS hfs hkn
-  have hM0 : M.det ≠ 0 := by
-    intro h0; apply hf0; rw [hfk, h0, zero_mul]
+  have hM0 : M.det ≠ 0 := by intro h0; apply hf0; rw [hfk, h0, zero_mul]
   have hcS : ϖ ^ l * M.det⁻¹ ∈ S := by
     have e : ϖ ^ l * M.det⁻¹ = ϖ ^ l * (R.eval (v k))⁻¹ * star M.det := by
       rw [hfk]

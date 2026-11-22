@@ -13,14 +13,21 @@ open Formalism.MainNotions.G Formalism.BasicNotions Formalism.L2.Forms NumberFie
 
 section Gen
 
-variable {p : ℕ} {O Kf : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
-  (P : Places p O Kf) (α : Type) {LL : Type} [Field LL] (e : LL →+* Kf) (Mi : Submodule O (FnP P α))
+variable
+  {p : ℕ} {O Kf : Type}
+  [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+  (P : Places p O Kf) (α : Type)
+  {LL : Type} [Field LL]
+  (e : LL →+* Kf) (Mi : Submodule O (FnP P α))
 
-theorem span_image_of_surj {V : Type} [AddCommGroup V] [Module LL V] (cmp : V →ₛₗ[e] FnP P α) (A : Subring LL)
-    (hA : ∀ a ∈ A, e a ∈ Set.range (algebraMap O Kf)) (S : Set V)
+theorem span_image_of_surj
+    {V : Type} [AddCommGroup V] [Module LL V]
+    (cmp : V →ₛₗ[e] FnP P α)
+    (A : Subring LL) (hA : ∀ a ∈ A, e a ∈ Set.range (algebraMap O Kf))
+    (S : Set V)
     (hsurj : ∀ F ∈ Mi, RatFnP P α e F → ∃ x, cmp x = F)
-    (hlat : ∀ x, cmp x ∈ Mi ↔ x ∈ Submodule.span A S) (hd : MRatSpan P α e Mi) :
-    Submodule.span O (cmp '' S) = Mi := by
+    (hlat : ∀ x, cmp x ∈ Mi ↔ x ∈ Submodule.span A S) (hd : MRatSpan P α e Mi)
+    : Submodule.span O (cmp '' S) = Mi := by
   apply le_antisymm
   · rw [Submodule.span_le]
     rintro _ ⟨s, hs, rfl⟩

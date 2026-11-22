@@ -5,21 +5,24 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CupEqClassOf
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Kun
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC UpperTheory.Pbf UpperTheory.Kun
 
-theorem UpperTheory.exists_cocycle_product_eq_pull_add_cup :
-    ∀ (R : Type) [CommRing R] (W X : Scheme.{0}) {I Q P : Cx R} (μ : Pair Q P I)
+theorem UpperTheory.exists_cocycle_product_eq_pull_add_cup
+    : ∀ (R : Type) [CommRing R] (W X : Scheme.{0}) {I Q P : Cx R} (μ : Pair Q P I)
         (κ : Cocycle ((chains R).obj (sch.obj W)) P 1) {m n : ℤ} (h : m + 1 = n)
-        (α₁ : Cocycle ((chains R).obj (sch.obj X)) I n) (α₂ : Cocycle ((chains R).obj (sch.obj X)) Q m),
-        ∃ β : Cocycle ((chains R).obj (sch.obj (W ⨯ X))) I n,
-          CohomologyClass.mk β =
-              cpull ((chains R).map (sch.map (prod.snd : W ⨯ X ⟶ X))) I n (CohomologyClass.mk α₁) +
-                μ.cup (sch.obj (W ⨯ X)) h
-                  (cpull ((chains R).map (sch.map (prod.snd : W ⨯ X ⟶ X))) Q m (CohomologyClass.mk α₂))
-                  (cpull ((chains R).map (sch.map (prod.fst : W ⨯ X ⟶ W))) P 1 (CohomologyClass.mk κ)) ∧
-            sg β = Sec.res (prod.snd : W ⨯ X ⟶ X) (sg α₁) +
-              μ.mul (W ⨯ X) m 1 n h (Sec.res (prod.snd : W ⨯ X ⟶ X) (sg α₂))
-                (Sec.res (prod.fst : W ⨯ X ⟶ W) (sg κ)) := by
+        (α₁ : Cocycle ((chains R).obj (sch.obj X)) I n)
+        (α₂ : Cocycle ((chains R).obj (sch.obj X)) Q m),
+      ∃ β : Cocycle ((chains R).obj (sch.obj (W ⨯ X))) I n,
+        CohomologyClass.mk β
+            = cpull ((chains R).map (sch.map (prod.snd : W ⨯ X ⟶ X))) I n (CohomologyClass.mk α₁)
+              + μ.cup (sch.obj (W ⨯ X)) h
+                (cpull ((chains R).map (sch.map (prod.snd : W ⨯ X ⟶ X))) Q m
+                  (CohomologyClass.mk α₂))
+                (cpull ((chains R).map (sch.map (prod.fst : W ⨯ X ⟶ W))) P 1 (CohomologyClass.mk κ))
+          ∧ sg β
+            = Sec.res (prod.snd : W ⨯ X ⟶ X) (sg α₁) + μ.mul (W ⨯ X) m 1 n h
+              (Sec.res (prod.snd : W ⨯ X ⟶ X) (sg α₂)) (Sec.res (prod.fst : W ⨯ X ⟶ W) (sg κ)) := by
   intro R _ W X I Q P μ κ m n h α₁ α₂
   let A := zcomp (Cocycle.ofHom ((chains R).map (sch.map (prod.snd : W ⨯ X ⟶ X)))) α₂ (zero_add m)
   let B := zcomp (Cocycle.ofHom ((chains R).map (sch.map (prod.fst : W ⨯ X ⟶ W)))) κ (zero_add 1)
@@ -30,13 +33,15 @@ theorem UpperTheory.exists_cocycle_product_eq_pull_add_cup :
   · rw [CohomologyClass.mk_add, ← hc]
     rfl
   · have hadd : sg (C + γ) = sg C + sg γ :=
-      ((GlobalTheory.T.etaleCochainEvalOnSimplex_basic_properties R (E := sch.obj (W ⨯ X)) (I := I) (n := n)).1 C.1 γ.1 0 n (by simp) (W ⨯ X) (𝟙 _)).1
+      ((GlobalTheory.T.etaleCochainEvalOnSimplex_basic_properties R (E := sch.obj (W ⨯ X)) (I := I)
+        (n := n)).1 C.1 γ.1 0 n (by simp) (W ⨯ X) (𝟙 _)).1
     have hC : sg C = Sec.res (prod.snd : W ⨯ X ⟶ X) (sg α₁) := sg_pull _ α₁
     have hA : sg A = Sec.res (prod.snd : W ⨯ X ⟶ X) (sg α₂) := sg_pull _ α₂
     have hB : sg B = Sec.res (prod.fst : W ⨯ X ⟶ W) (sg κ) := sg_pull _ κ
-    have key : ∀ (d e : ℤ) (hd : -((0 : ℕ) : ℤ) + m = d) (he : -((0 : ℕ) : ℤ) + 1 = e) (hw : d + e = n),
-        μ.mul (W ⨯ X) d e n hw (ev A.1 0 d hd (W ⨯ X) (𝟙 _)) (ev B.1 0 e he (W ⨯ X) (𝟙 _)) =
-          μ.mul (W ⨯ X) m 1 n h (sg A) (sg B) := by
+    have key
+        : ∀ (d e : ℤ) (hd : -((0 : ℕ) : ℤ) + m = d) (he : -((0 : ℕ) : ℤ) + 1 = e) (hw : d + e = n),
+          μ.mul (W ⨯ X) d e n hw (ev A.1 0 d hd (W ⨯ X) (𝟙 _)) (ev B.1 0 e he (W ⨯ X) (𝟙 _))
+            = μ.mul (W ⨯ X) m 1 n h (sg A) (sg B) := by
       intro d e hd he hw
       obtain rfl : m = d := by simpa using hd
       obtain rfl : (1 : ℤ) = e := by simpa using he

@@ -7,7 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
 
@@ -17,8 +18,10 @@ variable {M : Model F E} {g : SplitG M.L}
 
 section Rtools
 
-theorem mem_R_of (hs : M.split = some g) (x : E) (a b c : 𝒪[F]) (hx : g.e x = ((a : F), (b : F)))
-    (h : (a : F) - b = (g.q : F) * c) : x ∈ M.R := by
+theorem mem_R_of
+    (hs : M.split = some g)
+    (x : E) (a b c : 𝒪[F]) (hx : g.e x = ((a : F), (b : F))) (h : (a : F) - b = (g.q : F) * c)
+    : x ∈ M.R := by
   unfold Formalism.MainNotions.S.Loc.Model.R
   rw [hs]
   simp only [Subring.mem_comap, Subring.mem_map]
@@ -36,16 +39,22 @@ def dgR (hs : M.split = some g) : 𝒪[F] →+* M.R where
   map_zero' := by apply Subtype.ext; simp
   map_add' a b := by apply Subtype.ext; simp
 
-theorem dgR_coe (hs : M.split = some g) (c : 𝒪[F]) : ((dgR hs c : M.R) : E) = algebraMap F E c := rfl
+theorem dgR_coe (hs : M.split = some g) (c : 𝒪[F]) : ((dgR hs c : M.R) : E) = algebraMap F E c :=
+  rfl
 
-theorem e_dgR (hs : M.split = some g) (c : 𝒪[F]) : g.e ((dgR hs c : M.R) : E) = ((c : F), (c : F)) := by
+theorem e_dgR (hs : M.split = some g) (c : 𝒪[F])
+    : g.e ((dgR hs c : M.R) : E) = ((c : F), (c : F)) := by
   rw [dgR_coe, AlgEquiv.commutes]
   rfl
 
 def trO (hs : M.split = some g) : M.R →+ 𝒪[F] where
-  toFun x := ⟨((g.e x).1 - (g.e x).2) / (g.q : F), by
-    obtain ⟨-, -, c, hc⟩ := comp_of_mem_R hs x.2
-    rw [hc, mul_div_cancel_left₀ _ (q_ne g)]; exact c.2⟩
+  toFun x := ⟨
+    ((g.e x).1 - (g.e x).2) / (g.q : F),
+    by
+      obtain ⟨-, -, c, hc⟩ := comp_of_mem_R hs x.2
+      rw [hc, mul_div_cancel_left₀ _ (q_ne g)]
+      exact c.2
+  ⟩
   map_zero' := by apply Subtype.ext; simp
   map_add' x y := by
     apply Subtype.ext
@@ -53,13 +62,15 @@ def trO (hs : M.split = some g) : M.R →+ 𝒪[F] where
     push_cast
     ring
 
-theorem trO_coe (hs : M.split = some g) (x : M.R) :
-    ((trO hs x : 𝒪[F]) : F) = ((g.e x).1 - (g.e x).2) / (g.q : F) := rfl
+theorem trO_coe (hs : M.split = some g) (x : M.R)
+    : ((trO hs x : 𝒪[F]) : F) = ((g.e x).1 - (g.e x).2) / (g.q : F) :=
+  rfl
 
 def q2 (hs : M.split = some g) : M.R :=
   ⟨g.e.symm (0, (g.q : F)), mem_R_of hs _ 0 g.q (-1) (by simp) (by simp)⟩
 
-theorem embedding_uniformizer (hs : M.split = some g) : g.e ((q2 hs : M.R) : E) = (0, (g.q : F)) := by
+theorem embedding_uniformizer (hs : M.split = some g)
+    : g.e ((q2 hs : M.R) : E) = (0, (g.q : F)) := by
   show g.e (g.e.symm (0, (g.q : F))) = _
   exact g.e.apply_symm_apply _
 
@@ -68,19 +79,21 @@ theorem trO_one (hs : M.split = some g) : trO hs 1 = 0 := by
   rw [trO_coe]
   simp
 
-theorem trO_dgR_mul (hs : M.split = some g) (c : 𝒪[F]) (x : M.R) :
-    trO hs (dgR hs c * x) = c * trO hs x := by
+theorem trO_dgR_mul (hs : M.split = some g) (c : 𝒪[F]) (x : M.R)
+    : trO hs (dgR hs c * x) = c * trO hs x := by
   apply Subtype.ext
-  rw [trO_coe, MulMemClass.coe_mul, MulMemClass.coe_mul, trO_coe, map_mul, e_dgR, Prod.fst_mul, Prod.snd_mul]
+  rw [trO_coe, MulMemClass.coe_mul, MulMemClass.coe_mul, trO_coe, map_mul, e_dgR, Prod.fst_mul,
+    Prod.snd_mul]
   ring
 
-theorem R_decomp (hs : M.split = some g) (s : M.R) :
-    ∃ a b : 𝒪[F], s = dgR hs a + dgR hs b * q2 hs := by
+theorem R_decomp (hs : M.split = some g) (s : M.R)
+    : ∃ a b : 𝒪[F], s = dgR hs a + dgR hs b * q2 hs := by
   obtain ⟨h1, -, c, hc⟩ := comp_of_mem_R hs s.2
   refine ⟨⟨(g.e s).1, h1⟩, -c, ?_⟩
   apply Subtype.ext
   apply g.e.injective
-  rw [AddMemClass.coe_add, MulMemClass.coe_mul, map_add (f := _), map_mul, e_dgR, e_dgR, embedding_uniformizer]
+  rw [AddMemClass.coe_add, MulMemClass.coe_mul, map_add (f := _), map_mul, e_dgR, e_dgR,
+    embedding_uniformizer]
   ext
   · simp
   · simp only [Prod.snd_add, Prod.snd_mul]

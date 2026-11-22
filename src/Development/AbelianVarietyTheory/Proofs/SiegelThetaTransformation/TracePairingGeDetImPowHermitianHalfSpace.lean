@@ -169,18 +169,22 @@ private lemma card_mul_det_mul_det_rpow_le_trace_mul_of_posDef {N : ℕ} (hN : 0
   rw [htr, ← hre]
   exact card_mul_det_rpow_le_trace_of_posDef hN hP
 
-
 open Matrix Complex NumberField Filter Topology in
 open scoped ComplexConjugate ComplexOrder Real Classical in
 variable {E : Type} [Field E] [NumberField E] in
-theorem _root_.GlobalTheory.SW.TracePair.trace_ge :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)),
-      _root_.GlobalTheory.SW.IsType Ψ → ∀ N c : ℕ, 0 < N → 0 < c → ∃ k : ℝ, 0 < k ∧
-        ∀ T : Matrix (Fin N) (Fin N) E, _root_.GlobalTheory.SW.ccT T = T →
-          _root_.GlobalTheory.SW.Den c T → (∀ τ : Ψ, (T.map τ.1).PosDef) →
-            ∀ Z ∈ _root_.GlobalTheory.SW.Hn Ψ N,
-              k * _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ)) ≤
-                ∑ τ : Ψ, (T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := by
+theorem _root_.GlobalTheory.SW.TracePair.trace_ge
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Finset (E →+* ℂ)),
+      _root_.GlobalTheory.SW.IsType Ψ
+        → ∀ N c : ℕ,
+          0 < N → 0 < c
+            → ∃ k : ℝ,
+              0 < k
+                ∧ ∀ T : Matrix (Fin N) (Fin N) E,
+                  _root_.GlobalTheory.SW.ccT T = T → _root_.GlobalTheory.SW.Den c T
+                    → (∀ τ : Ψ, (T.map τ.1).PosDef)
+                    → ∀ Z ∈ _root_.GlobalTheory.SW.Hn Ψ N,
+                      k * _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ))
+                        ≤ ∑ τ : Ψ, (T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := by
   intro E _ _ _ Ψ hΨ N c hN hc
   have hne : Ψ.Nonempty := by
     obtain ⟨τ₀⟩ : Nonempty (E →+* ℂ) := inferInstance
@@ -197,36 +201,43 @@ theorem _root_.GlobalTheory.SW.TracePair.trace_ge :
   intro T _ hden hpos Z hZ
   have hY : ∀ τ : Ψ, (_root_.GlobalTheory.SW.imH (Z τ)).PosDef := by
     simpa [_root_.GlobalTheory.SW.Hn] using hZ
-  have hA : ∀ τ : Ψ, ((c : ℂ) • T.map τ.1).PosDef := fun τ =>
-    (hpos τ).smul (by exact_mod_cast hc)
+  have hA : ∀ τ : Ψ, ((c : ℂ) • T.map τ.1).PosDef := fun τ => (hpos τ).smul (by exact_mod_cast hc)
   set a : Ψ → ℝ := fun τ => ((c : ℂ) • T.map τ.1).det.re
   set y : Ψ → ℝ := fun τ => (_root_.GlobalTheory.SW.imH (Z τ)).det.re
   have ha : ∀ τ, 0 < a τ := fun τ => (Complex.pos_iff.1 (hA τ).det_pos).1
   have hy : ∀ τ, 0 < y τ := fun τ => (Complex.pos_iff.1 (hY τ).det_pos).1
   have hD : _root_.GlobalTheory.SW.detIm Z = ∏ τ, y τ := rfl
   have hprod_a : 1 ≤ ∏ τ, a τ := by
-    have h := one_le_prod_re_of_isType_of_isIntegral_pos Ψ hΨ (((c : E) • T).det)
-      (isIntegral_det_natCast_smul_of_den c T hden) (fun τ hτ => by
-        rw [map_det_natCast_smul]
-        exact (hA ⟨τ, hτ⟩).det_pos)
+    have h :=
+      one_le_prod_re_of_isType_of_isIntegral_pos Ψ hΨ (((c : E) • T).det)
+        (isIntegral_det_natCast_smul_of_den c T hden)
+        (fun τ hτ => by
+          rw [map_det_natCast_smul]
+          exact (hA ⟨τ, hτ⟩).det_pos)
     have h' : ∏ τ, a τ = ∏ τ : Ψ, (τ.1 ((c : E) • T).det).re :=
       Finset.prod_congr rfl fun τ _ => by simp only [a]; rw [map_det_natCast_smul]
     rw [h', Finset.prod_coe_sort Ψ (fun τ => (τ ((c : E) • T).det).re)]
     exact h
-  have hsum : (c : ℝ) * ∑ τ : Ψ, (T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re =
-      ∑ τ : Ψ, ((c : ℂ) • T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := by
+  have hsum
+      : (c : ℝ) * ∑ τ : Ψ, (T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re
+        = ∑ τ : Ψ, ((c : ℂ) • T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := by
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun τ _ => ?_
     rw [Matrix.smul_mul, trace_smul, smul_eq_mul]
     simp
-  have hlow : ∀ τ : Ψ, (N : ℝ) * (a τ * y τ) ^ (1 / (N : ℝ)) ≤
-      ((c : ℂ) • T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := fun τ =>
+  have hlow
+      : ∀ τ : Ψ,
+        (N : ℝ) * (a τ * y τ) ^ (1 / (N : ℝ))
+          ≤ ((c : ℂ) • T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := fun τ =>
     card_mul_det_mul_det_rpow_le_trace_mul_of_posDef hN (hA τ) (hY τ)
-  have hamgm := card_mul_prod_rpow_inv_card_le_sum (fun τ : Ψ => (a τ * y τ) ^ (1 / (N : ℝ)))
-    (fun τ => by have := ha τ; have := hy τ; positivity)
+  have hamgm :=
+    card_mul_prod_rpow_inv_card_le_sum
+      (fun τ : Ψ => (a τ * y τ) ^ (1 / (N : ℝ)))
+      (fun τ => by have := ha τ; have := hy τ; positivity)
   rw [Fintype.card_coe, Real.finsetProd_rpow _ _ (fun τ _ => (mul_pos (ha τ) (hy τ)).le),
-    ← Real.rpow_mul (Finset.prod_nonneg fun τ _ => (mul_pos (ha τ) (hy τ)).le),
-    Finset.prod_mul_distrib, ← hD] at hamgm
+      ← Real.rpow_mul (Finset.prod_nonneg fun τ _ => (mul_pos (ha τ) (hy τ)).le),
+      Finset.prod_mul_distrib, ← hD]
+    at hamgm
   have he : 1 / (N : ℝ) * (1 / (Ψ.card : ℝ)) = 1 / ((Ψ.card * N : ℕ) : ℝ) := by
     push_cast
     field_simp
@@ -234,17 +245,21 @@ theorem _root_.GlobalTheory.SW.TracePair.trace_ge :
   have hDnn : 0 ≤ _root_.GlobalTheory.SW.detIm Z := by
     rw [hD]
     exact Finset.prod_nonneg fun τ _ => (hy τ).le
-  have hmono : _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ)) ≤
-      ((∏ τ, a τ) * _root_.GlobalTheory.SW.detIm Z) ^ (1 / ((Ψ.card * N : ℕ) : ℝ)) :=
+  have hmono
+      : _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ))
+        ≤ ((∏ τ, a τ) * _root_.GlobalTheory.SW.detIm Z) ^ (1 / ((Ψ.card * N : ℕ) : ℝ)) :=
     Real.rpow_le_rpow hDnn (le_mul_of_one_le_left hDnn hprod_a) (by positivity)
-  have hchain : (Ψ.card * N : ℝ) * _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ)) ≤
-      (c : ℝ) * ∑ τ : Ψ, (T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := by
+  have hchain
+      : (Ψ.card * N : ℝ) * _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ))
+        ≤ (c : ℝ) * ∑ τ : Ψ, (T.map τ.1 * _root_.GlobalTheory.SW.imH (Z τ)).trace.re := by
     rw [hsum]
-    calc (Ψ.card * N : ℝ) * _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ))
-        ≤ (N : ℝ) * ((Ψ.card : ℝ) *
-            ((∏ τ, a τ) * _root_.GlobalTheory.SW.detIm Z) ^ (1 / ((Ψ.card * N : ℕ) : ℝ))) := by
-          rw [← mul_assoc, mul_comm (N : ℝ)]
-          gcongr
+    calc
+      (Ψ.card * N : ℝ) * _root_.GlobalTheory.SW.detIm Z ^ (1 / ((Ψ.card * N : ℕ) : ℝ))
+          ≤ (N : ℝ)
+            * ((Ψ.card : ℝ)
+              * ((∏ τ, a τ) * _root_.GlobalTheory.SW.detIm Z) ^ (1 / ((Ψ.card * N : ℕ) : ℝ))) := by
+        rw [← mul_assoc, mul_comm (N : ℝ)]
+        gcongr
       _ ≤ (N : ℝ) * ∑ τ : Ψ, (a τ * y τ) ^ (1 / (N : ℝ)) := by gcongr
       _ = ∑ τ : Ψ, (N : ℝ) * (a τ * y τ) ^ (1 / (N : ℝ)) := Finset.mul_sum _ _ _
       _ ≤ _ := Finset.sum_le_sum fun τ _ => hlow τ

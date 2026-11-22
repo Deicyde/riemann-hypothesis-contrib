@@ -5,25 +5,31 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.IsBlo
 
 @[expose] public section
 
-open Matrix NumberField MeasureTheory Formalism.DegreeFormula Formalism.MJ Formalism.UG Formalism.L2.Geo
-open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates GlobalTheory.HodgeDomain GlobalTheory.TrueCx GlobalTheory.FlagFibre
+open Matrix NumberField MeasureTheory Formalism.DegreeFormula Formalism.MJ Formalism.UG
+  Formalism.L2.Geo
+open ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst
+  ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates
+  GlobalTheory.HodgeDomain GlobalTheory.TrueCx GlobalTheory.FlagFibre
 open scoped ComplexOrder ENNReal
 
 namespace GlobalTheory.FlagFibre.FundPre
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-theorem ae_lact_notMem (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0)
-    {Bad : Set (Frame X.Ψ r)} (hB : MeasurableSet Bad)
-    (hinv : ∀ x, ∀ b ∈ Bor X.Ψ r, (rmul x b ∈ Bad ↔ x ∈ Bad))
-    (h0 : ∀ᵐ z ∂muF X x0, cpt X x0 z ∉ Bad) {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ) :
-    ∀ᵐ z ∂muF X x0, lact γ (cpt X x0 z) ∉ Bad := by
-  have hφ : Measurable (Bad.indicator (1 : Frame X.Ψ r → ℝ≥0∞)) :=
-    measurable_one.indicator hB
-  have hM := measInv_holds (E := E) r X x0 (lact γ x0) ho (KU.isOrth_lact X hγ ho)
-    (Bad.indicator 1) hφ (fun x _ b hb => by
-      classical
-      simp only [Set.indicator_apply, hinv x b hb, Pi.one_apply])
+theorem ae_lact_notMem
+    (X : Data E r)
+    {x0 : Frame X.Ψ r} (ho : IsOrth X x0)
+    {Bad : Set (Frame X.Ψ r)}
+    (hB : MeasurableSet Bad) (hinv : ∀ x, ∀ b ∈ Bor X.Ψ r, (rmul x b ∈ Bad ↔ x ∈ Bad))
+    (h0 : ∀ᵐ z ∂muF X x0, cpt X x0 z ∉ Bad)
+    {γ : GL (Fin r) E} (hγ : γ ∈ X.Γ)
+    : ∀ᵐ z ∂muF X x0, lact γ (cpt X x0 z) ∉ Bad := by
+  have hφ : Measurable (Bad.indicator (1 : Frame X.Ψ r → ℝ≥0∞)) := measurable_one.indicator hB
+  have hM :=
+    measInv_holds (E := E) r X x0 (lact γ x0) ho (KU.isOrth_lact X hγ ho) (Bad.indicator 1) hφ
+      (fun x _ b hb => by
+        classical
+        simp only [Set.indicator_apply, hinv x b hb, Pi.one_apply])
   have h1 : ∫⁻ z, Bad.indicator (1 : Frame X.Ψ r → ℝ≥0∞) (cpt X x0 z) ∂muF X x0 = 0 := by
     rw [lintegral_congr_ae (g := fun _ => 0), lintegral_zero]
     filter_upwards [h0] with z hz
@@ -37,15 +43,20 @@ theorem ae_lact_notMem (X : Data E r) {x0 : Frame X.Ψ r} (ho : IsOrth X x0)
   simp only [Set.indicator_of_mem hbad, Pi.one_apply, Pi.zero_apply] at hz
   exact one_ne_zero hz
 
-theorem isFundSet_preimage (E : Type) [Field E] [NumberField E] [IsCMField E] (r j : ℕ)
-    (X : Data E r) (hj : j ≤ r) (Tau : Type) [Fintype Tau] (κ : Tau ≃ X.Ψ)
+theorem isFundSet_preimage
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (r j : ℕ) (X : Data E r) (hj : j ≤ r)
+    (Tau : Type) [Fintype Tau]
+    (κ : Tau ≃ X.Ψ)
     (hp : X.p0 = r - j)
     (hfree : ∀ γ ∈ X.Γ, ∀ x ∈ X.dom, domPt X hj κ (lact γ x) = domPt X hj κ x → γ = 1)
-    (hnull : ∀ N, MeasurableSet N → N ⊆ DomFlat Tau j (r - j) → muD Tau j (r - j) N = 0 →
-      muF X (x0F X) (proj X hj κ ⁻¹' N) = 0)
-    (F : Set (Tau × Fin j × Fin (r - j) → ℂ)) (hF : IsFD (gammaU X hj κ) F) :
-    ∃ F', MeasurableSet F' ∧ F' ⊆ F ∧ muD Tau j (r - j) (F \ F') = 0 ∧
-      IsFundSet X (x0F X) (proj X hj κ ⁻¹' F' ∩ OmF X (x0F X)) := by
+    (hnull : ∀ N,
+      MeasurableSet N → N ⊆ DomFlat Tau j (r - j) → muD Tau j (r - j) N = 0
+        → muF X (x0F X) (proj X hj κ ⁻¹' N) = 0)
+    (F : Set (Tau × Fin j × Fin (r - j) → ℂ)) (hF : IsFD (gammaU X hj κ) F)
+    : ∃ F',
+      MeasurableSet F' ∧ F' ⊆ F ∧ muD Tau j (r - j) (F \ F') = 0
+        ∧ IsFundSet X (x0F X) (proj X hj κ ⁻¹' F' ∩ OmF X (x0F X)) := by
   obtain ⟨hFm, hFD, hcov, hbad⟩ := hF
   obtain ⟨N0, hN0, hN0m, hN0z⟩ := exists_measurable_superset_of_null hbad
   have ho := isOrth_x0F X
@@ -77,15 +88,16 @@ theorem isFundSet_preimage (E : Type) [Field E] [NumberField E] [IsCMField E] (r
       rfl
     exact ((KU.cpt_mem_S X ho z').1 hS).symm
   · have := KU.countable_Γ X
-    have hA : ∀ᵐ z ∂muF X (x0F X), ∀ γ : X.Γ, lact (γ : GL (Fin r) E) (cpt X (x0F X) z) ∉
-        (fun x => flat (domPt X hj κ x)) ⁻¹' (F ∩ N0) := by
+    have hA
+        : ∀ᵐ z ∂muF X (x0F X), ∀ γ : X.Γ, lact (γ : GL (Fin r) E) (cpt X (x0F X) z) ∉
+          (fun x => flat (domPt X hj κ x)) ⁻¹' (F ∩ N0) := by
       refine ae_all_iff.2 fun γ => ae_lact_notMem X ho (measurable_domPt X hj κ hNm) ?_ ?_ γ.2
       · intro x b hb
         simp only [Set.mem_preimage, domPt_rmul X hj κ hb]
-      · exact measure_eq_zero_iff_ae_notMem.1
-          (hnull _ hNm (Set.inter_subset_left.trans hFD) hNz)
-    have hB : ∀ᵐ z ∂muF X (x0F X), ∀ γ : X.Γ, lact (γ : GL (Fin r) E) (cpt X (x0F X) z) ∉
-        (KU.Sset X (x0F X) (OmF X (x0F X)))ᶜ := by
+      · exact measure_eq_zero_iff_ae_notMem.1 (hnull _ hNm (Set.inter_subset_left.trans hFD) hNz)
+    have hB
+        : ∀ᵐ z ∂muF X (x0F X), ∀ γ : X.Γ, lact (γ : GL (Fin r) E) (cpt X (x0F X) z) ∉
+          (KU.Sset X (x0F X) (OmF X (x0F X)))ᶜ := by
       refine ae_all_iff.2 fun γ => ae_lact_notMem X ho (KU.meas_S X ho hOm).compl ?_ ?_ γ.2
       · intro x b hb
         simp only [Set.mem_compl_iff, KU.rmul_mem_S X hb]

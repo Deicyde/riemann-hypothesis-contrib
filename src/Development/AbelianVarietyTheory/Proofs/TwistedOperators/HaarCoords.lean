@@ -11,7 +11,10 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix GlobalTheory.MixModel GlobalTheory.MixPer
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+  GlobalTheory.MixModel GlobalTheory.MixPer
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,7 +24,18 @@ set_option synthInstance.maxHeartbeats 200000
 
 namespace GlobalTheory.HaarCoords
 
-theorem haar_coords : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ), ∃ (μ : Measure (UX D ρ)) (lB : Measure (Mx D ρ S₀.rank)) (lC : Measure (skewA D ρ)), μ.IsHaarMeasure ∧ lB.IsAddHaarMeasure ∧ lC.IsAddHaarMeasure ∧ SFinite μ ∧ SFinite lB ∧ SFinite lC ∧ Measurable (fun p : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) => d.levi p.1.1 * (d.nB p.2.1 * d.nC p.2.2)) ∧ ∃ ν₀ : Measure (flagN d), ν₀.IsHaarMeasure ∧ ν₀.map Subtype.val = (μ.prod (lB.prod lC)).map (fun p : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) => d.levi p.1.1 * (d.nB p.2.1 * d.nC p.2.2)) := by
+theorem haar_coords
+    : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S₀ ρ),
+      ∃ (μ : Measure (UX D ρ)) (lB : Measure (Mx D ρ S₀.rank)) (lC : Measure (skewA D ρ)),
+        μ.IsHaarMeasure ∧ lB.IsAddHaarMeasure ∧ lC.IsAddHaarMeasure ∧ SFinite μ ∧ SFinite lB
+          ∧ SFinite lC
+          ∧ Measurable (fun p : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) =>
+            d.levi p.1.1 * (d.nB p.2.1 * d.nC p.2.2))
+          ∧ ∃ ν₀ : Measure (flagN d),
+            ν₀.IsHaarMeasure
+              ∧ ν₀.map Subtype.val
+                = (μ.prod (lB.prod lC)).map (fun p : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) =>
+                  d.levi p.1.1 * (d.nB p.2.1 * d.nC p.2.2)) := by
   intro D S S₀ ρ d
   obtain ⟨iU1, iU2, iU3⟩ := GlobalTheory.UnitU.topology D ρ
   obtain ⟨-, familyMassSecondLine, iM3, iM4, -⟩ := lattice_Mx D ρ S₀.rank
@@ -38,10 +52,24 @@ theorem haar_coords : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S�
   let lB : Measure (Mx D ρ S₀.rank) := Measure.addHaar
   let lC : Measure (skewA D ρ) := Measure.addHaar
   obtain ⟨e, he⟩ := GlobalTheory.MixPer.flagCoord_homeo D S S₀ ρ d
-  have hΦ : (fun p : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) => d.levi p.1.1 * (d.nB p.2.1 * d.nC p.2.2)) =
-      Subtype.val ∘ e := funext fun p => (he p).symm
+  have hΦ
+      : (fun p : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) => d.levi p.1.1 * (d.nB p.2.1 * d.nC p.2.2))
+        = Subtype.val ∘ e :=
+    funext fun p => (he p).symm
   have hem : Measurable e := e.continuous.measurable
-  refine ⟨μ, lB, lC, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, ?_, ?_⟩
+  refine ⟨
+    μ,
+    lB,
+    lC,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    ?_,
+    ?_
+  ⟩
   · rw [hΦ]; exact (continuous_subtype_val.comp e.continuous).measurable
   refine ⟨(μ.prod (lB.prod lC)).map e, ?_, ?_⟩
   · haveI := Measure.IsFiniteMeasureOnCompacts.map (μ.prod (lB.prod lC)) e
@@ -51,10 +79,12 @@ theorem haar_coords : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S�
     obtain ⟨p₀, hp₀⟩ := e.surjective g
     have hg : (g : GA D S) = d.levi p₀.1.1 * (d.nB p₀.2.1 * d.nC p₀.2.2) := by rw [← hp₀, he]
     obtain ⟨⟨u', hu'⟩, b', c'⟩ := p₀
-    obtain ⟨Tb, hTb, hTb'⟩ := GlobalTheory.HaarCoords.transl_nB_preserves D S S₀ ρ d μ lB lC inferInstance inferInstance inferInstance inferInstance
-      inferInstance inferInstance b'
-    obtain ⟨Tc, hTc, hTc'⟩ := GlobalTheory.HaarCoords.transl_nC D S S₀ ρ d μ lB lC inferInstance inferInstance inferInstance inferInstance
-      inferInstance inferInstance c'
+    obtain ⟨Tb, hTb, hTb'⟩ :=
+      GlobalTheory.HaarCoords.transl_nB_preserves D S S₀ ρ d μ lB lC inferInstance inferInstance
+        inferInstance inferInstance inferInstance inferInstance b'
+    obtain ⟨Tc, hTc, hTc'⟩ :=
+      GlobalTheory.HaarCoords.transl_nC D S S₀ ρ d μ lB lC inferInstance inferInstance inferInstance
+        inferInstance inferInstance inferInstance c'
     let Ta : UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) → UX D ρ × (Mx D ρ S₀.rank × skewA D ρ) :=
       Prod.map (fun u => ⟨u', hu'⟩ * u) id
     have hTa : MeasurePreserving Ta (μ.prod (lB.prod lC)) (μ.prod (lB.prod lC)) :=
@@ -63,13 +93,16 @@ theorem haar_coords : ∀ (D : D7) (S S₀ : HSp D) (ρ : ℕ) (d : HypDec S S�
     have key : (fun x => g * x) ∘ e = e ∘ (Ta ∘ Tb ∘ Tc) := by
       funext p
       apply Subtype.ext
-      have h3 : ∀ q, d.levi (Ta q).1.1 * (d.nB (Ta q).2.1 * d.nC (Ta q).2.2) =
-          d.levi u' * (d.levi q.1.1 * (d.nB q.2.1 * d.nC q.2.2)) := fun q => by
+      have h3
+          : ∀ q,
+            d.levi (Ta q).1.1 * (d.nB (Ta q).2.1 * d.nC (Ta q).2.2)
+              = d.levi u' * (d.levi q.1.1 * (d.nB q.2.1 * d.nC q.2.2)) := fun q => by
         simp only [Ta, Prod.map_fst, Prod.map_snd, id, Subgroup.coe_mul, map_mul, mul_assoc]
       simp only [Function.comp_apply, Subgroup.coe_mul, he]
       rw [h3, hTb', hTc', hg]
       simp only [mul_assoc]
-    rw [Measure.map_map (measurable_const_mul g) hem, key, ← Measure.map_map hem hT.measurable, hT.map_eq]
+    rw [Measure.map_map (measurable_const_mul g) hem, key, ← Measure.map_map hem hT.measurable,
+      hT.map_eq]
   · rw [Measure.map_map continuous_subtype_val.measurable hem, hΦ]
 
 end GlobalTheory.HaarCoords

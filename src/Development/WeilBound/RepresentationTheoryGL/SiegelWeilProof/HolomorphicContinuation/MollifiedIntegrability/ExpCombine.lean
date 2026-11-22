@@ -15,29 +15,35 @@ open PositivityTheory.Rg.Sw PositivityTheory.Rg.Sw.WR PositivityTheory.Rg.Sw.WR.
 
 variable {n : ℕ} {X : Type} [MeasurableSpace X] {μ : Measure X} [SFinite μ]
 
-theorem exp_combine (t : ℝ) (y q β : E n) :
-    Complex.exp (Complex.I * t * ip y q) * Complex.exp (-(Complex.I * t * ip β y)) =
-      Complex.exp (Complex.I * t * ip y (q - β)) := by
+theorem exp_combine (t : ℝ) (y q β : E n)
+    : Complex.exp (Complex.I * t * ip y q) * Complex.exp (-(Complex.I * t * ip β y))
+      = Complex.exp (Complex.I * t * ip y (q - β)) := by
   rw [ip_sub_right, ip_comm β y, ← Complex.exp_add]
   congr 1
   push_cast
   ring
 
 set_option maxHeartbeats 1000000 in
-theorem step_a (Ψ : X → ℂ) (qq : X → E n) (hΨ : Integrable Ψ μ) (hqq : Measurable qq) (t ε : ℝ) (hε : 0 < ε)
-    (β : E n) :
-    ∫ y, (∫ x, Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) ∂μ) * gam ε y *
-        Complex.exp (-(Complex.I * t * ip β y)) =
-      ∫ x, Ψ x * kr ε t (qq x - β) ∂μ := by
-  have hfun : ∀ (y : E n) (x : X), Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) * gam ε y *
-      Complex.exp (-(Complex.I * t * ip β y)) =
-      Ψ x * (gam ε y * Complex.exp (Complex.I * t * ip y (qq x - β))) := by
+theorem step_a
+    (Ψ : X → ℂ) (qq : X → E n) (hΨ : Integrable Ψ μ) (hqq : Measurable qq)
+    (t ε : ℝ) (hε : 0 < ε)
+    (β : E n)
+    : ∫ y, (∫ x, Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) ∂μ) * gam ε y *
+          Complex.exp (-(Complex.I * t * ip β y))
+      = ∫ x, Ψ x * kr ε t (qq x - β) ∂μ := by
+  have hfun
+      : ∀ (y : E n) (x : X),
+        Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) * gam ε y
+            * Complex.exp (-(Complex.I * t * ip β y))
+          = Ψ x * (gam ε y * Complex.exp (Complex.I * t * ip y (qq x - β))) := by
     intro y x
     rw [← exp_combine]
     ring
-  have hL : ∀ y : E n, (∫ x, Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) ∂μ) * gam ε y *
-      Complex.exp (-(Complex.I * t * ip β y)) =
-      ∫ x, Ψ x * (gam ε y * Complex.exp (Complex.I * t * ip y (qq x - β))) ∂μ := by
+  have hL
+      : ∀ y : E n,
+        (∫ x, Ψ x * Complex.exp (Complex.I * t * ip y (qq x)) ∂μ) * gam ε y
+            * Complex.exp (-(Complex.I * t * ip β y))
+          = ∫ x, Ψ x * (gam ε y * Complex.exp (Complex.I * t * ip y (qq x - β))) ∂μ := by
     intro y
     rw [← integral_mul_const, ← integral_mul_const]
     exact integral_congr_ae (Eventually.of_forall fun x => hfun y x)
@@ -45,8 +51,8 @@ theorem step_a (Ψ : X → ℂ) (qq : X → E n) (hΨ : Integrable Ψ μ) (hqq :
     continuous_ip.measurable.comp (measurable_fst.prodMk ((hqq.comp measurable_snd).sub_const β))
   have hm2 : Measurable fun p : E n × X => Complex.exp (Complex.I * t * ip p.1 (qq p.2 - β)) :=
     ((Complex.measurable_ofReal.comp hm1).const_mul (Complex.I * t)).cexp
-  have hint : Integrable (fun p : E n × X =>
-      Ψ p.2 * (gam ε p.1 * Complex.exp (Complex.I * t * ip p.1 (qq p.2 - β))))
+  have hint : Integrable
+      (fun p : E n × X => Ψ p.2 * (gam ε p.1 * Complex.exp (Complex.I * t * ip p.1 (qq p.2 - β))))
       ((volume : Measure (E n)).prod μ) := by
     refine Integrable.mono ((integrable_gauss (n := n) ε hε).mul_prod hΨ) ?_ ?_
     · exact (hΨ.1.comp_snd (μ := (volume : Measure (E n)))).mul

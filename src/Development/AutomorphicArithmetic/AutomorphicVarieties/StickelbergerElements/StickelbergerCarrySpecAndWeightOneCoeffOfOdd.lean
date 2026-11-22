@@ -6,9 +6,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Stickelberg
 
 open Finset UpperTheory.V.Bern UpperTheory.V.Stk
 
-theorem UpperTheory.V.Stk.stickelbergerCarry_spec_and_weightOne_coeff_of_odd :
-    ∀ (M a : ℕ) [NeZero M], a.Coprime M → ∀ b : ZMod M,
-      (a : ℤ) * ((yCl a b).val : ℤ) = (b.val : ℤ) + (M : ℤ) * jv M a b ∧ (Odd a → Eva M 1 a b = (Eone M a b : ℚ)) := by
+theorem UpperTheory.V.Stk.stickelbergerCarry_spec_and_weightOne_coeff_of_odd
+    : ∀ (M a : ℕ) [NeZero M],
+      a.Coprime M
+        → ∀ b : ZMod M,
+          (a : ℤ) * ((yCl a b).val : ℤ) = (b.val : ℤ) + (M : ℤ) * jv M a b
+            ∧ (Odd a → Eva M 1 a b = (Eone M a b : ℚ)) := by
   intro M a _ hcop b
   have hM : (M : ℤ) ∣ (a : ℤ) * ((yCl a b).val : ℤ) - (b.val : ℤ) := by
     rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]

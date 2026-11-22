@@ -5,18 +5,24 @@ public import ReciprocityTheory.AnalyticForms.RegularLocalRings.FinalTheorems
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZM
+  GlobalTheory.SiegelTor GlobalTheory.TorRef GlobalTheory.PolDeg
 open scoped CategoryTheory.Obj
 open ReciprocityTheory.AnForm.R GlobalTheory.ZH GlobalTheory.Poinc GlobalTheory.Poinc.Sep
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.Poinc.Sep
 
-
 open Module in
-theorem comap_map_eq_of_isUnit_finrank : ∀ (V V' : Type) [CommRing V] [IsDomain V] [IsIntegrallyClosed V] [CommRing V'] [IsDomain V'] [Algebra V V'] [Module.Finite V V'], Function.Injective (algebraMap V V') → IsUnit ((Module.finrank V V' : ℕ) : V) → ∀ I : Ideal V, (I.map (algebraMap V V')).comap (algebraMap V V') = I := by
+theorem comap_map_eq_of_isUnit_finrank
+    : ∀ (V V' : Type) [CommRing V] [IsDomain V] [IsIntegrallyClosed V] [CommRing V'] [IsDomain V']
+        [Algebra V V'] [Module.Finite V V'],
+      Function.Injective (algebraMap V V') → IsUnit ((Module.finrank V V' : ℕ) : V)
+        → ∀ I : Ideal V, (I.map (algebraMap V V')).comap (algebraMap V V') = I := by
   intro V V' _ _ _ _ _ _ _ hinj hunit I
   refine le_antisymm ?_ Ideal.le_comap_map
   let K := FractionRing V
@@ -41,12 +47,14 @@ theorem comap_map_eq_of_isUnit_finrank : ∀ (V V' : Type) [CommRing V] [IsDomai
     have hz : IsIntegral V (algebraMap V' L z) :=
       (Algebra.IsIntegral.isIntegral (R := V) z).map (IsScalarTower.toAlgHom V V' L)
     exact IsIntegrallyClosed.isIntegral_iff.mp (Algebra.isIntegral_trace hz)
-  have hmul : ∀ (i : V) (w : L), Algebra.trace K L (algebraMap V L i * w) =
-      algebraMap V K i * Algebra.trace K L w := by
+  have hmul
+      : ∀ (i : V) (w : L),
+        Algebra.trace K L (algebraMap V L i * w) = algebraMap V K i * Algebra.trace K L w := by
     intro i w
     rw [IsScalarTower.algebraMap_apply V K L, ← Algebra.smul_def, LinearMap.map_smul, smul_eq_mul]
-  have key : ∀ y ∈ I.map (algebraMap V V'), ∀ z : V', ∃ c ∈ I,
-      algebraMap V K c = Algebra.trace K L (algebraMap V' L (z * y)) := by
+  have key
+      : ∀ y ∈ I.map (algebraMap V V'), ∀ z : V', ∃ c ∈ I,
+        algebraMap V K c = Algebra.trace K L (algebraMap V' L (z * y)) := by
     intro y hy
     refine Submodule.span_induction ?_ ?_ ?_ ?_ hy
     · rintro _ ⟨i, hi, rfl⟩ z
@@ -58,14 +66,19 @@ theorem comap_map_eq_of_isUnit_finrank : ∀ (V V' : Type) [CommRing V] [IsDomai
     · intro x y _ _ hx hy z
       obtain ⟨c, hc, hcx⟩ := hx z
       obtain ⟨d, hd, hdy⟩ := hy z
-      exact ⟨c + d, I.add_mem hc hd, by rw [map_add (f := _), hcx, hdy, mul_add, map_add (f := _), map_add (f := _)]⟩
+      exact ⟨
+        c + d,
+        I.add_mem hc hd,
+        by rw [map_add (f := _), hcx, hdy, mul_add, map_add (f := _), map_add (f := _)]
+      ⟩
     · intro w x _ hx z
       obtain ⟨c, hc, hcx⟩ := hx (z * w)
       exact ⟨c, hc, by rw [hcx, smul_eq_mul, _root_.mul_assoc]⟩
   intro a ha
   obtain ⟨c, hc, hca⟩ := key _ ha 1
   rw [_root_.one_mul, ← IsScalarTower.algebraMap_apply V V' L, IsScalarTower.algebraMap_apply V K L,
-    Algebra.trace_algebraMap, hrank, nsmul_eq_mul, ← map_natCast (algebraMap V K), ← map_mul] at hca
+      Algebra.trace_algebraMap, hrank, nsmul_eq_mul, ← map_natCast (algebraMap V K), ← map_mul]
+    at hca
   have hc' : c = (finrank V V' : V) * a := IsFractionRing.injective V K hca
   obtain ⟨u, hu⟩ := hunit
   have : a = ↑u⁻¹ * c := by rw [hc', ← hu, ← _root_.mul_assoc, Units.inv_mul, _root_.one_mul]

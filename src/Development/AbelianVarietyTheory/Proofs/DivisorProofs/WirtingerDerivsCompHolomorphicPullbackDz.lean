@@ -15,12 +15,13 @@ theorem chain_sum_coordVec {n : ℕ} (w : V n) : w = ∑ b, w b • coordVec b :
   ext i
   simp [coordVec, Pi.single_apply]
 
-theorem del_dbar_comp_holo_pull : ∀ (m n : ℕ) (τ : V m → V n) (c : V n → ℂ) (v : V m),
-    DifferentiableAt ℂ τ v → DifferentiableAt ℝ c (τ v) →
-    (∑ a, del (fun x => c (τ x)) v (coordVec a) • dz a : Alt m)
-      = pull (fderiv ℂ τ v) (∑ a, del c (τ v) (coordVec a) • dz a) ∧
-    (∑ a, dbar (fun x => c (τ x)) v (coordVec a) • dzb a : Alt m)
-      = pull (fderiv ℂ τ v) (∑ a, dbar c (τ v) (coordVec a) • dzb a) := by
+theorem del_dbar_comp_holo_pull
+    : ∀ (m n : ℕ) (τ : V m → V n) (c : V n → ℂ) (v : V m),
+      DifferentiableAt ℂ τ v → DifferentiableAt ℝ c (τ v)
+        → (∑ a, del (fun x => c (τ x)) v (coordVec a) • dz a : Alt m)
+            = pull (fderiv ℂ τ v) (∑ a, del c (τ v) (coordVec a) • dz a)
+          ∧ (∑ a, dbar (fun x => c (τ x)) v (coordVec a) • dzb a : Alt m)
+            = pull (fderiv ℂ τ v) (∑ a, dbar c (τ v) (coordVec a) • dzb a) := by
   intro m n τ c v hτ hc
   constructor
   set_option synthInstance.maxHeartbeats 100000 in
@@ -29,13 +30,13 @@ theorem del_dbar_comp_holo_pull : ∀ (m n : ℕ) (τ : V m → V n) (c : V n �
       refine Finset.sum_congr rfl fun a _ => ?_
       conv_lhs => rw [chain_sum_coordVec (fderiv ℂ τ v (coordVec a))]
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smul, Finset.sum_smul, smul_smul, smul_eq_mul, mul_comm]
+      simp only [map_sum, map_smul, Finset.sum_smul, smul_smul, smul_eq_mul, mul_comm]
   set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [dbar_comp_holo hc hτ, map_sum, map_smul, (pull_dz _ _).2, Finset.smul_sum]
-      rw [Finset.sum_comm]
-      refine Finset.sum_congr rfl fun a _ => ?_
-      conv_lhs => rw [chain_sum_coordVec (fderiv ℂ τ v (coordVec a))]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_smulₛₗ, Finset.sum_smul, smul_smul, smul_eq_mul, mul_comm]
+  · simp only [dbar_comp_holo hc hτ, map_sum, map_smul, (pull_dz _ _).2, Finset.smul_sum]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    conv_lhs => rw [chain_sum_coordVec (fderiv ℂ τ v (coordVec a))]
+    set_option synthInstance.maxHeartbeats 100000 in
+    simp only [map_sum, map_smulₛₗ, Finset.sum_smul, smul_smul, smul_eq_mul, mul_comm]
 
 end GlobalTheory.LineForm

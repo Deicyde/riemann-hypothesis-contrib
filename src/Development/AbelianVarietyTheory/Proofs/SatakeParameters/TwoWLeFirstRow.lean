@@ -14,7 +14,13 @@ open Formalism.MainNotions Formalism.BasicNotions Formalism.MainNotions.G Classi
 
 namespace GlobalTheory.TopFirstRow
 
-theorem two_w_le_first_row : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0, Fm.x1 < x → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m, ∀ (z : Bool × HH (Fm.D x i)), IsTopPl (Fm.D x i) z → 2 * wPl (Fm.D x i) (j + 1) z ≤ (((nuD (Fm.D x i) u j z).rowLen 0 : ℕ) : ℝ) := by
+theorem two_w_le_first_row
+    : ∀ {eps : ℝ} (Fm : FamP eps), ∃ x0 : ℝ, ∀ x ≥ x0,
+      Fm.x1 < x
+        → ∀ i : Fm.Ix x, ∀ (u : (Fm.D x i).what₂.Word), ∀ j < (Fm.D x i).R.m,
+          ∀ (z : Bool × HH (Fm.D x i)),
+            IsTopPl (Fm.D x i) z
+              → 2 * wPl (Fm.D x i) (j + 1) z ≤ (((nuD (Fm.D x i) u j z).rowLen 0 : ℕ) : ℝ) := by
   intro eps Fm
   obtain ⟨x1, h1⟩ := GlobalTheory.ShNums.size_rel Fm
   obtain ⟨x2, h2⟩ := GlobalTheory.TopRows.top_rows Fm

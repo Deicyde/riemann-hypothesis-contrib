@@ -9,6 +9,7 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutNFTopForm
 
 namespace Formalism.FourierDecayAlt.P.CutBP
 
-theorem top_domination_measurable_compact : TopDMeasCpt := TDM.topDMeasCpt_of_typeNormMeas type_norm_measurability_holds
+theorem top_domination_measurable_compact : TopDMeasCpt :=
+  TDM.topDMeasCpt_of_typeNormMeas type_norm_measurability_holds
 
 end Formalism.FourierDecayAlt.P.CutBP

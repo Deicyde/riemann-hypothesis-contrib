@@ -7,11 +7,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Finset UpperTheory.V.Bern
 
-theorem UpperTheory.V.Bern.b_sumicc :
-    ∀ {M : Type} [AddCommMonoid M] {N : ℕ} [NeZero N] (G : ZMod N → M), ∑ a ∈ Icc 1 N, G (a : ZMod N) = ∑ a : ZMod N, G a := by
+theorem UpperTheory.V.Bern.b_sumicc
+    : ∀ {M : Type} [AddCommMonoid M] {N : ℕ} [NeZero N] (G : ZMod N → M),
+      ∑ a ∈ Icc 1 N, G (a : ZMod N) = ∑ a : ZMod N, G a := by
   intro M _ N _ G
   have hN : 0 < N := Nat.pos_of_ne_zero (NeZero.ne N)
-  refine Finset.sum_nbij' (fun a : ℕ => (a : ZMod N)) (fun x : ZMod N => if x.val = 0 then N else x.val)
+  refine Finset.sum_nbij'
+    (fun a : ℕ => (a : ZMod N))
+    (fun x : ZMod N => if x.val = 0 then N else x.val)
     ?_ ?_ ?_ ?_ ?_
   · intro a _
     exact Finset.mem_univ _

@@ -22,7 +22,8 @@ end Index
 
 section Lattice
 
-instance periodLattice_finite (L : PeriodPair) : Module.Finite ℤ L.lattice := ZLattice.module_finite ℝ L.lattice
+instance periodLattice_finite (L : PeriodPair) : Module.Finite ℤ L.lattice :=
+  ZLattice.module_finite ℝ L.lattice
 
 def stdLatEquiv (L : PeriodPair) (m : Type*) : stdLat L m ≃+ (m → L.lattice) where
   toFun x := fun i => ⟨(x : m → ℂ) i, (mem_stdLat L m x).1 x.2 i⟩
@@ -31,7 +32,8 @@ def stdLatEquiv (L : PeriodPair) (m : Type*) : stdLat L m ≃+ (m → L.lattice)
   right_inv _ := rfl
   map_add' _ _ := rfl
 
-theorem stdLat_finite (L : PeriodPair) (m : Type*) [Finite m] : Module.Finite ℤ (stdLat L m) := Module.Finite.equiv (stdLatEquiv L m).symm.toIntLinearEquiv
+theorem stdLat_finite (L : PeriodPair) (m : Type*) [Finite m] : Module.Finite ℤ (stdLat L m) :=
+  Module.Finite.equiv (stdLatEquiv L m).symm.toIntLinearEquiv
 
 end Lattice
 

@@ -21,22 +21,32 @@ variable {C : Type} [Field C]
 def absDifferent (v : Valuation C ℝ≥0) {E : Type} [Field E] [NumberField E] (τ : E →+* C) : ℝ≥0 :=
   sSup {r | ∃ x ∈ differentIdeal ℤ (𝓞 E), v (τ x) = r}
 
-def IsPowMul_vp (p : ℕ) (v : Valuation C ℝ≥0) {O : Type} [CommRing O] [Algebra O C] {U : Type}
-    [AddCommGroup U] [Module C U] [Module O U] [IsScalarTower O C U] (t : ℝ)
-    (La La' : Submodule O U) : Prop :=
+def IsPowMul_vp
+    (p : ℕ) (v : Valuation C ℝ≥0)
+    {O : Type} [CommRing O] [Algebra O C]
+    {U : Type} [AddCommGroup U] [Module C U] [Module O U] [IsScalarTower O C U]
+    (t : ℝ) (La La' : Submodule O U)
+    : Prop :=
   ∃ u : C, (v u : ℝ) = (v (p : C) : ℝ) ^ t ∧ La' = scaleLat u La
-
 
 set_option autoImplicit false in
 open scoped NNReal NumberField Classical in
 variable {C : Type} [Field C] in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.exists_generator_different {v : Valuation C ℝ≥0} {O : Type}
-    [CommRing O] [Algebra O C] (hv : v.Integers O) {E : Type} [Field E] [NumberField E]
-    (τ : E →+* C) :
-    ∃ δ : O, (differentIdeal ℤ (𝓞 E)).map (_root_.GlobalTheory.HTLat.embO hv τ) =
-        Ideal.span {δ} ∧
-      v (algebraMap O C δ) = _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ ∧
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ ≠ 0 ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ ≤ 1 := by
+theorem
+    _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.exists_generator_different
+    {v : Valuation C ℝ≥0} {O : Type} [CommRing O] [Algebra O C]
+    (hv : v.Integers O)
+    {E : Type} [Field E] [NumberField E]
+    (τ : E →+* C)
+    : ∃ δ : O,
+      (differentIdeal ℤ (𝓞 E)).map (_root_.GlobalTheory.HTLat.embO hv τ) = Ideal.span {δ}
+        ∧ v (algebraMap O C δ)
+          = _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v
+            τ
+        ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ
+          ≠ 0
+        ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ
+          ≤ 1 := by
   set f := _root_.GlobalTheory.HTLat.embO hv τ with hf
   have hemb : ∀ x : 𝓞 E, algebraMap O C (f x) = τ x :=
     _root_.GlobalTheory.HTLat.algebraMap_embO hv τ
@@ -58,7 +68,8 @@ theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison
       apply hv.dvd_of_le
       rw [hemb, hemb]
       exact hmax y hy
-    | zero => simp
+    | zero =>
+      simp
     | add a b _ _ ha hb =>
       rw [map_add (f := _)]
       exact dvd_add ha hb
@@ -70,7 +81,10 @@ theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison
     rintro r ⟨x, hx, rfl⟩
     rw [← hemb, ← hemb]
     exact hv.le_of_dvd (hdvd x hx)
-  have habs : _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ = v (τ g) := hgreat.csSup_eq
+  have habs
+      : _root_.GlobalTheory.IndefiniteRowSideFullHecke.GradedDifferentComparison.absDifferent v τ
+        = v (τ g) :=
+    hgreat.csSup_eq
   refine ⟨f g, ?_, ?_, ?_, ?_⟩
   · apply le_antisymm
     · rw [Ideal.map_le_iff_le_comap]
@@ -93,10 +107,14 @@ end Valuations
 
 section AtAPoint
 
-variable {p : ℕ} [Fact p.Prime] {C : Type} [Field C] {v : Valuation C ℝ≥0} {O : Type} [CommRing O]
-  [Algebra O C] [Algebra ℤ_[p] C] [Algebra ℤ_[p] O] [IsScalarTower ℤ_[p] O C] [IsAlgClosed C]
-  [CharZero C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
-  {E : Type} [Field E] [NumberField E] [StarRing (𝓞 E)] (P : Point p v O (𝓞 E))
+variable
+  {p : ℕ} [Fact p.Prime]
+  {C : Type} [Field C]
+  {v : Valuation C ℝ≥0} {O : Type}
+  [CommRing O] [Algebra O C] [Algebra ℤ_[p] C] [Algebra ℤ_[p] O] [IsScalarTower ℤ_[p] O C]
+  [IsAlgClosed C] [CharZero C] [Fact ¬ IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O]
+  {E : Type} [Field E] [NumberField E] [StarRing (𝓞 E)]
+  (P : Point p v O (𝓞 E))
 
 variable {P} {Ψ : Finset (E →+* C)} {N j : ℕ}
 
@@ -104,18 +122,20 @@ end AtAPoint
 
 section PadicComplex
 
-@[reducible] def algInt (p : ℕ) [Fact p.Prime] : Algebra ℤ_[p] 𝓞_ℂ_[p] := (padicIntHom p).toAlgebra
+@[reducible]
+def algInt (p : ℕ) [Fact p.Prime] : Algebra ℤ_[p] 𝓞_ℂ_[p] := (padicIntHom p).toAlgebra
 
-@[reducible] def algField (p : ℕ) [Fact p.Prime] : Algebra ℤ_[p] ℂ_[p] :=
+@[reducible]
+def algField (p : ℕ) [Fact p.Prime] : Algebra ℤ_[p] ℂ_[p] :=
   ((algebraMap 𝓞_ℂ_[p] ℂ_[p]).comp (padicIntHom p)).toAlgebra
 
 attribute [local instance] algInt algField
 
-theorem tower (p : ℕ) [Fact p.Prime] :
-    @IsScalarTower ℤ_[p] 𝓞_ℂ_[p] ℂ_[p] (algInt p).toSMul Algebra.toSMul (algField p).toSMul :=
+theorem tower (p : ℕ) [Fact p.Prime]
+    : @IsScalarTower ℤ_[p] 𝓞_ℂ_[p] ℂ_[p] (algInt p).toSMul Algebra.toSMul (algField p).toSMul :=
   IsScalarTower.of_algebraMap_eq fun _ => rfl
 
-theorem fact_not_isUnit (p : ℕ) [Fact p.Prime] : Fact ¬IsUnit (p : 𝓞_ℂ_[p]) :=
+theorem fact_not_isUnit (p : ℕ) [Fact p.Prime] : Fact ¬ IsUnit (p : 𝓞_ℂ_[p]) :=
   ⟨PadicComplexHost.not_isUnit_p p⟩
 
 attribute [local instance] tower fact_not_isUnit PadicComplexHost.isAdicComplete

@@ -13,9 +13,12 @@ noncomputable section
 
 namespace GlobalTheory.SnMass.ProdQuot
 
-theorem isHaarMeasure_of_sigmaFinite {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H]
-    [MeasurableSpace H] [BorelSpace H] [SecondCountableTopology H] [LocallyCompactSpace H] (ν : Measure H)
-    [SigmaFinite ν] [ν.IsMulLeftInvariant] (hν : ν ≠ 0) : ν.IsHaarMeasure := by
+theorem isHaarMeasure_of_sigmaFinite
+    {H : Type} [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [MeasurableSpace H]
+    [BorelSpace H] [SecondCountableTopology H] [LocallyCompactSpace H]
+    (ν : Measure H) [SigmaFinite ν] [ν.IsMulLeftInvariant]
+    (hν : ν ≠ 0)
+    : ν.IsHaarMeasure := by
   obtain ⟨K⟩ : Nonempty (TopologicalSpace.PositiveCompacts H) := inferInstance
   have e := Measure.haarMeasure_unique ν K
   rw [e]
@@ -31,11 +34,14 @@ theorem isHaarMeasure_of_sigmaFinite {H : Type} [Group H] [TopologicalSpace H] [
   · rw [h2, ENNReal.top_mul h3] at h1
     exact absurd h1 (lt_irrefl _)
 
-theorem exists_cutoff {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
-    [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] (R : Subgroup G) (μ : Measure G)
-    [SigmaFinite μ] (hR : IsClosed (R : Set G)) (h0 : μ ≠ 0) (hc : μ (R : Set G)ᶜ = 0)
-    (hi : ∀ s ∈ R, μ.map (fun x => s * x) = μ ∧ μ.map (fun x => x * s) = μ) :
-    ∃ b : G → ℝ≥0, Measurable b ∧ ∀ g, ∫⁻ s, (b (s * g) : ℝ≥0∞) ∂μ = 1 := by
+theorem exists_cutoff
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [T2Space G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
+    (R : Subgroup G)
+    (μ : Measure G) [SigmaFinite μ]
+    (hR : IsClosed (R : Set G)) (h0 : μ ≠ 0) (hc : μ (R : Set G)ᶜ = 0)
+    (hi : ∀ s ∈ R, μ.map (fun x => s * x) = μ ∧ μ.map (fun x => x * s) = μ)
+    : ∃ b : G → ℝ≥0, Measurable b ∧ ∀ g, ∫⁻ s, (b (s * g) : ℝ≥0∞) ∂μ = 1 := by
   have hce : Topology.IsClosedEmbedding R.subtype := hR.isClosedEmbedding_subtypeVal
   have hφ : MeasurableEmbedding R.subtype := hce.measurableEmbedding
   haveI : LocallyCompactSpace R := hce.locallyCompactSpace
@@ -72,11 +78,13 @@ theorem exists_cutoff {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGr
   filter_upwards [ae_lt_top hm (by rw [h3]; exact ENNReal.one_ne_top)] with s hs
   exact ENNReal.coe_toNNReal hs.ne
 
-theorem map_eq {G : Type} [Group G] [MeasurableSpace G] (μG μ ν : Measure G) {b : G → ℝ≥0} (hb : Measurable b)
-    (h1 : ∀ g, ∫⁻ s, (b (s * g) : ℝ≥0∞) ∂μ = 1)
+theorem map_eq
+    {G : Type} [Group G] [MeasurableSpace G]
+    (μG μ ν : Measure G)
+    {b : G → ℝ≥0} (hb : Measurable b) (h1 : ∀ g, ∫⁻ s, (b (s * g) : ℝ≥0∞) ∂μ = 1)
     (hν : ∀ f : G → ℝ≥0∞, Measurable f → ∫⁻ x, f x ∂μG = ∫⁻ x, ∫⁻ s, f (s * x) ∂μ ∂ν)
-    {F : G → ℂ} (hF : Measurable F) (hi : ∀ᵐ s ∂μ, ∀ x, F (s * x) = F x) :
-    ν.map F = (μG.withDensity fun x => b x).map F := by
+    {F : G → ℂ} (hF : Measurable F) (hi : ∀ᵐ s ∂μ, ∀ x, F (s * x) = F x)
+    : ν.map F = (μG.withDensity fun x => b x).map F := by
   have hb' : Measurable fun x => (b x : ℝ≥0∞) := hb.coe_nnreal_ennreal
   ext A hA
   rw [Measure.map_apply hF hA, Measure.map_apply hF hA, withDensity_apply _ (hF hA),
@@ -92,16 +100,20 @@ theorem map_eq {G : Type} [Group G] [MeasurableSpace G] (μG μ ν : Measure G) 
     filter_upwards [hi] with s hs
     rw [Set.indicator_of_notMem (by simpa [hs] using hx)]
 
-theorem integral_eq {G : Type} [Group G] [MeasurableSpace G] (μG μ ν : Measure G) {b : G → ℝ≥0} (hb : Measurable b)
-    (h1 : ∀ g, ∫⁻ s, (b (s * g) : ℝ≥0∞) ∂μ = 1)
+theorem integral_eq
+    {G : Type} [Group G] [MeasurableSpace G]
+    (μG μ ν : Measure G)
+    {b : G → ℝ≥0} (hb : Measurable b) (h1 : ∀ g, ∫⁻ s, (b (s * g) : ℝ≥0∞) ∂μ = 1)
     (hν : ∀ f : G → ℝ≥0∞, Measurable f → ∫⁻ x, f x ∂μG = ∫⁻ x, ∫⁻ s, f (s * x) ∂μ ∂ν)
-    {F : G → ℂ} (hF : Measurable F) (hi : ∀ᵐ s ∂μ, ∀ x, F (s * x) = F x) :
-    ∫ x, F x ∂ν = ∫ x, (b x : ℂ) * F x ∂μG ∧ (Integrable F ν ↔ Integrable (fun x => (b x : ℂ) * F x) μG) := by
+    {F : G → ℂ} (hF : Measurable F) (hi : ∀ᵐ s ∂μ, ∀ x, F (s * x) = F x)
+    : ∫ x, F x ∂ν = ∫ x, (b x : ℂ) * F x ∂μG
+      ∧ (Integrable F ν ↔ Integrable (fun x => (b x : ℂ) * F x) μG) := by
   have h := map_eq μG μ ν hb h1 hν hF hi
   have e : (fun x => (b x : ℂ) * F x) = fun x => b x • F x := by
     ext x
     simp [NNReal.smul_def]
-  have hid : ∀ ρ : Measure ℂ, AEStronglyMeasurable (fun z : ℂ => z) ρ := fun ρ => continuous_id.aestronglyMeasurable
+  have hid : ∀ ρ : Measure ℂ, AEStronglyMeasurable (fun z : ℂ => z) ρ := fun ρ =>
+    continuous_id.aestronglyMeasurable
   rw [e]
   constructor
   · rw [← integral_withDensity_eq_integral_smul hb, ← integral_map hF.aemeasurable (hid _),

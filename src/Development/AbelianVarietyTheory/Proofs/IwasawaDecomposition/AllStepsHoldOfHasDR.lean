@@ -35,7 +35,10 @@ set_option autoImplicit false
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts GlobalTheory.ShFam GlobalTheory.LocM
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.PullbackSections Formalism.L2.Pj Formalism.BasicNotions
+  Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts GlobalTheory.ShFam
+  GlobalTheory.LocM
 open GlobalTheory.LieMet GlobalTheory.LocM.FrameBC
 
 namespace GlobalTheory.LocM.StepOfFrame
@@ -45,9 +48,12 @@ open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory Over.braidedCategory
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
 
-variable {Dw : Datum H} {Xo : ∀ l : Level H, Moduli Dw l} {p : ℕ} {W : ValuationSubring ℂ} {Y : LocalSystem Xo p W}
-  {i₀ : Idx H p}
+variable
+  {Dw : Datum H} {Xo : ∀ l : Level H, Moduli Dw l} {p : ℕ} {W : ValuationSubring ℂ}
+  {Y : LocalSystem Xo p W} {i₀ : Idx H p}
 
 end GlobalTheory.LocM.StepOfFrame

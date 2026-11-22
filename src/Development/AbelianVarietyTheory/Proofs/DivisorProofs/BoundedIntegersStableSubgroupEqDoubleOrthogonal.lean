@@ -11,17 +11,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LatAtVAtStab
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 open scoped TensorProduct Matrix
 open scoped GlobalTheory.VacAny
 
 namespace GlobalTheory.LatticeDual
 
-theorem exists_integral_form_separating {R K : Type} [CommRing R] [IsDomain R]
-    [IsPrincipalIdealRing R] [Field K] [Algebra R K] [IsFractionRing R K] {κ : Type} [Fintype κ]
-    (M : Submodule R (κ → K)) (hM : M.FG) (z : K) (hz : z ∉ (algebraMap R K).range)
-    (t : κ → K) (ht : t ∉ M) :
-    ∃ y : κ → K, (∀ s ∈ M, s ⬝ᵥ y ∈ (algebraMap R K).range) ∧ t ⬝ᵥ y ∉ (algebraMap R K).range := by
+theorem exists_integral_form_separating
+    {R K : Type}
+    [CommRing R] [IsDomain R] [IsPrincipalIdealRing R] [Field K] [Algebra R K] [IsFractionRing R K]
+    {κ : Type} [Fintype κ]
+    (M : Submodule R (κ → K)) (hM : M.FG)
+    (z : K) (hz : z ∉ (algebraMap R K).range)
+    (t : κ → K) (ht : t ∉ M)
+    : ∃ y : κ → K,
+      (∀ s ∈ M, s ⬝ᵥ y ∈ (algebraMap R K).range) ∧ t ⬝ᵥ y ∉ (algebraMap R K).range := by
   classical
   haveI : Module.Finite R M := Module.Finite.iff_fg.mpr hM
   haveI : Module.Free R M := Module.free_of_finite_type_torsion_free'
@@ -41,8 +47,9 @@ theorem exists_integral_form_separating {R K : Type} [CommRing R] [IsDomain R]
       Equiv.symm_symm, Equiv.trans_apply, Equiv.sumCongr_apply]
     rfl
 
-  have key : ∀ f : (κ → K) →ₗ[K] K, (∀ i, f (a i) ∈ (algebraMap R K).range) →
-      ∀ s ∈ M, f s ∈ (algebraMap R K).range := by
+  have key
+      : ∀ f : (κ → K) →ₗ[K] K,
+        (∀ i, f (a i) ∈ (algebraMap R K).range) → ∀ s ∈ M, f s ∈ (algebraMap R K).range := by
     intro f hf s hs
     have hs' : s = ∑ i, b.repr ⟨s, hs⟩ i • a i := by
       have := congrArg Subtype.val (b.sum_repr ⟨s, hs⟩)
@@ -60,8 +67,9 @@ theorem exists_integral_form_separating {R K : Type} [CommRing R] [IsDomain R]
     refine ⟨fun k => f (fun j => if k = j then 1 else 0), fun x => ?_⟩
     rw [LinearMap.pi_apply_eq_sum_univ f x]
     simp [dotProduct, smul_eq_mul]
-  suffices h : ∃ f : (κ → K) →ₗ[K] K, (∀ i, f (a i) ∈ (algebraMap R K).range) ∧
-      f t ∉ (algebraMap R K).range by
+  suffices h
+      : ∃ f : (κ → K) →ₗ[K] K,
+        (∀ i, f (a i) ∈ (algebraMap R K).range) ∧ f t ∉ (algebraMap R K).range by
     obtain ⟨f, hf, hft⟩ := h
     obtain ⟨y, hy⟩ := dot f
     exact ⟨y, fun s hs => (hy s).symm ▸ key f hf s hs, (hy t).symm ▸ hft⟩
@@ -95,24 +103,31 @@ end GlobalTheory.LatticeDual
 
 namespace GlobalTheory.LatticeDual
 
-theorem mem_of_mem_doubleOrth : ∀ (F : Type) [Field F] [NumberField F] (v : Pl (F := F)) (κ : Type) [Fintype κ] (ψ₀ : AddChar (Fv F v) ℂ),
-    (∀ x : Fv F v, (∀ y ∈ HeightOneSpectrum.adicCompletionIntegers F v, ψ₀ (x * y) = 1) ↔ x ∈ HeightOneSpectrum.adicCompletionIntegers F v) →
-    ∀ A : AddSubgroup (κ → Fv F v), (∀ c ∈ HeightOneSpectrum.adicCompletionIntegers F v, ∀ t ∈ A, c • t ∈ A) →
-    (∃ c : Fv F v, c ≠ 0 ∧ ∀ t ∈ A, ∀ k, c * t k ∈ HeightOneSpectrum.adicCompletionIntegers F v) →
-    ∀ t : κ → Fv F v, (∀ y : κ → Fv F v, (∀ s ∈ A, ψ₀ (s ⬝ᵥ y) = 1) → ψ₀ (t ⬝ᵥ y) = 1) → t ∈ A := by
+theorem mem_of_mem_doubleOrth
+    : ∀ (F : Type) [Field F] [NumberField F] (v : Pl (F := F)) (κ : Type) [Fintype κ]
+        (ψ₀ : AddChar (Fv F v) ℂ),
+      (∀ x : Fv F v,
+          (∀ y ∈ HeightOneSpectrum.adicCompletionIntegers F v, ψ₀ (x * y) = 1)
+            ↔ x ∈ HeightOneSpectrum.adicCompletionIntegers F v)
+        → ∀ A : AddSubgroup (κ → Fv F v),
+          (∀ c ∈ HeightOneSpectrum.adicCompletionIntegers F v, ∀ t ∈ A, c • t ∈ A)
+            → (∃ c : Fv F v,
+              c ≠ 0 ∧ ∀ t ∈ A, ∀ k, c * t k ∈ HeightOneSpectrum.adicCompletionIntegers F v)
+            → ∀ t : κ → Fv F v,
+              (∀ y : κ → Fv F v, (∀ s ∈ A, ψ₀ (s ⬝ᵥ y) = 1) → ψ₀ (t ⬝ᵥ y) = 1) → t ∈ A := by
   intro F _ _ v κ _ ψ₀ hψ A hA hbd t ht
   classical
   let O := HeightOneSpectrum.adicCompletionIntegers F v
-  have hrange : ∀ x : Fv F v, x ∈ (algebraMap O (Fv F v)).range ↔ x ∈ O :=
-    fun x => ⟨fun ⟨r, hr⟩ => hr ▸ r.2, fun h => ⟨⟨x, h⟩, rfl⟩⟩
-  have hψO : ∀ x ∈ O, ψ₀ x = 1 := fun x hx => by
-    simpa using (hψ 1).mpr (one_mem _) x hx
+  have hrange : ∀ x : Fv F v, x ∈ (algebraMap O (Fv F v)).range ↔ x ∈ O := fun x =>
+    ⟨fun ⟨r, hr⟩ => hr ▸ r.2, fun h => ⟨⟨x, h⟩, rfl⟩⟩
+  have hψO : ∀ x ∈ O, ψ₀ x = 1 := fun x hx => by simpa using (hψ 1).mpr (one_mem _) x hx
 
-  let M : Submodule O (κ → Fv F v) :=
-    { carrier := A
-      add_mem' := fun h h' => A.add_mem h h'
-      zero_mem' := A.zero_mem
-      smul_mem' := fun c x hx => hA _ c.2 x hx }
+  let M : Submodule O (κ → Fv F v) := {
+    carrier := A
+    add_mem' := fun h h' => A.add_mem h h'
+    zero_mem' := A.zero_mem
+    smul_mem' := fun c x hx => hA _ c.2 x hx
+  }
   obtain ⟨c, hc0, hc⟩ := hbd
 
   let N : Submodule O (κ → Fv F v) :=
@@ -149,9 +164,10 @@ theorem mem_of_mem_doubleOrth : ∀ (F : Type) [Field F] [NumberField F] (v : Pl
     push_neg at h
     exact hyt ((hψ _).mp h)
   apply hbψ
-  have := ht (b • y') (fun s hs => by
-    rw [dotProduct_smul, smul_eq_mul, mul_comm]
-    exact hψO _ (mul_mem (hyA s hs) hb))
+  have :=
+    ht (b • y') (fun s hs => by
+      rw [dotProduct_smul, smul_eq_mul, mul_comm]
+      exact hψO _ (mul_mem (hyA s hs) hb))
   rwa [dotProduct_smul, smul_eq_mul, mul_comm] at this
 
 end GlobalTheory.LatticeDual

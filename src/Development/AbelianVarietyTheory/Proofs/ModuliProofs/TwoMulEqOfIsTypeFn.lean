@@ -11,7 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.HostGener
 @[expose] public section
 
 open NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped TensorProduct
 
 namespace GlobalTheory.PeriodDatum
@@ -84,14 +85,18 @@ lemma two_mul_eq_of_isTypeFn (H : Host E) {p q g : ℕ} {ty : Fin g → (E →+*
   have : (2 * g : ℂ) = Module.finrank ℚ E * (p + q) := by rw [h1, h2]; ring
   exact_mod_cast this
 
-theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (La : Type)
-    [AddCommGroup La] [Module (𝓞 E) La] (EF : LinearMap.BilinForm ℤ La) (p q g : ℕ) (ty : Fin g → (E →+* ℂ))
-    (P : La →+ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ), IsTypeFn H p q ty → Function.Bijective EF →
-    (∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y)) →
-    (∀ (a : 𝓞 E) x i, P (a • x) i = ty i (a : E) * P x i) → Function.Injective P → DiscreteTopology P.range →
-    Submodule.span ℝ (Set.range P) = ⊤ → Hm.IsHermitian →
-    (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) → (∀ x y, (hermForm Hm (P x) (P y)).im = EF x y) →
-    ∃ (D' : Datum H) (e : D'.La ≃ₗ[𝓞 E] La), D'.p = p ∧ D'.q = q ∧ ∀ x y, D'.EF x y = EF (e x) (e y) := by
+theorem exists_datum
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (La : Type)
+        [AddCommGroup La] [Module (𝓞 E) La] (EF : LinearMap.BilinForm ℤ La) (p q g : ℕ)
+        (ty : Fin g → (E →+* ℂ)) (P : La →+ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ),
+      IsTypeFn H p q ty → Function.Bijective EF
+        → (∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y))
+        → (∀ (a : 𝓞 E) x i, P (a • x) i = ty i (a : E) * P x i) → Function.Injective P
+        → DiscreteTopology P.range → Submodule.span ℝ (Set.range P) = ⊤ → Hm.IsHermitian
+        → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re)
+        → (∀ x y, (hermForm Hm (P x) (P y)).im = EF x y)
+        → ∃ (D' : Datum H) (e : D'.La ≃ₗ[𝓞 E] La),
+          D'.p = p ∧ D'.q = q ∧ ∀ x y, D'.EF x y = EF (e x) (e y) := by
   intro E _ _ _ H La _ _ EF p q g ty P Hm hty hbij hadj hlin hinj hdisc hspan hH hpos him
   classical
   obtain ⟨hfin, hrk, e, he⟩ := lattice_equiv P hinj hdisc hspan
@@ -99,8 +104,7 @@ theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
   have htor : Submodule.torsion (𝓞 E) La = ⊥ := by
     rw [eq_bot_iff]
     rintro x ⟨⟨a, ha⟩, hx⟩
-    have ha0 : (a : E) ≠ 0 := by
-      simpa using nonZeroDivisors.ne_zero ha
+    have ha0 : (a : E) ≠ 0 := by simpa using nonZeroDivisors.ne_zero ha
     rw [Submodule.mem_bot]
     apply hinj
     funext i
@@ -121,7 +125,8 @@ theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
   have hB : ∀ x y, EF.baseChange ℝ x y = (hermForm Hm (e x) (e y)).im := fun x y => by
     induction x using TensorProduct.induction_on with
     | zero => simp [hermForm]
-    | add x x' h h' => simp only [map_add (f := _), LinearMap.add_apply, h, h', hermForm_add_left, Complex.add_im]
+    | add x x' h h' =>
+      simp only [map_add (f := _), LinearMap.add_apply, h, h', hermForm_add_left, Complex.add_im]
     | tmul r x =>
       induction y using TensorProduct.induction_on with
       | zero => simp [hermForm]
@@ -132,16 +137,35 @@ theorem exists_datum : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
         ring
   let d : (Fin g → ℂ) → Module.End ℂ (Fin g → ℂ) := fun c => Matrix.toLin' (Matrix.diagonal c)
   have hd : ∀ c z i, d c z i = c i * z i := fun c z i => by simp [d, Matrix.mulVec_diagonal]
-  have hdt : ∀ c, LinearMap.trace ℝ _ (e.symm.conj ((d c).restrictScalars ℝ)) = 2 * (∑ i, c i).re := fun c => by
+  have hdt
+      : ∀ c,
+        LinearMap.trace ℝ _ (e.symm.conj ((d c).restrictScalars ℝ))
+          = 2 * (∑ i, c i).re := fun c => by
     rw [LinearMap.trace_conj', PeriodNonempty.trace_real]
     simp [d]
   let J : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La := e.symm.conj ((d fun _ => Complex.I).restrictScalars ℝ)
   have hJ : ∀ x, e (J x) = Complex.I • e x := fun x => by
     funext i
     simp [J, LinearEquiv.conj_apply, hd]
-  refine ⟨{ La := La, fin := inferInstance, proj := hproj, EF := EF, alt := fun x => ?_, unimod := hbij,
-            adj := hadj, p := p, q := q, rank := hrank, dom := ⟨J, fun x => ?_, fun x y => ?_, fun x hx => ?_, ?_⟩ },
-    LinearEquiv.refl _ _, rfl, rfl, fun _ _ => rfl⟩
+  refine ⟨
+    {
+      La := La
+      fin := inferInstance
+      proj := hproj
+      EF := EF
+      alt := fun x => ?_
+      unimod := hbij
+      adj := hadj
+      p := p
+      q := q
+      rank := hrank
+      dom := ⟨J, fun x => ?_, fun x y => ?_, fun x hx => ?_, ?_⟩
+    },
+    LinearEquiv.refl _ _,
+    rfl,
+    rfl,
+    fun _ _ => rfl
+  ⟩
   · have := him x x
     rw [hermForm_self_im hH] at this
     exact_mod_cast this.symm

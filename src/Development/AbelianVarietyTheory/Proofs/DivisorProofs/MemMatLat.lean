@@ -23,8 +23,8 @@ def stdLat (n : ℕ) : Submodule O (Fin n → K) where
     obtain ⟨a, ha⟩ := hv i
     exact ⟨c * a, by simp [Algebra.smul_def, ha]⟩
 
-def matLat {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K)) :
-    Submodule O (Fin n → K) :=
+def matLat {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K))
+    : Submodule O (Fin n → K) :=
   M.map ((Matrix.mulVecLin g).restrictScalars O)
 
 def IsLatV {n : ℕ} (M : Submodule O (Fin n → K)) : Prop :=
@@ -40,12 +40,13 @@ variable {O}
 theorem mem_stdLat {n : ℕ} (v : Fin n → K) : v ∈ stdLat O n ↔ ∀ i, v i ∈ (algebraMap O K).range :=
   Iff.rfl
 
-theorem mem_matLat {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K))
-    (v : Fin n → K) : v ∈ matLat O g M ↔ ∃ u ∈ M, g *ᵥ u = v := by
+theorem mem_matLat
+    {n : ℕ} (g : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K)) (v : Fin n → K)
+    : v ∈ matLat O g M ↔ ∃ u ∈ M, g *ᵥ u = v := by
   simp [matLat]
 
-theorem matLat_mul {n : ℕ} (a b : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K)) :
-    matLat O (a * b) M = matLat O a (matLat O b M) := by
+theorem matLat_mul {n : ℕ} (a b : Matrix (Fin n) (Fin n) K) (M : Submodule O (Fin n → K))
+    : matLat O (a * b) M = matLat O a (matLat O b M) := by
   ext v
   simp only [mem_matLat]
   constructor

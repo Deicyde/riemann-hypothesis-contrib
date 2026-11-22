@@ -12,8 +12,7 @@ open scoped ComplexOrder
 
 noncomputable section
 
-theorem PhaseOnMinus.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
-    PhaseOnMinus.Statement ι := by
+theorem PhaseOnMinus.proof (ι : Type*) [Fintype ι] [DecidableEq ι] : PhaseOnMinus.Statement ι := by
   intro H P hM c hc
   obtain ⟨hP, hH, hdet, hPHP⟩ := hM
   set A := majInvolution H P with hAdef
@@ -21,15 +20,16 @@ theorem PhaseOnMinus.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
 
   have hA2 : A * A = 1 := by
     simp only [hAdef, majInvolution]
-    calc H⁻¹ * P * (H⁻¹ * P) = H⁻¹ * (P * H⁻¹ * P) := by simp only [Matrix.mul_assoc]
+    calc
+      H⁻¹ * P * (H⁻¹ * P)
+        = H⁻¹ * (P * H⁻¹ * P) := by simp only [Matrix.mul_assoc]
       _ = 1 := by rw [hPHP, hHi]
 
-  have hPA : P * A = H := by
-    simp only [hAdef, majInvolution]; rw [← Matrix.mul_assoc, hPHP]
+  have hPA : P * A = H := by simp only [hAdef, majInvolution]; rw [← Matrix.mul_assoc, hPHP]
 
   have hAh : Aᴴ = P * H⁻¹ := by
-    simp only [hAdef, majInvolution, conjTranspose_mul, conjTranspose_nonsing_inv,
-      hH.eq, hP.isHermitian.eq]
+    simp only [hAdef, majInvolution, conjTranspose_mul, conjTranspose_nonsing_inv, hH.eq,
+      hP.isHermitian.eq]
 
   let Dm : ℂ → Matrix ι ι ℂ := fun a => ((1 + a) / 2) • (1 : Matrix ι ι ℂ) + ((1 - a) / 2) • A
   have hD : phaseOnMinus H P c = Dm c := by
@@ -42,17 +42,18 @@ theorem PhaseOnMinus.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
       linear_combination (1 / 2 : ℂ) * hab
     have e2 : (1 + a) / 2 * ((1 - b) / 2) + (1 - a) / 2 * ((1 + b) / 2) = 0 := by
       linear_combination (-1 / 2 : ℂ) * hab
-    calc _ = ((1 + a) / 2 * ((1 + b) / 2) + (1 - a) / 2 * ((1 - b) / 2)) • (1 : Matrix ι ι ℂ)
-          + ((1 + a) / 2 * ((1 - b) / 2) + (1 - a) / 2 * ((1 + b) / 2)) • A := by module
+    calc
+      _ = ((1 + a) / 2 * ((1 + b) / 2) + (1 - a) / 2 * ((1 - b) / 2)) • (1 : Matrix ι ι ℂ)
+          + ((1 + a) / 2 * ((1 - b) / 2) + (1 - a) / 2 * ((1 + b) / 2)) • A := by
+        module
       _ = 1 := by rw [e1, e2]; simp
   have hDA : ∀ a : ℂ, Dm a * A = A * Dm a := by
     intro a
-    simp only [Dm, add_mul, mul_add, smul_mul_assoc, mul_smul_comm, Matrix.one_mul,
-      Matrix.mul_one]
+    simp only [Dm, add_mul, mul_add, smul_mul_assoc, mul_smul_comm, Matrix.one_mul, Matrix.mul_one]
 
   have hDP : (Dm c)ᴴ * P = P * Dm (star c) := by
-    simp only [Dm, conjTranspose_add, conjTranspose_smul, conjTranspose_one, hAh, add_mul,
-      mul_add, smul_mul_assoc, mul_smul_comm, Matrix.one_mul, Matrix.mul_one, hPA]
+    simp only [Dm, conjTranspose_add, conjTranspose_smul, conjTranspose_one, hAh, add_mul, mul_add,
+      smul_mul_assoc, mul_smul_comm, Matrix.one_mul, Matrix.mul_one, hPA]
     simp only [hPHP, star_div₀, star_add, star_sub, star_one]
     norm_num
   have hcc : star c * c = 1 := by

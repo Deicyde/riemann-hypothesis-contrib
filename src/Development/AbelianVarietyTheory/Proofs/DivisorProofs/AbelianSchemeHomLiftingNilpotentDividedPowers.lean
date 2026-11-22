@@ -21,8 +21,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AbelianSchem
 namespace GlobalTheory
 
 theorem abelianScheme_hom_lifting_nilpotent_dividedPowers : GlobalTheory.Published.AbelianLifting :=
-  GlobalTheory.LiftFour.abelianLifting_of_four GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates GlobalTheory.T.dualAbelianScheme_exists_biduality
-    (GlobalTheory.PoincareDeRhamDualityProof.poincareDeRhamDuality_of_hodge GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates GlobalTheory.T.dualAbelianScheme_exists_biduality)
+  GlobalTheory.LiftFour.abelianLifting_of_four
+    GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates
+    GlobalTheory.T.dualAbelianScheme_exists_biduality
+    (GlobalTheory.PoincareDeRhamDualityProof.poincareDeRhamDuality_of_hodge
+      GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates
+      GlobalTheory.T.dualAbelianScheme_exists_biduality)
     GlobalTheory.UnobTop.abelianUnobstructed
 
 end GlobalTheory

@@ -10,7 +10,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -18,8 +19,10 @@ namespace ReciprocityTheory.ChartRestriction.G.DVR
 
 open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing
 
-variable {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-  (D : DegData V (maximalIdeal V)) (F : Type) [Field F] [Algebra (FractionRing V) F]
+variable
+  {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+  (D : DegData V (maximalIdeal V))
+  (F : Type) [Field F] [Algebra (FractionRing V) F]
   {O : Type} [CommRing O] [StarRing O] [Module O D.toPre.X]
 
 abbrev cPB (χ : D.toPre.X) : DegPre.BF D.toPre F ⟶ D.toPre.P.A := toUnit _ ≫ D.toPre.c χ
@@ -37,14 +40,14 @@ lemma aF_one (oa : D.toPre.OAct O) (a : O) :
     aF D F oa a ≫ (toUnit _ ≫ η[D.toPre.P.A]) = toUnit _ ≫ η[D.toPre.P.A] := by
   rw [← Category.assoc, toUnit_unique (aF D F oa a ≫ toUnit _) (toUnit _)]
 
-def pullSum (oa : D.toPre.OAct O) (a : O) (k N : ℕ) (χ : D.toPre.X) :
-    (DegPre.BF D.toPre F ⟶ D.toPre.P.A) →₀ ℤ :=
-  ((((k * N : ℕ) : ℤ) - 1) • Finsupp.single (DegPre.prB D.toPre F) 1 +
-      (1 : ℤ) • Finsupp.single (DegPre.prB D.toPre F * cPB D F (star a • χ)) 1 +
-      (-1 : ℤ) • Finsupp.single (cPB D F (star a • χ)) 1 + (1 : ℤ) • Finsupp.single 1 1) +
-    ((-((k : ℤ) - 1)) • Finsupp.single (DegPre.prB D.toPre F ≫ oa.onB.act a) 1 +
-      (-1 : ℤ) • Finsupp.single ((DegPre.prB D.toPre F ≫ oa.onB.act a) * cPB D F χ) 1 +
-      (1 : ℤ) • Finsupp.single (cPB D F χ) 1 + (-1 : ℤ) • Finsupp.single 1 1)
+def pullSum (oa : D.toPre.OAct O) (a : O) (k N : ℕ) (χ : D.toPre.X)
+    : (DegPre.BF D.toPre F ⟶ D.toPre.P.A) →₀ ℤ :=
+  ((((k * N : ℕ) : ℤ) - 1) • Finsupp.single (DegPre.prB D.toPre F) 1
+      + (1 : ℤ) • Finsupp.single (DegPre.prB D.toPre F * cPB D F (star a • χ)) 1
+      + (-1 : ℤ) • Finsupp.single (cPB D F (star a • χ)) 1 + (1 : ℤ) • Finsupp.single 1 1)
+    + ((-((k : ℤ) - 1)) • Finsupp.single (DegPre.prB D.toPre F ≫ oa.onB.act a) 1
+      + (-1 : ℤ) • Finsupp.single ((DegPre.prB D.toPre F ≫ oa.onB.act a) * cPB D F χ) 1
+      + (1 : ℤ) • Finsupp.single (cPB D F χ) 1 + (-1 : ℤ) • Finsupp.single 1 1)
 
 lemma fsum_pull (oa : D.toPre.OAct O) (a : O) (k N : ℕ) (χ : D.toPre.X) :
     fsum (pullφ D F oa a χ) (pullε k N) = lf (pullSum D F oa a k N χ) := by
@@ -84,25 +87,36 @@ lemma mapDomain_zsmul' {α β : Type} (f : α → β) (n : ℤ) (F' : α →₀ 
     Finsupp.mapDomain f (n • F') = n • Finsupp.mapDomain f F' := by
   rw [Finsupp.mapDomain_smul]
 
-theorem hasGen_pull (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
+theorem hasGen_pull
+    (hL : D.toPre.P.L.IsLB)
+    (oa : D.toPre.OAct O) (w0 : O)
     (uΨ : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 4)
       ![(padd D.toPre.P.A (𝟙 _) (oa.onB.act w0)).left, 𝟙 D.toPre.P.A.left, (oa.onB.act w0).left,
-        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left] ![1, -2, -1, 2]))
-    (huΨ : uΨ.IsGen) (a : O) (N : ℕ) (hN : a * star a = (N : O)) (k : ℕ) (χ : D.toPre.X) :
-    HasGen D.toPre.P.L (lf (pullSum D F oa a k N χ)) := by
+        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left]
+      ![1, -2, -1, 2]))
+    (huΨ : uΨ.IsGen)
+    (a : O) (N : ℕ) (hN : a * star a = (N : O))
+    (k : ℕ) (χ : D.toPre.X)
+    : HasGen D.toPre.P.L (lf (pullSum D F oa a k N χ)) := by
   have hA := oa.onB.rosati a
   have hA' := oa.onB.rosati (star a)
   rw [star_star] at hA'
-  obtain ⟨uR, huR⟩ := gen_of_local_base hL (Out.rosatiφ D.toPre.P.A (oa.onB.act a) (oa.onB.act (star a))) Out.rosatiε hA
+  obtain ⟨uR, huR⟩ :=
+    gen_of_local_base hL (Out.rosatiφ D.toPre.P.A (oa.onB.act a) (oa.onB.act (star a))) Out.rosatiε
+      hA
   obtain ⟨uR', huR'⟩ :=
-    gen_of_local_base hL (Out.rosatiφ D.toPre.P.A (oa.onB.act (star a)) (oa.onB.act a)) Out.rosatiε hA'
-  have hPM := hasGen_pullMul oa.onB.toRingAct w0 a N hN uΨ huΨ uR huR D.toPre.cub.t D.toPre.cub.isGen
+    gen_of_local_base hL (Out.rosatiφ D.toPre.P.A (oa.onB.act (star a)) (oa.onB.act a)) Out.rosatiε
+      hA'
+  have hPM :=
+    hasGen_pullMul oa.onB.toRingAct w0 a N hN uΨ huΨ uR huR D.toPre.cub.t D.toPre.cub.isGen
   have h1 := hPM.pull (DegPre.prB D.toPre F).left
   rw [lf_pull] at h1
-  have h2 := hasGen_rosati (oa.onB.act (star a)) (oa.onB.act a) uR' huR' (cPB D F χ) (DegPre.prB D.toPre F)
+  have h2 :=
+    hasGen_rosati (oa.onB.act (star a)) (oa.onB.act a) uR' huR' (cPB D F χ) (DegPre.prB D.toPre F)
   have h3 : HasGen D.toPre.P.L (lf (Finsupp.single (1 : DegPre.BF D.toPre F ⟶ D.toPre.P.A) 1)) := by
-    have := HasGen.of_gen (LB.pullGen D.toPre.P.L _ _ D.toPre.rig (toUnit (DegPre.BF D.toPre F)).left)
-      (pullGen_isGen_of_isGen _ _ D.toPre.rig D.toPre.rig_gen _)
+    have :=
+      HasGen.of_gen (LB.pullGen D.toPre.P.L _ _ D.toPre.rig (toUnit (DegPre.BF D.toPre F)).left)
+        (pullGen_isGen_of_isGen _ _ D.toPre.rig D.toPre.rig_gen _)
     convert this using 1
     simp only [fsum, Fintype.univ_punit, Finset.sum_singleton, lf_single]
     rfl
@@ -111,8 +125,8 @@ theorem hasGen_pull (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
   convert h using 2
   have hc : cPB D F χ ≫ oa.onB.act (star a) = cPB D F (star a • χ) := by
     simp only [cPB, Category.assoc, oa.c_lin]
-  simp only [pullSum, mapDomain_add', mapDomain_sub', mapDomain_zsmul', mapDomain_single', Category.comp_id,
-    MonObj.comp_one, lamP, hc]
+  simp only [pullSum, mapDomain_add', mapDomain_sub', mapDomain_zsmul', mapDomain_single',
+    Category.comp_id, MonObj.comp_one, lamP, hc]
   rw [mul_comm (cPB D F (star a • χ)), mul_comm (cPB D F χ)]
   push_cast
   module
@@ -213,14 +227,22 @@ lemma fsum_pull_zF (oa : D.toPre.OAct O) (a : O) (k N : ℕ) (hN1 : 1 ≤ N) (χ
   simp only [Finsupp.add_apply, Finsupp.single_apply, Finsupp.smul_apply, smul_eq_mul]
   split_ifs <;> (try push_cast [Nat.cast_sub hN1]) <;> ring
 
-theorem exists_pullGen (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
+theorem exists_pullGen
+    (hL : D.toPre.P.L.IsLB)
+    (oa : D.toPre.OAct O) (w0 : O)
     (uΨ : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 4)
       ![(padd D.toPre.P.A (𝟙 _) (oa.onB.act w0)).left, 𝟙 D.toPre.P.A.left, (oa.onB.act w0).left,
-        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left] ![1, -2, -1, 2]))
-    (huΨ : uΨ.IsGen) (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N) (k : ℕ) (χ : D.toPre.X) :
-    ∃ u : LB.Gen (LB.LinComb D.toPre.P.L (pullφ D F oa a χ) (pullε k N)), u.IsGen ∧
-      LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ u (DegPre.zF D.toPre F).left)
-        (LB.pullGen D.toPre.P.L _ _ (GeneratorPullback.powGen D.toPre.P.L _ _ D.toPre.rigK (k * (N - 1))) (jFK (R := V) F)) := by
+        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left]
+      ![1, -2, -1, 2]))
+    (huΨ : uΨ.IsGen)
+    (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N)
+    (k : ℕ) (χ : D.toPre.X)
+    : ∃ u : LB.Gen (LB.LinComb D.toPre.P.L (pullφ D F oa a χ) (pullε k N)),
+      u.IsGen
+        ∧ LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ u (DegPre.zF D.toPre F).left)
+          (LB.pullGen D.toPre.P.L _ _
+            (GeneratorPullback.powGen D.toPre.P.L _ _ D.toPre.rigK (k * (N - 1)))
+            (jFK (R := V) F)) := by
   set n := k * (N - 1)
 
   set r := LB.pullGen D.toPre.P.L _ _ (GeneratorPullback.powGen D.toPre.P.L _ _ D.toPre.rigK n) (jFK (R := V) F)
@@ -235,30 +257,43 @@ theorem exists_pullGen (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
   set rT := LB.pullGen D.toPre.P.L _ _ r p
   have hrT : rT.IsGen := pullGen_isGen_of_isGen _ _ r hr p
 
-  obtain ⟨u0, hu0⟩ := (hasGen_pull D F hL oa w0 uΨ huΨ a N hN k χ).gen hL _ _ (fsum_pull D F oa a k N χ)
+  obtain ⟨u0, hu0⟩ :=
+    (hasGen_pull D F hL oa w0 uΨ huΨ a N hN k χ).gen hL _ _ (fsum_pull D F oa a k N χ)
   set v := LB.mulGen D.toPre.P.L _ _ _ _ u0 (LB.invGen D.toPre.P.L _ _ rT)
   have hv : v.IsGen := mulGen_isGen_of_isGen _ hu0 _ (invGen_isGen_of_isGen _ hrT)
 
-  have hφr : fsum (fun _ : PUnit => jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A)
-      (fun _ : PUnit => (n : ℤ) * 1) = (n : ℤ) • Finsupp.single (1 : TF (R := V) F ⟶ D.toPre.P.A).left 1 := by
+  have hφr
+      : fsum
+          (fun _ : PUnit => jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A)
+          (fun _ : PUnit => (n : ℤ) * 1)
+        = (n : ℤ) • Finsupp.single (1 : TF (R := V) F ⟶ D.toPre.P.A).left 1 := by
     rw [one_left_TF]
     simp [fsum, Finsupp.smul_single_one]
-  have h0 : fsum (fun i => z ≫ Sum.elim (pullφ D F oa a χ)
-        (fun _ : PUnit => p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A) i)
-      (Sum.elim (pullε k N) (fun _ : PUnit => -((n : ℤ) * 1))) = 0 := by
-    rw [fsum_comp, fsum_sumElim, mapDomain_add', ← fsum_comp, fsum_pull_zF D F oa a k N hN1 χ, ← fsum_comp]
-    have e : (fun _ : PUnit => z ≫ p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A) =
-        fun _ => jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A := by
+  have h0
+      : fsum
+          (fun i =>
+            z ≫ Sum.elim (pullφ D F oa a χ)
+              (fun _ : PUnit => p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A)
+              i)
+          (Sum.elim (pullε k N) (fun _ : PUnit => -((n : ℤ) * 1)))
+        = 0 := by
+    rw [fsum_comp, fsum_sumElim, mapDomain_add', ← fsum_comp, fsum_pull_zF D F oa a k N hN1 χ,
+      ← fsum_comp]
+    have e
+        : (fun _ : PUnit => z ≫ p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A)
+          = fun _ => jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A := by
       funext _
       rw [← Category.assoc, hzp, Category.id_comp]
     rw [e, fsum_neg, hφr, add_neg_cancel]
   obtain ⟨v', hv', hv1⟩ := exists_normalized hL _ _ v hv p z hzp h0
   have hW := mulGen_isGen_of_isGen _ hv' _ hrT
   have hsW : LB.SameSum
-      (Sum.elim (Sum.elim (pullφ D F oa a χ)
+      (Sum.elim
+        (Sum.elim (pullφ D F oa a χ)
+          (fun _ : PUnit => p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A))
         (fun _ : PUnit => p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A))
-        (fun _ : PUnit => p ≫ jFK (R := V) F ≫ (toUnit (TK V)).left ≫ eSec D.toPre.P.A))
-      (Sum.elim (Sum.elim (pullε k N) (fun _ : PUnit => -((n : ℤ) * 1))) (fun _ : PUnit => (n : ℤ) * 1))
+      (Sum.elim (Sum.elim (pullε k N) (fun _ : PUnit => -((n : ℤ) * 1)))
+        (fun _ : PUnit => (n : ℤ) * 1))
       (pullφ D F oa a χ) (pullε k N) := by
     rw [sameSum_iff_fsum, fsum_sumElim, fsum_sumElim, fsum_neg]
     abel
@@ -266,8 +301,9 @@ theorem exists_pullGen (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
   refine ⟨u, hu, ?_⟩
   have c1 := corr_pullGen (corr_symm hcW) z
   have c2 := corr_pullGen_mulGen v' rT z
-  have c4 := corr_trans hL (corr_pullGen_comp r p z)
-    (corr_trans hL (corr_pullGen_of_eq r hr _ _ hzp) (corr_pullGen_id r))
+  have c4 :=
+    corr_trans hL (corr_pullGen_comp r p z)
+      (corr_trans hL (corr_pullGen_of_eq r hr _ _ hzp) (corr_pullGen_id r))
   have c3 := corr_mulGen (corr_one_of (fun j hj => hv1 j hj)) c4
   have c5 := corr_mulGen_one r
   exact corr_trans hL c1 (corr_trans hL c2 (corr_trans hL c3 c5))
@@ -279,14 +315,18 @@ private lemma res_res_lemma {Y : Scheme.{0}} {U W Z : Y.Opens} (h₁ : W ≤ U) 
   rw [← RingHom.comp_apply, ← CommRingCat.hom_comp, ← Functor.map_comp]
   rfl
 
-
 section PullFam
 
-variable (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
+variable
+  (hL : D.toPre.P.L.IsLB)
+  (oa : D.toPre.OAct O) (w0 : O)
   (uΨ : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 4)
-      ![(padd D.toPre.P.A (𝟙 _) (oa.onB.act w0)).left, 𝟙 D.toPre.P.A.left, (oa.onB.act w0).left,
-        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left] ![1, -2, -1, 2]))
-  (huΨ : uΨ.IsGen) (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N) (k : ℕ)
+    ![(padd D.toPre.P.A (𝟙 _) (oa.onB.act w0)).left, 𝟙 D.toPre.P.A.left, (oa.onB.act w0).left,
+      (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left]
+    ![1, -2, -1, 2]))
+  (huΨ : uΨ.IsGen)
+  (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N)
+  (k : ℕ)
 
 def uPull (χ : D.toPre.X) : LB.Gen (LB.LinComb D.toPre.P.L (pullφ D F oa a χ) (pullε k N)) :=
   Classical.choose (exists_pullGen D F hL oa w0 uΨ huΨ a N hN hN1 k χ)
@@ -298,7 +338,9 @@ lemma uPull_spec (χ : D.toPre.X) :
         (LB.pullGen D.toPre.P.L _ _ (GeneratorPullback.powGen D.toPre.P.L _ _ D.toPre.rigK (k * (N - 1))) (jFK (R := V) F)) := Classical.choose_spec (exists_pullGen D F hL oa w0 uΨ huΨ a N hN hN1 k χ)
 
 def pullProd (s : Fam D.toPre F k) (χ : D.toPre.X) :=
-  mulSec D.toPre.P.L _ _ _ _ (genSec (uPull D F hL oa w0 uΨ huΨ a N hN hN1 k χ) (uPull_spec D F hL oa w0 uΨ huΨ a N hN hN1 k χ).1)
+  mulSec D.toPre.P.L _ _ _ _
+    (genSec (uPull D F hL oa w0 uΨ huΨ a N hN hN1 k χ)
+      (uPull_spec D F hL oa w0 uΨ huΨ a N hN hN1 k χ).1)
     (pullSec D.toPre.P.L _ _ (s.s χ) (aF D F oa a).left)
 
 lemma pullProd_sameSum (χ : D.toPre.X) (β : D.toPre.X) (hβ : star a • χ = β) :
@@ -318,14 +360,14 @@ lemma pullProd_sameSum (χ : D.toPre.X) (β : D.toPre.X) (hβ : star a • χ = 
       ∑ x : Fin 4, if DegPre.famφ D.toPre F (star a • χ) x = ψ then DegPre.famε (k * N) x else 0
   rw [Finset.sum_eq_zero (fun x _ => hz x), add_zero]
 
-
 open scoped Classical in
-def pullSecs (s : Fam D.toPre F k) (β : D.toPre.X) :
-    LB.Sec (LB.LinComb D.toPre.P.L (DegPre.famφ D.toPre F β) (DegPre.famε (k * N))) :=
+def pullSecs (s : Fam D.toPre F k) (β : D.toPre.X)
+    : LB.Sec (LB.LinComb D.toPre.P.L (DegPre.famφ D.toPre F β) (DegPre.famε (k * N))) :=
   if h : ∃ χ, star a • χ = β then
     Classical.choose (sec_transport hL (pullProd_sameSum D F oa a N k h.choose β h.choose_spec)
       (pullProd D F hL oa w0 uΨ huΨ a N hN hN1 k s h.choose))
-  else SecOps.secZero
+  else
+    SecOps.secZero
 
 end PullFam
 
@@ -355,7 +397,6 @@ lemma shape_secRel {Y : Scheme.{0}} {U₁ U₂ U₃ W V₂ O : Y.Opens} (hW : W 
   simp only [rs_rs_eq_rs_trans, rs_mul'] at e2
   rw [mul_comm]
   exact e2.symm
-
 
 variable {D F} in
 lemma secRel_pullSecs (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
@@ -398,17 +439,25 @@ lemma secRel_pullSecs (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
         · exact Set.mem_iInter.1 hy.1.2 k, hy.1.1⟩
   exact shape_secRel _ _ (wchart_comp_le _ _ j₂) ho _ _ _ _ _ _ e
 
-theorem exists_pullAl (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
+theorem exists_pullAl
+    (hL : D.toPre.P.L.IsLB)
+    (oa : D.toPre.OAct O) (w0 : O)
     (uΨ : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 4)
       ![(padd D.toPre.P.A (𝟙 _) (oa.onB.act w0)).left, 𝟙 D.toPre.P.A.left, (oa.onB.act w0).left,
-        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left] ![1, -2, -1, 2]))
-    (huΨ : uΨ.IsGen) (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N) (k : ℕ)
-    (s : Fam D.toPre F k)
-    (hfe : DegPre.FamFE D.toPre F (k * N) (pullSecs D F hL oa w0 uΨ huΨ a N hN hN1 k s)) :
-    ∃ s' : Fam D.toPre F (k * N), PullAl D F oa a k N s s' := by
+        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left]
+      ![1, -2, -1, 2]))
+    (huΨ : uΨ.IsGen)
+    (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N)
+    (k : ℕ) (s : Fam D.toPre F k)
+    (hfe : DegPre.FamFE D.toPre F (k * N) (pullSecs D F hL oa w0 uΨ huΨ a N hN hN1 k s))
+    : ∃ s' : Fam D.toPre F (k * N), PullAl D F oa a k N s s' := by
   refine ⟨⟨pullSecs D F hL oa w0 uΨ huΨ a N hN hN1 k s, hfe⟩, fun χ => ?_, fun β hβ j => ?_⟩
-  · refine ⟨uPull D F hL oa w0 uΨ huΨ a N hN hN1 k χ, (uPull_spec D F hL oa w0 uΨ huΨ a N hN hN1 k χ).1,
-      (uPull_spec D F hL oa w0 uΨ huΨ a N hN hN1 k χ).2, ?_⟩
+  · refine ⟨
+      uPull D F hL oa w0 uΨ huΨ a N hN hN1 k χ,
+      (uPull_spec D F hL oa w0 uΨ huΨ a N hN hN1 k χ).1,
+      (uPull_spec D F hL oa w0 uΨ huΨ a N hN hN1 k χ).2,
+      ?_
+    ⟩
     have hex : ∃ χ₀, star a • χ₀ = star a • χ := ⟨χ, rfl⟩
     show GeneratorPullback.SecRel _ _ _ (pullSecs D F hL oa w0 uΨ huΨ a N hN hN1 k s (star a • χ)) _ _ _ _ _ _ _
     simp only [pullSecs, dif_pos hex]
@@ -419,30 +468,42 @@ theorem exists_pullAl (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
     simp only [pullSecs, dif_neg this]
     rfl
 
-theorem exists_XB (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
+theorem exists_XB
+    (hL : D.toPre.P.L.IsLB)
+    (oa : D.toPre.OAct O) (w0 : O)
     (uΨ : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 4)
       ![(padd D.toPre.P.A (𝟙 _) (oa.onB.act w0)).left, 𝟙 D.toPre.P.A.left, (oa.onB.act w0).left,
-        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left] ![1, -2, -1, 2]))
-    (huΨ : uΨ.IsGen) (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N) (k : ℕ) :
-    ∃ X : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 2) ![𝟙 D.toPre.P.A.left, (oa.onB.act a).left]
-        ![((k * N : ℕ) : ℤ), -(k : ℤ)]), X.IsGen ∧
-      LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ X (eSec D.toPre.P.A))
+        (toUnit D.toPre.P.A ≫ η[D.toPre.P.A]).left]
+      ![1, -2, -1, 2]))
+    (huΨ : uΨ.IsGen)
+    (a : O) (N : ℕ) (hN : a * star a = (N : O)) (hN1 : 1 ≤ N)
+    (k : ℕ)
+    : ∃ X : LB.Gen (LB.LinComb D.toPre.P.L (K := Fin 2) ![𝟙 D.toPre.P.A.left, (oa.onB.act a).left]
+        ![((k * N : ℕ) : ℤ), -(k : ℤ)]),
+      X.IsGen ∧ LB.Gen.Corr D.toPre.P.L _ _ _ _ (LB.pullGen D.toPre.P.L _ _ X (eSec D.toPre.P.A))
         (GeneratorPullback.powGen D.toPre.P.L _ _ D.toPre.rig (k * (N - 1))) := by
   have hA := oa.onB.rosati a
-  obtain ⟨uR, huR⟩ := gen_of_local_base hL (Out.rosatiφ D.toPre.P.A (oa.onB.act a) (oa.onB.act (star a))) Out.rosatiε hA
-  have hPM := hasGen_pullMul oa.onB.toRingAct w0 a N hN uΨ huΨ uR huR D.toPre.cub.t D.toPre.cub.isGen
+  obtain ⟨uR, huR⟩ :=
+    gen_of_local_base hL (Out.rosatiφ D.toPre.P.A (oa.onB.act a) (oa.onB.act (star a))) Out.rosatiε
+      hA
+  have hPM :=
+    hasGen_pullMul oa.onB.toRingAct w0 a N hN uΨ huΨ uR huR D.toPre.cub.t D.toPre.cub.isGen
   have hRig : HasGen D.toPre.P.L (lf (Finsupp.single (1 : D.toPre.P.A ⟶ D.toPre.P.A) 1)) := by
-    have := HasGen.of_gen (LB.pullGen D.toPre.P.L _ _ D.toPre.rig (toUnit D.toPre.P.A).left)
-      (pullGen_isGen_of_isGen _ _ D.toPre.rig D.toPre.rig_gen _)
+    have :=
+      HasGen.of_gen (LB.pullGen D.toPre.P.L _ _ D.toPre.rig (toUnit D.toPre.P.A).left)
+        (pullGen_isGen_of_isGen _ _ D.toPre.rig D.toPre.rig_gen _)
     convert this using 1
     simp only [fsum, Fintype.univ_punit, Finset.sum_singleton, lf_single]
     rfl
   have h := (hPM.zsmul (-(k : ℤ))).add (hRig.zsmul ((k : ℤ) * ((N : ℤ) - 1)))
   simp only [← lf_smul, ← lf_add] at h
-  have hf : fsum (K := Fin 2) ![𝟙 D.toPre.P.A.left, (oa.onB.act a).left] ![((k * N : ℕ) : ℤ), -(k : ℤ)] =
-      lf (-(k : ℤ) • (Finsupp.single (oa.onB.act a) 1 - (N : ℤ) • Finsupp.single (𝟙 D.toPre.P.A) 1 +
-        ((N : ℤ) - 1) • Finsupp.single (1 : D.toPre.P.A ⟶ D.toPre.P.A) 1) +
-        ((k : ℤ) * ((N : ℤ) - 1)) • Finsupp.single (1 : D.toPre.P.A ⟶ D.toPre.P.A) 1) := by
+  have hf
+      : fsum (K := Fin 2) ![𝟙 D.toPre.P.A.left, (oa.onB.act a).left] ![((k * N : ℕ) : ℤ), -(k : ℤ)]
+        = lf
+          (-(k : ℤ)
+              • (Finsupp.single (oa.onB.act a) 1 - (N : ℤ) • Finsupp.single (𝟙 D.toPre.P.A) 1
+                + ((N : ℤ) - 1) • Finsupp.single (1 : D.toPre.P.A ⟶ D.toPre.P.A) 1)
+            + ((k : ℤ) * ((N : ℤ) - 1)) • Finsupp.single (1 : D.toPre.P.A ⟶ D.toPre.P.A) 1) := by
     simp only [fsum, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons]
     rw [← Over.id_left, ← lf_single, ← lf_single, ← lf_add]
     congr 1
@@ -456,12 +517,13 @@ theorem exists_XB (hL : D.toPre.P.L.IsLB) (oa : D.toPre.OAct O) (w0 : O)
     rfl
   have hrig : (GeneratorPullback.powGen D.toPre.P.L _ _ D.toPre.rig (k * (N - 1))).IsGen :=
     powGen_isGen_of_isGen _ D.toPre.rig_gen _
-  refine exists_normalized_to hL _ _ X0 hX0 (toUnit D.toPre.P.A).left (eSec D.toPre.P.A) hzp _ _ _ hrig ?_
+  refine exists_normalized_to hL _ _ X0 hX0 (toUnit D.toPre.P.A).left (eSec D.toPre.P.A) hzp _ _ _
+    hrig ?_
   have ha : eSec D.toPre.P.A ≫ (oa.onB.act a).left = eSec D.toPre.P.A := by
     haveI := oa.onB.hom a
     simp only [eSec, ← Over.comp_left, IsMonHom.one_hom]
-  simp only [fsum, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons, Category.comp_id,
-    ha, Fintype.univ_punit, Finset.sum_singleton, ← Finsupp.single_add]
+  simp only [fsum, Fin.sum_univ_two, Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+    Category.comp_id, ha, Fintype.univ_punit, Finset.sum_singleton, ← Finsupp.single_add]
   congr 1
   rw [Nat.cast_mul, Nat.cast_mul, Nat.cast_sub hN1]
   push_cast

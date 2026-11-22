@@ -13,9 +13,11 @@ open MvPolynomial
 
 universe u
 
-theorem exists_block_var_of_weight_pos {K : Type} [DecidableEq K] {ι : K → Type}
-    (d : (Σ k, ι k) →₀ ℕ) (k : K) (h : 1 ≤ Finsupp.weight (blockWeight ι) d k) :
-    ∃ v : Σ k, ι k, v.1 = k ∧ d v ≠ 0 := by
+theorem exists_block_var_of_weight_pos
+    {K : Type} [DecidableEq K]
+    {ι : K → Type} (d : (Σ k, ι k) →₀ ℕ)
+    (k : K) (h : 1 ≤ Finsupp.weight (blockWeight ι) d k)
+    : ∃ v : Σ k, ι k, v.1 = k ∧ d v ≠ 0 := by
   by_contra hne
   push Not at hne
   have h0 : Finsupp.weight (blockWeight ι) d k = 0 := by
@@ -25,10 +27,14 @@ theorem exists_block_var_of_weight_pos {K : Type} [DecidableEq K] {ι : K → Ty
     simp [blockWeight, hv1]
   omega
 
-theorem mem_of_block_vars_mem {F : Type u} [Field F] {K : Type} [DecidableEq K] {ι : K → Type}
-    (Q : Ideal (MRing ι F)) (k : K) (hX : ∀ i, (X ⟨k, i⟩ : MRing ι F) ∈ Q) (m : K → ℕ)
-    (hm : 1 ≤ m k) (f : MRing ι F) (hf : f ∈ weightedHomogeneousSubmodule F (blockWeight ι) m) :
-    f ∈ Q := by
+theorem mem_of_block_vars_mem
+    {F : Type u} [Field F]
+    {K : Type} [DecidableEq K]
+    {ι : K → Type} (Q : Ideal (MRing ι F))
+    (k : K) (hX : ∀ i, (X ⟨k, i⟩ : MRing ι F) ∈ Q)
+    (m : K → ℕ) (hm : 1 ≤ m k)
+    (f : MRing ι F) (hf : f ∈ weightedHomogeneousSubmodule F (blockWeight ι) m)
+    : f ∈ Q := by
   have hspan : Ideal.span ((X : (Σ k, ι k) → MRing ι F) '' {v | v.1 = k}) ≤ Q := by
     rw [Ideal.span_le]
     rintro _ ⟨⟨k', i⟩, hv, rfl⟩

@@ -28,27 +28,33 @@ def val (x : MG G hG) : MtM m := x.1
 
 theorem toM_mem (x : MG G hG) : x.toM ∈ G := x.2
 
-def mk (hG : IsMatGroup G) (g : Matrix (Fin m) (Fin m) ℂ) (h : g ∈ G) : MG G hG :=
-  ⟨Matrix.of.symm g, by
+def mk (hG : IsMatGroup G) (g : Matrix (Fin m) (Fin m) ℂ) (h : g ∈ G) : MG G hG := ⟨
+  Matrix.of.symm g,
+  by
     have heq : Matrix.of (Matrix.of.symm g) = g := (Matrix.of).apply_symm_apply g
-    exact heq ▸ h⟩
+    exact heq ▸ h
+⟩
 
-@[simp] theorem toM_mk (g : Matrix (Fin m) (Fin m) ℂ) (h : g ∈ G) : (mk hG g h).toM = g := by
-  rfl
+@[simp]
+theorem toM_mk (g : Matrix (Fin m) (Fin m) ℂ) (h : g ∈ G) : (mk hG g h).toM = g := by rfl
 
 theorem toM_injective : Function.Injective (toM : MG G hG → Matrix (Fin m) (Fin m) ℂ) := by
   intro x y h
   exact Subtype.ext (Matrix.of.injective h)
 
-@[simp] theorem mk_toM (x : MG G hG) : mk hG x.toM x.toM_mem = x := toM_injective (toM_mk _ _)
+@[simp]
+theorem mk_toM (x : MG G hG) : mk hG x.toM x.toM_mem = x := toM_injective (toM_mk _ _)
 
 instance : Mul (MG G hG) := ⟨fun x y => mk hG (x.toM * y.toM) (hG.2.2.1 _ x.2 _ y.2)⟩
 instance : One (MG G hG) := ⟨mk hG 1 hG.2.1⟩
 instance : Inv (MG G hG) := ⟨fun x => mk hG (x.toM)⁻¹ (hG.2.2.2 _ x.2).1⟩
 
-@[simp] theorem toM_mul (x y : MG G hG) : (x * y).toM = x.toM * y.toM := toM_mk _ _
-@[simp] theorem toM_one : (1 : MG G hG).toM = 1 := toM_mk _ _
-@[simp] theorem toM_inv (x : MG G hG) : x⁻¹.toM = (x.toM)⁻¹ := toM_mk _ _
+@[simp]
+theorem toM_mul (x y : MG G hG) : (x * y).toM = x.toM * y.toM := toM_mk _ _
+@[simp]
+theorem toM_one : (1 : MG G hG).toM = 1 := toM_mk _ _
+@[simp]
+theorem toM_inv (x : MG G hG) : x⁻¹.toM = (x.toM)⁻¹ := toM_mk _ _
 
 theorem mul_inv_toM (x : MG G hG) : x.toM * (x.toM)⁻¹ = 1 := (hG.2.2.2 _ x.toM_mem).2
 
@@ -84,7 +90,8 @@ instance : Group (MG G hG) where
     change (npowRec n.succ a)⁻¹ = (npowRec n.succ a)⁻¹
     rfl
 
-@[simp] theorem toM_mul' (x y : MG G hG) : (x * y).toM = x.toM * y.toM := toM_mul x y
+@[simp]
+theorem toM_mul' (x y : MG G hG) : (x * y).toM = x.toM * y.toM := toM_mul x y
 
 end MG
 
@@ -98,18 +105,18 @@ instance : TopologicalSpace (MG G hG) :=
 instance : T2Space (MG G hG) := inferInstanceAs (T2Space {x : MtM m // Matrix.of x ∈ G})
 instance : SecondCountableTopology (MG G hG) :=
   inferInstanceAs (SecondCountableTopology {x : MtM m // Matrix.of x ∈ G})
-instance : LocallyCompactSpace (MG G hG) :=
-  (isClosed_set hG).locallyCompactSpace
+instance : LocallyCompactSpace (MG G hG) := (isClosed_set hG).locallyCompactSpace
 instance : MeasurableSpace (MG G hG) :=
   inferInstanceAs (MeasurableSpace {x : MtM m // Matrix.of x ∈ G})
 instance : BorelSpace (MG G hG) := inferInstanceAs (BorelSpace {x : MtM m // Matrix.of x ∈ G})
 
 theorem continuous_val : Continuous (val : MG G hG → MtM m) := continuous_subtype_val
 
-theorem continuous_toM : Continuous (toM : MG G hG → Matrix (Fin m) (Fin m) ℂ) := continuous_subtype_val
+theorem continuous_toM : Continuous (toM : MG G hG → Matrix (Fin m) (Fin m) ℂ) :=
+  continuous_subtype_val
 
-theorem continuous_iff_toM {X : Type*} [TopologicalSpace X] {f : X → MG G hG} :
-    Continuous f ↔ Continuous (fun x => (f x).toM) :=
+theorem continuous_iff_toM {X : Type*} [TopologicalSpace X] {f : X → MG G hG}
+    : Continuous f ↔ Continuous (fun x => (f x).toM) :=
   ⟨fun h => continuous_toM.comp h, fun h => continuous_induced_rng.2 h⟩
 
 instance : IsTopologicalGroup (MG G hG) where

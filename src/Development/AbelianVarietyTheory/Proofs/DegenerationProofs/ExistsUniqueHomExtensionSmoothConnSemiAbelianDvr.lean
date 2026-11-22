@@ -13,13 +13,21 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.FinitePoi
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory
 
-theorem existsUnique_hom_extension_smConn_semiAbelian_dvr :
-    ∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K] [IsFractionRing T K] (H G : Over (Sp T)) [GrpObj H] [GrpObj G], SmConn H → IsSemiAbelian G → ∀ f : (Over.pullback (spMap (algebraMap T K))).obj H ⟶ (Over.pullback (spMap (algebraMap T K))).obj G, IsMonHom f → ∃! F : H ⟶ G, IsMonHom F ∧ (Over.pullback (spMap (algebraMap T K))).map F = f := by
+theorem existsUnique_hom_extension_smConn_semiAbelian_dvr
+    : ∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K]
+        [IsFractionRing T K] (H G : Over (Sp T)) [GrpObj H] [GrpObj G],
+      SmConn H → IsSemiAbelian G
+        → ∀ f
+            : (Over.pullback (spMap (algebraMap T K))).obj H
+              ⟶ (Over.pullback (spMap (algebraMap T K))).obj G,
+          IsMonHom f
+            → ∃! F : H ⟶ G, IsMonHom F ∧ (Over.pullback (spMap (algebraMap T K))).map F = f := by
   intro T K _ _ _ _ _ _ G G' _ _ hG hG' f hf
   obtain ⟨hcomm, hsm, hsep, hqc, hgc⟩ := hG
   have := hG'.comm
@@ -31,10 +39,10 @@ theorem existsUnique_hom_extension_smConn_semiAbelian_dvr :
   let Φ := Over.pullback (spMap (algebraMap T K))
   let i : Φ.obj G ⟶ Φ.obj (G ⊗ G') := lift (𝟙 _) f ≫ Functor.LaxMonoidal.μ Φ G G'
   have hi : IsMonHom i := inferInstance
-  have hi1 : i ≫ Φ.map (fst G G') = 𝟙 _ := by
-    rw [Category.assoc, Functor.Monoidal.μ_fst, lift_fst]
+  have hi1 : i ≫ Φ.map (fst G G') = 𝟙 _ := by rw [Category.assoc, Functor.Monoidal.μ_fst, lift_fst]
   have hi2 : i ≫ Φ.map (snd G G') = f := by simp [i]
-  have hs1 : IsSeparated (fst G G').left := inferInstanceAs (IsSeparated (pullback.fst G.hom G'.hom))
+  have hs1 : IsSeparated (fst G G').left :=
+    inferInstanceAs (IsSeparated (pullback.fst G.hom G'.hom))
   have hs2 : LocallyOfFiniteType (fst G G').left :=
     inferInstanceAs (LocallyOfFiniteType (pullback.fst G.hom G'.hom))
   have hs3 : QuasiCompact (fst G G').left :=
@@ -64,16 +72,19 @@ theorem existsUnique_hom_extension_smConn_semiAbelian_dvr :
   have hp1 : IsSeparated (io ≫ fst G G').left := by rw [Over.comp_left]; infer_instance
   have hp2 : LocallyOfFiniteType (io ≫ fst G G').left := by rw [Over.comp_left]; infer_instance
   have hp3 : QuasiCompact (io ≫ fst G G').left := by rw [Over.comp_left]; infer_instance
-  have hnt := KernelNoTorsion.eq_one_of_pow_eq_one_of_comp_eq_one T K Ga G (io ≫ fst G G') n hp hGaS
-    (etale_mulN_torsion_dvr T Ga n hnT hGa hGaL).2
-    (etale_mulN_torsion_dvr T G n hnT hGflat inferInstance).2 hpKi
+  have hnt :=
+    KernelNoTorsion.eq_one_of_pow_eq_one_of_comp_eq_one T K Ga G (io ≫ fst G G') n hp hGaS
+      (etale_mulN_torsion_dvr T Ga n hnT hGa hGaL).2
+      (etale_mulN_torsion_dvr T G n hnT hGflat inferInstance).2 hpKi
   have hnS : IsUnit (n : Γ(Sp T, ⊤)) := by
     simpa using hnT.map (Scheme.ΓSpecIso (CommRingCat.of T)).inv.hom
-  have hker := finite_geometric_kernel_of_pow_eq_one
-    AbelianSubgroupFinite.finite_of_torsionFree (Sp T) G G' Ga io n hG' hio' hio hn hnS hnt
+  have hker :=
+    finite_geometric_kernel_of_pow_eq_one AbelianSubgroupFinite.finite_of_torsionFree (Sp T) G G' Ga
+      io n hG' hio' hio hn hnS hnt
   have hqf := locallyQuasiFinite_of_finite_geometric_ker (Sp T) Ga G (io ≫ fst G G') hp hp2 hp3 hker
-  have hiso := isIso_of_quasiFinite_of_isIso_genericFibre_dvr T K Ga G (io ≫ fst G G') hp hGa hp1 hp2
-    hp3 hqf hsm hgc hpKi
+  have hiso :=
+    isIso_of_quasiFinite_of_isIso_genericFibre_dvr T K Ga G (io ≫ fst G G') hp hGa hp1 hp2 hp3 hqf
+      hsm hgc hpKi
   have hF : Φ.map (inv (io ≫ fst G G') ≫ io ≫ snd G G') = f := by
     rw [Functor.map_comp, Functor.map_inv, IsIso.inv_comp_eq, hpK, Functor.map_comp, ← he,
       Category.assoc, hi2]

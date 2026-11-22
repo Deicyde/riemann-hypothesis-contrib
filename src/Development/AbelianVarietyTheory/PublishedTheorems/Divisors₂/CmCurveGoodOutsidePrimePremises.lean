@@ -21,25 +21,27 @@ section Reduction
 variable {F : Type} [Field F] [NumberField F]
 
 def HasGoodReductionOutside (p : ℕ) (A : WeierstrassCurve F) : Prop :=
-  ∀ v : HeightOneSpectrum (𝓞 F), (p : 𝓞 F) ∉ v.asIdeal →
-    ∃ C : VariableChange F, (C • A).HasGoodReduction (v.valuationSubringAtPrime F)
+  ∀ v : HeightOneSpectrum (𝓞 F),
+    (p : 𝓞 F) ∉ v.asIdeal
+      → ∃ C : VariableChange F, (C • A).HasGoodReduction (v.valuationSubringAtPrime F)
 
 def HasMinimalDiscriminant (A : WeierstrassCurve F) (D : F) : Prop :=
-  ∀ v : HeightOneSpectrum (𝓞 F),
-    ∃ (C : VariableChange F) (u : (v.valuationSubringAtPrime F)ˣ),
-      (C • A).IsMinimal (v.valuationSubringAtPrime F) ∧
-        (C • A).Δ = ((u : v.valuationSubringAtPrime F) : F) * D
+  ∀ v : HeightOneSpectrum (𝓞 F), ∃ (C : VariableChange F) (u : (v.valuationSubringAtPrime F)ˣ),
+    (C • A).IsMinimal (v.valuationSubringAtPrime F)
+      ∧ (C • A).Δ = ((u : v.valuationSubringAtPrime F) : F) * D
 
 end Reduction
 
 def IsGoodCMCurve (p : ℕ) (F : IntermediateField ℚ ℂ) (A : WeierstrassCurve F) : Prop :=
-  ∃ (_ : NumberField F) (_ : A.IsElliptic) (L : PeriodPair), IsIntegersLattice p L ∧
-    F = ℚ⟮(latticeCurve L).j⟯ ∧ (A.j : ℂ) = (latticeCurve L).j ∧ HasGoodReductionOutside p A
+  ∃ (_ : NumberField F) (_ : A.IsElliptic) (L : PeriodPair),
+    IsIntegersLattice p L ∧ F = ℚ⟮(latticeCurve L).j⟯ ∧ (A.j : ℂ) = (latticeCurve L).j
+      ∧ HasGoodReductionOutside p A
 
 def CMCurveGoodOutsidePrimeSt : Prop :=
-  ∀ p : ℕ, p.Prime → p % 4 = 3 → 3 < p →
-    ∃ (F : IntermediateField ℚ ℂ) (_ : NumberField F) (A : WeierstrassCurve F),
-      IsGoodCMCurve p F A ∧ HasMinimalDiscriminant A (-(p : F) ^ 3)
+  ∀ p : ℕ,
+    p.Prime → p % 4 = 3 → 3 < p
+      → ∃ (F : IntermediateField ℚ ℂ) (_ : NumberField F) (A : WeierstrassCurve F),
+        IsGoodCMCurve p F A ∧ HasMinimalDiscriminant A (- (p : F) ^ 3)
 
 section Lattice
 
@@ -49,8 +51,8 @@ theorem sqrtNegNat_sq (p : ℕ) : sqrtNegNat p ^ 2 = -(p : ℂ) := by
   push_cast
   ring
 
-theorem latticeCurve_j_congr {L L' : PeriodPair} (h : L.lattice = L'.lattice) :
-    (latticeCurve L).j = (latticeCurve L').j := by
+theorem latticeCurve_j_congr {L L' : PeriodPair} (h : L.lattice = L'.lattice)
+    : (latticeCurve L).j = (latticeCurve L').j := by
   have hG : ∀ n, L.G n = L'.G n := by
     intro n
     unfold PeriodPair.G
@@ -58,16 +60,17 @@ theorem latticeCurve_j_congr {L L' : PeriodPair} (h : L.lattice = L'.lattice) :
   rw [latticeCurve_j_eq, latticeCurve_j_eq]
   simp only [PeriodPair.g₂, PeriodPair.g₃, hG]
 
-theorem IsIntegersLattice.j_eq {p : ℕ} {L L' : PeriodPair} (h : IsIntegersLattice p L)
-    (h' : IsIntegersLattice p L') : (latticeCurve L).j = (latticeCurve L').j := by
+theorem IsIntegersLattice.j_eq
+    {p : ℕ} {L L' : PeriodPair} (h : IsIntegersLattice p L) (h' : IsIntegersLattice p L')
+    : (latticeCurve L).j = (latticeCurve L').j := by
   apply latticeCurve_j_congr
   ext z
   rw [h z, h' z]
 
 variable {p : ℕ} {K : Type} [Field K] [NumberField K]
 
-theorem isTotallyComplex_of_sq_eq_neg (hp : 0 < p) {x : K} (hx : x ^ 2 = -(p : K)) :
-    IsTotallyComplex K := by
+theorem isTotallyComplex_of_sq_eq_neg (hp : 0 < p) {x : K} (hx : x ^ 2 = -(p : K))
+    : IsTotallyComplex K := by
   refine ⟨fun v => ?_⟩
   rw [← InfinitePlace.not_isReal_iff_isComplex]
   intro hv
@@ -78,7 +81,8 @@ theorem isTotallyComplex_of_sq_eq_neg (hp : 0 < p) {x : K} (hx : x ^ 2 = -(p : K
 
 variable [Algebra K ℂ]
 
-private theorem algebraMap_rat_ne_sqrtNegNat (hp : 0 < p) (q : ℚ) : algebraMap ℚ ℂ q ≠ sqrtNegNat p := by
+private theorem algebraMap_rat_ne_sqrtNegNat (hp : 0 < p) (q : ℚ)
+    : algebraMap ℚ ℂ q ≠ sqrtNegNat p := by
   intro hq
   have h1 := sqrtNegNat_sq p
   rw [← hq, eq_ratCast] at h1
@@ -89,14 +93,18 @@ private theorem algebraMap_rat_ne_sqrtNegNat (hp : 0 < p) (q : ℚ) : algebraMap
   have h5 : (0 : ℚ) < p := by exact_mod_cast hp
   nlinarith [sq_nonneg q]
 
-private theorem finrank_adjoin_sqrtNegNat_eq_two (hp : 0 < p) : Module.finrank ℚ ℚ⟮sqrtNegNat p⟯ = 2 := by
-  have hint : IsIntegral ℚ (sqrtNegNat p) :=
-    ⟨Polynomial.X ^ 2 + Polynomial.C (p : ℚ), Polynomial.monic_X_pow_add_C _ two_ne_zero, by
-      simp [sqrtNegNat_sq]⟩
+private theorem finrank_adjoin_sqrtNegNat_eq_two (hp : 0 < p)
+    : Module.finrank ℚ ℚ⟮sqrtNegNat p⟯ = 2 := by
+  have hint : IsIntegral ℚ (sqrtNegNat p) := ⟨
+    Polynomial.X ^ 2 + Polynomial.C (p : ℚ),
+    Polynomial.monic_X_pow_add_C _ two_ne_zero,
+    by simp [sqrtNegNat_sq]
+  ⟩
   rw [IntermediateField.adjoin.finrank hint]
   have hle : (minpoly ℚ (sqrtNegNat p)).natDegree ≤ 2 := by
-    have hd := minpoly.degree_le_of_ne_zero ℚ (sqrtNegNat p)
-      (Polynomial.X_pow_add_C_ne_zero two_pos (p : ℚ)) (by simp [sqrtNegNat_sq])
+    have hd :=
+      minpoly.degree_le_of_ne_zero ℚ (sqrtNegNat p) (Polynomial.X_pow_add_C_ne_zero two_pos (p : ℚ))
+        (by simp [sqrtNegNat_sq])
     rw [Polynomial.degree_X_pow_add_C two_pos] at hd
     exact Polynomial.natDegree_le_of_degree_le hd
   have hne : (minpoly ℚ (sqrtNegNat p)).natDegree ≠ 1 := by
@@ -106,9 +114,9 @@ private theorem finrank_adjoin_sqrtNegNat_eq_two (hp : 0 < p) : Module.finrank �
   have hpos := minpoly.natDegree_pos hint
   omega
 
-theorem mem_adjoin_sqrtNegNat_iff (hp : 0 < p) (h2 : Module.finrank ℚ K = 2) {x : K}
-    (hx : x ^ 2 = -(p : K)) (z : ℂ) :
-    z ∈ ℚ⟮sqrtNegNat p⟯ ↔ ∃ y : K, algebraMap K ℂ y = z := by
+theorem mem_adjoin_sqrtNegNat_iff
+    (hp : 0 < p) (h2 : Module.finrank ℚ K = 2) {x : K} (hx : x ^ 2 = -(p : K)) (z : ℂ)
+    : z ∈ ℚ⟮sqrtNegNat p⟯ ↔ ∃ y : K, algebraMap K ℂ y = z := by
   let φ : K →ₐ[ℚ] ℂ := (algebraMap K ℂ).toRatAlgHom
   have hxs : sqrtNegNat p ^ 2 = φ x ^ 2 := by
     rw [sqrtNegNat_sq, ← map_pow, hx, map_neg, map_natCast]
@@ -126,18 +134,21 @@ theorem mem_adjoin_sqrtNegNat_iff (hp : 0 < p) (h2 : Module.finrank ℚ K = 2) {
   rw [heq]
   exact AlgHom.mem_fieldRange
 
-theorem isIntegersLattice_iff (hp : 0 < p) (h2 : Module.finrank ℚ K = 2) {x : K}
-    (hx : x ^ 2 = -(p : K)) (L : PeriodPair) :
-    IsIntegersLattice p L ↔ IsIdealLattice (1 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) L := by
+theorem isIntegersLattice_iff
+    (hp : 0 < p) (h2 : Module.finrank ℚ K = 2) {x : K} (hx : x ^ 2 = -(p : K)) (L : PeriodPair)
+    : IsIntegersLattice p L ↔ IsIdealLattice (1 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) L := by
   let ψ : K →ₐ[ℤ] ℂ := (algebraMap K ℂ).toIntAlgHom
-  have key : ∀ z : ℂ, (z ∈ ℚ⟮sqrtNegNat p⟯ ∧ IsIntegral ℤ z) ↔
-      z ∈ algebraMap K ℂ '' (((1 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : FractionalIdeal (𝓞 K)⁰ K) : Set K) := by
+  have key
+      : ∀ z : ℂ,
+        (z ∈ ℚ⟮sqrtNegNat p⟯ ∧ IsIntegral ℤ z)
+          ↔ z
+            ∈ algebraMap K ℂ
+              '' (((1 : (FractionalIdeal (𝓞 K)⁰ K)ˣ) : FractionalIdeal (𝓞 K)⁰ K) : Set K) := by
     intro z
     rw [mem_adjoin_sqrtNegNat_iff hp h2 hx z, Units.val_one]
     constructor
     · rintro ⟨⟨y, rfl⟩, hz⟩
-      have hy : IsIntegral ℤ y :=
-        (isIntegral_algHom_iff ψ (algebraMap K ℂ).injective).mp hz
+      have hy : IsIntegral ℤ y := (isIntegral_algHom_iff ψ (algebraMap K ℂ).injective).mp hz
       refine ⟨y, ?_, rfl⟩
       exact (FractionalIdeal.mem_one_iff _).mpr ⟨⟨y, hy⟩, rfl⟩
     · rintro ⟨y, hy, rfl⟩
@@ -154,9 +165,11 @@ theorem isIntegersLattice_iff (hp : 0 < p) (h2 : Module.finrank ℚ K = 2) {x : 
     exact Set.ext_iff.mp h z
 
 theorem exists_isIntegersLattice (hp : 0 < p) : ∃ L, IsIntegersLattice p L := by
-  have hint : IsIntegral ℚ (sqrtNegNat p) :=
-    ⟨Polynomial.X ^ 2 + Polynomial.C (p : ℚ), Polynomial.monic_X_pow_add_C _ two_ne_zero, by
-      simp [sqrtNegNat_sq]⟩
+  have hint : IsIntegral ℚ (sqrtNegNat p) := ⟨
+    Polynomial.X ^ 2 + Polynomial.C (p : ℚ),
+    Polynomial.monic_X_pow_add_C _ two_ne_zero,
+    by simp [sqrtNegNat_sq]
+  ⟩
   have : FiniteDimensional ℚ ℚ⟮sqrtNegNat p⟯ := IntermediateField.adjoin.finiteDimensional hint
   have : NumberField ℚ⟮sqrtNegNat p⟯ := ⟨⟩
   let x : ℚ⟮sqrtNegNat p⟯ := ⟨sqrtNegNat p, IntermediateField.mem_adjoin_simple_self ℚ _⟩
@@ -173,31 +186,40 @@ section Consequences
 
 variable {p : ℕ}
 
-private theorem valuation_algebraMap_unit_eq_one' {R K : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R]
-    [Field K] [Algebra R K] [IsFractionRing R K] (w : Rˣ) :
-    IsDedekindDomain.HeightOneSpectrum.valuation K (IsDiscreteValuationRing.maximalIdeal R)
-      (algebraMap R K w) = 1 := by
+private theorem valuation_algebraMap_unit_eq_one'
+    {R K : Type} [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+    [IsFractionRing R K]
+    (w : Rˣ)
+    : IsDedekindDomain.HeightOneSpectrum.valuation K (IsDiscreteValuationRing.maximalIdeal R)
+        (algebraMap R K w)
+      = 1 := by
   apply le_antisymm (IsDedekindDomain.HeightOneSpectrum.valuation_le_one _ _)
-  have h1 : IsDedekindDomain.HeightOneSpectrum.valuation K (IsDiscreteValuationRing.maximalIdeal R)
-        (algebraMap R K w) *
-      IsDedekindDomain.HeightOneSpectrum.valuation K (IsDiscreteValuationRing.maximalIdeal R)
-        (algebraMap R K ↑w⁻¹) = 1 := by
+  have h1
+      : IsDedekindDomain.HeightOneSpectrum.valuation K (IsDiscreteValuationRing.maximalIdeal R)
+            (algebraMap R K w)
+          * IsDedekindDomain.HeightOneSpectrum.valuation K (IsDiscreteValuationRing.maximalIdeal R)
+            (algebraMap R K ↑w⁻¹)
+        = 1 := by
     rw [← map_mul, ← map_mul, Units.mul_inv, map_one, map_one]
   rw [← h1]
   exact mul_le_of_le_one_right zero_le (IsDedekindDomain.HeightOneSpectrum.valuation_le_one _ _)
 
-theorem HasMinimalDiscriminant.hasGoodReductionOutside {F : Type} [Field F] [NumberField F]
-    {A : WeierstrassCurve F} (h : HasMinimalDiscriminant A (-(p : F) ^ 3)) :
-    HasGoodReductionOutside p A := by
+theorem HasMinimalDiscriminant.hasGoodReductionOutside
+    {F : Type} [Field F] [NumberField F]
+    {A : WeierstrassCurve F} (h : HasMinimalDiscriminant A (- (p : F) ^ 3))
+    : HasGoodReductionOutside p A := by
   intro v hv
   obtain ⟨C, u, hmin, hΔ⟩ := h v
   refine ⟨C, { toIsMinimal := hmin, goodReduction := ?_ }⟩
   have hpu : IsUnit (p : v.valuationSubringAtPrime F) := by
-    have := IsLocalization.map_units (M := v.asIdeal.primeCompl) (v.valuationSubringAtPrime F)
-      ⟨(p : 𝓞 F), hv⟩
+    have :=
+      IsLocalization.map_units (M := v.asIdeal.primeCompl) (v.valuationSubringAtPrime F)
+        ⟨(p : 𝓞 F), hv⟩
     simpa using this
   obtain ⟨w, hw⟩ := u.isUnit.mul (hpu.pow 3).neg
-  have hΔ' : (C • A).Δ = algebraMap (v.valuationSubringAtPrime F) F (w : v.valuationSubringAtPrime F) := by
+  have hΔ'
+      : (C • A).Δ
+        = algebraMap (v.valuationSubringAtPrime F) F (w : v.valuationSubringAtPrime F) := by
     rw [hw, hΔ, map_mul, map_neg, map_pow, map_natCast]
     rfl
   rw [hΔ']
@@ -213,14 +235,15 @@ theorem IsGoodCMCurve.isElliptic (h : IsGoodCMCurve p F A) : A.IsElliptic := by
   obtain ⟨-, hA, -⟩ := h
   exact hA
 
-theorem IsGoodCMCurve.field_eq (h : IsGoodCMCurve p F A) {L : PeriodPair}
-    (hL : IsIntegersLattice p L) : F = ℚ⟮(latticeCurve L).j⟯ := by
+theorem IsGoodCMCurve.field_eq
+    (h : IsGoodCMCurve p F A) {L : PeriodPair} (hL : IsIntegersLattice p L)
+    : F = ℚ⟮(latticeCurve L).j⟯ := by
   obtain ⟨_, _, L₀, hL₀, hF, _⟩ := h
   rw [hF, hL₀.j_eq hL]
 
-theorem CMCurveGoodOutsidePrimeSt.exists_isGoodCMCurve (h : CMCurveGoodOutsidePrimeSt)
-    (hp : p.Prime) (h4 : p % 4 = 3) (h3 : 3 < p) :
-    ∃ (F : IntermediateField ℚ ℂ) (A : WeierstrassCurve F), IsGoodCMCurve p F A := by
+theorem CMCurveGoodOutsidePrimeSt.exists_isGoodCMCurve
+    (h : CMCurveGoodOutsidePrimeSt) (hp : p.Prime) (h4 : p % 4 = 3) (h3 : 3 < p)
+    : ∃ (F : IntermediateField ℚ ℂ) (A : WeierstrassCurve F), IsGoodCMCurve p F A := by
   obtain ⟨F, -, A, hA, -⟩ := h p hp h4 h3
   exact ⟨F, A, hA⟩
 

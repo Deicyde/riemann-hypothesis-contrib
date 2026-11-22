@@ -11,10 +11,13 @@ namespace GlobalTheory.CompanionTheory.FixedPointsCM
 open NumberField IsDedekindDomain HeckeCharacterZeroLocus.SiegelWeilU
 open scoped TensorProduct
 
-theorem exists_eq_algebraMap_of_sigR_eq {F E K : Type} [Field F] [CharZero F] [Field E] [Algebra F E]
-    [CommRing K] [Algebra F K] (σ : E →ₐ[F] E) (hfin : Module.finrank F E = 2)
-    (hσ : ∀ x, σ (σ x) = x) (u : E) (hu : σ u ≠ u) (x : K ⊗[F] E) (hx : sigR K σ x = x) :
-    ∃ c : K, x = algebraMap K (K ⊗[F] E) c := by
+theorem exists_eq_algebraMap_of_sigR_eq
+    {F E K : Type} [Field F] [CharZero F] [Field E] [Algebra F E] [CommRing K] [Algebra F K]
+    (σ : E →ₐ[F] E)
+    (hfin : Module.finrank F E = 2) (hσ : ∀ x, σ (σ x) = x)
+    (u : E) (hu : σ u ≠ u)
+    (x : K ⊗[F] E) (hx : sigR K σ x = x)
+    : ∃ c : K, x = algebraMap K (K ⊗[F] E) c := by
   have hli : LinearIndependent F ![(1 : E), u] := by
     rw [LinearIndependent.pair_iff]
     intro s t h
@@ -46,7 +49,9 @@ theorem exists_eq_algebraMap_of_sigR_eq {F E K : Type} [Field F] [CharZero F] [F
       rw [hsu] at this
       simpa [map_add (f := _), map_smul] using this.symm
     rw [hsu] at h1
-    have : (p + q * p) • (1 : E) + (q * q - 1) • u = (p • (1 : E) + q • (p • (1 : E) + q • u)) - u := by module
+    have : (p + q * p) • (1 : E) + (q * q - 1) • u
+        = (p • (1 : E) + q • (p • (1 : E) + q • u)) - u := by
+      module
     rw [this, ← h1, sub_self]
   obtain ⟨hp, hq⟩ := LinearIndependent.pair_iff.mp hli _ _ hrel
   have hq' : q = -1 := by
@@ -78,7 +83,9 @@ theorem exists_eq_algebraMap_of_sigR_eq {F E K : Type} [Field F] [CharZero F] [F
     rw [hB0, hB1]
     have h1 : a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] σ u = a ⊗ₜ[F] (1 : E) + c ⊗ₜ[F] u := by rw [← hs, hx, hac]
     have h2 := add_left_cancel h1
-    rw [hsu, TensorProduct.tmul_add, TensorProduct.tmul_smul, TensorProduct.tmul_smul, neg_smul, one_smul] at h2
+    rw [hsu, TensorProduct.tmul_add, TensorProduct.tmul_smul, TensorProduct.tmul_smul, neg_smul,
+        one_smul]
+      at h2
     have e0 : (algebraMap F K p * c) • ((1 : K) ⊗ₜ[F] (1 : E)) = p • (c ⊗ₜ[F] (1 : E)) := by
       rw [TensorProduct.smul_tmul', TensorProduct.smul_tmul']
       congr 1

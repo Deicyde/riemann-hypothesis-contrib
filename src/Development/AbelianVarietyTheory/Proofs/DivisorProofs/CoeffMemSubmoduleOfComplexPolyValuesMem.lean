@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IsSquareInte
 
 namespace GlobalTheory
 
-theorem coeff_mem_of_poly_values_mem : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (S : Submodule ℂ V) (N : ℕ) (c : ℕ → V), (∀ u : ℂ, ∑ k ∈ Finset.range N, u ^ k • c k ∈ S) → ∀ k < N, c k ∈ S := by
+theorem coeff_mem_of_poly_values_mem
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (S : Submodule ℂ V) (N : ℕ) (c : ℕ → V),
+      (∀ u : ℂ, ∑ k ∈ Finset.range N, u ^ k • c k ∈ S) → ∀ k < N, c k ∈ S := by
   intro V _ _ S N c h k hk
   rw [← Submodule.Quotient.mk_eq_zero, ← Module.forall_dual_apply_eq_zero_iff ℂ]
   intro f
@@ -28,7 +30,8 @@ theorem coeff_mem_of_poly_values_mem : ∀ (V : Type) [AddCommGroup V] [Module �
     exact Finset.sum_congr rfl (fun j _ => mul_comm _ _)
   have hc := congrArg (fun q : Polynomial ℂ => q.coeff k) hp
   simp only [hpdef, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul, Polynomial.coeff_X_pow,
-    Polynomial.coeff_zero, mul_ite, mul_one, mul_zero] at hc
+      Polynomial.coeff_zero, mul_ite, mul_one, mul_zero]
+    at hc
   rw [Finset.sum_ite_eq] at hc
   simpa [Finset.mem_range.mpr hk] using hc
 

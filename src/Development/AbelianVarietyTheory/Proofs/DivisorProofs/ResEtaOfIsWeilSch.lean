@@ -80,8 +80,11 @@ public import Formalism.LocalRingCardinality.SpanPowerMembership.Spaces
 noncomputable section
 
 open scoped Matrix NNReal ENNReal TensorProduct Classical
-open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont GlobalTheory.Eis GlobalTheory.MixModel GlobalTheory.RegSW
+open MeasureTheory NumberField IsDedekindDomain Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
+  GlobalTheory.Eis GlobalTheory.MixModel GlobalTheory.RegSW
 open GlobalTheory.IndefiniteRowSideFullHecke.ModerateGrowthSchwartz (schwartzA)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory GlobalTheory.RegSch
@@ -89,19 +92,24 @@ open Filter Topology
 
 namespace GlobalTheory.RegSch.JointCont
 
-
 open GlobalTheory.StdUnn GlobalTheory.StdUnn.Model in
-theorem levi_weyl_rel {R : Type} [CommRing R] {n : ℕ} {b c : Matrix (Fin n) (Fin n) R} (h1 : b * c = 1) (h2 : c * b = 1) :
-    blk4 b 0 0 c * blk4 0 1 (-1) 0 = blk4 1 b 0 1 * blk4 0 1 (-1) 0 * blk4 1 c 0 1 *
-      (blk4 0 1 (-1) 0 * blk4 0 1 (-1) 0 * blk4 0 1 (-1) 0) * blk4 1 b 0 1 := by
+theorem levi_weyl_rel
+    {R : Type} [CommRing R]
+    {n : ℕ} {b c : Matrix (Fin n) (Fin n) R} (h1 : b * c = 1) (h2 : c * b = 1)
+    : blk4 b 0 0 c * blk4 0 1 (-1) 0
+      = blk4 1 b 0 1 * blk4 0 1 (-1) 0 * blk4 1 c 0 1
+        * (blk4 0 1 (-1) 0 * blk4 0 1 (-1) 0 * blk4 0 1 (-1) 0) * blk4 1 b 0 1 := by
   simp [submatrix_fromBlocks_mul, h1, h2]
 
-
 open GlobalTheory.StdUnn GlobalTheory.StdUnn.Model in
-theorem resEta_of_isWeilSch {D : D7} {n : ℕ} (hn : 0 < n) {V : HSp D} {ψ : AddChar (AF D.host.F) ℂ}
-    (hψ : IsCharAF D.host.F ψ) {θ : InfFam D} (hθ : IsInfFam θ) {χ : (AE D)ˣ →* Circle}
-    {μ : Measure (Mx D V.rank n)} {𝓕 : Set (Mx D V.rank n)} (hμ : IsCovolOne (ratMx D V.rank n) μ 𝓕)
-    {ω : StdUnn.G D n →* Module.End ℂ (schwartzA θ V.rank n)} (hω : IsWeilSch ψ χ θ V μ ω) : ResEta D χ V.rank := by
+theorem resEta_of_isWeilSch
+    {D : D7} {n : ℕ} (hn : 0 < n)
+    {V : HSp D} {ψ : AddChar (AF D.host.F) ℂ} (hψ : IsCharAF D.host.F ψ)
+    {θ : InfFam D} (hθ : IsInfFam θ)
+    {χ : (AE D)ˣ →* Circle} {μ : Measure (Mx D V.rank n)} {𝓕 : Set (Mx D V.rank n)}
+    (hμ : IsCovolOne (ratMx D V.rank n) μ 𝓕)
+    {ω : StdUnn.G D n →* Module.End ℂ (schwartzA θ V.rank n)} (hω : IsWeilSch ψ χ θ V μ ω)
+    : ResEta D χ V.rank := by
   obtain ⟨χ₀, h1, h2, -⟩ := GlobalTheory.PlaceCompare.Spherical.exists_unram_char D V.rank
   obtain ⟨ψ₀, h₀, lam, hlam, hψeq⟩ := GlobalTheory.ThetaAllChar.exists_std hψ
   have hsh : ψ = shift ψ₀ lam := by
@@ -113,7 +121,8 @@ theorem resEta_of_isWeilSch {D : D7} {n : ℕ} (hn : 0 < n) {V : HSp D} {ψ : Ad
   suffices h : ∀ t, χ (idF D t) = χ₀ (idF D t) from ⟨h2.1, fun η hη a => (h a).trans (h2.2 η hη a)⟩
   intro t
   let i₀ : Fin n := ⟨0, hn⟩
-  let dg : (AF D.host.F)ˣ → Mx D n n := fun u => Matrix.diagonal (Function.update 1 i₀ (idF D u : AE D))
+  let dg : (AF D.host.F)ˣ → Mx D n n := fun u =>
+    Matrix.diagonal (Function.update 1 i₀ (idF D u : AE D))
   have hmul : ∀ u u', dg u * dg u' = dg (u * u') := fun u u' => by
     simp only [dg, Matrix.diagonal_mul_diagonal, map_mul, Units.val_mul]
     congr 1
@@ -153,12 +162,17 @@ theorem resEta_of_isWeilSch {D : D7} {n : ℕ} (hn : 0 < n) {V : HSp D} {ψ : Ad
     exact levi_weyl_rel e1 e2
   let S := ω.toHomUnits.eqLocus ω₀.toHomUnits
   have hU : ∀ (x : StdUnn.G D n) (b : Mx D n n), mat x = blk4 1 b 0 1 → x ∈ S := fun x b hx =>
-    Units.ext (LinearMap.ext fun Φ => Subtype.ext (funext fun y => (hω.unip x b hx Φ y).trans (hω₀.unip x b hx Φ y).symm))
+    Units.ext (LinearMap.ext fun Φ =>
+      Subtype.ext (funext fun y => (hω.unip x b hx Φ y).trans (hω₀.unip x b hx Φ y).symm))
   have hW : w ∈ S :=
-    Units.ext (LinearMap.ext fun Φ => Subtype.ext (funext fun y => (hω.weyl w hw Φ y).trans (hω₀.weyl w hw Φ y).symm))
+    Units.ext (LinearMap.ext fun Φ =>
+      Subtype.ext (funext fun y => (hω.weyl w hw Φ y).trans (hω₀.weyl w hw Φ y).symm))
   have hgS : g ∈ S := by
     rw [← S.mul_mem_cancel_right hW, hrel]
-    exact S.mul_mem (S.mul_mem (S.mul_mem (S.mul_mem (hU _ _ hu) hW) (hU _ _ hu')) (S.mul_mem (S.mul_mem hW hW) hW)) (hU _ _ hu)
+    exact S.mul_mem
+      (S.mul_mem (S.mul_mem (S.mul_mem (hU _ _ hu) hW) (hU _ _ hu'))
+        (S.mul_mem (S.mul_mem hW hW) hW))
+      (hU _ _ hu)
   have hge : ω g = ω₀ g := congrArg Units.val hgS
   obtain ⟨Φ, hΦ⟩ := GlobalTheory.Published.ThetaConvModel.exists_schwartz θ V.rank n
   have k1 := hω.levi g a hg Φ 0

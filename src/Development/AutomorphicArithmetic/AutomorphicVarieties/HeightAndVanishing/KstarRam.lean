@@ -6,11 +6,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
 open Polynomial in
-private theorem sqrt_div_mul_eq_sqrt_mul (p : ℕ) (L : Type) [Field L] [Algebra ℚ L]
-    [h : IsSplittingField ℚ L (X ^ 2 + C (p : ℚ) : ℚ[X])] : ∃ s : L, s ^ 2 = -(p : L) := by
+private theorem sqrt_div_mul_eq_sqrt_mul
+    (p : ℕ) (L : Type) [Field L] [Algebra ℚ L] [h : IsSplittingField ℚ L (X ^ 2 + C (p : ℚ) : ℚ[X])]
+    : ∃ s : L, s ^ 2 = -(p : L) := by
   have hs := h.splits
   have hd : ((X ^ 2 + C (p : ℚ) : ℚ[X]).map (algebraMap ℚ L)).degree ≠ 0 := by
     rw [degree_map, degree_X_pow_add_C two_pos]
@@ -24,9 +26,12 @@ private theorem sqrt_kstar (p : ℕ) : ∃ s : Kstar p, s ^ 2 = -(p : Kstar p) :
   exact @sqrt_div_mul_eq_sqrt_mul p (SplittingField (X ^ 2 + C (p : ℚ) : ℚ[X])) _ _
     (Polynomial.IsSplittingField.splittingField _)
 
-theorem UpperTheory.V.HV.kstarRam :
-    ∀ p : ℕ, p.Prime → p % 4 = 3 → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra (Kstar p) Ω] (A : ValuationSubring Ω), A.valuation (p : Ω) < 1 →
-      ¬ Ine (F := ℚ) A ≤ galOf ℚ (Kstar p) Ω := by
+theorem UpperTheory.V.HV.kstarRam
+    : ∀ p : ℕ,
+      p.Prime → p % 4 = 3
+        → ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra (Kstar p) Ω]
+            (A : ValuationSubring Ω),
+          A.valuation (p : Ω) < 1 → ¬ Ine (F := ℚ) A ≤ galOf ℚ (Kstar p) Ω := by
   intro p hp hp4 Ω _ _ _ _ A hA hle
   haveI := Fact.mk hp
   haveI : NeZero p := ⟨hp.ne_zero⟩

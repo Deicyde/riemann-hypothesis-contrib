@@ -9,7 +9,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology Filter GlobalTheory.CompanionTheory.Equi
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology Filter GlobalTheory.CompanionTheory.Equi
 open scoped Classical
 
 noncomputable section
@@ -23,9 +24,9 @@ variable {A O Q ι : Type} [AddCommGroup A] [AddCommGroup O] [Fintype ι] [Finty
 def reps (j : O →+ A) (rep : Q → O) : Finset (ι → A) :=
   Finset.univ.image fun (c : ι → Q) (i : ι) => j (rep (c i))
 
-theorem card_reps (j : O →+ A) (hj : Function.Injective j) (q : O → Q) (rep : Q → O)
-    (hrep : ∀ c, q (rep c) = c) :
-    (reps (ι := ι) j rep).card = Fintype.card Q ^ Fintype.card ι := by
+theorem card_reps
+    (j : O →+ A) (hj : Function.Injective j) (q : O → Q) (rep : Q → O) (hrep : ∀ c, q (rep c) = c)
+    : (reps (ι := ι) j rep).card = Fintype.card Q ^ Fintype.card ι := by
   unfold reps
   rw [Finset.card_image_of_injective, Finset.card_univ, Fintype.card_fun]
   intro c c' h
@@ -34,12 +35,16 @@ theorem card_reps (j : O →+ A) (hj : Function.Injective j) (q : O → Q) (rep 
   have h2 := congrArg q (hj h1)
   rwa [hrep, hrep] at h2
 
-theorem tile_pi (H : AddSubgroup O) (j : O →+ A) (hj : Function.Injective j) (q : O → Q) (rep : Q → O)
-    (hrep : ∀ c, q (rep c) = c) (hq : ∀ a b, q a = q b ↔ a - b ∈ H) (D₀ : Set A)
-    (hD : ∀ y : A, ∃! a : O, y - j a ∈ D₀) (y : ι → A) :
-    ∃! p : (ι → A) × (ι → A), p.1 ∈ reps (ι := ι) j rep ∧
-      p.2 ∈ AddSubgroup.pi Set.univ (fun _ : ι => H.map j) ∧
-      y - p.1 - p.2 ∈ Set.pi Set.univ (fun _ : ι => D₀) := by
+theorem tile_pi
+    (H : AddSubgroup O)
+    (j : O →+ A) (hj : Function.Injective j)
+    (q : O → Q) (rep : Q → O) (hrep : ∀ c, q (rep c) = c)
+    (hq : ∀ a b, q a = q b ↔ a - b ∈ H)
+    (D₀ : Set A) (hD : ∀ y : A, ∃! a : O, y - j a ∈ D₀)
+    (y : ι → A)
+    : ∃! p : (ι → A) × (ι → A), p.1 ∈ reps (ι := ι) j rep ∧
+        p.2 ∈ AddSubgroup.pi Set.univ (fun _ : ι => H.map j) ∧
+        y - p.1 - p.2 ∈ Set.pi Set.univ (fun _ : ι => D₀) := by
   choose a ha hau using fun i => hD (y i)
   refine ⟨(fun i => j (rep (q (a i))), fun i => j (a i - rep (q (a i)))), ⟨?_, ?_, ?_⟩, ?_⟩
   · exact Finset.mem_image.2 ⟨fun i => q (a i), Finset.mem_univ _, rfl⟩
@@ -62,7 +67,8 @@ theorem tile_pi (H : AddSubgroup O) (j : O →+ A) (hj : Function.Injective j) (
       have h5 : y i - j (rep (c i) + l i) = (y - (fun i => j (rep (c i))) - p₂) i := by
         simp only [Pi.sub_apply, map_add (f := _), hlj]; abel
       show y i - j (rep (c i) + l i) ∈ D₀
-      rw [h5]; exact h4
+      rw [h5]
+      exact h4
     have hc : ∀ i, q (a i) = c i := fun i => by
       have h6 : q (a i) = q (rep (c i)) := (hq _ _).2 (by rw [← hai i]; simpa using hlH i)
       rwa [hrep] at h6
@@ -81,9 +87,30 @@ def scal {R : Type} (ι : Type) [CommRing R] (t : R) : (ι → R) →+ (ι → R
 
 end GlobalTheory.CompanionTheory.Equi.LatSum
 
-
 open GlobalTheory.CompanionTheory.Equi.LatSum in
-theorem GlobalTheory.CompanionTheory.Equi.lat_sum : ∀ (F : Type) [Field F] [NumberField F], IsTotallyReal F → ∀ θ : ℝ →+* Ainf F, Continuous θ → ∀ li : Measure (Ainf F), IsStdInf li → ∀ (ι : Type) [Fintype ι] (I : Ideal (𝓞 F)), I ≠ ⊥ → ∀ (x0 : ι → F) (φ : (ι → Ainf F) → ℝ), Continuous φ → HasCompactSupport φ → (∀ ε : ℝ, 0 < ε → Summable fun x : latCoset I x0 => φ (fun i => θ ε * algebraMap F (Ainf F) (x.1 i))) ∧ Tendsto (fun ε : ℝ => ε ^ (Module.finrank ℚ F * Fintype.card ι) * ∑' x : latCoset I x0, φ (fun i => θ ε * algebraMap F (Ainf F) (x.1 i))) (𝓝[>] 0) (𝓝 (((Ideal.absNorm I : ℝ) ^ Fintype.card ι)⁻¹ * ∫ y, φ y ∂(Measure.pi fun _ => li))) := by
+theorem GlobalTheory.CompanionTheory.Equi.lat_sum
+    : ∀ (F : Type) [Field F] [NumberField F],
+      IsTotallyReal F
+        → ∀ θ : ℝ →+* Ainf F,
+          Continuous θ
+            → ∀ li : Measure (Ainf F),
+              IsStdInf li
+                → ∀ (ι : Type) [Fintype ι] (I : Ideal (𝓞 F)),
+                  I ≠ ⊥
+                    → ∀ (x0 : ι → F) (φ : (ι → Ainf F) → ℝ),
+                      Continuous φ → HasCompactSupport φ
+                        → (∀ ε : ℝ,
+                            0 < ε
+                              → Summable fun x : latCoset I x0 =>
+                                φ (fun i => θ ε * algebraMap F (Ainf F) (x.1 i)))
+                          ∧ Tendsto
+                            (fun ε : ℝ =>
+                              ε ^ (Module.finrank ℚ F * Fintype.card ι)
+                                * ∑' x : latCoset I x0, φ (fun i => θ ε * algebraMap F (Ainf F) (x.1 i)))
+                            (𝓝[>] 0)
+                            (𝓝
+                              (((Ideal.absNorm I : ℝ) ^ Fintype.card ι)⁻¹
+                                * ∫ y, φ y ∂(Measure.pi fun _ => li))) := by
   intro F _ _ hF θ hθ li hli ι _ I hI x0 φ hφ hφs
   haveI : BorelSpace (Ainf F) := ⟨rfl⟩
   obtain ⟨hTR, hLC, hSC, hT2, -⟩ := GlobalTheory.CompanionTheory.SW.isLocR_Ainf F hF
@@ -92,7 +119,8 @@ theorem GlobalTheory.CompanionTheory.Equi.lat_sum : ∀ (F : Type) [Field F] [Nu
   haveI := hSC
   haveI := hT2
   haveI : li.IsAddHaarMeasure := hli.1
-  obtain ⟨D₀, K₀, hDm, hK, hDK, hD1, htile⟩ := GlobalTheory.T.archimedean_fundamental_domain_integers F hF li hli
+  obtain ⟨D₀, K₀, hDm, hK, hDK, hD1, htile⟩ :=
+    GlobalTheory.T.archimedean_fundamental_domain_integers F hF li hli
   have hg : Function.Injective (algebraMap F (Ainf F)) := (algebraMap F (Ainf F)).injective
   let j : 𝓞 F →+ Ainf F := ((algebraMap F (Ainf F)).comp (algebraMap (𝓞 F) F)).toAddMonoidHom
   have hj : Function.Injective j := hg.comp (IsFractionRing.injective (𝓞 F) F)
@@ -101,7 +129,8 @@ theorem GlobalTheory.CompanionTheory.Equi.lat_sum : ∀ (F : Type) [Field F] [Nu
   letI : Fintype (𝓞 F ⧸ I) := Fintype.ofFinite _
   let rep : 𝓞 F ⧸ I → 𝓞 F := Function.surjInv Ideal.Quotient.mk_surjective
   have hrep : ∀ c, Ideal.Quotient.mk I (rep c) = c := Function.surjInv_eq _
-  have hq : ∀ a b, Ideal.Quotient.mk I a = Ideal.Quotient.mk I b ↔ a - b ∈ H := fun a b => Ideal.Quotient.eq
+  have hq : ∀ a b, Ideal.Quotient.mk I a = Ideal.Quotient.mk I b ↔ a - b ∈ H := fun a b =>
+    Ideal.Quotient.eq
   let Λ : AddSubgroup (ι → Ainf F) := AddSubgroup.pi Set.univ (fun _ : ι => H.map j)
   haveI : Countable (𝓞 F) := (RingOfIntegers.basis F).equivFun.toEquiv.injective.countable
   haveI : Countable (H.map j) := by
@@ -118,42 +147,47 @@ theorem GlobalTheory.CompanionTheory.Equi.lat_sum : ∀ (F : Type) [Field F] [Nu
   have hjoint : Continuous fun p : ℝ × (ι → Ainf F) => T p.1 p.2 :=
     continuous_pi fun i => (hθ.comp continuous_fst).mul ((continuous_apply i).comp continuous_snd)
   have hθ0 : θ 0 = 0 := map_zero θ
-  have key := GlobalTheory.T.lattice_point_count_scaling (ι → Ainf F) (Measure.pi fun _ => li) Λ (Set.pi Set.univ fun _ => D₀)
-    (Set.pi Set.univ fun _ => K₀) (reps (ι := ι) j rep) T (Module.finrank ℚ F * Fintype.card ι)
-    (MeasurableSet.univ_pi fun _ => hDm) (isCompact_univ_pi fun _ => hK)
-    (Set.pi_mono fun _ _ => hDK)
-    (by rw [Measure.pi_pi]; simp [hD1])
-    (fun y => tile_pi H j hj (Ideal.Quotient.mk I) rep hrep hq D₀ htile y)
-    (fun ε _ => continuous_pi fun i => continuous_const.mul (continuous_apply i))
-    (fun ε hε y => by
-      have h1 : θ ε⁻¹ * θ ε = 1 := by rw [← map_mul, inv_mul_cancel₀ hε.ne', map_one]
-      have h2 : θ ε * θ ε⁻¹ = 1 := by rw [mul_comm, h1]
-      constructor
-      · funext i
-        show θ ε⁻¹ * (θ ε * y i) = y i
-        rw [← mul_assoc, h1, one_mul]
-      · funext i
-        show θ ε * (θ ε⁻¹ * y i) = y i
-        rw [← mul_assoc, h2, one_mul])
-    (fun ε hε => GlobalTheory.T.scaling_measure_product_archimedean F hF θ hθ li hli.1 ι ε hε)
-    (fun B hB U hU => by
-      have h0 : ∀ b ∈ B, ∀ᶠ z : ℝ × (ι → Ainf F) in 𝓝 ((0 : ℝ), b), T z.1 z.2 ∈ U := by
-        intro b _
-        refine hjoint.continuousAt.eventually_mem ?_
-        have : T (0 : ℝ) b = 0 := by
-          funext i
-          show θ 0 * b i = 0
-          rw [hθ0, zero_mul]
-        simpa [this] using hU
-      exact (hB.eventually_forall_of_forall_eventually h0).filter_mono nhdsWithin_le_nhds)
-    (fun i => algebraMap F (Ainf F) (x0 i)) φ hφ hφs
+  have key :=
+    GlobalTheory.T.lattice_point_count_scaling (ι → Ainf F) (Measure.pi fun _ => li) Λ
+      (Set.pi Set.univ fun _ => D₀) (Set.pi Set.univ fun _ => K₀) (reps (ι := ι) j rep) T
+      (Module.finrank ℚ F * Fintype.card ι) (MeasurableSet.univ_pi fun _ => hDm)
+      (isCompact_univ_pi fun _ => hK) (Set.pi_mono fun _ _ => hDK)
+      (by rw [Measure.pi_pi]; simp [hD1])
+      (fun y => tile_pi H j hj (Ideal.Quotient.mk I) rep hrep hq D₀ htile y)
+      (fun ε _ => continuous_pi fun i => continuous_const.mul (continuous_apply i))
+      (fun ε hε y => by
+        have h1 : θ ε⁻¹ * θ ε = 1 := by rw [← map_mul, inv_mul_cancel₀ hε.ne', map_one]
+        have h2 : θ ε * θ ε⁻¹ = 1 := by rw [mul_comm, h1]
+        constructor
+        · funext i
+          show θ ε⁻¹ * (θ ε * y i) = y i
+          rw [← mul_assoc, h1, one_mul]
+        · funext i
+          show θ ε * (θ ε⁻¹ * y i) = y i
+          rw [← mul_assoc, h2, one_mul])
+      (fun ε hε => GlobalTheory.T.scaling_measure_product_archimedean F hF θ hθ li hli.1 ι ε hε)
+      (fun B hB U hU => by
+        have h0 : ∀ b ∈ B, ∀ᶠ z : ℝ × (ι → Ainf F) in 𝓝 ((0 : ℝ), b), T z.1 z.2 ∈ U := by
+          intro b _
+          refine hjoint.continuousAt.eventually_mem ?_
+          have : T (0 : ℝ) b = 0 := by
+            funext i
+            show θ 0 * b i = 0
+            rw [hθ0, zero_mul]
+          simpa [this] using hU
+        exact (hB.eventually_forall_of_forall_eventually h0).filter_mono nhdsWithin_le_nhds)
+      (fun i => algebraMap F (Ainf F) (x0 i))
+      φ hφ hφs
   rw [hcard] at key
 
-  let f : latCoset I x0 → Λ := fun x => ⟨fun i => algebraMap F (Ainf F) (x.1 i - x0 i), fun i _ => by
-    obtain ⟨y, hy, e⟩ := x.2 i
-    refine AddSubgroup.mem_map.2 ⟨y, hy, ?_⟩
-    show algebraMap F (Ainf F) (y : F) = algebraMap F (Ainf F) (x.1 i - x0 i)
-    rw [e]⟩
+  let f : latCoset I x0 → Λ := fun x => ⟨
+    fun i => algebraMap F (Ainf F) (x.1 i - x0 i),
+    fun i _ => by
+      obtain ⟨y, hy, e⟩ := x.2 i
+      refine AddSubgroup.mem_map.2 ⟨y, hy, ?_⟩
+      show algebraMap F (Ainf F) (y : F) = algebraMap F (Ainf F) (x.1 i - x0 i)
+      rw [e]
+  ⟩
   have hf : Function.Bijective f := by
     constructor
     · intro x x' h
@@ -165,13 +199,18 @@ theorem GlobalTheory.CompanionTheory.Equi.lat_sum : ∀ (F : Type) [Field F] [Nu
         obtain ⟨y, hy, e⟩ := AddSubgroup.mem_map.1 (hl i (Set.mem_univ i))
         exact ⟨y, hy, e⟩
       choose y hyI hyl using hy
-      refine ⟨⟨fun i => x0 i + (y i : F), fun i => ⟨y i, hyI i, by simp⟩⟩, Subtype.ext (funext fun i => ?_)⟩
+      refine ⟨
+        ⟨fun i => x0 i + (y i : F), fun i => ⟨y i, hyI i, by simp⟩⟩,
+        Subtype.ext (funext fun i => ?_)
+      ⟩
       show algebraMap F (Ainf F) (x0 i + (y i : F) - x0 i) = l i
       rw [add_sub_cancel_left, ← hyl]
       rfl
   let e : latCoset I x0 ≃ Λ := Equiv.ofBijective f hf
-  have hterm : ∀ (ε : ℝ) (x : latCoset I x0), φ (fun i => θ ε * algebraMap F (Ainf F) (x.1 i)) =
-      φ (T ε ((fun i => algebraMap F (Ainf F) (x0 i)) + (e x : ι → Ainf F))) := by
+  have hterm
+      : ∀ (ε : ℝ) (x : latCoset I x0),
+        φ (fun i => θ ε * algebraMap F (Ainf F) (x.1 i))
+          = φ (T ε ((fun i => algebraMap F (Ainf F) (x0 i)) + (e x : ι → Ainf F))) := by
     intro ε x
     congr 1
     funext i
@@ -179,7 +218,9 @@ theorem GlobalTheory.CompanionTheory.Equi.lat_sum : ∀ (F : Type) [Field F] [Nu
     rw [← map_add (f := _), add_sub_cancel]
   constructor
   · intro ε hε
-    have h1 := (e.summable_iff (f := fun l : Λ => φ (T ε ((fun i => algebraMap F (Ainf F) (x0 i)) + l)))).2 (key.1 ε hε)
+    have h1 :=
+      (e.summable_iff (f := fun l : Λ => φ (T ε ((fun i => algebraMap F (Ainf F) (x0 i)) + l)))).2
+        (key.1 ε hε)
     refine h1.congr fun x => ?_
     exact (hterm ε x).symm
   · refine key.2.congr fun ε => ?_

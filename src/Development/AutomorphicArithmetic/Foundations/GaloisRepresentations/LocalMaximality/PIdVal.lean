@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Complementar
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 namespace UpperTheory.Gal.productCup_of_system
@@ -59,7 +60,8 @@ private lemma val_of_mem (hV : ValBasic) {v : L} (h : v ∈ loc B e) : ∃ c, Va
 end Vals
 
 section
-variable {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
+variable
+  {F K : Type} [Field F] [Field K] [Algebra ℂ F] [Algebra ℂ K] [Algebra F K] [IsScalarTower ℂ F K]
 
 private lemma muP_tmul (τ : DR ℂ K →ₗ[K] K) (w' w'' w : DR ℂ K) :
     muP F K τ (w' ⊗ₜ w'') w = (Algebra.trace F K (τ (w' * w))) ⊗ₜ[ℂ] w'' := by
@@ -82,19 +84,20 @@ end
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.idVal_of :
-    LocForms → DtBasic → CRT → TrVal → ResVal → LatA → ValBasic → OmLoc → IdVal := by
+theorem UpperTheory.Gal.productCup_of_system.idVal_of
+    : LocForms → DtBasic → CRT → TrVal → ResVal → LatA → ValBasic → OmLoc → IdVal := by
   intro hLF hDt hCRT hTV hRV hLat hV hOL F K _ _ _ _ _ _ d x cov τ hτ red a ha m w' w hw hact z
   classical
   obtain ⟨hli, hdt, hvol, -, -⟩ := hDt F K d x cov τ hτ
   set B := rB ℂ K (xv x) ({0} : Finset (Fin (d + 1))) with hB
   set om : K := algebraMap F K (omG x 0) with hom
   have omne : om ≠ 0 := omG_ne x
-  have hτv : τ (dtS K x Finset.univ) = om := by
-    rw [hvol, map_smul, hτ.1, smul_eq_mul, mul_one]
+  have hτv : τ (dtS K x Finset.univ) = om := by rw [hvol, map_smul, hτ.1, smul_eq_mul, mul_one]
   have hgEq : ∀ y ∈ omB ℂ K B d, y = (τ y / om) • dtS K x Finset.univ := by
     intro y hy
-    have h1 := (GlobalTheory.T.exists_topDegreeCoefficientForm_and_eq_on_top_forms ℂ F K d (xv x) cov).2 τ hτ y (mem_deg_of_mem_omB B d y hy)
+    have h1 :=
+      (GlobalTheory.T.exists_topDegreeCoefficientForm_and_eq_on_top_forms ℂ F K d (xv x) cov).2 τ hτ
+        y (mem_deg_of_mem_omB B d y hy)
     rw [hvol, smul_smul, div_mul_cancel₀ _ omne]
     exact h1
   have hgLoc : ∀ (e : fib ℂ K (xv x)), ∀ y ∈ omB ℂ K B d, τ y / om ∈ loc B e.1 := by
@@ -106,16 +109,16 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of :
       have := Finset.powersetCard_self (Finset.univ : Finset (Fin d))
       simpa using this
     rw [hp, Finset.sum_singleton] at hce
-    have : τ y = c Finset.univ * om := by
-      rw [hce, map_smul, hτv, smul_eq_mul]
+    have : τ y = c Finset.univ * om := by rw [hce, map_smul, hτv, smul_eq_mul]
     rw [this, mul_div_cancel_right₀ _ omne]
     exact hc _
   have hyB : ∀ k (S : Finset (Fin d)), S.card = a → w' k * dtS K x S ∈ omB ℂ K B d := by
     intro k S hS
     have := mul_mem_omB B (d - a) a _ (hw k).1 _ (hS ▸ hdt S)
     rwa [Nat.sub_add_cancel ha] at this
-  have hwL : ∀ k, ∃ c : Finset (Fin d) → K, (∀ S, c S ∈ loc B z.1) ∧
-      w k = ∑ S ∈ Finset.univ.powersetCard a, c S • dtS K x S := fun k =>
+  have hwL
+      : ∀ k, ∃ c : Finset (Fin d) → K,
+        (∀ S, c S ∈ loc B z.1) ∧ w k = ∑ S ∈ Finset.univ.powersetCard a, c S • dtS K x S := fun k =>
     (hLF F K d x cov red z a (w k)).1 ((hOL K B z.1 a).2.2 _ (hV K B z.1).1 (hw k).2)
   choose b hbl hbe using hwL
   have hφ : ∀ v : K, ∃ c : ℂ, v ∈ loc B z.1 → Val B z.1 v c := by
@@ -126,9 +129,16 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of :
     · exact ⟨0, fun h => absurd h hv⟩
   choose φ hφ using hφ
   obtain ⟨ρ, hρ⟩ := GlobalTheory.T.exists_laurentConstantTermForm_functionField ℂ F d (xv x) cov.pd
-  refine ⟨fun k S => τ (w' k * dtS K x S) / om, b, fun k S => φ (τ (w' k * dtS K x S) / om),
-    fun k T => φ (b k T), fun k S hS => hgEq _ (hyB k S hS), hbe, fun k S hS =>
-      ⟨hφ _ (hgLoc z _ (hyB k S hS)), hφ _ (hbl k S)⟩, ?_⟩
+  refine ⟨
+    fun k S => τ (w' k * dtS K x S) / om,
+    b,
+    fun k S => φ (τ (w' k * dtS K x S) / om),
+    fun k T => φ (b k T),
+    fun k S hS => hgEq _ (hyB k S hS),
+    hbe,
+    fun k S hS => ⟨hφ _ (hgLoc z _ (hyB k S hS)), hφ _ (hbl k S)⟩,
+    ?_
+  ⟩
   intro S T hS hT
   obtain ⟨h, hh⟩ := (hCRT F K d x cov).2 (fun e => if e = z then 1 else 0)
   set g : Fin m → K := fun k => τ (w' k * dtS K x S) / om with hg
@@ -142,12 +152,19 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of :
     rw [hom, ← Algebra.smul_def, map_smul, smul_eq_mul]
   have claim1 : ∀ k, t k ∈ rA ℂ (xv x) {0} := by
     intro k
-    have h1 := (GlobalTheory.T.complementaryModule_standardOpens_iff ℂ F K d (xv x) cov τ hτ {0} ⟨0, by simp⟩ (om * (g k * h))).2
-      ⟨(h : K) • (w' k * dtS K x S), smul_mem_omB B d _ h.2 _ (hyB k S hS), by
-        rw [map_smul, hgy, smul_eq_mul]; ring⟩ 1 (Subalgebra.one_mem _)
+    have h1 :=
+      (GlobalTheory.T.complementaryModule_standardOpens_iff ℂ F K d (xv x) cov τ hτ {0} ⟨0, by simp⟩
+          (om * (g k * h))).2
+        ⟨
+          (h : K) • (w' k * dtS K x S),
+          smul_mem_omB B d _ h.2 _ (hyB k S hS),
+          by rw [map_smul, hgy, smul_eq_mul]; ring
+        ⟩
+        1 (Subalgebra.one_mem _)
     rw [mul_one, htr] at h1
     have h2 := ((hLat F d x cov.pd {0} 0 (by simp)).2.1 _).1 h1
-    have hne : omG x 0 ≠ 0 := Finset.prod_ne_zero_iff.2 fun l _ => div_ne_zero (x l).ne_zero (x 0).ne_zero
+    have hne : omG x 0 ≠ 0 :=
+      Finset.prod_ne_zero_iff.2 fun l _ => div_ne_zero (x l).ne_zero (x 0).ne_zero
     rwa [mul_div_cancel_left₀ _ hne] at h2
   have claim2 : ∀ k, Val B z.1 (algebraMap F K (t k)) (φ (g k)) := by
     intro k
@@ -168,20 +185,25 @@ theorem UpperTheory.Gal.productCup_of_system.idVal_of :
     have : ρ (t k) = φ (g k) := by rw [← hfs]; exact htv
     rwa [this] at hres
   have claim3 : ∑ k, algebraMap F K (t k) • w k = (h : K) • dtS K x S := by
-    have h1 := hact ((h : K) • dtS K x S)
-      (Submodule.smul_mem _ _ (hS ▸ mem_deg_of_mem_omB B _ _ (hdt S)))
+    have h1 :=
+      hact ((h : K) • dtS K x S) (Submodule.smul_mem _ _ (hS ▸ mem_deg_of_mem_omB B _ _ (hdt S)))
     rw [acts_expand] at h1
-    have h2 : ∀ k, algebraMap F K (Algebra.trace F K (τ (w' k * ((h : K) • dtS K x S)))) • w k =
-        om • (algebraMap F K (t k) • w k) := by
+    have h2
+        : ∀ k,
+          algebraMap F K (Algebra.trace F K (τ (w' k * ((h : K) • dtS K x S)))) • w k
+            = om • (algebraMap F K (t k) • w k) := by
       intro k
       rw [mul_smul_comm, map_smul, hgy, smul_eq_mul,
         show (h : K) * (om * g k) = om * (g k * h) by ring, htr, map_mul, mul_smul]
     simp only [h2, ← Finset.smul_sum] at h1
     exact smul_right_injective _ omne h1
-  have claim4 : ∀ T ∈ Finset.univ.powersetCard a,
-      ∑ k, algebraMap F K (t k) * b k T = if S = T then (h : K) else 0 := by
-    have hsum : ∑ T ∈ Finset.univ.powersetCard a,
-        ((∑ k, algebraMap F K (t k) * b k T) - if S = T then (h : K) else 0) • dtS K x T = 0 := by
+  have claim4
+      : ∀ T ∈ Finset.univ.powersetCard a,
+        ∑ k, algebraMap F K (t k) * b k T = if S = T then (h : K) else 0 := by
+    have hsum
+        : ∑ T ∈ Finset.univ.powersetCard a,
+            ((∑ k, algebraMap F K (t k) * b k T) - if S = T then (h : K) else 0) • dtS K x T
+          = 0 := by
       simp only [sub_smul, Finset.sum_sub_distrib, ite_smul, zero_smul, Finset.sum_smul, mul_smul]
       rw [Finset.sum_comm]
       simp only [← Finset.smul_sum, ← hbe]

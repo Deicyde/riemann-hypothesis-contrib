@@ -10,7 +10,6 @@ open scoped Classical
 
 namespace GlobalTheory.Lin.NonPrimeVonMangoldt
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 open scoped Classical in
 private lemma log_div_pow_add_two_rpow_three_quarters_le (P : ℝ) (hP : 2 ≤ P) (k : ℕ) :
@@ -36,16 +35,16 @@ private lemma log_div_pow_add_two_rpow_three_quarters_le (P : ℝ) (hP : 2 ≤ P
   rw [hsplit, hrhs]
   exact div_le_div₀ (by positivity) hlog (mul_pos hA hC) (mul_le_mul_of_nonneg_left hCB hA.le)
 
-
 open Complex DirichletCharacter ArithmeticFunction MeasureTheory Filter Topology in
 open scoped Classical in
-theorem _root_.GlobalTheory.Lin.NonPrimeVonMangoldt.summable_nonPrime_vonMangoldt_div_rpow :
-    Summable (fun n : ℕ => (if n.Prime then 0 else Λ n) / (n : ℝ) ^ (3 / 4 : ℝ)) := by
+theorem _root_.GlobalTheory.Lin.NonPrimeVonMangoldt.summable_nonPrime_vonMangoldt_div_rpow
+    : Summable (fun n : ℕ => (if n.Prime then 0 else Λ n) / (n : ℝ) ^ (3 / 4 : ℝ)) := by
   set F := (fun n : ℕ => (if n.Prime then 0 else Λ n) / (n : ℝ) ^ (3 / 4 : ℝ)) with hF
   set g : Nat.Primes × ℕ → ℕ := fun pk => (pk.1 : ℕ) ^ (pk.2 + 2) with hg_def
   have hg : Function.Injective g := by
     rintro ⟨p, k⟩ ⟨q, m⟩ h
-    obtain ⟨h1, h2⟩ := Nat.Prime.pow_inj p.2 q.2 (h : (p : ℕ) ^ ((k + 1) + 1) = (q : ℕ) ^ ((m + 1) + 1))
+    obtain ⟨h1, h2⟩ :=
+      Nat.Prime.pow_inj p.2 q.2 (h : (p : ℕ) ^ ((k + 1) + 1) = (q : ℕ) ^ ((m + 1) + 1))
     exact Prod.ext (Subtype.ext h1) (by simpa using h2)
   have hrange : ∀ n ∉ Set.range g, F n = 0 := by
     intro n hn
@@ -65,8 +64,10 @@ theorem _root_.GlobalTheory.Lin.NonPrimeVonMangoldt.summable_nonPrime_vonMangold
   rw [← hg.summable_iff hrange]
   have hmaj : Summable (fun pk : Nat.Primes × ℕ =>
       (4 * ((pk.1 : ℕ) : ℝ) ^ (-(5 / 4 : ℝ))) * ((2 : ℝ) ^ (-(3 / 4 : ℝ))) ^ pk.2) := by
-    refine Summable.mul_of_nonneg (f := fun p : Nat.Primes => 4 * ((p : ℕ) : ℝ) ^ (-(5 / 4 : ℝ)))
-      (g := fun k : ℕ => ((2 : ℝ) ^ (-(3 / 4 : ℝ))) ^ k) ?_ ?_ ?_ ?_
+    refine Summable.mul_of_nonneg
+      (f := fun p : Nat.Primes => 4 * ((p : ℕ) : ℝ) ^ (-(5 / 4 : ℝ)))
+      (g := fun k : ℕ => ((2 : ℝ) ^ (-(3 / 4 : ℝ))) ^ k)
+      ?_ ?_ ?_ ?_
     · exact (Nat.Primes.summable_rpow.2 (by norm_num)).mul_left 4
     · exact summable_geometric_of_lt_one (by positivity)
         (Real.rpow_lt_one_of_one_lt_of_neg (by norm_num) (by norm_num))
@@ -79,7 +80,7 @@ theorem _root_.GlobalTheory.Lin.NonPrimeVonMangoldt.summable_nonPrime_vonMangold
     · exact le_rfl
     · exact vonMangoldt_nonneg
   · obtain ⟨⟨p, hp⟩, k⟩ := pk
-    have hnp : ¬ (p ^ (k + 2)).Prime := Nat.Prime.not_prime_pow (by omega)
+    have hnp : ¬(p ^ (k + 2)).Prime := Nat.Prime.not_prime_pow (by omega)
     simp only [Function.comp_apply, hF, hg_def, if_neg hnp]
     rw [vonMangoldt_apply_pow (by omega), vonMangoldt_apply_prime hp, Nat.cast_pow]
     exact log_div_pow_add_two_rpow_three_quarters_le _ (by exact_mod_cast hp.two_le) k

@@ -4,8 +4,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.KappaOK
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor GlobalTheory.EndLoc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
+  GlobalTheory.EndLoc
 
 noncomputable section
 
@@ -17,20 +20,22 @@ section Obj
 
 variable {S : Scheme.{0}} (A B : Over S) [GrpObj A] [GrpObj B] [IsCommMonObj A] [IsCommMonObj B]
 
-theorem mkZ_pa {T : Over S} (u : Fin 4 → (T ⟶ A)) (v : Fin 4 → (T ⟶ B)) (i : Fin 4) :
-    mkZ A B u v ≫ pa A B i = u i := by
+theorem mkZ_pa {T : Over S} (u : Fin 4 → (T ⟶ A)) (v : Fin 4 → (T ⟶ B)) (i : Fin 4)
+    : mkZ A B u v ≫ pa A B i = u i := by
   simp only [mkZ, pa]
   rw [lift_fst_assoc]
   exact (Out.powIsLimit A 4).fac (Fan.mk T u) ⟨i⟩
 
-theorem mkZ_pb {T : Over S} (u : Fin 4 → (T ⟶ A)) (v : Fin 4 → (T ⟶ B)) (j : Fin 4) :
-    mkZ A B u v ≫ pb A B j = v j := by
+theorem mkZ_pb {T : Over S} (u : Fin 4 → (T ⟶ A)) (v : Fin 4 → (T ⟶ B)) (j : Fin 4)
+    : mkZ A B u v ≫ pb A B j = v j := by
   simp only [mkZ, pb]
   rw [lift_snd_assoc]
   exact (Out.powIsLimit B 4).fac (Fan.mk T v) ⟨j⟩
 
-theorem zob_ext {T : Over S} {f g : T ⟶ Zob A B} (ha : ∀ i, f ≫ pa A B i = g ≫ pa A B i)
-    (hb : ∀ j, f ≫ pb A B j = g ≫ pb A B j) : f = g := by
+theorem zob_ext
+    {T : Over S} {f g : T ⟶ Zob A B}
+    (ha : ∀ i, f ≫ pa A B i = g ≫ pa A B i) (hb : ∀ j, f ≫ pb A B j = g ≫ pb A B j)
+    : f = g := by
   apply CartesianMonoidalCategory.hom_ext
   · apply (Out.powIsLimit A 4).hom_ext
     rintro ⟨i⟩
@@ -47,8 +52,10 @@ instance isMonHom_pb (j : Fin 4) : IsMonHom (pb A B j) := by
   unfold pb
   infer_instance
 
-theorem isMonHom_of_coords {X : Over S} [MonObj X] (f : X ⟶ Zob A B)
-    (ha : ∀ i, IsMonHom (f ≫ pa A B i)) (hb : ∀ j, IsMonHom (f ≫ pb A B j)) : IsMonHom f := by
+theorem isMonHom_of_coords
+    {X : Over S} [MonObj X]
+    (f : X ⟶ Zob A B) (ha : ∀ i, IsMonHom (f ≫ pa A B i)) (hb : ∀ j, IsMonHom (f ≫ pb A B j))
+    : IsMonHom f := by
   refine ⟨?_, ?_⟩
   · apply zob_ext A B
     · intro i
@@ -88,7 +95,8 @@ theorem incZ_prZ : incZ A B ≫ prZ A B = 𝟙 A := by
   rw [incZ, prZ, mkZ_pa]
   simp
 
-theorem prZ_incZ (d : ℕ) (la : A ⟶ B) (mu : B ⟶ A) : prZ A B ≫ incZ A B = actZ A B d la mu (idem d) := by
+theorem prZ_incZ (d : ℕ) (la : A ⟶ B) (mu : B ⟶ A)
+    : prZ A B ≫ incZ A B = actZ A B d la mu (idem d) := by
   apply zob_ext
   · intro i
     rw [Category.assoc, incZ, mkZ_pa, actZ, mkZ_pa]
@@ -116,8 +124,8 @@ def precompHom {X Y M : Over S} [GrpObj M] [IsCommMonObj M] (x : X ⟶ Y) : (Y �
   map_one' := MonObj.comp_one x
   map_mul' g₁ g₂ := MonObj.comp_mul x g₁ g₂
 
-theorem one_comp_actZ (d : ℕ) (la : A ⟶ B) (mu : B ⟶ A) [IsMonHom la] [IsMonHom mu] (N : ord d) :
-    (1 : 𝟙_ (Over S) ⟶ Zob A B) ≫ actZ A B d la mu N = 1 := by
+theorem one_comp_actZ (d : ℕ) (la : A ⟶ B) (mu : B ⟶ A) [IsMonHom la] [IsMonHom mu] (N : ord d)
+    : (1 : 𝟙_ (Over S) ⟶ Zob A B) ≫ actZ A B d la mu N = 1 := by
   apply zob_ext
   · intro i
     rw [Category.assoc, actZ, mkZ_pa, MonObj.one_comp (pa A B i)]
@@ -148,7 +156,23 @@ namespace GlobalTheory.ZarhinFam
 
 open GlobalTheory.ZarhinFam.RelAlg
 
-theorem zRel_alg : ∀ (h M d : ℕ) (S : Scheme.{0}) (t : S ⟶ Sp (cycAway M)) (c : SiegPre h M (zetaAway M) t) (B : Over S) [GrpObj B] [IsCommMonObj B] (Q : LB (c.A ⊗ B).left) (la : c.A ⟶ B) (mu : B ⟶ c.A) (hZ : GlobalTheory.ZarhinFam.ZData c d B Q la mu), 1 ≤ h → 3 ≤ M → Odd M → 0 < d → M.Coprime d → IsUnit ((d : ℕ) : Γ(S, ⊤)) → SiegKerBy c d → ∀ (κ : Fin 8 → (Fin (8 * h) ⊕ Fin (8 * h) → ℤ) →+ (Fin h ⊕ Fin h → ℤ)), GlobalTheory.ZarhinFam.KappaOK h M d κ → IsMonHom (GlobalTheory.ZarhinFam.incZ c.A B) ∧ IsMonHom (GlobalTheory.ZarhinFam.prZ c.A B) ∧ GlobalTheory.ZarhinFam.incZ c.A B ≫ GlobalTheory.ZarhinFam.prZ c.A B = 𝟙 c.A ∧ GlobalTheory.ZarhinFam.prZ c.A B ≫ GlobalTheory.ZarhinFam.incZ c.A B = (GlobalTheory.ZarhinFam.actZ c.A B d la mu) (GlobalTheory.ZarhinFam.idem d) ∧ ∀ a, c.lev a ≫ GlobalTheory.ZarhinFam.incZ c.A B = (GlobalTheory.ZarhinFam.levZ c.lev (GlobalTheory.ZarhinFam.incZ c.A B) (GlobalTheory.ZarhinFam.actZ c.A B d la mu) (GlobalTheory.ZarhinFam.oMat d) κ) (GlobalTheory.ZarhinFam.jlMap h a) := by
+theorem zRel_alg
+    : ∀ (h M d : ℕ) (S : Scheme.{0}) (t : S ⟶ Sp (cycAway M)) (c : SiegPre h M (zetaAway M) t)
+        (B : Over S) [GrpObj B] [IsCommMonObj B] (Q : LB (c.A ⊗ B).left) (la : c.A ⟶ B)
+        (mu : B ⟶ c.A) (hZ : GlobalTheory.ZarhinFam.ZData c d B Q la mu),
+      1 ≤ h → 3 ≤ M → Odd M → 0 < d → M.Coprime d → IsUnit ((d : ℕ) : Γ(S, ⊤)) → SiegKerBy c d
+        → ∀ (κ : Fin 8 → (Fin (8 * h) ⊕ Fin (8 * h) → ℤ) →+ (Fin h ⊕ Fin h → ℤ)),
+          GlobalTheory.ZarhinFam.KappaOK h M d κ
+            → IsMonHom (GlobalTheory.ZarhinFam.incZ c.A B)
+              ∧ IsMonHom (GlobalTheory.ZarhinFam.prZ c.A B)
+              ∧ GlobalTheory.ZarhinFam.incZ c.A B ≫ GlobalTheory.ZarhinFam.prZ c.A B = 𝟙 c.A
+              ∧ GlobalTheory.ZarhinFam.prZ c.A B ≫ GlobalTheory.ZarhinFam.incZ c.A B
+                = (GlobalTheory.ZarhinFam.actZ c.A B d la mu) (GlobalTheory.ZarhinFam.idem d)
+              ∧ ∀ a,
+                c.lev a ≫ GlobalTheory.ZarhinFam.incZ c.A B
+                  = (GlobalTheory.ZarhinFam.levZ c.lev (GlobalTheory.ZarhinFam.incZ c.A B)
+                      (GlobalTheory.ZarhinFam.actZ c.A B d la mu) (GlobalTheory.ZarhinFam.oMat d) κ)
+                    (GlobalTheory.ZarhinFam.jlMap h a) := by
   intro h M d S t c B _ _ Q la mu hZ _ _ _ _ _ _ _ κ hκ
   haveI : IsMonHom la := hZ.2.2.2.1
   haveI : IsMonHom mu := hZ.2.2.2.2.1
@@ -159,8 +183,9 @@ theorem zRel_alg : ∀ (h M d : ℕ) (S : Scheme.{0}) (t : S ⟶ Sp (cycAway M))
     have h0 := c.lev_add 0 0
     rw [add_zero] at h0
     exact left_eq_mul.mp h0
-  rw [levZ, List.prod_ofFn, Fintype.prod_eq_single 0 (fun k hk => by
-    rw [hκ.2.2 k hk a, hlev0, ← Category.assoc, MonObj.one_comp, one_comp_actZ])]
+  rw [levZ, List.prod_ofFn,
+    Fintype.prod_eq_single 0
+      (fun k hk => by rw [hκ.2.2 k hk a, hlev0, ← Category.assoc, MonObj.one_comp, one_comp_actZ])]
   rw [hκ.2.1 a, oMat_zero, ← hpi, ← Category.assoc (incZ c.A B), incZ_prZ, Category.id_comp]
 
 end GlobalTheory.ZarhinFam

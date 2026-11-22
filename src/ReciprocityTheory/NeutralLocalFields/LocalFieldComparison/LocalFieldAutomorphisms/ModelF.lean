@@ -11,8 +11,8 @@ namespace ReciprocityTheory.Neutral.Cmp
 
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain ValuativeRel
 
-theorem card_quot_natCast_padicInt (p : ℕ) [Fact p.Prime] {n : ℕ} (hn : n ≠ 0) :
-    Nat.card (ℤ_[p] ⧸ Ideal.span {(n : ℤ_[p])}) = p ^ padicValNat p n := by
+theorem card_quot_natCast_padicInt (p : ℕ) [Fact p.Prime] {n : ℕ} (hn : n ≠ 0)
+    : Nat.card (ℤ_[p] ⧸ Ideal.span {(n : ℤ_[p])}) = p ^ padicValNat p n := by
   have hp := (Fact.out : p.Prime)
   have hdec : n = p ^ padicValNat p n * (n / p ^ padicValNat p n) := by
     have h1 := Nat.ordProj_mul_ordCompl_eq_self n p
@@ -29,20 +29,23 @@ theorem card_quot_natCast_padicInt (p : ℕ) [Fact p.Prime] {n : ℕ} (hn : n �
     rw [PadicInt.norm_lt_one_iff_dvd] at hlt
     obtain ⟨c, hc⟩ := hlt
     have h1 := congrArg PadicInt.toZMod hc
-    rw [map_natCast, map_mul, map_natCast, ZMod.natCast_self, zero_mul,
-      ZMod.natCast_eq_zero_iff] at h1
+    rw [map_natCast, map_mul, map_natCast, ZMod.natCast_self, zero_mul, ZMod.natCast_eq_zero_iff]
+      at h1
     exact hnd h1
   have hspan : Ideal.span {(n : ℤ_[p])} = Ideal.span {(p : ℤ_[p]) ^ padicValNat p n} := by
     conv_lhs => rw [hdec]
     push_cast
     exact Ideal.span_singleton_mul_right_unit hu _
   rw [hspan, ← PadicInt.ker_toZModPow]
-  rw [Nat.card_congr (RingHom.quotientKerEquivOfSurjective
-    (ZMod.ringHom_surjective (PadicInt.toZModPow (p := p) (padicValNat p n)))).toEquiv, Nat.card_zmod]
+  rw [Nat.card_congr (RingHom.quotientKerEquivOfSurjective (ZMod.ringHom_surjective
+      (PadicInt.toZModPow (p := p) (padicValNat p n)))).toEquiv,
+    Nat.card_zmod]
 
-theorem card_quot_span_algebraMap {R C ι : Type*} [CommRing R] [CommRing C] [Algebra R C] [Fintype ι]
-    [DecidableEq ι] (b : Module.Basis ι R C) (r : R) :
-    Nat.card (C ⧸ Ideal.span {algebraMap R C r}) = Nat.card (R ⧸ Ideal.span {r}) ^ Fintype.card ι := by
+theorem card_quot_span_algebraMap
+    {R C ι : Type*} [CommRing R] [CommRing C] [Algebra R C] [Fintype ι] [DecidableEq ι]
+    (b : Module.Basis ι R C) (r : R)
+    : Nat.card (C ⧸ Ideal.span {algebraMap R C r})
+      = Nat.card (R ⧸ Ideal.span {r}) ^ Fintype.card ι := by
   let φ : C →ₗ[R] (ι → R ⧸ Ideal.span {r}) :=
     LinearMap.pi fun i => (Ideal.span {r}).mkQ ∘ₗ b.coord i
   have hφ : Function.Surjective φ := by
@@ -52,7 +55,8 @@ theorem card_quot_span_algebraMap {R C ι : Type*} [CommRing R] [CommRing C] [Al
     funext i
     have h1 : b.repr (b.equivFun.symm c) i = c i := by
       rw [← b.equivFun_apply, LinearEquiv.apply_symm_apply]
-    simp only [φ, LinearMap.pi_apply, LinearMap.comp_apply, Module.Basis.coord_apply, Submodule.mkQ_apply, h1]
+    simp only [φ, LinearMap.pi_apply, LinearMap.comp_apply, Module.Basis.coord_apply,
+      Submodule.mkQ_apply, h1]
     exact hc i
   have hker : LinearMap.ker φ = (Ideal.span {algebraMap R C r}).restrictScalars R := by
     ext x
@@ -74,25 +78,29 @@ theorem card_quot_span_algebraMap {R C ι : Type*} [CommRing R] [CommRing C] [Al
       simp only [φ, LinearMap.pi_apply, LinearMap.comp_apply, Module.Basis.coord_apply, map_smul,
         Submodule.mkQ_apply, Pi.zero_apply]
       exact (Submodule.Quotient.mk_eq_zero _).2 (Ideal.mem_span_singleton.2 (dvd_mul_right _ _))
-  have e := ((Submodule.Quotient.restrictScalarsEquiv R (Ideal.span {algebraMap R C r})).symm.trans
-    (Submodule.quotEquivOfEq _ _ hker.symm)).trans (φ.quotKerEquivOfSurjective hφ)
+  have e :=
+    ((Submodule.Quotient.restrictScalarsEquiv R (Ideal.span {algebraMap R C r})).symm.trans
+      (Submodule.quotEquivOfEq _ _ hker.symm)).trans (φ.quotKerEquivOfSurjective hφ)
   rw [Nat.card_congr e.toEquiv, Nat.card_fun, Nat.card_eq_fintype_card (α := ι)]
 
-variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {p : ℕ} [Fact p.Prime]
+variable
+  {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+  {p : ℕ} [Fact p.Prime]
 
 attribute [local instance] locRel
 
-theorem norm_algebraMap_padicInt_Kloc (ι : Ω →+* PadicAlgCl p) (x : ℤ_[p]) :
-    ‖((algebraMap ℤ_[p] (Kloc F ι) x : Kloc F ι) : PadicAlgCl p)‖ ≤ 1 := by
+theorem norm_algebraMap_padicInt_Kloc (ι : Ω →+* PadicAlgCl p) (x : ℤ_[p])
+    : ‖((algebraMap ℤ_[p] (Kloc F ι) x : Kloc F ι) : PadicAlgCl p)‖ ≤ 1 := by
   show ‖algebraMap ℚ_[p] (PadicAlgCl p) (x : ℚ_[p])‖ ≤ 1
   exact (PadicAlgCl.norm_extends p (x : ℚ_[p])).le.trans x.2
 
 def zpToInteger (ι : Ω →+* PadicAlgCl p) : ℤ_[p] →+* 𝒪[Kloc F ι] :=
-  (algebraMap ℤ_[p] (Kloc F ι)).codRestrict _
-    fun x => (mem_integer_Kloc ι _).2 (norm_algebraMap_padicInt_Kloc ι x)
+  (algebraMap ℤ_[p] (Kloc F ι)).codRestrict _ fun x =>
+    (mem_integer_Kloc ι _).2 (norm_algebraMap_padicInt_Kloc ι x)
 
 @[instance_reducible]
-def zpAlgInteger (ι : Ω →+* PadicAlgCl p) : Algebra ℤ_[p] 𝒪[Kloc F ι] := (zpToInteger (F := F) ι).toAlgebra
+def zpAlgInteger (ι : Ω →+* PadicAlgCl p) : Algebra ℤ_[p] 𝒪[Kloc F ι] :=
+  (zpToInteger (F := F) ι).toAlgebra
 
 attribute [local instance] zpAlgInteger
 

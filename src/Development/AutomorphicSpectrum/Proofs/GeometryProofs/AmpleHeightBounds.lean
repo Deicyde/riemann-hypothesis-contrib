@@ -12,7 +12,10 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Ht.AmpleBd
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top GlobalTheory.CompanionTheory.Ar.Small GlobalTheory.CompanionTheory.Ar.Cmp GlobalTheory.CompanionTheory.Ar.Ht
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo NumberField
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+  GlobalTheory.CompanionTheory.Ar.Small GlobalTheory.CompanionTheory.Ar.Cmp
+  GlobalTheory.CompanionTheory.Ar.Ht
 
 section Places
 
@@ -107,8 +110,7 @@ section Blocks
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-def bnorm (z : (Σ k, ι k) → ℂ) (k : K) : ℝ :=
-  Real.sqrt (∑ i, ‖z ⟨k, i⟩‖ ^ 2)
+def bnorm (z : (Σ k, ι k) → ℂ) (k : K) : ℝ := Real.sqrt (∑ i, ‖z ⟨k, i⟩‖ ^ 2)
 
 lemma norm_le_bnorm (z : (Σ k, ι k) → ℂ) (k : K) (i : ι k) : ‖z ⟨k, i⟩‖ ≤ bnorm z k := by
   refine Real.le_sqrt_of_sq_le ?_
@@ -193,8 +195,8 @@ def twistLine (A : HermLine ι) (m : ℕ) : HermLine ι where
     have hn : ∀ k, ‖c k‖ ≠ 0 := fun k => norm_ne_zero_iff.2 (hc k)
     have h1 : ∀ k, ‖c k‖ ^ ((m : ℤ) * A.a k - 1) = (‖c k‖ ^ A.a k) ^ m / ‖c k‖ := fun k => by
       rw [zpow_sub₀ (hn k), zpow_one, mul_comm (m : ℤ), zpow_mul, zpow_natCast]
-    simp only [h1, A.smul c z hc, bnorm_smul, Finset.prod_mul_distrib, Finset.prod_div_distrib, mul_pow,
-      Finset.prod_pow]
+    simp only [h1, A.smul c z hc, bnorm_smul, Finset.prod_mul_distrib, Finset.prod_div_distrib,
+      mul_pow, Finset.prod_pow]
     rw [mul_div_mul_comm]
 
 lemma twistLine_smooth {A : HermLine ι} (hA : IsSmoothHerm A) (m : ℕ) : IsSmoothHerm (twistLine A m) := by
@@ -208,11 +210,11 @@ section Heights
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
 def blockHt (L : Type) [Field L] [NumberField L] (w : (Σ k, ι k) → L) (k : K) : ℝ :=
-  (Module.finrank ℚ L : ℝ)⁻¹ *
-    ((∑ᶠ v : FinitePlace L, Real.log (⨆ i, v (w ⟨k, i⟩))) + ∑ σ : L →+* ℂ, Real.log (bnorm (fun p => σ (w p)) k))
+  (Module.finrank ℚ L : ℝ)⁻¹
+    * ((∑ᶠ v : FinitePlace L, Real.log (⨆ i, v (w ⟨k, i⟩)))
+      + ∑ σ : L →+* ℂ, Real.log (bnorm (fun p => σ (w p)) k))
 
-def sumHt (L : Type) [Field L] [NumberField L] (w : (Σ k, ι k) → L) : ℝ :=
-  ∑ k, blockHt L w k
+def sumHt (L : Type) [Field L] [NumberField L] (w : (Σ k, ι k) → L) : ℝ := ∑ k, blockHt L w k
 
 variable {L : Type} [Field L] [NumberField L]
 
@@ -370,13 +372,28 @@ lemma sumHt_le {y : (Σ k, ι k) → Ω} {d : ℕ} (hv : IsArithVar (mCoordIdeal
 
 end Sections
 
-theorem height_bound : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω] (y : (Σ k, ι k) → Ω) (d : ℕ), IsArithVar (mCoordIdeal y) d → Birational y → ∀ A : HermLine ι, IsSmoothHerm A → AmpleQ y A.a → (∃ C : ℝ, ∀ (L : Type) [Field L] [NumberField L], ∀ w ∈ ptsOver L (mCoordIdeal y), -C ≤ lineHt A L w) ∧ ∀ B : HermLine ι, IsSmoothHerm B → ∃ n C : ℝ, 0 ≤ n ∧ ∀ (L : Type) [Field L] [NumberField L], ∀ w ∈ ptsOver L (mCoordIdeal y), |lineHt B L w| ≤ n * lineHt A L w + C := by
+theorem height_bound
+    : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (Ω : Type) [Field Ω]
+        (y : (Σ k, ι k) → Ω) (d : ℕ),
+      IsArithVar (mCoordIdeal y) d → Birational y
+        → ∀ A : HermLine ι,
+          IsSmoothHerm A → AmpleQ y A.a
+            → (∃ C : ℝ, ∀ (L : Type) [Field L] [NumberField L], ∀ w ∈ ptsOver L (mCoordIdeal y),
+                -C ≤ lineHt A L w)
+              ∧ ∀ B : HermLine ι,
+                IsSmoothHerm B
+                  → ∃ n C : ℝ,
+                    0 ≤ n
+                      ∧ ∀ (L : Type) [Field L] [NumberField L], ∀ w ∈ ptsOver L (mCoordIdeal y),
+                        |lineHt B L w| ≤ n * lineHt A L w + C := by
   intro K _ ι _ Ω _ y d hv hb A hA ha
   obtain ⟨m, C, hC0, hC⟩ := sumHt_le hv hb A hA ha
   obtain ⟨nA, CA, hnA, hCA, hAle⟩ := abs_lineHt_le A hA
   rcases Nat.eq_zero_or_pos m with hm | hm
   · subst hm
-    have hsum : ∀ (L : Type) [Field L] [NumberField L], ∀ w ∈ ptsOver L (mCoordIdeal y), sumHt L w ≤ C := by
+    have hsum
+        : ∀ (L : Type) [Field L] [NumberField L], ∀ w ∈ ptsOver L (mCoordIdeal y),
+          sumHt L w ≤ C := by
       intro L _ _ w hw
       simpa using hC L w hw
     refine ⟨⟨nA * C + CA, fun L _ _ w hw => ?_⟩, fun B hB => ?_⟩
@@ -393,8 +410,7 @@ theorem height_bound : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fint
     · have h1 := hC L w hw
       have h2 := sumHt_nonneg w hw.1
       rw [neg_le_iff_add_nonneg, ← mul_le_mul_iff_right₀ hmr]
-      have h3 : (m : ℝ) * (lineHt A L w + C / m) = m * lineHt A L w + C := by
-        field_simp
+      have h3 : (m : ℝ) * (lineHt A L w + C / m) = m * lineHt A L w + C := by field_simp
       rw [mul_zero, h3]
       linarith
     · obtain ⟨n, CB, hn, hCB, hBle⟩ := abs_lineHt_le B hB

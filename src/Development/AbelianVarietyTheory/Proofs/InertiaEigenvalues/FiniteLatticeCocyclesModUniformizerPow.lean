@@ -13,29 +13,39 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Coeffic
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N TensorProduct Module
 
 namespace GlobalTheory.CocycleModPow
 
-theorem cocycles_finite (hT : Formalism.GaloisCohomology.LocalTateDualityK) (l : ℕ) [Fact l.Prime] (K : FinExt l)
-    (r : ℕ) (M : Type) [AddCommGroup M] [Finite M] (a : ↥(GK K) → M →+ M) (h1 : ∀ m, a 1 m = m)
-    (hmul : ∀ g h m, a (g * h) m = a g (a h m)) (hr : ∀ m : M, l ^ r • m = 0)
-    (hlc : ∀ m, IsLocallyConstant fun g => a g m) :
-    {c : ↥(GK K) → M | IsLocallyConstant c ∧ ∀ g h, c (g * h) = c g + a g (c h)}.Finite := by
+theorem cocycles_finite
+    (hT : Formalism.GaloisCohomology.LocalTateDualityK)
+    (l : ℕ) [Fact l.Prime]
+    (K : FinExt l)
+    (r : ℕ)
+    (M : Type) [AddCommGroup M] [Finite M]
+    (a : ↥(GK K) → M →+ M) (h1 : ∀ m, a 1 m = m) (hmul : ∀ g h m, a (g * h) m = a g (a h m))
+    (hr : ∀ m : M, l ^ r • m = 0) (hlc : ∀ m, IsLocallyConstant fun g => a g m)
+    : {c : ↥(GK K) → M | IsLocallyConstant c ∧ ∀ g h, c (g * h) = c g + a g (c h)}.Finite := by
   have hK : FiniteDimensional ℚ_[l] ↥K.1 := K.2
   let _ : TopologicalSpace M := ⊥
   have _ : DiscreteTopology M := ⟨rfl⟩
-  have hr' : ∀ m : M, l ^ (r + 1) • m = 0 := fun m => by
-    rw [pow_succ', mul_smul, hr, smul_zero]
+  have hr' : ∀ m : M, l ^ (r + 1) • m = 0 := fun m => by rw [pow_succ', mul_smul, hr, smul_zero]
   have _ : NeZero (l ^ (r + 1)) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
   obtain ⟨_⟩ : Nonempty (Module (ZMod (l ^ (r + 1))) M) := ⟨AddCommGroup.zmodModule hr'⟩
-  let φ : ↥(GK K) ≃* Formalism.GaloisCohomology.GK l K.1 := IntermediateField.fixingSubgroupEquiv K.1
+  let φ : ↥(GK K) ≃* Formalism.GaloisCohomology.GK l K.1 :=
+    IntermediateField.fixingSubgroupEquiv K.1
   have hφ : Continuous φ ∧ Continuous φ.symm :=
     GlobalTheory.fixingSubgroupEquiv_bicontinuous ℚ_[l] (Om l) K.1
   let rho : Representation (ZMod (l ^ (r + 1))) (Formalism.GaloisCohomology.GK l K.1) M :=
-    GlobalTheory.CocycleCount.repOfAction _ (fun g => a (φ.symm g)) (fun m => by rw [map_one, h1])
+    GlobalTheory.CocycleCount.repOfAction _
+      (fun g => a (φ.symm g))
+      (fun m => by rw [map_one, h1])
       (fun g h m => by rw [map_mul, hmul])
-  have ha : ∀ (g : Formalism.GaloisCohomology.GK l K.1) (m : M), (rho g : M →ₗ[ZMod (l ^ (r + 1))] M) m = a (φ.symm g) m := fun _ _ => rfl
+  have ha
+      : ∀ (g : Formalism.GaloisCohomology.GK l K.1) (m : M),
+        (rho g : M →ₗ[ZMod (l ^ (r + 1))] M) m = a (φ.symm g) m := fun _ _ =>
+    rfl
   have hrho : ReciprocityTheory.Gal.ContAction rho := by
     refine continuous_prod_of_discrete_right.2 fun m => ?_
     exact (hlc m).continuous.comp hφ.2
@@ -47,27 +57,37 @@ theorem cocycles_finite (hT : Formalism.GaloisCohomology.LocalTateDualityK) (l :
     refine Nat.finite_of_card_ne_zero fun h0 => ?_
     rw [h0, zero_mul] at hZ
     exact (Nat.mul_pos hH1 hM).ne hZ
-  let E : ↥{c : ↥(GK K) → M | IsLocallyConstant c ∧ ∀ g h, c (g * h) = c g + a g (c h)} →
-      ↥(ReciprocityTheory.Gal.Z1 rho) :=
-    fun c => ⟨fun g => c.1 (φ.symm g), c.2.1.continuous.comp hφ.2, fun g h => by
-        beta_reduce
-        rw [ha, map_mul, c.2.2]⟩
+  let E
+      : ↥ {c : ↥(GK K) → M | IsLocallyConstant c ∧ ∀ g h, c (g * h) = c g + a g (c h)}
+        → ↥(ReciprocityTheory.Gal.Z1 rho) := fun c => ⟨
+    fun g => c.1 (φ.symm g),
+    c.2.1.continuous.comp hφ.2,
+    fun g h => by
+      beta_reduce
+      rw [ha, map_mul, c.2.2]
+  ⟩
   refine Set.finite_coe_iff.1 (Finite.of_injective E fun c c' h => Subtype.ext (funext fun g => ?_))
   have := congrFun (congrArg Subtype.val h) (φ g)
   simpa only [E, φ.symm_apply_apply] using this
 
-theorem dvd_and_finite (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra ℚ_[l] LL]
-    [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL] (hO : GoodO (Qp := ℚ_[l]) LL O)
-    (ϖ : O) (hϖ : Irreducible ϖ) (n : ℕ) :
-    ϖ ^ n ∣ ((l : ℕ) : O) ^ n ∧ Finite (O ⧸ Ideal.span {ϖ ^ n}) := by
-  obtain ⟨-, -, hfin, hcomp⟩ := GlobalTheory.T.coefficient_ring_integers_compact_adic_properties l LL O hO
+theorem dvd_and_finite
+    (l : ℕ) [Fact l.Prime]
+    (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL]
+    (O : Type) [CommRing O] [Algebra O LL]
+    (hO : GoodO (Qp := ℚ_[l]) LL O)
+    (ϖ : O) (hϖ : Irreducible ϖ)
+    (n : ℕ)
+    : ϖ ^ n ∣ ((l : ℕ) : O) ^ n ∧ Finite (O ⧸ Ideal.span {ϖ ^ n}) := by
+  obtain ⟨-, -, hfin, hcomp⟩ :=
+    GlobalTheory.T.coefficient_ring_integers_compact_adic_properties l LL O hO
   obtain ⟨⟨hdom, hdvr, -⟩, -⟩ := hO
   have hnu : ¬ IsUnit ((l : ℕ) : O) := fun hu => by
     have htop : Ideal.span {((l : ℕ) : O)} = ⊤ := Ideal.span_singleton_eq_top.2 hu
     have hH : IsHausdorff (Ideal.span {((l : ℕ) : O)}) O := hcomp.toIsHausdorff
-    have h1 : (1 : O) = 0 := hH.haus 1 fun k => by
-      rw [htop, SModEq.zero]
-      simp [Ideal.top_pow]
+    have h1 : (1 : O) = 0 :=
+      hH.haus 1 fun k => by
+        rw [htop, SModEq.zero]
+        simp [Ideal.top_pow]
     exact one_ne_zero h1
   have hdvd : ϖ ∣ ((l : ℕ) : O) := by
     rw [← Ideal.mem_span_singleton, ← hϖ.maximalIdeal_eq]
@@ -78,7 +98,16 @@ theorem dvd_and_finite (l : ℕ) [Fact l.Prime] (LL : Type) [Field LL] [Algebra 
   exact Finite.of_surjective _
     (Ideal.Quotient.factor_surjective (Ideal.span_singleton_le_span_singleton.2 hd))
 
-theorem finite_Z1Q : Formalism.GaloisCohomology.LocalTateDualityK → ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL] [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL], GoodO (Qp := ℚ_[l]) LL O → ∀ (A : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (ϖ : O), Irreducible ϖ → ∀ (n : ℕ) (hI : StableSub LA (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T)), (quotientCocycles LA _ hI : Set (↥(GK K) → ↥LA.T ⧸ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T))).Finite := by
+theorem finite_Z1Q
+    : Formalism.GaloisCohomology.LocalTateDualityK
+      → ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (LL : Type) [Field LL] [Algebra ℚ_[l] LL]
+          [TopologicalSpace LL] (O : Type) [CommRing O] [Algebra O LL],
+        GoodO (Qp := ℚ_[l]) LL O
+          → ∀ (A : GRep ↥(GK K) ℚ_[l] LL O) (LA : Lattice (O := O) A.ρ) (ϖ : O),
+            Irreducible ϖ
+              → ∀ (n : ℕ) (hI : StableSub LA (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T)),
+                (quotientCocycles LA _ hI : Set
+                  (↥(GK K) → ↥LA.T ⧸ (Ideal.span {ϖ ^ n} • ⊤ : Submodule O ↥LA.T))).Finite := by
   intro hT l _ K LL _ _ _ O _ _ hO A LA ϖ hϖ n hI
   obtain ⟨hd, hfin⟩ := dvd_and_finite l LL O hO ϖ hϖ n
   have hring : IsTopologicalRing LL := hO.2.2.2.1
@@ -109,8 +138,8 @@ theorem finite_Z1Q : Formalism.GaloisCohomology.LocalTateDualityK → ∀ (l : �
   · intro g h m
     induction m using Submodule.Quotient.induction_on with
     | H x =>
-      change Submodule.Quotient.mk (actT LA (g * h) x) =
-        Submodule.Quotient.mk (actT LA g (actT LA h x))
+      change Submodule.Quotient.mk (actT LA (g * h) x)
+        = Submodule.Quotient.mk (actT LA g (actT LA h x))
       congr 1
       apply Subtype.ext
       change A.ρ (g * h) x = A.ρ g (A.ρ h x)
@@ -127,8 +156,8 @@ theorem finite_Z1Q : Formalism.GaloisCohomology.LocalTateDualityK → ∀ (l : �
     | H x =>
       rw [IsLocallyConstant.iff_eventually_eq]
       intro g₀
-      have hcont : Continuous fun g : ↥(GK K) =>
-          (algebraMap O LL (ϖ ^ n))⁻¹ • (A.ρ g x - A.ρ g₀ x) :=
+      have hcont
+          : Continuous fun g : ↥(GK K) => (algebraMap O LL (ϖ ^ n))⁻¹ • (A.ρ g x - A.ρ g₀ x) :=
         ((A.cont x).sub continuous_const).const_smul _
       have hev := (hopen.preimage hcont).mem_nhds (x := g₀) (by simp)
       filter_upwards [hev] with g hg

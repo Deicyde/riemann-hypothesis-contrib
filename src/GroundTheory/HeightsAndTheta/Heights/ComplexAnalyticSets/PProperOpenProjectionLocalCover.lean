@@ -15,8 +15,8 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology
 
-theorem ProperOpenProjectionLocalCover.proof (hR : ProperOpenProjectionLocalUnbranched.Statement) :
-    ProperOpenProjectionLocalCover.Statement := by
+theorem ProperOpenProjectionLocalCover.proof (hR : ProperOpenProjectionLocalUnbranched.Statement)
+    : ProperOpenProjectionLocalCover.Statement := by
   intro σ _ X B k f d A D hB hf hXB hDo hmaps hprop hopen y₀ hy₀
   obtain ⟨U₁, g, hU₁o, hy₀U₁, hU₁D, hg, hgd, hsec⟩ :=
     hR σ X B k f d A D hB hf hXB hDo hmaps hprop hopen y₀ hy₀
@@ -48,12 +48,25 @@ theorem ProperOpenProjectionLocalCover.proof (hR : ProperOpenProjectionLocalUnbr
       exact ⟨fun h => ⟨h.1.1, h.2⟩, fun h => ⟨⟨h.1, hKU h.2⟩, h.2⟩⟩
     rw [this]
     exact hprop K (hKU.trans hUD) hK
-  have hYsec : ∀ x ∈ Y, g (A x) ≠ 0 → ∃ (O : Set (Fin d → ℂ)) (V : Set (σ → ℂ)) (h : (Fin d → ℂ) → σ → ℂ),
-      IsOpen O ∧ IsOpen V ∧ x ∈ V ∧ ContinuousOn h O ∧ (∀ y ∈ O, A (h y) = y) ∧ Y ∩ V = h '' O := by
+  have hYsec
+      : ∀ x ∈ Y,
+        g (A x) ≠ 0
+          → ∃ (O : Set (Fin d → ℂ)) (V : Set (σ → ℂ)) (h : (Fin d → ℂ) → σ → ℂ),
+            IsOpen O ∧ IsOpen V ∧ x ∈ V ∧ ContinuousOn h O ∧ (∀ y ∈ O, A (h y) = y)
+              ∧ Y ∩ V = h '' O := by
     intro x hx hgx
     obtain ⟨O, V, h, hO, hV, hxV, hh, hAh, hXV⟩ := hsec (A x) (hball hx.2) hgx x hx.1 rfl
-    refine ⟨O ∩ U, V ∩ A ⁻¹' U, h, hO.inter hUo, hV.inter (hUo.preimage A.continuous), ⟨hxV, hx.2⟩,
-      hh.continuousOn.mono Set.inter_subset_left, fun y hy => hAh y hy.1, ?_⟩
+    refine ⟨
+      O ∩ U,
+      V ∩ A ⁻¹' U,
+      h,
+      hO.inter hUo,
+      hV.inter (hUo.preimage A.continuous),
+      ⟨hxV, hx.2⟩,
+      hh.continuousOn.mono Set.inter_subset_left,
+      fun y hy => hAh y hy.1,
+      ?_
+    ⟩
     ext z
     constructor
     · rintro ⟨⟨hzXB, hzU⟩, hzV, -⟩
@@ -65,9 +78,10 @@ theorem ProperOpenProjectionLocalCover.proof (hR : ProperOpenProjectionLocalUnbr
       have hAy : A (h y) ∈ U := by rw [hAh y hyO]; exact hyU
       exact ⟨⟨hmem.1, hAy⟩, hmem.2, hAy⟩
 
-  obtain ⟨n, hn⟩ := UnbranchedProperCountConstant.proof UnbranchedProperCountLocallyConstant.proof
-    ManifoldZerosComplementConnected.proof σ Y d A U g hUo (convex_ball y₀ r).isPreconnected hYmaps hYprop
-    hgU hYsec
+  obtain ⟨n, hn⟩ :=
+    UnbranchedProperCountConstant.proof UnbranchedProperCountLocallyConstant.proof
+      ManifoldZerosComplementConnected.proof σ Y d A U g hUo (convex_ball y₀ r).isPreconnected
+      hYmaps hYprop hgU hYsec
   have hcount : ∀ y ∈ U, g y ≠ 0 → {x | x ∈ X ∩ B ∧ A x = y}.encard = n := by
     intro y hy hgy
     rw [← hfib y hy]
@@ -88,8 +102,9 @@ theorem ProperOpenProjectionLocalCover.proof (hR : ProperOpenProjectionLocalUnbr
       have hxF := hTF hx
       have := hopen x hxF.1 (S x) ((hS x).2.mem_nhds (hS x).1)
       rwa [hxF.2] at this
-    obtain ⟨t, ⟨htW, hgt⟩⟩ := hgdU (interior (U ∩ ⋂ x ∈ T, A '' (X ∩ B ∩ S x))) isOpen_interior
-      (interior_subset.trans Set.inter_subset_left) ⟨y, mem_interior_iff_mem_nhds.2 hW⟩
+    obtain ⟨t, ⟨htW, hgt⟩⟩ :=
+      hgdU (interior (U ∩ ⋂ x ∈ T, A '' (X ∩ B ∩ S x))) isOpen_interior
+        (interior_subset.trans Set.inter_subset_left) ⟨y, mem_interior_iff_mem_nhds.2 hW⟩
     have htW' := interior_subset htW
     have htU : t ∈ U := htW'.1
     have hpick : ∀ x ∈ T, ∃ z, z ∈ X ∩ B ∩ S x ∧ A z = t := by

@@ -8,14 +8,19 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Polynomial ValuativeRel GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil UpperTheory.V.Hi
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Polynomial ValuativeRel GlobalTheory.CuspRep GlobalTheory.WeilDeligne
+  GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL
+  GlobalTheory.SplitWeil UpperTheory.V.Hi
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
 section SlopeTestRemainingChoices
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] {n : ℕ}
 
-private theorem br_loc : IsLocalRing 𝒪[k] := (inferInstance : IsDiscreteValuationRing 𝒪[k]).toIsLocalRing
+private theorem br_loc : IsLocalRing 𝒪[k] :=
+  (inferInstance : IsDiscreteValuationRing 𝒪[k]).toIsLocalRing
 attribute [local instance] br_loc
 
 private theorem br_unif : valuation k (unif k : k) = uniformizer k := by
@@ -23,36 +28,45 @@ private theorem br_unif : valuation k (unif k : k) = uniformizer k := by
   have h0 : x ≠ 0 := by
     rintro rfl
     exact uniformizer_pos.ne (by simpa using hx)
-  exact Classical.epsilon_spec (p := fun x : kˣ => valuation k (x : k) = uniformizer k) ⟨Units.mk0 x h0, hx⟩
+  exact Classical.epsilon_spec
+    (p := fun x : kˣ => valuation k (x : k) = uniformizer k)
+    ⟨Units.mk0 x h0, hx⟩
 
-private theorem br_pow (c : ℕ) (x : 𝒪[k]) :
-    x ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c ↔ valuation k (x : k) ≤ uniformizer k ^ c := by
+private theorem br_pow (c : ℕ) (x : 𝒪[k])
+    : x ∈ IsLocalRing.maximalIdeal 𝒪[k] ^ c ↔ valuation k (x : k) ≤ uniformizer k ^ c := by
   have hI := Valuation.integer.integers (valuation k)
   let p : 𝒪[k] := ⟨unif k, (br_unif.trans_lt uniformizer_lt_one).le⟩
   have hp : valuation k (algebraMap 𝒪[k] k p) = uniformizer k := br_unif
   have e : IsLocalRing.maximalIdeal 𝒪[k] = Ideal.span {p} := by
     ext y
-    rw [← IsLocalRing.residue_eq_zero_iff, GlobalTheory.StepData.residue_eq_zero_iff_lt, Ideal.mem_span_singleton,
-      hI.dvd_iff_le, hp, le_uniformizer_iff]
+    rw [← IsLocalRing.residue_eq_zero_iff, GlobalTheory.StepData.residue_eq_zero_iff_lt,
+      Ideal.mem_span_singleton, hI.dvd_iff_le, hp, le_uniformizer_iff]
     rfl
   rw [e, Ideal.span_singleton_pow, Ideal.mem_span_singleton, hI.dvd_iff_le, map_pow, map_pow, hp]
   rfl
 
-private theorem br_memKc {c : ℕ} {g : GL (Fin n) k} :
-    g ∈ Kc k n c ↔ g ∈ KO k (Fin n) ∧ ∀ i j, valuation k ((g.val - 1) i j) ≤ uniformizer k ^ c := by
-  have key : ∀ u : GL (Fin n) 𝒪[k],
-      u ∈ (Matrix.GeneralLinearGroup.map (n := Fin n) (Ideal.Quotient.mk (IsLocalRing.maximalIdeal 𝒪[k] ^ c))).ker ↔
-      ∀ i j, valuation k (((Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) u).val - 1) i j) ≤ uniformizer k ^ c := by
+private theorem br_memKc {c : ℕ} {g : GL (Fin n) k}
+    : g ∈ Kc k n c
+      ↔ g ∈ KO k (Fin n) ∧ ∀ i j, valuation k ((g.val - 1) i j) ≤ uniformizer k ^ c := by
+  have key
+      : ∀ u : GL (Fin n) 𝒪[k],
+        u ∈ (Matrix.GeneralLinearGroup.map (n := Fin n)
+            (Ideal.Quotient.mk (IsLocalRing.maximalIdeal 𝒪[k] ^ c))).ker
+          ↔ ∀ i j,
+            valuation k (((Matrix.GeneralLinearGroup.map (algebraMap 𝒪[k] k) u).val - 1) i j)
+              ≤ uniformizer k ^ c := by
     intro u
     rw [MonoidHom.mem_ker, Units.ext_iff, ← Matrix.ext_iff]
     refine forall₂_congr fun i j => ?_
-    have e : ((1 : GL (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ c)).val) i j =
-        Ideal.Quotient.mk _ ((1 : Matrix (Fin n) (Fin n) 𝒪[k]) i j) := by
+    have e
+        : ((1 : GL (Fin n) (𝒪[k] ⧸ IsLocalRing.maximalIdeal 𝒪[k] ^ c)).val) i j
+          = Ideal.Quotient.mk _ ((1 : Matrix (Fin n) (Fin n) 𝒪[k]) i j) := by
       simp only [Units.val_one, Matrix.one_apply]; split_ifs <;> simp
     rw [e]
     refine (Ideal.Quotient.eq.trans (br_pow c _)).trans (iff_of_eq ?_)
     congr 2
-    simp only [Matrix.sub_apply, Matrix.one_apply]; split_ifs <;> simp <;> rfl
+    simp only [Matrix.sub_apply, Matrix.one_apply]
+    split_ifs <;> simp <;> rfl
   constructor
   · rintro ⟨u, hu, rfl⟩
     exact ⟨⟨u, rfl⟩, (key u).1 hu⟩
@@ -60,41 +74,49 @@ private theorem br_memKc {c : ℕ} {g : GL (Fin n) k} :
     exact ⟨u, (key u).2 hu, rfl⟩
 
 private theorem br_Kc_anti {c d : ℕ} (h : c ≤ d) : Kc k n d ≤ Kc k n c := fun _ hg =>
-  br_memKc.2 ⟨(br_memKc.1 hg).1, fun i j => ((br_memKc.1 hg).2 i j).trans
-    (pow_le_pow_right_of_le_one' uniformizer_lt_one.le h)⟩
+  br_memKc.2 ⟨
+    (br_memKc.1 hg).1,
+    fun i j => ((br_memKc.1 hg).2 i j).trans (pow_le_pow_right_of_le_one' uniformizer_lt_one.le h)
+  ⟩
 
 private theorem br_Kc_open (c : ℕ) : IsOpen (Kc k n c : Set (GL (Fin n) k)) := by
-  have e : (Kc k n c : Set (GL (Fin n) k)) = (KO k (Fin n) : Set (GL (Fin n) k)) ∩
-      ⋂ i, ⋂ j, (fun g : GL (Fin n) k => (g.val - 1) i j) ⁻¹' {x | valuation k x ≤ uniformizer k ^ c} := by
-    ext g; simp only [SetLike.mem_coe, br_memKc, Set.mem_iInter, Set.mem_inter_iff]; rfl
+  have e
+      : (Kc k n c : Set (GL (Fin n) k))
+        = (KO k (Fin n) : Set (GL (Fin n) k))
+          ∩ ⋂ i, ⋂ j, (fun g : GL (Fin n) k => (g.val - 1) i j) ⁻¹' {x | valuation k x ≤ uniformizer k ^ c} :=
+    by ext g; simp only [SetLike.mem_coe, br_memKc, Set.mem_iInter, Set.mem_inter_iff]; rfl
   rw [e]
   refine GlobalTheory.SplitFlip.isOpen_KO.inter <|
     isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => IsOpen.preimage ?_ ?_
   · have := Units.continuous_val (M := Matrix (Fin n) (Fin n) k)
     fun_prop
   · have h0 : (valuation k).restrict ((unif k : k) ^ c) ≠ 0 := by simp
-    simpa only [Valuation.restrict_le_iff, map_pow (valuation k), br_unif] using Valuation.isOpen_closedBall h0
+    simpa only [Valuation.restrict_le_iff, map_pow (valuation k), br_unif] using
+      Valuation.isOpen_closedBall h0
 
-private theorem br_basis (U : Subgroup (GL (Fin n) k)) (hU : IsOpen (U : Set (GL (Fin n) k))) :
-    ∃ c, Kc k n c ≤ U := by
-  refine exists_subset_nhds_of_isCompact' (V := fun c => (Kc k n c : Set (GL (Fin n) k)))
+private theorem br_basis (U : Subgroup (GL (Fin n) k)) (hU : IsOpen (U : Set (GL (Fin n) k)))
+    : ∃ c, Kc k n c ≤ U := by
+  refine exists_subset_nhds_of_isCompact'
+    (V := fun c => (Kc k n c : Set (GL (Fin n) k)))
     (directed_of_isDirected_le fun _ _ h => br_Kc_anti h)
-    (fun c => GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ (br_Kc_open c))
-      fun g hg => (br_memKc.1 hg).1) (fun c => Subgroup.isClosed_of_isOpen _ (br_Kc_open c)) ?_
+    (fun c =>
+      GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset
+        (Subgroup.isClosed_of_isOpen _ (br_Kc_open c)) fun g hg => (br_memKc.1 hg).1)
+    (fun c => Subgroup.isClosed_of_isOpen _ (br_Kc_open c))
+    ?_
   apply mem_nhdsSet_iff_forall.mpr
   intro g hg
   have : g = 1 := by
     ext i j
     by_contra h
-    have h0 : valuation k ((g.val - 1) i j) ≠ 0 := by
-      simpa [sub_eq_zero] using h
+    have h0 : valuation k ((g.val - 1) i j) ≠ 0 := by simpa [sub_eq_zero] using h
     obtain ⟨c, hc⟩ := exists_pow_lt₀ (uniformizer_lt_one (R := k)) (Units.mk0 _ h0)
     exact hc.not_ge ((br_memKc.1 (Set.mem_iInter.1 hg c)).2 i j)
   rw [this]
   exact hU.mem_nhds (one_mem U)
 
-private theorem br_memN {g : GL (Fin n) k} :
-    g ∈ (glIwa k n).N ↔ g ∈ unipB k (Fin n) ∧ ∀ i j, valuation k (g.val i j) ≤ 1 := by
+private theorem br_memN {g : GL (Fin n) k}
+    : g ∈ (glIwa k n).N ↔ g ∈ unipB k (Fin n) ∧ ∀ i j, valuation k (g.val i j) ≤ 1 := by
   refine ⟨fun h => ⟨h.1, GlobalTheory.StepData.intM_of_mem_KO h.2⟩, fun ⟨h, h1⟩ => ⟨h, ?_⟩⟩
   obtain ⟨h2, h3⟩ := (mem_unipB k).1 h
   let A : Matrix (Fin n) (Fin n) 𝒪[k] := fun i j => ⟨g.val i j, h1 i j⟩
@@ -103,47 +125,66 @@ private theorem br_memN {g : GL (Fin n) k} :
     exact Finset.prod_eq_one fun i _ => Subtype.ext (h3 i)
   exact ⟨Matrix.GeneralLinearGroup.mk'' A (by rw [hA]; exact isUnit_one), Units.ext rfl⟩
 
-private theorem br_memNconj (a : Fin n → ℤ) {g : GL (Fin n) k} :
-    g ∈ (glIwa k n).Nconj (upow k n a) ↔
-      g ∈ unipB k (Fin n) ∧ ∀ i j, valuation k (g.val i j) ≤ uniformizer k ^ (a i - a j) := by
-  have e : (MulAut.conj (upow k n a)).symm g =
-      diagT k (Fin n) (fun i => unif k ^ a i)⁻¹ * g * (diagT k (Fin n) (fun i => unif k ^ a i)⁻¹)⁻¹ := by
+private theorem br_memNconj (a : Fin n → ℤ) {g : GL (Fin n) k}
+    : g ∈ (glIwa k n).Nconj (upow k n a)
+      ↔ g ∈ unipB k (Fin n) ∧ ∀ i j, valuation k (g.val i j) ≤ uniformizer k ^ (a i - a j) := by
+  have e
+      : (MulAut.conj (upow k n a)).symm g
+        = diagT k (Fin n) (fun i => unif k ^ a i)⁻¹ * g
+          * (diagT k (Fin n) (fun i => unif k ^ a i)⁻¹)⁻¹ := by
     simp [upow]
-  have e' : g = diagT k (Fin n) (fun i => unif k ^ a i) * (diagT k (Fin n) (fun i => unif k ^ a i)⁻¹ * g * (diagT k (Fin n) (fun i => unif k ^ a i)⁻¹)⁻¹) * (diagT k (Fin n) (fun i => unif k ^ a i))⁻¹ := by
+  have e'
+      : g
+        = diagT k (Fin n) (fun i => unif k ^ a i)
+          * (diagT k (Fin n) (fun i => unif k ^ a i)⁻¹ * g
+            * (diagT k (Fin n) (fun i => unif k ^ a i)⁻¹)⁻¹)
+          * (diagT k (Fin n) (fun i => unif k ^ a i))⁻¹ := by
     rw [map_inv]; group
   rw [Iwa.Nconj, Subgroup.mem_map_equiv, e, br_memN]
-  refine and_congr ⟨fun h => e' ▸ GlobalTheory.IwahoriTraceProof.conj_mem_unipB _ h, GlobalTheory.IwahoriTraceProof.conj_mem_unipB _⟩
+  refine and_congr
+    ⟨
+      fun h => e' ▸ GlobalTheory.IwahoriTraceProof.conj_mem_unipB _ h,
+      GlobalTheory.IwahoriTraceProof.conj_mem_unipB _
+    ⟩
     (forall₂_congr fun i j => ?_)
-  rw [← map_inv, inv_inv, GlobalTheory.IwahoriTraceProof.diag_mul_mul_diag, map_mul, Pi.inv_apply, ← _root_.zpow_neg,
-    ← _root_.zpow_add, Units.val_zpow_eq_zpow_val, map_zpow₀, br_unif,
-    show -a i + a j = -(a i - a j) by ring, _root_.zpow_neg, inv_mul_le_iff₀ (zpow_pos uniformizer_pos _), mul_one]
+  rw [← map_inv, inv_inv, GlobalTheory.IwahoriTraceProof.diag_mul_mul_diag, map_mul, Pi.inv_apply,
+    ← _root_.zpow_neg, ← _root_.zpow_add, Units.val_zpow_eq_zpow_val, map_zpow₀, br_unif,
+    show - a i + a j = -(a i - a j) by ring, _root_.zpow_neg,
+    inv_mul_le_iff₀ (zpow_pos uniformizer_pos _), mul_one]
 
-private theorem br_memNm {c : ℕ} {g : GL (Fin n) k} :
-    g ∈ (glIwa k n).Nm c ↔ g ∈ unipBLower k (Fin n) ∧ g ∈ Kc k n (c + 1) := by
+private theorem br_memNm {c : ℕ} {g : GL (Fin n) k}
+    : g ∈ (glIwa k n).Nm c ↔ g ∈ unipBLower k (Fin n) ∧ g ∈ Kc k n (c + 1) := by
   refine and_congr ?_ Iff.rfl
   rw [← inv_mem_iff (H := unipBLower k (Fin n)), GlobalTheory.IwahoriTraceProof.mem_unipBLower]
   refine (mem_unipB k).trans ?_
   exact ⟨fun h => ⟨fun i j hij => h.1 j i hij, h.2⟩, fun h => ⟨fun i j hij => h.1 j i hij, h.2⟩⟩
 
-private theorem br_smooth {V : Type} [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V)
-    (h : GlobalTheory.PRep.IsSmooth π) : (glIwa k n).Smooth π :=
+private theorem br_smooth
+    {V : Type} [AddCommGroup V] [Module ℂ V]
+    (π : Representation ℂ (GL (Fin n) k) V) (h : GlobalTheory.PRep.IsSmooth π)
+    : (glIwa k n).Smooth π :=
   _root_.UpperTheory.Reformulated.B.BranchingSmooth.br_smooth π h
 
 private theorem br_Kone : Kc k n 1 = KOne k (Fin n) := by
   ext g
   rw [br_memKc, pow_one]
   simp only [le_uniformizer_iff]
-  exact ⟨fun h => GlobalTheory.StepData.mem_KOne.2 h.2, fun h => ⟨GlobalTheory.StepData.KOne_le_KO h, GlobalTheory.StepData.mem_KOne.1 h⟩⟩
+  exact ⟨
+    fun h => GlobalTheory.StepData.mem_KOne.2 h.2,
+    fun h => ⟨GlobalTheory.StepData.KOne_le_KO h, GlobalTheory.StepData.mem_KOne.1 h⟩
+  ⟩
 
 private theorem br_Iw : (glIwa k n).Iw 0 = iwahori k (Fin n) := by
   apply le_antisymm
-  · refine sup_le (sup_le (fun g hg => (GlobalTheory.IwahoriTraceProof.mem_unipO_iff hg.1).2 hg) ?_) fun g hg => ?_
+  · refine sup_le (sup_le (fun g hg => (GlobalTheory.IwahoriTraceProof.mem_unipO_iff hg.1).2 hg) ?_)
+      fun g hg => ?_
     · rintro _ ⟨t, ht, rfl⟩
       exact diagT_mem_iwahori ht
     · exact KOne_le_iwahori k _ (br_Kone (k := k) (n := n) ▸ hg.2)
   · intro g hg
     obtain ⟨u, hu, d, hd, y, hy, rfl⟩ := GlobalTheory.IwahoriTraceProof.iwahori_factorisation hg
-    exact (iwMem _ _ 0 _).1.2 ⟨u, hu, _, ⟨d, hd, rfl⟩, y, br_memNm.2 ⟨hy.1, br_Kone (k := k) (n := n) ▸ hy.2⟩, rfl⟩
+    exact (iwMem _ _ 0 _).1.2
+      ⟨u, hu, _, ⟨d, hd, rfl⟩, y, br_memNm.2 ⟨hy.1, br_Kone (k := k) (n := n) ▸ hy.2⟩, rfl⟩
 
 private theorem br_K_le (c : ℕ) : Kc k n (c + 1) ≤ (glIwa k n).I1 c := by
   intro g hg
@@ -154,20 +195,34 @@ private theorem br_K_le (c : ℕ) : Kc k n (c + 1) ≤ (glIwa k n).I1 c := by
   have hw := GlobalTheory.StepData.intM_of_mem_KO (mul_mem hu.2 hdK)
   obtain ⟨u2, u3⟩ := (mem_unipB k).1 hu.1
   obtain ⟨y2, y3⟩ := GlobalTheory.IwahoriTraceProof.mem_unipBLower.1 (inv_mem hy.1)
-  have e1 : (y⁻¹).val - (u * diagT k (Fin n) d).val = ((g⁻¹).val - 1) * (u * diagT k (Fin n) d).val := by
+  have e1
+      : (y⁻¹).val - (u * diagT k (Fin n) d).val
+        = ((g⁻¹).val - 1) * (u * diagT k (Fin n) d).val := by
     rw [Matrix.sub_mul, Matrix.one_mul, ← Units.val_mul, e]
     congr 2
     group
   have key : ∀ i j, valuation k ((y⁻¹).val i j - u.val i j * d j) ≤ uniformizer k ^ (c + 1) := by
     intro i j
     have e2 := congrFun (congrFun e1 i) j
-    rw [Matrix.sub_apply, Units.val_mul, val_diagT, Matrix.mul_diagonal, ← val_diagT, ← Units.val_mul] at e2
+    rw [Matrix.sub_apply, Units.val_mul, val_diagT, Matrix.mul_diagonal, ← val_diagT,
+        ← Units.val_mul]
+      at e2
     rw [e2, Matrix.mul_apply]
     refine Valuation.map_sum_le _ fun l _ => ?_
     rw [map_mul]
     exact (mul_le_of_le_one_right' (hw l j)).trans ((br_memKc.1 (inv_mem hg)).2 i l)
-  refine (iwMem _ _ c _).2.1.2 ⟨u, hu, _, ⟨⟨d, hd, rfl⟩, br_memKc.2 ⟨hdK, fun i j => ?_⟩⟩, y,
-    br_memNm.2 ⟨hy.1, inv_mem_iff.1 (br_memKc.2 ⟨inv_mem (GlobalTheory.StepData.KOne_le_KO hy.2), fun i j => ?_⟩)⟩, e⟩
+  refine (iwMem _ _ c _).2.1.2 ⟨
+    u,
+    hu,
+    _,
+    ⟨⟨d, hd, rfl⟩, br_memKc.2 ⟨hdK, fun i j => ?_⟩⟩,
+    y,
+    br_memNm.2 ⟨
+      hy.1,
+      inv_mem_iff.1 (br_memKc.2 ⟨inv_mem (GlobalTheory.StepData.KOne_le_KO hy.2), fun i j => ?_⟩)
+    ⟩,
+    e
+  ⟩
   · rw [val_diagT]
     by_cases hij : i = j
     · subst hij
@@ -176,7 +231,8 @@ private theorem br_K_le (c : ℕ) : Kc k n (c + 1) ≤ (glIwa k n).I1 c := by
       simpa using this
     · simp [hij]
   · rcases lt_trichotomy i j with hij | rfl | hij
-    · simp only [Matrix.sub_apply, y2 i j hij, Matrix.one_apply_ne hij.ne, sub_self, map_zero, zero_le]
+    · simp only [Matrix.sub_apply, y2 i j hij, Matrix.one_apply_ne hij.ne, sub_self, map_zero,
+        zero_le]
     · simp only [Matrix.sub_apply, y3 i, Matrix.one_apply_eq, sub_self, map_zero, zero_le]
     · have := key i j
       rw [u2 i j hij, zero_mul] at this
@@ -186,7 +242,8 @@ private theorem iwahori_first_le_maximal_compact (c : ℕ) : (glIwa k n).I1 c �
   sup_le (sup_le (fun _ hg => hg.2) fun _ hg => (br_memKc.1 hg.2).1) fun _ hg => (br_memKc.1 hg.2).1
 
 private theorem iwahori_z_eq_product : (glIwa k n).z = ((List.range n).map (al k n)).prod := by
-  have key : ∀ m : ℕ, ((List.range m).map (al k n)).prod = upow k n fun i => ((m - 1 - i : ℕ) : ℤ) := by
+  have key
+      : ∀ m : ℕ, ((List.range m).map (al k n)).prod = upow k n fun i => ((m - 1 - i : ℕ) : ℤ) := by
     intro m
     induction m with
     | zero =>
@@ -194,8 +251,8 @@ private theorem iwahori_z_eq_product : (glIwa k n).z = ((List.range n).map (al k
       simp
       exact ((diagT k (Fin n)).map_one).symm
     | succ m ih =>
-      rw [List.range_succ, List.map_append, List.prod_append, ih, List.map_singleton, List.prod_singleton, al, upow, upow,
-        upow, ← map_mul]
+      rw [List.range_succ, List.map_append, List.prod_append, ih, List.map_singleton,
+        List.prod_singleton, al, upow, upow, upow, ← map_mul]
       congr 1
       funext i
       rw [Pi.mul_apply, ← _root_.zpow_add]
@@ -208,24 +265,31 @@ private theorem iwahori_z_eq_product : (glIwa k n).z = ((List.range n).map (al k
   have := i.2
   omega
 
-private theorem iwahori_torus_product_form (t : (glIwa k n).T) : ∃ y : Fin n → Uo k,
-    (t : GL (Fin n) k) = (List.ofFn fun i => (eT k n i (y i) : GL (Fin n) k)).prod ∧
-      ∀ c, (t : GL (Fin n) k) ∈ (glIwa k n).Tc c → ∀ i, (y i : kˣ) ∈ Uc k (c + 1) := by
+private theorem iwahori_torus_product_form (t : (glIwa k n).T)
+    : ∃ y : Fin n → Uo k,
+      (t : GL (Fin n) k) = (List.ofFn fun i => (eT k n i (y i) : GL (Fin n) k)).prod
+        ∧ ∀ c, (t : GL (Fin n) k) ∈ (glIwa k n).Tc c → ∀ i, (y i : kˣ) ∈ Uc k (c + 1) := by
   obtain ⟨_, d, hd, rfl⟩ := t
   refine ⟨fun i => ⟨d i, hd i⟩, ?_, fun c hc i => ?_⟩
   · show diagT k (Fin n) d = (List.ofFn fun i => diagT k (Fin n) (Pi.mulSingle i (d i))).prod
-    rw [show (fun i => diagT k (Fin n) (Pi.mulSingle i (d i))) = diagT k (Fin n) ∘ fun i => Pi.mulSingle i (d i) from rfl,
+    rw [show (fun i => diagT k (Fin n) (Pi.mulSingle i (d i)))
+          = diagT k (Fin n) ∘ fun i => Pi.mulSingle i (d i) from
+        rfl,
       ← List.map_ofFn, ← map_list_prod, List.prod_ofFn, Finset.univ_prod_mulSingle]
   · have h := (br_memKc.1 hc.2).2 i i
-    let u : 𝒪[k]ˣ := ⟨⟨d i, (hd i).le⟩, ⟨((d i)⁻¹ : kˣ), (inv_mem hd i).le⟩,
-      Subtype.ext (d i).mul_inv, Subtype.ext (d i).inv_mul⟩
+    let u : 𝒪[k]ˣ := ⟨
+      ⟨d i, (hd i).le⟩,
+      ⟨((d i)⁻¹ : kˣ), (inv_mem hd i).le⟩,
+      Subtype.ext (d i).mul_inv,
+      Subtype.ext (d i).inv_mul
+    ⟩
     refine ⟨u, ?_, Units.ext rfl⟩
     refine Units.ext (show Ideal.Quotient.mk _ u.val = Ideal.Quotient.mk _ 1 from ?_)
     refine Ideal.Quotient.eq.2 ((br_pow _ _).2 ?_)
     simpa [val_diagT] using h
 
-private theorem br_index (j : ℕ) (hj : j ≤ n) :
-    ((glIwa k n).Nconj (al k n j)).relIndex (glIwa k n).N = Nat.card 𝓀[k] ^ (j * (n - j)) := by
+private theorem br_index (j : ℕ) (hj : j ≤ n)
+    : ((glIwa k n).Nconj (al k n j)).relIndex (glIwa k n).N = Nat.card 𝓀[k] ^ (j * (n - j)) := by
   have hint : ∀ x : BlockIx n j → 𝒪[k], unip (fun p => (x p : k)) ∈ (glIwa k n).N := by
     intro x
     refine br_memN.2 ⟨(mem_unipB k).2 ⟨fun a b hab => ?_, fun a => ?_⟩, fun a b => ?_⟩
@@ -241,8 +305,10 @@ private theorem br_index (j : ℕ) (hj : j ≤ n) :
       simp only [nilM, Matrix.of_apply]
       split_ifs
       exacts [(x _).2, zero_mem _]
-  have hmem : ∀ g ∈ (glIwa k n).N, g ∈ (glIwa k n).Nconj (al k n j) ↔
-      ∀ p : BlockIx n j, valuation k (g.val p.1.1 p.1.2) < 1 := by
+  have hmem
+      : ∀ g ∈ (glIwa k n).N,
+        g ∈ (glIwa k n).Nconj (al k n j)
+          ↔ ∀ p : BlockIx n j, valuation k (g.val p.1.1 p.1.2) < 1 := by
     intro g hg
     obtain ⟨h1, h2⟩ := br_memN.1 hg
     rw [al, br_memNconj]
@@ -276,68 +342,106 @@ private theorem br_index (j : ℕ) (hj : j ≤ n) :
     choose x hx using fun p => IsLocalRing.residue_surjective (y.toAdd p)
     exact ⟨.ofAdd x, funext hx⟩
   have h3 : Nat.card (BlockIx n j) = j * (n - j) := by
-    let e : BlockIx n j ≃ Fin j × Fin (n - j) :=
-      { toFun := fun p => (⟨p.1.1, p.2.1⟩, ⟨p.1.2 - j, by have := p.2.2; have := p.1.2.2; omega⟩)
-        invFun := fun q => ⟨(⟨q.1, by have := q.1.2; omega⟩, ⟨j + q.2, by have := q.2.2; omega⟩), q.1.2, Nat.le_add_right _ _⟩
-        left_inv := fun p => by
-          have := p.2.2
-          ext
-          · rfl
-          · show j + (p.1.2 - j) = p.1.2
-            omega
-        right_inv := fun q => by
-          ext
-          · rfl
-          · show j + q.2 - j = q.2
-            omega }
+    let e : BlockIx n j ≃ Fin j × Fin (n - j) := {
+      toFun := fun p => (⟨p.1.1, p.2.1⟩, ⟨p.1.2 - j, by have := p.2.2; have := p.1.2.2; omega⟩)
+      invFun := fun q => ⟨
+        (⟨q.1, by have := q.1.2; omega⟩, ⟨j + q.2, by have := q.2.2; omega⟩),
+        q.1.2,
+        Nat.le_add_right _ _
+      ⟩
+      left_inv := fun p => by
+        have := p.2.2
+        ext
+        · rfl
+        · show j + (p.1.2 - j) = p.1.2
+          omega
+      right_inv := fun q => by
+        ext
+        · rfl
+        · show j + q.2 - j = q.2
+          omega
+    }
     rw [Nat.card_congr e]
     simp
-  have h4 : ((glIwa k n).Nconj (al k n j)).relIndex f.range = ((glIwa k n).Nconj (al k n j)).relIndex (glIwa k n).N := by
+  have h4
+      : ((glIwa k n).Nconj (al k n j)).relIndex f.range
+        = ((glIwa k n).Nconj (al k n j)).relIndex (glIwa k n).N := by
     refine Nat.card_congr (Equiv.ofBijective (Subgroup.quotientSubgroupOfEmbeddingOfLE _ hle)
       ⟨Function.Embedding.injective _, fun q => ?_⟩)
     induction q using QuotientGroup.induction_on with
     | H x =>
-    obtain ⟨x, hx⟩ := x
-    let B : Matrix (Fin n) (Fin n) k := nilM fun p : BlockIx n j => x.val p.1.1 p.1.2
-    have hB : GlobalTheory.StepData.IntM B := fun a b => by
-      simp only [B, nilM, Matrix.of_apply]
-      split_ifs
-      exacts [(br_memN.1 hx).2 _ _, zero_mem _]
-    have hY := hB.mul (GlobalTheory.StepData.intM_of_mem_KO (inv_mem hx).2)
-    let y : BlockIx n j → 𝒪[k] := fun p => ⟨_, hY p.1.1 p.1.2⟩
-    have e : nilM (fun p => (y p : k)) = B * (x⁻¹).val := by
-      ext a b
-      simp only [nilM, Matrix.of_apply]
-      split_ifs with h
-      · rfl
-      · rw [Matrix.mul_apply]
-        refine (Finset.sum_eq_zero fun l _ => ?_).symm
-        by_cases hl : (a : ℕ) < j ∧ j ≤ (l : ℕ)
-        · rw [((mem_unipB k).1 (inv_mem hx).1).1 l b (show (b : ℕ) < l by omega), mul_zero]
-        · simp only [B, nilM, Matrix.of_apply, dif_neg hl, zero_mul]
-    refine ⟨((⟨f (.ofAdd y), _, rfl⟩ : f.range) : _ ⧸ _), ?_⟩
-    rw [Subgroup.quotientSubgroupOfEmbeddingOfLE_apply_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf,
-      hmem _ (Subtype.mem _)]
-    intro p
-    have e2 : ((f (.ofAdd y))⁻¹ * x).val = x.val - B := by
-      show (1 - nilM (fun p => (y p : k))) * x.val = _
-      rw [e, Matrix.sub_mul, Matrix.one_mul, Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
-    show valuation k (((f (.ofAdd y))⁻¹ * x).val _ _) < 1
-    rw [e2]
-    simp only [B, nilM, Matrix.sub_apply, Matrix.of_apply, dif_pos p.2, sub_self, map_zero, zero_lt_one]
+      obtain ⟨x, hx⟩ := x
+      let B : Matrix (Fin n) (Fin n) k := nilM fun p : BlockIx n j => x.val p.1.1 p.1.2
+      have hB : GlobalTheory.StepData.IntM B := fun a b => by
+        simp only [B, nilM, Matrix.of_apply]
+        split_ifs
+        exacts [(br_memN.1 hx).2 _ _, zero_mem _]
+      have hY := hB.mul (GlobalTheory.StepData.intM_of_mem_KO (inv_mem hx).2)
+      let y : BlockIx n j → 𝒪[k] := fun p => ⟨_, hY p.1.1 p.1.2⟩
+      have e : nilM (fun p => (y p : k)) = B * (x⁻¹).val := by
+        ext a b
+        simp only [nilM, Matrix.of_apply]
+        split_ifs with h
+        · rfl
+        · rw [Matrix.mul_apply]
+          refine (Finset.sum_eq_zero fun l _ => ?_).symm
+          by_cases hl : (a : ℕ) < j ∧ j ≤ (l : ℕ)
+          · rw [((mem_unipB k).1 (inv_mem hx).1).1 l b (show (b : ℕ) < l by omega), mul_zero]
+          · simp only [B, nilM, Matrix.of_apply, dif_neg hl, zero_mul]
+      refine ⟨((⟨f (.ofAdd y), _, rfl⟩ : f.range) : _ ⧸ _), ?_⟩
+      rw [Subgroup.quotientSubgroupOfEmbeddingOfLE_apply_mk, QuotientGroup.eq,
+        Subgroup.mem_subgroupOf, hmem _ (Subtype.mem _)]
+      intro p
+      have e2 : ((f (.ofAdd y))⁻¹ * x).val = x.val - B := by
+        show (1 - nilM (fun p => (y p : k))) * x.val = _
+        rw [e, Matrix.sub_mul, Matrix.one_mul, Matrix.mul_assoc, Units.inv_mul, Matrix.mul_one]
+      show valuation k (((f (.ofAdd y))⁻¹ * x).val _ _) < 1
+      rw [e2]
+      simp only [B, nilM, Matrix.sub_apply, Matrix.of_apply, dif_pos p.2, sub_self, map_zero,
+        zero_lt_one]
   rw [← h4, ← Subgroup.index_comap, h1, Subgroup.index_ker, h2, Subgroup.card_top, ← h3]
   exact Nat.card_fun
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.V.Hi.glBridge :
-    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V), ((glIwa k n).jacKer π = GlobalTheory.PRep.twKer π (unipB k (Fin n)) 1) ∧ (GlobalTheory.PRep.IsSmooth π → (glIwa k n).Smooth π) ∧ (∀ c, IsOpen ((glIwa k n).I1 c : Set (GL (Fin n) k)) ∧ IsCompact ((glIwa k n).I1 c : Set (GL (Fin n) k))) ∧ (∀ U : Subgroup (GL (Fin n) k), IsOpen (U : Set (GL (Fin n) k)) → ∃ c, Kc k n c ≤ U) ∧ (∀ c, Kc k n (c + 1) ≤ (glIwa k n).I1 c) ∧ (glIwa k n).Iw 0 = iwahori k (Fin n) ∧ valuation k (unif k : k) = uniformizer k ∧ (∀ j ≤ n, ((glIwa k n).Nconj (al k n j)).relIndex (glIwa k n).N = Nat.card 𝓀[k] ^ (j * (n - j))) ∧ (glIwa k n).z = ((List.range n).map (al k n)).prod ∧ ∀ t : (glIwa k n).T, ∃ y : Fin n → Uo k, (t : GL (Fin n) k) = (List.ofFn fun i => (eT k n i (y i) : GL (Fin n) k)).prod ∧ ∀ c, (t : GL (Fin n) k) ∈ (glIwa k n).Tc c → ∀ i, (y i : kˣ) ∈ Uc k (c + 1) := by
+theorem UpperTheory.V.Hi.glBridge
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        (n : ℕ) (V : Type) [AddCommGroup V] [Module ℂ V] (π : Representation ℂ (GL (Fin n) k) V),
+      ((glIwa k n).jacKer π = GlobalTheory.PRep.twKer π (unipB k (Fin n)) 1)
+        ∧ (GlobalTheory.PRep.IsSmooth π → (glIwa k n).Smooth π)
+        ∧ (∀ c,
+          IsOpen ((glIwa k n).I1 c : Set (GL (Fin n) k))
+            ∧ IsCompact ((glIwa k n).I1 c : Set (GL (Fin n) k)))
+        ∧ (∀ U : Subgroup (GL (Fin n) k), IsOpen (U : Set (GL (Fin n) k)) → ∃ c, Kc k n c ≤ U)
+        ∧ (∀ c, Kc k n (c + 1) ≤ (glIwa k n).I1 c) ∧ (glIwa k n).Iw 0 = iwahori k (Fin n)
+        ∧ valuation k (unif k : k) = uniformizer k
+        ∧ (∀ j ≤ n,
+          ((glIwa k n).Nconj (al k n j)).relIndex (glIwa k n).N = Nat.card 𝓀[k] ^ (j * (n - j)))
+        ∧ (glIwa k n).z = ((List.range n).map (al k n)).prod
+        ∧ ∀ t : (glIwa k n).T, ∃ y : Fin n → Uo k,
+          (t : GL (Fin n) k) = (List.ofFn fun i => (eT k n i (y i) : GL (Fin n) k)).prod
+            ∧ ∀ c, (t : GL (Fin n) k) ∈ (glIwa k n).Tc c → ∀ i, (y i : kˣ) ∈ Uc k (c + 1) := by
   intro k _ _ _ _ n V _ _ π
-  refine ⟨?_, br_smooth π, fun c => ?_, br_basis, br_K_le, br_Iw, br_unif, br_index, iwahori_z_eq_product, iwahori_torus_product_form⟩
+  refine ⟨
+    ?_,
+    br_smooth π,
+    fun c => ?_,
+    br_basis,
+    br_K_le,
+    br_Iw,
+    br_unif,
+    br_index,
+    iwahori_z_eq_product,
+    iwahori_torus_product_form
+  ⟩
   · refine congrArg (Submodule.span ℂ) (Set.ext fun w => ⟨?_, ?_⟩)
     · rintro ⟨x, hx, v, rfl⟩
       exact ⟨⟨x, hx⟩, v, by simp⟩
     · rintro ⟨x, v, rfl⟩
       exact ⟨x, x.2, v, by simp⟩
   · have ho := Subgroup.isOpen_mono (br_K_le c) (br_Kc_open (k := k) (n := n) (c + 1))
-    exact ⟨ho, GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ ho) (iwahori_first_le_maximal_compact c)⟩
+    exact ⟨
+      ho,
+      GlobalTheory.SplitFlip.isCompact_KO.of_isClosed_subset (Subgroup.isClosed_of_isOpen _ ho)
+        (iwahori_first_le_maximal_compact c)
+    ⟩

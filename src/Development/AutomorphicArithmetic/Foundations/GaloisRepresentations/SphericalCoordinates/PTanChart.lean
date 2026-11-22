@@ -5,14 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.ToricGeometry.TopLePreimag
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU Filter Topology
 open scoped Matrix
 open GlobalTheory.HodgeCoh GlobalTheory.CechDR Polynomial UpperTheory.Gal.W2
 
-theorem UpperTheory.Gal.W2.tanChart_of :
-    UpperTheory.Gal.W2.TanDeriv → UpperTheory.Gal.W2.FlatAffine → UpperTheory.Gal.W2.ConjCharpoly → UpperTheory.Gal.W2.TanChart := by
-  intro hTD hFA hCC E _ _ _ d hd Z Y sZ s' c₁ c₂ h₁ h₂ B s v₀ hB hv hs hs' hflat G G' hG hGv hev y hy0 A hT
+theorem UpperTheory.Gal.W2.tanChart_of
+    : UpperTheory.Gal.W2.TanDeriv → UpperTheory.Gal.W2.FlatAffine → UpperTheory.Gal.W2.ConjCharpoly
+      → UpperTheory.Gal.W2.TanChart := by
+  intro hTD hFA hCC E _ _ _ d hd Z Y sZ s' c₁ c₂ h₁ h₂ B s v₀ hB hv hs hs' hflat G G' hG hGv hev y
+    hy0 A hT
   obtain ⟨U, W, hW1, hW2, t, hy, hU, hW, φ, hφ1, hφ2, hφ3, hφ4⟩ := hT
   obtain ⟨ψ, hψ1, hψ2⟩ := hTD E Y s' B s v₀ hB hv hs hs' y hy0 W hy
   let e₁ : Fin d → Sec s' W := fun l => Sec.res s' hW1 (appSec sZ s' c₁ U (t l))
@@ -51,10 +55,12 @@ theorem UpperTheory.Gal.W2.tanChart_of :
       rw [map_add (f := _), hψω', zero_add, map_sum]
     simp only [map_smul]
   let τ : E →ₗ[ℂ] Fin d → ℂ :=
-    LinearMap.pi (fun l => ((ψ (KaehlerDifferential.D ℂ (Sec s' W) (e₁ l)) : E →L[ℂ] ℂ) : E →ₗ[ℂ] ℂ))
+    LinearMap.pi (fun l =>
+      ((ψ (KaehlerDifferential.D ℂ (Sec s' W) (e₁ l)) : E →L[ℂ] ℂ) : E →ₗ[ℂ] ℂ))
   have hτ : ∀ w l, τ w l = ψ (KaehlerDifferential.D ℂ (Sec s' W) (e₁ l)) w := fun w l => rfl
   have hinj : Function.Injective τ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro w hw
     apply hflat
     refine hFA E Y B s v₀ w hB hv hs W hW hv₀N.2 (fun f => ?_)
@@ -64,8 +70,10 @@ theorem UpperTheory.Gal.W2.tanChart_of :
     refine Finset.sum_eq_zero (fun l _ => ?_)
     rw [ContinuousLinearMap.smul_apply, ← hτ, hw]
     simp
-  have hval : ∀ (c : Y ⟶ Z) (hc : W ≤ c ⁻¹ᵁ U) (f : Sec sZ U) (v : E), ⊤ ≤ s v ⁻¹ᵁ W →
-      valAt' (s v) W (Sec.res s' hc (appSec sZ s' c U f)) = valAt' (s v ≫ c) U f := by
+  have hval
+      : ∀ (c : Y ⟶ Z) (hc : W ≤ c ⁻¹ᵁ U) (f : Sec sZ U) (v : E),
+        ⊤ ≤ s v ⁻¹ᵁ W
+          → valAt' (s v) W (Sec.res s' hc (appSec sZ s' c U f)) = valAt' (s v ≫ c) U f := by
     intro c hc f v hvW
     exact (valAt'_res (s v) hc _ hvW).trans (valAt'_comp (s v) c U f)
   have hrel : ∀ w, τ (G' w) = A *ᵥ τ w := by
@@ -76,17 +84,20 @@ theorem UpperTheory.Gal.W2.tanChart_of :
     have hGN : ∀ᶠ v in 𝓝 v₀, G v ∈ N := by
       have hNn' : N ∈ 𝓝 (G v₀) := by rw [hGv]; exact hNn
       exact hG.continuousAt.preimage_mem_nhds hNn'
-    have heq : (fun v => valAt' (s v) W (e₂ j)) =ᶠ[𝓝 v₀]
-        (fun v => valAt' (s v) W (e₁ j)) ∘ G := by
+    have heq
+        : (fun v => valAt' (s v) W (e₂ j)) =ᶠ[𝓝 v₀]
+          (fun v => valAt' (s v) W (e₁ j)) ∘ G := by
       filter_upwards [hNn, hGN, hev] with v hvN hGvN hevv
       simp only [Function.comp_apply]
       rw [hval c₂ hW2 (t j) v hvN.2, hval c₁ hW1 (t j) (G v) hGvN.2, hevv]
-    have hd1' : HasFDerivAt (fun v => valAt' (s v) W (e₁ j))
+    have hd1' : HasFDerivAt
+        (fun v => valAt' (s v) W (e₁ j))
         (fderiv ℂ (fun v => valAt' (s v) W (e₁ j)) v₀) (G v₀) := by
       rw [hGv]; exact hd1.hasFDerivAt
     have hcomp := hd1'.comp v₀ hG
-    have hfd : fderiv ℂ (fun v => valAt' (s v) W (e₂ j)) v₀ =
-        (fderiv ℂ (fun v => valAt' (s v) W (e₁ j)) v₀).comp G' := by
+    have hfd
+        : fderiv ℂ (fun v => valAt' (s v) W (e₂ j)) v₀
+          = (fderiv ℂ (fun v => valAt' (s v) W (e₁ j)) v₀).comp G' := by
       rw [heq.fderiv_eq]
       exact hcomp.fderiv
     have h2 : ψ (KaehlerDifferential.D ℂ (Sec s' W) (e₂ j)) w = ∑ l, A j l * τ w l := by

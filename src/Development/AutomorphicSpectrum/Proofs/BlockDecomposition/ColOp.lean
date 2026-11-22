@@ -19,8 +19,7 @@ theorem colOp : KerBasic → CvTest → KernelL2RowsColumns → KerMul → ColOp
   · intro y j
     have hm : MemLp (fun x => ker X.Γ ψ x y) 2 X.ν := (hL X ψ hψ).1 y
     refine ⟨WithLp.toLp 2 (Pi.single j (hm.toLp _)), ?_, ?_⟩
-    · have e : (WithLp.toLp 2 (Pi.single j (hm.toLp _)) : X.Hs ι) j = hm.toLp _ := by
-        simp
+    · have e : (WithLp.toLp 2 (Pi.single j (hm.toLp _)) : X.Hs ι) j = hm.toLp _ := by simp
       rw [e]
       exact hm.coeFn_toLp
     · intro l hl

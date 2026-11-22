@@ -8,8 +8,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 open Filter UpperTheory.V.AlgebraTools
 open scoped TensorProduct
 
-private theorem ker_map_power_series_quotient (R : Type) [CommRing R] (a : Ideal R) (ha : a.FG) :
-    RingHom.ker (PowerSeries.map (Ideal.Quotient.mk a)) = a.map (PowerSeries.C : R →+* PowerSeries R) := by
+private theorem ker_map_power_series_quotient (R : Type) [CommRing R] (a : Ideal R) (ha : a.FG)
+    : RingHom.ker (PowerSeries.map (Ideal.Quotient.mk a))
+      = a.map (PowerSeries.C : R →+* PowerSeries R) := by
   classical
   apply le_antisymm
   · intro f hf
@@ -36,14 +37,19 @@ private theorem ker_map_power_series_quotient (R : Type) [CommRing R] (a : Ideal
     exact Ideal.mem_map_of_mem _ (Ideal.subset_span hx)
   · rw [Ideal.map_le_iff_le_comap]
     intro x hx
-    rw [Ideal.mem_comap, RingHom.mem_ker, PowerSeries.map_C, Ideal.Quotient.eq_zero_iff_mem.2 hx, map_zero]
+    rw [Ideal.mem_comap, RingHom.mem_ker, PowerSeries.map_C, Ideal.Quotient.eq_zero_iff_mem.2 hx,
+      map_zero]
 
-theorem UpperTheory.V.AlgebraTools.powerSeries_ker_map :
-    ∀ (R : Type) [CommRing R] (a : Ideal R), a.FG →
-      RingHom.ker (PowerSeries.map (Ideal.Quotient.mk a)) = a.map (PowerSeries.C : R →+* PowerSeries R) ∧
-      Function.Surjective (PowerSeries.map (Ideal.Quotient.mk a)) ∧
-      (a.IsPrime → (a.map (PowerSeries.C : R →+* PowerSeries R)).IsPrime) ∧
-      (a.map (PowerSeries.C : R →+* PowerSeries R)).comap (PowerSeries.C : R →+* PowerSeries R) = a := by
+theorem UpperTheory.V.AlgebraTools.powerSeries_ker_map
+    : ∀ (R : Type) [CommRing R] (a : Ideal R),
+      a.FG
+        → RingHom.ker (PowerSeries.map (Ideal.Quotient.mk a))
+            = a.map (PowerSeries.C : R →+* PowerSeries R)
+          ∧ Function.Surjective (PowerSeries.map (Ideal.Quotient.mk a))
+          ∧ (a.IsPrime → (a.map (PowerSeries.C : R →+* PowerSeries R)).IsPrime)
+          ∧ (a.map (PowerSeries.C : R →+* PowerSeries R)).comap
+              (PowerSeries.C : R →+* PowerSeries R)
+            = a := by
   intro R _ a ha
   have hk := ker_map_power_series_quotient R a ha
   refine ⟨hk, ?_, ?_, ?_⟩

@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up.MI
 
-open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates
+open NumberField Matrix MeasureTheory ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.L2DbarEstimates
   ReciprocityTheory.ChartRestriction.G.AR.Up
 
 noncomputable section
@@ -32,7 +33,8 @@ lemma NF_ΦL (z : V (nd X)) : NF X (ΦL X z) = nmat X z := by
   split_ifs <;> rfl
 
 def muX (x0 : Frame X.Ψ r) : Measure (V (nd X)) :=
-  (volume.restrict {z | cpt X x0 z ∈ X.dom}).withDensity fun z => ENNReal.ofReal (densY X (cpt X x0 z))
+  (volume.restrict {z | cpt X x0 z ∈ X.dom}).withDensity fun z =>
+    ENNReal.ofReal (densY X (cpt X x0 z))
 
 def ΦC : V (nd X) ≃L[ℂ] (LoI X.Ψ r → ℂ) := (ΦL X).toContinuousLinearEquiv
 
@@ -86,9 +88,9 @@ lemma continuous_cpt (x0 : Frame X.Ψ r) : Continuous (cpt X x0) := by
   show Continuous fun z => mat x0 τ * mat (NF X (ΦC X z)) τ
   exact continuous_const.matrix_mul (((continuous_apply τ).comp (continuous_NF X)).comp (ΦC X).continuous)
 
-theorem lintegral_muX {x0 : Frame X.Ψ r} {φ : Frame X.Ψ r → ENNReal} (hφm : Measurable φ) :
-    ∫⁻ z, φ (cpt X x0 z) ∂muX X x0 =
-      Measure.addHaarScalarFactor (volume.map (ΦC X)) volume * ∫⁻ x, GLo X x0 φ x := by
+theorem lintegral_muX {x0 : Frame X.Ψ r} {φ : Frame X.Ψ r → ENNReal} (hφm : Measurable φ)
+    : ∫⁻ z, φ (cpt X x0 z) ∂muX X x0
+      = Measure.addHaarScalarFactor (volume.map (ΦC X)) volume * ∫⁻ x, GLo X x0 φ x := by
   have hdom : MeasurableSet X.dom := by
     have ho : IsOpen X.dom := by
       show IsOpen {x : Frame X.Ψ r | ∀ τ : X.Ψ, (mat x τ).det ≠ 0 ∧
@@ -111,9 +113,11 @@ theorem lintegral_muX {x0 : Frame X.Ψ r} {φ : Frame X.Ψ r → ENNReal} (hφm 
   funext z
   simp [GLo, Set.indicator, cpt_eq, mul_comm]
 
-theorem lintegral_cpt_muX_indep_of_isOrtho {x0 x0' : Frame X.Ψ r} (hx0 : X.IsOrtho x0) (hx0' : X.IsOrtho x0') {φ : Frame X.Ψ r → ENNReal}
-    (hφm : Measurable φ) (hφ : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul x b) = φ x) :
-    ∫⁻ z, φ (cpt X x0 z) ∂muX X x0 = ∫⁻ z, φ (cpt X x0' z) ∂muX X x0' := by
+theorem lintegral_cpt_muX_indep_of_isOrtho
+    {x0 x0' : Frame X.Ψ r} (hx0 : X.IsOrtho x0) (hx0' : X.IsOrtho x0')
+    {φ : Frame X.Ψ r → ENNReal}
+    (hφm : Measurable φ) (hφ : ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, φ (rmul x b) = φ x)
+    : ∫⁻ z, φ (cpt X x0 z) ∂muX X x0 = ∫⁻ z, φ (cpt X x0' z) ∂muX X x0' := by
   rw [lintegral_muX X hφm, lintegral_muX X hφm]
   congr 1
   have h1 := core X hx0 hφm hφ

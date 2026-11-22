@@ -10,8 +10,10 @@ open scoped ENNReal Pointwise
 
 namespace GlobalTheory.QuotientHaar
 
-variable {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-  [MeasurableSpace G] [BorelSpace G] (H : Subgroup G)
+variable
+  {G : Type}
+  [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G]
+  (H : Subgroup G)
 
 theorem measurable_translate (g : G) : Measurable (fun h : H => g * (h : G)) :=
   (continuous_const.mul continuous_subtype_val).measurable
@@ -28,25 +30,30 @@ noncomputable def cosetMeasure (ν : Measure H) [ν.IsMulLeftInvariant] : G ⧸ 
     funext h
     simp [← mul_assoc])
 
-theorem cosetMeasure_mk (ν : Measure H) [ν.IsMulLeftInvariant] (g : G) :
-    cosetMeasure H ν (g : G ⧸ H) = ν.map (fun h : H => g * (h : G)) := rfl
+theorem cosetMeasure_mk (ν : Measure H) [ν.IsMulLeftInvariant] (g : G)
+    : cosetMeasure H ν (g : G ⧸ H) = ν.map (fun h : H => g * (h : G)) :=
+  rfl
 
-theorem cosetMeasure_apply (ν : Measure H) [ν.IsMulLeftInvariant] (g : G) {s : Set G}
-    (hs : MeasurableSet s) :
-    cosetMeasure H ν (g : G ⧸ H) s = ν ((fun h : H => g * (h : G)) ⁻¹' s) := by
+theorem cosetMeasure_apply
+    (ν : Measure H) [ν.IsMulLeftInvariant] (g : G) {s : Set G} (hs : MeasurableSet s)
+    : cosetMeasure H ν (g : G ⧸ H) s = ν ((fun h : H => g * (h : G)) ⁻¹' s) := by
   rw [cosetMeasure_mk, Measure.map_apply (measurable_translate H g) hs]
 
-theorem lintegral_cosetMeasure (ν : Measure H) [ν.IsMulLeftInvariant] {f : G → ℝ≥0∞}
-    (hf : Measurable f) (q : G ⧸ H) :
-    ∫⁻ x, f x ∂(cosetMeasure H ν q) = fibreIntegral H ν f q := by
+theorem lintegral_cosetMeasure
+    (ν : Measure H) [ν.IsMulLeftInvariant] {f : G → ℝ≥0∞} (hf : Measurable f) (q : G ⧸ H)
+    : ∫⁻ x, f x ∂(cosetMeasure H ν q) = fibreIntegral H ν f q := by
   induction q using QuotientGroup.induction_on with
   | H g => rw [cosetMeasure_mk, lintegral_map hf (measurable_translate H g), fibreIntegral_mk]
 
 variable [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G]
 
 omit [LocallyCompactSpace G] [SecondCountableTopology G] in
-theorem cosetMeasure_lt_top (hH : IsClosed (H : Set G)) (ν : Measure H) [ν.IsHaarMeasure]
-    (q : G ⧸ H) {K : Set G} (hK : IsCompact K) : cosetMeasure H ν q K < ⊤ := by
+theorem cosetMeasure_lt_top
+    (hH : IsClosed (H : Set G))
+    (ν : Measure H) [ν.IsHaarMeasure]
+    (q : G ⧸ H)
+    {K : Set G} (hK : IsCompact K)
+    : cosetMeasure H ν q K < ⊤ := by
   induction q using QuotientGroup.induction_on with
   | H g =>
     rw [cosetMeasure_apply H ν g hK.measurableSet]
@@ -54,9 +61,11 @@ theorem cosetMeasure_lt_top (hH : IsClosed (H : Set G)) (ν : Measure H) [ν.IsH
       (Homeomorph.mulLeft g).isCompact_preimage.mpr hK
     exact (hH.isClosedEmbedding_subtypeVal.isCompact_preimage h1).measure_lt_top
 
-theorem measurable_cosetMeasure_open (hH : IsClosed (H : Set G)) (ν : Measure H)
-    [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)] {U : Set G}
-    (hU : IsOpen U) : Measurable (fun q : G ⧸ H => cosetMeasure H ν q U) := by
+theorem measurable_cosetMeasure_open
+    (hH : IsClosed (H : Set G))
+    (ν : Measure H) [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)]
+    {U : Set G} (hU : IsOpen U)
+    : Measurable (fun q : G ⧸ H => cosetMeasure H ν q U) := by
   haveI : LocallyCompactSpace H := hH.isClosedEmbedding_subtypeVal.locallyCompactSpace
   haveI : SecondCountableTopology H := TopologicalSpace.Subtype.secondCountableTopology _
   haveI : IsLocallyFiniteMeasure ν := isLocallyFiniteMeasure_of_isFiniteMeasureOnCompacts
@@ -76,22 +85,24 @@ theorem measurable_cosetMeasure_open (hH : IsClosed (H : Set G)) (ν : Measure H
   simp only [Set.mem_preimage, Set.mem_Ioi, cosetMeasure_apply H ν x hU.measurableSet]
   exact hc.trans_le (measure_mono fun h hh => hx h hh)
 
-theorem measurable_cosetMeasure (hH : IsClosed (H : Set G)) (ν : Measure H)
-    [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)] :
-    Measurable (cosetMeasure H ν) := by
+theorem measurable_cosetMeasure
+    (hH : IsClosed (H : Set G))
+    (ν : Measure H) [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)]
+    : Measurable (cosetMeasure H ν) := by
   let K := CompactExhaustion.choice G
   have hres : ∀ n, Measurable (fun q => (cosetMeasure H ν q).restrict (interior (K n))) := by
     intro n
     haveI : ∀ q, IsFiniteMeasure ((cosetMeasure H ν q).restrict (interior (K n))) := fun q =>
       isFiniteMeasure_restrict.mpr ((measure_mono interior_subset).trans_lt
         (cosetMeasure_lt_top H hH ν q (K.isCompact n))).ne
-    have key : ∀ s : Set G, IsOpen s →
-        Measurable fun q => (cosetMeasure H ν q).restrict (interior (K n)) s := by
+    have key
+        : ∀ s : Set G,
+          IsOpen s → Measurable fun q => (cosetMeasure H ν q).restrict (interior (K n)) s := by
       intro s hs
       simp only [Measure.restrict_apply hs.measurableSet]
       exact measurable_cosetMeasure_open H hH ν (hs.inter isOpen_interior)
-    exact Measurable.measure_of_isPiSystem (S := {s : Set G | IsOpen s})
-      BorelSpace.measurable_eq isPiSystem_isOpen key (key _ isOpen_univ)
+    exact Measurable.measure_of_isPiSystem (S := {s : Set G | IsOpen s}) BorelSpace.measurable_eq
+      isPiSystem_isOpen key (key _ isOpen_univ)
   refine Measure.measurable_of_measurable_coe _ fun s hs => ?_
   have hmono : Monotone fun n => s ∩ interior (K n) := fun a b hab =>
     Set.inter_subset_inter_right _ (interior_mono (K.subset hab))
@@ -101,33 +112,39 @@ theorem measurable_cosetMeasure (hH : IsClosed (H : Set G)) (ν : Measure H)
     refine ⟨fun ⟨_, h, _⟩ => h, fun h => ?_⟩
     obtain ⟨n, hn⟩ := K.exists_mem x
     exact ⟨n + 1, h, K.subset_interior_succ n hn⟩
-  have : (fun q => cosetMeasure H ν q s) =
-      fun q => ⨆ n, (cosetMeasure H ν q).restrict (interior (K n)) s := by
+  have : (fun q => cosetMeasure H ν q s)
+      = fun q => ⨆ n, (cosetMeasure H ν q).restrict (interior (K n)) s := by
     funext q
     simp only [Measure.restrict_apply hs]
     rw [← hmono.measure_iUnion, hun]
   rw [this]
   exact Measurable.iSup fun n => (Measure.measurable_coe hs).comp (hres n)
 
-theorem measurable_fibreIntegral (hH : IsClosed (H : Set G)) (ν : Measure H)
-    [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)] {f : G → ℝ≥0∞}
-    (hf : Measurable f) : Measurable (fibreIntegral H ν f) := by
+theorem measurable_fibreIntegral
+    (hH : IsClosed (H : Set G))
+    (ν : Measure H) [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)]
+    {f : G → ℝ≥0∞} (hf : Measurable f)
+    : Measurable (fibreIntegral H ν f) := by
   have : fibreIntegral H ν f = fun q => ∫⁻ x, f x ∂(cosetMeasure H ν q) :=
     funext fun q => (lintegral_cosetMeasure H ν hf q).symm
   rw [this]
   exact (Measure.measurable_lintegral hf).comp (measurable_cosetMeasure H hH ν)
 
-theorem quotientFormula_bind (hH : IsClosed (H : Set G)) (ν : Measure H)
-    [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)] (μ : Measure (G ⧸ H)) :
-    QuotientFormula H (μ.bind (cosetMeasure H ν)) ν μ := by
+theorem quotientFormula_bind
+    (hH : IsClosed (H : Set G))
+    (ν : Measure H) [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)]
+    (μ : Measure (G ⧸ H))
+    : QuotientFormula H (μ.bind (cosetMeasure H ν)) ν μ := by
   intro f hf
   refine ⟨measurable_fibreIntegral H hH ν hf, ?_⟩
   rw [Measure.lintegral_bind (measurable_cosetMeasure H hH ν).aemeasurable hf.aemeasurable]
   exact lintegral_congr fun q => lintegral_cosetMeasure H ν hf q
 
-theorem isHaarMeasure_bind (hH : IsClosed (H : Set G)) (ν : Measure H)
-    [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)] (μ : Measure (G ⧸ H))
-    (hμ : IsInvariantRadon H μ) : (μ.bind (cosetMeasure H ν)).IsHaarMeasure := by
+theorem isHaarMeasure_bind
+    (hH : IsClosed (H : Set G))
+    (ν : Measure H) [ν.IsHaarMeasure] [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)]
+    (μ : Measure (G ⧸ H)) (hμ : IsInvariantRadon H μ)
+    : (μ.bind (cosetMeasure H ν)).IsHaarMeasure := by
   haveI := hμ.finiteOnCompacts
   haveI := hμ.invariant
   have hm := measurable_cosetMeasure H hH ν
@@ -191,10 +208,20 @@ end GlobalTheory.QuotientHaar
 
 namespace GlobalTheory.QuotientHaar
 
-theorem existsUnique_haar_of_invariantRadon : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G] [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (H : Subgroup G) [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)], IsClosed (H : Set G) → ∀ (ν : Measure H) [ν.IsHaarMeasure] (μ : Measure (G ⧸ H)), IsInvariantRadon H μ → ∃! dg : Measure G, dg.IsHaarMeasure ∧ QuotientFormula H dg ν μ := by
+theorem existsUnique_haar_of_invariantRadon
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+        [SecondCountableTopology G] [T2Space G] [MeasurableSpace G] [BorelSpace G] (H : Subgroup G)
+        [MeasurableSpace (G ⧸ H)] [BorelSpace (G ⧸ H)],
+      IsClosed (H : Set G)
+        → ∀ (ν : Measure H) [ν.IsHaarMeasure] (μ : Measure (G ⧸ H)),
+          IsInvariantRadon H μ
+            → ∃! dg : Measure G, dg.IsHaarMeasure ∧ QuotientFormula H dg ν μ := by
   intro G _ _ _ _ _ _ _ _ H _ _ hH ν _ μ hμ
-  refine ⟨μ.bind (cosetMeasure H ν),
-    ⟨isHaarMeasure_bind H hH ν μ hμ, quotientFormula_bind H hH ν μ⟩, fun dg hdg => ?_⟩
+  refine ⟨
+    μ.bind (cosetMeasure H ν),
+    ⟨isHaarMeasure_bind H hH ν μ hμ, quotientFormula_bind H hH ν μ⟩,
+    fun dg hdg => ?_
+  ⟩
   ext s hs
   have hf : Measurable (s.indicator (1 : G → ℝ≥0∞)) := measurable_one.indicator hs
   rw [← lintegral_indicator_one hs, ← lintegral_indicator_one hs, (hdg.2 _ hf).2,

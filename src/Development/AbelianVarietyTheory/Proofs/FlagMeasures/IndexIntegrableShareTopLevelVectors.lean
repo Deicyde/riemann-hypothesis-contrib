@@ -20,14 +20,33 @@ namespace GlobalTheory.TopLevelShare
 
 open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
-theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : _root_.Formalism.MainNotions.S.Loc.LocE F E), ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k), ∀ (j : Fin r) (β βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → S.InFF β (j + 1) βJ d Λ → 1 ≤ βJ ∧ 1 ≤ β ∧ _root_.GlobalTheory.IdxInt.Nice (S.refB (j + 1) Λ) (_root_.GlobalTheory.IdxInt.ind fun b : S.V × S.V => b ∈ S.refB (j + 1) Λ ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (b.1 + b.2) = j + 1) ∧ _root_.GlobalTheory.IdxInt.cint (S.refB (j + 1) Λ) (_root_.GlobalTheory.IdxInt.ind fun b : S.V × S.V => b ∈ S.refB (j + 1) Λ ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (b.1 + b.2) = j + 1) = (βJ : ℂ) / (β : ℂ) := by
+theorem _root_.GlobalTheory.TopLevelShare.main
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+        (L : _root_.Formalism.MainNotions.S.Loc.LocE F E),
+      ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k),
+        ∀ (j : Fin r) (β βJ : ℕ) (d : S.Datum) (Λ : Submodule L.O S.V),
+          S.IsTerm d Λ → S.InFF β (j + 1) βJ d Λ
+            → 1 ≤ βJ ∧ 1 ≤ β
+              ∧ _root_.GlobalTheory.IdxInt.Nice (S.refB (j + 1) Λ)
+                (_root_.GlobalTheory.IdxInt.ind fun b : S.V × S.V =>
+                  b ∈ S.refB (j + 1) Λ ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (b.1 + b.2) = j + 1)
+              ∧ _root_.GlobalTheory.IdxInt.cint (S.refB (j + 1) Λ)
+                  (_root_.GlobalTheory.IdxInt.ind fun b : S.V × S.V =>
+                    b ∈ S.refB (j + 1) Λ ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (b.1 + b.2) = j + 1)
+                = (βJ : ℂ) / (β : ℂ) := by
   intro F _ _ _ _ _ E _ _ _ L r k S j β βJ d Λ hT hF
   obtain ⟨-, hbe, hle, ⟨y₀, hy₀, hy₀l⟩, hJ⟩ := hF
   obtain ⟨-, -, hMsat, -⟩ := _root_.GlobalTheory.HL.TermBasic.term_basic L r k S d Λ hT
-  obtain ⟨-, -, -, -, -, ⟨i, -, hq⟩, -, -, -, -, hlev⟩ := _root_.GlobalTheory.HL.Defect.exponents_and_defect L r k S d Λ hT
+  obtain ⟨-, -, -, -, -, ⟨i, -, hq⟩, -, -, -, -, hlev⟩ :=
+    _root_.GlobalTheory.HL.Defect.exponents_and_defect L r k S d Λ hT
   have hth : S.th ≠ 0 := (_root_.GlobalTheory.FrameBasic.main L r k S).2.2.2.2.2.1
   set A := S.refB (↑j + 1) Λ with hAdef
-  have hA : ∀ b : S.V × S.V, b ∈ A ↔ b.1 ∈ S.spanTo S.f (↑j + 1) ∧ b.2 ∈ S.spanTo S.f' (↑j + 1) ∧ ∃ y ∈ Λ, S.th • y = b.1 + b.2 := by
+  have hA
+      : ∀ b : S.V × S.V,
+        b ∈ A
+          ↔ b.1 ∈ S.spanTo S.f (↑j + 1) ∧ b.2 ∈ S.spanTo S.f' (↑j + 1)
+            ∧ ∃ y ∈ Λ, S.th • y = b.1 + b.2 := by
     intro b
     simp [hAdef, _root_.GlobalTheory.HL.Frames.refB, AddSubgroup.mem_prod, and_assoc]
   have hlevC : ∀ y, S.levC d Λ y = S.lev (S.fr d Λ) (S.fr' d Λ) (S.th • y) := by
@@ -82,10 +101,15 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
     intro b
     rw [hBdef, AddSubgroup.mem_inf]
     refine and_congr_right fun _ => ?_
-    simp only [AddSubgroup.mem_comap, AddSubgroup.mem_map, AddMonoidHom.add_apply, AddMonoidHom.coe_fst, AddMonoidHom.coe_snd, DistribSMul.toAddMonoidHom_apply, Submodule.mem_toAddSubgroup]
+    simp only [AddSubgroup.mem_comap, AddSubgroup.mem_map, AddMonoidHom.add_apply,
+      AddMonoidHom.coe_fst, AddMonoidHom.coe_snd, DistribSMul.toAddMonoidHom_apply,
+      Submodule.mem_toAddSubgroup]
     constructor
     · rintro ⟨m, hm, hmb⟩
-      rw [hπdef]; dsimp only; rw [← hmb, inv_smul_smul₀ hth]; exact hm
+      rw [hπdef]
+      dsimp only
+      rw [← hmb, inv_smul_smul₀ hth]
+      exact hm
     · intro h
       exact ⟨π b, h, hπsmul b⟩
   have hsatΛ : ∀ y ∈ S.sat Λ, y ∈ Λ := fun y hy => ((hsat y).1 hy).1
@@ -95,16 +119,18 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
     have hy₁Λ : y₁ ∈ Λ := by simpa using sub_mem (hsatΛ y hy) (hsatΛ _ (hMsat hyM))
     obtain ⟨u₁, hu₁, u₂, hu₂, hu⟩ := Submodule.mem_sup.1 (Submodule.smul_of_tower_mem _ S.th hy₁U)
     refine ⟨(u₁, u₂), (hA _).2 ⟨hu₁, hu₂, y₁, hy₁Λ, hu.symm⟩, ?_⟩
-    have : π (u₁, u₂) = y₁ := by
-      rw [hπdef]; dsimp only; rw [hu, inv_smul_smul₀ hth]
-    rw [this]; exact hyM
+    have : π (u₁, u₂) = y₁ := by rw [hπdef]; dsimp only; rw [hu, inv_smul_smul₀ hth]
+    rw [this]
+    exact hyM
   set K := (S.M d Λ).toAddSubgroup.addSubgroupOf (S.sat Λ).toAddSubgroup with hKdef
-  let πA : A →+ (S.sat Λ).toAddSubgroup :=
-    { toFun := fun b => ⟨π b, hπA b b.2⟩
-      map_zero' := Subtype.ext (by simp [hπdef])
-      map_add' := fun a b => Subtype.ext (hπadd a b) }
+  let πA : A →+ (S.sat Λ).toAddSubgroup := {
+    toFun := fun b => ⟨π b, hπA b b.2⟩
+    map_zero' := Subtype.ext (by simp [hπdef])
+    map_add' := fun a b => Subtype.ext (hπadd a b)
+  }
   let g : A →+ (S.sat Λ).toAddSubgroup ⧸ K := (QuotientAddGroup.mk' K).comp πA
-  have hg : ∀ a : A, g a = QuotientAddGroup.mk (⟨π a, hπA a a.2⟩ : (S.sat Λ).toAddSubgroup) := fun a => rfl
+  have hg : ∀ a : A, g a = QuotientAddGroup.mk (⟨π a, hπA a a.2⟩ : (S.sat Λ).toAddSubgroup) :=
+    fun a => rfl
   have hsurj : Function.Surjective g := by
     intro c
     obtain ⟨⟨y, hy⟩, rfl⟩ := QuotientAddGroup.mk_surjective c
@@ -114,15 +140,18 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
     simpa [neg_add_eq_sub] using hbM
   have hker : g.ker = B.addSubgroupOf A := by
     ext a
-    rw [AddMonoidHom.mem_ker, AddSubgroup.mem_addSubgroupOf, hB, hg, QuotientAddGroup.eq_zero_iff, hKdef, AddSubgroup.mem_addSubgroupOf]
+    rw [AddMonoidHom.mem_ker, AddSubgroup.mem_addSubgroupOf, hB, hg, QuotientAddGroup.eq_zero_iff,
+      hKdef, AddSubgroup.mem_addSubgroupOf]
     simp
   have hidx : B.relIndex A = β := by
-    rw [← hbe, hbe', AddSubgroup.relIndex, AddSubgroup.relIndex, ← hker, AddSubgroup.index_ker, AddMonoidHom.range_eq_top.2 hsurj, AddSubgroup.card_top]
+    rw [← hbe, hbe', AddSubgroup.relIndex, AddSubgroup.relIndex, ← hker, AddSubgroup.index_ker,
+      AddMonoidHom.range_eq_top.2 hsurj, AddSubgroup.card_top]
     rfl
   have hidx0 : B.relIndex A ≠ 0 := by rw [hidx]; exact hβ0
   haveI : Finite (A ⧸ B.addSubgroupOf A) := Nat.finite_of_card_ne_zero hidx0
   set φ := _root_.GlobalTheory.IdxInt.ind (fun b : S.V × S.V => b ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (b.1 + b.2) = ↑j + 1) with hφdef
-  have hφval : ∀ w, φ w = if w ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (w.1 + w.2) = ↑j + 1 then 1 else 0 := by
+  have hφval
+      : ∀ w, φ w = if w ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (w.1 + w.2) = ↑j + 1 then 1 else 0 := by
     intro w
     rw [hφdef]
     unfold _root_.GlobalTheory.IdxInt.ind
@@ -130,7 +159,9 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
   have hφinv : ∀ w b : S.V × S.V, b ∈ B → φ (w + b) = φ w := by
     intro w b hb
     obtain ⟨hbA, hbM⟩ := (hB b).1 hb
-    have key : (w + b ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) ((w + b).1 + (w + b).2) = ↑j + 1) ↔ (w ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (w.1 + w.2) = ↑j + 1) := by
+    have key
+        : (w + b ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) ((w + b).1 + (w + b).2) = ↑j + 1)
+          ↔ (w ∈ A ∧ S.lev (S.fr d Λ) (S.fr' d Λ) (w.1 + w.2) = ↑j + 1) := by
       by_cases hw : w ∈ A
       · rw [hlevπ, hlevπ, hπadd, hinv _ (hπA w hw) _ hbM]
         simp [hw, add_mem hw hbA]
@@ -142,7 +173,8 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
     by_contra h
     exact hw (by rw [hφval, if_neg (fun hc => h hc.1)])
   have hfin : ((fun w : S.V × S.V => (w : (S.V × S.V) ⧸ B)) '' Function.support φ).Finite := by
-    let h : A ⧸ B.addSubgroupOf A →+ (S.V × S.V) ⧸ B := QuotientAddGroup.map (B.addSubgroupOf A) B A.subtype (fun x hx => hx)
+    let h : A ⧸ B.addSubgroupOf A →+ (S.V × S.V) ⧸ B :=
+      QuotientAddGroup.map (B.addSubgroupOf A) B A.subtype (fun x hx => hx)
     refine (Set.finite_range h).subset ?_
     rintro _ ⟨w, hw, rfl⟩
     exact ⟨QuotientAddGroup.mk ⟨w, hsupp hw⟩, rfl⟩
@@ -154,19 +186,22 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
     simp [Function.mem_support, hφval, hc.1, hc.2]
   have hTfin : T.Finite := hfin.subset hTsub
   have hsum : ∑ᶠ c : (S.V × S.V) ⧸ B, φ (Quotient.out c) = (T.ncard : ℂ) := by
-    calc ∑ᶠ c : (S.V × S.V) ⧸ B, φ (Quotient.out c) = ∑ᶠ c ∈ T, (1 : ℂ) := by
-          rw [finsum_mem_def]
-          refine finsum_congr fun c => ?_
-          simp only [hφval, Set.indicator, hTdef, Set.mem_setOf_eq]
+    calc
+      ∑ᶠ c : (S.V × S.V) ⧸ B, φ (Quotient.out c) = ∑ᶠ c ∈ T, (1 : ℂ) := by
+        rw [finsum_mem_def]
+        refine finsum_congr fun c => ?_
+        simp only [hφval, Set.indicator, hTdef, Set.mem_setOf_eq]
       _ = T.ncard := by
-          rw [finsum_mem_eq_finite_toFinset_sum _ hTfin, Finset.sum_const, nsmul_eq_mul, mul_one, Set.ncard_eq_toFinset_card T hTfin]
+        rw [finsum_mem_eq_finite_toFinset_sum _ hTfin, Finset.sum_const, nsmul_eq_mul, mul_one,
+          Set.ncard_eq_toFinset_card T hTfin]
   have hout : ∀ b : S.V × S.V, Quotient.out (b : (S.V × S.V) ⧸ B) - b ∈ B := by
     intro b
     have h := QuotientAddGroup.eq.1 (QuotientAddGroup.out_eq' (b : (S.V × S.V) ⧸ B))
     rw [neg_add_eq_sub, ← neg_sub] at h
     simpa using B.neg_mem h
   set fC : (S.V × S.V) ⧸ B → Set S.V := fun c => {x | x - π (Quotient.out c) ∈ S.M d Λ} with hfCdef
-  have himage : fC '' T = {C | ∃ y ∈ S.sat Λ, S.levC d Λ y = ↑j + 1 ∧ C = {x | x - y ∈ S.M d Λ}} := by
+  have himage
+      : fC '' T = {C | ∃ y ∈ S.sat Λ, S.levC d Λ y = ↑j + 1 ∧ C = {x | x - y ∈ S.M d Λ}} := by
     ext C
     constructor
     · rintro ⟨c, hc, rfl⟩
@@ -196,19 +231,20 @@ theorem _root_.GlobalTheory.TopLevelShare.main : ∀ {F : Type} [Field F] [Valua
     intro c₁ hc₁ c₂ hc₂ heq
     have hmem : π (Quotient.out c₁) ∈ fC c₁ := by
       show π (Quotient.out c₁) - π (Quotient.out c₁) ∈ S.M d Λ
-      rw [sub_self]; exact zero_mem _
+      rw [sub_self]
+      exact zero_mem _
     rw [heq] at hmem
     have hB₁₂ : Quotient.out c₁ - Quotient.out c₂ ∈ B :=
       (hB _).2 ⟨sub_mem hc₁.1 hc₂.1, by rw [hπsub]; exact hmem⟩
-    rw [← QuotientAddGroup.out_eq' c₁, ← QuotientAddGroup.out_eq' c₂, QuotientAddGroup.eq, neg_add_eq_sub, ← neg_sub]
+    rw [← QuotientAddGroup.out_eq' c₁, ← QuotientAddGroup.out_eq' c₂, QuotientAddGroup.eq,
+      neg_add_eq_sub, ← neg_sub]
     exact B.neg_mem hB₁₂
   have hcount : T.ncard = βJ := by
     rw [← hJ]
     unfold _root_.GlobalTheory.HL.Frames.nLev
     rw [← himage, Set.InjOn.ncard_image hinj]
   have hTne : T.Nonempty := by
-    have : (fC '' T).Nonempty := by
-      rw [himage]; exact ⟨_, y₀, hy₀, hy₀l, rfl⟩
+    have : (fC '' T).Nonempty := by rw [himage]; exact ⟨_, y₀, hy₀, hy₀l, rfl⟩
     exact Set.image_nonempty.1 this
   refine ⟨?_, Nat.one_le_iff_ne_zero.2 hβ0, ⟨B, hfine⟩, ?_⟩
   · rw [← hcount]

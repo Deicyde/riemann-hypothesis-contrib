@@ -22,6 +22,7 @@ theorem lemmaRb : LemmaRb := reduction_lemma_second
 theorem specDet : SpecDet := spectral_determinant_formula
 theorem stepA : StepA := reduction_first_step
 
-theorem interlace : Formalism.LatticeIndexTer.Interlace := Formalism.LatticeIndexTer.sumInterlacedBound
+theorem interlace : Formalism.LatticeIndexTer.Interlace :=
+  Formalism.LatticeIndexTer.sumInterlacedBound
 
 end Formalism.DivisionValues

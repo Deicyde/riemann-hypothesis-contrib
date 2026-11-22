@@ -23,12 +23,11 @@ theorem eps_zero (X : PT E) : X.eps 0 = 1 := by
   · rw [h1] at h
     norm_num [Hf] at h
 
-theorem natCast_smul_mem (X : PT E) {x : Vsp X.dim} (hx : x ∈ X.L) (k : ℕ) :
-    (k : ℂ) • x ∈ X.L := by
+theorem natCast_smul_mem (X : PT E) {x : Vsp X.dim} (hx : x ∈ X.L) (k : ℕ) : (k : ℂ) • x ∈ X.L := by
   rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hx k
 
-theorem eps_natCast_smul (X : PT E) {x : Vsp X.dim} (hx : x ∈ X.L) (k : ℕ) :
-    (X.eps ((k : ℂ) • x) : ℝ) = (X.eps x : ℝ) ^ k := by
+theorem eps_natCast_smul (X : PT E) {x : Vsp X.dim} (hx : x ∈ X.L) (k : ℕ)
+    : (X.eps ((k : ℂ) • x) : ℝ) = (X.eps x : ℝ) ^ k := by
   induction k with
   | zero => simp [eps_zero]
   | succ k ih =>
@@ -38,8 +37,8 @@ theorem eps_natCast_smul (X : PT E) {x : Vsp X.dim} (hx : x ∈ X.L) (k : ℕ) :
       rw [Complex.im_sum]
       refine Finset.sum_eq_zero fun i _ => ?_
       simp [PiLp.smul_apply, mul_assoc, Complex.mul_conj]
-    rw [show ((k + 1 : ℕ) : ℂ) • x = (k : ℂ) • x + x by push_cast; rw [add_smul, one_smul],
-      h, ih, him]
+    rw [show ((k + 1 : ℕ) : ℂ) • x = (k : ℂ) • x + x by push_cast; rw [add_smul, one_smul], h, ih,
+      him]
     simp [pow_succ]
 
 theorem isPi_natCast (X : PT E) (n : ℕ) : IsPi X (n ^ 2) ((n : ℂ) • LinearMap.id) := by
@@ -66,8 +65,8 @@ theorem isPi_natCast (X : PT E) (n : ℕ) : IsPi X (n ^ 2) ((n : ℂ) • Linear
         rcases neg_one_pow_eq_or ℝ n with h3 | h3 <;> simp [h3]
     exact_mod_cast h.trans h2
 
-theorem exists_isReps (X : PT E) (n : ℕ) (hn : n ≠ 0) :
-    ∃ K, IsReps X (n ^ 2) 1 ((n : ℂ) • LinearMap.id) K := by
+theorem exists_isReps (X : PT E) (n : ℕ) (hn : n ≠ 0)
+    : ∃ K, IsReps X (n ^ 2) 1 ((n : ℂ) • LinearMap.id) K := by
   classical
   have hn' : (n : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hn
   have hsq : ∀ x : Vsp X.dim, ((n ^ 2 : ℕ) : ℂ) • x = (n : ℂ) • (n : ℂ) • x := fun x => by
@@ -75,8 +74,7 @@ theorem exists_isReps (X : PT E) (n : ℕ) (hn : n ≠ 0) :
   let S : Set (Fin 1 → Vsp X.dim) :=
     {b | (n : ℂ) • (n : ℂ) • b 0 ∈ X.L ∧ (n : ℂ) • b 0 ∈ ZSpan.fundamentalDomain X.b}
   have hS : S.Finite := by
-    have hb := ZSpan.setFinite_inter X.b
-      ((ZSpan.fundamentalDomain_isBounded X.b).smul₀ (n : ℂ))
+    have hb := ZSpan.setFinite_inter X.b ((ZSpan.fundamentalDomain_isBounded X.b).smul₀ (n : ℂ))
     refine Set.Finite.of_injOn (f := fun b => (n : ℂ) • (n : ℂ) • b 0) ?_ ?_ hb
     · intro b hb
       exact ⟨Set.smul_mem_smul_set hb.2, hb.1⟩
@@ -92,8 +90,11 @@ theorem exists_isReps (X : PT E) (n : ℕ) (hn : n ≠ 0) :
     have hfl : (n : ℂ) • b 0 - ZSpan.fract X.b ((n : ℂ) • b 0) ∈ X.L := by
       rw [ZSpan.fract_apply, sub_sub_cancel]
       exact (ZSpan.floor X.b _).2
-    refine ⟨fun _ => (n : ℂ)⁻¹ • ZSpan.fract X.b ((n : ℂ) • b 0), ⟨hS.mem_toFinset.2 ⟨?_, ?_⟩,
-      fun k => ?_⟩, ?_⟩
+    refine ⟨
+      fun _ => (n : ℂ)⁻¹ • ZSpan.fract X.b ((n : ℂ) • b 0),
+      ⟨hS.mem_toFinset.2 ⟨?_, ?_⟩, fun k => ?_⟩,
+      ?_
+    ⟩
     · simp only [smul_inv_smul₀ hn']
       have := sub_mem hb0 (natCast_smul_mem X hfl n)
       rwa [smul_sub, sub_sub_cancel] at this
@@ -110,9 +111,12 @@ theorem exists_isReps (X : PT E) (n : ℕ) (hn : n ≠ 0) :
         ZSpan.fract_eq_fract, neg_add_eq_sub]
       exact h2
 
-theorem exists_ne_zero_on_coset (E : Type) [Field E] [NumberField E] [IsCMField E] (X : PT E)
-    (s : (Fin 1 → Vsp X.dim) → ℂ) (hs : s ∈ X.Sec 1 1) (h0 : s ≠ 0) (n : ℕ) (hn : 2 ≤ n)
-    (a : Vsp X.dim) : ∃ y ∈ X.L, s (fun _ => a + ((n : ℂ)⁻¹) • y) ≠ 0 := by
+theorem exists_ne_zero_on_coset
+    (E : Type) [Field E] [NumberField E] [IsCMField E]
+    (X : PT E) (s : (Fin 1 → Vsp X.dim) → ℂ) (hs : s ∈ X.Sec 1 1) (h0 : s ≠ 0)
+    (n : ℕ) (hn : 2 ≤ n)
+    (a : Vsp X.dim)
+    : ∃ y ∈ X.L, s (fun _ => a + ((n : ℂ)⁻¹) • y) ≠ 0 := by
   by_contra hcon
   push Not at hcon
   have hn0 : n ≠ 0 := by omega
@@ -121,12 +125,13 @@ theorem exists_ne_zero_on_coset (E : Type) [Field E] [NumberField E] [IsCMField 
   obtain ⟨K, hK⟩ := exists_isReps X n hn0
   obtain ⟨-, -, -, hspan⟩ :=
     thetaBasis_holds E X (n ^ 2) 1 _ (by omega) (isPi_natCast X n) s hs h0 K hK
-  obtain ⟨F, hF, hFv⟩ := GlobalTheory.BasePointFree.exists_sec_ne_zero E X s hs h0 (n ^ 2) hq
-    (fun _ => (n : ℂ)⁻¹ • a)
+  obtain ⟨F, hF, hFv⟩ :=
+    GlobalTheory.BasePointFree.exists_sec_ne_zero E X s hs h0 (n ^ 2) hq (fun _ => (n : ℂ)⁻¹ • a)
   apply hFv
-  have hle : Submodule.span ℂ ((fun b => X.U (n ^ 2) b (s0 X ((n : ℂ) • LinearMap.id) s)) ''
-      (K : Set _)) ≤ LinearMap.ker (LinearMap.proj (R := ℂ) (φ := fun _ => ℂ)
-        (fun _ : Fin 1 => (n : ℂ)⁻¹ • a)) := by
+  have hle
+      : Submodule.span ℂ ((fun b => X.U (n ^ 2) b (s0 X ((n : ℂ) • LinearMap.id) s)) '' (K : Set _))
+        ≤ LinearMap.ker
+          (LinearMap.proj (R := ℂ) (φ := fun _ => ℂ) (fun _ : Fin 1 => (n : ℂ)⁻¹ • a)) := by
     rw [Submodule.span_le]
     rintro _ ⟨b, hb, rfl⟩
     have h := hcon _ (neg_mem (hK.1 b hb 0))

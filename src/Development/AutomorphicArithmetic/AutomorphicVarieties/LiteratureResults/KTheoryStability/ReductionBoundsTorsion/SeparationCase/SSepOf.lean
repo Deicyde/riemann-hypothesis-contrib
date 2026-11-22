@@ -21,15 +21,21 @@ theorem sSep : SSep := by
       Submodule.mem_map_of_mem (LinearMap.mem_range_self _ w)
     rw [hφp] at hw
     exact (Submodule.mem_bot ℝ).mp hw
-  refine ⟨fun y => φ (Finsupp.single (fun i : Fin (k + 1) => (y i.castSucc)⁻¹ * y i.succ) 1), ?_, ?_, ?_⟩
+  refine
+    ⟨fun y => φ (Finsupp.single (fun i : Fin (k + 1) => (y i.castSucc)⁻¹ * y i.succ) 1), ?_, ?_, ?_⟩
   · intro g y
     simp [smul_eq_mul, mul_assoc]
   · funext y
-    have key : dC (fun y : Fin (k + 2) → G =>
-        φ (Finsupp.single (fun i : Fin (k + 1) => (y i.castSucc)⁻¹ * y i.succ) 1)) y
-        = φ (bd G (k + 1) (Finsupp.single (fun i : Fin (k + 2) => (y i.castSucc)⁻¹ * y i.succ) 1)) := by
+    have key
+        : dC
+            (fun y : Fin (k + 2) → G =>
+              φ (Finsupp.single (fun i : Fin (k + 1) => (y i.castSucc)⁻¹ * y i.succ) 1))
+            y
+          = φ (bd G (k + 1)
+            (Finsupp.single (fun i : Fin (k + 2) => (y i.castSucc)⁻¹ * y i.succ) 1)) := by
       set_option synthInstance.maxHeartbeats 100000 in
-        simp only [dC, bd, Finsupp.linearCombination_single, one_smul, map_add (f := _), map_sum, map_smul]
+        simp only [dC, bd, Finsupp.linearCombination_single, one_smul, map_add (f := _), map_sum,
+          map_smul]
       rw [Fin.sum_univ_succ]
       congr 1
       · simp only [Fin.val_zero, pow_zero, one_mul, Fin.succAbove_zero, Fin.succ_castSucc]
@@ -59,15 +65,21 @@ theorem sSep : SSep := by
           rw [e1, e2, Fin.succ_castSucc]
     rw [key, hφ]
     rfl
-  · have hev : ev (MonoidHom.id G) (fun y : Fin (k + 2) → G =>
-        φ (Finsupp.single (fun i : Fin (k + 1) => (y i.castSucc)⁻¹ * y i.succ) 1)) 1 z = φ z := by
+  · have hev
+        : ev (MonoidHom.id G)
+            (fun y : Fin (k + 2) → G =>
+              φ (Finsupp.single (fun i : Fin (k + 1) => (y i.castSucc)⁻¹ * y i.succ) 1))
+            1 z
+          = φ z := by
       unfold ev
       simp only [MonoidHom.id_apply, smul_eq_mul, mul_one]
       conv_rhs => rw [← Finsupp.sum_single z]
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [Finsupp.sum, map_sum]
       refine Finset.sum_congr rfl (fun g _ => ?_)
-      have hg : (fun i : Fin (k + 1) => (Fin.partialProd g i.castSucc)⁻¹ * Fin.partialProd g i.succ) = g := by
+      have hg
+          : (fun i : Fin (k + 1) => (Fin.partialProd g i.castSucc)⁻¹ * Fin.partialProd g i.succ)
+            = g := by
         funext i
         simp [Fin.partialProd_succ]
       rw [hg, ← smul_eq_mul, ← map_smul, Finsupp.smul_single, smul_eq_mul, mul_one]

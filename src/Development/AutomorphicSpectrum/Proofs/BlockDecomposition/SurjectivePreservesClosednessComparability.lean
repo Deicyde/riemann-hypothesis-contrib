@@ -5,23 +5,33 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
+open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison
+  CrystallineSemistableComparison.R
 
 namespace GlobalTheory.CompanionTheory.SurjPass
 
-theorem aic_of_surjective {S : Type} [CommRing S] {T : Type} [CommRing T] (φ : S →+* T)
-    (hφ : Function.Surjective φ) (h : Aic (S := S)) : Aic (S := T) := by
+theorem aic_of_surjective
+    {S : Type} [CommRing S]
+    {T : Type} [CommRing T]
+    (φ : S →+* T) (hφ : Function.Surjective φ)
+    (h : Aic (S := S))
+    : Aic (S := T) := by
   intro P hP hdeg
   rcases subsingleton_or_nontrivial T with hT | hT
   · exact ⟨0, Subsingleton.elim _ _⟩
-  obtain ⟨Q, hQ, hQdeg, hQm⟩ := Polynomial.lifts_and_natDegree_eq_and_monic
-    ((Polynomial.lifts_iff_coeff_lifts P).mpr fun n => hφ (P.coeff n)) hP
+  obtain ⟨Q, hQ, hQdeg, hQm⟩ :=
+    Polynomial.lifts_and_natDegree_eq_and_monic
+      ((Polynomial.lifts_iff_coeff_lifts P).mpr fun n => hφ (P.coeff n)) hP
   obtain ⟨x, hx⟩ := h Q hQm (hQdeg ▸ hdeg)
   refine ⟨φ x, ?_⟩
   rw [← hQ, Polynomial.IsRoot, Polynomial.eval_map, Polynomial.eval₂_hom, hx.eq_zero, map_zero]
 
-theorem comparable_of_surjective {S : Type} [CommRing S] {T : Type} [CommRing T] (φ : S →+* T)
-    (hφ : Function.Surjective φ) (h : Val0 (S := S)) : Val0 (S := T) := by
+theorem comparable_of_surjective
+    {S : Type} [CommRing S]
+    {T : Type} [CommRing T]
+    (φ : S →+* T) (hφ : Function.Surjective φ)
+    (h : Val0 (S := S))
+    : Val0 (S := T) := by
   intro f g
   obtain ⟨f', rfl⟩ := hφ f
   obtain ⟨g', rfl⟩ := hφ g
@@ -36,8 +46,9 @@ theorem comparable_of_surjective {S : Type} [CommRing S] {T : Type} [CommRing T]
     rw [← map_one φ, ← map_sub, ← map_mul]
     exact map_dvd φ h2
 
-theorem absolutely_closed_comparable_surjective : ∀ {S : Type} [CommRing S] {T : Type} [CommRing T] (φ : S →+* T),
-    Function.Surjective φ → (Aic (S := S) → Aic (S := T)) ∧ (Val0 (S := S) → Val0 (S := T)) := by
+theorem absolutely_closed_comparable_surjective
+    : ∀ {S : Type} [CommRing S] {T : Type} [CommRing T] (φ : S →+* T),
+      Function.Surjective φ → (Aic (S := S) → Aic (S := T)) ∧ (Val0 (S := S) → Val0 (S := T)) := by
   intro S _ T _ φ hφ
   exact ⟨aic_of_surjective φ hφ, comparable_of_surjective φ hφ⟩
 

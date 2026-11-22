@@ -9,8 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE
-  GlobalTheory.CompanionTheory.GE.Step
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE GlobalTheory.CompanionTheory.GE.Step
 
 namespace GlobalTheory.CompanionTheory.GE.Step.Maps
 
@@ -45,8 +45,10 @@ section Mul
 
 attribute [local instance] algebraOfOver
 
-variable {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
-  [X.Over (Spec (.of A))]
+variable
+  {A : Type} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{0}} [X.Over (Spec (.of A))]
 
 lemma exists_smulHom_eq (P : X.Modules) {a : A} (ha : a ∈ I ^ 1) :
     ∃ m : P ⟶ idealPow I P 1, m ≫ idealPowι I P 1 = GroundTheory.Arith.SchemeCoh.smulHom P (algebraMap A Γ(X, ⊤) a) := by
@@ -75,10 +77,14 @@ lemma factors_powSub (P : X.Modules) (n : ℕ) {a : A} (ha : a ∈ I ^ 1) :
   rw [Category.assoc, idealPowMul_ι, ← Category.assoc, Subobject.underlyingIso_hom_comp_eq_mk]
   rfl
 
-theorem mapsDown_toFunctions {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A)
-    {X : Scheme.{0}} [X.Over (Spec (.of A))] {P : X.Modules} (_ : P.IsQuasicoherent)
-    (S : ℕ → Subobject P) (hS : ClosedSys I P S) (a : A) (ha : a ∈ I) :
-    MapsDown S (toFunctions (X := X) (A := A) ⊤ a) := by
+theorem mapsDown_toFunctions
+    {A : Type} [CommRing A] [IsNoetherianRing A]
+    (I : Ideal A)
+    {X : Scheme.{0}} [X.Over (Spec (.of A))]
+    {P : X.Modules} (_ : P.IsQuasicoherent)
+    (S : ℕ → Subobject P) (hS : ClosedSys I P S)
+    (a : A) (ha : a ∈ I)
+    : MapsDown S (toFunctions (X := X) (A := A) ⊤ a) := by
   have ha1 : a ∈ I ^ 1 := by rwa [pow_one]
   have hr : toFunctions (X := X) (A := A) ⊤ a = algebraMap A Γ(X, ⊤) a := by
     simp only [GroundTheory.Arith.SchemeCoh.toFunctions, RingHom.comp_apply]

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZer
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 noncomputable section
 
@@ -14,46 +15,85 @@ namespace GlobalTheory.PolFan
 
 section Enumerate
 
-theorem exists_enum_fin {n : ℕ} (P : Fin n → Prop) :
-    ∃ (p : ℕ) (e : Fin p ↪ Fin n), ∀ k, P k ↔ k ∈ Set.range e := by
+theorem exists_enum_fin {n : ℕ} (P : Fin n → Prop)
+    : ∃ (p : ℕ) (e : Fin p ↪ Fin n), ∀ k, P k ↔ k ∈ Set.range e := by
   classical
-  refine ⟨(Finset.univ.filter P).card, ((Finset.univ.filter P).orderEmbOfFin rfl).toEmbedding, fun k => ?_⟩
+  refine ⟨
+    (Finset.univ.filter P).card,
+    ((Finset.univ.filter P).orderEmbOfFin rfl).toEmbedding,
+    fun k => ?_
+  ⟩
   have := (Finset.univ.filter P).range_orderEmbOfFin rfl
   change _ ↔ k ∈ Set.range ((Finset.univ.filter P).orderEmbOfFin rfl)
   rw [this]
   simp
 
-theorem exists_append_emb {p r b a : ℕ} (eS : Fin p ↪ Fin b) (eT : Fin r ↪ Fin a) :
-    ∃ s : Fin (p + r) ↪ Fin (b + a), (∀ k, s (Fin.castAdd r k) = Fin.castAdd a (eS k)) ∧
-      ∀ j, s (Fin.natAdd p j) = Fin.natAdd b (eT j) := by
-  refine ⟨(finSumFinEquiv.symm.toEmbedding.trans (Function.Embedding.sumMap eS eT)).trans finSumFinEquiv.toEmbedding,
-    fun k => ?_, fun j => ?_⟩
+theorem exists_append_emb {p r b a : ℕ} (eS : Fin p ↪ Fin b) (eT : Fin r ↪ Fin a)
+    : ∃ s : Fin (p + r) ↪ Fin (b + a),
+      (∀ k, s (Fin.castAdd r k) = Fin.castAdd a (eS k))
+        ∧ ∀ j, s (Fin.natAdd p j) = Fin.natAdd b (eT j) := by
+  refine ⟨
+    (finSumFinEquiv.symm.toEmbedding.trans (Function.Embedding.sumMap eS eT)).trans
+      finSumFinEquiv.toEmbedding,
+    fun k => ?_,
+    fun j => ?_
+  ⟩
   · simp
   · simp
 
-theorem exists_extend_coeff {R : Type*} [Semiring R] {p n : ℕ} (e : Fin p ↪ Fin n) (d : Fin p → R) :
-    ∃ r : Fin n → R, (∀ j, r (e j) = d j) ∧ (∀ x, x ∉ Set.range e → r x = 0) ∧
-      ∀ {M : Type _} [AddCommMonoid M] [Module R M] (f : Fin n → M), ∑ x, r x • f x = ∑ j, d j • f (e j) := by
+theorem exists_extend_coeff {R : Type*} [Semiring R] {p n : ℕ} (e : Fin p ↪ Fin n) (d : Fin p → R)
+    : ∃ r : Fin n → R,
+      (∀ j, r (e j) = d j) ∧ (∀ x, x ∉ Set.range e → r x = 0)
+        ∧ ∀ {M : Type _} [AddCommMonoid M] [Module R M] (f : Fin n → M),
+          ∑ x, r x • f x = ∑ j, d j • f (e j) := by
   classical
   have h1 : ∀ j, Function.extend e d 0 (e j) = d j := fun j => e.injective.extend_apply _ _ _
   have h2 : ∀ x, x ∉ Set.range e → Function.extend e d 0 x = 0 := fun x hx => by
     rw [Function.extend_apply' _ _ _ (by simpa using hx)]
     rfl
   refine ⟨Function.extend e d 0, h1, h2, fun f => ?_⟩
-  rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.map e)) (fun x _ hx => ?_), Finset.sum_map]
+  rw [← Finset.sum_subset (Finset.subset_univ (Finset.univ.map e)) (fun x _ hx => ?_),
+    Finset.sum_map]
   · simp only [Function.Embedding.coeFn_mk, h1]
   · rw [h2 x (fun ⟨j, hj⟩ => hx (by simp [← hj])), zero_smul]
 
-theorem exists_perm_append_cons {α : Type*} {p q : ℕ} (x : α) (f : Fin p → α) (g : Fin q → α) :
-    ∃ e : Fin (p + (q + 1)) ≃ Fin (p + q + 1), ∀ i,
-      Fin.append f (Fin.cons x g : Fin (q + 1) → α) i = (Fin.cons x (Fin.append f g) : Fin (p + q + 1) → α) (e i) := by
+theorem exists_perm_append_cons {α : Type*} {p q : ℕ} (x : α) (f : Fin p → α) (g : Fin q → α)
+    : ∃ e : Fin (p + (q + 1)) ≃ Fin (p + q + 1), ∀ i,
+      Fin.append f (Fin.cons x g : Fin (q + 1) → α) i
+        = (Fin.cons x (Fin.append f g) : Fin (p + q + 1) → α) (e i) := by
   let F : Fin (p + (q + 1)) → Fin (p + q + 1) := fun i =>
-    if h : (i : ℕ) < p then ⟨i + 1, by omega⟩ else if (i : ℕ) = p then ⟨0, by omega⟩ else ⟨i, by have := i.isLt; omega⟩
+    if h : (i : ℕ) < p then
+      ⟨i + 1, by omega⟩
+    else if (i : ℕ) = p then
+      ⟨0, by omega⟩
+    else
+      ⟨i, by have := i.isLt; omega⟩
   let G : Fin (p + q + 1) → Fin (p + (q + 1)) := fun j =>
-    if (j : ℕ) = 0 then ⟨p, by omega⟩ else if (j : ℕ) ≤ p then ⟨j - 1, by omega⟩ else ⟨j, by have := j.isLt; omega⟩
-  have hF : ∀ i, (F i : ℕ) = if (i : ℕ) < p then (i : ℕ) + 1 else if (i : ℕ) = p then 0 else (i : ℕ) := fun i => by
+    if (j : ℕ) = 0 then
+      ⟨p, by omega⟩
+    else if (j : ℕ) ≤ p then
+      ⟨j - 1, by omega⟩
+    else
+      ⟨j, by have := j.isLt; omega⟩
+  have hF
+      : ∀ i,
+        (F i : ℕ)
+          = if (i : ℕ) < p then
+              (i : ℕ) + 1
+            else if (i : ℕ) = p then
+              0
+            else
+              (i : ℕ) := fun i => by
     simp only [F]; split_ifs <;> rfl
-  have hG : ∀ j, (G j : ℕ) = if (j : ℕ) = 0 then p else if (j : ℕ) ≤ p then (j : ℕ) - 1 else (j : ℕ) := fun j => by
+  have hG
+      : ∀ j,
+        (G j : ℕ)
+          = if (j : ℕ) = 0 then
+              p
+            else if (j : ℕ) ≤ p then
+              (j : ℕ) - 1
+            else
+              (j : ℕ) := fun j => by
     simp only [G]; split_ifs <;> rfl
   have hGF : ∀ i, G (F i) = i := fun i => by
     apply Fin.ext
@@ -83,10 +123,65 @@ end Enumerate
 
 section Step
 
-theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ lab φ' w : InvFun O) (i : ℕ) (X : Type) [AddCommGroup X] [Module O X] [Module.Finite O X] (b a : ℕ) (v : Fin b → LinearMap.BilinForm ℤ X) (u : Fin a → LinearMap.BilinForm ℤ X), IsCell bar ψ v → Function.Injective (fun j => lab.evalZ (u j)) → (∀ j, ((i + 1 : ℕ) : ℝ) < lab.evalZ (u j)) → (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone v β → lab.evalZ β ≤ ((i + 1 : ℕ) : ℝ)) → (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone (Fin.append v u) β → ¬ InRCone v β → ((i + 1 : ℕ) : ℝ) < lab.evalZ β) → (∀ (d : Fin b → ℤ) (c : Fin a → ℤ), ∑ j, c j • u j = ∑ k, d k • v k → c = 0) → (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → ∃ n : ℕ, lab.evalZ β = n) → (∀ (m' : ℕ) (s : Fin m' ↪ Fin b) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), IsFaceCut v s h → IsCell bar ψ (fun j => v (s j))) → (∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X), IsCell bar ψ γ → ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone γ β → lab.evalZ β = ((i + 1 : ℕ) : ℝ) → ∃ β₁ ∈ balForms bar X, (∀ y, 0 ≤ β₁ y y) ∧ w.evalZ β₁ = 1 ∧ InRCone γ β₁) → (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → ∀ β' ∈ balForms bar X, (∀ y, 0 ≤ β' y y) → w.evalZ β = 1 → w.evalZ β' = 1 → InRCone (Fin.append v u) β → InRCone (Fin.append v u) β' → β = β') → (∀ β₀ ∈ balForms bar X, (∀ y, 0 ≤ β₀ y y) → ∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone v β₀ → ∀ (c₀ : ℝ) (c : Fin b → ℝ), 0 < c₀ → (∀ k, 0 ≤ c k) → toReal β = c₀ • toReal β₀ + ∑ k, c k • toReal (v k) → lab.evalZ β₀ ≤ lab.evalZ β) → ∀ β₀ ∈ balForms bar X, (∀ y, 0 ≤ β₀ y y) → w.evalZ β₀ = 1 → lab.evalZ β₀ = ((i + 1 : ℕ) : ℝ) → InRCone (Fin.append v u) β₀ → (∀ (m' : ℕ) (s : Fin m' ↪ Fin (b + a)) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), IsFaceCut (Fin.append v u) s h → 0 < h β₀ → IsCell bar φ' (Fin.cons β₀ fun j => Fin.append v u (s j))) → ∀ (m' : ℕ) (s : Fin m' ↪ Fin (b + a)) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ), IsFaceCut (Fin.append v u) s h → 0 < h β₀ → ∃ (b' a' : ℕ) (v' : Fin b' → LinearMap.BilinForm ℤ X) (u' : Fin a' → LinearMap.BilinForm ℤ X), IsCell bar φ' (Fin.append v' u') ∧ IsCell bar ψ v' ∧ (∀ k, InRCone (Fin.append v' u') ((Fin.cons β₀ fun j => Fin.append v u (s j) : Fin (m' + 1) → LinearMap.BilinForm ℤ X) k)) ∧ Function.Injective (fun j => lab.evalZ (u' j)) ∧ (∀ j, (i : ℝ) < lab.evalZ (u' j)) ∧ (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone v' β → lab.evalZ β ≤ i) ∧ (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone (Fin.append v' u') β → ¬ InRCone v' β → (i : ℝ) < lab.evalZ β) ∧ ∀ (d : Fin b' → ℤ) (c : Fin a' → ℤ), ∑ j, c j • u' j = ∑ k, d k • v' k → c = 0 := by
+theorem star_cell_bary_step
+    : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ lab φ' w : InvFun O) (i : ℕ) (X : Type)
+        [AddCommGroup X] [Module O X] [Module.Finite O X] (b a : ℕ)
+        (v : Fin b → LinearMap.BilinForm ℤ X) (u : Fin a → LinearMap.BilinForm ℤ X),
+      IsCell bar ψ v → Function.Injective (fun j => lab.evalZ (u j))
+        → (∀ j, ((i + 1 : ℕ) : ℝ) < lab.evalZ (u j))
+        → (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone v β → lab.evalZ β ≤ ((i + 1 : ℕ) : ℝ))
+        → (∀ β ∈ balForms bar X,
+          (∀ y, 0 ≤ β y y) → InRCone (Fin.append v u) β → ¬ InRCone v β
+            → ((i + 1 : ℕ) : ℝ) < lab.evalZ β)
+        → (∀ (d : Fin b → ℤ) (c : Fin a → ℤ), ∑ j, c j • u j = ∑ k, d k • v k → c = 0)
+        → (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → ∃ n : ℕ, lab.evalZ β = n)
+        → (∀ (m' : ℕ) (s : Fin m' ↪ Fin b) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
+          IsFaceCut v s h → IsCell bar ψ (fun j => v (s j)))
+        → (∀ (m : ℕ) (γ : Fin m → LinearMap.BilinForm ℤ X),
+          IsCell bar ψ γ
+            → ∀ β ∈ balForms bar X,
+              (∀ y, 0 ≤ β y y) → InRCone γ β → lab.evalZ β = ((i + 1 : ℕ) : ℝ)
+                → ∃ β₁ ∈ balForms bar X, (∀ y, 0 ≤ β₁ y y) ∧ w.evalZ β₁ = 1 ∧ InRCone γ β₁)
+        → (∀ β ∈ balForms bar X,
+          (∀ y, 0 ≤ β y y)
+            → ∀ β' ∈ balForms bar X,
+              (∀ y, 0 ≤ β' y y) → w.evalZ β = 1 → w.evalZ β' = 1 → InRCone (Fin.append v u) β
+                → InRCone (Fin.append v u) β'
+                → β = β')
+        → (∀ β₀ ∈ balForms bar X,
+          (∀ y, 0 ≤ β₀ y y)
+            → ∀ β ∈ balForms bar X,
+              (∀ y, 0 ≤ β y y) → InRCone v β₀
+                → ∀ (c₀ : ℝ) (c : Fin b → ℝ),
+                  0 < c₀ → (∀ k, 0 ≤ c k) → toReal β = c₀ • toReal β₀ + ∑ k, c k • toReal (v k)
+                    → lab.evalZ β₀ ≤ lab.evalZ β)
+        → ∀ β₀ ∈ balForms bar X,
+          (∀ y, 0 ≤ β₀ y y) → w.evalZ β₀ = 1 → lab.evalZ β₀ = ((i + 1 : ℕ) : ℝ)
+            → InRCone (Fin.append v u) β₀
+            → (∀ (m' : ℕ) (s : Fin m' ↪ Fin (b + a)) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
+              IsFaceCut (Fin.append v u) s h → 0 < h β₀
+                → IsCell bar φ' (Fin.cons β₀ fun j => Fin.append v u (s j)))
+            → ∀ (m' : ℕ) (s : Fin m' ↪ Fin (b + a)) (h : LinearMap.BilinForm ℤ X →ₗ[ℤ] ℤ),
+              IsFaceCut (Fin.append v u) s h → 0 < h β₀
+                → ∃ (b' a' : ℕ) (v' : Fin b' → LinearMap.BilinForm ℤ X)
+                    (u' : Fin a' → LinearMap.BilinForm ℤ X),
+                  IsCell bar φ' (Fin.append v' u') ∧ IsCell bar ψ v'
+                    ∧ (∀ k,
+                      InRCone (Fin.append v' u')
+                        ((Fin.cons β₀ fun j => Fin.append v u (s j)
+                            : Fin (m' + 1) → LinearMap.BilinForm ℤ X)
+                          k))
+                    ∧ Function.Injective (fun j => lab.evalZ (u' j))
+                    ∧ (∀ j, (i : ℝ) < lab.evalZ (u' j))
+                    ∧ (∀ β ∈ balForms bar X, (∀ y, 0 ≤ β y y) → InRCone v' β → lab.evalZ β ≤ i)
+                    ∧ (∀ β ∈ balForms bar X,
+                      (∀ y, 0 ≤ β y y) → InRCone (Fin.append v' u') β → ¬ InRCone v' β
+                        → (i : ℝ) < lab.evalZ β)
+                    ∧ ∀ (d : Fin b' → ℤ) (c : Fin a' → ℤ),
+                      ∑ j, c j • u' j = ∑ k, d k • v' k → c = 0 := by
   classical
-  intro O _ bar ψ lab φ' w i X _ _ _ b a v u hv hinj hlab hle hgt hind hnat hface hex huniq hmono β₀ hβ₀ hβ₀n hw hl0 hcone
-    hstar m' s h hcut hpos
+  intro O _ bar ψ lab φ' w i X _ _ _ b a v u hv hinj hlab hle hgt hind hnat hface hex huniq hmono β₀
+    hβ₀ hβ₀n hw hl0 hcone hstar m' s h hcut hpos
   set G := Fin.append v u with hGdef
   have hGv : ∀ k, G (Fin.castAdd a k) = v k := fun k => Fin.append_left v u k
   have hGu : ∀ j, G (Fin.natAdd b j) = u j := fun j => Fin.append_right v u j
@@ -107,10 +202,11 @@ theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ la
   set u' : Fin (r + 1) → LinearMap.BilinForm ℤ X := Fin.cons β₀ uT with hu'def
   have hvS0 : ∀ k, h (v' k) = 0 := fun k => (heS _).2 ⟨k, rfl⟩
   have huT0 : ∀ j, h (uT j) = 0 := fun j => (heT _).2 ⟨j, rfl⟩
-  have hcomp : (fun j => G (s' j)) = Fin.append v' uT := funext fun j => by
-    induction j using Fin.addCases with
-    | left k => simp only [hs1, hGv, Fin.append_left, hv'def]
-    | right l => simp only [hs2, hGu, Fin.append_right, huTdef]
+  have hcomp : (fun j => G (s' j)) = Fin.append v' uT :=
+    funext fun j => by
+      induction j using Fin.addCases with
+      | left k => simp only [hs1, hGv, Fin.append_left, hv'def]
+      | right l => simp only [hs2, hGu, Fin.append_right, huTdef]
   have hz : ∀ x, h (Fin.append v' uT x) = 0 := fun x => by
     induction x using Fin.addCases with
     | left k => rw [Fin.append_left]; exact hvS0 k
@@ -139,8 +235,8 @@ theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ la
     funext x
     exact he x
 
-  have hcellv : IsCell bar ψ v' := hface p eS h ⟨fun k => by
-    have := hcut.1 (Fin.castAdd a k); rwa [hGv] at this, fun k => (heS k)⟩
+  have hcellv : IsCell bar ψ v' :=
+    hface p eS h ⟨fun k => by have := hcut.1 (Fin.castAdd a k); rwa [hGv] at this, fun k => (heS k)⟩
 
   have hm0 : InRCone (Fin.append v' u') β₀ := by
     have := inRCone_self (Fin.append v' u') (Fin.natAdd p 0)
@@ -181,7 +277,8 @@ theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ la
         exact hmu l'
 
   · have hl0' : lab.evalZ (u' 0) = ((i + 1 : ℕ) : ℝ) := by rw [hu'def, Fin.cons_zero]; exact hl0
-    have hls : ∀ j, lab.evalZ (u' j.succ) = lab.evalZ (u (eT j)) := fun j => by rw [hu'def, Fin.cons_succ]
+    have hls : ∀ j, lab.evalZ (u' j.succ) = lab.evalZ (u (eT j)) := fun j => by
+      rw [hu'def, Fin.cons_succ]
     intro x y hxy
     simp only at hxy
     induction x using Fin.cases with
@@ -220,7 +317,8 @@ theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ la
     · exfalso
       have h4 : n = i + 1 := le_antisymm h2 h3
       obtain ⟨β₁, hβ₁, hβ₁n, hw₁, hc₁⟩ := hex p v' hcellv β hβ hβn hin (by rw [hn, h4])
-      have hβ₁G : InRCone G β₁ := inRCone_trans (fun k => inRCone_trans (fun k' => hvG k') (hv'v k)) hc₁
+      have hβ₁G : InRCone G β₁ :=
+        inRCone_trans (fun k => inRCone_trans (fun k' => hvG k') (hv'v k)) hc₁
       have := huniq β₁ hβ₁ hβ₁n β₀ hβ₀ hβ₀n hw₁ hw hβ₁G hcone
       subst this
       obtain ⟨c, hc, ec⟩ := hc₁
@@ -234,7 +332,9 @@ theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ la
     by_cases hbv : InRCone v β
     · obtain ⟨c, hc, ec⟩ := hin
       rw [Fin.sum_univ_add] at ec
-      simp only [Fin.append_left, Fin.append_right, Fin.sum_univ_succ, hu'def, Fin.cons_zero, Fin.cons_succ] at ec
+      simp only [Fin.append_left, Fin.append_right, Fin.sum_univ_succ, hu'def, Fin.cons_zero,
+          Fin.cons_succ]
+        at ec
       set c₀ := c (Fin.natAdd p 0)
       set cv : Fin p → ℝ := fun k => c (Fin.castAdd (r + 1) k) with hcv
       set d : Fin r → ℝ := fun j => c (Fin.natAdd p j.succ) with hd
@@ -276,7 +376,9 @@ theorem star_cell_bary_step : ∀ (O : Type) [CommRing O] (bar : O → O) (ψ la
     simp only [hu'def, Fin.cons_zero, Fin.cons_succ] at hrel
     have h1 := congrArg h hrel
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum, map_zsmul, hvS0, huT0, smul_zero, smul_eq_mul, mul_zero, Finset.sum_const_zero, add_zero] at h1
+      simp only [map_add (f := _), map_sum, map_zsmul, hvS0, huT0, smul_zero, smul_eq_mul, mul_zero,
+          Finset.sum_const_zero, add_zero]
+        at h1
     have hc0 : c 0 = 0 := (mul_eq_zero.1 h1).resolve_right hpos.ne'
     rw [hc0, zero_smul, zero_add] at hrel
     obtain ⟨rc, hrc1, -, hrc⟩ := exists_extend_coeff eT (fun j => c j.succ)

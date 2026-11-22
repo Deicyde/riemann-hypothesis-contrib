@@ -8,7 +8,14 @@ open MeasureTheory
 
 namespace GlobalTheory.ChainOnto
 
-theorem map_restrict_isHaar : ∀ (G B : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G] [BorelSpace G] [Group B] [TopologicalSpace B] [IsTopologicalGroup B] [MeasurableSpace B] [BorelSpace B] [T2Space B] (ν : Measure G) [ν.IsHaarMeasure] (A : Subgroup G) (i : B →* G) (p : G →* B), IsOpen (A : Set G) → Continuous i → Continuous p → (∀ b, p (i b) = b) → (∀ b, i b ∈ A) → IsCompact {g : G | g ∈ A ∧ p g = 1} → (Measure.map p (ν.restrict A)).IsHaarMeasure := by
+theorem map_restrict_isHaar
+    : ∀ (G B : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [MeasurableSpace G]
+        [BorelSpace G] [Group B] [TopologicalSpace B] [IsTopologicalGroup B] [MeasurableSpace B]
+        [BorelSpace B] [T2Space B] (ν : Measure G) [ν.IsHaarMeasure] (A : Subgroup G) (i : B →* G)
+        (p : G →* B),
+      IsOpen (A : Set G) → Continuous i → Continuous p → (∀ b, p (i b) = b) → (∀ b, i b ∈ A)
+        → IsCompact {g : G | g ∈ A ∧ p g = 1}
+        → (Measure.map p (ν.restrict A)).IsHaarMeasure := by
   intro G B _ _ _ _ _ _ _ _ _ _ _ ν _ A i p hA hi hp hpi hiA hK
   have hpm : Measurable p := hp.measurable
   have hAm : MeasurableSet (A : Set G) := hA.measurableSet
@@ -16,7 +23,9 @@ theorem map_restrict_isHaar : ∀ (G B : Type) [Group G] [TopologicalSpace G] [I
     intro S hS
     rw [Measure.map_apply hpm hS, Measure.restrict_apply (hpm hS)]
 
-  have hpre : ∀ S : Set B, p ⁻¹' S ∩ A = (fun x : G × G => x.1 * x.2) '' ((i '' S) ×ˢ {g : G | g ∈ A ∧ p g = 1}) := by
+  have hpre
+      : ∀ S : Set B,
+        p ⁻¹' S ∩ A = (fun x : G × G => x.1 * x.2) '' ((i '' S) ×ˢ {g : G | g ∈ A ∧ p g = 1}) := by
     intro S
     ext g
     constructor
@@ -33,7 +42,8 @@ theorem map_restrict_isHaar : ∀ (G B : Type) [Group G] [TopologicalSpace G] [I
     exact ((hC.image hi).prod hK).image continuous_mul |>.measure_lt_top
   · intro b
     ext S hS
-    rw [Measure.map_apply (measurable_const_mul b) hS, happ _ (measurable_const_mul b hS), happ S hS]
+    rw [Measure.map_apply (measurable_const_mul b) hS, happ _ (measurable_const_mul b hS),
+      happ S hS]
     have : p ⁻¹' ((fun x => b * x) ⁻¹' S) ∩ A = (fun g => i b * g) ⁻¹' (p ⁻¹' S ∩ A) := by
       ext g
       simp only [Set.mem_inter_iff, Set.mem_preimage, map_mul, hpi, SetLike.mem_coe]

@@ -11,7 +11,8 @@ noncomputable section
 
 namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker Classical
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker
+  Classical
 
 theorem discrNe (D : D7) : DiscrNe D := by
   intro cc hcc
@@ -19,16 +20,19 @@ theorem discrNe (D : D7) : DiscrNe D := by
   have h4 := Formalism.L2.PairingIndexBounds.Rec.eisG_eq_G _ L hL 2 (by norm_num)
   have h6 := Formalism.L2.PairingIndexBounds.Rec.eisG_eq_G _ L hL 3 (by norm_num)
   have := Formalism.L2.Th1.F.discNeZero L
-  unfold Formalism.MainNotions.TaylorLogMetric.discr Formalism.MainNotions.TaylorLogMetric.g2 Formalism.MainNotions.TaylorLogMetric.g3
+  unfold Formalism.MainNotions.TaylorLogMetric.discr Formalism.MainNotions.TaylorLogMetric.g2
+    Formalism.MainNotions.TaylorLogMetric.g3
   rw [h4, h6]
   simpa [PeriodPair.g₂, PeriodPair.g₃] using this
 
 def LinkDeltaNe : Prop :=
-  ∀ D : D7, ∀ cc : Ideal (𝓞 D.host.K), IsCurveIdeal D cc → ∀ δ : ℂ, IsDiscriminantTwelfthRootOfIdealLattice D cc δ → δ ≠ 0
+  ∀ D : D7, ∀ cc : Ideal (𝓞 D.host.K),
+    IsCurveIdeal D cc → ∀ δ : ℂ, IsDiscriminantTwelfthRootOfIdealLattice D cc δ → δ ≠ 0
 
 def LinkQInt : Prop :=
-  ∀ D : D7, ∀ cc : Ideal (𝓞 D.host.K), IsCurveIdeal D cc → ∀ δ : ℂ, IsDiscriminantTwelfthRootOfIdealLattice D cc δ →
-    ∀ B : Base D cc δ, B.QIntAll
+  ∀ D : D7, ∀ cc : Ideal (𝓞 D.host.K),
+    IsCurveIdeal D cc
+      → ∀ δ : ℂ, IsDiscriminantTwelfthRootOfIdealLattice D cc δ → ∀ B : Base D cc δ, B.QIntAll
 
 theorem delta_nonzero_link : LinkDeltaNe := by
   intro D cc hcc δ hδ e
@@ -38,7 +42,9 @@ theorem delta_nonzero_link : LinkDeltaNe := by
 
 theorem rational_integrality_link : LinkQInt := by
   intro D cc hcc δ hδ B N N' L L' hA x hx
-  obtain ⟨a, b, hab, e⟩ := hermitian_form_integral_values D cc hcc δ hδ (delta_nonzero_link D cc hcc δ hδ) N N' L L' hA x hx x hx
+  obtain ⟨a, b, hab, e⟩ :=
+    hermitian_form_integral_values D cc hcc δ hδ (delta_nonzero_link D cc hcc δ hδ) N N' L L' hA x
+      hx x hx
   have hs := IO.sqrt_d_pos D
   have hreal : (Formalism.MainNotions.TaylorLogMetric.Hf D (tor0 D cc δ) x x).im = 0 := by
     have h1 := IO.Hf_herm (tor0 D cc δ) x x

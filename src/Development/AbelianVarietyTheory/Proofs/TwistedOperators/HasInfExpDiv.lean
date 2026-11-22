@@ -10,10 +10,13 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.How
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef Formalism.DivisionValues
 open Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
-open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
+open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr
+  GlobalTheory.IndefiniteRowSideFullHecke.MatchingAdjoints
 open scoped TensorProduct
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -28,8 +31,10 @@ variable {ι Q : Type} [AddCommGroup Q] [Module ℂ Q]
 def IsStab (ρ : ι → Module.End ℂ Q) (N : Submodule ℂ Q) : Prop := ∀ i, ∀ x ∈ N, ρ i x ∈ N
 
 def HoweCond (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) : Prop :=
-  (∃ L : ℕ, ∀ (m : ℕ) (N : Fin m → Submodule ℂ Q), StrictMono N → (∀ k, IsStab ρ (N k) ∧ C ≤ N k) → m ≤ L) ∧
-  ∀ N N' : Submodule ℂ Q, IsStab ρ N → C ≤ N → N ≠ ⊤ → IsStab ρ N' → C ≤ N' → N' ≠ ⊤ → N ⊔ N' ≠ ⊤
+  (∃ L : ℕ, ∀ (m : ℕ) (N : Fin m → Submodule ℂ Q),
+      StrictMono N → (∀ k, IsStab ρ (N k) ∧ C ≤ N k) → m ≤ L)
+    ∧ ∀ N N' : Submodule ℂ Q,
+      IsStab ρ N → C ≤ N → N ≠ ⊤ → IsStab ρ N' → C ≤ N' → N' ≠ ⊤ → N ⊔ N' ≠ ⊤
 
 def rad (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) : Submodule ℂ Q :=
   sSup {N | IsStab ρ N ∧ C ≤ N ∧ N ≠ ⊤}
@@ -45,8 +50,9 @@ theorem isStab_rad (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) : IsStab
 def radAct (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) (i : ι) : Module.End ℂ (Q ⧸ rad ρ C) :=
   (rad ρ C).mapQ (rad ρ C) (ρ i) fun x hx => isStab_rad ρ C i x hx
 
-theorem radAct_mk (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) (i : ι) (x : Q) :
-    radAct ρ C i (Submodule.Quotient.mk x) = Submodule.Quotient.mk (ρ i x) := rfl
+theorem radAct_mk (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) (i : ι) (x : Q)
+    : radAct ρ C i (Submodule.Quotient.mk x) = Submodule.Quotient.mk (ρ i x) :=
+  rfl
 
 end LA
 
@@ -54,33 +60,48 @@ section Fock
 
 variable {D : D7}
 
-def actT (ε : Bool) {M X : HSp D} (A : Fr M) (B : Fr X) (eS : D.what₂.Tau → ℚ) (τ : D.what₂.Tau)
-    (Y : Matrix (Fin X.rank) (Fin X.rank) ℂ) : Module.End ℂ (PolF D X.rank M.rank) :=
-  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.fockT τ ((frSgn ε A).ε τ) (B.ε τ) (B.fr τ * Y * (B.fr τ)⁻¹) + ((eS τ : ℂ) * Y.trace) • 1
+def actT
+    (ε : Bool)
+    {M X : HSp D} (A : Fr M) (B : Fr X)
+    (eS : D.what₂.Tau → ℚ) (τ : D.what₂.Tau) (Y : Matrix (Fin X.rank) (Fin X.rank) ℂ)
+    : Module.End ℂ (PolF D X.rank M.rank) :=
+  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.fockT τ ((frSgn ε A).ε τ) (B.ε τ)
+      (B.fr τ * Y * (B.fr τ)⁻¹)
+    + ((eS τ : ℂ) * Y.trace) • 1
 
-def actS (ε : Bool) {M X : HSp D} (A : Fr M) (B : Fr X) (eT : D.what₂.Tau → ℚ) (τ : D.what₂.Tau)
-    (Z : Matrix (Fin M.rank) (Fin M.rank) ℂ) : Module.End ℂ (PolF D X.rank M.rank) :=
-  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.fockS τ ((frSgn ε A).ε τ) (B.ε τ) ((A.fr τ * Z * (A.fr τ)⁻¹).map (starRingEnd ℂ)) -
-    ((eT τ : ℂ) * Z.trace) • 1
+def actS
+    (ε : Bool)
+    {M X : HSp D} (A : Fr M) (B : Fr X)
+    (eT : D.what₂.Tau → ℚ) (τ : D.what₂.Tau) (Z : Matrix (Fin M.rank) (Fin M.rank) ℂ)
+    : Module.End ℂ (PolF D X.rank M.rank) :=
+  GlobalTheory.IndefiniteRowSideFullHecke.RaisingLoweringOperators.fockS τ ((frSgn ε A).ε τ) (B.ε τ)
+      ((A.fr τ * Z * (A.fr τ)⁻¹).map (starRingEnd ℂ))
+    - ((eT τ : ℂ) * Z.trace) • 1
 
-def coinv (ε : Bool) {M X : HSp D} (A : Fr M) (B : Fr X) (eT : D.what₂.Tau → ℚ) : Submodule ℂ (PolF D X.rank M.rank) :=
+def coinv (ε : Bool) {M X : HSp D} (A : Fr M) (B : Fr X) (eT : D.what₂.Tau → ℚ)
+    : Submodule ℂ (PolF D X.rank M.rank) :=
   Submodule.span ℂ {P | ∃ τ, ∃ Z ∈ lieAt M τ, ∃ P₀, P = actS ε A B eT τ Z P₀}
 
-abbrev LieIx (X : HSp D) : Type := {x : D.what₂.Tau × Matrix (Fin X.rank) (Fin X.rank) ℂ // x.2 ∈ lieAt X x.1}
+abbrev LieIx (X : HSp D) : Type :=
+  {x : D.what₂.Tau × Matrix (Fin X.rank) (Fin X.rank) ℂ // x.2 ∈ lieAt X x.1}
 
 end Fock
 
 section LALemmas
 
-theorem isStab_sup {ι Q : Type} [AddCommGroup Q] [Module ℂ Q] {ρ : ι → Module.End ℂ Q} {N N' : Submodule ℂ Q}
-    (h : IsStab ρ N) (h' : IsStab ρ N') : IsStab ρ (N ⊔ N') := by
+theorem isStab_sup
+    {ι Q : Type} [AddCommGroup Q] [Module ℂ Q]
+    {ρ : ι → Module.End ℂ Q} {N N' : Submodule ℂ Q} (h : IsStab ρ N) (h' : IsStab ρ N')
+    : IsStab ρ (N ⊔ N') := by
   intro i x hx
   obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hx
   rw [map_add (f := _)]
   exact Submodule.add_mem_sup (h i y hy) (h' i z hz)
 
-theorem rad_ne_top : ∀ (ι Q : Type) [AddCommGroup Q] [Module ℂ Q] (ρ : ι → Module.End ℂ Q) (C N₀ : Submodule ℂ Q),
-  GlobalTheory.RealQuot.HoweCond ρ C → GlobalTheory.RealQuot.IsStab ρ N₀ → C ≤ N₀ → N₀ ≠ ⊤ → GlobalTheory.RealQuot.rad ρ C ≠ ⊤ := by
+theorem rad_ne_top
+    : ∀ (ι Q : Type) [AddCommGroup Q] [Module ℂ Q] (ρ : ι → Module.End ℂ Q) (C N₀ : Submodule ℂ Q),
+      GlobalTheory.RealQuot.HoweCond ρ C → GlobalTheory.RealQuot.IsStab ρ N₀ → C ≤ N₀ → N₀ ≠ ⊤
+        → GlobalTheory.RealQuot.rad ρ C ≠ ⊤ := by
   intro ι Q _ _ ρ C N₀ hH hs hC hne
   obtain ⟨⟨L, hL⟩, hsum⟩ := hH
   let S : Set (Submodule ℂ Q) := {N | IsStab ρ N ∧ C ≤ N ∧ N ≠ ⊤}
@@ -89,24 +110,31 @@ theorem rad_ne_top : ∀ (ι Q : Type) [AddCommGroup Q] [Module ℂ Q] (ρ : ι 
     by_contra hx
     obtain ⟨f, -, hf⟩ := not_acc_iff_exists_descending_chain.1 hx
     have mono : StrictMono fun n => (f n).1 := strictMono_nat_of_lt_succ hf
-    have := hL (L + 1) (fun k => (f k).1) (mono.comp Fin.val_strictMono) fun k => ⟨(f k).2.1, (f k).2.2.1⟩
+    have :=
+      hL (L + 1) (fun k => (f k).1) (mono.comp Fin.val_strictMono) fun k => ⟨(f k).2.1, (f k).2.2.1⟩
     omega
   obtain ⟨M, -, hM⟩ := wf.has_min Set.univ ⟨⟨N₀, hs, hC, hne⟩, trivial⟩
   have hmax : ∀ N ∈ S, N ≤ M.1 := by
     intro N hN
-    have hs' : M.1 ⊔ N ∈ S := ⟨isStab_sup M.2.1 hN.1, le_sup_of_le_left M.2.2.1,
-      hsum _ _ M.2.1 M.2.2.1 M.2.2.2 hN.1 hN.2.1 hN.2.2⟩
+    have hs' : M.1 ⊔ N ∈ S := ⟨
+      isStab_sup M.2.1 hN.1,
+      le_sup_of_le_left M.2.2.1,
+      hsum _ _ M.2.1 M.2.2.1 M.2.2.2 hN.1 hN.2.1 hN.2.2
+    ⟩
     by_contra h
     exact hM ⟨_, hs'⟩ trivial (lt_of_le_of_ne le_sup_left fun e => h (e ▸ le_sup_right))
   have e : rad ρ C = M.1 := le_antisymm (sSup_le hmax) (le_sSup M.2)
   rw [e]
   exact M.2.2.2
 
-theorem rad_le_ker : ∀ (ι Q Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Pi] [Module ℂ Pi] (ρ : ι → Module.End ℂ Q)
-  (C : Submodule ℂ Q) (σ : ι → Module.End ℂ Pi) (β : Q →ₗ[ℂ] Pi),
-  (∀ i, β ∘ₗ ρ i = σ i ∘ₗ β) → C ≤ LinearMap.ker β → GlobalTheory.RealQuot.rad ρ C ≠ ⊤ →
-  (∀ N : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N → ∃ N' : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N' ∧ IsCompl N N') →
-  GlobalTheory.RealQuot.rad ρ C ≤ LinearMap.ker β := by
+theorem rad_le_ker
+    : ∀ (ι Q Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCommGroup Pi] [Module ℂ Pi]
+        (ρ : ι → Module.End ℂ Q) (C : Submodule ℂ Q) (σ : ι → Module.End ℂ Pi) (β : Q →ₗ[ℂ] Pi),
+      (∀ i, β ∘ₗ ρ i = σ i ∘ₗ β) → C ≤ LinearMap.ker β → GlobalTheory.RealQuot.rad ρ C ≠ ⊤
+        → (∀ N : Submodule ℂ Pi,
+          GlobalTheory.RealQuot.IsStab σ N
+            → ∃ N' : Submodule ℂ Pi, GlobalTheory.RealQuot.IsStab σ N' ∧ IsCompl N N')
+        → GlobalTheory.RealQuot.rad ρ C ≤ LinearMap.ker β := by
   intro ι Q Pi _ _ _ _ ρ C σ β hi hk hrad hss
   by_contra hne
   have hKs : IsStab ρ (LinearMap.ker β) := fun i x hx => by
@@ -151,8 +179,9 @@ theorem rad_le_ker : ∀ (ι Q Pi : Type) [AddCommGroup Q] [Module ℂ Q] [AddCo
 
 end LALemmas
 
-theorem hasInfExp_div : ∀ (D : D7) (α β : (AE D)ˣ →* Circle) (τ : D.what₂.Tau) (a b : ℚ), HasInfExp D α τ a → HasInfExp D β τ b →
-  HasInfExp D (β / α) τ (b - a) := by
+theorem hasInfExp_div
+    : ∀ (D : D7) (α β : (AE D)ˣ →* Circle) (τ : D.what₂.Tau) (a b : ℚ),
+      HasInfExp D α τ a → HasInfExp D β τ b → HasInfExp D (β / α) τ (b - a) := by
   intro D α β τ a b hA hB
   obtain ⟨m, hm, ex, hα⟩ := hA
   obtain ⟨n, hn, -, hβ⟩ := hB

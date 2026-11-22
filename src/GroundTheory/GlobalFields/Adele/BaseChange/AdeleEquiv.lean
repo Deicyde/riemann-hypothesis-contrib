@@ -22,16 +22,17 @@ def adeleMap : 𝔸[K] →+* 𝔸[L] :=
   RingHom.prodMap (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap (K := K) (L := L))
     (finiteAdeleMap K L)
 
-theorem adeleMap_apply (x : 𝔸[K]) :
-    adeleMap K L x =
-      (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap x.1, finiteAdeleMap K L x.2) :=
+theorem adeleMap_apply (x : 𝔸[K])
+    : adeleMap K L x
+      = (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap x.1, finiteAdeleMap K L x.2) :=
   rfl
 
 theorem continuous_adeleMap : Continuous (adeleMap K L) :=
-  GroundTheory.Global.InfinitePlace.continuous_infiniteAdeleRingMap.prodMap continuous_finiteAdeleMap
+  GroundTheory.Global.InfinitePlace.continuous_infiniteAdeleRingMap.prodMap
+    continuous_finiteAdeleMap
 
-theorem adeleMap_algebraMap (k : K) :
-    adeleMap K L (algebraMap K 𝔸[K] k) = algebraMap L 𝔸[L] (algebraMap K L k) :=
+theorem adeleMap_algebraMap (k : K)
+    : adeleMap K L (algebraMap K 𝔸[K] k) = algebraMap L 𝔸[L] (algebraMap K L k) :=
   Prod.ext (GroundTheory.Global.InfinitePlace.infiniteAdeleRingMap_algebraMap k)
     (finiteAdeleMap_algebraMap k)
 
@@ -41,14 +42,14 @@ def adeleTensorEquiv : L ⊗[K] 𝔸[K] ≃ₐ[L] 𝔸[L] :=
     (AlgEquiv.prodCongr GroundTheory.Global.InfinitePlace.tensorInfiniteAdeleRingEquiv
       (finiteTensorEquiv K L))
 
-theorem adeleTensorEquiv_tmul (l : L) (a : 𝔸[K]) :
-    adeleTensorEquiv K L (l ⊗ₜ a) = algebraMap L 𝔸[L] l * adeleMap K L a :=
+theorem adeleTensorEquiv_tmul (l : L) (a : 𝔸[K])
+    : adeleTensorEquiv K L (l ⊗ₜ a) = algebraMap L 𝔸[L] l * adeleMap K L a :=
   Prod.ext (GroundTheory.Global.InfinitePlace.tensorInfiniteAdeleRingEquiv_tmul' l a.1)
     (finiteTensorEquiv_tmul l a.2)
 
-theorem adeleTensorEquiv_tmul_snd (l : L) (a : 𝔸[K]) (w : HeightOneSpectrum (𝓞 L)) :
-    (adeleTensorEquiv K L (l ⊗ₜ a)).2 w =
-      SemiLocal.tensorEquiv' L (below K w) (l ⊗ₜ a.2 (below K w)) ⟨w, liesOver_below w⟩ :=
+theorem adeleTensorEquiv_tmul_snd (l : L) (a : 𝔸[K]) (w : HeightOneSpectrum (𝓞 L))
+    : (adeleTensorEquiv K L (l ⊗ₜ a)).2 w
+      = SemiLocal.tensorEquiv' L (below K w) (l ⊗ₜ a.2 (below K w)) ⟨w, liesOver_below w⟩ :=
   finiteTensorEquiv_tmul_apply l a.2 w
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι] (b : Basis ι K L)
@@ -70,8 +71,8 @@ def sndAddHom : 𝔸[L] →+ FiniteAdeleRing (𝓞 L) L where
   map_zero' := rfl
   map_add' _ _ := rfl
 
-theorem adeleTensorEquiv_sum_coord (y : 𝔸[L]) :
-    adeleTensorEquiv K L (∑ i, b i ⊗ₜ coord b i y) = y := by
+theorem adeleTensorEquiv_sum_coord (y : 𝔸[L])
+    : adeleTensorEquiv K L (∑ i, b i ⊗ₜ coord b i y) = y := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]
   simp_rw [adeleTensorEquiv_tmul]
@@ -93,8 +94,8 @@ theorem adeleTensorEquiv_sum_coord (y : 𝔸[L]) :
     simp_rw [finiteTensorMap_tmul]
     rfl
 
-theorem adeleTensorEquiv_symm_apply (y : 𝔸[L]) :
-    (adeleTensorEquiv K L).symm y = ∑ i, b i ⊗ₜ coord b i y := by
+theorem adeleTensorEquiv_symm_apply (y : 𝔸[L])
+    : (adeleTensorEquiv K L).symm y = ∑ i, b i ⊗ₜ coord b i y := by
   rw [AlgEquiv.symm_apply_eq]
   exact (adeleTensorEquiv_sum_coord b y).symm
 

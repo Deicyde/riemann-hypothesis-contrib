@@ -10,25 +10,27 @@ namespace GroundTheory.Heights₂.Heights.FiniteCovolume
 open Matrix
 open scoped ComplexOrder
 
-theorem majorant_mul_inv_mul {ι : Type*} [Fintype ι] [DecidableEq ι] {H P : Matrix ι ι ℂ}
-    (hM : IsMajorantOf H P) : H * P⁻¹ * H = P := by
+theorem majorant_mul_inv_mul
+    {ι : Type*} [Fintype ι] [DecidableEq ι] {H P : Matrix ι ι ℂ} (hM : IsMajorantOf H P)
+    : H * P⁻¹ * H = P := by
   obtain ⟨hP, -, hdet, hPHP⟩ := hM
   have hPdet : IsUnit P.det := isUnit_iff_ne_zero.mpr (ne_of_gt hP.det_pos)
-  calc H * P⁻¹ * H = (P * H⁻¹ * P) * P⁻¹ * H := by rw [hPHP]
+  calc
+    H * P⁻¹ * H
+      = (P * H⁻¹ * P) * P⁻¹ * H := by rw [hPHP]
     _ = P * H⁻¹ * (P * P⁻¹) * H := by simp only [Matrix.mul_assoc]
     _ = P := by
       rw [Matrix.mul_nonsing_inv _ hPdet, Matrix.mul_one, Matrix.mul_assoc,
         Matrix.nonsing_inv_mul _ hdet, Matrix.mul_one]
 
-theorem MajorantBound.proof (ι : Type*) [Fintype ι] [DecidableEq ι] :
-    MajorantBound.Statement ι := by
+theorem MajorantBound.proof (ι : Type*) [Fintype ι] [DecidableEq ι]
+    : MajorantBound.Statement ι := by
   intro H P hM z
   have key := majorant_mul_inv_mul hM
   obtain ⟨hP, hH, hdet, hPHP⟩ := hM
   have hPdet : IsUnit P.det := isUnit_iff_ne_zero.mpr (ne_of_gt hP.det_pos)
   set w := P⁻¹ *ᵥ (H *ᵥ z) with hw
-  have h1 : P *ᵥ w = H *ᵥ z := by
-    rw [hw, mulVec_mulVec, Matrix.mul_nonsing_inv _ hPdet, one_mulVec]
+  have h1 : P *ᵥ w = H *ᵥ z := by rw [hw, mulVec_mulVec, Matrix.mul_nonsing_inv _ hPdet, one_mulVec]
   have hPinv : (P⁻¹)ᴴ = P⁻¹ := by rw [conjTranspose_nonsing_inv, hP.1.eq]
   have h2 : star w ⬝ᵥ (P *ᵥ w) = star z ⬝ᵥ (P *ᵥ z) := by
     rw [h1, hw, star_mulVec, star_mulVec, hPinv, hH.eq, vecMul_vecMul, ← dotProduct_mulVec,

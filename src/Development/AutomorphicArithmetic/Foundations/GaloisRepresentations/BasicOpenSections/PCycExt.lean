@@ -51,8 +51,7 @@ private lemma sum_eq (hF : FibExt) (hWt : TranscendenceTraces.WtPt) {p : ℕ} {Y
   · intro z _
     exact hWt T.p w hw Ω Ω' z (sp a ≫ z) (pt_sp a z).symm
 
-theorem UpperTheory.Gal.Mod.cycExt :
-    FibExt → CycExt := by
+theorem UpperTheory.Gal.Mod.cycExt : FibExt → CycExt := by
   intro hF p q n Y T w hw Ω Ω' _ _ _ _ a φ φ' hc x
   have hWt : TranscendenceTraces.WtPt := TranscendenceTraces.all_holds.1.2.2.2.2.1
   have hs := fun (j : Fin (n + 1)) y => sum_eq hF hWt (T j) (w j) (hw j) (n - j) a φ φ' hc x y
@@ -64,12 +63,14 @@ theorem UpperTheory.Gal.Mod.cycExt :
       simp only [hs] at this
       exact this
     · refine Finset.sum_eq_zero fun j _ => ?_
-      have : {z : gp Ω' ⟶ (T j).Z | z ≫ (T j).p = sp a ≫ x ∧ (twist φ' Y)^[n - j] (z ≫ (T j).r) = y'} = ∅ := by
+      have : {z : gp Ω' ⟶ (T j).Z | z ≫ (T j).p = sp a ≫ x ∧ (twist φ' Y)^[n - j] (z ≫ (T j).r) = y'}
+          = ∅ := by
         ext z'
         simp only [Set.mem_setOf_eq, Set.mem_empty_iff_false, iff_false, not_and]
         intro h1 h2
         haveI : IsFinite (T j).p := (T j).fin
-        obtain ⟨z, -, rfl⟩ := (hF (T j).p Ω Ω' a x).2.1.surjOn (show z' ∈ fib (T j).p (sp a ≫ x) from h1)
+        obtain ⟨z, -, rfl⟩ :=
+          (hF (T j).p Ω Ω' a x).2.1.surjOn (show z' ∈ fib (T j).p (sp a ≫ x) from h1)
         refine hy ⟨(twist φ Y)^[n - j] (z ≫ (T j).r), ?_⟩
         rw [sp_iter a φ φ' hc, ← h2, Category.assoc]
       rw [this]

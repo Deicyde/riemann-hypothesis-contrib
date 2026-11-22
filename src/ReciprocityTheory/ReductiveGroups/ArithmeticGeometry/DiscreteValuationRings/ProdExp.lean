@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
 
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -20,8 +21,10 @@ open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction
 
 section BoxG
 
-variable {R : Type} [CommRing R] [IsDomain R] {j : ℕ}
-  {G G' : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G']
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {j : ℕ} {G G' : Over (Spec (CommRingCat.of R))}
+  [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G']
   {LG : LB G.left} {LG' : LB G'.left}
 
 lemma boxG_le_b (pG : IsPowGrp G' G j) (jN : Fin j → LG.ι) (jL : LG'.ι) :
@@ -43,11 +46,13 @@ lemma boxG_le_c (pG : IsPowGrp G' G j) (jN : Fin j → LG.ι) (jL : LG'.ι) (i :
     | exact Set.mem_iInter.2 fun _ => hx
     | simpa [LB.wchart] using hx
 
-def IsBoxSecG (pG : IsPowGrp G' G j) (w : LB.Iso LG' (boxLB LG pG.pr)) (k : ℕ) (σ' : H0 LG' k)
-    (σ : Fin j → H0 LG k) : Prop :=
+def IsBoxSecG
+    (pG : IsPowGrp G' G j) (w : LB.Iso LG' (boxLB LG pG.pr))
+    (k : ℕ) (σ' : H0 LG' k) (σ : Fin j → H0 LG k)
+    : Prop :=
   ∀ (jN : Fin j → LG.ι) (jL : LG'.ι),
-    ((w.s (jN, jL)) ^ k).val * rs (boxG_le_b pG jN jL) (σ'.f (fun _ => jL)) =
-      ∏ i, rs (boxG_le_c pG jN jL i) (((pG.pr i).left.app _).hom ((σ i).f (fun _ => jN i)))
+    ((w.s (jN, jL)) ^ k).val * rs (boxG_le_b pG jN jL) (σ'.f (fun _ => jL))
+      = ∏ i, rs (boxG_le_c pG jN jL i) (((pG.pr i).left.app _).hom ((σ i).f (fun _ => jN i)))
 
 end BoxG
 
@@ -55,26 +60,35 @@ section BoxB
 
 variable {R : Type} [CommRing R] [IsDomain R] {j : ℕ}
 
-def IsBoxFamB {D' D : DegPre R} (pD : IsPowDeg D' D j) (k : ℕ) (f' : ∀ α' : D'.X, D'.SecB k α')
-    (f : Fin j → ∀ α : D.X, D.SecB k α) : Prop :=
-  ∀ α' : D'.X, ∃ hφ : ∀ (i : Fin j) (a : Fin 4),
-      D'.famφB α' a ≫ (pD.pw.pr i).left = (pD.pw.pr i).left ≫ D.famφB (pD.xe α' i) a,
-    ∀ (jN : Fin 4 → Fin j → D.P.L.ι) (jM : Fin 4 → D'.P.L.ι),
-      (@id (Γ(D'.P.A.left, LB.wchart (boxLB D.P.L pD.pw.pr) (D'.famφB α') jN ⊓
-          LB.wchart D'.P.L (D'.famφB α') jM)ˣ)
-        ((LB.linCombIso pD.w (D'.famφB α') (DegPre.famε k)).s (jN, jM))).val *
-        rs (inf_le_right : LB.wchart (boxLB D.P.L pD.pw.pr) (D'.famφB α') jN ⊓
-            LB.wchart D'.P.L (D'.famφB α') jM ≤ LB.wchart D'.P.L (D'.famφB α') jM) ((f' α').f jM) =
-      ∏ i, rs (inf_le_left.trans (box_le_of_comp D.P.L (fun i => (pD.pw.pr i).left) (D'.famφB α')
-            (D.famφB (pD.xe α' i)) (pD.pw.pr i).left i (hφ i) jN))
-        (((pD.pw.pr i).left.app _).hom (((f i) (pD.xe α' i)).f (fun a => jN a i)))
+def IsBoxFamB
+    {D' D : DegPre R} (pD : IsPowDeg D' D j)
+    (k : ℕ) (f' : ∀ α' : D'.X, D'.SecB k α') (f : Fin j → ∀ α : D.X, D.SecB k α)
+    : Prop :=
+  ∀ α' : D'.X,
+    ∃ hφ : ∀ (i : Fin j) (a : Fin 4),
+        D'.famφB α' a ≫ (pD.pw.pr i).left = (pD.pw.pr i).left ≫ D.famφB (pD.xe α' i) a,
+      ∀ (jN : Fin 4 → Fin j → D.P.L.ι) (jM : Fin 4 → D'.P.L.ι),
+        (@id
+              (Γ(D'.P.A.left, LB.wchart (boxLB D.P.L pD.pw.pr) (D'.famφB α') jN ⊓
+                LB.wchart D'.P.L (D'.famφB α') jM)ˣ)
+              ((LB.linCombIso pD.w (D'.famφB α') (DegPre.famε k)).s (jN, jM))).val
+            * rs
+              (inf_le_right
+                : LB.wchart (boxLB D.P.L pD.pw.pr) (D'.famφB α') jN
+                    ⊓ LB.wchart D'.P.L (D'.famφB α') jM
+                  ≤ LB.wchart D'.P.L (D'.famφB α') jM)
+              ((f' α').f jM)
+          = ∏ i, rs (inf_le_left.trans (box_le_of_comp D.P.L (fun i => (pD.pw.pr i).left) (D'.famφB α')
+                  (D.famφB (pD.xe α' i)) (pD.pw.pr i).left i (hφ i) jN))
+              (((pD.pw.pr i).left.app _).hom (((f i) (pD.xe α' i)).f (fun a => jN a i)))
 
 end BoxB
 
 section Exp
 
-variable {R : Type} [CommRing R] [IsDomain R] {I : Ideal R} {j : ℕ} {D D' : DegData R I}
-  {A A' : PolAV (Spec (CommRingCat.of (FractionRing R)))}
+variable
+  {R : Type} [CommRing R] [IsDomain R]
+  {I : Ideal R} {j : ℕ} {D D' : DegData R I} {A A' : PolAV (Spec (CommRingCat.of (FractionRing R)))}
   {G G' : Over (Spec (CommRingCat.of R))} [GrpObj G] [IsCommMonObj G] [GrpObj G'] [IsCommMonObj G']
   {pD : IsPowDeg D'.toPre D.toPre j} {pA : IsPowPolAV A' A j} {pG : IsPowGrp G' G j}
   {U' : Unif I D' A' G'} {U : Unif I D A G}

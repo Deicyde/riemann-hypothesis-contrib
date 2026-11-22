@@ -7,8 +7,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.HomExtOfAgre
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -17,9 +19,13 @@ noncomputable section
 
 namespace GlobalTheory.Mum.DescHom
 
-theorem ext_of_open {T : Scheme.{0}} {W X Y : Over T} (j : W ⟶ X) [IsOpenImmersion j.left] [Surjective W.hom]
-    [Smooth X.hom] [GeometricallyIrreducible X.hom] [IsSeparated Y.hom] {f g : X ⟶ Y} (h : j ≫ f = j ≫ g) : f = g := by
-  have hfib : ∀ x : X.left, x ∈ closure ((j.left.opensRange : Set X.left) ∩ X.hom ⁻¹' {X.hom x}) := by
+theorem ext_of_open
+    {T : Scheme.{0}} {W X Y : Over T} (j : W ⟶ X) [IsOpenImmersion j.left] [Surjective W.hom]
+    [Smooth X.hom] [GeometricallyIrreducible X.hom] [IsSeparated Y.hom]
+    {f g : X ⟶ Y} (h : j ≫ f = j ≫ g)
+    : f = g := by
+  have hfib
+      : ∀ x : X.left, x ∈ closure ((j.left.opensRange : Set X.left) ∩ X.hom ⁻¹' {X.hom x}) := by
     intro x
     have hirr : IsIrreducible (X.hom ⁻¹' {X.hom x}) :=
       X.hom.isIrreducible_preimage X.hom.isOpenMap isIrreducible_singleton
@@ -29,19 +35,23 @@ theorem ext_of_open {T : Scheme.{0}} {W X Y : Over T} (j : W ⟶ X) [IsOpenImmer
       show X.hom (j.left w) = X.hom x
       rw [← Scheme.Hom.comp_apply, Over.w]
       exact hw
-    have hsub := subset_closure_inter_of_isPreirreducible_of_isOpen hirr.isPreirreducible
-      j.left.opensRange.isOpen hne (show x ∈ X.hom ⁻¹' {X.hom x} from rfl)
+    have hsub :=
+      subset_closure_inter_of_isPreirreducible_of_isOpen hirr.isPreirreducible
+        j.left.opensRange.isOpen hne (show x ∈ X.hom ⁻¹' {X.hom x} from rfl)
     rwa [Set.inter_comm] at hsub
   have hl : j.left ≫ f.left = j.left ≫ g.left := by
     simpa only [Over.comp_left] using congrArg CommaMorphism.left h
   apply Over.OverMorphism.ext
-  refine GlobalTheory.FibreDense.main X.left T Y.left X.hom Y.hom j.left.opensRange hfib f.left g.left
-    (by rw [Over.w f, Over.w g]) ?_
+  refine GlobalTheory.FibreDense.main X.left T Y.left X.hom Y.hom j.left.opensRange hfib f.left
+    g.left (by rw [Over.w f, Over.w g]) ?_
   rw [← Scheme.Hom.isoOpensRange_inv_comp, Category.assoc, Category.assoc, hl]
 
-theorem isMonHom_of_open {T : Scheme.{0}} {W X Y : Over T} [GrpObj X] [GrpObj Y] (j : W ⟶ X) [IsOpenImmersion j.left]
-    [Surjective W.hom] [Smooth X.hom] [GeometricallyIrreducible X.hom] [IsSeparated Y.hom] (φ : X ⟶ Y)
-    (h : ((fst W W ≫ j) * (snd W W ≫ j)) ≫ φ = (fst W W ≫ j ≫ φ) * (snd W W ≫ j ≫ φ)) : IsMonHom φ := by
+theorem isMonHom_of_open
+    {T : Scheme.{0}} {W X Y : Over T} [GrpObj X] [GrpObj Y]
+    (j : W ⟶ X) [IsOpenImmersion j.left] [Surjective W.hom] [Smooth X.hom]
+    [GeometricallyIrreducible X.hom] [IsSeparated Y.hom]
+    (φ : X ⟶ Y) (h : ((fst W W ≫ j) * (snd W W ≫ j)) ≫ φ = (fst W W ≫ j ≫ φ) * (snd W W ≫ j ≫ φ))
+    : IsMonHom φ := by
   have hmuX : (μ : X ⊗ X ⟶ X) = fst X X * snd X X := by
     rw [Hom.mul_def, lift_fst_snd, Category.id_comp]
   have hmuY : (μ : Y ⊗ Y ⟶ Y) = fst Y Y * snd Y Y := by
@@ -49,10 +59,8 @@ theorem isMonHom_of_open {T : Scheme.{0}} {W X Y : Over T} [GrpObj X] [GrpObj Y]
   have hoi : IsOpenImmersion (j ⊗ₘ j).left := by
     rw [Over.tensorHom_left]
     exact MorphismProperty.pullbackMap (P := @IsOpenImmersion) ‹_› ‹_› (by simp) (by simp)
-  have hsurj : Surjective (W ⊗ W).hom := by
-    rw [Over.tensorObj_hom]; infer_instance
-  have hsm : Smooth (X ⊗ X).hom := by
-    rw [Over.tensorObj_hom]; infer_instance
+  have hsurj : Surjective (W ⊗ W).hom := by rw [Over.tensorObj_hom]; infer_instance
+  have hsm : Smooth (X ⊗ X).hom := by rw [Over.tensorObj_hom]; infer_instance
   have hgi : GeometricallyIrreducible (X ⊗ X).hom := by
     rw [Over.tensorObj_hom]
     exact GeometricallyIrreducible.comp _ _
@@ -68,7 +76,9 @@ theorem isMonHom_of_open {T : Scheme.{0}} {W X Y : Over T} [GrpObj X] [GrpObj Y]
     intro Z a b
     rw [Hom.mul_def, Hom.mul_def, Category.assoc, hmul, ← Category.assoc, lift_map]
   have hone : η ≫ φ = η := by
-    have h1 : ((1 : 𝟙_ (Over T) ⟶ X) ≫ φ) * ((1 : 𝟙_ (Over T) ⟶ X) ≫ φ) = (1 : 𝟙_ (Over T) ⟶ X) ≫ φ := by
+    have h1
+        : ((1 : 𝟙_ (Over T) ⟶ X) ≫ φ) * ((1 : 𝟙_ (Over T) ⟶ X) ≫ φ)
+          = (1 : 𝟙_ (Over T) ⟶ X) ≫ φ := by
       rw [← hcomp, _root_.mul_one]
     have h2 : (1 : 𝟙_ (Over T) ⟶ X) ≫ φ = 1 := _root_.mul_eq_left.mp h1
     have e1 : ∀ {M : Over T} [MonObj M], (1 : 𝟙_ (Over T) ⟶ M) = η := by
@@ -78,8 +88,9 @@ theorem isMonHom_of_open {T : Scheme.{0}} {W X Y : Over T} [GrpObj X] [GrpObj Y]
     exact h2
   exact ⟨hone, hmul⟩
 
-theorem geometricallyIrreducible_of_semiAbelian {S : Scheme.{0}} (G : Over S) [GrpObj G] (hG : IsSemiAbelian G) :
-    GeometricallyIrreducible G.hom := by
+theorem geometricallyIrreducible_of_semiAbelian
+    {S : Scheme.{0}} (G : Over S) [GrpObj G] (hG : IsSemiAbelian G)
+    : GeometricallyIrreducible G.hom := by
   obtain ⟨_, hsm, _, _, hgc, _⟩ := hG
   have := GlobalTheory.grpObj_geometricallyIntegral_of_smooth S G
   infer_instance
@@ -97,29 +108,44 @@ theorem surjective_near [GrpObj G] [Surjective π] (N : Near π G) : Surjective 
     refine ⟨pullback.fst N.U.hom π y, ?_⟩
     rw [← Scheme.Hom.comp_apply, pullback.condition, Scheme.Hom.comp_apply, ← N.u_over,
       Scheme.Hom.comp_apply, hy, hGs, hs]
-  exact ⟨fun x => (Flat.generalizingMap N.U.hom).stableUnderGeneralization_range
-    (specializes_closedPoint x) hcl⟩
+  exact ⟨fun x =>
+    (Flat.generalizingMap N.U.hom).stableUnderGeneralization_range (specializes_closedPoint x) hcl⟩
 
-theorem isPullback_embL (N : Near π G) (p : pullback π π ⟶ S) (hp : p ≫ π = pullback.fst π π ≫ π) :
-    IsPullback (Desc.toS N p hp) (Desc.embL N p hp) N.u (pullback.fst G.hom p) := by
+theorem isPullback_embL (N : Near π G) (p : pullback π π ⟶ S) (hp : p ≫ π = pullback.fst π π ≫ π)
+    : IsPullback (Desc.toS N p hp) (Desc.embL N p hp) N.u (pullback.fst G.hom p) := by
   have hA : IsPullback (Desc.toS N p hp) (pullback.snd N.U.hom (pullback.fst π π ≫ π))
       (pullback.snd N.U.hom π) p := by
     have outer : IsPullback (Desc.toS N p hp ≫ pullback.fst N.U.hom π)
         (pullback.snd N.U.hom (pullback.fst π π ≫ π)) N.U.hom (p ≫ π) := by
       rw [Desc.toS, pullback.lift_fst, hp]
       exact IsPullback.of_hasPullback _ _
-    exact IsPullback.of_right outer (by rw [Desc.toS, pullback.lift_snd]) (IsPullback.of_hasPullback _ _)
+    exact IsPullback.of_right outer (by rw [Desc.toS, pullback.lift_snd])
+      (IsPullback.of_hasPullback _ _)
   refine IsPullback.of_bot ?_ ?_ (IsPullback.of_hasPullback G.hom p)
   · rw [Desc.embL, pullback.lift_snd, N.u_over]
     exact hA
   · rw [Desc.embL, pullback.lift_fst]
 
-theorem isOpenImmersion_emb (N : Near π G) (p : pullback π π ⟶ S) (hp : p ≫ π = pullback.fst π π ≫ π) :
-    IsOpenImmersion (Desc.emb N p hp).left := by
+theorem isOpenImmersion_emb
+    (N : Near π G) (p : pullback π π ⟶ S) (hp : p ≫ π = pullback.fst π π ≫ π)
+    : IsOpenImmersion (Desc.emb N p hp).left := by
   have := N.isOpen
   exact MorphismProperty.of_isPullback (P := @IsOpenImmersion) (isPullback_embL N p hp) N.isOpen
 
-theorem isMonHom_of_sum_of_emb : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], AdmBase R (maximalIdeal R) → ∀ (S : Scheme.{0}) (π : S ⟶ Sp R), IsProper π → Surjective π → IsIntegral S → ∀ (G' : Over S) [GrpObj G'] [IsCommMonObj G'], IsSemiAbelian G' → ∀ N : Near π G', ∀ (p p' : pullback π π ⟶ S) (hp : p ≫ π = pullback.fst π π ≫ π) (hp' : p' ≫ π = pullback.fst π π ≫ π), ∀ φ : (Over.pullback p).obj G' ⟶ (Over.pullback p').obj G', Desc.sum N p hp ≫ φ = Desc.sum N p' hp' → Desc.emb N p hp ≫ φ = Desc.emb N p' hp' → IsMonHom φ := by
+theorem isMonHom_of_sum_of_emb
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      AdmBase R (maximalIdeal R)
+        → ∀ (S : Scheme.{0}) (π : S ⟶ Sp R),
+          IsProper π → Surjective π → IsIntegral S
+            → ∀ (G' : Over S) [GrpObj G'] [IsCommMonObj G'],
+              IsSemiAbelian G'
+                → ∀ N : Near π G',
+                  ∀ (p p' : pullback π π ⟶ S) (hp : p ≫ π = pullback.fst π π ≫ π)
+                      (hp' : p' ≫ π = pullback.fst π π ≫ π),
+                    ∀ φ : (Over.pullback p).obj G' ⟶ (Over.pullback p').obj G',
+                      Desc.sum N p hp ≫ φ = Desc.sum N p' hp'
+                        → Desc.emb N p hp ≫ φ = Desc.emb N p' hp'
+                        → IsMonHom φ := by
   intro R _ _ _ _ S π _ _ _ G' _ _ hG N p p' hp hp' φ hsum hemb
   have : Surjective N.U.hom := surjective_near N
   have : GeometricallyIrreducible G'.hom := geometricallyIrreducible_of_semiAbelian G' hG

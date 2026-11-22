@@ -20,9 +20,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.BadElt
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
-open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp GlobalTheory.DegVal GlobalTheory.DegCmp
-open GlobalTheory.AllWt (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Theta
+open GlobalTheory GlobalTheory.CompHS GlobalTheory.CovTop GlobalTheory.BigTop GlobalTheory.HSApp
+  GlobalTheory.DegVal GlobalTheory.DegCmp
+open GlobalTheory.AllWt
+  (Psi wtOf cuspOn cuspW latOn latW normOn petOn GoodOn GoodW rankOn degOn rankW)
 open GlobalTheory.CompHt (hodgeWt)
 open GlobalTheory.LevDesc (TypeFrame grpHR grpGHR latN levDet secRing transl pull KeepsCusp)
 open GlobalTheory.IndefiniteRowSideFullHecke.LevelStructureAutomorphisms (LevelAut)
@@ -60,7 +63,8 @@ def tm1 (w : W) : VC σ W := by
   letI : Algebra K ℂ := σ.toAlgebra
   exact (1 : ℂ) ⊗ₜ[K] w
 
-theorem complexificationBaseChangeLinear_one_tmul (f : W →ₗ[K] W) (w : W) : bcLin σ f (tm1 σ w) = tm1 σ (f w) := by
+theorem complexificationBaseChangeLinear_one_tmul (f : W →ₗ[K] W) (w : W)
+    : bcLin σ f (tm1 σ w) = tm1 σ (f w) := by
   letI : Algebra K ℂ := σ.toAlgebra
   exact LinearMap.baseChange_tmul (A := ℂ) f 1 w
 
@@ -78,24 +82,33 @@ def twBC (ρ0 : G →* (W →ₗ[K] W)) (χ : G →* Kˣ) : Representation ℂ G
   toFun g := σ (((χ g)⁻¹ : Kˣ) : K) • bcLin σ (ρ0 g)
   map_one' := by simp [bcLin_one]
   map_mul' g h := by
-    rw [map_mul, map_mul, bcLin_mul, smul_mul_smul_comm, mul_inv_rev, Units.val_mul, map_mul, mul_comm (σ _)]
+    rw [map_mul, map_mul, bcLin_mul, smul_mul_smul_comm, mul_inv_rev, Units.val_mul, map_mul,
+      mul_comm (σ _)]
 
-theorem twBC_apply (ρ0 : G →* (W →ₗ[K] W)) (χ : G →* Kˣ) (g : G) :
-    twBC σ ρ0 χ g = σ (((χ g)⁻¹ : Kˣ) : K) • bcLin σ (ρ0 g) := rfl
+theorem twBC_apply (ρ0 : G →* (W →ₗ[K] W)) (χ : G →* Kˣ) (g : G)
+    : twBC σ ρ0 χ g = σ (((χ g)⁻¹ : Kˣ) : K) • bcLin σ (ρ0 g) :=
+  rfl
 
 end GlobalTheory.DefRead
 
 namespace GlobalTheory.DefRead
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ}
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ}
 
-abbrev VAt (p : PtAt ex Csz) (i : Fin D.R.m) : Type := VC D.what₂.embLL (Fin (p.R.nW i) → D.what₂.LL)
+abbrev VAt (p : PtAt ex Csz) (i : Fin D.R.m) : Type :=
+  VC D.what₂.embLL (Fin (p.R.nW i) → D.what₂.LL)
 
 def repAt (p : PtAt ex Csz) (i : Fin D.R.m) : Representation ℂ (G0g D.nd) (VAt p i) :=
-  (twBC D.what₂.embLL (p.R.toRealDat.FW i).ρ (p.R.toRealDat.FW i).chi).comp (p.R.eG.trans p.cG).symm.toMonoidHom
+  (twBC D.what₂.embLL (p.R.toRealDat.FW i).ρ (p.R.toRealDat.FW i).chi).comp
+    (p.R.eG.trans p.cG).symm.toMonoidHom
 
-theorem repAt_apply (p : PtAt ex Csz) (i : Fin D.R.m) (g : G0g D.nd) :
-    repAt p i g = twBC D.what₂.embLL (p.R.toRealDat.FW i).ρ (p.R.toRealDat.FW i).chi ((p.R.eG.trans p.cG).symm g) := rfl
+theorem repAt_apply (p : PtAt ex Csz) (i : Fin D.R.m) (g : G0g D.nd)
+    : repAt p i g
+      = twBC D.what₂.embLL (p.R.toRealDat.FW i).ρ (p.R.toRealDat.FW i).chi
+        ((p.R.eG.trans p.cG).symm g) :=
+  rfl
 
 end GlobalTheory.DefRead

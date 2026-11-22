@@ -15,7 +15,16 @@ open scoped Topology
 noncomputable section
 namespace GlobalTheory.SplitWeil.FourierPi
 
-theorem integral_eq_measureReal_box_mul_sum : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [MeasurableSpace k] [BorelSpace k] (ν : Measure k), ν.IsAddHaarMeasure → ∀ (n : Type) [Fintype n] (r R : kˣ) (S : Finset (n → k)), (∀ b ∈ S, b ∈ box n R) → (∀ a ∈ box n R, ∃! b, b ∈ S ∧ a - b ∈ box n r) → ∀ F : (n → k) → ℂ, (∀ t ∈ box n r, ∀ y, F (y + t) = F y) → (∀ y ∉ box n R, F y = 0) → ∫ y, F y ∂(Measure.pi fun _ => ν) = ((Measure.pi fun _ : n => ν).real (box n r) : ℂ) * ∑ b ∈ S, F b := by
+theorem integral_eq_measureReal_box_mul_sum
+    : ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+        [MeasurableSpace k] [BorelSpace k] (ν : Measure k),
+      ν.IsAddHaarMeasure
+        → ∀ (n : Type) [Fintype n] (r R : kˣ) (S : Finset (n → k)),
+          (∀ b ∈ S, b ∈ box n R) → (∀ a ∈ box n R, ∃! b, b ∈ S ∧ a - b ∈ box n r)
+            → ∀ F : (n → k) → ℂ,
+              (∀ t ∈ box n r, ∀ y, F (y + t) = F y) → (∀ y ∉ box n R, F y = 0)
+                → ∫ y, F y ∂(Measure.pi fun _ => ν)
+                  = ((Measure.pi fun _ : n => ν).real (box n r) : ℂ) * ∑ b ∈ S, F b := by
   intro k _ _ _ _ _ _ ν hν n _ r R S hS hrep F hF hF0
   classical
   have : ν.IsAddHaarMeasure := hν
@@ -55,15 +64,16 @@ theorem integral_eq_measureReal_box_mul_sum : ∀ (k : Type) [Field k] [Valuativ
       refine (integrable_indicator_iff hmeas).2 ?_
       exact integrableOn_const hfin.ne
     exact h1.comp_sub_right b
-  calc ∫ y, F y ∂μ = ∫ y, ∑ b ∈ S, (box n r).indicator (fun _ => F b) (y - b) ∂μ := by
-        congr 1
-        funext y
-        exact key y
+  calc
+    ∫ y, F y ∂μ = ∫ y, ∑ b ∈ S, (box n r).indicator (fun _ => F b) (y - b) ∂μ := by
+      congr 1
+      funext y
+      exact key y
     _ = ∑ b ∈ S, ∫ y, (box n r).indicator (fun _ => F b) (y - b) ∂μ := integral_finsetSum S hint
     _ = ∑ b ∈ S, (μ.real (box n r) : ℂ) * F b := by
-        refine Finset.sum_congr rfl fun b _ => ?_
-        rw [integral_sub_right_eq_self (fun y => (box n r).indicator (fun _ => F b) y) b,
-          integral_indicator_const _ hmeas, Complex.real_smul]
+      refine Finset.sum_congr rfl fun b _ => ?_
+      rw [integral_sub_right_eq_self (fun y => (box n r).indicator (fun _ => F b) y) b,
+        integral_indicator_const _ hmeas, Complex.real_smul]
     _ = _ := by rw [Finset.mul_sum]
 
 end GlobalTheory.SplitWeil.FourierPi

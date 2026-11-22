@@ -6,14 +6,16 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.DeRhamLattices.
 
 @[expose] public section
 
-open Formalism Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations TensorProduct UpperTheory.KN
+open Formalism Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+  TensorProduct UpperTheory.KN
 
-theorem _root_.UpperTheory.KN.isLocallyConstant_torsion_push_of_continuous :
-    ∀ {G O LL Q : Type} [TopologicalSpace G] [CommRing O] [IsDomain O] [IsNoetherianRing O] [Field LL] [TopologicalSpace LL]
-      [IsTopologicalRing LL] [Algebra O LL] [IsFractionRing O LL] [AddCommGroup Q] [Module O Q] {a n : ℕ}
-      (Y : Submodule O (Fin a → Fin n → LL)) (φ : ↥Y →ₗ[O] Q) (u : G → Fin a → Fin n → LL) (hu : ∀ g, u g ∈ Y) (c : O),
-      IsOpen (Set.range (algebraMap O LL)) → Continuous u → c ≠ 0 → (∀ y, c • φ y = 0) →
-      IsLocallyConstant fun g => φ ⟨u g, hu g⟩ := by
+theorem _root_.UpperTheory.KN.isLocallyConstant_torsion_push_of_continuous
+    : ∀ {G O LL Q : Type} [TopologicalSpace G] [CommRing O] [IsDomain O] [IsNoetherianRing O]
+        [Field LL] [TopologicalSpace LL] [IsTopologicalRing LL] [Algebra O LL] [IsFractionRing O LL]
+        [AddCommGroup Q] [Module O Q] {a n : ℕ} (Y : Submodule O (Fin a → Fin n → LL))
+        (φ : ↥Y →ₗ[O] Q) (u : G → Fin a → Fin n → LL) (hu : ∀ g, u g ∈ Y) (c : O),
+      IsOpen (Set.range (algebraMap O LL)) → Continuous u → c ≠ 0 → (∀ y, c • φ y = 0)
+        → IsLocallyConstant fun g => φ ⟨u g, hu g⟩ := by
   classical
   intro G O LL Q _ _ _ _ _ _ _ _ _ _ _ a n Y φ u hu c hopen hcont hc hkill
   let Lmap : (Fin a → Fin n → O) →ₗ[O] (Fin a → Fin n → LL) :=
@@ -30,11 +32,10 @@ theorem _root_.UpperTheory.KN.isLocallyConstant_torsion_push_of_continuous :
   have hW : IsOpen W := hopen.preimage (continuous_const.mul continuous_id)
   let U : Set (Fin a → Fin n → LL) := {v | ∀ j m, v j m ∈ W}
   have hU : IsOpen U := by
-    have hUe : U = ⋂ j, ⋂ m, (fun v : Fin a → Fin n → LL => v j m) ⁻¹' W := by
-      ext v; simp [U]
+    have hUe : U = ⋂ j, ⋂ m, (fun v : Fin a → Fin n → LL => v j m) ⁻¹' W := by ext v; simp [U]
     rw [hUe]
-    exact isOpen_iInter_of_finite fun j => isOpen_iInter_of_finite fun m =>
-      hW.preimage ((continuous_apply m).comp (continuous_apply j))
+    exact isOpen_iInter_of_finite fun j =>
+      isOpen_iInter_of_finite fun m => hW.preimage ((continuous_apply m).comp (continuous_apply j))
   have key : ∀ v ∈ Y, v ∈ U → ∃ y ∈ Y, v = c • y := by
     intro v hvY hvU
     simp only [U, W, Set.mem_setOf_eq, Set.mem_preimage, Set.mem_range] at hvU

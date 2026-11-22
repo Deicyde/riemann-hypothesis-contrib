@@ -31,30 +31,35 @@ theorem wfLog_of (hI : PI.InvSerSub) (hL : PI.WfLogL) : PI.WfLog := by
     simp [hw0]
     rw [map_ofNat]
     norm_num
-  let S : Subring ℂ_[p] :=
-    { carrier := {x | InWf x}
-      mul_mem' := by
-        rintro a b ⟨k, hk⟩ ⟨k', hk'⟩
-        refine ⟨k + k', ?_⟩
-        have e : (p : ℂ_[p]) ^ (k + k') * (a * b) = ((p : ℂ_[p]) ^ k * a) * ((p : ℂ_[p]) ^ k' * b) := by
-          ring
-        rw [e]
-        exact (Wp p).mul_mem hk hk'
-      one_mem' := ⟨0, by simpa using (Wp p).one_mem⟩
-      add_mem' := by
-        rintro a b ⟨k, hk⟩ ⟨k', hk'⟩
-        refine ⟨k + k', ?_⟩
-        have e : (p : ℂ_[p]) ^ (k + k') * (a + b) =
-            (p : ℂ_[p]) ^ k' * ((p : ℂ_[p]) ^ k * a) + (p : ℂ_[p]) ^ k * ((p : ℂ_[p]) ^ k' * b) := by
-          ring
-        rw [e]
-        exact (Wp p).add_mem ((Wp p).mul_mem ((Wp p).pow_mem (natCast_mem (Wp p) p) _) hk)
-          ((Wp p).mul_mem ((Wp p).pow_mem (natCast_mem (Wp p) p) _) hk')
-      zero_mem' := ⟨0, by simpa using (Wp p).zero_mem⟩
-      neg_mem' := by
-        rintro a ⟨k, hk⟩
-        exact ⟨k, by rw [mul_neg]; exact (Wp p).neg_mem hk⟩ }
-  have hres := hI ℂ_[p] S (AddIntG.flog W wq) ex (fun n => hfl (Finsupp.single () n)) hc0 hc1 hex hsub
+  let S : Subring ℂ_[p] := {
+    carrier := {x | InWf x}
+    mul_mem' := by
+      rintro a b ⟨k, hk⟩ ⟨k', hk'⟩
+      refine ⟨k + k', ?_⟩
+      have e
+          : (p : ℂ_[p]) ^ (k + k') * (a * b) = ((p : ℂ_[p]) ^ k * a) * ((p : ℂ_[p]) ^ k' * b) := by
+        ring
+      rw [e]
+      exact (Wp p).mul_mem hk hk'
+    one_mem' := ⟨0, by simpa using (Wp p).one_mem⟩
+    add_mem' := by
+      rintro a b ⟨k, hk⟩ ⟨k', hk'⟩
+      refine ⟨k + k', ?_⟩
+      have e
+          : (p : ℂ_[p]) ^ (k + k') * (a + b)
+            = (p : ℂ_[p]) ^ k' * ((p : ℂ_[p]) ^ k * a)
+              + (p : ℂ_[p]) ^ k * ((p : ℂ_[p]) ^ k' * b) := by
+        ring
+      rw [e]
+      exact (Wp p).add_mem ((Wp p).mul_mem ((Wp p).pow_mem (natCast_mem (Wp p) p) _) hk)
+        ((Wp p).mul_mem ((Wp p).pow_mem (natCast_mem (Wp p) p) _) hk')
+    zero_mem' := ⟨0, by simpa using (Wp p).zero_mem⟩
+    neg_mem' := by
+      rintro a ⟨k, hk⟩
+      exact ⟨k, by rw [mul_neg]; exact (Wp p).neg_mem hk⟩
+  }
+  have hres :=
+    hI ℂ_[p] S (AddIntG.flog W wq) ex (fun n => hfl (Finsupp.single () n)) hc0 hc1 hex hsub
   intro n
   have hn : n = Finsupp.single () (n ()) := by
     ext

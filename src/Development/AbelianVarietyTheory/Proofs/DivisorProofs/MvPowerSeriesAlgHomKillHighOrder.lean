@@ -7,15 +7,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FrobKerIdeal
 
 @[expose] public section
 
-open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv GlobalTheory.PDivGroup GlobalTheory.Katz
+open CategoryTheory TensorProduct MvPowerSeries GlobalTheory GlobalTheory.PDiv
+  GlobalTheory.PDivGroup GlobalTheory.Katz
 
 namespace GlobalTheory
 
-theorem mvPowerSeries_algHom_kill_high_order :
-    ∀ (k : Type) [CommRing k] (σ : Type) [Finite σ] (A : Type) [CommRing A] [Algebra k A],
-      ∀ φ : MvPowerSeries σ k →ₐ[k] A, (∀ i, IsNilpotent (φ (X i))) →
-        ∃ N : ℕ, ∀ f : MvPowerSeries σ k,
-          (∀ α : σ →₀ ℕ, α.degree < N → coeff α f = 0) → φ f = 0 := by
+theorem mvPowerSeries_algHom_kill_high_order
+    : ∀ (k : Type) [CommRing k] (σ : Type) [Finite σ] (A : Type) [CommRing A] [Algebra k A],
+      ∀ φ : MvPowerSeries σ k →ₐ[k] A,
+        (∀ i, IsNilpotent (φ (X i)))
+          → ∃ N : ℕ, ∀ f : MvPowerSeries σ k,
+            (∀ α : σ →₀ ℕ, α.degree < N → coeff α f = 0) → φ f = 0 := by
   intro k _ σ _ A _ _ φ hφ
   classical
   haveI := Fintype.ofFinite σ
@@ -27,8 +29,9 @@ theorem mvPowerSeries_algHom_kill_high_order :
 
   let fi : σ → MvPowerSeries σ k := fun i α =>
     if h : ∃ j, M ≤ α j then (if h.choose = i then coeff α f else 0) else 0
-  have hcoeff : ∀ i α, coeff α (fi i) =
-      if h : ∃ j, M ≤ α j then (if h.choose = i then coeff α f else 0) else 0 :=
+  have hcoeff
+      : ∀ i α,
+        coeff α (fi i) = if h : ∃ j, M ≤ α j then (if h.choose = i then coeff α f else 0) else 0 :=
     fun i α => rfl
   have hsum : f = ∑ i, fi i := by
     ext α
@@ -43,7 +46,9 @@ theorem mvPowerSeries_algHom_kill_high_order :
       apply hf
       push_neg at h
       rw [Finsupp.degree_eq_sum]
-      calc ∑ i, α i ≤ ∑ _i : σ, M := Finset.sum_le_sum fun i _ => (h i).le
+      calc
+        ∑ i, α i
+          ≤ ∑ _i : σ, M := Finset.sum_le_sum fun i _ => (h i).le
         _ = Fintype.card σ * M := by simp
         _ < Fintype.card σ * M + 1 := Nat.lt_succ_self _
   have hdvd : ∀ i, (X i : MvPowerSeries σ k) ^ M ∣ fi i := by

@@ -74,11 +74,16 @@ private lemma ge_zero_of_mm_sub_one {c : C} (h : V.MM (c - 1)) : V.Ge 0 c := by
   rw [h1]
   exact ge0_add_lemma_4 (ge_zero_of_mm h) ge0_one_lemma_7
 
-theorem mm_mul_series {σ : Type} {A B : MvPowerSeries σ C} (hA : ∀ μ, V.MM (MvPowerSeries.coeff μ A))
-    (hB : ∀ μ, V.Ge 0 (MvPowerSeries.coeff μ B)) : ∀ μ, V.MM (MvPowerSeries.coeff μ (A * B)) := by
+theorem mm_mul_series
+    {σ : Type} {A B : MvPowerSeries σ C}
+    (hA : ∀ μ, V.MM (MvPowerSeries.coeff μ A)) (hB : ∀ μ, V.Ge 0 (MvPowerSeries.coeff μ B))
+    : ∀ μ, V.MM (MvPowerSeries.coeff μ (A * B)) := by
   intro μ
   rw [MvPowerSeries.coeff_mul]
-  exact Finset.sum_induction _ (fun x => V.MM x) (fun a b ha hb => mm_add_lemma_3 ha hb) mm_zero_lemma
+  exact Finset.sum_induction _
+    (fun x => V.MM x)
+    (fun a b ha hb => mm_add_lemma_3 ha hb)
+    mm_zero_lemma
     (fun p _ => mm_mul_lemma_5 (hA p.1) (hB p.2))
 
 theorem root_one {ζ : C} (hζ : ζ ^ V.l = 1) : V.MM (ζ - 1) := by
@@ -103,17 +108,21 @@ theorem root_one {ζ : C} (hζ : ζ ^ V.l = 1) : V.MM (ζ - 1) := by
   have hpow : ∀ m : ℕ, v ((ζ - 1) ^ m) = (((m : ℝ) * r : ℝ) : WithTop ℝ) := by
     intro m
     rw [AddValuation.map_pow, ← hr]
-    first
-      | rw [← WithTop.coe_nsmul, nsmul_eq_mul]
-      | (norm_cast; simp [nsmul_eq_mul])
-  have hbin : ∑ m ∈ Finset.range (l' + 1 + 1), (ζ - 1) ^ m * 1 ^ (l' + 1 - m) * ((l' + 1).choose m : C) = 1 := by
+    first | rw [← WithTop.coe_nsmul, nsmul_eq_mul] | (norm_cast; simp [nsmul_eq_mul])
+  have hbin
+      : ∑ m ∈ Finset.range (l' + 1 + 1), (ζ - 1) ^ m * 1 ^ (l' + 1 - m) * ((l' + 1).choose m : C)
+        = 1 := by
     rw [← add_pow, sub_add_cancel, hζ]
   rw [Finset.sum_range_succ, Finset.sum_range_succ'] at hbin
-  simp only [pow_zero, one_pow, mul_one, Nat.choose_zero_right, Nat.choose_self, Nat.cast_one] at hbin
-  have hx : (ζ - 1) ^ (l' + 1) = -∑ m ∈ Finset.range l', (ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C) := by
+  simp only [pow_zero, one_pow, mul_one, Nat.choose_zero_right, Nat.choose_self, Nat.cast_one]
+    at hbin
+  have hx
+      : (ζ - 1) ^ (l' + 1)
+        = - ∑ m ∈ Finset.range l', (ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C) := by
     linear_combination hbin
-  have hterm : ∀ m ∈ Finset.range l', v ((ζ - 1) ^ (l' + 1)) <
-      v ((ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C)) := by
+  have hterm
+      : ∀ m ∈ Finset.range l',
+        v ((ζ - 1) ^ (l' + 1)) < v ((ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C)) := by
     intro m hm
     rw [Finset.mem_range] at hm
     obtain ⟨q, hq⟩ := hp.dvd_choose_self (k := m + 1) (by omega) (by omega)
@@ -123,36 +132,48 @@ theorem root_one {ζ : C} (hζ : ζ ^ V.l = 1) : V.MM (ζ - 1) := by
     have hreal : ((l' + 1 : ℕ) : ℝ) * r < ((m + 1 : ℕ) : ℝ) * r + 1 := by
       push_cast
       nlinarith [mul_nonpos_of_nonneg_of_nonpos (sub_nonneg.mpr hm') hr0]
-    have hA : ((((l' + 1 : ℕ) : ℝ) * r : ℝ) : WithTop ℝ) < ((((m + 1 : ℕ) : ℝ) * r + 1 : ℝ) : WithTop ℝ) :=
+    have hA
+        : ((((l' + 1 : ℕ) : ℝ) * r : ℝ) : WithTop ℝ)
+          < ((((m + 1 : ℕ) : ℝ) * r + 1 : ℝ) : WithTop ℝ) :=
       WithTop.coe_lt_coe.mpr hreal
-    have hB : ((((m + 1 : ℕ) : ℝ) * r + 1 : ℝ) : WithTop ℝ) ≤
-        ((((m + 1 : ℕ) : ℝ) * r : ℝ) : WithTop ℝ) + (1 + v (q : C)) := by
+    have hB
+        : ((((m + 1 : ℕ) : ℝ) * r + 1 : ℝ) : WithTop ℝ)
+          ≤ ((((m + 1 : ℕ) : ℝ) * r : ℝ) : WithTop ℝ) + (1 + v (q : C)) := by
       rw [WithTop.coe_add, WithTop.coe_one]
       exact add_le_add le_rfl (le_add_of_nonneg_right hq0)
     exact lt_of_lt_of_le hA hB
-  have hsum : v ((ζ - 1) ^ (l' + 1)) <
-      v (∑ m ∈ Finset.range l', (ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C)) := by
+  have hsum
+      : v ((ζ - 1) ^ (l' + 1))
+        < v (∑ m ∈ Finset.range l', (ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C)) := by
     refine Finset.sum_induction _ (fun y => v ((ζ - 1) ^ (l' + 1)) < v y) ?_ ?_ hterm
     · intro a b ha hb
       exact lt_of_lt_of_le (lt_min ha hb) (v.map_add a b)
     · rw [AddValuation.map_zero, hpow]
       exact WithTop.coe_lt_top _
-  have hx' : v ((ζ - 1) ^ (l' + 1)) =
-      v (∑ m ∈ Finset.range l', (ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C)) := by
+  have hx'
+      : v ((ζ - 1) ^ (l' + 1))
+        = v (∑ m ∈ Finset.range l', (ζ - 1) ^ (m + 1) * ((l' + 1).choose (m + 1) : C)) := by
     rw [hx, AddValuation.map_neg]
   rw [← hx'] at hsum
   exact lt_irrefl _ hsum
 
 end RootsP
 
-theorem rootsProd : ∀ (C : Type) [Field C] (V : VF C) (ζ : C), ζ ^ V.l = 1 → ∀ (j : Fin 2)
-    (f : MvPowerSeries (Fin 2) C), IntS V f → ∀ μ, V.MM (MvPowerSeries.coeff μ
-      (∏ k ∈ Finset.range V.l, MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f - f ^ V.l)) := by
+theorem rootsProd
+    : ∀ (C : Type) [Field C] (V : VF C) (ζ : C),
+      ζ ^ V.l = 1
+        → ∀ (j : Fin 2) (f : MvPowerSeries (Fin 2) C),
+          IntS V f
+            → ∀ μ,
+              V.MM (MvPowerSeries.coeff μ
+                (∏ k ∈ Finset.range V.l, MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f
+                  - f ^ V.l)) := by
   intro C _ V ζ hζ j f hf
-  have hc : ∀ (k : ℕ) (μ : Fin 2 →₀ ℕ), (μ.prod fun s m => (if s = j then ζ ^ k else 1) ^ m) ^ V.l = 1 := by
+  have hc
+      : ∀ (k : ℕ) (μ : Fin 2 →₀ ℕ),
+        (μ.prod fun s m => (if s = j then ζ ^ k else 1) ^ m) ^ V.l = 1 := by
     intro k μ
-    have hk : (ζ ^ k) ^ V.l = 1 := by
-      rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow]
+    have hk : (ζ ^ k) ^ V.l = 1 := by rw [← pow_mul, mul_comm, pow_mul, hζ, one_pow]
     unfold Finsupp.prod
     rw [← Finset.prod_pow]
     apply Finset.prod_eq_one
@@ -161,16 +182,19 @@ theorem rootsProd : ∀ (C : Type) [Field C] (V : VF C) (ζ : C), ζ ^ V.l = 1 �
     split_ifs
     · rw [hk, one_pow]
     · simp
-  have hcoef : ∀ (k : ℕ) (μ : Fin 2 →₀ ℕ),
-      MvPowerSeries.coeff μ (MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f) =
-        (μ.prod fun s m => (if s = j then ζ ^ k else 1) ^ m) * MvPowerSeries.coeff μ f := by
+  have hcoef
+      : ∀ (k : ℕ) (μ : Fin 2 →₀ ℕ),
+        MvPowerSeries.coeff μ (MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f)
+          = (μ.prod fun s m => (if s = j then ζ ^ k else 1) ^ m) * MvPowerSeries.coeff μ f := by
     intro k μ
     first
-      | exact MvPowerSeries.coeff_rescale _ _ _
-      | rw [MvPowerSeries.coeff_rescale]
-      | simp [MvPowerSeries.coeff_rescale]
-  have hE : ∀ (k : ℕ) (μ : Fin 2 →₀ ℕ), V.MM (MvPowerSeries.coeff μ
-      (MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f - f)) := by
+    | exact MvPowerSeries.coeff_rescale _ _ _
+    | rw [MvPowerSeries.coeff_rescale]
+    | simp [MvPowerSeries.coeff_rescale]
+  have hE
+      : ∀ (k : ℕ) (μ : Fin 2 →₀ ℕ),
+        V.MM (MvPowerSeries.coeff μ
+          (MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f - f)) := by
     intro k μ
     rw [map_sub, hcoef, ← sub_one_mul]
     exact RootsP.mm_mul_lemma_5 (RootsP.root_one (hc k μ)) (hf μ)
@@ -187,8 +211,11 @@ theorem rootsProd : ∀ (C : Type) [Field C] (V : VF C) (ζ : C), ζ ^ V.l = 1 �
     | succ n ih =>
       rw [pow_succ]
       exact RootsP.ints_mul_lemma_8 ih hf
-  have key : ∀ n : ℕ, ∀ μ, V.MM (MvPowerSeries.coeff μ
-      (∏ k ∈ Finset.range n, MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f - f ^ n)) := by
+  have key
+      : ∀ n : ℕ, ∀ μ,
+        V.MM (MvPowerSeries.coeff μ
+          (∏ k ∈ Finset.range n, MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f
+            - f ^ n)) := by
     intro n
     induction n with
     | zero =>
@@ -197,11 +224,13 @@ theorem rootsProd : ∀ (C : Type) [Field C] (V : VF C) (ζ : C), ζ ^ V.l = 1 �
       exact RootsP.mm_zero_lemma
     | succ n ih =>
       intro μ
-      have hid : ∏ k ∈ Finset.range (n + 1), MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f -
-          f ^ (n + 1) =
-          (∏ k ∈ Finset.range n, MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f - f ^ n) *
-              MvPowerSeries.rescale (fun i => if i = j then ζ ^ n else 1) f +
-            f ^ n * (MvPowerSeries.rescale (fun i => if i = j then ζ ^ n else 1) f - f) := by
+      have hid
+          : ∏ k ∈ Finset.range (n + 1), MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f
+              - f ^ (n + 1)
+            = (∏ k ∈ Finset.range n, MvPowerSeries.rescale (fun i => if i = j then ζ ^ k else 1) f
+                  - f ^ n)
+                * MvPowerSeries.rescale (fun i => if i = j then ζ ^ n else 1) f
+              + f ^ n * (MvPowerSeries.rescale (fun i => if i = j then ζ ^ n else 1) f - f) := by
         rw [Finset.prod_range_succ, pow_succ]
         ring
       rw [hid, map_add (f := _)]

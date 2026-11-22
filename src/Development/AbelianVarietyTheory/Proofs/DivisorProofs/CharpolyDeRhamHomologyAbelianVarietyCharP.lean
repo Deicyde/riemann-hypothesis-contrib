@@ -12,7 +12,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.DeRhamVector
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
 
 set_option autoImplicit false
 
@@ -20,12 +21,14 @@ noncomputable section
 
 namespace GlobalTheory.DeRhamCharpolyP
 
-theorem charpoly_of_red {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M] [Module R M]
-    [Module.Free R M] [Module.Finite R M] [AddCommGroup V] [Module K V]
-    (π : R →+* K) (hπ : Function.Surjective π) (c : ℕ) (hc : (c : K) = 0)
+theorem charpoly_of_red
+    {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M] [Module R M] [Module.Free R M]
+    [Module.Finite R M] [AddCommGroup V] [Module K V]
+    (π : R →+* K) (hπ : Function.Surjective π)
+    (c : ℕ) (hc : (c : K) = 0)
     (red : M →ₛₗ[π] V) (hs : Function.Surjective red) (hk : ∀ m, red m = 0 ↔ ∃ n, m = c • n)
-    (φ : Module.End R M) (ψ : Module.End K V) (h : ∀ m, red (φ m) = ψ (red m)) :
-    ∃ _ : Module.Finite K V, ψ.charpoly = φ.charpoly.map π := by
+    (φ : Module.End R M) (ψ : Module.End K V) (h : ∀ m, red (φ m) = ψ (red m))
+    : ∃ _ : Module.Finite K V, ψ.charpoly = φ.charpoly.map π := by
   classical
   let b := Module.Free.chooseBasis R M
   let v : Module.Free.ChooseBasisIndex R M → V := fun i => red (b i)
@@ -49,9 +52,12 @@ theorem charpoly_of_red {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M]
       have := congrArg (fun m => b.repr m i) hn
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_sum, map_smul, Finsupp.finsetSum_apply, Finsupp.smul_apply,
-          Module.Basis.repr_self, smul_eq_mul, map_nsmul] at this
-      rw [Finset.sum_eq_single i (fun j _ hj => by simp [hj])
-        (fun hi => absurd (Finset.mem_univ i) hi)] at this
+            Module.Basis.repr_self, smul_eq_mul, map_nsmul]
+          at this
+      rw [Finset.sum_eq_single i
+          (fun j _ hj => by simp [hj])
+          (fun hi => absurd (Finset.mem_univ i) hi)]
+        at this
       simpa [nsmul_eq_mul] using this
     rw [← ha i, hai, map_mul, map_natCast, hc, zero_mul]
   have hsp : ⊤ ≤ Submodule.span K (Set.range v) := by
@@ -68,28 +74,32 @@ theorem charpoly_of_red {R K M V : Type} [CommRing R] [Field K] [AddCommGroup M]
     rw [Matrix.map_apply, LinearMap.toMatrix_apply, LinearMap.toMatrix_apply, hbV j, ← h, hred]
     have hv : ∀ i', v i' = bV i' := fun i' => (hbV i').symm
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hv, map_sum, map_smul, Module.Basis.repr_self, Finsupp.finsetSum_apply,
-        Finsupp.smul_apply, smul_eq_mul, Finsupp.single_apply, mul_ite, _root_.mul_one, mul_zero,
-        Finset.sum_ite_eq', Finset.mem_univ, ite_true]
+    simp only [hv, map_sum, map_smul, Module.Basis.repr_self, Finsupp.finsetSum_apply,
+      Finsupp.smul_apply, smul_eq_mul, Finsupp.single_apply, mul_ite, _root_.mul_one, mul_zero,
+      Finset.sum_ite_eq', Finset.mem_univ, ite_true]
   rw [← LinearMap.charpoly_toMatrix ψ bV, hmat, Matrix.charpoly_map, LinearMap.charpoly_toMatrix]
 
-theorem charpoly_dualMap {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
-    [Module.Finite K (Module.Dual K V)] (f : Module.End K V) : (f.dualMap).charpoly = f.charpoly := by
+theorem charpoly_dualMap
+    {K V : Type*} [Field K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    [Module.Finite K (Module.Dual K V)]
+    (f : Module.End K V)
+    : (f.dualMap).charpoly = f.charpoly := by
   classical
   rw [← LinearMap.charpoly_toMatrix f (Module.finBasis K V),
-    ← LinearMap.charpoly_toMatrix f.dualMap (Module.finBasis K V).dualBasis, ← Matrix.charpoly_transpose,
-    LinearMap.dualMap_def, LinearMap.toMatrix_transpose, Matrix.transpose_transpose]
+    ← LinearMap.charpoly_toMatrix f.dualMap (Module.finBasis K V).dualBasis,
+    ← Matrix.charpoly_transpose, LinearMap.dualMap_def, LinearMap.toMatrix_transpose,
+    Matrix.transpose_transpose]
 
 end GlobalTheory.DeRhamCharpolyP
 
 namespace GlobalTheory.DeRhamCharpolyP
 
-
 open GlobalTheory.AV GlobalTheory.PDivGroup in
-theorem charpoly_push : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p]
-    (B : GlobalTheory.AV.AbVar k) (f : B ⟶ B) [Module.Finite k (HdR B.X)],
-    LinearMap.charpoly (push (dp0 k) (𝟙 _) f.hom) =
-      (GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom k) := by
+theorem charpoly_push
+    : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP k p] [PerfectRing k p]
+        (B : GlobalTheory.AV.AbVar k) (f : B ⟶ B) [Module.Finite k (HdR B.X)],
+      LinearMap.charpoly (push (dp0 k) (𝟙 _) f.hom)
+        = (GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom k) := by
   intro p _ k _ _ _ B f _
   obtain ⟨G, -, ⟨t⟩⟩ := GlobalTheory.AVTower.exists_tower p k B
   let T := GlobalTheory.Dieu.theory p
@@ -98,12 +108,14 @@ theorem charpoly_push : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP
   have h1 := GlobalTheory.Dieu.CharpolyAV.charpoly_map_eq p T k B G t (End.of f)
   have hπ : Function.Surjective (WittVector.constantCoeff : WittVector p k →+* k) := fun x =>
     ⟨WittVector.teichmuller p x, by simp⟩
-  obtain ⟨hfin, h2⟩ := charpoly_of_red (WittVector.constantCoeff : WittVector p k →+* k) hπ p
-    (CharP.cast_eq_zero k p) (T.red G) (T.base.red_surjective G trivial) (T.base.red_eq_zero G trivial)
-    (T.map (t.map t f.hom)) (rigExtMap (t.map t f.hom)) (fun m => by
-      have := T.base.red_smap trivial trivial (SemiHom.ofHom (t.map t f.hom)) m
-      rw [SemiHom.ofHom_rig] at this
-      exact this)
+  obtain ⟨hfin, h2⟩ :=
+    charpoly_of_red (WittVector.constantCoeff : WittVector p k →+* k) hπ p (CharP.cast_eq_zero k p)
+      (T.red G) (T.base.red_surjective G trivial) (T.base.red_eq_zero G trivial)
+      (T.map (t.map t f.hom)) (rigExtMap (t.map t f.hom))
+      (fun m => by
+        have := T.base.red_smap trivial trivial (SemiHom.ofHom (t.map t f.hom)) m
+        rw [SemiHom.ofHom_rig] at this
+        exact this)
   have : Module.Finite k G.RigExt := hfin
   obtain ⟨e, he, -, -⟩ := GlobalTheory.deRhamVectorExtension p
   have hR : IsNilpotent (p : k) := by rw [CharP.cast_eq_zero]; exact IsNilpotent.zero
@@ -114,13 +126,15 @@ theorem charpoly_push : ∀ (p : ℕ) [Fact p.Prime] (k : Type) [Field k] [CharP
     exact E.eq_symm_apply.mpr (he.primPull hR B.ab B.ab t t f.hom c)
   have h3 : (primPull (dp0 k) (𝟙 _) f.hom).charpoly = (rigExtMap (t.map t f.hom)).charpoly := by
     exact (congrArg LinearMap.charpoly hconj).trans (E.symm.charpoly_conj _)
-  calc LinearMap.charpoly (push (dp0 k) (𝟙 _) f.hom)
+  calc
+    LinearMap.charpoly (push (dp0 k) (𝟙 _) f.hom)
       = ((primPull (dp0 k) (𝟙 _) f.hom).dualMap).charpoly := rfl
     _ = (primPull (dp0 k) (𝟙 _) f.hom).charpoly := charpoly_dualMap _
     _ = (rigExtMap (t.map t f.hom)).charpoly := h3
-    _ = ((GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom (WittVector p k))).map WittVector.constantCoeff :=
+    _ = ((GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom (WittVector p k))).map
+        WittVector.constantCoeff :=
       h2.trans (congrArg (Polynomial.map WittVector.constantCoeff) h1)
     _ = (GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom k) := by
-        rw [Polynomial.map_map]; congr 1; exact RingHom.ext_int _ _
+      rw [Polynomial.map_map]; congr 1; exact RingHom.ext_int _ _
 
 end GlobalTheory.DeRhamCharpolyP

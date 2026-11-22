@@ -5,11 +5,16 @@ public import Development.AbelianVarietyTheory.Definitions.TwistedInnerProducts.
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 
@@ -17,8 +22,8 @@ namespace GlobalTheory.AscFin.CongrOrbit
 
 variable {O : Type} [CommRing O] {n : Type} [Fintype n] [DecidableEq n]
 
-theorem quot_mapMatrix_eq_one_iff (I : Ideal O) (A : Matrix n n O) :
-    (Ideal.Quotient.mk I).mapMatrix A = 1 ↔ ∀ i j, (A - 1) i j ∈ I := by
+theorem quot_mapMatrix_eq_one_iff (I : Ideal O) (A : Matrix n n O)
+    : (Ideal.Quotient.mk I).mapMatrix A = 1 ↔ ∀ i j, (A - 1) i j ∈ I := by
   constructor
   · intro h i j
     have := congrFun (congrFun h i) j
@@ -30,34 +35,34 @@ theorem quot_mapMatrix_eq_one_iff (I : Ideal O) (A : Matrix n n O) :
     rw [Matrix.sub_apply, ← Ideal.Quotient.eq] at this
     simpa [Matrix.one_apply, apply_ite] using this
 
-theorem isUnit_det_of_sub_one_mem (I : Ideal O) (hI : I ≤ Ideal.jacobson ⊥) (A : Matrix n n O)
-    (hA : ∀ i j, (A - 1) i j ∈ I) : IsUnit A.det := by
+theorem isUnit_det_of_sub_one_mem
+    (I : Ideal O) (hI : I ≤ Ideal.jacobson ⊥) (A : Matrix n n O) (hA : ∀ i j, (A - 1) i j ∈ I)
+    : IsUnit A.det := by
   have h1 := (quot_mapMatrix_eq_one_iff I A).2 hA
-  have h2 : Ideal.Quotient.mk I A.det = 1 := by
-    rw [RingHom.map_det, h1, Matrix.det_one]
-  have h3 : A.det - 1 ∈ I := by
-    rw [← Ideal.Quotient.eq, h2, map_one]
+  have h2 : Ideal.Quotient.mk I A.det = 1 := by rw [RingHom.map_det, h1, Matrix.det_one]
+  have h3 : A.det - 1 ∈ I := by rw [← Ideal.Quotient.eq, h2, map_one]
   have h4 := (Ideal.mem_jacobson_bot.1 (hI h3)) 1
   simpa using h4
 
 variable {a b : Type} [Fintype a] [Fintype b]
 
 def colFix (f : a → n) (ξ : a → n → O) : Matrix n n O :=
-  Matrix.of fun i j => (if i = j then 1 else 0) +
-    ∑ p, (ξ p i - if i = f p then 1 else 0) * (if j = f p then 1 else 0)
+  Matrix.of fun i j =>
+    (if i = j then 1 else 0) + ∑ p, (ξ p i - if i = f p then 1 else 0) * (if j = f p then 1 else 0)
 
 def rowFix (g : b → n) (ζ : b → n → O) : Matrix n n O :=
-  Matrix.of fun i j => (if i = j then 1 else 0) +
-    ∑ q, (if i = g q then 1 else 0) * (ζ q j - if g q = j then 1 else 0)
+  Matrix.of fun i j =>
+    (if i = j then 1 else 0) + ∑ q, (if i = g q then 1 else 0) * (ζ q j - if g q = j then 1 else 0)
 
-theorem colFix_sub_one_mem (I : Ideal O) (f : a → n) (ξ : a → n → O)
-    (hξ : ∀ p i, ξ p i - (if i = f p then 1 else 0) ∈ I) (i j : n) :
-    (colFix f ξ - 1) i j ∈ I := by
+theorem colFix_sub_one_mem
+    (I : Ideal O) (f : a → n) (ξ : a → n → O) (hξ : ∀ p i, ξ p i - (if i = f p then 1 else 0) ∈ I)
+    (i j : n)
+    : (colFix f ξ - 1) i j ∈ I := by
   simp only [colFix, Matrix.sub_apply, Matrix.of_apply, Matrix.one_apply, add_sub_cancel_left]
   exact Ideal.sum_mem _ fun p _ => Ideal.mul_mem_right _ _ (hξ p i)
 
-theorem colFix_apply_col {f : a → n} (hf : Function.Injective f) (ξ : a → n → O) (i : n)
-    (p₀ : a) : colFix f ξ i (f p₀) = ξ p₀ i := by
+theorem colFix_apply_col {f : a → n} (hf : Function.Injective f) (ξ : a → n → O) (i : n) (p₀ : a)
+    : colFix f ξ i (f p₀) = ξ p₀ i := by
   simp only [colFix, Matrix.of_apply]
   rw [Finset.sum_eq_single p₀]
   · rw [if_pos rfl, mul_one]; ring
@@ -65,14 +70,15 @@ theorem colFix_apply_col {f : a → n} (hf : Function.Injective f) (ξ : a → n
     rw [if_neg (fun h => hp (hf h).symm), mul_zero]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem rowFix_sub_one_mem (I : Ideal O) (g : b → n) (ζ : b → n → O)
-    (hζ : ∀ q j, ζ q j - (if g q = j then 1 else 0) ∈ I) (i j : n) :
-    (rowFix g ζ - 1) i j ∈ I := by
+theorem rowFix_sub_one_mem
+    (I : Ideal O) (g : b → n) (ζ : b → n → O) (hζ : ∀ q j, ζ q j - (if g q = j then 1 else 0) ∈ I)
+    (i j : n)
+    : (rowFix g ζ - 1) i j ∈ I := by
   simp only [rowFix, Matrix.sub_apply, Matrix.of_apply, Matrix.one_apply, add_sub_cancel_left]
   exact Ideal.sum_mem _ fun q _ => Ideal.mul_mem_left _ _ (hζ q j)
 
-theorem rowFix_apply_row {g : b → n} (hg : Function.Injective g) (ζ : b → n → O) (j : n)
-    (q₀ : b) : rowFix g ζ (g q₀) j = ζ q₀ j := by
+theorem rowFix_apply_row {g : b → n} (hg : Function.Injective g) (ζ : b → n → O) (j : n) (q₀ : b)
+    : rowFix g ζ (g q₀) j = ζ q₀ j := by
   simp only [rowFix, Matrix.of_apply]
   rw [Finset.sum_eq_single q₀]
   · rw [if_pos rfl, one_mul]; ring
@@ -80,15 +86,17 @@ theorem rowFix_apply_row {g : b → n} (hg : Function.Injective g) (ζ : b → n
     rw [if_neg (fun h => hq (hg h).symm), zero_mul]
   · intro h; exact absurd (Finset.mem_univ _) h
 
-theorem rowFix_apply_col (f : a → n) (g : b → n) (ζ : b → n → O)
-    (hζ : ∀ q p, ζ q (f p) = if g q = f p then 1 else 0) (i : n) (p : a) :
-    rowFix g ζ i (f p) = if i = f p then 1 else 0 := by
+theorem rowFix_apply_col
+    (f : a → n) (g : b → n) (ζ : b → n → O) (hζ : ∀ q p, ζ q (f p) = if g q = f p then 1 else 0)
+    (i : n) (p : a)
+    : rowFix g ζ i (f p) = if i = f p then 1 else 0 := by
   simp only [rowFix, Matrix.of_apply, hζ, sub_self, mul_zero, Finset.sum_const_zero, add_zero]
 
-theorem vecMul_sub_single_mem (I : Ideal O) (A : Matrix n n O)
-    (hA : ∀ i j, (A - 1) i j ∈ I) (v : n → O) (c : n)
-    (hv : ∀ i, v i - (if i = c then 1 else 0) ∈ I) (j : n) :
-    (v ᵥ* A) j - (if c = j then 1 else 0) ∈ I := by
+theorem vecMul_sub_single_mem
+    (I : Ideal O) (A : Matrix n n O) (hA : ∀ i j, (A - 1) i j ∈ I)
+    (v : n → O) (c : n) (hv : ∀ i, v i - (if i = c then 1 else 0) ∈ I)
+    (j : n)
+    : (v ᵥ* A) j - (if c = j then 1 else 0) ∈ I := by
   have e1 : (v ᵥ* A) j = (v ᵥ* (A - 1)) j + v j := by
     rw [Matrix.vecMul_sub, Matrix.vecMul_one, Pi.sub_apply]; ring
   have e2 : (if c = j then (1 : O) else 0) = if j = c then 1 else 0 := by
@@ -102,7 +110,19 @@ theorem vecMul_sub_single_mem (I : Ideal O) (A : Matrix n n O)
 
 end GlobalTheory.AscFin.CongrOrbit
 
-theorem GlobalTheory.AscFin.exists_gl_congr_cols_rows : ∀ (O : Type) [CommRing O] (I : Ideal O), I ≤ Ideal.jacobson ⊥ → ∀ (n a b : Type) [Fintype n] [DecidableEq n] [Fintype a] [Fintype b] (f : a → n) (g : b → n), Function.Injective f → Function.Injective g → ∀ (ξ : a → n → O) (η : b → n → O), (∀ p i, ξ p i - (if i = f p then 1 else 0) ∈ I) → (∀ q i, η q i - (if i = g q then 1 else 0) ∈ I) → (∀ p q, η q ⬝ᵥ ξ p = if g q = f p then 1 else 0) → ∃ k : GL n O, (∀ i j, (k.1 - 1) i j ∈ I) ∧ (∀ p i, k.1 i (f p) = ξ p i) ∧ ∀ q, η q ᵥ* k.1 = fun i => if i = g q then 1 else 0 := by
+theorem GlobalTheory.AscFin.exists_gl_congr_cols_rows
+    : ∀ (O : Type) [CommRing O] (I : Ideal O),
+      I ≤ Ideal.jacobson ⊥
+        → ∀ (n a b : Type) [Fintype n] [DecidableEq n] [Fintype a] [Fintype b] (f : a → n)
+            (g : b → n),
+          Function.Injective f → Function.Injective g
+            → ∀ (ξ : a → n → O) (η : b → n → O),
+              (∀ p i, ξ p i - (if i = f p then 1 else 0) ∈ I)
+                → (∀ q i, η q i - (if i = g q then 1 else 0) ∈ I)
+                → (∀ p q, η q ⬝ᵥ ξ p = if g q = f p then 1 else 0)
+                → ∃ k : GL n O,
+                  (∀ i j, (k.1 - 1) i j ∈ I) ∧ (∀ p i, k.1 i (f p) = ξ p i)
+                    ∧ ∀ q, η q ᵥ* k.1 = fun i => if i = g q then 1 else 0 := by
   intro O _ I hI n a b _ _ _ _ f g hf hg ξ η hξ hη hηξ
   open GlobalTheory.AscFin.CongrOrbit in
   set k₁ := colFix f ξ with hk₁
@@ -131,9 +151,10 @@ theorem GlobalTheory.AscFin.exists_gl_congr_cols_rows : ∀ (O : Type) [CommRing
     have e1 := (quot_mapMatrix_eq_one_iff I k₁).2 hk₁I
     have e2 := (quot_mapMatrix_eq_one_iff I m).2 hmI
     have eW : (Ideal.Quotient.mk I).mapMatrix Wm = 1 := by
-      calc (Ideal.Quotient.mk I).mapMatrix Wm
-          = (Ideal.Quotient.mk I).mapMatrix Wm * (Ideal.Quotient.mk I).mapMatrix m := by
-            rw [e2, mul_one]
+      calc
+        (Ideal.Quotient.mk I).mapMatrix Wm
+            = (Ideal.Quotient.mk I).mapMatrix Wm * (Ideal.Quotient.mk I).mapMatrix m := by
+          rw [e2, mul_one]
         _ = 1 := by rw [← map_mul, hWmm, map_one]
     rw [map_mul, e1, eW, one_mul]
   · intro p i
@@ -142,16 +163,15 @@ theorem GlobalTheory.AscFin.exists_gl_congr_cols_rows : ∀ (O : Type) [CommRing
       intro l
       have := congrFun (congrFun hWmm l) (f p)
       rw [Matrix.mul_apply, Matrix.one_apply] at this
-      simpa only [hmcol, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ,
-        if_true] using this
+      simpa only [hmcol, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
+        using this
     rw [Matrix.mul_apply]
     simp only [hWcol, mul_ite, mul_one, mul_zero, Finset.sum_ite_eq', Finset.mem_univ, if_true]
     exact colFix_apply_col hf ξ i p
   · intro q
     rw [hval, ← Matrix.vecMul_vecMul]
     funext j
-    have hrow : η q ᵥ* k₁ = fun l => m (g q) l := by
-      funext l; rw [hm, rowFix_apply_row hg]
+    have hrow : η q ᵥ* k₁ = fun l => m (g q) l := by funext l; rw [hm, rowFix_apply_row hg]
     rw [hrow]
     have := congrFun (congrFun hmWm (g q)) j
     rw [Matrix.mul_apply, Matrix.one_apply] at this

@@ -12,13 +12,16 @@ namespace Formalism.MainNotions.ColumnSystems.Pf
 
 open Formalism.MainNotions.G
 
-theorem choose_ratio (A x n : ℕ) (Q θ : ℝ) (hθ : 0 ≤ θ) (hQ : 0 ≤ Q)
-    (h : ∀ t : ℕ, 1 ≤ t → θ * ((x : ℝ) + t) ≤ Q * ((A : ℝ) + t)) :
-    θ ^ n * (sd n x : ℝ) ≤ Q ^ n * (sd n A : ℝ) := by
+theorem choose_ratio
+    (A x n : ℕ) (Q θ : ℝ)
+    (hθ : 0 ≤ θ) (hQ : 0 ≤ Q) (h : ∀ t : ℕ, 1 ≤ t → θ * ((x : ℝ) + t) ≤ Q * ((A : ℝ) + t))
+    : θ ^ n * (sd n x : ℝ) ≤ Q ^ n * (sd n A : ℝ) := by
   induction n with
   | zero => simp [sd]
   | succ n ih =>
-    have key : ∀ y : ℕ, ((sd (n + 1) y : ℕ) : ℝ) * ((n : ℝ) + 1) = (sd n y : ℝ) * ((y : ℝ) + ((n : ℝ) + 1)) := by
+    have key
+        : ∀ y : ℕ,
+          ((sd (n + 1) y : ℕ) : ℝ) * ((n : ℝ) + 1) = (sd n y : ℝ) * ((y : ℝ) + ((n : ℝ) + 1)) := by
       intro y
       have h1 := Nat.add_one_mul_choose_eq (y + n) n
       have h2 : sd (n + 1) y = (y + n + 1).choose (n + 1) := rfl
@@ -34,10 +37,12 @@ theorem choose_ratio (A x n : ℕ) (Q θ : ℝ) (hθ : 0 ≤ θ) (hQ : 0 ≤ Q)
     have hx : 0 ≤ θ * ((x : ℝ) + ((n : ℝ) + 1)) := by positivity
     have hmain := mul_le_mul ih hstep hx hA
     refine le_of_mul_le_mul_right ?_ hn
-    calc θ ^ (n + 1) * (sd (n + 1) x : ℝ) * ((n : ℝ) + 1)
+    calc
+      θ ^ (n + 1) * (sd (n + 1) x : ℝ) * ((n : ℝ) + 1)
         = θ ^ n * (sd n x : ℝ) * (θ * ((x : ℝ) + ((n : ℝ) + 1))) := by rw [mul_assoc, key]; ring
       _ ≤ Q ^ n * (sd n A : ℝ) * (Q * ((A : ℝ) + ((n : ℝ) + 1))) := hmain
-      _ = Q ^ (n + 1) * (sd (n + 1) A : ℝ) * ((n : ℝ) + 1) := by rw [mul_assoc (Q ^ (n + 1)), key]; ring
+      _ = Q ^ (n + 1) * (sd (n + 1) A : ℝ) * ((n : ℝ) + 1) := by
+        rw [mul_assoc (Q ^ (n + 1)), key]; ring
 
 theorem Ne_ge (q n : ℕ) (hq : 2 ≤ q) : (q : ℝ) ^ n ≤ gaussianNumber q (n + 1) := by
   unfold gaussianNumber
@@ -49,8 +54,10 @@ theorem Ne_ge (q n : ℕ) (hq : 2 ≤ q) : (q : ℝ) ^ n ≤ gaussianNumber q (n
   rw [e]
   linarith
 
-theorem four_fac {e1 e2 x z w : ℝ} (h1 : 0 ≤ e1) (h1' : e1 ≤ 1) (h2 : 0 ≤ e2) (h2' : e2 ≤ 1) (hx : 0 ≤ x) (hx' : x ≤ 1)
-    (hz : 0 ≤ z) (hw : 1 - z ≤ w) : 1 - e1 - e2 - x - z ≤ (1 - e1) * (1 - e2) * (1 - x) * w := by
+theorem four_fac
+    {e1 e2 x z w : ℝ} (h1 : 0 ≤ e1) (h1' : e1 ≤ 1) (h2 : 0 ≤ e2) (h2' : e2 ≤ 1) (hx : 0 ≤ x)
+    (hx' : x ≤ 1) (hz : 0 ≤ z) (hw : 1 - z ≤ w)
+    : 1 - e1 - e2 - x - z ≤ (1 - e1) * (1 - e2) * (1 - x) * w := by
   have hP0 : 0 ≤ (1 - e1) * (1 - e2) * (1 - x) :=
     mul_nonneg (mul_nonneg (by linarith) (by linarith)) (by linarith)
   have hP1 : (1 - e1) * (1 - e2) * (1 - x) ≤ 1 := by
@@ -68,25 +75,27 @@ theorem symDim_toNat (m : ℕ) (A : ℤ) (hA : 0 ≤ A) : symDim (m + 1) A = sd 
   rw [if_neg (not_lt.2 hA)]
   rw [show A.toNat + (m + 1) - 1 = A.toNat + m by omega, show m + 1 - 1 = m by omega]
 
-theorem prod_letters {n' : ℕ} (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (f g : Fin n' → ℝ) :
-    ∏ j, (f (segStart TT j) * ((∏ i, g (segPos TT j i) * f (segPos TT j i)) * g (segNext TT j))) =
-      ∏ s ∈ TT, f s * g s := by
+theorem prod_letters {n' : ℕ} (TT : Finset (Fin n')) (h2 : 2 ≤ numSeg TT) (f g : Fin n' → ℝ)
+    : ∏ j, (f (segStart TT j) * ((∏ i, g (segPos TT j i) * f (segPos TT j i)) * g (segNext TT j)))
+      = ∏ s ∈ TT, f s * g s := by
   have e : ∏ s ∈ TT, f s * g s = (∏ s ∈ TT, f s) * ∏ s ∈ TT, g s := Finset.prod_mul_distrib
   rw [e, prod_tops TT h2 f, prod_tops TT h2 g]
   simp only [Finset.prod_mul_distrib]
   rw [prod_next TT g]
   ring
 
-
 set_option maxHeartbeats 800000 in
-theorem seg_num {k Q a b' Y E0 N1 La m cm A0 mN e1 e2 : ℝ} (hk5 : 5 ≤ k) (hQ1 : 1 ≤ Q) (hb : 0 < b') (hba : b' ≤ a)
-    (hY1 : 1 ≤ Y) (hE : 0 ≤ E0) (hN1 : 1 ≤ N1) (hLa1 : 1 ≤ La) (hkm : k = mN + 1) (hm4 : 1 ≤ mN)
-    (hA0lo : a / (2 * Q) ≤ A0) (hkQ : k ^ 3 * Q ≤ b') (hm : 0 ≤ m) (hcm : cm < m + 1) (hcm0 : 0 ≤ cm) (t1 : 0 < e1)
-    (_he2 : 0 < e2) (he21 : e2 ≤ e1) (hB : e1 + k * Q * (m + N1 * k) / b' + 1 / Y + k * E0 / a < 1 / 6) :
-    cm ≤ A0 * N1 * La / k ∧ 0 ≤ mN * cm / A0 ∧ mN * cm / A0 ≤ 1 ∧ 0 ≤ mN * ((2 * a / (k * Y) + E0 + Q) / a) ∧
-      (2 * a / (k * Y) + E0 + Q) / a ≤ 1 ∧ 0 ≤ (2 * a / (k * Y) + E0 + Q) / a ∧
-      e1 + e2 + mN * cm / A0 + mN * ((2 * a / (k * Y) + E0 + Q) / a) ≤
-        3 * (e1 + k * Q * (m + N1 * k) / b' + 1 / Y + k * E0 / a) := by
+theorem seg_num
+    {k Q a b' Y E0 N1 La m cm A0 mN e1 e2 : ℝ} (hk5 : 5 ≤ k) (hQ1 : 1 ≤ Q) (hb : 0 < b')
+    (hba : b' ≤ a) (hY1 : 1 ≤ Y) (hE : 0 ≤ E0) (hN1 : 1 ≤ N1) (hLa1 : 1 ≤ La) (hkm : k = mN + 1)
+    (hm4 : 1 ≤ mN) (hA0lo : a / (2 * Q) ≤ A0) (hkQ : k ^ 3 * Q ≤ b') (hm : 0 ≤ m) (hcm : cm < m + 1)
+    (hcm0 : 0 ≤ cm) (t1 : 0 < e1) (_he2 : 0 < e2) (he21 : e2 ≤ e1)
+    (hB : e1 + k * Q * (m + N1 * k) / b' + 1 / Y + k * E0 / a < 1 / 6)
+    : cm ≤ A0 * N1 * La / k ∧ 0 ≤ mN * cm / A0 ∧ mN * cm / A0 ≤ 1
+      ∧ 0 ≤ mN * ((2 * a / (k * Y) + E0 + Q) / a) ∧ (2 * a / (k * Y) + E0 + Q) / a ≤ 1
+      ∧ 0 ≤ (2 * a / (k * Y) + E0 + Q) / a
+      ∧ e1 + e2 + mN * cm / A0 + mN * ((2 * a / (k * Y) + E0 + Q) / a)
+        ≤ 3 * (e1 + k * Q * (m + N1 * k) / b' + 1 / Y + k * E0 / a) := by
   have hk : 0 < k := by linarith
   have hQ : 0 < Q := by linarith
   have ha : 0 < a := lt_of_lt_of_le hb hba
@@ -164,9 +173,10 @@ theorem seg_num {k Q a b' Y E0 N1 La m cm A0 mN e1 e2 : ℝ} (hk5 : 5 ≤ k) (hQ
   · exact mul_nonneg hmN0 hr0
   · linarith
 
-theorem ratio_num {a x t δ Qj A0 E0 Q D : ℝ} (ha : 0 < a) (hδ : δ = D + E0 + Q) (hδ0 : 0 ≤ δ / a) (hx1 : a ≤ x)
-    (hx2 : x ≤ a + D) (ht : 1 ≤ t) (hQj1 : 1 ≤ Qj) (hQ1 : 1 ≤ Q) (hfl : a - E0 < Qj * (A0 + 1)) :
-    (1 + -(δ / a)) * (x + t) ≤ Qj * (A0 + t) := by
+theorem ratio_num
+    {a x t δ Qj A0 E0 Q D : ℝ} (ha : 0 < a) (hδ : δ = D + E0 + Q) (hδ0 : 0 ≤ δ / a) (hx1 : a ≤ x)
+    (hx2 : x ≤ a + D) (ht : 1 ≤ t) (hQj1 : 1 ≤ Qj) (hQ1 : 1 ≤ Q) (hfl : a - E0 < Qj * (A0 + 1))
+    : (1 + -(δ / a)) * (x + t) ≤ Qj * (A0 + t) := by
   have ha' : a ≠ 0 := ha.ne'
   have hua : δ / a * a = δ := by field_simp
   have hD : 0 ≤ D := by linarith
@@ -184,10 +194,14 @@ theorem ratio_num {a x t δ Qj A0 E0 Q D : ℝ} (ha : 0 < a) (hδ : δ = D + E0 
       nlinarith
   linarith
 
-theorem chain_num {B lf θm sx F sA Qm R : ℝ} (h1 : 1 - 3 * B ≤ lf * θm) (hsx : 0 ≤ sx) (hF : 0 ≤ F) (hlf : 0 ≤ lf)
-    (hr : θm * sx ≤ Qm * sA) (hQm : 0 ≤ Qm) (hs : lf * (sA * F) ≤ R) : (1 - 3 * B) * (sx * F) ≤ Qm * R := by
+theorem chain_num
+    {B lf θm sx F sA Qm R : ℝ} (h1 : 1 - 3 * B ≤ lf * θm) (hsx : 0 ≤ sx) (hF : 0 ≤ F) (hlf : 0 ≤ lf)
+    (hr : θm * sx ≤ Qm * sA) (hQm : 0 ≤ Qm) (hs : lf * (sA * F) ≤ R)
+    : (1 - 3 * B) * (sx * F) ≤ Qm * R := by
   have hsF : 0 ≤ sx * F := mul_nonneg hsx hF
-  calc (1 - 3 * B) * (sx * F) ≤ (lf * θm) * (sx * F) := mul_le_mul_of_nonneg_right h1 hsF
+  calc
+    (1 - 3 * B) * (sx * F)
+      ≤ (lf * θm) * (sx * F) := mul_le_mul_of_nonneg_right h1 hsF
     _ = (lf * F) * (θm * sx) := by ring
     _ ≤ (lf * F) * (Qm * sA) := mul_le_mul_of_nonneg_left hr (mul_nonneg hlf hF)
     _ = Qm * (lf * (sA * F)) := by ring
@@ -198,17 +212,23 @@ section Core
 variable {C0 Cde CE1 CE2 : ℝ} {X : Loc}
 
 def brk (C0 CE1 CE2 : ℝ) (X : Loc) (m : ℝ) : ℝ :=
-  Real.exp (-(X.La C0) / 8) + X.k * X.Q * (m + X.N1 * X.k) / X.b' + 1 / X.Y + X.k * X.E0 C0 CE1 CE2 / X.a
+  Real.exp (-(X.La C0) / 8) + X.k * X.Q * (m + X.N1 * X.k) / X.b' + 1 / X.Y
+    + X.k * X.E0 C0 CE1 CE2 / X.a
 
-theorem kap_eq (Ckap m : ℝ) : kappaMarginBound Ckap X.N X.k X.Q m X.N1 X.b' X.Y (X.E0 C0 CE1 CE2) X.a (X.La C0) =
-    Ckap * X.N * brk C0 CE1 CE2 X m := rfl
+theorem kap_eq (Ckap m : ℝ)
+    : kappaMarginBound Ckap X.N X.k X.Q m X.N1 X.b' X.Y (X.E0 C0 CE1 CE2) X.a (X.La C0)
+      = Ckap * X.N * brk C0 CE1 CE2 X m :=
+  rfl
 
-theorem first_coefficient_facts (h : Std C0 Cde CE1 CE2 1 X) (j : Fin (numSeg X.TT)) :
-    (1 : ℝ) ≤ ((X.p ^ segG X.TT j : ℕ) : ℝ) ∧ ((X.p ^ segG X.TT j : ℕ) : ℝ) ≤ X.Q ∧
-    (X.a : ℝ) - X.E0 C0 CE1 CE2 < ((X.p ^ segG X.TT j : ℕ) : ℝ) * (((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) + 1) ∧
-    (X.a : ℝ) / (2 * X.Q) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) := by
-  have hdef : (X.seg C0 CE1 CE2 j).A0 X.p =
-      ⌊((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ)⌋ := rfl
+theorem first_coefficient_facts (h : Std C0 Cde CE1 CE2 1 X) (j : Fin (numSeg X.TT))
+    : (1 : ℝ) ≤ ((X.p ^ segG X.TT j : ℕ) : ℝ) ∧ ((X.p ^ segG X.TT j : ℕ) : ℝ) ≤ X.Q
+      ∧ (X.a : ℝ) - X.E0 C0 CE1 CE2
+        < ((X.p ^ segG X.TT j : ℕ) : ℝ) * (((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) + 1)
+      ∧ (X.a : ℝ) / (2 * X.Q) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) := by
+  have hdef
+      : (X.seg C0 CE1 CE2 j).A0 X.p
+        = ⌊((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ)⌋ :=
+    rfl
   have hp1 := h.p1
   have hQj1 : (1 : ℝ) ≤ ((X.p ^ segG X.TT j : ℕ) : ℝ) := by
     push_cast
@@ -228,7 +248,8 @@ theorem first_coefficient_facts (h : Std C0 Cde CE1 CE2 1 X) (j : Fin (numSeg X.
     have h4 : X.E0 C0 CE1 CE2 / X.a + X.Q / X.a ≤ 1 / 240 := by
       have : 40 * (X.N1 * X.La C0 / X.k) ≤ X.de C0 Cde := by
         have e : 40 * (X.N1 * X.La C0 / X.k) = 40 * X.N1 * X.La C0 / X.k := by ring
-        rw [e]; exact h2
+        rw [e]
+        exact h2
       linarith
     rw [← add_div, div_le_iff₀ ha] at h4
     linarith
@@ -236,8 +257,9 @@ theorem first_coefficient_facts (h : Std C0 Cde CE1 CE2 1 X) (j : Fin (numSeg X.
   · rw [div_lt_iff₀ hQj0] at hfl
     linarith
   · have hE := h.E0nn
-    have h3 : ((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q ≤
-        ((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ) :=
+    have h3
+        : ((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q
+          ≤ ((X.a : ℝ) - X.E0 C0 CE1 CE2) / ((X.p ^ segG X.TT j : ℕ) : ℝ) :=
       div_le_div_of_nonneg_left (by linarith) hQj0 hQjQ
     have h4 : (X.a : ℝ) / (2 * X.Q) + 1 ≤ ((X.a : ℝ) - X.E0 C0 CE1 CE2) / X.Q := by
       rw [le_div_iff₀ hQ0]
@@ -246,16 +268,23 @@ theorem first_coefficient_facts (h : Std C0 Cde CE1 CE2 1 X) (j : Fin (numSeg X.
       linarith
     linarith
 
-theorem seg_step (h : Std C0 Cde CE1 CE2 1 X) {m : ℝ} (hm : 0 ≤ m) (hB : brk C0 CE1 CE2 X m < 1 / 6)
+theorem seg_step
+    (h : Std C0 Cde CE1 CE2 1 X)
+    {m : ℝ} (hm : 0 ≤ m) (hB : brk C0 CE1 CE2 X m < 1 / 6)
     (j : Fin (numSeg X.TT)) (R : ℝ)
-    (hseg : (⌈m⌉₊ : ℝ) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) * X.N1 * X.La C0 / X.k →
-      lowFac C0 CE1 CE2 X j ⌈m⌉₊ *
-        ((symDim (X.m + 1) ((X.seg C0 CE1 CE2 j).A0 X.p) *
-          (∏ i, sd X.m (X.bT (segPos X.TT j i)) * sd X.m (X.aT (segPos X.TT j i))) *
-          sd X.m (X.bT (segNext X.TT j)) : ℕ) : ℝ) ≤ R) :
-    (1 - 3 * brk C0 CE1 CE2 X m) * ((sd X.m (X.aT (segStart X.TT j)) : ℝ) *
-        ((∏ i, (sd X.m (X.bT (segPos X.TT j i)) : ℝ) * (sd X.m (X.aT (segPos X.TT j i)) : ℝ)) *
-          (sd X.m (X.bT (segNext X.TT j)) : ℝ))) ≤ ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m * R := by
+    (hseg : (⌈m⌉₊ : ℝ) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) * X.N1 * X.La C0 / X.k
+      → lowFac C0 CE1 CE2 X j ⌈m⌉₊
+          * ((symDim (X.m + 1) ((X.seg C0 CE1 CE2 j).A0 X.p)
+                * (∏ i, sd X.m (X.bT (segPos X.TT j i)) * sd X.m (X.aT (segPos X.TT j i)))
+                * sd X.m (X.bT (segNext X.TT j))
+              : ℕ)
+            : ℝ)
+        ≤ R)
+    : (1 - 3 * brk C0 CE1 CE2 X m)
+        * ((sd X.m (X.aT (segStart X.TT j)) : ℝ)
+          * ((∏ i, (sd X.m (X.bT (segPos X.TT j i)) : ℝ) * (sd X.m (X.aT (segPos X.TT j i)) : ℝ))
+            * (sd X.m (X.bT (segNext X.TT j)) : ℝ)))
+      ≤ ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m * R := by
   have ha := h.apos
   have hm4 : (1 : ℝ) ≤ (X.m : ℝ) := by
     have := h.N1k
@@ -266,53 +295,70 @@ theorem seg_step (h : Std C0 Cde CE1 CE2 1 X) {m : ℝ} (hm : 0 ≤ m) (hB : brk
   have hA0pos : (0 : ℝ) < ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) :=
     lt_of_lt_of_le (div_pos ha (by have := h.Q1; linarith)) hA0lo
   have hA0nn : 0 ≤ (X.seg C0 CE1 CE2 j).A0 X.p := by exact_mod_cast hA0pos.le
-  have hcast : ((((X.seg C0 CE1 CE2 j).A0 X.p).toNat : ℕ) : ℝ) = ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) := by
+  have hcast
+      : ((((X.seg C0 CE1 CE2 j).A0 X.p).toNat : ℕ) : ℝ) = ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) := by
     exact_mod_cast Int.toNat_of_nonneg hA0nn
   have he21 : Real.exp (-(X.La C0) / 3) ≤ Real.exp (-(X.La C0) / 8) :=
     Real.exp_le_exp.mpr (by have := h.La1; linarith)
   have he1 : Real.exp (-(X.La C0) / 8) ≤ 1 := Real.exp_le_one_iff.mpr (by have := h.La1; linarith)
-  obtain ⟨hrange, hx0, hx1, hz0, hδ1, hδa0, hsum⟩ := seg_num (mN := (X.m : ℝ)) (cm := (⌈m⌉₊ : ℝ)) h.k5 h.Q1 h.bpos h.ba
-    h.Y1 h.E0nn h.one_le_level_alt h.La1 rfl hm4 hA0lo (h.kQ le_rfl) hm (Nat.ceil_lt_add_one hm) (Nat.cast_nonneg _)
-    (Real.exp_pos (-(X.La C0) / 8)) (Real.exp_pos (-(X.La C0) / 3)) he21 hB
+  obtain ⟨hrange, hx0, hx1, hz0, hδ1, hδa0, hsum⟩ :=
+    seg_num (mN := (X.m : ℝ)) (cm := (⌈m⌉₊ : ℝ)) h.k5 h.Q1 h.bpos h.ba h.Y1 h.E0nn
+      h.one_le_level_alt h.La1 rfl hm4 hA0lo (h.kQ le_rfl) hm (Nat.ceil_lt_add_one hm)
+      (Nat.cast_nonneg _) (Real.exp_pos (-(X.La C0) / 8)) (Real.exp_pos (-(X.La C0) / 3)) he21 hB
   have hs := hseg hrange
-  have hbern : 1 - (X.m : ℝ) * ((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ)) ≤
-      (1 + -((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ))) ^ X.m := by
-    have := one_add_mul_le_pow
-      (a := -((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ))) (by linarith) X.m
+  have hbern
+      : 1 - (X.m : ℝ) * ((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ))
+        ≤ (1 + -((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ))) ^ X.m := by
+    have :=
+      one_add_mul_le_pow (a := -((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ)))
+        (by linarith) X.m
     linarith
-  have hratio := choose_ratio ((X.seg C0 CE1 CE2 j).A0 X.p).toNat (X.aT (segStart X.TT j)) X.m
-    ((X.p ^ segG X.TT j : ℕ) : ℝ) (1 + -((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ)))
-    (by linarith) (by linarith)
-    (by
-      intro t ht
-      rw [hcast]
-      obtain ⟨hw1, hw2⟩ := h.winA _ (start_mem X.TT j).1
-      have e : (X.a : ℝ) * (1 + 2 / (X.k * X.Y)) = (X.a : ℝ) + 2 * (X.a : ℝ) / (X.k * X.Y) := by ring
-      rw [e] at hw2
-      exact ratio_num ha rfl hδa0 hw1 hw2 (by exact_mod_cast ht) hQj1 h.Q1 hfl)
-  have hfour := four_fac (Real.exp_pos (-(X.La C0) / 8)).le he1 (Real.exp_pos (-(X.La C0) / 3)).le (le_trans he21 he1)
-    hx0 hx1 hz0 hbern
+  have hratio :=
+    choose_ratio ((X.seg C0 CE1 CE2 j).A0 X.p).toNat (X.aT (segStart X.TT j)) X.m
+      ((X.p ^ segG X.TT j : ℕ) : ℝ)
+      (1 + -((2 * (X.a : ℝ) / (X.k * X.Y) + X.E0 C0 CE1 CE2 + X.Q) / (X.a : ℝ))) (by linarith)
+      (by linarith)
+      (by
+        intro t ht
+        rw [hcast]
+        obtain ⟨hw1, hw2⟩ := h.winA _ (start_mem X.TT j).1
+        have e : (X.a : ℝ) * (1 + 2 / (X.k * X.Y)) = (X.a : ℝ) + 2 * (X.a : ℝ) / (X.k * X.Y) := by
+          ring
+        rw [e] at hw2
+        exact ratio_num ha rfl hδa0 hw1 hw2 (by exact_mod_cast ht) hQj1 h.Q1 hfl)
+  have hfour :=
+    four_fac (Real.exp_pos (-(X.La C0) / 8)).le he1 (Real.exp_pos (-(X.La C0) / 3)).le
+      (le_trans he21 he1) hx0 hx1 hz0 hbern
   rw [symDim_toNat _ _ hA0nn] at hs
   push_cast at hs
-  refine chain_num (lf := lowFac C0 CE1 CE2 X j ⌈m⌉₊) (sA := (sd X.m ((X.seg C0 CE1 CE2 j).A0 X.p).toNat : ℝ))
-    ?_ (Nat.cast_nonneg _) (by positivity) ?_ hratio (by positivity) ?_
+  refine chain_num (lf := lowFac C0 CE1 CE2 X j ⌈m⌉₊)
+    (sA := (sd X.m ((X.seg C0 CE1 CE2 j).A0 X.p).toNat : ℝ)) ?_ (Nat.cast_nonneg _) (by positivity)
+    ?_ hratio (by positivity) ?_
   · unfold lowFac brk
     linarith
   · unfold lowFac
     exact mul_nonneg (mul_nonneg (by linarith) (by linarith [le_trans he21 he1])) (by linarith)
-  · calc _ = _ := by ring
+  · calc
+      _ = _ := by ring
       _ ≤ R := hs
 
-theorem rank_alternative_lower (h : Std C0 Cde CE1 CE2 1 X) {Ckap : ℝ} (hCk : 3 ≤ Ckap) {m : ℝ} (hm : 0 ≤ m)
-    (R : Fin (numSeg X.TT) → ℝ) (hR0 : ∀ j, 0 ≤ R j) (dim : ℝ)
-    (hdim : dim = ∏ s ∈ X.TT, (sd X.m (X.aT s) : ℝ) * (sd X.m (X.bT s) : ℝ))
-    (hseg : ∀ j, (⌈m⌉₊ : ℝ) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) * X.N1 * X.La C0 / X.k →
-      lowFac C0 CE1 CE2 X j ⌈m⌉₊ *
-        ((symDim (X.m + 1) ((X.seg C0 CE1 CE2 j).A0 X.p) *
-          (∏ i, sd X.m (X.bT (segPos X.TT j i)) * sd X.m (X.aT (segPos X.TT j i))) *
-          sd X.m (X.bT (segNext X.TT j)) : ℕ) : ℝ) ≤ R j) :
-    (1 - kappaMarginBound Ckap X.N X.k X.Q m X.N1 X.b' X.Y (X.E0 C0 CE1 CE2) X.a (X.La C0)) * dim ≤
-      gaussianNumber (X.p ^ X.n') (X.m + 1) * ∏ j, R j := by
+theorem rank_alternative_lower
+    (h : Std C0 Cde CE1 CE2 1 X)
+    {Ckap : ℝ} (hCk : 3 ≤ Ckap)
+    {m : ℝ} (hm : 0 ≤ m)
+    (R : Fin (numSeg X.TT) → ℝ) (hR0 : ∀ j, 0 ≤ R j)
+    (dim : ℝ) (hdim : dim = ∏ s ∈ X.TT, (sd X.m (X.aT s) : ℝ) * (sd X.m (X.bT s) : ℝ))
+    (hseg : ∀ j,
+      (⌈m⌉₊ : ℝ) ≤ ((X.seg C0 CE1 CE2 j).A0 X.p : ℝ) * X.N1 * X.La C0 / X.k
+        → lowFac C0 CE1 CE2 X j ⌈m⌉₊
+            * ((symDim (X.m + 1) ((X.seg C0 CE1 CE2 j).A0 X.p)
+                  * (∏ i, sd X.m (X.bT (segPos X.TT j i)) * sd X.m (X.aT (segPos X.TT j i)))
+                  * sd X.m (X.bT (segNext X.TT j))
+                : ℕ)
+              : ℝ)
+          ≤ R j)
+    : (1 - kappaMarginBound Ckap X.N X.k X.Q m X.N1 X.b' X.Y (X.E0 C0 CE1 CE2) X.a (X.La C0)) * dim
+      ≤ gaussianNumber (X.p ^ X.n') (X.m + 1) * ∏ j, R j := by
   rw [kap_eq]
   have hdim0 : 0 ≤ dim := by rw [hdim]; positivity
   have hq2 : 2 ≤ X.p ^ X.n' := by
@@ -339,26 +385,39 @@ theorem rank_alternative_lower (h : Std C0 Cde CE1 CE2 1 X) {Ckap : ℝ} (hCk : 
     have hNB : 3 * X.N * brk C0 CE1 CE2 X m ≤ Ckap * X.N * brk C0 CE1 CE2 X m :=
       mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right hCk (by linarith)) hB0
     have hB : brk C0 CE1 CE2 X m < 1 / 6 := by
-      have h1 : 2 * brk C0 CE1 CE2 X m ≤ X.N * brk C0 CE1 CE2 X m := mul_le_mul_of_nonneg_right hN2 hB0
+      have h1 : 2 * brk C0 CE1 CE2 X m ≤ X.N * brk C0 CE1 CE2 X m :=
+        mul_le_mul_of_nonneg_right hN2 hB0
       have e : 3 * X.N * brk C0 CE1 CE2 X m = 3 * (X.N * brk C0 CE1 CE2 X m) := by ring
       linarith
-    have hprod := Finset.prod_le_prod₀ (s := Finset.univ)
-      (f := fun j : Fin (numSeg X.TT) => (1 - 3 * brk C0 CE1 CE2 X m) * ((sd X.m (X.aT (segStart X.TT j)) : ℝ) *
-        ((∏ i, (sd X.m (X.bT (segPos X.TT j i)) : ℝ) * (sd X.m (X.aT (segPos X.TT j i)) : ℝ)) *
-          (sd X.m (X.bT (segNext X.TT j)) : ℝ))))
-      (g := fun j => ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m * R j)
-      (fun j _ => mul_nonneg (by linarith) (by positivity)) (fun j _ => seg_step h hm hB j (R j) (hseg j))
-    have hpl := prod_letters X.TT h.seg2 (fun s => (sd X.m (X.aT s) : ℝ)) (fun s => (sd X.m (X.bT s) : ℝ))
+    have hprod :=
+      Finset.prod_le_prod₀ (s := Finset.univ)
+        (f := fun j : Fin (numSeg X.TT) =>
+          (1 - 3 * brk C0 CE1 CE2 X m)
+            * ((sd X.m (X.aT (segStart X.TT j)) : ℝ)
+              * ((∏ i, (sd X.m (X.bT (segPos X.TT j i)) : ℝ) * (sd X.m (X.aT (segPos X.TT j i)) : ℝ))
+                * (sd X.m (X.bT (segNext X.TT j)) : ℝ))))
+        (g := fun j => ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m * R j)
+        (fun j _ => mul_nonneg (by linarith) (by positivity))
+        (fun j _ => seg_step h hm hB j (R j) (hseg j))
+    have hpl :=
+      prod_letters X.TT h.seg2 (fun s => (sd X.m (X.aT s) : ℝ)) (fun s => (sd X.m (X.bT s) : ℝ))
     beta_reduce at hpl
     have hQ : ∏ j, ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m = ((X.p ^ X.n' : ℕ) : ℝ) ^ X.m := by
       rw [Finset.prod_pow, ← Nat.cast_prod, Finset.prod_pow_eq_pow_sum, sum_segG X.TT h.seg2]
-    have eL : ∏ j : Fin (numSeg X.TT), (1 - 3 * brk C0 CE1 CE2 X m) * ((sd X.m (X.aT (segStart X.TT j)) : ℝ) *
-        ((∏ i, (sd X.m (X.bT (segPos X.TT j i)) : ℝ) * (sd X.m (X.aT (segPos X.TT j i)) : ℝ)) *
-          (sd X.m (X.bT (segNext X.TT j)) : ℝ))) = (1 - 3 * brk C0 CE1 CE2 X m) ^ numSeg X.TT * dim := by
-      rw [Finset.prod_mul_distrib, Finset.prod_const, hpl, ← hdim, Finset.card_univ, Fintype.card_fin]
-    have eR : ∏ j, ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m * R j = ((X.p ^ X.n' : ℕ) : ℝ) ^ X.m * ∏ j, R j := by
+    have eL
+        : ∏ j : Fin (numSeg X.TT), (1 - 3 * brk C0 CE1 CE2 X m) * ((sd X.m (X.aT (segStart X.TT j)) : ℝ) *
+            ((∏ i, (sd X.m (X.bT (segPos X.TT j i)) : ℝ) * (sd X.m (X.aT (segPos X.TT j i)) : ℝ)) *
+              (sd X.m (X.bT (segNext X.TT j)) : ℝ)))
+          = (1 - 3 * brk C0 CE1 CE2 X m) ^ numSeg X.TT * dim := by
+      rw [Finset.prod_mul_distrib, Finset.prod_const, hpl, ← hdim, Finset.card_univ,
+        Fintype.card_fin]
+    have eR
+        : ∏ j, ((X.p ^ segG X.TT j : ℕ) : ℝ) ^ X.m * R j
+          = ((X.p ^ X.n' : ℕ) : ℝ) ^ X.m * ∏ j, R j := by
       rw [Finset.prod_mul_distrib, hQ]
-    have hprod' : (1 - 3 * brk C0 CE1 CE2 X m) ^ numSeg X.TT * dim ≤ ((X.p ^ X.n' : ℕ) : ℝ) ^ X.m * ∏ j, R j := by
+    have hprod'
+        : (1 - 3 * brk C0 CE1 CE2 X m) ^ numSeg X.TT * dim
+          ≤ ((X.p ^ X.n' : ℕ) : ℝ) ^ X.m * ∏ j, R j := by
       rw [← eL, ← eR]
       exact hprod
     have hbern := one_add_mul_le_pow (a := -(3 * brk C0 CE1 CE2 X m)) (by linarith) (numSeg X.TT)
@@ -372,20 +431,27 @@ theorem rank_alternative_lower (h : Std C0 Cde CE1 CE2 1 X) {Ckap : ℝ} (hCk : 
       rw [e] at hbern
       have e2 : 3 * X.N * brk C0 CE1 CE2 X m = 3 * (X.N * brk C0 CE1 CE2 X m) := by ring
       linarith
-    calc (1 - Ckap * X.N * brk C0 CE1 CE2 X m) * dim
+    calc
+      (1 - Ckap * X.N * brk C0 CE1 CE2 X m) * dim
         ≤ (1 - 3 * brk C0 CE1 CE2 X m) ^ numSeg X.TT * dim := mul_le_mul_of_nonneg_right h2 hdim0
       _ ≤ ((X.p ^ X.n' : ℕ) : ℝ) ^ X.m * ∏ j, R j := hprod'
       _ ≤ gaussianNumber (X.p ^ X.n') (X.m + 1) * ∏ j, R j := mul_le_mul_of_nonneg_right hNe hP0
 
 end Core
 
-theorem threshold_standard_one : TransportedAlt fun C0 CYb Cde Ck CD Cb CE1 CE2 _ Cc =>
-    ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X :=
-  TransportedAlt.of_explicit (fun _ => 1) (fun _ _ => 1) (fun Cc _ CE1 CE2 _ => T2 CE1 CE2 Cc 1)
-    fun _ _ _ _ _ _ _ _ _ _ hCc hC0 _ h1 h2 _ _ _ _ _ _ _ _ _ t1 t2 t3 t4 t5 =>
-      fun _ hD hI hc => std_of hCc hC0 h1 h2 le_rfl t1 t2 t3 t4 t5 hD hI hc
+theorem threshold_standard_one
+    : TransportedAlt fun C0 CYb Cde Ck CD Cb CE1 CE2 _ Cc =>
+      ∀ X : Loc, D1num X → HIext C0 CYb Cde Ck CD Cb X → CBound Cc X → Std C0 Cde CE1 CE2 1 X :=
+  TransportedAlt.of_explicit
+    (fun _ => 1)
+    (fun _ _ => 1)
+    (fun Cc _ CE1 CE2 _ => T2 CE1 CE2 Cc 1)
+    fun _ _ _ _ _ _ _ _ _ _ hCc hC0 _ h1 h2 _ _ _ _ _ _ _ _ _ t1 t2 t3 t4 t5 => fun _ hD hI hc =>
+      std_of hCc hC0 h1 h2 le_rfl t1 t2 t3 t4 t5 hD hI hc
 
-theorem restAlt2_of {D : Formalism.BasicNotions.D7} (hSeg : RestSegLow) (hDim : DimHHAt) (hCZ : CharZeroAt) : RemainderSegmentBoundSecond D := by
+theorem restAlt2_of
+    {D : Formalism.BasicNotions.D7} (hSeg : RestSegLow) (hDim : DimHHAt) (hCZ : CharZeroAt)
+    : RemainderSegmentBoundSecond D := by
   refine TransportedAlt.mono ?_ (threshold_standard_one.and hSeg)
   rintro C0 CYb Cde Ck CD Cb CE1 CE2 Cm Cc ⟨hs, hseg⟩
   refine ⟨3, by norm_num, fun Ckap hCk => ?_⟩
@@ -395,8 +461,10 @@ theorem restAlt2_of {D : Formalism.BasicNotions.D7} (hSeg : RestSegLow) (hDim : 
   have := hCZ X.p X.n' W Qq O Kf ι σ jO w hS
   have hd := hDim Kf X.n' X.m X.TT X.aT X.bT (Nat.one_le_iff_ne_zero.mpr (NeZero.ne _))
   exact rank_alternative_lower h hCk hm
-    (fun j => (segRank O X.p X.m (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) m : ℝ))
-    (fun j => Nat.cast_nonneg _) _ (by rw [hd]; push_cast; rfl)
+    (fun j =>
+      (segRank O X.p X.m (X.seg C0 CE1 CE2 j) (segATop X.TT X.aT j) (segAPlus X.TT X.aT j) m : ℝ))
+    (fun j => Nat.cast_nonneg _)
+    _ (by rw [hd]; push_cast; rfl)
     (fun j hr => hseg X W Qq O Kf ι σ jO w hS hH hc j m hm hr)
 
 end Formalism.MainNotions.ColumnSystems.Pf

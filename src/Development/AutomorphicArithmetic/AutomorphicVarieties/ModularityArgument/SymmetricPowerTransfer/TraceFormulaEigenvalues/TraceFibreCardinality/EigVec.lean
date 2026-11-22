@@ -40,9 +40,10 @@ theorem eigVec : EigVec := by
           rw [hE, Submodule.mem_iInf] at this
           exact this a
         obtain ⟨k, hk⟩ := (Module.End.mem_maxGenEigenspace _ _ _).1 hva
-        obtain ⟨w, hwW, hw, hN⟩ := exists_ker_of_pow (u a - χ a • (1 : Module.End ℂ M)) W
-          (fun w hw => by
-            simpa using W.sub_mem (hWs a w hw) (W.smul_mem (χ a) hw)) k v hvW hv hk
+        obtain ⟨w, hwW, hw, hN⟩ :=
+          exists_ker_of_pow (u a - χ a • (1 : Module.End ℂ M)) W
+            (fun w hw => by simpa using W.sub_mem (hWs a w hw) (W.smul_mem (χ a) hw))
+            k v hvW hv hk
         refine (Submodule.ne_bot_iff _).2 ⟨w, ⟨hwW, ?_⟩, hw⟩
         refine Module.End.mem_eigenspace_iff.2 ?_
         simpa [sub_eq_zero] using hN

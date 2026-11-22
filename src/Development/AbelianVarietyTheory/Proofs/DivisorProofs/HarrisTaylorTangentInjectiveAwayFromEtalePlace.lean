@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.FormalModule
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.EtLev
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.EtLev
 open scoped TensorProduct
 
 noncomputable section
@@ -20,24 +23,32 @@ open GlobalTheory.UPel.HT.EtLev.TanKill
 
 variable {k V : Type} [Field k] [AddCommGroup V] [Module k V]
 
-theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] (b : Base D R) (w0 : Ideal (𝓞 D.F))
-    (hw : IsEtPlace b w0) [IsAlgClosed k] (β : R →+* k) (L : 𝓞 D.F →+* Module.End k V)
-    (hlie : ∀ v, L D.ω v = β b.ρ • v → ∃ w : Fin D.a → V, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ v = ∑ i, w i)
-    (c : 𝓞 D.F) (hc0 : c ≠ 0)
-    (hcw : ∀ w : Ideal (𝓞 D.F), w.IsMaximal → ((p : ℕ) : 𝓞 D.F) ∈ w → w ≠ w0 → c ∉ w)
-    (v : V) (hv : L c v = 0) : v = 0 := by
+theorem core_inj
+    {p : ℕ} [Fact p.Prime]
+    (D : Datum p)
+    {R : Type} [CommRing R]
+    (b : Base D R) (w0 : Ideal (𝓞 D.F)) (hw : IsEtPlace b w0)
+    [IsAlgClosed k]
+    (β : R →+* k) (L : 𝓞 D.F →+* Module.End k V)
+    (hlie : ∀ v,
+      L D.ω v = β b.ρ • v
+        → ∃ w : Fin D.a → V, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ v = ∑ i, w i)
+    (c : 𝓞 D.F)
+    (hc0 : c ≠ 0) (hcw : ∀ w : Ideal (𝓞 D.F), w.IsMaximal → ((p : ℕ) : 𝓞 D.F) ∈ w → w ≠ w0 → c ∉ w)
+    (v : V) (hv : L c v = 0)
+    : v = 0 := by
   have hpr : p.Prime := Fact.out
   by_cases hp : (p : k) = 0
   swap
-  ·
-    set N := Ideal.absNorm (Ideal.span {c}) with hNdef
+  · set N := Ideal.absNorm (Ideal.span {c}) with hNdef
     have hNmem : ((N : ℕ) : 𝓞 D.F) ∈ Ideal.span {c} := Ideal.absNorm_mem _
     obtain ⟨d, hd⟩ := Ideal.mem_span_singleton'.mp hNmem
     have hN0 : N ≠ 0 := by
       rw [hNdef, Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
       exact hc0
     obtain ⟨e, N', hN', hNe⟩ := Nat.exists_eq_pow_mul_and_not_dvd hN0 p hpr.one_lt.ne'
-    have hN'u : IsUnit ((N' : ℕ) : R) := b.unit N' ((Nat.Prime.coprime_iff_not_dvd hpr).mpr hN').symm
+    have hN'u : IsUnit ((N' : ℕ) : R) :=
+      b.unit N' ((Nat.Prime.coprime_iff_not_dvd hpr).mpr hN').symm
     have hN'k : ((N' : ℕ) : k) ≠ 0 := by
       have := hN'u.map β
       rw [map_natCast] at this
@@ -45,8 +56,7 @@ theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] 
     have hNk : ((N : ℕ) : k) ≠ 0 := by
       rw [hNe, Nat.cast_mul, Nat.cast_pow]
       exact mul_ne_zero (pow_ne_zero _ hp) hN'k
-    have h : L ((N : ℕ) : 𝓞 D.F) v = 0 := by
-      rw [← hd, map_mul, Module.End.mul_apply, hv, map_zero]
+    have h : L ((N : ℕ) : 𝓞 D.F) v = 0 := by rw [← hd, map_mul, Module.End.mul_apply, hv, map_zero]
     rw [L_nat] at h
     exact (smul_eq_zero.mp h).resolve_left hNk
   haveI : CharP k p := (CharP.charP_iff_prime_eq_zero hpr).mpr hp
@@ -61,8 +71,9 @@ theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] 
   have hq : ∀ u, Tω (Tω u) = (D.tr : k) • Tω u - (D.nm : k) • u := by
     intro u
     have h := congrArg (fun f => f u) (congrArg L hquad)
-    simp only [map_add (f := _), map_sub, map_mul, map_zero, Module.End.mul_apply, LinearMap.add_apply, LinearMap.sub_apply,
-      LinearMap.zero_apply, L_int] at h
+    simp only [map_add (f := _), map_sub, map_mul, map_zero, Module.End.mul_apply,
+        LinearMap.add_apply, LinearMap.sub_apply, LinearMap.zero_apply, L_int]
+      at h
     rw [← hTω] at h
     rw [← sub_eq_zero, ← h]
     abel
@@ -77,8 +88,10 @@ theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] 
     have hd : ((D.tr ^ 2 - 4 * D.nm : ℤ) : k) = 0 := by
       have : ((D.tr ^ 2 - 4 * D.nm : ℤ) : k) = (ρ1 - ρ2) ^ 2 := by
         push_cast
-        rw [← hsum, ← hprod]; ring
-      rw [this, h0]; ring
+        rw [← hsum, ← hprod]
+        ring
+      rw [this, h0]
+      ring
     exact D.disc_p ((CharP.intCast_eq_zero_iff k p _).mp hd)
   have hcomm : ∀ c u, L c (Tω u) = Tω (L c u) := by
     intro c u
@@ -127,9 +140,13 @@ theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] 
       exact hcw _ hmax hpP hnw (RingHom.mem_ker.mpr h0)
     obtain ⟨w, hwe, hweq⟩ := hlie v1 e1
     rw [hweq]
-    refine sum_eq_zero_of_eigen (L c) Finset.univ w (fun i => β (b.t i c)) (fun i _ => hwe i c)
-      (fun i _ => hne i) ?_
-    rw [← hweq]; exact k1
+    refine sum_eq_zero_of_eigen (L c) Finset.univ w
+      (fun i => β (b.t i c))
+      (fun i _ => hwe i c)
+      (fun i _ => hne i)
+      ?_
+    rw [← hweq]
+    exact k1
   have z2 : v2 = 0 := by
     obtain ⟨r0, hr0⟩ := D.split
     have hr0k : ((r0 : k) - ρ1) * ((r0 : k) - ρ2) = 0 := by
@@ -140,7 +157,8 @@ theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] 
       rcases mul_eq_zero.mp hr0k with h | h
       · exact ⟨D.tr - r0, by push_cast; rw [hρ2]; linear_combination -h⟩
       · exact ⟨r0, by linear_combination h⟩
-    obtain ⟨c', hc', e', f', hcef'⟩ := exists_mem_pow_add_eq_one p D R b w0 1 hw k β r2 (by rw [hr2, hρ2, hρ1])
+    obtain ⟨c', hc', e', f', hcef'⟩ :=
+      exists_mem_pow_add_eq_one p D R b w0 1 hw k β r2 (by rw [hr2, hρ2, hρ1])
     rw [pow_one] at hc'
     let J : Ideal (𝓞 D.F) := Ideal.span {D.ω - (r2 : 𝓞 D.F), ((p : ℕ) : 𝓞 D.F)}
     have hJ : Ideal.span {c} ⊔ J = ⊤ := by
@@ -158,13 +176,15 @@ theorem core_inj {p : ℕ} [Fact p.Prime] (D : Datum p) {R : Type} [CommRing R] 
           exact m.add_mem (m.add_mem hc' (m.mul_mem_left _ hωm)) (m.mul_mem_left _ hpm)
         exact hm.ne_top ((Ideal.eq_top_iff_one _).mpr h1)
       exact hcw m hm hpm hmw hcm
-    obtain ⟨a, ha, j, hj, haj⟩ := Submodule.mem_sup.mp (hJ ▸ Submodule.mem_top : (1 : 𝓞 D.F) ∈ Ideal.span {c} ⊔ J)
+    obtain ⟨a, ha, j, hj, haj⟩ :=
+      Submodule.mem_sup.mp (hJ ▸ Submodule.mem_top : (1 : 𝓞 D.F) ∈ Ideal.span {c} ⊔ J)
     obtain ⟨d, rfl⟩ := Ideal.mem_span_singleton'.mp ha
     obtain ⟨e, f, hef⟩ := Ideal.mem_span_pair.mp hj
     have h := congrArg (fun g => g v2) (congrArg L haj)
     rw [← hef] at h
-    simp only [map_add (f := _), map_mul, map_sub, map_one, Module.End.mul_apply, LinearMap.add_apply, LinearMap.sub_apply,
-      Module.End.one_apply, L_int, L_nat, k2] at h
+    simp only [map_add (f := _), map_mul, map_sub, map_one, Module.End.mul_apply,
+        LinearMap.add_apply, LinearMap.sub_apply, Module.End.one_apply, L_int, L_nat, k2]
+      at h
     rw [← hTω, e2, hr2, sub_self] at h
     simp only [hp, zero_smul, map_zero, zero_add, add_zero] at h
     exact h.symm
@@ -176,21 +196,38 @@ namespace GlobalTheory.UPel.HT.EtLev.TanInj
 
 open GlobalTheory.TanPtMod
 
-theorem tan_eq_one_of_notMem : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ) (w0 : Ideal (𝓞 D.F)), IsEtPlace b w0 → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s) (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (c : 𝓞 D.F), c ≠ 0 → (∀ w : Ideal (𝓞 D.F), w.IsMaximal → ((p : ℕ) : 𝓞 D.F) ∈ w → w ≠ w0 → c ∉ w) → ∀ v : epsPtR x ⟶ o.A, spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk x ⟶ o.A).left → v ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1 → v = 1 := by
+theorem tan_eq_one_of_notMem
+    : ∀ (p : ℕ) [Fact p.Prime] (D : Datum p) (R : Type) [CommRing R] (b : Base D R) (N : ℕ)
+        (w0 : Ideal (𝓞 D.F)),
+      IsEtPlace b w0
+        → ∀ (S : Scheme.{0}) (s : S ⟶ Sp R) (o : Obj b N s) (k : Type) [Field k] [IsAlgClosed k]
+            (x : Sp k ⟶ S) (c : 𝓞 D.F),
+          c ≠ 0 → (∀ w : Ideal (𝓞 D.F), w.IsMaximal → ((p : ℕ) : 𝓞 D.F) ∈ w → w ≠ w0 → c ∉ w)
+            → ∀ v : epsPtR x ⟶ o.A,
+              spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk x ⟶ o.A).left
+                → v ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) = 1
+                → v = 1 := by
   intro p _ D R _ b N w0 hw S s o k _ _ x c hc0 hcw v hv0 hv
   set β : R →+* k := (Spec.preimage (x ≫ s)).hom with hβ
   have hx : x ≫ s = spMap β := (Spec.map_preimage (x ≫ s)).symm
   let L : 𝓞 D.F →+* Module.End k (Tan x o.A) := (actEnd o.act).comp (algebraMap (𝓞 D.F) D.O)
-  have hL : ∀ c (u : Tan x o.A), (L c u).hom = u.hom ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) := fun _ _ => rfl
-  have hlie : ∀ u : Tan x o.A, L D.ω u = β b.ρ • u →
-      ∃ w : Fin D.a → Tan x o.A, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ u = ∑ i, w i := by
+  have hL : ∀ c (u : Tan x o.A), (L c u).hom = u.hom ≫ o.act.act (algebraMap (𝓞 D.F) D.O c) :=
+    fun _ _ => rfl
+  have hlie
+      : ∀ u : Tan x o.A,
+        L D.ω u = β b.ρ • u
+          → ∃ w : Fin D.a → Tan x o.A, (∀ i c, L c (w i) = β (b.t i c) • w i) ∧ u = ∑ i, w i := by
     intro u hu
-    obtain ⟨w, hw1, hw2⟩ := o.lie k β x hx u.hom
-      ⟨(mem_tanSub_iff x o.A _).mp u.hom_mem, by
-        have := congrArg (fun t : Tan x o.A => t.hom.left) hu
-        simpa [hL, GrpTangentPt.epsScalePt_left] using this⟩
+    obtain ⟨w, hw1, hw2⟩ :=
+      o.lie k β x hx u.hom ⟨
+        (mem_tanSub_iff x o.A _).mp u.hom_mem,
+        by
+          have := congrArg (fun t : Tan x o.A => t.hom.left) hu
+          simpa [hL, GrpTangentPt.epsScalePt_left] using this
+      ⟩
     have hmem : ∀ i, w i ∈ tanSub x o.A := fun i => (mem_tanSub_iff x o.A _).mpr (hw1 i 0).1
-    refine ⟨fun i => Tan.mk (w i) (hmem i), fun i c => Tan.ext (Over.OverMorphism.ext ((hw1 i c).2)), ?_⟩
+    refine
+      ⟨fun i => Tan.mk (w i) (hmem i), fun i c => Tan.ext (Over.OverMorphism.ext ((hw1 i c).2)), ?_⟩
     refine Tan.ext ?_
     rw [Tan.hom_sum, hw2, List.prod_ofFn]
     rfl

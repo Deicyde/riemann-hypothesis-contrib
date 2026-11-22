@@ -28,7 +28,9 @@ noncomputable section
 namespace GlobalTheory.Frames
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD
+  Formalism.L2.Pj
 
 namespace ComplexTransfer
 
@@ -40,8 +42,9 @@ theorem epi_spMap_field {k Ω : Type} [Field k] [Field Ω] (σ : k →+* Ω) : E
   haveI : Surjective (spMap σ) := ⟨fun p => ⟨IsLocalRing.closedPoint Ω, Subsingleton.elim _ _⟩⟩
   exact Flat.epi_of_flat_of_surjective _
 
-theorem countable_of_finiteType (K A : Type) [CommRing K] [Countable K] [CommRing A] [Algebra K A]
-    [h : Algebra.FiniteType K A] : Countable A := by
+theorem countable_of_finiteType
+    (K A : Type) [CommRing K] [Countable K] [CommRing A] [Algebra K A] [h : Algebra.FiniteType K A]
+    : Countable A := by
   obtain ⟨n, f, hf⟩ := Algebra.FiniteType.iff_quotient_mvPolynomial''.1 h
   haveI : Countable (MvPolynomial (Fin n) K) := by
     rw [← Cardinal.mk_le_aleph0_iff]
@@ -49,11 +52,15 @@ theorem countable_of_finiteType (K A : Type) [CommRing K] [Countable K] [CommRin
     simp
   exact hf.countable
 
-theorem exists_common_field {K : Type} [Field K] [Countable K] (σ : K →+* ℂ) {A B k : Type} [CommRing A] [Algebra K A]
-    [CommRing B] [Algebra K B] [Countable A] [Countable B] [Field k] [Algebra K k]
-    (φ : A →ₐ[K] k) (ψ : B →ₐ[K] k) :
-    ∃ (L : Type) (_ : Field L) (_ : Algebra K L) (ι : L →ₐ[K] k) (j : L →ₐ[K] CAt σ) (φL : A →ₐ[K] L)
-      (ψL : B →ₐ[K] L), ι.comp φL = φ ∧ ι.comp ψL = ψ ∧ Function.Injective j := by
+theorem exists_common_field
+    {K : Type} [Field K] [Countable K]
+    (σ : K →+* ℂ)
+    {A B k : Type} [CommRing A] [Algebra K A] [CommRing B] [Algebra K B] [Countable A] [Countable B]
+    [Field k] [Algebra K k]
+    (φ : A →ₐ[K] k) (ψ : B →ₐ[K] k)
+    : ∃ (L : Type) (_ : Field L) (_ : Algebra K L) (ι : L →ₐ[K] k) (j : L →ₐ[K] CAt σ)
+        (φL : A →ₐ[K] L) (ψL : B →ₐ[K] L),
+      ι.comp φL = φ ∧ ι.comp ψL = ψ ∧ Function.Injective j := by
   let s : Set k := Set.range φ ∪ Set.range ψ
   have hs : s.Countable := (Set.countable_range _).union (Set.countable_range _)
   let L := IntermediateField.adjoin K s
@@ -64,20 +71,32 @@ theorem exists_common_field {K : Type} [Field K] [Countable K] (σ : K →+* ℂ
     simp
   letI : Algebra K ℂ := σ.toAlgebra
   obtain ⟨j⟩ := GlobalTheory.nonempty_algHom_complex_of_countable K L
-  refine ⟨L, inferInstance, inferInstance, L.val, j,
+  refine ⟨
+    L,
+    inferInstance,
+    inferInstance,
+    L.val,
+    j,
     φ.codRestrict L.toSubalgebra fun a => IntermediateField.subset_adjoin K s (Or.inl ⟨a, rfl⟩),
-    ψ.codRestrict L.toSubalgebra fun a => IntermediateField.subset_adjoin K s (Or.inr ⟨a, rfl⟩), ?_, ?_, ?_⟩
+    ψ.codRestrict L.toSubalgebra fun a => IntermediateField.subset_adjoin K s (Or.inr ⟨a, rfl⟩),
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · ext a; rfl
   · ext a; rfl
   · exact j.toRingHom.injective
 
-theorem evalAt_of_mapR {K : Type} [Field K]
+theorem evalAt_of_mapR
+    {K : Type} [Field K]
     (pts : ∀ (S : Type) [CommRing S] [Algebra K S], Type)
     (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
       (S →ₐ[K] T) → pts S → pts T → Prop)
     (hW : EvalWD pts mapR) (f : Rules pts) (hf : IsNatural pts mapR f)
-    {S : Type} [CommRing S] [Algebra K S] (p : TRing K) (φ : p.R →ₐ[K] S) (y : pts p.R) (z : pts S)
-    (hz : mapR φ y z) : evalAt pts mapR f z = φ (f p y) := by
+    {S : Type} [CommRing S] [Algebra K S]
+    (p : TRing K) (φ : p.R →ₐ[K] S) (y : pts p.R)
+    (z : pts S) (hz : mapR φ y z)
+    : evalAt pts mapR f z = φ (f p y) := by
   have hT : FromTest pts mapR z := ⟨p, φ, y, hz⟩
   unfold evalAt
   rw [dite_eq_left hT]
@@ -85,7 +104,16 @@ theorem evalAt_of_mapR {K : Type} [Field K]
 
 end ComplexTransfer
 
-theorem exists_complex_framed_pair : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (k : Type) [Field k] [Algebra c.F k] (y y' : FrPt Xo c k), ∃ z z' : FrPt Xo c (CAt c.F.val.toRingHom), (∀ ρ : Xo.X ⟶ Xo.X, y'.x = y.x ≫ ρ → z'.x = z.x ≫ ρ) ∧ (∀ f ∈ sec Xo c 0 0, evR Xo c f y = 0 → evR Xo c f z = 0) ∧ ∀ f ∈ sec Xo c 0 0, ∀ a : c.F, evR Xo c f z' = algebraMap c.F (CAt c.F.val.toRingHom) a * evR Xo c f z → evR Xo c f y' = algebraMap c.F k a * evR Xo c f y := by
+theorem exists_complex_framed_pair
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (k : Type) [Field k] [Algebra c.F k] (y y' : FrPt Xo c k),
+      ∃ z z' : FrPt Xo c (CAt c.F.val.toRingHom),
+        (∀ ρ : Xo.X ⟶ Xo.X, y'.x = y.x ≫ ρ → z'.x = z.x ≫ ρ)
+          ∧ (∀ f ∈ sec Xo c 0 0, evR Xo c f y = 0 → evR Xo c f z = 0)
+          ∧ ∀ f ∈ sec Xo c 0 0, ∀ a : c.F,
+            evR Xo c f z' = algebraMap c.F (CAt c.F.val.toRingHom) a * evR Xo c f z
+              → evR Xo c f y' = algebraMap c.F k a * evR Xo c f y := by
   intro E _ _ _ H Dw l Xo c k _ _ y y'
   have hS : Out.SecBaseChangeSt := GlobalTheory.firstFiveLaws.1.secBaseChange
   have hW : EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) :=
@@ -99,11 +127,15 @@ theorem exists_complex_framed_pair : ∀ (E : Type) [Field E] [NumberField E] [I
   haveI : Countable q.R := ComplexTransfer.countable_of_finiteType c.F q.R
   obtain ⟨L, _, _, ι, j, φL, ψL, hφ, hψ, hj⟩ :=
     ComplexTransfer.exists_common_field c.F.val.toRingHom φ ψ
-  obtain ⟨z, hz⟩ := GlobalTheory.Frames.FramedBaseChange.exists_frMap hS E H Dw l Xo c _ _ (j.comp φL) y₀
-  obtain ⟨z', hz'⟩ := GlobalTheory.Frames.FramedBaseChange.exists_frMap hS E H Dw l Xo c _ _ (j.comp ψL) y₁
+  obtain ⟨z, hz⟩ :=
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap hS E H Dw l Xo c _ _ (j.comp φL) y₀
+  obtain ⟨z', hz'⟩ :=
+    GlobalTheory.Frames.FramedBaseChange.exists_frMap hS E H Dw l Xo c _ _ (j.comp ψL) y₁
   have hι : Function.Injective ι := ι.toRingHom.injective
-  have ev : ∀ f ∈ sec Xo c 0 0, evR Xo c f y = ι (φL (f p y₀)) ∧ evR Xo c f y' = ι (ψL (f q y₁)) ∧
-      evR Xo c f z = j (φL (f p y₀)) ∧ evR Xo c f z' = j (ψL (f q y₁)) := by
+  have ev
+      : ∀ f ∈ sec Xo c 0 0,
+        evR Xo c f y = ι (φL (f p y₀)) ∧ evR Xo c f y' = ι (ψL (f q y₁))
+          ∧ evR Xo c f z = j (φL (f p y₀)) ∧ evR Xo c f z' = j (ψL (f q y₁)) := by
     intro f hf
     refine ⟨?_, ?_, ?_, ?_⟩
     · rw [← AlgHom.comp_apply, hφ]

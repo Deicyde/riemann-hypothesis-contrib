@@ -9,7 +9,10 @@ open GlobalTheory.CompanionTheory.Ar.BT TensorProduct
 
 namespace GlobalTheory.CompanionTheory.Ar.BT.ExtSpan
 
-theorem extOrder_eq_span : ∀ (R : Type) [CommRing R] (T : Type) [CommGroup T] (R' : Type) [CommRing R'] (φ : R →+* R') (A : Subalgebra R (T → R)) (g : T → R'), g ∈ extOrder φ A ↔ g ∈ Submodule.span R' {g : T → R' | ∃ f ∈ A, g = fun t => φ (f t)} := by
+theorem extOrder_eq_span
+    : ∀ (R : Type) [CommRing R] (T : Type) [CommGroup T] (R' : Type) [CommRing R'] (φ : R →+* R')
+        (A : Subalgebra R (T → R)) (g : T → R'),
+      g ∈ extOrder φ A ↔ g ∈ Submodule.span R' {g : T → R' | ∃ f ∈ A, g = fun t => φ (f t)} := by
   intro R _ T _ R' _ φ A g
   set S : Set (T → R') := {g : T → R' | ∃ f ∈ A, g = fun t => φ (f t)} with hS
   have hmul : ∀ {x y : T → R'}, x ∈ S → y ∈ S → x * y ∈ S := by
@@ -25,7 +28,14 @@ theorem extOrder_eq_span : ∀ (R : Type) [CommRing R] (T : Type) [CommGroup T] 
     first
     | rfl
     | (unfold extOrder; congr 1)
-    | (unfold extOrder; congr 1; ext x; simp only [hS, Set.mem_setOf_eq, Set.mem_range, Set.mem_image, Subtype.exists, exists_prop, SetLike.mem_coe]; constructor <;> rintro ⟨f, hf, h⟩ <;> exact ⟨f, hf, h.symm⟩)
+    | (
+        unfold extOrder
+        congr 1
+        ext x
+        simp only [hS, Set.mem_setOf_eq, Set.mem_range, Set.mem_image, Subtype.exists, exists_prop,
+          SetLike.mem_coe]
+        constructor <;> rintro ⟨f, hf, h⟩ <;> exact ⟨f, hf, h.symm⟩
+      )
   rw [hdef, ← Subalgebra.mem_toSubmodule, hspan]
 
 end GlobalTheory.CompanionTheory.Ar.BT.ExtSpan

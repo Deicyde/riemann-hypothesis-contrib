@@ -7,7 +7,8 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.PAlg
+open CategoryTheory GroundTheory.PAdicHodge CrystallineSemistableComparison
+  CrystallineSemistableComparison.PAlg
 
 noncomputable section
 
@@ -32,8 +33,8 @@ theorem awayW_left (h : IsBase l A) (y : WL l (Ob l)) : awayW (invS A h) (awayW 
 theorem awayW_right (h : IsBase l A) (y : WL l A.A) : awayW A.s (awayW (invS A h) y) = y := by
   rw [← RingHom.comp_apply, ← awayW_comp, comp_invS, awayW_id]; rfl
 
-theorem awayW_inv_mem (h : IsBase l A) {y : WL l A.A} (hy : y ∈ A.Acr0) :
-    awayW (invS A h) y ∈ ACris.ACrisZero ℂ_[l] l := by
+theorem awayW_inv_mem (h : IsBase l A) {y : WL l A.A} (hy : y ∈ A.Acr0)
+    : awayW (invS A h) y ∈ ACris.ACrisZero ℂ_[l] l := by
   induction hy using Algebra.adjoin_induction with
   | mem y hy =>
     obtain ⟨k, rfl⟩ := hy
@@ -55,13 +56,15 @@ theorem acrisZero_bijective_of_isBase (h : IsBase l A) : Function.Bijective A.cr
     exact ⟨⟨awayW (invS A h) y.1, awayW_inv_mem A h y.2⟩, Subtype.ext (awayW_right A h y.1)⟩
 
 theorem sW_bijective (h : IsBase l A) : Function.Bijective A.sW :=
-  Function.bijective_iff_has_inverse.2 ⟨WittVector.map (invS A h),
+  Function.bijective_iff_has_inverse.2 ⟨
+    WittVector.map (invS A h),
     fun x => by
       change WittVector.map (invS A h) (WittVector.map A.s x) = x
       rw [← wmap_comp, invS_comp, wmap_id],
     fun x => by
       change WittVector.map A.s (WittVector.map (invS A h) x) = x
-      rw [← wmap_comp, comp_invS, wmap_id]⟩
+      rw [← wmap_comp, comp_invS, wmap_id]
+  ⟩
 
 theorem oC_bijective (h : IsBase l A) : Function.Bijective A.oC := by
   have hs := sW_bijective A h
@@ -75,17 +78,18 @@ theorem oC_bijective (h : IsBase l A) : Function.Bijective A.oC := by
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 hm
     obtain ⟨c', rfl⟩ := hs.2 c
     have e : x = c' * xi0 l := hs.1 (by rw [map_mul, ← hc]; rfl)
-    have : x ∈ RingHom.ker (theta0 l) := by
-      rw [e]; exact Ideal.mul_mem_left _ _ xi0_mem
+    have : x ∈ RingHom.ker (theta0 l) := by rw [e]; exact Ideal.mul_mem_left _ _ xi0_mem
     exact this
   · intro u
     obtain ⟨w, rfl⟩ := Ideal.Quotient.mk_surjective u
     obtain ⟨x, rfl⟩ := hs.2 w
     exact ⟨theta0 l x, A.oC_theta0 x⟩
 
-theorem mem_map_of_evalₐ_eq_zero (B : Type) [CommRing B] (π : B) (n : ℕ)
-    (a : AdicCompletion (Ideal.span {π}) B) (h : AdicCompletion.evalₐ (Ideal.span {π}) n a = 0) :
-    a ∈ (Ideal.span {π} ^ n).map (algebraMap B (AdicCompletion (Ideal.span {π}) B)) := by
+theorem mem_map_of_evalₐ_eq_zero
+    (B : Type) [CommRing B]
+    (π : B) (n : ℕ)
+    (a : AdicCompletion (Ideal.span {π}) B) (h : AdicCompletion.evalₐ (Ideal.span {π}) n a = 0)
+    : a ∈ (Ideal.span {π} ^ n).map (algebraMap B (AdicCompletion (Ideal.span {π}) B)) := by
   rw [← Submodule.restrictScalars_mem B, ← Ideal.smul_top_eq_map,
     AdicCompletion.pow_smul_top_eq_ker_eval (Submodule.fg_span_singleton _), LinearMap.mem_ker,
     ← AdicCompletion.factor_evalₐ_eq_eval _ a (by simp), h, map_zero]
@@ -99,11 +103,12 @@ theorem cris_surjective (h : IsBase l A) (n : ℕ) : Function.Surjective (A.cris
 theorem cris_natCast_pow (n : ℕ) : A.cris n ((l : Acris l) ^ n) = 0 := by
   rw [map_pow, map_natCast, pow_l_acr]
 
-theorem ker_cris (h : IsBase l A) (n : ℕ) :
-    RingHom.ker (A.cris n) = Ideal.span {(l : Acris l) ^ n} := by
+theorem ker_cris (h : IsBase l A) (n : ℕ)
+    : RingHom.ker (A.cris n) = Ideal.span {(l : Acris l) ^ n} := by
   apply le_antisymm
   · intro a ha
-    obtain ⟨y, hy⟩ := Ideal.Quotient.mk_surjective (AdicCompletion.evalₐ (Ideal.span {(l : Acris0 l)}) n a)
+    obtain ⟨y, hy⟩ :=
+      Ideal.Quotient.mk_surjective (AdicCompletion.evalₐ (Ideal.span {(l : Acris0 l)}) n a)
     have e : A.cris n a = A.mkAcr n (A.cris0 y) := by
       simp only [cris, RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, ← hy,
         Ideal.Quotient.lift_mk]
@@ -111,8 +116,8 @@ theorem ker_cris (h : IsBase l A) (n : ℕ) :
     have hm : A.cris0 y ∈ Ideal.span {(l : A.Acr0) ^ n} := Ideal.Quotient.eq_zero_iff_mem.1 ha
     obtain ⟨c, hc⟩ := Ideal.mem_span_singleton'.1 hm
     obtain ⟨c', rfl⟩ := (acrisZero_bijective_of_isBase A h).2 c
-    have e2 : y = c' * (l : Acris0 l) ^ n := (acrisZero_bijective_of_isBase A h).1 (by
-      rw [map_mul, map_pow, map_natCast, hc])
+    have e2 : y = c' * (l : Acris0 l) ^ n :=
+      (acrisZero_bijective_of_isBase A h).1 (by rw [map_mul, map_pow, map_natCast, hc])
     have hz : Ideal.Quotient.mk (Ideal.span {(l : Acris0 l)} ^ n) y = 0 :=
       Ideal.Quotient.eq_zero_iff_mem.2 (by
         rw [e2, Ideal.span_singleton_pow]
@@ -125,9 +130,15 @@ theorem ker_cris (h : IsBase l A) (n : ℕ) :
   · rw [Ideal.span_singleton_le_iff_mem]
     exact cris_natCast_pow A n
 
-theorem main : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l), IsBase l A →
-    (Function.Bijective A.cris0 ∧ Function.Bijective A.oC) ∧
-      ∀ n, Function.Surjective (A.cris n) ∧ RingHom.ker (A.cris n) = Ideal.span {(l : Acris l) ^ n} :=
-  fun A h => ⟨⟨acrisZero_bijective_of_isBase A h, oC_bijective A h⟩, fun n => ⟨cris_surjective A h n, ker_cris A h n⟩⟩
+theorem main
+    : ∀ {l : ℕ} [Fact l.Prime] (A : PAlg l),
+      IsBase l A
+        → (Function.Bijective A.cris0 ∧ Function.Bijective A.oC)
+          ∧ ∀ n,
+            Function.Surjective (A.cris n)
+              ∧ RingHom.ker (A.cris n) = Ideal.span {(l : Acris l) ^ n} := fun A h => ⟨
+  ⟨acrisZero_bijective_of_isBase A h, oC_bijective A h⟩,
+  fun n => ⟨cris_surjective A h n, ker_cris A h n⟩
+⟩
 
 end GlobalTheory.CompanionTheory.BaseAcris

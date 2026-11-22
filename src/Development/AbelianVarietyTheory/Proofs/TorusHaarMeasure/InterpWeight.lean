@@ -13,28 +13,39 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.KronHolPs
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.InterpWeight
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem core (hN : NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧ PnormInvStatement (E := E))
-    (hExt : ExtFStatement (E := E)) (hMI : MeasInvStatement (E := E)) (hV : VanishAtSStatement (E := E))
-    (hK : KapGGStatement (E := E)) {r : ℕ} (X : Data E r) (Xa : ArchInM X) (Fl : FlatM X Xa)
-    (G : Wt X.Ψ r) (bb m η : ℝ) (hbb : 4 * (X.Ψ.card : ℝ) * (r : ℝ) ^ 2 < bb) (hbm : bb < m) (hη : 0 < η)
-    (hmar : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
-        m * leviRh X x0 z ξ ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ -
-          (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ)
-    (hstr : ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
-      2 * η * leviO X x0 (phla X Xa.L) z ξ ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ -
-        (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ) (j : Fin Fl.δ) :
-    ∃ (x0 : Frame X.Ψ r) (W : Frame X.Ψ r → ℝ≥0∞) (F : V (nd X) → ℂ) (P : Frame X.Ψ r → ℂ),
-      IsOrth X x0 ∧ IsMetricW X G W ∧ WLower X G W ∧
-      DifferentiableOn ℂ F (OmF X x0) ∧ InAt X x0 W bb F ∧ IsBEq X G P ∧
-      (∀ z ∈ OmF X x0, P (cpt X x0 z) = F z) ∧ P (lact 1 (Fl.xs j)) ≠ 0 ∧
-      ∀ γ ∈ X.Γ, ∀ j', (γ ≠ 1 ∨ j' ≠ j) → P (lact γ (Fl.xs j')) = 0 := by
+theorem core
+    (hN : NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧ PnormInvStatement (E := E))
+    (hExt : ExtFStatement (E := E)) (hMI : MeasInvStatement (E := E))
+    (hV : VanishAtSStatement (E := E)) (hK : KapGGStatement (E := E))
+    {r : ℕ} (X : Data E r) (Xa : ArchInM X) (Fl : FlatM X Xa) (G : Wt X.Ψ r)
+    (bb m η : ℝ) (hbb : 4 * (X.Ψ.card : ℝ) * (r : ℝ) ^ 2 < bb) (hbm : bb < m) (hη : 0 < η)
+    (hmar : ∀ x0,
+      IsOrth X x0
+        → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
+          m * leviRh X x0 z ξ
+            ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ
+              - (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ)
+    (hstr : ∀ x0,
+      IsOrth X x0
+        → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
+          2 * η * leviO X x0 (phla X Xa.L) z ξ
+            ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ
+              - (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ)
+    (j : Fin Fl.δ)
+    : ∃ (x0 : Frame X.Ψ r) (W : Frame X.Ψ r → ℝ≥0∞) (F : V (nd X) → ℂ) (P : Frame X.Ψ r → ℂ),
+      IsOrth X x0 ∧ IsMetricW X G W ∧ WLower X G W ∧ DifferentiableOn ℂ F (OmF X x0)
+        ∧ InAt X x0 W bb F ∧ IsBEq X G P ∧ (∀ z ∈ OmF X x0, P (cpt X x0 z) = F z)
+        ∧ P (lact 1 (Fl.xs j)) ≠ 0
+        ∧ ∀ γ ∈ X.Γ, ∀ j', (γ ≠ 1 ∨ j' ≠ j) → P (lact γ (Fl.xs j')) = 0 := by
   have hCo := GlobalTheory.OrbitCoord.det_fderiv_ne_zero_orbit hK
   have hn : 0 < nd X := lt_of_lt_of_le (by norm_num) Xa.n_ge
   have hbb0 : 0 ≤ bb := le_trans (by positivity) hbb.le
@@ -42,13 +53,21 @@ theorem core (hN : NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧
   have hsb : ∀ k, X.IsBddSec Xa.L (Fl.s k) := fun k => (Fl.s_van k).1.1
   have hw0 : X.IsSec Xa.L Fl.w0 := hw0b.1
   have hs : ∀ k, X.IsSec Xa.L (Fl.s k) := fun k => (hsb k).1
-  have key : ∀ j', ∀ γ ∈ X.Γ, ∀ b ∈ Bor X.Ψ r, ∀ x1, x1 = lact γ (rmul (Fl.xs j') b) →
-      Fl.w0 x1 ≠ 0 ∧ (∀ k, Fl.s k x1 = 0) ∧
-      (fderiv ℂ (fun z : V (nd X) => (WithLp.toLp 2 fun k =>
-        Fl.s k (cpt X x1 z) / Fl.w0 (cpt X x1 z) : V (nd X))) 0).det ≠ 0 := by
+  have key
+      : ∀ j', ∀ γ ∈ X.Γ, ∀ b ∈ Bor X.Ψ r, ∀ x1,
+        x1 = lact γ (rmul (Fl.xs j') b)
+          → Fl.w0 x1 ≠ 0 ∧ (∀ k, Fl.s k x1 = 0)
+            ∧ (fderiv ℂ
+                (fun z : V (nd X) =>
+                  (WithLp.toLp 2 fun k => Fl.s k (cpt X x1 z) / Fl.w0 (cpt X x1 z) : V (nd X)))
+                0).det
+              ≠ 0 := by
     rintro j' γ hγ b hb x1 rfl
-    refine ⟨KronAssembly.sec_ne_zero X hw0 (Fl.xs_mem j') (Fl.w0_ne j') hγ hb, ?_,
-      hCo r X Xa.L Fl.w0 Fl.s hw0 hs _ (Fl.xs_mem j') (Fl.w0_ne j') (Fl.coord j') γ hγ b hb⟩
+    refine ⟨
+      KronAssembly.sec_ne_zero X hw0 (Fl.xs_mem j') (Fl.w0_ne j') hγ hb,
+      ?_,
+      hCo r X Xa.L Fl.w0 Fl.s hw0 hs _ (Fl.xs_mem j') (Fl.w0_ne j') (Fl.coord j') γ hγ b hb
+    ⟩
     exact (Fl.S_eq _ (OntoS.dom_lact X hγ (OntoS.dom_rmul X (Fl.xs_mem j') hb))).2
       ⟨j', γ, hγ, b, hb, rfl⟩
   obtain ⟨x0, ho, b0, hb0, b0', hb0', hx0, hx0'⟩ :=
@@ -56,20 +75,29 @@ theorem core (hN : NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧
   have hx0d : x0 ∈ X.dom := IW.orth_mem_dom X x0 ho
   obtain ⟨k1, k2, k3⟩ := key j 1 X.Γ.one_mem b0' hb0' x0 hx0'
   have hψb : ∃ C : ℝ, ∀ x ∈ X.dom, (fun _ : Frame X.Ψ r => (0 : ℝ)) x ≤ C := ⟨0, fun _ _ => le_rfl⟩
-  obtain ⟨hψc, hMW, hWL⟩ := GlobalTheory.KronMetric.kronMetric hN r X G (fun _ => 0) (fun _ _ _ _ _ _ => rfl)
-    (fun _ _ => contDiffOn_const) hψb
+  obtain ⟨hψc, hMW, hWL⟩ :=
+    GlobalTheory.KronMetric.kronMetric hN r X G
+      (fun _ => 0)
+      (fun _ _ _ _ _ _ => rfl)
+      (fun _ _ => contDiffOn_const)
+      hψb
   obtain ⟨ε, χ, F, hε, hball, hiso, hχc, hχ1, hχ0, hF, hint⟩ :=
-    GlobalTheory.kronSolve r X G Xa.L Fl.w0 Fl.s (fun _ => 0) x0 bb m η hn ho hw0 hs contDiffOn_const hbb0 hbm hη
+    GlobalTheory.kronSolve r X G Xa.L Fl.w0 Fl.s
+      (fun _ => 0)
+      x0 bb m η hn ho hw0 hs contDiffOn_const hbb0 hbm hη
       (fun z hz ξ => by rw [leviO_zero, add_zero]; exact hmar x0 ho z hz ξ)
       (fun z hz ξ => by rw [leviO_zero, add_zero]; exact hstr x0 ho z hz ξ)
-      (fun z hz ξ hξ => Xa.posL x0 hx0d z hz ξ hξ) k1 k2 k3
+      (fun z hz ξ hξ => Xa.posL x0 hx0d z hz ξ hξ)
+      k1 k2 k3
   obtain ⟨hF0, hInAt, hloc⟩ :=
-    GlobalTheory.KronValue.value_and_integrability hV r X G Xa.L Fl.w0 Fl.s (fun _ => 0) x0 bb ε (2 * ε) χ F hn
-      ho hw0b hsb hψc hψb hbb0 hε hball hχc hχ1 hχ0 hF hint k1 k2 k3
+    GlobalTheory.KronValue.value_and_integrability hV r X G Xa.L Fl.w0 Fl.s
+      (fun _ => 0)
+      x0 bb ε (2 * ε) χ F hn ho hw0b hsb hψc hψb hbb0 hε hball hχc hχ1 hχ0 hF hint k1 k2 k3
   obtain ⟨P, hP, hPF⟩ := hExt r X x0 ho G F hF hloc
   have h0 : (0 : V (nd X)) ∈ OmF X x0 := by
     show cpt X x0 0 ∈ X.dom
-    rw [IW.cpt_zero]; exact hx0d
+    rw [IW.cpt_zero]
+    exact hx0d
   have hP0 : P x0 = 1 := by
     have := hPF 0 h0
     rwa [IW.cpt_zero, hF0] at this
@@ -81,8 +109,11 @@ theorem core (hN : NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧
     have hx1d : x1 ∈ X.dom := IW.orth_mem_dom X x1 ho1
     obtain ⟨l1, l2, l3⟩ := key j' γ hγ b1' hb1' x1 hx1'
     have hP1 : P x1 = 0 := by
-      refine GlobalTheory.KronOff.vanish_off hMI hV hN r X G Xa.L Fl.w0 Fl.s (fun _ => 0) x0 x1 bb (2 * ε) χ F P
-        hn ho ho1 hw0 hs hψc (fun _ _ _ _ => rfl) hbb0 hball hχ0 hP hPF hint ?_ l1 l2 l3
+      refine GlobalTheory.KronOff.vanish_off hMI hV hN r X G Xa.L Fl.w0 Fl.s
+        (fun _ => 0)
+        x0 x1 bb (2 * ε) χ F P hn ho ho1 hw0 hs hψc
+        (fun _ _ _ _ => rfl)
+        hbb0 hball hχ0 hP hPF hint ?_ l1 l2 l3
       intro z hz b hb hxz
       have hz0 : z = 0 := by
         refine hiso z hz fun k => ?_
@@ -104,17 +135,30 @@ theorem core (hN : NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧
       · exact h rfl
     rw [hx1, hP.2 x1 hx1d b1 hb1, hP1, mul_zero]
 
-theorem interp_weight : (NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧ PnormInvStatement (E := E)) → PoinStatement (E := E) → ExtFStatement (E := E) → MeasInvStatement (E := E) → VanishAtSStatement (E := E) → KapGGStatement (E := E) →
-    ∀ (r : ℕ) (X : Data E r) (Xa : ArchInM X) (Fl : FlatM X Xa) (G : Wt X.Ψ r), PropDisc X →
-    (∃ bb m : ℝ, 4 * (X.Ψ.card : ℝ) * (r : ℝ) ^ 2 < bb ∧ bb < m ∧
-      ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
-        m * leviRh X x0 z ξ ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ -
-          (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ) →
-    (∃ η : ℝ, 0 < η ∧ ∀ x0, IsOrth X x0 → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
-      2 * η * leviO X x0 (phla X Xa.L) z ξ ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ -
-        (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ) →
-    (∀ P, X.IsBddSec G P → P ∈ X.SS G) →
-    ∀ v : Fin Fl.δ → ℂ, ∃ F ∈ X.SSgt G 0, ∀ j, F (Fl.xs j) = v j := by
+theorem interp_weight
+    : (NfacRmulStatement (E := E) ∧ NfacLactStatement (E := E) ∧ PnormInvStatement (E := E))
+      → PoinStatement (E := E) → ExtFStatement (E := E) → MeasInvStatement (E := E)
+      → VanishAtSStatement (E := E) → KapGGStatement (E := E)
+      → ∀ (r : ℕ) (X : Data E r) (Xa : ArchInM X) (Fl : FlatM X Xa) (G : Wt X.Ψ r),
+        PropDisc X
+          → (∃ bb m : ℝ,
+            4 * (X.Ψ.card : ℝ) * (r : ℝ) ^ 2 < bb ∧ bb < m
+              ∧ ∀ x0,
+                IsOrth X x0
+                  → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
+                    m * leviRh X x0 z ξ
+                      ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ
+                        - (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ)
+          → (∃ η : ℝ,
+            0 < η
+              ∧ ∀ x0,
+                IsOrth X x0
+                  → ∀ z ∈ OmF X x0, ∀ ξ : Fin (nd X) → ℂ,
+                    2 * η * leviO X x0 (phla X Xa.L) z ξ
+                      ≤ leviO X x0 (phla X G) z ξ - leviDens X x0 z ξ
+                        - (nd X : ℝ) * leviO X x0 (phla X Xa.L) z ξ)
+          → (∀ P, X.IsBddSec G P → P ∈ X.SS G)
+          → ∀ v : Fin Fl.δ → ℂ, ∃ F ∈ X.SSgt G 0, ∀ j, F (Fl.xs j) = v j := by
   intro hN hPo hExt hMI hV hK r X Xa Fl G hPD ⟨bb, m, hbb, hbm, hmar⟩ ⟨η, hη, hstr⟩ hcusp
   apply interp_of_kron X G Fl.xs
   intro j

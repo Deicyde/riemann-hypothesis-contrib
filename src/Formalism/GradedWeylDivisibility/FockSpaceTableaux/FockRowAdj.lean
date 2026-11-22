@@ -11,9 +11,9 @@ noncomputable section
 
 namespace Formalism.GradedWeylDivisibility
 
-def LFocks_rowMat {r n : ℕ} (g : Matrix (Fin r) (Fin r) ℂ) :
-    Matrix (Fin r × Fin n) (Fin r × Fin n) ℂ :=
-  fun v w => if v.2 = w.2 then g v.1 w.1 else 0
+def LFocks_rowMat {r n : ℕ} (g : Matrix (Fin r) (Fin r) ℂ)
+    : Matrix (Fin r × Fin n) (Fin r × Fin n) ℂ := fun v w =>
+  if v.2 = w.2 then g v.1 w.1 else 0
 
 lemma LFocks_rowAct_eq_sub {r n : ℕ} (g : Matrix (Fin r) (Fin r) ℂ) :
     rowAct ℂ (n := n) g = sub (LFocks_rowMat g) := by

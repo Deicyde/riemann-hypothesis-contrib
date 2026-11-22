@@ -6,12 +6,17 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual Formalism.HC ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.Top UpperTheory.V.HV
 
 open Polynomial in
-private theorem splitting_field_iso_quadratic (p : ℕ) (hp : 0 < p) (K : Type) [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
-    (δ : K) (hδ : δ ^ 2 = -(p : K)) (L : Type) [Field L] [NumberField L]
-    [hL : IsSplittingField ℚ L (X ^ 2 + C (p : ℚ) : ℚ[X])] : Nonempty (L ≃ₐ[ℚ] K) := by
+private theorem splitting_field_iso_quadratic
+    (p : ℕ) (hp : 0 < p)
+    (K : Type) [Field K] [NumberField K]
+    (hK : Module.finrank ℚ K = 2)
+    (δ : K) (hδ : δ ^ 2 = -(p : K))
+    (L : Type) [Field L] [NumberField L] [hL : IsSplittingField ℚ L (X ^ 2 + C (p : ℚ) : ℚ[X])]
+    : Nonempty (L ≃ₐ[ℚ] K) := by
   classical
   set f : ℚ[X] := X ^ 2 + C (p : ℚ) with hf
   have hsK : (f.map (algebraMap ℚ K)).Splits := by
@@ -37,8 +42,7 @@ private theorem splitting_field_iso_quadratic (p : ℕ) (hp : 0 < p) (K : Type) 
     obtain ⟨r, hr⟩ := hsL.exists_eval_eq_zero hdeg
     have hrm : r ∈ (⊥ : Subalgebra ℚ L) := hbt ▸ Algebra.mem_top
     obtain ⟨q, rfl⟩ := Algebra.mem_bot.mp hrm
-    have hq : algebraMap ℚ L (q ^ 2 + p) = 0 := by
-      simpa [hf, Polynomial.eval_map] using hr
+    have hq : algebraMap ℚ L (q ^ 2 + p) = 0 := by simpa [hf, Polynomial.eval_map] using hr
     have hq0 : q ^ 2 + (p : ℚ) = 0 := (algebraMap ℚ L).injective (by rw [hq, map_zero])
     have hpq : (0 : ℚ) < q ^ 2 + p := by
       have : (0 : ℚ) < p := by exact_mod_cast hp
@@ -51,8 +55,11 @@ private theorem splitting_field_iso_quadratic (p : ℕ) (hp : 0 < p) (K : Type) 
       (h2.trans hK.symm)).1 hinj
   exact ⟨AlgEquiv.ofBijective φ ⟨hinj, hsurj⟩⟩
 
-theorem UpperTheory.V.HV.kstar :
-    ∀ p : ℕ, p.Prime → p % 4 = 3 → discr (Kstar p) = -(p : ℤ) ∧ IsTotallyComplex (Kstar p) ∧ Module.finrank ℚ (Kstar p) = 2 ∧ ∃ s : Kstar p, s ^ 2 = -(p : Kstar p) := by
+theorem UpperTheory.V.HV.kstar
+    : ∀ p : ℕ,
+      p.Prime → p % 4 = 3
+        → discr (Kstar p) = -(p : ℤ) ∧ IsTotallyComplex (Kstar p) ∧ Module.finrank ℚ (Kstar p) = 2
+          ∧ ∃ s : Kstar p, s ^ 2 = -(p : Kstar p) := by
   intro p hp h3
   obtain ⟨K, _, _, hK2, hd⟩ := KStar.Consta.exists_quadField hp h3
   obtain ⟨⟨δ, hδ⟩, -⟩ := KStar.Choice.exists_sq_eq_neg_of_discr hK2 hp.ne_zero hd

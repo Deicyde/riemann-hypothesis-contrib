@@ -14,7 +14,20 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.StableHopfOrd
 open ReciprocityTheory.PGsh.L2 ReciprocityTheory.PGsh.Up GlobalTheory.CompanionTheory.Ar.GR
 open scoped Matrix
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C], v.Integers R → v (p : C) < 1 → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ), Fintype.card F = p ^ f → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N] (AA : HopfOrder (C := C) R N), FStable F AA.carrier → ∀ (K : Submodule F N) (t : N), t ∉ K → GenAF p AA.carrier K.toAddSubgroup → ∀ χ : MulChar F R, idealX AA.carrier K t χ = ⊤ → ∃ τ : MulChar F R, IsFund p τ ∧ idealD p AA.carrier K t τ = ⊤ := by
+theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (R : Type) [CommRing R] [Algebra R C],
+      v.Integers R → v (p : C) < 1
+        → ∀ (F : Type) [Field F] [Fintype F] [DecidableEq F] [CharP F p] (f : ℕ),
+          Fintype.card F = p ^ f
+            → ∀ (N : Type) [AddCommGroup N] [Module F N] [Fintype N] [DecidableEq N]
+                (AA : HopfOrder (C := C) R N),
+              FStable F AA.carrier
+                → ∀ (K : Submodule F N) (t : N),
+                  t ∉ K → GenAF p AA.carrier K.toAddSubgroup
+                    → ∀ χ : MulChar F R,
+                      idealX AA.carrier K t χ = ⊤
+                        → ∃ τ : MulChar F R, IsFund p τ ∧ idealD p AA.carrier K t τ = ⊤ := by
   intro p _ C _ _ _ v R _ _ hv hp F _ _ _ _ f hc N _ _ _ _ AA hFS K t ht hGen χ hχ
   haveI : Nontrivial R := (algebraMap R C).domain_nontrivial
   have hval : ∀ g ∈ AA.carrier, ∀ x, ∃ r : R, algebraMap R C r = g x := fun g hg =>
@@ -30,18 +43,25 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top : ∀
     obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hz
     rw [Algebra.smul_def, map_mul]
     exact lt_of_le_of_lt (mul_le_of_le_one_left zero_le (hv.map_le_one a)) hp
-  have hinv : ∀ g, g ∈ invFun AA.carrier K.toAddSubgroup →
-      g ∈ AA.carrier ∧ ∀ x, ∀ k ∈ K.toAddSubgroup, g (x + k) = g x := fun g hg => hg
-  have hinvI : ∀ g, (g ∈ AA.carrier ∧ ∀ x, ∀ k ∈ K.toAddSubgroup, g (x + k) = g x) →
-      g ∈ invFun AA.carrier K.toAddSubgroup := fun g hg => hg
-  have hadd : ∀ g, g ∈ addFun (C := C) R p N →
-      ∀ x y, g (x + y) - g x - g y ∈ pInt (C := C) R p := fun g hg => hg
+  have hinv
+      : ∀ g,
+        g ∈ invFun AA.carrier K.toAddSubgroup
+          → g ∈ AA.carrier ∧ ∀ x, ∀ k ∈ K.toAddSubgroup, g (x + k) = g x := fun g hg =>
+    hg
+  have hinvI
+      : ∀ g,
+        (g ∈ AA.carrier ∧ ∀ x, ∀ k ∈ K.toAddSubgroup, g (x + k) = g x)
+          → g ∈ invFun AA.carrier K.toAddSubgroup := fun g hg =>
+    hg
+  have hadd : ∀ g, g ∈ addFun (C := C) R p N → ∀ x y, g (x + y) - g x - g y ∈ pInt (C := C) R p :=
+    fun g hg => hg
   have h1 : (1 : R) ∈ idealX AA.carrier K t χ := by
     rw [hχ]
     exact Submodule.mem_top
-  obtain ⟨g0, hg0, hg0e⟩ := Submodule.mem_map.1
-    (show LinearMap.toSpanSingleton R (F → C) (fun a => algebraMap R C (χ a)) 1 ∈
-      stepOrder AA.carrier K t from h1)
+  obtain ⟨g0, hg0, hg0e⟩ :=
+    Submodule.mem_map.1 (show LinearMap.toSpanSingleton R (F → C) (fun a => algebraMap R C (χ a)) 1
+        ∈ stepOrder AA.carrier K t from
+      h1)
   have hg0a : ∀ a : F, g0 (a • t) = algebraMap R C (χ a) := by
     intro a
     have := congrFun hg0e a
@@ -50,13 +70,14 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top : ∀
   have hg0z : g0 0 = 0 := by
     have e := hg0a 0
     rwa [zero_smul, MulChar.map_zero, map_zero] at e
-  obtain ⟨h, hA, hh⟩ : ∃ h ∈ afFun p (invFun AA.carrier K.toAddSubgroup),
-      ¬ v (h t - h 0) < 1 := by
+  obtain ⟨h, hA, hh⟩ : ∃ h ∈ afFun p (invFun AA.carrier K.toAddSubgroup), ¬ v (h t - h 0) < 1 := by
     by_contra hcon
     push Not at hcon
-    have key : ∀ φ ∈ Algebra.adjoin R
-        ((afFun p (invFun AA.carrier K.toAddSubgroup) : Submodule R (N → C)) : Set (N → C)),
-        φ ∈ AA.carrier ∧ v (φ t - φ 0) < 1 := by
+    have key
+        : ∀ φ
+            ∈ Algebra.adjoin R
+              ((afFun p (invFun AA.carrier K.toAddSubgroup) : Submodule R (N → C)) : Set (N → C)),
+          φ ∈ AA.carrier ∧ v (φ t - φ 0) < 1 := by
       intro φ hφ
       induction hφ using Algebra.adjoin_induction with
       | mem x hx =>
@@ -94,13 +115,15 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top : ∀
   obtain ⟨r0, hr0⟩ := hval h hM 0
   have h0p : h 0 ∈ pInt (C := C) R p := by
     have h00 := hAd 0 0
-    rw [add_zero, show h 0 - h 0 - h 0 = -h 0 by ring] at h00
+    rw [add_zero, show h 0 - h 0 - h 0 = - h 0 by ring] at h00
     simpa using (pInt (C := C) R p).neg_mem h00
-  obtain ⟨h', h'apply, h'M⟩ : ∃ h' : N → C, (∀ x, h' x = h x - h 0) ∧ h' ∈ AA.carrier :=
-    ⟨h - r0 • (1 : N → C), fun x => by
+  obtain ⟨h', h'apply, h'M⟩ : ∃ h' : N → C, (∀ x, h' x = h x - h 0) ∧ h' ∈ AA.carrier := ⟨
+    h - r0 • (1 : N → C),
+    fun x => by
       show h x - (r0 • (1 : N → C)) x = h x - h 0
       rw [Pi.smul_apply, Pi.one_apply, Algebra.smul_def, mul_one, hr0],
-      AA.carrier.sub_mem hM (AA.carrier.smul_mem r0 AA.one_mem)⟩
+    AA.carrier.sub_mem hM (AA.carrier.smul_mem r0 AA.one_mem)
+  ⟩
   have h'z : h' 0 = 0 := by rw [h'apply, sub_self]
   have h'inv : h' ∈ invFun AA.carrier K.toAddSubgroup :=
     hinvI h' ⟨h'M, fun x k hk => by rw [h'apply, h'apply, hK x k hk]⟩
@@ -135,8 +158,10 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top : ∀
     have hpf := PositivityTheory.HtPt.Rb.proj_nf p C v R hv hp F f hc N AA hFS h' h'af (σ ^ m) hnf
     exact hm (hpv _ (PositivityTheory.HtPt.Rb.mem_pFun.1 hpf t))
   refine ⟨σ ^ m, hτ, ?_⟩
-  have hgE : proj (σ ^ m) h' ∈ AA.carrier ∧ ∀ (a : F) x,
-      proj (σ ^ m) h' (a • x) = algebraMap R C ((σ ^ m) a) * proj (σ ^ m) h' x := P1 (σ ^ m)
+  have hgE
+      : proj (σ ^ m) h' ∈ AA.carrier
+        ∧ ∀ (a : F) x, proj (σ ^ m) h' (a • x) = algebraMap R C ((σ ^ m) a) * proj (σ ^ m) h' x :=
+    P1 (σ ^ m)
   have hgI := hinv _ (P4 K h'inv (σ ^ m))
   have hgA : proj (σ ^ m) h' ∈ afFun p AA.carrier := P3 h'af (σ ^ m)
   generalize proj (σ ^ m) h' = g at hgE hgI hgA hm
@@ -158,8 +183,9 @@ theorem _root_.GlobalTheory.CompanionTheory.Relay.hopf_order_ideals_eq_top : ∀
     (∀ k ∈ K, G k ∈ pInt (C := C) R p) ∧ G t - algebraMap R C 1 ∈ pInt (C := C) R p
   refine ⟨(↑huU.unit⁻¹ : R) • g, (afFun p AA.carrier).smul_mem _ hgA, ?_, ?_, ?_⟩
   · intro a x
-    have e : ((↑huU.unit⁻¹ : R) • g) (a • x) - algebraMap R C ((σ ^ m) a) *
-        ((↑huU.unit⁻¹ : R) • g) x = 0 := by
+    have e
+        : ((↑huU.unit⁻¹ : R) • g) (a • x) - algebraMap R C ((σ ^ m) a) * ((↑huU.unit⁻¹ : R) • g) x
+          = 0 := by
       simp only [Pi.smul_apply, hgE.2 a x, Algebra.smul_def]
       ring
     rw [e]

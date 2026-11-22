@@ -32,7 +32,8 @@ theorem piLen_holds : PiLen := by
     · intro h i
       have := congrFun h i
       simp only [LinearMap.pi_apply, LinearMap.comp_apply, Submodule.mkQ_apply, Pi.zero_apply,
-        Submodule.Quotient.mk_eq_zero] at this
+          Submodule.Quotient.mk_eq_zero]
+        at this
       exact this
   have hsurj : Function.Surjective f := by
     intro y

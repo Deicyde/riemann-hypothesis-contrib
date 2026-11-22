@@ -8,8 +8,7 @@ public import Development.AutomorphicArithmetic.Foundations.LocalLanglands.Local
 
 open NumberField IsDedekindDomain
 
-theorem UpperTheory.Zero.LLC.extEx :
-    UpperTheory.Zero.LLC.ExtEx := by
+theorem UpperTheory.Zero.LLC.extEx : UpperTheory.Zero.LLC.ExtEx := by
   intro E Ω _ _ _ _ _ A w h g _ i hi n hn
   obtain ⟨E', fE, nE, _, aE, aΩ, tE, cE, w', h', hg, unr, card, _, _⟩ :=
     GlobalTheory.T.exists_unramified_totallyComplex_ext_with_unity_roots E Ω g A w h i hi n hn

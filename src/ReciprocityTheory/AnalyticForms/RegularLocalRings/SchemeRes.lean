@@ -17,16 +17,15 @@ noncomputable section
 variable {K : Type} [Fintype K] [Nonempty K] {ι : K → Type} [∀ k, Fintype (ι k)]
 variable {P D : Ideal (MvPolynomial (Σ k, ι k) ℂ)} {hP : IsMultiHomogIdeal P}
 
+open Classical in
+def WData.idxEquiv (w : WData P D hP) : w.Idx ≃ Fin (Fintype.card w.Idx) := Fintype.equivFin w.Idx
 
 open Classical in
-def WData.idxEquiv (w : WData P D hP) : w.Idx ≃ Fin (Fintype.card w.Idx) :=
-  Fintype.equivFin w.Idx
-
-
-open Classical in
-def WData.toAlgRes (w : WData P D hP) {e : ℕ} (he : ∀ x : w.M, ringKrullDim (w.W.presheaf.stalk x.1) = e)
-    (hD : IsMultiHomogIdeal D) (hcomp : ∀ Q ∈ P.minimalPrimes, IsRelevant Q → ¬ D ≤ Q) :
-    AlgRes ι P D e where
+def WData.toAlgRes
+    (w : WData P D hP)
+    {e : ℕ} (he : ∀ x : w.M, ringKrullDim (w.W.presheaf.stalk x.1) = e)
+    (hD : IsMultiHomogIdeal D) (hcomp : ∀ Q ∈ P.minimalPrimes, IsRelevant Q → ¬ D ≤ Q)
+    : AlgRes ι P D e where
   M := w.M
   top := w.topology
   compact := w.compactSpace
@@ -66,16 +65,19 @@ def WData.toAlgRes (w : WData P D hP) {e : ℕ} (he : ∀ x : w.M, ringKrullDim 
     obtain ⟨m, hm⟩ := w.mult he hD hcomp f a hf hfP hzero
     exact ⟨m, fun i x hx => hm _ x hx⟩
 
-theorem algRes_of_logResStC (hQ : FinalTheorems.FinTypeQE)
-    (P D : Ideal (MvPolynomial (Σ k, ι k) ℂ)) (e : ℕ)
-    (hP : IsMultiHomogIdeal P) (hrad : P.IsRadical) (hD : IsMultiHomogIdeal D)
+theorem algRes_of_logResStC
+    (hQ : FinalTheorems.FinTypeQE)
+    (P D : Ideal (MvPolynomial (Σ k, ι k) ℂ))
+    (e : ℕ) (hP : IsMultiHomogIdeal P)
+    (hrad : P.IsRadical) (hD : IsMultiHomogIdeal D)
     (hcomp : ∀ Q ∈ P.minimalPrimes, IsRelevant Q → ¬ D ≤ Q)
-    (hsing : ∀ (p : (k : K) → ι k) (z : (Σ k, ι k) → ℂ), (∀ h ∈ chartIdeal P p, eval z h = 0) →
-      ¬ IsRegularLocalRing (locAt (chartIdeal P p) z) → ∀ f ∈ D, eval z f = 0)
-    (hdim : ∀ (p : (k : K) → ι k) (z : (Σ k, ι k) → ℂ), (∀ h ∈ chartIdeal P p, eval z h = 0) →
-      ringKrullDim (locAt (chartIdeal P p) z) = e)
-    (hL : FinalTheorems.LogResStC (projX P hP) (projB P D hP)) :
-    Nonempty (AlgRes ι P D e) := by
+    (hsing : ∀ (p : (k : K) → ι k) (z : (Σ k, ι k) → ℂ),
+      (∀ h ∈ chartIdeal P p, eval z h = 0) → ¬ IsRegularLocalRing (locAt (chartIdeal P p) z)
+        → ∀ f ∈ D, eval z f = 0)
+    (hdim : ∀ (p : (k : K) → ι k) (z : (Σ k, ι k) → ℂ),
+      (∀ h ∈ chartIdeal P p, eval z h = 0) → ringKrullDim (locAt (chartIdeal P p) z) = e)
+    (hL : FinalTheorems.LogResStC (projX P hP) (projB P D hP))
+    : Nonempty (AlgRes ι P D e) := by
   obtain ⟨w⟩ := exists_wData_of_logRes hQ hP hD hrad hsing hcomp hL
   exact ⟨w.toAlgRes (w.ringKrullDim_stalk e hD hcomp hdim) hD hcomp⟩
 

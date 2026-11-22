@@ -10,10 +10,15 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Sat
 @[expose] public section
 
 open scoped ComplexConjugate Matrix NNReal
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero (ip delta swSec sZero IsKFinVec ThetaClause SectionClause CoefClause)
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling
+  GlobalTheory.Cont
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift
+  (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalZero
+  (ip delta swSec sZero IsKFinVec ThetaClause SectionClause CoefClause)
 open GlobalTheory.Mem.Th (CptF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP
@@ -22,8 +27,11 @@ namespace GlobalTheory.Core.Rk.ParamInert
 
 open Formalism.UG (IsUnramInv GU KU qV IsInertAt)
 
-theorem paramBoundOn_nonsplit (hUDI : GlobalTheory.IndefiniteRowSideFullHecke.SphericalSectionVariables.UnramDoublingInert) :
-    ∀ D : D7, ParamBoundOn D fun v => ¬ Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) v := by
+theorem paramBoundOn_nonsplit
+    (hUDI : GlobalTheory.IndefiniteRowSideFullHecke.SphericalSectionVariables.UnramDoublingInert)
+    : ∀ D : D7,
+      ParamBoundOn D fun v =>
+        ¬ Formalism.MainNotions.SchurIrreducible.IsSplit (E := D.host.E) v := by
   intro D A L hL v hv par c hc hc1 w hw
   obtain ⟨⟨C, hC⟩, V, iV, iM, ρ, x, ℓ, hpar, hℓ, hcv⟩ := hc
   have hp := hpar w hw
@@ -45,16 +53,18 @@ theorem paramBoundOn_nonsplit (hUDI : GlobalTheory.IndefiniteRowSideFullHecke.Sp
     simp only [hρ', MonoidHom.coe_comp, Function.comp_apply, MulEquiv.coe_toMonoidHom, map_mul]
     rw [← map_mul]
     exact hℓ _ hk' _
-  have h1 : ℓ x ≠ 0 := by
-    intro h0; apply hc1; rw [hcv, map_one]; exact h0
-  have hz := (GlobalTheory.T.invariant_sphericalCoefficient_eq_zero_or_zonal _ ϖu τ (qV D.host.F v) A.rank hU' V ρ' x α hsat ℓ hKinv).2 h1
+  have h1 : ℓ x ≠ 0 := by intro h0; apply hc1; rw [hcv, map_one]; exact h0
+  have hz :=
+    (GlobalTheory.T.invariant_sphericalCoefficient_eq_zero_or_zonal _ ϖu τ (qV D.host.F v) A.rank
+      hU' V ρ' x α hsat ℓ hKinv).2 h1
   have hbd : ∃ C' : ℝ, ∀ g, ‖ℓ (ρ' g x) / ℓ x‖ ≤ C' := by
     refine ⟨C / ‖ℓ x‖, fun g => ?_⟩
     rw [norm_div]
-    have : ‖ℓ (ρ' g x)‖ ≤ C := by
-      have := hC (e.symm g); rw [hcv] at this; exact this
+    have : ‖ℓ (ρ' g x)‖ ≤ C := by have := hC (e.symm g); rw [hcv] at this; exact this
     exact div_le_div_of_nonneg_right this (norm_nonneg _)
-  have htb := GlobalTheory.T.satakeTrivialBound_of_bounded_zonal_spherical_unitary hUDI _ ϖu τ (qV D.host.F v) A.rank hU' α _ hz hbd
+  have htb :=
+    GlobalTheory.T.satakeTrivialBound_of_bounded_zonal_spherical_unitary hUDI _ ϖu τ (qV D.host.F v)
+      A.rank hU' α _ hz hbd
   intro β hβ
   rw [hB] at hβ
   have hq2 : 2 ≤ qV D.host.F v := hU.2.2.2.2.2.1

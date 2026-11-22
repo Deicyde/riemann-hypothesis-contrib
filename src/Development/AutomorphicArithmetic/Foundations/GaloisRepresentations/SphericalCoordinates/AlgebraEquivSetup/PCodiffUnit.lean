@@ -5,40 +5,40 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pCodiffUnit :
-    UnitMod → CodiffUnit := by
+theorem UpperTheory.Gal.W2.Seed.pCodiffUnit : UnitMod → CodiffUnit := by
   intro hU E _ _ M hMpos y t hy ht hloc
   obtain ⟨_, e, he, hye⟩ := hy
   by_cases hM1 : M = 1
   · refine ⟨ht, 0, by simp [hM1], fun z _ => ⟨0, by simp⟩⟩
-  let A : Ideal (𝓞 E) :=
-    { carrier := {a | ∀ z : E, InCodiff z → ∃ x : 𝓞 E, (a : E) * z = t * x}
-      add_mem' := by
-        intro a b ha hb z hz
-        obtain ⟨x1, h1⟩ := ha z hz
-        obtain ⟨x2, h2⟩ := hb z hz
-        exact ⟨x1 + x2, by push_cast; rw [add_mul, h1, h2, mul_add]⟩
-      zero_mem' := by
-        intro z _
-        exact ⟨0, by simp⟩
-      smul_mem' := by
-        intro c a ha z hz
-        obtain ⟨x, hx⟩ := ha z hz
-        refine ⟨c * x, ?_⟩
-        simp only [smul_eq_mul]
-        push_cast
-        rw [mul_assoc, hx]
-        ring }
-  have hA : ∀ a : 𝓞 E, a ∈ A → ∀ z : E, InCodiff z → ∃ x : 𝓞 E, (a : E) * z = t * x :=
-    fun a ha => ha
+  let A : Ideal (𝓞 E) := {
+    carrier := {a | ∀ z : E, InCodiff z → ∃ x : 𝓞 E, (a : E) * z = t * x}
+    add_mem' := by
+      intro a b ha hb z hz
+      obtain ⟨x1, h1⟩ := ha z hz
+      obtain ⟨x2, h2⟩ := hb z hz
+      exact ⟨x1 + x2, by push_cast; rw [add_mul, h1, h2, mul_add]⟩
+    zero_mem' := by
+      intro z _
+      exact ⟨0, by simp⟩
+    smul_mem' := by
+      intro c a ha z hz
+      obtain ⟨x, hx⟩ := ha z hz
+      refine ⟨c * x, ?_⟩
+      simp only [smul_eq_mul]
+      push_cast
+      rw [mul_assoc, hx]
+      ring
+  }
+  have hA : ∀ a : 𝓞 E, a ∈ A → ∀ z : E, InCodiff z → ∃ x : 𝓞 E, (a : E) * z = t * x := fun a ha =>
+    ha
   have htop : A ⊔ Ideal.span {((M : ℕ) : 𝓞 E)} = ⊤ := by
     by_contra hne
     obtain ⟨P, hPmax, hle⟩ := Ideal.exists_le_maximal _ hne
-    have hMP : ((M : ℕ) : 𝓞 E) ∈ P :=
-      hle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
+    have hMP : ((M : ℕ) : 𝓞 E) ∈ P := hle (Ideal.mem_sup_right (Ideal.mem_span_singleton_self _))
     obtain ⟨s, u, _, huP, hsu⟩ := hloc P hPmax hMP
     have heP : ((e : ℕ) : 𝓞 E) ∉ P := by
       intro heP

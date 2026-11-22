@@ -15,9 +15,12 @@ noncomputable section
 
 namespace GlobalTheory.UnitLemma.Desc
 
-theorem finite_between (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [Finite (IsLocalRing.ResidueField O)] [AddCommGroup A] [Module O A] (R : Submodule O A) (hR : R.FG)
-    (a : O) (ha : a ≠ 0) : Finite {N : Submodule O A // N ≤ R ∧ ∀ x ∈ R, a • x ∈ N} := by
+theorem finite_between
+    (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    [Finite (IsLocalRing.ResidueField O)] [AddCommGroup A] [Module O A]
+    (R : Submodule O A) (hR : R.FG)
+    (a : O) (ha : a ≠ 0)
+    : Finite {N : Submodule O A // N ≤ R ∧ ∀ x ∈ R, a • x ∈ N} := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
   obtain ⟨k, hk⟩ := IsDiscreteValuationRing.associated_pow_irreducible ha hϖ
   haveI : Finite (O ⧸ IsLocalRing.maximalIdeal O) := ‹Finite (IsLocalRing.ResidueField O)›
@@ -38,31 +41,39 @@ theorem finite_between (O A : Type) [CommRing O] [IsDomain O] [IsDiscreteValuati
     ((N.1.comap R.subtype).map J.mkQ : Set (R ⧸ J))
   refine Finite.of_injective φ ?_
   intro N N' h
-  have h1 : (N.1.comap R.subtype).map J.mkQ = (N'.1.comap R.subtype).map J.mkQ := SetLike.coe_injective h
+  have h1 : (N.1.comap R.subtype).map J.mkQ = (N'.1.comap R.subtype).map J.mkQ :=
+    SetLike.coe_injective h
   have h2 := congrArg (Submodule.comap J.mkQ) h1
   rw [Submodule.comap_map_mkQ, Submodule.comap_map_mkQ, sup_eq_right.2 (hJle N),
-    sup_eq_right.2 (hJle N')] at h2
+      sup_eq_right.2 (hJle N')]
+    at h2
   have h3 := congrArg (Submodule.map R.subtype) h2
-  rw [Submodule.map_comap_eq, Submodule.map_comap_eq, Submodule.range_subtype,
-    inf_eq_right.2 N.2.1, inf_eq_right.2 N'.2.1] at h3
+  rw [Submodule.map_comap_eq, Submodule.map_comap_eq, Submodule.range_subtype, inf_eq_right.2 N.2.1,
+      inf_eq_right.2 N'.2.1]
+    at h3
   exact Subtype.ext h3
 
-theorem isIntegral_sigma (K : UQ) (B : InvAlg K) (y : B.A) (hy : IsIntegral K.O y) : IsIntegral K.O (B.σ y) := by
+theorem isIntegral_sigma (K : UQ) (B : InvAlg K) (y : B.A) (hy : IsIntegral K.O y)
+    : IsIntegral K.O (B.σ y) := by
   obtain ⟨p, hpm, hp⟩ := hy
   choose cO hcO using K.c_int
   have hinj : Function.Injective (algebraMap K.O K.E) := IsFractionRing.injective K.O K.E
-  let ψ : K.O →+* K.O :=
-    { toFun := cO
-      map_one' := hinj (by rw [← hcO, map_one, map_one])
-      map_mul' := fun x y => hinj (by rw [← hcO, map_mul, map_mul, map_mul, hcO, hcO])
-      map_zero' := hinj (by rw [← hcO, map_zero, map_zero])
-      map_add' := fun x y => hinj (by rw [← hcO, map_add (f := _), map_add (f := _), map_add (f := _), hcO, hcO]) }
+  let ψ : K.O →+* K.O := {
+    toFun := cO
+    map_one' := hinj (by rw [← hcO, map_one, map_one])
+    map_mul' := fun x y => hinj (by rw [← hcO, map_mul, map_mul, map_mul, hcO, hcO])
+    map_zero' := hinj (by rw [← hcO, map_zero, map_zero])
+    map_add' := fun x y =>
+      hinj (by rw [← hcO, map_add (f := _), map_add (f := _), map_add (f := _), hcO, hcO])
+  }
   have hcomp : (algebraMap K.O B.A).comp ψ = (B.σ : B.A →+* B.A).comp (algebraMap K.O B.A) := by
     ext x
     simp only [RingHom.coe_comp, Function.comp_apply, RingHom.coe_coe]
-    rw [IsScalarTower.algebraMap_apply K.O K.E B.A, IsScalarTower.algebraMap_apply K.O K.E B.A, B.σ_alg]
+    rw [IsScalarTower.algebraMap_apply K.O K.E B.A, IsScalarTower.algebraMap_apply K.O K.E B.A,
+      B.σ_alg]
     show _ = algebraMap K.E B.A (K.c (algebraMap K.O K.E x))
-    rw [hcO]; rfl
+    rw [hcO]
+    rfl
   refine ⟨p.map ψ, hpm.map ψ, ?_⟩
   rw [Polynomial.eval₂_map, hcomp]
   have := Polynomial.hom_eval₂ p (algebraMap K.O B.A) (B.σ : B.A →+* B.A) y
@@ -155,14 +166,20 @@ theorem finite_rhoSet (K : UQ) (B : InvAlg K) (hsep : B.P.Separable) (a : K.O) (
   subst this
   rfl
 
-theorem rho_lower : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype ι] (e π : ι → B.A) (S : Finset ι) (a : K.O), B.P.Separable → K.Small a → IsFrame B e π S → ∀ k : ℕ, (k + 1) ^ (Fintype.card ι - S.card) ≤ B.rho (algebraMap K.O B.A a ^ k) := by
+theorem rho_lower
+    : ∀ (K : UQ) (B : InvAlg K) (ι : Type) [Fintype ι] (e π : ι → B.A) (S : Finset ι) (a : K.O),
+      B.P.Separable → K.Small a → IsFrame B e π S
+        → ∀ k : ℕ, (k + 1) ^ (Fintype.card ι - S.card) ≤ B.rho (algebraMap K.O B.A a ^ k) := by
   intro K B ι _ e π S a hsep ha hF k
   classical
   have hfin := finite_rhoSet K B hsep a ha k
-  obtain ⟨f, hf, hint⟩ := GlobalTheory.T.exists_injective_torus_classes_of_idempotent_decomposition K B ι e S a ha hF.1 k
-  let g : ({i // i ∉ S} → Fin (k + 1)) → {c : B.T ⧸ (intUnits K.O B.A).subgroupOf B.T //
-      IsIntegral K.O ((((Quotient.out c : B.T) : B.Aˣ)⁻¹ : B.Aˣ) * algebraMap K.O B.A a ^ k : B.A)} :=
-    fun n => ⟨f n, hint n⟩
+  obtain ⟨f, hf, hint⟩ :=
+    GlobalTheory.T.exists_injective_torus_classes_of_idempotent_decomposition K B ι e S a ha hF.1 k
+  let g
+      : ({i // i ∉ S} → Fin (k + 1))
+        → {c : B.T ⧸ (intUnits K.O B.A).subgroupOf B.T // IsIntegral K.O
+          ((((Quotient.out c : B.T) : B.Aˣ)⁻¹ : B.Aˣ) * algebraMap K.O B.A a ^ k : B.A)} := fun n =>
+    ⟨f n, hint n⟩
   have hg : Function.Injective g := fun n n' h => hf (congrArg Subtype.val h)
   have h := Nat.card_le_card_of_injective g hg
   unfold InvAlg.rho

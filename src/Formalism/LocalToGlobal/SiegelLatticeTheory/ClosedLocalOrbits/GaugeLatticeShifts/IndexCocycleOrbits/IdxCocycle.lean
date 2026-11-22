@@ -7,8 +7,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedLocalOrbits.Gaug
 
 namespace Formalism.L2.SG.Pf.IndexCocycleOrbits
 
-theorem index_ratio_identity (m n aB aC cA : ℕ) (hm : m ≠ 0) (hn : n ≠ 0) (key : aB * n = m * aC) :
-    ((m * cA : ℕ) : ℝ) / (aB : ℝ) = (n : ℝ) * ((cA : ℝ) / (aC : ℝ)) := by
+theorem index_ratio_identity (m n aB aC cA : ℕ) (hm : m ≠ 0) (hn : n ≠ 0) (key : aB * n = m * aC)
+    : ((m * cA : ℕ) : ℝ) / (aB : ℝ) = (n : ℝ) * ((cA : ℝ) / (aC : ℝ)) := by
   have keyR : (aB : ℝ) * n = m * aC := by exact_mod_cast key
   have hmR : (m : ℝ) ≠ 0 := by exact_mod_cast hm
   have hnR : (n : ℝ) ≠ 0 := by exact_mod_cast hn

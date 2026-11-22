@@ -9,10 +9,11 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.A
 
 namespace GlobalTheory.PrimeMembershipExistence
 
-theorem exists_prime_mem {K : Type} [Field K] [NumberField K] (w : Formalism.PairingDivisionLocalBalance.Pl K) :
-    ∃ p : ℕ, Nat.Prime p ∧
-      (p : NumberField.RingOfIntegers K) ∈ IsDedekindDomain.HeightOneSpectrum.asIdeal w := by
-
+theorem exists_prime_mem
+    {K : Type} [Field K] [NumberField K] (w : Formalism.PairingDivisionLocalBalance.Pl K)
+    : ∃ p : ℕ,
+      Nat.Prime p
+        ∧ (p : NumberField.RingOfIntegers K) ∈ IsDedekindDomain.HeightOneSpectrum.asIdeal w := by
   have hP := w.isPrime
   have hn0 : Ideal.absNorm w.asIdeal ≠ 0 := by
     rw [Ne, Ideal.absNorm_eq_zero_iff]

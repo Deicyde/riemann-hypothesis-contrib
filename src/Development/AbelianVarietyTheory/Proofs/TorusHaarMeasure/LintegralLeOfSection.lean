@@ -5,21 +5,24 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.FrameSplit
 
-theorem lintegral_le_of_section {A B : Type*} [NormedAddCommGroup A] [NormedAddCommGroup B]
-    [MeasurableSpace A] [BorelSpace A] [MeasurableSpace B] [BorelSpace B]
-    [ProperSpace A] [ProperSpace B]
-    (μ : Measure A) [μ.IsAddHaarMeasure] (ν : Measure B) [ν.IsAddHaarMeasure]
+theorem lintegral_le_of_section
+    {A B : Type*} [NormedAddCommGroup A] [NormedAddCommGroup B] [MeasurableSpace A] [BorelSpace A]
+    [MeasurableSpace B] [BorelSpace B] [ProperSpace A] [ProperSpace B]
+    (μ : Measure A) [μ.IsAddHaarMeasure]
+    (ν : Measure B) [ν.IsAddHaarMeasure]
     (L : A → B) (hL : Continuous L) (hadd : ∀ x y, L (x + y) = L x + L y)
-    (s : B → A) (hs : ∀ b, L (s b) = b) (S : Set A) (hS : MeasurableSet S)
-    (hinv : ∀ b x, s b + x ∈ S ↔ x ∈ S)
-    (hb : ∀ C : ℝ, ∃ D : ℝ, ∀ x ∈ S, ‖L x‖ ≤ C → ‖x‖ ≤ D) :
-    ∃ K : ℝ≥0∞, K < ⊤ ∧ ∀ g : B → ℝ≥0∞, Measurable g →
-      ∫⁻ y in S, g (L y) ∂μ ≤ K * ∫⁻ z, g z ∂ν := by
+    (s : B → A) (hs : ∀ b, L (s b) = b)
+    (S : Set A) (hS : MeasurableSet S) (hinv : ∀ b x, s b + x ∈ S ↔ x ∈ S)
+    (hb : ∀ C : ℝ, ∃ D : ℝ, ∀ x ∈ S, ‖L x‖ ≤ C → ‖x‖ ≤ D)
+    : ∃ K : ℝ≥0∞,
+      K < ⊤ ∧ ∀ g : B → ℝ≥0∞, Measurable g → ∫⁻ y in S, g (L y) ∂μ ≤ K * ∫⁻ z, g z ∂ν := by
   have hLm : Measurable L := hL.measurable
   set ρ : Measure B := (μ.restrict S).map L with hρ
   have happ : ∀ T : Set B, MeasurableSet T → ρ T = μ (L ⁻¹' T ∩ S) := by

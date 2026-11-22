@@ -8,12 +8,15 @@ public import Development.WeilBound.CoreStatements.AutomorphicKernels.SiegelWeil
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
 
 namespace PositivityTheory.SiegelWeilFormula.kunf
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
 theorem a_pos (d : SD σ) (x : d.G) : 0 < d.a x := by
   obtain ⟨p, t, hp, k, hk, rfl⟩ := d.ok.hgt.iwa x
@@ -33,16 +36,20 @@ theorem isClosed_siegel_stabiliser (d : SD σ) : IsClosed (par2 σ d.Y : Set d.G
     exact mem_stabiliser_iff_lower_block_zero d.ok.frame p
   rw [e]
   have hfr := GlobalTheory.EisBL.DoubledParabolic.continuous_inFrame (σ := σ) (Y := d.Y) d.b
-  exact isClosed_singleton.preimage
-    (continuous_pi fun i => continuous_pi fun j => hfr.matrix_elem (Sum.inr i) (Sum.inl j))
+  exact isClosed_singleton.preimage (continuous_pi fun i =>
+    continuous_pi fun j => hfr.matrix_elem (Sum.inr i) (Sum.inl j))
 
 theorem continuous_a (d : SD σ) : Continuous d.a := by
-  refine GlobalTheory.Doubling.continuous_of_prod (P := par2 σ d.Y) (K := d.K) (isClosed_siegel_stabiliser d) (isCompact_K d)
-    (fun g => ?_) ?_
+  refine GlobalTheory.Doubling.continuous_of_prod (P := par2 σ d.Y) (K := d.K)
+    (isClosed_siegel_stabiliser d) (isCompact_K d)
+    (fun g => ?_)
+    ?_
   · obtain ⟨p, t, hp, k, hk, e⟩ := d.ok.hgt.iwa g
     exact ⟨⟨p, mem_parabolic_GL2_iff.2 ⟨t, hp⟩⟩, k, hk, e⟩
-  · have hc : Continuous fun x : par2 σ d.Y × d.K => ((GlobalTheory.Doubling.absE F E (SecA.uDet x.1) : ℝ≥0) : ℝ) :=
-      NNReal.continuous_coe.comp (GlobalTheory.Doubling.continuous_absE.comp (SecA.continuous_uDet.comp continuous_fst))
+  · have hc : Continuous fun x : par2 σ d.Y × d.K =>
+        ((GlobalTheory.Doubling.absE F E (SecA.uDet x.1) : ℝ≥0) : ℝ) :=
+      NNReal.continuous_coe.comp (GlobalTheory.Doubling.continuous_absE.comp
+        (SecA.continuous_uDet.comp continuous_fst))
     refine hc.congr fun x => ?_
     obtain ⟨t, ht⟩ := mem_parabolic_GL2_iff.1 x.1.2
     rw [d.ok.hgt.val _ t ht _ x.2.2, SecA.uDet_eq ht]

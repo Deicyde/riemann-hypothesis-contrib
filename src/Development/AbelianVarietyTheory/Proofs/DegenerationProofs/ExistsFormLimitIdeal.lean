@@ -8,38 +8,52 @@ namespace GlobalTheory.Degen
 
 open MvPolynomial
 
-theorem exists_form_limit_ideal (R : Type) [CommRing R] (I : Ideal R) (hI : IsAdicComplete I R)
-    (σ : Type) [Finite σ] (K : ℕ → Ideal (MvPolynomial σ R)) (t : ℕ)
+theorem exists_form_limit_ideal
+    (R : Type) [CommRing R]
+    (I : Ideal R) (hI : IsAdicComplete I R)
+    (σ : Type) [Finite σ]
+    (K : ℕ → Ideal (MvPolynomial σ R)) (t : ℕ)
     (hK : ∀ e F, F.IsHomogeneous t → F ∈ K (e + 1) → F ∈ K e)
     (ha : ∀ e, ∀ a ∈ I ^ (e + 1), MvPolynomial.C a ∈ K e)
-    (hs : ∀ e F, F.IsHomogeneous t → F ∈ K e → ∃ G : MvPolynomial σ R, G.IsHomogeneous t ∧
-      (∀ d, AddMonoidAlgebra.coeff G d ∈ I ^ (e + 1)) ∧ F - G ∈ K (e + 1))
-    (e : ℕ) (F : MvPolynomial σ R) (hF : F.IsHomogeneous t) (hFe : F ∈ K e) :
-    ∃ F₁ : MvPolynomial σ R, F₁.IsHomogeneous t ∧ (∀ e', F₁ ∈ K e') ∧
-      ∀ d, AddMonoidAlgebra.coeff (F - F₁) d ∈ I ^ (e + 1) := by
+    (hs : ∀ e F,
+      F.IsHomogeneous t → F ∈ K e
+        → ∃ G : MvPolynomial σ R,
+          G.IsHomogeneous t ∧ (∀ d, AddMonoidAlgebra.coeff G d ∈ I ^ (e + 1)) ∧ F - G ∈ K (e + 1))
+    (e : ℕ) (F : MvPolynomial σ R) (hF : F.IsHomogeneous t) (hFe : F ∈ K e)
+    : ∃ F₁ : MvPolynomial σ R,
+      F₁.IsHomogeneous t ∧ (∀ e', F₁ ∈ K e')
+        ∧ ∀ d, AddMonoidAlgebra.coeff (F - F₁) d ∈ I ^ (e + 1) := by
   classical
   have hdesc : ∀ (P : MvPolynomial σ R), P.IsHomogeneous t → ∀ m k, P ∈ K (m + k) → P ∈ K m := by
     intro P hP m k
     induction k with
     | zero => exact id
     | succ k ih => exact fun h => ih (hK _ _ hP h)
-  have hcoef : ∀ (j : ℕ) (P : MvPolynomial σ R), (∀ d, AddMonoidAlgebra.coeff P d ∈ I ^ (j + 1)) → P ∈ K j := by
+  have hcoef
+      : ∀ (j : ℕ) (P : MvPolynomial σ R),
+        (∀ d, AddMonoidAlgebra.coeff P d ∈ I ^ (j + 1)) → P ∈ K j := by
     intro j P hP
     rw [P.as_sum]
     refine Ideal.sum_mem _ fun d _ => ?_
-    have : (monomial d (AddMonoidAlgebra.coeff P d) : MvPolynomial σ R) = C (AddMonoidAlgebra.coeff P d) * monomial d 1 := by
+    have : (monomial d (AddMonoidAlgebra.coeff P d) : MvPolynomial σ R)
+        = C (AddMonoidAlgebra.coeff P d) * monomial d 1 := by
       rw [C_mul_monomial, mul_one]
     rw [this]
     exact Ideal.mul_mem_right _ _ (ha _ _ (hP d))
   choose G hG1 hG2 hG3 using hs
   let s : (n : ℕ) → {P : MvPolynomial σ R // P.IsHomogeneous t ∧ P ∈ K (e + n)} := fun n =>
-    Nat.rec (motive := fun n => {P : MvPolynomial σ R // P.IsHomogeneous t ∧ P ∈ K (e + n)})
+    Nat.rec
+      (motive := fun n => {P : MvPolynomial σ R // P.IsHomogeneous t ∧ P ∈ K (e + n)})
       ⟨F, hF, hFe⟩
-      (fun n z => ⟨z.1 - G (e + n) z.1 z.2.1 z.2.2, z.2.1.sub (hG1 _ _ _ _), hG3 _ _ _ _⟩) n
+      (fun n z => ⟨z.1 - G (e + n) z.1 z.2.1 z.2.2, z.2.1.sub (hG1 _ _ _ _), hG3 _ _ _ _⟩)
+      n
   have hs0 : (s 0).1 = F := rfl
-  have hsn : ∀ n, (s (n + 1)).1 = (s n).1 - G (e + n) (s n).1 (s n).2.1 (s n).2.2 :=
-    fun n => rfl
-  have hd : ∀ d m n, m ≤ n → AddMonoidAlgebra.coeff (s m).1 d - AddMonoidAlgebra.coeff (s n).1 d ∈ I ^ (e + m + 1) := by
+  have hsn : ∀ n, (s (n + 1)).1 = (s n).1 - G (e + n) (s n).1 (s n).2.1 (s n).2.2 := fun n => rfl
+  have hd
+      : ∀ d m n,
+        m ≤ n
+          → AddMonoidAlgebra.coeff (s m).1 d - AddMonoidAlgebra.coeff (s n).1 d
+            ∈ I ^ (e + m + 1) := by
     intro d m n hmn
     induction n, hmn using Nat.le_induction with
     | base => simp
@@ -52,11 +66,13 @@ theorem exists_form_limit_ideal (R : Type) [CommRing R] (I : Ideal R) (hI : IsAd
     rw [Ideal.smul_eq_mul, Ideal.mul_top]
   have hlim : ∀ d, ∃ L : R, ∀ m, AddMonoidAlgebra.coeff (s m).1 d - L ∈ I ^ (e + m + 1) := by
     intro d
-    obtain ⟨L, hL⟩ := IsPrecomplete.prec (I := I) (M := R) hI.toIsPrecomplete
-      (f := fun n => AddMonoidAlgebra.coeff (s n).1 d) (by
-        intro m n hmn
-        rw [SModEq.sub_mem, hmem]
-        exact Ideal.pow_le_pow_right (by omega) (hd d m n hmn))
+    obtain ⟨L, hL⟩ :=
+      IsPrecomplete.prec (I := I) (M := R) hI.toIsPrecomplete
+        (f := fun n => AddMonoidAlgebra.coeff (s n).1 d)
+        (by
+          intro m n hmn
+          rw [SModEq.sub_mem, hmem]
+          exact Ideal.pow_le_pow_right (by omega) (hd d m n hmn))
     refine ⟨L, fun m => ?_⟩
     have h := hL (e + m + 1)
     rw [SModEq.sub_mem, hmem] at h

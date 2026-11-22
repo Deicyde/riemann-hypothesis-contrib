@@ -21,8 +21,8 @@ theorem satake_unif_ne_zero {ϖ : v.adicCompletion F} (h : IsUnifV F v ϖ) : ϖ 
   unfold IsUnifV at h
   first | simp at h | done
 
-theorem satake_lt_one_le {x : WithZero (Multiplicative ℤ)} (hx : x < 1) :
-    x ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+theorem satake_lt_one_le {x : WithZero (Multiplicative ℤ)} (hx : x < 1)
+    : x ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
   cases x using WithZero.recZeroCoe with
   | zero => exact WithZero.zero_le _
   | coe a =>
@@ -35,10 +35,7 @@ theorem satake_lt_one_le {x : WithZero (Multiplicative ℤ)} (hx : x < 1) :
 
 private theorem mem_Ov_iff' (x : v.adicCompletion F) : x ∈ Ov F v ↔ Valued.v x ≤ 1 := by
   unfold Ov
-  first
-    | exact Iff.rfl
-    | exact mem_adicCompletionIntegers
-    | simp [mem_adicCompletionIntegers]
+  first | exact Iff.rfl | exact mem_adicCompletionIntegers | simp [mem_adicCompletionIntegers]
 
 theorem satake_unif_inv_not_mem {ϖ : v.adicCompletion F} (h : IsUnifV F v ϖ) : ϖ⁻¹ ∉ Ov F v := by
   unfold IsUnifV at h
@@ -48,11 +45,15 @@ theorem satake_unif_inv_not_mem {ϖ : v.adicCompletion F} (h : IsUnifV F v ϖ) :
   have h4 : ((Multiplicative.ofAdd (-1 : ℤ))⁻¹ : Multiplicative ℤ) ≤ 1 := by
     rw [← WithZero.coe_le_coe, WithZero.coe_inv]
     first | exact_mod_cast hm' | simpa using hm'
-  have h5 : Multiplicative.toAdd ((Multiplicative.ofAdd (-1 : ℤ))⁻¹) ≤ Multiplicative.toAdd (1 : Multiplicative ℤ) := h4
+  have h5
+      : Multiplicative.toAdd ((Multiplicative.ofAdd (-1 : ℤ))⁻¹)
+        ≤ Multiplicative.toAdd (1 : Multiplicative ℤ) :=
+    h4
   simp at h5
 
-theorem satake_mem_span_iff {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h : IsUnifV F v ϖ)
-    (y : Ov F v) : y ∈ Ideal.span {(⟨ϖ, hϖ⟩ : Ov F v)} ↔ Valued.v (y : v.adicCompletion F) < 1 := by
+theorem satake_mem_span_iff
+    {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h : IsUnifV F v ϖ) (y : Ov F v)
+    : y ∈ Ideal.span {(⟨ϖ, hϖ⟩ : Ov F v)} ↔ Valued.v (y : v.adicCompletion F) < 1 := by
   have h0 := satake_unif_ne_zero v h
   rw [Ideal.mem_span_singleton']
   constructor
@@ -60,22 +61,29 @@ theorem satake_mem_span_iff {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h :
     have hz : Valued.v ((z : Ov F v) : v.adicCompletion F) ≤ 1 := z.2
     show Valued.v ((z : v.adicCompletion F) * ϖ) < 1
     rw [Valuation.map_mul, h]
-    calc Valued.v (z : v.adicCompletion F) * ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
-        ≤ 1 * ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) :=
-          by gcongr
+    calc
+      Valued.v (z : v.adicCompletion F)
+            * ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+          ≤ 1
+            * ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ)
+              : WithZero (Multiplicative ℤ)) := by
+        gcongr
       _ < 1 := by
-          rw [one_mul, ← WithZero.coe_one, WithZero.coe_lt_coe]
-          show (-1 : ℤ) < 0
-          omega
+        rw [one_mul, ← WithZero.coe_one, WithZero.coe_lt_coe]
+        show (-1 : ℤ) < 0
+        omega
   · intro hy
     have hle := satake_lt_one_le hy
     have hm : (y : v.adicCompletion F) * ϖ⁻¹ ∈ Ov F v := by
       show Valued.v ((y : v.adicCompletion F) * ϖ⁻¹) ≤ 1
       rw [Valuation.map_mul, Valuation.map_inv, h]
-      calc Valued.v (y : v.adicCompletion F) * (((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))⁻¹
-          ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) *
-              (((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)))⁻¹ :=
-            by gcongr
+      calc
+        Valued.v (y : v.adicCompletion F) * (((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ)
+              : WithZero (Multiplicative ℤ)))⁻¹
+            ≤ ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+              * (((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ)
+                : WithZero (Multiplicative ℤ)))⁻¹ := by
+          gcongr
         _ = 1 := mul_inv_cancel₀ WithZero.coe_ne_zero
     refine ⟨⟨_, hm⟩, Subtype.ext ?_⟩
     show (y : v.adicCompletion F) * ϖ⁻¹ * ϖ = y
@@ -83,11 +91,13 @@ theorem satake_mem_span_iff {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h :
 
 def satakeIota : 𝓞 F →+* Ov F v := algebraMap (𝓞 F) (v.adicCompletionIntegers F)
 
-theorem satakeIota_coe (r : 𝓞 F) :
-    ((satakeIota v r : Ov F v) : v.adicCompletion F) = algebraMap (𝓞 F) (v.adicCompletion F) r := by first | rfl | simp [satakeIota] | (unfold satakeIota Ov; done)
+theorem satakeIota_coe (r : 𝓞 F)
+    : ((satakeIota v r : Ov F v) : v.adicCompletion F)
+      = algebraMap (𝓞 F) (v.adicCompletion F) r := by
+  first | rfl | simp [satakeIota] | (unfold satakeIota Ov; done)
 
-theorem satake_card_res {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h : IsUnifV F v ϖ) :
-    Nat.card (Ov F v ⧸ Ideal.span {(⟨ϖ, hϖ⟩ : Ov F v)}) = qV F v := by
+theorem satake_card_res {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h : IsUnifV F v ϖ)
+    : Nat.card (Ov F v ⧸ Ideal.span {(⟨ϖ, hϖ⟩ : Ov F v)}) = qV F v := by
   set I := Ideal.span {(⟨ϖ, hϖ⟩ : Ov F v)}
   let φ : 𝓞 F →+* Ov F v ⧸ I := (Ideal.Quotient.mk I).comp (satakeIota v)
   have hker : ∀ r ∈ v.asIdeal, φ r = 0 := by
@@ -116,8 +126,9 @@ theorem satake_card_res {ϖ : v.adicCompletion F} (hϖ : ϖ ∈ Ov F v) (h : IsU
     show φ r = _
     simp only [φ, RingHom.comp_apply]
     rw [Ideal.Quotient.eq, satake_mem_span_iff v hϖ h]
-    have e : ((satakeIota v r - x : Ov F v) : v.adicCompletion F) =
-        -((x : v.adicCompletion F) - algebraMap (𝓞 F) (v.adicCompletion F) r) := by
+    have e
+        : ((satakeIota v r - x : Ov F v) : v.adicCompletion F)
+          = -((x : v.adicCompletion F) - algebraMap (𝓞 F) (v.adicCompletion F) r) := by
       rw [AddSubgroupClass.coe_sub, satakeIota_coe, neg_sub]
     rw [e, Valuation.map_neg]
     exact hr
@@ -129,8 +140,9 @@ theorem satake_ordV_unif {ϖ : v.adicCompletion F} (h : IsUnifV F v ϖ) : ordV F
   unfold ordV IsUnifV at *
   have h0 : Valued.v ϖ ≠ 0 := by rw [h]; exact WithZero.coe_ne_zero
   rw [dite_eq_right h0]
-  have e : ((WithZero.unzero h0 : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) =
-      ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+  have e
+      : ((WithZero.unzero h0 : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+        = ((Multiplicative.ofAdd (-1 : ℤ) : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
     rw [WithZero.coe_unzero, h]
   rw [WithZero.coe_injective e]
   simp
@@ -139,16 +151,16 @@ theorem satake_ordV_one : ordV F v 1 = 0 := by
   unfold ordV
   have h0 : Valued.v (1 : v.adicCompletion F) ≠ 0 := by simp
   rw [dite_eq_right h0]
-  have e : ((WithZero.unzero h0 : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) =
-      ((1 : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+  have e
+      : ((WithZero.unzero h0 : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+        = ((1 : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
     rw [WithZero.coe_unzero, map_one, WithZero.coe_one]
   rw [WithZero.coe_injective e]
   simp
 
 theorem satake_two_le_qV : 2 ≤ qV F v := by
   unfold qV
-  have h1 : Ideal.absNorm v.asIdeal ≠ 0 := by
-    rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
+  have h1 : Ideal.absNorm v.asIdeal ≠ 0 := by rw [Ne, Ideal.absNorm_eq_zero_iff]; exact v.ne_bot
   have h2 : Ideal.absNorm v.asIdeal ≠ 1 := by
     rw [Ne, Ideal.absNorm_eq_one_iff]; exact v.isPrime.ne_top
   omega

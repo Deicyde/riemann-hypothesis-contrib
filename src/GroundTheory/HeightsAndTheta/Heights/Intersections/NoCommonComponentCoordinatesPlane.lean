@@ -20,19 +20,22 @@ section Objects
 variable {K : Type*} [Fintype K] {ι : K → Type*} [∀ k, Fintype (ι k)]
 
 def IsSemiPosHerm (M : HermLine ι) : Prop :=
-  ∀ z : (Σ k, ι k) → ℂ, (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0) → ∀ v : (Σ k, ι k) → ℂ,
-    0 ≤ Δ (fun t : ℂ => Real.log (M.h (z + t • v))) 0
+  ∀ z : (Σ k, ι k) → ℂ,
+    (∀ k, ∃ i, z ⟨k, i⟩ ≠ 0)
+      → ∀ v : (Σ k, ι k) → ℂ, 0 ≤ Δ (fun t : ℂ => Real.log (M.h (z + t • v))) 0
 
-def De (P : Ideal (MRing ι)) {n : ℕ} (L : Fin n → HermLine ι) (A A' : HermLine ι) (s s' : MRing ι) : ℝ :=
+def De (P : Ideal (MRing ι)) {n : ℕ} (L : Fin n → HermLine ι) (A A' : HermLine ι) (s s' : MRing ι)
+    : ℝ :=
   ((∑ᶠ (W) (_ : W ∈ divSupp P s ∧ IsHorizontal W),
-        (multAt (P ⊔ Ideal.span {s}) W : ℝ) * ptsIntegral W (pot L) (logNorm A' s')) +
-      ptsIntegral P (Fin.cons (fun z => Real.log (A'.h z)) (pot L)) (logNorm A s)) -
-    ((∑ᶠ (W) (_ : W ∈ divSupp P s' ∧ IsHorizontal W),
-        (multAt (P ⊔ Ideal.span {s'}) W : ℝ) * ptsIntegral W (pot L) (logNorm A s)) +
-      ptsIntegral P (Fin.cons (fun z => Real.log (A.h z)) (pot L)) (logNorm A' s'))
+        (multAt (P ⊔ Ideal.span {s}) W : ℝ) * ptsIntegral W (pot L) (logNorm A' s'))
+      + ptsIntegral P (Fin.cons (fun z => Real.log (A'.h z)) (pot L)) (logNorm A s))
+    - ((∑ᶠ (W) (_ : W ∈ divSupp P s' ∧ IsHorizontal W),
+          (multAt (P ⊔ Ideal.span {s'}) W : ℝ) * ptsIntegral W (pot L) (logNorm A s))
+      + ptsIntegral P (Fin.cons (fun z => Real.log (A.h z)) (pot L)) (logNorm A' s'))
 
-theorem De_swap (P : Ideal (MRing ι)) {n : ℕ} (L : Fin n → HermLine ι) (A A' : HermLine ι)
-    (s s' : MRing ι) : De P L A' A s' s = -De P L A A' s s' := by
+theorem De_swap
+    (P : Ideal (MRing ι)) {n : ℕ} (L : Fin n → HermLine ι) (A A' : HermLine ι) (s s' : MRing ι)
+    : De P L A' A s' s = - De P L A A' s s' := by
   unfold De
   ring
 
@@ -40,12 +43,12 @@ end Objects
 
 def DeSlotAdd.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (n : ℕ)
-    (L : Fin n → HermLine ι) (j : Fin n) (M N A A' : HermLine ι) (s s' : MRing ι),
-    IsArithVar P (n + 2) → (∀ i, IsSmoothHerm (L i)) → IsSmoothHerm M → IsSmoothHerm N →
-    IsSmoothHerm A → IsSmoothHerm A' → IsSectionOn P A s → IsSectionOn P A' s' →
-    (∀ W, W ∈ divSupp P s → W ∈ divSupp P s' → ¬ IsHorizontal W) →
-    De P (Function.update L j (M.tensor N)) A A' s s' =
-      De P (Function.update L j M) A A' s s' + De P (Function.update L j N) A A' s s'
+      (L : Fin n → HermLine ι) (j : Fin n) (M N A A' : HermLine ι) (s s' : MRing ι),
+    IsArithVar P (n + 2) → (∀ i, IsSmoothHerm (L i)) → IsSmoothHerm M → IsSmoothHerm N
+      → IsSmoothHerm A → IsSmoothHerm A' → IsSectionOn P A s → IsSectionOn P A' s'
+      → (∀ W, W ∈ divSupp P s → W ∈ divSupp P s' → ¬ IsHorizontal W)
+      → De P (Function.update L j (M.tensor N)) A A' s s'
+        = De P (Function.update L j M) A A' s s' + De P (Function.update L j N) A A' s s'
 
 def SemiPosTwist.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (M : HermLine ι),
@@ -53,10 +56,10 @@ def SemiPosTwist.Statement : Prop :=
 
 def DeLeSemiPos.Statement : Prop :=
   ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (n : ℕ)
-    (L : Fin n → HermLine ι) (A A' : HermLine ι) (s s' : MRing ι),
-    IsArithVar P (n + 2) → (∀ j, IsSmoothHerm (L j)) → (∀ j, IsSemiPosHerm (L j)) →
-    IsSmoothHerm A → IsSmoothHerm A' → IsSectionOn P A s → IsSectionOn P A' s' →
-    (∀ W, W ∈ divSupp P s → W ∈ divSupp P s' → ¬ IsHorizontal W) →
-    De P L A A' s s' ≤ 0
+      (L : Fin n → HermLine ι) (A A' : HermLine ι) (s s' : MRing ι),
+    IsArithVar P (n + 2) → (∀ j, IsSmoothHerm (L j)) → (∀ j, IsSemiPosHerm (L j)) → IsSmoothHerm A
+      → IsSmoothHerm A' → IsSectionOn P A s → IsSectionOn P A' s'
+      → (∀ W, W ∈ divSupp P s → W ∈ divSupp P s' → ¬ IsHorizontal W)
+      → De P L A A' s s' ≤ 0
 
 end GroundTheory.Heights₂.Heights.Inter

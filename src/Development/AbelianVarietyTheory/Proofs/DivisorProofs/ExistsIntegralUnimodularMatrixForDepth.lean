@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatFram
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh GlobalTheory.FGDepth
+open MvPowerSeries ReciprocityTheory.PGsh ReciprocityTheory.ChartRestriction.G.Sh
+  GlobalTheory.FGDepth
 
 namespace GlobalTheory
 
@@ -33,15 +34,17 @@ theorem powRow_nonneg_of_nsmul {a : WithTop ℝ} {N : ℕ} (hN : N ≠ 0) (h : 0
       nlinarith
     exact_mod_cast this
 
-theorem powRow_int_root [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) {N : ℕ} (hN : 0 < N)
-    (y : C) (hy : IsIntV v y) : ∃ x, x ^ N = y ∧ IsIntV v x := by
+theorem powRow_int_root
+    [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) {N : ℕ} (hN : 0 < N) (y : C) (hy : IsIntV v y)
+    : ∃ x, x ^ N = y ∧ IsIntV v x := by
   obtain ⟨x, hx⟩ := IsAlgClosed.exists_pow_nat_eq y hN
   refine ⟨x, hx, powRow_nonneg_of_nsmul hN.ne' ?_⟩
   rw [← AddValuation.map_pow, hx]
   exact hy
 
-theorem powRow_int_of_le (v : AddValuation C (WithTop ℝ)) {a b : C} (hb : b ≠ 0)
-    (h : v b ≤ v (a * b)) : IsIntV v a := by
+theorem powRow_int_of_le
+    (v : AddValuation C (WithTop ℝ)) {a b : C} (hb : b ≠ 0) (h : v b ≤ v (a * b))
+    : IsIntV v a := by
   unfold IsIntV
   rw [AddValuation.map_mul] at h
   have hb' : v b ≠ ⊤ := (v.ne_top_iff).2 hb
@@ -59,11 +62,17 @@ theorem powRow_int_of_le (v : AddValuation C (WithTop ℝ)) {a b : C} (hb : b �
 theorem powRow_v_neg_one_pow (v : AddValuation C (WithTop ℝ)) (k : ℕ) : v ((-1 : C) ^ k) = 0 := by
   rw [AddValuation.map_pow, AddValuation.map_neg, AddValuation.map_one, smul_zero]
 
-theorem powRow_exists [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) {V : Type} [AddCommGroup V]
-    [Module C V] (N : ℕ) (hN : 0 < N) (j : ℕ) : ∀ (m : ℕ) (z : Fin m → V),
-    Module.finrank C (Submodule.span C (Set.range z)) ≤ j →
-    ∃ x : Matrix (Fin m) (Fin m) C, (∀ w u, IsIntV v (x w u)) ∧ v x.det = 0 ∧
-      ∀ w : Fin m, j ≤ w.val → ∑ u, (x w u) ^ N • z u = 0 := by
+theorem powRow_exists
+    [IsAlgClosed C]
+    (v : AddValuation C (WithTop ℝ))
+    {V : Type} [AddCommGroup V] [Module C V]
+    (N : ℕ) (hN : 0 < N)
+    (j : ℕ)
+    : ∀ (m : ℕ) (z : Fin m → V),
+      Module.finrank C (Submodule.span C (Set.range z)) ≤ j
+        → ∃ x : Matrix (Fin m) (Fin m) C,
+          (∀ w u, IsIntV v (x w u)) ∧ v x.det = 0
+            ∧ ∀ w : Fin m, j ≤ w.val → ∑ u, (x w u) ^ N • z u = 0 := by
   intro m
   induction m with
   | zero =>
@@ -82,8 +91,8 @@ theorem powRow_exists [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) {V : Ty
       rw [Matrix.one_apply]
       split_ifs <;> simp
     · obtain ⟨g, hg, i, hi⟩ := Fintype.not_linearIndependent_iff.1 hli
-      obtain ⟨u0, -, hu0⟩ := Finset.exists_min_image Finset.univ (fun u => v (g u))
-        ⟨i, Finset.mem_univ _⟩
+      obtain ⟨u0, -, hu0⟩ :=
+        Finset.exists_min_image Finset.univ (fun u => v (g u)) ⟨i, Finset.mem_univ _⟩
       have hg0 : g u0 ≠ 0 := by
         intro h0
         apply hi
@@ -126,8 +135,7 @@ theorem powRow_exists [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) {V : Ty
       obtain ⟨x', hx'int, hx'det, hx'k⟩ := ih (z ∘ u0.succAbove) hz'
       let A : Matrix (Fin (m + 1)) (Fin (m + 1)) C :=
         Matrix.of (Fin.snoc (fun w' => Fin.insertNth (α := fun _ => C) u0 0 (x' w')) r')
-      have hAlast : ∀ u, A (Fin.last m) u = r' u := by
-        intro u; simp [A, Fin.snoc_last]
+      have hAlast : ∀ u, A (Fin.last m) u = r' u := by intro u; simp [A, Fin.snoc_last]
       have hAcs : ∀ w' u, A w'.castSucc u = Fin.insertNth (α := fun _ => C) u0 0 (x' w') u := by
         intro w' u; simp [A, Fin.snoc_castSucc]
       refine ⟨A, ?_, ?_, ?_⟩
@@ -167,7 +175,15 @@ theorem powRow_exists [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) {V : Ty
           simp only [Fin.insertNth_apply_succAbove]
           exact hx'k w' (by simpa using hw)
 
-theorem powRow_matrix : ∀ (C : Type) [Field C] [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) (V : Type) [AddCommGroup V] [Module C V] (N : ℕ), 0 < N → ∀ (j m : ℕ) (z : Fin m → V), Module.finrank C (Submodule.span C (Set.range z)) ≤ j → ∃ x : Matrix (Fin m) (Fin m) C, (∀ w u, IsIntV v (x w u)) ∧ v x.det = 0 ∧ ∀ w : Fin m, j ≤ w.val → ∑ u, (x w u) ^ N • z u = 0 := by
+theorem powRow_matrix
+    : ∀ (C : Type) [Field C] [IsAlgClosed C] (v : AddValuation C (WithTop ℝ)) (V : Type)
+        [AddCommGroup V] [Module C V] (N : ℕ),
+      0 < N
+        → ∀ (j m : ℕ) (z : Fin m → V),
+          Module.finrank C (Submodule.span C (Set.range z)) ≤ j
+            → ∃ x : Matrix (Fin m) (Fin m) C,
+              (∀ w u, IsIntV v (x w u)) ∧ v x.det = 0
+                ∧ ∀ w : Fin m, j ≤ w.val → ∑ u, (x w u) ^ N • z u = 0 := by
   intro C _ _ v V _ _ N hN j m z hz
   exact powRow_exists v N hN j m z hz
 

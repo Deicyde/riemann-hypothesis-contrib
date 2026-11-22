@@ -13,18 +13,21 @@ noncomputable section
 
 namespace GlobalTheory
 
-abbrev specAlgebraMap (A B : Type u) [CommRing A] [CommRing B] [Algebra A B] :
-    Spec (.of B) ⟶ Spec (.of A) :=
+abbrev specAlgebraMap (A B : Type u) [CommRing A] [CommRing B] [Algebra A B]
+    : Spec (.of B) ⟶ Spec (.of A) :=
   Spec.map (CommRingCat.ofHom (algebraMap A B))
 
 section Extension
 
-variable {V K : Type u} [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K] {X X' S S' : Scheme.{u}}
+variable
+  {V K : Type u}
+  [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+  {X X' S S' : Scheme.{u}}
 
-theorem exists_valuativeExtension (p : X ⟶ S) [UniversallyClosed p] (r : Spec (.of V) ⟶ S)
-    (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r) :
-    ∃ x : Spec (.of V) ⟶ X, specAlgebraMap V K ≫ x = y ∧ x ≫ p = r := by
+theorem exists_valuativeExtension
+    (p : X ⟶ S) [UniversallyClosed p]
+    (r : Spec (.of V) ⟶ S) (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r)
+    : ∃ x : Spec (.of V) ⟶ X, specAlgebraMap V K ≫ x = y ∧ x ≫ p = r := by
   have hE : ValuativeCriterion.Existence p := by
     have h : UniversallyClosed p := inferInstance
     rw [UniversallyClosed.eq_valuativeCriterion] at h
@@ -32,34 +35,48 @@ theorem exists_valuativeExtension (p : X ⟶ S) [UniversallyClosed p] (r : Spec 
   obtain ⟨⟨l⟩⟩ := hE { R := V, K := K, i₁ := y, i₂ := r, commSq := ⟨h⟩ }
   exact ⟨l.l, l.fac_left, l.fac_right⟩
 
-
 variable (K) in
-theorem valuativePoint_ext (p : X ⟶ S) [IsSeparated p] {x x' : Spec (.of V) ⟶ X}
-    (h : specAlgebraMap V K ≫ x = specAlgebraMap V K ≫ x') (h' : x ≫ p = x' ≫ p) : x = x' := by
-  have hU := IsSeparated.valuativeCriterion p
-    { R := V, K := K, i₁ := specAlgebraMap V K ≫ x, i₂ := x ≫ p,
-      commSq := ⟨Category.assoc _ _ _⟩ }
+theorem valuativePoint_ext
+    (p : X ⟶ S) [IsSeparated p]
+    {x x' : Spec (.of V) ⟶ X}
+    (h : specAlgebraMap V K ≫ x = specAlgebraMap V K ≫ x') (h' : x ≫ p = x' ≫ p)
+    : x = x' := by
+  have hU :=
+    IsSeparated.valuativeCriterion p {
+      R := V
+      K := K
+      i₁ := specAlgebraMap V K ≫ x
+      i₂ := x ≫ p
+      commSq := ⟨Category.assoc _ _ _⟩
+    }
   exact congrArg (fun l ↦ l.l) (hU.elim ⟨x, rfl, rfl⟩ ⟨x', h.symm, h'.symm⟩)
 
-
 variable (K) in
-theorem valuativePoint_ext_of_isSeparated [X.IsSeparated] {x x' : Spec (.of V) ⟶ X}
-    (h : specAlgebraMap V K ≫ x = specAlgebraMap V K ≫ x') : x = x' :=
+theorem valuativePoint_ext_of_isSeparated
+    [X.IsSeparated] {x x' : Spec (.of V) ⟶ X} (h : specAlgebraMap V K ≫ x = specAlgebraMap V K ≫ x')
+    : x = x' :=
   valuativePoint_ext (K := K) (terminal.from X) h (terminal.hom_ext _ _)
 
-theorem existsUnique_valuativeExtension (p : X ⟶ S) [UniversallyClosed p] [IsSeparated p]
-    (r : Spec (.of V) ⟶ S) (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r) :
-    ∃! x : Spec (.of V) ⟶ X, specAlgebraMap V K ≫ x = y ∧ x ≫ p = r := by
+theorem existsUnique_valuativeExtension
+    (p : X ⟶ S) [UniversallyClosed p] [IsSeparated p]
+    (r : Spec (.of V) ⟶ S) (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r)
+    : ∃! x : Spec (.of V) ⟶ X, specAlgebraMap V K ≫ x = y ∧ x ≫ p = r := by
   obtain ⟨x, hx⟩ := exists_valuativeExtension p r y h
-  exact ⟨x, hx, fun x' hx' ↦
-    valuativePoint_ext (K := K) p (hx'.1.trans hx.1.symm) (hx'.2.trans hx.2.symm)⟩
+  exact ⟨
+    x,
+    hx,
+    fun x' hx' ↦ valuativePoint_ext (K := K) p (hx'.1.trans hx.1.symm) (hx'.2.trans hx.2.symm)
+  ⟩
 
-def valExt (p : X ⟶ S) [UniversallyClosed p] [IsSeparated p] (r : Spec (.of V) ⟶ S)
-    (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r) : Spec (.of V) ⟶ X :=
+def valExt
+    (p : X ⟶ S) [UniversallyClosed p] [IsSeparated p]
+    (r : Spec (.of V) ⟶ S) (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r)
+    : Spec (.of V) ⟶ X :=
   (existsUnique_valuativeExtension p r y h).exists.choose
 
-variable (p : X ⟶ S) [UniversallyClosed p] [IsSeparated p] (r : Spec (.of V) ⟶ S)
-  (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r)
+variable
+  (p : X ⟶ S) [UniversallyClosed p] [IsSeparated p]
+  (r : Spec (.of V) ⟶ S) (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap V K ≫ r)
 
 theorem specAlgebraMap_valExt : specAlgebraMap V K ≫ valExt p r y h = y :=
   (existsUnique_valuativeExtension p r y h).exists.choose_spec.1
@@ -67,10 +84,9 @@ theorem specAlgebraMap_valExt : specAlgebraMap V K ≫ valExt p r y h = y :=
 theorem valExt_over : valExt p r y h ≫ p = r :=
   (existsUnique_valuativeExtension p r y h).exists.choose_spec.2
 
-
-variable {V' K' : Type u} [CommRing V'] [IsDomain V'] [ValuationRing V'] [Field K']
-  [Algebra V' K'] [IsFractionRing V' K']
-
+variable
+  {V' K' : Type u}
+  [CommRing V'] [IsDomain V'] [ValuationRing V'] [Field K'] [Algebra V' K'] [IsFractionRing V' K']
 
 def valCentre : X := valExt p r y h (closedPoint V)
 
@@ -81,11 +97,15 @@ end Extension
 
 section Ring
 
-variable {O : Type u} [CommRing O] (V : Type u) {K : Type u} [CommRing V] [IsDomain V]
-  [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K] [Algebra O V] [Algebra O K]
-  [IsScalarTower O V K] {X X' : Scheme.{u}}
+variable
+  {O : Type u} [CommRing O]
+  (V : Type u)
+  {K : Type u} [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
+  [IsFractionRing V K] [Algebra O V] [Algebra O K] [IsScalarTower O V K]
+  {X X' : Scheme.{u}}
 
-variable (p : X ⟶ Spec (.of O)) [UniversallyClosed p] [IsSeparated p]
+variable
+  (p : X ⟶ Spec (.of O)) [UniversallyClosed p] [IsSeparated p]
   (y : Spec (.of K) ⟶ X) (h : y ≫ p = specAlgebraMap O K)
 
 end Ring
@@ -94,17 +114,19 @@ section Domination
 
 variable {V K K' : Type*} [CommRing V] [Field K] [Field K']
 
-theorem mem_iff_mem_range_of_isLocalHom [IsDomain V] [ValuationRing V] [Algebra V K]
-    [IsFractionRing V K] (χ : K →+* K') (V' : ValuationSubring K') (ψ : V →+* V') [IsLocalHom ψ]
-    (w : ∀ a, (ψ a : K') = χ (algebraMap V K a)) (x : K) :
-    χ x ∈ V' ↔ x ∈ (algebraMap V K).range := by
+theorem mem_iff_mem_range_of_isLocalHom
+    [IsDomain V] [ValuationRing V] [Algebra V K] [IsFractionRing V K]
+    (χ : K →+* K')
+    (V' : ValuationSubring K') (ψ : V →+* V') [IsLocalHom ψ]
+    (w : ∀ a, (ψ a : K') = χ (algebraMap V K a)) (x : K)
+    : χ x ∈ V' ↔ x ∈ (algebraMap V K).range := by
   refine ⟨fun hx ↦ ?_, ?_⟩
   · rcases ValuationRing.isInteger_or_isInteger V x with h | ⟨a, ha⟩
     · exact h
     · obtain rfl | hx0 := eq_or_ne x 0
       · exact zero_mem _
-      have hu : IsUnit (ψ a) := isUnit_iff_exists_inv.mpr ⟨⟨χ x, hx⟩, Subtype.ext (by
-        simp [w, ha, hx0])⟩
+      have hu : IsUnit (ψ a) :=
+        isUnit_iff_exists_inv.mpr ⟨⟨χ x, hx⟩, Subtype.ext (by simp [w, ha, hx0])⟩
       obtain ⟨b, hb⟩ := isUnit_iff_exists_inv.mp (IsUnit.of_map ψ a hu)
       refine ⟨b, ?_⟩
       have := congrArg (algebraMap V K) hb
@@ -114,17 +136,22 @@ theorem mem_iff_mem_range_of_isLocalHom [IsDomain V] [ValuationRing V] [Algebra 
     rw [← w]
     exact (ψ a).2
 
-theorem exists_valuationSubring_dominating [IsDomain V] [ValuationRing V] [Algebra V K]
-    [IsFractionRing V K] (χ : K →+* K') :
-    ∃ (V' : ValuationSubring K') (ψ : V →+* V'), IsLocalHom ψ ∧
-      (∀ a, (ψ a : K') = χ (algebraMap V K a)) ∧
-      ∀ x : K, χ x ∈ V' ↔ x ∈ (algebraMap V K).range := by
+theorem exists_valuationSubring_dominating
+    [IsDomain V] [ValuationRing V] [Algebra V K] [IsFractionRing V K] (χ : K →+* K')
+    : ∃ (V' : ValuationSubring K') (ψ : V →+* V'),
+      IsLocalHom ψ ∧ (∀ a, (ψ a : K') = χ (algebraMap V K a))
+        ∧ ∀ x : K, χ x ∈ V' ↔ x ∈ (algebraMap V K).range := by
   obtain ⟨V', h, hl⟩ := IsLocalRing.exists_factor_valuationRing (χ.comp (algebraMap V K))
-  exact ⟨V', _, hl, fun _ ↦ rfl,
-    @mem_iff_mem_range_of_isLocalHom _ _ _ _ _ _ _ _ _ _ χ V' _ hl fun _ ↦ rfl⟩
+  exact ⟨
+    V',
+    _,
+    hl,
+    fun _ ↦ rfl,
+    @mem_iff_mem_range_of_isLocalHom _ _ _ _ _ _ _ _ _ _ χ V' _ hl fun _ ↦ rfl
+  ⟩
 
-theorem exists_valuationSubring_comap_eq (T : ValuationSubring K) (χ : K →+* K') :
-    ∃ V' : ValuationSubring K', V'.comap χ = T := by
+theorem exists_valuationSubring_comap_eq (T : ValuationSubring K) (χ : K →+* K')
+    : ∃ V' : ValuationSubring K', V'.comap χ = T := by
   obtain ⟨V', -, -, -, h⟩ := exists_valuationSubring_dominating (V := T) χ
   refine ⟨V', ValuationSubring.ext _ _ fun x ↦ (h x).trans ⟨?_, fun hx ↦ ⟨⟨x, hx⟩, rfl⟩⟩⟩
   rintro ⟨a, rfl⟩
@@ -133,23 +160,25 @@ theorem exists_valuationSubring_comap_eq (T : ValuationSubring K) (χ : K →+* 
 def comapToValuationSubring (V' : ValuationSubring K') (χ : K →+* K') : V'.comap χ →+* V' :=
   (χ.comp (V'.comap χ).subtype).codRestrict V'.toSubring fun a ↦ a.2
 
-instance isLocalHom_comapToValuationSubring (V' : ValuationSubring K') (χ : K →+* K') :
-    IsLocalHom (comapToValuationSubring V' χ) := ⟨fun a ha ↦ by
-  obtain ⟨b, hb⟩ := isUnit_iff_exists_inv.mp ha
-  have hb' : χ a * b = 1 := congrArg Subtype.val hb
-  have ha0 : (a : K) ≠ 0 := fun e ↦ by simp [e] at hb'
-  have hm : (a : K)⁻¹ ∈ V'.comap χ := by
-    rw [ValuationSubring.mem_comap, map_inv₀, ← eq_inv_of_mul_eq_one_right hb']
-    exact b.2
-  exact isUnit_iff_exists_inv.mpr ⟨⟨_, hm⟩, Subtype.ext (mul_inv_cancel₀ ha0)⟩⟩
+instance isLocalHom_comapToValuationSubring (V' : ValuationSubring K') (χ : K →+* K')
+    : IsLocalHom (comapToValuationSubring V' χ) :=
+  ⟨fun a ha ↦ by
+    obtain ⟨b, hb⟩ := isUnit_iff_exists_inv.mp ha
+    have hb' : χ a * b = 1 := congrArg Subtype.val hb
+    have ha0 : (a : K) ≠ 0 := fun e ↦ by simp [e] at hb'
+    have hm : (a : K)⁻¹ ∈ V'.comap χ := by
+      rw [ValuationSubring.mem_comap, map_inv₀, ← eq_inv_of_mul_eq_one_right hb']
+      exact b.2
+    exact isUnit_iff_exists_inv.mpr ⟨⟨_, hm⟩, Subtype.ext (mul_inv_cancel₀ ha0)⟩⟩
 
 end Domination
 
 section Graph
 
-variable {V K : Type u} [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K]
-  [IsFractionRing V K] {U Z Z₁ Z₂ S : Scheme.{u}}
-  (p₁ : Z₁ ⟶ S) [UniversallyClosed p₁] [IsSeparated p₁]
+variable
+  {V K : Type u}
+  [CommRing V] [IsDomain V] [ValuationRing V] [Field K] [Algebra V K] [IsFractionRing V K]
+  {U Z Z₁ Z₂ S : Scheme.{u}} (p₁ : Z₁ ⟶ S) [UniversallyClosed p₁] [IsSeparated p₁]
   (p₂ : Z₂ ⟶ S) [UniversallyClosed p₂] [IsSeparated p₂]
   (j₁ : U ⟶ Z₁) (j₂ : U ⟶ Z₂) (w : j₁ ≫ p₁ = j₂ ≫ p₂)
   (r : Spec (.of V) ⟶ S) (y : Spec (.of K) ⟶ U) (h : y ≫ j₁ ≫ p₁ = specAlgebraMap V K ≫ r)
@@ -160,29 +189,28 @@ section Centre
 
 variable {X X' S : Scheme.{u}} [IsIntegral X] [IsIntegral X']
 
-
 variable (X) in
 def genericFieldPoint (X : Scheme.{u}) [IsIntegral X] : Spec (.of X.functionField) ⟶ X :=
   X.fromSpecStalk (genericPoint X)
 
-theorem specAlgebraMap_fromSpecStalk (x : X) :
-    specAlgebraMap (X.presheaf.stalk x) X.functionField ≫ X.fromSpecStalk x =
-      genericFieldPoint X :=
+theorem specAlgebraMap_fromSpecStalk (x : X)
+    : specAlgebraMap (X.presheaf.stalk x) X.functionField ≫ X.fromSpecStalk x
+      = genericFieldPoint X :=
   Scheme.SpecMap_stalkSpecializes_fromSpecStalk ((genericPoint_spec X).specializes trivial)
 
 def DominatesStalk (W : ValuationSubring X.functionField) (x : X) : Prop :=
-  (∀ a : X.presheaf.stalk x, algebraMap _ X.functionField a ∈ W) ∧
-    ∀ a ∈ maximalIdeal (X.presheaf.stalk x), algebraMap _ X.functionField a ∈ W.nonunits
+  (∀ a : X.presheaf.stalk x, algebraMap _ X.functionField a ∈ W)
+    ∧ ∀ a ∈ maximalIdeal (X.presheaf.stalk x), algebraMap _ X.functionField a ∈ W.nonunits
 
 variable {W : ValuationSubring X.functionField} {x : X}
 
-theorem dominatesStalk_iff_exists_isLocalHom : DominatesStalk W x ↔
-    ∃ ψ : X.presheaf.stalk x →+* W, IsLocalHom ψ ∧
-      ∀ a, (ψ a : X.functionField) = algebraMap _ X.functionField a := by
+theorem dominatesStalk_iff_exists_isLocalHom
+    : DominatesStalk W x
+      ↔ ∃ ψ : X.presheaf.stalk x →+* W,
+        IsLocalHom ψ ∧ ∀ a, (ψ a : X.functionField) = algebraMap _ X.functionField a := by
   constructor
   · rintro ⟨h₁, h₂⟩
-    refine ⟨(algebraMap _ X.functionField).codRestrict W.toSubring h₁, ⟨fun a ha ↦ ?_⟩,
-      fun _ ↦ rfl⟩
+    refine ⟨(algebraMap _ X.functionField).codRestrict W.toSubring h₁, ⟨fun a ha ↦ ?_⟩, fun _ ↦ rfl⟩
     by_contra hu
     exact (W.coe_mem_nonunits_iff (a := ⟨_, h₁ a⟩)).mp (h₂ a hu) ha
   · rintro ⟨ψ, _, hψ⟩
@@ -190,8 +218,10 @@ theorem dominatesStalk_iff_exists_isLocalHom : DominatesStalk W x ↔
     rw [← hψ, W.coe_mem_nonunits_iff]
     exact map_nonunit ψ a ha
 
-theorem dominatesStalk_iff_range_le : DominatesStalk W x ↔
-    LocalSubring.range (algebraMap (X.presheaf.stalk x) X.functionField) ≤ W.toLocalSubring := by
+theorem dominatesStalk_iff_range_le
+    : DominatesStalk W x
+      ↔ LocalSubring.range (algebraMap (X.presheaf.stalk x) X.functionField)
+        ≤ W.toLocalSubring := by
   have hs : IsLocalHom (algebraMap (X.presheaf.stalk x) X.functionField).rangeRestrict :=
     .of_surjective _ (RingHom.rangeRestrict_surjective _)
   constructor
@@ -206,15 +236,17 @@ theorem dominatesStalk_iff_range_le : DominatesStalk W x ↔
     exact dominatesStalk_iff_exists_isLocalHom.mpr
       ⟨_, @RingHom.isLocalHom_comp _ _ _ _ _ _ _ _ h.2 hs, fun _ ↦ rfl⟩
 
-theorem exists_dominatesStalk (x : X) :
-    ∃ W : ValuationSubring X.functionField, DominatesStalk W x := by
-  obtain ⟨W, hW⟩ := (LocalSubring.range
-    (algebraMap (X.presheaf.stalk x) X.functionField)).exists_le_valuationSubring
+theorem exists_dominatesStalk (x : X)
+    : ∃ W : ValuationSubring X.functionField, DominatesStalk W x := by
+  obtain ⟨W, hW⟩ :=
+    (LocalSubring.range (algebraMap (X.presheaf.stalk x)
+      X.functionField)).exists_le_valuationSubring
   exact ⟨W, dominatesStalk_iff_range_le.mpr hW⟩
 
-theorem dominatesStalk_iff_exists_hom : DominatesStalk W x ↔
-    ∃ l : Spec (.of W) ⟶ X, specAlgebraMap W X.functionField ≫ l = genericFieldPoint X ∧
-      l (closedPoint W) = x := by
+theorem dominatesStalk_iff_exists_hom
+    : DominatesStalk W x
+      ↔ ∃ l : Spec (.of W) ⟶ X,
+        specAlgebraMap W X.functionField ≫ l = genericFieldPoint X ∧ l (closedPoint W) = x := by
   rw [dominatesStalk_iff_exists_isLocalHom]
   constructor
   · rintro ⟨ψ, _, hψ⟩
@@ -227,23 +259,25 @@ theorem dominatesStalk_iff_exists_hom : DominatesStalk W x ↔
         Scheme.fromSpecStalk_closedPoint
   · rintro ⟨l, hl, rfl⟩
     refine ⟨(Scheme.stalkClosedPointTo l).hom, inferInstance, fun a ↦ ?_⟩
-    have e : Spec.map (Scheme.stalkClosedPointTo l ≫
-          CommRingCat.ofHom (algebraMap W X.functionField)) ≫ X.fromSpecStalk _ =
-        specAlgebraMap (X.presheaf.stalk (l (closedPoint W))) X.functionField ≫
-          X.fromSpecStalk (l (closedPoint W)) := by
+    have e
+        : Spec.map (Scheme.stalkClosedPointTo l ≫ CommRingCat.ofHom (algebraMap W X.functionField))
+            ≫ X.fromSpecStalk _
+          = specAlgebraMap (X.presheaf.stalk (l (closedPoint W))) X.functionField
+            ≫ X.fromSpecStalk (l (closedPoint W)) := by
       rw [specAlgebraMap_fromSpecStalk, ← hl, Spec.map_comp, Category.assoc,
         Scheme.Spec_stalkClosedPointTo_fromSpecStalk]
     exact congr($(Spec.map_injective ((cancel_mono _).mp e)) a)
 
-theorem DominatesStalk.unique [X.IsSeparated] {x' : X} (h : DominatesStalk W x)
-    (h' : DominatesStalk W x') : x = x' := by
+theorem DominatesStalk.unique
+    [X.IsSeparated] {x' : X} (h : DominatesStalk W x) (h' : DominatesStalk W x')
+    : x = x' := by
   obtain ⟨l, hl, rfl⟩ := dominatesStalk_iff_exists_hom.mp h
   obtain ⟨l', hl', rfl⟩ := dominatesStalk_iff_exists_hom.mp h'
   rw [valuativePoint_ext_of_isSeparated (K := X.functionField) (hl.trans hl'.symm)]
 
-theorem DominatesStalk.range_eq_of_valuationRing [ValuationRing (X.presheaf.stalk x)]
-    (h : DominatesStalk W x) :
-    (algebraMap (X.presheaf.stalk x) X.functionField).range = W.toSubring := by
+theorem DominatesStalk.range_eq_of_valuationRing
+    [ValuationRing (X.presheaf.stalk x)] (h : DominatesStalk W x)
+    : (algebraMap (X.presheaf.stalk x) X.functionField).range = W.toSubring := by
   obtain ⟨ψ, _, hψ⟩ := dominatesStalk_iff_exists_isLocalHom.mp h
   ext f
   exact (mem_iff_mem_range_of_isLocalHom (RingHom.id _) W ψ hψ f).symm
@@ -252,14 +286,14 @@ section Normal
 
 variable [IsNormalScheme X] [IsLocallyNoetherian X]
 
-theorem DominatesStalk.range_eq (h : DominatesStalk W x) (hx : Order.coheight x = 1) :
-    (algebraMap (X.presheaf.stalk x) X.functionField).range = W.toSubring :=
+theorem DominatesStalk.range_eq (h : DominatesStalk W x) (hx : Order.coheight x = 1)
+    : (algebraMap (X.presheaf.stalk x) X.functionField).range = W.toSubring :=
   have := IsNormalScheme.isDiscreteValuationRing_stalk hx
   h.range_eq_of_valuationRing
 
-theorem DominatesStalk.exists_ringEquiv (h : DominatesStalk W x) (hx : Order.coheight x = 1) :
-    ∃ e : X.presheaf.stalk x ≃+* W,
-      ∀ a, (e a : X.functionField) = algebraMap _ X.functionField a := by
+theorem DominatesStalk.exists_ringEquiv (h : DominatesStalk W x) (hx : Order.coheight x = 1)
+    : ∃ e : X.presheaf.stalk x ≃+* W, ∀ a,
+      (e a : X.functionField) = algebraMap _ X.functionField a := by
   obtain ⟨ψ, _, hψ⟩ := dominatesStalk_iff_exists_isLocalHom.mp h
   refine ⟨RingEquiv.ofBijective ψ ⟨fun a b e ↦ ?_, fun b ↦ ?_⟩, hψ⟩
   · apply IsFractionRing.injective (X.presheaf.stalk x) X.functionField
@@ -267,8 +301,8 @@ theorem DominatesStalk.exists_ringEquiv (h : DominatesStalk W x) (hx : Order.coh
   · obtain ⟨a, ha⟩ := (h.range_eq hx).ge b.2
     exact ⟨a, Subtype.ext ((hψ a).trans ha)⟩
 
-theorem DominatesStalk.isDiscreteValuationRing (h : DominatesStalk W x)
-    (hx : Order.coheight x = 1) : IsDiscreteValuationRing W := by
+theorem DominatesStalk.isDiscreteValuationRing (h : DominatesStalk W x) (hx : Order.coheight x = 1)
+    : IsDiscreteValuationRing W := by
   obtain ⟨e, -⟩ := h.exists_ringEquiv hx
   have := IsNormalScheme.isDiscreteValuationRing_stalk hx
   exact IsDiscreteValuationRing.RingEquivClass.isDiscreteValuationRing e
@@ -277,35 +311,40 @@ end Normal
 
 def functionFieldMap (f : X ⟶ X') [IsDominant f] : X'.functionField →+* X.functionField :=
   (X'.presheaf.stalkSpecializes (x := f (genericPoint X)) (y := genericPoint X') (by
-    have := (genericPoint_spec X).image f.continuous
-    rw [Set.image_univ, f.denseRange.closure_range] at this
-    exact this.specializes trivial) ≫ f.stalkMap (genericPoint X)).hom
+      have := (genericPoint_spec X).image f.continuous
+      rw [Set.image_univ, f.denseRange.closure_range] at this
+      exact this.specializes trivial)
+    ≫ f.stalkMap (genericPoint X)).hom
 
-theorem specMap_functionFieldMap (f : X ⟶ X') [IsDominant f] :
-    Spec.map (CommRingCat.ofHom (functionFieldMap f)) ≫ genericFieldPoint X' =
-      genericFieldPoint X ≫ f := by
+theorem specMap_functionFieldMap (f : X ⟶ X') [IsDominant f]
+    : Spec.map (CommRingCat.ofHom (functionFieldMap f)) ≫ genericFieldPoint X'
+      = genericFieldPoint X ≫ f := by
   refine (congrArg (· ≫ X'.fromSpecStalk (genericPoint X')) (Spec.map_comp _ _)).trans ?_
   rw [Category.assoc, Scheme.SpecMap_stalkSpecializes_fromSpecStalk,
     Scheme.SpecMap_stalkMap_fromSpecStalk]
   rfl
 
-theorem functionFieldMap_algebraMap (f : X ⟶ X') [IsDominant f] (x : X)
-    (a : X'.presheaf.stalk (f x)) :
-    functionFieldMap f (algebraMap _ X'.functionField a) =
-      algebraMap _ X.functionField (f.stalkMap x a) := by
-  have e : Spec.map (CommRingCat.ofHom (algebraMap (X'.presheaf.stalk (f x)) X'.functionField) ≫
-        CommRingCat.ofHom (functionFieldMap f)) ≫ X'.fromSpecStalk _ =
-      Spec.map (f.stalkMap x ≫ CommRingCat.ofHom
-        (algebraMap (X.presheaf.stalk x) X.functionField)) ≫ X'.fromSpecStalk _ := by
+theorem functionFieldMap_algebraMap
+    (f : X ⟶ X') [IsDominant f] (x : X) (a : X'.presheaf.stalk (f x))
+    : functionFieldMap f (algebraMap _ X'.functionField a)
+      = algebraMap _ X.functionField (f.stalkMap x a) := by
+  have e
+      : Spec.map
+            (CommRingCat.ofHom (algebraMap (X'.presheaf.stalk (f x)) X'.functionField)
+              ≫ CommRingCat.ofHom (functionFieldMap f))
+          ≫ X'.fromSpecStalk _
+        = Spec.map
+            (f.stalkMap x ≫ CommRingCat.ofHom (algebraMap (X.presheaf.stalk x) X.functionField))
+          ≫ X'.fromSpecStalk _ := by
     refine Eq.trans ?_ (congrArg (· ≫ X'.fromSpecStalk (f x)) (Spec.map_comp _ _)).symm
-    rw [Spec.map_comp, Category.assoc, Category.assoc,
-      specAlgebraMap_fromSpecStalk, specMap_functionFieldMap,
-      Scheme.SpecMap_stalkMap_fromSpecStalk, ← specAlgebraMap_fromSpecStalk x]
+    rw [Spec.map_comp, Category.assoc, Category.assoc, specAlgebraMap_fromSpecStalk,
+      specMap_functionFieldMap, Scheme.SpecMap_stalkMap_fromSpecStalk,
+      ← specAlgebraMap_fromSpecStalk x]
     exact Category.assoc _ _ _
   exact congr($(Spec.map_injective ((cancel_mono _).mp e)) a)
 
-theorem DominatesStalk.comap (h : DominatesStalk W x) (f : X ⟶ X') [IsDominant f] :
-    DominatesStalk (W.comap (functionFieldMap f)) (f x) := by
+theorem DominatesStalk.comap (h : DominatesStalk W x) (f : X ⟶ X') [IsDominant f]
+    : DominatesStalk (W.comap (functionFieldMap f)) (f x) := by
   refine ⟨fun a ↦ ?_, fun a ha ↦ ?_⟩
   · rw [ValuationSubring.mem_comap, functionFieldMap_algebraMap]
     exact h.1 _
@@ -319,35 +358,38 @@ variable {O : Type u} [CommRing O]
 def toFunctionField (p : X ⟶ Spec (.of O)) : O →+* X.functionField :=
   ((Scheme.ΓSpecIso (.of O)).inv ≫ p.appTop ≫ X.presheaf.germ ⊤ (genericPoint X) trivial).hom
 
-theorem genericFieldPoint_over (p : X ⟶ Spec (.of O)) :
-    genericFieldPoint X ≫ p = Spec.map (CommRingCat.ofHom (toFunctionField p)) := by
-  change X.fromSpecStalk _ ≫ p = Spec.map ((Scheme.ΓSpecIso (.of O)).inv ≫ p.appTop ≫
-    X.presheaf.germ ⊤ (genericPoint X) trivial)
-  rw [Spec.map_comp, Spec.map_comp, ← Scheme.fromSpecStalk_toSpecΓ, Category.assoc,
-    Category.assoc, ← Scheme.toSpecΓ_naturality_assoc]
+theorem genericFieldPoint_over (p : X ⟶ Spec (.of O))
+    : genericFieldPoint X ≫ p = Spec.map (CommRingCat.ofHom (toFunctionField p)) := by
+  change X.fromSpecStalk _ ≫ p
+    = Spec.map
+      ((Scheme.ΓSpecIso (.of O)).inv ≫ p.appTop ≫ X.presheaf.germ ⊤ (genericPoint X) trivial)
+  rw [Spec.map_comp, Spec.map_comp, ← Scheme.fromSpecStalk_toSpecΓ, Category.assoc, Category.assoc,
+    ← Scheme.toSpecΓ_naturality_assoc]
   simp
 
-theorem DominatesStalk.toFunctionField_mem (h : DominatesStalk W x) (p : X ⟶ Spec (.of O))
-    (a : O) : toFunctionField p a ∈ W := by
+theorem DominatesStalk.toFunctionField_mem (h : DominatesStalk W x) (p : X ⟶ Spec (.of O)) (a : O)
+    : toFunctionField p a ∈ W := by
   have := h.1 (X.presheaf.germ ⊤ x trivial (p.appTop ((Scheme.ΓSpecIso (.of O)).inv a)))
   have _ : Nonempty (⊤ : X.Opens) := ⟨⟨x, trivial⟩⟩
   exact (Scheme.algebraMap_germ_eq_germToFunctionField X (U := ⊤) (x := x) trivial _) ▸ this
 
-variable (p : X ⟶ Spec (.of O)) [UniversallyClosed p] [IsSeparated p]
+variable
+  (p : X ⟶ Spec (.of O)) [UniversallyClosed p] [IsSeparated p]
   (W : ValuationSubring X.functionField) (hW : ∀ a : O, toFunctionField p a ∈ W)
 
 omit [UniversallyClosed p] [IsSeparated p] in
-theorem genericFieldPoint_over_codRestrict : genericFieldPoint X ≫ p =
-    specAlgebraMap W X.functionField ≫ Spec.map (CommRingCat.ofHom (S := W)
-      ((toFunctionField p).codRestrict W.toSubring hW)) := by
+theorem genericFieldPoint_over_codRestrict
+    : genericFieldPoint X ≫ p
+      = specAlgebraMap W X.functionField ≫ Spec.map (CommRingCat.ofHom (S := W)
+        ((toFunctionField p).codRestrict W.toSubring hW)) := by
   rw [genericFieldPoint_over, ← Spec.map_comp]
   rfl
 
 def centreHom : Spec (.of W) ⟶ X :=
   valExt p _ (genericFieldPoint X) (genericFieldPoint_over_codRestrict p W hW)
 
-theorem specAlgebraMap_centreHom :
-    specAlgebraMap W X.functionField ≫ centreHom p W hW = genericFieldPoint X :=
+theorem specAlgebraMap_centreHom
+    : specAlgebraMap W X.functionField ≫ centreHom p W hW = genericFieldPoint X :=
   specAlgebraMap_valExt ..
 
 def centre : X := centreHom p W hW (closedPoint W)
@@ -359,8 +401,9 @@ theorem centre_eq_iff (x : X) : centre p W hW = x ↔ DominatesStalk W x := by
   have : X.IsSeparated := ⟨by rw [← terminal.comp_from p]; infer_instance⟩
   exact ⟨fun e ↦ e ▸ dominatesStalk_centre p W hW, (dominatesStalk_centre p W hW).unique⟩
 
-theorem exists_centre_eq (x : X) : ∃ (W : ValuationSubring X.functionField)
-    (hW : ∀ a : O, toFunctionField p a ∈ W), centre p W hW = x := by
+theorem exists_centre_eq (x : X)
+    : ∃ (W : ValuationSubring X.functionField) (hW : ∀ a : O, toFunctionField p a ∈ W),
+      centre p W hW = x := by
   obtain ⟨W, hW⟩ := exists_dominatesStalk x
   exact ⟨W, hW.toFunctionField_mem p, (centre_eq_iff ..).mpr hW⟩
 

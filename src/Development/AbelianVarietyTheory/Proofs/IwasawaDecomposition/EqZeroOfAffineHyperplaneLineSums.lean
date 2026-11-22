@@ -5,16 +5,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.GlESy
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix GlobalTheory.LevelHecke
+open Formalism.BasicNotions Formalism.L2.Forms Formalism.UG
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases NumberField IsDedekindDomain Matrix
+  GlobalTheory.LevelHecke
 open scoped TensorProduct
 
 namespace GlobalTheory.FiniteRadon
 
-
 open Classical in
-theorem card_annihilator_mul (k W : Type) [Field k] [Fintype k] [AddCommGroup W] [Module k W]
-    [Fintype (Module.Dual k W)] (y : W) (hy : y ≠ 0) :
-    Fintype.card k * (Finset.univ.filter (fun g : Module.Dual k W => g y = 0)).card
+theorem card_annihilator_mul
+    (k W : Type) [Field k] [Fintype k] [AddCommGroup W] [Module k W] [Fintype (Module.Dual k W)]
+    (y : W) (hy : y ≠ 0)
+    : Fintype.card k * (Finset.univ.filter (fun g : Module.Dual k W => g y = 0)).card
       = Fintype.card (Module.Dual k W) := by
   let ev : Module.Dual k W →ₗ[k] k := Module.Dual.eval k W y
   have hev : ∀ g, ev g = g y := fun g => rfl
@@ -25,17 +27,20 @@ theorem card_annihilator_mul (k W : Type) [Field k] [Fintype k] [AddCommGroup W]
   have h1 := Submodule.card_eq_card_quotient_mul_card (LinearMap.ker ev)
   have h2 : Nat.card (Module.Dual k W ⧸ LinearMap.ker ev) = Nat.card k :=
     Nat.card_congr (ev.quotKerEquivOfSurjective hs).toEquiv
-  have h3 : Nat.card (LinearMap.ker ev)
-      = (Finset.univ.filter (fun g : Module.Dual k W => g y = 0)).card := by
+  have h3
+      : Nat.card (LinearMap.ker ev)
+        = (Finset.univ.filter (fun g : Module.Dual k W => g y = 0)).card := by
     rw [← Fintype.card_subtype, ← Nat.card_eq_fintype_card]
     exact Nat.card_congr (Equiv.subtypeEquivRight (fun g => by simp [LinearMap.mem_ker, hev]))
   rw [← h3, ← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card, h1, h2, mul_comm]
 
-theorem eq_zero_of_hyperplane_sums (k W M : Type) [Field k] [Fintype k] [DecidableEq k]
-    [AddCommGroup W] [Module k W] [Finite W] [AddCommGroup M] [Module ℂ M] (ψ : W → M)
-    (_h0 : ψ 0 = 0)
-    (h1 : ∀ g : Module.Dual k W, g ≠ 0 → ∑ᶠ x ∈ {x | g x = 1}, ψ x = 0)
-    (h2 : ∀ x, ∑ a : kˣ, ψ ((a : k) • x) = 0) (x0 : W) : ψ x0 = 0 := by
+theorem eq_zero_of_hyperplane_sums
+    (k W M : Type) [Field k] [Fintype k] [DecidableEq k] [AddCommGroup W] [Module k W] [Finite W]
+    [AddCommGroup M] [Module ℂ M]
+    (ψ : W → M) (_h0 : ψ 0 = 0) (h1 : ∀ g : Module.Dual k W, g ≠ 0 → ∑ᶠ x ∈ {x | g x = 1}, ψ x = 0)
+    (h2 : ∀ x, ∑ a : kˣ, ψ ((a : k) • x) = 0)
+    (x0 : W)
+    : ψ x0 = 0 := by
   classical
   haveI : Fintype W := Fintype.ofFinite W
   haveI : Finite (Module.Dual k W) :=
@@ -52,8 +57,9 @@ theorem eq_zero_of_hyperplane_sums (k W M : Type) [Field k] [Fintype k] [Decidab
     by_cases ht : t = 0
     · subst ht
       apply hcancel (Fintype.card kˣ) _ Fintype.card_ne_zero
-      have e : ∀ a : kˣ, ∑ x, (if g x = 0 then ψ x else 0)
-          = ∑ x, (if g x = 0 then ψ ((a : k) • x) else 0) := by
+      have e
+          : ∀ a : kˣ,
+            ∑ x, (if g x = 0 then ψ x else 0) = ∑ x, (if g x = 0 then ψ ((a : k) • x) else 0) := by
         intro a
         rw [← Equiv.sum_comp (MulAction.toPerm a)]
         refine Finset.sum_congr rfl fun x _ => ?_
@@ -77,8 +83,8 @@ theorem eq_zero_of_hyperplane_sums (k W M : Type) [Field k] [Fintype k] [Decidab
           rw [inv_mul_eq_one₀ ht, eq_comm]
         simp only [Set.indicator_apply, Set.mem_setOf_eq, this]
   have T : ∑ x, ψ x = 0 := by simpa using A 0 0
-  have B : ∑ x, (Finset.univ.filter (fun g : Module.Dual k W => g (x - x0) = 0)).card • ψ x
-      = 0 := by
+  have B
+      : ∑ x, (Finset.univ.filter (fun g : Module.Dual k W => g (x - x0) = 0)).card • ψ x = 0 := by
     have : ∑ g : Module.Dual k W, ∑ x, (if g x = g x0 then ψ x else 0) = 0 :=
       Finset.sum_eq_zero fun g _ => A g _
     rw [Finset.sum_comm] at this
@@ -88,22 +94,27 @@ theorem eq_zero_of_hyperplane_sums (k W M : Type) [Field k] [Fintype k] [Decidab
     simp only [map_sub, sub_eq_zero]
   set N := Fintype.card (Module.Dual k W) with hN
   obtain ⟨r, hr⟩ : ∃ r, Fintype.card k = r + 1 := ⟨Fintype.card k - 1, by omega⟩
-  have C : ∀ x, Fintype.card k •
-      ((Finset.univ.filter (fun g : Module.Dual k W => g (x - x0) = 0)).card • ψ x)
-      = N • ψ x + (if x = x0 then (r * N) • ψ x0 else 0) := by
+  have C
+      : ∀ x,
+        Fintype.card k
+            • ((Finset.univ.filter (fun g : Module.Dual k W => g (x - x0) = 0)).card • ψ x)
+          = N • ψ x + (if x = x0 then (r * N) • ψ x0 else 0) := by
     intro x
     rw [← mul_smul]
     by_cases hx : x = x0
     · subst hx
       simp only [sub_self, map_zero, Finset.filter_true, Finset.card_univ, if_true, hr]
-      rw [← add_smul]; congr 1; ring
+      rw [← add_smul]
+      congr 1
+      ring
     · have := card_annihilator_mul k W (x - x0) (sub_ne_zero.mpr hx)
       rw [if_neg hx, add_zero, hN, ← this]
       congr!
   have D := congrArg (fun m => Fintype.card k • m) B
   simp only [Finset.smul_sum, C] at D
-  simp only [smul_zero, Finset.sum_add_distrib, ← Finset.smul_sum, T,
-    Finset.sum_ite_eq', Finset.mem_univ, if_true, zero_add] at D
+  simp only [smul_zero, Finset.sum_add_distrib, ← Finset.smul_sum, T, Finset.sum_ite_eq',
+      Finset.mem_univ, if_true, zero_add]
+    at D
   exact hcancel _ _ (Nat.mul_ne_zero (show r ≠ 0 by omega) Fintype.card_ne_zero) D
 
 end GlobalTheory.FiniteRadon

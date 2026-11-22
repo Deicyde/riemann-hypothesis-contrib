@@ -10,9 +10,12 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TopLePreimag
 
 set_option autoImplicit false
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -24,9 +27,12 @@ open GlobalTheory.ChartDer
 
 namespace GlobalTheory.BoundaryPoint
 
-theorem isClosed_of_isMaximal {X : Scheme.{0}} [JacobsonSpace X] {U : X.Opens} (hU : IsAffineOpen U)
-    {m : Ideal Γ(X, U)} (hm : m.IsMaximal) {x : X} (hx : x ∈ U) (h : ∀ f ∈ m, x ∉ X.basicOpen f) :
-    IsClosed ({x} : Set X) := by
+theorem isClosed_of_isMaximal
+    {X : Scheme.{0}} [JacobsonSpace X]
+    {U : X.Opens} (hU : IsAffineOpen U)
+    {m : Ideal Γ(X, U)} (hm : m.IsMaximal)
+    {x : X} (hx : x ∈ U) (h : ∀ f ∈ m, x ∉ X.basicOpen f)
+    : IsClosed ({x} : Set X) := by
   have e := hU.fromSpec_primeIdealOf ⟨x, hx⟩
   have hle : m ≤ (hU.primeIdealOf ⟨x, hx⟩).asIdeal := fun f hf => by
     by_contra hc
@@ -45,7 +51,15 @@ theorem isClosed_of_isMaximal {X : Scheme.{0}} [JacobsonSpace X] {U : X.Opens} (
   have h₄ : IsClosed ({hU.fromSpec (hU.primeIdealOf ⟨x, hx⟩)} : Set X) := h₃
   rwa [e] at h₄
 
-theorem exists_closed_boundary_point : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (Y : Model Xo c (RingHom.id c.F)), SmoothOfRelativeDimension Dw.dim (genStr Y) → ∀ (U : Y.X.affineOpens) (m : Ideal Γ(Y.X, U.1)), m.IsMaximal → ∀ x : Y.X, x ∉ interior Y → x ∈ U.1 → (∀ f ∈ m, x ∉ Y.X.basicOpen f) → ∃ x' : gen Y, genι Y x' = x ∧ x' ∈ genBd Y ∧ IsClosed ({x'} : Set (gen Y)) := by
+theorem exists_closed_boundary_point
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (Y : Model Xo c (RingHom.id c.F)),
+      SmoothOfRelativeDimension Dw.dim (genStr Y)
+        → ∀ (U : Y.X.affineOpens) (m : Ideal Γ(Y.X, U.1)),
+          m.IsMaximal
+            → ∀ x : Y.X,
+              x ∉ interior Y → x ∈ U.1 → (∀ f ∈ m, x ∉ Y.X.basicOpen f)
+                → ∃ x' : gen Y, genι Y x' = x ∧ x' ∈ genBd Y ∧ IsClosed ({x'} : Set (gen Y)) := by
   intro E _ _ _ H Dw l Xo c Y hs U m hm x hx hU h
   have hi : IsIso (genι Y) := GlobalTheory.LogKS.isIso_fst Y
   have : Smooth (genStr Y) := SmoothOfRelativeDimension.smooth Dw.dim _

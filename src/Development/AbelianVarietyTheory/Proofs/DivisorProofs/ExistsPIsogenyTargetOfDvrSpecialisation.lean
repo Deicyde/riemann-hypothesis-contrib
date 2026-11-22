@@ -7,17 +7,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsPullbackKe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke GlobalTheory.UPel.HT.ES
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Hecke
+  GlobalTheory.UPel.HT.ES
 
 noncomputable section
 
 namespace GlobalTheory.UPel.HT.ES.CorrQF
 
-theorem exists_geomPt_closedPoint (V : Type) [CommRing V] [IsLocalRing V] (X : Scheme.{0}) (y : Sp V ⟶ X) :
-    ∃ (k : Type) (_ : Field k) (_ : IsAlgClosed k) (σ : X.residueField (y (IsLocalRing.closedPoint V)) →+* k)
-      (π : Sp k ⟶ Sp V), π ≫ y = spMap σ ≫ X.fromSpecResidueField (y (IsLocalRing.closedPoint V)) ∧
-      ∀ q, π q = IsLocalRing.closedPoint V := by
+theorem exists_geomPt_closedPoint
+    (V : Type) [CommRing V] [IsLocalRing V] (X : Scheme.{0}) (y : Sp V ⟶ X)
+    : ∃ (k : Type) (_ : Field k) (_ : IsAlgClosed k)
+        (σ : X.residueField (y (IsLocalRing.closedPoint V)) →+* k) (π : Sp k ⟶ Sp V),
+      π ≫ y = spMap σ ≫ X.fromSpecResidueField (y (IsLocalRing.closedPoint V))
+        ∧ ∀ q, π q = IsLocalRing.closedPoint V := by
   let k := AlgebraicClosure (IsLocalRing.ResidueField V)
   let g₀ : V →+* k := (algebraMap (IsLocalRing.ResidueField V) k).comp (IsLocalRing.residue V)
   haveI : IsLocalHom g₀ := RingHom.isLocalHom_comp _ _
@@ -30,7 +35,8 @@ theorem exists_geomPt_closedPoint (V : Type) [CommRing V] [IsLocalRing V] (X : S
   rw [Scheme.SpecToEquivOfField_symm_apply] at h
   have hx : x = y (IsLocalRing.closedPoint V) := by
     let q : Sp k := IsLocalRing.closedPoint k
-    have e : (Spec.map σ ≫ X.fromSpecResidueField x) q = (spMap g₀ ≫ y) q := congrArg (fun g : Sp k ⟶ X => g q) h
+    have e : (Spec.map σ ≫ X.fromSpecResidueField x) q = (spMap g₀ ≫ y) q :=
+      congrArg (fun g : Sp k ⟶ X => g q) h
     rw [Scheme.Hom.comp_apply, Scheme.Hom.comp_apply, hπ, Scheme.fromSpecResidueField_apply] at e
     exact e
   subst hx

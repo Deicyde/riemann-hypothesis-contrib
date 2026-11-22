@@ -4,9 +4,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
-open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC UpperTheory.Gal.InertialTypesAlt
+open NumberField IsDedekindDomain ValuativeRel Polynomial Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.L2.Host
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL
+  GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Shin
+open GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.V.Published UpperTheory.CBC
+  UpperTheory.Gal.InertialTypesAlt
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -183,8 +186,7 @@ private lemma splitsL (q l f : ℕ) (hl : l.Prime) (L : List (ℕ × ℕ))
       simp [if_neg hlm]
     exact (hd _ h1).mul_left l
 
-theorem UpperTheory.Gal.InertialTypesAlt.liftBlocks :
-    LiftBlocks := by
+theorem UpperTheory.Gal.InertialTypesAlt.liftBlocks : LiftBlocks := by
   intro a l Q hl ha hs
   obtain ⟨q, D, L⟩ := a
   obtain ⟨hq, hD, hL⟩ := ha
@@ -197,10 +199,12 @@ theorem UpperTheory.Gal.InertialTypesAlt.liftBlocks :
   have hS := geo_mul q l (by omega)
   have hql : 1 < q ^ l := Nat.one_lt_pow hl.ne_zero (by omega)
   have hDid : (∑ i ∈ Finset.range l, q ^ i) * ((Q - 1) / (q ^ l - 1)) = (Q - 1) / (q - 1) :=
-    div_id (Q - 1) (q - 1) (q ^ l - 1) _ (by omega) hS (by rw [hQ']; exact sub_one_dvd _ f) (by omega)
-  have hDpart : ((⟨q, D, L⟩ : Lbl).lift l).D.map (fun p =>
-        (p.1, ((p.2 * ((Q - 1) / (((⟨q, D, L⟩ : Lbl).lift l).q - 1)) : ℕ) : ZMod (Q - 1)))) =
-      D.map (fun p => (p.1, ((p.2 * ((Q - 1) / (q - 1)) : ℕ) : ZMod (Q - 1)))) := by
+    div_id (Q - 1) (q - 1) (q ^ l - 1) _ (by omega) hS (by rw [hQ']; exact sub_one_dvd _ f)
+      (by omega)
+  have hDpart
+      : ((⟨q, D, L⟩ : Lbl).lift l).D.map (fun p =>
+          (p.1, ((p.2 * ((Q - 1) / (((⟨q, D, L⟩ : Lbl).lift l).q - 1)) : ℕ) : ZMod (Q - 1))))
+        = D.map (fun p => (p.1, ((p.2 * ((Q - 1) / (q - 1)) : ℕ) : ZMod (Q - 1)))) := by
     show (D.map _).map _ = _
     rw [List.map_map]
     refine List.map_congr_left fun p _ => ?_

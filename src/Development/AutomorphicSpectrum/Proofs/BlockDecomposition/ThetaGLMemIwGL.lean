@@ -30,14 +30,16 @@ theorem sg_self (i : Fin n) : sg F i i = 1 := by
   rw [sg]
   exact Even.neg_one_pow ⟨_, rfl⟩
 
-theorem map_sg (c : F →+* F) (i l : Fin n) : c (sg F i l) = sg F i l := by
-  simp [sg]
+theorem map_sg (c : F →+* F) (i l : Fin n) : c (sg F i l) = sg F i l := by simp [sg]
 
-theorem theta_expand (c : F →+* F) (p : GL (Fin n) F) (T : Matrix (Fin n) (Fin n) F)
-    (hP : (p : Matrix (Fin n) (Fin n) F) = 1 + T) (i l : Fin n) :
-    (GlobalTheory.CuspRep.thetaGL n c p).val i l = (1 : Matrix (Fin n) (Fin n) F) i l -
-      sg F i l * c (T l.rev i.rev) +
-      sg F i l * c ((T * T * ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)) l.rev i.rev) := by
+theorem theta_expand
+    (c : F →+* F)
+    (p : GL (Fin n) F) (T : Matrix (Fin n) (Fin n) F) (hP : (p : Matrix (Fin n) (Fin n) F) = 1 + T)
+    (i l : Fin n)
+    : (GlobalTheory.CuspRep.thetaGL n c p).val i l
+      = (1 : Matrix (Fin n) (Fin n) F) i l - sg F i l * c (T l.rev i.rev)
+        + sg F i l
+          * c ((T * T * ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)) l.rev i.rev) := by
   set P' : Matrix (Fin n) (Fin n) F := ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) with hP'
   have h1 : (1 + T) * P' = 1 := by
     rw [← hP, hP', ← Units.val_mul, mul_inv_cancel]
@@ -46,12 +48,14 @@ theorem theta_expand (c : F →+* F) (p : GL (Fin n) F) (T : Matrix (Fin n) (Fin
     rw [add_mul, one_mul] at h1
     exact eq_sub_of_add_eq h1
   have h3 : P' = 1 - T + T * T * P' := by
-    calc P' = 1 - T * P' := h2
+    calc
+      P'
+        = 1 - T * P' := h2
       _ = 1 - T * (1 - T * P') := by rw [← h2]; exact h2
       _ = 1 - T + T * T * P' := by noncomm_ring
   have hent : P' l.rev i.rev = (1 - T + T * T * P') l.rev i.rev := congrFun (congrFun h3 _) _
-  rw [GlobalTheory.ThetaPull.thetaGL_apply, ← hP', hent, Matrix.add_apply, Matrix.sub_apply, map_add (f := _), map_sub,
-    mul_add, mul_sub]
+  rw [GlobalTheory.ThetaPull.thetaGL_apply, ← hP', hent, Matrix.add_apply, Matrix.sub_apply,
+    map_add (f := _), map_sub, mul_add, mul_sub]
   congr 2
   · by_cases h : i = l
     · subst h
@@ -62,19 +66,27 @@ theorem theta_expand (c : F →+* F) (p : GL (Fin n) F) (T : Matrix (Fin n) (Fin
 
 variable [ValuativeRel F]
 
-theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F)
+theorem step
+    (U : Subgroup (GL (Fin n) F))
+    (hU : (U : Set (GL (Fin n) F)) = PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F)
     (c : F →+* F) (hcv : ∀ a, valuation F (c a) = valuation F a) (hcc : ∀ a, c (c a) = a)
     (hθU : ∀ g ∈ U, GlobalTheory.CuspRep.thetaGL n c g ∈ U)
-    (ρ : ValueGroupWithZero F) (hρ1 : ρ < 1)
-    (hunif : ∀ a : F, valuation F a < 1 → valuation F a ≤ ρ)
-    (e : Fin n → F) (he : ∀ i, e i ≠ 0)
-    (hc : ∀ i l, i < l → valuation F (e i) ≤ ρ * valuation F (e l))
+    (ρ : ValueGroupWithZero F)
+    (hρ1 : ρ < 1) (hunif : ∀ a : F, valuation F a < 1 → valuation F a ≤ ρ)
+    (e : Fin n → F)
+    (he : ∀ i, e i ≠ 0) (hc : ∀ i l, i < l → valuation F (e i) ≤ ρ * valuation F (e l))
     (x : GL (Fin n) F) (hx : (x : Matrix (Fin n) (Fin n) F) = Matrix.diagonal e)
-    (j : ℕ) (g : GL (Fin n) F) (hgU : g ∈ U)
-    (hgD : ∀ i l, i ≠ l → valuation F ((g : Matrix (Fin n) (Fin n) F) i l) ≤ ρ ^ j) :
-    ∃ p ∈ U, x⁻¹ * p⁻¹ * x * g * GlobalTheory.CuspRep.thetaGL n c p ∈ U ∧
-      ∀ i l, i ≠ l → valuation F (((x⁻¹ * p⁻¹ * x * g * GlobalTheory.CuspRep.thetaGL n c p :
-        GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i l) ≤ ρ ^ (j + 1) := by
+    (j : ℕ) (g : GL (Fin n) F)
+    (hgU : g ∈ U) (hgD : ∀ i l, i ≠ l → valuation F ((g : Matrix (Fin n) (Fin n) F) i l) ≤ ρ ^ j)
+    : ∃ p ∈ U,
+      x⁻¹ * p⁻¹ * x * g * GlobalTheory.CuspRep.thetaGL n c p ∈ U
+        ∧ ∀ i l,
+          i ≠ l
+            → valuation F
+                (((x⁻¹ * p⁻¹ * x * g * GlobalTheory.CuspRep.thetaGL n c p : GL (Fin n) F)
+                    : Matrix (Fin n) (Fin n) F)
+                  i l)
+              ≤ ρ ^ (j + 1) := by
   have hI : g ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := by rw [← hU]; exact hgU
   have hρ1' : ρ ≤ 1 := hρ1.le
   set C : Matrix (Fin n) (Fin n) F := (g : Matrix (Fin n) (Fin n) F) with hCdef
@@ -99,10 +111,14 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
     · rw [hs, h']; exact hgD i l h.ne'
     · rw [hs, h', pow_one]; exact hunif _ (hI.2 i l h)
   let T : Matrix (Fin n) (Fin n) F := fun i l =>
-    if l < i then sg F l.rev i.rev * c (C l.rev i.rev / d l.rev)
-    else if i < l then (e i / e l) * (C i l / d l) else 0
-  have hTlo : ∀ i l, l < i → T i l = sg F l.rev i.rev * c (C l.rev i.rev / d l.rev) :=
-    fun i l h => if_pos h
+    if l < i then
+      sg F l.rev i.rev * c (C l.rev i.rev / d l.rev)
+    else if i < l then
+      (e i / e l) * (C i l / d l)
+    else
+      0
+  have hTlo : ∀ i l, l < i → T i l = sg F l.rev i.rev * c (C l.rev i.rev / d l.rev) := fun i l h =>
+    if_pos h
   have hTup : ∀ i l, i < l → T i l = (e i / e l) * (C i l / d l) := fun i l h => by
     show (if l < i then _ else _) = _
     rw [if_neg (not_lt.2 h.le), if_pos h]
@@ -121,7 +137,9 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
     · subst h; rw [hTd, map_zero]; exact zero_le'
     · exact hTlov i l h
   have hρs : ρ ^ s ≤ ρ := by
-    calc ρ ^ s ≤ ρ ^ 1 := pow_le_pow_right_of_le_one' hρ1' hs1
+    calc
+      ρ ^ s
+        ≤ ρ ^ 1 := pow_le_pow_right_of_le_one' hρ1' hs1
       _ = ρ := pow_one ρ
   set P : Matrix (Fin n) (Fin n) F := 1 + T with hP
   have hPd : ∀ i, P i i = 1 := fun i => by
@@ -145,12 +163,13 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
     exact zero_ne_one hPdet
   let p : GL (Fin n) F := Matrix.GeneralLinearGroup.mkOfDetNeZero P hPne
   have hpv : (p : Matrix (Fin n) (Fin n) F) = P := rfl
-  have hpI : p ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := ⟨mem_unitGL_of p hPint hPdet, hPlow⟩
+  have hpI : p ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F :=
+    ⟨mem_unitGL_of p hPint hPdet, hPlow⟩
   have hpU : p ∈ U := by
     rw [← SetLike.mem_coe, hU]
     exact hpI
-  have hxinv : ((x⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) =
-      Matrix.diagonal fun i => (e i)⁻¹ := by
+  have hxinv
+      : ((x⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = Matrix.diagonal fun i => (e i)⁻¹ := by
     rw [Matrix.coe_units_inv, hx]
     refine Matrix.inv_eq_left_inv ?_
     rw [Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -162,16 +181,15 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
   have hQ : ∀ i l, Q i l = (e i)⁻¹ * P i l * e l := fun i l => by
     show ((x⁻¹ * p * x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) i l = _
     rw [Units.val_mul, Units.val_mul, hxinv, hx, hpv, Matrix.mul_diagonal, Matrix.diagonal_mul]
-  have hQd : ∀ i, Q i i = 1 := fun i => by
-    rw [hQ, hPd, mul_one, inv_mul_cancel₀ (he i)]
+  have hQd : ∀ i, Q i i = 1 := fun i => by rw [hQ, hPd, mul_one, inv_mul_cancel₀ (he i)]
   have hQup : ∀ i l, i < l → Q i l = C i l / d l := fun i l h => by
     rw [hQ, hPo i l h.ne, hTup i l h]
     have h1 := he i
     have h2 := he l
     field_simp
   have hQlow : ∀ i l, l < i → valuation F (Q i l) ≤ ρ * ρ ^ s := fun i l h => by
-    rw [hQ, hPo i l h.ne', show (e i)⁻¹ * T i l * e l = (e l / e i) * T i l by
-      rw [div_eq_mul_inv]; ring, map_mul]
+    rw [hQ, hPo i l h.ne',
+      show (e i)⁻¹ * T i l * e l = (e l / e i) * T i l by rw [div_eq_mul_inv]; ring, map_mul]
     exact mul_le_mul' (hq l i h) (hTlov i l h)
   have hQint : ∀ i l, valuation F (Q i l) ≤ 1 := fun i l => by
     rcases lt_trichotomy i l with h | h | h
@@ -179,38 +197,52 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
       exact mem_unitGL_entries hI.1 i l
     · subst h; rw [hQd, map_one]
     · refine (hQlow i l h).trans ?_
-      calc ρ * ρ ^ s ≤ 1 * 1 := mul_le_mul' hρ1' (hρs.trans hρ1')
+      calc
+        ρ * ρ ^ s
+          ≤ 1 * 1 := mul_le_mul' hρ1' (hρs.trans hρ1')
         _ = 1 := one_mul 1
   have hQdet : valuation F Q.det = 1 := by
     have : Q.det = P.det := by
       show ((x⁻¹ * p * x : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det = _
       rw [Units.val_mul, Units.val_mul, Matrix.det_mul, Matrix.det_mul, hpv]
-      have h3 : (x : Matrix (Fin n) (Fin n) F).det * ((x⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det = 1 := by
+      have h3
+          : (x : Matrix (Fin n) (Fin n) F).det
+              * ((x⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det
+            = 1 := by
         rw [← Matrix.det_mul, ← Units.val_mul, mul_inv_cancel]
         simp
-      calc _ = P.det * ((x : Matrix (Fin n) (Fin n) F).det *
-            ((x⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det) := by ring
+      calc
+        _ = P.det
+            * ((x : Matrix (Fin n) (Fin n) F).det
+              * ((x⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F).det) := by
+          ring
         _ = P.det := by rw [h3, mul_one]
-    rw [this]; exact hPdet
+    rw [this]
+    exact hPdet
   have hqU : q ∈ U := by
-    have : q ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := ⟨mem_unitGL_of q hQint hQdet, fun i l h =>
-      lt_of_le_of_lt (hQlow i l h) (lt_of_le_of_lt (mul_le_mul' le_rfl hρs) (by
-        calc ρ * ρ ≤ ρ * 1 := mul_le_mul' le_rfl hρ1'
-          _ = ρ := mul_one ρ
-          _ < 1 := hρ1 |>.trans_le le_rfl))⟩
+    have : q ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := ⟨
+      mem_unitGL_of q hQint hQdet,
+      fun i l h =>
+        lt_of_le_of_lt (hQlow i l h)
+          (lt_of_le_of_lt (mul_le_mul' le_rfl hρs) (by
+            calc
+              ρ * ρ
+                ≤ ρ * 1 := mul_le_mul' le_rfl hρ1'
+              _ = ρ := mul_one ρ
+              _ < 1 := hρ1 |>.trans_le le_rfl))
+    ⟩
     rw [← SetLike.mem_coe, hU]
     exact this
 
-  let T' : Matrix (Fin n) (Fin n) F := fun i l => - (sg F i l * c (T l.rev i.rev))
+  let T' : Matrix (Fin n) (Fin n) F := fun i l => -(sg F i l * c (T l.rev i.rev))
   have hT'v : ∀ i l, valuation F (T' i l) = valuation F (T l.rev i.rev) := fun i l => by
     show valuation F (- (sg F i l * c (T l.rev i.rev))) = _
     rw [Valuation.map_neg, map_mul, hsgv, one_mul, hcv]
-  have hT' : Dp ρ s T' := fun i l => by
-    rw [hT'v]; exact hT _ _
+  have hT' : Dp ρ s T' := fun i l => by rw [hT'v]; exact hT _ _
   have hT'd : ∀ i, T' i i = 0 := fun i => by
     show - (sg F i i * c (T i.rev i.rev)) = 0
     rw [hTd, map_zero, mul_zero, neg_zero]
-  have hT'lo : ∀ i l, l < i → T' i l = - (C i l / d i) := fun i l h => by
+  have hT'lo : ∀ i l, l < i → T' i l = -(C i l / d i) := fun i l h => by
     show - (sg F i l * c (T l.rev i.rev)) = _
     rw [hTlo _ _ (Fin.rev_lt_rev.2 h), Fin.rev_rev, Fin.rev_rev, map_mul, map_sg, hcc, ← mul_assoc,
       sg_mul_self, one_mul]
@@ -219,8 +251,7 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
     exact hTupv _ _ (Fin.rev_lt_rev.2 h)
   have hp0 : Dp ρ 0 ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) := fun a b => by
     rw [pow_zero]
-    have : p⁻¹ ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := by
-      rw [← hU]; exact U.inv_mem hpU
+    have : p⁻¹ ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := by rw [← hU]; exact U.inv_mem hpU
     exact mem_unitGL_entries this.1 a b
   let W : Matrix (Fin n) (Fin n) F := T * T * ((p⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
   have hW : Dp ρ (s + s + 0) W := (hT.mul hT).mul hp0
@@ -229,7 +260,9 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
     show valuation F (sg F i l * c (W l.rev i.rev)) ≤ _
     rw [map_mul, hsgv, one_mul, hcv]
     exact hW _ _
-  have hθ : ((GlobalTheory.CuspRep.thetaGL n c p : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) = 1 + T' + D := by
+  have hθ
+      : ((GlobalTheory.CuspRep.thetaGL n c p : GL (Fin n) F) : Matrix (Fin n) (Fin n) F)
+        = 1 + T' + D := by
     ext i l
     rw [theta_expand c p T hpv i l, Matrix.add_apply, Matrix.add_apply]
     show _ = (1 : Matrix (Fin n) (Fin n) F) i l + - (sg F i l * c (T l.rev i.rev)) +
@@ -263,8 +296,8 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
       show valuation F (C i i - C i i) ≤ _
       rw [sub_self, map_zero]
       exact zero_le'
-    · rw [hT'lo i l h, mul_neg, mul_div_cancel₀ _ (hd0 i),
-        add_neg_cancel, zero_sub, Valuation.map_neg, map_mul, hd, mul_one]
+    · rw [hT'lo i l h, mul_neg, mul_div_cancel₀ _ (hd0 i), add_neg_cancel, zero_sub,
+        Valuation.map_neg, map_mul, hd, mul_one]
       refine (hQlow i l h).trans ?_
       rw [← pow_succ']
       exact pow_le_pow_right_of_le_one' hρ1' (Nat.succ_le_succ hjs)
@@ -275,8 +308,9 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
   have hid : C * (1 + T' + D) = Q * Dg + R := by
     show C * (1 + T' + D) = Q * Dg + (C + Dg * T' - Q * Dg + (C - Dg) * T' + C * D)
     noncomm_ring
-  have hw : x⁻¹ * p⁻¹ * x * g * GlobalTheory.CuspRep.thetaGL n c p =
-      q⁻¹ * (g * GlobalTheory.CuspRep.thetaGL n c p) := by
+  have hw
+      : x⁻¹ * p⁻¹ * x * g * GlobalTheory.CuspRep.thetaGL n c p
+        = q⁻¹ * (g * GlobalTheory.CuspRep.thetaGL n c p) := by
     show _ = (x⁻¹ * p * x)⁻¹ * _
     group
   refine ⟨p, hpU, ?_, ?_⟩
@@ -284,8 +318,10 @@ theorem step (U : Subgroup (GL (Fin n) F)) (hU : (U : Set (GL (Fin n) F)) = Posi
     exact U.mul_mem (U.inv_mem hqU) (U.mul_mem hgU (hθU p hpU))
   · intro i l hil
     rw [hw]
-    have hval : ((q⁻¹ * (g * GlobalTheory.CuspRep.thetaGL n c p) : GL (Fin n) F) :
-        Matrix (Fin n) (Fin n) F) = Dg + ((q⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * R := by
+    have hval
+        : ((q⁻¹ * (g * GlobalTheory.CuspRep.thetaGL n c p) : GL (Fin n) F)
+            : Matrix (Fin n) (Fin n) F)
+          = Dg + ((q⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * R := by
       rw [Units.val_mul, Units.val_mul, hθ]
       show ((q⁻¹ : GL (Fin n) F) : Matrix (Fin n) (Fin n) F) * (C * (1 + T' + D)) = _
       rw [hid, mul_add, ← mul_assoc]
@@ -306,27 +342,28 @@ end Step
 
 section Main
 
-variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
-  {n : ℕ}
+variable
+  {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] {n : ℕ}
 
-theorem contraction (U : Subgroup (GL (Fin n) F))
+theorem contraction
+    (U : Subgroup (GL (Fin n) F))
     (hU : (U : Set (GL (Fin n) F)) = PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F)
     (hcpt : IsCompact (PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F))
     (c : F →+* F) (hcc : ∀ a, c (c a) = a) (hcv : ∀ a, valuation F (c a) = valuation F a)
     (hcont : Continuous c) (hθU : ∀ g ∈ U, GlobalTheory.CuspRep.thetaGL n c g ∈ U)
-    (ρ : ValueGroupWithZero F) (hρ1 : ρ < 1)
-    (hunif : ∀ a : F, valuation F a < 1 → valuation F a ≤ ρ)
-    (e : Fin n → F) (he : ∀ i, e i ≠ 0)
-    (hc : ∀ i l, i < l → valuation F (e i) ≤ ρ * valuation F (e l))
+    (ρ : ValueGroupWithZero F)
+    (hρ1 : ρ < 1) (hunif : ∀ a : F, valuation F a < 1 → valuation F a ≤ ρ)
+    (e : Fin n → F)
+    (he : ∀ i, e i ≠ 0) (hc : ∀ i l, i < l → valuation F (e i) ≤ ρ * valuation F (e l))
     (x : GL (Fin n) F) (hx : (x : Matrix (Fin n) (Fin n) F) = Matrix.diagonal e)
-    (δ : GL (Fin n) F) (hδ : δ ∈ PositivityTheory.Rg.Tf.Loc.iwDouble F x) :
-    ∃ m ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F, ∃ t ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F,
-      (∀ i l, i ≠ l → (t : Matrix (Fin n) (Fin n) F) i l = 0) ∧
-      m⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c m = x * t := by
+    (δ : GL (Fin n) F) (hδ : δ ∈ PositivityTheory.Rg.Tf.Loc.iwDouble F x)
+    : ∃ m ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F,
+      ∃ t ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F,
+        (∀ i l, i ≠ l → (t : Matrix (Fin n) (Fin n) F) i l = 0)
+          ∧ m⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c m = x * t := by
   have hUI : ∀ g, g ∈ U ↔ g ∈ PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F := fun g => by
     rw [← hU]; rfl
-  let f : GL (Fin n) F → GL (Fin n) F := fun m =>
-    x⁻¹ * m⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c m
+  let f : GL (Fin n) F → GL (Fin n) F := fun m => x⁻¹ * m⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c m
   have hf : Continuous f :=
     ((continuous_const.mul continuous_inv).mul continuous_const).mul
       (GlobalTheory.ThetaPull.continuous_thetaGL c hcont)
@@ -335,8 +372,9 @@ theorem contraction (U : Subgroup (GL (Fin n) F))
       ∀ i l, i ≠ l → valuation F ((f m : Matrix (Fin n) (Fin n) F) i l) ≤ ρ ^ j}
   have hclosedI : IsClosed (PositivityTheory.Rg.Tf.Loc.iwahori (m := n) F) := hcpt.isClosed
   have hSc : ∀ j, IsClosed (S j) := fun j => by
-    have h1 : IsClosed {m : GL (Fin n) F | ∀ i l, i ≠ l →
-        valuation F ((f m : Matrix (Fin n) (Fin n) F) i l) ≤ ρ ^ j} := by
+    have h1 : IsClosed
+        {m : GL (Fin n) F | ∀ i l, i ≠ l →
+          valuation F ((f m : Matrix (Fin n) (Fin n) F) i l) ≤ ρ ^ j} := by
       simp only [Set.setOf_forall]
       refine isClosed_iInter fun i => isClosed_iInter fun l => isClosed_iInter fun _ => ?_
       have hcont : Continuous fun m : GL (Fin n) F => (f m : Matrix (Fin n) (Fin n) F) i l :=
@@ -359,8 +397,8 @@ theorem contraction (U : Subgroup (GL (Fin n) F))
       exact mem_unitGL_entries hfaI.1 i l
     | succ j ih =>
       obtain ⟨m, hm, hfm, hD⟩ := ih
-      obtain ⟨p, hp, hcU, hcD⟩ := step U hU c hcv hcc hθU ρ hρ1 hunif e he hc x hx j (f m)
-        ((hUI _).2 hfm) hD
+      obtain ⟨p, hp, hcU, hcD⟩ :=
+        step U hU c hcv hcc hθU ρ hρ1 hunif e he hc x hx j (f m) ((hUI _).2 hfm) hD
       have hfmp : f (m * p) = x⁻¹ * p⁻¹ * x * f m * GlobalTheory.CuspRep.thetaGL n c p := by
         show x⁻¹ * (m * p)⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c (m * p) =
           x⁻¹ * p⁻¹ * x * (x⁻¹ * m⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c m) * _
@@ -369,16 +407,21 @@ theorem contraction (U : Subgroup (GL (Fin n) F))
       refine ⟨m * p, (hUI _).1 (U.mul_mem ((hUI _).2 hm) hp), ?_, ?_⟩
       · rw [hfmp]; exact (hUI _).1 hcU
       · rw [hfmp]; exact hcD
-  have hSd : ∀ j, S (j + 1) ⊆ S j := fun j m hm => ⟨hm.1, hm.2.1, fun i l h =>
-    (hm.2.2 i l h).trans (pow_le_pow_right_of_le_one' hρ1.le (Nat.le_succ j))⟩
+  have hSd : ∀ j, S (j + 1) ⊆ S j := fun j m hm => ⟨
+    hm.1,
+    hm.2.1,
+    fun i l h => (hm.2.2 i l h).trans (pow_le_pow_right_of_le_one' hρ1.le (Nat.le_succ j))
+  ⟩
   have hS0 : IsCompact (S 0) := hcpt.of_isClosed_subset (hSc 0) fun m hm => hm.1
-  obtain ⟨m, hm⟩ := IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S hSd hSn hS0 hSc
+  obtain ⟨m, hm⟩ :=
+    IsCompact.nonempty_iInter_of_sequence_nonempty_isCompact_isClosed S hSd hSn hS0 hSc
   have hm' : ∀ j, m ∈ S j := Set.mem_iInter.1 hm
   have : MulArchimedean (ValueGroupWithZero F) :=
     ValuativeRel.isRankLeOne_iff_mulArchimedean.mp inferInstance
   refine ⟨m, (hm' 0).1, f m, (hm' 0).2.1, fun i l hil => ?_, ?_⟩
   · by_contra h0
-    have hv : valuation F ((f m : Matrix (Fin n) (Fin n) F) i l) ≠ 0 := (Valuation.ne_zero_iff _).2 h0
+    have hv : valuation F ((f m : Matrix (Fin n) (Fin n) F) i l) ≠ 0 :=
+      (Valuation.ne_zero_iff _).2 h0
     obtain ⟨j, hj⟩ := exists_pow_lt₀ hρ1 (Units.mk0 _ hv)
     exact absurd ((hm' j).2.2 i l hil) (not_le.2 hj)
   · show _ = x * (x⁻¹ * m⁻¹ * δ * GlobalTheory.CuspRep.thetaGL n c m)
@@ -395,14 +438,19 @@ attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalDat
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem thetaGL_mem_iwGL {w : Pl E} (c : w.adicCompletion E →+* w.adicCompletion E)
-    (hcv : ∀ x, Valued.v (c x) = Valued.v x) (n : ℕ) (g : GLw n w) (hg : g ∈ iwGL n w) :
-    GlobalTheory.CuspRep.thetaGL n c g ∈ iwGL n w := by
-  have hsg : ∀ i l : Fin n, Valued.v ((-1 : w.adicCompletion E) ^ ((i : ℕ) + l)) = 1 := fun i l => by
+theorem thetaGL_mem_iwGL
+    {w : Pl E}
+    (c : w.adicCompletion E →+* w.adicCompletion E) (hcv : ∀ x, Valued.v (c x) = Valued.v x)
+    (n : ℕ) (g : GLw n w) (hg : g ∈ iwGL n w)
+    : GlobalTheory.CuspRep.thetaGL n c g ∈ iwGL n w := by
+  have hsg
+      : ∀ i l : Fin n, Valued.v ((-1 : w.adicCompletion E) ^ ((i : ℕ) + l)) = 1 := fun i l => by
     rw [map_pow, Valuation.map_neg, map_one, one_pow]
   obtain ⟨h1, h2, h3⟩ := (GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w n g).1.1 hg
-  obtain ⟨-, -, h4⟩ := (GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w n g⁻¹).1.1 (inv_mem hg)
-  refine (GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w n _).1.2 ⟨fun i l => ?_, fun i l => ?_, fun i l h => ?_⟩
+  obtain ⟨-, -, h4⟩ :=
+    (GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w n g⁻¹).1.1 (inv_mem hg)
+  refine (GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w n _).1.2
+    ⟨fun i l => ?_, fun i l => ?_, fun i l h => ?_⟩
   · rw [GlobalTheory.ThetaPull.thetaGL_apply, map_mul, hsg, one_mul, hcv]
     exact h2 _ _
   · rw [← map_inv, GlobalTheory.ThetaPull.thetaGL_apply, map_mul, hsg, one_mul, hcv, inv_inv]
@@ -413,23 +461,29 @@ theorem thetaGL_mem_iwGL {w : Pl E} (c : w.adicCompletion E →+* w.adicCompleti
 theorem contr_tw : PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw.P_contr_tw := by
   intro E _ _ _ hU w hw ϖ hϖ n y hy δ hδ
   obtain ⟨hcont, hcc, hcv, -⟩ := GlobalTheory.T.placeConjugation_properties_cmField E hU w
-  have hθ : GlobalTheory.BCT.thL n w = GlobalTheory.CuspRep.thetaGL n (GlobalTheory.BCT.cj w) := if_neg hw
+  have hθ : GlobalTheory.BCT.thL n w = GlobalTheory.CuspRep.thetaGL n (GlobalTheory.BCT.cj w) :=
+    if_neg hw
   have hEq : (ValuativeRel.valuation (w.adicCompletion E)).IsEquiv
       (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ))) := by
     have : (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ))).Compatible :=
       Valuation.Compatible.ofValuation _
     exact ValuativeRel.isEquiv _ _
-  have hvF : ∀ a, valuation (w.adicCompletion E) (GlobalTheory.BCT.cj w a) = valuation (w.adicCompletion E) a :=
-    fun a => le_antisymm ((hEq _ _).2 (hcv a).le) ((hEq _ _).2 (hcv a).ge)
-  have hIU : ((GlobalTheory.BCT.iwGL n w : Subgroup _) : Set (GlobalTheory.BCT.GLw n w)) =
-      PositivityTheory.Rg.Tf.Loc.iwahori (m := n) (w.adicCompletion E) := by
+  have hvF
+      : ∀ a,
+        valuation (w.adicCompletion E) (GlobalTheory.BCT.cj w a)
+          = valuation (w.adicCompletion E) a := fun a =>
+    le_antisymm ((hEq _ _).2 (hcv a).le) ((hEq _ _).2 (hcv a).ge)
+  have hIU
+      : ((GlobalTheory.BCT.iwGL n w : Subgroup _) : Set (GlobalTheory.BCT.GLw n w))
+        = PositivityTheory.Rg.Tf.Loc.iwahori (m := n) (w.adicCompletion E) := by
     ext g
     exact (GlobalTheory.CompanionTheory.IwContract.mem_iwahori_iff).symm
   have hcpt : IsCompact (PositivityTheory.Rg.Tf.Loc.iwahori (m := n) (w.adicCompletion E)) := by
     rw [← hIU]
     exact GlobalTheory.SmGL.IwahoriOnto.isCompact_iwahori _ _
-  obtain ⟨u, hu⟩ := WithZero.ne_zero_iff_exists.1
-    ((Valuation.ne_zero_iff (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ)))).2 ϖ.ne_zero)
+  obtain ⟨u, hu⟩ :=
+    WithZero.ne_zero_iff_exists.1 ((Valuation.ne_zero_iff
+      (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ)))).2 ϖ.ne_zero)
   have hu1 : Multiplicative.toAdd u = -1 := by
     have := hϖ.1
     rw [GlobalTheory.CompanionTheory.UnitaryCorrection.ordL_of_eq hu.symm] at this
@@ -439,8 +493,11 @@ theorem contr_tw : PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw.P_contr_tw := by
     rw [← hu, ← WithZero.coe_one, WithZero.coe_lt_coe]
     change Multiplicative.toAdd u < 0
     omega
-  have hunif : ∀ a : w.adicCompletion E, valuation (w.adicCompletion E) a < 1 →
-      valuation (w.adicCompletion E) a ≤ valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) := by
+  have hunif
+      : ∀ a : w.adicCompletion E,
+        valuation (w.adicCompletion E) a < 1
+          → valuation (w.adicCompletion E) a
+            ≤ valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) := by
     intro a ha
     have ha' := (GlobalTheory.CompanionTheory.IwEntries.rel_lt_one_iff w a).1 ha
     refine (hEq _ _).2 ?_
@@ -452,10 +509,15 @@ theorem contr_tw : PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw.P_contr_tw := by
       change Multiplicative.toAdd b < 0 at ha'
       change Multiplicative.toAdd b ≤ Multiplicative.toAdd u
       omega
-  let e : Fin n → w.adicCompletion E := fun i => ((ϖ ^ y i : (w.adicCompletion E)ˣ) : w.adicCompletion E)
+  let e : Fin n → w.adicCompletion E := fun i =>
+    ((ϖ ^ y i : (w.adicCompletion E)ˣ) : w.adicCompletion E)
   have he : ∀ i, e i ≠ 0 := fun i => Units.ne_zero _
-  have hc : ∀ i l, i < l → valuation (w.adicCompletion E) (e i) ≤
-      valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) * valuation (w.adicCompletion E) (e l) := by
+  have hc
+      : ∀ i l,
+        i < l
+          → valuation (w.adicCompletion E) (e i)
+            ≤ valuation (w.adicCompletion E) (ϖ : w.adicCompletion E)
+              * valuation (w.adicCompletion E) (e l) := by
     intro i l h
     obtain ⟨b, hb⟩ := Int.eq_ofNat_of_zero_le (show 0 ≤ y i - y l - 1 by have := hy h; omega)
     have hyi : y i = y l + ((b + 1 : ℕ) : ℤ) := by push_cast; omega
@@ -465,21 +527,30 @@ theorem contr_tw : PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw.P_contr_tw := by
       rw [hyi, _root_.zpow_add, Units.val_mul, zpow_natCast, Units.val_pow_eq_pow_val]
     rw [hei, map_mul, map_pow, mul_comm]
     refine mul_le_mul' ?_ le_rfl
-    calc valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) ^ (b + 1)
-        ≤ valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) ^ 1 :=
-          pow_le_pow_right_of_le_one' hρ1.le (Nat.succ_le_succ (Nat.zero_le b))
+    calc
+      valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) ^ (b + 1)
+          ≤ valuation (w.adicCompletion E) (ϖ : w.adicCompletion E) ^ 1 :=
+        pow_le_pow_right_of_le_one' hρ1.le (Nat.succ_le_succ (Nat.zero_le b))
       _ = _ := pow_one _
-  have hx : ((GlobalTheory.BCT.tdiag ϖ y : GlobalTheory.BCT.GLw n w) : Matrix (Fin n) (Fin n) (w.adicCompletion E)) =
-      Matrix.diagonal e := by
+  have hx
+      : ((GlobalTheory.BCT.tdiag ϖ y : GlobalTheory.BCT.GLw n w)
+          : Matrix (Fin n) (Fin n) (w.adicCompletion E))
+        = Matrix.diagonal e := by
     rw [GlobalTheory.BCT.tdiag, GlobalTheory.SmGL.val_diagT]
-  have hδ' : δ ∈ PositivityTheory.Rg.Tf.Loc.iwDouble (w.adicCompletion E) (GlobalTheory.BCT.tdiag ϖ y) := by
-    have h : ∃ x ∈ GlobalTheory.BCT.iwGL n w, ∃ z ∈ GlobalTheory.BCT.iwGL n w, δ = x * GlobalTheory.BCT.tdiag ϖ y * z := by
+  have hδ'
+      : δ ∈ PositivityTheory.Rg.Tf.Loc.iwDouble (w.adicCompletion E)
+        (GlobalTheory.BCT.tdiag ϖ y) := by
+    have h
+        : ∃ x ∈ GlobalTheory.BCT.iwGL n w, ∃ z ∈ GlobalTheory.BCT.iwGL n w,
+          δ = x * GlobalTheory.BCT.tdiag ϖ y * z := by
       by_contra h
       exact hδ (if_neg h)
     obtain ⟨a, ha, b, hb, e'⟩ := h
     exact ⟨a, by rw [← hIU]; exact ha, b, by rw [← hIU]; exact hb, e'⟩
-  obtain ⟨m, hm, t, ht, hoff, h⟩ := contraction (GlobalTheory.BCT.iwGL n w) hIU hcpt (GlobalTheory.BCT.cj w) hcc hvF hcont
-    (fun g hg => thetaGL_mem_iwGL _ hcv n g hg) _ hρ1 hunif e he hc _ hx δ hδ'
+  obtain ⟨m, hm, t, ht, hoff, h⟩ :=
+    contraction (GlobalTheory.BCT.iwGL n w) hIU hcpt (GlobalTheory.BCT.cj w) hcc hvF hcont
+      (fun g hg => thetaGL_mem_iwGL _ hcv n g hg)
+      _ hρ1 hunif e he hc _ hx δ hδ'
   refine ⟨m, by rw [← SetLike.mem_coe, hIU]; exact hm, t, ⟨hoff, fun i => ?_⟩, by rw [hθ]; exact h⟩
   exact hEq.eq_one_iff_eq_one.1 (val_diag_of_mem_iwahori ht i)
 

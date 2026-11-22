@@ -11,8 +11,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.HermiteNorm
 open NumberField Matrix UpperTheory.V UpperTheory.V.KT
 open scoped Pointwise
 
-theorem UpperTheory.minimal_orbit_representatives :
-    UpperTheory.V.Af.BA.MinOrb := by
+theorem UpperTheory.minimal_orbit_representatives : UpperTheory.V.Af.BA.MinOrb := by
   intro L _ _ _ N p
   classical
   obtain ⟨S, -, hS⟩ := hnf L N (I0 L N)

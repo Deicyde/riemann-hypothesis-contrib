@@ -10,13 +10,15 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace ReciprocityTheory.ChartRestriction.G.DVR
 
-open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing QForm
+open ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi IsLocalRing
+  QForm
 
 private lemma coh_lemma {X Y : Scheme} (L : LB X) (φ : Fin 1 ⊕ Fin 1 → (Y ⟶ X))
     (j : Fin 1 → L.ι) : LB.Coh L φ (Sum.elim j j) := by
@@ -50,27 +52,26 @@ theorem expansion_nonneg_regular : RegularSectionNonneg := by
     refine res_inj_lemma_2 _ (by exact _root_.map_one _) h3 ?_
     refine le_inf le_rfl ?_
     first
-      | exact le_rfl
-      | (simp only [Category.comp_id]; exact le_rfl)
-      | exact fun x hx => hx
-      | (intro x hx; simpa [LB.wchart] using hx)
+    | exact le_rfl
+    | (simp only [Category.comp_id]; exact le_rfl)
+    | exact fun x hx => hx
+    | (intro x hx; simpa [LB.wchart] using hx)
   subst hsK
 
   have hEF : E = F := ((U.expand 1 le_rfl).1 _).unique hE hF
   rw [hEF]
   refine (n1a V ϖ hϖ D Q hQ (FractionRing V) vK hvK 1 le_rfl {0}
-    (fun χ => ⟨0, Finset.mem_singleton_self 0, χ, by simp⟩) F 0).2 ?_
+    (fun χ => ⟨0, Finset.mem_singleton_self 0, χ, by simp⟩)
+    F 0).2 ?_
   intro α hα
   rw [Finset.mem_singleton] at hα
   subst hα
   rw [Q_zero hϖ (hQ := hQ)]
   unfold VGe
   refine ⟨1, fun _ => 1, fun _ => g' 0, fun _ => F.s 0, fun _ => hFg 0, fun _ => ?_, fun j => ?_⟩
+  · first | simp | (rw [AddValuation.map_one]; simp)
   · first
-      | simp
-      | (rw [AddValuation.map_one]; simp)
-  · first
-      | simp [DegPre.constBF]
-      | (simp only [DegPre.constBF, Fin.sum_univ_one, _root_.map_one, _root_.one_mul])
+    | simp [DegPre.constBF]
+    | (simp only [DegPre.constBF, Fin.sum_univ_one, _root_.map_one, _root_.one_mul])
 
 end ReciprocityTheory.ChartRestriction.G.DVR

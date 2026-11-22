@@ -9,10 +9,16 @@ noncomputable section
 
 namespace SquareStatements
 
-open Filter Topology ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Top
+open Filter Topology ReciprocityTheory.ChartRestriction.G.Geo GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Top
 
-theorem smooth_comb {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {J : Type} [Fintype J]
-    (ℓ : J → HermLine ι) (n : J → ℤ) (h : ∀ j, IsSmoothHerm (ℓ j)) : IsSmoothHerm (Top.combLine ℓ n) := by
+theorem smooth_comb
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {J : Type} [Fintype J]
+    (ℓ : J → HermLine ι)
+    (n : J → ℤ) (h : ∀ j, IsSmoothHerm (ℓ j))
+    : IsSmoothHerm (Top.combLine ℓ n) := by
   show ContDiffOn ℝ _ (fun z => ∏ j, (ℓ j).h z ^ n j) _
   refine contDiffOn_prod fun j _ => ?_
   rcases n j with m | m
@@ -28,10 +34,16 @@ theorem stXB : StX := by
     by_cases h : 0 < t ∧ t ≤ S.t₀
     · simp only [cl, if_pos h]; exact h
     · simp only [cl, if_neg h]; exact ⟨h0, le_rfl⟩
-  refine ⟨fun t r => Top.combLine (fun a => Re.line a (cl t)) (Cmp.rootOnFund r), fun t r => ?_,
-    fun t r => smooth_comb _ _ fun a => Re.line_smooth a _ (hcl t).1 (hcl t).2, fun t r z => ?_, ?_⟩
+  refine ⟨
+    fun t r => Top.combLine (fun a => Re.line a (cl t)) (Cmp.rootOnFund r),
+    fun t r => ?_,
+    fun t r => smooth_comb _ _ fun a => Re.line_smooth a _ (hcl t).1 (hcl t).2,
+    fun t r z => ?_,
+    ?_
+  ⟩
   · funext k
-    have h1 : ∀ a, (Re.line a (cl t)).a k = -∑ m ∈ Finset.Iic a.2, (sing (a.1, m)).a k := fun a => by
+    have h1
+        : ∀ a, (Re.line a (cl t)).a k = - ∑ m ∈ Finset.Iic a.2, (sing (a.1, m)).a k := fun a => by
       rw [Re.line_deg, hd]
       show (∑ r, _ • (sing r).a) k = _
       rw [RootFieldNumerics.Sq.sum_fundOnRoot]

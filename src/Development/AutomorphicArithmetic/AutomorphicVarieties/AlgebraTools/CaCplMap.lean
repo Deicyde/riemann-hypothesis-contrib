@@ -7,8 +7,9 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.map_pow_eq :
-    ∀ (R : Type) [CommRing R] (p : Ideal R) (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B], IsCplAt R p B → ∀ n : ℕ, (p ^ n).map (algebraMap R B) = maximalIdeal B ^ n := by
+theorem UpperTheory.V.AlgebraTools.IsCplAt.map_pow_eq
+    : ∀ (R : Type) [CommRing R] (p : Ideal R) (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B],
+      IsCplAt R p B → ∀ n : ℕ, (p ^ n).map (algebraMap R B) = maximalIdeal B ^ n := by
   intro R _ p B _ _ _ h n
   have hnoeth := h.noeth
   have hle : p.map (algebraMap R B) ≤ maximalIdeal B := by
@@ -27,7 +28,9 @@ theorem UpperTheory.V.AlgebraTools.IsCplAt.map_pow_eq :
     have hm2 : maximalIdeal B ^ 2 ≤ maximalIdeal B := Ideal.pow_le_self two_ne_zero
     have ha : a ∈ p := by
       rw [← h.comap_eq, Ideal.mem_comap]
-      have : algebraMap R B a = algebraMap R B s * b - (algebraMap R B s * b - algebraMap R B a) := by ring
+      have : algebraMap R B a
+          = algebraMap R B s * b - (algebraMap R B s * b - algebraMap R B a) := by
+        ring
       rw [this]
       exact sub_mem (Ideal.mul_mem_left _ _ hb) (hm2 hsa)
     obtain ⟨u, hu⟩ := hsu

@@ -4,9 +4,12 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.two_pow_dvd_sub_one_or_add_one_of_pow_two_pow :
-    ∀ (k a : ℕ) (x : ℤ), (2 : ℤ) ^ (a + k) ∣ x ^ (2 ^ k) - 1 → (2 : ℤ) ^ a ∣ x - 1 ∨ (2 : ℤ) ^ a ∣ x + 1 := by
-  have B : ∀ (a : ℕ) (x : ℤ), (2 : ℤ) ^ (a + 1) ∣ x ^ 2 - 1 → (2 : ℤ) ^ a ∣ x - 1 ∨ (2 : ℤ) ^ a ∣ x + 1 := by
+theorem UpperTheory.two_pow_dvd_sub_one_or_add_one_of_pow_two_pow
+    : ∀ (k a : ℕ) (x : ℤ),
+      (2 : ℤ) ^ (a + k) ∣ x ^ (2 ^ k) - 1 → (2 : ℤ) ^ a ∣ x - 1 ∨ (2 : ℤ) ^ a ∣ x + 1 := by
+  have B
+      : ∀ (a : ℕ) (x : ℤ),
+        (2 : ℤ) ^ (a + 1) ∣ x ^ 2 - 1 → (2 : ℤ) ^ a ∣ x - 1 ∨ (2 : ℤ) ^ a ∣ x + 1 := by
     intro a x h
     rcases Nat.eq_zero_or_pos a with rfl | ha
     · left
@@ -22,14 +25,12 @@ theorem UpperTheory.two_pow_dvd_sub_one_or_add_one_of_pow_two_pow :
       rw [e1, show b + 1 + 1 = 2 + b by omega, pow_add] at h
       have h' : (2 : ℤ) ^ b ∣ q * (q + 1) := (mul_dvd_mul_iff_left (by norm_num)).1 h
       rcases Int.even_or_odd q with hqe | hqo
-      · have hc : IsCoprime ((2 : ℤ) ^ b) (q + 1) :=
-          (Int.isCoprime_two_left.2 hqe.add_one).pow_left
+      · have hc : IsCoprime ((2 : ℤ) ^ b) (q + 1) := (Int.isCoprime_two_left.2 hqe.add_one).pow_left
         left
         have hd := hc.dvd_of_dvd_mul_right h'
         rw [show 2 * q + 1 - 1 = 2 * q by ring, pow_succ, mul_comm ((2 : ℤ) ^ b) 2]
         exact mul_dvd_mul_left 2 hd
-      · have hc : IsCoprime ((2 : ℤ) ^ b) q :=
-          (Int.isCoprime_two_left.2 hqo).pow_left
+      · have hc : IsCoprime ((2 : ℤ) ^ b) q := (Int.isCoprime_two_left.2 hqo).pow_left
         right
         have hd := hc.dvd_of_dvd_mul_left h'
         rw [show 2 * q + 1 + 1 = 2 * (q + 1) by ring, pow_succ, mul_comm ((2 : ℤ) ^ b) 2]

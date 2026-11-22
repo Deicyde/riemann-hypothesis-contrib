@@ -6,7 +6,12 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem posquad_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (q : X → ℤ), (∀ a, q (-a) = q a) → (∀ a a' b, q (a + a' + b) + q a + q a' + q b = q (a + a') + q (a + b) + q (a' + b)) → (∀ a, a ≠ 0 → 1 ≤ q a) → ∀ N : ℤ, {a | q a ≤ N}.Finite := by
+theorem posquad_finite
+    : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (q : X → ℤ),
+      (∀ a, q (-a) = q a)
+        → (∀ a a' b, q (a + a' + b) + q a + q a' + q b = q (a + a') + q (a + b) + q (a' + b))
+        → (∀ a, a ≠ 0 → 1 ≤ q a)
+        → ∀ N : ℤ, {a | q a ≤ N}.Finite := by
   intro X _ _ q hneg hcube hpos N
   have h0 : q 0 = 0 := by
     have := hcube 0 0 0
@@ -18,8 +23,7 @@ theorem posquad_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (
     · simp [ha, h0]
     · linarith [hpos a ha]
   let B : X → X → ℤ := fun a b => q (a + b) - q a - q b
-  have Bsymm : ∀ a b, B a b = B b a := by
-    intro a b; simp only [B, add_comm a b]; ring
+  have Bsymm : ∀ a b, B a b = B b a := by intro a b; simp only [B, add_comm a b]; ring
   have Badd : ∀ a a' b, B (a + a') b = B a b + B a' b := by
     intro a a' b
     simp only [B]
@@ -36,12 +40,12 @@ theorem posquad_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (
     intro a s
     have h1 : B a s = q (a + s) - q a - q s := rfl
     have h2 : B (-a) s = q (-a + s) - q (-a) - q s := rfl
-    have h3 : B (-a) s = - B a s := by
-      rw [← L_apply, ← L_apply, map_neg]
+    have h3 : B (-a) s = - B a s := by rw [← L_apply, ← L_apply, map_neg]
     rw [hneg] at h2
     have := hnn (a + s)
     have := hnn (-a + s)
-    rw [abs_le]; constructor <;> linarith
+    rw [abs_le]
+    constructor <;> linarith
   obtain ⟨S, hS⟩ := Module.Finite.fg_top (R := ℤ) (M := X)
   have hzero : ∀ c, (∀ i ∈ S, B c i = 0) → c = 0 := by
     intro c hc
@@ -49,7 +53,8 @@ theorem posquad_finite : ∀ (X : Type) [AddCommGroup X] [Module.Finite ℤ X] (
       rw [Submodule.span_le]
       intro x hx
       change (L c) x = 0
-      rw [L_apply, Bsymm]; exact hc x hx
+      rw [L_apply, Bsymm]
+      exact hc x hx
     have hc' : c ∈ (L c).ker.toIntSubmodule := hle (hS ▸ Submodule.mem_top)
     change (L c) c = 0 at hc'
     rw [L_apply, Bdiag] at hc'

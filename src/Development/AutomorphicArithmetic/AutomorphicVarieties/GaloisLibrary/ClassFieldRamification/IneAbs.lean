@@ -5,11 +5,15 @@ public import CompanionTheory.AutomorphicTheory.PlaceSeparation.ArtinA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain IntermediateField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Kum UpperTheory.V.CF
+open NumberField IsDedekindDomain IntermediateField Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.ineAbs :
-    ∀ (K L Ω : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Field Ω] [Algebra K L] [Algebra K Ω] [Algebra L Ω] [IsScalarTower K L Ω] [IsAlgClosure K Ω] [IsGalois K L] (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 L)), IsPlaceOver A w → (Ine (F := K) A).map (resTo K L Ω) = w.asIdeal.inertia Gal(L/K) := by
+theorem UpperTheory.V.CF.ineAbs
+    : ∀ (K L Ω : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Field Ω] [Algebra K L]
+        [Algebra K Ω] [Algebra L Ω] [IsScalarTower K L Ω] [IsAlgClosure K Ω] [IsGalois K L]
+        (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 L)),
+      IsPlaceOver A w → (Ine (F := K) A).map (resTo K L Ω) = w.asIdeal.inertia Gal(L/K) := by
   intro K L Ω _ _ _ _ _ _ _ _ _ _ _ A w hw
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed K
   haveI : Algebra.IsAlgebraic L Ω := Algebra.IsAlgebraic.tower_top (K := K) L

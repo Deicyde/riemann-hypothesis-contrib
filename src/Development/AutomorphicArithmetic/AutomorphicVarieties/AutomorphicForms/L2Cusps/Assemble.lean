@@ -6,15 +6,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 noncomputable section
 
-open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep GlobalTheory.CuspRep.CuspidalL2GL
-open GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+open NumberField MeasureTheory GlobalTheory.AutomorphicL2Unitary GlobalTheory.DiscreteSum
+  GlobalTheory.UnitaryBC GlobalTheory.DiscSpec GlobalTheory.CuspRep
+  GlobalTheory.CuspRep.CuspidalL2GL
+open GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm
+  GroundTheory.Automorphic.CuspidalSpectrum
 
 namespace UpperTheory.V.KernelIndexFullLattice
 
 variable {E : Type} [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] {a : ℕ}
 
-theorem exists_split (h : SplitEq) (s : {r : ℝ // 0 < r}) :
-    ∃ t : ℝ, Reduction.centralSection E a s = splitCentre E a t := by
+theorem exists_split (h : SplitEq) (s : {r : ℝ // 0 < r})
+    : ∃ t : ℝ, Reduction.centralSection E a s = splitCentre E a t := by
   rcases Nat.eq_zero_or_pos a with rfl | ha
   · exact ⟨0, Subsingleton.elim _ _⟩
   · have h0 : ((a : ℝ) * Module.finrank ℚ E) ≠ 0 :=
@@ -27,25 +30,30 @@ theorem exists_split (h : SplitEq) (s : {r : ℝ // 0 < r}) :
     rw [mul_div_cancel₀ _ h0, Real.exp_log s.2]
 
 omit [_root_.NumberField.IsTotallyComplex E] in
-theorem retractOne_surjective : Function.Surjective (retractOne : GA E a → G1 E a) :=
-  fun x => ⟨x, retractOne_coe x⟩
+theorem retractOne_surjective : Function.Surjective (retractOne : GA E a → G1 E a) := fun x =>
+  ⟨x, retractOne_coe x⟩
 
-theorem range_cmp (h1 : RangeLe) (h2 : ContMem) {μ : Measure (GA E a)} [μ.IsHaarMeasure]
-    {μ₁ : Measure (G1 E a)} [μ₁.IsHaarMeasure] (hp : Pres μ μ₁) :
-    LinearMap.range (cmp hp).toLinearMap = L2cusp μ := by
+theorem range_cmp
+    (h1 : RangeLe) (h2 : ContMem)
+    {μ : Measure (GA E a)} [μ.IsHaarMeasure]
+    {μ₁ : Measure (G1 E a)} [μ₁.IsHaarMeasure]
+    (hp : Pres μ μ₁)
+    : LinearMap.range (cmp hp).toLinearMap = L2cusp μ := by
   refine le_antisymm ?_ (L2cusp_le ?_ fun φ hφ h => h2 E a μ μ₁ hp φ hφ h)
   · rintro _ ⟨v, rfl⟩
     exact h1 E a μ μ₁ hp v
   · exact (cmp hp).isometry.isClosedEmbedding.isClosed_range
 
-theorem partA (hH : MuHaar) (hP : QuotPres) (hE : CmpEquiv) (h1 : RangeLe) (h2 : ContMem) (hC : AbsCompact) :
-    GlobalTheory.Published.CuspDiscreteDecompositionGL := by
+theorem partA
+    (hH : MuHaar) (hP : QuotPres) (hE : CmpEquiv) (h1 : RangeLe) (h2 : ContMem) (hC : AbsCompact)
+    : GlobalTheory.Published.CuspDiscreteDecompositionGL := by
   intro E _ _ _ a μ _ _
   have := hH E a μ
   have hp := hP E a μ
   exact EnoughCompact.isDiscreteSum (isUnitaryRep_Rcusp μ)
-    (hC _ _ _ _ (cuspRepT (muOne μ)) (muOne μ) _ _ (isSubrep_L2cusp μ) (cmp hp) retractOne retractOne_surjective
-      (hE E a μ _ hp) (range_cmp h1 h2 hp) fun f => isCompactOperator_cuspRep (muOne μ) f)
+    (hC _ _ _ _ (cuspRepT (muOne μ)) (muOne μ) _ _ (isSubrep_L2cusp μ) (cmp hp) retractOne
+      retractOne_surjective (hE E a μ _ hp) (range_cmp h1 h2 hp)
+      fun f => isCompactOperator_cuspRep (muOne μ) f)
 
 theorem partC (hS : SplitEq) (hB : BrCusp) : GlobalTheory.Published.CuspFormsBoundedGL := by
   intro E _ _ _ a φ hφ hn
@@ -56,14 +64,17 @@ theorem partC (hS : SplitEq) (hB : BrCusp) : GlobalTheory.Published.CuspFormsBou
   rw [ht, hn]
   exact hC y hy
 
-theorem partB (hS : SplitEq) (hH : MuHaar) (hP : QuotPres) (hE : CmpEquiv) (hF : CmpForm) (h1 : RangeLe) (h2 : ContMem)
-    (hI : AbsIrr) (hN : NeBot) (hK : KFinTr) (hM : KFinMem) (hR : BrRep) : GlobalTheory.Published.CuspFiniteVectorsGL := by
+theorem partB
+    (hS : SplitEq) (hH : MuHaar) (hP : QuotPres) (hE : CmpEquiv) (hF : CmpForm) (h1 : RangeLe)
+    (h2 : ContMem) (hI : AbsIrr) (hN : NeBot) (hK : KFinTr) (hM : KFinMem) (hR : BrRep)
+    : GlobalTheory.Published.CuspFiniteVectorsGL := by
   intro E _ _ _ a μ _ _ H hH' hirr
   have := hH E a μ
   have hp := hP E a μ
   have hle : H ≤ LinearMap.range (cmp hp).toLinearMap := (range_cmp h1 h2 hp).symm ▸ hH'
-  obtain ⟨_, hV, hVi⟩ := hI _ _ _ _ (cuspRepT (muOne μ)) _ (cmp hp) retractOne retractOne_surjective
-    (hE E a μ _ hp) H hle hirr
+  obtain ⟨_, hV, hVi⟩ :=
+    hI _ _ _ _ (cuspRepT (muOne μ)) _ (cmp hp) retractOne retractOne_surjective (hE E a μ _ hp) H
+      hle hirr
   have hne := hN E a _ _ hV hVi
   have hcl := CuspidalAutomorphicRepresentation.topologicalClosure_map_ofSummand _ hV hVi hne
   generalize CuspidalAutomorphicRepresentation.ofSummand _ hV hVi hne = π₀ at hcl
@@ -79,7 +90,12 @@ theorem partB (hS : SplitEq) (hH : MuHaar) (hP : QuotPres) (hE : CmpEquiv) (hF :
     constructor
     · rintro ⟨φ, hφ, e⟩
       obtain ⟨ψ, hψ, e'⟩ := hto φ hφ
-      exact ⟨_, ⟨ψ, hψ, rfl⟩, l2DiscreteQuotient_ext_iff_lift_ae_eq.2 ((hF E a μ _ hp ψ (π₀.le_central hψ)).trans (e' ▸ e.symm))⟩
+      exact ⟨
+        _,
+        ⟨ψ, hψ, rfl⟩,
+        l2DiscreteQuotient_ext_iff_lift_ae_eq.2 ((hF E a μ _ hp ψ (π₀.le_central hψ)).trans
+          (e' ▸ e.symm))
+      ⟩
     · rintro ⟨_, ⟨ψ, hψ, rfl⟩, rfl⟩
       obtain ⟨φ, hφ, e⟩ := hof ψ hψ
       exact ⟨φ, hφ, e ▸ hF E a μ _ hp ψ (π₀.le_central hψ)⟩

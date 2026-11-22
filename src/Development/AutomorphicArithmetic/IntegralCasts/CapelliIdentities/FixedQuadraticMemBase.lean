@@ -4,8 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.fixed_quadratic_mem_base :
-    ∀ {F E : Type} [Field F] [Field E] [Algebra F E], Module.finrank F E = 2 → ∀ (σ : E →ₐ[F] E) (α : E), σ α ≠ α → ∀ x, σ x = x → x ∈ (algebraMap F E).range := by
+theorem UpperTheory.fixed_quadratic_mem_base
+    : ∀ {F E : Type} [Field F] [Field E] [Algebra F E],
+      Module.finrank F E = 2
+        → ∀ (σ : E →ₐ[F] E) (α : E), σ α ≠ α → ∀ x, σ x = x → x ∈ (algebraMap F E).range := by
   intro F E _ _ _ h σ α hα x hx
   by_contra hxr
   have hfin : FiniteDimensional F E := Module.finite_of_finrank_pos (by omega)
@@ -18,8 +20,7 @@ theorem UpperTheory.fixed_quadratic_mem_base :
       refine ⟨-(s / t), ?_⟩
       have hst' : algebraMap F E s + algebraMap F E t * x = 0 := by
         simpa [Algebra.smul_def] using hst
-      have ht' : algebraMap F E t ≠ 0 := by
-        simpa using ht
+      have ht' : algebraMap F E t ≠ 0 := by simpa using ht
       rw [map_neg, map_div₀]
       field_simp
       linear_combination -hst'

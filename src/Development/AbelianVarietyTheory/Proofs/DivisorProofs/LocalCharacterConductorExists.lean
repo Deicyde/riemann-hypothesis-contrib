@@ -20,17 +20,18 @@ theorem norm_le_one_of_pow_near (z : ℂ) (h : ∀ n : ℕ, ‖z ^ n - 1‖ < 1)
   obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt (2 : ℝ) hz
   have h1 := h n
   have h2 : ‖z ^ n‖ ≤ ‖z ^ n - 1‖ + ‖(1 : ℂ)‖ := by
-    calc ‖z ^ n‖ = ‖(z ^ n - 1) + 1‖ := by rw [sub_add_cancel]
+    calc
+      ‖z ^ n‖
+        = ‖(z ^ n - 1) + 1‖ := by rw [sub_add_cancel]
       _ ≤ _ := norm_add_le _ _
   rw [norm_pow, norm_one] at h2
   linarith
 
-theorem exists_ball_trivial (ψ0 : AddChar k ℂ) (hψ : Continuous ψ0) :
-    ∃ γ : ValueGroupWithZero k, γ ≠ 0 ∧ ∀ t : k, valuation k t < γ → ψ0 t = 1 := by
+theorem exists_ball_trivial (ψ0 : AddChar k ℂ) (hψ : Continuous ψ0)
+    : ∃ γ : ValueGroupWithZero k, γ ≠ 0 ∧ ∀ t : k, valuation k t < γ → ψ0 t = 1 := by
   have hc : Continuous fun t : k => ‖ψ0 t - 1‖ := (hψ.sub continuous_const).norm
   have h0 : ‖ψ0 0 - 1‖ < 1 := by simp
-  have hU : {t : k | ‖ψ0 t - 1‖ < 1} ∈ nhds (0 : k) :=
-    (isOpen_lt hc continuous_const).mem_nhds h0
+  have hU : {t : k | ‖ψ0 t - 1‖ < 1} ∈ nhds (0 : k) := (isOpen_lt hc continuous_const).mem_nhds h0
   obtain ⟨γ, hγ, hsub⟩ := (IsValuativeTopology.hasBasis_nhds_zero' k).mem_iff.mp hU
   refine ⟨γ, hγ, fun t ht => ?_⟩
   have hp : ∀ s : k, valuation k s < γ → ∀ n : ℕ, ‖ψ0 s ^ n - 1‖ < 1 := by
@@ -50,9 +51,9 @@ theorem exists_ball_trivial (ψ0 : AddChar k ℂ) (hψ : Continuous ψ0) :
     nlinarith [norm_nonneg (ψ0 t), norm_nonneg (ψ0 (-t))]
   exact GlobalTheory.IrredSB.eq_one_of_forall_pow hn (hp t ht)
 
-theorem exists_rescale_conductor_integers [CharZero k]
-    (ψ0 : AddChar k ℂ) (hψ : Continuous ψ0) (hne : ψ0 ≠ 1) :
-    ∃ c : k, c ≠ 0 ∧ ∀ x : k, (∀ y ∈ 𝒪[k], ψ0 (c * (x * y)) = 1) ↔ x ∈ 𝒪[k] := by
+theorem exists_rescale_conductor_integers
+    [CharZero k] (ψ0 : AddChar k ℂ) (hψ : Continuous ψ0) (hne : ψ0 ≠ 1)
+    : ∃ c : k, c ≠ 0 ∧ ∀ x : k, (∀ y ∈ 𝒪[k], ψ0 (c * (x * y)) = 1) ↔ x ∈ 𝒪[k] := by
   classical
   let P : k → Prop := fun a => ∀ y ∈ 𝒪[k], ψ0 (a * y) = 1
   obtain ⟨t, ht⟩ : ∃ t : k, ψ0 t ≠ 1 := by
@@ -81,11 +82,17 @@ theorem exists_rescale_conductor_integers [CharZero k]
     intro y hy
     apply hball
     rw [map_mul, map_pow]
-    calc valuation k r ^ m * valuation k y ≤ valuation k r ^ m * 1 :=
-          mul_le_mul' le_rfl ((Valuation.mem_integer_iff _ _).1 hy)
+    calc
+      valuation k r ^ m * valuation k y
+        ≤ valuation k r ^ m * 1 := mul_le_mul' le_rfl ((Valuation.mem_integer_iff _ _).1 hy)
       _ < γ := by simpa using hm
   let e := IsNonarchimedeanLocalField.valueGroupWithZeroIsoInt k
-  have hex : ∀ a : k, a ≠ 0 → ∃ n : ℤ, e (valuation k a) = ((Multiplicative.ofAdd n : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
+  have hex
+      : ∀ a : k,
+        a ≠ 0
+          → ∃ n : ℤ,
+            e (valuation k a)
+              = ((Multiplicative.ofAdd n : Multiplicative ℤ) : WithZero (Multiplicative ℤ)) := by
     intro a ha
     have h1 : e (valuation k a) ≠ 0 := by
       intro h
@@ -96,16 +103,24 @@ theorem exists_rescale_conductor_integers [CharZero k]
       simpa using this
     obtain ⟨u, hu⟩ := WithZero.ne_zero_iff_exists.1 h1
     exact ⟨Multiplicative.toAdd u, by simpa using hu.symm⟩
-  let Q : ℤ → Prop := fun n => ∃ a, P a ∧ a ≠ 0 ∧
-    e (valuation k a) = ((Multiplicative.ofAdd n : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
+  let Q : ℤ → Prop := fun n =>
+    ∃ a,
+      P a ∧ a ≠ 0
+        ∧ e (valuation k a)
+          = ((Multiplicative.ofAdd n : Multiplicative ℤ) : WithZero (Multiplicative ℤ))
   obtain ⟨N, hN⟩ := hex t ht0
   have hr0' : r ^ m ≠ 0 := pow_ne_zero _ hr0
   obtain ⟨n1, hn1⟩ := hex _ hr0'
-  obtain ⟨n0, ⟨a0, ha0P, ha0, hn0⟩, hmax⟩ := Int.exists_greatest_of_bdd (P := Q)
-    ⟨N, fun n ⟨a, ha, ha0, hn⟩ => by
-      have h1 : e (valuation k a) < e (valuation k t) := e.strictMono (hbd a ha ha0)
-      rw [hn, hN, WithZero.coe_lt_coe, Multiplicative.ofAdd_lt] at h1
-      exact h1.le⟩ ⟨n1, r ^ m, hPr, hr0', hn1⟩
+  obtain ⟨n0, ⟨a0, ha0P, ha0, hn0⟩, hmax⟩ :=
+    Int.exists_greatest_of_bdd (P := Q)
+      ⟨
+        N,
+        fun n ⟨a, ha, ha0, hn⟩ => by
+          have h1 : e (valuation k a) < e (valuation k t) := e.strictMono (hbd a ha ha0)
+          rw [hn, hN, WithZero.coe_lt_coe, Multiplicative.ofAdd_lt] at h1
+          exact h1.le
+      ⟩
+      ⟨n1, r ^ m, hPr, hr0', hn1⟩
   have hdown : ∀ b, P b → b ≠ 0 → valuation k b ≤ valuation k a0 := by
     intro b hb hb0
     obtain ⟨n, hn⟩ := hex b hb0

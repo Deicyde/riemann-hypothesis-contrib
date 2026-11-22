@@ -10,7 +10,9 @@ open scoped TensorProduct
 
 section Transfer
 
-variable {G G' W W' : Type} [Group G] [Group G'] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
+variable
+  {G G' W W' : Type}
+  [Group G] [Group G'] [AddCommGroup W] [Module ℂ W] [AddCommGroup W'] [Module ℂ W']
 
 private lemma irr_iff (ρ : Representation ℂ G W) :
     ρ.IsIrreducible ↔ Nontrivial W ∧
@@ -68,7 +70,8 @@ private lemma piRep_tprod {I : Type} {Gi Wi : I → Type} [∀ i, Group (Gi i)]
 
 private def Pp (I : Type) : Prop :=
   ∀ (Gi Wi : I → Type) [∀ i, Group (Gi i)] [∀ i, AddCommGroup (Wi i)] [∀ i, Module ℂ (Wi i)]
-    (τ : ∀ i, Representation ℂ (Gi i) (Wi i)), (∀ i, AbsIrr (τ i)) → AbsIrr (piRep τ)
+      (τ : ∀ i, Representation ℂ (Gi i) (Wi i)),
+    (∀ i, AbsIrr (τ i)) → AbsIrr (piRep τ)
 
 private lemma Pp_equiv {α β : Type} (f : β ≃ α) (h : Pp α) : Pp β := by
   intro Gi Wi _ _ _ τ hτ
@@ -120,8 +123,7 @@ private lemma Pp_sum (hB : BoxIrr) {α β : Type} (ha : Pp α) (hb : Pp β) : Pp
   simp only [box, Representation.tprod_apply, MonoidHom.comp_apply, TensorProduct.map_tmul]
   simp [piRep_tprod]
 
-theorem UpperTheory.V.Z.J.D.piIrr :
-    BoxIrr → PiIrr := by
+theorem UpperTheory.V.Z.J.D.piIrr : BoxIrr → PiIrr := by
   intro hB I _ _ Gi Wi _ _ _ τ hτ
   have key : ∀ (α : Type) [Fintype α], Pp α := by
     refine Fintype.induction_empty_option (P := fun α _ => Pp α) ?_ Pp_empty ?_

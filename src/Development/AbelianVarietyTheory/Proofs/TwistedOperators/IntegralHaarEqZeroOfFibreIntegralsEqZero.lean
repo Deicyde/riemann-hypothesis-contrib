@@ -8,8 +8,16 @@ open MeasureTheory
 
 namespace GlobalTheory
 
-theorem integral_haar_eq_zero_of_fibre_integrals_eq_zero :
-    ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H] [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H] (μ : Measure H), μ.IsHaarMeasure → ∀ (P Q : Subgroup H), IsClosed (P : Set H) → IsClosed (Q : Set H) → (∀ p ∈ P, ∀ q ∈ Q, p * q = q * p) → (∀ h, ∃ p ∈ P, ∃ q ∈ Q, h = p * q) → (∀ h, h ∈ P → h ∈ Q → h = 1) → ∀ F : H → ℂ, (∀ ν : Measure P, ν.IsHaarMeasure → ∀ q ∈ Q, ∫ p, F ((p : H) * q) ∂ν = 0) → ∫ h, F h ∂μ = 0 := by
+theorem integral_haar_eq_zero_of_fibre_integrals_eq_zero
+    : ∀ (H : Type) [Group H] [TopologicalSpace H] [IsTopologicalGroup H] [LocallyCompactSpace H]
+        [SecondCountableTopology H] [T2Space H] [MeasurableSpace H] [BorelSpace H] (μ : Measure H),
+      μ.IsHaarMeasure
+        → ∀ (P Q : Subgroup H),
+          IsClosed (P : Set H) → IsClosed (Q : Set H) → (∀ p ∈ P, ∀ q ∈ Q, p * q = q * p)
+            → (∀ h, ∃ p ∈ P, ∃ q ∈ Q, h = p * q) → (∀ h, h ∈ P → h ∈ Q → h = 1)
+            → ∀ F : H → ℂ,
+              (∀ ν : Measure P, ν.IsHaarMeasure → ∀ q ∈ Q, ∫ p, F ((p : H) * q) ∂ν = 0)
+                → ∫ h, F h ∂μ = 0 := by
   intro H _ _ _ _ _ _ _ _ μ hμ P Q hP hQ hcomm hgen hdisj F hF
   haveI : LocallyCompactSpace P := hP.locallyCompactSpace
   haveI : LocallyCompactSpace Q := hQ.locallyCompactSpace
@@ -17,16 +25,19 @@ theorem integral_haar_eq_zero_of_fibre_integrals_eq_zero :
   haveI : SecondCountableTopology Q := TopologicalSpace.Subtype.secondCountableTopology (Q : Set H)
   haveI : BorelSpace P := Subtype.borelSpace (fun x => x ∈ (P : Set H))
   haveI : BorelSpace Q := Subtype.borelSpace (fun x => x ∈ (Q : Set H))
-  let m : P × Q →* H :=
-    { toFun := fun x => (x.1 : H) * x.2
-      map_one' := by simp
-      map_mul' := by
-        rintro ⟨p, q⟩ ⟨p', q'⟩
-        simp only [Prod.mk_mul_mk, Subgroup.coe_mul]
-        have h := hcomm p' p'.2 q q.2
-        calc (p : H) * p' * (q * q') = p * (p' * q) * q' := by simp only [mul_assoc]
-          _ = p * (q * p') * q' := by rw [h]
-          _ = p * q * (p' * q') := by simp only [mul_assoc] }
+  let m : P × Q →* H := {
+    toFun := fun x => (x.1 : H) * x.2
+    map_one' := by simp
+    map_mul' := by
+      rintro ⟨p, q⟩ ⟨p', q'⟩
+      simp only [Prod.mk_mul_mk, Subgroup.coe_mul]
+      have h := hcomm p' p'.2 q q.2
+      calc
+        (p : H) * p' * (q * q')
+          = p * (p' * q) * q' := by simp only [mul_assoc]
+        _ = p * (q * p') * q' := by rw [h]
+        _ = p * q * (p' * q') := by simp only [mul_assoc]
+  }
   have hm : ∀ x : P × Q, m x = (x.1 : H) * x.2 := fun _ => rfl
   have hcont : Continuous m :=
     (continuous_subtype_val.comp continuous_fst).mul (continuous_subtype_val.comp continuous_snd)

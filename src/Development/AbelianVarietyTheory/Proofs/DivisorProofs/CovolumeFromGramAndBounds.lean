@@ -11,25 +11,28 @@ set_option synthInstance.maxHeartbeats 400000
 
 noncomputable section
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
+open NumberField Formalism.BasicNotions Formalism.MainNotions Formalism.L2 Formalism.L2.DIV
+  Formalism.L2.Indef Formalism.L2.Pj Formalism.IndefR.Links Formalism.IndefR.FWT
 open GlobalTheory.AllWt GlobalTheory.BigTop Filter Topology
 
 namespace GlobalTheory.CovTop.Assembly
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem tendsto_exp_mul_rpow {c : ℝ} (hc : 0 < c) (A : ℝ) :
-    Tendsto (fun x : ℝ => Real.exp (-(x ^ c)) * x ^ A) atTop (𝓝 0) := by
-  have h := (tendsto_rpow_mul_exp_neg_mul_atTop_nhds_zero (A / c) 1 one_pos).comp (tendsto_rpow_atTop hc)
+theorem tendsto_exp_mul_rpow {c : ℝ} (hc : 0 < c) (A : ℝ)
+    : Tendsto (fun x : ℝ => Real.exp (-(x ^ c)) * x ^ A) atTop (𝓝 0) := by
+  have h :=
+    (tendsto_rpow_mul_exp_neg_mul_atTop_nhds_zero (A / c) 1 one_pos).comp (tendsto_rpow_atTop hc)
   refine h.congr' ?_
   filter_upwards [eventually_ge_atTop (0 : ℝ)] with x hx
   simp only [Function.comp]
   rw [← Real.rpow_mul hx, mul_div_cancel₀ _ hc.ne', mul_comm, neg_mul, one_mul]
 
-theorem exists_loss_le {c : ℝ} (hc : 0 < c) (A B C : ℝ) :
-    ∃ x0 : ℝ, ∀ x, x0 ≤ x → 12 * Real.exp (-(x ^ c)) * (x ^ A + x ^ B + C) ≤ 1 := by
-  have h := ((((tendsto_exp_mul_rpow hc A).add (tendsto_exp_mul_rpow hc B)).add
-    ((tendsto_exp_mul_rpow hc 0).mul_const C)).const_mul 12)
+theorem exists_loss_le {c : ℝ} (hc : 0 < c) (A B C : ℝ)
+    : ∃ x0 : ℝ, ∀ x, x0 ≤ x → 12 * Real.exp (-(x ^ c)) * (x ^ A + x ^ B + C) ≤ 1 := by
+  have h :=
+    ((((tendsto_exp_mul_rpow hc A).add (tendsto_exp_mul_rpow hc B)).add
+      ((tendsto_exp_mul_rpow hc 0).mul_const C)).const_mul 12)
   have h1 : (12 : ℝ) * (0 + 0 + 0 * C) < 1 := by norm_num
   obtain ⟨x0, hx0⟩ := eventually_atTop.1 (h.eventually (gt_mem_nhds h1))
   refine ⟨x0, fun x hx => ?_⟩
@@ -37,14 +40,19 @@ theorem exists_loss_le {c : ℝ} (hc : 0 < c) (A B C : ℝ) :
   simp only [Real.rpow_zero] at this
   nlinarith
 
-variable {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts}
-  {Y0 : DivX D} {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
+variable
+  {D : D7} {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+  {Gl : Formalism.MainNotions.G.LatInst D} {Kc : Formalism.MainNotions.G.Consts} {Y0 : DivX D}
+  {cX : ExtraC} {ex : Extra D L hT Gi Gl Kc Y0 cX} {Csz : ℝ} (p : PtAt ex Csz) (i : Fin D.R.m)
 
-theorem lcv_le {A B PP C1 C2 : ℝ} (hx : 0 < L.sc.x) (h1 : 0 ≤ C1) (h2 : 0 ≤ C2)
+theorem lcv_le
+    {A B PP C1 C2 : ℝ}
+    (hx : 0 < L.sc.x) (h1 : 0 ≤ C1) (h2 : 0 ≤ C2)
     (hs : 12 * Real.exp (-(L.sc.x ^ (L.sc.ez / 7))) * (L.sc.x ^ A + L.sc.x ^ B + (C1 + C2 + 1)) ≤ 1)
-    (hG : GramAt p i) (hR : RecAt p i) (hC : CutAt p i) (hB : BadAt p i) (hL : LamAt p i A) (hS : SizeAt p i PP B)
-    (hK : CoreAt p i C1) (hW : LowAt p i C2) :
-    Formalism.DivisionValues.lcv ((p.S false).XW i) ((p.S false).M i) / ((p.S false).D : ℝ) ≤ mainT p i + (C1 + C2 + 1) * unitE p := by
+    (hG : GramAt p i) (hR : RecAt p i) (hC : CutAt p i) (hB : BadAt p i) (hL : LamAt p i A)
+    (hS : SizeAt p i PP B) (hK : CoreAt p i C1) (hW : LowAt p i C2)
+    : Formalism.DivisionValues.lcv ((p.S false).XW i) ((p.S false).M i) / ((p.S false).D : ℝ)
+      ≤ mainT p i + (C1 + C2 + 1) * unitE p := by
   haveI : IsTotallyComplex D.what₂.LL := D.tcLL
   obtain ⟨g1, g2, g3, -⟩ := hG
   obtain ⟨c1, c2, c3, c4⟩ := hC
@@ -57,13 +65,18 @@ theorem lcv_le {A B PP C1 C2 : ℝ} (hx : 0 < L.sc.x) (h1 : 0 ≤ C1) (h2 : 0 �
   have hB' := Real.rpow_pos_of_pos hx B
   have hδ := Real.exp_pos (-(L.sc.x ^ (L.sc.ez / 7)))
   have hm := (abs_le.1 s4).2
-  have key := GlobalTheory.CutNum.slope_good_ge D.what₂.LL _ (nrmR p.R.toRealDat i) (latType p.R.toRealDat p.F.lv2 i)
-    (latAll p.R.toRealDat i) (eGood p.R.toRealDat i) (Fintype.card p.P.Gp) (Real.exp (-(L.sc.x ^ (L.sc.ez / 7))))
-    ((L.sc.x ^ A + L.sc.x ^ B + (C1 + C2 + 1)) * unitE p) g1 g2 inf_le_left
-    (fun h => g3 (le_bot_iff.1 (h ▸ latGood_le p.R.toRealDat p.F.lv2 i))) c1 c2 Fintype.card_pos c3 hδ.le
-  have key' : slope_sq (nrmR p.R.toRealDat i) (latType p.R.toRealDat p.F.lv2 i) -
-      12 * Real.exp (-(L.sc.x ^ (L.sc.ez / 7))) * ((L.sc.x ^ A + L.sc.x ^ B + (C1 + C2 + 1)) * unitE p) ≤
-      slope_sq (nrmR p.R.toRealDat i) (latGood p.R.toRealDat p.F.lv2 i) := by
+  have key :=
+    GlobalTheory.CutNum.slope_good_ge D.what₂.LL _ (nrmR p.R.toRealDat i)
+      (latType p.R.toRealDat p.F.lv2 i) (latAll p.R.toRealDat i) (eGood p.R.toRealDat i)
+      (Fintype.card p.P.Gp) (Real.exp (-(L.sc.x ^ (L.sc.ez / 7))))
+      ((L.sc.x ^ A + L.sc.x ^ B + (C1 + C2 + 1)) * unitE p) g1 g2 inf_le_left
+      (fun h => g3 (le_bot_iff.1 (h ▸ latGood_le p.R.toRealDat p.F.lv2 i)))
+      c1 c2 Fintype.card_pos c3 hδ.le
+  have key'
+      : slope_sq (nrmR p.R.toRealDat i) (latType p.R.toRealDat p.F.lv2 i)
+          - 12 * Real.exp (-(L.sc.x ^ (L.sc.ez / 7)))
+            * ((L.sc.x ^ A + L.sc.x ^ B + (C1 + C2 + 1)) * unitE p)
+        ≤ slope_sq (nrmR p.R.toRealDat i) (latGood p.R.toRealDat p.F.lv2 i) := by
     refine key ?_ hB ?_ ?_ ?_
     all_goals
       clear key hR

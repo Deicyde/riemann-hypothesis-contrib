@@ -21,7 +21,6 @@ open PI.RhsWLim
 theorem constVal_of_unimodW_orbitPush (hU : UnimodW) (hO : OrbitPush) : ConstVal :=
   constVal_of_polarHyp rhsTest transW hU hO polarHyp
 
-theorem constVal_of_orbit (hO : OrbitPush) : ConstVal :=
-  constVal_of_unimodW_orbitPush unimodW hO
+theorem constVal_of_orbit (hO : OrbitPush) : ConstVal := constVal_of_unimodW_orbitPush unimodW hO
 
 end PI.RhsWLim.W

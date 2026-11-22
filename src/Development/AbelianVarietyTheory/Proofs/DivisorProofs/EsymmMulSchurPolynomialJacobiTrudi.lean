@@ -10,11 +10,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SchurMulDetE
 open scoped Classical
 
 open MvPolynomial in
-theorem GlobalTheory.JSW.PieriDeterminant.vdm_ne (n : ℕ) : Matrix.det (Matrix.of fun i j : Fin n => (X i : MvPolynomial (Fin n) ℤ) ^ (n - 1 - (j : ℕ))) ≠ 0 := by
-  have h : (Matrix.of fun i j : Fin n => (X i : MvPolynomial (Fin n) ℤ) ^ (n - 1 - (j : ℕ))) =
-      (Matrix.vandermonde (fun i => (X i : MvPolynomial (Fin n) ℤ))).submatrix id Fin.revPerm := by
+theorem GlobalTheory.JSW.PieriDeterminant.vdm_ne (n : ℕ)
+    : Matrix.det (Matrix.of fun i j : Fin n => (X i : MvPolynomial (Fin n) ℤ) ^ (n - 1 - (j : ℕ)))
+      ≠ 0 := by
+  have h
+      : (Matrix.of fun i j : Fin n => (X i : MvPolynomial (Fin n) ℤ) ^ (n - 1 - (j : ℕ)))
+        = (Matrix.vandermonde (fun i => (X i : MvPolynomial (Fin n) ℤ))).submatrix id
+          Fin.revPerm := by
     ext i j
-    simp only [Matrix.of_apply, Matrix.submatrix_apply, Matrix.vandermonde_apply, id, Fin.revPerm_apply, Fin.val_rev]
+    simp only [Matrix.of_apply, Matrix.submatrix_apply, Matrix.vandermonde_apply, id,
+      Fin.revPerm_apply, Fin.val_rev]
     rw [show n - 1 - (j : ℕ) = n - ((j : ℕ) + 1) by omega]
   rw [h, Matrix.det_permute']
   refine mul_ne_zero (by simp [Units.ne_zero]) ?_
@@ -23,9 +28,10 @@ theorem GlobalTheory.JSW.PieriDeterminant.vdm_ne (n : ℕ) : Matrix.det (Matrix.
 
 namespace GlobalTheory.JSW.PieriDeterminant
 
-theorem adj {n : ℕ} (l : Fin n → ℕ) (hl : Antitone l) (J : Finset (Fin n)) :
-    ∀ d : ℕ, ∀ a b : Fin n, (b : ℕ) = a + d + 1 → l a = l b → a ∉ J → b ∈ J →
-      ∃ a' b' : Fin n, (b' : ℕ) = a' + 1 ∧ l a' = l b' ∧ a' ∉ J ∧ b' ∈ J := by
+theorem adj {n : ℕ} (l : Fin n → ℕ) (hl : Antitone l) (J : Finset (Fin n))
+    : ∀ d : ℕ, ∀ a b : Fin n,
+      (b : ℕ) = a + d + 1 → l a = l b → a ∉ J → b ∈ J
+        → ∃ a' b' : Fin n, (b' : ℕ) = a' + 1 ∧ l a' = l b' ∧ a' ∉ J ∧ b' ∈ J := by
   intro d
   induction d with
   | zero => intro a b h1 h2 h3 h4; exact ⟨a, b, by omega, h2, h3, h4⟩
@@ -40,14 +46,21 @@ theorem adj {n : ℕ} (l : Fin n → ℕ) (hl : Antitone l) (J : Finset (Fin n))
     · exact ⟨a, c, rfl, hlc.symm, h3, hcJ⟩
     · exact ih c b (by show (b : ℕ) = a + 1 + d + 1; omega) (hlc.trans h2) hcJ h4
 
-theorem det_zero {n : ℕ} (l : Fin n → ℕ) (hl : Antitone l) (J : Finset (Fin n))
-    (hJ : ¬ Antitone (l + (fun i => if i ∈ J then 1 else 0))) :
-    Matrix.det (Matrix.of fun i k : Fin n => (MvPolynomial.X i : MvPolynomial (Fin n) ℤ) ^
-      ((l k + n - 1 - (k : ℕ)) + if k ∈ J then 1 else 0)) = 0 := by
-  obtain ⟨a, b, hab, hlt⟩ : ∃ a b : Fin n, a ≤ b ∧ ((l + (fun i => if i ∈ J then 1 else 0) : Fin n → ℕ)) a <
-      ((l + (fun i => if i ∈ J then 1 else 0) : Fin n → ℕ)) b := by
+theorem det_zero
+    {n : ℕ} (l : Fin n → ℕ) (hl : Antitone l) (J : Finset (Fin n))
+    (hJ : ¬ Antitone (l + (fun i => if i ∈ J then 1 else 0)))
+    : Matrix.det (Matrix.of fun i k : Fin n =>
+        (MvPolynomial.X i : MvPolynomial (Fin n) ℤ)
+          ^ ((l k + n - 1 - (k : ℕ)) + if k ∈ J then 1 else 0))
+      = 0 := by
+  obtain ⟨a, b, hab, hlt⟩
+      : ∃ a b : Fin n,
+        a ≤ b
+          ∧ ((l + (fun i => if i ∈ J then 1 else 0) : Fin n → ℕ)) a
+            < ((l + (fun i => if i ∈ J then 1 else 0) : Fin n → ℕ)) b := by
     simp only [Antitone, not_forall, not_le] at hJ
-    obtain ⟨a, b, h1, h2⟩ := hJ; exact ⟨a, b, h1, h2⟩
+    obtain ⟨a, b, h1, h2⟩ := hJ
+    exact ⟨a, b, h1, h2⟩
   simp only [Pi.add_apply] at hlt
   have hla := hl hab
   have hA : a ∉ J := by intro h; simp only [h, if_true] at hlt; split_ifs at hlt <;> omega
@@ -55,8 +68,10 @@ theorem det_zero {n : ℕ} (l : Fin n → ℕ) (hl : Antitone l) (J : Finset (Fi
   have hE : l a = l b := by simp only [hA, hB, if_true, if_false] at hlt; omega
   have hne : a ≠ b := by rintro rfl; exact hA hB
   obtain ⟨a', b', h1, h2, h3, h4⟩ :=
-    adj l hl J ((b : ℕ) - a - 1) a b (by have : (a : ℕ) < b := lt_of_le_of_ne hab (fun h => hne (Fin.ext h)); omega) hE hA hB
-  refine Matrix.det_zero_of_column_eq (i := a') (j := b') (fun h => by rw [h] at h1; omega) (fun i => ?_)
+    adj l hl J ((b : ℕ) - a - 1) a b
+      (by have : (a : ℕ) < b := lt_of_le_of_ne hab (fun h => hne (Fin.ext h)); omega) hE hA hB
+  refine
+    Matrix.det_zero_of_column_eq (i := a') (j := b') (fun h => by rw [h] at h1; omega) (fun i => ?_)
   simp only [Matrix.of_apply, h3, h4, if_true, if_false]
   congr 1
   have := b'.isLt

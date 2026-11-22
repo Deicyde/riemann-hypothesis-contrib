@@ -16,21 +16,26 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open Topology Filter Metric Set
 
-theorem le_of_isolated_fibres (hfi : HolomorphicFibreInfinite.Statement) {e d : ℕ} {O : Set (Fin e → ℂ)}
-    {φ : (Fin e → ℂ) → Fin d → ℂ} (hO : IsOpen O) (hne : O.Nonempty) (hφ : DifferentiableOn ℂ φ O)
-    (hiso : ∀ t ∈ O, ∃ W ∈ 𝓝 t, ∀ v ∈ W, v ∈ O → φ v = φ t → v = t) : e ≤ d := by
+theorem le_of_isolated_fibres
+    (hfi : HolomorphicFibreInfinite.Statement)
+    {e d : ℕ} {O : Set (Fin e → ℂ)} {φ : (Fin e → ℂ) → Fin d → ℂ} (hO : IsOpen O) (hne : O.Nonempty)
+    (hφ : DifferentiableOn ℂ φ O) (hiso : ∀ t ∈ O, ∃ W ∈ 𝓝 t, ∀ v ∈ W, v ∈ O → φ v = φ t → v = t)
+    : e ≤ d := by
   by_contra hlt
   rw [not_le] at hlt
   obtain ⟨y0, hy0⟩ := hne
   obtain ⟨ρ, hρ, hρO⟩ := Metric.nhds_basis_closedBall.mem_iff.1 (hO.mem_nhds hy0)
-  obtain ⟨y, hy⟩ := hfi e d (ball y0 ρ) φ hlt isOpen_ball ⟨y0, mem_ball_self hρ⟩
-    (hφ.mono (ball_subset_closedBall.trans hρO))
-  obtain ⟨p, hpK, hpacc⟩ := hy.exists_accPt_of_subset_isCompact (isCompact_closedBall y0 ρ)
-    (fun t ht => ball_subset_closedBall ht.1)
+  obtain ⟨y, hy⟩ :=
+    hfi e d (ball y0 ρ) φ hlt isOpen_ball ⟨y0, mem_ball_self hρ⟩
+      (hφ.mono (ball_subset_closedBall.trans hρO))
+  obtain ⟨p, hpK, hpacc⟩ :=
+    hy.exists_accPt_of_subset_isCompact (isCompact_closedBall y0 ρ)
+      (fun t ht => ball_subset_closedBall ht.1)
   have hpO : p ∈ O := hρO hpK
-  have hcl : p ∈ closure {t | t ∈ ball y0 ρ ∧ φ t = y} := mem_closure_iff_nhds.2 fun U hU => by
-    obtain ⟨q, hq, -⟩ := accPt_iff_nhds.1 hpacc U hU
-    exact ⟨q, hq⟩
+  have hcl : p ∈ closure {t | t ∈ ball y0 ρ ∧ φ t = y} :=
+    mem_closure_iff_nhds.2 fun U hU => by
+      obtain ⟨q, hq, -⟩ := accPt_iff_nhds.1 hpacc U hU
+      exact ⟨q, hq⟩
   have hφp : φ p = y := by
     have h1 := mem_closure_image ((hφ p hpO).differentiableAt (hO.mem_nhds hpO)).continuousAt hcl
     have h2 : φ '' {t | t ∈ ball y0 ρ ∧ φ t = y} ⊆ {y} := by
@@ -41,16 +46,20 @@ theorem le_of_isolated_fibres (hfi : HolomorphicFibreInfinite.Statement) {e d : 
   obtain ⟨q, ⟨hqW, hqB, hqy⟩, hqp⟩ := accPt_iff_nhds.1 hpacc W hW
   exact hqp (hWiso q hqW (hρO (ball_subset_closedBall hqB)) (hqy.trans hφp.symm))
 
-theorem IrreducibleGermProjectionImageNear.proof (hdim : IrreducibleGermRegularDimGe.Statement)
-    (hisoN : IsolatedFibreNear.Statement) (hreg : RegularLocusDense.Statement)
-    (hopen : HolomorphicIsolatedFibreOpen.Statement) (hfi : HolomorphicFibreInfinite.Statement) :
-    IrreducibleGermProjectionImageNear.Statement := by
+theorem IrreducibleGermProjectionImageNear.proof
+    (hdim : IrreducibleGermRegularDimGe.Statement) (hisoN : IsolatedFibreNear.Statement)
+    (hreg : RegularLocusDense.Statement) (hopen : HolomorphicIsolatedFibreOpen.Statement)
+    (hfi : HolomorphicFibreInfinite.Statement)
+    : IrreducibleGermProjectionImageNear.Statement := by
   intro σ _ X w d A hX hirr hfin hnd
   obtain ⟨N1, hN1, hdimN⟩ := hdim σ X w d A hX hirr hfin hnd
   obtain ⟨N2, hN2, hisoX⟩ := hisoN σ X w d A hX hfin
   obtain ⟨N3, hN3o, hwN3, hdense⟩ := hreg σ X w hX
-  refine ⟨interior (N1 ∩ N2) ∩ N3,
-    inter_mem (interior_mem_nhds.2 (inter_mem hN1 hN2)) (hN3o.mem_nhds hwN3), ?_⟩
+  refine ⟨
+    interior (N1 ∩ N2) ∩ N3,
+    inter_mem (interior_mem_nhds.2 (inter_mem hN1 hN2)) (hN3o.mem_nhds hwN3),
+    ?_
+  ⟩
   have hBo : IsOpen (interior (N1 ∩ N2) ∩ N3) := isOpen_interior.inter hN3o
   rintro x ⟨hxX, hxB⟩ h hh hvan
   obtain ⟨ε, hε, hhb⟩ := hh.exists_ball_analyticOnNhd
@@ -70,8 +79,9 @@ theorem IrreducibleGermProjectionImageNear.proof (hdim : IrreducibleGermRegularD
     exact this.1
   have hN12 : ∀ z ∈ V1, z ∈ N1 ∩ N2 := fun z hz => interior_subset hz.1.2.1
   have hchart : X ∩ (V1 ∩ V') = g '' O := by rw [← hXV']; exact (inter_assoc X V1 V').symm
-  have hde : d ≤ e := hdimN r ⟨hrX.1, (hN12 r hrX.2).1⟩ e A' O (V1 ∩ V') g hO (hV1o.inter hV')
-    ⟨hrX.2, hrV'⟩ hg hA'g hchart
+  have hde : d ≤ e :=
+    hdimN r ⟨hrX.1, (hN12 r hrX.2).1⟩ e A' O (V1 ∩ V') g hO (hV1o.inter hV') ⟨hrX.2, hrV'⟩ hg hA'g
+      hchart
   have hφ : DifferentiableOn ℂ (fun y => A (g y)) O :=
     A.differentiable.comp_differentiableOn hg.differentiableOn
   have hisoC : ∀ t ∈ O, ∃ W ∈ 𝓝 t, ∀ v ∈ W, v ∈ O → A (g v) = A (g t) → v = t := by

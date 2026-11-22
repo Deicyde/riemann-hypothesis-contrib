@@ -32,8 +32,8 @@ theorem ne_zero_of_notMem {𝔭 : Ideal (𝓞 F)} {t : 𝓞 F} (ht : t ∉ 𝔭)
   rintro rfl
   exact ht 𝔭.zero_mem
 
-theorem exists_inv_mod {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {t : 𝓞 F} (ht : t ∉ 𝔭) (e : ℕ) :
-    ∃ u : 𝓞 F, 1 - t * u ∈ 𝔭 ^ e := by
+theorem exists_inv_mod {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {t : 𝓞 F} (ht : t ∉ 𝔭) (e : ℕ)
+    : ∃ u : 𝓞 F, 1 - t * u ∈ 𝔭 ^ e := by
   obtain ⟨y, i, hi, hyi⟩ := h𝔭.exists_inv ht
   refine ⟨y * ∑ k ∈ Finset.range e, i ^ k, ?_⟩
   have h1 : t * (y * ∑ k ∈ Finset.range e, i ^ k) = 1 - i ^ e := by
@@ -42,8 +42,8 @@ theorem exists_inv_mod {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {t : �
   rw [h1, sub_sub_cancel]
   exact Ideal.pow_mem_pow hi e
 
-theorem exists_mul_mem_span {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0) :
-    ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∀ x ∈ 𝔭 ^ vF 𝔭 a, t * x ∈ Ideal.span {a} := by
+theorem exists_mul_mem_span {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0)
+    : ∃ t : 𝓞 F, t ∉ 𝔭 ∧ ∀ x ∈ 𝔭 ^ vF 𝔭 a, t * x ∈ Ideal.span {a} := by
   have hle : Ideal.span {a} ≤ 𝔭 ^ vF 𝔭 a :=
     (Ideal.span_singleton_le_iff_mem _).2 (localValuationFiltration.mem_pow_vF h𝔭 ha)
   obtain ⟨J, hJ⟩ := Ideal.dvd_iff_le.2 hle
@@ -59,9 +59,9 @@ theorem exists_mul_mem_span {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a 
   rw [hJ, mul_comm t x]
   exact Ideal.mul_mem_mul hx htJ
 
-theorem div_mem_SP_iff {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0) (z : 𝓞 K) :
-    haveI := h𝔭.isPrime
-    jK z / jK (ι a) ∈ HU.SP K 𝔭 ↔ z ∈ extP K 𝔭 ^ vF 𝔭 a := by
+theorem div_mem_SP_iff {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0) (z : 𝓞 K)
+    : haveI := h𝔭.isPrime
+      jK z / jK (ι a) ∈ HU.SP K 𝔭 ↔ z ∈ extP K 𝔭 ^ vF 𝔭 a := by
   have := h𝔭.isPrime
   have ha' := jK_ι_ne_zero (K := K) ha
   rw [HU.mem_SP]
@@ -71,7 +71,8 @@ theorem div_mem_SP_iff {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : �
       apply FaithfulSMul.algebraMap_injective (𝓞 K) K
       rw [map_mul, map_mul, hw, mul_assoc, div_mul_cancel₀ _ ha']
     obtain ⟨u, hu⟩ := exists_inv_mod h𝔭 ht (vF 𝔭 a)
-    have hA : ι a ∈ extP K 𝔭 ^ vF 𝔭 a := localizedQuotients.ι_mem_pow (localValuationFiltration.mem_pow_vF h𝔭 ha)
+    have hA : ι a ∈ extP K 𝔭 ^ vF 𝔭 a :=
+      localizedQuotients.ι_mem_pow (localValuationFiltration.mem_pow_vF h𝔭 ha)
     have e2 : z = ι u * (ι t * z) + ι (1 - t * u) * z := by
       rw [map_sub, map_mul, map_one]
       ring
@@ -98,16 +99,18 @@ theorem div_mem_SP_iff {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : �
       · intro c x _ hx
         rw [smul_eq_mul, mul_left_comm]
         exact Ideal.mul_mem_left _ _ hx
-    obtain ⟨w, hw⟩ := Ideal.mem_span_singleton'.1
-      (hle (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) hz))
+    obtain ⟨w, hw⟩ :=
+      Ideal.mem_span_singleton'.1 (hle (Ideal.mul_mem_mul (Ideal.mem_span_singleton_self _) hz))
     refine ⟨w, ?_⟩
     rw [← mul_div_assoc]
     exact (eq_div_iff ha').2 (by simpa only [map_mul] using congrArg jK hw)
 
-theorem exists_sub_div_mem_SP {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal) {a : 𝓞 F} (ha : a ≠ 0) {r : K}
-    (hr : haveI := h𝔭.isPrime; r ∈ HU.SP K 𝔭) :
-    haveI := h𝔭.isPrime
-    ∃ z : 𝓞 K, (r - jK z) / jK (ι a) ∈ HU.SP K 𝔭 := by
+theorem exists_sub_div_mem_SP
+    {𝔭 : Ideal (𝓞 F)} (h𝔭 : 𝔭.IsMaximal)
+    {a : 𝓞 F} (ha : a ≠ 0)
+    {r : K} (hr : haveI := h𝔭.isPrime; r ∈ HU.SP K 𝔭)
+    : haveI := h𝔭.isPrime
+      ∃ z : 𝓞 K, (r - jK z) / jK (ι a) ∈ HU.SP K 𝔭 := by
   have := h𝔭.isPrime
   obtain ⟨t, ht, w, hw⟩ := HU.mem_SP.1 hr
   obtain ⟨u, hu⟩ := exists_inv_mod h𝔭 ht (vF 𝔭 a)

@@ -10,7 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsU
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 open GlobalTheory.SS.Ord
 
@@ -18,7 +19,9 @@ namespace GlobalTheory.SS.Ord
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
-variable {R K : Type} [CommRing R] [Field K] [Algebra R K] {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
+variable
+  {R K : Type} [CommRing R] [Field K] [Algebra R K]
+  {A A' : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)} in
 private lemma model_isPullback_genericFibre_spMap (M : _root_.GlobalTheory.SS.Model R A) :
     IsPullback M.j A.hom M.Y.hom (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap R K)) := by
   have h := IsPullback.of_hasPullback M.Y.hom (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (algebraMap R K))
@@ -28,14 +31,13 @@ private lemma model_isPullback_genericFibre_spMap (M : _root_.GlobalTheory.SS.Mo
   · have := Over.w M.e.hom
     simpa using this.symm
 
-
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry in
 open scoped CategoryTheory.Obj in
 variable {R K : Type} [CommRing R] [Field K] [Algebra R K] in
-theorem _root_.GlobalTheory.SS.Ord.isOpenImmersion_of_extends_id_of_etale :
-    ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
-      [IsFractionRing R K] (A : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K)) (M N : _root_.GlobalTheory.SS.Model R A)
-      (U : M.Y.left.Opens) (g : U.toScheme ⟶ N.Y.left),
+theorem _root_.GlobalTheory.SS.Ord.isOpenImmersion_of_extends_id_of_etale
+    : ∀ (R K : Type) [CommRing R] [IsDomain R] [IsDiscreteValuationRing R] [Field K] [Algebra R K]
+        [IsFractionRing R K] (A : Over (_root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp K))
+        (M N : _root_.GlobalTheory.SS.Model R A) (U : M.Y.left.Opens) (g : U.toScheme ⟶ N.Y.left),
       _root_.GlobalTheory.SS.Extends M N (𝟙 A) U g → Etale g → IsOpenImmersion g := by
   intro R K _ _ _ _ _ _ A M N U g hE _
   haveI := M.smooth
@@ -49,8 +51,8 @@ theorem _root_.GlobalTheory.SS.Ord.isOpenImmersion_of_extends_id_of_etale :
   let φ := pullback.fst q ψ
   haveI : IsSchemeTheoreticallyDominant φ :=
     IsSchemeTheoreticallyDominant.of_isPullback (IsPullback.of_hasPullback q ψ).flip
-  have hU := ((isPullback_morphismRestrict M.j U).paste_vert
-    (model_isPullback_genericFibre_spMap M))
+  have hU :=
+    ((isPullback_morphismRestrict M.j U).paste_vert (model_isPullback_genericFibre_spMap M))
   have hN := model_isPullback_genericFibre_spMap N
   have hs : (φ ≫ pullback.fst g g) ≫ U.ι ≫ M.Y.hom = pullback.snd q ψ ≫ ψ := by
     rw [Category.assoc]
@@ -58,15 +60,15 @@ theorem _root_.GlobalTheory.SS.Ord.isOpenImmersion_of_extends_id_of_etale :
   have hs' : (φ ≫ pullback.snd g g) ≫ U.ι ≫ M.Y.hom = pullback.snd q ψ ≫ ψ := by
     rw [← hs, ← hE.1]
     simp only [Category.assoc, pullback.condition_assoc]
-  have key : ∀ (c : pullback q ψ ⟶ U) (hc : c ≫ U.ι ≫ M.Y.hom = pullback.snd q ψ ≫ ψ),
-      (hU.lift c _ hc ≫ (M.j ⁻¹ᵁ U).ι) ≫ N.j = c ≫ g := by
+  have key
+      : ∀ (c : pullback q ψ ⟶ U) (hc : c ≫ U.ι ≫ M.Y.hom = pullback.snd q ψ ≫ ψ),
+        (hU.lift c _ hc ≫ (M.j ⁻¹ᵁ U).ι) ≫ N.j = c ≫ g := by
     intro c hc
     have h2 := hE.2
     conv_rhs => rw [← hU.lift_fst c _ hc]
     rw [Category.assoc (hU.lift c _ hc) (M.j ∣_ U) g, h2]
     simp
-  have hl : hU.lift _ _ hs ≫ (M.j ⁻¹ᵁ U).ι =
-      hU.lift _ _ hs' ≫ (M.j ⁻¹ᵁ U).ι := by
+  have hl : hU.lift _ _ hs ≫ (M.j ⁻¹ᵁ U).ι = hU.lift _ _ hs' ≫ (M.j ⁻¹ᵁ U).ι := by
     apply hN.hom_ext
     · rw [key _ hs, key _ hs']
       simp only [Category.assoc, pullback.condition]

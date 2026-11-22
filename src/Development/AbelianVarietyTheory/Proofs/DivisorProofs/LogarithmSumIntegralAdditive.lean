@@ -12,10 +12,12 @@ noncomputable section
 
 namespace GlobalTheory.IsoTriv
 
-open MvPowerSeries ReciprocityTheory.PGsh GlobalTheory.FGDepth GlobalTheory.CharDepth GlobalTheory.FactorDepth GlobalTheory.LawLog
+open MvPowerSeries ReciprocityTheory.PGsh GlobalTheory.FGDepth GlobalTheory.CharDepth
+  GlobalTheory.FactorDepth GlobalTheory.LawLog
 
-theorem exp_point_zero {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ} (G : LogFGL v d)
-    (σ : Type) : expPt G (0 : Fin d → MvPowerSeries σ C) = 0 := by
+theorem exp_point_zero
+    {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {d : ℕ} (G : LogFGL v d) (σ : Type)
+    : expPt G (0 : Fin d → MvPowerSeries σ C) = 0 := by
   funext i
   have h0 : ∀ j, constantCoeff ((0 : Fin d → MvPowerSeries σ C) j) = 0 := fun _ => by simp
   have hs : HasSubst (0 : Fin d → MvPowerSeries σ C) := hasSubst_of_constantCoeff_zero h0
@@ -27,8 +29,7 @@ theorem exp_point_zero {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {
   by_cases hm : m = 0
   · subst hm
     simp [coeff_zero_eq_constantCoeff_apply, (isExp_expOf G).1 i]
-  · obtain ⟨s, hsm⟩ : ∃ s, m s ≠ 0 := by
-      by_contra hc; push_neg at hc; exact hm (Finsupp.ext hc)
+  · obtain ⟨s, hsm⟩ : ∃ s, m s ≠ 0 := by by_contra hc; push_neg at hc; exact hm (Finsupp.ext hc)
     have : (m.prod fun s n => ((0 : Fin d → MvPowerSeries σ C) s) ^ n) = 0 := by
       rw [Finsupp.prod]
       apply Finset.prod_eq_zero (Finsupp.mem_support_iff.2 hsm)
@@ -37,9 +38,10 @@ theorem exp_point_zero {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)} {
 
 theorem log_sum_additive_preserves_integrality : AddSt := by
   intro C _ v d G σ _
-  have hadd : ∀ w w' : Fin d → MvPowerSeries σ C, (∀ i, constantCoeff (w i) = 0) →
-      (∀ i, constantCoeff (w' i) = 0) →
-      expPt G (w + w') = fun i => subst (Sum.elim (expPt G w) (expPt G w')) (G.F i) := by
+  have hadd
+      : ∀ w w' : Fin d → MvPowerSeries σ C,
+        (∀ i, constantCoeff (w i) = 0) → (∀ i, constantCoeff (w' i) = 0)
+          → expPt G (w + w') = fun i => subst (Sum.elim (expPt G w) (expPt G w')) (G.F i) := by
     intro w w' hw hw'
     set a : Fin d ⊕ Fin d → MvPowerSeries σ C := Sum.elim (expPt G w) (expPt G w') with ha_def
     have ha0 : ∀ s, constantCoeff (a s) = 0 := by
@@ -59,9 +61,13 @@ theorem log_sum_additive_preserves_integrality : AddSt := by
       have hXr : HasSubst (fun b : Fin d => (X (Sum.inr b) : MvPowerSeries (Fin d ⊕ Fin d) C)) :=
         hasSubst_of_constantCoeff_zero (fun b => by simp)
       rw [G.lg_F, subst_add ha, subst_comp_subst_apply hXl ha, subst_comp_subst_apply hXr ha] at h1
-      have hl : (fun s : Fin d => subst a (X (Sum.inl s) : MvPowerSeries (Fin d ⊕ Fin d) C)) = expPt G w := by
+      have hl
+          : (fun s : Fin d => subst a (X (Sum.inl s) : MvPowerSeries (Fin d ⊕ Fin d) C))
+            = expPt G w := by
         funext s; rw [subst_X ha]; rfl
-      have hr : (fun s : Fin d => subst a (X (Sum.inr s) : MvPowerSeries (Fin d ⊕ Fin d) C)) = expPt G w' := by
+      have hr
+          : (fun s : Fin d => subst a (X (Sum.inr s) : MvPowerSeries (Fin d ⊕ Fin d) C))
+            = expPt G w' := by
         funext s; rw [subst_X ha]; rfl
       rw [hl, hr] at h1
       have e1 : subst (expPt G w) (G.lg i) = w i := by

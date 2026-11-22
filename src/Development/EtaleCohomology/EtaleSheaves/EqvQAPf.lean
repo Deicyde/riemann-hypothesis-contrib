@@ -9,8 +9,8 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace LateralTheory.E.EqvQAPf
 
-theorem prim_of_aic (q : ℕ) [NeZero q] (S : Type) [CommRing S] (hS : AIC S) (hq : IsUnit (q : S)) :
-    Nonempty (Prim q S) := by
+theorem prim_of_aic (q : ℕ) [NeZero q] (S : Type) [CommRing S] (hS : AIC S) (hq : IsUnit (q : S))
+    : Nonempty (Prim q S) := by
   rcases subsingleton_or_nontrivial S with hs | hs
   · exact ⟨⟨0, hq, Subsingleton.elim _ _⟩⟩
   have hm : ((Polynomial.cyclotomic q ℤ).map (Int.castRingHom S)).Monic :=
@@ -21,14 +21,18 @@ theorem prim_of_aic (q : ℕ) [NeZero q] (S : Type) [CommRing S] (hS : AIC S) (h
   obtain ⟨a, ha⟩ := hS _ hm hd
   exact ⟨⟨a, hq, by rw [Polynomial.aeval_def, Polynomial.eval₂_eq_eval_map]; simpa using ha⟩⟩
 
-theorem bij_of_sub {A B : Type*} [AddZeroClass A] [AddZeroClass B] [Subsingleton A] [Subsingleton B] (f : A →+ B) :
-    Function.Bijective f :=
+theorem bij_of_sub
+    {A B : Type*} [AddZeroClass A] [AddZeroClass B] [Subsingleton A] [Subsingleton B] (f : A →+ B)
+    : Function.Bijective f :=
   ⟨fun x y _ => Subsingleton.elim x y, fun _ => ⟨0, Subsingleton.elim _ _⟩⟩
 
 end LateralTheory.E.EqvQAPf
 
 open LateralTheory.E.t_E1Cut in
-theorem LateralTheory.E.t_E1Cut.EqvQA_of (hAcyc : AcycQA) (hQA : QAClosed) (hH0 : EtaleDegreeZeroCohomologyEquivLocallyConstantFunctions) (hLC : LCGood) : EqvQA := by
+theorem LateralTheory.E.t_E1Cut.EqvQA_of
+    (hAcyc : AcycQA) (hQA : QAClosed) (hH0 : EtaleDegreeZeroCohomologyEquivLocallyConstantFunctions)
+    (hLC : LCGood)
+    : EqvQA := by
   intro h1 h9 hb1 hb2 q _ S _ J hS hJ hq i n
   have hqJ : IsUnit (q : S ⧸ J) := by simpa using hq.map (Ideal.Quotient.mk J)
   have hSJ : QA (S ⧸ J) := (hQA S hS).2.2 J
@@ -38,12 +42,15 @@ theorem LateralTheory.E.t_E1Cut.EqvQA_of (hAcyc : AcycQA) (hQA : QAClosed) (hH0 
     exact LateralTheory.E.EqvQAPf.bij_of_sub _
   · obtain ⟨ζ⟩ := LateralTheory.E.EqvQAPf.prim_of_aic q S (hQA S hS).1 hq
     obtain ⟨e, he⟩ := hH0 h9 q i
-    have key : ∀ φ, pull _ (spMap (Ideal.Quotient.mk J)) (tw q i) 0 (e S ζ φ) =
-        e (S ⧸ J) (ζ.map (Ideal.Quotient.mk J)) (lcMap (Ideal.Quotient.mk J) φ) :=
-      fun φ => he S (S ⧸ J) (Ideal.Quotient.mk J) ζ φ
-    have hcomp : (pull _ (spMap (Ideal.Quotient.mk J)) (tw q i) 0) =
-        (e (S ⧸ J) (ζ.map (Ideal.Quotient.mk J))) ∘
-          (fun φ => lcMap (Ideal.Quotient.mk J) φ) ∘ (e S ζ).symm := by
+    have key
+        : ∀ φ,
+          pull _ (spMap (Ideal.Quotient.mk J)) (tw q i) 0 (e S ζ φ)
+            = e (S ⧸ J) (ζ.map (Ideal.Quotient.mk J)) (lcMap (Ideal.Quotient.mk J) φ) := fun φ =>
+      he S (S ⧸ J) (Ideal.Quotient.mk J) ζ φ
+    have hcomp
+        : (pull _ (spMap (Ideal.Quotient.mk J)) (tw q i) 0)
+          = (e (S ⧸ J) (ζ.map (Ideal.Quotient.mk J))) ∘ (fun φ => lcMap (Ideal.Quotient.mk J) φ)
+            ∘ (e S ζ).symm := by
       funext x
       obtain ⟨φ, rfl⟩ := (e S ζ).surjective x
       simp only [Function.comp_apply, AddEquiv.symm_apply_apply]

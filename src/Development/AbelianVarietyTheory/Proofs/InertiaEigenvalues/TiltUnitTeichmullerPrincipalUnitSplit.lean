@@ -163,66 +163,74 @@ lemma inJ_of_nrm {y : Per.Fl l} (h : nrm (y - 1) ≤ ‖((l : ℕ) : ℂ_[l])‖
 
 end GlobalTheory.LogU.TeichSplit
 
-
 open GlobalTheory.LogU.TeichSplit in
-theorem GlobalTheory.LogU.teich_split : ∀ (l : ℕ) [Fact l.Prime] (x : Per.Fl l), IsUnit x → ∃ (ω x₁ : Per.Fl l) (N : ℕ), x = ω * x₁ ∧ GlobalTheory.LogU.InJ (Per.tm (x₁ ^ (l ^ N)) - 1) ∧ ∀ (g : Per.Gq l) (e : Per.Fl l), e.untilt = 1 → Per.σF g x = x * e → Per.σF g ω = ω := by
+theorem GlobalTheory.LogU.teich_split
+    : ∀ (l : ℕ) [Fact l.Prime] (x : Per.Fl l),
+      IsUnit x
+        → ∃ (ω x₁ : Per.Fl l) (N : ℕ),
+          x = ω * x₁ ∧ GlobalTheory.LogU.InJ (Per.tm (x₁ ^ (l ^ N)) - 1)
+            ∧ ∀ (g : Per.Gq l) (e : Per.Fl l),
+              e.untilt = 1 → Per.σF g x = x * e → Per.σF g ω = ω := by
   intro l _ x hx
   have hl : l.Prime := Fact.out
   have hlt := GlobalTheory.TiltAbs.norm_l_lt (l := l)
   have hN1 : nrm x = 1 := nrm_eq_one_of_isUnit hx
 
-  obtain ⟨α, hα⟩ := UniformSpace.Completion.denseRange_coe.exists_dist_lt
-    (((x.untilt : Per.OC l) : ℂ_[l])) one_pos
+  obtain ⟨α, hα⟩ :=
+    UniformSpace.Completion.denseRange_coe.exists_dist_lt (((x.untilt : Per.OC l) : ℂ_[l])) one_pos
   rw [dist_eq_norm] at hα
   have hαn : ‖α‖ = 1 := by
     rw [← PadicComplex.norm_extends]
     have hx1 : ‖((x.untilt : Per.OC l) : ℂ_[l])‖ = 1 := hN1
     have a1 : ‖((α : PadicAlgCl l) : ℂ_[l])‖ ≤ 1 := by
-      have := IsUltrametricDist.norm_add_le_max (((x.untilt : Per.OC l) : ℂ_[l]))
-        (((α : PadicAlgCl l) : ℂ_[l]) - ((x.untilt : Per.OC l) : ℂ_[l]))
+      have :=
+        IsUltrametricDist.norm_add_le_max (((x.untilt : Per.OC l) : ℂ_[l]))
+          (((α : PadicAlgCl l) : ℂ_[l]) - ((x.untilt : Per.OC l) : ℂ_[l]))
       rw [add_sub_cancel, norm_sub_rev] at this
       exact this.trans (max_le hx1.le hα.le)
-    have a2 := IsUltrametricDist.norm_add_le_max (((α : PadicAlgCl l) : ℂ_[l]))
+    have a2 :=
+      IsUltrametricDist.norm_add_le_max (((α : PadicAlgCl l) : ℂ_[l]))
         (((x.untilt : Per.OC l) : ℂ_[l]) - ((α : PadicAlgCl l) : ℂ_[l]))
     rw [add_sub_cancel, hx1] at a2
     refine le_antisymm a1 ?_
     rcases le_max_iff.1 a2 with h | h
     · exact h
     · exact absurd h (not_le.2 hα)
-  obtain ⟨ζ, m, hm, hζ, hαζ⟩ := ReciprocityTheory.DiscreteGroups.LocalClassField.exists_teichmuller_bar α hαn
+  obtain ⟨ζ, m, hm, hζ, hαζ⟩ :=
+    ReciprocityTheory.DiscreteGroups.LocalClassField.exists_teichmuller_bar α hαn
   have hm0 : 0 < m := Nat.pos_of_ne_zero (by rintro rfl; exact hm (dvd_zero l))
   obtain ⟨ω, hωm, hωζ⟩ := GlobalTheory.MemLoc.exists_tilt_root_of_unity l ζ m hm0 hm hζ
 
   have hxω : nrm (x - ω) < 1 := by
     refine lt_of_le_of_lt (nrm_sub_le x ω) (max_lt ?_ hlt)
     rw [hωζ]
-    have e1 : ((x.untilt : Per.OC l) : ℂ_[l]) - ((ζ : Om l) : ℂ_[l]) =
-        (((x.untilt : Per.OC l) : ℂ_[l]) - ((α : PadicAlgCl l) : ℂ_[l])) +
-          (((α - ζ : PadicAlgCl l)) : ℂ_[l]) := by
+    have e1
+        : ((x.untilt : Per.OC l) : ℂ_[l]) - ((ζ : Om l) : ℂ_[l])
+          = (((x.untilt : Per.OC l) : ℂ_[l]) - ((α : PadicAlgCl l) : ℂ_[l]))
+            + (((α - ζ : PadicAlgCl l)) : ℂ_[l]) := by
       rw [UniformSpace.Completion.coe_sub]; ring
     rw [e1]
     refine lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt hα ?_)
-    rw [PadicComplex.norm_extends]; exact hαζ
+    rw [PadicComplex.norm_extends]
+    exact hαζ
   set x₁ := x * ω ^ (m - 1) with hx₁
-  have hωω : ω * ω ^ (m - 1) = 1 := by
-    rw [← pow_succ', Nat.sub_add_cancel hm0, hωm]
+  have hωω : ω * ω ^ (m - 1) = 1 := by rw [← pow_succ', Nat.sub_add_cancel hm0, hωm]
   have hx1 : nrm (x₁ - 1) < 1 := by
-    have : x₁ - 1 = ω ^ (m - 1) * (x - ω) := by
-      rw [hx₁, ← hωω]; ring
+    have : x₁ - 1 = ω ^ (m - 1) * (x - ω) := by rw [hx₁, ← hωω]; ring
     rw [this, nrm_mul]
-    calc nrm (ω ^ (m - 1)) * nrm (x - ω) ≤ 1 * nrm (x - ω) :=
-          mul_le_mul_of_nonneg_right (nrm_le_one _) (nrm_nonneg _)
+    calc
+      nrm (ω ^ (m - 1)) * nrm (x - ω)
+        ≤ 1 * nrm (x - ω) := mul_le_mul_of_nonneg_right (nrm_le_one _) (nrm_nonneg _)
       _ < 1 := by rw [one_mul]; exact hxω
 
   obtain ⟨k, hk⟩ := exists_pow_lt_of_lt_one (norm_l_pos (l := l)) hx1
   refine ⟨ω, x₁, k, ?_, ?_, ?_⟩
   · rw [hx₁, ← mul_assoc, mul_comm ω x, mul_assoc, hωω, mul_one]
   · refine inJ_of_nrm ?_
-    have e2 : x₁ ^ l ^ k - 1 = (x₁ - 1) ^ l ^ k := by
-      rw [sub_pow_char_pow, one_pow]
+    have e2 : x₁ ^ l ^ k - 1 = (x₁ - 1) ^ l ^ k := by rw [sub_pow_char_pow, one_pow]
     rw [e2, nrm_pow]
-    refine le_trans (pow_le_pow_of_le_one (nrm_nonneg _) (nrm_le_one _)
-      (Nat.lt_pow_self hl.one_lt).le) hk.le
+    refine le_trans
+      (pow_le_pow_of_le_one (nrm_nonneg _) (nrm_le_one _) (Nat.lt_pow_self hl.one_lt).le) hk.le
   · intro g e he hgx
     have f0 : 0 < Nat.totient m := Nat.totient_pos.2 hm0
     have hcop : Nat.Coprime l m := (Nat.Prime.coprime_iff_not_dvd hl).2 hm
@@ -231,18 +239,19 @@ theorem GlobalTheory.LogU.teich_split : ∀ (l : ℕ) [Fact l.Prime] (x : Per.Fl
     obtain ⟨c, hc⟩ := (Nat.modEq_iff_dvd' hq1).1 hmod.symm
     have hωq : ω ^ l ^ Nat.totient m = ω := by
       rw [← Nat.sub_add_cancel hq1, pow_succ, hc, pow_mul, hωm, one_pow, one_mul]
-    have hq2 : 2 ≤ l ^ Nat.totient m :=
-      le_trans hl.two_le (Nat.le_self_pow f0.ne' l)
+    have hq2 : 2 ≤ l ^ Nat.totient m := le_trans hl.two_le (Nat.le_self_pow f0.ne' l)
     rw [← sub_eq_zero]
     refine eq_zero_of_pow_eq_self hq2 ?_ ?_
     · rw [sub_pow_char_pow, ← map_pow, hωq]
     · have he1 : nrm (e - 1) < 1 := by
         refine lt_of_le_of_lt (nrm_sub_le e 1) (max_lt ?_ hlt)
-        rw [he, map_one, sub_self, norm_zero]; exact zero_lt_one
+        rw [he, map_one, sub_self, norm_zero]
+        exact zero_lt_one
       have h1 : nrm (Per.σF g ω - Per.σF g x) < 1 := by
         rw [← map_sub, nrm_σF, ← neg_sub, nrm_neg]; exact hxω
       have h2 : nrm (Per.σF g x - x) < 1 := by
         have : Per.σF g x - x = x * (e - 1) := by rw [hgx]; ring
-        rw [this, nrm_mul, hN1, one_mul]; exact he1
+        rw [this, nrm_mul, hN1, one_mul]
+        exact he1
       refine lt_of_le_of_lt (nrm_sub_tri _ (Per.σF g x) _) (max_lt h1 ?_)
       exact lt_of_le_of_lt (nrm_sub_tri _ x _) (max_lt h2 hxω)

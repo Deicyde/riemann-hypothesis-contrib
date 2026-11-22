@@ -8,8 +8,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.Matched
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,23 +20,33 @@ set_option autoImplicit false
 
 namespace GlobalTheory.PinchLift
 
-theorem germ_appLE_eq_gm_val {Y X : Scheme.{0}} (f : Y ⟶ X) (U : X.Opens) (O : Y.Opens) (hle : O ≤ f ⁻¹ᵁ U)
-    (y : Y) (hy : y ∈ O) (a : Γ(X, U)ˣ) :
-    (Y.presheaf.germ O y hy).hom ((f.appLE U O hle).hom a.val) = (gm f y U a).val := by
+theorem germ_appLE_eq_gm_val
+    {Y X : Scheme.{0}}
+    (f : Y ⟶ X) (U : X.Opens) (O : Y.Opens) (hle : O ≤ f ⁻¹ᵁ U) (y : Y) (hy : y ∈ O) (a : Γ(X, U)ˣ)
+    : (Y.presheaf.germ O y hy).hom ((f.appLE U O hle).hom a.val) = (gm f y U a).val := by
   rw [gm_val f y U (hle hy)]
   exact TopCat.Presheaf.germ_res_apply Y.presheaf (homOfLE hle) y hy _
 
-theorem exists_unit_of_glues : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z), i' ≫ p = p' ≫ i → GlobalTheory.PinchLift.Glues p i i' p' → ∀ (V : X.Opens) (a : Γ(X', p ⁻¹ᵁ V)ˣ) (b : Γ(Z, i ⁻¹ᵁ V)ˣ), (∀ z : Z', p (i' z) ∈ V → gm i' z (p ⁻¹ᵁ V) a = gm p' z (i ⁻¹ᵁ V) b) → ∃ u : Γ(X, V)ˣ, (∀ x' : X', p x' ∈ V → gm p x' V u = gm (𝟙 X') x' (p ⁻¹ᵁ V) a) ∧ (∀ z : Z, i z ∈ V → gm i z V u = gm (𝟙 Z) z (i ⁻¹ᵁ V) b) := by
+theorem exists_unit_of_glues
+    : ∀ (X X' Z Z' : Scheme.{0}) (p : X' ⟶ X) (i : Z ⟶ X) (i' : Z' ⟶ X') (p' : Z' ⟶ Z),
+      i' ≫ p = p' ≫ i → GlobalTheory.PinchLift.Glues p i i' p'
+        → ∀ (V : X.Opens) (a : Γ(X', p ⁻¹ᵁ V)ˣ) (b : Γ(Z, i ⁻¹ᵁ V)ˣ),
+          (∀ z : Z', p (i' z) ∈ V → gm i' z (p ⁻¹ᵁ V) a = gm p' z (i ⁻¹ᵁ V) b)
+            → ∃ u : Γ(X, V)ˣ,
+              (∀ x' : X', p x' ∈ V → gm p x' V u = gm (𝟙 X') x' (p ⁻¹ᵁ V) a)
+                ∧ (∀ z : Z, i z ∈ V → gm i z V u = gm (𝟙 Z) z (i ⁻¹ᵁ V) b) := by
   intro X X' Z Z' p i i' p' _ hG V a b hab
-  have key : ∀ (a : Γ(X', p ⁻¹ᵁ V)ˣ) (b : Γ(Z, i ⁻¹ᵁ V)ˣ),
-      (∀ z : Z', p (i' z) ∈ V → gm i' z (p ⁻¹ᵁ V) a = gm p' z (i ⁻¹ᵁ V) b) →
-      ∃! s : Γ(X, V), (p.app V).hom s = a.val ∧ (i.app V).hom s = b.val := by
+  have key
+      : ∀ (a : Γ(X', p ⁻¹ᵁ V)ˣ) (b : Γ(Z, i ⁻¹ᵁ V)ˣ),
+        (∀ z : Z', p (i' z) ∈ V → gm i' z (p ⁻¹ᵁ V) a = gm p' z (i ⁻¹ᵁ V) b)
+          → ∃! s : Γ(X, V), (p.app V).hom s = a.val ∧ (i.app V).hom s = b.val := by
     intro a b hab
     apply hG V
     apply TopCat.Presheaf.section_ext Z'.sheaf
     intro z hz
     exact (germ_appLE_eq_gm_val i' _ _ inf_le_left z hz a).trans
-      ((congrArg Units.val (hab z hz.1)).trans (germ_appLE_eq_gm_val p' _ _ inf_le_right z hz b).symm)
+      ((congrArg Units.val (hab z hz.1)).trans
+        (germ_appLE_eq_gm_val p' _ _ inf_le_right z hz b).symm)
   obtain ⟨s, ⟨hs₁, hs₂⟩, -⟩ := key a b hab
   obtain ⟨t, ⟨ht₁, ht₂⟩, -⟩ := key a⁻¹ b⁻¹ (fun z hz => by rw [map_inv, map_inv, hab z hz])
   have h₁ := key 1 1 (fun z _ => by rw [map_one, map_one])

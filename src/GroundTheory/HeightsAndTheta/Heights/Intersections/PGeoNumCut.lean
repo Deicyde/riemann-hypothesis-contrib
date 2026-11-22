@@ -15,11 +15,16 @@ open MvPolynomial GroundTheory.Heights₂.Heights.Bridge GroundTheory.Heights₂
 
 noncomputable section
 
-theorem C_charOf_mem {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
-    (V : Ideal (ReciprocityTheory.ChartRestriction.G.Geo.MRing ι)) :
-    (C ((ReciprocityTheory.ChartRestriction.G.Geo.charOf V : ℕ) : ℤ) : ReciprocityTheory.ChartRestriction.G.Geo.MRing ι) ∈ V := by
-  have h : ((ReciprocityTheory.ChartRestriction.G.Geo.charOf V : ℕ) : ℤ) ∈
-      V.comap (C : ℤ →+* ReciprocityTheory.ChartRestriction.G.Geo.MRing ι) := by
+theorem C_charOf_mem
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    (V : Ideal (ReciprocityTheory.ChartRestriction.G.Geo.MRing ι))
+    : (C ((ReciprocityTheory.ChartRestriction.G.Geo.charOf V : ℕ) : ℤ)
+        : ReciprocityTheory.ChartRestriction.G.Geo.MRing ι)
+      ∈ V := by
+  have h
+      : ((ReciprocityTheory.ChartRestriction.G.Geo.charOf V : ℕ) : ℤ)
+        ∈ V.comap (C : ℤ →+* ReciprocityTheory.ChartRestriction.G.Geo.MRing ι) := by
     rw [← Submodule.IsPrincipal.span_singleton_generator (V.comap C), Ideal.mem_span_singleton]
     exact Int.dvd_natAbs.mpr dvd_rfl
   exact h
@@ -63,12 +68,14 @@ theorem GeoNumCut.full : GeoNumCut.Statement := by
 
   rw [← intNum_map_eq_geoNum p (n + 1) V hV hpV hdim,
     CutRegular.full (ZMod p) K ι (V.map (red p)) hQ n hd b (red p t) htr htrV a]
-  have hcut := cycEval_divCycle_eq p (V.map (red p)) t
-    (fun W => intNum (ZMod p) W a) (fun W => ReciprocityTheory.ChartRestriction.G.Geo.geoNum n W a)
-    (fun W' hW' => by
-      obtain ⟨hW'm, hW'd⟩ :=
-        DivCycleSupport.full (ZMod p) K ι (V.map (red p)) hQ n hd b _ htr htrV W' hW'
-      exact intNum_eq_geoNum_comap p n W' hW'm hW'd a)
+  have hcut :=
+    cycEval_divCycle_eq p (V.map (red p)) t
+      (fun W => intNum (ZMod p) W a)
+      (fun W => ReciprocityTheory.ChartRestriction.G.Geo.geoNum n W a)
+      (fun W' hW' => by
+        obtain ⟨hW'm, hW'd⟩ :=
+          DivCycleSupport.full (ZMod p) K ι (V.map (red p)) hQ n hd b _ htr htrV W' hW'
+        exact intNum_eq_geoNum_comap p n W' hW'm hW'd a)
   rw [hcm] at hcut
   exact hcut
 

@@ -6,9 +6,10 @@ public import Mathlib
 
 namespace GlobalTheory
 
-theorem idempotent_algHom_ker_fg {R A : Type} [CommRing R] [CommRing A] [Algebra R A]
-    [Algebra.FiniteType R A] (e : A →ₐ[R] A) (he : ∀ x, e (e x) = e x) :
-    (RingHom.ker e.rangeRestrict.toRingHom).FG := by
+theorem idempotent_algHom_ker_fg
+    {R A : Type} [CommRing R] [CommRing A] [Algebra R A] [Algebra.FiniteType R A]
+    (e : A →ₐ[R] A) (he : ∀ x, e (e x) = e x)
+    : (RingHom.ker e.rangeRestrict.toRingHom).FG := by
   classical
   obtain ⟨s, hs⟩ := (Algebra.FiniteType.out : (⊤ : Subalgebra R A).FG)
   refine ⟨s.image (fun x => x - e x), ?_⟩
@@ -31,14 +32,17 @@ theorem idempotent_algHom_ker_fg {R A : Type} [CommRing R] [CommRing A] [Algebra
       | algebraMap r => simp
       | add x y _ _ hx hy =>
         have h : x + y - e (x + y) = (x - e x) + (y - e y) := by rw [map_add (f := _)]; ring
-        rw [h]; exact Ideal.add_mem _ hx hy
+        rw [h]
+        exact Ideal.add_mem _ hx hy
       | mul x y _ _ hx hy =>
         have h : x * y - e (x * y) = x * (y - e y) + e y * (x - e x) := by rw [map_mul]; ring
-        rw [h]; exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hy) (Ideal.mul_mem_left _ _ hx)
+        rw [h]
+        exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hy) (Ideal.mul_mem_left _ _ hx)
     simpa [hb'] using key b
 
-theorem smooth_range_of_idempotent : ∀ (R A : Type) [CommRing R] [CommRing A] [Algebra R A]
-    [Algebra.Smooth R A] (e : A →ₐ[R] A), (∀ x, e (e x) = e x) → Algebra.Smooth R e.range := by
+theorem smooth_range_of_idempotent
+    : ∀ (R A : Type) [CommRing R] [CommRing A] [Algebra R A] [Algebra.Smooth R A] (e : A →ₐ[R] A),
+      (∀ x, e (e x) = e x) → Algebra.Smooth R e.range := by
   intro R A _ _ _ _ e he
   have hq : ∀ b : e.range, e.rangeRestrict (b : A) = b := by
     rintro ⟨_, a, rfl⟩

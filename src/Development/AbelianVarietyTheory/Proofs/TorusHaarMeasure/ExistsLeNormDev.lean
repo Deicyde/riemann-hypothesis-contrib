@@ -6,23 +6,24 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.GrpSep
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-noncomputable def dev {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x0 : Frame Ψ r) (γ : GL (Fin r) E) :
-    Frame Ψ r :=
-  fun τ => ((mat x0 τ)⁻¹ * (γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x0 τ - 1 :
-    Matrix (Fin r) (Fin r) ℂ)
+noncomputable def dev {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x0 : Frame Ψ r) (γ : GL (Fin r) E)
+    : Frame Ψ r := fun τ =>
+  ((mat x0 τ)⁻¹ * (γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x0 τ - 1 : Matrix (Fin r) (Fin r) ℂ)
 
-noncomputable def shift {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x0 M : Frame Ψ r) : Frame Ψ r :=
-  fun τ => (mat x0 τ * (mat M τ + 1) : Matrix (Fin r) (Fin r) ℂ)
+noncomputable def shift {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x0 M : Frame Ψ r) : Frame Ψ r := fun τ =>
+  (mat x0 τ * (mat M τ + 1) : Matrix (Fin r) (Fin r) ℂ)
 
-noncomputable def oneF (Ψ : Finset (E →+* ℂ)) (r : ℕ) : Frame Ψ r :=
-  fun _ => (1 : Matrix (Fin r) (Fin r) ℂ)
+noncomputable def oneF (Ψ : Finset (E →+* ℂ)) (r : ℕ) : Frame Ψ r := fun _ =>
+  (1 : Matrix (Fin r) (Fin r) ℂ)
 
 end GlobalTheory.GrpSep
 
@@ -124,44 +125,70 @@ private lemma rmul_oneF' {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x0 : _root_.Reci
   change (_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x0 τ * 1 : Matrix (Fin r) (Fin r) ℂ) = _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x0 τ
   exact Matrix.mul_one _
 
-
 open NumberField MeasureTheory Topology in
 open scoped ContDiff ENNReal Matrix in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.grpSep : ∀ (r : ℕ) (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (x0 : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r),
-    _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0 → _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.PropDisc X →
-    ∃ c : ℝ, 0 < c ∧ ∀ γ ∈ X.Γ, γ ≠ 1 → ∃ (τ : X.Ψ) (a b : Fin r),
-      c ≤ ‖((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x0 τ)⁻¹ * (γ : Matrix (Fin r) (Fin r) E).map τ.1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x0 τ - 1) a b‖ := by
-  intro r X x0 hO hP
-  have hdom := mem_dom_of_isOrth X hO
-  have hdet := det_mat_ne_zero_of_isOrth' X hO
-  obtain ⟨U, hU, U', hU', hfin⟩ := hP x0 hdom x0 hdom
-  have hV : (fun M : X.Ψ → Fin r → Fin r → ℂ =>
-      (_root_.GlobalTheory.GrpSep.shift x0 M : X.Ψ → Fin r → Fin r → ℂ)) ⁻¹' U' ∈
-      nhds (0 : X.Ψ → Fin r → Fin r → ℂ) :=
-    (continuous_shift' x0).continuousAt.preimage_mem_nhds (by erw [shift_zero_torus_haar_measure]; exact hU')
-  obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.mp hV
-  let S : Set (GL (Fin r) E) :=
-    {γ | γ ∈ {γ | γ ∈ X.Γ ∧ ∃ u ∈ U, ∃ u' ∈ U', ∃ b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor X.Ψ r,
-      _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ u = _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul u' b} \ ({1} : Set (GL (Fin r) E))}
-  obtain ⟨δ, hδ, hmin⟩ := exists_pos_le_of_finite_pos S (hfin.subset (fun _ h => Set.sdiff_subset h))
-    (fun γ => ‖(_root_.GlobalTheory.GrpSep.dev x0 γ : X.Ψ → Fin r → Fin r → ℂ)‖) (by
-      rintro γ ⟨hγ, h1⟩
-      refine norm_pos_iff.mpr fun h0 => h1 (Set.mem_singleton_iff.mpr ?_)
-      refine X.Γ_free γ hγ.1 x0 hdom (_root_.GlobalTheory.GrpSep.oneF X.Ψ r) oneF_mem_bor ?_
-      rw [← shift_dev_eq_lact x0 hdet, rmul_oneF']
-      exact (congrArg (_root_.GlobalTheory.GrpSep.shift x0) h0).trans (shift_zero_torus_haar_measure x0))
-  refine ⟨min ε δ, lt_min hε hδ, fun γ hγ h1 => ?_⟩
-  by_contra hcon
-  push_neg at hcon
-  have hlt : ‖(_root_.GlobalTheory.GrpSep.dev x0 γ : X.Ψ → Fin r → Fin r → ℂ)‖ < min ε δ := by
-    refine (pi_norm_lt_iff (lt_min hε hδ)).mpr fun τ => (pi_norm_lt_iff (lt_min hε hδ)).mpr
-      fun a => (pi_norm_lt_iff (lt_min hε hδ)).mpr fun b => hcon τ a b
-  have hmem : _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x0 ∈ U' := by
-    rw [← shift_dev_eq_lact x0 hdet]
-    exact hball (mem_ball_zero_iff.mpr (hlt.trans_le (min_le_left _ _)))
-  have hS := hmin γ ⟨⟨hγ, x0, mem_of_mem_nhds hU, _, hmem, _root_.GlobalTheory.GrpSep.oneF X.Ψ r,
-    oneF_mem_bor, (rmul_oneF' _).symm⟩, h1⟩
-  exact absurd hS (not_le.mpr (hlt.trans_le (min_le_right _ _)))
+theorem _root_.GlobalTheory.grpSep
+    : ∀ (r : ℕ) (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+        (x0 : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r),
+      _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0
+        → _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.PropDisc X
+        → ∃ c : ℝ,
+          0 < c
+            ∧ ∀ γ ∈ X.Γ,
+              γ ≠ 1
+                → ∃ (τ : X.Ψ) (a b : Fin r),
+                  c ≤ ‖((_root_.ReciprocityTheory.ChartRestriction.G.FD.mat x0 τ)⁻¹ * (γ : Matrix (Fin r) (Fin r) E).map τ.1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.mat x0 τ - 1) a b‖ :=
+  by
+    intro r X x0 hO hP
+    have hdom := mem_dom_of_isOrth X hO
+    have hdet := det_mat_ne_zero_of_isOrth' X hO
+    obtain ⟨U, hU, U', hU', hfin⟩ := hP x0 hdom x0 hdom
+    have hV
+        : (fun M : X.Ψ → Fin r → Fin r → ℂ =>
+              (_root_.GlobalTheory.GrpSep.shift x0 M : X.Ψ → Fin r → Fin r → ℂ))
+            ⁻¹' U'
+          ∈ nhds (0 : X.Ψ → Fin r → Fin r → ℂ) :=
+      (continuous_shift' x0).continuousAt.preimage_mem_nhds
+        (by erw [shift_zero_torus_haar_measure]; exact hU')
+    obtain ⟨ε, hε, hball⟩ := Metric.mem_nhds_iff.mp hV
+    let S : Set (GL (Fin r) E) :=
+      {γ | γ ∈ {γ | γ ∈ X.Γ ∧ ∃ u ∈ U, ∃ u' ∈ U', ∃ b ∈ _root_.ReciprocityTheory.ChartRestriction.G.FD.Bor X.Ψ r,
+        _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ u = _root_.ReciprocityTheory.ChartRestriction.G.FD.rmul u' b} \ ({1} : Set (GL (Fin r) E))}
+    obtain ⟨δ, hδ, hmin⟩ :=
+      exists_pos_le_of_finite_pos S (hfin.subset (fun _ h => Set.sdiff_subset h))
+        (fun γ => ‖(_root_.GlobalTheory.GrpSep.dev x0 γ : X.Ψ → Fin r → Fin r → ℂ)‖)
+        (by
+          rintro γ ⟨hγ, h1⟩
+          refine norm_pos_iff.mpr fun h0 => h1 (Set.mem_singleton_iff.mpr ?_)
+          refine X.Γ_free γ hγ.1 x0 hdom (_root_.GlobalTheory.GrpSep.oneF X.Ψ r) oneF_mem_bor ?_
+          rw [← shift_dev_eq_lact x0 hdet, rmul_oneF']
+          exact (congrArg (_root_.GlobalTheory.GrpSep.shift x0) h0).trans
+            (shift_zero_torus_haar_measure x0))
+    refine ⟨min ε δ, lt_min hε hδ, fun γ hγ h1 => ?_⟩
+    by_contra hcon
+    push_neg at hcon
+    have hlt : ‖(_root_.GlobalTheory.GrpSep.dev x0 γ : X.Ψ → Fin r → Fin r → ℂ)‖ < min ε δ := by
+      refine (pi_norm_lt_iff (lt_min hε hδ)).mpr fun τ =>
+        (pi_norm_lt_iff (lt_min hε hδ)).mpr fun a =>
+          (pi_norm_lt_iff (lt_min hε hδ)).mpr fun b => hcon τ a b
+    have hmem : _root_.ReciprocityTheory.ChartRestriction.G.FD.lact γ x0 ∈ U' := by
+      rw [← shift_dev_eq_lact x0 hdet]
+      exact hball (mem_ball_zero_iff.mpr (hlt.trans_le (min_le_left _ _)))
+    have hS :=
+      hmin γ ⟨
+        ⟨
+          hγ,
+          x0,
+          mem_of_mem_nhds hU,
+          _,
+          hmem,
+          _root_.GlobalTheory.GrpSep.oneF X.Ψ r,
+          oneF_mem_bor,
+          (rmul_oneF' _).symm
+        ⟩,
+        h1
+      ⟩
+    exact absurd hS (not_le.mpr (hlt.trans_le (min_le_right _ _)))
 
 end GlobalTheory

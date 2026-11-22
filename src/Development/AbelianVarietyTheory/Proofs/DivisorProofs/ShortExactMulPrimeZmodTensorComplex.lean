@@ -21,8 +21,8 @@ lemma zmultiples_mkQ_p (p : ℕ) (M : Type) [AddCommGroup M] [Module ℤ M] :
   rw [← Submodule.Quotient.mk_smul, Submodule.Quotient.mk_eq_zero]
   exact ⟨m, by simp⟩
 
-def modPPairing (p : ℕ) (M : Type) [AddCommGroup M] [Module ℤ M] :
-    ZMod p →+ M →+ (M ⧸ pMultiples p M) :=
+def modPPairing (p : ℕ) (M : Type) [AddCommGroup M] [Module ℤ M]
+    : ZMod p →+ M →+ (M ⧸ pMultiples p M) :=
   ZMod.lift p ⟨zmultiplesHom _ (pMultiples p M).mkQ.toAddMonoidHom, zmultiples_mkQ_p p M⟩
 
 lemma modPPairing_one (p : ℕ) (M : Type) [AddCommGroup M] [Module ℤ M] (m : M) :
@@ -37,8 +37,8 @@ lemma modPPairing_one (p : ℕ) (M : Type) [AddCommGroup M] [Module ℤ M] (m : 
 abbrev zmodOverInt (p : ℕ) : ModuleCat.{0} ℤ :=
   (ModuleCat.restrictScalars (Int.castRingHom (ZMod p))).obj (ModuleCat.of (ZMod p) (ZMod p))
 
-def tensorToModP (p : ℕ) (M : ModuleCat.{0} ℤ) :
-    TensorProduct ℤ (zmodOverInt p) M →+ (M ⧸ pMultiples p M) :=
+def tensorToModP (p : ℕ) (M : ModuleCat.{0} ℤ)
+    : TensorProduct ℤ (zmodOverInt p) M →+ (M ⧸ pMultiples p M) :=
   TensorProduct.liftAddHom (modPPairing p M) (fun r a m => by
     have key : ∀ b : ZMod p, modPPairing p M ((r : ZMod p) * b) m = r • modPPairing p M b m := by
       intro b
@@ -121,20 +121,26 @@ lemma pmul_injective (p : ℕ) (M : ModuleCat.{0} ℤ) (h : ∀ x : M, (p : ℤ)
   apply h
   rw [zsmul_sub, hab', sub_self]
 
-theorem shortExact_mul_p_modP :
-    ∀ (C : CochainComplex (ModuleCat.{0} ℤ) ℕ) (p : ℕ) [Fact p.Prime],
-      (∀ (n : ℕ) (x : C.X n), (p : ℤ) • x = 0 → x = 0) →
-      ∃ (π : C ⟶ ((ModuleCat.restrictScalars.{0} (Int.castRingHom (ZMod p))).mapHomologicalComplex
-          (ComplexShape.up ℕ)).obj (((ModuleCat.extendScalars (Int.castRingHom (ZMod p))).mapHomologicalComplex
-          (ComplexShape.up ℕ)).obj C)) (hz : ((p : ℤ) • 𝟙 C) ≫ π = 0),
-        (ShortComplex.mk ((p : ℤ) • 𝟙 C) π hz).ShortExact := by
+theorem shortExact_mul_p_modP
+    : ∀ (C : CochainComplex (ModuleCat.{0} ℤ) ℕ) (p : ℕ) [Fact p.Prime],
+      (∀ (n : ℕ) (x : C.X n), (p : ℤ) • x = 0 → x = 0)
+        → ∃ (π : C
+            ⟶ ((ModuleCat.restrictScalars.{0} (Int.castRingHom (ZMod p))).mapHomologicalComplex
+                (ComplexShape.up ℕ)).obj
+              (((ModuleCat.extendScalars (Int.castRingHom (ZMod p))).mapHomologicalComplex
+                (ComplexShape.up ℕ)).obj C))
+            (hz : ((p : ℤ) • 𝟙 C) ≫ π = 0),
+          (ShortComplex.mk ((p : ℤ) • 𝟙 C) π hz).ShortExact := by
   intro C p _ hinj
-  let π : C ⟶ ((ModuleCat.restrictScalars.{0} (Int.castRingHom (ZMod p))).mapHomologicalComplex
-          (ComplexShape.up ℕ)).obj (((ModuleCat.extendScalars (Int.castRingHom (ZMod p))).mapHomologicalComplex
-          (ComplexShape.up ℕ)).obj C) :=
-    { f := fun n => (ModuleCat.extendRestrictScalarsAdj (Int.castRingHom (ZMod p))).unit.app (C.X n)
-      comm' := fun i j _ =>
-        ((ModuleCat.extendRestrictScalarsAdj (Int.castRingHom (ZMod p))).unit.naturality (C.d i j)) }
+  let π
+      : C ⟶ ((ModuleCat.restrictScalars.{0} (Int.castRingHom (ZMod p))).mapHomologicalComplex
+          (ComplexShape.up ℕ)).obj
+        (((ModuleCat.extendScalars (Int.castRingHom (ZMod p))).mapHomologicalComplex
+          (ComplexShape.up ℕ)).obj C) := {
+    f := fun n => (ModuleCat.extendRestrictScalarsAdj (Int.castRingHom (ZMod p))).unit.app (C.X n)
+    comm' := fun i j _ =>
+      ((ModuleCat.extendRestrictScalarsAdj (Int.castRingHom (ZMod p))).unit.naturality (C.d i j))
+  }
   have hz : ((p : ℤ) • 𝟙 C) ≫ π = 0 := by
     ext n x
     simp only [HomologicalComplex.comp_f, HomologicalComplex.zsmul_f_apply, HomologicalComplex.id_f,
@@ -148,8 +154,9 @@ theorem shortExact_mul_p_modP :
   · rw [ShortComplex.moduleCat_exact_iff]
     intro y hy
     simp only [ShortComplex.map_f, ShortComplex.map_g, HomologicalComplex.eval_map,
-      HomologicalComplex.zsmul_f_apply, HomologicalComplex.id_f, ModuleCat.hom_zsmul,
-      ModuleCat.hom_id] at hy ⊢
+        HomologicalComplex.zsmul_f_apply, HomologicalComplex.id_f, ModuleCat.hom_zsmul,
+        ModuleCat.hom_id]
+      at hy ⊢
     exact unit_kernel_zmod p (C.X n) y hy
   · rw [ModuleCat.mono_iff_injective]
     exact pmul_injective p (C.X n) (hinj n)

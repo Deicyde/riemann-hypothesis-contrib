@@ -9,4 +9,7 @@ public import CompanionTheory.RealGroups.UnitaryAdmissibility.ArchimedeanUnitary
 open CompanionTheory.Rg.Fl
 set_option maxHeartbeats 1000000 in
 theorem _root_.GlobalTheory.T.StatementStar : StStar := by
-  first | exact @GlobalTheory.CompanionTheory.RgFl.StarPf.stStar | exact GlobalTheory.CompanionTheory.RgFl.StarPf.stStar | (intros; apply GlobalTheory.CompanionTheory.RgFl.StarPf.stStar <;> assumption)
+  first
+  | exact @GlobalTheory.CompanionTheory.RgFl.StarPf.stStar
+  | exact GlobalTheory.CompanionTheory.RgFl.StarPf.stStar
+  | (intros; apply GlobalTheory.CompanionTheory.RgFl.StarPf.stStar <;> assumption)

@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LocEqOneOfMe
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DefU Formalism.L2.Host GlobalTheory.HeckeGal
+open NumberField IsDedekindDomain Matrix GlobalTheory.CuspRep GlobalTheory.UnitaryBC
+  GlobalTheory.DefU Formalism.L2.Host GlobalTheory.HeckeGal
 open GlobalTheory.UPel.HT GlobalTheory.LKTrip GlobalTheory.LKGeo GlobalTheory.LKDef
 open GlobalTheory.LFun (KGL)
 open UpperTheory.Gal.CertificateRingHomMap (GUf Plc GLw AfQ sim comp loc SameK IsCen cj)
@@ -68,24 +69,25 @@ private lemma cong_of {A : Arith E} {n p : ℕ} [Fact p.Prime] (S : Setup A n p)
 
 end UpperTheory.Gal.Int.Geo.Pl.Tj
 
-theorem UpperTheory.Gal.Int.Geo.Pl.Tj.tCong :
-    UpperTheory.Gal.Int.Geo.Pl.Tj.TCong := by
+theorem UpperTheory.Gal.Int.Geo.Pl.Tj.tCong : UpperTheory.Gal.Int.Geo.Pl.Tj.TCong := by
   intro hS hD hL E _ _ _ A n p _ S F x hx N w σ i hi g hg
   have hq : σ.q.Prime := σ.atp.prime
   have hG : A.Good σ.q := σ.good
   have hqw : (σ.q : 𝓞 E) ∈ w.asIdeal := σ.atp.le (q_mem_uId S.D _ _)
   have hrw : A.ω - (σ.r : 𝓞 E) ∈ w.asIdeal := σ.atp.le (ω_mem_uId S.D _ _)
   obtain ⟨s1, -, -, -, s5, -, s7⟩ := hS E A x hx σ.q hq hG.1 w hqw
-  have tri : ∀ u : Plc E, comp u g = 1 ∨ ((σ.q : 𝓞 E) ∈ u.asIdeal ∧ (u = w ∨ SameK x (cj u) w)) := by
+  have tri
+      : ∀ u : Plc E, comp u g = 1 ∨ ((σ.q : 𝓞 E) ∈ u.asIdeal ∧ (u = w ∨ SameK x (cj u) w)) := by
     intro u
     by_cases h1 : u = w
     · exact Or.inr ⟨h1 ▸ hqw, Or.inl h1⟩
     by_cases h2 : SameK x (cj u) w
-    · have h3 : (σ.q : 𝓞 E) ∈ (cj u).asIdeal :=
-        (h2 _ (by simpa using natCast_mem _ σ.q)).2 hqw
+    · have h3 : (σ.q : 𝓞 E) ∈ (cj u).asIdeal := (h2 _ (by simpa using natCast_mem _ σ.q)).2 hqw
       exact Or.inr ⟨(nat_mem_cj u _).1 h3, Or.inr h2⟩
     · exact Or.inl (hg.off u h1 h2)
-  have hω : ∀ u : Plc E, (σ.q : 𝓞 E) ∈ u.asIdeal → SameK x (cj u) w → A.ω - (σ.r : 𝓞 E) ∉ u.asIdeal := by
+  have hω
+      : ∀ u : Plc E,
+        (σ.q : 𝓞 E) ∈ u.asIdeal → SameK x (cj u) w → A.ω - (σ.r : 𝓞 E) ∉ u.asIdeal := by
     intro u hqu h1 h2
     have h3 := s5 u w ((s7 σ.r hrw u).2 ⟨hqu, h2⟩)
     exact s1 fun y hy => (h3 y hy).symm.trans (h1 y hy)
@@ -95,12 +97,12 @@ theorem UpperTheory.Gal.Int.Geo.Pl.Tj.tCong :
       refine Nat.cast_ne_zero.2 ?_
       rintro rfl
       exact hq.one_lt.ne' ((Nat.coprime_zero_left _).1 hm)
-    refine cong_of S F hD hq hG g hg.int (Ideal.span {(m : 𝓞 E)}) (Ideal.span_singleton_eq_bot.not.2 hm0) fun u => ?_
+    refine cong_of S F hD hq hG g hg.int (Ideal.span {(m : 𝓞 E)})
+      (Ideal.span_singleton_eq_bot.not.2 hm0) fun u => ?_
     rcases tri u with h | ⟨h, -⟩
     · exact Or.inl h
     · exact Or.inr ⟨h, _, Ideal.mem_span_singleton_self _, natCast_not_mem u hm h⟩
-  · have hq0 : (σ.q : 𝓞 E) ^ e ∈ 𝔞 :=
-      he (Ideal.pow_mem_pow (q_mem_uId S.D _ _) e)
+  · have hq0 : (σ.q : 𝓞 E) ^ e ∈ 𝔞 := he (Ideal.pow_mem_pow (q_mem_uId S.D _ _) e)
     have hb : 𝔞 ≠ ⊥ := by
       rintro rfl
       exact pow_ne_zero e (Nat.cast_ne_zero.2 hq.ne_zero) ((Ideal.mem_bot).1 hq0)

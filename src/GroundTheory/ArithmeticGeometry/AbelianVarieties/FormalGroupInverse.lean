@@ -13,8 +13,8 @@ section Neg
 
 variable {A : Type*} [CommRing A] (V : WeierstrassCurve A)
 
-theorem zwPoly_neg_mul {z w e : A} (he : (1 - V.a₁ * z - V.a₃ * w) * e = 1) :
-    zwPoly V (-z * e) (-w * e) = -e ^ 3 * zwPoly V z w := by
+theorem zwPoly_neg_mul {z w e : A} (he : (1 - V.a₁ * z - V.a₃ * w) * e = 1)
+    : zwPoly V (-z * e) (-w * e) = - e ^ 3 * zwPoly V z w := by
   unfold zwPoly
   linear_combination (-e * w * (e + 1)) * he
 
@@ -31,57 +31,67 @@ theorem algHom_C (r : R) : ψ (MvPowerSeries.C r) = algebraMap R T r := by
     rw [MvPowerSeries.algebraMap_apply, Algebra.algebraMap_self, RingHom.id_apply]
   rw [this, ψ.commutes]
 
-theorem map_C_algHom :
-    (W.map (MvPowerSeries.C (σ := Fin 2))).map (ψ : MvPowerSeries (Fin 2) R →+* T) =
-      W.map (algebraMap R T) := by
+theorem map_C_algHom
+    : (W.map (MvPowerSeries.C (σ := Fin 2))).map (ψ : MvPowerSeries (Fin 2) R →+* T)
+      = W.map (algebraMap R T) := by
   rw [WeierstrassCurve.map_map]
   congr 1
   ext r
   exact algHom_C ψ r
 
-theorem apply_wAt_X_zero :
-    ψ (wAt W (MvPowerSeries.X 0)) = ψ (addSlope W) * ψ (MvPowerSeries.X 0) + ψ (addIntercept W) := by
+theorem apply_wAt_X_zero
+    : ψ (wAt W (MvPowerSeries.X 0))
+      = ψ (addSlope W) * ψ (MvPowerSeries.X 0) + ψ (addIntercept W) := by
   rw [wAt_X_zero_eq, map_add (f := _), map_mul]
 
-theorem apply_wAt_X_one :
-    ψ (wAt W (MvPowerSeries.X 1)) = ψ (addSlope W) * ψ (MvPowerSeries.X 1) + ψ (addIntercept W) := by
+theorem apply_wAt_X_one
+    : ψ (wAt W (MvPowerSeries.X 1))
+      = ψ (addSlope W) * ψ (MvPowerSeries.X 1) + ψ (addIntercept W) := by
   rw [wAt_X_one_eq, map_add (f := _), map_mul]
 
-theorem zwPoly_apply_wAt_X (i : Fin 2) :
-    zwPoly (W.map (algebraMap R T)) (ψ (MvPowerSeries.X i)) (ψ (wAt W (MvPowerSeries.X i))) = 0 := by
-  have := congrArg (ψ : MvPowerSeries (Fin 2) R →+* T)
-    (zwPoly_wAt W (MvPowerSeries.constantCoeff_X (R := R) i))
+theorem zwPoly_apply_wAt_X (i : Fin 2)
+    : zwPoly (W.map (algebraMap R T)) (ψ (MvPowerSeries.X i)) (ψ (wAt W (MvPowerSeries.X i)))
+      = 0 := by
+  have :=
+    congrArg (ψ : MvPowerSeries (Fin 2) R →+* T)
+      (zwPoly_wAt W (MvPowerSeries.constantCoeff_X (R := R) i))
   rwa [map_zwPoly, map_zero, map_C_algHom] at this
 
-theorem secantB_apply_mul :
-    secantB (W.map (algebraMap R T)) (ψ (addSlope W)) *
-      ψ (MvPowerSeries.invOfUnit (secantB (W.map MvPowerSeries.C) (addSlope W)) 1) = 1 := by
+theorem secantB_apply_mul
+    : secantB (W.map (algebraMap R T)) (ψ (addSlope W))
+        * ψ (MvPowerSeries.invOfUnit (secantB (W.map MvPowerSeries.C) (addSlope W)) 1)
+      = 1 := by
   have := congrArg (ψ : MvPowerSeries (Fin 2) R →+* T) (mul_invOfUnit_one (constantCoeff_secantB W))
   rwa [map_mul, map_one, map_secantB, map_C_algHom] at this
 
-theorem apply_thirdZ :
-    ψ (thirdZ W) = -ψ (MvPowerSeries.X 0) - ψ (MvPowerSeries.X 1) -
-      secantA (W.map (algebraMap R T)) (ψ (addSlope W)) (ψ (addIntercept W)) *
-        ψ (MvPowerSeries.invOfUnit (secantB (W.map MvPowerSeries.C) (addSlope W)) 1) := by
-  have h := map_secantA (W.map (MvPowerSeries.C (σ := Fin 2))) (ψ : MvPowerSeries (Fin 2) R →+* T)
-    (addSlope W) (addIntercept W)
+theorem apply_thirdZ
+    : ψ (thirdZ W)
+      = - ψ (MvPowerSeries.X 0) - ψ (MvPowerSeries.X 1)
+        - secantA (W.map (algebraMap R T)) (ψ (addSlope W)) (ψ (addIntercept W))
+          * ψ (MvPowerSeries.invOfUnit (secantB (W.map MvPowerSeries.C) (addSlope W)) 1) := by
+  have h :=
+    map_secantA (W.map (MvPowerSeries.C (σ := Fin 2))) (ψ : MvPowerSeries (Fin 2) R →+* T)
+      (addSlope W) (addIntercept W)
   rw [map_C_algHom] at h
-  have h' : ψ (secantA (W.map MvPowerSeries.C) (addSlope W) (addIntercept W)) =
-      secantA (W.map (algebraMap R T)) (ψ (addSlope W)) (ψ (addIntercept W)) := h
+  have h'
+      : ψ (secantA (W.map MvPowerSeries.C) (addSlope W) (addIntercept W))
+        = secantA (W.map (algebraMap R T)) (ψ (addSlope W)) (ψ (addIntercept W)) :=
+    h
   rw [thirdZ, map_sub, map_sub, map_neg, map_mul, h']
 
 theorem apply_thirdW : ψ (thirdW W) = ψ (addSlope W) * ψ (thirdZ W) + ψ (addIntercept W) := by
   rw [thirdW, map_add (f := _), map_mul]
 
-theorem negDen_apply_mul :
-    (1 - algebraMap R T W.a₁ * ψ (thirdZ W) - algebraMap R T W.a₃ * ψ (thirdW W)) *
-      ψ (MvPowerSeries.invOfUnit (negDen W) 1) = 1 := by
+theorem negDen_apply_mul
+    : (1 - algebraMap R T W.a₁ * ψ (thirdZ W) - algebraMap R T W.a₃ * ψ (thirdW W))
+        * ψ (MvPowerSeries.invOfUnit (negDen W) 1)
+      = 1 := by
   have := congrArg ψ (mul_invOfUnit_one (constantCoeff_negDen W))
-  rwa [map_mul, map_one, negDen, map_sub, map_sub, map_one, map_mul, map_mul, algHom_C,
-    algHom_C] at this
+  rwa [map_mul, map_one, negDen, map_sub, map_sub, map_one, map_mul, map_mul, algHom_C, algHom_C] at
+    this
 
-theorem apply_addSeries :
-    ψ (addSeries W) = -ψ (thirdZ W) * ψ (MvPowerSeries.invOfUnit (negDen W) 1) := by
+theorem apply_addSeries
+    : ψ (addSeries W) = - ψ (thirdZ W) * ψ (MvPowerSeries.invOfUnit (negDen W) 1) := by
   rw [addSeries, map_mul, map_neg]
 
 end Apply
@@ -95,20 +105,21 @@ theorem constantCoeff_invDen : MvPowerSeries.constantCoeff (invDen W) = 1 := by
   have h : MvPowerSeries.constantCoeff (formalW W) = 0 := constantCoeff_formalW W
   simp [invDen, PowerSeries.C_apply, h, PowerSeries.X]
 
-def invSeries : PowerSeries R :=
-  -PowerSeries.X * MvPowerSeries.invOfUnit (invDen W) 1
+def invSeries : PowerSeries R := -PowerSeries.X * MvPowerSeries.invOfUnit (invDen W) 1
 
 theorem constantCoeff_invSeries : MvPowerSeries.constantCoeff (invSeries W) = 0 := by
   simp [invSeries, PowerSeries.X]
 
-theorem wAt_X_unit : wAt W (PowerSeries.X : PowerSeries R) = formalW W :=
-  PowerSeries.X_subst _
+theorem wAt_X_unit : wAt W (PowerSeries.X : PowerSeries R) = formalW W := PowerSeries.X_subst _
 
-theorem wAt_invSeries :
-    wAt W (invSeries W) = -formalW W * MvPowerSeries.invOfUnit (invDen W) 1 := by
+theorem wAt_invSeries
+    : wAt W (invSeries W) = - formalW W * MvPowerSeries.invOfUnit (invDen W) 1 := by
   set e := MvPowerSeries.invOfUnit (invDen W) 1 with he_def
-  have he : (1 - (W.map MvPowerSeries.C).a₁ * (PowerSeries.X : PowerSeries R) -
-      (W.map MvPowerSeries.C).a₃ * formalW W) * e = 1 :=
+  have he
+      : (1 - (W.map MvPowerSeries.C).a₁ * (PowerSeries.X : PowerSeries R)
+            - (W.map MvPowerSeries.C).a₃ * formalW W)
+          * e
+        = 1 :=
     mul_invOfUnit_one (constantCoeff_invDen W)
   have hX : MvPowerSeries.constantCoeff (PowerSeries.X : PowerSeries R) = 0 :=
     PowerSeries.constantCoeff_X
@@ -123,20 +134,20 @@ theorem wAt_invSeries :
   have hw : MvPowerSeries.constantCoeff (formalW W) = 0 := constantCoeff_formalW W
   simp [hi, constantCoeff_wAt W hi, hw]
 
-theorem map_invDen {S : Type*} [CommRing S] (f : R →+* S) :
-    MvPowerSeries.map f (invDen W) = invDen (W.map f) := by
+theorem map_invDen {S : Type*} [CommRing S] (f : R →+* S)
+    : MvPowerSeries.map f (invDen W) = invDen (W.map f) := by
   have h : MvPowerSeries.map f (formalW W) = formalW (W.map f) := map_formalW W f
   simp only [invDen, map_sub, map_one, map_mul, h, PowerSeries.C_apply, MvPowerSeries.map_C,
     PowerSeries.X, MvPowerSeries.map_X, WeierstrassCurve.map_a₁, WeierstrassCurve.map_a₃]
 
-theorem map_invSeries {S : Type*} [CommRing S] (f : R →+* S) :
-    MvPowerSeries.map f (invSeries W) = invSeries (W.map f) := by
+theorem map_invSeries {S : Type*} [CommRing S] (f : R →+* S)
+    : MvPowerSeries.map f (invSeries W) = invSeries (W.map f) := by
   rw [invSeries, map_mul, map_neg, map_invOfUnit_one f (constantCoeff_invDen W), map_invDen,
     invSeries, PowerSeries.X, MvPowerSeries.map_X]
   rfl
 
-theorem subst_X_invSeries_of_isDomain [IsDomain R] (h2 : (2 : R) ≠ 0) :
-    MvPowerSeries.subst ![PowerSeries.X, invSeries W] (addSeries W) = (0 : PowerSeries R) := by
+theorem subst_X_invSeries_of_isDomain [IsDomain R] (h2 : (2 : R) ≠ 0)
+    : MvPowerSeries.subst ![PowerSeries.X, invSeries W] (addSeries W) = (0 : PowerSeries R) := by
   have hX : MvPowerSeries.constantCoeff (PowerSeries.X : PowerSeries R) = 0 :=
     PowerSeries.constantCoeff_X
   have hi := constantCoeff_invSeries W
@@ -144,14 +155,13 @@ theorem subst_X_invSeries_of_isDomain [IsDomain R] (h2 : (2 : R) ≠ 0) :
   set ψ := MvPowerSeries.substAlgHom (R := R) hab with hψdef
   have hψ : ∀ f, MvPowerSeries.subst ![PowerSeries.X, invSeries W] f = ψ f := fun f => by
     rw [hψdef, MvPowerSeries.coe_substAlgHom]
-  have ψX0 : ψ (MvPowerSeries.X 0) = PowerSeries.X := by
-    rw [← hψ, MvPowerSeries.subst_X hab]; rfl
-  have ψX1 : ψ (MvPowerSeries.X 1) = invSeries W := by
-    rw [← hψ, MvPowerSeries.subst_X hab]; rfl
-  have ψw : ∀ i, ψ (wAt W (MvPowerSeries.X i)) = wAt W (![PowerSeries.X, invSeries W] i) :=
-    fun i => by
-      rw [← hψ, wAt, GroundTheory.LocalField.FormalGroup.subst_powerSeries_subst
-        (PowerSeries.HasSubst.X i) hab, MvPowerSeries.subst_X hab, wAt]
+  have ψX0 : ψ (MvPowerSeries.X 0) = PowerSeries.X := by rw [← hψ, MvPowerSeries.subst_X hab]; rfl
+  have ψX1 : ψ (MvPowerSeries.X 1) = invSeries W := by rw [← hψ, MvPowerSeries.subst_X hab]; rfl
+  have ψw
+      : ∀ i, ψ (wAt W (MvPowerSeries.X i)) = wAt W (![PowerSeries.X, invSeries W] i) := fun i => by
+    rw [← hψ, wAt,
+      GroundTheory.LocalField.FormalGroup.subst_powerSeries_subst (PowerSeries.HasSubst.X i) hab,
+      MvPowerSeries.subst_X hab, wAt]
   set V := W.map (algebraMap R (PowerSeries R)) with hV
   set u : PowerSeries R := PowerSeries.X with hu
   set e := MvPowerSeries.invOfUnit (invDen W) 1 with he
@@ -181,19 +191,17 @@ theorem subst_X_invSeries_of_isDomain [IsDomain R] (h2 : (2 : R) ≠ 0) :
   have z₂ : zwPoly V (invSeries W) (-w * e) = 0 := by
     have := zwPoly_apply_wAt_X W ψ 1
     rwa [ψw, ψX1, Matrix.cons_val_one, Matrix.cons_val_fin_one, wAt_invSeries] at this
-  have hcub : ∀ t, zwPoly V t (l * t) =
-      t * (secantB V l * t ^ 2 + secantA V l n * t - l) := by
+  have hcub : ∀ t, zwPoly V t (l * t) = t * (secantB V l * t ^ 2 + secantA V l n * t - l) := by
     intro t; simp only [zwPoly, secantB, secantA, hn0]; ring
-  have q₁ : u * (secantB V l * u ^ 2 + secantA V l n * u - l) = 0 := by
-    rw [← hcub, hlu, z₁]
-  have q₂ : invSeries W * (secantB V l * invSeries W ^ 2 + secantA V l n * invSeries W - l) = 0 := by
+  have q₁ : u * (secantB V l * u ^ 2 + secantA V l n * u - l) = 0 := by rw [← hcub, hlu, z₁]
+  have q₂
+      : invSeries W * (secantB V l * invSeries W ^ 2 + secantA V l n * invSeries W - l) = 0 := by
     rw [← hcub, ← z₂]; congr 1; linear_combination -r₂ - hn0
   have hu0 : u ≠ 0 := PowerSeries.X_ne_zero
   have heu : IsUnit e := by
     refine MvPowerSeries.isUnit_iff_constantCoeff.2 ?_
     simp [he, MvPowerSeries.constantCoeff_invOfUnit]
-  have hu'0 : invSeries W ≠ 0 := by
-    rw [hu']; exact mul_ne_zero (neg_ne_zero.2 hu0) heu.ne_zero
+  have hu'0 : invSeries W ≠ 0 := by rw [hu']; exact mul_ne_zero (neg_ne_zero.2 hu0) heu.ne_zero
   have p₁ := (mul_eq_zero.1 q₁).resolve_left hu0
   have p₂ := (mul_eq_zero.1 q₂).resolve_left hu'0
   have hd : u - invSeries W ≠ 0 := by
@@ -215,13 +223,16 @@ theorem two_ne_zero_univ : (2 : MvPolynomial (Fin 5) ℤ) ≠ 0 := by
   rw [map_ofNat, map_zero] at this
   norm_num at this
 
-theorem subst_X_invSeries :
-    MvPowerSeries.subst ![PowerSeries.X, invSeries W] (addSeries W) = (0 : PowerSeries R) := by
-  have h := congrArg (MvPowerSeries.map (univMap W))
-    (subst_X_invSeries_of_isDomain univCurve two_ne_zero_univ)
-  have hX : MvPowerSeries.constantCoeff
-      (PowerSeries.X : PowerSeries (MvPolynomial (Fin 5) ℤ)) = 0 := PowerSeries.constantCoeff_X
-  have hab := GroundTheory.LocalField.FormalGroup.hasSubst_pair hX (constantCoeff_invSeries univCurve)
+theorem subst_X_invSeries
+    : MvPowerSeries.subst ![PowerSeries.X, invSeries W] (addSeries W) = (0 : PowerSeries R) := by
+  have h :=
+    congrArg (MvPowerSeries.map (univMap W))
+      (subst_X_invSeries_of_isDomain univCurve two_ne_zero_univ)
+  have hX
+      : MvPowerSeries.constantCoeff (PowerSeries.X : PowerSeries (MvPolynomial (Fin 5) ℤ)) = 0 :=
+    PowerSeries.constantCoeff_X
+  have hab :=
+    GroundTheory.LocalField.FormalGroup.hasSubst_pair hX (constantCoeff_invSeries univCurve)
   rw [MvPowerSeries.map_subst hab, map_zero] at h
   rw [← h, addSeries_eq_map]
   congr 1

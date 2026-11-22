@@ -28,16 +28,17 @@ def IsSelfDualLat (W : HSpace E) (L : Submodule (𝓞 E) W.V) : Prop :=
   Submodule.IsLattice E L ∧ Formalism.HermitianLatticesTheory.dual W.hT L = L
 
 def HasComplement (W : HSpace E) (x : W.V) (M' P' Q' : ℕ) : Prop :=
-  ∃ L : Submodule (𝓞 E) W.V, IsSelfDualLat W L ∧ x ∈ L ∧
-    L = Submodule.span (𝓞 E) {x} ⊔ perpLat W L x ∧
-    ∃ (W' : HSpace E) (ι : W'.V →ₗ[E] W.V), OfKind W' M' P' Q' ∧
-      HSpace.IsIsomEmb W' W ι ∧ LinearMap.range ι = perp W x ∧
-      W'.L0.map (ι.restrictScalars (𝓞 E)) = perpLat W L x
+  ∃ L : Submodule (𝓞 E) W.V,
+    IsSelfDualLat W L ∧ x ∈ L ∧ L = Submodule.span (𝓞 E) {x} ⊔ perpLat W L x
+      ∧ ∃ (W' : HSpace E) (ι : W'.V →ₗ[E] W.V),
+        OfKind W' M' P' Q' ∧ HSpace.IsIsomEmb W' W ι ∧ LinearMap.range ι = perp W x
+          ∧ W'.L0.map (ι.restrictScalars (𝓞 E)) = perpLat W L x
 
 def UnitVectorPerpOver (E : Type) [Field E] [NumberField E] [StarRing E] : Prop :=
-  ∀ (W : HSpace E) (M P Q : ℕ), OfKind W M P Q → 3 ≤ M →
-    (1 ≤ P → ∃ x : W.V, W.hD x x = 1 ∧ HasComplement W x (M - 1) (P - 1) Q) ∧
-    (1 ≤ Q → ∃ x : W.V, W.hD x x = -1 ∧ HasComplement W x (M - 1) P (Q - 1))
+  ∀ (W : HSpace E) (M P Q : ℕ),
+    OfKind W M P Q → 3 ≤ M
+      → (1 ≤ P → ∃ x : W.V, W.hD x x = 1 ∧ HasComplement W x (M - 1) (P - 1) Q)
+        ∧ (1 ≤ Q → ∃ x : W.V, W.hD x x = -1 ∧ HasComplement W x (M - 1) P (Q - 1))
 
 end Generic
 

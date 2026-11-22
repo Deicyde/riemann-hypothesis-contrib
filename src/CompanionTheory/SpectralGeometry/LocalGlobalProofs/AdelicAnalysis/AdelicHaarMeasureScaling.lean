@@ -38,11 +38,12 @@ lemma ι_mem (r : 𝓞 F) : ι r ∈ Oh F :=
 lemma ι_sub (r s : 𝓞 F) : ι r - ι s = ι (r - s) := by
   simp [ι]
 
-theorem mass_of_subgroup [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F))
-    (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1) (H : AddSubgroup (A F))
-    (hHo : IsOpen (H : Set (A F))) (hHs : ∀ x ∈ H, x ∈ Oh F) (I : Ideal (𝓞 F))
-    (hI : ∀ r : 𝓞 F, r ∈ I ↔ ι r ∈ H) (hI0 : I ≠ ⊥) :
-    lf (H : Set (A F)) = ((Ideal.absNorm I : ℝ≥0∞))⁻¹ := by
+theorem mass_of_subgroup
+    [MeasurableSpace (A F)] [BorelSpace (A F)]
+    (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1)
+    (H : AddSubgroup (A F)) (hHo : IsOpen (H : Set (A F))) (hHs : ∀ x ∈ H, x ∈ Oh F)
+    (I : Ideal (𝓞 F)) (hI : ∀ r : 𝓞 F, r ∈ I ↔ ι r ∈ H) (hI0 : I ≠ ⊥)
+    : lf (H : Set (A F)) = ((Ideal.absNorm I : ℝ≥0∞))⁻¹ := by
   obtain ⟨-, -, -, -, hOo, hd, hint, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   haveI : IsTopologicalRing (A F) := inferInstance
   have : Finite (𝓞 F ⧸ I) := Ideal.finiteQuotientOfFreeOfNeBot I hI0
@@ -53,7 +54,7 @@ theorem mass_of_subgroup [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measur
   have hCm : ∀ t, MeasurableSet (C t) := fun t =>
     ((hHo.preimage (continuous_id.sub continuous_const))).measurableSet
   have hCl : ∀ t, lf (C t) = lf (H : Set (A F)) := fun t => by
-    simpa [C, sub_eq_add_neg] using measure_preimage_add_right lf (-ι (rep t)) (H : Set (A F))
+    simpa [C, sub_eq_add_neg] using measure_preimage_add_right lf (- ι (rep t)) (H : Set (A F))
   have hdisj : Pairwise (Function.onFun Disjoint C) := by
     intro t t' htt
     refine Set.disjoint_left.2 fun x hx hx' => htt ?_
@@ -77,8 +78,7 @@ theorem mass_of_subgroup [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measur
         simpa using this
       obtain ⟨r, rfl⟩ := (hint f).1 hfO
       refine ⟨Ideal.Quotient.mk I r, ?_⟩
-      have h2 : rep (Ideal.Quotient.mk I r) - r ∈ I :=
-        Ideal.Quotient.eq.1 (hrep _)
+      have h2 : rep (Ideal.Quotient.mk I r) - r ∈ I := Ideal.Quotient.eq.1 (hrep _)
       have h3 := (hI _).1 h2
       rw [← ι_sub] at h3
       have h4 := H.neg_mem (H.add_mem hf h3)
@@ -99,8 +99,7 @@ theorem mass_of_subgroup [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measur
 lemma mul_mem_Oh {x y : A F} (hx : x ∈ Oh F) (hy : y ∈ Oh F) : x * y ∈ Oh F := fun v =>
   mul_mem (hx v) (hy v)
 
-def uF (c : F) (hc : c ≠ 0) : (A F)ˣ :=
-  Units.map (algebraMap F (A F)).toMonoidHom (Units.mk0 c hc)
+def uF (c : F) (hc : c ≠ 0) : (A F)ˣ := Units.map (algebraMap F (A F)).toMonoidHom (Units.mk0 c hc)
 
 lemma uF_val (c : F) (hc : c ≠ 0) : ((uF c hc : (A F)ˣ) : A F) = algebraMap F (A F) c := rfl
 
@@ -129,10 +128,12 @@ lemma isOpen_image_mul (a : (A F)ˣ) {s : Set (A F)} (hs : IsOpen s) :
   rw [h]
   exact hs.preimage (continuous_mulEquiv_symm a)
 
-theorem scale_unit [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F))
-    (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1) (a : (A F)ˣ) (s : Set (A F))
-    (hs : MeasurableSet s) :
-    lf ((fun x => (a : A F) * x) '' s) = lf ((fun x => (a : A F) * x) '' Oh F) * lf s := by
+theorem scale_unit
+    [MeasurableSpace (A F)] [BorelSpace (A F)]
+    (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1)
+    (a : (A F)ˣ)
+    (s : Set (A F)) (hs : MeasurableSet s)
+    : lf ((fun x => (a : A F) * x) '' s) = lf ((fun x => (a : A F) * x) '' Oh F) * lf s := by
   obtain ⟨hlc, hsc, ht2, -, hOo, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   have hμ : (lf.map (mulEquiv a).symm).IsAddHaarMeasure :=
     (mulEquiv a).symm.isAddHaarMeasure_map lf (continuous_mulEquiv_symm a) (continuous_mulEquiv a)
@@ -145,22 +146,26 @@ theorem scale_unit [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F
       simpa [mulEquiv] using hy
     · intro hx
       exact ⟨_, hx, (mulEquiv a).apply_symm_apply x⟩
-  have hval : ∀ t : Set (A F), MeasurableSet t →
-      lf ((fun x => (a : A F) * x) '' t) = (lf.map (mulEquiv a).symm) t := by
+  have hval
+      : ∀ t : Set (A F),
+        MeasurableSet t → lf ((fun x => (a : A F) * x) '' t) = (lf.map (mulEquiv a).symm) t := by
     intro t ht
     rw [Measure.map_apply hm ht, himg]
   obtain ⟨k, hk⟩ : ∃ k : ℝ≥0, lf.map (mulEquiv a).symm = k • lf :=
     ⟨_, Measure.isAddLeftInvariant_eq_smul (lf.map (mulEquiv a).symm) lf⟩
-  have hc : ∀ t : Set (A F), MeasurableSet t → lf ((fun x => (a : A F) * x) '' t) =
-      (k : ℝ≥0∞) * lf t := by
+  have hc
+      : ∀ t : Set (A F),
+        MeasurableSet t → lf ((fun x => (a : A F) * x) '' t) = (k : ℝ≥0∞) * lf t := by
     intro t ht
     rw [hval t ht, hk, Measure.smul_apply, ENNReal.smul_def, smul_eq_mul]
   rw [hc s hs, hc _ hOo.measurableSet, h1, mul_one]
 
-theorem mass_mul_int [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F))
-    (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1) (r : 𝓞 F) (hr : (r : F) ≠ 0) :
-    lf ((fun x => algebraMap F (A F) (r : F) * x) '' Oh F) =
-      (((Algebra.norm ℤ r).natAbs : ℝ≥0∞))⁻¹ := by
+theorem mass_mul_int
+    [MeasurableSpace (A F)] [BorelSpace (A F)]
+    (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1)
+    (r : 𝓞 F) (hr : (r : F) ≠ 0)
+    : lf ((fun x => algebraMap F (A F) (r : F) * x) '' Oh F)
+      = (((Algebra.norm ℤ r).natAbs : ℝ≥0∞))⁻¹ := by
   obtain ⟨-, -, -, -, hOo, -, hint, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
   have hr0 : r ≠ 0 := fun h => hr (by simp [h])
   let H : AddSubgroup (A F) := (OhSub F).map (AddMonoidHom.mulLeft (ι r))
@@ -184,8 +189,9 @@ theorem mass_mul_int [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A
       have hy' : y = algebraMap F (A F) ((s : F) / r) := by
         have hu : algebraMap F (A F) (r : F) * algebraMap F (A F) ((r : F)⁻¹) = 1 := by
           rw [← map_mul, mul_inv_cancel₀ hr, map_one]
-        calc y = (algebraMap F (A F) (r : F) * algebraMap F (A F) ((r : F)⁻¹)) * y := by
-              rw [hu, one_mul]
+        calc
+          y = (algebraMap F (A F) (r : F) * algebraMap F (A F) ((r : F)⁻¹)) * y := by
+            rw [hu, one_mul]
           _ = algebraMap F (A F) ((r : F)⁻¹) * (algebraMap F (A F) (r : F) * y) := by ring
           _ = _ := by rw [hys', ← map_mul, div_eq_mul_inv, mul_comm]
       rw [hy'] at hy
@@ -199,11 +205,9 @@ theorem mass_mul_int [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A
 
 def denSub (b : F) : AddSubgroup (A F) where
   carrier := {x | x ∈ Oh F ∧ algebraMap F (A F) b * x ∈ Oh F}
-  add_mem' := fun {x y} hx hy => ⟨add_mem_Oh hx.1 hy.1, by
-    rw [mul_add]; exact add_mem_Oh hx.2 hy.2⟩
+  add_mem' := fun {x y} hx hy => ⟨add_mem_Oh hx.1 hy.1, by rw [mul_add]; exact add_mem_Oh hx.2 hy.2⟩
   zero_mem' := ⟨zero_mem_Oh, by rw [mul_zero]; exact zero_mem_Oh⟩
-  neg_mem' := fun {x} hx => ⟨neg_mem_Oh hx.1, by
-    rw [mul_neg]; exact neg_mem_Oh hx.2⟩
+  neg_mem' := fun {x} hx => ⟨neg_mem_Oh hx.1, by rw [mul_neg]; exact neg_mem_Oh hx.2⟩
 
 lemma isOpen_denSub (b : F) : IsOpen (denSub b : Set (A F)) := by
   obtain ⟨-, -, -, -, hOo, -⟩ := GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F
@@ -254,17 +258,22 @@ lemma mem_denI_iff_sub (b : F) (r : 𝓞 F) : r ∈ denI b ↔ ι r ∈ denSub b
       rw [mul_comm, map_mul]; exact h
     exact (hint _).1 h'
 
-theorem mass_den [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F))
-    (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1) (b : F) :
-    lf {x | x ∈ Oh F ∧ algebraMap F (A F) b * x ∈ Oh F} = ((den b : ℝ≥0∞))⁻¹ :=
-  mass_of_subgroup lf hlf h1 (denSub b) (isOpen_denSub b) (fun _ hx => hx.1) (denI b)
-    (mem_denI_iff_sub b) (denI_ne_bot b)
+theorem mass_den
+    [MeasurableSpace (A F)] [BorelSpace (A F)]
+    (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1)
+    (b : F)
+    : lf {x | x ∈ Oh F ∧ algebraMap F (A F) b * x ∈ Oh F} = ((den b : ℝ≥0∞))⁻¹ :=
+  mass_of_subgroup lf hlf h1 (denSub b) (isOpen_denSub b)
+    (fun _ hx => hx.1)
+    (denI b) (mem_denI_iff_sub b) (denI_ne_bot b)
 
-theorem scale_field [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F))
-    (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1) (c : F) (hc : c ≠ 0) (s : Set (A F))
-    (hs : MeasurableSet s) :
-    lf ((fun x => algebraMap F (A F) c * x) '' s) =
-      ENNReal.ofReal (|((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹) * lf s := by
+theorem scale_field
+    [MeasurableSpace (A F)] [BorelSpace (A F)]
+    (lf : Measure (A F)) (hlf : lf.IsAddHaarMeasure) (h1 : lf (Oh F) = 1)
+    (c : F) (hc : c ≠ 0)
+    (s : Set (A F)) (hs : MeasurableSet s)
+    : lf ((fun x => algebraMap F (A F) c * x) '' s)
+      = ENNReal.ofReal (|((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹) * lf s := by
   have hOo := (GlobalTheory.T.mem_Oh_iff_and_nat_mul_properties F).2.2.2.2.1
   obtain ⟨x, y, hy, hxy⟩ := IsFractionRing.div_surjective (A := 𝓞 F) c
   have hxy' : (x : F) / (y : F) = c := hxy
@@ -275,13 +284,12 @@ theorem scale_field [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A 
     rw [h, zero_div] at hxy'
     exact hc hxy'.symm
   have hx0 : x ≠ 0 := fun h => hxF (by simp [h])
-  have hnx : (Algebra.norm ℤ x).natAbs ≠ 0 := by
-    simpa [Algebra.norm_eq_zero_iff] using hx0
-  have hny : (Algebra.norm ℤ y).natAbs ≠ 0 := by
-    simpa [Algebra.norm_eq_zero_iff] using hy0
-  have hcy : (fun z => algebraMap F (A F) (x : F) * z) '' Oh F =
-      (fun z => algebraMap F (A F) c * z) ''
-        ((fun z => algebraMap F (A F) (y : F) * z) '' Oh F) := by
+  have hnx : (Algebra.norm ℤ x).natAbs ≠ 0 := by simpa [Algebra.norm_eq_zero_iff] using hx0
+  have hny : (Algebra.norm ℤ y).natAbs ≠ 0 := by simpa [Algebra.norm_eq_zero_iff] using hy0
+  have hcy
+      : (fun z => algebraMap F (A F) (x : F) * z) '' Oh F
+        = (fun z => algebraMap F (A F) c * z)
+          '' ((fun z => algebraMap F (A F) (y : F) * z) '' Oh F) := by
     rw [Set.image_image]
     refine Set.image_congr fun z _ => ?_
     rw [← mul_assoc, ← map_mul, ← hxy']
@@ -292,24 +300,28 @@ theorem scale_field [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A 
   have h2 := scale_unit lf hlf h1 (uF c hc) _ hm
   simp only [uF_val] at h2
   rw [← hcy, mass_mul_int lf hlf h1 x hxF, mass_mul_int lf hlf h1 y hyF] at h2
-  have hφ : lf ((fun z => algebraMap F (A F) c * z) '' Oh F) =
-      ENNReal.ofReal (|((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹) := by
-    have hnorm : |((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹ =
-        ((Algebra.norm ℤ y).natAbs : ℝ) / ((Algebra.norm ℤ x).natAbs : ℝ) := by
+  have hφ
+      : lf ((fun z => algebraMap F (A F) c * z) '' Oh F)
+        = ENNReal.ofReal (|((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹) := by
+    have hnorm
+        : |((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹
+          = ((Algebra.norm ℤ y).natAbs : ℝ) / ((Algebra.norm ℤ x).natAbs : ℝ) := by
       have hmul : Algebra.norm ℚ c * Algebra.norm ℚ (y : F) = Algebra.norm ℚ (x : F) := by
         rw [← map_mul, ← hxy']
         congr 1
         field_simp
       rw [← Algebra.coe_norm_int, ← Algebra.coe_norm_int] at hmul
-      have hmulR : ((Algebra.norm ℚ c : ℚ) : ℝ) * ((Algebra.norm ℤ y : ℤ) : ℝ) =
-          ((Algebra.norm ℤ x : ℤ) : ℝ) := by
+      have hmulR
+          : ((Algebra.norm ℚ c : ℚ) : ℝ) * ((Algebra.norm ℤ y : ℤ) : ℝ)
+            = ((Algebra.norm ℤ x : ℤ) : ℝ) := by
         exact_mod_cast congrArg (fun q : ℚ => (q : ℝ)) hmul
       have hYp : (0 : ℝ) < ((Algebra.norm ℤ y).natAbs : ℝ) := by
         exact_mod_cast Nat.pos_of_ne_zero hny
       have hXp : (0 : ℝ) < ((Algebra.norm ℤ x).natAbs : ℝ) := by
         exact_mod_cast Nat.pos_of_ne_zero hnx
-      have habs : |((Algebra.norm ℚ c : ℚ) : ℝ)| * ((Algebra.norm ℤ y).natAbs : ℝ) =
-          ((Algebra.norm ℤ x).natAbs : ℝ) := by
+      have habs
+          : |((Algebra.norm ℚ c : ℚ) : ℝ)| * ((Algebra.norm ℤ y).natAbs : ℝ)
+            = ((Algebra.norm ℤ x).natAbs : ℝ) := by
         rw [Nat.cast_natAbs, Nat.cast_natAbs, Int.cast_abs, Int.cast_abs, ← abs_mul, hmulR]
       rw [← habs]
       have hC : |((Algebra.norm ℚ c : ℚ) : ℝ)| ≠ 0 := by
@@ -326,9 +338,26 @@ theorem scale_field [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A 
   simp only [uF_val] at h3
   rw [h3, hφ]
 
-theorem lf_scale : ∀ (F : Type) [Field F] [NumberField F], ∀ [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F)), lf.IsAddHaarMeasure → lf (Oh F) = 1 → (∀ (c : F), c ≠ 0 → ∀ s : Set (A F), MeasurableSet s → lf ((fun x => algebraMap F (A F) c * x) '' s) = ENNReal.ofReal (|((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹) * lf s) ∧ (∀ b : F, lf {x | x ∈ Oh F ∧ algebraMap F (A F) b * x ∈ Oh F} = ((den b : ℝ≥0∞))⁻¹) ∧ ∀ (a : (A F)ˣ) (s : Set (A F)), MeasurableSet s → lf ((fun x => (a : A F) * x) '' s) = lf ((fun x => (a : A F) * x) '' Oh F) * lf s := by
+theorem lf_scale
+    : ∀ (F : Type) [Field F] [NumberField F],
+      ∀ [MeasurableSpace (A F)] [BorelSpace (A F)] (lf : Measure (A F)),
+        lf.IsAddHaarMeasure → lf (Oh F) = 1
+          → (∀ (c : F),
+              c ≠ 0
+                → ∀ s : Set (A F),
+                  MeasurableSet s
+                    → lf ((fun x => algebraMap F (A F) c * x) '' s)
+                      = ENNReal.ofReal (|((Algebra.norm ℚ c : ℚ) : ℝ)|⁻¹) * lf s)
+            ∧ (∀ b : F, lf {x | x ∈ Oh F ∧ algebraMap F (A F) b * x ∈ Oh F} = ((den b : ℝ≥0∞))⁻¹)
+            ∧ ∀ (a : (A F)ˣ) (s : Set (A F)),
+              MeasurableSet s
+                → lf ((fun x => (a : A F) * x) '' s)
+                  = lf ((fun x => (a : A F) * x) '' Oh F) * lf s := by
   intro F _ _ _ _ lf hlf h1
-  exact ⟨fun c hc s hs => scale_field lf hlf h1 c hc s hs, fun b => mass_den lf hlf h1 b,
-    fun a s hs => scale_unit lf hlf h1 a s hs⟩
+  exact ⟨
+    fun c hc s hs => scale_field lf hlf h1 c hc s hs,
+    fun b => mass_den lf hlf h1 b,
+    fun a s hs => scale_unit lf hlf h1 a s hs
+  ⟩
 
 end GlobalTheory.CompanionTheory.SW.Core.Scale

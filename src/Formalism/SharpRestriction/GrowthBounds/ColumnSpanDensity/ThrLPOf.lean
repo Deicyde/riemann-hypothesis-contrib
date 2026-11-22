@@ -27,19 +27,20 @@ theorem thrLP_of (hO : RestOddTops) (K : Cst) (hK : K.Pos) : TransportedAlt K (F
   obtain ⟨-, -, -, -, -, -, hm, -, hb, -, -, -, -, -, -, -, -, -, -, -, -, -, hcs, -⟩ := h'
   have hd := dle_of hK hCH h B
   have hp := B.hp25
-  exact
-    { cst := hcs
-      bpos := hb
-      ppos := by exact_mod_cast (show (0 : ℝ) < X.p by linarith)
-      m2 := by omega
-      D1nn := D1nn_of hK B
-      four_depth_lt_conductor := four_depth_lt_conductor_of_bounds hd hcs
-      dle := hd
-      a8 := second_moment_of_columns hCH B
-      eps := eps_of hCH B
-      lowa := lowa_of B
-      lowb := lowb_of h
-      tle := fun aw bw hw => tle_of hO hK hC h B aw bw hw }
+  exact {
+    cst := hcs
+    bpos := hb
+    ppos := by exact_mod_cast (show (0 : ℝ) < X.p by linarith)
+    m2 := by omega
+    D1nn := D1nn_of hK B
+    four_depth_lt_conductor := four_depth_lt_conductor_of_bounds hd hcs
+    dle := hd
+    a8 := second_moment_of_columns hCH B
+    eps := eps_of hCH B
+    lowa := lowa_of B
+    lowb := lowb_of h
+    tle := fun aw bw hw => tle_of hO hK hC h B aw bw hw
+  }
 
 theorem thrLP (K : Cst) (hK : K.Pos) : TransportedAlt K (FactsLP K) := by
   exact thrLP_of restOddTops K hK

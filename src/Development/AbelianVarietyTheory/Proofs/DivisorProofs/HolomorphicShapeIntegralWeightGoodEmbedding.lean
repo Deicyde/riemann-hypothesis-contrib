@@ -7,16 +7,19 @@ public import Formalism.FormalDegreeBessel.FormalDegreeRatio.DSLowK
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
+open NumberField IsDedekindDomain MeasureTheory Matrix Formalism.BasicNotions Formalism.MainNotions
+  Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.MainNotions.StandardLattice Formalism.MainNotions.S Formalism.L2.Theta Formalism.L2.DIV
+  Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Lev Formalism.IndefR.Datum
+  Formalism.L2.Pj Formalism.IndefR.FWT Formalism.IndefR GlobalTheory.HolDict
 open scoped TensorProduct InnerProductSpace ContDiff
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.HolDict
 
-
 open Formalism.L2.NTheta in
-theorem lamAt_strictAnti {R : Ranks} (h : HCParam R) {n : ℕ} (hn : n = R.r) :
-    StrictAnti fun a : Fin n => lamAt h a := by
+theorem lamAt_strictAnti {R : Ranks} (h : HCParam R) {n : ℕ} (hn : n = R.r)
+    : StrictAnti fun a : Fin n => lamAt h a := by
   intro a b hab
   have h1 : (a : ℕ) < b := hab
   have h2 := b.2
@@ -28,10 +31,10 @@ theorem lamAt_strictAnti {R : Ranks} (h : HCParam R) {n : ℕ} (hn : n = R.r) :
   show lamAt h b < lamAt h a
   linarith
 
-
 open Formalism.L2.NTheta in
-theorem holPar_kapW_eq {R : Ranks} (h : HCParam R) {n p q : ℕ} (hn : n = R.r) (hpq : p + q = n) :
-    holPar p q (kapW h p q) = Finset.univ.image fun a : Fin n => (lamAt h a, decide ((a : ℕ) < p)) := by
+theorem holPar_kapW_eq {R : Ranks} (h : HCParam R) {n p q : ℕ} (hn : n = R.r) (hpq : p + q = n)
+    : holPar p q (kapW h p q)
+      = Finset.univ.image fun a : Fin n => (lamAt h a, decide ((a : ℕ) < p)) := by
   have ho : Odd (p + q) := by rw [hpq, hn]; exact odd_r R
   ext x
   simp only [holPar, Finset.mem_image, Finset.mem_univ, true_and, holEnt_kapW h p q ho]
@@ -45,11 +48,13 @@ theorem holPar_kapW_eq {R : Ranks} (h : HCParam R) {n p q : ℕ} (hn : n = R.r) 
     · refine ⟨Sum.inr ⟨a - p, by have := a.2; omega⟩, ?_⟩
       simp [ha, show p + ((a : ℕ) - p) = a by omega]
 
-
 open Formalism.L2.NTheta in
-theorem isEnum_holPar_kapW {R : Ranks} (h : HCParam R) {n p q : ℕ} (hn : n = R.r) (hpq : p + q = n)
-    {lam : Fin n → ℝ} {ε : Fin n → Bool} (he : IsEnum (holPar p q (kapW h p q)) lam ε) (a : Fin n) :
-    lam a = (lamAt h a : ℝ) ∧ ε a = decide ((a : ℕ) < p) := by
+theorem isEnum_holPar_kapW
+    {R : Ranks} (h : HCParam R)
+    {n p q : ℕ} (hn : n = R.r) (hpq : p + q = n)
+    {lam : Fin n → ℝ} {ε : Fin n → Bool} (he : IsEnum (holPar p q (kapW h p q)) lam ε)
+    (a : Fin n)
+    : lam a = (lamAt h a : ℝ) ∧ ε a = decide ((a : ℕ) < p) := by
   obtain ⟨hs, f, hf, hS⟩ := he
   rw [holPar_kapW_eq h hn hpq] at hS
   have hg := lamAt_strictAnti h hn
@@ -64,11 +69,15 @@ theorem isEnum_holPar_kapW {R : Ranks} (h : HCParam R) {n p q : ℕ} (hn : n = R
     exact ⟨b, hb⟩
   have m2 : ∀ a : Fin n, ∃ b, (f b, ε b) = (lamAt h a, decide ((a : ℕ) < p)) := fun a => by
     have : (lamAt h a, decide ((a : ℕ) < p)) ∈ Finset.univ.image fun a : Fin n => (f a, ε a) := by
-      rw [← hS]; exact Finset.mem_image_of_mem (fun a : Fin n => (lamAt h a, decide ((a : ℕ) < p))) (Finset.mem_univ a)
+      rw [← hS]
+      exact Finset.mem_image_of_mem
+        (fun a : Fin n => (lamAt h a, decide ((a : ℕ) < p)))
+        (Finset.mem_univ a)
     obtain ⟨b, -, hb⟩ := Finset.mem_image.1 this
     exact ⟨b, hb⟩
   have e : f = fun a : Fin n => lamAt h a := by
-    refine (StrictMono.range_inj hfs.dual_right hg.dual_right).1 ?_ |> fun e => funext fun a => congrFun e a
+    refine (StrictMono.range_inj hfs.dual_right hg.dual_right).1 ?_
+      |> fun e => funext fun a => congrFun e a
     ext x
     constructor
     · rintro ⟨a, rfl⟩
@@ -83,17 +92,29 @@ theorem isEnum_holPar_kapW {R : Ranks} (h : HCParam R) {n p q : ℕ} (hn : n = R
   obtain rfl : b = a := hg.injective (congrArg Prod.fst hb)
   exact (congrArg Prod.snd hb).symm
 
-theorem holShape_of_good : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type) (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL] (R : RealDat D A T.Q.c.F) (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)) (v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec), TieIn T R κ v₀ → ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), GoodEmb T.Q.c (res T σ) → HolShape (R.MW i σ) ∧ (∀ ρ, nNeg ((R.MW i σ).ε ρ) = (D.R.sigW ((i : ℕ) + 1)).2) ∧ ∃ w, WtIs (R.MW i σ) w := by
+theorem holShape_of_good
+    : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0 : Type)
+        (A : FamIn D.what₂.LL G Pl0 T0 D.R.m) (T : CoreJ D) [Algebra T.Q.c.F D.what₂.LL]
+        (R : RealDat D A T.Q.c.F) (κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1))
+        (v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec),
+      TieIn T R κ v₀
+        → ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ),
+          GoodEmb T.Q.c (res T σ)
+            → HolShape (R.MW i σ) ∧ (∀ ρ, nNeg ((R.MW i σ).ε ρ) = (D.R.sigW ((i : ℕ) + 1)).2)
+              ∧ ∃ w, WtIs (R.MW i σ) w := by
   intro D G _ _ Pl0 T0 A T _ R κ v₀ ht i σ hσ
-  have hs : ∀ ρ, (Wc D i).sig (tauE D ρ) = D.R.sigW ((i : ℕ) + 1) := fun ρ => D.sp.W_sigval _ (inR i).1 (inR i).2 _
+  have hs : ∀ ρ, (Wc D i).sig (tauE D ρ) = D.R.sigW ((i : ℕ) + 1) := fun ρ =>
+    D.sp.W_sigval _ (inR i).1 (inR i).2 _
   have hr : (D.R.sigW ((i : ℕ) + 1)).1 + (D.R.sigW ((i : ℕ) + 1)).2 = (Wc D i).rank := by
     have := D.R.m_add_three_le_k
     have hi := i.2
     rw [rank_Wc i]
     simp only [Ranks.sigW, Ranks.r]
     omega
-  have key : ∀ ρ a, (R.MW i σ).lam ρ a = (Formalism.L2.NTheta.lamAt (D.hc (lab σ ρ)) a : ℝ) ∧
-      (R.MW i σ).ε ρ a = decide ((a : ℕ) < (D.R.sigW ((i : ℕ) + 1)).1) := fun ρ a => by
+  have key
+      : ∀ ρ a,
+        (R.MW i σ).lam ρ a = (Formalism.L2.NTheta.lamAt (D.hc (lab σ ρ)) a : ℝ)
+          ∧ (R.MW i σ).ε ρ a = decide ((a : ℕ) < (D.R.sigW ((i : ℕ) + 1)).1) := fun ρ a => by
     have he := (R.MW i σ).enum ρ
     unfold Links.parAt at he
     rw [if_pos ((GlobalTheory.ConjReading.branch_of_pins T ht.alg ht.laws.pins σ ρ).1 hσ)] at he
@@ -112,6 +133,9 @@ theorem holShape_of_good : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 T0
   · rw [nNeg_shape (by omega) fun a => (key ρ a).2]
     omega
   · choose w hw using fun ρ a => Formalism.QuantumDeterminants.low_k_integrable_holds _ ((R.MW i σ).ε ρ) _ (hc ρ).2 a
-    exact ⟨fun ρ c => w ρ (revNeg ((R.MW i σ).ε ρ) (arr (nNeg ((R.MW i σ).ε ρ)) c)), fun ρ c => (hw ρ _).symm⟩
+    exact ⟨
+      fun ρ c => w ρ (revNeg ((R.MW i σ).ε ρ) (arr (nNeg ((R.MW i σ).ε ρ)) c)),
+      fun ρ c => (hw ρ _).symm
+    ⟩
 
 end GlobalTheory.HolDict

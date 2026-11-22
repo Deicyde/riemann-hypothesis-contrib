@@ -6,12 +6,15 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.CuspidalProjection PositivityTheory.Rg.Tf.Core UpperTheory.ConvolutionTheory.K
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.CuspidalSpectrum
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.CuspidalProjection PositivityTheory.Rg.Tf.Core
+  UpperTheory.ConvolutionTheory.K
 open scoped InnerProductSpace
 
-theorem UpperTheory.ConvolutionTheory.K.ropPc :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (G1 K n)) [μ.IsHaarMeasure] (f : CC K n),
+theorem UpperTheory.ConvolutionTheory.K.ropPc
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (G1 K n)) [μ.IsHaarMeasure]
+        (f : CC K n),
       Rop μ f ∘L Pc μ = Pc μ ∘L Rop μ f := by
   intro K _ _ n μ _ f
   have h : ∀ g : CC K n, ∀ v ∈ cuspidalL2 μ, Rop μ g v ∈ cuspidalL2 μ := by

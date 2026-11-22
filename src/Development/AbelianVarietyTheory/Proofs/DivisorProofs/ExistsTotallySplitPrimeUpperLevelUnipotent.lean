@@ -7,12 +7,14 @@ public import Development.AbelianVarietyTheory.Definitions.UpperBounds.FreeBallI
 
 @[expose] public section
 
-open NumberField Module ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
+open NumberField Module ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  GlobalTheory.IndefiniteRowSideFullHecke.FrameWeightGapBounds GlobalTheory.ShareOn
 
 namespace GlobalTheory.LevelSplit
 
-theorem primesOver_eq (E : Type) [Field E] [NumberField E] {g : ℕ} (hg : g.Prime) :
-    (Ideal.span {(g : ℤ)}).primesOver (𝓞 E) = {P : Ideal (𝓞 E) | P.IsPrime ∧ (g : 𝓞 E) ∈ P} := by
+theorem primesOver_eq (E : Type) [Field E] [NumberField E] {g : ℕ} (hg : g.Prime)
+    : (Ideal.span {(g : ℤ)}).primesOver (𝓞 E) = {P : Ideal (𝓞 E) | P.IsPrime ∧ (g : 𝓞 E) ∈ P} := by
   ext P
   simp only [Ideal.primesOver, Set.mem_setOf_eq]
   constructor
@@ -31,7 +33,16 @@ theorem primesOver_eq (E : Type) [Field E] [NumberField E] {g : ℕ} (hg : g.Pri
 
 end GlobalTheory.LevelSplit
 
-theorem GlobalTheory.levelHyp_totallySplit_unipotent : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (U C : Type) [Group U] [MulAction U C] (M : TwoLevels E r U C), LevelHyp M → ∃ g : ℕ, GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsTotallySplitPrime E g ∧ 3 * r < g ∧ ∀ c, ∀ β ∈ M.upper c, GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsUnipotentModOver (M.comp c).L' g β := by
+theorem GlobalTheory.levelHyp_totallySplit_unipotent
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (U C : Type) [Group U]
+        [MulAction U C] (M : TwoLevels E r U C),
+      LevelHyp M
+        → ∃ g : ℕ,
+          GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsTotallySplitPrime E g
+            ∧ 3 * r < g
+            ∧ ∀ c, ∀ β ∈ M.upper c,
+              GlobalTheory.IndefiniteRowSideFullHecke.SmallUnipotentElements.IsUnipotentModOver
+                (M.comp c).L' g β := by
   intro E _ _ _ r U C _ _ M hM
   obtain ⟨g, ⟨hg, hcard⟩, hgr, hU⟩ := hM
   have hset := GlobalTheory.LevelSplit.primesOver_eq E hg

@@ -4,4 +4,7 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnipotentCorrect
 
 @[expose] public section
 
-theorem cutoff_plain_and_smoothed : Formalism.FourierDecayAlt.U.StarBoundOfCutoffOperator ∧ Formalism.FourierDecayAlt.U.StarBoundOfTwoCutoffOperator := PI.UnitaryCorollaryDerivatives.unitary_corollary_both_forms
+theorem cutoff_plain_and_smoothed
+    : Formalism.FourierDecayAlt.U.StarBoundOfCutoffOperator
+      ∧ Formalism.FourierDecayAlt.U.StarBoundOfTwoCutoffOperator :=
+  PI.UnitaryCorollaryDerivatives.unitary_corollary_both_forms

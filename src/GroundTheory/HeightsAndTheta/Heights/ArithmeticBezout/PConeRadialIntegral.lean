@@ -38,8 +38,9 @@ theorem ConeRadialIntegral.proof : ConeRadialIntegral.Statement := by
         intro h
         exact absurd (lt_of_lt_of_le h hr) (not_lt.2 (norm_nonneg y))
       rw [hempty, measure_empty, max_eq_right hr, zero_pow h2m, ENNReal.ofReal_zero, zero_mul]
-    · have hset : (fun y : EuclideanSpace ℂ (Fin n) => ‖y‖) ⁻¹' Iio r ∩ C =
-          r • {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ y ∈ C} := by
+    · have hset
+          : (fun y : EuclideanSpace ℂ (Fin n) => ‖y‖) ⁻¹' Iio r ∩ C
+            = r • {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ y ∈ C} := by
         ext y
         simp only [mem_inter_iff, mem_preimage, mem_Iio, mem_smul_set, mem_ofPred_eq]
         constructor
@@ -50,7 +51,9 @@ theorem ConeRadialIntegral.proof : ConeRadialIntegral.Statement := by
         · rintro ⟨z, ⟨hz, hzC⟩, rfl⟩
           refine ⟨?_, hC z hzC r hr⟩
           rw [norm_smul, Real.norm_eq_abs, abs_of_pos hr]
-          calc r * ‖z‖ < r * 1 := mul_lt_mul_of_pos_left hz hr
+          calc
+            r * ‖z‖
+              < r * 1 := mul_lt_mul_of_pos_left hz hr
             _ = r := mul_one r
       rw [hset, Measure.hausdorffMeasure_smul₀ hd hr.ne', max_eq_left hr.le, ENNReal.smul_def,
         smul_eq_mul]
@@ -74,7 +77,8 @@ theorem ConeRadialIntegral.proof : ConeRadialIntegral.Statement := by
         ENNReal.ofReal_zero]
     · rw [max_eq_left hr.le, inter_comm, Ioi_inter_Iio]
       have hcont : Continuous (fun t : ℝ => 2 * (m : ℝ) * t ^ (2 * m - 1)) := by fun_prop
-      rw [← ofReal_integral_eq_lintegral_ofReal (hcont.integrableOn_Icc.mono_set Ioo_subset_Icc_self)]
+      rw [← ofReal_integral_eq_lintegral_ofReal (hcont.integrableOn_Icc.mono_set
+        Ioo_subset_Icc_self)]
       · rw [← integral_Ioc_eq_integral_Ioo, ← intervalIntegral.integral_of_le hr.le,
           intervalIntegral.integral_const_mul, integral_pow]
         congr 1
@@ -89,26 +93,27 @@ theorem ConeRadialIntegral.proof : ConeRadialIntegral.Statement := by
     ENNReal.mul_ne_top ENNReal.ofReal_ne_top hfin.ne
   have hνρ : ν = ρ := by
     refine Measure.ext_of_Ico' ν ρ (fun a b _ => ?_) (fun a b hab => ?_)
-    · exact ne_top_of_le_ne_top (by rw [hνIio b]; exact hfinG b)
-        (measure_mono Ico_subset_Iio_self)
+    · exact ne_top_of_le_ne_top (by rw [hνIio b]; exact hfinG b) (measure_mono Ico_subset_Iio_self)
     · have hsub : Iio a ⊆ Iio b := Iio_subset_Iio hab.le
       have hIco : Ico a b = Iio b \ Iio a := by
         ext t
         simp only [mem_Ico, mem_sdiff, mem_Iio, not_lt]
         tauto
-      rw [hIco, measure_sdiff hsub measurableSet_Iio.nullMeasurableSet (by rw [hνIio a]; exact hfinG a),
+      rw [hIco,
+        measure_sdiff hsub measurableSet_Iio.nullMeasurableSet (by rw [hνIio a]; exact hfinG a),
         measure_sdiff hsub measurableSet_Iio.nullMeasurableSet (by rw [hρIio a]; exact hfinG a),
         hνIio, hνIio, hρIio, hρIio]
-  calc ∫⁻ y in C, f ‖y‖ ∂(Measure.hausdorffMeasure d) = ∫⁻ r, f r ∂ν := by
-        rw [hν_def, lintegral_map hf continuous_norm.measurable]
+  calc
+    ∫⁻ y in C, f ‖y‖ ∂(Measure.hausdorffMeasure d)
+      = ∫⁻ r, f r ∂ν := by rw [hν_def, lintegral_map hf continuous_norm.measurable]
     _ = ∫⁻ r, f r ∂ρ := by rw [hνρ]
     _ = c * ∫⁻ r in Ioi 0, f r * D r := by
-        rw [hρ_def, lintegral_smul_measure, smul_eq_mul,
-          lintegral_withDensity_eq_lintegral_mul _ hDm hf]
-        congr 1
-        refine lintegral_congr fun r => ?_
-        simp only [Pi.mul_apply]
-        exact mul_comm _ _
+      rw [hρ_def, lintegral_smul_measure, smul_eq_mul,
+        lintegral_withDensity_eq_lintegral_mul _ hDm hf]
+      congr 1
+      refine lintegral_congr fun r => ?_
+      simp only [Pi.mul_apply]
+      exact mul_comm _ _
 
 end
 

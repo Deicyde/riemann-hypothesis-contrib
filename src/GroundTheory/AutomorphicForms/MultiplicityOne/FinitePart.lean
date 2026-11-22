@@ -31,8 +31,9 @@ def archType : UnitaryRep (ArchUnits K n) V₀ := (archRep σ).restrict V₀ hV�
 
 def homArch : Submodule ℂ (V₀ →L[ℂ] H) := (archType σ V₀ hV₀).intertwiners (archRep σ)
 
-theorem finProj_comp_mem_homArch (w : AdelicGLn.FiniteAdelicGL K n) {S : V₀ →L[ℂ] H}
-    (hS : S ∈ homArch σ V₀ hV₀) : σ (finProj K n w) ∘L S ∈ homArch σ V₀ hV₀ := by
+theorem finProj_comp_mem_homArch
+    (w : AdelicGLn.FiniteAdelicGL K n) {S : V₀ →L[ℂ] H} (hS : S ∈ homArch σ V₀ hV₀)
+    : σ (finProj K n w) ∘L S ∈ homArch σ V₀ hV₀ := by
   intro A v
   show σ (finProj K n w) (S (archType σ V₀ hV₀ A v)) = σ (archProj K n A) (σ (finProj K n w) (S v))
   rw [hS A v]
@@ -46,11 +47,16 @@ instance : AddCommGroup (HomSpace σ V₀ hV₀) := inferInstanceAs (AddCommGrou
 instance : Module ℂ (HomSpace σ V₀ hV₀) := inferInstanceAs (Module ℂ (homArch σ V₀ hV₀))
 
 def finRep : Representation ℂ (AdelicGLn.FiniteAdelicGL K n) (HomSpace σ V₀ hV₀) where
-  toFun w :=
-    { toFun := fun S => (⟨σ (finProj K n w) ∘L (S : homArch σ V₀ hV₀).1,
-        finProj_comp_mem_homArch σ V₀ hV₀ w (S : homArch σ V₀ hV₀).2⟩ : homArch σ V₀ hV₀)
-      map_add' := fun S S' => Subtype.ext (ContinuousLinearMap.comp_add _ _ _)
-      map_smul' := fun c S => Subtype.ext (ContinuousLinearMap.comp_smul _ _ _) }
+  toFun w := {
+    toFun := fun S =>
+      (⟨
+         σ (finProj K n w) ∘L (S : homArch σ V₀ hV₀).1,
+         finProj_comp_mem_homArch σ V₀ hV₀ w (S : homArch σ V₀ hV₀).2
+       ⟩
+        : homArch σ V₀ hV₀)
+    map_add' := fun S S' => Subtype.ext (ContinuousLinearMap.comp_add _ _ _)
+    map_smul' := fun c S => Subtype.ext (ContinuousLinearMap.comp_smul _ _ _)
+  }
   map_one' := by
     refine LinearMap.ext fun S => Subtype.ext ?_
     show σ (finProj K n 1) ∘L (S : homArch σ V₀ hV₀).1 = (S : homArch σ V₀ hV₀).1
@@ -66,7 +72,6 @@ section Admissible
 
 variable {σ V₀}
 variable {U₀ : Subgroup (AdelicGLn.FiniteAdelicGL K n)} (hV₀U : V₀ ≤ fixedSubspace σ U₀)
-
 
 variable {μ : Measure (normOneGL (K := K) (n := n))} [μ.IsHaarMeasure]
 

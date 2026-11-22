@@ -13,9 +13,11 @@ open GlobalTheory.HTW Formalism.BasicNotions Formalism.FrobeniusOrbits
 
 namespace GlobalTheory.HTW
 
-theorem mul_small_le_bHat {D : D7} (L : SizeData₂ D) (C C' : ℝ) (j : ℕ) (hR : Roomy L C') (hC : 0 ≤ C)
-    (hCC : 2 * C ≤ C') (hj : 2 * j + 2 ≤ D.host.Lw) :
-    C * ((j : ℝ) + 1) * (((wHat D + sHat L + etaHat L : ℕ) : ℝ) + 1) ≤ (bHat L : ℝ) := by
+theorem mul_small_le_bHat
+    {D : D7} (L : SizeData₂ D)
+    (C C' : ℝ) (j : ℕ)
+    (hR : Roomy L C') (hC : 0 ≤ C) (hCC : 2 * C ≤ C') (hj : 2 * j + 2 ≤ D.host.Lw)
+    : C * ((j : ℝ) + 1) * (((wHat D + sHat L + etaHat L : ℕ) : ℝ) + 1) ≤ (bHat L : ℝ) := by
   have hlow := (GlobalTheory.T.roundedSizeBound_window L C' hR).1
   obtain ⟨-, hw2, hG⟩ := GlobalTheory.T.maxNonThickSizeShifted_value_and_bounds L C' hR
   obtain ⟨h100, -, -, -, -, hbig⟩ := hR
@@ -28,8 +30,9 @@ theorem mul_small_le_bHat {D : D7} (L : SizeData₂ D) (C C' : ℝ) (j : ℕ) (h
   have hjL : ((j : ℝ) + 1) * 2 ≤ (D.host.Lw : ℝ) := by exact_mod_cast hjN
   have hj0 : (0 : ℝ) ≤ (j : ℝ) + 1 := by positivity
   push_cast
-  have s1 : C * ((j : ℝ) + 1) * ((wHat D : ℝ) + sHat L + etaHat L + 1)
-      ≤ C * ((j : ℝ) + 1) * (2 * L.sc.b') :=
+  have s1
+      : C * ((j : ℝ) + 1) * ((wHat D : ℝ) + sHat L + etaHat L + 1)
+        ≤ C * ((j : ℝ) + 1) * (2 * L.sc.b') :=
     mul_le_mul_of_nonneg_left hG (mul_nonneg hC hj0)
   have s2 : C * ((j : ℝ) + 1) * (2 * L.sc.b') ≤ C' * ((j : ℝ) + 1) * L.sc.b' := by
     have := mul_le_mul_of_nonneg_right hCC (mul_nonneg hj0 hb0)

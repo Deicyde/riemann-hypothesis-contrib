@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlTower
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology PowerSeries.WithPiTopology
 set_option synthInstance.maxHeartbeats 400000
 set_option maxHeartbeats 1600000
@@ -17,13 +18,16 @@ noncomputable section
 
 namespace GlobalTheory.WeakClosed
 
-theorem lt_of_mem_span_pow {l : ℕ} [Fact l.Prime] (ϖ : OCb l) (hϖ : ¬ IsUnit ϖ)
-    (hdiv : ∀ a : OCb l, a ≠ 0 → ∃ m : ℕ, a ∣ ϖ ^ m) (c : Cb l) (hc : c ≠ 0) :
-    ∃ m : ℕ, ∀ x ∈ Ideal.span {ϖ ^ m},
+theorem lt_of_mem_span_pow
+    {l : ℕ} [Fact l.Prime]
+    (ϖ : OCb l) (hϖ : ¬ IsUnit ϖ) (hdiv : ∀ a : OCb l, a ≠ 0 → ∃ m : ℕ, a ∣ ϖ ^ m)
+    (c : Cb l) (hc : c ≠ 0)
+    : ∃ m : ℕ, ∀ x ∈ Ideal.span {ϖ ^ m},
       (cbValued l).v (algebraMap (OCb l) (Cb l) x) < (cbValued l).v c := by
   letI := cbValued l
-  have hle : ∀ x y : Cb l, Valued.v x ≤ Valued.v y ↔
-      ∃ e : OCb l, algebraMap (OCb l) (Cb l) e * y = x := by
+  have hle
+      : ∀ x y : Cb l,
+        Valued.v x ≤ Valued.v y ↔ ∃ e : OCb l, algebraMap (OCb l) (Cb l) e * y = x := by
     intro x y
     change (∃ e : OCb l, e • y = x) ↔ _
     simp only [Algebra.smul_def]
@@ -49,11 +53,12 @@ theorem lt_of_mem_span_pow {l : ℕ} [Fact l.Prime] (ϖ : OCb l) (hϖ : ¬ IsUni
   · exact absurd h ha
   · exact isUnit_iff_exists_inv.2 ⟨e * t * d * b, (sub_eq_zero.1 h).symm⟩
 
-theorem weakly_small : ∀ {l : ℕ} [Fact l.Prime] (ϖ : OCb l), ¬ IsUnit ϖ →
-    (∀ a : OCb l, a ≠ 0 → ∃ m : ℕ, a ∣ ϖ ^ m) →
-      (letI := wTop l
-       ∀ U ∈ 𝓝 (0 : WCb l), ∃ N m : ℕ, ∀ w : Ainf l,
-         (∀ n < N, w.coeff n ∈ Ideal.span {ϖ ^ m}) → inclW l w ∈ U) := by
+theorem weakly_small
+    : ∀ {l : ℕ} [Fact l.Prime] (ϖ : OCb l),
+      ¬ IsUnit ϖ → (∀ a : OCb l, a ≠ 0 → ∃ m : ℕ, a ∣ ϖ ^ m)
+        → (letI := wTop l
+           ∀ U ∈ 𝓝 (0 : WCb l), ∃ N m : ℕ, ∀ w : Ainf l,
+             (∀ n < N, w.coeff n ∈ Ideal.span {ϖ ^ m}) → inclW l w ∈ U) := by
   intro l _ ϖ hϖ hdiv
   letI := wTop l
   letI := cbTop l

@@ -15,15 +15,18 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.Bijective
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Topology
 
 namespace GlobalTheory.ContinuousQuotient
 
-theorem exists_prime_of_not_dvd {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A]
-    [IsIntegrallyClosed A] {a b : A} (hb : b ≠ 0) (h : ¬ b ∣ a) :
-    ∃ p : Ideal A, p.IsPrime ∧ ∃ s r : A, s ∉ p ∧ r ∈ p ∧ b * s = a * r := by
+theorem exists_prime_of_not_dvd
+    {A : Type*} [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsIntegrallyClosed A]
+    {a b : A} (hb : b ≠ 0) (h : ¬ b ∣ a)
+    : ∃ p : Ideal A, p.IsPrime ∧ ∃ s r : A, s ∉ p ∧ r ∈ p ∧ b * s = a * r := by
   classical
   set I : Ideal A := Ideal.span {b} with hI
   have hmk : ∀ r x : A, r • (Ideal.Quotient.mk I x) = Ideal.Quotient.mk I (r * x) := fun r x => by
@@ -35,8 +38,9 @@ theorem exists_prime_of_not_dvd {A : Type*} [CommRing A] [IsDomain A] [IsNoether
   have hJ : ∀ x r : A, r ∈ J x ↔ b ∣ r * x := fun x r => by
     simp only [J, Submodule.mem_comap, LinearMap.mulRight_apply, hI, Ideal.mem_span_singleton]
 
-  obtain ⟨P, ⟨c, hc, hac, rfl⟩, hmaxP⟩ := (set_has_maximal_iff_noetherian (R := A) (M := A)).2 inferInstance
-    {P | ∃ x, ¬ b ∣ x ∧ J a ≤ J x ∧ P = J x} ⟨J a, a, h, le_rfl, rfl⟩
+  obtain ⟨P, ⟨c, hc, hac, rfl⟩, hmaxP⟩ :=
+    (set_has_maximal_iff_noetherian (R := A) (M := A)).2 inferInstance
+      {P | ∃ x, ¬ b ∣ x ∧ J a ≤ J x ∧ P = J x} ⟨J a, a, h, le_rfl, rfl⟩
   have hp : (J c).IsPrime := by
     refine ⟨fun ht => hc (by simpa using (hJ c 1).1 ((Ideal.eq_top_iff_one _).1 ht)), ?_⟩
     intro r s hrs
@@ -45,7 +49,8 @@ theorem exists_prime_of_not_dvd {A : Type*} [CommRing A] [IsDomain A] [IsNoether
     obtain ⟨hr, hs⟩ := hno
     have hle' : J c ≤ J (r * c) := fun t ht => by
       obtain ⟨k, hk⟩ := (hJ c t).1 ht
-      exact (hJ _ t).2 ⟨r * k, by rw [← _root_.mul_assoc, _root_.mul_comm t r, _root_.mul_assoc, hk]; ring⟩
+      exact (hJ _ t).2
+        ⟨r * k, by rw [← _root_.mul_assoc, _root_.mul_comm t r, _root_.mul_assoc, hk]; ring⟩
     have hrc : ¬ b ∣ r * c := fun hd => hr ((hJ c r).2 hd)
     have heq : J c = J (r * c) := by
       by_contra hne
@@ -82,7 +87,8 @@ theorem exists_prime_of_not_dvd {A : Type*} [CommRing A] [IsDomain A] [IsNoether
         exact hne q w hq hwp hw.symm
       refine ⟨w, hwp, ?_⟩
       simp only [Algebra.linearMap_apply, smul_eq_mul, y]
-      rw [div_mul_eq_mul_div, eq_div_iff hb', ← map_mul, ← map_mul, _root_.mul_comm w b, ← hw, _root_.mul_comm]
+      rw [div_mul_eq_mul_div, eq_div_iff hb', ← map_mul, ← map_mul, _root_.mul_comm w b, ← hw,
+        _root_.mul_comm]
     obtain ⟨z, hz'⟩ := IsIntegrallyClosed.isIntegral_iff.1 hint
     have hbc : b * z = c := by
       apply IsFractionRing.injective A K
@@ -102,7 +108,9 @@ theorem exists_prime_of_not_dvd {A : Type*} [CommRing A] [IsDomain A] [IsNoether
       obtain ⟨v, hv⟩ := (hpc x).1 hx
       have hwx : w * x = v * q := by
         apply mul_left_cancel₀ hb
-        calc b * (w * x) = (b * w) * x := by ring
+        calc
+          b * (w * x)
+            = (b * w) * x := by ring
           _ = b * v * q := by rw [hbw, _root_.mul_assoc, _root_.mul_comm c x, hv]; ring
           _ = b * (v * q) := by ring
       obtain ⟨u, hu⟩ := IsLocalization.map_units R (⟨w, hw⟩ : p.primeCompl)
@@ -134,9 +142,11 @@ theorem exists_prime_of_not_dvd {A : Type*} [CommRing A] [IsDomain A] [IsNoether
     have e' : b * r = a * s := hinj e
     exact absurd (hla s ⟨r, by rw [_root_.mul_comm (s : A) a, e']⟩) hs
 
-private theorem valAt'_ne_zero_iff_top_le_preimage_basicOpen {X : Scheme.{0}} (x : Sp ℂ ⟶ X) {U : X.Opens}
-    (h : ⊤ ≤ x ⁻¹ᵁ U) (f : Γ(X, U)) : valAt' x U f ≠ 0 ↔ ⊤ ≤ x ⁻¹ᵁ X.basicOpen f := by
-  have hv : valAt' x U f = (Scheme.ΓSpecIso (CommRingCat.of ℂ)).hom.hom ((x.appLE U ⊤ h).hom f) := by
+private theorem valAt'_ne_zero_iff_top_le_preimage_basicOpen
+    {X : Scheme.{0}} (x : Sp ℂ ⟶ X) {U : X.Opens} (h : ⊤ ≤ x ⁻¹ᵁ U) (f : Γ(X, U))
+    : valAt' x U f ≠ 0 ↔ ⊤ ≤ x ⁻¹ᵁ X.basicOpen f := by
+  have hv
+      : valAt' x U f = (Scheme.ΓSpecIso (CommRingCat.of ℂ)).hom.hom ((x.appLE U ⊤ h).hom f) := by
     simp only [valAt', dif_pos h, valAt]
   have hb : x ⁻¹ᵁ X.basicOpen f = (Sp ℂ).basicOpen ((x.appLE U ⊤ h).hom f) := by
     rw [Scheme.preimage_basicOpen]
@@ -159,14 +169,17 @@ private theorem valAt'_ne_zero_iff_top_le_preimage_basicOpen {X : Scheme.{0}} (x
     obtain ⟨pt⟩ : Nonempty (Sp ℂ) := inferInstance
     exact (h1 (show pt ∈ (⊤ : (Sp ℂ).Opens) from trivial)).elim
 
-private theorem valAt'_mul_of_top_le_preimage_open {X : Scheme.{0}} (x : Sp ℂ ⟶ X) {U : X.Opens}
-    (h : ⊤ ≤ x ⁻¹ᵁ U) (f f' : Γ(X, U)) : valAt' x U (f * f') = valAt' x U f * valAt' x U f' := by
+private theorem valAt'_mul_of_top_le_preimage_open
+    {X : Scheme.{0}} (x : Sp ℂ ⟶ X) {U : X.Opens} (h : ⊤ ≤ x ⁻¹ᵁ U) (f f' : Γ(X, U))
+    : valAt' x U (f * f') = valAt' x U f * valAt' x U f' := by
   simp only [valAt', dif_pos h, valAt, map_mul]
 
-theorem exists_point_of_prime (X : Over (Sp ℂ)) [LocallyOfFiniteType X.hom] {U : X.left.Opens}
-    (hU : IsAffineOpen U) (p : Ideal Γ(X.left, U)) [p.IsPrime] {s : Γ(X.left, U)} (hs : s ∉ p) :
-    ∃ x : 𝟙_ (Over (Sp ℂ)) ⟶ X, ⊤ ≤ x.left ⁻¹ᵁ U ∧ valAt' x.left U s ≠ 0 ∧
-      ∀ r ∈ p, valAt' x.left U r = 0 := by
+theorem exists_point_of_prime
+    (X : Over (Sp ℂ)) [LocallyOfFiniteType X.hom]
+    {U : X.left.Opens} (hU : IsAffineOpen U) (p : Ideal Γ(X.left, U)) [p.IsPrime]
+    {s : Γ(X.left, U)} (hs : s ∉ p)
+    : ∃ x : 𝟙_ (Over (Sp ℂ)) ⟶ X,
+      ⊤ ≤ x.left ⁻¹ᵁ U ∧ valAt' x.left U s ≠ 0 ∧ ∀ r ∈ p, valAt' x.left U r = 0 := by
   classical
   have hle : U ≤ X.hom ⁻¹ᵁ ⊤ := by simp
   let φ : ℂ →+* Γ(X.left, U) :=
@@ -211,8 +224,8 @@ theorem exists_point_of_prime (X : Over (Sp ℂ)) [LocallyOfFiniteType X.hom] {U
 
 variable {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g)
 
-theorem dense_preimage (W : A.left.Opens) (hW : ∃ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ W) :
-    Dense {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ W} := by
+theorem dense_preimage (W : A.left.Opens) (hW : ∃ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ W)
+    : Dense {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ W} := by
   classical
   set V : Set (Fin g → ℂ) := {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ W} with hVdef
   obtain ⟨pt⟩ : Nonempty (Sp ℂ) := inferInstance
@@ -240,8 +253,9 @@ theorem dense_preimage (W : A.left.Opens) (hW : ∃ z, ⊤ ≤ (u.ex z).left ⁻
   rw [isClosed_closure.frontier_eq] at hzs
   obtain ⟨hzsF, hzsi⟩ := hzs
 
-  obtain ⟨U0, hU0a, hxU0, -⟩ := TopologicalSpace.Opens.isBasis_iff_nbhd.1 (Scheme.isBasis_affineOpens A.left)
-    (show (u.ex zs).left.base pt ∈ (⊤ : A.left.Opens) from trivial)
+  obtain ⟨U0, hU0a, hxU0, -⟩ :=
+    TopologicalSpace.Opens.isBasis_iff_nbhd.1 (Scheme.isBasis_affineOpens A.left)
+      (show (u.ex zs).left.base pt ∈ (⊤ : A.left.Opens) from trivial)
   have hU0 : IsAffineOpen U0 := hU0a
   have hV0o : IsOpen {z : Fin g → ℂ | ⊤ ≤ (u.ex z).left ⁻¹ᵁ U0} := (u.8 U0 0).1
   obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.1 hV0o zs ((hpt _ _ _).2 hxU0)
@@ -251,8 +265,8 @@ theorem dense_preimage (W : A.left.Opens) (hW : ∃ z, ⊤ ≤ (u.ex z).left ⁻
     by_contra hno
     push Not at hno
     exact hzsi (mem_interior.2 ⟨Metric.ball zs ε, hno, Metric.isOpen_ball, Metric.mem_ball_self hε⟩)
-  obtain ⟨δ, hδ, hδb⟩ := Metric.isOpen_iff.1
-    (isClosed_closure.isOpen_compl.inter Metric.isOpen_ball) z0 ⟨hz0F, hz0b⟩
+  obtain ⟨δ, hδ, hδb⟩ :=
+    Metric.isOpen_iff.1 (isClosed_closure.isOpen_compl.inter Metric.isOpen_ball) z0 ⟨hz0F, hz0b⟩
 
   have hx1 : (u.ex z1).left.base pt ∈ W ⊓ U0 := ⟨(hpt _ _ _).1 hz1V, (hpt _ _ _).1 (hball hz1b)⟩
   obtain ⟨f, hfW, hf1⟩ := hU0.exists_basicOpen_le (V := W ⊓ U0) ⟨_, hx1⟩ hx1.2
@@ -282,20 +296,21 @@ theorem dense_preimage (W : A.left.Opens) (hW : ∃ z, ⊤ ≤ (u.ex z).left ⁻
   have hℓ1 : ℓ 1 = z1 := by simp [ℓ]
   have h0T : (0 : ℂ) ∈ T := by
     change ℓ 0 ∈ Metric.ball zs ε
-    rw [hℓ0]; exact hz0b
+    rw [hℓ0]
+    exact hz0b
   let h : ℂ → ℂ := fun t => valAt' (u.ex (ℓ t)).left U0 f
-  have hd : DifferentiableOn ℂ h T :=
-    (u.8 U0 f).2.comp hℓd.differentiableOn (fun t ht => hball ht)
+  have hd : DifferentiableOn ℂ h T := (u.8 U0 f).2.comp hℓd.differentiableOn (fun t ht => hball ht)
   have hev : h =ᶠ[nhds 0] 0 := by
     have hmem : ℓ ⁻¹' Metric.ball z0 δ ∈ nhds (0 : ℂ) :=
       hℓd.continuous.continuousAt.preimage_mem_nhds (by rw [hℓ0]; exact Metric.ball_mem_nhds z0 hδ)
     filter_upwards [hmem] with t ht
     exact hf0 _ ht
-  have hzero := (hd.analyticOnNhd hTo).eqOn_zero_of_preconnected_of_eventuallyEq_zero
-    hTc.isPreconnected h0T hev
+  have hzero :=
+    (hd.analyticOnNhd hTo).eqOn_zero_of_preconnected_of_eventuallyEq_zero hTc.isPreconnected h0T hev
   have h1T : (1 : ℂ) ∈ T := by
     change ℓ 1 ∈ Metric.ball zs ε
-    rw [hℓ1]; exact hz1b
+    rw [hℓ1]
+    exact hz1b
   apply hf1'
   have := hzero h1T
   simp only [h, hℓ1, Pi.zero_apply] at this
@@ -305,10 +320,13 @@ end GlobalTheory.ContinuousQuotient
 
 namespace GlobalTheory
 
-
 open ContinuousQuotient in
-theorem exists_eq_mul_of_continuousOn_quotient :
-    ∀ (P : Out.PolAV (Sp ℂ)) (L : LB P.A.left) (u : HolUnif P.A L P.g) (U : P.A.left.Opens) (a b : Γ(P.A.left, U)) (φ : (Fin P.g → ℂ) → ℂ), Out.Laws → IsAffineOpen U → b ≠ 0 → ContinuousOn φ {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ U} → (∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ U → valAt' (u.ex z).left U a = φ z * valAt' (u.ex z).left U b) → ∃ c : Γ(P.A.left, U), a = c * b := by
+theorem exists_eq_mul_of_continuousOn_quotient
+    : ∀ (P : Out.PolAV (Sp ℂ)) (L : LB P.A.left) (u : HolUnif P.A L P.g) (U : P.A.left.Opens)
+        (a b : Γ(P.A.left, U)) (φ : (Fin P.g → ℂ) → ℂ),
+      Out.Laws → IsAffineOpen U → b ≠ 0 → ContinuousOn φ {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ U}
+        → (∀ z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ U → valAt' (u.ex z).left U a = φ z * valAt' (u.ex z).left U b)
+        → ∃ c : Γ(P.A.left, U), a = c * b := by
   intro P L u U a b φ _ hU hb hφc hφ
   classical
   have hsm : Smooth P.A.hom := P.5.smooth
@@ -326,8 +344,7 @@ theorem exists_eq_mul_of_continuousOn_quotient :
   have : IsIntegrallyClosed Γ(P.A.left, U) := by
     refine IsIntegrallyClosed.of_localization_maximal fun q _ hqm => ?_
     let y : PrimeSpectrum Γ(P.A.left, U) := ⟨q, hqm.isPrime⟩
-    have hy : hU.fromSpec y ∈ U := by
-      rw [← SetLike.mem_coe, ← hU.range_fromSpec]; exact ⟨y, rfl⟩
+    have hy : hU.fromSpec y ∈ U := by rw [← SetLike.mem_coe, ← hU.range_fromSpec]; exact ⟨y, rfl⟩
     letI := TopCat.Presheaf.algebra_section_stalk P.A.left.presheaf ⟨hU.fromSpec y, hy⟩
     have : IsLocalization.AtPrime (P.A.left.presheaf.stalk (hU.fromSpec y)) q :=
       hU.isLocalization_stalk' y hy
@@ -335,8 +352,9 @@ theorem exists_eq_mul_of_continuousOn_quotient :
     exact IsIntegrallyClosed.of_equiv (IsLocalization.algEquiv q.primeCompl
       (P.A.left.presheaf.stalk (hU.fromSpec y)) (Localization.AtPrime q)).toRingEquiv
   by_contra hnd
-  obtain ⟨p, hp, s, r, hs, hr, hbs⟩ := ContinuousQuotient.exists_prime_of_not_dvd (a := a) hb
-    (by rintro ⟨c, hc⟩; exact hnd ⟨c, by rw [hc, _root_.mul_comm]⟩)
+  obtain ⟨p, hp, s, r, hs, hr, hbs⟩ :=
+    ContinuousQuotient.exists_prime_of_not_dvd (a := a) hb
+      (by rintro ⟨c, hc⟩; exact hnd ⟨c, by rw [hc, _root_.mul_comm]⟩)
   have hr0 : r ≠ 0 := by
     rintro rfl
     apply hs
@@ -348,11 +366,13 @@ theorem exists_eq_mul_of_continuousOn_quotient :
   obtain ⟨x, hxU, hxs, hxp⟩ := ContinuousQuotient.exists_point_of_prime P.A hU p hs
   obtain ⟨z₀, hz₀⟩ := u.3 x
 
-  obtain ⟨y, hyU, hyrb, -⟩ := ContinuousQuotient.exists_point_of_prime P.A hU ⊥ (s := r * b)
-    (by rw [Ideal.mem_bot]; exact mul_ne_zero hr0 hb)
+  obtain ⟨y, hyU, hyrb, -⟩ :=
+    ContinuousQuotient.exists_point_of_prime P.A hU ⊥ (s := r * b)
+      (by rw [Ideal.mem_bot]; exact mul_ne_zero hr0 hb)
   obtain ⟨z₁, hz₁⟩ := u.3 y
-  have hD := ContinuousQuotient.dense_preimage u (P.A.left.basicOpen (r * b))
-    ⟨z₁, by rw [hz₁]; exact (valAt'_ne_zero_iff_top_le_preimage_basicOpen y.left hyU _).1 hyrb⟩
+  have hD :=
+    ContinuousQuotient.dense_preimage u (P.A.left.basicOpen (r * b))
+      ⟨z₁, by rw [hz₁]; exact (valAt'_ne_zero_iff_top_le_preimage_basicOpen y.left hyU _).1 hyrb⟩
   set O : Set (Fin P.g → ℂ) := {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ U} with hO
   set D : Set (Fin P.g → ℂ) := {z | ⊤ ≤ (u.ex z).left ⁻¹ᵁ P.A.left.basicOpen (r * b)} with hDdef
   have hOo : IsOpen O := (u.8 U s).1
@@ -360,9 +380,9 @@ theorem exists_eq_mul_of_continuousOn_quotient :
     hz.trans (Scheme.Hom.preimage_mono _ (P.A.left.basicOpen_le (r * b)))
   have hz₀O : z₀ ∈ O := by
     change ⊤ ≤ (u.ex z₀).left ⁻¹ᵁ U
-    rw [hz₀]; exact hxU
-  let G : (Fin P.g → ℂ) → ℂ := fun z =>
-    valAt' (u.ex z).left U s - φ z * valAt' (u.ex z).left U r
+    rw [hz₀]
+    exact hxU
+  let G : (Fin P.g → ℂ) → ℂ := fun z => valAt' (u.ex z).left U s - φ z * valAt' (u.ex z).left U r
   have hG : ContinuousWithinAt G O z₀ :=
     (((u.8 U s).2.continuousOn).sub (hφc.mul (u.8 U r).2.continuousOn)) z₀ hz₀O
   have hG0 : ∀ z ∈ O ∩ D, G z = 0 := by
@@ -371,7 +391,9 @@ theorem exists_eq_mul_of_continuousOn_quotient :
     rw [valAt'_mul_of_top_le_preimage_open _ hzO] at hrb
     have hbz : valAt' (u.ex z).left U b ≠ 0 := right_ne_zero_of_mul hrb
     have e1 := congrArg (valAt' (u.ex z).left U) hbs
-    rw [valAt'_mul_of_top_le_preimage_open _ hzO, valAt'_mul_of_top_le_preimage_open _ hzO, hφ z hzO] at e1
+    rw [valAt'_mul_of_top_le_preimage_open _ hzO, valAt'_mul_of_top_le_preimage_open _ hzO,
+        hφ z hzO]
+      at e1
     have e2 : valAt' (u.ex z).left U b * G z = 0 := by
       simp only [G]
       rw [_root_.mul_sub, e1]
@@ -382,8 +404,7 @@ theorem exists_eq_mul_of_continuousOn_quotient :
   have hsub : G '' (O ∩ D) ⊆ {0} := by
     rintro _ ⟨z, hz, rfl⟩
     exact hG0 z hz
-  have hGz0 : G z₀ = 0 := by
-    simpa using closure_mono hsub hGz
+  have hGz0 : G z₀ = 0 := by simpa using closure_mono hsub hGz
   apply hxs
   have hrx : valAt' x.left U r = 0 := hxp r hr
   simp only [G, hz₀, hrx, mul_zero, sub_zero] at hGz0

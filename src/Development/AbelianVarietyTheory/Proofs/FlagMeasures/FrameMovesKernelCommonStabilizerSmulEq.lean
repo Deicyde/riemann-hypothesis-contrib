@@ -32,7 +32,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma form_apply_apply_of_mem_St {h : S.GLV}
     (hh : h ∈ S.St) (x y : S.V) :
     S.h (h x) (h y) = S.h x y := by
@@ -48,7 +50,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma addSubgroup_eq_map_of_apply_mem_iff {M : Type} [AddCommGroup M] (e : M ≃+ M)
     (A B : AddSubgroup M) (hAB : ∀ w, e w ∈ B ↔ w ∈ A) : B = A.map e.toAddMonoidHom := by
   ext w
@@ -62,7 +66,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma mem_refB_iff (J : ℕ) (Λ : Submodule L.O S.V) (a b : S.V) :
     (a, b) ∈ S.refB J Λ ↔ a ∈ S.spanTo S.f J ∧ b ∈ S.spanTo S.f' J ∧
       ∃ y ∈ Λ, a + b = (algebraMap F E) S.th • y := by
@@ -75,7 +81,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma apply_mem_sup_iff_of_apply_mem_iff (h : S.GLV) (A B : Submodule E S.V)
     (hA : ∀ v, h v ∈ A ↔ v ∈ A) (hB : ∀ v, h v ∈ B ↔ v ∈ B) (v : S.V) :
     h v ∈ A ⊔ B ↔ v ∈ A ⊔ B := by
@@ -91,7 +99,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma apply_mem_perp_Ysp_iff_of_mem_St {h : S.GLV}
     (hh : h ∈ S.St) (J : ℕ) (u : S.V) :
     h u ∈ _root_.GlobalTheory.HL.perp L S.Hm (S.Ysp J) ↔
@@ -118,7 +128,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma coe_smul_submodule_eq_iff_of_apply_mem_iff (h : S.GLV) (Λ₁ : Submodule L.O S.V) (P Q : Set S.V)
     (hPQ : ∀ v, h v ∈ Q ↔ v ∈ P) :
     ((h • Λ₁ : Submodule L.O S.V) : Set S.V) = Q ↔ (Λ₁ : Set S.V) = P := by
@@ -130,7 +142,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma eich_apply_apply_of_mem_St {h : S.GLV}
     (hh : h ∈ S.St) (a b v : S.V) (c : E) :
     _root_.GlobalTheory.HL.eich L S.Hm (h a) (h b) c (h v) = h (_root_.GlobalTheory.HL.eich L S.Hm a b c v) := by
@@ -144,7 +158,9 @@ open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
 private lemma apply_mem_moved_smul_iff_of_mem_St {h : S.GLV}
     (hh : h ∈ S.St) (Λ : Submodule L.O S.V) (a b v : S.V) (c : E) :
     h v ∈ S.moved (h • Λ) (h a) (h b) c ↔ v ∈ S.moved Λ a b c := by
@@ -153,24 +169,35 @@ private lemma apply_mem_moved_smul_iff_of_mem_St {h : S.GLV}
     _root_.GlobalTheory.HL.eich L S.Hm a b c v ∈ Λ
   rw [eich_apply_apply_of_mem_St S hh, _root_.GlobalTheory.FrameAct.mem_smul_iff]
 
-
 open ValuativeRel MeasureTheory in
 open scoped Pointwise ENNReal Classical in
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] in
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] in
-variable {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ} (S : _root_.GlobalTheory.HL.Frames L r k) in
-theorem _root_.GlobalTheory.HL.kern_smul_eq : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] (L : _root_.Formalism.MainNotions.S.Loc.LocE F E), ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k), ∀ (d : S.Datum) (Λ : Submodule L.O S.V), S.IsTerm d Λ → ∀ (β J βJ : ℕ) (Λ₁ : Submodule L.O S.V), ∀ h ∈ S.St, S.kern β J βJ d (h • Λ) (h • Λ₁) = S.kern β J βJ d Λ Λ₁ := by
+variable
+  {L : _root_.Formalism.MainNotions.S.Loc.LocE F E} {r k : ℕ}
+  (S : _root_.GlobalTheory.HL.Frames L r k) in
+theorem _root_.GlobalTheory.HL.kern_smul_eq
+    : ∀ {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+        [CharZero F] {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E]
+        (L : _root_.Formalism.MainNotions.S.Loc.LocE F E),
+      ∀ (r k : ℕ) (S : _root_.GlobalTheory.HL.Frames L r k),
+        ∀ (d : S.Datum) (Λ : Submodule L.O S.V),
+          S.IsTerm d Λ
+            → ∀ (β J βJ : ℕ) (Λ₁ : Submodule L.O S.V), ∀ h ∈ S.St,
+              S.kern β J βJ d (h • Λ) (h • Λ₁) = S.kern β J βJ d Λ Λ₁ := by
   intro F _ _ _ _ _ E _ _ _ L r k S d Λ hT β J βJ Λ₁ h hh
   have hform := form_apply_apply_of_mem_St S hh
-  have hmove := (_root_.GlobalTheory.FrameAct.stabiliser_acts_on_terms L r k S d Λ hT h hh).2.2.2.2.2.2.2.2.2.2
-  have hA : S.refA J (h • Λ) =
-      (S.refA J Λ).map (_root_.GlobalTheory.HL.KernInv.mvEquiv S h).toAddMonoidHom := by
+  have hmove :=
+    (_root_.GlobalTheory.FrameAct.stabiliser_acts_on_terms L r k S d Λ hT h hh).2.2.2.2.2.2.2.2.2.2
+  have hA
+      : S.refA J (h • Λ)
+        = (S.refA J Λ).map (_root_.GlobalTheory.HL.KernInv.mvEquiv S h).toAddMonoidHom := by
     refine addSubgroup_eq_map_of_apply_mem_iff _ _ _ ?_
     rintro ⟨⟨a, b⟩, u, t⟩
     unfold _root_.GlobalTheory.HL.Frames.refA
     simp only [AddSubgroup.mem_prod]
-    change (h a, h b) ∈ S.refB J (h • Λ) ∧ h u ∈ S.refU J (h • Λ) ∧ t ∈ S.refT ↔
-      (a, b) ∈ S.refB J Λ ∧ u ∈ S.refU J Λ ∧ t ∈ S.refT
+    change (h a, h b) ∈ S.refB J (h • Λ) ∧ h u ∈ S.refU J (h • Λ) ∧ t ∈ S.refT
+      ↔ (a, b) ∈ S.refB J Λ ∧ u ∈ S.refU J Λ ∧ t ∈ S.refT
     rw [mem_refB_iff, mem_refB_iff, ← map_add (f := _),
       _root_.GlobalTheory.FrameAct.spanTo_iff S h hh,
       _root_.GlobalTheory.FrameAct.spanTo_iff' S h hh]
@@ -180,23 +207,28 @@ theorem _root_.GlobalTheory.HL.kern_smul_eq : ∀ {F : Type} [Field F] [Valuativ
     unfold _root_.GlobalTheory.HL.Frames.refU
     simp only [AddSubgroup.mem_inf, Submodule.mem_toAddSubgroup,
       _root_.GlobalTheory.FrameAct.mem_smul_iff, apply_mem_perp_Ysp_iff_of_mem_St S hh]
-  have hP : ∀ w, _root_.GlobalTheory.IdxInt.ind (S.MvTo J d (h • Λ) (h • Λ₁))
-      (_root_.GlobalTheory.HL.KernInv.mvEquiv S h w) = _root_.GlobalTheory.IdxInt.ind (S.MvTo J d Λ Λ₁) w := by
+  have hP
+      : ∀ w,
+        _root_.GlobalTheory.IdxInt.ind (S.MvTo J d (h • Λ) (h • Λ₁))
+            (_root_.GlobalTheory.HL.KernInv.mvEquiv S h w)
+          = _root_.GlobalTheory.IdxInt.ind (S.MvTo J d Λ Λ₁) w := by
     rintro ⟨⟨a, b⟩, u, t⟩
     have hs : S.sOf ((h a, h b), (h u, t)) = S.sOf ((a, b), (u, t)) := by
       unfold _root_.GlobalTheory.HL.Frames.sOf
       simp only [hform]
-    have hiff : S.MvTo J d (h • Λ) (h • Λ₁) ((h a, h b), (h u, t)) ↔
-        S.MvTo J d Λ Λ₁ ((a, b), (u, t)) := by
+    have hiff
+        : S.MvTo J d (h • Λ) (h • Λ₁) ((h a, h b), (h u, t))
+          ↔ S.MvTo J d Λ Λ₁ ((a, b), (u, t)) := by
       unfold _root_.GlobalTheory.HL.Frames.MvTo _root_.GlobalTheory.HL.Frames.Mv
-      change S.IsMove J d (h • Λ) (h a) (h b) (h u) (S.sOf ((h a, h b), (h u, t))) ∧
-          ((h • Λ₁ : Submodule L.O S.V) : Set S.V) =
-            S.moved (h • Λ) (h a) (h u) (S.sOf ((h a, h b), (h u, t))) ↔
-        S.IsMove J d Λ a b u (S.sOf ((a, b), (u, t))) ∧
-          (Λ₁ : Set S.V) = S.moved Λ a u (S.sOf ((a, b), (u, t)))
+      change S.IsMove J d (h • Λ) (h a) (h b) (h u) (S.sOf ((h a, h b), (h u, t)))
+          ∧ ((h • Λ₁ : Submodule L.O S.V) : Set S.V)
+            = S.moved (h • Λ) (h a) (h u) (S.sOf ((h a, h b), (h u, t)))
+        ↔ S.IsMove J d Λ a b u (S.sOf ((a, b), (u, t)))
+          ∧ (Λ₁ : Set S.V) = S.moved Λ a u (S.sOf ((a, b), (u, t)))
       rw [hs]
       exact and_congr (hmove J a b u _).symm
-        (coe_smul_submodule_eq_iff_of_apply_mem_iff S h Λ₁ _ _ fun v => apply_mem_moved_smul_iff_of_mem_St S hh Λ a u v _)
+        (coe_smul_submodule_eq_iff_of_apply_mem_iff S h Λ₁ _ _ fun v =>
+          apply_mem_moved_smul_iff_of_mem_St S hh Λ a u v _)
     unfold _root_.GlobalTheory.IdxInt.ind
     exact if_congr hiff rfl rfl
   unfold _root_.GlobalTheory.HL.Frames.kern

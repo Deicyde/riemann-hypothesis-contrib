@@ -12,10 +12,14 @@ open scoped NNReal
 
 namespace GlobalTheory.AlmostEt
 
-theorem approxRoot_fix_of_almostSep : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ),
-    p.Prime → 0 < v (p : L) → v (p : L) < 1 → ∀ (G : Type) [Group G] [MulSemiringAction G L],
-    (∀ (g : G) (x : L), v (g • x) = v x) → ∀ N : Subgroup G, N.FiniteIndex → AlmostSep v N →
-    ApproxRoot p v (Fix L (⊤ : Subgroup G)) → ApproxRoot p v (Fix L N) := by
+theorem approxRoot_fix_of_almostSep
+    : ∀ (L : Type) [Field L] (v : Valuation L ℝ≥0) (p : ℕ),
+      p.Prime → 0 < v (p : L) → v (p : L) < 1
+        → ∀ (G : Type) [Group G] [MulSemiringAction G L],
+          (∀ (g : G) (x : L), v (g • x) = v x)
+            → ∀ N : Subgroup G,
+              N.FiniteIndex → AlmostSep v N → ApproxRoot p v (Fix L (⊤ : Subgroup G))
+                → ApproxRoot p v (Fix L N) := by
   intro L _ v p hp hp0 hp1 G _ _ hinv N hN hsep hroot
   haveI : Finite (G ⧸ N) := Subgroup.finite_quotient_of_finiteIndex
   haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
@@ -39,7 +43,8 @@ theorem approxRoot_fix_of_almostSep : ∀ (L : Type) [Field L] (v : Valuation L 
   have hdN : d ∈ Fix L N := fun σ => hdF ⟨σ.1, Subgroup.mem_top _⟩
   have hx'N : x * d ^ p ∈ Fix L N := mul_mem hx (pow_mem hdN p)
   obtain ⟨w, hwN, hw⟩ :=
-    GlobalTheory.T.pow_mul_approx_pow_of_almostEtaleSeparatingFamily L v p hp G hinv N θ hθ1.le hθ n a b c hc (x * d ^ p) hx'N hd1
+    GlobalTheory.T.pow_mul_approx_pow_of_almostEtaleSeparatingFamily L v p hp G hinv N θ hθ1.le hθ n
+      a b c hc (x * d ^ p) hx'N hd1
   have hc0 : c ≠ 0 := by
     intro h
     rw [h, map_zero] at hrc
@@ -47,7 +52,8 @@ theorem approxRoot_fix_of_almostSep : ∀ (L : Type) [Field L] (v : Valuation L 
   refine ⟨w / (c * d), div_mem hwN (mul_mem hc.c_mem hdN), ?_⟩
   have key : x - (w / (c * d)) ^ p = (c ^ p * (x * d ^ p) - w ^ p) / (c ^ p * d ^ p) := by
     have hD0 : c ^ p * d ^ p ≠ 0 := mul_ne_zero (pow_ne_zero _ hc0) (pow_ne_zero _ hd0)
-    rw [eq_div_iff hD0, div_pow, mul_pow, sub_mul, div_mul_cancel₀ _ (mul_ne_zero (pow_ne_zero _ hc0) (pow_ne_zero _ hd0))]
+    rw [eq_div_iff hD0, div_pow, mul_pow, sub_mul,
+      div_mul_cancel₀ _ (mul_ne_zero (pow_ne_zero _ hc0) (pow_ne_zero _ hd0))]
     ring
   have hD : 0 < v (c ^ p * d ^ p) := by
     rw [Valuation.pos_iff]
@@ -57,10 +63,11 @@ theorem approxRoot_fix_of_almostSep : ∀ (L : Type) [Field L] (v : Valuation L 
   have hbig : r ^ (p + 1) ≤ v c ^ p * (v x * v d ^ p) := by
     rw [pow_succ, ← hvx]
     exact mul_le_mul' (pow_le_pow_left₀ bot_le hrc.le p) hdr.le
-  calc v (c ^ p * (x * d ^ p) - w ^ p) ≤ θ₀ := hw
+  calc
+    v (c ^ p * (x * d ^ p) - w ^ p)
+      ≤ θ₀ := hw
     _ = θ₀ / r ^ (p + 1) * r ^ (p + 1) := (div_mul_cancel₀ _ hrpos.ne').symm
     _ ≤ θ₀ / r ^ (p + 1) * (v c ^ p * (v x * v d ^ p)) := by gcongr
-    _ = θ₀ / r ^ (p + 1) * v x * v (c ^ p * d ^ p) := by
-      rw [map_mul, map_pow, map_pow]; ring
+    _ = θ₀ / r ^ (p + 1) * v x * v (c ^ p * d ^ p) := by rw [map_mul, map_pow, map_pow]; ring
 
 end GlobalTheory.AlmostEt

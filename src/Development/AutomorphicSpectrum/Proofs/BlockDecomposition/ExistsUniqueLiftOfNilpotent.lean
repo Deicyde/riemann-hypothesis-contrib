@@ -7,14 +7,18 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.EtaleLift
 
-theorem existsUnique_lift_of_nilpotent {P E C D : Type} [CommRing P] [CommRing E] [CommRing C] [CommRing D]
-    (ψ : P →+* E) (hψ : ψ.Etale) (u : C →+* D) (hu : Function.Surjective u)
-    (hn : IsNilpotent (RingHom.ker u)) (f : P →+* C) (g : E →+* D) (h : g.comp ψ = u.comp f) :
-    ∃! l : E →+* C, l.comp ψ = f ∧ u.comp l = g := by
+theorem existsUnique_lift_of_nilpotent
+    {P E C D : Type} [CommRing P] [CommRing E] [CommRing C] [CommRing D]
+    (ψ : P →+* E) (hψ : ψ.Etale)
+    (u : C →+* D) (hu : Function.Surjective u) (hn : IsNilpotent (RingHom.ker u))
+    (f : P →+* C) (g : E →+* D) (h : g.comp ψ = u.comp f)
+    : ∃! l : E →+* C, l.comp ψ = f ∧ u.comp l = g := by
   letI : Algebra P E := ψ.toAlgebra
   letI : Algebra P C := f.toAlgebra
   letI : Algebra P D := (u.comp f).toAlgebra
@@ -29,8 +33,9 @@ theorem existsUnique_lift_of_nilpotent {P E C D : Type} [CommRing P] [CommRing E
   refine ⟨(lA : E →+* C), ⟨RingHom.ext fun r => lA.commutes r, RingHom.ext hl⟩, ?_⟩
   rintro l' ⟨h1, h2⟩
   let lA' : E →ₐ[P] C := { l' with commutes' := fun r => congrArg (fun t : P →+* C => t r) h1 }
-  have : lA' = lA := Algebra.FormallyUnramified.ext' u hn lA' lA fun x => by
-    rw [hl]; exact congrArg (fun t : E →+* D => t x) h2
+  have : lA' = lA :=
+    Algebra.FormallyUnramified.ext' u hn lA' lA fun x => by
+      rw [hl]; exact congrArg (fun t : E →+* D => t x) h2
   exact congrArg (fun t : E →ₐ[P] C => (t : E →+* C)) this
 
 variable {B : Type} [CommRing B] (J : Ideal B)
@@ -45,9 +50,12 @@ theorem isNilpotent_ker_toBase (n : ℕ) : IsNilpotent (RingHom.ker (toBase J n)
   rw [hk, ← Ideal.map_pow]
   simp
 
-theorem existsUnique_level {P E : Type} [CommRing P] [CommRing E] (ψ : P →+* E) (hψ : ψ.Etale)
-    (f : P →+* B) (g : E →+* B ⧸ J) (h : g.comp ψ = (Ideal.Quotient.mk J).comp f) (n : ℕ) :
-    ∃! l : E →+* B ⧸ J ^ (n + 1), l.comp ψ = (Ideal.Quotient.mk _).comp f ∧ (toBase J n).comp l = g :=
+theorem existsUnique_level
+    {P E : Type} [CommRing P] [CommRing E]
+    (ψ : P →+* E) (hψ : ψ.Etale)
+    (f : P →+* B) (g : E →+* B ⧸ J) (h : g.comp ψ = (Ideal.Quotient.mk J).comp f)
+    (n : ℕ)
+    : ∃! l : E →+* B ⧸ J ^ (n + 1), l.comp ψ = (Ideal.Quotient.mk _).comp f ∧ (toBase J n).comp l = g :=
   existsUnique_lift_of_nilpotent ψ hψ (toBase J n) (Ideal.Quotient.factor_surjective _)
     (isNilpotent_ker_toBase J n) _ g h
 
@@ -59,14 +67,15 @@ theorem iInf_pow_eq_bot (hJ : IsAdicComplete J B) : ⨅ i : ℕ, J ^ i = ⊥ := 
 
 end GlobalTheory.CompanionTheory.EtaleLift
 
-
 open GlobalTheory.CompanionTheory.EtaleLift in
-theorem GlobalTheory.CompanionTheory.EtaleLift.etLift_of_isAdicComplete :
-    ∀ {B : Type} [CommRing B] (J : Ideal B), IsAdicComplete J B → EtLift J := by
+theorem GlobalTheory.CompanionTheory.EtaleLift.etLift_of_isAdicComplete
+    : ∀ {B : Type} [CommRing B] (J : Ideal B), IsAdicComplete J B → EtLift J := by
   intro B _ J hJ P E _ _ ψ hψ f g h
   haveI := hJ
   choose l hl hu using existsUnique_level J ψ hψ f g h
-  have hcomp : ∀ {m n : ℕ} (hle : m ≤ n), (Ideal.Quotient.factorPow J (Nat.succ_le_succ hle)).comp (l n) = l m := by
+  have hcomp
+      : ∀ {m n : ℕ} (hle : m ≤ n),
+        (Ideal.Quotient.factorPow J (Nat.succ_le_succ hle)).comp (l n) = l m := by
     intro m n hle
     refine (hu m _ ⟨?_, ?_⟩).symm ▸ rfl
     · rw [RingHom.comp_assoc, (hl n).1]
@@ -74,7 +83,8 @@ theorem GlobalTheory.CompanionTheory.EtaleLift.etLift_of_isAdicComplete :
     · rw [← (hl n).2, ← RingHom.comp_assoc]
       congr 1
       exact Ideal.Quotient.ringHom_ext (RingHom.ext fun _ => rfl)
-  let F : (n : ℕ) → E →+* B ⧸ J ^ n := fun n => (Ideal.Quotient.factorPow J (Nat.le_succ n)).comp (l n)
+  let F : (n : ℕ) → E →+* B ⧸ J ^ n := fun n =>
+    (Ideal.Quotient.factorPow J (Nat.le_succ n)).comp (l n)
   have hF : ∀ {m n : ℕ} (hle : m ≤ n), (Ideal.Quotient.factorPow J hle).comp (F n) = F m := by
     intro m n hle
     simp only [F]
@@ -90,7 +100,10 @@ theorem GlobalTheory.CompanionTheory.EtaleLift.etLift_of_isAdicComplete :
     refine IsHausdorff.haus hJ.toIsHausdorff _ fun n => ?_
     rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, ← Ideal.Quotient.eq_zero_iff_mem, map_sub,
       RingHom.comp_apply, hH, sub_eq_zero]
-    have := congrArg (fun t : P →+* B ⧸ J ^ (n + 1) => Ideal.Quotient.factorPow J (Nat.le_succ n) (t p)) (hl n).1
+    have :=
+      congrArg
+        (fun t : P →+* B ⧸ J ^ (n + 1) => Ideal.Quotient.factorPow J (Nat.le_succ n) (t p))
+        (hl n).1
     exact this
   have h2 : (Ideal.Quotient.mk J).comp H = g := by
     ext x
@@ -108,6 +121,8 @@ theorem GlobalTheory.CompanionTheory.EtaleLift.etLift_of_isAdicComplete :
   haveI : Algebra.Etale P E := hψ
   let A : E →ₐ[P] B := { H with commutes' := fun r => congrArg (fun t : P →+* B => t r) h1 }
   let A' : E →ₐ[P] B := { H' with commutes' := fun r => congrArg (fun t : P →+* B => t r) h1' }
-  have : A' = A := Algebra.FormallyUnramified.ext_of_iInf J (iInf_pow_eq_bot J hJ) fun x => by
-    exact (congrArg (fun t : E →+* B ⧸ J => t x) h2').trans (congrArg (fun t : E →+* B ⧸ J => t x) h2).symm
+  have : A' = A :=
+    Algebra.FormallyUnramified.ext_of_iInf J (iInf_pow_eq_bot J hJ) fun x => by
+      exact (congrArg (fun t : E →+* B ⧸ J => t x) h2').trans
+        (congrArg (fun t : E →+* B ⧸ J => t x) h2).symm
   exact congrArg (fun t : E →ₐ[P] B => (t : E →+* B)) this

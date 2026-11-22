@@ -4,7 +4,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ClassesAt
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn GlobalTheory.ExpFrame GlobalTheory.ExpTie GlobalTheory.FrameOf
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.DIV
+  Formalism.IndefR Formalism.IndefR.Links Formalism.L2.Pj GlobalTheory.BigTop GlobalTheory.BigOn
+  GlobalTheory.ExpFrame GlobalTheory.ExpTie GlobalTheory.FrameOf
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -20,7 +22,8 @@ theorem cjE_cjE (φ : E →+* Formalism.ConjugateSelfDual.Qbar l) : ExpFrame.cj 
   simp only [ExpFrame.cj, RingHom.comp_apply]
   exact congrArg φ (IsCMField.complexConj_apply_apply E x)
 
-theorem isHalf_cj {ι : Type} {inc : ι → (E →+* Formalism.ConjugateSelfDual.Qbar l)} (h : IsHalf inc) : IsHalf fun τ => ExpFrame.cj (inc τ) := by
+theorem isHalf_cj {ι : Type} {inc : ι → (E →+* Formalism.ConjugateSelfDual.Qbar l)} (h : IsHalf inc)
+    : IsHalf fun τ => ExpFrame.cj (inc τ) := by
   obtain ⟨h1, h2, h3⟩ := h
   refine ⟨fun a b hab => h1 ?_, fun τ τ' e => h2 τ' τ ?_, fun i => ?_⟩
   · have := congrArg ExpFrame.cj hab
@@ -35,11 +38,14 @@ end GlobalTheory.HalfLabels
 
 namespace GlobalTheory.HalfLabels
 
-theorem exists_aut {E K : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field K] [CharZero K] (ι i : E →+* K) :
-    ∃ σ : E ≃ₐ[ℚ] E, i = ι.comp (σ : E →+* E) := by
+theorem exists_aut
+    {E K : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Field K] [CharZero K] (ι i : E →+* K)
+    : ∃ σ : E ≃ₐ[ℚ] E, i = ι.comp (σ : E →+* E) := by
   let _ : Algebra E K := ι.toAlgebra
-  have : IsScalarTower ℚ E K := IsScalarTower.of_algebraMap_eq fun x => by
-    rw [RingHom.algebraMap_toAlgebra, eq_ratCast (algebraMap ℚ K), eq_ratCast (algebraMap ℚ E), map_ratCast]
+  have : IsScalarTower ℚ E K :=
+    IsScalarTower.of_algebraMap_eq fun x => by
+      rw [RingHom.algebraMap_toAlgebra, eq_ratCast (algebraMap ℚ K), eq_ratCast (algebraMap ℚ E),
+        map_ratCast]
   let φ : E →ₐ[ℚ] K := i.toRatAlgHom
   refine ⟨AlgEquiv.ofBijective (φ.restrictNormal E) (AlgHom.normal_bijective ℚ E E _), ?_⟩
   ext x
@@ -48,12 +54,17 @@ theorem exists_aut {E K : Type} [Field E] [NumberField E] [IsGalois ℚ E] [Fiel
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem isHalf_lab (D : D7) {l : ℕ} [Fact l.Prime] (e0 : D.what₂.LL →+* PadicAlgCl l) : IsHalf (incOf D e0 false) := by
+theorem isHalf_lab (D : D7) {l : ℕ} [Fact l.Prime] (e0 : D.what₂.LL →+* PadicAlgCl l)
+    : IsHalf (incOf D e0 false) := by
   have : IsGalois ℚ D.host.E := D.host.hostE_isGalois
   set ι : D.host.E →+* PadicAlgCl l := e0.comp D.embE with hι
-  have hinc : ∀ τ, incOf D e0 false τ = ι.comp (D.host.sigmaOf (D.eTau τ).1 : D.host.E →+* D.host.E) := fun τ => rfl
-  have hcc : ∀ g, ExpFrame.cj (ι.comp (D.host.sigmaOf g : D.host.E →+* D.host.E)) =
-      ι.comp (D.host.sigmaOf (g * D.R.cc) : D.host.E →+* D.host.E) := by
+  have hinc
+      : ∀ τ, incOf D e0 false τ = ι.comp (D.host.sigmaOf (D.eTau τ).1 : D.host.E →+* D.host.E) :=
+    fun τ => rfl
+  have hcc
+      : ∀ g,
+        ExpFrame.cj (ι.comp (D.host.sigmaOf g : D.host.E →+* D.host.E))
+          = ι.comp (D.host.sigmaOf (g * D.R.cc) : D.host.E →+* D.host.E) := by
     intro g
     have hs : D.host.sigmaOf (g * D.R.cc) = D.host.sigmaOf g * D.host.conj :=
       map_mul (D.host.gal).symm g (D.R.cc)
@@ -62,10 +73,14 @@ theorem isHalf_lab (D : D7) {l : ℕ} [Fact l.Prime] (e0 : D.what₂.LL →+* Pa
     show ι (D.host.sigmaOf g (IsCMField.complexConj D.host.E x)) = ι (D.host.sigmaOf g (D.host.conj x))
     congr 2
     exact Formalism.BasicNotions.bridge_star_holds D.R D.host x
-  have hinj : ∀ g g', ι.comp (D.host.sigmaOf g : D.host.E →+* D.host.E) = ι.comp (D.host.sigmaOf g' : D.host.E →+* D.host.E) →
-      g = g' := by
+  have hinj
+      : ∀ g g',
+        ι.comp (D.host.sigmaOf g : D.host.E →+* D.host.E)
+            = ι.comp (D.host.sigmaOf g' : D.host.E →+* D.host.E)
+          → g = g' := by
     intro g g' h
-    have : D.host.sigmaOf g = D.host.sigmaOf g' := AlgEquiv.ext fun x => ι.injective (RingHom.congr_fun h x)
+    have : D.host.sigmaOf g = D.host.sigmaOf g' :=
+      AlgEquiv.ext fun x => ι.injective (RingHom.congr_fun h x)
     exact (D.host.gal).symm.injective this
   refine ⟨fun τ τ' h => ?_, fun τ τ' h => ?_, fun i => ?_⟩
   · rw [hinc, hinc] at h
@@ -74,8 +89,7 @@ theorem isHalf_lab (D : D7) {l : ℕ} [Fact l.Prime] (e0 : D.what₂.LL →+* Pa
     have e := hinj _ _ h
     exact (Formalism.L2.Geo.mem_Psi_iff_mul_cc_notMem _).1 (D.eTau τ).2 (e ▸ (D.eTau τ').2)
   · obtain ⟨σ, hσ⟩ := exists_aut ι i
-    have hσg : D.host.sigmaOf (D.host.gal σ) = σ :=
-      (D.host.gal).symm_apply_apply σ
+    have hσg : D.host.sigmaOf (D.host.gal σ) = σ := (D.host.gal).symm_apply_apply σ
     by_cases hg : D.host.gal σ ∈ D.R.Psi
     · refine ⟨D.eTau.symm ⟨_, hg⟩, Or.inl ?_⟩
       rw [hinc, Equiv.apply_symm_apply, hσ, hσg]

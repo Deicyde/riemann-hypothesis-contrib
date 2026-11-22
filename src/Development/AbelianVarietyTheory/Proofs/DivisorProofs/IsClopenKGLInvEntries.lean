@@ -16,8 +16,9 @@ namespace GlobalTheory.HenQ.Basic
 
 variable {K : Type} [Field K] [NumberField K] {n : ℕ}
 
-theorem mem_KGL_iff (w : HeightOneSpectrum (𝓞 K)) (y : GL (Fin n) (w.adicCompletion K)) :
-    y ∈ GlobalTheory.LFun.KGL w (n := n) ↔ (∀ i j, y.val i j ∈ Formalism.UG.Ov K w) ∧ ∀ i j, (y⁻¹).val i j ∈ Formalism.UG.Ov K w := by
+theorem mem_KGL_iff (w : HeightOneSpectrum (𝓞 K)) (y : GL (Fin n) (w.adicCompletion K))
+    : y ∈ GlobalTheory.LFun.KGL w (n := n)
+      ↔ (∀ i j, y.val i j ∈ Formalism.UG.Ov K w) ∧ ∀ i j, (y⁻¹).val i j ∈ Formalism.UG.Ov K w := by
   rw [GlobalTheory.LFun.KGL, Formalism.UG.GLint, MonoidHom.mem_range]
   constructor
   · rintro ⟨z, rfl⟩
@@ -29,7 +30,8 @@ theorem mem_KGL_iff (w : HeightOneSpectrum (𝓞 K)) (y : GL (Fin n) (w.adicComp
     let N : Matrix (Fin n) (Fin n) (Formalism.UG.Ov K w) := Matrix.of fun i j => ⟨_, h2 i j⟩
     have hM : M.map (Formalism.UG.Ov K w).subtype = y.val := by ext i j; rfl
     have hN : N.map (Formalism.UG.Ov K w).subtype = (y⁻¹).val := by ext i j; rfl
-    have inj : Function.Injective (fun A : Matrix (Fin n) (Fin n) (Formalism.UG.Ov K w) => A.map (Formalism.UG.Ov K w).subtype) :=
+    have inj : Function.Injective (fun A : Matrix (Fin n) (Fin n) (Formalism.UG.Ov K w) =>
+        A.map (Formalism.UG.Ov K w).subtype) :=
       Matrix.map_injective Subtype.val_injective
     refine ⟨⟨M, N, inj ?_, inj ?_⟩, Units.ext ?_⟩
     · simp only

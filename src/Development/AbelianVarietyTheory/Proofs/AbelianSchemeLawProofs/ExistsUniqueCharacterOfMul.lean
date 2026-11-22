@@ -7,8 +7,10 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSc
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out
 open scoped CategoryTheory.Obj TensorProduct AlgebraMonoidAlgebra
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -17,7 +19,8 @@ noncomputable section
 namespace GlobalTheory
 namespace TorusUnit
 
-open ReciprocityTheory.ChartRestriction.G.Semi.Rosenlicht (torusFst ringHom_ext_ZU ringHom_uliftInt_ext)
+open ReciprocityTheory.ChartRestriction.G.Semi.Rosenlicht
+  (torusFst ringHom_ext_ZU ringHom_uliftInt_ext)
 open AddMonoidAlgebra (single)
 
 section Ring
@@ -25,9 +28,9 @@ section Ring
 variable {A X : Type} [CommRing A] [AddCommGroup X]
 
 def IsMultiplicative (u : AddMonoidAlgebra A X) : Prop :=
-  AddMonoidAlgebra.mapDomainRingHom A ((AddMonoidHom.id X).prod (AddMonoidHom.id X)) u =
-    AddMonoidAlgebra.mapDomainRingHom A (AddMonoidHom.inl X X) u *
-      AddMonoidAlgebra.mapDomainRingHom A (AddMonoidHom.inr X X) u
+  AddMonoidAlgebra.mapDomainRingHom A ((AddMonoidHom.id X).prod (AddMonoidHom.id X)) u
+    = AddMonoidAlgebra.mapDomainRingHom A (AddMonoidHom.inl X X) u
+      * AddMonoidAlgebra.mapDomainRingHom A (AddMonoidHom.inr X X) u
 
 lemma coeff_inl_mul_inr (u v : AddMonoidAlgebra A X) (x y : X) :
     (AddMonoidAlgebra.mapDomainRingHom A (AddMonoidHom.inl X X) u *
@@ -92,8 +95,8 @@ end Ring
 
 variable {S : Scheme.{0}} {X : Type} [AddCommGroup X]
 
-def torusPoint {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (s : Spec R ⟶ S) :
-    Over.mk s ⟶ splitTorus S X :=
+def torusPoint {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (s : Spec R ⟶ S)
+    : Over.mk s ⟶ splitTorus S X :=
   Over.homMk (pullback.lift (Spec.map φ) s (specULiftZIsTerminal.hom_ext _ _))
     (pullback.lift_snd _ _ _)
 
@@ -168,8 +171,8 @@ lemma torusPoint_mul {R : CommRingCat.{0}} (φ φ' ψ : torusRing ZU X ⟶ R) (s
 
 variable {Y : Over S}
 
-def prodPoint {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (y : Spec R ⟶ Y.left) :
-    Spec R ⟶ (splitTorus S X ⊗ Y).left :=
+def prodPoint {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (y : Spec R ⟶ Y.left)
+    : Spec R ⟶ (splitTorus S X ⊗ Y).left :=
   (lift (torusPoint φ (y ≫ Y.hom)) (Over.homMk y rfl : Over.mk (y ≫ Y.hom) ⟶ Y)).left
 
 lemma prodPoint_fst {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (y : Spec R ⟶ Y.left) :
@@ -201,8 +204,8 @@ lemma map_prodPoint {R R' : CommRingCat.{0}} (g : R ⟶ R') (φ : torusRing ZU X
   · rw [Category.assoc, prodPoint_fst, prodPoint_fst, Spec.map_comp]
   · rw [Category.assoc, prodPoint_snd, prodPoint_snd]
 
-def value {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (y : Spec R ⟶ Y.left) :
-    Γ((splitTorus S X ⊗ Y).left, ⊤) ⟶ R :=
+def value {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (y : Spec R ⟶ Y.left)
+    : Γ((splitTorus S X ⊗ Y).left, ⊤) ⟶ R :=
   (prodPoint φ y).appTop ≫ (Scheme.ΓSpecIso R).hom
 
 lemma value_comp {R R' : CommRingCat.{0}} (g : R ⟶ R') (φ : torusRing ZU X ⟶ R)
@@ -227,8 +230,8 @@ lemma value_char {R : CommRingCat.{0}} (φ : torusRing ZU X ⟶ R) (y : Spec R �
 
 def IsMulLeft (ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)) : Prop :=
   ∀ (Z : Over S) (t t' : Z ⟶ splitTorus S X) (y : Z ⟶ Y),
-    (lift (t * t') y).left.appTop.hom ρ =
-      (lift t y).left.appTop.hom ρ * (lift t' y).left.appTop.hom ρ
+    (lift (t * t') y).left.appTop.hom ρ
+      = (lift t y).left.appTop.hom ρ * (lift t' y).left.appTop.hom ρ
 
 lemma IsMulLeft.value_mul {ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)} (hρ : IsMulLeft ρ)
     {R : CommRingCat.{0}} (φ φ' ψ : torusRing ZU X ⟶ R) (y : Spec R ⟶ Y.left)
@@ -257,8 +260,8 @@ lemma fromInt_single (R : CommRingCat.{0}) (x : X) :
     (fromInt X R).hom (single x 1) = single x 1 := by
   simp [fromInt]
 
-def expand {R : CommRingCat.{0}} (y : Spec R ⟶ Y.left) :
-    Γ((splitTorus S X ⊗ Y).left, ⊤) ⟶ grpAlg X R :=
+def expand {R : CommRingCat.{0}} (y : Spec R ⟶ Y.left)
+    : Γ((splitTorus S X ⊗ Y).left, ⊤) ⟶ grpAlg X R :=
   value (fromInt X R) (Spec.map (const X R) ≫ y)
 
 lemma expand_char {R : CommRingCat.{0}} (y : Spec R ⟶ Y.left) (χ : X) :
@@ -351,8 +354,8 @@ lemma ext_of_expand {f g : Γ((splitTorus S X ⊗ Y).left, ⊤)}
   · exact (Scheme.ΓSpecIso (grpAlg X (R p))).commRingCatIsoToRingEquiv.injective (he p)
 
 def IsCharNear (ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)) (χ : X) (p : Y.left) : Prop :=
-  ∃ (R : CommRingCat.{0}) (y : Spec R ⟶ Y.left), IsOpenImmersion y ∧
-    p ∈ Set.range y ∧ (expand y).hom ρ = single χ 1
+  ∃ (R : CommRingCat.{0}) (y : Spec R ⟶ Y.left),
+    IsOpenImmersion y ∧ p ∈ Set.range y ∧ (expand y).hom ρ = single χ 1
 
 lemma IsCharNear.residueField {ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)} {χ : X} {p : Y.left}
     (h : IsCharNear ρ χ p) : (expand (Y.left.fromSpecResidueField p)).hom ρ = single χ 1 := by
@@ -391,19 +394,26 @@ lemma IsMulLeft.exists_isCharNear {ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)} (h
 end TorusUnit
 
 open TorusUnit in
-theorem existsUnique_character_of_mul (S : Scheme.{0}) (X : Type) [AddCommGroup X] (Y : Over S)
-    [ConnectedSpace Y.left] (ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)ˣ)
+theorem existsUnique_character_of_mul
+    (S : Scheme.{0})
+    (X : Type) [AddCommGroup X]
+    (Y : Over S) [ConnectedSpace Y.left]
+    (ρ : Γ((splitTorus S X ⊗ Y).left, ⊤)ˣ)
     (hρ : ∀ (Z : Over S) (t t' : Z ⟶ splitTorus S X) (y : Z ⟶ Y),
-      (lift (t * t') y).left.appTop.hom ρ.val =
-        (lift t y).left.appTop.hom ρ.val * (lift t' y).left.appTop.hom ρ.val) :
-    ∃! χ : X, ρ.val = (fst (splitTorus S X) Y).left.appTop.hom (charUnit S X χ).val := by
+      (lift (t * t') y).left.appTop.hom ρ.val
+        = (lift t y).left.appTop.hom ρ.val * (lift t' y).left.appTop.hom ρ.val)
+    : ∃! χ : X, ρ.val = (fst (splitTorus S X) Y).left.appTop.hom (charUnit S X χ).val := by
   choose c hc using IsMulLeft.exists_isCharNear (ρ := ρ.val) hρ ρ.isUnit
   have hlc : IsLocallyConstant c := by
     rw [IsLocallyConstant.iff_exists_open]
     intro p
     obtain ⟨R, y, hy, hp, he⟩ := hc p
-    exact ⟨Set.range y, y.isOpenEmbedding.isOpen_range, hp,
-      fun p' hp' => (hc p').unique ⟨R, y, hy, hp', he⟩⟩
+    exact ⟨
+      Set.range y,
+      y.isOpenEmbedding.isOpen_range,
+      hp,
+      fun p' hp' => (hc p').unique ⟨R, y, hy, hp', he⟩
+    ⟩
   obtain ⟨p₀⟩ : Nonempty Y.left := inferInstance
   refine ⟨c p₀, ext_of_expand fun p => ?_, fun χ hχ => ?_⟩
   · obtain ⟨R, y, hy, hp, he⟩ := hc p

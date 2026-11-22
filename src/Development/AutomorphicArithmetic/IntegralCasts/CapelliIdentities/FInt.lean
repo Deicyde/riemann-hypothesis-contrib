@@ -15,8 +15,12 @@ private lemma F_int {c : ℝ} (hc : 0 < c) :
 
 end YhaHelp
 
-theorem UpperTheory.Reformulated.B.Yha4.main :
-    ∀ {c : ℝ}, (0 : ℝ) < c → MeasureTheory.Integrable (fun (x : ℝ) ↦ Real.exp (-c * |x|)) MeasureTheory.MeasureSpace.volume := by
+theorem UpperTheory.Reformulated.B.Yha4.main
+    : ∀ {c : ℝ},
+      (0 : ℝ) < c
+        → MeasureTheory.Integrable
+          (fun (x : ℝ) ↦ Real.exp (-c * |x|))
+          MeasureTheory.MeasureSpace.volume := by
   intro c hc
   have hF := YhaHelp.F_int hc
   have hG := hF.comp_neg

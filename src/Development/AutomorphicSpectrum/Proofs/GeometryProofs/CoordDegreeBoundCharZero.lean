@@ -11,14 +11,21 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.CoordValuati
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 open GlobalTheory.CompanionTheory.Ar.RootHt GroundTheory.Heights₂.Heights
 
 namespace GlobalTheory.CompanionTheory.Ar.RootHt.FinLocal
 
-theorem unit_aux {S R F : Type} [CommRing S] [CommRing R] [Field F] (ψ : S →+* F) (φ : S →+* R) (hφ : IsLocalHom φ)
-    (s : S) (hu : IsUnit (φ s)) : ∃ s', φ s * φ s' = 1 ∧ ψ s' = (ψ s)⁻¹ := by
+theorem unit_aux
+    {S R F : Type} [CommRing S] [CommRing R] [Field F]
+    (ψ : S →+* F)
+    (φ : S →+* R) (hφ : IsLocalHom φ)
+    (s : S) (hu : IsUnit (φ s))
+    : ∃ s', φ s * φ s' = 1 ∧ ψ s' = (ψ s)⁻¹ := by
   have h1 : IsUnit s := hφ.map_nonunit s hu
   obtain ⟨u, rfl⟩ := h1
   refine ⟨(u⁻¹ : Sˣ).1, ?_, ?_⟩
@@ -27,9 +34,13 @@ theorem unit_aux {S R F : Type} [CommRing S] [CommRing R] [Field F] (ψ : S →+
     rw [← map_mul, Units.inv_mul, map_one]
 
 section Val
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R] {z : Sp R ⟶ X}
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Sp Ω ⟶ X} {R : Type} [CommRing R] [IsLocalRing R]
+  {z : Sp R ⟶ X}
 
-theorem val_mul {a a' : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a' r') : ValAt ξ z (a * a') (r * r') := by
+theorem val_mul {a a' : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a' r')
+    : ValAt ξ z (a * a') (r * r') := by
   obtain ⟨h1, s, rfl, rfl⟩ := h
   obtain ⟨_, s', rfl, rfl⟩ := h'
   exact ⟨h1, s * s', map_mul _ _ _, map_mul _ _ _⟩
@@ -37,18 +48,22 @@ theorem val_mul {a a' : Ω} {r r' : R} (h : ValAt ξ z a r) (h' : ValAt ξ z a' 
 theorem val_natCast (h : genPt ξ ⤳ centre z) (n : ℕ) : ValAt ξ z (n : Ω) (n : R) :=
   ⟨h, n, map_natCast _ _, map_natCast _ _⟩
 
-theorem val_of_mem (h : genPt ξ ⤳ centre z) {a : Ω} (ha : a ∈ regAt ξ ⟨centre z, h⟩) : ∃ r, ValAt ξ z a r := by
+theorem val_of_mem (h : genPt ξ ⤳ centre z) {a : Ω} (ha : a ∈ regAt ξ ⟨centre z, h⟩)
+    : ∃ r, ValAt ξ z a r := by
   obtain ⟨s, hs⟩ := ha
   exact ⟨_, h, s, hs, rfl⟩
 
-theorem val_inv {a : Ω} {r : R} (hs : ValAt ξ z a r) (hu : IsUnit r) : ∃ r', r * r' = 1 ∧ ValAt ξ z a⁻¹ r' := by
+theorem val_inv {a : Ω} {r : R} (hs : ValAt ξ z a r) (hu : IsUnit r)
+    : ∃ r', r * r' = 1 ∧ ValAt ξ z a⁻¹ r' := by
   obtain ⟨h, s, rfl, rfl⟩ := hs
-  obtain ⟨s', h1, h2⟩ := unit_aux (genMap ξ ⟨centre z, h⟩) (Scheme.stalkClosedPointTo z).hom
-    (Scheme.isLocalHom_stalkClosedPointTo' z) s hu
+  obtain ⟨s', h1, h2⟩ :=
+    unit_aux (genMap ξ ⟨centre z, h⟩) (Scheme.stalkClosedPointTo z).hom
+      (Scheme.isLocalHom_stalkClosedPointTo' z) s hu
   exact ⟨_, h1, h, s', h2, rfl⟩
 
-theorem val_inv₀ {F : Type} [Field F] {z : Sp F ⟶ X} {a : Ω} {r : F} (hs : ValAt ξ z a r) (hr : r ≠ 0) :
-    ValAt ξ z a⁻¹ r⁻¹ := by
+theorem val_inv₀
+    {F : Type} [Field F] {z : Sp F ⟶ X} {a : Ω} {r : F} (hs : ValAt ξ z a r) (hr : r ≠ 0)
+    : ValAt ξ z a⁻¹ r⁻¹ := by
   obtain ⟨r', h1, h2⟩ := val_inv hs (isUnit_iff_ne_zero.2 hr)
   rwa [← eq_inv_of_mul_eq_one_right h1]
 
@@ -58,21 +73,29 @@ end GlobalTheory.CompanionTheory.Ar.RootHt.FinLocal
 namespace GlobalTheory.CompanionTheory.Ar.RootHt.FinLocal
 
 section Main
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Sp Ω ⟶ X} {K : Type} [Fintype K] {J : K → Type}
-  [∀ k, Fintype (J k)] {y : (Σ k, J k) → Ω} {L : Type} [Field L]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Sp Ω ⟶ X} {K : Type} [Fintype K]
+  {J : K → Type} [∀ k, Fintype (J k)]
+  {y : (Σ k, J k) → Ω} {L : Type} [Field L]
 
-theorem val_gen_ratio {z : Sp L ⟶ X} {w : (Σ k, J k) → L} (hw : CoordsAt ξ y z w) (hz : genPt ξ ⤳ centre z)
-    (a : K → ℤ) {e₀ : Ω} (he₀ : e₀ ≠ 0) (c c₀ : (k : K) → J k) (hc : ∀ k, w ⟨k, c k⟩ ≠ 0)
-    (hc₀ : ∀ k, w ⟨k, c₀ k⟩ ≠ 0) :
-    ValAt ξ z (gen y a e₀ c / gen y a e₀ c₀) (∏ k, (w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) ^ a k) := by
+theorem val_gen_ratio
+    {z : Sp L ⟶ X} {w : (Σ k, J k) → L} (hw : CoordsAt ξ y z w) (hz : genPt ξ ⤳ centre z)
+    (a : K → ℤ)
+    {e₀ : Ω} (he₀ : e₀ ≠ 0)
+    (c c₀ : (k : K) → J k) (hc : ∀ k, w ⟨k, c k⟩ ≠ 0) (hc₀ : ∀ k, w ⟨k, c₀ k⟩ ≠ 0)
+    : ValAt ξ z (gen y a e₀ c / gen y a e₀ c₀) (∏ k, (w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) ^ a k) := by
   have h1 : ∀ k, y ⟨k, c₀ k⟩ ≠ 0 := fun k => (hw.2 k (c₀ k) (isUnit_iff_ne_zero.2 (hc₀ k))).1
   have h2 : ∀ k, y ⟨k, c k⟩ ≠ 0 := fun k => (hw.2 k (c k) (isUnit_iff_ne_zero.2 (hc k))).1
   have h3 : ∀ k, ValAt ξ z (y ⟨k, c k⟩ / y ⟨k, c₀ k⟩) (w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) := fun k => by
     obtain ⟨r, hr, e⟩ := (hw.2 k (c₀ k) (isUnit_iff_ne_zero.2 (hc₀ k))).2 (c k)
     rwa [e, mul_div_cancel_right₀ _ (hc₀ k)]
-  have h4 : ∀ (k) (n : ℤ), ValAt ξ z ((y ⟨k, c k⟩ / y ⟨k, c₀ k⟩) ^ n) ((w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) ^ n) := fun k n => by
+  have h4
+      : ∀ (k) (n : ℤ),
+        ValAt ξ z ((y ⟨k, c k⟩ / y ⟨k, c₀ k⟩) ^ n) ((w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) ^ n) := fun k n => by
     have hr : w ⟨k, c k⟩ / w ⟨k, c₀ k⟩ ≠ 0 := div_ne_zero (hc k) (hc₀ k)
-    have pw : ∀ (a : Ω) (r : L), ValAt ξ z a r → ∀ n : ℕ, ValAt ξ z (a ^ n) (r ^ n) := fun a r h n => by
+    have pw
+        : ∀ (a : Ω) (r : L), ValAt ξ z a r → ∀ n : ℕ, ValAt ξ z (a ^ n) (r ^ n) := fun a r h n => by
       induction n with
       | zero => simpa using val_natCast hz 1
       | succ n ih => rw [pow_succ, pow_succ]; exact val_mul ih h
@@ -85,12 +108,15 @@ theorem val_gen_ratio {z : Sp L ⟶ X} {w : (Σ k, J k) → L} (hw : CoordsAt ξ
     rw [mul_div_mul_right _ _ he₀, ← Finset.prod_div_distrib]
     exact Finset.prod_congr rfl fun k _ => (div_zpow _ _ _).symm
   rw [h5]
-  have pr : ∀ s : Finset K, ValAt ξ z (∏ k ∈ s, (y ⟨k, c k⟩ / y ⟨k, c₀ k⟩) ^ a k)
-      (∏ k ∈ s, (w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) ^ a k) := fun s => by
+  have pr
+      : ∀ s : Finset K,
+        ValAt ξ z (∏ k ∈ s, (y ⟨k, c k⟩ / y ⟨k, c₀ k⟩) ^ a k)
+          (∏ k ∈ s, (w ⟨k, c k⟩ / w ⟨k, c₀ k⟩) ^ a k) := fun s => by
     classical
     induction s using Finset.induction_on with
     | empty => simpa using val_natCast hz 1
-    | insert k s hk ih => rw [Finset.prod_insert hk, Finset.prod_insert hk]; exact val_mul (h4 k _) ih
+    | insert k s hk ih =>
+      rw [Finset.prod_insert hk, Finset.prod_insert hk]; exact val_mul (h4 k _) ih
   exact pr _
 
 end Main
@@ -248,30 +274,37 @@ end GlobalTheory.CompanionTheory.Ar.RootHt.FinLocal
 
 namespace GlobalTheory.CompanionTheory.Ar.RootHt.FinLocal
 
-theorem place_one (L : Type) [Field L] [NumberField L] (v : FinitePlace L) (d : 𝓞 L)
-    (hd : d ∉ (FinitePlace.maximalIdeal v).asIdeal) : v (algebraMap (𝓞 L) L d) = 1 := by
+theorem place_one
+    (L : Type) [Field L] [NumberField L]
+    (v : FinitePlace L) (d : 𝓞 L) (hd : d ∉ (FinitePlace.maximalIdeal v).asIdeal)
+    : v (algebraMap (𝓞 L) L d) = 1 := by
   rw [← FinitePlace.norm_embedding_eq]
   exact (FinitePlace.norm_eq_one_iff_notMem L _ d).2 hd
 
-theorem place_le (L : Type) [Field L] [NumberField L] (v : FinitePlace L) (d : 𝓞 L) :
-    v (algebraMap (𝓞 L) L d) ≤ 1 := by
+theorem place_le (L : Type) [Field L] [NumberField L] (v : FinitePlace L) (d : 𝓞 L)
+    : v (algebraMap (𝓞 L) L d) ≤ 1 := by
   rw [← FinitePlace.norm_embedding_eq]
   exact FinitePlace.norm_le_one L _ d
 
-theorem place_local (L : Type) [Field L] [NumberField L] (v : FinitePlace L) (A : Type) [CommRing A]
-    [Algebra (𝓞 L) A] [IsLocalization.AtPrime A (FinitePlace.maximalIdeal v).asIdeal] [Algebra A L]
-    [IsScalarTower (𝓞 L) A L] :
-    (∀ r : A, v (algebraMap A L r) ≤ 1) ∧ ∀ r : A, v (algebraMap A L r) = 1 → IsUnit r := by
-  have hs : ∀ r : A, ∃ (a s : 𝓞 L), s ∉ (FinitePlace.maximalIdeal v).asIdeal ∧
-      r * algebraMap (𝓞 L) A s = algebraMap (𝓞 L) A a := fun r => by
+theorem place_local
+    (L : Type) [Field L] [NumberField L]
+    (v : FinitePlace L) (A : Type)
+    [CommRing A] [Algebra (𝓞 L) A] [IsLocalization.AtPrime A (FinitePlace.maximalIdeal v).asIdeal]
+    [Algebra A L] [IsScalarTower (𝓞 L) A L]
+    : (∀ r : A, v (algebraMap A L r) ≤ 1) ∧ ∀ r : A, v (algebraMap A L r) = 1 → IsUnit r := by
+  have hs
+      : ∀ r : A, ∃ (a s : 𝓞 L),
+        s ∉ (FinitePlace.maximalIdeal v).asIdeal
+          ∧ r * algebraMap (𝓞 L) A s = algebraMap (𝓞 L) A a := fun r => by
     obtain ⟨⟨a, s⟩, e⟩ := IsLocalization.surj (FinitePlace.maximalIdeal v).asIdeal.primeCompl r
     exact ⟨a, s, s.2, e⟩
-  have hv : ∀ (r : A) (a s : 𝓞 L), s ∉ (FinitePlace.maximalIdeal v).asIdeal →
-      r * algebraMap (𝓞 L) A s = algebraMap (𝓞 L) A a → v (algebraMap A L r) = v (algebraMap (𝓞 L) L a) :=
-    fun r a s hs' e => by
-      have e1 := congrArg (fun t => v (algebraMap A L t)) e
-      simp only [map_mul, ← IsScalarTower.algebraMap_apply, place_one L v s hs', _root_.mul_one] at e1
-      exact e1
+  have hv
+      : ∀ (r : A) (a s : 𝓞 L),
+        s ∉ (FinitePlace.maximalIdeal v).asIdeal → r * algebraMap (𝓞 L) A s = algebraMap (𝓞 L) A a
+          → v (algebraMap A L r) = v (algebraMap (𝓞 L) L a) := fun r a s hs' e => by
+    have e1 := congrArg (fun t => v (algebraMap A L t)) e
+    simp only [map_mul, ← IsScalarTower.algebraMap_apply, place_one L v s hs', _root_.mul_one] at e1
+    exact e1
   refine ⟨fun r => ?_, fun r hr => ?_⟩
   · obtain ⟨a, s, h1, h2⟩ := hs r
     rw [hv r a s h1 h2]
@@ -287,23 +320,37 @@ theorem place_local (L : Type) [Field L] [NumberField L] (v : FinitePlace L) (A 
     rw [← h2] at hu
     exact isUnit_of_mul_isUnit_left hu
 
-theorem coord_size : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K : Type) [Fintype K] (J : K → Type)
-    [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (G : Over X) [GrpObj G] [IsCommMonObj G] [Smooth G.hom]
-    (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li) (V : Lat ξ Li) (r : ℕ) (b₀ : Fin r → Li)
-    (m : ℕ) (i : Fin r) (a : K → ℤ) (e₀ : Ω),
-    CharZero Ω → (∀ q : X, genPt ξ ⤳ q) → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → 0 < m →
-    LinearIndependent Ω b₀ → Sandwich M V b₀ m → (V.gr b₀ i).IsDegOn Set.univ y a e₀ →
-    ∀ (L : Type) [Field L] [NumberField L] (w : (Σ k, J k) → L) (z : Sp (𝓞 L) ⟶ X),
-      CoordsAt ξ y (spMap (algebraMap (𝓞 L) L) ≫ z) w → ∀ (B : HermitianBundle.{0} L) (MB : LieModel G z B.carrier)
-      (F₀ F₁ : Submodule (𝓞 L) B.carrier), IsSubFibre M (flagStep Ω b₀ i) z MB F₀ →
-      IsSubFibre M (flagStep Ω b₀ (i + 1)) z MB F₁ → ∀ c₀ : (k : K) → J k, (∀ k, w ⟨k, c₀ k⟩ ≠ 0) →
-      ∀ φ : F₁ →ₗ[𝓞 L] L, (∀ (x : F₁) (e : Li) (v : epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G) (t : Ω) (u : L),
-          e ∈ flagStep Ω b₀ (i + 1) → M.ValAt _ e v → (v.left ≫ (𝟙 G.left) = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L)) ≫ (MB.pt (x : B.carrier)).left) →
-          IsCls b₀ i e t → ValAt ξ (spMap (algebraMap (𝓞 L) L) ≫ z) (t / gen y a e₀ c₀) u → φ x = u) →
-        ∀ v : FinitePlace L, (∀ x, v (φ x) ≤ (v (m : L))⁻¹ * locRatio a w c₀ v) ∧
-          ∃ x, v (m : L) * locRatio a w c₀ v ≤ v (φ x) := by
-  intro X Ω _ ξ K _ J _ y G _ _ _ Li _ _ M V r b₀ m i a e₀ hchar hgen hcoord hm hb₀ hS hdeg L _ _ w z hw B MB F₀ F₁ hF₀ hF₁
-    c₀ hc₀ φ hφ v
+theorem coord_size
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶ X) (K : Type) [Fintype K] (J : K → Type)
+        [∀ k, Fintype (J k)] (y : (Σ k, J k) → Ω) (G : Over X) [GrpObj G] [IsCommMonObj G]
+        [Smooth G.hom] (Li : Type) [AddCommGroup Li] [Module Ω Li] (M : LieModel G ξ Li)
+        (V : Lat ξ Li) (r : ℕ) (b₀ : Fin r → Li) (m : ℕ) (i : Fin r) (a : K → ℤ) (e₀ : Ω),
+      CharZero Ω → (∀ q : X, genPt ξ ⤳ q)
+        → CoordTie ℤ ξ (fun c' : (k : K) → J k => ∏ k, y ⟨k, c' k⟩) → 0 < m → LinearIndependent Ω b₀
+        → Sandwich M V b₀ m → (V.gr b₀ i).IsDegOn Set.univ y a e₀
+        → ∀ (L : Type) [Field L] [NumberField L] (w : (Σ k, J k) → L) (z : Sp (𝓞 L) ⟶ X),
+          CoordsAt ξ y (spMap (algebraMap (𝓞 L) L) ≫ z) w
+            → ∀ (B : HermitianBundle.{0} L) (MB : LieModel G z B.carrier)
+                (F₀ F₁ : Submodule (𝓞 L) B.carrier),
+              IsSubFibre M (flagStep Ω b₀ i) z MB F₀ → IsSubFibre M (flagStep Ω b₀ (i + 1)) z MB F₁
+                → ∀ c₀ : (k : K) → J k,
+                  (∀ k, w ⟨k, c₀ k⟩ ≠ 0)
+                    → ∀ φ : F₁ →ₗ[𝓞 L] L,
+                      (∀ (x : F₁) (e : Li) (v : epsAt (spMap (algebraMap (𝓞 L) L) ≫ z) ⟶ G) (t : Ω)
+                            (u : L),
+                          e ∈ flagStep Ω b₀ (i + 1) → M.ValAt _ e v
+                            → (v.left ≫ (𝟙 G.left)
+                              = ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap
+                                  (GlobalTheory.CompanionTheory.Ar.dualMap (algebraMap (𝓞 L) L))
+                                ≫ (MB.pt (x : B.carrier)).left)
+                            → IsCls b₀ i e t
+                            → ValAt ξ (spMap (algebraMap (𝓞 L) L) ≫ z) (t / gen y a e₀ c₀) u
+                            → φ x = u)
+                        → ∀ v : FinitePlace L,
+                          (∀ x, v (φ x) ≤ (v (m : L))⁻¹ * locRatio a w c₀ v)
+                            ∧ ∃ x, v (m : L) * locRatio a w c₀ v ≤ v (φ x) := by
+  intro X Ω _ ξ K _ J _ y G _ _ _ Li _ _ M V r b₀ m i a e₀ hchar hgen hcoord hm hb₀ hS hdeg L _ _ w
+    z hw B MB F₀ F₁ hF₀ hF₁ c₀ hc₀ φ hφ v
   have hle : (FinitePlace.maximalIdeal v).asIdeal.primeCompl ≤ nonZeroDivisors (𝓞 L) :=
     Ideal.primeCompl_le_nonZeroDivisors _
   let A := Localization.subalgebra.ofField L _ hle
@@ -311,7 +358,7 @@ theorem coord_size : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Sp Ω ⟶
     inferInstanceAs (IsLocalization (FinitePlace.maximalIdeal v).asIdeal.primeCompl A)
   haveI : IsLocalRing A := IsLocalization.AtPrime.isLocalRing A (FinitePlace.maximalIdeal v).asIdeal
   obtain ⟨h1, h2⟩ := place_local L v A
-  exact core X Ω ξ K J y G Li M V r b₀ m i a e₀ hchar hgen hcoord hm hb₀ hS hdeg L w z hw B MB F₁ hF₁ c₀ hc₀ φ hφ v
-    (FinitePlace.maximalIdeal v).asIdeal A (place_one L v) h1 h2
+  exact core X Ω ξ K J y G Li M V r b₀ m i a e₀ hchar hgen hcoord hm hb₀ hS hdeg L w z hw B MB F₁
+    hF₁ c₀ hc₀ φ hφ v (FinitePlace.maximalIdeal v).asIdeal A (place_one L v) h1 h2
 
 end GlobalTheory.CompanionTheory.Ar.RootHt.FinLocal

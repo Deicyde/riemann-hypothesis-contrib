@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.SelfMemSpanK
 
 noncomputable section
 
-open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory Filter Topology
+open NumberField GlobalTheory.CuspRep GlobalTheory.CuspQuot GlobalTheory.AutGrowth MeasureTheory
+  Filter Topology
 
 namespace GlobalTheory.AutGrowth
 
@@ -14,8 +15,8 @@ section SlopeTestRemainingChoices
 
 variable {E : Type} [Field E] [NumberField E] {a : ℕ}
 
-theorem norm_toL_mul_le (A B : Matrix (Fin a) (Fin a) (Cinf E)) :
-    ‖toL (A * B)‖ ≤ a * (‖toL A‖ * ‖toL B‖) := by
+theorem norm_toL_mul_le (A B : Matrix (Fin a) (Fin a) (Cinf E))
+    : ‖toL (A * B)‖ ≤ a * (‖toL A‖ * ‖toL B‖) := by
   have hA : ∀ i k, ‖A i k‖ ≤ ‖toL A‖ := fun i k =>
     (norm_le_pi_norm (toL A i) k).trans (norm_le_pi_norm (toL A) i)
   have hB : ∀ i k, ‖B i k‖ ≤ ‖toL B‖ := fun i k =>
@@ -25,12 +26,14 @@ theorem norm_toL_mul_le (A B : Matrix (Fin a) (Fin a) (Cinf E)) :
   change ‖(A * B) i j‖ ≤ _
   rw [Matrix.mul_apply]
   refine (norm_sum_le _ _).trans ?_
-  calc ∑ k, ‖A i k * B k j‖ ≤ ∑ _k : Fin a, ‖toL A‖ * ‖toL B‖ :=
-        Finset.sum_le_sum fun k _ => (norm_mul_le _ _).trans
-          (mul_le_mul (hA i k) (hB k j) (norm_nonneg _) (norm_nonneg _))
+  calc
+    ∑ k, ‖A i k * B k j‖ ≤ ∑ _k : Fin a, ‖toL A‖ * ‖toL B‖ :=
+      Finset.sum_le_sum fun k _ =>
+        (norm_mul_le _ _).trans (mul_le_mul (hA i k) (hB k j) (norm_nonneg _) (norm_nonneg _))
     _ = a * (‖toL A‖ * ‖toL B‖) := by simp
 
-theorem continuousOn_toL_inv : ContinuousOn (fun x : Lie E a => toL (Matrix.of x)⁻¹) (invSet E a) := by
+theorem continuousOn_toL_inv
+    : ContinuousOn (fun x : Lie E a => toL (Matrix.of x)⁻¹) (invSet E a) := by
   intro x hx
   apply ContinuousAt.continuousWithinAt
   have hd : IsUnit (Matrix.of x).det := (Matrix.isUnit_iff_isUnit_det _).1 hx
@@ -38,9 +41,10 @@ theorem continuousOn_toL_inv : ContinuousOn (fun x : Lie E a => toL (Matrix.of x
 
 end SlopeTestRemainingChoices
 
-theorem smoothing_mem_growth : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
-    (ν : Measure (Lie E a)) [ν.IsAddHaarMeasure] (α : Lie E a → ℂ), IsTest (invSet E a) α →
-    ∀ f ∈ growth E a, smoothing ν α f ∈ growth E a := by
+theorem smoothing_mem_growth
+    : ∀ (E : Type) [Field E] [NumberField E] [_root_.NumberField.IsTotallyComplex E] (a : ℕ)
+        (ν : Measure (Lie E a)) [ν.IsAddHaarMeasure] (α : Lie E a → ℂ),
+      IsTest (invSet E a) α → ∀ f ∈ growth E a, smoothing ν α f ∈ growth E a := by
   intro E _ _ _ a ν _ α hα f hf g
   obtain ⟨C, N, hC⟩ := hf g
   have C0 : 0 ≤ C := by
@@ -80,8 +84,9 @@ theorem smoothing_mem_growth : ∀ (E : Type) [Field E] [NumberField E] [_root_.
         have n1 := norm_nonneg (toL y.val)
         have n2 := norm_nonneg (toL (y⁻¹).val)
         have q1 : (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * M * ‖toL y.val‖ := by
-          calc (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * (‖toL y.val‖ * M) :=
-                mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left m1 n1) (Nat.cast_nonneg a)
+          calc
+            (a : ℝ) * (‖toL y.val‖ * ‖toL u.val‖) ≤ a * (‖toL y.val‖ * M) :=
+              mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left m1 n1) (Nat.cast_nonneg a)
             _ = a * M * ‖toL y.val‖ := by ring
         have q2 : (a : ℝ) * (‖toL (u⁻¹).val‖ * ‖toL (y⁻¹).val‖) ≤ a * M * ‖toL (y⁻¹).val‖ := by
           rw [← mul_assoc]
@@ -90,8 +95,9 @@ theorem smoothing_mem_growth : ∀ (E : Type) [Field E] [NumberField E] [_root_.
         unfold height
         rw [show toL (y * u).val = toL (y.val * u.val) from rfl, e2, hc]
         nlinarith
-      calc C * height (y * u) ^ N ≤ C * (c * height y) ^ N :=
-            mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by linarith [one_le_height (y * u)]) hh N) C0
+      calc
+        C * height (y * u) ^ N ≤ C * (c * height y) ^ N :=
+          mul_le_mul_of_nonneg_left (pow_le_pow_left₀ (by linarith [one_le_height (y * u)]) hh N) C0
         _ = C * c ^ N * height y ^ N := by rw [mul_pow, mul_assoc]
     · rw [image_eq_zero_of_notMem_tsupport hx]
       simp

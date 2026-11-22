@@ -17,7 +17,8 @@ set_option linter.unusedSectionVars false
 
 namespace BanachRep
 
-variable {L : Type*} [Group L] [TopologicalSpace L] [IsTopologicalGroup L] [CompactSpace L]
+variable
+  {L : Type*} [Group L] [TopologicalSpace L] [IsTopologicalGroup L] [CompactSpace L]
   [TotallyDisconnectedSpace L] [T2Space L]
   {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
 
@@ -28,9 +29,10 @@ def fixedIn (σ : BanachRep L E) (W : Submodule ℂ E) (U : Subgroup L) : Submod
   zero_mem' := ⟨W.zero_mem, fun u _ => map_zero _⟩
   smul_mem' := fun c w hw => ⟨W.smul_mem c hw.1, fun u hu => by rw [map_smul, hw.2 u hu]⟩
 
-theorem exists_isOpen_forall_eq_of_finiteDimensional (σ : BanachRep L E) (v : E)
-    (hv : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun g : L => σ g v))) :
-    ∃ U : Subgroup L, IsOpen (U : Set L) ∧ ∀ u ∈ U, σ u v = v := by
+theorem exists_isOpen_forall_eq_of_finiteDimensional
+    (σ : BanachRep L E) (v : E)
+    (hv : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun g : L => σ g v)))
+    : ∃ U : Subgroup L, IsOpen (U : Set L) ∧ ∀ u ∈ U, σ u v = v := by
   classical
   let _ : MeasurableSpace L := borel L
   have _ : BorelSpace L := ⟨rfl⟩
@@ -40,8 +42,8 @@ theorem exists_isOpen_forall_eq_of_finiteDimensional (σ : BanachRep L E) (v : E
   set F : Subgroup L → Submodule ℂ E := fun U => fixedIn σ W U with hFdef
   have hFle : ∀ U, F U ≤ W := fun U w hw => hw.1
   have hFfin : ∀ U, FiniteDimensional ℂ (F U) := fun U => Submodule.finiteDimensional_of_le (hFle U)
-  have hFanti : ∀ {U V : Subgroup L}, U ≤ V → F V ≤ F U :=
-    fun hUV w hw => ⟨hw.1, fun u hu => hw.2 u (hUV hu)⟩
+  have hFanti : ∀ {U V : Subgroup L}, U ≤ V → F V ≤ F U := fun hUV w hw =>
+    ⟨hw.1, fun u hu => hw.2 u (hUV hu)⟩
 
   set S : Set ℕ := {d | ∃ U : Subgroup L, IsOpen (U : Set L) ∧ finrank ℂ (F U) = d} with hSdef
   have hSne : S.Nonempty := ⟨_, ⊤, by rw [Subgroup.coe_top]; exact isOpen_univ, rfl⟩
@@ -96,8 +98,9 @@ theorem exists_isOpen_forall_eq_of_finiteDimensional (σ : BanachRep L E) (v : E
     have hdiff : e - v = ∫ u : U, (σ (u : L) v - v) ∂ρ := by
       rw [integral_sub hint (integrable_const v), integral_const, probReal_univ, one_smul]
     rw [dist_comm, dist_eq_norm, hdiff]
-    calc ‖∫ u : U, (σ (u : L) v - v) ∂ρ‖ ≤ ε / 2 * ρ.real univ :=
-          norm_integral_le_of_norm_le_const (ae_of_all _ fun u => (hUN u u.2).le)
+    calc
+      ‖∫ u : U, (σ (u : L) v - v) ∂ρ‖ ≤ ε / 2 * ρ.real univ :=
+        norm_integral_le_of_norm_le_const (ae_of_all _ fun u => (hUN u u.2).le)
       _ = ε / 2 := by rw [probReal_univ, mul_one]
       _ < ε := half_lt_self hε
   exact ⟨U₀, hU₀, fun u hu => hvF.2 u hu⟩
@@ -106,13 +109,15 @@ end BanachRep
 
 namespace UnitaryRep
 
-variable {L : Type*} [Group L] [TopologicalSpace L] [IsTopologicalGroup L] [CompactSpace L]
+variable
+  {L : Type*} [Group L] [TopologicalSpace L] [IsTopologicalGroup L] [CompactSpace L]
   [TotallyDisconnectedSpace L] [T2Space L]
   {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
 
-theorem exists_isOpen_forall_eq_of_finiteDimensional (σ : UnitaryRep L H) (v : H)
-    (hv : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun g : L => σ g v))) :
-    ∃ U : Subgroup L, IsOpen (U : Set L) ∧ ∀ u ∈ U, σ u v = v := by
+theorem exists_isOpen_forall_eq_of_finiteDimensional
+    (σ : UnitaryRep L H) (v : H)
+    (hv : FiniteDimensional ℂ (Submodule.span ℂ (Set.range fun g : L => σ g v)))
+    : ∃ U : Subgroup L, IsOpen (U : Set L) ∧ ∀ u ∈ U, σ u v = v := by
   have e : (Set.range fun g : L => BanachRep.ofUnitary σ g v) = Set.range fun g : L => σ g v := rfl
   rw [← e] at hv
   exact BanachRep.exists_isOpen_forall_eq_of_finiteDimensional (BanachRep.ofUnitary σ) v hv

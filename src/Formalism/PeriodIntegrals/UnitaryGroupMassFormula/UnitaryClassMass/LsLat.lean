@@ -4,7 +4,8 @@ public import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.UnitaryClassMass
 
 @[expose] public section
 
-open NumberField PI.UJClassFin PI.UJClassMass Formalism.HermitianLatticesTheory Formalism.ThetaLiftIndependence PI.UnitaryGroupMassFormula.UJClassFin
+open NumberField PI.UJClassFin PI.UJClassMass Formalism.HermitianLatticesTheory
+  Formalism.ThetaLiftIndependence PI.UnitaryGroupMassFormula.UJClassFin
 open scoped TensorProduct
 
 noncomputable section
@@ -21,18 +22,22 @@ theorem lsLat : LSLat := by
   set Q := finMat σ (gramOf h b) g with hQ
   have hQP : Q * P = 1 := by rw [hQ, hP, ← finMat_mul, mul_inv_cancel, finMat_one]
 
-  have hsm : ∀ e : E, IsIntegral ℤ e → ∀ x ∈ abelian₂ σ (gramOf h b) L g, e • x ∈ abelian₂ σ (gramOf h b) L g := by
+  have hsm
+      : ∀ e : E,
+        IsIntegral ℤ e
+          → ∀ x ∈ abelian₂ σ (gramOf h b) L g, e • x ∈ abelian₂ σ (gramOf h b) L g := by
     intro e he x hx
     show P.mulVec (vinc (F := F) (e • x)) ∈ latHat F E L
     rw [vinc_smul, Matrix.mulVec_smul]
     exact latHat_incl_smul b L0 he hx
-  let C : Submodule (𝓞 E) (Fin M → E) :=
-    { carrier := abelian₂ σ (gramOf h b) L g
-      add_mem' := fun {x y} hx hy => (LamG σ (gramOf h b) L g).add_mem hx hy
-      zero_mem' := (LamG σ (gramOf h b) L g).zero_mem
-      smul_mem' := fun c x hx => by
-        show (algebraMap (𝓞 E) E c) • x ∈ abelian₂ σ (gramOf h b) L g
-        exact hsm _ c.isIntegral_coe x hx }
+  let C : Submodule (𝓞 E) (Fin M → E) := {
+    carrier := abelian₂ σ (gramOf h b) L g
+    add_mem' := fun {x y} hx hy => (LamG σ (gramOf h b) L g).add_mem hx hy
+    zero_mem' := (LamG σ (gramOf h b) L g).zero_mem
+    smul_mem' := fun c x hx => by
+      show (algebraMap (𝓞 E) E c) • x ∈ abelian₂ σ (gramOf h b) L g
+      exact hsm _ c.isIntegral_coe x hx
+  }
 
   obtain ⟨m, hm, hmO⟩ := den_mat (F := F) (E := E) Q
   have hupC : ∀ y ∈ C, ∀ j, IsIntegral ℤ (((m * u : ℕ) : E) * y j) := by
@@ -41,12 +46,13 @@ theorem lsLat : LSLat := by
     have hw : P.mulVec (vinc (F := F) y) ∈ latHat F E L := hy
     have ev : vinc (F := F) y = Q.mulVec (P.mulVec (vinc (F := F) y)) := by
       rw [Matrix.mulVec_mulVec, hQP, Matrix.one_mulVec]
-    have e1 : inclR (F := F) (Af F) (((m * u : ℕ) : E) * y j) =
-        ∑ l, (m • Q j l) * (u • P.mulVec (vinc (F := F) y) l) := by
+    have e1
+        : inclR (F := F) (Af F) (((m * u : ℕ) : E) * y j)
+          = ∑ l, (m • Q j l) * (u • P.mulVec (vinc (F := F) y) l) := by
       have : inclR (F := F) (Af F) (((m * u : ℕ) : E) * y j) = (m * u) • vinc (F := F) y j := by
         simp [vinc, nsmul_eq_mul]
-      have gen : ∀ w : Fin M → Af F ⊗[F] E,
-          (m * u) • Q.mulVec w j = ∑ l, (m • Q j l) * (u • w l) := by
+      have gen
+          : ∀ w : Fin M → Af F ⊗[F] E, (m * u) • Q.mulVec w j = ∑ l, (m • Q j l) * (u • w l) := by
         intro w
         simp only [Matrix.mulVec, dotProduct, Finset.smul_sum, nsmul_eq_mul]
         refine Finset.sum_congr rfl fun l _ => ?_
@@ -84,7 +90,8 @@ theorem lsLat : LSLat := by
     constructor
     · rintro ⟨x, hx, rfl⟩
       show b.equivFun (b.equivFun.symm x) ∈ abelian₂ σ (gramOf h b) L g
-      rw [LinearEquiv.apply_symm_apply]; exact hx
+      rw [LinearEquiv.apply_symm_apply]
+      exact hx
     · intro hv
       exact ⟨b.equivFun v, hv, by simp [f]⟩
   have hNfull : Submodule.IsFullLattice E N := by

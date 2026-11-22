@@ -14,10 +14,11 @@ section gen
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E]
 
-theorem HSpace.pos_of_isomEmb (A B : HSpace E) (ι : A.V →ₗ[E] B.V) (hι : HSpace.IsIsomEmb A B ι)
-    (hA : A.SigOK) (hB : B.SigOK) (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
-    (hdef : A.sig τ = (A.rank, 0) ∨ A.sig τ = (0, A.rank)) (hlt : (B.sig τ).2 < A.rank) :
-    A.sig τ = (A.rank, 0) := by
+theorem HSpace.pos_of_isomEmb
+    (A B : HSpace E) (ι : A.V →ₗ[E] B.V) (hι : HSpace.IsIsomEmb A B ι) (hA : A.SigOK) (hB : B.SigOK)
+    (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a))
+    (hdef : A.sig τ = (A.rank, 0) ∨ A.sig τ = (0, A.rank)) (hlt : (B.sig τ).2 < A.rank)
+    : A.sig τ = (A.rank, 0) := by
   rcases hdef with h | h
   · exact h
   · exfalso
@@ -30,10 +31,12 @@ theorem HSpace.pos_of_isomEmb (A B : HSpace E) (ι : A.V →ₗ[E] B.V) (hι : H
     simp only at key
     omega
 
-theorem HSpace.frame_of_pos (S : HSpace E) (σ : E →+* ℂ)
-    (hσ : ∀ a, σ (star a) = (starRingEnd ℂ) (σ a)) (h : Formalism.UG.HasSignature (S.gram.map σ) S.rank 0) :
-    ∃ Y : Matrix (Fin S.rank) (Fin S.rank) ℂ, IsUnit Y.det ∧
-      ∀ y : S.V, ∑ i, ‖(Y.mulVec fun j => σ (S.frame.repr y j)) i‖ ^ 2 = (σ (S.hT y y)).re := by
+theorem HSpace.frame_of_pos
+    (S : HSpace E) (σ : E →+* ℂ) (hσ : ∀ a, σ (star a) = (starRingEnd ℂ) (σ a))
+    (h : Formalism.UG.HasSignature (S.gram.map σ) S.rank 0)
+    : ∃ Y : Matrix (Fin S.rank) (Fin S.rank) ℂ,
+      IsUnit Y.det
+        ∧ ∀ y : S.V, ∑ i, ‖(Y.mulVec fun j => σ (S.frame.repr y j)) i‖ ^ 2 = (σ (S.hT y y)).re := by
   obtain ⟨e, P, hP⟩ := h
   have hJ : Formalism.UG.Jpq S.rank 0 = 1 := by
     ext i j
@@ -50,13 +53,16 @@ theorem HSpace.frame_of_pos (S : HSpace E) (σ : E →+* ℂ)
   rw [hcT, hJ] at hP
   set G : Matrix (Fin S.rank) (Fin S.rank) ℂ := S.gram.map σ with hG
   have hGr : G.reindex e e = Qm.conjTranspose * Qm := by
-    have h1 : Qm.conjTranspose * (Pm.conjTranspose * G.reindex e e * Pm) * Qm = Qm.conjTranspose * Qm := by
+    have h1
+        : Qm.conjTranspose * (Pm.conjTranspose * G.reindex e e * Pm) * Qm
+          = Qm.conjTranspose * Qm := by
       rw [hP, Matrix.mul_one]
     have h2 : Qm.conjTranspose * Pm.conjTranspose = 1 := by
       rw [← Matrix.conjTranspose_mul, hPQ, Matrix.conjTranspose_one]
     rw [← h1]
-    calc G.reindex e e = (Qm.conjTranspose * Pm.conjTranspose) * G.reindex e e * (Pm * Qm) := by
-          rw [h2, hPQ, Matrix.one_mul, Matrix.mul_one]
+    calc
+      G.reindex e e = (Qm.conjTranspose * Pm.conjTranspose) * G.reindex e e * (Pm * Qm) := by
+        rw [h2, hPQ, Matrix.one_mul, Matrix.mul_one]
       _ = _ := by simp only [Matrix.mul_assoc]
   let Y : Matrix (Fin S.rank) (Fin S.rank) ℂ := Qm.submatrix e e
   have hGY : G = Y.conjTranspose * Y := by
@@ -83,15 +89,18 @@ theorem HSpace.frame_of_pos (S : HSpace E) (σ : E →+* ℂ)
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Finsupp.sum_fintype _ _ (by intro j; simp), map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
-      simp only [smul_eq_mul, map_mul, RingHom.id_apply, hG, hz, Matrix.map_apply, HSpace.gram, Pi.star_apply]
+      simp only [smul_eq_mul, map_mul, RingHom.id_apply, hG, hz, Matrix.map_apply, HSpace.gram,
+        Pi.star_apply]
       rw [starRingEnd_apply, hσ]
       simp only [starRingEnd_apply]
       ring
     rw [h1, h2, h3]
 
-theorem HSpace.form_pos (S : HSpace E) (hS : S.SigOK) (τ : E →+* ℂ)
-    (hτ : ∀ a, τ (star a) = (starRingEnd ℂ) (τ a)) (h : S.sig τ = (S.rank, 0)) (x : S.V) (hx : x ≠ 0) :
-    ∃ c : ℝ, 0 < c ∧ τ (S.hT x x) = (c : ℂ) := by
+theorem HSpace.form_pos
+    (S : HSpace E) (hS : S.SigOK)
+    (τ : E →+* ℂ) (hτ : ∀ a, τ (star a) = (starRingEnd ℂ) (τ a)) (h : S.sig τ = (S.rank, 0))
+    (x : S.V) (hx : x ≠ 0)
+    : ∃ c : ℝ, 0 < c ∧ τ (S.hT x x) = (c : ℂ) := by
   have hsig := hS τ
   rw [h] at hsig
   obtain ⟨Y, hY, hsum⟩ := S.frame_of_pos τ hτ hsig
@@ -130,29 +139,31 @@ end gen
 
 section spaces
 
-variable {R : Ranks} {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E]
-  [Algebra F E]
+variable
+  {R : Ranks} {F E : Type}
+  [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
 
-theorem Spaces.X'_posDef (S : Spaces R F E) (hYm : ∀ τ : E →+* ℂ, (S.Y R.m).sig τ = sigYD R R.m) :
-    S.X'.IsPosDef := by
+theorem Spaces.X'_posDef (S : Spaces R F E) (hYm : ∀ τ : E →+* ℂ, (S.Y R.m).sig τ = sigYD R R.m)
+    : S.X'.IsPosDef := by
   intro τ
   have hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a) := S.cm.cmUnram.2.1 τ
-  refine HSpace.pos_of_isomEmb S.X' (S.Y R.m) S.eYm.toLinearMap S.eYm_isom S.X'_sig (S.Y_sig R.m) τ hτ
-    ((factXmDef R F S).1 τ) ?_
+  refine HSpace.pos_of_isomEmb S.X' (S.Y R.m) S.eYm.toLinearMap S.eYm_isom S.X'_sig (S.Y_sig R.m) τ
+    hτ ((factXmDef R F S).1 τ) ?_
   rw [hYm τ, S.X'_rank]
   simp only [sigYD, Nat.sub_self, Nat.zero_div]
   unfold Ranks.rankX' Ranks.r
   have := R.k_ge
   omega
 
-theorem Spaces.X_posDef (S : Spaces R F E)
-    (hY : ∀ j, j ≤ R.m → ∀ τ : E →+* ℂ, (S.Y j).sig τ = sigYD R j) (j : ℕ) (hj : j ≤ R.m) :
-    (S.X j).IsPosDef := by
+theorem Spaces.X_posDef
+    (S : Spaces R F E) (hY : ∀ j, j ≤ R.m → ∀ τ : E →+* ℂ, (S.Y j).sig τ = sigYD R j)
+    (j : ℕ) (hj : j ≤ R.m)
+    : (S.X j).IsPosDef := by
   intro τ
   have hτ : ∀ a, τ (star a) = starRingEnd ℂ (τ a) := S.cm.cmUnram.2.1 τ
   rcases Nat.lt_or_ge j R.m with hjm | hjm
-  · refine HSpace.pos_of_isomEmb (S.X j) (S.Y j) (S.iXY j) (S.iXY_isom j hjm) (S.X_sig j) (S.Y_sig j) τ hτ
-      (S.X_def j hj τ) ?_
+  · refine HSpace.pos_of_isomEmb (S.X j) (S.Y j) (S.iXY j) (S.iXY_isom j hjm) (S.X_sig j)
+      (S.Y_sig j) τ hτ (S.X_def j hj τ) ?_
     rw [hY j hj τ, S.X_rank j hj]
     simp only [sigYD, Ranks.N]
     have h1 := R.m_add_three_le_k
@@ -165,9 +176,12 @@ theorem Spaces.X_posDef (S : Spaces R F E)
     rw [S.X_rank R.m le_rfl]
     exact ((factXmDef R F S).2.2 τ).2 hX'
 
-theorem Spaces.X_form_pos (S : Spaces R F E)
-    (hY : ∀ j, j ≤ R.m → ∀ τ : E →+* ℂ, (S.Y j).sig τ = sigYD R j) (j : ℕ) (hj : j ≤ R.m)
-    (τ : E →+* ℂ) (x : (S.X j).V) (hx : x ≠ 0) : ∃ c : ℝ, 0 < c ∧ τ ((S.X j).hT x x) = (c : ℂ) :=
+theorem Spaces.X_form_pos
+    (S : Spaces R F E) (hY : ∀ j, j ≤ R.m → ∀ τ : E →+* ℂ, (S.Y j).sig τ = sigYD R j)
+    (j : ℕ) (hj : j ≤ R.m)
+    (τ : E →+* ℂ)
+    (x : (S.X j).V) (hx : x ≠ 0)
+    : ∃ c : ℝ, 0 < c ∧ τ ((S.X j).hT x x) = (c : ℂ) :=
   HSpace.form_pos (S.X j) (S.X_sig j) τ (S.cm.cmUnram.2.1 τ) (S.X_posDef hY j hj τ) x hx
 
 end spaces
@@ -182,8 +196,9 @@ theorem X_posDef (j : ℕ) (hj : j ≤ D.R.m) : letI := D.host.cmStar; (D.sp.X j
 theorem X'_posDef : letI := D.host.cmStar; D.sp.X'.IsPosDef :=
   letI := D.host.cmStar; D.sp.X'_posDef (D.Y_sigval D.R.m le_rfl)
 
-theorem X_form_pos (j : ℕ) (hj : j ≤ D.R.m) (τ : D.host.E →+* ℂ) :
-    letI := D.host.cmStar; ∀ x : (D.sp.X j).V, x ≠ 0 → ∃ c : ℝ, 0 < c ∧ τ ((D.sp.X j).hT x x) = (c : ℂ) :=
+theorem X_form_pos (j : ℕ) (hj : j ≤ D.R.m) (τ : D.host.E →+* ℂ)
+    : letI := D.host.cmStar
+      ∀ x : (D.sp.X j).V, x ≠ 0 → ∃ c : ℝ, 0 < c ∧ τ ((D.sp.X j).hT x x) = (c : ℂ) :=
   letI := D.host.cmStar; fun x hx => D.sp.X_form_pos D.Y_sigval j hj τ x hx
 
 end D7

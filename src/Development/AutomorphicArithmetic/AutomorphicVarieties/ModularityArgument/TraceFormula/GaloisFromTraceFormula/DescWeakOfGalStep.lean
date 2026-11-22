@@ -52,7 +52,8 @@ public import Development.WeilBound.RepresentationTheoryGL.ArchimedeanBaseChange
 
 @[expose] public section
 
-open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm PositivityTheory.Rg.BcB.G8
+open UpperTheory.V.Z.Tf.GlobalTraceComparison UpperTheory.V.Z.Tf.GlobalTraceComparison.Cusp
+  UpperTheory.V.Z.Tf.GlobalTraceComparison.Asm PositivityTheory.Rg.BcB.G8
 
 namespace UpperTheory.V.Z.Tf.GaloisFromTraceFormula
 
@@ -61,12 +62,24 @@ theorem cuspReadI : CuspReadI :=
     (ctCaseJ (stepT (iwaT levShrink typeSat) sliceT stabT) splitLim satComb cdAddG absInf mtoLaws)
 
 theorem asmTh : AsmTh :=
-  asmTh_of (rChoice places levelFn regFn) (fun h => rUEval h places exAct splitLine inertLine uConj)
-    (fun h1 h3 => rFamMatch h1 h3 places exAct exHecke2 ctEx muConj) ends (twDataT cdAddG muInf mwAt dualWt) (regOf mwAt dualWt)
-    unStable muInf (csdInert GOne.csdSat) (rSep places) regCt trAvg places
+  asmTh_of (rChoice places levelFn regFn)
+    (fun h => rUEval h places exAct splitLine inertLine uConj)
+    (fun h1 h3 => rFamMatch h1 h3 places exAct exHecke2 ctEx muConj)
+    ends (twDataT cdAddG muInf mwAt dualWt) (regOf mwAt dualWt) unStable muInf
+    (csdInert GOne.csdSat) (rSep places) regCt trAvg places
 
-theorem runTh_of (hU : GlobalTheory.BCT.USide) (hG : G2s) (hM : MuEx) (h1 : MatchUnit) (h3 : MatchSplit) (hS : StUnit) (hE : EndoBlockG)
-    (hB : StableBlockG) : RunTh :=
-  asmTh hU hG hM h1 h3 (endoS (enlarge hS hecke_eigenvalues_unitary_one_factor unitary_one_characters_separated_by_eigenvalues places) places hE) (stableS (enlarge hS hecke_eigenvalues_unitary_one_factor unitary_one_characters_separated_by_eigenvalues places) places hB)
+theorem runTh_of
+    (hU : GlobalTheory.BCT.USide) (hG : G2s) (hM : MuEx) (h1 : MatchUnit) (h3 : MatchSplit)
+    (hS : StUnit) (hE : EndoBlockG) (hB : StableBlockG)
+    : RunTh :=
+  asmTh hU hG hM h1 h3
+    (endoS
+      (enlarge hS hecke_eigenvalues_unitary_one_factor
+        unitary_one_characters_separated_by_eigenvalues places)
+      places hE)
+    (stableS
+      (enlarge hS hecke_eigenvalues_unitary_one_factor
+        unitary_one_characters_separated_by_eigenvalues places)
+      places hB)
 
 end UpperTheory.V.Z.Tf.GaloisFromTraceFormula

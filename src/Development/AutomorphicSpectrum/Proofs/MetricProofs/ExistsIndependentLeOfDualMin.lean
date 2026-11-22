@@ -9,26 +9,32 @@ public import Formalism.NormUnitaryBounds.DetPolynomialWeights.ShortIndependentV
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
 open scoped ENNReal InnerProductSpace
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp
 
-theorem exists_independent_le_of_dual_min :
-    ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-      (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L] (μ : ℝ), 0 < μ →
-      (∀ y : V, y ≠ 0 → (∀ x ∈ L, ∃ m : ℤ, ⟪x, y⟫_ℝ = m) → μ ≤ ‖y‖) →
-      ∃ b : Fin (Module.finrank ℝ V) → V, (∀ i, b i ∈ L) ∧ LinearIndependent ℝ b ∧
-        ∀ i, ‖b i‖ ≤ (Module.finrank ℝ V : ℝ) ^ (3 / 2 : ℝ) / μ := by
+theorem exists_independent_le_of_dual_min
+    : ∀ (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+        (L : Submodule ℤ V) [DiscreteTopology L] [IsZLattice ℝ L] (μ : ℝ),
+      0 < μ → (∀ y : V, y ≠ 0 → (∀ x ∈ L, ∃ m : ℤ, ⟪x, y⟫_ℝ = m) → μ ≤ ‖y‖)
+        → ∃ b : Fin (Module.finrank ℝ V) → V,
+          (∀ i, b i ∈ L) ∧ LinearIndependent ℝ b
+            ∧ ∀ i, ‖b i‖ ≤ (Module.finrank ℝ V : ℝ) ^ (3 / 2 : ℝ) / μ := by
   intro V _ _ _ L _ _ μ hμ hdual
   set n := Module.finrank ℝ V with hn
   set c : ℝ := (n : ℝ) / μ with hc
   have hc0 : 0 ≤ c := div_nonneg (Nat.cast_nonneg _) hμ.le
   have hspan : Submodule.span ℝ (L : Set V) = ⊤ := IsZLattice.span_top
-  have main : ∀ k, k ≤ n → ∃ b : Fin k → V, (∀ i, b i ∈ L) ∧ LinearIndependent ℝ b ∧
-      (∀ i, ‖b i‖ ^ 2 ≤ n * c ^ 2) ∧
-      (∀ w ∈ Submodule.span ℝ (Set.range b), ∃ z ∈ Submodule.span ℤ (Set.range b),
-        ‖w - z‖ ^ 2 ≤ k * c ^ 2 / 4) := by
+  have main
+      : ∀ k,
+        k ≤ n
+          → ∃ b : Fin k → V,
+            (∀ i, b i ∈ L) ∧ LinearIndependent ℝ b ∧ (∀ i, ‖b i‖ ^ 2 ≤ n * c ^ 2)
+              ∧ (∀ w ∈ Submodule.span ℝ (Set.range b), ∃ z ∈ Submodule.span ℤ (Set.range b),
+                ‖w - z‖ ^ 2 ≤ k * c ^ 2 / 4) := by
     intro k
     induction k with
     | zero =>
@@ -53,7 +59,9 @@ theorem exists_independent_le_of_dual_min :
         rw [h, finrank_top] at h1
         omega
       have hNsubW : ∀ y ∈ N, y ∈ W := fun y hy => by rw [← hNW]; exact Submodule.subset_span hy
-      obtain ⟨m, hmL, hp0, hpn⟩ := Formalism.NormUnitaryCountingLemmas.exists_starProjection_ne_zero_norm_le_of_dualMinimum L hspan hμ hdual W N hNL hNW hWtop
+      obtain ⟨m, hmL, hp0, hpn⟩ :=
+        Formalism.NormUnitaryCountingLemmas.exists_starProjection_ne_zero_norm_le_of_dualMinimum L
+          hspan hμ hdual W N hNL hNW hWtop
       set p := Wᗮ.starProjection m with hp
       have hpW : p ∈ Wᗮ := Wᗮ.starProjection_apply_mem m
       have hwW : m - p ∈ W := by
@@ -108,8 +116,8 @@ theorem exists_independent_le_of_dual_min :
         · have e : t • v + u - ((round t : ℤ) • v + z') = (s • (m - p - z) + u - z') + s • p := by
             rw [← Int.cast_smul_eq_zsmul ℝ, hs, hvdec]
             module
-          rw [e, pyth _ (W.sub_mem hq (hNsubW z' hz'N)) _ (Wᗮ.smul_mem _ hpW), norm_smul,
-            mul_pow, Real.norm_eq_abs, sq_abs]
+          rw [e, pyth _ (W.sub_mem hq (hNsubW z' hz'N)) _ (Wᗮ.smul_mem _ hpW), norm_smul, mul_pow,
+            Real.norm_eq_abs, sq_abs]
           have h4 := mul_le_mul hs2 hp2 (sq_nonneg _) (by norm_num : (0 : ℝ) ≤ 1 / 4)
           push_cast
           nlinarith [h4, hz']
@@ -121,7 +129,9 @@ theorem exists_independent_le_of_dual_min :
       ← Real.rpow_add_one hnR.ne']
     norm_num
   rw [key]
-  calc ‖b i‖ = Real.sqrt (‖b i‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
+  calc
+    ‖b i‖
+      = Real.sqrt (‖b i‖ ^ 2) := (Real.sqrt_sq (norm_nonneg _)).symm
     _ ≤ _ := Real.sqrt_le_sqrt (hbn i)
 
 end GlobalTheory.CompanionTheory.Ar.Cusp

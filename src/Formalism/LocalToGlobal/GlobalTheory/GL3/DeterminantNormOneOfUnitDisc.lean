@@ -18,15 +18,13 @@ def vol {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) : IdE D :
   Submodule.span (𝓞 D.host.E)
     {x | ∃ U : Matrix (Fin N) (Fin N) D.host.E, (∀ j, (fun i => U i j) ∈ L) ∧ x = U.det}
 
-theorem mulVec_col {N : ℕ} (A U : Matrix (Fin N) (Fin N) D.host.E) (j : Fin N) :
-    A *ᵥ (fun i => U i j) = fun i => (A * U) i j := by
+theorem mulVec_col {N : ℕ} (A U : Matrix (Fin N) (Fin N) D.host.E) (j : Fin N)
+    : A *ᵥ (fun i => U i j) = fun i => (A * U) i j := by
   funext i
-  first
-  | rfl
-  | simp [Matrix.mulVec, Matrix.mul_apply, dotProduct]
+  first | rfl | simp [Matrix.mulVec, Matrix.mul_apply, dotProduct]
 
-theorem detId_mul_vol_le {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → D.host.E)) :
-    detId D L L' * vol D L ≤ vol D L' := by
+theorem detId_mul_vol_le {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+    : detId D L L' * vol D L ≤ vol D L' := by
   unfold detId vol
   rw [Submodule.span_mul_span]
   refine Submodule.span_le.2 ?_
@@ -35,12 +33,13 @@ theorem detId_mul_vol_le {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → 
   have h := hA _ (hU j)
   rwa [mulVec_col] at h
 
-theorem cS_span_le (S : Set D.host.E) :
-    CU.cS D (Submodule.span (𝓞 D.host.E) S) ≤ Submodule.span (𝓞 D.host.E) (D.host.conj '' S) := by
+theorem cS_span_le (S : Set D.host.E)
+    : CU.cS D (Submodule.span (𝓞 D.host.E) S) ≤ Submodule.span (𝓞 D.host.E) (D.host.conj '' S) := by
   intro x hx
   have hx' : D.host.conj x ∈ Submodule.span (𝓞 D.host.E) S := hx
-  have key : ∀ y ∈ Submodule.span (𝓞 D.host.E) S,
-      D.host.conj y ∈ Submodule.span (𝓞 D.host.E) (D.host.conj '' S) := by
+  have key
+      : ∀ y ∈ Submodule.span (𝓞 D.host.E) S,
+        D.host.conj y ∈ Submodule.span (𝓞 D.host.E) (D.host.conj '' S) := by
     intro y hy
     induction hy using Submodule.span_induction with
     | mem z hz => exact Submodule.subset_span ⟨z, hz, rfl⟩
@@ -55,10 +54,12 @@ theorem cS_cS (𝔞 : IdE D) : CU.cS D (CU.cS D 𝔞) = 𝔞 := by
   show D.host.conj (D.host.conj x) ∈ 𝔞 ↔ x ∈ 𝔞
   rw [Formalism.HC.HostRaw.conj_conj]
 
-theorem vol_mul_cS_le {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
-    (hL : letI := D.host.cmStar; ∀ x ∈ L, ∀ w ∈ L,
-      stdH D.host.E N w x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range) :
-    vol D L' * CU.cS D (vol D L) ≤ detId D L L' := by
+theorem vol_mul_cS_le
+    {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+    (hL
+      : letI := D.host.cmStar
+        ∀ x ∈ L, ∀ w ∈ L, stdH D.host.E N w x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range)
+    : vol D L' * CU.cS D (vol D L) ≤ detId D L L' := by
   let _ := D.host.cmStar
   refine (mul_le_mul' (le_refl _) (cS_span_le D _)).trans ?_
   unfold vol detId
@@ -82,10 +83,12 @@ theorem vol_mul_cS_le {N : ℕ} (L L' : Submodule (𝓞 D.host.E) (Fin N → D.h
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (hV i)
   · rw [det_mul, det_conjTranspose, CU.star_conj]
 
-theorem vol_mul_cS_le_one {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
-    (hL : letI := D.host.cmStar; ∀ x ∈ L, ∀ w ∈ L,
-      stdH D.host.E N w x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range) :
-    vol D L * CU.cS D (vol D L) ≤ 1 := by
+theorem vol_mul_cS_le_one
+    {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+    (hL
+      : letI := D.host.cmStar
+        ∀ x ∈ L, ∀ w ∈ L, stdH D.host.E N w x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range)
+    : vol D L * CU.cS D (vol D L) ≤ 1 := by
   let _ := D.host.cmStar
   refine (mul_le_mul' (le_refl _) (cS_span_le D _)).trans ?_
   unfold vol
@@ -97,8 +100,7 @@ theorem vol_mul_cS_le_one {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.
     refine ⟨r, hr.trans ?_⟩
     simp [stdH, Matrix.mul_apply, conjTranspose_apply]
   choose r hr using hc
-  have e : Wᴴ * V = (Matrix.of r).map (algebraMap (𝓞 D.host.E) D.host.E) := by
-    ext i j; simp [hr]
+  have e : Wᴴ * V = (Matrix.of r).map (algebraMap (𝓞 D.host.E) D.host.E) := by ext i j; simp [hr]
   show _ ∈ (1 : IdE D)
   rw [Submodule.mem_one, ← CU.star_conj, ← det_conjTranspose]
   refine ⟨(Matrix.of r).det, ?_⟩
@@ -107,17 +109,18 @@ theorem vol_mul_cS_le_one {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.
   rw [h2, det_mul]
   exact mul_comm _ _
 
-theorem sd_int {N : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}
-    (hL : letI := D.host.cmStar; IsSDLat D.host.E N L) :
-    letI := D.host.cmStar; ∀ x ∈ L, ∀ w ∈ L,
-      stdH D.host.E N w x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
+theorem sd_int
+    {N : ℕ} {L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)}
+    (hL : letI := D.host.cmStar; IsSDLat D.host.E N L)
+    : letI := D.host.cmStar
+      ∀ x ∈ L, ∀ w ∈ L, stdH D.host.E N w x ∈ (algebraMap (𝓞 D.host.E) D.host.E).range := by
   intro x hx w hw
   exact (hL.2.2 x).1 hx w hw
 
 def UnitDisc (D : D7) : Prop :=
   let _ := D.host.cmStar
-  ∀ N (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)), IsSDLat D.host.E N L →
-    1 ≤ vol D L * CU.cS D (vol D L)
+  ∀ N (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E)),
+    IsSDLat D.host.E N L → 1 ≤ vol D L * CU.cS D (vol D L)
 
 theorem determinant_norm_one_of_unit_disc (hU : UnitDisc D) : DetIdealsKernelNormOne D := by
   intro N L L' _ hL hL'
@@ -136,22 +139,24 @@ theorem determinant_norm_one_of_unit_disc (hU : UnitDisc D) : DetIdealsKernelNor
   have h3 : vol D L' * CU.cS D (vol D L) ≤ detId D L L' := vol_mul_cS_le D L L' (sd_int D hL)
   have h4 : detId D L L' * vol D L ≤ vol D L' := detId_mul_vol_le D L L'
   refine ⟨CU.cS D (detId D L L'), fun x => Iff.rfl, le_antisymm ?_ ?_⟩
-  · calc detId D L L' * CU.cS D (detId D L L')
-          = detId D L L' * CU.cS D (detId D L L') * 1 := (mul_one _).symm
+  · calc
+      detId D L L' * CU.cS D (detId D L L')
+        = detId D L L' * CU.cS D (detId D L L') * 1 := (mul_one _).symm
       _ ≤ detId D L L' * CU.cS D (detId D L L') * (vol D L * CU.cS D (vol D L)) :=
-          mm _ _ _ _ le_rfl h1
+        mm _ _ _ _ le_rfl h1
       _ = (detId D L L' * vol D L) * (CU.cS D (detId D L L') * CU.cS D (vol D L)) := by ring
       _ ≤ vol D L' * CU.cS D (detId D L L' * vol D L) := mm _ _ _ _ h4 (mulc _ _)
       _ ≤ vol D L' * CU.cS D (vol D L') := mm _ _ _ _ le_rfl (mono _ _ h4)
       _ ≤ 1 := h2
-  · calc (1 : IdE D) = 1 * 1 := (mul_one _).symm
-      _ ≤ (vol D L' * CU.cS D (vol D L')) * (vol D L * CU.cS D (vol D L)) :=
-          mm _ _ _ _ h1' h1
+  · calc
+      (1 : IdE D)
+        = 1 * 1 := (mul_one _).symm
+      _ ≤ (vol D L' * CU.cS D (vol D L')) * (vol D L * CU.cS D (vol D L)) := mm _ _ _ _ h1' h1
       _ = (vol D L' * CU.cS D (vol D L)) * (CU.cS D (vol D L') * vol D L) := by ring
       _ = (vol D L' * CU.cS D (vol D L)) * (CU.cS D (vol D L') * CU.cS D (CU.cS D (vol D L))) := by
-          rw [cS_cS]
+        rw [cS_cS]
       _ ≤ (vol D L' * CU.cS D (vol D L)) * CU.cS D (vol D L' * CU.cS D (vol D L)) :=
-          mm _ _ _ _ le_rfl (mulc _ _)
+        mm _ _ _ _ le_rfl (mulc _ _)
       _ ≤ detId D L L' * CU.cS D (detId D L L') := mm _ _ _ _ h3 (mono _ _ h3)
 
 end Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.DN
@@ -162,11 +167,12 @@ open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Ma
 
 variable (D : D7)
 
-theorem adj_step {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
-    (hL : letI := D.host.cmStar; IsSDLat D.host.E N L)
-    (U : Matrix (Fin N) (Fin N) D.host.E) (hU : ∀ j, (fun i => U i j) ∈ L) (t : Fin N → D.host.E)
-    (ht : ∀ i, ∀ b ∈ CU.cS D (vol D L), t i * b ∈ (1 : IdE D)) :
-    D.host.conj U.det ^ (N - 1) * ∏ i, t i ∈ vol D L := by
+theorem adj_step
+    {N : ℕ} (L : Submodule (𝓞 D.host.E) (Fin N → D.host.E))
+    (hL : letI := D.host.cmStar; IsSDLat D.host.E N L) (U : Matrix (Fin N) (Fin N) D.host.E)
+    (hU : ∀ j, (fun i => U i j) ∈ L) (t : Fin N → D.host.E)
+    (ht : ∀ i, ∀ b ∈ CU.cS D (vol D L), t i * b ∈ (1 : IdE D))
+    : D.host.conj U.det ^ (N - 1) * ∏ i, t i ∈ vol D L := by
   let _ := D.host.cmStar
   refine Submodule.subset_span ⟨(adjugate U)ᴴ * diagonal t, fun i => ?_, ?_⟩
   · refine (hL.2.2 _).2 fun x hx => ?_
@@ -193,38 +199,42 @@ namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.DN
 
 open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Matrix nonZeroDivisors
 
-
 open FractionalIdeal in
-theorem spanPow {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-    [IsFractionRing R K] (I : FractionalIdeal R⁰ K) (hI : I ≠ 0) (S : Set K)
-    (hIS : (I : Submodule R K) = Submodule.span R S) (k : ℕ) :
-    (I : Submodule R K) ^ k ≤ Submodule.span R ((fun s => s ^ k) '' S) := by
+theorem spanPow
+    {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    (I : FractionalIdeal R⁰ K) (hI : I ≠ 0)
+    (S : Set K) (hIS : (I : Submodule R K) = Submodule.span R S)
+    (k : ℕ)
+    : (I : Submodule R K) ^ k ≤ Submodule.span R ((fun s => s ^ k) '' S) := by
   have mmR : ∀ A B C : FractionalIdeal R⁰ K, A ≤ B → A * C ≤ B * C := by
     intro A B C h
     rw [← FractionalIdeal.coe_le_coe, FractionalIdeal.coe_mul, FractionalIdeal.coe_mul]
     exact Submodule.mul_le.2 fun x hx y hy =>
       Submodule.mul_mem_mul (FractionalIdeal.coe_le_coe.2 h hx) hy
-  have hJle : Submodule.span R ((fun s => s ^ k) '' S) ≤
-      ((I ^ k : FractionalIdeal R⁰ K) : Submodule R K) := by
+  have hJle
+      : Submodule.span R ((fun s => s ^ k) '' S)
+        ≤ ((I ^ k : FractionalIdeal R⁰ K) : Submodule R K) := by
     rw [FractionalIdeal.coe_pow, Submodule.span_le]
     rintro _ ⟨s, hs, rfl⟩
     have hsI : s ∈ (I : Submodule R K) := by
       rw [hIS]
       exact Submodule.subset_span hs
-    first
-    | exact Submodule.pow_mem_pow hsI k
-    | exact Submodule.pow_mem_pow _ hsI k
+    first | exact Submodule.pow_mem_pow hsI k | exact Submodule.pow_mem_pow _ hsI k
   let J : FractionalIdeal R⁰ K := ⟨_, FractionalIdeal.isFractional_of_le hJle⟩
   have hJ : (J : Submodule R K) = Submodule.span R ((fun s => s ^ k) '' S) := rfl
   rw [← hJ, ← FractionalIdeal.coe_pow, FractionalIdeal.coe_le_coe]
   have hIk : I ^ k ≠ 0 := pow_ne_zero _ hI
   have hJIk : J ≤ I ^ k := hJle
   have hC1 : J * (I ^ k)⁻¹ ≤ 1 := by
-    calc J * (I ^ k)⁻¹ ≤ I ^ k * (I ^ k)⁻¹ := mmR _ _ _ hJIk
+    calc
+      J * (I ^ k)⁻¹
+        ≤ I ^ k * (I ^ k)⁻¹ := mmR _ _ _ hJIk
       _ = 1 := mul_inv_cancel₀ hIk
   by_cases h1 : J * (I ^ k)⁻¹ = 1
   · refine le_of_eq ?_
-    calc I ^ k = J * (I ^ k)⁻¹ * I ^ k := by rw [h1, one_mul]
+    calc
+      I ^ k
+        = J * (I ^ k)⁻¹ * I ^ k := by rw [h1, one_mul]
       _ = J := by rw [mul_assoc, inv_mul_cancel₀ hIk, mul_one]
   · exfalso
     obtain ⟨𝔠, h𝔠⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.1 hC1
@@ -240,7 +250,9 @@ theorem spanPow {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algeb
         rw [FractionalIdeal.spanSingleton_le_iff_mem, ← FractionalIdeal.mem_coe, hIS]
         exact Submodule.subset_span hs
       have hA1 : FractionalIdeal.spanSingleton R⁰ s * I⁻¹ ≤ 1 := by
-        calc FractionalIdeal.spanSingleton R⁰ s * I⁻¹ ≤ I * I⁻¹ := mmR _ _ _ hsI
+        calc
+          FractionalIdeal.spanSingleton R⁰ s * I⁻¹
+            ≤ I * I⁻¹ := mmR _ _ _ hsI
           _ = 1 := mul_inv_cancel₀ hI
       obtain ⟨a, ha⟩ := FractionalIdeal.le_one_iff_exists_coeIdeal.1 hA1
       have hak : a ^ k ≤ P := by
@@ -252,21 +264,21 @@ theorem spanPow {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algeb
           exact Submodule.subset_span ⟨s, hs, rfl⟩
         exact le_trans ((FractionalIdeal.coeIdeal_le_coeIdeal K).1 h2) hcP
       have haP : a ≤ P := by
-        first
-        | exact Ideal.IsPrime.le_of_pow_le hak
-        | exact hPmax.isPrime.le_of_pow_le hak
-      calc FractionalIdeal.spanSingleton R⁰ s
-            = FractionalIdeal.spanSingleton R⁰ s * I⁻¹ * I := by
-              rw [mul_assoc, inv_mul_cancel₀ hI, mul_one]
+        first | exact Ideal.IsPrime.le_of_pow_le hak | exact hPmax.isPrime.le_of_pow_le hak
+      calc
+        FractionalIdeal.spanSingleton R⁰ s = FractionalIdeal.spanSingleton R⁰ s * I⁻¹ * I := by
+          rw [mul_assoc, inv_mul_cancel₀ hI, mul_one]
         _ = (a : FractionalIdeal R⁰ K) * I := by rw [ha]
         _ ≤ (P : FractionalIdeal R⁰ K) * I :=
-            mmR _ _ _ ((FractionalIdeal.coeIdeal_le_coeIdeal K).2 haP)
+          mmR _ _ _ ((FractionalIdeal.coeIdeal_le_coeIdeal K).2 haP)
     have hIle : I ≤ (P : FractionalIdeal R⁰ K) * I := by
       rw [← FractionalIdeal.coe_le_coe, hIS, Submodule.span_le]
       intro s hs
       exact FractionalIdeal.spanSingleton_le_iff_mem.1 (key s hs)
     have hPI : (P : FractionalIdeal R⁰ K) * I ≤ I := by
-      calc (P : FractionalIdeal R⁰ K) * I ≤ 1 * I := mmR _ _ _ FractionalIdeal.coeIdeal_le_one
+      calc
+        (P : FractionalIdeal R⁰ K) * I
+          ≤ 1 * I := mmR _ _ _ FractionalIdeal.coeIdeal_le_one
         _ = I := one_mul _
     have heq : (P : FractionalIdeal R⁰ K) * I = 1 * I := by
       rw [one_mul]
@@ -277,8 +289,8 @@ theorem spanPow {R K : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algeb
 
 variable (D : D7)
 
-theorem cS_span (S : Set D.host.E) :
-    CU.cS D (Submodule.span (𝓞 D.host.E) S) = Submodule.span (𝓞 D.host.E) (D.host.conj '' S) := by
+theorem cS_span (S : Set D.host.E)
+    : CU.cS D (Submodule.span (𝓞 D.host.E) S) = Submodule.span (𝓞 D.host.E) (D.host.conj '' S) := by
   refine le_antisymm (cS_span_le D S) ?_
   refine Submodule.span_le.2 ?_
   rintro _ ⟨s, hs, rfl⟩
@@ -290,7 +302,8 @@ end Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.DN
 
 namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.DN
 
-open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Matrix nonZeroDivisors FractionalIdeal
+open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric Matrix nonZeroDivisors
+  FractionalIdeal
 
 variable (D : D7)
 
@@ -306,9 +319,11 @@ theorem unitDisc : UnitDisc D := by
     rw [Submodule.one_le]
     simpa using Submodule.mul_mem_mul h1 h2
   obtain ⟨n, rfl⟩ : ∃ n, N = n + 1 := ⟨N - 1, by omega⟩
-  obtain ⟨U0, hU0, hdet⟩ : ∃ U : Matrix (Fin (n + 1)) (Fin (n + 1)) D.host.E,
-      (∀ j, (fun i => U i j) ∈ L) ∧ U.det ≠ 0 := by
-    obtain ⟨b, hbL, hbspan, hbli⟩ := exists_linearIndependent D.host.E (L : Set (Fin (n + 1) → D.host.E))
+  obtain ⟨U0, hU0, hdet⟩
+      : ∃ U : Matrix (Fin (n + 1)) (Fin (n + 1)) D.host.E,
+        (∀ j, (fun i => U i j) ∈ L) ∧ U.det ≠ 0 := by
+    obtain ⟨b, hbL, hbspan, hbli⟩ :=
+      exists_linearIndependent D.host.E (L : Set (Fin (n + 1) → D.host.E))
     have hsp : ⊤ ≤ Submodule.span D.host.E (Set.range ((↑) : b → (Fin (n + 1) → D.host.E))) := by
       rw [Subtype.range_coe, hbspan]
       exact hL.2.1.ge
@@ -353,18 +368,29 @@ theorem unitDisc : UnitDisc D := by
       exact Submodule.subset_span ⟨U0, hU0, rfl⟩
     rw [h0, FractionalIdeal.coe_zero, Submodule.mem_bot] at hm
     exact hdet (by simpa using hm)
-  have hI' : (I'F : Submodule (𝓞 D.host.E) D.host.E) =
-      Submodule.span (𝓞 D.host.E) (D.host.conj '' {x | ∃ U : Matrix (Fin (n + 1)) (Fin (n + 1)) D.host.E, (∀ j, (fun i => U i j) ∈ L) ∧ x = U.det}) := cS_span D _
-  have hinv : ∀ t ∈ ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E),
-      ∀ c ∈ CU.cS D (vol D L), t * c ∈ (1 : IdE D) := by
+  have hI'
+      : (I'F : Submodule (𝓞 D.host.E) D.host.E)
+        = Submodule.span (𝓞 D.host.E)
+          (D.host.conj
+            '' {x | ∃ U : Matrix (Fin (n + 1)) (Fin (n + 1)) D.host.E, (∀ j, (fun i => U i j) ∈ L) ∧ x = U.det}) :=
+    cS_span D _
+  have hinv
+      : ∀ t ∈ ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E),
+        ∀ c ∈ CU.cS D (vol D L),
+          t * c ∈ (1 : IdE D) := by
     intro t ht c hc
-    have h := (FractionalIdeal.mem_inv_iff hne).1 (FractionalIdeal.mem_coe.1 ht) c
-      (FractionalIdeal.mem_coe.1 (show c ∈ (I'F : Submodule (𝓞 D.host.E) D.host.E) from hc))
+    have h :=
+      (FractionalIdeal.mem_inv_iff hne).1 (FractionalIdeal.mem_coe.1 ht) c
+        (FractionalIdeal.mem_coe.1 (show c ∈ (I'F : Submodule (𝓞 D.host.E) D.host.E) from hc))
     have h2 := FractionalIdeal.mem_coe.2 h
     rwa [FractionalIdeal.coe_one] at h2
-  have hclaim : ∀ U : Matrix (Fin (n + 1)) (Fin (n + 1)) D.host.E, (∀ j, (fun i => U i j) ∈ L) →
-      ∀ x ∈ ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E) ^ (n + 1),
-      D.host.conj U.det ^ (n + 1 - 1) * x ∈ vol D L := by
+  have hclaim
+      : ∀ U : Matrix (Fin (n + 1)) (Fin (n + 1)) D.host.E,
+        (∀ j, (fun i => U i j) ∈ L)
+          → ∀ x
+              ∈ ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E)
+                ^ (n + 1),
+            D.host.conj U.det ^ (n + 1 - 1) * x ∈ vol D L := by
     intro U hU x hx
     rw [Submodule.pow_eq_span_pow_set] at hx
     induction hx using Submodule.span_induction with
@@ -376,8 +402,10 @@ theorem unitDisc : UnitDisc D := by
     | add a b _ _ ha hb => rw [mul_add]; exact Submodule.add_mem _ ha hb
     | smul r a _ ha => rw [mul_smul_comm]; exact Submodule.smul_mem _ r ha
   have hA := spanPow I'F hne _ hI' (n + 1 - 1)
-  have hC : (I'F : Submodule (𝓞 D.host.E) D.host.E) ^ (n + 1 - 1) *
-      ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E) ^ (n + 1)
+  have hC
+      : (I'F : Submodule (𝓞 D.host.E) D.host.E) ^ (n + 1 - 1)
+          * ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E)
+            ^ (n + 1)
         ≤ vol D L := by
     refine Submodule.mul_le.2 fun x hx y hy => ?_
     have hx' := hA hx
@@ -389,20 +417,24 @@ theorem unitDisc : UnitDisc D := by
     | zero => rw [zero_mul]; exact Submodule.zero_mem _
     | add a b _ _ ha hb => rw [add_mul]; exact Submodule.add_mem _ ha hb
     | smul r a _ ha => rw [smul_mul_assoc]; exact Submodule.smul_mem _ r ha
-  have hD : ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E)
-      ≤ vol D L := by
+  have hD
+      : ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E)
+        ≤ vol D L := by
     have heq : I'F ^ (n + 1 - 1) * I'F⁻¹ ^ (n + 1) = I'F⁻¹ := by
       rw [Nat.add_sub_cancel, pow_succ, ← mul_assoc, ← mul_pow, mul_inv_cancel₀ hne, one_pow,
         one_mul]
     rw [← heq, FractionalIdeal.coe_mul, FractionalIdeal.coe_pow, FractionalIdeal.coe_pow]
     exact hC
-  calc (1 : IdE D)
-        = ((I'F⁻¹ * I'F : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E) := by
-          rw [inv_mul_cancel₀ hne, FractionalIdeal.coe_one]
-    _ = ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E) *
-          (I'F : Submodule (𝓞 D.host.E) D.host.E) := FractionalIdeal.coe_mul _ _
+  calc
+    (1 : IdE D)
+        = ((I'F⁻¹ * I'F : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E)
+          : Submodule (𝓞 D.host.E) D.host.E) := by
+      rw [inv_mul_cancel₀ hne, FractionalIdeal.coe_one]
+    _ = ((I'F⁻¹ : FractionalIdeal (𝓞 D.host.E)⁰ D.host.E) : Submodule (𝓞 D.host.E) D.host.E)
+        * (I'F : Submodule (𝓞 D.host.E) D.host.E) :=
+      FractionalIdeal.coe_mul _ _
     _ ≤ vol D L * CU.cS D (vol D L) :=
-        Submodule.mul_le.2 fun x hx y hy => Submodule.mul_mem_mul (hD hx) hy
+      Submodule.mul_le.2 fun x hx y hy => Submodule.mul_mem_mul (hD hx) hy
 
 end Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity.DN
 
@@ -410,7 +442,8 @@ namespace Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity
 
 open NumberField Formalism.BasicNotions Formalism.MainNotions.TaylorLogMetric
 
-theorem relative_determinant_norm_one (D : D7) : DetIdealsKernelNormOne D := DN.determinant_norm_one_of_unit_disc D (DN.unitDisc D)
+theorem relative_determinant_norm_one (D : D7) : DetIdealsKernelNormOne D :=
+  DN.determinant_norm_one_of_unit_disc D (DN.unitDisc D)
 
 theorem character_unit_on_determinant (D : D7) (χ : IdE D → ℂ) (hχ : IsChi D χ) : ChiUnitDet D χ :=
   chi_unit_of_det_norm_one D (relative_determinant_norm_one D) χ hχ

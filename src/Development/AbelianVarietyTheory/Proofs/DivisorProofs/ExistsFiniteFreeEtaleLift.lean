@@ -14,17 +14,21 @@ namespace GlobalTheory.EtaleLiftQuot
 
 open IsLocalRing TensorProduct
 
-theorem ker_le_jacobson_of_factor {S T F : Type} [CommRing S] [CommRing T] [FunLike F S T]
-    [RingHomClass F S T] (g : F)
-    (h : ∀ n : Ideal S, n.IsMaximal → ∃ τ : T →+* S ⧸ n, ∀ x, τ (g x) = Ideal.Quotient.mk n x) :
-    RingHom.ker g ≤ (⊥ : Ideal S).jacobson := by
+theorem ker_le_jacobson_of_factor
+    {S T F : Type} [CommRing S] [CommRing T] [FunLike F S T] [RingHomClass F S T]
+    (g : F)
+    (h : ∀ n : Ideal S, n.IsMaximal → ∃ τ : T →+* S ⧸ n, ∀ x, τ (g x) = Ideal.Quotient.mk n x)
+    : RingHom.ker g ≤ (⊥ : Ideal S).jacobson := by
   intro x hx
   refine GlobalTheory.mem_jacobson_bot_of_forall_isMaximal fun n hn ↦ ?_
   obtain ⟨τ, hτ⟩ := h n hn
   rw [← Ideal.Quotient.eq_zero_iff_mem, ← hτ, RingHom.mem_ker.1 hx, map_zero]
 
-def residueToQuot (R : Type) [CommRing R] [IsLocalRing R] {S : Type} [CommRing S] [Algebra R S]
-    [Module.Finite R S] (n : Ideal S) [n.IsMaximal] : ResidueField R →ₐ[R] S ⧸ n :=
+def residueToQuot
+    (R : Type) [CommRing R] [IsLocalRing R]
+    {S : Type} [CommRing S] [Algebra R S] [Module.Finite R S]
+    (n : Ideal S) [n.IsMaximal]
+    : ResidueField R →ₐ[R] S ⧸ n :=
   Ideal.Quotient.liftₐ (maximalIdeal R) (Algebra.ofId R _) fun a ha ↦ by
     rw [← GlobalTheory.comap_eq_maximalIdeal_of_finite n] at ha
     exact Ideal.Quotient.eq_zero_iff_mem.2 ha
@@ -34,10 +38,12 @@ variable {R : Type} [CommRing R] [HenselianLocalRing R] (I : Ideal R)
 abbrev algQuotResidue (hI : I ≤ maximalIdeal R) : Algebra (R ⧸ I) (ResidueField R) :=
   (Ideal.Quotient.factor hI : R ⧸ I →+* R ⧸ maximalIdeal R).toAlgebra
 
-theorem exists_lift (hI : I ≤ maximalIdeal R) (E : Type) [CommRing E] [Algebra (R ⧸ I) E] [Module.Finite (R ⧸ I) E]
-    [Algebra.Etale (R ⧸ I) E] :
-    ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B), Module.Finite R B ∧ Algebra.Etale R B ∧
-      Nonempty ((B ⧸ I.map (algebraMap R B)) ≃ₐ[R ⧸ I] E) := by
+theorem exists_lift
+    (hI : I ≤ maximalIdeal R)
+    (E : Type) [CommRing E] [Algebra (R ⧸ I) E] [Module.Finite (R ⧸ I) E] [Algebra.Etale (R ⧸ I) E]
+    : ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B),
+      Module.Finite R B ∧ Algebra.Etale R B
+        ∧ Nonempty ((B ⧸ I.map (algebraMap R B)) ≃ₐ[R ⧸ I] E) := by
   letI := algQuotResidue I hI
   have : IsScalarTower R (R ⧸ I) (ResidueField R) := .of_algebraMap_eq fun _ ↦ rfl
   have hsurj : Function.Surjective (algebraMap R (R ⧸ I)) := Ideal.Quotient.mk_surjective
@@ -62,8 +68,9 @@ theorem exists_lift (hI : I ≤ maximalIdeal R) (E : Type) [CommRing E] [Algebra
     exact ⟨τ.toRingHom, fun x ↦ by simp [τ, πE]⟩
 
   let J := I.map (algebraMap R B)
-  have hJ : ∀ (T : Type) [CommRing T] [Algebra R T] (g : B →ₐ[R] T),
-      (∀ r ∈ I, algebraMap R T r = 0) → ∀ a ∈ J, g a = 0 := fun T _ _ g hT a ha ↦ by
+  have hJ
+      : ∀ (T : Type) [CommRing T] [Algebra R T] (g : B →ₐ[R] T),
+        (∀ r ∈ I, algebraMap R T r = 0) → ∀ a ∈ J, g a = 0 := fun T _ _ g hT a ha ↦ by
     have : J ≤ RingHom.ker g := by
       rw [Ideal.map_le_iff_le_comap]
       intro r hr
@@ -82,39 +89,45 @@ theorem exists_lift (hI : I ≤ maximalIdeal R) (E : Type) [CommRing E] [Algebra
     exact ⟨Ideal.Quotient.mk J b, rfl⟩
   have hkerB : RingHom.ker πB ≤ (⊥ : Ideal (B ⧸ J)).jacobson := by
     refine ker_le_jacobson_of_factor πB fun n hn ↦ ?_
-    let τ := Algebra.TensorProduct.lift (residueToQuot R n)
-      ((Ideal.Quotient.mkₐ R n).comp (Ideal.Quotient.mkₐ R J)) fun _ _ ↦ .all _ _
+    let τ :=
+      Algebra.TensorProduct.lift (residueToQuot R n)
+        ((Ideal.Quotient.mkₐ R n).comp (Ideal.Quotient.mkₐ R J)) fun _ _ ↦ .all _ _
     refine ⟨τ.toRingHom, fun x ↦ ?_⟩
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective x
     rw [hπB_mk]
     simp [τ]
 
-  obtain ⟨φ, hφ⟩ := (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R) (A := B)
-    (πE.restrictScalars R) hπE hkerE).2
-    ((e.toAlgHom.restrictScalars R).comp Algebra.TensorProduct.includeRight)
+  obtain ⟨φ, hφ⟩ :=
+    (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R) (A := B)
+        (πE.restrictScalars R) hπE hkerE).2
+      ((e.toAlgHom.restrictScalars R).comp Algebra.TensorProduct.includeRight)
   have hφb : ∀ b, πE (φ b) = e (1 ⊗ₜ b) := fun b ↦ congr($hφ b)
 
-  obtain ⟨ψ, hψ⟩ := (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R ⧸ I) (A := E)
-    πB hπB hkerB).2 ((e.symm.toAlgHom.restrictScalars (R ⧸ I)).comp πE)
+  obtain ⟨ψ, hψ⟩ :=
+    (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R ⧸ I) (A := E) πB hπB
+      hkerB).2 ((e.symm.toAlgHom.restrictScalars (R ⧸ I)).comp πE)
   have hψx : ∀ x, πB (ψ x) = e.symm (πE x) := fun x ↦ congr($hψ x)
   have hEI : ∀ r ∈ I, algebraMap R E r = 0 := fun r hr ↦ by
     rw [IsScalarTower.algebraMap_apply R (R ⧸ I), Ideal.Quotient.algebraMap_eq,
       Ideal.Quotient.eq_zero_iff_mem.2 hr, map_zero]
-  let φ' : B ⧸ J →ₐ[R ⧸ I] E := (Ideal.Quotient.liftₐ J φ (hJ _ _ hEI)).extendScalarsOfSurjective hsurj
+  let φ' : B ⧸ J →ₐ[R ⧸ I] E :=
+    (Ideal.Quotient.liftₐ J φ (hJ _ _ hEI)).extendScalarsOfSurjective hsurj
   have hφ'_mk : ∀ b, φ' (Ideal.Quotient.mk J b) = φ b := fun b ↦ rfl
   have key : ∀ y, πE (φ' y) = e (πB y) := fun y ↦ by
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective y
     rw [hφ'_mk, hφb, hπB_mk]
   have h1 : φ'.comp ψ = AlgHom.id (R ⧸ I) E := by
-    refine (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R ⧸ I) (A := E)
-      πE hπE hkerE).1 (AlgHom.ext fun x ↦ ?_)
+    refine (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R ⧸ I) (A := E) πE hπE
+      hkerE).1 (AlgHom.ext fun x ↦ ?_)
     simp only [AlgHom.comp_apply, AlgHom.id_apply, key, hψx, AlgEquiv.apply_symm_apply]
   have h2 : ψ.comp φ' = AlgHom.id (R ⧸ I) (B ⧸ J) := by
-    have H := (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R) (A := B)
-      (πB.restrictScalars R) hπB hkerB).1
-      (a₁ := (ψ.restrictScalars R).comp φ) (a₂ := Ideal.Quotient.mkₐ R J) (AlgHom.ext fun b ↦ by
-        simp only [AlgHom.comp_apply, AlgHom.restrictScalars_apply, Ideal.Quotient.mkₐ_eq_mk]
-        rw [hψx, hφb, AlgEquiv.symm_apply_apply, hπB_mk])
+    have H :=
+      (GlobalTheory.bijective_algHom_comp_of_etale_of_henselian R (k := R) (A := B)
+          (πB.restrictScalars R) hπB hkerB).1 (a₁ := (ψ.restrictScalars R).comp φ)
+        (a₂ := Ideal.Quotient.mkₐ R J)
+        (AlgHom.ext fun b ↦ by
+          simp only [AlgHom.comp_apply, AlgHom.restrictScalars_apply, Ideal.Quotient.mkₐ_eq_mk]
+          rw [hψx, hφb, AlgEquiv.symm_apply_apply, hπB_mk])
     refine AlgHom.ext fun y ↦ ?_
     obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective y
     rw [AlgHom.comp_apply, AlgHom.id_apply, hφ'_mk]
@@ -127,12 +140,16 @@ namespace GlobalTheory.EtaleLiftQuot
 
 open IsLocalRing TensorProduct
 
-theorem exists_finite_free_etale_lift : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R],
-    IsAdicComplete (maximalIdeal R) R → ∀ f ∈ maximalIdeal R, ∀ (E : Type) [CommRing E]
-    [Algebra (R ⧸ Ideal.span {f}) E] [Module.Finite (R ⧸ Ideal.span {f}) E]
-    [Algebra.Etale (R ⧸ Ideal.span {f}) E], ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B),
-      Module.Finite R B ∧ Module.Free R B ∧ Algebra.Etale R B ∧
-        Nonempty ((B ⧸ (Ideal.span {f}).map (algebraMap R B)) ≃ₐ[R ⧸ Ideal.span {f}] E) := by
+theorem exists_finite_free_etale_lift
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R],
+      IsAdicComplete (maximalIdeal R) R
+        → ∀ f ∈ maximalIdeal R,
+          ∀ (E : Type) [CommRing E] [Algebra (R ⧸ Ideal.span {f}) E]
+              [Module.Finite (R ⧸ Ideal.span {f}) E] [Algebra.Etale (R ⧸ Ideal.span {f}) E],
+            ∃ (B : Type) (_ : CommRing B) (_ : Algebra R B),
+              Module.Finite R B ∧ Module.Free R B ∧ Algebra.Etale R B
+                ∧ Nonempty
+                  ((B ⧸ (Ideal.span {f}).map (algebraMap R B)) ≃ₐ[R ⧸ Ideal.span {f}] E) := by
   intro R _ _ _ hc f hf E _ _ _ _
   have : HenselianRing R (maximalIdeal R) := @IsAdicComplete.henselianRing R _ _ hc
   have : HenselianLocalRing R := GlobalTheory.henselianLocalRing_of_henselianRing R

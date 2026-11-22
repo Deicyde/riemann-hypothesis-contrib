@@ -8,7 +8,8 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.ProperCohomology.
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE TensorProduct Opposite
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE TensorProduct Opposite
 
 set_option autoImplicit false
 
@@ -48,18 +49,29 @@ lemma overBase_appTop {X Z : Scheme.{0}} (φ : Z ⟶ X) (V : X.Opens) (hV : IsAf
     CommRingCat.comp_apply]
   erw [Iso.inv_hom_id_apply]
 
-theorem toFunctions_preimage : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] {X Z : Scheme.{0}} [X.Over (Spec (.of A))] [Z.Over (Spec (.of A))] (φ : Z ⟶ X), φ ≫ (X ↘ Spec (.of A)) = (Z ↘ Spec (.of A)) → ∀ (V : X.Opens) (hV : IsAffineOpen V) [IsNoetherianRing Γ(X, V)], letI : (φ ⁻¹ᵁ V).toScheme.Over (Spec (.of Γ(X, V))) := ⟨φ ∣_ V ≫ hV.isoSpec.hom⟩; ∀ (W : (φ ⁻¹ᵁ V).toScheme.Opens) (a : A), ((φ ⁻¹ᵁ V).ι.appIso W).hom (toFunctions (A := A) ((φ ⁻¹ᵁ V).ι ''ᵁ W) a) = toFunctions (A := Γ(X, V)) W (toFunctions (A := A) V a) := by
+theorem toFunctions_preimage
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] {X Z : Scheme.{0}} [X.Over (Spec (.of A))]
+        [Z.Over (Spec (.of A))] (φ : Z ⟶ X),
+      φ ≫ (X ↘ Spec (.of A)) = (Z ↘ Spec (.of A))
+        → ∀ (V : X.Opens) (hV : IsAffineOpen V) [IsNoetherianRing Γ(X, V)],
+          letI : (φ ⁻¹ᵁ V).toScheme.Over (Spec (.of Γ(X, V))) := ⟨φ ∣_ V ≫ hV.isoSpec.hom⟩
+          ∀ (W : (φ ⁻¹ᵁ V).toScheme.Opens) (a : A),
+            ((φ ⁻¹ᵁ V).ι.appIso W).hom (toFunctions (A := A) ((φ ⁻¹ᵁ V).ι ''ᵁ W) a)
+              = toFunctions (A := Γ(X, V)) W (toFunctions (A := A) V a) := by
   intro A _ _ X Z _ _ φ hφ V hV _ W a
-  have hZ : (Z ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a) =
-      φ.appTop ((X ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a)) := by
+  have hZ
+      : (Z ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a)
+        = φ.appTop ((X ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a)) := by
     rw [← hφ, Scheme.Hom.comp_appTop]
     rfl
-  change ((φ ⁻¹ᵁ V).ι.appIso W).hom (Z.presheaf.map (homOfLE le_top).op
-      ((Z ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a))) =
-    (φ ⁻¹ᵁ V).toScheme.presheaf.map (homOfLE le_top).op
-      ((φ ∣_ V ≫ hV.isoSpec.hom).appTop ((Scheme.ΓSpecIso (.of Γ(X, V))).inv
-        (X.presheaf.map (homOfLE le_top).op
-          ((X ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a)))))
+  change ((φ ⁻¹ᵁ V).ι.appIso W).hom
+      (Z.presheaf.map (homOfLE le_top).op
+        ((Z ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a)))
+    = (φ ⁻¹ᵁ V).toScheme.presheaf.map (homOfLE le_top).op
+      ((φ ∣_ V ≫ hV.isoSpec.hom).appTop
+        ((Scheme.ΓSpecIso (.of Γ(X, V))).inv
+          (X.presheaf.map (homOfLE le_top).op
+            ((X ↘ Spec (.of A)).appTop ((Scheme.ΓSpecIso (.of A)).inv a)))))
   rw [overBase_appTop, topIso_inv_res, morphismRestrict_appTop_ι, hZ, appIso_hom_res]
 
 end GlobalTheory.CompanionTheory.GE.RingCompat

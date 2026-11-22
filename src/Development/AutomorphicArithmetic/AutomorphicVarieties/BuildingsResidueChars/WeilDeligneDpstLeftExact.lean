@@ -4,20 +4,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Pst GlobalTheory.WeilDeligne TensorProduct Module GlobalTheory.Pst.DpstMap
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Pst GlobalTheory.WeilDeligne
+  TensorProduct Module GlobalTheory.Pst.DpstMap
 
-private theorem tensV_eq_rT {l : ℕ} [Fact l.Prime] (P : LocPrime l) {LL : Type} [Field LL] [Algebra ℚ_[l] LL]
+private theorem tensV_eq_rT
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l)
+    {LL : Type} [Field LL] [Algebra ℚ_[l] LL]
     {V : Type} [AddCommGroup V] [Module LL V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] LL V]
-    {V' : Type} [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V']
-    [IsScalarTower ℚ_[l] LL V'] (f : V →ₗ[LL] V') (x : V ⊗[ℚ_[l]] Bst P) :
-    tensV P f x = (f.restrictScalars ℚ_[l]).rTensor (Bst P) x := by
+    {V' : Type} [AddCommGroup V'] [Module LL V'] [Module ℚ_[l] V'] [IsScalarTower ℚ_[l] LL V']
+    (f : V →ₗ[LL] V') (x : V ⊗[ℚ_[l]] Bst P)
+    : tensV P f x = (f.restrictScalars ℚ_[l]).rTensor (Bst P) x := by
   induction x using TensorProduct.induction_on with
   | zero => simp
   | tmul v b => rfl
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-theorem UpperTheory.weilDeligne_dpst_leftExact :
-    UpperTheory.V.Af.Wd.DLeft := by
+theorem UpperTheory.weilDeligne_dpst_leftExact : UpperTheory.V.Af.Wd.DLeft := by
   intro l _ P K L V' V V'' _ _ _ _ _ _ _ _ _ _ _ _ ρ' ρ ρ'' f p hf hp hfi hex0
   have hex : Function.Exact (f.restrictScalars ℚ_[l]) (p.restrictScalars ℚ_[l]) := hex0
   have hexT := Module.Flat.rTensor_exact (Bst P) hex

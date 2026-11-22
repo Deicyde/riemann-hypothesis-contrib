@@ -17,8 +17,7 @@ variable {E : Type} [Field E] [NumberField E] (σ : E ≃ₐ[ℚ] E)
 
 def normSums : AddSubmonoid E := AddSubmonoid.closure (Set.range fun b : E => σ b * b)
 
-theorem norm_mem (b : E) : σ b * b ∈ normSums σ :=
-  AddSubmonoid.subset_closure ⟨b, rfl⟩
+theorem norm_mem (b : E) : σ b * b ∈ normSums σ := AddSubmonoid.subset_closure ⟨b, rfl⟩
 
 theorem norm_mul_mem (t : E) {s : E} (hs : s ∈ normSums σ) : σ t * t * s ∈ normSums σ := by
   induction hs using AddSubmonoid.closure_induction with
@@ -30,7 +29,8 @@ theorem norm_mul_mem (t : E) {s : E} (hs : s ∈ normSums σ) : σ t * t * s ∈
   | zero => rw [mul_zero]; exact (normSums σ).zero_mem
   | add x y _ _ hx hy => rw [mul_add]; exact (normSums σ).add_mem hx hy
 
-theorem rat_mul_mem {q : ℚ} (hq : 0 ≤ q) {s : E} (hs : s ∈ normSums σ) : (q : E) * s ∈ normSums σ := by
+theorem rat_mul_mem {q : ℚ} (hq : 0 ≤ q) {s : E} (hs : s ∈ normSums σ)
+    : (q : E) * s ∈ normSums σ := by
   obtain ⟨n, hn⟩ := Int.eq_ofNat_of_zero_le (Rat.num_nonneg.mpr hq)
   have hden : (q.den : ℚ) ≠ 0 := by positivity
   have hq' : q = ((n * q.den : ℕ) : ℚ) * ((q.den : ℚ)⁻¹ * (q.den : ℚ)⁻¹) := by
@@ -43,7 +43,9 @@ theorem rat_mul_mem {q : ℚ} (hq : 0 ≤ q) {s : E} (hs : s ∈ normSums σ) : 
     conv_lhs => rw [hq']
     push_cast
     ring
-  have key : (q : E) * s = (n * q.den) • (σ (((q.den : ℚ)⁻¹ : ℚ) : E) * (((q.den : ℚ)⁻¹ : ℚ) : E) * s) := by
+  have key
+      : (q : E) * s
+        = (n * q.den) • (σ (((q.den : ℚ)⁻¹ : ℚ) : E) * (((q.den : ℚ)⁻¹ : ℚ) : E) * s) := by
     rw [nsmul_eq_mul, map_ratCast, hE]
     push_cast
     ring
@@ -54,10 +56,11 @@ theorem rat_mem {q : ℚ} (hq : 0 ≤ q) : (q : E) ∈ normSums σ := by
   have h1 : (1 : E) ∈ normSums σ := by simpa using norm_mem σ 1
   simpa using rat_mul_mem σ hq h1
 
-theorem casimir {ι : Type} [Fintype ι] [DecidableEq ι] (e : Module.Basis ι ℚ E)
-    (ho : ∀ i j, i ≠ j → Algebra.trace ℚ E (σ (e i) * e j) = 0)
-    (hd : ∀ i, Algebra.trace ℚ E (σ (e i) * e i) ≠ 0) :
-    ∑ i, (Algebra.trace ℚ E (σ (e i) * e i))⁻¹ • (σ (e i) * e i) = 1 := by
+theorem casimir
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    (e : Module.Basis ι ℚ E) (ho : ∀ i j, i ≠ j → Algebra.trace ℚ E (σ (e i) * e j) = 0)
+    (hd : ∀ i, Algebra.trace ℚ E (σ (e i) * e i) ≠ 0)
+    : ∑ i, (Algebra.trace ℚ E (σ (e i) * e i))⁻¹ • (σ (e i) * e i) = 1 := by
   set c := ∑ i, (Algebra.trace ℚ E (σ (e i) * e i))⁻¹ • (σ (e i) * e i) with hc
   have htr : ∀ y : E, Algebra.trace ℚ E (c * y) = Algebra.trace ℚ E y := by
     intro y
@@ -87,27 +90,33 @@ theorem casimir {ι : Type} [Fintype ι] [DecidableEq ι] (e : Module.Basis ι �
   have h4 : (Module.finrank ℚ E : ℚ) = 0 := by simpa using h2
   exact Module.finrank_pos.ne' (by exact_mod_cast h4)
 
-theorem exists_rat_bound (hσ : ∀ x, σ (σ x) = x) (hp : ∀ x, x ≠ 0 → 0 < Algebra.trace ℚ E (σ x * x))
-    (x : E) : ∃ c : ℚ, (c : E) - σ x * x ∈ normSums σ := by
+theorem exists_rat_bound
+    (hσ : ∀ x, σ (σ x) = x) (hp : ∀ x, x ≠ 0 → 0 < Algebra.trace ℚ E (σ x * x)) (x : E)
+    : ∃ c : ℚ, (c : E) - σ x * x ∈ normSums σ := by
   classical
   have : Invertible (2 : ℚ) := invertibleOfNonzero two_ne_zero
   have hsym : ∀ u v : E, Algebra.trace ℚ E (σ u * v) = Algebra.trace ℚ E (σ v * u) := by
     intro u v
     rw [← Algebra.trace_eq_of_algEquiv σ (σ v * u), map_mul σ, hσ, mul_comm]
-  obtain ⟨e, he⟩ := LinearMap.BilinForm.exists_orthogonal_basis
-    (B := LinearMap.mk₂ ℚ (fun u v : E => Algebra.trace ℚ E (σ u * v))
-      (fun a b c => by rw [map_add (f := _), add_mul, map_add (f := _)])
-      (fun r a b => by
-        rw [show σ (r • a) = r • σ a by rw [Rat.smul_def, Rat.smul_def, map_mul, map_ratCast],
-          smul_mul_assoc, map_smul])
-      (fun a b c => by rw [mul_add, map_add (f := _)])
-      (fun r a b => by rw [mul_smul_comm, map_smul]))
-    (LinearMap.isSymm_def.mpr fun u v => by simp only [LinearMap.mk₂_apply, RingHom.id_apply]; exact hsym u v)
+  obtain ⟨e, he⟩ :=
+    LinearMap.BilinForm.exists_orthogonal_basis
+      (B :=
+        LinearMap.mk₂ ℚ
+          (fun u v : E => Algebra.trace ℚ E (σ u * v))
+          (fun a b c => by rw [map_add (f := _), add_mul, map_add (f := _)])
+          (fun r a b => by
+            rw [show σ (r • a) = r • σ a by rw [Rat.smul_def, Rat.smul_def, map_mul, map_ratCast],
+              smul_mul_assoc, map_smul])
+          (fun a b c => by rw [mul_add, map_add (f := _)])
+          (fun r a b => by rw [mul_smul_comm, map_smul]))
+      (LinearMap.isSymm_def.mpr fun u v => by
+        simp only [LinearMap.mk₂_apply, RingHom.id_apply]; exact hsym u v)
   rw [LinearMap.isOrthoᵢ_def] at he
   simp only [LinearMap.mk₂_apply] at he
   have hd : ∀ i, Algebra.trace ℚ E (σ (e i) * e i) ≠ 0 := fun i => (hp _ (e.ne_zero i)).ne'
   have hcas := casimir σ e he hd
-  obtain ⟨d, hd_def⟩ : ∃ d : Fin (Module.finrank ℚ E) → ℚ, ∀ j, d j = Algebra.trace ℚ E (σ (e j) * e j) :=
+  obtain ⟨d, hd_def⟩
+      : ∃ d : Fin (Module.finrank ℚ E) → ℚ, ∀ j, d j = Algebra.trace ℚ E (σ (e j) * e j) :=
     ⟨_, fun _ => rfl⟩
   simp_rw [← hd_def] at hcas hd
   have hdpos : ∀ j, 0 < d j := fun j => by rw [hd_def]; exact hp _ (e.ne_zero j)
@@ -121,29 +130,39 @@ theorem exists_rat_bound (hσ : ∀ x, σ (σ x) = x) (hp : ∀ x, x ≠ 0 → 0
       rw [Rat.smul_def]
       push_cast
       ring
-    have h2 : ((d i : ℚ) : E) - σ (e i) * e i =
-        ∑ j ∈ Finset.univ.erase i, ((d i / d j : ℚ) : E) * (σ (e j) * e j) := by
-      rw [h1, ← Finset.add_sum_erase _ _ (Finset.mem_univ i), div_self (hd i), Rat.cast_one, one_mul,
-        add_sub_cancel_left]
+    have h2
+        : ((d i : ℚ) : E) - σ (e i) * e i
+          = ∑ j ∈ Finset.univ.erase i, ((d i / d j : ℚ) : E) * (σ (e j) * e j) := by
+      rw [h1, ← Finset.add_sum_erase _ _ (Finset.mem_univ i), div_self (hd i), Rat.cast_one,
+        one_mul, add_sub_cancel_left]
     rw [h2]
     exact AddSubmonoid.sum_mem _ fun j _ =>
       rat_mul_mem σ (div_nonneg (hdpos i).le (hdpos j).le) (norm_mem σ _)
-  have hadd : ∀ u v : E, (∃ c : ℚ, (c : E) - σ u * u ∈ normSums σ) →
-      (∃ c : ℚ, (c : E) - σ v * v ∈ normSums σ) → ∃ c : ℚ, (c : E) - σ (u + v) * (u + v) ∈ normSums σ := by
+  have hadd
+      : ∀ u v : E,
+        (∃ c : ℚ, (c : E) - σ u * u ∈ normSums σ) → (∃ c : ℚ, (c : E) - σ v * v ∈ normSums σ)
+          → ∃ c : ℚ, (c : E) - σ (u + v) * (u + v) ∈ normSums σ := by
     rintro u v ⟨a, ha⟩ ⟨b, hb⟩
     refine ⟨2 * a + 2 * b, ?_⟩
-    have h : ((2 * a + 2 * b : ℚ) : E) - σ (u + v) * (u + v) =
-        ((2 : ℚ) : E) * ((a : E) - σ u * u) + ((2 : ℚ) : E) * ((b : E) - σ v * v) + σ (u - v) * (u - v) := by
+    have h
+        : ((2 * a + 2 * b : ℚ) : E) - σ (u + v) * (u + v)
+          = ((2 : ℚ) : E) * ((a : E) - σ u * u) + ((2 : ℚ) : E) * ((b : E) - σ v * v)
+            + σ (u - v) * (u - v) := by
       rw [map_add (f := _), map_sub]
       push_cast
       ring
     rw [h]
-    exact add_mem (add_mem (rat_mul_mem σ (by norm_num) ha) (rat_mul_mem σ (by norm_num) hb)) (norm_mem σ _)
-  have hsmul : ∀ (r : ℚ) (u : E), (∃ c : ℚ, (c : E) - σ u * u ∈ normSums σ) →
-      ∃ c : ℚ, (c : E) - σ (r • u) * (r • u) ∈ normSums σ := by
+    exact add_mem (add_mem (rat_mul_mem σ (by norm_num) ha) (rat_mul_mem σ (by norm_num) hb))
+      (norm_mem σ _)
+  have hsmul
+      : ∀ (r : ℚ) (u : E),
+        (∃ c : ℚ, (c : E) - σ u * u ∈ normSums σ)
+          → ∃ c : ℚ, (c : E) - σ (r • u) * (r • u) ∈ normSums σ := by
     rintro r u ⟨a, ha⟩
     refine ⟨r ^ 2 * a, ?_⟩
-    have h : ((r ^ 2 * a : ℚ) : E) - σ (r • u) * (r • u) = ((r ^ 2 : ℚ) : E) * ((a : E) - σ u * u) := by
+    have h
+        : ((r ^ 2 * a : ℚ) : E) - σ (r • u) * (r • u)
+          = ((r ^ 2 : ℚ) : E) * ((a : E) - σ u * u) := by
       rw [Rat.smul_def, map_mul, map_ratCast]
       push_cast
       ring
@@ -151,11 +170,14 @@ theorem exists_rat_bound (hσ : ∀ x, σ (σ x) = x) (hp : ∀ x, x ≠ 0 → 0
     exact rat_mul_mem σ (sq_nonneg r) ha
   have hzero : ∃ c : ℚ, (c : E) - σ 0 * 0 ∈ normSums σ := ⟨0, by simp⟩
   rw [← e.sum_repr x]
-  exact Finset.sum_induction _ (fun y => ∃ c : ℚ, (c : E) - σ y * y ∈ normSums σ)
-    (fun u v hu hv => hadd u v hu hv) hzero (fun i _ => hsmul _ _ (hbasis i))
+  exact Finset.sum_induction _
+    (fun y => ∃ c : ℚ, (c : E) - σ y * y ∈ normSums σ)
+    (fun u v hu hv => hadd u v hu hv)
+    hzero
+    (fun i _ => hsmul _ _ (hbasis i))
 
-theorem exists_integral_sum {s : E} (hs : s ∈ normSums σ) :
-    ∃ (m r : ℕ) (b : Fin r → 𝓞 E), 1 ≤ m ∧ (m : E) ^ 2 * s = ∑ i, σ (b i : E) * (b i : E) := by
+theorem exists_integral_sum {s : E} (hs : s ∈ normSums σ)
+    : ∃ (m r : ℕ) (b : Fin r → 𝓞 E), 1 ≤ m ∧ (m : E) ^ 2 * s = ∑ i, σ (b i : E) * (b i : E) := by
   induction hs using AddSubmonoid.closure_induction with
   | mem x hx =>
     obtain ⟨b, rfl⟩ := hx
@@ -169,24 +191,31 @@ theorem exists_integral_sum {s : E} (hs : s ∈ normSums σ) :
       rw [← Int.cast_natCast, ← Int.cast_pow, Int.natAbs_sq, Int.cast_pow]
     rw [h]
     ring
-  | zero => exact ⟨1, 0, Fin.elim0, le_rfl, by simp⟩
+  | zero =>
+    exact ⟨1, 0, Fin.elim0, le_rfl, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨m, r, b, hm, hb⟩ := hx
     obtain ⟨n, r', b', hn, hb'⟩ := hy
-    refine ⟨m * n, r + r', Fin.append (fun i => (n : 𝓞 E) * b i) (fun j => (m : 𝓞 E) * b' j),
-      Nat.mul_pos hm hn, ?_⟩
+    refine ⟨
+      m * n,
+      r + r',
+      Fin.append (fun i => (n : 𝓞 E) * b i) (fun j => (m : 𝓞 E) * b' j),
+      Nat.mul_pos hm hn,
+      ?_
+    ⟩
     rw [Fin.sum_univ_add]
     simp only [Fin.append_left, Fin.append_right]
     push_cast
     simp only [map_mul, map_natCast]
-    calc ((m : E) * n) ^ 2 * (x + y) = (n : E) ^ 2 * ((m : E) ^ 2 * x) + (m : E) ^ 2 * ((n : E) ^ 2 * y) := by
-          ring
+    calc
+      ((m : E) * n) ^ 2 * (x + y)
+        = (n : E) ^ 2 * ((m : E) ^ 2 * x) + (m : E) ^ 2 * ((n : E) ^ 2 * y) := by ring
       _ = _ := by
         rw [hb, hb', Finset.mul_sum, Finset.mul_sum]
         congr 1 <;> refine Finset.sum_congr rfl fun i _ => ?_ <;> ring
 
-theorem trace_conj_mul_pos [IsCMField E] (x : E) (hx : x ≠ 0) :
-    0 < Algebra.trace ℚ E (IsCMField.complexConj E x * x) := by
+theorem trace_conj_mul_pos [IsCMField E] (x : E) (hx : x ≠ 0)
+    : 0 < Algebra.trace ℚ E (IsCMField.complexConj E x * x) := by
   set t := Algebra.trace ℚ E (IsCMField.complexConj E x * x) with ht
   have h := trace_eq_sum_embeddings (K := ℚ) (L := E) (E := ℂ) (x := IsCMField.complexConj E x * x)
   rw [← ht, eq_ratCast] at h
@@ -207,23 +236,32 @@ theorem trace_conj_mul_pos [IsCMField E] (x : E) (hx : x ≠ 0) :
 
 end StarNormBound
 
-
 open StarNormBound in
-theorem exists_starNormLE_of_isCMField : ∀ (E : Type) [Field E] [NumberField E] [NumberField.IsCMField E]
-    [StarRing (NumberField.RingOfIntegers E)],
-    (∀ a : NumberField.RingOfIntegers E, ((star a : NumberField.RingOfIntegers E) : E) =
-      NumberField.IsCMField.complexConj E (a : E)) →
-    ∀ a : NumberField.RingOfIntegers E, ∃ c : ℕ, GlobalTheory.StarNormLE a c := by
+theorem exists_starNormLE_of_isCMField
+    : ∀ (E : Type) [Field E] [NumberField E] [NumberField.IsCMField E]
+        [StarRing (NumberField.RingOfIntegers E)],
+      (∀ a : NumberField.RingOfIntegers E,
+          ((star a : NumberField.RingOfIntegers E) : E)
+            = NumberField.IsCMField.complexConj E (a : E))
+        → ∀ a : NumberField.RingOfIntegers E, ∃ c : ℕ, GlobalTheory.StarNormLE a c := by
   intro E _ _ _ _ hstar a
-  have hσ : ∀ x, ((IsCMField.complexConj E).restrictScalars ℚ) (((IsCMField.complexConj E).restrictScalars ℚ) x) = x :=
-    fun x => IsCMField.complexConj_apply_apply E x
-  have hp : ∀ x, x ≠ 0 → 0 < Algebra.trace ℚ E (((IsCMField.complexConj E).restrictScalars ℚ) x * x) :=
+  have hσ
+      : ∀ x,
+        ((IsCMField.complexConj E).restrictScalars ℚ) (((IsCMField.complexConj E).restrictScalars ℚ)
+            x)
+          = x := fun x =>
+    IsCMField.complexConj_apply_apply E x
+  have hp
+      : ∀ x, x ≠ 0 → 0 < Algebra.trace ℚ E (((IsCMField.complexConj E).restrictScalars ℚ) x * x) :=
     fun x hx => trace_conj_mul_pos x hx
   obtain ⟨q, hq⟩ := exists_rat_bound ((IsCMField.complexConj E).restrictScalars ℚ) hσ hp (a : E)
-  have hc : (((⌈q⌉₊ : ℕ) : ℚ) : E) - ((IsCMField.complexConj E).restrictScalars ℚ) a * a ∈
-      normSums ((IsCMField.complexConj E).restrictScalars ℚ) := by
-    have h : (((⌈q⌉₊ : ℕ) : ℚ) : E) - ((IsCMField.complexConj E).restrictScalars ℚ) a * a =
-        ((((⌈q⌉₊ : ℕ) : ℚ) - q : ℚ) : E) + ((q : E) - ((IsCMField.complexConj E).restrictScalars ℚ) a * a) := by
+  have hc
+      : (((⌈q⌉₊ : ℕ) : ℚ) : E) - ((IsCMField.complexConj E).restrictScalars ℚ) a * a
+        ∈ normSums ((IsCMField.complexConj E).restrictScalars ℚ) := by
+    have h
+        : (((⌈q⌉₊ : ℕ) : ℚ) : E) - ((IsCMField.complexConj E).restrictScalars ℚ) a * a
+          = ((((⌈q⌉₊ : ℕ) : ℚ) - q : ℚ) : E)
+            + ((q : E) - ((IsCMField.complexConj E).restrictScalars ℚ) a * a) := by
       push_cast
       ring
     rw [h]
@@ -231,7 +269,8 @@ theorem exists_starNormLE_of_isCMField : ∀ (E : Type) [Field E] [NumberField E
   obtain ⟨m, r, b, hm, hb⟩ := exists_integral_sum _ hc
   refine ⟨m ^ 2 * ⌈q⌉₊, m, r, b, hm, ?_⟩
   apply RingOfIntegers.ext
-  have hconj : ∀ z : E, ((IsCMField.complexConj E).restrictScalars ℚ) z = IsCMField.complexConj E z :=
+  have hconj
+      : ∀ z : E, ((IsCMField.complexConj E).restrictScalars ℚ) z = IsCMField.complexConj E z :=
     fun _ => rfl
   simp only [hconj] at hb
   push_cast at hb ⊢

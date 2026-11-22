@@ -11,8 +11,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsFiniteAndF
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -21,10 +23,22 @@ noncomputable section
 
 namespace GlobalTheory.TwoTorsPull
 
-theorem twoTorsRat_of_pullback : ∀ (R : Type) [CommRing R] [IsDomain R] (G : Over (Sp R)) [GrpObj G] (A : PolAV (Sp (FractionRing R))) (gen : ((Over.pullback (jK R)).obj G) ≅ A.A), IsMonHom gen.hom → ∃ (K' : Type) (_ : Field K') (_ : Algebra (FractionRing R) K'), Module.Finite (FractionRing R) K' ∧ ∀ (R₂ : Type) [CommRing R₂] [IsDomain R₂] (ρ : R →+* R₂) (i : K' →+* FractionRing R₂), (∀ r : R, i (algebraMap (FractionRing R) K' (algebraMap R (FractionRing R) r)) = algebraMap R₂ (FractionRing R₂) (ρ r)) → ∀ (G₁ : Over (Sp R₂)) [GrpObj G₁] (β : G₁.left ⟶ G.left), IsGrpPullback G₁ G (spMap ρ) β → TwoTorsRat G₁ := by
+theorem twoTorsRat_of_pullback
+    : ∀ (R : Type) [CommRing R] [IsDomain R] (G : Over (Sp R)) [GrpObj G]
+        (A : PolAV (Sp (FractionRing R))) (gen : ((Over.pullback (jK R)).obj G) ≅ A.A),
+      IsMonHom gen.hom
+        → ∃ (K' : Type) (_ : Field K') (_ : Algebra (FractionRing R) K'),
+          Module.Finite (FractionRing R) K'
+            ∧ ∀ (R₂ : Type) [CommRing R₂] [IsDomain R₂] (ρ : R →+* R₂) (i : K' →+* FractionRing R₂),
+              (∀ r : R,
+                  i (algebraMap (FractionRing R) K' (algebraMap R (FractionRing R) r))
+                    = algebraMap R₂ (FractionRing R₂) (ρ r))
+                → ∀ (G₁ : Over (Sp R₂)) [GrpObj G₁] (β : G₁.left ⟶ G.left),
+                  IsGrpPullback G₁ G (spMap ρ) β → TwoTorsRat G₁ := by
   intro R _ _ G _ A gen hgen
-  obtain ⟨K', _, _, hfin, H⟩ := TorsRational.exists_ext_points (FractionRing R) (torsion A.A 2)
-    (AbTorsionAnyBase.isFinite_and_flat_torsion _ A.A A.isAb 2 (by norm_num)).1
+  obtain ⟨K', _, _, hfin, H⟩ :=
+    TorsRational.exists_ext_points (FractionRing R) (torsion A.A 2)
+      (AbTorsionAnyBase.isFinite_and_flat_torsion _ A.A A.isAb 2 (by norm_num)).1
   refine ⟨K', inferInstance, inferInstance, hfin, ?_⟩
   intro R₂ _ _ ρ i hi G₁ _ β hβ F _ _ x hx
   let f : FractionRing R →+* FractionRing R₂ := i.comp (algebraMap (FractionRing R) K')
@@ -33,7 +47,8 @@ theorem twoTorsRat_of_pullback : ∀ (R : Type) [CommRing R] [IsDomain R] (G : O
   haveI : IsScalarTower (FractionRing R) K' (FractionRing R₂) := IsScalarTower.of_algebraMap_eq' rfl
   let σ : FractionRing R₂ →+* F := algebraMap (FractionRing R₂) F
   have hsq : spMap f ≫ jK R = jK R₂ ≫ spMap ρ := by
-    rw [jK, jK, spMap, spMap, ← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp, ← CommRingCat.ofHom_comp]
+    rw [jK, jK, spMap, spMap, ← Spec.map_comp, ← Spec.map_comp, ← CommRingCat.ofHom_comp,
+      ← CommRingCat.ofHom_comp]
     congr 2
     ext r
     exact hi r
@@ -72,15 +87,18 @@ theorem twoTorsRat_of_pullback : ∀ (R : Type) [CommRing R] [IsDomain R] (G : O
     rw [spMap, spMap, ← Spec.map_comp, ← CommRingCat.ofHom_comp]
   obtain ⟨w, hw⟩ := H (FractionRing R₂) F σ t0.left ((Over.w t0).trans hs)
   have hw2 : w ≫ (torsion A.A 2).hom = spMap f := by
-    have spec_map_field_cancel {K C : Type} [Field K] [Field C] (gam : K →+* C)
-        {X : Scheme} (y y' : Sp K ⟶ X)
-        (h : spMap gam ≫ y = spMap gam ≫ y') : y = y' := by
+    have spec_map_field_cancel
+        {K C : Type} [Field K] [Field C]
+        (gam : K →+* C)
+        {X : Scheme} (y y' : Sp K ⟶ X) (h : spMap gam ≫ y = spMap gam ≫ y')
+        : y = y' := by
       obtain ⟨⟨p, φ⟩, rfl⟩ := (Scheme.SpecToEquivOfField K X).symm.surjective y
       obtain ⟨⟨p', φ'⟩, rfl⟩ := (Scheme.SpecToEquivOfField K X).symm.surjective y'
       simp only [Scheme.SpecToEquivOfField_symm_apply] at h ⊢
-      have e : ∀ (q : X) (ψ : X.residueField q ⟶ CommRingCat.of K),
-          spMap gam ≫ (Spec.map ψ ≫ X.fromSpecResidueField q) =
-            (Scheme.SpecToEquivOfField C X).symm ⟨q, ψ ≫ CommRingCat.ofHom gam⟩ := by
+      have e
+          : ∀ (q : X) (ψ : X.residueField q ⟶ CommRingCat.of K),
+            spMap gam ≫ (Spec.map ψ ≫ X.fromSpecResidueField q)
+              = (Scheme.SpecToEquivOfField C X).symm ⟨q, ψ ≫ CommRingCat.ofHom gam⟩ := by
         intro q ψ
         simp only [Scheme.SpecToEquivOfField_symm_apply, spMap, Spec.map_comp, Category.assoc]
       rw [e, e] at h
@@ -97,17 +115,20 @@ theorem twoTorsRat_of_pullback : ∀ (R : Type) [CommRing R] [IsDomain R] (G : O
     refine spec_map_field_cancel σ _ _ ?_
     rw [← Category.assoc, hw, Over.w t0]
     rfl
-  let z : Sp (FractionRing R₂) ⟶ G.left := w ≫ (torsion.ι A.A 2).left ≫ gen.inv.left ≫ pullback.fst G.hom (jK R)
+  let z : Sp (FractionRing R₂) ⟶ G.left :=
+    w ≫ (torsion.ι A.A 2).left ≫ gen.inv.left ≫ pullback.fst G.hom (jK R)
   have hz : z ≫ G.hom = jK R₂ ≫ spMap ρ := by
     simp only [z, Category.assoc]
     have hgi : gen.inv.left ≫ pullback.snd G.hom (jK R) = A.A.hom := Over.w gen.inv
-    rw [pullback.condition, ← Category.assoc gen.inv.left, hgi, ← Category.assoc (torsion.ι A.A 2).left,
-      Over.w (torsion.ι A.A 2), ← Category.assoc w, hw2, hsq]
+    rw [pullback.condition, ← Category.assoc gen.inv.left, hgi,
+      ← Category.assoc (torsion.ι A.A 2).left, Over.w (torsion.ι A.A 2), ← Category.assoc w, hw2,
+      hsq]
   let y : Over.mk (jK R₂) ⟶ G₁ := Over.homMk (hβ.1.lift z (jK R₂) hz) (hβ.1.lift_snd _ _ _)
   refine ⟨y, hβ.1.hom_ext ?_ ?_⟩
   · show x.left ≫ β = spMap σ ≫ hβ.1.lift z (jK R₂) hz ≫ β
     rw [hβ.1.lift_fst, ← hx0l, ← hx1l, ← hx2l]
-    have hgh : gen.hom.left ≫ gen.inv.left = 𝟙 _ := by rw [← Over.comp_left, Iso.hom_inv_id, Over.id_left]
+    have hgh : gen.hom.left ≫ gen.inv.left = 𝟙 _ := by
+      rw [← Over.comp_left, Iso.hom_inv_id, Over.id_left]
     simp only [z, ← Category.assoc]
     rw [hw, ← Over.comp_left, ht0]
     show x2.left ≫ pullback.fst G.hom (jK R) = ((x2.left ≫ gen.hom.left) ≫ gen.inv.left) ≫ pullback.fst G.hom (jK R)

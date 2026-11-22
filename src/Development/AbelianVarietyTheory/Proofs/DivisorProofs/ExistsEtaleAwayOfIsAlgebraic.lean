@@ -8,7 +8,16 @@ set_option autoImplicit false
 
 namespace GlobalTheory.GenericEtale
 
-theorem exists_etale_away_of_isAlgebraic : ∀ {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [IsNoetherianRing A] [CharZero A] [IsDomain B] [Algebra A B] [FaithfulSMul A B] [Algebra.FiniteType A B] [Algebra.IsAlgebraic A B], ∃ a : A, a ≠ 0 ∧ ∀ (c : A) (A' B' : Type) [CommRing A'] [CommRing B'] [Algebra A A'] [Algebra B B'] [Algebra A' B'] [Algebra A B'] [IsScalarTower A A' B'] [IsScalarTower A B B'], IsLocalization.Away (a * c) A' → IsLocalization.Away (algebraMap A B (a * c)) B' → Algebra.Etale A' B' := by
+theorem exists_etale_away_of_isAlgebraic
+    : ∀ {A B : Type} [CommRing A] [CommRing B] [IsDomain A] [IsNoetherianRing A] [CharZero A]
+        [IsDomain B] [Algebra A B] [FaithfulSMul A B] [Algebra.FiniteType A B]
+        [Algebra.IsAlgebraic A B],
+      ∃ a : A,
+        a ≠ 0
+          ∧ ∀ (c : A) (A' B' : Type) [CommRing A'] [CommRing B'] [Algebra A A'] [Algebra B B']
+              [Algebra A' B'] [Algebra A B'] [IsScalarTower A A' B'] [IsScalarTower A B B'],
+            IsLocalization.Away (a * c) A' → IsLocalization.Away (algebraMap A B (a * c)) B'
+              → Algebra.Etale A' B' := by
   intro A B _ _ _ _ _ _ _ _ _ _
   haveI : Algebra.FinitePresentation A B := Algebra.FinitePresentation.of_finiteType.1 inferInstance
   let K := FractionRing A
@@ -28,8 +37,9 @@ theorem exists_etale_away_of_isAlgebraic : ∀ {A B : Type} [CommRing A] [CommRi
     .of_equiv ((IsLocalization.algEquiv (⊥ : Ideal B).primeCompl L
       (Localization.AtPrime (⊥ : Ideal B))).restrictScalars A)
   obtain ⟨b, hb, hE⟩ := Algebra.exists_etale_of_isEtaleAt (R := A) (⊥ : Ideal B)
-  obtain ⟨h, hh, hd⟩ := (Algebra.IsAlgebraic.isAlgebraic (R := A) b).exists_nonzero_dvd
-    (mem_nonZeroDivisors_of_ne_zero (by simpa using hb))
+  obtain ⟨h, hh, hd⟩ :=
+    (Algebra.IsAlgebraic.isAlgebraic (R := A) b).exists_nonzero_dvd
+      (mem_nonZeroDivisors_of_ne_zero (by simpa using hb))
   refine ⟨h, hh, fun c A' B' _ _ _ _ _ _ _ _ hA' hB' => ?_⟩
   have e5 : Algebra.Etale A (Localization.Away (algebraMap A B (h * c))) := by
     rw [← Algebra.basicOpen_subset_etaleLocus_iff_etale] at hE ⊢

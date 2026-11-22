@@ -7,20 +7,26 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FixingS
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc Topology
 
-private theorem ag_lift {G C : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CommGroup C]
-    [TopologicalSpace C] [T2Space C] (q : G →* C) (hq : Continuous q) :
-    ∃ F : TopologicalAbelianization G →* C, Continuous F ∧ ∀ g : G, F g = q g := by
+private theorem ag_lift
+    {G C : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [CommGroup C]
+    [TopologicalSpace C] [T2Space C]
+    (q : G →* C) (hq : Continuous q)
+    : ∃ F : TopologicalAbelianization G →* C, Continuous F ∧ ∀ g : G, F g = q g := by
   have hle : (commutator G).topologicalClosure ≤ q.ker :=
     Subgroup.topologicalClosure_minimal _ (Abelianization.commutator_subset_ker q)
       (isClosed_singleton.preimage hq)
   refine ⟨QuotientGroup.lift _ q hle, ?_, fun g => rfl⟩
   exact continuous_coinduced_dom.2 hq
 
-private theorem ag_map {G G' : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group G']
-    [TopologicalSpace G'] [IsTopologicalGroup G'] (f : G →* G') (hf : Continuous f) :
-    ∃ F : TopologicalAbelianization G →* TopologicalAbelianization G', Continuous F ∧ ∀ g : G, F g = (f g : G') := by
+private theorem ag_map
+    {G G' : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [Group G']
+    [TopologicalSpace G'] [IsTopologicalGroup G']
+    (f : G →* G') (hf : Continuous f)
+    : ∃ F : TopologicalAbelianization G →* TopologicalAbelianization G',
+      Continuous F ∧ ∀ g : G, F g = (f g : G') := by
   set M := (commutator G').topologicalClosure
   have hker : ((QuotientGroup.mk' M).comp f).ker = M.comap f := by
     ext x
@@ -34,16 +40,21 @@ private theorem ag_map {G G' : Type} [Group G] [TopologicalSpace G] [IsTopologic
   exact continuous_coinduced_dom.2 (continuous_quotient_mk'.comp hf)
 
 open GroundTheory.LocalField ValuativeRel GroundTheory.LocalField.Abstract in
-private theorem ag_field (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] [Field Ω] [Algebra K Ω] [IsSepClosure K Ω]
-    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (ε : G ≃* (Ω ≃ₐ[K] Ω))
-    (hε : Continuous ε) (hε' : Continuous ε.symm) :
-    ∃ (θ : Kˣ →* TopologicalAbelianization G) (D : TopologicalAbelianization G →* Multiplicative ProfiniteInteger),
-      Continuous θ ∧ Function.Injective θ ∧ DenseRange θ ∧
-      (∀ H : Subgroup Kˣ, IsOpen (H : Set Kˣ) → H.FiniteIndex →
-        ∃ V : Subgroup (TopologicalAbelianization G), IsOpen (V : Set (TopologicalAbelianization G)) ∧ V.comap θ = H) ∧
-      Continuous D ∧ (∀ y : Kˣ, D (θ y) = Multiplicative.ofAdd ((ord (y : K) : ℤ) : ProfiniteInteger)) ∧
-      ∀ g : G, D (QuotientGroup.mk' _ g) = unramifiedDegree K Ω (ε g) := by
+private theorem ag_field
+    (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    [Field Ω] [Algebra K Ω] [IsSepClosure K Ω]
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (ε : G ≃* (Ω ≃ₐ[K] Ω)) (hε : Continuous ε) (hε' : Continuous ε.symm)
+    : ∃ (θ : Kˣ →* TopologicalAbelianization G)
+        (D : TopologicalAbelianization G →* Multiplicative ProfiniteInteger),
+      Continuous θ ∧ Function.Injective θ ∧ DenseRange θ
+        ∧ (∀ H : Subgroup Kˣ,
+          IsOpen (H : Set Kˣ) → H.FiniteIndex
+            → ∃ V : Subgroup (TopologicalAbelianization G),
+              IsOpen (V : Set (TopologicalAbelianization G)) ∧ V.comap θ = H)
+        ∧ Continuous D
+        ∧ (∀ y : Kˣ, D (θ y) = Multiplicative.ofAdd ((ord (y : K) : ℤ) : ProfiniteInteger))
+        ∧ ∀ g : G, D (QuotientGroup.mk' _ g) = unramifiedDegree K Ω (ε g) := by
   obtain ⟨F, hF, hFe⟩ := ag_map (ε : G →* (Ω ≃ₐ[K] Ω)) hε
   obtain ⟨F', hF', hF'e⟩ := ag_map (ε.symm : (Ω ≃ₐ[K] Ω) →* G) hε'
   have hFF' : ∀ b, F (F' b) = b := by
@@ -58,8 +69,8 @@ private theorem ag_field (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSp
     simp
   obtain ⟨U, hU, hUe⟩ := ag_lift (unramifiedDegree K Ω) continuous_unramifiedDegree
   set L := localReciprocityLimit K Ω
-  have hLart : ∀ x, localArtinMap K Ω x = topologicalAbelianizationEquiv K Ω (L x) :=
-    fun x => localArtinMap_apply x
+  have hLart : ∀ x, localArtinMap K Ω x = topologicalAbelianizationEquiv K Ω (L x) := fun x =>
+    localArtinMap_apply x
   have hLc : Continuous L := by
     have h : (L : Kˣ → _) = (topologicalAbelianizationEquiv K Ω).symm ∘ localArtinMap K Ω := by
       funext x
@@ -84,8 +95,8 @@ private theorem ag_field (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSp
       (denseRange_localReciprocityLimit (K := K) (Ω := Ω)) hF'
   · intro H hHo hHf
     let H' : openFiniteIndex Kˣ := ⟨H, hHo, hHf⟩
-    let ψ := ((artinCoord K Ω H').comp
-      (topologicalAbelianizationEquiv K Ω).toMulEquiv.toMonoidHom).comp F
+    let ψ :=
+      ((artinCoord K Ω H').comp (topologicalAbelianizationEquiv K Ω).toMulEquiv.toMonoidHom).comp F
     have hψ : Continuous ψ :=
       (continuous_artinCoord H').comp ((topologicalAbelianizationEquiv K Ω).continuous.comp hF)
     haveI := openCompletion.discreteTopology_quotient H'
@@ -102,8 +113,11 @@ private theorem ag_field (K Ω : Type) [Field K] [ValuativeRel K] [TopologicalSp
     simp [hFe, hUe]
 
 open GroundTheory.LocalField ValuativeRel IsLocalRing in
-private theorem ag_char (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
-    [IsNonarchimedeanLocalField k] [Algebra ℚ_[l] k] [ValuativeExtension ℚ_[l] k] : CharP 𝓀[k] l := by
+private theorem ag_char
+    (l : ℕ) [Fact l.Prime]
+    (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    [Algebra ℚ_[l] k] [ValuativeExtension ℚ_[l] k]
+    : CharP 𝓀[k] l := by
   rw [CharP.charP_iff_prime_eq_zero (Fact.out : l.Prime)]
   have hnu : ¬ IsUnit ((l : 𝒪[k])) := by
     rintro ⟨u, hu⟩
@@ -126,8 +140,28 @@ private theorem ag_char (l : ℕ) [Fact l.Prime] (k : Type) [Field k] [Valuative
   rw [← map_natCast (residue 𝒪[k]) l]
   exact (residue_eq_zero_iff _).2 hmem
 
-theorem UpperTheory.local_class_field_theory_of_open_embedding :
-    ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (φ : G →* GQ l) (hφ : IsOpenEmbedding φ), ∃ (K : Type) (_ : Field K) (_ : ValuativeRel K) (_ : TopologicalSpace K) (_ : IsNonarchimedeanLocalField K) (_ : Algebra ℚ_[l] K) (_ : ValuativeExtension ℚ_[l] K) (_ : FiniteDimensional ℚ_[l] K), φ.range.index = Module.finrank ℚ_[l] K ∧ ∃ (θ : Kˣ →* TopologicalAbelianization G) (D : TopologicalAbelianization G →* Multiplicative GroundTheory.LocalField.Abstract.ProfiniteInteger), Continuous θ ∧ Function.Injective θ ∧ DenseRange θ ∧ (∀ H : Subgroup Kˣ, IsOpen (H : Set Kˣ) → H.FiniteIndex → ∃ V : Subgroup (TopologicalAbelianization G), IsOpen (V : Set (TopologicalAbelianization G)) ∧ V.comap θ = H) ∧ Continuous D ∧ (∀ y : Kˣ, D (θ y) = Multiplicative.ofAdd ((GroundTheory.LocalField.ord (y : K) : ℤ) : GroundTheory.LocalField.Abstract.ProfiniteInteger)) ∧ ∀ g : G, φ g ∈ Iq l ↔ D (QuotientGroup.mk' _ g) = 1 := by
+theorem UpperTheory.local_class_field_theory_of_open_embedding
+    : ∀ {l : ℕ} [Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        (φ : G →* GQ l) (hφ : IsOpenEmbedding φ),
+      ∃ (K : Type) (_ : Field K) (_ : ValuativeRel K) (_ : TopologicalSpace K)
+          (_ : IsNonarchimedeanLocalField K) (_ : Algebra ℚ_[l] K) (_ : ValuativeExtension ℚ_[l] K)
+          (_ : FiniteDimensional ℚ_[l] K),
+        φ.range.index = Module.finrank ℚ_[l] K
+          ∧ ∃ (θ : Kˣ →* TopologicalAbelianization G)
+              (D : TopologicalAbelianization G
+                →* Multiplicative GroundTheory.LocalField.Abstract.ProfiniteInteger),
+            Continuous θ ∧ Function.Injective θ ∧ DenseRange θ
+              ∧ (∀ H : Subgroup Kˣ,
+                IsOpen (H : Set Kˣ) → H.FiniteIndex
+                  → ∃ V : Subgroup (TopologicalAbelianization G),
+                    IsOpen (V : Set (TopologicalAbelianization G)) ∧ V.comap θ = H)
+              ∧ Continuous D
+              ∧ (∀ y : Kˣ,
+                D (θ y)
+                  = Multiplicative.ofAdd
+                    ((GroundTheory.LocalField.ord (y : K) : ℤ)
+                      : GroundTheory.LocalField.Abstract.ProfiniteInteger))
+              ∧ ∀ g : G, φ g ∈ Iq l ↔ D (QuotientGroup.mk' _ g) = 1 := by
   intro l _ G _ _ _ φ hφ
   obtain ⟨K, e, he, he', hcomp, -, hidx, -⟩ := openField φ hφ
   haveI hfin : FiniteDimensional ℚ_[l] K.1 := K.2
@@ -145,8 +179,26 @@ theorem UpperTheory.local_class_field_theory_of_open_embedding :
   have hε : Continuous ε := hc1.comp he
   have hε' : Continuous ε.symm := he'.comp hc2
   obtain ⟨θ, D, h1, h2, h3, h4, h5, h6, hD⟩ := ag_field K.1 (Om l) ε hε hε'
-  refine ⟨K.1, inferInstance, vr, tp, hloc, inferInstance, hext, hfin, hidx, θ, D,
-    h1, h2, h3, h4, h5, h6, ?_⟩
+  refine ⟨
+    K.1,
+    inferInstance,
+    vr,
+    tp,
+    hloc,
+    inferInstance,
+    hext,
+    hfin,
+    hidx,
+    θ,
+    D,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    ?_
+  ⟩
   intro g
   have hεg : ∀ x, (ε g) x = φ g x := by
     intro x

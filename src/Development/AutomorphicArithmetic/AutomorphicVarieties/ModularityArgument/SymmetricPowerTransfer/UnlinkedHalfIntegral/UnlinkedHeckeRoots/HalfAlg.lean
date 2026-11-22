@@ -8,16 +8,19 @@ open scoped ComplexConjugate
 
 namespace UpperTheory.V.Z.Sym.Unl
 
-private theorem sq_of_conj {a x : ℂ} (h : conj a * x = a) :
-    a * a = ((‖a‖ ^ 2 : ℝ) : ℂ) * x := by
-  have h1 : a * conj a = ((‖a‖ ^ 2 : ℝ) : ℂ) := by
-    rw [Complex.mul_conj']; push_cast; rfl
-  calc a * a = a * (conj a * x) := by rw [h]
+private theorem sq_of_conj {a x : ℂ} (h : conj a * x = a) : a * a = ((‖a‖ ^ 2 : ℝ) : ℂ) * x := by
+  have h1 : a * conj a = ((‖a‖ ^ 2 : ℝ) : ℂ) := by rw [Complex.mul_conj']; push_cast; rfl
+  calc
+    a * a
+      = a * (conj a * x) := by rw [h]
     _ = (a * conj a) * x := by ring
     _ = _ := by rw [h1]
 
-private theorem ratio_eq {p s t : ℝ} (hp : 2 ≤ p) (hs0 : 0 < s) (hs : s * s = p) {z : ℂ}
-    (hz : z * conj z = (p : ℂ)) (ht : 0 ≤ t) (hzt : z + 2 + z⁻¹ = (t : ℂ)) : z = (s : ℂ) := by
+private theorem ratio_eq
+    {p s t : ℝ} (hp : 2 ≤ p) (hs0 : 0 < s) (hs : s * s = p)
+    {z : ℂ} (hz : z * conj z = (p : ℂ))
+    (ht : 0 ≤ t) (hzt : z + 2 + z⁻¹ = (t : ℂ))
+    : z = (s : ℂ) := by
   have hp0 : (0 : ℝ) < p := by linarith
   have hn : Complex.normSq z = p := by
     have e := Complex.mul_conj z
@@ -55,10 +58,11 @@ private theorem ratio_eq {p s t : ℝ} (hp : 2 ≤ p) (hs0 : 0 < s) (hs : s * s 
   · simp [hr]
   · simp [hv]
 
-private theorem abs_ratio_ne_of_sqrt_flip (p m : ℕ) (a x α β : ℂ) (σ : ℂ ≃+* ℂ) (hp : 2 ≤ p) (hx : ‖x‖ = 1)
-    (hσx : ‖σ x‖ = 1) (hσ : σ ((Real.sqrt p : ℝ) : ℂ) = -((Real.sqrt p : ℝ) : ℂ))
-    (ha : conj a * x = a) (hσa : conj (σ a) * σ x = σ a) (hsum : α + β = a)
-    (hprod : α * β = x * (p : ℂ) ^ m) : ‖α‖ ^ 2 ≠ (p : ℝ) * ‖β‖ ^ 2 := by
+private theorem abs_ratio_ne_of_sqrt_flip
+    (p m : ℕ) (a x α β : ℂ) (σ : ℂ ≃+* ℂ) (hp : 2 ≤ p) (hx : ‖x‖ = 1) (hσx : ‖σ x‖ = 1)
+    (hσ : σ ((Real.sqrt p : ℝ) : ℂ) = -((Real.sqrt p : ℝ) : ℂ)) (ha : conj a * x = a)
+    (hσa : conj (σ a) * σ x = σ a) (hsum : α + β = a) (hprod : α * β = x * (p : ℂ) ^ m)
+    : ‖α‖ ^ 2 ≠ (p : ℝ) * ‖β‖ ^ 2 := by
   intro hab
   have hx0 : x ≠ 0 := by
     intro h0
@@ -82,8 +86,7 @@ private theorem abs_ratio_ne_of_sqrt_flip (p m : ℕ) (a x α β : ℂ) (σ : �
   have hn : Complex.normSq α = p * Complex.normSq β := by
     rw [← Complex.sq_norm, ← Complex.sq_norm]
     exact hab
-  have hnβ : (Complex.normSq β : ℂ) ≠ 0 := by
-    exact_mod_cast (Complex.normSq_pos.mpr hβ).ne'
+  have hnβ : (Complex.normSq β : ℂ) ≠ 0 := by exact_mod_cast (Complex.normSq_pos.mpr hβ).ne'
   have hz : (α / β) * conj (α / β) = ((p : ℝ) : ℂ) := by
     rw [map_div₀, div_mul_div_comm, Complex.mul_conj, Complex.mul_conj, hn]
     push_cast
@@ -117,7 +120,7 @@ private theorem abs_ratio_ne_of_sqrt_flip (p m : ℕ) (a x α β : ℂ) (σ : �
 
 end UpperTheory.V.Z.Sym.Unl
 
-theorem UpperTheory.V.Z.Sym.Unl.halfAlg :
-    UpperTheory.V.Z.Sym.Unl.HalfAlg := by
+theorem UpperTheory.V.Z.Sym.Unl.halfAlg : UpperTheory.V.Z.Sym.Unl.HalfAlg := by
   intro p m a x α β σ hp hx hσx hσ ha hσa hsum hprod
-  exact UpperTheory.V.Z.Sym.Unl.abs_ratio_ne_of_sqrt_flip p m a x α β σ hp hx hσx hσ ha hσa hsum hprod
+  exact UpperTheory.V.Z.Sym.Unl.abs_ratio_ne_of_sqrt_flip p m a x α β σ hp hx hσx hσ ha hσa hsum
+    hprod

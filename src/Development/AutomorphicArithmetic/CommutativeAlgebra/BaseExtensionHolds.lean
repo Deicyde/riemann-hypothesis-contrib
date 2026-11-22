@@ -15,34 +15,36 @@ open GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
 
 namespace UpperTheory
 
-private theorem card_quot_of {A B : Type} [CommRing A] [CommRing B] (f : A →+* B)
-    (hf : Function.Surjective f) (I : Ideal A) (h : ∀ a, a ∈ I ↔ f a = 0) :
-    Nat.card (A ⧸ I) = Nat.card B := by
+private theorem card_quot_of
+    {A B : Type} [CommRing A] [CommRing B]
+    (f : A →+* B) (hf : Function.Surjective f)
+    (I : Ideal A) (h : ∀ a, a ∈ I ↔ f a = 0)
+    : Nat.card (A ⧸ I) = Nat.card B := by
   have hk : I = RingHom.ker f := by
     ext a
     rw [RingHom.mem_ker]
     exact h a
-  exact Nat.card_congr ((Ideal.quotEquivOfEq hk).trans (RingHom.quotientKerEquivOfSurjective hf)).toEquiv
+  exact Nat.card_congr ((Ideal.quotEquivOfEq hk).trans
+    (RingHom.quotientKerEquivOfSurjective hf)).toEquiv
 
 section Local
 
 variable {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
 
 private def iota : 𝓞 E →+* Gal.Int.Geo.Ow w :=
-  (algebraMap (𝓞 E) E).codRestrict (w.valuation E).valuationSubring
-    (fun a => by
-      rw [Valuation.mem_valuationSubring_iff]
-      exact w.valuation_le_one a)
+  (algebraMap (𝓞 E) E).codRestrict (w.valuation E).valuationSubring (fun a => by
+    rw [Valuation.mem_valuationSubring_iff]
+    exact w.valuation_le_one a)
 
-private theorem iota_mem_max (a : 𝓞 E) :
-    iota w a ∈ IsLocalRing.maximalIdeal (Gal.Int.Geo.Ow w) ↔ a ∈ w.asIdeal := by
+private theorem iota_mem_max (a : 𝓞 E)
+    : iota w a ∈ IsLocalRing.maximalIdeal (Gal.Int.Geo.Ow w) ↔ a ∈ w.asIdeal := by
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff,
     (Valuation.valuationSubring.integers (w.valuation E)).isUnit_iff_valuation_eq_one,
     ← w.valuation_lt_one_iff_mem (K := E) a]
   exact ⟨fun h => lt_of_le_of_ne (w.valuation_le_one a) h, ne_of_lt⟩
 
-private theorem res_surj :
-    Function.Surjective ((IsLocalRing.residue (Gal.Int.Geo.Ow w)).comp (iota w)) := by
+private theorem res_surj
+    : Function.Surjective ((IsLocalRing.residue (Gal.Int.Geo.Ow w)).comp (iota w)) := by
   intro y
   obtain ⟨x, rfl⟩ := IsLocalRing.residue_surjective y
   have hx : (x : E) ∈ w.valuationSubringAtPrime E := by
@@ -51,8 +53,8 @@ private theorem res_surj :
   haveI : IsLocalization w.asIdeal.primeCompl (w.valuationSubringAtPrime E) :=
     Localization.subalgebra.isLocalization_ofField E w.asIdeal.primeCompl
       w.asIdeal.primeCompl_le_nonZeroDivisors
-  obtain ⟨⟨a, s⟩, h⟩ := IsLocalization.surj w.asIdeal.primeCompl
-    (⟨x, hx⟩ : w.valuationSubringAtPrime E)
+  obtain ⟨⟨a, s⟩, h⟩ :=
+    IsLocalization.surj w.asIdeal.primeCompl (⟨x, hx⟩ : w.valuationSubringAtPrime E)
   have hxs : x * iota w (s : 𝓞 E) = iota w a :=
     Subtype.ext (congrArg (fun z : w.valuationSubringAtPrime E => (z : E)) h)
   obtain ⟨c, i, hi, hc⟩ := w.isMaximal.exists_inv s.2
@@ -66,14 +68,14 @@ private theorem res_surj :
   rw [e1]
   exact neg_mem (Ideal.mul_mem_left _ _ ((iota_mem_max w i).2 hi))
 
-private theorem card_res :
-    Nat.card (IsLocalRing.ResidueField (Gal.Int.Geo.Ow w)) = Nat.card (𝓞 E ⧸ w.asIdeal) :=
-  (card_quot_of _ (res_surj w) w.asIdeal (fun a => by
-    rw [RingHom.comp_apply, IsLocalRing.residue_eq_zero_iff, iota_mem_max])).symm
+private theorem card_res
+    : Nat.card (IsLocalRing.ResidueField (Gal.Int.Geo.Ow w)) = Nat.card (𝓞 E ⧸ w.asIdeal) :=
+  (card_quot_of _ (res_surj w) w.asIdeal
+    (fun a => by rw [RingHom.comp_apply, IsLocalRing.residue_eq_zero_iff, iota_mem_max])).symm
 
-private theorem card_pow (q : ℕ) (hq : q.Prime) (h : (q : 𝓞 E) ∈ w.asIdeal) :
-    ∃ f : ℕ, Nat.card (𝓞 E ⧸ w.asIdeal) = q ^ f :=
-  by apply _root_.UpperTheory.Reformulated.B.Qi54.card_pow <;> assumption
+private theorem card_pow (q : ℕ) (hq : q.Prime) (h : (q : 𝓞 E) ∈ w.asIdeal)
+    : ∃ f : ℕ, Nat.card (𝓞 E ⧸ w.asIdeal) = q ^ f := by
+  apply _root_.UpperTheory.Reformulated.B.Qi54.card_pow <;> assumption
 
 end Local
 
@@ -109,36 +111,39 @@ theorem baseExtension_holds : Gal.Int.Geo.BaseEx := by
     refine hkw ((iota_mem_max w _).1 ?_)
     rw [map_natCast]
     exact (IsLocalRing.mem_maximalIdeal _).2 hn
-  let b : Base D (Gal.Int.Geo.Ow w) :=
-    { unit := hunit
-      ρ := t D.ω
-      ρ_root := by
-        have h := congrArg t hroot
-        simpa only [map_add (f := _), map_sub, map_mul, map_pow, map_intCast, map_zero] using h
-      t := fun _ => t
-      t_ω := fun _ => rfl
-      comax := fun i j h => absurd (Subsingleton.elim i j) h
-      apart := fun i j h => absurd (Subsingleton.elim i j) h }
+  let b : Base D (Gal.Int.Geo.Ow w) := {
+    unit := hunit
+    ρ := t D.ω
+    ρ_root := by
+      have h := congrArg t hroot
+      simpa only [map_add (f := _), map_sub, map_mul, map_pow, map_intCast, map_zero] using h
+    t := fun _ => t
+    t_ω := fun _ => rfl
+    comax := fun i j h => absurd (Subsingleton.elim i j) h
+    apart := fun i j h => absurd (Subsingleton.elim i j) h
+  }
   refine ⟨f, b, ⟨?_, ?_⟩, ?_, hqm, hnw⟩
   · exact hstd.1
   · exact fun i => RingHom.ext fun c => hstd.2 i c
   · have hsurj : Function.Surjective ((Ideal.Quotient.mk w.asIdeal).comp j.toRingHom) :=
       Ideal.Quotient.mk_surjective.comp j.surjective
-    refine
-      { pmem := ?_
-        card := by rw [card_res, hf]
-        three := h3
-        cop := hcop
-        m1 := hm
-        a1 := ha
-        ule := hu
-        norm := ?_
-        tw := fun i x hx => (iota_mem_max w _).2 ((hpl' x).1 hx) }
+    refine {
+      pmem := ?_
+      card := by rw [card_res, hf]
+      three := h3
+      cop := hcop
+      m1 := hm
+      a1 := ha
+      ule := hu
+      norm := ?_
+      tw := fun i x hx => (iota_mem_max w _).2 ((hpl' x).1 hx)
+    }
     · rw [← map_natCast (iota w)]
       exact (iota_mem_max w _).2 hqm
     · rw [Ideal.absNorm_apply, Submodule.cardQuot_apply,
         card_quot_of _ hsurj 𝔴 (fun a => by
           rw [RingHom.comp_apply, Ideal.Quotient.eq_zero_iff_mem]
-          exact hpl' a), hf]
+          exact hpl' a),
+        hf]
 
 end UpperTheory

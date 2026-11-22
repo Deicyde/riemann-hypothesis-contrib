@@ -6,23 +6,27 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
 
 section Transport
 
-theorem graph_transport4 {D₁ D₂ Dc₁ Dc₂ W₁ W₂ W₁' W₂' P P' : Type} (Ψ₁ : D₁ ≃ Dc₁) (Ψ₂ : D₂ ≃ Dc₂)
-    (θ : D₁ ≃ D₂) (φ : W₁ → W₂) (φ' : W₁' → W₂') (Pc₁ : W₁ → P) (Pc₂ : W₂ → P) (Pc₁' : W₁' → P')
-    (Pc₂' : W₂' → P') (Γ₁ : Set (D₁ × D₁ × W₁ × W₁')) (Γ₂ : Set (D₂ × D₂ × W₂ × W₂'))
-    (Γc₁ : Set (Dc₁ × Dc₁ × P × P')) (Γc₂ : Set (Dc₂ × Dc₂ × P × P'))
+theorem graph_transport4
+    {D₁ D₂ Dc₁ Dc₂ W₁ W₂ W₁' W₂' P P' : Type} (Ψ₁ : D₁ ≃ Dc₁) (Ψ₂ : D₂ ≃ Dc₂) (θ : D₁ ≃ D₂)
+    (φ : W₁ → W₂) (φ' : W₁' → W₂') (Pc₁ : W₁ → P) (Pc₂ : W₂ → P) (Pc₁' : W₁' → P') (Pc₂' : W₂' → P')
+    (Γ₁ : Set (D₁ × D₁ × W₁ × W₁')) (Γ₂ : Set (D₂ × D₂ × W₂ × W₂')) (Γc₁ : Set (Dc₁ × Dc₁ × P × P'))
+    (Γc₂ : Set (Dc₂ × Dc₂ × P × P'))
     (h1 : (fun p => (Ψ₁ p.1, Ψ₁ p.2.1, Pc₁ p.2.2.1, Pc₁' p.2.2.2)) '' Γ₁ = Γc₁)
     (h2 : (fun p => (Ψ₂ p.1, Ψ₂ p.2.1, Pc₂ p.2.2.1, Pc₂' p.2.2.2)) '' Γ₂ = Γc₂)
     (hP : ∀ w, Pc₂ (φ w) = Pc₁ w) (hP' : ∀ w, Pc₂' (φ' w) = Pc₁' w)
-    (hinj : ∀ p ∈ Γ₁, ∀ q ∈ Γ₂, Pc₂ q.2.2.1 = Pc₁ p.2.2.1 → Pc₂' q.2.2.2 = Pc₁' p.2.2.2 →
-      q.2.2.1 = φ p.2.2.1 ∧ q.2.2.2 = φ' p.2.2.2) :
-    ((fun p => (θ p.1, θ p.2.1, φ p.2.2.1, φ' p.2.2.2)) '' Γ₁ = Γ₂) ↔
-      ((fun p => (Ψ₂ (θ (Ψ₁.symm p.1)), Ψ₂ (θ (Ψ₁.symm p.2.1)), p.2.2.1, p.2.2.2)) '' Γc₁ = Γc₂) := by
+    (hinj : ∀ p ∈ Γ₁, ∀ q ∈ Γ₂,
+      Pc₂ q.2.2.1 = Pc₁ p.2.2.1 → Pc₂' q.2.2.2 = Pc₁' p.2.2.2
+        → q.2.2.1 = φ p.2.2.1 ∧ q.2.2.2 = φ' p.2.2.2)
+    : ((fun p => (θ p.1, θ p.2.1, φ p.2.2.1, φ' p.2.2.2)) '' Γ₁ = Γ₂)
+      ↔ ((fun p => (Ψ₂ (θ (Ψ₁.symm p.1)), Ψ₂ (θ (Ψ₁.symm p.2.1)), p.2.2.1, p.2.2.2)) '' Γc₁
+        = Γc₂) := by
   subst h1 h2
   constructor
   · intro h
@@ -34,8 +38,9 @@ theorem graph_transport4 {D₁ D₂ Dc₁ Dc₂ W₁ W₂ W₁' W₂' P P' : Typ
     ext q
     constructor
     · rintro ⟨p, hp, rfl⟩
-      have hc : (Ψ₂ (θ p.1), Ψ₂ (θ p.2.1), Pc₁ p.2.2.1, Pc₁' p.2.2.2) ∈
-          (fun p => (Ψ₂ p.1, Ψ₂ p.2.1, Pc₂ p.2.2.1, Pc₂' p.2.2.2)) '' Γ₂ := by
+      have hc
+          : (Ψ₂ (θ p.1), Ψ₂ (θ p.2.1), Pc₁ p.2.2.1, Pc₁' p.2.2.2)
+            ∈ (fun p => (Ψ₂ p.1, Ψ₂ p.2.1, Pc₂ p.2.2.1, Pc₂' p.2.2.2)) '' Γ₂ := by
         rw [← h]
         exact ⟨_, ⟨p, hp, rfl⟩, by simp⟩
       obtain ⟨q, hq, hqe⟩ := hc
@@ -48,16 +53,18 @@ theorem graph_transport4 {D₁ D₂ Dc₁ Dc₂ W₁ W₂ W₁' W₂' P P' : Typ
       rw [hpq]
       exact hq
     · intro hq
-      have hc : (Ψ₂ q.1, Ψ₂ q.2.1, Pc₂ q.2.2.1, Pc₂' q.2.2.2) ∈
-          (fun p => (Ψ₂ (θ (Ψ₁.symm p.1)), Ψ₂ (θ (Ψ₁.symm p.2.1)), p.2.2.1, p.2.2.2)) ''
-            ((fun p => (Ψ₁ p.1, Ψ₁ p.2.1, Pc₁ p.2.2.1, Pc₁' p.2.2.2)) '' Γ₁) := by
+      have hc
+          : (Ψ₂ q.1, Ψ₂ q.2.1, Pc₂ q.2.2.1, Pc₂' q.2.2.2)
+            ∈ (fun p => (Ψ₂ (θ (Ψ₁.symm p.1)), Ψ₂ (θ (Ψ₁.symm p.2.1)), p.2.2.1, p.2.2.2))
+              '' ((fun p => (Ψ₁ p.1, Ψ₁ p.2.1, Pc₁ p.2.2.1, Pc₁' p.2.2.2)) '' Γ₁) := by
         rw [h]
         exact ⟨q, hq, rfl⟩
       obtain ⟨_, ⟨p, hp, rfl⟩, hpe⟩ := hc
       simp only [Equiv.symm_apply_apply, Prod.mk.injEq] at hpe
       obtain ⟨e1, e2, e3, e4⟩ := hpe
       obtain ⟨f1, f2⟩ := hinj p hp q hq e3.symm e4.symm
-      exact ⟨p, hp, Prod.ext (Ψ₂.injective e1) (Prod.ext (Ψ₂.injective e2) (Prod.ext f1.symm f2.symm))⟩
+      exact
+        ⟨p, hp, Prod.ext (Ψ₂.injective e1) (Prod.ext (Ψ₂.injective e2) (Prod.ext f1.symm f2.symm))⟩
 
 end Transport
 
@@ -74,12 +81,16 @@ def PcG' {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) : H.Wb t.f' →ₗ
   coordW H t.f' (omP H t.f' t.f) (t.f' (Fin.last r))
     (omP_mem H t.f' t.f (unit_swap H t.f t.f' hg.2.2.2.1)) (z_mem H t.f' t.T' hg.2.2.1)
 
-theorem pcG_mk {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) (u : ↥(MMsharp H t))
-    (hu : (u : V) ∈ H.perp (H.X t.f)) :
-    PcG H hg (H.mkW t.f ⟨u, hu⟩) = ((sharpEquiv H t (unit_gramHG H hg) u (Sum.inl (Fin.last r)) : E),
-      lamStarC (M.L.cj : E →+* E) (H.Zhat t.f t.f') (fun b =>
-        (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl b) : E) +
-          algebraMap F E (g.q : F) * (sharpEquiv H t (unit_gramHG H hg) u (Sum.inr b) : E))) := by
+theorem pcG_mk
+    {g : SplitG M.L} {t : Term V M r}
+    (hg : GoodG H g t) (u : ↥(MMsharp H t)) (hu : (u : V) ∈ H.perp (H.X t.f))
+    : PcG H hg (H.mkW t.f ⟨u, hu⟩)
+      = (
+        (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl (Fin.last r)) : E),
+        lamStarC (M.L.cj : E →+* E) (H.Zhat t.f t.f') (fun b =>
+          (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl b) : E)
+            + algebraMap F E (g.q : F) * (sharpEquiv H t (unit_gramHG H hg) u (Sum.inr b) : E))
+      ) := by
   simp only [PcG, coordW_mk]
   refine Prod.ext ?_ ?_
   · show H.h u (t.f (Fin.last r)) = _
@@ -90,12 +101,16 @@ theorem pcG_mk {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) (u : ↥(MMs
     rw [sharpG_f' H hg]
     rfl
 
-theorem pcG'_mk {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) (u : ↥(MMsharp H t))
-    (hu : (u : V) ∈ H.perp (H.X t.f')) :
-    PcG' H hg (H.mkW t.f' ⟨u, hu⟩) = (lamC (H.Zhat t.f t.f') (fun a =>
-        (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl a) : E)),
-      (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl (Fin.last r)) : E) +
-        algebraMap F E (g.q : F) * (sharpEquiv H t (unit_gramHG H hg) u (Sum.inr (Fin.last r)) : E)) := by
+theorem pcG'_mk
+    {g : SplitG M.L} {t : Term V M r}
+    (hg : GoodG H g t) (u : ↥(MMsharp H t)) (hu : (u : V) ∈ H.perp (H.X t.f'))
+    : PcG' H hg (H.mkW t.f' ⟨u, hu⟩)
+      = (
+        lamC (H.Zhat t.f t.f') (fun a => (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl a) : E)),
+        (sharpEquiv H t (unit_gramHG H hg) u (Sum.inl (Fin.last r)) : E)
+          + algebraMap F E (g.q : F)
+            * (sharpEquiv H t (unit_gramHG H hg) u (Sum.inr (Fin.last r)) : E)
+      ) := by
   simp only [PcG', coordW_mk]
   refine Prod.ext ?_ ?_
   · show H.h u (omP H t.f' t.f) = _
@@ -105,10 +120,10 @@ theorem pcG'_mk {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) (u : ↥(MM
   · show H.h u (t.f' (Fin.last r)) = _
     rw [sharpG_f' H hg]
 
-theorem gamR_image {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) :
-    (fun p => (PsiG H hg p.1, PsiG H hg p.2.1, PcG H hg p.2.2.1, PcG' H hg p.2.2.2)) ''
-        GamR H t (algebraMap F E (g.q : F)) =
-      GamRC M.L.O (M.L.cj : E →+* E) (algebraMap F E (g.q : F)) (algebraMap F E ((g.q : F)⁻¹))
+theorem gamR_image {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t)
+    : (fun p => (PsiG H hg p.1, PsiG H hg p.2.1, PcG H hg p.2.2.1, PcG' H hg p.2.2.2))
+        '' GamR H t (algebraMap F E (g.q : F))
+      = GamRC M.L.O (M.L.cj : E →+* E) (algebraMap F E (g.q : F)) (algebraMap F E ((g.q : F)⁻¹))
         (H.Zhat t.f t.f') (algebraMap F E t.T) (algebraMap F E t.T') := by
   set s := sharpEquiv H t (unit_gramHG H hg) with hsdef
   ext ⟨d, e, c, c'⟩
@@ -140,7 +155,8 @@ theorem gamR_image {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) :
       intro a
       rw [sharpG_f' H hg, ← hsdef, sY']
       exact hY' a
-    have hqO : algebraMap F E (g.q : F) ∈ M.L.O := Formalism.MainNotions.LocalModelPeriodLattices.algebraMap_mem_O M.L g.q
+    have hqO : algebraMap F E (g.q : F) ∈ M.L.O :=
+      Formalism.MainNotions.LocalModelPeriodLattices.algebraMap_mem_O M.L g.q
     have huu : (u : V) - u' = algebraMap F E (g.q : F) • (u'' : V) := by
       have h0 : u - u' - (⟨_, hqO⟩ : M.L.O) • u'' = 0 := by
         apply s.injective
@@ -154,8 +170,11 @@ theorem gamR_image {g : SplitG M.L} {t : Term V M r} (hg : GoodG H g t) :
       have h1 := congrArg Subtype.val h0
       simp only [Submodule.coe_sub, Submodule.coe_smul, Submodule.coe_zero, Subring.smul_def] at h1
       exact sub_eq_zero.1 h1
-    refine ⟨(ddMk H t u, ddMk H t u'', H.mkW t.f ⟨u, hX⟩, H.mkW t.f' ⟨u', hX'⟩),
-      ⟨u, u', u'', hX, hX', huu, rfl⟩, ?_⟩
+    refine ⟨
+      (ddMk H t u, ddMk H t u'', H.mkW t.f ⟨u, hX⟩, H.mkW t.f' ⟨u', hX'⟩),
+      ⟨u, u', u'', hX, hX', huu, rfl⟩,
+      ?_
+    ⟩
     rw [he]
     simp only [PsiG_mk, pcG_mk, pcG'_mk, ← hsdef, sY, sY', sY'']
 

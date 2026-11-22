@@ -9,11 +9,15 @@ namespace GaussValuationUniqueness
 
 open ReciprocityTheory.ChartRestriction.G.T0 NumberField
 
-theorem admissibleValuation_prime_subsingleton {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι]
-    {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)] {WT : Type} [AddCommGroup WT]
+theorem admissibleValuation_prime_subsingleton
+    {K : Type} [Field K] [NumberField K]
+    {ι : Type} [Fintype ι]
+    {Ω : ι → Type} [∀ c, Field (Ω c)] [∀ c, Algebra K (Ω c)]
+    {WT : Type} [AddCommGroup WT]
     {A : ι → Type} [∀ c, CommRing (A c)] [∀ c, Algebra (Ω c) (A c)] [∀ c, Algebra K (A c)]
-    [∀ c, Algebra (𝓞 K) (A c)] (𝒜 : (c : ι) → WT → Submodule (Ω c) (A c))
-    (d : Data K ι Ω WT A) : LeafSt.AdmissibleValuationPrimeUnique 𝒜 d := by
+    [∀ c, Algebra (𝓞 K) (A c)]
+    (𝒜 : (c : ι) → WT → Submodule (Ω c) (A c)) (d : Data K ι Ω WT A)
+    : LeafSt.AdmissibleValuationPrimeUnique 𝒜 d := by
   intro hd _ c v hAdm hK p1 hp1 p2 hp2
   obtain ⟨hH1, w1, hw1, hv1⟩ := hp1
   obtain ⟨hH2, w2, hw2, hv2⟩ := hp2
@@ -30,50 +34,54 @@ theorem admissibleValuation_prime_subsingleton {K : Type} [Field K] [NumberField
   obtain ⟨_, j0, hj0, hnn, htr⟩ := hRC
   set a : Fin (d.N + 1) → Ω c := fun j => ratio (Ω := Ω c) (d.w j c) (d.w j0 c) with ha_def
   have ha : ∀ j, a j ∈ vRing v := fun j => (GaussValuationUniqueness.mem_vRing_iff v _).mpr (hnn j)
-  have hQne : RingHom.ker
-      (GaussValuationUniqueness.psiR (D := d.D) v hK j0
-        (fun k => ⟨a (j0.succAbove k), ha _⟩)) ≠ ⊥ := by
+  have hQne
+      : RingHom.ker (GaussValuationUniqueness.psiR (D := d.D) v hK j0
+          (fun k => ⟨a (j0.succAbove k), ha _⟩))
+        ≠ ⊥ := by
     letI := resAlg (F := K) v
     intro hbot
     let S : Set (IsLocalRing.ResidueField (vRing v)) :=
       {r | ∃ j, ∃ h : a j ∈ vRing v, r = IsLocalRing.residue (vRing v) ⟨_, h⟩}
-    let ρL : Fin d.N → IntermediateField.adjoin
-        (IsLocalRing.ResidueField ((vRing v).comap (algebraMap K (Ω c)))) S :=
-      fun k => ⟨IsLocalRing.residue (vRing v) ⟨a (j0.succAbove k), ha _⟩,
-        IntermediateField.subset_adjoin _ _ ⟨j0.succAbove k, ha _, rfl⟩⟩
-    have hni := GaussValuationUniqueness.not_inj_of_trdeg (D := d.D) S j0 ρL
-      (by have := hd.D_ge; omega) htr
+    let ρL
+        : Fin d.N
+          → IntermediateField.adjoin
+            (IsLocalRing.ResidueField ((vRing v).comap (algebraMap K (Ω c)))) S := fun k => ⟨
+      IsLocalRing.residue (vRing v) ⟨a (j0.succAbove k), ha _⟩,
+      IntermediateField.subset_adjoin _ _ ⟨j0.succAbove k, ha _, rfl⟩
+    ⟩
+    have hni :=
+      GaussValuationUniqueness.not_inj_of_trdeg (D := d.D) S j0 ρL (by have := hd.D_ge; omega) htr
     rw [injective_iff_map_eq_zero] at hni
     push_neg at hni
     obtain ⟨G, hG0, hG⟩ := hni
-    obtain ⟨f, rfl⟩ := MvPolynomial.map_surjective
-      (GaussValuationUniqueness.gK v hK) (GaussValuationUniqueness.gK_surj v hK) G
+    obtain ⟨f, rfl⟩ :=
+      MvPolynomial.map_surjective (GaussValuationUniqueness.gK v hK)
+        (GaussValuationUniqueness.gK_surj v hK) G
     have hf : f ≠ 0 := by
       rintro rfl
       exact hG (map_zero _)
-    have H : GaussValuationUniqueness.psiR (D := d.D) v hK j0
-          (fun k => ⟨a (j0.succAbove k), ha _⟩) =
-        (MvPolynomial.map (algebraMap
-          (IntermediateField.adjoin
-            (IsLocalRing.ResidueField ((vRing v).comap (algebraMap K (Ω c)))) S)
-          (IsLocalRing.ResidueField (vRing v)))).comp
-        (((MvPolynomial.aeval (imgR (D := d.D) j0 ρL)).toRingHom).comp
-          (MvPolynomial.map (gK v hK))) := by
+    have H
+        : GaussValuationUniqueness.psiR (D := d.D) v hK j0 (fun k => ⟨a (j0.succAbove k), ha _⟩)
+          = (MvPolynomial.map (algebraMap
+              (IntermediateField.adjoin
+                (IsLocalRing.ResidueField ((vRing v).comap (algebraMap K (Ω c)))) S)
+              (IsLocalRing.ResidueField (vRing v)))).comp
+            (((MvPolynomial.aeval (imgR (D := d.D) j0 ρL)).toRingHom).comp
+              (MvPolynomial.map (gK v hK))) := by
       apply MvPolynomial.ringHom_ext
       · intro r
-        simp only [GaussValuationUniqueness.psiR, GaussValuationUniqueness.psiT,
-          RingHom.comp_apply, MvPolynomial.eval₂Hom_C, MvPolynomial.map_C,
-          AlgHom.toRingHom_eq_coe, RingHom.coe_coe, MvPolynomial.aeval_C,
-          MvPolynomial.algebraMap_apply]
+        simp only [GaussValuationUniqueness.psiR, GaussValuationUniqueness.psiT, RingHom.comp_apply,
+          MvPolynomial.eval₂Hom_C, MvPolynomial.map_C, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+          MvPolynomial.aeval_C, MvPolynomial.algebraMap_apply]
         congr 1
       · intro t
-        simp only [GaussValuationUniqueness.psiR, GaussValuationUniqueness.psiT,
-          RingHom.comp_apply, MvPolynomial.eval₂Hom_X', MvPolynomial.map_X,
-          AlgHom.toRingHom_eq_coe, RingHom.coe_coe, MvPolynomial.aeval_X]
+        simp only [GaussValuationUniqueness.psiR, GaussValuationUniqueness.psiT, RingHom.comp_apply,
+          MvPolynomial.eval₂Hom_X', MvPolynomial.map_X, AlgHom.toRingHom_eq_coe, RingHom.coe_coe,
+          MvPolynomial.aeval_X]
         rw [GaussValuationUniqueness.imgR_map, GaussValuationUniqueness.imgR_map]
         rfl
-    have hmem : f ∈ RingHom.ker
-        (GaussValuationUniqueness.psiR (D := d.D) v hK j0
+    have hmem
+        : f ∈ RingHom.ker (GaussValuationUniqueness.psiR (D := d.D) v hK j0
           (fun k => ⟨a (j0.succAbove k), ha _⟩)) := by
       rw [RingHom.mem_ker, H]
       simp only [RingHom.comp_apply, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, hG0, map_zero]
@@ -88,7 +96,8 @@ theorem admissibleValuation_prime_subsingleton {K : Type} [Field K] [NumberField
   set b : Fin (d.N + 1) → Ω c := fun j => ratio (Ω := Ω c) (d.w j c) (d.w (d.jc c) c) with hb_def
   have hα : ∀ j, d.w j c = b j • d.w (d.jc c) c := by
     intro j
-    obtain ⟨α, hα⟩ := GaussValuationUniqueness.exists_smul_of_line hline (hd.w_mem j c) (hd.w_mem _ c) hbase
+    obtain ⟨α, hα⟩ :=
+      GaussValuationUniqueness.exists_smul_of_line hline (hd.w_mem j c) (hd.w_mem _ c) hbase
     rw [hb_def]
     simp only
     rw [GaussValuationUniqueness.ratio_eq_of hbase hα]
@@ -103,12 +112,18 @@ theorem admissibleValuation_prime_subsingleton {K : Type} [Field K] [NumberField
     apply GaussValuationUniqueness.ratio_eq_of hj0
     rw [hα j, hα j0, smul_smul, mul_assoc, inv_mul_cancel₀ hb0, mul_one]
   have ha0 : a j0 = 1 := by rw [hab, mul_inv_cancel₀ hb0]
-  have hrel : ∀ i : Fin (d.D + 1), i ≠ 0 →
-      ∑ j, sImg (D := d.D) (d.jc c) (d.x c) (i, j) *
-        algebraMap (Ω c) (OmS (Ω c) d.D d.N) (a j) = 0 := by
+  have hrel
+      : ∀ i : Fin (d.D + 1),
+        i ≠ 0
+          → ∑ j, sImg (D := d.D) (d.jc c) (d.x c) (i, j) *
+              algebraMap (Ω c) (OmS (Ω c) d.D d.N) (a j)
+            = 0 := by
     intro i hi
-    have rel : ∑ j, sImg (D := d.D) (d.jc c) (d.x c) (i, j) *
-        algebraMap (Ω c) (OmS (Ω c) d.D d.N) (b j) = 0 := sImg_rel (d.jc c) b hb i hi
+    have rel
+        : ∑ j, sImg (D := d.D) (d.jc c) (d.x c) (i, j) *
+            algebraMap (Ω c) (OmS (Ω c) d.D d.N) (b j)
+          = 0 :=
+      sImg_rel (d.jc c) b hb i hi
     simp_rw [hab, map_mul, ← mul_assoc]
     rw [← Finset.sum_mul, rel, zero_mul]
 
@@ -120,16 +135,24 @@ theorem admissibleValuation_prime_subsingleton {K : Type} [Field K] [NumberField
     have he : ∀ s, 0 ≤ w (GaussValuationUniqueness.eS (D := d.D) (d.jc c) j0 (d.x c) s) := by
       intro s
       rcases s with u | ik
-      · have e1 : GaussValuationUniqueness.eS (D := d.D) (d.jc c) j0 (d.x c) (Sum.inl u) =
-            d.sH c (MvPolynomial.X ((0, j0) : TVar d.D d.N)) := by
+      · have e1
+            : GaussValuationUniqueness.eS (D := d.D) (d.jc c) j0 (d.x c) (Sum.inl u)
+              = d.sH c (MvPolynomial.X ((0, j0) : TVar d.D d.N)) := by
           simp [GaussValuationUniqueness.eS, Data.sH, sHom]
-        rw [e1]; exact (hOv.2 _).1
-      · have e1 : GaussValuationUniqueness.eS (D := d.D) (d.jc c) j0 (d.x c) (Sum.inr ik) =
-            d.sH c (MvPolynomial.X ((ik.1, j0.succAbove ik.2) : TVar d.D d.N)) := by
+        rw [e1]
+        exact (hOv.2 _).1
+      · have e1
+            : GaussValuationUniqueness.eS (D := d.D) (d.jc c) j0 (d.x c) (Sum.inr ik)
+              = d.sH c (MvPolynomial.X ((ik.1, j0.succAbove ik.2) : TVar d.D d.N)) := by
           simp [GaussValuationUniqueness.eS, Data.sH, sHom]
-        rw [e1]; exact (hOv.2 _).1
-    have hq : MvPolynomial.map (IsLocalRing.residue (vRing v))
-        (GaussValuationUniqueness.psiT (D := d.D) v hK j0 (fun k => ⟨a (j0.succAbove k), ha _⟩) f) = 0 :=
+        rw [e1]
+        exact (hOv.2 _).1
+    have hq
+        : MvPolynomial.map (IsLocalRing.residue (vRing v))
+            (GaussValuationUniqueness.psiT (D := d.D) v hK j0
+              (fun k => ⟨a (j0.succAbove k), ha _⟩)
+              f)
+          = 0 :=
       RingHom.mem_ker.mp hf
     have hpos := GaussValuationUniqueness.pos_of_ker v hwv' _ he _ hq
     have hfac := GaussValuationUniqueness.sHom_factor v hK (d.jc c) j0 (d.x c) a ha ha0 hrel f

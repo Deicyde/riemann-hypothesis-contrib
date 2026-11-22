@@ -8,12 +8,13 @@ noncomputable section
 
 namespace Formalism.MainNotions.N.Ln34.GenPf
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
 variable {l : ℕ} [Fact l.Prime]
 
-theorem mem_or_inv_mem (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) :
-    x ∈ OL LL ∨ x⁻¹ ∈ OL LL := by
+theorem mem_or_inv_mem (P : LocPrime l) (LL : FinExt l) (x : ↥LL.1) : x ∈ OL LL ∨ x⁻¹ ∈ OL LL := by
   by_cases hx : x = 0
   · left; rw [hx]; exact zero_mem _
   rw [← P.v_O, ← P.v_O]
@@ -97,8 +98,8 @@ theorem isFractionRing (LL : FinExt l) : IsFractionRing ↥(OL LL) ↥LL.1 := by
   unfold OL
   exact integralClosure.isFractionRing_of_finite_extension ℚ_[l] _
 
-theorem natCard_emb (K LL : FinExt l) (hg : Good K 1 LL) :
-    Nat.card (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) = finrank ℚ_[l] ↥K.1 := by
+theorem natCard_emb (K LL : FinExt l) (hg : Good K 1 LL)
+    : Nat.card (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) = finrank ℚ_[l] ↥K.1 := by
   haveI : FiniteDimensional ℚ_[l] ↥K.1 := K.2
   let Φ : (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) → (↥K.1 →ₐ[ℚ_[l]] Om l) := fun σ => LL.1.val.comp σ
   have hinj : Function.Injective Φ := by
@@ -121,40 +122,43 @@ theorem natCard_emb (K LL : FinExt l) (hg : Good K 1 LL) :
   rw [Nat.card_eq_of_bijective Φ ⟨hinj, hsurj⟩, ← Field.finSepDegree_eq_of_isAlgClosed,
     Field.finSepDegree_eq_finrank_of_isSeparable]
 
-theorem card_emb (K LL : FinExt l) (hg : Good K 1 LL) [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)] :
-    Fintype.card (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) =
-      finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 := by
+theorem card_emb (K LL : FinExt l) (hg : Good K 1 LL) [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)]
+    : Fintype.card (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) = finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 := by
   rw [Fintype.card_eq_nat_card, natCard_emb K LL hg, Module.finrank_mul_finrank]
 
-theorem goodCoeffs (P : LocPrime l) (K LL : FinExt l) (hg : Good K 1 LL)
-    (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL)) [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)] :
-    GoodCoeffs (K := ↥K.1) (Qp := ℚ_[l]) (LL := ↥LL.1) (O := ↥(OL LL)) (V := T.V) := by
+theorem goodCoeffs
+    (P : LocPrime l)
+    (K LL : FinExt l) (hg : Good K 1 LL) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL))
+    [Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1)]
+    : GoodCoeffs (K := ↥K.1) (Qp := ℚ_[l]) (LL := ↥LL.1) (O := ↥(OL LL)) (V := T.V) := by
   refine ⟨⟨LL.2, ?_⟩, inferInstance, inferInstance, isDVR P LL, isFractionRing LL⟩
   rw [Fintype.card_eq_nat_card, natCard_emb K LL hg]
 
 section Gen
 
-variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K]
-    [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K] [IsScalarTower Qp K₀ K]
-    {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
-    [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
-    [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
-    (PD : PeriodData G Qp K₀ K B BdR)
-    {LL : Type} [Field LL] [Algebra Qp LL]
-    {O : Type} [CommRing O] [Algebra O LL]
-    {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V]
-    [Module O V] [IsScalarTower O LL V] {ρ : Representation LL G V}
-    [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
+variable
+  {G : Type} [Group G]
+  {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field K] [Algebra Qp K₀] [Algebra Qp K] [Algebra K₀ K]
+  [IsScalarTower Qp K₀ K]
+  {B BdR : Type} [CommRing B] [CommRing BdR] [Algebra Qp B] [Algebra K₀ B] [IsScalarTower Qp K₀ B]
+  [Algebra Qp BdR] [Algebra K₀ BdR] [Algebra K BdR] [IsScalarTower Qp K BdR]
+  [IsScalarTower K₀ K BdR] [IsScalarTower Qp K₀ BdR]
+  (PD : PeriodData G Qp K₀ K B BdR)
+  {LL : Type} [Field LL] [Algebra Qp LL]
+  {O : Type} [CommRing O] [Algebra O LL]
+  {V : Type} [AddCommGroup V] [Module LL V] [Module Qp V] [IsScalarTower Qp LL V] [Module O V]
+  [IsScalarTower O LL V]
+  {ρ : Representation LL G V}
+  [TopologicalSpace G] [TopologicalSpace V] [ContinuousAdd V] [ContinuousConstSMul LL V]
 
-theorem coboundaries_le_bloch_kato (hc : ∀ x, Continuous fun g => ρ g x) (L : Lattice (O := O) ρ) :
-    latticeCoboundaries L ≤ latticeFiniteCocycles PD L := by
+theorem coboundaries_le_bloch_kato (hc : ∀ x, Continuous fun g => ρ g x) (L : Lattice (O := O) ρ)
+    : latticeCoboundaries L ≤ latticeFiniteCocycles PD L := by
   intro c hc'
   obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hc'
   have hcoc : cob ρ x ∈ continuousCocycles ρ := by
     show Continuous (cob ρ x) ∧ ∀ g h, cob ρ x (g * h) = cob ρ x g + ρ g (cob ρ x h)
     refine ⟨?_, fun g h => ?_⟩
-    · have e : (cob ρ x : G → V) = fun g => ρ g x + -x := by
-        funext g; simp [cob, sub_eq_add_neg]
+    · have e : (cob ρ x : G → V) = fun g => ρ g x + -x := by funext g; simp [cob, sub_eq_add_neg]
       rw [e]
       exact (hc x).add continuous_const
     · simp only [cob, LinearMap.pi_apply, LinearMap.sub_apply, LinearMap.id_apply, map_mul,
@@ -170,10 +174,14 @@ theorem coboundaries_le_bloch_kato (hc : ∀ x, Continuous fun g => ρ g x) (L :
     refine ⟨hcoc, TensorProduct.tmul Qp x (1 : B), fun g => ?_⟩
     simp [cob, actVB, TensorProduct.sub_tmul]
 
-theorem lift_gens (hc : ∀ x, Continuous fun g => ρ g x) (L : Lattice (O := O) ρ)
-    (s : Finset (LatticeCohomology L)) (hs : Submodule.span O (s : Set (LatticeCohomology L)) = latticeFiniteCohomology PD L) :
-    ∃ t : Finset (G → V), t.card ≤ s.card ∧
-      Submodule.span O (t : Set (G → V)) ⊔ latticeCoboundaries L = latticeFiniteCocycles PD L := by
+theorem lift_gens
+    (hc : ∀ x, Continuous fun g => ρ g x)
+    (L : Lattice (O := O) ρ) (s : Finset (LatticeCohomology L))
+    (hs : Submodule.span O (s : Set (LatticeCohomology L)) = latticeFiniteCohomology PD L)
+    : ∃ t : Finset (G → V),
+      t.card ≤ s.card
+        ∧ Submodule.span O (t : Set (G → V)) ⊔ latticeCoboundaries L
+          = latticeFiniteCocycles PD L := by
   classical
   set N := (latticeCoboundaries L).comap (latticeCocycles L).subtype
   let rep : LatticeCohomology L → ↥(latticeCocycles L) := fun q => (N.mkQ_surjective q).choose
@@ -187,7 +195,8 @@ theorem lift_gens (hc : ∀ x, Continuous fun g => ρ g x) (L : Lattice (O := O)
     obtain ⟨c, hc', hcq⟩ := hq'
     have h1 : N.mkQ (rep q) = N.mkQ c := by rw [hrep]; exact hcq.symm
     have h2 : rep q - c ∈ N := (Submodule.Quotient.eq N).mp h1
-    have h3 : ((rep q : ↥(latticeCocycles L)) : G → V) - (c : G → V) ∈ latticeFiniteCocycles PD L := hB h2
+    have h3 : ((rep q : ↥(latticeCocycles L)) : G → V) - (c : G → V) ∈ latticeFiniteCocycles PD L :=
+      hB h2
     have h4 := (latticeFiniteCocycles PD L).add_mem h3 hc'
     simpa using h4
   apply le_antisymm
@@ -218,8 +227,10 @@ theorem lift_gens (hc : ∀ x, Continuous fun g => ρ g x) (L : Lattice (O := O)
 
 end Gen
 
-theorem arith {tc sc N r H0 : ℕ} {S : ℤ} (hts : tc ≤ sc) (hs : (sc : ℤ) ≤ H0 + r + S)
-    (h0 : H0 ≤ r) (hS : S ≤ (N : ℤ) * r) : tc ≤ 2 * ((N + 1) * r) := by
+theorem arith
+    {tc sc N r H0 : ℕ} {S : ℤ}
+    (hts : tc ≤ sc) (hs : (sc : ℤ) ≤ H0 + r + S) (h0 : H0 ≤ r) (hS : S ≤ (N : ℤ) * r)
+    : tc ≤ 2 * ((N + 1) * r) := by
   have h1 : (tc : ℤ) ≤ sc := by exact_mod_cast hts
   have h2 : (H0 : ℤ) ≤ r := by exact_mod_cast h0
   have h3 : (0 : ℤ) ≤ (N : ℤ) * r := by positivity
@@ -227,12 +238,17 @@ theorem arith {tc sc N r H0 : ℕ} {S : ℤ} (hts : tc ≤ sc) (hs : (sc : ℤ) 
   nlinarith
 
 set_option maxHeartbeats 800000 in
-theorem gen_core (LT : LocTheory) (hgen : H1fGeneratorBoundAll LT) (hfon : FontaineRegularity LT) (l : ℕ) [Fact l.Prime]
-    (hl : l ≠ 2) (K LL : FinExt l) (hg : Good K 1 LL) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL))
-    (r : ℕ) (hc : IsCrys ((LT l).PD K) T.ρ) (hr : finrank ↥LL.1 T.V = r) :
-    ∃ s : Finset (↥(GK K) → T.V),
-      s.card ≤ 2 * ((finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 + 1) * r) ∧
-      Submodule.span ↥(OL LL) (s : Set (↥(GK K) → T.V)) ⊔ latticeCoboundaries T.L = latticeFiniteCocycles ((LT l).PD K) T.L := by
+theorem gen_core
+    (LT : LocTheory) (hgen : H1fGeneratorBoundAll LT) (hfon : FontaineRegularity LT)
+    (l : ℕ) [Fact l.Prime]
+    (hl : l ≠ 2)
+    (K LL : FinExt l) (hg : Good K 1 LL) (T : LocLat ↥(GK K) ℚ_[l] ↥LL.1 ↥(OL LL))
+    (r : ℕ)
+    (hc : IsCrys ((LT l).PD K) T.ρ) (hr : finrank ↥LL.1 T.V = r)
+    : ∃ s : Finset (↥(GK K) → T.V),
+      s.card ≤ 2 * ((finrank ℚ_[l] ↥(K0 K) * finrank ↥(K0 K) ↥K.1 + 1) * r)
+        ∧ Submodule.span ↥(OL LL) (s : Set (↥(GK K) → T.V)) ⊔ latticeCoboundaries T.L
+          = latticeFiniteCocycles ((LT l).PD K) T.L := by
   haveI : FiniteDimensional ℚ_[l] ↥K.1 := K.2
   letI : Fintype (↥K.1 →ₐ[ℚ_[l]] ↥LL.1) := Fintype.ofFinite _
   haveI : IsTopologicalAddGroup T.V := IsModuleTopology.topologicalAddGroup ↥LL.1 T.V
@@ -240,9 +256,10 @@ theorem gen_core (LT : LocTheory) (hgen : H1fGeneratorBoundAll LT) (hfon : Fonta
   obtain ⟨s, hspan, hcard⟩ := H (goodCoeffs (LT l) K LL hg T) hc T.cont
   obtain ⟨t, ht, heq⟩ := lift_gens ((LT l).PD K) T.cont T.L s hspan
   refine ⟨t, ?_, heq⟩
-  have hsum : ∑ τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1,
-      ((finrank ↥LL.1 ↥(DdRE ((LT l).PD K) T.ρ τ) : ℤ) - finrank ↥LL.1 ↥(FildR ((LT l).PD K) T.ρ τ 0))
-      ≤ ∑ _τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1, (r : ℤ) := by
+  have hsum
+      : ∑ τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1,
+          ((finrank ↥LL.1 ↥(DdRE ((LT l).PD K) T.ρ τ) : ℤ) - finrank ↥LL.1 ↥(FildR ((LT l).PD K) T.ρ τ 0))
+        ≤ ∑ _τ : ↥K.1 →ₐ[ℚ_[l]] ↥LL.1, (r : ℤ) := by
     apply Finset.sum_le_sum
     intro τ _
     have h1 := ((hfon l K LL T).2 τ).2
@@ -250,8 +267,9 @@ theorem gen_core (LT : LocTheory) (hgen : H1fGeneratorBoundAll LT) (hfon : Fonta
     have h2 : (0 : ℤ) ≤ finrank ↥LL.1 ↥(FildR ((LT l).PD K) T.ρ τ 0) := Int.natCast_nonneg _
     have h3 : (finrank ↥LL.1 ↥(DdRE ((LT l).PD K) T.ρ τ) : ℤ) ≤ r := by exact_mod_cast h1
     linarith
-  have hS := hsum.trans (le_of_eq (by
-    rw [Finset.sum_const, Finset.card_univ, card_emb K LL hg, nsmul_eq_mul]))
+  have hS :=
+    hsum.trans (le_of_eq (by
+      rw [Finset.sum_const, Finset.card_univ, card_emb K LL hg, nsmul_eq_mul]))
   have hV : (finrank ↥LL.1 T.V : ℤ) = r := by exact_mod_cast hr
   rw [hV] at hcard
   set_option synthInstance.maxHeartbeats 200000 in
@@ -262,10 +280,14 @@ end Formalism.MainNotions.N.Ln34.GenPf
 
 namespace Formalism.MainNotions.N.Ln34
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module Formalism.MainNotions.ElementDenominator Formalism.MainNotions.ElementDenominator.CongruenceModules
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Module
+  Formalism.MainNotions.ElementDenominator
+  Formalism.MainNotions.ElementDenominator.CongruenceModules
 
-theorem generator_bound_of_hypotheses (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW)
-    (Cm : CmpOf D.loc D.locA HW F) (CA CB CK : ℝ) (hA : Adm1 D HW F Cm CA CB CK) : genR D := by
+theorem generator_bound_of_hypotheses
+    (D : D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F)
+    (CA CB CK : ℝ) (hA : Adm1 D HW F Cm CA CB CK)
+    : genR D := by
   obtain ⟨-, -, -, -, -, -, -, -, -, h7, h8, -, -⟩ := hA
   intro l _ hl K LL hg T₁ T₂ F' r S η m h up b hH
   exact GenPf.gen_core D.loc h7 h8 l hl K LL hg T₂ r hH.2.1 hH.2.2.2.1

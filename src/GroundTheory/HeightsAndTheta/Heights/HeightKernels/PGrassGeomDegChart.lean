@@ -33,16 +33,17 @@ theorem fin_one_fun_eq_const {α : Type*} (i : Fin 1 → α) : (fun _ => i 0) = 
 
 def a0 : Σ _ : Fin 1, PlIdx 1 n := ⟨0, single1 (Fin.castAdd n 0)⟩
 
-def chartPt (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) : Fin 1 → Matrix (Fin 1) (Fin n) ℂ :=
-  fun _ _ b => z ⟨0, single1 (Fin.natAdd 1 b)⟩ / z a0
+def chartPt (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) : Fin 1 → Matrix (Fin 1) (Fin n) ℂ := fun _ _ b =>
+  z ⟨0, single1 (Fin.natAdd 1 b)⟩ / z a0
 
-theorem rootCoord_mul (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (ht : z a0 ≠ 0) :
-    (fun p => rootCoord (chartPt z) p * z a0) = z := by
+theorem rootCoord_mul (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (ht : z a0 ≠ 0)
+    : (fun p => rootCoord (chartPt z) p * z a0) = z := by
   funext p
   obtain ⟨k, I⟩ := p
   obtain rfl : k = 0 := Subsingleton.elim _ _
   conv_rhs => rw [eq_single1 I]
-  simp only [rootCoord, colsOf, onePipe, Matrix.det_unique, Matrix.submatrix_apply, Matrix.of_apply, id]
+  simp only [rootCoord, colsOf, onePipe, Matrix.det_unique, Matrix.submatrix_apply, Matrix.of_apply,
+    id]
   generalize I.1.orderEmbOfFin I.2 0 = c
   refine Fin.addCases (fun a => ?_) (fun b => ?_) c
   · obtain rfl : a = 0 := Subsingleton.elim _ _
@@ -52,21 +53,29 @@ theorem rootCoord_mul (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (ht : z a0 ≠ 0) 
   · simp only [Fin.append_right, chartPt]
     exact div_mul_cancel₀ _ ht
 
-theorem eval_eq_zero {g : MRing (plBlocks 1 1 n)} (hg : g ∈ grassIdeal 1 1 n) (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) :
-    MvPolynomial.eval z (MvPolynomial.map (Int.castRingHom ℂ) g) = 0 := by
-  have key : ∀ z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ, z a0 ≠ 0 →
-      MvPolynomial.eval z (MvPolynomial.map (Int.castRingHom ℂ) g) = 0 := by
+theorem eval_eq_zero
+    {g : MRing (plBlocks 1 1 n)} (hg : g ∈ grassIdeal 1 1 n) (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ)
+    : MvPolynomial.eval z (MvPolynomial.map (Int.castRingHom ℂ) g) = 0 := by
+  have key
+      : ∀ z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ,
+        z a0 ≠ 0 → MvPolynomial.eval z (MvPolynomial.map (Int.castRingHom ℂ) g) = 0 := by
     intro z hz
     have h0 : mConeMap (rootCoord (chartPt z)) g = 0 := GrassLeRoot.proof 1 1 n _ hg
     have h1 := congrArg ((MvPolynomial.aeval fun _ : Fin 1 => z a0).restrictScalars ℤ) h0
     rw [map_zero, mConeMap] at h1
-    rw [show ((MvPolynomial.aeval fun _ : Fin 1 => z a0).restrictScalars ℤ)
-        ((MvPolynomial.aeval fun p => MvPolynomial.C (rootCoord (chartPt z) p) * MvPolynomial.X p.1) g) =
-        (((MvPolynomial.aeval fun _ : Fin 1 => z a0).restrictScalars ℤ).comp
-          (MvPolynomial.aeval fun p => MvPolynomial.C (rootCoord (chartPt z) p) * MvPolynomial.X p.1)) g from rfl,
-      MvPolynomial.comp_aeval] at h1
+    rw [show ((MvPolynomial.aeval fun _ : Fin 1 => z a0).restrictScalars ℤ) ((MvPolynomial.aeval
+                fun p => MvPolynomial.C (rootCoord (chartPt z) p) * MvPolynomial.X p.1)
+              g)
+            = (((MvPolynomial.aeval fun _ : Fin 1 => z a0).restrictScalars ℤ).comp
+                (MvPolynomial.aeval fun p =>
+                  MvPolynomial.C (rootCoord (chartPt z) p) * MvPolynomial.X p.1))
+              g from
+          rfl,
+        MvPolynomial.comp_aeval]
+      at h1
     simp only [AlgHom.restrictScalars_apply, map_mul, MvPolynomial.aeval_C, MvPolynomial.aeval_X,
-      Algebra.algebraMap_self, RingHom.id_apply] at h1
+        Algebra.algebraMap_self, RingHom.id_apply]
+      at h1
     rw [rootCoord_mul z hz] at h1
     rw [MvPolynomial.eval_map, ← h1, MvPolynomial.aeval_def]
     rfl
@@ -81,24 +90,24 @@ theorem eval_eq_zero {g : MRing (plBlocks 1 1 n)} (hg : g ∈ grassIdeal 1 1 n) 
   · rw [h, map_zero]
   · exact absurd h (MvPolynomial.X_ne_zero a0)
 
-theorem mem_mcPts (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) :
-    z ∈ mcPts (grassIdeal 1 1 n) ↔ ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0 :=
+theorem mem_mcPts (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ)
+    : z ∈ mcPts (grassIdeal 1 1 n) ↔ ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0 :=
   ⟨fun h => h.1, fun h => ⟨h, fun _ hf => eval_eq_zero hf z⟩⟩
 
-theorem segre_eq (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (i : Fin 1 → PlIdx 1 n) :
-    segre (ι := plBlocks 1 1 n) z i = z ⟨0, i 0⟩ := by
+theorem segre_eq (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (i : Fin 1 → PlIdx 1 n)
+    : segre (ι := plBlocks 1 1 n) z i = z ⟨0, i 0⟩ := by
   simp [segre]
 
-theorem apply_eq_segre (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (p : Σ _ : Fin 1, PlIdx 1 n) :
-    z p = segre (ι := plBlocks 1 1 n) z (fun _ => p.2) := by
+theorem apply_eq_segre (z : (Σ _ : Fin 1, PlIdx 1 n) → ℂ) (p : Σ _ : Fin 1, PlIdx 1 n)
+    : z p = segre (ι := plBlocks 1 1 n) z (fun _ => p.2) := by
   obtain ⟨k, I⟩ := p
   obtain rfl : k = 0 := Subsingleton.elim _ _
   rw [segre_eq]
 
 def blockLift (x : PlIdx 1 n → ℂ) : (Σ _ : Fin 1, PlIdx 1 n) → ℂ := fun p => x p.2
 
-theorem segre_blockLift (x : PlIdx 1 n → ℂ) :
-    segre (ι := plBlocks 1 1 n) (blockLift x) = fun i => x (i 0) := by
+theorem segre_blockLift (x : PlIdx 1 n → ℂ)
+    : segre (ι := plBlocks 1 1 n) (blockLift x) = fun i => x (i 0) := by
   funext i
   rw [segre_eq]
   rfl
@@ -106,9 +115,9 @@ theorem segre_blockLift (x : PlIdx 1 n → ℂ) :
 theorem card_seg : Fintype.card (Fin 1 → PlIdx 1 n) = n + 1 := by
   simp [PlIdx, Fintype.card_subtype, Finset.card_powersetCard, add_comm]
 
-theorem exists_of_ne_zero {w : (Fin 1 → PlIdx 1 n) → ℂ} (hw : w ≠ 0) :
-    blockLift (fun I => w fun _ => I) ∈ mcPts (grassIdeal 1 1 n) ∧
-      segre (ι := plBlocks 1 1 n) (blockLift fun I => w fun _ => I) = w := by
+theorem exists_of_ne_zero {w : (Fin 1 → PlIdx 1 n) → ℂ} (hw : w ≠ 0)
+    : blockLift (fun I => w fun _ => I) ∈ mcPts (grassIdeal 1 1 n)
+      ∧ segre (ι := plBlocks 1 1 n) (blockLift fun I => w fun _ => I) = w := by
   obtain ⟨i, hi⟩ := Function.ne_iff.mp hw
   refine ⟨(mem_mcPts _).2 fun _ => ⟨i 0, ?_⟩, ?_⟩
   · simpa [blockLift, fin_one_fun_eq_const] using hi
@@ -116,30 +125,38 @@ theorem exists_of_ne_zero {w : (Fin 1 → PlIdx 1 n) → ℂ} (hw : w ≠ 0) :
     funext i'
     simp only [fin_one_fun_eq_const]
 
-theorem injective_of_good {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)}
-    (hΨ : IsGoodProj (grassIdeal 1 1 n) Ψ) : Function.Injective Ψ := by
+theorem injective_of_good
+    {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)}
+    (hΨ : IsGoodProj (grassIdeal 1 1 n) Ψ)
+    : Function.Injective Ψ := by
   rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
   intro w hw
   by_contra hne
   obtain ⟨hm, hs⟩ := exists_of_ne_zero hne
   exact hΨ _ hm (by rw [hs]; exact hw)
 
-theorem exists_good (n : ℕ) :
-    ∃ Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ), IsGoodProj (grassIdeal 1 1 n) Ψ := by
+theorem exists_good (n : ℕ)
+    : ∃ Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ),
+      IsGoodProj (grassIdeal 1 1 n) Ψ := by
   let Ψ0 := LinearEquiv.funCongrLeft ℂ ℂ (Fintype.equivFinOfCardEq (card_seg (n := n))).symm
   refine ⟨Ψ0.toLinearMap, fun z hz h0 => ?_⟩
   obtain ⟨i, hi⟩ := hz.1 0
   have hs : segre (ι := plBlocks 1 1 n) z = 0 := Ψ0.map_eq_zero_iff.mp h0
   exact hi (by rw [apply_eq_segre z ⟨0, i⟩, hs]; rfl)
 
-theorem ptsIntegralAt_eq {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)}
-    (hΨ : IsGoodProj (grassIdeal 1 1 n) Ψ) :
-    ∃ B : Matrix (PlIdx 1 n) (Fin (n + 1)) ℂ, Function.Bijective B.mulVec ∧
-      ptsIntegralAt (grassIdeal 1 1 n) Ψ (fun _ z => Real.log ((fsMulti (plBlocks 1 1 n)).h z)) (fun _ => 1) =
-        chartMass (Bᴴ * B) := by
+theorem ptsIntegralAt_eq
+    {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)}
+    (hΨ : IsGoodProj (grassIdeal 1 1 n) Ψ)
+    : ∃ B : Matrix (PlIdx 1 n) (Fin (n + 1)) ℂ,
+      Function.Bijective B.mulVec
+        ∧ ptsIntegralAt (grassIdeal 1 1 n) Ψ
+            (fun _ z => Real.log ((fsMulti (plBlocks 1 1 n)).h z))
+            (fun _ => 1)
+          = chartMass (Bᴴ * B) := by
   have hinj := injective_of_good hΨ
   have hrank : Module.finrank ℂ ((Fin 1 → PlIdx 1 n) → ℂ) = Module.finrank ℂ (Fin (n + 1) → ℂ) := by
-    rw [Module.finrank_fintype_fun_eq_card, Module.finrank_fintype_fun_eq_card, card_seg, Fintype.card_fin]
+    rw [Module.finrank_fintype_fun_eq_card, Module.finrank_fintype_fun_eq_card, card_seg,
+      Fintype.card_fin]
   have hsurj := (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hrank).mp hinj
   set L := (LinearEquiv.ofBijective Ψ ⟨hinj, hsurj⟩).symm with hL
   have hΨL : ∀ v, Ψ (L v) = v := (LinearEquiv.ofBijective Ψ ⟨hinj, hsurj⟩).apply_symm_apply
@@ -157,7 +174,8 @@ theorem ptsIntegralAt_eq {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →�
     rw [segre_blockLift]
     funext i
     rw [hMapp, fin_one_fun_eq_const]
-  have hMdiff : Differentiable ℂ fun v => M v := (LinearMap.toContinuousLinearMap M.toLinearMap).differentiable
+  have hMdiff : Differentiable ℂ fun v => M v :=
+    (LinearMap.toContinuousLinearMap M.toLinearMap).differentiable
   have hcons : Differentiable ℂ fun y' : Fin n → ℂ => (Fin.cons 1 y' : Fin (n + 1) → ℂ) := by
     rw [differentiable_pi]
     intro c
@@ -204,10 +222,12 @@ theorem ptsIntegralAt_eq {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →�
   rw [hfib, finsum_mem_singleton]
   unfold sheetDensity
   split_ifs with hγ
-  · have hev : (fun y' => Real.log ((fsMulti (plBlocks 1 1 n)).h (hγ.choose y'))) =ᶠ[𝓝 y]
-        hermChartPot (Bᴴ * B) := by
+  · have hev
+        : (fun y' => Real.log ((fsMulti (plBlocks 1 1 n)).h (hγ.choose y'))) =ᶠ[𝓝 y]
+          hermChartPot (Bᴴ * B) := by
       filter_upwards [hγ.choose_spec.2] with y' hy'
-      have hs : segre (ι := plBlocks 1 1 n) (hγ.choose y') = segre (ι := plBlocks 1 1 n) (γ0 y') := by
+      have hs
+          : segre (ι := plBlocks 1 1 n) (hγ.choose y') = segre (ι := plBlocks 1 1 n) (γ0 y') := by
         rw [hseg, ← hy'.2.2, hLΨ]
       have he : hγ.choose y' = γ0 y' := by
         funext p
@@ -217,7 +237,6 @@ theorem ptsIntegralAt_eq {Ψ : (((k : Fin 1) → plBlocks 1 1 n k) → ℂ) →�
   · exact absurd ⟨γ0, hsheet⟩ hγ
 
 end GrassmannianGeometricDegreeChart
-
 
 open GrassmannianGeometricDegreeChart in
 theorem GrassGeomDegChart.proof : GrassGeomDegChart.Statement := by

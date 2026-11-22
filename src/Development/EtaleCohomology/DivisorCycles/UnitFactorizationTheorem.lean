@@ -180,13 +180,19 @@ lemma closed_sdiff {T T' : Finset (Fin n)} (h : Closed E T) (h' : Closed E T') :
 end mu
 
 section block
-variable {p : Fin n → Mat C N} {A : Subalgebra C (Mat C N)} {E : Fin n → Fin n → Mat C N} {r : Fin n}
+variable
+  {p : Fin n → Mat C N} {A : Subalgebra C (Mat C N)} {E : Fin n → Fin n → Mat C N} {r : Fin n}
 
-noncomputable def X (E : Fin n → Fin n → Mat C N) (r : Fin n)
-    (M : Matrix {j // j ∈ Bk E r} {j // j ∈ Bk E r} C) : Mat C N := ∑ i, ∑ j, M i j • E i j
+noncomputable def X
+    (E : Fin n → Fin n → Mat C N) (r : Fin n) (M : Matrix {j // j ∈ Bk E r} {j // j ∈ Bk E r} C)
+    : Mat C N :=
+  ∑ i, ∑ j, M i j • E i j
 
-noncomputable def Ψ (p : Fin n → Mat C N) (E : Fin n → Fin n → Mat C N) (r : Fin n)
-    (M : Matrix {j // j ∈ Bk E r} {j // j ∈ Bk E r} C) : Mat C N := 1 - zT p (Bk E r) + X E r M
+noncomputable def Ψ
+    (p : Fin n → Mat C N)
+    (E : Fin n → Fin n → Mat C N) (r : Fin n) (M : Matrix {j // j ∈ Bk E r} {j // j ∈ Bk E r} C)
+    : Mat C N :=
+  1 - zT p (Bk E r) + X E r M
 
 lemma zT_Bk : zT p (Bk E r) = ∑ j : {j // j ∈ Bk E r}, p j :=
   (Finset.sum_coe_sort _ _).symm
@@ -259,7 +265,8 @@ lemma pXp (hp : Sys p) (hE : MUnits A p E) (M : Matrix {j // j ∈ Bk E r} {j //
 end block
 
 section final
-variable {p : Fin n → Mat C N} {A : Subalgebra C (Mat C N)} {E : Fin n → Fin n → Mat C N} {r : Fin n}
+variable
+  {p : Fin n → Mat C N} {A : Subalgebra C (Mat C N)} {E : Fin n → Fin n → Mat C N} {r : Fin n}
 
 lemma Ψ_trans (hp : Sys p) (hE : MUnits A p E) (t : TransvectionStruct {j // j ∈ Bk E r} C) :
     Ψ p E r t.toMatrix ∈ S A p := by
@@ -272,8 +279,9 @@ lemma Ψ_trans (hp : Sys p) (hE : MUnits A p E) (t : TransvectionStruct {j // j 
   exact Submonoid.subset_closure
     ⟨_, A.smul_mem (hE.1 _ _) _, t.i, t.j, fun h => t.hij (Subtype.ext h), rfl⟩
 
-noncomputable def dd (E : Fin n → Fin n → Mat C N) (r : Fin n) (D : {j // j ∈ Bk E r} → C) :
-    Fin n → C := fun j => if h : j ∈ Bk E r then D ⟨j, h⟩ else 1
+noncomputable def dd (E : Fin n → Fin n → Mat C N) (r : Fin n) (D : {j // j ∈ Bk E r} → C)
+    : Fin n → C := fun j =>
+  if h : j ∈ Bk E r then D ⟨j, h⟩ else 1
 
 lemma Ψ_diag (hp : Sys p) (hE : MUnits A p E) (D : {j // j ∈ Bk E r} → C) :
     Ψ p E r (Matrix.diagonal D) = Dg p (dd E r D) := by

@@ -11,13 +11,15 @@ noncomputable section
 
 namespace PI.UnitaryGroupMassFormula.CntFormula
 
-open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
+open NumberField Formalism.MainNotions.S Formalism.MainNotions.S.Lat
+  Formalism.MainNotions.S.LocalSplitGroups Formalism.L2.SG.CntLocal
 open Classical
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem one_mem_ddS_zpow (D : Formalism.BasicNotions.D7) (k : ℕ) :
-    (1 : D.host.E) ∈ ((ddS D) ^ (-(k : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
+theorem one_mem_ddS_zpow (D : Formalism.BasicNotions.D7) (k : ℕ)
+    : (1 : D.host.E)
+      ∈ ((ddS D) ^ (-(k : ℤ)) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) := by
   have h0 : ddS D ≠ 0 := PI.TripleFrameDeterminant.W.ddS_ne_zero D
   have hle : ddS D ^ k ≤ 1 := by
     rw [ddS, ← FractionalIdeal.coeIdeal_pow]
@@ -27,10 +29,14 @@ theorem one_mem_ddS_zpow (D : Formalism.BasicNotions.D7) (k : ℕ) :
   rw [zpow_neg, zpow_natCast]
   exact h (FractionalIdeal.one_mem_one _)
 
-theorem flag_gram (D : Formalism.BasicNotions.D7) {T' : D.host.E} (G : FlagG (VS D) D.R.rS T') (a b : Fin (D.R.rS + 1)) :
-    (VS D).hT (G.fvec a) (G.fvec b) = if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then -T' else 0 := by
-  have hs : ∀ x y, (VS D).hT y x = starRingEnd D.host.E ((VS D).hT x y) :=
-    fun x y => ((VS D).herm.eq x y).symm
+theorem flag_gram
+    (D : Formalism.BasicNotions.D7)
+    {T' : D.host.E} (G : FlagG (VS D) D.R.rS T')
+    (a b : Fin (D.R.rS + 1))
+    : (VS D).hT (G.fvec a) (G.fvec b)
+      = if a = Fin.last D.R.rS ∧ b = Fin.last D.R.rS then -T' else 0 := by
+  have hs : ∀ x y, (VS D).hT y x = starRingEnd D.host.E ((VS D).hT x y) := fun x y =>
+    ((VS D).herm.eq x y).symm
   induction a using Fin.lastCases with
   | last =>
     induction b using Fin.lastCases with

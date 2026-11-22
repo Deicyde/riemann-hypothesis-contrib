@@ -13,7 +13,8 @@ noncomputable section
 
 namespace GlobalTheory.CuspFormsCompare
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD Formalism.L2.Pj Formalism.L2.PjFree
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
@@ -37,12 +38,13 @@ private lemma smul_mem_SS {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestricti
   refine ⟨_root_.ReciprocityTheory.ChartRestriction.G.FD.BoundedSectionAlgebra.bdd_smul X a hP.1, fun ξ hξ x hx => ?_⟩
   rw [_root_.ReciprocityTheory.ChartRestriction.G.FD.BoundedSectionAlgebra.fj_smul X la P ξ x 0 a, hP.2 ξ hξ x hx, mul_zero]
 
-
 open NumberField in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] in
-theorem _root_.GlobalTheory.CuspFormsCompare.mem_holSub_iff_forall_SS {r : ℕ} {Comp : Type}
-    (X : Comp → _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) (la : ∀ k, _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt (X k).Ψ r)
-    (P : _root_.Formalism.L2.PjFree.FDSec X) : P ∈ _root_.Formalism.L2.PjFree.holSub X la ↔ ∀ k, P k ∈ (X k).SS (la k) := by
+theorem _root_.GlobalTheory.CuspFormsCompare.mem_holSub_iff_forall_SS
+    {r : ℕ} {Comp : Type} (X : Comp → _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+    (la : ∀ k, _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt (X k).Ψ r)
+    (P : _root_.Formalism.L2.PjFree.FDSec X)
+    : P ∈ _root_.Formalism.L2.PjFree.holSub X la ↔ ∀ k, P k ∈ (X k).SS (la k) := by
   constructor
   · intro hP
     unfold _root_.Formalism.L2.PjFree.holSub at hP

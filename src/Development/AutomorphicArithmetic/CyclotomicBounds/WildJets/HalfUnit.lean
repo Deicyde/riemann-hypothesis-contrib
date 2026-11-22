@@ -14,21 +14,27 @@ public import Development.AbelianVarietyTheory.Proofs.AdelicLatticeProofs.SmulMe
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-theorem UpperTheory.WildA.halfUnit :
-    ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts} {G : GlobalTheory.ChiGrid.GridData L sc} (p : GlobalTheory.ChiGrid.Pair T) (P : Finset (Pl D.host.E)) (e : AE D), IsIdemSum e P →
-      ∀ c : ℕ, (∀ w ∈ P, ((c : ℕ) : 𝓞 D.host.E) ∉ w.asIdeal) →
-      ∀ u ∈ pairLat G p, IsHalf e u → ∃ u' ∈ pairLat G p, IsHalf e u' ∧ c • u' = u := by
+theorem UpperTheory.WildA.halfUnit
+    : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : GlobalTheory.ChiGrid.Consts}
+        {G : GlobalTheory.ChiGrid.GridData L sc} (p : GlobalTheory.ChiGrid.Pair T)
+        (P : Finset (Pl D.host.E)) (e : AE D),
+      IsIdemSum e P
+        → ∀ c : ℕ,
+          (∀ w ∈ P, ((c : ℕ) : 𝓞 D.host.E) ∉ w.asIdeal)
+            → ∀ u ∈ pairLat G p, IsHalf e u → ∃ u' ∈ pairLat G p, IsHalf e u' ∧ c • u' = u := by
   intro D T L sc G p P e he c hc u hu hhalf
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
   by_cases hc0 : c = 0
   · subst hc0
-    have hS : ∑ PP ∈ P, es PP = 0 :=
-      Finset.sum_eq_zero fun PP hPP => (hc PP hPP (by simp)).elim
+    have hS : ∑ PP ∈ P, es PP = 0 := Finset.sum_eq_zero fun PP hPP => (hc PP hPP (by simp)).elim
     have hu0 : u = 0 := by
       ext i j
       have h := hhalf i j
@@ -50,9 +56,10 @@ theorem UpperTheory.WildA.halfUnit :
       have hce : (((c : 𝓞 D.host.E) : D.host.E)) = (c : D.host.E) := by simp
       rw [hce, inv_mul_cancel₀ (by exact_mod_cast hc0), map_one]
     have hcw : (c : AE D) * w = ∑ PP ∈ P, es PP := by
-      calc (c : AE D) * w
-          = (∑ PP ∈ P, es PP) * (incA D (((c : 𝓞 D.host.E) : D.host.E))⁻¹ * (c : AE D)) := by
-            simp only [w]; ring
+      calc
+        (c : AE D) * w
+            = (∑ PP ∈ P, es PP) * (incA D (((c : 𝓞 D.host.E) : D.host.E))⁻¹ * (c : AE D)) := by
+          simp only [w]; ring
         _ = ∑ PP ∈ P, es PP := by rw [h1, mul_one]
     refine ⟨w • u, GlobalTheory.LatticeStable.smul_mem_latO _ _ _ _ _ _ w hw u hu, ?_, ?_⟩
     · intro i j

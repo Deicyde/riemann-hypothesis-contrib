@@ -7,7 +7,8 @@ public import Development.WeilBound.RepresentationTheoryGL.UnitaryDualProof.Open
 
 noncomputable section
 
-open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.CompanionTheory.Rodier
+open Matrix GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.CompanionTheory.Rodier
 
 namespace PositivityTheory.RgUd.CellA
 
@@ -15,30 +16,35 @@ variable {r m : ℕ}
 
 variable (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem wConj_apply (u : GL (Fin (r + m)) k) (i j : Fin (r + m)) :
-    ((pm k (wOpen (dd r m) (hdd r m)) * u * (pm k (wOpen (dd r m) (hdd r m)))⁻¹ : GL (Fin (r + m)) k) :
-      Matrix (Fin (r + m)) (Fin (r + m)) k) i j =
-      (u : Matrix (Fin (r + m)) (Fin (r + m)) k) ((w2 r m).symm i) ((w2 r m).symm j) := by
+theorem wConj_apply (u : GL (Fin (r + m)) k) (i j : Fin (r + m))
+    : ((pm k (wOpen (dd r m) (hdd r m)) * u * (pm k (wOpen (dd r m) (hdd r m)))⁻¹
+            : GL (Fin (r + m)) k)
+          : Matrix (Fin (r + m)) (Fin (r + m)) k)
+        i j
+      = (u : Matrix (Fin (r + m)) (Fin (r + m)) k) ((w2 r m).symm i) ((w2 r m).symm j) := by
   rw [wOpen_two, ← map_inv, Units.val_mul, Units.val_mul, GroundTheory.Automorphic.mul_permGL_apply,
     GroundTheory.Automorphic.permGL_mul_apply]
   rfl
 
-
 omit [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] in
-theorem mem_unipU_two {u : GL (Fin (r + m)) k} :
-    u ∈ unipU k (dd r m) (hdd r m) ↔ u ∈ unipB k (Fin (r + m)) ∧ ∀ i j : Fin (r + m),
-      (u : Matrix (Fin (r + m)) (Fin (r + m)) k) i j ≠ (1 : Matrix (Fin (r + m)) (Fin (r + m)) k) i j →
-        (i : ℕ) < m ∧ m ≤ (j : ℕ) := by
+theorem mem_unipU_two {u : GL (Fin (r + m)) k}
+    : u ∈ unipU k (dd r m) (hdd r m)
+      ↔ u ∈ unipB k (Fin (r + m))
+        ∧ ∀ i j : Fin (r + m),
+          (u : Matrix (Fin (r + m)) (Fin (r + m)) k) i j
+              ≠ (1 : Matrix (Fin (r + m)) (Fin (r + m)) k) i j
+            → (i : ℕ) < m ∧ m ≤ (j : ℕ) := by
   set e := stdBlocks (dd r m) (hdd r m) with he
   have hblk : ∀ (a : Fin 2) (i' : Fin (dd r m a)), ((w2 r m).symm (e ⟨a, i'⟩) : ℕ) < m ↔ a = 1 := by
     intro a i'
     have := weyl_shuffle_symm_lt_iff (r := r) (m := m) (e ⟨a, i'⟩)
     rwa [blk_apply] at this
-  have hone : ∀ (a b : Fin 2) (i' : Fin (dd r m a)) (j' : Fin (dd r m b)),
-      (1 : Matrix (Fin (r + m)) (Fin (r + m)) k) ((w2 r m).symm (e ⟨a, i'⟩)) ((w2 r m).symm (e ⟨b, j'⟩)) =
-        if (⟨a, i'⟩ : Σ c, Fin (dd r m c)) = ⟨b, j'⟩ then 1 else 0 := by
+  have hone
+      : ∀ (a b : Fin 2) (i' : Fin (dd r m a)) (j' : Fin (dd r m b)),
+        (1 : Matrix (Fin (r + m)) (Fin (r + m)) k) ((w2 r m).symm (e ⟨a, i'⟩))
+            ((w2 r m).symm (e ⟨b, j'⟩))
+          = if (⟨a, i'⟩ : Σ c, Fin (dd r m c)) = ⟨b, j'⟩ then 1 else 0 := by
     intro a b i' j'
     rw [Matrix.one_apply]
     by_cases h : (⟨a, i'⟩ : Σ c, Fin (dd r m c)) = ⟨b, j'⟩
@@ -47,8 +53,10 @@ theorem mem_unipU_two {u : GL (Fin (r + m)) k} :
   constructor
   · intro hu
     refine ⟨hu.1, fun p q hpq => ?_⟩
-    have h2 : pm k (wOpen (dd r m) (hdd r m)) * u * (pm k (wOpen (dd r m) (hdd r m)))⁻¹ ∈
-        unipRadLower k e := hu.2
+    have h2
+        : pm k (wOpen (dd r m) (hdd r m)) * u * (pm k (wOpen (dd r m) (hdd r m)))⁻¹
+          ∈ unipRadLower k e :=
+      hu.2
     obtain ⟨hP, hD⟩ := (mem_unipRadLower k).1 h2
     obtain ⟨⟨a, i'⟩, hi⟩ := e.surjective (w2 r m p)
     obtain ⟨⟨b, j'⟩, hj⟩ := e.surjective (w2 r m q)
@@ -81,20 +89,24 @@ theorem mem_unipU_two {u : GL (Fin (r + m)) k} :
   · rintro ⟨hB, hc⟩
     refine ⟨hB, ?_⟩
     show pm k (wOpen (dd r m) (hdd r m)) * u * (pm k (wOpen (dd r m) (hdd r m)))⁻¹ ∈ unipRadLower k e
-    refine (mem_unipRadLower k).2 ⟨(mem_parabLower_iff k).2 fun a b i' j' hab => ?_, fun a i' j' => ?_⟩
+    refine (mem_unipRadLower k).2
+      ⟨(mem_parabLower_iff k).2 fun a b i' j' hab => ?_, fun a i' j' => ?_⟩
     · rw [wConj_apply]
       have ha : a = 0 := by fin_cases a <;> fin_cases b <;> simp_all
       have hb : b = 1 := by fin_cases a <;> fin_cases b <;> simp_all
       by_contra hne
-      have h1 := hc _ _ (by
-        rw [hone, if_neg (fun h => hab.ne (congrArg Sigma.fst h))]
-        exact hne)
+      have h1 :=
+        hc _ _ (by
+          rw [hone, if_neg (fun h => hab.ne (congrArg Sigma.fst h))]
+          exact hne)
       have h2 := (hblk a i').1 h1.1
       rw [ha] at h2
       exact absurd h2 (by decide)
     · rw [wConj_apply]
-      have hpq : (1 : Matrix (Fin (r + m)) (Fin (r + m)) k) ((w2 r m).symm (e ⟨a, i'⟩)) ((w2 r m).symm (e ⟨a, j'⟩)) =
-          (1 : Matrix (Fin (dd r m a)) (Fin (dd r m a)) k) i' j' := by
+      have hpq
+          : (1 : Matrix (Fin (r + m)) (Fin (r + m)) k) ((w2 r m).symm (e ⟨a, i'⟩))
+              ((w2 r m).symm (e ⟨a, j'⟩))
+            = (1 : Matrix (Fin (dd r m a)) (Fin (dd r m a)) k) i' j' := by
         rw [hone, Matrix.one_apply]
         by_cases h' : i' = j'
         · subst h'

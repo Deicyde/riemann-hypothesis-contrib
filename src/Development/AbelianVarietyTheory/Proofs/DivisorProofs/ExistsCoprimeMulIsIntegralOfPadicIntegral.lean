@@ -10,9 +10,12 @@ open Polynomial
 
 namespace GlobalTheory.IntegralDescent
 
-theorem not_dvd_den_coeff_minpoly (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E]
-    (ℓ : ℕ) [Fact ℓ.Prime] (w : E) (hw : IsIntegral ℤ_[ℓ] ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w)) (i : ℕ) :
-    ¬ ℓ ∣ ((minpoly ℚ w).coeff i).den := by
+theorem not_dvd_den_coeff_minpoly
+    (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E]
+    (ℓ : ℕ) [Fact ℓ.Prime]
+    (w : E) (hw : IsIntegral ℤ_[ℓ] ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w))
+    (i : ℕ)
+    : ¬ ℓ ∣ ((minpoly ℚ w).coeff i).den := by
   obtain ⟨p, hpm, hp⟩ := hw
   have hzi : IsIntegral ℚ_[ℓ] ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w) := IsIntegral.of_finite _ _
   have hdvd : minpoly ℚ_[ℓ] ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w) ∣ p.map (algebraMap ℤ_[ℓ] ℚ_[ℓ]) := by
@@ -20,7 +23,8 @@ theorem not_dvd_den_coeff_minpoly (E : Type) [CommRing E] [Algebra ℚ E] [Finit
     rw [aeval_def, eval₂_map]
     exact hp
   obtain ⟨g, hg⟩ := IsIntegrallyClosed.eq_map_mul_C_of_dvd ℚ_[ℓ] hpm hdvd
-  rw [(minpoly.monic hzi).leadingCoeff, C_1, mul_one, GlobalTheory.DescCoeff.minpoly_one_tmul_eq] at hg
+  rw [(minpoly.monic hzi).leadingCoeff, C_1, mul_one, GlobalTheory.DescCoeff.minpoly_one_tmul_eq]
+    at hg
   have hc := congrArg (fun q => q.coeff i) hg
   simp only [coeff_map] at hc
   have hn : ‖(((minpoly ℚ w).coeff i : ℚ) : ℚ_[ℓ])‖ ≤ 1 := by
@@ -28,10 +32,13 @@ theorem not_dvd_den_coeff_minpoly (E : Type) [CommRing E] [Algebra ℚ E] [Finit
     exact (g.coeff i).2
   intro hd
   have hu := PadicInt.isUnit_den _ hn
-  exact PadicInt.irreducible_p.not_isUnit
-    (isUnit_of_dvd_unit (Nat.cast_dvd_cast (α := ℤ_[ℓ]) hd) hu)
+  exact PadicInt.irreducible_p.not_isUnit (isUnit_of_dvd_unit (Nat.cast_dvd_cast (α := ℤ_[ℓ]) hd)
+    hu)
 
-theorem exists_not_dvd_isIntegral_mul : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E] (ℓ : ℕ) [Fact ℓ.Prime] (w : E), IsIntegral ℤ_[ℓ] ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w) → ∃ d : ℕ, ¬ ℓ ∣ d ∧ IsIntegral ℤ ((d : E) * w) := by
+theorem exists_not_dvd_isIntegral_mul
+    : ∀ (E : Type) [CommRing E] [Algebra ℚ E] [FiniteDimensional ℚ E] (ℓ : ℕ) [Fact ℓ.Prime]
+        (w : E),
+      IsIntegral ℤ_[ℓ] ((1 : ℚ_[ℓ]) ⊗ₜ[ℚ] w) → ∃ d : ℕ, ¬ ℓ ∣ d ∧ IsIntegral ℤ ((d : E) * w) := by
   intro E _ _ _ ℓ hℓ w hw
   set f := minpoly ℚ w with hf
   have hfm : f.Monic := minpoly.monic (IsIntegral.of_finite ℚ w)

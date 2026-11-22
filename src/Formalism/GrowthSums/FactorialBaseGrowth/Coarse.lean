@@ -9,9 +9,9 @@ open Finset
 
 namespace Formalism.GrowthSums
 
-theorem factorial_add_prod (m k : ℕ) :
-    (((m + k).factorial : ℕ) : ℚ) =
-      (m.factorial : ℚ) * (k.factorial : ℚ) * ∏ y ∈ Ico 1 (k + 1), (1 + (m : ℚ) / y) := by
+theorem factorial_add_prod (m k : ℕ)
+    : (((m + k).factorial : ℕ) : ℚ)
+      = (m.factorial : ℚ) * (k.factorial : ℚ) * ∏ y ∈ Ico 1 (k + 1), (1 + (m : ℚ) / y) := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -24,8 +24,8 @@ theorem factorial_add_prod (m k : ℕ) :
     field_simp
     ring
 
-theorem coarseUnit_succ (P n : ℕ) (hP : 1 ≤ P) :
-    coarseUnit P (n + 1) = coarseUnit P n * ∏ y ∈ Ico 1 P, (1 + (P : ℚ) * n / y) := by
+theorem coarseUnit_succ (P n : ℕ) (hP : 1 ≤ P)
+    : coarseUnit P (n + 1) = coarseUnit P n * ∏ y ∈ Ico 1 P, (1 + (P : ℚ) * n / y) := by
   have hPq : (P : ℚ) ≠ 0 := by exact_mod_cast (show P ≠ 0 by omega)
   have key := factorial_add_prod (P * n) P
   push_cast at key

@@ -14,8 +14,9 @@ open scoped ENNReal
 variable {ι : Type} {r : ℕ}
 
 def suGrp (H : ι → Matrix (Fin r) (Fin r) ℂ) : Subgroup (ι → GL (Fin r) ℂ) where
-  carrier := {g | ∀ i, (g i : Matrix (Fin r) (Fin r) ℂ)ᵀ * H i * (g i : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) = H i ∧
-    (g i : Matrix (Fin r) (Fin r) ℂ).det = 1}
+  carrier :=
+    {g | ∀ i, (g i : Matrix (Fin r) (Fin r) ℂ)ᵀ * H i * (g i : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) = H i ∧
+      (g i : Matrix (Fin r) (Fin r) ℂ).det = 1}
   one_mem' := fun i => by simp
   mul_mem' := by
     intro g h hg hh i
@@ -23,20 +24,29 @@ def suGrp (H : ι → Matrix (Fin r) (Fin r) ℂ) : Subgroup (ι → GL (Fin r) 
     obtain ⟨h1, h2⟩ := hh i
     refine ⟨?_, by simp [g2, h2]⟩
     rw [Pi.mul_apply, Units.val_mul, transpose_mul, Matrix.map_mul]
-    calc _ = (h i : Matrix (Fin r) (Fin r) ℂ)ᵀ * ((g i : Matrix (Fin r) (Fin r) ℂ)ᵀ * H i *
-        (g i : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)) * (h i : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      _ = (h i : Matrix (Fin r) (Fin r) ℂ)ᵀ
+          * ((g i : Matrix (Fin r) (Fin r) ℂ)ᵀ * H i
+            * (g i : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ))
+          * (h i : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) := by
+        simp only [Matrix.mul_assoc]
       _ = H i := by rw [g1, h1]
   inv_mem' := by
     intro g hg i
     obtain ⟨g1, g2⟩ := hg i
-    have e : (g i : Matrix (Fin r) (Fin r) ℂ) * ((g⁻¹ i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) = 1 := by
+    have e
+        : (g i : Matrix (Fin r) (Fin r) ℂ) * ((g⁻¹ i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)
+          = 1 := by
       rw [Pi.inv_apply, ← Units.val_mul, mul_inv_cancel, Units.val_one]
     refine ⟨?_, ?_⟩
     · conv_lhs => rw [← g1]
-      calc _ = ((g i : Matrix (Fin r) (Fin r) ℂ) * ((g⁻¹ i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ))ᵀ * H i *
-          ((g i : Matrix (Fin r) (Fin r) ℂ) * ((g⁻¹ i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)).map (starRingEnd ℂ) := by
-            simp only [transpose_mul, Matrix.map_mul, Matrix.mul_assoc]
+      calc
+        _ = ((g i : Matrix (Fin r) (Fin r) ℂ)
+              * ((g⁻¹ i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ))ᵀ
+            * H i
+            * ((g i : Matrix (Fin r) (Fin r) ℂ)
+              * ((g⁻¹ i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ)).map (starRingEnd ℂ) := by
+          simp only [transpose_mul, Matrix.map_mul, Matrix.mul_assoc]
         _ = H i := by rw [e]; simp
     · have := congrArg Matrix.det e
       rwa [det_mul, g2, one_mul, det_one] at this
@@ -52,29 +62,40 @@ def suLie (H : ι → Matrix (Fin r) (Fin r) ℂ) : Submodule ℝ (ι → Matrix
   smul_mem' := by
     intro c X hX i
     refine ⟨?_, by simp [(hX i).2]⟩
-    have e : (c • X i).map (starRingEnd ℂ) = c • (X i).map (starRingEnd ℂ) := by
-      ext a b; simp
-    rw [Pi.smul_apply, transpose_smul, e, Matrix.smul_mul, Matrix.mul_smul, ← smul_add, (hX i).1, smul_zero]
+    have e : (c • X i).map (starRingEnd ℂ) = c • (X i).map (starRingEnd ℂ) := by ext a b; simp
+    rw [Pi.smul_apply, transpose_smul, e, Matrix.smul_mul, Matrix.mul_smul, ← smul_add, (hX i).1,
+      smul_zero]
 
 def trForm [Fintype ι] (X Y : ι → Matrix (Fin r) (Fin r) ℂ) : ℝ := ∑ i, (X i * Y i).trace.re
 
-def expCube {H : ι → Matrix (Fin r) (Fin r) ℂ} {n : ℕ} (b : Module.Basis (Fin n) ℝ (suLie H)) (ε : ℝ) :
-    Set (suGrp H) :=
+def expCube
+    {H : ι → Matrix (Fin r) (Fin r) ℂ} {n : ℕ} (b : Module.Basis (Fin n) ℝ (suLie H)) (ε : ℝ)
+    : Set (suGrp H) :=
   {g | ∃ t ∈ Metric.ball (0 : Fin n → ℝ) ε, ∀ i, ((g.1 i : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ) =
     NormedSpace.exp ((b.equivFun.symm t).1 i)}
 
-def TraceDensity [Fintype ι] (H : ι → Matrix (Fin r) (Fin r) ℂ) [MeasurableSpace (suGrp H)]
-    (m : Measure (suGrp H)) (c : ℝ≥0∞) : Prop :=
+def TraceDensity
+    [Fintype ι]
+    (H : ι → Matrix (Fin r) (Fin r) ℂ) [MeasurableSpace (suGrp H)]
+    (m : Measure (suGrp H)) (c : ℝ≥0∞)
+    : Prop :=
   ∃ (n : ℕ) (b : Module.Basis (Fin n) ℝ (suLie H)),
-    Tendsto (fun ε : ℝ => m (expCube b ε) / volume (Metric.ball (0 : Fin n → ℝ) ε)) (𝓝[>] 0)
-      (𝓝 (c * ENNReal.ofReal √|(Matrix.of fun k l => trForm (b k).1 (b l).1).det|))
+    Tendsto
+      (fun ε : ℝ => m (expCube b ε) / volume (Metric.ball (0 : Fin n → ℝ) ε))
+      (𝓝[>] 0) (𝓝 (c * ENNReal.ofReal √ |(Matrix.of fun k l => trForm (b k).1 (b l).1).det|))
 
-abbrev suCpt (ι : Type) (r : ℕ) : Subgroup (ι → GL (Fin r) ℂ) := suGrp fun _ : ι => (1 : Matrix (Fin r) (Fin r) ℂ)
+abbrev suCpt (ι : Type) (r : ℕ) : Subgroup (ι → GL (Fin r) ℂ) :=
+  suGrp fun _ : ι => (1 : Matrix (Fin r) (Fin r) ℂ)
 
-def IsCompactDualHaar [Fintype ι] (H : ι → Matrix (Fin r) (Fin r) ℂ) [MeasurableSpace (suGrp H)]
-    (m : Measure (suGrp H)) : Prop :=
-  m.IsHaarMeasure ∧
-    ∃ (_ : MeasurableSpace (suCpt ι r)) (_ : BorelSpace (suCpt ι r)) (m₀ : Measure (suCpt ι r)) (c : ℝ≥0∞),
-      m₀.IsHaarMeasure ∧ IsProbabilityMeasure m₀ ∧ c ≠ 0 ∧ c ≠ ⊤ ∧ TraceDensity H m c ∧ TraceDensity _ m₀ c
+def IsCompactDualHaar
+    [Fintype ι]
+    (H : ι → Matrix (Fin r) (Fin r) ℂ) [MeasurableSpace (suGrp H)]
+    (m : Measure (suGrp H))
+    : Prop :=
+  m.IsHaarMeasure
+    ∧ ∃ (_ : MeasurableSpace (suCpt ι r)) (_ : BorelSpace (suCpt ι r)) (m₀ : Measure (suCpt ι r))
+        (c : ℝ≥0∞),
+      m₀.IsHaarMeasure ∧ IsProbabilityMeasure m₀ ∧ c ≠ 0 ∧ c ≠ ⊤ ∧ TraceDensity H m c
+        ∧ TraceDensity _ m₀ c
 
 end GlobalTheory.SUVol

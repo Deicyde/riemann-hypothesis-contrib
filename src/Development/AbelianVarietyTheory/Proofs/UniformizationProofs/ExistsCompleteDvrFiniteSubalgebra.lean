@@ -16,43 +16,65 @@ namespace CompleteFiniteExtension
 
 open IsLocalRing
 
-theorem isPrecomplete_of_le_of_pow_le {A : Type*} [CommRing A] {I J : Ideal A} (hJ : J ≤ I)
-    {e : ℕ} (he : I ^ e ≤ J) [IsPrecomplete J A] : IsPrecomplete I A := by
+theorem isPrecomplete_of_le_of_pow_le
+    {A : Type*} [CommRing A]
+    {I J : Ideal A} (hJ : J ≤ I)
+    {e : ℕ} (he : I ^ e ≤ J)
+    [IsPrecomplete J A]
+    : IsPrecomplete I A := by
   first
-  | (rename_i h_1 h_7; revert A h_1 I J hJ e he h_7; exact @_root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le)
+  | (
+      rename_i h_1 h_7
+      revert A h_1 I J hJ e he h_7
+      exact @_root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le
+    )
   | exact @_root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le
   | exact _root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le
   | (apply _root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le <;> assumption)
-  | (intros; apply _root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.PrecompleteOfPowLe.isPrecomplete_of_le_of_pow_le ..)
 
-theorem isAdicComplete_of_finite_local (R S : Type*) [CommRing R] [IsLocalRing R]
-    [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R] [CommRing S] [IsLocalRing S]
-    [Algebra R S] [Module.Finite R S] : IsAdicComplete (maximalIdeal S) S := by
+theorem isAdicComplete_of_finite_local
+    (R S : Type*)
+    [CommRing R] [IsLocalRing R] [IsNoetherianRing R] [IsAdicComplete (maximalIdeal R) R]
+    [CommRing S] [IsLocalRing S] [Algebra R S] [Module.Finite R S]
+    : IsAdicComplete (maximalIdeal S) S := by
   have := IsNoetherianRing.of_finite R S
-  have := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isAdicComplete_finite_algebra (R := R) S
+  have :=
+    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isAdicComplete_finite_algebra
+      (R := R) S
   obtain ⟨e, he⟩ : ∃ e, maximalIdeal S ^ e ≤ (maximalIdeal R).map (algebraMap R S) := by
     refine Ideal.exists_pow_le_of_le_radical_of_fg (fun b hb => ?_) (IsNoetherian.noetherian _)
-    obtain ⟨N, -, hN⟩ := ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.exists_pow_mem_map_maximalIdeal (R := R) S b
-      fun n hn => eq_maximalIdeal hn ▸ hb
+    obtain ⟨N, -, hN⟩ :=
+      ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.exists_pow_mem_map_maximalIdeal
+        (R := R) S b fun n hn => eq_maximalIdeal hn ▸ hb
     exact ⟨N, hN⟩
-  have := isPrecomplete_of_le_of_pow_le
-    (ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.map_maximalIdeal_le_maximal (R := R) S _ inferInstance) he
+  have :=
+    isPrecomplete_of_le_of_pow_le
+      (ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.map_maximalIdeal_le_maximal
+        (R := R) S _ inferInstance)
+      he
   exact ⟨⟩
 
 end CompleteFiniteExtension
 
-theorem exists_complete_dvr_finite_subalgebra :
-    ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-      [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [CharZero V] (F : Type) [Field F]
-      [Algebra V F] [FaithfulSMul V F] [Algebra.IsAlgebraic V F] (s : Finset F),
+theorem exists_complete_dvr_finite_subalgebra
+    : ∀ (V : Type) [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
+        [IsAdicComplete (IsLocalRing.maximalIdeal V) V] [CharZero V] (F : Type) [Field F]
+        [Algebra V F] [FaithfulSMul V F] [Algebra.IsAlgebraic V F] (s : Finset F),
       ∃ (W : Subalgebra V F) (_ : IsDiscreteValuationRing W),
-        IsAdicComplete (IsLocalRing.maximalIdeal W) W ∧
-        IsAdicComplete ((IsLocalRing.maximalIdeal V).map (algebraMap V W)) W ∧
-        Module.Finite V W ∧ Module.Free V W ∧ IsLocalHom (algebraMap V W) ∧
-        (∀ x ∈ s, ∃ a ∈ W, ∃ b ∈ W, b ≠ 0 ∧ x * b = a) ∧
-        ∀ x ∈ s, IsIntegral V x → x ∈ W := by
+        IsAdicComplete (IsLocalRing.maximalIdeal W) W
+          ∧ IsAdicComplete ((IsLocalRing.maximalIdeal V).map (algebraMap V W)) W ∧ Module.Finite V W
+          ∧ Module.Free V W ∧ IsLocalHom (algebraMap V W)
+          ∧ (∀ x ∈ s, ∃ a ∈ W, ∃ b ∈ W, b ≠ 0 ∧ x * b = a) ∧ ∀ x ∈ s, IsIntegral V x → x ∈ W := by
   intro V _ _ _ _ _ F _ _ _ _ s
   let K := FractionRing V
   let _ : Algebra K F := FractionRing.liftAlgebra V F
@@ -76,12 +98,27 @@ theorem exists_complete_dvr_finite_subalgebra :
   have hmem : ∀ x ∈ L, IsIntegral V x → x ∈ W := fun x hx hi =>
     ⟨⟨x, hx⟩, (isIntegral_algHom_iff f hf).1 hi, rfl⟩
   have hsL : ∀ x ∈ s, x ∈ L := fun x hx => IntermediateField.subset_adjoin K _ hx
-  refine ⟨W, hd, CompleteFiniteExtension.isAdicComplete_of_finite_local V W,
-    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isAdicComplete_finite_algebra W, hfin, inferInstance, inferInstance,
-    fun x hx => ?_, fun x hx => hmem x (hsL x hx)⟩
+  refine ⟨
+    W,
+    hd,
+    CompleteFiniteExtension.isAdicComplete_of_finite_local V W,
+    ReciprocityTheory.ChartRestriction.G.T0.FiniteAlgebraLocalCompletion.isAdicComplete_finite_algebra
+      W,
+    hfin,
+    inferInstance,
+    inferInstance,
+    fun x hx => ?_,
+    fun x hx => hmem x (hsL x hx)
+  ⟩
   obtain ⟨y, hy, h⟩ := (Algebra.IsAlgebraic.isAlgebraic (R := V) x).exists_integral_multiple
-  refine ⟨y • x, hmem _ ?_ h, algebraMap V F y, W.algebraMap_mem y,
-    (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective V F)).2 hy, ?_⟩
+  refine ⟨
+    y • x,
+    hmem _ ?_ h,
+    algebraMap V F y,
+    W.algebraMap_mem y,
+    (map_ne_zero_iff _ (FaithfulSMul.algebraMap_injective V F)).2 hy,
+    ?_
+  ⟩
   · rw [← algebraMap_smul K y x]
     exact L.smul_mem (hsL x hx)
   · rw [Algebra.smul_def, mul_comm]

@@ -10,9 +10,11 @@ open GlobalTheory.UnitLemma Polynomial
 
 namespace GlobalTheory.UnitLemma
 
-theorem exists_aeval_eq_of_charpoly_separable {E A : Type} [Field E] [CommRing A] [Algebra E A]
-    [Module.Finite E A] (g : A) (hP : (LinearMap.mulLeft E g).charpoly.Separable) (a : A) :
-    ∃ f : E[X], a = aeval g f := by
+theorem exists_aeval_eq_of_charpoly_separable
+    {E A : Type} [Field E] [CommRing A] [Algebra E A] [Module.Finite E A]
+    (g : A) (hP : (LinearMap.mulLeft E g).charpoly.Separable)
+    (a : A)
+    : ∃ f : E[X], a = aeval g f := by
   classical
   rcases subsingleton_or_nontrivial A with hA | hA
   · exact ⟨0, Subsingleton.elim _ _⟩
@@ -34,8 +36,9 @@ theorem exists_aeval_eq_of_charpoly_separable {E A : Type} [Field E] [CommRing A
   rw [Fintype.card_fin] at h4
   haveI : Nonempty (Fin (minpoly E g).natDegree) := ⟨⟨0, by omega⟩⟩
   have htop := hli.span_eq_top_of_card_eq_finrank (by rw [Fintype.card_fin]; omega)
-  have hle : Submodule.span E (Set.range fun i : Fin (minpoly E g).natDegree => g ^ (i : ℕ)) ≤
-      Subalgebra.toSubmodule (Algebra.adjoin E {g}) := by
+  have hle
+      : Submodule.span E (Set.range fun i : Fin (minpoly E g).natDegree => g ^ (i : ℕ))
+        ≤ Subalgebra.toSubmodule (Algebra.adjoin E {g}) := by
     rw [Submodule.span_le]
     rintro _ ⟨i, rfl⟩
     have hg : g ∈ Algebra.adjoin E {g} := Algebra.subset_adjoin (Set.mem_singleton g)
@@ -48,8 +51,8 @@ theorem exists_aeval_eq_of_charpoly_separable {E A : Type} [Field E] [CommRing A
   obtain ⟨f, hf⟩ := ha
   exact ⟨f, hf.symm⟩
 
-theorem InvAlg.exists_aeval_eq_of_separable :
-    ∀ (K : UQ) (B : InvAlg K), B.P.Separable → ∀ a : B.A, ∃ f : K.E[X], a = aeval B.g f :=
+theorem InvAlg.exists_aeval_eq_of_separable
+    : ∀ (K : UQ) (B : InvAlg K), B.P.Separable → ∀ a : B.A, ∃ f : K.E[X], a = aeval B.g f :=
   fun _ B hP a => exists_aeval_eq_of_charpoly_separable B.g hP a
 
 end GlobalTheory.UnitLemma

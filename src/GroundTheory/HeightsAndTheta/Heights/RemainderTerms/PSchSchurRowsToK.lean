@@ -25,22 +25,23 @@ theorem SchSchurRowsToK.proof : SchSchurRowsToK.Statement := by
       have h1 : ∑ j ∈ Finset.Iic i, 1 ≤ ∑ j ∈ Finset.Iic i, nu j :=
         Finset.sum_le_sum fun j hj => le_trans hpos (hanti (Finset.mem_Iic.mp hj))
       have h2 : ∑ j ∈ Finset.Iic i, nu j ≤ ∑ j, nu j :=
-        Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _)
-          (fun _ _ _ => Nat.zero_le _)
+        Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun _ _ _ => Nat.zero_le _)
       simp only [Finset.sum_const, smul_eq_mul, mul_one, Fin.card_Iic] at h1
       omega
-    have heq : nu = Schur.padPartition r
-        (fun i : Fin k => if h : (i : ℕ) < r then nu ⟨i, h⟩ else 0) := by
+    have heq
+        : nu
+          = Schur.padPartition r (fun i : Fin k => if h : (i : ℕ) < r then nu ⟨i, h⟩ else 0) := by
       funext i
       simp only [Schur.padPartition]
       by_cases hik : (i : ℕ) < k
       · simp [hik, i.isLt]
       · simp only [hik, dite_false]
         exact hzero i (by omega)
-    calc schur σ nu
-        = schur σ (Schur.padPartition r
-            (fun i : Fin k => if h : (i : ℕ) < r then nu ⟨i, h⟩ else 0)) :=
-          congrArg (schur σ) heq
+    calc
+      schur σ nu
+          = schur σ
+            (Schur.padPartition r (fun i : Fin k => if h : (i : ℕ) < r then nu ⟨i, h⟩ else 0)) :=
+        congrArg (schur σ) heq
       _ = _ := Schur.schur_padPartition σ _ r hrk.le
 
 end GroundTheory.Heights₂.Heights.RestTerms

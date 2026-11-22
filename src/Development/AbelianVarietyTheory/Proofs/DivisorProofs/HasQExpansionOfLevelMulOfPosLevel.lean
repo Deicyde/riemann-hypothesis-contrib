@@ -36,12 +36,13 @@ private lemma mvExp_add_character_germs (N : ℕ) (τ : ℍ) (m n : ℕ) :
   push_cast
   ring
 
-theorem HasQ.mul_conv {N : ℕ} {f g : ℍ → ℂ} {a b : ℕ → ℂ} (hf : HasQ N f a) (hg : HasQ N g b) :
-    HasQ N (fun τ => f τ * g τ) (conv a b) :=
-  fun τ => hasSum_conv_mul_of_multiplicative (mvExp_add_character_germs N τ) (hf τ) (hg τ)
+theorem HasQ.mul_conv {N : ℕ} {f g : ℍ → ℂ} {a b : ℕ → ℂ} (hf : HasQ N f a) (hg : HasQ N g b)
+    : HasQ N (fun τ => f τ * g τ) (conv a b) := fun τ =>
+  hasSum_conv_mul_of_multiplicative (mvExp_add_character_germs N τ) (hf τ) (hg τ)
 
-theorem hasQ_mul_conv : ∀ (N : ℕ) (f g : ℍ → ℂ) (a b : ℕ → ℂ), 0 < N → HasQ N f a → HasQ N g b →
-    HasQ N (fun τ => f τ * g τ) (conv a b) := by
+theorem hasQ_mul_conv
+    : ∀ (N : ℕ) (f g : ℍ → ℂ) (a b : ℕ → ℂ),
+      0 < N → HasQ N f a → HasQ N g b → HasQ N (fun τ => f τ * g τ) (conv a b) := by
   intro N f g a b _ hf hg τ
   exact hasSum_conv_mul_of_multiplicative (mvExp_add_character_germs N τ) (hf τ) (hg τ)
 

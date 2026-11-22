@@ -25,7 +25,8 @@ theorem neBot_Hs : (codiscreteWithin Hs).NeBot := by
   intro s hs
   have hI : Complex.I ∈ Hs := by simp [Hs]
   have h1 := (mem_codiscreteWithin_iff_forall_mem_nhdsNE.1 hs) _ hI
-  have h2 : Hs ∈ nhdsWithin Complex.I {Complex.I}ᶜ := mem_nhdsWithin_of_mem_nhds (isOpen_Hs.mem_nhds hI)
+  have h2 : Hs ∈ nhdsWithin Complex.I {Complex.I}ᶜ :=
+    mem_nhdsWithin_of_mem_nhds (isOpen_Hs.mem_nhds hI)
   obtain ⟨z, hz1, hz2⟩ := Filter.nonempty_of_mem (Filter.inter_mem h1 h2)
   rcases hz1 with h | h
   · exact ⟨z, h⟩
@@ -35,10 +36,11 @@ theorem germ_eq_of_eqOn {φ ψ : ℂ → ℂ} (h : ∀ z ∈ Hs, φ z = ψ z) : 
   rw [Filter.Germ.coe_eq]
   exact Filter.mem_of_superset (Filter.self_mem_codiscreteWithin Hs) h
 
-theorem mob_mem (γ : SL(2, ℤ)) {z : ℂ} (hz : z ∈ Hs) : mob (ofSL γ) z ∈ Hs := GlobalTheory.T.glTwoPosRatMobius_upperHalfPlane_properties.1 _ _ hz
+theorem mob_mem (γ : SL(2, ℤ)) {z : ℂ} (hz : z ∈ Hs) : mob (ofSL γ) z ∈ Hs :=
+  GlobalTheory.T.glTwoPosRatMobius_upperHalfPlane_properties.1 _ _ hz
 
-theorem mob_mul (γ δ : SL(2, ℤ)) {z : ℂ} (hz : z ∈ Hs) :
-    mob (ofSL (γ * δ)) z = mob (ofSL γ) (mob (ofSL δ) z) := by
+theorem mob_mul (γ δ : SL(2, ℤ)) {z : ℂ} (hz : z ∈ Hs)
+    : mob (ofSL (γ * δ)) z = mob (ofSL γ) (mob (ofSL δ) z) := by
   rw [map_mul]; exact GlobalTheory.T.glTwoPosRatMobius_upperHalfPlane_properties.2.1 _ _ _ hz
 
 theorem mob_ofSL_one (z : ℂ) : mob (ofSL 1) z = z := by
@@ -47,20 +49,26 @@ theorem mob_ofSL_one (z : ℂ) : mob (ofSL 1) z = z := by
 theorem mob_mob_inv (γ : SL(2, ℤ)) {z : ℂ} (hz : z ∈ Hs) : mob (ofSL γ) (mob (ofSL γ⁻¹) z) = z := by
   rw [← mob_mul _ _ hz, mul_inv_cancel, mob_ofSL_one]
 
-theorem diff_comp {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (γ : SL(2, ℤ)) :
-    DifferentiableOn ℂ (fun z => a (mob (ofSL γ) z)) Hs :=
-  ha.comp (GlobalTheory.T.glTwoPosRatMobius_upperHalfPlane_properties.2.2.2.2.1 _) (fun _ hz => mob_mem γ hz)
+theorem diff_comp {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (γ : SL(2, ℤ))
+    : DifferentiableOn ℂ (fun z => a (mob (ofSL γ) z)) Hs :=
+  ha.comp (GlobalTheory.T.glTwoPosRatMobius_upperHalfPlane_properties.2.2.2.2.1 _)
+    (fun _ hz => mob_mem γ hz)
 
-theorem eqOn_of_germ {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
-    (h : (a : Mero) = (b : Mero)) : ∀ z ∈ Hs, a z = b z :=
+theorem eqOn_of_germ
+    {a b : ℂ → ℂ}
+    (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs) (h : (a : Mero) = (b : Mero))
+    : ∀ z ∈ Hs, a z = b z :=
   GlobalTheory.T.upperHalfPlaneCodiscreteGerm_identity_and_units.2.1 a b ha hb h
 
-theorem eqOn_of_eventually {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
-    (h : ∀ᶠ z in codiscreteWithin Hs, a z = b z) : ∀ z ∈ Hs, a z = b z :=
+theorem eqOn_of_eventually
+    {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
+    (h : ∀ᶠ z in codiscreteWithin Hs, a z = b z)
+    : ∀ z ∈ Hs, a z = b z :=
   eqOn_of_germ ha hb (Filter.Germ.coe_eq.2 h)
 
-theorem germ_ne_zero {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (h : a z₀ ≠ 0) :
-    (a : Mero) ≠ 0 := by
+theorem germ_ne_zero
+    {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (h : a z₀ ≠ 0)
+    : (a : Mero) ≠ 0 := by
   intro h0
   exact h (eqOn_of_germ ha (differentiableOn_const 0) h0 z₀ hz₀)
 
@@ -69,29 +77,35 @@ theorem exists_ne_zero {a : ℂ → ℂ} (h : (a : Mero) ≠ 0) : ∃ z ∈ Hs, 
   push_neg at hc
   exact h (germ_eq_of_eqOn (ψ := fun _ => 0) hc)
 
-theorem eventually_ne_zero {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (h : a z₀ ≠ 0) :
-    ∀ᶠ z in codiscreteWithin Hs, a z ≠ 0 :=
-  (GlobalTheory.T.upperHalfPlaneCodiscreteGerm_identity_and_units.2.2 a ha (germ_ne_zero ha hz₀ h)).1
+theorem eventually_ne_zero
+    {a : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (h : a z₀ ≠ 0)
+    : ∀ᶠ z in codiscreteWithin Hs, a z ≠ 0 :=
+  (GlobalTheory.T.upperHalfPlaneCodiscreteGerm_identity_and_units.2.2 a ha
+    (germ_ne_zero ha hz₀ h)).1
 
-theorem comp_ne_zero {a : ℂ → ℂ} {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (h : a z₀ ≠ 0) (γ : SL(2, ℤ)) :
-    ∃ z ∈ Hs, a (mob (ofSL γ) z) ≠ 0 :=
+theorem comp_ne_zero {a : ℂ → ℂ} {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (h : a z₀ ≠ 0) (γ : SL(2, ℤ))
+    : ∃ z ∈ Hs, a (mob (ofSL γ) z) ≠ 0 :=
   ⟨mob (ofSL γ⁻¹) z₀, mob_mem _ hz₀, by rwa [mob_mob_inv γ hz₀]⟩
 
-theorem exists_both_ne_zero {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
-    {z₁ z₂ : ℂ} (hz₁ : z₁ ∈ Hs) (hz₂ : z₂ ∈ Hs) (h₁ : a z₁ ≠ 0) (h₂ : b z₂ ≠ 0) :
-    ∃ z ∈ Hs, a z ≠ 0 ∧ b z ≠ 0 := by
+theorem exists_both_ne_zero
+    {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
+    {z₁ z₂ : ℂ} (hz₁ : z₁ ∈ Hs) (hz₂ : z₂ ∈ Hs) (h₁ : a z₁ ≠ 0) (h₂ : b z₂ ≠ 0)
+    : ∃ z ∈ Hs, a z ≠ 0 ∧ b z ≠ 0 := by
   haveI := neBot_Hs
   have hs : ∀ᶠ z in codiscreteWithin Hs, z ∈ Hs := Filter.self_mem_codiscreteWithin Hs
-  obtain ⟨z, hz, h1, h2⟩ := (hs.and ((eventually_ne_zero ha hz₁ h₁).and (eventually_ne_zero hb hz₂ h₂))).exists
+  obtain ⟨z, hz, h1, h2⟩ :=
+    (hs.and ((eventually_ne_zero ha hz₁ h₁).and (eventually_ne_zero hb hz₂ h₂))).exists
   exact ⟨z, hz, h1, h2⟩
 
-theorem comp_eventually {φ ψ : ℂ → ℂ} (γ : SL(2, ℤ)) (h : ∀ᶠ z in codiscreteWithin Hs, φ z = ψ z) :
-    ∀ᶠ z in codiscreteWithin Hs, φ (mob (ofSL γ) z) = ψ (mob (ofSL γ) z) :=
+theorem comp_eventually {φ ψ : ℂ → ℂ} (γ : SL(2, ℤ)) (h : ∀ᶠ z in codiscreteWithin Hs, φ z = ψ z)
+    : ∀ᶠ z in codiscreteWithin Hs, φ (mob (ofSL γ) z) = ψ (mob (ofSL γ) z) :=
   (GlobalTheory.T.tendsto_mob_codiscreteWithin_codiscreteWithin (ofSL γ)).eventually h
 
-theorem const_of_pow_eq {u v : ℂ → ℂ} (hu : DifferentiableOn ℂ u Hs) (hv : DifferentiableOn ℂ v Hs) {m : ℕ}
-    (hm : 0 < m) (h : ∀ z ∈ Hs, u z ^ m = v z ^ m) {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (hv0 : v z₀ ≠ 0) :
-    ∃ ζ : ℂ, ζ ^ m = 1 ∧ ∀ z ∈ Hs, u z = ζ * v z := by
+theorem const_of_pow_eq
+    {u v : ℂ → ℂ} (hu : DifferentiableOn ℂ u Hs) (hv : DifferentiableOn ℂ v Hs)
+    {m : ℕ} (hm : 0 < m) (h : ∀ z ∈ Hs, u z ^ m = v z ^ m)
+    {z₀ : ℂ} (hz₀ : z₀ ∈ Hs) (hv0 : v z₀ ≠ 0)
+    : ∃ ζ : ℂ, ζ ^ m = 1 ∧ ∀ z ∈ Hs, u z = ζ * v z := by
   set ζ := u z₀ / v z₀ with hζdef
   have hζ : ζ ^ m = 1 := by rw [hζdef, div_pow, h z₀ hz₀, div_self (pow_ne_zero _ hv0)]
   refine ⟨ζ, hζ, ?_⟩
@@ -106,7 +120,8 @@ theorem const_of_pow_eq {u v : ℂ → ℂ} (hu : DifferentiableOn ℂ u Hs) (hv
   have hloc : u =ᶠ[𝓝 z₀] fun z => ζ * v z := by
     filter_upwards [h1, h2, hn] with z h1 h2 h3
     have hr : (u z / v z) ^ m = 1 := by rw [div_pow, h z h3, div_self (pow_ne_zero _ h2)]
-    have hmem : u z / v z ∈ Polynomial.nthRootsFinset m (1 : ℂ) := (Polynomial.mem_nthRootsFinset hm 1).2 hr
+    have hmem : u z / v z ∈ Polynomial.nthRootsFinset m (1 : ℂ) :=
+      (Polynomial.mem_nthRootsFinset hm 1).2 hr
     have he : u z / v z = ζ := by
       by_contra hne
       exact h1 (Finset.mem_erase.2 ⟨hne, hmem⟩)
@@ -126,19 +141,22 @@ theorem rel_one (a b : ℂ → ℂ) : RootRel a b 1 1 := by
   intro z _
   rw [mob_ofSL_one, one_mul]
 
-theorem rel_inv {a b : ℂ → ℂ} {γ : SL(2, ℤ)} {ζ : ℂ} (hζ : ζ ≠ 0) (h : RootRel a b γ ζ) :
-    RootRel a b γ⁻¹ ζ⁻¹ := by
+theorem rel_inv {a b : ℂ → ℂ} {γ : SL(2, ℤ)} {ζ : ℂ} (hζ : ζ ≠ 0) (h : RootRel a b γ ζ)
+    : RootRel a b γ⁻¹ ζ⁻¹ := by
   intro z hz
   have e := h _ (mob_mem γ⁻¹ hz)
   rw [mob_mob_inv γ hz] at e
   rw [e, ← mul_assoc, inv_mul_cancel₀ hζ, one_mul]
 
-theorem rel_mul {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs) {z₁ z₂ : ℂ}
-    (hz₁ : z₁ ∈ Hs) (hz₂ : z₂ ∈ Hs) (h₁ : a z₁ ≠ 0) (h₂ : b z₂ ≠ 0) {γ δ : SL(2, ℤ)} {ζ η : ℂ}
-    (hγ : RootRel a b γ ζ) (hδ : RootRel a b δ η) : RootRel a b (γ * δ) (ζ * η) := by
+theorem rel_mul
+    {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
+    {z₁ z₂ : ℂ} (hz₁ : z₁ ∈ Hs) (hz₂ : z₂ ∈ Hs) (h₁ : a z₁ ≠ 0) (h₂ : b z₂ ≠ 0)
+    {γ δ : SL(2, ℤ)} {ζ η : ℂ} (hγ : RootRel a b γ ζ) (hδ : RootRel a b δ η)
+    : RootRel a b (γ * δ) (ζ * η) := by
   obtain ⟨w₁, hw₁, e₁⟩ := comp_ne_zero hz₁ h₁ δ
   obtain ⟨w₂, hw₂, e₂⟩ := comp_ne_zero hz₂ h₂ δ
-  have hev := (eventually_ne_zero (diff_comp ha δ) hw₁ e₁).and (eventually_ne_zero (diff_comp hb δ) hw₂ e₂)
+  have hev :=
+    (eventually_ne_zero (diff_comp ha δ) hw₁ e₁).and (eventually_ne_zero (diff_comp hb δ) hw₂ e₂)
   have hs : ∀ᶠ z in codiscreteWithin Hs, z ∈ Hs := Filter.self_mem_codiscreteWithin Hs
   refine eqOn_of_eventually ((diff_comp ha (γ * δ)).mul hb)
     ((ha.mul (diff_comp hb (γ * δ))).const_mul (ζ * η)) ?_
@@ -152,14 +170,20 @@ theorem rel_mul {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : Diffe
   linear_combination (a (mob (ofSL δ) z) * b z) * e1 +
     (ζ * a (mob (ofSL δ) z) * b (mob (ofSL γ) (mob (ofSL δ) z))) * e2
 
-theorem char_exists {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) {M m : ℕ} (hm : 0 < m)
-    {f : X.K} (hf : ∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) f = f) {a b : ℂ → ℂ}
-    (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs) (hab : X.an f * (b : Mero) ^ m = (a : Mero) ^ m)
+theorem char_exists
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    {M m : ℕ} (hm : 0 < m)
+    {f : X.K} (hf : ∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) f = f)
+    {a b : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
+    (hab : X.an f * (b : Mero) ^ m = (a : Mero) ^ m)
     {z₁ z₂ : ℂ} (hz₁ : z₁ ∈ Hs) (hz₂ : z₂ ∈ Hs) (h₁ : a z₁ ≠ 0) (h₂ : b z₂ ≠ 0)
-    {γ : SL(2, ℤ)} (hγ : γ ∈ CongruenceSubgroup.Gamma M) : ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel a b γ ζ := by
+    {γ : SL(2, ℤ)} (hγ : γ ∈ CongruenceSubgroup.Gamma M)
+    : ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel a b γ ζ := by
   obtain ⟨φ, -, hφ, -⟩ := X.an_exp f
   have E1 : ∀ᶠ z in codiscreteWithin Hs, φ z * b z ^ m = a z ^ m := by
-    rw [hφ, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_mul, Filter.Germ.coe_eq] at hab
+    rw [hφ, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_mul, Filter.Germ.coe_eq]
+      at hab
     filter_upwards [hab] with z hz
     simpa using hz
   have E2 : ∀ᶠ z in codiscreteWithin Hs, φ z = φ (mob (ofSL γ) z) := by
@@ -169,7 +193,9 @@ theorem char_exists {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} 
   have E3 := comp_eventually γ E1
   have hu := (diff_comp ha γ).mul hb
   have hv := ha.mul (diff_comp hb γ)
-  have hpow : ∀ z ∈ Hs, (fun z => (a (mob (ofSL γ) z) * b z) ^ m) z = (fun z => (a z * b (mob (ofSL γ) z)) ^ m) z :=
+  have hpow
+      : ∀ z ∈ Hs,
+        (fun z => (a (mob (ofSL γ) z) * b z) ^ m) z = (fun z => (a z * b (mob (ofSL γ) z)) ^ m) z :=
     eqOn_of_eventually (hu.pow m) (hv.pow m) (by
       filter_upwards [E1, E2, E3] with z e1 e2 e3
       beta_reduce at e3 ⊢
@@ -183,22 +209,29 @@ end GlobalTheory.KZ.FinLev
 
 namespace GlobalTheory.KZ.FinLev
 
-theorem quot_pow {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X : Tower Ω ε) {M m : ℕ} (hM : 0 < M)
-    (hm : 0 < m) (f r : X.Kˣ) {a b a' b' : ℂ → ℂ} (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs)
-    (ha' : DifferentiableOn ℂ a' Hs) (hb' : DifferentiableOn ℂ b' Hs)
-    (hab : X.an (f : X.K) * (b : Mero) ^ m = (a : Mero) ^ m)
+theorem quot_pow
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    {ε : Ω →+* ℂ} (X : Tower Ω ε)
+    {M m : ℕ} (hM : 0 < M) (hm : 0 < m)
+    (f r : X.Kˣ)
+    {a b a' b' : ℂ → ℂ}
+    (ha : DifferentiableOn ℂ a Hs) (hb : DifferentiableOn ℂ b Hs) (ha' : DifferentiableOn ℂ a' Hs)
+    (hb' : DifferentiableOn ℂ b' Hs) (hab : X.an (f : X.K) * (b : Mero) ^ m = (a : Mero) ^ m)
     (hab' : X.an (r : X.K) * (b' : Mero) ^ m = (a' : Mero) ^ m)
     {z₂ z₃ : ℂ} (hz₂ : z₂ ∈ Hs) (hz₃ : z₃ ∈ Hs) (h₂ : b z₂ ≠ 0) (h₃ : a' z₃ ≠ 0)
-    (hrel : ∀ γ ∈ CongruenceSubgroup.Gamma M, ∃ ζ : ℂ, RootRel a b γ ζ ∧ RootRel a' b' γ ζ) :
-    ∃ g : X.Kˣ, (∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (g : X.K) = g) ∧ (f : X.K) = r * (g : X.K) ^ m := by
+    (hrel : ∀ γ ∈ CongruenceSubgroup.Gamma M, ∃ ζ : ℂ, RootRel a b γ ζ ∧ RootRel a' b' γ ζ)
+    : ∃ g : X.Kˣ,
+      (∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (g : X.K) = g)
+        ∧ (f : X.K) = r * (g : X.K) ^ m := by
   have hs : ∀ᶠ z in codiscreteWithin Hs, z ∈ Hs := Filter.self_mem_codiscreteWithin Hs
   have hAd : DifferentiableOn ℂ (a * b') Hs := ha.mul hb'
   have hBd : DifferentiableOn ℂ (b * a') Hs := hb.mul ha'
   obtain ⟨z₀, hz₀, n1, n2⟩ := exists_both_ne_zero hb ha' hz₂ hz₃ h₂ h₃
   have hB0 : (b * a') z₀ ≠ 0 := by simp [n1, n2]
   have hBev : ∀ᶠ z in codiscreteWithin Hs, (b * a') z ≠ 0 := eventually_ne_zero hBd hz₀ hB0
-  have hinv : ∀ γ ∈ CongruenceSubgroup.Gamma M, ∀ z ∈ Hs,
-      (a * b') (mob (ofSL γ) z) * (b * a') z = (a * b') z * (b * a') (mob (ofSL γ) z) := by
+  have hinv
+      : ∀ γ ∈ CongruenceSubgroup.Gamma M, ∀ z ∈ Hs,
+        (a * b') (mob (ofSL γ) z) * (b * a') z = (a * b') z * (b * a') (mob (ofSL γ) z) := by
     intro γ hγ z hz
     obtain ⟨ζ, h1, h2⟩ := hrel γ hγ
     have e1 := h1 z hz
@@ -207,24 +240,34 @@ theorem quot_pow {Ω : Type} [Field Ω] [Algebra ℚ Ω] {ε : Ω →+* ℂ} (X 
     linear_combination (b' (mob (ofSL γ) z) * a' z) * e1 - (a z * b (mob (ofSL γ) z)) * e2
   have hFr : X.an ((f * r⁻¹ : X.Kˣ) : X.K) * X.an (r : X.K) = X.an (f : X.K) := by
     rw [← map_mul, Units.val_mul, mul_assoc, Units.inv_mul, mul_one]
-  have hFAB : X.an ((f * r⁻¹ : X.Kˣ) : X.K) * ((b * a' : ℂ → ℂ) : Mero) ^ m = ((a * b' : ℂ → ℂ) : Mero) ^ m := by
+  have hFAB
+      : X.an ((f * r⁻¹ : X.Kˣ) : X.K) * ((b * a' : ℂ → ℂ) : Mero) ^ m
+        = ((a * b' : ℂ → ℂ) : Mero) ^ m := by
     rw [Filter.Germ.coe_mul, Filter.Germ.coe_mul]
     linear_combination (-(X.an ((f * r⁻¹ : X.Kˣ) : X.K) * (b : Mero) ^ m)) * hab' +
       ((b : Mero) ^ m * (b' : Mero) ^ m) * hFr + (b' : Mero) ^ m * hab
   obtain ⟨φ, -, hφ, -⟩ := X.an_exp ((f * r⁻¹ : X.Kˣ) : X.K)
   have E1 : ∀ᶠ z in codiscreteWithin Hs, φ z * (b * a') z ^ m = (a * b') z ^ m := by
     have h := hFAB
-    rw [hφ, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_mul, Filter.Germ.coe_eq] at h
+    rw [hφ, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_pow, ← Filter.Germ.coe_mul, Filter.Germ.coe_eq]
+      at h
     filter_upwards [h] with z hz
     simpa only [Pi.mul_apply, Pi.pow_apply] using hz
-  have hgerm : ∀ γ ∈ CongruenceSubgroup.Gamma M,
-      ((fun z => (a * b') (mob (ofSL γ) z) * (b * a') z : ℂ → ℂ) : Mero) =
-        ((fun z => (a * b') z * (b * a') (mob (ofSL γ) z) : ℂ → ℂ) : Mero) :=
-    fun γ hγ => germ_eq_of_eqOn (hinv γ hγ)
-  have hpoly : ∃ P : Polynomial X.K, P ≠ 0 ∧ P.eval₂ X.an ((((a * b') / (b * a') : ℂ → ℂ)) : Mero) = 0 := by
-    refine ⟨Polynomial.X ^ m - Polynomial.C ((f * r⁻¹ : X.Kˣ) : X.K), Polynomial.X_pow_sub_C_ne_zero hm _, ?_⟩
-    rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C, hφ, ← Filter.Germ.coe_pow, sub_eq_zero,
-      Filter.Germ.coe_eq]
+  have hgerm
+      : ∀ γ ∈ CongruenceSubgroup.Gamma M,
+        ((fun z => (a * b') (mob (ofSL γ) z) * (b * a') z : ℂ → ℂ) : Mero)
+          = ((fun z => (a * b') z * (b * a') (mob (ofSL γ) z) : ℂ → ℂ) : Mero) := fun γ hγ =>
+    germ_eq_of_eqOn (hinv γ hγ)
+  have hpoly
+      : ∃ P : Polynomial X.K,
+        P ≠ 0 ∧ P.eval₂ X.an ((((a * b') / (b * a') : ℂ → ℂ)) : Mero) = 0 := by
+    refine ⟨
+      Polynomial.X ^ m - Polynomial.C ((f * r⁻¹ : X.Kˣ) : X.K),
+      Polynomial.X_pow_sub_C_ne_zero hm _,
+      ?_
+    ⟩
+    rw [Polynomial.eval₂_sub, Polynomial.eval₂_X_pow, Polynomial.eval₂_C, hφ, ← Filter.Germ.coe_pow,
+      sub_eq_zero, Filter.Germ.coe_eq]
     filter_upwards [E1, hBev] with z e hz
     simp only [Pi.pow_apply, Pi.div_apply]
     rw [div_pow, ← e]
@@ -266,43 +309,54 @@ end GlobalTheory.KZ.FinLev
 
 namespace GlobalTheory.KZ.FinLev
 
-theorem finite_mod_powers : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
-    Function.Injective ε → (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero)) →
-    ∀ (M m : ℕ), 0 < M → 0 < m → ∃ R : Finset X.Kˣ, ∀ f : X.Kˣ, f ∈ X.Un m →
-      (∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (f : X.K) = f) → ∃ r ∈ R, ∃ g : X.Kˣ,
-        (∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (g : X.K) = g) ∧ ∃ c : Ω, c ≠ 0 ∧
-          (f : X.K) = r * (g : X.K) ^ m * algebraMap Ω X.K c := by
+theorem finite_mod_powers
+    : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ε : Ω →+* ℂ) (X : Tower Ω ε),
+      Function.Injective ε → (∃ φ : ℂ → ℂ, DifferentiableOn ℂ φ Hs ∧ X.an X.jK = (φ : Mero))
+        → ∀ (M m : ℕ),
+          0 < M → 0 < m
+            → ∃ R : Finset X.Kˣ, ∀ f : X.Kˣ,
+              f ∈ X.Un m → (∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (f : X.K) = f)
+                → ∃ r ∈ R, ∃ g : X.Kˣ,
+                  (∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (g : X.K) = g)
+                    ∧ ∃ c : Ω, c ≠ 0 ∧ (f : X.K) = r * (g : X.K) ^ m * algebraMap Ω X.K c := by
   intro Ω _ _ _ ε X hε hj M m hM hm
   classical
   haveI : NeZero M := ⟨hM.ne'⟩
   haveI : Nontrivial Mero := GlobalTheory.T.upperHalfPlaneCodiscreteGerm_identity_and_units.1
   haveI : Group.FG SL(2, ℤ) :=
     Group.fg_iff.mpr ⟨{ModularGroup.S, ModularGroup.T}, SpecialLinearGroup.SL2Z_generators, (Set.finite_singleton _).insert _⟩
-  obtain ⟨_, S, _, hS⟩ := (Group.fg_iff' (G := CongruenceSubgroup.Gamma M)).1 ((Group.fg_iff_subgroup_fg (CongruenceSubgroup.Gamma M)).2 (Subgroup.fg_of_index_ne_zero _))
+  obtain ⟨_, S, _, hS⟩ :=
+    (Group.fg_iff' (G := CongruenceSubgroup.Gamma M)).1
+      ((Group.fg_iff_subgroup_fg (CongruenceSubgroup.Gamma M)).2 (Subgroup.fg_of_index_ne_zero _))
   have hSmem : ∀ s ∈ S, (s : SL(2, ℤ)) ∈ CongruenceSubgroup.Gamma M := fun s _ => s.property
-  let Sset := {f : X.Kˣ // f ∈ X.Un m ∧ ∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (f : X.K) = f}
-  have hroot : ∀ f : Sset, ∃ a b : ℂ → ℂ, DifferentiableOn ℂ a Hs ∧ DifferentiableOn ℂ b Hs ∧ (b : Mero) ≠ 0 ∧
-      X.an (f.1 : X.K) * (b : Mero) ^ m = (a : Mero) ^ m :=
-    fun f => GlobalTheory.T.exists_meromorphic_root_of_mem_modularFunctionTower_Un ε X hε hj m hm f.1 f.2.1
+  let Sset :=
+    {f : X.Kˣ // f ∈ X.Un m ∧ ∀ γ ∈ CongruenceSubgroup.Gamma M, X.sl (ofSL γ) (f : X.K) = f}
+  have hroot
+      : ∀ f : Sset, ∃ a b : ℂ → ℂ,
+        DifferentiableOn ℂ a Hs ∧ DifferentiableOn ℂ b Hs ∧ (b : Mero) ≠ 0
+          ∧ X.an (f.1 : X.K) * (b : Mero) ^ m = (a : Mero) ^ m := fun f =>
+    GlobalTheory.T.exists_meromorphic_root_of_mem_modularFunctionTower_Un ε X hε hj m hm f.1 f.2.1
   choose A B hA hB hB0 hAB using hroot
   have hAnz : ∀ f : Sset, ∃ z ∈ Hs, A f z ≠ 0 := by
     intro f
     apply exists_ne_zero
     intro h0
     have hu : IsUnit (X.an (f.1 : X.K) * (B f : Mero) ^ m) :=
-      ((f.1.isUnit).map X.an).mul ((GlobalTheory.T.upperHalfPlaneCodiscreteGerm_identity_and_units.2.2 (B f) (hB f) (hB0 f)).2.pow m)
+      ((f.1.isUnit).map X.an).mul
+        ((GlobalTheory.T.upperHalfPlaneCodiscreteGerm_identity_and_units.2.2 (B f) (hB f)
+          (hB0 f)).2.pow m)
     rw [hAB f, h0, zero_pow hm.ne'] at hu
     exact not_isUnit_zero hu
   have hBnz : ∀ f : Sset, ∃ z ∈ Hs, B f z ≠ 0 := fun f => exists_ne_zero (hB0 f)
   choose zA hzA hAz using hAnz
   choose zB hzB hBz using hBnz
-  have hchar : ∀ (f : Sset) (s : S), ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel (A f) (B f) s ζ :=
-    fun f s => char_exists X hm f.2.2 (hA f) (hB f) (hAB f) (hzA f) (hzB f) (hAz f) (hBz f) (hSmem s s.2)
+  have hchar : ∀ (f : Sset) (s : S), ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel (A f) (B f) s ζ := fun f s =>
+    char_exists X hm f.2.2 (hA f) (hB f) (hAB f) (hzA f) (hzB f) (hAz f) (hBz f) (hSmem s s.2)
   choose Z hZ hZrel using hchar
-  let sig : Sset → (S → Polynomial.nthRootsFinset m (1 : ℂ)) :=
-    fun f s => ⟨Z f s, (Polynomial.mem_nthRootsFinset hm 1).2 (hZ f s)⟩
-  let rep : (S → Polynomial.nthRootsFinset m (1 : ℂ)) → X.Kˣ :=
-    fun σ => if h : ∃ f : Sset, sig f = σ then (h.choose).1 else 1
+  let sig : Sset → (S → Polynomial.nthRootsFinset m (1 : ℂ)) := fun f s =>
+    ⟨Z f s, (Polynomial.mem_nthRootsFinset hm 1).2 (hZ f s)⟩
+  let rep : (S → Polynomial.nthRootsFinset m (1 : ℂ)) → X.Kˣ := fun σ =>
+    if h : ∃ f : Sset, sig f = σ then (h.choose).1 else 1
   refine ⟨Finset.univ.image rep, ?_⟩
   intro f hfU hfinv
   let f' : Sset := ⟨f, hfU, hfinv⟩
@@ -311,23 +365,29 @@ theorem finite_mod_powers : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgCl
   have hsig : sig hex.choose = sig f' := hex.choose_spec
   have hsame : ∀ s : S, Z hex.choose s = Z f' s := fun s => congrArg Subtype.val (congrFun hsig s)
   let r : Sset := hex.choose
-  let H : Subgroup SL(2, ℤ) :=
-    { carrier := {γ | ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel (A f') (B f') γ ζ ∧ RootRel (A r) (B r) γ ζ}
-      mul_mem' := by
-        rintro γ δ ⟨ζ, hζ, h1, h2⟩ ⟨η, hη, h3, h4⟩
-        exact ⟨ζ * η, by rw [mul_pow, hζ, hη, one_mul],
-          rel_mul (hA f') (hB f') (hzA f') (hzB f') (hAz f') (hBz f') h1 h3,
-          rel_mul (hA r) (hB r) (hzA r) (hzB r) (hAz r) (hBz r) h2 h4⟩
-      one_mem' := ⟨1, one_pow m, rel_one _ _, rel_one _ _⟩
-      inv_mem' := by
-        rintro γ ⟨ζ, hζ, h1, h2⟩
-        have hζ0 : ζ ≠ 0 := by
-          rintro rfl
-          rw [zero_pow hm.ne'] at hζ
-          exact zero_ne_one hζ
-        exact ⟨ζ⁻¹, by rw [inv_pow, hζ, inv_one], rel_inv hζ0 h1, rel_inv hζ0 h2⟩ }
+  let H : Subgroup SL(2, ℤ) := {
+    carrier := {γ | ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel (A f') (B f') γ ζ ∧ RootRel (A r) (B r) γ ζ}
+    mul_mem' := by
+      rintro γ δ ⟨ζ, hζ, h1, h2⟩ ⟨η, hη, h3, h4⟩
+      exact ⟨
+        ζ * η,
+        by rw [mul_pow, hζ, hη, one_mul],
+        rel_mul (hA f') (hB f') (hzA f') (hzB f') (hAz f') (hBz f') h1 h3,
+        rel_mul (hA r) (hB r) (hzA r) (hzB r) (hAz r) (hBz r) h2 h4
+      ⟩
+    one_mem' := ⟨1, one_pow m, rel_one _ _, rel_one _ _⟩
+    inv_mem' := by
+      rintro γ ⟨ζ, hζ, h1, h2⟩
+      have hζ0 : ζ ≠ 0 := by
+        rintro rfl
+        rw [zero_pow hm.ne'] at hζ
+        exact zero_ne_one hζ
+      exact ⟨ζ⁻¹, by rw [inv_pow, hζ, inv_one], rel_inv hζ0 h1, rel_inv hζ0 h2⟩
+  }
   have hle : CongruenceSubgroup.Gamma M ≤ H := by
-    have htop : (⊤ : Subgroup (CongruenceSubgroup.Gamma M)) ≤ H.comap (CongruenceSubgroup.Gamma M).subtype := by
+    have htop
+        : (⊤ : Subgroup (CongruenceSubgroup.Gamma M))
+          ≤ H.comap (CongruenceSubgroup.Gamma M).subtype := by
       rw [← hS, Subgroup.closure_le]
       intro s hs
       have h := hZrel r ⟨s, hs⟩
@@ -336,11 +396,13 @@ theorem finite_mod_powers : ∀ {Ω : Type} [Field Ω] [Algebra ℚ Ω] [IsAlgCl
       exact ⟨Z f' ⟨s, hs⟩, hZ f' ⟨s, hs⟩, hZrel f' ⟨s, hs⟩, h⟩
     intro γ hγ
     exact htop (x := ⟨γ, hγ⟩) trivial
-  obtain ⟨g, hg, hfg⟩ := quot_pow X hM hm f r.1 (hA f') (hB f') (hA r) (hB r) (hAB f') (hAB r) (hzB f') (hzA r)
-    (hBz f') (hAz r) (fun γ hγ => by
-      have h : ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel (A f') (B f') γ ζ ∧ RootRel (A r) (B r) γ ζ := hle hγ
-      obtain ⟨ζ, -, h1, h2⟩ := h
-      exact ⟨ζ, h1, h2⟩)
+  obtain ⟨g, hg, hfg⟩ :=
+    quot_pow X hM hm f r.1 (hA f') (hB f') (hA r) (hB r) (hAB f') (hAB r) (hzB f') (hzA r) (hBz f')
+      (hAz r)
+      (fun γ hγ => by
+        have h : ∃ ζ : ℂ, ζ ^ m = 1 ∧ RootRel (A f') (B f') γ ζ ∧ RootRel (A r) (B r) γ ζ := hle hγ
+        obtain ⟨ζ, -, h1, h2⟩ := h
+        exact ⟨ζ, h1, h2⟩)
   refine ⟨r.1, Finset.mem_image.2 ⟨sig f', Finset.mem_univ _, hrep⟩, g, hg, 1, one_ne_zero, ?_⟩
   rw [map_one, mul_one]
   exact hfg

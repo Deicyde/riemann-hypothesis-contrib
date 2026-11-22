@@ -11,8 +11,12 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.RootsOfUnity.Ho
 
 open NumberField Formalism.HC KStar.Tree
 
-theorem UpperTheory.Mu.nuLe :
-    ∀ (φ : Frame) (H : HostRaw φ) (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra H.E Ω] [IsAlgClosure H.E Ω] (n : ℕ), Odd n → l ≠ H.q → l ≠ H.d → nuOf l (cyc l H.E Ω) n ≤ H.QS.factorization l + (if l ∣ H.QS then n.factorization l else 0) := by
+theorem UpperTheory.Mu.nuLe
+    : ∀ (φ : Frame) (H : HostRaw φ) (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra H.E Ω]
+        [IsAlgClosure H.E Ω] (n : ℕ),
+      Odd n → l ≠ H.q → l ≠ H.d
+        → nuOf l (cyc l H.E Ω) n
+          ≤ H.QS.factorization l + (if l ∣ H.QS then n.factorization l else 0) := by
   intro φ H l _ Ω _ _ _ n hn hq hd
   have hQS0 : H.QS ≠ 0 := H.QS_pos.ne'
   obtain ⟨u, hu1, hun⟩ := exists_unit_not_dvd l H.QS n hQS0 H.two_dvd_QS hn

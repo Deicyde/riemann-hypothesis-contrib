@@ -13,8 +13,15 @@ open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestrictio
 
 namespace GlobalTheory
 
-theorem existsUnique_hom_extension_semiAbelian :
-    (∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K] [IsFractionRing T K] (G G' : Over (Sp T)) [GrpObj G] [GrpObj G'], IsSemiAbelian G → IsSemiAbelian G' → ∀ f : (Over.pullback (spMap (algebraMap T K))).obj G ⟶ (Over.pullback (spMap (algebraMap T K))).obj G', IsMonHom f → ∃! F : G ⟶ G', IsMonHom F ∧ (Over.pullback (spMap (algebraMap T K))).map F = f) :=
+theorem existsUnique_hom_extension_semiAbelian
+    : (∀ (T K : Type) [CommRing T] [IsDomain T] [IsDiscreteValuationRing T] [Field K] [Algebra T K]
+        [IsFractionRing T K] (G G' : Over (Sp T)) [GrpObj G] [GrpObj G'],
+      IsSemiAbelian G → IsSemiAbelian G'
+        → ∀ f
+            : (Over.pullback (spMap (algebraMap T K))).obj G
+              ⟶ (Over.pullback (spMap (algebraMap T K))).obj G',
+          IsMonHom f
+            → ∃! F : G ⟶ G', IsMonHom F ∧ (Over.pullback (spMap (algebraMap T K))).map F = f) :=
   GlobalTheory.existsUnique_hom_extension_semiAbelian_dvr
     GlobalTheory.AbelianSubgroupFinite.finite_of_torsionFree
 

@@ -10,8 +10,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsogenyFlatF
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AV.DegSep
@@ -33,15 +35,20 @@ end GlobalTheory.AV.DegSep
 
 namespace GlobalTheory.AV.DegSep
 
-theorem isUnit_natCast_Γ (K : Type) [Field K] (n : ℕ) (hn : (n : K) ≠ 0) : IsUnit (n : Γ(Sp K, ⊤)) := by
+theorem isUnit_natCast_Γ (K : Type) [Field K] (n : ℕ) (hn : (n : K) ≠ 0)
+    : IsUnit (n : Γ(Sp K, ⊤)) := by
   have h : IsUnit (n : K) := hn.isUnit
   have := h.map (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
   simpa using this
 
-theorem deg_eq_card_ker (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (n : ℕ) (hn : (n : K) ≠ 0)
-    (hiso : IsIsogeny f) (hker : ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ f.hom = 1 → x ^ n = 1) :
-    deg f = Nat.card (ptMap f).ker := by
-  have hfl : Flat f.hom.left := (GlobalTheory.T.dim_eq_flat_finrank_eq_deg_of_isIsogeny K A B f hiso).2.1
+theorem deg_eq_card_ker
+    (K : Type) [Field K]
+    (A B : AbVar K) (f : A ⟶ B)
+    (n : ℕ) (hn : (n : K) ≠ 0)
+    (hiso : IsIsogeny f) (hker : ∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ f.hom = 1 → x ^ n = 1)
+    : deg f = Nat.card (ptMap f).ker := by
+  have hfl : Flat f.hom.left :=
+    (GlobalTheory.T.dim_eq_flat_finrank_eq_deg_of_isIsogeny K A B f hiso).2.1
   have hfin : IsFinite f.hom.left := hiso.1
   have hprop : IsProper B.X.hom := B.ab.proper
   let e : Sp K ⟶ B.X.left := η[B.X].left
@@ -52,7 +59,9 @@ theorem deg_eq_card_ker (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (n : 
   let p := pullback.snd f.hom.left e
   let i := pullback.fst f.hom.left e
   have hpi : i ≫ A.X.hom = p := by
-    calc i ≫ A.X.hom = i ≫ f.hom.left ≫ B.X.hom := by rw [Over.w f.hom]
+    calc
+      i ≫ A.X.hom
+        = i ≫ f.hom.left ≫ B.X.hom := by rw [Over.w f.hom]
       _ = p ≫ e ≫ B.X.hom := by rw [← Category.assoc, pullback.condition, Category.assoc]
       _ = p := by rw [he1, Category.comp_id]
   have hifu : FormallyUnramified i := inferInstance
@@ -79,8 +88,7 @@ theorem deg_eq_card_ker (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (n : 
   have hsnd : FormallyUnramified (pullback.snd (Out.mulA A.X n).left η[A.X].left) :=
     MorphismProperty.of_isPullback (IsPullback.of_hasPullback _ _) hmu
   have hjfu : FormallyUnramified j := by
-    have : FormallyUnramified (j ≫ pullback.fst _ _) := by
-      rw [pullback.lift_fst]; exact hifu
+    have : FormallyUnramified (j ≫ pullback.fst _ _) := by rw [pullback.lift_fst]; exact hifu
     exact FormallyUnramified.of_comp j (pullback.fst _ _)
   have hpfu : FormallyUnramified p := by
     have : j ≫ pullback.snd _ _ = p := pullback.lift_snd _ _ _
@@ -101,38 +109,46 @@ theorem deg_eq_card_ker (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (n : 
   rw [deg, if_pos hiso, ← hcard]
   symm
   refine Nat.card_congr ?_
-  exact
-    { toFun := fun y => ⟨pullback.lift y.1.left t (by
-          have h := y.2
-          rw [MonoidHom.mem_ker, ptMap_apply] at h
-          have h2 : (y.1 ≫ f.hom).left = (1 : ptOver K (AlgebraicClosure K) ⟶ B.X).left := by rw [h]
-          rw [Over.comp_left, one_left'] at h2
-          exact h2), pullback.lift_snd _ _ _⟩
-      invFun := fun y => ⟨Over.homMk (y.1 ≫ i) (by
-          change (y.1 ≫ i) ≫ A.X.hom = t
-          rw [Category.assoc, hpi, y.2]), by
-          rw [MonoidHom.mem_ker, ptMap_apply]
-          ext1
-          rw [Over.comp_left, one_left']
-          change (y.1 ≫ i) ≫ f.hom.left = t ≫ e
-          rw [Category.assoc, pullback.condition, ← Category.assoc, y.2]⟩
-      left_inv := fun y => by
-        apply Subtype.ext
+  exact {
+    toFun := fun y => ⟨
+      pullback.lift y.1.left t (by
+        have h := y.2
+        rw [MonoidHom.mem_ker, ptMap_apply] at h
+        have h2 : (y.1 ≫ f.hom).left = (1 : ptOver K (AlgebraicClosure K) ⟶ B.X).left := by rw [h]
+        rw [Over.comp_left, one_left'] at h2
+        exact h2),
+      pullback.lift_snd _ _ _
+    ⟩
+    invFun := fun y => ⟨
+      Over.homMk (y.1 ≫ i) (by
+        change (y.1 ≫ i) ≫ A.X.hom = t
+        rw [Category.assoc, hpi, y.2]),
+      by
+        rw [MonoidHom.mem_ker, ptMap_apply]
         ext1
-        exact pullback.lift_fst _ _ _
-      right_inv := fun y => by
-        apply Subtype.ext
-        apply pullback.hom_ext
-        · exact pullback.lift_fst _ _ _
-        · rw [pullback.lift_snd]; exact y.2.symm }
+        rw [Over.comp_left, one_left']
+        change (y.1 ≫ i) ≫ f.hom.left = t ≫ e
+        rw [Category.assoc, pullback.condition, ← Category.assoc, y.2]
+    ⟩
+    left_inv := fun y => by
+      apply Subtype.ext
+      ext1
+      exact pullback.lift_fst _ _ _
+    right_inv := fun y => by
+      apply Subtype.ext
+      apply pullback.hom_ext
+      · exact pullback.lift_fst _ _ _
+      · rw [pullback.lift_snd]; exact y.2.symm
+  }
 
 end GlobalTheory.AV.DegSep
 
 namespace GlobalTheory.AV.DegSep
 
-theorem deg_eq_card_ker_of_killed : ∀ (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (n : ℕ), (n : K) ≠ 0 →
-    IsIsogeny f → (∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ f.hom = 1 → x ^ n = 1) →
-    deg f = Nat.card (ptMap f).ker :=
-  fun K _ A B f n hn hiso hker => deg_eq_card_ker K A B f n hn hiso hker
+theorem deg_eq_card_ker_of_killed
+    : ∀ (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (n : ℕ),
+      (n : K) ≠ 0 → IsIsogeny f → (∀ (T : Over (Sp K)) (x : T ⟶ A.X), x ≫ f.hom = 1 → x ^ n = 1)
+        → deg f = Nat.card (ptMap f).ker := fun K _ A B f n hn hiso hker =>
+  deg_eq_card_ker K A B f n hn hiso hker
 
 end GlobalTheory.AV.DegSep

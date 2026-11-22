@@ -11,15 +11,19 @@ namespace LateralTheory.E.NoetherianChartOverlapFiniteComplement
 
 variable {A K : Type} [CommRing A] [Field K] [Algebra A K]
 
-theorem exists_pow_mul_mem (S : Subalgebra A K) (u : K) (hu : u ≠ 0) (hv : u⁻¹ ∈ S) {x : K}
-    (hx : x ∈ Algebra.adjoin A ((S : Set K) ∪ {u})) : ∃ n : ℕ, u⁻¹ ^ n * x ∈ S := by
+theorem exists_pow_mul_mem
+    (S : Subalgebra A K) (u : K) (hu : u ≠ 0) (hv : u⁻¹ ∈ S)
+    {x : K} (hx : x ∈ Algebra.adjoin A ((S : Set K) ∪ {u}))
+    : ∃ n : ℕ, u⁻¹ ^ n * x ∈ S := by
   induction hx using Algebra.adjoin_induction with
   | mem x hx =>
     rcases hx with hx | hx
     · exact ⟨0, by simpa using hx⟩
-    · rw [Set.mem_singleton_iff] at hx; subst hx
+    · rw [Set.mem_singleton_iff] at hx
+      subst hx
       exact ⟨1, by rw [pow_one, inv_mul_cancel₀ hu]; exact S.one_mem⟩
-  | algebraMap r => exact ⟨0, by simpa using S.algebraMap_mem r⟩
+  | algebraMap r =>
+    exact ⟨0, by simpa using S.algebraMap_mem r⟩
   | add x y _ _ ihx ihy =>
     obtain ⟨n, hn⟩ := ihx
     obtain ⟨m, hm⟩ := ihy
@@ -32,22 +36,25 @@ theorem exists_pow_mul_mem (S : Subalgebra A K) (u : K) (hu : u ≠ 0) (hv : u�
     obtain ⟨m, hm⟩ := ihy
     refine ⟨n + m, ?_⟩
     have : u⁻¹ ^ (n + m) * (x * y) = (u⁻¹ ^ n * x) * (u⁻¹ ^ m * y) := by ring
-    rw [this]; exact S.mul_mem hn hm
+    rw [this]
+    exact S.mul_mem hn hm
 
-theorem pow_inv_mul_pow (t : K) (ht : t ≠ 0) (n j : ℕ) :
-    (n ≤ j ∧ t⁻¹ ^ n * t ^ j = t ^ (j - n)) ∨ (j < n ∧ t⁻¹ ^ n * t ^ j = t⁻¹ ^ (n - j)) := by
+theorem pow_inv_mul_pow (t : K) (ht : t ≠ 0) (n j : ℕ)
+    : (n ≤ j ∧ t⁻¹ ^ n * t ^ j = t ^ (j - n)) ∨ (j < n ∧ t⁻¹ ^ n * t ^ j = t⁻¹ ^ (n - j)) := by
   rcases le_or_gt n j with h | h
   · left
     obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
     refine ⟨h, ?_⟩
-    rw [Nat.add_sub_cancel_left, pow_add, ← mul_assoc, ← mul_pow, inv_mul_cancel₀ ht, one_pow, one_mul]
+    rw [Nat.add_sub_cancel_left, pow_add, ← mul_assoc, ← mul_pow, inv_mul_cancel₀ ht, one_pow,
+      one_mul]
   · right
     obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h.le
     refine ⟨h, ?_⟩
-    rw [Nat.add_sub_cancel_left, pow_add, mul_comm (t⁻¹ ^ j), mul_assoc, ← mul_pow, inv_mul_cancel₀ ht,
-      one_pow, mul_one]
+    rw [Nat.add_sub_cancel_left, pow_add, mul_comm (t⁻¹ ^ j), mul_assoc, ← mul_pow,
+      inv_mul_cancel₀ ht, one_pow, mul_one]
 
-theorem noetherian_local_chart_overlap_finite_complement : LateralTheory.E.LZIdemSumNoetherian.NoetherianLocalChartOverlapFiniteComplement := by
+theorem noetherian_local_chart_overlap_finite_complement
+    : LateralTheory.E.LZIdemSumNoetherian.NoetherianLocalChartOverlapFiniteComplement := by
   intro A _ _ _ K _ _ B C t hc hB _
   obtain ⟨S, hS⟩ := hB
   set R := Algebra.adjoin A ({t} : Set K)
@@ -91,12 +98,12 @@ theorem noetherian_local_chart_overlap_finite_complement : LateralTheory.E.LZIde
     intro g hg
     have h := hLex g hg
     have hle : Lf g ≤ L := Finset.le_sup hg
-    have hspec : t⁻¹ ^ Lf g * g ∈ C := by
-      simp only [Lf, dif_pos h]; exact Classical.choose_spec h
+    have hspec : t⁻¹ ^ Lf g * g ∈ C := by simp only [Lf, dif_pos h]; exact Classical.choose_spec h
     obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le hle
     rw [hk, pow_add, mul_comm (t⁻¹ ^ Lf g), mul_assoc]
     exact C.mul_mem (C.pow_mem hc.tC _) hspec
-  let N : Submodule A K := Submodule.span A ↑((G ×ˢ Finset.range L).image (fun p => t⁻¹ ^ p.2 * p.1))
+  let N : Submodule A K :=
+    Submodule.span A ↑((G ×ˢ Finset.range L).image (fun p => t⁻¹ ^ p.2 * p.1))
   refine ⟨N, ⟨_, rfl⟩, ?_⟩
   set T := Subalgebra.toSubmodule B ⊔ Subalgebra.toSubmodule C ⊔ N with hT
   have hCT : ∀ x ∈ C, x ∈ T := fun x hx => Submodule.mem_sup_left (Submodule.mem_sup_right hx)
@@ -105,7 +112,8 @@ theorem noetherian_local_chart_overlap_finite_complement : LateralTheory.E.LZIde
     intro g hg m
     rcases lt_or_ge m L with h | h
     · refine Submodule.mem_sup_right (Submodule.subset_span ?_)
-      exact Finset.mem_coe.mpr (Finset.mem_image.mpr ⟨(g, m), Finset.mem_product.mpr ⟨hg, Finset.mem_range.mpr h⟩, rfl⟩)
+      exact Finset.mem_coe.mpr (Finset.mem_image.mpr
+        ⟨(g, m), Finset.mem_product.mpr ⟨hg, Finset.mem_range.mpr h⟩, rfl⟩)
     · obtain ⟨k, hk⟩ := Nat.exists_eq_add_of_le h
       rw [hk, pow_add, mul_comm (t⁻¹ ^ L), mul_assoc]
       exact hCT _ (C.mul_mem (C.pow_mem hc.tC _) (hL g hg))
@@ -135,9 +143,11 @@ theorem noetherian_local_chart_overlap_finite_complement : LateralTheory.E.LZIde
         exact T.add_mem hp' hq'
       | monomial i a =>
         rw [Polynomial.aeval_monomial]
-        have : t⁻¹ ^ n * t ^ j * (algebraMap A K a * t ^ i * x) = a • (t⁻¹ ^ n * t ^ (j + i) * x) := by
+        have : t⁻¹ ^ n * t ^ j * (algebraMap A K a * t ^ i * x)
+            = a • (t⁻¹ ^ n * t ^ (j + i) * x) := by
           rw [Algebra.smul_def, pow_add]; ring
-        rw [this]; exact T.smul_mem a (hx n (j + i))
+        rw [this]
+        exact T.smul_mem a (hx n (j + i))
   intro x hx
   have hx' : x ∈ Algebra.adjoin A ((B : Set K) ∪ {t⁻¹}) := hx
   obtain ⟨n, hn⟩ := exists_pow_mul_mem B t⁻¹ (inv_ne_zero hc.ne) (by rw [inv_inv]; exact hc.tB) hx'

@@ -11,15 +11,17 @@ namespace GlobalTheory.EtaleDescent
 
 open TensorProduct
 
-theorem exists_etale_polynomial_model_of_directed_union :
-    ∀ (T : Type) [CommRing T] (ι : Type) [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
-    (𝒜 : ι → Subring T), Monotone 𝒜 → (∀ x : T, ∃ i, x ∈ 𝒜 i) →
-    ∀ (E : Type) [CommRing E] [Algebra (Polynomial T) E] [Algebra.Etale (Polynomial T) E],
-    ∃ (i : ι) (E₀ : Type) (_ : CommRing E₀) (_ : Algebra (Polynomial (𝒜 i)) E₀),
-      Algebra.Etale (Polynomial (𝒜 i)) E₀ ∧
-      (letI : Algebra (Polynomial (𝒜 i)) (Polynomial T) :=
-        (Polynomial.mapRingHom (𝒜 i).subtype).toAlgebra
-       Nonempty (TensorProduct (Polynomial (𝒜 i)) (Polynomial T) E₀ ≃ₐ[Polynomial T] E)) := by
+theorem exists_etale_polynomial_model_of_directed_union
+    : ∀ (T : Type) [CommRing T] (ι : Type) [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι]
+        (𝒜 : ι → Subring T),
+      Monotone 𝒜 → (∀ x : T, ∃ i, x ∈ 𝒜 i)
+        → ∀ (E : Type) [CommRing E] [Algebra (Polynomial T) E] [Algebra.Etale (Polynomial T) E],
+          ∃ (i : ι) (E₀ : Type) (_ : CommRing E₀) (_ : Algebra (Polynomial (𝒜 i)) E₀),
+            Algebra.Etale (Polynomial (𝒜 i)) E₀
+              ∧ (letI : Algebra (Polynomial (𝒜 i)) (Polynomial T) :=
+                   (Polynomial.mapRingHom (𝒜 i).subtype).toAlgebra
+                 Nonempty
+                   (TensorProduct (Polynomial (𝒜 i)) (Polynomial T) E₀ ≃ₐ[Polynomial T] E)) := by
   intro T _ ι _ _ _ 𝒜 hmono hcov E _ _ _
   let S : ι → Subring (Polynomial T) := fun i ↦ (Polynomial.mapRingHom (𝒜 i).subtype).range
   have hSmono : Monotone S := by
@@ -47,16 +49,18 @@ theorem exists_etale_polynomial_model_of_directed_union :
     exists_etale_model_of_directed_union (Polynomial T) ι S hSmono hScov E
   let f : Polynomial (𝒜 i) →+* Polynomial T := Polynomial.mapRingHom (𝒜 i).subtype
   have hf : Function.Injective f := Polynomial.map_injective _ Subtype.val_injective
-  let e : Polynomial (𝒜 i) ≃+* S i := RingEquiv.ofBijective f.rangeRestrict
-    ⟨fun a b h ↦ hf (congrArg Subtype.val h), f.rangeRestrict_surjective⟩
+  let e : Polynomial (𝒜 i) ≃+* S i :=
+    RingEquiv.ofBijective f.rangeRestrict
+      ⟨fun a b h ↦ hf (congrArg Subtype.val h), f.rangeRestrict_surjective⟩
   have he : ∀ p, ((e p : S i) : Polynomial T) = f p := fun _ ↦ rfl
   letI alg₀ : Algebra (Polynomial (𝒜 i)) E₀ := ((algebraMap (S i) E₀).comp e.toRingHom).toAlgebra
   letI algT : Algebra (Polynomial (𝒜 i)) (Polynomial T) := f.toAlgebra
   have hEt : Algebra.Etale (Polynomial (𝒜 i)) E₀ := by
     rw [← RingHom.etale_algebraMap]
-    exact RingHom.Etale.respectsIso.2 (algebraMap (S i) E₀) e
-      (RingHom.etale_algebraMap.mpr hE₀)
-  have hmapT : ∀ p, algebraMap (S i) (Polynomial T) (e p) = algebraMap (Polynomial (𝒜 i)) (Polynomial T) p :=
+    exact RingHom.Etale.respectsIso.2 (algebraMap (S i) E₀) e (RingHom.etale_algebraMap.mpr hE₀)
+  have hmapT
+      : ∀ p,
+        algebraMap (S i) (Polynomial T) (e p) = algebraMap (Polynomial (𝒜 i)) (Polynomial T) p :=
     fun _ ↦ rfl
   have hmapE : ∀ p, algebraMap (S i) E₀ (e p) = algebraMap (Polynomial (𝒜 i)) E₀ p := fun _ ↦ rfl
   haveI c1 : SMulCommClass (S i) (Polynomial (𝒜 i)) (Polynomial T) :=

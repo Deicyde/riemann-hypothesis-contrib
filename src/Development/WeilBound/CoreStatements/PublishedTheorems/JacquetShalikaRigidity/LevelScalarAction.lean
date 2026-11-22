@@ -7,8 +7,10 @@ public import Development.WeilBound.CoreStatements.PublishedTheorems.JacquetShal
 noncomputable section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec PositivityTheory.jumpWindows PositivityTheory.RgJS
-open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
+open GlobalTheory.CuspGeneric GlobalTheory.CuspRep GlobalTheory.UnitaryBC GlobalTheory.DiscSpec
+  PositivityTheory.jumpWindows PositivityTheory.RgJS
+open GroundTheory.Automorphic GroundTheory.Automorphic.FourierWhittaker
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.Spherical
 open scoped ENNReal ComplexConjugate
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -28,7 +30,10 @@ theorem lev_smul {S : Finset (Pl E)} {x : XB E k} (h : Lev S x) (c : ℂ) : Lev 
 
 end LevelScalarAction
 
-theorem global_level_of : jumpWindows.G0 → jumpWindows.G1 → jumpWindows.AlmostEverywhereSpherical → jumpWindows.G2c → jumpWindows.G5 → K8 → K9 := by
+theorem global_level_of
+    : jumpWindows.G0 → jumpWindows.G1 → jumpWindows.AlmostEverywhereSpherical → jumpWindows.G2c
+      → jumpWindows.G5 → K8
+      → K9 := by
   intro hG0 hG1 hG1b hG2c hG5 hK8 E _ _ _ k _ ψ hψ hcond π hπ
   obtain ⟨φ₀, hφ₀, hne⟩ := Submodule.exists_mem_ne_zero_of_ne_bot π.ne_bot
   obtain ⟨x₀, hx₀, -, hlev⟩ := hG1 E k π hπ φ₀ hφ₀
@@ -47,11 +52,22 @@ theorem global_level_of : jumpWindows.G0 → jumpWindows.G1 → jumpWindows.Almo
     subst h
     exact hne (Subtype.ext (by rw [← hx₀]; rfl))
   obtain ⟨g, hg⟩ := ((hG5 E k ψ hψ).2.2.2 x₀ hgood).2.1 hx0
-  have hsat : ∀ w : Off E S, SatFn w.1 (Finset.univ.val.map (α w)) x₀ := fun w => (hoff w.1 w.2).2 _ (hα w)
+  have hsat : ∀ w : Off E S, SatFn w.1 (Finset.univ.val.map (α w)) x₀ := fun w =>
+    (hoff w.1 w.2).2 _ (hα w)
   obtain ⟨g₀, h1, h2, h3⟩ := (hG0 E k).2.2.2.2.2.2.2.2.2.2.1 S g
   have hne0 : Wh ψ x₀ g₀ ≠ 0 :=
     ((hK8 E k ψ hψ S (fun w hw => (hoff w hw).1) α x₀ hgood hsat).2.2 g hg).1 g₀ h1 h2 h3
-  refine ⟨(Wh ψ x₀ g₀)⁻¹ • φ₀, π.V.smul_mem _ hφ₀, g₀, (Wh ψ x₀ g₀)⁻¹ • x₀, h3, ?_, ?_, LevelScalarAction.lev_smul (hlev S) _, ?_⟩
+  refine ⟨
+    (Wh ψ x₀ g₀)⁻¹ • φ₀,
+    π.V.smul_mem _ hφ₀,
+    g₀,
+    (Wh ψ x₀ g₀)⁻¹ • x₀,
+    h3,
+    ?_,
+    ?_,
+    LevelScalarAction.lev_smul (hlev S) _,
+    ?_
+  ⟩
   · funext y
     change (Wh ψ x₀ g₀)⁻¹ * x₀ y = (Wh ψ x₀ g₀)⁻¹ * φ₀.1 y
     rw [hx₀]

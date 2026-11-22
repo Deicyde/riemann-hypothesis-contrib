@@ -21,33 +21,43 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField TensorProduct Filter Topology Matrix
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField TensorProduct Filter Topology Matrix
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar
 
 namespace PositivityTheory.Xgn.IntegralPointExtension
 
-theorem exists_lift {A B : CommRingCat.{0}} (ψ : A ⟶ B) [IsDomain A] [ValuationRing A] (hB : IsField B)
-    (hf : letI := ψ.hom.toAlgebra; IsFractionRing A B) {Y S : Scheme.{0}} (sY : Y ⟶ S) [IsProper sY]
-    (φ : Spec B ⟶ Y) (t : Spec A ⟶ S) (h : φ ≫ sY = Spec.map ψ ≫ t) :
-    ∃ m : Spec A ⟶ Y, Spec.map ψ ≫ m = φ ∧ m ≫ sY = t := by
+theorem exists_lift
+    {A B : CommRingCat.{0}} (ψ : A ⟶ B) [IsDomain A] [ValuationRing A]
+    (hB : IsField B) (hf : letI := ψ.hom.toAlgebra; IsFractionRing A B)
+    {Y S : Scheme.{0}} (sY : Y ⟶ S) [IsProper sY]
+    (φ : Spec B ⟶ Y) (t : Spec A ⟶ S) (h : φ ≫ sY = Spec.map ψ ≫ t)
+    : ∃ m : Spec A ⟶ Y, Spec.map ψ ≫ m = φ ∧ m ≫ sY = t := by
   letI : Algebra A B := ψ.hom.toAlgebra
   letI : Field B := hB.toField
   have hv : ValuativeCriterion.Existence sY :=
-    (IsProper.eq_valuativeCriterion ▸ (inferInstance : IsProper sY) :
-      (ValuativeCriterion ⊓ @QuasiCompact ⊓ @QuasiSeparated ⊓ @LocallyOfFiniteType) sY).1.1.1.existence
-  let S : ValuativeCommSq sY :=
-    { R := A, K := B, i₁ := φ, i₂ := t, commSq := ⟨h⟩ }
+    (IsProper.eq_valuativeCriterion ▸ (inferInstance : IsProper sY)
+      : (ValuativeCriterion ⊓ @QuasiCompact ⊓ @QuasiSeparated ⊓ @LocallyOfFiniteType)
+        sY).1.1.1.existence
+  let S : ValuativeCommSq sY := { R := A, K := B, i₁ := φ, i₂ := t, commSq := ⟨h⟩ }
   obtain ⟨⟨l⟩⟩ := hv S
   exact ⟨l.l, l.fac_left, l.fac_right⟩
 
-theorem extend_functionField {X Y S : Scheme.{0}} [IsIntegral X] [Y.IsSeparated]
-    (hv : ∀ x : X, ValuationRing (X.presheaf.stalk x)) (sX : X ⟶ S) (sY : Y ⟶ S) [IsProper sY]
-    (φ : Spec X.functionField ⟶ Y) (h : φ ≫ sY = X.fromSpecStalk _ ≫ sX) :
-    ∃ g : X ⟶ Y, X.fromSpecStalk (genericPoint X) ≫ g = φ := by
+theorem extend_functionField
+    {X Y S : Scheme.{0}} [IsIntegral X] [Y.IsSeparated]
+    (hv : ∀ x : X, ValuationRing (X.presheaf.stalk x))
+    (sX : X ⟶ S)
+    (sY : Y ⟶ S) [IsProper sY]
+    (φ : Spec X.functionField ⟶ Y) (h : φ ≫ sY = X.fromSpecStalk _ ≫ sX)
+    : ∃ g : X ⟶ Y, X.fromSpecStalk (genericPoint X) ≫ g = φ := by
   classical
   have hs : ∀ x : X, genericPoint X ⤳ x := fun x => (genericPoint_spec X).specializes trivial
-  have hlift : ∀ x : X, ∃ m : Spec (X.presheaf.stalk x) ⟶ Y,
-      Spec.map (X.presheaf.stalkSpecializes (hs x)) ≫ m = φ ∧ m ≫ sY = X.fromSpecStalk x ≫ sX := by
+  have hlift
+      : ∀ x : X, ∃ m : Spec (X.presheaf.stalk x) ⟶ Y,
+        Spec.map (X.presheaf.stalkSpecializes (hs x)) ≫ m = φ
+          ∧ m ≫ sY = X.fromSpecStalk x ≫ sX := by
     intro x
     haveI := hv x
     letI : Algebra (X.presheaf.stalk x) X.functionField :=
@@ -66,8 +76,10 @@ theorem extend_functionField {X Y S : Scheme.{0}} [IsIntegral X] [Y.IsSeparated]
     have hx : x ∈ gx.domain := Scheme.PartialMap.mem_domain_ofFromSpecStalk sX sY (m x) (hm2 x)
     have hg : genericPoint X ∈ gx.domain := (hs x).mem_open gx.domain.2 hx
     have key : gx.fromSpecStalkOfMem hg = φ := by
-      have e1 : gx.domain.fromSpecStalkOfMem (genericPoint X) hg =
-          Spec.map (X.presheaf.stalkSpecializes (hs x)) ≫ gx.domain.fromSpecStalkOfMem x hx := by
+      have e1
+          : gx.domain.fromSpecStalkOfMem (genericPoint X) hg
+            = Spec.map (X.presheaf.stalkSpecializes (hs x))
+              ≫ gx.domain.fromSpecStalkOfMem x hx := by
         rw [← cancel_mono gx.domain.ι]
         simp [Scheme.Opens.fromSpecStalkOfMem_ι, Scheme.SpecMap_stalkSpecializes_fromSpecStalk]
       have e2 := Scheme.PartialMap.fromSpecStalkOfMem_ofFromSpecStalk sX sY (m x) (hm2 x)
@@ -91,9 +103,11 @@ theorem extend_functionField {X Y S : Scheme.{0}} [IsIntegral X] [Y.IsSeparated]
     have e4 : P.fromFunctionField = r0.fromFunctionField := by
       rw [← Scheme.RationalMap.fromFunctionField_toRationalMap, hP,
         Scheme.RationalMap.fromFunctionField_toRationalMap]
-    exact e4.trans (Scheme.PartialMap.fromSpecStalkOfMem_ofFromSpecStalk sX sY (x := genericPoint X) φ h)
-  have e3 : X.fromSpecStalk (genericPoint X) ≫ X.topIso.inv ≫ (X.isoOfEq htop).hom =
-      P.domain.fromSpecStalkOfMem (genericPoint X) hgP := by
+    exact e4.trans (Scheme.PartialMap.fromSpecStalkOfMem_ofFromSpecStalk sX sY (x := genericPoint X)
+      φ h)
+  have e3
+      : X.fromSpecStalk (genericPoint X) ≫ X.topIso.inv ≫ (X.isoOfEq htop).hom
+        = P.domain.fromSpecStalkOfMem (genericPoint X) hgP := by
     rw [← cancel_mono P.domain.ι]
     simp [Scheme.Opens.fromSpecStalkOfMem_ι]
   rw [← hPeq]
@@ -101,8 +115,9 @@ theorem extend_functionField {X Y S : Scheme.{0}} [IsIntegral X] [Y.IsSeparated]
   rw [← e3]
   simp only [Category.assoc]
 
-private theorem valuationRing_localization_atPrime_dedekind (R : Type) [CommRing R] [IsDedekindDomain R] (p : Ideal R) [p.IsPrime] :
-    ValuationRing (Localization.AtPrime p) := by
+private theorem valuationRing_localization_atPrime_dedekind
+    (R : Type) [CommRing R] [IsDedekindDomain R] (p : Ideal R) [p.IsPrime]
+    : ValuationRing (Localization.AtPrime p) := by
   by_cases h0 : p = ⊥
   · subst h0
     have hF : IsFractionRing R (Localization.AtPrime (⊥ : Ideal R)) := by
@@ -119,8 +134,8 @@ private theorem valuationRing_localization_atPrime_dedekind (R : Type) [CommRing
   · haveI := IsLocalization.AtPrime.isDiscreteValuationRing_of_dedekind_domain R h0 (Localization.AtPrime p)
     infer_instance
 
-theorem stalk_valuationRing (R : Type) [CommRing R] [IsDedekindDomain R] (x : Sp R) :
-    ValuationRing ((Sp R).presheaf.stalk x) := by
+theorem stalk_valuationRing (R : Type) [CommRing R] [IsDedekindDomain R] (x : Sp R)
+    : ValuationRing ((Sp R).presheaf.stalk x) := by
   haveI : (PrimeSpectrum.asIdeal (R := R) x).IsPrime := PrimeSpectrum.isPrime (R := R) x
   have e := (Spec.stalkIso (CommRingCat.of R) x).commRingCatIsoToRingEquiv
   have hL := valuationRing_localization_atPrime_dedekind R (PrimeSpectrum.asIdeal (R := R) x)
@@ -129,9 +144,13 @@ theorem stalk_valuationRing (R : Type) [CommRing R] [IsDedekindDomain R] (x : Sp
   · simpa using map_dvd e.symm h
   · simpa using map_dvd e.symm h
 
-theorem extend_dedekind (R K : Type) [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    {Y S : Scheme.{0}} [Y.IsSeparated] (sX : Sp R ⟶ S) (sY : Y ⟶ S) [IsProper sY] (y : Sp K ⟶ Y)
-    (h : y ≫ sY = spMap (algebraMap R K) ≫ sX) : ∃ g : Sp R ⟶ Y, spMap (algebraMap R K) ≫ g = y := by
+theorem extend_dedekind
+    (R K : Type) [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+    {Y S : Scheme.{0}} [Y.IsSeparated]
+    (sX : Sp R ⟶ S)
+    (sY : Y ⟶ S) [IsProper sY]
+    (y : Sp K ⟶ Y) (h : y ≫ sY = spMap (algebraMap R K) ≫ sX)
+    : ∃ g : Sp R ⟶ Y, spMap (algebraMap R K) ≫ g = y := by
   classical
   haveI : IsDomain (CommRingCat.of R) := inferInstanceAs (IsDomain R)
   letI : Algebra (CommRingCat.of R) (Spec (CommRingCat.of R)).functionField :=
@@ -140,31 +159,41 @@ theorem extend_dedekind (R K : Type) [CommRing R] [IsDedekindDomain R] [Field K]
     functionField_isFractionRing_of_affine (CommRingCat.of R)
   let eK : (Spec (CommRingCat.of R)).functionField ≃ₐ[CommRingCat.of R] K :=
     IsLocalization.algEquiv (nonZeroDivisors (CommRingCat.of R)) _ K
-  have hfs : (Sp R).fromSpecStalk (genericPoint (Sp R)) =
-      Spec.map (CommRingCat.ofHom (algebraMap (CommRingCat.of R) (Spec (CommRingCat.of R)).functionField)) := by
+  have hfs
+      : (Sp R).fromSpecStalk (genericPoint (Sp R))
+        = Spec.map (CommRingCat.ofHom (algebraMap (CommRingCat.of R)
+          (Spec (CommRingCat.of R)).functionField)) := by
     rw [Spec.fromSpecStalk_eq']
     rfl
-  have hc1 : CommRingCat.ofHom (algebraMap R K) ≫
-      CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField) =
-      CommRingCat.ofHom (algebraMap (CommRingCat.of R) (Spec (CommRingCat.of R)).functionField) := by
+  have hc1
+      : CommRingCat.ofHom (algebraMap R K)
+          ≫ CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField)
+        = CommRingCat.ofHom (algebraMap (CommRingCat.of R)
+          (Spec (CommRingCat.of R)).functionField) := by
     ext r
     simp [eK]
-  have hc2 : CommRingCat.ofHom (algebraMap (CommRingCat.of R) (Spec (CommRingCat.of R)).functionField) ≫
-      CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K) =
-      CommRingCat.ofHom (algebraMap R K) := by
+  have hc2
+      : CommRingCat.ofHom (algebraMap (CommRingCat.of R) (Spec (CommRingCat.of R)).functionField)
+          ≫ CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K)
+        = CommRingCat.ofHom (algebraMap R K) := by
     ext r
     simp [eK]
-  have hc3 : CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField) ≫
-      CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K) = 𝟙 _ := by
+  have hc3
+      : CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField)
+          ≫ CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K)
+        = 𝟙 _ := by
     ext r
     simp
-  have k1 : Spec.map (CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField)) ≫
-      Spec.map (CommRingCat.ofHom (algebraMap R K)) =
-      Spec.map (CommRingCat.ofHom (algebraMap (CommRingCat.of R) (Spec (CommRingCat.of R)).functionField)) := by
+  have k1
+      : Spec.map (CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField))
+          ≫ Spec.map (CommRingCat.ofHom (algebraMap R K))
+        = Spec.map (CommRingCat.ofHom (algebraMap (CommRingCat.of R)
+          (Spec (CommRingCat.of R)).functionField)) := by
     rw [← hc1, Spec.map_comp]
-  have k3 : Spec.map (CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K)) ≫
-      Spec.map (CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField)) =
-      𝟙 (Spec (CommRingCat.of K)) := by
+  have k3
+      : Spec.map (CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K))
+          ≫ Spec.map (CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField))
+        = 𝟙 (Spec (CommRingCat.of K)) := by
     rw [← Spec.map_id, ← hc3, Spec.map_comp]
   let φ : Spec (Spec (CommRingCat.of R)).functionField ⟶ Y :=
     Spec.map (CommRingCat.ofHom (eK.symm : K →+* (Spec (CommRingCat.of R)).functionField)) ≫ y
@@ -174,9 +203,10 @@ theorem extend_dedekind (R K : Type) [CommRing R] [IsDedekindDomain R] [Field K]
     exact congrArg (· ≫ sX) k1
   obtain ⟨g, hg⟩ := extend_functionField (X := Sp R) (stalk_valuationRing R) sX sY φ h'
   refine ⟨g, ?_⟩
-  have e1 : spMap (algebraMap R K) =
-      Spec.map (CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K)) ≫
-        (Sp R).fromSpecStalk (genericPoint (Sp R)) := by
+  have e1
+      : spMap (algebraMap R K)
+        = Spec.map (CommRingCat.ofHom (eK : (Spec (CommRingCat.of R)).functionField →+* K))
+          ≫ (Sp R).fromSpecStalk (genericPoint (Sp R)) := by
     rw [hfs, spMap, ← Spec.map_comp, hc2]
   rw [e1, Category.assoc, hg]
   show Spec.map _ ≫ Spec.map _ ≫ y = y
@@ -185,7 +215,13 @@ theorem extend_dedekind (R K : Type) [CommRing R] [IsDedekindDomain R] [Field K]
 
 end PositivityTheory.Xgn.IntegralPointExtension
 
-theorem PositivityTheory.Xgn.integral_point_extends_model : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (c : Coeff l) (_ : FiniteDimensional ℚ c.F) (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (F : Type) [Field F] [NumberField F] (f : c.F →+* F) (y : Sp F ⟶ Xo.XF c), y ≫ pullback.snd _ _ = spMap f → ∃ yt : Sp (𝓞 F) ⟶ Y.X, spMap (algebraMap (𝓞 F) F) ≫ yt = y ≫ Y.j := by
+theorem PositivityTheory.Xgn.integral_point_extends_model
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (c : Coeff l) (_ : FiniteDimensional ℚ c.F)
+        (Y : Model Xo c (algebraMap (𝓞 c.F) c.F)) (F : Type) [Field F] [NumberField F]
+        (f : c.F →+* F) (y : Sp F ⟶ Xo.XF c),
+      y ≫ pullback.snd _ _ = spMap f
+        → ∃ yt : Sp (𝓞 F) ⟶ Y.X, spMap (algebraMap (𝓞 F) F) ≫ yt = y ≫ Y.j := by
   intro E _ _ _ H D l Xo c _ Y F _ _ f y hy
   obtain ⟨N, i, hi, hs⟩ := Y.proj
   haveI : IsProper Y.s := by

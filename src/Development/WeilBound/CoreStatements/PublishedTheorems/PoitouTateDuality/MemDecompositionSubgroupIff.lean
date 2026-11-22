@@ -6,14 +6,16 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.NineTerm
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.Published GlobalTheory.Published.PoitouTate
-  PositivityTheory.PoitouTateConclusion GlobalTheory.CompanionTheory.PTIso Pointwise
+open NumberField IsDedekindDomain Representation Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.Published GlobalTheory.Published.PoitouTate PositivityTheory.PoitouTateConclusion
+  GlobalTheory.CompanionTheory.PTIso Pointwise
 
 namespace PositivityTheory.PTNLoc
 
-theorem mem_decompositionSubgroup_iff {F Ω : Type} [Field F] [NumberField F] [Field Ω]
-    [Algebra F Ω] (A : ValuationSubring Ω) (σ : G F Ω) :
-    σ ∈ A.decompositionSubgroup F ↔ ∀ x, σ x ∈ A ↔ x ∈ A := by
+theorem mem_decompositionSubgroup_iff
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
+    (A : ValuationSubring Ω) (σ : G F Ω)
+    : σ ∈ A.decompositionSubgroup F ↔ ∀ x, σ x ∈ A ↔ x ∈ A := by
   constructor
   · intro h x
     exact ReciprocityTheory.Gal.apply_mem_iff_of_mem_Dec (F := F) h x
@@ -25,19 +27,37 @@ theorem mem_decompositionSubgroup_iff {F Ω : Type} [Field F] [NumberField F] [F
     rw [ReciprocityTheory.Gal.mul_inv_apply] at this
     exact this.symm
 
-theorem valuation_le_one_transport {Ω Ω' : Type} [Field Ω] [Field Ω'] (E : Ω ≃+* Ω')
-    {A : ValuationSubring Ω} {A' : ValuationSubring Ω'} (hA : ∀ x, E x ∈ A' ↔ x ∈ A) (x : Ω) :
-    A'.valuation (E x) ≤ 1 ↔ A.valuation x ≤ 1 := by
+theorem valuation_le_one_transport
+    {Ω Ω' : Type} [Field Ω] [Field Ω']
+    (E : Ω ≃+* Ω')
+    {A : ValuationSubring Ω} {A' : ValuationSubring Ω'} (hA : ∀ x, E x ∈ A' ↔ x ∈ A)
+    (x : Ω)
+    : A'.valuation (E x) ≤ 1 ↔ A.valuation x ≤ 1 := by
   rw [A'.valuation_le_one_iff, A.valuation_le_one_iff]
   exact hA x
 
-theorem valuation_lt_one_transport {Ω Ω' : Type} [Field Ω] [Field Ω'] (E : Ω ≃+* Ω')
-    {A : ValuationSubring Ω} {A' : ValuationSubring Ω'} (hA : ∀ x, E x ∈ A' ↔ x ∈ A) (x : Ω) :
-    A'.valuation (E x) < 1 ↔ A.valuation x < 1 := by
-  rw [ReciprocityTheory.Gal.valuation_lt_one_iff', ReciprocityTheory.Gal.valuation_lt_one_iff', ← map_inv₀ E x,
-    hA, hA, map_eq_zero_iff E E.injective]
+theorem valuation_lt_one_transport
+    {Ω Ω' : Type} [Field Ω] [Field Ω']
+    (E : Ω ≃+* Ω')
+    {A : ValuationSubring Ω} {A' : ValuationSubring Ω'} (hA : ∀ x, E x ∈ A' ↔ x ∈ A)
+    (x : Ω)
+    : A'.valuation (E x) < 1 ↔ A.valuation x < 1 := by
+  rw [ReciprocityTheory.Gal.valuation_lt_one_iff', ReciprocityTheory.Gal.valuation_lt_one_iff',
+    ← map_inv₀ E x, hA, hA, map_eq_zero_iff E E.injective]
 
-theorem locHyp : ∀ (F Ω F' Ω' : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω'] (e : F ≃+* F') (E : Ω ≃+* Ω'), (∀ x : F, E (algebraMap F Ω x) = algebraMap F' Ω' (e x)) → ∀ (Φ : G F Ω ≃ₜ* G F' Ω'), (∀ (σ : G F Ω) (x : Ω), Φ σ (E x) = E (σ x)) → ∀ (A : ValuationSubring Ω) (A' : ValuationSubring Ω'), (∀ x, E x ∈ A' ↔ x ∈ A) → ∀ σ : G F Ω, (σ ∈ Dec (F := F) A ↔ Φ σ ∈ Dec (F := F') A') ∧ (σ ∈ Inertia (F := F) A ↔ Φ σ ∈ Inertia (F := F') A') ∧ ∀ q : ℕ, IsFrob (F := F) A q σ ↔ IsFrob (F := F') A' q (Φ σ) := by
+theorem locHyp
+    : ∀ (F Ω F' Ω' : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+        [Field F'] [NumberField F'] [Field Ω'] [Algebra F' Ω'] [IsAlgClosure F' Ω'] (e : F ≃+* F')
+        (E : Ω ≃+* Ω'),
+      (∀ x : F, E (algebraMap F Ω x) = algebraMap F' Ω' (e x))
+        → ∀ (Φ : G F Ω ≃ₜ* G F' Ω'),
+          (∀ (σ : G F Ω) (x : Ω), Φ σ (E x) = E (σ x))
+            → ∀ (A : ValuationSubring Ω) (A' : ValuationSubring Ω'),
+              (∀ x, E x ∈ A' ↔ x ∈ A)
+                → ∀ σ : G F Ω,
+                  (σ ∈ Dec (F := F) A ↔ Φ σ ∈ Dec (F := F') A')
+                    ∧ (σ ∈ Inertia (F := F) A ↔ Φ σ ∈ Inertia (F := F') A')
+                    ∧ ∀ q : ℕ, IsFrob (F := F) A q σ ↔ IsFrob (F := F') A' q (Φ σ) := by
   intro F Ω F' Ω' _ _ _ _ _ _ _ _ _ _ e E hE Φ hΦ A A' hA σ
   have hdec : σ ∈ A.decompositionSubgroup F ↔ Φ σ ∈ A'.decompositionSubgroup F' := by
     rw [mem_decompositionSubgroup_iff, mem_decompositionSubgroup_iff]

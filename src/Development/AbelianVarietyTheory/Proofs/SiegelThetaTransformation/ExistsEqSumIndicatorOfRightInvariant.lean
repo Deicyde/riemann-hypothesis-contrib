@@ -10,10 +10,11 @@ namespace GlobalTheory
 
 namespace LatticeIndicator
 
-theorem exists_injective_comp_eq_of_surjective {k V W : Type*} [Field k] [AddCommGroup V]
-    [Module k V] [FiniteDimensional k V] [AddCommGroup W] [Module k W] (f g : V →ₗ[k] W)
-    (hf : Function.Surjective f) (hg : Function.Surjective g) :
-    ∃ e : V →ₗ[k] V, Function.Injective e ∧ g ∘ₗ e = f := by
+theorem exists_injective_comp_eq_of_surjective
+    {k V W : Type*}
+    [Field k] [AddCommGroup V] [Module k V] [FiniteDimensional k V] [AddCommGroup W] [Module k W]
+    (f g : V →ₗ[k] W) (hf : Function.Surjective f) (hg : Function.Surjective g)
+    : ∃ e : V →ₗ[k] V, Function.Injective e ∧ g ∘ₗ e = f := by
   obtain ⟨s, hs⟩ := g.exists_rightInverse_of_surjective (LinearMap.range_eq_top.2 hg)
   have hrk : Module.finrank k (LinearMap.ker f) = Module.finrank k (LinearMap.ker g) := by
     have h1 := f.finrank_range_add_finrank_ker
@@ -22,13 +23,14 @@ theorem exists_injective_comp_eq_of_surjective {k V W : Type*} [Field k] [AddCom
     rw [LinearMap.range_eq_top.2 hg] at h2
     omega
   let θ := LinearEquiv.ofFinrankEq _ _ hrk
-  obtain ⟨p, hp⟩ := (LinearMap.ker f).subtype.exists_leftInverse_of_injective
-    (Submodule.ker_subtype _)
+  obtain ⟨p, hp⟩ :=
+    (LinearMap.ker f).subtype.exists_leftInverse_of_injective (Submodule.ker_subtype _)
   have hgs : ∀ w, g (s w) = w := fun w => LinearMap.congr_fun hs w
   have key : ∀ v, g (s (f v) + (θ (p v) : V)) = f v := fun v => by
     rw [map_add (f := _), hgs, (θ (p v)).2, add_zero]
   refine ⟨s ∘ₗ f + (LinearMap.ker g).subtype ∘ₗ θ.toLinearMap ∘ₗ p, ?_, LinearMap.ext key⟩
-  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+  set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+    rw [injective_iff_map_eq_zero]
   intro v hv
   have hv' : s (f v) + (θ (p v) : V) = 0 := hv
   have hfv : f v = 0 := by rw [← key v, hv', map_zero]
@@ -38,14 +40,16 @@ theorem exists_injective_comp_eq_of_surjective {k V W : Type*} [Field k] [AddCom
   rw [h2] at h1
   exact congrArg Subtype.val h1
 
-theorem exists_matrix_of_span_eq_top_field {k W n : Type*} [Field k] [AddCommGroup W] [Module k W]
-    [Fintype n] [DecidableEq n] (a b : n → W) (ha : Submodule.span k (Set.range a) = ⊤)
-    (hb : Submodule.span k (Set.range b) = ⊤) :
-    ∃ g : Matrix n n k, g.det ≠ 0 ∧ ∀ j, a j = ∑ i, g i j • b i := by
-  obtain ⟨e, he, hge⟩ := exists_injective_comp_eq_of_surjective
-    (Fintype.linearCombination k a) (Fintype.linearCombination k b)
-    (by rw [← LinearMap.range_eq_top, Fintype.range_linearCombination, ha])
-    (by rw [← LinearMap.range_eq_top, Fintype.range_linearCombination, hb])
+theorem exists_matrix_of_span_eq_top_field
+    {k W n : Type*} [Field k] [AddCommGroup W] [Module k W] [Fintype n] [DecidableEq n]
+    (a b : n → W)
+    (ha : Submodule.span k (Set.range a) = ⊤) (hb : Submodule.span k (Set.range b) = ⊤)
+    : ∃ g : Matrix n n k, g.det ≠ 0 ∧ ∀ j, a j = ∑ i, g i j • b i := by
+  obtain ⟨e, he, hge⟩ :=
+    exists_injective_comp_eq_of_surjective (Fintype.linearCombination k a)
+      (Fintype.linearCombination k b)
+      (by rw [← LinearMap.range_eq_top, Fintype.range_linearCombination, ha])
+      (by rw [← LinearMap.range_eq_top, Fintype.range_linearCombination, hb])
   refine ⟨LinearMap.toMatrix' e, ?_, fun j => ?_⟩
   · rw [LinearMap.det_toMatrix']
     exact ((LinearMap.isUnit_iff_isUnit_det e).1
@@ -61,9 +65,10 @@ open LatticeIndicator
 
 section Main
 
-variable {O K m n R : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K]
-  [Fintype m] [DecidableEq m] [Fintype n] [DecidableEq n] [CommRing R]
+variable
+  {O K m n R : Type*} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+  [Finite (IsLocalRing.ResidueField O)] [Field K] [Algebra O K] [IsFractionRing O K] [Fintype m]
+  [DecidableEq m] [Fintype n] [DecidableEq n] [CommRing R]
 
 end Main
 

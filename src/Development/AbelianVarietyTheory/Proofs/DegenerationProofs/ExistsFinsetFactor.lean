@@ -12,10 +12,10 @@ open CategoryTheory AlgebraicGeometry
 
 namespace GlobalTheory.PointDescentFactorization
 
-theorem exists_finset_factor {R Ω : Type} [CommRing R] [Field Ω] (g : ℚ →+* R) (hg : g.FiniteType)
-    (φ : R →+* Ω) :
-    ∃ s : Finset Ω, ∀ (k : Type) [Field k] (β : k →+* Ω), (↑s : Set Ω) ⊆ Set.range β →
-      ∃ ψ : R →+* k, β.comp ψ = φ := by
+theorem exists_finset_factor
+    {R Ω : Type} [CommRing R] [Field Ω] (g : ℚ →+* R) (hg : g.FiniteType) (φ : R →+* Ω)
+    : ∃ s : Finset Ω, ∀ (k : Type) [Field k] (β : k →+* Ω),
+      (↑s : Set Ω) ⊆ Set.range β → ∃ ψ : R →+* k, β.comp ψ = φ := by
   classical
   letI : Algebra ℚ R := g.toAlgebra
   have hft : Algebra.FiniteType ℚ R := hg
@@ -40,20 +40,24 @@ theorem exists_finset_factor {R Ω : Type} [CommRing R] [Field Ω] (g : ℚ →+
   have h := β.rangeRestrictFieldEquiv.apply_symm_apply ⟨φ x, hall x⟩
   exact congrArg Subtype.val h
 
-theorem point_descends {Ω : Type} [Field Ω] {X : Scheme}
-    (p : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℚ) [LocallyOfFiniteType p]
-    (a : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp Ω ⟶ X) :
-    ∃ s : Finset Ω, ∀ (k : Type) [Field k] (β : k →+* Ω), (↑s : Set Ω) ⊆ Set.range (⇑β : k → Ω) →
-      ∃ b : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k ⟶ X, ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap β ≫ b = a := by
+theorem point_descends
+    {Ω : Type} [Field Ω]
+    {X : Scheme} (p : X ⟶ ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp ℚ) [LocallyOfFiniteType p]
+    (a : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp Ω ⟶ X)
+    : ∃ s : Finset Ω, ∀ (k : Type) [Field k] (β : k →+* Ω),
+      (↑s : Set Ω) ⊆ Set.range (⇑β : k → Ω)
+        → ∃ b : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Sp k ⟶ X,
+          ReciprocityTheory.ChartRestriction.G.Geo.Tor.spMap β ≫ b = a := by
   let x₀ : (Spec (CommRingCat.of Ω)) := IsLocalRing.closedPoint Ω
-  obtain ⟨R, j, hj, hx⟩ : ∃ (R : CommRingCat.{0}) (j : Spec R ⟶ X), IsOpenImmersion j ∧
-      a x₀ ∈ Set.range j := by
+  obtain ⟨R, j, hj, hx⟩
+      : ∃ (R : CommRingCat.{0}) (j : Spec R ⟶ X), IsOpenImmersion j ∧ a x₀ ∈ Set.range j := by
     obtain ⟨U, hU, hxU, -⟩ := exists_isAffineOpen_mem_and_subset (x := a x₀) (U := ⊤) trivial
     exact ⟨_, hU.fromSpec, inferInstance, by rw [hU.range_fromSpec]; exact hxU⟩
   have hr : Set.range a ⊆ Set.range j := by
     rintro _ ⟨y, rfl⟩
     have : y = x₀ := Subsingleton.elim (α := PrimeSpectrum Ω) _ _
-    rw [this]; exact hx
+    rw [this]
+    exact hx
   let a' := IsOpenImmersion.lift j a hr
   have ha' : a' ≫ j = a := IsOpenImmersion.lift_fac j a hr
   obtain ⟨φ, hφ⟩ := Spec.map_surjective a'

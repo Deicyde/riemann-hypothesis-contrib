@@ -93,8 +93,7 @@ theorem flowThirdPoint : FlowThird.{u} := by
     have h := hadd 0 0
     rw [add_zero] at h
     linear_combination -h
-  have hDline : ∀ z, D (l * z + n) = l * D z + z * D l + D n := by
-    intro z; rw [hadd, hmul]
+  have hDline : ∀ z, D (l * z + n) = l * D z + z * D l + D n := by intro z; rw [hadd, hmul]
 
   have T1 : u1 * D l + D n = 3 * k3 W l * u1 ^ 2 + 2 * k2 W l n * u1 + k1 W l n := by
     have h := hDline u1
@@ -118,7 +117,7 @@ theorem flowThirdPoint : FlowThird.{u} := by
   have hkey : (k3 W l * (u3 - u1) * (u3 - u2)) * (D u3 + fwAt W u3 (l * u3 + n)) = 0 := by
     linear_combination -hd3 - D u3 * hd3' - D u3 * (2 * u3 * hs - e2)
       + fwAt W u3 (l * u3 + n) * (u3 - u2) * hDl + fwAt W u3 (l * u3 + n) * T2
-  have hX : D u3 = -fwAt W u3 (l * u3 + n) := by
+  have hX : D u3 = - fwAt W u3 (l * u3 + n) := by
     have := (mul_eq_zero.mp hkey).resolve_left hK
     linear_combination this
   refine ⟨(wEq_iff W u3 _).2 hg3, hX, ?_⟩

@@ -15,15 +15,17 @@ open NumberField GroundTheory.Automorphic Module Matrix Topology MeasureTheory
 
 noncomputable section
 
-variable {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
+variable
+  {F E : Type*} [Field F] [Field E] [NumberField F] [NumberField E] [Algebra F E]
   [Algebra.IsQuadraticExtension F E] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-
 omit [NumberField F] [IsTotallyReal F] [_root_.NumberField.IsTotallyComplex E] in
-theorem BoundedGenerators.proof (h : HermitianForm F E W) (v : Basis ι E W)
+theorem BoundedGenerators.proof
+    (h : HermitianForm F E W) (v : Basis ι E W)
     (hR : ReducedBasisBound.Statement) (hA : ArchCovolumeBound.Statement h v)
-    (hT : MajorantTransport.Statement h v) : BoundedGenerators.Statement h v := by
+    (hT : MajorantTransport.Statement h v)
+    : BoundedGenerators.Statement h v := by
   intro M D t ht
   obtain ⟨c, hc⟩ := hA D
   obtain ⟨d, κ, hκ⟩ := hT M
@@ -65,8 +67,8 @@ theorem BoundedGenerators.proof (h : HermitianForm F E W) (v : Basis ι E W)
       (mul_le_mul_of_nonneg_left hcov (abs_nonneg κ))
   obtain ⟨b, hb⟩ := hC L hLmin hLcov
   choose e he heb using fun i => (hmemL (b i)).1 (b i).2
-  refine ⟨e, le_antisymm ((AddSubgroup.closure_le La).2 (Set.range_subset_iff.2 he)) ?_,
-    fun i => ?_⟩
+  refine
+    ⟨e, le_antisymm ((AddSubgroup.closure_le La).2 (Set.range_subset_iff.2 he)) ?_, fun i => ?_⟩
   · intro x hx
     have hxL : Φ x ∈ L := (hmemL _).2 ⟨x, hx, rfl⟩
     have hsum := congrArg Subtype.val (b.sum_repr ⟨Φ x, hxL⟩)

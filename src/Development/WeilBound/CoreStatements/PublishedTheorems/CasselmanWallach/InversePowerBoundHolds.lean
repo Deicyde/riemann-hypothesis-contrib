@@ -45,8 +45,7 @@ theorem inverse_power_bound_holds : A10 := by
   · have h := InversePowerBound.sq_le_inv_pow s y hy h0
     have : 0 ≤ (s : ℝ) ^ 4 / 16 * y ^ 4 := by positivity
     linarith
-  ·
-    rw [not_le] at h0
+  · rw [not_le] at h0
     have hu : 1 < (s : ℝ) * y / 2 := by linarith
     have k1 : (1 - (s : ℝ) * y / 2) ^ 2 ≤ ((s : ℝ) * y / 2) ^ 2 := by nlinarith
     have k2 : ((s : ℝ) * y / 2) ^ 2 ≤ ((s : ℝ) * y / 2) ^ 4 := by

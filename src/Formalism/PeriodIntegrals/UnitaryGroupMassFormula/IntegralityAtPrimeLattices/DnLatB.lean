@@ -12,7 +12,8 @@ open NumberField Ideal Matrix IsDedekindDomain
 
 namespace PI.UnitaryGroupMassFormula.IAT
 
-open Formalism.BasicNotions Formalism.L2.Forms Formalism.L2.Host Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.UG
+open Formalism.BasicNotions Formalism.L2.Forms Formalism.L2.Host
+  Formalism.L2.GlobalTheoryTheory.LocalLatticeBases Formalism.UG
 
 variable {D : D7} {u : D.what₂.Word}
 

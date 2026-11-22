@@ -91,11 +91,10 @@ theorem neFacts : NEFacts := by
   have hH := GBasic.Hpk_herm k r
   have hc : star ((1 : ℂ) / ((Tz k r z : ℝ) : ℂ)) = (1 : ℂ) / ((Tz k r z : ℝ) : ℂ) := by
     simp [Complex.star_def]
-  have h2 : star ((1 : ℂ) / 2) = (1 : ℂ) / 2 := by
-    simp [Complex.star_def]
+  have h2 : star ((1 : ℂ) / 2) = (1 : ℂ) / 2 := by simp [Complex.star_def]
   have hzW : ∀ i : Fin (2 * r + k + 1), r + k < i.val → z i = 0 := fun i hi => hz.1 i (Or.inr hi)
-  have hξW : ∀ i : Fin (2 * r + k + 1), r + k < i.val → xiV k r ξ i = 0 :=
-    fun i hi => xiV_hi k r ξ i (by omega)
+  have hξW : ∀ i : Fin (2 * r + k + 1), r + k < i.val → xiV k r ξ i = 0 := fun i hi =>
+    xiV_hi k r ξ i (by omega)
   have hξξ : herm (Hpk k r) (xiV k r ξ) (xiV k r ξ) = 0 := herm_xi_zero k r _ hξW ξ
   have hξz : herm (Hpk k r) (xiV k r ξ) z = 0 := hermitian_xi_orthogonal k r hz.1 ξ
   have hzξ : herm (Hpk k r) z (xiV k r ξ) = 0 := herm_xi_zero k r z hzW ξ
@@ -107,10 +106,14 @@ theorem neFacts : NEFacts := by
       simp only [Complex.star_def, Complex.conj_im] at him
       rw [Complex.neg_im, Complex.ofReal_im, neg_zero]
       linarith
-  have hn : ∀ u, nEich k r z ξ *ᵥ u = u +
-      (-((1 : ℂ) / ((Tz k r z : ℝ) : ℂ) * herm (Hpk k r) u z) +
-        (1 : ℂ) / ((Tz k r z : ℝ) : ℂ) * ((1 : ℂ) / 2) * herm (Hpk k r) u (xiV k r ξ)) • xiV k r ξ +
-      ((1 : ℂ) / ((Tz k r z : ℝ) : ℂ) * herm (Hpk k r) u (xiV k r ξ)) • z := by
+  have hn
+      : ∀ u,
+        nEich k r z ξ *ᵥ u
+          = u
+            + (-((1 : ℂ) / ((Tz k r z : ℝ) : ℂ) * herm (Hpk k r) u z)
+                + (1 : ℂ) / ((Tz k r z : ℝ) : ℂ) * ((1 : ℂ) / 2) * herm (Hpk k r) u (xiV k r ξ))
+              • xiV k r ξ
+            + ((1 : ℂ) / ((Tz k r z : ℝ) : ℂ) * herm (Hpk k r) u (xiV k r ξ)) • z := by
     intro u
     rw [nEich_mulVec]
     funext i
@@ -118,10 +121,12 @@ theorem neFacts : NEFacts := by
     ring
   have hfix : ∀ p : Fin r → ℂ, nEich k r z ξ *ᵥ xiV k r p = xiV k r p := by
     intro p
-    rw [nEich_mulVec, hermitian_xi_orthogonal k r hz.1 p, herm_xi_zero k r _ (fun i hi => xiV_hi k r p i (by omega)) ξ]
+    rw [nEich_mulVec, hermitian_xi_orthogonal k r hz.1 p,
+      herm_xi_zero k r _ (fun i hi => xiV_hi k r p i (by omega)) ξ]
     simp
-  have hentry : ∀ (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j : Fin (2 * r + k + 1)),
-      M i j = (M *ᵥ Pi.single j 1) i := by
+  have hentry
+      : ∀ (M : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (i j : Fin (2 * r + k + 1)),
+        M i j = (M *ᵥ Pi.single j 1) i := by
     intro M i j
     simp [Matrix.mulVec, dotProduct, Pi.single_apply]
   have hxe : ∀ a : Fin r, xiV k r (Pi.single a 1) = Pi.single (eI k r a) 1 := by
@@ -151,9 +156,11 @@ theorem neFacts : NEFacts := by
       have hzv : herm (Hpk k r) z v = star (herm (Hpk k r) v z) :=
         (Formalism.FourierDecayAlt.P.B2x4.herm_symm (Hpk k r) hH v z).symm
       rw [hn u, hn v]
-      simp only [Formalism.FourierDecayAlt.P.B2x4.herm_add_left, Formalism.FourierDecayAlt.P.B2x4.herm_add_right,
-        Formalism.FourierDecayAlt.P.B2x4.herm_smul_left, Formalism.FourierDecayAlt.P.B2x4.herm_smul_right, hξξ, hξz, hzξ, hzz, hξv, hzv,
-        star_add, star_neg, star_mul', hc, h2]
+      simp only [Formalism.FourierDecayAlt.P.B2x4.herm_add_left,
+        Formalism.FourierDecayAlt.P.B2x4.herm_add_right,
+        Formalism.FourierDecayAlt.P.B2x4.herm_smul_left,
+        Formalism.FourierDecayAlt.P.B2x4.herm_smul_right, hξξ, hξz, hzξ, hzz, hξv, hzv, star_add,
+        star_neg, star_mul', hc, h2]
       field_simp
       ring
     · intro a i _
@@ -161,11 +168,13 @@ theorem neFacts : NEFacts := by
     · intro i j hj1 hj2 hi
       rw [hentry (nEich k r z ξ) i j, hn]
       have h0 : herm (Hpk k r) (Pi.single j 1 : Fin (2 * r + k + 1) → ℂ) (xiV k r ξ) = 0 :=
-        herm_xi_zero k r _ (fun l hl => by
-          rw [Pi.single_eq_of_ne]
-          intro e
-          rw [e] at hl
-          omega) ξ
+        herm_xi_zero k r _
+          (fun l hl => by
+            rw [Pi.single_eq_of_ne]
+            intro e
+            rw [e] at hl
+            omega)
+          ξ
       simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul, h0, mul_zero, zero_mul, add_zero,
         xiV_hi k r ξ i hi, Pi.single_apply]
   · rw [nEich_mulVec, hzz, hzξ]

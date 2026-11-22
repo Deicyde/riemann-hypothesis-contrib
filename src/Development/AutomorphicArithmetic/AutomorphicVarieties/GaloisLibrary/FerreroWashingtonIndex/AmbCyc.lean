@@ -7,11 +7,19 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick UpperTheory.V.FW
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Stick
+  UpperTheory.V.FW
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.FW.ambCyc :
-    ∀ (l : ℕ) [Fact l.Prime] (f : ℕ), f.Coprime l → ∃ B : ℕ, ∀ (n : ℕ) [NeZero (f * l ^ n)] (L : Type) [Field L] [NumberField L] [IsCyclotomicExtension {f * l ^ n} ℚ L] (γ : (ZMod (f * l ^ n))ˣ), 2 ≤ n → (γ : ZMod (f * l ^ n)) = 1 + f * l ^ ee l → (powR (Cl L) l ⊔ difR (clA (f * l ^ n) L γ)).index ≤ B := by
+theorem UpperTheory.V.FW.ambCyc
+    : ∀ (l : ℕ) [Fact l.Prime] (f : ℕ),
+      f.Coprime l
+        → ∃ B : ℕ,
+          ∀ (n : ℕ) [NeZero (f * l ^ n)] (L : Type) [Field L] [NumberField L]
+              [IsCyclotomicExtension {f * l ^ n} ℚ L] (γ : (ZMod (f * l ^ n))ˣ),
+            2 ≤ n → (γ : ZMod (f * l ^ n)) = 1 + f * l ^ ee l
+              → (powR (Cl L) l ⊔ difR (clA (f * l ^ n) L γ)).index ≤ B := by
   intro l hl f hf
   have hl1 : 1 < l := hl.out.one_lt
   have hlpos : 0 < l := hl.out.pos
@@ -51,15 +59,23 @@ theorem UpperTheory.V.FW.ambCyc :
   obtain ⟨τ, hτ⟩ := hex γ⁻¹ hγinv
   have hbig : 2 < f * l ^ n := by
     have h4 : 4 ≤ l ^ n := by
-      calc 4 = 2 ^ 2 := by norm_num
+      calc
+        4 = 2 ^ 2 := by norm_num
         _ ≤ l ^ 2 := Nat.pow_le_pow_left hl.out.two_le 2
         _ ≤ l ^ n := Nat.pow_le_pow_right hlpos hn
     nlinarith
-  have htc : IsTotallyComplex L := IsCyclotomicExtension.Rat.isTotallyComplex (n := f * l ^ n) L hbig
-  let ρF : Gal(L/CyclotomicField (f * l ^ ee l) ℚ) →* (L ≃+* L) :=
-    { toFun := fun σ => σ.toRingEquiv, map_one' := rfl, map_mul' := fun _ _ => rfl }
-  let ρQ : Gal(L/ℚ) →* (L ≃+* L) :=
-    { toFun := fun σ => σ.toRingEquiv, map_one' := rfl, map_mul' := fun _ _ => rfl }
+  have htc : IsTotallyComplex L :=
+    IsCyclotomicExtension.Rat.isTotallyComplex (n := f * l ^ n) L hbig
+  let ρF : Gal(L/CyclotomicField (f * l ^ ee l) ℚ) →* (L ≃+* L) := {
+    toFun := fun σ => σ.toRingEquiv
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
+  let ρQ : Gal(L/ℚ) →* (L ≃+* L) := {
+    toFun := fun σ => σ.toRingEquiv
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+  }
   have hgen : ∀ σ : Gal(L/CyclotomicField (f * l ^ ee l) ℚ), σ ∈ Subgroup.zpowers τ := by
     intro σ
     obtain ⟨t, ht, hσ⟩ := hall σ

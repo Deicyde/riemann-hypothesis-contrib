@@ -14,18 +14,20 @@ namespace PI.UnitaryGroupMassFormula.CntFormula.R6
 
 section Bridge
 
-variable {K V ι : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
+variable
+  {K V ι : Type} [Field K] [NumberField K] [StarRing K] [AddCommGroup V] [Module K V]
   [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] [Fintype ι] [DecidableEq ι]
 
-theorem nondegOn_of_gram (h : V →ₗ⋆[K] V →ₗ[K] K) (x : ι → V) (hdet : (gram h x).det ≠ 0) :
-    Formalism.L2.SG.Pf.Cnt.NondegOn h (Submodule.span K (Set.range x)) := by
+theorem nondegOn_of_gram (h : V →ₗ⋆[K] V →ₗ[K] K) (x : ι → V) (hdet : (gram h x).det ≠ 0)
+    : Formalism.L2.SG.Pf.Cnt.NondegOn h (Submodule.span K (Set.range x)) := by
   intro v hv hv0
   obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun K).mp hv
   have hvec : Matrix.vecMul (fun i => star (c i)) (gram h x) = 0 := by
     funext j
     have := hv0 (x j) (Submodule.subset_span ⟨j, rfl⟩)
     set_option synthInstance.maxHeartbeats 100000 in
-      simpa [gram, Matrix.vecMul, dotProduct, map_sum, LinearMap.map_smulₛₗ, starRingEnd_apply] using this
+    simpa [gram, Matrix.vecMul, dotProduct, map_sum, LinearMap.map_smulₛₗ, starRingEnd_apply] using
+      this
   have h0 := Matrix.eq_zero_of_vecMul_eq_zero hdet hvec
   have hc : c = 0 := by
     funext i
@@ -33,11 +35,11 @@ theorem nondegOn_of_gram (h : V →ₗ⋆[K] V →ₗ[K] K) (x : ι → V) (hdet
     simpa using this
   simp [hc]
 
-theorem isLatIn_pb (x : ι → V) (𝔞 : ι → FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (hne : ∀ i, 𝔞 i ≠ 0) :
-    Formalism.L2.SG.Pf.Cnt.IsLatIn (Submodule.span K (Set.range x)) (pbLat x 𝔞) := by
+theorem isLatIn_pb
+    (x : ι → V) (𝔞 : ι → FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (hne : ∀ i, 𝔞 i ≠ 0)
+    : Formalism.L2.SG.Pf.Cnt.IsLatIn (Submodule.span K (Set.range x)) (pbLat x 𝔞) := by
   refine ⟨?_, ?_⟩
-  ·
-    have hden : ∀ i, ∃ d : 𝓞 K, d ≠ 0 ∧ ∀ c ∈ 𝔞 i, ∃ o : 𝓞 K, (o : K) = (d : K) * c := by
+  · have hden : ∀ i, ∃ d : 𝓞 K, d ≠ 0 ∧ ∀ c ∈ 𝔞 i, ∃ o : 𝓞 K, (o : K) = (d : K) * c := by
       intro i
       obtain ⟨d, hd, hdi⟩ := (𝔞 i).isFractional
       refine ⟨d, nonZeroDivisors.ne_zero hd, fun c hc => ?_⟩
@@ -71,8 +73,9 @@ theorem isLatIn_pb (x : ι → V) (𝔞 : ι → FractionalIdeal (nonZeroDivisor
       exact hle' hv
     · rw [Submodule.span_le]
       rintro v ⟨i, rfl⟩
-      obtain ⟨c, hc, hc0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot
-        (fun hb => hne i (FractionalIdeal.coeToSubmodule_eq_bot.mp hb))
+      obtain ⟨c, hc, hc0⟩ :=
+        Submodule.exists_mem_ne_zero_of_ne_bot (fun hb =>
+          hne i (FractionalIdeal.coeToSubmodule_eq_bot.mp hb))
       have hm : c • x i ∈ pbLat x 𝔞 := Submodule.subset_span ⟨i, c, hc, rfl⟩
       have : x i = c⁻¹ • (c • x i) := by rw [smul_smul, inv_mul_cancel₀ hc0, one_smul]
       rw [this]
@@ -83,8 +86,8 @@ end Bridge
 theorem jordan_decomposition_exists : JordanExists := by
   intro K F V ι _ _ _ _ _ _ _ _ _ _ _ _ _ h X x 𝔞 hcm hfix _ hsymm _ hne _ hspan hdet hint 𝔭 h𝔭
   subst hspan
-  exact (Formalism.L2.SG.Pf.Cnt.jordan_splitting_exists K F V hcm hfix h hsymm).1 _ _ (nondegOn_of_gram h x hdet)
-    (isLatIn_pb x 𝔞 hne) hint 𝔭 h𝔭
+  exact (Formalism.L2.SG.Pf.Cnt.jordan_splitting_exists K F V hcm hfix h hsymm).1 _ _
+    (nondegOn_of_gram h x hdet) (isLatIn_pb x 𝔞 hne) hint 𝔭 h𝔭
 
 theorem norm_mass_of_jordan : Formalism.L2.SG.Pf.Cnt.NormMM :=
   normMM_of_J jordan_decomposition_exists

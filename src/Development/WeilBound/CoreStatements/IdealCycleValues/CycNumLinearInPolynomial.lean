@@ -9,17 +9,29 @@ public import Development.WeilBound.CoreStatements.IdealCycleValues.ProdMapToMul
 
 open MvPolynomial GroundTheory.Heights₂.Heights.NumbersDVR GlobalTheory.CompanionTheory.Ar.Num
 
-theorem BaseChangeColon.cycNum_linear_in_polynomial : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (K : Type) [Fintype K] [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (σ : Type) (Z : Ideal (MRing ι O) → ℤ) (cls : σ → K → ℤ) (Q : List (K → ℤ)), (∀ H H' : MvPolynomial σ ℝ, cycNum Z cls (H + H') Q = cycNum Z cls H Q + cycNum Z cls H' Q) ∧ (∀ (c : ℝ) (H : MvPolynomial σ ℝ), cycNum Z cls (C c * H) Q = c * cycNum Z cls H Q) ∧ (∀ (α : Type) (s : Finset α) (H : α → MvPolynomial σ ℝ), cycNum Z cls (∑ a ∈ s, H a) Q = ∑ a ∈ s, cycNum Z cls (H a) Q) ∧ ∀ (μ : σ →₀ ℕ) (c : ℝ), cycNum Z cls (monomial μ c) Q = c * (cycList Z (classList cls μ ++ Q) : ℝ) := by
+theorem BaseChangeColon.cycNum_linear_in_polynomial
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (K : Type) [Fintype K]
+        [DecidableEq K] (ι : K → Type) [∀ k, Fintype (ι k)] (σ : Type) (Z : Ideal (MRing ι O) → ℤ)
+        (cls : σ → K → ℤ) (Q : List (K → ℤ)),
+      (∀ H H' : MvPolynomial σ ℝ, cycNum Z cls (H + H') Q = cycNum Z cls H Q + cycNum Z cls H' Q)
+        ∧ (∀ (c : ℝ) (H : MvPolynomial σ ℝ), cycNum Z cls (C c * H) Q = c * cycNum Z cls H Q)
+        ∧ (∀ (α : Type) (s : Finset α) (H : α → MvPolynomial σ ℝ),
+          cycNum Z cls (∑ a ∈ s, H a) Q = ∑ a ∈ s, cycNum Z cls (H a) Q)
+        ∧ ∀ (μ : σ →₀ ℕ) (c : ℝ),
+          cycNum Z cls (monomial μ c) Q = c * (cycList Z (classList cls μ ++ Q) : ℝ) := by
   intro O _ _ _ K _ _ ι _ σ Z cls Q
   classical
   set g : (σ →₀ ℕ) → ℝ := fun μ => (cycList Z (classList cls μ ++ Q) : ℝ) with hg
-  have key : ∀ (H : MvPolynomial σ ℝ) (s : Finset (σ →₀ ℕ)), H.support ⊆ s →
-      cycNum Z cls H Q = ∑ μ ∈ s, AddMonoidAlgebra.coeff H μ * g μ := by
+  have key
+      : ∀ (H : MvPolynomial σ ℝ) (s : Finset (σ →₀ ℕ)),
+        H.support ⊆ s → cycNum Z cls H Q = ∑ μ ∈ s, AddMonoidAlgebra.coeff H μ * g μ := by
     intro H s hs
     show ∑ μ ∈ H.support, AddMonoidAlgebra.coeff H μ * g μ = _
     refine Finset.sum_subset hs (fun μ _ hμ => ?_)
     rw [MvPolynomial.notMem_support_iff.mp hμ, zero_mul]
-  have hadd : ∀ H H' : MvPolynomial σ ℝ, cycNum Z cls (H + H') Q = cycNum Z cls H Q + cycNum Z cls H' Q := by
+  have hadd
+      : ∀ H H' : MvPolynomial σ ℝ,
+        cycNum Z cls (H + H') Q = cycNum Z cls H Q + cycNum Z cls H' Q := by
     intro H H'
     rw [key (H + H') (H.support ∪ H'.support) MvPolynomial.support_add,
       key H (H.support ∪ H'.support) Finset.subset_union_left,

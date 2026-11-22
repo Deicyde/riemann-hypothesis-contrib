@@ -22,22 +22,28 @@ variable {n : ℕ}
 
 def dk (ε : Fin n → Bool) : Measure (KG ε) := (muK ε Set.univ)⁻¹ • muK ε
 
-/-- The compact Haar measure normalized by its total mass. Use this lemma to rewrite `dk`
-so separate import branches do not generate duplicate equation theorems. -/
+/--
+The compact Haar measure normalized by its total mass. Use this lemma to rewrite `dk`
+so separate import branches do not generate duplicate equation theorems.
+-/
 theorem dk_def (ε : Fin n → Bool) : dk ε = (muK ε Set.univ)⁻¹ • muK ε := rfl
 
 abbrev PCoord (ε : Fin n → Bool) : Type := {ab : Fin n × Fin n // ab.2 < ab.1 ∧ ε ab.1 ≠ ε ab.2}
 
 def pmat {ε : Fin n → Bool} (z : PCoord ε → ℂ) : Matrix (Fin n) (Fin n) ℂ := fun a b =>
-  if h : b < a ∧ ε a ≠ ε b then z ⟨(a, b), h⟩
-  else if h' : a < b ∧ ε b ≠ ε a then star (z ⟨(b, a), h'⟩) else 0
+  if h : b < a ∧ ε a ≠ ε b then
+    z ⟨(a, b), h⟩
+  else if h' : a < b ∧ ε b ≠ ε a then
+    star (z ⟨(b, a), h'⟩)
+  else
+    0
 
 theorem pmat_isHermitian {ε : Fin n → Bool} (z : PCoord ε → ℂ) : (pmat z).IsHermitian := by
   apply Matrix.IsHermitian.ext
   intro a b
   simp only [pmat]
   by_cases h1 : b < a ∧ ε a ≠ ε b
-  · have hn : ¬ (a < b ∧ ε b ≠ ε a) := fun h => absurd h.1 (not_lt.2 h1.1.le)
+  · have hn : ¬(a < b ∧ ε b ≠ ε a) := fun h => absurd h.1 (not_lt.2 h1.1.le)
     simp only [dite_eq_right hn, dite_eq_left h1, star_star]
   · by_cases h2 : a < b ∧ ε b ≠ ε a
     · simp only [dite_eq_left h2, dite_eq_right h1]
@@ -75,13 +81,13 @@ def rhoP {ε : Fin n → Bool} (z : PCoord ε → ℂ) : ℝ :=
 def PiW (ε : Fin n → Bool) (lam : Fin n → ℝ) : ℝ := ∏ ab : PCoord ε, Real.pi / wab lam ab.1.1 ab.1.2
 
 def dimVlam (lam : Fin n → ℝ) : ℝ :=
-  (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b), |lam a - lam b|) /
-    ∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))
+  (∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b), |lam a - lam b|)
+    / ∏ a : Fin n, ∏ b ∈ univ.filter (fun b : Fin n => a < b), (((b : ℕ) : ℝ) - ((a : ℕ) : ℝ))
 
 def cPQ (ε : Fin n → Bool) : ℝ :=
-  (∏ i ∈ range n, (i.factorial : ℝ)) /
-    (Real.pi ^ (pOf ε * qOf ε) * (∏ i ∈ range (pOf ε), (i.factorial : ℝ)) *
-      ∏ i ∈ range (qOf ε), (i.factorial : ℝ))
+  (∏ i ∈ range n, (i.factorial : ℝ))
+    / (Real.pi ^ (pOf ε * qOf ε) * (∏ i ∈ range (pOf ε), (i.factorial : ℝ))
+      * ∏ i ∈ range (qOf ε), (i.factorial : ℝ))
 
 def polarM {ε : Fin n → Bool} (kz : KG ε × (PCoord ε → ℂ)) : Matrix (Fin n) (Fin n) ℂ :=
   toMK kz.1 * NormedSpace.exp (pmat kz.2)
@@ -94,25 +100,37 @@ def muPolar (ε : Fin n → Bool) : Measure (UJ ε) :=
   Measure.comap (β := Fin n → Fin n → ℂ) (fun g : UJ ε => toM g) (muPolarMat ε)
 
 def muCD (ε : Fin n → Bool) : Measure (Formalism.REAL.UJ ε) :=
-  ENNReal.ofReal (cPQ ε) •
-    Measure.comap (β := Fin n → Fin n → ℂ) (fun g : Formalism.REAL.UJ ε => Formalism.MainNotions.S.umat g) (muPolarMat ε)
+  ENNReal.ofReal (cPQ ε) • Measure.comap (β := Fin n → Fin n → ℂ)
+    (fun g : Formalism.REAL.UJ ε => Formalism.MainNotions.S.umat g)
+    (muPolarMat ε)
 
-def fF (ε : Fin n → Bool) (lam : Fin n → ℝ) {Λ : Fin n → ℝ} (T : KType ε Λ)
-    (X : Matrix (Fin n) (Fin n) ℂ) : T.V →L[ℂ] T.V :=
-  ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ)) •
-    ∫ k, ((Real.exp (-Ph lam (toMK k⁻¹ * X * toMK k)) : ℝ) : ℂ) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε)
+def fF
+    (ε : Fin n → Bool)
+    (lam : Fin n → ℝ)
+    {Λ : Fin n → ℝ} (T : KType ε Λ)
+    (X : Matrix (Fin n) (Fin n) ℂ)
+    : T.V →L[ℂ] T.V :=
+  ((Module.finrank ℂ T.V : ℂ) / ((muK ε Set.univ).toReal : ℂ))
+    • ∫ k, ((Real.exp (-Ph lam (toMK k⁻¹ * X * toMK k)) : ℝ) : ℂ) • (T.op k * projW T * T.op k⁻¹) ∂(muK ε)
 
-def hsOp {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
-    (A : V →L[ℂ] V) : ℝ :=
+def hsOp
+    {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℂ V] [FiniteDimensional ℂ V]
+    (A : V →L[ℂ] V)
+    : ℝ :=
   ∑ i, ‖A (stdOrthonormalBasis ℂ V i)‖ ^ 2
 
-structure FData (ε : Fin n → Bool) (lam : Fin n → ℝ) {H : Type*} [NormedAddCommGroup H]
-    [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
-    (T : KType ε (lowK ε lam)) (j : T.V →L[ℂ] H) : Prop where
+structure FData
+    (ε : Fin n → Bool) (lam : Fin n → ℝ)
+    {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (T : KType ε (lowK ε lam)) (j : T.V →L[ℂ] H)
+    : Prop where
   urep : IsURepOn (UJset ε) σ
   iso : ∀ v, ‖j v‖ = ‖v‖
   kequiv : ∀ (k : KG ε) (v : T.V), σ (toMK k) (j v) = j (T.op k v)
-  formF : ∀ z : PCoord ε → ℂ,
-    (ContinuousLinearMap.adjoint j).comp ((σ (NormedSpace.exp (pmat z))).comp j) = fF ε lam T (pmat z)
+  formF
+    : ∀ z : PCoord ε → ℂ,
+      (ContinuousLinearMap.adjoint j).comp ((σ (NormedSpace.exp (pmat z))).comp j)
+        = fF ε lam T (pmat z)
 
 end ReciprocityTheory.ChartRestriction.DS

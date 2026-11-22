@@ -11,10 +11,10 @@ open scoped ENNReal
 namespace GlobalTheory.CompanionTheory.MeasureTails
 
 theorem tendsto_setLIntegral_diff_compactCovering
-    {α : Type} [TopologicalSpace α] [MeasurableSpace α] [BorelSpace α] [T2Space α]
-    [SigmaCompactSpace α] (μ : Measure α) (F : Set α) (h : α → ℝ≥0∞)
-    (hfin : ∫⁻ x in F, h x ∂μ < ⊤) :
-    Tendsto (fun k : ℕ => ∫⁻ x in F \ compactCovering α k, h x ∂μ) atTop (𝓝 0) := by
+    {α : Type}
+    [TopologicalSpace α] [MeasurableSpace α] [BorelSpace α] [T2Space α] [SigmaCompactSpace α]
+    (μ : Measure α) (F : Set α) (h : α → ℝ≥0∞) (hfin : ∫⁻ x in F, h x ∂μ < ⊤)
+    : Tendsto (fun k : ℕ => ∫⁻ x in F \ compactCovering α k, h x ∂μ) atTop (𝓝 0) := by
   set m : Measure α := (μ.restrict F).withDensity h with hm
   have hmeas : ∀ k : ℕ, MeasurableSet (compactCovering α k)ᶜ := fun k =>
     ((isCompact_compactCovering α k).isClosed.measurableSet).compl
@@ -31,8 +31,7 @@ theorem tendsto_setLIntegral_diff_compactCovering
     rw [← Set.compl_iUnion, iUnion_compactCovering, Set.compl_univ]
   have hne : ∃ k : ℕ, m (compactCovering α k)ᶜ ≠ ⊤ :=
     ⟨0, ne_top_of_le_ne_top huniv.ne (measure_mono (Set.subset_univ _))⟩
-  have key := tendsto_measure_iInter_atTop (μ := m)
-    (fun k => (hmeas k).nullMeasurableSet) hanti hne
+  have key := tendsto_measure_iInter_atTop (μ := m) (fun k => (hmeas k).nullMeasurableSet) hanti hne
   rw [hinter, measure_empty] at key
   simp only [hrew]
   exact key

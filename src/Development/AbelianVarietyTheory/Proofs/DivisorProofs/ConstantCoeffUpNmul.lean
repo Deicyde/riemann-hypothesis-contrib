@@ -6,7 +6,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ConstantCoef
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 open TensorProduct
 
 set_option autoImplicit false
@@ -172,12 +174,21 @@ private lemma subst_nmul_nmul_eq_nmul_mul {μ : Fin d → MvPowerSeries (Fin d �
     simp_rw [ih, subst_X hm]
     rw [Nat.succ_mul, nmul_add_eq_op hG]
 
-
 set_option autoImplicit false in
 open MvPowerSeries TensorProduct in
 variable {R Q : Type} [CommRing R] [CommRing Q] [Algebra R Q] {d : ℕ} in
 variable {S : Type} [CommRing S] in
-theorem _root_.GlobalTheory.DefectComp.main : ∀ (R Q : Type) [CommRing R] [CommRing Q] [Algebra R Q] (d : ℕ) (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R), _root_.GlobalTheory.Katz.IsLaw μ → Function.Injective (algebraMap R Q) → ∀ (f : MvPowerSeries (Fin d) Q), constantCoeff f = 0 → ∀ (k m : ℕ) (s t u : MvPowerSeries (Fin d) R), map (algebraMap R Q) s = _root_.GlobalTheory.QLog.defect μ k f → map (algebraMap R Q) t = _root_.GlobalTheory.QLog.defect μ m f → map (algebraMap R Q) u = _root_.GlobalTheory.QLog.defect μ (k * m) f → u = subst (_root_.GlobalTheory.QLog.nmul μ m) s + (k : R) • t := by
+theorem _root_.GlobalTheory.DefectComp.main
+    : ∀ (R Q : Type) [CommRing R] [CommRing Q] [Algebra R Q] (d : ℕ)
+        (μ : Fin d → MvPowerSeries (Fin d ⊕ Fin d) R),
+      _root_.GlobalTheory.Katz.IsLaw μ → Function.Injective (algebraMap R Q)
+        → ∀ (f : MvPowerSeries (Fin d) Q),
+          constantCoeff f = 0
+            → ∀ (k m : ℕ) (s t u : MvPowerSeries (Fin d) R),
+              map (algebraMap R Q) s = _root_.GlobalTheory.QLog.defect μ k f
+                → map (algebraMap R Q) t = _root_.GlobalTheory.QLog.defect μ m f
+                → map (algebraMap R Q) u = _root_.GlobalTheory.QLog.defect μ (k * m) f
+                → u = subst (_root_.GlobalTheory.QLog.nmul μ m) s + (k : R) • t := by
   intro R Q _ _ _ d μ hG hinj f _ k m s t u hs ht hu
   have hμ := hG.const
   have hm : HasSubst (_root_.GlobalTheory.QLog.nmul μ m) :=
@@ -186,17 +197,22 @@ theorem _root_.GlobalTheory.DefectComp.main : ∀ (R Q : Type) [CommRing R] [Com
   have hkQ := _root_.GlobalTheory.QLog.hasSubst_up_nmul (Q := Q) hμ k
   apply mvPowerSeries_map_injective hinj
   rw [map_add (f := _), map_subst hm, hs, hu, Nat.cast_smul_eq_nsmul, map_nsmul, ht]
-  change _ = subst (_root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ m))
-    (_root_.GlobalTheory.QLog.defect μ k f) + _
+  change _
+    = subst (_root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ m))
+        (_root_.GlobalTheory.QLog.defect μ k f)
+      + _
   simp only [_root_.GlobalTheory.QLog.defect]
   rw [subst_sub hmQ, subst_smul hmQ, subst_comp_subst_apply hkQ hmQ]
-  have hcomp : (fun i => subst (_root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ m))
-      (_root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ k) i)) =
-      _root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ (k * m)) := by
+  have hcomp
+      : (fun i =>
+          subst (_root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ m))
+            (_root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ k) i))
+        = _root_.GlobalTheory.QLog.up Q (_root_.GlobalTheory.QLog.nmul μ (k * m)) := by
     funext i
-    change subst (fun j => map (algebraMap R Q) (_root_.GlobalTheory.QLog.nmul μ m j))
-      (map (algebraMap R Q) (_root_.GlobalTheory.QLog.nmul μ k i)) =
-        map (algebraMap R Q) (_root_.GlobalTheory.QLog.nmul μ (k * m) i)
+    change subst
+        (fun j => map (algebraMap R Q) (_root_.GlobalTheory.QLog.nmul μ m j))
+        (map (algebraMap R Q) (_root_.GlobalTheory.QLog.nmul μ k i))
+      = map (algebraMap R Q) (_root_.GlobalTheory.QLog.nmul μ (k * m) i)
     rw [← map_subst hm, subst_nmul_nmul_eq_nmul_mul hG]
   rw [hcomp, ← Nat.cast_smul_eq_nsmul Q, Nat.cast_mul, mul_smul, smul_sub]
   abel

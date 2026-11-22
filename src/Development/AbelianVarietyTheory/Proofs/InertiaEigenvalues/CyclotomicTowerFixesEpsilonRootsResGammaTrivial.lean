@@ -10,14 +10,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Cycloto
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.Decompl
+open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.MainNotions.N Formalism.MainNotions.LocalSituation GlobalTheory.Cyc GlobalTheory.Decompl
 open scoped TensorProduct
 
 namespace GlobalTheory.Decompl
 
-theorem resΓ_eq_one_of_chi {l : ℕ} [Fact l.Prime] (P : LocPrime l) {K LL : FinExt l}
-    (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K)))
-    (g : ↥(GK K)) (h1 : P.χQ g = 1) : W.resΓ g = 1 := by
+theorem resΓ_eq_one_of_chi
+    {l : ℕ} [Fact l.Prime]
+    (P : LocPrime l)
+    {K LL : FinExt l} (W : LocWach (P.PD K) ↥LL.1 ↥(OL LL) (P.v LL) (Module.finrank ℚ_[l] ↥(K0 K)))
+    (g : ↥(GK K)) (h1 : P.χQ g = 1)
+    : W.resΓ g = 1 := by
   apply W.χΓ_inj
   rw [map_one W.χΓ]
   apply Units.ext
@@ -26,10 +30,11 @@ theorem resΓ_eq_one_of_chi {l : ℕ} [Fact l.Prime] (P : LocPrime l) {K LL : Fi
   rw [P.PD_χ, h1, Units.val_one, map_one] at h3
   exact h3
 
-theorem hinf_fixes_εroot_and_resΓ_eq_one : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l),
-    (∀ g ∈ Hinf K, ∀ j : ℕ, AI.actT g (AI.εroot j) = AI.εroot j) ∧
-    ∀ (s : ℕ) (LL : FinExt l), Good K s LL → ∀ (W : Wach P K LL), ∀ g ∈ Hinf K,
-      ∃ hg : g ∈ GK K, W.resΓ ⟨g, hg⟩ = 1 := by
+theorem hinf_fixes_εroot_and_resΓ_eq_one
+    : ∀ (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l),
+      (∀ g ∈ Hinf K, ∀ j : ℕ, AI.actT g (AI.εroot j) = AI.εroot j)
+        ∧ ∀ (s : ℕ) (LL : FinExt l),
+          Good K s LL → ∀ (W : Wach P K LL), ∀ g ∈ Hinf K, ∃ hg : g ∈ GK K, W.resΓ ⟨g, hg⟩ = 1 := by
   intro l _ P AI K
   have hχ : ∀ g ∈ Hinf K, P.χQ g = 1 := fun g hg =>
     ((GlobalTheory.Cyc.cyc_basic l P.χQ P.χQ_cyc).2.2 K g

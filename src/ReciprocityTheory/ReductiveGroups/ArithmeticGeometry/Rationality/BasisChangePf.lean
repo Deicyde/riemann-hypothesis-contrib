@@ -80,7 +80,8 @@ theorem basisChange_holds : BasisChangeStatement := by
   have hC0 : (0 : ℝ) ≤ C := by linarith
   have hL : ∀ i, CB (∑ k, MvPolynomial.C (A i k) * MvPolynomial.X k : MvPolynomial ι K) C :=
     fun i => cb_lin A hC0 hA i
-  have key : CB (MvPolynomial.bind₁ (fun i => ∑ k, MvPolynomial.C (A i k) * MvPolynomial.X k) P) (C ^ d) := by
+  have key : CB (MvPolynomial.bind₁ (fun i => ∑ k, MvPolynomial.C (A i k) * MvPolynomial.X k) P)
+      (C ^ d) := by
     conv => arg 1; rw [P.as_sum]
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum]
@@ -97,12 +98,13 @@ theorem basisChange_holds : BasisChangeStatement := by
       rw [Finset.prod_pow_eq_pow_sum, ← hdeg]
       rfl
     intro ν
-    calc ‖AddMonoidAlgebra.coeff (MvPolynomial.C (AddMonoidAlgebra.coeff P v) *
-          ∏ i ∈ v.support, (∑ k, MvPolynomial.C (A i k) * MvPolynomial.X k) ^ v i) ν‖
+    calc
+      ‖AddMonoidAlgebra.coeff (MvPolynomial.C (AddMonoidAlgebra.coeff P v) *
+       ∏ i ∈ v.support, (∑ k, MvPolynomial.C (A i k) * MvPolynomial.X k) ^ v i) ν‖
         ≤ ‖AddMonoidAlgebra.coeff P v‖ * ∏ i ∈ v.support, C ^ v i := hb ν
       _ ≤ 1 * C ^ d := by
-          rw [hpow]
-          exact mul_le_mul_of_nonneg_right (hP1 v) (pow_nonneg hC0 d)
+        rw [hpow]
+        exact mul_le_mul_of_nonneg_right (hP1 v) (pow_nonneg hC0 d)
       _ = C ^ d := one_mul _
   exact key μ
 

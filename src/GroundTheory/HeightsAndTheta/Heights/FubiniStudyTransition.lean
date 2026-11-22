@@ -81,22 +81,26 @@ lemma hpair_chartVec_self (i : Fin (N + 1)) (z : Fin N → ℂ) :
   rw [hpair, Fin.sum_univ_succAbove _ i]
   simp [normSqSum, Complex.mul_conj']
 
-theorem chernForm_eq_fsHerm (i : Fin (N + 1)) (z ξ η : Fin N → ℂ) :
-    ∑ a, ∑ b, chernCoeff i z a b * ξ a * conj (η b) =
-      fsHerm (chartVec i z) (liftVec i ξ) (liftVec i η) := by
+theorem chernForm_eq_fsHerm (i : Fin (N + 1)) (z ξ η : Fin N → ℂ)
+    : ∑ a, ∑ b, chernCoeff i z a b * ξ a * conj (η b)
+      = fsHerm (chartVec i z) (liftVec i ξ) (liftVec i η) := by
   have hS := one_add_normSqSum_pos z
-  have h1 : ∑ a, ∑ b, (1 : Matrix (Fin N) (Fin N) ℂ) a b * ξ a * conj (η b) =
-      ∑ a, ξ a * conj (η a) := by
+  have h1
+      : ∑ a, ∑ b, (1 : Matrix (Fin N) (Fin N) ℂ) a b * ξ a * conj (η b)
+        = ∑ a, ξ a * conj (η a) := by
     simp [Matrix.one_apply]
-  have h2 : ∑ a, ∑ b, conj (z a) * z b * ξ a * conj (η b) =
-      (∑ a, ξ a * conj (z a)) * ∑ b, z b * conj (η b) := by
+  have h2
+      : ∑ a, ∑ b, conj (z a) * z b * ξ a * conj (η b)
+        = (∑ a, ξ a * conj (z a)) * ∑ b, z b * conj (η b) := by
     rw [Finset.sum_mul_sum]
     exact Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => by ring
-  have hpt : ∀ a b, chernCoeff i z a b * ξ a * conj (η b) =
-      ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ) *
-          ((1 : Matrix (Fin N) (Fin N) ℂ) a b * ξ a * conj (η b)) -
-        ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ) * (((1 + normSqSum z)⁻¹ : ℝ) : ℂ) *
-          (conj (z a) * z b * ξ a * conj (η b)) := by
+  have hpt
+      : ∀ a b,
+        chernCoeff i z a b * ξ a * conj (η b)
+          = ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ)
+              * ((1 : Matrix (Fin N) (Fin N) ℂ) a b * ξ a * conj (η b))
+            - ((1 / (2 * Real.pi * (1 + normSqSum z)) : ℝ) : ℂ) * (((1 + normSqSum z)⁻¹ : ℝ) : ℂ)
+              * (conj (z a) * z b * ξ a * conj (η b)) := by
     intro a b; rw [chernCoeff_apply]; ring
   simp_rw [hpt, Finset.sum_sub_distrib, ← Finset.mul_sum, h1, h2]
   rw [fsHerm, hpair_liftVec_liftVec, hpair_chartVec_self, hpair_liftVec_chartVec,
@@ -112,14 +116,15 @@ lemma transition_apply (i j : Fin (N + 1)) (z : Fin N → ℂ) (k : Fin N) :
     transition i j z k = chartVec i z (j.succAbove k) / chartVec i z j := rfl
 
 def liftCLM (i : Fin (N + 1)) : (Fin N → ℂ) →L[ℂ] (Fin (N + 1) → ℂ) :=
-  LinearMap.toContinuousLinearMap
-    { toFun := liftVec i
-      map_add' := fun ξ η => by
-        funext m
-        obtain rfl | ⟨k, rfl⟩ := Fin.eq_self_or_eq_succAbove i m <;> simp
-      map_smul' := fun c ξ => by
-        funext m
-        obtain rfl | ⟨k, rfl⟩ := Fin.eq_self_or_eq_succAbove i m <;> simp }
+  LinearMap.toContinuousLinearMap {
+    toFun := liftVec i
+    map_add' := fun ξ η => by
+      funext m
+      obtain rfl | ⟨k, rfl⟩ := Fin.eq_self_or_eq_succAbove i m <;> simp
+    map_smul' := fun c ξ => by
+      funext m
+      obtain rfl | ⟨k, rfl⟩ := Fin.eq_self_or_eq_succAbove i m <;> simp
+  }
 
 @[simp] lemma liftCLM_apply (i : Fin (N + 1)) (ξ : Fin N → ℂ) : liftCLM i ξ = liftVec i ξ := rfl
 
@@ -135,14 +140,16 @@ lemma hasFDerivAt_chartVec (i : Fin (N + 1)) (z : Fin N → ℂ) :
   rw [h]
   exact (liftCLM i).hasFDerivAt.const_add _
 
-theorem hasFDerivAt_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0) :
-    HasFDerivAt (transition i j) (ContinuousLinearMap.pi fun k =>
-      chartVec i z (j.succAbove k) • ((-(chartVec i z j ^ 2)⁻¹) •
-          (ContinuousLinearMap.proj j).comp (liftCLM i)) +
-        (chartVec i z j)⁻¹ • (ContinuousLinearMap.proj (j.succAbove k)).comp (liftCLM i)) z := by
+theorem hasFDerivAt_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
+    : HasFDerivAt (transition i j)
+      (ContinuousLinearMap.pi fun k =>
+        chartVec i z (j.succAbove k)
+            • ((-(chartVec i z j ^ 2)⁻¹) • (ContinuousLinearMap.proj j).comp (liftCLM i))
+          + (chartVec i z j)⁻¹ • (ContinuousLinearMap.proj (j.succAbove k)).comp (liftCLM i))
+      z := by
   have hc := hasFDerivAt_pi'.mp (hasFDerivAt_chartVec (N := N) i z)
-  have hfun : transition (N := N) i j =
-      fun w k => chartVec i w (j.succAbove k) * (chartVec i w j)⁻¹ := by
+  have hfun
+      : transition (N := N) i j = fun w k => chartVec i w (j.succAbove k) * (chartVec i w j)⁻¹ := by
     funext w k; rw [transition_apply, div_eq_mul_inv]
   rw [hfun]
   refine hasFDerivAt_pi.mpr fun k => ?_
@@ -152,19 +159,20 @@ lemma differentiableAt_transition (i j : Fin (N + 1)) {z : Fin N → ℂ}
     (hz : chartVec i z j ≠ 0) : DifferentiableAt ℂ (transition i j) z :=
   (hasFDerivAt_transition i j hz).differentiableAt
 
-theorem liftVec_fderiv_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
-    (ξ : Fin N → ℂ) :
-    liftVec j (fderiv ℂ (transition i j) z ξ) = (chartVec i z j)⁻¹ •
-      (liftVec i ξ + (-(liftVec i ξ j / chartVec i z j)) • chartVec i z) := by
+theorem liftVec_fderiv_transition
+    (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0) (ξ : Fin N → ℂ)
+    : liftVec j (fderiv ℂ (transition i j) z ξ)
+      = (chartVec i z j)⁻¹
+        • (liftVec i ξ + (-(liftVec i ξ j / chartVec i z j)) • chartVec i z) := by
   rw [(hasFDerivAt_transition i j hz).fderiv]
   funext m
   obtain rfl | ⟨k, rfl⟩ := Fin.eq_self_or_eq_succAbove j m
   · simp only [liftVec_self, Pi.smul_apply, Pi.add_apply, smul_eq_mul]
     field_simp
     ring
-  · simp only [liftVec_succAbove, ContinuousLinearMap.pi_apply, FunLike.coe_add,
-      FunLike.coe_smul, ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply,
-      liftCLM_apply, Pi.smul_apply, Pi.add_apply, smul_eq_mul]
+  · simp only [liftVec_succAbove, ContinuousLinearMap.pi_apply, FunLike.coe_add, FunLike.coe_smul,
+      ContinuousLinearMap.comp_apply, ContinuousLinearMap.proj_apply, liftCLM_apply, Pi.smul_apply,
+      Pi.add_apply, smul_eq_mul]
     field_simp
     ring
 
@@ -176,11 +184,11 @@ lemma chartVec_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec
   · simp only [chartVec_succAbove, transition_apply, Pi.smul_apply, smul_eq_mul]
     rw [div_eq_mul_inv, mul_comm]
 
-theorem chernForm_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
-    (ξ η : Fin N → ℂ) :
-    ∑ a, ∑ b, chernCoeff i z a b * ξ a * conj (η b) =
-      ∑ a, ∑ b, chernCoeff j (transition i j z) a b * fderiv ℂ (transition i j) z ξ a *
-        conj (fderiv ℂ (transition i j) z η b) := by
+theorem chernForm_transition
+    (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0) (ξ η : Fin N → ℂ)
+    : ∑ a, ∑ b, chernCoeff i z a b * ξ a * conj (η b)
+      = ∑ a, ∑ b, chernCoeff j (transition i j z) a b * fderiv ℂ (transition i j) z ξ a *
+          conj (fderiv ℂ (transition i j) z η b) := by
   rw [chernForm_eq_fsHerm, chernForm_eq_fsHerm, chartVec_transition i j hz,
     liftVec_fderiv_transition i j hz, liftVec_fderiv_transition i j hz,
     fsHerm_smul (inv_ne_zero hz), fsHerm_add_smul]
@@ -192,9 +200,10 @@ lemma fderiv_transition_single (i j : Fin (N + 1)) (z : Fin N → ℂ) (b a : Fi
     fderiv ℂ (transition i j) z (Pi.single b 1) a = transitionJac i j z a b := by
   simp [transitionJac, LinearMap.toMatrix'_apply]
 
-theorem chernCoeff_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0) :
-    chernCoeff i z = (transitionJac i j z)ᵀ * chernCoeff j (transition i j z) *
-      (transitionJac i j z).map conj := by
+theorem chernCoeff_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
+    : chernCoeff i z
+      = (transitionJac i j z)ᵀ * chernCoeff j (transition i j z)
+        * (transitionJac i j z).map conj := by
   ext b d
   have h := chernForm_transition i j hz (Pi.single b 1) (Pi.single d 1)
   simp only [fderiv_transition_single] at h
@@ -204,24 +213,23 @@ theorem chernCoeff_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : char
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => by ring
 
-theorem det_chernCoeff_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0) :
-    (chernCoeff i z).det =
-      (Complex.normSq (transitionJac i j z).det : ℂ) * (chernCoeff j (transition i j z)).det := by
+theorem det_chernCoeff_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
+    : (chernCoeff i z).det
+      = (Complex.normSq (transitionJac i j z).det : ℂ) * (chernCoeff j (transition i j z)).det := by
   rw [chernCoeff_transition i j hz, Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose,
     ← RingHom.mapMatrix_apply, ← RingHom.map_det, ← Complex.mul_conj]
   ring
 
-theorem det_fderiv_real_transition (i j : Fin (N + 1)) {z : Fin N → ℂ}
-    (hz : chartVec i z j ≠ 0) :
-    (fderiv ℝ (transition i j) z).det = Complex.normSq (transitionJac i j z).det := by
-  rw [((hasFDerivAt_transition i j hz).restrictScalars ℝ).fderiv, ← (hasFDerivAt_transition i j hz).fderiv,
-    ContinuousLinearMap.det, ContinuousLinearMap.coe_restrictScalars,
-    LinearMap.det_restrictScalars, Algebra.norm_complex_apply, transitionJac, LinearMap.det_toMatrix']
+theorem det_fderiv_real_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
+    : (fderiv ℝ (transition i j) z).det = Complex.normSq (transitionJac i j z).det := by
+  rw [((hasFDerivAt_transition i j hz).restrictScalars ℝ).fderiv,
+    ← (hasFDerivAt_transition i j hz).fderiv, ContinuousLinearMap.det,
+    ContinuousLinearMap.coe_restrictScalars, LinearMap.det_restrictScalars,
+    Algebra.norm_complex_apply, transitionJac, LinearMap.det_toMatrix']
 
-theorem fsVolumeDensity_transition (i j : Fin (N + 1)) {z : Fin N → ℂ}
-    (hz : chartVec i z j ≠ 0) :
-    fsVolumeDensity i z =
-      |(fderiv ℝ (transition i j) z).det| * fsVolumeDensity j (transition i j z) := by
+theorem fsVolumeDensity_transition (i j : Fin (N + 1)) {z : Fin N → ℂ} (hz : chartVec i z j ≠ 0)
+    : fsVolumeDensity i z
+      = |(fderiv ℝ (transition i j) z).det| * fsVolumeDensity j (transition i j z) := by
   rw [det_fderiv_real_transition i j hz, abs_of_nonneg (Complex.normSq_nonneg _), fsVolumeDensity,
     fsVolumeDensity, det_chernCoeff_transition i j hz, Complex.re_ofReal_mul]
   ring

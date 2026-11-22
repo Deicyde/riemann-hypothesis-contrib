@@ -16,9 +16,11 @@ open Formalism.TwoAdicCyclotomicDecomposition
 
 namespace Frob
 
-theorem frob_mul_inertia {S : Type*} [CommRing S] {G : Type*} [Group G] [MulSemiringAction G S]
-    [SMulCommClass G ℤ S] (Q : Ideal S) (ρ τ : G) (hρ : ρ ∈ Q.inertia G)
-    (hτ : IsArithFrobAt ℤ τ Q) : IsArithFrobAt ℤ (ρ * τ) Q := by
+theorem frob_mul_inertia
+    {S : Type*} [CommRing S]
+    {G : Type*} [Group G] [MulSemiringAction G S] [SMulCommClass G ℤ S]
+    (Q : Ideal S) (ρ τ : G) (hρ : ρ ∈ Q.inertia G) (hτ : IsArithFrobAt ℤ τ Q)
+    : IsArithFrobAt ℤ (ρ * τ) Q := by
   intro x
   have h1 : ρ • (τ • x) - τ • x ∈ Q := hρ (τ • x)
   have h2 := hτ x
@@ -73,8 +75,8 @@ theorem hostFrob_of (hGal : HostGalois) (hSpec : HostGalSpec) : HostFrob := by
     exact congrArg Subtype.val this
 
   let σ₀ : Gal(hostE ζ a b/ℚ) := τ.restrictNormal (hostE ζ a b)
-  have hσ₀ : ∀ x : hostE ζ a b, ((σ₀ x : hostE ζ a b) : L) = τ x :=
-    fun x => AlgEquiv.restrictNormal_commutes τ (hostE ζ a b) x
+  have hσ₀ : ∀ x : hostE ζ a b, ((σ₀ x : hostE ζ a b) : L) = τ x := fun x =>
+    AlgEquiv.restrictNormal_commutes τ (hostE ζ a b) x
   have hσ₀F : IsArithFrobAt ℤ σ₀ P := by
     intro x
     have hx := hτ (algebraMap (𝓞 (hostE ζ a b)) (𝓞 L) x)

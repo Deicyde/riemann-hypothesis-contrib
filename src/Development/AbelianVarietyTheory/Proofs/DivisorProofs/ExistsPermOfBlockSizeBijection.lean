@@ -6,15 +6,22 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.IsCu
 
 @[expose] public section
 
-open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
+open Formalism.L2.DIV GlobalTheory.FinGL GlobalTheory.Parabolic
+  GlobalTheory.IndefiniteRowSideFullHecke.BlockProductIsomorphism
 
 namespace GlobalTheory
 
-theorem exists_perm_of_block_bijection : ∀ (r : ℕ) (b b' : Fin r → ℕ) (R : ℕ → ℕ → Prop), (∀ c ∈ Set.range b, ∃! c', c' ∈ Set.range b' ∧ R c c') → (∀ c' ∈ Set.range b', ∃! c, c ∈ Set.range b ∧ R c c') → (∀ c ∈ Set.range b, ∀ c' ∈ Set.range b', R c c' → (block b c).card = (block b' c').card) → ∃ w : Equiv.Perm (Fin r), (∀ i, R (b i) (b' (w i))) ∧ ∀ i j : Fin r, b i = b j ↔ b' (w i) = b' (w j) := by
+theorem exists_perm_of_block_bijection
+    : ∀ (r : ℕ) (b b' : Fin r → ℕ) (R : ℕ → ℕ → Prop),
+      (∀ c ∈ Set.range b, ∃! c', c' ∈ Set.range b' ∧ R c c')
+        → (∀ c' ∈ Set.range b', ∃! c, c ∈ Set.range b ∧ R c c')
+        → (∀ c ∈ Set.range b, ∀ c' ∈ Set.range b', R c c' → (block b c).card = (block b' c').card)
+        → ∃ w : Equiv.Perm (Fin r),
+          (∀ i, R (b i) (b' (w i))) ∧ ∀ i j : Fin r, b i = b j ↔ b' (w i) = b' (w j) := by
   classical
   intro r b b' R h1 h2 h3
-  have h1' : ∀ i : Fin r, ∃ c', c' ∈ Set.range b' ∧ R (b i) c' :=
-    fun i => (h1 (b i) ⟨i, rfl⟩).exists
+  have h1' : ∀ i : Fin r, ∃ c', c' ∈ Set.range b' ∧ R (b i) c' := fun i =>
+    (h1 (b i) ⟨i, rfl⟩).exists
   choose f hf1 hf2 using h1'
   have hiff : ∀ i c c', c ∈ Set.range b → c' ∈ Set.range b' → R c c' → (f i = c' ↔ b i = c) := by
     intro i c c' hc hc' hR

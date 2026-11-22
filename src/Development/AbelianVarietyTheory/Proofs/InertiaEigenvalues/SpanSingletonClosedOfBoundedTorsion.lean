@@ -8,9 +8,9 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 namespace GlobalTheory.BSP
 
-private theorem span_sup_span_pow_succ_le {A : Type} [CommRing A] (p d : A) (k : ℕ) :
-    (Ideal.span {p} ⊔ Ideal.span {d}) ^ (k + 1) ≤
-      Ideal.span {p ^ (k + 1)} ⊔ Ideal.span {d} * (Ideal.span {p} ⊔ Ideal.span {d}) ^ k := by
+private theorem span_sup_span_pow_succ_le {A : Type} [CommRing A] (p d : A) (k : ℕ)
+    : (Ideal.span {p} ⊔ Ideal.span {d}) ^ (k + 1)
+      ≤ Ideal.span {p ^ (k + 1)} ⊔ Ideal.span {d} * (Ideal.span {p} ⊔ Ideal.span {d}) ^ k := by
   induction k with
   | zero => simp
   | succ k ih =>
@@ -18,11 +18,9 @@ private theorem span_sup_span_pow_succ_le {A : Type} [CommRing A] (p d : A) (k :
     refine (Ideal.mul_mono_right ih).trans ?_
     rw [Ideal.mul_sup, Ideal.sup_mul, Ideal.sup_mul]
     refine sup_le (sup_le ?_ ?_) (sup_le ?_ ?_)
-    ·
-      rw [Ideal.span_singleton_mul_span_singleton, ← pow_succ']
+    · rw [Ideal.span_singleton_mul_span_singleton, ← pow_succ']
       exact le_sup_left
-    ·
-      refine le_sup_of_le_right (Ideal.mul_mono_right ?_)
+    · refine le_sup_of_le_right (Ideal.mul_mono_right ?_)
       rw [← Ideal.span_singleton_pow]
       exact Ideal.pow_right_mono le_sup_left _
     · refine le_sup_of_le_right ?_
@@ -32,11 +30,12 @@ private theorem span_sup_span_pow_succ_le {A : Type} [CommRing A] (p d : A) (k :
       rw [pow_succ' _ k]
       exact Ideal.mul_mono_right (Ideal.mul_mono_left le_sup_right)
 
-private theorem div_cont {A : Type} [CommRing A] (p d : A) (N : ℕ) (hd : d ∈ nonZeroDivisors A)
+private theorem div_cont
+    {A : Type} [CommRing A]
+    (p d : A) (N : ℕ) (hd : d ∈ nonZeroDivisors A)
     (ht : ∀ (x : A) (m : ℕ), p ^ m * x ∈ Ideal.span {d} → p ^ N * x ∈ Ideal.span {d})
-    (n : ℕ) (z : A) (hz : d * z ∈ (Ideal.span {p} ⊔ Ideal.span {d}) ^ (2 * (n + N + 1))) :
-    z ∈ (Ideal.span {p} ⊔ Ideal.span {d}) ^ n := by
-
+    (n : ℕ) (z : A) (hz : d * z ∈ (Ideal.span {p} ⊔ Ideal.span {d}) ^ (2 * (n + N + 1)))
+    : z ∈ (Ideal.span {p} ⊔ Ideal.span {d}) ^ n := by
   have h1 := span_sup_span_pow_succ_le p d (2 * (n + N + 1) - 1)
   have e : 2 * (n + N + 1) - 1 + 1 = 2 * (n + N + 1) := by omega
   rw [e] at h1
@@ -60,30 +59,44 @@ private theorem div_cont {A : Type} [CommRing A] (p d : A) (N : ℕ) (hd : d ∈
   exact Ideal.pow_le_pow_right (by omega)
     (Ideal.pow_mem_pow (Ideal.mem_sup_left (Ideal.mem_span_singleton_self p)) _)
 
-theorem span_singleton_closed_of_bounded_torsion (l : ℕ) [Fact l.Prime] (A : Type) [CommRing A]
-    (d : A) (N : ℕ) (hd : d ∈ nonZeroDivisors A)
+theorem span_singleton_closed_of_bounded_torsion
+    (l : ℕ) [Fact l.Prime]
+    (A : Type) [CommRing A]
+    (d : A)
+    (N : ℕ)
+    (hd : d ∈ nonZeroDivisors A)
     (ht : ∀ (x : A) (m : ℕ), (l : A) ^ m * x ∈ Ideal.span {d} → (l : A) ^ N * x ∈ Ideal.span {d})
-    (hc : IsAdicComplete (Ideal.span {(l : A)} ⊔ Ideal.span {d}) A) (x : A)
-    (hx : ∀ n : ℕ, ∃ z, x - d * z ∈ (Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ n) :
-    x ∈ Ideal.span {d} := by
-  have hsm : ∀ n : ℕ, ((Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ n • ⊤ : Submodule A A) =
-      (Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ n := fun n => by
+    (hc : IsAdicComplete (Ideal.span {(l : A)} ⊔ Ideal.span {d}) A)
+    (x : A) (hx : ∀ n : ℕ, ∃ z, x - d * z ∈ (Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ n)
+    : x ∈ Ideal.span {d} := by
+  have hsm
+      : ∀ n : ℕ,
+        ((Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ n • ⊤ : Submodule A A)
+          = (Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ n := fun n => by
     rw [Ideal.smul_eq_mul, Ideal.mul_top]
   choose z hz using hx
 
-  have hcau : ∀ {m k : ℕ}, m ≤ k → z (2 * (m + N + 1)) - z (2 * (k + N + 1)) ∈
-      (Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ m := by
+  have hcau
+      : ∀ {m k : ℕ},
+        m ≤ k
+          → z (2 * (m + N + 1)) - z (2 * (k + N + 1))
+            ∈ (Ideal.span {(l : A)} ⊔ Ideal.span {d}) ^ m := by
     intro m k hmk
     apply div_cont (l : A) d N hd ht m
     have h1 := hz (2 * (m + N + 1))
-    have h2 := Ideal.pow_le_pow_right (I := Ideal.span {(l : A)} ⊔ Ideal.span {d})
-      (show 2 * (m + N + 1) ≤ 2 * (k + N + 1) by omega) (hz (2 * (k + N + 1)))
-    have e : d * (z (2 * (m + N + 1)) - z (2 * (k + N + 1))) =
-        (x - d * z (2 * (k + N + 1))) - (x - d * z (2 * (m + N + 1))) := by ring
+    have h2 :=
+      Ideal.pow_le_pow_right (I := Ideal.span {(l : A)} ⊔ Ideal.span {d})
+        (show 2 * (m + N + 1) ≤ 2 * (k + N + 1) by omega) (hz (2 * (k + N + 1)))
+    have e
+        : d * (z (2 * (m + N + 1)) - z (2 * (k + N + 1)))
+          = (x - d * z (2 * (k + N + 1))) - (x - d * z (2 * (m + N + 1))) := by
+      ring
     rw [e]
     exact Ideal.sub_mem _ h2 h1
-  obtain ⟨L, hL⟩ := hc.toIsPrecomplete.prec' (fun n => z (2 * (n + N + 1)))
-    (fun {m k} hmk => by rw [SModEq.sub_mem, hsm]; exact hcau hmk)
+  obtain ⟨L, hL⟩ :=
+    hc.toIsPrecomplete.prec'
+      (fun n => z (2 * (n + N + 1)))
+      (fun {m k} hmk => by rw [SModEq.sub_mem, hsm]; exact hcau hmk)
 
   have h0 : x - d * L = 0 := by
     apply hc.toIsHausdorff.haus'

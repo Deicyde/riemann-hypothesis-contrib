@@ -20,10 +20,12 @@ theorem orthogonality_of_mackey : OrthOfMackey := by
     unfold eig at hz
     have h1 := (Submodule.mem_iInf _).mp hz ⟨u, hu⟩
     rw [LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.smul_apply, LinearMap.id_apply,
-      sub_eq_zero] at h1
+        sub_eq_zero]
+      at h1
     exact h1
-  have hA : ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) (ρ u0 (ρ h z)) =
-      ((ψ u0 : 𝓞 K) : K) • S := by
+  have hA
+      : ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) (ρ u0 (ρ h z))
+        = ((ψ u0 : 𝓞 K) : K) • S := by
     rw [hS, Finset.smul_sum]
     refine Fintype.sum_equiv (Equiv.mulRight (⟨u0, hu0⟩ : U)) _ _ (fun u => ?_)
     simp only [Equiv.coe_mulRight, Subgroup.coe_mul, map_mul, Module.End.mul_apply, smul_smul]
@@ -34,8 +36,9 @@ theorem orthogonality_of_mackey : OrthOfMackey := by
       group
     rw [key]
     norm_cast
-  have hB : ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) (ρ u0 (ρ h z)) =
-      ((ψ (h⁻¹ * u0 * h) : 𝓞 K) : K) • S := by
+  have hB
+      : ∑ u : U, ((ψ ((u : P)⁻¹) : 𝓞 K) : K) • ρ (u : P) (ρ u0 (ρ h z))
+        = ((ψ (h⁻¹ * u0 * h) : 𝓞 K) : K) • S := by
     have e1 : ρ u0 (ρ h z) = ((ψ (h⁻¹ * u0 * h) : 𝓞 K) : K) • ρ h z := by
       have e2 : ρ u0 (ρ h z) = ρ h (ρ (h⁻¹ * u0 * h) z) := by
         rw [← Module.End.mul_apply, ← map_mul, ← Module.End.mul_apply, ← map_mul]

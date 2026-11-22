@@ -10,16 +10,17 @@ noncomputable section
 
 namespace GlobalTheory
 
-theorem lattice_hom_finite_image_of_trivial_on_multiples :
-    ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (G : Type) [Group G] (e : (Fin g → ℂ) → G) (N : ℕ),
-    DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤ → (∀ z w, e (z + w) = e z * e w) → 0 < N →
-    (∀ l ∈ Λ, e ((N : ℂ) • l) = 1) → (e '' (Λ : Set (Fin g → ℂ))).Finite := by
+theorem lattice_hom_finite_image_of_trivial_on_multiples
+    : ∀ (g : ℕ) (Λ : Submodule ℤ (Fin g → ℂ)) (G : Type) [Group G] (e : (Fin g → ℂ) → G) (N : ℕ),
+      DiscreteTopology Λ → Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+        → (∀ z w, e (z + w) = e z * e w) → 0 < N → (∀ l ∈ Λ, e ((N : ℂ) • l) = 1)
+        → (e '' (Λ : Set (Fin g → ℂ))).Finite := by
   intro g Λ G _ e N hd hspan hadd hN hker
   haveI := hd
   haveI : IsZLattice ℝ Λ := ⟨hspan⟩
   let b := Module.Free.chooseBasis ℤ Λ
-  let f : (Module.Free.ChooseBasisIndex ℤ Λ → Fin N) → G :=
-    fun a => e (∑ i, ((a i : ℕ) : ℤ) • ((b i : Λ) : Fin g → ℂ))
+  let f : (Module.Free.ChooseBasisIndex ℤ Λ → Fin N) → G := fun a =>
+    e (∑ i, ((a i : ℕ) : ℤ) • ((b i : Λ) : Fin g → ℂ))
   refine (Set.finite_range f).subset ?_
   rintro _ ⟨l, hl, rfl⟩
   set x : Λ := ⟨l, hl⟩ with hxdef
@@ -29,10 +30,11 @@ theorem lattice_hom_finite_image_of_trivial_on_multiples :
   refine ⟨fun i => ⟨(c i % (N : ℤ)).toNat, ?_⟩, ?_⟩
   · have h1 := Int.emod_lt_of_pos (c i) (by exact_mod_cast hN : (0 : ℤ) < N)
     omega
-  · have hl' : l = (N : ℂ) • ((q : Λ) : Fin g → ℂ) +
-        ∑ i, (((c i % (N : ℤ)).toNat : ℕ) : ℤ) • ((b i : Λ) : Fin g → ℂ) := by
-      have hx : l = ((∑ i, c i • b i : Λ) : Fin g → ℂ) := by
-        rw [b.sum_repr x]
+  · have hl'
+        : l
+          = (N : ℂ) • ((q : Λ) : Fin g → ℂ)
+            + ∑ i, (((c i % (N : ℤ)).toNat : ℕ) : ℤ) • ((b i : Λ) : Fin g → ℂ) := by
+      have hx : l = ((∑ i, c i • b i : Λ) : Fin g → ℂ) := by rw [b.sum_repr x]
       rw [hx]
       simp only [q, Submodule.coe_sum, Submodule.coe_smul, Finset.smul_sum]
       rw [← Finset.sum_add_distrib]

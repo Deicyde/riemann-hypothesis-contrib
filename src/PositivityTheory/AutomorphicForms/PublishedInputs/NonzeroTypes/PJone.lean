@@ -8,7 +8,8 @@ noncomputable section
 
 open scoped Classical
 
-open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel Matrix
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL ValuativeRel
+  Matrix
 
 namespace UpperTheory.TNZ
 
@@ -18,8 +19,7 @@ namespace Grp
 
 namespace P_Jone
 
-theorem inPow_zero (c : ℕ) : InPow c (0 : k) :=
-  ⟨0, zero_mem _, map_zero _⟩
+theorem inPow_zero (c : ℕ) : InPow c (0 : k) := ⟨0, zero_mem _, map_zero _⟩
 
 end P_Jone
 

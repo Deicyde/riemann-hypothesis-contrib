@@ -7,13 +7,21 @@ public import Development.EtaleCohomology.EtaleSheaves.BuildCut
 
 open CategoryTheory Limits AlgebraicGeometry TopologicalSpace LateralTheory.E.BuildCut
 
-theorem UpperTheory.isCompact_open_eq_basicOpen_idempotent_of_prodACF :
-    ∀ {W : Type} [CommRing W], ProdACF W → ∀ (V : Opens (PrimeSpectrum W)), IsCompact (V : Set (PrimeSpectrum W)) →
-        ∃ e : W, IsIdempotentElem e ∧ (V : Set (PrimeSpectrum W)) = (PrimeSpectrum.basicOpen e : Set (PrimeSpectrum W)) := by
+theorem UpperTheory.isCompact_open_eq_basicOpen_idempotent_of_prodACF
+    : ∀ {W : Type} [CommRing W],
+      ProdACF W
+        → ∀ (V : Opens (PrimeSpectrum W)),
+          IsCompact (V : Set (PrimeSpectrum W))
+            → ∃ e : W,
+              IsIdempotentElem e
+                ∧ (V : Set (PrimeSpectrum W))
+                  = (PrimeSpectrum.basicOpen e : Set (PrimeSpectrum W)) := by
   classical
   intro W _ hW V hV
-  have key : ∀ s : Finset W, ∃ e : W, IsIdempotentElem e ∧
-      ∀ p : PrimeSpectrum W, ((s : Set W) ⊆ (p.asIdeal : Set W) ↔ e ∈ p.asIdeal) := by
+  have key
+      : ∀ s : Finset W, ∃ e : W,
+        IsIdempotentElem e
+          ∧ ∀ p : PrimeSpectrum W, ((s : Set W) ⊆ (p.asIdeal : Set W) ↔ e ∈ p.asIdeal) := by
     intro s
     induction s using Finset.induction_on with
     | empty => exact ⟨0, IsIdempotentElem.zero, fun p => by simp [p.asIdeal.zero_mem]⟩

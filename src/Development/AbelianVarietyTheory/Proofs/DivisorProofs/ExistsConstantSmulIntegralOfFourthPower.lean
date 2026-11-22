@@ -13,8 +13,9 @@ set_option synthInstance.maxHeartbeats 400000
 noncomputable section
 namespace GlobalTheory.RuleIntegral
 
-theorem vLa_int_nonneg {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) {r : 𝓞 K}
-    (hr : (r : K) ≠ 0) : 0 ≤ vLa w (r : K) := by
+theorem vLa_int_nonneg
+    {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum (𝓞 K)) {r : 𝓞 K} (hr : (r : K) ≠ 0)
+    : 0 ≤ vLa w (r : K) := by
   unfold vLa
   have h1 := w.valuation_le_one (K := K) r
   have h2 : (w.valuation K) (r : K) ≠ 0 := (Valuation.ne_zero_iff _).mpr hr
@@ -41,14 +42,13 @@ theorem eq_zero_or_top_of_double {x : EReal} (hx : x ≠ ⊥) (h : x = x + x) : 
     have : r = 0 := by linarith
     simp [this]
 
-theorem exists_common_denom {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] (a : ι → K) :
-    ∃ s : 𝓞 K, (s : K) ≠ 0 ∧ ∀ i, ∃ r : 𝓞 K, (r : K) = (s : K) * a i := by
+theorem exists_common_denom {K : Type} [Field K] [NumberField K] {ι : Type} [Fintype ι] (a : ι → K)
+    : ∃ s : 𝓞 K, (s : K) ≠ 0 ∧ ∀ i, ∃ r : 𝓞 K, (r : K) = (s : K) * a i := by
   classical
   have h := fun i => IsLocalization.exists_integer_multiple (nonZeroDivisors (𝓞 K)) (a i)
   choose d hd using h
   refine ⟨∏ i, (d i : 𝓞 K), ?_, fun i => ?_⟩
-  · have hm : (∏ i, (d i : 𝓞 K)) ∈ nonZeroDivisors (𝓞 K) :=
-      Submonoid.prod_mem _ fun i _ => (d i).2
+  · have hm : (∏ i, (d i : 𝓞 K)) ∈ nonZeroDivisors (𝓞 K) := Submonoid.prod_mem _ fun i _ => (d i).2
     exact IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors hm
   · obtain ⟨r, hr⟩ := hd i
     refine ⟨(∏ j ∈ Finset.univ.erase i, (d j : 𝓞 K)) * r, ?_⟩
@@ -57,11 +57,14 @@ theorem exists_common_denom {K : Type} [Field K] [NumberField K] {ι : Type} [Fi
     rw [e1, e1, map_mul, map_mul, hr, Algebra.smul_def]
     ring
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l}
 
-theorem exists_idem_zero {w : HeightOneSpectrum (𝓞 c.F)} {v : Rul Xo c → EReal}
-    (hv : v ∈ valSet Xo c (algCls Xo c) w) : ∃ Z, v (GlobalTheory.FlatLine.idem Z) = 0 := by
+theorem exists_idem_zero
+    {w : HeightOneSpectrum (𝓞 c.F)} {v : Rul Xo c → EReal} (hv : v ∈ valSet Xo c (algCls Xo c) w)
+    : ∃ Z, v (GlobalTheory.FlatLine.idem Z) = 0 := by
   obtain ⟨y, rfl⟩ := hv
   have h1 : vAtV y 1 = 0 := by
     rcases y with ⟨q, T, io, e, ho, y, hy, eta, heta, rfl⟩
@@ -94,7 +97,17 @@ theorem exists_idem_zero {w : HeightOneSpectrum (𝓞 c.F)} {v : Rul Xo c → ER
   rw [h2] at h1
   exact EReal.top_ne_zero h1
 
-theorem exists_smul_nonneg : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (K ρ : Rul Xo c) (a : Comp Xo c → c.F), (∀ Z, a Z ≠ 0) → (∀ Z, GlobalTheory.FlatLine.idem Z * ρ ^ 4 = a Z • (GlobalTheory.FlatLine.idem Z * K)) → (∀ (w : HeightOneSpectrum (𝓞 c.F)), ∀ v ∈ valSet Xo c (algCls Xo c) w, 0 ≤ v K) → ∃ t : c.F, t ≠ 0 ∧ ∀ (w : HeightOneSpectrum (𝓞 c.F)), ∀ v ∈ valSet Xo c (algCls Xo c) w, 0 ≤ v (t • ρ) := by
+theorem exists_smul_nonneg
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H)
+        (Xo : Moduli Dw l) (c : Coeff l) (K ρ : Rul Xo c) (a : Comp Xo c → c.F),
+      (∀ Z, a Z ≠ 0)
+        → (∀ Z, GlobalTheory.FlatLine.idem Z * ρ ^ 4 = a Z • (GlobalTheory.FlatLine.idem Z * K))
+        → (∀ (w : HeightOneSpectrum (𝓞 c.F)), ∀ v ∈ valSet Xo c (algCls Xo c) w, 0 ≤ v K)
+        → ∃ t : c.F,
+          t ≠ 0
+            ∧ ∀ (w : HeightOneSpectrum (𝓞 c.F)), ∀ v ∈ valSet Xo c (algCls Xo c) w,
+              0 ≤ v (t • ρ) := by
   intro E _ _ _ H Dw l Xo c K ρ a ha hρ hK
   haveI := CompFin.finite_comp Xo c
   haveI := Fintype.ofFinite (Comp Xo c)
@@ -107,15 +120,19 @@ theorem exists_smul_nonneg : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
   have hb : (((s ^ 3 * r : 𝓞 c.F)) : c.F) = (s : c.F) ^ 4 * a Z := by
     have hr' : algebraMap (𝓞 c.F) c.F r = algebraMap (𝓞 c.F) c.F s * a Z := hr
     show algebraMap (𝓞 c.F) c.F (s ^ 3 * r) = (algebraMap (𝓞 c.F) c.F s) ^ 4 * a Z
-    rw [map_mul, map_pow, hr']; ring
+    rw [map_mul, map_pow, hr']
+    ring
   have hb0 : (((s ^ 3 * r : 𝓞 c.F)) : c.F) ≠ 0 := by
     rw [hb]; exact mul_ne_zero (pow_ne_zero _ hs0) (ha Z)
-  have hid : GlobalTheory.FlatLine.idem Z * ((s : c.F) • ρ) ^ 4 =
-      (((s ^ 3 * r : 𝓞 c.F)) : c.F) • (GlobalTheory.FlatLine.idem Z * K) := by
+  have hid
+      : GlobalTheory.FlatLine.idem Z * ((s : c.F) • ρ) ^ 4
+        = (((s ^ 3 * r : 𝓞 c.F)) : c.F) • (GlobalTheory.FlatLine.idem Z * K) := by
     rw [smul_pow, mul_smul_comm, hρ Z, smul_smul, hb]
   have h4 : ∀ x : Rul Xo c, x ^ 4 = x * x * x * x := fun x => by ring
   have e := congrArg (vAtV y) hid
-  rw [h4, vAtV_mul, vAtV_mul, vAtV_mul, vAtV_mul, vAtV_smul _ _ _ hb0, vAtV_mul, hZ, zero_add, zero_add] at e
+  rw [h4, vAtV_mul, vAtV_mul, vAtV_mul, vAtV_mul, vAtV_smul _ _ _ hb0, vAtV_mul, hZ, zero_add,
+      zero_add]
+    at e
   refine nonneg_of_four (vAtV_ne_bot _ _) ?_
   rw [e]
   refine add_nonneg ?_ hKv

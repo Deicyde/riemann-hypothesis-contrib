@@ -14,11 +14,12 @@ open MvPolynomial Filter Topology Matrix ComplexSets
 noncomputable section
 
 def NormalDoublePointsGeneric.Statement : Prop :=
-  ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (u : Fin n → ℂ) (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J),
-    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) → linForm u ∉ J →
-      ∃ I : Ideal (MvPolynomial (Fin n) ℂ), J ⊔ Ideal.span {linForm u} ≤ I ∧
-        ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ I) < (d : ℕ) ∧
-        ∀ q ∈ zeroSet J, linEval u q = 0 → q ∉ zeroSet I → NormalDoublePointsOnDivisor M u q
+  ∀ (n d : ℕ) (J : Ideal (MvPolynomial (Fin n) ℂ)) (u : Fin n → ℂ)
+      (M : IndefiniteRowSideFullHecke.ComplexSets.NormalModel J),
+    J.IsPrime → ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ J) = (d + 1 : ℕ) → linForm u ∉ J
+      → ∃ I : Ideal (MvPolynomial (Fin n) ℂ),
+        J ⊔ Ideal.span {linForm u} ≤ I ∧ ringKrullDim (MvPolynomial (Fin n) ℂ ⧸ I) < (d : ℕ)
+          ∧ ∀ q ∈ zeroSet J, linEval u q = 0 → q ∉ zeroSet I → NormalDoublePointsOnDivisor M u q
 
 end
 

@@ -48,41 +48,43 @@ theorem exists_mem_sub_one {I : Ideal R} (h : IsCoprime I m) : ∃ a ∈ I, a - 
   exact m.neg_mem hj
 
 theorem isCoprime_span {a : R} (ha : a - 1 ∈ m) : IsCoprime (Ideal.span {a}) m := by
-  refine Ideal.isCoprime_iff_exists.2 ⟨a, Ideal.mem_span_singleton_self a, -(a - 1), m.neg_mem ha, ?_⟩
+  refine Ideal.isCoprime_iff_exists.2
+    ⟨a, Ideal.mem_span_singleton_self a, -(a - 1), m.neg_mem ha, ?_⟩
   ring
 
-theorem Rel.refl (I : Ideal R) : Rel m I I :=
-  ⟨1, 1, by simp, by simp, rfl⟩
+theorem Rel.refl (I : Ideal R) : Rel m I I := ⟨1, 1, by simp, by simp, rfl⟩
 
 theorem Rel.symm {I J : Ideal R} (h : Rel m I J) : Rel m J I := by
   obtain ⟨a, b, ha, hb, e⟩ := h
   exact ⟨b, a, hb, ha, e.symm⟩
 
-theorem Rel.mul {I J I' J' : Ideal R} (h : Rel m I J) (h' : Rel m I' J') : Rel m (I * I') (J * J') := by
+theorem Rel.mul {I J I' J' : Ideal R} (h : Rel m I J) (h' : Rel m I' J')
+    : Rel m (I * I') (J * J') := by
   obtain ⟨a, b, ha, hb, e⟩ := h
   obtain ⟨a', b', ha', hb', e'⟩ := h'
   refine ⟨a * a', b * b', mul_sub_one_mem ha ha', mul_sub_one_mem hb hb', ?_⟩
-  calc Ideal.span {a * a'} * (I * I') = (Ideal.span {a} * I) * (Ideal.span {a'} * I') := by
-        rw [← Ideal.span_singleton_mul_span_singleton]; ring
+  calc
+    Ideal.span {a * a'} * (I * I') = (Ideal.span {a} * I) * (Ideal.span {a'} * I') := by
+      rw [← Ideal.span_singleton_mul_span_singleton]; ring
     _ = (Ideal.span {b} * J) * (Ideal.span {b'} * J') := by rw [e, e']
-    _ = Ideal.span {b * b'} * (J * J') := by
-        rw [← Ideal.span_singleton_mul_span_singleton]; ring
+    _ = Ideal.span {b * b'} * (J * J') := by rw [← Ideal.span_singleton_mul_span_singleton]; ring
 
 theorem Rel.trans {I J L : Ideal R} (h : Rel m I J) (h' : Rel m J L) : Rel m I L := by
   obtain ⟨a, b, ha, hb, e⟩ := h
   obtain ⟨c, d, hc, hd, e'⟩ := h'
   refine ⟨a * c, b * d, mul_sub_one_mem ha hc, mul_sub_one_mem hb hd, ?_⟩
-  calc Ideal.span {a * c} * I = Ideal.span {c} * (Ideal.span {a} * I) := by
-        rw [← Ideal.span_singleton_mul_span_singleton]; ring
+  calc
+    Ideal.span {a * c} * I = Ideal.span {c} * (Ideal.span {a} * I) := by
+      rw [← Ideal.span_singleton_mul_span_singleton]; ring
     _ = Ideal.span {c} * (Ideal.span {b} * J) := by rw [e]
     _ = Ideal.span {b} * (Ideal.span {c} * J) := by ring
     _ = Ideal.span {b} * (Ideal.span {d} * L) := by rw [e']
-    _ = Ideal.span {b * d} * L := by
-        rw [← Ideal.span_singleton_mul_span_singleton]; ring
+    _ = Ideal.span {b * d} * L := by rw [← Ideal.span_singleton_mul_span_singleton]; ring
 
-theorem exists_good {I J : Ideal R} (hI : IsCoprime I m) (hJ : IsCoprime J m) {x y : R} (hy : y ≠ 0)
-    (h : Ideal.span {x} * I = Ideal.span {y} * J) :
-    ∃ b : R, IsCoprime (Ideal.span {b}) m ∧ Rel m I (Ideal.span {b} * J) := by
+theorem exists_good
+    {I J : Ideal R} (hI : IsCoprime I m) (hJ : IsCoprime J m)
+    {x y : R} (hy : y ≠ 0) (h : Ideal.span {x} * I = Ideal.span {y} * J)
+    : ∃ b : R, IsCoprime (Ideal.span {b}) m ∧ Rel m I (Ideal.span {b} * J) := by
   obtain ⟨j, hj, hj1⟩ := exists_mem_sub_one hJ
   have hyj : y * j ∈ Ideal.span {x} := by
     have hm : y * j ∈ Ideal.span {y} * J := Ideal.mul_mem_mul (Ideal.mem_span_singleton_self y) hj
@@ -99,14 +101,24 @@ theorem exists_good {I J : Ideal R} (hI : IsCoprime I m) (hJ : IsCoprime J m) {x
       have h1 : -(0 - 1 : R) ∈ m := m.neg_mem hj1
       simpa using h1
     subst htop
-    refine ⟨0, Ideal.isCoprime_iff_sup_eq.2 (sup_top_eq _), 0, 0, Submodule.mem_top, Submodule.mem_top, ?_⟩
+    refine ⟨
+      0,
+      Ideal.isCoprime_iff_sup_eq.2 (sup_top_eq _),
+      0,
+      0,
+      Submodule.mem_top,
+      Submodule.mem_top,
+      ?_
+    ⟩
     rw [Ideal.span_singleton_eq_bot.2 rfl, Ideal.bot_mul, Ideal.bot_mul]
   · have key : Ideal.span {j} * I = Ideal.span {b} * J := by
       have hx' : Ideal.span {x} ≠ 0 := by
         rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
         exact hx
       apply mul_left_cancel₀ hx'
-      calc Ideal.span {x} * (Ideal.span {j} * I) = Ideal.span {j} * (Ideal.span {x} * I) := by ring
+      calc
+        Ideal.span {x} * (Ideal.span {j} * I)
+          = Ideal.span {j} * (Ideal.span {x} * I) := by ring
         _ = Ideal.span {j} * (Ideal.span {y} * J) := by rw [h]
         _ = Ideal.span {y * j} * J := by rw [← Ideal.span_singleton_mul_span_singleton]; ring
         _ = Ideal.span {x} * (Ideal.span {b} * J) := by
@@ -118,8 +130,8 @@ theorem exists_good {I J : Ideal R} (hI : IsCoprime I m) (hJ : IsCoprime J m) {x
     · rw [Ideal.span_singleton_one, Ideal.top_mul]
       exact key
 
-theorem rel_span {b c : R} (hb : IsCoprime (Ideal.span {b}) m) (h : b - c ∈ m) :
-    Rel m (Ideal.span {b}) (Ideal.span {c}) := by
+theorem rel_span {b c : R} (hb : IsCoprime (Ideal.span {b}) m) (h : b - c ∈ m)
+    : Rel m (Ideal.span {b}) (Ideal.span {c}) := by
   obtain ⟨i, hi, j, hj, hij⟩ := Ideal.isCoprime_iff_exists.1 hb
   obtain ⟨u, rfl⟩ := Ideal.mem_span_singleton'.1 hi
   have hu : u * b - 1 ∈ m := by
@@ -137,17 +149,19 @@ end General
 
 variable {K : Type} [Field K] [NumberField K] {𝔮 : Ideal (𝓞 K)}
 
-theorem mem_principalRay_of_eq {I J : Ideal (𝓞 K)} (hI0 : I ≠ ⊥) (hJ0 : J ≠ ⊥) {a b : 𝓞 K} (ha : a ≠ 0) (hb : b ≠ 0)
-    (ha1 : a - 1 ∈ 𝔮) (hb1 : b - 1 ∈ 𝔮) (h : Ideal.span {a} * I = Ideal.span {b} * J) :
-    (idealUnit I hI0)⁻¹ * idealUnit J hJ0 ∈ rayP 𝔮 := by
+theorem mem_principalRay_of_eq
+    {I J : Ideal (𝓞 K)} (hI0 : I ≠ ⊥) (hJ0 : J ≠ ⊥)
+    {a b : 𝓞 K} (ha : a ≠ 0) (hb : b ≠ 0) (ha1 : a - 1 ∈ 𝔮) (hb1 : b - 1 ∈ 𝔮)
+    (h : Ideal.span {a} * I = Ideal.span {b} * J)
+    : (idealUnit I hI0)⁻¹ * idealUnit J hJ0 ∈ rayP 𝔮 := by
   refine (mem_principalRay_iff 𝔮 _).2 ⟨a, b, ha, hb, ha1, hb1, ?_⟩
   rw [mul_assoc, inv_mul_eq_iff_eq_mul]
   apply Units.ext
   simp only [Units.val_mul, coe_idealUnit]
   rw [← FractionalIdeal.coeIdeal_mul, ← FractionalIdeal.coeIdeal_mul, mul_comm J, mul_comm I, h]
 
-theorem exists_integral (h𝔮 : 𝔮 ≠ ⊥) (x : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (hx : x ∈ rayI 𝔮) :
-    ∃ (I : Ideal (𝓞 K)) (hI0 : I ≠ ⊥), IsCoprime I 𝔮 ∧ (idealUnit I hI0)⁻¹ * x ∈ rayP 𝔮 := by
+theorem exists_integral (h𝔮 : 𝔮 ≠ ⊥) (x : (FractionalIdeal (𝓞 K)⁰ K)ˣ) (hx : x ∈ rayI 𝔮)
+    : ∃ (I : Ideal (𝓞 K)) (hI0 : I ≠ ⊥), IsCoprime I 𝔮 ∧ (idealUnit I hI0)⁻¹ * x ∈ rayP 𝔮 := by
   unfold rayI at hx
   induction hx using Subgroup.closure_induction with
   | mem x hx =>
@@ -207,16 +221,22 @@ theorem exists_integral (h𝔮 : 𝔮 ≠ ⊥) (x : (FractionalIdeal (𝓞 K)⁰
     convert key using 1
     rw [hS, mul_inv, mul_inv, inv_inv, mul_mul_mul_comm, inv_mul_cancel, one_mul]
 
-theorem exists_injective (h𝔮 : 𝔮 ≠ ⊥) :
-    ∃ F : (rayI 𝔮 ⧸ (rayP 𝔮).subgroupOf (rayI 𝔮)) → ClassGroup (𝓞 K) × (𝓞 K ⧸ 𝔮), Function.Injective F := by
-  have H1 : ∀ ξ : rayI 𝔮 ⧸ (rayP 𝔮).subgroupOf (rayI 𝔮), ∃ (I : Ideal (𝓞 K)) (hI0 : I ≠ ⊥),
-      IsCoprime I 𝔮 ∧ (idealUnit I hI0)⁻¹ * (ξ.out : (FractionalIdeal (𝓞 K)⁰ K)ˣ) ∈ rayP 𝔮 :=
+theorem exists_injective (h𝔮 : 𝔮 ≠ ⊥)
+    : ∃ F : (rayI 𝔮 ⧸ (rayP 𝔮).subgroupOf (rayI 𝔮)) → ClassGroup (𝓞 K) × (𝓞 K ⧸ 𝔮),
+      Function.Injective F := by
+  have H1
+      : ∀ ξ : rayI 𝔮 ⧸ (rayP 𝔮).subgroupOf (rayI 𝔮), ∃ (I : Ideal (𝓞 K)) (hI0 : I ≠ ⊥),
+        IsCoprime I 𝔮 ∧ (idealUnit I hI0)⁻¹ * (ξ.out : (FractionalIdeal (𝓞 K)⁰ K)ˣ) ∈ rayP 𝔮 :=
     fun ξ => exists_integral h𝔮 _ ξ.out.2
   choose I hI0 hIc hIr using H1
-  obtain ⟨c, hc⟩ : ∃ c : rayI 𝔮 ⧸ (rayP 𝔮).subgroupOf (rayI 𝔮) → ClassGroup (𝓞 K),
-      ∀ ξ, c ξ = ClassGroup.mk0 ⟨I ξ, mem_nonZeroDivisors_of_ne_zero (hI0 ξ)⟩ := ⟨_, fun _ => rfl⟩
-  have H2 : ∀ ξ, ∃ b : 𝓞 K, IsCoprime (Ideal.span {b}) 𝔮 ∧
-      Rel 𝔮 (I ξ) (Ideal.span {b} * I (Function.invFun c (c ξ))) := by
+  obtain ⟨c, hc⟩
+      : ∃ c : rayI 𝔮 ⧸ (rayP 𝔮).subgroupOf (rayI 𝔮) → ClassGroup (𝓞 K), ∀ ξ,
+        c ξ = ClassGroup.mk0 ⟨I ξ, mem_nonZeroDivisors_of_ne_zero (hI0 ξ)⟩ :=
+    ⟨_, fun _ => rfl⟩
+  have H2
+      : ∀ ξ, ∃ b : 𝓞 K,
+        IsCoprime (Ideal.span {b}) 𝔮
+          ∧ Rel 𝔮 (I ξ) (Ideal.span {b} * I (Function.invFun c (c ξ))) := by
     intro ξ
     obtain ⟨ξ0, hξ0⟩ : ∃ ξ0, ξ0 = Function.invFun c (c ξ) := ⟨_, rfl⟩
     have e : c ξ0 = c ξ := hξ0 ▸ Function.invFun_eq (f := c) ⟨ξ, rfl⟩
@@ -242,14 +262,16 @@ theorem exists_injective (h𝔮 : 𝔮 ≠ ⊥) :
       obtain ⟨a, a', ha, ha', e⟩ := R
       exact mem_principalRay_of_eq (hI0 ξ) (hI0 η) (ne_zero_of_sub_one_mem htop ha)
         (ne_zero_of_sub_one_mem htop ha') ha ha' e
-  rw [← QuotientGroup.out_eq' ξ, ← QuotientGroup.out_eq' η, QuotientGroup.eq, Subgroup.mem_subgroupOf]
+  rw [← QuotientGroup.out_eq' ξ, ← QuotientGroup.out_eq' η, QuotientGroup.eq,
+    Subgroup.mem_subgroupOf]
   have key := mul_mem (mul_mem (inv_mem (hIr ξ)) hq) (hIr η)
   convert key using 1
   simp only [Subgroup.coe_mul, Subgroup.coe_inv]
   group
 
-theorem rayNo_bounds : ∀ (K : Type) [Field K] [NumberField K] (𝔮 : Ideal (𝓞 K)), 𝔮 ≠ ⊥ →
-    1 ≤ rayNo 𝔮 ∧ rayNo 𝔮 ≤ classNumber K * Ideal.absNorm 𝔮 ∧ rayP 𝔮 ≤ rayI 𝔮 := by
+theorem rayNo_bounds
+    : ∀ (K : Type) [Field K] [NumberField K] (𝔮 : Ideal (𝓞 K)),
+      𝔮 ≠ ⊥ → 1 ≤ rayNo 𝔮 ∧ rayNo 𝔮 ≤ classNumber K * Ideal.absNorm 𝔮 ∧ rayP 𝔮 ≤ rayI 𝔮 := by
   intro K _ _ 𝔮 h𝔮
   have : Finite (𝓞 K ⧸ 𝔮) := Ideal.finiteQuotientOfFreeOfNeBot 𝔮 h𝔮
   obtain ⟨F, hF⟩ := exists_injective h𝔮
@@ -259,7 +281,9 @@ theorem rayNo_bounds : ∀ (K : Type) [Field K] [NumberField K] (𝔮 : Ideal (�
   · rw [hno]
     exact Nat.card_pos
   · rw [hno]
-    calc Nat.card _ ≤ Nat.card (ClassGroup (𝓞 K) × (𝓞 K ⧸ 𝔮)) := Nat.card_le_card_of_injective F hF
+    calc
+      Nat.card _
+        ≤ Nat.card (ClassGroup (𝓞 K) × (𝓞 K ⧸ 𝔮)) := Nat.card_le_card_of_injective F hF
       _ = classNumber K * Ideal.absNorm 𝔮 := by
         rw [Nat.card_prod, Ideal.absNorm_apply, Submodule.cardQuot_apply, classNumber,
           Nat.card_eq_fintype_card]

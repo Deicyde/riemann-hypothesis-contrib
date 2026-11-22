@@ -9,8 +9,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.IsCplAt.flat :
-    ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (p : Ideal R) (B : Type) [CommRing B] [IsLocalRing B] [Algebra R B], IsCplAt R p B → Module.Flat R B := by
+theorem UpperTheory.V.AlgebraTools.IsCplAt.flat
+    : ∀ (R : Type) [CommRing R] [IsNoetherianRing R] (p : Ideal R) (B : Type) [CommRing B]
+        [IsLocalRing B] [Algebra R B],
+      IsCplAt R p B → Module.Flat R B := by
   intro R _ _ p B _ _ _ h
   haveI := h.isPrime
   haveI : Module.Flat (Localization.AtPrime p) (CplAt R p) := AdicCompletion.flat_of_isNoetherian _

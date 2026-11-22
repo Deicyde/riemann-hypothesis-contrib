@@ -8,14 +8,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CohomologyCo
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.RingContH
 
-theorem main : ∀ (R : Type) [CommRing R] (F : Shv R), Finitary F → ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D), IsColimit c → ∀ n : ℤ, (∀ x : H R (sp c.pt) F n, ∃ j y, pull R (spMap (c.ι.app j).hom) F n y = x) ∧ ∀ j (y : H R (sp (D.obj j)) F n), pull R (spMap (c.ι.app j).hom) F n y = 0 → ∃ (k : J) (f : j ⟶ k), pull R (spMap (D.map f).hom) F n y = 0 := by
+theorem main
+    : ∀ (R : Type) [CommRing R] (F : Shv R),
+      Finitary F
+        → ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D),
+          IsColimit c
+            → ∀ n : ℤ,
+              (∀ x : H R (sp c.pt) F n, ∃ j y, pull R (spMap (c.ι.app j).hom) F n y = x)
+                ∧ ∀ j (y : H R (sp (D.obj j)) F n),
+                  pull R (spMap (c.ι.app j).hom) F n y = 0
+                    → ∃ (k : J) (f : j ⟶ k), pull R (spMap (D.map f).hom) F n y = 0 := by
   intro R _ F hF J _ _ D c hc n
   obtain ⟨_, cl, hsurj, heq, hzero, hpull⟩ := GlobalTheory.EtC.HCElements.main R F
-  obtain ⟨h1, h2⟩ := GlobalTheory.T.ringCohomologyComplex_continuous_filtered_colimit R F hF J D c hc n
+  obtain ⟨h1, h2⟩ :=
+    GlobalTheory.T.ringCohomologyComplex_continuous_filtered_colimit R F hF J D c hc n
   refine ⟨fun x => ?_, fun j y hy => ?_⟩
   · obtain ⟨z, hz, rfl⟩ := hsurj (sp c.pt) n x
     obtain ⟨j, w, y, hw, hwy⟩ := h1 z hz

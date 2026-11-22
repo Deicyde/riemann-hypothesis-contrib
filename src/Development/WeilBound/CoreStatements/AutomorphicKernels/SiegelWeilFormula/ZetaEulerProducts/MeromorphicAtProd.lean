@@ -18,8 +18,11 @@ variable {f g : ℂ → ℂ} {x : ℂ} {k l m n : ℕ}
 
 theorem PO.mono (h : PO f x k) (hk : k ≤ l) : PO f x l := by
   obtain ⟨H, hH, hev⟩ := h
-  refine ⟨fun s => (s - x) ^ (l - k) * H s,
-    ((analyticAt_id.sub analyticAt_const).fun_pow _).fun_mul hH, ?_⟩
+  refine ⟨
+    fun s => (s - x) ^ (l - k) * H s,
+    ((analyticAt_id.sub analyticAt_const).fun_pow _).fun_mul hH,
+    ?_
+  ⟩
   filter_upwards [hev] with s hs
   rw [hs, ← mul_assoc, ← pow_add, Nat.sub_add_cancel hk]
 
@@ -34,8 +37,9 @@ theorem PO.mul (hf : PO f x k) (hg : PO g x l) : PO (fun s => f s * g s) x (k + 
 theorem PO.of_analytic (hf : AnalyticAt ℂ f x) : PO f x 0 :=
   ⟨f, hf, Filter.Eventually.of_forall fun s => by rw [pow_zero, one_mul]⟩
 
-theorem PO.prod {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (K : ι → ℕ) (h : ∀ i ∈ t, PO (F i) x (K i)) :
-    PO (fun s => ∏ i ∈ t, F i s) x (∑ i ∈ t, K i) := by
+theorem PO.prod
+    {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (K : ι → ℕ) (h : ∀ i ∈ t, PO (F i) x (K i))
+    : PO (fun s => ∏ i ∈ t, F i s) x (∑ i ∈ t, K i) := by
   classical
   revert h
   refine Finset.induction_on t ?_ ?_
@@ -44,14 +48,12 @@ theorem PO.prod {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (K : ι �
     exact PositivityTheory.Lord.PO.of_analytic analyticAt_const
   · intro a t ha ih h
     simp only [Finset.prod_insert ha, Finset.sum_insert ha]
-    exact (h a (Finset.mem_insert_self a t)).mul
-      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    exact (h a (Finset.mem_insert_self a t)).mul (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
 theorem ZO.inv (hf : ZO f x m) : PO (fun s => (f s)⁻¹) x m := by
   obtain ⟨u, hu, hux, hev⟩ := hf
   refine ⟨fun s => (u s)⁻¹, hu.fun_inv hux, ?_⟩
-  have hne : ∀ᶠ s in 𝓝[≠] x, u s ≠ 0 :=
-    nhdsWithin_le_nhds (hu.continuousAt.eventually_ne hux)
+  have hne : ∀ᶠ s in 𝓝[≠] x, u s ≠ 0 := nhdsWithin_le_nhds (hu.continuousAt.eventually_ne hux)
   filter_upwards [hev, hne, self_mem_nhdsWithin] with s hs hus hsx
   have hsx' : s - x ≠ 0 := sub_ne_zero.mpr (Set.mem_compl_singleton_iff.mp hsx)
   rw [hs, mul_inv, ← mul_assoc, mul_inv_cancel₀ (pow_ne_zero _ hsx'), one_mul]
@@ -79,8 +81,9 @@ theorem ZO.congr (hf : ZO f x m) (h : ∀ᶠ s in 𝓝[≠] x, f s = g s) : ZO g
   filter_upwards [hev, h] with s h1 h2
   rw [← h2, h1]
 
-theorem ZO.prod {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (K : ι → ℕ) (h : ∀ i ∈ t, ZO (F i) x (K i)) :
-    ZO (fun s => ∏ i ∈ t, F i s) x (∑ i ∈ t, K i) := by
+theorem ZO.prod
+    {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (K : ι → ℕ) (h : ∀ i ∈ t, ZO (F i) x (K i))
+    : ZO (fun s => ∏ i ∈ t, F i s) x (∑ i ∈ t, K i) := by
   classical
   revert h
   refine Finset.induction_on t ?_ ?_
@@ -89,19 +92,23 @@ theorem ZO.prod {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (K : ι �
     exact PositivityTheory.Lord.ZO.of_analytic analyticAt_const one_ne_zero
   · intro a t ha ih h
     simp only [Finset.prod_insert ha, Finset.sum_insert ha]
-    exact (h a (Finset.mem_insert_self a t)).mul
-      (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
+    exact (h a (Finset.mem_insert_self a t)).mul (ih fun i hi => h i (Finset.mem_insert_of_mem hi))
 
 theorem ZO.one_of_deriv (hf : AnalyticAt ℂ f x) (h0 : f x = 0) (hd : deriv f x ≠ 0) : ZO f x 1 := by
   obtain ⟨p, hp⟩ := hf
-  refine ⟨dslope f x, ⟨_, hp.has_fpower_series_dslope_fslope⟩, by rwa [dslope_same],
-    Filter.Eventually.of_forall fun s => ?_⟩
+  refine ⟨
+    dslope f x,
+    ⟨_, hp.has_fpower_series_dslope_fslope⟩,
+    by rwa [dslope_same],
+    Filter.Eventually.of_forall fun s => ?_
+  ⟩
   have h := sub_smul_dslope f x s
   rw [smul_eq_mul, h0, sub_zero] at h
   rw [pow_one, h]
 
-theorem meromorphicAt_prod {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (h : ∀ i ∈ t, MeromorphicAt (F i) x) :
-    MeromorphicAt (fun s => ∏ i ∈ t, F i s) x := by
+theorem meromorphicAt_prod
+    {ι : Type*} (t : Finset ι) (F : ι → ℂ → ℂ) (h : ∀ i ∈ t, MeromorphicAt (F i) x)
+    : MeromorphicAt (fun s => ∏ i ∈ t, F i s) x := by
   classical
   revert h
   refine Finset.induction_on t ?_ ?_

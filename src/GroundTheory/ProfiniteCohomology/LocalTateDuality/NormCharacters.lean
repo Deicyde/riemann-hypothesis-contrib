@@ -16,13 +16,14 @@ namespace GroundTheory.ProfCoh
 
 open IntermediateField GroundTheory.LocalField
 
-variable {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
+variable
+  {F : Type*} [Field F] [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F]
   {Ω : Type*} [Field Ω] [Algebra F Ω] [IsSepClosure F Ω]
 
-
 omit [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [IsSepClosure F Ω] in
-theorem exists_norm_iff_mem_range_normUnits (E : IntermediateField F Ω) [FiniteDimensional F E]
-    (a : Fˣ) : (∃ y : E, Algebra.norm F y = (a : F)) ↔ a ∈ (normUnits F E).range := by
+theorem exists_norm_iff_mem_range_normUnits
+    (E : IntermediateField F Ω) [FiniteDimensional F E] (a : Fˣ)
+    : (∃ y : E, Algebra.norm F y = (a : F)) ↔ a ∈ (normUnits F E).range := by
   constructor
   · rintro ⟨y, hy⟩
     have hy0 : y ≠ 0 := by
@@ -33,16 +34,18 @@ theorem exists_norm_iff_mem_range_normUnits (E : IntermediateField F Ω) [Finite
   · rintro ⟨u, rfl⟩
     exact ⟨u, rfl⟩
 
-
 omit [ValuativeRel F] [TopologicalSpace F] [IsNonarchimedeanLocalField F] [IsSepClosure F Ω] in
-theorem exists_norm_of_eq {E₁ E₂ : IntermediateField F Ω} (h : E₁ = E₂) {a : F}
-    (hy : ∃ y : E₁, Algebra.norm F y = a) : ∃ y : E₂, Algebra.norm F y = a := by
+theorem exists_norm_of_eq
+    {E₁ E₂ : IntermediateField F Ω} (h : E₁ = E₂) {a : F} (hy : ∃ y : E₁, Algebra.norm F y = a)
+    : ∃ y : E₂, Algebra.norm F y = a := by
   subst h
   exact hy
 
-theorem eq_top_of_forall_exists_norm (H : Subgroup Gal(Ω/F)) [H.Normal]
+theorem eq_top_of_forall_exists_norm
+    (H : Subgroup Gal(Ω/F)) [H.Normal]
     (hH : IsOpen (H : Set Gal(Ω/F))) (hcomm : ∀ σ τ : Gal(Ω/F), σ * τ * σ⁻¹ * τ⁻¹ ∈ H)
-    (h : ∀ a : Fˣ, ∃ y : fixedField H, Algebra.norm F y = (a : F)) : H = ⊤ := by
+    (h : ∀ a : Fˣ, ∃ y : fixedField H, Algebra.norm F y = (a : F))
+    : H = ⊤ := by
   set E := fixedField H with hE
   have hfix : E.fixingSubgroup = H :=
     InfiniteGalois.fixingSubgroup_fixedField ⟨H, Subgroup.isClosed_of_isOpen H hH⟩
@@ -60,7 +63,9 @@ theorem eq_top_of_forall_exists_norm (H : Subgroup Gal(Ω/F)) [H.Normal]
     rw [MonoidHom.mem_ker, map_mul, map_mul, map_mul, map_inv, map_inv] at hk
     have key : ∀ {M : Type _} [Group M] (x y : M), x * y * x⁻¹ * y⁻¹ = 1 → x * y = y * x := by
       intro M _ x y hxy
-      calc x * y = (x * y * x⁻¹ * y⁻¹) * (y * x) := by group
+      calc
+        x * y
+          = (x * y * x⁻¹ * y⁻¹) * (y * x) := by group
         _ = y * x := by rw [hxy, one_mul]
     exact key _ _ hk
   have : IsAbelianGalois F E := { toIsGalois := hgal, toIsMulCommutative := ⟨⟨hc⟩⟩ }
@@ -71,9 +76,9 @@ theorem eq_top_of_forall_exists_norm (H : Subgroup Gal(Ω/F)) [H.Normal]
   have hbot : E = ⊥ := IntermediateField.finrank_eq_one_iff.1 hidx.symm
   rw [← hfix, hbot, IntermediateField.fixingSubgroup_bot]
 
-theorem exists_zmod_char_not_norm {n : ℕ} (hn : (n : F) ≠ 0) (a : Fˣ) (ha : ∀ b : Fˣ, b ^ n ≠ a) :
-    ∃ ψ : Gal(Ω/F) →* Multiplicative (ZMod n), IsOpen (ψ.ker : Set Gal(Ω/F)) ∧
-      ¬ ∃ y : fixedField ψ.ker, Algebra.norm F y = (a : F) := by
+theorem exists_zmod_char_not_norm {n : ℕ} (hn : (n : F) ≠ 0) (a : Fˣ) (ha : ∀ b : Fˣ, b ^ n ≠ a)
+    : ∃ ψ : Gal(Ω/F) →* Multiplicative (ZMod n),
+      IsOpen (ψ.ker : Set Gal(Ω/F)) ∧ ¬ ∃ y : fixedField ψ.ker, Algebra.norm F y = (a : F) := by
   have hn0 : n ≠ 0 := by
     rintro rfl
     exact hn Nat.cast_zero
@@ -86,8 +91,8 @@ theorem exists_zmod_char_not_norm {n : ℕ} (hn : (n : F) ≠ 0) (a : Fˣ) (ha :
     intro q
     obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective (Additive.toMul q)
     have hq : q = Additive.ofMul (x : Fˣ ⧸ P) := by rw [hx]; rfl
-    rw [hq, ← ofMul_pow, ← QuotientGroup.mk_pow, (QuotientGroup.eq_one_iff (x ^ n)).2 (MonoidHom.mem_range.2 ⟨x, rfl⟩),
-      ofMul_one]
+    rw [hq, ← ofMul_pow, ← QuotientGroup.mk_pow,
+      (QuotientGroup.eq_one_iff (x ^ n)).2 (MonoidHom.mem_range.2 ⟨x, rfl⟩), ofMul_one]
   have hane : Additive.ofMul (a : Fˣ ⧸ P) ≠ 0 := by
     intro h0
     have h1 : (a : Fˣ ⧸ P) = 1 := congrArg Additive.toMul h0

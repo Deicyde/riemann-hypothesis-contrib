@@ -8,9 +8,10 @@ namespace PositivityTheory.SiegelWeilFormula.OswLocFin
 
 open Filter Topology
 
-theorem exists_nhds_invariant {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
-    {Φ : G → ℂ} (hΦ : IsLocallyConstant Φ ∧ HasCompactSupport Φ) :
-    ∃ U ∈ nhds (0 : G), ∀ Y, ∀ Z ∈ U, Φ (Y + Z) = Φ Y := by
+theorem exists_nhds_invariant
+    {G : Type} [AddCommGroup G] [TopologicalSpace G] [IsTopologicalAddGroup G]
+    {Φ : G → ℂ} (hΦ : IsLocallyConstant Φ ∧ HasCompactSupport Φ)
+    : ∃ U ∈ nhds (0 : G), ∀ Y, ∀ Z ∈ U, Φ (Y + Z) = Φ Y := by
   obtain ⟨hlc, hcs⟩ := hΦ
   have hT : ∀ x : G, {z : G | Φ (x + z) = Φ x} ∈ 𝓝 (0 : G) := by
     intro x
@@ -24,10 +25,13 @@ theorem exists_nhds_invariant {G : Type} [AddCommGroup G] [TopologicalSpace G] [
     have ht : Tendsto (fun y : G => y - x) (𝓝 x) (𝓝 (x - x)) := (continuous_sub_right x).tendsto x
     rw [sub_self] at ht
     exact ht (Filter.inter_mem (hV₁ x) (hV₂ x))
-  obtain ⟨t, -, hcover⟩ := hcs.isCompact.elim_nhds_subcover
-    (fun x => {y : G | y - x ∈ V₁ x ∩ V₂ x}) (fun x _ => hU x)
-  refine ⟨⋂ x ∈ t, V₁ x ∩ V₂ x, (Filter.biInter_finset_mem t).mpr fun x _ =>
-    Filter.inter_mem (hV₁ x) (hV₂ x), fun Y Z hZ => ?_⟩
+  obtain ⟨t, -, hcover⟩ :=
+    hcs.isCompact.elim_nhds_subcover (fun x => {y : G | y - x ∈ V₁ x ∩ V₂ x}) (fun x _ => hU x)
+  refine ⟨
+    ⋂ x ∈ t, V₁ x ∩ V₂ x,
+    (Filter.biInter_finset_mem t).mpr fun x _ => Filter.inter_mem (hV₁ x) (hV₂ x),
+    fun Y Z hZ => ?_
+  ⟩
   have hZ' : ∀ x ∈ t, Z ∈ V₁ x ∩ V₂ x := Set.mem_iInter₂.mp hZ
   by_cases hY : Y ∈ tsupport Φ
   · obtain ⟨x, hxt, hx⟩ := Set.mem_iUnion₂.mp (hcover hY)

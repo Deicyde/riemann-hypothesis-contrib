@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.PointFinitePower.ptFin_pow :
-    ∀ {O S : Type} [inst : CommRing O] [inst_1 : CommRing S]
-    [inst_2 : Algebra O S] [IsNoetherianRing S] (m : Ideal S),
-    (∀ (x : S), ∃ (a : O), x - (Algebra.algebraMap O S : O → S) a ∈ m) →
-      ∀ (n : ℕ), ∃ (N : Submodule O S), N.FG ∧ ∀ (x : S), ∃ y ∈ N, x - y ∈ m ^ n := by
+theorem UpperTheory.Reformulated.B.PointFinitePower.ptFin_pow
+    : ∀ {O S : Type} [inst : CommRing O] [inst_1 : CommRing S] [inst_2 : Algebra O S]
+        [IsNoetherianRing S] (m : Ideal S),
+      (∀ (x : S), ∃ (a : O), x - (Algebra.algebraMap O S : O → S) a ∈ m)
+        → ∀ (n : ℕ), ∃ (N : Submodule O S), N.FG ∧ ∀ (x : S), ∃ y ∈ N, x - y ∈ m ^ n := by
   intro O S _ _ _ _ m hm n
   induction n with
   | zero =>
@@ -18,8 +18,10 @@ theorem UpperTheory.Reformulated.B.PointFinitePower.ptFin_pow :
   | succ n ih =>
     obtain ⟨N, hN, hx⟩ := ih
     obtain ⟨s, hs⟩ : (m ^ n).FG := IsNoetherian.noetherian (m ^ n)
-    have key : ∀ z : S, z ∈ Submodule.span S (s : Set S) →
-        ∃ w ∈ Submodule.span O (s : Set S), z - w ∈ m ^ (n + 1) := by
+    have key
+        : ∀ z : S,
+          z ∈ Submodule.span S (s : Set S)
+            → ∃ w ∈ Submodule.span O (s : Set S), z - w ∈ m ^ (n + 1) := by
       intro z hz
       induction hz using Submodule.span_induction with
       | mem z hz =>
@@ -40,8 +42,7 @@ theorem UpperTheory.Reformulated.B.PointFinitePower.ptFin_pow :
         have hz' : z ∈ m ^ n := by
           rw [← hs]
           exact hz
-        have e : c • z - a • w
-            = algebraMap O S a * (z - w) + z * (c - algebraMap O S a) := by
+        have e : c • z - a • w = algebraMap O S a * (z - w) + z * (c - algebraMap O S a) := by
           rw [Algebra.smul_def a w, smul_eq_mul]
           ring
         rw [e]

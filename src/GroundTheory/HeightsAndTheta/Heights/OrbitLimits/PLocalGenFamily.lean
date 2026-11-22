@@ -14,21 +14,22 @@ theorem LocalGenFamily.proof : LocalGenFamily.Statement := by
   have : Module.Finite ℤ B := hfin
   have : IsNoetherianRing B := IsNoetherianRing.of_finite ℤ B
 
-  let K : η → Ideal B := fun i =>
-    { carrier := {t : B | (t : Ω) * f i ∈ X}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_ofPred_eq, Subring.coe_add, add_mul] at ha hb ⊢
-        exact X.add_mem ha hb
-      zero_mem' := by simp only [Set.mem_ofPred_eq, ZeroMemClass.coe_zero, zero_mul]; exact X.zero_mem
-      smul_mem' := fun c t ht => by
-        simp only [Set.mem_ofPred_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at ht ⊢
-        exact hX _ c.2 _ ht }
+  let K : η → Ideal B := fun i => {
+    carrier := {t : B | (t : Ω) * f i ∈ X}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_ofPred_eq, Subring.coe_add, add_mul] at ha hb ⊢
+      exact X.add_mem ha hb
+    zero_mem' := by simp only [Set.mem_ofPred_eq, ZeroMemClass.coe_zero, zero_mul]; exact X.zero_mem
+    smul_mem' := fun c t ht => by
+      simp only [Set.mem_ofPred_eq, smul_eq_mul, Subring.coe_mul, mul_assoc] at ht ⊢
+      exact hX _ c.2 _ ht
+  }
   have hK : ∀ i, ∀ t : B, t ∈ K i ↔ (t : Ω) * f i ∈ X := fun _ _ => Iff.rfl
-  have hfg : ∀ i, ∃ T : Finset B, Ideal.span (T : Set B) = K i := fun i => IsNoetherian.noetherian (K i)
+  have hfg : ∀ i, ∃ T : Finset B, Ideal.span (T : Set B) = K i := fun i =>
+    IsNoetherian.noetherian (K i)
   choose T hT using hfg
   refine ⟨?_, Σ i : η, {t : B // t ∈ T i}, inferInstance, fun j => (j.2.1 : Ω) * f j.1, ?_, ?_, ?_⟩
-  ·
-    obtain ⟨m, hm⟩ := Ideal.exists_maximal B
+  · obtain ⟨m, hm⟩ := Ideal.exists_maximal B
     obtain ⟨i, ⟨b, hbm, hbX⟩, -⟩ := hloc m hm
     have hb : (b : Ω) ≠ 0 := by
       intro h
@@ -61,7 +62,9 @@ theorem LocalGenFamily.proof : LocalGenFamily.Statement := by
       · exact htm h
       · exact hb'm h
     · simp only [Subring.coe_mul]
-      calc (t : Ω) * b' * z = t * (b' * z) := by ring
+      calc
+        (t : Ω) * b' * z
+          = t * (b' * z) := by ring
         _ = t * (c' * f i) := by rw [hbz]
         _ = c' * (t * f i) := by ring
 

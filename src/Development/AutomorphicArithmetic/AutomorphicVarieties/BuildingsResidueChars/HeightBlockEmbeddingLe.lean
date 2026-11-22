@@ -4,12 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
+open NumberField NumberField.mixedEmbedding Matrix MeasureTheory GroundTheory.Automorphic
+  GroundTheory.Automorphic.AutomorphicForm UpperTheory.V.Af.Fin
 open scoped TensorProduct
 attribute [local instance 100] LieRing.ofAssociativeRing
 
-private theorem ent_le {E : Type} [NormedField E] {a n : ℕ} (e : Fin a ↪ Fin n) (g : GL (Fin a) E) {c : ℝ}
-    (hc : 1 ≤ c) (h : ∀ i j, ‖g.val i j‖ ≤ c) (i j : Fin n) : ‖(emb e g).val i j‖ ≤ c := by
+private theorem ent_le
+    {E : Type} [NormedField E]
+    {a n : ℕ} (e : Fin a ↪ Fin n) (g : GL (Fin a) E)
+    {c : ℝ} (hc : 1 ≤ c) (h : ∀ i j, ‖g.val i j‖ ≤ c)
+    (i j : Fin n)
+    : ‖(emb e g).val i j‖ ≤ c := by
   have hone : ∀ p q : Fin n, ‖(1 : Matrix (Fin n) (Fin n) E) p q‖ ≤ c := by
     intro p q
     rw [Matrix.one_apply]
@@ -20,7 +25,8 @@ private theorem ent_le {E : Type} [NormedField E] {a n : ℕ} (e : Fin a ↪ Fin
   · by_cases hj : ∃ l, j = e l
     · obtain ⟨k, rfl⟩ := hi
       obtain ⟨l, rfl⟩ := hj
-      simp only [matrixExtendByZero_apply, Matrix.sub_apply, Matrix.one_apply, e.injective.eq_iff, add_sub_cancel]
+      simp only [matrixExtendByZero_apply, Matrix.sub_apply, Matrix.one_apply, e.injective.eq_iff,
+        add_sub_cancel]
       exact h k l
     · push_neg at hj
       rw [matrixExtendByZero_apply_of_outside_col e _ i hj, add_zero]
@@ -29,16 +35,18 @@ private theorem ent_le {E : Type} [NormedField E] {a n : ℕ} (e : Fin a ↪ Fin
     rw [extendByZero_apply_eq_zero_of_row_not_mem e _ hi, add_zero]
     exact hone i j
 
-private theorem loc_le {E : Type} [NormedField E] {a n : ℕ} (e : Fin a ↪ Fin n) (g : GL (Fin a) E) :
-    locHeight (emb e g) ≤ locHeight g := by
+private theorem loc_le {E : Type} [NormedField E] {a n : ℕ} (e : Fin a ↪ Fin n) (g : GL (Fin a) E)
+    : locHeight (emb e g) ≤ locHeight g := by
   apply locHeight_le (one_le_locHeight g)
   · exact ent_le e g (one_le_locHeight g) (norm_apply_le_locHeight g)
   · intro i j
     rw [← map_inv]
     exact ent_le e g⁻¹ (one_le_locHeight g) (norm_inv_apply_le_locHeight g) i j
 
-theorem UpperTheory.height_blockEmbedding_le :
-    ∀ (K : Type) [Field K] [NumberField K] (a n : ℕ) (e : Fin a ↪ Fin n) (g : AdelicGLn.AdelicGL K a), AutomorphicForm.height (emb e g) ≤ AutomorphicForm.height g := by
+theorem UpperTheory.height_blockEmbedding_le
+    : ∀ (K : Type) [Field K] [NumberField K] (a n : ℕ) (e : Fin a ↪ Fin n)
+        (g : AdelicGLn.AdelicGL K a),
+      AutomorphicForm.height (emb e g) ≤ AutomorphicForm.height g := by
   classical
   intro K _ _ a n e g
   have hfin : ∀ v, Reduction.finAt v (emb e g) = emb e (Reduction.finAt v g) := by

@@ -14,41 +14,51 @@ noncomputable section
 
 open MvPolynomial
 
-theorem JacobianRankGeneric.kaehler_D_aeval {σ K : Type*} [Fintype σ] [Field K] [Algebra ℂ K] (x : σ → K)
-    (f : MvPolynomial σ ℂ) :
-    KaehlerDifferential.D ℂ K (aeval x f) =
-      ∑ l, aeval x (pderiv l f) • KaehlerDifferential.D ℂ K (x l) := by
+theorem JacobianRankGeneric.kaehler_D_aeval
+    {σ K : Type*} [Fintype σ] [Field K] [Algebra ℂ K] (x : σ → K) (f : MvPolynomial σ ℂ)
+    : KaehlerDifferential.D ℂ K (aeval x f)
+      = ∑ l, aeval x (pderiv l f) • KaehlerDifferential.D ℂ K (x l) := by
   classical
   induction f using MvPolynomial.induction_on with
   | C a => simp
   | add p q hp hq => simp [hp, hq, Finset.sum_add_distrib, add_smul]
   | mul_X p i hp =>
-    simp only [map_mul, aeval_X, Derivation.leibniz, hp, Finset.smul_sum, smul_smul, map_add (f := _), add_smul,
-      Finset.sum_add_distrib, pderiv_X, smul_eq_mul, Pi.single_apply]
+    simp only [map_mul, aeval_X, Derivation.leibniz, hp, Finset.smul_sum, smul_smul,
+      map_add (f := _), add_smul, Finset.sum_add_distrib, pderiv_X, smul_eq_mul, Pi.single_apply]
     rw [add_left_inj]
     simp [apply_ite, ite_smul]
 
-theorem JacobianRankGeneric.finrank_kaehler_eq_card {k K : Type} [Field k] [Field K] [Algebra k K] (s : Finset K)
-    (hs : IsTranscendenceBasis k ((↑) : s → K))
-    (H : Algebra.IsSeparable (IntermediateField.adjoin k (s : Set K)) K) :
-    Module.finrank K Ω[K⁄k] = s.card := by
+theorem JacobianRankGeneric.finrank_kaehler_eq_card
+    {k K : Type} [Field k] [Field K] [Algebra k K]
+    (s : Finset K) (hs : IsTranscendenceBasis k ((↑) : s → K))
+    (H : Algebra.IsSeparable (IntermediateField.adjoin k (s : Set K)) K)
+    : Module.finrank K Ω[K⁄k] = s.card := by
   have hx : AlgebraicIndependent k (fun i : s => (i : K)) := hs.1
   let _ : Algebra (MvPolynomial s k) K := (aeval (fun i : s => (i : K))).toRingHom.toAlgebra
-  have : IsScalarTower k (MvPolynomial s k) K := IsScalarTower.of_algebraMap_eq fun a => by
-    simp [RingHom.algebraMap_toAlgebra]
-  let _ : Algebra (MvPolynomial s k) (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) :=
-    ((hx.aevalEquivField).toRingHom.comp (algebraMap (MvPolynomial s k) (FractionRing (MvPolynomial s k)))).toAlgebra
-  let e : FractionRing (MvPolynomial s k) ≃ₐ[MvPolynomial s k]
-      IntermediateField.adjoin k (Set.range fun i : s => (i : K)) :=
-    { hx.aevalEquivField with commutes' := fun q => rfl }
+  have : IsScalarTower k (MvPolynomial s k) K :=
+    IsScalarTower.of_algebraMap_eq fun a => by simp [RingHom.algebraMap_toAlgebra]
+  let _
+      : Algebra (MvPolynomial s k) (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) :=
+    ((hx.aevalEquivField).toRingHom.comp
+      (algebraMap (MvPolynomial s k) (FractionRing (MvPolynomial s k)))).toAlgebra
+  let e
+      : FractionRing (MvPolynomial s k) ≃ₐ[MvPolynomial s k]
+        IntermediateField.adjoin k (Set.range fun i : s => (i : K)) := {
+    hx.aevalEquivField with
+    commutes' := fun q => rfl
+  }
   have : Algebra.FormallyEtale (MvPolynomial s k) (FractionRing (MvPolynomial s k)) :=
     .of_isLocalization (nonZeroDivisors _)
-  have : Algebra.FormallyEtale (MvPolynomial s k) (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) :=
+  have : Algebra.FormallyEtale (MvPolynomial s k)
+      (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) :=
     .of_equiv e
-  have : IsScalarTower (MvPolynomial s k) (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) K :=
+  have : IsScalarTower (MvPolynomial s k)
+      (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) K :=
     IsScalarTower.of_algebraMap_eq fun q => by
-      change aeval (fun i : s => (i : K)) q =
-        ((hx.aevalEquivField (algebraMap (MvPolynomial s k) (FractionRing (MvPolynomial s k)) q) : _) : K)
+      change aeval (fun i : s => (i : K)) q
+        = ((hx.aevalEquivField (algebraMap (MvPolynomial s k) (FractionRing (MvPolynomial s k)) q)
+            : _)
+          : K)
       rw [hx.aevalEquivField_algebraMap_apply_coe]
   have : Algebra.IsSeparable (IntermediateField.adjoin k (Set.range fun i : s => (i : K))) K := by
     convert! H <;> simp
@@ -59,8 +69,8 @@ theorem JacobianRankGeneric.finrank_kaehler_eq_card {k K : Type} [Field k] [Fiel
   have : Module.Free (MvPolynomial s k) Ω[MvPolynomial s k⁄k] :=
     Module.Free.of_basis (KaehlerDifferential.mvPolynomialBasis k s)
   rw [← (KaehlerDifferential.tensorKaehlerEquivOfFormallyEtale k (MvPolynomial s k) K).finrank_eq,
-    Module.finrank_baseChange, Module.finrank_eq_card_basis (KaehlerDifferential.mvPolynomialBasis k s),
-    Fintype.card_coe]
+    Module.finrank_baseChange,
+    Module.finrank_eq_card_basis (KaehlerDifferential.mvPolynomialBasis k s), Fintype.card_coe]
 
 theorem JacobianRankGeneric.proof : JacobianRankGeneric.Statement := by
   classical
@@ -68,7 +78,8 @@ theorem JacobianRankGeneric.proof : JacobianRankGeneric.Statement := by
   set A := MvPolynomial (Fin n) ℂ ⧸ J
   set K := FractionRing A
 
-  let ψ : MvPolynomial (Fin n) ℂ →ₐ[ℂ] K := (IsScalarTower.toAlgHom ℂ A K).comp (Ideal.Quotient.mkₐ ℂ J)
+  let ψ : MvPolynomial (Fin n) ℂ →ₐ[ℂ] K :=
+    (IsScalarTower.toAlgHom ℂ A K).comp (Ideal.Quotient.mkₐ ℂ J)
   let x : Fin n → K := fun l => ψ (X l)
   have hψ : ∀ f, ψ f = aeval x f := fun f => congrArg (fun φ => φ f) (MvPolynomial.aeval_unique ψ)
   have hgrad : ∀ f l, genericGradient J f l = aeval x (pderiv l f) := fun f l => hψ (pderiv l f)
@@ -99,7 +110,8 @@ theorem JacobianRankGeneric.proof : JacobianRankGeneric.Statement := by
     have hg := hA g
     change KaehlerDifferential.D ℂ K (ψ f / ψ g) ∈ _
     rw [Derivation.leibniz_div]
-    exact Submodule.smul_mem _ _ (Submodule.sub_mem _ (Submodule.smul_mem _ _ hf) (Submodule.smul_mem _ _ hg))
+    exact Submodule.smul_mem _ _
+      (Submodule.sub_mem _ (Submodule.smul_mem _ _ hf) (Submodule.smul_mem _ _ hg))
 
   obtain ⟨s, hs, H⟩ := exists_isTranscendenceBasis_and_isSeparable_of_perfectField ℂ K
   have hcard : s.card = d := by
@@ -115,7 +127,8 @@ theorem JacobianRankGeneric.proof : JacobianRankGeneric.Statement := by
   have h2 := LinearMap.finrank_range_add_finrank_ker Φ
   rw [hsurj, finrank_top, hrank, Module.finrank_fin_fun] at h2
   change Module.finrank K (Submodule.span K (genericGradient J '' (J : Set _))) ≤ n - d
-  calc _ ≤ _ := h1
+  calc
+    _ ≤ _ := h1
     _ = n - d := by
       generalize Module.finrank K (LinearMap.ker Φ) = m at h2 ⊢
       omega

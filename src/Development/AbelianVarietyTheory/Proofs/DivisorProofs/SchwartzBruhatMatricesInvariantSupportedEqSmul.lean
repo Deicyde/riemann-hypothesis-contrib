@@ -11,12 +11,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CoBarZero
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum Formalism.IndefR.Links
 open IsDedekindDomain NumberField MeasureTheory Matrix
 open scoped TensorProduct
-open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil GlobalTheory.StdFrames Formalism.L2.DIV
+open GlobalTheory.FunObj GlobalTheory.ChiGrid GlobalTheory.SplitFlip GlobalTheory.SplitWeil
+  GlobalTheory.StdFrames Formalism.L2.DIV
 
-attribute [local instance] Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
+attribute [local instance]
+  Formalism.BasicNotions.Host.cmStar GlobalTheory.LocalData.complRel
+  GlobalTheory.LocalData.isLocalField borelKw borelSpaceKw
 
 open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
 open ValuativeRel
@@ -26,21 +31,34 @@ namespace GlobalTheory.SBClosure
 
 open scoped Topology
 
-theorem nonarch_pi {ι : Type} [Finite ι] (G : ι → Type) [∀ i, AddCommGroup (G i)] [∀ i, TopologicalSpace (G i)]
-    [∀ i, NonarchimedeanAddGroup (G i)] : NonarchimedeanAddGroup (∀ i, G i) where
+theorem nonarch_pi
+    {ι : Type} [Finite ι]
+    (G : ι → Type)
+    [∀ i, AddCommGroup (G i)] [∀ i, TopologicalSpace (G i)] [∀ i, NonarchimedeanAddGroup (G i)]
+    : NonarchimedeanAddGroup (∀ i, G i) where
   is_nonarchimedean U hU := by
     rw [nhds_pi, Filter.mem_pi] at hU
     obtain ⟨I, -, t, ht, hs⟩ := hU
     choose K hK using fun i => NonarchimedeanAddGroup.is_nonarchimedean (G := G i) (t i) (ht i)
-    exact ⟨⟨AddSubgroup.pi Set.univ fun i => (K i : AddSubgroup (G i)),
-      isOpen_set_pi Set.finite_univ fun i _ => (K i).isOpen⟩, fun x hx => hs fun i _ => hK i (hx i trivial)⟩
+    exact ⟨
+      ⟨
+        AddSubgroup.pi Set.univ fun i => (K i : AddSubgroup (G i)),
+        isOpen_set_pi Set.finite_univ fun i _ => (K i).isOpen
+      ⟩,
+      fun x hx => hs fun i _ => hK i (hx i trivial)
+    ⟩
 
-theorem eq_smul_indicator_closure {X : Type} [AddCommGroup X] [TopologicalSpace X] [NonarchimedeanAddGroup X]
-    (S : AddSubgroup X) (B : Set X) (hB : ∀ Y h, Y ∈ B → Y + h ∈ B → h ∈ B) (f : X → ℂ) (hf : f ∈ GlobalTheory.WeilM.SB X)
-    (hf0 : f ≠ 0) (hinv : ∀ s ∈ S, ∀ Y, f (Y + s) = f Y) (hsupp : ∀ Y ∉ B, f Y = 0)
-    (huniq : ∀ g ∈ GlobalTheory.WeilM.SB X, (∀ s ∈ S, ∀ Y, g (Y + s) = g Y) → (∀ Y ∉ B, g Y = 0) → ∃ c : ℂ, g = c • f) :
-    ∃ c : ℂ, f = c • (closure (S : Set X)).indicator 1 ∧ IsOpen (closure (S : Set X)) ∧
-      IsCompact (closure (S : Set X)) := by
+theorem eq_smul_indicator_closure
+    {X : Type} [AddCommGroup X] [TopologicalSpace X] [NonarchimedeanAddGroup X]
+    (S : AddSubgroup X)
+    (B : Set X) (hB : ∀ Y h, Y ∈ B → Y + h ∈ B → h ∈ B)
+    (f : X → ℂ) (hf : f ∈ GlobalTheory.WeilM.SB X) (hf0 : f ≠ 0)
+    (hinv : ∀ s ∈ S, ∀ Y, f (Y + s) = f Y) (hsupp : ∀ Y ∉ B, f Y = 0)
+    (huniq : ∀ g ∈ GlobalTheory.WeilM.SB X,
+      (∀ s ∈ S, ∀ Y, g (Y + s) = g Y) → (∀ Y ∉ B, g Y = 0) → ∃ c : ℂ, g = c • f)
+    : ∃ c : ℂ,
+      f = c • (closure (S : Set X)).indicator 1 ∧ IsOpen (closure (S : Set X))
+        ∧ IsCompact (closure (S : Set X)) := by
   set H : AddSubgroup X := S.topologicalClosure with hHdef
   have hHc : (H : Set X) = closure (S : Set X) := rfl
   rw [← hHc]
@@ -49,12 +67,16 @@ theorem eq_smul_indicator_closure {X : Type} [AddCommGroup X] [TopologicalSpace 
     by_contra h
     push_neg at h
     exact hf0 (funext h)
-  have hind : ∀ U : Set X, IsClopen U → ∀ φ ∈ GlobalTheory.WeilM.SB X, U.indicator φ ∈ GlobalTheory.WeilM.SB X := by
+  have hind
+      : ∀ U : Set X,
+        IsClopen U → ∀ φ ∈ GlobalTheory.WeilM.SB X, U.indicator φ ∈ GlobalTheory.WeilM.SB X := by
     intro U hU φ hφ
-    have : U.indicator φ = U.indicator 1 * φ := by
-      funext x; by_cases hx : x ∈ U <;> simp [hx]
+    have : U.indicator φ = U.indicator 1 * φ := by funext x; by_cases hx : x ∈ U <;> simp [hx]
     rw [this]
-    exact ⟨(LocallyConstant.indicator (1 : LocallyConstant X ℂ) hU).isLocallyConstant.mul hφ.1, hφ.2.mul_left⟩
+    exact ⟨
+      (LocallyConstant.indicator (1 : LocallyConstant X ℂ) hU).isLocallyConstant.mul hφ.1,
+      hφ.2.mul_left
+    ⟩
   have hSH : S ≤ H := S.le_topologicalClosure
   have hHcl : IsClosed (H : Set X) := S.isClosed_topologicalClosure
   have hH : ∀ h ∈ H, f (Y₀ + h) = f Y₀ := by
@@ -72,7 +94,8 @@ theorem eq_smul_indicator_closure {X : Type} [AddCommGroup X] [TopologicalSpace 
       simpa using hopen
     obtain ⟨U, hU⟩ := NonarchimedeanAddGroup.is_nonarchimedean _ h0
     set V : AddSubgroup X := H ⊔ U.toAddSubgroup with hVdef
-    have hVo : IsOpen (V : Set X) := AddSubgroup.isOpen_mono (le_sup_right : U.toAddSubgroup ≤ V) U.isOpen
+    have hVo : IsOpen (V : Set X) :=
+      AddSubgroup.isOpen_mono (le_sup_right : U.toAddSubgroup ≤ V) U.isOpen
     have hVc : IsClosed (V : Set X) := AddSubgroup.isClosed_of_isOpen V hVo
     have hxV : x - Y₀ ∉ V := by
       intro hm
@@ -84,23 +107,29 @@ theorem eq_smul_indicator_closure {X : Type} [AddCommGroup X] [TopologicalSpace 
       rw [← hab]
       simpa using ha
     set Wset : Set X := (fun y => y - Y₀) ⁻¹' (V : Set X) with hWdef
-    have hWc : IsClopen Wset :=
-      ⟨hVc.preimage (continuous_id.sub continuous_const), hVo.preimage (continuous_id.sub continuous_const)⟩
+    have hWc : IsClopen Wset := ⟨
+      hVc.preimage (continuous_id.sub continuous_const),
+      hVo.preimage (continuous_id.sub continuous_const)
+    ⟩
     have hWinv : ∀ s ∈ S, ∀ Y, (Y + s ∈ Wset ↔ Y ∈ Wset) := by
       intro s hs Y
       have hsV : s ∈ V := AddSubgroup.mem_sup_left (hSH hs)
       simp only [Wset, Set.mem_preimage, SetLike.mem_coe]
       rw [show Y + s - Y₀ = (Y - Y₀) + s by abel]
       exact V.add_mem_cancel_right hsV
-    obtain ⟨c, hc⟩ := huniq (Wset.indicator f) (hind _ hWc f hf) (by
-      intro s hs Y
-      by_cases hY : Y ∈ Wset
-      · rw [Set.indicator_of_mem hY, Set.indicator_of_mem ((hWinv s hs Y).mpr hY), hinv s hs Y]
-      · rw [Set.indicator_of_notMem hY, Set.indicator_of_notMem (fun h => hY ((hWinv s hs Y).mp h))]) (by
-      intro Y hY
-      by_cases h : Y ∈ Wset
-      · rw [Set.indicator_of_mem h, hsupp Y hY]
-      · rw [Set.indicator_of_notMem h])
+    obtain ⟨c, hc⟩ :=
+      huniq (Wset.indicator f) (hind _ hWc f hf)
+        (by
+          intro s hs Y
+          by_cases hY : Y ∈ Wset
+          · rw [Set.indicator_of_mem hY, Set.indicator_of_mem ((hWinv s hs Y).mpr hY), hinv s hs Y]
+          · rw [Set.indicator_of_notMem hY,
+              Set.indicator_of_notMem (fun h => hY ((hWinv s hs Y).mp h))])
+        (by
+          intro Y hY
+          by_cases h : Y ∈ Wset
+          · rw [Set.indicator_of_mem h, hsupp Y hY]
+          · rw [Set.indicator_of_notMem h])
     have e1 := congrFun hc Y₀
     have e2 := congrFun hc x
     have hY₀W : Y₀ ∈ Wset := by simp [Wset, V.zero_mem]
@@ -133,27 +162,25 @@ theorem eq_smul_indicator_closure {X : Type} [AddCommGroup X] [TopologicalSpace 
     have := (LocallyConstant.indicator (1 : LocallyConstant X ℂ) hHclo).isLocallyConstant
     convert this using 1
     funext x
-    first
-    | rfl
-    | by_cases hx : x ∈ (H : Set X) <;> simp [hx, LocallyConstant.indicator]
-  obtain ⟨c, hc⟩ := huniq _ h1SB (by
-      intro s hs Y
-      have : (Y + s ∈ (H : Set X) ↔ Y ∈ (H : Set X)) := H.add_mem_cancel_right (hSH hs)
-      by_cases hY : Y ∈ (H : Set X)
-      · rw [Set.indicator_of_mem hY, Set.indicator_of_mem (this.mpr hY)]; rfl
-      · rw [Set.indicator_of_notMem hY, Set.indicator_of_notMem (fun h => hY (this.mp h))]) (by
-      intro Y hY
-      refine Set.indicator_of_notMem (fun hYH => hY ?_) _
-      have hB0 : Y₀ ∈ B := by
-        by_contra h; exact hY₀ (hsupp _ h)
-      have hB1 : Y₀ + Y ∈ B := by
-        by_contra h; exact hY₀ ((hH Y hYH).symm.trans (hsupp _ h))
-      exact hB _ _ hB0 hB1)
+    first | rfl | by_cases hx : x ∈ (H : Set X) <;> simp [hx, LocallyConstant.indicator]
+  obtain ⟨c, hc⟩ :=
+    huniq _ h1SB
+      (by
+        intro s hs Y
+        have : (Y + s ∈ (H : Set X) ↔ Y ∈ (H : Set X)) := H.add_mem_cancel_right (hSH hs)
+        by_cases hY : Y ∈ (H : Set X)
+        · rw [Set.indicator_of_mem hY, Set.indicator_of_mem (this.mpr hY)]; rfl
+        · rw [Set.indicator_of_notMem hY, Set.indicator_of_notMem (fun h => hY (this.mp h))])
+      (by
+        intro Y hY
+        refine Set.indicator_of_notMem (fun hYH => hY ?_) _
+        have hB0 : Y₀ ∈ B := by by_contra h; exact hY₀ (hsupp _ h)
+        have hB1 : Y₀ + Y ∈ B := by by_contra h; exact hY₀ ((hH Y hYH).symm.trans (hsupp _ h))
+        exact hB _ _ hB0 hB1)
   have e0 := congrFun hc 0
   rw [Set.indicator_of_mem (show (0 : X) ∈ (H : Set X) from H.zero_mem)] at e0
   simp only [Pi.smul_apply, smul_eq_mul, Pi.one_apply] at e0
-  have hc0 : c ≠ 0 := by
-    rintro rfl; simp at e0
+  have hc0 : c ≠ 0 := by rintro rfl; simp at e0
   refine ⟨c⁻¹, ?_, hHo, hHk⟩
   funext y
   have ey := congrFun hc y
@@ -162,14 +189,18 @@ theorem eq_smul_indicator_closure {X : Type} [AddCommGroup X] [TopologicalSpace 
 
 end GlobalTheory.SBClosure
 
-theorem GlobalTheory.SBClosure.main : ∀ {F : Type} [Field F] [NumberField F] (v : IsDedekindDomain.HeightOneSpectrum (𝓞 F)) {m k : ℕ}
-    (S : AddSubgroup (Matrix (Fin m) (Fin k) (Fv F v))) (B : Set (Matrix (Fin m) (Fin k) (Fv F v)))
-    (hB : ∀ Y h, Y ∈ B → Y + h ∈ B → h ∈ B) (f : Matrix (Fin m) (Fin k) (Fv F v) → ℂ) (hf : f ∈ GlobalTheory.WeilM.SB _) (hf0 : f ≠ 0)
-    (hinv : ∀ s ∈ S, ∀ Y, f (Y + s) = f Y) (hsupp : ∀ Y ∉ B, f Y = 0)
-    (huniq : ∀ g ∈ GlobalTheory.WeilM.SB (Matrix (Fin m) (Fin k) (Fv F v)), (∀ s ∈ S, ∀ Y, g (Y + s) = g Y) → (∀ Y ∉ B, g Y = 0) →
-      ∃ c : ℂ, g = c • f),
-    ∃ c : ℂ, f = c • (closure (S : Set (Matrix (Fin m) (Fin k) (Fv F v)))).indicator 1 ∧
-      IsOpen (closure (S : Set (Matrix (Fin m) (Fin k) (Fv F v)))) ∧ IsCompact (closure (S : Set (Matrix (Fin m) (Fin k) (Fv F v)))) := by
+theorem GlobalTheory.SBClosure.main
+    : ∀ {F : Type} [Field F] [NumberField F] (v : IsDedekindDomain.HeightOneSpectrum (𝓞 F))
+        {m k : ℕ} (S : AddSubgroup (Matrix (Fin m) (Fin k) (Fv F v)))
+        (B : Set (Matrix (Fin m) (Fin k) (Fv F v))) (hB : ∀ Y h, Y ∈ B → Y + h ∈ B → h ∈ B)
+        (f : Matrix (Fin m) (Fin k) (Fv F v) → ℂ) (hf : f ∈ GlobalTheory.WeilM.SB _) (hf0 : f ≠ 0)
+        (hinv : ∀ s ∈ S, ∀ Y, f (Y + s) = f Y) (hsupp : ∀ Y ∉ B, f Y = 0)
+        (huniq : ∀ g ∈ GlobalTheory.WeilM.SB (Matrix (Fin m) (Fin k) (Fv F v)),
+          (∀ s ∈ S, ∀ Y, g (Y + s) = g Y) → (∀ Y ∉ B, g Y = 0) → ∃ c : ℂ, g = c • f),
+      ∃ c : ℂ,
+        f = c • (closure (S : Set (Matrix (Fin m) (Fin k) (Fv F v)))).indicator 1
+          ∧ IsOpen (closure (S : Set (Matrix (Fin m) (Fin k) (Fv F v))))
+          ∧ IsCompact (closure (S : Set (Matrix (Fin m) (Fin k) (Fv F v)))) := by
   intro F _ _ v m k S B hB f hf hf0 hinv hsupp huniq
   haveI : NonarchimedeanAddGroup (Fin k → Fv F v) := GlobalTheory.SBClosure.nonarch_pi (fun _ : Fin k => Fv F v)
   haveI : NonarchimedeanAddGroup (Matrix (Fin m) (Fin k) (Fv F v)) :=

@@ -6,14 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsKer
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV GlobalTheory.Ord2
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.MainNotions.N GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.HV
+  GlobalTheory.Ord2
 open scoped Matrix
 
 namespace GlobalTheory.Ord2
 
-theorem h1dual_of_vanish_fix : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
-    (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l), Nf e S A W → ∀ z ∈ Z1 (Loc.colRep (dual1 W)),
-    (∀ g ∈ N0g W, z g = 0) → z ∈ ReciprocityTheory.Gal.B1 (Loc.colRep (dual1 W)) := by
+theorem h1dual_of_vanish_fix
+    : ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (e : ℕ)
+        (S : Finset Pl) (A : ValuationSubring Ω) (W : R2 Ω l),
+      Nf e S A W
+        → ∀ z ∈ Z1 (Loc.colRep (dual1 W)),
+          (∀ g ∈ N0g W, z g = 0) → z ∈ ReciprocityTheory.Gal.B1 (Loc.colRep (dual1 W)) := by
   intro l _ Ω _ _ _ e S A W hW z hz hN
   obtain ⟨a, haK, hae⟩ := GlobalTheory.T.exists_ker_rep_cyclotomic_ne_one_normalForm l Ω e S A W hW
   have hWa : W a = 1 := haK

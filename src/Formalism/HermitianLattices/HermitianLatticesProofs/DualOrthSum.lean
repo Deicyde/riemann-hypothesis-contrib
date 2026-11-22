@@ -10,10 +10,11 @@ noncomputable section
 
 namespace Formalism.HermitianLatticesTheory
 
-private theorem mem_dual_iff_hermitian_lattices {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K]
-    [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
-    (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) (x : V) :
-    x ∈ dual h L ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule R K) := by
+private theorem mem_dual_iff_hermitian_lattices
+    {R K V : Type*} [CommRing R] [Field K] [StarRing K] [Algebra R K] [AddCommGroup V] [Module K V]
+    [Module R V] [IsScalarTower R K V]
+    (h : V →ₗ⋆[K] V →ₗ[K] K) (L : Submodule R V) (x : V)
+    : x ∈ dual h L ↔ ∀ y ∈ L, h y x ∈ (1 : Submodule R K) := by
   simp only [dual, Formalism.E.hdual, Submodule.mem_iInf, Submodule.mem_comap,
     LinearMap.restrictScalars_apply]
 
@@ -26,8 +27,8 @@ theorem dualOrthSum : DualOrthSum := by
       rw [hc.sup_eq_top]
       exact Submodule.mem_top
     obtain ⟨x₁, hx₁, x₂, hx₂, rfl⟩ := Submodule.mem_sup.mp htop
-    refine Submodule.mem_sup.mpr ⟨x₁, Submodule.mem_inf.mpr ⟨?_, hx₁⟩,
-      x₂, Submodule.mem_inf.mpr ⟨?_, hx₂⟩, rfl⟩
+    refine Submodule.mem_sup.mpr
+      ⟨x₁, Submodule.mem_inf.mpr ⟨?_, hx₁⟩, x₂, Submodule.mem_inf.mpr ⟨?_, hx₂⟩, rfl⟩
     · rw [mem_dual_iff_hermitian_lattices]
       intro y hy
       have e : h y x₂ = 0 := h12 y (hL₁ hy) x₂ hx₂

@@ -8,13 +8,12 @@ namespace GlobalTheory.PolarU
 
 open Module
 
-theorem det_complexification (E W : Type) [AddCommGroup E] [Module ℝ E] [FiniteDimensional ℝ E]
-    [AddCommGroup W] [Module ℂ W] (j : E →+ W) (T : E →ₗ[ℝ] E) (S : W →ₗ[ℂ] W)
-    (hj : ∀ (t : ℝ) (x : E), j (t • x) = (t : ℂ) • j x)
+theorem det_complexification
+    (E W : Type) [AddCommGroup E] [Module ℝ E] [FiniteDimensional ℝ E] [AddCommGroup W] [Module ℂ W]
+    (j : E →+ W) (T : E →ₗ[ℝ] E) (S : W →ₗ[ℂ] W) (hj : ∀ (t : ℝ) (x : E), j (t • x) = (t : ℂ) • j x)
     (hspan : ∀ w, ∃ a b, w = j a + Complex.I • j b)
-    (hinj : ∀ a b, j a + Complex.I • j b = 0 → a = 0 ∧ b = 0)
-    (hS : ∀ x, S (j x) = j (T x)) :
-    LinearMap.det S = ((LinearMap.det T : ℝ) : ℂ) := by
+    (hinj : ∀ a b, j a + Complex.I • j b = 0 → a = 0 ∧ b = 0) (hS : ∀ x, S (j x) = j (T x))
+    : LinearMap.det S = ((LinearMap.det T : ℝ) : ℂ) := by
   classical
   let bE := Module.finBasis ℝ E
   let v : Fin (Module.finrank ℝ E) → W := fun i => j (bE i)

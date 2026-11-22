@@ -10,12 +10,17 @@ open CategoryTheory Limits AlgebraicGeometry
 noncomputable section
 namespace GlobalTheory.EtC.Tr
 
-theorem splits_pullbackSnd_of_splits_diagComplHom {Z X V : Scheme.{0}} (f : Z ⟶ X) [IsFinite f] [Etale f]
-    (v : V ⟶ Z) (h : Splits (diagComplHom f) v) : Splits (pullback.snd f f) v := by
+theorem splits_pullbackSnd_of_splits_diagComplHom
+    {Z X V : Scheme.{0}} (f : Z ⟶ X) [IsFinite f] [Etale f]
+    (v : V ⟶ Z) (h : Splits (diagComplHom f) v)
+    : Splits (pullback.snd f f) v := by
   obtain ⟨m, s, hs, hiso⟩ := h
   have hδs : pullback.diagonal f ≫ pullback.snd f f = 𝟙 Z := pullback.diagonal_snd f
   let t : Fin (m + 1) → (V ⟶ pullback f f) :=
-    Fin.cons (α := fun _ => V ⟶ pullback f f) (v ≫ pullback.diagonal f) (fun j => s j ≫ (diagCompl f).ι)
+    Fin.cons
+      (α := fun _ => V ⟶ pullback f f)
+      (v ≫ pullback.diagonal f)
+      (fun j => s j ≫ (diagCompl f).ι)
   have ht0 : t 0 = v ≫ pullback.diagonal f := rfl
   have hts : ∀ k : Fin m, t k.succ = s k ≫ (diagCompl f).ι := fun k => rfl
   have ht : ∀ j, t j ≫ pullback.snd f f = v := by
@@ -24,8 +29,8 @@ theorem splits_pullbackSnd_of_splits_diagComplHom {Z X V : Scheme.{0}} (f : Z �
     | zero => rw [ht0, Category.assoc, hδs, Category.comp_id]
     | succ k => rw [hts, Category.assoc]; exact hs k
   refine ⟨m + 1, t, ht, ?_⟩
-  let d : Fin m → (V ⟶ pullback (diagComplHom f) v) :=
-    fun j => pullback.lift (s j) (𝟙 V) (by rw [hs j, Category.id_comp])
+  let d : Fin m → (V ⟶ pullback (diagComplHom f) v) := fun j =>
+    pullback.lift (s j) (𝟙 V) (by rw [hs j, Category.id_comp])
   let Φ : ∐ (fun _ : Fin m => V) ⟶ pullback (diagComplHom f) v := Sigma.desc d
   have hΦ : IsIso Φ := hiso
   have hdΦ : ∀ k, d k = Sigma.ι (fun _ : Fin m => V) k ≫ Φ := fun k => (Sigma.ι_desc _ _).symm
@@ -44,8 +49,10 @@ theorem splits_pullbackSnd_of_splits_diagComplHom {Z X V : Scheme.{0}} (f : Z �
     exact IsIso.of_isIso_comp_right l (pullback.snd _ _)
   let g : Fin (m + 1) → (V ⟶ pullback (pullback.snd f f) v) :=
     Fin.cons (α := fun _ => V ⟶ pullback (pullback.snd f f) v) (l ≫ eD) (fun k => d k ≫ eU)
-  have hg : (Sigma.desc (fun j => pullback.lift (t j) (𝟙 V) (by rw [ht j, Category.id_comp])) :
-      ∐ (fun _ : Fin (m + 1) => V) ⟶ pullback (pullback.snd f f) v) = Sigma.desc g := by
+  have hg
+      : (Sigma.desc (fun j => pullback.lift (t j) (𝟙 V) (by rw [ht j, Category.id_comp]))
+          : ∐ (fun _ : Fin (m + 1) => V) ⟶ pullback (pullback.snd f f) v)
+        = Sigma.desc g := by
     refine Sigma.hom_ext _ _ (fun j => ?_)
     rw [Sigma.ι_desc, Sigma.ι_desc]
     induction j using Fin.cases with
@@ -56,7 +63,8 @@ theorem splits_pullbackSnd_of_splits_diagComplHom {Z X V : Scheme.{0}} (f : Z �
         rw [Category.assoc, pullback.lift_fst, ← Category.assoc, pullback.lift_fst, ht0]
       · rw [pullback.lift_snd]
         show 𝟙 V = (l ≫ eD) ≫ _
-        rw [Category.assoc, pullback.lift_snd, ← Category.assoc, pullback.lift_snd, Category.id_comp]
+        rw [Category.assoc, pullback.lift_snd, ← Category.assoc, pullback.lift_snd,
+          Category.id_comp]
     | succ k =>
       apply pullback.hom_ext
       · rw [pullback.lift_fst]
@@ -64,7 +72,8 @@ theorem splits_pullbackSnd_of_splits_diagComplHom {Z X V : Scheme.{0}} (f : Z �
         rw [Category.assoc, pullback.lift_fst, ← Category.assoc, pullback.lift_fst, hts]
       · rw [pullback.lift_snd]
         show 𝟙 V = (d k ≫ eU) ≫ _
-        rw [Category.assoc, pullback.lift_snd, ← Category.assoc, pullback.lift_snd, Category.id_comp]
+        rw [Category.assoc, pullback.lift_snd, ← Category.assoc, pullback.lift_snd,
+          Category.id_comp]
   rw [hg]
   have hΦi : IsOpenImmersion Φ := inferInstance
   have hι : ∀ k, IsOpenImmersion (Sigma.ι (fun _ : Fin m => V) k) := fun k => inferInstance

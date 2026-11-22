@@ -14,28 +14,31 @@ open Polynomial
 
 namespace RatDilation
 
-theorem coe_comp_C_mul_X {F : Type} [Field F] (a : F) (f : F[X]) :
-    ((f.comp (C a * X) : F[X]) : PowerSeries F) = PowerSeries.rescale a (f : PowerSeries F) := by
+theorem coe_comp_C_mul_X {F : Type} [Field F] (a : F) (f : F[X])
+    : ((f.comp (C a * X) : F[X]) : PowerSeries F) = PowerSeries.rescale a (f : PowerSeries F) := by
   ext n
   rw [PowerSeries.coeff_rescale, Polynomial.coeff_coe, Polynomial.coeff_coe]
   induction f using Polynomial.induction_on' with
   | add p q hp hq => simp [add_comp, hp, hq, mul_add]
   | monomial m c =>
     rw [← C_mul_X_pow_eq_monomial]
-    simp only [mul_comp, C_comp, X_pow_comp, mul_pow, ← C_pow, ← mul_assoc, ← C_mul, coeff_C_mul_X_pow]
+    simp only [mul_comp, C_comp, X_pow_comp, mul_pow, ← C_pow, ← mul_assoc, ← C_mul,
+      coeff_C_mul_X_pow]
     split_ifs with h <;> simp [h, mul_comm]
 
-theorem natDegree_comp_two {F : Type} [Field F] [CharZero F] (f : F[X]) :
-    (f.comp (C (2:F) * X)).natDegree = f.natDegree := by
+theorem natDegree_comp_two {F : Type} [Field F] [CharZero F] (f : F[X])
+    : (f.comp (C (2 : F) * X)).natDegree = f.natDegree := by
   rw [natDegree_comp, natDegree_C_mul_X _ two_ne_zero, mul_one]
 
-theorem natDegree_eq_zero_of_sq_dvd {F : Type} [Field F] [CharZero F] (f g : F[X]) (hf : f ≠ 0)
-    (hc : IsCoprime f g) (h : f.comp (C (2:F) * X) * g ^ 2 = g.comp (C (2:F) * X) * f ^ 2) :
-    f.natDegree = 0 := by
-  have hd : f ^ 2 ∣ f.comp (C (2:F) * X) := by
-    have : f ^ 2 ∣ f.comp (C (2:F) * X) * g ^ 2 := h ▸ dvd_mul_left _ _
+theorem natDegree_eq_zero_of_sq_dvd
+    {F : Type} [Field F] [CharZero F]
+    (f g : F[X]) (hf : f ≠ 0) (hc : IsCoprime f g)
+    (h : f.comp (C (2 : F) * X) * g ^ 2 = g.comp (C (2 : F) * X) * f ^ 2)
+    : f.natDegree = 0 := by
+  have hd : f ^ 2 ∣ f.comp (C (2 : F) * X) := by
+    have : f ^ 2 ∣ f.comp (C (2 : F) * X) * g ^ 2 := h ▸ dvd_mul_left _ _
     exact (hc.pow).dvd_of_dvd_mul_right this
-  have hne : f.comp (C (2:F) * X) ≠ 0 := by
+  have hne : f.comp (C (2 : F) * X) ≠ 0 := by
     intro h0
     rw [comp_eq_zero_iff] at h0
     rcases h0 with h0 | ⟨_, h0⟩
@@ -49,10 +52,12 @@ theorem natDegree_eq_zero_of_sq_dvd {F : Type} [Field F] [CharZero F] (f g : F[X
 
 end RatDilation
 
-
 open RatDilation in
-theorem rat_dilation_eq_one (F : Type) [Field F] [CharZero F] (φ : PowerSeries F) (hr : IsRat φ)
-    (h0 : PowerSeries.constantCoeff φ = 1) (h2 : PowerSeries.rescale 2 φ = φ ^ 2) : φ = 1 := by
+theorem rat_dilation_eq_one
+    (F : Type) [Field F] [CharZero F]
+    (φ : PowerSeries F)
+    (hr : IsRat φ) (h0 : PowerSeries.constantCoeff φ = 1) (h2 : PowerSeries.rescale 2 φ = φ ^ 2)
+    : φ = 1 := by
   classical
   obtain ⟨p₀, q₀, hq₀, hpq₀⟩ := hr
   set g := GCDMonoid.gcd p₀ q₀ with hg
@@ -63,25 +68,24 @@ theorem rat_dilation_eq_one (F : Type) [Field F] [CharZero F] (φ : PowerSeries 
   have hp₀ : p₀ = g * p := (EuclideanDomain.mul_div_cancel' hg0 (gcd_dvd_left _ _)).symm
   have hq₀' : q₀ = g * q := (EuclideanDomain.mul_div_cancel' hg0 (gcd_dvd_right _ _)).symm
   have hq : q ≠ 0 := by rintro h; rw [h, mul_zero] at hq₀'; exact hq₀ hq₀'
-  have hgc : ((g : F[X]) : PowerSeries F) ≠ 0 := by
-    rwa [Ne, Polynomial.coe_eq_zero_iff]
+  have hgc : ((g : F[X]) : PowerSeries F) ≠ 0 := by rwa [Ne, Polynomial.coe_eq_zero_iff]
   have hpq : (q : PowerSeries F) * φ = (p : PowerSeries F) := by
     rw [hp₀, hq₀', Polynomial.coe_mul, Polynomial.coe_mul, mul_assoc] at hpq₀
     exact mul_left_cancel₀ hgc hpq₀
-  have hφ0 : φ ≠ 0 := by
-    rintro rfl; simp at h0
+  have hφ0 : φ ≠ 0 := by rintro rfl; simp at h0
   have hp : p ≠ 0 := by
     rintro h
     rw [h, Polynomial.coe_zero] at hpq
     rcases mul_eq_zero.1 hpq with h' | h'
     · exact hq ((Polynomial.coe_eq_zero_iff).1 h')
     · exact hφ0 h'
-  have key : p.comp (C (2:F) * X) * q ^ 2 = q.comp (C (2:F) * X) * p ^ 2 := by
+  have key : p.comp (C (2 : F) * X) * q ^ 2 = q.comp (C (2 : F) * X) * p ^ 2 := by
     apply Polynomial.coe_inj.1
-    have e := congrArg (PowerSeries.rescale (2:F)) hpq
+    have e := congrArg (PowerSeries.rescale (2 : F)) hpq
     rw [map_mul, h2, ← RatDilation.coe_comp_C_mul_X, ← RatDilation.coe_comp_C_mul_X] at e
     simp only [Polynomial.coe_mul, Polynomial.coe_pow]
-    rw [← e, ← hpq]; ring
+    rw [← e, ← hpq]
+    ring
   have dq := RatDilation.natDegree_eq_zero_of_sq_dvd q p hq hcop.symm key.symm
   have dp := RatDilation.natDegree_eq_zero_of_sq_dvd p q hp hcop key
   rw [eq_C_of_natDegree_eq_zero dq, eq_C_of_natDegree_eq_zero dp] at hpq
@@ -93,7 +97,8 @@ theorem rat_dilation_eq_one (F : Type) [Field F] [CharZero F] (φ : PowerSeries 
     intro h
     have h0 : PowerSeries.C (q.coeff 0) = PowerSeries.C 0 := by simpa using h
     have h' : q.coeff 0 = 0 := PowerSeries.C_injective h0
-    apply hq; rw [eq_C_of_natDegree_eq_zero dq, h', C_0]
+    apply hq
+    rw [eq_C_of_natDegree_eq_zero dq, h', C_0]
   exact mul_left_cancel₀ ha (hpq.trans (mul_one _).symm)
 
 end GlobalTheory.Nef

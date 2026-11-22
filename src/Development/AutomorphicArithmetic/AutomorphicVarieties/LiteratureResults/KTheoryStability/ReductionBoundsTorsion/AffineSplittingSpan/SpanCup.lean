@@ -21,8 +21,9 @@ theorem dc_dc : ∀ (m : ℕ) (F : (Fin (m + 1) → Y) → ℝ), dc (dc F) = 0 :
     intro F
     funext y
     simp [dc, Fin.sum_univ_succ]
-    have hCD : (fun j : Fin 1 => y (Fin.succAbove 1 (Fin.succAbove 1 j))) =
-        fun j => y (Fin.succAbove 2 (Fin.succAbove 1 j)) := by
+    have hCD
+        : (fun j : Fin 1 => y (Fin.succAbove 1 (Fin.succAbove 1 j)))
+          = fun j => y (Fin.succAbove 2 (Fin.succAbove 1 j)) := by
       funext j
       rw [Subsingleton.elim j (0 : Fin 1)]
       rfl
@@ -36,7 +37,7 @@ theorem dc_dc : ∀ (m : ℕ) (F : (Fin (m + 1) → Y) → ℝ), dc (dc F) = 0 :
     rw [e, dc_sub, ih]
     simp
 
-theorem dc_neg {m : ℕ} (F : (Fin (m + 1) → Y) → ℝ) : dc (-F) = -dc F := by
+theorem dc_neg {m : ℕ} (F : (Fin (m + 1) → Y) → ℝ) : dc (-F) = - dc F := by
   funext y; simp [dc, Finset.sum_neg_distrib]
 
 theorem prism_zero (φ : Y → Y) : ∀ {n : ℕ}, prism φ (0 : (Fin (n + 1) → Y) → ℝ) = 0 := by
@@ -66,34 +67,35 @@ def tcup (l : Additive P →+ ℝ) {n : ℕ} (e : (Fin (n + 1) → P) → ℝ) :
 
 theorem tail_eq' {α : Type} {k : ℕ} (q : Fin (k + 1) → α) : Fin.tail q = fun i => q i.succ := rfl
 
-theorem dc_tcup (l : Additive P →+ ℝ) {n : ℕ} (e : (Fin (n + 1) → P) → ℝ) :
-    dc (tcup l e) = -tcup l (dc e) := by
+theorem dc_tcup (l : Additive P →+ ℝ) {n : ℕ} (e : (Fin (n + 1) → P) → ℝ)
+    : dc (tcup l e) = - tcup l (dc e) := by
   funext y
   simp [dc, tcup, Fin.sum_univ_succ, tail_eq']
   simp only [pow_succ, mul_add, Finset.mul_sum, neg_add, ← Finset.sum_neg_distrib]
   ring_nf
 
-theorem tcup_inv (l : Additive P →+ ℝ) (S : Set P) {n : ℕ} (e : (Fin (n + 1) → P) → ℝ) (he : InvS S e) :
-    InvS S (tcup l e) := by
+theorem tcup_inv
+    (l : Additive P →+ ℝ) (S : Set P) {n : ℕ} (e : (Fin (n + 1) → P) → ℝ) (he : InvS S e)
+    : InvS S (tcup l e) := by
   intro g hg y
   simp only [tcup]
   rw [show (g * y 0)⁻¹ * (g * y 1) = (y 0)⁻¹ * y 1 by group]
   congr 1
   exact he g hg (Fin.tail y)
 
-theorem tcup_add (l : Additive P →+ ℝ) {n : ℕ} (e f : (Fin (n + 1) → P) → ℝ) :
-    tcup l (e + f) = tcup l e + tcup l f := by
+theorem tcup_add (l : Additive P →+ ℝ) {n : ℕ} (e f : (Fin (n + 1) → P) → ℝ)
+    : tcup l (e + f) = tcup l e + tcup l f := by
   funext y; simp [tcup, mul_add]
 
-theorem tcup_sum (l : Additive P →+ ℝ) {n k : ℕ} (a : Fin k → ℝ) (F : Fin k → (Fin (n + 1) → P) → ℝ) :
-    tcup l (∑ i, a i • F i) = ∑ i, a i • tcup l (F i) := by
+theorem tcup_sum (l : Additive P →+ ℝ) {n k : ℕ} (a : Fin k → ℝ) (F : Fin k → (Fin (n + 1) → P) → ℝ)
+    : tcup l (∑ i, a i • F i) = ∑ i, a i • tcup l (F i) := by
   funext y
   simp only [tcup, Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   ring
 
-theorem tcup_cupH (l : Additive P →+ ℝ) {q : ℕ} (β : Fin q → (Additive P →+ ℝ)) :
-    tcup l (cupH β) = cupH (Fin.cons l β) := by
+theorem tcup_cupH (l : Additive P →+ ℝ) {q : ℕ} (β : Fin q → (Additive P →+ ℝ))
+    : tcup l (cupH β) = cupH (Fin.cons l β) := by
   funext y
   simp [tcup, cupH, Fin.prod_univ_succ, Fin.tail]
 

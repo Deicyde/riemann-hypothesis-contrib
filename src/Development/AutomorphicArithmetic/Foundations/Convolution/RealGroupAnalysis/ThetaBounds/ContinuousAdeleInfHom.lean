@@ -6,7 +6,9 @@ public import GroundTheory.HeightsAndTheta.Theta.AdelicFourierCoord
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
 open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.Ff
 open scoped Classical
 
@@ -18,9 +20,9 @@ section
 
 variable {K : Type} [Field K] [NumberField K]
 
-private theorem inv_map_mulVec {R : Type} [CommRing R] (h : A K →+* R) (g : GL (Fin 4) (A K))
-    (v : Fin 4 → A K) :
-    (g⁻¹).val.map h *ᵥ (fun i => h ((g.val *ᵥ v) i)) = fun i => h (v i) := by
+private theorem inv_map_mulVec
+    {R : Type} [CommRing R] (h : A K →+* R) (g : GL (Fin 4) (A K)) (v : Fin 4 → A K)
+    : (g⁻¹).val.map h *ᵥ (fun i => h ((g.val *ᵥ v) i)) = fun i => h (v i) := by
   rw [map_mulVec_eq, Matrix.mulVec_mulVec, ← Matrix.map_mul, ← Units.val_mul, inv_mul_cancel,
     Units.val_one, Matrix.map_one h (map_zero h) (map_one h), Matrix.one_mulVec]
 
@@ -30,20 +32,21 @@ private theorem continuous_adeleInfHom : Continuous (adeleInfHom : A K → mixed
 private theorem continuous_adeleFinHom : Continuous (adeleFinHom : A K → FiniteAdeleRing (𝓞 K) K) :=
   continuous_snd
 
-private theorem continuous_invEntry (i j : Fin 4) :
-    Continuous fun x : GL (Fin 4) (A K) => (x⁻¹).val i j :=
+private theorem continuous_invEntry (i j : Fin 4)
+    : Continuous fun x : GL (Fin 4) (A K) => (x⁻¹).val i j :=
   (Units.continuous_val.comp continuous_inv).matrix_elem i j
 
-private theorem wt_nonneg (S : Set (Fin 4 → FiniteAdeleRing (𝓞 K) K)) (N : ℕ) (v : V4 K) :
-    0 ≤ wt S N v := by
+private theorem wt_nonneg (S : Set (Fin 4 → FiniteAdeleRing (𝓞 K) K)) (N : ℕ) (v : V4 K)
+    : 0 ≤ wt S N v := by
   unfold wt
   split_ifs
   · positivity
   · exact le_rfl
 
-private theorem wt_le_of {S S' : Set (Fin 4 → FiniteAdeleRing (𝓞 K) K)} {N : ℕ} {v w : V4 K} {m : ℝ}
-    (hm1 : 1 ≤ m) (h : finPartPi w ∈ S → finPartPi v ∈ S' ∧ ‖infPartPi v‖ ≤ m * ‖infPartPi w‖) :
-    wt S N w ≤ m ^ N * wt S' N v := by
+private theorem wt_le_of
+    {S S' : Set (Fin 4 → FiniteAdeleRing (𝓞 K) K)} {N : ℕ} {v w : V4 K} {m : ℝ}
+    (hm1 : 1 ≤ m) (h : finPartPi w ∈ S → finPartPi v ∈ S' ∧ ‖infPartPi v‖ ≤ m * ‖infPartPi w‖)
+    : wt S N w ≤ m ^ N * wt S' N v := by
   have hm0 : 0 ≤ m ^ N := by positivity
   by_cases hv : finPartPi w ∈ S
   · obtain ⟨hfin, hs⟩ := h hv
@@ -63,29 +66,36 @@ private theorem wt_le_of {S S' : Set (Fin 4 → FiniteAdeleRing (𝓞 K) K)} {N 
     rw [this]
     exact mul_nonneg hm0 (wt_nonneg _ _ _)
 
-private theorem norm_mulVec_le (M : Matrix (Fin 4) (Fin 4) (mixedSpace K))
-    (u : Fin 4 → mixedSpace K) : ‖M *ᵥ u‖ ≤ (∑ i, ∑ j, ‖M i j‖) * ‖u‖ := by
+private theorem norm_mulVec_le
+    (M : Matrix (Fin 4) (Fin 4) (mixedSpace K)) (u : Fin 4 → mixedSpace K)
+    : ‖M *ᵥ u‖ ≤ (∑ i, ∑ j, ‖M i j‖) * ‖u‖ := by
   refine (pi_norm_le_iff_of_nonneg (by positivity)).2 fun i => ?_
-  calc ‖(M *ᵥ u) i‖ = ‖∑ j, M i j * u j‖ := rfl
+  calc
+    ‖(M *ᵥ u) i‖
+      = ‖∑ j, M i j * u j‖ := rfl
     _ ≤ ∑ j, ‖M i j * u j‖ := norm_sum_le _ _
-    _ ≤ ∑ j, ‖M i j‖ * ‖u‖ := Finset.sum_le_sum fun j _ =>
+    _ ≤ ∑ j, ‖M i j‖ * ‖u‖ :=
+      Finset.sum_le_sum fun j _ =>
         (norm_mul_le _ _).trans (mul_le_mul_of_nonneg_left (norm_le_pi_norm u j) (norm_nonneg _))
     _ = (∑ j, ‖M i j‖) * ‖u‖ := (Finset.sum_mul _ _ _).symm
     _ ≤ (∑ i, ∑ j, ‖M i j‖) * ‖u‖ := by
-        refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
-        exact Finset.single_le_sum (f := fun i => ∑ j, ‖M i j‖)
-          (fun i _ => Finset.sum_nonneg fun j _ => norm_nonneg _) (Finset.mem_univ i)
+      refine mul_le_mul_of_nonneg_right ?_ (norm_nonneg _)
+      exact Finset.single_le_sum
+        (f := fun i => ∑ j, ‖M i j‖)
+        (fun i _ => Finset.sum_nonneg fun j _ => norm_nonneg _)
+        (Finset.mem_univ i)
 
 end
 
 end UpperTheory.ConvolutionTheory.R2.Ff
 
 open GroundTheory.Heights₂.Theta NumberField.mixedEmbedding in
-theorem UpperTheory.ConvolutionTheory.R2.Ff.wtLin :
-    ∀ (F : Type) [Field F] [NumberField F], WtLin F := by
+theorem UpperTheory.ConvolutionTheory.R2.Ff.wtLin
+    : ∀ (F : Type) [Field F] [NumberField F], WtLin F := by
   intro F _ _ C hC K hK
 
-  let ψ : GL (Fin 4) (A F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) → (Fin 4 → FiniteAdeleRing (𝓞 F) F) :=
+  let ψ
+      : GL (Fin 4) (A F) × (Fin 4 → FiniteAdeleRing (𝓞 F) F) → (Fin 4 → FiniteAdeleRing (𝓞 F) F) :=
     fun p => (p.1⁻¹).val.map adeleFinHom *ᵥ p.2
   have hψ : Continuous ψ := by
     exact (Continuous.matrix_map (Units.continuous_val.comp (continuous_inv.comp continuous_fst))
@@ -111,5 +121,5 @@ theorem UpperTheory.ConvolutionTheory.R2.Ff.wtLin :
     simpa only [infPartPi_eq_adeleInfHom] using this.symm
   refine ⟨hfin, ?_⟩
   rw [hinf]
-  exact (norm_mulVec_le _ _).trans (mul_le_mul_of_nonneg_right
-    ((hβle x hx).trans (le_max_right _ _)) (norm_nonneg _))
+  exact (norm_mulVec_le _ _).trans
+    (mul_le_mul_of_nonneg_right ((hβle x hx).trans (le_max_right _ _)) (norm_nonneg _))

@@ -169,17 +169,17 @@ private lemma length_quotient_smul_univ_eq_finrank_mul {A M : Type*} [CommRing A
   rw [e1, add_comm] at e2
   exact (WithTop.add_left_cancel hfin e2).symm
 
-
 open IsLocalRing in
 open scoped Pointwise in
-theorem _root_.GlobalTheory.finsum_ord_mul_inertiaDeg_eq_finrank_mul_ord (A B : Type) [CommRing A] [IsDomain A]
-    [IsNoetherianRing A] [IsLocalRing A] [CommRing B] [IsDomain B] [Algebra A B]
-    [Module.Finite A B] (hinj : Function.Injective (algebraMap A B)) (hdim : ringKrullDim A = 1)
-    (a : A) (ha : a ≠ 0) :
-    ∑ᶠ Q ∈ {Q : PrimeSpectrum B | Q.asIdeal.comap (algebraMap A B) = IsLocalRing.maximalIdeal A},
-      ((Ring.ord (Localization.AtPrime Q.asIdeal)
-        (algebraMap B _ (algebraMap A B a))).toNat : ℤ) * (Q.asIdeal.inertiaDeg A : ℤ) =
-      (Module.finrank A B : ℤ) * ((Ring.ord A a).toNat : ℤ) := by
+theorem _root_.GlobalTheory.finsum_ord_mul_inertiaDeg_eq_finrank_mul_ord
+    (A B : Type) [CommRing A] [IsDomain A] [IsNoetherianRing A] [IsLocalRing A] [CommRing B]
+    [IsDomain B] [Algebra A B] [Module.Finite A B]
+    (hinj : Function.Injective (algebraMap A B)) (hdim : ringKrullDim A = 1)
+    (a : A) (ha : a ≠ 0)
+    : ∑ᶠ Q ∈ {Q : PrimeSpectrum B | Q.asIdeal.comap (algebraMap A B) = IsLocalRing.maximalIdeal A},
+        ((Ring.ord (Localization.AtPrime Q.asIdeal)
+          (algebraMap B _ (algebraMap A B a))).toNat : ℤ) * (Q.asIdeal.inertiaDeg A : ℤ)
+      = (Module.finrank A B : ℤ) * ((Ring.ord A a).toNat : ℤ) := by
   classical
   haveI : Ring.KrullDimLE 1 A := Ring.krullDimLE_iff.2 hdim.le
   haveI : IsNoetherianRing B := isNoetherian_of_tower A inferInstance
@@ -201,8 +201,9 @@ theorem _root_.GlobalTheory.finsum_ord_mul_inertiaDeg_eq_finrank_mul_ord (A B : 
       exact ⟨y, Submodule.mem_top, by rw [Algebra.smul_def, mul_comm]⟩
     · rintro ⟨y, -, rfl⟩
       exact ⟨y, by rw [Algebra.smul_def, mul_comm]⟩
-  have hordA : Ring.ord A a ≠ ⊤ := Module.length_ne_top_iff.2
-    (isFiniteLength_quotient_span_singleton A (mem_nonZeroDivisors_of_ne_zero ha))
+  have hordA : Ring.ord A a ≠ ⊤ :=
+    Module.length_ne_top_iff.2 (isFiniteLength_quotient_span_singleton A
+      (mem_nonZeroDivisors_of_ne_zero ha))
   have h1 : Module.length A (B ⧸ Ideal.span {b}) = Module.finrank A B * Ring.ord A a := by
     rw [← (Submodule.Quotient.restrictScalarsEquiv A (Ideal.span {b})).length_eq, hI,
       length_quotient_smul_univ_eq_finrank_mul a hM]
@@ -215,43 +216,57 @@ theorem _root_.GlobalTheory.finsum_ord_mul_inertiaDeg_eq_finrank_mul_ord (A B : 
   have hfinB : IsFiniteLength B (B ⧸ Ideal.span {b}) := by
     rw [isFiniteLength_iff_isNoetherian_isArtinian] at hfinA ⊢
     exact ⟨inferInstance, isArtinian_of_tower A hfinA.2⟩
-  have h2 := _root_.GlobalTheory.length_restrictScalars_eq_sum_inertiaDeg_of_isLocalizedModule A B hfinB
-    (fun n : MaximalSpectrum B ↦ Localization.AtPrime n.asIdeal)
-    (fun n ↦ Localization.AtPrime n.asIdeal ⧸ (Ideal.span {b}).localized'
-      (Localization.AtPrime n.asIdeal) n.asIdeal.primeCompl (Algebra.linearMap B (Localization.AtPrime n.asIdeal)))
-    (fun n ↦ (Ideal.span {b}).toLocalizedQuotient' (Localization.AtPrime n.asIdeal)
-      n.asIdeal.primeCompl (Algebra.linearMap B (Localization.AtPrime n.asIdeal)))
-  have hloc : ∀ n : MaximalSpectrum B, Module.length (Localization.AtPrime n.asIdeal)
-      (Localization.AtPrime n.asIdeal ⧸ (Ideal.span {b}).localized'
-        (Localization.AtPrime n.asIdeal) n.asIdeal.primeCompl (Algebra.linearMap B (Localization.AtPrime n.asIdeal))) =
-      Ring.ord (Localization.AtPrime n.asIdeal) (algebraMap B _ b) := by
+  have h2 :=
+    _root_.GlobalTheory.length_restrictScalars_eq_sum_inertiaDeg_of_isLocalizedModule A B hfinB
+      (fun n : MaximalSpectrum B ↦ Localization.AtPrime n.asIdeal)
+      (fun n ↦
+        Localization.AtPrime n.asIdeal ⧸ (Ideal.span {b}).localized'
+          (Localization.AtPrime n.asIdeal) n.asIdeal.primeCompl (Algebra.linearMap B (Localization.AtPrime n.asIdeal)))
+      (fun n ↦
+        (Ideal.span {b}).toLocalizedQuotient' (Localization.AtPrime n.asIdeal) n.asIdeal.primeCompl
+          (Algebra.linearMap B (Localization.AtPrime n.asIdeal)))
+  have hloc
+      : ∀ n : MaximalSpectrum B,
+        Module.length (Localization.AtPrime n.asIdeal)
+            (Localization.AtPrime n.asIdeal ⧸ (Ideal.span {b}).localized'
+              (Localization.AtPrime n.asIdeal) n.asIdeal.primeCompl (Algebra.linearMap B (Localization.AtPrime n.asIdeal)))
+          = Ring.ord (Localization.AtPrime n.asIdeal) (algebraMap B _ b) := by
     intro n
     rw [Submodule.localized'_span, Set.image_singleton]
     rfl
   simp only [hloc, h1] at h2
-  have hterm : ∀ n ∈ (Finset.univ : Finset (MaximalSpectrum B)),
-      Ring.ord (Localization.AtPrime n.asIdeal) (algebraMap B _ b) *
-        ((n.asIdeal.inertiaDeg A : ℕ) : ℕ∞) ≠ ⊤ := fun n hn ↦
-    ne_top_of_le_ne_top (h2 ▸ hne) (Finset.single_le_sum (f := fun n : MaximalSpectrum B ↦
-      Ring.ord (Localization.AtPrime n.asIdeal) (algebraMap B _ b) *
-        ((n.asIdeal.inertiaDeg A : ℕ) : ℕ∞)) (fun _ _ ↦ bot_le) hn)
+  have hterm
+      : ∀ n ∈ (Finset.univ : Finset (MaximalSpectrum B)),
+        Ring.ord (Localization.AtPrime n.asIdeal) (algebraMap B _ b)
+            * ((n.asIdeal.inertiaDeg A : ℕ) : ℕ∞)
+          ≠ ⊤ := fun n hn ↦
+    ne_top_of_le_ne_top (h2 ▸ hne)
+      (Finset.single_le_sum
+        (f := fun n : MaximalSpectrum B ↦
+          Ring.ord (Localization.AtPrime n.asIdeal) (algebraMap B _ b)
+            * ((n.asIdeal.inertiaDeg A : ℕ) : ℕ∞))
+        (fun _ _ ↦ bot_le)
+        hn)
   have h3 := congrArg ENat.toNat h2
   rw [ENat.toNat_sum hterm] at h3
   simp only [ENat.toNat_mul, ENat.toNat_coe] at h3
-  have hS : {Q : PrimeSpectrum B | Q.asIdeal.comap (algebraMap A B) = maximalIdeal A} =
-      Set.range MaximalSpectrum.toPrimeSpectrum := by
+  have hS
+      : {Q : PrimeSpectrum B | Q.asIdeal.comap (algebraMap A B) = maximalIdeal A}
+        = Set.range MaximalSpectrum.toPrimeSpectrum := by
     ext Q
     constructor
     · intro hQ
       have : (Q.asIdeal.comap (algebraMap A B)).IsMaximal := by
         rw [show Q.asIdeal.comap (algebraMap A B) = maximalIdeal A from hQ]; infer_instance
       have hInt : (algebraMap A B).IsIntegral := fun x ↦ IsIntegral.of_finite A x
-      exact ⟨⟨Q.asIdeal,
-        Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap A B) hInt _ this⟩, rfl⟩
+      exact ⟨
+        ⟨Q.asIdeal, Ideal.isMaximal_of_isIntegral_of_isMaximal_comap (algebraMap A B) hInt _ this⟩,
+        rfl
+      ⟩
     · rintro ⟨n, rfl⟩
       have hInt : (algebraMap A B).IsIntegral := fun x ↦ IsIntegral.of_finite A x
-      exact IsLocalRing.eq_maximalIdeal
-        (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal (algebraMap A B) hInt n.asIdeal)
+      exact IsLocalRing.eq_maximalIdeal (Ideal.isMaximal_comap_of_isIntegral_of_isMaximal
+        (algebraMap A B) hInt n.asIdeal)
   rw [hS, finsum_mem_range MaximalSpectrum.toPrimeSpectrum_injective, finsum_eq_sum_of_fintype]
   exact_mod_cast h3.symm
 

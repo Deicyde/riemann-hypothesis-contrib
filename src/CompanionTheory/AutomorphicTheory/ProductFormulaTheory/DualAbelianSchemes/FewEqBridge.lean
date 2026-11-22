@@ -8,9 +8,12 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual CompanionTheory.ObstructionTrivialLocus
 open GlobalTheory.CechDR MainStatements.Hodge
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -23,6 +26,7 @@ theorem fewEquations_of_fewEqSt (hF : FewEqSt) (hLe : H1StructureDimLe) : FewEqu
   obtain ⟨_, hab', hsm'⟩ := GlobalTheory.CompanionTheory.Hodge.FormBC.exists_grp A g hab hsm s' φ hP
   exact hLe _ (Over.mk s') g hab' hsm'
 
-theorem fewEquations_pf : H1StructureDimLe → FewEquations := fun hLe => fewEquations_of_fewEqSt GlobalTheory.T.FewEquationsStatement hLe
+theorem fewEquations_pf : H1StructureDimLe → FewEquations := fun hLe =>
+  fewEquations_of_fewEqSt GlobalTheory.T.FewEquationsStatement hLe
 
 end CompanionTheory.PfDual

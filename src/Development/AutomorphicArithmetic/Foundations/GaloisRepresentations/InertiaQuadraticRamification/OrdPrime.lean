@@ -11,13 +11,16 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.AbsNormPr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal GlobalTheory.CuspRep UpperTheory.V.Published
 open UpperTheory.Gal.UnramifiedFromSplittingCriterion
 open scoped Pointwise
 
-private theorem op_isPlaceOver {Ω : Type} [Field Ω] [Algebra ℚ Ω] (A : ValuationSubring Ω)
-    (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ) (hp : p.Prime) (hv : ((p : ℕ) : 𝓞 ℚ) ∈ v.asIdeal)
-    (hA : A.valuation (p : Ω) < 1) : IsPlaceOver A v := by
+private theorem op_isPlaceOver
+    {Ω : Type} [Field Ω] [Algebra ℚ Ω]
+    (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 ℚ)) (p : ℕ)
+    (hp : p.Prime) (hv : ((p : ℕ) : 𝓞 ℚ) ∈ v.asIdeal) (hA : A.valuation (p : Ω) < 1)
+    : IsPlaceOver A v := by
   intro x
   obtain ⟨n, rfl⟩ : ∃ n : ℤ, x = (n : 𝓞 ℚ) :=
     ⟨Rat.ringOfIntegersEquiv x, Rat.ringOfIntegersEquiv.injective (by rw [map_intCast]; simp)⟩
@@ -65,29 +68,41 @@ private theorem op_normV (v : HeightOneSpectrum (𝓞 ℚ)) : normV v = Ideal.ab
   rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]
   rfl
 
-private theorem op_ringHom_eq {Y Ω : Type} [Field Y] [NumberField Y] [Field Ω] [CharZero Ω] (j₁ j₂ : Y →+* Ω)
-    (h : ∀ i, j₁ (Module.finBasis ℚ Y i) = j₂ (Module.finBasis ℚ Y i)) (y : Y) : j₁ y = j₂ y := by
-  have := (Module.finBasis ℚ Y).ext (f₁ := (RingHom.toRatAlgHom j₁).toLinearMap)
-    (f₂ := (RingHom.toRatAlgHom j₂).toLinearMap) h
+private theorem op_ringHom_eq
+    {Y Ω : Type} [Field Y] [NumberField Y] [Field Ω] [CharZero Ω]
+    (j₁ j₂ : Y →+* Ω) (h : ∀ i, j₁ (Module.finBasis ℚ Y i) = j₂ (Module.finBasis ℚ Y i))
+    (y : Y)
+    : j₁ y = j₂ y := by
+  have :=
+    (Module.finBasis ℚ Y).ext (f₁ := (RingHom.toRatAlgHom j₁).toLinearMap)
+      (f₂ := (RingHom.toRatAlgHom j₂).toLinearMap) h
   exact DFunLike.congr_fun this y
 
-private theorem op_dec_le {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    {N : Subgroup (G F Ω)} (hNo : IsOpen (N : Set (G F Ω))) {B : ValuationSubring Ω}
-    {u : HeightOneSpectrum (𝓞 F)} (hB : IsPlaceOver B u) (hI : Ine (F := F) B ≤ N) {σ : G F Ω}
-    (hσ : IsFrob B (normV u) σ) (hσN : σ ∈ N) : Dec (F := F) B ≤ N := by
+private theorem op_dec_le
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {N : Subgroup (G F Ω)} (hNo : IsOpen (N : Set (G F Ω)))
+    {B : ValuationSubring Ω} {u : HeightOneSpectrum (𝓞 F)}
+    (hB : IsPlaceOver B u) (hI : Ine (F := F) B ≤ N)
+    {σ : G F Ω} (hσ : IsFrob B (normV u) σ) (hσN : σ ∈ N)
+    : Dec (F := F) B ≤ N := by
   intro d hd
   have h := GlobalTheory.TameQuot.closure_frob_sup_Ine F Ω B u hB ⟨σ, hσ.1⟩ hσ
-  have hc : IsClosed ((N.subgroupOf (Dec (F := F) B) : Subgroup (Dec (F := F) B)) : Set (Dec (F := F) B)) :=
+  have hc : IsClosed
+      ((N.subgroupOf (Dec (F := F) B) : Subgroup (Dec (F := F) B)) : Set (Dec (F := F) B)) :=
     (N.isClosed_of_isOpen hNo).preimage continuous_subtype_val
-  have h2 := Subgroup.topologicalClosure_minimal
-    (Subgroup.zpowers (⟨σ, hσ.1⟩ : Dec (F := F) B) ⊔ (Ine (F := F) B).subgroupOf (Dec (F := F) B))
-    (sup_le (Subgroup.zpowers_le.2 (Subgroup.mem_subgroupOf.2 hσN))
-      (fun x hx => Subgroup.mem_subgroupOf.2 (hI (Subgroup.mem_subgroupOf.1 hx)))) hc
+  have h2 :=
+    Subgroup.topologicalClosure_minimal
+      (Subgroup.zpowers (⟨σ, hσ.1⟩ : Dec (F := F) B) ⊔ (Ine (F := F) B).subgroupOf (Dec (F := F) B))
+      (sup_le (Subgroup.zpowers_le.2 (Subgroup.mem_subgroupOf.2 hσN))
+        (fun x hx => Subgroup.mem_subgroupOf.2 (hI (Subgroup.mem_subgroupOf.1 hx))))
+      hc
   rw [h] at h2
   exact Subgroup.mem_subgroupOf.1 (h2 (Subgroup.mem_top (⟨d, hd⟩ : Dec (F := F) B)))
 
-private theorem op_arith {ℓ m j k t : ℕ} (hℓ : ℓ.Prime) (hm : m ∣ ℓ ^ j * t) (hm0 : m ≠ 0) (hk : ℓ ^ k ∣ t)
-    (hn : ¬ ℓ ^ k ∣ m) : m ∣ t := by
+private theorem op_arith
+    {ℓ m j k t : ℕ}
+    (hℓ : ℓ.Prime) (hm : m ∣ ℓ ^ j * t) (hm0 : m ≠ 0) (hk : ℓ ^ k ∣ t) (hn : ¬ ℓ ^ k ∣ m)
+    : m ∣ t := by
   obtain ⟨a, m', hm', rfl⟩ := Nat.exists_eq_pow_mul_and_not_dvd hm0 ℓ hℓ.ne_one
   have hak : a < k := by
     by_contra h
@@ -97,16 +112,22 @@ private theorem op_arith {ℓ m j k t : ℕ} (hℓ : ℓ.Prime) (hm : m ∣ ℓ 
   have h2 : ℓ ^ a ∣ t := (pow_dvd_pow ℓ hak.le).trans hk
   exact (hco.pow_left a).mul_dvd_of_dvd_of_dvd h2 h1
 
-private theorem op_val_root {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {q n : ℕ} {y : Ω} (hn0 : n ≠ 0)
-    (hq : ¬ A.valuation (q : Ω) < 1) (hy : y ^ n = (q : Ω)) : A.valuation y = 1 := by
+private theorem op_val_root
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {q n : ℕ} {y : Ω} (hn0 : n ≠ 0) (hq : ¬ A.valuation (q : Ω) < 1) (hy : y ^ n = (q : Ω))
+    : A.valuation y = 1 := by
   have h1 : A.valuation (q : Ω) = 1 := le_antisymm (valuation_natCast_le_one A q) (not_lt.1 hq)
   rw [← hy, map_pow] at h1
   exact (pow_eq_one_iff.1 h1).resolve_right hn0
 
-private theorem op_val {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {p q n t : ℕ} {y w : Ω}
-    (hp : A.valuation (p : Ω) < 1) (hn : ¬ A.valuation (n : Ω) < 1) (hn0 : n ≠ 0)
-    (hq : ¬ A.valuation (q : Ω) < 1) (hy : y ^ n = (q : Ω)) (hw : w ^ n = (q : Ω))
-    (hfrob : A.valuation (w - y ^ (n * t + 1)) < 1) (hqt : (p : ℤ) ∣ (q : ℤ) ^ t - 1) : w = y := by
+private theorem op_val
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {p q n t : ℕ} {y w : Ω} (hp : A.valuation (p : Ω) < 1) (hn : ¬ A.valuation (n : Ω) < 1)
+    (hn0 : n ≠ 0) (hq : ¬ A.valuation (q : Ω) < 1) (hy : y ^ n = (q : Ω)) (hw : w ^ n = (q : Ω))
+    (hfrob : A.valuation (w - y ^ (n * t + 1)) < 1) (hqt : (p : ℤ) ∣ (q : ℤ) ^ t - 1)
+    : w = y := by
   have hvy := op_val_root A hn0 hq hy
   have hy0 : y ≠ 0 := by
     rintro rfl
@@ -136,8 +157,7 @@ private theorem op_val {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {p q n t
     exact Valuation.map_add_lt _ hfrob h2
   rw [eq_of_pow_eq_one A hn hξn (one_pow n) h3, one_mul]
 
-theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.ordPrime :
-    KumMove → OrdPrime := by
+theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.ordPrime : KumMove → OrdPrime := by
   classical
   intro hKum E Ω _ _ _ _ _ ℓ k q B hℓ hq
   have hc0 : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
@@ -150,8 +170,9 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.ordPrime :
   have hLfin : FiniteDimensional ℚ L := by
     have : Finite X := hXfin
     exact IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
-  obtain ⟨U0, hU0n, hU0o, -, hU0U⟩ := GlobalTheory.OpenNormal.exists_open_normal_le Ω ℚ L.fixingSubgroup
-    (IntermediateField.fixingSubgroup_isOpen L)
+  obtain ⟨U0, hU0n, hU0o, -, hU0U⟩ :=
+    GlobalTheory.OpenNormal.exists_open_normal_le Ω ℚ L.fixingSubgroup
+      (IntermediateField.fixingSubgroup_isOpen L)
 
   obtain ⟨j, hj⟩ := hKum Ω U0 hU0o ℓ q hℓ hq
   have hℓ0 : ∀ n, 0 < ℓ ^ n := fun n => pow_pos hℓ.pos n
@@ -166,17 +187,20 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.ordPrime :
   have hL2fin : FiniteDimensional ℚ L2 := by
     have : Finite X2 := hX2fin
     exact IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
-  obtain ⟨N, hNn, hNo, -, hNU⟩ := GlobalTheory.OpenNormal.exists_open_normal_le Ω ℚ (L2.fixingSubgroup ⊓ U0)
-    ((IntermediateField.fixingSubgroup_isOpen L2).inter hU0o)
+  obtain ⟨N, hNn, hNo, -, hNU⟩ :=
+    GlobalTheory.OpenNormal.exists_open_normal_le Ω ℚ (L2.fixingSubgroup ⊓ U0)
+      ((IntermediateField.fixingSubgroup_isOpen L2).inter hU0o)
   have hfix : ∀ n ∈ N, ∀ x ∈ X2, n x = x := fun n hn x hx =>
-    (IntermediateField.mem_fixingSubgroup_iff L2 n).1 (hNU hn).1 x (IntermediateField.subset_adjoin ℚ X2 hx)
+    (IntermediateField.mem_fixingSubgroup_iff L2 n).1 (hNU hn).1 x
+      (IntermediateField.subset_adjoin ℚ X2 hx)
 
   set K := max B (max q (ℓ ^ (j + k))) with hK
   have hKne : ((K.factorial : ℕ) : 𝓞 ℚ) ≠ 0 := Nat.cast_ne_zero.2 (Nat.factorial_ne_zero K)
-  have hspan : Ideal.span {((K.factorial : ℕ) : 𝓞 ℚ)} ≠ 0 := by
-    simpa using hKne
-  obtain ⟨v, hvS, hd, -, B0, hB0, hIne, φ, hφ, hφg⟩ := GlobalTheory.Published.chebotarevDegreeOne_iff_cheb.1
-    GlobalTheory.Published.chebotarevDegreeOne' ℚ Ω N hNo hNn σ (Ideal.finite_factors hspan).toFinset
+  have hspan : Ideal.span {((K.factorial : ℕ) : 𝓞 ℚ)} ≠ 0 := by simpa using hKne
+  obtain ⟨v, hvS, hd, -, B0, hB0, hIne, φ, hφ, hφg⟩ :=
+    GlobalTheory.Published.chebotarevDegreeOne_iff_cheb.1
+      GlobalTheory.Published.chebotarevDegreeOne' ℚ Ω N hNo hNn σ
+      (Ideal.finite_factors hspan).toFinset
   have hKv : ((K.factorial : ℕ) : 𝓞 ℚ) ∉ v.asIdeal := by
     intro h
     apply hvS
@@ -230,15 +254,13 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.ordPrime :
         (hφ.2 ζ (valuation_eq_one_of_pow_eq_one B0 (hℓ0 _).ne' hζ.pow_eq_one).le)
       · rw [← map_pow, hζ.pow_eq_one, map_one]
       · rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]
-    have hφζ : φ ζ = ζ := by
-      rw [hφX ζ (Set.mem_insert _ _), hσζ]
+    have hφζ : φ ζ = ζ := by rw [hφX ζ (Set.mem_insert _ _), hσζ]
     have hpow : ζ ^ (normV v - 1) = 1 := by
       have : ζ ^ (normV v - 1) * ζ = 1 * ζ := by
         rw [← pow_succ, Nat.sub_add_cancel hpr.one_le, one_mul, ← h1, hφζ]
       exact mul_right_cancel₀ hζ0 this
     obtain ⟨c, hc⟩ := hζ.dvd_of_pow_eq_one _ hpow
-    have hpt : normV v - 1 = ℓ ^ j * (ℓ ^ k * c) := by
-      rw [hc, pow_add, mul_assoc]
+    have hpt : normV v - 1 = ℓ ^ j * (ℓ ^ k * c) := by rw [hc, pow_add, mul_assoc]
     have hpt' : normV v = ℓ ^ j * (ℓ ^ k * c) + 1 := by
       have := hpr.one_le
       omega
@@ -282,7 +304,10 @@ theorem UpperTheory.Gal.UnramifiedFromSplittingCriterion.ordPrime :
     have h1 := hU0n.conj_mem _ (hDec hk) s
     have h2 : s * (s⁻¹ * h' * s) * s⁻¹ = h' := by group
     rw [h2] at h1
-    have hfixb : ∀ i, h (algebraMap E Ω (Module.finBasis ℚ E i)) = algebraMap E Ω (Module.finBasis ℚ E i) :=
-      fun i => (IntermediateField.mem_fixingSubgroup_iff L h').1 (hU0U h1) _
+    have hfixb
+        : ∀ i,
+          h (algebraMap E Ω (Module.finBasis ℚ E i))
+            = algebraMap E Ω (Module.finBasis ℚ E i) := fun i =>
+      (IntermediateField.mem_fixingSubgroup_iff L h').1 (hU0U h1) _
         (IntermediateField.subset_adjoin ℚ X ⟨i, rfl⟩)
     exact op_ringHom_eq ((h : Ω →+* Ω).comp (algebraMap E Ω)) (algebraMap E Ω) hfixb z

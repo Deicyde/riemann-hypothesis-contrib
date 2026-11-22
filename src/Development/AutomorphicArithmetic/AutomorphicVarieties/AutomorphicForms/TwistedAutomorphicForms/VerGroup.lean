@@ -4,8 +4,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 @[expose] public section
 
-theorem UpperTheory.V.Af.Tw.verGroup :
-    UpperTheory.V.Af.Tw.VerGroup := by
+theorem UpperTheory.V.Af.Tw.verGroup : UpperTheory.V.Af.Tw.VerGroup := by
   unfold UpperTheory.V.Af.Tw.VerGroup
   intro H Γ B _ _ _ _ _ _ _ _ _ r hr hidx κ hκ
   classical
@@ -49,8 +48,10 @@ theorem UpperTheory.V.Af.Tw.verGroup :
       (hmem _ _).mpr (iff_of_false (fun h => hg0 (by simpa using R.inv_mem h)) hg)
     have hc : g0 * (g0⁻¹ * g) * g0⁻¹ ∈ R := hnorm.conj_mem _ hh g0
     have hx' : g0 * x * g0⁻¹ ∈ R := hnorm.conj_mem _ hx g0
-    have e1 : g * x * g⁻¹ = (g0 * (g0⁻¹ * g) * g0⁻¹) * (g0 * x * g0⁻¹) *
-        (g0 * (g0⁻¹ * g) * g0⁻¹)⁻¹ := by group
+    have e1
+        : g * x * g⁻¹
+          = (g0 * (g0⁻¹ * g) * g0⁻¹) * (g0 * x * g0⁻¹) * (g0 * (g0⁻¹ * g) * g0⁻¹)⁻¹ := by
+      group
     rw [e1, kmul _ (R.mul_mem hc hx') _ (R.inv_mem hc), kmul _ hc _ hx', kinv _ hc,
       mul_inv_cancel_comm]
   let f : Γ → B := fun γ => if γ ∈ R then k γ * k (g0 * γ * g0⁻¹) else k (γ * γ)
@@ -63,8 +64,8 @@ theorem UpperTheory.V.Af.Tw.verGroup :
       have cx := hnorm.conj_mem _ hx g0
       have cy := hnorm.conj_mem _ hy g0
       rw [fin _ hxy, fin _ hx, fin _ hy,
-        show g0 * (x * y) * g0⁻¹ = (g0 * x * g0⁻¹) * (g0 * y * g0⁻¹) by group,
-        kmul _ hx _ hy, kmul _ cx _ cy, mul_mul_mul_comm]
+        show g0 * (x * y) * g0⁻¹ = (g0 * x * g0⁻¹) * (g0 * y * g0⁻¹) by group, kmul _ hx _ hy,
+        kmul _ cx _ cy, mul_mul_mul_comm]
     · have hxy : x * y ∉ R := fun h => hy (((hmem x y).mp h).mp hx)
       have c1 : y * x * y⁻¹ ∈ R := hnorm.conj_mem _ hx y
       rw [fout _ hxy, fin _ hx, fout _ hy,
@@ -81,17 +82,17 @@ theorem UpperTheory.V.Af.Tw.verGroup :
       have hyy := hsq y hy
       have hxx := hsq x hx
       have c1 : x * (y * y) * x⁻¹ ∈ R := hnorm.conj_mem _ hyy x
-      rw [fin _ hxy, fout _ hx, fout _ hy, ← L y hy _ hxy,
-        show y * (x * y) * y⁻¹ = y * x by group, ← kmul _ hxy _ hyx,
-        show x * y * (y * x) = x * (y * y) * x⁻¹ * (x * x) by group,
-        kmul _ c1 _ hxx, L x hx _ hyy, ← L y hy _ hyy,
-        show y * (y * y) * y⁻¹ = y * y by group, mul_comm]
-  let ν : Γ →* B :=
-    { toFun := f
-      map_one' := by
-        show f 1 = 1
-        rw [fin _ R.one_mem, mul_one, mul_inv_cancel, k1, mul_one]
-      map_mul' := fmul }
+      rw [fin _ hxy, fout _ hx, fout _ hy, ← L y hy _ hxy, show y * (x * y) * y⁻¹ = y * x by group,
+        ← kmul _ hxy _ hyx, show x * y * (y * x) = x * (y * y) * x⁻¹ * (x * x) by group,
+        kmul _ c1 _ hxx, L x hx _ hyy, ← L y hy _ hyy, show y * (y * y) * y⁻¹ = y * y by group,
+        mul_comm]
+  let ν : Γ →* B := {
+    toFun := f
+    map_one' := by
+      show f 1 = 1
+      rw [fin _ R.one_mem, mul_one, mul_inv_cancel, k1, mul_one]
+    map_mul' := fmul
+  }
   have hσ : Continuous (fun s : H => pre (g0 * r s * g0⁻¹)) := by
     rw [hr.toIsEmbedding.toIsInducing.continuous_iff]
     have hcomp : (r ∘ fun s : H => pre (g0 * r s * g0⁻¹)) = fun s => g0 * r s * g0⁻¹ :=

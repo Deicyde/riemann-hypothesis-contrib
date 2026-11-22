@@ -7,5 +7,6 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ImportsSideM
 
 @[expose] public section
 
-theorem GlobalTheory.FourClauses.irreducibleAdmissibleGL : GlobalTheory.Published.IrreducibleAdmissibleGL :=
+theorem GlobalTheory.FourClauses.irreducibleAdmissibleGL
+    : GlobalTheory.Published.IrreducibleAdmissibleGL :=
   GlobalTheory.FourClauses.adm GlobalTheory.CompanionTheory.Published.bernsteinZelevinskyFiniteness

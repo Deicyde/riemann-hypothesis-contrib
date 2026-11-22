@@ -6,13 +6,18 @@ public import Mathlib
 
 namespace PositivityTheory.Rg.Rs.StrStepA
 
-theorem adjacent (c₁ c₂ : ℝ) (d₁ d₂ : ℕ) (hd₁ : 0 < d₁) (hd₂ : 0 < d₂) (S : Set ℝ)
-    (hS : ∀ x, x ∈ S ↔ (∃ i : ℕ, i < d₁ ∧ x = c₁ + ((d₁ : ℝ) - 1) / 2 - i) ∨
-      ∃ j : ℕ, j < d₂ ∧ x = c₂ + ((d₂ : ℝ) - 1) / 2 - j)
+theorem adjacent
+    (c₁ c₂ : ℝ)
+    (d₁ d₂ : ℕ) (hd₁ : 0 < d₁) (hd₂ : 0 < d₂)
+    (S : Set ℝ)
+    (hS : ∀ x,
+      x ∈ S
+        ↔ (∃ i : ℕ, i < d₁ ∧ x = c₁ + ((d₁ : ℝ) - 1) / 2 - i)
+          ∨ ∃ j : ℕ, j < d₂ ∧ x = c₂ + ((d₂ : ℝ) - 1) / 2 - j)
     (hdisj : ∀ i j : ℕ, i < d₁ → j < d₂ → c₁ + ((d₁ : ℝ) - 1) / 2 - i ≠ c₂ + ((d₂ : ℝ) - 1) / 2 - j)
-    (hint : ∀ x ∈ S, ∀ y ∈ S, ∃ n : ℤ, x - y = n)
-    (hneg : ∀ x ∈ S, -x ∈ S) (hP : ∀ u ∈ S, 1 ≤ u → u - 1 ∈ S) (hc : c₁ < c₂) :
-    c₂ - c₁ = ((d₁ : ℝ) + d₂) / 2 := by
+    (hint : ∀ x ∈ S, ∀ y ∈ S, ∃ n : ℤ, x - y = n) (hneg : ∀ x ∈ S, -x ∈ S)
+    (hP : ∀ u ∈ S, 1 ≤ u → u - 1 ∈ S) (hc : c₁ < c₂)
+    : c₂ - c₁ = ((d₁ : ℝ) + d₂) / 2 := by
   set e₁ : ℝ := ((d₁ : ℝ) - 1) / 2 with he₁
   set e₂ : ℝ := ((d₂ : ℝ) - 1) / 2 with he₂
   have hd₁' : (1 : ℝ) ≤ d₁ := by exact_mod_cast hd₁
@@ -32,7 +37,8 @@ theorem adjacent (c₁ c₂ : ℝ) (d₁ d₂ : ℕ) (hd₁ : 0 < d₁) (hd₂ :
     · right
       have h1 : j ≤ d₂ - 1 := by omega
       have h2 : (j : ℝ) ≤ ((d₂ - 1 : ℕ) : ℝ) := by exact_mod_cast h1
-      rw [hcast₂] at h2; linarith
+      rw [hcast₂] at h2
+      linarith
   obtain ⟨n, hn⟩ := hint _ hC _ hB
   rcases lt_trichotomy n 1 with h | h | h
   · exfalso
@@ -45,7 +51,8 @@ theorem adjacent (c₁ c₂ : ℝ) (d₁ d₂ : ℕ) (hd₁ : 0 < d₁) (hd₂ :
         have : (((-n).toNat : ℕ) : ℝ) < d₁ := by rw [hk']; linarith
         exact_mod_cast this
       refine hdisj (-n).toNat (d₂ - 1) hkd (by omega) ?_
-      rw [hk', hcast₂]; linarith
+      rw [hk', hcast₂]
+      linarith
     · rw [not_le] at hCA
       have hJ0 : (0 : ℤ) ≤ n + d₁ + d₂ - 2 := by
         have : (0 : ℝ) ≤ (n : ℝ) + d₁ + d₂ - 2 := by linarith
@@ -57,7 +64,8 @@ theorem adjacent (c₁ c₂ : ℝ) (d₁ d₂ : ℕ) (hd₁ : 0 < d₁) (hd₂ :
       have hj' : (((n + d₁ + d₂ - 2).toNat : ℕ) : ℝ) = (n : ℝ) + d₁ + d₂ - 2 := by exact_mod_cast hj
       have hjd : (n + d₁ + d₂ - 2).toNat < d₂ := by omega
       refine hdisj (d₁ - 1) (n + d₁ + d₂ - 2).toNat (by omega) hjd ?_
-      rw [hj', hcast₁]; linarith
+      rw [hj', hcast₁]
+      linarith
   · subst h
     push_cast at hn
     linarith
@@ -65,10 +73,10 @@ theorem adjacent (c₁ c₂ : ℝ) (d₁ d₂ : ℕ) (hd₁ : 0 < d₁) (hd₂ :
     have hn2 : (2 : ℝ) ≤ n := by exact_mod_cast (show (2 : ℤ) ≤ n by omega)
     have hC1 : C - 1 ∉ S := fun h1 => by rcases hmem _ h1 with h2 | h2 <;> linarith
     have hB1 : B + 1 ∉ S := fun h1 => by rcases hmem _ h1 with h2 | h2 <;> linarith
-    have hClt : C < 1 := by
-      by_contra h3; exact hC1 (hP _ hC (not_lt.1 h3))
+    have hClt : C < 1 := by by_contra h3; exact hC1 (hP _ hC (not_lt.1 h3))
     have hBgt : -1 < B := by
-      by_contra h3; rw [not_lt] at h3
+      by_contra h3
+      rw [not_lt] at h3
       have h4 := hneg _ (hP _ (hneg _ hB) (by linarith))
       exact hB1 (by convert h4 using 1; ring)
     linarith

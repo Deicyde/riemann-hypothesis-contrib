@@ -8,9 +8,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 open NumberField IsDedekindDomain UpperTheory.V.Kum UpperTheory.V.Stick
 open scoped nonZeroDivisors
 
-theorem UpperTheory.V.Stick.splitInj :
-    ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K] (p : ℕ) [Fact p.Prime] (π : 𝓞 K →+* ZMod p), p.Coprime M →
-    Function.Injective (conjI M K (RingHom.ker π)) := by
+theorem UpperTheory.V.Stick.splitInj
+    : ∀ (M : ℕ) [NeZero M] (K : Type) [Field K] [NumberField K] [IsCyclotomicExtension {M} ℚ K]
+        (p : ℕ) [Fact p.Prime] (π : 𝓞 K →+* ZMod p),
+      p.Coprime M → Function.Injective (conjI M K (RingHom.ker π)) := by
   intro M _ K _ _ _ p _ π hp a b hab
   haveI : NeZero p := ⟨(Fact.out : p.Prime).ne_zero⟩
   have hz := (IsCyclotomicExtension.zeta_spec M ℚ K).toInteger_isPrimitiveRoot
@@ -21,8 +22,9 @@ theorem UpperTheory.V.Stick.splitInj :
       simp only [conjI, Ideal.mem_comap, RingHom.mem_ker, map_sub, map_natCast,
         ZMod.natCast_zmod_val, sub_self]
     rw [hab] at h1
-    simp only [conjI, Ideal.mem_comap, RingHom.mem_ker, map_sub, map_natCast,
-      ZMod.natCast_zmod_val, sub_eq_zero] at h1
+    simp only [conjI, Ideal.mem_comap, RingHom.mem_ker, map_sub, map_natCast, ZMod.natCast_zmod_val,
+        sub_eq_zero]
+      at h1
     exact h1.symm
   have h2 := key (IsCyclotomicExtension.zeta_spec M ℚ K).toInteger
   rw [sgO_apply _ _ _ hz.pow_eq_one, sgO_apply _ _ _ hz.pow_eq_one, map_pow, map_pow] at h2

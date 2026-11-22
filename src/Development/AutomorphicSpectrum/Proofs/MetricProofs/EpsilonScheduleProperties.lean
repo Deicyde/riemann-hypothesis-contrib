@@ -8,27 +8,30 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.LoglogQuotNonn
 
 @[expose] public section
 
-open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
+open MeasureTheory Metric Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
+  ReciprocityTheory.AnForm.P ReciprocityTheory.AnForm.M.FinHolAtlas
 open scoped ContDiff
 
 namespace GlobalTheory.CompanionTheory.Ar.Num
 
-theorem log_div_self_anti (a b : ℝ) (ha : Real.exp 1 ≤ a) (hab : a ≤ b) :
-    Real.log b / b ≤ Real.log a / a :=
+theorem log_div_self_anti (a b : ℝ) (ha : Real.exp 1 ≤ a) (hab : a ≤ b)
+    : Real.log b / b ≤ Real.log a / a :=
   Real.log_div_self_antitoneOn ha (show Real.exp 1 ≤ b from ha.trans hab) hab
 
-theorem epsT_mono (C t t' : ℝ) (hC : 0 ≤ C) (ht : 0 < t) (htt : t ≤ t')
-    (ht' : t' ≤ Real.exp (-Real.exp 1)) : epsT C t ≤ epsT C t' := by
+theorem epsT_mono
+    (C t t' : ℝ) (hC : 0 ≤ C) (ht : 0 < t) (htt : t ≤ t') (ht' : t' ≤ Real.exp (- Real.exp 1))
+    : epsT C t ≤ epsT C t' := by
   have ht'0 : 0 < t' := ht.trans_le htt
   have h1 := (GlobalTheory.CompanionTheory.Ar.Giv.log_inv_bounds ht'0 ht').1
   have h2 : Real.log (1 / t') ≤ Real.log (1 / t) := by
     rw [one_div, one_div, Real.log_inv, Real.log_inv]
     linarith [Real.log_le_log ht htt]
-  rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul, GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul]
+  rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul,
+    GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul]
   exact mul_le_mul_of_nonneg_left (log_div_self_anti _ _ h1 h2) hC
 
-theorem le_epsT (C t : ℝ) (hC : 1 ≤ C) (ht : 0 < t) (hte : t ≤ Real.exp (-Real.exp 1)) :
-    t ≤ epsT C t := by
+theorem le_epsT (C t : ℝ) (hC : 1 ≤ C) (ht : 0 < t) (hte : t ≤ Real.exp (- Real.exp 1))
+    : t ≤ epsT C t := by
   obtain ⟨h1, h2⟩ := GlobalTheory.CompanionTheory.Ar.Giv.log_inv_bounds ht hte
   set ℓ := Real.log (1 / t) with hℓ
   have hℓ0 : 0 < ℓ := lt_of_lt_of_le (Real.exp_pos 1) h1
@@ -54,7 +57,9 @@ theorem epsT_tendsto (C : ℝ) : Tendsto (epsT C) (𝓝[>] 0) (𝓝 0) := by
     simpa [Function.comp_def, one_div] using this
   have h := (hl.comp hL).const_mul C
   rw [mul_zero] at h
-  have e : epsT C = fun t => C * ((fun x : ℝ => Real.log x / x) ∘ (fun t : ℝ => Real.log (1 / t))) t := by
+  have e
+      : epsT C
+        = fun t => C * ((fun x : ℝ => Real.log x / x) ∘ (fun t : ℝ => Real.log (1 / t))) t := by
     funext t
     rw [GlobalTheory.CompanionTheory.Ar.Giv.epsT_eq_mul]
     rfl
@@ -69,20 +74,23 @@ theorem epsT_le_one (C : ℝ) : ∃ a : ℝ, 0 < a ∧ ∀ t, 0 < t → t ≤ a 
   refine ⟨u / 2, by linarith, fun t ht hta => ?_⟩
   exact (hsub ⟨ht, by linarith⟩ : epsT C t < 1).le
 
-theorem fin_pos_lower (n : ℕ) (a : Fin n → ℝ) (ha : ∀ j, 0 < a j) :
-    ∃ b : ℝ, 0 < b ∧ ∀ j, b ≤ a j := by
+theorem fin_pos_lower (n : ℕ) (a : Fin n → ℝ) (ha : ∀ j, 0 < a j)
+    : ∃ b : ℝ, 0 < b ∧ ∀ j, b ≤ a j := by
   by_cases h : Nonempty (Fin n)
-  · refine ⟨Finset.univ.inf' Finset.univ_nonempty a,
-      (Finset.lt_inf'_iff _).2 (fun j _ => ha j), fun j => Finset.inf'_le _ (Finset.mem_univ j)⟩
+  · refine ⟨
+      Finset.univ.inf' Finset.univ_nonempty a,
+      (Finset.lt_inf'_iff _).2 (fun j _ => ha j),
+      fun j => Finset.inf'_le _ (Finset.mem_univ j)
+    ⟩
   · exact ⟨1, one_pos, fun j => (h ⟨j⟩).elim⟩
 
-theorem epsT_numerics :
-    (∀ a b : ℝ, Real.exp 1 ≤ a → a ≤ b → Real.log b / b ≤ Real.log a / a) ∧
-    (∀ C t t' : ℝ, 0 ≤ C → 0 < t → t ≤ t' → t' ≤ Real.exp (-Real.exp 1) → epsT C t ≤ epsT C t') ∧
-    (∀ C t : ℝ, 1 ≤ C → 0 < t → t ≤ Real.exp (-Real.exp 1) → t ≤ epsT C t) ∧
-    (∀ C : ℝ, Tendsto (epsT C) (𝓝[>] 0) (𝓝 0)) ∧
-    (∀ C : ℝ, ∃ a : ℝ, 0 < a ∧ ∀ t, 0 < t → t ≤ a → epsT C t ≤ 1) ∧
-    (∀ (n : ℕ) (a : Fin n → ℝ), (∀ j, 0 < a j) → ∃ b : ℝ, 0 < b ∧ ∀ j, b ≤ a j) :=
+theorem epsT_numerics
+    : (∀ a b : ℝ, Real.exp 1 ≤ a → a ≤ b → Real.log b / b ≤ Real.log a / a)
+      ∧ (∀ C t t' : ℝ, 0 ≤ C → 0 < t → t ≤ t' → t' ≤ Real.exp (- Real.exp 1) → epsT C t ≤ epsT C t')
+      ∧ (∀ C t : ℝ, 1 ≤ C → 0 < t → t ≤ Real.exp (- Real.exp 1) → t ≤ epsT C t)
+      ∧ (∀ C : ℝ, Tendsto (epsT C) (𝓝[>] 0) (𝓝 0))
+      ∧ (∀ C : ℝ, ∃ a : ℝ, 0 < a ∧ ∀ t, 0 < t → t ≤ a → epsT C t ≤ 1)
+      ∧ (∀ (n : ℕ) (a : Fin n → ℝ), (∀ j, 0 < a j) → ∃ b : ℝ, 0 < b ∧ ∀ j, b ≤ a j) :=
   ⟨log_div_self_anti, epsT_mono, le_epsT, epsT_tendsto, epsT_le_one, fin_pos_lower⟩
 
 end GlobalTheory.CompanionTheory.Ar.Num

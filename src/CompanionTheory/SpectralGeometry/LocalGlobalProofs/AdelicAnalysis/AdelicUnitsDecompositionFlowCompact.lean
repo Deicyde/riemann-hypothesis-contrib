@@ -11,7 +11,8 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix Pointwise
 
 noncomputable section
@@ -20,10 +21,9 @@ namespace GlobalTheory.CompanionTheory.SW.Fujisaki
 
 variable {K : Type} [CommRing K] [TopologicalSpace K] [IsTopologicalRing K] [T2Space K]
 
-theorem isCompact_units_setOf {Ω W : Set K} (hΩ : IsCompact Ω) (hW : IsCompact W) :
-    IsCompact {u : Kˣ | (u : K) ∈ Ω ∧ ((u⁻¹ : Kˣ) : K) ∈ W} := by
-  have hc : IsCompact (Ω ×ˢ (MulOpposite.op '' W)) :=
-    hΩ.prod (hW.image MulOpposite.continuous_op)
+theorem isCompact_units_setOf {Ω W : Set K} (hΩ : IsCompact Ω) (hW : IsCompact W)
+    : IsCompact {u : Kˣ | (u : K) ∈ Ω ∧ ((u⁻¹ : Kˣ) : K) ∈ W} := by
+  have hc : IsCompact (Ω ×ˢ (MulOpposite.op '' W)) := hΩ.prod (hW.image MulOpposite.continuous_op)
   have h := (Units.isClosedEmbedding_embedProduct (α := K)).isCompact_preimage hc
   convert h using 1
   ext u
@@ -42,10 +42,12 @@ theorem continuous_act : Continuous fun p : Kˣ × (Fin 1 → Fin 1 → K) => ac
     (continuous_apply i).comp ((continuous_apply a).comp continuous_snd)
   exact h1.mul h2
 
-theorem chi_flow {V : Type} [TopologicalSpace V] [AddCommGroup V] [IsTopologicalAddGroup V]
-    [LocallyCompactSpace V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V)
-    [μ.IsAddHaarMeasure] {c : ℝ≥0} {r : ℝ} (hr : 0 ≤ r)
-    (h : c • μ = ENNReal.ofReal r • μ) : (c : ℝ) = r := by
+theorem chi_flow
+    {V : Type} [TopologicalSpace V] [AddCommGroup V] [IsTopologicalAddGroup V]
+    [LocallyCompactSpace V] [MeasurableSpace V] [BorelSpace V]
+    (μ : Measure V) [μ.IsAddHaarMeasure]
+    {c : ℝ≥0} {r : ℝ} (hr : 0 ≤ r) (h : c • μ = ENNReal.ofReal r • μ)
+    : (c : ℝ) = r := by
   obtain ⟨Q, hQc, hQ⟩ := exists_compact_mem_nhds (0 : V)
   have h0 : μ Q ≠ 0 := (Measure.measure_pos_of_mem_nhds μ hQ).ne'
   have h1 : μ Q ≠ ⊤ := hQc.measure_lt_top.ne
@@ -57,34 +59,46 @@ theorem chi_flow {V : Type} [TopologicalSpace V] [AddCommGroup V] [IsTopological
   have h4 := congrArg ENNReal.toReal h3
   rwa [ENNReal.coe_toReal, ENNReal.toReal_ofReal hr] at h4
 
-theorem core {E : Type} [Field E] [Countable E] [LocallyCompactSpace K] [SecondCountableTopology K]
-    (ι : E →+* K) [MeasurableSpace (Fin 1 → Fin 1 → K)] [BorelSpace (Fin 1 → Fin 1 → K)]
-    (μ : Measure (Fin 1 → Fin 1 → K)) [μ.IsAddHaarMeasure] (hinf : μ Set.univ = ⊤)
-    (hcov : ∃ C : Set (Fin 1 → Fin 1 → K), IsCompact C ∧
-      ∀ y, ∃ X : Fin 1 → Fin 1 → E, y - (fun a i => ι (X a i)) ∈ C)
-    (hfin : ∀ C : Set (Fin 1 → Fin 1 → K), IsCompact C →
-      {X : Fin 1 → Fin 1 → E | (fun a i => ι (X a i)) ∈ C}.Finite)
-    (τ : Multiplicative ℝ →* Kˣ) (hτ : Continuous τ) (D : ℝ) (hD : 0 < D)
-    (hflow : ∀ x : ℝ, μ.map (fun X => ((τ (Multiplicative.ofAdd x) : Kˣ) : K) • X) =
-      ENNReal.ofReal (Real.exp (-(D * x))) • μ) :
-    ∃ ω : Set Kˣ, IsCompact ω ∧ ∀ a : Kˣ, ∃ (l : Eˣ) (a' c : Kˣ) (j : ℤ),
-      (a' : K) = ι (l : E) ∧ c ∈ ω ∧ a = a' * τ (Multiplicative.ofAdd (j : ℝ)) * c := by
+theorem core
+    {E : Type} [Field E] [Countable E] [LocallyCompactSpace K] [SecondCountableTopology K]
+    (ι : E →+* K)
+    [MeasurableSpace (Fin 1 → Fin 1 → K)] [BorelSpace (Fin 1 → Fin 1 → K)]
+    (μ : Measure (Fin 1 → Fin 1 → K)) [μ.IsAddHaarMeasure]
+    (hinf : μ Set.univ = ⊤)
+    (hcov : ∃ C : Set (Fin 1 → Fin 1 → K),
+      IsCompact C ∧ ∀ y, ∃ X : Fin 1 → Fin 1 → E, y - (fun a i => ι (X a i)) ∈ C)
+    (hfin : ∀ C : Set (Fin 1 → Fin 1 → K),
+      IsCompact C → {X : Fin 1 → Fin 1 → E | (fun a i => ι (X a i)) ∈ C}.Finite)
+    (τ : Multiplicative ℝ →* Kˣ) (hτ : Continuous τ)
+    (D : ℝ) (hD : 0 < D)
+    (hflow : ∀ x : ℝ,
+      μ.map (fun X => ((τ (Multiplicative.ofAdd x) : Kˣ) : K) • X)
+        = ENNReal.ofReal (Real.exp (-(D * x))) • μ)
+    : ∃ ω : Set Kˣ,
+      IsCompact ω
+        ∧ ∀ a : Kˣ, ∃ (l : Eˣ) (a' c : Kˣ) (j : ℤ),
+          (a' : K) = ι (l : E) ∧ c ∈ ω ∧ a = a' * τ (Multiplicative.ofAdd (j : ℝ)) * c := by
   obtain ⟨C, hCc, hC⟩ := hcov
   haveI : LocallyCompactSpace Kˣ := Units.isClosedEmbedding_embedProduct.locallyCompactSpace
   haveI : SecondCountableTopology Kᵐᵒᵖ :=
     (MulOpposite.opHomeomorph (M := K)).symm.secondCountableTopology
   haveI : SecondCountableTopology Kˣ := Units.isEmbedding_embedProduct.secondCountableTopology
-  obtain ⟨χ, -, hχ⟩ := GlobalTheory.T.group_action_haar_scaling_continuous (Fin 1 → Fin 1 → K) μ Kˣ act continuous_act continuous_inv
-    (fun y => by simp [act]) (fun s t y => by simp [act, mul_smul])
-  let jj : (Fin 1 → Fin 1 → E) →+ (Fin 1 → Fin 1 → K) :=
-    { toFun := fun X a i => ι (X a i)
-      map_zero' := by ext a i; simp
-      map_add' := fun X Y => by ext a i; simp }
-  obtain ⟨ΩV, hΩc, hΩ⟩ := GlobalTheory.T.exists_compact_for_measure_preserving_endos (Fin 1 → Fin 1 → K) μ hinf (Fin 1 → Fin 1 → E) jj C hCc hC
+  obtain ⟨χ, -, hχ⟩ :=
+    GlobalTheory.T.group_action_haar_scaling_continuous (Fin 1 → Fin 1 → K) μ Kˣ act continuous_act
+      continuous_inv
+      (fun y => by simp [act])
+      (fun s t y => by simp [act, mul_smul])
+  let jj : (Fin 1 → Fin 1 → E) →+ (Fin 1 → Fin 1 → K) := {
+    toFun := fun X a i => ι (X a i)
+    map_zero' := by ext a i; simp
+    map_add' := fun X Y => by ext a i; simp
+  }
+  obtain ⟨ΩV, hΩc, hΩ⟩ :=
+    GlobalTheory.T.exists_compact_for_measure_preserving_endos (Fin 1 → Fin 1 → K) μ hinf
+      (Fin 1 → Fin 1 → E) jj C hCc hC
 
   set Ω : Set K := (fun Y : Fin 1 → Fin 1 → K => Y 0 0) '' ΩV with hΩdef
-  have hΩK : IsCompact Ω :=
-    hΩc.image ((continuous_apply 0).comp (continuous_apply 0))
+  have hΩK : IsCompact Ω := hΩc.image ((continuous_apply 0).comp (continuous_apply 0))
   have hΩ2 : IsCompact (Ω * Ω) := hΩK.mul hΩK
   have hconst : Continuous fun k : K => (fun _ _ => k : Fin 1 → Fin 1 → K) :=
     continuous_pi fun _ => continuous_pi fun _ => continuous_id
@@ -97,8 +111,7 @@ theorem core {E : Type} [Field E] [Countable E] [LocallyCompactSpace K] [SecondC
   have hW : IsCompact (Zi * Ω) := hZi.mul hΩK
   have hω₀ := isCompact_units_setOf hΩK hW
   set T₀ : Set Kˣ := (fun r : ℝ => τ (Multiplicative.ofAdd r)) '' Set.Icc 0 1 with hT₀
-  have hT₀c : IsCompact T₀ := isCompact_Icc.image
-    (hτ.comp continuous_ofAdd)
+  have hT₀c : IsCompact T₀ := isCompact_Icc.image (hτ.comp continuous_ofAdd)
   refine ⟨T₀ * {u : Kˣ | (u : K) ∈ Ω ∧ ((u⁻¹ : Kˣ) : K) ∈ Zi * Ω}, hT₀c.mul hω₀, fun a => ?_⟩
 
   have hτχ : ∀ x : ℝ, ((χ (τ (Multiplicative.ofAdd x)) : ℝ≥0) : ℝ) = Real.exp (-(D * x)) := by
@@ -116,7 +129,7 @@ theorem core {E : Type} [Field E] [Countable E] [LocallyCompactSpace K] [SecondC
     apply NNReal.coe_injective
     have hpos : 0 < (χ a : ℝ) := by exact_mod_cast pos_iff_ne_zero.2 hχa
     rw [ha₁, map_mul, NNReal.coe_mul, hτχ]
-    have : -(D * -x) = -Real.log (χ a : ℝ) := by rw [hx]; field_simp
+    have : -(D * -x) = - Real.log (χ a : ℝ) := by rw [hx]; field_simp
     rw [this, Real.exp_neg, Real.exp_log hpos]
     simp [hpos.ne']
   have hχ₂ : χ a₁⁻¹ = 1 := by rw [map_inv, hχ₁, inv_one]
@@ -142,11 +155,11 @@ theorem core {E : Type} [Field E] [Countable E] [LocallyCompactSpace K] [SecondC
     refine ⟨_, h1, _, h2, ?_⟩
     show (a₁ : K) * ι l * (((a₁⁻¹ : Kˣ) : K) * ι l') = ι (l * l')
     have hu : (a₁ : K) * ((a₁⁻¹ : Kˣ) : K) = 1 := Units.mul_inv_of_eq rfl
-    calc (a₁ : K) * ι l * (((a₁⁻¹ : Kˣ) : K) * ι l')
+    calc
+      (a₁ : K) * ι l * (((a₁⁻¹ : Kˣ) : K) * ι l')
         = ((a₁ : K) * ((a₁⁻¹ : Kˣ) : K)) * (ι l * ι l') := by ring
       _ = ι (l * l') := by rw [hu, one_mul, map_mul]
-  have hz : l * l' ∈ Z := by
-    refine ⟨fun _ _ => l * l', ⟨_, hll, rfl⟩, rfl⟩
+  have hz : l * l' ∈ Z := by refine ⟨fun _ _ => l * l', ⟨_, hll, rfl⟩, rfl⟩
   let lU : Eˣ := Units.mk0 l hl0
   let m : Kˣ := Units.map ι.toMonoidHom lU
   have hm : (m : K) = ι l := rfl
@@ -161,34 +174,54 @@ theorem core {E : Type} [Field E] [Countable E] [LocallyCompactSpace K] [SecondC
     have ez : (l * l')⁻¹ = l'⁻¹ * l⁻¹ := mul_inv_rev _ _
     have : ι l'⁻¹ * ι l' = 1 := by rw [← map_mul, inv_mul_cancel₀ hl'0, map_one]
     rw [e, Units.val_mul, hmi, ez, map_mul]
-    calc ι l'⁻¹ * ι l⁻¹ * (((a₁⁻¹ : Kˣ) : K) * ι l')
+    calc
+      ι l'⁻¹ * ι l⁻¹ * (((a₁⁻¹ : Kˣ) : K) * ι l')
         = (ι l'⁻¹ * ι l') * (((a₁⁻¹ : Kˣ) : K) * ι l⁻¹) := by ring
       _ = _ := by rw [this, one_mul, mul_comm]
-  have hfr : x - (⌊x⌋ : ℝ) ∈ Set.Icc (0 : ℝ) 1 :=
-    ⟨sub_nonneg.2 (Int.floor_le x), (sub_le_iff_le_add').2 (Int.lt_floor_add_one x).le |>.trans' le_rfl⟩
+  have hfr : x - (⌊x⌋ : ℝ) ∈ Set.Icc (0 : ℝ) 1 := ⟨
+    sub_nonneg.2 (Int.floor_le x),
+    (sub_le_iff_le_add').2 (Int.lt_floor_add_one x).le |>.trans' le_rfl
+  ⟩
   refine ⟨lU⁻¹, m⁻¹, τ (Multiplicative.ofAdd (x - (⌊x⌋ : ℝ))) * (a₁ * m), ⌊x⌋, ?_, ?_, ?_⟩
   · exact hmi.trans (by simp [lU])
   · exact ⟨_, ⟨_, hfr, rfl⟩, _, ⟨hu1, hu2⟩, rfl⟩
-  · have hone : τ (Multiplicative.ofAdd ((⌊x⌋ : ℤ) : ℝ)) * τ (Multiplicative.ofAdd (x - (⌊x⌋ : ℝ))) *
-        τ (Multiplicative.ofAdd (-x)) = 1 := by
+  · have hone
+        : τ (Multiplicative.ofAdd ((⌊x⌋ : ℤ) : ℝ)) * τ (Multiplicative.ofAdd (x - (⌊x⌋ : ℝ)))
+            * τ (Multiplicative.ofAdd (-x))
+          = 1 := by
       rw [← map_mul, ← map_mul, ← ofAdd_add, ← ofAdd_add]
       simp
-    calc a = (m⁻¹ * m) * (a * (τ (Multiplicative.ofAdd ((⌊x⌋ : ℤ) : ℝ)) *
-          τ (Multiplicative.ofAdd (x - (⌊x⌋ : ℝ))) * τ (Multiplicative.ofAdd (-x)))) := by
-            rw [hone]; simp
+    calc
+      a = (m⁻¹ * m)
+          * (a
+            * (τ (Multiplicative.ofAdd ((⌊x⌋ : ℤ) : ℝ)) * τ (Multiplicative.ofAdd (x - (⌊x⌋ : ℝ)))
+              * τ (Multiplicative.ofAdd (-x)))) := by
+        rw [hone]; simp
       _ = _ := by rw [ha₁]; ac_rfl
 
 end GlobalTheory.CompanionTheory.SW.Fujisaki
 
 namespace GlobalTheory.CompanionTheory.SW.Fujisaki
 
-theorem units_decomp : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ τ : Multiplicative ℝ →* (AF F ⊗[F] E)ˣ, IsFlow τ → ∃ ω : Set (AF F ⊗[F] E)ˣ, IsCompact ω ∧ ∀ a : (AF F ⊗[F] E)ˣ, ∃ (l : Eˣ) (a' : (AF F ⊗[F] E)ˣ) (c : (AF F ⊗[F] E)ˣ) (j : ℤ), (a' : AF F ⊗[F] E) = inclR (AF F) (l : E) ∧ c ∈ ω ∧ a = a' * τ (Multiplicative.ofAdd (j : ℝ)) * c := by
+theorem units_decomp
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ τ : Multiplicative ℝ →* (AF F ⊗[F] E)ˣ,
+          IsFlow τ
+            → ∃ ω : Set (AF F ⊗[F] E)ˣ,
+              IsCompact ω
+                ∧ ∀ a : (AF F ⊗[F] E)ˣ,
+                  ∃ (l : Eˣ) (a' : (AF F ⊗[F] E)ˣ) (c : (AF F ⊗[F] E)ˣ) (j : ℤ),
+                    (a' : AF F ⊗[F] E) = inclR (AF F) (l : E) ∧ c ∈ ω
+                      ∧ a = a' * τ (Multiplicative.ofAdd (j : ℝ)) * c := by
   intro F E _ _ _ _ _ σ hσ τ hτ
   obtain ⟨⟨hLC, hSC, hT2⟩, -⟩ := GlobalTheory.CompanionTheory.AdeleTop.adele_top F
   haveI := hLC
   haveI := hSC
   haveI := hT2
-  obtain ⟨hTR, hLCK, hSCK, hT2K, -, -, -, hBor, -, -⟩ := GlobalTheory.T.tensor_locally_compact_ring F E σ hσ (AF F)
+  obtain ⟨hTR, hLCK, hSCK, hT2K, -, -, -, hBor, -, -⟩ :=
+    GlobalTheory.T.tensor_locally_compact_ring F E σ hσ (AF F)
   haveI := hTR
   haveI := hLCK
   haveI := hSCK

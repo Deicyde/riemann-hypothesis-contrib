@@ -9,11 +9,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools
 
-theorem UpperTheory.V.AlgebraTools.genKer_le_ker :
-    ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι] (z : Matrix ι ι P) (m : ι → P),
-      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m) →
-      ∀ (c : ι) (D : Type) [CommRing D] [IsLocalRing D] (φ : P →+* D) [IsLocalHom φ] (l : ι → D),
-      l c = 1 → (z.map φ).mulVec l = 0 → (∀ j, φ (m j) = l j * φ (m c)) → genKer z m c ≤ RingHom.ker φ := by
+theorem UpperTheory.V.AlgebraTools.genKer_le_ker
+    : ∀ (P : Type) [CommRing P] [IsRegularLocalRing P] (ι : Type) [Fintype ι] [DecidableEq ι]
+        (z : Matrix ι ι P) (m : ι → P),
+      CotInd P (Sum.elim (fun ij : ι × ι => z ij.1 ij.2) m)
+        → ∀ (c : ι) (D : Type) [CommRing D] [IsLocalRing D] (φ : P →+* D) [IsLocalHom φ]
+            (l : ι → D),
+          l c = 1 → (z.map φ).mulVec l = 0 → (∀ j, φ (m j) = l j * φ (m c))
+            → genKer z m c ≤ RingHom.ker φ := by
   intro P _ _ ι _ _ z m hcot c D _ _ φ _ l hlc hzl hm
   let ψ : MvPolynomial ι P →+* D := MvPolynomial.eval₂Hom φ l
   have hψC : ∀ a, ψ (MvPolynomial.C a) = φ a := fun a => MvPolynomial.eval₂Hom_C φ l a
@@ -55,16 +58,20 @@ theorem UpperTheory.V.AlgebraTools.genKer_le_ker :
       refine Ideal.sum_mem _ fun j _ => Ideal.mul_mem_right _ _ (Ideal.mem_map_of_mem _ ?_)
       simpa using hcot.mem (Sum.inl (i, j))
     · show MvPolynomial.C (m j) - UpperTheory.V.AlgebraTools.lam P c j * MvPolynomial.C (m c) ∈ M0
-      refine Ideal.sub_mem _ (Ideal.mem_map_of_mem _ ?_) (Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ ?_))
+      refine Ideal.sub_mem _ (Ideal.mem_map_of_mem _ ?_)
+        (Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ ?_))
       · simpa using hcot.mem (Sum.inr j)
       · simpa using hcot.mem (Sum.inr c)
   have hprime := UpperTheory.V.AlgebraTools.chartIdeal_localization_isPrime P ι z m hcot c Q hMQ
-  have hsat : ∀ x, algebraMap (MvPolynomial ι P) (Localization.AtPrime Q) x ∈
-      Ideal.map (algebraMap (MvPolynomial ι P) (Localization.AtPrime Q)) (chartIdeal z m c) →
-      ∃ t ∉ Q, t * x ∈ chartIdeal z m c := by
+  have hsat
+      : ∀ x,
+        algebraMap (MvPolynomial ι P) (Localization.AtPrime Q) x
+            ∈ Ideal.map (algebraMap (MvPolynomial ι P) (Localization.AtPrime Q)) (chartIdeal z m c)
+          → ∃ t ∉ Q, t * x ∈ chartIdeal z m c := by
     intro x hx
-    obtain ⟨t, ht, htx⟩ := (IsLocalization.algebraMap_mem_map_algebraMap_iff (M := Q.primeCompl)
-      (S := Localization.AtPrime Q) (chartIdeal z m c) x).mp hx
+    obtain ⟨t, ht, htx⟩ :=
+      (IsLocalization.algebraMap_mem_map_algebraMap_iff (M := Q.primeCompl)
+        (S := Localization.AtPrime Q) (chartIdeal z m c) x).mp hx
     exact ⟨t, ht, htx⟩
   intro f hf
   obtain ⟨s, hs, hsf⟩ := hf

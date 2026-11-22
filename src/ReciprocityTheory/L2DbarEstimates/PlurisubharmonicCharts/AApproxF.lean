@@ -13,25 +13,32 @@ noncomputable section
 
 namespace WeightedAtlas
 
-variable {n : ℕ} {Y : Type*} [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y]
-  [MeasurableSpace Y] [BorelSpace Y] {ι : Type*} {La : Type*} [AddCommGroup La]
+variable
+  {n : ℕ} {Y : Type*}
+  [TopologicalSpace Y] [T2Space Y] [SecondCountableTopology Y] [MeasurableSpace Y] [BorelSpace Y]
+  {ι : Type*} {La : Type*} [AddCommGroup La]
   (A : WeightedAtlas n Y ι La)
 
-theorem mem_ovl {j i : ι} {y : Y} (hj : y ∈ (A.chart j).source) (hi : y ∈ (A.chart i).source) :
-    A.chart j y ∈ ovl A.chart j i :=
+theorem mem_ovl {j i : ι} {y : Y} (hj : y ∈ (A.chart j).source) (hi : y ∈ (A.chart i).source)
+    : A.chart j y ∈ ovl A.chart j i :=
   ⟨(A.chart j).map_source hj, by simp [(A.chart j).left_inv hj, hi]⟩
 
-theorem trans_contDiffAt {j i : ι} {y : Y} (hj : y ∈ (A.chart j).source)
-    (hi : y ∈ (A.chart i).source) :
-    ContDiffAt ℂ 2 ((A.chart i) ∘ (A.chart j).symm) (A.chart j y) :=
+theorem trans_contDiffAt
+    {j i : ι} {y : Y} (hj : y ∈ (A.chart j).source) (hi : y ∈ (A.chart i).source)
+    : ContDiffAt ℂ 2 ((A.chart i) ∘ (A.chart j).symm) (A.chart j y) :=
   ((A.trans_contDiffOn j i).contDiffAt ((A.isOpen_ovl j i).mem_nhds (A.mem_ovl hj hi))).of_le
     (by norm_cast)
 
-theorem levi_transfer (la : La) (f : Y → ℝ) (hf : A.SmoothFn f) (j i : ι) {y : Y}
-    (hj : y ∈ (A.chart j).source) (hi : y ∈ (A.chart i).source) (ξ : Fin n → ℂ) :
-    A.leviAt j (fun x => A.ph la j x + f x) y ξ =
-      A.leviAt i (fun x => A.ph la i x + f x) y
-        (fderiv ℂ ((A.chart i) ∘ (A.chart j).symm) (A.chart j y) (WithLp.toLp 2 ξ)).ofLp := by
+theorem levi_transfer
+    (la : La)
+    (f : Y → ℝ) (hf : A.SmoothFn f)
+    (j i : ι)
+    {y : Y} (hj : y ∈ (A.chart j).source) (hi : y ∈ (A.chart i).source)
+    (ξ : Fin n → ℂ)
+    : A.leviAt j (fun x => A.ph la j x + f x) y ξ
+      = A.leviAt i
+        (fun x => A.ph la i x + f x)
+        y (fderiv ℂ ((A.chart i) ∘ (A.chart j).symm) (A.chart j y) (WithLp.toLp 2 ξ)).ofLp := by
   set Φ := (A.chart i) ∘ (A.chart j).symm
   set v0 := (A.chart j) y
   have hv0 := A.mem_ovl hj hi
@@ -44,17 +51,18 @@ theorem levi_transfer (la : La) (f : Y → ℝ) (hf : A.SmoothFn f) (j i : ι) {
     exact (((A.smooth_ph la i).add (hf i)).contDiffAt
       ((A.chart i).open_target.mem_nhds ((A.chart i).map_source hi))).of_le (by norm_cast)
   set G := A.g la j i ∘ (A.chart j).symm
-  have hG : ContDiffAt ℂ 2 G v0 :=
-    contDiffAt_two_of_holo (A.isOpen_ovl j i) (A.holo_g la j i) hv0
+  have hG : ContDiffAt ℂ 2 G v0 := contDiffAt_two_of_holo (A.isOpen_ovl j i) (A.holo_g la j i) hv0
   have hG0 : G v0 ≠ 0 := by
     simp only [G, Function.comp, v0, (A.chart j).left_inv hj]; exact A.g_ne la j i y hj hi
   set u2 : Fin 2 → V n → ℝ := ![fun v => h (Φ v), fun v => Real.log (Complex.normSq (G v))]
   have hu2 : ∀ k, ContDiffAt ℝ 2 (u2 k) v0 := by
-    intro k; fin_cases k
+    intro k
+    fin_cases k
     · exact hh.comp v0 (hΦ.restrict_scalars ℝ)
     · exact (contDiffAt_normSq_comp hG).log (Complex.normSq_pos.2 hG0).ne'
-  have hev : (fun v => ((A.ph la j ((A.chart j).symm v) + f ((A.chart j).symm v) : ℝ) : ℂ)) =ᶠ[𝓝 v0]
-      fun v => ((∑ k, u2 k v : ℝ) : ℂ) := by
+  have hev
+      : (fun v => ((A.ph la j ((A.chart j).symm v) + f ((A.chart j).symm v) : ℝ) : ℂ)) =ᶠ[𝓝 v0]
+        fun v => ((∑ k, u2 k v : ℝ) : ℂ) := by
     filter_upwards [hO] with v hv
     have hxj : (A.chart j).symm v ∈ (A.chart j).source := (A.chart j).map_target hv.1
     have hxi : (A.chart j).symm v ∈ (A.chart i).source := hv.2
@@ -63,7 +71,8 @@ theorem levi_transfer (la : La) (f : Y → ℝ) (hf : A.SmoothFn f) (j i : ι) {
     have hne : ‖A.g la j i ((A.chart j).symm v)‖ ≠ 0 := norm_ne_zero_iff.2 (A.g_ne la j i _ hxj hxi)
     simp only [Fin.sum_univ_two, u2, Matrix.cons_val_zero, Matrix.cons_val_one, h, hsy, G,
       Function.comp, A.ph_trans la j i _ hxj hxi, Complex.normSq_eq_norm_sq]
-    push_cast; ring
+    push_cast
+    ring
   unfold leviAt
   rw [leviV_congr hev, leviV_ofReal_sum hu2, Fin.sum_univ_two]
   have e1 : u2 0 = fun v => h (Φ v) := rfl

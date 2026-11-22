@@ -6,4 +6,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.cix : UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.CIx := UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.cix_of UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.kernX UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.truncCpt
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.cix
+    : UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.CIx :=
+  UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.cix_of
+    UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.kernX
+    UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.truncCpt

@@ -9,10 +9,19 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 open NumberField IsDedekindDomain IntermediateField UpperTheory.V.Kum UpperTheory.V.CF
 open scoped Pointwise
 
-theorem UpperTheory.V.CF.unramIff :
-    (∀ (L : Type) [Field L] [NumberField L] [IsGalois ℚ L] (p : ℕ), p.Prime → (UnramAt L p ↔ ∀ w : HeightOneSpectrum (𝓞 L), (p : 𝓞 L) ∈ w.asIdeal → w.asIdeal.inertia Gal(L/ℚ) = ⊥)) ∧ (∀ (L : Type) [Field L] [NumberField L] (p : ℕ), p.Prime → (UnramAt L p ↔ ¬ (p : ℤ) ∣ NumberField.discr L)) ∧ ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] (p : ℕ), p.Prime → UnramAt L p → UnramAt K p := by
-  have h2 : ∀ (L : Type) [Field L] [NumberField L] (p : ℕ), p.Prime →
-      (UnramAt L p ↔ ¬ (p : ℤ) ∣ NumberField.discr L) := by
+theorem UpperTheory.V.CF.unramIff
+    : (∀ (L : Type) [Field L] [NumberField L] [IsGalois ℚ L] (p : ℕ),
+        p.Prime
+          → (UnramAt L p
+            ↔ ∀ w : HeightOneSpectrum (𝓞 L),
+              (p : 𝓞 L) ∈ w.asIdeal → w.asIdeal.inertia Gal(L/ℚ) = ⊥))
+      ∧ (∀ (L : Type) [Field L] [NumberField L] (p : ℕ),
+        p.Prime → (UnramAt L p ↔ ¬ (p : ℤ) ∣ NumberField.discr L))
+      ∧ ∀ (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L] (p : ℕ),
+        p.Prime → UnramAt L p → UnramAt K p := by
+  have h2
+      : ∀ (L : Type) [Field L] [NumberField L] (p : ℕ),
+        p.Prime → (UnramAt L p ↔ ¬ (p : ℤ) ∣ NumberField.discr L) := by
     intro L _ _ p hp
     have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp
     rw [NumberField.not_dvd_discr_iff_forall_mem L (𝓞 L) hpZ]
@@ -37,9 +46,9 @@ theorem UpperTheory.V.CF.unramIff :
         rw [hb, Ideal.mem_bot] at hpP
         exact hp.ne_zero (by exact_mod_cast hpP)
       have hw := h ⟨P, hP, hne⟩ hpP
-      rw [← Subgroup.card_eq_one,
-        Ideal.card_inertia_eq_ramificationIdxIn (P.under ℤ) P,
-        Ideal.ramificationIdxIn_eq_ramificationIdx (P.under ℤ) P Gal(L/ℚ)] at hw
+      rw [← Subgroup.card_eq_one, Ideal.card_inertia_eq_ramificationIdxIn (P.under ℤ) P,
+          Ideal.ramificationIdxIn_eq_ramificationIdx (P.under ℤ) P Gal(L/ℚ)]
+        at hw
       exact hw
   · intro K L _ _ _ _ _ p hp hL
     exact (h2 K p hp).2 fun hd => (h2 L p hp).1 hL (hd.trans (NumberField.discr_dvd_discr K L))

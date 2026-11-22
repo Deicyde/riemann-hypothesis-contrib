@@ -9,10 +9,12 @@ namespace PI.EF.Loc
 
 open Complex Metric Set Filter Topology
 
-theorem logDeriv_bound_of_zero_free (hDL : PI.DiscLog) {g : ℂ → ℂ} {s₀ : ℂ} {r R M : ℝ}
+theorem logDeriv_bound_of_zero_free
+    (hDL : PI.DiscLog)
+    {g : ℂ → ℂ} {s₀ : ℂ} {r R M : ℝ}
     (hr : 0 < r) (hrR : r < R) (hM : 0 < M) (hg : DifferentiableOn ℂ g (ball s₀ R))
-    (hz : ∀ z ∈ ball s₀ R, g z ≠ 0) (hb : ∀ z ∈ ball s₀ R, ‖g z‖ ≤ Real.exp M * ‖g s₀‖) :
-    ∀ z ∈ closedBall s₀ r, ‖deriv g z / g z‖ ≤ 4 * (r + R) / (R - r) ^ 2 * M := by
+    (hz : ∀ z ∈ ball s₀ R, g z ≠ 0) (hb : ∀ z ∈ ball s₀ R, ‖g z‖ ≤ Real.exp M * ‖g s₀‖)
+    : ∀ z ∈ closedBall s₀ r, ‖deriv g z / g z‖ ≤ 4 * (r + R) / (R - r) ^ 2 * M := by
   intro z hzr
   obtain ⟨L, hL0, hLd, hLe⟩ := hDL g s₀ R hg hz
   have hR : 0 < R := hr.trans hrR
@@ -34,16 +36,15 @@ theorem logDeriv_bound_of_zero_free (hDL : PI.DiscLog) {g : ℂ → ℂ} {s₀ :
     have h1 : DifferentiableAt ℂ L (s₀ + u) := (hLd _ (hmem u hu)).differentiableAt
     have h2 : DifferentiableAt ℂ (fun v : ℂ => s₀ + v) u := differentiableAt_id.const_add s₀
     exact (h1.comp u h2).differentiableWithinAt
-  have hFre : MapsTo (fun u => L (s₀ + u)) (ball 0 R) {w | w.re ≤ M} :=
-    fun u hu => hre _ (hmem u hu)
+  have hFre : MapsTo (fun u => L (s₀ + u)) (ball 0 R) {w | w.re ≤ M} := fun u hu =>
+    hre _ (hmem u hu)
   have hF0 : (fun u => L (s₀ + u)) 0 = 0 := by simp [hL0]
   have hρR : (r + R) / 2 < R := by linarith
-  have hbound : ∀ x ∈ closedBall s₀ ((r + R) / 2),
-      ‖L x‖ ≤ 2 * M * ((r + R) / 2) / (R - (r + R) / 2) := by
+  have hbound
+      : ∀ x ∈ closedBall s₀ ((r + R) / 2), ‖L x‖ ≤ 2 * M * ((r + R) / 2) / (R - (r + R) / 2) := by
     intro x hx
     rw [mem_closedBall, dist_eq_norm] at hx
-    have hu : x - s₀ ∈ ball (0 : ℂ) R := by
-      rw [mem_ball_zero_iff]; linarith
+    have hu : x - s₀ ∈ ball (0 : ℂ) R := by rw [mem_ball_zero_iff]; linarith
     have h1 := Complex.borelCaratheodory_zero hM hFd hFre hR hu hF0
     have e : s₀ + (x - s₀) = x := by ring
     simp only [e] at h1
@@ -65,8 +66,9 @@ theorem logDeriv_bound_of_zero_free (hDL : PI.DiscLog) {g : ℂ → ℂ} {s₀ :
     apply DifferentiableOn.diffContOnCl
     rw [closure_ball z hδ.ne']
     exact hLdiff.mono (hsub.trans hsubB)
-  have hc := Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hδ hdc
-    (fun x hx => hbound x (hsub (sphere_subset_closedBall hx)))
+  have hc :=
+    Complex.norm_deriv_le_of_forall_mem_sphere_norm_le hδ hdc
+      (fun x hx => hbound x (hsub (sphere_subset_closedBall hx)))
   have hzB : z ∈ ball s₀ R := hsubB (hsub (mem_closedBall_self hδ.le))
   rw [(hLd z hzB).deriv] at hc
   refine hc.trans (le_of_eq ?_)

@@ -13,24 +13,37 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Lat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows GlobalTheory.Asc
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinPl (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
+open GlobalTheory.FinPl
+  (Lat idAt idOff intAt grpAt grpOff MxAt latV latA InK MonoAt OrthAt PrimAt ColsAt)
 open scoped nonZeroDivisors ContDiff
 open GlobalTheory.AscFin
 open ValuativeRel
 
 namespace GlobalTheory.LatBridge
 
-theorem cut_mem_latV {D : D7} (S : HSp D) (L : GlobalTheory.FinPl.Lat S) (P : GlobalTheory.FinPl.Pl D → Prop)
-    (u : Fin S.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
-    (hu : u ∈ latHat D.host.F D.host.E (L : Set (Fin S.rank → D.host.E))) :
-    AddMonoidHom.compLeft (GlobalTheory.HatLatV.cutHom P) (Fin S.rank) u ∈ latV S L P := by
-  refine AddSubgroup.closure_induction (fun y hy => ?_) ?_ (fun y z _ _ hy hz => ?_) (fun y _ hy => ?_) hu
+theorem cut_mem_latV
+    {D : D7} (S : HSp D) (L : GlobalTheory.FinPl.Lat S) (P : GlobalTheory.FinPl.Pl D → Prop)
+    (u : Fin S.rank
+      → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+    (hu : u ∈ latHat D.host.F D.host.E (L : Set (Fin S.rank → D.host.E)))
+    : AddMonoidHom.compLeft (GlobalTheory.HatLatV.cutHom P) (Fin S.rank) u ∈ latV S L P := by
+  refine AddSubgroup.closure_induction
+    (fun y hy => ?_)
+    ?_
+    (fun y z _ _ hy hz => ?_)
+    (fun y _ hy => ?_)
+    hu
   · obtain ⟨a, ha, x, hx, rfl⟩ := hy
-    refine AddSubgroup.subset_closure ⟨GlobalTheory.SelfDualAt.indP P * a, ?_, ?_, 1, rfl, x, hx, ?_⟩
+    refine AddSubgroup.subset_closure
+      ⟨GlobalTheory.SelfDualAt.indP P * a, ?_, ?_, 1, rfl, x, hx, ?_⟩
     · intro v
       rw [map_mul, GlobalTheory.SelfDualAt.evalV_indP]
       split_ifs
@@ -50,22 +63,25 @@ theorem cut_mem_latV {D : D7} (S : HSp D) (L : GlobalTheory.FinPl.Lat S) (P : Gl
   · rw [map_neg]
     exact (latV S L P).neg_mem hy
 
-theorem finPart_mul_cut {D : D7} (P : GlobalTheory.FinPl.Pl D → Prop) (a : AE D) (ha : a ∈ idAt D P)
-    (u : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E) :
-    finPart D (a * GlobalTheory.HatLatV.cut P u) = finPart D a * u := by
-
+theorem finPart_mul_cut
+    {D : D7} (P : GlobalTheory.FinPl.Pl D → Prop) (a : AE D) (ha : a ∈ idAt D P)
+    (u : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E)
+    : finPart D (a * GlobalTheory.HatLatV.cut P u) = finPart D a * u := by
   have hfix := congrArg (finPart D) (GlobalTheory.HatLatV.cut_finPart P a ha)
-  simp only [GlobalTheory.HatLatV.cut, Formalism.IndefR.Fin.LevelGroupLemmas.Lat.finPart_lift] at hfix
+  simp only [GlobalTheory.HatLatV.cut, Formalism.IndefR.Fin.LevelGroupLemmas.Lat.finPart_lift]
+    at hfix
   rw [map_mul]
   simp only [GlobalTheory.HatLatV.cut, Formalism.IndefR.Fin.LevelGroupLemmas.Lat.finPart_lift]
   rw [← mul_assoc, mul_comm (finPart D a), hfix]
 
-
 set_option synthInstance.maxHeartbeats 400000 in
 set_option maxHeartbeats 1600000 in
-theorem sub_mem_hatL : ∀ (D : D7) (S : HSp D) (P : GlobalTheory.FinPl.Pl D → Prop) (L L' : GlobalTheory.FinPl.Lat S) (g : GA D S), g ∈ grpAt S P →
-  (∀ y : Fin S.rank → AE D, y ∈ latV S L P → (mt S g - 1) *ᵥ y ∈ latV S L' P) →
-  ∀ x ∈ Formalism.L2.Herm.hatL (F := D.host.F) L, (Lev.finE S g).1 *ᵥ x - x ∈ Formalism.L2.Herm.hatL (F := D.host.F) L' := by
+theorem sub_mem_hatL
+    : ∀ (D : D7) (S : HSp D) (P : GlobalTheory.FinPl.Pl D → Prop) (L L' : GlobalTheory.FinPl.Lat S)
+        (g : GA D S),
+      g ∈ grpAt S P → (∀ y : Fin S.rank → AE D, y ∈ latV S L P → (mt S g - 1) *ᵥ y ∈ latV S L' P)
+        → ∀ x ∈ Formalism.L2.Herm.hatL (F := D.host.F) L,
+          (Lev.finE S g).1 *ᵥ x - x ∈ Formalism.L2.Herm.hatL (F := D.host.F) L' := by
   intro D S P L L' g hg hmove x hx
 
   set u : Fin S.rank → Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af D.host.F ⊗[D.host.F] D.host.E :=
@@ -88,14 +104,16 @@ theorem sub_mem_hatL : ∀ (D : D7) (S : HSp D) (P : GlobalTheory.FinPl.Pl D →
     (GlobalTheory.FrameAt.mem_congGrp S (idAt D P) g).1 hg
   have hmem := GlobalTheory.LatVHat.latV_mem_hatL D S L' P _ (hmove _ (cut_mem_latV S L P u hu))
   have hcut : ∀ z, GlobalTheory.HatLatV.cutHom P z = GlobalTheory.HatLatV.cut P z := fun _ => rfl
-  have hlhs : (Lev.finE S g).1 *ᵥ x - x = ((Formalism.L2.Theta.mt S g - 1).map (GlobalTheory.LevSplit.finSw D)) *ᵥ x := by
-    rw [GlobalTheory.LevSplit.finE_val, Matrix.map_sub _ (map_sub _), Matrix.map_one _ (map_zero _) (map_one _), Matrix.sub_mulVec,
-      Matrix.one_mulVec]
+  have hlhs
+      : (Lev.finE S g).1 *ᵥ x - x
+        = ((Formalism.L2.Theta.mt S g - 1).map (GlobalTheory.LevSplit.finSw D)) *ᵥ x := by
+    rw [GlobalTheory.LevSplit.finE_val, Matrix.map_sub _ (map_sub _),
+      Matrix.map_one _ (map_zero _) (map_one _), Matrix.sub_mulVec, Matrix.one_mulVec]
   rw [hlhs]
   convert hmem using 1
   funext i
-  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum,
-    AddMonoidHom.compLeft_apply, Function.comp_apply, hcut]
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, AddMonoidHom.compLeft_apply,
+    Function.comp_apply, hcut]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [finPart_mul_cut P _ (hI i j), map_mul, hswap]
   rfl

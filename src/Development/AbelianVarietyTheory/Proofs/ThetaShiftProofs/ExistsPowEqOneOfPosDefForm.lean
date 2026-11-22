@@ -7,9 +7,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 namespace GlobalTheory
 
-theorem exists_pow_eq_one_of_posDef_form (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
+theorem exists_pow_eq_one_of_posDef_form
+    (Y : Type) [AddCommGroup Y] [Module.Free ℤ Y] [Module.Finite ℤ Y]
     (b : LinearMap.BilinForm ℤ Y) (hs : ∀ y z, b y z = b z y) (hp : ∀ y, y ≠ 0 → 0 < b y y)
-    (σ : Y ≃ₗ[ℤ] Y) (hσ : ∀ y z, b (σ y) (σ z) = b y z) : ∃ n : ℕ, 0 < n ∧ σ ^ n = 1 := by
+    (σ : Y ≃ₗ[ℤ] Y) (hσ : ∀ y z, b (σ y) (σ z) = b y z)
+    : ∃ n : ℕ, 0 < n ∧ σ ^ n = 1 := by
   classical
   rw [← isOfFinOrder_iff_pow_eq_one]
   by_contra hfin
@@ -43,15 +45,15 @@ theorem exists_pow_eq_one_of_posDef_form (Y : Type) [AddCommGroup Y] [Module.Fre
     simp only [f] at this
     simp [this]
   let C : _ → _ → ℤ := fun i j => b (e i) (e i) * b (e j) (e j)
-  have hS : (Set.univ.pi fun i => Set.univ.pi fun j => Set.Icc (-C i j) (C i j)).Finite :=
+  have hS : (Set.univ.pi fun i => Set.univ.pi fun j => Set.Icc (- C i j) (C i j)).Finite :=
     Set.Finite.pi fun i => Set.Finite.pi fun j => Set.finite_Icc _ _
   refine Set.infinite_of_injective_forall_mem hf (fun n => ?_) hS
   intro i _ j _
   have h1 := LinearMap.BilinForm.apply_mul_apply_le_of_forall_zero_le b h0 ((σ ^ n) (e i)) (e j)
   rw [hpow, hs (e j), hs (e j)] at h1
-  have h2 : f n i j ^ 2 ≤ C i j := by
-    simp only [f, C]; nlinarith [h1]
-  constructor <;> nlinarith [h2, sq_nonneg (f n i j - 1), sq_nonneg (f n i j + 1), Int.le_self_sq (f n i j), Int.le_self_sq (-f n i j)]
+  have h2 : f n i j ^ 2 ≤ C i j := by simp only [f, C]; nlinarith [h1]
+  constructor
+    <;> nlinarith [h2, sq_nonneg (f n i j - 1), sq_nonneg (f n i j + 1), Int.le_self_sq (f n i j), Int.le_self_sq (-f n i j)]
 
 theorem latFinOrdSt : ReciprocityTheory.ChartRestriction.G.Geo.Tor.LatFinOrdSt :=
   fun Y _ _ _ b hs hp σ hσ => exists_pow_eq_one_of_posDef_form Y b hs hp σ hσ

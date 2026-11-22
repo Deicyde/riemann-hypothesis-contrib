@@ -17,14 +17,16 @@ theorem loc_holds : Loc := by
   have bz := GlobalTheory.bernsteinZelevinskyFiniteness_holds
   have zel := UpperTheory.Lit.Mix.polynomialRing
   have seg := PositivityTheory.RgGu.segmentRepresentation
-  exact
-    { bz := bz
-      geo := geo
-      zel := zel
-      disj := PositivityTheory.SlGl.totallyDisjointProductIrreducible_of_parts geo seg
+  exact {
+    bz := bz
+    geo := geo
+    zel := zel
+    disj :=
+      PositivityTheory.SlGl.totallyDisjointProductIrreducible_of_parts geo seg
         (PositivityTheory.Groth.grothendieckRingPolynomial_of_seg seg)
-      mp := GlobalTheory.CompanionTheory.MoyPrasadTop.moyPrasadJacquetIso
-      dzi := GlobalTheory.DepthZeroPass.depthZeroInduction geo bz zel
-      dzj := GlobalTheory.DepthZeroJac.depthZeroJacquetInjective }
+    mp := GlobalTheory.CompanionTheory.MoyPrasadTop.moyPrasadJacquetIso
+    dzi := GlobalTheory.DepthZeroPass.depthZeroInduction geo bz zel
+    dzj := GlobalTheory.DepthZeroJac.depthZeroJacquetInjective
+  }
 
 end UpperTheory.Gal.TypesAndIwahori

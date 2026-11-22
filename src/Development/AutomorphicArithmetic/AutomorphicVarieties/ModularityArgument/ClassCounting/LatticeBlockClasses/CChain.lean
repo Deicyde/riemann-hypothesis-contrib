@@ -7,10 +7,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK UpperTheory.V.ZK.Cl
+open NumberField IsDedekindDomain UpperTheory.V UpperTheory.V.KL UpperTheory.V.ZK
+  UpperTheory.V.ZK.Cl
 
-theorem UpperTheory.V.ZK.Cl.cChain :
-    UpperTheory.V.ZK.Cl.CChain := by
+theorem UpperTheory.V.ZK.Cl.cChain : UpperTheory.V.ZK.Cl.CChain := by
   unfold UpperTheory.V.ZK.Cl.CChain
   intro A _ C D G _ _ _ ι _ m H ρ d n z g t₀ hz hB hc hρ hσ hg
   obtain ⟨-, h1, h2, h3, -⟩ := sChain A
@@ -30,11 +30,20 @@ theorem UpperTheory.V.ZK.Cl.cChain :
     ext c
     have e := (hc t c).eq
     simp [σH, ρH, k]
-    calc _ = (g t)⁻¹ * (ρ (d t c) * g t) := by group
+    calc
+      _ = (g t)⁻¹ * (ρ (d t c) * g t) := by group
       _ = ρ (d t c) := by rw [← e]; group
-  refine ⟨cm A σH (m + 2) b - cm A ρH (m + 2) b + ∑ t, n t • prism A (k t) (m + 1) (cm A (σH.comp (d t)) (m + 1) z), ?_, ?_⟩
+  refine ⟨
+    cm A σH (m + 2) b - cm A ρH (m + 2) b
+      + ∑ t, n t • prism A (k t) (m + 1) (cm A (σH.comp (d t)) (m + 1) z),
+    ?_,
+    ?_
+  ⟩
   · show bd A H (m + 1) _ = 0
-    have hp : ∀ t, bd A H (m + 1) (prism A (k t) (m + 1) (cm A (σH.comp (d t)) (m + 1) z)) = cm A (ρH.comp (d t)) (m + 1) z - cm A (σH.comp (d t)) (m + 1) z := by
+    have hp
+        : ∀ t,
+          bd A H (m + 1) (prism A (k t) (m + 1) (cm A (σH.comp (d t)) (m + 1) z))
+            = cm A (ρH.comp (d t)) (m + 1) z - cm A (σH.comp (d t)) (m + 1) z := by
       intro t
       have e := sPrism A H (k t) m (cm A (σH.comp (d t)) (m + 1) z)
       rw [hcyc, map_zero, add_zero, ← h2] at e
@@ -53,7 +62,10 @@ theorem UpperTheory.V.ZK.Cl.cChain :
     have hincl2 : H.subtype.comp ρH = ρ := by
       ext x
       rfl
-    have hincl3 : ∀ t, H.subtype.comp (σH.comp (d t)) = (MulAut.conj (g t₀)⁻¹).toMonoidHom.comp (ρ.comp (d t)) := by
+    have hincl3
+        : ∀ t,
+          H.subtype.comp (σH.comp (d t))
+            = (MulAut.conj (g t₀)⁻¹).toMonoidHom.comp (ρ.comp (d t)) := by
       intro t
       ext x
       rfl

@@ -8,10 +8,10 @@ open scoped Matrix
 
 namespace GlobalTheory
 
-theorem exists_det_add_mul_ne_zero_of_ker_inf {k : Type} [Field k] {n : ℕ}
-    (A C : Matrix (Fin n) (Fin n) k)
-    (h : ∀ v : Fin n → k, A *ᵥ v = 0 → C *ᵥ v = 0 → v = 0) :
-    ∃ X : Matrix (Fin n) (Fin n) k, (A + X * C).det ≠ 0 := by
+theorem exists_det_add_mul_ne_zero_of_ker_inf
+    {k : Type} [Field k]
+    {n : ℕ} (A C : Matrix (Fin n) (Fin n) k) (h : ∀ v : Fin n → k, A *ᵥ v = 0 → C *ᵥ v = 0 → v = 0)
+    : ∃ X : Matrix (Fin n) (Fin n) k, (A + X * C).det ≠ 0 := by
   classical
   set a := Matrix.toLin' A with ha
   set c := Matrix.toLin' C with hc
@@ -84,50 +84,57 @@ theorem exists_det_add_mul_ne_zero_of_ker_inf {k : Type} [Field k] {n : ℕ}
     abel
   rw [← hmv, hv]
 
-theorem exists_isUnit_det_toBlocks_add_mul {R : Type} [CommRing R] [IsLocalRing R] {n : ℕ}
-    (H : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R) (hH : IsUnit H.det) :
-    ∃ X : Matrix (Fin n) (Fin n) R, IsUnit (H.toBlocks₁₁ + X * H.toBlocks₂₁).det := by
+theorem exists_isUnit_det_toBlocks_add_mul
+    {R : Type} [CommRing R] [IsLocalRing R]
+    {n : ℕ} (H : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R) (hH : IsUnit H.det)
+    : ∃ X : Matrix (Fin n) (Fin n) R, IsUnit (H.toBlocks₁₁ + X * H.toBlocks₂₁).det := by
   classical
   set Hb := H.map (IsLocalRing.residue R) with hHb_def
   have hHb : Hb.det ≠ 0 := by
     rw [hHb_def, ← RingHom.mapMatrix_apply, ← RingHom.map_det]
     exact (hH.map (IsLocalRing.residue R)).ne_zero
-  obtain ⟨Xb, hXb⟩ := exists_det_add_mul_ne_zero_of_ker_inf Hb.toBlocks₁₁ Hb.toBlocks₂₁ (by
-    intro v h1 h2
-    by_contra hv
-    apply hHb
-    refine Matrix.exists_mulVec_eq_zero_iff.mp ⟨Sum.elim v 0, ?_, ?_⟩
-    · intro h0
-      apply hv
-      funext i
-      simpa using congrFun h0 (Sum.inl i)
-    · funext i
-      cases i with
-      | inl i =>
-        simpa [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.toBlocks₁₁] using congrFun h1 i
-      | inr i =>
-        simpa [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.toBlocks₂₁] using congrFun h2 i)
+  obtain ⟨Xb, hXb⟩ :=
+    exists_det_add_mul_ne_zero_of_ker_inf Hb.toBlocks₁₁ Hb.toBlocks₂₁ (by
+      intro v h1 h2
+      by_contra hv
+      apply hHb
+      refine Matrix.exists_mulVec_eq_zero_iff.mp ⟨Sum.elim v 0, ?_, ?_⟩
+      · intro h0
+        apply hv
+        funext i
+        simpa using congrFun h0 (Sum.inl i)
+      · funext i
+        cases i with
+        | inl i =>
+          simpa [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.toBlocks₁₁] using
+            congrFun h1 i
+        | inr i =>
+          simpa [Matrix.mulVec, dotProduct, Fintype.sum_sum_type, Matrix.toBlocks₂₁] using
+            congrFun h2 i)
   choose X hX using fun i j => IsLocalRing.residue_surjective (R := R) (Xb i j)
   refine ⟨Matrix.of X, ?_⟩
   rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det]
-  have hm : (IsLocalRing.residue R).mapMatrix (H.toBlocks₁₁ + Matrix.of X * H.toBlocks₂₁) =
-      Hb.toBlocks₁₁ + Xb * Hb.toBlocks₂₁ := by
+  have hm
+      : (IsLocalRing.residue R).mapMatrix (H.toBlocks₁₁ + Matrix.of X * H.toBlocks₂₁)
+        = Hb.toBlocks₁₁ + Xb * Hb.toBlocks₂₁ := by
     ext i j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp [RingHom.mapMatrix_apply, Matrix.mul_apply, map_sum, hX, hHb_def, Matrix.toBlocks₁₁,
+    simp [RingHom.mapMatrix_apply, Matrix.mul_apply, map_sum, hX, hHb_def, Matrix.toBlocks₁₁,
       Matrix.toBlocks₂₁]
   rw [hm]
   exact hXb
 
-theorem isUnit_det_of_dual_blocks {R : Type} [CommRing R] {n : ℕ}
-    (S A B C D A' C' : Matrix (Fin n) (Fin n) R) (hA : IsUnit A.det)
-    (h1 : Aᵀ * (S * C') + Cᵀ * (S * A') = 0)
-    (h2 : IsUnit (Bᵀ * (S * C') + Dᵀ * (S * A')).det) : IsUnit A'.det := by
+theorem isUnit_det_of_dual_blocks
+    {R : Type} [CommRing R]
+    {n : ℕ} (S A B C D A' C' : Matrix (Fin n) (Fin n) R) (hA : IsUnit A.det)
+    (h1 : Aᵀ * (S * C') + Cᵀ * (S * A') = 0) (h2 : IsUnit (Bᵀ * (S * C') + Dᵀ * (S * A')).det)
+    : IsUnit A'.det := by
   have hAt : IsUnit Aᵀ.det := by rwa [Matrix.det_transpose]
   have hSC : S * C' = -(Aᵀ⁻¹ * (Cᵀ * (S * A'))) := by
     have h1' : Aᵀ * (S * C') = -(Cᵀ * (S * A')) := eq_neg_of_add_eq_zero_left h1
-    calc S * C' = Aᵀ⁻¹ * (Aᵀ * (S * C')) := by
-          rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hAt, Matrix.one_mul]
+    calc
+      S * C' = Aᵀ⁻¹ * (Aᵀ * (S * C')) := by
+        rw [← Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hAt, Matrix.one_mul]
       _ = -(Aᵀ⁻¹ * (Cᵀ * (S * A'))) := by rw [h1', Matrix.mul_neg]
   have key : Bᵀ * (S * C') + Dᵀ * (S * A') = (Dᵀ - Bᵀ * Aᵀ⁻¹ * Cᵀ) * (S * A') := by
     rw [hSC]
@@ -176,38 +183,51 @@ private lemma H_affine_combination_eq_of_quadratic_relation {R : Type} [CommRing
           noncomm_ring
       _ = S + S + S + S := by rw [E11, E12, E21, E22, hX]; noncomm_ring
 
-theorem exists_dual_pair_isUnit_det_blocks :
-    ∀ {R : Type} [CommRing R] [IsLocalRing R], IsUnit (2 : R) → ∀ {n : ℕ} (S : Matrix (Fin n) (Fin n) R), IsUnit S.det →
-    ∀ (G₁ G₂ : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R), IsUnit G₁.det →
-      G₁ᵀ * Matrix.fromBlocks S 0 0 (-S) * G₂ = Matrix.fromBlocks S 0 0 (-S) →
-      ∃ X₁ X₂ : Matrix (Fin n) (Fin n) R, X₁ᵀ * S + S * X₂ = 0 ∧
-        IsUnit (G₁.toBlocks₁₁ + G₁.toBlocks₁₂ + G₁.toBlocks₂₁ + G₁.toBlocks₂₂ +
-          X₁ * (G₁.toBlocks₁₁ + G₁.toBlocks₁₂ - G₁.toBlocks₂₁ - G₁.toBlocks₂₂)).det ∧
-        IsUnit (G₂.toBlocks₁₁ + G₂.toBlocks₁₂ + G₂.toBlocks₂₁ + G₂.toBlocks₂₂ +
-          X₂ * (G₂.toBlocks₁₁ + G₂.toBlocks₁₂ - G₂.toBlocks₂₁ - G₂.toBlocks₂₂)).det := by
+theorem exists_dual_pair_isUnit_det_blocks
+    : ∀ {R : Type} [CommRing R] [IsLocalRing R],
+      IsUnit (2 : R)
+        → ∀ {n : ℕ} (S : Matrix (Fin n) (Fin n) R),
+          IsUnit S.det
+            → ∀ (G₁ G₂ : Matrix (Fin n ⊕ Fin n) (Fin n ⊕ Fin n) R),
+              IsUnit G₁.det → G₁ᵀ * Matrix.fromBlocks S 0 0 (-S) * G₂ = Matrix.fromBlocks S 0 0 (-S)
+                → ∃ X₁ X₂ : Matrix (Fin n) (Fin n) R,
+                  X₁ᵀ * S + S * X₂ = 0
+                    ∧ IsUnit
+                      (G₁.toBlocks₁₁ + G₁.toBlocks₁₂ + G₁.toBlocks₂₁ + G₁.toBlocks₂₂
+                        + X₁ * (G₁.toBlocks₁₁ + G₁.toBlocks₁₂ - G₁.toBlocks₂₁ - G₁.toBlocks₂₂)).det
+                    ∧ IsUnit
+                      (G₂.toBlocks₁₁ + G₂.toBlocks₁₂ + G₂.toBlocks₂₁ + G₂.toBlocks₂₂
+                        + X₂
+                          * (G₂.toBlocks₁₁ + G₂.toBlocks₁₂ - G₂.toBlocks₂₁
+                            - G₂.toBlocks₂₂)).det := by
   intro R _ _ h2 n S hS G₁ G₂ hG₁ hG
   classical
-  have hKdet : IsUnit (Matrix.fromBlocks (1 : Matrix (Fin n) (Fin n) R) (1 : Matrix (Fin n) (Fin n) R)
-      (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R)).det := by
+  have hKdet
+      : IsUnit (Matrix.fromBlocks (1 : Matrix (Fin n) (Fin n) R) (1 : Matrix (Fin n) (Fin n) R)
+        (1 : Matrix (Fin n) (Fin n) R) (-1 : Matrix (Fin n) (Fin n) R)).det := by
     rw [Matrix.det_fromBlocks_one₁₁]
-    have e : (-1 - 1 * 1 : Matrix (Fin n) (Fin n) R) = (-2 : R) • (1 : Matrix (Fin n) (Fin n) R) := by
+    have e
+        : (-1 - 1 * 1 : Matrix (Fin n) (Fin n) R) = (-2 : R) • (1 : Matrix (Fin n) (Fin n) R) := by
       ext i j
       simp only [Matrix.sub_apply, Matrix.neg_apply, Matrix.one_mul, Matrix.smul_apply, smul_eq_mul,
         Matrix.one_apply]
       split_ifs <;> ring
     rw [e, Matrix.det_smul, Matrix.det_one, mul_one, Fintype.card_fin]
     exact h2.neg.pow n
-  obtain ⟨X₁, hX₁⟩ := exists_isUnit_det_toBlocks_add_mul
-    (Matrix.fromBlocks 1 1 1 (-1) * G₁ * Matrix.fromBlocks 1 1 1 (-1))
-    (by rw [Matrix.det_mul, Matrix.det_mul]; exact (hKdet.mul hG₁).mul hKdet)
-  rw [blocks_conj_eq_fromBlocks_sums, Matrix.toBlocks_fromBlocks₁₁, Matrix.toBlocks_fromBlocks₂₁] at hX₁
+  obtain ⟨X₁, hX₁⟩ :=
+    exists_isUnit_det_toBlocks_add_mul
+      (Matrix.fromBlocks 1 1 1 (-1) * G₁ * Matrix.fromBlocks 1 1 1 (-1))
+      (by rw [Matrix.det_mul, Matrix.det_mul]; exact (hKdet.mul hG₁).mul hKdet)
+  rw [blocks_conj_eq_fromBlocks_sums, Matrix.toBlocks_fromBlocks₁₁, Matrix.toBlocks_fromBlocks₂₁]
+    at hX₁
   have hsum : X₁ᵀ * S + S * -(S⁻¹ * X₁ᵀ * S) = 0 := by
     rw [Matrix.mul_neg, ← Matrix.mul_assoc, ← Matrix.mul_assoc, Matrix.mul_nonsing_inv _ hS,
       Matrix.one_mul, add_neg_cancel]
   refine ⟨X₁, -(S⁻¹ * X₁ᵀ * S), hsum, hX₁, ?_⟩
   have hG' := hG
   rw [← Matrix.fromBlocks_toBlocks G₁, ← Matrix.fromBlocks_toBlocks G₂, Matrix.fromBlocks_transpose,
-    Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply] at hG'
+      Matrix.fromBlocks_multiply, Matrix.fromBlocks_multiply]
+    at hG'
   obtain ⟨e11, e12, e21, e22⟩ := Matrix.fromBlocks_inj.mp hG'
   have E11 : G₁.toBlocks₁₁ᵀ * S * G₂.toBlocks₁₁ - G₁.toBlocks₂₁ᵀ * S * G₂.toBlocks₂₁ = S := by
     convert e11 using 1; noncomm_ring
@@ -217,7 +237,8 @@ theorem exists_dual_pair_isUnit_det_blocks :
     convert e21 using 1; noncomm_ring
   have E22 : G₁.toBlocks₁₂ᵀ * S * G₂.toBlocks₁₂ - G₁.toBlocks₂₂ᵀ * S * G₂.toBlocks₂₂ = -S := by
     convert e22 using 1; noncomm_ring
-  obtain ⟨c1, c2⟩ := H_affine_combination_eq_of_quadratic_relation S _ _ _ _ _ _ _ _ X₁ _ E11 E12 E21 E22 hsum
+  obtain ⟨c1, c2⟩ :=
+    H_affine_combination_eq_of_quadratic_relation S _ _ _ _ _ _ _ _ X₁ _ E11 E12 E21 E22 hsum
   have h4 : IsUnit (4 : R) := by
     have := h2.mul h2
     norm_num at this

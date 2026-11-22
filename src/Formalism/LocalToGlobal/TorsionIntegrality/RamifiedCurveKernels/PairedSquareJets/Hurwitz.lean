@@ -14,8 +14,7 @@ namespace Formalism.L2.Th1.G
 
 open Formalism.DworkPowerSeriesWeights (mfact JetsIntegral mfact_add_single)
 
-theorem mfact_zero {ι : Type} : mfact (0 : ι →₀ ℕ) = 1 := by
-  simp [mfact]
+theorem mfact_zero {ι : Type} : mfact (0 : ι →₀ ℕ) = 1 := by simp [mfact]
 
 theorem mfact_single_one {ι : Type} (i : ι) : mfact (Finsupp.single i 1) = 1 := by
   unfold mfact
@@ -23,8 +22,10 @@ theorem mfact_single_one {ι : Type} (i : ι) : mfact (Finsupp.single i 1) = 1 :
 
 theorem mfact_mul_dvd_add {ι : Type} (μ ν : ι →₀ ℕ) : mfact μ * mfact ν ∣ mfact (μ + ν) := by
   classical
-  have key : ∀ κ : ι →₀ ℕ, κ.support ⊆ μ.support ∪ ν.support →
-      mfact κ = ∏ i ∈ μ.support ∪ ν.support, (κ i).factorial := by
+  have key
+      : ∀ κ : ι →₀ ℕ,
+        κ.support ⊆ μ.support ∪ ν.support
+          → mfact κ = ∏ i ∈ μ.support ∪ ν.support, (κ i).factorial := by
     intro κ hκ
     exact Finsupp.prod_of_support_subset κ hκ (fun _ k => k.factorial) (fun _ _ => rfl)
   rw [key μ Finset.subset_union_left, key ν Finset.subset_union_right,
@@ -35,15 +36,14 @@ theorem mfact_mul_dvd_add {ι : Type} (μ ν : ι →₀ ℕ) : mfact μ * mfact
 
 theorem jets_in_norm_holds : JetsInNorm := by
   intro K _ _ ι f
-  first
-    | exact Iff.rfl
-    | exact forall_congr' (fun κ => by simp [Formalism.G.unitBall])
+  first | exact Iff.rfl | exact forall_congr' (fun κ => by simp [Formalism.G.unitBall])
 
 section Ring
 
 variable {K : Type} [Field K] {R : Subring K} {ι : Type}
 
-theorem jetsIn_of_int {f : MvPowerSeries ι K} (hf : Formalism.L2.Th1.C.IntMv R f) : JetsIn R f := fun κ => R.mul_mem (natCast_mem R _) (hf κ)
+theorem jetsIn_of_int {f : MvPowerSeries ι K} (hf : Formalism.L2.Th1.C.IntMv R f) : JetsIn R f :=
+  fun κ => R.mul_mem (natCast_mem R _) (hf κ)
 
 theorem jetsIn_C {c : K} (hc : c ∈ R) : JetsIn R (MvPowerSeries.C c : MvPowerSeries ι K) := by
   intro κ
@@ -66,8 +66,8 @@ theorem jetsIn_X (i : ι) : JetsIn R (MvPowerSeries.X i : MvPowerSeries ι K) :=
     simp [mfact_single_one]
   · simp
 
-theorem jetsIn_add {f g : MvPowerSeries ι K} (hf : JetsIn R f) (hg : JetsIn R g) :
-    JetsIn R (f + g) := by
+theorem jetsIn_add {f g : MvPowerSeries ι K} (hf : JetsIn R f) (hg : JetsIn R g)
+    : JetsIn R (f + g) := by
   intro κ
   rw [map_add (f := _), mul_add]
   exact R.add_mem (hf κ) (hg κ)
@@ -77,54 +77,55 @@ theorem jetsIn_neg {f : MvPowerSeries ι K} (hf : JetsIn R f) : JetsIn R (-f) :=
   rw [map_neg, mul_neg]
   exact R.neg_mem (hf κ)
 
-theorem jetsIn_mul {f g : MvPowerSeries ι K} (hf : JetsIn R f) (hg : JetsIn R g) :
-    JetsIn R (f * g) := by
+theorem jetsIn_mul {f g : MvPowerSeries ι K} (hf : JetsIn R f) (hg : JetsIn R g)
+    : JetsIn R (f * g) := by
   classical
   intro κ
   rw [MvPowerSeries.coeff_mul, Finset.mul_sum]
   refine sum_mem (fun p hp => ?_)
   have hp' : p.1 + p.2 = κ := by
-    first
-      | exact Finset.HasAntidiagonal.mem_antidiagonal.mp hp
-      | simpa using hp
+    first | exact Finset.HasAntidiagonal.mem_antidiagonal.mp hp | simpa using hp
   obtain ⟨q, hq⟩ := mfact_mul_dvd_add p.1 p.2
   rw [← hp', hq]
-  have e : ((mfact p.1 * mfact p.2 * q : ℕ) : K) *
-      (MvPowerSeries.coeff p.1 f * MvPowerSeries.coeff p.2 g) =
-      (q : K) * (((mfact p.1 : ℕ) : K) * MvPowerSeries.coeff p.1 f) *
-        (((mfact p.2 : ℕ) : K) * MvPowerSeries.coeff p.2 g) := by
+  have e
+      : ((mfact p.1 * mfact p.2 * q : ℕ) : K)
+          * (MvPowerSeries.coeff p.1 f * MvPowerSeries.coeff p.2 g)
+        = (q : K) * (((mfact p.1 : ℕ) : K) * MvPowerSeries.coeff p.1 f)
+          * (((mfact p.2 : ℕ) : K) * MvPowerSeries.coeff p.2 g) := by
     push_cast
     ring
   rw [e]
   exact R.mul_mem (R.mul_mem (natCast_mem R q) (hf p.1)) (hg p.2)
 
-theorem jetsIn_sum {α : Type} (s : Finset α) (f : α → MvPowerSeries ι K)
-    (hf : ∀ a ∈ s, JetsIn R (f a)) : JetsIn R (∑ a ∈ s, f a) := by
-  exact Finset.sum_induction f (JetsIn R) (fun a b ha hb => jetsIn_add ha hb)
+theorem jetsIn_sum
+    {α : Type} (s : Finset α) (f : α → MvPowerSeries ι K) (hf : ∀ a ∈ s, JetsIn R (f a))
+    : JetsIn R (∑ a ∈ s, f a) := by
+  exact Finset.sum_induction f (JetsIn R)
+    (fun a b ha hb => jetsIn_add ha hb)
     (by simpa using jetsIn_C (ι := ι) (R := R) R.zero_mem) hf
 
-theorem jetsIn_prod {α : Type} (s : Finset α) (f : α → MvPowerSeries ι K)
-    (hf : ∀ a ∈ s, JetsIn R (f a)) : JetsIn R (∏ a ∈ s, f a) := by
-  exact Finset.prod_induction f (JetsIn R) (fun a b ha hb => jetsIn_mul ha hb)
-    jetsIn_one hf
+theorem jetsIn_prod
+    {α : Type} (s : Finset α) (f : α → MvPowerSeries ι K) (hf : ∀ a ∈ s, JetsIn R (f a))
+    : JetsIn R (∏ a ∈ s, f a) := by
+  exact Finset.prod_induction f (JetsIn R) (fun a b ha hb => jetsIn_mul ha hb) jetsIn_one hf
 
-theorem jet_pderiv (f : MvPowerSeries ι K) (i : ι) (κ : ι →₀ ℕ) :
-    ((mfact κ : ℕ) : K) * MvPowerSeries.coeff κ (MvPowerSeries.pderiv (R := K) i f) =
-      ((mfact (κ + Finsupp.single i 1) : ℕ) : K) *
-        MvPowerSeries.coeff (κ + Finsupp.single i 1) f := by
+theorem jet_pderiv (f : MvPowerSeries ι K) (i : ι) (κ : ι →₀ ℕ)
+    : ((mfact κ : ℕ) : K) * MvPowerSeries.coeff κ (MvPowerSeries.pderiv (R := K) i f)
+      = ((mfact (κ + Finsupp.single i 1) : ℕ) : K)
+        * MvPowerSeries.coeff (κ + Finsupp.single i 1) f := by
   rw [mfact_add_single, MvPowerSeries.coeff_pderiv]
   push_cast
   ring
 
-theorem jetsIn_pderiv {f : MvPowerSeries ι K} (hf : JetsIn R f) (i : ι) :
-    JetsIn R (MvPowerSeries.pderiv (R := K) i f) := by
+theorem jetsIn_pderiv {f : MvPowerSeries ι K} (hf : JetsIn R f) (i : ι)
+    : JetsIn R (MvPowerSeries.pderiv (R := K) i f) := by
   intro κ
   rw [jet_pderiv]
   exact hf _
 
-theorem jetsIn_iff_pderiv (f : MvPowerSeries ι K) :
-    JetsIn R f ↔ MvPowerSeries.constantCoeff f ∈ R ∧
-      ∀ i, JetsIn R (MvPowerSeries.pderiv (R := K) i f) := by
+theorem jetsIn_iff_pderiv (f : MvPowerSeries ι K)
+    : JetsIn R f
+      ↔ MvPowerSeries.constantCoeff f ∈ R ∧ ∀ i, JetsIn R (MvPowerSeries.pderiv (R := K) i f) := by
   constructor
   · intro hf
     refine ⟨?_, fun i => jetsIn_pderiv hf i⟩
@@ -148,8 +149,13 @@ end Ring
 
 theorem jets_ring_holds : JetsRing := by
   intro K _ R ι
-  exact ⟨fun c hc => jetsIn_C hc, jetsIn_X, fun f g => jetsIn_add, fun f => jetsIn_neg,
-    fun f g => jetsIn_mul⟩
+  exact ⟨
+    fun c hc => jetsIn_C hc,
+    jetsIn_X,
+    fun f g => jetsIn_add,
+    fun f => jetsIn_neg,
+    fun f g => jetsIn_mul
+  ⟩
 
 theorem integral_jets_holds : IntJets := by
   intro K _ R ι f hf
@@ -159,12 +165,15 @@ section CharZero
 
 variable {K : Type} [Field K] [CharZero K] {R : Subring K} {ι : Type}
 
-theorem pderiv_divPow (a : MvPowerSeries ι K) (i : ι) (m : ℕ) :
-    MvPowerSeries.pderiv (R := K) i (MvPowerSeries.C (((m + 1).factorial : K)⁻¹) * a ^ (m + 1)) =
-      (MvPowerSeries.C ((m.factorial : K)⁻¹) * a ^ m) * MvPowerSeries.pderiv (R := K) i a := by
-  have hC : ∀ c : K, MvPowerSeries.pderiv (R := K) i (MvPowerSeries.C c : MvPowerSeries ι K) = 0 := by
+theorem pderiv_divPow (a : MvPowerSeries ι K) (i : ι) (m : ℕ)
+    : MvPowerSeries.pderiv (R := K) i (MvPowerSeries.C (((m + 1).factorial : K)⁻¹) * a ^ (m + 1))
+      = (MvPowerSeries.C ((m.factorial : K)⁻¹) * a ^ m) * MvPowerSeries.pderiv (R := K) i a := by
+  have hC
+      : ∀ c : K, MvPowerSeries.pderiv (R := K) i (MvPowerSeries.C c : MvPowerSeries ι K) = 0 := by
     intro c
-    have h := (MvPowerSeries.pderiv (R := K) i : Derivation K (MvPowerSeries ι K) (MvPowerSeries ι K)).map_algebraMap c
+    have h :=
+      (MvPowerSeries.pderiv (R := K) i
+        : Derivation K (MvPowerSeries ι K) (MvPowerSeries ι K)).map_algebraMap c
     simpa [MvPowerSeries.algebraMap_apply] using h
   have hN : ((m + 1 : ℕ) : MvPowerSeries ι K) = MvPowerSeries.C ((m + 1 : ℕ) : K) :=
     (map_natCast _ _).symm
@@ -178,8 +187,9 @@ theorem pderiv_divPow (a : MvPowerSeries ι K) (i : ι) (m : ℕ) :
     smul_eq_mul, nsmul_eq_mul, smul_eq_mul, hN, ← key, map_mul]
   ring
 
-theorem jetsIn_divPow {a : MvPowerSeries ι K} (h0 : MvPowerSeries.constantCoeff a = 0)
-    (ha : JetsIn R a) (m : ℕ) : JetsIn R (MvPowerSeries.C ((m.factorial : K)⁻¹) * a ^ m) := by
+theorem jetsIn_divPow
+    {a : MvPowerSeries ι K} (h0 : MvPowerSeries.constantCoeff a = 0) (ha : JetsIn R a) (m : ℕ)
+    : JetsIn R (MvPowerSeries.C ((m.factorial : K)⁻¹) * a ^ m) := by
   induction m with
   | zero => simpa using (jetsIn_one (R := R) (ι := ι))
   | succ m ih =>
@@ -189,10 +199,12 @@ theorem jetsIn_divPow {a : MvPowerSeries ι K} (h0 : MvPowerSeries.constantCoeff
     · rw [pderiv_divPow]
       exact jetsIn_mul ih (jetsIn_pderiv ha i)
 
-theorem coeff_subst_one (f : PowerSeries K) {a : MvPowerSeries ι K}
-    (h0 : MvPowerSeries.constantCoeff a = 0) {n : ι →₀ ℕ} {N : ℕ} (hN : n.degree < N) :
-    MvPowerSeries.coeff n (PowerSeries.subst a f) =
-      ∑ k ∈ range N, PowerSeries.coeff k f * MvPowerSeries.coeff n (a ^ k) := by
+theorem coeff_subst_one
+    (f : PowerSeries K)
+    {a : MvPowerSeries ι K} (h0 : MvPowerSeries.constantCoeff a = 0)
+    {n : ι →₀ ℕ} {N : ℕ} (hN : n.degree < N)
+    : MvPowerSeries.coeff n (PowerSeries.subst a f)
+      = ∑ k ∈ range N, PowerSeries.coeff k f * MvPowerSeries.coeff n (a ^ k) := by
   classical
   rw [PowerSeries.coeff_subst (Formalism.L2.Th1.C.hasSubst_of_cc h0),
     finsum_eq_sum_of_support_subset (s := range N)]
@@ -204,20 +216,24 @@ theorem coeff_subst_one (f : PowerSeries K) {a : MvPowerSeries ι K}
     apply hk
     rw [Formalism.L2.Th1.C.coeff_pow_eq_zero_of_cc h0 (by omega), smul_zero]
 
-theorem jetsIn_subst_one {f : PowerSeries K} {a : MvPowerSeries ι K} (hf : JetsIn1 R f)
-    (h0 : MvPowerSeries.constantCoeff a = 0) (ha : JetsIn R a) :
-    JetsIn R (PowerSeries.subst a f) := by
+theorem jetsIn_subst_one
+    {f : PowerSeries K} {a : MvPowerSeries ι K}
+    (hf : JetsIn1 R f) (h0 : MvPowerSeries.constantCoeff a = 0) (ha : JetsIn R a)
+    : JetsIn R (PowerSeries.subst a f) := by
   intro n
   rw [coeff_subst_one f h0 (Nat.lt_succ_self n.degree), Finset.mul_sum]
   refine sum_mem (fun k _ => ?_)
   have hk : ((k.factorial : ℕ) : K) ≠ 0 := Nat.cast_ne_zero.mpr k.factorial_ne_zero
-  have e : ((mfact n : ℕ) : K) * (PowerSeries.coeff k f * MvPowerSeries.coeff n (a ^ k)) =
-      (((k.factorial : ℕ) : K) * PowerSeries.coeff k f) *
-        (((mfact n : ℕ) : K) *
-          MvPowerSeries.coeff n (MvPowerSeries.C ((k.factorial : K)⁻¹) * a ^ k)) := by
+  have e
+      : ((mfact n : ℕ) : K) * (PowerSeries.coeff k f * MvPowerSeries.coeff n (a ^ k))
+        = (((k.factorial : ℕ) : K) * PowerSeries.coeff k f)
+          * (((mfact n : ℕ) : K)
+            * MvPowerSeries.coeff n (MvPowerSeries.C ((k.factorial : K)⁻¹) * a ^ k)) := by
     rw [MvPowerSeries.coeff_C_mul]
-    calc _ = (((mfact n : ℕ) : K) * (PowerSeries.coeff k f * MvPowerSeries.coeff n (a ^ k))) *
-          (((k.factorial : ℕ) : K) * ((k.factorial : K))⁻¹) := by rw [mul_inv_cancel₀ hk, mul_one]
+    calc
+      _ = (((mfact n : ℕ) : K) * (PowerSeries.coeff k f * MvPowerSeries.coeff n (a ^ k)))
+          * (((k.factorial : ℕ) : K) * ((k.factorial : K))⁻¹) := by
+        rw [mul_inv_cancel₀ hk, mul_one]
       _ = _ := by ring
   rw [e]
   exact R.mul_mem (hf k) (jetsIn_divPow h0 ha k n)
@@ -230,8 +246,10 @@ theorem jetsIn1_exp : JetsIn1 R (PowerSeries.exp K) := by
   rw [e]
   exact R.one_mem
 
-theorem jetsIn_mvExp {a : MvPowerSeries ι K} (h0 : MvPowerSeries.constantCoeff a = 0)
-    (ha : JetsIn R a) : JetsIn R (Formalism.L2.Th1.C.mvExp a) := jetsIn_subst_one jetsIn1_exp h0 ha
+theorem jetsIn_mvExp
+    {a : MvPowerSeries ι K} (h0 : MvPowerSeries.constantCoeff a = 0) (ha : JetsIn R a)
+    : JetsIn R (Formalism.L2.Th1.C.mvExp a) :=
+  jetsIn_subst_one jetsIn1_exp h0 ha
 
 end CharZero
 

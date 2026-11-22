@@ -15,27 +15,29 @@ noncomputable section
 
 namespace FreeParAlgIndep
 
-theorem genPar_algIndep (k : Type*) [Field k] (e n : ℕ) :
-    AlgebraicIndependent k (genPar k e n) := by
+theorem genPar_algIndep (k : Type*) [Field k] (e n : ℕ)
+    : AlgebraicIndependent k (genPar k e n) := by
   have hinj : Function.Injective (IsScalarTower.toAlgHom k (MvPolynomial (Par e n) k)
       (GenParField k e n)) :=
     IsFractionRing.injective (MvPolynomial (Par e n) k) (GenParField k e n)
   have h := (MvPolynomial.algebraicIndependent_X (Par e n) k).map' hinj
-  have hc : (⇑(IsScalarTower.toAlgHom k (MvPolynomial (Par e n) k) (GenParField k e n)) ∘ X) =
-      genPar k e n := by
+  have hc
+      : (⇑(IsScalarTower.toAlgHom k (MvPolynomial (Par e n) k) (GenParField k e n)) ∘ X)
+        = genPar k e n := by
     funext p
     simp only [Function.comp_apply, IsScalarTower.coe_toAlgHom', genPar]
   rwa [hc] at h
 
-theorem algebraicIndependent_of_trdeg {k L : Type} [Field k] [Field L] [Algebra k L]
-    (A₀ : Subalgebra k L) {ι : Type} [Finite ι] (w : ι → L)
-    [Algebra.IsAlgebraic (Algebra.adjoin A₀ (Set.range w)) L] {e : ℕ}
-    (htr : Algebra.trdeg k A₀ ≤ e) (hle : (e : Cardinal) + #ι ≤ Algebra.trdeg k L) :
-    AlgebraicIndependent A₀ w := by
+theorem algebraicIndependent_of_trdeg
+    {k L : Type} [Field k] [Field L] [Algebra k L]
+    (A₀ : Subalgebra k L)
+    {ι : Type} [Finite ι]
+    (w : ι → L) [Algebra.IsAlgebraic (Algebra.adjoin A₀ (Set.range w)) L]
+    {e : ℕ} (htr : Algebra.trdeg k A₀ ≤ e) (hle : (e : Cardinal) + #ι ≤ Algebra.trdeg k L)
+    : AlgebraicIndependent A₀ w := by
   have : FaithfulSMul k A₀ :=
     (faithfulSMul_iff_algebraMap_injective k A₀).2 (algebraMap k A₀).injective
-  have : FaithfulSMul A₀ L :=
-    (faithfulSMul_iff_algebraMap_injective A₀ L).2 Subtype.val_injective
+  have : FaithfulSMul A₀ L := (faithfulSMul_iff_algebraMap_injective A₀ L).2 Subtype.val_injective
   have hadd := trdeg_add_eq k A₀ (A := L)
   refine (Algebra.IsAlgebraic.isTranscendenceBasis_of_le_trdeg_of_finite A₀ w ?_).1
   have h3 : #ι + (e : Cardinal) ≤ Algebra.trdeg A₀ L + e := by
@@ -53,10 +55,11 @@ theorem proof : FreeParAlgIndep.Statement := by
   rw [IntermediateField.algebraicIndependent_adjoin_iff]
 
   let w : (Fin e × {j : Fin n // j ≠ j₀}) ⊕ Fin n → L :=
-    Sum.elim (fun p => algebraMap (GenParField k e n) L (genPar k e n (.inl (p.1, p.2.1))))
+    Sum.elim
+      (fun p => algebraMap (GenParField k e n) L (genPar k e n (.inl (p.1, p.2.1))))
       (fun j => algebraMap (GenParField k e n) L (genPar k e n (.inr j)))
-  have halg : Algebra.IsAlgebraic
-      (Algebra.adjoin (Algebra.adjoin k (Set.range z)) (Set.range w)) L := by
+  have halg
+      : Algebra.IsAlgebraic (Algebra.adjoin (Algebra.adjoin k (Set.range z)) (Set.range w)) L := by
     set A₀ := Algebra.adjoin k (Set.range z) with hA₀
     set B := Algebra.adjoin A₀ (Set.range w) with hB
     have hzB : ∀ m, z m ∈ B := fun m =>
@@ -69,11 +72,13 @@ theorem proof : FreeParAlgIndep.Statement := by
       rintro (⟨i, j⟩ | j)
       · by_cases hj : j = j₀
         · rw [hj]
-          have hsum : ∑ j, algebraMap (GenParField k e n) L (genPar k e n (.inl (i, j))) * z j = 0 := by
+          have hsum
+              : ∑ j, algebraMap (GenParField k e n) L (genPar k e n (.inl (i, j))) * z j = 0 := by
             simp only [hzm, ← mul_assoc, ← Finset.sum_mul, hU i, zero_mul]
-          have h1 := Finset.add_sum_erase Finset.univ
-            (fun j => algebraMap (GenParField k e n) L (genPar k e n (.inl (i, j))) * z j)
-            (Finset.mem_univ j₀)
+          have h1 :=
+            Finset.add_sum_erase Finset.univ
+              (fun j => algebraMap (GenParField k e n) L (genPar k e n (.inl (i, j))) * z j)
+              (Finset.mem_univ j₀)
           simp only [hz0, mul_one] at h1
           rw [hsum, ← eq_neg_iff_add_eq_zero] at h1
           rw [h1]
@@ -85,8 +90,8 @@ theorem proof : FreeParAlgIndep.Statement := by
     have hx0alg : IsAlgebraic B (x j₀) := by
       have hs : ∑ j, algebraMap (GenParField k e n) L (genPar k e n (.inr j)) * z j = (x j₀)⁻¹ := by
         simp only [hzm, ← mul_assoc, ← Finset.sum_mul, hT, one_mul]
-      have h2 : IsAlgebraic B
-          (∑ j, algebraMap (GenParField k e n) L (genPar k e n (.inr j)) * z j) :=
+      have h2
+          : IsAlgebraic B (∑ j, algebraMap (GenParField k e n) L (genPar k e n (.inr j)) * z j) :=
         hmem _ (Subalgebra.sum_mem _ fun j _ => Subalgebra.mul_mem _ (hwB (.inr j)) (hzB j))
       have := h2.inv
       rwa [hs, inv_inv] at this
@@ -94,8 +99,11 @@ theorem proof : FreeParAlgIndep.Statement := by
       have hm : x m = z m * x j₀ := by rw [hzm, inv_mul_cancel_right₀ hx0]
       rw [hm]
       exact (hmem _ (hzB m)).mul hx0alg
-    have hpoly : ∀ a : MvPolynomial (Par e n) k, algebraMap (GenParField k e n) L
-        (algebraMap (MvPolynomial (Par e n) k) (GenParField k e n) a) ∈ B := by
+    have hpoly
+        : ∀ a : MvPolynomial (Par e n) k,
+          algebraMap (GenParField k e n) L
+              (algebraMap (MvPolynomial (Par e n) k) (GenParField k e n) a)
+            ∈ B := by
       intro a
       induction a using MvPolynomial.induction_on with
       | C c =>
@@ -130,25 +138,28 @@ theorem proof : FreeParAlgIndep.Statement := by
       rw [map_mul, MvPolynomial.aeval_X]
       exact ha.mul (hxalg j)
 
-  have hcard : (e : Cardinal) + #((Fin e × {j : Fin n // j ≠ j₀}) ⊕ Fin n) ≤
-      Algebra.trdeg k L := by
-    have hind : AlgebraicIndependent k
-        (fun p => algebraMap (GenParField k e n) L (genPar k e n p)) :=
+  have hcard : (e : Cardinal) + #((Fin e × {j : Fin n // j ≠ j₀}) ⊕ Fin n) ≤ Algebra.trdeg k L := by
+    have hind
+        : AlgebraicIndependent k (fun p => algebraMap (GenParField k e n) L (genPar k e n p)) :=
       (genPar_algIndep k e n).map' (f := IsScalarTower.toAlgHom k (GenParField k e n) L)
         (algebraMap (GenParField k e n) L).injective
-    have hinj : Function.Injective (Sum.elim (fun i : Fin e => (Sum.inl (i, j₀) : Par e n))
-        (Sum.elim (fun p : Fin e × {j : Fin n // j ≠ j₀} => (Sum.inl (p.1, p.2.1) : Par e n))
+    have hinj : Function.Injective (Sum.elim
+        (fun i : Fin e => (Sum.inl (i, j₀) : Par e n))
+        (Sum.elim
+          (fun p : Fin e × {j : Fin n // j ≠ j₀} => (Sum.inl (p.1, p.2.1) : Par e n))
           Sum.inr)) := by
-      rintro (i | ⟨i, j, hj⟩ | j) (i' | ⟨i', j', hj'⟩ | j') h <;>
-        simp only [Sum.elim_inl, Sum.elim_inr, Sum.inl.injEq, Sum.inr.injEq, Prod.mk.injEq,
-          reduceCtorEq, Subtype.mk.injEq, and_true] at h ⊢ <;>
-        first | exact h | exact absurd h.2.symm hj' | exact absurd h.2 hj
-    calc (e : Cardinal) + #((Fin e × {j : Fin n // j ≠ j₀}) ⊕ Fin n)
+      rintro (i | ⟨i, j, hj⟩ | j) (i' | ⟨i', j', hj'⟩ | j') h
+        <;> simp only [Sum.elim_inl, Sum.elim_inr, Sum.inl.injEq, Sum.inr.injEq, Prod.mk.injEq,
+            reduceCtorEq, Subtype.mk.injEq, and_true]
+          at h ⊢
+        <;> first | exact h | exact absurd h.2.symm hj' | exact absurd h.2 hj
+    calc
+      (e : Cardinal) + #((Fin e × {j : Fin n // j ≠ j₀}) ⊕ Fin n)
         = #(Fin e ⊕ ((Fin e × {j : Fin n // j ≠ j₀}) ⊕ Fin n)) := by simp
       _ ≤ #(Par e n) := Cardinal.mk_le_of_injective hinj
       _ ≤ Algebra.trdeg k L := hind.cardinalMk_le_trdeg
-  exact (algebraicIndependent_of_trdeg (Algebra.adjoin k (Set.range z)) w htr hcard).comp
-    Sum.inl Sum.inl_injective
+  exact (algebraicIndependent_of_trdeg (Algebra.adjoin k (Set.range z)) w htr hcard).comp Sum.inl
+    Sum.inl_injective
 
 end FreeParAlgIndep
 

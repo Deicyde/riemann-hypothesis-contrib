@@ -9,7 +9,8 @@ public import Formalism.SharpRestriction.CuspSpanNormBounds.BruhatCellsKronecker
 
 @[expose] public section
 
-open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions Formalism.L2.SG.CntLocal
+open NumberField Module Formalism.MainNotions.S Formalism.MainNotions.S.Lat Formalism.BasicNotions
+  Formalism.L2.SG.CntLocal
 open Classical
 
 noncomputable section
@@ -26,7 +27,8 @@ section Dual
 variable {D : D7} {T : D.host.E} (F0 : FlagG (VS D) D.R.rS T)
 
 theorem exists_dual0 : ∃ g0 : Fin D.R.rS → (VS D).V, IsDual0 F0 g0 := by
-  let Φ : (VS D).V →ₗ[D.host.E] (Fin D.R.rS → D.host.E) := LinearMap.pi (fun a => (VS D).hT (F0.e a))
+  let Φ : (VS D).V →ₗ[D.host.E] (Fin D.R.rS → D.host.E) :=
+    LinearMap.pi (fun a => (VS D).hT (F0.e a))
   have hsurj : LinearMap.range Φ = ⊤ := by
     by_contra hne
     obtain ⟨f, hf0, hle⟩ := Submodule.exists_le_ker_of_lt_top _ (lt_top_iff_ne_top.2 hne)
@@ -73,8 +75,9 @@ theorem row_dual_frame : RowDualFrame := by
   have hu : Formalism.HermitianLatticesTheory.IsUnimodular (VS D).hT Λ := hΛ.2.1.2.1
   have hiso : ∀ x ∈ F0.X, ∀ y ∈ F0.X, (VS D).hT x y = 0 := fun x hx y hy => hX_X F0 hx hy
   obtain ⟨P, P', hadj, hid, hX, _, hint', _⟩ :=
-    Formalism.MainNotions.BridgeLemma.l_iso Formalism.MainNotions.BridgeLemma.l_adj Formalism.MainNotions.BridgeLemma.l_retr Formalism.MainNotions.BridgeLemma.l_theta
-      D.host.E (VS D) Λ F0.X D.sp.cm.cmUnram hlat hu hiso
+    Formalism.MainNotions.BridgeLemma.l_iso Formalism.MainNotions.BridgeLemma.l_adj
+      Formalism.MainNotions.BridgeLemma.l_retr Formalism.MainNotions.BridgeLemma.l_theta D.host.E
+      (VS D) Λ F0.X D.sp.cm.cmUnram hlat hu hiso
 
   have hker : ∀ w ∈ perpS (VS D) F0.X, P' w = 0 := by
     intro w hw

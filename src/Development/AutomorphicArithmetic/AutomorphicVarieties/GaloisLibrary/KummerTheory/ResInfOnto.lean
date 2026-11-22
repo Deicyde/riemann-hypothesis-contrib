@@ -14,17 +14,26 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.ExistsDec
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 
-private theorem UpperTheory.V.Kum.decCob {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
-    {l : ℕ} [Fact l.Prime] {e : ℤ} (he : e ≠ 0) (hP : Procyc F Ω l) {v : HeightOneSpectrum (𝓞 F)}
-    {A : ValuationSubring Ω} (hv : v ∈ Above F l) (hA : IsPlaceOver A v) {z : G F Ω → QZ l}
-    (hz : z ∈ Z1 (qzG F Ω l e)) (h0 : ∀ g ∈ Dec (F := F) A, cycZ F Ω l g = 1 → z g = 0) :
-    ∃ m, ∀ g ∈ Dec (F := F) A, z g = qzG F Ω l e g m - m := by
+private theorem UpperTheory.V.Kum.decCob
+    {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} [Fact l.Prime]
+    {e : ℤ} (he : e ≠ 0)
+    (hP : Procyc F Ω l)
+    {v : HeightOneSpectrum (𝓞 F)} {A : ValuationSubring Ω}
+    (hv : v ∈ Above F l) (hA : IsPlaceOver A v)
+    {z : G F Ω → QZ l}
+    (hz : z ∈ Z1 (qzG F Ω l e)) (h0 : ∀ g ∈ Dec (F := F) A, cycZ F Ω l g = 1 → z g = 0)
+    : ∃ m, ∀ g ∈ Dec (F := F) A, z g = qzG F Ω l e g m - m := by
   haveI : CompactSpace (Dec (F := F) A) := isCompact_iff_compactSpace.mp (isClosed_Dec A).isCompact
   let χ : Dec (F := F) A →* ℤ_[l]ˣ := (cycZ F Ω l).comp (Dec (F := F) A).subtype
-  let ρ : Representation ℤ_[l] (Dec (F := F) A) (QZ l) := (qzG F Ω l e).comp (Dec (F := F) A).subtype
-  have hV : IsClosed (decImage F l A : Set ℤ_[l]ˣ) := Subgroup.isClosed_of_isOpen _ (isOpen_decImage hv hA)
+  let ρ : Representation ℤ_[l] (Dec (F := F) A) (QZ l) :=
+    (qzG F Ω l e).comp (Dec (F := F) A).subtype
+  have hV : IsClosed (decImage F l A : Set ℤ_[l]ˣ) :=
+    Subgroup.isClosed_of_isOpen _ (isOpen_decImage hv hA)
   have hVp : l ≠ 2 ∨ decImage F l A ≤ KStar.TotallyRealRoots.princ l 2 := by
     rcases hP with h | h
     · exact Or.inl h
@@ -48,14 +57,16 @@ private theorem UpperTheory.V.Kum.decCob {F Ω : Type} [Field F] [NumberField F]
     unfold ReciprocityTheory.Gal.ContAction
     refine hρc0.congr fun p => ?_
     simp only [ρ, Function.comp_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
-  have hχc0 := (continuous_cycZ F Ω l).comp (continuous_subtype_val (p := fun g : G F Ω => g ∈ Dec (F := F) A))
+  have hχc0 :=
+    (continuous_cycZ F Ω l).comp (continuous_subtype_val (p := fun g : G F Ω => g ∈ Dec (F := F) A))
   have hχc : Continuous χ := by
     refine hχc0.congr fun g => ?_
     simp only [χ, Function.comp_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
   have htriv : ∀ g, χ g = 1 → ∀ m, ρ g m = m := by
     intro g hg m
     simp only [χ, MonoidHom.comp_apply, Subgroup.coe_subtype] at hg
-    simp only [ρ, MonoidHom.comp_apply, Subgroup.coe_subtype, qzG_apply, hg, one_zpow, Units.val_one, one_smul]
+    simp only [ρ, MonoidHom.comp_apply, Subgroup.coe_subtype, qzG_apply, hg, one_zpow,
+      Units.val_one, one_smul]
   have hgen : ∀ g, χ g ∈ (Subgroup.zpowers (χ ⟨γ, hγ⟩)).topologicalClosure := by
     intro g
     have h1 : χ ⟨γ, hγ⟩ = γ' := by
@@ -67,7 +78,8 @@ private theorem UpperTheory.V.Kum.decCob {F Ω : Type} [Field F] [NumberField F]
     exact Subgroup.mem_map_of_mem _ g.2
   have hne : (cycZ F Ω l γ) ^ (-e) ≠ 1 := by
     intro h1
-    obtain ⟨g, hg, hg1⟩ := GlobalTheory.CycDec.exists_mem_Dec_cycZ_zpow_ne_one F Ω l v A hv hA (-e) (neg_ne_zero.mpr he)
+    obtain ⟨g, hg, hg1⟩ :=
+      GlobalTheory.CycDec.exists_mem_Dec_cycZ_zpow_ne_one F Ω l v A hv hA (-e) (neg_ne_zero.mpr he)
     let K : Subgroup ℤ_[l]ˣ := (zpowGroupHom (-e) : ℤ_[l]ˣ →* ℤ_[l]ˣ).ker
     have hK : IsClosed (K : Set ℤ_[l]ˣ) := by
       have : (K : Set ℤ_[l]ˣ) = {x : ℤ_[l]ˣ | x ^ (-e) = 1} := by
@@ -96,15 +108,18 @@ private theorem UpperTheory.V.Kum.decCob {F Ω : Type} [Field F] [NumberField F]
     have := hz.2 a b
     simp only [ρ, MonoidHom.comp_apply, Subgroup.coe_subtype, Subgroup.coe_mul]
     exact this
-  have hB := cobOfGen l (Dec (F := F) A) χ ℤ_[l] (QZ l) ρ ⟨γ, hγ⟩ hχc hρc htriv hgen hsurj _ hzr
-    (fun g hg => h0 g g.2 (by simpa [χ] using hg))
+  have hB :=
+    cobOfGen l (Dec (F := F) A) χ ℤ_[l] (QZ l) ρ ⟨γ, hγ⟩ hχc hρc htriv hgen hsurj _ hzr
+      (fun g hg => h0 g g.2 (by simpa [χ] using hg))
   obtain ⟨m, hm⟩ := (mem_coboundaries1 ρ _).mp hB
   refine ⟨m, fun g hg => ?_⟩
   have := hm ⟨g, hg⟩
   simpa [ρ] using this
 
-theorem UpperTheory.V.Kum.resInfOnto :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (D : LData F Ω l) (e : ℤ), e ≠ 0 → Procyc F Ω l → (Sha D e).map (resInf D e) = EqHom l (Uinf F Ω l) (qzG F Ω l e) := by
+theorem UpperTheory.V.Kum.resInfOnto
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (D : LData F Ω l) (e : ℤ),
+      e ≠ 0 → Procyc F Ω l → (Sha D e).map (resInf D e) = EqHom l (Uinf F Ω l) (qzG F Ω l e) := by
   intro F Ω _ _ _ _ _ l _ D e he hP
   apply le_antisymm (resInfMem F Ω l D e)
   intro φ hφ
@@ -113,8 +128,10 @@ theorem UpperTheory.V.Kum.resInfOnto :
   have hlc : IsLocallyConstant φ := hX.1
   have hadd : ∀ a b, φ (a * b) = φ a + φ b := hX.2.1
   have hIne : ∀ (A : ValuationSubring Ω) (u : Uinf F Ω l), (u : G F Ω) ∈ Ine A → φ u = 0 := hX.2.2.1
-  have hDec : ∀ (A : ValuationSubring Ω), A.valuation (l : Ω) < 1 →
-      ∀ u : Uinf F Ω l, (u : G F Ω) ∈ Dec A → φ u = 0 := hX.2.2.2
+  have hDec
+      : ∀ (A : ValuationSubring Ω),
+        A.valuation (l : Ω) < 1 → ∀ u : Uinf F Ω l, (u : G F Ω) ∈ Dec A → φ u = 0 :=
+    hX.2.2.2
   have hmemU : ∀ g : G F Ω, cycZ F Ω l g = 1 → g ∈ Uinf F Ω l := by
     intro g hg
     simp only [Uinf, cycU, Subgroup.mem_inf, MonoidHom.mem_ker]
@@ -123,33 +140,42 @@ theorem UpperTheory.V.Kum.resInfOnto :
     intro u hu m
     simp only [Uinf, cycU, Subgroup.mem_inf, MonoidHom.mem_ker] at hu
     rw [qzG_apply, hu.2, one_zpow, Units.val_one, one_smul]
-  obtain ⟨z, hz, hzφ⟩ := extCocycle F Ω l ℤ_[l] (QZ l) (qzG F Ω l e) φ hP (contAction_qzG e) htriv
-    (qzBasic l).2.1 hlc hadd hC
-  have hρ' : ∀ g m, ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))) g m = qzG F Ω l e g m := by
+  obtain ⟨z, hz, hzφ⟩ :=
+    extCocycle F Ω l ℤ_[l] (QZ l) (qzG F Ω l e) φ hP (contAction_qzG e) htriv (qzBasic l).2.1 hlc
+      hadd hC
+  have hρ'
+      : ∀ g m,
+        ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))) g m = qzG F Ω l e g m := by
     intro g m
     rw [qzTw_comp_toGS]
   have hz' : z ∈ Z1 ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))) := by
     rw [qzTw_comp_toGS]
     exact hz
   have hsha := shaInfl F Ω D.S D.A D.hA ℤ_[l] (QZ l) (qzTw D e) (contTw F Ω l D e).1
-  have hmk : (Submodule.Quotient.mk ⟨z, hz'⟩ : H1 ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))))) ∈
-      ShaAbs ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))) (D.S : Set (HeightOneSpectrum (𝓞 F))) := by
+  have hmk
+      : (Submodule.Quotient.mk ⟨z, hz'⟩
+          : H1 ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))))))
+        ∈ ShaAbs ((qzTw D e).comp (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))))
+          (D.S : Set (HeightOneSpectrum (𝓞 F))) := by
     rw [mk_mem_ShaAbs]
     refine ⟨fun v hv A hA => ?_, fun v hv A hA => ⟨0, fun g hg => ?_⟩⟩
     · rw [D.hS] at hv
       have hAl : A.valuation (l : Ω) < 1 := ((placeDict F Ω).2.2.2 A v l hA).mpr hv
-      obtain ⟨m, hm⟩ := decCob he hP hv hA hz (fun g hg hg1 => by
-        rw [show z g = φ ⟨g, hmemU g hg1⟩ from hzφ ⟨g, hmemU g hg1⟩]
-        exact hDec A hAl ⟨g, hmemU g hg1⟩ hg)
+      obtain ⟨m, hm⟩ :=
+        decCob he hP hv hA hz (fun g hg hg1 => by
+          rw [show z g = φ ⟨g, hmemU g hg1⟩ from hzφ ⟨g, hmemU g hg1⟩]
+          exact hDec A hAl ⟨g, hmemU g hg1⟩ hg)
       refine ⟨m, fun g hg => ?_⟩
       rw [hρ']
       exact hm g hg
     · have hgN : g ∈ NS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) :=
-        Subgroup.le_topologicalClosure _ (Subgroup.subset_normalClosure
-          (Set.mem_biUnion (x := v) hv (Set.mem_biUnion (x := A) hA hg)))
+        Subgroup.le_topologicalClosure _
+          (Subgroup.subset_normalClosure (Set.mem_biUnion (x := v) hv
+            (Set.mem_biUnion (x := A) hA hg)))
       have hg1 : cycZ F Ω l g = 1 := by
         rw [← DFunLike.congr_fun D.hchi g, MonoidHom.comp_apply]
-        have : toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) g = 1 := (QuotientGroup.eq_one_iff g).mpr hgN
+        have : toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F))) g = 1 :=
+          (QuotientGroup.eq_one_iff g).mpr hgN
         rw [this, map_one]
       simp only [map_zero, sub_zero]
       show z g = 0
@@ -159,8 +185,10 @@ theorem UpperTheory.V.Kum.resInfOnto :
   obtain ⟨y, hy, hyz⟩ := Submodule.mem_map.mp hmk
   refine Submodule.mem_map.mpr ⟨y, hy, ?_⟩
   obtain ⟨w, rfl⟩ := Submodule.Quotient.mk_surjective _ y
-  change Submodule.Quotient.mk (restrictCocycles1 (qzTw D e) (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))) _ w) =
-    Submodule.Quotient.mk ⟨z, hz'⟩ at hyz
+  change Submodule.Quotient.mk (restrictCocycles1 (qzTw D e)
+        (toGS Ω (D.S : Set (HeightOneSpectrum (𝓞 F)))) _ w)
+      = Submodule.Quotient.mk ⟨z, hz'⟩
+    at hyz
   rw [Submodule.Quotient.eq, Submodule.mem_comap, Submodule.coe_subtype, mem_coboundaries1] at hyz
   obtain ⟨m, hm⟩ := hyz
   funext u

@@ -25,8 +25,7 @@ private lemma conj_apply {k X ι : Type*} [Field k] [Fintype X] [DecidableEq X] 
   refine Finset.sum_congr rfl fun x _ => ?_
   simp [Matrix.mul_apply, Matrix.mulVec, dotProduct]
 
-theorem UpperTheory.Gal.Gen.triMat_pf :
-    UpperTheory.Gal.Gen.Flag → UpperTheory.Gal.Gen.TriMat := by
+theorem UpperTheory.Gal.Gen.triMat_pf : UpperTheory.Gal.Gen.Flag → UpperTheory.Gal.Gen.TriMat := by
   intro hF l _ H _ hH X _ _ ρ
   let ρ' : Representation (ZMod l) H (X → ZMod l) :=
     ((Matrix.toLinAlgEquiv' (R := ZMod l) (n := X)).toAlgHom.toRingHom.toMonoidHom).comp
@@ -47,19 +46,21 @@ theorem UpperTheory.Gal.Gen.triMat_pf :
   let P : Matrix X (Fin (Fintype.card X)) ℤ := fun x j => ((b j x).val : ℤ)
   refine ⟨Q, P, fun h i j hij => ?_⟩
   apply (ZMod.intCast_zmod_eq_zero_iff_dvd _ l).1
-  have hQ : Q.map (Int.castRingHom (ZMod l)) =
-      (Matrix.of fun i x => b.repr (Pi.single x 1) i : Matrix _ X (ZMod l)) := by
+  have hQ
+      : Q.map (Int.castRingHom (ZMod l))
+        = (Matrix.of fun i x => b.repr (Pi.single x 1) i : Matrix _ X (ZMod l)) := by
     ext i x
     change ((((b.repr (Pi.single x 1) i).val : ℤ)) : ZMod l) = b.repr (Pi.single x 1) i
     rw [Int.cast_natCast, ZMod.natCast_zmod_val]
-  have hP : P.map (Int.castRingHom (ZMod l)) =
-      (Matrix.of fun x j => b j x : Matrix X _ (ZMod l)) := by
+  have hP
+      : P.map (Int.castRingHom (ZMod l)) = (Matrix.of fun x j => b j x : Matrix X _ (ZMod l)) := by
     ext x j
     change ((((b j x).val : ℤ)) : ZMod l) = b j x
     rw [Int.cast_natCast, ZMod.natCast_zmod_val]
   have hc : (((Q * ρ h * P) i j : ℤ) : ZMod l) = b.repr (ρ' h (b j)) i := by
-    have h1 : (((Q * ρ h * P) i j : ℤ) : ZMod l) =
-        ((Q * ρ h * P).map (Int.castRingHom (ZMod l))) i j := rfl
+    have h1
+        : (((Q * ρ h * P) i j : ℤ) : ZMod l) = ((Q * ρ h * P).map (Int.castRingHom (ZMod l))) i j :=
+      rfl
     rw [h1, Matrix.map_mul, Matrix.map_mul, hQ, hP, conj_apply, hρ']
   have hd := hb h i j hij
   rw [map_sub, Finsupp.sub_apply, sub_eq_zero, Module.Basis.repr_self, Finsupp.single_apply] at hd

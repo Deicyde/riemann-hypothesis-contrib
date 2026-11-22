@@ -28,12 +28,13 @@ theorem TrdegBaseAlgebraic.proof : TrdegBaseAlgebraic.Statement := by
     | add u v _ _ hu hv => exact Subalgebra.add_mem _ hu hv
     | mul u v _ _ hu hv => exact Subalgebra.mul_mem _ hu hv
 
-  let i : A →+* B :=
-    { toFun := fun a => ⟨a, hAB a a.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let i : A →+* B := {
+    toFun := fun a => ⟨a, hAB a a.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have : FaithfulSMul F A :=
     (faithfulSMul_iff_algebraMap_injective F A).mpr (algebraMap F A).injective
   obtain ⟨t, ht⟩ := exists_isTranscendenceBasis F A
@@ -58,19 +59,21 @@ theorem TrdegBaseAlgebraic.proof : TrdegBaseAlgebraic.Statement := by
     | mul r s _ _ hr hs =>
       rw [map_mul]
       exact C.mul_mem hr hs
-  let f : Algebra.adjoin F (Set.range ((↑) : t → A)) →+* C :=
-    { toFun := fun r => ⟨i r, hFC r r.2⟩
-      map_one' := rfl
-      map_mul' := fun _ _ => rfl
-      map_zero' := rfl
-      map_add' := fun _ _ => rfl }
+  let f : Algebra.adjoin F (Set.range ((↑) : t → A)) →+* C := {
+    toFun := fun r => ⟨i r, hFC r r.2⟩
+    map_one' := rfl
+    map_mul' := fun _ _ => rfl
+    map_zero' := rfl
+    map_add' := fun _ _ => rfl
+  }
   have hf : Function.Injective f := by
     intro a b hab
     apply Subtype.ext
     apply Subtype.ext
     exact congrArg (fun c : C => ((c : B) : Ω)) hab
-  have key : ∀ (w : Ω), w ∈ Algebra.adjoin K (Set.range z) →
-      ∀ (hw : w ∈ B), IsAlgebraic C (⟨w, hw⟩ : B) := by
+  have key
+      : ∀ (w : Ω),
+        w ∈ Algebra.adjoin K (Set.range z) → ∀ (hw : w ∈ B), IsAlgebraic C (⟨w, hw⟩ : B) := by
     intro w hw'
     induction hw' using Algebra.adjoin_induction with
     | mem w hw' =>
@@ -91,7 +94,9 @@ theorem TrdegBaseAlgebraic.proof : TrdegBaseAlgebraic.Statement := by
       intro hw
       exact (hu (hB ▸ hu')).mul (hv (hB ▸ hv'))
   have alg : Algebra.IsAlgebraic C B := ⟨fun b => key b.1 (hB ▸ b.2) b.2⟩
-  calc Algebra.trdeg K B ≤ #(Set.range x) := Algebra.IsAlgebraic.trdeg_le_cardinalMk K (Set.range x)
+  calc
+    Algebra.trdeg K B
+      ≤ #(Set.range x) := Algebra.IsAlgebraic.trdeg_le_cardinalMk K (Set.range x)
     _ ≤ #t := Cardinal.mk_range_le
     _ = Algebra.trdeg F A := ht.cardinalMk_eq_trdeg
 

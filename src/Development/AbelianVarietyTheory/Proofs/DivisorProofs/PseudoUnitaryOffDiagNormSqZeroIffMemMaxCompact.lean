@@ -102,10 +102,11 @@ lemma comm_of {n : ℕ} (ε : Fin n → Bool) (M : Matrix (Fin n) (Fin n) ℂ)
 
 end GlobalTheory.OffDiagK
 
-
 open GlobalTheory.OffDiagK in
-theorem GlobalTheory.offDiag_zero_iff_mem_K : ∀ (n : ℕ) (ε : Fin n → Bool) (g : UJ ε),
-    ∑ z : {z : Fin n × Fin n // ε z.1 = true ∧ ε z.2 = false}, ‖(toM g) z.1.1 z.1.2‖ ^ 2 = 0 ↔ g ∈ KG ε := by
+theorem GlobalTheory.offDiag_zero_iff_mem_K
+    : ∀ (n : ℕ) (ε : Fin n → Bool) (g : UJ ε),
+      ∑ z : {z : Fin n × Fin n // ε z.1 = true ∧ ε z.2 = false}, ‖(toM g) z.1.1 z.1.2‖ ^ 2 = 0
+        ↔ g ∈ KG ε := by
   intro n ε g
   have hg : (toM g)ᴴ * Jm ε * toM g = Jm ε := g.2
   rw [Formalism.REAL.mem_KG, Fintype.sum_eq_zero_iff_of_nonneg (fun _ => by positivity)]
@@ -120,8 +121,9 @@ theorem GlobalTheory.offDiag_zero_iff_mem_K : ∀ (n : ℕ) (ε : Fin n → Bool
     refine ⟨?_, hc⟩
     rw [Matrix.mem_unitaryGroup_iff']
     have hJ := Formalism.REAL.Jm_mul_self ε
-    calc star (toM g) * toM g = (toM g)ᴴ * (toM g * Jm ε) * Jm ε := by
-          rw [Matrix.mul_assoc, Matrix.mul_assoc, hJ, Matrix.mul_one, Matrix.star_eq_conjTranspose]
+    calc
+      star (toM g) * toM g = (toM g)ᴴ * (toM g * Jm ε) * Jm ε := by
+        rw [Matrix.mul_assoc, Matrix.mul_assoc, hJ, Matrix.mul_one, Matrix.star_eq_conjTranspose]
       _ = 1 := by rw [hc, ← Matrix.mul_assoc, hg, hJ]
   · rintro ⟨_, hc⟩
     funext z

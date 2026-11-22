@@ -91,26 +91,34 @@ private lemma psi_rootSum_charpoly_mem_virt (F : Type) [Field F] [Finite F]
     (fun V _ _ _ g => _root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) V g)
     hconj a d (ih a (Finset.mem_range.1 ha))
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.CuspGL.isChar_psi_rootSum_of_regular (F : Type) [Field F] [Finite F] (θ : AlgebraicClosure F →* ℂ)
-    (hθ : ∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y) (d k : ℕ) (hd : 0 < d)
-    (hk : ∀ i : ℕ, 0 < i → i < d → ¬ k * Nat.card F ^ i ≡ k [MOD Nat.card F ^ d - 1]) :
-    _root_.GlobalTheory.BI.IsChar ℂ ℂ (fun x : GL (Fin d) F => (-1) ^ (d - 1) *
-      _root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F) (Matrix.toLin' (x : Matrix (Fin d) (Fin d) F))) ∧
-    _root_.GlobalTheory.CuspGL.ipGL (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F)) (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F)) = _root_.GlobalTheory.CuspGL.glCard F d := by
+theorem _root_.GlobalTheory.CuspGL.isChar_psi_rootSum_of_regular
+    (F : Type) [Field F] [Finite F]
+    (θ : AlgebraicClosure F →* ℂ)
+    (hθ : ∀ x y : AlgebraicClosure F, x ≠ 0 → y ≠ 0 → θ x = θ y → x = y)
+    (d k : ℕ)
+    (hd : 0 < d) (hk : ∀ i : ℕ, 0 < i → i < d → ¬ k * Nat.card F ^ i ≡ k [MOD Nat.card F ^ d - 1])
+    : _root_.GlobalTheory.BI.IsChar ℂ ℂ (fun x : GL (Fin d) F =>
+        (-1) ^ (d - 1) * _root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k)
+          (Fin d → F) (Matrix.toLin' (x : Matrix (Fin d) (Fin d) F)))
+      ∧ _root_.GlobalTheory.CuspGL.ipGL
+          (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F))
+          (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F))
+        = _root_.GlobalTheory.CuspGL.glCard F d := by
   obtain ⟨hadd, hX⟩ := _root_.GlobalTheory.CuspGL.rootSum_isAdditive_and_pow_X_sub_one F θ k
   have hfr : Module.finrank F (Fin d → F) = d := Module.finrank_fin_fun F
   have hfr0 : 0 < Module.finrank F (Fin d → F) := by rw [hfr]; exact hd
-  have hip : _root_.GlobalTheory.CuspGL.ipGL
-      (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F))
-      (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F)) =
-      _root_.GlobalTheory.CuspGL.glCard F d := by
+  have hip
+      : _root_.GlobalTheory.CuspGL.ipGL
+          (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F))
+          (_root_.GlobalTheory.CuspGL.psi (_root_.GlobalTheory.CuspGL.rootSum θ k) (Fin d → F))
+        = _root_.GlobalTheory.CuspGL.glCard F d := by
     rw [_root_.GlobalTheory.CuspGL.PrimOrth.ipGL_psi_eq F _ _ hadd _
-      (_root_.GlobalTheory.CuspGL.isPrimitive_psi F _ _ hadd),
+        (_root_.GlobalTheory.CuspGL.isPrimitive_psi F _ _ hadd),
       _root_.GlobalTheory.CuspGL.ipGL_psi_rootSum F _ θ hθ hfr0 k k, hfr]
-    have hset : (Finset.range d).filter (fun i => k * Nat.card F ^ i ≡ k [MOD Nat.card F ^ d - 1]) =
-        {0} := by
+    have hset
+        : (Finset.range d).filter (fun i => k * Nat.card F ^ i ≡ k [MOD Nat.card F ^ d - 1])
+          = {0} := by
       ext i
       simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_singleton]
       constructor
@@ -150,14 +158,15 @@ theorem _root_.GlobalTheory.CuspGL.isChar_psi_rootSum_of_regular (F : Type) [Fie
     have h1 : ψ 1 = ∏ i ∈ Finset.Ico 1 d, (1 - (Nat.card F : ℂ) ^ i) := by
       simp only [hψ, Units.val_one, Matrix.toLin'_one]
       rw [← Module.End.one_eq_id, _root_.GlobalTheory.CuspGL.psi_one F _ _ hX hfr0, hfr]
-    have h2 : ∏ i ∈ Finset.Ico 1 d, (1 - (Nat.card F : ℂ) ^ i) =
-        (-1) ^ (d - 1) * ∏ i ∈ Finset.Ico 1 d, ((Nat.card F : ℂ) ^ i - 1) := by
+    have h2
+        : ∏ i ∈ Finset.Ico 1 d, (1 - (Nat.card F : ℂ) ^ i)
+          = (-1) ^ (d - 1) * ∏ i ∈ Finset.Ico 1 d, ((Nat.card F : ℂ) ^ i - 1) := by
       rw [show ((-1 : ℂ) ^ (d - 1)) = ∏ _i ∈ Finset.Ico 1 d, (-1 : ℂ) by
-        rw [Finset.prod_const, Nat.card_Ico], ← Finset.prod_mul_distrib]
+          rw [Finset.prod_const, Nat.card_Ico],
+        ← Finset.prod_mul_distrib]
       exact Finset.prod_congr rfl fun i _ => by ring
     show (-1 : ℂ) ^ (d - 1) * ψ 1 = _
-    rw [h1, h2, ← mul_assoc, ← mul_pow, neg_one_mul, neg_neg, one_pow, one_mul,
-      Nat.cast_prod]
+    rw [h1, h2, ← mul_assoc, ← mul_pow, neg_one_mul, neg_neg, one_pow, one_mul, Nat.cast_prod]
     refine Finset.prod_congr rfl fun i _ => ?_
     rw [Nat.cast_sub (Nat.one_le_pow _ _ (by omega)), Nat.cast_pow, Nat.cast_one]
   have hpos : 0 < ∏ i ∈ Finset.Ico 1 d, (Nat.card F ^ i - 1) := by
@@ -167,8 +176,9 @@ theorem _root_.GlobalTheory.CuspGL.isChar_psi_rootSum_of_regular (F : Type) [Fie
       omega
     have := Nat.one_lt_pow hi1 hq
     omega
-  have hIrrChar : ∀ φ : GL (Fin d) F → ℂ, _root_.GlobalTheory.BI.IsIrrChar ℂ ℂ φ →
-      _root_.GlobalTheory.BI.IsChar ℂ ℂ φ := by
+  have hIrrChar
+      : ∀ φ : GL (Fin d) F → ℂ,
+        _root_.GlobalTheory.BI.IsIrrChar ℂ ℂ φ → _root_.GlobalTheory.BI.IsChar ℂ ℂ φ := by
     intro φ hφ
     unfold _root_.GlobalTheory.BI.IsIrrChar at hφ
     unfold _root_.GlobalTheory.BI.IsChar
@@ -178,8 +188,7 @@ theorem _root_.GlobalTheory.CuspGL.isChar_psi_rootSum_of_regular (F : Type) [Fie
   · exact hIrrChar χ hirr
   · exfalso
     obtain ⟨n, hn, hn1⟩ :=
-      ((_root_.GlobalTheory.BI.irr_of_norm_one _ (-χ) (neg_mem hχv) hnorm').2
-        (hIrrChar _ hirr)).2
+      ((_root_.GlobalTheory.BI.irr_of_norm_one _ (-χ) (neg_mem hχv) hnorm').2 (hIrrChar _ hirr)).2
     rw [Pi.neg_apply, hval] at hn1
     have h3 : ((n + ∏ i ∈ Finset.Ico 1 d, (Nat.card F ^ i - 1) : ℕ) : ℂ) = 0 := by
       rw [Nat.cast_add]

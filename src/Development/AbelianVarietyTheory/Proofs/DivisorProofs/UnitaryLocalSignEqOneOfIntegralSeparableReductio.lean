@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EvenOrdLConj
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC Formalism.L2.Host GlobalTheory.BCT
 open scoped Classical TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
@@ -17,12 +18,18 @@ noncomputable section
 
 namespace GlobalTheory.BCT
 
-theorem kapSign_eq_one_of_integral : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E),
-    (∀ x, cj w (cj w x) = x) → (∀ x, Valued.v (cj w x) = Valued.v x) →
-    ∀ P₀ : (w.adicCompletionIntegers E)[X], IsCoprime P₀ (derivative P₀) →
-    ∀ γ : UL n w, γ.1.val.charpoly = P₀.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E)) →
-    γ ∈ KL n w → ∀ Q₁ : (w.adicCompletion E)[X],
-    Q₁ ∣ P₀.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E)) → kapSign n w Q₁ γ.1 = 1 := by
+theorem kapSign_eq_one_of_integral
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (w : Pl E),
+      (∀ x, cj w (cj w x) = x) → (∀ x, Valued.v (cj w x) = Valued.v x)
+        → ∀ P₀ : (w.adicCompletionIntegers E)[X],
+          IsCoprime P₀ (derivative P₀)
+            → ∀ γ : UL n w,
+              γ.1.val.charpoly
+                  = P₀.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E))
+                → γ ∈ KL n w
+                → ∀ Q₁ : (w.adicCompletion E)[X],
+                  Q₁ ∣ P₀.map (algebraMap (w.adicCompletionIntegers E) (w.adicCompletion E))
+                    → kapSign n w Q₁ γ.1 = 1 := by
   intro E _ _ _ n w hinv hv P₀ hcop γ hchar hK Q₁ hdvd
   unfold kapSign
   split_ifs with hs
@@ -45,8 +52,10 @@ theorem kapSign_eq_one_of_integral : ∀ (E : Type) [Field E] [NumberField E] [I
     simpa [bc] using this.symm
   have hmon : P₀.Monic := by
     apply Polynomial.monic_of_injective finj
-    rw [← hchar]; exact Matrix.charpoly_monic _
-  obtain ⟨Q₁₀, Q₂₀, A, B, c, hc, hP, hAB, hQ⟩ := GlobalTheory.T.dvd_integral_monic_coprime_derivative_bezout_factor E w P₀ hmon hcop Q₁ hdvd
+    rw [← hchar]
+    exact Matrix.charpoly_monic _
+  obtain ⟨Q₁₀, Q₂₀, A, B, c, hc, hP, hAB, hQ⟩ :=
+    GlobalTheory.T.dvd_integral_monic_coprime_derivative_bezout_factor E w P₀ hmon hcop Q₁ hdvd
   set q₁ := Q₁₀.map f
   set q₂ := Q₂₀.map f
   have hAB' : A.map f * q₁ + B.map f * q₂ = 1 := by
@@ -66,14 +75,17 @@ theorem kapSign_eq_one_of_integral : ∀ (E : Type) [Field E] [NumberField E] [I
     intro i j
     have : e = (aeval g.val (Q₂₀ * B)).map (fun x => (x : K)) := by
       rw [he, ← Polynomial.map_mul, Polynomial.aeval_map_algebraMap, hγ,
-        show g.val.map (fun x => (x : K)) = (Algebra.ofId (w.adicCompletionIntegers E) K).mapMatrix g.val from rfl,
+        show g.val.map (fun x => (x : K))
+            = (Algebra.ofId (w.adicCompletionIntegers E) K).mapMatrix g.val from
+          rfl,
         Polynomial.aeval_algHom_apply]
       rfl
     rw [this, Matrix.map_apply]
     exact ((aeval g.val (Q₂₀ * B)) i j).2
   have hcomm1 : ∀ x, aeval γ.1.val q₁ *ᵥ (e *ᵥ x) = 0 := by
     intro x
-    rw [Matrix.mulVec_mulVec, he, ← map_mul, ← mul_assoc, map_mul, hCH, zero_mul, Matrix.zero_mulVec]
+    rw [Matrix.mulVec_mulVec, he, ← map_mul, ← mul_assoc, map_mul, hCH, zero_mul,
+      Matrix.zero_mulVec]
   have he1 : e = 1 - aeval γ.1.val (A.map f) * aeval γ.1.val q₁ := by
     rw [he, ← map_mul, mul_comm q₂, eq_sub_iff_add_eq, ← map_add (f := _), add_comm, hAB', map_one]
   have hfix : ∀ x ∈ V₁, e *ᵥ x = x := by
@@ -82,11 +94,18 @@ theorem kapSign_eq_one_of_integral : ∀ (E : Type) [Field E] [NumberField E] [I
       Matrix.mulVec_zero, sub_zero]
   have hker2 : ∀ y, aeval γ.1.val q₂ *ᵥ (y - e *ᵥ y) = 0 := by
     intro y
-    rw [he1, Matrix.sub_mulVec, Matrix.one_mulVec, sub_sub_cancel, Matrix.mulVec_mulVec, ← map_mul, ← map_mul,
-      show q₂ * (A.map f * q₁) = A.map f * (q₁ * q₂) by ring, map_mul, hCH, mul_zero, Matrix.zero_mulVec]
-  have horth := GlobalTheory.T.unitary_aeval_kernels_orthogonal_of_coprime K (cj w) n γ.1.val hU q₁ q₂ (A.map f) (B.map f) hAB' hCH V₁ hmem (Module.finBasis K V₁) h0
-  obtain ⟨s, fb, hfb⟩ := GlobalTheory.T.orthogonal_projection_integral_adic E w (cj w) hinv hv n V₁ e heint (fun x => (hmem _).2 (hcomm1 x)) hfix
-    (fun x hx y => horth x hx _ (hker2 y))
-  exact GlobalTheory.T.even_ordL_conjGramDet_of_unit_gram_adicCompletion E w (cj w) hv n V₁ (Module.finBasis K V₁) fb hfb
+    rw [he1, Matrix.sub_mulVec, Matrix.one_mulVec, sub_sub_cancel, Matrix.mulVec_mulVec, ← map_mul,
+      ← map_mul, show q₂ * (A.map f * q₁) = A.map f * (q₁ * q₂) by ring, map_mul, hCH, mul_zero,
+      Matrix.zero_mulVec]
+  have horth :=
+    GlobalTheory.T.unitary_aeval_kernels_orthogonal_of_coprime K (cj w) n γ.1.val hU q₁ q₂ (A.map f)
+      (B.map f) hAB' hCH V₁ hmem (Module.finBasis K V₁) h0
+  obtain ⟨s, fb, hfb⟩ :=
+    GlobalTheory.T.orthogonal_projection_integral_adic E w (cj w) hinv hv n V₁ e heint
+      (fun x => (hmem _).2 (hcomm1 x))
+      hfix
+      (fun x hx y => horth x hx _ (hker2 y))
+  exact GlobalTheory.T.even_ordL_conjGramDet_of_unit_gram_adicCompletion E w (cj w) hv n V₁
+    (Module.finBasis K V₁) fb hfb
 
 end GlobalTheory.BCT

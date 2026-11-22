@@ -6,10 +6,13 @@ public import PositivityTheory.AutomorphicForms.PublishedInputs.HilbertEisenstei
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
-open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Base
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N Polynomial
+open GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af
+  UpperTheory.V.Base
 open scoped Matrix
-open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd UpperTheory.V.Published GroundTheory.LocalField
+open MeasureTheory GroundTheory.Global GroundTheory.Global.IdeleGroup UpperTheory.V.Sd
+  UpperTheory.V.Published GroundTheory.LocalField
 
 namespace UpperTheory.HilbertEisensteinWeightOne.FourierExpansionEisenstein.LocalCharacterUnits
 
@@ -19,14 +22,14 @@ variable {F : Type} [Field F] [NumberField F] [IsTotallyReal F]
 
 theorem pLoc_apply (w : HeightOneSpectrum (𝓞 F)) (x : Af F) : pLoc F w x = x w := rfl
 
-theorem loc_eq (ω : HChar F) (v : HeightOneSpectrum (𝓞 F)) (a : (v.adicCompletion F)ˣ) :
-    ((ω.loc v a : ℂˣ) : ℂ) = ((ω.1 (finiteEmbedding v a) : ℂˣ) : ℂ) := by
+theorem loc_eq (ω : HChar F) (v : HeightOneSpectrum (𝓞 F)) (a : (v.adicCompletion F)ˣ)
+    : ((ω.loc v a : ℂˣ) : ℂ) = ((ω.1 (finiteEmbedding v a) : ℂˣ) : ℂ) := by
   unfold HChar.loc
   rw [MonoidHom.comp_apply]
   congr 3
 
-theorem val_unit {u : (Af F)ˣ} {w : HeightOneSpectrum (𝓞 F)} (h : IsIntegralUnitAt u w) :
-    Valued.v ((u : Af F) w) = 1 := by
+theorem val_unit {u : (Af F)ˣ} {w : HeightOneSpectrum (𝓞 F)} (h : IsIntegralUnitAt u w)
+    : Valued.v ((u : Af F) w) = 1 := by
   have h1 : Valued.v ((u : Af F) w) ≤ 1 := h.1
   have h2 : Valued.v (((u⁻¹ : (Af F)ˣ) : Af F) w) ≤ 1 := h.2
   have h3 : Valued.v ((u : Af F) w) * Valued.v (((u⁻¹ : (Af F)ˣ) : Af F) w) = 1 := by
@@ -38,25 +41,33 @@ theorem val_unit {u : (Af F)ˣ} {w : HeightOneSpectrum (𝓞 F)} (h : IsIntegral
   rw [h3] at this
   exact lt_irrefl _ this
 
-theorem loc_unit_eq_one {ω : HChar F} {c : HeightOneSpectrum (𝓞 F) → ℕ} (H : Hyp ω c) {w : HeightOneSpectrum (𝓞 F)}
-    (hc : c w = 0) {b : (Af F)ˣ} (hb : IsIntegralUnitAt b w) : ω.loc w (finUnitAt w b) = 1 := by
+theorem loc_unit_eq_one
+    {ω : HChar F} {c : HeightOneSpectrum (𝓞 F) → ℕ} (H : Hyp ω c)
+    {w : HeightOneSpectrum (𝓞 F)} (hc : c w = 0)
+    {b : (Af F)ˣ} (hb : IsIntegralUnitAt b w)
+    : ω.loc w (finUnitAt w b) = 1 := by
   have h0 := (H.cond w).1
   rw [hc] at h0
   refine h0 (finUnitAt w b) (val_unit hb) ?_
-  have hx : ((finUnitAt w b : (w.adicCompletion F)ˣ) : w.adicCompletion F) - 1 ∈ w.adicCompletionIntegers F :=
+  have hx
+      : ((finUnitAt w b : (w.adicCompletion F)ˣ) : w.adicCompletion F) - 1
+        ∈ w.adicCompletionIntegers F :=
     sub_mem hb.1 (one_mem _)
   rw [HeightOneSpectrum.mem_adicCompletionIntegers] at hx
   simpa using hx
 
-theorem psi_split (S : Finset (HeightOneSpectrum (𝓞 F))) (x : Af F)
-    (hx : ∀ w ∉ S, x w ∈ localInvDifferent w) :
-    ((finiteAdelicChar F x : Circle) : ℂ) = ∏ v ∈ S, ((localAdelicChar F v (x v) : Circle) : ℂ) := by
+theorem psi_split
+    (S : Finset (HeightOneSpectrum (𝓞 F))) (x : Af F) (hx : ∀ w ∉ S, x w ∈ localInvDifferent w)
+    : ((finiteAdelicChar F x : Circle) : ℂ)
+      = ∏ v ∈ S, ((localAdelicChar F v (x v) : Circle) : ℂ) := by
   classical
   set s : Af F := ∑ v ∈ S, finiteAdeleSingleAdd v (x v) with hs
   have hsx : ∀ w, s w = if w ∈ S then x w else 0 := by
     intro w
     have h1 : s w = ∑ v ∈ S, finiteAdeleSingleAdd v (x v) w :=
-      map_sum (RestrictedProduct.evalRingHom (fun u : HeightOneSpectrum (𝓞 F) => u.adicCompletion F) w) _ _
+      map_sum
+        (RestrictedProduct.evalRingHom (fun u : HeightOneSpectrum (𝓞 F) => u.adicCompletion F) w) _
+        _
     rw [h1]
     split_ifs with hw
     · rw [Finset.sum_eq_single w]
@@ -78,16 +89,21 @@ theorem psi_split (S : Finset (HeightOneSpectrum (𝓞 F))) (x : Af F)
     · rw [sub_zero]
       exact hx w hw
   have hxs : x = s + (x - s) := by abel
-  have hsum : ∀ T : Finset (HeightOneSpectrum (𝓞 F)), finiteAdelicChar F (∑ v ∈ T, finiteAdeleSingleAdd v (x v)) =
-      ∏ v ∈ T, finiteAdelicChar F (finiteAdeleSingleAdd v (x v)) := by
+  have hsum
+      : ∀ T : Finset (HeightOneSpectrum (𝓞 F)),
+        finiteAdelicChar F (∑ v ∈ T, finiteAdeleSingleAdd v (x v))
+          = ∏ v ∈ T, finiteAdelicChar F (finiteAdeleSingleAdd v (x v)) := by
     intro T
     induction T using Finset.induction_on with
     | empty => simp [AddChar.map_zero_eq_one]
-    | insert a T ha ih => rw [Finset.sum_insert ha, Finset.prod_insert ha, AddChar.map_add_eq_mul, ih]
+    | insert a T ha ih =>
+      rw [Finset.sum_insert ha, Finset.prod_insert ha, AddChar.map_add_eq_mul, ih]
   conv_lhs => rw [hxs]
   rw [AddChar.map_add_eq_mul, finiteAdelicChar_eq_one_of_mem hrest, mul_one, hs, hsum]
-  have h3 : ((∏ v ∈ S, finiteAdelicChar F (finiteAdeleSingleAdd v (x v)) : Circle) : ℂ) =
-      ∏ v ∈ S, ((finiteAdelicChar F (finiteAdeleSingleAdd v (x v)) : Circle) : ℂ) := map_prod Circle.coeHom _ _
+  have h3
+      : ((∏ v ∈ S, finiteAdelicChar F (finiteAdeleSingleAdd v (x v)) : Circle) : ℂ)
+        = ∏ v ∈ S, ((finiteAdelicChar F (finiteAdeleSingleAdd v (x v)) : Circle) : ℂ) :=
+    map_prod Circle.coeHom _ _
   rw [h3]
   rfl
 
@@ -144,13 +160,15 @@ theorem finite_split_holds : FinSplit := by
       simp only [hHs, Set.mem_setOf_eq]
       exact forall₂_congr fun w hw => by rw [h w hw]
     simp only [hGdef, Set.indicator_apply, h1, Pi.one_apply]
-  have hUG : (finUnitsAt S ⁻¹' intUnitsAtS S).indicator G =
-      (finiteIntegralUnits F : Set (Af F)ˣ).indicator 1 := by
+  have hUG
+      : (finUnitsAt S ⁻¹' intUnitsAtS S).indicator G
+        = (finiteIntegralUnits F : Set (Af F)ˣ).indicator 1 := by
     rw [hGdef, Set.indicator_indicator]
     congr 1
     ext b
-    simp only [Set.mem_inter_iff, Set.mem_preimage, intUnitsAtS, Set.mem_pi, Set.mem_univ, true_implies,
-      finUnitsAt_apply, hHs, Set.mem_setOf_eq, SetLike.mem_coe, mem_finiteIntegralUnits_iff_forall_finUnitAt]
+    simp only [Set.mem_inter_iff, Set.mem_preimage, intUnitsAtS, Set.mem_pi, Set.mem_univ,
+      true_implies, finUnitsAt_apply, hHs, Set.mem_setOf_eq, SetLike.mem_coe,
+      mem_finiteIntegralUnits_iff_forall_finUnitAt]
     constructor
     · rintro ⟨h1, h2⟩ w
       by_cases hw : w ∈ S
@@ -158,15 +176,18 @@ theorem finite_split_holds : FinSplit := by
       · exact h2 w hw
     · intro h
       exact ⟨fun v => h v.1, fun w _ => h w⟩
-  have hfin : finiteIdeleMeasure F (finiteIntegralUnits F : Set (Af F)ˣ) = 1 := finiteIdeleMeasure_finiteIntegralUnits F
+  have hfin : finiteIdeleMeasure F (finiteIntegralUnits F : Set (Af F)ˣ) = 1 :=
+    finiteIdeleMeasure_finiteIntegralUnits F
   have hGi : Integrable ((finUnitsAt S ⁻¹' intUnitsAtS S).indicator G) (finiteIdeleMeasure F) := by
     rw [hUG, integrable_indicator_iff (isOpen_finiteIntegralUnits F).measurableSet]
     exact integrableOn_const (by rw [hfin]; exact ENNReal.one_ne_top)
 
-  have hout : ∀ w ∉ S, ∀ b : (Af F)ˣ,
-      (Valued.v (pLoc F w ((b : Af F) * (yf : Af F))) ≤ WithZero.exp (-(c w : ℤ)) ∧
-        Valued.v (pLoc F w (((b⁻¹ : (Af F)ˣ) : Af F) * algebraMap F (Af F) (ξ : F))) ≤
-          WithZero.exp ((c w : ℤ) + dd w)) ↔ finUnitAt w b ∈ intUnitsAt w := by
+  have hout
+      : ∀ w ∉ S, ∀ b : (Af F)ˣ,
+        (Valued.v (pLoc F w ((b : Af F) * (yf : Af F))) ≤ WithZero.exp (-(c w : ℤ))
+            ∧ Valued.v (pLoc F w (((b⁻¹ : (Af F)ˣ) : Af F) * algebraMap F (Af F) (ξ : F)))
+              ≤ WithZero.exp ((c w : ℤ) + dd w))
+          ↔ finUnitAt w b ∈ intUnitsAt w := by
     intro w hw b
     obtain ⟨hc0, hd0, hyf, hξ⟩ := hS w hw
     have hy1 := val_unit hyf
@@ -177,18 +198,27 @@ theorem finite_split_holds : FinSplit := by
     have hξ1 := val_unit hξ
     rw [hxi] at hξ1
     rw [finUnitAt_mem_intUnitsAt_iff, hc0, hd0]
-    simp only [pLoc_apply, mul_apply', Valuation.map_mul, hy1, hξ1, mul_one, HeightOneSpectrum.mem_adicCompletionIntegers]
+    simp only [pLoc_apply, mul_apply', Valuation.map_mul, hy1, hξ1, mul_one,
+      HeightOneSpectrum.mem_adicCompletionIntegers]
     simp
-  have hpt : ∀ b, finK c yf (ξ : F) b * (ωF ω b)⁻¹ =
-      (∏ v : S, locF ω c yf (ξ : F) v.1 (finUnitAt v.1 b)) * G b := by
+  have hpt
+      : ∀ b,
+        finK c yf (ξ : F) b * (ωF ω b)⁻¹
+          = (∏ v : S, locF ω c yf (ξ : F) v.1 (finUnitAt v.1 b)) * G b := by
     intro b
-    have hc1 : ∀ v : HeightOneSpectrum (𝓞 F), pLoc F v ((b : Af F) * (yf : Af F)) =
-        ((finUnitAt v b : (v.adicCompletion F)ˣ) : v.adicCompletion F) * pLoc F v (yf : Af F) := by
+    have hc1
+        : ∀ v : HeightOneSpectrum (𝓞 F),
+          pLoc F v ((b : Af F) * (yf : Af F))
+            = ((finUnitAt v b : (v.adicCompletion F)ˣ) : v.adicCompletion F)
+              * pLoc F v (yf : Af F) := by
       intro v
       rw [map_mul]
       rfl
-    have hc2 : ∀ v : HeightOneSpectrum (𝓞 F), pLoc F v (((b⁻¹ : (Af F)ˣ) : Af F) * algebraMap F (Af F) (ξ : F)) =
-        (((finUnitAt v b)⁻¹ : (v.adicCompletion F)ˣ) : v.adicCompletion F) * algebraMap F (v.adicCompletion F) (ξ : F) := by
+    have hc2
+        : ∀ v : HeightOneSpectrum (𝓞 F),
+          pLoc F v (((b⁻¹ : (Af F)ˣ) : Af F) * algebraMap F (Af F) (ξ : F))
+            = (((finUnitAt v b)⁻¹ : (v.adicCompletion F)ˣ) : v.adicCompletion F)
+              * algebraMap F (v.adicCompletion F) (ξ : F) := by
       intro v
       rw [map_mul, ← map_inv]
       rfl
@@ -214,16 +244,23 @@ theorem finite_split_holds : FinSplit := by
             unfold xiF
             rw [Units.coe_map]
             rfl
-          have h1 : (((b⁻¹ : (Af F)ˣ) : Af F) * algebraMap F (Af F) (ξ : F)) w =
-              ((b⁻¹ : (Af F)ˣ) : Af F) w * ((xiF ξ : (Af F)ˣ) : Af F) w := by
+          have h1
+              : (((b⁻¹ : (Af F)ˣ) : Af F) * algebraMap F (Af F) (ξ : F)) w
+                = ((b⁻¹ : (Af F)ˣ) : Af F) w * ((xiF ξ : (Af F)ˣ) : Af F) w := by
             rw [hxi]
             exact mul_apply' _ _ w
           rw [h1]
           exact mul_mem ((finUnitAt_mem_intUnitsAt_iff w b).1 hbw).2 hξw.1
-      · have hex : ∃ v : S, ¬ (Valued.v (((finUnitAt v.1 b : (v.1.adicCompletion F)ˣ) : v.1.adicCompletion F) *
-            pLoc F v.1 (yf : Af F)) ≤ WithZero.exp (-(c v.1 : ℤ)) ∧
-            Valued.v ((((finUnitAt v.1 b)⁻¹ : (v.1.adicCompletion F)ˣ) : v.1.adicCompletion F) *
-              algebraMap F (v.1.adicCompletion F) (ξ : F)) ≤ WithZero.exp ((c v.1 : ℤ) + dd v.1)) := by
+      · have hex
+            : ∃ v : S,
+              ¬(Valued.v
+                    (((finUnitAt v.1 b : (v.1.adicCompletion F)ˣ) : v.1.adicCompletion F)
+                      * pLoc F v.1 (yf : Af F))
+                  ≤ WithZero.exp (-(c v.1 : ℤ))
+                ∧ Valued.v
+                    ((((finUnitAt v.1 b)⁻¹ : (v.1.adicCompletion F)ˣ) : v.1.adicCompletion F)
+                      * algebraMap F (v.1.adicCompletion F) (ξ : F))
+                  ≤ WithZero.exp ((c v.1 : ℤ) + dd v.1)) := by
           by_contra hne
           push_neg at hne
           apply hfk
@@ -248,13 +285,17 @@ theorem finite_split_holds : FinSplit := by
       apply hb
       intro w hw
       exact (hout w hw b).1 ⟨hC.1 w, hC.2 w⟩
-  obtain ⟨hi, he⟩ := integral_finiteIdele_prod_local_mul S (fun v => locF ω c yf (ξ : F) v.1) (fun v => hloc v.1)
-    hGm hG hGi
+  obtain ⟨hi, he⟩ :=
+    integral_finiteIdele_prod_local_mul S
+      (fun v => locF ω c yf (ξ : F) v.1)
+      (fun v => hloc v.1)
+      hGm hG hGi
   refine ⟨hi.congr (Filter.Eventually.of_forall fun b => (hpt b).symm), ?_⟩
   rw [integral_congr_ae (Filter.Eventually.of_forall hpt), he, hUG,
     integral_indicator (isOpen_finiteIntegralUnits F).measurableSet]
   simp only [Pi.one_apply]
   rw [setIntegral_const, measureReal_def, hfin, ENNReal.toReal_one, one_smul, mul_one]
-  exact Finset.prod_coe_sort S (fun v => ∫ a, locF ω c yf (ξ : F) v a ∂multHaar (v.adicCompletion F))
+  exact Finset.prod_coe_sort S
+    (fun v => ∫ a, locF ω c yf (ξ : F) v a ∂multHaar (v.adicCompletion F))
 
 end UpperTheory.HilbertEisensteinWeightOne.FourierExpansionEisenstein

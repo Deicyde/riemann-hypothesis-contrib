@@ -8,18 +8,27 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IntegralL
 
 open GlobalTheory.K5
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.geometric_h1_zeta_sub_one_kills : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω →
-  ∀ (T : Tower p Ω) (k j : ℕ), 1 ≤ j → ∀ c : Gal p Ω → Ω, IntegralLocallyConstCochainModPow k (Ggeo p Ω ⊓ ⨅ n, Gn T n) c →
-  (∀ g ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, ∀ h ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, Cong (p := p) k (c (g * h)) (c g + g (c h))) →
-  Cob1 k (Ggeo p Ω ⊓ ⨅ n, Gn T n) (fun g => (T.ζ j - 1) * c g) := by
+theorem _root_.GlobalTheory.T.geometric_h1_zeta_sub_one_kills
+    : ∀ (p : ℕ) [Fact p.Prime],
+      p ≠ 2
+        → ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
+          IsClo p Ω
+            → ∀ (T : Tower p Ω) (k j : ℕ),
+              1 ≤ j
+                → ∀ c : Gal p Ω → Ω,
+                  IntegralLocallyConstCochainModPow k (Ggeo p Ω ⊓ ⨅ n, Gn T n) c
+                    → (∀ g ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n, ∀ h ∈ Ggeo p Ω ⊓ ⨅ n, Gn T n,
+                      Cong (p := p) k (c (g * h)) (c g + g (c h)))
+                    → Cob1 k (Ggeo p Ω ⊓ ⨅ n, Gn T n) (fun g => (T.ζ j - 1) * c g) := by
   intro p _ hp2 Ω _ _ hΩ T k j hj c hc hcoc
   classical
   let H := Ggeo p Ω ⊓ ⨅ n, Gn T n
-  have uniform : ∃ S : Finset Ω, ∀ g ∈ H, ∀ h ∈ H,
-      (∀ x ∈ S, h x = g x) → Cong (p := p) k (c h) (c g) := by
-    have localTests : ∀ g : Gal p Ω, ∃ S : Finset Ω,
-        (g ∈ H → ∀ h ∈ H, (∀ x ∈ S, h x = g x) → Cong (p := p) k (c h) (c g)) ∧
-        (g ∉ H → ∀ h ∈ H, ¬ ∀ x ∈ S, h x = g x) := by
+  have uniform
+      : ∃ S : Finset Ω, ∀ g ∈ H, ∀ h ∈ H, (∀ x ∈ S, h x = g x) → Cong (p := p) k (c h) (c g) := by
+    have localTests
+        : ∀ g : Gal p Ω, ∃ S : Finset Ω,
+          (g ∈ H → ∀ h ∈ H, (∀ x ∈ S, h x = g x) → Cong (p := p) k (c h) (c g))
+            ∧ (g ∉ H → ∀ h ∈ H, ¬ ∀ x ∈ S, h x = g x) := by
       intro g
       by_cases hg : g ∈ H
       · obtain ⟨S, hS⟩ := hc.2 g hg
@@ -35,8 +44,9 @@ theorem _root_.GlobalTheory.T.geometric_h1_zeta_sub_one_kills : ∀ (p : ℕ) [F
       by_contra h
       exact hsep g₀ h g hg hg₀
     have hg' := hlocal g₀ hg₀H g hg hg₀
-    have hh' := hlocal g₀ hg₀H h hh (fun x hx =>
-      (agree x (Finset.mem_biUnion.mpr ⟨g₀, hg₀F, hx⟩)).trans (hg₀ x hx))
+    have hh' :=
+      hlocal g₀ hg₀H h hh
+        (fun x hx => (agree x (Finset.mem_biUnion.mpr ⟨g₀, hg₀F, hx⟩)).trans (hg₀ x hx))
     simpa [Cong] using Basic.cong_sub hh' hg'
   obtain ⟨S, hS⟩ := uniform
   obtain ⟨y, E, hy, hEH, hu, hsum⟩ :=
@@ -62,23 +72,25 @@ theorem _root_.GlobalTheory.T.geometric_h1_zeta_sub_one_kills : ∀ (p : ℕ) [F
       (by rw [Finset.card_image_of_injOn hσinj])
   have hperm : ∑ g ∈ E, σ g y * c (σ g) = x := by
     rw [← Finset.sum_image (f := fun g' => g' y * c g') hσinj, himage]
-  have hhx : h x = ∑ g ∈ E, h (g y) * h (c g) := by
-    simp only [x, map_sum, map_mul]
+  have hhx : h x = ∑ g ∈ E, h (g y) * h (c g) := by simp only [x, map_sum, map_mul]
   have hζ : h (T.ζ j) = T.ζ j := (((TateGeo.mem_geoTop_iff T h).mp hh).2 j).1
-  have hsumh : ∑ g ∈ E, h (g y) = T.ζ j - 1 := by
-    rw [← map_sum, hsum, map_sub, map_one, hζ]
-  have termCong : ∀ g ∈ E, Cong (p := p) k (h (g y) * h (c g))
-      (σ g y * c (σ g) - h (g y) * c h) := by
+  have hsumh : ∑ g ∈ E, h (g y) = T.ζ j - 1 := by rw [← map_sum, hsum, map_sub, map_one, hζ]
+  have termCong
+      : ∀ g ∈ E, Cong (p := p) k (h (g y) * h (c g)) (σ g y * c (σ g) - h (g y) * c h) := by
     intro g hg
     have hgH := hEH g hg
     obtain ⟨a, ha, ea⟩ := hcoc h hh g hgH
     obtain ⟨b, hb, eb⟩ := hS (σ g) (hEH _ (hσE g hg)) (h * g) (H.mul_mem hh hgH) (hσS g hg)
-    refine ⟨h (g y) * (b - a), (IsIntegral.map h.toAlgHom (IsIntegral.map g.toAlgHom hy)).mul (hb.sub ha), ?_⟩
+    refine ⟨
+      h (g y) * (b - a),
+      (IsIntegral.map h.toAlgHom (IsIntegral.map g.toAlgHom hy)).mul (hb.sub ha),
+      ?_
+    ⟩
     rw [← hσy g hg]
     linear_combination h (g y) * (eb - ea)
-  have sumCong (s : Finset (Gal p Ω)) (f f' : Gal p Ω → Ω)
-      (hs : ∀ g ∈ s, Cong (p := p) k (f g) (f' g)) :
-      Cong (p := p) k (∑ g ∈ s, f g) (∑ g ∈ s, f' g) := by
+  have sumCong
+      (s : Finset (Gal p Ω)) (f f' : Gal p Ω → Ω) (hs : ∀ g ∈ s, Cong (p := p) k (f g) (f' g))
+      : Cong (p := p) k (∑ g ∈ s, f g) (∑ g ∈ s, f' g) := by
     induction s using Finset.induction_on with
     | empty => simpa using Basic.cong_refl (p := p) k (0 : Ω)
     | insert a s ha ih =>

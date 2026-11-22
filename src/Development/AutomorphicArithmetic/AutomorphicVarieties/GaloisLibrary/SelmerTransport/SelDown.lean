@@ -7,11 +7,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open ReciprocityTheory.Gal UpperTheory.V.Base
 
-private theorem length_addMonoidHom_le_of_card_eq {R A B C X : Type} [CommRing R] [AddCommGroup A] [Module R A]
-    [AddCommGroup B] [Module R B] [AddCommGroup C] [Module R C] [AddCommGroup X] [Module R X]
-    (f : A →ₗ[R] X) (j : B →ₗ[R] X) (hj : Function.Injective j) (g : B →ₗ[R] C)
-    (h : ∀ x, g x = 0 → j x ∈ LinearMap.range f) :
-    Module.length R B ≤ Module.length R A + Module.length R C := by
+private theorem length_addMonoidHom_le_of_card_eq
+    {R A B C X : Type} [CommRing R] [AddCommGroup A] [Module R A] [AddCommGroup B] [Module R B]
+    [AddCommGroup C] [Module R C] [AddCommGroup X] [Module R X]
+    (f : A →ₗ[R] X)
+    (j : B →ₗ[R] X) (hj : Function.Injective j)
+    (g : B →ₗ[R] C) (h : ∀ x, g x = 0 → j x ∈ LinearMap.range f)
+    : Module.length R B ≤ Module.length R A + Module.length R C := by
   have hex : Function.Exact (LinearMap.ker g).subtype g.rangeRestrict := by
     intro x
     constructor
@@ -32,19 +34,28 @@ private theorem length_addMonoidHom_le_of_card_eq {R A B C X : Type} [CommRing R
       apply Subtype.ext
       apply hj
       exact congrArg Subtype.val hab
-    calc Module.length R (LinearMap.ker g) ≤ Module.length R (LinearMap.range f) :=
-          Module.length_le_of_injective φ hφ
-      _ ≤ Module.length R A := Module.length_le_of_surjective f.rangeRestrict f.surjective_rangeRestrict
+    calc
+      Module.length R (LinearMap.ker g)
+        ≤ Module.length R (LinearMap.range f) := Module.length_le_of_injective φ hφ
+      _ ≤ Module.length R A :=
+        Module.length_le_of_surjective f.rangeRestrict f.surjective_rangeRestrict
   · exact Module.length_le_of_injective (LinearMap.range g).subtype (Submodule.subtype_injective _)
 
-theorem UpperTheory.V.Base.selDown :
-    ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup M] [Module R M]
-      [TopologicalSpace M] [IsTopologicalAddGroup M] [ContinuousConstSMul R M] [DiscreteTopology M] (ρ : Representation R G M) (U' U : Subgroup G) [U'.Normal] (h : U' ≤ U) (𝒟 : Set (Subgroup G)) (h𝒟 : ConjStable 𝒟) (ι : Type) [Fintype ι] (D : ι → Subgroup G), (∀ i, D i ∈ 𝒟) →
-      (∀ D' ∈ 𝒟, U ⊓ D' ≤ U' ∨ ∃ i, ∃ u ∈ U, ∀ x ∈ U ⊓ D', u⁻¹ * x * u ∈ D i) →
-      Module.length R (selEig ρ U' h𝒟 U 1) ≤ Module.length R (LocSel ρ U 𝒟) + ∑ i, Module.length R (LinearMap.ker (resU ρ (inf_le_inf_right (D i) h))) + Module.length R (resCoker ρ h) := by
+theorem UpperTheory.V.Base.selDown
+    : ∀ (R G M : Type) [CommRing R] [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+        [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
+        [ContinuousConstSMul R M] [DiscreteTopology M] (ρ : Representation R G M)
+        (U' U : Subgroup G) [U'.Normal] (h : U' ≤ U) (𝒟 : Set (Subgroup G)) (h𝒟 : ConjStable 𝒟)
+        (ι : Type) [Fintype ι] (D : ι → Subgroup G),
+      (∀ i, D i ∈ 𝒟) → (∀ D' ∈ 𝒟, U ⊓ D' ≤ U' ∨ ∃ i, ∃ u ∈ U, ∀ x ∈ U ⊓ D', u⁻¹ * x * u ∈ D i)
+        → Module.length R (selEig ρ U' h𝒟 U 1)
+          ≤ Module.length R (LocSel ρ U 𝒟)
+            + ∑ i, Module.length R (LinearMap.ker (resU ρ (inf_le_inf_right (D i) h)))
+            + Module.length R (resCoker ρ h) := by
   intro R G M _ _ _ _ _ _ _ _ _ _ ρ U' U _ h 𝒟 h𝒟 ι _ D hD hcov
-  have hinv : ∀ x : selEig ρ U' h𝒟 U 1,
-      ((x : LocSel ρ U' 𝒟) : H1U ρ U') ∈ invariantsUnderSubgroupH1 ρ U U' := by
+  have hinv
+      : ∀ x : selEig ρ U' h𝒟 U 1,
+        ((x : LocSel ρ U' 𝒟) : H1U ρ U') ∈ invariantsUnderSubgroupH1 ρ U U' := by
     intro x
     rw [Representation.mem_invariants]
     intro u

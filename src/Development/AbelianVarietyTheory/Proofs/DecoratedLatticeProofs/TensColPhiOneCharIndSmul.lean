@@ -16,8 +16,11 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Wei
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.LatPair GlobalTheory.SplitWeil ValuativeRel IsLocalRing
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.LatPair GlobalTheory.SplitWeil ValuativeRel IsLocalRing
 open GlobalTheory.IndefiniteRowSideFullHecke.UnramifiedCharacter (compFin ExtUnramAt CharUnramAt)
 open scoped TensorProduct Pointwise
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -26,15 +29,22 @@ namespace GlobalTheory.FinPl
 
 section Translate
 
-variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   {n n' : Type} [Fintype n] [DecidableEq n] [Fintype n'] [DecidableEq n']
 
-theorem tensCol_phiOne_charInd_smul (χ : AddChar 𝓀[k] ℂ) (P₁ : Pair k n') (Q : Pair k n) (g : GL n k)
-    (x : Matrix n (n' ⊕ Fin 1) k) :
-    tensCol (phiOne P₁ Q) (charInd χ Q) ((g⁻¹ : GL n k).val * x) =
-      tensCol (phiOne P₁ (g • Q)) (charInd χ (g • Q)) x := by
-  have hcol : (fun i => ((g⁻¹ : GL n k).val * x) i (Sum.inr 0)) = (g⁻¹ : GL n k) • (fun i => x i (Sum.inr 0)) := rfl
-  have hsub : ((g⁻¹ : GL n k).val * x).submatrix id Sum.inl = (g⁻¹ : GL n k).val * x.submatrix id Sum.inl := rfl
+theorem tensCol_phiOne_charInd_smul
+    (χ : AddChar 𝓀[k] ℂ) (P₁ : Pair k n') (Q : Pair k n) (g : GL n k) (x : Matrix n (n' ⊕ Fin 1) k)
+    : tensCol (phiOne P₁ Q) (charInd χ Q) ((g⁻¹ : GL n k).val * x)
+      = tensCol (phiOne P₁ (g • Q)) (charInd χ (g • Q)) x := by
+  have hcol
+      : (fun i => ((g⁻¹ : GL n k).val * x) i (Sum.inr 0))
+        = (g⁻¹ : GL n k) • (fun i => x i (Sum.inr 0)) :=
+    rfl
+  have hsub
+      : ((g⁻¹ : GL n k).val * x).submatrix id Sum.inl
+        = (g⁻¹ : GL n k).val * x.submatrix id Sum.inl :=
+    rfl
   have hphi : ∀ z : Matrix n n' k, phiOne P₁ (g • Q) z = phiOne P₁ Q ((g⁻¹ : GL n k).val * z) := by
     intro z
     have h := phiOne_smul (P := P₁) (Q := Q) (x := z) (1 : GL n' k) g
@@ -45,7 +55,8 @@ theorem tensCol_phiOne_charInd_smul (χ : AddChar 𝓀[k] ℂ) (P₁ : Pair k n'
     unfold charInd vecInd
     rw [Pair.smul_lat, mem_smul_iff]
     split_ifs with hy
-    · have hv := Pair.hasVal_ev (P := g • Q) (x := y) (by rw [Pair.smul_lat, mem_smul_iff]; exact hy)
+    · have hv :=
+        Pair.hasVal_ev (P := g • Q) (x := y) (by rw [Pair.smul_lat, mem_smul_iff]; exact hy)
       rw [Pair.smul_hasVal] at hv
       rw [hv.ev_eq]
     · simp

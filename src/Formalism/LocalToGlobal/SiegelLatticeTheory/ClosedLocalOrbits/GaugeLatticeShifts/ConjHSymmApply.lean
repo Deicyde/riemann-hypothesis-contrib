@@ -13,28 +13,36 @@ open scoped ComplexConjugate ENNReal NNReal
 
 namespace Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames.NH
 
-open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.REAL Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames
+open Formalism.L2.SG.RealObj Formalism.L2.SG.HidaSetting Formalism.REAL
+  Formalism.L2.SG.RealObj.InfCut.JacobianCoordinates
+  Formalism.L2.SG.RealObj.InfCut.NilradicalHermitianFrames
 
 variable {n r k : ℕ} {ε : Fin n → Bool} {e p : Fin r → Fin n → ℂ} {z : Fin n → ℂ} {T : ℝ}
 
-theorem HG_compact {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T) (hdim : n = 2 * r + 1 + k) :
-    IsCompact (HG ε e p z : Set (UJ ε)) := by
+theorem HG_compact {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T) (hdim : n = 2 * r + 1 + k)
+    : IsCompact (HG ε e p z : Set (UJ ε)) := by
   set Q : Set (Matrix (Fin n) (Fin n) ℂ) := {g | gᴴ * Jm ε * g = Jm ε} ∩ ((⋂ a, {g | g *ᵥ e a = e a}) ∩
     ((⋂ a, {g | g *ᵥ p a = p a}) ∩ {g | g *ᵥ z = z})) with hQ
   have e1 : (HG ε e p z : Set (UJ ε)) = (fun g : UJ ε => Formalism.MainNotions.S.uMat g) ⁻¹' Q := by
     ext g
-    simp only [coe_HG, HLoc, hQ, Set.mem_ofPred_eq, Set.mem_preimage, Set.mem_inter_iff, Set.mem_iInter]
+    simp only [coe_HG, HLoc, hQ, Set.mem_ofPred_eq, Set.mem_preimage, Set.mem_inter_iff,
+      Set.mem_iInter]
     exact ⟨fun h => ⟨g.2, h.1, h.2.1, h.2.2⟩, fun h => ⟨h.2.1, h.2.2.1, h.2.2.2⟩⟩
   have hQc : IsClosed Q := by
-    refine (isClosed_eq ((continuous_id.matrix_conjTranspose.mul continuous_const).mul continuous_id)
-      continuous_const).inter ((isClosed_iInter fun a => isClosed_eq (continuous_id.matrix_mulVec continuous_const)
-        continuous_const).inter ((isClosed_iInter fun a => isClosed_eq (continuous_id.matrix_mulVec continuous_const)
-          continuous_const).inter (isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const)))
-  have hzz : hJ ε z z ≠ 0 := by
-    rw [Fw.zz]; exact neg_ne_zero.2 (Complex.ofReal_ne_zero.2 Fw.T_ne)
-  have hQk : IsCompact Q := Formalism.L2.SG.Pf.frame_compact ε e p z w Fw.ee Fw.pp Fw.ep Fw.ez Fw.pz hzz Fw.ww Fw.ew Fw.pw
-    Fw.zw hdim.symm hQc (fun g hg => ⟨hg.1, fun a => Set.mem_iInter.1 hg.2.1 a,
-      fun a => Set.mem_iInter.1 hg.2.2.1 a, hg.2.2.2⟩)
+    refine (isClosed_eq
+        ((continuous_id.matrix_conjTranspose.mul continuous_const).mul continuous_id)
+        continuous_const).inter
+      ((isClosed_iInter fun a =>
+          isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const).inter
+        ((isClosed_iInter fun a =>
+            isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const).inter
+          (isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const)))
+  have hzz : hJ ε z z ≠ 0 := by rw [Fw.zz]; exact neg_ne_zero.2 (Complex.ofReal_ne_zero.2 Fw.T_ne)
+  have hQk : IsCompact Q :=
+    Formalism.L2.SG.Pf.frame_compact ε e p z w Fw.ee Fw.pp Fw.ep Fw.ez Fw.pz hzz Fw.ww Fw.ew Fw.pw
+      Fw.zw hdim.symm hQc
+      (fun g hg =>
+        ⟨hg.1, fun a => Set.mem_iInter.1 hg.2.1 a, fun a => Set.mem_iInter.1 hg.2.2.1 a, hg.2.2.2⟩)
   rw [e1]
   exact ((Formalism.REAL.uJEmb n ε).1).isCompact_preimage hQk
 
@@ -44,8 +52,9 @@ theorem conjH_apply (h x : UJ ε) : conjH h x = h * x * h⁻¹ := rfl
 
 section Conj
 
-theorem map_conj_isHaarS {μ : Measure (UJ ε)} (hμ : IsHaarS (NLoc ε e z) μ) {h : UJ ε}
-    (hh : h ∈ HG ε e p z) : IsHaarS (NLoc ε e z) (μ.map (conjH h)) := by
+theorem map_conj_isHaarS
+    {μ : Measure (UJ ε)} (hμ : IsHaarS (NLoc ε e z) μ) {h : UJ ε} (hh : h ∈ HG ε e p z)
+    : IsHaarS (NLoc ε e z) (μ.map (conjH h)) := by
   obtain ⟨⟨hσ, hne, hcompl, hinv⟩, hfin⟩ := hμ
   have hmeas : Measurable (conjH h) := (conjH h).continuous.measurable
   set E := (conjH h).toMeasurableEquiv with hE
@@ -56,11 +65,14 @@ theorem map_conj_isHaarS {μ : Measure (UJ ε)} (hμ : IsHaarS (NLoc ε e z) μ)
     apply hne
     have := congrArg (fun m : Measure (UJ ε) => m Set.univ) h0
     simp only [Measure.map_apply hmeas MeasurableSet.univ, Set.preimage_univ, FunLike.coe_zero,
-      Pi.zero_apply] at this
+        Pi.zero_apply]
+      at this
     exact Measure.measure_univ_eq_zero.1 this
-  · rw [Measure.map_apply hmeas (show MeasurableSet (NLoc ε e z)ᶜ from (NG_closed ε e z).measurableSet.compl)]
+  · rw [Measure.map_apply hmeas
+      (show MeasurableSet (NLoc ε e z)ᶜ from (NG_closed ε e z).measurableSet.compl)]
     refine measure_mono_null (s := (conjH h) ⁻¹' (NLoc ε e z)ᶜ) (t := (NLoc ε e z)ᶜ)
-      (fun x hx hxN => hx ?_) hcompl
+      (fun x hx hxN => hx ?_)
+      hcompl
     exact conj_mem ε e p z hh hxN
   · have ht' : h⁻¹ * t * h ∈ (NG ε e z) := by
       have := conj_mem ε e p z ((HG ε e p z).inv_mem hh) ht
@@ -75,13 +87,19 @@ theorem map_conj_isHaarS {μ : Measure (UJ ε)} (hμ : IsHaarS (NLoc ε e z) μ)
     rw [this]
     exact (hK.image (conjH h).symm.continuous).measure_lt_top
 
-theorem conj_haar_eq {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T) (hdim : n = 2 * r + 1 + k)
-    {μ : Measure (UJ ε)} (hμ : IsHaarS (NLoc ε e z) μ) {h : UJ ε} (hh : h ∈ HG ε e p z) :
-    μ.map (conjH h) = μ := by
-  have : LocallyCompactSpace (NG ε e z) := (NG_closed ε e z).isClosedEmbedding_subtypeVal.locallyCompactSpace
-  have : SecondCountableTopology (NG ε e z) := Topology.IsEmbedding.subtypeVal.secondCountableTopology
+theorem conj_haar_eq
+    {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T)
+    (hdim : n = 2 * r + 1 + k)
+    {μ : Measure (UJ ε)} (hμ : IsHaarS (NLoc ε e z) μ)
+    {h : UJ ε} (hh : h ∈ HG ε e p z)
+    : μ.map (conjH h) = μ := by
+  have : LocallyCompactSpace (NG ε e z) :=
+    (NG_closed ε e z).isClosedEmbedding_subtypeVal.locallyCompactSpace
+  have : SecondCountableTopology (NG ε e z) :=
+    Topology.IsEmbedding.subtypeVal.secondCountableTopology
   have hNm : MeasurableSet ((NG ε e z) : Set (UJ ε)) := (NG_closed ε e z).measurableSet
-  have memb : MeasurableEmbedding (Subtype.val : (NG ε e z) → UJ ε) := MeasurableEmbedding.subtype_coe hNm
+  have memb : MeasurableEmbedding (Subtype.val : (NG ε e z) → UJ ε) :=
+    MeasurableEmbedding.subtype_coe hNm
   set m0 : Measure (UJ ε) := (Measure.haar : Measure (NG ε e z)).map Subtype.val with hm0
 
   have huniq : ∀ ν : Measure (UJ ε), IsHaarS (NLoc ε e z) ν → ∃ c : ℝ≥0, ν = c • m0 := by
@@ -92,10 +110,11 @@ theorem conj_haar_eq {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T) (hdim
       apply Measure.restrict_eq_self_of_ae_mem
       rw [ae_iff]
       exact hcompl
-    have hmapν : ν'.map Subtype.val = ν := by
-      rw [hν', memb.map_comap, Subtype.range_coe, hrestr]
-    have himg : ∀ (t : (NG ε e z)) (A : Set (NG ε e z)), Subtype.val '' ((fun x => t * x) ⁻¹' A) =
-        (fun x => (t : UJ ε) * x) ⁻¹' (Subtype.val '' A) := by
+    have hmapν : ν'.map Subtype.val = ν := by rw [hν', memb.map_comap, Subtype.range_coe, hrestr]
+    have himg
+        : ∀ (t : (NG ε e z)) (A : Set (NG ε e z)),
+          Subtype.val '' ((fun x => t * x) ⁻¹' A)
+            = (fun x => (t : UJ ε) * x) ⁻¹' (Subtype.val '' A) := by
       intro t A
       ext x
       constructor
@@ -105,16 +124,19 @@ theorem conj_haar_eq {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T) (hdim
         have hxS : x ∈ (NG ε e z) := by
           have : x = ((t⁻¹ * a : (NG ε e z)) : UJ ε) := by
             simp only [Subgroup.coe_mul, Subgroup.coe_inv, hax]; group
-          rw [this]; exact (t⁻¹ * a).2
+          rw [this]
+          exact (t⁻¹ * a).2
         refine ⟨⟨x, hxS⟩, ?_, rfl⟩
         show t * ⟨x, hxS⟩ ∈ A
         have : t * ⟨x, hxS⟩ = a := Subtype.ext (by simpa using hax.symm)
-        rw [this]; exact ha
+        rw [this]
+        exact ha
     have hνinv : ν'.IsMulLeftInvariant := by
       refine ⟨fun t => ?_⟩
       ext A hA
-      rw [Measure.map_apply (measurable_const_mul t) hA, hν', memb.comap_apply, memb.comap_apply, himg,
-        ← Measure.map_apply (measurable_const_mul _) (memb.measurableSet_image.2 hA), hinv _ t.2]
+      rw [Measure.map_apply (measurable_const_mul t) hA, hν', memb.comap_apply, memb.comap_apply,
+        himg, ← Measure.map_apply (measurable_const_mul _) (memb.measurableSet_image.2 hA),
+        hinv _ t.2]
     have hνfin : IsFiniteMeasureOnCompacts ν' := by
       refine ⟨fun K hK => ?_⟩
       rw [hν', memb.comap_apply]
@@ -132,8 +154,7 @@ theorem conj_haar_eq {w : Fin k → Fin n → ℂ} (Fw : Frm ε e p z w T) (hdim
   set C : Set (UJ ε) := Subtype.val '' C' with hC
   have hHc := HG_compact Fw hdim
   set K : Set (UJ ε) := (fun q : UJ ε × UJ ε => q.1 * q.2 * q.1⁻¹) '' ((HG ε e p z : Set (UJ ε)) ×ˢ C) with hK
-  have hKc : IsCompact K :=
-    (hHc.prod (hC'c.image continuous_subtype_val)).image (by fun_prop)
+  have hKc : IsCompact K := (hHc.prod (hC'c.image continuous_subtype_val)).image (by fun_prop)
   have hKN : K ⊆ ((NG ε e z) : Set (UJ ε)) := by
     rintro _ ⟨⟨h', x⟩, ⟨hh', ⟨x', _, rfl⟩⟩, rfl⟩
     exact conj_mem ε e p z hh' x'.2

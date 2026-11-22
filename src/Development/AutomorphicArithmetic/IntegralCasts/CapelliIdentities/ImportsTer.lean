@@ -4,8 +4,8 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.DYdc5.main.{u_1} :
-    ∀ {R : Type u_1} [inst : CommRing R] (P : Ideal R) [hP : P.IsPrime] (t : ℕ),
+theorem UpperTheory.Reformulated.B.DYdc5.main.{u_1}
+    : ∀ {R : Type u_1} [inst : CommRing R] (P : Ideal R) [hP : P.IsPrime] (t : ℕ),
       t ≠ (0 : ℕ) → (↑t : R) ∈ P → ∃ (p : ℕ), Nat.Prime p ∧ p ∣ t ∧ (↑p : R) ∈ P := by
   intro R _ P hP t
   induction t using Nat.strong_induction_on with
@@ -21,7 +21,6 @@ theorem UpperTheory.Reformulated.B.DYdc5.main.{u_1} :
     · have hk : k ≠ 0 := by
         rintro rfl
         simp at ht
-      have hlt : k < p * k :=
-        lt_mul_of_one_lt_left (Nat.pos_of_ne_zero hk) hp.one_lt
+      have hlt : k < p * k := lt_mul_of_one_lt_left (Nat.pos_of_ne_zero hk) hp.one_lt
       obtain ⟨q, hq, hqk, hqP⟩ := ih k hlt hk h
       exact ⟨q, hq, hqk.mul_left p, hqP⟩

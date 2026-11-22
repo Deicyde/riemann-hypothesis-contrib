@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsNorma
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC Formalism.UG GlobalTheory.CuspRep
+open NumberField IsDedekindDomain Matrix Polynomial GlobalTheory.BCT GlobalTheory.UnitaryBC
+  Formalism.UG GlobalTheory.CuspRep
 open PositivityTheory.Rg.Bc.ArchbcB.B.M4 PositivityTheory.Rg.Bc.ArchbcB.B.M4.Tw
 open scoped Classical
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
@@ -19,12 +20,13 @@ namespace GlobalTheory.CompanionTheory.IwFacts
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-theorem v_thetaGL_apply (w : Pl E) (a : ℕ) (g : GLw a w) (i j : Fin a) :
-    Valued.v ((thetaGL a (cj w) g).val i j) = Valued.v ((g⁻¹).val j.rev i.rev) := by
-  rw [GlobalTheory.ThetaPull.thetaGL_apply, map_mul, GlobalTheory.PrincCong.v_cj, map_pow, Valuation.map_neg, map_one, one_pow, one_mul]
+theorem v_thetaGL_apply (w : Pl E) (a : ℕ) (g : GLw a w) (i j : Fin a)
+    : Valued.v ((thetaGL a (cj w) g).val i j) = Valued.v ((g⁻¹).val j.rev i.rev) := by
+  rw [GlobalTheory.ThetaPull.thetaGL_apply, map_mul, GlobalTheory.PrincCong.v_cj, map_pow,
+    Valuation.map_neg, map_one, one_pow, one_mul]
 
-theorem thetaGL_mem_KGL (w : Pl E) (a : ℕ) {k : GLw a w} (hk : k ∈ GlobalTheory.LFun.KGL w (n := a)) :
-    thetaGL a (cj w) k ∈ GlobalTheory.LFun.KGL w (n := a) := by
+theorem thetaGL_mem_KGL (w : Pl E) (a : ℕ) {k : GLw a w} (hk : k ∈ GlobalTheory.LFun.KGL w (n := a))
+    : thetaGL a (cj w) k ∈ GlobalTheory.LFun.KGL w (n := a) := by
   obtain ⟨h1, h2⟩ := (GlobalTheory.CompanionTheory.IwEntries.mem_KGL_iff w a k).1 hk
   refine (GlobalTheory.CompanionTheory.IwEntries.mem_KGL_iff w a _).2 ⟨fun i j => ?_, fun i j => ?_⟩
   · rw [v_thetaGL_apply]
@@ -32,11 +34,13 @@ theorem thetaGL_mem_KGL (w : Pl E) (a : ℕ) {k : GLw a w} (hk : k ∈ GlobalThe
   · rw [← map_inv, v_thetaGL_apply, inv_inv]
     exact h1 _ _
 
-theorem thetaGL_mem_iwGL (w : Pl E) (a : ℕ) {k : GLw a w} (hk : k ∈ iwGL a w) :
-    thetaGL a (cj w) k ∈ iwGL a w := by
+theorem thetaGL_mem_iwGL (w : Pl E) (a : ℕ) {k : GLw a w} (hk : k ∈ iwGL a w)
+    : thetaGL a (cj w) k ∈ iwGL a w := by
   obtain ⟨h1, h2, -⟩ := ((GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w a k).1).1 hk
-  obtain ⟨-, -, h3⟩ := ((GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w a k⁻¹).1).1 (inv_mem hk)
-  refine ((GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w a _).1).2 ⟨fun i j => ?_, fun i j => ?_, fun i j hij => ?_⟩
+  obtain ⟨-, -, h3⟩ :=
+    ((GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w a k⁻¹).1).1 (inv_mem hk)
+  refine ((GlobalTheory.CompanionTheory.IwEntries.iwGL_KGL_entries E w a _).1).2
+    ⟨fun i j => ?_, fun i j => ?_, fun i j hij => ?_⟩
   · rw [v_thetaGL_apply]
     exact h2 _ _
   · rw [← map_inv, v_thetaGL_apply, inv_inv]
@@ -44,12 +48,13 @@ theorem thetaGL_mem_iwGL (w : Pl E) (a : ℕ) {k : GLw a w} (hk : k ∈ iwGL a w
   · rw [v_thetaGL_apply]
     exact h3 _ _ (Fin.rev_lt_rev.2 hij)
 
-theorem isCompact_support_dcos (w : Pl E) (a : ℕ) (t : GLw a w) :
-    IsCompact {g : GLw a w | dcos a w t g ≠ 0} := by
+theorem isCompact_support_dcos (w : Pl E) (a : ℕ) (t : GLw a w)
+    : IsCompact {g : GLw a w | dcos a w t g ≠ 0} := by
   have hI : IsCompact (iwGL a w : Set (GLw a w)) :=
     GlobalTheory.SmGL.IwahoriOnto.isCompact_iwahori (w.adicCompletion E) (Fin a)
-  have hS : IsCompact ((fun p : GLw a w × GLw a w => p.1 * t * p.2) ''
-      ((iwGL a w : Set (GLw a w)) ×ˢ (iwGL a w : Set (GLw a w)))) :=
+  have hS : IsCompact
+      ((fun p : GLw a w × GLw a w => p.1 * t * p.2)
+        '' ((iwGL a w : Set (GLw a w)) ×ˢ (iwGL a w : Set (GLw a w)))) :=
     (hI.prod hI).image ((continuous_fst.mul continuous_const).mul continuous_snd)
   convert hS using 1
   ext g

@@ -11,27 +11,31 @@ namespace GlobalTheory
 
 open Formalism.IndefR.Arith
 
-theorem card_smul_eOp_mem_Mall : ∀ {LL Ks : Type} [Field LL] [NumberField LL] [Field Ks] [NumberField Ks] [Algebra Ks LL]
-    {WL : Type} [AddCommGroup WL] [Module LL WL] [Module Ks WL] [IsScalarTower Ks LL WL]
-    [Module (𝓞 LL) WL] [IsScalarTower (𝓞 LL) LL WL] [Module (𝓞 Ks) WL] [IsScalarTower (𝓞 Ks) Ks WL]
-    {W : (LL →+* ℂ) → Type} [∀ σ, NormedAddCommGroup (W σ)] [∀ σ, InnerProductSpace ℂ (W σ)]
-    {G0 : Type} [Group G0] [Fintype G0] (A : Formalism.IndefR.Arith.FormsL LL Ks WL W G0) (eC : G0 → LL),
-    (∀ g h, eC (h * g * h⁻¹) = eC g) → (∀ g, IsIntegral ℤ ((Fintype.card G0 : LL) * eC g)) →
-    (∀ g f, f ∈ A.MK → A.ρ g f ∈ A.MK) → ∀ (J0 : Subgroup G0) (lam0 : J0 →* LLˣ),
-    ∀ x ∈ A.Mall J0 lam0, ((Fintype.card G0 : ℕ) : LL) • A.eOp eC x ∈ A.Mall J0 lam0 := by
+theorem card_smul_eOp_mem_Mall
+    : ∀ {LL Ks : Type} [Field LL] [NumberField LL] [Field Ks] [NumberField Ks] [Algebra Ks LL]
+        {WL : Type} [AddCommGroup WL] [Module LL WL] [Module Ks WL] [IsScalarTower Ks LL WL]
+        [Module (𝓞 LL) WL] [IsScalarTower (𝓞 LL) LL WL] [Module (𝓞 Ks) WL]
+        [IsScalarTower (𝓞 Ks) Ks WL] {W : (LL →+* ℂ) → Type} [∀ σ, NormedAddCommGroup (W σ)]
+        [∀ σ, InnerProductSpace ℂ (W σ)] {G0 : Type} [Group G0] [Fintype G0]
+        (A : Formalism.IndefR.Arith.FormsL LL Ks WL W G0) (eC : G0 → LL),
+      (∀ g h, eC (h * g * h⁻¹) = eC g) → (∀ g, IsIntegral ℤ ((Fintype.card G0 : LL) * eC g))
+        → (∀ g f, f ∈ A.MK → A.ρ g f ∈ A.MK)
+        → ∀ (J0 : Subgroup G0) (lam0 : J0 →* LLˣ), ∀ x ∈ A.Mall J0 lam0,
+          ((Fintype.card G0 : ℕ) : LL) • A.eOp eC x ∈ A.Mall J0 lam0 := by
   intro LL Ks _ _ _ _ _ WL _ _ _ _ _ _ _ _ W _ _ G0 _ _ A eC hcl hint hMK J0 lam0 x hx
   classical
   rw [FormsL.Mall, Submodule.mem_inf] at hx ⊢
-  have hρspan : ∀ g, ∀ y ∈ Submodule.span (𝓞 LL) (A.MK : Set WL),
-      A.ρ g y ∈ Submodule.span (𝓞 LL) (A.MK : Set WL) := by
+  have hρspan
+      : ∀ g, ∀ y ∈ Submodule.span (𝓞 LL) (A.MK : Set WL),
+        A.ρ g y ∈ Submodule.span (𝓞 LL) (A.MK : Set WL) := by
     intro g y hy
     induction hy using Submodule.span_induction with
     | mem z hz => exact Submodule.subset_span (hMK g z hz)
     | zero => simp
     | add a b _ _ ha hb => rw [map_add (f := _)]; exact Submodule.add_mem _ ha hb
     | smul r a _ ha =>
-        rw [← algebraMap_smul LL r a, LinearMap.map_smul, algebraMap_smul]
-        exact Submodule.smul_mem _ r ha
+      rw [← algebraMap_smul LL r a, LinearMap.map_smul, algebraMap_smul]
+      exact Submodule.smul_mem _ r ha
   have hchi : ∀ g, IsIntegral ℤ (((A.chi g)⁻¹ : LLˣ) : LL) := by
     intro g
     have h1 : ((A.chi g)⁻¹) ^ (orderOf g) = 1 := by
@@ -48,8 +52,10 @@ theorem card_smul_eOp_mem_Mall : ∀ {LL Ks : Type} [Field LL] [NumberField LL] 
     rw [smul_smul]
     have hi : IsIntegral ℤ (((Fintype.card G0 : ℕ) : LL) * (eC g * ((A.chi g)⁻¹ : LLˣ))) := by
       rw [← mul_assoc]; exact (hint g).mul (hchi g)
-    obtain ⟨r, hr⟩ : ∃ r : 𝓞 LL, algebraMap (𝓞 LL) LL r =
-        ((Fintype.card G0 : ℕ) : LL) * (eC g * ((A.chi g)⁻¹ : LLˣ)) := ⟨⟨_, hi⟩, rfl⟩
+    obtain ⟨r, hr⟩
+        : ∃ r : 𝓞 LL,
+          algebraMap (𝓞 LL) LL r = ((Fintype.card G0 : ℕ) : LL) * (eC g * ((A.chi g)⁻¹ : LLˣ)) :=
+      ⟨⟨_, hi⟩, rfl⟩
     rw [← hr, algebraMap_smul]
     exact Submodule.smul_mem _ r (hρspan g x hx.1)
   · have hcomm : ∀ p : G0, A.ρ p (A.eOp eC x) = A.eOp eC (A.ρ p x) := by

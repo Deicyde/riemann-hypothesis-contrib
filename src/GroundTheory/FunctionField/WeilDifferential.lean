@@ -58,13 +58,15 @@ theorem A_sup_le (D E : Divisor k K) : A (D ⊔ E) ≤ A D ⊔ A E := by
 noncomputable def weilSpace (D : Divisor k K) : Submodule k (Module.Dual k (Repartition k K)) :=
   (A D ⊔ principal k K).dualAnnihilator
 
-theorem mem_weilSpace {D : Divisor k K} {ω : Module.Dual k (Repartition k K)} :
-    ω ∈ weilSpace D ↔ (∀ a ∈ A D, ω a = 0) ∧ ∀ x : K, ω (diag x) = 0 := by
+theorem mem_weilSpace {D : Divisor k K} {ω : Module.Dual k (Repartition k K)}
+    : ω ∈ weilSpace D ↔ (∀ a ∈ A D, ω a = 0) ∧ ∀ x : K, ω (diag x) = 0 := by
   rw [weilSpace, Submodule.mem_dualAnnihilator]
   constructor
   · intro h
-    exact ⟨fun a ha => h a (Submodule.mem_sup_left ha),
-      fun x => h _ (Submodule.mem_sup_right (diag_mem_principal x))⟩
+    exact ⟨
+      fun a ha => h a (Submodule.mem_sup_left ha),
+      fun x => h _ (Submodule.mem_sup_right (diag_mem_principal x))
+    ⟩
   · rintro ⟨h1, h2⟩ a ha
     obtain ⟨b, hb, c, ⟨x, rfl⟩, rfl⟩ := Submodule.mem_sup.1 ha
     rw [map_add (f := _), h1 b hb, h2 x, add_zero]
@@ -72,8 +74,10 @@ theorem mem_weilSpace {D : Divisor k K} {ω : Module.Dual k (Repartition k K)} :
 theorem weilSpace_anti {D E : Divisor k K} (h : D ≤ E) : weilSpace E ≤ weilSpace D :=
   Submodule.dualAnnihilator_anti (sup_le_sup_right (A_mono h) _)
 
-theorem weilSpace_sup {D E : Divisor k K} {ω : Module.Dual k (Repartition k K)}
-    (hD : ω ∈ weilSpace D) (hE : ω ∈ weilSpace E) : ω ∈ weilSpace (D ⊔ E) := by
+theorem weilSpace_sup
+    {D E : Divisor k K} {ω : Module.Dual k (Repartition k K)}
+    (hD : ω ∈ weilSpace D) (hE : ω ∈ weilSpace E)
+    : ω ∈ weilSpace (D ⊔ E) := by
   rw [mem_weilSpace] at hD hE ⊢
   refine ⟨fun a ha => ?_, hD.2⟩
   obtain ⟨b, hb, c, hc, rfl⟩ := Submodule.mem_sup.1 (A_sup_le D E ha)
@@ -85,8 +89,8 @@ theorem finrank_weilSpace (D : Divisor k K) : finrank k (weilSpace D) = indexOfS
     ← (Submodule.dualQuotEquivDualAnnihilator (A D ⊔ principal k K)).finrank_eq,
     Subspace.dual_finrank_eq]
 
-theorem exists_indexOfSpeciality_eq_zero :
-    ∃ c : ℤ, ∀ D : Divisor k K, c ≤ deg D → indexOfSpeciality D = 0 := by
+theorem exists_indexOfSpeciality_eq_zero
+    : ∃ c : ℤ, ∀ D : Divisor k K, c ≤ deg D → indexOfSpeciality D = 0 := by
   obtain ⟨E₀, hE₀⟩ := exists_eq_genusInt (k := k) (K := K)
   refine ⟨deg E₀ + genusInt k K, fun D hD => ?_⟩
   have h1 := le_genusInt (D - E₀)
@@ -127,7 +131,6 @@ end Divisor
 
 open Divisor
 
-
 variable (k K) in
 def weilDifferentials : Submodule k (Module.Dual k (Repartition k K)) where
   carrier := {ω | ∃ D : Divisor k K, ω ∈ weilSpace D}
@@ -138,7 +141,6 @@ def weilDifferentials : Submodule k (Module.Dual k (Repartition k K)) where
   smul_mem' := by
     rintro c ω ⟨D, h⟩
     exact ⟨D, Submodule.smul_mem _ c h⟩
-
 
 variable (k K) in
 def WeilDifferential : Type _ := weilDifferentials k K
@@ -153,16 +155,15 @@ instance : Module k (WeilDifferential k K) := inferInstanceAs (Module k (weilDif
 def toDual : WeilDifferential k K →ₗ[k] Module.Dual k (Repartition k K) :=
   (weilDifferentials k K).subtype
 
-theorem toDual_injective : Function.Injective (toDual (k := k) (K := K)) :=
-  Subtype.val_injective
+theorem toDual_injective : Function.Injective (toDual (k := k) (K := K)) := Subtype.val_injective
 
-def mk (ω : Module.Dual k (Repartition k K)) (h : ∃ D : Divisor k K, ω ∈ weilSpace D) :
-    WeilDifferential k K :=
+def mk (ω : Module.Dual k (Repartition k K)) (h : ∃ D : Divisor k K, ω ∈ weilSpace D)
+    : WeilDifferential k K :=
   (⟨ω, h⟩ : weilDifferentials k K)
 
 @[simp]
-theorem toDual_mk (ω : Module.Dual k (Repartition k K)) (h : ∃ D : Divisor k K, ω ∈ weilSpace D) :
-    toDual (mk ω h) = ω :=
+theorem toDual_mk (ω : Module.Dual k (Repartition k K)) (h : ∃ D : Divisor k K, ω ∈ weilSpace D)
+    : toDual (mk ω h) = ω :=
   rfl
 
 theorem exists_mem (ω : WeilDifferential k K) : ∃ D : Divisor k K, toDual ω ∈ weilSpace D :=
@@ -180,32 +181,31 @@ theorem exists_ne_zero : ∃ ω : WeilDifferential k K, ω ≠ 0 := by
   have := congrArg toDual h
   rwa [toDual_mk, map_zero] at this
 
-noncomputable def toQuotDual (D : Divisor k K) :
-    weilSpace D ≃ₗ[k] Module.Dual k (Repartition k K ⧸ (A D ⊔ principal k K)) :=
+noncomputable def toQuotDual (D : Divisor k K)
+    : weilSpace D ≃ₗ[k] Module.Dual k (Repartition k K ⧸ (A D ⊔ principal k K)) :=
   (Submodule.dualQuotEquivDualAnnihilator (A D ⊔ principal k K)).symm
 
-theorem exists_deg_lt {ω : WeilDifferential k K} (hω : ω ≠ 0) :
-    ∃ c : ℤ, ∀ D : Divisor k K, toDual ω ∈ weilSpace D → deg D < c := by
+theorem exists_deg_lt {ω : WeilDifferential k K} (hω : ω ≠ 0)
+    : ∃ c : ℤ, ∀ D : Divisor k K, toDual ω ∈ weilSpace D → deg D < c := by
   obtain ⟨c, hc⟩ := exists_indexOfSpeciality_eq_zero (k := k) (K := K)
   refine ⟨c, fun D hD => ?_⟩
   by_contra hle
   push Not at hle
   have h0 : finrank k (Repartition k K ⧸ (A D ⊔ principal k K)) = 0 := hc D hle
-  have hsub : Subsingleton (Repartition k K ⧸ (A D ⊔ principal k K)) :=
-    Module.finrank_zero_iff.1 h0
+  have hsub : Subsingleton (Repartition k K ⧸ (A D ⊔ principal k K)) := Module.finrank_zero_iff.1 h0
   have h1 : toQuotDual D ⟨toDual ω, hD⟩ = 0 :=
     LinearMap.ext fun q => by simp [Subsingleton.elim q 0]
-  have h2 : (⟨toDual ω, hD⟩ : weilSpace D) = 0 :=
-    (toQuotDual D).injective (by rw [h1, map_zero])
+  have h2 : (⟨toDual ω, hD⟩ : weilSpace D) = 0 := (toQuotDual D).injective (by rw [h1, map_zero])
   exact hω (toDual_injective (by rw [map_zero]; exact congrArg Subtype.val h2))
 
-theorem exists_divisor {ω : WeilDifferential k K} (hω : ω ≠ 0) :
-    ∃ W : Divisor k K, ∀ D : Divisor k K, toDual ω ∈ weilSpace D ↔ D ≤ W := by
+theorem exists_divisor {ω : WeilDifferential k K} (hω : ω ≠ 0)
+    : ∃ W : Divisor k K, ∀ D : Divisor k K, toDual ω ∈ weilSpace D ↔ D ≤ W := by
   classical
   obtain ⟨c, hc⟩ := exists_deg_lt hω
   obtain ⟨D₀, hD₀⟩ := ω.exists_mem
   obtain ⟨n, ⟨W, hW, rfl⟩, hmax⟩ :=
-    Int.exists_greatest_of_bdd (P := fun n => ∃ D, toDual ω ∈ weilSpace D ∧ deg D = n)
+    Int.exists_greatest_of_bdd
+      (P := fun n => ∃ D, toDual ω ∈ weilSpace D ∧ deg D = n)
       ⟨c, fun n ⟨D, hD, hn⟩ => hn ▸ (hc D hD).le⟩ ⟨deg D₀, D₀, hD₀, rfl⟩
   refine ⟨W, fun D => ⟨fun hD => ?_, fun h => weilSpace_anti h hW⟩⟩
   have hsup := weilSpace_sup hD hW
@@ -219,7 +219,6 @@ theorem exists_divisor {ω : WeilDifferential k K} (hω : ω ≠ 0) :
   have : D ⊔ W = W := sub_eq_zero.1 h4
   rw [← this]
   exact le_sup_left
-
 
 open Classical in
 noncomputable def divisor (ω : WeilDifferential k K) : Divisor k K :=

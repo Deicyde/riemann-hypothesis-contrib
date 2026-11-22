@@ -17,7 +17,6 @@ namespace GlobalTheory.PeriodExists
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
-
 omit [IsCMField E] in
 lemma card_cmType (Ψ : Finset (E →+* ℂ))
     (h : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ) :
@@ -153,18 +152,27 @@ lemma period_of_isTypeFn (H : Host E) (D : Datum H) (g : ℕ) (ty : Fin g → (E
   obtain ⟨e, he⟩ := exists_equiv_of_isTypeFn h h'
   exact ⟨(Fin.equiv_iff_eq.1 ⟨e⟩).trans hg, exists_isPeriod_of_equiv e he hP⟩
 
-theorem typeFn_period_exist : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H), (∃ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H D.p D.q ty) ∧ (∀ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H D.p D.q ty → g = Module.finrank ℚ E / 2 * (D.p + D.q) ∧ ∃ P, IsPeriod D ty P) ∧ (N1c → 1 ≤ D.p + D.q → ∀ (l : Level H) (Xo : Moduli D l) (c : Coeff l), Nonempty (Xo.XF c)) := by
+theorem typeFn_period_exist
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H),
+      (∃ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H D.p D.q ty)
+        ∧ (∀ (g : ℕ) (ty : Fin g → (E →+* ℂ)),
+          IsTypeFn H D.p D.q ty → g = Module.finrank ℚ E / 2 * (D.p + D.q) ∧ ∃ P, IsPeriod D ty P)
+        ∧ (N1c → 1 ≤ D.p + D.q
+          → ∀ (l : Level H) (Xo : Moduli D l) (c : Coeff l), Nonempty (Xo.XF c)) := by
   intro E _ _ _ H D
   obtain ⟨g, ty, h, -⟩ := exists_typeFn_period H D
   refine ⟨⟨g, ty, h⟩, period_of_isTypeFn H D, fun hN hr l Xo c => ?_⟩
   obtain ⟨U⟩ := hN E H D l Xo (KA l).val.toRingHom g ty hr rfl h
   let i : Fin U.n := ⟨0, U.n_pos⟩
-  obtain ⟨-, P, hP⟩ := period_of_isTypeFn H (U.Di i) g ty (by rw [(U.sig i).1, (U.sig i).2]; exact h)
-  have hw : CategoryTheory.CategoryStruct.comp (U.u i P) Xo.s =
-      CategoryTheory.CategoryStruct.comp (spMap c.F.val.toRingHom)
-        (spMap (IntermediateField.inclusion c.le).toRingHom) := by
+  obtain ⟨-, P, hP⟩ :=
+    period_of_isTypeFn H (U.Di i) g ty (by rw [(U.sig i).1, (U.sig i).2]; exact h)
+  have hw
+      : CategoryTheory.CategoryStruct.comp (U.u i P) Xo.s
+        = CategoryTheory.CategoryStruct.comp (spMap c.F.val.toRingHom)
+          (spMap (IntermediateField.inclusion c.le).toRingHom) := by
     rw [U.over_σ i P hP]
-    exact AlgebraicGeometry.Spec.map_comp (CommRingCat.ofHom (IntermediateField.inclusion c.le).toRingHom)
+    exact AlgebraicGeometry.Spec.map_comp
+      (CommRingCat.ofHom (IntermediateField.inclusion c.le).toRingHom)
       (CommRingCat.ofHom c.F.val.toRingHom)
   exact ⟨(CategoryTheory.Limits.pullback.lift _ _ hw).base (IsLocalRing.closedPoint ℂ)⟩
 

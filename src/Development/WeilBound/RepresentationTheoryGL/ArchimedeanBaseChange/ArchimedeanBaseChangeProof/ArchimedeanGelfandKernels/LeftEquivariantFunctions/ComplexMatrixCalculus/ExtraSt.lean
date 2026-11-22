@@ -10,7 +10,8 @@ open Matrix
 
 namespace PositivityTheory.RgBcC
 
-def GamTrace : Prop := ∀ (n : ℕ) (z : Fin n → ℂ), (∀ a, ‖z a‖ = 1) →
-  (gamM (Mt (diagonal z)⁻¹)ᵀ).trace = ∏ a, ∏ b, (1 + z a / z b)
+def GamTrace : Prop :=
+  ∀ (n : ℕ) (z : Fin n → ℂ),
+    (∀ a, ‖z a‖ = 1) → (gamM (Mt (diagonal z)⁻¹)ᵀ).trace = ∏ a, ∏ b, (1 + z a / z b)
 
 end PositivityTheory.RgBcC

@@ -9,7 +9,8 @@ public import Formalism.SharpRestriction.ParamsHeightRankConstant
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.LatticeConditions
 
@@ -18,14 +19,15 @@ def nlen {O : Type} [CommRing O] (l : ℕ) (M : Type) [AddCommGroup M] [Module O
 
 section Ext
 
-variable {O₀ O' : Type} [CommRing O₀] [IsDomain O₀] [CommRing O'] [IsDomain O']
+variable
+  {O₀ O' : Type} [CommRing O₀] [IsDomain O₀] [CommRing O'] [IsDomain O']
   (f : O₀ →+* O') (hf : Function.Injective f)
 
 def fracMap : FractionRing O₀ →+* FractionRing O' :=
   IsFractionRing.map (A := O₀) (B := O') (K := FractionRing O₀) (L := FractionRing O') hf
 
-theorem fracMap_alg (c : O₀) :
-    fracMap f hf (algebraMap O₀ (FractionRing O₀) c) = algebraMap O' (FractionRing O') (f c) := by
+theorem fracMap_alg (c : O₀)
+    : fracMap f hf (algebraMap O₀ (FractionRing O₀) c) = algebraMap O' (FractionRing O') (f c) := by
   simp [fracMap, IsFractionRing.map]
 
 def vecMap (k : ℕ) : (Fin k → FractionRing O₀) →ₛₗ[f] (Fin k → FractionRing O') where
@@ -44,23 +46,30 @@ def pushKO (k : ℕ) : KOG O₀ k →ₛₗ[f] KOG O' k :=
     funext j
     exact (fracMap_alg f hf (u j)).symm)
 
-def extCond {Γ : Type} [Group Γ] [TopologicalSpace Γ] {k : ℕ}
-    (ρ₀ : Representation O₀ Γ (KOG O₀ k)) (L₀ : Submodule O₀ (H1 ρ₀))
-    (ρ' : Representation O' Γ (KOG O' k)) : Submodule O' (H1 ρ') :=
-  ((Submodule.span O' {c : Γ → KOG O' k | ∃ c₀ : Z1 ρ₀, Submodule.Quotient.mk c₀ ∈ L₀ ∧
-      c = fun g => pushKO f hf k ((c₀ : Γ → KOG O₀ k) g)}).comap (Z1 ρ').subtype).map
+def extCond
+    {Γ : Type} [Group Γ] [TopologicalSpace Γ]
+    {k : ℕ} (ρ₀ : Representation O₀ Γ (KOG O₀ k)) (L₀ : Submodule O₀ (H1 ρ₀))
+    (ρ' : Representation O' Γ (KOG O' k))
+    : Submodule O' (H1 ρ') :=
+  ((Submodule.span O'
+      {c : Γ → KOG O' k | ∃ c₀ : Z1 ρ₀, Submodule.Quotient.mk c₀ ∈ L₀ ∧
+        c = fun g => pushKO f hf k ((c₀ : Γ → KOG O₀ k) g)}).comap (Z1 ρ').subtype).map
     (Submodule.mkQ _)
 
 end Ext
 
-def SameChar {O₀ O₁ O₂ Γ : Type} [CommRing O₀] [CommRing O₁] [CommRing O₂] [Group Γ]
-    (f₁ : O₀ →+* O₁) (f₂ : O₀ →+* O₂) (ψ₁ : Γ →* O₁ˣ) (ψ₂ : Γ →* O₂ˣ) : Prop :=
-  ∀ F : Γ →₀ O₀, (F.sum fun g c => f₁ c * ((ψ₁ g : O₁ˣ) : O₁)) = 0 ↔
-    (F.sum fun g c => f₂ c * ((ψ₂ g : O₂ˣ) : O₂)) = 0
+def SameChar
+    {O₀ O₁ O₂ Γ : Type} [CommRing O₀] [CommRing O₁] [CommRing O₂] [Group Γ]
+    (f₁ : O₀ →+* O₁) (f₂ : O₀ →+* O₂) (ψ₁ : Γ →* O₁ˣ) (ψ₂ : Γ →* O₂ˣ)
+    : Prop :=
+  ∀ F : Γ →₀ O₀,
+    (F.sum fun g c => f₁ c * ((ψ₁ g : O₁ˣ) : O₁)) = 0
+      ↔ (F.sum fun g c => f₂ c * ((ψ₂ g : O₂ˣ) : O₂)) = 0
 
 section Tw
 
-variable {R : Ranks} {H : Host R} {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
+variable
+  {R : Ranks} {H : Host R} {what₂ : Rows.Data R} [NumberField what₂.LL] [StarRing what₂.LL]
   {LL0 : IntermediateField ℚ what₂.LL} {N : NData R H what₂} (tw : NTw R H what₂ LL0 N)
 
 def latT (i : tw.Tw) (s : tw.Sig i) : GE N →* Matrix (Fin R.r) (Fin R.r) (tw.O0 i) :=
@@ -69,22 +78,30 @@ def latT (i : tw.Tw) (s : tw.Sig i) : GE N →* Matrix (Fin R.r) (Fin R.r) (tw.O
 def setS (i : tw.Tw) : Set (PlE H) :=
   {v | ((∃ k, v ∈ placesOver H.E (H.g k)) ∨ v ∈ tw.pD i) ∧ v ∉ placesOver H.E (tw.l i)}
 
-def latTpsi (i : tw.Tw) (s : tw.Sig i) {O' : Type} [CommRing O'] (f : tw.O0 i →+* O')
-    (ψ : GE N →* O'ˣ) : GE N →* Matrix (Fin R.r) (Fin R.r) O' :=
+def latTpsi
+    (i : tw.Tw) (s : tw.Sig i) {O' : Type} [CommRing O'] (f : tw.O0 i →+* O') (ψ : GE N →* O'ˣ)
+    : GE N →* Matrix (Fin R.r) (Fin R.r) O' :=
   twistM (mapM f (latT tw i s)) ψ⁻¹
 
-variable {tw} (L : LocTheory) (nbt : Br.NBrTw tw) (i : tw.Tw) (s : tw.Sig i)
-  (Q : Finset (PlE H)) {O' : Type} [CommRing O'] [IsDomain O'] (f : tw.O0 i →+* O')
-  (hf : Function.Injective f) (ψ : GE N →* O'ˣ)
-
+variable
+  {tw}
+  (L : LocTheory) (nbt : Br.NBrTw tw)
+  (i : tw.Tw) (s : tw.Sig i)
+  (Q : Finset (PlE H))
+  {O' : Type} [CommRing O'] [IsDomain O']
+  (f : tw.O0 i →+* O') (hf : Function.Injective f)
+  (ψ : GE N →* O'ˣ)
 
 open Classical in
-def condL : ∀ v, Submodule O'
-    (H1 ((WKG (latTpsi tw i s f ψ)).comp (Dec (F := H.E) (N.plOm.1 v)).subtype)) :=
-  fun v => if h : v ∈ placesOver H.E (tw.l i) then
+def condL
+    : ∀ v,
+      Submodule O'
+        (H1 ((WKG (latTpsi tw i s f ψ)).comp (Dec (F := H.E) (N.plOm.1 v)).subtype)) := fun v =>
+  if h : v ∈ placesOver H.E (tw.l i) then
     extCond f hf ((WKG (latT tw i s)).comp (decS N v)) (Br.bkTw L nbt i v h (latT tw i s))
       ((WKG (latTpsi tw i s f ψ)).comp (Dec (F := H.E) (N.plOm.1 v)).subtype)
-  else ⊤
+  else
+    ⊤
 
 def selT : Submodule O' (H1 (WKG (latTpsi tw i s f ψ))) :=
   Formalism.GaloisCohomology.SelAll (WKG (latTpsi tw i s f ψ)) N.plOm
@@ -111,10 +128,14 @@ theorem twO_inj (a : N.Loc) : Function.Injective (tw.twist₂ a) := by
   have he := IsLocalRing.eq_maximalIdeal hm
   haveI := tw.twistBaseCoefficientRing_residueField_finite (tw.twOf a)
   haveI := Fintype.ofFinite (IsLocalRing.ResidueField (tw.O0 (tw.twOf a)))
-  have h0 : ((Fintype.card (IsLocalRing.ResidueField (tw.O0 (tw.twOf a))) : ℕ) :
-      IsLocalRing.ResidueField (tw.O0 (tw.twOf a))) = 0 := FiniteField.cast_card_eq_zero _
-  have h1 : ((Fintype.card (IsLocalRing.ResidueField (tw.O0 (tw.twOf a))) : ℕ) :
-      tw.O0 (tw.twOf a)) ∈ RingHom.ker (tw.twist₂ a) := by
+  have h0
+      : ((Fintype.card (IsLocalRing.ResidueField (tw.O0 (tw.twOf a))) : ℕ)
+          : IsLocalRing.ResidueField (tw.O0 (tw.twOf a)))
+        = 0 :=
+    FiniteField.cast_card_eq_zero _
+  have h1
+      : ((Fintype.card (IsLocalRing.ResidueField (tw.O0 (tw.twOf a))) : ℕ) : tw.O0 (tw.twOf a))
+        ∈ RingHom.ker (tw.twist₂ a) := by
     rw [he, ← IsLocalRing.residue_eq_zero_iff, map_natCast]
     exact h0
   rw [RingHom.mem_ker, map_natCast, Nat.cast_eq_zero] at h1
@@ -126,43 +147,51 @@ section Rec
 
 variable (D : D7)
 
-def sPiTop (a : D.nd.Loc) (ρ : D.nd.X a → (GE D.nd →* GL (Fin D.R.r) (D.nd.O a))) (π : D.nd.X a) :
-    WithTop ℚ :=
+def sPiTop (a : D.nd.Loc) (ρ : D.nd.X a → (GE D.nd →* GL (Fin D.R.r) (D.nd.O a))) (π : D.nd.X a)
+    : WithTop ℚ :=
   nlen (O := D.nd.O a) (D.nd.l a) ↥(Br.selPi D.loc D.nbr a ρ π)
 
 def sTLoc (a : D.nd.Loc) (s : D.ntw.Sig (D.ntw.twOf a)) : WithTop ℚ :=
   sT D.loc D.ntwbr (D.ntw.twOf a) s (D.nd.Q a) (D.ntw.twist₂ a) (twO_inj D.ntw a) (D.ntw.psiL a)
 
 def IsRhoPt (a : D.nd.Loc) (π : D.nd.X a) (ρ : GE D.nd →* GL (Fin D.R.r) (D.nd.O a)) : Prop :=
-  Continuous (fun g => ((ρ g : GL (Fin D.R.r) (D.nd.O a)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O a))) ∧
-  ∃ r : GE D.nd →* GL (Fin D.R.nV) (D.nd.O a), IsHeckeGalois D.nd a π r ∧
-    ∃ e : (Fin D.R.nV → KK D.nd a) ≃ₗ[KK D.nd a] ((Fin D.R.r → KK D.nd a) × (Fin D.R.t → KK D.nd a)),
-      ∀ g u, e ((mapM (toK D.nd a) ((Units.coeHom _).comp r) g).mulVec u) =
-        ((mapM (toK D.nd a) ((Units.coeHom _).comp ρ) g).mulVec (e u).1,
-          fun c : Fin D.R.t =>
-            toK D.nd a ((D.nd.chi a ((c : ℕ) + 1) g : (D.nd.O a)ˣ) : D.nd.O a) * (e u).2 c)
+  Continuous (fun g =>
+      ((ρ g : GL (Fin D.R.r) (D.nd.O a)) : Matrix (Fin D.R.r) (Fin D.R.r) (D.nd.O a)))
+    ∧ ∃ r : GE D.nd →* GL (Fin D.R.nV) (D.nd.O a),
+      IsHeckeGalois D.nd a π r
+        ∧ ∃ e
+            : (Fin D.R.nV → KK D.nd a) ≃ₗ[KK D.nd a] ((Fin D.R.r → KK D.nd a) × (Fin D.R.t → KK D.nd a)),
+          ∀ g u,
+            e ((mapM (toK D.nd a) ((Units.coeHom _).comp r) g).mulVec u)
+              = (
+                (mapM (toK D.nd a) ((Units.coeHom _).comp ρ) g).mulVec (e u).1,
+                fun c : Fin D.R.t =>
+                  toK D.nd a ((D.nd.chi a ((c : ℕ) + 1) g : (D.nd.O a)ˣ) : D.nd.O a) * (e u).2 c
+              )
 
 def GoodRowOf (j : ℕ) (σ : D.what₂.FT) : Prop := D.nd.goodRow σ ∧ D.what₂.isot j σ ≠ ⊥
 
 def IsTriple (a : D.nd.Loc) (s : D.ntw.Sig (D.ntw.twOf a)) (Sg : List (Part D.naut.CG)) : Prop :=
-  D.ntw.jS _ s = D.nd.j a ∧ D.ntw.side _ s = D.ntw.twSide a ∧
-  IsSSRep (mapRep (algebraMap (D.ntw.O0 (D.ntw.twOf a)) (FractionRing (D.ntw.O0 (D.ntw.twOf a))))
-    (D.ntw.rhoS _ s)) ∧
-  ∀ᶠ w in Filter.cofinite, SplitOut D.nd a w →
-    ∀ (B : ValuationSubring D.nd.Om) (γ : GE D.nd), IsPlaceOver (F := D.host.E) B w →
-      IsFrob (F := D.host.E) B (normV w) γ →
-      ((D.ntw.rhoS _ s γ : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) _).charpoly.map
-          ((iotaO D.nd D.naut a).comp (D.ntw.twist₂ a)) =
-        galPol D.naut (D.naut.lpTw (isoLoc D.nd D.naut (twistIso D.nd D.naut Sg D.naut.etaTinv) w)
-          ((1 - (D.R.nV : ℝ)) / 2))
+  D.ntw.jS _ s = D.nd.j a ∧ D.ntw.side _ s = D.ntw.twSide a
+    ∧ IsSSRep (mapRep
+      (algebraMap (D.ntw.O0 (D.ntw.twOf a)) (FractionRing (D.ntw.O0 (D.ntw.twOf a))))
+      (D.ntw.rhoS _ s))
+    ∧ ∀ᶠ w in Filter.cofinite, SplitOut D.nd a w →
+        ∀ (B : ValuationSubring D.nd.Om) (γ : GE D.nd), IsPlaceOver (F := D.host.E) B w →
+          IsFrob (F := D.host.E) B (normV w) γ →
+          ((D.ntw.rhoS _ s γ : GL _ _) : Matrix (Fin D.R.r) (Fin D.R.r) _).charpoly.map
+              ((iotaO D.nd D.naut a).comp (D.ntw.twist₂ a)) =
+            galPol D.naut (D.naut.lpTw (isoLoc D.nd D.naut (twistIso D.nd D.naut Sg D.naut.etaTinv) w)
+              ((1 - (D.R.nV : ℝ)) / 2))
 
 def AllTriples : Prop :=
-  ∀ (a : D.nd.Loc) (σ : D.what₂.FT) (Sg : List (Part D.naut.CG)), GoodRowOf D (D.nd.j a) σ →
-    HasParamW D.nd D.naut a σ Sg → ∃ s, IsTriple D a s Sg
+  ∀ (a : D.nd.Loc) (σ : D.what₂.FT) (Sg : List (Part D.naut.CG)),
+    GoodRowOf D (D.nd.j a) σ → HasParamW D.nd D.naut a σ Sg → ∃ s, IsTriple D a s Sg
 
 def Attached (a : D.nd.Loc) (π : D.nd.X a) (s : D.ntw.Sig (D.ntw.twOf a)) : Prop :=
-  ∃ (σ : D.what₂.FT) (Sg : List (Part D.naut.CG)), GoodRowOf D (D.nd.j a) σ ∧
-    HasParamW D.nd D.naut a σ Sg ∧ HasParamX D.nd D.naut a π Sg ∧ IsTriple D a s Sg
+  ∃ (σ : D.what₂.FT) (Sg : List (Part D.naut.CG)),
+    GoodRowOf D (D.nd.j a) σ ∧ HasParamW D.nd D.naut a σ Sg ∧ HasParamX D.nd D.naut a π Sg
+      ∧ IsTriple D a s Sg
 
 end Rec
 

@@ -9,7 +9,11 @@ open scoped LaurentPolynomial
 
 namespace GlobalTheory.CompanionTheory.GoodBaseChange
 
-theorem good_baseChange : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A](B : Type) [CommRing B] [Algebra A B] (r : ℕ → A) (K₁ K₀ : Type) [AddCommGroup K₁] [Module A K₁] [AddCommGroup K₀] [Module A K₀] (d : K₁ →ₗ[A] K₀), Good p r d → Good p (fun k => algebraMap A B (r k)) (d.baseChange B) := by
+theorem good_baseChange
+    : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A] (B : Type) [CommRing B] [Algebra A B]
+        (r : ℕ → A) (K₁ K₀ : Type) [AddCommGroup K₁] [Module A K₁] [AddCommGroup K₀] [Module A K₀]
+        (d : K₁ →ₗ[A] K₀),
+      Good p r d → Good p (fun k => algebraMap A B (r k)) (d.baseChange B) := by
   intro p _ A _ B _ _ r K₁ K₀ _ _ _ _ d hd
   intro C _ _ hC w hw k
   letI : Algebra A C := Algebra.compHom C (algebraMap A B)
@@ -32,9 +36,10 @@ theorem good_baseChange : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A](B
   have hsmul : r k • e₁ w = e₁ (algebraMap A B (r k) • w) := by
     rw [← algebraMap_smul C (algebraMap A B (r k)) w, map_smul, algebraMap_smul]
     rfl
-  have key : ∀ u : C ⊗[A] LinearMap.ker d,
-      e₁.symm ((LinearMap.ker d).subtype.lTensor C u) ∈
-        LinearMap.range ((LinearMap.ker (d.baseChange B)).subtype.lTensor C) := by
+  have key
+      : ∀ u : C ⊗[A] LinearMap.ker d,
+        e₁.symm ((LinearMap.ker d).subtype.lTensor C u)
+          ∈ LinearMap.range ((LinearMap.ker (d.baseChange B)).subtype.lTensor C) := by
     intro u
     induction u using TensorProduct.induction_on with
     | zero => simp

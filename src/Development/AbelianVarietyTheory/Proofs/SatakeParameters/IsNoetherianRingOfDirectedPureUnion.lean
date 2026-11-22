@@ -11,11 +11,12 @@ namespace GlobalTheory.DirectedNoeth
 
 variable {S : Type} [CommRing S] [IsLocalRing S]
 
-theorem mem_of_forall_mem_sup_pow (T : Subring S) [IsNoetherianRing T]
+theorem mem_of_forall_mem_sup_pow
+    (T : Subring S) [IsNoetherianRing T]
     (hmax : ((maximalIdeal S).comap T.subtype).map T.subtype = maximalIdeal S)
     (hpure : ∀ J : Ideal T, (J.map T.subtype).comap T.subtype = J)
-    (A : Ideal T) (x : T) (hx : ∀ n : ℕ, (x : S) ∈ A.map T.subtype ⊔ maximalIdeal S ^ n) :
-    x ∈ A := by
+    (A : Ideal T) (x : T) (hx : ∀ n : ℕ, (x : S) ∈ A.map T.subtype ⊔ maximalIdeal S ^ n)
+    : x ∈ A := by
   set m : Ideal T := (maximalIdeal S).comap T.subtype with hm
   have hjac : m ≤ Ideal.jacobson ⊥ := by
     intro y hy
@@ -35,8 +36,9 @@ theorem mem_of_forall_mem_sup_pow (T : Subring S) [IsNoetherianRing T]
       rw [← hpure (Ideal.span {y * z + 1}), Ideal.map_span, Set.image_singleton,
         Ideal.span_singleton_eq_top.mpr hunit, Ideal.comap_top]
     exact Ideal.span_singleton_eq_top.mp h2
-  have hK := Ideal.iInf_pow_smul_eq_bot_of_le_jacobson (M := T ⧸ A) m
-    (by simpa only [Ideal.jacobson_bot] using hjac)
+  have hK :=
+    Ideal.iInf_pow_smul_eq_bot_of_le_jacobson (M := T ⧸ A) m
+      (by simpa only [Ideal.jacobson_bot] using hjac)
   have hxn : ∀ n : ℕ, x ∈ A ⊔ m ^ n := by
     intro n
     have h := hx n
@@ -48,34 +50,41 @@ theorem mem_of_forall_mem_sup_pow (T : Subring S) [IsNoetherianRing T]
     intro n
     obtain ⟨a, ha, b, hb, hab⟩ := Submodule.mem_sup.mp (hxn n)
     have : Ideal.Quotient.mk A x = b • (1 : T ⧸ A) := by
-      rw [← hab, map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr ha, zero_add, Algebra.smul_def,
-        mul_one, Ideal.Quotient.algebraMap_eq]
+      rw [← hab, map_add (f := _), Ideal.Quotient.eq_zero_iff_mem.mpr ha, zero_add,
+        Algebra.smul_def, mul_one, Ideal.Quotient.algebraMap_eq]
     rw [this]
     exact Submodule.smul_mem_smul hb trivial
   rw [hK, Submodule.mem_bot, Ideal.Quotient.eq_zero_iff_mem] at h0
   exact h0
 
-theorem mem_sup_pow_of_algebraMap_mem (K : Ideal S) (x : S)
-    (hx : algebraMap S (AdicCompletion (maximalIdeal S) S) x ∈
-      K.map (algebraMap S (AdicCompletion (maximalIdeal S) S))) (n : ℕ) :
-    x ∈ K ⊔ maximalIdeal S ^ n := by
+theorem mem_sup_pow_of_algebraMap_mem
+    (K : Ideal S) (x : S)
+    (hx : algebraMap S (AdicCompletion (maximalIdeal S) S) x
+      ∈ K.map (algebraMap S (AdicCompletion (maximalIdeal S) S)))
+    (n : ℕ)
+    : x ∈ K ⊔ maximalIdeal S ^ n := by
   have h := Ideal.mem_map_of_mem (AdicCompletion.evalₐ (maximalIdeal S) n).toRingHom hx
   rw [Ideal.map_map] at h
-  have hc : (AdicCompletion.evalₐ (maximalIdeal S) n).toRingHom.comp
-      (algebraMap S (AdicCompletion (maximalIdeal S) S)) = Ideal.Quotient.mk _ := by
+  have hc
+      : (AdicCompletion.evalₐ (maximalIdeal S) n).toRingHom.comp
+          (algebraMap S (AdicCompletion (maximalIdeal S) S))
+        = Ideal.Quotient.mk _ := by
     ext y
     simp [AlgHom.commutes, Ideal.Quotient.algebraMap_eq]
   rw [hc] at h
   have h' : Ideal.Quotient.mk (maximalIdeal S ^ n) x ∈ K.map (Ideal.Quotient.mk _) := by
-    have e : (AdicCompletion.evalₐ (maximalIdeal S) n).toRingHom
-        (algebraMap S (AdicCompletion (maximalIdeal S) S) x) = Ideal.Quotient.mk _ x := by
+    have e
+        : (AdicCompletion.evalₐ (maximalIdeal S) n).toRingHom
+            (algebraMap S (AdicCompletion (maximalIdeal S) S) x)
+          = Ideal.Quotient.mk _ x := by
       rw [← RingHom.comp_apply, hc]
-    rw [← e]; exact h
+    rw [← e]
+    exact h
   rw [Ideal.mem_quotient_iff_mem_sup] at h'
   exact h'
 
-theorem isNoetherianRing_completion (hfg : (maximalIdeal S).FG) :
-    IsNoetherianRing (AdicCompletion (maximalIdeal S) S) := by
+theorem isNoetherianRing_completion (hfg : (maximalIdeal S).FG)
+    : IsNoetherianRing (AdicCompletion (maximalIdeal S) S) := by
   refine GlobalTheory.AdicNoeth.isNoetherianRing_of_isAdicComplete _
     ((maximalIdeal S).map (algebraMap S (AdicCompletion (maximalIdeal S) S))) (hfg.map _)
     (AdicCompletion.isAdicComplete_self _ hfg) ?_
@@ -83,20 +92,22 @@ theorem isNoetherianRing_completion (hfg : (maximalIdeal S).FG) :
   letI := Ideal.Quotient.field (maximalIdeal S)
   haveI : IsNoetherianRing (S ⧸ maximalIdeal S) := inferInstance
   exact isNoetherianRing_of_ringEquiv _
-    (RingHom.quotientKerEquivOfSurjective (f := (AdicCompletion.evalOneₐ (maximalIdeal S)).toRingHom)
+    (RingHom.quotientKerEquivOfSurjective
+      (f := (AdicCompletion.evalOneₐ (maximalIdeal S)).toRingHom)
       (AdicCompletion.evalOneₐ_surjective _)).symm
 
 end GlobalTheory.DirectedNoeth
 
 namespace GlobalTheory
 
-
 open GlobalTheory.DirectedNoeth in
-theorem isNoetherianRing_of_directed_pure_union : ∀ (S : Type) [CommRing S] [IsLocalRing S] (ι : Type)
-    [Preorder ι] [IsDirected ι (· ≤ ·)] [Nonempty ι] (R : ι → Subring S), Monotone R →
-    (∀ x : S, ∃ i, x ∈ R i) → (∀ i, IsNoetherianRing (R i)) →
-    (∀ i, ((maximalIdeal S).comap (R i).subtype).map (R i).subtype = maximalIdeal S) →
-    (∀ i (J : Ideal (R i)), (J.map (R i).subtype).comap (R i).subtype = J) → IsNoetherianRing S := by
+theorem isNoetherianRing_of_directed_pure_union
+    : ∀ (S : Type) [CommRing S] [IsLocalRing S] (ι : Type) [Preorder ι] [IsDirected ι (· ≤ ·)]
+        [Nonempty ι] (R : ι → Subring S),
+      Monotone R → (∀ x : S, ∃ i, x ∈ R i) → (∀ i, IsNoetherianRing (R i))
+        → (∀ i, ((maximalIdeal S).comap (R i).subtype).map (R i).subtype = maximalIdeal S)
+        → (∀ i (J : Ideal (R i)), (J.map (R i).subtype).comap (R i).subtype = J)
+        → IsNoetherianRing S := by
   intro S _ _ ι _ _ _ R hmono hcov hnoeth hmax hpure
   obtain ⟨i₁⟩ := ‹Nonempty ι›
   have hfg : (maximalIdeal S).FG := by
@@ -115,9 +126,11 @@ theorem isNoetherianRing_of_directed_pure_union : ∀ (S : Type) [CommRing S] [I
     have hyj : (y : S) ∈ R j := hmono hij y.2
     have : (⟨y, hyj⟩ : R j) ∈ I.comap (R j).subtype := hy
     exact Ideal.mem_map_of_mem (R j).subtype this
-  obtain ⟨_, ⟨i₀, rfl⟩, hmaxl⟩ := set_has_maximal_iff_noetherian.mpr
-    (inferInstance : IsNoetherian (AdicCompletion (maximalIdeal S) S) (AdicCompletion (maximalIdeal S) S))
-    (Set.range fun i => (E i).map f) (Set.range_nonempty _)
+  obtain ⟨_, ⟨i₀, rfl⟩, hmaxl⟩ :=
+    set_has_maximal_iff_noetherian.mpr
+      (inferInstance
+        : IsNoetherian (AdicCompletion (maximalIdeal S) S) (AdicCompletion (maximalIdeal S) S))
+      (Set.range fun i => (E i).map f) (Set.range_nonempty _)
   have hfg0 : (E i₀).FG := by
     haveI := hnoeth i₀
     exact (Ideal.fg_of_isNoetherianRing _).map _

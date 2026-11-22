@@ -15,7 +15,8 @@ open Formalism.DivisionValues
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K] (S : CSD K)
 
-theorem I_apply (x : Fin S.dim → K) : S.I x = ((S.basis.equivFun.symm x : S.Forms) : S.Cl → S.V) := rfl
+theorem I_apply (x : Fin S.dim → K) : S.I x = ((S.basis.equivFun.symm x : S.Forms) : S.Cl → S.V) :=
+  rfl
 
 theorem I_injective : Function.Injective S.I := by
   intro x y h
@@ -33,12 +34,12 @@ theorem I_eq_sum (x : Fin S.dim → K) : S.I x = ∑ i, x i • (S.basis i : S.C
   rw [I_apply, Basis.equivFun_symm_apply]
   simp
 
-theorem csum_sum (x y : Fin S.dim → K) :
-    S.csum (S.I x) (S.I y) = ∑ i, ∑ j, star (x i) * S.H i j * y j := by
+theorem csum_sum (x y : Fin S.dim → K)
+    : S.csum (S.I x) (S.I y) = ∑ i, ∑ j, star (x i) * S.H i j * y j := by
   set_option synthInstance.maxHeartbeats 100000 in
     simp only [csum, I_eq_sum, H, Matrix.of_apply, Finset.sum_apply, Pi.smul_apply, map_sum,
-    LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, smul_eq_mul,
-    starRingEnd_apply, Finset.mul_sum, Finset.sum_mul]
+      LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply, map_smul, smul_eq_mul,
+      starRingEnd_apply, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   conv_rhs => rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_

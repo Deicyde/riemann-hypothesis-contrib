@@ -5,7 +5,8 @@ public import CompanionTheory.SpectralGeometry.CountingDefinitions.AdelicEulerPr
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 noncomputable section
@@ -20,8 +21,8 @@ theorem sigma_sigma {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (x : E) : σ (σ
   apply τ.injective
   rw [h τ, h τ, star_star]
 
-theorem exists_basis {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) :
-    ∃ bb : Module.Basis (Fin 2) F E, bb 0 = 1 ∧ σ (bb 1) = - bb 1 := by
+theorem exists_basis {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ)
+    : ∃ bb : Module.Basis (Fin 2) F E, bb 0 = 1 ∧ σ (bb 1) = - bb 1 := by
   have hcm := hσ
   obtain ⟨-, hc, h2, h⟩ := hσ
   let τ : E →+* ℂ := Classical.choice (inferInstance : Nonempty (E →+* ℂ))
@@ -36,8 +37,7 @@ theorem exists_basis {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) :
     exact this ⟨τ, hreal, rfl⟩
   obtain ⟨x, hx⟩ := hnr
   set δ : E := x - σ x with hδ
-  have hσδ : σ δ = -δ := by
-    simp [hδ, sigma_sigma hcm]
+  have hσδ : σ δ = -δ := by simp [hδ, sigma_sigma hcm]
   have hδ0 : δ ≠ 0 := by
     intro h0
     apply hx
@@ -68,15 +68,14 @@ theorem exists_basis {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) :
 variable (R : Type) [CommRing R] [Algebra F R]
 
 theorem half_add (r : R) : algebraMap F R (1 / 2) * (r + r) = r := by
-  have h : r + r = algebraMap F R 2 * r := by
-    rw [map_ofNat, two_mul]
+  have h : r + r = algebraMap F R 2 * r := by rw [map_ofNat, two_mul]
   rw [h, ← mul_assoc, ← map_mul]
   norm_num
 
 variable {R}
 
-theorem fixed_eq {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {y : R ⊗[F] E} (hy : sigR R σ y = y) :
-    ∃ r : R, y = r ⊗ₜ[F] (1 : E) := by
+theorem fixed_eq {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {y : R ⊗[F] E} (hy : sigR R σ y = y)
+    : ∃ r : R, y = r ⊗ₜ[F] (1 : E) := by
   obtain ⟨bb, h0, h1⟩ := exists_basis hσ
   set B := Algebra.TensorProduct.basis R bb with hB
   have hy' : y = (B.repr y 0) ⊗ₜ[F] (1 : E) + (B.repr y 1) ⊗ₜ[F] bb 1 := by
@@ -100,8 +99,8 @@ theorem fixed_eq {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {y : R ⊗[F] E} (h
     rw [← half_add (F := F) R c1, this, mul_zero]
   exact ⟨c0, by rw [hy', hc]; simp⟩
 
-theorem trace_tmul_one {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (r : R) :
-    Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] (1 : E)) = r + r := by
+theorem trace_tmul_one {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (r : R)
+    : Algebra.trace R (R ⊗[F] E) (r ⊗ₜ[F] (1 : E)) = r + r := by
   obtain ⟨bb, -, -⟩ := exists_basis hσ
   have := Algebra.trace_algebraMap_of_basis (Algebra.TensorProduct.basis R bb) r
   rw [Algebra.TensorProduct.algebraMap_apply] at this
@@ -131,9 +130,11 @@ theorem continuous_trace : Continuous (Algebra.trace R (R ⊗[F] E)) := by
 def hermHalf (σ : E →ₐ[F] E) (S : HermR R σ 1) : R :=
   algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0)
 
-theorem hermScal_hermHalf {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (S : HermR R σ 1) :
-    hermScal R σ (hermHalf R σ S) = S := by
-  have hfix : sigR R σ ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0) = (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0 :=
+theorem hermScal_hermHalf {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (S : HermR R σ 1)
+    : hermScal R σ (hermHalf R σ S) = S := by
+  have hfix
+      : sigR R σ ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0)
+        = (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0 :=
     S.2 0 0
   obtain ⟨r, hr⟩ := fixed_eq hσ hfix
   apply Subtype.ext
@@ -144,8 +145,8 @@ theorem hermScal_hermHalf {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (S : HermR
   change (hermHalf R σ S) ⊗ₜ[F] (1 : E) = _
   rw [hr, hermHalf, hr, trace_tmul_one hσ, half_add]
 
-theorem hermHalf_hermScal {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (s : R) :
-    hermHalf R σ (hermScal R σ s) = s := by
+theorem hermHalf_hermScal {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) (s : R)
+    : hermHalf R σ (hermScal R σ s) = s := by
   change algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) (s ⊗ₜ[F] (1 : E)) = s
   rw [trace_tmul_one hσ, half_add]
 
@@ -169,7 +170,8 @@ end Top
 
 section Meas
 
-variable (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+variable
+  (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
   [LocallyCompactSpace R] [SecondCountableTopology R] [T2Space R] [MeasurableSpace R] [BorelSpace R]
 
 instance : IsEmpty {p : Fin 1 × Fin 1 // p.1 < p.2} :=
@@ -178,16 +180,20 @@ instance : IsEmpty {p : Fin 1 × Fin 1 // p.1 < p.2} :=
     rw [Subsingleton.elim p.1.1 p.1.2] at h
     exact lt_irrefl _ h⟩
 
-theorem map_hermScal {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {d : ℕ} (b : Module.Basis (Fin d) F E)
-    (lam : Measure R) [lam.IsAddHaarMeasure] :
-    lam.map (hermScal R σ) = coordHerm R σ b lam 1 := by
+theorem map_hermScal
+    {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ)
+    {d : ℕ} (b : Module.Basis (Fin d) F E)
+    (lam : Measure R) [lam.IsAddHaarMeasure]
+    : lam.map (hermScal R σ) = coordHerm R σ b lam 1 := by
   haveI : BorelSpace (HermR R σ 1) := ⟨rfl⟩
   let P := {p : Fin 1 × Fin 1 // p.1 < p.2}
   let x₀ : P → R ⊗[F] E := isEmptyElim
-  let ψ : HermR R σ 1 → (Fin 1 → R) × (P → R ⊗[F] E) := fun S =>
-      ((fun i : Fin 1 => algebraMap F R (1 / 2) *
-          Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) i i)),
-        (fun p : P => (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) p.1.1 p.1.2))
+  let ψ : HermR R σ 1 → (Fin 1 → R) × (P → R ⊗[F] E) := fun S => (
+    (fun i : Fin 1 =>
+      algebraMap F R (1 / 2)
+        * Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) i i)),
+    (fun p : P => (S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) p.1.1 p.1.2)
+  )
   let e : R → (Fin 1 → R) × (P → R ⊗[F] E) := fun s => (fun _ => s, x₀)
   have hHs : MeasurableEmbedding (hermScal R σ) := (hermHomeo R hσ).measurableEmbedding
   have hψe : ∀ S, ψ S = e (hermHalf R σ S) := by
@@ -216,11 +222,13 @@ theorem map_hermScal {σ : E →ₐ[F] E} (hσ : IsCMExt F E σ) {d : ℕ} (b : 
     have : ψ = e ∘ (hermHomeo R hσ).symm := funext hψe
     rw [this]
     exact hemb.comp (hermHomeo R hσ).symm.measurableEmbedding
-  have hprod : (Measure.pi fun _ : Fin 1 => lam).prod (Measure.pi fun _ : P => coordK R b lam) =
-      lam.map e := by
+  have hprod
+      : (Measure.pi fun _ : Fin 1 => lam).prod (Measure.pi fun _ : P => coordK R b lam)
+        = lam.map e := by
     rw [Measure.pi_of_empty _ x₀, Measure.prod_dirac]
     have h1 : (Measure.pi fun _ : Fin 1 => lam) = lam.map (fun s _ => s) :=
-      ((measurePreserving_funUnique lam (Fin 1)).symm (MeasurableEquiv.funUnique (Fin 1) R)).map_eq.symm
+      ((measurePreserving_funUnique lam (Fin 1)).symm
+        (MeasurableEquiv.funUnique (Fin 1) R)).map_eq.symm
     have hm1 : Measurable fun (s : R) (_ : Fin 1) => s := Measurable.of_eval fun _ => measurable_id
     have hm2 : Measurable fun y : Fin 1 → R => (y, x₀) := measurable_id.prodMk measurable_const
     rw [h1, Measure.map_map hm2 hm1]
@@ -237,8 +245,27 @@ end Meas
 
 end GlobalTheory.CompanionTheory.SW.OneHerm
 
-theorem GlobalTheory.CompanionTheory.SW.hermScal_main : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R] [LocallyCompactSpace R] [SecondCountableTopology R] [T2Space R] [MeasurableSpace R] [BorelSpace R], ∀ (d : ℕ) (b : Module.Basis (Fin d) F E), IsHomeomorph (hermScal R σ) ∧ (∀ S : HermR R σ 1, hermScal R σ (algebraMap F R (1 / 2) * Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0)) = S) ∧ ∀ (lam : Measure R), lam.IsAddHaarMeasure → lam.map (hermScal R σ) = coordHerm R σ b lam 1 := by
+theorem GlobalTheory.CompanionTheory.SW.hermScal_main
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (R : Type) [CommRing R] [Algebra F R] [TopologicalSpace R] [IsTopologicalRing R]
+            [LocallyCompactSpace R] [SecondCountableTopology R] [T2Space R] [MeasurableSpace R]
+            [BorelSpace R],
+          ∀ (d : ℕ) (b : Module.Basis (Fin d) F E),
+            IsHomeomorph (hermScal R σ)
+              ∧ (∀ S : HermR R σ 1,
+                hermScal R σ
+                    (algebraMap F R (1 / 2)
+                      * Algebra.trace R (R ⊗[F] E) ((S : Matrix (Fin 1) (Fin 1) (R ⊗[F] E)) 0 0))
+                  = S)
+              ∧ ∀ (lam : Measure R),
+                lam.IsAddHaarMeasure → lam.map (hermScal R σ) = coordHerm R σ b lam 1 := by
   intro F E _ _ _ _ _ σ hσ R _ _ _ _ _ _ _ _ _ d b
-  refine ⟨(GlobalTheory.CompanionTheory.SW.OneHerm.hermHomeo R hσ).isHomeomorph, GlobalTheory.CompanionTheory.SW.OneHerm.hermScal_hermHalf R hσ, ?_⟩
+  refine ⟨
+    (GlobalTheory.CompanionTheory.SW.OneHerm.hermHomeo R hσ).isHomeomorph,
+    GlobalTheory.CompanionTheory.SW.OneHerm.hermScal_hermHalf R hσ,
+    ?_
+  ⟩
   intro lam hlam
   exact GlobalTheory.CompanionTheory.SW.OneHerm.map_hermScal R hσ b lam

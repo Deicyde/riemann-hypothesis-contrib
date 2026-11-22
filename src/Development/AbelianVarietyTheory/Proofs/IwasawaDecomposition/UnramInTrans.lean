@@ -10,7 +10,13 @@ open NumberField IsDedekindDomain GlobalTheory.NT GlobalTheory.Mem.Fld GlobalThe
 
 namespace GlobalTheory.Mem.UnramTower
 
-theorem unramIn_trans : ∀ (K L N : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Field N] [NumberField N] [Algebra K L] [Algebra L N] [Algebra K N] [IsScalarTower K L N] [IsGalois K L] [IsGalois K N], (∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn L 𝔭) → (∀ P : HeightOneSpectrum (𝓞 L), GlobalTheory.NT.UnramIn N P) → ∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn N 𝔭 := by
+theorem unramIn_trans
+    : ∀ (K L N : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Field N] [NumberField N]
+        [Algebra K L] [Algebra L N] [Algebra K N] [IsScalarTower K L N] [IsGalois K L]
+        [IsGalois K N],
+      (∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn L 𝔭)
+        → (∀ P : HeightOneSpectrum (𝓞 L), GlobalTheory.NT.UnramIn N P)
+        → ∀ 𝔭 : HeightOneSpectrum (𝓞 K), GlobalTheory.NT.UnramIn N 𝔭 := by
   intro K L N _ _ _ _ _ _ _ _ _ _ _ _ hL hN 𝔭 σ hσ
   obtain ⟨Q, hQ, hQo, hσ⟩ := hσ
   have hσ' : ∀ x : 𝓞 N, σ • x - x ∈ Q := fun x => hσ x

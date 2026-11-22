@@ -9,8 +9,7 @@ open scoped ENNReal NNReal MatrixGroups
 
 namespace GlobalTheory.CompanionTheory.SW.Core.GaussianDyadic
 
-noncomputable def wt (c : ℝ) (j : ℕ) : ℝ :=
-  if j = 0 then 1 else Real.exp (-(c * 4 ^ j / 4))
+noncomputable def wt (c : ℝ) (j : ℕ) : ℝ := if j = 0 then 1 else Real.exp (-(c * 4 ^ j / 4))
 
 lemma wt_nonneg (c : ℝ) (j : ℕ) : 0 ≤ wt c j := by
   unfold wt; split_ifs
@@ -129,16 +128,22 @@ lemma gaussian_le_tsum {X : Type} (c t : ℝ) (hc : 0 < c) (ht : 0 < t) (s : X �
   · rw [Set.indicator_of_notMem (show x ∉ {x | p x} from hp)]
     exact zero_le
 
-theorem gaussian_sum_le (n : ℕ) (c t₀ C : ℝ) (hc : 0 < c) (ht₀ : 0 < t₀) :
-    ∀ (X Ω : Type) [MeasurableSpace Ω] [Countable X] (Pr : Measure Ω)
-      (s : Ω → X → ℝ) (p : Ω → X → Prop), (∀ x, Measurable fun ω => s ω x) →
-      (∀ x, MeasurableSet {ω | p ω x}) → (∀ ω x, 0 ≤ s ω x) →
-      (∀ R : ℝ, 0 < R → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x ∧ s ω x ≤ R}
-          (fun _ => (1 : ℝ≥0∞)) x ∂Pr ≤ ENNReal.ofReal (C * (R ^ n + R ^ (2 * n)))) →
-      ∀ t : ℝ, t₀ ≤ t → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x}
-          (fun x => ENNReal.ofReal (Real.exp (-(c * t * s ω x ^ 2)))) x ∂Pr ≤
-        ENNReal.ofReal ((|C| * (1 + (Real.sqrt t₀ ^ n)⁻¹) *
-          ∑' j : ℕ, wt c j * ((4 : ℝ) ^ n) ^ j) * (Real.sqrt t ^ n)⁻¹) := by
+theorem gaussian_sum_le (n : ℕ) (c t₀ C : ℝ) (hc : 0 < c) (ht₀ : 0 < t₀)
+    : ∀ (X Ω : Type) [MeasurableSpace Ω] [Countable X] (Pr : Measure Ω) (s : Ω → X → ℝ)
+        (p : Ω → X → Prop),
+      (∀ x, Measurable fun ω => s ω x) → (∀ x, MeasurableSet {ω | p ω x}) → (∀ ω x, 0 ≤ s ω x)
+        → (∀ R : ℝ,
+          0 < R
+            → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x ∧ s ω x ≤ R}
+                (fun _ => (1 : ℝ≥0∞)) x ∂Pr
+              ≤ ENNReal.ofReal (C * (R ^ n + R ^ (2 * n))))
+        → ∀ t : ℝ,
+          t₀ ≤ t
+            → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x}
+                (fun x => ENNReal.ofReal (Real.exp (-(c * t * s ω x ^ 2)))) x ∂Pr
+              ≤ ENNReal.ofReal
+                ((|C| * (1 + (Real.sqrt t₀ ^ n)⁻¹) * ∑' j : ℕ, wt c j * ((4 : ℝ) ^ n) ^ j)
+                  * (Real.sqrt t ^ n)⁻¹) := by
   intro X Ω _ _ Pr s p hsm hpm hs0 hcount t ht
   have htpos : 0 < t := ht₀.trans_le ht
   have hq : 0 < Real.sqrt t := Real.sqrt_pos.mpr htpos
@@ -148,15 +153,18 @@ theorem gaussian_sum_le (n : ℕ) (c t₀ C : ℝ) (hc : 0 < c) (ht₀ : 0 < t�
   have hD0 : 0 ≤ D := by positivity
   set E : ℝ := |C| * D * B with hE
   have hE0 : 0 ≤ E := by positivity
-  have hmeas : ∀ j : ℕ, Measurable fun ω => ∑' x, Set.indicator
-      {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x := by
+  have hmeas
+      : ∀ j : ℕ,
+        Measurable fun ω =>
+          ∑' x, Set.indicator
+            {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x := by
     intro j
     refine Measurable.tsum fun x => ?_
     have hset : MeasurableSet {ω | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} :=
       (hpm x).inter (measurableSet_le (hsm x) measurable_const)
-    have heq : (fun ω => Set.indicator {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t}
-        (fun _ => (1 : ℝ≥0∞)) x) =
-        Set.indicator {ω | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) := by
+    have heq
+        : (fun ω => Set.indicator {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x)
+          = Set.indicator {ω | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) := by
       funext ω
       classical
       by_cases h : p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t
@@ -166,70 +174,84 @@ theorem gaussian_sum_le (n : ℕ) (c t₀ C : ℝ) (hc : 0 < c) (ht₀ : 0 < t�
           Set.indicator_of_notMem (show ω ∉ {ω | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} from h)]
     rw [heq]
     exact measurable_const.indicator hset
-  have hpt : ∀ ω, ∑' x, Set.indicator {x | p ω x}
-      (fun x => ENNReal.ofReal (Real.exp (-(c * t * s ω x ^ 2)))) x ≤
-      ∑' j : ℕ, ENNReal.ofReal (wt c j) * ∑' x, Set.indicator
-        {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x := by
+  have hpt
+      : ∀ ω,
+        ∑' x, Set.indicator {x | p ω x}
+            (fun x => ENNReal.ofReal (Real.exp (-(c * t * s ω x ^ 2)))) x
+          ≤ ∑' j : ℕ, ENNReal.ofReal (wt c j) * ∑' x, Set.indicator
+              {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x := by
     intro ω
-    calc _ ≤ ∑' x, ∑' j : ℕ, ENNReal.ofReal (wt c j) * Set.indicator
-            {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x :=
-          ENNReal.tsum_le_tsum fun x =>
-            gaussian_le_tsum c t hc htpos (s ω) (p ω) (hs0 ω) x
+    calc
+      _ ≤ ∑' x, ∑' j : ℕ, ENNReal.ofReal (wt c j) * Set.indicator
+          {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x :=
+        ENNReal.tsum_le_tsum fun x => gaussian_le_tsum c t hc htpos (s ω) (p ω) (hs0 ω) x
       _ = ∑' j : ℕ, ∑' x, ENNReal.ofReal (wt c j) * Set.indicator
             {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x :=
-          ENNReal.tsum_comm
+        ENNReal.tsum_comm
       _ = _ := by simp_rw [ENNReal.tsum_mul_left]
-  have hterm : ∀ j : ℕ, ENNReal.ofReal (wt c j) * ∫⁻ ω, ∑' x, Set.indicator
-      {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x ∂Pr ≤
-      ENNReal.ofReal (wt c j * ((4 : ℝ) ^ n) ^ j * E) := by
+  have hterm
+      : ∀ j : ℕ,
+        ENNReal.ofReal (wt c j)
+            * ∫⁻ ω, ∑' x, Set.indicator
+              {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x ∂Pr
+          ≤ ENNReal.ofReal (wt c j * ((4 : ℝ) ^ n) ^ j * E) := by
     intro j
     have hR : (0 : ℝ) < 2 ^ j / Real.sqrt t := by positivity
     have hr := radius_bound n j ht₀ ht
-    have hb : C * ((2 ^ j / Real.sqrt t) ^ n + (2 ^ j / Real.sqrt t) ^ (2 * n)) ≤
-        ((4 : ℝ) ^ n) ^ j * E := by
+    have hb
+        : C * ((2 ^ j / Real.sqrt t) ^ n + (2 ^ j / Real.sqrt t) ^ (2 * n))
+          ≤ ((4 : ℝ) ^ n) ^ j * E := by
       have h0 : 0 ≤ (2 ^ j / Real.sqrt t) ^ n + (2 ^ j / Real.sqrt t) ^ (2 * n) := by positivity
-      calc _ ≤ |C| * ((2 ^ j / Real.sqrt t) ^ n + (2 ^ j / Real.sqrt t) ^ (2 * n)) :=
-            mul_le_mul_of_nonneg_right (le_abs_self C) h0
-        _ ≤ |C| * (((4 : ℝ) ^ n) ^ j * (D * B)) :=
-            mul_le_mul_of_nonneg_left hr (abs_nonneg C)
+      calc
+        _ ≤ |C| * ((2 ^ j / Real.sqrt t) ^ n + (2 ^ j / Real.sqrt t) ^ (2 * n)) :=
+          mul_le_mul_of_nonneg_right (le_abs_self C) h0
+        _ ≤ |C| * (((4 : ℝ) ^ n) ^ j * (D * B)) := mul_le_mul_of_nonneg_left hr (abs_nonneg C)
         _ = _ := by rw [hE]; ring
-    calc _ ≤ ENNReal.ofReal (wt c j) * ENNReal.ofReal (((4 : ℝ) ^ n) ^ j * E) := by
-          gcongr
-          exact (hcount _ hR).trans (ENNReal.ofReal_le_ofReal hb)
-      _ = _ := by
-          rw [← ENNReal.ofReal_mul (wt_nonneg c j), mul_assoc]
-  have hsum : Summable fun j : ℕ => wt c j * ((4 : ℝ) ^ n) ^ j * E :=
-    (summable_wt hc n).mul_right E
-  calc _ ≤ ∫⁻ ω, ∑' j : ℕ, ENNReal.ofReal (wt c j) * ∑' x, Set.indicator
-          {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x ∂Pr :=
-        lintegral_mono hpt
+    calc
+      _ ≤ ENNReal.ofReal (wt c j) * ENNReal.ofReal (((4 : ℝ) ^ n) ^ j * E) := by
+        gcongr
+        exact (hcount _ hR).trans (ENNReal.ofReal_le_ofReal hb)
+      _ = _ := by rw [← ENNReal.ofReal_mul (wt_nonneg c j), mul_assoc]
+  have hsum : Summable fun j : ℕ => wt c j * ((4 : ℝ) ^ n) ^ j * E := (summable_wt hc n).mul_right E
+  calc
+    _ ≤ ∫⁻ ω, ∑' j : ℕ, ENNReal.ofReal (wt c j) * ∑' x, Set.indicator
+        {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x ∂Pr :=
+      lintegral_mono hpt
     _ = ∑' j : ℕ, ∫⁻ ω, ENNReal.ofReal (wt c j) * ∑' x, Set.indicator
           {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x ∂Pr :=
-        lintegral_tsum fun j => ((hmeas j).const_mul _).aemeasurable
+      lintegral_tsum fun j => ((hmeas j).const_mul _).aemeasurable
     _ = ∑' j : ℕ, ENNReal.ofReal (wt c j) * ∫⁻ ω, ∑' x, Set.indicator
           {x | p ω x ∧ s ω x ≤ 2 ^ j / Real.sqrt t} (fun _ => (1 : ℝ≥0∞)) x ∂Pr := by
-        congr 1; funext j
-        exact lintegral_const_mul _ (hmeas j)
-    _ ≤ ∑' j : ℕ, ENNReal.ofReal (wt c j * ((4 : ℝ) ^ n) ^ j * E) :=
-        ENNReal.tsum_le_tsum hterm
+      congr 1
+      funext j
+      exact lintegral_const_mul _ (hmeas j)
+    _ ≤ ∑' j : ℕ, ENNReal.ofReal (wt c j * ((4 : ℝ) ^ n) ^ j * E) := ENNReal.tsum_le_tsum hterm
     _ = ENNReal.ofReal (∑' j : ℕ, wt c j * ((4 : ℝ) ^ n) ^ j * E) :=
-        (ENNReal.ofReal_tsum_of_nonneg
-          (fun j => mul_nonneg (mul_nonneg (wt_nonneg c j) (by positivity)) hE0) hsum).symm
+      (ENNReal.ofReal_tsum_of_nonneg
+        (fun j => mul_nonneg (mul_nonneg (wt_nonneg c j) (by positivity)) hE0)
+        hsum).symm
     _ = _ := by
-        rw [tsum_mul_right, hE]
-        congr 1
-        ring
+      rw [tsum_mul_right, hE]
+      congr 1
+      ring
 
-theorem gaussian_sum_of_counting :
-    ∀ (n : ℕ) (c t₀ C : ℝ), 0 < c → 0 < t₀ → ∃ C' : ℝ, ∀ (X Ω : Type) [MeasurableSpace Ω]
-      [Countable X] (Pr : Measure Ω) (s : Ω → X → ℝ) (p : Ω → X → Prop),
-      (∀ x, Measurable fun ω => s ω x) → (∀ x, MeasurableSet {ω | p ω x}) →
-      (∀ ω x, 0 ≤ s ω x) →
-      (∀ R : ℝ, 0 < R → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x ∧ s ω x ≤ R}
-          (fun _ => (1 : ℝ≥0∞)) x ∂Pr ≤ ENNReal.ofReal (C * (R ^ n + R ^ (2 * n)))) →
-      ∀ t : ℝ, t₀ ≤ t → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x}
-          (fun x => ENNReal.ofReal (Real.exp (-(c * t * s ω x ^ 2)))) x ∂Pr ≤
-        ENNReal.ofReal (C' * (Real.sqrt t ^ n)⁻¹) :=
-  fun n c t₀ C hc ht₀ => ⟨_, gaussian_sum_le n c t₀ C hc ht₀⟩
+theorem gaussian_sum_of_counting
+    : ∀ (n : ℕ) (c t₀ C : ℝ),
+      0 < c → 0 < t₀
+        → ∃ C' : ℝ,
+          ∀ (X Ω : Type) [MeasurableSpace Ω] [Countable X] (Pr : Measure Ω) (s : Ω → X → ℝ)
+              (p : Ω → X → Prop),
+            (∀ x, Measurable fun ω => s ω x) → (∀ x, MeasurableSet {ω | p ω x}) → (∀ ω x, 0 ≤ s ω x)
+              → (∀ R : ℝ,
+                0 < R
+                  → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x ∧ s ω x ≤ R}
+                      (fun _ => (1 : ℝ≥0∞)) x ∂Pr
+                    ≤ ENNReal.ofReal (C * (R ^ n + R ^ (2 * n))))
+              → ∀ t : ℝ,
+                t₀ ≤ t
+                  → ∫⁻ ω, ∑' x, Set.indicator {x | p ω x}
+                      (fun x => ENNReal.ofReal (Real.exp (-(c * t * s ω x ^ 2)))) x ∂Pr
+                    ≤ ENNReal.ofReal (C' * (Real.sqrt t ^ n)⁻¹) := fun n c t₀ C hc ht₀ =>
+  ⟨_, gaussian_sum_le n c t₀ C hc ht₀⟩
 
 end GlobalTheory.CompanionTheory.SW.Core.GaussianDyadic

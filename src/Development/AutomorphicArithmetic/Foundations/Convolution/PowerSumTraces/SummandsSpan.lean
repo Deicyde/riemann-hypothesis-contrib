@@ -4,21 +4,27 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C
 
 section Generic
 
-variable {G H : Type*} [Group G] [TopologicalSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H]
-  [CompleteSpace H] (π : UnitaryRep G H) (W : Submodule ℂ H) [CompleteSpace W]
+variable
+  {G H : Type*}
+  [Group G] [TopologicalSpace G] [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+  (π : UnitaryRep G H)
+  (W : Submodule ℂ H) [CompleteSpace W]
   (hWi : π.IsInvariant W)
 
-private theorem isSummandOf_map (hWc : IsClosed (W : Set H))
-    (V : Submodule ℂ W) [CompleteSpace V] (hinv : (π.restrict W hWi).IsInvariant V)
-    (hirr : ((π.restrict W hWi).restrict V hinv).IsIrreducible) :
-    IsSummandOf π W (V.map W.subtype) := by
-  have hVc : IsClosed (V : Set W) :=
-    (completeSpace_coe_iff_isComplete.1 ‹CompleteSpace V›).isClosed
+private theorem isSummandOf_map
+    (hWc : IsClosed (W : Set H))
+    (V : Submodule ℂ W) [CompleteSpace V]
+    (hinv : (π.restrict W hWi).IsInvariant V)
+    (hirr : ((π.restrict W hWi).restrict V hinv).IsIrreducible)
+    : IsSummandOf π W (V.map W.subtype) := by
+  have hVc : IsClosed (V : Set W) := (completeSpace_coe_iff_isComplete.1 ‹CompleteSpace V›).isClosed
   have hemb : Topology.IsClosedEmbedding ((↑) : W → H) := hWc.isClosedEmbedding_subtypeVal
   refine ⟨Submodule.map_subtype_le _ _, ?_, ?_, ?_, ?_⟩
   · have h := hemb.isClosedMap _ hVc
@@ -34,8 +40,9 @@ private theorem isSummandOf_map (hWc : IsClosed (W : Set H))
   · intro V' hle hcl hinv'
     have hYc : IsClosed (((V'.comap W.subtype).comap V.subtype : Submodule ℂ V) : Set V) :=
       hcl.preimage (continuous_subtype_val.comp continuous_subtype_val)
-    have hYi : ((π.restrict W hWi).restrict V hinv).IsInvariant
-        ((V'.comap W.subtype).comap V.subtype) := fun g v hv => hinv' g _ hv
+    have hYi
+        : ((π.restrict W hWi).restrict V hinv).IsInvariant ((V'.comap W.subtype).comap V.subtype) :=
+      fun g v hv => hinv' g _ hv
     rcases hirr.2 _ hYc hYi with h | h
     · left
       rw [eq_bot_iff]
@@ -51,28 +58,29 @@ private theorem isSummandOf_map (hWc : IsClosed (W : Set H))
       have hm : (⟨w, hw⟩ : V) ∈ (V'.comap W.subtype).comap V.subtype := h ▸ Submodule.mem_top
       exact hm
 
-private theorem closure_iSup_summands (hWc : IsClosed (W : Set H))
+private theorem closure_iSup_summands
+    (hWc : IsClosed (W : Set H))
     (s : Set (Submodule ℂ W)) [∀ V : s, CompleteSpace (V : Submodule ℂ W)]
     (hinv : ∀ V : s, (π.restrict W hWi).IsInvariant V)
-    (hH : IsHilbertSum ℂ (fun V : s => (V : Submodule ℂ W)) (fun V => (V : Submodule ℂ W).subtypeₗᵢ))
-    (hirr : ∀ V : s, ((π.restrict W hWi).restrict V (hinv V)).IsIrreducible) :
-    (⨆ V : {V // IsSummandOf π W V}, V.1).topologicalClosure = W := by
-  have hmain : ∀ V : s, IsSummandOf π W ((V : Submodule ℂ W).map W.subtype) :=
-    fun V => isSummandOf_map π W hWi hWc V.1 (hinv V) (hirr V)
+    (hH
+      : IsHilbertSum ℂ (fun V : s => (V : Submodule ℂ W)) (fun V => (V : Submodule ℂ W).subtypeₗᵢ))
+    (hirr : ∀ V : s, ((π.restrict W hWi).restrict V (hinv V)).IsIrreducible)
+    : (⨆ V : {V // IsSummandOf π W V}, V.1).topologicalClosure = W := by
+  have hmain : ∀ V : s, IsSummandOf π W ((V : Submodule ℂ W).map W.subtype) := fun V =>
+    isSummandOf_map π W hWi hWc V.1 (hinv V) (hirr V)
   apply le_antisymm
   · exact Submodule.topologicalClosure_minimal _ (iSup_le fun V => V.2.le) hWc
   · set S : Submodule ℂ H := ⨆ V : {V // IsSummandOf π W V}, V.1
     have hcl : IsClosed ((S.topologicalClosure.comap W.subtype : Submodule ℂ W) : Set W) :=
       S.isClosed_topologicalClosure.preimage continuous_subtype_val
-    have hle : (⨆ V : s, (V : Submodule ℂ W)) ≤
-        S.topologicalClosure.comap W.subtype := by
+    have hle : (⨆ V : s, (V : Submodule ℂ W)) ≤ S.topologicalClosure.comap W.subtype := by
       refine iSup_le fun V w hw => ?_
       exact S.le_topologicalClosure
         (le_iSup (fun V : {V // IsSummandOf π W V} => V.1) ⟨_, hmain V⟩ ⟨w, hw, rfl⟩)
     have hspan : (⨆ V : s, (V : Submodule ℂ W)).topologicalClosure = ⊤ := by
       simpa only [Submodule.subtypeₗᵢ_toLinearMap, Submodule.range_subtype] using
-        hH.OrthogonalFamily.range_linearIsometry.symm.trans
-          (LinearMap.range_eq_top.2 hH.surjective_isometry)
+        hH.OrthogonalFamily.range_linearIsometry.symm.trans (LinearMap.range_eq_top.2
+          hH.surjective_isometry)
     have htop : (⊤ : Submodule ℂ W) ≤ S.topologicalClosure.comap W.subtype := by
       rw [← hspan]
       exact Submodule.topologicalClosure_minimal _ hle hcl
@@ -81,8 +89,8 @@ private theorem closure_iSup_summands (hWc : IsClosed (W : Set H))
 
 end Generic
 
-theorem UpperTheory.ConvolutionTheory.C.summandsSpan :
-    UpperTheory.ConvolutionTheory.C.SummandsSpan := by
+theorem UpperTheory.ConvolutionTheory.C.summandsSpan
+    : UpperTheory.ConvolutionTheory.C.SummandsSpan := by
   intro K _ _ n μ _
   obtain ⟨s, hc, hinv, hH, hirr⟩ := exists_isHilbertSum_isIrreducible_cuspidal μ
   haveI := hc

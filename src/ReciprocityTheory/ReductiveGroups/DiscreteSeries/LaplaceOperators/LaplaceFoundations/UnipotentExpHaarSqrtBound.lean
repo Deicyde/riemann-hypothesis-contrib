@@ -12,18 +12,22 @@ open ReciprocityTheory.ChartRestriction.DS.Lap.Base.N
 open Matrix Formalism.QuantumDeterminants Formalism.MainNotions.S MeasureTheory
 
 section Generic
-variable {A : Type*} [NormedRing A] [NormedAlgebra ℝ A] [FiniteDimensional ℝ A]
-  {F : ℕ → Submodule ℝ A} {L : ℕ} {st : A →ₗ[ℝ] A}
-  {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
+variable
+  {A : Type*} [NormedRing A] [NormedAlgebra ℝ A] [FiniteDimensional ℝ A]
+  {F : ℕ → Submodule ℝ A} {L : ℕ} {st : A →ₗ[ℝ] A} {E : Type*}
+  [NormedAddCommGroup E] [NormedSpace ℝ E] [FiniteDimensional ℝ E]
 
-theorem haar_of_equiv [MeasurableSpace A] [BorelSpace A] [MeasurableSpace E] [BorelSpace E]
-    (hF : IsFil F L) (hst : IsAdj F st) (μ : Measure E) [μ.IsAddHaarMeasure]
-    (e : E ≃ₗ[ℝ] lieN F st) :
-    SigmaFinite (μ.map fun x => NormedSpace.exp (e x : A)) ∧
-      (μ.map fun x => NormedSpace.exp (e x : A)) ≠ 0 ∧
-      (μ.map fun x => NormedSpace.exp (e x : A)) {x | x ∉ grpN F st} = 0 ∧
-      ∀ s ∈ grpN F st, (μ.map fun x => NormedSpace.exp (e x : A)).map (s * ·) =
-        μ.map fun x => NormedSpace.exp (e x : A) := by
+theorem haar_of_equiv
+    [MeasurableSpace A] [BorelSpace A] [MeasurableSpace E] [BorelSpace E]
+    (hF : IsFil F L) (hst : IsAdj F st)
+    (μ : Measure E) [μ.IsAddHaarMeasure]
+    (e : E ≃ₗ[ℝ] lieN F st)
+    : SigmaFinite (μ.map fun x => NormedSpace.exp (e x : A))
+      ∧ (μ.map fun x => NormedSpace.exp (e x : A)) ≠ 0
+      ∧ (μ.map fun x => NormedSpace.exp (e x : A)) {x | x ∉ grpN F st} = 0
+      ∧ ∀ s ∈ grpN F st,
+        (μ.map fun x => NormedSpace.exp (e x : A)).map (s * ·)
+          = μ.map fun x => NormedSpace.exp (e x : A) := by
   let e' := e.toContinuousLinearEquiv
   have : (Measure.map e' μ).IsAddHaarMeasure := e'.isAddHaarMeasure_map μ
   have h := exp_chart_haar hF hst (Measure.map e' μ)
@@ -33,9 +37,13 @@ theorem haar_of_equiv [MeasurableSpace A] [BorelSpace A] [MeasurableSpace E] [Bo
   exact h
 
 omit [FiniteDimensional ℝ A] in
-theorem growth_of_equiv (hF : IsFil F L) (U0 : E ≃ₗ[ℝ] A) : ∃ (C : ℝ) (M : ℕ), 0 ≤ C ∧ ∀ Y ∈ F 0,
-    ‖U0.symm Y‖ ≤ C * ‖U0.symm (NormedSpace.exp Y - 1)‖ *
-      (1 + ‖U0.symm (NormedSpace.exp Y - 1)‖) ^ M := by
+theorem growth_of_equiv (hF : IsFil F L) (U0 : E ≃ₗ[ℝ] A)
+    : ∃ (C : ℝ) (M : ℕ),
+      0 ≤ C
+        ∧ ∀ Y ∈ F 0,
+          ‖U0.symm Y‖
+            ≤ C * ‖U0.symm (NormedSpace.exp Y - 1)‖
+              * (1 + ‖U0.symm (NormedSpace.exp Y - 1)‖) ^ M := by
   obtain ⟨C, M, hC, h⟩ := hF.log_growth
   let U := U0.toContinuousLinearEquiv
   set a := ‖(U.symm : A →L[ℝ] E)‖ with ha
@@ -51,9 +59,11 @@ theorem growth_of_equiv (hF : IsFil F L) (U0 : E ≃ₗ[ℝ] A) : ∃ (C : ℝ) 
   have hs0 : 0 ≤ s := norm_nonneg _
   have h3 := h2 (NormedSpace.exp Y - 1)
   have h4 : 1 + ‖NormedSpace.exp Y - 1‖ ≤ (1 + b) * (1 + s) := by nlinarith
-  calc ‖U0.symm Y‖ ≤ a * ‖Y‖ := h1 Y
+  calc
+    ‖U0.symm Y‖
+      ≤ a * ‖Y‖ := h1 Y
     _ ≤ a * (C * ‖NormedSpace.exp Y - 1‖ * (1 + ‖NormedSpace.exp Y - 1‖) ^ M) :=
-        mul_le_mul_of_nonneg_left (h Y hY) ha0
+      mul_le_mul_of_nonneg_left (h Y hY) ha0
     _ ≤ a * (C * (b * s) * ((1 + b) * (1 + s)) ^ M) := by gcongr
     _ = _ := by rw [mul_pow]; ring
 
@@ -61,8 +71,8 @@ end Generic
 
 open scoped Matrix.Norms.Operator
 
-noncomputable def unrealL (m : ℕ) :
-    EuclideanSpace ℝ (Fin m × Fin m × Bool) ≃ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ where
+noncomputable def unrealL (m : ℕ)
+    : EuclideanSpace ℝ (Fin m × Fin m × Bool) ≃ₗ[ℝ] Matrix (Fin m) (Fin m) ℂ where
   toFun := unrealify
   invFun X := (WithLp.equiv 2 _).symm (realifyFun X)
   map_add' x y := by ext i j; apply Complex.ext <;> simp [unrealify]
@@ -72,8 +82,8 @@ noncomputable def unrealL (m : ℕ) :
     cases b <;> simp [unrealify, realifyFun]
   right_inv X := by ext i j; apply Complex.ext <;> simp [unrealify, realifyFun]
 
-theorem sqrt_hs {m : ℕ} (X : Matrix (Fin m) (Fin m) ℂ) :
-    Real.sqrt (S7.hs X) = ‖(unrealL m).symm X‖ := by
+theorem sqrt_hs {m : ℕ} (X : Matrix (Fin m) (Fin m) ℂ)
+    : Real.sqrt (S7.hs X) = ‖(unrealL m).symm X‖ := by
   rw [EuclideanSpace.norm_eq, S7.hs]
   congr 1
   simp only [Fintype.sum_prod_type, Fintype.sum_bool]
@@ -84,22 +94,27 @@ theorem sqrt_hs {m : ℕ} (X : Matrix (Fin m) (Fin m) ℂ) :
 
 variable {k r : ℕ}
 
-theorem lieE_eq : lieE (Nset k r) =
-    (lieN (levF (levB k r)) (adjH (Hpk k r))).map (unrealL _).symm.toLinearMap := by
+theorem lieE_eq
+    : lieE (Nset k r)
+      = (lieN (levF (levB k r)) (adjH (Hpk k r))).map (unrealL _).symm.toLinearMap := by
   rw [lieE, lieOf_Nset_eq, ← Submodule.span_eq (Submodule.map _ _)]
   rfl
 
-theorem unipotent_exp_haar_sqrt_bound (k r : ℕ) :
-    (∀ Y ∈ lieOf (Nset k r), ∀ Y' ∈ lieOf (Nset k r),
-      NormedSpace.exp Y = NormedSpace.exp Y' → Y = Y') ∧
-    (∀ g ∈ Nset k r, ∃ Y ∈ lieOf (Nset k r), NormedSpace.exp Y = g) ∧
-    (∀ x : lieE (Nset k r), unrealify (x : EuclideanSpace ℝ _) ∈ lieOf (Nset k r)) ∧
-    IsHaarOn (Nset k r) (haarLie (Nset k r) 1) ∧
-    ∃ (C : ℝ) (m : ℕ), 0 ≤ C ∧ ∀ Y ∈ lieOf (Nset k r),
-      Real.sqrt (S7.hs Y) ≤ C * Real.sqrt (S7.hs (NormedSpace.exp Y - 1)) *
-        (1 + Real.sqrt (S7.hs (NormedSpace.exp Y - 1))) ^ m := by
-  have hmem : ∀ x : lieE (Nset k r),
-      unrealL _ (x : EuclideanSpace ℝ _) ∈ lieN (levF (levB k r)) (adjH (Hpk k r)) := by
+theorem unipotent_exp_haar_sqrt_bound (k r : ℕ)
+    : (∀ Y ∈ lieOf (Nset k r), ∀ Y' ∈ lieOf (Nset k r),
+        NormedSpace.exp Y = NormedSpace.exp Y' → Y = Y')
+      ∧ (∀ g ∈ Nset k r, ∃ Y ∈ lieOf (Nset k r), NormedSpace.exp Y = g)
+      ∧ (∀ x : lieE (Nset k r), unrealify (x : EuclideanSpace ℝ _) ∈ lieOf (Nset k r))
+      ∧ IsHaarOn (Nset k r) (haarLie (Nset k r) 1)
+      ∧ ∃ (C : ℝ) (m : ℕ),
+        0 ≤ C
+          ∧ ∀ Y ∈ lieOf (Nset k r),
+            Real.sqrt (S7.hs Y)
+              ≤ C * Real.sqrt (S7.hs (NormedSpace.exp Y - 1))
+                * (1 + Real.sqrt (S7.hs (NormedSpace.exp Y - 1))) ^ m := by
+  have hmem
+      : ∀ x : lieE (Nset k r),
+        unrealL _ (x : EuclideanSpace ℝ _) ∈ lieN (levF (levB k r)) (adjH (Hpk k r)) := by
     rintro ⟨x, hx⟩
     rw [lieE_eq] at hx
     obtain ⟨Y, hY, rfl⟩ := hx
@@ -111,17 +126,19 @@ theorem unipotent_exp_haar_sqrt_bound (k r : ℕ) :
     rw [lieOf_Nset_eq]
     exact ⟨_, lg_spec isFilB isAdjB hg⟩
   · rw [lieOf_Nset_eq]; exact hmem x
-  · let e : lieE (Nset k r) ≃ₗ[ℝ] lieN (levF (levB k r)) (adjH (Hpk k r)) :=
-      { toFun := fun x => ⟨unrealL _ x, hmem x⟩
-        invFun := fun Y => ⟨(unrealL _).symm Y, by rw [lieE_eq]; exact ⟨Y, Y.2, rfl⟩⟩
-        map_add' := fun x y => Subtype.ext (map_add (unrealL _) _ _)
-        map_smul' := fun c x => Subtype.ext (map_smul (unrealL _) _ _)
-        left_inv := fun x => Subtype.ext ((unrealL _).symm_apply_apply _)
-        right_inv := fun Y => Subtype.ext ((unrealL _).apply_symm_apply _) }
-    have h := @haar_of_equiv (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
-      Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra _ _ _ _ _ _ _ _
-      (inferInstance : MeasurableSpace (Mt k r))
-      (inferInstance : BorelSpace (Mt k r)) _ _ isFilB isAdjB volume _ e
+  · let e : lieE (Nset k r) ≃ₗ[ℝ] lieN (levF (levB k r)) (adjH (Hpk k r)) := {
+      toFun := fun x => ⟨unrealL _ x, hmem x⟩
+      invFun := fun Y => ⟨(unrealL _).symm Y, by rw [lieE_eq]; exact ⟨Y, Y.2, rfl⟩⟩
+      map_add' := fun x y => Subtype.ext (map_add (unrealL _) _ _)
+      map_smul' := fun c x => Subtype.ext (map_smul (unrealL _) _ _)
+      left_inv := fun x => Subtype.ext ((unrealL _).symm_apply_apply _)
+      right_inv := fun Y => Subtype.ext ((unrealL _).apply_symm_apply _)
+    }
+    have h :=
+      @haar_of_equiv (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+        Matrix.linftyOpNormedRing Matrix.linftyOpNormedAlgebra _ _ _ _ _ _ _ _
+        (inferInstance : MeasurableSpace (Mt k r)) (inferInstance : BorelSpace (Mt k r)) _ _ isFilB
+        isAdjB volume _ e
     rw [← Nset_eq] at h
     rw [haarLie, one_smul]
     exact h

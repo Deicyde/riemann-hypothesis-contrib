@@ -12,7 +12,8 @@ noncomputable section
 namespace GlobalTheory.AmpleModel
 
 open AlgebraicGeometry CategoryTheory TopologicalSpace Opposite MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.LBGerm GlobalTheory.ProjSpace
 
 attribute [local instance] MvPolynomial.gradedAlgebra
@@ -30,8 +31,10 @@ def genericPt : ProjectiveSpectrum (grading K N) where
 
 instance irreducibleSpace : IrreducibleSpace (PSpace K N) := by
   have h : closure {genericPt K N} = (Set.univ : Set (ProjectiveSpectrum (grading K N))) :=
-    Set.eq_univ_of_forall fun x => (ProjectiveSpectrum.le_iff_mem_closure _ _ x).1 (show ⊥ ≤ x.asHomogeneousIdeal from bot_le)
-  have h2 : IsIrreducible (Set.univ : Set (ProjectiveSpectrum (grading K N))) := h ▸ isIrreducible_singleton.closure
+    Set.eq_univ_of_forall fun x =>
+      (ProjectiveSpectrum.le_iff_mem_closure _ _ x).1 (show ⊥ ≤ x.asHomogeneousIdeal from bot_le)
+  have h2 : IsIrreducible (Set.univ : Set (ProjectiveSpectrum (grading K N))) :=
+    h ▸ isIrreducible_singleton.closure
   exact (irreducibleSpace_def _).2 h2
 
 instance isIntegral : IsIntegral (PSpace K N) := by
@@ -45,8 +48,9 @@ theorem coord_ne_top : nonzeroLocus (coord K 1 1) ≠ ⊤ := by
   rw [nonzeroLocus_coord] at h
   have h1 : (PSpace K 1).basicOpen (ratio K 1 0 1) = chart K 1 0 :=
     basicOpen_ratioOn.trans ((congrArg (_ ⊓ ·) h).trans (inf_top_eq _))
-  have h2 : IsUnit (ratio K 1 0 1) := (PSpace K 1).toRingedSpace.isUnit_of_isUnit_germ _ _ fun x hx =>
-    ((PSpace K 1).mem_basicOpen _ x hx).1 (h1.ge hx)
+  have h2 : IsUnit (ratio K 1 0 1) :=
+    (PSpace K 1).toRingedSpace.isUnit_of_isUnit_germ _ _ fun x hx =>
+      ((PSpace K 1).mem_basicOpen _ x hx).1 (h1.ge hx)
   rw [← chartAlgEquiv_X K 1 0 ⟨1, by decide⟩] at h2
   have h3 := (h2.map (chartAlgEquiv K 1 0).symm).map constantCoeff
   rw [AlgEquiv.symm_apply_apply, constantCoeff_X] at h3

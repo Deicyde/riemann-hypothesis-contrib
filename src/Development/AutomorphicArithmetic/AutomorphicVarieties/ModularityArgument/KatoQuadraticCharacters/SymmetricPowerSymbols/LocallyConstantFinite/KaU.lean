@@ -29,8 +29,7 @@ theorem kaU : KaU := by
   · exact hlg _ _ _ ((map_ne_zero g).2 hθ) hhg
   · refine hlg _ _ _ hθ ?_
     show g.symm (h (g θ)) = _
-    have e2 : g.symm (zt X m) = zt X m := by
-      rw [RingEquiv.symm_apply_eq, hgz]
+    have e2 : g.symm (zt X m) = zt X m := by rw [RingEquiv.symm_apply_eq, hgz]
     rw [hhg, map_mul, map_pow, e2, RingEquiv.symm_apply_apply]
 
 end UpperTheory.V.Z.Kato.Sym.PE

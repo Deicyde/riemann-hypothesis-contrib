@@ -4,7 +4,8 @@ public import Formalism.JumpKernelCokernel.Statement
 
 @[expose] public section
 
-theorem Formalism.KernelCokernelLengths.filtration_exponent_holds : Formalism.KernelCokernelLengths.FExp := by
+theorem Formalism.KernelCokernelLengths.filtration_exponent_holds
+    : Formalism.KernelCokernelLengths.FExp := by
   intro R _ u π₀ q ℓ hℓ Mi h hMi
   set m := h / (ℓ - 1) with hm
   have hpos : 0 < ℓ - 1 := by omega

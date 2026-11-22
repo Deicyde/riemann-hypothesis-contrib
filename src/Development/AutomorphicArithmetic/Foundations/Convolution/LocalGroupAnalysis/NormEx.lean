@@ -12,12 +12,14 @@ open scoped ENNReal Pointwise
 
 namespace UpperTheory.ConvolutionTheory.G
 
-private theorem exists_bump {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [T2Space G] [SecondCountableTopology G] (H : Set G)
-    (hH : IsClosed H) (h1 : (1 : G) ∈ H) (hmul : ∀ a ∈ H, ∀ b ∈ H, a * b ∈ H)
-    (hinv : ∀ a ∈ H, a⁻¹ ∈ H) :
-    ∃ f : G → ℝ, Continuous f ∧ (∀ x, 0 ≤ f x) ∧ (∀ x, ∃ h ∈ H, 0 < f (h * x)) ∧
-      ∀ C : Set G, IsCompact C → ∃ D : Set G, IsCompact D ∧ ∀ g ∈ H * C, f g ≠ 0 → g ∈ D := by
+private theorem exists_bump
+    {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [T2Space G] [SecondCountableTopology G]
+    (H : Set G) (hH : IsClosed H) (h1 : (1 : G) ∈ H) (hmul : ∀ a ∈ H, ∀ b ∈ H, a * b ∈ H)
+    (hinv : ∀ a ∈ H, a⁻¹ ∈ H)
+    : ∃ f : G → ℝ,
+      Continuous f ∧ (∀ x, 0 ≤ f x) ∧ (∀ x, ∃ h ∈ H, 0 < f (h * x))
+        ∧ ∀ C : Set G, IsCompact C → ∃ D : Set G, IsCompact D ∧ ∀ g ∈ H * C, f g ≠ 0 → g ∈ D := by
   classical
   let L : CompactExhaustion G := (CompactExhaustion.choice G).shiftr
   have L0 : L 0 = ∅ := rfl
@@ -37,8 +39,10 @@ private theorem exists_bump {G : Type} [Group G] [TopologicalSpace G] [IsTopolog
     cases n with
     | zero => simp [hA0] at hxA
     | succ n => exact hx (hAO n hxA)
-  have hex : ∀ n, ∃ φ : C(G, ℝ), EqOn φ 1 ((L (n + 1) : Set G) \ O n) ∧ EqOn φ 0 (A (n - 1)) ∧
-      HasCompactSupport φ ∧ ∀ x, φ x ∈ Icc (0 : ℝ) 1 := fun n =>
+  have hex
+      : ∀ n, ∃ φ : C(G, ℝ),
+        EqOn φ 1 ((L (n + 1) : Set G) \ O n) ∧ EqOn φ 0 (A (n - 1)) ∧ HasCompactSupport φ
+          ∧ ∀ x, φ x ∈ Icc (0 : ℝ) 1 := fun n =>
     exists_continuous_one_zero_of_isCompact ((L.isCompact (n + 1)).diff (hO n)) (hA (n - 1))
       (hdisj n)
   choose φ hφ1 hφ0 hφc hφI using hex
@@ -51,8 +55,13 @@ private theorem exists_bump {G : Type} [Group G] [TopologicalSpace G] [IsTopolog
     rintro n ⟨y, hy, hyk⟩
     by_contra hn
     exact hy (hvan n k y (not_le.mp hn) (hLA k hyk))
-  refine ⟨fun x => ∑ᶠ n, φ n x, continuous_finsum (fun n => (φ n).continuous) hlf,
-    fun x => finsum_nonneg fun n => (hφI n x).1, ?_, ?_⟩
+  refine ⟨
+    fun x => ∑ᶠ n, φ n x,
+    continuous_finsum (fun n => (φ n).continuous) hlf,
+    fun x => finsum_nonneg fun n => (hφI n x).1,
+    ?_,
+    ?_
+  ⟩
   · intro x
     have hexA : ∃ m, x ∈ A m := by
       obtain ⟨k, hk⟩ := L.exists_mem_nhds x
@@ -81,8 +90,11 @@ private theorem exists_bump {G : Type} [Group G] [TopologicalSpace G] [IsTopolog
     linarith
   · intro C hC
     obtain ⟨k, hk⟩ := L.exists_superset_of_isCompact hC
-    refine ⟨⋃ n ∈ Finset.range (k + 1), tsupport (φ n),
-      (Finset.range (k + 1)).isCompact_biUnion fun n _ => hφc n, ?_⟩
+    refine ⟨
+      ⋃ n ∈ Finset.range (k + 1), tsupport (φ n),
+      (Finset.range (k + 1)).isCompact_biUnion fun n _ => hφc n,
+      ?_
+    ⟩
     intro g hg hfg
     have hgA : g ∈ A k := mul_subset_mul_left hk hg
     obtain ⟨n, hn⟩ : ∃ n, φ n g ≠ 0 := by
@@ -92,24 +104,27 @@ private theorem exists_bump {G : Type} [Group G] [TopologicalSpace G] [IsTopolog
     have hnk : n ≤ k := by
       by_contra hnk
       exact hn (hvan n k g (not_le.mp hnk) hgA)
-    exact mem_biUnion (Finset.mem_coe.mpr (Finset.mem_range.mpr (by omega)))
-      (subset_tsupport _ hn)
+    exact mem_biUnion (Finset.mem_coe.mpr (Finset.mem_range.mpr (by omega))) (subset_tsupport _ hn)
 
-private theorem exists_nrm {G T : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
-    [LocallyCompactSpace G] [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G]
-    [Group T] [TopologicalSpace T] [IsTopologicalGroup T] [MeasurableSpace T] [BorelSpace T]
-    (j : T →* G) (hj : IsClosedEmbedding j) (ν : Measure T) [ν.IsHaarMeasure]
-    [ν.IsMulRightInvariant] (f : G → ℝ) (hf : Continuous f) (hf0 : ∀ x, 0 ≤ f x)
-    (hpos : ∀ x, ∃ h ∈ Set.range j, 0 < f (h * x))
-    (hsupp : ∀ C : Set G, IsCompact C → ∃ D : Set G, IsCompact D ∧
-      ∀ g ∈ Set.range j * C, f g ≠ 0 → g ∈ D) :
-    ∃ ρ : G → NNReal, Continuous ρ ∧ IsNrm j ν (fun g => ρ g) ∧
-      ∀ C : Set G, IsCompact C → ∃ D : Set G, IsCompact D ∧
-        ∀ g ∈ Set.range j * C, ρ g ≠ 0 → g ∈ D := by
+private theorem exists_nrm
+    {G T : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [LocallyCompactSpace G]
+    [SecondCountableTopology G] [MeasurableSpace G] [BorelSpace G] [Group T] [TopologicalSpace T]
+    [IsTopologicalGroup T] [MeasurableSpace T] [BorelSpace T]
+    (j : T →* G) (hj : IsClosedEmbedding j)
+    (ν : Measure T) [ν.IsHaarMeasure] [ν.IsMulRightInvariant]
+    (f : G → ℝ)
+    (hf : Continuous f) (hf0 : ∀ x, 0 ≤ f x) (hpos : ∀ x, ∃ h ∈ Set.range j, 0 < f (h * x))
+    (hsupp : ∀ C : Set G,
+      IsCompact C → ∃ D : Set G, IsCompact D ∧ ∀ g ∈ Set.range j * C, f g ≠ 0 → g ∈ D)
+    : ∃ ρ : G → NNReal,
+      Continuous ρ ∧ IsNrm j ν (fun g => ρ g)
+        ∧ ∀ C : Set G,
+          IsCompact C → ∃ D : Set G, IsCompact D ∧ ∀ g ∈ Set.range j * C, ρ g ≠ 0 → g ∈ D := by
   have hcont2 : Continuous fun p : G × T => f (j p.2 * p.1) :=
     hf.comp ((hj.continuous.comp continuous_snd).mul continuous_fst)
-  have hk : ∀ N : Set G, IsCompact N → ∃ k : Set T, IsCompact k ∧
-      ∀ x ∈ N, ∀ t, t ∉ k → f (j t * x) = 0 := by
+  have hk
+      : ∀ N : Set G,
+        IsCompact N → ∃ k : Set T, IsCompact k ∧ ∀ x ∈ N, ∀ t, t ∉ k → f (j t * x) = 0 := by
     intro N hN
     obtain ⟨D, hD, hDs⟩ := hsupp N hN
     refine ⟨j ⁻¹' (D * N⁻¹), hj.isCompact_preimage (hD.mul hN.inv), ?_⟩
@@ -133,28 +148,37 @@ private theorem exists_nrm {G T : Type} [Group G] [TopologicalSpace G] [IsTopolo
     obtain ⟨N, hNc, hNx⟩ := exists_compact_mem_nhds x
     obtain ⟨k, hkc, hks⟩ := hk N hNc
     have : ContinuousOn I N :=
-      continuousOn_integral_of_compact_support (f := fun x t => f (j t * x)) hkc
-        hcont2.continuousOn fun p t hp ht => hks p hp t ht
+      continuousOn_integral_of_compact_support
+        (f := fun x t => f (j t * x))
+        hkc hcont2.continuousOn
+        fun p t hp ht => hks p hp t ht
     exact this.continuousAt hNx
   have hIpos : ∀ x, 0 < I x := by
     intro x
     obtain ⟨_, ⟨t, rfl⟩, ht⟩ := hpos x
-    exact (hc1 x).integral_pos_of_hasCompactSupport_nonneg_nonzero (hcs x)
-      (fun s => hf0 _) ht.ne'
+    exact (hc1 x).integral_pos_of_hasCompactSupport_nonneg_nonzero (hcs x) (fun s => hf0 _) ht.ne'
   have hIinv : ∀ s x, I (j s * x) = I x := by
     intro s x
     have := integral_mul_right_eq_self (μ := ν) (fun t => f (j t * x)) s
     simpa [I, mul_assoc] using this
-  refine ⟨fun g => Real.toNNReal (f g / I g),
-    continuous_real_toNNReal.comp (hf.div hIc fun x => (hIpos x).ne'), ⟨?_, ?_⟩, ?_⟩
-  · exact measurable_coe_nnreal_ennreal.comp
-      (continuous_real_toNNReal.comp (hf.div hIc fun x => (hIpos x).ne')).measurable
+  refine ⟨
+    fun g => Real.toNNReal (f g / I g),
+    continuous_real_toNNReal.comp (hf.div hIc fun x => (hIpos x).ne'),
+    ⟨?_, ?_⟩,
+    ?_
+  ⟩
+  · exact measurable_coe_nnreal_ennreal.comp (continuous_real_toNNReal.comp (hf.div hIc fun x =>
+      (hIpos x).ne')).measurable
   · intro x
-    have hrw : ∀ t, ((Real.toNNReal (f (j t * x) / I (j t * x)) : NNReal) : ℝ≥0∞) =
-        ENNReal.ofReal (f (j t * x) / I x) := fun t => by rw [hIinv]; rfl
+    have hrw
+        : ∀ t,
+          ((Real.toNNReal (f (j t * x) / I (j t * x)) : NNReal) : ℝ≥0∞)
+            = ENNReal.ofReal (f (j t * x) / I x) := fun t => by
+      rw [hIinv]; rfl
     simp_rw [hrw]
     rw [← ofReal_integral_eq_lintegral_ofReal ((hint x).div_const _)
-      (Filter.Eventually.of_forall fun t => div_nonneg (hf0 _) (hIpos x).le), integral_div]
+        (Filter.Eventually.of_forall fun t => div_nonneg (hf0 _) (hIpos x).le),
+      integral_div]
     rw [div_self (hIpos x).ne', ENNReal.ofReal_one]
   · intro C hC
     obtain ⟨D, hD, hDs⟩ := hsupp C hC
@@ -171,9 +195,10 @@ theorem normEx : NormEx := by
   haveI : ν.IsMulRightInvariant := by
     have h : ν.inv.IsMulRightInvariant := inferInstance
     rwa [Measure.inv_eq_self] at h
-  obtain ⟨f, hf, hf0, hpos, hsupp⟩ := exists_bump (Set.range j) hj.isClosed_range
-    ⟨1, map_one j⟩ (by rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩; exact ⟨a * b, map_mul j a b⟩)
-    (by rintro _ ⟨a, rfl⟩; exact ⟨a⁻¹, map_inv j a⟩)
+  obtain ⟨f, hf, hf0, hpos, hsupp⟩ :=
+    exists_bump (Set.range j) hj.isClosed_range ⟨1, map_one j⟩
+      (by rintro _ ⟨a, rfl⟩ _ ⟨b, rfl⟩; exact ⟨a * b, map_mul j a b⟩)
+      (by rintro _ ⟨a, rfl⟩; exact ⟨a⁻¹, map_inv j a⟩)
   exact exists_nrm j hj ν f hf hf0 hpos hsupp
 
 end UpperTheory.ConvolutionTheory.G

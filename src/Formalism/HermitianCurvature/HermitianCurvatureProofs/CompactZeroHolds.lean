@@ -23,23 +23,29 @@ theorem herm_nondeg (x : Fin (2 * r + k + 1) → ℂ) (h : ∀ u, herm (Hpk k r)
     rw [← JfS.Sym.herm_bvec]
     exact h _
   have h2 := (hpkFacts k r).2.1
-  calc x = (Hpk k r * Hpk k r) *ᵥ x := by rw [h2, one_mulVec]
+  calc
+    x = (Hpk k r * Hpk k r) *ᵥ x := by rw [h2, one_mulVec]
     _ = 0 := by rw [← mulVec_mulVec, hH, mulVec_zero]
 
-theorem lie_fix {X : B.Mat k r} {v : Fin (2 * r + k + 1) → ℂ}
-    (h : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) *ᵥ v = v) : X *ᵥ v = 0 := by
+theorem lie_fix
+    {X : B.Mat k r} {v : Fin (2 * r + k + 1) → ℂ}
+    (h : ∀ t : ℝ, NormedSpace.exp ((t : ℂ) • X) *ᵥ v = v)
+    : X *ᵥ v = 0 := by
   funext i
-  have := LieSplitPf.clm_zero (k := k) (r := r) X
-    (((ContinuousLinearMap.proj i).comp (LieSplitPf.mvL v)).restrictScalars ℝ) (v i)
-    (fun t => by
-      simp only [ContinuousLinearMap.coe_restrictScalars', ContinuousLinearMap.coe_comp', Function.comp_apply,
-        ContinuousLinearMap.proj_apply, LieSplitPf.mvL_apply]
-      rw [h t])
-  simpa only [ContinuousLinearMap.coe_restrictScalars', ContinuousLinearMap.coe_comp', Function.comp_apply,
-    ContinuousLinearMap.proj_apply, LieSplitPf.mvL_apply, Pi.zero_apply] using this
+  have :=
+    LieSplitPf.clm_zero (k := k) (r := r) X
+      (((ContinuousLinearMap.proj i).comp (LieSplitPf.mvL v)).restrictScalars ℝ) (v i)
+      (fun t => by
+        simp only [ContinuousLinearMap.coe_restrictScalars', ContinuousLinearMap.coe_comp',
+          Function.comp_apply, ContinuousLinearMap.proj_apply, LieSplitPf.mvL_apply]
+        rw [h t])
+  simpa only [ContinuousLinearMap.coe_restrictScalars', ContinuousLinearMap.coe_comp',
+      Function.comp_apply, ContinuousLinearMap.proj_apply, LieSplitPf.mvL_apply, Pi.zero_apply]
+    using this
 
-theorem lieW_facts {z : Fin (2 * r + k + 1) → ℂ} {X : B.Mat k r} (hX : X ∈ JfS.lieOf (UWset k r z)) :
-    B.inLie k r X ∧ (∀ a : Fin r, X *ᵥ bvec (eI k r a) = 0 ∧ X *ᵥ bvec (esI k r a) = 0) ∧ X *ᵥ z = 0 := by
+theorem lieW_facts {z : Fin (2 * r + k + 1) → ℂ} {X : B.Mat k r} (hX : X ∈ JfS.lieOf (UWset k r z))
+    : B.inLie k r X ∧ (∀ a : Fin r, X *ᵥ bvec (eI k r a) = 0 ∧ X *ᵥ bvec (esI k r a) = 0)
+      ∧ X *ᵥ z = 0 := by
   refine ⟨?_, fun a => ⟨?_, ?_⟩, ?_⟩
   · have := LieSplitPf.lieHpk_of (k := k) (r := r) (X := X) (fun t => (hX t).1)
     exact this
@@ -65,16 +71,19 @@ theorem psiW_inj {w : Fin (2 * r + k + 1) → ℂ} (hw : inWb k r w) (h : psiW k
     rw [← e, h]
     rfl
 
-theorem inWb_sum {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) (h : ∀ i ∈ s, inWb k r (f i)) :
-    inWb k r (∑ i ∈ s, f i) := by
+theorem inWb_sum
+    {ι : Type*} (s : Finset ι) (f : ι → Fin (2 * r + k + 1) → ℂ) (h : ∀ i ∈ s, inWb k r (f i))
+    : inWb k r (∑ i ∈ s, f i) := by
   intro p hp
   rw [Finset.sum_apply]
   exact Finset.sum_eq_zero (fun i hi => h i hi p hp)
 
-theorem perp_zero {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z)
+theorem perp_zero
+    {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z)
     {Bs : Fin k → Fin (2 * r + k + 1) → ℂ} (hB : Q.IsFrameOf k r [z] Bs)
-    (y : Fin (2 * r + k + 1) → ℂ) (hy : inWb k r y) (hyz : herm (Hpk k r) y z = 0)
-    (hyB : ∀ b, herm (Hpk k r) y (Bs b) = 0) : y = 0 := by
+    (y : Fin (2 * r + k + 1) → ℂ)
+    (hy : inWb k r y) (hyz : herm (Hpk k r) y z = 0) (hyB : ∀ b, herm (Hpk k r) y (Bs b) = 0)
+    : y = 0 := by
   by_contra hy0
   have hyy : herm (Hpk k r) y y ≠ 0 := by
     intro h
@@ -126,8 +135,10 @@ theorem perp_zero {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < 
       simpa only [map_smul] using hg
     have := congrArg (fun x => herm (Hpk k r) x (f o)) hsum
     simp only [JfS.Sym.herm_sum_left, JfS.Sym.herm_smul_left, JfS.Sym.herm_zero_left] at this
-    rw [Finset.sum_eq_single o (fun o' _ hne => by rw [hfo o' o hne, mul_zero])
-      (fun h => absurd (Finset.mem_univ o) h)] at this
+    rw [Finset.sum_eq_single o
+        (fun o' _ hne => by rw [hfo o' o hne, mul_zero])
+        (fun h => absurd (Finset.mem_univ o) h)]
+      at this
     exact (mul_eq_zero.1 this).resolve_right (hfs o)
   have hc := hli.fintype_card_le_finrank
   simp only [Fintype.card_option, Fintype.card_fin, Module.finrank_fin_fun] at hc
@@ -135,25 +146,28 @@ theorem perp_zero {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < 
 
 section lieW
 
-variable {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z)
+variable
+  {z : Fin (2 * r + k + 1) → ℂ} (hz : inWb k r z) (hT : 0 < Tz k r z)
   {Bs : Fin k → Fin (2 * r + k + 1) → ℂ} (hB : Q.IsFrameOf k r [z] Bs)
   {X : B.Mat k r} (hX : X ∈ JfS.lieOf (UWset k r z))
 include hz hT hB hX
 
-theorem col_in (w : Fin (2 * r + k + 1) → ℂ) :
-    X *ᵥ w = ∑ a, herm (Hpk k r) (X *ᵥ w) (Bs a) • Bs a := by
+theorem col_in (w : Fin (2 * r + k + 1) → ℂ)
+    : X *ᵥ w = ∑ a, herm (Hpk k r) (X *ᵥ w) (Bs a) • Bs a := by
   obtain ⟨hL, hE, hXz⟩ := lieW_facts hX
   have hBz : ∀ b, herm (Hpk k r) (Bs b) z = 0 := fun b => hB.2.2 b z (List.mem_singleton_self z)
   have hXw : inWb k r (X *ᵥ w) := by
     intro i hi
     rcases hi with hi | hi
     · have e : i = eI k r ⟨i.val, hi⟩ := Fin.ext rfl
-      rw [e, ← JfS.Sym.herm_es (X *ᵥ w) ⟨i.val, hi⟩, JfS.Sym.herm_skew hL, (hE _).2, JfS.Sym.herm_zero_right, neg_zero]
+      rw [e, ← JfS.Sym.herm_es (X *ᵥ w) ⟨i.val, hi⟩, JfS.Sym.herm_skew hL, (hE _).2,
+        JfS.Sym.herm_zero_right, neg_zero]
     · have e : i = esI k r ⟨2 * r + k - i.val, by omega⟩ := by
         apply Fin.ext
         simp only [esI]
         omega
-      rw [e, ← JfS.Sym.herm_e (X *ᵥ w) ⟨2 * r + k - i.val, by omega⟩, JfS.Sym.herm_skew hL, (hE _).1, JfS.Sym.herm_zero_right, neg_zero]
+      rw [e, ← JfS.Sym.herm_e (X *ᵥ w) ⟨2 * r + k - i.val, by omega⟩, JfS.Sym.herm_skew hL,
+        (hE _).1, JfS.Sym.herm_zero_right, neg_zero]
   set q := X *ᵥ w - ∑ a, herm (Hpk k r) (X *ᵥ w) (Bs a) • Bs a with hq
   have hqW : inWb k r q :=
     JfS.Sym.inWb_sub hXw (inWb_sum _ _ (fun a _ => JfS.Sym.inWb_smul _ (hB.1 a)))
@@ -168,8 +182,8 @@ theorem col_in (w : Fin (2 * r + k + 1) → ℂ) :
     simp [JfS.Sym.herm_smul_left, hB.2.1]
   exact sub_eq_zero.1 (perp_zero hz hT hB q hqW hqz hqB)
 
-theorem row_in (v : Fin (2 * r + k + 1) → ℂ) :
-    X *ᵥ v = ∑ b, herm (Hpk k r) v (Bs b) • (X *ᵥ Bs b) := by
+theorem row_in (v : Fin (2 * r + k + 1) → ℂ)
+    : X *ᵥ v = ∑ b, herm (Hpk k r) v (Bs b) • (X *ᵥ Bs b) := by
   obtain ⟨hL, -, -⟩ := lieW_facts hX
   set y := v - ∑ b, herm (Hpk k r) v (Bs b) • Bs b with hy
   have hyB : ∀ a, herm (Hpk k r) y (Bs a) = 0 := by
@@ -189,21 +203,21 @@ theorem row_in (v : Fin (2 * r + k + 1) → ℂ) :
 
 end lieW
 
-theorem sum_mulVec' {ι : Type*} (s : Finset ι) (M : ι → B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ) :
-    (∑ i ∈ s, M i) *ᵥ v = ∑ i ∈ s, M i *ᵥ v := by
+theorem sum_mulVec' {ι : Type*} (s : Finset ι) (M : ι → B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ)
+    : (∑ i ∈ s, M i) *ᵥ v = ∑ i ∈ s, M i *ᵥ v := by
   induction s using Finset.cons_induction with
   | empty => simp
   | cons a s ha ih => rw [Finset.sum_cons, Finset.sum_cons, add_mulVec, ih]
 
-theorem smul_mulVec'' (c : ℂ) (M : B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ) :
-    (c • M) *ᵥ v = c • (M *ᵥ v) := by
+theorem smul_mulVec'' (c : ℂ) (M : B.Mat k r) (v : Fin (2 * r + k + 1) → ℂ)
+    : (c • M) *ᵥ v = c • (M *ᵥ v) := by
   funext i
-  simp only [mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply, Finset.mul_sum, mul_assoc]
+  simp only [mulVec, dotProduct, Matrix.smul_apply, smul_eq_mul, Pi.smul_apply, Finset.mul_sum,
+    mul_assoc]
 
-theorem trace_vmv (ξ : B.Mat k r) (a b : Fin (2 * r + k + 1) → ℂ) :
-    Matrix.trace (ξ * vecMulVec a (star (Hpk k r *ᵥ b))) = herm (Hpk k r) (ξ *ᵥ a) b := by
-  have hb : star (Hpk k r *ᵥ b) = star b ᵥ* Hpk k r := by
-    rw [star_mulVec, JfS.Sym.hpk_conjT]
+theorem trace_vmv (ξ : B.Mat k r) (a b : Fin (2 * r + k + 1) → ℂ)
+    : Matrix.trace (ξ * vecMulVec a (star (Hpk k r *ᵥ b))) = herm (Hpk k r) (ξ *ᵥ a) b := by
+  have hb : star (Hpk k r *ᵥ b) = star b ᵥ* Hpk k r := by rw [star_mulVec, JfS.Sym.hpk_conjT]
   rw [hb, herm, dotProduct_mulVec]
   simp only [Matrix.trace, Matrix.diag, Matrix.mul_apply, vecMulVec_apply, dotProduct, mulVec]
   refine Finset.sum_congr rfl (fun i _ => ?_)
@@ -211,8 +225,8 @@ theorem trace_vmv (ξ : B.Mat k r) (a b : Fin (2 * r + k + 1) → ℂ) :
   refine Finset.sum_congr rfl (fun j _ => ?_)
   ring
 
-theorem unitB_eq (Bs : Fin k → Fin (2 * r + k + 1) → ℂ) (a b : Fin k) :
-    Q.unitB (Hpk k r) Bs a b = vecMulVec (Bs a) (star (Hpk k r *ᵥ Bs b)) := by
+theorem unitB_eq (Bs : Fin k → Fin (2 * r + k + 1) → ℂ) (a b : Fin k)
+    : Q.unitB (Hpk k r) Bs a b = vecMulVec (Bs a) (star (Hpk k r *ᵥ Bs b)) := by
   ext p q
   simp only [Q.unitB, Matrix.of_apply, vecMulVec_apply]
   congr 1
@@ -222,8 +236,8 @@ theorem unitB_eq (Bs : Fin k → Fin (2 * r + k + 1) → ℂ) (a b : Fin k) :
   rw [JfS.Sym.hpk_symm]
   ring
 
-theorem cmp_eq (Ξ : B.Mat k r) (Bs : Fin k → Fin (2 * r + k + 1) → ℂ) (a b : Fin k) :
-    cmp Ξ Bs a b = herm (Hpk k r) (Ξ *ᵥ Bs a) (Bs b) := by
+theorem cmp_eq (Ξ : B.Mat k r) (Bs : Fin k → Fin (2 * r + k + 1) → ℂ) (a b : Fin k)
+    : cmp Ξ Bs a b = herm (Hpk k r) (Ξ *ᵥ Bs a) (Bs b) := by
   show Matrix.trace (Ξ * Q.unitB (Hpk k r) Bs a b) = _
   rw [unitB_eq, trace_vmv]
 
@@ -235,8 +249,8 @@ theorem le_two_pow (n : ℕ) : n ≤ 2 ^ n := by
     rw [pow_succ]
     omega
 
-theorem skew_nil_zero {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (hs : Mᴴ = -M) (N : ℕ) (hN : M ^ N = 0) :
-    M = 0 := by
+theorem skew_nil_zero {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (hs : Mᴴ = -M) (N : ℕ) (hN : M ^ N = 0)
+    : M = 0 := by
   have key : ∀ j : ℕ, M ^ (2 ^ j) = 0 → M = 0 := by
     intro j
     induction j with
@@ -245,14 +259,15 @@ theorem skew_nil_zero {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (hs : Mᴴ = -M
       intro h
       apply ih
       have hc : (M ^ 2 ^ j)ᴴ * M ^ 2 ^ j = 0 := by
-        rw [Matrix.conjTranspose_pow, hs, neg_pow, mul_assoc, ← pow_add, ← two_mul, ← pow_succ', h, mul_zero]
+        rw [Matrix.conjTranspose_pow, hs, neg_pow, mul_assoc, ← pow_add, ← two_mul, ← pow_succ', h,
+          mul_zero]
       exact Matrix.conjTranspose_mul_self_eq_zero.1 hc
   exact key N (pow_eq_zero_of_le (le_two_pow N) hN)
 
-theorem cp_pow {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ)
-    (h : ∀ j, 1 ≤ j → j ≤ m → M.charpoly.coeff (m - j) = 0) : M ^ m = 0 := by
-  have hdeg : M.charpoly.natDegree = m := by
-    rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+theorem cp_pow
+    {m : ℕ} (M : Matrix (Fin m) (Fin m) ℂ) (h : ∀ j, 1 ≤ j → j ≤ m → M.charpoly.coeff (m - j) = 0)
+    : M ^ m = 0 := by
+  have hdeg : M.charpoly.natDegree = m := by rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
   have hcp : M.charpoly = Polynomial.X ^ m := by
     ext n
     rw [Polynomial.coeff_X_pow]
@@ -275,8 +290,8 @@ theorem compact_zero_holds : CmpZero := by
   have hnil := cp_pow (cmp Ξ Bs) hcp
   have hskew : (cmp Ξ Bs)ᴴ = -(cmp Ξ Bs) := by
     ext a b
-    rw [Matrix.conjTranspose_apply, Matrix.neg_apply, cmp_eq, cmp_eq, JfS.Sym.herm_skew hΞ (Bs a) (Bs b),
-      JfS.Sym.herm_swap (Bs a), neg_neg]
+    rw [Matrix.conjTranspose_apply, Matrix.neg_apply, cmp_eq, cmp_eq,
+      JfS.Sym.herm_skew hΞ (Bs a) (Bs b), JfS.Sym.herm_swap (Bs a), neg_neg]
   have hzero := skew_nil_zero _ hskew k hnil
   have hc : ∀ a b, herm (Hpk k r) (Ξ *ᵥ Bs a) (Bs b) = 0 := by
     intro a b
@@ -299,8 +314,8 @@ theorem compact_zero_holds : CmpZero := by
     rw [JfS.Sym.mat_eq_mulVec_bvec X i j, JfS.Sym.mat_eq_mulVec_bvec Y i j, hv]
   have htr : Matrix.trace (Ξ * X) = 0 := by
     rw [hXY, hY]
-    simp only [Finset.mul_sum, Matrix.trace_sum, Matrix.mul_smul, Matrix.trace_smul, trace_vmv, hc, smul_zero,
-      Finset.sum_const_zero]
+    simp only [Finset.mul_sum, Matrix.trace_sum, Matrix.mul_smul, Matrix.trace_smul, trace_vmv, hc,
+      smul_zero, Finset.sum_const_zero]
   rw [htr, Complex.zero_re]
 
 end

@@ -14,8 +14,8 @@ namespace PI.UnitaryGroupMassFormula.LCG
 def oLat (K : Type) [Field K] [NumberField K] (k : ℕ) : Submodule (𝓞 K) (Fin k → K) :=
   LinearMap.range (LinearMap.compLeft (Algebra.linearMap (𝓞 K) K) (Fin k))
 
-def dualL {K : Type} [Field K] [NumberField K] {k : ℕ} (X : Submodule (𝓞 K) (Fin k → K)) :
-    Submodule (𝓞 K) (Fin k → K) where
+def dualL {K : Type} [Field K] [NumberField K] {k : ℕ} (X : Submodule (𝓞 K) (Fin k → K))
+    : Submodule (𝓞 K) (Fin k → K) where
   carrier := {t | ∀ s ∈ X, s ⬝ᵥ t ∈ (algebraMap (𝓞 K) K).range}
   add_mem' := by
     intro a b ha hb s hs
@@ -37,18 +37,20 @@ def dualL {K : Type} [Field K] [NumberField K] {k : ℕ} (X : Submodule (𝓞 K)
     exact h1
 
 def DualIdx : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] (k : ℕ) (X Y : Submodule (𝓞 K) (Fin k → K)), X ≤ Y →
-    X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0 →
-    (dualL Y).toAddSubgroup.relIndex (dualL X).toAddSubgroup ≠ 0 ∧
-      (dualL Y).toAddSubgroup.relIndex (dualL X).toAddSubgroup ≤ X.toAddSubgroup.relIndex Y.toAddSubgroup
+  ∀ (K : Type) [Field K] [NumberField K] (k : ℕ) (X Y : Submodule (𝓞 K) (Fin k → K)),
+    X ≤ Y → X.toAddSubgroup.relIndex Y.toAddSubgroup ≠ 0
+      → (dualL Y).toAddSubgroup.relIndex (dualL X).toAddSubgroup ≠ 0
+        ∧ (dualL Y).toAddSubgroup.relIndex (dualL X).toAddSubgroup
+          ≤ X.toAddSubgroup.relIndex Y.toAddSubgroup
 
 def DetIdx : Prop :=
-  ∀ (K : Type) [Field K] [NumberField K] (k : ℕ) (N : Matrix (Fin k) (Fin k) K) (Q D : AddSubgroup (Fin k → K)),
-    (oLat K k).toAddSubgroup ≤ Q → (oLat K k).toAddSubgroup.relIndex Q ≠ 0 →
-    D ≤ (oLat K k).toAddSubgroup → D.relIndex (oLat K k).toAddSubgroup ≠ 0 →
-    (∀ r ∈ D, ∃ s ∈ Q, s ᵥ* N = r) →
-    |((Algebra.norm ℚ N.det : ℚ) : ℝ)| ≤
-      ((oLat K k).toAddSubgroup.relIndex Q : ℝ) * (D.relIndex (oLat K k).toAddSubgroup : ℝ)
+  ∀ (K : Type) [Field K] [NumberField K] (k : ℕ) (N : Matrix (Fin k) (Fin k) K)
+      (Q D : AddSubgroup (Fin k → K)),
+    (oLat K k).toAddSubgroup ≤ Q → (oLat K k).toAddSubgroup.relIndex Q ≠ 0
+      → D ≤ (oLat K k).toAddSubgroup → D.relIndex (oLat K k).toAddSubgroup ≠ 0
+      → (∀ r ∈ D, ∃ s ∈ Q, s ᵥ* N = r)
+      → |((Algebra.norm ℚ N.det : ℚ) : ℝ)|
+        ≤ ((oLat K k).toAddSubgroup.relIndex Q : ℝ) * (D.relIndex (oLat K k).toAddSubgroup : ℝ)
 
 def IndexOf : Prop := DualIdx → DetIdx → IndexIneq
 

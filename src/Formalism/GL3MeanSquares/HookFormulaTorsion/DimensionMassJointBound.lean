@@ -58,13 +58,15 @@ theorem local_index_formula : LocalColumnIndex := by
   refine ⟨⟨_, hb1, hb2, ?_⟩, ⟨_, hc1, hc2, ?_⟩⟩
   · rw [cardGeneralLinear F k, div_eq_iff (pow_ne_zero _ hg0)]
     ring
-  · rw [card_general_linear_group F, (exponent_square_identities k s A hA3).1, (exponent_square_identities k s A hA3).2, hA1]
-    have hexp : (k + 2 * s + 1) * (k + 2 * s + 1) = (2 * (s * k) + s + 2 * (s * s)) + A +
-        (A + 3 * k + 1 + 2 * (s * k) + 3 * s + 2 * (s * s)) := by
+  · rw [card_general_linear_group F, (exponent_square_identities k s A hA3).1,
+      (exponent_square_identities k s A hA3).2, hA1]
+    have hexp
+        : (k + 2 * s + 1) * (k + 2 * s + 1)
+          = (2 * (s * k) + s + 2 * (s * s)) + A
+            + (A + 3 * k + 1 + 2 * (s * k) + 3 * s + 2 * (s * s)) := by
       rw [← sq, odd_square_expansion, hA3]
       ring
-    rw [hexp, pow_add, pow_add,
-      div_eq_iff (mul_ne_zero (pow_ne_zero _ hg0) (pow_ne_zero _ hg0))]
+    rw [hexp, pow_add, pow_add, div_eq_iff (mul_ne_zero (pow_ne_zero _ hg0) (pow_ne_zero _ hg0))]
     ring
 
 private lemma prod_two_factor_split (f E : ℕ) (G : Fin 2 → ℝ) (t : Fin 2 → ℕ → ℝ) :
@@ -105,17 +107,23 @@ theorem index_ratio_bound : IndexRatioComparison := by
   have hX0 : 0 < g₁ * g₂ := by nlinarith
   have hc : (0 : ℝ) < ((2 : ℝ) ^ (2 * f))⁻¹ := by positivity
   have hPpos : 0 < ∏ i, ∏ ρ ∈ range f, θ i ρ := lt_of_lt_of_le hc hPl
-  have hN : (g₁ * g₂) ^ ((f : ℝ) * ((2 * s + 2 : ℕ) : ℝ) * (2 * (k : ℝ) + ((2 * s + 2 : ℕ) : ℝ) - 1) / 2) =
-      (g₁ * g₂) ^ ((2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f) := by
+  have hN
+      : (g₁ * g₂)
+          ^ ((f : ℝ) * ((2 * s + 2 : ℕ) : ℝ) * (2 * (k : ℝ) + ((2 * s + 2 : ℕ) : ℝ) - 1) / 2)
+        = (g₁ * g₂) ^ ((2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f) := by
     rw [← Real.rpow_natCast]
     congr 1
     push_cast
     ring
-  have hratio : Isig / Ipi = (g₁ * g₂) ^ ((2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f) *
-      ((∏ i, ∏ ρ ∈ range f, θ' i ρ) / ∏ i, ∏ ρ ∈ range f, θ i ρ) := by
+  have hratio
+      : Isig / Ipi
+        = (g₁ * g₂) ^ ((2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f)
+          * ((∏ i, ∏ ρ ∈ range f, θ' i ρ) / ∏ i, ∏ ρ ∈ range f, θ i ρ) := by
     rw [hIsig, hIpi]
-    have e : (A + 3 * k + 1 + 2 * (s * k) + 3 * s + 2 * (s * s)) * f =
-        (A + k) * f + (2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f := by ring
+    have e
+        : (A + 3 * k + 1 + 2 * (s * k) + 3 * s + 2 * (s * s)) * f
+          = (A + k) * f + (2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f := by
+      ring
     rw [e, pow_add, mul_assoc, mul_div_mul_left _ _ (pow_pos hX0 _).ne', mul_div_assoc]
   rw [hN, hratio]
   have hXN : 0 ≤ (g₁ * g₂) ^ ((2 * (s * k) + 2 * (s * s) + 3 * s + 2 * k + 1) * f) :=
@@ -161,7 +169,8 @@ theorem least_noncompact_gap : LeastNoncompactGap := by
       nlinarith [mul_le_mul_of_nonneg_right h1 hh]
   · have hj' : ¬ j < k - 1 := by omega
     simp only [rowPar, hi, hj', if_false]
-    have hst := increments_sum_lower_bound m b h₀ hb (i - (k - 1)) (j - (k - 1) - (i - (k - 1))) (by omega)
+    have hst :=
+      increments_sum_lower_bound m b h₀ hb (i - (k - 1)) (j - (k - 1) - (i - (k - 1))) (by omega)
     have e : i - (k - 1) + (j - (k - 1) - (i - (k - 1))) = j - (k - 1) := by omega
     rw [e] at hst
     have h1 : (1 : ℝ) ≤ ((j - (k - 1) - (i - (k - 1)) : ℕ) : ℝ) := by

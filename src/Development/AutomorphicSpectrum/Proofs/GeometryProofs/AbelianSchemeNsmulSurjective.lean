@@ -12,15 +12,16 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PowerMapFlat
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open scoped CategoryTheory.Obj CategoryTheory.MonObj
 
 namespace GlobalTheory.CompanionTheory.Ar.Approx
 
-theorem surjective_pow_of_isAbelianScheme :
-    ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A], IsAbelianScheme A → ∀ n : ℕ, n ≠ 0 →
-      Surjective ((𝟙 A) ^ n : A ⟶ A).left := by
+theorem surjective_pow_of_isAbelianScheme
+    : ∀ (K : Type) [Field K] (A : Over (Sp K)) [GrpObj A],
+      IsAbelianScheme A → ∀ n : ℕ, n ≠ 0 → Surjective ((𝟙 A) ^ n : A ⟶ A).left := by
   intro K _ A _ hA n hn
   haveI : Smooth A.hom := IsAbelianScheme.smooth (self := hA)
   haveI : IsProper A.hom := IsAbelianScheme.proper (self := hA)

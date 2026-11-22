@@ -9,16 +9,20 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.CoefQExpa
 
 @[expose] public section
 
-open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af Filter Topology
+open UpperHalfPlane Complex MeasureTheory CongruenceSubgroup GlobalTheory.EisM UpperTheory.V.Af
+  Filter Topology
 open scoped MatrixGroups Real ComplexConjugate Manifold ModularForm
 
 namespace GlobalTheory.EisM
 
 open Asymptotics Function
 
-theorem isBigO_qParam_pow_of_qExpansion_coeff_zero {F : Type*} [FunLike F ℍ ℂ] {Γ : Subgroup (GL (Fin 2) ℝ)} {k : ℤ} [ModularFormClass F Γ k]
-    (hΓ : (1 : ℝ) ∈ Γ.strictPeriods) (f : F) (m : ℕ) (h : ∀ n < m, (qExpansion 1 f).coeff n = 0) :
-    (f : ℍ → ℂ) =O[atImInfty] fun τ : ℍ => Periodic.qParam 1 τ ^ m := by
+theorem isBigO_qParam_pow_of_qExpansion_coeff_zero
+    {F : Type*} [FunLike F ℍ ℂ]
+    {Γ : Subgroup (GL (Fin 2) ℝ)} {k : ℤ} [ModularFormClass F Γ k]
+    (hΓ : (1 : ℝ) ∈ Γ.strictPeriods)
+    (f : F) (m : ℕ) (h : ∀ n < m, (qExpansion 1 f).coeff n = 0)
+    : (f : ℍ → ℂ) =O[atImInfty] fun τ : ℍ => Periodic.qParam 1 τ ^ m := by
   have ha := ModularFormClass.analyticAt_cuspFunction_zero f one_pos hΓ
   have h1 : (m : ℕ∞) ≤ analyticOrderAt (cuspFunction 1 f) 0 := by
     rw [natCast_le_analyticOrderAt_iff_iteratedDeriv_eq_zero ha]
@@ -35,12 +39,15 @@ theorem isBigO_qParam_pow_of_qExpansion_coeff_zero {F : Type*} [FunLike F ℍ �
   refine h3.congr' ?_ EventuallyEq.rfl
   filter_upwards [ht.eventually hfg] with τ hτ
   rw [SlashInvariantFormClass.eq_cuspFunction f τ hΓ one_ne_zero] at hτ
-  rw [hτ]; simp
+  rw [hτ]
+  simp
 
-theorem qExpansion_coeff_zero_of_isBigO_qParam_pow {F : Type*} [FunLike F ℍ ℂ] {Γ : Subgroup (GL (Fin 2) ℝ)} {k : ℤ} [ModularFormClass F Γ k]
-    (hΓ : (1 : ℝ) ∈ Γ.strictPeriods) (f : F) (m : ℕ)
-    (h : (f : ℍ → ℂ) =O[atImInfty] fun τ : ℍ => Periodic.qParam 1 τ ^ m) :
-    ∀ n < m, (qExpansion 1 f).coeff n = 0 := by
+theorem qExpansion_coeff_zero_of_isBigO_qParam_pow
+    {F : Type*} [FunLike F ℍ ℂ]
+    {Γ : Subgroup (GL (Fin 2) ℝ)} {k : ℤ} [ModularFormClass F Γ k]
+    (hΓ : (1 : ℝ) ∈ Γ.strictPeriods)
+    (f : F) (m : ℕ) (h : (f : ℍ → ℂ) =O[atImInfty] fun τ : ℍ => Periodic.qParam 1 τ ^ m)
+    : ∀ n < m, (qExpansion 1 f).coeff n = 0 := by
   have ha := ModularFormClass.analyticAt_cuspFunction_zero f one_pos hΓ
   have h1 : (m : ℕ∞) ≤ analyticOrderAt (cuspFunction 1 f) 0 := by
     by_contra hlt
@@ -50,8 +57,9 @@ theorem qExpansion_coeff_zero_of_isBigO_qParam_pow {F : Type*} [FunLike F ℍ �
     have hjm : j < m := by exact_mod_cast hlt
     obtain ⟨g, hg, hg0, hfg⟩ := ha.analyticOrderAt_eq_natCast.mp hj.symm
     have ht := qParam_tendsto_atImInfty (h := 1) one_pos
-    have h2 : (fun τ : ℍ => g (Periodic.qParam 1 τ)) =O[atImInfty]
-        fun τ : ℍ => Periodic.qParam 1 τ ^ (m - j) := by
+    have h2
+        : (fun τ : ℍ => g (Periodic.qParam 1 τ)) =O[atImInfty]
+          fun τ : ℍ => Periodic.qParam 1 τ ^ (m - j) := by
       have h3 := (isBigO_refl (fun τ : ℍ => (Periodic.qParam 1 τ ^ j)⁻¹) atImInfty).mul h
       refine h3.congr' ?_ ?_
       · filter_upwards [ht.eventually hfg] with τ hτ
@@ -70,39 +78,53 @@ theorem qExpansion_coeff_zero_of_isBigO_qParam_pow {F : Type*} [FunLike F ℍ �
   intro n hn
   rw [qExpansion_coeff, h1 n hn, mul_zero]
 
-theorem modularFormNorm_isBigO_self_atImInfty {F : Type*} [FunLike F ℍ ℂ] {Γ : Subgroup (GL (Fin 2) ℝ)} {k : ℤ} [ModularFormClass F Γ k]
-    [Γ.IsArithmetic] (f : F) : (ModularForm.norm 𝒮ℒ f : ℍ → ℂ) =O[atImInfty] (f : ℍ → ℂ) := by
+theorem modularFormNorm_isBigO_self_atImInfty
+    {F : Type*} [FunLike F ℍ ℂ]
+    {Γ : Subgroup (GL (Fin 2) ℝ)} {k : ℤ} [ModularFormClass F Γ k] [Γ.IsArithmetic]
+    (f : F)
+    : (ModularForm.norm 𝒮ℒ f : ℍ → ℂ) =O[atImInfty] (f : ℍ → ℂ) := by
   classical
   let := Fintype.ofFinite (𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ))
-  have hb : ∀ q : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ),
-      SlashInvariantForm.quotientFunc (k := k) f q =O[atImInfty] fun _ => (1 : ℂ) := by
+  have hb
+      : ∀ q : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ),
+        SlashInvariantForm.quotientFunc (k := k) f q =O[atImInfty] fun _ => (1 : ℂ) := by
     refine Quotient.forall.mpr fun ⟨r, hr⟩ => ?_
     have hc : IsCusp OnePoint.infty 𝒮ℒ := Fact.out
-    have := (ModularForm.translate f r⁻¹).bdd_at_cusps' (c := OnePoint.infty)
-      (by simpa using hc.of_isFiniteRelIndex_conj hr)
+    have :=
+      (ModularForm.translate f r⁻¹).bdd_at_cusps' (c := OnePoint.infty)
+        (by simpa using hc.of_isFiniteRelIndex_conj hr)
     rw [OnePoint.isBoundedAt_infty_iff] at this
     have h2 : (ModularForm.translate f r⁻¹ : ℍ → ℂ) =O[atImInfty] (1 : ℍ → ℝ) := this
     refine IsBigO.trans h2 ?_
     exact IsBigO.of_bound 1 (by simp)
-  have h1 : (∏ q ∈ Finset.univ.erase (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ)),
-      SlashInvariantForm.quotientFunc (k := k) f q) =O[atImInfty] fun _ => (1 : ℂ) := by
-    have := IsBigO.finsetProd (s := Finset.univ.erase (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ))) (fun q _ => hb q)
+  have h1
+      : (∏ q ∈ Finset.univ.erase (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ)),
+        SlashInvariantForm.quotientFunc (k := k) f q) =O[atImInfty] fun _ => (1 : ℂ) := by
+    have :=
+      IsBigO.finsetProd (s := Finset.univ.erase (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ))) (fun q _ => hb q)
     simpa [Finset.prod_fn] using this
   have h2 := (isBigO_refl (f : ℍ → ℂ) atImInfty).mul h1
   simp only [mul_one] at h2
   refine h2.congr_left fun τ => ?_
-  have h3 := congr_fun (Finset.mul_prod_erase Finset.univ (fun q => SlashInvariantForm.quotientFunc (k := k) f q)
-    (Finset.mem_univ (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ)))) τ
+  have h3 :=
+    congr_fun
+      (Finset.mul_prod_erase Finset.univ
+        (fun q => SlashInvariantForm.quotientFunc (k := k) f q)
+        (Finset.mem_univ (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ))))
+      τ
   rw [ModularForm.coe_norm]
   have h4 : SlashInvariantForm.quotientFunc (k := k) f (⟦1⟧ : 𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ)) = f := by simp
   rw [h4, Pi.mul_apply] at h3
   convert h3
 
-theorem exists_sturmBound_modularForm_arithmetic {Γ : Subgroup (GL (Fin 2) ℝ)} [Γ.IsArithmetic] (hΓ : (1 : ℝ) ∈ Γ.strictPeriods) (k : ℤ) :
-    ∃ m : ℕ, ∀ f : ModularForm Γ k, (∀ n < m, (qExpansion 1 f).coeff n = 0) → f = 0 := by
+theorem exists_sturmBound_modularForm_arithmetic
+    {Γ : Subgroup (GL (Fin 2) ℝ)} [Γ.IsArithmetic] (hΓ : (1 : ℝ) ∈ Γ.strictPeriods) (k : ℤ)
+    : ∃ m : ℕ, ∀ f : ModularForm Γ k, (∀ n < m, (qExpansion 1 f).coeff n = 0) → f = 0 := by
   refine ⟨(k * Nat.card (𝒮ℒ ⧸ (Γ.subgroupOf 𝒮ℒ))).toNat / 12 + 1, fun f hf => ?_⟩
-  have h1 := qExpansion_coeff_zero_of_isBigO_qParam_pow one_mem_strictPeriods_SL (ModularForm.norm 𝒮ℒ f) _
-    ((modularFormNorm_isBigO_self_atImInfty f).trans (isBigO_qParam_pow_of_qExpansion_coeff_zero hΓ f _ hf))
+  have h1 :=
+    qExpansion_coeff_zero_of_isBigO_qParam_pow one_mem_strictPeriods_SL (ModularForm.norm 𝒮ℒ f) _
+      ((modularFormNorm_isBigO_self_atImInfty f).trans
+        (isBigO_qParam_pow_of_qExpansion_coeff_zero hΓ f _ hf))
   have h2 : ModularForm.norm 𝒮ℒ f = 0 := by
     apply ModularForm.sturm_bound_levelOne
     refine lt_of_lt_of_le ?_ (PowerSeries.nat_le_order _ _ h1)
@@ -111,8 +133,9 @@ theorem exists_sturmBound_modularForm_arithmetic {Γ : Subgroup (GL (Fin 2) ℝ)
   ext τ
   simpa using congr_fun h2 τ
 
-theorem sturm_coef_zero : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N), 0 < L → N ∣ L →
-    ∃ B : ℕ, ∀ a, MF k L (ch ε) a → (∀ n < B, a n = 0) → a = 0 := by
+theorem sturm_coef_zero
+    : ∀ (k L N : ℕ) (ε : DirichletCharacter ℂ N),
+      0 < L → N ∣ L → ∃ B : ℕ, ∀ a, MF k L (ch ε) a → (∀ n < B, a n = 0) → a = 0 := by
   intro k L N ε hL hN
   have hΓ : (1 : ℝ) ∈ (Gamma1 L : Subgroup (GL (Fin 2) ℝ)).strictPeriods := by
     simp [strictPeriods_Gamma1]

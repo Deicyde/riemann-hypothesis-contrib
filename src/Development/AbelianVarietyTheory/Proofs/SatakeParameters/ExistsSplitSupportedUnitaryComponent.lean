@@ -5,7 +5,10 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.IsIntOv
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix GlobalTheory.SplitHecke
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.NTheta Formalism.IndefR.Datum IsDedekindDomain NumberField Matrix
+  GlobalTheory.SplitHecke
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -15,29 +18,35 @@ section Generic
 
 variable {A : Type} [CommRing A] {n : ℕ}
 
-def adj (c : A →+* A) (G H X : Matrix (Fin n) (Fin n) A) : Matrix (Fin n) (Fin n) A := H * (X.map c)ᵀ * G
+def adj (c : A →+* A) (G H X : Matrix (Fin n) (Fin n) A) : Matrix (Fin n) (Fin n) A :=
+  H * (X.map c)ᵀ * G
 
 variable {c : A →+* A} {G H : Matrix (Fin n) (Fin n) A}
 
-theorem adj_add (X Y : Matrix (Fin n) (Fin n) A) : adj c G H (X + Y) = adj c G H X + adj c G H Y := by
-  simp only [adj, Matrix.map_add _ (map_add c), Matrix.transpose_add, Matrix.mul_add, Matrix.add_mul]
+theorem adj_add (X Y : Matrix (Fin n) (Fin n) A)
+    : adj c G H (X + Y) = adj c G H X + adj c G H Y := by
+  simp only [adj, Matrix.map_add _ (map_add c), Matrix.transpose_add, Matrix.mul_add,
+    Matrix.add_mul]
 
-theorem adj_smul (a : A) (X : Matrix (Fin n) (Fin n) A) : adj c G H (a • X) = c a • adj c G H X := by
+theorem adj_smul (a : A) (X : Matrix (Fin n) (Fin n) A)
+    : adj c G H (a • X) = c a • adj c G H X := by
   have : (a • X).map c = c a • X.map c := by
     ext i j
     simp
   simp only [adj, this, Matrix.transpose_smul, Matrix.mul_smul, Matrix.smul_mul]
 
 theorem adj_one (h : G * H = 1) : adj c G H 1 = 1 := by
-  rw [adj, Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one, Matrix.mul_one, mul_eq_one_comm.1 h]
+  rw [adj, Matrix.map_one _ (map_zero _) (map_one _), Matrix.transpose_one, Matrix.mul_one,
+    mul_eq_one_comm.1 h]
 
-theorem adj_mul (h : G * H = 1) (X Y : Matrix (Fin n) (Fin n) A) :
-    adj c G H (X * Y) = adj c G H Y * adj c G H X := by
+theorem adj_mul (h : G * H = 1) (X Y : Matrix (Fin n) (Fin n) A)
+    : adj c G H (X * Y) = adj c G H Y * adj c G H X := by
   simp only [adj, Matrix.map_mul, Matrix.transpose_mul, Matrix.mul_assoc]
   rw [← Matrix.mul_assoc G H, h, Matrix.one_mul]
 
-theorem adj_adj (hc : ∀ a, c (c a) = a) (h : G * H = 1) (hG : (G.map c)ᵀ = G) (X : Matrix (Fin n) (Fin n) A) :
-    adj c G H (adj c G H X) = X := by
+theorem adj_adj
+    (hc : ∀ a, c (c a) = a) (h : G * H = 1) (hG : (G.map c)ᵀ = G) (X : Matrix (Fin n) (Fin n) A)
+    : adj c G H (adj c G H X) = X := by
   have h' : H * G = 1 := mul_eq_one_comm.1 h
   have h1 : (H.map c)ᵀ * G = 1 := by
     conv_lhs => rw [← hG]
@@ -46,12 +55,16 @@ theorem adj_adj (hc : ∀ a, c (c a) = a) (h : G * H = 1) (hG : (G.map c)ᵀ = G
   have h2 : (((X.map c)ᵀ).map c)ᵀ = X := by
     ext i j
     exact hc _
-  simp only [adj, Matrix.map_mul, Matrix.transpose_mul, h2, hG, Matrix.mul_assoc, h1, Matrix.mul_one]
+  simp only [adj, Matrix.map_mul, Matrix.transpose_mul, h2, hG, Matrix.mul_assoc, h1,
+    Matrix.mul_one]
   rw [← Matrix.mul_assoc, h', Matrix.one_mul]
 
-theorem exists_unitary (hc : ∀ a, c (c a) = a) (h : G * H = 1) (hG : (G.map c)ᵀ = G) {e : A} (he : e * e = e)
-    (he' : e * c e = 0) (M M' : Matrix (Fin n) (Fin n) A) (hM : e • (M' * M) = e • (1 : Matrix (Fin n) (Fin n) A)) :
-    ∃ g : GL (Fin n) A, (g.1.map c)ᵀ * G * g.1 = G ∧ (e + c e) • (g.1 - 1) = g.1 - 1 ∧ e • g.1 = e • M := by
+theorem exists_unitary
+    (hc : ∀ a, c (c a) = a) (h : G * H = 1) (hG : (G.map c)ᵀ = G)
+    {e : A} (he : e * e = e) (he' : e * c e = 0)
+    (M M' : Matrix (Fin n) (Fin n) A) (hM : e • (M' * M) = e • (1 : Matrix (Fin n) (Fin n) A))
+    : ∃ g : GL (Fin n) A,
+      (g.1.map c)ᵀ * G * g.1 = G ∧ (e + c e) • (g.1 - 1) = g.1 - 1 ∧ e • g.1 = e • M := by
   have hee : c e * c e = c e := by rw [← map_mul, he]
   have he2 : c e * e = 0 := by rw [mul_comm, he']
   set f := 1 - e - c e with hf
@@ -63,13 +76,15 @@ theorem exists_unitary (hc : ∀ a, c (c a) = a) (h : G * H = 1) (hG : (G.map c)
   have h5 : f * f = f := by linear_combination f * hf - h3 - h4
   set g := e • M + c e • adj c G H M' + f • (1 : Matrix (Fin n) (Fin n) A) with hg
   have hadj : adj c G H g = e • M' + c e • adj c G H M + f • (1 : Matrix (Fin n) (Fin n) A) := by
-    rw [hg, adj_add, adj_add, adj_smul, adj_smul, adj_smul, adj_adj hc h hG, adj_one h, hc, hcf, add_comm (c e • _)]
+    rw [hg, adj_add, adj_add, adj_smul, adj_smul, adj_smul, adj_adj hc h hG, adj_one h, hc, hcf,
+      add_comm (c e • _)]
   have hM' : c e • (adj c G H M * adj c G H M') = c e • (1 : Matrix (Fin n) (Fin n) A) := by
     rw [← adj_mul h, ← adj_smul, hM, adj_smul, adj_one h]
   have hinv : adj c G H g * g = 1 := by
     rw [hadj, hg]
-    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_add, smul_smul, he, he', hee, he2,
-      h1, h2, h3, h4, h5, zero_smul, add_zero, zero_add, Matrix.mul_one, hM, hM']
+    simp only [Matrix.add_mul, Matrix.mul_add, Matrix.smul_mul, Matrix.mul_smul, smul_add,
+      smul_smul, he, he', hee, he2, h1, h2, h3, h4, h5, zero_smul, add_zero, zero_add,
+      Matrix.mul_one, hM, hM']
     rw [← add_smul, ← add_smul, hf]
     simp
   refine ⟨⟨g, adj c G H g, mul_eq_one_comm.1 hinv, hinv⟩, ?_, ?_, ?_⟩
@@ -110,7 +125,8 @@ theorem gram_det_ne (V : HSp D) : V.gram.det ≠ 0 := by
       set_option synthInstance.maxHeartbeats 100000 in
         rw [Module.Basis.equivFun_symm_apply, map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
-      rw [map_smul, smul_eq_mul, mul_comm]; rfl
+      rw [map_smul, smul_eq_mul, mul_comm]
+      rfl
     rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, h2, h1, smul_zero]
   exact V.frame.equivFun.symm.injective (this.trans (map_zero _).symm)
 
@@ -123,22 +139,32 @@ theorem gram_conj (V : HSp D) : ((V.gram.map (incA D)).map (cA D))ᵀ = V.gram.m
   have h : star (V.gram j i) = V.gram i j := LinearMap.isSymm_def.1 V.herm _ _
   exact congrArg (incA D) h
 
-theorem exists_suppAt_rho_eq : ∀ {D : D7} (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v), IsSplitIdem D e → Chart e v π → ∀ (V : HSp D) (β x : GL (Fin V.rank) (Fv D.host.F v)), ∃ g : GA D V, SuppAt e V g ∧ rho V π β g = x := by
+theorem exists_suppAt_rho_eq
+    : ∀ {D : D7} (e : AE D) (v : HeightOneSpectrum (𝓞 D.host.F)) (π : AE D →+* Fv D.host.F v),
+      IsSplitIdem D e → Chart e v π
+        → ∀ (V : HSp D) (β x : GL (Fin V.rank) (Fv D.host.F v)), ∃ g : GA D V,
+          SuppAt e V g ∧ rho V π β g = x := by
   intro D e v π he hπ V β x
   obtain ⟨he1, he2, -⟩ := he
   obtain ⟨hs, hk, -, -⟩ := hπ
   have key : ∀ a b, π a = π b ↔ e * a = e * b := fun a b => by
     rw [← sub_eq_zero, ← map_sub, hk, mul_sub, sub_eq_zero]
-  have keyM : ∀ X Y : Matrix (Fin V.rank) (Fin V.rank) (AE D), X.map π = Y.map π ↔ e • X = e • Y := fun X Y => by
+  have keyM
+      : ∀ X Y : Matrix (Fin V.rank) (Fin V.rank) (AE D),
+        X.map π = Y.map π ↔ e • X = e • Y := fun X Y => by
     simp only [← Matrix.ext_iff, Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, key]
-  have lift : ∀ Z : Matrix (Fin V.rank) (Fin V.rank) (Fv D.host.F v),
-      ∃ X : Matrix (Fin V.rank) (Fin V.rank) (AE D), X.map π = Z := fun Z => by
+  have lift
+      : ∀ Z : Matrix (Fin V.rank) (Fin V.rank) (Fv D.host.F v),
+        ∃ X : Matrix (Fin V.rank) (Fin V.rank) (AE D),
+          X.map π = Z := fun Z => by
     choose X hX using fun i j => hs (Z i j)
     exact ⟨Matrix.of X, Matrix.ext hX⟩
   obtain ⟨M, hM⟩ := lift (β * x * β⁻¹).1
   obtain ⟨M', hM'⟩ := lift ((β * x * β⁻¹)⁻¹).1
-  obtain ⟨g, h1, h2, h3⟩ := exists_unitary (c := cA D) cA_cA (gram_mul_inv V) (gram_conj V) he1 he2 M M' (by
-    rw [← keyM, Matrix.map_mul, hM, hM', Units.inv_mul, Matrix.map_one _ (map_zero _) (map_one _)])
+  obtain ⟨g, h1, h2, h3⟩ :=
+    exists_unitary (c := cA D) cA_cA (gram_mul_inv V) (gram_conj V) he1 he2 M M' (by
+      rw [← keyM, Matrix.map_mul, hM, hM', Units.inv_mul,
+        Matrix.map_one _ (map_zero _) (map_one _)])
   let g' : HR (AF D.host.F) D.sp.cm.sig V.gram := ⟨g, h1⟩
   refine ⟨g', fun i j => congrFun (congrFun h2 i) j, Units.ext ?_⟩
   refine (rho_val V π β g').trans ?_

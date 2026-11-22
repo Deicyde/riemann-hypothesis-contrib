@@ -12,24 +12,27 @@ namespace GlobalTheory.BSP.LiftProj
 
 variable {A : Type} [CommRing A] {n : Type} [Fintype n] [DecidableEq n]
 
-theorem mul_mem {I J : Ideal A} {x y : Matrix n n A} (hx : ∀ i j, x i j ∈ I) (hy : ∀ i j, y i j ∈ J)
-    (i j : n) : (x * y) i j ∈ I * J := by
+theorem mul_mem
+    {I J : Ideal A} {x y : Matrix n n A} (hx : ∀ i j, x i j ∈ I) (hy : ∀ i j, y i j ∈ J) (i j : n)
+    : (x * y) i j ∈ I * J := by
   rw [Matrix.mul_apply]
   exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_mul (hx i k) (hy k j)
 
-theorem mul_mem_right {I : Ideal A} {x : Matrix n n A} (y : Matrix n n A) (hx : ∀ i j, x i j ∈ I)
-    (i j : n) : (x * y) i j ∈ I := by
+theorem mul_mem_right
+    {I : Ideal A} {x : Matrix n n A} (y : Matrix n n A) (hx : ∀ i j, x i j ∈ I) (i j : n)
+    : (x * y) i j ∈ I := by
   rw [Matrix.mul_apply]
   exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_right _ _ (hx i k)
 
-theorem mul_mem_left {I : Ideal A} {y : Matrix n n A} (x : Matrix n n A) (hy : ∀ i j, y i j ∈ I)
-    (i j : n) : (x * y) i j ∈ I := by
+theorem mul_mem_left
+    {I : Ideal A} {y : Matrix n n A} (x : Matrix n n A) (hy : ∀ i j, y i j ∈ I) (i j : n)
+    : (x * y) i j ∈ I := by
   rw [Matrix.mul_apply]
   exact Ideal.sum_mem _ fun k _ => Ideal.mul_mem_left _ _ (hy k j)
 
-theorem exists_idem (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (x : Matrix n n A)
-    (hx : ∀ i j, (x * x - x) i j ∈ 𝔞) :
-    ∃ e : Matrix n n A, e * e = e ∧ ∀ i j, (e - x) i j ∈ 𝔞 := by
+theorem exists_idem
+    (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (x : Matrix n n A) (hx : ∀ i j, (x * x - x) i j ∈ 𝔞)
+    : ∃ e : Matrix n n A, e * e = e ∧ ∀ i j, (e - x) i j ∈ 𝔞 := by
   let f : ℕ → Matrix n n A := fun k => Nat.rec x (fun _ y => 3 * (y * y) - 2 * (y * y * y)) k
   have f0 : f 0 = x := rfl
   have fs : ∀ k, f (k + 1) = 3 * (f k * f k) - 2 * (f k * f k * f k) := fun k => rfl
@@ -38,8 +41,9 @@ theorem exists_idem (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (x : Matrix n n A)
     induction k with
     | zero => simpa [f0] using hx
     | succ k ih =>
-      have e : f (k + 1) * f (k + 1) - f (k + 1) =
-          ((f k * f k - f k) * (f k * f k - f k)) * (4 * (f k * f k) - 4 * f k - 3) := by
+      have e
+          : f (k + 1) * f (k + 1) - f (k + 1)
+            = ((f k * f k - f k) * (f k * f k - f k)) * (4 * (f k * f k) - 4 * f k - 3) := by
         rw [fs]; noncomm_ring
       intro i j
       rw [e]
@@ -49,8 +53,7 @@ theorem exists_idem (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (x : Matrix n n A)
       exact Ideal.pow_le_pow_right (by omega) this
   have h2 : ∀ k i j, (f (k + 1) - f k) i j ∈ 𝔞 ^ (k + 1) := by
     intro k i j
-    have e : f (k + 1) - f k = (f k * f k - f k) * (1 - 2 * f k) := by
-      rw [fs]; noncomm_ring
+    have e : f (k + 1) - f k = (f k * f k - f k) * (1 - 2 * f k) := by rw [fs]; noncomm_ring
     rw [e]
     exact mul_mem_right _ (h1 k) i j
   have h3 : ∀ k m, k ≤ m → ∀ i j, (f m - f k) i j ∈ 𝔞 ^ (k + 1) := by
@@ -64,9 +67,12 @@ theorem exists_idem (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (x : Matrix n n A)
       exact add_mem (Ideal.pow_le_pow_right (by omega) (h2 m i j)) (ih i j)
   have h4 : ∀ i j, ∃ L : A, ∀ k, f k i j - L ∈ 𝔞 ^ k := by
     intro i j
-    obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := 𝔞) (fun k => f k i j) (fun {k m} hkm => by
-      rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, ← neg_mem_iff, neg_sub]
-      exact Ideal.pow_le_pow_right (Nat.le_succ k) (h3 k m hkm i j))
+    obtain ⟨L, hL⟩ :=
+      IsPrecomplete.prec' (I := 𝔞)
+        (fun k => f k i j)
+        (fun {k m} hkm => by
+          rw [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, ← neg_mem_iff, neg_sub]
+          exact Ideal.pow_le_pow_right (Nat.le_succ k) (h3 k m hkm i j))
     refine ⟨L, fun k => ?_⟩
     have := hL k
     rwa [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top] at this
@@ -91,40 +97,44 @@ theorem exists_idem (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (x : Matrix n n A)
     rw [pow_one] at b
     exact sub_mem a b
 
-theorem exists_idem_lift (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (y : Matrix n n (A ⧸ 𝔞))
-    (hy : y * y = y) :
-    ∃ e : Matrix n n A, e * e = e ∧ e.map (Ideal.Quotient.mk 𝔞) = y := by
+theorem exists_idem_lift
+    (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (y : Matrix n n (A ⧸ 𝔞)) (hy : y * y = y)
+    : ∃ e : Matrix n n A, e * e = e ∧ e.map (Ideal.Quotient.mk 𝔞) = y := by
   choose g hg using Ideal.Quotient.mk_surjective (I := 𝔞)
-  have hxy : (y.map g).map (Ideal.Quotient.mk 𝔞) = y := by
-    ext i j; simp [hg]
-  obtain ⟨e, he, hex⟩ := exists_idem 𝔞 (y.map g) fun i j => by
-    rw [← Ideal.Quotient.eq_zero_iff_mem]
-    have : (Ideal.Quotient.mk 𝔞).mapMatrix (y.map g * y.map g - y.map g) = 0 := by
-      rw [map_sub, map_mul, RingHom.mapMatrix_apply, hxy, hy, sub_self]
-    exact congrFun (congrFun this i) j
+  have hxy : (y.map g).map (Ideal.Quotient.mk 𝔞) = y := by ext i j; simp [hg]
+  obtain ⟨e, he, hex⟩ :=
+    exists_idem 𝔞 (y.map g) fun i j => by
+      rw [← Ideal.Quotient.eq_zero_iff_mem]
+      have : (Ideal.Quotient.mk 𝔞).mapMatrix (y.map g * y.map g - y.map g) = 0 := by
+        rw [map_sub, map_mul, RingHom.mapMatrix_apply, hxy, hy, sub_self]
+      exact congrFun (congrFun this i) j
   refine ⟨e, he, ?_⟩
   ext i j
   have := (Ideal.Quotient.eq).2 (hex i j)
   simpa [hg] using this
 
-theorem exists_lift : ∀ (A : Type) [CommRing A] (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (N : Type)
-    [AddCommGroup N] [Module (A ⧸ 𝔞) N] [Module.Finite (A ⧸ 𝔞) N] [Module.Projective (A ⧸ 𝔞) N],
-    ∃ (P : Type) (_ : AddCommGroup P) (_ : Module A P) (_ : Module.Finite A P)
-      (_ : Module.Projective A P) (u : P →ₛₗ[Ideal.Quotient.mk 𝔞] N), SemiBC u := by
+theorem exists_lift
+    : ∀ (A : Type) [CommRing A] (𝔞 : Ideal A) [IsAdicComplete 𝔞 A] (N : Type) [AddCommGroup N]
+        [Module (A ⧸ 𝔞) N] [Module.Finite (A ⧸ 𝔞) N] [Module.Projective (A ⧸ 𝔞) N],
+      ∃ (P : Type) (_ : AddCommGroup P) (_ : Module A P) (_ : Module.Finite A P)
+          (_ : Module.Projective A P) (u : P →ₛₗ[Ideal.Quotient.mk 𝔞] N),
+        SemiBC u := by
   intro A _ 𝔞 _ N _ _ _ _
   obtain ⟨n, p, hp⟩ := Module.Finite.exists_fin' (A ⧸ 𝔞) N
   obtain ⟨s, hs⟩ := Module.projective_lifting_property p LinearMap.id hp
   have hs' : ∀ z, p (s z) = z := fun z => LinearMap.congr_fun hs z
-  obtain ⟨e, he, hey⟩ := exists_idem_lift 𝔞 (LinearMap.toMatrix' (s ∘ₗ p)) (by
-    rw [← LinearMap.toMatrix'_comp]
-    congr 1
-    ext1 z
-    ext1
-    simp [hs'])
-  let red : (Fin n → A) →ₛₗ[Ideal.Quotient.mk 𝔞] (Fin n → A ⧸ 𝔞) :=
-    { toFun := fun z i => Ideal.Quotient.mk 𝔞 (z i)
-      map_add' := fun a b => by ext i; simp
-      map_smul' := fun a b => by ext i; simp }
+  obtain ⟨e, he, hey⟩ :=
+    exists_idem_lift 𝔞 (LinearMap.toMatrix' (s ∘ₗ p)) (by
+      rw [← LinearMap.toMatrix'_comp]
+      congr 1
+      ext1 z
+      ext1
+      simp [hs'])
+  let red : (Fin n → A) →ₛₗ[Ideal.Quotient.mk 𝔞] (Fin n → A ⧸ 𝔞) := {
+    toFun := fun z i => Ideal.Quotient.mk 𝔞 (z i)
+    map_add' := fun a b => by ext i; simp
+    map_smul' := fun a b => by ext i; simp
+  }
   have red_surj : Function.Surjective red := fun z => by
     choose g hg using Ideal.Quotient.mk_surjective (I := 𝔞)
     exact ⟨fun i => g (z i), funext fun i => hg (z i)⟩

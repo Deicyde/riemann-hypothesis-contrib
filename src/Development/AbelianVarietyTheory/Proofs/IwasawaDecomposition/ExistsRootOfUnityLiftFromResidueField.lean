@@ -6,15 +6,22 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.FrobeniusOrbits Formalism.L2.Host Formalism.L2.NT Formalism.L2.TwC Formalism.L2.NC NumberField IsDedekindDomain Polynomial GlobalTheory.HeightCounting
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.FrobeniusOrbits Formalism.L2.Host
+  Formalism.L2.NT Formalism.L2.TwC Formalism.L2.NC NumberField IsDedekindDomain Polynomial
+  GlobalTheory.HeightCounting
 
 noncomputable section
 
 namespace GlobalTheory.TameLift
 
-theorem valuation_sub_lt_of_redThrough_eq {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {g : ℕ} [Fact g.Prime]
-    (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) {x y : Ω} (hx : x ∈ A) (hy : y ∈ A)
-    (h : redThrough A κ x = redThrough A κ y) : A.valuation (x - y) < 1 := by
+theorem valuation_sub_lt_of_redThrough_eq
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {g : ℕ} [Fact g.Prime]
+    (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g)
+    {x y : Ω} (hx : x ∈ A) (hy : y ∈ A) (h : redThrough A κ x = redThrough A κ y)
+    : A.valuation (x - y) < 1 := by
   unfold redThrough at h
   rw [dite_eq_left hx, dite_eq_left hy] at h
   have h1 := κ.injective h
@@ -23,10 +30,16 @@ theorem valuation_sub_lt_of_redThrough_eq {Ω : Type} [Field Ω] (A : ValuationS
   have := (A.valuation_lt_one_iff _).1 h2
   simpa using this
 
-theorem exists_lift : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
-    (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)), IsPlaceOver (F := E) A v → ∀ (g : ℕ) [Fact g.Prime],
-    ((g : ℕ) : 𝓞 E) ∈ v.asIdeal → ∀ (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) (m : ℕ), 0 < m → ¬ g ∣ m →
-    ∀ c : Formalism.CyclotomicNorms.Fbar g, c ^ m = 1 → ∃ μ : Ω, μ ^ m = 1 ∧ redThrough A κ μ = c := by
+theorem exists_lift
+    : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+        (A : ValuationSubring Ω) (v : HeightOneSpectrum (𝓞 E)),
+      IsPlaceOver (F := E) A v
+        → ∀ (g : ℕ) [Fact g.Prime],
+          ((g : ℕ) : 𝓞 E) ∈ v.asIdeal
+            → ∀ (κ : IsLocalRing.ResidueField A ≃+* Formalism.CyclotomicNorms.Fbar g) (m : ℕ),
+              0 < m → ¬ g ∣ m
+                → ∀ c : Formalism.CyclotomicNorms.Fbar g,
+                  c ^ m = 1 → ∃ μ : Ω, μ ^ m = 1 ∧ redThrough A κ μ = c := by
   intro E Ω _ _ _ _ _ A v hA g hg hgv κ m hm hgm c hc
   have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have : CharZero Ω := charZero_of_injective_algebraMap (algebraMap E Ω).injective
@@ -65,8 +78,9 @@ theorem exists_lift : ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Al
     · intro l hl hlm hrl
       rw [← redThrough_pow A κ hζA, ← redThrough_one A κ] at hrl
       have hv := valuation_sub_lt_of_redThrough_eq A κ (pow_mem hζA l) (one_mem A) hrl
-      have heq : ζ ^ l = 1 := eq_of_pow_eq_one A hvm
-        (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow]) (one_pow _) hv
+      have heq : ζ ^ l = 1 :=
+        eq_of_pow_eq_one A hvm (by rw [← pow_mul, mul_comm, pow_mul, hζ.pow_eq_one, one_pow])
+          (one_pow _) hv
       exact hζ.pow_ne_one_of_pos_of_lt hl.ne' hlm heq
   obtain ⟨i, -, hi⟩ := hr.eq_pow_of_pow_eq_one hc
   refine ⟨ζ ^ i, ?_, ?_⟩

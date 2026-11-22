@@ -15,7 +15,9 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PDivGroupFor
 
 @[expose] public section
 
-open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta GlobalTheory.PDivLat
+open MvPowerSeries GlobalTheory GlobalTheory.Katz GlobalTheory.QLog GlobalTheory.PDivGroup
+  GlobalTheory.Sandwich GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta
+  GlobalTheory.PDivLat
 
 set_option autoImplicit false
 
@@ -278,10 +280,24 @@ private lemma theta_eval_eq_tate_pt_ev_of_isEval {p : ℕ} {O B : Type} [CommRin
   exact ((_root_.GlobalTheory.CEval.continuous_eval p B B (Fin d) z hz).2 E hE).2.2
     O O θ θ _ (fun b => by simp) hE' s
 
-
 set_option autoImplicit false in
 open MvPowerSeries in
-theorem _root_.GlobalTheory.PeriodExists.main : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C] (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬IsUnit (p : O)] [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O], v.Integers O → ∀ (ε : PreTilt O p) (hε : _root_.GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.IsPrimitiveSystem ε), ∀ F : _root_.GlobalTheory.QLog.BFrame ε, ∀ (G : _root_.GlobalTheory.PDivGroup p O) (d : ℕ) (c : _root_.GlobalTheory.QLog.Chart G d) (μ' : Fin d → MvPowerSeries (Fin d ⊕ Fin d) F.B), _root_.GlobalTheory.QLog.IsLift F.θ μ' → (∀ i, map F.θ (μ' i) = c.μ i) → ∀ (f : MvPowerSeries (Fin d) F.Q) (t : G.Tate), _root_.GlobalTheory.QLog.QL μ' ⊤ f → ∃! y : F.B, c.HasPeriod F.θ t f y := by
+theorem _root_.GlobalTheory.PeriodExists.main
+    : ∀ (p : ℕ) [Fact p.Prime] (C : Type) [Field C] [IsAlgClosed C] [CharZero C]
+        (v : Valuation C NNReal) (O : Type) [CommRing O] [Algebra O C] [Fact ¬ IsUnit (p : O)]
+        [IsAdicComplete (Ideal.span {(p : O)}) O] [IsDomain O],
+      v.Integers O
+        → ∀ (ε : PreTilt O p)
+            (hε
+              : _root_.GlobalTheory.IndefiniteRowSideFullHecke.EpsilonPairingZeta.IsPrimitiveSystem
+                ε),
+          ∀ F : _root_.GlobalTheory.QLog.BFrame ε,
+            ∀ (G : _root_.GlobalTheory.PDivGroup p O) (d : ℕ)
+                (c : _root_.GlobalTheory.QLog.Chart G d)
+                (μ' : Fin d → MvPowerSeries (Fin d ⊕ Fin d) F.B),
+              _root_.GlobalTheory.QLog.IsLift F.θ μ' → (∀ i, map F.θ (μ' i) = c.μ i)
+                → ∀ (f : MvPowerSeries (Fin d) F.Q) (t : G.Tate),
+                  _root_.GlobalTheory.QLog.QL μ' ⊤ f → ∃! y : F.B, c.HasPeriod F.θ t f y := by
   intro p _ C _ _ _ v O _ _ _ _ _ hv ε hε F G d c μ' hlift hmap f t hf
   have hex : ∃ y, c.HasPeriod F.θ t f y := by
     classical
@@ -290,76 +306,101 @@ theorem _root_.GlobalTheory.PeriodExists.main : ∀ (p : ℕ) [Fact p.Prime] (C 
       hF.complete
     obtain ⟨hf0, hlin, hcob⟩ := hf
     have hD : _root_.GlobalTheory.QLog.DIn (⊤ : Ideal F.B) f := by
-      obtain ⟨s, hs⟩ := (_root_.GlobalTheory.QLog.In.top_iff
-        (B := F.B)).1 hcob
-      have hadd : ∀ k, subst (Sum.elim (X : Fin d → MvPowerSeries (Fin d) F.B)
-          (0 : Fin d → MvPowerSeries (Fin d) F.B)) (μ' k) = X k := fun k =>
+      obtain ⟨s, hs⟩ := (_root_.GlobalTheory.QLog.In.top_iff (B := F.B)).1 hcob
+      have hadd
+          : ∀ k,
+            subst
+                (Sum.elim (X : Fin d → MvPowerSeries (Fin d) F.B)
+                  (0 : Fin d → MvPowerSeries (Fin d) F.B))
+                (μ' k)
+              = X k := fun k =>
         congrFun hlift.unit k
       exact dIn_univ_of_forall_pderiv_integral f (fun i =>
         exists_integral_pderiv_of_integral_cob1_lin hlift.const hadd
           (coeff_single_inr_eq_ite_of_add_id_of_symm hadd hlift.comm)
-          (fun i => by obtain ⟨b, -, hb⟩ := hlin i; exact ⟨b, hb⟩) s hs i)
+          (fun i => by obtain ⟨b, -, hb⟩ := hlin i; exact ⟨b, hb⟩)
+          s hs i)
     have hμ0 := hlift.const
     obtain ⟨a, ha⟩ := exists_integral_defect_of_integral_cob1 hμ0 hf0 hcob p
-    let IsLift : ℕ → (Fin d → F.B) → Prop := fun n z =>
-      ∀ i, F.θ (z i) = t.pt n (c.x n i)
+    let IsLift : ℕ → (Fin d → F.B) → Prop := fun n z => ∀ i, F.θ (z i) = t.pt n (c.x n i)
     have hnil : ∀ n z, IsLift n z → ∀ i, ∃ N, (p : F.B) ∣ z i ^ N := by
       intro n z hz i
       obtain ⟨N, o, ho⟩ := c.nil n i
       obtain ⟨b, hb⟩ := hF.surj (t.pt n o)
-      obtain ⟨y, -, hy⟩ := hF.pd (z i ^ N - p * b) (by
-        rw [map_sub, map_pow, hz i, map_mul, map_natCast, hb, ← map_pow, ho, map_mul,
-          map_natCast, sub_self])
+      obtain ⟨y, -, hy⟩ :=
+        hF.pd (z i ^ N - p * b) (by
+          rw [map_sub, map_pow, hz i, map_mul, map_natCast, hb, ← map_pow, ho, map_mul, map_natCast,
+            sub_self])
       refine ⟨N * p, ?_⟩
       rw [← Ideal.mem_span_singleton, ← Ideal.Quotient.eq_zero_iff_mem, pow_mul, map_pow]
-      have he : Ideal.Quotient.mk (Ideal.span {(p : F.B)}) (z i ^ N) =
-          Ideal.Quotient.mk _ (z i ^ N - p * b) := by
+      have he
+          : Ideal.Quotient.mk (Ideal.span {(p : F.B)}) (z i ^ N)
+            = Ideal.Quotient.mk _ (z i ^ N - p * b) := by
         rw [Ideal.Quotient.eq]
         simp [Ideal.mem_span_singleton]
       rw [he, ← map_pow, hy, Ideal.Quotient.eq_zero_iff_mem]
       exact Ideal.mul_mem_right _ _ (Ideal.subset_span rfl)
-    have hdiff : ∀ n z z' q q', IsLift n z → IsLift n z' → _root_.GlobalTheory.QLog.HasVal p z f q →
-        _root_.GlobalTheory.QLog.HasVal p z' f q' → ∃ b, q - q' = algebraMap F.B F.Q b := by
+    have hdiff
+        : ∀ n z z' q q',
+          IsLift n z → IsLift n z' → _root_.GlobalTheory.QLog.HasVal p z f q
+            → _root_.GlobalTheory.QLog.HasVal p z' f q'
+            → ∃ b, q - q' = algebraMap F.B F.Q b := by
       intro n z z' q q' hz hz' hq hq'
-      obtain ⟨b, -, b', h⟩ := _root_.GlobalTheory.HasValCong.hasVal_sub_mem p _ O _ _ hF _ z
-        (hnil n z hz) (RingHom.ker F.θ) (fun x hx => by
-          obtain ⟨y, hy, hxy⟩ := hF.pd x hx
-          exact ⟨y, hy, hxy⟩) z' f q q' (fun i => by simp [RingHom.mem_ker, hz i, hz' i]) hD hq hq' 0
+      obtain ⟨b, -, b', h⟩ :=
+        _root_.GlobalTheory.HasValCong.hasVal_sub_mem p _ O _ _ hF _ z (hnil n z hz)
+          (RingHom.ker F.θ)
+          (fun x hx => by
+            obtain ⟨y, hy, hxy⟩ := hF.pd x hx
+            exact ⟨y, hy, hxy⟩)
+          z' f q q'
+          (fun i => by simp [RingHom.mem_ker, hz i, hz' i])
+          hD hq hq' 0
       exact ⟨b + (p : F.B) ^ 0 * b', h⟩
-    have hdesc : ∀ n z q, IsLift (n + 1) z → _root_.GlobalTheory.QLog.HasVal p z f q →
-        ∃ z', IsLift n z' ∧ ∃ q', _root_.GlobalTheory.QLog.HasVal p z' f q' ∧
-          ∃ b, (p : F.Q) * q - q' = algebraMap F.B F.Q b := by
+    have hdesc
+        : ∀ n z q,
+          IsLift (n + 1) z → _root_.GlobalTheory.QLog.HasVal p z f q
+            → ∃ z',
+              IsLift n z'
+                ∧ ∃ q',
+                  _root_.GlobalTheory.QLog.HasVal p z' f q'
+                    ∧ ∃ b, (p : F.Q) * q - q' = algebraMap F.B F.Q b := by
       intro n z q hz hq
       have hzn := hnil _ z hz
-      obtain ⟨E, hE⟩ := ((_root_.GlobalTheory.CEval.continuous_eval p
-        F.B F.B (Fin d) z hzn).1).exists
+      obtain ⟨E, hE⟩ :=
+        ((_root_.GlobalTheory.CEval.continuous_eval p F.B F.B (Fin d) z hzn).1).exists
       have hk := _root_.GlobalTheory.MapNMul.cc_nmul μ' hμ0 p
       have hw : IsLift n (fun i => E (_root_.GlobalTheory.QLog.nmul μ' p i)) := by
         intro i
         rw [theta_eval_eq_tate_pt_ev_of_isEval c F.θ t (n + 1) z hzn E hE hz,
           _root_.GlobalTheory.MapNMul.map_nmul _ _ _ _ _ hμ0]
         have hμc : (fun j => map F.θ (μ' j)) = c.μ := funext hmap
-        rw [hμc, _root_.GlobalTheory.NMul.ev_nmul p C v O hv G d c,
-          ← G.mulP_res, c.res,
+        rw [hμc, _root_.GlobalTheory.NMul.ev_nmul p C v O hv G d c, ← G.mulP_res, c.res,
           _root_.GlobalTheory.PDivGroup.TateOver.pt_mulP]
-      obtain ⟨q', hq'⟩ := (_root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ O _ _ hF _ _
-        (hnil n _ hw) f hD).exists
+      obtain ⟨q', hq'⟩ :=
+        (_root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ O _ _ hF _ _ (hnil n _ hw) f
+          hD).exists
       refine ⟨_, hw, q', hq', E a, ?_⟩
-      have h1 := _root_.GlobalTheory.QLog.hasVal_subst p _ O _ _ hF _ z hzn E hE _
-        (_root_.GlobalTheory.QLog.nmul μ' p) f q' hk hD hq'
+      have h1 :=
+        _root_.GlobalTheory.QLog.hasVal_subst p _ O _ _ hF _ z hzn E hE _
+          (_root_.GlobalTheory.QLog.nmul μ' p) f q' hk hD hq'
       have h2 := _root_.GlobalTheory.hasVal_map_of_isEval p _ O _ _ hF _ z hzn E hE a
-      have h3 := ((_root_.GlobalTheory.QLog.ValLin.hasVal_add_smul_map p _ O _ _ hF _ z _ _ _ _ h2).1 h1)
-      have h4 := (_root_.GlobalTheory.QLog.ValLin.hasVal_add_smul_map p _ O _ _ hF _ z f 0 q 0 hq).2.1
-        (p : F.Q)
-      have hser : map (algebraMap F.B F.Q) a +
-          subst (_root_.GlobalTheory.QLog.up F.Q
-            (_root_.GlobalTheory.QLog.nmul μ' p)) f = (p : F.Q) • f := by
+      have h3 :=
+        ((_root_.GlobalTheory.QLog.ValLin.hasVal_add_smul_map p _ O _ _ hF _ z _ _ _ _ h2).1 h1)
+      have h4 :=
+        (_root_.GlobalTheory.QLog.ValLin.hasVal_add_smul_map p _ O _ _ hF _ z f 0 q 0 hq).2.1
+          (p : F.Q)
+      have hser
+          : map (algebraMap F.B F.Q) a
+              + subst (_root_.GlobalTheory.QLog.up F.Q (_root_.GlobalTheory.QLog.nmul μ' p)) f
+            = (p : F.Q) • f := by
         rw [ha]; unfold _root_.GlobalTheory.QLog.defect; ring
       rw [hser] at h3
       rw [_root_.GlobalTheory.QLog.HasVal.unique hF h4 h3]
       ring
-    have hint : ∀ n z q, IsLift n z → _root_.GlobalTheory.QLog.HasVal p z f q →
-        ∃ b, (p : F.Q) ^ n * q = algebraMap F.B F.Q b := by
+    have hint
+        : ∀ n z q,
+          IsLift n z → _root_.GlobalTheory.QLog.HasVal p z f q
+            → ∃ b, (p : F.Q) ^ n * q = algebraMap F.B F.Q b := by
       intro n
       induction n with
       | zero =>
@@ -391,12 +432,11 @@ theorem _root_.GlobalTheory.PeriodExists.main : ∀ (p : ℕ) [Fact p.Prime] (C 
         rw [map_add (f := _), map_mul, map_pow, map_natCast, ← hb, ← hb']
         ring
     have hlift_ex : ∀ n, ∃ z, IsLift n z := fun n =>
-      ⟨fun i => (hF.surj (t.pt n (c.x n i))).choose,
-        fun i => (hF.surj _).choose_spec⟩
+      ⟨fun i => (hF.surj (t.pt n (c.x n i))).choose, fun i => (hF.surj _).choose_spec⟩
     choose z hz using hlift_ex
     have hq_ex : ∀ n, ∃ q, _root_.GlobalTheory.QLog.HasVal p (z n) f q := fun n =>
-      (_root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ O _ _ hF _ (z n)
-        (hnil n _ (hz n)) f hD).exists
+      (_root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ O _ _ hF _ (z n) (hnil n _ (hz n)) f
+        hD).exists
     choose q hq using hq_ex
     choose r hr using fun n => hint n (z n) (q n) (hz n) (hq n)
     have hstep : ∀ n, (p : F.B) ^ n ∣ r (n + 1) - r n := by
@@ -406,8 +446,11 @@ theorem _root_.GlobalTheory.PeriodExists.main : ∀ (p : ℕ) [Fact p.Prime] (C 
       refine ⟨b + b', hF.inj ?_⟩
       rw [map_sub, ← hr, ← hr, map_mul, map_pow, map_natCast, map_add (f := _), ← hb, ← hb']
       ring
-    have hcauchy : ∀ {m n : ℕ}, m ≤ n → r m ≡ r n
-        [SMOD (Ideal.span {(p : F.B)} ^ m • ⊤ : Submodule F.B F.B)] := by
+    have hcauchy
+        : ∀ {m n : ℕ},
+          m ≤ n
+            → r m ≡ r n
+              [SMOD (Ideal.span {(p : F.B)} ^ m • ⊤ : Submodule F.B F.B)] := by
       intro m n hmn
       have hdvd : (p : F.B) ^ m ∣ r n - r m := by
         induction n, hmn using Nat.le_induction with
@@ -422,21 +465,19 @@ theorem _root_.GlobalTheory.PeriodExists.main : ∀ (p : ℕ) [Fact p.Prime] (C 
     obtain ⟨y, hy⟩ := IsPrecomplete.prec' r hcauchy
     refine ⟨y, (c.hasPeriod_iff hF t f y).2 ?_⟩
     intro n w hw
-    obtain ⟨qw, hqw⟩ := (_root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ O _ _ hF _ w
-      (hnil n _ hw) f hD).exists
+    obtain ⟨qw, hqw⟩ :=
+      (_root_.GlobalTheory.QLog.existsUnique_hasVal_of_dIn p _ O _ _ hF _ w (hnil n _ hw) f
+        hD).exists
     refine ⟨qw, hqw, ?_⟩
     obtain ⟨e, he⟩ := hdiff n w (z n) qw (q n) hw (hz n) hqw (hq n)
     obtain ⟨g, hg⟩ := _root_.GlobalTheory.CEval.dvd_of_smodEq p n (hy n)
     refine ⟨g + e, ?_⟩
     have hrn : r n = y + (p : F.B) ^ n * g := by rw [← hg]; ring
-    have hqw' : qw = q n + algebraMap F.B F.Q e := by
-      rw [← he]; ring
+    have hqw' : qw = q n + algebraMap F.B F.Q e := by rw [← he]; ring
     rw [hqw', mul_add, hr n, hrn]
     simp only [map_add (f := _), map_mul, map_pow, map_natCast]
     ring
   obtain ⟨y, hy⟩ := hex
-  exact ⟨y, hy, fun y' hy' =>
-    _root_.GlobalTheory.QLog.Chart.HasPeriod.unique
-      F.frame hy' hy⟩
+  exact ⟨y, hy, fun y' hy' => _root_.GlobalTheory.QLog.Chart.HasPeriod.unique F.frame hy' hy⟩
 
 end GlobalTheory.PeriodExists

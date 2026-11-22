@@ -9,14 +9,19 @@ set_option linter.unusedSectionVars false
 
 noncomputable section
 
-open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR GlobalTheory.CompanionTheory.RedCov
+open NumberField MeasureTheory Matrix Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.AdelicU GlobalTheory.SiegelSet PositivityTheory.ThKR
+  GlobalTheory.CompanionTheory.RedCov
 open Formalism.UG (cT)
 open scoped TensorProduct NNReal ENNReal
 
 namespace GlobalTheory.CompanionTheory.ParCocompact
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) {r : ℕ}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+  {r : ℕ}
 
 def rowOf (C : Matrix (Fin n) (Fin r) E) (i : Fin r) : Fin n → E := (cT (σ : E →+* E) C * J) i
 
@@ -41,12 +46,14 @@ variable {σ J} {X Y : Matrix (Fin n) (Fin r) E}
 theorem leviMin_subset (X Y : Matrix (Fin n) (Fin r) E) : leviMin σ J X Y ⊆ minPar σ J X :=
   fun _ ⟨d, _, e, _⟩ => ⟨_, Matrix.blockTriangular_diagonal _, e⟩
 
-theorem unipMin_subset_minParOne (X : Matrix (Fin n) (Fin r) E) : unipMin σ J X ⊆ minParOne σ J X := by
+theorem unipMin_subset_minParOne (X : Matrix (Fin n) (Fin r) E)
+    : unipMin σ J X ⊆ minParOne σ J X := by
   rintro u ⟨B, hB, h1, e, -⟩
   exact ⟨B, hB, e, fun i => ⟨1, by rw [h1]; rfl, map_one _⟩⟩
 
-theorem minParOne_props (h : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFrame σ J X Y) :
-    IsClosed (minParOne σ J X) ∧ ∀ p ∈ minParOne σ J X, ∀ q ∈ minParOne σ J X, p * q ∈ minParOne σ J X := by
+theorem minParOne_props (h : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFrame σ J X Y)
+    : IsClosed (minParOne σ J X)
+      ∧ ∀ p ∈ minParOne σ J X, ∀ q ∈ minParOne σ J X, p * q ∈ minParOne σ J X := by
   obtain ⟨a, ha⟩ := exists_isTorus h hJ hW
   obtain ⟨τ, hc, hm, -, h0, h1⟩ := exists_tau h hJ hW ha
   have ha0 : a 0 = 1 := by
@@ -69,8 +76,9 @@ theorem minParOne_props (h : IsCMExt F E σ) (hJ : IsHermND σ J) (hW : IsWittFr
     rw [e]
     exact (hcl.isClosedEmbedding_subtypeVal.isClosedMap) _ (isClosed_singleton.preimage hc)
   · intro p hp q hq
-    have := (key (⟨p, minParOne_subset hp⟩ * ⟨q, minParOne_subset hq⟩)).2 (by
-      rw [hm, (key _).1 hp, (key _).1 hq, add_zero])
+    have :=
+      (key (⟨p, minParOne_subset hp⟩ * ⟨q, minParOne_subset hq⟩)).2
+        (by rw [hm, (key _).1 hp, (key _).1 hq, add_zero])
     exact this
 
 end GlobalTheory.CompanionTheory.ParCocompact

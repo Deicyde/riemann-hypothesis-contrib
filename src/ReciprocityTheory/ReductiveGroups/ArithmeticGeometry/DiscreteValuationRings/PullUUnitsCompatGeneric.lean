@@ -84,19 +84,24 @@ lemma pullU_of_eq_id (f : Z ⟶ Z) (hf : f = 𝟙 Z) (U V : Z.Opens) (hV : V ≤
   ext
   simp [res, pullU, CommRingCat.hom_id, Units.coe_map] <;> rfl
 
-
 open scoped Classical in
-theorem exists_value (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
-    (z : Z ⟶ Y) (h0 : fsum (fun k => z ≫ φ k) ε = 0) :
-    ∃ c : Γ(Z, ⊤)ˣ, ∀ j : K → L.ι, LB.Coh L (fun k => z ≫ φ k) j →
-      res (le_top : LB.wchart L (fun k => z ≫ φ k) j ≤ ⊤) c = (LB.pullGen L φ ε t z).s j := by
+theorem exists_value
+    (hL : L.IsLB)
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
+    (z : Z ⟶ Y) (h0 : fsum (fun k => z ≫ φ k) ε = 0)
+    : ∃ c : Γ(Z, ⊤)ˣ, ∀ j : K → L.ι,
+      LB.Coh L (fun k => z ≫ φ k) j
+        → res (le_top : LB.wchart L (fun k => z ≫ φ k) j ≤ ⊤) c = (LB.pullGen L φ ε t z).s j := by
   have hs : LB.SameSum (fun k => z ≫ φ k) ε (K' := PEmpty) PEmpty.elim PEmpty.elim := by
     rw [sameSum_iff_fsum, h0, fsum_empty]
-  obtain ⟨te, -, hc⟩ := gen_transport hL hs (LB.pullGen L φ ε t z) (pullGen_isGen_of_isGen φ ε t ht z)
+  obtain ⟨te, -, hc⟩ :=
+    gen_transport hL hs (LB.pullGen L φ ε t z) (pullGen_isGen_of_isGen φ ε t ht z)
   let j0 : PEmpty → L.ι := PEmpty.elim
   refine ⟨res (le_of_eq (wchart_empty j0).symm) (te.s j0), fun j hj => ?_⟩
   have e := hc j j0 hj (fun k _ => k.elim) (fun _ k => k.elim)
-  have hle : LB.wchart L (fun k => z ≫ φ k) j ≤ LB.wchart L (fun k => z ≫ φ k) j ⊓ LB.wchart L PEmpty.elim j0 :=
+  have hle
+      : LB.wchart L (fun k => z ≫ φ k) j
+        ≤ LB.wchart L (fun k => z ≫ φ k) j ⊓ LB.wchart L PEmpty.elim j0 :=
     le_inf le_rfl (by rw [wchart_empty]; exact le_top)
   have e2 := congrArg (res hle) e
   erw [res_res'] at e2
@@ -118,18 +123,22 @@ lemma pull_pull_id (z : Z ⟶ Y) (p : Y ⟶ Z) (hzp : z ≫ p = 𝟙 Z) {W : Y.O
   rw [res_pullU_res_eq_res_pullU z hW hV hV', ← pullU_comp_lemma_3]
   exact pullU_of_eq_id (z ≫ p) hzp ⊤ V hV' le_top c
 
-theorem exists_normalized (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε))
-    (ht : t.IsGen) (p : Y ⟶ Z) (z : Z ⟶ Y) (hzp : z ≫ p = 𝟙 Z) (h0 : fsum (fun k => z ≫ φ k) ε = 0) :
-    ∃ t' : LB.Gen (LB.LinComb L φ ε), t'.IsGen ∧
-      ∀ j : K → L.ι, LB.Coh L (fun k => z ≫ φ k) j → (LB.pullGen L φ ε t' z).s j = 1 := by
+theorem exists_normalized
+    (hL : L.IsLB)
+    (φ : K → (Y ⟶ X)) (ε : K → ℤ) (t : LB.Gen (LB.LinComb L φ ε)) (ht : t.IsGen)
+    (p : Y ⟶ Z) (z : Z ⟶ Y) (hzp : z ≫ p = 𝟙 Z) (h0 : fsum (fun k => z ≫ φ k) ε = 0)
+    : ∃ t' : LB.Gen (LB.LinComb L φ ε),
+      t'.IsGen
+        ∧ ∀ j : K → L.ι, LB.Coh L (fun k => z ≫ φ k) j → (LB.pullGen L φ ε t' z).s j = 1 := by
   obtain ⟨c, hc⟩ := exists_value hL φ ε t ht z h0
   let c' : Γ(Y, ⊤)ˣ := res (fun _ _ => trivial : (⊤ : Y.Opens) ≤ p ⁻¹ᵁ ⊤) (pullU p ⊤ c⁻¹)
   refine ⟨scaleGen c' t, scaleGen_isGen c' t ht, fun j hj => ?_⟩
   have e := hc j hj
   show res _ (pullU z _ (res le_top c' * t.s j)) = 1
   rw [map_mul, map_mul]
-  have e1 : res (wchart_comp_le φ z j) (pullU z _ (res (le_top : (LB.LinComb L φ ε).U j ≤ ⊤) c')) =
-      res (le_top : LB.wchart L (fun k => z ≫ φ k) j ≤ ⊤) c⁻¹ := by
+  have e1
+      : res (wchart_comp_le φ z j) (pullU z _ (res (le_top : (LB.LinComb L φ ε).U j ≤ ⊤) c'))
+        = res (le_top : LB.wchart L (fun k => z ≫ φ k) j ≤ ⊤) c⁻¹ := by
     simp only [c']
     erw [res_res']
     exact pull_pull_id z p hzp _ _ c⁻¹
@@ -138,9 +147,11 @@ theorem exists_normalized (hL : L.IsLB) (φ : K → (Y ⟶ X)) (ε : K → ℤ) 
   erw [e2, ← e, ← map_mul, inv_mul_cancel, map_one]
   rfl
 
-theorem gen_of_top (hL : L.IsLB) {S : Scheme.{0}} {W : Over S} (ψ : K → (W.left ⟶ X)) (ε : K → ℤ)
-    (t : LB.Gen (LB.LinComb L (fun k => (W.hom ⁻¹ᵁ ⊤).ι ≫ ψ k) ε)) (ht : t.IsGen) :
-    ∃ t' : LB.Gen (LB.LinComb L ψ ε), t'.IsGen := by
+theorem gen_of_top
+    (hL : L.IsLB)
+    {S : Scheme.{0}} {W : Over S} (ψ : K → (W.left ⟶ X))
+    (ε : K → ℤ) (t : LB.Gen (LB.LinComb L (fun k => (W.hom ⁻¹ᵁ ⊤).ι ≫ ψ k) ε)) (ht : t.IsGen)
+    : ∃ t' : LB.Gen (LB.LinComb L ψ ε), t'.IsGen := by
   have e : ∀ k, W.left.topIso.inv ≫ (W.hom ⁻¹ᵁ ⊤).ι ≫ ψ k = ψ k := fun k =>
     W.left.toIso_inv_ι_assoc (ψ k)
   have hs : LB.SameSum (fun k => W.left.topIso.inv ≫ (W.hom ⁻¹ᵁ ⊤).ι ≫ ψ k) ε ψ ε := by
@@ -149,11 +160,14 @@ theorem gen_of_top (hL : L.IsLB) {S : Scheme.{0}} {W : Over S} (ψ : K → (W.le
   obtain ⟨t', ht', -⟩ := gen_transport hL hs _ (pullGen_isGen_of_isGen _ ε t ht W.left.topIso.inv)
   exact ⟨t', ht'⟩
 
-theorem gen_of_local_base {V : Type} [CommRing V] [IsLocalRing V] (hL : L.IsLB)
-    {W : Over (Spec (CommRingCat.of V))} (ψ : K → (W.left ⟶ X)) (ε : K → ℤ)
-    (h : ∀ s : Spec (CommRingCat.of V), ∃ U : (Spec (CommRingCat.of V)).Opens, s ∈ U ∧
-      ∃ t : LB.Gen (LB.LinComb L (fun k => (W.hom ⁻¹ᵁ U).ι ≫ ψ k) ε), t.IsGen) :
-    ∃ t' : LB.Gen (LB.LinComb L ψ ε), t'.IsGen := by
+theorem gen_of_local_base
+    {V : Type} [CommRing V] [IsLocalRing V]
+    (hL : L.IsLB)
+    {W : Over (Spec (CommRingCat.of V))} (ψ : K → (W.left ⟶ X))
+    (ε : K → ℤ)
+    (h : ∀ s : Spec (CommRingCat.of V), ∃ U : (Spec (CommRingCat.of V)).Opens,
+      s ∈ U ∧ ∃ t : LB.Gen (LB.LinComb L (fun k => (W.hom ⁻¹ᵁ U).ι ≫ ψ k) ε), t.IsGen)
+    : ∃ t' : LB.Gen (LB.LinComb L ψ ε), t'.IsGen := by
   obtain ⟨U, hU, t, ht⟩ := h (IsLocalRing.closedPoint V)
   obtain rfl : U = ⊤ := (IsLocalRing.closedPoint_mem_iff (R := V) U).1 hU
   exact gen_of_top hL ψ ε t ht

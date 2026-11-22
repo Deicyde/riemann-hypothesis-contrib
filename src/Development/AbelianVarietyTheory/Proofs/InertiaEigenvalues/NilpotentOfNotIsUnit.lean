@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Acri
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations GlobalTheory.Per Ideal Finset
+open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations
+  GlobalTheory.Per Ideal Finset
 
 namespace GlobalTheory.Per.AinfComplete
 
@@ -13,25 +14,25 @@ section General
 
 variable {A : Type*} [CommRing A]
 
-def Summ (y : A) : Prop :=
-  ∀ b : ℕ → A, ∃ L, ∀ n, L - ∑ i ∈ range n, y ^ i * b i ∈ span {y ^ n}
+def Summ (y : A) : Prop := ∀ b : ℕ → A, ∃ L, ∀ n, L - ∑ i ∈ range n, y ^ i * b i ∈ span {y ^ n}
 
 def Tails (y : A) : Prop := ∀ b : ℕ → A, ∃ t : ℕ → A, ∀ n, b n = t n - y * t (n + 1)
 
 theorem summ_of_precomplete (y : A) [h : IsPrecomplete (span {y}) A] : Summ y := by
   intro b
-  have hC : ∀ m n, m ≤ n →
-      ∑ i ∈ range m, y ^ i * b i - ∑ i ∈ range n, y ^ i * b i ∈ span {y ^ m} := by
+  have hC
+      : ∀ m n, m ≤ n → ∑ i ∈ range m, y ^ i * b i - ∑ i ∈ range n, y ^ i * b i ∈ span {y ^ m} := by
     intro m n hmn
     induction n, hmn using Nat.le_induction with
     | base => simp
     | succ n hmn ih =>
       rw [sum_range_succ, ← sub_sub]
       exact sub_mem ih (mem_span_singleton.2 (Dvd.dvd.mul_right (pow_dvd_pow y hmn) _))
-  obtain ⟨L, hL⟩ := h.prec' (fun n => ∑ i ∈ range n, y ^ i * b i) (by
-    intro m n hmn
-    simp only [span_singleton_pow, smul_eq_mul, mul_top, SModEq.sub_mem]
-    exact hC m n hmn)
+  obtain ⟨L, hL⟩ :=
+    h.prec' (fun n => ∑ i ∈ range n, y ^ i * b i) (by
+      intro m n hmn
+      simp only [span_singleton_pow, smul_eq_mul, mul_top, SModEq.sub_mem]
+      exact hC m n hmn)
   refine ⟨L, fun n => ?_⟩
   have hn := hL n
   simp only [span_singleton_pow, smul_eq_mul, mul_top, SModEq.sub_mem] at hn
@@ -76,8 +77,7 @@ theorem le_pair_pow (p y : A) (n : ℕ) : span {p ^ n, y ^ n} ≤ span {p, y} ^ 
   · exact pow_mem_pow (subset_span (by simp)) n
   · exact pow_mem_pow (subset_span (by simp)) n
 
-theorem precomplete_pair {p y : A} (hp : Summ p) (hy : Summ y) :
-    IsPrecomplete (span {p, y}) A := by
+theorem precomplete_pair {p y : A} (hp : Summ p) (hy : Summ y) : IsPrecomplete (span {p, y}) A := by
   refine ⟨fun f hf => ?_⟩
   simp only [smul_eq_mul, mul_top, SModEq.sub_mem] at hf ⊢
   have h1 : ∀ n, ∃ a b, a * p ^ n + b * y ^ n = f (2 * n) - f (2 * (n + 1)) := fun n =>
@@ -98,21 +98,26 @@ theorem precomplete_pair {p y : A} (hp : Summ p) (hy : Summ y) :
   convert add_mem (add_mem h2 h3) h4 using 1
   linear_combination this
 
-theorem eq_zero_of_haus (p : A) [h : IsHausdorff (span {p}) A] (x : A)
-    (hx : ∀ n, x ∈ span {p ^ n}) : x = 0 := by
+theorem eq_zero_of_haus (p : A) [h : IsHausdorff (span {p}) A] (x : A) (hx : ∀ n, x ∈ span {p ^ n})
+    : x = 0 := by
   refine h.haus' x fun n => ?_
   simp only [span_singleton_pow, smul_eq_mul, mul_top, SModEq.zero]
   exact hx n
 
-theorem tails_of_mod (p y : A) [IsAdicComplete (span {p}) A]
-    (h : ∀ b : ℕ → A, ∃ t c : ℕ → A, ∀ n, b n = t n - y * t (n + 1) + p * c n) : Tails y := by
+theorem tails_of_mod
+    (p y : A) [IsAdicComplete (span {p}) A]
+    (h : ∀ b : ℕ → A, ∃ t c : ℕ → A, ∀ n, b n = t n - y * t (n + 1) + p * c n)
+    : Tails y := by
   choose τ γ hτ using h
   intro b
   have hs := summ_of_precomplete p
   choose T hT using fun n => hs fun k => τ (γ^[k] b) n
   refine ⟨T, fun n => ?_⟩
-  have key : ∀ k, b n = ∑ i ∈ range k, p ^ i * τ (γ^[i] b) n -
-      y * ∑ i ∈ range k, p ^ i * τ (γ^[i] b) (n + 1) + p ^ k * γ^[k] b n := by
+  have key
+      : ∀ k,
+        b n
+          = ∑ i ∈ range k, p ^ i * τ (γ^[i] b) n - y * ∑ i ∈ range k, p ^ i * τ (γ^[i] b) (n + 1)
+            + p ^ k * γ^[k] b n := by
     intro k
     induction k with
     | zero => simp
@@ -125,19 +130,23 @@ theorem tails_of_mod (p y : A) [IsAdicComplete (span {p}) A]
     (mul_mem_right (γ^[k] b n) _ (mem_span_singleton_self (p ^ k))) using 1
   linear_combination key k
 
-theorem hausdorff_pair {R : Type*} [CommRing R] [IsDomain R] (π : A →+* R) (p y : A)
-    [IsHausdorff (span {p}) A] (hker : RingHom.ker π = span {p})
-    (hreg : ∀ x, x * p = 0 → x = 0) (hR : ∀ x : R, (∀ n, π y ^ n ∣ x) → x = 0) :
-    IsHausdorff (span {p, y}) A := by
-  have hπp : π p = 0 := by
-    rw [← RingHom.mem_ker, hker]; exact mem_span_singleton_self _
+theorem hausdorff_pair
+    {R : Type*} [CommRing R] [IsDomain R]
+    (π : A →+* R)
+    (p y : A) [IsHausdorff (span {p}) A]
+    (hker : RingHom.ker π = span {p}) (hreg : ∀ x, x * p = 0 → x = 0)
+    (hR : ∀ x : R, (∀ n, π y ^ n ∣ x) → x = 0)
+    : IsHausdorff (span {p, y}) A := by
+  have hπp : π p = 0 := by rw [← RingHom.mem_ker, hker]; exact mem_span_singleton_self _
   by_cases hy : π y = 0
   · have hy' : y ∈ span {p} := hker ▸ hy
     have : span {p, y} = span {p} := by
       rw [span_insert, sup_eq_left, span_singleton_le_iff_mem]; exact hy'
-    rw [this]; infer_instance
-  have step : ∀ x : A, (∀ n, x ∈ span {p ^ n, y ^ n}) →
-      ∃ x', x = p * x' ∧ ∀ n, x' ∈ span {p ^ n, y ^ n} := by
+    rw [this]
+    infer_instance
+  have step
+      : ∀ x : A,
+        (∀ n, x ∈ span {p ^ n, y ^ n}) → ∃ x', x = p * x' ∧ ∀ n, x' ∈ span {p ^ n, y ^ n} := by
     intro x hx
     have h0 : π x = 0 := by
       refine hR _ fun n => ?_
@@ -175,19 +184,22 @@ section Perf
 
 variable {p : ℕ} [hp : Fact p.Prime] {R : Type*} [CommRing R] [CharP R p]
 
-theorem coeff_pow_self (x : Perfection R p) (n : ℕ) :
-    Perfection.coeff R p n x ^ p ^ n = Perfection.coeff R p 0 x :=
+theorem coeff_pow_self (x : Perfection R p) (n : ℕ)
+    : Perfection.coeff R p n x ^ p ^ n = Perfection.coeff R p 0 x :=
   Perfection.coeffMonoidHom_pow_p_pow_self x n
 
-theorem perfection_isUnit (x : Perfection R p) (h : IsUnit (Perfection.coeff R p 0 x)) :
-    IsUnit x := by
+theorem perfection_isUnit (x : Perfection R p) (h : IsUnit (Perfection.coeff R p 0 x))
+    : IsUnit x := by
   have hn : ∀ n, IsUnit (Perfection.coeff R p n x) := fun n => by
     rw [← coeff_pow_self x n] at h
     exact (isUnit_pow_iff (pow_ne_zero _ hp.out.ne_zero)).1 h
-  let y : Perfection R p := ⟨fun n => ((hn n).unit⁻¹ : Rˣ), fun n => by
-    have e : (hn (n + 1)).unit ^ p = (hn n).unit :=
-      Units.ext (by simp [Perfection.coeff_pow_p' x n])
-    rw [← Units.val_pow_eq_pow_val, inv_pow, e]⟩
+  let y : Perfection R p := ⟨
+    fun n => ((hn n).unit⁻¹ : Rˣ),
+    fun n => by
+      have e : (hn (n + 1)).unit ^ p = (hn n).unit :=
+        Units.ext (by simp [Perfection.coeff_pow_p' x n])
+      rw [← Units.val_pow_eq_pow_val, inv_pow, e]
+  ⟩
   have hy : ∀ n, Perfection.coeff R p n x * Perfection.coeff R p n y = 1 := fun n => by
     rw [Perfection.coeff_mk]
     exact (hn n).mul_val_inv
@@ -195,25 +207,31 @@ theorem perfection_isUnit (x : Perfection R p) (h : IsUnit (Perfection.coeff R p
   · ext n; rw [map_mul, hy, map_one]
   · ext n; rw [map_mul, mul_comm, hy, map_one]
 
-theorem coeff_pow_eq_zero {y : Perfection R p} {m : ℕ} (hm : Perfection.coeff R p 0 y ^ m = 0)
-    (n N : ℕ) (hN : p ^ n * m ≤ N) : Perfection.coeff R p n y ^ N = 0 := by
+theorem coeff_pow_eq_zero
+    {y : Perfection R p} {m : ℕ} (hm : Perfection.coeff R p 0 y ^ m = 0)
+    (n N : ℕ) (hN : p ^ n * m ≤ N)
+    : Perfection.coeff R p n y ^ N = 0 := by
   obtain ⟨c, rfl⟩ := Nat.exists_eq_add_of_le hN
   rw [pow_add, pow_mul, coeff_pow_self, hm, zero_mul]
 
-theorem perfection_haus {y : Perfection R p} (hy : IsNilpotent (Perfection.coeff R p 0 y))
-    (x : Perfection R p) (hx : ∀ n, y ^ n ∣ x) : x = 0 := by
+theorem perfection_haus
+    {y : Perfection R p} (hy : IsNilpotent (Perfection.coeff R p 0 y))
+    (x : Perfection R p) (hx : ∀ n, y ^ n ∣ x)
+    : x = 0 := by
   obtain ⟨m, hm⟩ := hy
   ext n
   obtain ⟨c, rfl⟩ := hx (p ^ n * m)
   rw [map_mul, map_pow, coeff_pow_eq_zero hm n _ le_rfl, zero_mul, map_zero]
 
-theorem perfection_tails {y : Perfection R p} (hy : IsNilpotent (Perfection.coeff R p 0 y)) :
-    Tails y := by
+theorem perfection_tails {y : Perfection R p} (hy : IsNilpotent (Perfection.coeff R p 0 y))
+    : Tails y := by
   obtain ⟨m, hm⟩ := hy
   intro b
   let S : ℕ → ℕ → Perfection R p := fun k N => ∑ i ∈ range N, y ^ i * b (k + i)
-  have stab : ∀ k n N, p ^ n * m ≤ N →
-      Perfection.coeff R p n (S k N) = Perfection.coeff R p n (S k (p ^ n * m)) := by
+  have stab
+      : ∀ k n N,
+        p ^ n * m ≤ N
+          → Perfection.coeff R p n (S k N) = Perfection.coeff R p n (S k (p ^ n * m)) := by
     intro k n N hN
     induction N, hN using Nat.le_induction with
     | base => rfl
@@ -222,12 +240,17 @@ theorem perfection_tails {y : Perfection R p} (hy : IsNilpotent (Perfection.coef
       simp only [S]
       rw [sum_range_succ, map_add (f := _), map_mul, map_pow, coeff_pow_eq_zero hm n N hN, zero_mul,
         add_zero]
-  have ex : ∀ k, ∃ t : Perfection R p, ∀ n,
-      Perfection.coeff R p n t = Perfection.coeff R p n (S k (p ^ n * m)) := fun k =>
-    ⟨⟨fun n => Perfection.coeff R p n (S k (p ^ n * m)), fun n => by
-      rw [Perfection.coeff_pow_p']
-      exact stab k n _
-        (Nat.mul_le_mul_right _ (Nat.pow_le_pow_right hp.out.pos (Nat.le_succ n)))⟩, fun _ => rfl⟩
+  have ex
+      : ∀ k, ∃ t : Perfection R p, ∀ n,
+        Perfection.coeff R p n t = Perfection.coeff R p n (S k (p ^ n * m)) := fun k => ⟨
+    ⟨
+      fun n => Perfection.coeff R p n (S k (p ^ n * m)),
+      fun n => by
+        rw [Perfection.coeff_pow_p']
+        exact stab k n _ (Nat.mul_le_mul_right _ (Nat.pow_le_pow_right hp.out.pos (Nat.le_succ n)))
+    ⟩,
+    fun _ => rfl
+  ⟩
   choose t ht using ex
   refine ⟨t, fun k => ?_⟩
   · ext n
@@ -260,10 +283,12 @@ theorem witt_isUnit (c : WittVector p R) (h : IsUnit (constantCoeff c)) : IsUnit
   rw [mul_one, sub_add_cancel] at h1
   exact isUnit_of_mul_isUnit_left h1
 
-theorem witt_complete [IsDomain R] (y : WittVector p R) (ht : Tails (constantCoeff y))
-    (hh : ∀ x : R, (∀ n, constantCoeff y ^ n ∣ x) → x = 0) :
-    IsAdicComplete (span {(p : WittVector p R), y}) (WittVector p R) ∧
-      IsAdicComplete (span {y}) (WittVector p R) := by
+theorem witt_complete
+    [IsDomain R]
+    (y : WittVector p R)
+    (ht : Tails (constantCoeff y)) (hh : ∀ x : R, (∀ n, constantCoeff y ^ n ∣ x) → x = 0)
+    : IsAdicComplete (span {(p : WittVector p R), y}) (WittVector p R)
+      ∧ IsAdicComplete (span {y}) (WittVector p R) := by
   have hT : Tails y := by
     refine tails_of_mod (p : WittVector p R) y fun b => ?_
     obtain ⟨t, ht⟩ := ht fun n => constantCoeff (b n)
@@ -287,8 +312,8 @@ theorem witt_complete [IsDomain R] (y : WittVector p R) (ht : Tails (constantCoe
 
 end Witt
 
-theorem nilpotent_of_not_isUnit (l : ℕ) [hl : Fact l.Prime] (x : ModP (OC l) l)
-    (hx : ¬ IsUnit x) : IsNilpotent x := by
+theorem nilpotent_of_not_isUnit (l : ℕ) [hl : Fact l.Prime] (x : ModP (OC l) l) (hx : ¬ IsUnit x)
+    : IsNilpotent x := by
   obtain ⟨a, rfl⟩ := Ideal.Quotient.mk_surjective (I := span {((l : ℕ) : OC l)}) x
   have hv := PadicComplexInt.integers l
   have h1 : Valued.v (algebraMap (OC l) (PadicComplex l) a) < 1 :=
@@ -303,9 +328,11 @@ theorem nilpotent_of_not_isUnit (l : ℕ) [hl : Fact l.Prime] (x : ModP (OC l) l
     map_pow]
   exact hm.le
 
-theorem main : ∀ (l : ℕ) [Fact l.Prime], ∀ y : Ainf l, ¬ IsUnit y →
-    IsAdicComplete (Ideal.span {((l : ℕ) : Ainf l), y}) (Ainf l) ∧
-      IsAdicComplete (Ideal.span {y}) (Ainf l) := by
+theorem main
+    : ∀ (l : ℕ) [Fact l.Prime], ∀ y : Ainf l,
+      ¬ IsUnit y
+        → IsAdicComplete (Ideal.span {((l : ℕ) : Ainf l), y}) (Ainf l)
+          ∧ IsAdicComplete (Ideal.span {y}) (Ainf l) := by
   intro l _ y hy
   have h1 : IsNilpotent (Perfection.coeff (ModP (OC l) l) l 0 (WittVector.constantCoeff y)) :=
     nilpotent_of_not_isUnit l _ fun h => hy (witt_isUnit y (perfection_isUnit _ h))

@@ -5,15 +5,21 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.UOver
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
 open GlobalTheory.ZH GlobalTheory.UPoinc GlobalTheory.UCovSep
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.XScov
 
-theorem genericPoints_XF_finite : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l), (genericPoints (Xo.XF c)).Finite := by
+theorem genericPoints_XF_finite
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H)
+        (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l),
+      (genericPoints (Xo.XF c)).Finite := by
   intro E _ _ _ H Dw l Xo c
   obtain ⟨N, i, hi, hq, he⟩ := Xo.qproj
   have := ReciprocityTheory.ChartRestriction.G.Geo.Tor.isProper_str (KA l) N

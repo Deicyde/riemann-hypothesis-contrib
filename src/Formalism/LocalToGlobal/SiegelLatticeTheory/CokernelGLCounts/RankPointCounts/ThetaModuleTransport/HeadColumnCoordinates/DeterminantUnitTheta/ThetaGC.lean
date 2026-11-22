@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.RankP
 
 noncomputable section
 
-open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA Formalism.L2.SG.LocalCountModules.LocCntCommon
+open ValuativeRel Formalism.MainNotions.S.Loc Formalism.L2.SG.LsDatumA
+  Formalism.L2.SG.LocalCountModules.LocCntCommon
 
 namespace Formalism.L2.SG.LocalCountModules.ThetaMbe0GWork
 
@@ -40,8 +41,8 @@ abbrev DDg (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E) : Type :=
 def formG (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E) (Y W : Ix r → O) : E :=
   ∑ i, ∑ j, (Y i : E) * (gramG cj qi Z T T')⁻¹ i j * cj (W j)
 
-def GamRC (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E) :
-    Set (DDg O cj qi Z T T' × DDg O cj qi Z T T' × (E × E) × (E × E)) :=
+def GamRC (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E)
+    : Set (DDg O cj qi Z T T' × DDg O cj qi Z T T' × (E × E) × (E × E)) :=
   {p | ∃ Y Y' Y'' : Ix r → O, (∀ a : Fin r, Y (Sum.inl a.castSucc) = 0) ∧
     (∀ a : Fin r, (Y' (Sum.inl a.castSucc) : E) + q * Y' (Sum.inr a.castSucc) = 0) ∧
     (∀ i, (Y i : E) - Y' i = q * Y'' i) ∧
@@ -50,8 +51,8 @@ def GamRC (Z : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E) :
       (lamC Z (fun a => (Y' (Sum.inl a) : E)),
         (Y' (Sum.inl (Fin.last r)) : E) + q * Y' (Sum.inr (Fin.last r))))}
 
-def ThetaGC (Z₁ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E) :
-    Set (DDg O cj qi Z₁ T T' ≃ₗ[O] DDg O cj qi Z₂ T T') :=
+def ThetaGC (Z₁ Z₂ : Matrix (Fin (r + 1)) (Fin (r + 1)) E) (T T' : E)
+    : Set (DDg O cj qi Z₁ T T' ≃ₗ[O] DDg O cj qi Z₂ T T') :=
   {θ | (∀ Y W Y₂ W₂ : Ix r → O, θ (Submodule.Quotient.mk Y) = Submodule.Quotient.mk Y₂ →
       θ (Submodule.Quotient.mk W) = Submodule.Quotient.mk W₂ →
       formG O cj qi Z₂ T T' Y₂ W₂ - formG O cj qi Z₁ T T' Y W ∈ O) ∧

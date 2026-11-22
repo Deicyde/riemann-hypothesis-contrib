@@ -8,7 +8,9 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StandardFrame
 
 @[expose] public section
 
-open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open NumberField IsDedekindDomain MeasureTheory
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.Measures
 open scoped TensorProduct ENNReal
 
 noncomputable section
@@ -17,12 +19,14 @@ namespace GlobalTheory.FrameExtend
 
 section Alg
 
-variable {F E : Type} [Field F] [Field E] [Algebra F E] {R : Type} [CommRing R] [Algebra F R]
+variable
+  {F E : Type} [Field F] [Field E] [Algebra F E]
+  {R : Type} [CommRing R] [Algebra F R]
   {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
 
-theorem hR_sub_sum_right {m : ℕ} (x w : Fin n → R ⊗[F] E) (c : Fin m → R ⊗[F] E)
-    (u : Fin m → Fin n → R ⊗[F] E) :
-    hR R σ J x (w - ∑ a, c a • u a) = hR R σ J x w - ∑ a, c a * hR R σ J x (u a) := by
+theorem hR_sub_sum_right
+    {m : ℕ} (x w : Fin n → R ⊗[F] E) (c : Fin m → R ⊗[F] E) (u : Fin m → Fin n → R ⊗[F] E)
+    : hR R σ J x (w - ∑ a, c a • u a) = hR R σ J x w - ∑ a, c a * hR R σ J x (u a) := by
   simp only [hR, Formalism.UG.hform, Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, smul_eq_mul,
     mul_sub, Finset.sum_sub_distrib, Finset.mul_sum]
   congr 1
@@ -35,9 +39,21 @@ theorem hR_sub_sum_right {m : ℕ} (x w : Fin n → R ⊗[F] E) (c : Fin m → R
 
 end Alg
 
-
 open GlobalTheory.FrameGram in
-theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (v : HeightOneSpectrum (𝓞 F)), ∀ (r : ℕ) (P : Frame E n r) (T : F), P.IsStd σ J T → ∀ y : Fin (r + 1) → Fin n → Fv F v ⊗[F] E, LinearIndependent (Fv F v ⊗[F] E) y → gramR (Fv F v) σ J y = (gramE σ J (F0 P)).map (inclR (Fv F v)) → ∃ f : Fin r → Fin n → Fv F v ⊗[F] E, gramR (Fv F v) σ J (Fin.append y f) = (gramE σ J (tupH P)).map (inclR (Fv F v)) := by
+theorem extend_frame
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ
+        → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+          IsHermND σ J
+            → ∀ (v : HeightOneSpectrum (𝓞 F)), ∀ (r : ℕ) (P : Frame E n r) (T : F),
+              P.IsStd σ J T
+                → ∀ y : Fin (r + 1) → Fin n → Fv F v ⊗[F] E,
+                  LinearIndependent (Fv F v ⊗[F] E) y
+                    → gramR (Fv F v) σ J y = (gramE σ J (F0 P)).map (inclR (Fv F v))
+                    → ∃ f : Fin r → Fin n → Fv F v ⊗[F] E,
+                      gramR (Fv F v) σ J (Fin.append y f)
+                        = (gramE σ J (tupH P)).map (inclR (Fv F v)) := by
   intro F E _ _ _ _ _ σ hσ n J hJ v r P T hP y hy hgram
   have hinv : ∀ x, σ (σ x) = x := conj_invol hσ
   obtain ⟨_, hGh, _, hG0, _⟩ := std_frame_gram F E σ hσ n J hJ r P T hP
@@ -52,7 +68,8 @@ theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
     PI.VolStabS.hR_herm (Fv F v) σ hinv J hJ.1
   have hss : ∀ x, s (s x) = x := PI.VolStabS.sigR_invol (Fv F v) σ hinv
 
-  let Z : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun i => Matrix.vecMul (fun l => s (y i l)) (JR (F := F) (Fv F v) J)
+  let Z : Fin (r + 1) → Fin n → Fv F v ⊗[F] E := fun i =>
+    Matrix.vecMul (fun l => s (y i l)) (JR (F := F) (Fv F v) J)
   have hZh : ∀ i w, hR (Fv F v) σ J (y i) w = ∑ k, Z i k * w k := by
     intro i w
     simp only [hR, Formalism.UG.hform, Z, Matrix.vecMul, dotProduct, Finset.sum_mul]
@@ -70,7 +87,8 @@ theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
       funext j
       have := congrFun hg j
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Z, Matrix.vecMul, dotProduct,
-        Finset.mul_sum, Pi.zero_apply] at this
+          Finset.mul_sum, Pi.zero_apply]
+        at this
       simp only [Matrix.vecMul, dotProduct, w, Finset.sum_mul, Pi.zero_apply]
       rw [Finset.sum_comm]
       rw [← this]
@@ -78,7 +96,8 @@ theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
     have hv : w = 0 := by
       have := congrArg (fun u => Matrix.vecMul u (JR (F := F) (Fv F v) J)⁻¹) hv0
       simp only [Matrix.vecMul_vecMul, Matrix.mul_nonsing_inv _ hJu, Matrix.vecMul_one,
-        Matrix.zero_vecMul] at this
+          Matrix.zero_vecMul]
+        at this
       exact this
     have hX0 : ∑ i, s (g i) • y i = 0 := by
       funext l
@@ -97,8 +116,11 @@ theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
     intro i b
     rw [hZh]
     exact hq i b.castSucc
-  have hyy : ∀ i j, hR (Fv F v) σ J (y i) (y j) =
-      inclR (Fv F v) (if i = Fin.last r ∧ j = Fin.last r then algebraMap F E (-T) else 0) := by
+  have hyy
+      : ∀ i j,
+        hR (Fv F v) σ J (y i) (y j)
+          = inclR (Fv F v)
+            (if i = Fin.last r ∧ j = Fin.last r then algebraMap F E (-T) else 0) := by
     intro i j
     have := congrFun (congrFun hgram i) j
     simp only [Matrix.map_apply, hG0] at this
@@ -140,15 +162,19 @@ theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
       rw [GlobalTheory.FrameExtend.hR_sub_sum_right]
       congr 1
       simp [hf'y]
-    have e3 : hR (Fv F v) σ J (f a) (f' b) = hR (Fv F v) σ J (f' a) (f' b) - h2 * hR (Fv F v) σ J (f' a) (f' b) := by
+    have e3
+        : hR (Fv F v) σ J (f a) (f' b)
+          = hR (Fv F v) σ J (f' a) (f' b) - h2 * hR (Fv F v) σ J (f' a) (f' b) := by
       rw [← hsw, e2, map_sub, hsw]
       simp only [c, map_mul, hsh, hsw]
     rw [e1, e3]
     simp only [c]
     linear_combination (-(hR (Fv F v) σ J (f' a) (f' b))) * hh
   refine ⟨f, ?_⟩
-  have hTL : ∀ i (b : Fin r), gramE σ J (tupH P) (Fin.castAdd r i) (Fin.natAdd (r + 1) b) =
-      if i = b.castSucc then 1 else 0 := by
+  have hTL
+      : ∀ i (b : Fin r),
+        gramE σ J (tupH P) (Fin.castAdd r i) (Fin.natAdd (r + 1) b)
+          = if i = b.castSucc then 1 else 0 := by
     intro i b
     simp only [gramE, tupH, Fin.append_left, Fin.append_right, F0]
     refine Fin.lastCases ?_ (fun a => ?_) i
@@ -159,8 +185,8 @@ theorem extend_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [Num
   funext i j
   simp only [Matrix.map_apply]
   show hR (Fv F v) σ J (Fin.append y f i) (Fin.append y f j) = _
-  refine Fin.addCases (fun i => ?_) (fun a => ?_) i <;>
-    refine Fin.addCases (fun j => ?_) (fun b => ?_) j
+  refine Fin.addCases (fun i => ?_) (fun a => ?_) i
+    <;> refine Fin.addCases (fun j => ?_) (fun b => ?_) j
   · rw [Fin.append_left, Fin.append_left, hyy, ← hG0]
     simp [gramE, tupH, Fin.append_left]
   · rw [Fin.append_left, Fin.append_right, hyf, hTL]

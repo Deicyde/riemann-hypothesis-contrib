@@ -35,12 +35,15 @@ variable {K : Type*} [Field K] [NumberField K] [Algebra F K]
 
 variable [Module.Finite (𝓞 F) W] [Module.Projective (𝓞 F) W]
 
-def fibreGen (h : HermitianMetric F W) (σ : F →+* ℂ) {n : ℕ} (w : Fin n → W) (x : Fin n → ℂ) :
-    FibreSpace h σ :=
+def fibreGen (h : HermitianMetric F W) (σ : F →+* ℂ) {n : ℕ} (w : Fin n → W) (x : Fin n → ℂ)
+    : FibreSpace h σ :=
   ∑ k, x k • fibreVec h σ (w k)
 
-def fibrePoly (h : HermitianMetric F W) (σ : F →+* ℂ) {n : ℕ} (w : Fin n → W)
-    (P : MvPolynomial (Fin n) ℂ) (ξ : FibreSpace h σ) : ℂ :=
+def fibrePoly
+    (h : HermitianMetric F W) (σ : F →+* ℂ)
+    {n : ℕ} (w : Fin n → W) (P : MvPolynomial (Fin n) ℂ)
+    (ξ : FibreSpace h σ)
+    : ℂ :=
   eval (Function.invFun (fibreGen h σ w) ξ) P
 
 end HeightsOfPoints

@@ -11,24 +11,26 @@ open GlobalTheory.CuspRep GlobalTheory.UnitaryBC PositivityTheory.Rg.Rs
 
 namespace PositivityTheory.Rg.BcB.F.LemDd.InfinitesimalUniqueness
 
-theorem prod_X_add_C_eq (m : Multiset ℂ) :
-    (m.map fun x => (X + C x : ℂ[X])).prod = ((m.map fun x => -x).map fun a => (X - C a : ℂ[X])).prod := by
+theorem prod_X_add_C_eq (m : Multiset ℂ)
+    : (m.map fun x => (X + C x : ℂ[X])).prod
+      = ((m.map fun x => -x).map fun a => (X - C a : ℂ[X])).prod := by
   rw [Multiset.map_map]
   congr 1
   apply Multiset.map_congr rfl
   intro x _
   simp [sub_eq_add_neg]
 
-theorem eval_prod_X_add_C (m : Multiset ℂ) (u : ℂ) :
-    ((m.map fun x => (X + C x : ℂ[X])).prod).eval u = (m.map fun x => u + x).prod := by
+theorem eval_prod_X_add_C (m : Multiset ℂ) (u : ℂ)
+    : ((m.map fun x => (X + C x : ℂ[X])).prod).eval u = (m.map fun x => u + x).prod := by
   rw [Polynomial.eval_multiset_prod, Multiset.map_map]
   congr 1
   apply Multiset.map_congr rfl
   intro x _
   simp
 
-theorem eq_of_prod_eq (m m' : Multiset ℂ) (h : ∀ u : ℂ, (m.map fun x => u + x).prod = (m'.map fun x => u + x).prod) :
-    m = m' := by
+theorem eq_of_prod_eq
+    (m m' : Multiset ℂ) (h : ∀ u : ℂ, (m.map fun x => u + x).prod = (m'.map fun x => u + x).prod)
+    : m = m' := by
   have hP : (m.map fun x => (X + C x : ℂ[X])).prod = (m'.map fun x => (X + C x : ℂ[X])).prod := by
     apply Polynomial.funext
     intro u

@@ -7,7 +7,10 @@ public import Development.WeilBound.CoreStatements.FlagImmersions.FibSandwich
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField IsDedekindDomain MvPolynomial
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat GlobalTheory.CompanionTheory.Ar.Fl
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
+  GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+  GlobalTheory.CompanionTheory.Ar.Fl
 
 namespace RootFieldNumerics.RF
 
@@ -17,9 +20,12 @@ theorem chiEx : ChiEx := by
   have h4 : H.d % 4 = 3 := by
     have := H.d_mod
     omega
-  refine ⟨(quadraticChar (ZMod H.d)).ringHomComp (Int.castRingHom ℂ), GlobalTheory.isKroneckerChar_quadraticChar h4, ?_⟩
-  have hr : rootDiscr E = hostRd E := by
-    simp [rootDiscr_def, hostRd, Int.cast_abs, one_div]
+  refine ⟨
+    (quadraticChar (ZMod H.d)).ringHomComp (Int.castRingHom ℂ),
+    GlobalTheory.isKroneckerChar_quadraticChar h4,
+    ?_
+  ⟩
+  have hr : rootDiscr E = hostRd E := by simp [rootDiscr_def, hostRd, Int.cast_abs, one_div]
   have hpos : 0 < hostRd E := by
     unfold hostRd
     apply Real.rpow_pos_of_pos

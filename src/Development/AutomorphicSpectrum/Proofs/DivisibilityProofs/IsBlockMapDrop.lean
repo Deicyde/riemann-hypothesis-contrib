@@ -9,13 +9,14 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Top.FlDeg
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 open GroundTheory.Heights₂.Heights.LowerBoundFree
 
 variable {Ψ : Type} [Fintype Ψ] [DecidableEq Ψ] {N : ℕ} {K : Type}
 
-theorem isBlockMap_drop (j : K → FlBlock Ψ N) (k₀ : K) :
-    IsBlockMap (Subtype.val : {k // k ≠ k₀} → K) (dropV j k₀) := by
+theorem isBlockMap_drop (j : K → FlBlock Ψ N) (k₀ : K)
+    : IsBlockMap (Subtype.val : {k // k ≠ k₀} → K) (dropV j k₀) := by
   refine ⟨Subtype.val_injective, ?_, fun _ => rfl, ?_⟩
   · rintro ⟨⟨a, ha⟩, x⟩ ⟨⟨b, hb⟩, y⟩ h
     have h' : (⟨a, x⟩ : Σ k, PIdx j k) = ⟨b, y⟩ := h
@@ -24,10 +25,12 @@ theorem isBlockMap_drop (j : K → FlBlock Ψ N) (k₀ : K) :
   · rintro ⟨k, x⟩ ⟨⟨k', hk⟩, rfl⟩
     exact ⟨⟨⟨k', hk⟩, x⟩, rfl⟩
 
-theorem imageZ_drop [Fintype K] [DecidableEq K] (j : K → FlBlock Ψ N) (k₀ : K) :
-    imageZ (dropV j k₀) (PPart j) = PPart (dropJ j k₀) := by
-  have key : ∀ f : MRing (PIdx (dropJ j k₀)), mConeMap (yPart j) (rename (dropV j k₀) f) =
-      rename Subtype.val (mConeMap (yPart (dropJ j k₀)) f) := by
+theorem imageZ_drop [Fintype K] [DecidableEq K] (j : K → FlBlock Ψ N) (k₀ : K)
+    : imageZ (dropV j k₀) (PPart j) = PPart (dropJ j k₀) := by
+  have key
+      : ∀ f : MRing (PIdx (dropJ j k₀)),
+        mConeMap (yPart j) (rename (dropV j k₀) f)
+          = rename Subtype.val (mConeMap (yPart (dropJ j k₀)) f) := by
     intro f
     induction f using MvPolynomial.induction_on with
     | C a => simp [mConeMap]

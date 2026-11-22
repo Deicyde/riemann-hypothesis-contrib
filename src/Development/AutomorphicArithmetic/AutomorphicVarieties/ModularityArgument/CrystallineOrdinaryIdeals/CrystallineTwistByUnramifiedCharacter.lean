@@ -7,14 +7,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
+open Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal Module
+  UpperTheory.V.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing Polynomial Topology
 
 noncomputable section
 
 namespace GlobalTheory.OrdTwist
 
-theorem tor_map {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (t : Rˣ) :
-    Matrix.GeneralLinearGroup.map f (tor R t) = tor S (Units.map (f : R →* S) t) := by
+theorem tor_map {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (t : Rˣ)
+    : Matrix.GeneralLinearGroup.map f (tor R t) = tor S (Units.map (f : R →* S) t) := by
   apply Units.ext
   change (Matrix.diagonal _).map f = Matrix.diagonal _
   rw [Matrix.diagonal_map (map_zero _)]
@@ -22,8 +23,9 @@ theorem tor_map {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) (t : Rˣ)
   funext a
   exact congrArg Units.val (map_zpow (Units.map (f : R →* S)) _ _)
 
-theorem residualRep_map_ringHom {G R S : Type} [Group G] [CommRing R] [CommRing S] (f : R →+* S) (η : G →* ℤˣ) (ψ : G →* Rˣ) :
-    (GG.map f).comp (r0 η ψ) = r0 η ((Units.map (f : R →* S)).comp ψ) := by
+theorem residualRep_map_ringHom
+    {G R S : Type} [Group G] [CommRing R] [CommRing S] (f : R →+* S) (η : G →* ℤˣ) (ψ : G →* Rˣ)
+    : (GG.map f).comp (r0 η ψ) = r0 η ((Units.map (f : R →* S)).comp ψ) := by
   ext1 g
   refine SemidirectProduct.ext ?_ ?_
   · exact tor_map f (ψ g)
@@ -31,43 +33,59 @@ theorem residualRep_map_ringHom {G R S : Type} [Group G] [CommRing R] [CommRing 
 
 section Cr
 
-variable {l : ℕ} [Fact l.Prime] {A : Type} [CommRing A] [Algebra ℚ_[l] A] [FiniteDimensional ℚ_[l] A]
-  [Algebra ℤ_[l] A] [IsScalarTower ℤ_[l] ℚ_[l] A] [TopologicalSpace A] [IsModuleTopology ℚ_[l] A]
+variable
+  {l : ℕ} [Fact l.Prime]
+  {A : Type} [CommRing A] [Algebra ℚ_[l] A] [FiniteDimensional ℚ_[l] A] [Algebra ℤ_[l] A]
+  [IsScalarTower ℤ_[l] ℚ_[l] A] [TopologicalSpace A] [IsModuleTopology ℚ_[l] A]
   [IsTopologicalRing A]
 
-theorem cont_ch {G : Type} [Group G] [TopologicalSpace G] {κ : G →* Aˣ} (h : Continuous κ) :
-    ContAction (chRep κ) :=
+theorem cont_ch {G : Type} [Group G] [TopologicalSpace G] {κ : G →* Aˣ} (h : Continuous κ)
+    : ContAction (chRep κ) :=
   (Units.continuous_val.comp (h.comp continuous_fst)).mul continuous_snd
 
-theorem cont_prod {G V V' : Type} [Group G] [TopologicalSpace G] [AddCommGroup V] [Module A V]
-    [TopologicalSpace V] [AddCommGroup V'] [Module A V'] [TopologicalSpace V'] {ρ : Representation A G V}
-    {ρ' : Representation A G V'} (h : ContAction ρ) (h' : ContAction ρ') : ContAction (ρ.prod ρ') :=
-  (h.comp (continuous_fst.prodMk continuous_snd.fst)).prodMk (h'.comp (continuous_fst.prodMk continuous_snd.snd))
+theorem cont_prod
+    {G V V' : Type} [Group G] [TopologicalSpace G] [AddCommGroup V] [Module A V]
+    [TopologicalSpace V] [AddCommGroup V'] [Module A V'] [TopologicalSpace V']
+    {ρ : Representation A G V} {ρ' : Representation A G V'} (h : ContAction ρ) (h' : ContAction ρ')
+    : ContAction (ρ.prod ρ') :=
+  (h.comp (continuous_fst.prodMk continuous_snd.fst)).prodMk
+    (h'.comp (continuous_fst.prodMk continuous_snd.snd))
 
-theorem isCr_char (H : Subgroup (GQ l)) (hH : IsOpen (H : Set (GQ l))) (κ : GQ l →* Aˣ) (hκ : Continuous κ)
-    (w : ℤ) (hw : ∀ g ∈ H, g ∈ Iq l → κ g = cycA l l A g ^ w) : IsCr H.subtype (chRep (κ.comp H.subtype)) :=
-  crUnr H.subtype hH.isOpenEmbedding_subtypeVal _ (cont_ch (hκ.comp continuous_subtype_val)) w fun g hg x => by
-    rw [Subgroup.subtype_apply, ← hw g g.2 hg]
-    rfl
+theorem isCr_char
+    (H : Subgroup (GQ l)) (hH : IsOpen (H : Set (GQ l)))
+    (κ : GQ l →* Aˣ) (hκ : Continuous κ)
+    (w : ℤ) (hw : ∀ g ∈ H, g ∈ Iq l → κ g = cycA l l A g ^ w)
+    : IsCr H.subtype (chRep (κ.comp H.subtype)) :=
+  crUnr H.subtype hH.isOpenEmbedding_subtypeVal _ (cont_ch (hκ.comp continuous_subtype_val)) w
+    fun g hg x => by
+      rw [Subgroup.subtype_apply, ← hw g g.2 hg]
+      rfl
 
-theorem isCr_diag (H : Subgroup (GQ l)) (hH : IsOpen (H : Set (GQ l))) (κ : Fin 3 → GQ l →* Aˣ)
-    (hκ : ∀ a, Continuous (κ a)) (w : Fin 3 → ℤ) (hw : ∀ a, ∀ g ∈ H, g ∈ Iq l → κ a g = cycA l l A g ^ w a)
+theorem isCr_diag
+    (H : Subgroup (GQ l)) (hH : IsOpen (H : Set (GQ l)))
+    (κ : Fin 3 → GQ l →* Aˣ) (hκ : ∀ a, Continuous (κ a))
+    (w : Fin 3 → ℤ) (hw : ∀ a, ∀ g ∈ H, g ∈ Iq l → κ a g = cycA l l A g ^ w a)
     (ρ : ↥H →* GL (Fin 3) A)
-    (hρ : ∀ g, (ρ g : Matrix (Fin 3) (Fin 3) A) = Matrix.diagonal fun a => (κ a g : A)) :
-    IsCr H.subtype (colRep ρ) := by
+    (hρ : ∀ g, (ρ g : Matrix (Fin 3) (Fin 3) A) = Matrix.diagonal fun a => (κ a g : A))
+    : IsCr H.subtype (colRep ρ) := by
   have hφ : IsOpenEmbedding H.subtype := hH.isOpenEmbedding_subtypeVal
   have hc : ∀ a, ContAction (chRep ((κ a).comp H.subtype)) := fun a =>
     cont_ch ((hκ a).comp continuous_subtype_val)
   have hcr := fun a => isCr_char H hH (κ a) (hκ a) (w a) (hw a)
   have hp := fun a g x => R0.proj_diag (κ := fun a => (κ a).comp H.subtype) hρ a g x
-  have h0 : ContAction (colRep ρ) := continuous_pi fun a => by
-    have := (hc a).comp (continuous_fst.prodMk ((continuous_apply a).comp continuous_snd) :
-      Continuous fun p : ↥H × (Fin 3 → A) => (p.1, p.2 a))
-    exact this.congr fun p => (hp a p.1 p.2).symm
-  have h1 := (isCrys_isDR_prod _ hφ _ _ (hc 0) (cont_prod (hc 1) (hc 2))).1 (hcr 0)
-    ((isCrys_isDR_prod _ hφ _ _ (hc 1) (hc 2)).1 (hcr 1) (hcr 2))
+  have h0 : ContAction (colRep ρ) :=
+    continuous_pi fun a => by
+      have :=
+        (hc a).comp
+          (continuous_fst.prodMk ((continuous_apply a).comp continuous_snd)
+            : Continuous fun p : ↥H × (Fin 3 → A) => (p.1, p.2 a))
+      exact this.congr fun p => (hp a p.1 p.2).symm
+  have h1 :=
+    (isCrys_isDR_prod _ hφ _ _ (hc 0) (cont_prod (hc 1) (hc 2))).1 (hcr 0)
+      ((isCrys_isDR_prod _ hφ _ _ (hc 1) (hc 2)).1 (hcr 1) (hcr 2))
   refine ((isCrys_isDR_sub_quot _ hφ _ _ h0 (cont_prod (hc 0) (cont_prod (hc 1) (hc 2)))
-    ((LinearMap.proj 0).prod ((LinearMap.proj 1).prod (LinearMap.proj 2))) fun g x => ?_).1 fun x y h => ?_).1 h1
+      ((LinearMap.proj 0).prod ((LinearMap.proj 1).prod (LinearMap.proj 2))) fun g x => ?_).1
+    fun x y h => ?_).1 h1
   · exact Prod.ext (hp 0 g x) (Prod.ext (hp 1 g x) (hp 2 g x))
   · funext a
     fin_cases a
@@ -79,7 +97,17 @@ end Cr
 
 end GlobalTheory.OrdTwist
 
-theorem GlobalTheory.OrdTwist.twist_inDcr : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O] (D : Dat3 l O) (E : Type) [Field E] [Algebra ℚ_[l] E] [Module.Finite ℚ_[l] E] [Algebra O E] [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] O E] [IsScalarTower ℤ_[l] ℚ_[l] E] (B : Type) [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B] [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B] [Algebra E B] [IsScalarTower O E B] [IsScalarTower ℚ_[l] E B] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a) (u : GQ l →* Bˣ), QCont l (fun g => (u g : B)) → (∀ g ∈ Iq l, u g = 1) → (∀ g, IsNilpotent ((u g : B) - 1)) → D.InDcr (π : B →+* E) (r0 D.η ((Units.map (algebraMap O B : O →* B)).comp D.Ψ * u)) := by
+theorem GlobalTheory.OrdTwist.twist_inDcr
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [CharZero O] [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O] [IsAdicComplete (maximalIdeal O) O]
+        (D : Dat3 l O) (E : Type) [Field E] [Algebra ℚ_[l] E] [Module.Finite ℚ_[l] E] [Algebra O E]
+        [Algebra ℤ_[l] E] [IsScalarTower ℤ_[l] O E] [IsScalarTower ℤ_[l] ℚ_[l] E] (B : Type)
+        [CommRing B] [Algebra ℚ_[l] B] [Module.Finite ℚ_[l] B] [Algebra O B] [Algebra ℤ_[l] B]
+        [IsScalarTower ℤ_[l] O B] [IsScalarTower ℤ_[l] ℚ_[l] B] [Algebra E B] [IsScalarTower O E B]
+        [IsScalarTower ℚ_[l] E B] (π : B →ₐ[E] E) (hπ : ∀ a, π a = 0 → IsNilpotent a)
+        (u : GQ l →* Bˣ),
+      QCont l (fun g => (u g : B)) → (∀ g ∈ Iq l, u g = 1) → (∀ g, IsNilpotent ((u g : B) - 1))
+        → D.InDcr (π : B →+* E) (r0 D.η ((Units.map (algebraMap O B : O →* B)).comp D.Ψ * u)) := by
   intro l _ O _ _ _ _ _ _ _ D E _ _ _ _ _ _ _ B _ _ _ _ _ _ _ _ _ _ π _ u hc hI hu
   letI : TopologicalSpace B := moduleTopology ℚ_[l] B
   haveI : IsModuleTopology ℚ_[l] B := ⟨rfl⟩
@@ -99,7 +127,8 @@ theorem GlobalTheory.OrdTwist.twist_inDcr : ∀ {l : ℕ} [Fact l.Prime] {O : Ty
   have hψ : Continuous fun g => (ψ g : B) := by
     simp only [hψv]
     exact hΨ.mul hc
-  have hψi : Continuous fun g => (((ψ g)⁻¹ : Bˣ) : B) := UpperTheory.continuous_units_inv_of_continuous_coe_finite_Qp_algebra (l := l) (fun g => ψ g) hψ
+  have hψi : Continuous fun g => (((ψ g)⁻¹ : Bˣ) : B) :=
+    UpperTheory.continuous_units_inv_of_continuous_coe_finite_Qp_algebra (l := l) (fun g => ψ g) hψ
   have hψ' : Continuous ψ := Units.continuous_iff.2 ⟨hψ, hψi⟩
   refine ⟨fun g => rfl, ?_, fun a b => ?_, ?_⟩
   · show (GG.map (π : B →+* E)).comp (r0 D.η ψ) = (GG.map (algebraMap O E)).comp (r0 D.η D.Ψ)
@@ -130,7 +159,11 @@ theorem GlobalTheory.OrdTwist.twist_inDcr : ∀ {l : ℕ} [Fact l.Prime] {O : Ty
     have hcyc : ∀ g, j (cycA l l O g) = cycA l l B g := fun g =>
       Units.ext (IsScalarTower.algebraMap_apply ℤ_[l] O B _).symm
     refine ⟨((tor B).comp ψ).comp D.HL.subtype, fun g => rfl, ?_⟩
-    refine isCr_diag D.HL hH κ (fun a => hψ'.zpow _) (fun a => (D.e : ℤ) * wt1 a) (fun a g hg hgI => ?_) _
+    refine isCr_diag D.HL hH κ
+      (fun a => hψ'.zpow _)
+      (fun a => (D.e : ℤ) * wt1 a)
+      (fun a g hg hgI => ?_)
+      _
       fun g => rfl
     have hτ : D.τ g = 1 := hg.2
     change ψ g ^ wt1 a = _

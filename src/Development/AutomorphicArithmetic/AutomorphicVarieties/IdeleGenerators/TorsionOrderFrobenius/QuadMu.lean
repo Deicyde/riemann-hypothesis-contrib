@@ -5,11 +5,13 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V.Base
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  UpperTheory.V.Base
 
 namespace UpperTheory.V.Sd.Tw
 
-private def Fx {Ω : Type} [Field Ω] (s : Ω →+* Ω) (a : ℤ) : Prop := ∀ δ : Ω, δ ^ 2 = (a : Ω) → s δ = δ
+private def Fx {Ω : Type} [Field Ω] (s : Ω →+* Ω) (a : ℤ) : Prop :=
+  ∀ δ : Ω, δ ^ 2 = (a : Ω) → s δ = δ
 
 section
 variable {Ω : Type} [Field Ω] {s : Ω →+* Ω}
@@ -47,8 +49,9 @@ private theorem fx_four : Fx s 4 := by
 
 variable {M : ℕ}
 
-private theorem fix_dvd (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) {n : ℕ} (hn : n ∣ M) {ζ : Ω} (hζ : ζ ^ n = 1) :
-    s ζ = ζ := by
+private theorem fix_dvd
+    (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) {n : ℕ} (hn : n ∣ M) {ζ : Ω} (hζ : ζ ^ n = 1)
+    : s ζ = ζ := by
   obtain ⟨k, rfl⟩ := hn
   exact h ζ (by rw [pow_mul, hζ, one_pow])
 
@@ -59,7 +62,8 @@ private theorem fx_neg_one (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (h4 : 4 �
   push_cast
   norm_num
 
-private theorem fx_two [IsAlgClosed Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (h8 : 8 ∣ M) : Fx s 2 := by
+private theorem fx_two [IsAlgClosed Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (h8 : 8 ∣ M)
+    : Fx s 2 := by
   intro δ hδ
   have hδ' : δ ^ 2 = 2 := by
     rw [hδ]
@@ -89,8 +93,8 @@ private theorem fx_two [IsAlgClosed Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = 
     linear_combination (-δ) * ht + δ * t * hi
   rw [hδη, map_mul, map_sub, map_one, hsη, hsi]
 
-private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (n : ℕ) :
-    n % 2 = 1 → n ∣ M → ∃ a : ℤ, a % 4 = 1 ∧ a.natAbs = n ∧ Fx s a := by
+private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) (n : ℕ)
+    : n % 2 = 1 → n ∣ M → ∃ a : ℤ, a % 4 = 1 ∧ a.natAbs = n ∧ Fx s a := by
   induction n using Nat.recOnMul with
   | zero =>
     intro h0
@@ -131,11 +135,12 @@ private theorem fx_odd [IsAlgClosed Ω] [CharZero Ω] (h : ∀ ζ : Ω, ζ ^ M =
       norm_num
     · rw [Int.natAbs_mul, hx2, hy2]
 
-private theorem fx_disc [IsAlgClosed Ω] [CharZero Ω] {d : ℤ} (hd0 : d ≠ 0) (hd : d % 4 = 0 ∨ d % 4 = 1)
-    (h : ∀ ζ : Ω, ζ ^ d.natAbs = 1 → s ζ = ζ) : Fx s d := by
+private theorem fx_disc
+    [IsAlgClosed Ω] [CharZero Ω]
+    {d : ℤ} (hd0 : d ≠ 0) (hd : d % 4 = 0 ∨ d % 4 = 1) (h : ∀ ζ : Ω, ζ ^ d.natAbs = 1 → s ζ = ζ)
+    : Fx s d := by
   obtain ⟨k, m, hm, hdk⟩ := Nat.exists_eq_two_pow_mul_odd (Int.natAbs_ne_zero.2 hd0)
-  obtain ⟨a, ha4, ham, hfa⟩ :=
-    fx_odd h m (Nat.odd_iff.1 hm) (by rw [hdk]; exact dvd_mul_left m _)
+  obtain ⟨a, ha4, ham, hfa⟩ := fx_odd h m (Nat.odd_iff.1 hm) (by rw [hdk]; exact dvd_mul_left m _)
   have hda : d = 2 ^ k * a ∨ d = -(2 ^ k * a) := by
     apply Int.natAbs_eq_natAbs_iff.1
     rw [Int.natAbs_mul, ham, hdk]
@@ -171,17 +176,17 @@ private theorem fx_disc [IsAlgClosed Ω] [CharZero Ω] {d : ℤ} (hd0 : d ≠ 0)
 
 end
 
-private theorem exists_sq_sub_trace_mul_eq_rat_of_finrank_two {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
-    (x : K) : ∃ r : ℚ, x ^ 2 - algebraMap ℚ K (Algebra.trace ℚ K x) * x = algebraMap ℚ K r := by
+private theorem exists_sq_sub_trace_mul_eq_rat_of_finrank_two
+    {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) (x : K)
+    : ∃ r : ℚ, x ^ 2 - algebraMap ℚ K (Algebra.trace ℚ K x) * x = algebraMap ℚ K r := by
   classical
   let b := Module.finBasisOfFinrankEq ℚ K hK
   set M := Algebra.leftMulMatrix b x with hM
-  have hnd : M.charpoly.natDegree = 2 := by
-    rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
+  have hnd : M.charpoly.natDegree = 2 := by rw [Matrix.charpoly_natDegree_eq_dim, Fintype.card_fin]
   have h2 : M.charpoly.coeff 2 = 1 := by
     have := (Matrix.charpoly_monic M).leadingCoeff
     rwa [Polynomial.leadingCoeff, hnd] at this
-  have htr : Algebra.trace ℚ K x = -M.charpoly.coeff 1 := by
+  have htr : Algebra.trace ℚ K x = - M.charpoly.coeff 1 := by
     rw [Algebra.trace_eq_matrix_trace b, Matrix.trace_eq_neg_charpoly_coeff]
     rfl
   have hzero : Polynomial.aeval x M.charpoly = 0 := by
@@ -190,39 +195,46 @@ private theorem exists_sq_sub_trace_mul_eq_rat_of_finrank_two {K : Type} [Field 
     exact Matrix.aeval_self_charpoly M
   rw [Polynomial.aeval_eq_sum_range, hnd] at hzero
   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, pow_zero, pow_one, h2,
-    one_smul, Algebra.smul_def, mul_one, map_one, one_mul] at hzero
-  refine ⟨-M.charpoly.coeff 0, ?_⟩
+      one_smul, Algebra.smul_def, mul_one, map_one, one_mul]
+    at hzero
+  refine ⟨- M.charpoly.coeff 0, ?_⟩
   rw [htr, map_neg, map_neg]
   linear_combination hzero
 
-private theorem two_mul_mul_sub_trace_eq_rat_of_finrank_two {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
-    (x y : K) : 2 * x * y - algebraMap ℚ K (Algebra.trace ℚ K x) * y
-      - algebraMap ℚ K (Algebra.trace ℚ K y) * x
+private theorem two_mul_mul_sub_trace_eq_rat_of_finrank_two
+    {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) (x y : K)
+    : 2 * x * y - algebraMap ℚ K (Algebra.trace ℚ K x) * y
+        - algebraMap ℚ K (Algebra.trace ℚ K y) * x
       = algebraMap ℚ K (Algebra.trace ℚ K (x * y) - Algebra.trace ℚ K x * Algebra.trace ℚ K y) := by
   obtain ⟨r1, h1⟩ := exists_sq_sub_trace_mul_eq_rat_of_finrank_two hK (x + y)
   obtain ⟨r2, h2⟩ := exists_sq_sub_trace_mul_eq_rat_of_finrank_two hK x
   obtain ⟨r3, h3⟩ := exists_sq_sub_trace_mul_eq_rat_of_finrank_two hK y
   simp only [map_add (f := _)] at h1
-  have hE : 2 * x * y - algebraMap ℚ K (Algebra.trace ℚ K x) * y
-      - algebraMap ℚ K (Algebra.trace ℚ K y) * x = algebraMap ℚ K (r1 - r2 - r3) := by
+  have hE
+      : 2 * x * y - algebraMap ℚ K (Algebra.trace ℚ K x) * y
+          - algebraMap ℚ K (Algebra.trace ℚ K y) * x
+        = algebraMap ℚ K (r1 - r2 - r3) := by
     rw [map_sub, map_sub, ← h1, ← h2, ← h3]
     ring
-  have e2 : 2 * x * y - algebraMap ℚ K (Algebra.trace ℚ K x) * y
-      - algebraMap ℚ K (Algebra.trace ℚ K y) * x
-      = (2 : ℚ) • (x * y) - Algebra.trace ℚ K x • y - Algebra.trace ℚ K y • x := by
+  have e2
+      : 2 * x * y - algebraMap ℚ K (Algebra.trace ℚ K x) * y
+          - algebraMap ℚ K (Algebra.trace ℚ K y) * x
+        = (2 : ℚ) • (x * y) - Algebra.trace ℚ K x • y - Algebra.trace ℚ K y • x := by
     simp only [Algebra.smul_def, map_ofNat]
     ring
   have hT := congrArg (Algebra.trace ℚ K) hE
-  rw [e2, Algebra.trace_algebraMap, hK, map_sub, map_sub, map_smul, map_smul, map_smul,
-    smul_eq_mul, smul_eq_mul, smul_eq_mul, nsmul_eq_mul] at hT
+  rw [e2, Algebra.trace_algebraMap, hK, map_sub, map_sub, map_smul, map_smul, map_smul, smul_eq_mul,
+      smul_eq_mul, smul_eq_mul, nsmul_eq_mul]
+    at hT
   rw [hE]
   congr 1
   push_cast at hT
   linarith
 
-private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2) :
-    (discr K % 4 = 0 ∨ discr K % 4 = 1) ∧ ∃ δ : K, δ ^ 2 = (discr K : K) ∧
-      ∀ x : K, ∃ a b : ℚ, 2 * x * δ = (a : K) * δ + (b : K) := by
+private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic
+    {K : Type} [Field K] [NumberField K] (hK : Module.finrank ℚ K = 2)
+    : (discr K % 4 = 0 ∨ discr K % 4 = 1)
+      ∧ ∃ δ : K, δ ^ 2 = (discr K : K) ∧ ∀ x : K, ∃ a b : ℚ, 2 * x * δ = (a : K) * δ + (b : K) := by
   classical
   have hcard : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 K)) = 2 := by
     rw [← Module.finrank_eq_card_chooseBasisIndex, NumberField.RingOfIntegers.rank, hK]
@@ -247,18 +259,24 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
   have tr1 : Algebra.trace ℚ K 1 = 2 := by
     rw [← map_one (algebraMap ℚ K), Algebra.trace_algebraMap, hK]
     norm_num
-  have R0 : Algebra.trace ℚ K x0
-      = c0 * Algebra.trace ℚ K (x0 * x0) + c1 * Algebra.trace ℚ K (x0 * x1) := by
+  have R0
+      : Algebra.trace ℚ K x0
+        = c0 * Algebra.trace ℚ K (x0 * x0) + c1 * Algebra.trace ℚ K (x0 * x1) := by
     have h : x0 = c0 • (x0 * x0) + c1 • (x0 * x1) := by
-      calc x0 = x0 * 1 := (mul_one _).symm
+      calc
+        x0
+          = x0 * 1 := (mul_one _).symm
         _ = x0 * (c0 • x0 + c1 • x1) := by rw [hone]
         _ = _ := by rw [mul_add, mul_smul_comm, mul_smul_comm]
     conv_lhs => rw [h]
     rw [map_add (f := _), map_smul, map_smul, smul_eq_mul, smul_eq_mul]
-  have R1 : Algebra.trace ℚ K x1
-      = c0 * Algebra.trace ℚ K (x0 * x1) + c1 * Algebra.trace ℚ K (x1 * x1) := by
+  have R1
+      : Algebra.trace ℚ K x1
+        = c0 * Algebra.trace ℚ K (x0 * x1) + c1 * Algebra.trace ℚ K (x1 * x1) := by
     have h : x1 = c0 • (x0 * x1) + c1 • (x1 * x1) := by
-      calc x1 = 1 * x1 := (one_mul _).symm
+      calc
+        x1
+          = 1 * x1 := (one_mul _).symm
         _ = (c0 • x0 + c1 • x1) * x1 := by rw [hone]
         _ = _ := by rw [add_mul, smul_mul_assoc, smul_mul_assoc]
     conv_lhs => rw [h]
@@ -277,8 +295,11 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
   obtain ⟨n0, hn0⟩ := hZ x0 hi0
   obtain ⟨n1, hn1⟩ := hZ x1 hi1
   obtain ⟨m01, hm01⟩ := hZ (x0 * x1) (hi0.mul hi1)
-  obtain ⟨δ, hδd⟩ : ∃ δ : K, δ = algebraMap ℚ K (Algebra.trace ℚ K x1) * x0
-      - algebraMap ℚ K (Algebra.trace ℚ K x0) * x1 := ⟨_, rfl⟩
+  obtain ⟨δ, hδd⟩
+      : ∃ δ : K,
+        δ = algebraMap ℚ K (Algebra.trace ℚ K x1) * x0
+          - algebraMap ℚ K (Algebra.trace ℚ K x0) * x1 :=
+    ⟨_, rfl⟩
   have htd : Algebra.trace ℚ K δ = 0 := by
     rw [hδd, map_sub, ← Algebra.smul_def, ← Algebra.smul_def, map_smul, map_smul, smul_eq_mul,
       smul_eq_mul]
@@ -328,7 +349,7 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
     linear_combination (1 / 4 : K) * hν - (1 / 4 : K) * hsq
   obtain ⟨q, hq⟩ : ∃ n : ℤ, (n : ℚ) = ((t0 * t1 - T01) ^ 2 - ((discr K : ℤ) : ℚ)) / 4 := by
     have h1 : IsIntegral ℤ (((t0 * t1 - T01) ^ 2 - ((discr K : ℤ) : ℚ)) / 4) :=
-      (isIntegral_algebraMap_iff ).1 (hνq ▸ hνint)
+      (isIntegral_algebraMap_iff).1 (hνq ▸ hνint)
     obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.1 h1
     exact ⟨n, by rw [← hn]; simp⟩
   rw [← hn0, ← hn1, ← hm01] at hq
@@ -351,14 +372,16 @@ private theorem sub_smul_mul_sub_smul_eq_zero_of_quadratic {K : Type} [Field K] 
     generalize k * k + k - q = X
     omega
 
-theorem quadMu (K Ω : Type) [Field K] [NumberField K] [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra K Ω]
-    (hK : Module.finrank ℚ K = 2) (s : G ℚ Ω) (hs : ∀ ζ : Ω, ζ ^ (discr K).natAbs = 1 → s ζ = ζ) : s ∈ galOf ℚ K Ω := by
+theorem quadMu
+    (K Ω : Type) [Field K] [NumberField K] [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra K Ω]
+    (hK : Module.finrank ℚ K = 2)
+    (s : G ℚ Ω) (hs : ∀ ζ : Ω, ζ ^ (discr K).natAbs = 1 → s ζ = ζ)
+    : s ∈ galOf ℚ K Ω := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   obtain ⟨hd4, δ, hδ, hx⟩ := sub_smul_mul_sub_smul_eq_zero_of_quadratic hK
   have hD : discr K ≠ 0 := NumberField.discr_ne_zero K
   obtain ⟨δ', hδ'⟩ : ∃ δ' : Ω, δ' = algebraMap K Ω δ := ⟨_, rfl⟩
-  have hδ'2 : δ' ^ 2 = ((discr K : ℤ) : Ω) := by
-    rw [hδ', ← map_pow, hδ, map_intCast]
+  have hδ'2 : δ' ^ 2 = ((discr K : ℤ) : Ω) := by rw [hδ', ← map_pow, hδ, map_intCast]
   have hsδ : s δ' = δ' := fx_disc (s := (s : Ω →+* Ω)) hD hd4 (fun ζ hζ => hs ζ hζ) δ' hδ'2
   have hδ0 : δ' ≠ 0 := by
     intro h0

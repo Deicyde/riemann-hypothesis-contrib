@@ -8,24 +8,33 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.LiftOfReduce
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj CategoryTheory.MonObj TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic GlobalTheory.AV GlobalTheory.AV.AbVar
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.HTLat GlobalTheory.Published.AbVarRed GlobalTheory.CechPic
+  GlobalTheory.AV GlobalTheory.AV.AbVar
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AV.AbVar
 
-theorem exists_lift_of_surjective_of_isReduced {K : Type} [Field K] {T T' Z Y : Over (Sp K)}
-    (i : Z ⟶ Y) [IsClosedImmersion i.left] [IsReduced T.left] (q : T' ⟶ T) (g : T ⟶ Y) (r : T' ⟶ Z)
-    (hq : Surjective q.left) (h : q ≫ g = r ≫ i) : ∃ e : T ⟶ Z, e ≫ i = g := by
-  obtain ⟨e, he⟩ := GlobalTheory.lift_of_reduced_of_support i.left g.left (fun t => by
-    obtain ⟨t', rfl⟩ := hq.surj t
-    apply i.left.range_subset_ker_support
-    refine ⟨r.left t', ?_⟩
-    rw [← Scheme.Hom.comp_apply, ← Over.comp_left, ← h, Over.comp_left, Scheme.Hom.comp_apply])
-  exact ⟨Over.homMk e (by rw [← Over.w i, ← Category.assoc, he, Over.w g]), Over.OverMorphism.ext he⟩
+theorem exists_lift_of_surjective_of_isReduced
+    {K : Type} [Field K]
+    {T T' Z Y : Over (Sp K)} (i : Z ⟶ Y) [IsClosedImmersion i.left] [IsReduced T.left]
+    (q : T' ⟶ T) (g : T ⟶ Y) (r : T' ⟶ Z) (hq : Surjective q.left) (h : q ≫ g = r ≫ i)
+    : ∃ e : T ⟶ Z, e ≫ i = g := by
+  obtain ⟨e, he⟩ :=
+    GlobalTheory.lift_of_reduced_of_support i.left g.left (fun t => by
+      obtain ⟨t', rfl⟩ := hq.surj t
+      apply i.left.range_subset_ker_support
+      refine ⟨r.left t', ?_⟩
+      rw [← Scheme.Hom.comp_apply, ← Over.comp_left, ← h, Over.comp_left, Scheme.Hom.comp_apply])
+  exact
+    ⟨Over.homMk e (by rw [← Over.w i, ← Category.assoc, he, Over.w g]), Over.OverMorphism.ext he⟩
 
-theorem exists_grpObj_of_image :
-    ∀ (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (Z : Over (Sp K)) (p : A.X ⟶ Z) (i : Z ⟶ B.X), p ≫ i = f.hom → Surjective p.left → IsClosedImmersion i.left → GeometricallyIntegral Z.hom → ∃ _ : GrpObj Z, IsMonHom p ∧ IsMonHom i := by
+theorem exists_grpObj_of_image
+    : ∀ (K : Type) [Field K] (A B : AbVar K) (f : A ⟶ B) (Z : Over (Sp K)) (p : A.X ⟶ Z)
+        (i : Z ⟶ B.X),
+      p ≫ i = f.hom → Surjective p.left → IsClosedImmersion i.left → GeometricallyIntegral Z.hom
+        → ∃ _ : GrpObj Z, IsMonHom p ∧ IsMonHom i := by
   intro K _ A B f Z p i hf hp hi hZ
   have hmono : Mono i := Over.mono_of_mono_left i
   haveI : IsIntegral Z.left := GeometricallyIntegral.isIntegral_of_subsingleton Z.hom
@@ -39,13 +48,17 @@ theorem exists_grpObj_of_image :
   have hpp : Surjective (p ⊗ₘ p).left :=
     MorphismProperty.pullbackMap (P := @Surjective) hp hp (Over.w p).symm (Over.w p).symm
   have hinv : ι[A.X] ≫ f.hom = f.hom ≫ ι[B.X] := by
-    calc ι[A.X] ≫ f.hom = (𝟙 A.X)⁻¹ ≫ f.hom := by rw [Hom.inv_def, Category.id_comp]
+    calc
+      ι[A.X] ≫ f.hom
+        = (𝟙 A.X)⁻¹ ≫ f.hom := by rw [Hom.inv_def, Category.id_comp]
       _ = (𝟙 A.X ≫ f.hom)⁻¹ := GrpObj.inv_comp _ _
       _ = f.hom ≫ ι[B.X] := by rw [Category.id_comp, Hom.inv_def]
-  obtain ⟨m, hm⟩ := exists_lift_of_surjective_of_isReduced i (p ⊗ₘ p) ((i ⊗ₘ i) ≫ μ[B.X]) (μ[A.X] ≫ p) hpp (by
-    rw [← Category.assoc, tensorHom_comp_tensorHom, hf, ← IsMonHom.mul_hom, Category.assoc, hf])
-  obtain ⟨v, hv⟩ := exists_lift_of_surjective_of_isReduced i p (i ≫ ι[B.X]) (ι[A.X] ≫ p) hp (by
-    rw [← Category.assoc, hf, Category.assoc, hf, hinv])
+  obtain ⟨m, hm⟩ :=
+    exists_lift_of_surjective_of_isReduced i (p ⊗ₘ p) ((i ⊗ₘ i) ≫ μ[B.X]) (μ[A.X] ≫ p) hpp (by
+      rw [← Category.assoc, tensorHom_comp_tensorHom, hf, ← IsMonHom.mul_hom, Category.assoc, hf])
+  obtain ⟨v, hv⟩ :=
+    exists_lift_of_surjective_of_isReduced i p (i ≫ ι[B.X]) (ι[A.X] ≫ p) hp
+      (by rw [← Category.assoc, hf, Category.assoc, hf, hinv])
   have h1 : (η[A.X] ≫ p) ≫ i = η[B.X] := by rw [Category.assoc, hf, IsMonHom.one_hom]
   have h1a : η[A.X] ≫ p ≫ i = η[B.X] := by rw [← Category.assoc, h1]
   letI M : MonObj Z :=
@@ -86,6 +99,7 @@ theorem exists_grpObj_of_image :
         simp only [Category.assoc, h1a] }
   refine ⟨G, ⟨rfl, ?_⟩, ⟨h1, hm⟩⟩
   change μ[A.X] ≫ p = (p ⊗ₘ p) ≫ m
-  rw [← cancel_mono i, Category.assoc, Category.assoc, hm, hf, IsMonHom.mul_hom, tensorHom_comp_tensorHom_assoc, hf]
+  rw [← cancel_mono i, Category.assoc, Category.assoc, hm, hf, IsMonHom.mul_hom,
+    tensorHom_comp_tensorHom_assoc, hf]
 
 end GlobalTheory.AV.AbVar

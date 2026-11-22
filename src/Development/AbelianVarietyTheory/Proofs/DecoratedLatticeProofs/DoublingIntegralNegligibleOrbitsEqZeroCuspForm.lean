@@ -9,9 +9,13 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Dou
 @[expose] public section
 
 open scoped ComplexConjugate Matrix NNReal
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
-open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling GlobalTheory.Cont
-open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.Theta Formalism.L2.Pj
+  Formalism.IndefR.Datum MeasureTheory IsDedekindDomain NumberField
+open GlobalTheory.AutomorphicL2Unitary GlobalTheory.Cusp GlobalTheory.AdelicU GlobalTheory.Doubling
+  GlobalTheory.Cont
+open GlobalTheory.IndefiniteRowSideFullHecke.SphericalVolumeLift
+  (FinPl RealMat Lat IsFockVec IsSphOff HidaSetting volQ)
 open GlobalTheory.Mem.Th (CptF)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Core.Rk.IP
@@ -26,49 +30,61 @@ def IsNeg (x : GA D (dblSp V)) : Prop := ¬ ∃ δ ∈ GQ V, x * (io V (δ, 1))�
 
 variable {V}
 
-theorem isNeg_siegel_mul {p x : GA D (dblSp V)} (hp : p ∈ siegel V) : IsNeg V (p * x) ↔ IsNeg V x := by
+theorem isNeg_siegel_mul {p x : GA D (dblSp V)} (hp : p ∈ siegel V)
+    : IsNeg V (p * x) ↔ IsNeg V x := by
   unfold IsNeg
   refine not_congr ⟨fun ⟨δ, hδ, h⟩ => ⟨δ, hδ, ?_⟩, fun ⟨δ, hδ, h⟩ => ⟨δ, hδ, ?_⟩⟩
   · have := (siegel V).mul_mem ((siegel V).inv_mem hp) h
     simpa [mul_assoc] using this
   · simpa [mul_assoc] using (siegel V).mul_mem hp h
 
-theorem isNeg_mul_io {x : GA D (dblSp V)} {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V) :
-    IsNeg V (x * io V (γ₁, γ₂)) → IsNeg V x := by
+theorem isNeg_mul_io {x : GA D (dblSp V)} {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V)
+    : IsNeg V (x * io V (γ₁, γ₂)) → IsNeg V x := by
   intro h ⟨δ, hδ, hx⟩
   refine h ⟨γ₂⁻¹ * δ * γ₁, (GQ V).mul_mem ((GQ V).mul_mem ((GQ V).inv_mem h₂) hδ) h₁, ?_⟩
-  have e : x * io V (γ₁, γ₂) * (io V (γ₂⁻¹ * δ * γ₁, 1))⁻¹ = x * (io V (δ, 1))⁻¹ * io V (γ₂, γ₂) := by
+  have e
+      : x * io V (γ₁, γ₂) * (io V (γ₂⁻¹ * δ * γ₁, 1))⁻¹ = x * (io V (δ, 1))⁻¹ * io V (γ₂, γ₂) := by
     simp only [mul_assoc, ← map_inv, ← map_mul]
     congr 2
     ext <;> simp [mul_assoc]
   rw [e]
   exact (siegel V).mul_mem hx ((io_mem_siegel V).2 rfl)
 
-theorem isNeg_mul_io_iff {x : GA D (dblSp V)} {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V) :
-    IsNeg V (x * io V (γ₁, γ₂)) ↔ IsNeg V x := by
+theorem isNeg_mul_io_iff {x : GA D (dblSp V)} {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V)
+    : IsNeg V (x * io V (γ₁, γ₂)) ↔ IsNeg V x := by
   refine ⟨isNeg_mul_io h₁ h₂, fun h => isNeg_mul_io ((GQ V).inv_mem h₁) ((GQ V).inv_mem h₂) ?_⟩
   have e : ((γ₁, γ₂) * (γ₁⁻¹, γ₂⁻¹) : GA D V × GA D V) = 1 := by ext <;> simp
   rw [mul_assoc, ← map_mul, e, map_one, mul_one]
   exact h
 
-theorem exists_out_rmul (q : SiegelCosets V) (g : GQ (dblSp V)) : ∃ p ∈ siegelQ V,
-    (((rmul _ g q).out : GQ (dblSp V)) : GA D (dblSp V)) = p * (q.out : GQ (dblSp V)) * g := by
+theorem exists_out_rmul (q : SiegelCosets V) (g : GQ (dblSp V))
+    : ∃ p ∈ siegelQ V,
+      (((rmul _ g q).out : GQ (dblSp V)) : GA D (dblSp V)) = p * (q.out : GQ (dblSp V)) * g := by
   have e : mk ((siegel V).subgroupOf (GQ (dblSp V))) (q.out * g) = mk _ (rmul _ g q).out :=
-    ((rmul_mk g q.out).symm.trans (congrArg (rmul _ g) (Quotient.out_eq q))).trans (Quotient.out_eq _).symm
+    ((rmul_mk g q.out).symm.trans (congrArg (rmul _ g) (Quotient.out_eq q))).trans
+      (Quotient.out_eq _).symm
   obtain ⟨p, hp⟩ := mk_eq_iff.1 e
-  refine ⟨((p : GQ (dblSp V)) : GA D (dblSp V)), ⟨Subgroup.mem_subgroupOf.1 p.2, (p : GQ (dblSp V)).2⟩, ?_⟩
+  refine ⟨
+    ((p : GQ (dblSp V)) : GA D (dblSp V)),
+    ⟨Subgroup.mem_subgroupOf.1 p.2, (p : GQ (dblSp V)).2⟩,
+    ?_
+  ⟩
   rw [← hp]
   simp [mul_assoc]
 
-theorem isNeg_out_rmul_iff (q : SiegelCosets V) {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V) :
-    IsNeg V ((rmul _ ⟨io V (γ₁, γ₂), io_mem_GQ V h₁ h₂⟩ q).out : GQ (dblSp V)) ↔ IsNeg V (q.out : GQ (dblSp V)) := by
+theorem isNeg_out_rmul_iff (q : SiegelCosets V) {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V)
+    : IsNeg V ((rmul _ ⟨io V (γ₁, γ₂), io_mem_GQ V h₁ h₂⟩ q).out : GQ (dblSp V))
+      ↔ IsNeg V (q.out : GQ (dblSp V)) := by
   obtain ⟨p, hp, e⟩ := exists_out_rmul q ⟨io V (γ₁, γ₂), io_mem_GQ V h₁ h₂⟩
   rw [e, mul_assoc, isNeg_siegel_mul hp.1]
   exact isNeg_mul_io_iff h₁ h₂
 
-theorem apply_out_rmul {a : GL (Fin V.rank) (AE D)} {μ : (AE D)ˣ →* Circle} (hμ : IsHeckeChar D μ) {s : ℂ}
-    {φ : GA D (dblSp V) → ℂ} (hφ : φ ∈ degPS V a μ s) (q : SiegelCosets V) (g : GQ (dblSp V)) (y : GA D (dblSp V)) :
-    φ ((((rmul _ g q).out : GQ (dblSp V)) : GA D (dblSp V)) * y) = φ ((q.out : GQ (dblSp V)) * g * y) := by
+theorem apply_out_rmul
+    {a : GL (Fin V.rank) (AE D)} {μ : (AE D)ˣ →* Circle} (hμ : IsHeckeChar D μ)
+    {s : ℂ} {φ : GA D (dblSp V) → ℂ} (hφ : φ ∈ degPS V a μ s)
+    (q : SiegelCosets V) (g : GQ (dblSp V)) (y : GA D (dblSp V))
+    : φ ((((rmul _ g q).out : GQ (dblSp V)) : GA D (dblSp V)) * y)
+      = φ ((q.out : GQ (dblSp V)) * g * y) := by
   obtain ⟨p, hp, e⟩ := exists_out_rmul q g
   rw [e, mul_assoc, mul_assoc, apply_siegelQ_mul V a hμ hφ hp, mul_assoc]
 
@@ -76,53 +92,75 @@ abbrev NegCosets (V : HSp D) : Type := {q : SiegelCosets V // IsNeg V (q.out : G
 
 def ioEquiv {γ₁ γ₂ : GA D V} (h₁ : γ₁ ∈ GQ V) (h₂ : γ₂ ∈ GQ V) : NegCosets V ≃ NegCosets V where
   toFun q := ⟨rmul _ ⟨io V (γ₁, γ₂), io_mem_GQ V h₁ h₂⟩ q.1, (isNeg_out_rmul_iff q.1 h₁ h₂).2 q.2⟩
-  invFun q := ⟨rmul _ ⟨io V (γ₁⁻¹, γ₂⁻¹), io_mem_GQ V (inv_mem h₁) (inv_mem h₂)⟩ q.1,
-    (isNeg_out_rmul_iff q.1 (inv_mem h₁) (inv_mem h₂)).2 q.2⟩
-  left_inv q := Subtype.ext (by
-    show rmul _ _ (rmul _ _ q.1) = q.1
-    rw [← rmul_mul]
-    convert rmul_one q.1 using 2
-    ext1; simp [← map_mul]; exact map_one (io V))
-  right_inv q := Subtype.ext (by
-    show rmul _ _ (rmul _ _ q.1) = q.1
-    rw [← rmul_mul]
-    convert rmul_one q.1 using 2
-    ext1; simp [← map_mul]; exact map_one (io V))
+  invFun q := ⟨
+    rmul _ ⟨io V (γ₁⁻¹, γ₂⁻¹), io_mem_GQ V (inv_mem h₁) (inv_mem h₂)⟩ q.1,
+    (isNeg_out_rmul_iff q.1 (inv_mem h₁) (inv_mem h₂)).2 q.2
+  ⟩
+  left_inv q :=
+    Subtype.ext (by
+      show rmul _ _ (rmul _ _ q.1) = q.1
+      rw [← rmul_mul]
+      convert rmul_one q.1 using 2
+      ext1
+      simp [← map_mul]
+      exact map_one (io V))
+  right_inv q :=
+    Subtype.ext (by
+      show rmul _ _ (rmul _ _ q.1) = q.1
+      rw [← rmul_mul]
+      convert rmul_one q.1 using 2
+      ext1
+      simp [← map_mul]
+      exact map_one (io V))
 
 def negAction (V : HSp D) : MulAction (GQ V) (NegCosets V) where
   smul δ q := ioEquiv (inv_mem δ.2) (one_mem (GQ V)) q
-  one_smul q := Subtype.ext (by
-    show rmul _ _ q.1 = q.1
-    convert rmul_one q.1 using 2
-    ext1; simp; exact map_one (io V))
-  mul_smul δ₁ δ₂ q := Subtype.ext (by
-    show rmul _ _ q.1 = rmul _ _ (rmul _ _ q.1)
-    rw [← rmul_mul]
-    congr 1
-    ext1; simp [← map_mul])
+  one_smul q :=
+    Subtype.ext (by
+      show rmul _ _ q.1 = q.1
+      convert rmul_one q.1 using 2
+      ext1
+      simp
+      exact map_one (io V))
+  mul_smul δ₁ δ₂ q :=
+    Subtype.ext (by
+      show rmul _ _ q.1 = rmul _ _ (rmul _ _ q.1)
+      rw [← rmul_mul]
+      congr 1
+      ext1
+      simp [← map_mul])
 
 attribute [local instance] negAction
 
-@[simp] theorem io_one_one : io V (1, 1) = 1 := map_one (io V)
+@[simp]
+theorem io_one_one : io V (1, 1) = 1 := map_one (io V)
 
-theorem smul_val (δ : GQ V) (q : NegCosets V) : (δ • q).1 =
-    rmul _ ⟨io V ((δ : GA D V)⁻¹, 1), io_mem_GQ V (inv_mem δ.2) (one_mem _)⟩ q.1 := rfl
+theorem smul_val (δ : GQ V) (q : NegCosets V)
+    : (δ • q).1 = rmul _ ⟨io V ((δ : GA D V)⁻¹, 1), io_mem_GQ V (inv_mem δ.2) (one_mem _)⟩ q.1 :=
+  rfl
 
-theorem mem_map_stabilizer_iff (y : NegCosets V) (x : GA D V) :
-    x ∈ (MulAction.stabilizer (GQ V) y).map (GQ V).subtype ↔
-      x ∈ GQ V ∧ ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (x, 1) *
-        ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))⁻¹ ∈ siegel V := by
+theorem mem_map_stabilizer_iff (y : NegCosets V) (x : GA D V)
+    : x ∈ (MulAction.stabilizer (GQ V) y).map (GQ V).subtype
+      ↔ x ∈ GQ V
+        ∧ ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (x, 1)
+            * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))⁻¹
+          ∈ siegel V := by
   constructor
   · rintro ⟨δ, hδ, rfl⟩
     refine ⟨δ.2, ?_⟩
-    obtain ⟨p, hp, e⟩ := exists_out_rmul y.1 ⟨io V ((δ : GA D V)⁻¹, 1), io_mem_GQ V (inv_mem δ.2) (one_mem _)⟩
+    obtain ⟨p, hp, e⟩ :=
+      exists_out_rmul y.1 ⟨io V ((δ : GA D V)⁻¹, 1), io_mem_GQ V (inv_mem δ.2) (one_mem _)⟩
     have hv : rmul _ ⟨io V ((δ : GA D V)⁻¹, 1), io_mem_GQ V (inv_mem δ.2) (one_mem _)⟩ y.1 = y.1 :=
       (smul_val δ y).symm.trans (congrArg Subtype.val (MulAction.mem_stabilizer_iff.1 hδ))
     rw [hv] at e
-    have e' : ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) =
-        p * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V ((δ : GA D V)⁻¹, 1) := e
-    have h' : p * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V ((δ : GA D V)⁻¹, 1) * io V ((δ : GA D V), 1) *
-        ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))⁻¹ = p := by
+    have e'
+        : ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))
+          = p * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V ((δ : GA D V)⁻¹, 1) :=
+      e
+    have h'
+        : p * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V ((δ : GA D V)⁻¹, 1)
+            * io V ((δ : GA D V), 1) * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))⁻¹
+          = p := by
       rw [mul_assoc (p * _), ← map_mul]
       simp [io_one_one]
     rw [← e'] at h'
@@ -132,23 +170,32 @@ theorem mem_map_stabilizer_iff (y : NegCosets V) (x : GA D V) :
     refine ⟨⟨x, hx⟩, MulAction.mem_stabilizer_iff.2 (Subtype.ext ?_), rfl⟩
     rw [smul_val]
     conv_lhs => rw [← Quotient.out_eq y.1]
-    have hr : ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (x, 1) *
-        ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))⁻¹ ∈ GQ (dblSp V) :=
+    have hr
+        : ((y.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (x, 1)
+            * ((y.1.out : GQ (dblSp V)) : GA D (dblSp V))⁻¹
+          ∈ GQ (dblSp V) :=
       mul_mem (mul_mem (y.1.out).2 (io_mem_GQ V hx (one_mem _))) (inv_mem (y.1.out).2)
-    refine ((rmul_mk _ _).trans (mk_eq_iff.2 ⟨⟨⟨_, hr⟩, Subgroup.mem_subgroupOf.2 hs⟩, ?_⟩)).trans (Quotient.out_eq _)
+    refine ((rmul_mk _ _).trans (mk_eq_iff.2 ⟨⟨⟨_, hr⟩, Subgroup.mem_subgroupOf.2 hs⟩, ?_⟩)).trans
+      (Quotient.out_eq _)
     apply Subtype.ext
     simp only [Subgroup.coe_mul, mul_assoc, inv_mul_cancel_left, ← map_mul]
     simp [io_one_one]
 
-theorem leftInv_negIntegrand {a : GL (Fin V.rank) (AE D)} {μ : (AE D)ˣ →* Circle} (hμ : IsHeckeChar D μ) {s : ℂ}
-    {φ : GA D (dblSp V) → ℂ} (hφ : φ ∈ degPS V a μ s) {f₁ f₂ : GA D V → ℂ} (hf₁ : LeftInv (GQ V) f₁)
-    (hf₂ : LeftInv (GQ V) f₂) : LeftInv ((GQ V).prod (GQ V))
-      (dblIntegrand V μ (fun y => ∑' q : NegCosets V, φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * y)) f₁ f₂) := by
+theorem leftInv_negIntegrand
+    {a : GL (Fin V.rank) (AE D)} {μ : (AE D)ˣ →* Circle} (hμ : IsHeckeChar D μ)
+    {s : ℂ} {φ : GA D (dblSp V) → ℂ} (hφ : φ ∈ degPS V a μ s)
+    {f₁ f₂ : GA D V → ℂ} (hf₁ : LeftInv (GQ V) f₁) (hf₂ : LeftInv (GQ V) f₂)
+    : LeftInv ((GQ V).prod (GQ V))
+      (dblIntegrand V μ
+        (fun y => ∑' q : NegCosets V, φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * y))
+        f₁ f₂) := by
   rintro ⟨γ₁, γ₂⟩ ⟨h₁, h₂⟩ ⟨g₁, g₂⟩
-  have hE : (∑' q : NegCosets V, φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V ((γ₁, γ₂) * (g₁, g₂)))) =
-      ∑' q : NegCosets V, φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (g₁, g₂)) := by
-    refine (tsum_congr fun q => ?_).trans ((ioEquiv h₁ h₂).tsum_eq
-      (fun q : NegCosets V => φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (g₁, g₂))))
+  have hE
+      : (∑' q : NegCosets V, φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V ((γ₁, γ₂) * (g₁, g₂))))
+        = ∑' q : NegCosets V, φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (g₁, g₂)) := by
+    refine (tsum_congr fun q => ?_).trans
+      ((ioEquiv h₁ h₂).tsum_eq
+        (fun q : NegCosets V => φ (((q.1.out : GQ (dblSp V)) : GA D (dblSp V)) * io V (g₁, g₂))))
     show _ = φ ((((rmul _ ⟨io V (γ₁, γ₂), io_mem_GQ V h₁ h₂⟩ q.1).out : GQ (dblSp V)) : GA D (dblSp V)) *
       io V (g₁, g₂))
     rw [apply_out_rmul hμ hφ, map_mul, mul_assoc]

@@ -38,10 +38,12 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 namespace UpperTheory.Gal.UnramifiedFromSplittingCriterion
 
-theorem freshChar_holds : FreshChar := freshChar powChar inertiaGen decPow (freshPrime splitPlace rootMod)
+theorem freshChar_holds : FreshChar :=
+  freshChar powChar inertiaGen decPow (freshPrime splitPlace rootMod)
 theorem layerOf_holds : LayerOf := layerOf inclOf indexComap
 theorem noSelfTwist_holds : NoSelfTwist := noSelfTwist_of normRam
-theorem infinitely_many_real_quadratic_steps : Quad0 := quadraticCharTwist_of_exists_of_infinity (quad0Ex sqrtFix mkQ unrLarge) infOf
+theorem infinitely_many_real_quadratic_steps : Quad0 :=
+  quadraticCharTwist_of_exists_of_infinity (quad0Ex sqrtFix mkQ unrLarge) infOf
 theorem allUnr_holds : AllUnr := allUnr splitIff
 theorem threeApart_holds : ThreeApart := threeApart_of double apartUp
 theorem satSplit_holds : SatSplit := satSplit

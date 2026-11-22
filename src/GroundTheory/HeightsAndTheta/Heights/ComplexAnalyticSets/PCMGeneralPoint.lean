@@ -12,10 +12,11 @@ namespace GroundTheory.Heights₂.Heights
 
 open MvPolynomial ComplexSets IsLocalRing
 
-theorem isCohenMacaulayLocalRing_atPrime_of_mem_minimalPrimes {n : ℕ}
-    {I W : Ideal (MvPolynomial (Fin n) ℂ)} [W.IsPrime] (hW : W ∈ I.minimalPrimes) :
-    IsCohenMacaulayLocalRing (Localization.AtPrime W ⧸
-      I.map (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime W))) := by
+theorem isCohenMacaulayLocalRing_atPrime_of_mem_minimalPrimes
+    {n : ℕ} {I W : Ideal (MvPolynomial (Fin n) ℂ)} [W.IsPrime] (hW : W ∈ I.minimalPrimes)
+    : IsCohenMacaulayLocalRing
+      (Localization.AtPrime W ⧸
+        I.map (algebraMap (MvPolynomial (Fin n) ℂ) (Localization.AtPrime W))) := by
   set S := Localization.AtPrime W
   set J := I.map (algebraMap (MvPolynomial (Fin n) ℂ) S)
   have hJm : J ≤ maximalIdeal S := by
@@ -23,7 +24,8 @@ theorem isCohenMacaulayLocalRing_atPrime_of_mem_minimalPrimes {n : ℕ}
     exact Ideal.map_mono hW.1.2
   have hJ : J ≠ ⊤ := fun h => (maximalIdeal.isMaximal S).ne_top (top_le_iff.mp (h ▸ hJm))
   have : Nontrivial (S ⧸ J) := Ideal.Quotient.nontrivial_iff.mpr hJ
-  have : IsLocalRing (S ⧸ J) := IsLocalRing.of_surjective' (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
+  have : IsLocalRing (S ⧸ J) :=
+    IsLocalRing.of_surjective' (Ideal.Quotient.mk J) Ideal.Quotient.mk_surjective
   have hdim : Ring.KrullDimLE 0 (S ⧸ J) := by
     rw [Ideal.krullDimLE_zero_quotient_iff_forall_minimalPrimes_isMaximal]
     intro K hK
@@ -34,7 +36,8 @@ theorem isCohenMacaulayLocalRing_atPrime_of_mem_minimalPrimes {n : ℕ}
     have hKW : K.comap (algebraMap (MvPolynomial (Fin n) ℂ) S) ≤ W := by
       have h := Ideal.comap_mono (f := algebraMap (MvPolynomial (Fin n) ℂ) S) hKm
       rwa [show (maximalIdeal S).comap (algebraMap (MvPolynomial (Fin n) ℂ) S) = W from
-        Localization.AtPrime.under_maximalIdeal] at h
+          Localization.AtPrime.under_maximalIdeal]
+        at h
     have hWK : W ≤ K.comap (algebraMap (MvPolynomial (Fin n) ℂ) S) :=
       hW.2 ⟨Ideal.IsPrime.comap _, hI⟩ hKW
     have hmK : maximalIdeal S ≤ K := by
@@ -43,8 +46,10 @@ theorem isCohenMacaulayLocalRing_atPrime_of_mem_minimalPrimes {n : ℕ}
     rw [le_antisymm hKm hmK]
     exact maximalIdeal.isMaximal S
   have h0 : ringKrullDim (S ⧸ J) = 0 := ringKrullDimZero_iff_ringKrullDim_eq_zero.mp hdim
-  exact
-    { exists_isWeaklyRegular := ⟨[], by simp, RingTheory.Sequence.IsWeaklyRegular.nil _ _, by simpa using h0⟩ }
+  exact {
+    exists_isWeaklyRegular :=
+      ⟨[], by simp, RingTheory.Sequence.IsWeaklyRegular.nil _ _, by simpa using h0⟩
+  }
 
 theorem CMGeneralPoint.proof (hOpen : CMLocusOpen.Statement) : CMGeneralPoint.Statement := by
   intro n I W hW
@@ -73,8 +78,8 @@ theorem CMGeneralPoint.proof (hOpen : CMLocusOpen.Statement) : CMGeneralPoint.St
     · by_contra hne
       have hmem : W' ∈ I.minimalPrimes \ {W} := ⟨hW', hne⟩
       exact hp0 (Finset.prod_eq_zero (hfin.mem_toFinset.mpr hmem) (hqW' _ (hh W' hmem).1))
-    · have hWq : W ≤ RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ) :=
-        fun x hx => RingHom.mem_ker.mpr (hq x hx)
+    · have hWq : W ≤ RingHom.ker (eval q : MvPolynomial (Fin n) ℂ →+* ℂ) := fun x hx =>
+        RingHom.mem_ker.mpr (hq x hx)
       exact hg _ (hW.1.2.trans hWq) fun hk => hg0 (RingHom.mem_ker.mp hk)
 
 end GroundTheory.Heights₂.Heights

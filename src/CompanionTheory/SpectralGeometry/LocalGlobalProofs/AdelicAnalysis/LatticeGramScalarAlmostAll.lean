@@ -8,36 +8,39 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.AdelicAnalysis.
 
 @[expose] public section
 
-open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField IsDedekindDomain MeasureTheory Topology
+open HeckeCharacterZeroLocus.SiegelWeilU GlobalTheory.CompanionTheory.SW NumberField
+  IsDedekindDomain MeasureTheory Topology
 open scoped TensorProduct ENNReal NNReal Matrix
 
 namespace GlobalTheory.CompanionTheory.SW.GoodTrans
 
-theorem transit_ring {T : Type} [CommRing T] (O : Subring T) (s : T →+* T)
-    (hs : ∀ y ∈ O, s y ∈ O) (hss : ∀ y, s (s y) = y) {M : ℕ} (JT : Matrix (Fin M) (Fin M) T)
-    (hJO : ∀ i j, JT i j ∈ O) (hJ : ∀ i j, s (JT j i) = JT i j) (x y : Fin M → T)
-    (hx : ∀ i, x i ∈ O) (hy : ∀ i, y i ∈ O) (hxy : hform s JT x x = hform s JT y y)
+theorem transit_ring
+    {T : Type} [CommRing T]
+    (O : Subring T) (s : T →+* T) (hs : ∀ y ∈ O, s y ∈ O) (hss : ∀ y, s (s y) = y)
+    {M : ℕ} (JT : Matrix (Fin M) (Fin M) T) (hJO : ∀ i j, JT i j ∈ O)
+    (hJ : ∀ i j, s (JT j i) = JT i j) (x y : Fin M → T) (hx : ∀ i, x i ∈ O) (hy : ∀ i, y i ∈ O)
+    (hxy : hform s JT x x = hform s JT y y)
     (w : T) (hw : w ∈ O) (hxw : hform s JT x x * w = 1)
-    (hgood : ∀ p β : O, IsUnit β → s β = β → ∃ ε z : O,
-      (ε : T) * s ε = 1 ∧ ((β : T) - s ε * p) * z = 1) :
-    ∃ g ∈ UJ s JT, (g : Matrix (Fin M) (Fin M) T) *ᵥ x = y ∧
-      (∀ i j, (g : Matrix (Fin M) (Fin M) T) i j ∈ O) ∧
-      ∀ i j, ((g⁻¹ : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) i j ∈ O := by
+    (hgood
+      : ∀ p β : O, IsUnit β → s β = β → ∃ ε z : O, (ε : T) * s ε = 1 ∧ ((β : T) - s ε * p) * z = 1)
+    : ∃ g ∈ UJ s JT,
+      (g : Matrix (Fin M) (Fin M) T) *ᵥ x = y ∧ (∀ i j, (g : Matrix (Fin M) (Fin M) T) i j ∈ O)
+        ∧ ∀ i j, ((g⁻¹ : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) i j ∈ O := by
   let τ : O →+* O := s.restrict O O hs
   have hτ : ∀ a : O, ((τ a : O) : T) = s a := fun a => rfl
   let JO : Matrix (Fin M) (Fin M) O := fun i j => ⟨JT i j, hJO i j⟩
   let x0 : Fin M → O := fun i => ⟨x i, hx i⟩
   let y0 : Fin M → O := fun i => ⟨y i, hy i⟩
-  have hcoe : ∀ p q : Fin M → O, ((hform τ JO p q : O) : T) =
-      hform s JT (fun i => (p i : T)) (fun i => (q i : T)) := by
+  have hcoe
+      : ∀ p q : Fin M → O,
+        ((hform τ JO p q : O) : T) = hform s JT (fun i => (p i : T)) (fun i => (q i : T)) := by
     intro p q
     simp [hform, hτ, JO]
   have hβ0 : ((hform τ JO x0 x0 : O) : T) = hform s JT x x := hcoe x0 x0
-  have hxy0 : hform τ JO x0 x0 = hform τ JO y0 y0 := Subtype.ext (by
-    rw [hβ0, hxy]; exact (hcoe y0 y0).symm)
+  have hxy0 : hform τ JO x0 x0 = hform τ JO y0 y0 :=
+    Subtype.ext (by rw [hβ0, hxy]; exact (hcoe y0 y0).symm)
   have hunit : IsUnit (hform τ JO x0 x0) :=
-    IsUnit.of_mul_eq_one ⟨w, hw⟩ (Subtype.ext (by
-      rw [Subring.coe_mul, hβ0]; exact hxw))
+    IsUnit.of_mul_eq_one ⟨w, hw⟩ (Subtype.ext (by rw [Subring.coe_mul, hβ0]; exact hxw))
   have hτinv : ∀ a : O, τ (τ a) = a := fun a => Subtype.ext (hss a)
   have hJ0 : ∀ i j, τ (JO j i) = JO i j := fun i j => Subtype.ext (hJ i j)
   have hfix : s (hform τ JO x0 x0 : O) = (hform τ JO x0 x0 : O) := by
@@ -47,25 +50,33 @@ theorem transit_ring {T : Type} [CommRing T] (O : Subring T) (s : T →+* T)
   have hε' : ε * τ ε = 1 := Subtype.ext hε
   have hu : IsUnit (hform τ JO x0 x0 - τ ε * hform τ JO y0 x0) :=
     IsUnit.of_mul_eq_one z (Subtype.ext hz)
-  obtain ⟨g0, hg0, hgx, -⟩ := GlobalTheory.CompanionTheory.SW.QuasiRefl.exists_unitary_carry O τ hτinv M JO hJ0 x0 y0 ε
-    hxy0 hunit hε' hu
-  have hval : ∀ g : GL (Fin M) O, ((bc O.subtype g : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) =
-      (g : Matrix (Fin M) (Fin M) O).map O.subtype := fun g => rfl
+  obtain ⟨g0, hg0, hgx, -⟩ :=
+    GlobalTheory.CompanionTheory.SW.QuasiRefl.exists_unitary_carry O τ hτinv M JO hJ0 x0 y0 ε hxy0
+      hunit hε' hu
+  have hval
+      : ∀ g : GL (Fin M) O,
+        ((bc O.subtype g : GL (Fin M) T) : Matrix (Fin M) (Fin M) T)
+          = (g : Matrix (Fin M) (Fin M) O).map O.subtype := fun g =>
+    rfl
   refine ⟨bc O.subtype g0, ?_, ?_, ?_, ?_⟩
-  · have h0 : cT τ (g0 : Matrix (Fin M) (Fin M) O) * JO * (g0 : Matrix (Fin M) (Fin M) O) = JO := hg0
+  · have h0 : cT τ (g0 : Matrix (Fin M) (Fin M) O) * JO * (g0 : Matrix (Fin M) (Fin M) O) = JO :=
+      hg0
     have h1 := congrArg (RingHom.mapMatrix O.subtype) h0
     rw [map_mul, map_mul] at h1
     show cT s ((bc O.subtype g0 : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) * JT *
       ((bc O.subtype g0 : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) = JT
-    have e1 : RingHom.mapMatrix O.subtype (cT τ (g0 : Matrix (Fin M) (Fin M) O)) =
-        cT s ((bc O.subtype g0 : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) := by
+    have e1
+        : RingHom.mapMatrix O.subtype (cT τ (g0 : Matrix (Fin M) (Fin M) O))
+          = cT s ((bc O.subtype g0 : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) := by
       ext i j
       rfl
     have e2 : RingHom.mapMatrix O.subtype JO = JT := by
       ext i j
       rfl
-    have e3 : RingHom.mapMatrix O.subtype (g0 : Matrix (Fin M) (Fin M) O) =
-        ((bc O.subtype g0 : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) := rfl
+    have e3
+        : RingHom.mapMatrix O.subtype (g0 : Matrix (Fin M) (Fin M) O)
+          = ((bc O.subtype g0 : GL (Fin M) T) : Matrix (Fin M) (Fin M) T) :=
+      rfl
     rwa [e1, e2, e3] at h1
   · funext i
     have := congrArg Subtype.val (congrFun hgx i)
@@ -77,15 +88,22 @@ theorem transit_ring {T : Type} [CommRing T] (O : Subring T) (s : T →+* T)
     rw [← map_inv, hval]
     exact (((g0⁻¹ : GL (Fin M) O) : Matrix (Fin M) (Fin M) O) i j).2
 
-theorem mem_latV_iff {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E] {d n M : ℕ}
-    (b : Module.Basis (Fin d) F E) (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
-    (hO : ∀ y, y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈
-      v.adicCompletionIntegers F) (X : Fin n → Fin M → Fv F v ⊗[F] E) :
-    X ∈ latV b v ↔ ∀ a i, X a i ∈ O :=
+theorem mem_latV_iff
+    {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+    {d n M : ℕ} (b : Module.Basis (Fin d) F E)
+    (v : HeightOneSpectrum (𝓞 F)) (O : Subring (Fv F v ⊗[F] E))
+    (hO : ∀ y,
+      y ∈ O ↔ ∀ k, (Algebra.TensorProduct.basis (Fv F v) b).repr y k ∈ v.adicCompletionIntegers F)
+    (X : Fin n → Fin M → Fv F v ⊗[F] E)
+    : X ∈ latV b v ↔ ∀ a i, X a i ∈ O :=
   ⟨fun h a i => (hO _).2 (h a i), fun h a i => (hO _).1 (h a i)⟩
 
-theorem mulVec_mem {T : Type} [CommRing T] (O : Subring T) {M : ℕ} (g : Matrix (Fin M) (Fin M) T)
-    (hg : ∀ i j, g i j ∈ O) (x : Fin M → T) (hx : ∀ i, x i ∈ O) (i : Fin M) : (g *ᵥ x) i ∈ O := by
+theorem mulVec_mem
+    {T : Type} [CommRing T]
+    (O : Subring T)
+    {M : ℕ} (g : Matrix (Fin M) (Fin M) T) (hg : ∀ i j, g i j ∈ O) (x : Fin M → T)
+    (hx : ∀ i, x i ∈ O) (i : Fin M)
+    : (g *ᵥ x) i ∈ O := by
   simp only [Matrix.mulVec, dotProduct]
   exact O.sum_mem fun j _ => O.mul_mem (hg i j) (hx j)
 

@@ -6,17 +6,29 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.Divisors₂.Exi
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.SpecPi
 
-theorem specPi_cover : ∀ (R : Type) [CommRing R] (n : ℕ) (D : Fin n → Type) [∀ i, CommRing (D i)] [∀ i, Algebra R (D i)], ∃ V : Fin n → (Sp (∀ i, D i)).Opens, (⨆ i, V i = ⊤) ∧ (Pairwise fun i i' => Disjoint (V i) (V i')) ∧ ∀ i, Nonempty (Over.mk ((V i).ι ≫ spMap (algebraMap R (∀ i, D i))) ≅ Over.mk (spMap (algebraMap R (D i)))) := by
+theorem specPi_cover
+    : ∀ (R : Type) [CommRing R] (n : ℕ) (D : Fin n → Type) [∀ i, CommRing (D i)]
+        [∀ i, Algebra R (D i)],
+      ∃ V : Fin n → (Sp (∀ i, D i)).Opens,
+        (⨆ i, V i = ⊤) ∧ (Pairwise fun i i' => Disjoint (V i) (V i'))
+          ∧ ∀ i,
+            Nonempty
+              (Over.mk ((V i).ι ≫ spMap (algebraMap R (∀ i, D i)))
+                ≅ Over.mk (spMap (algebraMap R (D i)))) := by
   intro R _ n D _ _
   let S := sigmaSpec (fun i => CommRingCat.of (D i))
-  have hS : ∀ i, Sigma.ι (fun i => Spec (CommRingCat.of (D i))) i ≫ S = spMap (Pi.evalRingHom D i) :=
+  have hS
+      : ∀ i, Sigma.ι (fun i => Spec (CommRingCat.of (D i))) i ≫ S = spMap (Pi.evalRingHom D i) :=
     fun i => ι_sigmaSpec _ i
   have hinv : ∀ y, (inv S) (S y) = y := fun y => by
     rw [← Scheme.Hom.comp_apply, IsIso.hom_inv_id]; rfl
@@ -25,9 +37,10 @@ theorem specPi_cover : ∀ (R : Type) [CommRing R] (n : ℕ) (D : Fin n → Type
   refine ⟨fun i => (spMap (Pi.evalRingHom D i)).opensRange, ?_, ?_, ?_⟩
   · rw [eq_top_iff]
     rintro x -
-    have hcov : ∀ y : ↥(∐ fun i => Spec (CommRingCat.of (D i))), ∃ k, ∃ z : Sp (D k),
-        (Sigma.ι (fun i => Spec (CommRingCat.of (D i))) k) z = y :=
-      fun y => ⟨_, (sigmaOpenCover (fun i => Spec (CommRingCat.of (D i)))).covers y⟩
+    have hcov
+        : ∀ y : ↥(∐ fun i => Spec (CommRingCat.of (D i))), ∃ k, ∃ z : Sp (D k),
+          (Sigma.ι (fun i => Spec (CommRingCat.of (D i))) k) z = y := fun y =>
+      ⟨_, (sigmaOpenCover (fun i => Spec (CommRingCat.of (D i)))).covers y⟩
     obtain ⟨k, z, hz⟩ := hcov ((inv S) x)
     rw [TopologicalSpace.Opens.mem_iSup]
     refine ⟨k, z, ?_⟩

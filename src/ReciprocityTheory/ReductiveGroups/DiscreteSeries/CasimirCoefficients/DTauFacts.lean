@@ -20,13 +20,10 @@ variable {n : ℕ}
 
 variable {ε : Fin n → Bool} {Λ : Fin n → ℝ}
 
-theorem op_inv_eq_adjoint (T : KType ε Λ) (k : KG ε) :
-    T.op k⁻¹ = ContinuousLinearMap.adjoint (T.op k) := by
+theorem op_inv_eq_adjoint (T : KType ε Λ) (k : KG ε)
+    : T.op k⁻¹ = ContinuousLinearMap.adjoint (T.op k) := by
   rw [KType.op, map_inv, ← ContinuousLinearMap.star_eq_adjoint]
-  first
-  | rfl
-  | simp [Unitary.star_eq_inv]
-  | simp [unitary.star_eq_inv]
+  first | rfl | simp [Unitary.star_eq_inv] | simp [unitary.star_eq_inv]
 
 private lemma commute_Jm_of_isBlock {Y : Matrix (Fin n) (Fin n) ℂ} (hY : IsBlock ε Y) :
     Y * Jm ε = Jm ε * Y := by
@@ -91,12 +88,12 @@ lemma dtau_skew (T : KType ε Λ) {A : Matrix (Fin n) (Fin n) ℂ} (hA : inK ε 
   rw [e] at h3
   rw [h3.unique h2, map_neg]
 
-theorem dtau_adj (T : KType ε Λ) {X : Matrix (Fin n) (Fin n) ℂ} (hX : IsBlock ε X) :
-    ContinuousLinearMap.adjoint (T.dτ X) = T.dτ Xᴴ := by
+theorem dtau_adj (T : KType ε Λ) {X : Matrix (Fin n) (Fin n) ℂ} (hX : IsBlock ε X)
+    : ContinuousLinearMap.adjoint (T.dτ X) = T.dτ Xᴴ := by
   obtain ⟨A, B, hA, hB, hX1, hX2⟩ := block_decomp hX
   rw [hX2, hX1]
-  simp [map_add (f := _), map_neg, map_smul, LinearIsometryEquiv.map_smulₛₗ, dtau_skew T hA, dtau_skew T hB,
-    Complex.conj_I]
+  simp [map_add (f := _), map_neg, map_smul, LinearIsometryEquiv.map_smulₛₗ, dtau_skew T hA,
+    dtau_skew T hB, Complex.conj_I]
 
 lemma inK_conj (k : KG ε) {A : Matrix (Fin n) (Fin n) ℂ} (hA : inK ε A) :
     inK ε (toMK k * A * toMK k⁻¹) := by
@@ -145,19 +142,22 @@ lemma dtau_conj_inK (T : KType ε Λ) (k : KG ε) {A : Matrix (Fin n) (Fin n) �
   rw [e] at h2
   exact h1.unique h2
 
-theorem dtau_conj (T : KType ε Λ) (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : IsBlock ε X) :
-    T.op k * T.dτ X * T.op k⁻¹ = T.dτ (toMK k * X * toMK k⁻¹) := by
+theorem dtau_conj (T : KType ε Λ) (k : KG ε) {X : Matrix (Fin n) (Fin n) ℂ} (hX : IsBlock ε X)
+    : T.op k * T.dτ X * T.op k⁻¹ = T.dτ (toMK k * X * toMK k⁻¹) := by
   obtain ⟨A, B, hA, hB, hX1, -⟩ := block_decomp hX
   subst hX1
-  have e1 : toMK k * (A + Complex.I • B) * toMK k⁻¹ =
-      toMK k * A * toMK k⁻¹ + Complex.I • (toMK k * B * toMK k⁻¹) := by
+  have e1
+      : toMK k * (A + Complex.I • B) * toMK k⁻¹
+        = toMK k * A * toMK k⁻¹ + Complex.I • (toMK k * B * toMK k⁻¹) := by
     rw [Matrix.mul_add, Matrix.add_mul, Matrix.mul_smul, Matrix.smul_mul]
-  rw [e1, map_add (f := _), map_smul, map_add (f := _), map_smul, ← dtau_conj_inK T k hA, ← dtau_conj_inK T k hB,
-    mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
+  rw [e1, map_add (f := _), map_smul, map_add (f := _), map_smul, ← dtau_conj_inK T k hA,
+    ← dtau_conj_inK T k hB, mul_add, add_mul, mul_smul_comm, smul_mul_assoc]
 
-theorem hasDerivAt_op (T : KType ε Λ) (k : KG ε) {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y) (γ : ℝ → KG ε)
-    (hγ : ∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y)) :
-    HasDerivAt (fun t => T.op (k * γ t)) (T.op k * T.dτ Y) 0 := by
+theorem hasDerivAt_op
+    (T : KType ε Λ) (k : KG ε)
+    {Y : Matrix (Fin n) (Fin n) ℂ} (hY : inK ε Y)
+    (γ : ℝ → KG ε) (hγ : ∀ t, toMK (γ t) = NormedSpace.exp ((t : ℂ) • Y))
+    : HasDerivAt (fun t => T.op (k * γ t)) (T.op k * T.dτ Y) 0 := by
   have h1 := T.hasDeriv Y hY γ hγ
   have e : (fun t => T.op (k * γ t)) = fun t => T.op k * T.op (γ t) := by
     funext t

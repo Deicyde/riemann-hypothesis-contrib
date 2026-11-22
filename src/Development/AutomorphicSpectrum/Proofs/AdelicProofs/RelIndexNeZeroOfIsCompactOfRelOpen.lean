@@ -9,10 +9,10 @@ open scoped Pointwise ENNReal
 
 namespace GlobalTheory.CompanionTheory.Ar.Cmp
 
-theorem relIndex_ne_zero_of_isCompact_of_relOpen :
-    ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (S K K' : Subgroup G),
-      K' ≤ S → IsCompact (K' : Set G) →
-      (∃ O : Set G, IsOpen O ∧ O ∩ (S : Set G) = (K : Set G)) → K.relIndex K' ≠ 0 := by
+theorem relIndex_ne_zero_of_isCompact_of_relOpen
+    : ∀ (G : Type) [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (S K K' : Subgroup G),
+      K' ≤ S → IsCompact (K' : Set G) → (∃ O : Set G, IsOpen O ∧ O ∩ (S : Set G) = (K : Set G))
+        → K.relIndex K' ≠ 0 := by
   intro G _ _ _ S K K' hK'S hK' ⟨O, hO, hOS⟩
   have : CompactSpace K' := isCompact_iff_compactSpace.mp hK'
   have hopen : IsOpen ((K.subgroupOf K' : Subgroup K') : Set K') := by

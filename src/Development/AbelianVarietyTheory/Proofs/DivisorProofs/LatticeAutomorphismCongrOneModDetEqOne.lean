@@ -8,9 +8,10 @@ open GlobalTheory.Poinc
 
 namespace GlobalTheory.Poinc
 
-theorem det_eq_one_of_congMod (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (k : X ≃+ X) (m : ℕ)
-    (hm : 3 ≤ m) (hk : ∀ x, CongMod m (k x) x) :
-    LinearMap.det (k.toIntLinearEquiv : X →ₗ[ℤ] X) = 1 := by
+theorem det_eq_one_of_congMod
+    (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X]
+    (k : X ≃+ X) (m : ℕ) (hm : 3 ≤ m) (hk : ∀ x, CongMod m (k x) x)
+    : LinearMap.det (k.toIntLinearEquiv : X →ₗ[ℤ] X) = 1 := by
   set f : X ≃ₗ[ℤ] X := k.toIntLinearEquiv
   have hu : IsUnit (LinearMap.det (f : X →ₗ[ℤ] X)) := LinearEquiv.isUnit_det' f
   let b := Module.Free.chooseBasis ℤ X
@@ -20,8 +21,9 @@ theorem det_eq_one_of_congMod (X : Type) [AddCommGroup X] [Module.Free ℤ X] [M
     ext i j
     obtain ⟨w, hw⟩ := hk (b j)
     have hfb : (f : X →ₗ[ℤ] X) (b j) = k (b j) := rfl
-    rw [RingHom.mapMatrix_apply, Matrix.map_apply, hM, LinearMap.toMatrix_apply, hfb, hw, map_add (f := _), map_nsmul,
-      Finsupp.add_apply, Finsupp.smul_apply, b.repr_self, Finsupp.single_apply, Matrix.one_apply]
+    rw [RingHom.mapMatrix_apply, Matrix.map_apply, hM, LinearMap.toMatrix_apply, hfb, hw,
+      map_add (f := _), map_nsmul, Finsupp.add_apply, Finsupp.smul_apply, b.repr_self,
+      Finsupp.single_apply, Matrix.one_apply]
     by_cases h : j = i
     · subst h; simp
     · simp [h, Ne.symm h]

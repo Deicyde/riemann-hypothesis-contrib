@@ -17,8 +17,8 @@ variable (D : D7) (hinj : Function.Injective D.what₂.OtoLL)
 
 def oEOsFun (x : 𝓞 D.host.E) : D.what₂.O := Classical.choose (D.O_contains x)
 
-theorem oEOsFun_spec (x : 𝓞 D.host.E) :
-    D.what₂.OtoLL (oEOsFun D x) = (D.embE.comp (algebraMap (𝓞 D.host.E) D.host.E)) x :=
+theorem oEOsFun_spec (x : 𝓞 D.host.E)
+    : D.what₂.OtoLL (oEOsFun D x) = (D.embE.comp (algebraMap (𝓞 D.host.E) D.host.E)) x :=
   Classical.choose_spec (D.O_contains x)
 
 def oEOs : 𝓞 D.host.E →+* D.what₂.O where
@@ -26,7 +26,8 @@ def oEOs : 𝓞 D.host.E →+* D.what₂.O where
   map_one' := hinj (by rw [oEOsFun_spec, map_one, map_one])
   map_mul' x y := hinj (by rw [map_mul, oEOsFun_spec, oEOsFun_spec, oEOsFun_spec, map_mul])
   map_zero' := hinj (by rw [oEOsFun_spec, map_zero, map_zero])
-  map_add' x y := hinj (by rw [map_add (f := _), oEOsFun_spec, oEOsFun_spec, oEOsFun_spec, map_add (f := _)])
+  map_add' x y :=
+    hinj (by rw [map_add (f := _), oEOsFun_spec, oEOsFun_spec, oEOsFun_spec, map_add (f := _)])
 
 theorem oEOs_injective : Function.Injective (oEOs D hinj) := by
   intro x y hxy
@@ -54,7 +55,10 @@ def Dminus (w : WeightFamilies.Wt D j) : ℕ := ∑ τ, ∑ i, w.aM τ i
 def piBarO (EX : ErrX D) (i : Fin 2) : 𝓞 D.host.E :=
   NumberField.RingOfIntegers.mapRingHom D.host.conj.toAlgHom.toRingHom (EX.piG i)
 
-def nnW (B : WeightFamilies.Prov D) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D) (w : WeightFamilies.Wt D j) : 𝓞 B.KO :=
+def nnW
+    (B : WeightFamilies.Prov D) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D)
+    (w : WeightFamilies.Wt D j)
+    : 𝓞 B.KO :=
   ∏ i : Fin 2, iE D hinj B (EX.piG i) ^ Dplus w * iE D hinj B (piBarO EX i) ^ Dminus w
 
 def vd2 (D : D7) : ℝ := Real.logb 2 D.host.QS
@@ -69,17 +73,27 @@ def po (D : D7) : ℕ := D.host.pde
 
 def po2 (D : D7) : ℕ := D.host.pde'
 
-def zOwnP (D : D7) (p : ℕ) (w : WeightFamilies.Wt D j) : ℕ := p ^ (WeightAlgebra.DF w + 2 * D.R.f * D.R.r * w.n)
+def zOwnP (D : D7) (p : ℕ) (w : WeightFamilies.Wt D j) : ℕ :=
+  p ^ (WeightAlgebra.DF w + 2 * D.R.f * D.R.r * w.n)
 
-def scalOfP (B : WeightFamilies.Prov D) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D) (p : ℕ)
-    (ka wL wF : WeightFamilies.Wt D j) (T : ℕ) : WeightAlgebra.Scal B where
+def scalOfP
+    (B : WeightFamilies.Prov D) (hinj : Function.Injective D.what₂.OtoLL) (EX : ErrX D) (p : ℕ)
+    (ka wL wF : WeightFamilies.Wt D j) (T : ℕ)
+    : WeightAlgebra.Scal B where
   sW := nnW B hinj EX wL * (pPow D (c2 D wL) (cHalf wL) (cHalf wL) : 𝓞 B.KO)
-  sF := (zOwnP D p wF : 𝓞 B.KO) * nnW B hinj EX wF * (pPow D (c2 D wF) (cHalf wF) (cHalf wF) : 𝓞 B.KO)
-  s0 := (zOwnP D p (WeightAlgebra.wadd wF (WeightAlgebra.wsmul (WeightFamilies.dimY D j) wL)) : 𝓞 B.KO) * nnW B hinj EX wL ^ WeightFamilies.dimY D j *
-    nnW B hinj EX wF * (pPow D (WeightFamilies.dimY D j * c2 D wL + c2 D wF) (WeightFamilies.dimY D j * cHalf wL + cHalf wF)
-      (WeightFamilies.dimY D j * cHalf wL + cHalf wF) : 𝓞 B.KO)
-  sK := (zOwnP D p ka : 𝓞 B.KO) * nnW B hinj EX wL ^ T * nnW B hinj EX wF *
-    (pPow D (T * c2 D wL + c2 D wF) (T * cHalf wL + cHalf wF) (T * cHalf wL + cHalf wF) : 𝓞 B.KO)
+  sF :=
+    (zOwnP D p wF : 𝓞 B.KO) * nnW B hinj EX wF * (pPow D (c2 D wF) (cHalf wF) (cHalf wF) : 𝓞 B.KO)
+  s0 :=
+    (zOwnP D p (WeightAlgebra.wadd wF (WeightAlgebra.wsmul (WeightFamilies.dimY D j) wL)) : 𝓞 B.KO)
+      * nnW B hinj EX wL ^ WeightFamilies.dimY D j * nnW B hinj EX wF
+      * (pPow D (WeightFamilies.dimY D j * c2 D wL + c2 D wF)
+          (WeightFamilies.dimY D j * cHalf wL + cHalf wF)
+          (WeightFamilies.dimY D j * cHalf wL + cHalf wF)
+        : 𝓞 B.KO)
+  sK :=
+    (zOwnP D p ka : 𝓞 B.KO) * nnW B hinj EX wL ^ T * nnW B hinj EX wF
+      * (pPow D (T * c2 D wL + c2 D wF) (T * cHalf wL + cHalf wF) (T * cHalf wL + cHalf wF)
+        : 𝓞 B.KO)
 
 end Scal
 
@@ -87,7 +101,8 @@ section Run
 
 variable {D : D7} {L : SizeData₂ D} {P : ParameterChoice' D L}
 
-def kaR (T : ParamsT D L P) (hK : DV.KapDef D) (j : ℕ) : WeightFamilies.Wt D j := kaWt D hK (even_nV T) j
+def kaR (T : ParamsT D L P) (hK : DV.KapDef D) (j : ℕ) : WeightFamilies.Wt D j :=
+  kaWt D hK (even_nV T) j
 
 def lR (T : ParamsT D L P) (hK : DV.KapDef D) (j : ℕ) : WeightFamilies.Wt D j :=
   lWt D (kaR T hK j) T.TO T.nWn (even_nW T)
@@ -95,17 +110,24 @@ def lR (T : ParamsT D L P) (hK : DV.KapDef D) (j : ℕ) : WeightFamilies.Wt D j 
 def fR (T : ParamsT D L P) (hK : DV.KapDef D) (j : ℕ) : WeightFamilies.Wt D j :=
   fWt D (kaR T hK j) (lR T hK j) T.TO T.nP (even_nP T)
 
-
 open Classical in
-def nusOf (B : WeightFamilies.Prov D) {j : ℕ} (wL : WeightFamilies.Wt D j) (nuWW : HeightOneSpectrum (𝓞 B.KO) → ℝ)
-    (la : HeightOneSpectrum (𝓞 B.KO)) : ℝ :=
+def nusOf
+    (B : WeightFamilies.Prov D)
+    {j : ℕ} (wL : WeightFamilies.Wt D j)
+    (nuWW : HeightOneSpectrum (𝓞 B.KO) → ℝ) (la : HeightOneSpectrum (𝓞 B.KO))
+    : ℝ :=
   if h : ∃ i : Fin 2, ((D.host.g i : ℕ) : 𝓞 B.KO) ∈ la.asIdeal then
     (eWL B.KO la : ℝ) * (WeightAlgebra.DF wL : ℝ) / ((D.host.g (Classical.choose h) : ℝ) - 1)
-  else (eWL B.KO la : ℝ) * (nuWW la +
-    (if ((D.host.QS : ℕ) : 𝓞 B.KO) ∈ la.asIdeal then
-        (padicValNat (ringChar (𝓞 B.KO ⧸ la.asIdeal)) D.host.QS : ℝ) * (c2 D wL : ℝ)
-     else if ((D.host.q : ℕ) : 𝓞 B.KO) ∈ la.asIdeal ∨ ((D.host.d : ℕ) : 𝓞 B.KO) ∈ la.asIdeal then (cHalf wL : ℝ)
-     else 0))
+  else
+    (eWL B.KO la : ℝ)
+      * (nuWW la
+        + (if ((D.host.QS : ℕ) : 𝓞 B.KO) ∈ la.asIdeal then
+             (padicValNat (ringChar (𝓞 B.KO ⧸ la.asIdeal)) D.host.QS : ℝ) * (c2 D wL : ℝ)
+           else if ((D.host.q : ℕ) : 𝓞 B.KO) ∈ la.asIdeal
+               ∨ ((D.host.d : ℕ) : 𝓞 B.KO) ∈ la.asIdeal then
+             (cHalf wL : ℝ)
+           else
+             0))
 
 end Run
 

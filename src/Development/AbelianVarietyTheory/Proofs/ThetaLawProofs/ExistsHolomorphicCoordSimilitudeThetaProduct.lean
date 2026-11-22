@@ -23,8 +23,10 @@ public import Development.AbelianVarietyTheory.Proofs.ThetaLawProofs.ThetaCharLe
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.AbLaw
 open GlobalTheory.KeyPow GlobalTheory.KeyKa
@@ -33,7 +35,8 @@ open GlobalTheory.SimilTheta
 noncomputable section
 namespace GlobalTheory.SimilTheta
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 private lemma sum_tensor_fin_cons {V : Type} {N n : ℕ} (T : Fin N → V → ℂ)
     (q : (Fin (n + 1) → Fin N) → ℂ) (y : Fin (n + 1) → V) :
@@ -47,7 +50,8 @@ private lemma sum_tensor_fin_cons {V : Type} {N n : ℕ} (T : Fin N → V → �
   simp only [Fin.prod_univ_succ, Fin.cons_zero, Fin.cons_succ]
   ring
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 private lemma exists_tensor_expansion_of_quasiperiodic {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
     {N : ℕ} {Λ : Type} (L : Λ → V) (A : Λ → V → ℂ) (T : Fin N → V → ℂ)
@@ -123,7 +127,8 @@ private lemma exists_tensor_expansion_of_quasiperiodic {V : Type} [NormedAddComm
     rw [hqk k]
     simp [Fin.tail]
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 private lemma differentiable_simTheta {g m : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ}
     {a b : Fin g → ℂ} (al : Matrix (Fin 4) (Fin 4) ℤ) (k n : Fin 4 → Fin g → ℤ)
@@ -133,7 +138,8 @@ private lemma differentiable_simTheta {g m : ℕ} {τ : Matrix (Fin g) (Fin g) �
   simp only [dotProduct]
   fun_prop
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 private lemma simTheta_update_add_lat {g m : ℕ} {τ : Matrix (Fin g) (Fin g) ℂ}
     {a b : Fin g → ℂ} {al : Matrix (Fin 4) (Fin 4) ℤ} (ha : _root_.GlobalTheory.KeyPow.charHalf g a b)
@@ -183,7 +189,8 @@ private lemma simTheta_update_add_lat {g m : ℕ} {τ : Matrix (Fin g) (Fin g) �
   rw [← (_root_.GlobalTheory.SimilTheta.aut_similitude_and_mul g m τ a b al ha hτ hm hal).1 k n y c k₀ n₀]
   ring
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
 private lemma tensor_coeff_eq_zero_of_linearIndependent {V : Type} {N : ℕ} (T : Fin N → V → ℂ)
     (hli : LinearIndependent ℂ T) :
@@ -212,41 +219,55 @@ private lemma tensor_coeff_eq_zero_of_linearIndependent {V : Type} {N : ℕ} (T 
     rw [← Fin.cons_self_tail I]
     exact congrFun (hk (I 0)) (Fin.tail I)
 
-
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj MeasureTheory in
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  MeasureTheory in
 attribute [local instance] Over.cartesianMonoidalCategory in
-theorem _root_.GlobalTheory.SimilTheta.exists_holomorphic_coord_simTheta : ∀ (g m : ℕ) (a b : Fin g → ℂ)
-    (al : Matrix (Fin 4) (Fin 4) ℤ) (Th : Fin (m ^ g) → (Fin g → Fin g → ℂ) → (Fin g → ℂ) → ℂ),
-    _root_.GlobalTheory.KeyPow.charHalf g a b → 1 ≤ m →
-    al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ) →
-    _root_.GlobalTheory.KeyKa.LevBasis a b m Th → ∀ k n : Fin 4 → Fin g → ℤ,
-    ∃ qa : (Fin g → Fin g → ℂ) → (Fin 4 → Fin (m ^ g)) → ℂ,
-      (∀ I, DifferentiableOn ℂ (fun p => qa p I) (_root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g)) ∧
-      ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g, ∀ q : (Fin 4 → Fin (m ^ g)) → ℂ,
-        (∀ y, _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n y =
-          ∑ I, q I * ∏ c, Th (I c) p (y c)) ↔ q = qa p := by
+theorem _root_.GlobalTheory.SimilTheta.exists_holomorphic_coord_simTheta
+    : ∀ (g m : ℕ) (a b : Fin g → ℂ) (al : Matrix (Fin 4) (Fin 4) ℤ)
+        (Th : Fin (m ^ g) → (Fin g → Fin g → ℂ) → (Fin g → ℂ) → ℂ),
+      _root_.GlobalTheory.KeyPow.charHalf g a b → 1 ≤ m
+        → al.transpose * al = (m : ℤ) • (1 : Matrix (Fin 4) (Fin 4) ℤ)
+        → _root_.GlobalTheory.KeyKa.LevBasis a b m Th
+        → ∀ k n : Fin 4 → Fin g → ℤ, ∃ qa : (Fin g → Fin g → ℂ) → (Fin 4 → Fin (m ^ g)) → ℂ,
+          (∀ I,
+              DifferentiableOn ℂ
+                (fun p => qa p I)
+                (_root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g))
+            ∧ ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g,
+              ∀ q : (Fin 4 → Fin (m ^ g)) → ℂ,
+                (∀ y,
+                    _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al
+                        m k n y
+                      = ∑ I, q I * ∏ c, Th (I c) p (y c))
+                  ↔ q = qa p := by
   intro g m a b al Th ha hm hal hB k n
   classical
   obtain ⟨hfam, hbas⟩ := hB
   have hlev := _root_.GlobalTheory.SimilTheta.level_one_and_holomorphic g a b ha
-  have hli : ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g, LinearIndependent ℂ fun j => Th j p := by
+  have hli
+      : ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g,
+        LinearIndependent ℂ fun j => Th j p := by
     intro p hp
     refine Fintype.linearIndependent_iff.mpr fun d hd => ?_
-    have h0 : _root_.GlobalTheory.KeyKa.IsLevel (_root_.GlobalTheory.KeyKa.per p) a b m (fun _ => 0) :=
+    have h0
+        : _root_.GlobalTheory.KeyKa.IsLevel (_root_.GlobalTheory.KeyKa.per p) a b m (fun _ => 0) :=
       (_root_.GlobalTheory.SimilTheta.isLevel_iff_aut _ _ _ _ _).mpr
         ⟨differentiable_const 0, fun _ _ _ => by simp⟩
     obtain ⟨c₀, -, hc₀⟩ := (hbas p hp).2 _ h0
-    have e1 : d = c₀ := hc₀ d fun z => by
-      have := congrFun hd z
-      simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at this
-      exact this.symm
+    have e1 : d = c₀ :=
+      hc₀ d fun z => by
+        have := congrFun hd z
+        simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at this
+        exact this.symm
     have e2 : (0 : Fin (m ^ g) → ℂ) = c₀ := hc₀ 0 fun z => by simp
     intro i
     rw [e1, ← e2]
     rfl
-  have hexp : ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g, ∃ q : (Fin 4 → Fin (m ^ g)) → ℂ, ∀ y,
-      _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n y =
-        ∑ I, q I * ∏ c, Th (I c) p (y c) := by
+  have hexp
+      : ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g,
+        ∃ q : (Fin 4 → Fin (m ^ g)) → ℂ, ∀ y,
+          _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n y
+            = ∑ I, q I * ∏ c, Th (I c) p (y c) := by
     intro p hp
     have hsym : (_root_.GlobalTheory.KeyKa.per p).IsSymm := by
       unfold _root_.GlobalTheory.KeyKa.per
@@ -255,24 +276,40 @@ theorem _root_.GlobalTheory.SimilTheta.exists_holomorphic_coord_simTheta : ∀ (
     have hθd := ((_root_.GlobalTheory.SimilTheta.isLevel_iff_aut _ _ _ _ _).mp hθ).1
     refine exists_tensor_expansion_of_quasiperiodic (Λ := (Fin g → ℤ) × (Fin g → ℤ))
       (fun l => _root_.GlobalTheory.SimilTheta.lat (_root_.GlobalTheory.KeyKa.per p) l.1 l.2)
-      (fun l z => _root_.GlobalTheory.SimilTheta.aut (_root_.GlobalTheory.KeyKa.per p) a b l.1 l.2 z ^ m)
-      (fun j => Th j p) (hli p hp) ?_ 4 _ (differentiable_simTheta al k n hθd)
+      (fun l z =>
+        _root_.GlobalTheory.SimilTheta.aut (_root_.GlobalTheory.KeyKa.per p) a b l.1 l.2 z ^ m)
+      (fun j => Th j p)
+      (hli p hp) ?_ 4 _ (differentiable_simTheta al k n hθd)
       (fun c y l => simTheta_update_add_lat ha hsym hm hal hθ k n c y l.1 l.2)
     intro f hf hfa
-    obtain ⟨d, hd, -⟩ := (hbas p hp).2 f
-      ((_root_.GlobalTheory.SimilTheta.isLevel_iff_aut _ _ _ _ _).mpr
-        ⟨hf, fun k₀ n₀ z => hfa (k₀, n₀) z⟩)
+    obtain ⟨d, hd, -⟩ :=
+      (hbas p hp).2 f
+        ((_root_.GlobalTheory.SimilTheta.isLevel_iff_aut _ _ _ _ _).mpr
+          ⟨hf, fun k₀ n₀ z => hfa (k₀, n₀) z⟩)
     exact ⟨d, hd⟩
   choose! qa hqa using hexp
-  have huniq : ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g, ∀ q : (Fin 4 → Fin (m ^ g)) → ℂ, (∀ y,
-      _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n y =
-        ∑ I, q I * ∏ c, Th (I c) p (y c)) → q = qa p := by
+  have huniq
+      : ∀ p ∈ _root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g,
+        ∀ q : (Fin 4 → Fin (m ^ g)) → ℂ,
+          (∀ y,
+              _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n
+                  y
+                = ∑ I, q I * ∏ c, Th (I c) p (y c))
+            → q = qa p := by
     intro p hp q hq
-    have := tensor_coeff_eq_zero_of_linearIndependent (fun j => Th j p) (hli p hp) 4 (q - qa p) (fun y => by
-      simp only [Pi.sub_apply, sub_mul, Finset.sum_sub_distrib]
-      rw [← hq y, ← hqa p hp y, sub_self])
+    have :=
+      tensor_coeff_eq_zero_of_linearIndependent
+        (fun j => Th j p)
+        (hli p hp) 4 (q - qa p)
+        (fun y => by
+          simp only [Pi.sub_apply, sub_mul, Finset.sum_sub_distrib]
+          rw [← hq y, ← hqa p hp y, sub_self])
     exact sub_eq_zero.mp this
-  have hTh : ∀ j z, DifferentiableOn ℂ (fun p => Th j p z) (_root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g) := by
+  have hTh
+      : ∀ j z,
+        DifferentiableOn ℂ
+          (fun p => Th j p z)
+          (_root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g) := by
     intro j z
     have h := hfam j
     unfold _root_.GlobalTheory.KeyKa.HolFam at h
@@ -280,20 +317,30 @@ theorem _root_.GlobalTheory.SimilTheta.exists_holomorphic_coord_simTheta : ∀ (
       (fun p hp => ⟨hp, Set.mem_univ _⟩)
   refine ⟨qa, fun I => ?_, fun p hp q => ⟨huniq p hp q, fun h => h ▸ hqa p hp⟩⟩
   refine _root_.GlobalTheory.differentiableOn_coord_of_linearIndependent (Fin g → Fin g → ℂ)
-    (Fin 4 → Fin g → ℂ) (Fin 4 → Fin (m ^ g)) (_root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g)
+    (Fin 4 → Fin g → ℂ) (Fin 4 → Fin (m ^ g))
+    (_root_.ReciprocityTheory.ChartRestriction.G.Key.phDom g)
     (fun J p y => ∏ c, Th (J c) p (y c))
-    (fun p y => _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n y) qa
-    (_root_.GlobalTheory.isOpen_phDom g) (fun J y => ?_) (fun y => hlev.2.1 al m k n y)
-    (fun p hp => ?_) (fun p hp y => hqa p hp y) I
+    (fun p y =>
+      _root_.GlobalTheory.SimilTheta.simTheta (_root_.GlobalTheory.KeyKa.per p) a b al m k n y)
+    qa (_root_.GlobalTheory.isOpen_phDom g)
+    (fun J y => ?_)
+    (fun y => hlev.2.1 al m k n y)
+    (fun p hp => ?_)
+    (fun p hp y => hqa p hp y)
+    I
   · intro p hp
     have h' : ∀ c, DifferentiableAt ℂ (fun e => Th (J c) e (y c)) p := fun c =>
       (hTh (J c) (y c)).differentiableAt ((_root_.GlobalTheory.isOpen_phDom g).mem_nhds hp)
     have : DifferentiableAt ℂ (fun e => ∏ c, Th (J c) e (y c)) p := by fun_prop
     exact this.differentiableWithinAt
   · refine Fintype.linearIndependent_iff.mpr fun d hd i => ?_
-    have := tensor_coeff_eq_zero_of_linearIndependent (fun j => Th j p) (hli p hp) 4 d (fun y => by
-      have := congrFun hd y
-      simpa [Finset.sum_apply, smul_eq_mul] using this)
+    have :=
+      tensor_coeff_eq_zero_of_linearIndependent
+        (fun j => Th j p)
+        (hli p hp) 4 d
+        (fun y => by
+          have := congrFun hd y
+          simpa [Finset.sum_apply, smul_eq_mul] using this)
     exact congrFun this i
 
 end GlobalTheory.SimilTheta

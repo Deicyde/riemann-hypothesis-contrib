@@ -4,12 +4,14 @@ public import Development.EtaleCohomology.TateTwists.PrismAlexanderWhitneySwapCh
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace LateralTheory.EtaleFoundations.SteenPf
 
-def leaf_acyc : Prop := ∀ (N k : ℕ) (c : Pr N →₀ ℤ), Pr.Deg (k + 1) c → Pr.d N c = 0 →
-  ∃ b : Pr N →₀ ℤ, Pr.Deg (k + 2) b ∧ Pr.d N b = c
+def leaf_acyc : Prop :=
+  ∀ (N k : ℕ) (c : Pr N →₀ ℤ),
+    Pr.Deg (k + 1) c → Pr.d N c = 0 → ∃ b : Pr N →₀ ℤ, Pr.Deg (k + 2) b ∧ Pr.d N b = c
 
 def leaf_dbd : Prop := ∀ (N : ℕ) (c : Pr N →₀ ℤ), Pr.d (N + 1) (Pr.bd c) = Pr.bd (Pr.d N c)
 
@@ -97,13 +99,19 @@ lemma good_zero : Good 0 0 := by
 end LateralTheory.EtaleFoundations.SteenPf
 
 open LateralTheory.EtaleFoundations.SteenPf in
-theorem LateralTheory.EtaleFoundations.etale_prism_alexander_whitney_homotopy_of_relations (hA : leaf_acyc) (hD : leaf_dbd) (hB : leaf_bdbd)
-    (hAW : leaf_aw) (hWA : leaf_wa) : LateralTheory.EtaleFoundations.PrismAlexanderWhitneySwapChainHomotopy := by
+theorem LateralTheory.EtaleFoundations.etale_prism_alexander_whitney_homotopy_of_relations
+    (hA : leaf_acyc) (hD : leaf_dbd) (hB : leaf_bdbd) (hAW : leaf_aw) (hWA : leaf_wa)
+    : LateralTheory.EtaleFoundations.PrismAlexanderWhitneySwapChainHomotopy := by
   classical
   let seq : ∀ N, {x : Pr N →₀ ℤ // Good N x} := fun N =>
-    Nat.rec (motive := fun N => {x : Pr N →₀ ℤ // Good N x}) ⟨0, good_zero⟩
-      (fun N x => ⟨Classical.choose (step hA hD hB hAW hWA N x.1 x.2),
-        (Classical.choose_spec (step hA hD hB hAW hWA N x.1 x.2)).1⟩) N
+    Nat.rec
+      (motive := fun N => {x : Pr N →₀ ℤ // Good N x})
+      ⟨0, good_zero⟩
+      (fun N x => ⟨
+        Classical.choose (step hA hD hB hAW hWA N x.1 x.2),
+        (Classical.choose_spec (step hA hD hB hAW hWA N x.1 x.2)).1
+      ⟩)
+      N
   refine ⟨fun N => (seq N).1, fun N => (seq N).2.1, ?_, fun N => ?_⟩
   · show Pr.d 0 0 = _
     rw [map_zero, aw_zero_eq, sub_self]

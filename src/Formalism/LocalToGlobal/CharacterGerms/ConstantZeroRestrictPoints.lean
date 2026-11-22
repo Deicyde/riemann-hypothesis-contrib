@@ -14,7 +14,8 @@ open Classical
 
 namespace Formalism.L2.FormalSeriesBounds.FunEq
 
-open Formalism.L2.FormalSeriesBounds Formalism.L2.FormalSeriesBounds.PartialDerivEval ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ MvPowerSeries
+open Formalism.L2.FormalSeriesBounds Formalism.L2.FormalSeriesBounds.PartialDerivEval
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ MvPowerSeries
 
 variable {C : Type} [Field C] [CharZero C] {dd : ℕ}
 
@@ -40,13 +41,16 @@ theorem up_ne_zero (m : ℕ) (i : Fin dd) : ((0 : Fin (m + 1)), i) ∉ Set.range
   rintro ⟨p, hp⟩
   exact Fin.succ_ne_zero _ (congrArg Prod.fst hp)
 
-theorem coeff_rz (m : ℕ) (f : PS C (m + 1) dd) (ν : Fin m × Fin dd →₀ ℕ) :
-    coeff ν (ev (rz m) f) = coeff (ν.mapDomain (up m)) f := by
+theorem coeff_rz (m : ℕ) (f : PS C (m + 1) dd) (ν : Fin m × Fin dd →₀ ℕ)
+    : coeff ν (ev (rz m) f) = coeff (ν.mapDomain (up m)) f := by
   unfold ev
-  rw [coeff_subst (hasSubst_ev (constant_zero_restrict_points m)), finsum_eq_single _ (ν.mapDomain (up m))]
+  rw [coeff_subst (hasSubst_ev (constant_zero_restrict_points m)),
+    finsum_eq_single _ (ν.mapDomain (up m))]
   · rw [Finsupp.prod_mapDomain_index_inj (up_inj m)]
-    have e : (ν.prod fun t e => (fun p : Fin (m + 1) × Fin dd => rz (C := C) (dd := dd) m p.1 p.2) (up m t) ^ e) =
-        monomial ν (1 : C) := by
+    have e
+        : (ν.prod fun t e =>
+            (fun p : Fin (m + 1) × Fin dd => rz (C := C) (dd := dd) m p.1 p.2) (up m t) ^ e)
+          = monomial ν (1 : C) := by
       have h1 := monomial_eq (R := C) ν (fun _ => (1 : C))
       simp only [one_pow, Finsupp.prod, Finset.prod_const_one, one_smul] at h1
       rw [Finsupp.prod, h1]
@@ -55,8 +59,9 @@ theorem coeff_rz (m : ℕ) (f : PS C (m + 1) dd) (ν : Fin m × Fin dd →₀ �
   · intro d hd
     by_cases hx : ∃ j, d ((0 : Fin (m + 1)), j) ≠ 0
     · obtain ⟨j, hj⟩ := hx
-      rw [Finsupp.prod, Finset.prod_eq_zero (i := ((0 : Fin (m + 1)), j)) (Finsupp.mem_support_iff.2 hj)
-        (by show (rz (C := C) (dd := dd) m 0 j) ^ _ = 0; rw [rz_zero]; exact zero_pow hj),
+      rw [Finsupp.prod,
+        Finset.prod_eq_zero (i := ((0 : Fin (m + 1)), j)) (Finsupp.mem_support_iff.2 hj)
+          (by show (rz (C := C) (dd := dd) m 0 j) ^ _ = 0; rw [rz_zero]; exact zero_pow hj),
         map_zero, smul_zero]
     · push_neg at hx
       have hsub : ↑d.support ⊆ Set.range (up (dd := dd) m) := by
@@ -68,33 +73,36 @@ theorem coeff_rz (m : ℕ) (f : PS C (m + 1) dd) (ν : Fin m × Fin dd →₀ �
         exact ⟨(s1.pred hs1, s2), by simp [up, Fin.succ_pred]⟩
       set e := Finsupp.comapDomain (up m) d ((up_inj m).injOn) with he
       have hde : e.mapDomain (up m) = d := Finsupp.mapDomain_comapDomain _ (up_inj m) d hsub
-      have hne : e ≠ ν := by
-        intro h; apply hd; rw [← hde, h]
+      have hne : e ≠ ν := by intro h; apply hd; rw [← hde, h]
       rw [← hde, Finsupp.prod_mapDomain_index_inj (up_inj m)]
-      have e2 : (e.prod fun t k => (fun p : Fin (m + 1) × Fin dd => rz (C := C) (dd := dd) m p.1 p.2) (up m t) ^ k) =
-          monomial e (1 : C) := by
+      have e2
+          : (e.prod fun t k =>
+              (fun p : Fin (m + 1) × Fin dd => rz (C := C) (dd := dd) m p.1 p.2) (up m t) ^ k)
+            = monomial e (1 : C) := by
         have h1 := monomial_eq (R := C) e (fun _ => (1 : C))
         simp only [one_pow, Finsupp.prod, Finset.prod_const_one, one_smul] at h1
         rw [Finsupp.prod, h1]
         rfl
       rw [e2, coeff_monomial, if_neg (Ne.symm hne), smul_zero]
 
-theorem coeff_iter_pderiv {σ : Type} (q : σ) (L : ℕ) (f : MvPowerSeries σ C) (n : σ →₀ ℕ) :
-    coeff n ((pderiv (R := C) q)^[L] f) =
-      coeff (n + L • Finsupp.single q 1) f * ∏ r ∈ Finset.range L, ((n q : C) + r + 1) := by
+theorem coeff_iter_pderiv {σ : Type} (q : σ) (L : ℕ) (f : MvPowerSeries σ C) (n : σ →₀ ℕ)
+    : coeff n ((pderiv (R := C) q)^[L] f)
+      = coeff (n + L • Finsupp.single q 1) f * ∏ r ∈ Finset.range L, ((n q : C) + r + 1) := by
   induction L generalizing f with
   | zero => simp
   | succ L ih =>
-    have h1 : n + (L + 1) • Finsupp.single q 1 = n + L • Finsupp.single q 1 + Finsupp.single q 1 := by
+    have h1
+        : n + (L + 1) • Finsupp.single q 1 = n + L • Finsupp.single q 1 + Finsupp.single q 1 := by
       rw [add_smul, one_smul, add_assoc]
     rw [Function.iterate_succ_apply, ih, coeff_pderiv, Finset.prod_range_succ, h1]
-    simp only [Finsupp.coe_add, Finsupp.coe_smul, Pi.add_apply, Pi.smul_apply, Finsupp.single_eq_same,
-      smul_eq_mul, mul_one, Nat.cast_add, Nat.cast_one]
+    simp only [Finsupp.coe_add, Finsupp.coe_smul, Pi.add_apply, Pi.smul_apply,
+      Finsupp.single_eq_same, smul_eq_mul, mul_one, Nat.cast_add, Nat.cast_one]
     ring
 
-theorem coeff_rz_iter (m : ℕ) (i : Fin dd) (L : ℕ) (f : PS C (m + 1) dd) (ν : Fin m × Fin dd →₀ ℕ) :
-    coeff ν (ev (rz m) ((pderiv (R := C) ((0 : Fin (m + 1)), i))^[L] f)) =
-      (L.factorial : C) * coeff (Finsupp.single ((0 : Fin (m + 1)), i) L + ν.mapDomain (up m)) f := by
+theorem coeff_rz_iter (m : ℕ) (i : Fin dd) (L : ℕ) (f : PS C (m + 1) dd) (ν : Fin m × Fin dd →₀ ℕ)
+    : coeff ν (ev (rz m) ((pderiv (R := C) ((0 : Fin (m + 1)), i))^[L] f))
+      = (L.factorial : C)
+        * coeff (Finsupp.single ((0 : Fin (m + 1)), i) L + ν.mapDomain (up m)) f := by
   rw [coeff_rz, coeff_iter_pderiv, Finsupp.mapDomain_notin_range _ _ (up_ne_zero m i)]
   simp only [Nat.cast_zero, zero_add]
   rw [← Finset.prod_range_add_one_eq_factorial, Nat.cast_prod, Finsupp.smul_single_one,

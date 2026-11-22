@@ -5,7 +5,12 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.FockOfA
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.IndefR.FWT IsDedekindDomain NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.TwInputs GlobalTheory.ConjTwist GlobalTheory.ChoiceRead
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links
+  Formalism.IndefR.FWT IsDedekindDomain NumberField Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.ExportSeries GlobalTheory.SeriesTie GlobalTheory.TwInputs
+  GlobalTheory.ConjTwist GlobalTheory.ChoiceRead
 open Formalism.MainNotions.IntegralHeckeForms (TwOK ClsQ)
 open Formalism.L2.Host (embLL0)
 open Formalism.IndefR.RecTie (Used0)
@@ -16,10 +21,12 @@ set_option maxHeartbeats 1600000
 open GlobalTheory.PlaceRead
 open GlobalTheory.HeightCounting.Up (PrN)
 
-private theorem tensor_exists_basis_expansion {O K L M ι : Type*} [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K]
-    [Field L] [Algebra O L] [AddCommGroup M] [Module O M] [Module K M] [IsScalarTower O K M] [Fintype ι]
-    (hinj : ∀ d : O, d ≠ 0 → algebraMap O L d ≠ 0) (v : Module.Basis ι K M) (x : L ⊗[O] M) :
-    ∃ cf : ι → L, x = ∑ a, cf a ⊗ₜ v a := by
+private theorem tensor_exists_basis_expansion
+    {O K L M ι : Type*}
+    [CommRing O] [IsDomain O] [Field K] [Algebra O K] [IsFractionRing O K] [Field L] [Algebra O L]
+    [AddCommGroup M] [Module O M] [Module K M] [IsScalarTower O K M] [Fintype ι]
+    (hinj : ∀ d : O, d ≠ 0 → algebraMap O L d ≠ 0) (v : Module.Basis ι K M) (x : L ⊗[O] M)
+    : ∃ cf : ι → L, x = ∑ a, cf a ⊗ₜ v a := by
   induction x using TensorProduct.induction_on with
   | zero => exact ⟨0, by simp⟩
   | add x y hx hy =>
@@ -29,7 +36,8 @@ private theorem tensor_exists_basis_expansion {O K L M ι : Type*} [CommRing O] 
     rw [e, e']
     simp [TensorProduct.add_tmul, Finset.sum_add_distrib]
   | tmul a f =>
-    obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) fun c => v.repr f c
+    obtain ⟨d, hd⟩ :=
+      IsLocalization.exist_integer_multiples_of_finite (nonZeroDivisors O) fun c => v.repr f c
     choose y hy using hd
     have e : (d : O) • (a ⊗ₜ[O] f) = ∑ c, (y c • a) ⊗ₜ[O] v c := by
       rw [← TensorProduct.tmul_smul]
@@ -43,11 +51,16 @@ private theorem tensor_exists_basis_expansion {O K L M ι : Type*} [CommRing O] 
     rw [← inv_smul_smul₀ h0 (a ⊗ₜ[O] f), e, Finset.smul_sum]
     simp only [TensorProduct.smul_tmul']
 
-private theorem tensor_scalar_relation {O L M N ι : Type*} [CommRing O] [Field L] [Algebra O L] [AddCommGroup M] [Module O M]
-    [AddCommGroup N] [Module ℂ N] [Fintype ι] (ε : L →+* ℂ) (v : ι → M) (r : M → N) (R : L ⊗[O] M →ₛₗ[ε] N)
-    (hR : ∀ a f, R (a ⊗ₜ f) = ε a • r f) (hli : LinearIndependent ℂ fun c => r (v c))
-    (hsp : ∀ x : L ⊗[O] M, ∃ cf : ι → L, x = ∑ a, cf a ⊗ₜ v a) (A B : L ⊗[O] M) (z : ℂ) (h : R A = z • R B) :
-    (B = 0 → A = 0) ∧ (B ≠ 0 → ∃ t : L, ε t = z ∧ A = t • B) := by
+private theorem tensor_scalar_relation
+    {O L M N ι : Type*} [CommRing O] [Field L] [Algebra O L] [AddCommGroup M] [Module O M]
+    [AddCommGroup N] [Module ℂ N] [Fintype ι]
+    (ε : L →+* ℂ)
+    (v : ι → M)
+    (r : M → N) (R : L ⊗[O] M →ₛₗ[ε] N) (hR : ∀ a f, R (a ⊗ₜ f) = ε a • r f)
+    (hli : LinearIndependent ℂ fun c => r (v c))
+    (hsp : ∀ x : L ⊗[O] M, ∃ cf : ι → L, x = ∑ a, cf a ⊗ₜ v a)
+    (A B : L ⊗[O] M) (z : ℂ) (h : R A = z • R B)
+    : (B = 0 → A = 0) ∧ (B ≠ 0 → ∃ t : L, ε t = z ∧ A = t • B) := by
   obtain ⟨α, rfl⟩ := hsp A
   have hind := Fintype.linearIndependent_iff.1 hli
   constructor
@@ -62,8 +75,9 @@ private theorem tensor_scalar_relation {O L M N ι : Type*} [CommRing O] [Field 
     set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, map_sum] at h
     simp only [hR] at h
-    have h1 : ∀ a, ε (α a) - z * ε (β a) = 0 := hind (fun a => ε (α a) - z * ε (β a)) (by
-      simp only [sub_smul, mul_smul, Finset.sum_sub_distrib, ← Finset.smul_sum, h, sub_self])
+    have h1 : ∀ a, ε (α a) - z * ε (β a) = 0 :=
+      hind (fun a => ε (α a) - z * ε (β a)) (by
+        simp only [sub_smul, mul_smul, Finset.sum_sub_distrib, ← Finset.smul_sum, h, sub_self])
     have h2 : ∃ a, β a ≠ 0 := by
       by_contra hc
       push Not at hc
@@ -80,12 +94,22 @@ private theorem tensor_scalar_relation {O L M N ι : Type*} [CommRing O] [Field 
     apply ε.injective
     rw [map_mul, ht, sub_eq_zero.1 (h1 a)]
 
-theorem _root_.GlobalTheory.T.chosenField_forms_proportional_of_readings : ∀ (D : D7) (c : NChoice D) (w : D.what₂.places.Pl) (ρ : Setup D.ntw) (hρ : ρ.Good) (j : Fin D.R.m) (rd : Rd ρ D.nexp (c.twI w) j (c.sd w)), Faithful rd → ∀ (ε : KE c w →+* ℂ) (hε : Extends ρ ε) (A B : KE c w ⊗[D.ntw.O (c.twI w)] D.nexp.Fm (c.twI w) (j.1 + 1) (c.sd w)) (z : ℂ),
-  rdF rd hρ hε A = z • rdF rd hρ hε B → (B = 0 → A = 0) ∧ (B ≠ 0 → ∃ t : KE c w, ε t = z ∧ A = t • B) := by
+theorem _root_.GlobalTheory.T.chosenField_forms_proportional_of_readings
+    : ∀ (D : D7) (c : NChoice D) (w : D.what₂.places.Pl) (ρ : Setup D.ntw) (hρ : ρ.Good)
+        (j : Fin D.R.m) (rd : Rd ρ D.nexp (c.twI w) j (c.sd w)),
+      Faithful rd
+        → ∀ (ε : KE c w →+* ℂ) (hε : Extends ρ ε)
+            (A B : KE c w ⊗[D.ntw.O (c.twI w)] D.nexp.Fm (c.twI w) (j.1 + 1) (c.sd w)) (z : ℂ),
+          rdF rd hρ hε A = z • rdF rd hρ hε B
+            → (B = 0 → A = 0) ∧ (B ≠ 0 → ∃ t : KE c w, ε t = z ∧ A = t • B) := by
   intro D c w ρ hρ j rd hF ε hε A B z h
-  let v := Module.finBasis (FractionRing (D.ntw.O (c.twI w))) (D.nexp.Fm (c.twI w) (j.1 + 1) (c.sd w))
+  let v :=
+    Module.finBasis (FractionRing (D.ntw.O (c.twI w))) (D.nexp.Fm (c.twI w) (j.1 + 1) (c.sd w))
   have hinj : ∀ d : D.ntw.O (c.twI w), d ≠ 0 → algebraMap _ (KE c w) d ≠ 0 := fun d hd h0 => by
     have h1 := congrArg ε h0
-    rw [IsScalarTower.algebraMap_apply _ (D.ntw.Ok (c.twI w) (c.k' w)) (KE c w), hε.apply, hρ.ek_e, map_zero] at h1
+    rw [IsScalarTower.algebraMap_apply _ (D.ntw.Ok (c.twI w) (c.k' w)) (KE c w), hε.apply, hρ.ek_e,
+        map_zero]
+      at h1
     exact hd (ρ.eO_injective (c.twI w) (c.sd w) (h1.trans (map_zero _).symm))
-  exact tensor_scalar_relation ε v rd (rdF rd hρ hε) (rdF_tmul hρ hε) (hF _ v v.linearIndependent) (tensor_exists_basis_expansion hinj v) A B z h
+  exact tensor_scalar_relation ε v rd (rdF rd hρ hε) (rdF_tmul hρ hε) (hF _ v v.linearIndependent)
+    (tensor_exists_basis_expansion hinj v) A B z h

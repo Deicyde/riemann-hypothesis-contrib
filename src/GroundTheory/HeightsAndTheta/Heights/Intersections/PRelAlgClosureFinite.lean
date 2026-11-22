@@ -13,10 +13,12 @@ namespace GroundTheory.Heights₂.Heights.Inter
 
 open MvPolynomial IntermediateField.algebraAdjoinAdjoin
 
-theorem RelAlgClosureFinite.linearIndependent_adjoin {K L : Type*} [Field K] [Field L] [Algebra K L]
-    (M : IntermediateField K L) {σ : Type*} {x : σ → L} (hx : AlgebraicIndependent M x)
-    {ι : Type*} {m : ι → M} (hm : LinearIndependent K m) :
-    LinearIndependent (Algebra.adjoin K (Set.range x)) (fun i => (m i : L)) := by
+theorem RelAlgClosureFinite.linearIndependent_adjoin
+    {K L : Type*} [Field K] [Field L] [Algebra K L]
+    (M : IntermediateField K L)
+    {σ : Type*} {x : σ → L} (hx : AlgebraicIndependent M x)
+    {ι : Type*} {m : ι → M} (hm : LinearIndependent K m)
+    : LinearIndependent (Algebra.adjoin K (Set.range x)) (fun i => (m i : L)) := by
   rw [linearIndependent_iff'] at hm ⊢
   intro s g hg i hi
   have hp : ∀ j, ∃ p : MvPolynomial σ K, aeval x p = (g j : L) := fun j => by
@@ -36,11 +38,13 @@ theorem RelAlgClosureFinite.linearIndependent_adjoin {K L : Type*} [Field K] [Fi
   have hcoeff : ∀ d, ∀ j ∈ s, AddMonoidAlgebra.coeff (p j) d = 0 := fun d => by
     apply hm s (fun j => AddMonoidAlgebra.coeff (p j) d)
     have := congrArg (AddMonoidAlgebra.coeff · d) hP
-    simp only [coeff_sum, coeff_C_mul, coeff_map, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply] at this
+    simp only [coeff_sum, coeff_C_mul, coeff_map, AddMonoidAlgebra.coeff_zero, Finsupp.zero_apply]
+      at this
     rw [← this]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [Algebra.smul_def, mul_comm]
-  have hpi : p i = 0 := MvPolynomial.ext _ _ fun d => by simp [hcoeff d i hi, AddMonoidAlgebra.coeff_zero]
+  have hpi : p i = 0 :=
+    MvPolynomial.ext _ _ fun d => by simp [hcoeff d i hi, AddMonoidAlgebra.coeff_zero]
   apply Subtype.ext
   rw [← hp i, hpi, map_zero]
   rfl
@@ -56,13 +60,15 @@ theorem RelAlgClosureFinite.proof : RelAlgClosureFinite.Statement := by
     rw [eq_top_iff]
     intro z _
     have hz : z ∈ IntermediateField.adjoin K (S : Set L) := hS ▸ IntermediateField.mem_top
-    have hle : IntermediateField.adjoin K (S : Set L) ≤
-        (IntermediateField.adjoin E (S : Set L)).restrictScalars K :=
+    have hle
+        : IntermediateField.adjoin K (S : Set L)
+          ≤ (IntermediateField.adjoin E (S : Set L)).restrictScalars K :=
       IntermediateField.adjoin_le_iff.2 fun y hy => IntermediateField.subset_adjoin E _ hy
     exact hle hz
   have hfin : FiniteDimensional E L := by
-    have h := IntermediateField.finiteDimensional_adjoin (K := E) (S := (S : Set L))
-      fun y _ => (halg.isAlgebraic y).isIntegral
+    have h :=
+      IntermediateField.finiteDimensional_adjoin (K := E) (S := (S : Set L)) fun y _ =>
+        (halg.isAlgebraic y).isIntegral
     rw [htop] at h
     exact (IntermediateField.topEquiv (F := E) (E := L)).toLinearEquiv.finiteDimensional
   let b := Module.Basis.ofVectorSpace K M

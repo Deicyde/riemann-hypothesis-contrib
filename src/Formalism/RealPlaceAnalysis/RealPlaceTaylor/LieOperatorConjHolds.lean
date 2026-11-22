@@ -111,7 +111,9 @@ lemma p0auxiliary_cpart2_I {n : ℕ} (ε : Fin n → Bool) (Z : Matrix (Fin n) (
   module
 
 section EcV
-variable (hl : RdLinV) {n : ℕ} {ε : Fin n → Bool} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
+variable
+  (hl : RdLinV)
+  {n : ℕ} {ε : Fin n → Bool} {E : Type} [NormedAddCommGroup E] [NormedSpace ℂ E]
   {f : Matrix (Fin n) (Fin n) ℂ → E} {g : Matrix (Fin n) (Fin n) ℂ}
 include hl
 
@@ -157,14 +159,15 @@ theorem ecSumV_of (h : RdLinV) : EcSumV := by
   let L : Matrix (Fin n) (Fin n) ℂ →+ E :=
     AddMonoidHom.mk' (fun Y => EcV ε Y f g) (fun Y W => p0auxiliary_ecV_add h hf hg Y W)
   have hL : ∀ Y, L Y = EcV ε Y f g := fun Y => rfl
-  calc EcV ε Z f g = L (∑ a, ∑ b, Matrix.single a b (Z a b)) := by
-        rw [hL, ← Matrix.matrix_eq_sum_single Z]
+  calc
+    EcV ε Z f g
+      = L (∑ a, ∑ b, Matrix.single a b (Z a b)) := by rw [hL, ← Matrix.matrix_eq_sum_single Z]
     _ = ∑ a, ∑ b, L (Matrix.single a b (Z a b)) := by simp only [map_sum]
     _ = ∑ a, ∑ b, Z a b • EabV ε a b f g := by
-        refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
-        have hs : Matrix.single a b (Z a b) = Z a b • Matrix.single a b (1 : ℂ) := by
-          ext i j
-          simp [Matrix.single_apply]
-        rw [hL, hs, p0auxiliary_ecV_smul h hf hg, EabV]
+      refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
+      have hs : Matrix.single a b (Z a b) = Z a b • Matrix.single a b (1 : ℂ) := by
+        ext i j
+        simp [Matrix.single_apply]
+      rw [hL, hs, p0auxiliary_ecV_smul h hf hg, EabV]
 
 end Formalism.REAL

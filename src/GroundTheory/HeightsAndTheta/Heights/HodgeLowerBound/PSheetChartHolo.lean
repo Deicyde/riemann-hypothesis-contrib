@@ -20,40 +20,44 @@ namespace SheetChartHolo
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-
 omit [∀ k, Fintype (ι k)] in
-theorem segre_torusSmul (c : K → ℂ) (z : (Σ k, ι k) → ℂ) :
-    segre (torusSmul c z) = (∏ k, c k) • segre z := by
+theorem segre_torusSmul (c : K → ℂ) (z : (Σ k, ι k) → ℂ)
+    : segre (torusSmul c z) = (∏ k, c k) • segre z := by
   funext i
   simp [segre, torusSmul, Finset.prod_mul_distrib]
 
 theorem coordDiv_null {n : ℕ} (S : Finset (Fin n)) : volume (coordDiv S) = 0 := by
-  have hsub : coordDiv S ⊆ ⋃ i ∈ (S : Set (Fin n)),
-      ((LinearMap.ker (LinearMap.proj i : (Fin n → ℂ) →ₗ[ℝ] ℂ) : Submodule ℝ (Fin n → ℂ)) :
-        Set (Fin n → ℂ)) := by
+  have hsub
+      : coordDiv S
+        ⊆ ⋃ i ∈ (S : Set (Fin n)),
+          ((LinearMap.ker (LinearMap.proj i : (Fin n → ℂ) →ₗ[ℝ] ℂ) : Submodule ℝ (Fin n → ℂ)) :
+            Set (Fin n → ℂ)) := by
     rintro z ⟨i, hi, hz⟩
     exact Set.mem_biUnion hi (by simp [hz])
   refine measure_mono_null hsub ((measure_biUnion_null_iff S.countable_toSet).2 fun i _ => ?_)
   refine Measure.addHaar_submodule _ _ fun htop => ?_
-  have : (Pi.single i (1 : ℂ) : Fin n → ℂ) ∈
-      LinearMap.ker (LinearMap.proj i : (Fin n → ℂ) →ₗ[ℝ] ℂ) := by
+  have : (Pi.single i (1 : ℂ) : Fin n → ℂ)
+      ∈ LinearMap.ker (LinearMap.proj i : (Fin n → ℂ) →ₗ[ℝ] ℂ) := by
     rw [htop]; trivial
   simp at this
 
-def patchMap {n : ℕ} (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ)) {X : Type}
-    [TopologicalSpace X] (ψ : OpenPartialHomeomorph X (Fin n → ℂ)) (s : X → (Σ k, ι k) → ℂ)
-    (ξ : Fin n → ℂ) : Fin n → ℂ :=
-  fun i => Q (segre (s (ψ.symm ξ))) i.succ / Q (segre (s (ψ.symm ξ))) 0
-
+def patchMap
+    {n : ℕ} (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ))
+    {X : Type} [TopologicalSpace X]
+    (ψ : OpenPartialHomeomorph X (Fin n → ℂ)) (s : X → (Σ k, ι k) → ℂ) (ξ : Fin n → ℂ)
+    : Fin n → ℂ := fun i =>
+  Q (segre (s (ψ.symm ξ))) i.succ / Q (segre (s (ψ.symm ξ))) 0
 
 omit [∀ k, Fintype (ι k)] in
-theorem patchMap_eq {P : Ideal (MRing ι)} {n : ℕ} (M : CxModel P n)
-    (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ))
+theorem patchMap_eq
+    {P : Ideal (MRing ι)} {n : ℕ}
+    (M : CxModel P n) (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ))
     (ψ : OpenPartialHomeomorph M.Xc (Fin n → ℂ)) (s : M.Xc → (Σ k, ι k) → ℂ)
-    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P) {x' : M.Xc} (hzx : M.proj z = x')
-    (hsrc : x' ∈ ψ.source) (hs : s x' ∈ mcPts P ∧ M.proj (s x') = x') {y : Fin n → ℂ}
-    (hQ : Q (segre z) = Fin.cons 1 y) :
-    Q (segre (s (ψ.symm (ψ x')))) 0 ≠ 0 ∧ patchMap Q ψ s (ψ x') = y := by
+    {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts P)
+    {x' : M.Xc}
+    (hzx : M.proj z = x') (hsrc : x' ∈ ψ.source) (hs : s x' ∈ mcPts P ∧ M.proj (s x') = x')
+    {y : Fin n → ℂ} (hQ : Q (segre z) = Fin.cons 1 y)
+    : Q (segre (s (ψ.symm (ψ x')))) 0 ≠ 0 ∧ patchMap Q ψ s (ψ x') = y := by
   rw [ψ.left_inv hsrc]
   obtain ⟨c, -, hc⟩ := (M.fibre _ hs.1 z hz).1 (hs.2.trans hzx.symm)
   have hQ' : Q (segre z) = (∏ k, c k) • Q (segre (s x')) := by
@@ -73,20 +77,23 @@ theorem patchMap_eq {P : Ideal (MRing ι)} {n : ℕ} (M : CxModel P n)
   rw [ψ.left_inv hsrc, div_eq_iff hne, hi]
   linear_combination (Q (segre (s x')) i.succ) * h0
 
-theorem patchMap_analyticAt {P : Ideal (MRing ι)} {n : ℕ} (M : CxModel P n)
-    (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ))
+theorem patchMap_analyticAt
+    {P : Ideal (MRing ι)} {n : ℕ}
+    (M : CxModel P n) (Q : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (n + 1) → ℂ))
     (ψ : OpenPartialHomeomorph M.Xc (Fin n → ℂ)) (hψ : IsCompatChart M.atlas ψ) (U : Set M.Xc)
-    (s : M.Xc → (Σ k, ι k) → ℂ) (hsh : ∀ p, M.atlas.HoloOn U fun y => s y p) {ξ : Fin n → ℂ}
-    (hξ : ξ ∈ ψ.target) (hU : ψ.symm ξ ∈ U) (h0 : Q (segre (s (ψ.symm ξ))) 0 ≠ 0) :
-    AnalyticAt ℂ (patchMap Q ψ s) ξ := by
+    (s : M.Xc → (Σ k, ι k) → ℂ) (hsh : ∀ p, M.atlas.HoloOn U fun y => s y p)
+    {ξ : Fin n → ℂ} (hξ : ξ ∈ ψ.target) (hU : ψ.symm ξ ∈ U) (h0 : Q (segre (s (ψ.symm ξ))) 0 ≠ 0)
+    : AnalyticAt ℂ (patchMap Q ψ s) ξ := by
   classical
   have hcoord : ∀ p, AnalyticAt ℂ (fun ξ' => s (ψ.symm ξ') p) ξ := by
     intro p
     obtain ⟨i, hi⟩ := M.atlas.cover (ψ.symm ξ)
-    have hg : AnalyticAt ℂ ((fun y => s y p) ∘ (M.atlas.chart i).symm)
-        (M.atlas.chart i (ψ.symm ξ)) :=
-      hsh p i _ ⟨(M.atlas.chart i).map_source hi, by
-        rw [Set.mem_preimage, (M.atlas.chart i).left_inv hi]; exact hU⟩
+    have hg
+        : AnalyticAt ℂ ((fun y => s y p) ∘ (M.atlas.chart i).symm) (M.atlas.chart i (ψ.symm ξ)) :=
+      hsh p i _ ⟨
+        (M.atlas.chart i).map_source hi,
+        by rw [Set.mem_preimage, (M.atlas.chart i).left_inv hi]; exact hU
+      ⟩
     have hh : AnalyticAt ℂ (M.atlas.chart i ∘ ψ.symm) ξ := (hψ i).2 ξ ⟨hξ, hi⟩
     refine (AnalyticAt.comp (g := (fun y => s y p) ∘ (M.atlas.chart i).symm)
       (f := M.atlas.chart i ∘ ψ.symm) hg hh).congr ?_
@@ -105,23 +112,25 @@ theorem patchMap_analyticAt {P : Ideal (MRing ι)} {n : ℕ} (M : CxModel P n)
 theorem proof : SheetChartHolo.Statement := by
   intro K _ ι _ P n M R Q
   classical
-
-  have hpatch : ∀ x : M.Xc, ∃ (j : Fin R.N) (U : Set M.Xc) (s : M.Xc → (Σ k, ι k) → ℂ),
-      IsOpen U ∧ x ∈ U ∧ x ∈ (R.chart j).source ∧ (∀ y ∈ U, s y ∈ mcPts P ∧ M.proj (s y) = y) ∧
-        ∀ p, M.atlas.HoloOn U fun y => s y p := by
+  have hpatch
+      : ∀ x : M.Xc, ∃ (j : Fin R.N) (U : Set M.Xc) (s : M.Xc → (Σ k, ι k) → ℂ),
+        IsOpen U ∧ x ∈ U ∧ x ∈ (R.chart j).source ∧ (∀ y ∈ U, s y ∈ mcPts P ∧ M.proj (s y) = y)
+          ∧ ∀ p, M.atlas.HoloOn U fun y => s y p := by
     intro x
     obtain ⟨j, hj⟩ := R.cover x
     obtain ⟨U, hU, hxU, s, hs, hsh⟩ := M.sections x
     exact ⟨j, U, s, hU, hxU, R.mid_subset_source j (R.inner_subset_mid j hj), hs, hsh⟩
   choose j U s hU hxU hxj hs hsh using hpatch
 
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover
-    (fun x => U x ∩ (R.chart (j x)).source)
-    (fun x => (hU x).inter (R.chart (j x)).open_source)
-    (fun x _ => Set.mem_iUnion.2 ⟨x, hxU x, hxj x⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun x => U x ∩ (R.chart (j x)).source)
+      (fun x => (hU x).inter (R.chart (j x)).open_source)
+      (fun x _ => Set.mem_iUnion.2 ⟨x, hxU x, hxj x⟩)
   let F : M.Xc → (Fin n → ℂ) → (Fin n → ℂ) := fun x => patchMap Q (R.chart (j x)) (s x)
-  let V : M.Xc → Set (Fin n → ℂ) := fun x => {ξ | ξ ∈ (R.chart (j x)).target ∧
-    (R.chart (j x)).symm ξ ∈ U x ∧ Q (segre (s x ((R.chart (j x)).symm ξ))) 0 ≠ 0}
+  let V : M.Xc → Set (Fin n → ℂ) := fun x =>
+    {ξ | ξ ∈ (R.chart (j x)).target ∧
+      (R.chart (j x)).symm ξ ∈ U x ∧ Q (segre (s x ((R.chart (j x)).symm ξ))) 0 ≠ 0}
   have hF : ∀ x, ∀ ξ ∈ V x, AnalyticAt ℂ (F x) ξ := fun x ξ hξ =>
     patchMap_analyticAt M Q _ (R.compat (j x)) (U x) (s x) (hsh x) hξ.1 hξ.2.1 hξ.2.2
   let f' : M.Xc → (Fin n → ℂ) → ((Fin n → ℂ) →L[ℝ] (Fin n → ℂ)) := fun x ξ =>
@@ -137,7 +146,8 @@ theorem proof : SheetChartHolo.Statement := by
       intro ξ hξ
       exact ((hF x ξ hξ.1).differentiableAt.restrictScalars ℝ).differentiableWithinAt
     · refine addHaar_image_eq_zero_of_det_fderivWithin_eq_zero volume (f' := f' x)
-        (fun ξ hξ => ?_) (fun ξ hξ => hξ.2)
+        (fun ξ hξ => ?_)
+        (fun ξ hξ => hξ.2)
       exact ((hF x ξ hξ.1).differentiableAt.hasFDerivAt.restrictScalars ℝ).hasFDerivWithinAt
   rw [ae_iff]
   refine measure_mono_null ?_ hB
@@ -149,8 +159,8 @@ theorem proof : SheetChartHolo.Statement := by
   obtain ⟨-, hev⟩ := hγ
   have hev0 := hev.self_of_nhds
 
-  obtain ⟨x, hxt, hxU', hxsrc⟩ : ∃ x ∈ t, M.proj (γ y) ∈ U x ∧
-      M.proj (γ y) ∈ (R.chart (j x)).source := by
+  obtain ⟨x, hxt, hxU', hxsrc⟩
+      : ∃ x ∈ t, M.proj (γ y) ∈ U x ∧ M.proj (γ y) ∈ (R.chart (j x)).source := by
     have h := ht (Set.mem_univ (M.proj (γ y)))
     simp only [Set.mem_iUnion] at h
     obtain ⟨x, hx, h⟩ := h
@@ -167,14 +177,17 @@ theorem proof : SheetChartHolo.Statement := by
   refine ⟨j x, hxsrc, hYo, ?_⟩
 
   have hbij : Function.Bijective (fderiv ℂ (F x) ξ0) := by
-    have hu : IsUnit (LinearMap.det ((f' x ξ0 : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)) :
-        (Fin n → ℂ) →ₗ[ℝ] (Fin n → ℂ))) := isUnit_iff_ne_zero.2 hξ0crit
-    have h2 := (Module.End.isUnit_iff _).1 ((LinearMap.isUnit_iff_isUnit_det
-      ((f' x ξ0 : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℝ] (Fin n → ℂ))).2 hu)
+    have hu : IsUnit (LinearMap.det
+        ((f' x ξ0 : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℝ] (Fin n → ℂ))) :=
+      isUnit_iff_ne_zero.2 hξ0crit
+    have h2 :=
+      (Module.End.isUnit_iff _).1
+        ((LinearMap.isUnit_iff_isUnit_det
+          ((f' x ξ0 : (Fin n → ℂ) →L[ℝ] (Fin n → ℂ)) : (Fin n → ℂ) →ₗ[ℝ] (Fin n → ℂ))).2 hu)
     exact h2
   let e : (Fin n → ℂ) ≃L[ℂ] (Fin n → ℂ) :=
-    ContinuousLinearEquiv.ofBijective (fderiv ℂ (F x) ξ0)
-      (LinearMap.ker_eq_bot.2 hbij.1) (LinearMap.range_eq_top.2 hbij.2)
+    ContinuousLinearEquiv.ofBijective (fderiv ℂ (F x) ξ0) (LinearMap.ker_eq_bot.2 hbij.1)
+      (LinearMap.range_eq_top.2 hbij.2)
   have hcd : ContDiffAt ℂ 1 (F x) ξ0 := (hF x ξ0 hξ0V).contDiffAt
   have hder : HasFDerivAt (F x) (e : (Fin n → ℂ) →L[ℂ] (Fin n → ℂ)) ξ0 := by
     rw [ContinuousLinearEquiv.coe_ofBijective]

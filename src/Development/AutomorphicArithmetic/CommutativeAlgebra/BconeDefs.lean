@@ -7,15 +7,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.RestrPreserv
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace UpperTheory.Bc
 
 abbrev prodW (W : Scheme.{0}) : Scheme.{0} ⥤ Scheme.{0} := prod.functor.obj W
 
 set_option backward.isDefEq.respectTransparency false in
-theorem prodW_compatible (W : Scheme.{0}) :
-    CompatiblePreserving Scheme.etaleTopology.{0} (prodW W) := by
+theorem prodW_compatible (W : Scheme.{0})
+    : CompatiblePreserving Scheme.etaleTopology.{0} (prodW W) := by
   constructor
   intro ℱ Z T x hx Y₁ Y₂ X f₁ f₂ g₁ g₂ hg₁ hg₂ e
   have hfst : f₁ ≫ prod.fst = f₂ ≫ prod.fst := by
@@ -25,28 +26,27 @@ theorem prodW_compatible (W : Scheme.{0}) :
     have h := congrArg (· ≫ (prod.snd : W ⨯ Z ⟶ Z)) e
     simpa using h
   let u : X ⟶ (prodW W).obj X := prod.lift (f₁ ≫ prod.fst) (𝟙 X)
-  have k₁ : f₁ = u ≫ (prodW W).map (f₁ ≫ prod.snd) := by
-    apply prod.hom_ext <;> simp [u]
-  have k₂ : f₂ = u ≫ (prodW W).map (f₂ ≫ prod.snd) := by
-    apply prod.hom_ext <;> simp [u, hfst]
+  have k₁ : f₁ = u ≫ (prodW W).map (f₁ ≫ prod.snd) := by apply prod.hom_ext <;> simp [u]
+  have k₂ : f₂ = u ≫ (prodW W).map (f₂ ≫ prod.snd) := by apply prod.hom_ext <;> simp [u, hfst]
   have hc := hx (f₁ ≫ prod.snd) (f₂ ≫ prod.snd) hg₁ hg₂ hsnd
-  calc ℱ.obj.map f₁.op (x g₁ hg₁)
-      = ℱ.obj.map u.op (ℱ.obj.map ((prodW W).map (f₁ ≫ prod.snd)).op (x g₁ hg₁)) := by
-        rw [← Functor.map_comp_apply, ← op_comp, ← k₁]
-    _ = ℱ.obj.map u.op (ℱ.obj.map ((prodW W).map (f₂ ≫ prod.snd)).op (x g₂ hg₂)) :=
-        congrArg _ hc
-    _ = ℱ.obj.map f₂.op (x g₂ hg₂) := by
-        rw [← Functor.map_comp_apply, ← op_comp, ← k₂]
+  calc
+    ℱ.obj.map f₁.op (x g₁ hg₁)
+        = ℱ.obj.map u.op (ℱ.obj.map ((prodW W).map (f₁ ≫ prod.snd)).op (x g₁ hg₁)) := by
+      rw [← Functor.map_comp_apply, ← op_comp, ← k₁]
+    _ = ℱ.obj.map u.op (ℱ.obj.map ((prodW W).map (f₂ ≫ prod.snd)).op (x g₂ hg₂)) := congrArg _ hc
+    _ = ℱ.obj.map f₂.op (x g₂ hg₂) := by rw [← Functor.map_comp_apply, ← op_comp, ← k₂]
 
 set_option backward.isDefEq.respectTransparency false in
-theorem prodW_cover (W : Scheme.{0}) :
-    CoverPreserving Scheme.etaleTopology.{0} Scheme.etaleTopology.{0} (prodW W) := by
+theorem prodW_cover (W : Scheme.{0})
+    : CoverPreserving Scheme.etaleTopology.{0} Scheme.etaleTopology.{0} (prodW W) := by
   constructor
   intro U S hS
   rw [GlobalTheory.T.mem_etale_covering_sieves_iff_points]
   intro u
-  obtain ⟨V, j, v, hj, hv, hS'⟩ := (GlobalTheory.T.mem_etale_covering_sieves_iff_points U S).1 hS ((prod.snd : W ⨯ U ⟶ U) u)
-  obtain ⟨z, hz1, hz2⟩ := Scheme.Pullback.exists_preimage_pullback (f := (prod.snd : W ⨯ U ⟶ U)) (g := j) u v hv.symm
+  obtain ⟨V, j, v, hj, hv, hS'⟩ :=
+    (GlobalTheory.T.mem_etale_covering_sieves_iff_points U S).1 hS ((prod.snd : W ⨯ U ⟶ U) u)
+  obtain ⟨z, hz1, hz2⟩ :=
+    Scheme.Pullback.exists_preimage_pullback (f := (prod.snd : W ⨯ U ⟶ U)) (g := j) u v hv.symm
   haveI := hj
   refine ⟨pullback (prod.snd : W ⨯ U ⟶ U) j, pullback.fst _ _, z, ?_, hz1, ?_⟩
   · exact MorphismProperty.pullback_fst _ _ hj
@@ -55,14 +55,15 @@ theorem prodW_cover (W : Scheme.{0}) :
   · simp
   · simp [pullback.condition]
 
-instance prodW_cont (W : Scheme.{0}) :
-    (prodW W).IsContinuous Scheme.etaleTopology.{0} Scheme.etaleTopology.{0} :=
+instance prodW_cont (W : Scheme.{0})
+    : (prodW W).IsContinuous Scheme.etaleTopology.{0} Scheme.etaleTopology.{0} :=
   Functor.isContinuous_of_coverPreserving (prodW_compatible W) (prodW_cover W)
 
 variable (R : Type) [CommRing R]
 
 def pw (W : Scheme.{0}) : Shv R ⥤ Shv R :=
-  (prodW W).sheafPushforwardContinuous (ModuleCat.{1} (ULift.{1} R)) Scheme.etaleTopology.{0} Scheme.etaleTopology.{0}
+  (prodW W).sheafPushforwardContinuous (ModuleCat.{1} (ULift.{1} R)) Scheme.etaleTopology.{0}
+    Scheme.etaleTopology.{0}
 
 instance (W : Scheme.{0}) : (pw R W).Additive where
   map_add {F G} {f g} := by

@@ -8,9 +8,7 @@ namespace GlobalTheory.MassConj
 
 @[ext]
 structure ConjPair (H X : Type) where
-
   elt : H
-
   pt : X
 
 variable {H X : Type} [Group H] [MulAction H X]
@@ -27,20 +25,25 @@ instance : MulAction H (ConjPair H X) where
     · simp only; group
     · exact mul_smul δ ε p.pt
 
-@[simp] theorem smul_elt (δ : H) (p : ConjPair H X) : (δ • p).elt = δ * p.elt * δ⁻¹ := rfl
+@[simp]
+theorem smul_elt (δ : H) (p : ConjPair H X) : (δ • p).elt = δ * p.elt * δ⁻¹ := rfl
 
-@[simp] theorem smul_pt (δ : H) (p : ConjPair H X) : (δ • p).pt = δ • p.pt := rfl
+@[simp]
+theorem smul_pt (δ : H) (p : ConjPair H X) : (δ • p).pt = δ • p.pt := rfl
 
-theorem mem_stabilizer_iff (δ : H) (p : ConjPair H X) :
-    δ ∈ MulAction.stabilizer H p ↔ δ * p.elt = p.elt * δ ∧ δ • p.pt = p.pt := by
+theorem mem_stabilizer_iff (δ : H) (p : ConjPair H X)
+    : δ ∈ MulAction.stabilizer H p ↔ δ * p.elt = p.elt * δ ∧ δ • p.pt = p.pt := by
   rw [MulAction.mem_stabilizer_iff, ConjPair.ext_iff, smul_elt, smul_pt]
   constructor
   · rintro ⟨h1, h2⟩
     refine ⟨?_, h2⟩
-    calc δ * p.elt = δ * p.elt * δ⁻¹ * δ := by group
+    calc
+      δ * p.elt
+        = δ * p.elt * δ⁻¹ * δ := by group
       _ = p.elt * δ := by rw [h1]
   · rintro ⟨h1, h2⟩
     refine ⟨?_, h2⟩
-    rw [h1]; group
+    rw [h1]
+    group
 
 end GlobalTheory.MassConj

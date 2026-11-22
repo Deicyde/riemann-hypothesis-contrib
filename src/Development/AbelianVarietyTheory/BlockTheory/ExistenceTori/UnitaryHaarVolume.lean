@@ -11,51 +11,73 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume
 
-open Formalism.L2.Pj Formalism.L2.PjFree NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.FD MeasureTheory
+open Formalism.L2.Pj Formalism.L2.PjFree NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.FD MeasureTheory
 open scoped ENNReal
 
-def sgnMat (r p0 : ℕ) : Matrix (Fin r) (Fin r) ℂ := Matrix.diagonal fun a : Fin r => ((sgn p0 (a : ℕ) : ℝ) : ℂ)
+def sgnMat (r p0 : ℕ) : Matrix (Fin r) (Fin r) ℂ :=
+  Matrix.diagonal fun a : Fin r => ((sgn p0 (a : ℕ) : ℝ) : ℂ)
 
 def Upq (r p0 : ℕ) : Subgroup (GL (Fin r) ℂ) where
-  carrier := {g | (g : Matrix (Fin r) (Fin r) ℂ).transpose * sgnMat r p0 *
-    (g : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) = sgnMat r p0}
+  carrier :=
+    {g | (g : Matrix (Fin r) (Fin r) ℂ).transpose * sgnMat r p0 *
+      (g : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) = sgnMat r p0}
   one_mem' := by simp
   mul_mem' := by
     intro a b ha hb
     simp only [Set.mem_ofPred_eq, Units.val_mul, Matrix.transpose_mul, Matrix.map_mul] at *
-    calc _ = (b : Matrix (Fin r) (Fin r) ℂ).transpose * ((a : Matrix (Fin r) (Fin r) ℂ).transpose * sgnMat r p0 *
-        (a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)) * (b : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) := by
-          simp only [Matrix.mul_assoc]
+    calc
+      _ = (b : Matrix (Fin r) (Fin r) ℂ).transpose
+          * ((a : Matrix (Fin r) (Fin r) ℂ).transpose * sgnMat r p0
+            * (a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ))
+          * (b : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by rw [ha, hb]
   inv_mem' := by
     intro a ha
     simp only [Set.mem_ofPred_eq] at *
-    have h1 : ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).transpose * (a : Matrix (Fin r) (Fin r) ℂ).transpose = 1 := by
-      rw [← Matrix.transpose_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.transpose_one]
-    have h2 : (a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) *
-        ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) = 1 := by
+    have h1
+        : ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).transpose
+            * (a : Matrix (Fin r) (Fin r) ℂ).transpose
+          = 1 := by
+      rw [← Matrix.transpose_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.transpose_one]
+    have h2
+        : (a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)
+            * ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)
+          = 1 := by
       rw [← Matrix.map_mul, ← Units.val_mul, mul_inv_cancel, Units.val_one]
       simp
-    calc _ = ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).transpose *
-        ((a : Matrix (Fin r) (Fin r) ℂ).transpose * sgnMat r p0 * (a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)) *
-        ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) := by rw [ha]
-      _ = (((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).transpose * (a : Matrix (Fin r) (Fin r) ℂ).transpose) *
-        sgnMat r p0 * ((a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) *
-        ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)) := by simp only [Matrix.mul_assoc]
+    calc
+      _ = ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).transpose
+          * ((a : Matrix (Fin r) (Fin r) ℂ).transpose * sgnMat r p0
+            * (a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ))
+          * ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) := by
+        rw [ha]
+      _ = (((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).transpose
+            * (a : Matrix (Fin r) (Fin r) ℂ).transpose)
+          * sgnMat r p0
+          * ((a : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)
+            * ((a⁻¹ : GL (Fin r) ℂ) : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ)) := by
+        simp only [Matrix.mul_assoc]
       _ = _ := by rw [h1, h2, Matrix.one_mul, Matrix.mul_one]
 
 set_option autoImplicit false in
 open NumberField MeasureTheory in
 open scoped ENNReal in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.isClosed_Upq (r p0 : ℕ) :
-    IsClosed (_root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r p0 : Set (GL (Fin r) ℂ)) := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.isClosed_Upq (r p0 : ℕ)
+    : IsClosed
+      (_root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.Upq r p0
+        : Set (GL (Fin r) ℂ)) := by
   show IsClosed {g : GL (Fin r) ℂ | (g : Matrix (Fin r) (Fin r) ℂ).transpose *
     _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat r p0 * (g : Matrix (Fin r) (Fin r) ℂ).map (starRingEnd ℂ) =
       _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.sgnMat r p0}
   have hv : Continuous fun g : GL (Fin r) ℂ => (g : Matrix (Fin r) (Fin r) ℂ) :=
     Units.continuous_val
-  exact isClosed_eq ((hv.matrix_transpose.matrix_mul continuous_const).matrix_mul
-    (hv.matrix_map Complex.continuous_conj)) continuous_const
+  exact isClosed_eq
+    ((hv.matrix_transpose.matrix_mul continuous_const).matrix_mul
+      (hv.matrix_map Complex.continuous_conj))
+    continuous_const
 
 instance locallyCompact_Upq (r p0 : ℕ) : LocallyCompactSpace (Upq r p0) := by
   haveI : LocallyCompactSpace (Matrix (Fin r) (Fin r) ℂ) := inferInstanceAs (LocallyCompactSpace (Fin r → Fin r → ℂ))
@@ -84,9 +106,12 @@ def baseFr : Frame X.Ψ r := fun τ => ((X.signature τ).choose : Matrix (Fin r)
 set_option autoImplicit false in
 open NumberField MeasureTheory in
 open scoped ENNReal in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.baseFr_mem :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.baseFr X ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.OrthFr X := by
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {r : ℕ} (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) in
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.baseFr_mem
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.baseFr X
+      ∈ _root_.GlobalTheory.IndefiniteRowSideFullHecke.UnitaryHaarVolume.OrthFr X := by
   intro τ
   exact (X.signature τ).choose_spec.2
 
@@ -101,8 +126,10 @@ def quotInt (F : Frame X.Ψ r → ℝ≥0∞) : ℝ≥0∞ :=
 
 end Comp
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {l : Level H} {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H} {l : Level H}
+  {Xo : Moduli Dw l} {c : Coeff l} {r : ℕ}
 
 section OneEmb
 
@@ -115,7 +142,8 @@ def totInt (F : ∀ k, Frame (V.X k).Ψ r → ℝ≥0∞) : ℝ≥0∞ := ∑ k,
 def piFac (a : (E →+* ℂ) × ℕ → ℕ) (k : V.Comp) : ℝ :=
   ∏ τ : E →+* ℂ, ∏ i : Fin (Dw.mult τ), (2 * Real.pi * ‖relab c σ τ (V.X k).ξ0‖) ^ (-(a (τ, i) : ℝ) / 2)
 
-def ptNorm (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (f : Rul Xo c) (k : V.Comp) (x : Frame (V.X k).Ψ r) : ℝ :=
+def ptNorm (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (f : Rul Xo c) (k : V.Comp) (x : Frame (V.X k).Ψ r)
+    : ℝ :=
   piFac V a k * (V.X k).pnorm (laU V a n k) (rdU V f k) x
 
 def sqInt (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (f : Rul Xo c) : ℝ≥0∞ :=

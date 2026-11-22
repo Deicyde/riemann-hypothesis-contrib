@@ -12,7 +12,8 @@ public import Formalism.HermitianCurvature.HermitianCurvatureProofs.CutSELeibniz
 namespace Formalism.FourierDecayAlt.P.CutSE
 
 theorem jSliceGenC_of_radLoc (hR : JSRadLoc) : JSliceGenC :=
-  jSliceGenC_of_sob2_meas_locality spectral_sobolev_second_order spectral_measurability (jSL2Loc_of spectral_word_normal_form hR)
+  jSliceGenC_of_sob2_meas_locality spectral_sobolev_second_order spectral_measurability
+    (jSL2Loc_of spectral_word_normal_form hR)
 
 theorem leibnizCls_of_radLoc (hR : JSRadLoc) : LeibnizCls :=
   leibnizCls_of_jSliceC (jSliceGenC_of_radLoc hR)

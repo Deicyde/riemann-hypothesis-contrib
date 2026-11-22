@@ -12,7 +12,9 @@ public import Development.AutomorphicArithmetic.WeightCongruences.IsRootOfIntegr
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -32,23 +34,25 @@ theorem phase_val (z : ℂˣ) : ((phase z : ℂˣ) : ℂ) = (z : ℂ) / (‖(z :
 theorem norm_phase (z : ℂˣ) : ‖((phase z : ℂˣ) : ℂ)‖ = 1 := by
   rw [phase_val, norm_div, Complex.norm_real, norm_norm, div_self (by simp)]
 
-theorem phase_of_norm (z : ℂˣ) (h : ‖(z : ℂ)‖ = 1) : phase z = z := by
-  ext; rw [phase_val, h]; simp
+theorem phase_of_norm (z : ℂˣ) (h : ‖(z : ℂ)‖ = 1) : phase z = z := by ext; rw [phase_val, h]; simp
 
-theorem exists_unitary_extension {A M : Type} [CommGroup A] [CommGroup M] (Φ : A →* M) (χ : A →* ℂˣ)
-    (hk : ∀ a, Φ a = 1 → χ a = 1) (hu : ∀ a, ‖((χ a : ℂˣ) : ℂ)‖ = 1) :
-    ∃ κ : M →* ℂˣ, (∀ x, κ (Φ x) = χ x) ∧ ∀ y, ‖((κ y : ℂˣ) : ℂ)‖ = 1 := by
-  let _ : DivisibleBy (Additive ℂˣ) ℕ := divisibleByOfSMulRightSurj _ _ fun {n} hn u => by
-    obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (u.toMul : ℂ) (Nat.pos_of_ne_zero hn)
-    have hz0 : z ≠ 0 := by
-      rintro rfl
-      rw [zero_pow hn] at hz
-      exact Units.ne_zero _ hz.symm
-    exact ⟨Additive.ofMul (Units.mk0 z hz0), Units.ext hz⟩
+theorem exists_unitary_extension
+    {A M : Type} [CommGroup A] [CommGroup M]
+    (Φ : A →* M) (χ : A →* ℂˣ) (hk : ∀ a, Φ a = 1 → χ a = 1) (hu : ∀ a, ‖((χ a : ℂˣ) : ℂ)‖ = 1)
+    : ∃ κ : M →* ℂˣ, (∀ x, κ (Φ x) = χ x) ∧ ∀ y, ‖((κ y : ℂˣ) : ℂ)‖ = 1 := by
+  let _ : DivisibleBy (Additive ℂˣ) ℕ :=
+    divisibleByOfSMulRightSurj _ _ fun {n} hn u => by
+      obtain ⟨z, hz⟩ := IsAlgClosed.exists_pow_nat_eq (u.toMul : ℂ) (Nat.pos_of_ne_zero hn)
+      have hz0 : z ≠ 0 := by
+        rintro rfl
+        rw [zero_pow hn] at hz
+        exact Units.ne_zero _ hz.symm
+      exact ⟨Additive.ofMul (Units.mk0 z hz0), Units.ext hz⟩
   let _ : DivisibleBy (Additive ℂˣ) ℤ := AddGroup.divisibleByIntOfDivisibleByNat _
-  obtain ⟨ρ, hρ⟩ := (Module.Baer.of_divisible (Additive ℂˣ)).extension_property_addMonoidHom
-    (MonoidHom.toAdditive (QuotientGroup.kerLift Φ)) (QuotientGroup.kerLift_injective Φ)
-    (MonoidHom.toAdditive (QuotientGroup.lift Φ.ker χ fun a ha => hk a ha))
+  obtain ⟨ρ, hρ⟩ :=
+    (Module.Baer.of_divisible (Additive ℂˣ)).extension_property_addMonoidHom
+      (MonoidHom.toAdditive (QuotientGroup.kerLift Φ)) (QuotientGroup.kerLift_injective Φ)
+      (MonoidHom.toAdditive (QuotientGroup.lift Φ.ker χ fun a ha => hk a ha))
   refine ⟨phase.comp (MonoidHom.toAdditive.symm ρ), fun x => ?_, fun y => norm_phase _⟩
   have h : (MonoidHom.toAdditive.symm ρ) (Φ x) = χ x :=
     DFunLike.congr_fun hρ (Additive.ofMul (QuotientGroup.mk x))
@@ -71,14 +75,15 @@ theorem sgA_sgA (x : AE D) : sgA D (sgA D x) = x := by
 
 theorem sgU_sgU (x : (AE D)ˣ) : sgU D (sgU D x) = x := Units.ext (sgA_sgA D x)
 
-theorem sgA_mem {x : AE D} (hx : x ∈ OhE D) : sgA D x ∈ OhE D :=
-  Formalism.UG.P.csDual_sig_mem _ hx
+theorem sgA_mem {x : AE D} (hx : x ∈ OhE D) : sgA D x ∈ OhE D := Formalism.UG.P.csDual_sig_mem _ hx
 
 def intUnits : Subgroup (AE D)ˣ where
   carrier := {u | IntU D u}
   one_mem' := ⟨by simp, by simp⟩
-  mul_mem' := fun {a b} ha hb => ⟨by rw [Units.val_mul]; exact mul_mem ha.1 hb.1,
-    by rw [mul_inv, Units.val_mul]; exact mul_mem ha.2 hb.2⟩
+  mul_mem' := fun {a b} ha hb => ⟨
+    by rw [Units.val_mul]; exact mul_mem ha.1 hb.1,
+    by rw [mul_inv, Units.val_mul]; exact mul_mem ha.2 hb.2
+  ⟩
   inv_mem' := fun {a} ha => ⟨ha.2, by rw [inv_inv]; exact ha.1⟩
 
 theorem sgU_mem {u : (AE D)ˣ} (hu : u ∈ intUnits D) : sgU D u ∈ intUnits D :=
@@ -93,8 +98,9 @@ abbrev incU : D.host.Eˣ →* (AE D)ˣ := Units.map (inc D).toMonoidHom
 def infChar (c : ℤ) : D.host.Eˣ →* ℂˣ :=
   ∏ τ : D.what₂.Tau, (zpowGroupHom (2 * c)).comp (phase.comp (Units.map (embT D τ).toMonoidHom))
 
-theorem infChar_val (c : ℤ) (a : D.host.Eˣ) : ((infChar D c a : ℂˣ) : ℂ) =
-    ∏ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (2 * c) := by
+theorem infChar_val (c : ℤ) (a : D.host.Eˣ)
+    : ((infChar D c a : ℂˣ) : ℂ)
+      = ∏ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (2 * c) := by
   simp [infChar, phase_val]
 
 theorem norm_infChar (c : ℤ) (a : D.host.Eˣ) : ‖((infChar D c a : ℂˣ) : ℂ)‖ = 1 := by
@@ -103,8 +109,8 @@ theorem norm_infChar (c : ℤ) (a : D.host.Eˣ) : ‖((infChar D c a : ℂˣ) : 
   have h : embT D τ (a : D.host.E) ≠ 0 := (map_ne_zero _).2 a.ne_zero
   rw [norm_zpow, norm_div, Complex.norm_real, norm_norm, div_self (by simpa using h), one_zpow]
 
-theorem ratio_eq_pm (a : D.host.Eˣ) (h : ratio D (incU D a) ∈ intUnits D) :
-    ∃ m : ℕ, 0 < m ∧ ((a : D.host.E) / D.host.conj a) ^ m = 1 := by
+theorem ratio_eq_pm (a : D.host.Eˣ) (h : ratio D (incU D a) ∈ intUnits D)
+    : ∃ m : ℕ, 0 < m ∧ ((a : D.host.E) / D.host.conj a) ^ m = 1 := by
   have hc : D.host.conj (a : D.host.E) ≠ 0 := (map_ne_zero _).2 a.ne_zero
   have hval : ((ratio D (incU D a) : (AE D)ˣ) : AE D) = inc D ((a : D.host.E) / D.host.conj a) := by
     have h1 : ((sgU D (incU D a) : (AE D)ˣ) : AE D) = inc D (D.host.conj a) :=
@@ -114,22 +120,25 @@ theorem ratio_eq_pm (a : D.host.Eˣ) (h : ratio D (incU D a) ∈ intUnits D) :
     rfl
   have hint : IsIntegral ℤ ((a : D.host.E) / D.host.conj a) :=
     Formalism.UG.P.csGlob_int (F := ℚ) _ (by have := h.1; rw [hval] at this; exact this)
-  obtain ⟨n, hn, hpow⟩ := NumberField.Embeddings.pow_eq_one_of_norm_eq_one D.host.E ℂ hint (fun φ => by
-    rw [map_div₀, emb_conj, norm_div, Complex.norm_conj, div_self]
-    simpa using a.ne_zero)
+  obtain ⟨n, hn, hpow⟩ :=
+    NumberField.Embeddings.pow_eq_one_of_norm_eq_one D.host.E ℂ hint (fun φ => by
+      rw [map_div₀, emb_conj, norm_div, Complex.norm_conj, div_self]
+      simpa using a.ne_zero)
   exact ⟨n, hn, hpow⟩
 
-theorem infChar_eq_one (c : ℤ) (a : D.host.Eˣ) (h : ratio D (incU D a) ∈ intUnits D) : infChar D c a = 1 := by
+theorem infChar_eq_one (c : ℤ) (a : D.host.Eˣ) (h : ratio D (incU D a) ∈ intUnits D)
+    : infChar D c a = 1 := by
   apply Units.ext
   rw [infChar_val, Units.val_one]
-  have key : ∀ τ, (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (2 * c) =
-      embT D τ ((a : D.host.E) / D.host.conj a) ^ c := by
+  have key
+      : ∀ τ,
+        (embT D τ (a : D.host.E) / (‖embT D τ (a : D.host.E)‖ : ℂ)) ^ (2 * c)
+          = embT D τ ((a : D.host.E) / D.host.conj a) ^ c := by
     intro τ
     have h : embT D τ (a : D.host.E) ≠ 0 := (map_ne_zero _).2 a.ne_zero
-    rw [zpow_mul, map_div₀, emb_conj, zpow_two, div_mul_div_comm, ← sq (‖_‖ : ℂ), ← Complex.mul_conj',
-      mul_div_mul_left _ _ h]
+    rw [zpow_mul, map_div₀, emb_conj, zpow_two, div_mul_div_comm, ← sq (‖_‖ : ℂ),
+      ← Complex.mul_conj', mul_div_mul_left _ _ h]
   simp only [key]
   exact UpperTheory.Mu.prod_emb_zpow D.host D.eTau (ratio_eq_pm D a h) c
 
 end GlobalTheory.NormSum.UnramHecke
-

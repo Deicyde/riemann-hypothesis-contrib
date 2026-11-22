@@ -6,7 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 open QuadraticAlgebra UpperTheory.V.Z.Sym UpperTheory.V.Z.Sym.Loc
 
-private theorem two_ne {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K] {Δ : K} (L : IsLoc O Δ) : (2 : K) ≠ 0 := by
+private theorem two_ne
+    {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    {Δ : K} (L : IsLoc O Δ)
+    : (2 : K) ≠ 0 := by
   have h := L.two.map (algebraMap O K)
   rw [map_ofNat] at h
   exact h.ne_zero
@@ -14,8 +17,9 @@ private theorem two_ne {O K : Type} [CommRing O] [IsDomain O] [IsDiscreteValuati
 theorem UpperTheory.V.Z.Sym.Loc.datFormM : UpperTheory.V.Z.Sym.Loc.DatFormM := by
   intro O K _ _ _ _ _ Δ τ hL c u hu2 hnu ν hν s hs
   have h2 : (2 : K) ≠ 0 := two_ne hL
-  have ofE_sm : ∀ (r : K) (y : Etau K τ),
-      ofE Δ (algebraMap K (Etau K τ) r * y) = (algebraMap K (Lsq K Δ) r) • ofE Δ y := by
+  have ofE_sm
+      : ∀ (r : K) (y : Etau K τ),
+        ofE Δ (algebraMap K (Etau K τ) r * y) = (algebraMap K (Lsq K Δ) r) • ofE Δ y := by
     intro r y
     ext <;> simp [ofE]
   have ofE_mul : ∀ x y : Etau K τ, ofE Δ (x * y) = ofE Δ x * ofE Δ y := by
@@ -33,10 +37,8 @@ theorem UpperTheory.V.Z.Sym.Loc.datFormM : UpperTheory.V.Z.Sym.Loc.DatFormM := b
   have star_sm : ∀ (a : Lsq K Δ) (y : EL Δ τ), star (a • y) = a • star y := by
     intro a y
     ext <;> simp <;> ring
-  have hν' : ν * star ν = algebraMap K (Lsq K Δ) (-1) := by
-    rw [← algebraMap_norm_eq_mul_star, hν]
-  have hus : u * star u = algebraMap K (Etau K τ) 1 := by
-    rw [← algebraMap_norm_eq_mul_star, hnu]
+  have hν' : ν * star ν = algebraMap K (Lsq K Δ) (-1) := by rw [← algebraMap_norm_eq_mul_star, hν]
+  have hus : u * star u = algebraMap K (Etau K τ) 1 := by rw [← algebraMap_norm_eq_mul_star, hnu]
   refine ⟨?_, ?_⟩
   · rw [sig_sm, sig_ofE, smul_mul_smul_comm, hν', ← ofE_mul, ← ofE_sm, ← sq, hu2]
     congr 1
@@ -46,8 +48,7 @@ theorem UpperTheory.V.Z.Sym.Loc.datFormM : UpperTheory.V.Z.Sym.Loc.DatFormM := b
     have hd : ν • ofE Δ u * star (sigL (ν • ofE Δ u)) = -1 := by
       rw [sig_sm, sig_ofE, star_sm, star_ofE, smul_mul_smul_comm, hν', ← ofE_mul, ← ofE_sm, hus]
       ext <;> simp [ofE]
-    have hsig : sigL m = -m := by
-      rw [hm.m_sig, mul_assoc, hd, mul_neg_one]
+    have hsig : sigL m = -m := by rw [hm.m_sig, mul_assoc, hd, mul_neg_one]
     have hst : star m = -m := by
       have h := hm.m_star
       rw [hsig, star_neg] at h

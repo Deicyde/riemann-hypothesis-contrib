@@ -6,7 +6,8 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ProductI
 
 @[expose] public section
 
-open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.JHMult GlobalTheory.SmGL.Exponents
+open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.LocGL
+  GlobalTheory.JHMult GlobalTheory.SmGL.Exponents
 
 namespace GlobalTheory.CompanionTheory.SubEmb
 

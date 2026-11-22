@@ -5,17 +5,20 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Delt
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
 
 namespace GlobalTheory.BSP
 
-theorem hf_X_δ_and_str : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K)
-    (C : Obj l ↥(OL K)) (g : Hom bk.prism C),
-    C.D.δ (BK.hf (bk := bk) g X) = 0 ∧
-      Ideal.Quotient.mk C.I (BK.hf (bk := bk) g X) = C.str (bk.str.symm (Ideal.Quotient.mk _ X)) := by
+theorem hf_X_δ_and_str
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K) (C : Obj l ↥(OL K)) (g : Hom bk.prism C),
+      C.D.δ (BK.hf (bk := bk) g X) = 0
+        ∧ Ideal.Quotient.mk C.I (BK.hf (bk := bk) g X)
+          = C.str (bk.str.symm (Ideal.Quotient.mk _ X)) := by
   intro l _ K bk C g
   have hδX : (deltaS l bk.a).δ (X : (Wq l bk.a)⟦X⟧) = 0 := by
     have h := (deltaS l bk.a).φ_eq (X : (Wq l bk.a)⟦X⟧)

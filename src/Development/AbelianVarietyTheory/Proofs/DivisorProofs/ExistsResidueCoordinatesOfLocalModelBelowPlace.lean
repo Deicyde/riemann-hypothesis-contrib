@@ -11,29 +11,35 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SpanFinra
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy GlobalTheory.FieldPair
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory GlobalTheory.Cartier GlobalTheory.TopForm GlobalTheory.Discrepancy
+  GlobalTheory.FieldPair
 open scoped TensorProduct
 
 namespace GlobalTheory.FieldPair
 
-
 open IsLocalRing in
-theorem exists_residue_coords_of_locModel : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
-    letI := hQ.isLocalRing; ∀ (N r : ℕ) (V : Place c) (hC : V.Contains Q) (u : Fin r → V.ring),
-    (∃ x : Fin N → L, TrBasis c x) →
-    (∀ q ∈ IsLocalRing.maximalIdeal Q,
-      (⟨q, hC _ q.2⟩ : V.ring) ∈ IsLocalRing.maximalIdeal V.ring) →
-    (∀ P : MvPolynomial (Fin r) Q, (∃ α, P.coeff α ∉ IsLocalRing.maximalIdeal Q) →
-      IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P)) →
-    (∀ f : V.ring, ∃ P R : MvPolynomial (Fin r) Q,
-      IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R) ∧
-      f * MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R =
-        MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P) →
-    ∃ (j : ℕ) (s : Fin j → Q), r + j + 1 = N ∧
-      ∀ P : MvPolynomial (Fin (r + j)) ℂ, P ≠ 0 →
-        IsUnit (MvPolynomial.eval₂ V.const
-          (Fin.append u fun i => (⟨s i, hC _ (s i).2⟩ : V.ring)) P) := by
+theorem exists_residue_coords_of_locModel
+    : ∀ {L : Type} [Field L] (c : ℂ →+* L) (Q : Subring L) (hQ : IsLocModel c Q),
+      letI := hQ.isLocalRing
+      ∀ (N r : ℕ) (V : Place c) (hC : V.Contains Q) (u : Fin r → V.ring),
+        (∃ x : Fin N → L, TrBasis c x)
+          → (∀ q ∈ IsLocalRing.maximalIdeal Q,
+            (⟨q, hC _ q.2⟩ : V.ring) ∈ IsLocalRing.maximalIdeal V.ring)
+          → (∀ P : MvPolynomial (Fin r) Q,
+            (∃ α, P.coeff α ∉ IsLocalRing.maximalIdeal Q)
+              → IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P))
+          → (∀ f : V.ring, ∃ P R : MvPolynomial (Fin r) Q,
+            IsUnit (MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R)
+              ∧ f * MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u R
+                = MvPolynomial.eval₂ (Q.subtype.codRestrict V.ring fun q => hC _ q.2) u P)
+          → ∃ (j : ℕ) (s : Fin j → Q),
+            r + j + 1 = N
+              ∧ ∀ P : MvPolynomial (Fin (r + j)) ℂ,
+                P ≠ 0
+                  → IsUnit (MvPolynomial.eval₂ V.const
+                    (Fin.append u fun i => (⟨s i, hC _ (s i).2⟩ : V.ring)) P) := by
   intro L _ c Q hQ
   letI := hQ.isLocalRing
   intro N r V hC u hx hm hunitP hloc
@@ -58,13 +64,15 @@ theorem exists_residue_coords_of_locModel : ∀ {L : Type} [Field L] (c : ℂ �
   obtain ⟨t, ht⟩ := IsDiscreteValuationRing.exists_irreducible V.ring
   obtain ⟨hN, -⟩ := exists_basis_kaehler_of_trdeg ℂ L h2.symm ht
   let ub : Fin r → ResidueField V.ring := fun i => residue V.ring (u i)
-  have key : ∀ P : MvPolynomial (Fin r) Q, residue V.ring (MvPolynomial.eval₂ φ u P) =
-      MvPolynomial.aeval ub (P.map (residue Q)) := by
+  have key
+      : ∀ P : MvPolynomial (Fin r) Q,
+        residue V.ring (MvPolynomial.eval₂ φ u P) = MvPolynomial.aeval ub (P.map (residue Q)) := by
     intro P
     rw [MvPolynomial.eval₂_comp_left, MvPolynomial.aeval_def, MvPolynomial.eval₂_map]
     congr 1
-  have hmem : ∀ Pb : MvPolynomial (Fin r) (ResidueField Q),
-      MvPolynomial.aeval ub Pb ∈ Algebra.adjoin (ResidueField Q) (Set.range ub) := fun Pb => by
+  have hmem
+      : ∀ Pb : MvPolynomial (Fin r) (ResidueField Q),
+        MvPolynomial.aeval ub Pb ∈ Algebra.adjoin (ResidueField Q) (Set.range ub) := fun Pb => by
     rw [Algebra.adjoin_range_eq_range_aeval]; exact ⟨Pb, rfl⟩
   have hind : AlgebraicIndependent (ResidueField Q) ub := by
     rw [algebraicIndependent_iff]
@@ -86,7 +94,8 @@ theorem exists_residue_coords_of_locModel : ∀ {L : Type} [Field L] (c : ℂ �
     let b : Algebra.adjoin (ResidueField Q) (Set.range ub) := ⟨_, hmem (R.map (residue Q))⟩
     have hb : (b : ResidueField V.ring) ≠ 0 := by
       change MvPolynomial.aeval ub (R.map (residue Q)) ≠ 0
-      rw [← key]; exact (residue_ne_zero_iff_isUnit _).2 hR
+      rw [← key]
+      exact (residue_ne_zero_iff_isUnit _).2 hR
     have hb0 : b ≠ 0 := fun h => hb (by rw [h]; rfl)
     refine ⟨Polynomial.C b * Polynomial.X - Polynomial.C a, fun h => hb0 ?_, ?_⟩
     · simpa using congrArg (fun p => p.coeff 1) h
@@ -96,7 +105,8 @@ theorem exists_residue_coords_of_locModel : ∀ {L : Type} [Field L] (c : ℂ �
       change (b : ResidueField V.ring) * residue V.ring f - (a : ResidueField V.ring) = 0
       change residue V.ring f * (b : ResidueField V.ring) = (a : ResidueField V.ring) at e
       rw [mul_comm, e, sub_self]
-  have hub : IsTranscendenceBasis (ResidueField Q) ub := hind.isTranscendenceBasis_iff_isAlgebraic.2 halg
+  have hub : IsTranscendenceBasis (ResidueField Q) ub :=
+    hind.isTranscendenceBasis_iff_isAlgebraic.2 halg
   obtain ⟨T, hT⟩ := exists_isTranscendenceBasis ℂ (ResidueField Q)
   have hB := hT.sumElim_comp hub
   have hc : (r : Cardinal) + Cardinal.mk T = ((N - 1 : ℕ) : Cardinal) := by
@@ -116,8 +126,9 @@ theorem exists_residue_coords_of_locModel : ∀ {L : Type} [Field L] (c : ℂ �
   have hg : Function.Injective g :=
     (Sum.map_injective.2 ⟨Function.injective_id, e.injective⟩).comp finSumFinEquiv.symm.injective
   have hind2 := hB.1.comp g hg
-  have hv : residue V.ring ∘ (Fin.append u fun i => (⟨s i, hC _ (s i).2⟩ : V.ring)) =
-      Sum.elim ub (algebraMap (ResidueField Q) (ResidueField V.ring) ∘ Subtype.val) ∘ g := by
+  have hv
+      : residue V.ring ∘ (Fin.append u fun i => (⟨s i, hC _ (s i).2⟩ : V.ring))
+        = Sum.elim ub (algebraMap (ResidueField Q) (ResidueField V.ring) ∘ Subtype.val) ∘ g := by
     funext i
     refine Fin.addCases (fun i => ?_) (fun i => ?_) i
     · simp [g, ub, Fin.append_left]

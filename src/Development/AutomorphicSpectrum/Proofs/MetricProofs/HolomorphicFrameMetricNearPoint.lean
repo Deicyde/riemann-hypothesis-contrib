@@ -8,9 +8,14 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.FrameChangeSca
 
 @[expose] public section
 
-open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2 ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
+open MvPolynomial MeasureTheory Filter Topology Matrix ReciprocityTheory.AnForm
+  ReciprocityTheory.AnForm.M ReciprocityTheory.AnForm.P ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I2
+  ReciprocityTheory.ChartRestriction.G.AI.I4 GlobalTheory.CompanionTheory.Ar.PB
+  GroundTheory.Heights₂.Heights GroundTheory.Heights₂.Heights.LowerBoundFree
 open scoped ComplexOrder Classical
-open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
+open GlobalTheory.CompanionTheory.Ar.PB.WSq GlobalTheory.CompanionTheory.Ar.PB.WSq.Sec
+  GlobalTheory.CompanionTheory.Ar.PB.CovMap.LocImg
 
 noncomputable section
 
@@ -20,79 +25,120 @@ section Holo
 
 variable {e : ℕ} {S : Type} [TopologicalSpace S]
 
-theorem holoOn_mono (A : FinHolAtlas e S) {U V : Set S} {f : S → ℂ} (h : A.HoloOn V f) (hU : U ⊆ V) :
-    A.HoloOn U f :=
-  fun j => (h j).mono (Set.inter_subset_inter_right _ (Set.preimage_mono hU))
+theorem holoOn_mono (A : FinHolAtlas e S) {U V : Set S} {f : S → ℂ} (h : A.HoloOn V f) (hU : U ⊆ V)
+    : A.HoloOn U f := fun j =>
+  (h j).mono (Set.inter_subset_inter_right _ (Set.preimage_mono hU))
 
-theorem holoOn_const (A : FinHolAtlas e S) (U : Set S) (c : ℂ) : A.HoloOn U fun _ => c := fun _ _ _ =>
-  analyticAt_const
+theorem holoOn_const (A : FinHolAtlas e S) (U : Set S) (c : ℂ) : A.HoloOn U fun _ => c :=
+  fun _ _ _ => analyticAt_const
 
-theorem holoOn_mul (A : FinHolAtlas e S) {U : Set S} {f g : S → ℂ} (hf : A.HoloOn U f) (hg : A.HoloOn U g) :
-    A.HoloOn U fun w => f w * g w := fun j u hu => (hf j u hu).mul (hg j u hu)
+theorem holoOn_mul
+    (A : FinHolAtlas e S) {U : Set S} {f g : S → ℂ} (hf : A.HoloOn U f) (hg : A.HoloOn U g)
+    : A.HoloOn U fun w => f w * g w := fun j u hu =>
+  (hf j u hu).mul (hg j u hu)
 
-theorem holoOn_zpow (A : FinHolAtlas e S) {U : Set S} {f : S → ℂ} (hf : A.HoloOn U f)
-    (h0 : ∀ w ∈ U, f w ≠ 0) (n : ℤ) : A.HoloOn U fun w => f w ^ n := fun j u hu =>
+theorem holoOn_zpow
+    (A : FinHolAtlas e S)
+    {U : Set S} {f : S → ℂ} (hf : A.HoloOn U f) (h0 : ∀ w ∈ U, f w ≠ 0)
+    (n : ℤ)
+    : A.HoloOn U fun w => f w ^ n := fun j u hu =>
   (hf j u hu).zpow (h0 _ hu.2)
 
-theorem holoOn_prod (A : FinHolAtlas e S) {U : Set S} {κ : Type} (s : Finset κ) {f : κ → S → ℂ}
-    (hf : ∀ i ∈ s, A.HoloOn U (f i)) : A.HoloOn U fun w => ∏ i ∈ s, f i w := by
+theorem holoOn_prod
+    (A : FinHolAtlas e S)
+    {U : Set S} {κ : Type} (s : Finset κ)
+    {f : κ → S → ℂ} (hf : ∀ i ∈ s, A.HoloOn U (f i))
+    : A.HoloOn U fun w => ∏ i ∈ s, f i w := by
   induction s using Finset.induction_on with
   | empty => simpa using holoOn_const A U 1
   | insert i s hi ih =>
-    have h := holoOn_mul A (hf i (Finset.mem_insert_self i s))
-      (ih fun k hk => hf k (Finset.mem_insert_of_mem hk))
+    have h :=
+      holoOn_mul A (hf i (Finset.mem_insert_self i s))
+        (ih fun k hk => hf k (Finset.mem_insert_of_mem hk))
     simpa only [Finset.prod_insert hi] using h
 
-theorem holoOn_minor (A : FinHolAtlas e S) {U : Set S} {N : ℕ} {H : S → Matrix (Fin N) (Fin N) ℂ}
-    (hH : ∀ r s, A.HoloOn U fun w => H w r s) (I J : Finset (Fin N)) :
-    A.HoloOn U fun w => minorIJ (H w) I J := by
-  have h := StepW.ValHolo.holoOn_eval A (b := fun w (q : Fin N × Fin N) => H w q.1 q.2) (fun q => hH q.1 q.2)
-    (minorIJ (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)) I J)
-  have e : (fun w => minorIJ (H w) I J) = fun w => eval (fun q : Fin N × Fin N => H w q.1 q.2)
-      (map (Int.castRingHom ℂ)
-        (minorIJ (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)) I J)) := by
+theorem holoOn_minor
+    (A : FinHolAtlas e S)
+    {U : Set S} {N : ℕ} {H : S → Matrix (Fin N) (Fin N) ℂ}
+    (hH : ∀ r s, A.HoloOn U fun w => H w r s) (I J : Finset (Fin N))
+    : A.HoloOn U fun w => minorIJ (H w) I J := by
+  have h :=
+    StepW.ValHolo.holoOn_eval A
+      (b := fun w (q : Fin N × Fin N) => H w q.1 q.2)
+      (fun q => hH q.1 q.2)
+      (minorIJ (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)) I J)
+  have e
+      : (fun w => minorIJ (H w) I J)
+        = fun w =>
+          eval
+            (fun q : Fin N × Fin N => H w q.1 q.2)
+            (map (Int.castRingHom ℂ)
+              (minorIJ
+                (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)) I
+                J)) := by
     funext w
     let f : MvPolynomial (Fin N × Fin N) ℤ →+* ℂ :=
       (eval fun q : Fin N × Fin N => H w q.1 q.2).comp (map (Int.castRingHom ℂ))
-    have hm : (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)).map f = H w := by
+    have hm
+        : (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)).map f
+          = H w := by
       ext r s
       simp [f]
-    have := minorIJ_map f (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ)) I J
+    have :=
+      minorIJ_map f (Matrix.of fun r s => (MvPolynomial.X (r, s) : MvPolynomial (Fin N × Fin N) ℤ))
+        I J
     rw [hm] at this
     exact this
   rw [e]
   exact h
 
-theorem prod_local (A : FinHolAtlas e S) {V : Set S} {y₀ : S} {N : ℕ} (hV : IsOpen V) (hy : y₀ ∈ V)
-    (g : Fin N → S → ℂ) (n : Fin N → ℤ)
-    (key : ∀ i, ∃ W : Set S, IsOpen W ∧ y₀ ∈ W ∧ W ⊆ V ∧ A.HoloOn W (g i) ∧ ∀ w ∈ W, g i w ≠ 0) :
-    ∃ V' : Set S, IsOpen V' ∧ y₀ ∈ V' ∧ V' ⊆ V ∧ A.HoloOn V' (fun w => ∏ i, g i w ^ n i) ∧
-      ∀ w ∈ V', ∏ i, g i w ^ n i ≠ 0 := by
+theorem prod_local
+    (A : FinHolAtlas e S)
+    {V : Set S} {y₀ : S} {N : ℕ} (hV : IsOpen V) (hy : y₀ ∈ V) (g : Fin N → S → ℂ) (n : Fin N → ℤ)
+    (key : ∀ i, ∃ W : Set S, IsOpen W ∧ y₀ ∈ W ∧ W ⊆ V ∧ A.HoloOn W (g i) ∧ ∀ w ∈ W, g i w ≠ 0)
+    : ∃ V' : Set S,
+      IsOpen V' ∧ y₀ ∈ V' ∧ V' ⊆ V ∧ A.HoloOn V' (fun w => ∏ i, g i w ^ n i)
+        ∧ ∀ w ∈ V', ∏ i, g i w ^ n i ≠ 0 := by
   choose W hW hyW hWV hh h0 using key
-  have hsub : ∀ i, V ∩ ⋂ i, W i ⊆ W i := fun i => Set.inter_subset_right.trans (Set.iInter_subset _ i)
-  refine ⟨V ∩ ⋂ i, W i, hV.inter (isOpen_iInter_of_finite hW), ⟨hy, Set.mem_iInter.2 hyW⟩,
-    Set.inter_subset_left, ?_, ?_⟩
+  have hsub : ∀ i, V ∩ ⋂ i, W i ⊆ W i := fun i =>
+    Set.inter_subset_right.trans (Set.iInter_subset _ i)
+  refine ⟨
+    V ∩ ⋂ i, W i,
+    hV.inter (isOpen_iInter_of_finite hW),
+    ⟨hy, Set.mem_iInter.2 hyW⟩,
+    Set.inter_subset_left,
+    ?_,
+    ?_
+  ⟩
   · exact holoOn_prod A _ fun i _ =>
       holoOn_zpow A (holoOn_mono A (hh i) (hsub i)) (fun w hw => h0 i w (hsub i hw)) (n i)
   · exact fun w hw => Finset.prod_ne_zero_iff.2 fun i _ => zpow_ne_zero _ (h0 i w (hsub i hw))
 
 end Holo
 
-theorem minor_w_ne {N j : ℕ} (hj : j ≤ N) (i : Fin N) (hi : (i : ℕ) + 1 = j) {T : Matrix (Fin N) (Fin N) ℂ}
-    (hT : IsBlockDiag j T) (hd : T.det ≠ 0) : minorIJ T (wIdx N j) (wIdx N j) ≠ 0 := by
+theorem minor_w_ne
+    {N j : ℕ} (hj : j ≤ N) (i : Fin N) (hi : (i : ℕ) + 1 = j)
+    {T : Matrix (Fin N) (Fin N) ℂ} (hT : IsBlockDiag j T) (hd : T.det ≠ 0)
+    : minorIJ T (wIdx N j) (wIdx N j) ≠ 0 := by
   have h := FrameChange.detFac_ne_zero hj i hT hd
   rw [detFac, if_pos hi.ge] at h
   exact left_ne_zero_of_mul h
 
-theorem minor_om_ne {N j : ℕ} (hj : j ≤ N) (i : Fin N) (hi : (i : ℕ) + 1 = N) {T : Matrix (Fin N) (Fin N) ℂ}
-    (hT : IsBlockDiag j T) (hd : T.det ≠ 0) : minorIJ T (omIdx N j) (omIdx N j) ≠ 0 := by
+theorem minor_om_ne
+    {N j : ℕ} (hj : j ≤ N) (i : Fin N) (hi : (i : ℕ) + 1 = N)
+    {T : Matrix (Fin N) (Fin N) ℂ} (hT : IsBlockDiag j T) (hd : T.det ≠ 0)
+    : minorIJ T (omIdx N j) (omIdx N j) ≠ 0 := by
   have h := FrameChange.detFac_ne_zero hj i hT hd
   rw [detFac, if_pos hi] at h
   exact right_ne_zero_of_mul h
 
-theorem val_ne {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)] {Ω : Type} [Field Ω]
-    {x : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal x)) {s : Ω} (h0 : s ≠ 0)
-    (hs : RegAt x (mCoordIdeal z) s) (hi : RegAt x (mCoordIdeal z) s⁻¹) : valAt x s z ≠ 0 := by
+theorem val_ne
+    {K : Type} [Fintype K]
+    {ι : K → Type} [∀ k, Fintype (ι k)]
+    {Ω : Type} [Field Ω]
+    {x : (Σ k, ι k) → Ω} {z : (Σ k, ι k) → ℂ} (hz : z ∈ mcPts (mCoordIdeal x))
+    {s : Ω} (h0 : s ≠ 0) (hs : RegAt x (mCoordIdeal z) s) (hi : RegAt x (mCoordIdeal z) s⁻¹)
+    : valAt x s z ≠ 0 := by
   intro e
   have h := (reg_mul hz hs hi).2
   rw [mul_inv_cancel₀ h0, e, zero_mul] at h

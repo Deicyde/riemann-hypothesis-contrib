@@ -6,17 +6,20 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LengthC
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 open scoped Pointwise
 
-private theorem UpperTheory.V.Kum.compact_union (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω]
-    [IsAlgClosure F Ω] (N : ℕ) (hN : N ≠ 0) (H : ValuationSubring Ω → Set (G F Ω)) (hcl : ∀ A, IsClosed (H A))
-    (hconj : ∀ (A : ValuationSubring Ω) (g σ : G F Ω), σ ∈ H (g • A) → g⁻¹ * σ * g ∈ H A) :
-    IsCompact {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ H A} := by
+private theorem UpperTheory.V.Kum.compact_union
+    (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    (N : ℕ) (hN : N ≠ 0)
+    (H : ValuationSubring Ω → Set (G F Ω)) (hcl : ∀ A, IsClosed (H A))
+    (hconj : ∀ (A : ValuationSubring Ω) (g σ : G F Ω), σ ∈ H (g • A) → g⁻¹ * σ * g ∈ H A)
+    : IsCompact {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ H A} := by
   obtain ⟨-, h2, h3, h4⟩ := placeDict F Ω
   have hfin : (Above F N).Finite := by
-    have h0 : Ideal.span {(N : 𝓞 F)} ≠ 0 := by
-      simpa using hN
+    have h0 : Ideal.span {(N : 𝓞 F)} ≠ 0 := by simpa using hN
     refine (Ideal.finite_factors h0).subset fun v hv => ?_
     exact Ideal.dvd_span_singleton.2 hv
   let T : ValuationSubring Ω → Set (G F Ω) := fun A =>
@@ -30,7 +33,9 @@ private theorem UpperTheory.V.Kum.compact_union (F Ω : Type) [Field F] [NumberF
     simp only [P]
     split_ifs
     exacts [hT _, isCompact_empty]
-  have e : {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ H A} = ⋃ v ∈ Above F N, P v := by
+  have e
+      : {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ H A}
+        = ⋃ v ∈ Above F N, P v := by
     ext σ
     simp only [Set.mem_setOf_eq, Set.mem_iUnion]
     constructor
@@ -55,10 +60,22 @@ private theorem UpperTheory.V.Kum.compact_union (F Ω : Type) [Field F] [NumberF
   rw [e]
   exact hfin.isCompact_biUnion fun v _ => hP v
 
-theorem UpperTheory.V.Kum.decCompact :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (N : ℕ), N ≠ 0 → IsCompact {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ Dec (F := F) A} ∧ IsCompact {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ Ine (F := F) A} := by
-  intro F Ω _ _ _ _ _ N hN
-  exact ⟨compact_union F Ω N hN (fun A => (Dec (F := F) A : Set (G F Ω))) (fun A => isClosed_Dec A)
-      fun A g σ h => GlobalTheory.Cut.ShaBound.conj_mem_Dec h,
-    compact_union F Ω N hN (fun A => (Ine (F := F) A : Set (G F Ω))) (fun A => isClosed_Ine A)
-      fun A g σ h => GlobalTheory.Cut.ShaBound.conj_mem_Ine' h⟩
+theorem UpperTheory.V.Kum.decCompact
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (N : ℕ),
+      N ≠ 0
+        → IsCompact
+            {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ Dec (F := F) A}
+          ∧ IsCompact
+            {g : G F Ω | ∃ A : ValuationSubring Ω, A.valuation (N : Ω) < 1 ∧ g ∈ Ine (F := F) A} :=
+  by
+    intro F Ω _ _ _ _ _ N hN
+    exact ⟨
+      compact_union F Ω N hN
+        (fun A => (Dec (F := F) A : Set (G F Ω)))
+        (fun A => isClosed_Dec A)
+        fun A g σ h => GlobalTheory.Cut.ShaBound.conj_mem_Dec h,
+      compact_union F Ω N hN
+        (fun A => (Ine (F := F) A : Set (G F Ω)))
+        (fun A => isClosed_Ine A)
+        fun A g σ h => GlobalTheory.Cut.ShaBound.conj_mem_Ine' h
+    ⟩

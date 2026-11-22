@@ -10,8 +10,8 @@ open Polynomial GlobalTheory.CuspGL GlobalTheory.BI
 
 namespace GlobalTheory.ElemLocal
 
-def cycMul {G : Type} [Group G] (c : G) (P : Subgroup G) (h : ∀ y ∈ P, Commute c y) :
-    Subgroup G where
+def cycMul {G : Type} [Group G] (c : G) (P : Subgroup G) (h : ∀ y ∈ P, Commute c y)
+    : Subgroup G where
   carrier := {g | ∃ i : ℤ, ∃ y ∈ P, g = c ^ i * y}
   one_mem' := ⟨0, 1, P.one_mem, by simp⟩
   mul_mem' := by
@@ -29,9 +29,9 @@ def cycMul {G : Type} [Group G] (c : G) (P : Subgroup G) (h : ∀ y ∈ P, Commu
 end GlobalTheory.ElemLocal
 
 open Polynomial in
-private theorem exists_commute_coprime_mul_prime_power_order {G : Type} [Group G] [Finite G] (x : G) {p : ℕ}
-    (hp : p.Prime) : ∃ c q : G, x = c * q ∧ Commute c q ∧ Nat.Coprime p (orderOf c) ∧
-      ∃ a : ℕ, q ^ p ^ a = 1 := by
+private theorem exists_commute_coprime_mul_prime_power_order
+    {G : Type} [Group G] [Finite G] (x : G) {p : ℕ} (hp : p.Prime)
+    : ∃ c q : G, x = c * q ∧ Commute c q ∧ Nat.Coprime p (orderOf c) ∧ ∃ a : ℕ, q ^ p ^ a = 1 := by
   have hn0 : orderOf x ≠ 0 := (orderOf_pos x).ne'
   have hcop : Nat.Coprime (p ^ (orderOf x).factorization p)
       (orderOf x / p ^ (orderOf x).factorization p) :=
@@ -43,34 +43,54 @@ private theorem exists_commute_coprime_mul_prime_power_order {G : Type} [Group G
   rw [hcop.gcd_eq_one, Nat.cast_one] at hb
   have hx : ∀ k : ℤ, x ^ ((orderOf x : ℤ) * k) = 1 := fun k => by
     rw [zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow]
-  refine ⟨x ^ (((p ^ a : ℕ) : ℤ) * Nat.gcdA (p ^ a) m), x ^ ((m : ℤ) * Nat.gcdB (p ^ a) m),
-    ?_, (Commute.refl x).zpow_zpow _ _, ?_, a, ?_⟩
+  refine ⟨
+    x ^ (((p ^ a : ℕ) : ℤ) * Nat.gcdA (p ^ a) m),
+    x ^ ((m : ℤ) * Nat.gcdB (p ^ a) m),
+    ?_,
+    (Commute.refl x).zpow_zpow _ _,
+    ?_,
+    a,
+    ?_
+  ⟩
   · rw [← zpow_add, ← hb, zpow_one]
   · have h1 : (x ^ (((p ^ a : ℕ) : ℤ) * Nat.gcdA (p ^ a) m)) ^ m = 1 := by
       rw [← zpow_natCast, ← zpow_mul]
       convert hx (Nat.gcdA (p ^ a) m) using 2
-      rw [← hnm]; push_cast; ring
-    exact Nat.Coprime.coprime_dvd_right (orderOf_dvd_of_pow_eq_one h1)
-      (Nat.coprime_ordCompl hp hn0)
+      rw [← hnm]
+      push_cast
+      ring
+    exact Nat.Coprime.coprime_dvd_right (orderOf_dvd_of_pow_eq_one h1) (Nat.coprime_ordCompl hp hn0)
   · rw [← zpow_natCast, ← zpow_mul]
     convert hx (Nat.gcdB (p ^ a) m) using 2
-    rw [← hnm]; push_cast; ring
+    rw [← hnm]
+    push_cast
+    ring
 
 open Polynomial in
-private theorem zpow_mul_zpow_eq_of_commute_of_zpow_eq {G : Type} [Group G] {c w : G} (hcw : Commute c w)
-    {M : ℤ} (hc : c ^ M = c) (hw : w ^ M = 1) (i : ℤ) : (c ^ i * w) ^ M = c ^ i := by
+private theorem zpow_mul_zpow_eq_of_commute_of_zpow_eq
+    {G : Type} [Group G]
+    {c w : G} (hcw : Commute c w)
+    {M : ℤ} (hc : c ^ M = c) (hw : w ^ M = 1)
+    (i : ℤ)
+    : (c ^ i * w) ^ M = c ^ i := by
   rw [(hcw.zpow_left i).mul_zpow, ← zpow_mul, mul_comm i M, zpow_mul, hc, hw, mul_one]
 
 open Polynomial in
-private theorem inv_mul_mul_zpow {G : Type} [Group G] (s a : G) (n : ℤ) :
-    (s⁻¹ * a * s) ^ n = s⁻¹ * a ^ n * s := by
+private theorem inv_mul_mul_zpow {G : Type} [Group G] (s a : G) (n : ℤ)
+    : (s⁻¹ * a * s) ^ n = s⁻¹ * a ^ n * s := by
   have := map_zpow (MulAut.conj s⁻¹) a n
   simp only [MulAut.conj_apply, inv_inv] at this
   exact this.symm
 
-
 open Polynomial in
-theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group G] [Finite G] (x : G) (p : ℕ), p.Prime → ∃ (E : Subgroup G) (f : G → ℤ) (ι : Type) (_ : Fintype ι) (r : ι → ℂ) (lam : ι → E →* ℂˣ), (∃ l : ℕ, l.Prime ∧ ∀ y : E, ∃ j : ℕ, y ^ l ^ j ∈ Subgroup.center E) ∧ ¬ (p : ℤ) ∣ f x ∧ (∀ i, IsIntegral ℤ (r i)) ∧ ∀ g, (f g : ℂ) = ∑ i, r i * _root_.GlobalTheory.BI.ind E (fun e => (lam i e : ℂ)) g := by
+theorem _root_.GlobalTheory.exists_induced_int_prime_to
+    : ∀ (G : Type) [Group G] [Finite G] (x : G) (p : ℕ),
+      p.Prime
+        → ∃ (E : Subgroup G) (f : G → ℤ) (ι : Type) (_ : Fintype ι) (r : ι → ℂ) (lam : ι → E →* ℂˣ),
+          (∃ l : ℕ, l.Prime ∧ ∀ y : E, ∃ j : ℕ, y ^ l ^ j ∈ Subgroup.center E) ∧ ¬ (p : ℤ) ∣ f x
+            ∧ (∀ i, IsIntegral ℤ (r i))
+            ∧ ∀ g,
+              (f g : ℂ) = ∑ i, r i * _root_.GlobalTheory.BI.ind E (fun e => (lam i e : ℂ)) g := by
   intro G _ _ x p hp
   classical
   haveI : Fact p.Prime := ⟨hp⟩
@@ -106,7 +126,9 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
   have hcM : c ^ M = c := by
     have h1 : c ^ ((o : ℤ) * Nat.gcdB N o) = 1 := by
       rw [zpow_mul, zpow_natCast, pow_orderOf_eq_one, one_zpow]
-    calc c ^ M = c ^ M * c ^ ((o : ℤ) * Nat.gcdB N o) := by rw [h1, mul_one]
+    calc
+      c ^ M
+        = c ^ M * c ^ ((o : ℤ) * Nat.gcdB N o) := by rw [h1, mul_one]
       _ = c := by rw [← zpow_add, hM, ← hb, zpow_one]
   have hwM : ∀ w ∈ P', w ^ M = 1 := by
     rintro _ ⟨z, hz, rfl⟩
@@ -149,19 +171,19 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
   set ζ : ℂˣ := Units.mk0 _ (hζ.ne_zero ho) with hζdef
   have hζu : IsPrimitiveRoot ζ o := IsPrimitiveRoot.coe_units_iff.mp hζ
   set cE : E := ⟨c, hcE⟩ with hcEdef
-  have hord : orderOf cE = orderOf ζ := by
-    rw [← Subgroup.orderOf_coe cE, ← hζu.eq_orderOf]
+  have hord : orderOf cE = orderOf ζ := by rw [← Subgroup.orderOf_coe cE, ← hζu.eq_orderOf]
   have hφmem : ∀ e : E, e ^ M ∈ Subgroup.zpowers cE := by
     rintro ⟨_, i, y, hy, rfl⟩
     refine Subgroup.mem_zpowers_iff.mpr ⟨i, Subtype.ext ?_⟩
     simp only [SubgroupClass.coe_zpow, hcEdef]
     rw [hpowE _ _ hy]
-  let φ : E →* Subgroup.zpowers cE :=
-    { toFun := fun e => ⟨e ^ M, hφmem e⟩
-      map_one' := by ext; simp
-      map_mul' := fun e₁ e₂ => by
-        ext
-        simpa using hmul e₁ e₁.2 e₂ e₂.2 }
+  let φ : E →* Subgroup.zpowers cE := {
+    toFun := fun e => ⟨e ^ M, hφmem e⟩
+    map_one' := by ext; simp
+    map_mul' := fun e₁ e₂ => by
+      ext
+      simpa using hmul e₁ e₁.2 e₂ e₂.2
+  }
   have hφ : ∀ e : E, ((φ e : E) : G) = (e : G) ^ M := fun e => by simp [φ]
   have hpowmem : ∀ e : E, (e : G) ^ M ∈ Subgroup.zpowers c := by
     rintro ⟨_, i, y, hy, rfl⟩
@@ -171,13 +193,13 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
   let d : E → ℤ := fun e => Classical.choose (Subgroup.mem_zpowers_iff.mp (hpowmem e))
   have hd : ∀ e : E, c ^ d e = (e : G) ^ M := fun e =>
     Classical.choose_spec (Subgroup.mem_zpowers_iff.mp (hpowmem e))
-  let χ : E →* ℂˣ :=
-    { toFun := fun e => ζ ^ d e
-      map_one' := by
-        rw [← zpow_zero ζ, ← hζiff, hd]; simp
-      map_mul' := fun e₁ e₂ => by
-        rw [← zpow_add, ← hζiff, zpow_add, hd, hd, hd]
-        exact hmul _ e₁.2 _ e₂.2 }
+  let χ : E →* ℂˣ := {
+    toFun := fun e => ζ ^ d e
+    map_one' := by rw [← zpow_zero ζ, ← hζiff, hd]; simp
+    map_mul' := fun e₁ e₂ => by
+      rw [← zpow_add, ← hζiff, zpow_add, hd, hd, hd]
+      exact hmul _ e₁.2 _ e₂.2
+  }
   have hχ : ∀ e : E, χ e = ζ ↔ (e : G) ^ M = c := fun e => by
     show ζ ^ d e = ζ ↔ _
     rw [← hd e]
@@ -188,12 +210,16 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
     show (ζ ^ d e) ^ o = 1
     rw [← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast, hζu.pow_eq_one, one_zpow]
 
-  have hψ : ∀ e : E, ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) *
-      ((((powMonoidHom (k : ℕ)).comp χ) e : ℂˣ) : ℂ) = if (e : G) ^ M = c then (o : ℂ) else 0 := by
+  have hψ
+      : ∀ e : E,
+        ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) *
+            ((((powMonoidHom (k : ℕ)).comp χ) e : ℂˣ) : ℂ)
+          = if (e : G) ^ M = c then (o : ℂ) else 0 := by
     intro e
-    have hsum : ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) *
-        ((((powMonoidHom (k : ℕ)).comp χ) e : ℂˣ) : ℂ) =
-        ∑ k ∈ Finset.range o, (((ζ⁻¹ * χ e : ℂˣ)) : ℂ) ^ k := by
+    have hsum
+        : ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) *
+            ((((powMonoidHom (k : ℕ)).comp χ) e : ℂˣ) : ℂ)
+          = ∑ k ∈ Finset.range o, (((ζ⁻¹ * χ e : ℂˣ)) : ℂ) ^ k := by
       rw [Finset.sum_range (fun k => (((ζ⁻¹ * χ e : ℂˣ)) : ℂ) ^ k)]
       refine Finset.sum_congr rfl fun k _ => ?_
       simp [mul_pow]
@@ -209,8 +235,8 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
         rw [inv_mul_eq_one] at h2
         exact h2.symm
       have hwo : (((ζ⁻¹ * χ e : ℂˣ)) : ℂ) ^ o = 1 := by
-        rw [← Units.val_pow_eq_pow_val, mul_pow, hχpow, inv_pow, hζu.pow_eq_one, inv_one,
-          one_mul, Units.val_one]
+        rw [← Units.val_pow_eq_pow_val, mul_pow, hχpow, inv_pow, hζu.pow_eq_one, inv_one, one_mul,
+          Units.val_one]
       have := geom_sum_mul (((ζ⁻¹ * χ e : ℂˣ)) : ℂ) o
       rw [hwo, sub_self] at this
       exact (mul_eq_zero.mp this).resolve_right (sub_ne_zero.mpr hw1)
@@ -227,18 +253,25 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
       constructor
       · intro h
         apply hker _ e.2
-        rw [← hφ, h]; rfl
+        rw [← hφ, h]
+        rfl
       · intro h
-        apply Subtype.ext; apply Subtype.ext
-        rw [hφ]; exact hwM _ h
-    calc Nat.card E = Nat.card φ.ker * φ.ker.index := φ.ker.card_mul_index.symm
+        apply Subtype.ext
+        apply Subtype.ext
+        rw [hφ]
+        exact hwM _ h
+    calc
+      Nat.card E
+        = Nat.card φ.ker * φ.ker.index := φ.ker.card_mul_index.symm
       _ = N * o := by
-        rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr hsurj, Subgroup.card_top, Nat.card_zpowers,
-          ← Subgroup.orderOf_coe cE, hkerφ,
+        rw [Subgroup.index_ker, MonoidHom.range_eq_top.mpr hsurj, Subgroup.card_top,
+          Nat.card_zpowers, ← Subgroup.orderOf_coe cE, hkerφ,
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP'E).toEquiv, hNP']
       _ = o * N := Nat.mul_comm _ _
-  have hinv : ∀ g s w : G, w ∈ P' → (s⁻¹ * g * s ∈ E ∧ (s⁻¹ * g * s) ^ M = c) →
-      ((s * w)⁻¹ * g * (s * w) ∈ E ∧ ((s * w)⁻¹ * g * (s * w)) ^ M = c) := by
+  have hinv
+      : ∀ g s w : G,
+        w ∈ P' → (s⁻¹ * g * s ∈ E ∧ (s⁻¹ * g * s) ^ M = c)
+          → ((s * w)⁻¹ * g * (s * w) ∈ E ∧ ((s * w)⁻¹ * g * (s * w)) ^ M = c) := by
     rintro g s w hw ⟨h1, h2⟩
     have hre : (s * w)⁻¹ * g * (s * w) = w⁻¹ * (s⁻¹ * g * s) * w := by group
     rw [hre, inv_mul_mul_zpow, h2]
@@ -259,8 +292,9 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
     rw [this, hS, QuotientGroup.card_preimage_mk, hNP']
     exact dvd_mul_right _ _
   have hxM : (c * q) ^ M = c := by simpa using hpowE 1 q hqP'
-  have hcond : ∀ s : G, (s⁻¹ * (c * q) * s ∈ E ∧ (s⁻¹ * (c * q) * s) ^ M = c) ↔
-      (s ∈ Z ∧ s⁻¹ * q * s ∈ P') := by
+  have hcond
+      : ∀ s : G,
+        (s⁻¹ * (c * q) * s ∈ E ∧ (s⁻¹ * (c * q) * s) ^ M = c) ↔ (s ∈ Z ∧ s⁻¹ * q * s ∈ P') := by
     intro s
     rw [inv_mul_mul_zpow, hxM]
     have hZc : s ∈ Z ↔ s⁻¹ * c * s = c := by
@@ -268,24 +302,32 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
       constructor
       · intro h; rw [mul_assoc, h, ← mul_assoc, inv_mul_cancel, one_mul]
       · intro h
-        calc c * s = s * (s⁻¹ * c * s) := by group
+        calc
+          c * s
+            = s * (s⁻¹ * c * s) := by group
           _ = s * c := by rw [h]
     rw [hZc]
     constructor
     · rintro ⟨h1, h2⟩
       refine ⟨h2, hker _ ?_ ?_⟩
       · have : s⁻¹ * q * s = c⁻¹ * (s⁻¹ * (c * q) * s) := by
-          calc s⁻¹ * q * s = (s⁻¹ * c * s)⁻¹ * (s⁻¹ * (c * q) * s) := by group
+          calc
+            s⁻¹ * q * s
+              = (s⁻¹ * c * s)⁻¹ * (s⁻¹ * (c * q) * s) := by group
             _ = c⁻¹ * (s⁻¹ * (c * q) * s) := by rw [h2]
-        rw [this]; exact E.mul_mem (E.inv_mem hcE) h1
+        rw [this]
+        exact E.mul_mem (E.inv_mem hcE) h1
       · rw [inv_mul_mul_zpow, hwM q hqP', mul_one, inv_mul_cancel]
     · rintro ⟨h1, h2⟩
       refine ⟨?_, h1⟩
       have : s⁻¹ * (c * q) * s = (s⁻¹ * c * s) * (s⁻¹ * q * s) := by group
-      rw [this, h1]; exact E.mul_mem hcE (hP'E h2)
-  have hfix : ∀ z : Z, ((z : Z ⧸ (P : Subgroup Z)) ∈
-      MulAction.fixedPoints (Subgroup.zpowers qZ) (Z ⧸ (P : Subgroup Z)) ↔
-      z⁻¹ * qZ * z ∈ (P : Subgroup Z)) := by
+      rw [this, h1]
+      exact E.mul_mem hcE (hP'E h2)
+  have hfix
+      : ∀ z : Z,
+        ((z : Z ⧸ (P : Subgroup Z))
+            ∈ MulAction.fixedPoints (Subgroup.zpowers qZ) (Z ⧸ (P : Subgroup Z))
+          ↔ z⁻¹ * qZ * z ∈ (P : Subgroup Z)) := by
     intro z
     rw [MulAction.mem_fixedPoints]
     constructor
@@ -297,27 +339,44 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
     · rintro h ⟨_, i, rfl⟩
       show (qZ ^ i : Z) • (z : Z ⧸ (P : Subgroup Z)) = z
       rw [MulAction.Quotient.smul_mk, QuotientGroup.eq, smul_eq_mul]
-      have : (qZ ^ i * z)⁻¹ * z = (z⁻¹ * qZ * z) ^ (-i) := by
-        rw [inv_mul_mul_zpow]; group
-      rw [this]; exact Subgroup.zpow_mem _ h _
+      have : (qZ ^ i * z)⁻¹ * z = (z⁻¹ * qZ * z) ^ (-i) := by rw [inv_mul_mul_zpow]; group
+      rw [this]
+      exact Subgroup.zpow_mem _ h _
   have hP'Z : ∀ z : Z, ((z : G)⁻¹ * q * z ∈ P' ↔ z⁻¹ * qZ * z ∈ (P : Subgroup Z)) := fun z => by
-    have h : Z.subtype (z⁻¹ * qZ * z) ∈ (P : Subgroup Z).map Z.subtype ↔
-        z⁻¹ * qZ * z ∈ (P : Subgroup Z) := Subgroup.mem_map_iff_mem Z.subtype_injective
+    have h
+        : Z.subtype (z⁻¹ * qZ * z) ∈ (P : Subgroup Z).map Z.subtype
+          ↔ z⁻¹ * qZ * z ∈ (P : Subgroup Z) :=
+      Subgroup.mem_map_iff_mem Z.subtype_injective
     exact h
-  have hcardx : Nat.card {s : G // s⁻¹ * (c * q) * s ∈ E ∧ (s⁻¹ * (c * q) * s) ^ M = c} =
-      N * Nat.card (MulAction.fixedPoints (Subgroup.zpowers qZ) (Z ⧸ (P : Subgroup Z))) := by
-    have e1 : {s : G // s⁻¹ * (c * q) * s ∈ E ∧ (s⁻¹ * (c * q) * s) ^ M = c} ≃
-        (QuotientGroup.mk ⁻¹' (MulAction.fixedPoints (Subgroup.zpowers qZ)
-          (Z ⧸ (P : Subgroup Z))) : Set Z) :=
-      { toFun := fun s => ⟨⟨s.1, ((hcond s.1).mp s.2).1⟩,
-          (hfix _).mpr ((hP'Z ⟨s.1, ((hcond s.1).mp s.2).1⟩).mp ((hcond s.1).mp s.2).2)⟩
-        invFun := fun z => ⟨z.1.1, (hcond z.1.1).mpr ⟨z.1.2, (hP'Z z.1).mpr ((hfix _).mp z.2)⟩⟩
-        left_inv := fun s => rfl
-        right_inv := fun z => rfl }
+  have hcardx
+      : Nat.card {s : G // s⁻¹ * (c * q) * s ∈ E ∧ (s⁻¹ * (c * q) * s) ^ M = c}
+        = N * Nat.card (MulAction.fixedPoints (Subgroup.zpowers qZ) (Z ⧸ (P : Subgroup Z))) := by
+    have e1
+        : {s : G // s⁻¹ * (c * q) * s ∈ E ∧ (s⁻¹ * (c * q) * s) ^ M = c}
+          ≃ (QuotientGroup.mk
+              ⁻¹' (MulAction.fixedPoints (Subgroup.zpowers qZ) (Z ⧸ (P : Subgroup Z)))
+            : Set Z) := {
+      toFun := fun s => ⟨
+        ⟨s.1, ((hcond s.1).mp s.2).1⟩,
+        (hfix _).mpr ((hP'Z ⟨s.1, ((hcond s.1).mp s.2).1⟩).mp ((hcond s.1).mp s.2).2)
+      ⟩
+      invFun := fun z => ⟨z.1.1, (hcond z.1.1).mpr ⟨z.1.2, (hP'Z z.1).mpr ((hfix _).mp z.2)⟩⟩
+      left_inv := fun s => rfl
+      right_inv := fun z => rfl
+    }
     rw [Nat.card_congr e1, QuotientGroup.card_preimage_mk]
-  refine ⟨E, fun g => ((Nat.card {s : G // s⁻¹ * g * s ∈ E ∧ (s⁻¹ * g * s) ^ M = c} / N : ℕ) : ℤ),
-    Fin o, inferInstance, fun k => ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ),
-    fun k => (powMonoidHom (k : ℕ)).comp χ, ⟨p, hp, hl⟩, ?_, ?_, ?_⟩
+  refine ⟨
+    E,
+    fun g => ((Nat.card {s : G // s⁻¹ * g * s ∈ E ∧ (s⁻¹ * g * s) ^ M = c} / N : ℕ) : ℤ),
+    Fin o,
+    inferInstance,
+    fun k => ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ),
+    fun k => (powMonoidHom (k : ℕ)).comp χ,
+    ⟨p, hp, hl⟩,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · show ¬ (p : ℤ) ∣ ((Nat.card {s : G // s⁻¹ * (c * q) * s ∈ E ∧
       (s⁻¹ * (c * q) * s) ^ M = c} / N : ℕ) : ℤ)
     rw [hcardx, Nat.mul_div_cancel_left _ Nat.card_pos, Int.natCast_dvd_natCast]
@@ -329,28 +388,32 @@ theorem _root_.GlobalTheory.exists_induced_int_prime_to : ∀ (G : Type) [Group 
     have : ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) ^ o = 1 := by
       rw [← Units.val_pow_eq_pow_val, ← pow_mul, mul_comm, pow_mul, inv_pow, hζu.pow_eq_one,
         inv_one, one_pow, Units.val_one]
-    rw [this]; exact isIntegral_one
+    rw [this]
+    exact isIntegral_one
   · intro g
     have hN0 : (N : ℂ) ≠ 0 := by exact_mod_cast (Nat.card_pos (α := (P : Subgroup Z))).ne'
     have ho0 : (o : ℂ) ≠ 0 := by exact_mod_cast ho
-    have hR : ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) * _root_.GlobalTheory.BI.ind E
-        (fun e => ((((powMonoidHom (k : ℕ)).comp χ) e : ℂˣ) : ℂ)) g =
-        (Nat.card E : ℂ)⁻¹ * ∑ s : G,
-          if s⁻¹ * g * s ∈ E ∧ (s⁻¹ * g * s) ^ M = c then (o : ℂ) else 0 := by
+    have hR
+        : ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) * _root_.GlobalTheory.BI.ind E
+            (fun e => ((((powMonoidHom (k : ℕ)).comp χ) e : ℂˣ) : ℂ)) g
+          = (Nat.card E : ℂ)⁻¹
+            * ∑ s : G,
+              if s⁻¹ * g * s ∈ E ∧ (s⁻¹ * g * s) ^ M = c then (o : ℂ) else 0 := by
       simp only [_root_.GlobalTheory.BI.ind, finsum_eq_sum_of_fintype, Finset.mul_sum]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun s _ => ?_
       simp only [_root_.GlobalTheory.BI.ext0]
       by_cases h : s⁻¹ * g * s ∈ E
       · simp only [dif_pos h, h, true_and]
-        calc _ = (Nat.card E : ℂ)⁻¹ * ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) *
-              ((((powMonoidHom (k : ℕ)).comp χ) ⟨_, h⟩ : ℂˣ) : ℂ) := by
-              rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun k _ => mul_left_comm _ _ _
+        calc
+          _ = (Nat.card E : ℂ)⁻¹
+              * ∑ k : Fin o, ((ζ⁻¹ ^ (k : ℕ) : ℂˣ) : ℂ) *
+                ((((powMonoidHom (k : ℕ)).comp χ) ⟨_, h⟩ : ℂˣ) : ℂ) := by
+            rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun k _ => mul_left_comm _ _ _
           _ = _ := by rw [hψ] <;> rfl
       · simp [h]
     refine Eq.trans ?_ hR.symm
     rw [Finset.sum_ite, Finset.sum_const_zero, add_zero, Finset.sum_const, nsmul_eq_mul, hcardE]
-    rw [Int.cast_natCast, Nat.cast_div (hdvd g) hN0, Nat.card_eq_fintype_card,
-      Fintype.card_subtype]
+    rw [Int.cast_natCast, Nat.cast_div (hdvd g) hN0, Nat.card_eq_fintype_card, Fintype.card_subtype]
     push_cast
     field_simp

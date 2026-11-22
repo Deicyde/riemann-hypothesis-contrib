@@ -8,15 +8,18 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.IsSplit
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N
+  Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut Formalism.AUTREP
+  Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.FormsStep NumberField IsDedekindDomain Polynomial
 open scoped TensorProduct
 
 noncomputable section
 
 namespace GlobalTheory.PdPlace
 
-theorem exists_place_over_prime (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime) :
-    (Formalism.BasicNotions.placesOver E p).Nonempty := by
+theorem exists_place_over_prime (E : Type) [Field E] [NumberField E] (p : ℕ) (hp : p.Prime)
+    : (Formalism.BasicNotions.placesOver E p).Nonempty := by
   have hnu : ¬ IsUnit ((p : ℕ) : 𝓞 E) := by
     intro hu
     have h1 := hu.map (Algebra.norm ℤ : 𝓞 E →* ℤ)
@@ -27,8 +30,9 @@ theorem exists_place_over_prime (E : Type) [Field E] [NumberField E] (p : ℕ) (
     rcases Nat.pow_eq_one.1 h2 with h | h
     · exact hp.one_lt.ne' h
     · exact h3.ne' h
-  obtain ⟨M, hM, hle⟩ := Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 E)})
-    (by rwa [Ne, Ideal.span_singleton_eq_top])
+  obtain ⟨M, hM, hle⟩ :=
+    Ideal.exists_le_maximal (Ideal.span {((p : ℕ) : 𝓞 E)})
+      (by rwa [Ne, Ideal.span_singleton_eq_top])
   have hmem : ((p : ℕ) : 𝓞 E) ∈ M := hle (Ideal.subset_span rfl)
   refine ⟨⟨M, hM.isPrime, fun h => ?_⟩, hmem⟩
   rw [h, Ideal.mem_bot] at hmem

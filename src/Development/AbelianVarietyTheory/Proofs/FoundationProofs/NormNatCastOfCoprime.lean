@@ -28,11 +28,12 @@ theorem norm_le_one_of_isIntegral {x : PadicAlgCl l} (hx : IsIntegral ℤ_[l] x)
   exact_mod_cast h2
 
 theorem norm_natCast_of_coprime {a : ℕ} (ha : a.Coprime l) : ‖(a : PadicAlgCl l)‖ = 1 := by
-  rw [← map_natCast (algebraMap ℚ_[l] (PadicAlgCl l)), norm_algebraMap', Padic.norm_natCast_eq_one_iff]
+  rw [← map_natCast (algebraMap ℚ_[l] (PadicAlgCl l)), norm_algebraMap',
+    Padic.norm_natCast_eq_one_iff]
   exact ha.symm
 
-theorem norm_inv_pow_val_le (r e : ℕ) (u : (ZMod (l ^ r))ˣ) :
-    ‖((((u : ZMod (l ^ r)).val : ℕ) : PadicAlgCl l) ^ e)⁻¹‖ ≤ 1 := by
+theorem norm_inv_pow_val_le (r e : ℕ) (u : (ZMod (l ^ r))ˣ)
+    : ‖((((u : ZMod (l ^ r)).val : ℕ) : PadicAlgCl l) ^ e)⁻¹‖ ≤ 1 := by
   rcases Nat.eq_zero_or_pos r with rfl | hr
   · have h0 : (u : ZMod (l ^ 0)).val = 0 := by
       have := ZMod.val_lt (u : ZMod (l ^ 0))
@@ -46,40 +47,57 @@ theorem norm_inv_pow_val_le (r e : ℕ) (u : (ZMod (l ^ r))ˣ) :
     rw [norm_inv, norm_pow, norm_natCast_of_coprime hc]
     simp
 
-theorem norm_inv_pow_sub_le {a b r : ℕ} (e : ℕ) (ha : a.Coprime l) (hb : b.Coprime l) (h : a ≡ b [MOD l ^ r]) :
-    ‖((a : PadicAlgCl l) ^ e)⁻¹ - ((b : PadicAlgCl l) ^ e)⁻¹‖ ≤ ‖(l : PadicAlgCl l) ^ r‖ := by
+theorem norm_inv_pow_sub_le
+    {a b r : ℕ} (e : ℕ) (ha : a.Coprime l) (hb : b.Coprime l) (h : a ≡ b [MOD l ^ r])
+    : ‖((a : PadicAlgCl l) ^ e)⁻¹ - ((b : PadicAlgCl l) ^ e)⁻¹‖ ≤ ‖(l : PadicAlgCl l) ^ r‖ := by
   have na := norm_natCast_of_coprime ha
   have nb := norm_natCast_of_coprime hb
-  have a0 : (a : PadicAlgCl l) ^ e ≠ 0 := pow_ne_zero _ (norm_ne_zero_iff.1 (by rw [na]; exact one_ne_zero))
-  have b0 : (b : PadicAlgCl l) ^ e ≠ 0 := pow_ne_zero _ (norm_ne_zero_iff.1 (by rw [nb]; exact one_ne_zero))
+  have a0 : (a : PadicAlgCl l) ^ e ≠ 0 :=
+    pow_ne_zero _ (norm_ne_zero_iff.1 (by rw [na]; exact one_ne_zero))
+  have b0 : (b : PadicAlgCl l) ^ e ≠ 0 :=
+    pow_ne_zero _ (norm_ne_zero_iff.1 (by rw [nb]; exact one_ne_zero))
   obtain ⟨k, hk⟩ := (h.pow e).dvd
-  have hk' : (b : PadicAlgCl l) ^ e - (a : PadicAlgCl l) ^ e = (l : PadicAlgCl l) ^ r * (k : PadicAlgCl l) := by
+  have hk'
+      : (b : PadicAlgCl l) ^ e - (a : PadicAlgCl l) ^ e
+        = (l : PadicAlgCl l) ^ r * (k : PadicAlgCl l) := by
     exact_mod_cast congrArg (Int.cast : ℤ → PadicAlgCl l) hk
-  rw [inv_sub_inv a0 b0, hk', norm_div, norm_mul, norm_mul, norm_pow (a : PadicAlgCl l), norm_pow (b : PadicAlgCl l),
-    na, nb, one_pow, one_mul, div_one]
+  rw [inv_sub_inv a0 b0, hk', norm_div, norm_mul, norm_mul, norm_pow (a : PadicAlgCl l),
+    norm_pow (b : PadicAlgCl l), na, nb, one_pow, one_mul, div_one]
   exact mul_le_of_le_one_right (norm_nonneg _) (IsUltrametricDist.norm_intCast_le_one _ k)
 
-theorem twist_compat (l : ℕ) [inst : Fact (Nat.Prime l)] (c : UpperTheory.V.HV.Coef l) (e : ℕ)
+theorem twist_compat
+    (l : ℕ) [inst : Fact (Nat.Prime l)]
+    (c : UpperTheory.V.HV.Coef l)
+    (e : ℕ)
     (χ : (r : ℕ) → (ZMod (l ^ r))ˣ → Formalism.ConjugateSelfDual.Qbar l)
     (hO : ∀ (r : ℕ) (x : (ZMod (l ^ r))ˣ), χ r x ∈ c.O)
-    (hχ : ∀ (r : ℕ) (x : (ZMod (l ^ (r + 1)))ˣ), ‖χ (r + 1) x - χ r
-      (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r)) : ZMod (l ^ Nat.succ r) →* ZMod (l ^ r)) x)‖ ≤
-        ‖(l : Formalism.ConjugateSelfDual.Qbar l) ^ r‖)
-    (r : ℕ) (x : (ZMod (l ^ (r + 1)))ˣ) :
-    ‖(fun x : (ZMod (l ^ (r + 1)))ˣ => (((ZMod.val (x : ZMod (l ^ (r + 1))) : ℕ) : Formalism.ConjugateSelfDual.Qbar l) ^ e)⁻¹ * χ (r + 1) x) x -
-      (fun x : (ZMod (l ^ r))ˣ => (((ZMod.val (x : ZMod (l ^ r)) : ℕ) : Formalism.ConjugateSelfDual.Qbar l) ^ e)⁻¹ * χ r x)
-        (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r)) :
-          ZMod (l ^ Nat.succ r) →* ZMod (l ^ r)) x)‖ ≤ ‖(l : Formalism.ConjugateSelfDual.Qbar l) ^ r‖ := by
+    (hχ : ∀ (r : ℕ) (x : (ZMod (l ^ (r + 1)))ˣ),
+      ‖χ (r + 1) x - χ r
+          (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r)) : ZMod (l ^ Nat.succ r) →* ZMod (l ^ r)) x)‖
+        ≤ ‖(l : Formalism.ConjugateSelfDual.Qbar l) ^ r‖)
+    (r : ℕ) (x : (ZMod (l ^ (r + 1)))ˣ)
+    : ‖(fun x : (ZMod (l ^ (r + 1)))ˣ => (((ZMod.val (x : ZMod (l ^ (r + 1))) : ℕ) : Formalism.ConjugateSelfDual.Qbar l) ^ e)⁻¹ * χ (r + 1) x) x -
+        (fun x : (ZMod (l ^ r))ˣ => (((ZMod.val (x : ZMod (l ^ r)) : ℕ) : Formalism.ConjugateSelfDual.Qbar l) ^ e)⁻¹ * χ r x)
+          (Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r)) :
+            ZMod (l ^ Nat.succ r) →* ZMod (l ^ r)) x)‖
+      ≤ ‖(l : Formalism.ConjugateSelfDual.Qbar l) ^ r‖ := by
   have h1 := hχ r x
-  generalize hy : Units.map (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r)) :
-    ZMod (l ^ Nat.succ r) →* ZMod (l ^ r)) x = y at h1 ⊢
+  generalize hy
+      : Units.map
+          (ZMod.castHom (pow_dvd_pow l (Nat.le_succ r)) (ZMod (l ^ r))
+            : ZMod (l ^ Nat.succ r) →* ZMod (l ^ r))
+          x
+        = y
+    at h1 ⊢
   have hint : ‖χ r y‖ ≤ 1 :=
     norm_le_one_of_isIntegral
       ((Algebra.IsIntegral.isIntegral (R := ℤ_[l]) (⟨χ r y, hO r y⟩ : c.O)).map c.O.val)
   have hA := norm_inv_pow_val_le (r + 1) e x
   have hB := norm_inv_pow_val_le r e y
-  have hAB : ‖((((x : ZMod (l ^ (r + 1))).val : ℕ) : PadicAlgCl l) ^ e)⁻¹ -
-      ((((y : ZMod (l ^ r)).val : ℕ) : PadicAlgCl l) ^ e)⁻¹‖ ≤ ‖(l : PadicAlgCl l) ^ r‖ := by
+  have hAB
+      : ‖((((x : ZMod (l ^ (r + 1))).val : ℕ) : PadicAlgCl l) ^ e)⁻¹ -
+          ((((y : ZMod (l ^ r)).val : ℕ) : PadicAlgCl l) ^ e)⁻¹‖
+        ≤ ‖(l : PadicAlgCl l) ^ r‖ := by
     rcases Nat.eq_zero_or_pos r with rfl | hr
     · rw [pow_zero (l : PadicAlgCl l), norm_one, sub_eq_add_neg]
       refine (IsUltrametricDist.norm_add_le_max _ _).trans (max_le hA ?_)

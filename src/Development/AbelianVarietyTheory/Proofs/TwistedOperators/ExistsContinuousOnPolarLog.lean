@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.Continuou
 
 @[expose] public section
 
-open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix MeasureTheory
+open Formalism.BasicNotions.TH Formalism.MainNotions.SchurIrreducible GlobalTheory.PolarU Matrix
+  MeasureTheory
 
 noncomputable section
 namespace GlobalTheory.PolarLogCont
@@ -28,17 +29,17 @@ theorem continuousOn_halfLog : ContinuousOn (halfLog (n := n)) {g | IsUnit g} :=
     · exact (show IsUnit gᴴ from hu.star).mul hu
   exact h.const_smul (1 / 2 : ℝ)
 
-theorem halfLog_mul_exp (c Y : Matrix n n ℂ) (hc : cᴴ * c = 1) (hY : Yᴴ = Y) :
-    halfLog (c * NormedSpace.exp Y) = Y := by
-  have he : (NormedSpace.exp Y)ᴴ = NormedSpace.exp Y := by
-    rw [← Matrix.exp_conjTranspose, hY]
+theorem halfLog_mul_exp (c Y : Matrix n n ℂ) (hc : cᴴ * c = 1) (hY : Yᴴ = Y)
+    : halfLog (c * NormedSpace.exp Y) = Y := by
+  have he : (NormedSpace.exp Y)ᴴ = NormedSpace.exp Y := by rw [← Matrix.exp_conjTranspose, hY]
   have h2 : NormedSpace.exp (Y + Y) = NormedSpace.exp Y * NormedSpace.exp Y :=
     Matrix.exp_add_of_commute _ _ (Commute.refl Y)
   have sq : (c * NormedSpace.exp Y)ᴴ * (c * NormedSpace.exp Y) = NormedSpace.exp (Y + Y) := by
     rw [conjTranspose_mul, he, h2]
-    calc NormedSpace.exp Y * cᴴ * (c * NormedSpace.exp Y)
+    calc
+      NormedSpace.exp Y * cᴴ * (c * NormedSpace.exp Y)
         = NormedSpace.exp Y * (cᴴ * c) * NormedSpace.exp Y := by simp only [Matrix.mul_assoc]
-    _ = _ := by rw [hc, Matrix.mul_one]
+      _ = _ := by rw [hc, Matrix.mul_one]
   have hsa : IsSelfAdjoint (Y + Y) := by
     rw [IsSelfAdjoint, star_eq_conjTranspose, conjTranspose_add, hY]
   unfold halfLog
@@ -47,10 +48,15 @@ theorem halfLog_mul_exp (c Y : Matrix n n ℂ) (hc : cᴴ * c = 1) (hY : Yᴴ = 
 
 end
 
-theorem exists_continuousOn_polar_log : ∀ (p q : ℕ), ∃ L : Mat p q → (Fin p → Fin q → ℂ), ContinuousOn L {g | IsUnit g} ∧ ∀ (k : Mat p q) (B : Fin p → Fin q → ℂ), kᴴ * k = 1 → L (k * NormedSpace.exp (pY B)) = B := by
+theorem exists_continuousOn_polar_log
+    : ∀ (p q : ℕ), ∃ L : Mat p q → (Fin p → Fin q → ℂ),
+      ContinuousOn L {g | IsUnit g}
+        ∧ ∀ (k : Mat p q) (B : Fin p → Fin q → ℂ),
+          kᴴ * k = 1 → L (k * NormedSpace.exp (pY B)) = B := by
   intro p q
   refine ⟨fun g i j => halfLog g (Sum.inl i) (Sum.inr j), ?_, ?_⟩
-  · have hc : Continuous fun (M : Mat p q) (i : Fin p) (j : Fin q) => M (Sum.inl i) (Sum.inr j) := by
+  · have hc
+        : Continuous fun (M : Mat p q) (i : Fin p) (j : Fin q) => M (Sum.inl i) (Sum.inr j) := by
       fun_prop
     exact hc.comp_continuousOn continuousOn_halfLog
   · intro k B hk

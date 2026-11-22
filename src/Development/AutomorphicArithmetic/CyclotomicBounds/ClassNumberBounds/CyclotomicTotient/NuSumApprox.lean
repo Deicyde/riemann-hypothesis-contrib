@@ -23,21 +23,21 @@ private theorem nsa_nat (k : ℕ) (m : ℕ) (h : (l : ℤ_[l]) ^ k ∣ (m : ℤ_
   have := (PadicInt.pow_p_dvd_int_iff (p := l) k (m : ℤ)).1 (by simpa using h)
   exact_mod_cast this
 
-private theorem nsa_lte (s n : ℕ) (hs : s ≠ 0) (hn : Odd n) :
-    ¬ (l : ℤ) ^ (s + n.factorization l + 1) ∣ (1 + (l : ℤ) ^ s) ^ n - 1 := by
+private theorem nsa_lte (s n : ℕ) (hs : s ≠ 0) (hn : Odd n)
+    : ¬ (l : ℤ) ^ (s + n.factorization l + 1) ∣ (1 + (l : ℤ) ^ s) ^ n - 1 := by
   have hp : l.Prime := Fact.out
   have hpz : Prime (l : ℤ) := Nat.prime_iff_prime_int.1 hp
   have hn0 : n ≠ 0 := by rintro rfl; simp at hn
-  have hxy : (l : ℤ) ∣ (1 + (l : ℤ) ^ s) - 1 := by
-    simpa using dvd_pow_self (l : ℤ) hs
+  have hxy : (l : ℤ) ∣ (1 + (l : ℤ) ^ s) - 1 := by simpa using dvd_pow_self (l : ℤ) hs
   have hx : ¬ (l : ℤ) ∣ 1 + (l : ℤ) ^ s := by
     intro h
     exact hpz.not_dvd_one ((dvd_add_left (dvd_pow_self (l : ℤ) hs)).1 h)
   have hs' : emultiplicity (l : ℤ) ((1 + (l : ℤ) ^ s) - 1) = s := by
     rw [add_sub_cancel_left]
     exact emultiplicity_pow_self_of_prime hpz s
-  have key : emultiplicity (l : ℤ) ((1 + (l : ℤ) ^ s) ^ n - 1 ^ n) =
-      ((s + n.factorization l : ℕ) : ℕ∞) := by
+  have key
+      : emultiplicity (l : ℤ) ((1 + (l : ℤ) ^ s) ^ n - 1 ^ n)
+        = ((s + n.factorization l : ℕ) : ℕ∞) := by
     by_cases hl : l = 2
     · have hnd : ¬ l ∣ n := by
         subst hl
@@ -53,9 +53,12 @@ private theorem nsa_lte (s n : ℕ) (hs : s ≠ 0) (hn : Odd n) :
   have := Nat.cast_le.1 this
   omega
 
-theorem nuOf_le_of_approx {Γ : Type} [Group Γ] (ε : Γ →* ℤ_[l]ˣ) (n m : ℕ) (u : ℤ_[l]ˣ)
+theorem nuOf_le_of_approx
+    {Γ : Type} [Group Γ]
+    (ε : Γ →* ℤ_[l]ˣ) (n m : ℕ) (u : ℤ_[l]ˣ)
     (h : ∀ k : ℕ, ∃ g, (l : ℤ_[l]) ^ k ∣ ((ε g : ℤ_[l]ˣ) : ℤ_[l]) - u)
-    (hu : ¬ (l : ℤ_[l]) ^ (m + 1) ∣ (u : ℤ_[l]) ^ n - 1) : nuOf l ε n ≤ m := by
+    (hu : ¬ (l : ℤ_[l]) ^ (m + 1) ∣ (u : ℤ_[l]) ^ n - 1)
+    : nuOf l ε n ≤ m := by
   obtain ⟨g, hg⟩ := h (m + 1)
   refine Nat.sInf_le ⟨g, fun hc => hu ?_⟩
   have h2 := hg.trans (sub_dvd_pow_sub_pow ((ε g : ℤ_[l]ˣ) : ℤ_[l]) (u : ℤ_[l]) n)
@@ -63,9 +66,11 @@ theorem nuOf_le_of_approx {Γ : Type} [Group Γ] (ε : Γ →* ℤ_[l]ˣ) (n m :
   convert h3 using 1
   ring
 
-theorem exists_unit_not_dvd (C n : ℕ) (hC : C ≠ 0) (h2 : 2 ∣ C) (hn : Odd n) :
-    ∃ u : ℤ_[l]ˣ, (l : ℤ_[l]) ^ C.factorization l ∣ (u : ℤ_[l]) - 1 ∧
-      ¬ (l : ℤ_[l]) ^ (C.factorization l + (if l ∣ C then n.factorization l else 0) + 1) ∣ (u : ℤ_[l]) ^ n - 1 := by
+theorem exists_unit_not_dvd (C n : ℕ) (hC : C ≠ 0) (h2 : 2 ∣ C) (hn : Odd n)
+    : ∃ u : ℤ_[l]ˣ,
+      (l : ℤ_[l]) ^ C.factorization l ∣ (u : ℤ_[l]) - 1
+        ∧ ¬ (l : ℤ_[l]) ^ (C.factorization l + (if l ∣ C then n.factorization l else 0) + 1)
+          ∣ (u : ℤ_[l]) ^ n - 1 := by
   have hp : l.Prime := Fact.out
   by_cases hlC : l ∣ C
   · rw [if_pos hlC]
@@ -89,8 +94,8 @@ theorem exists_unit_not_dvd (C n : ℕ) (hC : C ≠ 0) (h2 : 2 ∣ C) (hn : Odd 
     simp only [add_zero, zero_add, pow_one] at this
     exact this.trans h2
 
-theorem exists_sq_unit_not_dvd (n : ℕ) (hn : ¬ (l - 1) / 2 ∣ n) (hl : l ≠ 2) :
-    ∃ u : ℤ_[l]ˣ, ¬ (l : ℤ_[l]) ^ (0 + 1) ∣ ((u ^ 2 : ℤ_[l]ˣ) : ℤ_[l]) ^ n - 1 := by
+theorem exists_sq_unit_not_dvd (n : ℕ) (hn : ¬ (l - 1) / 2 ∣ n) (hl : l ≠ 2)
+    : ∃ u : ℤ_[l]ˣ, ¬ (l : ℤ_[l]) ^ (0 + 1) ∣ ((u ^ 2 : ℤ_[l]ˣ) : ℤ_[l]) ^ n - 1 := by
   have hp : l.Prime := Fact.out
   obtain ⟨g, hg⟩ := IsCyclic.exists_ofOrder_eq_natCard (α := (ZMod l)ˣ)
   rw [Nat.card_eq_fintype_card, ZMod.card_units] at hg
@@ -102,7 +107,8 @@ theorem exists_sq_unit_not_dvd (n : ℕ) (hn : ¬ (l - 1) / 2 ∣ n) (hl : l ≠
     exact g.ne_zero
   refine ⟨hU.unit, fun h => hn ?_⟩
   rw [zero_add, pow_one, nsa_dvd_iff, map_sub, map_one, map_pow, Units.val_pow_eq_pow_val, map_pow,
-    IsUnit.unit_spec, hx, sub_eq_zero, ← pow_mul] at h
+      IsUnit.unit_spec, hx, sub_eq_zero, ← pow_mul]
+    at h
   have h1 : g ^ (2 * n) = 1 := by
     apply Units.ext
     simpa using h

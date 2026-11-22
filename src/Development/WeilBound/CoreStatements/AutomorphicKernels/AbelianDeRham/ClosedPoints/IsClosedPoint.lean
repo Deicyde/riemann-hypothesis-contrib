@@ -6,12 +6,19 @@ public import Development.AbelianVarietyTheory.Proofs.UniformizationProofs.Stalk
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris GlobalTheory.CechDR MainStatements.Hodge
+open CategoryTheory AlgebraicGeometry TensorProduct Opposite MonoidalCategory
+  CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.ChartRestriction.G.Semi GlobalTheory.CatCoh GlobalTheory.Cris
+  GlobalTheory.CechDR MainStatements.Hodge
 
 namespace MainStatements.Hodge.Pf.STALKDIM
 
-theorem isClosed_point {k : Type} [Field k] (X : Scheme.{0}) (s : X ⟶ Sp k) (e : Sp k ⟶ X) (g : ℕ)
-    (he : e ≫ s = 𝟙 _) (hs : SmoothOfRelativeDimension g s) (p : Sp k) : IsClosed ({e.base p} : Set X) := by
+theorem isClosed_point
+    {k : Type} [Field k]
+    (X : Scheme.{0}) (s : X ⟶ Sp k) (e : Sp k ⟶ X)
+    (g : ℕ)
+    (he : e ≫ s = 𝟙 _) (hs : SmoothOfRelativeDimension g s) (p : Sp k)
+    : IsClosed ({e.base p} : Set X) := by
   have : Smooth s := hs.smooth
   have : LocallyOfFiniteType (e ≫ s) := by rw [he]; infer_instance
   have : LocallyOfFiniteType e := locallyOfFiniteType_of_comp e s
@@ -27,7 +34,8 @@ end MainStatements.Hodge.Pf.STALKDIM
 theorem MainStatements.Hodge.Pf.stalkdim : StalkDimSt := by
   intro k _ X s e g he hs p
   have hx := MainStatements.Hodge.Pf.STALKDIM.isClosed_point X s e g he hs p
-  let σ : CommRingCat.of k ⟶ X.presheaf.stalk (e.base p) := Spec.preimage (X.fromSpecStalk (e.base p) ≫ s)
+  let σ : CommRingCat.of k ⟶ X.presheaf.stalk (e.base p) :=
+    Spec.preimage (X.fromSpecStalk (e.base p) ≫ s)
   have hσ : X.fromSpecStalk (e.base p) ≫ s = Spec.map (CommRingCat.ofHom σ.hom) := by
     rw [CommRingCat.ofHom_hom, Spec.map_preimage]
   have hloc : IsLocalHom σ.hom := by
@@ -36,7 +44,8 @@ theorem MainStatements.Hodge.Pf.stalkdim : StalkDimSt := by
     · subst h0
       simp at ha
     · exact isUnit_iff_ne_zero.mpr h0
-  obtain ⟨-, -, -, hdim⟩ := GlobalTheory.StabFlat.stalk_of_smooth_local k X s g hs (e.base p) hx σ.hom hσ hloc
+  obtain ⟨-, -, -, hdim⟩ :=
+    GlobalTheory.StabFlat.stalk_of_smooth_local k X s g hs (e.base p) hx σ.hom hσ hloc
   rw [IsLocalRing.maximalIdeal_eq_bot, Ideal.map_bot] at hdim
   rw [← hdim]
   exact (ringKrullDim_eq_of_ringEquiv (RingEquiv.quotientBot _)).symm

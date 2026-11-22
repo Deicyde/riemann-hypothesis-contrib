@@ -17,9 +17,11 @@ namespace TameFlat
 
 open TensorProduct
 
-theorem flat_of_retraction {A B R : Type} [CommRing A] [CommRing B] [Algebra A B]
-    [AddCommGroup R] [Module A R] (e : B →ₗ[A] A) (he : e 1 = 1)
-    [Module.Flat B (B ⊗[A] R)] : Module.Flat A R := by
+theorem flat_of_retraction
+    {A B R : Type} [CommRing A] [CommRing B] [Algebra A B] [AddCommGroup R] [Module A R]
+    (e : B →ₗ[A] A) (he : e 1 = 1)
+    [Module.Flat B (B ⊗[A] R)]
+    : Module.Flat A R := by
   classical
   rw [Module.Flat.iff_rTensor_injective']
   intro I
@@ -37,19 +39,20 @@ theorem flat_of_retraction {A B R : Type} [CommRing A] [CommRing B] [Algebra A B
     | smul d x _ hx => intro c; rw [smul_eq_mul, ← mul_assoc]; exact hx (c * d)
   set J : Ideal B := I.map (algebraMap A B)
 
-  let eJ : J →ₗ[A] I := LinearMap.codRestrict (I.restrictScalars A)
-    (e ∘ₗ J.subtype.restrictScalars A) (fun z => by simpa using hmem z z.2 1)
+  let eJ : J →ₗ[A] I :=
+    LinearMap.codRestrict (I.restrictScalars A) (e ∘ₗ J.subtype.restrictScalars A)
+      (fun z => by simpa using hmem z z.2 1)
   have heJ : eJ ∘ₗ Algebra.idealMap B I = LinearMap.id := by
     ext i
     change e (algebraMap A B (i : A)) = (i : A)
     rw [Algebra.algebraMap_eq_smul_one, map_smul, he, smul_eq_mul, mul_one]
 
   let Φ : I ⊗[A] R →ₗ[A] J ⊗[B] (B ⊗[A] R) :=
-    (AlgebraTensorModule.cancelBaseChange A B B J R).symm.toLinearMap.restrictScalars A ∘ₗ
-      TensorProduct.map (Algebra.idealMap B I) LinearMap.id
+    (AlgebraTensorModule.cancelBaseChange A B B J R).symm.toLinearMap.restrictScalars A
+      ∘ₗ TensorProduct.map (Algebra.idealMap B I) LinearMap.id
   let Ψ : J ⊗[B] (B ⊗[A] R) →ₗ[A] I ⊗[A] R :=
-    TensorProduct.map eJ LinearMap.id ∘ₗ
-      (AlgebraTensorModule.cancelBaseChange A B B J R).toLinearMap.restrictScalars A
+    TensorProduct.map eJ LinearMap.id
+      ∘ₗ (AlgebraTensorModule.cancelBaseChange A B B J R).toLinearMap.restrictScalars A
   have hΨΦ : ∀ x, Ψ (Φ x) = x := by
     intro x
     have : Ψ ∘ₗ Φ = LinearMap.id := by
@@ -62,8 +65,10 @@ theorem flat_of_retraction {A B R : Type} [CommRing A] [CommRing B] [Algebra A B
   have hinc : Function.Injective (LinearMap.rTensor (B ⊗[A] R) J.subtype) :=
     Module.Flat.iff_rTensor_injective'.mp inferInstance J
 
-  have hkey : ∀ x, TensorProduct.lid B (B ⊗[A] R) (LinearMap.rTensor (B ⊗[A] R) J.subtype (Φ x)) =
-      (1 : B) ⊗ₜ[A] TensorProduct.lid A R (LinearMap.rTensor R I.subtype x) := by
+  have hkey
+      : ∀ x,
+        TensorProduct.lid B (B ⊗[A] R) (LinearMap.rTensor (B ⊗[A] R) J.subtype (Φ x))
+          = (1 : B) ⊗ₜ[A] TensorProduct.lid A R (LinearMap.rTensor R I.subtype x) := by
     intro x
     induction x using TensorProduct.induction_on with
     | zero => simp
@@ -83,10 +88,12 @@ theorem flat_of_retraction {A B R : Type} [CommRing A] [CommRing B] [Algebra A B
     rw [hkey, hkey, hxy]
   rw [← hΨΦ x, ← hΨΦ y, h1]
 
-theorem exists_retraction {Γ A B : Type} [Group Γ] [Finite Γ] [CommRing A] [CommRing B]
-    [MulSemiringAction Γ B] [Algebra A B] [SMulCommClass Γ A B] [Algebra.IsInvariant A B Γ]
-    (hinj : Function.Injective (algebraMap A B)) (b : B) (hb : ∑ᶠ g : Γ, g • b = 1) :
-    ∃ e : B →ₗ[A] A, e 1 = 1 := by
+theorem exists_retraction
+    {Γ A B : Type} [Group Γ] [Finite Γ] [CommRing A] [CommRing B] [MulSemiringAction Γ B]
+    [Algebra A B] [SMulCommClass Γ A B] [Algebra.IsInvariant A B Γ]
+    (hinj : Function.Injective (algebraMap A B))
+    (b : B) (hb : ∑ᶠ g : Γ, g • b = 1)
+    : ∃ e : B →ₗ[A] A, e 1 = 1 := by
   classical
   have : Fintype Γ := Fintype.ofFinite Γ
   rw [finsum_eq_sum_of_fintype] at hb
@@ -114,16 +121,16 @@ theorem exists_retraction {Γ A B : Type} [Group Γ] [Finite Γ] [CommRing A] [C
 
 end TameFlat
 
-theorem flat_of_tame_descent :
-    ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B R C : Type) [CommRing A] [CommRing B] [CommRing R]
-      [CommRing C] [MulSemiringAction Γ B] [MulSemiringAction Γ C] [Algebra A B] [Algebra A R]
-      [Algebra B C] [Algebra R C] [Algebra A C] [IsScalarTower A B C] [IsScalarTower A R C]
-      [SMulCommClass Γ A B] [SMulCommClass Γ R C] [Algebra.IsInvariant A B Γ]
-      [Algebra.IsInvariant R C Γ], Function.Injective (algebraMap A B) →
-      Function.Injective (algebraMap R C) →
-      (∀ (g : Γ) (b : B), g • algebraMap B C b = algebraMap B C (g • b)) →
-      Algebra.IsPushout A B R C → Module.Flat B C → (∃ b : B, ∑ᶠ g : Γ, g • b = 1) →
-      Module.Flat A R := by
+theorem flat_of_tame_descent
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (A B R C : Type) [CommRing A] [CommRing B] [CommRing R]
+        [CommRing C] [MulSemiringAction Γ B] [MulSemiringAction Γ C] [Algebra A B] [Algebra A R]
+        [Algebra B C] [Algebra R C] [Algebra A C] [IsScalarTower A B C] [IsScalarTower A R C]
+        [SMulCommClass Γ A B] [SMulCommClass Γ R C] [Algebra.IsInvariant A B Γ]
+        [Algebra.IsInvariant R C Γ],
+      Function.Injective (algebraMap A B) → Function.Injective (algebraMap R C)
+        → (∀ (g : Γ) (b : B), g • algebraMap B C b = algebraMap B C (g • b))
+        → Algebra.IsPushout A B R C → Module.Flat B C → (∃ b : B, ∑ᶠ g : Γ, g • b = 1)
+        → Module.Flat A R := by
   intro Γ _ _ A B R C
   intros
   rename_i hAB _ _ hpo hflat htr

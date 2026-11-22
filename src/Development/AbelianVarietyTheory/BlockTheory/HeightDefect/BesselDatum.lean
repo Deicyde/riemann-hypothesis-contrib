@@ -8,7 +8,9 @@ public import Formalism.LocalRingCardinality.ConjSqrtMinusD
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta MeasureTheory IsDedekindDomain NumberField
 open scoped TensorProduct
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.BesselData
@@ -19,14 +21,10 @@ variable {D : D7}
 
 structure BesselDatum (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) where
   isom : HSpace.IsIsomEmb A B ι
-
   ρ : ℕ
   rank_eq : B.rank = A.rank + (2 * ρ + 1)
-
   e : Fin ρ → B.V
-
   f : Fin ρ → B.V
-
   z : B.V
   ee : ∀ i j, B.hD (e i) (e j) = 0
   ff : ∀ i j, B.hD (f i) (f j) = 0
@@ -37,7 +35,6 @@ structure BesselDatum (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) where
   ez : ∀ i, B.hD (e i) z = 0
   fz : ∀ i, B.hD (f i) z = 0
   zz : B.hD z z ≠ 0
-
   θ : D.host.E
   θ_ne : θ ≠ 0
 
@@ -72,15 +69,21 @@ def psiN (ψ : AddChar (AF D.host.F) ℂ) (n : GA D B) : ℂ :=
 def IsUnitPair (ν : Measure d.N) (𝓝 : Set d.N) : Prop :=
   ν.IsHaarMeasure ∧ IsFundamentalDomain d.NQ 𝓝 ν ∧ ν 𝓝 = 1
 
-def coeff (ψ : AddChar (AF D.host.F) ℂ) (ν : Measure d.N) (𝓝 : Set d.N) (F : GA D B → ℂ) (g : GA D B) : ℂ :=
+def coeff
+    (ψ : AddChar (AF D.host.F) ℂ) (ν : Measure d.N) (𝓝 : Set d.N) (F : GA D B → ℂ) (g : GA D B)
+    : ℂ :=
   ∫ n in 𝓝, F ((n : GA D B) * g) * star (d.psiN ψ (n : GA D B)) ∂ν
 
-def period (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (GA D A)) (𝓕 : Set (GA D A)) (ν : Measure d.N) (𝓝 : Set d.N)
-    (s : GA D A → GA D B) (φ : GA D A → ℂ) (F : GA D B → ℂ) : ℂ :=
+def period
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (GA D A)) (𝓕 : Set (GA D A)) (ν : Measure d.N)
+    (𝓝 : Set d.N) (s : GA D A → GA D B) (φ : GA D A → ℂ) (F : GA D B → ℂ)
+    : ℂ :=
   ∫ h in 𝓕, φ h * d.coeff ψ ν 𝓝 F (s h) ∂μ
 
-def Converges (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (GA D A)) (𝓕 : Set (GA D A)) (ν : Measure d.N) (𝓝 : Set d.N)
-    (s : GA D A → GA D B) (φ : GA D A → ℂ) (F : GA D B → ℂ) : Prop :=
+def Converges
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (GA D A)) (𝓕 : Set (GA D A)) (ν : Measure d.N)
+    (𝓝 : Set d.N) (s : GA D A → GA D B) (φ : GA D A → ℂ) (F : GA D B → ℂ)
+    : Prop :=
   ∀ g, IntegrableOn (fun h => φ h * d.coeff ψ ν 𝓝 (rTr B g F) (s h)) 𝓕 μ
 
 def ExSet (ε : AE D) (i : Fin (d.ρ + 1)) : Set (GA D B) :=
@@ -93,21 +96,23 @@ def ExSet (ε : AE D) (i : Fin (d.ρ + 1)) : Set (GA D B) :=
 
 def Ex (ε : AE D) (i : Fin (d.ρ + 1)) : Subgroup (GA D B) := Subgroup.closure (d.ExSet ε i)
 
-def exch (ε : AE D) (i : Fin (d.ρ + 1)) (m : Measure (d.Ex ε i)) (b : (GA D B → ℂ) → ℂ) : (GA D B → ℂ) → ℂ :=
-  fun F => ∫ u, b (rTr B (u : GA D B) F) ∂m
+def exch (ε : AE D) (i : Fin (d.ρ + 1)) (m : Measure (d.Ex ε i)) (b : (GA D B → ℂ) → ℂ)
+    : (GA D B → ℂ) → ℂ := fun F =>
+  ∫ u, b (rTr B (u : GA D B) F) ∂m
 
-def toPos (ε : AE D) (m : ∀ i, Measure (d.Ex ε i)) (p : ℕ) (b : (GA D B → ℂ) → ℂ) : (GA D B → ℂ) → ℂ :=
-  ((List.finRange (d.ρ + 1)).filter fun i => decide (p ≤ i.1)).foldr (fun i b' => d.exch ε i (m i) b') b
+def toPos (ε : AE D) (m : ∀ i, Measure (d.Ex ε i)) (p : ℕ) (b : (GA D B → ℂ) → ℂ)
+    : (GA D B → ℂ) → ℂ :=
+  ((List.finRange (d.ρ + 1)).filter fun i => decide (p ≤ i.1)).foldr
+    (fun i b' => d.exch ε i (m i) b')
+    b
 
 end BesselDatum
 
 structure PosDatum (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) where
   bes : BesselDatum A B ι
   n : ℕ
-
   ε : Fin n → AE D
   split : ∀ a, IsSplitIdem D (ε a)
-
   apart : ∀ a b, a ≠ b → (ε a + cA D (ε a)) * (ε b + cA D (ε b)) = 0
   p : Fin n → ℕ
   one_le : ∀ a, 1 ≤ p a
@@ -134,8 +139,11 @@ def sym (d : BesselDatum A B ι) : PosDatum A B ι where
 def move (P : PosDatum A B ι) (b : (GA D B → ℂ) → ℂ) : (GA D B → ℂ) → ℂ :=
   (List.finRange P.n).foldr (fun a b' => P.bes.toPos (P.ε a) (P.m a) (P.p a) b') b
 
-def period (P : PosDatum A B ι) (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (GA D A)) (𝓕 : Set (GA D A))
-    (ν : Measure P.bes.N) (𝓝 : Set P.bes.N) (s : GA D A → GA D B) (φ : GA D A → ℂ) (F : GA D B → ℂ) : ℂ :=
+def period
+    (P : PosDatum A B ι)
+    (ψ : AddChar (AF D.host.F) ℂ) (μ : Measure (GA D A)) (𝓕 : Set (GA D A)) (ν : Measure P.bes.N)
+    (𝓝 : Set P.bes.N) (s : GA D A → GA D B) (φ : GA D A → ℂ) (F : GA D B → ℂ)
+    : ℂ :=
   P.move (P.bes.period ψ μ 𝓕 ν 𝓝 s φ) F
 
 end PosDatum
@@ -175,7 +183,8 @@ def memberDatum (D : D7) (u : D.what₂.Word) : BesselDatum (D.sp.X 0) (D.sp.Y 0
   ef := fun i j => by
     have := hT_swap (D.sp.hyp_ef i j)
     unfold HSpace.hD
-    rw [this]; split_ifs <;> simp
+    rw [this]
+    split_ifs <;> simp
   eA := fun i x => (D.sp.hyp_orthX i x).1
   fA := fun i x => (D.sp.hyp_orthX i x).2
   zA := fun x => by
@@ -196,7 +205,8 @@ def memberDatum (D : D7) (u : D.what₂.Word) : BesselDatum (D.sp.X 0) (D.sp.Y 0
   θ := D.host.xi0
   θ_ne := embedding_xi_zero_ne_zero D
 
-theorem odd_codim {A B : HSp D} {ι : A.V →ₗ[D.host.E] B.V} (d : BesselDatum A B ι) : Odd (B.rank - A.rank) :=
+theorem odd_codim {A B : HSp D} {ι : A.V →ₗ[D.host.E] B.V} (d : BesselDatum A B ι)
+    : Odd (B.rank - A.rank) :=
   ⟨d.ρ, by rw [d.rank_eq]; omega⟩
 
 def PlaceDivides (D : D7) (ε : AE D) (π : 𝓞 D.host.E) : Prop :=
@@ -205,53 +215,84 @@ def PlaceDivides (D : D7) (ε : AE D) (π : 𝓞 D.host.E) : Prop :=
 def IsNormGen (D : D7) (π : 𝓞 D.host.E) (p : ℕ) : Prop :=
   (π : D.host.E) ∈ D.host.K ∧ (π : D.host.E) * D.host.conj (π : D.host.E) = (p : D.host.E)
 
-structure BesselTied (D : D7) (X : ThetaX D) (T : ThetaTied D X) (Wl : WeilTied D X T)
-    (piT : D.what₂.Word → 𝓞 D.host.E) (piGbar : Fin 2 → 𝓞 D.host.E) where
+structure BesselTied
+    (D : D7) (X : ThetaX D) (T : ThetaTied D X)
+    (Wl : WeilTied D X T) (piT : D.what₂.Word → 𝓞 D.host.E) (piGbar : Fin 2 → 𝓞 D.host.E) where
   piT_norm : ∀ u, IsNormGen D (piT u) (D.mem u).A.T
   piGbar_norm : ∀ i, IsNormGen D (piGbar i) (D.host.g i)
-
-  dat : ∀ (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V), HSpace.IsIsomEmb A B ι → Odd (B.rank - A.rank) →
-    X.Pos A B ι → PosDatum A B ι
-
+  dat
+    : ∀ (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V),
+      HSpace.IsIsomEmb A B ι → Odd (B.rank - A.rank) → X.Pos A B ι → PosDatum A B ι
   dat_surj : ∀ A B ι h h', Function.Surjective (dat A B ι h h')
-
-  per : ∀ (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) (h : HSpace.IsIsomEmb A B ι) (h' : Odd (B.rank - A.rank))
-    (p : X.Pos A B ι), A.SigOK → ∀ μ 𝓕, IsVolPair D A μ 𝓕 →
-    ∀ ν 𝓝, (dat A B ι h h' p).bes.IsUnitPair ν 𝓝 →
-    ∀ s : GA D A → GA D B, (∀ g, EmbRel B A ι (s g) g) →
-    ∀ (σ : X.FJd A B ι) (φ : X.AF A) (F : X.cusp B),
-      (dat A B ι h h' p).bes.Converges Wl.ψ μ 𝓕 ν 𝓝 s (fun g => star (T.ev A φ g)) (T.ev B (F : X.AF B)) →
-      X.Bper A B ι p σ φ F = (T.petC A : ℂ) *
-        (dat A B ι h h' p).period Wl.ψ μ 𝓕 ν 𝓝 s (fun g => star (T.ev A φ g)) (T.ev B (F : X.AF B))
-
-  posSym : ∀ u, dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.posSym u) =
-    PosDatum.sym (memberDatum D u)
-
-  pos_bessel_eq_memberDatum : ∀ u, (dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.pos1 u)).bes = memberDatum D u
-
-  pos_bessel_p_eq_one : ∀ u a, (dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.pos1 u)).p a = 1
-
-  pos_split_places : ∀ u ε, IsSplitIdem D ε →
-    ((∃ a, (dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.pos1 u)).ε a = ε) ↔
-      (PlaceDivides D ε (piT u) ∨ ∃ i, PlaceDivides D ε (piGbar i)))
+  per
+    : ∀ (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) (h : HSpace.IsIsomEmb A B ι)
+        (h' : Odd (B.rank - A.rank)) (p : X.Pos A B ι),
+      A.SigOK
+        → ∀ μ 𝓕,
+          IsVolPair D A μ 𝓕
+            → ∀ ν 𝓝,
+              (dat A B ι h h' p).bes.IsUnitPair ν 𝓝
+                → ∀ s : GA D A → GA D B,
+                  (∀ g, EmbRel B A ι (s g) g)
+                    → ∀ (σ : X.FJd A B ι) (φ : X.AF A) (F : X.cusp B),
+                      (dat A B ι h h' p).bes.Converges Wl.ψ μ 𝓕 ν 𝓝 s
+                          (fun g => star (T.ev A φ g))
+                          (T.ev B (F : X.AF B))
+                        → X.Bper A B ι p σ φ F
+                          = (T.petC A : ℂ) * (dat A B ι h h' p).period Wl.ψ μ 𝓕 ν 𝓝 s
+                            (fun g => star (T.ev A φ g))
+                            (T.ev B (F : X.AF B))
+  posSym
+    : ∀ u,
+      dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.posSym u)
+        = PosDatum.sym (memberDatum D u)
+  pos_bessel_eq_memberDatum
+    : ∀ u,
+      (dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.pos1 u)).bes
+        = memberDatum D u
+  pos_bessel_p_eq_one
+    : ∀ u a, (dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.pos1 u)).p a = 1
+  pos_split_places
+    : ∀ u ε,
+      IsSplitIdem D ε
+        → ((∃ a,
+            (dat _ _ _ (memberDatum D u).isom (odd_codim (memberDatum D u)) (X.pos1 u)).ε a = ε)
+          ↔ (PlaceDivides D ε (piT u) ∨ ∃ i, PlaceDivides D ε (piGbar i)))
 
 def ConvergesDef (D : D7) : Prop :=
   ∀ (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) (d : BesselDatum A B ι) (ψ : AddChar (AF D.host.F) ℂ),
-    IsCharAF D.host.F ψ → A.SigOK → A.IsDefinite → ∀ μ 𝓕, IsVolPair D A μ 𝓕 → ∀ ν 𝓝, d.IsUnitPair ν 𝓝 →
-    ∀ s : GA D A → GA D B, (∀ g, EmbRel B A ι (s g) g) →
-    ∀ φ F, IsAutFun A φ → IsAutFun B F → d.Converges ψ μ 𝓕 ν 𝓝 s φ F
+    IsCharAF D.host.F ψ → A.SigOK → A.IsDefinite
+      → ∀ μ 𝓕,
+        IsVolPair D A μ 𝓕
+          → ∀ ν 𝓝,
+            d.IsUnitPair ν 𝓝
+              → ∀ s : GA D A → GA D B,
+                (∀ g, EmbRel B A ι (s g) g)
+                  → ∀ φ F, IsAutFun A φ → IsAutFun B F → d.Converges ψ μ 𝓕 ν 𝓝 s φ F
 
 def ExchangeFinite (D : D7) : Prop :=
   ∀ (A B : HSp D) (ι : A.V →ₗ[D.host.E] B.V) (P : PosDatum A B ι) (ψ : AddChar (AF D.host.F) ℂ),
-    IsStdChar D ψ (-1) → A.SigOK → ∀ μ 𝓕, IsVolPair D A μ 𝓕 → ∀ ν 𝓝, P.bes.IsUnitPair ν 𝓝 →
-    ∀ s : GA D A → GA D B, (∀ g, EmbRel B A ι (s g) g) →
-    ∀ φ F, IsAutFun A φ → IsAutFun B F → P.bes.Converges ψ μ 𝓕 ν 𝓝 s φ F →
-    ∀ ε, IsSplitIdem D ε → (∀ a, (ε + cA D ε) * (P.ε a + cA D (P.ε a)) = 0) →
-    ∀ m : ∀ i, Measure (P.bes.Ex ε i), (∀ i, (m i).IsHaarMeasure) → ∀ i : Fin (P.bes.ρ + 1), 1 ≤ i.1 →
-      IsLocallyConstant (fun u : P.bes.Ex ε i =>
-        P.bes.toPos ε m (i.1 + 1) (P.period ψ μ 𝓕 ν 𝓝 s φ) (rTr B (u : GA D B) F)) ∧
-      HasCompactSupport (fun u : P.bes.Ex ε i =>
-        P.bes.toPos ε m (i.1 + 1) (P.period ψ μ 𝓕 ν 𝓝 s φ) (rTr B (u : GA D B) F))
+    IsStdChar D ψ (-1) → A.SigOK
+      → ∀ μ 𝓕,
+        IsVolPair D A μ 𝓕
+          → ∀ ν 𝓝,
+            P.bes.IsUnitPair ν 𝓝
+              → ∀ s : GA D A → GA D B,
+                (∀ g, EmbRel B A ι (s g) g)
+                  → ∀ φ F,
+                    IsAutFun A φ → IsAutFun B F → P.bes.Converges ψ μ 𝓕 ν 𝓝 s φ F
+                      → ∀ ε,
+                        IsSplitIdem D ε → (∀ a, (ε + cA D ε) * (P.ε a + cA D (P.ε a)) = 0)
+                          → ∀ m : ∀ i, Measure (P.bes.Ex ε i),
+                            (∀ i, (m i).IsHaarMeasure)
+                              → ∀ i : Fin (P.bes.ρ + 1),
+                                1 ≤ i.1
+                                  → IsLocallyConstant (fun u : P.bes.Ex ε i =>
+                                      P.bes.toPos ε m (i.1 + 1) (P.period ψ μ 𝓕 ν 𝓝 s φ)
+                                        (rTr B (u : GA D B) F))
+                                    ∧ HasCompactSupport (fun u : P.bes.Ex ε i =>
+                                      P.bes.toPos ε m (i.1 + 1) (P.period ψ μ 𝓕 ν 𝓝 s φ)
+                                        (rTr B (u : GA D B) F))
 
 end GlobalTheory.IndefiniteRowSideFullHecke.BesselData
 

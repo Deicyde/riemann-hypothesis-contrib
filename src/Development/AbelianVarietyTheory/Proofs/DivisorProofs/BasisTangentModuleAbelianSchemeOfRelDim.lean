@@ -9,9 +9,12 @@ public import Development.AbelianVarietyTheory.Statements.FundamentalDomains.Exi
 
 @[expose] public section
 
-open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry NumberField IsLocalRing
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+  NumberField IsLocalRing
 open scoped CategoryTheory.Obj Matrix TensorProduct
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Out
+  ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj
 open ReciprocityTheory.ChartRestriction.G.PullbackSections (TanM tv)
 open GlobalTheory.KS (rsT pbT C1 IsCoc IsCob)
 open GlobalTheory.LogKS (IsField)
@@ -25,15 +28,17 @@ noncomputable section
 
 namespace GlobalTheory.TanBasisDim
 
-
 open ReciprocityTheory.ChartRestriction.G.PullbackSections in
-theorem basis_tanM_of_dim {R : Type} [CommRing R] [IsLocalRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
-    (d : ℕ) (hG : SmoothOfRelativeDimension d G.hom) :
-    Nonempty (Module.Basis (Fin d) R (TanM (𝟙 (Sp R)) G)) := by
+theorem basis_tanM_of_dim
+    {R : Type} [CommRing R] [IsLocalRing R]
+    (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G]
+    (d : ℕ) (hG : SmoothOfRelativeDimension d G.hom)
+    : Nonempty (Module.Basis (Fin d) R (TanM (𝟙 (Sp R)) G)) := by
   have hS := isGrpPullback_pullback G (𝟙 (Sp R))
   have hsm : SmoothOfRelativeDimension d ((Over.pullback (𝟙 (Sp R))).obj G).hom := by
     show SmoothOfRelativeDimension d (pullback.snd _ _)
-    exact (smoothOfRelativeDimension_isStableUnderBaseChange d).of_isPullback (IsPullback.of_hasPullback _ _) hG
+    exact (smoothOfRelativeDimension_isStableUnderBaseChange d).of_isPullback
+      (IsPullback.of_hasPullback _ _) hG
   obtain ⟨v, hv⟩ := GlobalTheory.KeyPow.exists_isLieBasis ((Over.pullback (𝟙 (Sp R))).obj G) hsm
   let b : Fin d → TanM (𝟙 (Sp R)) G := fun i =>
     mkT (pushHom hS (epsR R) (v i)) ((isTangent_iff hS _).1 (hv.1 i))
@@ -66,7 +71,11 @@ theorem basis_tanM_of_dim {R : Type} [CommRing R] [IsLocalRing R] (G : Over (Sp 
     rw [ha]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-theorem basis_tanM_abelian : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (d : ℕ), IsAbelianScheme G → SmoothOfRelativeDimension d G.hom → Nonempty (Module.Basis (Fin d) R (TanM (𝟙 (Sp R)) G)) := by
+theorem basis_tanM_abelian
+    : ∀ (R : Type) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] (G : Over (Sp R)) [GrpObj G]
+        [IsCommMonObj G] (d : ℕ),
+      IsAbelianScheme G → SmoothOfRelativeDimension d G.hom
+        → Nonempty (Module.Basis (Fin d) R (TanM (𝟙 (Sp R)) G)) := by
   intro R _ _ _ G _ _ d _ hG
   exact basis_tanM_of_dim G d hG
 

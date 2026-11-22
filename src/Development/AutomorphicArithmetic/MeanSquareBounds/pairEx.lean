@@ -8,22 +8,29 @@ public import Development.AutomorphicArithmetic.MeanSquareBounds.IndDrop
 
 @[expose] public section
 
-open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2 Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
+open Finset Formalism.HermitianLattices.ZeroFreeRegionGL2
+  Formalism.HermitianLattices.Ext.LogarithmicIntegralBounds
 
 namespace QH
 
-private theorem pairEx_lift {N L : ℕ} [NeZero L] (h : N ∣ L) (ξ : DirichletCharacter ℂ N) (n : ℕ) (hn : n.Coprime L) :
-    DirichletCharacter.changeLevel h ξ (n : ZMod L) = ξ (n : ZMod N) := by
+private theorem pairEx_lift
+    {N L : ℕ} [NeZero L] (h : N ∣ L) (ξ : DirichletCharacter ℂ N) (n : ℕ) (hn : n.Coprime L)
+    : DirichletCharacter.changeLevel h ξ (n : ZMod L) = ξ (n : ZMod N) := by
   have ha : IsCoprime (n : ℤ) (L : ℤ) := Nat.isCoprime_iff_coprime.mpr hn
   have key := DirichletCharacter.changeLevel_eq_cast_of_dvd' ξ h ha
   simpa using key
 
-private theorem pairEx_box (M : ℕ) (hM : 0 < M) (C τ Y X z z' : ℝ) (q d : ℕ) (hR : Rows z z' q d) (hq : 8 * M < q)
+private theorem pairEx_box
+    (M : ℕ) (hM : 0 < M)
+    (C τ Y X z z' : ℝ) (q d : ℕ) (hR : Rows z z' q d) (hq : 8 * M < q)
     (hQ : GoodQ (8 * M) C τ Y X z q) (hD : GoodD (8 * M) C τ Y X z z' q d)
-    (f : ℕ → ℂ) (ξ : DirichletCharacter ℂ (8 * M)) (hf : ∀ n : ℕ, n.Coprime (8 * M) → ξ (n : ZMod (8 * M)) = f n)
-    (i j : Fin 2) (hij : i ≠ 0 ∨ j ≠ 0) (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N)
-    (hI : Formalism.HC.An.Induces χ (UpperTheory.Top.tw f q d i j) (2 * M * q * d)) :
-    Box (8 * M * Real.exp z * Real.exp z' ^ (j : ℕ)) C τ Y X χ := by
+    (f : ℕ → ℂ) (ξ : DirichletCharacter ℂ (8 * M))
+    (hf : ∀ n : ℕ, n.Coprime (8 * M) → ξ (n : ZMod (8 * M)) = f n)
+    (i j : Fin 2) (hij : i ≠ 0 ∨ j ≠ 0)
+    (N : ℕ) [NeZero N]
+    (χ : DirichletCharacter ℂ N)
+    (hI : Formalism.HC.An.Induces χ (UpperTheory.Top.tw f q d i j) (2 * M * q * d))
+    : Box (8 * M * Real.exp z * Real.exp z' ^ (j : ℕ)) C τ Y X χ := by
   have hq2 : q ≠ 2 := by
     intro h2
     have hm := hR.q_mod
@@ -62,8 +69,8 @@ private theorem pairEx_box (M : ℕ) (hM : 0 < M) (C τ Y X z z' : ℝ) (q d : �
     refine (congrArg (fun Q => Box Q C τ Y X χ) ?_).mpr hB
     simp [Real.exp_add, mul_assoc]
 
-private theorem pairEx_g {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (h : χ ≠ 1) (y : ℝ) :
-    Formalism.HC.An.gChi χ y = Gchi χ y := by
+private theorem pairEx_g {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (h : χ ≠ 1) (y : ℝ)
+    : Formalism.HC.An.gChi χ y = Gchi χ y := by
   unfold Formalism.HC.An.gChi
   rw [if_neg h]
   unfold Formalism.HC.An.sumLamChi Gchi
@@ -80,11 +87,14 @@ private theorem pairEx_g {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) (h
     linarith
   rw [max_eq_left hnn]
 
-private theorem log_exp_product_bounds (M : ℕ) (hM : 0 < M) (ε Y : ℝ) (hε : 0 < ε)
-    (hY : Real.exp (1 + Real.log (8 * M)) ≤ Y) (j : ℕ) (hj : j ≤ 1) :
-    Y ^ (ε / 6) ≤ Real.log (8 * M * Real.exp (Y ^ (ε / 5)) * Real.exp (Y ^ (ε / 5) * Real.log Y ^ 2) ^ j) ∧
-    Real.log (8 * M * Real.exp (Y ^ (ε / 5)) * Real.exp (Y ^ (ε / 5) * Real.log Y ^ 2) ^ j)
-      ≤ 3 * Y ^ (ε / 5) * Real.log Y ^ 2 := by
+private theorem log_exp_product_bounds
+    (M : ℕ) (hM : 0 < M)
+    (ε Y : ℝ) (hε : 0 < ε) (hY : Real.exp (1 + Real.log (8 * M)) ≤ Y)
+    (j : ℕ) (hj : j ≤ 1)
+    : Y ^ (ε / 6)
+        ≤ Real.log (8 * M * Real.exp (Y ^ (ε / 5)) * Real.exp (Y ^ (ε / 5) * Real.log Y ^ 2) ^ j)
+      ∧ Real.log (8 * M * Real.exp (Y ^ (ε / 5)) * Real.exp (Y ^ (ε / 5) * Real.log Y ^ 2) ^ j)
+        ≤ 3 * Y ^ (ε / 5) * Real.log Y ^ 2 := by
   have hM1 : (1 : ℝ) ≤ M := by exact_mod_cast hM
   have hM8 : (1 : ℝ) ≤ 8 * M := by linarith
   have hlog8 : 0 ≤ Real.log (8 * M) := Real.log_nonneg hM8
@@ -98,8 +108,9 @@ private theorem log_exp_product_bounds (M : ℕ) (hM : 0 < M) (ε Y : ℝ) (hε 
   have hL1 : 1 ≤ L := by linarith
   have hL2 : L ≤ L ^ 2 := by nlinarith
   have hwL : L ^ 2 ≤ w * L ^ 2 := by nlinarith
-  have hlogQ : Real.log (8 * M * Real.exp w * Real.exp (w * L ^ 2) ^ j)
-      = Real.log (8 * M) + w + j * (w * L ^ 2) := by
+  have hlogQ
+      : Real.log (8 * M * Real.exp w * Real.exp (w * L ^ 2) ^ j)
+        = Real.log (8 * M) + w + j * (w * L ^ 2) := by
     rw [← Real.exp_nat_mul, mul_assoc, ← Real.exp_add,
       Real.log_mul (ne_of_gt (by linarith)) (Real.exp_pos _).ne', Real.log_exp]
     ring
@@ -113,8 +124,7 @@ private theorem log_exp_product_bounds (M : ℕ) (hM : 0 < M) (ε Y : ℝ) (hε 
     have a2 : (j : ℝ) * (w * L ^ 2) ≤ w * L ^ 2 := by nlinarith
     linarith
 
-theorem pairEx :
-    UpperTheory.Top.PairEx := by
+theorem pairEx : UpperTheory.Top.PairEx := by
   intro M hM eps A heps heps' hA
   obtain ⟨C, hC, hpair⟩ := pair_exists
   obtain ⟨Y₀, hY₀⟩ := hpair eps (eps / 2) A (8 * M) heps heps' (by linarith) hA (by omega)
@@ -130,8 +140,8 @@ theorem pairEx :
     have := Real.log_nonneg hY1
     positivity
   have hA2 : 1 ≤ A ^ 2 := by nlinarith
-  obtain ⟨q, d, hR, hq, hQ, hD⟩ := hY₀ Y hYa (Y ^ A) (Y ^ (eps / 5) * Real.log Y ^ 2) le_rfl le_rfl
-    (le_mul_of_one_le_left hz0 hA2)
+  obtain ⟨q, d, hR, hq, hQ, hD⟩ :=
+    hY₀ Y hYa (Y ^ A) (Y ^ (eps / 5) * Real.log Y ^ 2) le_rfl le_rfl (le_mul_of_one_le_left hz0 hA2)
   have hq2 : q ≠ 2 := by
     intro h2
     have hm := hR.q_mod
@@ -154,22 +164,29 @@ theorem pairEx :
     exact Nat.Coprime.mul_right ((Nat.Prime.coprime_iff_not_dvd hR.q_prime).mpr hqM).symm
       ((Nat.Prime.coprime_iff_not_dvd hR.d_prime).mpr hdM).symm
   · intro ξ i j hij N _ χ hI y hy1 hy2
-    have hB := pairEx_box M hM C (eps / 2) Y (Y ^ A) (Y ^ (eps / 5)) (Y ^ (eps / 5) * Real.log Y ^ 2) q d
-      hR hq hQ hD (fun a ↦ ξ a) (DirichletCharacter.changeLevel hM8 ξ)
-      (fun n hn => pairEx_lift hM8 ξ n hn) i j hij N χ hI
+    have hB :=
+      pairEx_box M hM C (eps / 2) Y (Y ^ A) (Y ^ (eps / 5)) (Y ^ (eps / 5) * Real.log Y ^ 2) q d hR
+        hq hQ hD
+        (fun a ↦ ξ a)
+        (DirichletCharacter.changeLevel hM8 ξ)
+        (fun n hn => pairEx_lift hM8 ξ n hn)
+        i j hij N χ hI
     obtain ⟨hgood, _, hG⟩ := hB
     have hne : χ ≠ 1 := hgood.1
     constructor
     · rw [pairEx_g χ hne]
       exact hG y ⟨hy1, hy2⟩
-    · obtain ⟨hk1, hk2⟩ := log_exp_product_bounds M hM eps Y heps hYc (j : ℕ) (Nat.lt_succ_iff.mp j.isLt)
+    · obtain ⟨hk1, hk2⟩ :=
+        log_exp_product_bounds M hM eps Y heps hYc (j : ℕ) (Nat.lt_succ_iff.mp j.isLt)
       have hk := hY₁ Y hYb _ N χ hk1 hk2 hgood
       have hlog : Real.log Y ≤ Real.log y := Real.log_le_log (by linarith) hy1
       exact le_trans hk (by linarith)
   · intro ρ hρ hρN i j hij N _ χ hI
-    have hB := pairEx_box M hM C (eps / 2) Y (Y ^ A) (Y ^ (eps / 5)) (Y ^ (eps / 5) * Real.log Y ^ 2) q d
-      hR hq hQ hD ρ.val (DirichletCharacter.changeLevel hρN ρ.χ)
-      (fun n hn => pairEx_lift hρN ρ.χ n hn) i j hij N χ hI
+    have hB :=
+      pairEx_box M hM C (eps / 2) Y (Y ^ A) (Y ^ (eps / 5)) (Y ^ (eps / 5) * Real.log Y ^ 2) q d hR
+        hq hQ hD ρ.val (DirichletCharacter.changeLevel hρN ρ.χ)
+        (fun n hn => pairEx_lift hρN ρ.χ n hn)
+        i j hij N χ hI
     exact hB.1.2.2
 
 end QH

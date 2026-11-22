@@ -9,29 +9,37 @@ namespace GlobalTheory.DoubleCosetIndicator
 def dc {G : Type} [Group G] (R K : Subgroup G) (t : G) : Set G :=
   {x : G | ∃ r ∈ R, ∃ κ ∈ K, x = r * t * κ}
 
-theorem dc_subset {G : Type} [Group G] (R K : Subgroup G) {s t x : G}
-    (hs : x ∈ dc R K s) (ht : x ∈ dc R K t) : dc R K s ⊆ dc R K t := by
+theorem dc_subset
+    {G : Type} [Group G] (R K : Subgroup G) {s t x : G} (hs : x ∈ dc R K s) (ht : x ∈ dc R K t)
+    : dc R K s ⊆ dc R K t := by
   rintro y ⟨a, ha, b, hb, rfl⟩
   obtain ⟨r, hr, κ, hκ, hx⟩ := hs
   obtain ⟨r', hr', κ', hκ', hx'⟩ := ht
   have hrs : r * s * κ = r' * t * κ' := hx.symm.trans hx'
   have hs' : s = r⁻¹ * r' * t * κ' * κ⁻¹ := by
-    calc s = r⁻¹ * (r * s * κ) * κ⁻¹ := by group
+    calc
+      s = r⁻¹ * (r * s * κ) * κ⁻¹ := by group
       _ = r⁻¹ * (r' * t * κ') * κ⁻¹ := by rw [hrs]
       _ = r⁻¹ * r' * t * κ' * κ⁻¹ := by group
-  refine ⟨a * r⁻¹ * r', R.mul_mem (R.mul_mem ha (R.inv_mem hr)) hr', κ' * κ⁻¹ * b,
-    K.mul_mem (K.mul_mem hκ' (K.inv_mem hκ)) hb, ?_⟩
+  refine ⟨
+    a * r⁻¹ * r',
+    R.mul_mem (R.mul_mem ha (R.inv_mem hr)) hr',
+    κ' * κ⁻¹ * b,
+    K.mul_mem (K.mul_mem hκ' (K.inv_mem hκ)) hb,
+    ?_
+  ⟩
   rw [hs']
   group
 
-theorem exists_eq_sum_indicator {G : Type} [Group G] {M : Type} [AddCommMonoid M]
-    (R K : Subgroup G) (T : Finset G) (φ : G → M)
-    (hR : ∀ r ∈ R, ∀ x : G, φ (r * x) = φ x) (hK : ∀ κ ∈ K, ∀ x : G, φ (x * κ) = φ x)
-    (hT : ∀ x : G, φ x ≠ 0 → ∃ t ∈ T, x ∈ dc R K t) :
-    ∃ c : G → M, (∀ t : G, c t = 0 ∨ c t = φ t) ∧
-      ∀ x : G, φ x = ∑ t ∈ T, Set.indicator (dc R K t) (fun _ => c t) x := by
+theorem exists_eq_sum_indicator
+    {G : Type} [Group G]
+    {M : Type} [AddCommMonoid M]
+    (R K : Subgroup G) (T : Finset G) (φ : G → M) (hR : ∀ r ∈ R, ∀ x : G, φ (r * x) = φ x)
+    (hK : ∀ κ ∈ K, ∀ x : G, φ (x * κ) = φ x) (hT : ∀ x : G, φ x ≠ 0 → ∃ t ∈ T, x ∈ dc R K t)
+    : ∃ c : G → M,
+      (∀ t : G, c t = 0 ∨ c t = φ t)
+        ∧ ∀ x : G, φ x = ∑ t ∈ T, Set.indicator (dc R K t) (fun _ => c t) x := by
   classical
-
   let S : G → Finset G := fun t => T.filter (fun t' => dc R K t' = dc R K t)
   let rep : G → G := fun t => if h : (S t).Nonempty then h.choose else t
   let c : G → M := fun t => if t ∈ T ∧ rep t = t then φ t else 0
@@ -79,7 +87,17 @@ theorem exists_eq_sum_indicator {G : Type} [Group G] {M : Type} [AddCommMonoid M
     symm
     exact Finset.sum_eq_zero fun t ht => Set.indicator_of_notMem (hx t ht) _
 
-theorem main : (let d1 : {G : Type} → [inst : Group G] → Subgroup G → Subgroup G → G → Set G := @(fun {G : Type} [Group G] (R K : Subgroup G) (t : G) ↦ {x : G | ∃ r ∈ R, ∃ κ ∈ K, x = r * t * κ}); ∀ {G : Type} [inst : Group G] {M : Type} [inst_1 : AddCommMonoid M] (R K : Subgroup G) (T : Finset G) (φ : G → M), (∀ r ∈ R, ∀ (x : G), φ (r * x) = φ x) → (∀ κ ∈ K, ∀ (x : G), φ (x * κ) = φ x) → (∀ (x : G), φ x ≠ (0 : M) → ∃ t ∈ T, x ∈ d1 R K t) → ∃ (c : G → M), (∀ (t : G), c t = (0 : M) ∨ c t = φ t) ∧ ∀ (x : G), φ x = ∑ t ∈ T, Set.indicator (d1 R K t) (fun (x : G) ↦ c t) x) := by
+theorem main
+    : (let d1 : {G : Type} → [inst : Group G] → Subgroup G → Subgroup G → G → Set G :=
+         @(fun {G : Type} [Group G] (R K : Subgroup G) (t : G) ↦
+           {x : G | ∃ r ∈ R, ∃ κ ∈ K, x = r * t * κ})
+       ∀ {G : Type} [inst : Group G] {M : Type} [inst_1 : AddCommMonoid M] (R K : Subgroup G)
+           (T : Finset G) (φ : G → M),
+         (∀ r ∈ R, ∀ (x : G), φ (r * x) = φ x) → (∀ κ ∈ K, ∀ (x : G), φ (x * κ) = φ x)
+           → (∀ (x : G), φ x ≠ (0 : M) → ∃ t ∈ T, x ∈ d1 R K t)
+           → ∃ (c : G → M),
+             (∀ (t : G), c t = (0 : M) ∨ c t = φ t)
+               ∧ ∀ (x : G), φ x = ∑ t ∈ T, Set.indicator (d1 R K t) (fun (x : G) ↦ c t) x) := by
   intro d1 G _ M _ R K T φ hR hK hT
   exact exists_eq_sum_indicator R K T φ hR hK hT
 

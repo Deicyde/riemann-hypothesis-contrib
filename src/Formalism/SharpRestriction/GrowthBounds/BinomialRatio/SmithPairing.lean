@@ -8,9 +8,10 @@ namespace Formalism.InvariantFactorPaths.KP
 
 open Module
 
-private theorem smithMatrix_lemma {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] (n : ℕ)
-    (φ : (Fin n → O) →ₗ[O] (Fin n → O)) :
-    ∃ b c : Module.Basis (Fin n) O (Fin n → O), ∀ i j, i ≠ j → c.repr (φ (b j)) i = 0 := by
+private theorem smithMatrix_lemma
+    {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
+    (n : ℕ) (φ : (Fin n → O) →ₗ[O] (Fin n → O))
+    : ∃ b c : Module.Basis (Fin n) O (Fin n → O), ∀ i j, i ≠ j → c.repr (φ (b j)) i = 0 := by
   classical
   obtain ⟨m, snf⟩ := Submodule.smithNormalForm (Pi.basisFun O (Fin n)) (LinearMap.range φ)
   have hx : ∀ i, ∃ x, φ x = (snf.bN i : Fin n → O) := fun i => LinearMap.mem_range.1 (snf.bN i).2
@@ -70,28 +71,40 @@ private theorem smithMatrix_lemma {O : Type} [CommRing O] [IsDomain O] [IsPrinci
       Finsupp.single_apply, if_neg hij.symm, smul_zero]
   · rw [hK _ (hB2 l), map_zero, Finsupp.zero_apply]
 
-theorem smithMatrix {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O] (n : ℕ)
-    (A : Matrix (Fin n) (Fin n) O) :
-    ∃ P Q : Matrix (Fin n) (Fin n) O, IsUnit P.det ∧ IsUnit Q.det ∧
-      ∀ i j, i ≠ j → (P * A * Q) i j = 0 := by
+theorem smithMatrix
+    {O : Type} [CommRing O] [IsDomain O] [IsPrincipalIdealRing O]
+    (n : ℕ) (A : Matrix (Fin n) (Fin n) O)
+    : ∃ P Q : Matrix (Fin n) (Fin n) O,
+      IsUnit P.det ∧ IsUnit Q.det ∧ ∀ i j, i ≠ j → (P * A * Q) i j = 0 := by
   classical
   obtain ⟨b, c, hbc⟩ := smithMatrix_lemma n (Matrix.toLin' A)
-  refine ⟨c.toMatrix (Pi.basisFun O (Fin n)), (Pi.basisFun O (Fin n)).toMatrix b, ?_, ?_, fun i j hij => ?_⟩
+  refine ⟨
+    c.toMatrix (Pi.basisFun O (Fin n)),
+    (Pi.basisFun O (Fin n)).toMatrix b,
+    ?_,
+    ?_,
+    fun i j hij => ?_
+  ⟩
   · exact Matrix.isUnit_det_of_right_inverse (Module.Basis.toMatrix_mul_toMatrix_flip _ _)
   · exact Matrix.isUnit_det_of_right_inverse (Module.Basis.toMatrix_mul_toMatrix_flip _ _)
-  · have h := basis_toMatrix_mul_linearMap_toMatrix_mul_basis_toMatrix b (Pi.basisFun O (Fin n))
-      c (Pi.basisFun O (Fin n)) (Matrix.toLin' A)
+  · have h :=
+      basis_toMatrix_mul_linearMap_toMatrix_mul_basis_toMatrix b (Pi.basisFun O (Fin n)) c
+        (Pi.basisFun O (Fin n)) (Matrix.toLin' A)
     rw [LinearMap.toMatrix_eq_toMatrix', LinearMap.toMatrix'_toLin'] at h
     rw [h, LinearMap.toMatrix_apply]
     exact hbc i j hij
 
-theorem smithPairing (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K]
-    [Algebra O K] [IsFractionRing O K] (n : ℕ) (G : Matrix (Fin n) (Fin n) K) :
-    ∃ P Q : Matrix (Fin n) (Fin n) O, IsUnit P.det ∧ IsUnit Q.det ∧
-      ∀ i j, i ≠ j → (P.map (algebraMap O K) * G * Q.map (algebraMap O K)) i j = 0 := by
+theorem smithPairing
+    (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field K] [Algebra O K]
+    [IsFractionRing O K]
+    (n : ℕ) (G : Matrix (Fin n) (Fin n) K)
+    : ∃ P Q : Matrix (Fin n) (Fin n) O,
+      IsUnit P.det ∧ IsUnit Q.det
+        ∧ ∀ i j, i ≠ j → (P.map (algebraMap O K) * G * Q.map (algebraMap O K)) i j = 0 := by
   classical
-  obtain ⟨d, hd⟩ := IsLocalization.exist_integer_multiples (nonZeroDivisors O)
-    (Finset.univ : Finset (Fin n × Fin n)) (fun p => G p.1 p.2)
+  obtain ⟨d, hd⟩ :=
+    IsLocalization.exist_integer_multiples (nonZeroDivisors O)
+      (Finset.univ : Finset (Fin n × Fin n)) (fun p => G p.1 p.2)
   have hA : ∀ i j, ∃ a : O, algebraMap O K a = (d : O) • G i j := fun i j => by
     obtain ⟨a, ha⟩ := hd (i, j) (Finset.mem_univ _)
     exact ⟨a, ha⟩
@@ -104,8 +117,9 @@ theorem smithPairing (O K : Type) [CommRing O] [IsDomain O] [IsDiscreteValuation
   have key : (Matrix.of A).map (algebraMap O K) = algebraMap O K (d : O) • G := by
     ext i j
     simp [hA, Algebra.smul_def]
-  have h2 : (P * Matrix.of A * Q).map (algebraMap O K) =
-      algebraMap O K (d : O) • (P.map (algebraMap O K) * G * Q.map (algebraMap O K)) := by
+  have h2
+      : (P * Matrix.of A * Q).map (algebraMap O K)
+        = algebraMap O K (d : O) • (P.map (algebraMap O K) * G * Q.map (algebraMap O K)) := by
     rw [Matrix.map_mul, Matrix.map_mul, key, Matrix.mul_smul, Matrix.smul_mul]
   have h3 := congrFun (congrFun h2 i) j
   rw [Matrix.map_apply, hPQ i j hij, map_zero, Matrix.smul_apply, smul_eq_mul] at h3

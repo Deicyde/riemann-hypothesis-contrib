@@ -10,16 +10,20 @@ public import Formalism.LocalToGlobal.ProjectiveLattices.CrudeVal
 
 set_option autoImplicit false
 
-open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues Formalism.EigenvalueLevelCeiling
+open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.DIV.Cons Formalism.L2.DIV Formalism.L2.Pj Formalism.L2.Indef
+  Formalism.L2.Indef.Tree Formalism.L2.Indef.Tree.DepthCond Formalism.DivisionValues
+  Formalism.EigenvalueLevelCeiling
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open ReciprocityTheory.ChartRestriction.G.Pdiv.ChartF (AvFSt HTFSt UpFSt)
 open GlobalTheory.RunDepth GlobalTheory.CharDepth
 
 namespace GlobalTheory.RunDepth
 
-theorem resChar_sub_one_le_ramOverZ_of_primitiveRoot {L : Type} [Field L] [NumberField L]
-    (la : HeightOneSpectrum (𝓞 L)) (ζ : L) (hζ : IsPrimitiveRoot ζ (resCharOf la)) :
-    resCharOf la - 1 ≤ ramOverZ la := by
+theorem resChar_sub_one_le_ramOverZ_of_primitiveRoot
+    {L : Type} [Field L] [NumberField L]
+    (la : HeightOneSpectrum (𝓞 L)) (ζ : L) (hζ : IsPrimitiveRoot ζ (resCharOf la))
+    : resCharOf la - 1 ≤ ramOverZ la := by
   have hp := Formalism.L2.Pj.Crude.resCharOf_prime la
   have hpP := Formalism.L2.Pj.Crude.crv_char_mem la
   unfold ramOverZ
@@ -41,7 +45,9 @@ theorem resChar_sub_one_le_ramOverZ_of_primitiveRoot {L : Type} [Field L] [Numbe
   have hZP : Z - 1 ∈ la.asIdeal := by
     obtain ⟨u, hu⟩ := hassoc.symm
     exact hP.mem_of_pow_mem _ (hu ▸ la.asIdeal.mul_mem_right _ hpP)
-  have hmap : Ideal.map (algebraMap ℤ (𝓞 L)) (Ideal.span {((p : ℕ) : ℤ)}) = Ideal.span {((p : ℕ) : 𝓞 L)} := by
+  have hmap
+      : Ideal.map (algebraMap ℤ (𝓞 L)) (Ideal.span {((p : ℕ) : ℤ)})
+        = Ideal.span {((p : ℕ) : 𝓞 L)} := by
     rw [Ideal.map_span, Set.image_singleton, map_natCast]
   have hle : Ideal.span {(p : 𝓞 L)} ≤ la.asIdeal ^ (p - 1) := by
     rw [← Ideal.span_singleton_eq_span_singleton.mpr hassoc, ← Ideal.span_singleton_pow]
@@ -55,9 +61,11 @@ theorem resChar_sub_one_le_ramOverZ_of_primitiveRoot {L : Type} [Field L] [Numbe
   · rw [Ideal.dvd_iff_le, hmap]
     exact hle
 
-theorem resChar_sub_one_le_ramOverZ_of_dvd_level :
-    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l)
-      (la : HeightOneSpectrum (𝓞 c.F)), resCharOf la ∣ l.M → resCharOf la - 1 ≤ ramOverZ la := by
+theorem resChar_sub_one_le_ramOverZ_of_dvd_level
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]
+        (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (l : Level H) (c : Coeff l)
+        (la : HeightOneSpectrum (𝓞 c.F)),
+      resCharOf la ∣ l.M → resCharOf la - 1 ≤ ramOverZ la := by
   intro E _ _ _ H l c la hd
   have hp := Formalism.L2.Pj.Crude.resCharOf_prime la
   have hM : l.M ≠ 0 := by have := l.three_le; omega

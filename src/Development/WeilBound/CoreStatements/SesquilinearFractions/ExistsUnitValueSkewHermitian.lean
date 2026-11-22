@@ -15,11 +15,12 @@ variable {R : Type} [CommRing R] [StarRing R] {I : Type} [Fintype I] [DecidableE
 
 def hf (G : Matrix I I R) (x y : I → R) : R := x ⬝ᵥ G *ᵥ star y
 
-theorem hf_expand (G : Matrix I I R) (x y : I → R) : hf G x y = ∑ i, ∑ j, x i * G i j * star (y j) := by
+theorem hf_expand (G : Matrix I I R) (x y : I → R)
+    : hf G x y = ∑ i, ∑ j, x i * G i j * star (y j) := by
   simp only [hf, dotProduct, mulVec, Pi.star_apply, Finset.mul_sum, mul_assoc]
 
-theorem hf_skew (G : Matrix I I R) (hG : Gᴴ = -G) (x y : I → R) : hf G y x = -star (hf G x y) := by
-  have h : ∀ i j, star (G i j) = -G j i := by
+theorem hf_skew (G : Matrix I I R) (hG : Gᴴ = -G) (x y : I → R) : hf G y x = - star (hf G x y) := by
+  have h : ∀ i j, star (G i j) = - G j i := by
     intro i j
     have := congrFun (congrFun hG j) i
     simpa [conjTranspose_apply] using this
@@ -29,7 +30,8 @@ theorem hf_skew (G : Matrix I I R) (hG : Gᴴ = -G) (x y : I → R) : hf G y x =
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring
 
-theorem hf_add_left (G : Matrix I I R) (x x' y : I → R) : hf G (x + x') y = hf G x y + hf G x' y := by
+theorem hf_add_left (G : Matrix I I R) (x x' y : I → R)
+    : hf G (x + x') y = hf G x y + hf G x' y := by
   simp only [hf, add_dotProduct]
 
 theorem hf_smul_left (G : Matrix I I R) (a : R) (x y : I → R) : hf G (a • x) y = a * hf G x y := by
@@ -39,14 +41,19 @@ theorem star_smul_vec (a : R) (y : I → R) : star (a • y) = star a • star y
   funext i
   simp only [Pi.star_apply, Pi.smul_apply, smul_eq_mul, star_mul', mul_comm]
 
-theorem hf_add_right (G : Matrix I I R) (x y y' : I → R) : hf G x (y + y') = hf G x y + hf G x y' := by
+theorem hf_add_right (G : Matrix I I R) (x y y' : I → R)
+    : hf G x (y + y') = hf G x y + hf G x y' := by
   simp only [hf, star_add, mulVec_add, dotProduct_add]
 
-theorem hf_smul_right (G : Matrix I I R) (a : R) (x y : I → R) : hf G x (a • y) = star a * hf G x y := by
+theorem hf_smul_right (G : Matrix I I R) (a : R) (x y : I → R)
+    : hf G x (a • y) = star a * hf G x y := by
   rw [hf, hf, star_smul_vec, mulVec_smul, dotProduct_smul, smul_eq_mul]
 
-theorem local_exists [Nonempty I] (G : Matrix I I R) (hG : Gᴴ = -G) (hdet : IsUnit G.det) (m : Ideal R)
-    (hm : ∃ a : R, a - star a ∉ m) : ∃ x : I → R, hf G x x ∉ m := by
+theorem local_exists
+    [Nonempty I]
+    (G : Matrix I I R) (hG : Gᴴ = -G) (hdet : IsUnit G.det)
+    (m : Ideal R) (hm : ∃ a : R, a - star a ∉ m)
+    : ∃ x : I → R, hf G x x ∉ m := by
   obtain ⟨a, ha⟩ := hm
   by_contra hcon
   push_neg at hcon
@@ -66,8 +73,8 @@ theorem local_exists [Nonempty I] (G : Matrix I I R) (hG : Gᴴ = -G) (hdet : Is
     rw [hf, hse, Matrix.dotProduct_mulVec, hvG, he]
     simp
   have hxy : hf G (a • v) e = a := by rw [hf_smul_left, hve, mul_one]
-  have hyx : hf G e (a • v) = -star a := by rw [hf_skew G hG, hxy]
-  have key : hf G (a • v + e) (a • v + e) = hf G (a • v) (a • v) + a + -star a + hf G e e := by
+  have hyx : hf G e (a • v) = - star a := by rw [hf_skew G hG, hxy]
+  have key : hf G (a • v + e) (a • v + e) = hf G (a • v) (a • v) + a + - star a + hf G e e := by
     rw [hf_add_left, hf_add_right, hf_add_right, hxy, hyx]
     ring
   apply ha
@@ -89,10 +96,10 @@ theorem starI_starI (m : Ideal R) : starI (starI m) = m := by
 theorem starI_max (m : Ideal R) [m.IsMaximal] : (starI m).IsMaximal :=
   Ideal.comap_isMaximal_of_surjective _ fun y => ⟨star y, by rw [starRingEnd_apply, star_star]⟩
 
-theorem mem_starI_iff_of_skew (G : Matrix I I R) (hG : Gᴴ = -G) (m : Ideal R) (x : I → R) :
-    hf G x x ∈ starI m ↔ hf G x x ∈ m := by
+theorem mem_starI_iff_of_skew (G : Matrix I I R) (hG : Gᴴ = -G) (m : Ideal R) (x : I → R)
+    : hf G x x ∈ starI m ↔ hf G x x ∈ m := by
   have h := hf_skew G hG x x
-  have h2 : star (hf G x x) = -hf G x x := by linear_combination h
+  have h2 : star (hf G x x) = - hf G x x := by linear_combination h
   simp only [starI, Ideal.mem_comap, starRingEnd_apply, h2, neg_mem_iff]
 
 def orb (m : Ideal R) : Set (Ideal R) := {m, starI m}
@@ -100,12 +107,15 @@ def orb (m : Ideal R) : Set (Ideal R) := {m, starI m}
 theorem orb_starI (m : Ideal R) : orb (starI m) = orb m := by
   rw [orb, orb, starI_starI, Set.pair_comm]
 
-
 open Classical in
-noncomputable def wit (G : Matrix I I R) (S : Set (Ideal R)) : I → R := Classical.epsilon fun x => ∀ n ∈ S, hf G x x ∉ n
+noncomputable def wit (G : Matrix I I R) (S : Set (Ideal R)) : I → R :=
+  Classical.epsilon fun x => ∀ n ∈ S, hf G x x ∉ n
 
-theorem wit_spec [Nonempty I] (G : Matrix I I R) (hG : Gᴴ = -G) (hdet : IsUnit G.det) (m : Ideal R)
-    (hm : ∃ a : R, a - star a ∉ m) : hf G (wit G (orb m)) (wit G (orb m)) ∉ m := by
+theorem wit_spec
+    [Nonempty I]
+    (G : Matrix I I R) (hG : Gᴴ = -G) (hdet : IsUnit G.det)
+    (m : Ideal R) (hm : ∃ a : R, a - star a ∉ m)
+    : hf G (wit G (orb m)) (wit G (orb m)) ∉ m := by
   obtain ⟨x, hx⟩ := local_exists G hG hdet m hm
   have hex : ∃ x : I → R, ∀ n ∈ orb m, hf G x x ∉ n := by
     refine ⟨x, fun n hn => ?_⟩
@@ -117,25 +127,32 @@ theorem wit_spec [Nonempty I] (G : Matrix I I R) (hG : Gᴴ = -G) (hdet : IsUnit
 end PositivityTheory.Xgf.Aniso
 
 open PositivityTheory.Xgf.Aniso in
-theorem PositivityTheory.Xgf.exists_unit_value_skew_hermitian : ∀ (R : Type) [CommRing R] [StarRing R] [Finite (MaximalSpectrum R)] (I : Type) [Fintype I] [DecidableEq I] [Nonempty I] (G : Matrix I I R), Gᴴ = -G → IsUnit G.det → (∀ m : Ideal R, m.IsMaximal → ∃ a : R, a - star a ∉ m) → ∃ x : I → R, IsUnit (x ⬝ᵥ G.mulVec (star x)) := by
+theorem PositivityTheory.Xgf.exists_unit_value_skew_hermitian
+    : ∀ (R : Type) [CommRing R] [StarRing R] [Finite (MaximalSpectrum R)] (I : Type) [Fintype I]
+        [DecidableEq I] [Nonempty I] (G : Matrix I I R),
+      Gᴴ = -G → IsUnit G.det → (∀ m : Ideal R, m.IsMaximal → ∃ a : R, a - star a ∉ m)
+        → ∃ x : I → R, IsUnit (x ⬝ᵥ G.mulVec (star x)) := by
   intro R _ _ _ I _ _ _ G hG hdet hm
   classical
   haveI := Fintype.ofFinite (MaximalSpectrum R)
-  have crt : ∀ t : MaximalSpectrum R → R, ∃ r : R, ∀ P : MaximalSpectrum R, r - t P ∈ P.asIdeal := by
+  have crt
+      : ∀ t : MaximalSpectrum R → R, ∃ r : R, ∀ P : MaximalSpectrum R, r - t P ∈ P.asIdeal := by
     intro t
     have hcop : Pairwise (Function.onFun IsCoprime fun P : MaximalSpectrum R => P.asIdeal) := by
       intro P Q hPQ
       haveI := P.isMaximal
       haveI := Q.isMaximal
       exact Ideal.isCoprime_of_isMaximal (fun h => hPQ (MaximalSpectrum.ext h))
-    obtain ⟨r, hr⟩ := Ideal.quotientInfToPiQuotient_surj hcop (fun P => Ideal.Quotient.mk P.asIdeal (t P))
+    obtain ⟨r, hr⟩ :=
+      Ideal.quotientInfToPiQuotient_surj hcop (fun P => Ideal.Quotient.mk P.asIdeal (t P))
     obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective r
     refine ⟨r, fun P => ?_⟩
     have h := congrFun hr P
     rw [Ideal.quotientInfToPiQuotient_mk'] at h
     exact Ideal.Quotient.eq.mp h
-  have crtO : ∀ O : Set (Ideal R), ∃ c : R, ∀ P : MaximalSpectrum R,
-      (P.asIdeal ∈ O → c - 1 ∈ P.asIdeal) ∧ (P.asIdeal ∉ O → c ∈ P.asIdeal) := by
+  have crtO
+      : ∀ O : Set (Ideal R), ∃ c : R, ∀ P : MaximalSpectrum R,
+        (P.asIdeal ∈ O → c - 1 ∈ P.asIdeal) ∧ (P.asIdeal ∉ O → c ∈ P.asIdeal) := by
     intro O
     obtain ⟨r, hr⟩ := crt (fun P => if P.asIdeal ∈ O then 1 else 0)
     refine ⟨r, fun P => ⟨fun h => ?_, fun h => ?_⟩⟩
@@ -170,16 +187,22 @@ theorem PositivityTheory.Xgf.exists_unit_value_skew_hermitian : ∀ (R : Type) [
         rw [h']
   have hz1 : ∀ y, hf G (∑ O ∈ S.erase (orb M), c O • wit G O) y ∈ M := by
     intro y
-    refine Finset.sum_induction _ (fun v => hf G v y ∈ M)
-      (fun a b ha hb => by rw [hf_add_left]; exact M.add_mem ha hb) (by simp [hf]) (fun O hO => ?_)
+    refine Finset.sum_induction _
+      (fun v => hf G v y ∈ M)
+      (fun a b ha hb => by rw [hf_add_left]; exact M.add_mem ha hb)
+      (by simp [hf])
+      (fun O hO => ?_)
     have hne := Finset.ne_of_mem_erase hO
     have hOS := Finset.mem_of_mem_erase hO
     rw [hf_smul_left]
     exact M.mul_mem_right _ ((hc O P).2 (hoff O hOS hne).1)
   have hz2 : ∀ y, hf G y (∑ O ∈ S.erase (orb M), c O • wit G O) ∈ M := by
     intro y
-    refine Finset.sum_induction _ (fun v => hf G y v ∈ M)
-      (fun a b ha hb => by rw [hf_add_right]; exact M.add_mem ha hb) (by simp [hf]) (fun O hO => ?_)
+    refine Finset.sum_induction _
+      (fun v => hf G y v ∈ M)
+      (fun a b ha hb => by rw [hf_add_right]; exact M.add_mem ha hb)
+      (by simp [hf])
+      (fun O hO => ?_)
     have hne := Finset.ne_of_mem_erase hO
     have hOS := Finset.mem_of_mem_erase hO
     rw [hf_smul_right]
@@ -188,23 +211,28 @@ theorem PositivityTheory.Xgf.exists_unit_value_skew_hermitian : ∀ (R : Type) [
   have hc2 : star (c (orb M)) - 1 ∈ M := by
     have h := Ideal.mem_comap.mp ((hc (orb M) P').1 (Set.mem_insert_of_mem _ rfl))
     simpa [starRingEnd_apply, star_sub, star_one] using h
-  have hsplit : ∑ O ∈ S, c O • wit G O = c (orb M) • wit G (orb M) + ∑ O ∈ S.erase (orb M), c O • wit G O :=
+  have hsplit
+      : ∑ O ∈ S, c O • wit G O = c (orb M) • wit G (orb M) + ∑ O ∈ S.erase (orb M), c O • wit G O :=
     (Finset.add_sum_erase S _ hO0).symm
   have hxM' : hf G (∑ O ∈ S, c O • wit G O) (∑ O ∈ S, c O • wit G O) ∈ M := hxM
   rw [hsplit] at hxM'
   set w := wit G (orb M)
   set z := ∑ O ∈ S.erase (orb M), c O • wit G O
   set a := c (orb M)
-  have expand : hf G (a • w + z) (a • w + z) =
-      a * (star a * hf G w w) + hf G (a • w) z + (hf G z (a • w) + hf G z z) := by
+  have expand
+      : hf G (a • w + z) (a • w + z)
+        = a * (star a * hf G w w) + hf G (a • w) z + (hf G z (a • w) + hf G z z) := by
     rw [hf_add_left, hf_add_right, hf_add_right, hf_smul_left G a w (a • w), hf_smul_right]
   apply hw
-  have e2 : hf G w w = hf G (a • w + z) (a • w + z) - (a * (star a - 1) + (a - 1)) * hf G w w
-      - hf G (a • w) z - (hf G z (a • w) + hf G z z) := by
+  have e2
+      : hf G w w
+        = hf G (a • w + z) (a • w + z) - (a * (star a - 1) + (a - 1)) * hf G w w - hf G (a • w) z
+          - (hf G z (a • w) + hf G z z) := by
     rw [expand]
     ring
   rw [e2]
-  exact M.sub_mem (M.sub_mem (M.sub_mem hxM' (M.mul_mem_right _ (M.add_mem (M.mul_mem_left _ hc2) hc1))) (hz2 _))
+  exact M.sub_mem
+    (M.sub_mem (M.sub_mem hxM' (M.mul_mem_right _ (M.add_mem (M.mul_mem_left _ hc2) hc1))) (hz2 _))
     (M.add_mem (hz1 _) (hz1 _))
 
 namespace PositivityTheory.Xgf.Diag
@@ -218,8 +246,8 @@ theorem isUnit_of_forall_notMem (r : R) (h : ∀ M : Ideal R, M.IsMaximal → r 
   obtain ⟨M, hM, hrM⟩ := exists_max_ideal_of_mem_nonunits h'
   exact h M hM hrM
 
-theorem crt_entry [Finite (MaximalSpectrum R)] (t : MaximalSpectrum R → R) :
-    ∃ r : R, ∀ P : MaximalSpectrum R, r - t P ∈ P.asIdeal := by
+theorem crt_entry [Finite (MaximalSpectrum R)] (t : MaximalSpectrum R → R)
+    : ∃ r : R, ∀ P : MaximalSpectrum R, r - t P ∈ P.asIdeal := by
   have hI : Pairwise (Function.onFun IsCoprime fun P : MaximalSpectrum R => P.asIdeal) := by
     intro P Q hPQ
     haveI := P.isMaximal
@@ -227,33 +255,40 @@ theorem crt_entry [Finite (MaximalSpectrum R)] (t : MaximalSpectrum R → R) :
     exact Ideal.isCoprime_of_isMaximal (fun h => hPQ (MaximalSpectrum.ext h))
   exact Ideal.exists_forall_sub_mem_ideal hI t
 
-theorem unimod {I : Type} [Fintype I] [DecidableEq I] (G : Matrix I I R) (x : I → R) (hu : IsUnit (hf G x x)) :
-    ∀ M : Ideal R, M.IsMaximal → ∃ i, x i ∉ M := by
+theorem unimod
+    {I : Type} [Fintype I] [DecidableEq I] (G : Matrix I I R) (x : I → R) (hu : IsUnit (hf G x x))
+    : ∀ M : Ideal R, M.IsMaximal → ∃ i, x i ∉ M := by
   intro M hM
   by_contra h
   push_neg at h
   have hmem : hf G x x ∈ M := by
     rw [hf_expand]
-    exact Ideal.sum_mem _ fun i _ => Ideal.sum_mem _ fun j _ => M.mul_mem_right _ (M.mul_mem_right _ (h i))
+    exact Ideal.sum_mem _ fun i _ =>
+      Ideal.sum_mem _ fun j _ => M.mul_mem_right _ (M.mul_mem_right _ (h i))
   exact hM.ne_top (Ideal.eq_top_of_isUnit_mem _ hmem hu)
 
-theorem unitCoord [Finite (MaximalSpectrum R)] {n : ℕ} (x : Fin (n + 1) → R)
-    (hx : ∀ M : Ideal R, M.IsMaximal → ∃ i, x i ∉ M) :
-    ∃ B : Matrix (Fin (n + 1)) (Fin (n + 1)) R, IsUnit B.det ∧ IsUnit ((x ᵥ* B) 0) := by
+theorem unitCoord
+    [Finite (MaximalSpectrum R)]
+    {n : ℕ} (x : Fin (n + 1) → R) (hx : ∀ M : Ideal R, M.IsMaximal → ∃ i, x i ∉ M)
+    : ∃ B : Matrix (Fin (n + 1)) (Fin (n + 1)) R, IsUnit B.det ∧ IsUnit ((x ᵥ* B) 0) := by
   classical
-  have hk : ∀ P : MaximalSpectrum R, ∃ k : Fin (n + 1), x k ∉ P.asIdeal ∧ (k ≠ 0 → x 0 ∈ P.asIdeal) := by
+  have hk
+      : ∀ P : MaximalSpectrum R, ∃ k : Fin (n + 1),
+        x k ∉ P.asIdeal ∧ (k ≠ 0 → x 0 ∈ P.asIdeal) := by
     intro P
     by_cases h0 : x 0 ∈ P.asIdeal
     · obtain ⟨i, hi⟩ := hx P.asIdeal P.isMaximal
       exact ⟨i, hi, fun _ => h0⟩
     · exact ⟨0, h0, fun h => absurd rfl h⟩
   choose k hkx hk0 using hk
-  have hc : ∀ i : Fin (n + 1), ∃ r : R, ∀ P : MaximalSpectrum R,
-      r - (if i = k P then 1 else 0) ∈ P.asIdeal :=
-    fun i => crt_entry (fun P => if i = k P then 1 else 0)
+  have hc
+      : ∀ i : Fin (n + 1), ∃ r : R, ∀ P : MaximalSpectrum R,
+        r - (if i = k P then 1 else 0) ∈ P.asIdeal := fun i =>
+    crt_entry (fun P => if i = k P then 1 else 0)
   choose c hc using hc
   let c' : Fin (n + 1) → R := fun i => if i = 0 then 1 else c i
-  let B : Matrix (Fin (n + 1)) (Fin (n + 1)) R := fun i j => if j = 0 then c' i else (1 : Matrix _ _ R) i j
+  let B : Matrix (Fin (n + 1)) (Fin (n + 1)) R := fun i j =>
+    if j = 0 then c' i else (1 : Matrix _ _ R) i j
   refine ⟨B, ?_, ?_⟩
   · have hB : B.BlockTriangular OrderDual.toDual := by
       intro i j hij
@@ -267,8 +302,7 @@ theorem unitCoord [Finite (MaximalSpectrum R)] {n : ℕ} (x : Fin (n + 1) → R)
       by_cases h : i = 0 <;> simp [B, c', h]
     rw [Matrix.det_of_lowerTriangular B hB]
     simp [hd]
-  · have hy : (x ᵥ* B) 0 = ∑ i, x i * c' i := by
-      simp [Matrix.vecMul, dotProduct, B]
+  · have hy : (x ᵥ* B) 0 = ∑ i, x i * c' i := by simp [Matrix.vecMul, dotProduct, B]
     rw [hy]
     apply isUnit_of_forall_notMem
     intro M hM
@@ -283,7 +317,9 @@ theorem unitCoord [Finite (MaximalSpectrum R)] {n : ℕ} (x : Fin (n + 1) → R)
         · rw [if_neg h0]
           simpa [c'] using hk0 P (Ne.symm h0)
       · have h : x i * (c i - if i = k P then 1 else 0) ∈ M := Ideal.mul_mem_left _ (x i) (hc i P)
-        have he : x i * c' i - (if i = k P then x i else 0) = x i * (c i - if i = k P then 1 else 0) := by
+        have he
+            : x i * c' i - (if i = k P then x i else 0)
+              = x i * (c i - if i = k P then 1 else 0) := by
           simp only [c', if_neg hi]
           split_ifs <;> ring
         rw [he]
@@ -296,21 +332,28 @@ theorem unitCoord [Finite (MaximalSpectrum R)] {n : ℕ} (x : Fin (n + 1) → R)
     have := M.sub_mem hmem hsum
     simpa using this
 
-theorem mul_conj_apply {I : Type} [Fintype I] [DecidableEq I] (T G : Matrix I I R) (i j : I) :
-    (T * G * Tᴴ) i j = hf G (T i) (T j) := by
+theorem mul_conj_apply {I : Type} [Fintype I] [DecidableEq I] (T G : Matrix I I R) (i j : I)
+    : (T * G * Tᴴ) i j = hf G (T i) (T j) := by
   rw [hf_expand]
   simp only [Matrix.mul_apply, conjTranspose_apply, Finset.sum_mul]
   rw [Finset.sum_comm]
 
-theorem step {n : ℕ} (G : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (hG : Gᴴ = -G) (x : Fin (n + 1) → R)
-    (hx0 : IsUnit (x 0)) (hu : IsUnit (hf G x x)) :
-    ∃ T : Matrix (Fin (n + 1)) (Fin (n + 1)) R, IsUnit T.det ∧ (∀ j : Fin n, (T * G * Tᴴ) j.succ 0 = 0) ∧
-      ∀ j : Fin n, (T * G * Tᴴ) 0 j.succ = 0 := by
+theorem step
+    {n : ℕ} (G : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (hG : Gᴴ = -G) (x : Fin (n + 1) → R)
+    (hx0 : IsUnit (x 0)) (hu : IsUnit (hf G x x))
+    : ∃ T : Matrix (Fin (n + 1)) (Fin (n + 1)) R,
+      IsUnit T.det ∧ (∀ j : Fin n, (T * G * Tᴴ) j.succ 0 = 0)
+        ∧ ∀ j : Fin n, (T * G * Tᴴ) 0 j.succ = 0 := by
   set a := hf G x x with ha
   set ainv : R := ↑hu.unit⁻¹ with hainv
   have haa : a * ainv = 1 := hu.mul_val_inv
   let L : Matrix (Fin (n + 1)) (Fin (n + 1)) R := fun i k =>
-    if i = k then 1 else if k = 0 then -(hf G (Pi.single i 1) x * ainv) else 0
+    if i = k then
+      1
+    else if k = 0 then
+      -(hf G (Pi.single i 1) x * ainv)
+    else
+      0
   let P : Matrix (Fin (n + 1)) (Fin (n + 1)) R := fun i => if i = 0 then x else Pi.single i 1
   have hL : L.det = 1 := by
     rw [Matrix.det_of_lowerTriangular L]
@@ -337,8 +380,9 @@ theorem step {n : ℕ} (G : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (hG : Gᴴ = -
     rw [Matrix.mul_apply, Fin.sum_univ_succ]
     simp [L, P, Fin.succ_ne_zero]
     exact Finset.sum_eq_zero fun m _ => by simp [(Fin.succ_ne_zero m).symm]
-  have hrs : ∀ j : Fin n, (L * P) j.succ =
-      Pi.single j.succ 1 - (hf G (Pi.single j.succ 1) x * ainv) • x := by
+  have hrs
+      : ∀ j : Fin n,
+        (L * P) j.succ = Pi.single j.succ 1 - (hf G (Pi.single j.succ 1) x * ainv) • x := by
     intro j
     ext k
     rw [Matrix.mul_apply, Fin.sum_univ_succ]
@@ -352,9 +396,9 @@ theorem step {n : ℕ} (G : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (hG : Gᴴ = -
     linear_combination (-(hf G (Pi.single j.succ 1) x)) * haa
   · intro j
     rw [mul_conj_apply, hr0, hrs, sub_eq_add_neg, ← neg_smul, hf_add_right, hf_smul_right]
-    have h1 : hf G x (Pi.single j.succ 1) = -star (hf G (Pi.single j.succ 1) x) :=
+    have h1 : hf G x (Pi.single j.succ 1) = - star (hf G (Pi.single j.succ 1) x) :=
       hf_skew G hG (Pi.single j.succ 1) x
-    have h2 : a = -star a := hf_skew G hG x x
+    have h2 : a = - star a := hf_skew G hG x x
     have h3 : star a * star ainv = 1 := by rw [← star_mul', haa, star_one]
     rw [h1, star_neg, star_mul']
     linear_combination (-(star (hf G (Pi.single j.succ 1) x) * star ainv)) * h2 +
@@ -363,7 +407,11 @@ theorem step {n : ℕ} (G : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (hG : Gᴴ = -
 end PositivityTheory.Xgf.Diag
 
 open PositivityTheory.Xgf.Aniso PositivityTheory.Xgf.Diag in
-theorem PositivityTheory.Xgf.skew_hermitian_diagonalizable : ∀ (R : Type) [CommRing R] [StarRing R] [Finite (MaximalSpectrum R)] (n : ℕ) (G : Matrix (Fin n) (Fin n) R), Gᴴ = -G → IsUnit G.det → (∀ m : Ideal R, m.IsMaximal → ∃ a : R, a - star a ∉ m) → ∃ T : Matrix (Fin n) (Fin n) R, IsUnit T.det ∧ (T * G * Tᴴ).IsDiag := by
+theorem PositivityTheory.Xgf.skew_hermitian_diagonalizable
+    : ∀ (R : Type) [CommRing R] [StarRing R] [Finite (MaximalSpectrum R)] (n : ℕ)
+        (G : Matrix (Fin n) (Fin n) R),
+      Gᴴ = -G → IsUnit G.det → (∀ m : Ideal R, m.IsMaximal → ∃ a : R, a - star a ∉ m)
+        → ∃ T : Matrix (Fin n) (Fin n) R, IsUnit T.det ∧ (T * G * Tᴴ).IsDiag := by
   intro R _ _ _ n
   induction n with
   | zero =>
@@ -373,20 +421,24 @@ theorem PositivityTheory.Xgf.skew_hermitian_diagonalizable : ∀ (R : Type) [Com
     exact Fin.elim0 i
   | succ n ih =>
     intro G hG hdet hR
-    have hcong : ∀ (S M : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (u v : Fin (n + 1) → R),
-        hf (S * M * Sᴴ) u v = hf M (u ᵥ* S) (v ᵥ* S) := by
+    have hcong
+        : ∀ (S M : Matrix (Fin (n + 1)) (Fin (n + 1)) R) (u v : Fin (n + 1) → R),
+          hf (S * M * Sᴴ) u v = hf M (u ᵥ* S) (v ᵥ* S) := by
       intro S M u v
       simp only [hf, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec, Matrix.star_vecMul]
-    have hskew : ∀ (S M : Matrix (Fin (n + 1)) (Fin (n + 1)) R), Mᴴ = -M →
-        (S * M * Sᴴ)ᴴ = -(S * M * Sᴴ) := by
+    have hskew
+        : ∀ (S M : Matrix (Fin (n + 1)) (Fin (n + 1)) R),
+          Mᴴ = -M → (S * M * Sᴴ)ᴴ = -(S * M * Sᴴ) := by
       intro S M hM
       simp [Matrix.conjTranspose_mul, hM, Matrix.mul_assoc]
-    have hdetc : ∀ (S M : Matrix (Fin (n + 1)) (Fin (n + 1)) R), IsUnit S.det → IsUnit M.det →
-        IsUnit (S * M * Sᴴ).det := by
+    have hdetc
+        : ∀ (S M : Matrix (Fin (n + 1)) (Fin (n + 1)) R),
+          IsUnit S.det → IsUnit M.det → IsUnit (S * M * Sᴴ).det := by
       intro S M hS hM
       rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_conjTranspose]
       exact (hS.mul hM).mul (isUnit_star.mpr hS)
-    obtain ⟨x, hx⟩ := PositivityTheory.Xgf.exists_unit_value_skew_hermitian R (Fin (n + 1)) G hG hdet hR
+    obtain ⟨x, hx⟩ :=
+      PositivityTheory.Xgf.exists_unit_value_skew_hermitian R (Fin (n + 1)) G hG hdet hR
     have hxu : IsUnit (hf G x x) := hx
     obtain ⟨B, hB, hB0⟩ := unitCoord x (unimod G x hxu)
     have hBi : IsUnit B⁻¹.det := Matrix.isUnit_nonsing_inv_det B hB
@@ -411,8 +463,11 @@ theorem PositivityTheory.Xgf.skew_hermitian_diagonalizable : ∀ (R : Type) [Com
       exact isUnit_of_mul_isUnit_right hG2d
     obtain ⟨T3, hT3, hT3d⟩ := ih G3 hG3s hG3d hR
     let D : Matrix (Fin (n + 1)) (Fin (n + 1)) R := fun i =>
-      Fin.cons (α := fun _ => Fin (n + 1) → R) (Pi.single 0 1)
-        (fun i' => Fin.cons (α := fun _ => R) 0 (T3 i')) i
+      Fin.cons
+        (α := fun _ => Fin (n + 1) → R)
+        (Pi.single 0 1)
+        (fun i' => Fin.cons (α := fun _ => R) 0 (T3 i'))
+        i
     have hD0 : D 0 = Pi.single 0 1 := by simp [D]
     have hDs : ∀ i' : Fin n, D i'.succ = Fin.cons 0 (T3 i') := by intro i'; simp [D]
     have hDdet : D.det = T3.det := by
@@ -453,32 +508,38 @@ theorem PositivityTheory.Xgf.skew_hermitian_diagonalizable : ∀ (R : Type) [Com
           rw [hDs, hDs, hcons, ← mul_conj_apply]
           exact hT3d (fun h => hij (by rw [h]))
 
-theorem PositivityTheory.Xgf.exists_not_mem_sub_conj : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (bar : 𝓞 E ≃+* 𝓞 E), (∀ a : 𝓞 E, ((bar a : 𝓞 E) : E) = IsCMField.complexConj E (a : E)) → Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E) → ∀ m : Ideal (𝓞 E), m.IsMaximal → ∃ a : 𝓞 E, a - bar a ∉ m := by
+theorem PositivityTheory.Xgf.exists_not_mem_sub_conj
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (bar : 𝓞 E ≃+* 𝓞 E),
+      (∀ a : 𝓞 E, ((bar a : 𝓞 E) : E) = IsCMField.complexConj E (a : E))
+        → Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)
+        → ∀ m : Ideal (𝓞 E), m.IsMaximal → ∃ a : 𝓞 E, a - bar a ∉ m := by
   intro E _ _ _ bar hbar hunr m hm
   by_contra hcon
   push_neg at hcon
-  have hfix : ∀ r : 𝓞 (maximalRealSubfield E),
-      bar (algebraMap _ (𝓞 E) r) = algebraMap _ (𝓞 E) r := by
+  have hfix
+      : ∀ r : 𝓞 (maximalRealSubfield E), bar (algebraMap _ (𝓞 E) r) = algebraMap _ (𝓞 E) r := by
     intro r
     apply RingOfIntegers.coe_injective
-    have h1 : ((algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) r : 𝓞 E) : E) =
-        algebraMap (maximalRealSubfield E) E (r : maximalRealSubfield E) := by
+    have h1
+        : ((algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E) r : 𝓞 E) : E)
+          = algebraMap (maximalRealSubfield E) E (r : maximalRealSubfield E) := by
       rw [← IsScalarTower.algebraMap_apply,
         IsScalarTower.algebraMap_apply (𝓞 (maximalRealSubfield E)) (maximalRealSubfield E) E]
       rfl
     show ((bar _ : 𝓞 E) : E) = ((algebraMap _ (𝓞 E) r : 𝓞 E) : E)
     rw [hbar, h1]
     exact IsCMField.complexConj_apply_eq_self E _
-  let σ : 𝓞 E →ₐ[𝓞 (maximalRealSubfield E)] 𝓞 E :=
-    { (bar : 𝓞 E →+* 𝓞 E) with commutes' := hfix }
+  let σ : 𝓞 E →ₐ[𝓞 (maximalRealSubfield E)] 𝓞 E := { (bar : 𝓞 E →+* 𝓞 E) with commutes' := hfix }
   have hσ : AlgHom.id (𝓞 (maximalRealSubfield E)) (𝓞 E) = σ := by
-    refine Algebra.FormallyUnramified.ext_of_iInf (I := m) (Ideal.iInf_pow_eq_bot_of_isDomain m hm.ne_top) ?_
+    refine Algebra.FormallyUnramified.ext_of_iInf (I := m)
+      (Ideal.iInf_pow_eq_bot_of_isDomain m hm.ne_top) ?_
     intro x
     rw [Ideal.Quotient.eq]
     exact hcon x
   apply IsCMField.complexConj_ne_one E
-  have hring : (IsCMField.complexConj E : E →+* E).comp (algebraMap (𝓞 E) E) =
-      (RingHom.id E).comp (algebraMap (𝓞 E) E) := by
+  have hring
+      : (IsCMField.complexConj E : E →+* E).comp (algebraMap (𝓞 E) E)
+        = (RingHom.id E).comp (algebraMap (𝓞 E) E) := by
     ext x
     have hx : bar x = x := (AlgHom.congr_fun hσ x).symm
     show IsCMField.complexConj E (x : E) = (x : E)
@@ -489,12 +550,15 @@ theorem PositivityTheory.Xgf.exists_not_mem_sub_conj : ∀ (E : Type) [Field E] 
 
 namespace PositivityTheory.Xgf.LocGen
 
-theorem natCast_not_unit (F : Type) [Field F] [NumberField F] (p : Nat.Primes) : ¬ IsUnit ((p : ℕ) : 𝓞 F) := by
+theorem natCast_not_unit (F : Type) [Field F] [NumberField F] (p : Nat.Primes)
+    : ¬ IsUnit ((p : ℕ) : 𝓞 F) := by
   rcases p with ⟨p, hp⟩
   intro h
   rw [NumberField.isUnit_iff_norm] at h
   change |((NumberField.RingOfIntegers.norm ℚ (p : 𝓞 F) : 𝓞 ℚ) : ℚ)| = 1 at h
-  have h1 : ((NumberField.RingOfIntegers.norm ℚ (p : 𝓞 F) : 𝓞 ℚ) : ℚ) = (p : ℚ) ^ Module.finrank ℚ F := by
+  have h1
+      : ((NumberField.RingOfIntegers.norm ℚ (p : 𝓞 F) : 𝓞 ℚ) : ℚ)
+        = (p : ℚ) ^ Module.finrank ℚ F := by
     rw [NumberField.RingOfIntegers.coe_norm]
     have : ((p : 𝓞 F) : F) = algebraMap ℚ F (p : ℚ) := by simp
     rw [this, Algebra.norm_algebraMap]
@@ -511,21 +575,27 @@ theorem norm_natCast_cp (p : Nat.Primes) (n : ℕ) (hn : ¬ (p : ℕ) ∣ n) : �
 
 end PositivityTheory.Xgf.LocGen
 
-private theorem norm_le_one_lemma (p : Nat.Primes) (y : ℂ_[(p : ℕ)]) (f : Polynomial ℤ) (hmon : f.Monic)
-    (hf : f.eval₂ (Int.castRingHom ℂ_[(p : ℕ)]) y = 0) : ‖y‖ ≤ 1 := by
+private theorem norm_le_one_lemma
+    (p : Nat.Primes) (y : ℂ_[(p : ℕ)])
+    (f : Polynomial ℤ) (hmon : f.Monic) (hf : f.eval₂ (Int.castRingHom ℂ_[(p : ℕ)]) y = 0)
+    : ‖y‖ ≤ 1 := by
   by_contra hlt
   push_neg at hlt
   rw [hmon.as_sum] at hf
-  simp only [Polynomial.eval₂_add, Polynomial.eval₂_pow, Polynomial.eval₂_X, Polynomial.eval₂_finsetSum,
-    Polynomial.eval₂_mul, Polynomial.eval₂_C, Int.coe_castRingHom] at hf
+  simp only [Polynomial.eval₂_add, Polynomial.eval₂_pow, Polynomial.eval₂_X,
+      Polynomial.eval₂_finsetSum, Polynomial.eval₂_mul, Polynomial.eval₂_C, Int.coe_castRingHom]
+    at hf
   have hd : f.natDegree ≠ 0 := by
     intro h0
     rw [h0] at hf
     simp at hf
-  have h1 : y ^ f.natDegree = -∑ i ∈ Finset.range f.natDegree, ((f.coeff i : ℤ) : ℂ_[(p : ℕ)]) * y ^ i :=
+  have h1
+      : y ^ f.natDegree
+        = - ∑ i ∈ Finset.range f.natDegree, ((f.coeff i : ℤ) : ℂ_[(p : ℕ)]) * y ^ i :=
     eq_neg_of_add_eq_zero_left hf
-  have h2 : ‖∑ i ∈ Finset.range f.natDegree, ((f.coeff i : ℤ) : ℂ_[(p : ℕ)]) * y ^ i‖ ≤
-      ‖y‖ ^ (f.natDegree - 1) := by
+  have h2
+      : ‖∑ i ∈ Finset.range f.natDegree, ((f.coeff i : ℤ) : ℂ_[(p : ℕ)]) * y ^ i‖
+        ≤ ‖y‖ ^ (f.natDegree - 1) := by
     apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg (by positivity)
     intro i hi
     rw [norm_mul, norm_pow]
@@ -533,15 +603,22 @@ private theorem norm_le_one_lemma (p : Nat.Primes) (y : ℂ_[(p : ℕ)]) (f : Po
     have hi' : i ≤ f.natDegree - 1 := by
       have := Finset.mem_range.1 hi
       omega
-    calc ‖((f.coeff i : ℤ) : ℂ_[(p : ℕ)])‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (f.natDegree - 1) :=
-          mul_le_mul hc (pow_le_pow_right₀ hlt.le hi') (by positivity) zero_le_one
+    calc
+      ‖((f.coeff i : ℤ) : ℂ_[(p : ℕ)])‖ * ‖y‖ ^ i ≤ 1 * ‖y‖ ^ (f.natDegree - 1) :=
+        mul_le_mul hc (pow_le_pow_right₀ hlt.le hi') (by positivity) zero_le_one
       _ = _ := one_mul _
   rw [← norm_neg, ← h1, norm_pow] at h2
   have h3 : ‖y‖ ^ (f.natDegree - 1) < ‖y‖ ^ f.natDegree := pow_lt_pow_right₀ hlt (by omega)
   linarith
 
 open PositivityTheory.Xgf.LocGen in
-theorem PositivityTheory.Xgf.ideal_padic_generator_log_norm : ∀ (F : Type) [Field F] [NumberField F] (I : Ideal (𝓞 F)) (p : Nat.Primes), I ≠ ⊥ → ∃ δ ∈ I, δ ≠ 0 ∧ (∃ n : ℕ, ¬ (p : ℕ) ∣ n ∧ ∀ a ∈ I, (n : 𝓞 F) * a ∈ Ideal.span {δ}) ∧ ∀ j : F →+* ℂ_[p], Real.log ‖j (δ : F)‖ = logIdeal (j.comp (algebraMap (𝓞 F) F)) I := by
+theorem PositivityTheory.Xgf.ideal_padic_generator_log_norm
+    : ∀ (F : Type) [Field F] [NumberField F] (I : Ideal (𝓞 F)) (p : Nat.Primes),
+      I ≠ ⊥
+        → ∃ δ ∈ I,
+          δ ≠ 0 ∧ (∃ n : ℕ, ¬ (p : ℕ) ∣ n ∧ ∀ a ∈ I, (n : 𝓞 F) * a ∈ Ideal.span {δ})
+            ∧ ∀ j : F →+* ℂ_[p],
+              Real.log ‖j (δ : F)‖ = logIdeal (j.comp (algebraMap (𝓞 F) F)) I := by
   intro F _ _ I p hI
   have hpI : Ideal.span {((p : ℕ) : 𝓞 F)} * I ≤ I := Ideal.mul_le_right
   have hp0 : ((p : ℕ) : 𝓞 F) ≠ 0 := by exact_mod_cast p.2.ne_zero
@@ -569,8 +646,10 @@ theorem PositivityTheory.Xgf.ideal_padic_generator_log_norm : ∀ (F : Type) [Fi
       obtain ⟨u, hu, v, hv, rfl⟩ := Submodule.mem_sup.1 hy
       obtain ⟨z, hz, rfl⟩ := Ideal.mem_span_singleton_mul.1 hu
       refine ⟨z, hz, ?_⟩
-      have e : x - ((p : ℕ) : 𝓞 F) ^ (k + 1) * z =
-          (x - ((p : ℕ) : 𝓞 F) ^ k * (((p : ℕ) : 𝓞 F) * z + v)) + ((p : ℕ) : 𝓞 F) ^ k * v := by ring
+      have e
+          : x - ((p : ℕ) : 𝓞 F) ^ (k + 1) * z
+            = (x - ((p : ℕ) : 𝓞 F) ^ k * (((p : ℕ) : 𝓞 F) * z + v)) + ((p : ℕ) : 𝓞 F) ^ k * v := by
+        ring
       rw [e]
       exact Ideal.add_mem _ hxy (Ideal.mul_mem_left _ _ hv)
   set N := Ideal.absNorm (Ideal.span {δ}) with hN
@@ -603,11 +682,13 @@ theorem PositivityTheory.Xgf.ideal_padic_generator_log_norm : ∀ (F : Type) [Fi
   have bound : ∀ a ∈ I, ‖j (algebraMap (𝓞 F) F a)‖ ≤ ‖j (algebraMap (𝓞 F) F δ)‖ := by
     intro a ha
     obtain ⟨b, hb⟩ := Ideal.mem_span_singleton'.1 (hmul a ha)
-    have h1 : j (algebraMap (𝓞 F) F b) * j (algebraMap (𝓞 F) F δ) =
-        (n : ℂ_[(p : ℕ)]) * j (algebraMap (𝓞 F) F a) := by
+    have h1
+        : j (algebraMap (𝓞 F) F b) * j (algebraMap (𝓞 F) F δ)
+          = (n : ℂ_[(p : ℕ)]) * j (algebraMap (𝓞 F) F a) := by
       have := congrArg (fun t : 𝓞 F => j (algebraMap (𝓞 F) F t)) hb
       simpa only [map_mul, map_natCast] using this
-    have h2 : ‖j (algebraMap (𝓞 F) F a)‖ = ‖j (algebraMap (𝓞 F) F b)‖ * ‖j (algebraMap (𝓞 F) F δ)‖ := by
+    have h2
+        : ‖j (algebraMap (𝓞 F) F a)‖ = ‖j (algebraMap (𝓞 F) F b)‖ * ‖j (algebraMap (𝓞 F) F δ)‖ := by
       have := congrArg norm h1
       rw [norm_mul, norm_mul, norm_natCast_cp p n hn, one_mul] at this
       exact this.symm

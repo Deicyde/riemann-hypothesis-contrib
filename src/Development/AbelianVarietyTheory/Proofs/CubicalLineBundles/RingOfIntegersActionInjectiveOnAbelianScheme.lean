@@ -7,8 +7,11 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory Formalism.L2.LamCM
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.GeometryOfNumbersTheory
+  Formalism.L2.LamCM
 open scoped CategoryTheory.Obj ComplexOrder
 open GlobalTheory GlobalTheory.CM GlobalTheory.LamF
 
@@ -27,17 +30,23 @@ theorem act_natCast (act : OAct O G) (n : ℕ) : act.act (n : O) = 𝟙 G ^ n :=
   | zero => rw [Nat.cast_zero, act_zero, pow_zero]
   | succ n ih => rw [Nat.cast_succ, act.add, ih, act.one, pow_succ]
 
-theorem act_mul_eq_one (act : OAct O G) {c : O} (hc : act.act c = 1) (d : O) : act.act (d * c) = 1 := by
+theorem act_mul_eq_one (act : OAct O G) {c : O} (hc : act.act c = 1) (d : O)
+    : act.act (d * c) = 1 := by
   rw [act.mul, hc, MonObj.comp_one]
 
-theorem pow_eq_one_of_act (act : OAct O G) {n : ℕ} (hn : act.act (n : O) = 1) {T : Over S} (x : T ⟶ G) :
-    x ^ n = 1 := by
+theorem pow_eq_one_of_act
+    (act : OAct O G) {n : ℕ} (hn : act.act (n : O) = 1) {T : Over S} (x : T ⟶ G)
+    : x ^ n = 1 := by
   have h : x ≫ (𝟙 G ^ n) = x ^ n := by rw [MonObj.comp_pow, Category.comp_id]
   rw [← h, ← act_natCast act, hn, MonObj.comp_one]
 
 end
 
-theorem act_injective : Out.Laws → ∀ (E : Type) [Field E] [NumberField E] (K : Type) [Field K] [NumberField K] (P : Out.PolAV (Sp (𝓞 K))) (act : OAct (𝓞 E) P.A), 1 ≤ P.g → Function.Injective act.act := by
+theorem act_injective
+    : Out.Laws
+      → ∀ (E : Type) [Field E] [NumberField E] (K : Type) [Field K] [NumberField K]
+          (P : Out.PolAV (Sp (𝓞 K))) (act : OAct (𝓞 E) P.A),
+        1 ≤ P.g → Function.Injective act.act := by
   intro hL E _ _ K _ _ P act hg a b hab
   by_contra hne
   have hc0 : a - b ≠ 0 := sub_ne_zero.mpr hne
@@ -50,8 +59,7 @@ theorem act_injective : Out.Laws → ∀ (E : Type) [Field E] [NumberField E] (K
     rw [hn, Ne, Ideal.absNorm_eq_zero_iff, Ideal.span_singleton_eq_bot]
     exact hc0
   obtain ⟨d, hd⟩ := Ideal.mem_span_singleton'.mp (Ideal.absNorm_mem (Ideal.span {a - b}))
-  have h1 : act.act (n : 𝓞 E) = 1 := by
-    rw [hn, ← hd]; exact act_mul_eq_one act hc d
+  have h1 : act.act (n : 𝓞 E) = 1 := by rw [hn, ← hd]; exact act_mul_eq_one act hc d
   let k := AlgebraicClosure K
   let t : Spec (CommRingCat.of k) ⟶ Sp (𝓞 K) :=
     Spec.map (CommRingCat.ofHom ((algebraMap K k).comp (algebraMap (𝓞 K) K)))

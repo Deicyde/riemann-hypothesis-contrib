@@ -8,9 +8,11 @@ open MeasureTheory IsDedekindDomain NumberField
 
 namespace GlobalTheory
 
-theorem exp_neg_le_norm_tprod_one_sub_inv {ι : Type} (x : ι → ℂ) (B : ℝ)
-    (h : ∀ a, ‖x a‖ ≤ 1 / 2) (hs : Summable (fun a => ‖x a‖)) (hB : ∑' a, ‖x a‖ ≤ B) :
-    Real.exp (-B) ≤ ‖∏' a, (1 - x a)⁻¹‖ := by
+theorem exp_neg_le_norm_tprod_one_sub_inv
+    {ι : Type} (x : ι → ℂ)
+    (B : ℝ)
+    (h : ∀ a, ‖x a‖ ≤ 1 / 2) (hs : Summable (fun a => ‖x a‖)) (hB : ∑' a, ‖x a‖ ≤ B)
+    : Real.exp (-B) ≤ ‖∏' a, (1 - x a)⁻¹‖ := by
   have hlow : ∀ a, 1 / 2 ≤ ‖1 - x a‖ := by
     intro a
     have h1 := norm_sub_norm_le (1 : ℂ) (x a)
@@ -35,7 +37,7 @@ theorem exp_neg_le_norm_tprod_one_sub_inv {ι : Type} (x : ι → ℂ) (B : ℝ)
   have hm : Multipliable (fun a => (1 - x a)⁻¹) := by
     have := multipliable_one_add_of_summable hsum
     simpa only [← heq] using this
-  have hfac : ∀ a, Real.exp (-‖x a‖) ≤ ‖(1 - x a)⁻¹‖ := by
+  have hfac : ∀ a, Real.exp (- ‖x a‖) ≤ ‖(1 - x a)⁻¹‖ := by
     intro a
     rw [norm_inv, Real.exp_neg]
     refine inv_anti₀ (by linarith [hlow a]) ?_
@@ -44,14 +46,14 @@ theorem exp_neg_le_norm_tprod_one_sub_inv {ι : Type} (x : ι → ℂ) (B : ℝ)
     linarith [Real.add_one_le_exp ‖x a‖]
   have ht := (continuous_norm.tendsto _).comp hm.hasProd
   refine ge_of_tendsto' ht (fun s => ?_)
-  have hsle : ∑ a ∈ s, ‖x a‖ ≤ B :=
-    (hs.sum_le_tsum s (fun a _ => norm_nonneg _)).trans hB
-  calc Real.exp (-B) ≤ Real.exp (∑ a ∈ s, -‖x a‖) := by
-        rw [Finset.sum_neg_distrib]
-        exact Real.exp_le_exp.2 (neg_le_neg hsle)
+  have hsle : ∑ a ∈ s, ‖x a‖ ≤ B := (hs.sum_le_tsum s (fun a _ => norm_nonneg _)).trans hB
+  calc
+    Real.exp (-B) ≤ Real.exp (∑ a ∈ s, -‖x a‖) := by
+      rw [Finset.sum_neg_distrib]
+      exact Real.exp_le_exp.2 (neg_le_neg hsle)
     _ = ∏ a ∈ s, Real.exp (-‖x a‖) := Real.exp_sum _ _
     _ ≤ ∏ a ∈ s, ‖(1 - x a)⁻¹‖ :=
-        Finset.prod_le_prod₀ (fun a _ => (Real.exp_pos _).le) (fun a _ => hfac a)
+      Finset.prod_le_prod₀ (fun a _ => (Real.exp_pos _).le) (fun a _ => hfac a)
     _ = _ := by simp only [Function.comp, norm_prod]
 
 end GlobalTheory

@@ -23,15 +23,14 @@ theorem VNumCut.proof (h : CutByForm.Statement.{u}) : VNumCut.Statement.{u} := b
   set π : MRing ι O →+* MRing ι (IsLocalRing.ResidueField O) :=
     MvPolynomial.map (IsLocalRing.residue O) with hπ
   have hsp : ∀ V : Ideal (MRing ι O), specialIdeal V = V.map π := fun V => rfl
-  have hsurj : Function.Surjective π :=
-    MvPolynomial.map_surjective _ IsLocalRing.residue_surjective
+  have hsurj : Function.Surjective π := MvPolynomial.map_surjective _ IsLocalRing.residue_surjective
   have hker : RingHom.ker π = Ideal.span {C ϖ} := ker_map_residue_eq_span hϖ
 
-  have hGbp : (specialIdeal G).IsPrime :=
-    (SpecialIdealCorresp.proof O ϖ hϖ K ι G G hGp hϖG).1
+  have hGbp : (specialIdeal G).IsPrime := (SpecialIdealCorresp.proof O ϖ hϖ K ι G G hGp hϖG).1
   have hGbh : IsMultiHomogIdeal (specialIdeal G) := SpecialIdealMultiHomog.proof O K ι G hGh
-  have hdimb : ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal G) <
-      ((n + 2 + Fintype.card K : ℕ) : WithBot ℕ∞) := by
+  have hdimb
+      : ringKrullDim (MRing ι (IsLocalRing.ResidueField O) ⧸ specialIdeal G)
+        < ((n + 2 + Fintype.card K : ℕ) : WithBot ℕ∞) := by
     rw [SpecialQuotDim.proof O ϖ hϖ K ι G hϖG]; exact hdim
   have hsb : IsMultiHomog (π s) c := isWeightedHomogeneous_map_of _ _ hs
   have hsbG : π s ∉ specialIdeal G := by
@@ -44,8 +43,8 @@ theorem VNumCut.proof (h : CutByForm.Statement.{u}) : VNumCut.Statement.{u} := b
     rw [← hcm]
     exact hm
 
-  have hcut := h (IsLocalRing.ResidueField O) K ι n (specialIdeal G) hGbp hGbh hdimb (π s) c hsb
-    hsbG bs
+  have hcut :=
+    h (IsLocalRing.ResidueField O) K ι n (specialIdeal G) hGbp hGbh hdimb (π s) c hsb hsbG bs
 
   have hJ : G ⊔ Ideal.span {s} ⊔ Ideal.span {C ϖ} = G ⊔ Ideal.span {s} := by
     rw [sup_eq_left, Ideal.span_le, Set.singleton_subset_iff]
@@ -54,9 +53,9 @@ theorem VNumCut.proof (h : CutByForm.Statement.{u}) : VNumCut.Statement.{u} := b
     rw [divCycle_eq_idealCycle, divCycle_eq_idealCycle, hJ]
   have hmapJ : specialIdeal (G ⊔ Ideal.span {s}) = specialIdeal G ⊔ Ideal.span {π s} := by
     rw [hsp, hsp, Ideal.map_sup, Ideal.map_span, Set.image_singleton]
-  have htr := SpecialCycleEval.proof SpecialIdealCorresp.proof SpecialIdealSurj.proof
-    SpecialMultAt.proof O ϖ hϖ K ι (G ⊔ Ideal.span {s})
-    (fun V => intNum (IsLocalRing.ResidueField O) V bs)
+  have htr :=
+    SpecialCycleEval.proof SpecialIdealCorresp.proof SpecialIdealSurj.proof SpecialMultAt.proof O ϖ
+      hϖ K ι (G ⊔ Ideal.span {s}) (fun V => intNum (IsLocalRing.ResidueField O) V bs)
   rw [hmapJ, ← divCycle_eq_idealCycle] at htr
   show intNum (IsLocalRing.ResidueField O) (specialIdeal G) _ =
     cycEval (fun U => intNum (IsLocalRing.ResidueField O) (specialIdeal U) bs) (divCycle G s)

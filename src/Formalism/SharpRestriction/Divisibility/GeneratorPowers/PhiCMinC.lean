@@ -28,8 +28,7 @@ theorem whiten_holds : WhitenStatement := by
     simp [Real.mul_self_sqrt (hL.eigenvalues_pos i).le]
   refine ⟨s * Uᵀ, ?_, ?_⟩
   · have hUU : star U * U = 1 := Unitary.star_mul_self_of_mem hH.eigenvectorUnitary.2
-    have h1 : (star U).det * U.det = 1 := by
-      rw [← Matrix.det_mul, hUU, Matrix.det_one]
+    have h1 : (star U).det * U.det = 1 := by rw [← Matrix.det_mul, hUU, Matrix.det_one]
     have hdU : IsUnit U.det := isUnit_iff_ne_zero.mpr (right_ne_zero_of_mul_eq_one h1)
     rw [Matrix.det_mul, Matrix.det_transpose]
     refine IsUnit.mul ?_ hdU

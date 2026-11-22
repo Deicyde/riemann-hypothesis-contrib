@@ -4,25 +4,35 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.QuadraticEx
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum UpperTheory.V.Two
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum UpperTheory.V.Two
 open scoped Pointwise
 
-private theorem ker_congr (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m n : ℕ) [NeZero m] [NeZero n]
-    (h : m = n) : (galChar Ω m).ker = (galChar Ω n).ker := by
+private theorem ker_congr
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (m n : ℕ) [NeZero m] [NeZero n]
+    (h : m = n)
+    : (galChar Ω m).ker = (galChar Ω n).ker := by
   subst h
   rfl
 
-private theorem prim_lemma (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m] :
-    ∃ ζ : Ω, IsPrimitiveRoot ζ m := by
+private theorem prim_lemma (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m]
+    : ∃ ζ : Ω, IsPrimitiveRoot ζ m := by
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
-  obtain ⟨ζ, hζ⟩ := IsAlgClosed.exists_root (Polynomial.cyclotomic m Ω)
-    (Polynomial.degree_cyclotomic_pos m Ω (NeZero.pos m)).ne'
+  obtain ⟨ζ, hζ⟩ :=
+    IsAlgClosed.exists_root (Polynomial.cyclotomic m Ω)
+      (Polynomial.degree_cyclotomic_pos m Ω (NeZero.pos m)).ne'
   exact ⟨ζ, Polynomial.isRoot_cyclotomic_iff.mp hζ⟩
 
-private theorem galChar_eq_of_apply_primitiveRoot_eq_pow (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m]
-    (g : G ℚ Ω) (ζ : Ω) (hζ : IsPrimitiveRoot ζ m) (k : ℕ) (hk : g ζ = ζ ^ k) :
-    (galChar Ω m g : ZMod m) = k := by
+private theorem galChar_eq_of_apply_primitiveRoot_eq_pow
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (m : ℕ) [NeZero m]
+    (g : G ℚ Ω)
+    (ζ : Ω) (hζ : IsPrimitiveRoot ζ m)
+    (k : ℕ) (hk : g ζ = ζ ^ k)
+    : (galChar Ω m g : ZMod m) = k := by
   have h1 := galChar_spec m g ζ hζ.pow_eq_one
   rw [hk] at h1
   have hfin : IsOfFinOrder ζ := isOfFinOrder_iff_pow_eq_one.mpr ⟨m, NeZero.pos m, hζ.pow_eq_one⟩
@@ -31,24 +41,29 @@ private theorem galChar_eq_of_apply_primitiveRoot_eq_pow (Ω : Type) [Field Ω] 
   rw [← ZMod.natCast_zmod_val (galChar Ω m g : ZMod m)]
   exact ((ZMod.natCast_eq_natCast_iff _ _ _).mpr h2).symm
 
-private theorem galChar_val_cast_eq_galChar_of_dvd (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m N : ℕ) [NeZero m]
-    [NeZero N] (h : m ∣ N) (g : G ℚ Ω) :
-    (((galChar Ω N g : ZMod N).val : ℕ) : ZMod m) = (galChar Ω m g : ZMod m) := by
+private theorem galChar_val_cast_eq_galChar_of_dvd
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (m N : ℕ) [NeZero m] [NeZero N]
+    (h : m ∣ N) (g : G ℚ Ω)
+    : (((galChar Ω N g : ZMod N).val : ℕ) : ZMod m) = (galChar Ω m g : ZMod m) := by
   obtain ⟨ζ, hζ⟩ := prim_lemma Ω N
   obtain ⟨d, hd⟩ := h
   have hμ : IsPrimitiveRoot (ζ ^ d) m := hζ.pow (NeZero.pos N) (by rw [hd, mul_comm])
   refine (galChar_eq_of_apply_primitiveRoot_eq_pow Ω m g (ζ ^ d) hμ _ ?_).symm
   rw [map_pow, galChar_spec N g ζ hζ.pow_eq_one, ← pow_mul, ← pow_mul, mul_comm]
 
-private theorem unitsMap_galChar_eq_galChar_of_dvd (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m N : ℕ) [NeZero m]
-    [NeZero N] (h : m ∣ N) (g : G ℚ Ω) :
-    ZMod.unitsMap h (galChar Ω N g) = galChar Ω m g := by
+private theorem unitsMap_galChar_eq_galChar_of_dvd
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω]
+    (m N : ℕ) [NeZero m] [NeZero N]
+    (h : m ∣ N) (g : G ℚ Ω)
+    : ZMod.unitsMap h (galChar Ω N g) = galChar Ω m g := by
   ext
   rw [← galChar_val_cast_eq_galChar_of_dvd Ω m N h g, ← ZMod.cast_eq_val]
   rfl
 
-private theorem galChar_surjective (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m] :
-    Function.Surjective (galChar Ω m) := by
+private theorem galChar_surjective
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m]
+    : Function.Surjective (galChar Ω m) := by
   intro u
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   obtain ⟨ζ, hζ⟩ := prim_lemma Ω m
@@ -64,8 +79,9 @@ private theorem galChar_surjective (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAl
   ext
   rw [galChar_eq_of_apply_primitiveRoot_eq_pow Ω m g ζ hζ _ hg', ZMod.natCast_zmod_val]
 
-private theorem isOpen_galChar_ker (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m] :
-    IsOpen ((galChar Ω m).ker : Set (G ℚ Ω)) := by
+private theorem isOpen_galChar_ker
+    (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (m : ℕ) [NeZero m]
+    : IsOpen ((galChar Ω m).ker : Set (G ℚ Ω)) := by
   obtain ⟨ζ, hζ⟩ := prim_lemma Ω m
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap ℚ Ω).injective
   haveI : FiniteDimensional ℚ (IntermediateField.adjoin ℚ {ζ}) :=
@@ -82,9 +98,15 @@ private theorem isOpen_galChar_ker (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAl
   rw [galChar_eq_of_apply_primitiveRoot_eq_pow Ω m g ζ hζ 1 hfix]
   simp
 
-theorem UpperTheory.V.Two.abBasic :
-    ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω], (∀ A B : AbF, abU Ω (A.sup B) = abU Ω A ⊓ abU Ω B) ∧ (∀ A : AbF, (abU Ω A).index = A.deg ∧ A.deg ≠ 0 ∧ IsOpen (abU Ω A : Set (G ℚ Ω)) ∧ (galChar Ω A.m).ker ≤ abU Ω A) ∧
-      (∀ (A : AbF) (N : ℕ) [NeZero N], A.m ∣ N → ∀ g, g ∈ abU Ω A ↔ A.ker (galChar Ω N g : ZMod N).val) ∧ ∀ (m : ℕ) [NeZero m], abU Ω (AbF.cyc m) = (galChar Ω m).ker := by
+theorem UpperTheory.V.Two.abBasic
+    : ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω],
+      (∀ A B : AbF, abU Ω (A.sup B) = abU Ω A ⊓ abU Ω B)
+        ∧ (∀ A : AbF,
+          (abU Ω A).index = A.deg ∧ A.deg ≠ 0 ∧ IsOpen (abU Ω A : Set (G ℚ Ω))
+            ∧ (galChar Ω A.m).ker ≤ abU Ω A)
+        ∧ (∀ (A : AbF) (N : ℕ) [NeZero N],
+          A.m ∣ N → ∀ g, g ∈ abU Ω A ↔ A.ker (galChar Ω N g : ZMod N).val)
+        ∧ ∀ (m : ℕ) [NeZero m], abU Ω (AbF.cyc m) = (galChar Ω m).ker := by
   intro Ω _ _ _
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro A B
@@ -96,7 +118,12 @@ theorem UpperTheory.V.Two.abBasic :
     rw [unitsMap_galChar_eq_galChar_of_dvd Ω A.m (A.m * B.m) (dvd_mul_right _ _) g,
       unitsMap_galChar_eq_galChar_of_dvd Ω B.m (A.m * B.m) (dvd_mul_left _ _) g]
   · intro A
-    refine ⟨Subgroup.index_comap_of_surjective _ (galChar_surjective Ω A.m), Subgroup.index_ne_zero_of_finite, ?_, ?_⟩
+    refine ⟨
+      Subgroup.index_comap_of_surjective _ (galChar_surjective Ω A.m),
+      Subgroup.index_ne_zero_of_finite,
+      ?_,
+      ?_
+    ⟩
     · refine Subgroup.isOpen_mono ?_ (isOpen_galChar_ker Ω A.m)
       intro g hg
       simp [abU, MonoidHom.mem_ker.mp hg, one_mem]

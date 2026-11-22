@@ -22,9 +22,11 @@ theorem UnbranchedFibreSections.proof : UnbranchedFibreSections.Statement := by
     exact_mod_cast h.symm
   let e : Fin N ≃ hfin.toFinset := (Finset.equivFinOfCardEq ht).symm
   have he : ∀ i, (e i : σ → ℂ) ∈ X ∩ B ∧ A (e i) = y₀ := fun i => hfin.mem_toFinset.mp (e i).2
-  have hc : ∀ i : Fin N, ∃ (O : Set (Fin d → ℂ)) (V : Set (σ → ℂ)) (g : (Fin d → ℂ) → σ → ℂ),
-      IsOpen O ∧ IsOpen V ∧ (e i : σ → ℂ) ∈ V ∧ AnalyticOnNhd ℂ g O ∧ (∀ y ∈ O, A (g y) = y) ∧
-        X ∩ B ∩ V = g '' O := fun i => hchart _ (he i).1 (by rw [(he i).2]; exact hδ₀)
+  have hc
+      : ∀ i : Fin N, ∃ (O : Set (Fin d → ℂ)) (V : Set (σ → ℂ)) (g : (Fin d → ℂ) → σ → ℂ),
+        IsOpen O ∧ IsOpen V ∧ (e i : σ → ℂ) ∈ V ∧ AnalyticOnNhd ℂ g O ∧ (∀ y ∈ O, A (g y) = y)
+          ∧ X ∩ B ∩ V = g '' O := fun i =>
+    hchart _ (he i).1 (by rw [(he i).2]; exact hδ₀)
   choose O V g hO hV hxV hg hAg hXV using hc
   have hy₀O : ∀ i, y₀ ∈ O i := by
     intro i
@@ -48,16 +50,27 @@ theorem UnbranchedFibreSections.proof : UnbranchedFibreSections.Statement := by
     apply hxV'
     refine Set.mem_iUnion.mpr ⟨e.symm ⟨x, hxF⟩, ?_⟩
     simpa using hxV (e.symm ⟨x, hxF⟩)
-  have hnhds : Metric.ball y₀ (ρ / 2) ∩ (A '' (C \ ⋃ i, V i))ᶜ ∩ (⋂ i, O i) ∩ {y | δ y ≠ 0} ∈ 𝓝 y₀ := by
-    refine Filter.inter_mem (Filter.inter_mem (Filter.inter_mem
-      (Metric.ball_mem_nhds _ (by linarith)) (hE.isOpen_compl.mem_nhds hy₀E)) ?_) ?_
+  have hnhds
+      : Metric.ball y₀ (ρ / 2) ∩ (A '' (C \ ⋃ i, V i))ᶜ ∩ (⋂ i, O i) ∩ {y | δ y ≠ 0} ∈ 𝓝 y₀ := by
+    refine Filter.inter_mem
+      (Filter.inter_mem
+        (Filter.inter_mem (Metric.ball_mem_nhds _ (by linarith)) (hE.isOpen_compl.mem_nhds hy₀E))
+        ?_)
+      ?_
     · exact Filter.iInter_mem.mpr fun i => (hO i).mem_nhds (hy₀O i)
     · exact (hδan y₀ hy₀).continuousAt.eventually_ne hδ₀
   obtain ⟨r, hr, hrsub⟩ := Metric.mem_nhds_iff.mp hnhds
   have hrD : Metric.ball y₀ r ⊆ D := fun y hy =>
     hρD (Metric.ball_subset_ball (by linarith) (hrsub hy).1.1.1)
-  refine ⟨r, g, hr, hrD, fun y hy => (hrsub hy).2,
-    fun i y hy => hg i y (Set.mem_iInter.mp (hrsub hy).1.2 i), ?_⟩
+  refine ⟨
+    r,
+    g,
+    hr,
+    hrD,
+    fun y hy => (hrsub hy).2,
+    fun i y hy => hg i y (Set.mem_iInter.mp (hrsub hy).1.2 i),
+    ?_
+  ⟩
   intro y hy
   obtain ⟨⟨⟨hyb, hyE⟩, hyO⟩, hyδ⟩ := hrsub hy
   have hyO' : ∀ i, y ∈ O i := Set.mem_iInter.mp hyO
@@ -85,10 +98,10 @@ theorem UnbranchedFibreSections.proof : UnbranchedFibreSections.Statement := by
   have hN : (Set.range (fun i => g i y)).encard = N := by
     rw [← hrange]
     exact hcard y (hrD hy) hyδ
-  have himg : Set.range (fun i => g i y) = ↑(Finset.univ.image (fun i => g i y)) := by
-    simp
+  have himg : Set.range (fun i => g i y) = ↑(Finset.univ.image (fun i => g i y)) := by simp
   rw [himg, Set.encard_coe_eq_coe_finsetCard] at hN
-  have hcardeq : (Finset.univ.image (fun i => g i y)).card = (Finset.univ : Finset (Fin N)).card := by
+  have hcardeq
+      : (Finset.univ.image (fun i => g i y)).card = (Finset.univ : Finset (Fin N)).card := by
     rw [Finset.card_univ, Fintype.card_fin]
     exact_mod_cast hN
   have hinj := Finset.card_image_iff.mp hcardeq

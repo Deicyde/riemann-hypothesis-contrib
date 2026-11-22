@@ -9,9 +9,11 @@ open scoped TensorProduct
 
 namespace GlobalTheory.CompanionTheory.FiniteComplete
 
-theorem isAdicComplete_of_finite : ∀ (O M : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
-    [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [AddCommGroup M] [Module O M]
-    [Module.Finite O M], IsAdicComplete (IsLocalRing.maximalIdeal O) M := by
+theorem isAdicComplete_of_finite
+    : ∀ (O M : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+        [IsAdicComplete (IsLocalRing.maximalIdeal O) O] [AddCommGroup M] [Module O M]
+        [Module.Finite O M],
+      IsAdicComplete (IsLocalRing.maximalIdeal O) M := by
   intro O M _ _ _ hO _ _ _
   set I := IsLocalRing.maximalIdeal O
   have hb : Function.Bijective (AdicCompletion.of I O) := AdicCompletion.of_bijective_iff.2 hO
@@ -23,8 +25,7 @@ theorem isAdicComplete_of_finite : ∀ (O M : Type) [CommRing O] [IsLocalRing O]
     simp
   have hfac : ⇑(AdicCompletion.of I M) = ⇑(AdicCompletion.ofTensorProduct I M) ∘ ⇑e := by
     funext m
-    have he : e m = (1 : AdicCompletion I O) ⊗ₜ[O] m := by
-      simp [e, φ, h1]
+    have he : e m = (1 : AdicCompletion I O) ⊗ₜ[O] m := by simp [e, φ, h1]
     simp [he]
   refine AdicCompletion.of_bijective_iff.1 ?_
   rw [hfac]

@@ -6,11 +6,18 @@ public import Mathlib
 
 open TensorProduct Module
 
-theorem GlobalTheory.tensorBasisCoords : ∀ (F : Type) [Field F] (B : Type) [CommRing B] [Algebra F B] (V : Type) [AddCommGroup V] [Module F V] (n : Type) [Fintype n] [DecidableEq n] (b : Basis n F V), ∃ e : V ⊗[F] B ≃ₗ[F] (n → B), (∀ v x i, e (v ⊗ₜ[F] x) i = b.repr v i • x) ∧ (∀ y : n → B, e.symm y = ∑ i, b i ⊗ₜ[F] y i) ∧ ∀ (r : V →ₗ[F] V) (f : B →ₗ[F] B) (y : V ⊗[F] B), e (TensorProduct.map r f y) = ((LinearMap.toMatrix b b r).map (algebraMap F B)).mulVec (fun i => f (e y i)) := by
+theorem GlobalTheory.tensorBasisCoords
+    : ∀ (F : Type) [Field F] (B : Type) [CommRing B] [Algebra F B] (V : Type) [AddCommGroup V]
+        [Module F V] (n : Type) [Fintype n] [DecidableEq n] (b : Basis n F V),
+      ∃ e : V ⊗[F] B ≃ₗ[F] (n → B),
+        (∀ v x i, e (v ⊗ₜ[F] x) i = b.repr v i • x) ∧ (∀ y : n → B, e.symm y = ∑ i, b i ⊗ₜ[F] y i)
+          ∧ ∀ (r : V →ₗ[F] V) (f : B →ₗ[F] B) (y : V ⊗[F] B),
+            e (TensorProduct.map r f y)
+              = ((LinearMap.toMatrix b b r).map (algebraMap F B)).mulVec (fun i => f (e y i)) := by
   intro F _ B _ _ V _ _ n _ _ b
   let e : V ⊗[F] B ≃ₗ[F] (n → B) :=
-    (TensorProduct.comm F V B) ≪≫ₗ (TensorProduct.congr (LinearEquiv.refl F B) b.equivFun) ≪≫ₗ
-      TensorProduct.piScalarRight F F B n
+    (TensorProduct.comm F V B) ≪≫ₗ (TensorProduct.congr (LinearEquiv.refl F B) b.equivFun)
+      ≪≫ₗ TensorProduct.piScalarRight F F B n
   have h1 : ∀ v x i, e (v ⊗ₜ[F] x) i = b.repr v i • x := by
     intro v x i
     simp [e, TensorProduct.piScalarRight_apply, TensorProduct.piScalarRightHom_tmul]
@@ -31,7 +38,8 @@ theorem GlobalTheory.tensorBasisCoords : ∀ (F : Type) [Field F] (B : Type) [Co
     | tmul v x =>
       funext i
       rw [TensorProduct.map_tmul, h1]
-      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, LinearMap.toMatrix_apply, h1, map_smul]
+      simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, LinearMap.toMatrix_apply, h1,
+        map_smul]
       simp_rw [← Algebra.smul_def, smul_smul]
       rw [← Finset.sum_smul]
       congr 1

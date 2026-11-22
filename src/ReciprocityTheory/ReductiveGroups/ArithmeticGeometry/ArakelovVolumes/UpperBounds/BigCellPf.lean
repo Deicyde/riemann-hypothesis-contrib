@@ -6,7 +6,9 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArakelovVolum
 
 namespace ReciprocityTheory.ChartRestriction.G.AR.Up
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up.ExtFPf
+  Topology
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E]
 
@@ -35,23 +37,26 @@ theorem bigCell_of (hLU : LUStatement (E := E)) : BigCellStatement (E := E) := b
       refine continuous_matrix fun a b => ?_
       simp only [gram, hermC, col, Matrix.of_apply]
       have h := hmat τ
-      first
-      | fun_prop
-      | continuity
-    have hdet : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => (mat x τ).det :=
-      fun τ => (hmat τ).matrix_det
-    have hmin : ∀ τ : X.Ψ, ∀ i : Fin (r + 1), Continuous fun x : Frame X.Ψ r => (dmin X.Gm x τ i).re := by
+      first | fun_prop | continuity
+    have hdet : ∀ τ : X.Ψ, Continuous fun x : Frame X.Ψ r => (mat x τ).det := fun τ =>
+      (hmat τ).matrix_det
+    have hmin
+        : ∀ τ : X.Ψ, ∀ i : Fin (r + 1), Continuous fun x : Frame X.Ψ r => (dmin X.Gm x τ i).re := by
       intro τ i
       unfold dmin lminor
       exact Complex.continuous_re.comp ((hgram τ).matrix_submatrix _ _).matrix_det
     show IsOpen (GG X.Ψ X.Gm X.p0)
-    have hset : GG X.Ψ X.Gm X.p0 = ⋂ τ : X.Ψ, ({x | (mat x τ).det ≠ 0} ∩
-        ⋂ i : Fin (r + 1), {x | 0 < psgn X.p0 i * (dmin X.Gm x τ i).re}) := by
+    have hset
+        : GG X.Ψ X.Gm X.p0
+          = ⋂ τ : X.Ψ, ({x | (mat x τ).det ≠ 0} ∩
+            ⋂ i : Fin (r + 1), {x | 0 < psgn X.p0 i * (dmin X.Gm x τ i).re}) := by
       ext x
       simp only [GG, Set.mem_setOf_eq, Set.mem_iInter, Set.mem_inter_iff]
     rw [hset]
-    exact isOpen_iInter_of_finite fun τ => (isOpen_ne_fun (hdet τ) continuous_const).inter
-      (isOpen_iInter_of_finite fun i => isOpen_lt continuous_const (continuous_const.mul (hmin τ i)))
+    exact isOpen_iInter_of_finite fun τ =>
+      (isOpen_ne_fun (hdet τ) continuous_const).inter
+        (isOpen_iInter_of_finite fun i =>
+          isOpen_lt continuous_const (continuous_const.mul (hmin τ i)))
   have hcont : ContinuousOn P X.dom := hP.1.continuousOn
   by_contra hne
   have hU : IsOpen (X.dom ∩ P ⁻¹' {0}ᶜ) := hcont.isOpen_inter_preimage hopen isOpen_compl_singleton

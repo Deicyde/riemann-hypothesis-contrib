@@ -9,9 +9,12 @@ open Matrix Polynomial
 
 namespace GlobalTheory.IsoIdem
 
-theorem eq_zero_of_pow_eq_zero {E : Type} [Field E] {r : ℕ} (A : Matrix (Fin r) (Fin r) E)
-    (hs : A.charpoly.Separable) (y : Matrix (Fin r) (Fin r) E) (hy : y * A = A * y) (k : ℕ)
-    (hk : y ^ k = 0) : y = 0 := by
+theorem eq_zero_of_pow_eq_zero
+    {E : Type} [Field E]
+    {r : ℕ} (A : Matrix (Fin r) (Fin r) E) (hs : A.charpoly.Separable)
+    (y : Matrix (Fin r) (Fin r) E) (hy : y * A = A * y)
+    (k : ℕ) (hk : y ^ k = 0)
+    : y = 0 := by
   obtain ⟨q, rfl⟩ := GlobalTheory.CommSep.eq_aeval_of_commute_of_separable A hs y hy
   rcases k with _ | k
   · rw [pow_zero] at hk
@@ -22,9 +25,11 @@ theorem eq_zero_of_pow_eq_zero {E : Type} [Field E] {r : ℕ} (A : Matrix (Fin r
   have h2 : minpoly E A ∣ q := (hsq.dvd_pow_iff_dvd (by omega)).1 h1
   exact minpoly.dvd_iff.1 h2
 
-theorem exists_pow_mul_eq {E : Type} [Field E] {r : ℕ} (A : Matrix (Fin r) (Fin r) E)
-    (hs : A.charpoly.Separable) (z : Matrix (Fin r) (Fin r) E) (hz : z * A = A * z) :
-    ∃ n : ℕ, ∃ w : Matrix (Fin r) (Fin r) E, w * A = A * w ∧ z ^ (n + 1) * w = z ^ n := by
+theorem exists_pow_mul_eq
+    {E : Type} [Field E]
+    {r : ℕ} (A : Matrix (Fin r) (Fin r) E) (hs : A.charpoly.Separable)
+    (z : Matrix (Fin r) (Fin r) E) (hz : z * A = A * z)
+    : ∃ n : ℕ, ∃ w : Matrix (Fin r) (Fin r) E, w * A = A * w ∧ z ^ (n + 1) * w = z ^ n := by
   let S := Subalgebra.centralizer E ({A} : Set (Matrix (Fin r) (Fin r) E))
   have hmem : ∀ a : Matrix (Fin r) (Fin r) E, a ∈ S ↔ a * A = A * a := by
     intro a; rw [Subalgebra.mem_centralizer_iff]; simp [eq_comm]
@@ -37,42 +42,52 @@ theorem exists_pow_mul_eq {E : Type} [Field E] {r : ℕ} (A : Matrix (Fin r) (Fi
   have := congrArg Subtype.val hw
   simpa using this
 
-theorem star_mul_comm {E : Type} [Field E] [StarRing E] {r : ℕ} (A : Matrix (Fin r) (Fin r) E)
-    (hA : A.IsHermitian) (y : Matrix (Fin r) (Fin r) E) (hy : y * A = A * y) :
-    star y * A = A * star y := by
+theorem star_mul_comm
+    {E : Type} [Field E] [StarRing E]
+    {r : ℕ} (A : Matrix (Fin r) (Fin r) E) (hA : A.IsHermitian) (y : Matrix (Fin r) (Fin r) E)
+    (hy : y * A = A * y)
+    : star y * A = A * star y := by
   have hA' : star A = A := hA
   have := congrArg star hy
   rw [star_mul, star_mul, hA'] at this
   exact this.symm
 
-theorem pow_add_mul_pow {R : Type} [Ring R] (z w : R) (m : ℕ) (h : z ^ (m + 1) * w = z ^ m) :
-    ∀ j : ℕ, z ^ (m + j) * w ^ j = z ^ m := by
+theorem pow_add_mul_pow {R : Type} [Ring R] (z w : R) (m : ℕ) (h : z ^ (m + 1) * w = z ^ m)
+    : ∀ j : ℕ, z ^ (m + j) * w ^ j = z ^ m := by
   intro j
   induction j with
   | zero => simp
   | succ j ih =>
-    calc z ^ (m + (j + 1)) * w ^ (j + 1) = z ^ j * (z ^ (m + 1) * w) * w ^ j := by
-          rw [pow_succ' w j, show m + (j + 1) = j + (m + 1) by omega, pow_add]
-          simp only [mul_assoc]
+    calc
+      z ^ (m + (j + 1)) * w ^ (j + 1) = z ^ j * (z ^ (m + 1) * w) * w ^ j := by
+        rw [pow_succ' w j, show m + (j + 1) = j + (m + 1) by omega, pow_add]
+        simp only [mul_assoc]
       _ = z ^ (m + j) * w ^ j := by rw [h, ← pow_add, show j + m = m + j by omega]
       _ = z ^ m := ih
 
-theorem isoIdem : ∀ (E : Type) [Field E] [StarRing E] (r : ℕ) (A₀ : Matrix (Fin r) (Fin r) E),
-    A₀.IsHermitian → A₀.charpoly.Separable → ∃ f : Matrix (Fin r) (Fin r) E, f * A₀ = A₀ * f ∧
-      f * f = f ∧ f * star f = 0 ∧ ∀ y : Matrix (Fin r) (Fin r) E, y * A₀ = A₀ * y →
-        y * (1 - f - star f) * star (y * (1 - f - star f)) = 0 → y * (1 - f - star f) = 0 := by
+theorem isoIdem
+    : ∀ (E : Type) [Field E] [StarRing E] (r : ℕ) (A₀ : Matrix (Fin r) (Fin r) E),
+      A₀.IsHermitian → A₀.charpoly.Separable
+        → ∃ f : Matrix (Fin r) (Fin r) E,
+          f * A₀ = A₀ * f ∧ f * f = f ∧ f * star f = 0
+            ∧ ∀ y : Matrix (Fin r) (Fin r) E,
+              y * A₀ = A₀ * y → y * (1 - f - star f) * star (y * (1 - f - star f)) = 0
+                → y * (1 - f - star f) = 0 := by
   intro E _ _ r A hA hs
   have comm : ∀ a b : Matrix (Fin r) (Fin r) E, a * A = A * a → b * A = A * b → a * b = b * a :=
     GlobalTheory.CommSep.commute_of_commute_separable E r A hs
   have cstar := star_mul_comm A hA
-  have cmul : ∀ a b : Matrix (Fin r) (Fin r) E, a * A = A * a → b * A = A * b →
-      (a * b) * A = A * (a * b) := by
+  have cmul
+      : ∀ a b : Matrix (Fin r) (Fin r) E,
+        a * A = A * a → b * A = A * b → (a * b) * A = A * (a * b) := by
     intro a b ha hb; rw [mul_assoc, hb, ← mul_assoc, ha, mul_assoc]
-  have cadd : ∀ a b : Matrix (Fin r) (Fin r) E, a * A = A * a → b * A = A * b →
-      (a + b) * A = A * (a + b) := by
+  have cadd
+      : ∀ a b : Matrix (Fin r) (Fin r) E,
+        a * A = A * a → b * A = A * b → (a + b) * A = A * (a + b) := by
     intro a b ha hb; rw [add_mul, mul_add, ha, hb]
-  have csub : ∀ a b : Matrix (Fin r) (Fin r) E, a * A = A * a → b * A = A * b →
-      (a - b) * A = A * (a - b) := by
+  have csub
+      : ∀ a b : Matrix (Fin r) (Fin r) E,
+        a * A = A * a → b * A = A * b → (a - b) * A = A * (a - b) := by
     intro a b ha hb; rw [sub_mul, mul_sub, ha, hb]
   have cone : (1 : Matrix (Fin r) (Fin r) E) * A = A * 1 := by simp
   have cpow : ∀ a : Matrix (Fin r) (Fin r) E, a * A = A * a → ∀ k : ℕ, a ^ k * A = A * a ^ k := by
@@ -97,10 +112,11 @@ theorem isoIdem : ∀ (E : Type) [Field E] [StarRing E] (r : ℕ) (A₀ : Matrix
   have hsfe : star f * e = 0 := by rw [he, mul_sub, mul_sub, mul_one, hsf, hsfsf]; abel
   have hef : e * star f = 0 := by rw [← comm _ _ hfsC heC]; exact hsfe
   have hee : e * e = e := by
-    calc e * e = (1 - f - star f) * e := by rw [← he]
+    calc
+      e * e
+        = (1 - f - star f) * e := by rw [← he]
       _ = e := by rw [sub_mul, sub_mul, one_mul, hfe, hsfe, sub_zero, sub_zero]
-  have hestar : star e = e := by
-    rw [he, star_sub, star_sub, star_one, star_star, sub_right_comm]
+  have hestar : star e = e := by rw [he, star_sub, star_sub, star_one, star_star, sub_right_comm]
   have hze : z * e = z := by rw [hzdef, mul_assoc, hee]
   obtain ⟨n, w, hwC, hw⟩ := exists_pow_mul_eq A hs z hzC
   have hw' : z ^ (n + 1 + 1) * w = z ^ (n + 1) := by
@@ -125,14 +141,11 @@ theorem isoIdem : ∀ (E : Type) [Field E] [StarRing E] (r : ℕ) (A₀ : Matrix
     have hb : (a * star a) * A = A * (a * star a) := cmul _ _ haC (cstar _ haC)
     rw [hgza, star_mul, mul_assoc, ← mul_assoc a, comm _ _ hb (cstar _ hzC), ← mul_assoc]
     rw [show z * star z = 0 from hiso, zero_mul]
-  have hge : g * e = g := by
-    rw [hgza, mul_assoc, comm a e haC heC, ← mul_assoc, hze]
-  have hfz : f * z = 0 := by
-    rw [hzdef, ← mul_assoc, comm f y hfC hy, mul_assoc, hfe, mul_zero]
+  have hge : g * e = g := by rw [hgza, mul_assoc, comm a e haC heC, ← mul_assoc, hze]
+  have hfz : f * z = 0 := by rw [hzdef, ← mul_assoc, comm f y hfC hy, mul_assoc, hfe, mul_zero]
   have hfg : f * g = 0 := by rw [hgza, ← mul_assoc, hfz, zero_mul]
   have hgf : g * f = 0 := by rw [comm g f hgC hfC]; exact hfg
-  have hfsg : f * star g = 0 := by
-    rw [← hge, star_mul, hestar, ← mul_assoc, hfe, zero_mul]
+  have hfsg : f * star g = 0 := by rw [← hge, star_mul, hestar, ← mul_assoc, hfe, zero_mul]
   have hgsf : g * star f = 0 := by rw [← hge, mul_assoc, hef, mul_zero]
   have hf'S : f + g ∈ S := by
     refine ⟨cadd _ _ hfC hgC, ?_, ?_⟩
@@ -144,7 +157,9 @@ theorem isoIdem : ∀ (E : Type) [Field E] [StarRing E] (r : ℕ) (A₀ : Matrix
     rw [SetLike.lt_iff_le_and_exists]
     constructor
     · have h1 : (f + g) * f = f := by rw [add_mul, hff, hgf, add_zero]
-      calc LinearMap.range f.mulVecLin = LinearMap.range ((f + g) * f).mulVecLin := by rw [h1]
+      calc
+        LinearMap.range f.mulVecLin
+          = LinearMap.range ((f + g) * f).mulVecLin := by rw [h1]
         _ ≤ _ := by rw [Matrix.mulVecLin_mul]; exact LinearMap.range_comp_le_range _ _
     · obtain ⟨v, hv⟩ : ∃ v : Fin r → E, g *ᵥ v ≠ 0 := by
         by_contra hall
@@ -160,8 +175,7 @@ theorem isoIdem : ∀ (E : Type) [Field E] [StarRing E] (r : ℕ) (A₀ : Matrix
         apply hv
         have hgv : g *ᵥ v = g *ᵥ (g *ᵥ v) := by rw [Matrix.mulVec_mulVec, hgg]
         rw [hgv, ← hu, Matrix.mulVec_mulVec, hgf, Matrix.zero_mulVec]
-  have hle : (f + g).rank ≤ r := by
-    simpa using Matrix.rank_le_card_width (f + g)
+  have hle : (f + g).rank ≤ r := by simpa using Matrix.rank_le_card_width (f + g)
   exact hmax (f + g) hf'S (show r - (f + g).rank < r - f.rank by omega)
 
 end GlobalTheory.IsoIdem

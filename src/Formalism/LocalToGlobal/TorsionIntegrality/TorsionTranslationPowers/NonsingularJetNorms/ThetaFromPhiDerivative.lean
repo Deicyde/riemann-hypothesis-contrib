@@ -17,7 +17,8 @@ namespace Two
 variable {K : Type} [NormedField K] [IsUltrametricDist K] [CharZero K]
 
 theorem fExp_zero : Formalism.L2.Th1.B.fExp (0 : PowerSeries K) = 1 := by
-  have h := Formalism.L2.Th1.B.fExp_add (K := K) (ι := Unit) (f := 0) (g := 0) (map_zero _) (map_zero _)
+  have h :=
+    Formalism.L2.Th1.B.fExp_add (K := K) (ι := Unit) (f := 0) (g := 0) (map_zero _) (map_zero _)
   rw [add_zero] at h
   have hc : MvPowerSeries.constantCoeff (Formalism.L2.Th1.B.fExp (0 : MvPowerSeries Unit K)) = 1 :=
     Formalism.L2.Th1.B.constantCoeff_fExp (map_zero _)
@@ -25,8 +26,9 @@ theorem fExp_zero : Formalism.L2.Th1.B.fExp (0 : PowerSeries K) = 1 := by
     intro h0; rw [h0, map_zero] at hc; exact zero_ne_one hc
   exact (mul_left_cancel₀ hne (h.symm.trans (mul_one _).symm))
 
-theorem oneUnit_fExp_neg {f : PowerSeries K} (h : Formalism.InvariantFactorPaths.G7.Simeq (ι := Unit) f 0) :
-    OneUnit (Formalism.L2.Th1.B.fExp (-f)) := by
+theorem oneUnit_fExp_neg
+    {f : PowerSeries K} (h : Formalism.InvariantFactorPaths.G7.Simeq (ι := Unit) f 0)
+    : OneUnit (Formalism.L2.Th1.B.fExp (-f)) := by
   obtain ⟨h0, hI⟩ := h
   rw [sub_zero] at h0 hI
   have h0n : MvPowerSeries.constantCoeff (-f : MvPowerSeries Unit K) = 0 := by

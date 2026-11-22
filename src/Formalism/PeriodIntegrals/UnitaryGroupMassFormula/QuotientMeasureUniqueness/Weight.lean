@@ -22,21 +22,27 @@ theorem qmuWeight : QmuWeight := by
   obtain ⟨d, hd⟩ := TopologicalSpace.exists_dense_seq G
   have hCo : ∀ n, IsOpen (d n • interior K) := fun n => hVo.smul (d n)
   have hCm : ∀ n, MeasurableSet (d n • interior K) := fun n => (hCo n).measurableSet
-  have hind : ∀ n, Measurable ((d n • interior K).indicator (1 : G → ℝ≥0∞)) :=
-    fun n => measurable_one.indicator (hCm n)
-  refine ⟨fun x => ∑' n, (2⁻¹ : ℝ≥0∞) ^ n * (d n • interior K).indicator 1 x,
-    Measurable.tsum fun n => (hind n).const_mul _, fun g => ?_⟩
-  have hmg : ∀ n, Measurable fun h : H => (d n • interior K).indicator (1 : G → ℝ≥0∞) (g * (h : G)) :=
+  have hind : ∀ n, Measurable ((d n • interior K).indicator (1 : G → ℝ≥0∞)) := fun n =>
+    measurable_one.indicator (hCm n)
+  refine ⟨
+    fun x => ∑' n, (2⁻¹ : ℝ≥0∞) ^ n * (d n • interior K).indicator 1 x,
+    Measurable.tsum fun n => (hind n).const_mul _,
+    fun g => ?_
+  ⟩
+  have hmg
+      : ∀ n, Measurable fun h : H => (d n • interior K).indicator (1 : G → ℝ≥0∞) (g * (h : G)) :=
     fun n => (hind n).comp ((measurable_const_mul g).comp measurable_subtype_coe)
-  have hterm : ∀ n, Measurable fun h : H =>
-      (2⁻¹ : ℝ≥0∞) ^ n * (d n • interior K).indicator 1 (g * (h : G)) :=
+  have hterm
+      : ∀ n,
+        Measurable fun h : H => (2⁻¹ : ℝ≥0∞) ^ n * (d n • interior K).indicator 1 (g * (h : G)) :=
     fun n => (hmg n).const_mul _
   have hM : ν {h : H | (h : G) ∈ K⁻¹ * K} ≠ ⊤ := by
     have hc : IsCompact (((↑) : H → G) ⁻¹' (K⁻¹ * K)) :=
       hH.isClosedEmbedding_subtypeVal.isCompact_preimage (hK.inv.mul hK)
     exact hc.measure_lt_top.ne
-  have hle : ∀ n, ∫⁻ h, (d n • interior K).indicator 1 (g * (h : G)) ∂ν
-      ≤ ν {h : H | (h : G) ∈ K⁻¹ * K} := by
+  have hle
+      : ∀ n,
+        ∫⁻ h, (d n • interior K).indicator 1 (g * (h : G)) ∂ν ≤ ν {h : H | (h : G) ∈ K⁻¹ * K} := by
     intro n
     refine hAvg_indicator_le ν (d n • interior K) K (d n) g ?_
     intro x hx
@@ -56,22 +62,27 @@ theorem qmuWeight : QmuWeight := by
       rw [Set.mem_smul_set_iff_inv_smul_mem, smul_eq_mul]
       simpa [mul_assoc] using hn
     have hpos : 0 < ν {h : H | g * (h : G) ∈ d n • interior K} := hSo.measure_pos ν ⟨1, hS1⟩
-    have heq : ∫⁻ h, (d n • interior K).indicator 1 (g * (h : G)) ∂ν
-        = ν {h : H | g * (h : G) ∈ d n • interior K} := by
-      have hfun : (fun h : H => (d n • interior K).indicator (1 : G → ℝ≥0∞) (g * (h : G)))
-          = ((fun h : H => g * (h : G)) ⁻¹' (d n • interior K)).indicator 1 := by
+    have heq
+        : ∫⁻ h, (d n • interior K).indicator 1 (g * (h : G)) ∂ν
+          = ν {h : H | g * (h : G) ∈ d n • interior K} := by
+      have hfun
+          : (fun h : H => (d n • interior K).indicator (1 : G → ℝ≥0∞) (g * (h : G)))
+            = ((fun h : H => g * (h : G)) ⁻¹' (d n • interior K)).indicator 1 := by
         funext h
         exact (indicator_preimage_one (fun h : H => g * (h : G)) (d n • interior K) h).symm
       rw [hfun]
       exact lintegral_indicator_one hSo.measurableSet
     apply ne_of_gt
-    calc (0 : ℝ≥0∞) < (2⁻¹ : ℝ≥0∞) ^ n * ν {h : H | g * (h : G) ∈ d n • interior K} :=
-          ENNReal.mul_pos (pow_ne_zero _ (by simp)) hpos.ne'
+    calc
+      (0 : ℝ≥0∞) < (2⁻¹ : ℝ≥0∞) ^ n * ν {h : H | g * (h : G) ∈ d n • interior K} :=
+        ENNReal.mul_pos (pow_ne_zero _ (by simp)) hpos.ne'
       _ = ∫⁻ h, (2⁻¹ : ℝ≥0∞) ^ n * (d n • interior K).indicator 1 (g * (h : G)) ∂ν := by
-          rw [lintegral_const_mul _ (hmg n), heq]
+        rw [lintegral_const_mul _ (hmg n), heq]
       _ ≤ ∫⁻ h, ∑' m, (2⁻¹ : ℝ≥0∞) ^ m * (d m • interior K).indicator 1 (g * (h : G)) ∂ν :=
-          lintegral_mono fun h => ENNReal.le_tsum
-            (f := fun m => (2⁻¹ : ℝ≥0∞) ^ m * (d m • interior K).indicator 1 (g * (h : G))) n
+        lintegral_mono fun h =>
+          ENNReal.le_tsum
+            (f := fun m => (2⁻¹ : ℝ≥0∞) ^ m * (d m • interior K).indicator 1 (g * (h : G)))
+            n
   · rw [lintegral_tsum fun n => (hterm n).aemeasurable]
     refine ne_top_of_le_ne_top (b := ∑' n, (2⁻¹ : ℝ≥0∞) ^ n * ν {h : H | (h : G) ∈ K⁻¹ * K}) ?_ ?_
     · rw [ENNReal.tsum_mul_right, ENNReal.tsum_geometric, ENNReal.one_sub_inv_two, inv_inv]

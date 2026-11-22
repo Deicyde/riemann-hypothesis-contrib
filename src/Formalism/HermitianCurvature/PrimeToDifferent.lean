@@ -23,15 +23,14 @@ noncomputable def deg : ℕ := finrank ℚ (maximalRealSubfield E)
 noncomputable def dd : FI E := ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FI E)
 
 def Unram : Prop :=
-  differentIdeal ℤ (𝓞 E) =
-    (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
+  differentIdeal ℤ (𝓞 E)
+    = (differentIdeal ℤ (𝓞 (maximalRealSubfield E))).map
       (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))
 
 def UnramAbove (g : ℕ) : Prop :=
   IsCoprime (differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E)) (Ideal.span {(g : 𝓞 E)})
 
-def PrimeToDifferent (g : ℕ) : Prop :=
-  IsCoprime (differentIdeal ℤ (𝓞 E)) (Ideal.span {(g : 𝓞 E)})
+def PrimeToDifferent (g : ℕ) : Prop := IsCoprime (differentIdeal ℤ (𝓞 E)) (Ideal.span {(g : 𝓞 E)})
 
 noncomputable def rd : ℝ := ((|discr E| : ℤ) : ℝ) ^ ((finrank ℚ E : ℝ)⁻¹)
 
@@ -66,17 +65,17 @@ def dualLat (g : ℕ) (L : Submodule ℤ E) : Submodule ℤ E where
     rw [h, map_add (f := _)]
     exact add_mem (ha y hy) (hb y hy)
   smul_mem' := fun n a ha y hy => by
-    have h : (n • a) * y / g = n • (a * y / g) := by
-      simp only [zsmul_eq_mul]; ring
+    have h : (n • a) * y / g = n • (a * y / g) := by simp only [zsmul_eq_mul]; ring
     rw [h, map_zsmul]
     exact zsmul_mem (ha y hy) n
 
 noncomputable def idx (L M : Submodule ℤ E) : ℕ := L.toAddSubgroup.relIndex M.toAddSubgroup
 
-noncomputable def frameLat (L : Submodule ℤ E) (c : ℝ) :
-    Submodule ℤ (mixedEmbedding.mixedSpace E) :=
+noncomputable def frameLat (L : Submodule ℤ E) (c : ℝ)
+    : Submodule ℤ (mixedEmbedding.mixedSpace E) :=
   (L.map (mixedEmbedding E).toAddMonoidHom.toIntLinearMap).map
-    ((c • (LinearMap.id : mixedEmbedding.mixedSpace E →ₗ[ℝ] mixedEmbedding.mixedSpace E)).restrictScalars ℤ)
+    ((c • (LinearMap.id
+        : mixedEmbedding.mixedSpace E →ₗ[ℝ] mixedEmbedding.mixedSpace E)).restrictScalars ℤ)
 
 def locAt (P : Ideal (𝓞 (maximalRealSubfield E))) (L : Submodule ℤ E) : Set E :=
   {t | ∃ a : 𝓞 (maximalRealSubfield E), a ∉ P ∧ algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L}
@@ -92,12 +91,11 @@ def DegreeFacts : Prop :=
     finrank ℚ E = 2 * deg E ∧ Fintype.card (InfinitePlace E) = deg E ∧ 0 < deg E
 
 def PowConjStable : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (k ν : ℤ),
-    ConjStable E (idl E g k ν)
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (k ν : ℤ), ConjStable E (idl E g k ν)
 
 def UnramRelative : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unram E →
-    differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) = ⊤ ∧ ∀ g : ℕ, UnramAbove E g
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+    Unram E → differentIdeal (𝓞 (maximalRealSubfield E)) (𝓞 E) = ⊤ ∧ ∀ g : ℕ, UnramAbove E g
 
 def Between : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (A B : FI E) (s : ℕ),
@@ -105,56 +103,61 @@ def Between : Prop :=
 
 def IndexCore : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (A : FI E) (g s : ℕ),
-    A ≠ 0 → ConjStable E A → 0 < g → UnramAbove E g →
-    idx E (twLat E A (A * FractionalIdeal.spanSingleton _ (g : E)) s) (zsub E A) = g ^ deg E ∧
-    idx E (zsub E (A * FractionalIdeal.spanSingleton _ (g : E)))
-      (twLat E A (A * FractionalIdeal.spanSingleton _ (g : E)) s) = g ^ deg E
+    A ≠ 0 → ConjStable E A → 0 < g → UnramAbove E g
+      → idx E (twLat E A (A * FractionalIdeal.spanSingleton _ (g : E)) s) (zsub E A) = g ^ deg E
+        ∧ idx E (zsub E (A * FractionalIdeal.spanSingleton _ (g : E)))
+            (twLat E A (A * FractionalIdeal.spanSingleton _ (g : E)) s)
+          = g ^ deg E
 
 def DualSubset : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (ν : ℤ) (s : ℕ), 0 < g →
-    dualLat E g (perLat E g ν s) ≤ twLat E (dualIdl E g ν) (idl E g 0 (-(ν + 1))) (s + 1)
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (ν : ℤ) (s : ℕ),
+    0 < g → dualLat E g (perLat E g ν s) ≤ twLat E (dualIdl E g ν) (idl E g 0 (-(ν + 1))) (s + 1)
 
 def DualSupset : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unram E →
-    ∀ (g : ℕ) (ν : ℤ) (s : ℕ), 0 < g →
-      twLat E (dualIdl E g ν) (idl E g 0 (-(ν + 1))) (s + 1) ≤ dualLat E g (perLat E g ν s)
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+    Unram E
+      → ∀ (g : ℕ) (ν : ℤ) (s : ℕ),
+        0 < g
+          → twLat E (dualIdl E g ν) (idl E g 0 (-(ν + 1))) (s + 1) ≤ dualLat E g (perLat E g ν s)
 
 def NormIdl : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (k ν : ℤ), 0 < g →
-    √(FractionalIdeal.absNorm (idl E g k ν) : ℝ) = ((g : ℝ) ^ k * rd E ^ ν) ^ deg E
-
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (k ν : ℤ),
+    0 < g → √(FractionalIdeal.absNorm (idl E g k ν) : ℝ) = ((g : ℝ) ^ k * rd E ^ ν) ^ deg E
 
 open scoped Classical in
 def CovolumeIndex : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (B : FI E) (L : Submodule ℤ E) (c : ℝ),
-    B ≠ 0 → c ≠ 0 → zsub E B ≤ L → idx E (zsub E B) L ≠ 0 →
-    DiscreteTopology (frameLat E L c) ∧
-    Submodule.span ℝ (frameLat E L c : Set (mixedEmbedding.mixedSpace E)) = ⊤ ∧
-    ZLattice.covolume (E := mixedEmbedding.mixedSpace E) (frameLat E L c) =
-      |c| ^ (2 * deg E) * (FractionalIdeal.absNorm B : ℝ) * (2⁻¹ : ℝ) ^ deg E *
-        √((|discr E| : ℤ) : ℝ) / (idx E (zsub E B) L : ℝ)
+    B ≠ 0 → c ≠ 0 → zsub E B ≤ L → idx E (zsub E B) L ≠ 0
+      → DiscreteTopology (frameLat E L c)
+        ∧ Submodule.span ℝ (frameLat E L c : Set (mixedEmbedding.mixedSpace E)) = ⊤
+        ∧ ZLattice.covolume (E := mixedEmbedding.mixedSpace E) (frameLat E L c)
+          = |c| ^ (2 * deg E) * (FractionalIdeal.absNorm B : ℝ) * (2⁻¹ : ℝ) ^ deg E
+            * √((|discr E| : ℤ) : ℝ) / (idx E (zsub E B) L : ℝ)
 
 def IdealsMatch : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (r i s : ℤ),
-    dualIdl E g (nuBlock r i s) = liftIdl E g (nuBlock r i (s - 1)) ∧
-    dualIdl E g (nuBlock r i s) = idl E g (-1) (-(2 * r + 4 - 2 * i - s)) ∧
-    nuBlock r i s = 2 * (r + 1) - i - (i - 1 + s)
+    dualIdl E g (nuBlock r i s) = liftIdl E g (nuBlock r i (s - 1))
+      ∧ dualIdl E g (nuBlock r i s) = idl E g (-1) (-(2 * r + 4 - 2 * i - s))
+      ∧ nuBlock r i s = 2 * (r + 1) - i - (i - 1 + s)
 
 def LocTw : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (A B : FI E) (s : ℕ)
-    (P : Ideal (𝓞 (maximalRealSubfield E))), P.IsPrime → ∀ t : E,
-    (t ∈ locAt E P (twLat E A B s) ↔
-      t ∈ locAt E P (zsub E A) ∧ t - (-1) ^ s * complexConj E t ∈ locAt E P (zsub E B))
+      (P : Ideal (𝓞 (maximalRealSubfield E))),
+    P.IsPrime
+      → ∀ t : E,
+        (t ∈ locAt E P (twLat E A B s)
+          ↔ t ∈ locAt E P (zsub E A) ∧ t - (-1) ^ s * complexConj E t ∈ locAt E P (zsub E B))
 
 def LocOrdinary : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (k ν : ℤ)
-    (P : Ideal (𝓞 (maximalRealSubfield E))), P.IsPrime → (g : 𝓞 (maximalRealSubfield E)) ∉ P →
-    locAt E P (zsub E (idl E g k ν)) = locAt E P (zsub E (idl E g 0 ν))
+      (P : Ideal (𝓞 (maximalRealSubfield E))),
+    P.IsPrime → (g : 𝓞 (maximalRealSubfield E)) ∉ P
+      → locAt E P (zsub E (idl E g k ν)) = locAt E P (zsub E (idl E g 0 ν))
 
 def IsFLattice (E : Type) [Field E] [NumberField E] [IsCMField E] (L : Submodule ℤ E) : Prop :=
-  (∀ (a : 𝓞 (maximalRealSubfield E)) (t : E), t ∈ L →
-    algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L) ∧
-  ∀ t : E, ∃ n : ℕ, 0 < n ∧ (n : E) * t ∈ L
+  (∀ (a : 𝓞 (maximalRealSubfield E)) (t : E),
+      t ∈ L → algebraMap (𝓞 (maximalRealSubfield E)) E a * t ∈ L)
+    ∧ ∀ t : E, ∃ n : ℕ, 0 < n ∧ (n : E) * t ∈ L
 
 def TwIsFLattice : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (A B : FI E) (s : ℕ),
@@ -164,41 +167,45 @@ end Small
 
 section Text
 
-
 open scoped Classical in
-def LatticeFacts (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (ν : ℤ) (s : ℕ) :
-    Prop :=
-  zsub E (idl E g 2 ν) ≤ perLat E g ν s ∧
-  perLat E g ν s ≤ zsub E (idl E g 1 ν) ∧
-  idx E (perLat E g ν s) (zsub E (idl E g 1 ν)) = g ^ deg E ∧
-  idx E (zsub E (idl E g 2 ν)) (perLat E g ν s) = g ^ deg E ∧
-  dualLat E g (perLat E g ν s) ≤ zsub E (dualIdl E g ν) ∧
-  idx E (dualLat E g (perLat E g ν s)) (zsub E (dualIdl E g ν)) = g ^ deg E ∧
-  liftLat E g ν s ≤ zsub E (liftIdl E g ν) ∧
-  idx E (liftLat E g ν s) (zsub E (liftIdl E g ν)) = g ^ deg E ∧
-  √(FractionalIdeal.absNorm (dualIdl E g ν) : ℝ) = ((g : ℝ) * rd E ^ (ν + 1)) ^ (-(deg E : ℤ)) ∧
-  DiscreteTopology (frameLat E (perLat E g ν s) (rd E ^ (-ν))) ∧
-  Submodule.span ℝ
-    (frameLat E (perLat E g ν s) (rd E ^ (-ν)) : Set (mixedEmbedding.mixedSpace E)) = ⊤ ∧
-  ZLattice.covolume (E := mixedEmbedding.mixedSpace E) (frameLat E (perLat E g ν s) (rd E ^ (-ν))) =
-    (rd E / 2) ^ deg E * (g : ℝ) ^ (3 * deg E)
+def LatticeFacts (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (ν : ℤ) (s : ℕ)
+    : Prop :=
+  zsub E (idl E g 2 ν) ≤ perLat E g ν s ∧ perLat E g ν s ≤ zsub E (idl E g 1 ν)
+    ∧ idx E (perLat E g ν s) (zsub E (idl E g 1 ν)) = g ^ deg E
+    ∧ idx E (zsub E (idl E g 2 ν)) (perLat E g ν s) = g ^ deg E
+    ∧ dualLat E g (perLat E g ν s) ≤ zsub E (dualIdl E g ν)
+    ∧ idx E (dualLat E g (perLat E g ν s)) (zsub E (dualIdl E g ν)) = g ^ deg E
+    ∧ liftLat E g ν s ≤ zsub E (liftIdl E g ν)
+    ∧ idx E (liftLat E g ν s) (zsub E (liftIdl E g ν)) = g ^ deg E
+    ∧ √(FractionalIdeal.absNorm (dualIdl E g ν) : ℝ) = ((g : ℝ) * rd E ^ (ν + 1)) ^ (-(deg E : ℤ))
+    ∧ DiscreteTopology (frameLat E (perLat E g ν s) (rd E ^ (-ν)))
+    ∧ Submodule.span ℝ
+        (frameLat E (perLat E g ν s) (rd E ^ (-ν)) : Set (mixedEmbedding.mixedSpace E))
+      = ⊤
+    ∧ ZLattice.covolume (E := mixedEmbedding.mixedSpace E)
+        (frameLat E (perLat E g ν s) (rd E ^ (-ν)))
+      = (rd E / 2) ^ deg E * (g : ℝ) ^ (3 * deg E)
 
 def LatticesGeneral : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unram E →
-    ∀ (g : ℕ) (ν : ℤ) (s : ℕ), 0 < g → LatticeFacts E g ν s
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+    Unram E → ∀ (g : ℕ) (ν : ℤ) (s : ℕ), 0 < g → LatticeFacts E g ν s
 
 def AssembleLattices : Prop :=
-  DegreeFacts → PowConjStable → UnramRelative → Between → IndexCore →
-    DualSubset → DualSupset → NormIdl → CovolumeIndex → LatticesGeneral
+  DegreeFacts → PowConjStable → UnramRelative → Between → IndexCore → DualSubset → DualSupset
+    → NormIdl → CovolumeIndex
+    → LatticesGeneral
 
 def TypedModel : Prop :=
-  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (ν : ℤ) (s : ℕ), 0 < g →
-    PrimeToDifferent E g →
-    ∀ P : Ideal (𝓞 (maximalRealSubfield E)), P.IsPrime → (g : 𝓞 (maximalRealSubfield E)) ∈ P →
-    ∀ (K : Type) [Field K] (o : Subring K) (σ : E →+* K),
-      (∀ x : E, x ∈ locAt E P (zsub E 1) ↔ σ x ∈ o ∧ σ (complexConj E x) ∈ o) →
-      ∀ t : E, (t ∈ locAt E P (perLat E g ν s) ↔
-        (σ t / (g : K), (-1) ^ s * σ (complexConj E t) / (g : K)) ∈ Formalism.FourierDecayAlt.I.orderR o (g : K))
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (g : ℕ) (ν : ℤ) (s : ℕ),
+    0 < g → PrimeToDifferent E g
+      → ∀ P : Ideal (𝓞 (maximalRealSubfield E)),
+        P.IsPrime → (g : 𝓞 (maximalRealSubfield E)) ∈ P
+          → ∀ (K : Type) [Field K] (o : Subring K) (σ : E →+* K),
+            (∀ x : E, x ∈ locAt E P (zsub E 1) ↔ σ x ∈ o ∧ σ (complexConj E x) ∈ o)
+              → ∀ t : E,
+                (t ∈ locAt E P (perLat E g ν s)
+                  ↔ (σ t / (g : K), (-1) ^ s * σ (complexConj E t) / (g : K))
+                    ∈ Formalism.FourierDecayAlt.I.orderR o (g : K))
 
 end Text
 

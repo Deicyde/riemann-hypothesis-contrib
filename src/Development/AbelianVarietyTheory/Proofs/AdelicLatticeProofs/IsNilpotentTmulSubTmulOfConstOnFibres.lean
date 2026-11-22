@@ -10,8 +10,10 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem isNilpotent_of_forall_algHom_eq_zero (T : Type) [CommRing T] [Algebra ℂ T]
-    [Algebra.FiniteType ℂ T] (x : T) (h : ∀ ω : T →ₐ[ℂ] ℂ, ω x = 0) : IsNilpotent x := by
+theorem isNilpotent_of_forall_algHom_eq_zero
+    (T : Type) [CommRing T] [Algebra ℂ T] [Algebra.FiniteType ℂ T]
+    (x : T) (h : ∀ ω : T →ₐ[ℂ] ℂ, ω x = 0)
+    : IsNilpotent x := by
   have hJ : IsJacobsonRing T := isJacobsonRing_of_finiteType (A := ℂ)
   have h1 : x ∈ Ideal.jacobson (⊥ : Ideal T) := by
     rw [Ideal.jacobson, Ideal.mem_sInf]
@@ -30,22 +32,27 @@ theorem isNilpotent_of_forall_algHom_eq_zero (T : Type) [CommRing T] [Algebra �
     exact Ideal.jacobson_mono Ideal.le_radical h1
   exact h2
 
-theorem isNilpotent_tmul_sub_tmul_of_const_on_fibres :
-    ∀ (B A : Type) [CommRing B] [CommRing A] [Algebra ℂ B] [Algebra ℂ A] [Algebra B A] [IsScalarTower ℂ B A] [Algebra.FiniteType ℂ A] (f : A), (∀ χ χ' : A →ₐ[ℂ] ℂ, (∀ b : B, χ (algebraMap B A b) = χ' (algebraMap B A b)) → χ f = χ' f) → IsNilpotent (f ⊗ₜ[B] (1 : A) - (1 : A) ⊗ₜ[B] f) := by
+theorem isNilpotent_tmul_sub_tmul_of_const_on_fibres
+    : ∀ (B A : Type) [CommRing B] [CommRing A] [Algebra ℂ B] [Algebra ℂ A] [Algebra B A]
+        [IsScalarTower ℂ B A] [Algebra.FiniteType ℂ A] (f : A),
+      (∀ χ χ' : A →ₐ[ℂ] ℂ, (∀ b : B, χ (algebraMap B A b) = χ' (algebraMap B A b)) → χ f = χ' f)
+        → IsNilpotent (f ⊗ₜ[B] (1 : A) - (1 : A) ⊗ₜ[B] f) := by
   intro B A _ _ _ _ _ _ _ f h
   have : Algebra.FiniteType B A := Algebra.FiniteType.of_restrictScalars_finiteType ℂ B A
   have : Algebra.FiniteType A (A ⊗[B] A) := inferInstance
-  have : Algebra.FiniteType ℂ (A ⊗[B] A) := Algebra.FiniteType.trans (S := A) inferInstance inferInstance
+  have : Algebra.FiniteType ℂ (A ⊗[B] A) :=
+    Algebra.FiniteType.trans (S := A) inferInstance inferInstance
   apply isNilpotent_of_forall_algHom_eq_zero
   intro ω
   let l : A →ₐ[ℂ] A ⊗[B] A := Algebra.TensorProduct.includeLeft
   let r : A →ₐ[ℂ] A ⊗[B] A :=
     (Algebra.TensorProduct.includeRight : A →ₐ[B] A ⊗[B] A).restrictScalars ℂ
-  have := h (ω.comp l) (ω.comp r) (fun b => by
-    simp only [AlgHom.comp_apply, l, r, Algebra.TensorProduct.includeLeft_apply,
-      AlgHom.restrictScalars_apply, Algebra.TensorProduct.includeRight_apply]
-    congr 1
-    rw [Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul])
+  have :=
+    h (ω.comp l) (ω.comp r) (fun b => by
+      simp only [AlgHom.comp_apply, l, r, Algebra.TensorProduct.includeLeft_apply,
+        AlgHom.restrictScalars_apply, Algebra.TensorProduct.includeRight_apply]
+      congr 1
+      rw [Algebra.algebraMap_eq_smul_one, TensorProduct.smul_tmul])
   rw [map_sub, sub_eq_zero]
   exact this
 

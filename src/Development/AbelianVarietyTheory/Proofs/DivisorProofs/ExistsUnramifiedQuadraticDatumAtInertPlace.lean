@@ -26,7 +26,8 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.IsSqua
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
+open NumberField IsDedekindDomain Matrix Polynomial Filter GlobalTheory.CuspRep GlobalTheory.PRep
+  Formalism.UG Formalism.BasicNotions GlobalTheory.UnitaryBC GlobalTheory.BCT
 open scoped Classical TensorProduct
 
 namespace GlobalTheory.InertUQ
@@ -35,9 +36,12 @@ open IsDedekindDomain.HeightOneSpectrum
 
 variable {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E))
 
-theorem mem_max_iff (x : w.adicCompletionIntegers E) :
-    x ∈ IsLocalRing.maximalIdeal (w.adicCompletionIntegers E) ↔ Valued.v (x : w.adicCompletion E) < 1 := by
-  have hI := Valuation.valuationSubring.integers (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ)))
+theorem mem_max_iff (x : w.adicCompletionIntegers E)
+    : x ∈ IsLocalRing.maximalIdeal (w.adicCompletionIntegers E)
+      ↔ Valued.v (x : w.adicCompletion E) < 1 := by
+  have hI :=
+    Valuation.valuationSubring.integers
+      (Valued.v : Valuation (w.adicCompletion E) (WithZero (Multiplicative ℤ)))
   rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
   have hx : Valued.v (x : w.adicCompletion E) ≤ 1 := x.2
   constructor
@@ -87,9 +91,10 @@ private lemma maximalIdeal_eq_span_of_valuation_eq_exp_neg_one (p : w.adicComple
   rw [pow_one, pow_one] at h
   rw [h, mem_max_iff, withZero_lt_one_iff_le_exp_neg_one]
 
-theorem valuation_max_eq (ϖ : w.adicCompletion E) (hϖ : Valued.v ϖ = WithZero.exp (-1 : ℤ))
-    (x : w.adicCompletion E) :
-    (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation (w.adicCompletion E) x
+theorem valuation_max_eq
+    (ϖ : w.adicCompletion E) (hϖ : Valued.v ϖ = WithZero.exp (-1 : ℤ)) (x : w.adicCompletion E)
+    : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+        (w.adicCompletion E) x
       = Valued.v x := by
   have hϖ1 : Valued.v ϖ ≤ 1 := by
     rw [hϖ]
@@ -101,19 +106,27 @@ theorem valuation_max_eq (ϖ : w.adicCompletion E) (hϖ : Valued.v ϖ = WithZero
     rw [h, map_zero] at hϖ
     exact WithZero.exp_ne_zero hϖ.symm
   have hp0 : p ≠ 0 := fun h => hϖ0 (congrArg Subtype.val h)
-  have hVp : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
-      (w.adicCompletion E) ϖ = WithZero.exp (-1 : ℤ) := by
-    have h1 := (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation_of_algebraMap
-      (K := w.adicCompletion E) p
-    rw [(IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).intValuation_singleton hp0
-      (maximalIdeal_eq_span_of_valuation_eq_exp_neg_one w p hp)] at h1
+  have hVp
+      : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+          (w.adicCompletion E) ϖ
+        = WithZero.exp (-1 : ℤ) := by
+    have h1 :=
+      (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation_of_algebraMap
+        (K := w.adicCompletion E) p
+    rw [(IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).intValuation_singleton
+        hp0 (maximalIdeal_eq_span_of_valuation_eq_exp_neg_one w p hp)]
+      at h1
     exact h1
-  have hVu : ∀ a : w.adicCompletionIntegers E, Valued.v (a : w.adicCompletion E) = 1 →
-      (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
-        (w.adicCompletion E) a = 1 := by
+  have hVu
+      : ∀ a : w.adicCompletionIntegers E,
+        Valued.v (a : w.adicCompletion E) = 1
+          → (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+              (w.adicCompletion E) a
+            = 1 := by
     intro a ha
-    have h1 := (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation_of_algebraMap
-      (K := w.adicCompletion E) a
+    have h1 :=
+      (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation_of_algebraMap
+        (K := w.adicCompletion E) a
     refine h1.trans (HeightOneSpectrum.intValuation_eq_one_iff.2 fun hmem => ?_)
     have := (mem_max_iff w a).1 hmem
     rw [ha] at this
@@ -125,14 +138,21 @@ theorem valuation_max_eq (ϖ : w.adicCompletion E) (hϖ : Valued.v ϖ = WithZero
   have hy : Valued.v (x * ϖ ^ k) = 1 := by
     rw [map_mul, map_zpow₀, hϖ, hk, ← WithZero.exp_zsmul, ← WithZero.exp_add, WithZero.exp_eq_one]
     simp
-  have hV : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
-      (w.adicCompletion E) (x * ϖ ^ k) = 1 := hVu ⟨x * ϖ ^ k, hy.le⟩ hy
+  have hV
+      : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+          (w.adicCompletion E) (x * ϖ ^ k)
+        = 1 :=
+    hVu ⟨x * ϖ ^ k, hy.le⟩ hy
   have hxe : x = (x * ϖ ^ k) * ϖ ^ (-k) := by
     rw [mul_assoc, ← zpow_add₀ hϖ0, add_neg_cancel, zpow_zero, mul_one]
-  have e1 : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
-      (w.adicCompletion E) x = (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
-      (w.adicCompletion E) (x * ϖ ^ k) * (IsDiscreteValuationRing.maximalIdeal
-        (w.adicCompletionIntegers E)).valuation (w.adicCompletion E) ϖ ^ (-k) := by
+  have e1
+      : (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+          (w.adicCompletion E) x
+        = (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+            (w.adicCompletion E) (x * ϖ ^ k)
+          * (IsDiscreteValuationRing.maximalIdeal (w.adicCompletionIntegers E)).valuation
+              (w.adicCompletion E) ϖ
+            ^ (-k) := by
     rw [← map_zpow₀, ← Valuation.map_mul, ← hxe]
   have e2 : Valued.v x = Valued.v (x * ϖ ^ k) * Valued.v ϖ ^ (-k) := by
     rw [← map_zpow₀, ← Valuation.map_mul, ← hxe]
@@ -200,7 +220,15 @@ private lemma neg_log_valuation_eq_ordL (x : w.adicCompletion E) : -WithZero.log
     conv_lhs => rw [← WithZero.coe_unzero h]
     rfl
 
-theorem exists_uq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr E → ∀ w : Pl E, ¬ IsSplitAt w → ∃ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E), (∀ x, e (K.c x) = cj w (e x)) ∧ (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1) ∧ (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x)) ∧ qV E w = K.q ^ 2 := by
+theorem exists_uq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E],
+      Unr E
+        → ∀ w : Pl E,
+          ¬ IsSplitAt w
+            → ∃ (K : GlobalTheory.UnitLemma.UQ) (e : K.E ≃+* w.adicCompletion E),
+              (∀ x, e (K.c x) = cj w (e x))
+                ∧ (∀ x, x ∈ (algebraMap K.O K.E).range ↔ Valued.v (e x) ≤ 1)
+                ∧ (∀ x, GlobalTheory.UnitLemma.val K.O x = ordL (e x)) ∧ qV E w = K.q ^ 2 := by
   intro E _ _ _ hU w hw
   obtain ⟨-, hcc, hiso, hns, -⟩ := GlobalTheory.ConjAtPlace.main E hU w
   obtain ⟨-, ⟨ϖ, q, hUI, hq⟩, -, -⟩ := hns hw
@@ -221,17 +249,19 @@ theorem exists_uq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr 
     show Valued.v (cj w x₀) ≤ 1
     rw [hiso]
     exact hx₀A
-  have hint : ∀ x : w.adicCompletionIntegers E, ∃ y : w.adicCompletionIntegers E,
-      σ (algebraMap _ (w.adicCompletion E) x) = algebraMap _ (w.adicCompletion E) y := by
+  have hint
+      : ∀ x : w.adicCompletionIntegers E, ∃ y : w.adicCompletionIntegers E,
+        σ (algebraMap _ (w.adicCompletion E) x) = algebraMap _ (w.adicCompletion E) y := by
     intro x
     have hx : Valued.v (σ x) ≤ 1 := by
       show Valued.v (cj w x) ≤ 1
       rw [hiso]
       exact x.2
     exact ⟨⟨σ x, hx⟩, rfl⟩
-  have hres : ∃ x y : w.adicCompletionIntegers E,
-      σ (algebraMap _ (w.adicCompletion E) x) = algebraMap _ (w.adicCompletion E) y ∧
-        x - y ∉ IsLocalRing.maximalIdeal (w.adicCompletionIntegers E) := by
+  have hres
+      : ∃ x y : w.adicCompletionIntegers E,
+        σ (algebraMap _ (w.adicCompletion E) x) = algebraMap _ (w.adicCompletion E) y
+          ∧ x - y ∉ IsLocalRing.maximalIdeal (w.adicCompletionIntegers E) := by
     refine ⟨⟨x₀, hx₀A⟩, ⟨σ x₀, hσx₀⟩, rfl, fun hm => ?_⟩
     have h1 := (mem_max_iff w _).1 hm
     have h2 : Valued.v (x₀ - σ x₀) = 1 := by
@@ -240,15 +270,16 @@ theorem exists_uq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E], Unr 
     push_cast at h1
     rw [h2] at h1
     exact lt_irrefl _ h1
-  let K : GlobalTheory.UnitLemma.UQ :=
-    { O := w.adicCompletionIntegers E
-      E := w.adicCompletion E
-      c := σ
-      c_c := hcc
-      c_int := hint
-      c_res := hres
-      q := q
-      card_res := hc }
+  let K : GlobalTheory.UnitLemma.UQ := {
+    O := w.adicCompletionIntegers E
+    E := w.adicCompletion E
+    c := σ
+    c_c := hcc
+    c_int := hint
+    c_res := hres
+    q := q
+    card_res := hc
+  }
   refine ⟨K, RingEquiv.refl _, fun x => rfl, ?_, ?_, hq⟩
   · intro x
     constructor

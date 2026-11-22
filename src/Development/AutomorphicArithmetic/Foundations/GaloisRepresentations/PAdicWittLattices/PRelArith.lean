@@ -6,23 +6,30 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsGeneri
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.G3
 open UpperTheory.Gal.Int.Geo (Lv IsTrans Integ KS Mem FEt KSEx KSNice)
 open scoped TensorProduct
 universe u
 
-private theorem nsmul_cancel' {V : Type} [AddCommGroup V] [Module ℚ V] {c : ℕ} (hc : c ≠ 0) {a b : V}
-    (h : c • a = c • b) : a = b := by
+private theorem nsmul_cancel'
+    {V : Type} [AddCommGroup V] [Module ℚ V] {c : ℕ} (hc : c ≠ 0) {a b : V} (h : c • a = c • b)
+    : a = b := by
   have h' : (c : ℚ) • a = (c : ℚ) • b := by
     rw [Nat.cast_smul_eq_nsmul ℚ, Nat.cast_smul_eq_nsmul ℚ]
     exact h
   exact smul_right_injective V (Nat.cast_ne_zero.mpr hc) h'
 
-private theorem rel_core {p : ℕ} [Fact p.Prime] {D : Datum p} (F : D.La →+ AfP p ⊗[ℚ] VQ D)
-    (hFmem : ∀ z, F z ∈ LaHat D) {Q Q' : Type} [Group Q] [Group Q'] (Φ : Q →* Q')
-    (eI : ℕ → D.La → Q) (eJ : ℕ → D.La → Q')
-    (addI : ∀ n a b, eI n (a + b) = eI n a * eI n b) (addJ : ∀ n a b, eJ n (a + b) = eJ n a * eJ n b)
+private theorem rel_core
+    {p : ℕ} [Fact p.Prime]
+    {D : Datum p} (F : D.La →+ AfP p ⊗[ℚ] VQ D) (hFmem : ∀ z, F z ∈ LaHat D)
+    {Q Q' : Type} [Group Q] [Group Q']
+    (Φ : Q →* Q')
+    (eI : ℕ → D.La → Q) (eJ : ℕ → D.La → Q') (addI : ∀ n a b, eI n (a + b) = eI n a * eI n b)
+    (addJ : ∀ n a b, eJ n (a + b) = eJ n a * eJ n b)
     (kerI : ∀ n, 0 < n → ∀ x, eI n x = 1 ↔ ∃ y, x = n • y)
     (kerJ : ∀ n, 0 < n → ∀ x, eJ n x = 1 ↔ ∃ y, x = n • y)
     (towerI : ∀ n m, 0 < n → 0 < m → ∀ x, eI (n * m) x ^ m = eI n x)
@@ -30,8 +37,9 @@ private theorem rel_core {p : ℕ} [Fact p.Prime] {D : Datum p} (F : D.La →+ A
     (honto : ∀ n, 0 < n → n.Coprime p → ∀ x, ∃ y z, f n y = k • x + n • z)
     (hrel : ∀ n, 0 < n → n.Coprime p → ∀ x, ∃ w ∈ LaHat D, F (f n x) = k • inAf D x + n • w)
     (hev : ∀ n, 0 < n → n.Coprime p → ∀ x, eJ n x = Φ (eI (n * k) (f (n * k) x)))
-    (n : ℕ) (hn : 0 < n) (hnp : n.Coprime p) (x y : D.La) :
-    Φ (eI n x) = eJ n y ↔ ∃ v ∈ LaHat D, F x = inAf D y + n • v := by
+    (n : ℕ) (hn : 0 < n) (hnp : n.Coprime p)
+    (x y : D.La)
+    : Φ (eI n x) = eJ n y ↔ ∃ v ∈ LaHat D, F x = inAf D y + n • v := by
   have hpowI : ∀ N, 0 < N → ∀ (m : ℕ) a, eI N (m • a) = eI N a ^ m := by
     intro N hN m a
     induction m with
@@ -45,8 +53,8 @@ private theorem rel_core {p : ℕ} [Fact p.Prime] {D : Datum p} (F : D.La →+ A
   have hNp : (n * k).Coprime p := Nat.Coprime.mul_left hnp hk
   obtain ⟨y', z, hy'⟩ := honto (n * k) hNpos hNp x
   have hL : Φ (eI n x) = eJ n y' := by
-    rw [← towerI n k hn hk0 x, hev n hn hnp y', hy', addI, (kerI (n * k) hNpos ((n * k) • z)).mpr ⟨z, rfl⟩,
-      _root_.mul_one, hpowI (n * k) hNpos]
+    rw [← towerI n k hn hk0 x, hev n hn hnp y', hy', addI,
+      (kerI (n * k) hNpos ((n * k) • z)).mpr ⟨z, rfl⟩, _root_.mul_one, hpowI (n * k) hNpos]
   obtain ⟨v0, hv0, hv0eq⟩ : ∃ v0 ∈ LaHat D, F x = inAf D y' + n • v0 := by
     obtain ⟨w, hw, hFw⟩ := hrel (n * k) hNpos hNp y'
     rw [hy', map_add (f := _), map_nsmul, map_nsmul] at hFw
@@ -73,12 +81,12 @@ private theorem rel_core {p : ℕ} [Fact p.Prime] {D : Datum p} (F : D.La →+ A
     rw [hv0eq, smul_add, ← h1]
     abel
   · rintro ⟨v, hv, hFv⟩
-    apply GlobalTheory.LKGeo.LatDiv.eq_nsmul_of_inAf_eq_nsmul p D (y' - y) n hn hnp (v - v0) ((LaHat D).sub_mem hv hv0)
+    apply GlobalTheory.LKGeo.LatDiv.eq_nsmul_of_inAf_eq_nsmul p D (y' - y) n hn hnp (v - v0)
+      ((LaHat D).sub_mem hv hv0)
     have h2 := hv0eq.symm.trans hFv
     rw [GlobalTheory.HeckeApprox.inAf_sub, smul_sub, sub_eq_sub_iff_add_eq_add, h2, add_comm]
 
-theorem UpperTheory.Gal.G3.pRelArith :
-    RelArith := by
+theorem UpperTheory.Gal.G3.pRelArith : RelArith := by
   unfold UpperTheory.Gal.G3.RelArith UpperTheory.Gal.G3.Rel
   intro p _ D G L R _ _ gb S s N N' o' o K _ t I J ψ h f u c k hψ hint hsys hrel hev n hn hnp x y
   haveI := hψ
@@ -91,5 +99,5 @@ theorem UpperTheory.Gal.G3.pRelArith :
   let Φ : (Over.mk t ⟶ o'.A) →* (Over.mk t ⟶ o.A) :=
     MonoidHom.mk' (fun g => g ≫ ψ) (fun a b => MonObj.mul_comp a b ψ)
   exact rel_core ((L.actG h).toAddMonoidHom.comp (GlobalTheory.HeckeApprox.inAfH D))
-    (fun z => hint _ (GlobalTheory.HeckeApprox.inAf_mem D z)) Φ I.ev J.ev I.add J.add I.ker J.ker I.tower f k hk0 hk
-    hsys.2.2.2.2.2.2 hrel hev n hn hnp x y
+    (fun z => hint _ (GlobalTheory.HeckeApprox.inAf_mem D z))
+    Φ I.ev J.ev I.add J.add I.ker J.ker I.tower f k hk0 hk hsys.2.2.2.2.2.2 hrel hev n hn hnp x y

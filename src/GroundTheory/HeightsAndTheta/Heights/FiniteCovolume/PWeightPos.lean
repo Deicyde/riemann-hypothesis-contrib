@@ -15,8 +15,10 @@ section Steps
 variable {F E : Type*} [Field F] [Field E] [Algebra F E] [Algebra.IsQuadraticExtension F E]
 variable {W : Type*} [AddCommGroup W] [Module E W] {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-theorem WeightPos.proof (h : GroundTheory.Automorphic.HermitianForm F E W) (v : Basis ι E W)
-    (h₁ : VecAtNeZero.Statement v) : WeightPos.Statement h v := by
+theorem WeightPos.proof
+    (h : GroundTheory.Automorphic.HermitianForm F E W)
+    (v : Basis ι E W) (h₁ : VecAtNeZero.Statement v)
+    : WeightPos.Statement h v := by
   intro M g x hx w
   set k : GL ι ℂ := ((g⁻¹ : archUnitary h v) : InfinitePlace E → GL ι ℂ) w with hk
   have hne : invApply g (vecAt v x) w ≠ 0 := by

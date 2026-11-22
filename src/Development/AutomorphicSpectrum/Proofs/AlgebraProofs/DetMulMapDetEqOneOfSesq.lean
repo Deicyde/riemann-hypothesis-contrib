@@ -8,11 +8,12 @@ open NumberField
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem det_mul_map_det_eq_one_of_sesq {E : Type*} [Field E] {V : Type*} [AddCommGroup V]
-    [Module E V] [FiniteDimensional E V] (σ : E →+* E) (H : V →ₗ[E] V →ₛₗ[σ] E)
-    (hH : ∀ x, (∀ y, H x y = 0) → x = 0) (g : V →ₗ[E] V)
-    (hg : ∀ x y, H (g x) (g y) = H x y) :
-    LinearMap.det g * σ (LinearMap.det g) = 1 := by
+theorem det_mul_map_det_eq_one_of_sesq
+    {E : Type*} [Field E]
+    {V : Type*} [AddCommGroup V] [Module E V] [FiniteDimensional E V]
+    (σ : E →+* E) (H : V →ₗ[E] V →ₛₗ[σ] E) (hH : ∀ x, (∀ y, H x y = 0) → x = 0)
+    (g : V →ₗ[E] V) (hg : ∀ x y, H (g x) (g y) = H x y)
+    : LinearMap.det g * σ (LinearMap.det g) = 1 := by
   classical
   let b := Module.finBasis E V
   let S : Matrix _ _ E := Matrix.of fun i j => H (b i) (b j)
@@ -27,8 +28,8 @@ theorem det_mul_map_det_eq_one_of_sesq {E : Type*} [Field E] {V : Type*} [AddCom
     rw [h1, hgb, hgb]
     set_option synthInstance.maxHeartbeats 100000 in
       simp only [Matrix.mul_apply, Matrix.transpose_apply, RingHom.mapMatrix_apply,
-      Matrix.map_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply,
-      LinearMap.map_smulₛₗ, smul_eq_mul, S, Matrix.of_apply]
+        Matrix.map_apply, map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply,
+        LinearMap.map_smulₛₗ, smul_eq_mul, S, Matrix.of_apply]
     refine Finset.sum_congr rfl fun l _ => ?_
     rw [mul_comm]
   have hdet : S.det ≠ 0 := by
@@ -42,9 +43,10 @@ theorem det_mul_map_det_eq_one_of_sesq {E : Type*} [Field E] {V : Type*} [AddCom
         intro j
         have := congrFun hvS j
         set_option synthInstance.maxHeartbeats 100000 in
-          simpa [Matrix.vecMul, dotProduct, S, map_sum, LinearMap.sum_apply] using this
+        simpa [Matrix.vecMul, dotProduct, S, map_sum, LinearMap.sum_apply] using this
       intro y
-      rw [this]; rfl
+      rw [this]
+      rfl
     funext i
     exact Fintype.linearIndependent_iff.mp b.linearIndependent v hx i
   have hd := congrArg Matrix.det hS

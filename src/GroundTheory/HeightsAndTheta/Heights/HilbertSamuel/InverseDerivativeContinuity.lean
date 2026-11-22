@@ -24,8 +24,8 @@ namespace G1
 
 variable {K : Type} [Fintype K] {ι : K → Type} [∀ k, Fintype (ι k)]
 
-theorem geoNum_nonneg : ∀ (n : ℕ) (V : Ideal (MRing ι)) (b : Fin n → K → ℤ),
-    (∀ j k, 0 ≤ b j k) → 0 ≤ geoNum n V b
+theorem geoNum_nonneg
+    : ∀ (n : ℕ) (V : Ideal (MRing ι)) (b : Fin n → K → ℤ), (∀ j k, 0 ≤ b j k) → 0 ≤ geoNum n V b
   | 0, V, b, _ => by
     unfold geoNum
     split_ifs <;> positivity
@@ -33,8 +33,9 @@ theorem geoNum_nonneg : ∀ (n : ℕ) (V : Ideal (MRing ι)) (b : Fin n → K �
     rw [geoNum]
     split_ifs with h
     · refine Finset.sum_nonneg fun k _ => mul_nonneg (hb _ k) ?_
-      exact finsum_nonneg fun W => finsum_nonneg fun _ =>
-        mul_nonneg (Nat.cast_nonneg _) (geoNum_nonneg n W (Fin.init b) fun j k => hb _ k)
+      exact finsum_nonneg fun W =>
+        finsum_nonneg fun _ =>
+          mul_nonneg (Nat.cast_nonneg _) (geoNum_nonneg n W (Fin.init b) fun j k => hb _ k)
     · exact le_rfl
 
 theorem finsum_nonpos' {α : Sort*} {g : α → ℝ} (h : ∀ x, g x ≤ 0) : ∑ᶠ x, g x ≤ 0 := by
@@ -42,23 +43,22 @@ theorem finsum_nonpos' {α : Sort*} {g : α → ℝ} (h : ∀ x, g x ≤ 0) : �
   rw [finsum_neg_distrib] at h0
   exact neg_nonneg.1 h0
 
-theorem mcPts_anti {P W : Ideal (MRing ι)} (h : P ≤ W) : mcPts W ⊆ mcPts P :=
-  fun _ hz => ⟨hz.1, fun f hf => hz.2 f (h hf)⟩
+theorem mcPts_anti {P W : Ideal (MRing ι)} (h : P ≤ W) : mcPts W ⊆ mcPts P := fun _ hz =>
+  ⟨hz.1, fun f hf => hz.2 f (h hf)⟩
 
 theorem isOpen_blocksNonzero : IsOpen {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} := by
   have e : {z : (Σ k, ι k) → ℂ | ∀ k, ∃ i, z ⟨k, i⟩ ≠ 0} = ⋂ k, ⋃ i, {z | z ⟨k, i⟩ ≠ 0} := by
     ext z
     simp
   rw [e]
-  exact isOpen_iInter_of_finite fun k => isOpen_iUnion fun i =>
-    isOpen_ne_fun (continuous_apply _) continuous_const
+  exact isOpen_iInter_of_finite fun k =>
+    isOpen_iUnion fun i => isOpen_ne_fun (continuous_apply _) continuous_const
 
-theorem exists_monomial_not_mem {P : Ideal (MRing ι)} (hP : IsMultiProjPrime P) (a : K → ℕ) :
-    ∃ μ : (Σ k, ι k) →₀ ℕ, (∀ k, ∑ i, μ ⟨k, i⟩ = a k) ∧ monomial μ (1 : ℤ) ∉ P := by
+theorem exists_monomial_not_mem {P : Ideal (MRing ι)} (hP : IsMultiProjPrime P) (a : K → ℕ)
+    : ∃ μ : (Σ k, ι k) →₀ ℕ, (∀ k, ∑ i, μ ⟨k, i⟩ = a k) ∧ monomial μ (1 : ℤ) ∉ P := by
   classical
   choose c hc using hP.2.2
-  let μ : (Σ k, ι k) →₀ ℕ :=
-    Finsupp.equivFunOnFinite.symm fun p => if p.2 = c p.1 then a p.1 else 0
+  let μ : (Σ k, ι k) →₀ ℕ := Finsupp.equivFunOnFinite.symm fun p => if p.2 = c p.1 then a p.1 else 0
   refine ⟨μ, fun k => ?_, ?_⟩
   · simp [μ]
   · intro hmem
@@ -73,39 +73,42 @@ theorem exists_monomial_not_mem {P : Ideal (MRing ι)} (hP : IsMultiProjPrime P)
       exact hc k hX
     · exact hμp (by simp [μ, hj])
 
-theorem isMultiHomog_monomial {μ : (Σ k, ι k) →₀ ℕ} {a : K → ℕ} (hμ : ∀ k, ∑ i, μ ⟨k, i⟩ = a k) :
-    IsMultiHomog (monomial μ (1 : ℤ)) a := by
+theorem isMultiHomog_monomial {μ : (Σ k, ι k) →₀ ℕ} {a : K → ℕ} (hμ : ∀ k, ∑ i, μ ⟨k, i⟩ = a k)
+    : IsMultiHomog (monomial μ (1 : ℤ)) a := by
   intro m hm k
   rw [Finset.mem_singleton.1 (support_monomial_subset hm)]
   exact hμ k
 
-theorem eval_monomial_one (μ : (Σ k, ι k) →₀ ℕ) (z : (Σ k, ι k) → ℂ) :
-    eval z (map (Int.castRingHom ℂ) (monomial μ (1 : ℤ))) = ∏ p, z p ^ μ p := by
+theorem eval_monomial_one (μ : (Σ k, ι k) →₀ ℕ) (z : (Σ k, ι k) → ℂ)
+    : eval z (map (Int.castRingHom ℂ) (monomial μ (1 : ℤ))) = ∏ p, z p ^ μ p := by
   rw [map_monomial, eval_monomial, map_one, one_mul, Finsupp.prod_fintype]
   intro p
   simp
 
-theorem isConeTangent_of_sheet {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P) {e : ℕ}
-    {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ} (hγ : AnalyticAt ℂ γ y)
-    (hpts : ∀ᶠ y' in 𝓝 y, γ y' ∈ mcPts P) (ξ : Fin e → ℂ) :
-    IsConeTangent (Int.castRingHom ℂ) P0 (γ y) (fderiv ℂ γ y ξ) := by
+theorem isConeTangent_of_sheet
+    {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P)
+    {e : ℕ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} {y : Fin e → ℂ}
+    (hγ : AnalyticAt ℂ γ y) (hpts : ∀ᶠ y' in 𝓝 y, γ y' ∈ mcPts P) (ξ : Fin e → ℂ)
+    : IsConeTangent (Int.castRingHom ℂ) P0 (γ y) (fderiv ℂ γ y ξ) := by
   intro f hf
   set F := map (Int.castRingHom ℂ) f
   have hzero : (fun w => eval w F) ∘ γ =ᶠ[𝓝 y] fun _ => (0 : ℂ) := by
     filter_upwards [hpts] with w hw
     exact hw.2 f (hP0 hf)
-  have hd := (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.adens_hasFDerivAt_eval F (γ y)).comp y
-    hγ.differentiableAt.hasFDerivAt
+  have hd :=
+    (ReciprocityTheory.ChartRestriction.G.ArakelovGeometry.adens_hasFDerivAt_eval F (γ y)).comp y
+      hγ.differentiableAt.hasFDerivAt
   have h0 : HasFDerivAt ((fun w => eval w F) ∘ γ) (0 : (Fin e → ℂ) →L[ℂ] ℂ) y :=
     (hasFDerivAt_const (0 : ℂ) y).congr_of_eventuallyEq hzero
   have := congrArg (fun L => L ξ) (hd.unique h0)
   simpa [ContinuousLinearMap.sum_apply, smul_eq_mul] using this
 
-theorem maDensity_nonneg_of_sheet {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P) {A : HermLine ι}
-    (hsp : IsSemipositiveRel P0 P A) {e : ℕ} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)}
-    {y : Fin e → ℂ} {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ}
-    (h : IsSheet P Ψ y w γ) :
-    0 ≤ maDensity (fun _ y' => Real.log (A.h (γ y'))) y := by
+theorem maDensity_nonneg_of_sheet
+    {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P)
+    {A : HermLine ι} (hsp : IsSemipositiveRel P0 P A)
+    {e : ℕ} {Ψ : (((k : K) → ι k) → ℂ) →ₗ[ℂ] (Fin (e + 1) → ℂ)} {y : Fin e → ℂ}
+    {w : ((k : K) → ι k) → ℂ} {γ : (Fin e → ℂ) → (Σ k, ι k) → ℂ} (h : IsSheet P Ψ y w γ)
+    : 0 ≤ maDensity (fun _ y' => Real.log (A.h (γ y'))) y := by
   have hA : AnalyticAt ℂ γ y := sheet_analyticAt osgood h
   have hpts : ∀ᶠ y' in 𝓝 y, γ y' ∈ mcPts P := h.2.mono fun _ hy' => hy'.2.1
   have hy : γ y ∈ mcPts P := hpts.self_of_nhds
@@ -122,17 +125,21 @@ theorem maDensity_nonneg_of_sheet {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P) {A 
   rw [hl]
   exact hsp.2 _ hy _ (isConeTangent_of_sheet hP0 hA hpts ξ)
 
-theorem arInt_nonpos {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P) {A : HermLine ι}
-    (hsp : IsSemipositiveRel P0 P A) {s : MRing ι}
-    (hs : ∀ z ∈ mcPts P, ‖eval z (map (Int.castRingHom ℂ) s)‖ ≤ A.h z) (e : ℕ) :
-    arInt P s A (fun _ : Fin e => A) ≤ 0 := by
+theorem arInt_nonpos
+    {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P)
+    {A : HermLine ι} (hsp : IsSemipositiveRel P0 P A)
+    {s : MRing ι} (hs : ∀ z ∈ mcPts P, ‖eval z (map (Int.castRingHom ℂ) s)‖ ≤ A.h z)
+    (e : ℕ)
+    : arInt P s A (fun _ : Fin e => A) ≤ 0 := by
   classical
   unfold arInt ptsIntegral
   split_ifs with hΨ
   · unfold ptsIntegralAt
     refine integral_nonpos fun y => ?_
-    have key : ∀ w, sheetDensity P hΨ.choose (fun (_ : Fin e) z => Real.log (A.h z))
-        (logNorm A s) y w ≤ 0 := by
+    have key
+        : ∀ w,
+          sheetDensity P hΨ.choose (fun (_ : Fin e) z => Real.log (A.h z)) (logNorm A s) y w
+            ≤ 0 := by
       intro w
       unfold sheetDensity
       split_ifs with hγ
@@ -140,18 +147,19 @@ theorem arInt_nonpos {P0 P : Ideal (MRing ι)} (hP0 : P0 ≤ P) {A : HermLine ι
         have hz : hγ.choose y ∈ mcPts P := hsh.2.self_of_nhds.2.1
         have hpos := A.pos _ hz.1
         have hg : logNorm A s (hγ.choose y) ≤ 0 :=
-          Real.log_nonpos (div_nonneg (norm_nonneg _) hpos.le)
-            ((div_le_one hpos).2 (hs _ hz))
+          Real.log_nonpos (div_nonneg (norm_nonneg _) hpos.le) ((div_le_one hpos).2 (hs _ hz))
         exact mul_nonpos_of_nonpos_of_nonneg hg (maDensity_nonneg_of_sheet hP0 hsp hsh)
       · exact le_rfl
     exact finsum_nonpos' fun w => finsum_nonpos' fun _ => key w
   · exact le_rfl
 
-theorem nonneg_of_family (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ)
-    (hI : IsIntersectionFamily I) (a : K → ℕ) (A : HermLine ι) (hA : A.a = fun k => (a k : ℤ))
-    (P0 : Ideal (MRing ι)) (n : ℕ) :
-    ∀ P : Ideal (MRing ι), IsArithVar P n → P0 ≤ P → IsSemipositiveRel P0 P A →
-      MonomialsBounded P A a → 0 ≤ I P n (fun _ => A) := by
+theorem nonneg_of_family
+    (I : Ideal (MRing ι) → (n : ℕ) → (Fin n → HermLine ι) → ℝ) (hI : IsIntersectionFamily I)
+    (a : K → ℕ) (A : HermLine ι) (hA : A.a = fun k => (a k : ℤ))
+    (P0 : Ideal (MRing ι)) (n : ℕ)
+    : ∀ P : Ideal (MRing ι),
+      IsArithVar P n → P0 ≤ P → IsSemipositiveRel P0 P A → MonomialsBounded P A a
+        → 0 ≤ I P n (fun _ => A) := by
   induction n with
   | zero =>
     intro P hP

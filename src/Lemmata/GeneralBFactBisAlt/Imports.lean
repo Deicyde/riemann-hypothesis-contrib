@@ -6,13 +6,15 @@ public import Mathlib
 
 namespace Bl.general_b_fact_bis_other
 
-theorem goal1 :
-  ∀ {K : Type} [inst : Field.{0} K] [NumberField.{0} K] {r n : Nat} (v : Fin n → Fin r → K) {x : Fin r → K},
-  Membership.mem.{0, 0} (Submodule.span.{0, 0} K (Set.range.{0, 1} v)) x →
-    Exists.{1} fun (d : Int) ↦
-      And (Ne.{1} d 0)
-        (Membership.mem.{0, 0} (Submodule.span.{0, 0} (NumberField.RingOfIntegers.{0} K) (Set.range.{0, 1} v))
-          (HSMul.hSMul.{0, 0, 0} d x)) := by
+theorem goal1
+    : ∀ {K : Type} [inst : Field.{0} K] [NumberField.{0} K] {r n : Nat} (v : Fin n → Fin r → K)
+        {x : Fin r → K},
+      Membership.mem.{0, 0} (Submodule.span.{0, 0} K (Set.range.{0, 1} v)) x
+        → Exists.{1} fun (d : Int) ↦
+          And (Ne.{1} d 0)
+            (Membership.mem.{0, 0}
+              (Submodule.span.{0, 0} (NumberField.RingOfIntegers.{0} K) (Set.range.{0, 1} v))
+              (HSMul.hSMul.{0, 0, 0} d x)) := by
   intro K _ _ r n v x hx
   induction hx using Submodule.span_induction with
   | mem y hy => exact ⟨1, one_ne_zero, by rw [one_smul]; exact Submodule.subset_span hy⟩
@@ -29,7 +31,9 @@ theorem goal1 :
       exact zsmul_mem he' d
   | smul c y _ hy =>
     obtain ⟨d, hd, hd'⟩ := hy
-    obtain ⟨e, he, hint⟩ := ((IsFractionRing.isAlgebraic_iff ℤ ℚ K).mpr (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) c)).exists_integral_multiple
+    obtain ⟨e, he, hint⟩ :=
+      ((IsFractionRing.isAlgebraic_iff ℤ ℚ K).mpr
+        (Algebra.IsAlgebraic.isAlgebraic (R := ℚ) c)).exists_integral_multiple
     refine ⟨e * d, mul_ne_zero he hd, ?_⟩
     have key : ((⟨e • c, hint⟩ : NumberField.RingOfIntegers K)) • (d • y) = (e * d) • (c • y) := by
       rw [← algebraMap_smul K]

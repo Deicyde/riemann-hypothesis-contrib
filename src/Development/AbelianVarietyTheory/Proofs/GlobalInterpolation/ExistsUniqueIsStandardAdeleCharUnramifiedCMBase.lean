@@ -8,14 +8,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex
+open NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  GlobalTheory.IndefiniteRowSideFullHecke.LocalDualIndex
 
 namespace GlobalTheory.StdCharUnique
 
 variable (F : Type) [Field F] [NumberField F]
 
-theorem sum_mult_re_eq_trace (x : F) :
-    ∑ w : InfinitePlace F, (w.mult : ℝ) * (w.embedding x).re = ((Algebra.trace ℚ F x : ℚ) : ℝ) := by
+theorem sum_mult_re_eq_trace (x : F)
+    : ∑ w : InfinitePlace F, (w.mult : ℝ) * (w.embedding x).re
+      = ((Algebra.trace ℚ F x : ℚ) : ℝ) := by
   classical
   have h1 : ((Algebra.trace ℚ F x : ℚ) : ℂ) = ∑ φ : F →+* ℂ, φ x := by
     have h := trace_eq_sum_embeddings ℂ (K := ℚ) (L := F) (x := x)
@@ -41,10 +43,11 @@ theorem traceInf_add (x y : Ainf F) : traceInf F (x + y) = traceInf F x + traceI
 
 theorem continuous_traceInf : Continuous (traceInf F) := by
   refine continuous_finsetSum _ fun w _ => continuous_const.mul (Complex.continuous_re.comp ?_)
-  exact (InfinitePlace.Completion.isometry_extensionEmbedding w).continuous.comp (continuous_apply w)
+  exact (InfinitePlace.Completion.isometry_extensionEmbedding w).continuous.comp
+    (continuous_apply w)
 
-theorem traceInf_algebraMap (x : F) :
-    traceInf F (algebraMap F (Ainf F) x) = ((Algebra.trace ℚ F x : ℚ) : ℝ) := by
+theorem traceInf_algebraMap (x : F)
+    : traceInf F (algebraMap F (Ainf F) x) = ((Algebra.trace ℚ F x : ℚ) : ℝ) := by
   rw [← sum_mult_re_eq_trace, traceInf]
   refine Finset.sum_congr rfl fun w _ => ?_
   congr 2
@@ -52,26 +55,38 @@ theorem traceInf_algebraMap (x : F) :
   simp
 
 theorem existsUnique_isStdChar : ∃! ψ₀ : AddChar (AF F) ℂ, IsStdChar F ψ₀ := by
-  let L : Ainf F →+ ℂ := AddMonoidHom.mk' (fun x => (traceInf F x : ℂ)) fun a b => by
-    rw [traceInf_add, Complex.ofReal_add]
-  obtain ⟨ψ, h1, h2⟩ := GlobalTheory.StdAdelicChar.exists_char_of_trace F L
-    (Complex.continuous_ofReal.comp (continuous_traceInf F)) fun x => by
-      show ((traceInf F (algebraMap F (Ainf F) x) : ℝ) : ℂ) = _
-      rw [traceInf_algebraMap, Complex.ofReal_ratCast]
-  have hψ : IsStdChar F ψ := ⟨h1, fun x => by
-    rw [h2, stdInf]
-    congr 1
-    show _ * ((traceInf F x : ℝ) : ℂ) = _
-    push_cast
-    ring⟩
-  exact ⟨ψ, hψ, fun ψ' h' => GlobalTheory.StdAdelicChar.eq_of_psiInf_eq h'.1 hψ.1
-    fun x => (h'.2 x).trans (hψ.2 x).symm⟩
+  let L : Ainf F →+ ℂ :=
+    AddMonoidHom.mk'
+      (fun x => (traceInf F x : ℂ))
+      fun a b => by rw [traceInf_add, Complex.ofReal_add]
+  obtain ⟨ψ, h1, h2⟩ :=
+    GlobalTheory.StdAdelicChar.exists_char_of_trace F L
+      (Complex.continuous_ofReal.comp (continuous_traceInf F))
+      fun x => by
+        show ((traceInf F (algebraMap F (Ainf F) x) : ℝ) : ℂ) = _
+        rw [traceInf_algebraMap, Complex.ofReal_ratCast]
+  have hψ : IsStdChar F ψ := ⟨
+    h1,
+    fun x => by
+      rw [h2, stdInf]
+      congr 1
+      show _ * ((traceInf F x : ℝ) : ℂ) = _
+      push_cast
+      ring
+  ⟩
+  exact ⟨
+    ψ,
+    hψ,
+    fun ψ' h' =>
+      GlobalTheory.StdAdelicChar.eq_of_psiInf_eq h'.1 hψ.1 fun x => (h'.2 x).trans (hψ.2 x).symm
+  ⟩
 
-theorem existsUnique_isStdChar_cm :
-    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-      (σ : E →ₐ[F] E), IsCMExt F E σ → (∀ x : E, star x = σ x) → Formalism.HermitianLatticesTheory.IsCMUnram E →
-      ∃! ψ₀ : AddChar (AF F) ℂ, IsStdChar F ψ₀ :=
-  fun F _ _ _ _ _ _ _ _ _ _ _ => existsUnique_isStdChar F
+theorem existsUnique_isStdChar_cm
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
+        (σ : E →ₐ[F] E),
+      IsCMExt F E σ → (∀ x : E, star x = σ x) → Formalism.HermitianLatticesTheory.IsCMUnram E
+        → ∃! ψ₀ : AddChar (AF F) ℂ, IsStdChar F ψ₀ := fun F _ _ _ _ _ _ _ _ _ _ _ =>
+  existsUnique_isStdChar F
 
 end GlobalTheory.StdCharUnique
 

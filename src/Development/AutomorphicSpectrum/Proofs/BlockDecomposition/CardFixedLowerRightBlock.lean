@@ -72,28 +72,36 @@ lemma card_fibre (g₀ : GL (Ix n) k) :
     have := congrArg (· * g₀.1) h
     simpa [Matrix.mul_assoc, ← Units.val_mul] using this
 
-theorem card_lowerRightBlock_eq_fibre_formula (k : Type) [Field k] [Fintype k] (n : ℕ) (D : Matrix (Fin n) (Fin n) k) :
-    Nat.card {g : GL (Ix n) k // dBlk g = D} =
-      Nat.card {g : GL (Ix n) k // lowerLeftBlock g = 0 ∧ dBlk g = 1} *
-        Nat.card {C : Matrix (Fin n) (Fin n) k // (Matrix.fromCols C D).rank = n} := by
+theorem card_lowerRightBlock_eq_fibre_formula
+    (k : Type) [Field k] [Fintype k] (n : ℕ) (D : Matrix (Fin n) (Fin n) k)
+    : Nat.card {g : GL (Ix n) k // dBlk g = D}
+      = Nat.card {g : GL (Ix n) k // lowerLeftBlock g = 0 ∧ dBlk g = 1}
+        * Nat.card {C : Matrix (Fin n) (Fin n) k // (Matrix.fromCols C D).rank = n} := by
   classical
   haveI : Fintype {C : Matrix (Fin n) (Fin n) k // (Matrix.fromCols C D).rank = n} := Fintype.ofFinite _
-  let f : {g : GL (Ix n) k // dBlk g = D} → {C : Matrix (Fin n) (Fin n) k // (Matrix.fromCols C D).rank = n} :=
-    fun g => ⟨lowerLeftBlock g.1, by have h := rank_lowH g.1; rw [lowH_eq, g.2] at h; exact h⟩
-  have hfib : ∀ C, Nat.card {x // f x = C} = Nat.card {g : GL (Ix n) k // lowerLeftBlock g = 0 ∧ dBlk g = 1} := by
+  let f
+      : {g : GL (Ix n) k // dBlk g = D}
+        → {C : Matrix (Fin n) (Fin n) k // (Matrix.fromCols C D).rank = n} := fun g =>
+    ⟨lowerLeftBlock g.1, by have h := rank_lowH g.1; rw [lowH_eq, g.2] at h; exact h⟩
+  have hfib
+      : ∀ C,
+        Nat.card {x // f x = C}
+          = Nat.card {g : GL (Ix n) k // lowerLeftBlock g = 0 ∧ dBlk g = 1} := by
     intro C
     obtain ⟨g₀, hg₀⟩ := exists_lowH (Matrix.fromCols C.1 D) C.2
     rw [← card_fibre g₀]
-    have hy : ∀ y : {g : GL (Ix n) k // lowH g = lowH g₀},
-        Matrix.fromCols (lowerLeftBlock y.1) (dBlk y.1) = Matrix.fromCols C.1 D := by
+    have hy
+        : ∀ y : {g : GL (Ix n) k // lowH g = lowH g₀},
+          Matrix.fromCols (lowerLeftBlock y.1) (dBlk y.1) = Matrix.fromCols C.1 D := by
       intro y
       rw [← lowH_eq, ← hg₀]
       exact y.2
-    refine Nat.card_congr
-      { toFun := fun x => ⟨x.1.1, ?_⟩
-        invFun := fun y => ⟨⟨y.1, ?_⟩, ?_⟩
-        left_inv := fun x => rfl
-        right_inv := fun y => rfl }
+    refine Nat.card_congr {
+      toFun := fun x => ⟨x.1.1, ?_⟩
+      invFun := fun y => ⟨⟨y.1, ?_⟩, ?_⟩
+      left_inv := fun x => rfl
+      right_inv := fun y => rfl
+    }
     · rw [hg₀, lowH_eq, x.1.2, show lowerLeftBlock x.1.1 = C.1 from congrArg Subtype.val x.2]
     · exact (Matrix.fromCols_inj (hy y)).2
     · exact Subtype.ext (Matrix.fromCols_inj (hy y)).1

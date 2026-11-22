@@ -11,11 +11,14 @@ public import Development.AbelianVarietyTheory.Proofs.TorusHaarMeasure.BasePsiLe
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates Topology
 open scoped ContDiff
 open GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm
-open GlobalTheory.FrameThetaCompare (transfer curv_lin diagForm chart_smooth smooth_of_chart mem_SS_iff lower_iff
-  upper_iff bdd_of_upper curvDe_eq_omRh curvDe_nonneg card_pos)
+open GlobalTheory.FrameThetaCompare
+  (transfer curv_lin diagForm chart_smooth smooth_of_chart mem_SS_iff lower_iff upper_iff
+    bdd_of_upper curvDe_eq_omRh curvDe_nonneg card_pos)
 
 namespace GlobalTheory.ThetaRecordCompare
 
@@ -48,19 +51,27 @@ private lemma twoDelta_sub_eq_two_mul_blockWt_sub {X : _root_.ReciprocityTheory.
       omega
   exact_mod_cast key
 
-
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.levi_twoDelta {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} {de : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r}
-    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.IsTwoDelta X de) {x0 : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r}
-    (ho : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0) {z : _root_.ReciprocityTheory.L2DbarEstimates.V (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)} (hz : z ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X x0)
-    (ξ : Fin (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) → ℂ) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.levi X x0 (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.phla X de) z ξ = 2 * _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviRh X x0 z ξ := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.levi_twoDelta
+    {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r}
+    {de : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r}
+    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.IsTwoDelta X de)
+    {x0 : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r}
+    (ho : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0)
+    {z : _root_.ReciprocityTheory.L2DbarEstimates.V
+      (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)}
+    (hz : z ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X x0)
+    (ξ : Fin (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) → ℂ)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.levi X x0
+        (_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.phla X de) z ξ
+      = 2 * _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviRh X x0 z ξ := by
   rw [_root_.GlobalTheory.CurvMargin.leviRh_eq X x0 ho hz ξ]
   obtain ⟨x1, D, -, -, -, hdiag, -⟩ := _root_.GlobalTheory.FrameThetaCompare.transfer X x0 z hz
-  change _root_.GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm.curv X x0 de z ξ =
-    2 * _root_.GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm.curv X x0 (_root_.GlobalTheory.CurvMargin.blockWt X) z ξ
+  change _root_.GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm.curv X x0 de z ξ
+    = 2 * _root_.GlobalTheory.IndefiniteRowSideFullHecke.CurvatureFamilyNorm.curv X x0
+      (_root_.GlobalTheory.CurvMargin.blockWt X) z ξ
   rw [hdiag, hdiag]
   unfold _root_.GlobalTheory.FrameThetaCompare.diagForm
   rw [Finset.mul_sum]
@@ -71,9 +82,15 @@ theorem _root_.GlobalTheory.ThetaRecordCompare.levi_twoDelta {X : _root_.Recipro
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.leviRh_nonneg (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r) {x0 : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r}
-    (ho : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0) {z : _root_.ReciprocityTheory.L2DbarEstimates.V (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)}
-    (hz : z ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X x0) (ξ : Fin (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) → ℂ) : 0 ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviRh X x0 z ξ := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.leviRh_nonneg
+    (X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r)
+    {x0 : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r}
+    (ho : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.IsOrth X x0)
+    {z : _root_.ReciprocityTheory.L2DbarEstimates.V
+      (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)}
+    (hz : z ∈ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.OmF X x0)
+    (ξ : Fin (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) → ℂ)
+    : 0 ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.leviRh X x0 z ξ := by
   have h0 := _root_.GlobalTheory.FrameThetaCompare.curvDe_nonneg X (x0 := x0) hz ξ
   rw [_root_.GlobalTheory.FrameThetaCompare.curvDe_eq_omRh X ho hz ξ] at h0
   exact h0
@@ -81,34 +98,42 @@ theorem _root_.GlobalTheory.ThetaRecordCompare.leviRh_nonneg (X : _root_.Recipro
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.gapsGe_mono {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} {la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r} {g g' : ℝ}
-    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la g) (hg : g' ≤ g) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la g' :=
+theorem _root_.GlobalTheory.ThetaRecordCompare.gapsGe_mono
+    {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r}
+    {la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r} {g g' : ℝ}
+    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la g)
+    (hg : g' ≤ g)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la g' :=
   fun τ i j hij hne => hg.trans (h τ i j hij hne)
-
 
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.cusp_of_gaps {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} (hn : 2 ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)
-    (h0 : 0 < X.p0) (hr : X.p0 < r) {la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r}
-    (hg : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la 0) (hp : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X la 1) {P : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r → ℂ}
-    (hP : X.IsBddSec la P) :
-    P ∈ X.SS la := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.cusp_of_gaps
+    {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r}
+    (hn : 2 ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) (h0 : 0 < X.p0)
+    (hr : X.p0 < r)
+    {la : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r}
+    (hg : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la 0)
+    (hp : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X la 1)
+    {P : _root_.ReciprocityTheory.ChartRestriction.G.FD.Frame X.Ψ r → ℂ} (hP : X.IsBddSec la P)
+    : P ∈ X.SS la := by
   obtain ⟨τ0, hτ0⟩ := Finset.card_pos.1 (_root_.GlobalTheory.FrameThetaCompare.card_pos hn)
   have key := @_root_.ReciprocityTheory.ChartRestriction.G.AR.Up.cuspStatement_holds E _ _ _
   unfold _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.CuspStatement at key
   refine key r X la ⟨τ0, hτ0⟩ h0 hr (fun i j hij hne => ?_) (fun i0 i1 hi0 hi1 => ?_) P hP
   · have h1 : (0 : ℤ) ≤ la ⟨τ0, hτ0⟩ i - la ⟨τ0, hτ0⟩ j := by exact_mod_cast hg _ i j hij hne
     omega
-  · have h1 : (1 : ℤ) ≤ la ⟨τ0, hτ0⟩ i1 - la ⟨τ0, hτ0⟩ i0 := by
-      exact_mod_cast hp _ i0 i1 hi0 hi1
+  · have h1 : (1 : ℤ) ≤ la ⟨τ0, hτ0⟩ i1 - la ⟨τ0, hτ0⟩ i0 := by exact_mod_cast hp _ i0 i1 hi0 hi1
     omega
 
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.two_le_r {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} (hn : 2 ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X) : 2 ≤ r := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.two_le_r
+    {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r}
+    (hn : 2 ≤ _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X)
+    : 2 ≤ r := by
   by_contra hlt
   push_neg at hlt
   have hempty : IsEmpty (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.Ent X) := by
@@ -213,21 +238,27 @@ private lemma diagForm_Fp_sub_pos (A : _root_.ReciprocityTheory.ChartRestriction
   have h3 := mul_pos (mul_pos two_pos hc) h1
   linarith
 
-
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 variable {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.arch_gaps (A : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.ArchInM X) (h0 : 0 < X.p0)
-    (hr : X.p0 < r) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X A.L 1 ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X A.L 1 ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X A.Fp 0 ∧
-      _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X A.Fp 1 := by
-  have hn : (2 : ℤ) ≤ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) := by exact_mod_cast A.n_ge
-  have gL : ∀ (τ : X.Ψ) (i j : Fin r), (j : ℕ) = i + 1 → (j : ℕ) ≠ X.p0 →
-      1 ≤ A.L τ i - A.L τ j := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.arch_gaps
+    (A : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.ArchInM X) (h0 : 0 < X.p0)
+    (hr : X.p0 < r)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X A.L 1
+      ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X A.L 1
+      ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X A.Fp 0
+      ∧ _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X A.Fp 1 := by
+  have hn : (2 : ℤ) ≤ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) := by
+    exact_mod_cast A.n_ge
+  have gL
+      : ∀ (τ : X.Ψ) (i j : Fin r), (j : ℕ) = i + 1 → (j : ℕ) ≠ X.p0 → 1 ≤ A.L τ i - A.L τ j := by
     intro τ i j hij hne
     have hlt : i < j := by rw [Fin.lt_def]; omega
-    have hs : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 j * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i = 1 := by
+    have hs
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 j
+            * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i
+          = 1 := by
       unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
       by_cases hj : (j : ℕ) < X.p0
       · rw [if_pos hj, if_pos (by omega)]; norm_num
@@ -237,23 +268,34 @@ theorem _root_.GlobalTheory.ThetaRecordCompare.arch_gaps (A : _root_.Reciprocity
     have h2 : (0 : ℤ) < A.L τ i - A.L τ j := by
       exact_mod_cast (by linarith : (0 : ℝ) < ((A.L τ i : ℤ) : ℝ) - ((A.L τ j : ℤ) : ℝ))
     omega
-  have pL : ∀ (τ : X.Ψ) (i0 i1 : Fin r), (i0 : ℕ) = 0 → (i1 : ℕ) = r - 1 →
-      1 ≤ A.L τ i1 - A.L τ i0 := by
+  have pL
+      : ∀ (τ : X.Ψ) (i0 i1 : Fin r), (i0 : ℕ) = 0 → (i1 : ℕ) = r - 1 → 1 ≤ A.L τ i1 - A.L τ i0 := by
     intro τ i0 i1 hi0 hi1
     have hlt : i0 < i1 := by rw [Fin.lt_def]; omega
-    have hs : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i0 = -1 := by
+    have hs
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i1
+            * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i0
+          = -1 := by
       unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
-      rw [if_neg (by omega), if_pos (by omega)]; norm_num
+      rw [if_neg (by omega), if_pos (by omega)]
+      norm_num
     have h1 := diagForm_L_pos A (single_ne_zero_jet_harmonics τ i0 i1 hlt)
     rw [diagForm_single' A.L τ i0 i1 hlt, hs] at h1
     have h2 : (0 : ℤ) < A.L τ i1 - A.L τ i0 := by
       exact_mod_cast (by linarith : (0 : ℝ) < ((A.L τ i1 : ℤ) : ℝ) - ((A.L τ i0 : ℤ) : ℝ))
     omega
-  refine ⟨fun τ i j hij hne => by exact_mod_cast gL τ i j hij hne,
-    fun τ i0 i1 hi0 hi1 => by exact_mod_cast pL τ i0 i1 hi0 hi1, ?_, ?_⟩
+  refine ⟨
+    fun τ i j hij hne => by exact_mod_cast gL τ i j hij hne,
+    fun τ i0 i1 hi0 hi1 => by exact_mod_cast pL τ i0 i1 hi0 hi1,
+    ?_,
+    ?_
+  ⟩
   · intro τ i j hij hne
     have hlt : i < j := by rw [Fin.lt_def]; omega
-    have hs : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 j * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i = 1 := by
+    have hs
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 j
+            * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i
+          = 1 := by
       unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
       by_cases hj : (j : ℕ) < X.p0
       · rw [if_pos hj, if_pos (by omega)]; norm_num
@@ -261,36 +303,68 @@ theorem _root_.GlobalTheory.ThetaRecordCompare.arch_gaps (A : _root_.Reciprocity
     have h1 := diagForm_Fp_sub_pos A (single_ne_zero_jet_harmonics τ i j hlt)
     rw [diagForm_single' _ τ i j hlt, hs, one_mul] at h1
     simp only [Pi.sub_apply, Pi.smul_apply, nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply,
-      _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW] at h1
+        _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW]
+      at h1
     push_cast at h1
-    have hR : (0 : ℝ) < ((A.Fp τ i - A.Fp τ j + 2 * ((j : ℤ) - i) -
-        (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) * (A.L τ i - A.L τ j) : ℤ) : ℝ) := by
+    have hR
+        : (0 : ℝ)
+          < ((A.Fp τ i - A.Fp τ j + 2 * ((j : ℤ) - i)
+                - (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ)
+                  * (A.L τ i - A.L τ j)
+              : ℤ)
+            : ℝ) := by
       push_cast; linarith
-    have hZ : (0 : ℤ) < A.Fp τ i - A.Fp τ j + 2 * ((j : ℤ) - i) -
-        (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) * (A.L τ i - A.L τ j) := by exact_mod_cast hR
+    have hZ
+        : (0 : ℤ)
+          < A.Fp τ i - A.Fp τ j + 2 * ((j : ℤ) - i)
+            - (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ)
+              * (A.L τ i - A.L τ j) := by
+      exact_mod_cast hR
     have hg := gL τ i j hij hne
     have hji : (j : ℤ) - i = 1 := by omega
-    have hm : (2 : ℤ) ≤ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) * (A.L τ i - A.L τ j) := by nlinarith
+    have hm
+        : (2 : ℤ)
+          ≤ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ)
+            * (A.L τ i - A.L τ j) := by
+      nlinarith
     have : (0 : ℤ) ≤ A.Fp τ i - A.Fp τ j := by linarith
     exact_mod_cast this
   · intro τ i0 i1 hi0 hi1
     have hlt : i0 < i1 := by rw [Fin.lt_def]; omega
-    have hs : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i1 * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i0 = -1 := by
+    have hs
+        : _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i1
+            * _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn X.p0 i0
+          = -1 := by
       unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.sgn
-      rw [if_neg (by omega), if_pos (by omega)]; norm_num
+      rw [if_neg (by omega), if_pos (by omega)]
+      norm_num
     have h1 := diagForm_Fp_sub_pos A (single_ne_zero_jet_harmonics τ i0 i1 hlt)
     rw [diagForm_single' _ τ i0 i1 hlt, hs] at h1
     simp only [Pi.sub_apply, Pi.smul_apply, nsmul_eq_mul, Pi.mul_apply, Pi.natCast_apply,
-      _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW] at h1
+        _root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.kapW]
+      at h1
     push_cast at h1
-    have hR : (0 : ℝ) < ((A.Fp τ i1 - A.Fp τ i0 - 2 * ((i1 : ℤ) - i0) -
-        (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) * (A.L τ i1 - A.L τ i0) : ℤ) : ℝ) := by
+    have hR
+        : (0 : ℝ)
+          < ((A.Fp τ i1 - A.Fp τ i0 - 2 * ((i1 : ℤ) - i0)
+                - (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ)
+                  * (A.L τ i1 - A.L τ i0)
+              : ℤ)
+            : ℝ) := by
       push_cast; linarith
-    have hZ : (0 : ℤ) < A.Fp τ i1 - A.Fp τ i0 - 2 * ((i1 : ℤ) - i0) -
-        (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) * (A.L τ i1 - A.L τ i0) := by exact_mod_cast hR
+    have hZ
+        : (0 : ℤ)
+          < A.Fp τ i1 - A.Fp τ i0 - 2 * ((i1 : ℤ) - i0)
+            - (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ)
+              * (A.L τ i1 - A.L τ i0) := by
+      exact_mod_cast hR
     have hg := pL τ i0 i1 hi0 hi1
     have hji : (0 : ℤ) ≤ (i1 : ℤ) - i0 := by omega
-    have hm : (2 : ℤ) ≤ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ) * (A.L τ i1 - A.L τ i0) := by nlinarith
+    have hm
+        : (2 : ℤ)
+          ≤ (_root_.ReciprocityTheory.ChartRestriction.G.AR.Inst.nd X : ℤ)
+            * (A.L τ i1 - A.L τ i0) := by
+      nlinarith
     have : (1 : ℤ) ≤ A.Fp τ i1 - A.Fp τ i0 := by linarith
     exact_mod_cast this
 
@@ -298,24 +372,33 @@ open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 variable {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.arch_extra (A : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.ArchInM X) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.IsExtra X A.ps0 A.a1 := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.arch_extra
+    (A : _root_.ReciprocityTheory.ChartRestriction.G.AR.Up.ArchInM X)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.IsExtra X A.ps0 A.a1 := by
   have hinv : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.IsInv X A.ps0 :=
     (_root_.GlobalTheory.FrameThetaCompare.isInv_iff X _).2 A.potential_invariant
   refine ⟨A.frame_theta_weight_pos.le, hinv, ?_, ?_, ?_⟩
   · exact _root_.GlobalTheory.FrameThetaCompare.smooth_of_chart X hinv.1 A.potential_smooth
-  · obtain ⟨B, hB⟩ := _root_.GlobalTheory.FlatCompare.bdd_add_log X A.base_psi_weighted_cf A.frame_theta_weight_pos 0
+  · obtain ⟨B, hB⟩ :=
+      _root_.GlobalTheory.FlatCompare.bdd_add_log X A.base_psi_weighted_cf A.frame_theta_weight_pos
+        0
     exact ⟨B, fun x hx => by simpa using hB x hx⟩
-  · obtain ⟨A', hdec, C, hC⟩ := (_root_.GlobalTheory.FlatCompare.extraBounds_iff X A.ps0 A.frame_theta_weight_pos.le).2 A.base_psi_weighted_cf
+  · obtain ⟨A', hdec, C, hC⟩ :=
+      (_root_.GlobalTheory.FlatCompare.extraBounds_iff X A.ps0 A.frame_theta_weight_pos.le).2
+        A.base_psi_weighted_cf
     exact ⟨A', ⟨C, hC⟩, fun η hη => hdec η hη⟩
 
 open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 variable {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.gaps_add {la la' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r} (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la 0)
-    (h' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la' 0) (k : ℕ) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X (la + k • la') 0 := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.gaps_add
+    {la la' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r}
+    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la 0)
+    (h' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X la' 0)
+    (k : ℕ)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.GapsGe X (la + k • la')
+      0 := by
   intro τ i j hij hne
   have a1 : (0 : ℤ) ≤ la τ i - la τ j := by exact_mod_cast h τ i j hij hne
   have a2 : (0 : ℤ) ≤ la' τ i - la' τ j := by exact_mod_cast h' τ i j hij hne
@@ -329,9 +412,13 @@ open NumberField Topology in
 open scoped ContDiff in
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} in
 variable {X : _root_.ReciprocityTheory.ChartRestriction.G.FD.Data E r} in
-theorem _root_.GlobalTheory.ThetaRecordCompare.pair_add {la la' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r} (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X la 1)
-    (h' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X la' 1) (k : ℕ) :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X (la + k • la') 1 := by
+theorem _root_.GlobalTheory.ThetaRecordCompare.pair_add
+    {la la' : _root_.ReciprocityTheory.ChartRestriction.G.FD.Wt X.Ψ r}
+    (h : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X la 1)
+    (h' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X la' 1)
+    (k : ℕ)
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.ThetaWeightedNorm.PairingGe X (la + k • la')
+      1 := by
   intro τ i0 i1 hi0 hi1
   have a1 : (1 : ℤ) ≤ la τ i1 - la τ i0 := by exact_mod_cast h τ i0 i1 hi0 hi1
   have a2 : (1 : ℤ) ≤ la' τ i1 - la' τ i0 := by exact_mod_cast h' τ i0 i1 hi0 hi1

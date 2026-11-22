@@ -9,15 +9,18 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.SubgroupC
 
 @[expose] public section
 
-open MeasureTheory Formalism.MainNotions.S Formalism.BasicNotions Formalism.MainNotions.ArithmeticCylinders GlobalTheory.RowLev NumberField IsDedekindDomain Matrix
+open MeasureTheory Formalism.MainNotions.S Formalism.BasicNotions
+  Formalism.MainNotions.ArithmeticCylinders GlobalTheory.RowLev NumberField IsDedekindDomain Matrix
 open scoped InnerProductSpace ComplexOrder TensorProduct Classical
 
 namespace GlobalTheory.RowLev.LevelIdem
 
 open GlobalTheory.BadShare GlobalTheory.BadShare.Basic
 
-theorem unitri_sub_one_pow {k : Type} [Field k] {N : ℕ} (M : Matrix (Fin N) (Fin N) k)
-    (h1 : ∀ a, M a a = 1) (h2 : ∀ a b, b < a → M a b = 0) : (M - 1) ^ N = 0 := by
+theorem unitri_sub_one_pow
+    {k : Type} [Field k]
+    {N : ℕ} (M : Matrix (Fin N) (Fin N) k) (h1 : ∀ a, M a a = 1) (h2 : ∀ a b, b < a → M a b = 0)
+    : (M - 1) ^ N = 0 := by
   have ht : (M - 1).BlockTriangular id := by
     intro a b hab
     have hab' : b < a := hab
@@ -28,9 +31,11 @@ theorem unitri_sub_one_pow {k : Type} [Field k] {N : ℕ} (M : Matrix (Fin N) (F
 
 variable {g : ℕ} [Fact g.Prime] {N : ℕ}
 
-theorem spec_of_eps (L : Lev g N) (χ : GG g N → ℂ) (hp : IsProj (eps L.Mem χ)) (a : MonoidAlgebra ℂ (GG g N))
-    (ha : ∀ x, a.coeff x = eps L.Mem χ x) :
-    a * a = a ∧ IsSA a ∧ ∀ q, a.coeff q ≠ 0 → ((q : Matrix (Fin N) (Fin N) (ZMod g)) - 1) ^ N = 0 := by
+theorem spec_of_eps
+    (L : Lev g N) (χ : GG g N → ℂ) (hp : IsProj (eps L.Mem χ))
+    (a : MonoidAlgebra ℂ (GG g N)) (ha : ∀ x, a.coeff x = eps L.Mem χ x)
+    : a * a = a ∧ IsSA a
+      ∧ ∀ q, a.coeff q ≠ 0 → ((q : Matrix (Fin N) (Fin N) (ZMod g)) - 1) ^ N = 0 := by
   have e : a = alg (eps L.Mem χ) := by
     ext x
     rw [coeff_alg, ha]
@@ -43,12 +48,15 @@ theorem spec_of_eps (L : Lev g N) (χ : GG g N → ℂ) (hp : IsProj (eps L.Mem 
       exact hq (if_neg hc)
     exact unitri_sub_one_pow _ hm.1.1 hm.1.2
 
-theorem spec_eDat (P : Matrix (Fin N) (Fin N) (ZMod g) → Prop) (φ : Matrix (Fin N) (Fin N) (ZMod g) → ZMod g)
+theorem spec_eDat
+    (P : Matrix (Fin N) (Fin N) (ZMod g) → Prop) (φ : Matrix (Fin N) (Fin N) (ZMod g) → ZMod g)
     (b : Bool) (s k : ℕ) (h : s + k < N)
     (H : ∀ (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) x,
-      (eDat g N P φ ψ).coeff x = (levOfChar ψ hψ N b s k h).e x) (ψ : AddChar (ZMod g) ℂ) :
-    eDat g N P φ ψ * eDat g N P φ ψ = eDat g N P φ ψ ∧ IsSA (eDat g N P φ ψ) ∧
-      ∀ q, (eDat g N P φ ψ).coeff q ≠ 0 → ((q : Matrix (Fin N) (Fin N) (ZMod g)) - 1) ^ N = 0 := by
+      (eDat g N P φ ψ).coeff x = (levOfChar ψ hψ N b s k h).e x)
+    (ψ : AddChar (ZMod g) ℂ)
+    : eDat g N P φ ψ * eDat g N P φ ψ = eDat g N P φ ψ ∧ IsSA (eDat g N P φ ψ)
+      ∧ ∀ q,
+        (eDat g N P φ ψ).coeff q ≠ 0 → ((q : Matrix (Fin N) (Fin N) (ZMod g)) - 1) ^ N = 0 := by
   by_cases hψ : ψ = 1
   swap
   · exact spec_of_eps _ _ (isProj_e _) _ (H ψ hψ)
@@ -75,12 +83,25 @@ theorem spec_eDat (P : Matrix (Fin N) (Fin N) (ZMod g) → Prop) (φ : Matrix (F
     · by_contra h2
       rw [if_neg h2, if_pos h1] at hx
       exact div_ne_zero (inv_ne_zero (chi_ne L x)) hc hx.symm
-  refine spec_of_eps L (fun _ => 1) (GlobalTheory.BadShare.EpsProj.isProj_eps (mem_one L) (fun _ _ => mem_mul L) rfl (fun _ _ _ _ => by simp)) _
+  refine spec_of_eps L
+    (fun _ => 1)
+    (GlobalTheory.BadShare.EpsProj.isProj_eps (mem_one L)
+      (fun _ _ => mem_mul L)
+      rfl
+      (fun _ _ _ _ => by simp))
+    _
     fun x => ?_
   rw [coeff_eDat, hP]
   rfl
 
-theorem eUk_eJk_spec : ∀ (D : D7) (k : Fin 2) (ψ₀ : AddChar (ZMod (D.host.g k)) ℂ) (a : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k)))), a = eUk D k ψ₀ ∨ a = eJk D k ψ₀ → a * a = a ∧ IsSA a ∧ ∀ q, a.coeff q ≠ 0 → ((q : Matrix (Fin D.R.r) (Fin D.R.r) (ZMod (D.host.g k))) - 1) ^ D.R.r = 0 := by
+theorem eUk_eJk_spec
+    : ∀ (D : D7) (k : Fin 2) (ψ₀ : AddChar (ZMod (D.host.g k)) ℂ)
+        (a : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k)))),
+      a = eUk D k ψ₀ ∨ a = eJk D k ψ₀
+        → a * a = a ∧ IsSA a
+          ∧ ∀ q,
+            a.coeff q ≠ 0
+              → ((q : Matrix (Fin D.R.r) (Fin D.R.r) (ZMod (D.host.g k))) - 1) ^ D.R.r = 0 := by
   intro D k ψ a ha
   haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
   have hN : D.R.r = D.R.k + 2 * (D.R.m / 2 - 1) + 1 := by

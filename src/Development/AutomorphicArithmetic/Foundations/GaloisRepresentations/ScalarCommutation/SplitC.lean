@@ -40,9 +40,23 @@ theorem splitC : SplitC := by
   intro p _ G Lv k _ _ _ _ P L hcont hat Kw hKo hKc hF
   haveI := t2Space_hTGroup_gAf G
   have hker : IsClosed (L.pr.ker : Set G.GAf) := isClosed_singleton.preimage hcont
-  refine ⟨inferInstance, inferInstance, inferInstance,
-    ⟨splitEquiv L, fun g => (hat g).symm, Kw, (Lv.K : Subgroup G.GAf).subgroupOf L.pr.ker,
-      hKo, hKc, ?_, ?_, ?_⟩, fun g h => rfl⟩
+  refine ⟨
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    ⟨
+      splitEquiv L,
+      fun g => (hat g).symm,
+      Kw,
+      (Lv.K : Subgroup G.GAf).subgroupOf L.pr.ker,
+      hKo,
+      hKc,
+      ?_,
+      ?_,
+      ?_
+    ⟩,
+    fun g h => rfl
+  ⟩
   · exact Lv.K.isOpen.preimage continuous_subtype_val
   · exact hker.isClosedEmbedding_subtypeVal.isCompact_preimage Lv.compact
   · ext x
@@ -52,7 +66,6 @@ theorem splitC : SplitC := by
       show (L.loc (L.pr g))⁻¹ * g ∈ (Lv.K : Subgroup G.GAf)
       exact mul_mem (inv_mem (hF.1 _ (hF.2 g hg))) hg
     · rintro ⟨hm, hh⟩
-      exact ⟨L.loc x.1 * (x.2 : G.GAf), mul_mem (hF.1 _ hm) hh,
-        (splitEquiv L).apply_symm_apply x⟩
+      exact ⟨L.loc x.1 * (x.2 : G.GAf), mul_mem (hF.1 _ hm) hh, (splitEquiv L).apply_symm_apply x⟩
 
 end UpperTheory.Gal.Spc

@@ -13,10 +13,12 @@ universe u
 theorem localise_holds : LocaliseStatement.{u} := by
   intro R _ G _ _ _ _ t L V j hφ hu he hcov n
   obtain ⟨e, he⟩ := he
-  have localiseCx {A B : Cx R} (f : Hom A B) (hj : ∀ k, Injective (f.f k))
-      (ht : ∀ k, Bijective fun x : B.X k => t • x)
+  have localiseCx
+      {A B : Cx R}
+      (f : Hom A B) (hj : ∀ k, Injective (f.f k)) (ht : ∀ k, Bijective fun x : B.X k => t • x)
       (hc : ∀ k (x : B.X k), ∃ (m : ℕ) (y : A.X k), f.f k y = t ^ m • x)
-      (k : ℕ) : IsLocalizedModule (Submonoid.powers t) (f.H k) := by
+      (k : ℕ)
+      : IsLocalizedModule (Submonoid.powers t) (f.H k) := by
     constructor
     · rintro ⟨_, m, rfl⟩
       show IsUnit (algebraMap R (Module.End R (B.H k)) (t ^ m))
@@ -26,8 +28,8 @@ theorem localise_holds : LocaliseStatement.{u} := by
       induction y using H_ind with
       | h x hx =>
         obtain ⟨m, a, ha⟩ := hc k x
-        have ha0 : A.d k a = 0 := (hj (k + 1)) (by
-          rw [f.comm, ha, cx_smul_d, hx, smul_zero, map_zero])
+        have ha0 : A.d k a = 0 :=
+          (hj (k + 1)) (by rw [f.comm, ha, cx_smul_d, hx, smul_zero, map_zero])
         refine ⟨(A.cls k a ha0, ⟨t ^ m, m, rfl⟩), ?_⟩
         show (t ^ m) • B.cls k x hx = f.H k (A.cls k a ha0)
         rw [cls_smul, Hom.H_cls]
@@ -68,7 +70,8 @@ theorem localise_holds : LocaliseStatement.{u} := by
       rw [he, he]
       exact congrFun (congrArg Subtype.val hxy) g
     · intro y
-      refine ⟨⟨fun g => e.symm (y.1 g), e.symm.continuous.comp y.2⟩, Subtype.ext (funext fun g => ?_)⟩
+      refine
+        ⟨⟨fun g => e.symm (y.1 g), e.symm.continuous.comp y.2⟩, Subtype.ext (funext fun g => ?_)⟩
       show t • e.symm (y.1 g) = y.1 g
       rw [← he, e.apply_symm_apply]
   · intro k x

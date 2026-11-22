@@ -9,7 +9,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.flipOneThree.Pf
 
-open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.G.LatticeSystems
+open Formalism.MainNotions.G Formalism.MainNotions.flipOneThree Formalism.CountingSumsFrames
+  Formalism.GradedWeylDivisibility MvPolynomial Formalism.MainNotions.G.LatticeSystems
 
 theorem letterWt_anti (m d : ℕ) (b : Bool) : Antitone (letterWt m d b) := by
   intro i j hij
@@ -27,12 +28,14 @@ theorem letterWt_anti (m d : ℕ) (b : Bool) : Antitone (letterWt m d b) := by
     · simp only [hj, if_false]
       split_ifs <;> omega
 
-theorem twoLat_le_twoSp {O Kf : Type} [CommRing O] [Field Kf] [Algebra O Kf] (m P Q : ℕ)
-    (Λ : Submodule O (Fin (m + 1) → Kf)) (hΛ : IsLattice O Λ) :
-    ∀ x ∈ twoLat O m P Q Λ, x ∈ twoSp Kf m P Q := by
+theorem twoLat_le_twoSp
+    {O Kf : Type} [CommRing O] [Field Kf] [Algebra O Kf]
+    (m P Q : ℕ) (Λ : Submodule O (Fin (m + 1) → Kf)) (hΛ : IsLattice O Λ)
+    : ∀ x ∈ twoLat O m P Q Λ, x ∈ twoSp Kf m P Q := by
   obtain ⟨g, hg, hΛg⟩ := hΛ
-  have hsub : ∀ b : Bool, ∀ F ∈ H0 O m (letterWt m (if b then P else Q) b) Λ,
-      F ∈ dualWeyl Kf (m + 1) (m + 1) (nuOf (letterWt m (if b then P else Q) b)) := by
+  have hsub
+      : ∀ b : Bool, ∀ F ∈ H0 O m (letterWt m (if b then P else Q) b) Λ,
+        F ∈ dualWeyl Kf (m + 1) (m + 1) (nuOf (letterWt m (if b then P else Q) b)) := by
     intro b F hF
     have hle := H0_le_twisted_nabla (O := O) m _ (letterWt_anti m (if b then P else Q) b) g hg
     rw [← hΛg] at hle

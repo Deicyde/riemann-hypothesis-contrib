@@ -13,9 +13,12 @@ namespace GlobalTheory.InertiaEigenvalues.FrobPow
 
 open Polynomial
 
-theorem eq_of_pow_eq_self_of_map_eq {O k : Type} [CommRing O] [IsDomain O] [Field k]
-    (φ : O →+* k) (q : ℕ) (hq : (q : k) = 0) {y z : O} (hy : y ^ q = y) (hz : z ^ q = z)
-    (h : φ y = φ z) : y = z := by
+theorem eq_of_pow_eq_self_of_map_eq
+    {O k : Type} [CommRing O] [IsDomain O] [Field k]
+    (φ : O →+* k)
+    (q : ℕ) (hq : (q : k) = 0)
+    {y z : O} (hy : y ^ q = y) (hz : z ^ q = z) (h : φ y = φ z)
+    : y = z := by
   have h1 := Commute.geom_sum₂_mul (Commute.all y z) q
   rw [hy, hz] at h1
   have h2 : ((∑ i ∈ Finset.range q, y ^ i * z ^ (q - 1 - i)) - 1) * (y - z) = 0 := by
@@ -29,10 +32,12 @@ theorem eq_of_pow_eq_self_of_map_eq {O k : Type} [CommRing O] [IsDomain O] [Fiel
     exact one_ne_zero h4
   · exact sub_eq_zero.1 h3
 
-theorem exists_forall_eq_pow_of_pow_eq_self (l : ℕ) [Fact l.Prime] {O k : Type} [CommRing O]
-    [IsDomain O] [Field k] [CharP k l] (φ : O →+* k) (τ : O →+* O)
-    (hτ : ∀ x, φ x = 0 → φ (τ x) = 0) (n : ℕ) (hn : 0 < n) :
-    ∃ a : ℕ, ∀ x : O, x ^ l ^ n = x → τ x = x ^ l ^ a := by
+theorem exists_forall_eq_pow_of_pow_eq_self
+    (l : ℕ) [Fact l.Prime]
+    {O k : Type} [CommRing O] [IsDomain O] [Field k] [CharP k l]
+    (φ : O →+* k) (τ : O →+* O) (hτ : ∀ x, φ x = 0 → φ (τ x) = 0)
+    (n : ℕ) (hn : 0 < n)
+    : ∃ a : ℕ, ∀ x : O, x ^ l ^ n = x → τ x = x ^ l ^ a := by
   classical
   have hl : l.Prime := Fact.out
   have hq : 1 < l ^ n := Nat.one_lt_pow hn.ne' hl.one_lt
@@ -55,8 +60,9 @@ theorem exists_forall_eq_pow_of_pow_eq_self (l : ℕ) [Fact l.Prime] {O k : Type
   have hfin : Module.Finite ℤ (Algebra.adjoin ℤ S) :=
     Algebra.finite_adjoin_of_finite_of_isIntegral hS hint
   let ι : Algebra.adjoin ℤ S →+* O := (Algebra.adjoin ℤ S).val.toRingHom
-  obtain ⟨a, ha⟩ := GlobalTheory.exists_forall_eq_pow_of_ker_le l (Algebra.adjoin ℤ S) k (φ.comp ι)
-    (φ.comp (τ.comp ι)) (fun x hx => hτ _ hx)
+  obtain ⟨a, ha⟩ :=
+    GlobalTheory.exists_forall_eq_pow_of_ker_le l (Algebra.adjoin ℤ S) k (φ.comp ι)
+      (φ.comp (τ.comp ι)) (fun x hx => hτ _ hx)
   refine ⟨a, fun x hx => ?_⟩
   have h1 : φ (τ x) = φ x ^ l ^ a := ha ⟨x, Algebra.subset_adjoin hx⟩
   refine eq_of_pow_eq_self_of_map_eq φ (l ^ n) ?_ ?_ ?_ ?_
@@ -65,13 +71,12 @@ theorem exists_forall_eq_pow_of_pow_eq_self (l : ℕ) [Fact l.Prime] {O k : Type
   · rw [← pow_mul, mul_comm, pow_mul, hx]
   · rw [h1, map_pow]
 
-theorem exists_gal_eq_pow (l : ℕ) [Fact l.Prime] (n : ℕ) (hn : 0 < n) (σ : GQ l) :
-    ∃ a : ℕ, ∀ x : Om l, x ^ l ^ n = x → σ x = x ^ l ^ a := by
+theorem exists_gal_eq_pow (l : ℕ) [Fact l.Prime] (n : ℕ) (hn : 0 < n) (σ : GQ l)
+    : ∃ a : ℕ, ∀ x : Om l, x ^ l ^ n = x → σ x = x ^ l ^ a := by
   have hl : l.Prime := Fact.out
   have hq : 1 < l ^ n := Nat.one_lt_pow hn.ne' hl.one_lt
   let v : Valuation (Om l) NNReal := (PadicAlgCl.valued l).v
-  have hv : ∀ x : Om l, v (σ x) = v x := fun x =>
-    NNReal.eq (spectralNorm_eq_of_equiv σ x).symm
+  have hv : ∀ x : Om l, v (σ x) = v x := fun x => NNReal.eq (spectralNorm_eq_of_equiv σ x).symm
   let O : ValuationSubring (Om l) := v.valuationSubring
   have hO : ∀ x : Om l, x ∈ O ↔ v x ≤ 1 := fun x => Iff.rfl
   have hm : ∀ x : O, IsLocalRing.residue O x = 0 ↔ v x < 1 := fun x => by
@@ -83,12 +88,15 @@ theorem exists_gal_eq_pow (l : ℕ) [Fact l.Prime] (n : ℕ) (hn : 0 < n) (σ : 
     have : v (l : Om l) = 1 / (l : NNReal) := PadicAlgCl.valuation_p l
     rw [SubringClass.coe_natCast, this, one_div]
     exact inv_lt_one_of_one_lt₀ (by exact_mod_cast hl.one_lt)
-  let τ : O →+* O := (σ : Om l →+* Om l).restrict O O (fun x hx => by
-    rw [hO] at hx ⊢
-    exact (hv x).trans_le hx)
+  let τ : O →+* O :=
+    (σ : Om l →+* Om l).restrict O O (fun x hx => by
+      rw [hO] at hx ⊢
+      exact (hv x).trans_le hx)
   have hτ : ∀ x : O, ((τ x : O) : Om l) = σ x := fun x => rfl
-  obtain ⟨a, ha⟩ := exists_forall_eq_pow_of_pow_eq_self l (IsLocalRing.residue O) τ
-    (fun x hx => by rw [hm] at hx ⊢; rw [hτ, hv]; exact hx) n hn
+  obtain ⟨a, ha⟩ :=
+    exists_forall_eq_pow_of_pow_eq_self l (IsLocalRing.residue O) τ
+      (fun x hx => by rw [hm] at hx ⊢; rw [hτ, hv]; exact hx)
+      n hn
   refine ⟨a, fun x hx => ?_⟩
   have hxO : x ∈ O := by
     rw [hO]

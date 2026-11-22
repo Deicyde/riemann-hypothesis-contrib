@@ -9,5 +9,10 @@ public import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForm
 @[expose] public section
 
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.thetaSeriesRationalOnGoodCovers_of_untwisted : GlobalTheory.Published.RayClassFieldSt → GlobalTheory.SerStd.UntwRatS → GlobalTheory.SerStd.SeriesRatS := by
-  first | exact @GlobalTheory.SerStdTwist.seriesRatS_of_untwRatS | exact GlobalTheory.SerStdTwist.seriesRatS_of_untwRatS | (intros; apply GlobalTheory.SerStdTwist.seriesRatS_of_untwRatS <;> assumption)
+theorem _root_.GlobalTheory.T.thetaSeriesRationalOnGoodCovers_of_untwisted
+    : GlobalTheory.Published.RayClassFieldSt → GlobalTheory.SerStd.UntwRatS
+      → GlobalTheory.SerStd.SeriesRatS := by
+  first
+  | exact @GlobalTheory.SerStdTwist.seriesRatS_of_untwRatS
+  | exact GlobalTheory.SerStdTwist.seriesRatS_of_untwRatS
+  | (intros; apply GlobalTheory.SerStdTwist.seriesRatS_of_untwRatS <;> assumption)

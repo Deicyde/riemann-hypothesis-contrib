@@ -35,8 +35,11 @@ theorem hostStab : HostStab := by
         rw [pow_succ, Module.End.mul_apply, ih, pow_succ]
         simp [f, Matrix.mulVec_mulVec]
     have hMg : M ^ g = 1 := by
-      have h := congrArg (fun u : Matrix.GeneralLinearGroup (Fin k) (hostE ζ a b) =>
-        (u : Matrix (Fin k) (Fin k) (hostE ζ a b))) hδ
+      have h :=
+        congrArg
+          (fun u : Matrix.GeneralLinearGroup (Fin k) (hostE ζ a b) =>
+            (u : Matrix (Fin k) (Fin k) (hostE ζ a b)))
+          hδ
       simpa [M] using h
     have hf1 : f ^ g = 1 := by
       apply LinearMap.ext
@@ -59,11 +62,13 @@ theorem hostStab : HostStab := by
       rw [mul_comm, Polynomial.cyclotomic_prime_mul_X_sub_one ℚ g]
       simp [hf1]
     have hP0 : minpoly ℚ f ≠ 0 := fun h0 => hQne (zero_dvd_iff.1 (h0 ▸ hdvd))
-    have hirr : Irreducible (Polynomial.cyclotomic g ℚ) := Polynomial.cyclotomic.irreducible_rat hg.pos
+    have hirr : Irreducible (Polynomial.cyclotomic g ℚ) :=
+      Polynomial.cyclotomic.irreducible_rat hg.pos
     by_cases hc : Polynomial.cyclotomic g ℚ ∣ minpoly ℚ f
     · have h1 := Polynomial.natDegree_le_of_dvd hc hP0
-      have h2 := Polynomial.natDegree_le_of_dvd (LinearMap.minpoly_dvd_charpoly f)
-        (LinearMap.charpoly_monic f).ne_zero
+      have h2 :=
+        Polynomial.natDegree_le_of_dvd (LinearMap.minpoly_dvd_charpoly f)
+          (LinearMap.charpoly_monic f).ne_zero
       rw [LinearMap.charpoly_natDegree] at h2
       rw [Polynomial.natDegree_cyclotomic, Nat.totient_prime hg] at h1
       have hdim : Module.finrank ℚ (Fin k → hostE ζ a b) = 2 ^ (e + 2) * k := by

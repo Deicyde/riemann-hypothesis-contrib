@@ -19,29 +19,35 @@ variable {k k' : Type} [Field k] [Field k'] [Algebra k k']
 def galAct (s : k' ≃ₐ[k] k') (n : ℕ) : GL (Fin n) k' →* GL (Fin n) k' :=
   GeneralLinearGroup.map s.toAlgHom.toRingHom
 
-@[simp] theorem galAct_one (n : ℕ) : galAct (1 : k' ≃ₐ[k] k') n = MonoidHom.id _ := by
-  ext g i j; rfl
+@[simp]
+theorem galAct_one (n : ℕ) : galAct (1 : k' ≃ₐ[k] k') n = MonoidHom.id _ := by ext g i j; rfl
 
-theorem galAct_mul (s t : k' ≃ₐ[k] k') (n : ℕ) : galAct (s * t) n = (galAct s n).comp (galAct t n) := by
+theorem galAct_mul (s t : k' ≃ₐ[k] k') (n : ℕ)
+    : galAct (s * t) n = (galAct s n).comp (galAct t n) := by
   ext g i j; rfl
 
 def incl (k' : Type) [Field k'] [Algebra k k'] (n : ℕ) : GL (Fin n) k →* GL (Fin n) k' :=
   GeneralLinearGroup.map (algebraMap k k')
 
-@[simp] theorem incl_apply {n : ℕ} (γ : GL (Fin n) k) (i j : Fin n) :
-    (incl k' n γ : Matrix (Fin n) (Fin n) k') i j = algebraMap k k' ((γ : Matrix (Fin n) (Fin n) k) i j) := rfl
+@[simp]
+theorem incl_apply {n : ℕ} (γ : GL (Fin n) k) (i j : Fin n)
+    : (incl k' n γ : Matrix (Fin n) (Fin n) k') i j
+      = algebraMap k k' ((γ : Matrix (Fin n) (Fin n) k) i j) :=
+  rfl
 
-@[simp] theorem galAct_incl (s : k' ≃ₐ[k] k') {n : ℕ} (γ : GL (Fin n) k) : galAct s n (incl k' n γ) = incl k' n γ := by
+@[simp]
+theorem galAct_incl (s : k' ≃ₐ[k] k') {n : ℕ} (γ : GL (Fin n) k)
+    : galAct s n (incl k' n γ) = incl k' n γ := by
   ext i j
   change s (algebraMap k k' ((γ : Matrix (Fin n) (Fin n) k) i j)) = _
   exact s.commutes _
-
 
 variable (k) in
 def norm (s : k' ≃ₐ[k] k') {n : ℕ} (g : GL (Fin n) k') : GL (Fin n) k' :=
   (List.ofFn fun j : Fin (Module.finrank k k') => galAct (s ^ (j : ℕ)) n g).prod
 
-def IsStable (s : k' ≃ₐ[k] k') {n : ℕ} (K : Subgroup (GL (Fin n) k')) : Prop := K.map (galAct s n) = K
+def IsStable (s : k' ≃ₐ[k] k') {n : ℕ} (K : Subgroup (GL (Fin n) k')) : Prop :=
+  K.map (galAct s n) = K
 
 end Groups
 
@@ -49,8 +55,9 @@ section Traces
 
 variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
 
-def IsLevelProj (π : Representation ℂ G V) (K : Subgroup G) (A : V →ₗ[ℂ] V)
-    (T : fixed π K →ₗ[ℂ] fixed π K) : Prop :=
+def IsLevelProj
+    (π : Representation ℂ G V) (K : Subgroup G) (A : V →ₗ[ℂ] V) (T : fixed π K →ₗ[ℂ] fixed π K)
+    : Prop :=
   ∀ v : fixed π K, ((T v : V) - A v) ∈ twKer π K 1
 
 def HasLevelTrace (π : Representation ℂ G V) (K : Subgroup G) (A : V →ₗ[ℂ] V) (c : ℂ) : Prop :=
@@ -60,28 +67,33 @@ end Traces
 
 section Unique
 
-variable {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V] {π : Representation ℂ G V} {K : Subgroup G}
-  {A : V →ₗ[ℂ] V}
+variable
+  {G V : Type} [Group G] [AddCommGroup V] [Module ℂ V]
+  {π : Representation ℂ G V} {K : Subgroup G} {A : V →ₗ[ℂ] V}
 
-def levelProj (hc : IsCompl (fixed π K) (twKer π K 1)) (A : V →ₗ[ℂ] V) : fixed π K →ₗ[ℂ] fixed π K :=
+def levelProj (hc : IsCompl (fixed π K) (twKer π K 1)) (A : V →ₗ[ℂ] V)
+    : fixed π K →ₗ[ℂ] fixed π K :=
   Submodule.projectionOnto _ _ hc ∘ₗ A ∘ₗ (fixed π K).subtype
 
 end Unique
 
 section Lift
 
-variable {k k' : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+variable
+  {k k' : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
   [Field k'] [ValuativeRel k'] [TopologicalSpace k'] [IsNonarchimedeanLocalField k'] [Algebra k k']
   {n : ℕ} {V W : Type} [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
-
 
 variable (k) in
 def IsTwInt (s : k' ≃ₐ[k] k') (P : Representation ℂ (GL (Fin n) k') W) (I : W →ₗ[ℂ] W) : Prop :=
   (∀ g, P (galAct s n g) ∘ₗ I = I ∘ₗ P g) ∧ 0 < Module.finrank k k' ∧ I ^ Module.finrank k k' = 1
 
-theorem IsTwInt.mem_fixed {s : k' ≃ₐ[k] k'} {P : Representation ℂ (GL (Fin n) k') W} {I : W →ₗ[ℂ] W}
-    (hI : IsTwInt k s P I) {K : Subgroup (GL (Fin n) k')} (hK : IsStable s K) {v : W} (hv : v ∈ fixed P K) :
-    I v ∈ fixed P K := by
+theorem IsTwInt.mem_fixed
+    {s : k' ≃ₐ[k] k'} {P : Representation ℂ (GL (Fin n) k') W} {I : W →ₗ[ℂ] W}
+    (hI : IsTwInt k s P I)
+    {K : Subgroup (GL (Fin n) k')} (hK : IsStable s K)
+    {v : W} (hv : v ∈ fixed P K)
+    : I v ∈ fixed P K := by
   intro x
   have hx : (x : GL (Fin n) k') ∈ K.map (galAct s n) := by rw [hK]; exact x.2
   obtain ⟨y, hy, e⟩ := Subgroup.mem_map.1 hx
@@ -91,30 +103,39 @@ theorem IsTwInt.mem_fixed {s : k' ≃ₐ[k] k'} {P : Representation ℂ (GL (Fin
   simp only [MonoidHom.one_apply, Units.val_one, one_smul]
   rw [← e, h1, h2]
 
-
 variable (k) in
-def TwCharVal (s : k' ≃ₐ[k] k') (P : Representation ℂ (GL (Fin n) k') W) (I : W →ₗ[ℂ] W) (g' : GL (Fin n) k')
-    (c : ℂ) : Prop :=
-  ∃ U ∈ 𝓝 (1 : GL (Fin n) k'), ∀ K : Subgroup (GL (Fin n) k'), IsOpen (K : Set (GL (Fin n) k')) →
-    IsCompact (K : Set (GL (Fin n) k')) → IsStable s K → (K : Set (GL (Fin n) k')) ⊆ U →
-      HasLevelTrace P K (P g' ∘ₗ I) c
+def TwCharVal
+    (s : k' ≃ₐ[k] k') (P : Representation ℂ (GL (Fin n) k') W) (I : W →ₗ[ℂ] W) (g' : GL (Fin n) k')
+    (c : ℂ)
+    : Prop :=
+  ∃ U ∈ 𝓝 (1 : GL (Fin n) k'), ∀ K : Subgroup (GL (Fin n) k'),
+    IsOpen (K : Set (GL (Fin n) k')) → IsCompact (K : Set (GL (Fin n) k')) → IsStable s K
+      → (K : Set (GL (Fin n) k')) ⊆ U
+      → HasLevelTrace P K (P g' ∘ₗ I) c
 
 def CharVal (π : Representation ℂ (GL (Fin n) k) V) (γ : GL (Fin n) k) (c : ℂ) : Prop :=
-  ∃ U ∈ 𝓝 (1 : GL (Fin n) k), ∀ K : Subgroup (GL (Fin n) k), IsOpen (K : Set (GL (Fin n) k)) →
-    IsCompact (K : Set (GL (Fin n) k)) → (K : Set (GL (Fin n) k)) ⊆ U → HasLevelTrace π K (π γ) c
+  ∃ U ∈ 𝓝 (1 : GL (Fin n) k), ∀ K : Subgroup (GL (Fin n) k),
+    IsOpen (K : Set (GL (Fin n) k)) → IsCompact (K : Set (GL (Fin n) k))
+      → (K : Set (GL (Fin n) k)) ⊆ U
+      → HasLevelTrace π K (π γ) c
 
-def IsLBC (s : k' ≃ₐ[k] k') (π : Representation ℂ (GL (Fin n) k) V) (P : Representation ℂ (GL (Fin n) k') W) :
-    Prop :=
-  IsSmooth π ∧ π.IsIrreducible ∧ IsSmooth P ∧ P.IsIrreducible ∧
-  ∃ I : W →ₗ[ℂ] W, IsTwInt k s P I ∧
-    ∀ g' : GL (Fin n) k', (norm k s g' : Matrix (Fin n) (Fin n) k').charpoly.Separable →
-      ∀ γ : GL (Fin n) k, (γ : Matrix (Fin n) (Fin n) k).charpoly.map (algebraMap k k') =
-          (norm k s g' : Matrix (Fin n) (Fin n) k').charpoly →
-        ∃ c : ℂ, TwCharVal k s P I g' c ∧ CharVal π γ c
+def IsLBC
+    (s : k' ≃ₐ[k] k') (π : Representation ℂ (GL (Fin n) k) V)
+    (P : Representation ℂ (GL (Fin n) k') W)
+    : Prop :=
+  IsSmooth π ∧ π.IsIrreducible ∧ IsSmooth P ∧ P.IsIrreducible
+    ∧ ∃ I : W →ₗ[ℂ] W,
+      IsTwInt k s P I
+        ∧ ∀ g' : GL (Fin n) k',
+          (norm k s g' : Matrix (Fin n) (Fin n) k').charpoly.Separable
+            → ∀ γ : GL (Fin n) k,
+              (γ : Matrix (Fin n) (Fin n) k).charpoly.map (algebraMap k k')
+                  = (norm k s g' : Matrix (Fin n) (Fin n) k').charpoly
+                → ∃ c : ℂ, TwCharVal k s P I g' c ∧ CharVal π γ c
 
 def IsLBCCl (s : k' ≃ₐ[k] k') (x : IrrGL (k := k)) (y : IrrGL (k := k')) : Prop :=
-  ∃ (m : ℕ) (π : IrrRep (GL (Fin m) k)) (P : IrrRep (GL (Fin m) k')), x = ⟨m, π.cl⟩ ∧ y = ⟨m, P.cl⟩ ∧
-    IsLBC s π.ρ P.ρ
+  ∃ (m : ℕ) (π : IrrRep (GL (Fin m) k)) (P : IrrRep (GL (Fin m) k')),
+    x = ⟨m, π.cl⟩ ∧ y = ⟨m, P.cl⟩ ∧ IsLBC s π.ρ P.ρ
 
 end Lift
 

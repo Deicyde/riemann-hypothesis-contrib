@@ -10,15 +10,14 @@ namespace GlobalTheory.CompanionTheory.Ggeo.DerivFree
 
 variable {k : Type} [Field k] {R : Type} [CommRing R] [Algebra k R]
 
-theorem deriv_mul_pow (D : Derivation k R R) {z : R} (hz : D z = 1) {c : R} (hc : D c = 0) (m : ℕ) :
-    D (c * z ^ m) = (m : R) * c * z ^ (m - 1) := by
+theorem deriv_mul_pow (D : Derivation k R R) {z : R} (hz : D z = 1) {c : R} (hc : D c = 0) (m : ℕ)
+    : D (c * z ^ m) = (m : R) * c * z ^ (m - 1) := by
   rw [D.leibniz, D.leibniz_pow, hz, hc]
   simp only [smul_eq_mul, nsmul_eq_mul, mul_one, mul_zero, add_zero]
   ring
 
-theorem iter_mul_pow (D : Derivation k R R) {z : R} (hz : D z = 1) {c : R} (hc : D c = 0)
-    (n i : ℕ) :
-    (⇑D)^[n] (c * z ^ i) = (i.descFactorial n : R) * c * z ^ (i - n) := by
+theorem iter_mul_pow (D : Derivation k R R) {z : R} (hz : D z = 1) {c : R} (hc : D c = 0) (n i : ℕ)
+    : (⇑D)^[n] (c * z ^ i) = (i.descFactorial n : R) * c * z ^ (i - n) := by
   induction n with
   | zero => simp
   | succ n ih =>
@@ -30,41 +29,45 @@ theorem iter_mul_pow (D : Derivation k R R) {z : R} (hz : D z = 1) {c : R} (hc :
     push_cast
     ring
 
-theorem iter_sum (D : Derivation k R R) (n : ℕ) {ι : Type} (s : Finset ι) (f : ι → R) :
-    (⇑D)^[n] (∑ i ∈ s, f i) = ∑ i ∈ s, (⇑D)^[n] (f i) := by
+theorem iter_sum (D : Derivation k R R) (n : ℕ) {ι : Type} (s : Finset ι) (f : ι → R)
+    : (⇑D)^[n] (∑ i ∈ s, f i) = ∑ i ∈ s, (⇑D)^[n] (f i) := by
   induction n generalizing f with
   | zero => simp
   | succ n ih =>
     simp only [Function.iterate_succ_apply']
     set_option synthInstance.maxHeartbeats 100000 in
-      rw [ih, map_sum]
+    rw [ih, map_sum]
 
-theorem iter_sub (D : Derivation k R R) (n : ℕ) (a b : R) :
-    (⇑D)^[n] (a - b) = (⇑D)^[n] a - (⇑D)^[n] b := by
+theorem iter_sub (D : Derivation k R R) (n : ℕ) (a b : R)
+    : (⇑D)^[n] (a - b) = (⇑D)^[n] a - (⇑D)^[n] b := by
   induction n with
   | zero => simp
   | succ n ih =>
     simp only [Function.iterate_succ_apply']
     rw [ih, map_sub]
 
-theorem iter_smul (D : Derivation k R R) (n : ℕ) (r : k) (a : R) :
-    (⇑D)^[n] (r • a) = r • (⇑D)^[n] a := by
+theorem iter_smul (D : Derivation k R R) (n : ℕ) (r : k) (a : R)
+    : (⇑D)^[n] (r • a) = r • (⇑D)^[n] a := by
   induction n with
   | zero => simp
   | succ n ih =>
     simp only [Function.iterate_succ_apply']
     rw [ih, D.map_smul]
 
-theorem factorial_ne_zero_of_lt (p : ℕ) [Fact p.Prime] [CharP k p] {j : ℕ} (hj : j < p) :
-    ((j.factorial : ℕ) : k) ≠ 0 := by
+theorem factorial_ne_zero_of_lt (p : ℕ) [Fact p.Prime] [CharP k p] {j : ℕ} (hj : j < p)
+    : ((j.factorial : ℕ) : k) ≠ 0 := by
   intro h
   rw [CharP.cast_eq_zero_iff k p] at h
   have := (Nat.Prime.dvd_factorial (Fact.out : p.Prime)).1 h
   omega
 
-theorem coeff_zero (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation k R R) {z : R}
-    (hz : D z = 1) (m : ℕ) (hm : m ≤ p) (c : ℕ → R) (hc : ∀ i, D (c i) = 0)
-    (h : ∑ i ∈ Finset.range m, c i * z ^ i = 0) : ∀ i < m, c i = 0 := by
+theorem coeff_zero
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (D : Derivation k R R)
+    {z : R} (hz : D z = 1)
+    (m : ℕ) (hm : m ≤ p)
+    (c : ℕ → R) (hc : ∀ i, D (c i) = 0) (h : ∑ i ∈ Finset.range m, c i * z ^ i = 0)
+    : ∀ i < m, c i = 0 := by
   induction m with
   | zero => intro i hi; omega
   | succ m ih =>
@@ -74,7 +77,8 @@ theorem coeff_zero (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation k R R) {
         have := iter_smul D m (0 : k) (0 : R)
         simpa using this
       rw [iter_sum, h0, Finset.sum_range_succ, Finset.sum_eq_zero, zero_add,
-        iter_mul_pow D hz (hc m), Nat.descFactorial_self, Nat.sub_self, pow_zero, mul_one] at h1
+          iter_mul_pow D hz (hc m), Nat.descFactorial_self, Nat.sub_self, pow_zero, mul_one]
+        at h1
       · have hf : ((m.factorial : ℕ) : k) ≠ 0 := factorial_ne_zero_of_lt p (by omega)
         have h2 : ((m.factorial : ℕ) : k) • c m = 0 := by
           rw [Algebra.smul_def, map_natCast]; exact h1
@@ -89,15 +93,18 @@ theorem coeff_zero (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation k R R) {
     · exact ih (by omega) h i hi
     · exact hlast
 
-theorem exists_coeff (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation k R R) {z : R}
-    (hz : D z = 1) (j : ℕ) (hj : j ≤ p) (a : R) (ha : (⇑D)^[j] a = 0) :
-    ∃ c : ℕ → R, (∀ i, D (c i) = 0) ∧ a = ∑ i ∈ Finset.range j, c i * z ^ i := by
+theorem exists_coeff
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (D : Derivation k R R)
+    {z : R} (hz : D z = 1)
+    (j : ℕ) (hj : j ≤ p)
+    (a : R) (ha : (⇑D)^[j] a = 0)
+    : ∃ c : ℕ → R, (∀ i, D (c i) = 0) ∧ a = ∑ i ∈ Finset.range j, c i * z ^ i := by
   induction j generalizing a with
   | zero => exact ⟨fun _ => 0, by simp, by simpa using ha⟩
   | succ j ih =>
     set b := (⇑D)^[j] a with hb
-    have hDb : D b = 0 := by
-      rw [hb, ← Function.iterate_succ_apply' (⇑D)]; exact ha
+    have hDb : D b = 0 := by rw [hb, ← Function.iterate_succ_apply' (⇑D)]; exact ha
     have hf : ((j.factorial : ℕ) : k) ≠ 0 := factorial_ne_zero_of_lt p (by omega)
     set e := (((j.factorial : ℕ) : k))⁻¹ • b with he
     have hDe : D e = 0 := by rw [he, D.map_smul, hDb, smul_zero]
@@ -118,14 +125,15 @@ theorem exists_coeff (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation k R R)
       rw [this, ← hac]
       simp
 
-theorem exists_deriv_eq_one (p : ℕ) [Fact p.Prime] (D : Derivation k R R)
-    (hnil : ∀ a : R, (⇑D)^[p] a = 0) (t : R) (ht : IsUnit ((⇑D)^[p - 1] t)) :
-    ∃ z : R, D z = 1 := by
+theorem exists_deriv_eq_one
+    (p : ℕ) [Fact p.Prime]
+    (D : Derivation k R R) (hnil : ∀ a : R, (⇑D)^[p] a = 0)
+    (t : R) (ht : IsUnit ((⇑D)^[p - 1] t))
+    : ∃ z : R, D z = 1 := by
   have hp : 2 ≤ p := (Fact.out : p.Prime).two_le
   obtain ⟨w, hw⟩ := ht
   have hp1 : p - 1 = (p - 2) + 1 := by omega
-  have hs : D ((⇑D)^[p - 2] t) = (w : R) := by
-    rw [hw, hp1, Function.iterate_succ_apply']
+  have hs : D ((⇑D)^[p - 2] t) = (w : R) := by rw [hw, hp1, Function.iterate_succ_apply']
   have hDw : D (w : R) = 0 := by
     have h := hnil t
     have hp2 : p = (p - 1) + 1 := by omega
@@ -133,22 +141,24 @@ theorem exists_deriv_eq_one (p : ℕ) [Fact p.Prime] (D : Derivation k R R)
     rw [hw]
     simpa using h
   have hDinv : D ((w⁻¹ : Rˣ) : R) = 0 := by
-    have h1 : D ((w : R) * ((w⁻¹ : Rˣ) : R)) = 0 := by
-      rw [Units.mul_inv, D.map_one_eq_zero]
+    have h1 : D ((w : R) * ((w⁻¹ : Rˣ) : R)) = 0 := by rw [Units.mul_inv, D.map_one_eq_zero]
     rw [D.leibniz, hDw, smul_zero, add_zero, smul_eq_mul] at h1
     exact (Units.mul_right_eq_zero w).1 h1
   refine ⟨((w⁻¹ : Rˣ) : R) * (⇑D)^[p - 2] t, ?_⟩
   rw [D.leibniz, hs, hDinv, smul_zero, add_zero, smul_eq_mul, Units.inv_mul]
 
-noncomputable def coeffMap (p : ℕ) (D : Derivation k R R) (z : R) :
-    (Fin p → LinearMap.ker (D : R →ₗ[k] R)) →ₗ[k] R where
+noncomputable def coeffMap (p : ℕ) (D : Derivation k R R) (z : R)
+    : (Fin p → LinearMap.ker (D : R →ₗ[k] R)) →ₗ[k] R where
   toFun a := ∑ i, (a i : R) * z ^ (i : ℕ)
   map_add' a b := by simp [add_mul, Finset.sum_add_distrib]
   map_smul' r a := by simp [Finset.smul_sum, smul_mul_assoc]
 
-theorem coeffMap_bijective (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation k R R) {z : R}
-    (hz : D z = 1) (hnil : ∀ a : R, (⇑D)^[p] a = 0) :
-    Function.Bijective (coeffMap p D z) := by
+theorem coeffMap_bijective
+    (p : ℕ) [Fact p.Prime] [CharP k p]
+    (D : Derivation k R R)
+    {z : R} (hz : D z = 1)
+    (hnil : ∀ a : R, (⇑D)^[p] a = 0)
+    : Function.Bijective (coeffMap p D z) := by
   constructor
   · rw [injective_iff_map_eq_zero]
     intro a ha
@@ -176,12 +186,19 @@ theorem coeffMap_bijective (p : ℕ) [Fact p.Prime] [CharP k p] (D : Derivation 
     rw [hac, Finset.sum_range]
     rfl
 
-theorem finrank_and_vanishing : ∀ (k : Type) [Field k] (p : ℕ) [Fact p.Prime] [CharP k p]
-    (R : Type) [CommRing R] [Algebra k R] [Module.Finite k R] (D : Derivation k R R) (ε : R →ₐ[k] k),
-    (∀ a : R, (⇑D)^[p] a = 0) → ∀ t : R, IsUnit ((⇑D)^[p - 1] t) →
-      Module.finrank k R = p * Module.finrank k (LinearMap.ker (D : R →ₗ[k] R)) ∧
-      ∃ z : R, ε (D z) ≠ 0 ∧ ∀ u : R →ₗ[k] k, (∀ a b : R, u (a * b) = u a * ε b + ε a * u b) →
-        (∀ a : R, D a = 0 → u a = 0) → u z = 0 → u = 0 := by
+theorem finrank_and_vanishing
+    : ∀ (k : Type) [Field k] (p : ℕ) [Fact p.Prime] [CharP k p] (R : Type) [CommRing R]
+        [Algebra k R] [Module.Finite k R] (D : Derivation k R R) (ε : R →ₐ[k] k),
+      (∀ a : R, (⇑D)^[p] a = 0)
+        → ∀ t : R,
+          IsUnit ((⇑D)^[p - 1] t)
+            → Module.finrank k R = p * Module.finrank k (LinearMap.ker (D : R →ₗ[k] R))
+              ∧ ∃ z : R,
+                ε (D z) ≠ 0
+                  ∧ ∀ u : R →ₗ[k] k,
+                    (∀ a b : R, u (a * b) = u a * ε b + ε a * u b) → (∀ a : R, D a = 0 → u a = 0)
+                      → u z = 0
+                      → u = 0 := by
   intro k _ p _ _ R _ _ _ D ε hnil t ht
   obtain ⟨z, hz⟩ := exists_deriv_eq_one p D hnil t ht
   have hbij := coeffMap_bijective p D hz hnil

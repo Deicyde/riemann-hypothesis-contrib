@@ -6,10 +6,15 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.HeckeGal UpperTheory.V.Base
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal GlobalTheory.HeckeGal UpperTheory.V.Base
 
-private theorem pow_cong {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {a b : Ω} (ha : A.valuation a ≤ 1)
-    (hb : A.valuation b ≤ 1) (h : A.valuation (a - b) < 1) (m : ℕ) : A.valuation (a ^ m - b ^ m) < 1 := by
+private theorem pow_cong
+    {Ω : Type} [Field Ω]
+    (A : ValuationSubring Ω)
+    {a b : Ω} (ha : A.valuation a ≤ 1) (hb : A.valuation b ≤ 1) (h : A.valuation (a - b) < 1)
+    (m : ℕ)
+    : A.valuation (a ^ m - b ^ m) < 1 := by
   induction m with
   | zero => simp
   | succ m ih =>
@@ -20,11 +25,14 @@ private theorem pow_cong {Ω : Type} [Field Ω] (A : ValuationSubring Ω) {a b :
     · rw [map_mul]
       exact lt_of_le_of_lt (mul_le_of_le_one_right' hb) ih
 
-private theorem isFrob_sq {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] {A : ValuationSubring Ω}
-    {q : ℕ} {g : G k Ω} (hg : IsFrob (F := k) A q g) : IsFrob (F := k) A (q ^ 2) (g * g) := by
+private theorem isFrob_sq
+    {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω]
+    {A : ValuationSubring Ω} {q : ℕ} {g : G k Ω} (hg : IsFrob (F := k) A q g)
+    : IsFrob (F := k) A (q ^ 2) (g * g) := by
   refine ⟨Subgroup.mul_mem _ hg.1 hg.1, fun x hx => ?_⟩
   have hgx : A.valuation (g x) ≤ 1 :=
-    (A.valuation_le_one_iff _).2 ((apply_mem_iff_of_mem_Dec (F := k) hg.1 x).2 ((A.valuation_le_one_iff _).1 hx))
+    (A.valuation_le_one_iff _).2
+      ((apply_mem_iff_of_mem_Dec (F := k) hg.1 x).2 ((A.valuation_le_one_iff _).1 hx))
   have h1 := hg.2 _ hgx
   have h2 := pow_cong A hgx (b := x ^ q) (by rw [map_pow]; exact pow_le_one' hx _) (hg.2 x hx) q
   have h3 := Valuation.map_add_lt A.valuation h1 h2
@@ -32,12 +40,19 @@ private theorem isFrob_sq {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Al
   rw [AlgEquiv.mul_apply]
   exact h3
 
-theorem UpperTheory.V.Sd.Tw.inert :
-    ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] [Algebra K Ω],
-        Module.finrank ℚ K = 2 → ∀ (p : ℕ), p.Prime → ∀ (A : ValuationSubring Ω), A.valuation (p : Ω) < 1 →
-        Ine (F := ℚ) A ≤ galOf ℚ K Ω → ∀ t : G ℚ Ω, IsFrob (F := ℚ) A p t → t ∉ galOf ℚ K Ω →
-        ∃ w : HeightOneSpectrum (𝓞 K), IsPlaceOver A w ∧ w.asIdeal = Ideal.span {(p : 𝓞 K)} ∧
-          ∀ s : G K Ω, galEmb ℚ K Ω s = t * t → IsFrob (F := K) A (normV w) s := by
+theorem UpperTheory.V.Sd.Tw.inert
+    : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+        [Algebra K Ω],
+      Module.finrank ℚ K = 2
+        → ∀ (p : ℕ),
+          p.Prime
+            → ∀ (A : ValuationSubring Ω),
+              A.valuation (p : Ω) < 1 → Ine (F := ℚ) A ≤ galOf ℚ K Ω
+                → ∀ t : G ℚ Ω,
+                  IsFrob (F := ℚ) A p t → t ∉ galOf ℚ K Ω
+                    → ∃ w : HeightOneSpectrum (𝓞 K),
+                      IsPlaceOver A w ∧ w.asIdeal = Ideal.span {(p : 𝓞 K)}
+                        ∧ ∀ s : G K Ω, galEmb ℚ K Ω s = t * t → IsFrob (F := K) A (normV w) s := by
   intro K Ω _ _ _ _ _ _ hK p hp A hA hI t ht htK
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic

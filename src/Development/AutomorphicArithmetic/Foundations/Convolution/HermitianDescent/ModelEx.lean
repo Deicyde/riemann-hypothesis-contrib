@@ -11,22 +11,29 @@ open scoped TensorProduct
 
 namespace UpperTheory.ConvolutionTheory.D
 
-private theorem desc_alg {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (c : R ≃ₐ[k] R) (hG : IsGal c 2)
-    (L : Type) [CommRing L] [Algebra k L] [Algebra R L] [IsScalarTower k R L] (s : L →ₐ[k] L)
-    (hs : ∀ r, s (algebraMap R L r) = algebraMap R L (c r)) (hss : ∀ z, s (s z) = z) :
-    ∃ (A : Type) (_ : CommRing A) (_ : Algebra k A) (e : R ⊗[k] A ≃ₐ[R] L), ∀ z, e (io c A z) = s (e z) := by
+private theorem desc_alg
+    {k R : Type} [CommRing k] [CommRing R] [Algebra k R]
+    (c : R ≃ₐ[k] R) (hG : IsGal c 2)
+    (L : Type) [CommRing L] [Algebra k L] [Algebra R L] [IsScalarTower k R L]
+    (s : L →ₐ[k] L) (hs : ∀ r, s (algebraMap R L r) = algebraMap R L (c r)) (hss : ∀ z, s (s z) = z)
+    : ∃ (A : Type) (_ : CommRing A) (_ : Algebra k A) (e : R ⊗[k] A ≃ₐ[R] L), ∀ z,
+      e (io c A z) = s (e z) := by
   let A : Subalgebra k L := AlgHom.equalizer s (AlgHom.id k L)
-  let f : R ⊗[k] A →ₐ[R] L := Algebra.TensorProduct.lift (Algebra.ofId R L) A.val fun _ _ => Commute.all _ _
+  let f : R ⊗[k] A →ₐ[R] L :=
+    Algebra.TensorProduct.lift (Algebra.ofId R L) A.val fun _ _ => Commute.all _ _
   have hf : ∀ (r : R) (a : A), f (r ⊗ₜ a) = algebraMap R L r * a := fun r a => rfl
-  have hb := descent k R c 2 hG L s.toLinearMap
-    (fun r m => by simp [Algebra.smul_def, hs]) (LinearMap.ext fun z => by simp [pow_two, hss])
-  let j : A ≃ₗ[k] LinearMap.eqLocus s.toLinearMap LinearMap.id :=
-    { toFun := fun a => ⟨a.1, a.2⟩
-      invFun := fun a => ⟨a.1, a.2⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl
-      left_inv := fun _ => rfl
-      right_inv := fun _ => rfl }
+  have hb :=
+    descent k R c 2 hG L s.toLinearMap
+      (fun r m => by simp [Algebra.smul_def, hs])
+      (LinearMap.ext fun z => by simp [pow_two, hss])
+  let j : A ≃ₗ[k] LinearMap.eqLocus s.toLinearMap LinearMap.id := {
+    toFun := fun a => ⟨a.1, a.2⟩
+    invFun := fun a => ⟨a.1, a.2⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+    left_inv := fun _ => rfl
+    right_inv := fun _ => rfl
+  }
   have hbij : Function.Bijective f := by
     have h2 := hb.comp (j.lTensor R).bijective
     convert h2 using 1
@@ -43,13 +50,15 @@ private theorem desc_alg {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (c
     have h2 : s a = a := a.2
     rw [h1, hf, hf, map_mul, hs, h2]
 
-private theorem inv_ex {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (c : R ≃ₐ[k] R) (hc : c ^ 2 = 1)
-    {n : ℕ} {P : R[X]} (hP : IsCsr c n P) :
-    ∃ s : AdjoinRoot P →ₐ[k] AdjoinRoot P, (∀ r, s (algebraMap R _ r) = algebraMap R _ (c r)) ∧ (∀ z, s (s z) = z) ∧
-      AdjoinRoot.root P * s (AdjoinRoot.root P) = 1 := by
+private theorem inv_ex
+    {k R : Type} [CommRing k] [CommRing R] [Algebra k R]
+    (c : R ≃ₐ[k] R) (hc : c ^ 2 = 1)
+    {n : ℕ} {P : R[X]} (hP : IsCsr c n P)
+    : ∃ s : AdjoinRoot P →ₐ[k] AdjoinRoot P,
+      (∀ r, s (algebraMap R _ r) = algebraMap R _ (c r)) ∧ (∀ z, s (s z) = z)
+        ∧ AdjoinRoot.root P * s (AdjoinRoot.root P) = 1 := by
   obtain ⟨hm, hn, hu, hr⟩ := hP
-  have hcc : ∀ r, c (c r) = r := fun r => by
-    rw [← AlgEquiv.mul_apply, ← pow_two, hc]; rfl
+  have hcc : ∀ r, c (c r) = r := fun r => by rw [← AlgEquiv.mul_apply, ← pow_two, hc]; rfl
   have hx : IsUnit (AdjoinRoot.root P) := by
     have h1 : AdjoinRoot.mk P (X * P.divX + C (P.coeff 0)) = 0 := by
       rw [X_mul_divX_add, AdjoinRoot.mk_self]
@@ -60,7 +69,8 @@ private theorem inv_ex {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (c :
   obtain ⟨y, hy⟩ := hx.exists_right_inv
   letI : Invertible y := ⟨AdjoinRoot.root P, hy, by rw [mul_comm, hy]⟩
   have h0 : P.eval₂ ((AdjoinRoot.of P).comp (c : R →+* R)) y = 0 := by
-    rw [← eval₂_map, ← eval₂_reflect_eq_zero_iff _ y n _ (natDegree_map_le.trans hn.le), hr, eval₂_mul]
+    rw [← eval₂_map, ← eval₂_reflect_eq_zero_iff _ y n _ (natDegree_map_le.trans hn.le), hr,
+      eval₂_mul]
     exact mul_eq_zero_of_right _ (AdjoinRoot.eval₂_root P)
   let s0 : AdjoinRoot P →+* AdjoinRoot P := AdjoinRoot.lift _ y h0
   have h1 : ∀ r, s0 (AdjoinRoot.of P r) = AdjoinRoot.of P (c r) := fun r => AdjoinRoot.lift_of h0
@@ -68,7 +78,9 @@ private theorem inv_ex {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (c :
   have h3 : s0 y = AdjoinRoot.root P := by
     have := congrArg s0 hy
     rw [map_mul, map_one, h2] at this
-    calc s0 y = (AdjoinRoot.root P * y) * s0 y := by rw [hy, one_mul]
+    calc
+      s0 y
+        = (AdjoinRoot.root P * y) * s0 y := by rw [hy, one_mul]
       _ = _ := by rw [mul_assoc, this, mul_one]
   refine ⟨⟨s0, fun a => ?_⟩, h1, fun z => ?_, ?_⟩
   · rw [IsScalarTower.algebraMap_apply k R (AdjoinRoot P)]
@@ -85,8 +97,7 @@ private theorem inv_ex {k R : Type} [CommRing k] [CommRing R] [Algebra k R] (c :
 
 end UpperTheory.ConvolutionTheory.D
 
-theorem UpperTheory.ConvolutionTheory.D.modelEx :
-    UpperTheory.ConvolutionTheory.D.ModelEx := by
+theorem UpperTheory.ConvolutionTheory.D.modelEx : UpperTheory.ConvolutionTheory.D.ModelEx := by
   intro k R _ _ _ _ c hG n P hP hsep
   obtain ⟨s, hs, hss, hx⟩ := inv_ex c hG.pow hP
   obtain ⟨A, _, _, e, he⟩ := desc_alg c hG (AdjoinRoot P) s hs hss
@@ -100,7 +111,8 @@ theorem UpperTheory.ConvolutionTheory.D.modelEx :
   haveI : Module.Flat k A := Module.Flat.of_flat_tensorProduct k A R
   haveI : Module.Free k A := Module.free_of_flat_of_isLocalRing
   have hr : Module.finrank k A = n := by
-    rw [← Module.finrank_baseChange (R := R), Module.finrank_eq_card_basis B, Fintype.card_fin, ← hn]
+    rw [← Module.finrank_baseChange (R := R), Module.finrank_eq_card_basis B, Fintype.card_fin,
+      ← hn]
     rfl
   let b := Module.finBasisOfFinrankEq k A hr
   have h1 : e.symm (AdjoinRoot.root P) * io c A (e.symm (AdjoinRoot.root P)) = 1 := by
@@ -113,7 +125,8 @@ theorem UpperTheory.ConvolutionTheory.D.modelEx :
     have h3 : aeval (AdjoinRoot.root P) M.charpoly = 0 := by
       have h4 := Matrix.aeval_self_charpoly M
       rw [hM, aeval_algHom_apply, ← hM, map_eq_zero_iff _ (Algebra.leftMulMatrix_injective _),
-        aeval_algHom_apply] at h4
+          aeval_algHom_apply]
+        at h4
       exact (map_eq_zero_iff _ e.symm.injective).1 h4
     rw [AdjoinRoot.aeval_eq, AdjoinRoot.mk_eq_zero] at h3
     exact eq_of_monic_of_dvd_of_natDegree_le hm M.charpoly_monic h3

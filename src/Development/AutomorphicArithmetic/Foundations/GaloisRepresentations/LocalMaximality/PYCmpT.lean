@@ -5,7 +5,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -13,9 +14,12 @@ set_option autoImplicit false
 namespace UpperTheory.Gal.productCup_of_system
 
 section
-variable {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K'] [Algebra F K]
-  [IsScalarTower ℂ F K] [Algebra K K'] [IsScalarTower ℂ K K'] [Algebra F K'] [IsScalarTower F K K'] [IsScalarTower ℂ F K'] {d : ℕ}
-  (x : Fin (d + 1) → Fˣ) (j2 : K →ₐ[ℂ] K')
+variable
+  {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra ℂ F] [Algebra ℂ K] [Algebra ℂ K']
+  [Algebra F K] [IsScalarTower ℂ F K] [Algebra K K'] [IsScalarTower ℂ K K'] [Algebra F K']
+  [IsScalarTower F K K'] [IsScalarTower ℂ F K']
+  {d : ℕ} (x : Fin (d + 1) → Fˣ)
+  (j2 : K →ₐ[ℂ] K')
 
 private lemma pk_single {d : ℕ} (i : Fin (d + 1)) : pk ({i} : Finset (Fin (d + 1))) = i := by
   simp [pk]
@@ -279,7 +283,11 @@ end
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.yCmpT_of :
-    YXi → YCols → YKE → PtT → CechKoszulSystemBoundaryCriterion → SysBasic → SysOk → KoszulBoundaryOfComponentMemIdeal → RS → LocMax → FixZ → ValBasic → RYBasic → DtBasic → OmLoc → YCmpT := by
-  intro hXi _ hKE hPt hL1 hBas _ hK2 hRS hLM hFZ hVB hRY hDt _ F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 Fx A hY h hh c hc hc0 hc1
+theorem UpperTheory.Gal.productCup_of_system.yCmpT_of
+    : YXi → YCols → YKE → PtT → CechKoszulSystemBoundaryCriterion → SysBasic → SysOk
+      → KoszulBoundaryOfComponentMemIdeal → RS → LocMax → FixZ → ValBasic → RYBasic → DtBasic
+      → OmLoc
+      → YCmpT := by
+  intro hXi _ hKE hPt hL1 hBas _ hK2 hRS hLM hFZ hVB hRY hDt _ F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x
+    j2 Fx A hY h hh c hc hc0 hc1
   exact main_core x j2 hXi hKE hPt hL1 hBas hK2 hRS hLM hFZ hVB hRY hDt Fx A hY h hh c hc hc0 hc1

@@ -6,7 +6,8 @@ public import Formalism.LocalToGlobal.KernelLattices.DeterminantCokernelCount.Co
 
 @[expose] public section
 
-open NumberField Formalism.BasicNotions Classical Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker
+open NumberField Formalism.BasicNotions Classical Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.L2.Ker
 
 namespace GlobalTheory.CoefWop
 
@@ -106,13 +107,20 @@ end GlobalTheory.CoefWop
 
 namespace GlobalTheory
 
-
 open GlobalTheory.CoefWop in
-theorem coefIn_Wop_U_translate : ∀ (D : D7) (T : Tor D) (N N' : ℕ) (F : VC D N N' → ℂ) (Λ : AddSubgroup (VC D N N')) (p : ℕ) [Fact p.Prime] (y t : VC D N N'), ContDiff ℂ ⊤ F → (∀ s : VC D N N', (∃ a : ℕ, 0 < a ∧ a • s ∈ Λ) → CoefIn D (U D T s F) Qbar) → (∃ a : ℕ, 0 < a ∧ a • t ∈ Λ) → (∃ a : ℕ, 0 < a ∧ a • y ∈ Λ) → (∀ x ∈ Λ, ∀ x' ∈ Λ, ∃ k : ℤ, (Hf D T x x').im = k) → (∃ m : ℤ, qH D T y = m) → CoefIn D (Wop D T p y (U D T t F)) Qbar := by
+theorem coefIn_Wop_U_translate
+    : ∀ (D : D7) (T : Tor D) (N N' : ℕ) (F : VC D N N' → ℂ) (Λ : AddSubgroup (VC D N N')) (p : ℕ)
+        [Fact p.Prime] (y t : VC D N N'),
+      ContDiff ℂ ⊤ F → (∀ s : VC D N N', (∃ a : ℕ, 0 < a ∧ a • s ∈ Λ) → CoefIn D (U D T s F) Qbar)
+        → (∃ a : ℕ, 0 < a ∧ a • t ∈ Λ) → (∃ a : ℕ, 0 < a ∧ a • y ∈ Λ)
+        → (∀ x ∈ Λ, ∀ x' ∈ Λ, ∃ k : ℤ, (Hf D T x x').im = k) → (∃ m : ℤ, qH D T y = m)
+        → CoefIn D (Wop D T p y (U D T t F)) Qbar := by
   intro D T N N' F Λ p _ y t hF hΛ ⟨b, hb, hbt⟩ ⟨a, ha, hay⟩ hHf ⟨m, hm⟩
-  have hfun : Wop D T p y (U D T t F)
-      = fun z => (wPh D T p y * Complex.exp (-(Real.pi : ℂ) * ((Hf D T y t - Hf D T t y) / 2)))
-          * U D T (y + t) F z := by
+  have hfun
+      : Wop D T p y (U D T t F)
+        = fun z =>
+          (wPh D T p y * Complex.exp (-(Real.pi : ℂ) * ((Hf D T y t - Hf D T t y) / 2)))
+            * U D T (y + t) F z := by
     funext z
     simp only [Wop, U_U]
     ring

@@ -14,9 +14,10 @@ namespace GroundTheory.Heights₂.Heights.NumbersDVR
 
 open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
 
-theorem GenericProjClosureModel.proof (h₁ : TwistedDualGensExist.Statement)
-    (h₂ : GenericProjClosureDim.Statement) (h₃ : GenericProjClosureDivisor.Statement) :
-    GenericProjClosureModel.Statement := by
+theorem GenericProjClosureModel.proof
+    (h₁ : TwistedDualGensExist.Statement) (h₂ : GenericProjClosureDim.Statement)
+    (h₃ : GenericProjClosureDivisor.Statement)
+    : GenericProjClosureModel.Statement := by
   intro O _ _ _ ϖ hϖ Ω _ _ K _ _ ι _ y d hV N hN E _ _ B B' hB Φ _ _ _ _ e t ht
   obtain ⟨a₁, ha₁⟩ := h₁ O Ω K ι y N E B
   obtain ⟨M, φ, hφ⟩ := ha₁ a₁ le_rfl

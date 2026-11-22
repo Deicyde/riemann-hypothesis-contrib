@@ -22,14 +22,15 @@ theorem exists_not_mem_range : ∃ x : I.E, x ∉ Set.range (algebraMap I.F I.E)
   have hs : Function.Surjective (Algebra.linearMap I.F I.E) := fun x => by
     obtain ⟨a, ha⟩ := h x
     exact ⟨a, ha⟩
-  have e := (LinearEquiv.ofBijective (Algebra.linearMap I.F I.E)
-    ⟨(algebraMap I.F I.E).injective, hs⟩).finrank_eq
+  have e :=
+    (LinearEquiv.ofBijective (Algebra.linearMap I.F I.E)
+      ⟨(algebraMap I.F I.E).injective, hs⟩).finrank_eq
   rw [I.cm.deg2] at e
   rw [Module.finrank_self] at e
   omega
 
-private theorem exists_nat_mul_lemma {E : Type} [Field E] [NumberField E] (x : E) :
-    ∃ d : ℕ, 1 ≤ d ∧ (d : E) * x ∈ Formalism.UG.intOE E := by
+private theorem exists_nat_mul_lemma {E : Type} [Field E] [NumberField E] (x : E)
+    : ∃ d : ℕ, 1 ≤ d ∧ (d : E) * x ∈ Formalism.UG.intOE E := by
   have H : ∃ y : ℤ, y ≠ 0 ∧ IsIntegral ℤ ((y : E) * x) := by
     have hq : IsIntegral ℚ x := Algebra.IsIntegral.isIntegral x
     obtain ⟨m, hm⟩ := IsIntegral.exists_multiple_integral_of_isLocalization (nonZeroDivisors ℤ) x hq
@@ -43,7 +44,8 @@ private theorem exists_nat_mul_lemma {E : Type} [Field E] [NumberField E] (x : E
   · refine ⟨n, Nat.one_le_iff_ne_zero.2 (by rintro rfl; simp at hy0), ?_⟩
     simpa using hmem
 
-theorem exists_beta : ∃ β : I.E, β ∈ Formalism.UG.intOE I.E ∧ β ∉ Set.range (algebraMap I.F I.E) := by
+theorem exists_beta
+    : ∃ β : I.E, β ∈ Formalism.UG.intOE I.E ∧ β ∉ Set.range (algebraMap I.F I.E) := by
   obtain ⟨x, hx⟩ := exists_not_mem_range I
   obtain ⟨d, hd, hdx⟩ := exists_nat_mul_lemma x
   have hd0 : (d : I.E) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
@@ -76,8 +78,7 @@ def basisE : Module.Basis (Fin 2) I.F I.E :=
   basisOfLinearIndependentOfCardEqFinrank (linearIndependent_one_beta I)
     (by rw [Fintype.card_fin, I.cm.deg2])
 
-theorem basisE_apply (k : Fin 2) : basisE I k = ![(1 : I.E), beta I] k := by
-  simp [basisE]
+theorem basisE_apply (k : Fin 2) : basisE I k = ![(1 : I.E), beta I] k := by simp [basisE]
 
 theorem basisE_mem (k : Fin 2) : basisE I k ∈ Formalism.UG.intOE I.E := by
   rw [basisE_apply]

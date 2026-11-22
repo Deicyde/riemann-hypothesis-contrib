@@ -28,11 +28,14 @@ open scoped ENNReal
 
 section Glob
 
-variable {D : Formalism.BasicNotions.D7} (X : HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I)
+variable
+  {D : Formalism.BasicNotions.D7}
+  (X : HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I)
 
 theorem lIdx_ne (p : TypX X) : lIdx X hb p ≠ 0 := by
-  obtain ⟨K, hKe, -, -, -, hfin⟩ := LocIdx_main X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X)
-    (Formalism.L2.SG.Closed.level_subgroup_properties X) p
+  obtain ⟨K, hKe, -, -, -, hfin⟩ :=
+    LocIdx_main X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+      (Formalism.L2.SG.Closed.level_subgroup_properties X) p
   have hcl : KvS X p = K := by rw [KvS, ← hKe, Subgroup.closure_eq]
   rw [lIdx, LocIdx_KppvS X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X) p, hcl]
   exact hfin
@@ -41,30 +44,46 @@ theorem g_pos : 1 ≤ X.B.g := Nat.one_le_iff_ne_zero.mpr (Formalism.L2.SG.Pf.mo
 
 theorem isOpen_Kg : IsOpen (X.B.I.Kg X.B.g) := X.B.I.topf_open X.B.g (g_pos X)
 
-theorem one_mem_Kg : (1 : X.B.I.Gf) ∈ X.B.I.Kg X.B.g :=
-  ⟨Formalism.L2.SG.Pf.unitaryCongruence.K_one _, fun y _ => ⟨0, zero_mem _, by rw [show X.B.I.fmat 1 = 1 from rfl, sub_self, Matrix.zero_mulVec, smul_zero]⟩⟩
+theorem one_mem_Kg : (1 : X.B.I.Gf) ∈ X.B.I.Kg X.B.g := ⟨
+  Formalism.L2.SG.Pf.unitaryCongruence.K_one _,
+  fun y _ =>
+    ⟨0, zero_mem _, by rw [show X.B.I.fmat 1 = 1 from rfl, sub_self, Matrix.zero_mulVec, smul_zero]⟩
+⟩
 
-theorem isOpen_levelSubgroup' : IsOpen ((levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X) : Subgroup X.B.I.Gf) : Set X.B.I.Gf) := by
+theorem isOpen_levelSubgroup'
+    : IsOpen
+      ((levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+          : Subgroup X.B.I.Gf)
+        : Set X.B.I.Gf) := by
   refine Subgroup.isOpen_of_mem_nhds _ (g := 1) ?_
   refine Filter.mem_of_superset ((isOpen_Kg X).mem_nhds (one_mem_Kg X)) ?_
   intro x hx
   exact ((Formalism.L2.SG.Closed.level_subgroup_properties X).1 x hx).1
 
-theorem relIdx_eq : ((levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)).relIndex (KsetSub X.B.I)) =
-    ∏ p : TypX X, lIdx X hb p := by
+theorem relIdx_eq
+    : ((levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)).relIndex
+        (KsetSub X.B.I))
+      = ∏ p : TypX X, lIdx X hb p := by
   rw [← PI.MassDataKppVolLemmas.IP_gIdx X hb (Formalism.L2.SG.Closed.level_subgroup_is_group X)]
   exact PI.MassDataKppVolLemmas.IP_idxProd X hb PI.MassDataKppVolLemmas.single_component_surjective
-    (Formalism.L2.SG.Closed.level_subgroup_is_group X) (Formalism.L2.SG.Closed.level_subgroup_properties X)
+    (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+    (Formalism.L2.SG.Closed.level_subgroup_properties X)
 
-theorem muK_eq : X.B.μf X.B.I.Kset =
-    ((∏ p : TypX X, lIdx X hb p : ℕ) : ℝ≥0∞) * X.B.μf X.K2 := by
-  have hle : levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X) ≤ KsetSub X.B.I :=
-    fun x hx => (Formalism.L2.SG.Closed.level_subgroup_properties X).2.1 x hx
-  have hi : (levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)).relIndex (KsetSub X.B.I) ≠ 0 := by
+theorem muK_eq : X.B.μf X.B.I.Kset = ((∏ p : TypX X, lIdx X hb p : ℕ) : ℝ≥0∞) * X.B.μf X.K2 := by
+  have hle
+      : levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)
+        ≤ KsetSub X.B.I := fun x hx =>
+    (Formalism.L2.SG.Closed.level_subgroup_properties X).2.1 x hx
+  have hi
+      : (levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)).relIndex
+          (KsetSub X.B.I)
+        ≠ 0 := by
     rw [relIdx_eq X hb]
     exact Finset.prod_ne_zero_iff.2 fun p _ => lIdx_ne X hb p
-  have := Glob_measure_eq_relIndex_mul X.B.μf (KsetSub X.B.I) (levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)) hle
-    (isOpen_levelSubgroup' X) hi
+  have :=
+    Glob_measure_eq_relIndex_mul X.B.μf (KsetSub X.B.I)
+      (levelSubgroupOfCharacter X (Formalism.L2.SG.Closed.level_subgroup_is_group X)) hle
+      (isOpen_levelSubgroup' X) hi
   rw [relIdx_eq X hb] at this
   exact this
 
@@ -79,8 +98,11 @@ theorem ratio_eq : (X.B.μf X.B.I.Kset).toReal / X.volK2 = ∏ p : TypX X, (lIdx
 
 end Glob
 
-theorem rowLev_arith (k m c : ℕ) (hm : Even m) (h2 : 2 ≤ m) (h : c + k = (k + m - 1) * (k + m - 1 - 1) / 2) :
-    c = (m / 2 - 1) * (m / 2 - 1 - 1) + 2 * (m / 2 - 1) * (k + 1) + (m / 2 - 1) ^ 2 + k * (k - 1) / 2 := by
+theorem rowLev_arith
+    (k m c : ℕ) (hm : Even m) (h2 : 2 ≤ m) (h : c + k = (k + m - 1) * (k + m - 1 - 1) / 2)
+    : c
+      = (m / 2 - 1) * (m / 2 - 1 - 1) + 2 * (m / 2 - 1) * (k + 1) + (m / 2 - 1) ^ 2
+        + k * (k - 1) / 2 := by
   obtain ⟨t, rfl⟩ := hm
   have ht : (t + t) / 2 = t := by omega
   rw [ht]
@@ -110,45 +132,55 @@ theorem rowLev_arith (k m c : ℕ) (hm : Even m) (h2 : 2 ≤ m) (h : c + k = (k 
   rw [hB, hK] at h
   omega
 
-theorem card_rowLev (R : Formalism.BasicNotions.Ranks) (g : ℕ) [Fact g.Prime] :
-    Nat.card {A : GL (Fin (R.k + R.m - 1)) (ZMod g) //
-      Formalism.MainNotions.StandardLattice.IsRowLev R.k (R.m / 2 - 1) (A : Matrix (Fin (R.k + R.m - 1)) (Fin (R.k + R.m - 1)) (ZMod g))} =
-      nnC R.rS R.k g * ukC R.k g := by
+theorem card_rowLev (R : Formalism.BasicNotions.Ranks) (g : ℕ) [Fact g.Prime]
+    : Nat.card
+        {A : GL (Fin (R.k + R.m - 1)) (ZMod g) // Formalism.MainNotions.StandardLattice.IsRowLev R.k
+          (R.m / 2 - 1) (A : Matrix (Fin (R.k + R.m - 1)) (Fin (R.k + R.m - 1)) (ZMod g))}
+      = nnC R.rS R.k g * ukC R.k g := by
   have h2 := R.two_le_m
   rw [Nat.card_congr (Equiv.subtypeEquivRight fun A : GL (Fin (R.k + R.m - 1)) (ZMod g) =>
-      Formalism.MainNotions.J.isRowLev_iff R.k (R.m / 2 - 1) (A : Matrix (Fin (R.k + R.m - 1)) (Fin (R.k + R.m - 1)) (ZMod g))),
+      Formalism.MainNotions.J.isRowLev_iff R.k (R.m / 2 - 1)
+        (A : Matrix (Fin (R.k + R.m - 1)) (Fin (R.k + R.m - 1)) (ZMod g))),
     Formalism.MainNotions.J.card_pat _ (by
-      simp only [Formalism.MainNotions.J.rowS, Formalism.MainNotions.J.upS, Finset.mem_filter, Finset.mem_univ, true_and]
-      exact fun p hp => hp.1), Nat.card_zmod]
+      simp only [Formalism.MainNotions.J.rowS, Formalism.MainNotions.J.upS, Finset.mem_filter,
+        Finset.mem_univ, true_and]
+      exact fun p hp => hp.1),
+    Nat.card_zmod]
   unfold nnC ukC
-  rw [MassDataIdxStIm.card_isN, Nat.card_congr (MassDataIdxStIm.upUniGEquiv R.k), MassDataIdxStIm.card_uni, ZMod.card,
-    ← pow_add]
+  rw [MassDataIdxStIm.card_isN, Nat.card_congr (MassDataIdxStIm.upUniGEquiv R.k),
+    MassDataIdxStIm.card_uni, ZMod.card, ← pow_add]
   congr 1
   have h := Formalism.MainNotions.J.card_rowS R.k (R.m / 2 - 1) (R.k + R.m - 1) (by omega)
   rw [rowLev_arith R.k R.m _ R.m_even h2 h]
   rfl
 
-theorem ggC_eq (R : Formalism.BasicNotions.Ranks) (g : ℕ) :
-    ggC R.rS R.k g = Nat.card (GL (Fin (R.k + R.m - 1)) (ZMod g)) := by
-  have hc0 : Nat.card (Formalism.FourierDecayAlt.S3.Idx R.rS R.k) = Nat.card (Fin (R.k + R.m - 1)) := by
+theorem ggC_eq (R : Formalism.BasicNotions.Ranks) (g : ℕ)
+    : ggC R.rS R.k g = Nat.card (GL (Fin (R.k + R.m - 1)) (ZMod g)) := by
+  have hc0
+      : Nat.card (Formalism.FourierDecayAlt.S3.Idx R.rS R.k) = Nat.card (Fin (R.k + R.m - 1)) := by
     obtain ⟨t, ht⟩ := R.m_even
     have h2 := R.two_le_m
-    simp only [Formalism.FourierDecayAlt.S3.Idx, Formalism.FourierDecayAlt.S3.Mid, Nat.card_sum, Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin,
-      Fintype.card_unit, Formalism.BasicNotions.Ranks.rS]
+    simp only [Formalism.FourierDecayAlt.S3.Idx, Formalism.FourierDecayAlt.S3.Mid, Nat.card_sum,
+      Nat.card_eq_fintype_card, Fintype.card_sum, Fintype.card_fin, Fintype.card_unit,
+      Formalism.BasicNotions.Ranks.rS]
     omega
-  have hc : Fintype.card (Formalism.FourierDecayAlt.S3.Idx R.rS R.k) = Fintype.card (Fin (R.k + R.m - 1)) := by
+  have hc
+      : Fintype.card (Formalism.FourierDecayAlt.S3.Idx R.rS R.k)
+        = Fintype.card (Fin (R.k + R.m - 1)) := by
     rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]
     exact hc0
   unfold ggC
-  exact Nat.card_congr (Units.mapEquiv
-    (Matrix.reindexAlgEquiv (ZMod g) (ZMod g) (Fintype.equivOfCardEq hc)).toMulEquiv).toEquiv
+  exact Nat.card_congr (Units.mapEquiv (Matrix.reindexAlgEquiv (ZMod g) (ZMod g)
+    (Fintype.equivOfCardEq hc)).toMulEquiv).toEquiv
 
 section Loc
 
-variable {D : Formalism.BasicNotions.D7} (X : HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I)
+variable
+  {D : Formalism.BasicNotions.D7}
+  (X : HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I)
 
-theorem lIdx_mul (p : TypX X) (hR : MassDataIdxSteps.StRed X p) (hI : MassDataIdxSteps.StImA X hb p) :
-    lIdx X hb p * (nnC D.R.rS D.R.k (gOf p) * ukC D.R.k (gOf p)) = ggC D.R.rS D.R.k (gOf p) := by
+theorem lIdx_mul (p : TypX X) (hR : MassDataIdxSteps.StRed X p) (hI : MassDataIdxSteps.StImA X hb p)
+    : lIdx X hb p * (nnC D.R.rS D.R.k (gOf p) * ukC D.R.k (gOf p)) = ggC D.R.rS D.R.k (gOf p) := by
   obtain ⟨K, hKs, -, -, -⟩ := MassDataIdxSteps.stK_holds X p
   obtain ⟨ρ, hρ, hker⟩ := hR K hKs
   obtain ⟨A, hAs, hAk, hcard⟩ := hI K hKs ρ hρ hker
@@ -159,18 +191,21 @@ theorem lIdx_mul (p : TypX X) (hR : MassDataIdxSteps.StRed X p) (hI : MassDataId
     rw [KvS, ← e, Subgroup.closure_eq]
   have hKpp : KppvS X hb p = A.map K.subtype := by
     rw [KppvS]
-    have e : Formalism.L2.SG.TypedSets.compSet X.B.I.cm.sig X.B.I.J (levelUnitary X hb) p.1 =
-        ((A.map K.subtype : Subgroup (MassDataIdxSteps.HAp X p)) : Set (MassDataIdxSteps.HAp X p)) := by
+    have e
+        : Formalism.L2.SG.TypedSets.compSet X.B.I.cm.sig X.B.I.J (levelUnitary X hb) p.1
+          = ((A.map K.subtype : Subgroup (MassDataIdxSteps.HAp X p))
+            : Set (MassDataIdxSteps.HAp X p)) := by
       rw [Subgroup.coe_map]
       exact hAs.symm
     rw [e, Subgroup.closure_eq]
   have hidx : lIdx X hb p = A.index := by
-    rw [lIdx, hKv, hKpp, Subgroup.relIndex, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective K.subtype_injective]
+    rw [lIdx, hKv, hKpp, Subgroup.relIndex, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective K.subtype_injective]
   rw [hidx, ← hcard]
   exact key
 
-theorem lIdx_eq (p : TypX X) (hR : MassDataIdxSteps.StRed X p) (hI : MassDataIdxSteps.StImA X hb p) :
-    (lIdx X hb p : ℝ) = Formalism.MainNotions.StandardLattice.idxRowLoc (gOf p) D.R.k D.R.m := by
+theorem lIdx_eq (p : TypX X) (hR : MassDataIdxSteps.StRed X p) (hI : MassDataIdxSteps.StImA X hb p)
+    : (lIdx X hb p : ℝ) = Formalism.MainNotions.StandardLattice.idxRowLoc (gOf p) D.R.k D.R.m := by
   haveI : Fact (gOf p).Prime := by
     unfold gOf
     split_ifs
@@ -184,7 +219,8 @@ theorem lIdx_eq (p : TypX X) (hR : MassDataIdxSteps.StRed X p) (hI : MassDataIdx
     intro h
     rw [h, mul_zero] at hm
     omega
-  unfold Formalism.MainNotions.StandardLattice.idxRowLoc Formalism.MainNotions.StandardLattice.idxLoc
+  unfold Formalism.MainNotions.StandardLattice.idxRowLoc
+    Formalism.MainNotions.StandardLattice.idxLoc
   rw [card_rowLev D.R (gOf p), ← ggC_eq D.R (gOf p), ← hm]
   have hne' : ((nnC D.R.rS D.R.k (gOf p) * ukC D.R.k (gOf p) : ℕ) : ℝ) ≠ 0 := by exact_mod_cast hne
   rw [Nat.cast_mul (lIdx X hb p), mul_div_assoc, div_self hne', mul_one]
@@ -195,27 +231,36 @@ section Typ
 
 open IsDedekindDomain NumberField
 
-def hosMap {R S : Type*} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S] (e : R ≃+* S)
-    (v : HeightOneSpectrum R) : HeightOneSpectrum S where
+def hosMap
+    {R S : Type*} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S]
+    (e : R ≃+* S) (v : HeightOneSpectrum R)
+    : HeightOneSpectrum S where
   asIdeal := v.asIdeal.comap e.symm.toRingHom
   isPrime := Ideal.IsPrime.comap _
   ne_bot := by
     obtain ⟨x, hx, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot v.ne_bot
     refine (Submodule.ne_bot_iff _).2 ⟨e x, ?_, ?_⟩
     · show e.symm (e x) ∈ v.asIdeal
-      rw [RingEquiv.symm_apply_apply]; exact hx
+      rw [RingEquiv.symm_apply_apply]
+      exact hx
     · exact (map_ne_zero_iff e e.injective).2 hx0
 
-theorem hosMap_symm {R S : Type*} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S] (e : R ≃+* S)
-    (v : HeightOneSpectrum R) : hosMap e.symm (hosMap e v) = v := by
+theorem hosMap_symm
+    {R S : Type*} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S]
+    (e : R ≃+* S) (v : HeightOneSpectrum R)
+    : hosMap e.symm (hosMap e v) = v := by
   apply IsDedekindDomain.HeightOneSpectrum.ext
   ext x
   simp [hosMap]
 
-def overEquiv {R S : Type*} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S] (e : R ≃+* S) (g : ℕ) :
-    {v : HeightOneSpectrum R // (g : R) ∈ v.asIdeal} ≃ {w : HeightOneSpectrum S // (g : S) ∈ w.asIdeal} where
+def overEquiv
+    {R S : Type*} [CommRing R] [IsDedekindDomain R] [CommRing S] [IsDedekindDomain S]
+    (e : R ≃+* S) (g : ℕ)
+    : {v : HeightOneSpectrum R // (g : R) ∈ v.asIdeal}
+      ≃ {w : HeightOneSpectrum S // (g : S) ∈ w.asIdeal} where
   toFun v := ⟨hosMap e v.1, by show e.symm (g : S) ∈ v.1.asIdeal; rw [map_natCast]; exact v.2⟩
-  invFun w := ⟨hosMap e.symm w.1, by show e.symm.symm (g : R) ∈ w.1.asIdeal; rw [map_natCast]; exact w.2⟩
+  invFun w :=
+    ⟨hosMap e.symm w.1, by show e.symm.symm (g : R) ∈ w.1.asIdeal; rw [map_natCast]; exact w.2⟩
   left_inv v := Subtype.ext (hosMap_symm e v.1)
   right_inv w := Subtype.ext (by simpa using hosMap_symm e.symm w.1)
 
@@ -223,28 +268,37 @@ variable {D : Formalism.BasicNotions.D7} (X : HidaSetting D)
 
 def iF : X.B.I.F ≃+* D.host.F :=
   RingEquiv.ofBijective
-    ((X.ιE.toRingHom.comp (algebraMap X.B.I.F X.B.I.E)).codRestrict D.host.F (fun a => (X.ιE_F _).2 ⟨a, rfl⟩))
-    ⟨fun a b h => by
-      have h' := congrArg Subtype.val h
-      simp only [RingHom.codRestrict_apply, RingHom.coe_comp, Function.comp_apply] at h'
-      exact (algebraMap X.B.I.F X.B.I.E).injective (X.ιE.injective h'),
-     fun y => by
-      obtain ⟨a, ha⟩ := (X.ιE_F y.1).1 y.2
-      exact ⟨a, Subtype.ext ha⟩⟩
+    ((X.ιE.toRingHom.comp (algebraMap X.B.I.F X.B.I.E)).codRestrict D.host.F
+      (fun a => (X.ιE_F _).2 ⟨a, rfl⟩))
+    ⟨
+      fun a b h => by
+        have h' := congrArg Subtype.val h
+        simp only [RingHom.codRestrict_apply, RingHom.coe_comp, Function.comp_apply] at h'
+        exact (algebraMap X.B.I.F X.B.I.E).injective (X.ιE.injective h'),
+      fun y => by
+        obtain ⟨a, ha⟩ := (X.ιE_F y.1).1 y.2
+        exact ⟨a, Subtype.ext ha⟩
+    ⟩
 
-theorem card_over (i : Fin 2) :
-    Nat.card {v : HeightOneSpectrum (𝓞 X.B.I.F) // ((D.host.g i : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal} = D.R.f := by
+theorem card_over (i : Fin 2)
+    : Nat.card {v : HeightOneSpectrum (𝓞 X.B.I.F) // ((D.host.g i : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal}
+      = D.R.f := by
   rw [Nat.card_congr (overEquiv (RingOfIntegers.mapRingEquiv (iF X)) (D.host.g i))]
   exact (Formalism.MainNotions.J.splitsF_g D i).1
 
-theorem not_both (v : HeightOneSpectrum (𝓞 X.B.I.F)) (h0 : ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal)
-    (h1 : ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal) : False := by
+theorem not_both
+    (v : HeightOneSpectrum (𝓞 X.B.I.F)) (h0 : ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal)
+    (h1 : ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal)
+    : False := by
   have hne : D.host.g 0 ≠ D.host.g 1 := D.host.g_ne
   have hcop : IsCoprime ((D.host.g 0 : ℕ) : ℤ) ((D.host.g 1 : ℕ) : ℤ) :=
-    Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).mpr hne)
+    Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).mpr
+      hne)
   obtain ⟨a, b, hab⟩ := hcop
-  have h2 : (a : 𝓞 X.B.I.F) * ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) +
-      (b : 𝓞 X.B.I.F) * ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) = 1 := by
+  have h2
+      : (a : 𝓞 X.B.I.F) * ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F)
+          + (b : 𝓞 X.B.I.F) * ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F)
+        = 1 := by
     have := congrArg (Int.cast : ℤ → 𝓞 X.B.I.F) hab
     push_cast at this
     exact this
@@ -252,11 +306,14 @@ theorem not_both (v : HeightOneSpectrum (𝓞 X.B.I.F)) (h0 : ((D.host.g 0 : ℕ
   rw [Ideal.eq_top_iff_one, ← h2]
   exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ h0) (Ideal.mul_mem_left _ _ h1)
 
-theorem gOf_iff (i : Fin 2) (p : TypX X) : gOf p = D.host.g i ↔ ((D.host.g i : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal := by
+theorem gOf_iff (i : Fin 2) (p : TypX X)
+    : gOf p = D.host.g i ↔ ((D.host.g i : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal := by
   have hne : D.host.g 0 ≠ D.host.g 1 := D.host.g_ne
-  have htyp : ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal ∨ ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal :=
-    (Formalism.L2.SG.TypedSets.mem_typSet X.B.I.F (D.host.g 0) (D.host.g 1) (D.host.g_prime 0).ne_zero
-      (D.host.g_prime 1).ne_zero p.1).1 p.2
+  have htyp
+      : ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal
+        ∨ ((D.host.g 1 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal :=
+    (Formalism.L2.SG.TypedSets.mem_typSet X.B.I.F (D.host.g 0) (D.host.g 1)
+      (D.host.g_prime 0).ne_zero (D.host.g_prime 1).ne_zero p.1).1 p.2
   unfold Formalism.L2.SG.TypedSets.gOf
   obtain rfl | rfl : i = 0 ∨ i = 1 := by fin_cases i <;> simp
   · by_cases h0 : ((D.host.g 0 : ℕ) : 𝓞 X.B.I.F) ∈ p.1.asIdeal
@@ -272,25 +329,32 @@ theorem gOf_iff (i : Fin 2) (p : TypX X) : gOf p = D.host.g i ↔ ((D.host.g i :
     · simp only [h0, if_false]
       exact ⟨fun _ => htyp.resolve_left h0, fun _ => trivial⟩
 
-def typEquiv (i : Fin 2) :
-    {p : TypX X // gOf p = D.host.g i} ≃ {v : HeightOneSpectrum (𝓞 X.B.I.F) // ((D.host.g i : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal} where
+def typEquiv (i : Fin 2)
+    : {p : TypX X // gOf p = D.host.g i}
+      ≃ {v : HeightOneSpectrum (𝓞 X.B.I.F) // ((D.host.g i : ℕ) : 𝓞 X.B.I.F) ∈ v.asIdeal} where
   toFun p := ⟨p.1.1, (gOf_iff X i p.1).1 p.2⟩
-  invFun v := ⟨⟨v.1, (mem_typSet X.B.I.F (D.host.g 0) (D.host.g 1) (D.host.g_prime 0).ne_zero
-      (D.host.g_prime 1).ne_zero v.1).2 (by fin_cases i; exacts [Or.inl v.2, Or.inr v.2])⟩,
-    (gOf_iff X i _).2 v.2⟩
+  invFun v := ⟨
+    ⟨
+      v.1,
+      (mem_typSet X.B.I.F (D.host.g 0) (D.host.g 1) (D.host.g_prime 0).ne_zero
+        (D.host.g_prime 1).ne_zero v.1).2 (by fin_cases i; exacts [Or.inl v.2, Or.inr v.2])
+    ⟩,
+    (gOf_iff X i _).2 v.2
+  ⟩
   left_inv p := rfl
   right_inv v := rfl
 
-theorem prod_typ (φ : ℕ → ℝ) :
-    ∏ p : TypX X, φ (gOf p) = φ (D.host.g 0) ^ D.R.f * φ (D.host.g 1) ^ D.R.f := by
+theorem prod_typ (φ : ℕ → ℝ)
+    : ∏ p : TypX X, φ (gOf p) = φ (D.host.g 0) ^ D.R.f * φ (D.host.g 1) ^ D.R.f := by
   classical
   rw [← Fintype.prod_subtype_mul_prod_subtype (fun p : TypX X => gOf p = D.host.g 0)]
   have hiff : ∀ p : TypX X, ¬ gOf p = D.host.g 0 ↔ gOf p = D.host.g 1 := by
     intro p
     constructor
     · intro h
-      have hp := (mem_typSet X.B.I.F (D.host.g 0) (D.host.g 1) (D.host.g_prime 0).ne_zero
-        (D.host.g_prime 1).ne_zero p.1).1 p.2
+      have hp :=
+        (mem_typSet X.B.I.F (D.host.g 0) (D.host.g 1) (D.host.g_prime 0).ne_zero
+          (D.host.g_prime 1).ne_zero p.1).1 p.2
       rcases hp with h0 | h1
       · exact absurd ((gOf_iff X 0 p).2 h0) h
       · exact (gOf_iff X 1 p).2 h1
@@ -311,9 +375,11 @@ section Main
 
 variable {D : Formalism.BasicNotions.D7} (X : HidaSetting D)
 
-theorem dstarIdx_of (hR : ∀ p : TypX X, MassDataIdxSteps.StRed X p)
-    (hI : ∀ (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (p : TypX X), MassDataIdxSteps.StImA X hb p) :
-    Formalism.L2.SG.Pf.RowDictPf.DstarIdx X := by
+theorem dstarIdx_of
+    (hR : ∀ p : TypX X, MassDataIdxSteps.StRed X p)
+    (hI : ∀ (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (p : TypX X),
+      MassDataIdxSteps.StImA X hb p)
+    : Formalism.L2.SG.Pf.RowDictPf.DstarIdx X := by
   let hb := (Formalism.L2.SG.Closed.adelic_isomorphism_statement X.B.I).1
   unfold Formalism.L2.SG.Pf.RowDictPf.DstarIdx
   rw [ratio_eq X hb]
@@ -322,7 +388,9 @@ theorem dstarIdx_of (hR : ∀ p : TypX X, MassDataIdxSteps.StRed X p)
   rfl
 
 theorem dstarIdx_holds : Formalism.L2.SG.Pf.RowDictPf.DstarIdx X :=
-  dstarIdx_of X (fun p => Formalism.L2.SG.Pf.MassDataX.stRed_holds X p) (fun hb p => Formalism.L2.SG.Pf.MassDataX.stImA_holds X hb p)
+  dstarIdx_of X
+    (fun p => Formalism.L2.SG.Pf.MassDataX.stRed_holds X p)
+    (fun hb p => Formalism.L2.SG.Pf.MassDataX.stImA_holds X hb p)
 
 end Main
 

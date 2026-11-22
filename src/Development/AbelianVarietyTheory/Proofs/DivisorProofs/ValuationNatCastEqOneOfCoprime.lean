@@ -6,9 +6,8 @@ public import Mathlib
 
 namespace GlobalTheory.CMModel
 
-theorem valuation_natCast_eq_one_of_coprime (V : ValuationSubring ℂ) (a b : ℕ)
-    (h : Nat.Coprime a b) :
-    V.valuation (a : ℂ) = 1 ∨ V.valuation (b : ℂ) = 1 := by
+theorem valuation_natCast_eq_one_of_coprime (V : ValuationSubring ℂ) (a b : ℕ) (h : Nat.Coprime a b)
+    : V.valuation (a : ℂ) = 1 ∨ V.valuation (b : ℂ) = 1 := by
   have hint : ∀ z : ℤ, V.valuation (z : ℂ) ≤ 1 := fun z =>
     (V.valuation_le_one_iff _).2 (intCast_mem V z)
   have hnat : ∀ n : ℕ, V.valuation (n : ℂ) ≤ 1 := fun n =>

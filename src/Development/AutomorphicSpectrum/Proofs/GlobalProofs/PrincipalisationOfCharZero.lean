@@ -25,23 +25,30 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
 
-open GlobalTheory.CompanionTheory.Hypotheses₂.SncBlowup GlobalTheory.CompanionTheory.Hypotheses₂.ResKSide GlobalTheory.CompanionTheory.Hypotheses₂.Resolution
+open GlobalTheory.CompanionTheory.Hypotheses₂.SncBlowup
+  GlobalTheory.CompanionTheory.Hypotheses₂.ResKSide
+  GlobalTheory.CompanionTheory.Hypotheses₂.Resolution
 
-theorem exists_centre_off {k : Type} [Field k] {X₁ X₂ : Scheme.{0}} (g : X₁ ⟶ Sp k) (Z : X₁.IdealSheafData) (π : X₂ ⟶ X₁)
-    (V : X₁.Opens) (h₀ : Smooth g) (h₁ : IsIntegral X₁) (h₂ : Smooth (Z.subschemeι ≫ g)) (h₃ : FinalTheorems.Blowup π Z)
-    (h₄ : IsIso (π ∣_ V)) :
-    ∃ Z' : X₁.IdealSheafData, Smooth (Z'.subschemeι ≫ g) ∧ (Z'.support : Set X₁) ⊆ (V : Set X₁)ᶜ ∧
-      FinalTheorems.Blowup π Z' := by
+theorem exists_centre_off
+    {k : Type} [Field k]
+    {X₁ X₂ : Scheme.{0}} (g : X₁ ⟶ Sp k) (Z : X₁.IdealSheafData) (π : X₂ ⟶ X₁) (V : X₁.Opens)
+    (h₀ : Smooth g) (h₁ : IsIntegral X₁) (h₂ : Smooth (Z.subschemeι ≫ g))
+    (h₃ : FinalTheorems.Blowup π Z) (h₄ : IsIso (π ∣_ V))
+    : ∃ Z' : X₁.IdealSheafData,
+      Smooth (Z'.subschemeι ≫ g) ∧ (Z'.support : Set X₁) ⊆ (V : Set X₁)ᶜ
+        ∧ FinalTheorems.Blowup π Z' := by
   obtain ⟨hB, hA⟩ := GlobalTheory.T.isClosed_cartier_locus_support g Z h₀ h₁ h₂
   let A : Closeds X₁ := ⟨_, hA⟩
   let O₁ : X₁.Opens := ⟨_, hB.isOpen_compl⟩
   let O₂ : X₁.Opens := ⟨_, hA.isOpen_compl⟩
   have hO₁ : (O₁ : Set X₁) = ((Z.support : Set X₁) \ A)ᶜ := by
     ext x
-    change ¬ (x ∈ Z.support ∧ CartAt Z x) ↔ ¬ (x ∈ Z.support ∧ ¬ (x ∈ Z.support ∧ ¬ CartAt Z x))
+    change ¬(x ∈ Z.support ∧ CartAt Z x) ↔ ¬(x ∈ Z.support ∧ ¬(x ∈ Z.support ∧ ¬ CartAt Z x))
     tauto
-  obtain ⟨c₁, c₂⟩ := GlobalTheory.T.vanishing_ideal_smooth_agrees_off g Z A O₁ h₂ (fun x hx => hx.1) hO₁
-  have hV : FinalTheorems.EffCartier (Z.comap V.ι) := GlobalTheory.effCartier_comap_of_isIso_restrict π Z V h₄ h₃.1
+  obtain ⟨c₁, c₂⟩ :=
+    GlobalTheory.T.vanishing_ideal_smooth_agrees_off g Z A O₁ h₂ (fun x hx => hx.1) hO₁
+  have hV : FinalTheorems.EffCartier (Z.comap V.ι) :=
+    GlobalTheory.effCartier_comap_of_isIso_restrict π Z V h₄ h₃.1
   have hsupp : ((Scheme.IdealSheafData.vanishingIdeal A).support : Set X₁) = A :=
     Scheme.IdealSheafData.coe_support_vanishingIdeal A
   refine ⟨_, c₁, ?_, GlobalTheory.T.blowup_of_agreeing_ideal_cartier π Z _ O₁ O₂ h₃ ?_ c₂ ?_ ?_⟩
@@ -59,19 +66,24 @@ theorem exists_centre_off {k : Type} [Field k] {X₁ X₂ : Scheme.{0}} (g : X�
     by_contra hc
     exact hx ⟨by_contra fun h => hc (GlobalTheory.T.cartier_at_of_not_mem_support Z x h), hc⟩
 
-theorem isIntegral_of_seq {k : Type} [Field k] {X X' : Scheme.{0}} {g : X ⟶ Sp k} {E : Closeds X} {s : X' ⟶ X}
-    {E' : Closeds X'} (h : IsSncBlowupSeq g E s E') (hX : IsIntegral X) :
-    Nonempty X' → Smooth (s ≫ g) → IsIntegral X' := by
+theorem isIntegral_of_seq
+    {k : Type} [Field k]
+    {X X' : Scheme.{0}} {g : X ⟶ Sp k} {E : Closeds X} {s : X' ⟶ X} {E' : Closeds X'}
+    (h : IsSncBlowupSeq g E s E') (hX : IsIntegral X)
+    : Nonempty X' → Smooth (s ≫ g) → IsIntegral X' := by
   induction h with
   | id => exact fun _ _ => hX
   | @step X₁ X₂ s E₁ Z π h₁ h₂ h₃ h₄ h₅ ih =>
     intro hn hsm
     have : Nonempty X₁ := ⟨π hn.some⟩
-    exact GlobalTheory.T.isIntegral_blowup_of_smooth (s ≫ g) Z π (ih this h₂) h₅ (by simpa using hsm) hn
+    exact GlobalTheory.T.isIntegral_blowup_of_smooth (s ≫ g) Z π (ih this h₂) h₅
+      (by simpa using hsm) hn
 
-theorem seq_of_iso {k : Type} [Field k] {X X' : Scheme.{0}} {g : X ⟶ Sp k} {E : Closeds X} {s : X' ⟶ X}
-    {E' : Closeds X'} (h : IsSncBlowupSeq g E s E') (hX : IsIntegral X) (hg : IsProjOver g) :
-    Nonempty X' → ∀ V : X.Opens, IsIso (s ∣_ V) → IsSmoothBlowupSeq g (V : Set X)ᶜ s := by
+theorem seq_of_iso
+    {k : Type} [Field k]
+    {X X' : Scheme.{0}} {g : X ⟶ Sp k} {E : Closeds X} {s : X' ⟶ X} {E' : Closeds X'}
+    (h : IsSncBlowupSeq g E s E') (hX : IsIntegral X) (hg : IsProjOver g)
+    : Nonempty X' → ∀ V : X.Opens, IsIso (s ∣_ V) → IsSmoothBlowupSeq g (V : Set X)ᶜ s := by
   induction h with
   | id => exact fun _ _ _ => .id
   | @step X₁ X₂ s E₁ Z π h₁ h₂ h₃ h₄ h₅ ih =>
@@ -89,6 +101,5 @@ theorem seq_of_iso {k : Type} [Field k] {X X' : Scheme.{0}} {g : X ⟶ Sp k} {E 
 end GlobalTheory.CompanionTheory.Hypotheses₂.CentreOver
 
 namespace GlobalTheory.CompanionTheory.Hypotheses₂
-
 
 end GlobalTheory.CompanionTheory.Hypotheses₂

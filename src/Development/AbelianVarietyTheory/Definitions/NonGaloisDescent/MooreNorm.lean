@@ -30,15 +30,19 @@ end Basic
 
 def GLOnto (N : ℕ) : Prop :=
   ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F] [IsAlgClosed F]
-    (p : ℕ) [Fact p.Prime] [CharP F p] (m : Type) [Fintype m] [DecidableEq m] (e D : ℕ), 0 < e → N ≤ D →
-    ∀ M : ℕ → Matrix m m F, Normal N M → ∀ b : m → F, Integral b →
-      ∃ x : m → F, Integral x ∧ gsum (p ^ e) D M x = b
+      (p : ℕ) [Fact p.Prime] [CharP F p] (m : Type) [Fintype m] [DecidableEq m] (e D : ℕ),
+    0 < e → N ≤ D
+      → ∀ M : ℕ → Matrix m m F,
+        Normal N M → ∀ b : m → F, Integral b → ∃ x : m → F, Integral x ∧ gsum (p ^ e) D M x = b
 
 def GLCount (N : ℕ) : Prop :=
   ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F] [IsAlgClosed F]
-    (p : ℕ) [Fact p.Prime] [CharP F p] (m : Type) [Fintype m] [DecidableEq m] (e D : ℕ), 0 < e → N ≤ D →
-    ∀ M : ℕ → Matrix m m F, Normal N M → (M 0).det ≠ 0 →
-      Nat.card {x : m → F // Integral x ∧ gsum (p ^ e) D M x = 0} = (p ^ e) ^ (Fintype.card m * N)
+      (p : ℕ) [Fact p.Prime] [CharP F p] (m : Type) [Fintype m] [DecidableEq m] (e D : ℕ),
+    0 < e → N ≤ D
+      → ∀ M : ℕ → Matrix m m F,
+        Normal N M → (M 0).det ≠ 0
+          → Nat.card {x : m → F // Integral x ∧ gsum (p ^ e) D M x = 0}
+            = (p ^ e) ^ (Fintype.card m * N)
 
 section Win
 
@@ -59,19 +63,30 @@ def rowT {h : ℕ} (ϖ : F) (lam : Fin h → F) (K : ℕ) (x : Fin h → F) (r :
 end Win
 
 def MooreNorm : Prop :=
-  ∀ (F : Type) [NormedField F] [IsUltrametricDist F] (p : ℕ) [Fact p.Prime] [CharP F p] [PerfectRing F p] (h : ℕ)
-    (lam : Fin h → F), Antitone (fun j => ‖lam j‖) → Orth p lam →
-    ‖(Matrix.of fun r j : Fin h => lam j ^ p ^ (r : ℕ)).det‖ = ∏ j : Fin h, ‖lam j‖ ^ p ^ (h - 1 - (j : ℕ))
+  ∀ (F : Type) [NormedField F] [IsUltrametricDist F] (p : ℕ) [Fact p.Prime] [CharP F p]
+      [PerfectRing F p] (h : ℕ) (lam : Fin h → F),
+    Antitone (fun j => ‖lam j‖) → Orth p lam
+      → ‖(Matrix.of fun r j : Fin h => lam j ^ p ^ (r : ℕ)).det‖
+        = ∏ j : Fin h, ‖lam j‖ ^ p ^ (h - 1 - (j : ℕ))
 
 def WinThm : Prop :=
-  ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F] [IsAlgClosed F] (p : ℕ) [Fact p.Prime]
-    [CharP F p] [PerfectRing F p] (h : ℕ) (ϖ : F), 0 < h → ‖ϖ‖ = (p : ℝ)⁻¹ → ∀ lam : Fin h → F, (∀ j, lam j ≠ 0) →
-    Antitone (fun j => ‖lam j‖) → Orth p lam → (∀ i j, ‖lam i‖ < p * ‖lam j‖) →
-    ∃ (ρ τ : Fin h → ℝ) (K : ℕ), (∀ j, 0 < ρ j ∧ ρ j < 1) ∧ (∀ r, 0 < τ r) ∧
-      (∀ x : Fin h → F, (∀ j, ‖x j‖ ≤ ρ j) → ∀ (r j : Fin h) (n : ℤ),
-        ‖term p ϖ lam x r j n‖ ≤ τ r ∧ ((K : ℤ) < |n| → ‖term p ϖ lam x r j n‖ ≤ τ r / p)) ∧
-      (∀ b : Fin h → F, (∀ r, ‖b r‖ ≤ τ r) → ∃ x : Fin h → F, (∀ j, ‖x j‖ ≤ ρ j) ∧ ∀ r, rowT p ϖ lam K x r = b r) ∧
-      (∃ x : Fin h → F, (∀ j, ‖x j‖ ≤ ρ j) ∧ (∃ j, ρ j ^ p ^ h < ‖x j‖) ∧ ∀ r, rowT p ϖ lam K x r = 0)
+  ∀ (F : Type) [NontriviallyNormedField F] [IsUltrametricDist F] [CompleteSpace F] [IsAlgClosed F]
+      (p : ℕ) [Fact p.Prime] [CharP F p] [PerfectRing F p] (h : ℕ) (ϖ : F),
+    0 < h → ‖ϖ‖ = (p : ℝ)⁻¹
+      → ∀ lam : Fin h → F,
+        (∀ j, lam j ≠ 0) → Antitone (fun j => ‖lam j‖) → Orth p lam → (∀ i j, ‖lam i‖ < p * ‖lam j‖)
+          → ∃ (ρ τ : Fin h → ℝ) (K : ℕ),
+            (∀ j, 0 < ρ j ∧ ρ j < 1) ∧ (∀ r, 0 < τ r)
+              ∧ (∀ x : Fin h → F,
+                (∀ j, ‖x j‖ ≤ ρ j)
+                  → ∀ (r j : Fin h) (n : ℤ),
+                    ‖term p ϖ lam x r j n‖ ≤ τ r
+                      ∧ ((K : ℤ) < |n| → ‖term p ϖ lam x r j n‖ ≤ τ r / p))
+              ∧ (∀ b : Fin h → F,
+                (∀ r, ‖b r‖ ≤ τ r)
+                  → ∃ x : Fin h → F, (∀ j, ‖x j‖ ≤ ρ j) ∧ ∀ r, rowT p ϖ lam K x r = b r)
+              ∧ (∃ x : Fin h → F,
+                (∀ j, ‖x j‖ ≤ ρ j) ∧ (∃ j, ρ j ^ p ^ h < ‖x j‖) ∧ ∀ r, rowT p ϖ lam K x r = 0)
 
 end GlobalTheory.PMonE
 

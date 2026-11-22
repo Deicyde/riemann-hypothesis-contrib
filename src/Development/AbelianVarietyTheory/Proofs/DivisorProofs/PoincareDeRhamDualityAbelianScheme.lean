@@ -11,6 +11,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.PoincareDeRh
 namespace GlobalTheory
 
 theorem poincareDeRhamDuality : GlobalTheory.Published.PoincareDeRhamDuality :=
-  GlobalTheory.T.poincareDeRhamDuality_of_hodgeDeRham_dual GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates GlobalTheory.T.dualAbelianScheme_exists_biduality
+  GlobalTheory.T.poincareDeRhamDuality_of_hodgeDeRham_dual
+    GlobalTheory.T.abelianScheme_deRham_locallyFree_hodgeDegenerates
+    GlobalTheory.T.dualAbelianScheme_exists_biduality
 
 end GlobalTheory

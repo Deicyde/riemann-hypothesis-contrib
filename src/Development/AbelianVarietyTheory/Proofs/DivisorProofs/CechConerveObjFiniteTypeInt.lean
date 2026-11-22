@@ -4,13 +4,15 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.IndEtOfForal
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory
 
-theorem widePushout_finiteType_int {J : Type} [Finite J] [Nonempty J] (A B : CommRingCat.{0})
-    (g : A ⟶ B) (hB : Algebra.FiniteType ℤ B) :
-    Algebra.FiniteType ℤ ((widePushout A (fun _ : J => B) (fun _ => g) : CommRingCat.{0})) := by
+theorem widePushout_finiteType_int
+    {J : Type} [Finite J] [Nonempty J]
+    (A B : CommRingCat.{0}) (g : A ⟶ B) (hB : Algebra.FiniteType ℤ B)
+    : Algebra.FiniteType ℤ ((widePushout A (fun _ : J => B) (fun _ => g) : CommRingCat.{0})) := by
   classical
   obtain ⟨s, hs⟩ := hB.out
   set W := widePushout A (fun _ : J => B) (fun _ => g) with hW
@@ -26,7 +28,8 @@ theorem widePushout_finiteType_int {J : Type} [Finite J] [Nonempty J] (A B : Com
     intro j b
     have hle : (Subring.closure (s : Set B)).map (WidePushout.ι (fun _ : J => g) j).hom ≤ S := by
       rw [RingHom.map_closure]
-      exact Subring.closure_mono (Set.subset_iUnion (fun j => (WidePushout.ι (fun _ : J => g) j).hom '' (s : Set B)) j)
+      exact Subring.closure_mono
+        (Set.subset_iUnion (fun j => (WidePushout.ι (fun _ : J => g) j).hom '' (s : Set B)) j)
     exact hle ⟨b, hB' b, rfl⟩
   let ιS : J → (B ⟶ CommRingCat.of S) := fun j =>
     CommRingCat.ofHom ((WidePushout.ι (fun _ : J => g) j).hom.codRestrict S (hmem j))
@@ -58,7 +61,9 @@ theorem widePushout_finiteType_int {J : Type} [Finite J] [Nonempty J] (A B : Com
 
 end GlobalTheory
 
-theorem GlobalTheory.cechConerve_obj_finiteType_int : ∀ (A B : CommRingCat.{0}) (g : A ⟶ B), Algebra.FiniteType ℤ B →
-    ∀ k : SimplexCategory, Algebra.FiniteType ℤ ((Arrow.mk g).cechConerve.obj k) := by
+theorem GlobalTheory.cechConerve_obj_finiteType_int
+    : ∀ (A B : CommRingCat.{0}) (g : A ⟶ B),
+      Algebra.FiniteType ℤ B
+        → ∀ k : SimplexCategory, Algebra.FiniteType ℤ ((Arrow.mk g).cechConerve.obj k) := by
   intro A B g hB k
   exact GlobalTheory.widePushout_finiteType_int (J := Fin (k.len + 1)) A B g hB

@@ -11,8 +11,11 @@ public import Development.AbelianVarietyTheory.Proofs.ModuliProofs.RangeSubsetOf
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor GlobalTheory.EndLoc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.SiegelTor
+  GlobalTheory.EndLoc
 open scoped CategoryTheory.Obj
 
 noncomputable section
@@ -21,14 +24,18 @@ namespace GlobalTheory.LevTrivOpen
 
 variable {S : Scheme.{0}}
 
-theorem range_subset_iff_mem {k : Type} [Field k] (x : Sp k ⟶ S) (U : Set S) (p : Sp k) :
-    Set.range x.base ⊆ U ↔ x.base p ∈ U := by
+theorem range_subset_iff_mem {k : Type} [Field k] (x : Sp k ⟶ S) (U : Set S) (p : Sp k)
+    : Set.range x.base ⊆ U ↔ x.base p ∈ U := by
   refine ⟨fun h => h ⟨p, rfl⟩, ?_⟩
   rintro h _ ⟨q, rfl⟩
   rwa [Subsingleton.elim q p]
 
-theorem pow_nsmul {G : Over S} [GrpObj G] {h : ℕ} (lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ G))
-    (hadd : ∀ a b, lev (a + b) = lev a * lev b) (n : ℕ) (c : Fin h ⊕ Fin h → ℤ) : lev (n • c) = lev c ^ n := by
+theorem pow_nsmul
+    {G : Over S} [GrpObj G]
+    {h : ℕ}
+    (lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ G)) (hadd : ∀ a b, lev (a + b) = lev a * lev b)
+    (n : ℕ) (c : Fin h ⊕ Fin h → ℤ)
+    : lev (n • c) = lev c ^ n := by
   have h0 : lev 0 = 1 := by
     have := hadd 0 0
     rw [add_zero] at this
@@ -40,17 +47,35 @@ theorem pow_nsmul {G : Over S} [GrpObj G] {h : ℕ} (lev : (Fin h ⊕ Fin h → 
 end GlobalTheory.LevTrivOpen
 
 open GlobalTheory.LevCover GlobalTheory.LevTrivOpen in
-theorem GlobalTheory.levTriv_locus_open : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (M : ℕ) (t : S ⟶ Sp (cycAway M)) (G : Over S) [GrpObj G] [IsCommMonObj G] (h : ℕ) (lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ G)), IsAbelianScheme G → 3 ≤ M → (∀ a b, lev (a + b) = lev a * lev b) → (∀ a, lev a ^ M = 1) → ∀ (k : Type) [Field k] [IsAlgClosed k] (x₀ : Sp k ⟶ S), (∀ a, (toUnit (Over.mk x₀) ≫ lev a = 1 ↔ ∃ b, a = M • b)) → ∃ W : S.Opens, Set.range x₀.base ⊆ W ∧ ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S), Set.range x.base ⊆ W → ∀ a, (toUnit (Over.mk x) ≫ lev a = 1 ↔ ∃ b, a = M • b) := by
+theorem GlobalTheory.levTriv_locus_open
+    : ∀ (S : Scheme.{0}) [IsLocallyNoetherian S] (M : ℕ) (t : S ⟶ Sp (cycAway M)) (G : Over S)
+        [GrpObj G] [IsCommMonObj G] (h : ℕ) (lev : (Fin h ⊕ Fin h → ℤ) → (𝟙_ (Over S) ⟶ G)),
+      IsAbelianScheme G → 3 ≤ M → (∀ a b, lev (a + b) = lev a * lev b) → (∀ a, lev a ^ M = 1)
+        → ∀ (k : Type) [Field k] [IsAlgClosed k] (x₀ : Sp k ⟶ S),
+          (∀ a, (toUnit (Over.mk x₀) ≫ lev a = 1 ↔ ∃ b, a = M • b))
+            → ∃ W : S.Opens,
+              Set.range x₀.base ⊆ W
+                ∧ ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S),
+                  Set.range x.base ⊆ W
+                    → ∀ a, (toUnit (Over.mk x) ≫ lev a = 1 ↔ ∃ b, a = M • b) := by
   intro S _ M t G _ _ h lev hab hM hadd hpow k _ _ x₀ hx₀
   have hu : IsUnit (M : Γ(S, ⊤)) := by
-    have := (GlobalTheory.SiegelTor.isUnit_natCast (n := M) (by omega)).map
-      (t.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of (GlobalTheory.SiegelTor.cycAway M))).inv.hom)
+    have :=
+      (GlobalTheory.SiegelTor.isUnit_natCast (n := M) (by omega)).map
+        (t.appTop.hom.comp (Scheme.ΓSpecIso (CommRingCat.of (GlobalTheory.SiegelTor.cycAway
+          M))).inv.hom)
     rwa [map_natCast] at this
   obtain ⟨-, hfin, het⟩ := GlobalTheory.GrpTangent.finiteEtale_mulN_torsion G (hG := hab) hu
-  have hU : ∀ f : 𝟙_ (Over S) ⟶ G, ∃ U : S.Opens, IsClosed (U : Set S) ∧ (f ^ M = 1 → ∀ (k' : Type) [Field k']
-      [IsAlgClosed k'] (x : Sp k' ⟶ S), (toUnit (Over.mk x) ≫ f = 1 ↔ Set.range x.base ⊆ U)) := fun f => by
+  have hU
+      : ∀ f : 𝟙_ (Over S) ⟶ G, ∃ U : S.Opens,
+        IsClosed (U : Set S)
+          ∧ (f ^ M = 1
+            → ∀ (k' : Type) [Field k'] [IsAlgClosed k'] (x : Sp k' ⟶ S),
+              (toUnit (Over.mk x) ≫ f = 1 ↔ Set.range x.base ⊆ U)) := fun f => by
     by_cases hf : f ^ M = 1
-    · obtain ⟨U, hUc, HU⟩ := GlobalTheory.TorsionSections.clopenCond_torsion_eq (n := M) (T := 𝟙_ (Over S)) hf (one_pow M)
+    · obtain ⟨U, hUc, HU⟩ :=
+        GlobalTheory.TorsionSections.clopenCond_torsion_eq (n := M) (T := 𝟙_ (Over S)) hf
+          (one_pow M)
       refine ⟨U, hUc, fun _ k' _ _ x => ?_⟩
       have := HU (Over.mk x) (toUnit (Over.mk x))
       simp only [MonObj.comp_one] at this
@@ -72,8 +97,10 @@ theorem GlobalTheory.levTriv_locus_open : ∀ (S : Scheme.{0}) [IsLocallyNoether
   have hAq : ∀ a a', q a = q a' → A a = A a' := fun a a' e => by
     obtain ⟨c, rfl⟩ := hq a a' e
     have hl : lev (a + M • c) = lev a := by rw [hadd, pow_nsmul lev hadd, hpow, _root_.mul_one]
-    have hP : P (a + M • c) ↔ P a :=
-      ⟨fun ⟨b, hb⟩ => ⟨b - c, by rw [smul_sub, ← hb]; abel⟩, fun ⟨b, hb⟩ => ⟨b + c, by rw [hb, smul_add]⟩⟩
+    have hP : P (a + M • c) ↔ P a := ⟨
+      fun ⟨b, hb⟩ => ⟨b - c, by rw [smul_sub, ← hb]; abel⟩,
+      fun ⟨b, hb⟩ => ⟨b + c, by rw [hb, smul_add]⟩
+    ⟩
     ext s
     simp only [A, Set.mem_setOf_eq, hl, hP]
   let pick : κ → (Fin h ⊕ Fin h → ℤ) := fun c => if hc : ∃ a, q a = c then hc.choose else 0

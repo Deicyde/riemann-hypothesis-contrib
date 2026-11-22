@@ -7,8 +7,14 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.Convolut
 
 @[expose] public section
 
-open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
-open GroundTheory.Automorphic.CuspidalSpectrum GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo GroundTheory.Global GroundTheory.Global.SemiLocal UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.L1 UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField IsDedekindDomain Filter GroundTheory.Automorphic
+  GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+  GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic.CuspidalSpectrum
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets GlobalTheory.PRep
+  Formalism.BasicNotions GlobalTheory.CuspRep GlobalTheory.SmGL PositivityTheory.Rg.Tf.Core
+  PositivityTheory.Rg.Tf.Geo GroundTheory.Global GroundTheory.Global.SemiLocal
+  UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.L1 UpperTheory.ConvolutionTheory.C
 open scoped ComplexConjugate Classical InnerProductSpace
 
 section Hilbert
@@ -147,16 +153,21 @@ private lemma tr_main {Z X Y : Submodule ℂ H} (Pr R : H →L[ℂ] H) [FiniteDi
 
 end Hilbert
 
-theorem UpperTheory.trOn_prod_eigenProjections_eq_trOn_joint_eigenspace :
-    ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n))) [μ.IsHaarMeasure] (Z : Submodule ℂ (LL μ))
-        (r : ℕ) (w : Fin r → Pl K), Function.Injective w → ∀ (J : ∀ i, Subgroup (Gw n (w i))) (χ : ∀ i, Gw n (w i) → ℂ)
-        (hc : ∀ i, IsChr (J i) (χ i)) (R : LL μ →L[ℂ] LL μ), (∀ i, CO (J i)) → IsClosed (Z : Set (LL μ)) →
-        (∀ i g, ∀ v ∈ Z, rhoL μ (w i) g v ∈ Z) → (∀ v ∈ Z, R v ∈ Z) →
-        FiniteDimensional ℂ ↥(Z ⊓ ⨅ i, fixL μ (w i) (kerChr (J i) (χ i) (hc i))) →
-        trOn (Z ⊓ ⨅ i, fixL μ (w i) (kerChr (J i) (χ i) (hc i))) ((List.ofFn fun i => prj (eigL μ (w i) (J i) (χ i))).prod ∘L R) =
-          trOn (Z ⊓ ⨅ i, eigL μ (w i) (J i) (χ i)) R := by
+theorem UpperTheory.trOn_prod_eigenProjections_eq_trOn_joint_eigenspace
+    : ∀ (K : Type) [Field K] [NumberField K] (n : ℕ) (μ : Measure (normOneGL (K := K) (n := n)))
+        [μ.IsHaarMeasure] (Z : Submodule ℂ (LL μ)) (r : ℕ) (w : Fin r → Pl K),
+      Function.Injective w
+        → ∀ (J : ∀ i, Subgroup (Gw n (w i))) (χ : ∀ i, Gw n (w i) → ℂ) (hc : ∀ i, IsChr (J i) (χ i))
+            (R : LL μ →L[ℂ] LL μ),
+          (∀ i, CO (J i)) → IsClosed (Z : Set (LL μ)) → (∀ i g, ∀ v ∈ Z, rhoL μ (w i) g v ∈ Z)
+            → (∀ v ∈ Z, R v ∈ Z)
+            → FiniteDimensional ℂ ↥(Z ⊓ ⨅ i, fixL μ (w i) (kerChr (J i) (χ i) (hc i)))
+            → trOn (Z ⊓ ⨅ i, fixL μ (w i) (kerChr (J i) (χ i) (hc i)))
+                ((List.ofFn fun i => prj (eigL μ (w i) (J i) (χ i))).prod ∘L R)
+              = trOn (Z ⊓ ⨅ i, eigL μ (w i) (J i) (χ i)) R := by
   intro K _ _ n μ _ Z r w hw J χ hc R hCO hZ hst hR hfd
-  have hB := fun i => UpperTheory.ConvolutionTheory.L1.eigBasic K n μ (w i) (J i) (χ i) (hCO i) (hc i)
+  have hB := fun i =>
+    UpperTheory.ConvolutionTheory.L1.eigBasic K n μ (w i) (J i) (χ i) (hCO i) (hc i)
   have hF := UpperTheory.ConvolutionTheory.Tf.commPrj K n μ ⊥
   have hmul : ∀ h h', rhoF μ (h * h') = rhoF μ h ∘L rhoF μ h' := hF.2.2.2.2.2.1
   have hadjF : ∀ h, ContinuousLinearMap.adjoint (rhoF μ h) = rhoF μ h⁻¹ := hF.2.2.2.2.2.2.2.1
@@ -174,18 +185,23 @@ theorem UpperTheory.trOn_prod_eigenProjections_eq_trOn_joint_eigenspace :
     rw [prj_self' hZ hv] at h1
     rw [← h1]
     exact prj_mem' hZ _
-  have hrho : ∀ i j, i ≠ j → ∀ x y, Commute (rhoL μ (w j) x) (rhoL μ (w i) y) := fun i j hij x y => by
+  have hrho
+      : ∀ i j, i ≠ j → ∀ x y, Commute (rhoL μ (w j) x) (rhoL μ (w i) y) := fun i j hij x y => by
     have hne : w i ≠ w j := fun h => hij (hw h)
     have := (UpperTheory.ConvolutionTheory.Tf.locEmb K n (w j)).2.2.2.1 (w i) hne x y
     show rhoF μ _ ∘L rhoF μ _ = rhoF μ _ ∘L rhoF μ _
     rw [← hmul, ← hmul, this]
-  have hcom : ∀ i j, Commute (prj (eigL μ (w i) (J i) (χ i))) (prj (eigL μ (w j) (J j) (χ j))) := fun i j => by
+  have hcom
+      : ∀ i j,
+        Commute (prj (eigL μ (w i) (J i) (χ i))) (prj (eigL μ (w j) (J j) (χ j))) := fun i j => by
     by_cases hij : i = j
     · subst hij
       exact Commute.refl _
     · exact (hB j).2.2.2 _ fun x _ => ((hB i).2.2.2 _ fun y _ => hrho i j hij x y).symm
-  obtain ⟨p1, p2, p3⟩ := pr_props Z r (fun i => eigL μ (w i) (J i) (χ i)) (fun i => (hB i).1) hcom hs
-  have hle : ∀ i, eigL μ (w i) (J i) (χ i) ≤ fixL μ (w i) (kerChr (J i) (χ i) (hc i)) := fun i v hv => by
+  obtain ⟨p1, p2, p3⟩ :=
+    pr_props Z r (fun i => eigL μ (w i) (J i) (χ i)) (fun i => (hB i).1) hcom hs
+  have hle
+      : ∀ i, eigL μ (w i) (J i) (χ i) ≤ fixL μ (w i) (kerChr (J i) (χ i) (hc i)) := fun i v hv => by
     refine ((UpperTheory.ConvolutionTheory.Tf.commPrj K n μ _).2.1 v).2 ?_
     rintro _ ⟨x, hx, rfl⟩
     have h1 : rhoL μ (w i) x v = χ i x • v := by
@@ -195,4 +211,5 @@ theorem UpperTheory.trOn_prod_eigenProjections_eq_trOn_joint_eigenspace :
     rw [h2, one_smul] at h1
     exact h1
   refine tr_main (Z := Z) _ R (inf_le_inf_left Z (iInf_mono hle)) inf_le_left hR
-    (fun u hu => Submodule.mem_inf.2 ⟨p1 u hu, p2 u⟩) fun u y hy => p3 u y (Submodule.mem_inf.1 hy).2
+    (fun u hu => Submodule.mem_inf.2 ⟨p1 u hu, p2 u⟩)
+    fun u y hy => p3 u y (Submodule.mem_inf.1 hy).2

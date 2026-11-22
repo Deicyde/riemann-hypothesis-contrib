@@ -12,16 +12,18 @@ namespace ReciprocityTheory.ChartRestriction.G.TB.G2.Gen
 
 open ReciprocityTheory.ChartRestriction.G.TB.G2
 
-variable {k : Type} [CommRing k] {S : Type} [CommRing S] {ι : Type}
-  (D : ι → S → S) (κ : k →+* S)
+variable
+  {k : Type} [CommRing k]
+  {S : Type} [CommRing S]
+  {ι : Type} (D : ι → S → S)
+  (κ : k →+* S)
   (hadd : ∀ l f g, D l (f + g) = D l f + D l g) (hC : ∀ l a, D l (κ a) = 0)
   (hmul : ∀ l f g, D l (f * g) = D l f * g + f * D l g)
 
 def TG (w : List ι) (A : S) : S := w.foldr (fun l g => D l g) A
 
 include hadd in
-theorem D_zero (l : ι) : D l 0 = 0 := by
-  simpa using hadd l 0 0
+theorem D_zero (l : ι) : D l 0 = 0 := by simpa using hadd l 0 0
 
 include hadd in
 theorem D_list_sum (l : ι) (L : List S) : D l L.sum = (L.map (D l)).sum := by
@@ -41,8 +43,8 @@ theorem TG_add (w : List ι) (A B : S) : TG D w (A + B) = TG D w A + TG D w B :=
     rw [ih, hadd]
 
 include hadd hmul in
-theorem TG_mul (w : List ι) (A B : S) :
-    TG D w (A * B) = ((splits w).map (fun p => TG D p.1 A * TG D p.2 B)).sum := by
+theorem TG_mul (w : List ι) (A B : S)
+    : TG D w (A * B) = ((splits w).map (fun p => TG D p.1 A * TG D p.2 B)).sum := by
   induction w with
   | nil => simp [TG, splits]
   | cons l w ih =>
@@ -52,7 +54,8 @@ theorem TG_mul (w : List ι) (A B : S) :
       List.sum_map_add]
 
 section Q
-variable (e : S →+* k) (c : ι → ι → k) (q : S)
+variable
+  (e : S →+* k) (c : ι → ι → k) (q : S)
   (hq0 : e q = 0) (hq1 : ∀ l, e (D l q) = 0) (hq2 : ∀ l l', D l (D l' q) = κ (c l l'))
 
 include hadd hC hq2 in
@@ -86,11 +89,12 @@ theorem e_TG_q (b : List ι) : e (TG D b q) = ev2 c b := by
     exact map_zero e
 
 include hadd hmul hC hq0 hq1 hq2 he in
-theorem e_TG_mul_q (w : List ι) (A : S) :
-    e (TG D w (A * q)) = ((splits w).map (fun p => e (TG D p.1 A) * ev2 c p.2)).sum := by
+theorem e_TG_mul_q (w : List ι) (A : S)
+    : e (TG D w (A * q)) = ((splits w).map (fun p => e (TG D p.1 A) * ev2 c p.2)).sum := by
   simp only [TG_mul (D := D) (hadd := hadd) (hmul := hmul), map_list_sum, List.map_map,
-    Function.comp_def, map_mul, e_TG_q (D := D) (κ := κ) (hadd := hadd) (hC := hC) (e := e) (c := c)
-      (q := q) (hq0 := hq0) (hq1 := hq1) (hq2 := hq2) (he := he)]
+    Function.comp_def, map_mul,
+    e_TG_q (D := D) (κ := κ) (hadd := hadd) (hC := hC) (e := e) (c := c) (q := q) (hq0 := hq0)
+      (hq1 := hq1) (hq2 := hq2) (he := he)]
 
 end Q
 

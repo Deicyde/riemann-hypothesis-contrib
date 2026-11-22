@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.MainNotions.ColumnSystems.Pf
 
-open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems Formalism.L2.G.Model
+open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems
+  Formalism.L2.G.Model
 
 theorem letterWt_anti (m d : ℕ) (vec : Bool) : Antitone (letterWt m d vec) := by
   intro i j hij

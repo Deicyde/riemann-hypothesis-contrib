@@ -10,10 +10,14 @@ namespace ReciprocityTheory.L2DbarEstimates.C
 open MeasureTheory Metric Set Filter Topology Complex
 open scoped ENNReal
 
-theorem holoWeak_bound {n : ℕ} {Ω K : Set (V n)} {u : V n → ℂ} (hΩ : IsOpen Ω)
-    (hu : DifferentiableOn ℂ u Ω) (hK : IsCompact K) (hKΩ : K ⊆ Ω) (v : V n) :
-    ∃ C : ℝ, ∀ x ∈ K, ‖fderiv ℝ u x v‖ ≤ C := by
-  first | exact Bl.SecondBlockLemmaG.goal1 .. | (apply Bl.SecondBlockLemmaG.goal1 <;> assumption) | (intros; apply Bl.SecondBlockLemmaG.goal1 <;> assumption)
+theorem holoWeak_bound
+    {n : ℕ} {Ω K : Set (V n)} {u : V n → ℂ}
+    (hΩ : IsOpen Ω) (hu : DifferentiableOn ℂ u Ω) (hK : IsCompact K) (hKΩ : K ⊆ Ω) (v : V n)
+    : ∃ C : ℝ, ∀ x ∈ K, ‖fderiv ℝ u x v‖ ≤ C := by
+  first
+  | exact Bl.SecondBlockLemmaG.goal1 ..
+  | (apply Bl.SecondBlockLemmaG.goal1 <;> assumption)
+  | (intros; apply Bl.SecondBlockLemmaG.goal1 <;> assumption)
 
 theorem holoWeak : HoloWeakStatement := by
   intro n Ω u hΩ hu
@@ -29,8 +33,9 @@ theorem holoWeak : HoloWeakStatement := by
   have hzero : ∀ x, x ∉ tsupport g → g x = 0 := fun x hx => image_eq_zero_of_notMem_tsupport hx
   have hzero' : ∀ w x, x ∉ tsupport g → fderiv ℝ g x w = 0 := fun w x hx => by
     rw [fderiv_of_notMem_tsupport ℝ hx]; rfl
-  have hint : ∀ h : V n → ℂ, Continuous h → (∀ x, x ∉ tsupport g → h x = 0) →
-      Integrable (fun x => u x * h x) := by
+  have hint
+      : ∀ h : V n → ℂ,
+        Continuous h → (∀ x, x ∉ tsupport g → h x = 0) → Integrable (fun x => u x * h x) := by
     intro h hh hh0
     refine IntegrableOn.integrable_of_forall_notMem_eq_zero (s := tsupport g) ?_ ?_
     · exact (huK.mul hh.continuousOn).integrableOn_compact hK
@@ -56,8 +61,7 @@ theorem holoWeak : HoloWeakStatement := by
   have hlin : ∀ x, fderiv ℝ u x (I • v) * g x = I * (fderiv ℝ u x v * g x) := by
     intro x
     by_cases hx : x ∈ tsupport g
-    · have hux : DifferentiableAt ℂ u x :=
-        (hu x (hgΩ hx)).differentiableAt (hΩ.mem_nhds (hgΩ hx))
+    · have hux : DifferentiableAt ℂ u x := (hu x (hgΩ hx)).differentiableAt (hΩ.mem_nhds (hgΩ hx))
       rw [hux.fderiv_restrictScalars (𝕜 := ℝ)]
       simp only [ContinuousLinearMap.coe_restrictScalars', map_smul, smul_eq_mul]
       ring
@@ -67,8 +71,9 @@ theorem holoWeak : HoloWeakStatement := by
     have hx' : x ∉ tsupport g := fun h => hx (hgΩ h)
     simp [dbarDir, fderiv_of_notMem_tsupport ℝ hx']
   rw [setIntegral_eq_integral_of_forall_compl_eq_zero hΩ0]
-  have e1 : (fun x => u x * dbarDir g x v) =
-      fun x => u x * fderiv ℝ g x (I • v) - I * (u x * fderiv ℝ g x v) := by
+  have e1
+      : (fun x => u x * dbarDir g x v)
+        = fun x => u x * fderiv ℝ g x (I • v) - I * (u x * fderiv ℝ g x v) := by
     funext x; simp only [dbarDir]; ring
   rw [e1, integral_sub (hint _ (hg'c _) (hzero' _)) ((hint _ (hg'c _) (hzero' _)).const_mul I),
     integral_const_mul, hibp (I • v), hibp v]

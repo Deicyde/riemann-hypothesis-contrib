@@ -16,8 +16,9 @@ noncomputable section
 
 variable {S : Type} [CommRing S] {N : ℕ} {Ω : Type} [Field Ω] [Algebra S Ω] {x : Fin (N + 1) → Ω}
 
-theorem div_mem_chartRing_of_mem (I : Kleiman.Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1)
-    (j : Fin (N + 1)) : x j / x i ∈ Kleiman.chartRing S x I :=
+theorem div_mem_chartRing_of_mem
+    (I : Kleiman.Chart x) {i : Fin (N + 1)} (hi : i ∈ I.1) (j : Fin (N + 1))
+    : x j / x i ∈ Kleiman.chartRing S x I :=
   ⟨X j, X i, 1, Kleiman.X_mem_monos hi, isHomogeneous_X S j, isHomogeneous_X S i, by simp⟩
 
 section First
@@ -30,20 +31,21 @@ section Second
 
 variable (Q' : IndefiniteRowSideFullHecke.Kleiman.LineBundle (S := S) x)
 
-def latSub {i : Fin (N + 1)} (h : x i ≠ 0) :
-    Submodule (Kleiman.chartRing S x (Kleiman.singleChart h)) Ω where
+def latSub {i : Fin (N + 1)} (h : x i ≠ 0)
+    : Submodule (Kleiman.chartRing S x (Kleiman.singleChart h)) Ω where
   carrier := Q'.lat i
   add_mem' := add_mem
   zero_mem' := zero_mem _
   smul_mem' a e he := Q'.stable i a (by rw [chartRing.equiv S x h]; exact a.2) e he
 
-theorem coe_latSub {i : Fin (N + 1)} (h : x i ≠ 0) : (latSub Q' h : Set Ω) = (Q'.lat i : Set Ω) := rfl
+theorem coe_latSub {i : Fin (N + 1)} (h : x i ≠ 0) : (latSub Q' h : Set Ω) = (Q'.lat i : Set Ω) :=
+  rfl
 
 def subOf (I : Kleiman.Chart x) : Submodule (Kleiman.chartRing S x I) Ω :=
   Submodule.span _ (⋃ i ∈ I.1, (Q'.lat i : Set Ω))
 
-theorem subOf_eq {I : Kleiman.Chart x} {i : Fin (N + 1)} (hi : i ∈ I.1) :
-    subOf Q' I = Submodule.span _ (Q'.lat i : Set Ω) := by
+theorem subOf_eq {I : Kleiman.Chart x} {i : Fin (N + 1)} (hi : i ∈ I.1)
+    : subOf Q' I = Submodule.span _ (Q'.lat i : Set Ω) := by
   have hxi : x i ≠ 0 := (Kleiman.mem_support x).1 (I.2.2 hi)
   apply le_antisymm
   · rw [subOf, Submodule.span_le]
@@ -51,16 +53,18 @@ theorem subOf_eq {I : Kleiman.Chart x} {i : Fin (N + 1)} (hi : i ∈ I.1) :
     obtain ⟨j, hj, he⟩ := Set.mem_iUnion₂.1 he
     have hxj : x j ≠ 0 := (Kleiman.mem_support x).1 (I.2.2 hj)
     obtain ⟨m, hm⟩ := Q'.overlap j i hxj hxi e he
-    have hr : (x i / x j) ^ m ∈ Kleiman.chartRing S x I := pow_mem (div_mem_chartRing_of_mem I hj i) m
+    have hr : (x i / x j) ^ m ∈ Kleiman.chartRing S x I :=
+      pow_mem (div_mem_chartRing_of_mem I hj i) m
     have hc : x i / x j * (x j / x i) = 1 := by field_simp
     have key : e = (⟨_, hr⟩ : Kleiman.chartRing S x I) • ((x j / x i) ^ m • e) := by
-      rw [Subalgebra.smul_def, smul_eq_mul, smul_eq_mul, ← mul_assoc, ← mul_pow, hc, one_pow, one_mul]
+      rw [Subalgebra.smul_def, smul_eq_mul, smul_eq_mul, ← mul_assoc, ← mul_pow, hc, one_pow,
+        one_mul]
     rw [key]
     exact Submodule.smul_mem _ _ (Submodule.subset_span hm)
   · exact Submodule.span_mono fun e he => Set.mem_iUnion₂.2 ⟨i, hi, he⟩
 
-theorem subOf_mono (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) (hy : y ∈ subOf Q' I) :
-    y ∈ subOf Q' J := by
+theorem subOf_mono (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) (hy : y ∈ subOf Q' I)
+    : y ∈ subOf Q' J := by
   induction hy using Submodule.span_induction with
   | mem z hz =>
     obtain ⟨i, hi, hz⟩ := Set.mem_iUnion₂.1 hz
@@ -69,9 +73,10 @@ theorem subOf_mono (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) (hy : y �
   | add u v _ _ hu hv => exact add_mem hu hv
   | smul a z _ hz => exact Submodule.smul_mem _ (Kleiman.chartIncl h a) hz
 
-theorem subOf_mem_iff (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) :
-    y ∈ subOf Q' J ↔
-      ∃ a : Kleiman.chartRing S x I, IsUnit (Kleiman.chartIncl h a) ∧ (a : Ω) • y ∈ subOf Q' I := by
+theorem subOf_mem_iff (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω)
+    : y ∈ subOf Q' J
+      ↔ ∃ a : Kleiman.chartRing S x I,
+        IsUnit (Kleiman.chartIncl h a) ∧ (a : Ω) • y ∈ subOf Q' I := by
   obtain ⟨i, hi⟩ := I.2.1
   have hxi : x i ≠ 0 := (Kleiman.mem_support x).1 (I.2.2 hi)
   constructor
@@ -89,12 +94,14 @@ theorem subOf_mem_iff (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) :
         rw [← mul_pow, hc, one_pow]
       · rw [subOf_eq Q' hi]
         exact Submodule.subset_span hm
-    | zero => exact ⟨1, by simp, by rw [smul_zero]; exact zero_mem _⟩
+    | zero =>
+      exact ⟨1, by simp, by rw [smul_zero]; exact zero_mem _⟩
     | add u v _ _ hu hv =>
       obtain ⟨a, ha, hau⟩ := hu
       obtain ⟨b, hb, hbv⟩ := hv
       refine ⟨a * b, by rw [map_mul]; exact ha.mul hb, ?_⟩
-      have : ((a * b : Kleiman.chartRing S x I) : Ω) • (u + v) = b • ((a : Ω) • u) + a • ((b : Ω) • v) := by
+      have : ((a * b : Kleiman.chartRing S x I) : Ω) • (u + v)
+          = b • ((a : Ω) • u) + a • ((b : Ω) • v) := by
         simp only [Subalgebra.coe_mul, Subalgebra.smul_def, smul_eq_mul]
         ring
       rw [this]
@@ -103,8 +110,8 @@ theorem subOf_mem_iff (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) :
       obtain ⟨a, ha, haz⟩ := hz
       obtain ⟨a', ha', hc⟩ := Kleiman.exists_isUnit_mul_mem h c
       refine ⟨a' * a, by rw [map_mul]; exact ha'.mul ha, ?_⟩
-      have : ((a' * a : Kleiman.chartRing S x I) : Ω) • (c • z) =
-          (⟨(a' : Ω) * c, hc⟩ : Kleiman.chartRing S x I) • ((a : Ω) • z) := by
+      have : ((a' * a : Kleiman.chartRing S x I) : Ω) • (c • z)
+          = (⟨(a' : Ω) * c, hc⟩ : Kleiman.chartRing S x I) • ((a : Ω) • z) := by
         simp only [Subalgebra.coe_mul, Subalgebra.smul_def, smul_eq_mul]
         ring
       rw [this]
@@ -120,16 +127,22 @@ theorem subOf_mem_iff (I J : Kleiman.Chart x) (h : I.1 ⊆ J.1) (y : Ω) :
     rw [hy']
     exact Submodule.smul_mem _ _ hay'
 
-theorem latSub_fg_invertible {i : Fin (N + 1)} (h : x i ≠ 0) :
-    (latSub Q' h).FG ∧ ∃ L' : Submodule (Kleiman.chartRing S x (Kleiman.singleChart h)) Ω,
-      latSub Q' h * L' = 1 := by
+theorem latSub_fg_invertible {i : Fin (N + 1)} (h : x i ≠ 0)
+    : (latSub Q' h).FG
+      ∧ ∃ L' : Submodule (Kleiman.chartRing S x (Kleiman.singleChart h)) Ω,
+        latSub Q' h * L' = 1 := by
   obtain ⟨k, f, c, hf, hc, hs, hb⟩ := Q'.frame i h
-  have hA : ReciprocityTheory.ChartRestriction.G.Geo.chartRing S x i = Kleiman.chartRing S x (Kleiman.singleChart h) :=
+  have hA
+      : ReciprocityTheory.ChartRestriction.G.Geo.chartRing S x i
+        = Kleiman.chartRing S x (Kleiman.singleChart h) :=
     chartRing.equiv S x h
   simp only [hA] at hf hc hb
   choose b hbli _ hiff using hb
-  refine fg_and_invertible_of_frame _ f c (latSub Q' h) (fun l => b l 0) hf hc hs
-    (fun l => linearIndependent_unique_iff.1 (hbli l)) (fun l e => ?_)
+  refine fg_and_invertible_of_frame _ f c (latSub Q' h)
+    (fun l => b l 0)
+    hf hc hs
+    (fun l => linearIndependent_unique_iff.1 (hbli l))
+    (fun l e => ?_)
   have := hiff l e
   simp only [Fin.sum_univ_one, smul_eq_mul] at this
   constructor
@@ -143,16 +156,18 @@ theorem subOf_fg (I : Kleiman.Chart x) : (subOf Q' I).FG := by
   obtain ⟨i, hi⟩ := I.2.1
   have hxi : x i ≠ 0 := (Kleiman.mem_support x).1 (I.2.2 hi)
   have hle : Kleiman.chartRing S x (Kleiman.singleChart hxi) ≤ Kleiman.chartRing S x I :=
-    Kleiman.chartRing_mono (I := Kleiman.singleChart hxi) (J := I) (Finset.singleton_subset_iff.2 hi)
+    Kleiman.chartRing_mono (I := Kleiman.singleChart hxi) (J := I)
+      (Finset.singleton_subset_iff.2 hi)
   rw [subOf_eq Q' hi]
   exact fg_span_of_le hle (latSub_fg_invertible Q' hxi).1
 
-theorem subOf_invertible (I : Kleiman.Chart x) :
-    ∃ L' : Submodule (Kleiman.chartRing S x I) Ω, subOf Q' I * L' = 1 := by
+theorem subOf_invertible (I : Kleiman.Chart x)
+    : ∃ L' : Submodule (Kleiman.chartRing S x I) Ω, subOf Q' I * L' = 1 := by
   obtain ⟨i, hi⟩ := I.2.1
   have hxi : x i ≠ 0 := (Kleiman.mem_support x).1 (I.2.2 hi)
   have hle : Kleiman.chartRing S x (Kleiman.singleChart hxi) ≤ Kleiman.chartRing S x I :=
-    Kleiman.chartRing_mono (I := Kleiman.singleChart hxi) (J := I) (Finset.singleton_subset_iff.2 hi)
+    Kleiman.chartRing_mono (I := Kleiman.singleChart hxi) (J := I)
+      (Finset.singleton_subset_iff.2 hi)
   obtain ⟨L', hL'⟩ := (latSub_fg_invertible Q' hxi).2
   have key := mul_span_eq_one_of_le (B := Kleiman.chartRing S x I) hle hL'
   rw [coe_latSub] at key

@@ -17,8 +17,8 @@ variable {n : ℕ}
 
 theorem contDiff_lead (j : ℕ) : ContDiff ℂ ⊤ (lead j : Matrix (Fin n) (Fin n) ℂ → ℂ) := by
   by_cases h : j ≤ n
-  · have : (lead j : Matrix (Fin n) (Fin n) ℂ → ℂ) =
-        fun z => (z.submatrix (Fin.castLE h) (Fin.castLE h)).det := by
+  · have : (lead j : Matrix (Fin n) (Fin n) ℂ → ℂ)
+        = fun z => (z.submatrix (Fin.castLE h) (Fin.castLE h)).det := by
       funext z; simp [lead, h]
     rw [this]
     simp only [Matrix.det_apply]
@@ -26,17 +26,14 @@ theorem contDiff_lead (j : ℕ) : ContDiff ℂ ⊤ (lead j : Matrix (Fin n) (Fin
     refine ContDiff.const_smul _ ?_
     refine contDiff_prod fun i _ => ?_
     exact contDiff_apply_apply (𝕜 := ℂ) (E := ℂ) (ι := Fin n) (ι' := Fin n) _ _
-  · have : (lead j : Matrix (Fin n) (Fin n) ℂ → ℂ) = fun _ => 0 := by
-      funext z; simp [lead, h]
+  · have : (lead j : Matrix (Fin n) (Fin n) ℂ → ℂ) = fun _ => 0 := by funext z; simp [lead, h]
     rw [this]
     exact contDiff_const
 
 theorem isOpen_OmegaSet (n : ℕ) : IsOpen (OmegaSet n) := by
-  have : OmegaSet n = ⋂ i : Fin n, {z | lead ((i : ℕ) + 1) z ≠ 0} := by
-    ext z; simp [OmegaSet]
+  have : OmegaSet n = ⋂ i : Fin n, {z | lead ((i : ℕ) + 1) z ≠ 0} := by ext z; simp [OmegaSet]
   rw [this]
-  exact isOpen_iInter_of_finite fun i =>
-    isOpen_ne_fun (contDiff_lead _).continuous continuous_const
+  exact isOpen_iInter_of_finite fun i => isOpen_ne_fun (contDiff_lead _).continuous continuous_const
 
 open PositivityTheory.RgDs.K
 
@@ -45,27 +42,33 @@ def mulL (Y : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ →L[ℂ]
 
 theorem mulL_apply (Y z : Matrix (Fin n) (Fin n) ℂ) : mulL Y z = Y * z := rfl
 
-theorem lop_on {Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ}
-    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n) : lop Y F z = -(fderiv ℂ F z (Y * z)) :=
+theorem lop_on
+    {Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ} {z : Matrix (Fin n) (Fin n) ℂ}
+    (hz : z ∈ OmegaSet n)
+    : lop Y F z = -(fderiv ℂ F z (Y * z)) :=
   if_pos hz
 
-theorem lop_off {Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ}
-    {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∉ OmegaSet n) : lop Y F z = 0 :=
+theorem lop_off
+    {Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ} {z : Matrix (Fin n) (Fin n) ℂ}
+    (hz : z ∉ OmegaSet n)
+    : lop Y F z = 0 :=
   if_neg hz
 
-theorem contDiffOn_dir (Y : Matrix (Fin n) (Fin n) ℂ) {F : Matrix (Fin n) (Fin n) ℂ → ℂ}
-    (hF : ContDiffOn ℂ ⊤ F (OmegaSet n)) :
-    ContDiffOn ℂ ⊤ (fun z => fderiv ℂ F z (mulL Y z)) (OmegaSet n) :=
+theorem contDiffOn_dir
+    (Y : Matrix (Fin n) (Fin n) ℂ)
+    {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : ContDiffOn ℂ ⊤ F (OmegaSet n))
+    : ContDiffOn ℂ ⊤ (fun z => fderiv ℂ F z (mulL Y z)) (OmegaSet n) :=
   (hF.fderiv_of_isOpen (isOpen_OmegaSet n) (by simp)).clm_apply (mulL Y).contDiff.contDiffOn
 
-theorem lop_mem {Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n) :
-    lop Y F ∈ OmF n := by
+theorem lop_mem {Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (hF : F ∈ OmF n)
+    : lop Y F ∈ OmF n := by
   refine ⟨?_, fun z hz => lop_off hz⟩
   exact (contDiffOn_dir Y hF.1).neg.congr fun z hz => lop_on hz
 
-theorem lop_lop {X Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ}
-    {z : Matrix (Fin n) (Fin n) ℂ} (hF : ContDiffOn ℂ ⊤ F (OmegaSet n)) (hz : z ∈ OmegaSet n) :
-    lop X (lop Y F) z = fderiv ℂ (fderiv ℂ F) z (X * z) (Y * z) + fderiv ℂ F z (Y * (X * z)) := by
+theorem lop_lop
+    {X Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) ℂ → ℂ}
+    {z : Matrix (Fin n) (Fin n) ℂ} (hF : ContDiffOn ℂ ⊤ F (OmegaSet n)) (hz : z ∈ OmegaSet n)
+    : lop X (lop Y F) z = fderiv ℂ (fderiv ℂ F) z (X * z) (Y * z) + fderiv ℂ F z (Y * (X * z)) := by
   have hU := (isOpen_OmegaSet n).mem_nhds hz
   have hc : ContDiffAt ℂ ⊤ F z := hF.contDiffAt hU
   have hd : DifferentiableAt ℂ (fderiv ℂ F) z :=
@@ -79,44 +82,48 @@ theorem lop_lop {X Y : Matrix (Fin n) (Fin n) ℂ} {F : Matrix (Fin n) (Fin n) �
   show -(-(fderiv ℂ F z (mulL Y (X * z)) + fderiv ℂ (fderiv ℂ F) z (X * z) (mulL Y z))) = _
   rw [neg_neg, mulL_apply, mulL_apply, add_comm]
 
-theorem single_mul_single_eq (a b c d : Fin n) :
-    (Matrix.single a b (1 : ℂ)) * Matrix.single c d 1 =
-      if b = c then Matrix.single a d 1 else 0 := by
+theorem single_mul_single_eq (a b c d : Fin n)
+    : (Matrix.single a b (1 : ℂ)) * Matrix.single c d 1
+      = if b = c then Matrix.single a d 1 else 0 := by
   split_ifs with h
   · subst h; simp [Matrix.single_mul_single_same]
   · simp [Matrix.single_mul_single_of_ne _ _ _ _ h]
 
-theorem lop_rel {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (a b c d : Fin n) (hF : F ∈ OmF n) :
-    lop (Matrix.single a b 1) (lop (Matrix.single c d 1) F) -
-        lop (Matrix.single c d 1) (lop (Matrix.single a b 1) F) =
-      (if b = c then lop (Matrix.single a d 1) F else 0) -
-        (if d = a then lop (Matrix.single c b 1) F else 0) := by
+theorem lop_rel {F : Matrix (Fin n) (Fin n) ℂ → ℂ} (a b c d : Fin n) (hF : F ∈ OmF n)
+    : lop (Matrix.single a b 1) (lop (Matrix.single c d 1) F)
+        - lop (Matrix.single c d 1) (lop (Matrix.single a b 1) F)
+      = (if b = c then lop (Matrix.single a d 1) F else 0)
+        - (if d = a then lop (Matrix.single c b 1) F else 0) := by
   funext z
   by_cases hz : z ∈ OmegaSet n
   · have hc : ContDiffAt ℂ ⊤ F z := hF.1.contDiffAt ((isOpen_OmegaSet n).mem_nhds hz)
     have hs : IsSymmSndFDerivAt ℂ F z := hc.isSymmSndFDerivAt (by simp)
-    have hs' : fderiv ℂ (fderiv ℂ F) z (Matrix.single c d 1 * z) (Matrix.single a b 1 * z) =
-        fderiv ℂ (fderiv ℂ F) z (Matrix.single a b 1 * z) (Matrix.single c d 1 * z) := hs.eq _ _
+    have hs'
+        : fderiv ℂ (fderiv ℂ F) z (Matrix.single c d 1 * z) (Matrix.single a b 1 * z)
+          = fderiv ℂ (fderiv ℂ F) z (Matrix.single a b 1 * z) (Matrix.single c d 1 * z) :=
+      hs.eq _ _
     simp only [Pi.sub_apply]
-    rw [lop_lop hF.1 hz, lop_lop hF.1 hz, hs', ← Matrix.mul_assoc,
-      ← Matrix.mul_assoc, single_mul_single_eq, single_mul_single_eq]
+    rw [lop_lop hF.1 hz, lop_lop hF.1 hz, hs', ← Matrix.mul_assoc, ← Matrix.mul_assoc,
+      single_mul_single_eq, single_mul_single_eq]
     by_cases hbc : b = c <;> by_cases hda : d = a <;> simp [hbc, hda, lop_on hz]
     all_goals ring
   · simp only [Pi.sub_apply, lop_off hz]
     split_ifs <;> simp [lop_off hz]
 
-theorem single_mul_apply' (a b r c : Fin n) (z : Matrix (Fin n) (Fin n) ℂ) :
-    (Matrix.single a b (1 : ℂ) * z) r c = if r = a then z b c else 0 := by
+theorem single_mul_apply' (a b r c : Fin n) (z : Matrix (Fin n) (Fin n) ℂ)
+    : (Matrix.single a b (1 : ℂ) * z) r c = if r = a then z b c else 0 := by
   by_cases h : r = a
   · subst h; simp [Matrix.single_mul_apply_same]
   · simp [h, Matrix.single_mul_apply_of_ne _ _ _ _ _ h]
 
-theorem lead_scale (a : Fin n) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ) {j : ℕ} (hj : j ≤ n) :
-    lead j (z + s • (Matrix.single a a 1 * z)) = (if (a : ℕ) < j then 1 + s else 1) * lead j z := by
+theorem lead_scale (a : Fin n) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ) {j : ℕ} (hj : j ≤ n)
+    : lead j (z + s • (Matrix.single a a 1 * z))
+      = (if (a : ℕ) < j then 1 + s else 1) * lead j z := by
   simp only [lead, hj, dite_true]
-  have key : (z + s • (Matrix.single a a 1 * z)).submatrix (Fin.castLE hj) (Fin.castLE hj) =
-      Matrix.diagonal (fun r : Fin j => if Fin.castLE hj r = a then 1 + s else 1) *
-        z.submatrix (Fin.castLE hj) (Fin.castLE hj) := by
+  have key
+      : (z + s • (Matrix.single a a 1 * z)).submatrix (Fin.castLE hj) (Fin.castLE hj)
+        = Matrix.diagonal (fun r : Fin j => if Fin.castLE hj r = a then 1 + s else 1)
+          * z.submatrix (Fin.castLE hj) (Fin.castLE hj) := by
     ext r c
     rw [Matrix.diagonal_mul]
     simp only [Matrix.submatrix_apply, Matrix.add_apply, Matrix.smul_apply, single_mul_apply',
@@ -146,8 +153,8 @@ theorem lead_scale (a : Fin n) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ) {j : �
     have h2 : (r : ℕ) = a := by simpa using congrArg Fin.val e
     omega
 
-theorem lead_rowop {a b : Fin n} (hab : b < a) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ) (j : ℕ) :
-    lead j (z + s • (Matrix.single a b 1 * z)) = lead j z := by
+theorem lead_rowop {a b : Fin n} (hab : b < a) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ) (j : ℕ)
+    : lead j (z + s • (Matrix.single a b 1 * z)) = lead j z := by
   by_cases hj : j ≤ n
   · simp only [lead, hj, dite_true]
     by_cases h : (a : ℕ) < j
@@ -156,10 +163,11 @@ theorem lead_rowop {a b : Fin n} (hab : b < a) (s : ℂ) (z : Matrix (Fin n) (Fi
         intro e
         have : (a : ℕ) = b := Fin.mk.inj_iff.1 e
         exact absurd (Fin.lt_def.1 hab) (by omega)
-      have key : (z + s • (Matrix.single a b 1 * z)).submatrix (Fin.castLE hj) (Fin.castLE hj) =
-          Matrix.updateRow (z.submatrix (Fin.castLE hj) (Fin.castLE hj)) ⟨a, h⟩
-            ((z.submatrix (Fin.castLE hj) (Fin.castLE hj)) ⟨a, h⟩ +
-              s • (z.submatrix (Fin.castLE hj) (Fin.castLE hj)) ⟨b, hb⟩) := by
+      have key
+          : (z + s • (Matrix.single a b 1 * z)).submatrix (Fin.castLE hj) (Fin.castLE hj)
+            = Matrix.updateRow (z.submatrix (Fin.castLE hj) (Fin.castLE hj)) ⟨a, h⟩
+              ((z.submatrix (Fin.castLE hj) (Fin.castLE hj)) ⟨a, h⟩
+                + s • (z.submatrix (Fin.castLE hj) (Fin.castLE hj)) ⟨b, hb⟩) := by
         ext r c
         by_cases hr : r = ⟨a, h⟩
         · subst hr
@@ -182,25 +190,29 @@ theorem lead_rowop {a b : Fin n} (hab : b < a) (s : ℂ) (z : Matrix (Fin n) (Fi
       simp [single_mul_apply', h3]
   · simp [lead, hj]
 
-theorem prod_zpow_eq {ι : Type*} (s : Finset ι) (f : ι → ℤ) {u : ℂ} (hu : u ≠ 0) :
-    ∏ i ∈ s, u ^ f i = u ^ ∑ i ∈ s, f i := by
+theorem prod_zpow_eq {ι : Type*} (s : Finset ι) (f : ι → ℤ) {u : ℂ} (hu : u ≠ 0)
+    : ∏ i ∈ s, u ^ f i = u ^ ∑ i ∈ s, f i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert i s hi ih => rw [Finset.prod_insert hi, Finset.sum_insert hi, ih, zpow_add₀ hu]
 
-theorem sum_tele (μ : Fin n → ℤ) (a : Fin n) :
-    ∑ i : Fin n, (if a ≤ i then -(μ i - muNext μ i) else 0) = -μ a := by
+theorem sum_tele (μ : Fin n → ℤ) (a : Fin n)
+    : ∑ i : Fin n, (if a ≤ i then -(μ i - muNext μ i) else 0) = - μ a := by
   set m : ℕ → ℤ := fun i => if h : i < n then μ ⟨i, h⟩ else 0 with hmdef
-  have hm : ∀ i : Fin n, (if a ≤ i then -(μ i - muNext μ i) else 0) =
-      (fun i : ℕ => if (a : ℕ) ≤ i then m (i + 1) - m i else 0) (i : ℕ) := by
+  have hm
+      : ∀ i : Fin n,
+        (if a ≤ i then -(μ i - muNext μ i) else 0)
+          = (fun i : ℕ => if (a : ℕ) ≤ i then m (i + 1) - m i else 0) (i : ℕ) := by
     intro i
     simp only [hmdef, muNext, Fin.le_def, i.isLt, dite_true, Fin.eta]
     split_ifs <;> ring
   simp_rw [hm]
   rw [Fin.sum_univ_eq_sum_range (fun i : ℕ => if (a : ℕ) ≤ i then m (i + 1) - m i else 0) n]
-  have key : ∀ N, (a : ℕ) ≤ N →
-      ∑ i ∈ Finset.range N, (if (a : ℕ) ≤ i then m (i + 1) - m i else 0) = m N - m a := by
+  have key
+      : ∀ N,
+        (a : ℕ) ≤ N
+          → ∑ i ∈ Finset.range N, (if (a : ℕ) ≤ i then m (i + 1) - m i else 0) = m N - m a := by
     intro N hN
     induction N, hN using Nat.le_induction with
     | base =>
@@ -212,11 +224,15 @@ theorem sum_tele (μ : Fin n → ℤ) (a : Fin n) :
   rw [key n a.isLt.le]
   simp [hmdef]
 
-theorem PhiM_scale (μ : Fin n → ℤ) (a : Fin n) {s : ℂ} (z : Matrix (Fin n) (Fin n) ℂ) (hs : 1 + s ≠ 0) :
-    PhiM μ (z + s • (Matrix.single a a 1 * z)) = (1 + s) ^ (-μ a) * PhiM μ z := by
+theorem PhiM_scale
+    (μ : Fin n → ℤ) (a : Fin n) {s : ℂ} (z : Matrix (Fin n) (Fin n) ℂ) (hs : 1 + s ≠ 0)
+    : PhiM μ (z + s • (Matrix.single a a 1 * z)) = (1 + s) ^ (- μ a) * PhiM μ z := by
   unfold PhiM
-  have key : ∀ i : Fin n, lead ((i : ℕ) + 1) (z + s • (Matrix.single a a 1 * z)) ^ (-(μ i - muNext μ i)) =
-      (1 + s) ^ (if a ≤ i then -(μ i - muNext μ i) else 0) * lead ((i : ℕ) + 1) z ^ (-(μ i - muNext μ i)) := by
+  have key
+      : ∀ i : Fin n,
+        lead ((i : ℕ) + 1) (z + s • (Matrix.single a a 1 * z)) ^ (-(μ i - muNext μ i))
+          = (1 + s) ^ (if a ≤ i then -(μ i - muNext μ i) else 0)
+            * lead ((i : ℕ) + 1) z ^ (-(μ i - muNext μ i)) := by
     intro i
     rw [lead_scale a s z (i.isLt : (i : ℕ) + 1 ≤ n)]
     by_cases h : a ≤ i
@@ -228,20 +244,21 @@ theorem PhiM_scale (μ : Fin n → ℤ) (a : Fin n) {s : ℂ} (z : Matrix (Fin n
   simp_rw [key]
   rw [Finset.prod_mul_distrib, prod_zpow_eq _ _ hs, sum_tele]
 
-theorem PhiM_rowop (μ : Fin n → ℤ) {a b : Fin n} (hab : b < a) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ) :
-    PhiM μ (z + s • (Matrix.single a b 1 * z)) = PhiM μ z := by
+theorem PhiM_rowop
+    (μ : Fin n → ℤ) {a b : Fin n} (hab : b < a) (s : ℂ) (z : Matrix (Fin n) (Fin n) ℂ)
+    : PhiM μ (z + s • (Matrix.single a b 1 * z)) = PhiM μ z := by
   simp only [PhiM, lead_rowop hab]
 
-theorem PhiO_on {μ : Fin n → ℤ} {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n) :
-    PhiO μ z = PhiM μ z :=
+theorem PhiO_on {μ : Fin n → ℤ} {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    : PhiO μ z = PhiM μ z :=
   Set.indicator_of_mem hz _
 
-theorem PhiO_off {μ : Fin n → ℤ} {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∉ OmegaSet n) :
-    PhiO μ z = 0 :=
+theorem PhiO_off {μ : Fin n → ℤ} {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∉ OmegaSet n)
+    : PhiO μ z = 0 :=
   Set.indicator_of_notMem hz _
 
-theorem contDiffAt_lead_zpow (j : ℕ) (k : ℤ) {z : Matrix (Fin n) (Fin n) ℂ} (h : lead j z ≠ 0) :
-    ContDiffAt ℂ ⊤ (fun z : Matrix (Fin n) (Fin n) ℂ => lead j z ^ k) z := by
+theorem contDiffAt_lead_zpow (j : ℕ) (k : ℤ) {z : Matrix (Fin n) (Fin n) ℂ} (h : lead j z ≠ 0)
+    : ContDiffAt ℂ ⊤ (fun z : Matrix (Fin n) (Fin n) ℂ => lead j z ^ k) z := by
   have hl : ContDiffAt ℂ ⊤ (lead j : Matrix (Fin n) (Fin n) ℂ → ℂ) z := (contDiff_lead j).contDiffAt
   obtain ⟨m, rfl | rfl⟩ := k.eq_nat_or_neg
   · simpa only [zpow_natCast] using hl.pow m
@@ -260,28 +277,30 @@ theorem contDiffOn_PhiM (μ : Fin n → ℤ) : ContDiffOn ℂ ⊤ (PhiM μ) (Ome
 theorem PhiO_mem (μ : Fin n → ℤ) : PhiO μ ∈ OmF n :=
   ⟨(contDiffOn_PhiM μ).congr fun _ hz => PhiO_on hz, fun _ hz => PhiO_off hz⟩
 
-theorem fderiv_dir_eq {F : Matrix (Fin n) (Fin n) ℂ → ℂ} {z v : Matrix (Fin n) (Fin n) ℂ}
-    {g : ℂ → ℂ} {c : ℂ} (hF : DifferentiableAt ℂ F z) (hg : HasDerivAt g c 0)
-    (he : ∀ᶠ s in nhds (0 : ℂ), F (z + s • v) = g s) : fderiv ℂ F z v = c := by
+theorem fderiv_dir_eq
+    {F : Matrix (Fin n) (Fin n) ℂ → ℂ} {z v : Matrix (Fin n) (Fin n) ℂ} {g : ℂ → ℂ} {c : ℂ}
+    (hF : DifferentiableAt ℂ F z) (hg : HasDerivAt g c 0)
+    (he : ∀ᶠ s in nhds (0 : ℂ), F (z + s • v) = g s)
+    : fderiv ℂ F z v = c := by
   have h1 : HasDerivAt (fun s : ℂ => F (z + s • v)) (fderiv ℂ F z v) 0 :=
     hF.hasFDerivAt.hasLineDerivAt v
   exact h1.unique (hg.congr_of_eventuallyEq he)
 
-theorem PhiO_differentiableAt (μ : Fin n → ℤ) {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n) :
-    DifferentiableAt ℂ (PhiO μ) z :=
+theorem PhiO_differentiableAt (μ : Fin n → ℤ) {z : Matrix (Fin n) (Fin n) ℂ} (hz : z ∈ OmegaSet n)
+    : DifferentiableAt ℂ (PhiO μ) z :=
   ((PhiO_mem μ).1.contDiffAt ((isOpen_OmegaSet n).mem_nhds hz)).differentiableAt (by simp)
 
-theorem PhiO_weight (μ : Fin n → ℤ) (a : Fin n) :
-    lop (Matrix.single a a 1) (PhiO μ) = ((μ a : ℤ) : ℂ) • PhiO μ := by
+theorem PhiO_weight (μ : Fin n → ℤ) (a : Fin n)
+    : lop (Matrix.single a a 1) (PhiO μ) = ((μ a : ℤ) : ℂ) • PhiO μ := by
   funext z
   by_cases hz : z ∈ OmegaSet n
-  · have hg : HasDerivAt (fun s : ℂ => (1 + s) ^ (-μ a) * PhiM μ z)
-        (-(μ a : ℂ) * PhiM μ z) 0 := by
-      have h0 := hasDerivAt_zpow (𝕜 := ℂ) (-μ a) (1 + 0) (Or.inl (by simp))
+  · have hg : HasDerivAt (fun s : ℂ => (1 + s) ^ (- μ a) * PhiM μ z) (-(μ a : ℂ) * PhiM μ z) 0 := by
+      have h0 := hasDerivAt_zpow (𝕜 := ℂ) (- μ a) (1 + 0) (Or.inl (by simp))
       have h1 := (h0.comp_const_add 1 0).mul_const (PhiM μ z)
       simpa using h1
-    have he : ∀ᶠ s in nhds (0 : ℂ), PhiO μ (z + s • (Matrix.single a a 1 * z)) =
-        (1 + s) ^ (-μ a) * PhiM μ z := by
+    have he
+        : ∀ᶠ s in nhds (0 : ℂ), PhiO μ (z + s • (Matrix.single a a 1 * z)) =
+          (1 + s) ^ (-μ a) * PhiM μ z := by
       have h1 : ∀ᶠ s in nhds (0 : ℂ), 1 + s ≠ 0 := by
         have hc : ContinuousAt (fun s : ℂ => 1 + s) 0 := by fun_prop
         exact hc.eventually_ne (by simp)
@@ -295,12 +314,13 @@ theorem PhiO_weight (μ : Fin n → ℤ) (a : Fin n) :
     simp
   · simp [lop_off hz, PhiO_off hz]
 
-theorem PhiO_lower (μ : Fin n → ℤ) {a b : Fin n} (hab : b < a) :
-    lop (Matrix.single a b 1) (PhiO μ) = 0 := by
+theorem PhiO_lower (μ : Fin n → ℤ) {a b : Fin n} (hab : b < a)
+    : lop (Matrix.single a b 1) (PhiO μ) = 0 := by
   funext z
   by_cases hz : z ∈ OmegaSet n
-  · have he : ∀ᶠ s in nhds (0 : ℂ), PhiO μ (z + s • (Matrix.single a b 1 * z)) =
-        (fun _ : ℂ => PhiM μ z) s := by
+  · have he
+        : ∀ᶠ s in nhds (0 : ℂ), PhiO μ (z + s • (Matrix.single a b 1 * z)) =
+          (fun _ : ℂ => PhiM μ z) s := by
       refine Filter.Eventually.of_forall fun s => ?_
       have hmem : z + s • (Matrix.single a b 1 * z) ∈ OmegaSet n := by
         intro i
@@ -313,6 +333,11 @@ theorem PhiO_lower (μ : Fin n → ℤ) {a b : Fin n} (hab : b < a) :
 
 end GlobalTheory.CompanionTheory.HolOm
 
-theorem GlobalTheory.CompanionTheory.HolOm.holFacts : PositivityTheory.RgDs.K.HolFacts := fun _ μ =>
-  ⟨fun _ _ hF => GlobalTheory.CompanionTheory.HolOm.lop_mem hF, fun _ a b c d hF => GlobalTheory.CompanionTheory.HolOm.lop_rel a b c d hF,
-    GlobalTheory.CompanionTheory.HolOm.PhiO_mem μ, GlobalTheory.CompanionTheory.HolOm.PhiO_weight μ, fun _ _ hab => GlobalTheory.CompanionTheory.HolOm.PhiO_lower μ hab⟩
+theorem GlobalTheory.CompanionTheory.HolOm.holFacts
+    : PositivityTheory.RgDs.K.HolFacts := fun _ μ => ⟨
+  fun _ _ hF => GlobalTheory.CompanionTheory.HolOm.lop_mem hF,
+  fun _ a b c d hF => GlobalTheory.CompanionTheory.HolOm.lop_rel a b c d hF,
+  GlobalTheory.CompanionTheory.HolOm.PhiO_mem μ,
+  GlobalTheory.CompanionTheory.HolOm.PhiO_weight μ,
+  fun _ _ hab => GlobalTheory.CompanionTheory.HolOm.PhiO_lower μ hab
+⟩

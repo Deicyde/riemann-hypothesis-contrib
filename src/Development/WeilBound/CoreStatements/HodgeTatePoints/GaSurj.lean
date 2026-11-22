@@ -14,9 +14,11 @@ open Module NumberField GlobalTheory.CompanionTheory.Ar.HT TensorProduct
 
 section
 
-variable {A K : Type} [CommRing A] [Field K] [Algebra A K] {E : Type} [Field E] [NumberField E]
-  {c : E ≃+* E} {p R N : ℕ}
-  {Ω : Type} [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω]
+variable
+  {A K : Type} [CommRing A] [Field K] [Algebra A K]
+  {E : Type} [Field E] [NumberField E]
+  {c : E ≃+* E} {p R N : ℕ} {Ω : Type}
+  [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω]
   (D : HTChart A K c p R N Ω)
 
 theorem h_mem_om' (x : Fin N → 𝓞 E) : D.h x ∈ D.om' :=
@@ -38,9 +40,10 @@ theorem q_smul (σ : E →+* K) (a : A) (x : Fin N → A) : D.q σ (a • x) = a
   unfold HTChart.q
   simp only [Pi.smul_apply, smul_eq_mul, mul_smul, Finset.smul_sum]
 
-private theorem toZMod_cycZ_eq_one_of_cycMod_eq_one (σ : E →+* K) (hσ : ∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range)
-    (z : Fin N → 𝓞 E) :
-    ∃ x : Fin N → A, ∃ y' ∈ D.om, eigProj D.ρΩ σ (D.h z) = D.q σ x + ((p : A) ^ R) • eigProj D.ρΩ σ y' := by
+private theorem toZMod_cycZ_eq_one_of_cycMod_eq_one
+    (σ : E →+* K) (hσ : ∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range) (z : Fin N → 𝓞 E)
+    : ∃ x : Fin N → A, ∃ y' ∈ D.om,
+      eigProj D.ρΩ σ (D.h z) = D.q σ x + ((p : A) ^ R) • eigProj D.ρΩ σ y' := by
   choose y hy he using fun i => D.h_lin (z i) (Pi.single i 1)
   choose b hb using fun i => hσ (z i)
   have hz : z = ∑ i, z i • Pi.single i (1 : 𝓞 E) := by
@@ -66,19 +69,22 @@ private theorem toZMod_cycZ_eq_one_of_cycMod_eq_one (σ : E →+* K) (hσ : ∀ 
   push_cast
   rfl
 
-theorem exists_q_add (σ : E →+* K) (hσ : ∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range)
-    {y : Ω} (hy : y ∈ D.om') :
-    ∃ x : Fin N → A, ∃ y' ∈ D.om, eigProj D.ρΩ σ y = D.q σ x + ((p : A) ^ R) • eigProj D.ρΩ σ y' := by
+theorem exists_q_add
+    (σ : E →+* K) (hσ : ∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range) {y : Ω} (hy : y ∈ D.om')
+    : ∃ x : Fin N → A, ∃ y' ∈ D.om,
+      eigProj D.ρΩ σ y = D.q σ x + ((p : A) ^ R) • eigProj D.ρΩ σ y' := by
   obtain ⟨s, hs, t, ht, rfl⟩ := Submodule.mem_sup.mp hy
   obtain ⟨y0, hy0, rfl⟩ := Submodule.mem_map.mp ht
   clear hy ht
-  have key : ∃ x : Fin N → A, ∃ y' ∈ D.om,
-      eigProj D.ρΩ σ s = D.q σ x + ((p : A) ^ R) • eigProj D.ρΩ σ y' := by
+  have key
+      : ∃ x : Fin N → A, ∃ y' ∈ D.om,
+        eigProj D.ρΩ σ s = D.q σ x + ((p : A) ^ R) • eigProj D.ρΩ σ y' := by
     induction hs using Submodule.span_induction with
     | mem v hv =>
       obtain ⟨z, rfl⟩ := hv
       exact toZMod_cycZ_eq_one_of_cycMod_eq_one D σ hσ z
-    | zero => exact ⟨0, 0, D.om.zero_mem, by simp [HTChart.q]⟩
+    | zero =>
+      exact ⟨0, 0, D.om.zero_mem, by simp [HTChart.q]⟩
     | add u v _ _ hu hv =>
       obtain ⟨x1, y1, hy1, e1⟩ := hu
       obtain ⟨x2, y2, hy2, e2⟩ := hv
@@ -88,17 +94,28 @@ theorem exists_q_add (σ : E →+* K) (hσ : ∀ a : 𝓞 E, σ (a : E) ∈ (alg
     | smul a v _ hv =>
       obtain ⟨x1, y1, hy1, e1⟩ := hv
       refine ⟨a • x1, a • y1, D.om.smul_mem a hy1, ?_⟩
-      rw [LinearMap.map_smul_of_tower, e1, q_smul, LinearMap.map_smul_of_tower, smul_add, smul_comm a]
+      rw [LinearMap.map_smul_of_tower, e1, q_smul, LinearMap.map_smul_of_tower, smul_add,
+        smul_comm a]
   obtain ⟨x, y', hy', e⟩ := key
-  have ht0 : eigProj D.ρΩ σ (((p : A) ^ R • LinearMap.id : Ω →ₗ[A] Ω) y0)
-      = ((p : A) ^ R) • eigProj D.ρΩ σ y0 := by
+  have ht0
+      : eigProj D.ρΩ σ (((p : A) ^ R • LinearMap.id : Ω →ₗ[A] Ω) y0)
+        = ((p : A) ^ R) • eigProj D.ρΩ σ y0 := by
     simp [LinearMap.map_smul_of_tower]
   refine ⟨x, y' + y0, D.om.add_mem hy' hy0, ?_⟩
   rw [map_add (f := _), e, ht0, map_add (f := _), smul_add, add_assoc]
 
 end
 
-theorem q_surj : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZero K] (hAK : Function.Injective (algebraMap A K)) (E : Type) [Field E] [NumberField E] (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Ω : Type) [AddCommGroup Ω] [Module K Ω] [Module A Ω] [IsScalarTower A K Ω] (D : HTChart A K c p R N Ω) (κ : A) (σ : E →+* K) (m : ℕ), (∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range) → κ * (p : A) ^ m ∣ (p : A) ^ R → (∀ x ∈ D.om, κ • x ∈ D.om') → (∀ x, D.q σ x ∈ D.omHT σ) ∧ (D.omHT σ).FG ∧ ∀ y ∈ D.omHT σ, ∃ x : Fin N → A, ∃ y' ∈ D.omHT σ, y = D.q σ x + ((p : A) ^ m) • y' := by
+theorem q_surj
+    : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZero K]
+        (hAK : Function.Injective (algebraMap A K)) (E : Type) [Field E] [NumberField E]
+        (c : E ≃+* E) (hc : ∀ x, c (c x) = x) (p R N : ℕ) [Fact p.Prime] (Ω : Type) [AddCommGroup Ω]
+        [Module K Ω] [Module A Ω] [IsScalarTower A K Ω] (D : HTChart A K c p R N Ω) (κ : A)
+        (σ : E →+* K) (m : ℕ),
+      (∀ a : 𝓞 E, σ (a : E) ∈ (algebraMap A K).range) → κ * (p : A) ^ m ∣ (p : A) ^ R
+        → (∀ x ∈ D.om, κ • x ∈ D.om')
+        → (∀ x, D.q σ x ∈ D.omHT σ) ∧ (D.omHT σ).FG
+          ∧ ∀ y ∈ D.omHT σ, ∃ x : Fin N → A, ∃ y' ∈ D.omHT σ, y = D.q σ x + ((p : A) ^ m) • y' := by
   intro A K _ _ _ _ hAK E _ _ c hc p R N _ Ω _ _ _ _ D κ σ m hσ hdiv hκ
   classical
   refine ⟨fun x => q_mem D σ x, ?_, ?_⟩
@@ -119,7 +136,8 @@ theorem q_surj : ∀ (A K : Type) [CommRing A] [Field K] [Algebra A K] [CharZero
       induction hz using Submodule.span_induction with
       | mem w hw =>
         exact Submodule.subset_span (by simp only [Finset.coe_image]; exact ⟨w, hw, rfl⟩)
-      | zero => simp
+      | zero =>
+        simp
       | add u v _ _ hu hv =>
         rw [map_add (f := _)]
         exact Submodule.add_mem _ hu hv

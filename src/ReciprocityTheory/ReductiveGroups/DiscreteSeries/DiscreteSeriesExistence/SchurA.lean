@@ -15,12 +15,15 @@ variable {n : ℕ}
 
 section Alg
 
-variable {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M] {ε : Fin n → Bool}
-  {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M}
+variable
+  {M : Type*} [NormedAddCommGroup M] [InnerProductSpace ℂ M]
+  {ε : Fin n → Bool} {E : Fin n → Fin n → Module.End ℂ M} {V : Submodule ℂ M}
 
-theorem schA_genSub_le {Λ : Fin n → ℝ} (hV : IsKIrrHW ε E Λ V) (X : Submodule ℂ M)
-    (hX : ∀ a b, ∀ x ∈ X, E a b x ∈ X) {x : M} (hxV : x ∈ V) (hxX : x ∈ X) (hx0 : x ≠ 0) :
-    genSub E V ≤ X := by
+theorem schA_genSub_le
+    {Λ : Fin n → ℝ} (hV : IsKIrrHW ε E Λ V)
+    (X : Submodule ℂ M) (hX : ∀ a b, ∀ x ∈ X, E a b x ∈ X)
+    {x : M} (hxV : x ∈ V) (hxX : x ∈ X) (hx0 : x ≠ 0)
+    : genSub E V ≤ X := by
   obtain ⟨-, hVk, hirr, -⟩ := hV
   have hst : IsKStableSub ε E (V ⊓ X) := fun a b hab v hv => ⟨hVk a b hab v hv.1, hX a b v hv.2⟩
   have hVX : V ≤ X := by
@@ -32,12 +35,14 @@ theorem schA_genSub_le {Λ : Fin n → ℝ} (hV : IsKIrrHW ε E Λ V) (X : Submo
   unfold genSub
   exact sInf_le ⟨hVX, hX⟩
 
-theorem schA_riesz (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimensional ℂ V)
-    (hVk : IsKStableSub ε E V) (T : Submodule ℂ M) (hT : T ≤ genSub E V)
-    (hTk : IsKStableSub ε E T) (f : M →ₗ[ℂ] ℂ) (μ : Fin n → ℝ)
-    (hfd : ∀ a, ∀ y ∈ T, f (E a a y) = (μ a : ℂ) * f y)
-    (hfl : ∀ a b, a < b → ε a = ε b → ∀ y ∈ T, f (E b a y) = 0) {y₀ : M} (hy₀ : y₀ ∈ T) :
-    ∃ u ∈ T, IsKHWVec ε E μ u ∧ inner ℂ u y₀ = f y₀ ∧ ∀ v ∈ T ⊓ V, inner ℂ u v = f v := by
+theorem schA_riesz
+    (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimensional ℂ V)
+    (hVk : IsKStableSub ε E V)
+    (T : Submodule ℂ M) (hT : T ≤ genSub E V) (hTk : IsKStableSub ε E T)
+    (f : M →ₗ[ℂ] ℂ) (μ : Fin n → ℝ) (hfd : ∀ a, ∀ y ∈ T, f (E a a y) = (μ a : ℂ) * f y)
+    (hfl : ∀ a b, a < b → ε a = ε b → ∀ y ∈ T, f (E b a y) = 0)
+    {y₀ : M} (hy₀ : y₀ ∈ T)
+    : ∃ u ∈ T, IsKHWVec ε E μ u ∧ inner ℂ u y₀ = f y₀ ∧ ∀ v ∈ T ⊓ V, inner ℂ u v = f v := by
   obtain ⟨m, hm⟩ := exists_layer_of_mem_genSub hE hVk (hT hy₀)
   have hVle : ∀ k, V ≤ layer ε E V k := by
     intro k
@@ -65,9 +70,10 @@ theorem schA_riesz (hE : IsGlRep E) (hU : IsInfUnitary ε E) (hVf : FiniteDimens
     have hsa : adjSign ε a a = 1 := if_pos rfl
     have hmem : E a a u' - (μ a : ℂ) • (u' : M) ∈ F :=
       F.sub_mem (hFk a a rfl _ u'.2) (F.smul_mem _ u'.2)
-    have h0 := hzero _ hmem (fun y hy => by
-      rw [inner_sub_left, inner_smul_left, hU a a, hsa, one_mul, hrep _ (hFk a a rfl y hy),
-        hrep y hy, hfd a y hy.1, Complex.conj_ofReal, sub_self])
+    have h0 :=
+      hzero _ hmem (fun y hy => by
+        rw [inner_sub_left, inner_smul_left, hU a a, hsa, one_mul, hrep _ (hFk a a rfl y hy),
+          hrep y hy, hfd a y hy.1, Complex.conj_ofReal, sub_self])
     exact sub_eq_zero.mp h0
   · intro a b hab hεab
     have hmem : E a b u' ∈ F := hFk a b hεab _ u'.2

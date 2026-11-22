@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Statements.PlaceShiftStatements.C
 
 set_option autoImplicit false
 noncomputable section
-open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open CategoryTheory CategoryTheory.Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  AlgebraicGeometry
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open ReciprocityTheory.ChartRestriction.G.Out (RingAct)
 open scoped CategoryTheory.Obj NumberField
 attribute [local instance] Over.cartesianMonoidalCategory
@@ -18,9 +20,10 @@ open GlobalTheory.IwLevel
 
 namespace GlobalTheory
 
-theorem localRing_finite_ideals_of_maximalIdeal_principal_nilpotent :
-    ∀ (S : Type) [CommRing S] [IsLocalRing S], (IsLocalRing.maximalIdeal S).IsPrincipal →
-    IsNilpotent (IsLocalRing.maximalIdeal S) → (Set.univ : Set (Ideal S)).Finite := by
+theorem localRing_finite_ideals_of_maximalIdeal_principal_nilpotent
+    : ∀ (S : Type) [CommRing S] [IsLocalRing S],
+      (IsLocalRing.maximalIdeal S).IsPrincipal → IsNilpotent (IsLocalRing.maximalIdeal S)
+        → (Set.univ : Set (Ideal S)).Finite := by
   intro S _ _ hprin hnil
   classical
   obtain ⟨x, hx⟩ := hprin.principal
@@ -35,8 +38,7 @@ theorem localRing_finite_ideals_of_maximalIdeal_principal_nilpotent :
   intro I _
   by_cases hI : I = ⊥
   · exact ⟨M, Set.mem_Iic.mpr le_rfl, by simp only [hM', hI]⟩
-  · have hnot : ¬ I ≤ m ^ M := by
-      rw [hM']; exact fun h => hI (le_bot_iff.mp h)
+  · have hnot : ¬ I ≤ m ^ M := by rw [hM']; exact fun h => hI (le_bot_iff.mp h)
     have hex : ∃ k, ¬ I ≤ m ^ k := ⟨M, hnot⟩
     have hk := Nat.find_spec hex
     have hkM : Nat.find hex ≤ M := Nat.find_min' hex hnot

@@ -13,22 +13,26 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.LowerBoundFree
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.Inter
 
 namespace FlagRatioTrdeg
 
-theorem trdeg_adjoin_eq {F E ι : Type} [Field F] [Field E] [Algebra F E] {x : ι → E}
-    (hx : AlgebraicIndependent F x) :
-    Algebra.trdeg F (IntermediateField.adjoin F (Set.range x)) = Cardinal.mk ι := by
+theorem trdeg_adjoin_eq
+    {F E ι : Type} [Field F] [Field E] [Algebra F E] {x : ι → E} (hx : AlgebraicIndependent F x)
+    : Algebra.trdeg F (IntermediateField.adjoin F (Set.range x)) = Cardinal.mk ι := by
   rw [← hx.aevalEquivField.trdeg_eq]
   have : Algebra.IsAlgebraic (MvPolynomial ι F) (FractionRing (MvPolynomial ι F)) :=
     IsLocalization.isAlgebraic _ (nonZeroDivisors _)
   exact ((IsTranscendenceBasis.mvPolynomial ι F).algebraMap_comp
     (A := FractionRing (MvPolynomial ι F))).cardinalMk_eq_trdeg.symm
 
-theorem ratio_indep (F : Type) [Field F] {ι E : Type} [Field E] [Algebra F E] [DecidableEq ι] {y : ι → E}
-    (hy : AlgebraicIndependent F y) (δ : ι → ι) (hδ : ∀ i, δ (δ i) = δ i) :
-    AlgebraicIndependent F (fun i => if δ i = i then y i else y i / y (δ i)) := by
+theorem ratio_indep
+    (F : Type) [Field F]
+    {ι E : Type} [Field E] [Algebra F E] [DecidableEq ι]
+    {y : ι → E} (hy : AlgebraicIndependent F y)
+    (δ : ι → ι) (hδ : ∀ i, δ (δ i) = δ i)
+    : AlgebraicIndependent F (fun i => if δ i = i then y i else y i / y (δ i)) := by
   let Kp := FractionRing (MvPolynomial ι F)
   let Xk : ι → Kp := fun i => algebraMap (MvPolynomial ι F) Kp (X i)
   have hXk : ∀ i, Xk i ≠ 0 := fun i => by
@@ -54,9 +58,10 @@ theorem ratio_indep (F : Type) [Field F] {ι E : Type} [Field E] [Algebra F E] [
     have : ⇑(aeval d) ∘ c = Xk := funext hdc
     rw [this]
     exact hXind
-  let χ : Kp →ₐ[F] Kp := IsFractionRing.liftAlgHom
-    (g := (IsScalarTower.toAlgHom F (MvPolynomial ι F) Kp).comp (aeval c))
-    ((IsFractionRing.injective (MvPolynomial ι F) Kp).comp (algebraicIndependent_iff_injective_aeval.1 hc))
+  let χ : Kp →ₐ[F] Kp :=
+    IsFractionRing.liftAlgHom (g := (IsScalarTower.toAlgHom F (MvPolynomial ι F) Kp).comp (aeval c))
+      ((IsFractionRing.injective (MvPolynomial ι F) Kp).comp
+        (algebraicIndependent_iff_injective_aeval.1 hc))
   have hχX : ∀ j, χ (Xk j) = algebraMap (MvPolynomial ι F) Kp (c j) := fun j => by
     simp [χ, Xk, IsFractionRing.lift_algebraMap]
   have hχ : ∀ i, χ (d i) = Xk i := by
@@ -74,9 +79,9 @@ theorem ratio_indep (F : Type) [Field F] {ι E : Type} [Field E] [Algebra F E] [
     have : ⇑χ ∘ d = Xk := funext hχ
     rw [this]
     exact hXind
-  let ψ : Kp →ₐ[F] E := IsFractionRing.liftAlgHom (g := aeval y) (algebraicIndependent_iff_injective_aeval.1 hy)
-  have hψX : ∀ j, ψ (Xk j) = y j := fun j => by
-    simp [ψ, Xk, IsFractionRing.lift_algebraMap]
+  let ψ : Kp →ₐ[F] E :=
+    IsFractionRing.liftAlgHom (g := aeval y) (algebraicIndependent_iff_injective_aeval.1 hy)
+  have hψX : ∀ j, ψ (Xk j) = y j := fun j => by simp [ψ, Xk, IsFractionRing.lift_algebraMap]
   have hψ : ⇑ψ ∘ d = fun i => if δ i = i then y i else y i / y (δ i) := by
     funext i
     by_cases h : δ i = i
@@ -85,42 +90,47 @@ theorem ratio_indep (F : Type) [Field F] {ι E : Type} [Field E] [Algebra F E] [
   rw [← hψ]
   exact hd.map' (ψ : Kp →+* E).injective
 
-def genMatPol (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) :
-    Matrix (Fin n) (Fin n) (MvPolynomial (Ψ × Fin n × Fin n) F) :=
+def genMatPol (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ)
+    : Matrix (Fin n) (Fin n) (MvPolynomial (Ψ × Fin n × Fin n) F) :=
   Matrix.of fun a b => X (τ, a, b)
 
-theorem pivotMinor_map {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) {m : ℕ}
-    (M : Matrix (Fin m) (Fin m) R) (a : Fin (m - 1)) (b : Fin m) :
-    pivotMinor (M.map f) a b = f (pivotMinor M a b) := by
+theorem pivotMinor_map
+    {R S : Type} [CommRing R] [CommRing S]
+    (f : R →+* S)
+    {m : ℕ} (M : Matrix (Fin m) (Fin m) R) (a : Fin (m - 1)) (b : Fin m)
+    : pivotMinor (M.map f) a b = f (pivotMinor M a b) := by
   unfold pivotMinor
   rw [RingHom.map_det]
   rfl
 
-theorem genMatFr_eq (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) :
-    genMatFr F Ψ n τ = (genMatPol F Ψ n τ).map (algebraMap _ (GenFrac F Ψ n)) := by
+theorem genMatFr_eq (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ)
+    : genMatFr F Ψ n τ = (genMatPol F Ψ n τ).map (algebraMap _ (GenFrac F Ψ n)) := by
   ext a b
   rfl
 
-theorem genMatPol_eq (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) :
-    genMatPol F Ψ n τ = (genMat F n).map (rename fun p : Fin n × Fin n => (τ, p)).toRingHom := by
+theorem genMatPol_eq (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ)
+    : genMatPol F Ψ n τ = (genMat F n).map (rename fun p : Fin n × Fin n => (τ, p)).toRingHom := by
   ext a b
   simp [genMatPol, genMat]
 
 abbrev PivotIdxLe (Ψ : Type) (n : ℕ) : Type := Ψ × Σ a : Fin (n - 1), {b : Fin n // (a : ℕ) ≤ b}
 
-theorem embed_inj (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) :
-    Function.Injective ((IsScalarTower.toAlgHom F (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n)).comp
-      (rename fun p : Fin n × Fin n => (τ, p))) := fun _ _ h =>
+theorem embed_inj (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ)
+    : Function.Injective
+      ((IsScalarTower.toAlgHom F (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n)).comp
+        (rename fun p : Fin n × Fin n => (τ, p))) := fun _ _ h =>
   rename_injective _ (Prod.mk_right_injective τ)
     (IsFractionRing.injective (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n) h)
 
-def embed (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) :
-    FractionRing (MvPolynomial (Fin n × Fin n) F) →ₐ[F] GenFrac F Ψ n :=
+def embed (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ)
+    : FractionRing (MvPolynomial (Fin n × Fin n) F) →ₐ[F] GenFrac F Ψ n :=
   IsFractionRing.liftAlgHom (embed_inj F Ψ n τ)
 
-theorem embed_algebraMap (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) (p : MvPolynomial (Fin n × Fin n) F) :
-    embed F Ψ n τ (algebraMap _ _ p) =
-      algebraMap (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n) (rename (fun q => (τ, q)) p) := by
+theorem embed_algebraMap
+    (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) (p : MvPolynomial (Fin n × Fin n) F)
+    : embed F Ψ n τ (algebraMap _ _ p)
+      = algebraMap (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n)
+        (rename (fun q => (τ, q)) p) := by
   show IsFractionRing.lift (embed_inj F Ψ n τ) _ = _
   rw [IsFractionRing.lift_algebraMap]
   rfl
@@ -128,24 +138,33 @@ theorem embed_algebraMap (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) (p
 def specAll (F : Type) [Field F] (Ψ : Type) (n : ℕ) (q : Ψ × Fin n × Fin n) : GenFrac F Ψ n :=
   embed F Ψ n q.1 (FlagPivotAlgIndep.spec F n q.2)
 
-theorem specAll_pivotMinor (F : Type) [Field F] (Ψ : Type) (n : ℕ) (τ : Ψ) (a : Fin (n - 1)) (b : Fin n)
-    (hab : (a : ℕ) ≤ b) :
-    aeval (specAll F Ψ n) (pivotMinor (genMatPol F Ψ n τ) a b) =
-      algebraMap (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n) (X (τ, Fin.castLE (Nat.sub_le n 1) a, b)) := by
+theorem specAll_pivotMinor
+    (F : Type) [Field F]
+    (Ψ : Type)
+    (n : ℕ)
+    (τ : Ψ)
+    (a : Fin (n - 1)) (b : Fin n) (hab : (a : ℕ) ≤ b)
+    : aeval (specAll F Ψ n) (pivotMinor (genMatPol F Ψ n τ) a b)
+      = algebraMap (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n)
+        (X (τ, Fin.castLE (Nat.sub_le n 1) a, b)) := by
   rw [genMatPol_eq, pivotMinor_map, AlgHom.toRingHom_eq_coe, RingHom.coe_coe, aeval_rename]
-  have e : specAll F Ψ n ∘ (fun p : Fin n × Fin n => (τ, p)) = fun p => embed F Ψ n τ (FlagPivotAlgIndep.spec F n p) :=
+  have e
+      : specAll F Ψ n ∘ (fun p : Fin n × Fin n => (τ, p))
+        = fun p => embed F Ψ n τ (FlagPivotAlgIndep.spec F n p) :=
     rfl
   rw [e, ← comp_aeval_apply, FlagPivotAlgIndep.spec_pivotMinor F n a b hab]
   rw [FlagPivotAlgIndep.genFrac, embed_algebraMap, rename_X]
 
-theorem pol_indep (F : Type) [Field F] (Ψ : Type) (n : ℕ) :
-    AlgebraicIndependent F (fun q : PivotIdxLe Ψ n => pivotMinor (genMatPol F Ψ n q.1) q.2.1 q.2.2.1) := by
+theorem pol_indep (F : Type) [Field F] (Ψ : Type) (n : ℕ)
+    : AlgebraicIndependent F
+      (fun q : PivotIdxLe Ψ n => pivotMinor (genMatPol F Ψ n q.1) q.2.1 q.2.2.1) := by
   refine AlgebraicIndependent.of_comp (aeval (specAll F Ψ n)) ?_
-  have hfun : ⇑(aeval (specAll F Ψ n)) ∘
-        (fun q : PivotIdxLe Ψ n => pivotMinor (genMatPol F Ψ n q.1) q.2.1 q.2.2.1) =
-      ⇑(IsScalarTower.toAlgHom F (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n)) ∘
-        ((X : Ψ × Fin n × Fin n → MvPolynomial (Ψ × Fin n × Fin n) F) ∘
-          fun q : PivotIdxLe Ψ n => (q.1, Fin.castLE (Nat.sub_le n 1) q.2.1, q.2.2.1)) := by
+  have hfun
+      : ⇑(aeval (specAll F Ψ n))
+          ∘ (fun q : PivotIdxLe Ψ n => pivotMinor (genMatPol F Ψ n q.1) q.2.1 q.2.2.1)
+        = ⇑(IsScalarTower.toAlgHom F (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n))
+          ∘ ((X : Ψ × Fin n × Fin n → MvPolynomial (Ψ × Fin n × Fin n) F)
+            ∘ fun q : PivotIdxLe Ψ n => (q.1, Fin.castLE (Nat.sub_le n 1) q.2.1, q.2.2.1)) := by
     funext q
     exact specAll_pivotMinor F Ψ n q.1 q.2.1 q.2.2.1 q.2.2.2
   rw [hfun]
@@ -158,30 +177,39 @@ theorem pol_indep (F : Type) [Field F] (Ψ : Type) (n : ℕ) :
   subst h0 h1' h2
   rfl
 
-theorem pivot_indep (F : Type) [Field F] (Ψ : Type) (n : ℕ) :
-    AlgebraicIndependent F (fun q : PivotIdxLe Ψ n => pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1) := by
-  have h := (pol_indep F Ψ n).map'
-    (f := IsScalarTower.toAlgHom F (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n))
-    (IsFractionRing.injective _ _)
+theorem pivot_indep (F : Type) [Field F] (Ψ : Type) (n : ℕ)
+    : AlgebraicIndependent F
+      (fun q : PivotIdxLe Ψ n => pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1) := by
+  have h :=
+    (pol_indep F Ψ n).map'
+      (f := IsScalarTower.toAlgHom F (MvPolynomial (Ψ × Fin n × Fin n) F) (GenFrac F Ψ n))
+      (IsFractionRing.injective _ _)
   convert h using 1
   funext q
   rw [Function.comp_apply, genMatFr_eq, pivotMinor_map]
   rfl
 
-theorem prod_Iic_fin {M : Type} [CommMonoid M] {m : ℕ} (f : Fin m → M) (j : Fin m) :
-    ∏ a ∈ Finset.Iic j, f a = ∏ r : Fin (j + 1), f ⟨r, by have := r.2; have := j.2; omega⟩ := by
-  refine Finset.prod_bij' (fun a ha => ⟨a, by have := Finset.mem_Iic.1 ha; rw [Fin.le_def] at this; omega⟩)
-    (fun r _ => ⟨r, by have := r.2; have := j.2; omega⟩) ?_ ?_ ?_ ?_ ?_
+theorem prod_Iic_fin {M : Type} [CommMonoid M] {m : ℕ} (f : Fin m → M) (j : Fin m)
+    : ∏ a ∈ Finset.Iic j, f a = ∏ r : Fin (j + 1), f ⟨r, by have := r.2; have := j.2; omega⟩ := by
+  refine Finset.prod_bij'
+    (fun a ha => ⟨a, by have := Finset.mem_Iic.1 ha; rw [Fin.le_def] at this; omega⟩)
+    (fun r _ => ⟨r, by have := r.2; have := j.2; omega⟩)
+    ?_ ?_ ?_ ?_ ?_
   · intro a _; exact Finset.mem_univ _
   · intro r _; rw [Finset.mem_Iic, Fin.le_def]; have := r.2; simp only; omega
   · intro a _; rfl
   · intro r _; rfl
   · intro a _; rfl
 
-theorem flag_mem (F : Type) [Field F] {K : Type} [Field K] [Algebra F K] {m : ℕ} (g : Matrix (Fin m) (Fin m) K)
-    (A : IntermediateField F K) (hL : ∀ a, leadMinor g a ≠ 0)
+theorem flag_mem
+    (F : Type) [Field F]
+    {K : Type} [Field K] [Algebra F K]
+    {m : ℕ} (g : Matrix (Fin m) (Fin m) K)
+    (A : IntermediateField F K)
+    (hL : ∀ a, leadMinor g a ≠ 0)
     (hA : ∀ (a : Fin (m - 1)) (b : Fin m), (a : ℕ) < b → pivotMinor g a b / leadMinor g a ∈ A)
-    (j : Fin (m - 1)) (S : PluckerBlocks m m j) : flagMinor g j S / leadMinor g j ∈ A := by
+    (j : Fin (m - 1)) (S : PluckerBlocks m m j)
+    : flagMinor g j S / leadMinor g j ∈ A := by
   have hj : (j : ℕ) + 1 ≤ m := by have := j.2; omega
   have hent : ∀ (a : Fin (m - 1)) (b : Fin m), pivotMinor g a b / leadMinor g a ∈ A := by
     intro a b
@@ -194,19 +222,24 @@ theorem flag_mem (F : Type) [Field F] {K : Type} [Field K] [Algebra F K] {m : �
       rw [div_self (hL a)]
       exact A.one_mem
     · exact hA a b h
-  let U : Matrix (Fin (j + 1)) (Fin (j + 1)) K := Matrix.of fun r s =>
-    pivotMinor g ⟨r, by have := r.2; have := j.2; omega⟩ (S.1.orderEmbOfFin S.2 s) /
-      leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩
-  have hP : (pivotMatrix g).submatrix (Fin.castLE hj) (S.1.orderEmbOfFin S.2) =
-      Matrix.diagonal (fun r : Fin (j + 1) => leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩) * U := by
+  let U : Matrix (Fin (j + 1)) (Fin (j + 1)) K :=
+    Matrix.of fun r s =>
+      pivotMinor g ⟨r, by have := r.2; have := j.2; omega⟩ (S.1.orderEmbOfFin S.2 s)
+        / leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩
+  have hP
+      : (pivotMatrix g).submatrix (Fin.castLE hj) (S.1.orderEmbOfFin S.2)
+        = Matrix.diagonal (fun r : Fin (j + 1) =>
+            leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩)
+          * U := by
     ext r s
     rw [Matrix.diagonal_mul]
     simp only [Matrix.submatrix_apply, pivotMatrix, Matrix.of_apply, U]
     rw [dite_eq_left (by simp only [Fin.val_castLE]; have := r.2; have := j.2; omega)]
     rw [mul_div_cancel₀ _ (hL _)]
     rfl
-  have hdet : flagMinor (pivotMatrix g) j S =
-      (∏ r : Fin (j + 1), leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩) * U.det := by
+  have hdet
+      : flagMinor (pivotMatrix g) j S
+        = (∏ r : Fin (j + 1), leadMinor g ⟨r, by have := r.2; have := j.2; omega⟩) * U.det := by
     unfold flagMinor
     rw [hP, Matrix.det_mul, Matrix.det_diagonal]
   have hid := FlagPivotIdentity.proof K m g j S
@@ -222,14 +255,15 @@ theorem flag_mem (F : Type) [Field F] {K : Type} [Field K] [Algebra F K] {m : �
   rw [Units.smul_def]
   exact zsmul_mem (A.prod_mem fun r _ => hent _ _) _
 
-theorem card_pivotIdx (Ψ : Type) [Fintype Ψ] (n : ℕ) :
-    Fintype.card (PivotIdx Ψ n) = Fintype.card Ψ * flagDim n := by
+theorem card_pivotIdx (Ψ : Type) [Fintype Ψ] (n : ℕ)
+    : Fintype.card (PivotIdx Ψ n) = Fintype.card Ψ * flagDim n := by
   rw [Fintype.card_prod, Fintype.card_sigma]
   congr 1
   have h1 : ∀ a : Fin (n - 1), Fintype.card {b : Fin n // (a : ℕ) < b} = n - 1 - a := by
     intro a
     rw [Fintype.card_subtype]
-    have : (Finset.univ.filter fun b : Fin n => (a : ℕ) < b) = Finset.Ioi (Fin.castLE (Nat.sub_le n 1) a) := by
+    have : (Finset.univ.filter fun b : Fin n => (a : ℕ) < b)
+        = Finset.Ioi (Fin.castLE (Nat.sub_le n 1) a) := by
       ext b
       simp [Fin.lt_def]
     rw [this, Fin.card_Ioi]
@@ -260,8 +294,8 @@ theorem proof : FlagRatioTrdeg.Statement := by
   intro F _ Ψ _ n
   classical
   have hy := pivot_indep F Ψ n
-  let δ : PivotIdxLe Ψ n → PivotIdxLe Ψ n :=
-    fun q => (q.1, ⟨q.2.1, ⟨Fin.castLE (Nat.sub_le n 1) q.2.1, by simp⟩⟩)
+  let δ : PivotIdxLe Ψ n → PivotIdxLe Ψ n := fun q =>
+    (q.1, ⟨q.2.1, ⟨Fin.castLE (Nat.sub_le n 1) q.2.1, by simp⟩⟩)
   have hz := ratio_indep F hy δ (fun q => rfl)
   let incl : PivotIdx Ψ n → PivotIdxLe Ψ n := fun q => (q.1, ⟨q.2.1, ⟨q.2.2.1, q.2.2.2.le⟩⟩)
   have hincl : Function.Injective incl := by
@@ -272,9 +306,15 @@ theorem proof : FlagRatioTrdeg.Statement := by
     simp only [heq_eq_eq, Subtype.mk.injEq] at h2
     subst h2
     rfl
-  have hrat : (fun q : PivotIdxLe Ψ n => if δ q = q then pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1 else
-      pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1 / pivotMinor (genMatFr F Ψ n (δ q).1) (δ q).2.1 (δ q).2.2.1) ∘
-        incl = pivotRatio F Ψ n := by
+  have hrat
+      : (fun q : PivotIdxLe Ψ n =>
+            if δ q = q then
+              pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1
+            else
+              pivotMinor (genMatFr F Ψ n q.1) q.2.1 q.2.2.1
+                / pivotMinor (genMatFr F Ψ n (δ q).1) (δ q).2.1 (δ q).2.2.1)
+          ∘ incl
+        = pivotRatio F Ψ n := by
     funext q
     have hne : δ (incl q) ≠ incl q := by
       intro h
@@ -287,8 +327,9 @@ theorem proof : FlagRatioTrdeg.Statement := by
   have hpr : AlgebraicIndependent F (pivotRatio F Ψ n) := hrat ▸ hz.comp incl hincl
   have hL : ∀ (τ : Ψ) (a : Fin (n - 1)), leadMinor (genMatFr F Ψ n τ) a ≠ 0 := fun τ a =>
     hy.ne_zero (τ, ⟨a, ⟨Fin.castLE (Nat.sub_le n 1) a, by simp⟩⟩)
-  have hadj : IntermediateField.adjoin F (Set.range (flagMinorRatio F Ψ n)) =
-      IntermediateField.adjoin F (Set.range (pivotRatio F Ψ n)) := by
+  have hadj
+      : IntermediateField.adjoin F (Set.range (flagMinorRatio F Ψ n))
+        = IntermediateField.adjoin F (Set.range (pivotRatio F Ψ n)) := by
     apply le_antisymm
     · rw [IntermediateField.adjoin_le_iff]
       rintro _ ⟨⟨τ, j, S⟩, rfl⟩

@@ -15,7 +15,8 @@ set_option autoImplicit false
 noncomputable section
 
 open CategoryTheory CategoryTheory.Limits AlgebraicGeometry
-open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp spMap epsR IsGrpPullback isGrpPullback_pullback)
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  (Sp spMap epsR IsGrpPullback isGrpPullback_pullback)
 open ReciprocityTheory.ChartRestriction.G.Semi (IsAbelianScheme)
 open GlobalTheory.Cris (dp0)
 open GlobalTheory.DeRham
@@ -49,14 +50,14 @@ variable (p : ℕ) {O : Type} [CommRing O]
 
 variable {p} {A : Over (Sp O)} [GrpObj A]
 
-
 end Levels
 
 abbrev Family (p : ℕ) : Type 1 :=
-  ∀ ⦃R : Type⦄ [CommRing R], IsAdicComplete (Ideal.span {(p : R)}) R →
-    ∀ ⦃A : Over (Sp R)⦄ [GrpObj A],
-      IsAbelianScheme A → (∃ g : ℕ, SmoothOfRelativeDimension g A.hom) →
-      ∀ ⦃G : PDivGroup p R⦄, G.TorsionTower A → (primDR A ≃ₗ[R] G.RigExt)
+  ∀ ⦃R : Type⦄ [CommRing R],
+    IsAdicComplete (Ideal.span {(p : R)}) R
+      → ∀ ⦃A : Over (Sp R)⦄ [GrpObj A],
+        IsAbelianScheme A → (∃ g : ℕ, SmoothOfRelativeDimension g A.hom)
+          → ∀ ⦃G : PDivGroup p R⦄, G.TorsionTower A → (primDR A ≃ₗ[R] G.RigExt)
 
 variable {p : ℕ} (E : Family p)
 

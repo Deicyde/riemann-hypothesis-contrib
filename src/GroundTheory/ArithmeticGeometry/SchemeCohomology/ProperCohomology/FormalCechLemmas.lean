@@ -17,11 +17,14 @@ noncomputable section
 
 attribute [local instance] algebraOfOver
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] {F : X.Modules} [F.IsQuasicoherent] (hF : IsCoherent F)
-  {ι : Type u} (𝔘 : ι → X.Opens)
-  (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a))) (p : ℕ)
-
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  {F : X.Modules} [F.IsQuasicoherent]
+  (hF : IsCoherent F)
+  {ι : Type u} (𝔘 : ι → X.Opens) (hU : ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a)))
+  (p : ℕ)
 
 set_option maxHeartbeats 2000000 in
 lemma reesCoefFam_cechH (n : ℕ) (x : cechH (reesPre I F) 𝔘 p) :
@@ -31,7 +34,6 @@ lemma reesCoefFam_cechH (n : ℕ) (x : cechH (reesPre I F) 𝔘 p) :
   refine CechFamily.cechH_congr (fun t y => ?_) p x
   exact (idealPowι_reesDeg I hF (isAffineOpen_inter 𝔘 hU t) n y).symm
 
-
 set_option maxHeartbeats 2000000 in
 lemma reesDegFam_reesIncFam (n : ℕ) (x : cechH (modulesAb (idealPow I F n)).obj 𝔘 p) :
     (reesDegFam I hF 𝔘 hU n).cechH p ((reesIncFam I hF 𝔘 hU n).cechH p x) = x := by
@@ -39,7 +41,6 @@ lemma reesDegFam_reesIncFam (n : ℕ) (x : cechH (modulesAb (idealPow I F n)).ob
   obtain ⟨σ, hσ, rfl⟩ := exists_cls x
   rw [CechFamily.cechH_cls]
   exact cls_congr 𝔘 (by funext t; exact reesDeg_reesInc I hF _ n (σ t)) _ _
-
 
 set_option maxHeartbeats 2000000 in
 lemma reesDegFam_reesIncFam_of_ne {n k : ℕ} (h : n ≠ k)
@@ -51,7 +52,6 @@ lemma reesDegFam_reesIncFam_of_ne {n k : ℕ} (h : n ≠ k)
   refine (cls_congr 𝔘 (by funext t; exact reesDeg_reesInc_of_ne I hF _ h (σ t)) _
     (map_zero _)).trans cls_zero
 
-
 set_option maxHeartbeats 2000000 in
 lemma reesCoefFam_reesIncFam (n k : ℕ) (x : cechH (modulesAb (idealPow I F n)).obj 𝔘 p) :
     (reesCoefFam I hF 𝔘 hU k).cechH p ((reesIncFam I hF 𝔘 hU n).cechH p x) =
@@ -61,7 +61,6 @@ lemma reesCoefFam_reesIncFam (n k : ℕ) (x : cechH (modulesAb (idealPow I F n))
   · subst h
     rw [reesDegFam_reesIncFam]
   · rw [reesDegFam_reesIncFam_of_ne I hF 𝔘 hU p h, map_zero]
-
 
 set_option maxHeartbeats 2000000 in
 lemma exists_cls_coef_eq_zero [Finite ι] (x : cechH (reesPre I F) 𝔘 p) :

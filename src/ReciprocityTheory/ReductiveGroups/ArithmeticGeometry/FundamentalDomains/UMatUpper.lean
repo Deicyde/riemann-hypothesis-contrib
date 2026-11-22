@@ -16,11 +16,17 @@ variable {n : ℕ}
 def blk (G : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) : Matrix (Fin c) (Fin c) ℂ :=
   G.submatrix (Fin.castLE c.isLt.le) (Fin.castLE c.isLt.le)
 
-def rowc (G : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) : Fin c → ℂ := fun m => G c (Fin.castLE c.isLt.le m)
+def rowc (G : Matrix (Fin n) (Fin n) ℂ) (c : Fin n) : Fin c → ℂ := fun m =>
+  G c (Fin.castLE c.isLt.le m)
 
 def uMat (G : Matrix (Fin n) (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ :=
-  Matrix.of fun j c => if j = c then 1 else
-    if h : j < c then -(Matrix.vecMul (rowc G c) (blk G c)⁻¹) ⟨j, h⟩ else 0
+  Matrix.of fun j c =>
+    if j = c then
+      1
+    else if h : j < c then
+      - (Matrix.vecMul (rowc G c) (blk G c)⁻¹) ⟨j, h⟩
+    else
+      0
 
 lemma uMat_diag (G : Matrix (Fin n) (Fin n) ℂ) (j : Fin n) : uMat G j j = 1 := by
   simp [uMat]

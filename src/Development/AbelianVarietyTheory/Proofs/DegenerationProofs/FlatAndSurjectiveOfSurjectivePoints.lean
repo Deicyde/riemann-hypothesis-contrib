@@ -15,17 +15,19 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsI
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open GlobalTheory.SS
 
 namespace GlobalTheory.SS
 
-
 open UnramifiedEndFlat in
-theorem flat_of_isDominant_grpHom (K : Type) [Field K] [IsAlgClosed K]
+theorem flat_of_isDominant_grpHom
+    (K : Type) [Field K] [IsAlgClosed K]
     (G G' : Over (Sp K)) [GrpObj G] [GrpObj G'] [IrreducibleSpace G.left] [IsIntegral G'.left]
-    [LocallyOfFiniteType G.hom] [LocallyOfFiniteType G'.hom] (φ : G ⟶ G') [IsMonHom φ]
-    [QuasiCompact φ.left] [IsDominant φ.left] : Flat φ.left := by
+    [LocallyOfFiniteType G.hom] [LocallyOfFiniteType G'.hom]
+    (φ : G ⟶ G') [IsMonHom φ] [QuasiCompact φ.left] [IsDominant φ.left]
+    : Flat φ.left := by
   have := LocallyOfFiniteType.jacobsonSpace G.hom
   have : IsLocallyNoetherian G'.left := LocallyOfFiniteType.isLocallyNoetherian G'.hom
   have : LocallyOfFiniteType (φ.left ≫ G'.hom) := by rw [Over.w φ]; infer_instance
@@ -46,8 +48,7 @@ theorem flat_of_isDominant_grpHom (K : Type) [Field K] [IsAlgClosed K]
     generalize y'⁻¹ * x' = z
     simp [comp_lift_assoc]
   have hα : y' ≫ α.hom = x' := by
-    have : y' ≫ α.hom = y' * (y'⁻¹ * x') := by
-      simp [α, comp_lift_assoc, Hom.mul_def]
+    have : y' ≫ α.hom = y' * (y'⁻¹ * x') := by simp [α, comp_lift_assoc, Hom.mul_def]
     rw [this, mul_inv_cancel_left]
   have hα' : α.hom.left y = x := by
     have h := congr(($hα).left (IsLocalRing.closedPoint K))
@@ -61,10 +62,15 @@ theorem flat_of_isDominant_grpHom (K : Type) [Field K] [IsAlgClosed K]
     exact (Flat.stalkMap β.hom.left _).comp (H y hy)
   rw [← Over.comp_left, ← hαβ, Over.comp_left, Scheme.Hom.stalkMap_comp] at h1
   rw [← hα']
-  exact (RingHom.Flat.respectsIso.cancel_right_isIso
-    (φ.left.stalkMap (α.hom.left y)) (α.hom.left.stalkMap y)).mp h1
+  exact (RingHom.Flat.respectsIso.cancel_right_isIso (φ.left.stalkMap (α.hom.left y))
+    (α.hom.left.stalkMap y)).mp h1
 
-theorem flat_and_surjective_of_surjective_points : ∀ (k : Type) [Field k] [IsAlgClosed k] (G G' : Over (Sp k)) [GrpObj G] [GrpObj G'], SmConn G → SmConn G' → ∀ i : G ⟶ G', IsMonHom i → (∀ y : (𝟙_ (Over (Sp k)) ⟶ G'), ∃ x : (𝟙_ (Over (Sp k)) ⟶ G), x ≫ i = y) → Flat i.left ∧ Surjective i.left := by
+theorem flat_and_surjective_of_surjective_points
+    : ∀ (k : Type) [Field k] [IsAlgClosed k] (G G' : Over (Sp k)) [GrpObj G] [GrpObj G'],
+      SmConn G → SmConn G'
+        → ∀ i : G ⟶ G',
+          IsMonHom i → (∀ y : (𝟙_ (Over (Sp k)) ⟶ G'), ∃ x : (𝟙_ (Over (Sp k)) ⟶ G), x ≫ i = y)
+            → Flat i.left ∧ Surjective i.left := by
   intro k _ _ G G' _ _ ⟨_, _, _, _, _⟩ ⟨_, _, _, _, _⟩ i _ hi
   have := grpObj_geometricallyIntegral_of_smooth _ G
   have := grpObj_geometricallyIntegral_of_smooth _ G'

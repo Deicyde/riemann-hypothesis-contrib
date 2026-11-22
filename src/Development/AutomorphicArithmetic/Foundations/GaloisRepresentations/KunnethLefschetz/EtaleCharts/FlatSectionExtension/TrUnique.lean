@@ -8,7 +8,8 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
+open CategoryTheory Limits AlgebraicGeometry GlobalTheory.EtC CrystallineSemistableComparison
+  CrystallineSemistableComparison.Onto UpperTheory.Gal.KunnethLefschetz.G.PX
 
 private lemma flat_of_etale {A B : Type} [CommRing A] [CommRing B] (f : A →+* B) (h : f.Etale) : f.Flat := by
   letI := f.toAlgebra
@@ -25,8 +26,13 @@ private lemma flat_res {X : Scheme.{0}} {U V : X.Opens} (hU : IsAffineOpen U) (h
     exact Category.id_comp _
   simpa only [h2] using h1
 
-theorem UpperTheory.Gal.KunnethLefschetz.G.PX.trUnique :
-    ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z} {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α β : B.ι) {N : Z.Opens} (_ : IsAffineOpen N) (h₁ : N ≤ B.V α) (h₂ : N ≤ B.V β) (G G' : Matrix (Fin d) (Fin d) Γ(Z, N)), IsTr B α β h₁ h₂ G → IsTr B α β h₁ h₂ G' → ∀ m l, (i.app N).hom (G m l) = (i.app N).hom (G' m l) := by
+theorem UpperTheory.Gal.KunnethLefschetz.G.PX.trUnique
+    : ∀ {K : Type} [CommRing K] {W Z Y : Scheme.{0}} {q : Z ⟶ Spec (CommRingCat.of K)} {i : W ⟶ Z}
+        {π : Y ⟶ Z} {D : E.LineData Y} {d : ℕ} (B : Blow q i π D d) (α β : B.ι) {N : Z.Opens}
+        (_ : IsAffineOpen N) (h₁ : N ≤ B.V α) (h₂ : N ≤ B.V β)
+        (G G' : Matrix (Fin d) (Fin d) Γ(Z, N)),
+      IsTr B α β h₁ h₂ G → IsTr B α β h₁ h₂ G'
+        → ∀ m l, (i.app N).hom (G m l) = (i.app N).hom (G' m l) := by
   intro K _ W Z Y q i π D d B α β N hN h₁ h₂ G G' hG hG' m l
   let φ₀ : MvPolynomial (Fin d) (MvPolynomial (Fin (B.c α).n) K) →+* Γ(Z, B.V α) :=
     MvPolynomial.eval₂Hom (MvPolynomial.eval₂Hom (Pb.strV q (B.V α)) (B.c α).x) (B.c α).t
@@ -41,7 +47,9 @@ theorem UpperTheory.Gal.KunnethLefschetz.G.PX.trUnique :
   have hzero : ∑ l, (G m l - G' m l) * φ (MvPolynomial.X l) = 0 := by
     simp only [hX, sub_mul, Finset.sum_sub_distrib]
     rw [← hG m, ← hG' m, sub_self]
-  have key := UpperTheory.Gal.KunnethLefschetz.G.regSeq _ _ d φ hflat (fun l => G m l - G' m l)
-    (by rw [hzero]; exact zero_mem _) l
+  have key :=
+    UpperTheory.Gal.KunnethLefschetz.G.regSeq _ _ d φ hflat
+      (fun l => G m l - G' m l)
+      (by rw [hzero]; exact zero_mem _) l
   rw [hfun, ← kerRes B α hN h₁, RingHom.mem_ker, map_sub] at key
   exact sub_eq_zero.mp key

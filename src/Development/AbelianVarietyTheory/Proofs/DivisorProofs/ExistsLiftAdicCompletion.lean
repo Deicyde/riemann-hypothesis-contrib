@@ -12,11 +12,13 @@ open scoped TensorProduct
 
 namespace GlobalTheory.TraitLift
 
-theorem exists_lift_adicCompletion (A V : Type) [CommRing A] [IsLocalRing A] [Algebra.EssFiniteType ℤ A]
-    [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [Algebra A V] :
-    ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsDiscreteValuationRing V') (h : V →+* V')
-      (g : AdicCompletion (maximalIdeal A) A →+* V'), IsAdicComplete (maximalIdeal V') V' ∧
-      g.comp (algebraMap A _) = h.comp (algebraMap A V) ∧ ∀ ϖ : V, Irreducible ϖ → Irreducible (h ϖ) := by
+theorem exists_lift_adicCompletion
+    (A V : Type) [CommRing A] [IsLocalRing A] [Algebra.EssFiniteType ℤ A] [CommRing V] [IsDomain V]
+    [IsDiscreteValuationRing V] [Algebra A V]
+    : ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsDiscreteValuationRing V')
+        (h : V →+* V') (g : AdicCompletion (maximalIdeal A) A →+* V'),
+      IsAdicComplete (maximalIdeal V') V' ∧ g.comp (algebraMap A _) = h.comp (algebraMap A V)
+        ∧ ∀ ϖ : V, Irreducible ϖ → Irreducible (h ϖ) := by
   haveI : IsNoetherianRing A := Algebra.EssFiniteType.isNoetherianRing ℤ A
   let R := AdicCompletion (maximalIdeal A) A
   haveI : Module.FaithfullyFlat A R := Module.FaithfullyFlat.of_flat_of_isLocalHom
@@ -24,23 +26,34 @@ theorem exists_lift_adicCompletion (A V : Type) [CommRing A] [IsLocalRing A] [Al
   let C := V ⊗[A] R
   let e : (C ⧸ (maximalIdeal V).map (algebraMap V C)) ≃+* R ⊗[A] (V ⧸ maximalIdeal V) :=
     ((Algebra.TensorProduct.quotIdealMapEquivQuotTensor C (maximalIdeal V)).toRingEquiv.trans
-      (Algebra.TensorProduct.cancelBaseChange A V V (V ⧸ maximalIdeal V) R).toRingEquiv).trans
+        (Algebra.TensorProduct.cancelBaseChange A V V (V ⧸ maximalIdeal V) R).toRingEquiv).trans
       (Algebra.TensorProduct.comm A _ _).toRingEquiv
   haveI := formalFibre_isReduced_of_field A (V ⧸ maximalIdeal V)
   haveI : Nontrivial (R ⊗[A] (V ⧸ maximalIdeal V)) := inferInstance
-  obtain ⟨V', i1, i2, i3, h₀, hc, hirr⟩ := GlobalTheory.ReducedFibre.exists_cdvr_of_flat_of_isReduced V C
-    e.toEquiv.nontrivial (isReduced_of_injective e e.injective)
-  refine ⟨V', i1, i2, i3, h₀.comp (algebraMap V C),
-    h₀.comp (Algebra.TensorProduct.includeRight (R := A) (A := V) (B := R)).toRingHom, hc, ?_, hirr⟩
+  obtain ⟨V', i1, i2, i3, h₀, hc, hirr⟩ :=
+    GlobalTheory.ReducedFibre.exists_cdvr_of_flat_of_isReduced V C e.toEquiv.nontrivial
+      (isReduced_of_injective e e.injective)
+  refine ⟨
+    V',
+    i1,
+    i2,
+    i3,
+    h₀.comp (algebraMap V C),
+    h₀.comp (Algebra.TensorProduct.includeRight (R := A) (A := V) (B := R)).toRingHom,
+    hc,
+    ?_,
+    hirr
+  ⟩
   ext a
   simp only [RingHom.comp_apply]
   congr 1
   rw [← IsScalarTower.algebraMap_apply]
   exact (Algebra.TensorProduct.includeRight (R := A) (A := V) (B := R)).commutes a
 
-theorem isLocalHom_and_injective {V V' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V]
-    [CommRing V'] [IsDomain V'] (h : V →+* V') (hh : ∀ ϖ : V, Irreducible ϖ → Irreducible (h ϖ)) :
-    Function.Injective h ∧ IsLocalHom h := by
+theorem isLocalHom_and_injective
+    {V V' : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] [CommRing V'] [IsDomain V']
+    (h : V →+* V') (hh : ∀ ϖ : V, Irreducible ϖ → Irreducible (h ϖ))
+    : Function.Injective h ∧ IsLocalHom h := by
   obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible V
   refine ⟨(injective_iff_map_eq_zero h).mpr fun x hx => ?_, ⟨fun x hx => ?_⟩⟩
   · by_contra h0
@@ -52,7 +65,15 @@ theorem isLocalHom_and_injective {V V' : Type} [CommRing V] [IsDomain V] [IsDisc
     rw [hϖ.maximalIdeal_eq, Ideal.mem_span_singleton] at hm
     exact (hh ϖ hϖ).not_isUnit (isUnit_of_dvd_unit (map_dvd h hm) hx)
 
-theorem exists_lift_of_isCpl : ∀ (A R V : Type) [CommRing A] [IsLocalRing A] [Algebra.EssFiniteType ℤ A] [CommRing R] (j : A →+* R), IsCpl j → ∀ [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (f : A →+* V), ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsDiscreteValuationRing V') (h : V →+* V') (g : R →+* V'), IsAdicComplete (maximalIdeal V') V' ∧ Function.Injective h ∧ IsLocalHom h ∧ g.comp j = h.comp f ∧ ∀ ϖ : V, Irreducible ϖ → Irreducible (h ϖ) := by
+theorem exists_lift_of_isCpl
+    : ∀ (A R V : Type) [CommRing A] [IsLocalRing A] [Algebra.EssFiniteType ℤ A] [CommRing R]
+        (j : A →+* R),
+      IsCpl j
+        → ∀ [CommRing V] [IsDomain V] [IsDiscreteValuationRing V] (f : A →+* V),
+          ∃ (V' : Type) (_ : CommRing V') (_ : IsDomain V') (_ : IsDiscreteValuationRing V')
+              (h : V →+* V') (g : R →+* V'),
+            IsAdicComplete (maximalIdeal V') V' ∧ Function.Injective h ∧ IsLocalHom h
+              ∧ g.comp j = h.comp f ∧ ∀ ϖ : V, Irreducible ϖ → Irreducible (h ϖ) := by
   intro A R V _ _ _ _ j hj _ _ _ f
   obtain ⟨e, he⟩ := hj
   letI : Algebra A V := f.toAlgebra

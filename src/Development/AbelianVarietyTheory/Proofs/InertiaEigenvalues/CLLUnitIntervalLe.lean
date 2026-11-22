@@ -5,13 +5,17 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Finr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
 
 namespace GlobalTheory.HubLoc
 
-theorem cLL_unit_interval_le : ∀ (l h N v : ℕ) (U : Finset ℤ) (U' : Set ℤ), l.Prime → 1 ≤ N → U' ⊆ U → U.card ≤ N →
-    (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u ≤ h) → v ≤ LocalSituation.mN l 1 (h + h) - 1 →
-    LocalSituation.cLL l (LocalSituation.mN l 1 (h + h)) v U' 0 1 ≤ 5 + Nat.log l (2 * h) + N * (4 + 2 * Nat.log l (2 * h)) := by
+theorem cLL_unit_interval_le
+    : ∀ (l h N v : ℕ) (U : Finset ℤ) (U' : Set ℤ),
+      l.Prime → 1 ≤ N → U' ⊆ U → U.card ≤ N → (∀ u ∈ U, -(h : ℤ) ≤ u ∧ u ≤ h)
+        → v ≤ LocalSituation.mN l 1 (h + h) - 1
+        → LocalSituation.cLL l (LocalSituation.mN l 1 (h + h)) v U' 0 1
+          ≤ 5 + Nat.log l (2 * h) + N * (4 + 2 * Nat.log l (2 * h)) := by
   classical
   intro l h N v U U' hl hN hU hcard hb hv
   haveI : Fact l.Prime := ⟨hl⟩
@@ -32,18 +36,22 @@ theorem cLL_unit_interval_le : ∀ (l h N v : ℕ) (U : Finset ℤ) (U' : Set �
     omega
   rw [hI, Finset.sum_singleton]
 
-  have hterm : ∀ u ∈ U,
-      (∑ᶠ (_ : u ∈ U') (_ : u ≠ 0), (2 * 1 + n0 + 1 + LocalSituation.vZ l (u - 0))) ≤ 4 + 2 * L := by
+  have hterm
+      : ∀ u ∈ U,
+        (∑ᶠ (_ : u ∈ U') (_ : u ≠ 0), (2 * 1 + n0 + 1 + LocalSituation.vZ l (u - 0)))
+          ≤ 4 + 2 * L := by
     intro u hu
     have hz : LocalSituation.vZ l u ≤ Nat.log l h := vZ_le_log l h u (hb u hu)
     have hlog : Nat.log l h ≤ L := Nat.log_mono_right (by omega)
     simp only [finsum_eq_if, sub_zero]
     split_ifs <;> omega
 
-  have hS : (∑ᶠ (u : ℤ) (_ : u ∈ U') (_ : u ≠ 0), (2 * 1 + n0 + 1 + LocalSituation.vZ l (u - 0)))
-      ≤ N * (4 + 2 * L) := by
+  have hS
+      : (∑ᶠ (u : ℤ) (_ : u ∈ U') (_ : u ≠ 0), (2 * 1 + n0 + 1 + LocalSituation.vZ l (u - 0)))
+        ≤ N * (4 + 2 * L) := by
     rw [finsum_eq_sum_of_support_subset _ (s := U) ?_]
-    · calc _ ≤ U.card • (4 + 2 * L) := Finset.sum_le_card_nsmul _ _ _ hterm
+    · calc
+        _ ≤ U.card • (4 + 2 * L) := Finset.sum_le_card_nsmul _ _ _ hterm
         _ ≤ N * (4 + 2 * L) := by
           rw [smul_eq_mul]
           exact Nat.mul_le_mul_right _ hcard

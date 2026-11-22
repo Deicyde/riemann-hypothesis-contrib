@@ -12,25 +12,33 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 noncomputable section
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Polynomial
-open GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd UpperTheory.V.Sd.EG
+open GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Base UpperTheory.V.Sd
+  UpperTheory.V.Sd.EG
 
 namespace UpperTheory.V.Z.Sym.Unl
 
-private theorem quad_pair {K : Type} [Field K] {a d u v : K} (hu : u ^ 2 - a * u + d = 0) (hv : v ^ 2 - a * v + d = 0)
-    (hne : u ≠ v) : v + u = a ∧ v * u = d := by
+private theorem quad_pair
+    {K : Type} [Field K]
+    {a d u v : K} (hu : u ^ 2 - a * u + d = 0) (hv : v ^ 2 - a * v + d = 0) (hne : u ≠ v)
+    : v + u = a ∧ v * u = d := by
   have h1 : u + v - a = 0 :=
-    (mul_eq_zero.1 (by linear_combination hu - hv : (u - v) * (u + v - a) = 0)).resolve_left (sub_ne_zero.2 hne)
+    (mul_eq_zero.1 (by linear_combination hu - hv : (u - v) * (u + v - a) = 0)).resolve_left
+      (sub_ne_zero.2 hne)
   exact ⟨by linear_combination h1, by linear_combination u * h1 - hu⟩
 
-private theorem charpoly_quad {K : Type} [Field K] (B : Matrix (Fin 2) (Fin 2) K) {u : K} (h : B.charpoly.IsRoot u) :
-    u ^ 2 - B.trace * u + B.det = 0 := by
+private theorem charpoly_quad
+    {K : Type} [Field K] (B : Matrix (Fin 2) (Fin 2) K) {u : K} (h : B.charpoly.IsRoot u)
+    : u ^ 2 - B.trace * u + B.det = 0 := by
   rw [Matrix.charpoly_fin_two] at h
   simpa [Polynomial.IsRoot] using h
 
-private theorem inv_charpoly_root {K : Type} [Field K] {n : ℕ} (g : GL (Fin n) K) {x : K}
-    (h : (g : Matrix (Fin n) (Fin n) K).charpoly.IsRoot x) :
-    x ≠ 0 ∧ ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly.IsRoot x⁻¹ := by
-  have hs : x ∈ spectrum K (g : Matrix (Fin n) (Fin n) K) := Matrix.mem_spectrum_iff_isRoot_charpoly.2 h
+private theorem inv_charpoly_root
+    {K : Type} [Field K]
+    {n : ℕ} (g : GL (Fin n) K)
+    {x : K} (h : (g : Matrix (Fin n) (Fin n) K).charpoly.IsRoot x)
+    : x ≠ 0 ∧ ((g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K).charpoly.IsRoot x⁻¹ := by
+  have hs : x ∈ spectrum K (g : Matrix (Fin n) (Fin n) K) :=
+    Matrix.mem_spectrum_iff_isRoot_charpoly.2 h
   have hx0 : x ≠ 0 := by
     rintro rfl
     exact spectrum.zero_notMem K (Units.isUnit g) hs
@@ -38,8 +46,13 @@ private theorem inv_charpoly_root {K : Type} [Field K] {n : ℕ} (g : GL (Fin n)
     simpa using (spectrum.inv_mem_iff (r := Units.mk0 x hx0) (a := g)).1 (by simpa using hs)
   exact ⟨hx0, Matrix.mem_spectrum_iff_isRoot_charpoly.1 hi⟩
 
-private theorem norm_xi {l : ℕ} [Fact l.Prime] {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (ι : Qbar l ≃+* ℂ)
-    (ξ : G ℚ Ω →* (Qbar l)ˣ) (h : IsOpen (ξ.ker : Set (G ℚ Ω))) (s : G ℚ Ω) : ‖ι (ξ s : Qbar l)‖ = 1 := by
+private theorem norm_xi
+    {l : ℕ} [Fact l.Prime]
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    (ι : Qbar l ≃+* ℂ)
+    (ξ : G ℚ Ω →* (Qbar l)ˣ) (h : IsOpen (ξ.ker : Set (G ℚ Ω)))
+    (s : G ℚ Ω)
+    : ‖ι (ξ s : Qbar l)‖ = 1 := by
   haveI : Finite (G ℚ Ω ⧸ ξ.ker) := Subgroup.quotient_finite_of_isOpen _ h
   have h0 : ξ.ker.index ≠ 0 := Subgroup.index_ne_zero_of_finite
   have h1 : ξ s ^ ξ.ker.index = 1 := by
@@ -49,14 +62,20 @@ private theorem norm_xi {l : ℕ} [Fact l.Prime] {Ω : Type} [Field Ω] [CharZer
     rw [← map_pow, ← Units.val_pow_eq_pow_val, h1, Units.val_one, map_one]
   exact Complex.norm_eq_one_of_pow_eq_one h2 h0
 
-private theorem det_inv {l : ℕ} [Fact l.Prime] {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {k : ℕ} (hk : 3 ≤ k)
+private theorem det_inv
+    {l : ℕ} [Fact l.Prime]
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {k : ℕ} (hk : 3 ≤ k)
     (r : G ℚ Ω →* GL (Fin 2) (Qbar l)) (ξ : G ℚ Ω →* (Qbar l)ˣ)
-    (h : Matrix.GeneralLinearGroup.det.comp r = cycBar ℚ Ω l ^ (1 - (k : ℤ)) * ξ) (s : G ℚ Ω) :
-    (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).det = (cycBar ℚ Ω l s : Qbar l) ^ (k - 1) * ((ξ s)⁻¹ : (Qbar l)ˣ) := by
-  have h1 : Matrix.GeneralLinearGroup.det (r s⁻¹) = (cycBar ℚ Ω l ^ (1 - (k : ℤ)) * ξ) s⁻¹ := DFunLike.congr_fun h s⁻¹
+    (h : Matrix.GeneralLinearGroup.det.comp r = cycBar ℚ Ω l ^ (1 - (k : ℤ)) * ξ)
+    (s : G ℚ Ω)
+    : (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).det
+      = (cycBar ℚ Ω l s : Qbar l) ^ (k - 1) * ((ξ s)⁻¹ : (Qbar l)ˣ) := by
+  have h1 : Matrix.GeneralLinearGroup.det (r s⁻¹) = (cycBar ℚ Ω l ^ (1 - (k : ℤ)) * ξ) s⁻¹ :=
+    DFunLike.congr_fun h s⁻¹
   have h2 : (cycBar ℚ Ω l ^ (1 - (k : ℤ)) * ξ) s⁻¹ = cycBar ℚ Ω l s ^ (k - 1) * (ξ s)⁻¹ := by
-    rw [show 1 - (k : ℤ) = -((k - 1 : ℕ) : ℤ) by omega, zpow_neg, zpow_natCast, MonoidHom.mul_apply, map_inv, map_inv,
-      MonoidHom.inv_apply, MonoidHom.pow_apply, inv_inv]
+    rw [show 1 - (k : ℤ) = -((k - 1 : ℕ) : ℤ) by omega, zpow_neg, zpow_natCast, MonoidHom.mul_apply,
+      map_inv, map_inv, MonoidHom.inv_apply, MonoidHom.pow_apply, inv_inv]
   have h3 := congrArg Units.val (h1.trans h2)
   simpa using h3
 
@@ -78,13 +97,18 @@ theorem halfOf : HypothesesH → HalfOf := by
       · rw [← h] at this
         simp at this
     have hn : N.factorization (normV w) ≠ 0 := (hp.factorization_pos_of_dvd (NeZero.ne N) hpN).ne'
-    obtain ⟨u₀, hu₀, hun⟩ := tieU P ℚ Ω l ι ξ _ c m a π r hO w hwl _ _ hn (norm_pos_iff.1 hR) (hU w) A hA s hs
+    obtain ⟨u₀, hu₀, hun⟩ :=
+      tieU P ℚ Ω l ι ξ _ c m a π r hO w hwl _ _ hn (norm_pos_iff.1 hR) (hU w) A hA s hs
     have hAq := (over_iff hA _).2 (dvd_refl (normV w))
     have hpl : ¬ normV w ∣ l := fun h => hwl ((mem_iff w l).2 h)
     have hd : ‖ι (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).det‖ = (normV w : ℝ) ^ (k - 1) := by
-      rw [det_inv hk r ξ hO.det s, cyc_frob hp hAq hpl hs, map_mul, norm_mul, map_pow, norm_pow, map_natCast, Complex.norm_natCast,
-        Units.val_inv_eq_inv_val, map_inv₀, norm_inv, norm_xi ι ξ hO.ξ_open s, inv_one, mul_one]
-    have hall : ∀ u : Qbar l, (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly.IsRoot u → ‖ι u‖ = ‖g.a (normV w)‖ := fun u hu => by
+      rw [det_inv hk r ξ hO.det s, cyc_frob hp hAq hpl hs, map_mul, norm_mul, map_pow, norm_pow,
+        map_natCast, Complex.norm_natCast, Units.val_inv_eq_inv_val, map_inv₀, norm_inv,
+        norm_xi ι ξ hO.ξ_open s, inv_one, mul_one]
+    have hall
+        : ∀ u : Qbar l,
+          (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly.IsRoot u
+            → ‖ι u‖ = ‖g.a (normV w)‖ := fun u hu => by
       by_cases e : u = u₀
       · rw [e, hun]
       · have h1 := (quad_pair (charpoly_quad _ hu) (charpoly_quad _ hu₀) e).2
@@ -102,11 +126,19 @@ theorem halfOf : HypothesesH → HalfOf := by
   · obtain ⟨B, hB, e⟩ := hS w hpN
     have hF := tieS P ℚ Ω l ι ξ _ c m a π r hO w hwl B hB
     have hP := ((hF A hA).2 s hs).trans e
-    have hq : ∀ u : Qbar l, (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly.IsRoot u →
-        (ι u) ^ 2 - g.a (normV w) * ι u + χ (normV w : ZMod N) * (normV w : ℂ) ^ (k - 1) = 0 := fun u hu => by
+    have hq
+        : ∀ u : Qbar l,
+          (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly.IsRoot u
+            → (ι u) ^ 2 - g.a (normV w) * ι u + χ (normV w : ZMod N) * (normV w : ℂ) ^ (k - 1)
+              = 0 := fun u hu => by
       have h1 := congrArg (Polynomial.eval (ι u)) hP
-      have h2 : (Polynomial.eval (ι u) (((r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly).map ι.toRingHom)) = 0 := by
-        have := Polynomial.eval₂_at_apply (p := (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly) ι.toRingHom u
+      have h2
+          : (Polynomial.eval (ι u)
+              (((r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly).map ι.toRingHom))
+            = 0 := by
+        have :=
+          Polynomial.eval₂_at_apply (p := (r s⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly)
+            ι.toRingHom u
         rw [Polynomial.eval_map]
         refine this.trans ?_
         rw [hu.eq_zero, map_zero]

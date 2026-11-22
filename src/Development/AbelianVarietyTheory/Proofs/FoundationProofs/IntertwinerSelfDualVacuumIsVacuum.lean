@@ -11,7 +11,9 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.OddThetaF
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 noncomputable section
@@ -185,7 +187,8 @@ lemma genus_one (D : D7) (L : PeriodPair) (Λ : AddSubgroup ℂ) (h : ∀ z, z �
 
 section Product
 
-variable {D : D7} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} {N N' r : ℕ}
+variable
+  {D : D7} {cc : Ideal (𝓞 D.host.K)} {δ : ℂ} {N N' r : ℕ}
   {b : Fin r → Matrix (Fin N') (Fin N) D.host.E}
 
 lemma coordB_embV (htr : TraceMapNormalisation D) (hb : Orthonormal D b) (i j : Fin r) :
@@ -300,10 +303,12 @@ lemma pullB_mem (htr : TraceMapNormalisation D) (hb : Orthonormal D b) (g : ℂ 
 
 end Product
 
-theorem pullbackOrthonormal_normalizedTheta_mem_thetaSpace (D : D7) (hD : admG1 D) (cc : Ideal (𝓞 D.host.K)) (δ t0 : ℂ) (hc : Crv D cc δ)
-    (ht : GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0) {N N' r : ℕ} (b : Fin r → Matrix (Fin N') (Fin N) D.host.E)
-    (hb : Orthonormal D b) :
-    pullB D (tor0 D cc δ) b (GL3Theta.th0 (lamOf D cc δ) t0) ∈ ThSp D (tor0 D cc δ) (LaB D (tor0 D cc δ) b) := by
+theorem pullbackOrthonormal_normalizedTheta_mem_thetaSpace
+    (D : D7) (hD : admG1 D) (cc : Ideal (𝓞 D.host.K))
+    (δ t0 : ℂ) (hc : Crv D cc δ) (ht : GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0)
+    {N N' r : ℕ} (b : Fin r → Matrix (Fin N') (Fin N) D.host.E) (hb : Orthonormal D b)
+    : pullB D (tor0 D cc δ) b (GL3Theta.th0 (lamOf D cc δ) t0)
+      ∈ ThSp D (tor0 D cc δ) (LaB D (tor0 D cc δ) b) := by
   obtain ⟨hl, -, -, -, hO⟩ := GlobalTheory.T.idealPeriodLattice_of_curveDatum D hD cc δ hc
   obtain ⟨⟨hdiff, -, -, hG⟩, -⟩ := GlobalTheory.T.oddThetaFunction_existence_uniqueness _ hl
   obtain ⟨w₁, w₂, hi, hl⟩ := hl
@@ -344,10 +349,23 @@ lemma mod1All_mul {κ μ : ℂ} (hκ : Mod1All κ) (hμ : μ ^ 8 = 1) : Mod1All 
   change ‖σ (⟨κ, h1⟩ * ⟨μ, h3⟩)‖ = 1
   rw [map_mul, norm_mul, h2, h5, one_mul]
 
-theorem isVacuum_thetaIntertwiner_selfDual : ∀ (D : D7), Inp D → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (t0 : ℂ), Crv D cc δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0 → ∀ (a d : ℕ) L L' L₁ L₁', SD D L → SD D L' → SD D L₁ → SD D L₁' → ∀ G, ThetaVectorUpToUnits D (tor0 D cc δ) t0 L L' G → ThetaVectorUpToUnits D (tor0 D cc δ) t0 L₁ L₁' (Iop D (tor0 D cc δ) (La D (tor0 D cc δ) L L') (La D (tor0 D cc δ) L₁ L₁') (G : VC D a d → ℂ)) := by
+theorem isVacuum_thetaIntertwiner_selfDual
+    : ∀ (D : D7),
+      Inp D
+        → ∀ (cc : Ideal (𝓞 D.host.K)) (δ : ℂ) (t0 : ℂ),
+          Crv D cc δ → GL3Theta.IsTwoTorsionPointUnkilled D (lamOf D cc δ) t0
+            → ∀ (a d : ℕ) L L' L₁ L₁',
+              SD D L → SD D L' → SD D L₁ → SD D L₁'
+                → ∀ G,
+                  ThetaVectorUpToUnits D (tor0 D cc δ) t0 L L' G
+                    → ThetaVectorUpToUnits D (tor0 D cc δ) t0 L₁ L₁'
+                      (Iop D (tor0 D cc δ) (La D (tor0 D cc δ) L L') (La D (tor0 D cc δ) L₁ L₁')
+                        (G : VC D a d → ℂ)) := by
   rintro D hD cc δ t0 hc ht a d L L' L₁ L₁' hL hL' hL₁ hL₁' G ⟨b, κ, hb, hκ, rfl⟩
-  obtain ⟨μ, hμ, h⟩ := hD.mu cc δ hc a d _ _ _ (Or.inl ⟨_, b, hb, rfl⟩) (Or.inr ⟨L, L', hL, hL', rfl⟩)
-    (Or.inr ⟨L₁, L₁', hL₁, hL₁', rfl⟩) _ (pullbackOrthonormal_normalizedTheta_mem_thetaSpace D hD.g1 cc δ t0 hc ht b hb.1)
+  obtain ⟨μ, hμ, h⟩ :=
+    hD.mu cc δ hc a d _ _ _ (Or.inl ⟨_, b, hb, rfl⟩) (Or.inr ⟨L, L', hL, hL', rfl⟩)
+      (Or.inr ⟨L₁, L₁', hL₁, hL₁', rfl⟩) _
+      (pullbackOrthonormal_normalizedTheta_mem_thetaSpace D hD.g1 cc δ t0 hc ht b hb.1)
   refine ⟨b, κ * μ, hb, mod1All_mul hκ hμ, funext fun z => ?_⟩
   rw [Iop_mul, mul_assoc κ μ]
   exact congrArg (κ * ·) (congrFun h z)

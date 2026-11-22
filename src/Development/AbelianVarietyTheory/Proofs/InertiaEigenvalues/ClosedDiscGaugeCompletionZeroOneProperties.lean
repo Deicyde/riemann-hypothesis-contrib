@@ -7,7 +7,9 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ClosedD
 
 @[expose] public section
 
-open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
+open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc
+  Formalism.WeaklyAdmissibleFiltrations TensorProduct PowerSeries GlobalTheory.Prism
+  GlobalTheory.BKReal GlobalTheory.Per GlobalTheory.BSP
 open scoped Formalism.Per NNReal
 
 noncomputable section
@@ -19,7 +21,8 @@ variable {l : ℕ} [hl : Fact l.Prime] {k : Type} [Field k] [CharP k l] [Perfect
 local notation "𝕎k" => WittVector l k
 local notation "Pk" => PreDisc l (0 : WittVector l k) 1
 local notation "Dk" => Disc l (0 : WittVector l k) 1
-local notation "sI" => IsLocalization.Away.invSelf (S := PreDisc l (0 : WittVector l k) 1) (l : WittVector l k)
+local notation "sI" =>
+  IsLocalization.Away.invSelf (S := PreDisc l (0 : WittVector l k) 1) (l : WittVector l k)
 
 omit [Field k] [CharP k l] [PerfectRing k l] in
 theorem l_pos : (0 : ℝ) < l := Nat.cast_pos.2 hl.out.pos
@@ -32,10 +35,11 @@ theorem l_mul_inv : (l : Pk) * sI = 1 := by
   rw [← map_natCast (algebraMap (𝕎k) (Pk)) l]
   exact IsLocalization.Away.mul_invSelf _
 
-
 omit [CharP k l] [PerfectRing k l] in
 theorem norm_l_mul (y : Pk) : ‖(l : Pk) * y‖ = ‖y‖ / l := by
-  have h := (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l (WittVector l k) 0 1).2.1 (ofPre l 0 1 y)
+  have h :=
+    (GlobalTheory.T.closedDiscGaugeCompletion_basic_properties l (WittVector l k) 0 1).2.1 (ofPre l
+      0 1 y)
   rw [← map_natCast (ofPre l (0 : WittVector l k) 1) l, ← map_mul, norm_ofPre, norm_ofPre] at h
   exact h
 
@@ -59,8 +63,8 @@ theorem algebraMap_injective : Function.Injective (algebraMap (𝕎k) (Pk)) := b
   have := congrArg (fun x : 𝕎k => x.coeff 1) h
   simp [WittVector.coeff_p_one] at this
 
-theorem ball_lt_one {r : ℝ} (hr : r < 1) {y : Pk} (hy : y ∈ ball l (0 : 𝕎k) 1 r) :
-    ∃ w : 𝕎k, y = algebraMap (𝕎k) (Pk) ((l : 𝕎k) * w) := by
+theorem ball_lt_one {r : ℝ} (hr : r < 1) {y : Pk} (hy : y ∈ ball l (0 : 𝕎k) 1 r)
+    : ∃ w : 𝕎k, y = algebraMap (𝕎k) (Pk) ((l : 𝕎k) * w) := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨a, b, c, h1, rfl⟩ := hx
@@ -68,17 +72,22 @@ theorem ball_lt_one {r : ℝ} (hr : r < 1) {y : Pk} (hy : y ∈ ball l (0 : 𝕎
     · have hca : c < a := by
         have h2 : (l : ℝ) ^ c < (l : ℝ) ^ a := by
           simp only [NNReal.coe_one, one_pow, mul_one] at h1
-          calc (l : ℝ) ^ c ≤ r * (l : ℝ) ^ a := h1
+          calc
+            (l : ℝ) ^ c
+              ≤ r * (l : ℝ) ^ a := h1
             _ < 1 * (l : ℝ) ^ a := mul_lt_mul_of_pos_right hr (pow_pos l_pos a)
             _ = _ := one_mul _
         exact (pow_lt_pow_iff_right₀ one_lt_l).1 h2
       obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_lt hca
       refine ⟨(l : 𝕎k) ^ d, ?_⟩
       simp only [pow_zero, mul_one, map_mul, map_pow, map_natCast]
-      calc (l : Pk) ^ (c + d + 1) * sI ^ c = ((l : Pk) * sI) ^ c * ((l : Pk) * (l : Pk) ^ d) := by ring
+      calc
+        (l : Pk) ^ (c + d + 1) * sI ^ c
+          = ((l : Pk) * sI) ^ c * ((l : Pk) * (l : Pk) ^ d) := by ring
         _ = _ := by rw [l_mul_inv, one_pow, one_mul]
     · exact ⟨0, by simp [zero_pow hb.ne']⟩
-  | zero => exact ⟨0, by simp⟩
+  | zero =>
+    exact ⟨0, by simp⟩
   | add x y _ _ hx hy =>
     obtain ⟨w, rfl⟩ := hx
     obtain ⟨w', rfl⟩ := hy
@@ -94,20 +103,21 @@ theorem norm_alg_unit (v : (𝕎k)ˣ) : ‖algebraMap (𝕎k) (Pk) v‖ = 1 := b
   have hv : (v : 𝕎k) = (l : 𝕎k) * w := algebraMap_injective hw
   exact (WittVector.irreducible l).not_isUnit (isUnit_of_mul_isUnit_left (hv ▸ v.isUnit))
 
-theorem norm_nf (v : (𝕎k)ˣ) (m n : ℕ) :
-    ‖(l : Pk) ^ m * (sI ^ n * algebraMap (𝕎k) (Pk) v)‖ = (l : ℝ) ^ n / (l : ℝ) ^ m := by
+theorem norm_nf (v : (𝕎k)ˣ) (m n : ℕ)
+    : ‖(l : Pk) ^ m * (sI ^ n * algebraMap (𝕎k) (Pk) v)‖ = (l : ℝ) ^ n / (l : ℝ) ^ m := by
   rw [norm_l_pow_mul, norm_inv_pow_mul, norm_alg_unit, one_mul]
 
-theorem norm_alg_pow_mul (v : (𝕎k)ˣ) (m : ℕ) :
-    ‖algebraMap (𝕎k) (Pk) ((l : 𝕎k) ^ m * v)‖ = 1 / (l : ℝ) ^ m := by
+theorem norm_alg_pow_mul (v : (𝕎k)ˣ) (m : ℕ)
+    : ‖algebraMap (𝕎k) (Pk) ((l : 𝕎k) ^ m * v)‖ = 1 / (l : ℝ) ^ m := by
   rw [map_mul, map_pow, map_natCast, norm_l_pow_mul, norm_alg_unit]
 
-theorem normal_form (y : Pk) (hy : y ≠ 0) :
-    ∃ (v : (𝕎k)ˣ) (m n : ℕ), y = (l : Pk) ^ m * (sI ^ n * algebraMap (𝕎k) (Pk) v) := by
+theorem normal_form (y : Pk) (hy : y ≠ 0)
+    : ∃ (v : (𝕎k)ˣ) (m n : ℕ), y = (l : Pk) ^ m * (sI ^ n * algebraMap (𝕎k) (Pk) v) := by
   obtain ⟨n, w, h⟩ := IsLocalization.Away.surj (l : 𝕎k) y
   have e : y = sI ^ n * algebraMap (𝕎k) (Pk) w := by
-    calc y = y * (algebraMap (𝕎k) (Pk) (l : 𝕎k) * sI) ^ n := by
-          rw [IsLocalization.Away.mul_invSelf, one_pow, mul_one]
+    calc
+      y = y * (algebraMap (𝕎k) (Pk) (l : 𝕎k) * sI) ^ n := by
+        rw [IsLocalization.Away.mul_invSelf, one_pow, mul_one]
       _ = sI ^ n * (y * algebraMap (𝕎k) (Pk) (l : 𝕎k) ^ n) := by ring
       _ = _ := by rw [h]
   have hw : w ≠ 0 := by rintro rfl; exact hy (by rw [e, map_zero, mul_zero])
@@ -123,19 +133,22 @@ theorem norm_mul_pre (x y : Pk) : ‖x * y‖ = ‖x‖ * ‖y‖ := by
   · simp
   obtain ⟨v, m, n, rfl⟩ := normal_form x hx
   obtain ⟨v', m', n', rfl⟩ := normal_form y hy
-  have e : (l : Pk) ^ m * (sI ^ n * algebraMap (𝕎k) (Pk) v) *
-      ((l : Pk) ^ m' * (sI ^ n' * algebraMap (𝕎k) (Pk) v')) =
-      (l : Pk) ^ (m + m') * (sI ^ (n + n') * algebraMap (𝕎k) (Pk) ↑(v * v')) := by
+  have e
+      : (l : Pk) ^ m * (sI ^ n * algebraMap (𝕎k) (Pk) v)
+          * ((l : Pk) ^ m' * (sI ^ n' * algebraMap (𝕎k) (Pk) v'))
+        = (l : Pk) ^ (m + m') * (sI ^ (n + n') * algebraMap (𝕎k) (Pk) ↑(v * v')) := by
     rw [Units.val_mul, map_mul]; ring
   rw [e, norm_nf, norm_nf, norm_nf, pow_add, pow_add, mul_div_mul_comm]
 
 theorem norm_mul_disc (x y : Dk) : ‖x * y‖ = ‖x‖ * ‖y‖ := by
   refine (denseRange_ofPre l (0 : 𝕎k) 1).induction_on x
     (isClosed_eq (continuous_norm.comp (continuous_id.mul continuous_const))
-      (continuous_norm.mul continuous_const)) fun a => ?_
+      (continuous_norm.mul continuous_const))
+    fun a => ?_
   refine (denseRange_ofPre l (0 : 𝕎k) 1).induction_on y
     (isClosed_eq (continuous_norm.comp (continuous_const.mul continuous_id))
-      (continuous_const.mul continuous_norm)) fun b => ?_
+      (continuous_const.mul continuous_norm))
+    fun b => ?_
   rw [← map_mul, norm_ofPre, norm_ofPre, norm_ofPre]
   exact norm_mul_pre a b
 
@@ -161,22 +174,24 @@ theorem mem_range_of_norm_lt (y : Pk) (hy : ‖y‖ < l) : ∃ w : 𝕎k, y = al
   obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hnm
   refine ⟨(l : 𝕎k) ^ d * v, ?_⟩
   rw [map_mul, map_pow, map_natCast]
-  calc (l : Pk) ^ (n + d) * (sI ^ n * algebraMap (𝕎k) (Pk) v)
+  calc
+    (l : Pk) ^ (n + d) * (sI ^ n * algebraMap (𝕎k) (Pk) v)
       = ((l : Pk) * sI) ^ n * ((l : Pk) ^ d * algebraMap (𝕎k) (Pk) v) := by ring
     _ = _ := by rw [l_mul_inv, one_pow, one_mul]
 
-theorem dvd_of_norm_le (w : 𝕎k) (j : ℕ) (h : ‖algebraMap (𝕎k) (Pk) w‖ ≤ 1 / (l : ℝ) ^ j) :
-    (l : 𝕎k) ^ j ∣ w := by
+theorem dvd_of_norm_le (w : 𝕎k) (j : ℕ) (h : ‖algebraMap (𝕎k) (Pk) w‖ ≤ 1 / (l : ℝ) ^ j)
+    : (l : 𝕎k) ^ j ∣ w := by
   rcases eq_or_ne w 0 with rfl | hw0
   · exact dvd_zero _
   obtain ⟨m, v, rfl⟩ := WittVector.exists_eq_pow_p_mul' w hw0
   rw [norm_alg_pow_mul, one_div_le_one_div (pow_pos l_pos _) (pow_pos l_pos _),
-    pow_le_pow_iff_right₀ one_lt_l] at h
+      pow_le_pow_iff_right₀ one_lt_l]
+    at h
   exact (pow_dvd_pow _ h).mul_right _
 
 omit [CharP k l] [PerfectRing k l] in
-theorem norm_alg_l_pow_mul_le (z : 𝕎k) (j : ℕ) :
-    ‖algebraMap (𝕎k) (Pk) ((l : 𝕎k) ^ j * z)‖ ≤ 1 / (l : ℝ) ^ j := by
+theorem norm_alg_l_pow_mul_le (z : 𝕎k) (j : ℕ)
+    : ‖algebraMap (𝕎k) (Pk) ((l : 𝕎k) ^ j * z)‖ ≤ 1 / (l : ℝ) ^ j := by
   rw [map_mul, map_pow, map_natCast, norm_l_pow_mul]
   gcongr
   exact norm_algebraMap_le z
@@ -186,7 +201,8 @@ theorem norm_ofPre_sub (a b : Pk) : ‖ofPre l (0 : 𝕎k) 1 a - ofPre l (0 : �
   rw [← map_sub, norm_ofPre]; rfl
 
 theorem exists_of_norm_le (x : Dk) (hx : ‖x‖ ≤ 1) : ∃ w : 𝕎k, x = toDisc l (0 : 𝕎k) 1 w := by
-  have hε : ∀ j : ℕ, (0 : ℝ) < 1 / (2 * (l : ℝ) ^ j) := fun j => by have := l_pos (l := l); positivity
+  have hε : ∀ j : ℕ, (0 : ℝ) < 1 / (2 * (l : ℝ) ^ j) := fun j => by
+    have := l_pos (l := l); positivity
   choose y hy using fun j : ℕ => (denseRange_ofPre l (0 : 𝕎k) 1).exists_dist_lt x (hε j)
   simp only [dist_eq_norm] at hy
   have hl2 : (2 : ℝ) ≤ l := by exact_mod_cast hl.out.two_le
@@ -206,8 +222,9 @@ theorem exists_of_norm_le (x : Dk) (hx : ‖x‖ ≤ 1) : ∃ w : 𝕎k, x = toD
   choose w hw using fun j => mem_range_of_norm_lt (y j) (hbd j)
   have hcau : ∀ {m n : ℕ}, m ≤ n → (l : 𝕎k) ^ m ∣ w m - w n := fun {m n} hmn => by
     refine dvd_of_norm_le _ m ?_
-    have h1 : ‖ofPre l (0 : 𝕎k) 1 (y m) - ofPre l (0 : 𝕎k) 1 (y n)‖ ≤
-        ‖x - ofPre l (0 : 𝕎k) 1 (y m)‖ + ‖x - ofPre l (0 : 𝕎k) 1 (y n)‖ := by
+    have h1
+        : ‖ofPre l (0 : 𝕎k) 1 (y m) - ofPre l (0 : 𝕎k) 1 (y n)‖
+          ≤ ‖x - ofPre l (0 : 𝕎k) 1 (y m)‖ + ‖x - ofPre l (0 : 𝕎k) 1 (y n)‖ := by
       have := norm_sub_le (x - ofPre l (0 : 𝕎k) 1 (y n)) (x - ofPre l (0 : 𝕎k) 1 (y m))
       rw [sub_sub_sub_cancel_left] at this
       linarith
@@ -218,21 +235,26 @@ theorem exists_of_norm_le (x : Dk) (hx : ‖x‖ ≤ 1) : ∃ w : 𝕎k, x = toD
         (mul_le_mul_of_nonneg_left (pow_le_pow_right₀ one_lt_l.le hmn) zero_le_two)
     have := hy m
     have := hy n
-    have h3 : 1 / (2 * (l : ℝ) ^ m) + 1 / (2 * (l : ℝ) ^ m) = 1 / (l : ℝ) ^ m := by
-      field_simp; ring
+    have h3 : 1 / (2 * (l : ℝ) ^ m) + 1 / (2 * (l : ℝ) ^ m) = 1 / (l : ℝ) ^ m := by field_simp; ring
     linarith
-  obtain ⟨L, hL⟩ := IsPrecomplete.prec' (I := Ideal.span {(l : 𝕎k)}) w fun {m n} hmn => by
-    simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-      Ideal.mem_span_singleton]
-    exact hcau hmn
+  obtain ⟨L, hL⟩ :=
+    IsPrecomplete.prec' (I := Ideal.span {(l : 𝕎k)}) w fun {m n} hmn => by
+      simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
+        Ideal.mem_span_singleton]
+      exact hcau hmn
   simp only [SModEq.sub_mem, smul_eq_mul, Ideal.mul_top, Ideal.span_singleton_pow,
-    Ideal.mem_span_singleton] at hL
+      Ideal.mem_span_singleton]
+    at hL
   refine ⟨L, ?_⟩
   have hb : ∀ n : ℕ, ‖toDisc l (0 : 𝕎k) 1 L - x‖ ≤ 2 * (1 / (l : ℝ)) ^ n := fun n => by
     obtain ⟨z, hz⟩ := hL n
-    have h1 : ‖toDisc l (0 : 𝕎k) 1 L - x‖ ≤
-        ‖toDisc l (0 : 𝕎k) 1 L - ofPre l (0 : 𝕎k) 1 (y n)‖ + ‖x - ofPre l (0 : 𝕎k) 1 (y n)‖ := by
-      have := norm_sub_le (toDisc l (0 : 𝕎k) 1 L - ofPre l (0 : 𝕎k) 1 (y n)) (x - ofPre l (0 : 𝕎k) 1 (y n))
+    have h1
+        : ‖toDisc l (0 : 𝕎k) 1 L - x‖
+          ≤ ‖toDisc l (0 : 𝕎k) 1 L - ofPre l (0 : 𝕎k) 1 (y n)‖
+            + ‖x - ofPre l (0 : 𝕎k) 1 (y n)‖ := by
+      have :=
+        norm_sub_le (toDisc l (0 : 𝕎k) 1 L - ofPre l (0 : 𝕎k) 1 (y n))
+          (x - ofPre l (0 : 𝕎k) 1 (y n))
       rwa [sub_sub_sub_cancel_right] at this
     have h2 : ‖toDisc l (0 : 𝕎k) 1 L - ofPre l (0 : 𝕎k) 1 (y n)‖ ≤ 1 / (l : ℝ) ^ n := by
       rw [show toDisc l (0 : 𝕎k) 1 L = ofPre l (0 : 𝕎k) 1 (algebraMap (𝕎k) (Pk) L) from rfl,
@@ -246,18 +268,18 @@ theorem exists_of_norm_le (x : Dk) (hx : ‖x‖ ≤ 1) : ∃ w : 𝕎k, x = toD
     linarith
   by_contra hne
   have hpos : 0 < ‖toDisc l (0 : 𝕎k) 1 L - x‖ := norm_pos_iff.2 (sub_ne_zero.2 (Ne.symm hne))
-  obtain ⟨n, hn⟩ := exists_pow_lt_of_lt_one (half_pos hpos)
-    ((div_lt_one (l_pos (l := l))).2 one_lt_l)
+  obtain ⟨n, hn⟩ :=
+    exists_pow_lt_of_lt_one (half_pos hpos) ((div_lt_one (l_pos (l := l))).2 one_lt_l)
   linarith [hb n]
 
 end GlobalTheory.BSP.DiscZero
 
-
 open GlobalTheory.BSP.DiscZero in
-theorem GlobalTheory.BSP.disc_zero_one : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
-    (∀ x y : Disc l (0 : Wq l bk.a) 1, ‖x * y‖ = ‖x‖ * ‖y‖) ∧
-    (∀ x : Disc l (0 : Wq l bk.a) 1, ‖x‖ ≤ 1 → ∃ w, x = toDisc l (0 : Wq l bk.a) 1 w) ∧
-    Function.Injective (toDisc l (0 : Wq l bk.a) 1) ∧
-    ∀ w : Wq l bk.a, IsUnit w → ‖toDisc l (0 : Wq l bk.a) 1 w‖ = 1 := by
+theorem GlobalTheory.BSP.disc_zero_one
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l) (bk : BK K),
+      (∀ x y : Disc l (0 : Wq l bk.a) 1, ‖x * y‖ = ‖x‖ * ‖y‖)
+        ∧ (∀ x : Disc l (0 : Wq l bk.a) 1, ‖x‖ ≤ 1 → ∃ w, x = toDisc l (0 : Wq l bk.a) 1 w)
+        ∧ Function.Injective (toDisc l (0 : Wq l bk.a) 1)
+        ∧ ∀ w : Wq l bk.a, IsUnit w → ‖toDisc l (0 : Wq l bk.a) 1 w‖ = 1 := by
   intro l _ K bk
   exact ⟨norm_mul_disc, exists_of_norm_le, toDisc_injective, norm_toDisc_unit⟩

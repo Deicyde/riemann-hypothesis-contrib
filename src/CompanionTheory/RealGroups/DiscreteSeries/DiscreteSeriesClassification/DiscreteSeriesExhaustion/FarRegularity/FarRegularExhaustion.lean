@@ -17,8 +17,15 @@ public import CompanionTheory.SpectralGeometry.LocalGlobalProofs.StableLattices.
 namespace CompanionTheory.RgExh.U
 
 theorem far_regular_exhaustion : CompanionTheory.RgExh.FarReg :=
-  GlobalTheory.CompanionTheory.FarRegularityLevels.farReg_of_lkt_unitIneq_farNum GlobalTheory.CompanionTheory.RgExhFarReg.lktExists GlobalTheory.CompanionTheory.RgFarRen.renumber GlobalTheory.CompanionTheory.RgExhUnit.unitIneq
-    (GlobalTheory.CompanionTheory.RgCOBlock.coBlock (GlobalTheory.CompanionTheory.RgExh.injU_of_injR (GlobalTheory.CompanionTheory.RgExhInjR.injR_of_vanKG
-      (GlobalTheory.CompanionTheory.RgExhVanKG.vanKG_of GlobalTheory.CompanionTheory.ClusterNum.numKG))) GlobalTheory.CompanionTheory.GenCOUP.genCOU) GlobalTheory.CompanionTheory.RgExhFar.farNum
+  GlobalTheory.CompanionTheory.FarRegularityLevels.farReg_of_lkt_unitIneq_farNum
+    GlobalTheory.CompanionTheory.RgExhFarReg.lktExists
+    GlobalTheory.CompanionTheory.RgFarRen.renumber GlobalTheory.CompanionTheory.RgExhUnit.unitIneq
+    (GlobalTheory.CompanionTheory.RgCOBlock.coBlock
+      (GlobalTheory.CompanionTheory.RgExh.injU_of_injR
+        (GlobalTheory.CompanionTheory.RgExhInjR.injR_of_vanKG
+          (GlobalTheory.CompanionTheory.RgExhVanKG.vanKG_of
+            GlobalTheory.CompanionTheory.ClusterNum.numKG)))
+      GlobalTheory.CompanionTheory.GenCOUP.genCOU)
+    GlobalTheory.CompanionTheory.RgExhFar.farNum
 
 end CompanionTheory.RgExh.U

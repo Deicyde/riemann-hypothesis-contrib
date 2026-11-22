@@ -24,8 +24,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.TensorLattic
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest
+  GlobalTheory.RowClaim
 open Formalism.L2.Host (HChar)
 open GlobalTheory.IndefiniteRowSideFullHecke.UnitCharTriangle (Tri)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -38,9 +41,12 @@ namespace GlobalTheory.SplitCharAlg
 open Formalism.L2.Host
 open scoped TensorProduct
 
-theorem isAlgebraic_loc {E : Type} [Field E] [NumberField E] {I : Type} [Fintype I] {φ : I → E →+* ℂ} {n : I → ℤ}
-    {χ : HChar E} (h : χ.HasInf φ n) (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ) :
-    IsAlgebraic ℚ ((χ.loc v x : ℂˣ) : ℂ) := by
+theorem isAlgebraic_loc
+    {E : Type} [Field E] [NumberField E]
+    {I : Type} [Fintype I]
+    {φ : I → E →+* ℂ} {n : I → ℤ} {χ : HChar E} (h : χ.HasInf φ n)
+    (v : HeightOneSpectrum (𝓞 E)) (x : (v.adicCompletion E)ˣ)
+    : IsAlgebraic ℚ ((χ.loc v x : ℂˣ) : ℂ) := by
   have h2 : (χ ^ 2).HasInf φ (fun i => 2 * n i) := by
     intro k
     have e1 : (((χ ^ 2).inf k : ℂˣ) : ℂ) = ((χ.inf k : ℂˣ) : ℂ) ^ 2 := rfl
@@ -56,17 +62,21 @@ theorem isAlgebraic_loc {E : Type} [Field E] [NumberField E] {I : Type} [Fintype
   have hint : IsIntegral ℚ (((⟨_, hx⟩ : M) : ℂ)) := (IsIntegral.of_finite ℚ (⟨_, hx⟩ : M)).map M.val
   exact IsAlgebraic.of_pow two_pos hint.isAlgebraic
 
-
-open GlobalTheory.AdelicU GlobalTheory.AdelicU.Supp GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels in
-theorem exists_locIdele {D : D7} {e : AE D} (he : IsSplitIdem D e) (x : (AE D)ˣ) (hx : (x : AE D) = e * x + (1 - e)) :
-    ∃ (w : HeightOneSpectrum (𝓞 D.host.E)) (y : (w.adicCompletion D.host.E)ˣ), x = GlobalTheory.LFun.locIdele D.host.F w y := by
+open GlobalTheory.AdelicU GlobalTheory.AdelicU.Supp
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels in
+theorem exists_locIdele
+    {D : D7} {e : AE D} (he : IsSplitIdem D e) (x : (AE D)ˣ) (hx : (x : AE D) = e * x + (1 - e))
+    : ∃ (w : HeightOneSpectrum (𝓞 D.host.E)) (y : (w.adicCompletion D.host.E)ˣ),
+      x = GlobalTheory.LFun.locIdele D.host.F w y := by
   obtain ⟨v, τ, rfl⟩ := isSplitIdem_iff_exists.1 he
   have hA : At (evFin D.host.F v) (splitIdemAd (isCMExt_host D) τ) := by
     intro u hu
     rw [Algebra.smul_def, mul_comm]
     change singleTens D.host.E v _ * _ = 0
     rw [singleTens_mul]
-    have : compFin D.host.F D.host.E v (algebraMap (AF D.host.F) (AF D.host.F ⊗[D.host.F] D.host.E) u) = 0 := by
+    have : compFin D.host.F D.host.E v
+          (algebraMap (AF D.host.F) (AF D.host.F ⊗[D.host.F] D.host.E) u)
+        = 0 := by
       change (evFin D.host.F v u) ⊗ₜ[D.host.F] (1 : D.host.E) = 0
       rw [hu, TensorProduct.zero_tmul]
     rw [this, mul_zero, map_zero]

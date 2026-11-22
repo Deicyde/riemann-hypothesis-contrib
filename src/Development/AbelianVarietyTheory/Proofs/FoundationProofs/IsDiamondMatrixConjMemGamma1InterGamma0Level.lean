@@ -9,8 +9,9 @@ open scoped MatrixGroups ModularForm Manifold
 
 namespace GlobalTheory.Hk
 
-theorem isDia_conj_mem_lev : ∀ (N l : ℕ) (d : ℤ) (σ γ : SL(2, ℤ)), IsDia N l d σ → γ ∈ lev N l →
-    σ * γ * σ⁻¹ ∈ lev N l := by
+theorem isDia_conj_mem_lev
+    : ∀ (N l : ℕ) (d : ℤ) (σ γ : SL(2, ℤ)),
+      IsDia N l d σ → γ ∈ lev N l → σ * γ * σ⁻¹ ∈ lev N l := by
   intro N l d σ γ hσ hγ
   have hc := (ZMod.intCast_zmod_eq_zero_iff_dvd _ _).1 hσ.1
   have hσN : σ ∈ Gamma0 N := by

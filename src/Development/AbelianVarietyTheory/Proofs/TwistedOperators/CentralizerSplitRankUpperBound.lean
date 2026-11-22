@@ -14,23 +14,24 @@ open scoped TensorProduct
 
 namespace GlobalTheory.RegSS.SplitRankBound
 
-theorem zpow_sum_eq {M : Type} [CommGroup M] (a : M) {ι : Type} (s : Finset ι) (f : ι → ℤ) :
-    a ^ (∑ i ∈ s, f i) = ∏ i ∈ s, a ^ f i := by
+theorem zpow_sum_eq {M : Type} [CommGroup M] (a : M) {ι : Type} (s : Finset ι) (f : ι → ℤ)
+    : a ^ (∑ i ∈ s, f i) = ∏ i ∈ s, a ^ f i := by
   classical
   induction s using Finset.induction_on with
   | empty => simp
   | insert x s hx ih => rw [Finset.sum_insert hx, Finset.prod_insert hx, _root_.zpow_add, ih]
 
-theorem two_zpow_eq_one {F : Type} [Field F] [CharZero F] {m : ℤ} (h : (2:F) ^ m = 1) : m = 0 := by
-  have h2 : ((2:ℚ) ^ m : ℚ) = (2:ℚ) ^ (0:ℤ) := by
+theorem two_zpow_eq_one {F : Type} [Field F] [CharZero F] {m : ℤ} (h : (2 : F) ^ m = 1)
+    : m = 0 := by
+  have h2 : ((2 : ℚ) ^ m : ℚ) = (2 : ℚ) ^ (0 : ℤ) := by
     rw [zpow_zero]
     apply (algebraMap ℚ F).injective
     rw [map_zpow₀, map_ofNat, h, map_one]
   exact (zpow_right_strictMono₀ one_lt_two).injective h2
 
 set_option maxHeartbeats 1000000 in
-theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : SeparatingPoints) :
-    SplitRankUpper := by
+theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : SeparatingPoints)
+    : SplitRankUpper := by
   intro F E _ _ _ _ n _ _ σ J γ hR hPl hPC k K _ _ he s hA
   classical
   obtain ⟨A⟩ := hA
@@ -38,44 +39,56 @@ theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : Sep
   obtain ⟨ψ, hsep, hfield⟩ := hP F E σ hR.quad (plusAlg σ J (γ : Matrix n n E)) k K he
   have hinj := (hPC F).1
   have hcent := (hPC F).2.2
-  obtain ⟨ρ, hρ⟩ := LinearMap.exists_leftInverse_of_injective
-    (toMat σ J (γ : Matrix n n E) F).toLinearMap (LinearMap.ker_eq_bot.2 hinj)
+  obtain ⟨ρ, hρ⟩ :=
+    LinearMap.exists_leftInverse_of_injective (toMat σ J (γ : Matrix n n E) F).toLinearMap
+      (LinearMap.ker_eq_bot.2 hinj)
   have hρT : ∀ x, ρ (toMat σ J (γ : Matrix n n E) F x) = x := fun x => LinearMap.congr_fun hρ x
-  have hex : ∀ t : Fin s → Fˣ, ∃ u ∈ normOne σ J (γ : Matrix n n E) F,
-      toMat σ J (γ : Matrix n n E) F (u : LPts σ J (γ : Matrix n n E) F) =
-        ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) :=
-    fun t => (hcent _).1 (A.mem F t)
-  have hTu : ∀ t : Fin s → Fˣ, toMat σ J (γ : Matrix n n E) F
-      (ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F))) =
-        ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) := by
+  have hex
+      : ∀ t : Fin s → Fˣ, ∃ u ∈ normOne σ J (γ : Matrix n n E) F,
+        toMat σ J (γ : Matrix n n E) F (u : LPts σ J (γ : Matrix n n E) F)
+          = ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) := fun t =>
+    (hcent _).1 (A.mem F t)
+  have hTu
+      : ∀ t : Fin s → Fˣ,
+        toMat σ J (γ : Matrix n n E) F (ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)))
+          = ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) := by
     intro t; obtain ⟨u, -, hu⟩ := hex t; rw [← hu, hρT]
-  have hnorm : ∀ t : Fin s → Fˣ,
-      ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) *
-        lConj σ J (γ : Matrix n n E) F (ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)))
+  have hnorm
+      : ∀ t : Fin s → Fˣ,
+        ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) * lConj σ J (γ : Matrix n n E) F
+            (ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)))
           = 1 := by
     intro t; obtain ⟨u, hu, hu'⟩ := hex t; rw [← hu', hρT]; exact hu
-  let uu : (Fin s → Fˣ) →* LPts σ J (γ : Matrix n n E) F :=
-    { toFun := fun t => ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F))
-      map_one' := hinj (by rw [hTu, map_one, Units.val_one, map_one])
-      map_mul' := fun a b => hinj (by
-        rw [map_mul (toMat σ J (γ : Matrix n n E) F), hTu a, hTu b, ← Units.val_mul, ← map_mul, hTu]) }
+  let uu : (Fin s → Fˣ) →* LPts σ J (γ : Matrix n n E) F := {
+    toFun := fun t => ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F))
+    map_one' := hinj (by rw [hTu, map_one, Units.val_one, map_one])
+    map_mul' := fun a b =>
+      hinj (by
+        rw [map_mul (toMat σ J (γ : Matrix n n E) F), hTu a, hTu b, ← Units.val_mul, ← map_mul,
+          hTu])
+  }
   have huu : ∀ t, uu t = ρ ((A.hom F t : GL n (E ⊗[F] F)) : Matrix n n (E ⊗[F] F)) := fun _ => rfl
   clear_value uu
   obtain ⟨S, C, hC⟩ := hL F E n σ J γ s A
-  have hmono : ∀ i, ∃ a : Fin s → ℤ, ∀ t : Fin s → Fˣ,
-      ψ i (uu t) = algebraMap F (AlgebraicClosure F) ((∏ j, t j ^ a j : Fˣ) : F) := by
+  have hmono
+      : ∀ i, ∃ a : Fin s → ℤ, ∀ t : Fin s → Fˣ,
+        ψ i (uu t) = algebraMap F (AlgebraicClosure F) ((∏ j, t j ^ a j : Fˣ) : F) := by
     intro i
     refine hM F (AlgebraicClosure F) s ((ψ i : _ →+* AlgebraicClosure F).toMonoidHom.comp uu) S
-      (fun a => ψ i (ρ (C a))) (fun t => ?_)
+      (fun a => ψ i (ρ (C a)))
+      (fun t => ?_)
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [MonoidHom.coe_comp, Function.comp_apply, RingHom.toMonoidHom_eq_coe,
+    simp only [MonoidHom.coe_comp, Function.comp_apply, RingHom.toMonoidHom_eq_coe,
       MonoidHom.coe_coe, RingHom.coe_coe, huu, hC t, map_sum, map_smul]
   choose a ha using hmono
   have hconj : ∀ i t, ψ i (uu t) * ψ i (lConj σ J (γ : Matrix n n E) F (uu t)) = 1 := by
     intro i t; rw [← map_mul, huu, hnorm, map_one]
   have hlc : tConj3 (plusAlg σ J (γ : Matrix n n E)) σ F = lConj σ J (γ : Matrix n n E) F := rfl
-  have hsq : ∀ i, IsField (K i ⊗[F] E) → ∀ t : Fin s → Fˣ,
-      ((∏ j, t j ^ a i j : Fˣ) : F) * ((∏ j, t j ^ a i j : Fˣ) : F) = 1 := by
+  have hsq
+      : ∀ i,
+        IsField (K i ⊗[F] E)
+          → ∀ t : Fin s → Fˣ,
+            ((∏ j, t j ^ a i j : Fˣ) : F) * ((∏ j, t j ^ a i j : Fˣ) : F) = 1 := by
     intro i hi t
     have h0 : ψ i (uu t - algebraMap F _ ((∏ j, t j ^ a i j : Fˣ) : F)) = 0 := by
       rw [map_sub, AlgHom.commutes, ha, sub_self]
@@ -93,7 +106,7 @@ theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : Sep
       simpa [M, Matrix.mulVec, dotProduct] using this
     let u2 : Fˣ := Units.mk0 2 two_ne_zero
     let t : Fin s → Fˣ := fun j => u2 ^ w j
-    have hprod : ∀ i, ((∏ j, t j ^ a i j : Fˣ) : F) = (2:F) ^ (∑ j, a i j * w j) := by
+    have hprod : ∀ i, ((∏ j, t j ^ a i j : Fˣ) : F) = (2 : F) ^ (∑ j, a i j * w j) := by
       intro i
       have : (∏ j, t j ^ a i j : Fˣ) = u2 ^ (∑ j, a i j * w j) := by
         rw [zpow_sum_eq]
@@ -113,13 +126,15 @@ theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : Sep
     have hψc : ∀ i, ψ i (lConj σ J (γ : Matrix n n E) F (uu t)) = 1 := fun i => by
       have h := hconj i t; rwa [hψ1, one_mul] at h
     have hut : uu t = 1 := by
-      have := hsep (uu t - 1) fun i => ⟨by rw [map_sub, hψ1, map_one, sub_self],
-        by rw [hlc, map_sub, map_sub, hψc, map_one, map_one, sub_self]⟩
+      have :=
+        hsep (uu t - 1) fun i => ⟨
+          by rw [map_sub, hψ1, map_one, sub_self],
+          by rw [hlc, map_sub, map_sub, hψc, map_one, map_one, sub_self]
+        ⟩
       rwa [sub_eq_zero] at this
     have hhom : A.hom F t = A.hom F 1 := by
       refine Units.ext ?_
-      rw [(A.hom F).map_one, Units.val_one, ← hTu t, ← huu, hut,
-        map_one]
+      rw [(A.hom F).map_one, Units.val_one, ← hTu t, ← huu, hut, map_one]
     have ht1 : t = 1 := A.inj F hhom
     funext j
     have hj := congrFun ht1 j

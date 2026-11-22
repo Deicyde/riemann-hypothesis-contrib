@@ -14,7 +14,8 @@ public import GroundTheory.AutomorphicForms.FourierWhittaker.IsAddFundamentalDom
 
 @[expose] public section
 
-open NumberField NumberField.mixedEmbedding MeasureTheory Topology Set Filter IsDedekindDomain Matrix
+open NumberField NumberField.mixedEmbedding MeasureTheory Topology Set Filter IsDedekindDomain
+  Matrix
 open scoped NumberField.AdeleRing
 
 namespace GroundTheory.Automorphic
@@ -33,12 +34,15 @@ def whittaker (ϕ : AdelicGLn.AdelicGL K n → ℂ) (g : AdelicGLn.AdelicGL K n)
 
 def gePosZeroEquiv : GePos n 0 ≃ Pos n := Equiv.subtypeUnivEquiv fun _ => Nat.zero_le _
 
-theorem whittaker_eq_partialCoeff_zero {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : Continuous ϕ)
-    (g : AdelicGLn.AdelicGL K n) : whittaker ϕ g = partialCoeff ϕ 0 g := by
+theorem whittaker_eq_partialCoeff_zero
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : Continuous ϕ) (g : AdelicGLn.AdelicGL K n)
+    : whittaker ϕ g = partialCoeff ϕ 0 g := by
   rw [partialCoeff_eq_setIntegral hϕ _ 0 rfl (Nat.zero_le n), whittaker]
   let E := MeasurableEquiv.piCongrLeft (fun _ : Pos n => 𝔸[K]) (gePosZeroEquiv (n := n))
   have hE : MeasurePreserving E (vecMeasure K (GePos n 0)) (vecMeasure K (Pos n)) :=
-    measurePreserving_piCongrLeft (fun _ : Pos n => GroundTheory.Global.adeleMeasure K) gePosZeroEquiv
+    measurePreserving_piCongrLeft
+      (fun _ : Pos n => GroundTheory.Global.adeleMeasure K)
+      gePosZeroEquiv
   have hext : ∀ Z : GePos n 0 → 𝔸[K], extGe Z = E Z := by
     intro Z
     funext p
@@ -58,11 +62,13 @@ theorem whittaker_eq_partialCoeff_zero {ϕ : AdelicGLn.AdelicGL K n → ℂ} (h�
   refine setIntegral_congr_fun measurableSet_vecDomain fun Z _ => ?_
   simp only [wInt, hext]
 
-theorem stepCoeff_zero (F : AdelicGLn.AdelicGL K n → ℂ) (g : AdelicGLn.AdelicGL K n) :
-    stepCoeff 0 F g = F g := by
+theorem stepCoeff_zero (F : AdelicGLn.AdelicGL K n → ℂ) (g : AdelicGLn.AdelicGL K n)
+    : stepCoeff 0 F g = F g := by
   have hx : ∀ x : Fin 0 → 𝔸[K], x = 0 := fun x => funext fun i => i.elim0
-  have hc : ∀ x : Fin 0 → 𝔸[K], F (colGL 0 x * g) *
-      (GroundTheory.Global.adelicChar K (-pair (lastVec 0) x) : ℂ) = F g := by
+  have hc
+      : ∀ x : Fin 0 → 𝔸[K],
+        F (colGL 0 x * g) * (GroundTheory.Global.adelicChar K (- pair (lastVec 0) x) : ℂ)
+          = F g := by
     intro x
     rw [hx x, colGL_zero, one_mul, pair_zero, neg_zero, AddChar.map_zero_eq_one, Circle.coe_one,
       mul_one]
@@ -70,45 +76,50 @@ theorem stepCoeff_zero (F : AdelicGLn.AdelicGL K n → ℂ) (g : AdelicGLn.Adeli
   simp_rw [hc]
   rw [setIntegral_const, measureReal_def, vecMeasure_vecDomain, ENNReal.toReal_one, one_smul]
 
-theorem partialCoeff_zero_eq_one (ϕ : AdelicGLn.AdelicGL K n → ℂ) (hn : 0 < n) :
-    partialCoeff ϕ 0 = partialCoeff ϕ 1 := by
+theorem partialCoeff_zero_eq_one (ϕ : AdelicGLn.AdelicGL K n → ℂ) (hn : 0 < n)
+    : partialCoeff ϕ 0 = partialCoeff ϕ 1 := by
   funext g
   rw [partialCoeff_of_lt ϕ hn, stepCoeff_zero]
 
-theorem whittaker_eq_partialCoeff {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : Continuous ϕ) (hn : 0 < n)
-    (g : AdelicGLn.AdelicGL K n) : whittaker ϕ g = partialCoeff ϕ 1 g := by
+theorem whittaker_eq_partialCoeff
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : Continuous ϕ) (hn : 0 < n) (g : AdelicGLn.AdelicGL K n)
+    : whittaker ϕ g = partialCoeff ϕ 1 g := by
   rw [whittaker_eq_partialCoeff_zero hϕ, partialCoeff_zero_eq_one ϕ hn]
 
-theorem isUSmooth_of_isAutomorphicForm {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : IsAutomorphicForm ϕ) :
-    IsUSmooth ϕ := by
+theorem isUSmooth_of_isAutomorphicForm {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : IsAutomorphicForm ϕ)
+    : IsUSmooth ϕ := by
   obtain ⟨U, -, hU⟩ := exists_openSubgroup_rightInvariant hϕ.isSmooth hϕ.isKFinite
   exact ⟨hϕ.isSmooth.1, ⟨U, hU⟩, hϕ.isLeftInvariant⟩
 
-theorem hasSum_partialCoeff_cusp {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n) {k : ℕ}
-    (hk0 : 0 < k) (hk : k < n) (g : AdelicGLn.AdelicGL K n) :
-    HasSum (fun ξ : {ξ : Fin k → K // ξ ≠ 0} =>
+theorem hasSum_partialCoeff_cusp
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n)
+    {k : ℕ} (hk0 : 0 < k) (hk : k < n)
+    (g : AdelicGLn.AdelicGL K n)
+    : HasSum
+      (fun ξ : {ξ : Fin k → K // ξ ≠ 0} =>
         partialCoeff ϕ k (AdelicGLn.diagonal K n (blockGL hk.le (rowCompletion ξ.1)) * g))
       (partialCoeff ϕ (k + 1) g) := by
-  have hzero (g' : AdelicGLn.AdelicGL K n) :
-      vecCoeff (fun x => partialCoeff ϕ (k + 1) (colGL k x * g')) 0 = 0 := by
-    have hconstant (B : LowPos n k → 𝔸[K]) :
-        ∫ A in vecDomain K (UPos n k), ϕ (uGL (extLow B + extU A) * g')
-            ∂vecMeasure K (UPos n k) = constantTerm k ϕ (uGL (extLow B) * g') := by
-      have hrepr (A : UPos n k → 𝔸[K]) :
-          uGL (extLow B + extU A) = unipGL ((shear B).symm A) * uGL (extLow B) := by
+  have hzero (g' : AdelicGLn.AdelicGL K n)
+      : vecCoeff (fun x => partialCoeff ϕ (k + 1) (colGL k x * g')) 0 = 0 := by
+    have hconstant (B : LowPos n k → 𝔸[K])
+        : ∫ A in vecDomain K (UPos n k), ϕ (uGL (extLow B + extU A) * g')
+              ∂vecMeasure K (UPos n k)
+          = constantTerm k ϕ (uGL (extLow B) * g') := by
+      have hrepr (A : UPos n k → 𝔸[K])
+          : uGL (extLow B + extU A) = unipGL ((shear B).symm A) * uGL (extLow B) := by
         apply Units.ext
         rw [Units.val_mul, coe_unipGL, coe_uGL, coe_uGL, unipMatrix_mul_uMat_extLow,
           AddEquiv.apply_symm_apply]
       simp_rw [hrepr, mul_assoc]
       rw [setIntegral_comp_addEquiv (shear B).symm (continuous_shear_symm B) (continuous_shear B)
-        (isAddFundamentalDomain_shear_symm B) (f := fun A => ϕ (unipGL A * (uGL (extLow B) * g')))
+        (isAddFundamentalDomain_shear_symm B)
+        (f := fun A => ϕ (unipGL A * (uGL (extLow B) * g')))
         fun ξ hξ x => hϕ.1.isLeftInvariant.unipGL_vadd _ ⟨ξ, hξ⟩ x]
       rfl
     rw [vecCoeff_zero_eq_setIntegral_low hϕ.1.continuous hk g']
     refine (setIntegral_congr_fun measurableSet_vecDomain fun B _ => ?_).trans (integral_zero _ _)
     rw [hconstant B, hϕ.2 k hk0 hk, mul_zero]
   exact hasSum_partialCoeff_of_vecCoeff_zero (isUSmooth_of_isAutomorphicForm hϕ.1) hk hzero g
-
 
 variable (K) in
 def mirabolic (k : ℕ) : Subgroup (GL (Fin k) K) where
@@ -128,15 +139,17 @@ theorem lastRow_ne_zero {k : ℕ} (hk : 0 < k) (γ : GL (Fin k) K) : lastRow γ 
   intro h
   have hlv : lastVec (K := K) k ≠ 0 := fun h0 => by
     have := congrFun h0 ⟨k - 1, by omega⟩
-    simp [lastVec] at this; omega
+    simp [lastVec] at this
+    omega
   apply hlv
   have := congrArg (fun v => Matrix.vecMul v ((γ⁻¹ : GL (Fin k) K) : Matrix (Fin k) (Fin k) K)) h
   simp only [lastRow, Matrix.vecMul_vecMul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
-    Matrix.vecMul_one, Matrix.zero_vecMul] at this
+      Matrix.vecMul_one, Matrix.zero_vecMul]
+    at this
   exact this
 
-theorem lastRow_eq_iff {k : ℕ} (γ γ' : GL (Fin k) K) :
-    lastRow γ = lastRow γ' ↔ γ' * γ⁻¹ ∈ mirabolic K k := by
+theorem lastRow_eq_iff {k : ℕ} (γ γ' : GL (Fin k) K)
+    : lastRow γ = lastRow γ' ↔ γ' * γ⁻¹ ∈ mirabolic K k := by
   constructor
   · intro h
     show Matrix.vecMul (lastVec k) ((γ' * γ⁻¹ : GL (Fin k) K) : Matrix (Fin k) (Fin k) K) = lastVec k
@@ -145,19 +158,26 @@ theorem lastRow_eq_iff {k : ℕ} (γ γ' : GL (Fin k) K) :
     rw [← h, lastRow, Matrix.vecMul_vecMul, ← Units.val_mul, mul_inv_cancel, Units.val_one,
       Matrix.vecMul_one]
   · intro h
-    have h' : Matrix.vecMul (lastVec k) ((γ' * γ⁻¹ : GL (Fin k) K) : Matrix (Fin k) (Fin k) K) =
-        lastVec k := h
+    have h'
+        : Matrix.vecMul (lastVec k) ((γ' * γ⁻¹ : GL (Fin k) K) : Matrix (Fin k) (Fin k) K)
+          = lastVec k :=
+      h
     symm
-    calc lastRow γ' = lastRow ((γ' * γ⁻¹) * γ) := by rw [inv_mul_cancel_right]
-      _ = Matrix.vecMul (Matrix.vecMul (lastVec k) ((γ' * γ⁻¹ : GL (Fin k) K) :
-            Matrix (Fin k) (Fin k) K)) (γ : Matrix (Fin k) (Fin k) K) := by
-          rw [lastRow, Units.val_mul, ← Matrix.vecMul_vecMul]
+    calc
+      lastRow γ'
+        = lastRow ((γ' * γ⁻¹) * γ) := by rw [inv_mul_cancel_right]
+      _ = Matrix.vecMul
+          (Matrix.vecMul (lastVec k) ((γ' * γ⁻¹ : GL (Fin k) K) : Matrix (Fin k) (Fin k) K))
+          (γ : Matrix (Fin k) (Fin k) K) := by
+        rw [lastRow, Units.val_mul, ← Matrix.vecMul_vecMul]
       _ = lastRow γ := by rw [h']; rfl
 
-def cosetEquiv {k : ℕ} (hk : 0 < k) :
-    Quotient (QuotientGroup.rightRel (mirabolic K k)) ≃ {ξ : Fin k → K // ξ ≠ 0} where
-  toFun := Quotient.lift (fun γ => ⟨lastRow γ, lastRow_ne_zero hk γ⟩) fun a b hab =>
-    Subtype.ext ((lastRow_eq_iff a b).2 (QuotientGroup.rightRel_apply.1 hab))
+def cosetEquiv {k : ℕ} (hk : 0 < k)
+    : Quotient (QuotientGroup.rightRel (mirabolic K k)) ≃ {ξ : Fin k → K // ξ ≠ 0} where
+  toFun :=
+    Quotient.lift
+      (fun γ => ⟨lastRow γ, lastRow_ne_zero hk γ⟩)
+      fun a b hab => Subtype.ext ((lastRow_eq_iff a b).2 (QuotientGroup.rightRel_apply.1 hab))
   invFun ξ := Quotient.mk _ (rowCompletion ξ.1)
   left_inv := by
     refine Quotient.ind fun γ => Quotient.sound ?_
@@ -166,9 +186,12 @@ def cosetEquiv {k : ℕ} (hk : 0 < k) :
     exact vecMul_rowCompletion (lastRow_ne_zero hk γ)
   right_inv ξ := Subtype.ext (vecMul_rowCompletion ξ.2)
 
-theorem hasSum_partialCoeff_cusp_cosets {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n)
-    {k : ℕ} (hk0 : 0 < k) (hk : k < n) (g : AdelicGLn.AdelicGL K n) :
-    HasSum (fun c : Quotient (QuotientGroup.rightRel (mirabolic K k)) =>
+theorem hasSum_partialCoeff_cusp_cosets
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n)
+    {k : ℕ} (hk0 : 0 < k) (hk : k < n)
+    (g : AdelicGLn.AdelicGL K n)
+    : HasSum
+      (fun c : Quotient (QuotientGroup.rightRel (mirabolic K k)) =>
         partialCoeff ϕ k (AdelicGLn.diagonal K n (blockGL hk.le c.out) * g))
       (partialCoeff ϕ (k + 1) g) := by
   rw [← (cosetEquiv (K := K) hk0).symm.hasSum_iff]
@@ -184,13 +207,15 @@ theorem hasSum_partialCoeff_cusp_cosets {ϕ : AdelicGLn.AdelicGL K n → ℂ} (h
 def nestedWhittaker (ϕ : AdelicGLn.AdelicGL K n → ℂ) : ℕ → AdelicGLn.AdelicGL K n → ℂ
   | 0 => whittaker ϕ
   | 1 => whittaker ϕ
-  | k + 2 => fun g => if h : k + 1 < n then
+  | k + 2 => fun g =>
+    if h : k + 1 < n then
       ∑' c : Quotient (QuotientGroup.rightRel (mirabolic K (k + 1))),
         nestedWhittaker ϕ (k + 1) (AdelicGLn.diagonal K n (blockGL h.le c.out) * g)
-    else 0
+    else
+      0
 
-theorem partialCoeff_eq_nestedWhittaker {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n) :
-    ∀ k, 0 < k → k ≤ n → partialCoeff ϕ k = nestedWhittaker ϕ k := by
+theorem partialCoeff_eq_nestedWhittaker {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n)
+    : ∀ k, 0 < k → k ≤ n → partialCoeff ϕ k = nestedWhittaker ϕ k := by
   intro k
   induction k with
   | zero => intro h; exact absurd h (lt_irrefl 0)
@@ -206,8 +231,10 @@ theorem partialCoeff_eq_nestedWhittaker {ϕ : AdelicGLn.AdelicGL K n → ℂ} (h
       dsimp only
       rw [dite_eq_left hlt, ← (hasSum_partialCoeff_cusp_cosets hϕ hk0 hlt g).tsum_eq, ih hk0 hlt.le]
 
-theorem eq_nestedWhittaker {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n) (hn : 0 < n)
-    (g : AdelicGLn.AdelicGL K n) : ϕ g = nestedWhittaker ϕ n g := by
+theorem eq_nestedWhittaker
+    {ϕ : AdelicGLn.AdelicGL K n → ℂ} (hϕ : ϕ ∈ cuspForms K n)
+    (hn : 0 < n) (g : AdelicGLn.AdelicGL K n)
+    : ϕ g = nestedWhittaker ϕ n g := by
   rw [← partialCoeff_eq_nestedWhittaker hϕ n hn le_rfl, partialCoeff_self]
 
 end FourierWhittaker

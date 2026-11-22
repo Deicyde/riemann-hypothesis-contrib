@@ -9,10 +9,12 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsDimEqO
 @[expose] public section
 
 open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Cris GlobalTheory.DeRham
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.charpoly_deRhamHomology_abelianVariety_charZero : ∀ (k : Type) [Field k] [CharZero k] [IsAlgClosed k]
-    (B : GlobalTheory.AV.AbVar k) (f : B ⟶ B) [Module.Finite k (HdR B.X)],
-    LinearMap.charpoly (push (dp0 k) (𝟙 _) f.hom) =
-      (GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom k) := by
+theorem _root_.GlobalTheory.T.charpoly_deRhamHomology_abelianVariety_charZero
+    : ∀ (k : Type) [Field k] [CharZero k] [IsAlgClosed k] (B : GlobalTheory.AV.AbVar k) (f : B ⟶ B)
+        [Module.Finite k (HdR B.X)],
+      LinearMap.charpoly (push (dp0 k) (𝟙 _) f.hom)
+        = (GlobalTheory.AV.AbVar.charpoly (End.of f)).map (Int.castRingHom k) := by
   exact @GlobalTheory.DeRhamCharpolyZero.charpoly_push

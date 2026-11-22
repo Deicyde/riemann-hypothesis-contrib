@@ -30,13 +30,13 @@ private lemma aux2 {R : Type u_2} {ι : Type u_3} [CommRing R] (s : Finset ι) (
     · exact Polynomial.natDegree_mul_le.trans (Nat.add_le_add (h a) ih.1)
     · rw [Polynomial.coeff_mul_add_eq_of_natDegree_le (h a) ih.1, ih.2]
 
-theorem goal1 :
-    ∀ {R : Type u_2} {ι : Type u_3} [inst : CommRing R] (s : Finset ι)
-      (p : ι → Polynomial R) (e : ι → ℕ),
-      (∀ i, (p i).natDegree ≤ 1) →
-        (s.prod fun i => p i ^ e i).natDegree ≤ s.sum e ∧
-          (s.prod fun i => p i ^ e i).coeff (s.sum e) =
-            s.prod (fun i => (p i).coeff 1 ^ e i) := by
+theorem goal1
+    : ∀ {R : Type u_2} {ι : Type u_3} [inst : CommRing R] (s : Finset ι) (p : ι → Polynomial R)
+        (e : ι → ℕ),
+      (∀ i, (p i).natDegree ≤ 1)
+        → (s.prod fun i => p i ^ e i).natDegree ≤ s.sum e
+          ∧ (s.prod fun i => p i ^ e i).coeff (s.sum e)
+            = s.prod (fun i => (p i).coeff 1 ^ e i) := by
   intro R ι _ s p e hp
   have h := aux2 s (fun i => p i ^ e i) e (fun i => (aux (p i) (e i) (hp i)).1)
   refine ⟨h.1, ?_⟩

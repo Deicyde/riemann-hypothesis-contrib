@@ -11,11 +11,13 @@ noncomputable section
 
 namespace ReciprocityTheory.ChartRestriction.G.PullbackSections.Pf
 
-open NumberField Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions
+open NumberField Formalism.L2.Pj ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions
 
 theorem nzdOfComp_of_conn
-    (hc : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r), IsPreconnected X.dom) :
-    ReciprocityTheory.ChartRestriction.G.PullbackSections.NZDOfCompSt := by
+    (hc : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      IsPreconnected X.dom)
+    : ReciprocityTheory.ChartRestriction.G.PullbackSections.NZDOfCompSt := by
   intro D T h j hj w F σ hσ hne w' G hFG
   have hFc : (F : T.R j) ∈ T.C j w := cutR_le T.C j w F.2
   have hGc : (G : T.R j) ∈ T.C j w' := cutR_le T.C j w' G.2
@@ -35,11 +37,15 @@ theorem nzdOfComp_of_conn
     intro k
     obtain ⟨x0, hx0, hx0ne⟩ := hne k
     exact eq_zero_of_mul_eq_zero (FourierCoefficientDomain.isOpen_dom _) (hc _ _ _) (hFs k) (hGs k)
-      (fun y _ => congrFun (congrFun hrd k) y) hx0 hx0ne
+      (fun y _ => congrFun (congrFun hrd k) y)
+      hx0 hx0ne
   have hsup : supN (T.U j σ).X (laU (T.U j σ) (wtA w') w'.n) (rdU (T.U j σ) (G : T.R j)) = 0 := by
     unfold supN supE
-    have h0 : ∀ p : FPt (T.U j σ).X, ENNReal.ofReal (((T.U j σ).X p.1).pnorm (laU (T.U j σ) (wtA w') w'.n p.1)
-        (rdU (T.U j σ) (G : T.R j) p.1) p.2) = 0 := by
+    have h0
+        : ∀ p : FPt (T.U j σ).X,
+          ENNReal.ofReal (((T.U j σ).X p.1).pnorm (laU (T.U j σ) (wtA w') w'.n p.1)
+              (rdU (T.U j σ) (G : T.R j) p.1) p.2)
+            = 0 := by
       intro p
       unfold Data.pnorm
       rw [hG0 p.1 p.2 p.2.2]

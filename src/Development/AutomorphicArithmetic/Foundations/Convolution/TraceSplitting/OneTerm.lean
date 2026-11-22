@@ -6,12 +6,13 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.CentreSp
 
 @[expose] public section
 
-theorem UpperTheory.ConvolutionTheory.T.oneTerm :
-    UpperTheory.ConvolutionTheory.T.OneTerm := by
+theorem UpperTheory.ConvolutionTheory.T.oneTerm : UpperTheory.ConvolutionTheory.T.OneTerm := by
   intro K _ _ _ n l _ μ _ θ 𝔰 V Λ t hV hθ hAt x j
-  have hset : {V' : Submodule ℂ (UpperTheory.ConvolutionTheory.C.LL μ) | UpperTheory.ConvolutionTheory.C.IsSummand μ V' ∧
-      V'.map (θ.U : UpperTheory.ConvolutionTheory.C.LL μ →ₗ[ℂ] UpperTheory.ConvolutionTheory.C.LL μ) = V' ∧
-      UpperTheory.ConvolutionTheory.At μ 𝔰.S V' Λ t} = {V} := by
+  have hset
+      : {V' : Submodule ℂ (UpperTheory.ConvolutionTheory.C.LL μ) | UpperTheory.ConvolutionTheory.C.IsSummand μ V' ∧
+          V'.map (θ.U : UpperTheory.ConvolutionTheory.C.LL μ →ₗ[ℂ] UpperTheory.ConvolutionTheory.C.LL μ) = V' ∧
+          UpperTheory.ConvolutionTheory.At μ 𝔰.S V' Λ t}
+        = {V} := by
     ext V'
     simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
     constructor

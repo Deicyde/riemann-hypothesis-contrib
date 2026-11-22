@@ -12,8 +12,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsSettin
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  IsLocalRing NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
@@ -24,9 +26,22 @@ namespace GlobalTheory.Mum.TraitCompare
 
 open GlobalTheory.UU GlobalTheory.LN
 
-
 set_option maxHeartbeats 1000000 in
-theorem exists_cmp_under : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R], Base R → ∀ (D : DegPre R) (A : PolAV (Sp (FractionRing R))) (G : Over (Sp R)) [GrpObj G] [IsCommMonObj G] (U : GlobalTheory.UU.PreU (maximalIdeal R) D A G), EvenOn U.P → ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsLocalRing V) (φ : R →+* V) (D' : DegData V (maximalIdeal V)) (A' : PolAV (Sp (FractionRing V))) (G' : Over (Sp V)) (_ : GrpObj G') (_ : IsCommMonObj G') (U' : GlobalTheory.UU.PreU (maximalIdeal V) D'.toPre A' G') (U₀ : Unif (maximalIdeal V) D' A' G') (F : G'.left ⟶ G.left) (_ : GlobalTheory.LN.Cmp φ U U' F), GlobalTheory.LN.CDvr V ∧ Function.Injective φ ∧ (maximalIdeal V).comap φ = maximalIdeal R ∧ GlobalTheory.LN.Under U' U₀.toUnifPre := by
+theorem exists_cmp_under
+    : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing R],
+      Base R
+        → ∀ (D : DegPre R) (A : PolAV (Sp (FractionRing R))) (G : Over (Sp R)) [GrpObj G]
+            [IsCommMonObj G] (U : GlobalTheory.UU.PreU (maximalIdeal R) D A G),
+          EvenOn U.P
+            → ∃ (V : Type) (_ : CommRing V) (_ : IsDomain V) (_ : IsLocalRing V) (φ : R →+* V)
+                (D' : DegData V (maximalIdeal V)) (A' : PolAV (Sp (FractionRing V)))
+                (G' : Over (Sp V)) (_ : GrpObj G') (_ : IsCommMonObj G')
+                (U' : GlobalTheory.UU.PreU (maximalIdeal V) D'.toPre A' G')
+                (U₀ : Unif (maximalIdeal V) D' A' G') (F : G'.left ⟶ G.left)
+                (_ : GlobalTheory.LN.Cmp φ U U' F),
+              GlobalTheory.LN.CDvr V ∧ Function.Injective φ
+                ∧ (maximalIdeal V).comap φ = maximalIdeal R
+                ∧ GlobalTheory.LN.Under U' U₀.toUnifPre := by
   intro R _ _ _ hB D A G _ _ U hE
   obtain ⟨⟨hL, hL2, -, -, -⟩, -⟩ := GlobalTheory.lawsAndExpansions
   have hEg := GlobalTheory.LN.ega_holds
@@ -39,13 +54,18 @@ theorem exists_cmp_under : ∀ (R : Type) [CommRing R] [IsDomain R] [IsLocalRing
   have hle : (maximalIdeal R).map φ ≤ maximalIdeal V := Ideal.map_le_iff_le_comap.2 hc.ge
   have := U.gen_hom
   obtain ⟨A', s, w, hw⟩ :=
-    GlobalTheory.Mum.TraitSetting.exists_setting_of_evenOn hL U.P U.semi hE A U.gen ⟨U.wA, U.wA_gen⟩ hV φ hφ hc.ge
+    GlobalTheory.Mum.TraitSetting.exists_setting_of_evenOn hL U.P U.semi hE A U.gen ⟨U.wA, U.wA_gen⟩
+      hV φ hφ hc.ge
   obtain ⟨D', U₀, hLG, -, -⟩ := hU V A' _ s
-  obtain ⟨U', hU'⟩ := (GlobalTheory.LN.PreForm.under_exists_and_expands hL hL2 V _ D' A' _ s.semi).1 U₀.toUnifPre
+  obtain ⟨U', hU'⟩ :=
+    (GlobalTheory.LN.PreForm.under_exists_and_expands hL hL2 V _ D' A' _ s.semi).1 U₀.toUnifPre
   have := s.semi.smooth
-  obtain ⟨w', hw'⟩ := GlobalTheory.PrimeUnif.isCPMap_of_eq hL.globalFns s.gen s.P U'.P (hU'.2.1.trans hLG) hw
-  obtain ⟨C, -⟩ := GlobalTheory.T.exists_compare_uniformisationData_pullback hL hL2 hEg R V _ _ hB.1 hBV (maximalIdeal.isMaximal V).ne_top φ hle D D'.toPre A A'
-    G _ U U' _ (isGrpPullback_pullback G _) w' hw'
+  obtain ⟨w', hw'⟩ :=
+    GlobalTheory.PrimeUnif.isCPMap_of_eq hL.globalFns s.gen s.P U'.P (hU'.2.1.trans hLG) hw
+  obtain ⟨C, -⟩ :=
+    GlobalTheory.T.exists_compare_uniformisationData_pullback hL hL2 hEg R V _ _ hB.1 hBV
+      (maximalIdeal.isMaximal V).ne_top φ hle D D'.toPre A A' G _ U U' _
+      (isGrpPullback_pullback G _) w' hw'
   exact ⟨V, _, _, _, φ, D', A', _, _, _, U', U₀, _, C, hV, hφ, hc, hU'⟩
 
 end GlobalTheory.Mum.TraitCompare

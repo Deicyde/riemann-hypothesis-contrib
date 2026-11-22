@@ -27,10 +27,12 @@ theorem connection_phase_holds : GTCConnPhase := by
   exact connF_phase P (tt_nonneg_of_hyp hyp) Bs d e A B u hAB hC hu
 
 theorem gTCHol_of_ref (hRef : GTCRef) : GTCHol :=
-  gTCHol_of_cut hRef phase_relation_holds connection_uniqueness_holds connection_phase_holds phase_holomorphy_holds
+  gTCHol_of_cut hRef phase_relation_holds connection_uniqueness_holds connection_phase_holds
+    phase_holomorphy_holds
 
 theorem gTCCurv_of_ref (hRef : GTCRef) : GTCCurv :=
-  gTCCurv_of_cut hRef phase_relation_holds connection_uniqueness_holds connection_phase_holds phase_curvature_holds
+  gTCCurv_of_cut hRef phase_relation_holds connection_uniqueness_holds connection_phase_holds
+    phase_curvature_holds
 
 end
 

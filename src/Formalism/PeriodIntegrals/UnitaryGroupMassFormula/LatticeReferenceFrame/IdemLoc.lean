@@ -17,7 +17,8 @@ theorem locIdem : LocIdem := by
   classical
   haveI : CharZero (v.adicCompletion F) :=
     charZero_of_injective_algebraMap (algebraMap F (v.adicCompletion F)).injective
-  have memO : ∀ x : v.adicCompletion F, x ∈ v.adicCompletionIntegers F ↔ Valued.v x ≤ 1 := fun x => by
+  have memO
+      : ∀ x : v.adicCompletion F, x ∈ v.adicCompletionIntegers F ↔ Valued.v x ≤ 1 := fun x => by
     rw [HeightOneSpectrum.mem_adicCompletionIntegers]
   let ϖ : v.adicCompletionIntegers F := ⟨((g : ℕ) : v.adicCompletion F), (memO _).2 hgv.le⟩
   let aO : v.adicCompletionIntegers F := ⟨α, (memO _).2 hα⟩
@@ -40,8 +41,9 @@ theorem locIdem : LocIdem := by
     rw [← map_one (Ideal.Quotient.mk (Ideal.span {ϖ})), ← map_neg, Ideal.Quotient.eq,
       Ideal.mem_span_singleton']
     exact ⟨-aO, by ring⟩
-  obtain ⟨ρ, hρ, hρI⟩ := HenselianRing.is_henselian (I := Ideal.span {ϖ}) f hf 0 h0
-    (by rw [hd, hm]; exact isUnit_one.neg)
+  obtain ⟨ρ, hρ, hρI⟩ :=
+    HenselianRing.is_henselian (I := Ideal.span {ϖ}) f hf 0 h0
+      (by rw [hd, hm]; exact isUnit_one.neg)
   rw [sub_zero, Ideal.mem_span_singleton'] at hρI
   obtain ⟨r0, rfl⟩ := hρI
   have hroot : (r0 * ϖ) ^ 2 - (1 + ϖ * aO) * (r0 * ϖ) + ϖ * bO = 0 := by
@@ -51,14 +53,19 @@ theorem locIdem : LocIdem := by
     rw [HeightOneSpectrum.adicCompletionIntegers.isUnit_iff_valued_eq_one]
     have hy : Valued.v ((aO - 2 * r0 : v.adicCompletionIntegers F) : v.adicCompletion F) ≤ 1 :=
       (memO _).1 (aO - 2 * r0).2
-    have hlt : Valued.v ((ϖ : v.adicCompletion F) *
-        ((aO - 2 * r0 : v.adicCompletionIntegers F) : v.adicCompletion F)) < 1 := by
+    have hlt
+        : Valued.v
+            ((ϖ : v.adicCompletion F)
+              * ((aO - 2 * r0 : v.adicCompletionIntegers F) : v.adicCompletion F))
+          < 1 := by
       rw [map_mul]
       exact lt_of_le_of_lt (mul_le_of_le_one_right' hy) hgv
     exact (Valued.v).map_one_add_of_lt hlt
   obtain ⟨U, hU⟩ := hu
-  obtain ⟨wO, hwO⟩ : ∃ w : v.adicCompletionIntegers F, w = ((U⁻¹ : (v.adicCompletionIntegers F)ˣ) :
-      v.adicCompletionIntegers F) := ⟨_, rfl⟩
+  obtain ⟨wO, hwO⟩
+      : ∃ w : v.adicCompletionIntegers F,
+        w = ((U⁻¹ : (v.adicCompletionIntegers F)ˣ) : v.adicCompletionIntegers F) :=
+    ⟨_, rfl⟩
   have huw : (1 + ϖ * (aO - 2 * r0)) * wO = 1 := by rw [← hU, hwO]; exact U.mul_inv
   obtain ⟨c1, hc1⟩ : ∃ c : v.adicCompletionIntegers F, c = -(aO - 2 * r0) * wO := ⟨_, rfl⟩
   obtain ⟨c2, hc2⟩ : ∃ c : v.adicCompletionIntegers F, c = r0 * wO := ⟨_, rfl⟩
@@ -69,12 +76,20 @@ theorem locIdem : LocIdem := by
     rw [hc1, hc2]
     linear_combination (-(r0 * ϖ) * wO + ϖ * bO * (2 * wO - ((1 + ϖ * (aO - 2 * r0)) * wO - 1))) * huw
       + (-wO ^ 2) * hroot
-  have hC : (ϖ * c2) ^ 2 - (1 + ϖ * aO) * (ϖ * c2) * (1 + ϖ * c1) + ϖ * bO * (1 + ϖ * c1) ^ 2 = 0 := by
+  have hC
+      : (ϖ * c2) ^ 2 - (1 + ϖ * aO) * (ϖ * c2) * (1 + ϖ * c1) + ϖ * bO * (1 + ϖ * c1) ^ 2 = 0 := by
     rw [hc1, hc2]
     linear_combination ((1 + ϖ * aO) * (r0 * ϖ) * wO - 2 * (ϖ * bO) * wO
       + ϖ * bO * ((1 + ϖ * (aO - 2 * r0)) * wO - 1)) * huw + wO ^ 2 * hroot
-  refine ⟨(c1 : v.adicCompletion F), (c2 : v.adicCompletion F), (memO _).1 c1.2, (memO _).1 c2.2,
-    ?_, ?_, ?_⟩
+  refine ⟨
+    (c1 : v.adicCompletion F),
+    (c2 : v.adicCompletion F),
+    (memO _).1 c1.2,
+    (memO _).1 c2.2,
+    ?_,
+    ?_,
+    ?_
+  ⟩
   · have e := congrArg (v.adicCompletionIntegers F).subtype hA
     simp only [map_add (f := _), map_sub, map_mul, map_pow, map_one, map_ofNat] at e
     exact e

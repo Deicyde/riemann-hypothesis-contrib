@@ -9,15 +9,18 @@ open Formalism.MainNotions Formalism.MainNotions.N GlobalTheory.SplitField
 
 namespace GlobalTheory.SplitField
 
-theorem endSpanned_of_endSpanned_map {Γ L E : Type} [Group Γ] [Field L] [Field E] (f : L →+* E) {a : ℕ}
-    (τ : Γ →* GL (Fin a) L) (U : Submodule L (Fin a → L))
-    (h : EndSpanned (mapRep f τ) (Submodule.span E ((fun v => f ∘ v) '' (U : Set (Fin a → L))))) :
-    EndSpanned τ U := by
+theorem endSpanned_of_endSpanned_map
+    {Γ L E : Type} [Group Γ] [Field L] [Field E]
+    (f : L →+* E)
+    {a : ℕ} (τ : Γ →* GL (Fin a) L) (U : Submodule L (Fin a → L))
+    (h : EndSpanned (mapRep f τ) (Submodule.span E ((fun v => f ∘ v) '' (U : Set (Fin a → L)))))
+    : EndSpanned τ U := by
   classical
   intro φ
   set UE := Submodule.span E ((fun v => f ∘ v) '' (U : Set (Fin a → L))) with hUE
-  have hmap : ∀ (M : Matrix (Fin a) (Fin a) L) (v : Fin a → L),
-      (M.map f).mulVec (f ∘ v) = f ∘ (M.mulVec v) := by
+  have hmap
+      : ∀ (M : Matrix (Fin a) (Fin a) L) (v : Fin a → L),
+        (M.map f).mulVec (f ∘ v) = f ∘ (M.mulVec v) := by
     intro M v
     funext i
     exact (RingHom.map_mulVec f M v i).symm
@@ -50,23 +53,29 @@ theorem endSpanned_of_endSpanned_map {Γ L E : Type} [Group Γ] [Field L] [Field
 
   let d := Module.finrank L U
   let b := Module.finBasis L U
-  let Φ : Matrix (Fin a) (Fin a) L →ₗ[L] (Fin a × Fin d → L) :=
-    { toFun := fun M ik => (M.mulVec (b ik.2 : Fin a → L)) ik.1
-      map_add' := by intro M N; funext ik; simp [Matrix.add_mulVec]
-      map_smul' := by intro c M; funext ik; simp [Matrix.smul_mulVec] }
-  let ΦE : Matrix (Fin a) (Fin a) E →ₗ[E] (Fin a × Fin d → E) :=
-    { toFun := fun M ik => (M.mulVec (f ∘ (b ik.2 : Fin a → L))) ik.1
-      map_add' := by intro M N; funext ik; simp [Matrix.add_mulVec]
-      map_smul' := by intro c M; funext ik; simp [Matrix.smul_mulVec] }
+  let Φ : Matrix (Fin a) (Fin a) L →ₗ[L] (Fin a × Fin d → L) := {
+    toFun := fun M ik => (M.mulVec (b ik.2 : Fin a → L)) ik.1
+    map_add' := by intro M N; funext ik; simp [Matrix.add_mulVec]
+    map_smul' := by intro c M; funext ik; simp [Matrix.smul_mulVec]
+  }
+  let ΦE : Matrix (Fin a) (Fin a) E →ₗ[E] (Fin a × Fin d → E) := {
+    toFun := fun M ik => (M.mulVec (f ∘ (b ik.2 : Fin a → L))) ik.1
+    map_add' := by intro M N; funext ik; simp [Matrix.add_mulVec]
+    map_smul' := by intro c M; funext ik; simp [Matrix.smul_mulVec]
+  }
   set R := Set.range fun g => ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L) with hR
   set RE := Set.range fun g => ((mapRep f τ g : GL (Fin a) E) : Matrix (Fin a) (Fin a) E) with hRE
-  have hrep : ∀ g, ((mapRep f τ g : GL (Fin a) E) : Matrix (Fin a) (Fin a) E)
-      = ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).map f := fun g => rfl
+  have hrep
+      : ∀ g,
+        ((mapRep f τ g : GL (Fin a) E) : Matrix (Fin a) (Fin a) E)
+          = ((τ g : GL (Fin a) L) : Matrix (Fin a) (Fin a) L).map f := fun g =>
+    rfl
   have hΦE : ∀ M : Matrix (Fin a) (Fin a) L, ΦE (M.map f) = f ∘ Φ M := by
     intro M
     funext ik
     show ((M.map f).mulVec (f ∘ (b ik.2 : Fin a → L))) ik.1 = f ((M.mulVec (b ik.2 : Fin a → L)) ik.1)
-    rw [hmap]; rfl
+    rw [hmap]
+    rfl
   set t : Fin a × Fin d → L := fun ik => (φ (b ik.2) : Fin a → L) ik.1 with ht
   have hXt : ΦE XE = f ∘ t := by
     funext ik
@@ -96,9 +105,10 @@ theorem endSpanned_of_endSpanned_map {Γ L E : Type} [Group Γ] [Field L] [Field
     intro k
     funext i
     exact congrFun hXt' (i, k)
-  have hext : (Matrix.mulVecLin X) ∘ₗ U.subtype = U.subtype ∘ₗ φ := b.ext fun k => by
-    simp only [LinearMap.comp_apply, Matrix.mulVecLin_apply, Submodule.subtype_apply]
-    exact hb k
+  have hext : (Matrix.mulVecLin X) ∘ₗ U.subtype = U.subtype ∘ₗ φ :=
+    b.ext fun k => by
+      simp only [LinearMap.comp_apply, Matrix.mulVecLin_apply, Submodule.subtype_apply]
+      exact hb k
   exact LinearMap.congr_fun hext w
 
 end GlobalTheory.SplitField

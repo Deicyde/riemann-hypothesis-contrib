@@ -7,16 +7,19 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 
 set_option backward.isDefEq.respectTransparency false
 
-open CategoryTheory Limits AlgebraicGeometry Opposite GroundTheory.PAdicHodge CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.E GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite GroundTheory.PAdicHodge
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.E GlobalTheory.EtC
 
 namespace GlobalTheory.CompanionTheory.TiltIdem
 
 variable {B R : Type} [CommRing B] [CommRing R]
 
-theorem idem_eq (i : B →* R)
-    (hidem : ∀ e : R, IsIdempotentElem e → ∃! e₀ : B, IsIdempotentElem e₀ ∧ i e₀ = e)
+theorem idem_eq
+    (i : B →* R) (hidem : ∀ e : R, IsIdempotentElem e → ∃! e₀ : B, IsIdempotentElem e₀ ∧ i e₀ = e)
     {x y : B} (hx : IsIdempotentElem x) (hy : IsIdempotentElem y)
-    (h : ∀ p : PrimeSpectrum R, i x ∉ p.asIdeal ↔ i y ∉ p.asIdeal) : x = y := by
+    (h : ∀ p : PrimeSpectrum R, i x ∉ p.asIdeal ↔ i y ∉ p.asIdeal)
+    : x = y := by
   have hix : IsIdempotentElem (i x) := by
     change i x * i x = i x
     rw [← map_mul, hx.eq]
@@ -29,16 +32,21 @@ theorem idem_eq (i : B →* R)
   have e : i x = i y := PrimeSpectrum.basicOpen_injOn_isIdempotentElem hix hiy hb
   exact (hidem (i y) hiy).unique ⟨hx, e⟩ ⟨hy, rfl⟩
 
-theorem exists_idem (i : B →* R) (h0 : i 0 = 0)
-    (hidem : ∀ e : R, IsIdempotentElem e → ∃! e₀ : B, IsIdempotentElem e₀ ∧ i e₀ = e)
-    {ι : Type} [Fintype ι] (f : LocallyConstant (PrimeSpectrum R) ι) :
-    ∃ e : ι → B, CompleteOrthogonalIdempotents e ∧
-      (∀ (a : ι) (p : PrimeSpectrum R), i (e a) ∉ p.asIdeal ↔ f p = a) ∧
-      ∀ (e' : B) (a : ι), IsIdempotentElem e' →
-        (∀ p : PrimeSpectrum R, i e' ∉ p.asIdeal → f p = a) → e' * e a = e' := by
+theorem exists_idem
+    (i : B →* R)
+    (h0 : i 0 = 0) (hidem : ∀ e : R, IsIdempotentElem e → ∃! e₀ : B, IsIdempotentElem e₀ ∧ i e₀ = e)
+    {ι : Type} [Fintype ι]
+    (f : LocallyConstant (PrimeSpectrum R) ι)
+    : ∃ e : ι → B,
+      CompleteOrthogonalIdempotents e
+        ∧ (∀ (a : ι) (p : PrimeSpectrum R), i (e a) ∉ p.asIdeal ↔ f p = a)
+        ∧ ∀ (e' : B) (a : ι),
+          IsIdempotentElem e' → (∀ p : PrimeSpectrum R, i e' ∉ p.asIdeal → f p = a)
+            → e' * e a = e' := by
   classical
-  have hfib : ∀ a : ι, ∃ e : B, IsIdempotentElem e ∧
-      ∀ p : PrimeSpectrum R, i e ∉ p.asIdeal ↔ f p = a := by
+  have hfib
+      : ∀ a : ι, ∃ e : B,
+        IsIdempotentElem e ∧ ∀ p : PrimeSpectrum R, i e ∉ p.asIdeal ↔ f p = a := by
     intro a
     have hc : IsClopen (f ⁻¹' {a}) := f.isLocallyConstant.isClopen_fiber a
     obtain ⟨ε, hε, hs⟩ := PrimeSpectrum.isClopen_iff.1 hc
@@ -47,8 +55,11 @@ theorem exists_idem (i : B →* R) (h0 : i 0 = 0)
     have : p ∈ f ⁻¹' {a} ↔ p ∈ PrimeSpectrum.basicOpen (i e₀) := by rw [hs]; rfl
     exact this.symm
   choose e he hp using hfib
-  have hnot0 : ∀ p : PrimeSpectrum R, ¬ (i 0 ∉ p.asIdeal) := fun p h => h (by rw [h0]; exact p.asIdeal.zero_mem)
-  have hmul : ∀ (x y : B) (p : PrimeSpectrum R), i (x * y) ∉ p.asIdeal ↔ i x ∉ p.asIdeal ∧ i y ∉ p.asIdeal := by
+  have hnot0 : ∀ p : PrimeSpectrum R, ¬(i 0 ∉ p.asIdeal) := fun p h =>
+    h (by rw [h0]; exact p.asIdeal.zero_mem)
+  have hmul
+      : ∀ (x y : B) (p : PrimeSpectrum R),
+        i (x * y) ∉ p.asIdeal ↔ i x ∉ p.asIdeal ∧ i y ∉ p.asIdeal := by
     intro x y p
     rw [map_mul, p.isPrime.mul_mem_iff_mem_or_mem]
     tauto

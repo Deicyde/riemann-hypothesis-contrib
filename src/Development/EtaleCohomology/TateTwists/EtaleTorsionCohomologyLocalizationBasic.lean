@@ -5,7 +5,10 @@ public import Development.EtaleCohomology.TateTwists.EtaleLocalPropertyBasicClos
 @[expose] public section
 
 namespace LateralTheory.Fin.EtaleLocalPropertyBasicClosure
-theorem etale_torsion_cohomology_localization_basic : LateralTheory.EtaleFoundations.EtaleLocalPropertyBasicClosure := by
+theorem etale_torsion_cohomology_localization_basic
+    : LateralTheory.EtaleFoundations.EtaleLocalPropertyBasicClosure := by
   apply LateralTheory.EtaleFoundations.etale_local_property_basic_closure_properties
-theorem intersectionNumber_baseChange : LateralTheory.EtaleFoundations.EtaleLocalPropertyBasicClosure := etale_torsion_cohomology_localization_basic
+theorem intersectionNumber_baseChange
+    : LateralTheory.EtaleFoundations.EtaleLocalPropertyBasicClosure :=
+  etale_torsion_cohomology_localization_basic
 end LateralTheory.Fin.EtaleLocalPropertyBasicClosure

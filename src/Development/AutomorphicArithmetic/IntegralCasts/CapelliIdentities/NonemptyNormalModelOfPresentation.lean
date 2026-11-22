@@ -7,28 +7,30 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 @[expose] public section
 
 open MvPolynomial in
-private theorem UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_extension {n : ℕ}
-    (J : Ideal (MvPolynomial (Fin n) ℂ)) (R S : Type) [CommRing R] [Nontrivial R] [Algebra ℂ R]
-    [CommRing S] [IsDomain S] [IsIntegrallyClosed S] [Algebra R S] [Module.Finite R S]
+private theorem UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_extension
+    {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ))
+    (R S : Type) [CommRing R] [Nontrivial R] [Algebra ℂ R] [CommRing S] [IsDomain S]
+    [IsIntegrallyClosed S] [Algebra R S] [Module.Finite R S]
     (π : MvPolynomial (Fin n) ℂ →ₐ[ℂ] R) (hπ : Function.Surjective π) (hJ : RingHom.ker π = J)
     (hinj : Function.Injective (algebraMap R S))
-    (hfrac : ∀ s : S, ∃ a b : R, b ≠ 0 ∧ algebraMap R S b * s = algebraMap R S a) :
-    Nonempty (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.NormalModel J) := by
+    (hfrac : ∀ s : S, ∃ a b : R, b ≠ 0 ∧ algebraMap R S b * s = algebraMap R S a)
+    : Nonempty (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.NormalModel
+      J) := by
   obtain ⟨m, s, hs⟩ := Module.Finite.exists_fin (R := R) (M := S)
   let φ : MvPolynomial (Fin n ⊕ Fin m) ℂ →+* S :=
     eval₂Hom ((algebraMap R S).comp (algebraMap ℂ R))
       (Sum.elim (fun i => algebraMap R S (π (X i))) s)
-  have hcomp : φ.comp (rename Sum.inl :
-      MvPolynomial (Fin n) ℂ →ₐ[ℂ] MvPolynomial (Fin n ⊕ Fin m) ℂ).toRingHom
-      = (algebraMap R S).comp π.toRingHom := by
+  have hcomp
+      : φ.comp
+          (rename Sum.inl : MvPolynomial (Fin n) ℂ →ₐ[ℂ] MvPolynomial (Fin n ⊕ Fin m) ℂ).toRingHom
+        = (algebraMap R S).comp π.toRingHom := by
     apply MvPolynomial.ringHom_ext
     · intro r
       have h : π (C r) = algebraMap ℂ R r := π.commutes r
       simp [φ, h]
     · intro i
       simp [φ]
-  have hren : ∀ q, φ (rename Sum.inl q) = algebraMap R S (π q) := fun q =>
-    RingHom.congr_fun hcomp q
+  have hren : ∀ q, φ (rename Sum.inl q) = algebraMap R S (π q) := fun q => RingHom.congr_fun hcomp q
   have hY : ∀ i, φ (X (Sum.inr i)) = s i := fun i => by simp [φ]
   have hsurj : Function.Surjective φ := by
     intro y
@@ -37,16 +39,23 @@ private theorem UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_extension
     choose p hp using fun i => hπ (c i)
     refine ⟨∑ i, rename Sum.inl (p i) * X (Sum.inr i), ?_⟩
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_mul, hren, hY, hp, Algebra.smul_def]
-  refine ⟨⟨m, RingHom.ker φ, RingHom.ker_isPrime _,
-    IsIntegrallyClosed.of_equiv (RingHom.quotientKerEquivOfSurjective hsurj).symm, ?_, ?_, ?_⟩⟩
+    simp only [map_sum, map_mul, hren, hY, hp, Algebra.smul_def]
+  refine ⟨⟨
+    m,
+    RingHom.ker φ,
+    RingHom.ker_isPrime _,
+    IsIntegrallyClosed.of_equiv (RingHom.quotientKerEquivOfSurjective hsurj).symm,
+    ?_,
+    ?_,
+    ?_
+  ⟩⟩
   · ext q
-    rw [Ideal.mem_comap, RingHom.mem_ker, hren, ← hJ, RingHom.mem_ker,
-      map_eq_zero_iff _ hinj]
+    rw [Ideal.mem_comap, RingHom.mem_ker, hren, ← hJ, RingHom.mem_ker, map_eq_zero_iff _ hinj]
   · intro i
     obtain ⟨Q, hQ, hQ0⟩ : IsIntegral R (s i) := Algebra.IsIntegral.isIntegral _
-    obtain ⟨P, hP, -, hPm⟩ := Polynomial.lifts_and_degree_eq_and_monic
-      (f := π.toRingHom) (Polynomial.mem_lifts_of_surjective hπ Q) hQ
+    obtain ⟨P, hP, -, hPm⟩ :=
+      Polynomial.lifts_and_degree_eq_and_monic (f := π.toRingHom)
+        (Polynomial.mem_lifts_of_surjective hπ Q) hQ
     refine ⟨P, hPm, ?_⟩
     rw [RingHom.mem_ker, Polynomial.hom_eval₂, hcomp, hY, ← Polynomial.eval₂_map, hP, hQ0]
   · intro i
@@ -58,15 +67,12 @@ private theorem UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_extension
       exact hb
     · rw [RingHom.mem_ker, map_sub, map_mul, hren, hren, hY, hab, sub_self]
 
-theorem UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_presentation :
-    ∀ {n : ℕ}
-    (J : Ideal (MvPolynomial (Fin n) ℂ)) (R : Type) [inst : CommRing R] [IsDomain R] [inst_2 : Algebra ℂ R]
-    (π : MvPolynomial (Fin n) ℂ →ₐ[ℂ] R),
-    Function.Surjective (⇑π : MvPolynomial (Fin n) ℂ → R) →
-      RingHom.ker π = J →
-        Nonempty
-          (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.NormalModel
-            J) := by
+theorem UpperTheory.Reformulated.B.Gc5.nonempty_normalModel_of_presentation
+    : ∀ {n : ℕ} (J : Ideal (MvPolynomial (Fin n) ℂ)) (R : Type) [inst : CommRing R] [IsDomain R]
+        [inst_2 : Algebra ℂ R] (π : MvPolynomial (Fin n) ℂ →ₐ[ℂ] R),
+      Function.Surjective (⇑π : MvPolynomial (Fin n) ℂ → R) → RingHom.ker π = J
+        → Nonempty (GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets.NormalModel
+          J) := by
   intro n J R _ _ _ π hπ hJ
   haveI : Algebra.FiniteType ℂ R := Algebra.FiniteType.of_surjective π hπ
   haveI : Module.Finite R (integralClosure R (FractionRing R)) := UpperTheory.integralClosure_finite ℂ R (FractionRing R)

@@ -9,8 +9,9 @@ noncomputable section
 
 namespace MassDataLevelSSteps.LatW
 
-open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.TypedSets Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
-  NumberField IsDedekindDomain
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+  Formalism.L2.SG.TypedSets Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+  Formalism.L2.SG.Sub NumberField IsDedekindDomain
 
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
@@ -21,29 +22,32 @@ abbrev crd (y : (VS D).V) : Fin X.B.I.n → X.B.I.E := crdOf X.B.I X.ιE X.bas y
 theorem crd_add (y z : (VS D).V) : crd X (y + z) = crd X y + crd X z := by
   funext i; simp [crd, crdOf, map_add (f := _)]
 
-theorem crd_zero : crd X 0 = 0 := by
-  funext i; simp [crd, crdOf]
+theorem crd_zero : crd X 0 = 0 := by funext i; simp [crd, crdOf]
 
 theorem crd_smul (c : D.host.E) (y : (VS D).V) : crd X (c • y) = X.ιE.symm c • crd X y := by
   funext i; simp [crd, crdOf, map_mul, smul_eq_mul]
 
-theorem crd_mem_span {S : Set (VS D).V} {y : (VS D).V} (hy : y ∈ Submodule.span D.host.E S) :
-    crd X y ∈ Submodule.span X.B.I.E (crd X '' S) := by
+theorem crd_mem_span {S : Set (VS D).V} {y : (VS D).V} (hy : y ∈ Submodule.span D.host.E S)
+    : crd X y ∈ Submodule.span X.B.I.E (crd X '' S) := by
   induction hy using Submodule.span_induction with
   | mem x hx => exact Submodule.subset_span ⟨x, hx, rfl⟩
   | zero => rw [crd_zero]; exact Submodule.zero_mem _
   | add x y _ _ hx hy => rw [crd_add]; exact Submodule.add_mem _ hx hy
   | smul c x _ hx => rw [crd_smul]; exact Submodule.smul_mem _ _ hx
 
-theorem latSpanS_le {r : ℕ} (aa : Fin r → FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E)
-    (v : Fin r → (VS D).V) {y : (VS D).V} (hy : y ∈ latSpanS aa v) :
-    y ∈ Submodule.span D.host.E (Set.range v) := by
+theorem latSpanS_le
+    {r : ℕ}
+    (aa : Fin r → FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) (v : Fin r → (VS D).V)
+    {y : (VS D).V} (hy : y ∈ latSpanS aa v)
+    : y ∈ Submodule.span D.host.E (Set.range v) := by
   induction hy using Submodule.span_induction with
   | mem x hx =>
     obtain ⟨a, c, -, rfl⟩ := hx
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨a, rfl⟩)
-  | zero => exact Submodule.zero_mem _
-  | add x y _ _ hx hy => exact Submodule.add_mem _ hx hy
+  | zero =>
+    exact Submodule.zero_mem _
+  | add x y _ _ hx hy =>
+    exact Submodule.add_mem _ hx hy
   | smul c x _ hx =>
     rw [← algebraMap_smul D.host.E c x]
     exact Submodule.smul_mem _ _ hx
@@ -61,8 +65,8 @@ theorem L_crd {x : Fin X.B.I.n → X.B.I.E} (hx : x ∈ X.B.I.L) : ∃ y ∈ (VS
   rw [Module.Basis.repr_sum_self]
   simp
 
-theorem ratV_add (R : Type) [CommRing R] [Algebra X.B.I.F R] (a b : Fin X.B.I.n → X.B.I.E) :
-    ratV (F := X.B.I.F) R (a + b) = ratV (F := X.B.I.F) R a + ratV (F := X.B.I.F) R b := by
+theorem ratV_add (R : Type) [CommRing R] [Algebra X.B.I.F R] (a b : Fin X.B.I.n → X.B.I.E)
+    : ratV (F := X.B.I.F) R (a + b) = ratV (F := X.B.I.F) R a + ratV (F := X.B.I.F) R b := by
   funext i
   simp [ratV, map_add (f := _)]
 
@@ -70,10 +74,12 @@ def LX : Set (Fin X.B.I.n → X.B.I.E) := crd X '' (latSpanS (fun a => aaD D a) 
 
 def LW : Set (Fin X.B.I.n → X.B.I.E) := crd X '' (X.Lb : Set (VS D).V)
 
-def LY : Set (Fin X.B.I.n → X.B.I.E) := crd X '' (latSpanS (fun a => (aaD D a)⁻¹) X.fY : Set (VS D).V)
+def LY : Set (Fin X.B.I.n → X.B.I.E) :=
+  crd X '' (latSpanS (fun a => (aaD D a)⁻¹) X.fY : Set (VS D).V)
 
-theorem adapted (w : D.what₂.Word) :
-    Formalism.L2.SG.Volumes.Adapted X.B.I.F X.B.I.E X.B.I.cm.sig X.B.I.n X.B.I.J (frameOf X w) (LX X) (LW X) (LY X) := by
+theorem adapted (w : D.what₂.Word)
+    : Formalism.L2.SG.Volumes.Adapted X.B.I.F X.B.I.E X.B.I.cm.sig X.B.I.n X.B.I.J (frameOf X w)
+      (LX X) (LW X) (LY X) := by
   refine ⟨?_, ?_, ?_⟩
   · rintro _ ⟨y, hy, rfl⟩
     have h := crd_mem_span X (latSpanS_le _ _ hy)
@@ -91,14 +97,17 @@ theorem adapted (w : D.what₂.Word) :
     · show hE _ _ (crdOf X.B.I X.ιE X.bas (X.fY a)) (crdOf X.B.I X.ιE X.bas y) = 0
       rw [FrameW.hE_crdOf, h.2, map_zero]
 
-theorem latLoc_eq (v : HeightOneSpectrum (𝓞 X.B.I.F)) :
-    latLoc (E := X.B.I.E) v (LX X ∪ LW X ∪ LY X) = latLoc v (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
+theorem latLoc_eq (v : HeightOneSpectrum (𝓞 X.B.I.F))
+    : latLoc (E := X.B.I.E) v (LX X ∪ LW X ∪ LY X)
+      = latLoc v (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
   apply le_antisymm
   · apply Submodule.span_mono
     apply Set.image_mono
     rintro _ ((⟨y, hy, rfl⟩ | ⟨y, hy, rfl⟩) | ⟨y, hy, rfl⟩)
-    · exact crd_mem_L X (by rw [X.Lam_split]; exact Submodule.mem_sup_left (Submodule.mem_sup_left hy))
-    · exact crd_mem_L X (by rw [X.Lam_split]; exact Submodule.mem_sup_left (Submodule.mem_sup_right hy))
+    · exact crd_mem_L X
+        (by rw [X.Lam_split]; exact Submodule.mem_sup_left (Submodule.mem_sup_left hy))
+    · exact crd_mem_L X
+        (by rw [X.Lam_split]; exact Submodule.mem_sup_left (Submodule.mem_sup_right hy))
     · exact crd_mem_L X (by rw [X.Lam_split]; exact Submodule.mem_sup_right hy)
   · apply Submodule.span_le.2
     rintro _ ⟨x, hx, rfl⟩
@@ -112,10 +121,13 @@ theorem latLoc_eq (v : HeightOneSpectrum (𝓞 X.B.I.F)) :
     · exact Submodule.subset_span ⟨crd X b, Or.inl (Or.inr ⟨b, hb, rfl⟩), rfl⟩
     · exact Submodule.subset_span ⟨crd X c, Or.inr ⟨c, hc, rfl⟩, rfl⟩
 
-theorem Kf_eq :
-    Kf X.B.I.cm.sig X.B.I.J (LX X ∪ LW X ∪ LY X) = Kf X.B.I.cm.sig X.B.I.J (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
-  have hK : ∀ v : HeightOneSpectrum (𝓞 X.B.I.F),
-      Kloc (E := X.B.I.E) v (LX X ∪ LW X ∪ LY X) = Kloc v (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
+theorem Kf_eq
+    : Kf X.B.I.cm.sig X.B.I.J (LX X ∪ LW X ∪ LY X)
+      = Kf X.B.I.cm.sig X.B.I.J (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
+  have hK
+      : ∀ v : HeightOneSpectrum (𝓞 X.B.I.F),
+        Kloc (E := X.B.I.E) v (LX X ∪ LW X ∪ LY X)
+          = Kloc v (X.B.I.L : Set (Fin X.B.I.n → X.B.I.E)) := by
     intro v
     ext g
     show (∀ x, x ∈ latLoc (E := X.B.I.E) v (LX X ∪ LW X ∪ LY X) ↔ _) ↔

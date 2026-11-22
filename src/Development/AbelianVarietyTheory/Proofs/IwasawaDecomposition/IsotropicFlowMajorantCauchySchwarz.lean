@@ -6,7 +6,8 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.FundamentalDo
 
 @[expose] public section
 
-open NumberField Complex ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.CuspFrom
+open NumberField Complex ReciprocityTheory.ChartRestriction.G
+  ReciprocityTheory.ChartRestriction.G.FD GlobalTheory.CuspFrom
 open scoped ComplexConjugate
 
 namespace GlobalTheory.CuspFrom.FlowMaj
@@ -115,8 +116,9 @@ end GlobalTheory.CuspFrom.FlowMaj
 
 namespace GlobalTheory.CuspFrom
 
-theorem flowMajSt_holds : FlowMajSt := fun _ _ _ _ _ X =>
-  ⟨fun _ hξ _ hx s hxs τ v hv => FlowMaj.maj_flow X hξ hx s hxs τ v hv,
-    fun _ hx τ v w => ⟨FlowMaj.herm_cs X hx τ v w, FlowMaj.majForm_cs X hx τ v w⟩⟩
+theorem flowMajSt_holds : FlowMajSt := fun _ _ _ _ _ X => ⟨
+  fun _ hξ _ hx s hxs τ v hv => FlowMaj.maj_flow X hξ hx s hxs τ v hv,
+  fun _ hx τ v w => ⟨FlowMaj.herm_cs X hx τ v w, FlowMaj.majForm_cs X hx τ v w⟩
+⟩
 
 end GlobalTheory.CuspFrom

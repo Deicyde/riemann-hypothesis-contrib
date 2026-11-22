@@ -31,8 +31,7 @@ def intVec (m : ℕ) : Submodule (𝓞 K) (Fin m → K) where
 
 abbrev FQ : Type := (Fin 1 → K) ⧸ intVec K 1
 
-def den (x : K) : Ideal (𝓞 K) :=
-  Ideal.torsionOf (𝓞 K) (FQ K) (Submodule.Quotient.mk fun _ => x)
+def den (x : K) : Ideal (𝓞 K) := Ideal.torsionOf (𝓞 K) (FQ K) (Submodule.Quotient.mk fun _ => x)
 
 def idx (c : Submodule (𝓞 K) K) : ℕ :=
   (1 : Submodule (𝓞 K) K).toAddSubgroup.relIndex c.toAddSubgroup
@@ -55,8 +54,10 @@ def lastFib {m : ℕ} (C : Matrix (Fin (m + 1)) (Fin (m + 1)) K) : Submodule (�
 
 theorem isLat_intVec (m : ℕ) : IsLat (intVec K m) := by
   refine ⟨?_, ?_⟩
-  · have h : intVec K m = (⊤ : Submodule (𝓞 K) (Fin m → 𝓞 K)).map
-        (LinearMap.compLeft (Algebra.linearMap (𝓞 K) K) (Fin m)) := by
+  · have h
+        : intVec K m
+          = (⊤ : Submodule (𝓞 K) (Fin m → 𝓞 K)).map
+            (LinearMap.compLeft (Algebra.linearMap (𝓞 K) K) (Fin m)) := by
       ext v
       simp only [Submodule.mem_map, Submodule.mem_top, true_and]
       constructor
@@ -86,11 +87,13 @@ section GlobalTheory
 
 variable {F E : Type} [Field F] [Field E] [Algebra F E]
 
-def blk {m : ℕ} (σ : E →ₐ[F] E) (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E) :
-    Matrix (Fin (m + 1)) (Fin (m + 1)) E := fun i j =>
-  Fin.lastCases (motive := fun _ => E)
+def blk {m : ℕ} (σ : E →ₐ[F] E) (c : Matrix (Fin m) (Fin m) E) (u : Fin m → E) (d : E)
+    : Matrix (Fin (m + 1)) (Fin (m + 1)) E := fun i j =>
+  Fin.lastCases
+    (motive := fun _ => E)
     (Fin.lastCases (motive := fun _ => E) d (fun b => σ (u b)) j)
-    (fun a => Fin.lastCases (motive := fun _ => E) (u a) (fun b => c a b) j) i
+    (fun a => Fin.lastCases (motive := fun _ => E) (u a) (fun b => c a b) j)
+    i
 
 variable [NumberField E]
 

@@ -14,10 +14,16 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr UpperTheory.V
+open NumberField IsLocalRing Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  GlobalTheory.GalOfCusp UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Aut UpperTheory.V.Pr
+  UpperTheory.V
 
-private theorem val_of_even {Ω : Type} [Field Ω] (B : ValuationSubring Ω) {M : ℕ} (hM : Even M)
-    (h : B.valuation ((4 : ℕ) : Ω) < 1) : B.valuation (M : Ω) < 1 := by
+private theorem val_of_even
+    {Ω : Type} [Field Ω]
+    (B : ValuationSubring Ω)
+    {M : ℕ} (hM : Even M)
+    (h : B.valuation ((4 : ℕ) : Ω) < 1)
+    : B.valuation (M : Ω) < 1 := by
   have h2 : B.valuation (2 : Ω) < 1 := by
     by_contra hc
     push_neg at hc
@@ -27,8 +33,7 @@ private theorem val_of_even {Ω : Type} [Field Ω] (B : ValuationSubring Ω) {M 
     rw [this] at h
     exact absurd h (not_lt.mpr h4)
   obtain ⟨k, rfl⟩ := hM
-  have hk : B.valuation (k : Ω) ≤ 1 := by
-    exact B.valuation_le_one (k : B)
+  have hk : B.valuation (k : Ω) ≤ 1 := by exact B.valuation_le_one (k : B)
   have : ((k + k : ℕ) : Ω) = 2 * (k : Ω) := by push_cast; ring
   rw [this, map_mul]
   exact mul_lt_one_of_lt_of_le h2 hk

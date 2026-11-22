@@ -9,21 +9,24 @@ public import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc NumberField
 
-private theorem isCM_of_conj (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
-    (h : ∀ x : K, ∃ y : K, ∀ φ : K →+* ℂ, φ y = starRingEnd ℂ (φ x)) : IsCMField K :=
+private theorem isCM_of_conj
+    (K : Type) [Field K] [NumberField K] [_root_.NumberField.IsTotallyComplex K]
+    (h : ∀ x : K, ∃ y : K, ∀ φ : K →+* ℂ, φ y = starRingEnd ℂ (φ x))
+    : IsCMField K :=
   _root_.UpperTheory.Reformulated.B.Qh8.isCM_of_conj K h
 
 open Polynomial in
-private theorem exists_sqrt (l : ℕ) [hl : Fact l.Prime] :
-    ∃ d : ℚ_[l], d ^ 2 = 1 - 4 * (l : ℚ_[l]) := by
+private theorem exists_sqrt (l : ℕ) [hl : Fact l.Prime]
+    : ∃ d : ℚ_[l], d ^ 2 = 1 - 4 * (l : ℚ_[l]) := by
   have h3 : ‖((l : ℕ) : ℤ_[l])‖ < 1 := PadicInt.norm_natCast_lt_one_iff.2 dvd_rfl
-  obtain ⟨z, hz, -⟩ := hensels_lemma (p := l) (R := ℤ_[l]) (F := X ^ 2 - X + C (l : ℤ_[l])) (a := 0) (by
-    have e1 : aeval (0 : ℤ_[l]) (X ^ 2 - X + C (l : ℤ_[l]) : ℤ_[l][X]) = ((l : ℕ) : ℤ_[l]) := by
-      simp
-    have e2 : aeval (0 : ℤ_[l]) (derivative (X ^ 2 - X + C (l : ℤ_[l]) : ℤ_[l][X])) = -1 := by
-      simp
-    rw [e1, e2, norm_neg, norm_one, one_pow]
-    exact h3)
+  obtain ⟨z, hz, -⟩ :=
+    hensels_lemma (p := l) (R := ℤ_[l]) (F := X ^ 2 - X + C (l : ℤ_[l])) (a := 0) (by
+      have e1 : aeval (0 : ℤ_[l]) (X ^ 2 - X + C (l : ℤ_[l]) : ℤ_[l][X]) = ((l : ℕ) : ℤ_[l]) := by
+        simp
+      have e2 : aeval (0 : ℤ_[l]) (derivative (X ^ 2 - X + C (l : ℤ_[l]) : ℤ_[l][X])) = -1 := by
+        simp
+      rw [e1, e2, norm_neg, norm_one, one_pow]
+      exact h3)
   have h4 : z ^ 2 - z + (l : ℤ_[l]) = 0 := by simpa using hz
   have h5 : (z : ℚ_[l]) ^ 2 - z + (l : ℚ_[l]) = 0 := by
     have := congrArg (fun x : ℤ_[l] => (x : ℚ_[l])) h4
@@ -44,25 +47,32 @@ private theorem conj_of_sq (w : ℂ) (r : ℝ) (hr : r < 0) (h : w ^ 2 = r) : st
   apply Complex.ext <;> simp [h3]
 
 open Polynomial in
-private theorem conj_of_root (g : ℚ[X]) (hg : g ≠ 0) (hs : (g.map (algebraMap ℚ ℝ)).Splits) (w : ℂ)
-    (h : aeval w g = 0) : starRingEnd ℂ w = w := by
+private theorem conj_of_root
+    (g : ℚ[X]) (hg : g ≠ 0) (hs : (g.map (algebraMap ℚ ℝ)).Splits) (w : ℂ) (h : aeval w g = 0)
+    : starRingEnd ℂ w = w := by
   have h1 : g.map (algebraMap ℚ ℝ) ≠ 0 := Polynomial.map_ne_zero hg
   have h2 : w ∈ ((g.map (algebraMap ℚ ℝ)).map (algebraMap ℝ ℂ)).roots := by
-    rw [mem_roots (Polynomial.map_ne_zero h1), IsRoot.def, eval_map_algebraMap, aeval_map_algebraMap]
+    rw [mem_roots (Polynomial.map_ne_zero h1), IsRoot.def, eval_map_algebraMap,
+      aeval_map_algebraMap]
     exact h
   rw [hs.roots_map] at h2
   obtain ⟨r, -, rfl⟩ := Multiset.mem_map.1 h2
   exact Complex.conj_ofReal r
 
-theorem UpperTheory.exists_totally_imaginary_generator_of_isCMField :
-    ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l), ∃ (M : Type) (_ : Field M) (_ : NumberField M) (_ : IsCMField M) (f : M →+* Om l), IntermediateField.adjoin ℚ_[l] (Set.range f) = K.1 ∧ ∃ (δ : M) (d : ℚ_[l]), δ ≠ 0 ∧ f δ = algebraMap ℚ_[l] (Om l) d ∧ ∀ φ : M →+* ℂ, starRingEnd ℂ (φ δ) = -φ δ := by
+theorem UpperTheory.exists_totally_imaginary_generator_of_isCMField
+    : ∀ (l : ℕ) [Fact l.Prime] (K : FinExt l),
+      ∃ (M : Type) (_ : Field M) (_ : NumberField M) (_ : IsCMField M) (f : M →+* Om l),
+        IntermediateField.adjoin ℚ_[l] (Set.range f) = K.1
+          ∧ ∃ (δ : M) (d : ℚ_[l]),
+            δ ≠ 0 ∧ f δ = algebraMap ℚ_[l] (Om l) d
+              ∧ ∀ φ : M →+* ℂ, starRingEnd ℂ (φ δ) = - φ δ := by
   intro l hl K
-  obtain ⟨β, g, hgm, hgs, hβ, hK⟩ := UpperTheory.exists_real_split_primitive_element_padic_finite_ext l K
+  obtain ⟨β, g, hgm, hgs, hβ, hK⟩ :=
+    UpperTheory.exists_real_split_primitive_element_padic_finite_ext l K
   obtain ⟨d, hd⟩ := exists_sqrt l
   have hl1 : (1 : ℝ) ≤ l := by exact_mod_cast hl.out.one_lt.le
   set D : Om l := algebraMap ℚ_[l] (Om l) d with hD
-  have hD2 : D ^ 2 = 1 - 4 * (l : Om l) := by
-    rw [hD, ← map_pow, hd]; simp [map_ofNat]
+  have hD2 : D ^ 2 = 1 - 4 * (l : Om l) := by rw [hD, ← map_pow, hd]; simp [map_ofNat]
   have hβi : IsIntegral ℚ β := ⟨g, hgm, hβ⟩
   have hDi : IsIntegral ℚ D := by
     apply IsIntegral.of_pow two_pos
@@ -71,10 +81,11 @@ theorem UpperTheory.exists_totally_imaginary_generator_of_isCMField :
     rw [this]
     exact isIntegral_algebraMap
   let M : IntermediateField ℚ (Om l) := IntermediateField.adjoin ℚ {β, D}
-  have hfd : FiniteDimensional ℚ M := IntermediateField.finiteDimensional_adjoin (by
-    rintro x (rfl | rfl)
-    · exact hβi
-    · exact hDi)
+  have hfd : FiniteDimensional ℚ M :=
+    IntermediateField.finiteDimensional_adjoin (by
+      rintro x (rfl | rfl)
+      · exact hβi
+      · exact hDi)
   have hNF : NumberField M := { to_charZero := inferInstance, to_finiteDimensional := hfd }
   let b : M := ⟨β, IntermediateField.subset_adjoin ℚ _ (by simp)⟩
   let δ : M := ⟨D, IntermediateField.subset_adjoin ℚ _ (by simp)⟩
@@ -88,7 +99,7 @@ theorem UpperTheory.exists_totally_imaginary_generator_of_isCMField :
     exact hβ
   have hδφ2 : ∀ φ : M →+* ℂ, φ δ ^ 2 = ((1 - 4 * l : ℝ) : ℂ) := fun φ => by
     rw [← map_pow, hδ2]; simp [map_ofNat]
-  have hδc : ∀ φ : M →+* ℂ, starRingEnd ℂ (φ δ) = -φ δ := fun φ =>
+  have hδc : ∀ φ : M →+* ℂ, starRingEnd ℂ (φ δ) = - φ δ := fun φ =>
     conj_of_sq _ _ (by linarith) (hδφ2 φ)
   have hδ0 : ∀ φ : M →+* ℂ, φ δ ≠ 0 := fun φ h => by
     have := hδφ2 φ
@@ -100,12 +111,14 @@ theorem UpperTheory.exists_totally_imaginary_generator_of_isCMField :
     have := Polynomial.aeval_algHom_apply φ.toRatAlgHom b g
     rw [hb, map_zero] at this
     exact this
-  have htc : IsTotallyComplex M := ⟨fun w => by
-    rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff, ComplexEmbedding.isReal_iff]
-    intro h
-    have h1 : starRingEnd ℂ (w.embedding δ) = w.embedding δ := RingHom.congr_fun h δ
-    rw [hδc] at h1
-    exact hδ0 w.embedding (by linear_combination (-1 / 2 : ℂ) * h1)⟩
+  have htc : IsTotallyComplex M :=
+    ⟨fun w => by
+      rw [← InfinitePlace.not_isReal_iff_isComplex, InfinitePlace.isReal_iff,
+        ComplexEmbedding.isReal_iff]
+      intro h
+      have h1 : starRingEnd ℂ (w.embedding δ) = w.embedding δ := RingHom.congr_fun h δ
+      rw [hδc] at h1
+      exact hδ0 w.embedding (by linear_combination (-1 / 2 : ℂ) * h1)⟩
   have hCM : IsCMField M := by
     refine isCM_of_conj _ ?_
     rintro ⟨x, hx⟩

@@ -9,8 +9,8 @@ open Polynomial Classical GlobalTheory.BadShare
 
 namespace GlobalTheory.BadShare
 
-theorem sum_le_prod_of_two_le_nat {ι : Type*} (s : Finset ι) (f : ι → ℕ)
-    (h : ∀ i ∈ s, 2 ≤ f i) : ∑ i ∈ s, f i ≤ ∏ i ∈ s, f i := by
+theorem sum_le_prod_of_two_le_nat {ι : Type*} (s : Finset ι) (f : ι → ℕ) (h : ∀ i ∈ s, 2 ≤ f i)
+    : ∑ i ∈ s, f i ≤ ∏ i ∈ s, f i := by
   rcases s.eq_empty_or_nonempty with rfl | hs
   · simp
   have key : ∑ i ∈ s, f i ≤ ∏ i ∈ s, f i ∧ 2 ≤ ∏ i ∈ s, f i := by
@@ -26,33 +26,42 @@ theorem sum_le_prod_of_two_le_nat {ι : Type*} (s : Finset ι) (f : ι → ℕ)
       · nlinarith
   exact key.1
 
-private theorem arith_four (a b c R m : ℕ) (ha : 16 ≤ a) (hb : m ≤ b) (hc : m ≤ c)
-    (hbc : 16 * m ≤ b * c) (hR : 1 ≤ R) : 4 * m * (a + b + c + R) ≤ a * b * c * R := by
+private theorem arith_four
+    (a b c R m : ℕ) (ha : 16 ≤ a) (hb : m ≤ b) (hc : m ≤ c) (hbc : 16 * m ≤ b * c) (hR : 1 ≤ R)
+    : 4 * m * (a + b + c + R) ≤ a * b * c * R := by
   have h1 : 16 * m * a ≤ b * c * a := Nat.mul_le_mul_right _ hbc
   have h2 : 16 * m * b ≤ a * c * b := Nat.mul_le_mul_right _ (Nat.mul_le_mul ha hc)
   have h3 : 16 * m * c ≤ a * b * c := Nat.mul_le_mul_right _ (Nat.mul_le_mul ha hb)
   have h4 : 16 * m * R ≤ a * b * c * R := by
     apply Nat.mul_le_mul_right
-    calc 16 * m ≤ b * c := hbc
+    calc
+      16 * m
+        ≤ b * c := hbc
       _ ≤ a * (b * c) := Nat.le_mul_of_pos_left _ (by omega)
       _ = a * b * c := by ring
   have h5 : a * b * c ≤ a * b * c * R := Nat.le_mul_of_pos_right _ hR
   nlinarith
 
-theorem sum_primePowerParts_le :
-    ∀ n q d : ℕ, 0 < n → q.Prime → d.Prime → q ≠ 2 → d ≠ 2 → q ≠ d → 16 ≤ max q d →
-      16 * q * d ∣ n → (∑ l ∈ n.primeFactors, ((l ^ padicValNat l n : ℕ) : ℝ)) ≤
-        (n : ℝ) / (4 * ((min q d : ℕ) : ℝ)) := by
+theorem sum_primePowerParts_le
+    : ∀ n q d : ℕ,
+      0 < n → q.Prime → d.Prime → q ≠ 2 → d ≠ 2 → q ≠ d → 16 ≤ max q d → 16 * q * d ∣ n
+        → (∑ l ∈ n.primeFactors, ((l ^ padicValNat l n : ℕ) : ℝ))
+          ≤ (n : ℝ) / (4 * ((min q d : ℕ) : ℝ)) := by
   intro n q d hn hq hd hq2 hd2 hqd hmax hdvd
   set f : ℕ → ℕ := fun l => l ^ padicValNat l n with hf
   have hpow : ∀ p k : ℕ, p.Prime → p ^ k ∣ n → p ^ k ≤ f p := by
     intro p k hp hk
     haveI := Fact.mk hp
-    exact Nat.pow_le_pow_right hp.pos (((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) hn.ne').1 hk)
+    exact Nat.pow_le_pow_right hp.pos
+      (((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+          : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+              (ha : a ≠ 0),
+            p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+        hn.ne').1 hk)
   have hge : ∀ p ∈ n.primeFactors, p ≤ f p := by
     intro p hp
-    have := hpow p 1 (Nat.prime_of_mem_primeFactors hp)
-      (by simpa using Nat.dvd_of_mem_primeFactors hp)
+    have :=
+      hpow p 1 (Nat.prime_of_mem_primeFactors hp) (by simpa using Nat.dvd_of_mem_primeFactors hp)
     simpa using this
   have h16 : 2 ^ 4 ∣ n := Dvd.dvd.trans ⟨q * d, by ring⟩ hdvd
   have hqn : q ∣ n := Dvd.dvd.trans ⟨16 * d, by ring⟩ hdvd
@@ -90,11 +99,14 @@ theorem sum_primePowerParts_le :
     rw [← Finset.sum_sdiff hsub, Finset.sum_insert hn2, Finset.sum_pair hqd]
     ring
   have hbc : 16 * min q d ≤ f q * f d := by
-    calc 16 * min q d ≤ max q d * min q d := Nat.mul_le_mul_right _ hmax
+    calc
+      16 * min q d
+        ≤ max q d * min q d := Nat.mul_le_mul_right _ hmax
       _ = q * d := max_mul_min q d
       _ ≤ f q * f d := Nat.mul_le_mul hb hc
-  have key := arith_four (f 2) (f q) (f d) (∏ i ∈ s, f i) (min q d) ha
-    ((min_le_left _ _).trans hb) ((min_le_right _ _).trans hc) hbc hR
+  have key :=
+    arith_four (f 2) (f q) (f d) (∏ i ∈ s, f i) (min q d) ha ((min_le_left _ _).trans hb)
+      ((min_le_right _ _).trans hc) hbc hR
   rw [← e1] at key
   have key2 : (∑ l ∈ n.primeFactors, f l) * (4 * min q d) ≤ n := by
     rw [e2, mul_comm]

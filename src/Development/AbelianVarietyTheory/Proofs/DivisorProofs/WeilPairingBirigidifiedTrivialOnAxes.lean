@@ -12,16 +12,23 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CubWeilProdE
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT
 attribute [local instance] Over.cartesianMonoidalCategory
 
 namespace GlobalTheory.AxisPairing
 
-theorem weilIs_comp_eq_one_of_pull_isGen {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A] (P : LB (G2 A).left)
-    (hA : IsAbelianScheme A) (hP : P.IsLB) (ψ : A ⟶ G2 A) [IsMonHom ψ]
-    (hg : ∃ t : (P.pull ψ.left).Gen, t.IsGen) {n : ℤ} {T : Over S} {u v : T ⟶ A}
-    {c : Γ(T.left, ⊤)ˣ} (h : Out.WeilIs (G2 A) P n (u ≫ ψ) (v ≫ ψ) c) : c = 1 := by
+theorem weilIs_comp_eq_one_of_pull_isGen
+    {S : Scheme.{0}} {A : Over S} [GrpObj A] [IsCommMonObj A]
+    (P : LB (G2 A).left)
+    (hA : IsAbelianScheme A) (hP : P.IsLB)
+    (ψ : A ⟶ G2 A) [IsMonHom ψ]
+    (hg : ∃ t : (P.pull ψ.left).Gen, t.IsGen)
+    {n : ℤ} {T : Over S} {u v : T ⟶ A} {c : Γ(T.left, ⊤)ˣ}
+    (h : Out.WeilIs (G2 A) P n (u ≫ ψ) (v ≫ ψ) c)
+    : c = 1 := by
   have hL : (P.pull ψ.left).IsLB := LB.isLB_pull hP ψ.left
   have h0 : GlobalTheory.CechPic.cls _ hL = 0 := (GlobalTheory.CechPic.cls_eq_zero_iff hL).2 hg
   have hw : LBIso (lbPow (P.pull ψ.left) 1) (P.pull ψ.left) := by
@@ -32,14 +39,20 @@ theorem weilIs_comp_eq_one_of_pull_isGen {S : Scheme.{0}} {A : Over S} [GrpObj A
   rw [Nat.cast_one, _root_.mul_one] at h1
   have iso : LBIso (lbPow (P.pull ψ.left) 0) ((P.pull ψ.left).pull (𝟙 A : A ⟶ A).left) := by
     apply (GlobalTheory.CechPic.cls_eq_iff (LB.isLB_linComb hL _ _) (LB.isLB_pull hL _)).1
-    rw [GlobalTheory.CechPic.cls_lbPow hL, GlobalTheory.CechPic.cls_pull hL,
-      Over.id_left, GlobalTheory.CechPic.pull_id, h0, zero_smul]
-  have h2 := (GlobalTheory.weilIs_along_hom GlobalTheory.globalFns_holds S A A (𝟙 A)
-    (P.pull ψ.left) (P.pull ψ.left) 0 n T u v c c hA hA hL hL inferInstance iso
-    (by simpa using h1)).2 h1
+    rw [GlobalTheory.CechPic.cls_lbPow hL, GlobalTheory.CechPic.cls_pull hL, Over.id_left,
+      GlobalTheory.CechPic.pull_id, h0, zero_smul]
+  have h2 :=
+    (GlobalTheory.weilIs_along_hom GlobalTheory.globalFns_holds S A A (𝟙 A) (P.pull ψ.left)
+      (P.pull ψ.left) 0 n T u v c c hA hA hL hL inferInstance iso (by simpa using h1)).2 h1
   simpa using h2
 
-theorem axes : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (P : LB (G2 A).left), IsAbelianScheme A → P.IsLB → (∃ t : (P.pull (lift (1 : A ⟶ A) (𝟙 A)).left).Gen, t.IsGen) → (∃ t : (P.pull (lift (𝟙 A) (1 : A ⟶ A)).left).Gen, t.IsGen) → ∀ (n : ℤ) (T : Over S) (u v : T ⟶ A) (c : Γ(T.left, ⊤)ˣ), (Out.WeilIs (G2 A) P n (lift u 1) (lift v 1) c → c = 1) ∧ (Out.WeilIs (G2 A) P n (lift 1 u) (lift 1 v) c → c = 1) := by
+theorem axes
+    : ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A] [IsCommMonObj A] (P : LB (G2 A).left),
+      IsAbelianScheme A → P.IsLB → (∃ t : (P.pull (lift (1 : A ⟶ A) (𝟙 A)).left).Gen, t.IsGen)
+        → (∃ t : (P.pull (lift (𝟙 A) (1 : A ⟶ A)).left).Gen, t.IsGen)
+        → ∀ (n : ℤ) (T : Over S) (u v : T ⟶ A) (c : Γ(T.left, ⊤)ˣ),
+          (Out.WeilIs (G2 A) P n (lift u 1) (lift v 1) c → c = 1)
+            ∧ (Out.WeilIs (G2 A) P n (lift 1 u) (lift 1 v) c → c = 1) := by
   intro S A _ _ P hA hP h₂ h₁ n T u v c
   have := GlobalTheory.Raynaud.ProdToric.isMonHom_lift_id_one A A
   have := GlobalTheory.Raynaud.ProdToric.isMonHom_lift_one_id A A

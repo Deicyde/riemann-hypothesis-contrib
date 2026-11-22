@@ -26,22 +26,25 @@ def rk (N j : ℕ) : Ψ ⊕ Ψ → ℝ
   | Sum.inl _ => j
   | Sum.inr _ => (N : ℝ) - j
 
-def ep (N j p : ℕ) (fr : ℕ → Ψ ⊕ Ψ) : ℝ := (∑' n : ℕ, ((p : ℝ)⁻¹) ^ (n + 1) * rk N j (fr n)) - j / ((p : ℝ) - 1)
+def ep (N j p : ℕ) (fr : ℕ → Ψ ⊕ Ψ) : ℝ :=
+  (∑' n : ℕ, ((p : ℝ)⁻¹) ^ (n + 1) * rk N j (fr n)) - j / ((p : ℝ) - 1)
 
 omit [Fintype Ψ] [DecidableEq Ψ] in
 theorem pLie_zero {j : ℕ} (hj : j ≤ N) (s : Ψ ⊕ Ψ) : (pLie j 0 s : RP Ψ N) = C (rk N j s) := by
   have hc : (Finset.univ.filter fun i : Fin N => (i : ℕ) < j).card = j := by
     rw [Fin.card_filter_val_lt]; omega
   have hc' : (Finset.univ.filter fun i : Fin N => j ≤ (i : ℕ)).card = N - j := by
-    have := Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin N))) (fun i : Fin N => (i : ℕ) < j)
+    have :=
+      Finset.card_filter_add_card_filter_not (s := (Finset.univ : Finset (Fin N)))
+        (fun i : Fin N => (i : ℕ) < j)
     simp only [not_lt, Finset.card_univ, Fintype.card_fin] at this
     omega
   cases s with
   | inl τ => simp [pLie, pkLow, rk, hc]
   | inr τ => simp [pLie, rk, hc', Nat.cast_sub hj]
 
-theorem delta_one {j : ℕ} (hj : j ≤ N) (p : ℕ) (τ : Ψ) (fr : ℕ → Ψ ⊕ Ψ) (Q : RP Ψ N) :
-    deltaTerm j p τ fr 1 Q = ep N j p fr * Real.log p * degFl Q := by
+theorem delta_one {j : ℕ} (hj : j ≤ N) (p : ℕ) (τ : Ψ) (fr : ℕ → Ψ ⊕ Ψ) (Q : RP Ψ N)
+    : deltaTerm j p τ fr 1 Q = ep N j p fr * Real.log p * degFl Q := by
   have h2 : (pkLow j τ 0 : RP Ψ N) = C (j : ℝ) := pLie_zero hj (Sum.inl τ)
   unfold deltaTerm ep
   simp only [Nat.sub_self, pLie_zero hj, h2, degFl_C_mul, pow_one, ← mul_assoc]
@@ -51,9 +54,9 @@ theorem delta_one {j : ℕ} (hj : j ≤ N) (p : ℕ) (τ : Ψ) (fr : ℕ → Ψ 
 
 variable (T : RootTower Ψ N) (II : IntersectionSystem)
 
-
 omit [Fintype Ψ] [DecidableEq Ψ] in
-theorem abs_ep_le {j p : ℕ} (hj : j ≤ N) (hp : 2 ≤ p) (fr : ℕ → Ψ ⊕ Ψ) : |ep N j p fr| ≤ N / ((p : ℝ) - 1) := by
+theorem abs_ep_le {j p : ℕ} (hj : j ≤ N) (hp : 2 ≤ p) (fr : ℕ → Ψ ⊕ Ψ)
+    : |ep N j p fr| ≤ N / ((p : ℝ) - 1) := by
   have hp' : (2 : ℝ) ≤ p := by exact_mod_cast hp
   have hj' : (j : ℝ) ≤ N := by exact_mod_cast hj
   have hj0 : (0 : ℝ) ≤ j := Nat.cast_nonneg j
@@ -72,7 +75,8 @@ theorem abs_ep_le {j p : ℕ} (hj : j ≤ N) (hp : 2 ≤ p) (fr : ℕ → Ψ ⊕
     rintro (s | s) <;> simp only [rk] <;> constructor <;> linarith
   have hle : ∀ n : ℕ, ((p : ℝ)⁻¹) ^ (n + 1) * rk N j (fr n) ≤ ((p : ℝ)⁻¹) ^ (n + 1) * N := fun n =>
     mul_le_mul_of_nonneg_left (hrk _).2 (by positivity)
-  have hnn : ∀ n : ℕ, 0 ≤ ((p : ℝ)⁻¹) ^ (n + 1) * rk N j (fr n) := fun n => mul_nonneg (by positivity) (hrk _).1
+  have hnn : ∀ n : ℕ, 0 ≤ ((p : ℝ)⁻¹) ^ (n + 1) * rk N j (fr n) := fun n =>
+    mul_nonneg (by positivity) (hrk _).1
   have hs := Summable.of_nonneg_of_le hnn hle hg.summable
   have hU := hs.tsum_le_tsum hle hg.summable
   rw [hg.tsum_eq] at hU

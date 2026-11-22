@@ -12,8 +12,8 @@ namespace GlobalTheory.UnitLemma.Unr
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem span_pow_eq_top_of_separable (K : UQ) (B : InvAlg K) (hs : B.P.Separable) :
-    Submodule.span K.E (Set.range fun i : ℕ => B.g ^ i) = ⊤ := by
+theorem span_pow_eq_top_of_separable (K : UQ) (B : InvAlg K) (hs : B.P.Separable)
+    : Submodule.span K.E (Set.range fun i : ℕ => B.g ^ i) = ⊤ := by
   classical
   have hP : B.P ≠ 0 := hs.ne_zero
   have hint : IsIntegral K.E B.g := Algebra.IsIntegral.isIntegral _
@@ -24,11 +24,16 @@ theorem span_pow_eq_top_of_separable (K : UQ) (B : InvAlg K) (hs : B.P.Separable
     exact this
   have hdvd : B.P ∣ minpoly K.E B.g := by
     rw [UniqueFactorizationMonoid.dvd_iff_normalizedFactors_le_normalizedFactors hP hz,
-      Multiset.le_iff_subset ((UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hP).1 hs.squarefree)]
+      Multiset.le_iff_subset
+        ((UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hP).1 hs.squarefree)]
     intro p hp
     rw [Polynomial.mem_normalizedFactors_iff hP] at hp
     rw [Polynomial.mem_normalizedFactors_iff hz]
-    exact ⟨hp.1, hp.2.1, GlobalTheory.CuspGL.irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero _ _ _ hp.1 hp.2.2 h0⟩
+    exact ⟨
+      hp.1,
+      hp.2.1,
+      GlobalTheory.CuspGL.irreducible_dvd_of_dvd_charpoly_of_aeval_eq_zero _ _ _ hp.1 hp.2.2 h0
+    ⟩
   have hle : Module.finrank K.E B.A ≤ (minpoly K.E B.g).natDegree := by
     have h1 : B.P.natDegree = Module.finrank K.E B.A := LinearMap.charpoly_natDegree _
     rw [← h1]

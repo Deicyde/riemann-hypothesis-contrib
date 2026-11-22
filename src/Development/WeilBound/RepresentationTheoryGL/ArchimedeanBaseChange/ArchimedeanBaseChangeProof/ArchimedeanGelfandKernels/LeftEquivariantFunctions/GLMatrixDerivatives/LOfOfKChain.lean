@@ -14,7 +14,10 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.Positive
 namespace PositivityTheory.RgBcC.LfSt
 
 theorem lOf_of_kChain (h : KChain) : LOf :=
-  lAsm GlobalTheory.T.height_bound_facts (GelfandReading.frameDer_of GlobalTheory.T.height_bound_facts) h (KSuppPf.ksupp_of GlobalTheory.T.height_bound_facts GlobalTheory.T.positive_cone_structure) UnitaryConjTransposeTrace.end1 GLSubgroupConjTransposeClosure.end0
+  lAsm GlobalTheory.T.height_bound_facts
+    (GelfandReading.frameDer_of GlobalTheory.T.height_bound_facts) h
+    (KSuppPf.ksupp_of GlobalTheory.T.height_bound_facts GlobalTheory.T.positive_cone_structure)
+    UnitaryConjTransposeTrace.end1 GLSubgroupConjTransposeClosure.end0
     GlobalTheory.T.positive_cone_homotopy GlobalTheory.T.positive_cone_structure
 
 end PositivityTheory.RgBcC.LfSt

@@ -66,8 +66,10 @@ theorem bkbConv : StatBKbConv := by
         exact (smul_eq_zero.1 h').resolve_left hc'
     haveI : Module.Free O (LinearMap.range ψ) := Module.free_of_finite_type_torsion_free'
     let b := Module.Free.chooseBasis O (LinearMap.range ψ)
-    have hcex : ∀ i, ∃ y : FractionRing O, Formalism.RepresentationBoundsCohomology.LOC.toKO O y = φbar (b i) :=
-      fun i => Submodule.mkQ_surjective _ _
+    have hcex
+        : ∀ i, ∃ y : FractionRing O,
+          Formalism.RepresentationBoundsCohomology.LOC.toKO O y = φbar (b i) := fun i =>
+      Submodule.mkQ_surjective _ _
     choose c hc using hcex
     have hli0 : LinearIndependent O (fun i => ((b i : LinearMap.range ψ) : HV' ⧸ HfV')) :=
       b.linearIndependent.map' (LinearMap.range ψ).subtype (Submodule.ker_subtype _)
@@ -76,20 +78,26 @@ theorem bkbConv : StatBKbConv := by
       first
       | exact (LinearIndependent.iff_fractionRing O (FractionRing O)).1 hli0
       | exact (LinearIndependent.iff_fractionRing (R := O) (K := FractionRing O)).1 hli0
-    obtain ⟨G, hG⟩ : ∃ G : (HV' ⧸ HfV') →ₗ[FractionRing O] FractionRing O,
-        ∀ i, G ((b i : LinearMap.range ψ) : HV' ⧸ HfV') = c i := by
+    obtain ⟨G, hG⟩
+        : ∃ G : (HV' ⧸ HfV') →ₗ[FractionRing O] FractionRing O, ∀ i,
+          G ((b i : LinearMap.range ψ) : HV' ⧸ HfV') = c i := by
       obtain ⟨G, hG⟩ :=
         LinearMap.exists_extend ((Finsupp.linearCombination (FractionRing O) c) ∘ₗ hli.repr)
       refine ⟨G, fun i => ?_⟩
       have h := LinearMap.congr_fun hG ⟨_, Submodule.subset_span ⟨i, rfl⟩⟩
       rw [LinearMap.comp_apply, LinearMap.comp_apply, hli.repr_eq_single i _ rfl,
-        Finsupp.linearCombination_single, one_smul] at h
+          Finsupp.linearCombination_single, one_smul]
+        at h
       exact h
     obtain ⟨a, ha⟩ := h2 (G ∘ₗ HfV'.mkQ)
-    have haV : a ∈ HfV := (h1 a).2 fun bb hbb => by
-      rw [ha, LinearMap.comp_apply, Submodule.mkQ_apply,
-        (Submodule.Quotient.mk_eq_zero HfV').2 hbb, map_zero]
-    have key : (Formalism.RepresentationBoundsCohomology.LOC.toKO O) ∘ₗ (G.restrictScalars O) ∘ₗ (LinearMap.range ψ).subtype = φbar :=
+    have haV : a ∈ HfV :=
+      (h1 a).2 fun bb hbb => by
+        rw [ha, LinearMap.comp_apply, Submodule.mkQ_apply,
+          (Submodule.Quotient.mk_eq_zero HfV').2 hbb, map_zero]
+    have key
+        : (Formalism.RepresentationBoundsCohomology.LOC.toKO O) ∘ₗ (G.restrictScalars O)
+            ∘ₗ (LinearMap.range ψ).subtype
+          = φbar :=
       b.ext fun i => by
         show Formalism.RepresentationBoundsCohomology.LOC.toKO O (G ((b i : LinearMap.range ψ) : HV' ⧸ HfV')) = φbar (b i)
         rw [hG i, hc i]
@@ -102,7 +110,8 @@ theorem bkbConv : StatBKbConv := by
     exact sub_eq_zero.1 hz
 
 theorem rowBK : StatRowBK := by
-  intro O _ _ _ X _ _ Hc HV Cs HV' _ _ _ _ _ _ _ _ _ _ _ q j' pr pair HfV HfV' F Fs h1 h2 h3 h4 hF hFs
+  intro O _ _ _ X _ _ Hc HV Cs HV' _ _ _ _ _ _ _ _ _ _ _ q j' pr pair HfV HfV' F Fs h1 h2 h3 h4 hF
+    hFs
   rw [hF, hFs, bkbConv O Hc HV Cs HV' q j' pr pair HfV HfV' h1 h2 h3 h4]
 
 end Formalism.RepresentationBoundsCohomology.JT

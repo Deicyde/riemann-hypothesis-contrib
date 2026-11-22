@@ -9,11 +9,12 @@ open scoped InnerProductSpace
 
 namespace PositivityTheory.CW.CasimirNonnegativeSymmetric
 
-variable {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
+variable
+  {n : ℕ} {ε : Fin n → Bool} {V : Type} [NormedAddCommGroup V] [InnerProductSpace ℂ V]
   {E : Fin n → Fin n → Module.End ℂ V}
 
-theorem casK_symm (hU : IsInfUnitary ε E) (x y : V) :
-    ⟪casimirK ε E x, y⟫_ℂ = ⟪x, casimirK ε E y⟫_ℂ := by
+theorem casK_symm (hU : IsInfUnitary ε E) (x y : V)
+    : ⟪casimirK ε E x, y⟫_ℂ = ⟪x, casimirK ε E y⟫_ℂ := by
   simp only [casimirK, LinearMap.sum_apply, Module.End.mul_apply, sum_inner, inner_sum]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b hb => ?_
   have hab : ε b = ε a := (Finset.mem_filter.1 hb).2
@@ -21,8 +22,8 @@ theorem casK_symm (hU : IsInfUnitary ε E) (x y : V) :
   simp [adjSign, hab]
 
 theorem re_inner_casK_nonneg (hU : IsInfUnitary ε E) (x : V) : 0 ≤ (⟪x, casimirK ε E x⟫_ℂ).re := by
-  simp only [ReciprocityTheory.ChartRestriction.DS.casimirK, LinearMap.sum_apply, Module.End.mul_apply,
-    inner_sum, Complex.re_sum]
+  simp only [ReciprocityTheory.ChartRestriction.DS.casimirK, LinearMap.sum_apply,
+    Module.End.mul_apply, inner_sum, Complex.re_sum]
   refine Finset.sum_nonneg fun a _ => Finset.sum_nonneg fun b hb => ?_
   have hb' : ε b = ε a := (Finset.mem_filter.1 hb).2
   have h := hU b a x (E b a x)
@@ -30,7 +31,8 @@ theorem re_inner_casK_nonneg (hU : IsInfUnitary ε E) (x : V) : 0 ≤ (⟪x, cas
   rw [← h]
   simpa using (inner_self_nonneg (𝕜 := ℂ) (x := E b a x))
 
-theorem eig_nonneg (hU : IsInfUnitary ε E) {μ : ℝ} {v : V} (hv : v ≠ 0) (h : Eig ε E μ v) : 0 ≤ μ := by
+theorem eig_nonneg (hU : IsInfUnitary ε E) {μ : ℝ} {v : V} (hv : v ≠ 0) (h : Eig ε E μ v)
+    : 0 ≤ μ := by
   have h2 := re_inner_casK_nonneg hU v
   rw [show casimirK ε E v = (μ : ℂ) • v from h, inner_smul_right, inner_self_eq_norm_sq_to_K] at h2
   have h3 : 0 ≤ μ * ‖v‖ ^ 2 := by simpa [← Complex.ofReal_pow] using h2
@@ -57,7 +59,9 @@ theorem e3a : CasimirPowerSurjectiveSymmetric := by
     | zero => intro x y; simp
     | succ j ih =>
       intro x y
-      calc ⟪(a ^ (j + 1)) x, y⟫_ℂ = ⟪(a ^ j) (a x), y⟫_ℂ := by rw [pow_succ, Module.End.mul_apply]
+      calc
+        ⟪(a ^ (j + 1)) x, y⟫_ℂ
+          = ⟪(a ^ j) (a x), y⟫_ℂ := by rw [pow_succ, Module.End.mul_apply]
         _ = ⟪a x, (a ^ j) y⟫_ℂ := ih _ _
         _ = ⟪x, a ((a ^ j) y)⟫_ℂ := ha _ _
         _ = ⟪x, (a ^ (j + 1)) y⟫_ℂ := by rw [pow_succ', Module.End.mul_apply]
@@ -75,8 +79,7 @@ theorem e3a : CasimirPowerSurjectiveSymmetric := by
       intro j
       induction j with
       | zero => simp
-      | succ j ih =>
-        rw [pow_succ, Module.End.mul_apply, h1, map_smul, ih, smul_smul, ← pow_succ']
+      | succ j ih => rw [pow_succ, Module.End.mul_apply, h1, map_smul, ih, smul_smul, ← pow_succ']
     have hne1 : (1 + (μ : ℂ)) ≠ 0 := by
       rw [← Complex.ofReal_one, ← Complex.ofReal_add]
       exact_mod_cast (by linarith : (0 : ℝ) < 1 + μ).ne'

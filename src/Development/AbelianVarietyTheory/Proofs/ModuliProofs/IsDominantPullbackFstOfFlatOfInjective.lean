@@ -14,16 +14,20 @@ public import Development.AbelianVarietyTheory.Definitions.ArchimedeanThetaValue
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 open GlobalTheory.Models
 
 namespace GlobalTheory
 
-theorem isDominant_pullback_fst_of_flat_of_injective {O F : Type} [CommRing O] [Field F] (β : O →+* F)
-    (hβ : Function.Injective β) {X : Scheme.{0}} (s : X ⟶ Sp O) [Flat s] :
-    IsDominant (pullback.fst s (spMap β)) := by
+theorem isDominant_pullback_fst_of_flat_of_injective
+    {O F : Type} [CommRing O] [Field F]
+    (β : O →+* F) (hβ : Function.Injective β)
+    {X : Scheme.{0}} (s : X ⟶ Sp O) [Flat s]
+    : IsDominant (pullback.fst s (spMap β)) := by
   constructor
   intro x
   have hη : (spMap β) (IsLocalRing.closedPoint F) ⤳ s x := by
@@ -33,41 +37,54 @@ theorem isDominant_pullback_fst_of_flat_of_injective {O F : Type} [CommRing O] [
     have ha' : β a ∈ IsLocalRing.maximalIdeal F := ha
     rw [IsLocalRing.maximalIdeal_eq_bot, Ideal.mem_bot] at ha'
     have : a = 0 := hβ (by rw [ha', map_zero])
-    rw [this]; exact Ideal.zero_mem _
+    rw [this]
+    exact Ideal.zero_mem _
   obtain ⟨y, hy, hy'⟩ := Flat.generalizingMap s hη
   refine closure_mono (Set.singleton_subset_iff.mpr ?_) hy.mem_closure
   rw [Scheme.Pullback.range_fst]
   exact ⟨_, hy'.symm⟩
 
-theorem isPrimitiveRoot_map_of_isUnit {O k : Type} [CommRing O] [IsDomain O] [Field k] (ψ : O →+* k)
-    {z : O} {A : ℕ} (hA : 0 < A) (hz : IsPrimitiveRoot z A) (hu : IsUnit (A : O)) :
-    IsPrimitiveRoot (ψ z) A := by
+theorem isPrimitiveRoot_map_of_isUnit
+    {O k : Type} [CommRing O] [IsDomain O] [Field k]
+    (ψ : O →+* k)
+    {z : O} {A : ℕ} (hA : 0 < A) (hz : IsPrimitiveRoot z A) (hu : IsUnit (A : O))
+    : IsPrimitiveRoot (ψ z) A := by
   have : NeZero (A : k) := ⟨by simpa using (hu.map ψ).ne_zero⟩
   rw [← (Polynomial.isRoot_cyclotomic_iff (R := k) (n := A)), ← Polynomial.map_cyclotomic A ψ]
   exact Polynomial.IsRoot.map ψ (hz.isRoot_cyclotomic hA)
 
-theorem galoisPart_eq_refl_of_fixes_point : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (S : ℕ) (β : RZ H S l.A →+* KA l) (C : Cpt Xo.s Xo.univ.t β) (r : Xo.X ≅ Xo.X) (ρ : C.X ≅ C.X) (σ : KA l ≃+* KA l), IsInc (RZ H S l.A).subtype (KA l).val.toRingHom β → 0 < S → (∃ e, l.A ∣ S ^ e) → C.j ≫ ρ.hom = r.hom ≫ C.j → σ (baseKA l).ρ = (baseKA l).ρ → r.hom ≫ Xo.s = Xo.s ≫ spMap σ.toRingHom → ∀ (k : Type) [Field k] (x : Sp k ⟶ C.X), x ≫ ρ.hom = x → σ = RingEquiv.refl _ := by
+theorem galoisPart_eq_refl_of_fixes_point
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (S : ℕ) (β : RZ H S l.A →+* KA l) (C : Cpt Xo.s Xo.univ.t β)
+        (r : Xo.X ≅ Xo.X) (ρ : C.X ≅ C.X) (σ : KA l ≃+* KA l),
+      IsInc (RZ H S l.A).subtype (KA l).val.toRingHom β → 0 < S → (∃ e, l.A ∣ S ^ e)
+        → C.j ≫ ρ.hom = r.hom ≫ C.j → σ (baseKA l).ρ = (baseKA l).ρ
+        → r.hom ≫ Xo.s = Xo.s ≫ spMap σ.toRingHom
+        → ∀ (k : Type) [Field k] (x : Sp k ⟶ C.X), x ≫ ρ.hom = x → σ = RingEquiv.refl _ := by
   intro E _ _ _ H D l Xo S β C r ρ σ hinc hS ⟨e, he⟩ hj hρ hr k _ x hx
   have hA := l.A_pos
   have : NeZero l.A := ⟨hA.ne'⟩
-  have hβ : Function.Injective β := fun a b h => Subtype.ext (by
-    have h1 := hinc a
-    rw [h, hinc b] at h1
-    exact h1.symm)
+  have hβ : Function.Injective β := fun a b h =>
+    Subtype.ext (by
+      have h1 := hinc a
+      rw [h, hinc b] at h1
+      exact h1.symm)
   let z : RZ H S l.A := ⟨zeta l.A, Subring.subset_closure (by simp)⟩
   let t : RZ H S l.A := ⟨(S : ℂ)⁻¹, Subring.subset_closure (by simp)⟩
   have hβz : β z = (baseKA l).ζ := Subtype.ext (hinc z)
   have hζ : IsPrimitiveRoot (baseKA l).ζ l.A := (baseKA l).ζ_prim
   have hz : IsPrimitiveRoot z l.A := IsPrimitiveRoot.of_map_of_injective (hβz ▸ hζ) hβ
-  have hSu : IsUnit (S : RZ H S l.A) := IsUnit.of_mul_eq_one t (Subtype.ext (by
-    have : (S : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hS.ne'
-    simp [t, this]))
+  have hSu : IsUnit (S : RZ H S l.A) :=
+    IsUnit.of_mul_eq_one t
+      (Subtype.ext (by
+        have : (S : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr hS.ne'
+        simp [t, this]))
   have hAu : IsUnit (l.A : RZ H S l.A) := by
     refine isUnit_of_dvd_unit (Nat.cast_dvd_cast he) ?_
     rw [Nat.cast_pow]
     exact hSu.pow e
-  obtain ⟨a, -, ha⟩ := hζ.eq_pow_of_pow_eq_one (ξ := σ (baseKA l).ζ)
-    (by rw [← map_pow, hζ.pow_eq_one, map_one])
+  obtain ⟨a, -, ha⟩ :=
+    hζ.eq_pow_of_pow_eq_one (ξ := σ (baseKA l).ζ) (by rw [← map_pow, hζ.pow_eq_one, map_one])
   have := C.flat
   have hd₁ := isDominant_pullback_fst_of_flat_of_injective β hβ C.s
   have hd₂ : IsDominant C.jQ := ⟨C.jQ_dense⟩

@@ -8,24 +8,34 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.SamePartI
 open Polynomial Classical GlobalTheory.BadShare
 namespace GlobalTheory.BadShare
 
-theorem pow_padicVal_eq_one_of_primePow {k : Type} [Field k] {n l : ℕ} (hn : 0 < n) (hl : l.Prime) {y : k}
-    (h1 : y ^ n = 1) {a : ℕ} (h2 : y ^ (l ^ a) = 1) : y ^ (l ^ padicValNat l n) = 1 := by
+theorem pow_padicVal_eq_one_of_primePow
+    {k : Type} [Field k]
+    {n l : ℕ} (hn : 0 < n) (hl : l.Prime)
+    {y : k} (h1 : y ^ n = 1)
+    {a : ℕ} (h2 : y ^ (l ^ a) = 1)
+    : y ^ (l ^ padicValNat l n) = 1 := by
   have := Fact.mk hl
   have d1 : orderOf y ∣ n := orderOf_dvd_of_pow_eq_one h1
   have d2 : orderOf y ∣ l ^ a := orderOf_dvd_of_pow_eq_one h2
   obtain ⟨i, -, hi⟩ := (Nat.dvd_prime_pow hl).1 d2
   rw [hi] at d1
-  have hle : i ≤ padicValNat l n := ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat} (ha : a ≠ 0), p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a) hn.ne').1 d1
+  have hle : i ≤ padicValNat l n :=
+    ((by simpa only [_root_.Nat.padicValNat_def] using @_root_.multiplicity_dvd_iff_le
+        : ∀ {p : _root_.Nat} [hp : _root_.Fact (_root_.Nat.Prime p)] {a n : _root_.Nat}
+            (ha : a ≠ 0),
+          p ^ n ∣ a ↔ n ≤ _root_.padicValNat p a)
+      hn.ne').1 d1
   apply orderOf_dvd_iff_pow_eq_one.1
   rw [hi]
   exact pow_dvd_pow l hle
 
-theorem primePowRoots_finite_ncard (k : Type) [Field k] (n l : ℕ) (hn : 0 < n) (hl : l.Prime) :
-    {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.Finite ∧
-      {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.ncard ≤ l ^ padicValNat l n := by
+theorem primePowRoots_finite_ncard (k : Type) [Field k] (n l : ℕ) (hn : 0 < n) (hl : l.Prime)
+    : {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.Finite
+      ∧ {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.ncard ≤ l ^ padicValNat l n := by
   have hm : 0 < l ^ padicValNat l n := pow_pos hl.pos _
-  have hsub : {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1} ⊆
-      ((nthRoots (l ^ padicValNat l n) (1 : k)).toFinset : Set k) := by
+  have hsub
+      : {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}
+        ⊆ ((nthRoots (l ^ padicValNat l n) (1 : k)).toFinset : Set k) := by
     rintro y ⟨h1, a, h2⟩
     rw [Finset.mem_coe, Multiset.mem_toFinset, mem_nthRoots hm]
     exact pow_padicVal_eq_one_of_primePow hn hl h1 h2
@@ -34,23 +44,27 @@ theorem primePowRoots_finite_ncard (k : Type) [Field k] (n l : ℕ) (hn : 0 < n)
   rw [Set.ncard_coe_finset]
   exact (Multiset.toFinset_card_le _).trans (card_nthRoots _ _)
 
-theorem samePart_roots_finite_ncard :
-    ∀ (k : Type) [Field k] (n l : ℕ), 0 < n → l.Prime →
-      ({y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.Finite ∧
-        {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.ncard ≤ l ^ padicValNat l n) ∧
-      ∀ z : k, {x : k | x ^ n = 1 ∧ SamePart l x z}.Finite ∧
-        {x : k | x ^ n = 1 ∧ SamePart l x z}.ncard ≤ l ^ padicValNat l n := by
+theorem samePart_roots_finite_ncard
+    : ∀ (k : Type) [Field k] (n l : ℕ),
+      0 < n → l.Prime
+        → ({y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.Finite
+            ∧ {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1}.ncard ≤ l ^ padicValNat l n)
+          ∧ ∀ z : k,
+            {x : k | x ^ n = 1 ∧ SamePart l x z}.Finite
+              ∧ {x : k | x ^ n = 1 ∧ SamePart l x z}.ncard ≤ l ^ padicValNat l n := by
   intro k _ n l hn hl
   obtain ⟨hf, hc⟩ := primePowRoots_finite_ncard k n l hn hl
   refine ⟨⟨hf, hc⟩, fun z => ?_⟩
   rcases Set.eq_empty_or_nonempty {x : k | x ^ n = 1 ∧ SamePart l x z} with he | ⟨x₀, hx₀, hb⟩
   · rw [he]; simp
-  have hsub : {x : k | x ^ n = 1 ∧ SamePart l x z} ⊆
-      (fun y => y * x₀) '' {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1} := by
+  have hsub
+      : {x : k | x ^ n = 1 ∧ SamePart l x z}
+        ⊆ (fun y => y * x₀) '' {y : k | y ^ n = 1 ∧ ∃ a : ℕ, y ^ (l ^ a) = 1} := by
     rintro x ⟨hx, ha⟩
     have hs : SamePart l x x₀ := Eq.trans ha (Eq.symm hb)
-    obtain ⟨a, ha⟩ := (samePart_iff hl (isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, hx⟩)
-      (isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, hx₀⟩)).1 hs
+    obtain ⟨a, ha⟩ :=
+      (samePart_iff hl (isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, hx⟩)
+        (isOfFinOrder_iff_pow_eq_one.2 ⟨n, hn, hx₀⟩)).1 hs
     have h0 : x₀ ≠ 0 := by
       rintro rfl
       rw [zero_pow hn.ne'] at hx₀

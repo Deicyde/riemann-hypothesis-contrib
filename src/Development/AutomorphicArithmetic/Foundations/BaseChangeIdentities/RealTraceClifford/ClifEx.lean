@@ -13,7 +13,8 @@ noncomputable section
 open Matrix Finset
 open scoped InnerProductSpace ComplexConjugate
 open PositivityTheory.RgTw (Mat)
-open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD UpperTheory.RealTr
+open PositivityTheory.RgBcC PositivityTheory.RgBcC.Real PositivityTheory.RgBcC.RealD
+  UpperTheory.RealTr
 open Formalism.REAL (GlRel IsWeight KHighest Cas)
 
 namespace UpperTheory.RealTr.ClifP
@@ -41,7 +42,13 @@ private lemma pr_comm (a b : Fin n) : pr a b = pr b a := by
   unfold pr
   simp only [min_comm a b, max_comm a b]
 
-private def cs (a b : Fin n) : ℂ := if a < b then 0 else if b < a then 1 else rr
+private def cs (a b : Fin n) : ℂ :=
+  if a < b then
+    0
+  else if b < a then
+    1
+  else
+    rr
 
 private lemma cs_conj (a b : Fin n) : star (cs a b) = cs a b := by
   unfold cs; split_ifs <;> simp [rr_conj]
@@ -104,7 +111,7 @@ private lemma adjC (α : Io n → Mt n) (a b : Fin n) : (cM α a b)ᴴ = cM α b
 
 private def sg (a d : Fin n) : ℝ := (if a < d then 1 else 0) - (if d < a then 1 else 0)
 
-private def eta (A : Finset (Io n)) : Wt n := -rhoV n + ∑ i ∈ A, rt i.1.1 i.1.2
+private def eta (A : Finset (Io n)) : Wt n := - rhoV n + ∑ i ∈ A, rt i.1.1 i.1.2
 
 private lemma sg_sum (a : Fin n) : ∑ d, sg a d = 2 * rhoV n a := by
   simp only [sg, Finset.sum_sub_distrib, Finset.sum_boole]
@@ -285,9 +292,18 @@ private lemma chrC : ∑ A : Finset (Io n), ex (eta A) = (2 : ℂ) ^ n • chR n
 
 end UpperTheory.RealTr.ClifP
 
-theorem UpperTheory.RealTr.clifEx :
-    ∀ n : ℕ, ∃ (J : Type) (_ : Fintype J) (_ : DecidableEq J) (c : Fin n → Fin n → Matrix J J ℂ) (η : J → Wt n), ClifMod c η := by
+theorem UpperTheory.RealTr.clifEx
+    : ∀ n : ℕ,
+      ∃ (J : Type) (_ : Fintype J) (_ : DecidableEq J) (c : Fin n → Fin n → Matrix J J ℂ)
+          (η : J → Wt n),
+        ClifMod c η := by
   intro n
   obtain ⟨α, h1, h2, h3⟩ := carEx (ClifP.Io n)
-  exact ⟨Finset (ClifP.Io n), inferInstance, inferInstance, ClifP.cM α, ClifP.eta,
-    ⟨ClifP.relC α h1 h2, ClifP.adjC α, ClifP.diagC α (ClifP.relC α h1 h2) h3, ClifP.chrC⟩⟩
+  exact ⟨
+    Finset (ClifP.Io n),
+    inferInstance,
+    inferInstance,
+    ClifP.cM α,
+    ClifP.eta,
+    ⟨ClifP.relC α h1 h2, ClifP.adjC α, ClifP.diagC α (ClifP.relC α h1 h2) h3, ClifP.chrC⟩
+  ⟩

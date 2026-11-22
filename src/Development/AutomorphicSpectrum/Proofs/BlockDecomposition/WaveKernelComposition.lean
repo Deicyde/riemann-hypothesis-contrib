@@ -25,10 +25,11 @@ attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
 
 namespace GlobalTheory.CompanionTheory.WaveMult
 
-theorem integral_smul_integral_shift {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V]
-    [CompleteSpace V] {g g' : ℝ → ℝ} {T T' : ℝ} (hg : IsBump g T) (hg' : IsBump g' T')
-    {φ : ℝ → V} (hφ : Continuous φ) :
-    ∫ t, (g t : ℂ) • ∫ s, (g' s : ℂ) • φ (t + s) = ∫ r, (gconv g g' r : ℂ) • φ r := by
+theorem integral_smul_integral_shift
+    {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] [CompleteSpace V]
+    {g g' : ℝ → ℝ} {T T' : ℝ} (hg : IsBump g T) (hg' : IsBump g' T')
+    {φ : ℝ → V} (hφ : Continuous φ)
+    : ∫ t, (g t : ℂ) • ∫ s, (g' s : ℂ) • φ (t + s) = ∫ r, (gconv g g' r : ℂ) • φ r := by
   have cg : Continuous g := hg.1.continuous
   have cg' : Continuous g' := hg'.1.continuous
   let F : ℝ → ℝ → V := fun t r => ((g t * g' (r - t) : ℝ) : ℂ) • φ r
@@ -38,7 +39,7 @@ theorem integral_smul_integral_shift {V : Type} [NormedAddCommGroup V] [NormedSp
     fun_prop
   have hFs : HasCompactSupport (Function.uncurry F) := by
     refine HasCompactSupport.intro
-      (K := Set.Icc (-|T|) |T| ×ˢ Set.Icc (-(|T| + |T'|)) (|T| + |T'|))
+      (K := Set.Icc (- |T|) |T| ×ˢ Set.Icc (-(|T| + |T'|)) (|T| + |T'|))
       (isCompact_Icc.prod isCompact_Icc) ?_
     rintro ⟨t, r⟩ h
     by_cases ht : T < |t|
@@ -65,12 +66,16 @@ theorem integral_smul_integral_shift {V : Type} [NormedAddCommGroup V] [NormedSp
   simp only [hL, hR]
   exact integral_integral_swap hFi
 
-theorem wave_compose : RCalc → WaveSpeed → ∀ (n : ℕ) (E : KMod n) (u : ℝ → Mat n → E.V)
-    (w w' : List (Bool × ℕ)) (g g' : ℝ → ℝ) (T T' : ℝ), IsWave E u → IsBump g T → IsBump g' T' →
-    ∃ v : ℝ → Mat n → E.V, IsWave E v ∧
-      (∀ x ∈ GLs n, v 0 x = zOp w' (fun x' => ∫ t, (g' t : ℂ) • u t x') x) ∧
-      ∀ x ∈ GLs n, zOp w (fun x' => ∫ t, (g t : ℂ) • v t x') x =
-        zOp (w ++ w') (fun x' => ∫ t, (gconv g g' t : ℂ) • u t x') x := by
+theorem wave_compose
+    : RCalc → WaveSpeed
+      → ∀ (n : ℕ) (E : KMod n) (u : ℝ → Mat n → E.V) (w w' : List (Bool × ℕ)) (g g' : ℝ → ℝ)
+          (T T' : ℝ),
+        IsWave E u → IsBump g T → IsBump g' T'
+          → ∃ v : ℝ → Mat n → E.V,
+            IsWave E v ∧ (∀ x ∈ GLs n, v 0 x = zOp w' (fun x' => ∫ t, (g' t : ℂ) • u t x') x)
+              ∧ ∀ x ∈ GLs n,
+                zOp w (fun x' => ∫ t, (g t : ℂ) • v t x') x
+                  = zOp (w ++ w') (fun x' => ∫ t, (gconv g g' t : ℂ) • u t x') x := by
   intro hR hS n E u w w' g g' T T' hu hg hg'
   have : CompleteSpace E.V := FiniteDimensional.complete ℂ E.V
   have hu' : IsWave E (fun t => zOp w' (u t)) := WaveZ.isWave_zOp hR n E u w' hu
@@ -83,10 +88,14 @@ theorem wave_compose : RCalc → WaveSpeed → ∀ (n : ℕ) (E : KMod n) (u : �
   · intro x hx
     have hb := isBump_gconv g g' T T' hg hg'
     have hφ : ∀ x' ∈ GLs n, Continuous fun r => zOp w' (u r) x' := fun x' hx' =>
-      hu'.1.continuousOn.comp_continuous (f := fun r : ℝ => (r, x')) (by fun_prop)
+      hu'.1.continuousOn.comp_continuous
+        (f := fun r : ℝ => (r, x'))
+        (by fun_prop)
         (fun r => ⟨trivial, hx'⟩)
-    have h1 : ∀ x' ∈ GLs n, (∫ t, (g t : ℂ) • ∫ s, (g' s : ℂ) • zOp w' (u (t + s)) x') =
-        ∫ r, (gconv g g' r : ℂ) • zOp w' (u r) x' := fun x' hx' =>
+    have h1
+        : ∀ x' ∈ GLs n,
+          (∫ t, (g t : ℂ) • ∫ s, (g' s : ℂ) • zOp w' (u (t + s)) x')
+            = ∫ r, (gconv g g' r : ℂ) • zOp w' (u r) x' := fun x' hx' =>
       integral_smul_integral_shift hg hg' (hφ x' hx')
     rw [zOp_agree_GLs n w _ _ h1 x hx,
       ZOpAvg.zOp_avg n (fun t => zOp w' (u t)) (gconv g g') (T + T') w hu'.1 hb x hx,

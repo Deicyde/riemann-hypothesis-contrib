@@ -9,7 +9,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ShellMassInt
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
+open MeasureTheory Filter Topology Metric ReciprocityTheory.L2DbarEstimates
+  ReciprocityTheory.L2DbarEstimates.Y GlobalTheory.OTY GlobalTheory.Published.L2Extension
 open scoped ENNReal ContDiff
 
 namespace GlobalTheory.OTY
@@ -67,7 +68,6 @@ private lemma resSq_nonneg {n : ℕ} {Y : Type*} [TopologicalSpace Y]
     0 ≤ _root_.GlobalTheory.Published.L2Extension.resSq A E L s P c := by
   unfold _root_.GlobalTheory.Published.L2Extension.resSq
   positivity
-
 
 open MeasureTheory Filter Topology Metric in
 open scoped ENNReal ContDiff in

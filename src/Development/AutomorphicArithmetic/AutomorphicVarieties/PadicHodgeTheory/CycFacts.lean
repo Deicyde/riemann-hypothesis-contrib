@@ -4,16 +4,18 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeT
 
 @[expose] public section
 
-open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
 
-private theorem cf_norm_root {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : n ≠ 0) {x : Om v} (hx : x ^ n = 1) :
-    ‖x‖ = 1 := by
+private theorem cf_norm_root {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : n ≠ 0) {x : Om v} (hx : x ^ n = 1)
+    : ‖x‖ = 1 := by
   have h := congrArg norm hx
   rw [norm_pow, norm_one] at h
   exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hn).1 h
 
-private theorem cf_root_one {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : ¬ v ∣ n) {x : Om v} (hx : x ^ n = 1)
-    (h : ‖x - 1‖ < 1) : x = 1 := by
+private theorem cf_root_one
+    {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : ¬ v ∣ n) {x : Om v} (hx : x ^ n = 1) (h : ‖x - 1‖ < 1)
+    : x = 1 := by
   have hn0 : n ≠ 0 := by rintro rfl; exact hn (dvd_zero v)
   by_contra hne
   have hx1 := cf_norm_root hn0 hx
@@ -35,8 +37,9 @@ private theorem cf_root_one {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : ¬ v ∣ n)
     induction k with
     | zero => simp
     | succ k ih =>
-      have e : ∑ i ∈ Finset.range (k + 1), x ^ i - ((k + 1 : ℕ) : Om v) =
-          (∑ i ∈ Finset.range k, x ^ i - (k : Om v)) + (x ^ k - 1) := by
+      have e
+          : ∑ i ∈ Finset.range (k + 1), x ^ i - ((k + 1 : ℕ) : Om v)
+            = (∑ i ∈ Finset.range k, x ^ i - (k : Om v)) + (x ^ k - 1) := by
         rw [Finset.sum_range_succ]; push_cast; ring
       rw [e]
       exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt ih (hp k))
@@ -46,8 +49,11 @@ private theorem cf_root_one {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : ¬ v ∣ n)
   rw [h2, PadicAlgCl.norm_extends, Padic.norm_natCast_lt_one_iff] at h1
   exact hn h1
 
-private theorem cf_root_eq {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : ¬ v ∣ n) {x y : Om v} (hx : x ^ n = 1)
-    (hy : y ^ n = 1) (h : ‖x - y‖ < 1) : x = y := by
+private theorem cf_root_eq
+    {v : ℕ} [Fact v.Prime]
+    {n : ℕ} (hn : ¬ v ∣ n)
+    {x y : Om v} (hx : x ^ n = 1) (hy : y ^ n = 1) (h : ‖x - y‖ < 1)
+    : x = y := by
   have hn0 : n ≠ 0 := by rintro rfl; exact hn (dvd_zero v)
   have hy1 := cf_norm_root hn0 hy
   have hy0 : y ≠ 0 := by rintro rfl; simp at hy1
@@ -57,14 +63,16 @@ private theorem cf_root_eq {v : ℕ} [Fact v.Prime] {n : ℕ} (hn : ¬ v ∣ n) 
     exact h
   exact (div_eq_one_iff_eq hy0).1 h1
 
-private theorem cf_toZModPow (v l : ℕ) [Fact v.Prime] [Fact l.Prime] (g : GQ v) (m a : ℕ)
-    (h : ∀ ζ : Om v, IsPrimitiveRoot ζ (l ^ m) → g ζ = ζ ^ a) :
-    PadicInt.toZModPow m ((cyc v l g : ℤ_[l]ˣ) : ℤ_[l]) = (a : ZMod (l ^ m)) := by
+private theorem cf_toZModPow
+    (v l : ℕ) [Fact v.Prime] [Fact l.Prime]
+    (g : GQ v) (m a : ℕ) (h : ∀ ζ : Om v, IsPrimitiveRoot ζ (l ^ m) → g ζ = ζ ^ a)
+    : PadicInt.toZModPow m ((cyc v l g : ℤ_[l]ˣ) : ℤ_[l]) = (a : ZMod (l ^ m)) := by
   have hl : l.Prime := Fact.out
   haveI : NeZero (l ^ m) := ⟨pow_ne_zero _ hl.ne_zero⟩
   obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (Om v) (l ^ m)
-  have hs := cyclotomicCharacter.spec l (n := m)
-    (MulSemiringAction.toRingAut (GQ v) (Om v) g) ζ hζ.pow_eq_one
+  have hs :=
+    cyclotomicCharacter.spec l (n := m) (MulSemiringAction.toRingAut (GQ v) (Om v) g) ζ
+      hζ.pow_eq_one
   set c : ℤ_[l] := ((cyc v l g : ℤ_[l]ˣ) : ℤ_[l]) with hc
   have hs' : g ζ = ζ ^ (PadicInt.toZModPow m c).val := hs
   have h3 := hs'.symm.trans (h ζ hζ)
@@ -73,18 +81,22 @@ private theorem cf_toZModPow (v l : ℕ) [Fact v.Prime] [Fact l.Prime] (g : GQ v
     rwa [← hζ.eq_orderOf] at this
   rw [← (ZMod.natCast_eq_natCast_iff _ _ _).mpr h4, ZMod.natCast_zmod_val]
 
-private theorem cf_chi (l : ℕ) [Fact l.Prime] (P : LocPrime l) (g : GQ l) :
-    ((P.χQ g : ℚ_[l]ˣ) : ℚ_[l]) = (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := by
+private theorem cf_chi (l : ℕ) [Fact l.Prime] (P : LocPrime l) (g : GQ l)
+    : ((P.χQ g : ℚ_[l]ˣ) : ℚ_[l]) = (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := by
   have hl : l.Prime := Fact.out
-  have key : ∀ m : ℕ, ‖((P.χQ g : ℚ_[l]ˣ) : ℚ_[l]) -
-      (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l])‖ ≤ (l : ℝ) ^ (-(m : ℤ)) := by
+  have key
+      : ∀ m : ℕ,
+        ‖((P.χQ g : ℚ_[l]ˣ) : ℚ_[l]) -
+            (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l])‖
+          ≤ (l : ℝ) ^ (-(m : ℤ)) := by
     intro m
     haveI : NeZero (l ^ m) := ⟨pow_ne_zero _ hl.ne_zero⟩
     obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot (Om l) (l ^ m)
     obtain ⟨a, ha, hga⟩ := P.χQ_cyc g m ζ hζ.pow_eq_one
-    have h4 := cf_toZModPow l l g m a (fun ξ hξ => by
-      obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hξ.pow_eq_one
-      rw [map_pow, hga, ← pow_mul, ← pow_mul, mul_comm])
+    have h4 :=
+      cf_toZModPow l l g m a (fun ξ hξ => by
+        obtain ⟨i, -, rfl⟩ := hζ.eq_pow_of_pow_eq_one hξ.pow_eq_one
+        rw [map_pow, hga, ← pow_mul, ← pow_mul, mul_comm])
     set c : ℤ_[l] := ((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) with hc
     have h5 : PadicInt.toZModPow m ((a : ℤ_[l]) - c) = 0 := by
       rw [map_sub, map_natCast, h4, sub_self]
@@ -93,7 +105,8 @@ private theorem cf_chi (l : ℕ) [Fact l.Prime] (P : LocPrime l) (g : GQ l) :
       exact h5
     have h7 : ‖(a : ℚ_[l]) - (c : ℚ_[l])‖ ≤ (l : ℝ) ^ (-(m : ℤ)) := by
       have : (((a : ℤ_[l]) - c : ℤ_[l]) : ℚ_[l]) = (a : ℚ_[l]) - (c : ℚ_[l]) := by push_cast; rfl
-      rw [← this]; exact h6
+      rw [← this]
+      exact h6
     have h8 := IsUltrametricDist.norm_add_le_max (((P.χQ g : ℚ_[l]ˣ) : ℚ_[l]) - a) ((a : ℚ_[l]) - c)
     rw [sub_add_sub_cancel] at h8
     exact h8.trans (max_le ha h7)
@@ -103,11 +116,14 @@ private theorem cf_chi (l : ℕ) [Fact l.Prime] (P : LocPrime l) (g : GQ l) :
   have := key m
   rwa [zpow_neg, zpow_natCast, ← inv_pow] at this
 
-theorem UpperTheory.V.Loc.cycFacts :
-    ∀ (v l : ℕ) [Fact v.Prime] [Fact l.Prime], Continuous (cyc v l) ∧
-      (v ≠ l → (∀ g ∈ Iq v, cyc v l g = 1) ∧
-        ∀ σ : GQ v, UpperTheory.V.Loc.IsFrob σ → ((cyc v l σ : ℤ_[l]ˣ) : ℤ_[l]) = (v : ℤ_[l])) ∧
-      ∀ g : GQ l, (((PP l).χQ g : ℚ_[l]ˣ) : ℚ_[l]) = (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := by
+theorem UpperTheory.V.Loc.cycFacts
+    : ∀ (v l : ℕ) [Fact v.Prime] [Fact l.Prime],
+      Continuous (cyc v l)
+        ∧ (v ≠ l
+          → (∀ g ∈ Iq v, cyc v l g = 1)
+            ∧ ∀ σ : GQ v, UpperTheory.V.Loc.IsFrob σ → ((cyc v l σ : ℤ_[l]ˣ) : ℤ_[l]) = (v : ℤ_[l]))
+        ∧ ∀ g : GQ l,
+          (((PP l).χQ g : ℚ_[l]ˣ) : ℚ_[l]) = (((cyc l l g : ℤ_[l]ˣ) : ℤ_[l]) : ℚ_[l]) := by
   intro v l _ _
   have hl : l.Prime := Fact.out
   have hv : v.Prime := Fact.out

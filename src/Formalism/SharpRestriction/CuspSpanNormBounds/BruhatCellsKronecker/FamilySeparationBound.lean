@@ -23,7 +23,8 @@ theorem szf_finrankF (D : D7) : Module.finrank ℚ D.host.F = D.R.f := by
 theorem szf_finrankFE (D : D7) : Module.finrank D.host.F D.host.E = 2 := by
   have h1 := D.host.der.finrank_E
   have h2 := D.host.der.finrank_F
-  have h3 : Module.finrank ℚ D.host.F * Module.finrank D.host.F D.host.E = Module.finrank ℚ D.host.E :=
+  have h3
+      : Module.finrank ℚ D.host.F * Module.finrank D.host.F D.host.E = Module.finrank ℚ D.host.E :=
     Module.finrank_mul_finrank ℚ D.host.F D.host.E
   have hpos : 0 < Module.finrank ℚ D.host.E := Module.finrank_pos
   rw [h1, h2] at h3
@@ -43,16 +44,20 @@ theorem szf_rd_pow (D : D7) : (D.host.rdE ^ D.R.f) ^ 2 = |(NumberField.discr D.h
     exact one_div_mul_cancel (Nat.cast_ne_zero.mpr (by omega))
   rw [hc, Real.rpow_one]
 
-theorem szf_normDD (D : D7) (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2) : SzfNormDD D := by
+theorem szf_normDD (D : D7) (hd : NumberField.discr D.host.E = NumberField.discr D.host.F ^ 2)
+    : SzfNormDD D := by
   unfold SzfNormDD
   rw [szf_rd_pow D, hd]
   have hFE := szf_finrankFE D
-  have gen : ∀ I : Ideal (𝓞 D.host.F), Ideal.absNorm (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) I) =
-      Ideal.absNorm I ^ Module.finrank (𝓞 D.host.F) (𝓞 D.host.E) := by
+  have gen
+      : ∀ I : Ideal (𝓞 D.host.F),
+        Ideal.absNorm (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E)) I)
+          = Ideal.absNorm I ^ Module.finrank (𝓞 D.host.F) (𝓞 D.host.E) := by
     intro I
     rw [← Ideal.absNorm_relNorm (𝓞 D.host.F), Ideal.relNorm_algebraMap, map_pow]
-  have n2 : ∀ (K : Type) [Field K] [NumberField K],
-      (Algebra.norm ℤ (2 : 𝓞 K)).natAbs = 2 ^ Module.finrank ℚ K := by
+  have n2
+      : ∀ (K : Type) [Field K] [NumberField K],
+        (Algebra.norm ℤ (2 : 𝓞 K)).natAbs = 2 ^ Module.finrank ℚ K := by
     intro K _ _
     rw [show (2 : 𝓞 K) = algebraMap ℤ (𝓞 K) 2 from (map_ofNat _ 2).symm, Algebra.norm_algebraMap,
       NumberField.RingOfIntegers.rank, Int.natAbs_pow]
@@ -60,30 +65,33 @@ theorem szf_normDD (D : D7) (hd : NumberField.discr D.host.E = NumberField.discr
   have hR : Module.finrank (𝓞 D.host.F) (𝓞 D.host.E) = 2 := by
     have h2 := gen (Ideal.span {(2 : 𝓞 D.host.F)})
     rw [Ideal.map_span, Set.image_singleton, map_ofNat, Ideal.absNorm_span_singleton,
-      Ideal.absNorm_span_singleton, n2, n2, szf_finrankE D, szf_finrankF D, ← pow_mul] at h2
+        Ideal.absNorm_span_singleton, n2, n2, szf_finrankE D, szf_finrankF D, ← pow_mul]
+      at h2
     have h3 := Nat.pow_right_injective (le_refl 2) h2
     have hpos : 0 < Module.finrank ℚ D.host.E := Module.finrank_pos
     rw [szf_finrankE D] at hpos
-    have h4 : D.R.f * Module.finrank (𝓞 D.host.F) (𝓞 D.host.E) = D.R.f * 2 := by
-      rw [← h3]; ring
+    have h4 : D.R.f * Module.finrank (𝓞 D.host.F) (𝓞 D.host.E) = D.R.f * 2 := by rw [← h3]; ring
     exact Nat.eq_of_mul_eq_mul_left (by omega) h4
-  have key : Ideal.absNorm (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))
-      (differentIdeal ℤ (𝓞 D.host.F))) = Ideal.absNorm (differentIdeal ℤ (𝓞 D.host.F)) ^ 2 := by
+  have key
+      : Ideal.absNorm (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))
+          (differentIdeal ℤ (𝓞 D.host.F)))
+        = Ideal.absNorm (differentIdeal ℤ (𝓞 D.host.F)) ^ 2 := by
     rw [gen, hR]
-  have hc : FractionalIdeal.absNorm (Formalism.MainNotions.S.ddE D) =
-      (Ideal.absNorm (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))
-        (differentIdeal ℤ (𝓞 D.host.F))) : ℚ) := by
+  have hc
+      : FractionalIdeal.absNorm (Formalism.MainNotions.S.ddE D)
+        = (Ideal.absNorm (Ideal.map (algebraMap (𝓞 D.host.F) (𝓞 D.host.E))
+            (differentIdeal ℤ (𝓞 D.host.F)))
+          : ℚ) := by
     first
     | exact FractionalIdeal.coeIdeal_absNorm _
     | exact FractionalIdeal.absNorm_coeIdeal _
     | exact FractionalIdeal.coe_absNorm _
-  have hd2 : Ideal.absNorm (differentIdeal ℤ (𝓞 D.host.F)) = (NumberField.discr D.host.F).natAbs := by
+  have hd2
+      : Ideal.absNorm (differentIdeal ℤ (𝓞 D.host.F)) = (NumberField.discr D.host.F).natAbs := by
     exact NumberField.absNorm_differentIdeal D.host.F (𝓞 D.host.F)
   rw [hc, key, hd2]
   push_cast
-  first
-  | simp [abs_pow, Nat.cast_natAbs]
-  | rw [Nat.cast_natAbs, Int.cast_abs, abs_pow]
+  first | simp [abs_pow, Nat.cast_natAbs] | rw [Nat.cast_natAbs, Int.cast_abs, abs_pow]
 
 end Formalism.MainNotions.BridgeLemma
 

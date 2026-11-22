@@ -15,9 +15,9 @@ open scoped ContDiff
 noncomputable section
 
 def LogNormSecLocalStatement : Prop :=
-  ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X)
-    (s : X → X → ℂ) (x : X) (y : X), IsSection A L s → y ∈ L.U x → s x y ≠ 0 →
-      logNormSec L s y = Real.log ‖s x y‖ - L.φ x y
+  ∀ {e : ℕ} {X : Type} [TopologicalSpace X] (A : FinHolAtlas e X) (L : LocPot X) (s : X → X → ℂ)
+      (x : X) (y : X),
+    IsSection A L s → y ∈ L.U x → s x y ≠ 0 → logNormSec L s y = Real.log ‖s x y‖ - L.φ x y
 
 theorem logNormSecLocal : LogNormSecLocalStatement := by
   intro e X _ A L s x y hS hy hs
@@ -26,28 +26,33 @@ theorem logNormSecLocal : LogNormSecLocalStatement := by
     Real.log_exp]
   ring
 
-theorem logNormSec_eq_indicator {e : ℕ} {X : Type} [TopologicalSpace X] {A : FinHolAtlas e X}
-    {L : LocPot X} {s : X → X → ℂ} (hS : IsSection A L s) {x p : X} (hp : p ∈ L.U x) :
-    logNormSec L s p = Real.log ‖s x p‖ - L.φ x p + {q | s x q = 0}.indicator (L.φ x) p := by
+theorem logNormSec_eq_indicator
+    {e : ℕ} {X : Type} [TopologicalSpace X]
+    {A : FinHolAtlas e X} {L : LocPot X} {s : X → X → ℂ} (hS : IsSection A L s)
+    {x p : X} (hp : p ∈ L.U x)
+    : logNormSec L s p = Real.log ‖s x p‖ - L.φ x p + {q | s x q = 0}.indicator (L.φ x) p := by
   by_cases h0 : s x p = 0
   · unfold logNormSec
-    rw [hS.2 p x p ⟨L.mem_U p, hp⟩, Set.indicator_apply,
-      if_pos (show p ∈ {q | s x q = 0} from h0), h0]
+    rw [hS.2 p x p ⟨L.mem_U p, hp⟩, Set.indicator_apply, if_pos (show p ∈ {q | s x q = 0} from h0),
+      h0]
     simp
   · rw [Set.indicator_apply, if_neg (show p ∉ {q | s x q = 0} from h0),
       logNormSecLocal A L s x p hS hp h0]
     ring
 
-theorem prod_option_eq_prod_zpow {e r : ℕ} (σ : Fin r → Option (Fin e)) (m : Fin r → ℕ)
-    (w : Fin e → ℂ) (g : Fin r → ℂ) (hg : ∀ k, g k = ∏ i, if σ k = some i then w i ^ m k else 1) :
-    ∏ k, g k = ∏ i, w i ^ (((∑ k ∈ Finset.univ.filter (fun k => σ k = some i), m k : ℕ)) : ℤ) := by
+theorem prod_option_eq_prod_zpow
+    {e r : ℕ} (σ : Fin r → Option (Fin e)) (m : Fin r → ℕ) (w : Fin e → ℂ) (g : Fin r → ℂ)
+    (hg : ∀ k, g k = ∏ i, if σ k = some i then w i ^ m k else 1)
+    : ∏ k, g k
+      = ∏ i, w i ^ (((∑ k ∈ Finset.univ.filter (fun k => σ k = some i), m k : ℕ)) : ℤ) := by
   simp_rw [hg]
   rw [Finset.prod_comm]
   refine Finset.prod_congr rfl (fun i _ => ?_)
   rw [← Finset.prod_filter, Finset.prod_pow_eq_pow_sum, zpow_natCast]
 
-theorem logNormIntegrable_of (hLU : ReciprocityTheory.AnForm.A.LogUnitMonoLocIntStatement)
-    (hD : LocDensContStatement) : LogNormIntegrableStatement := by
+theorem logNormIntegrable_of
+    (hLU : ReciprocityTheory.AnForm.A.LogUnitMonoLocIntStatement) (hD : LocDensContStatement)
+    : LogNormIntegrableStatement := by
   intro e X _ _ _ A L s r m W hL hS hSNC Φ hΦ j K hKt hK
   refine LocallyIntegrableOn.integrableOn_isCompact (fun y0 hy0 => ?_) hK
   set c := A.chart j with hc
@@ -67,8 +72,8 @@ theorem logNormIntegrable_of (hLU : ReciprocityTheory.AnForm.A.LogUnitMonoLocInt
   set V := ψ.target ∩ ψ.symm ⁻¹' c.source with hV
   have hVo : IsOpen V := ψ.isOpen_inter_preimage_symm c.open_source
   have hTinvA : AnalyticOnNhd ℂ (c ∘ ψ.symm) V := (hψc j).2
-  have hTV : ∀ y ∈ c.target ∩ c.symm ⁻¹' ψ.source,
-      ψ (c.symm y) ∈ V ∧ c (ψ.symm (ψ (c.symm y))) = y := by
+  have hTV
+      : ∀ y ∈ c.target ∩ c.symm ⁻¹' ψ.source, ψ (c.symm y) ∈ V ∧ c (ψ.symm (ψ (c.symm y))) = y := by
     intro y hy
     refine ⟨⟨ψ.map_source hy.2, ?_⟩, ?_⟩
     · simp only [Set.mem_preimage, ψ.left_inv hy.2]
@@ -113,13 +118,15 @@ theorem logNormIntegrable_of (hLU : ReciprocityTheory.AnForm.A.LogUnitMonoLocInt
   have hdetc : ContinuousOn (fun z => |(fderiv ℝ (c ∘ ψ.symm) z).det|) C := by
     have h1 : ContDiffOn ℝ 1 (c ∘ ψ.symm) V :=
       (hTinvA.contDiffOn_of_completeSpace (n := 1)).restrict_scalars ℝ
-    exact ((ContinuousLinearMap.continuous_det.comp_continuousOn
-      (h1.continuousOn_fderiv_of_isOpen hVo le_rfl)).abs).mono hCV
+    exact ((ContinuousLinearMap.continuous_det.comp_continuousOn (h1.continuousOn_fderiv_of_isOpen
+      hVo le_rfl)).abs).mono hCV
   have hGT : IntegrableOn (fun y => G (ψ (c.symm y))) B := by
-    have hiff := integrableOn_image_iff_integrableOn_abs_det_fderiv_smul (μ := volume)
-      hCm (f := c ∘ ψ.symm) (f' := fun z => fderiv ℝ (c ∘ ψ.symm) z)
-      (fun z hz => (hderR z (hCV hz)).hasFDerivAt.hasFDerivWithinAt) hinj
-      (fun y => G (ψ (c.symm y)))
+    have hiff :=
+      integrableOn_image_iff_integrableOn_abs_det_fderiv_smul (μ := volume) hCm (f := c ∘ ψ.symm)
+        (f' := fun z => fderiv ℝ (c ∘ ψ.symm) z)
+        (fun z hz => (hderR z (hCV hz)).hasFDerivAt.hasFDerivWithinAt)
+        hinj
+        (fun y => G (ψ (c.symm y)))
     rw [hCB] at hiff
     refine hiff.mpr ?_
     refine IntegrableOn.congr_fun
@@ -128,10 +135,9 @@ theorem logNormIntegrable_of (hLU : ReciprocityTheory.AnForm.A.LogUnitMonoLocInt
     have h := (hTV y (hBN hy)).2
     simp only [Function.comp_apply, h]
 
-  have hdB : ContinuousOn (locDens A Φ j) B :=
-    (hD A Φ hΦ j).mono (hBN.trans Set.inter_subset_left)
-  have hsub : c.target ∩ c.symm ⁻¹' ψ.source ⊆ c.target ∩ c.symm ⁻¹' L.U x0 :=
-    fun y hy => ⟨hy.1, hψU hy.2⟩
+  have hdB : ContinuousOn (locDens A Φ j) B := (hD A Φ hΦ j).mono (hBN.trans Set.inter_subset_left)
+  have hsub : c.target ∩ c.symm ⁻¹' ψ.source ⊆ c.target ∩ c.symm ⁻¹' L.U x0 := fun y hy =>
+    ⟨hy.1, hψU hy.2⟩
   have hφB : ContinuousOn (fun y => L.φ x0 (c.symm y)) B :=
     ((hL.1 x0 j).continuousOn.mono hsub).mono hBN
   have hsB : ContinuousOn (fun y => s x0 (c.symm y)) B :=
@@ -148,9 +154,12 @@ theorem logNormIntegrable_of (hLU : ReciprocityTheory.AnForm.A.LogUnitMonoLocInt
   intro y hy
   have hyN := hBN hy
   have hp : c.symm y ∈ L.U x0 := hψU hyN.2
-  have hprod : ∀ w : Fin e → ℂ, (∏ k, (match σ k with
-      | some i => w i ^ m k
-      | none => 1)) = ∏ i, w i ^ m' i := by
+  have hprod
+      : ∀ w : Fin e → ℂ,
+        (∏ k, (match σ k with
+          | some i => w i ^ m k
+          | none => 1))
+          = ∏ i, w i ^ m' i := by
     intro w
     apply prod_option_eq_prod_zpow
     intro k

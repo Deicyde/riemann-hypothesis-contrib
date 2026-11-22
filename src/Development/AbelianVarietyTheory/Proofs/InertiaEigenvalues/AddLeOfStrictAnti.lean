@@ -6,8 +6,9 @@ public import Mathlib
 
 namespace GlobalTheory.StrictAntiAddLe
 
-theorem add_le_of_strictAnti : ∀ {m : ℕ} {s : Fin m → ℕ}, StrictAnti s →
-    ∀ (k : ℕ) (i j : Fin m), (↑j : ℕ) = (↑i : ℕ) + k → s j + k ≤ s i := by
+theorem add_le_of_strictAnti
+    : ∀ {m : ℕ} {s : Fin m → ℕ},
+      StrictAnti s → ∀ (k : ℕ) (i j : Fin m), (↑j : ℕ) = (↑i : ℕ) + k → s j + k ≤ s i := by
   intro m s hs k
   induction k with
   | zero =>

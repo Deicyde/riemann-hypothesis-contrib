@@ -7,20 +7,22 @@ public import Formalism.LocalRingCardinality.RankBoundMonotoneInDimension
 
 @[expose] public section
 
-open NumberField Classical Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3 GlobalTheory.NormSum
+open NumberField Classical Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.TaylorLogMetric Formalism.MainNotions.StandardLatticesGL3
+  GlobalTheory.NormSum
 open scoped BigOperators
 
 namespace GlobalTheory.NormSum.Denom
 
-theorem norm_le_one {C : Type*} [NormedField C] [IsUltrametricDist C] {x : C}
-    (hx : IsIntegral ℤ x) : ‖x‖ ≤ 1 := by
+theorem norm_le_one {C : Type*} [NormedField C] [IsUltrametricDist C] {x : C} (hx : IsIntegral ℤ x)
+    : ‖x‖ ≤ 1 := by
   have h : x ∈ (NormedField.valuation (K := C)).integer :=
     (Valuation.integer.integers (NormedField.valuation (K := C))).mem_of_integral hx.tower_top
   rw [Valuation.mem_integer_iff, NormedField.valuation_apply] at h
   exact_mod_cast h
 
-theorem norm_natCast (p : ℕ) [Fact p.Prime] {N : ℕ} (hN : N ≠ 0) :
-    ‖(N : ℂ_[p])‖ = (p : ℝ) ^ (-(N.factorization p : ℝ)) := by
+theorem norm_natCast (p : ℕ) [Fact p.Prime] {N : ℕ} (hN : N ≠ 0)
+    : ‖(N : ℂ_[p])‖ = (p : ℝ) ^ (-(N.factorization p : ℝ)) := by
   have h1 := PadicComplex.norm_extends' p (N : ℚ_[p])
   have h2 : (((N : ℚ_[p]) : PadicAlgCl p) : ℂ_[p]) = (N : ℂ_[p]) := by simp
   have h3 : ‖(N : ℚ_[p])‖ = (p : ℝ) ^ (-(padicValNat p N : ℤ)) := by
@@ -42,8 +44,8 @@ theorem InCodiff.gal {x : E} (hx : InCodiff x) (σ : E ≃ₐ[ℚ] E) : InCodiff
   congr 2
   exact σ.apply_symm_apply _
 
-theorem InCodiff.mul_different {x : E} (hx : InCodiff x) {a : 𝓞 E}
-    (ha : a ∈ differentIdeal ℤ (𝓞 E)) : IsIntegral ℤ ((a : E) * x) := by
+theorem InCodiff.mul_different {x : E} (hx : InCodiff x) {a : 𝓞 E} (ha : a ∈ differentIdeal ℤ (𝓞 E))
+    : IsIntegral ℤ ((a : E) * x) := by
   have h1 : (a : E) ∈ IsLocalization.coeSubmodule E (differentIdeal ℤ (𝓞 E)) :=
     (IsLocalization.mem_coeSubmodule E _).2 ⟨a, ha, rfl⟩
   rw [coeSubmodule_differentIdeal ℤ ℚ, Submodule.mem_div_iff_forall_mul_mem] at h1
@@ -57,8 +59,8 @@ theorem InCodiff.mul_different {x : E} (hx : InCodiff x) {a : 𝓞 E}
   rw [← hz]
   exact z.isIntegral_coe
 
-theorem InCodiff.mul_different_pow {x : E} (hx : InCodiff x) (h : ℕ) :
-    ∀ a ∈ differentIdeal ℤ (𝓞 E) ^ h, IsIntegral ℤ ((a : E) * x ^ h) := by
+theorem InCodiff.mul_different_pow {x : E} (hx : InCodiff x) (h : ℕ)
+    : ∀ a ∈ differentIdeal ℤ (𝓞 E) ^ h, IsIntegral ℤ ((a : E) * x ^ h) := by
   induction h with
   | zero => intro a _; simpa using a.isIntegral_coe
   | succ h ih =>
@@ -72,17 +74,21 @@ theorem InCodiff.mul_different_pow {x : E} (hx : InCodiff x) (h : ℕ) :
       rw [RingOfIntegers.coe_eq_algebraMap, map_add (f := _), add_mul]
       exact this
 
-theorem exists_discr_pow_mul_isIntegral [IsGalois ℚ E] :
-    ∃ h : ℕ, 0 < h ∧ ∀ x : E, InCodiff x →
-      IsIntegral ℤ ((((discr E).natAbs : ℕ) : E) ^ h * x ^ (h * Module.finrank ℚ E)) := by
+theorem exists_discr_pow_mul_isIntegral [IsGalois ℚ E]
+    : ∃ h : ℕ,
+      0 < h
+        ∧ ∀ x : E,
+          InCodiff x
+            → IsIntegral ℤ ((((discr E).natAbs : ℕ) : E) ^ h * x ^ (h * Module.finrank ℚ E)) := by
   have hne : differentIdeal ℤ (𝓞 E) ∈ nonZeroDivisors (Ideal (𝓞 E)) :=
     mem_nonZeroDivisors_iff_ne_zero.2 differentIdeal_ne_bot
   refine ⟨Fintype.card (ClassGroup (𝓞 E)), Fintype.card_pos, fun x hx => ?_⟩
   set h := Fintype.card (ClassGroup (𝓞 E))
   have hpr : (differentIdeal ℤ (𝓞 E) ^ h).IsPrincipal := by
     rw [← ClassGroup.mk0_eq_one_iff (pow_mem hne h)]
-    have : (⟨differentIdeal ℤ (𝓞 E) ^ h, pow_mem hne h⟩ : nonZeroDivisors (Ideal (𝓞 E))) =
-        ⟨differentIdeal ℤ (𝓞 E), hne⟩ ^ h := rfl
+    have : (⟨differentIdeal ℤ (𝓞 E) ^ h, pow_mem hne h⟩ : nonZeroDivisors (Ideal (𝓞 E)))
+        = ⟨differentIdeal ℤ (𝓞 E), hne⟩ ^ h :=
+      rfl
     rw [this, map_pow, pow_card_eq_one]
   obtain ⟨a, ha⟩ := hpr
   have hmem : a ∈ differentIdeal ℤ (𝓞 E) ^ h := by
@@ -92,10 +98,11 @@ theorem exists_discr_pow_mul_isIntegral [IsGalois ℚ E] :
   have h1 : ∀ σ : E ≃ₐ[ℚ] E, IsIntegral ℤ (σ (a : E) * x ^ h) := fun σ => by
     have := map_isIntegral_int σ ((hx.gal σ.symm).mul_different_pow h a hmem)
     simpa using this
-  have h2 : IsIntegral ℤ (∏ σ : E ≃ₐ[ℚ] E, (σ (a : E) * x ^ h)) :=
-    IsIntegral.prod _ fun σ _ => h1 σ
-  rw [Finset.prod_mul_distrib, ← Algebra.norm_eq_prod_automorphisms, Finset.prod_const, Finset.card_univ,
-    ← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank, ← pow_mul, ← Algebra.coe_norm_int] at h2
+  have h2 : IsIntegral ℤ (∏ σ : E ≃ₐ[ℚ] E, (σ (a : E) * x ^ h)) := IsIntegral.prod _ fun σ _ => h1 σ
+  rw [Finset.prod_mul_distrib, ← Algebra.norm_eq_prod_automorphisms, Finset.prod_const,
+      Finset.card_univ, ← Nat.card_eq_fintype_card, IsGalois.card_aut_eq_finrank, ← pow_mul,
+      ← Algebra.coe_norm_int]
+    at h2
   rw [← Nat.cast_pow, ← hN]
   have h3 : algebraMap ℚ E ((Algebra.norm ℤ a : ℤ) : ℚ) = ((Algebra.norm ℤ a : ℤ) : E) := by simp
   rw [h3] at h2
@@ -106,13 +113,15 @@ theorem exists_discr_pow_mul_isIntegral [IsGalois ℚ E] :
     have := h2.neg
     simpa using this
 
-theorem InCodiff.norm_le [IsGalois ℚ E] {x : E} (hx : InCodiff x) (p : ℕ) [Fact p.Prime] (ρ : E →+* ℂ_[p]) :
-    ‖ρ x‖ ≤ (p : ℝ) ^ (((discr E).natAbs.factorization p : ℝ) / Module.finrank ℚ E) := by
+theorem InCodiff.norm_le
+    [IsGalois ℚ E] {x : E} (hx : InCodiff x) (p : ℕ) [Fact p.Prime] (ρ : E →+* ℂ_[p])
+    : ‖ρ x‖ ≤ (p : ℝ) ^ (((discr E).natAbs.factorization p : ℝ) / Module.finrank ℚ E) := by
   obtain ⟨h, hh, H⟩ := exists_discr_pow_mul_isIntegral (E := E)
   have h1 := norm_le_one (map_isIntegral_int ρ (H x hx))
   have hd : (discr E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero E)
-  rw [map_mul, map_pow, map_pow, map_natCast, norm_mul, norm_pow, norm_pow, norm_natCast p hd, mul_comm h,
-    pow_mul, ← mul_pow, pow_le_one_iff_of_nonneg (by positivity) hh.ne'] at h1
+  rw [map_mul, map_pow, map_pow, map_natCast, norm_mul, norm_pow, norm_pow, norm_natCast p hd,
+      mul_comm h, pow_mul, ← mul_pow, pow_le_one_iff_of_nonneg (by positivity) hh.ne']
+    at h1
   have hp : (0 : ℝ) < p := by exact_mod_cast (Fact.out : p.Prime).pos
   have hn : 0 < Module.finrank ℚ E := Module.finrank_pos
   rw [Real.rpow_neg hp.le, inv_mul_le_iff₀ (by positivity), mul_one] at h1
@@ -120,8 +129,10 @@ theorem InCodiff.norm_le [IsGalois ℚ E] {x : E} (hx : InCodiff x) (p : ℕ) [F
     div_mul_cancel₀ _ (by exact_mod_cast hn.ne')]
   exact h1
 
-theorem exists_dual_pair : ∃ (m : ℕ) (w : Fin m → 𝓞 E) (w' : Fin m → E), (∀ k, InCodiff (w' k)) ∧
-    ∀ σ τ : E →+* ℂ, ∑ k, τ (w' k) * σ (w k) = if σ = τ then 1 else 0 := by
+theorem exists_dual_pair
+    : ∃ (m : ℕ) (w : Fin m → 𝓞 E) (w' : Fin m → E),
+      (∀ k, InCodiff (w' k))
+        ∧ ∀ σ τ : E →+* ℂ, ∑ k, τ (w' k) * σ (w k) = if σ = τ then 1 else 0 := by
   let ι := Module.Free.ChooseBasisIndex ℤ (𝓞 E)
   let b := integralBasis E
   let b' := (Algebra.traceForm ℚ E).dualBasis (traceForm_nondegenerate ℚ E) b
@@ -129,8 +140,13 @@ theorem exists_dual_pair : ∃ (m : ℕ) (w : Fin m → 𝓞 E) (w' : Fin m → 
     rw [← Algebra.traceForm_apply]
     exact LinearMap.BilinForm.apply_dualBasis_left _ _ _ _
   let e := Fintype.equivFin ι
-  refine ⟨Fintype.card ι, fun k => RingOfIntegers.basis E (e.symm k), fun k => b' (e.symm k), fun k y => ?_,
-    fun σ τ => ?_⟩
+  refine ⟨
+    Fintype.card ι,
+    fun k => RingOfIntegers.basis E (e.symm k),
+    fun k => b' (e.symm k),
+    fun k y => ?_,
+    fun σ τ => ?_
+  ⟩
   · refine ⟨(RingOfIntegers.basis E).repr y (e.symm k), ?_⟩
     have : (y : E) = ∑ j, (RingOfIntegers.basis E).repr y j • b j := by
       conv_lhs => rw [← (RingOfIntegers.basis E).sum_repr y]
@@ -162,14 +178,15 @@ theorem exists_dual_pair : ∃ (m : ℕ) (w : Fin m → 𝓞 E) (w' : Fin m → 
     refine Finset.sum_congr rfl fun k _ => ?_
     simp [b, integralBasis_apply, mul_comm]
 
-theorem single_mem_YYl (D : D7) (a d : ℕ) (i : Fin d) (j : Fin a) (w : 𝓞 D.host.E) :
-    Matrix.single i j (w : D.host.E) ∈ YYl D (stdL D a) (stdL D d) := by
+theorem single_mem_YYl (D : D7) (a d : ℕ) (i : Fin d) (j : Fin a) (w : 𝓞 D.host.E)
+    : Matrix.single i j (w : D.host.E) ∈ YYl D (stdL D a) (stdL D d) := by
   have hb : D.host.𝔟 ≠ ⊥ := by
     intro h
     have h1 := D.host.𝔟_spec.1
     rw [h, Ideal.bot_mul] at h1
     exact differentIdeal_ne_bot h1
-  refine Submodule.subset_span ⟨1, ?_, Matrix.single i j (w : D.host.E), Submodule.subset_span ?_, by simp⟩
+  refine Submodule.subset_span
+    ⟨1, ?_, Matrix.single i j (w : D.host.E), Submodule.subset_span ?_, by simp⟩
   · have : (1 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) ≤ D.host.AA0 := by
       unfold Host.AA0
       exact one_le_inv₀ (by simpa [pos_iff_ne_zero] using hb) |>.2 FractionalIdeal.coeIdeal_le_one
@@ -184,9 +201,15 @@ theorem single_mem_YYl (D : D7) (a d : ℕ) (i : Fin d) (j : Fin a) (w : 𝓞 D.
 theorem exists_letters (D : D7) : ∃ (S : Finset ℕ) (dl : ℕ → ℝ), Letters D S dl := by
   have := D.host.hostE_isGalois
   have hd : (discr D.host.E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (discr_ne_zero _)
-  refine ⟨(discr D.host.E).natAbs.primeFactors,
+  refine ⟨
+    (discr D.host.E).natAbs.primeFactors,
     fun p => ((discr D.host.E).natAbs.factorization p : ℝ) / Module.finrank ℚ D.host.E,
-    fun l hl => Nat.prime_of_mem_primeFactors hl, fun l => by positivity, fun l hl => ?_, le_of_eq ?_, ?_⟩
+    fun l hl => Nat.prime_of_mem_primeFactors hl,
+    fun l => by positivity,
+    fun l hl => ?_,
+    le_of_eq ?_,
+    ?_
+  ⟩
   · rw [← Nat.support_factorization, Finsupp.notMem_support_iff] at hl
     simp [hl]
   · have h1 : |(discr D.host.E : ℝ)| = ((discr D.host.E).natAbs : ℝ) := by
@@ -198,10 +221,17 @@ theorem exists_letters (D : D7) : ∃ (S : Finset ℕ) (dl : ℕ → ℝ), Lette
   · intro p _ lam a d k
     obtain ⟨m, w, w', hw', horth⟩ := exists_dual_pair (E := D.host.E)
     have halg : ∀ x, embT D k.1 x ∈ Qbar := fun x =>
-      mem_algebraicClosure_iff.2 ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom (embT D k.1).toRatAlgHom)
+      mem_algebraicClosure_iff.2 ((Algebra.IsAlgebraic.isAlgebraic (R := ℚ) x).algHom
+        (embT D k.1).toRatAlgHom)
     let φ : D.host.E →+* Qbar := (embT D k.1).codRestrict Qbar halg
-    refine ⟨m, fun i => φ (w' i), fun i => Matrix.single k.2.1 k.2.2 (w i : D.host.E),
-      fun i => single_mem_YYl D a d _ _ _, fun i => (hw' i).norm_le p (lam.comp φ), ?_⟩
+    refine ⟨
+      m,
+      fun i => φ (w' i),
+      fun i => Matrix.single k.2.1 k.2.2 (w i : D.host.E),
+      fun i => single_mem_YYl D a d _ _ _,
+      fun i => (hw' i).norm_le p (lam.comp φ),
+      ?_
+    ⟩
     funext τ s t
     have hinj : embT D τ = embT D k.1 ↔ τ = k.1 :=
       ⟨fun h => D.eTau.injective (Subtype.ext ((factEmb D.R D.host).1.1 h)), fun h => by rw [h]⟩
@@ -211,7 +241,7 @@ theorem exists_letters (D : D7) : ∃ (S : Finset ℕ) (dl : ℕ → ℝ), Lette
     by_cases hst : k.2.1 = s ∧ k.2.2 = t
     · simp only [hst, and_self, if_true, and_true]
       exact h2.symm
-    · have : ¬ (τ = k.1 ∧ s = k.2.1 ∧ t = k.2.2) := fun h => hst ⟨h.2.1.symm, h.2.2.symm⟩
+    · have : ¬(τ = k.1 ∧ s = k.2.1 ∧ t = k.2.2) := fun h => hst ⟨h.2.1.symm, h.2.2.symm⟩
       simp [hst, this]
 
 theorem d_le_rd_sq (D : D7) : (D.host.d : ℝ) ≤ D.host.rdE ^ 2 ∧ 0 ≤ D.host.rdE := by
@@ -233,7 +263,12 @@ end GlobalTheory.NormSum.Denom
 
 namespace GlobalTheory.NormSum
 
-theorem letters_and_sizes : ∀ (D : D7), admG1 D → (∃ (S : Finset ℕ) (dl : ℕ → ℝ), Letters D S dl) ∧ Real.log D.host.d ≤ 2 * Real.log D.host.rdE ∧ 1 ≤ D.host.rdE ∧ 1 ≤ fF D ∧ Fintype.card D.what₂.Tau = fF D ∧ Module.finrank ℚ D.host.E = 2 * fF D := by
+theorem letters_and_sizes
+    : ∀ (D : D7),
+      admG1 D
+        → (∃ (S : Finset ℕ) (dl : ℕ → ℝ), Letters D S dl)
+          ∧ Real.log D.host.d ≤ 2 * Real.log D.host.rdE ∧ 1 ≤ D.host.rdE ∧ 1 ≤ fF D
+          ∧ Fintype.card D.what₂.Tau = fF D ∧ Module.finrank ℚ D.host.E = 2 * fF D := by
   intro D _
   obtain ⟨h1, h0⟩ := Denom.d_le_rd_sq D
   have hd : (1 : ℝ) ≤ D.host.d := by exact_mod_cast D.host.hyp.2.1.one_le

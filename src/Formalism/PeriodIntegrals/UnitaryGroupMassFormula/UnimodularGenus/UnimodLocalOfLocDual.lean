@@ -13,8 +13,8 @@ noncomputable section
 
 namespace PI.UG.W
 
-theorem stdLat_isOrtho (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ) :
-    Formalism.HermitianLatticesTheory.IsOrthoLattice (hStd E n) (stdLat E n) n := by
+theorem stdLat_isOrtho (E : Type) [Field E] [NumberField E] [StarRing E] (n : ℕ)
+    : Formalism.HermitianLatticesTheory.IsOrthoLattice (hStd E n) (stdLat E n) n := by
   refine ⟨fun i => Pi.single i 1, ?_, ?_, ?_, ?_⟩
   · convert (Pi.basisFun E (Fin n)).linearIndependent using 1 <;> first | rfl | (funext i; simp)
   · convert (Pi.basisFun E (Fin n)).span_eq using 3 <;> first | rfl | (funext i; simp)
@@ -50,12 +50,16 @@ theorem unimodLocal_of_locDual (hLD : Formalism.HermitianLatticesTheory.LocDual)
   intro E _ _ _ n N hN hU p hp
   have hsymm : (hStd E n).IsSymm := by
     first
-      | (refine ⟨fun x y => ?_⟩
-         set_option synthInstance.maxHeartbeats 100000 in
-           simp [hStd, map_sum, starRingEnd_apply, star_mul', mul_comm])
-      | (intro x y
-         set_option synthInstance.maxHeartbeats 100000 in
-           simp [hStd, map_sum, starRingEnd_apply, star_mul', mul_comm])
+    | (
+        refine ⟨fun x y => ?_⟩
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp [hStd, map_sum, starRingEnd_apply, star_mul', mul_comm]
+      )
+    | (
+        intro x y
+        set_option synthInstance.maxHeartbeats 100000 in
+        simp [hStd, map_sum, starRingEnd_apply, star_mul', mul_comm]
+      )
   have hstar : ∀ r : 𝓞 E, star (algebraMap (𝓞 E) E r) ∈ Set.range (algebraMap (𝓞 E) E) := by
     intro r
     exact ⟨RingOfIntegers.mapRingHom (starRingEnd E) r, rfl⟩
@@ -63,6 +67,7 @@ theorem unimodLocal_of_locDual (hLD : Formalism.HermitianLatticesTheory.LocDual)
   have key := (hLD (𝓞 E) E (Sp E n) (hStd E n) hsymm hstar N hfg).2
   exact key.mp hU p hp
 
-theorem unimodLocal : UnimodLocal := unimodLocal_of_locDual Formalism.HermitianLatticesTheory.locDual
+theorem unimodLocal : UnimodLocal :=
+  unimodLocal_of_locDual Formalism.HermitianLatticesTheory.locDual
 
 end PI.UG.W

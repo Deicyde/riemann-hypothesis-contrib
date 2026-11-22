@@ -10,12 +10,14 @@ namespace Formalism.MainNotions.BridgeLemma
 
 open Formalism.MainNotions.S
 
-theorem cpt_nat {K : Type} [Field K] : ∀ (n : ℕ) (σ : ℕ → ℕ) (τ : ℕ → K),
-    (∀ i, i < n → σ i < n) → (∀ i, i < n → ∀ j, j < n → σ i = σ j → i = j) → (∀ v, v < n → ∃ i, i < n ∧ σ i = v) →
-    (∀ i, i < n → τ i ≠ 0) →
-    (∀ c b, c < b → b < n → σ c = σ b + 1 → b = c + 1 ∧ τ b = τ c) →
-    ∃ bs : List (K × ℕ), (∀ x ∈ bs, x.1 ≠ 0 ∧ 1 ≤ x.2) ∧ (bs.map Prod.snd).sum = n ∧
-      ∀ a, a < n → ∀ b, b < n → ptEntry bs a b = if a = σ b then τ b else 0 := by
+theorem cpt_nat {K : Type} [Field K]
+    : ∀ (n : ℕ) (σ : ℕ → ℕ) (τ : ℕ → K),
+      (∀ i, i < n → σ i < n) → (∀ i, i < n → ∀ j, j < n → σ i = σ j → i = j)
+        → (∀ v, v < n → ∃ i, i < n ∧ σ i = v) → (∀ i, i < n → τ i ≠ 0)
+        → (∀ c b, c < b → b < n → σ c = σ b + 1 → b = c + 1 ∧ τ b = τ c)
+        → ∃ bs : List (K × ℕ),
+          (∀ x ∈ bs, x.1 ≠ 0 ∧ 1 ≤ x.2) ∧ (bs.map Prod.snd).sum = n
+            ∧ ∀ a, a < n → ∀ b, b < n → ptEntry bs a b = if a = σ b then τ b else 0 := by
   intro n
   induction n using Nat.strong_induction_on with
   | _ n ih =>
@@ -53,35 +55,38 @@ theorem cpt_nat {K : Type} [Field K] : ∀ (n : ℕ) (σ : ℕ → ℕ) (τ : �
         have e := (c1 (s - 1 - σ i) hj).1
         have := hinj i hin (s - 1 - σ i) (by omega) (by omega)
         omega
-      obtain ⟨bs, hb1, hb2, hb3⟩ := ih (n - s) (by omega) (fun i => σ (i + s) - s) (fun i => τ (i + s))
-        (fun i hi => by
-          have h1 := hmap (i + s) (by omega)
-          have h2 := c2 (i + s) (by omega) (by omega)
-          show σ (i + s) - s < n - s
-          omega)
-        (fun i hi j hj hij => by
-          have h1 := c2 (i + s) (by omega) (by omega)
-          have h2 := c2 (j + s) (by omega) (by omega)
-          have h3 : σ (i + s) - s = σ (j + s) - s := hij
-          have := hinj (i + s) (by omega) (j + s) (by omega) (by omega)
-          omega)
-        (fun v hv => by
-          obtain ⟨i, hin, hi⟩ := hsurj (v + s) (by omega)
-          have his : s ≤ i := by
-            by_contra hlt
-            have := (c1 i (by omega)).1
-            omega
-          refine ⟨i - s, by omega, ?_⟩
-          show σ (i - s + s) - s = v
-          rw [Nat.sub_add_cancel his, hi]
-          omega)
-        (fun i hi => hτ (i + s) (by omega))
-        (fun c b hcb hbn hv => by
-          have h1 := c2 (c + s) (by omega) (by omega)
-          have h2 := c2 (b + s) (by omega) (by omega)
-          have h3 : σ (c + s) - s = σ (b + s) - s + 1 := hv
-          obtain ⟨f1, f2⟩ := hP (c + s) (b + s) (by omega) (by omega) (by omega)
-          exact ⟨by omega, f2⟩)
+      obtain ⟨bs, hb1, hb2, hb3⟩ :=
+        ih (n - s) (by omega)
+          (fun i => σ (i + s) - s)
+          (fun i => τ (i + s))
+          (fun i hi => by
+            have h1 := hmap (i + s) (by omega)
+            have h2 := c2 (i + s) (by omega) (by omega)
+            show σ (i + s) - s < n - s
+            omega)
+          (fun i hi j hj hij => by
+            have h1 := c2 (i + s) (by omega) (by omega)
+            have h2 := c2 (j + s) (by omega) (by omega)
+            have h3 : σ (i + s) - s = σ (j + s) - s := hij
+            have := hinj (i + s) (by omega) (j + s) (by omega) (by omega)
+            omega)
+          (fun v hv => by
+            obtain ⟨i, hin, hi⟩ := hsurj (v + s) (by omega)
+            have his : s ≤ i := by
+              by_contra hlt
+              have := (c1 i (by omega)).1
+              omega
+            refine ⟨i - s, by omega, ?_⟩
+            show σ (i - s + s) - s = v
+            rw [Nat.sub_add_cancel his, hi]
+            omega)
+          (fun i hi => hτ (i + s) (by omega))
+          (fun c b hcb hbn hv => by
+            have h1 := c2 (c + s) (by omega) (by omega)
+            have h2 := c2 (b + s) (by omega) (by omega)
+            have h3 : σ (c + s) - s = σ (b + s) - s + 1 := hv
+            obtain ⟨f1, f2⟩ := hP (c + s) (b + s) (by omega) (by omega) (by omega)
+            exact ⟨by omega, f2⟩)
       refine ⟨(τ 0, s) :: bs, ?_, ?_, ?_⟩
       · intro x hx
         rcases List.mem_cons.1 hx with rfl | hx
@@ -115,22 +120,24 @@ theorem cpt_nat {K : Type} [Field K] : ∀ (n : ℕ) (σ : ℕ → ℕ) (τ : �
 
 theorem cell_point : MonomialMatrixIsPoint := by
   intro K _ n σ τ hσ hτ hP
-  obtain ⟨bs, h1, h2, h3⟩ := cpt_nat n (fun i => if h : i < n then (σ ⟨i, h⟩).val else 0)
-    (fun i => if h : i < n then τ ⟨i, h⟩ else 0)
-    (fun i hi => by simp only [dif_pos hi]; exact (σ ⟨i, hi⟩).isLt)
-    (fun i hi j hj hij => by
-      simp only [dif_pos hi, dif_pos hj] at hij
-      have := hσ.1 (Fin.ext hij)
-      exact congrArg Fin.val this)
-    (fun v hv => by
-      obtain ⟨i, hi⟩ := hσ.2 ⟨v, hv⟩
-      refine ⟨i.val, i.isLt, ?_⟩
-      simp only [dif_pos i.isLt, Fin.eta, hi])
-    (fun i hi => by simp only [dif_pos hi]; exact hτ _)
-    (fun c b hcb hbn hv => by
-      have hcn : c < n := lt_trans hcb hbn
-      simp only [dif_pos hcn, dif_pos hbn] at hv ⊢
-      exact hP ⟨c, hcn⟩ ⟨b, hbn⟩ hcb hv)
+  obtain ⟨bs, h1, h2, h3⟩ :=
+    cpt_nat n
+      (fun i => if h : i < n then (σ ⟨i, h⟩).val else 0)
+      (fun i => if h : i < n then τ ⟨i, h⟩ else 0)
+      (fun i hi => by simp only [dif_pos hi]; exact (σ ⟨i, hi⟩).isLt)
+      (fun i hi j hj hij => by
+        simp only [dif_pos hi, dif_pos hj] at hij
+        have := hσ.1 (Fin.ext hij)
+        exact congrArg Fin.val this)
+      (fun v hv => by
+        obtain ⟨i, hi⟩ := hσ.2 ⟨v, hv⟩
+        refine ⟨i.val, i.isLt, ?_⟩
+        simp only [dif_pos i.isLt, Fin.eta, hi])
+      (fun i hi => by simp only [dif_pos hi]; exact hτ _)
+      (fun c b hcb hbn hv => by
+        have hcn : c < n := lt_trans hcb hbn
+        simp only [dif_pos hcn, dif_pos hbn] at hv ⊢
+        exact hP ⟨c, hcn⟩ ⟨b, hbn⟩ hcb hv)
   refine ⟨⟨bs, h1, h2⟩, ?_⟩
   ext a b
   show ptEntry bs a.val b.val = mono σ τ a b

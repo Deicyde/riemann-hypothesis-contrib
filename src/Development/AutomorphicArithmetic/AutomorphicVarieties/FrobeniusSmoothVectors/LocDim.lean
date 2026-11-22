@@ -13,11 +13,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
 
-private theorem td_fin {B A D : Type} [CommRing B] [CommRing A] [CommRing D] [Algebra B A] [Algebra A D]
-    [Algebra B D] [IsScalarTower B A D] [Algebra.IsIntegral A D] (p : Ideal D) [p.IsPrime] (η : Ideal A)
-    (hη : p.comap (algebraMap A D) = η) :
-    p.comap (algebraMap B D) = η.comap (algebraMap B A) ∧
-    Algebra.trdeg (B ⧸ p.comap (algebraMap B D)) (D ⧸ p) = Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) := by
+private theorem td_fin
+    {B A D : Type} [CommRing B] [CommRing A] [CommRing D] [Algebra B A] [Algebra A D] [Algebra B D]
+    [IsScalarTower B A D] [Algebra.IsIntegral A D]
+    (p : Ideal D) [p.IsPrime]
+    (η : Ideal A) (hη : p.comap (algebraMap A D) = η)
+    : p.comap (algebraMap B D) = η.comap (algebraMap B A)
+      ∧ Algebra.trdeg (B ⧸ p.comap (algebraMap B D)) (D ⧸ p)
+        = Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) := by
   subst hη
   rename_i iBD iT iI hp
   have hI : iBD = ((algebraMap A D).comp (algebraMap B A)).toAlgebra := by
@@ -42,24 +45,36 @@ private theorem td_fin {B A D : Type} [CommRing B] [CommRing A] [CommRing D] [Al
     (faithfulSMul_iff_algebraMap_injective _ _).mpr Ideal.algebraMap_quotient_injective
   haveI : Algebra.IsAlgebraic (A ⧸ Ideal.comap (algebraMap A D) p) (D ⧸ p) :=
     Algebra.IsIntegral.isAlgebraic
-  have key := trdeg_add_eq (B ⧸ Ideal.comap (algebraMap B A) (Ideal.comap (algebraMap A D) p))
-    (A ⧸ Ideal.comap (algebraMap A D) p) (A := D ⧸ p)
+  have key :=
+    trdeg_add_eq (B ⧸ Ideal.comap (algebraMap B A) (Ideal.comap (algebraMap A D) p))
+      (A ⧸ Ideal.comap (algebraMap A D) p) (A := D ⧸ p)
   have h0 : Algebra.trdeg (A ⧸ Ideal.comap (algebraMap A D) p) (D ⧸ p) = 0 := trdeg_eq_zero
   rw [h0, add_zero] at key
   exact key.symm
 
-private theorem dim_gen (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
-    [IsAdicComplete (maximalIdeal O) O] {B A D R : Type} [CommRing B] [Algebra O B] [IsLocalRing B] [CommRing A]
-    [CommRing D] [Algebra B A] [Algebra A D] [Algebra.FiniteType B A] [Module.Finite A D] [Module.Flat A D]
-    [CommRing R] [IsLocalRing R] [Algebra D R] (hB : UpperTheory.V.CA.IsCL O B) (x : Ideal A) (hx : x.IsMaximal)
-    (hxB : x.comap (algebraMap B A) = maximalIdeal B) (y : Ideal D) (hy : y.comap (algebraMap A D) = x)
-    (hR : UpperTheory.V.CA.IsCplAt y R) :
-    (∀ P : Ideal R, P.IsPrime → ∀ η : Ideal A, (P.comap (algebraMap D R)).comap (algebraMap A D) = η → ∀ t : ℕ,
-      Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) ≤ t →
-        ringKrullDim (R ⧸ P) ≤ ringKrullDim (B ⧸ η.comap (algebraMap B A)) + t) ∧
-    ∀ η : Ideal A, η.IsPrime → η ≤ x → ∀ t : ℕ, Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) = t →
-      ∃ P : Ideal R, P.IsPrime ∧ (P.comap (algebraMap D R)).comap (algebraMap A D) = η ∧
-        ringKrullDim (R ⧸ P) = ringKrullDim (B ⧸ η.comap (algebraMap B A)) + t := by
+private theorem dim_gen
+    (O : Type)
+    [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O]
+    {B A D R : Type} [CommRing B] [Algebra O B] [IsLocalRing B] [CommRing A] [CommRing D]
+    [Algebra B A] [Algebra A D] [Algebra.FiniteType B A] [Module.Finite A D] [Module.Flat A D]
+    [CommRing R] [IsLocalRing R] [Algebra D R]
+    (hB : UpperTheory.V.CA.IsCL O B)
+    (x : Ideal A) (hx : x.IsMaximal) (hxB : x.comap (algebraMap B A) = maximalIdeal B)
+    (y : Ideal D) (hy : y.comap (algebraMap A D) = x) (hR : UpperTheory.V.CA.IsCplAt y R)
+    : (∀ P : Ideal R,
+        P.IsPrime
+          → ∀ η : Ideal A,
+            (P.comap (algebraMap D R)).comap (algebraMap A D) = η
+              → ∀ t : ℕ,
+                Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) ≤ t
+                  → ringKrullDim (R ⧸ P) ≤ ringKrullDim (B ⧸ η.comap (algebraMap B A)) + t)
+      ∧ ∀ η : Ideal A,
+        η.IsPrime → η ≤ x
+          → ∀ t : ℕ,
+            Algebra.trdeg (B ⧸ η.comap (algebraMap B A)) (A ⧸ η) = t
+              → ∃ P : Ideal R,
+                P.IsPrime ∧ (P.comap (algebraMap D R)).comap (algebraMap A D) = η
+                  ∧ ringKrullDim (R ⧸ P) = ringKrullDim (B ⧸ η.comap (algebraMap B A)) + t := by
   haveI : IsNoetherianRing B := hB.noeth
   haveI : IsNoetherianRing A := Algebra.FiniteType.isNoetherianRing B A
   haveI : IsNoetherianRing D := Algebra.FiniteType.isNoetherianRing A D
@@ -68,8 +83,7 @@ private theorem dim_gen (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuatio
   haveI : IsScalarTower B A D := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
   haveI : Algebra.FiniteType B D := Algebra.FiniteType.trans (S := A) inferInstance inferInstance
   haveI := hx
-  have hyc : Ideal.comap (algebraMap D R) (maximalIdeal R) = y := by
-    simpa using hR.comap_pow 1
+  have hyc : Ideal.comap (algebraMap D R) (maximalIdeal R) = y := by simpa using hR.comap_pow 1
   haveI hyP : y.IsPrime := by
     rw [← hyc]
     infer_instance
@@ -93,8 +107,7 @@ private theorem dim_gen (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuatio
     rw [htd.2] at ht'tr
     have hc : (t' : Cardinal) ≤ t := ht'tr ▸ ht
     have htt : t' ≤ t := by exact_mod_cast hc
-    have hcast : ((t' : ℕ∞) : WithBot ℕ∞) ≤ ((t : ℕ∞) : WithBot ℕ∞) := by
-      exact_mod_cast htt
+    have hcast : ((t' : ℕ∞) : WithBot ℕ∞) ≤ ((t : ℕ∞) : WithBot ℕ∞) := by exact_mod_cast htt
     exact h1.trans (add_le_add le_rfl hcast)
   · intro η hη hηx t ht
     haveI := hη
@@ -114,8 +127,22 @@ private theorem dim_gen (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuatio
     have htt : t' = t := by exact_mod_cast ht'tr.symm
     rw [htt]
 
-theorem UpperTheory.V.Fr.loc_dim :
-    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), (∀ P : Ideal L.R, P.IsPrime → ∀ t : ℕ, S.td (L.im P) ≤ t → ringKrullDim (L.R ⧸ P) ≤ ringKrullDim (S.B ⧸ L.π P) + t) ∧ ∀ η : Ideal S.A, η.IsPrime → η ≤ x → ∀ t : ℕ, S.td η = t → ∃ P : Ideal L.R, P.IsPrime ∧ L.im P = η ∧ ringKrullDim (L.R ⧸ P) = ringKrullDim (S.B ⧸ S.π η) + t := by
+theorem UpperTheory.V.Fr.loc_dim
+    : ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ},
+      F.Ok C₀ → (n = 2 ∨ n = 3)
+        → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x),
+          (∀ P : Ideal L.R,
+              P.IsPrime
+                → ∀ t : ℕ,
+                  S.td (L.im P) ≤ t → ringKrullDim (L.R ⧸ P) ≤ ringKrullDim (S.B ⧸ L.π P) + t)
+            ∧ ∀ η : Ideal S.A,
+              η.IsPrime → η ≤ x
+                → ∀ t : ℕ,
+                  S.td η = t
+                    → ∃ P : Ideal L.R,
+                      P.IsPrime ∧ L.im P = η
+                        ∧ ringKrullDim (L.R ⧸ P) = ringKrullDim (S.B ⧸ S.π η) + t := by
   intro l _ O _ _ _ _ F C₀ n hOk hn S x L
   obtain ⟨hco, hmB⟩ := co_B hOk hn S
   haveI := hco
@@ -166,13 +193,19 @@ theorem UpperTheory.V.Fr.loc_dim :
     simp [ι']
   have hR := loc_cpl hOk hn S x L ι' hι'
   letI : Algebra (TensorProduct O L.O' S.A) L.R := ι'.toRingHom.toAlgebra
-  have hcm : ∀ Q : Ideal L.R, (Q.comap (algebraMap (TensorProduct O L.O' S.A) L.R)).comap
-      (algebraMap S.A (TensorProduct O L.O' S.A)) = L.im Q := by
+  have hcm
+      : ∀ Q : Ideal L.R,
+        (Q.comap (algebraMap (TensorProduct O L.O' S.A) L.R)).comap
+            (algebraMap S.A (TensorProduct O L.O' S.A))
+          = L.im Q := by
     intro Q
     ext a
     change ι' (TensorProduct.tmul O (1 : L.O') a) ∈ Q ↔ L.ι a ∈ Q
     rw [hι']
-  have hy : (Ideal.comap ι'.toRingHom (maximalIdeal L.R)).comap (algebraMap S.A (TensorProduct O L.O' S.A)) = x := by
+  have hy
+      : (Ideal.comap ι'.toRingHom (maximalIdeal L.R)).comap
+          (algebraMap S.A (TensorProduct O L.O' S.A))
+        = x := by
     exact (hcm (maximalIdeal L.R)).trans L.lies
   have key := dim_gen O hB x hxM hxB _ hy hR
   constructor

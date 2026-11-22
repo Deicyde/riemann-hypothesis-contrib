@@ -13,8 +13,12 @@ public import Formalism.LocalToGlobal.IndefiniteReal.LevelTypeEquivalence.GinfCS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory IsDedekindDomain NumberField Matrix
-open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links MeasureTheory
+  IsDedekindDomain NumberField Matrix
+open GlobalTheory.MixModel GlobalTheory.MixPer GlobalTheory.Grow GlobalTheory.Unf
+  GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.SepRows
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.Asc
@@ -23,7 +27,14 @@ noncomputable section
 
 namespace GlobalTheory.MatCoefCont
 
-theorem continuous_thPair_heisO : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S T : HSp D) (μ : Measure (WO S T)) (𝓕 : Set (WO S T)), IsCovolOne (ratL T S) μ 𝓕 → ∀ f f₀ : WO S T → ℂ, IsThetaFunO ψ S T f → IsThetaFunO ψ S T f₀ → Continuous (fun w : WO S T => thPair μ 𝓕 f (heisO ψ S T w f₀)) := by
+theorem continuous_thPair_heisO
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
+      IsStdChar D ψ (-1)
+        → ∀ (S T : HSp D) (μ : Measure (WO S T)) (𝓕 : Set (WO S T)),
+          IsCovolOne (ratL T S) μ 𝓕
+            → ∀ f f₀ : WO S T → ℂ,
+              IsThetaFunO ψ S T f → IsThetaFunO ψ S T f₀
+                → Continuous (fun w : WO S T => thPair μ 𝓕 f (heisO ψ S T w f₀)) := by
   intro D ψ hψ S T μ 𝓕 h𝓕 f f₀ hf hf₀
   haveI hAE : SecondCountableTopology (AE D) := (Formalism.IndefR.Eqv.ae_facts D).2.2.2.1
   haveI hM : SecondCountableTopology (WO S T) :=
@@ -42,7 +53,11 @@ theorem continuous_thPair_heisO : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ),
         (hf₀.cont.comp (continuous_snd.add continuous_fst))).star)
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0)
   unfold thPair heisO
-  refine continuous_of_dominated (bound := fun _ => C * C₀) (fun w => ?_) (fun w => ?_) (integrable_const _) ?_
+  refine continuous_of_dominated
+    (bound := fun _ => C * C₀)
+    (fun w => ?_)
+    (fun w => ?_)
+    (integrable_const _) ?_
   · exact (hF.comp (Continuous.prodMk_right w)).aestronglyMeasurable
   · refine Filter.Eventually.of_forall fun z => ?_
     rw [norm_mul, norm_star, norm_mul, hψ.1.2.1, one_mul]

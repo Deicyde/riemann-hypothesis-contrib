@@ -8,10 +8,12 @@ open scoped NNReal
 
 namespace GlobalTheory
 
-theorem teichmuller_dvd_of_dvd_natCast_mul (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O]
-    [IsDomain O] [CharP O l] [PerfectRing O l] (x : O) (hx : x ≠ 0) (a : WittVector l O)
-    (h : WittVector.teichmuller l x ∣ ((l : ℕ) : WittVector l O) * a) :
-    WittVector.teichmuller l x ∣ a := by
+theorem teichmuller_dvd_of_dvd_natCast_mul
+    (l : ℕ) [Fact l.Prime]
+    (O : Type) [CommRing O] [IsDomain O] [CharP O l] [PerfectRing O l]
+    (x : O) (hx : x ≠ 0)
+    (a : WittVector l O) (h : WittVector.teichmuller l x ∣ ((l : ℕ) : WittVector l O) * a)
+    : WittVector.teichmuller l x ∣ a := by
   obtain ⟨b, hb⟩ := h
   have h0 : (((l : ℕ) : WittVector l O) * a).coeff 0 = 0 := by
     rw [← WittVector.mem_span_p_iff_coeff_zero_eq_zero]
@@ -22,17 +24,26 @@ theorem teichmuller_dvd_of_dvd_natCast_mul (l : ℕ) [Fact l.Prime] (O : Type) [
   obtain ⟨c, rfl⟩ := hb0
   have hl : ((l : ℕ) : WittVector l O) ≠ 0 := WittVector.p_nonzero l O
   refine ⟨c, mul_left_cancel₀ hl ?_⟩
-  rw [hb]; ring
+  rw [hb]
+  ring
 
-theorem teichmuller_distinguished_regular : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [CharP O l] [PerfectRing O l] (x : O) (e : ℕ) (w E' : WittVector l O), x ≠ 0 → 0 < e → IsUnit w → E' = WittVector.teichmuller l x ^ e + ((l : ℕ) : WittVector l O) * w → ∀ (k : ℕ) (a : WittVector l O), (WittVector.teichmuller l x ^ k ∣ E' * a → WittVector.teichmuller l x ^ k ∣ a) ∧ (E' ∣ WittVector.teichmuller l x ^ k * a → E' ∣ a) := by
+theorem teichmuller_distinguished_regular
+    : ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [CharP O l] [PerfectRing O l]
+        (x : O) (e : ℕ) (w E' : WittVector l O),
+      x ≠ 0 → 0 < e → IsUnit w
+        → E' = WittVector.teichmuller l x ^ e + ((l : ℕ) : WittVector l O) * w
+        → ∀ (k : ℕ) (a : WittVector l O),
+          (WittVector.teichmuller l x ^ k ∣ E' * a → WittVector.teichmuller l x ^ k ∣ a)
+            ∧ (E' ∣ WittVector.teichmuller l x ^ k * a → E' ∣ a) := by
   intro l _ O _ _ _ _ x e w E' hx he hw hE
   have hT : WittVector.teichmuller l x ≠ 0 := by
     intro h
     apply hx
     rw [← WittVector.teichmuller_coeff_zero l x, h]
     simp
-  have h1 : ∀ a : WittVector l O, WittVector.teichmuller l x ∣ E' * a →
-      WittVector.teichmuller l x ∣ a := by
+  have h1
+      : ∀ a : WittVector l O,
+        WittVector.teichmuller l x ∣ E' * a → WittVector.teichmuller l x ∣ a := by
     intro a h
     rw [hE, add_mul] at h
     have h2 : WittVector.teichmuller l x ∣ WittVector.teichmuller l x ^ e * a :=
@@ -40,8 +51,9 @@ theorem teichmuller_distinguished_regular : ∀ (l : ℕ) [Fact l.Prime] (O : Ty
     have h3 := (dvd_add_right h2).mp h
     rw [mul_assoc] at h3
     exact hw.dvd_mul_left.mp (teichmuller_dvd_of_dvd_natCast_mul l O x hx _ h3)
-  have hk : ∀ (k : ℕ) (a : WittVector l O), WittVector.teichmuller l x ^ k ∣ E' * a →
-      WittVector.teichmuller l x ^ k ∣ a := by
+  have hk
+      : ∀ (k : ℕ) (a : WittVector l O),
+        WittVector.teichmuller l x ^ k ∣ E' * a → WittVector.teichmuller l x ^ k ∣ a := by
     intro k
     induction k with
     | zero => intro a _; simp
@@ -56,6 +68,7 @@ theorem teichmuller_distinguished_regular : ∀ (l : ℕ) [Fact l.Prime] (O : Ty
   rintro ⟨b, hb⟩
   obtain ⟨c, rfl⟩ := hk k b ⟨a, hb.symm⟩
   refine ⟨c, mul_left_cancel₀ (pow_ne_zero k hT) ?_⟩
-  rw [hb]; ring
+  rw [hb]
+  ring
 
 end GlobalTheory

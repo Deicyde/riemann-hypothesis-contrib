@@ -12,15 +12,18 @@ public import Development.AbelianVarietyTheory.Proofs.UnitaryExistence.ExistsEqN
 
 open AlgebraicGeometry CategoryTheory NumberField Matrix
 open scoped nonZeroDivisors
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 
 namespace GlobalTheory.FrameFibre
 
 variable {E : Type} [Field E] [NumberField E] {r : ℕ}
 
-theorem exists_smul_eq {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L →ₗ[𝓞 E] (Fin r → E))
-    (hspan : Submodule.span E (Set.range φ) = ⊤) (u : Fin r → E) :
-    ∃ (c : 𝓞 E) (v : L), c ≠ 0 ∧ (c : E) • u = φ v := by
+theorem exists_smul_eq
+    {L : Type} [AddCommGroup L] [Module (𝓞 E) L]
+    (φ : L →ₗ[𝓞 E] (Fin r → E)) (hspan : Submodule.span E (Set.range φ) = ⊤)
+    (u : Fin r → E)
+    : ∃ (c : 𝓞 E) (v : L), c ≠ 0 ∧ (c : E) • u = φ v := by
   have hu : u ∈ Submodule.span E (Set.range φ) := by rw [hspan]; trivial
   induction hu using Submodule.span_induction with
   | mem x hx => obtain ⟨v, rfl⟩ := hx; exact ⟨1, v, one_ne_zero, by simp⟩
@@ -45,9 +48,12 @@ theorem exists_smul_eq {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L �
     rw [Algebra.smul_def]
     field_simp
 
-theorem exists_matrix {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L →ₗ[𝓞 E] (Fin r → E))
+theorem exists_matrix
+    {L : Type} [AddCommGroup L] [Module (𝓞 E) L]
+    (φ : L →ₗ[𝓞 E] (Fin r → E))
     (hφ : Function.Injective φ) (hspan : Submodule.span E (Set.range φ) = ⊤)
-    (ψ : L →ₗ[𝓞 E] (Fin r → E)) : ∃ A : Matrix (Fin r) (Fin r) E, ∀ v, A *ᵥ φ v = ψ v := by
+    (ψ : L →ₗ[𝓞 E] (Fin r → E))
+    : ∃ A : Matrix (Fin r) (Fin r) E, ∀ v, A *ᵥ φ v = ψ v := by
   haveI : IsLocalizedModule (𝓞 E)⁰ φ :=
     { map_units := fun s => (isLocalizedModule_id (𝓞 E)⁰ (Fin r → E) E).map_units s
       surj := fun u => by
@@ -55,13 +61,14 @@ theorem exists_matrix {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L �
         exact ⟨(v, ⟨c, mem_nonZeroDivisors_of_ne_zero hc⟩), hv⟩
       exists_of_eq := fun h => ⟨1, by rw [hφ h]⟩ }
   have hb := IsLocalizedModule.isBaseChange (𝓞 E)⁰ E φ
-  exact ⟨LinearMap.toMatrix' (hb.lift ψ), fun v => by
-    rw [LinearMap.toMatrix'_mulVec, hb.lift_eq]⟩
+  exact ⟨LinearMap.toMatrix' (hb.lift ψ), fun v => by rw [LinearMap.toMatrix'_mulVec, hb.lift_eq]⟩
 
-theorem exists_gl {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L →ₗ[𝓞 E] (Fin r → E))
+theorem exists_gl
+    {L : Type} [AddCommGroup L] [Module (𝓞 E) L]
+    (φ : L →ₗ[𝓞 E] (Fin r → E))
     (hφ : Function.Injective φ) (hspan : Submodule.span E (Set.range φ) = ⊤)
-    (gam : L ≃ₗ[𝓞 E] L) : ∃ γ : GL (Fin r) E,
-      ∀ v, (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v = φ (gam v) := by
+    (gam : L ≃ₗ[𝓞 E] L)
+    : ∃ γ : GL (Fin r) E, ∀ v, (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v = φ (gam v) := by
   obtain ⟨A, hA⟩ := exists_matrix φ hφ hspan (φ ∘ₗ gam.toLinearMap)
   obtain ⟨B, hB⟩ := exists_matrix φ hφ hspan (φ ∘ₗ gam.symm.toLinearMap)
   have hA' : ∀ v, A *ᵥ φ v = φ (gam v) := hA
@@ -69,8 +76,8 @@ theorem exists_gl {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L →ₗ
   have hAB : A * B = 1 := by
     apply Matrix.toLin'.injective
     refine LinearMap.ext_on_range hspan fun v => ?_
-    rw [Matrix.toLin'_apply, Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, hB', hA', Matrix.one_mulVec,
-      LinearEquiv.apply_symm_apply]
+    rw [Matrix.toLin'_apply, Matrix.toLin'_apply, ← Matrix.mulVec_mulVec, hB', hA',
+      Matrix.one_mulVec, LinearEquiv.apply_symm_apply]
   exact ⟨⟨A, B, hAB, mul_eq_one_comm.1 hAB⟩, hA'⟩
 
 theorem eq_zero_of_trace (t : E) (ht : ∀ a : 𝓞 E, Algebra.trace ℚ E ((a : E) * t) = 0) : t = 0 := by
@@ -85,17 +92,21 @@ theorem eq_zero_of_trace (t : E) (ht : ∀ a : 𝓞 E, Algebra.trace ℚ E ((a :
 
 variable [IsCMField E]
 
-theorem herm_smul_smul (G : Matrix (Fin r) (Fin r) E) (c d : E) (x y : Fin r → E) :
-    FD.herm G (c • x) (d • y) = c * FD.cc d * FD.herm G x y := by
+theorem herm_smul_smul (G : Matrix (Fin r) (Fin r) E) (c d : E) (x y : Fin r → E)
+    : FD.herm G (c • x) (d • y) = c * FD.cc d * FD.herm G x y := by
   simp only [FD.herm, FD.cc, Pi.smul_apply, smul_eq_mul, Finset.mul_sum, map_mul]
   refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem herm_of_trace {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L →ₗ[𝓞 E] (Fin r → E))
-    (hspan : Submodule.span E (Set.range φ) = ⊤) (G A : Matrix (Fin r) (Fin r) E) (ξ : E) (hξ : ξ ≠ 0)
-    (h : ∀ v w, Algebra.trace ℚ E (ξ * FD.herm G (A *ᵥ φ v) (A *ᵥ φ w)) =
-      Algebra.trace ℚ E (ξ * FD.herm G (φ v) (φ w))) (x y : Fin r → E) :
-    FD.herm G (A *ᵥ x) (A *ᵥ y) = FD.herm G x y := by
+theorem herm_of_trace
+    {L : Type} [AddCommGroup L] [Module (𝓞 E) L]
+    (φ : L →ₗ[𝓞 E] (Fin r → E)) (hspan : Submodule.span E (Set.range φ) = ⊤)
+    (G A : Matrix (Fin r) (Fin r) E) (ξ : E) (hξ : ξ ≠ 0)
+    (h : ∀ v w,
+      Algebra.trace ℚ E (ξ * FD.herm G (A *ᵥ φ v) (A *ᵥ φ w))
+        = Algebra.trace ℚ E (ξ * FD.herm G (φ v) (φ w)))
+    (x y : Fin r → E)
+    : FD.herm G (A *ᵥ x) (A *ᵥ y) = FD.herm G x y := by
   have h1 : FD.cc (1 : E) = 1 := map_one (IsCMField.complexConj E)
   have key : ∀ v w, FD.herm G (A *ᵥ φ v) (A *ᵥ φ w) = FD.herm G (φ v) (φ w) := by
     intro v w
@@ -117,9 +128,13 @@ theorem herm_of_trace {L : Type} [AddCommGroup L] [Module (𝓞 E) L] (φ : L �
   · simpa using hc
   · exact (map_ne_zero (IsCMField.complexConj E)).2 (by simpa using hd)
 
-theorem lact_mem_GG {Ψ : Finset (E →+* ℂ)} {G : Matrix (Fin r) (Fin r) E} {q : ℕ} {γ : GL (Fin r) E}
-    (hγ : ∀ u v, FD.herm G ((γ : Matrix (Fin r) (Fin r) E) *ᵥ u) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ v) =
-      FD.herm G u v) {x : FD.Frame Ψ r} (hx : x ∈ FD.GG Ψ G q) : FD.lact γ x ∈ FD.GG Ψ G q := by
+theorem lact_mem_GG
+    {Ψ : Finset (E →+* ℂ)} {G : Matrix (Fin r) (Fin r) E} {q : ℕ} {γ : GL (Fin r) E}
+    (hγ : ∀ u v,
+      FD.herm G ((γ : Matrix (Fin r) (Fin r) E) *ᵥ u) ((γ : Matrix (Fin r) (Fin r) E) *ᵥ v)
+        = FD.herm G u v)
+    {x : FD.Frame Ψ r} (hx : x ∈ FD.GG Ψ G q)
+    : FD.lact γ x ∈ FD.GG Ψ G q := by
   intro τ
   have e1 : FD.mat (FD.lact γ x) τ = (γ : Matrix (Fin r) (Fin r) E).map τ.1 * FD.mat x τ := rfl
   refine ⟨?_, fun i => ?_⟩
@@ -134,10 +149,43 @@ theorem lact_mem_GG {Ψ : Finset (E →+* ℂ)} {G : Matrix (Fin r) (Fin r) E} {
     unfold FD.dmin at h ⊢
     rwa [e2]
 
-theorem exists_level_block_of_eq : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (U : FamilyUnif Xo σ ty) (i : Fin U.n) (r : ℕ) (ξ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : (U.Di i).La →ₗ[𝓞 E] (Fin r → E)) (Ψ : Finset (E →+* ℂ)) (idx : Fin g ≃ Ψ × Fin r) (Pf : FD.Frame Ψ r → ((U.Di i).La →+ (Fin g → ℂ))), (∀ τ, τ ∈ Ψ ↔ τ (H.rt : E) = H.rt0) → (∀ k, ty k = if ((idx k).2 : ℕ) < (U.Di i).q then ComplexEmbedding.conjugate (idx k).1.1 else (idx k).1.1) → FD.cc ξ = -ξ → (∀ τ ∈ Ψ, 0 < (τ ξ).im) → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧ ∀ x y, (((U.Di i).EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ x) (φ y))) → r = (U.Di i).p + (U.Di i).q → (∀ x v k, Pf x v k = if ((idx k).2 : ℕ) < (U.Di i).q then FD.hermC (idx k).1.1 Gm (FD.col (FD.mat x (idx k).1) (idx k).2) (FD.Data.emb (idx k).1.1 (φ v)) else ((FD.mat x (idx k).1)⁻¹ *ᵥ FD.Data.emb (idx k).1.1 (φ v)) (idx k).2) → ∀ x ∈ FD.GG Ψ Gm (U.Di i).q, ∀ x' ∈ FD.GG Ψ Gm (U.Di i).q, U.u i (Pf x) = U.u i (Pf x') → ∃ (γ : GL (Fin r) E) (b : FD.Frame Ψ r), FD.IsUStab Gm (LinearMap.range φ) γ ∧ (∀ v, ∃ w, (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v = φ v + l.M • φ w) ∧ (∀ v, ∃ w, (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v = φ v + l.A • φ w) ∧ x' = FD.rmul (FD.lact γ x) b ∧ ∀ τ (a c : Fin r), (c : ℕ) < (U.Di i).q → (U.Di i).q ≤ (a : ℕ) → b τ a c = 0 := by
+theorem exists_level_block_of_eq
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H)
+        (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (U : FamilyUnif Xo σ ty)
+        (i : Fin U.n) (r : ℕ) (ξ : E) (Gm : Matrix (Fin r) (Fin r) E)
+        (φ : (U.Di i).La →ₗ[𝓞 E] (Fin r → E)) (Ψ : Finset (E →+* ℂ)) (idx : Fin g ≃ Ψ × Fin r)
+        (Pf : FD.Frame Ψ r → ((U.Di i).La →+ (Fin g → ℂ))),
+      (∀ τ, τ ∈ Ψ ↔ τ (H.rt : E) = H.rt0)
+        → (∀ k,
+          ty k
+            = if ((idx k).2 : ℕ) < (U.Di i).q then
+                ComplexEmbedding.conjugate (idx k).1.1
+              else
+                (idx k).1.1)
+        → FD.cc ξ = -ξ → (∀ τ ∈ Ψ, 0 < (τ ξ).im)
+        → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤
+          ∧ (∀ a b, FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0
+          ∧ ∀ x y, (((U.Di i).EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * FD.herm Gm (φ x) (φ y)))
+        → r = (U.Di i).p + (U.Di i).q
+        → (∀ x v k,
+          Pf x v k
+            = if ((idx k).2 : ℕ) < (U.Di i).q then
+                FD.hermC (idx k).1.1 Gm (FD.col (FD.mat x (idx k).1) (idx k).2)
+                  (FD.Data.emb (idx k).1.1 (φ v))
+              else
+                ((FD.mat x (idx k).1)⁻¹ *ᵥ FD.Data.emb (idx k).1.1 (φ v)) (idx k).2)
+        → ∀ x ∈ FD.GG Ψ Gm (U.Di i).q, ∀ x' ∈ FD.GG Ψ Gm (U.Di i).q,
+          U.u i (Pf x) = U.u i (Pf x')
+            → ∃ (γ : GL (Fin r) E) (b : FD.Frame Ψ r),
+              FD.IsUStab Gm (LinearMap.range φ) γ
+                ∧ (∀ v, ∃ w, (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v = φ v + l.M • φ w)
+                ∧ (∀ v, ∃ w, (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ v = φ v + l.A • φ w)
+                ∧ x' = FD.rmul (FD.lact γ x) b
+                ∧ ∀ τ (a c : Fin r), (c : ℕ) < (U.Di i).q → (U.Di i).q ≤ (a : ℕ) → b τ a c = 0 := by
   classical
   intro E _ _ _ H D l Xo σ g ty U i r ξ Gm φ Ψ idx Pf hΨ hty hξ hpos hlat hr hPf x hx x' hx' hu
-  have hper := (FramePeriod.isPeriod_frame E H (U.Di i) r ξ Gm φ Ψ hΨ g idx ty hty hξ hpos hlat hr).2
+  have hper :=
+    (FramePeriod.isPeriod_frame E H (U.Di i) r ξ Gm φ Ψ hΨ g idx ty hty hξ hpos hlat hr).2
   obtain ⟨gam, h, hiso, hhalf, hA, hh⟩ :=
     (U.fibre i _ _ ((hper x hx).2 _ (hPf x)) ((hper x' hx').2 _ (hPf x'))).1 hu
   have hM := LevelHalf.trivial_mod_of_trivial_on_half E H (U.Di i) l gam hiso hhalf
@@ -151,16 +199,20 @@ theorem exists_level_block_of_eq : ∀ (E : Type) [Field E] [NumberField E] [IsC
       · exact ⟨s, (hcm s).2 h⟩
     rintro rfl
     simpa using hpos τ hτ
-  have hun := herm_of_trace φ hlat.2.1 Gm γ ξ hξ0 fun v w => by
-    rw [hγ, hγ, ← hlat.2.2.2.2, ← hlat.2.2.2.2, hiso]
-  have hmove := (per_move E H (U.Di i) r ξ Gm φ Ψ hΨ g idx ty hty hξ hpos hlat).2.1 x γ (Pf x)
-    (Pf (FD.lact γ x)) hun (hPf x) (hPf _)
-  obtain ⟨b, hb, hb0, -⟩ := FramePeriod.frame_of_period_linear E H (U.Di i) r ξ Gm φ Ψ hΨ g idx ty hty
-    hξ hpos hlat (Pf (FD.lact γ x)) _ (lact_mem_GG hun hx) x' hx' (hPf _) (Pf x') (hPf _)
-    (LinearMap.toMatrix' h.toLinearMap) fun v => by
-      obtain ⟨a, rfl⟩ := gam.surjective v
-      rw [LinearMap.toMatrix'_mulVec, hh, hmove a (gam a) (hγ a).symm]
-      rfl
+  have hun :=
+    herm_of_trace φ hlat.2.1 Gm γ ξ hξ0 fun v w => by
+      rw [hγ, hγ, ← hlat.2.2.2.2, ← hlat.2.2.2.2, hiso]
+  have hmove :=
+    (per_move E H (U.Di i) r ξ Gm φ Ψ hΨ g idx ty hty hξ hpos hlat).2.1 x γ (Pf x)
+      (Pf (FD.lact γ x)) hun (hPf x) (hPf _)
+  obtain ⟨b, hb, hb0, -⟩ :=
+    FramePeriod.frame_of_period_linear E H (U.Di i) r ξ Gm φ Ψ hΨ g idx ty hty hξ hpos hlat
+      (Pf (FD.lact γ x)) _ (lact_mem_GG hun hx) x' hx' (hPf _) (Pf x') (hPf _)
+      (LinearMap.toMatrix' h.toLinearMap)
+      fun v => by
+        obtain ⟨a, rfl⟩ := gam.surjective v
+        rw [LinearMap.toMatrix'_mulVec, hh, hmove a (gam a) (hγ a).symm]
+        rfl
   refine ⟨γ, b, ⟨hun, fun y => ⟨?_, ?_⟩⟩, fun v => ?_, fun v => ?_, hb, hb0⟩
   · rintro ⟨v, rfl⟩
     exact ⟨gam v, (hγ v).symm⟩

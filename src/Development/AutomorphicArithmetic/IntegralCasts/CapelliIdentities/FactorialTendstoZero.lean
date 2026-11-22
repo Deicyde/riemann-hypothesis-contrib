@@ -53,17 +53,17 @@ private lemma UpperTheory.Reformulated.B.AdelicCharacterNormOne.eq_one_of_tendst
   · exact absurd h (not_tendsto_nhds_of_tendsto_atTop
       ((tendsto_pow_atTop_atTop_of_one_lt hgt).comp hf) 1)
 
-theorem UpperTheory.Reformulated.B.AdelicCharacterNormOne.norm_eq_one :
-    ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F]
-    (ψ : AddChar (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) ℂ),
-    Continuous (⇑ψ : NumberField.AdeleRing (NumberField.RingOfIntegers F) F → ℂ) →
-      (∀ (a : F),
+theorem UpperTheory.Reformulated.B.AdelicCharacterNormOne.norm_eq_one
+    : ∀ {F : Type} [inst : Field F] [inst_1 : NumberField F]
+        (ψ : AddChar (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) ℂ),
+      Continuous (⇑ψ : NumberField.AdeleRing (NumberField.RingOfIntegers F) F → ℂ)
+        → (∀ (a : F),
           (ψ : NumberField.AdeleRing (NumberField.RingOfIntegers F) F → ℂ)
-              ((Algebra.algebraMap F (NumberField.AdeleRing (NumberField.RingOfIntegers F) F) :
-                  F → NumberField.AdeleRing (NumberField.RingOfIntegers F) F)
-                a) =
-            (1 : ℂ)) →
-        ∀ (x : NumberField.AdeleRing (NumberField.RingOfIntegers F) F),
+              ((Algebra.algebraMap F (NumberField.AdeleRing (NumberField.RingOfIntegers F) F)
+                  : F → NumberField.AdeleRing (NumberField.RingOfIntegers F) F)
+                a)
+            = (1 : ℂ))
+        → ∀ (x : NumberField.AdeleRing (NumberField.RingOfIntegers F) F),
           ‖(ψ : NumberField.AdeleRing (NumberField.RingOfIntegers F) F → ℂ) x‖ = (1 : ℝ) := by
   intro F _ _ ψ hψ htriv
   let i : InfiniteAdeleRing F → AdeleRing (𝓞 F) F := fun x => (x, 0)
@@ -75,14 +75,16 @@ theorem UpperTheory.Reformulated.B.AdelicCharacterNormOne.norm_eq_one :
   have hfin : ∀ y, ‖ψ (j y)‖ = 1 := by
     intro y
     apply UpperTheory.Reformulated.B.AdelicCharacterNormOne.eq_one_of_tendsto (norm_nonneg _)
-    have h1 := (UpperTheory.Reformulated.B.AdelicCharacterNormOne.finite_tendsto (F := F)).mul_const y
+    have h1 :=
+      (UpperTheory.Reformulated.B.AdelicCharacterNormOne.finite_tendsto (F := F)).mul_const y
     rw [zero_mul] at h1
     have h2 := (((hψ.comp hj).norm).tendsto 0).comp h1
     have h0 : j 0 = 0 := rfl
     have hs : ∀ n : ℕ, j ((n : FiniteAdeleRing (𝓞 F) F) * y) = n • j y := fun n =>
       Prod.ext (nsmul_zero n).symm (nsmul_eq_mul n y).symm
     simp only [Function.comp_def, h0, hs, AddChar.map_zero_eq_one, norm_one,
-      AddChar.map_nsmul_eq_pow, norm_pow] at h2
+        AddChar.map_nsmul_eq_pow, norm_pow]
+      at h2
     exact h2
   have hinf : ∀ x, ‖ψ (i x)‖ = 1 := by
     intro x

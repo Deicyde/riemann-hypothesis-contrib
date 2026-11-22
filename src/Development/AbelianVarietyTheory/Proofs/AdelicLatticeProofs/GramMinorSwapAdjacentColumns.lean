@@ -10,9 +10,9 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-private theorem exch_sum_split {N : ℕ} (p q : Fin N) (hq : (q : ℕ) = p + 1) (f : Fin N → ℝ)
-    (hf : ∀ r, q < r → f r = 0) :
-    ∑ r, f r = ∑ r ∈ Finset.univ.filter (· < p), f r + (f p + f q) := by
+private theorem exch_sum_split
+    {N : ℕ} (p q : Fin N) (hq : (q : ℕ) = p + 1) (f : Fin N → ℝ) (hf : ∀ r, q < r → f r = 0)
+    : ∑ r, f r = ∑ r ∈ Finset.univ.filter (· < p), f r + (f p + f q) := by
   have hpq : p ≠ q := fun e => by have := congrArg Fin.val e; omega
   rw [← Finset.sum_filter_add_sum_filter_not Finset.univ (· < p)]
   congr 1
@@ -31,22 +31,37 @@ private theorem exch_sum_split {N : ℕ} (p q : Fin N) (hq : (q : ℕ) = p + 1) 
   have h2 : (x : ℕ) ≠ q := fun e => hx'.2 (Fin.ext e)
   omega
 
-private theorem det_updateRow_last_single_eq_mul_det_submatrix {m : ℕ} (X : Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ) (x : ℝ) :
-    (X.updateRow (Fin.last m) (Pi.single (Fin.last m) x)).det =
-      x * (X.submatrix Fin.castSucc Fin.castSucc).det := by
+private theorem det_updateRow_last_single_eq_mul_det_submatrix
+    {m : ℕ} (X : Matrix (Fin (m + 1)) (Fin (m + 1)) ℝ) (x : ℝ)
+    : (X.updateRow (Fin.last m) (Pi.single (Fin.last m) x)).det
+      = x * (X.submatrix Fin.castSucc Fin.castSucc).det := by
   rw [Matrix.det_succ_row _ (Fin.last m), Finset.sum_eq_single (Fin.last m)]
-  · have hsub : (X.updateRow (Fin.last m) (Pi.single (Fin.last m) x)).submatrix
-        (Fin.last m).succAbove (Fin.last m).succAbove = X.submatrix Fin.castSucc Fin.castSucc := by
+  · have hsub
+        : (X.updateRow (Fin.last m) (Pi.single (Fin.last m) x)).submatrix (Fin.last m).succAbove
+            (Fin.last m).succAbove
+          = X.submatrix Fin.castSucc Fin.castSucc := by
       ext i j
       simp only [Matrix.submatrix_apply, Fin.succAbove_last]
       rw [Matrix.updateRow_ne (Fin.castSucc_lt_last i).ne]
-    rw [hsub, Matrix.updateRow_self, Pi.single_eq_same, Fin.val_last, Even.neg_one_pow ⟨m, rfl⟩, one_mul]
+    rw [hsub, Matrix.updateRow_self, Pi.single_eq_same, Fin.val_last, Even.neg_one_pow ⟨m, rfl⟩,
+      one_mul]
   · intro j _ hj
     rw [Matrix.updateRow_self, Pi.single_eq_of_ne hj, mul_zero, zero_mul]
   · intro h
     exact absurd (Finset.mem_univ _) h
 
-theorem gram_minor_swap_columns : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ) (n g g' : Matrix (Fin N) (Fin N) ℝ) (p q : Fin N), kᵀ * k = 1 → (∀ i, n i i = 1) → (∀ i j, j < i → n i j = 0) → (q : ℕ) = p + 1 → g = k * diagonal a * n → g' = g.submatrix id (Equiv.swap p q) → (∀ (j : ℕ) (h : j ≤ N), j ≠ q → ((g'ᵀ * g').submatrix (Fin.castLE h) (Fin.castLE h)).det = ((gᵀ * g).submatrix (Fin.castLE h) (Fin.castLE h)).det) ∧ ∀ h : (q : ℕ) ≤ N, ((g'ᵀ * g').submatrix (Fin.castLE h) (Fin.castLE h)).det = (∏ l ∈ Finset.univ.filter (· < p), a l ^ 2) * (a q ^ 2 + n p q ^ 2 * a p ^ 2) := by
+theorem gram_minor_swap_columns
+    : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ) (a : Fin N → ℝ) (n g g' : Matrix (Fin N) (Fin N) ℝ)
+        (p q : Fin N),
+      kᵀ * k = 1 → (∀ i, n i i = 1) → (∀ i j, j < i → n i j = 0) → (q : ℕ) = p + 1
+        → g = k * diagonal a * n → g' = g.submatrix id (Equiv.swap p q)
+        → (∀ (j : ℕ) (h : j ≤ N),
+            j ≠ q
+              → ((g'ᵀ * g').submatrix (Fin.castLE h) (Fin.castLE h)).det
+                = ((gᵀ * g).submatrix (Fin.castLE h) (Fin.castLE h)).det)
+          ∧ ∀ h : (q : ℕ) ≤ N,
+            ((g'ᵀ * g').submatrix (Fin.castLE h) (Fin.castLE h)).det
+              = (∏ l ∈ Finset.univ.filter (· < p), a l ^ 2) * (a q ^ 2 + n p q ^ 2 * a p ^ 2) := by
   intro N k a n g g' p q hk hn1 hn0 hq hg hg'
 
   have hG : gᵀ * g = (diagonal a * n)ᵀ * (diagonal a * n) := by
@@ -64,8 +79,7 @@ theorem gram_minor_swap_columns : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ)
   have hMd : ∀ i, M i i = a i := fun i => by rw [hMe, hn1, mul_one]
   refine ⟨fun j hj hjq => ?_, fun h => ?_⟩
   · by_cases hjp : j ≤ (p : ℕ)
-    ·
-      congr 1
+    · congr 1
       have hfix : ∀ z : Fin j, Equiv.swap p q (Fin.castLE hj z) = Fin.castLE hj z := by
         intro z
         have hz := z.isLt
@@ -80,19 +94,22 @@ theorem gram_minor_swap_columns : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ)
           omega
       ext x y
       simp only [Matrix.submatrix_apply, hfix]
-    ·
-      have hpj : (p : ℕ) < j := by omega
+    · have hpj : (p : ℕ) < j := by omega
       have hqj : (q : ℕ) < j := by omega
       have e1 : Fin.castLE hj ⟨p, hpj⟩ = p := Fin.ext rfl
       have e2 : Fin.castLE hj ⟨q, hqj⟩ = q := Fin.ext rfl
-      have hs : ∀ z : Fin j, Equiv.swap p q (Fin.castLE hj z) =
-          Fin.castLE hj (Equiv.swap ⟨p, hpj⟩ ⟨q, hqj⟩ z) := by
+      have hs
+          : ∀ z : Fin j,
+            Equiv.swap p q (Fin.castLE hj z) = Fin.castLE hj (Equiv.swap ⟨p, hpj⟩ ⟨q, hqj⟩ z) := by
         intro z
         have := (Fin.castLE_injective hj).swap_apply ⟨p, hpj⟩ ⟨q, hqj⟩ z
         rwa [e1, e2] at this
-      have hsub : ((Mᵀ * M).submatrix (Equiv.swap p q) (Equiv.swap p q)).submatrix (Fin.castLE hj)
-          (Fin.castLE hj) = ((Mᵀ * M).submatrix (Fin.castLE hj) (Fin.castLE hj)).submatrix
-          (Equiv.swap (⟨p, hpj⟩ : Fin j) ⟨q, hqj⟩) (Equiv.swap (⟨p, hpj⟩ : Fin j) ⟨q, hqj⟩) := by
+      have hsub
+          : ((Mᵀ * M).submatrix (Equiv.swap p q) (Equiv.swap p q)).submatrix (Fin.castLE hj)
+              (Fin.castLE hj)
+            = ((Mᵀ * M).submatrix (Fin.castLE hj) (Fin.castLE hj)).submatrix
+              (Equiv.swap (⟨p, hpj⟩ : Fin j) ⟨q, hqj⟩)
+              (Equiv.swap (⟨p, hpj⟩ : Fin j) ⟨q, hqj⟩) := by
         ext x y
         simp only [Matrix.submatrix_apply, hs]
       rw [hsub, Matrix.det_submatrix_equiv_self]
@@ -148,13 +165,17 @@ theorem gram_minor_swap_columns : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ)
       · rintro ⟨i, _, rfl⟩
         exact i.isLt
 
-    have hX : ((Mᵀ * M).submatrix σ σ).submatrix c c =
-        (Bᵀ * B).updateRow (Fin.last p) ((Bᵀ * B) (Fin.last p) + Pi.single (Fin.last p) (a Q ^ 2)) := by
+    have hX
+        : ((Mᵀ * M).submatrix σ σ).submatrix c c
+          = (Bᵀ * B).updateRow (Fin.last p)
+            ((Bᵀ * B) (Fin.last p) + Pi.single (Fin.last p) (a Q ^ 2)) := by
       ext i j
-      have hsum : (((Mᵀ * M).submatrix σ σ).submatrix c c) i j =
-          (Bᵀ * B) i j + M Q (σ (c i)) * M Q (σ (c j)) := by
+      have hsum
+          : (((Mᵀ * M).submatrix σ σ).submatrix c c) i j
+            = (Bᵀ * B) i j + M Q (σ (c i)) * M Q (σ (c j)) := by
         simp only [Matrix.submatrix_apply, Matrix.mul_apply, Matrix.transpose_apply, hBe]
-        rw [exch_sum_split P Q rfl _ (fun r hr => by rw [hMl r _ (lt_of_le_of_lt (hle i) hr), zero_mul]),
+        rw [exch_sum_split P Q rfl _
+            (fun r hr => by rw [hMl r _ (lt_of_le_of_lt (hle i) hr), zero_mul]),
           Fin.sum_univ_castSucc, hfilt, Finset.sum_map, hcl]
         simp only [hembx]
         ring
@@ -181,8 +202,9 @@ theorem gram_minor_swap_columns : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ)
       · refine Finset.prod_congr rfl fun i _ => ?_
         rw [hBe, hσc _ (Fin.castSucc_lt_last i).ne, hMd]
       · rw [hBe, hσl, hcl, hMe]
-    have hminor : (Bᵀ * B).submatrix Fin.castSucc Fin.castSucc =
-        (B.submatrix Fin.castSucc Fin.castSucc)ᵀ * B.submatrix Fin.castSucc Fin.castSucc := by
+    have hminor
+        : (Bᵀ * B).submatrix Fin.castSucc Fin.castSucc
+          = (B.submatrix Fin.castSucc Fin.castSucc)ᵀ * B.submatrix Fin.castSucc Fin.castSucc := by
       ext i j
       simp only [Matrix.submatrix_apply, Matrix.mul_apply, Matrix.transpose_apply]
       rw [Fin.sum_univ_castSucc]
@@ -197,11 +219,13 @@ theorem gram_minor_swap_columns : ∀ (N : ℕ) (k : Matrix (Fin N) (Fin N) ℝ)
       rw [Matrix.det_of_upperTriangular hBT']
       refine Finset.prod_congr rfl fun i _ => ?_
       rw [Matrix.submatrix_apply, hBe, hσc _ (Fin.castSucc_lt_last i).ne, hMd]
-    have hprod : ∏ l ∈ Finset.univ.filter (· < P), a l ^ 2 = (∏ i : Fin p, a (c i.castSucc)) ^ 2 := by
+    have hprod
+        : ∏ l ∈ Finset.univ.filter (· < P), a l ^ 2 = (∏ i : Fin p, a (c i.castSucc)) ^ 2 := by
       rw [hfilt, Finset.prod_map, ← Finset.prod_pow]
       simp only [hembx]
-    rw [hX, Matrix.det_updateRow_add, Matrix.updateRow_eq_self, det_updateRow_last_single_eq_mul_det_submatrix, hminor,
-      Matrix.det_mul, Matrix.det_transpose, Matrix.det_mul, Matrix.det_transpose, hdB, hdB', hprod]
+    rw [hX, Matrix.det_updateRow_add, Matrix.updateRow_eq_self,
+      det_updateRow_last_single_eq_mul_det_submatrix, hminor, Matrix.det_mul, Matrix.det_transpose,
+      Matrix.det_mul, Matrix.det_transpose, hdB, hdB', hprod]
     ring
 
 end GlobalTheory.ClassFin

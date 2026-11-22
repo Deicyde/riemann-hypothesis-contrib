@@ -14,8 +14,8 @@ namespace RestTerms
 
 open MvPolynomial Finset
 
-theorem FlagRestrictDecomposition.proof (h1 : FlagRestrictPowerSum.Statement) :
-    FlagRestrictDecomposition.Statement := by
+theorem FlagRestrictDecomposition.proof (h1 : FlagRestrictPowerSum.Statement)
+    : FlagRestrictDecomposition.Statement := by
   intro f N τ R
   set_option synthInstance.maxHeartbeats 100000 in
     rw [map_sum]

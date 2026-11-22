@@ -107,24 +107,27 @@ private lemma norm_step (T : Type) [CommRing T] (ι : T →+* T) (ϖ ω : T)
   rw [hι', h]
   ring
 
-theorem UpperTheory.exists_mul_involution_eq_fixed_unit_of_complete :
-    ∀ (T : Type) [CommRing T] (ι : T →+* T) (ϖ ω : T), (∀ x, ι (ι x) = x) → ι ϖ = ϖ →
-        (∀ x : T, ϖ * x = 0 → x = 0) →
-        (∀ f : ℕ → T, (∀ m, ∃ e, f (m + 1) - f m = ϖ ^ m * e) → ∃ L, ∀ m, ∃ e, f m - L = ϖ ^ m * e) →
-        (∀ x : T, (∀ m : ℕ, ∃ e, x = ϖ ^ m * e) → x = 0) →
-        Finite (T ⧸ Ideal.span {ϖ}) → IsUnit (ω - ι ω) →
-        ∀ u : T, IsUnit u → ι u = u → ∃ z, z * ι z = u := by
+theorem UpperTheory.exists_mul_involution_eq_fixed_unit_of_complete
+    : ∀ (T : Type) [CommRing T] (ι : T →+* T) (ϖ ω : T),
+      (∀ x, ι (ι x) = x) → ι ϖ = ϖ → (∀ x : T, ϖ * x = 0 → x = 0)
+        → (∀ f : ℕ → T,
+          (∀ m, ∃ e, f (m + 1) - f m = ϖ ^ m * e) → ∃ L, ∀ m, ∃ e, f m - L = ϖ ^ m * e)
+        → (∀ x : T, (∀ m : ℕ, ∃ e, x = ϖ ^ m * e) → x = 0) → Finite (T ⧸ Ideal.span {ϖ})
+        → IsUnit (ω - ι ω)
+        → ∀ u : T, IsUnit u → ι u = u → ∃ z, z * ι z = u := by
   intro T _ ι ϖ ω hι hϖ hreg hcomp hsep hfin hω u hu hfix
   obtain ⟨z₀, hz₀⟩ := norm_level_zero T ι ϖ ω hι hϖ hfin hω u hu hfix
   have step := norm_step T ι ϖ ω hι hϖ hreg hω u hu hfix
   let g : (j : ℕ) → {z : T // ∃ a, z * ι z - u = ϖ ^ (j + 1) * a} := fun j =>
-    Nat.rec ⟨z₀, hz₀⟩
-      (fun j p => ⟨(step j p.1 p.2).choose, (step j p.1 p.2).choose_spec.1⟩) j
+    Nat.rec ⟨z₀, hz₀⟩ (fun j p => ⟨(step j p.1 p.2).choose, (step j p.1 p.2).choose_spec.1⟩) j
   have hg : ∀ j, ∃ e, (g (j + 1)).1 - (g j).1 = ϖ ^ (j + 1) * e := fun j =>
     (step j (g j).1 (g j).2).choose_spec.2
-  obtain ⟨L, hL⟩ := hcomp (fun j => (g j).1) (fun m => by
-    obtain ⟨e, he⟩ := hg m
-    exact ⟨ϖ * e, by rw [he, pow_succ]; ring⟩)
+  obtain ⟨L, hL⟩ :=
+    hcomp
+      (fun j => (g j).1)
+      (fun m => by
+        obtain ⟨e, he⟩ := hg m
+        exact ⟨ϖ * e, by rw [he, pow_succ]; ring⟩)
   refine ⟨L, sub_eq_zero.mp (hsep _ fun m => ?_)⟩
   obtain ⟨e, he⟩ := hL m
   obtain ⟨a, ha⟩ := (g m).2

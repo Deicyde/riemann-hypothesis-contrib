@@ -4,11 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.Reformulated.B.ExistsEvaluation.exists_eval :
-    ∀ {C Ω J : Type}
-    [inst : CommRing C] [inst_1 : Field Ω] [Fintype J] (f : (J → C) →+* Ω),
-    ∃ (j : J),
-      ∀ (v : J → C), (f : (J → C) → Ω) v = (f : (J → C) → Ω) ((Algebra.algebraMap C (J → C) : C → J → C) (v j)) := by
+theorem UpperTheory.Reformulated.B.ExistsEvaluation.exists_eval
+    : ∀ {C Ω J : Type} [inst : CommRing C] [inst_1 : Field Ω] [Fintype J] (f : (J → C) →+* Ω),
+      ∃ (j : J), ∀ (v : J → C),
+        (f : (J → C) → Ω) v
+          = (f : (J → C) → Ω) ((Algebra.algebraMap C (J → C) : C → J → C) (v j)) := by
   intro C Ω J _ _ _ f
   classical
   have hsum : ∑ j : J, f (Pi.single j 1) = 1 := by
@@ -29,11 +29,10 @@ theorem UpperTheory.Reformulated.B.ExistsEvaluation.exists_eval :
     by_cases hi : i = j
     · subst hi; simp
     · simp [Pi.single_eq_of_ne hi]
-  have hone : f (Pi.single j 1) = 1 := by
-    exact mul_left_cancel₀ hj (by rw [hidem, mul_one])
+  have hone : f (Pi.single j 1) = 1 := by exact mul_left_cancel₀ hj (by rw [hidem, mul_one])
   refine ⟨j, fun v => ?_⟩
-  have hmul : v * Pi.single j 1 =
-      (Algebra.algebraMap C (J → C) : C → J → C) (v j) * Pi.single j 1 := by
+  have hmul
+      : v * Pi.single j 1 = (Algebra.algebraMap C (J → C) : C → J → C) (v j) * Pi.single j 1 := by
     funext i
     by_cases hi : i = j
     · subst hi; simp [Algebra.algebraMap_eq_smul_one]

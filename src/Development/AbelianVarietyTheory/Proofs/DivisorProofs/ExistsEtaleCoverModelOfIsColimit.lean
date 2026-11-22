@@ -7,22 +7,25 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.ExistsEtaleM
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct GlobalTheory.EtC
 
 namespace GlobalTheory.EtaleCoverDescent
 
-
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct in
-theorem _root_.GlobalTheory.EtaleCoverDescent.exists_point_of_isPushout {R S T P : CommRingCat.{0}} {f : R ⟶ S} {g : R ⟶ T}
-    {inl : S ⟶ P} {inr : T ⟶ P} (H : IsPushout f g inl inr) (x : Spec S) (y : Spec T)
-    (hxy : Spec.map f x = Spec.map g y) : ∃ z : Spec P, Spec.map inl z = x := by
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct in
+theorem _root_.GlobalTheory.EtaleCoverDescent.exists_point_of_isPushout
+    {R S T P : CommRingCat.{0}} {f : R ⟶ S} {g : R ⟶ T} {inl : S ⟶ P} {inr : T ⟶ P}
+    (H : IsPushout f g inl inr) (x : Spec S) (y : Spec T) (hxy : Spec.map f x = Spec.map g y)
+    : ∃ z : Spec P, Spec.map inl z = x := by
   have hP := isPullback_SpecMap_of_isPushout f g inl inr H
   obtain ⟨w, hw, -⟩ := Scheme.Pullback.exists_preimage_pullback x y hxy
   refine ⟨hP.isoPullback.inv w, ?_⟩
   rw [← Scheme.Hom.comp_apply, hP.isoPullback_inv_fst]
   exact hw
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct in
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct in
 private lemma exists_etale_pushout_of_filtered_colimit (J : Type) [SmallCategory J] [IsFiltered J]
     (D : J ⥤ CommRingCat.{0}) (c : Cocone D) (hc : IsColimit c) {B : CommRingCat.{0}}
     (g : c.pt ⟶ B) (hg : g.hom.Etale) :
@@ -46,7 +49,8 @@ private lemma exists_etale_pushout_of_filtered_colimit (J : Type) [SmallCategory
       simp only [CommRingCat.hom_comp, RingHom.comp_apply]
       exact e.commutes x
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct in
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct in
 private lemma exists_etale_pushout_at_later_index_of_range {J : Type} [SmallCategory J]
     {D : J ⥤ CommRingCat.{0}} (c : Cocone D) {k k' : J} (f : k ⟶ k') {B B' : CommRingCat.{0}}
     {g : c.pt ⟶ B} {a : D.obj k ⟶ B'} {h : B' ⟶ B} (ha : a.hom.Etale)
@@ -71,10 +75,18 @@ private lemma exists_etale_pushout_at_later_index_of_range {J : Type} [SmallCate
     obtain ⟨z, hz⟩ := _root_.GlobalTheory.EtaleCoverDescent.exists_point_of_isPushout (IsPushout.of_hasPushout (D.map f) a) p v hv.symm
     exact ⟨z, hz⟩
 
-
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct in
-theorem _root_.GlobalTheory.EtaleCoverDescent.exists_etale_cover_model_of_isColimit :
-    ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D), IsColimit c → ∀ (ι : Type) [Finite ι] (B : ι → CommRingCat.{0}) (g : ∀ i, c.pt ⟶ B i), (∀ i, (g i).hom.Etale) → (∀ p : Spec c.pt, ∃ i v, Spec.map (g i) v = p) → ∀ j₀ : J, ∃ (j : J) (_ : j₀ ⟶ j) (B' : ι → CommRingCat.{0}) (g' : ∀ i, D.obj j ⟶ B' i) (h : ∀ i, B' i ⟶ B i), (∀ i, (g' i).hom.Etale ∧ IsPushout (g' i) (c.ι.app j) (h i) (g i)) ∧ ∀ p : Spec (D.obj j), ∃ i v, Spec.map (g' i) v = p := by
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  TensorProduct in
+theorem _root_.GlobalTheory.EtaleCoverDescent.exists_etale_cover_model_of_isColimit
+    : ∀ (J : Type) [SmallCategory J] [IsFiltered J] (D : J ⥤ CommRingCat.{0}) (c : Cocone D),
+      IsColimit c
+        → ∀ (ι : Type) [Finite ι] (B : ι → CommRingCat.{0}) (g : ∀ i, c.pt ⟶ B i),
+          (∀ i, (g i).hom.Etale) → (∀ p : Spec c.pt, ∃ i v, Spec.map (g i) v = p)
+            → ∀ j₀ : J,
+              ∃ (j : J) (_ : j₀ ⟶ j) (B' : ι → CommRingCat.{0}) (g' : ∀ i, D.obj j ⟶ B' i)
+                  (h : ∀ i, B' i ⟶ B i),
+                (∀ i, (g' i).hom.Etale ∧ IsPushout (g' i) (c.ι.app j) (h i) (g i))
+                  ∧ ∀ p : Spec (D.obj j), ∃ i v, Spec.map (g' i) v = p := by
   intro J _ _ D c hc ι _ B g hg hsurj j₀
   classical
   have := Fintype.ofFinite ι
@@ -101,16 +113,17 @@ theorem _root_.GlobalTheory.EtaleCoverDescent.exists_etale_cover_model_of_isColi
     push_neg at hcon
     haveI : ∀ {i i' : Jᵒᵖ} (f : i ⟶ i'), IsAffineHom ((D.op ⋙ Scheme.Spec).map f) :=
       fun f => inferInstanceAs (IsAffineHom (Spec.map (D.map f.unop)))
-    obtain ⟨s, hs⟩ := exists_mem_of_isClosed_of_nonempty' (D.op ⋙ Scheme.Spec)
-      (Scheme.Spec.mapCone c.op) (isLimitOfPreserves Scheme.Spec hc.op) (j := op j1)
-      (fun i hij => (Spec.map (D.map hij.unop)) ⁻¹' W)
-      (fun i hij => hW.preimage (Spec.map _).continuous)
-      (fun i hij => hcon _ hij.unop)
-      (fun i hij => (hW.preimage (Spec.map _).continuous).isCompact)
-      (fun i i' hi'i hij x hx => by
-        change Spec.map (D.map hij.unop) (Spec.map (D.map hi'i.unop) x) ∈ W
-        rw [← Scheme.Hom.comp_apply, ← Spec.map_comp, ← D.map_comp]
-        exact hx)
+    obtain ⟨s, hs⟩ :=
+      exists_mem_of_isClosed_of_nonempty' (D.op ⋙ Scheme.Spec) (Scheme.Spec.mapCone c.op)
+        (isLimitOfPreserves Scheme.Spec hc.op) (j := op j1)
+        (fun i hij => (Spec.map (D.map hij.unop)) ⁻¹' W)
+        (fun i hij => hW.preimage (Spec.map _).continuous)
+        (fun i hij => hcon _ hij.unop)
+        (fun i hij => (hW.preimage (Spec.map _).continuous).isCompact)
+        (fun i i' hi'i hij x hx => by
+          change Spec.map (D.map hij.unop) (Spec.map (D.map hi'i.unop) x) ∈ W
+          rw [← Scheme.Hom.comp_apply, ← Spec.map_comp, ← D.map_comp]
+          exact hx)
     have hs1 : Spec.map (c.ι.app j1) s ∈ W := by
       have := hs (op j1) (𝟙 _)
       change Spec.map (D.map (𝟙 j1)) (Spec.map (c.ι.app j1) s) ∈ W at this

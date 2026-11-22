@@ -6,17 +6,22 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 @[expose] public section
 
 open MeasureTheory NumberField Set Filter Topology
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
 open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel PositivityTheory.Rg.Tf.IntegralApplyAeEq
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Adel
+  PositivityTheory.Rg.Tf.IntegralApplyAeEq
 open scoped ENNReal NumberField.AdeleRing InnerProductSpace ComplexConjugate
 open UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial
 
-private theorem tower_point {G : Type*} [Group G] (Γ : Subgroup G) (P : Subgroup Γ) (E : Set G)
-    (hE : ∀ x : G, ∃! γ : P.map Γ.subtype, γ • x ∈ E) (Ψ : G → ℝ≥0∞)
-    (hΨ : ∀ γ ∈ P.map Γ.subtype, ∀ g, Ψ (γ * g) = Ψ g) (y : G) :
-    ∑' γ : Γ, E.indicator Ψ ((γ : G) * y) =
-      ∑' q : Quotient (QuotientGroup.rightRel P), Ψ (((q.out : Γ) : G) * y) := by
+private theorem tower_point
+    {G : Type*} [Group G]
+    (Γ : Subgroup G) (P : Subgroup Γ)
+    (E : Set G) (hE : ∀ x : G, ∃! γ : P.map Γ.subtype, γ • x ∈ E)
+    (Ψ : G → ℝ≥0∞) (hΨ : ∀ γ ∈ P.map Γ.subtype, ∀ g, Ψ (γ * g) = Ψ g)
+    (y : G)
+    : ∑' γ : Γ, E.indicator Ψ ((γ : G) * y)
+      = ∑' q : Quotient (QuotientGroup.rightRel P), Ψ (((q.out : Γ) : G) * y) := by
   classical
   rw [← (Equiv.sigmaFiberEquiv (fun γ : Γ => (Quotient.mk (QuotientGroup.rightRel P) γ))).tsum_eq,
     ENNReal.tsum_sigma']
@@ -41,18 +46,23 @@ private theorem tower_point {G : Type*} [Group G] (Γ : Subgroup G) (P : Subgrou
       refine Quotient.exact ?_
       rw [Quotient.out_eq, hγ]
     rw [QuotientGroup.rightRel_apply] at hrel
-    have h1 := huniq ⟨((γ * q.out⁻¹ : Γ) : G), Subgroup.mem_map.2 ⟨_, hrel, rfl⟩⟩ (by
-      change ((γ * q.out⁻¹ : Γ) : G) * (((q.out : Γ) : G) * y) ∈ E
-      simpa [mul_assoc] using hmem)
+    have h1 :=
+      huniq ⟨((γ * q.out⁻¹ : Γ) : G), Subgroup.mem_map.2 ⟨_, hrel, rfl⟩⟩ (by
+        change ((γ * q.out⁻¹ : Γ) : G) * (((q.out : Γ) : G) * y) ∈ E
+        simpa [mul_assoc] using hmem)
     have h2 : γ * q.out⁻¹ = p := Subtype.ext (congrArg (fun z : P.map Γ.subtype => (z : G)) h1)
     refine Subtype.ext ?_
     change γ = p * q.out
-    rw [← h2]; simp
+    rw [← h2]
+    simp
 
-theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.tower :
-    ∀ {K : Type} [Field K] [NumberField K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure] (E : Set (G1 K (2 + 2))), MeasurableSet E → (∀ x : G1 K (2 + 2), ∃! γ : PK K, γ • x ∈ E) →
-      ∀ Ψ : G1 K (2 + 2) → ℝ≥0∞, Measurable Ψ → (∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g) →
-        ∫⁻ y, ∑' q : Cos K, Ψ ((q.out : G1 K (2 + 2)) * y) ∂fd μ = ∫⁻ g in E, Ψ g ∂μ := by
+theorem UpperTheory.V.Z.InvariantSubmoduleMonicPolynomial.tower
+    : ∀ {K : Type} [Field K] [NumberField K] (μ : Measure (G1 K (2 + 2))) [μ.IsHaarMeasure]
+        (E : Set (G1 K (2 + 2))),
+      MeasurableSet E → (∀ x : G1 K (2 + 2), ∃! γ : PK K, γ • x ∈ E)
+        → ∀ Ψ : G1 K (2 + 2) → ℝ≥0∞,
+          Measurable Ψ → (∀ γ ∈ PK K, ∀ g, Ψ (γ * g) = Ψ g)
+            → ∫⁻ y, ∑' q : Cos K, Ψ ((q.out : G1 K (2 + 2)) * y) ∂fd μ = ∫⁻ g in E, Ψ g ∂μ := by
   intro K _ _ μ _ E hEm hE Ψ hΨm hΨ
   haveI : Countable (Gam K (2 + 2)) := inferInstance
   have hD := isFundamentalDomain_fundamentalDomain (Gam K (2 + 2)) μ

@@ -18,11 +18,13 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.DefectPhase
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
-  {A : Places F E sig} {r k : ℕ} (G : GFrames A r k)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  {sig : E →ₐ[F] E} {A : Places F E sig} {r k : ℕ} (G : GFrames A r k)
 
-theorem amp_eq_finsum (d : G.Dat) (hT : {o : Quot G.LRel | G.IsTerm d o.out}.Finite) (Q : G.Lt → Prop) :
-    G.amp d Q = ∑ o ∈ hT.toFinset, if Q o.out then (G.mu o.out : ℂ) * G.om d o.out else 0 := by
+theorem amp_eq_finsum
+    (d : G.Dat) (hT : {o : Quot G.LRel | G.IsTerm d o.out}.Finite) (Q : G.Lt → Prop)
+    : G.amp d Q = ∑ o ∈ hT.toFinset, if Q o.out then (G.mu o.out : ℂ) * G.om d o.out else 0 := by
   unfold GFrames.amp
   rw [tsum_eq_sum (s := hT.toFinset)]
   · refine Finset.sum_congr rfl fun o ho => ?_
@@ -32,39 +34,58 @@ theorem amp_eq_finsum (d : G.Dat) (hT : {o : Quot G.LRel | G.IsTerm d o.out}.Fin
     have : ¬ G.IsTerm d o.out := fun h => ho (hT.mem_toFinset.2 h)
     simp only [this, false_and, if_false]
 
-theorem finprod_split' {ι : Type} (S1 : Finset ι) (f g : ι → ℂ) (hf : (Function.mulSupport f).Finite)
-    (hfg : ∀ p ∉ S1, f p = g p) :
-    ∏ᶠ p, f p = (∏ p ∈ S1, f p) * ∏ᶠ p, (if p ∈ S1 then 1 else g p) := by
+theorem finprod_split'
+    {ι : Type}
+    (S1 : Finset ι) (f g : ι → ℂ) (hf : (Function.mulSupport f).Finite) (hfg : ∀ p ∉ S1, f p = g p)
+    : ∏ᶠ p, f p = (∏ p ∈ S1, f p) * ∏ᶠ p, (if p ∈ S1 then 1 else g p) := by
   first
   | exact @_root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite
   | exact _root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite
   | (apply _root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite <;> assumption)
-  | (intros; apply _root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite <;> assumption)
-  | (intros; apply @_root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite <;> first | assumption | infer_instance)
+  | (
+      intros
+      apply _root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite <;> assumption
+    )
+  | (
+      intros
+      apply @_root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite
+        <;> first | assumption | infer_instance
+    )
   | (intros; exact _root_.GlobalTheory.FinprodProdMulIte.finprod_eq_prod_mul_finprod_ite ..)
 
-theorem norm_finprod_eq_one {ι : Type} (g : ι → ℂ) (hg : (Function.mulSupport g).Finite)
-    (h1 : ∀ p, ‖g p‖ = 1) : ‖∏ᶠ p, g p‖ = 1 := by
-  rw [finprod_eq_prod_of_mulSupport_subset (s := hg.toFinset) g (fun p hp => hg.mem_toFinset.2 hp), norm_prod]
+theorem norm_finprod_eq_one
+    {ι : Type} (g : ι → ℂ) (hg : (Function.mulSupport g).Finite) (h1 : ∀ p, ‖g p‖ = 1)
+    : ‖∏ᶠ p, g p‖ = 1 := by
+  rw [finprod_eq_prod_of_mulSupport_subset (s := hg.toFinset) g (fun p hp => hg.mem_toFinset.2 hp),
+    norm_prod]
   exact Finset.prod_eq_one fun p _ => h1 p
 
-def cond (d : G.Dat) (B : Finset (HeightOneSpectrum (𝓞 F))) (p : HeightOneSpectrum (𝓞 F)) :
-    Submodule (A.L p).O (G.S p).V → Prop :=
+def cond (d : G.Dat) (B : Finset (HeightOneSpectrum (𝓞 F))) (p : HeightOneSpectrum (𝓞 F))
+    : Submodule (A.L p).O (G.S p).V → Prop :=
   if p ∈ B then fun Λ => ¬ (G.S p).BBzero (d p) Λ else (G.S p).BBzero (d p)
 
-theorem amp_cond (d : G.Dat) (B : Finset (HeightOneSpectrum (𝓞 F))) (p : HeightOneSpectrum (𝓞 F)) :
-    (G.S p).amp (d p) (cond G d B p) = if p ∈ B then (G.S p).amp (d p) (fun Λ => ¬ (G.S p).BBzero (d p) Λ)
-      else (G.S p).amp (d p) ((G.S p).BBzero (d p)) := by
+theorem amp_cond (d : G.Dat) (B : Finset (HeightOneSpectrum (𝓞 F))) (p : HeightOneSpectrum (𝓞 F))
+    : (G.S p).amp (d p) (cond G d B p)
+      = if p ∈ B then
+          (G.S p).amp (d p) (fun Λ => ¬ (G.S p).BBzero (d p) Λ)
+        else
+          (G.S p).amp (d p) ((G.S p).BBzero (d p)) := by
   unfold cond
   split_ifs <;> rfl
 
-theorem cond_pos (d : G.Dat) {B : Finset (HeightOneSpectrum (𝓞 F))} {p : HeightOneSpectrum (𝓞 F)} (h : p ∈ B)
-    (Λ : Submodule (A.L p).O (G.S p).V) : cond G d B p Λ ↔ ¬ (G.S p).BBzero (d p) Λ := by
+theorem cond_pos
+    (d : G.Dat)
+    {B : Finset (HeightOneSpectrum (𝓞 F))} {p : HeightOneSpectrum (𝓞 F)}
+    (h : p ∈ B) (Λ : Submodule (A.L p).O (G.S p).V)
+    : cond G d B p Λ ↔ ¬ (G.S p).BBzero (d p) Λ := by
   unfold cond
   rw [if_pos h]
 
-theorem cond_neg (d : G.Dat) {B : Finset (HeightOneSpectrum (𝓞 F))} {p : HeightOneSpectrum (𝓞 F)} (h : p ∉ B)
-    (Λ : Submodule (A.L p).O (G.S p).V) : cond G d B p Λ ↔ (G.S p).BBzero (d p) Λ := by
+theorem cond_neg
+    (d : G.Dat)
+    {B : Finset (HeightOneSpectrum (𝓞 F))} {p : HeightOneSpectrum (𝓞 F)}
+    (h : p ∉ B) (Λ : Submodule (A.L p).O (G.S p).V)
+    : cond G d B p Λ ↔ (G.S p).BBzero (d p) Λ := by
   unfold cond
   rw [if_neg h]
 

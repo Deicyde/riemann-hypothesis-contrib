@@ -23,8 +23,10 @@ theorem laurent_smooth : (algebraMap ℤ (LaurentPolynomial ℤ)).Smooth := by
   exact RingHom.ext_int _ _
 
 theorem gm_from_smooth : Smooth (specZIsTerminal.from Gm) := by
-  have e : specZIsTerminal.from Gm =
-      Spec.map (CommRingCat.ofHom (algebraMap ℤ (LaurentPolynomial ℤ))) := specZIsTerminal.hom_ext _ _
+  have e
+      : specZIsTerminal.from Gm
+        = Spec.map (CommRingCat.ofHom (algebraMap ℤ (LaurentPolynomial ℤ))) :=
+    specZIsTerminal.hom_ext _ _
   rw [e, HasRingHomProperty.Spec_iff (P := @Smooth)]
   exact laurent_smooth
 

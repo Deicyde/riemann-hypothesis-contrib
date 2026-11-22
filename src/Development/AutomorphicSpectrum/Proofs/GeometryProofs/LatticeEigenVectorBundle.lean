@@ -9,7 +9,8 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.GenMapGermEq
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj GlobalTheory.CompanionTheory.Ar
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  GlobalTheory.CompanionTheory.Ar
 
 noncomputable section
 
@@ -21,19 +22,23 @@ section Local
 
 variable {Ω : Type} [Field Ω] {E : Type} [AddCommGroup E] [Module Ω E]
 
-theorem exists_frame_of_proj (R : Subring Ω) [IsLocalRing R] (M : Submodule R E) {g : ℕ} (b : Fin g → E)
-    (hb : LinearIndependent Ω b) (hspan : Submodule.span Ω (Set.range b) = ⊤)
-    (hM : M = Submodule.span R (Set.range b)) (e : E →ₗ[Ω] E) (he : e ∘ₗ e = e) (hMe : ∀ v ∈ M, e v ∈ M) :
-    ∃ (r r' : ℕ) (f : Fin r → E) (f' : Fin r' → E),
-      LinearIndependent Ω (Sum.elim f f') ∧ Submodule.span Ω (Set.range (Sum.elim f f')) = ⊤ ∧
-      Submodule.span R (Set.range (Sum.elim f f')) = M ∧ (∀ i, e (f i) = f i) ∧ (∀ i, e (f' i) = 0) := by
+theorem exists_frame_of_proj
+    (R : Subring Ω) [IsLocalRing R]
+    (M : Submodule R E)
+    {g : ℕ} (b : Fin g → E) (hb : LinearIndependent Ω b)
+    (hspan : Submodule.span Ω (Set.range b) = ⊤) (hM : M = Submodule.span R (Set.range b))
+    (e : E →ₗ[Ω] E) (he : e ∘ₗ e = e) (hMe : ∀ v ∈ M, e v ∈ M)
+    : ∃ (r r' : ℕ) (f : Fin r → E) (f' : Fin r' → E),
+      LinearIndependent Ω (Sum.elim f f') ∧ Submodule.span Ω (Set.range (Sum.elim f f')) = ⊤
+        ∧ Submodule.span R (Set.range (Sum.elim f f')) = M ∧ (∀ i, e (f i) = f i)
+        ∧ (∀ i, e (f' i) = 0) := by
   classical
   have hee : ∀ v, e (e v) = e v := fun v => LinearMap.congr_fun he v
-  have hbR : LinearIndependent R b := hb.restrict_scalars (by
-    intro x y hxy
-    simpa [Subring.smul_def] using hxy)
-  let bM : Basis (Fin g) R M := by
-    rw [hM]; exact Basis.span hbR
+  have hbR : LinearIndependent R b :=
+    hb.restrict_scalars (by
+      intro x y hxy
+      simpa [Subring.smul_def] using hxy)
+  let bM : Basis (Fin g) R M := by rw [hM]; exact Basis.span hbR
   haveI : Module.Free R M := Module.Free.of_basis bM
   haveI : Module.Finite R M := Module.Finite.of_basis bM
 
@@ -41,8 +46,10 @@ theorem exists_frame_of_proj (R : Subring Ω) [IsLocalRing R] (M : Submodule R E
   have hPP : ∀ m, P (P m) = P m := fun m => Subtype.ext (hee m)
   let Q : M →ₗ[R] M := LinearMap.id - P
   have hQQ : ∀ m, Q (Q m) = Q m := fun m => by simp [Q, hPP]
-  have key : ∀ (A : M →ₗ[R] M), (∀ m, A (A m) = A m) →
-      Module.Free R (LinearMap.range A) ∧ Module.Finite R (LinearMap.range A) := by
+  have key
+      : ∀ (A : M →ₗ[R] M),
+        (∀ m, A (A m) = A m)
+          → Module.Free R (LinearMap.range A) ∧ Module.Finite R (LinearMap.range A) := by
     intro A hA
     let π : M →ₗ[R] LinearMap.range A := A.rangeRestrict
     let inc : LinearMap.range A →ₗ[R] M := (LinearMap.range A).subtype
@@ -68,14 +75,18 @@ theorem exists_frame_of_proj (R : Subring Ω) [IsLocalRing R] (M : Submodule R E
     obtain ⟨m, hm⟩ := (B' i).2
     have : f' i = (m : E) - e m := by simp only [f']; rw [← hm]; rfl
     rw [this, map_sub, hee, sub_self]
-  have hinl : ∀ n : LinearMap.range P, ((n : M) : E) ∈ Submodule.span R (Set.range (Sum.elim f f')) := by
+  have hinl
+      : ∀ n : LinearMap.range P, ((n : M) : E) ∈ Submodule.span R (Set.range (Sum.elim f f')) := by
     intro n
-    have hmem := Submodule.mem_map_of_mem (f := M.subtype ∘ₗ (LinearMap.range P).subtype) (B.mem_span n)
+    have hmem :=
+      Submodule.mem_map_of_mem (f := M.subtype ∘ₗ (LinearMap.range P).subtype) (B.mem_span n)
     rw [Submodule.map_span, ← Set.range_comp] at hmem
     exact Submodule.span_mono (by rintro _ ⟨i, rfl⟩; exact ⟨Sum.inl i, rfl⟩) hmem
-  have hinr : ∀ n : LinearMap.range Q, ((n : M) : E) ∈ Submodule.span R (Set.range (Sum.elim f f')) := by
+  have hinr
+      : ∀ n : LinearMap.range Q, ((n : M) : E) ∈ Submodule.span R (Set.range (Sum.elim f f')) := by
     intro n
-    have hmem := Submodule.mem_map_of_mem (f := M.subtype ∘ₗ (LinearMap.range Q).subtype) (B'.mem_span n)
+    have hmem :=
+      Submodule.mem_map_of_mem (f := M.subtype ∘ₗ (LinearMap.range Q).subtype) (B'.mem_span n)
     rw [Submodule.map_span, ← Set.range_comp] at hmem
     exact Submodule.span_mono (by rintro _ ⟨i, rfl⟩; exact ⟨Sum.inr i, rfl⟩) hmem
   have hspanR : Submodule.span R (Set.range (Sum.elim f f')) = M := by
@@ -85,8 +96,9 @@ theorem exists_frame_of_proj (R : Subring Ω) [IsLocalRing R] (M : Submodule R E
       · exact (B i : M).2
       · exact (B' i : M).2
     · intro v hv
-      have h := add_mem (hinl ⟨P ⟨v, hv⟩, LinearMap.mem_range_self _ _⟩)
-        (hinr ⟨Q ⟨v, hv⟩, LinearMap.mem_range_self _ _⟩)
+      have h :=
+        add_mem (hinl ⟨P ⟨v, hv⟩, LinearMap.mem_range_self _ _⟩)
+          (hinr ⟨Q ⟨v, hv⟩, LinearMap.mem_range_self _ _⟩)
       simpa [Q] using h
   have hspanΩ : Submodule.span Ω (Set.range (Sum.elim f f')) = ⊤ := by
     rw [eq_top_iff, ← hspan, Submodule.span_le]
@@ -94,18 +106,19 @@ theorem exists_frame_of_proj (R : Subring Ω) [IsLocalRing R] (M : Submodule R E
     have h1 : b i ∈ M := hM ▸ Submodule.subset_span ⟨i, rfl⟩
     rw [← hspanR] at h1
     exact Submodule.span_subset_span R Ω _ h1
-  let eqv : M ≃ₗ[R] (LinearMap.range P × LinearMap.range Q) := LinearEquiv.ofLinear
-    (P.rangeRestrict.prod Q.rangeRestrict)
-    ((LinearMap.range P).subtype.coprod (LinearMap.range Q).subtype)
-    (by
-      have hPQ : ∀ m, P (Q m) = 0 := fun m => by simp [Q, hPP]
-      have hQP : ∀ m, Q (P m) = 0 := fun m => by simp [Q, hPP]
-      apply LinearMap.ext
-      rintro ⟨⟨_, m, rfl⟩, ⟨_, m', rfl⟩⟩
-      apply Prod.ext <;> apply Subtype.ext <;> simp [hPP, hQQ, hPQ, hQP])
-    (by ext m; simp [Q])
+  let eqv : M ≃ₗ[R] (LinearMap.range P × LinearMap.range Q) :=
+    LinearEquiv.ofLinear (P.rangeRestrict.prod Q.rangeRestrict)
+      ((LinearMap.range P).subtype.coprod (LinearMap.range Q).subtype)
+      (by
+        have hPQ : ∀ m, P (Q m) = 0 := fun m => by simp [Q, hPP]
+        have hQP : ∀ m, Q (P m) = 0 := fun m => by simp [Q, hPP]
+        apply LinearMap.ext
+        rintro ⟨⟨_, m, rfl⟩, ⟨_, m', rfl⟩⟩
+        apply Prod.ext <;> apply Subtype.ext <;> simp [hPP, hQQ, hPQ, hQP])
+      (by ext m; simp [Q])
   have hcard : finrank R (LinearMap.range P) + finrank R (LinearMap.range Q) = g := by
-    rw [← Module.finrank_prod, ← LinearEquiv.finrank_eq eqv, Module.finrank_eq_card_basis bM, Fintype.card_fin]
+    rw [← Module.finrank_prod, ← LinearEquiv.finrank_eq eqv, Module.finrank_eq_card_basis bM,
+      Fintype.card_fin]
   haveI : FiniteDimensional Ω E := Module.Finite.of_basis (Basis.mk hb hspan.ge)
   have hfin : finrank Ω E = g := by
     have := finrank_span_eq_card hb
@@ -118,28 +131,31 @@ end Local
 
 section Near
 
-variable {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-  {E : Type} [AddCommGroup E] [Module Ω E]
+variable
+  {X : Scheme.{0}} {Ω : Type} [Field Ω]
+  {ξ : Spec (CommRingCat.of Ω) ⟶ X} {E : Type} [AddCommGroup E] [Module Ω E]
 
 theorem isLocalRing_regAt (p : Cpt ξ) : IsLocalRing (regAt ξ p) :=
   IsLocalRing.of_surjective' (genMap ξ p).rangeRestrict (genMap ξ p).rangeRestrict_surjective
 
-theorem exists_open_forall_mem_regAt (p : Cpt ξ) {κ : Type} [Finite κ] (a : κ → Ω)
-    (ha : ∀ j, a j ∈ regAt ξ p) :
-    ∃ U : X.Opens, p.1 ∈ U ∧ ∀ q : Cpt ξ, q.1 ∈ U → ∀ j, a j ∈ regAt ξ q := by
+theorem exists_open_forall_mem_regAt
+    (p : Cpt ξ) {κ : Type} [Finite κ] (a : κ → Ω) (ha : ∀ j, a j ∈ regAt ξ p)
+    : ∃ U : X.Opens, p.1 ∈ U ∧ ∀ q : Cpt ξ, q.1 ∈ U → ∀ j, a j ∈ regAt ξ q := by
   choose U hU hq using fun j => exists_open_mem_regAt ξ p (a j) (ha j)
   refine ⟨⟨⋂ j, (U j : Set X), isOpen_iInter_of_finite fun j => (U j).isOpen⟩, ?_, ?_⟩
   · exact Set.mem_iInter.2 hU
   · intro q hq' j
     exact hq j q (Set.mem_iInter.1 hq' j)
 
-theorem exists_open_mem_span (p : Cpt ξ) {J κ : Type} [Fintype J] [Fintype κ] (x : J → E) (y : κ → E)
-    (h : ∀ i, x i ∈ Submodule.span (regAt ξ p) (Set.range y)) :
-    ∃ U : X.Opens, p.1 ∈ U ∧ ∀ q : Cpt ξ, q.1 ∈ U → ∀ i,
-      x i ∈ Submodule.span (regAt ξ q) (Set.range y) := by
+theorem exists_open_mem_span
+    (p : Cpt ξ)
+    {J κ : Type} [Fintype J] [Fintype κ]
+    (x : J → E) (y : κ → E) (h : ∀ i, x i ∈ Submodule.span (regAt ξ p) (Set.range y))
+    : ∃ U : X.Opens,
+      p.1 ∈ U ∧ ∀ q : Cpt ξ, q.1 ∈ U → ∀ i, x i ∈ Submodule.span (regAt ξ q) (Set.range y) := by
   choose c hc using fun i => (Submodule.mem_span_range_iff_exists_fun (regAt ξ p)).1 (h i)
-  obtain ⟨U, hU, hq⟩ := exists_open_forall_mem_regAt p (fun ij : J × κ => (c ij.1 ij.2 : Ω))
-    (fun ij => (c ij.1 ij.2).2)
+  obtain ⟨U, hU, hq⟩ :=
+    exists_open_forall_mem_regAt p (fun ij : J × κ => (c ij.1 ij.2 : Ω)) (fun ij => (c ij.1 ij.2).2)
   refine ⟨U, hU, fun q hqU i => ?_⟩
   rw [← hc i]
   refine Submodule.sum_mem _ fun j _ => ?_
@@ -147,10 +163,15 @@ theorem exists_open_mem_span (p : Cpt ξ) {J κ : Type} [Fintype J] [Fintype κ]
   rw [h1]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
-theorem map_mem_span_elim {S : Type} [Semiring S] [Module S E] (e : E →ₗ[S] E) {J J' : Type}
-    (f : J → E) (f' : J' → E) (hf : ∀ i, e (f i) = f i) (hf' : ∀ i, e (f' i) = 0) {w : E}
-    (hw : w ∈ Submodule.span S (Set.range (Sum.elim f f'))) : e w ∈ Submodule.span S (Set.range f) := by
-  have h : Submodule.span S (Set.range (Sum.elim f f')) ≤ (Submodule.span S (Set.range f)).comap e := by
+theorem map_mem_span_elim
+    {S : Type} [Semiring S] [Module S E]
+    (e : E →ₗ[S] E)
+    {J J' : Type} (f : J → E) (f' : J' → E) (hf : ∀ i, e (f i) = f i) (hf' : ∀ i, e (f' i) = 0)
+    {w : E} (hw : w ∈ Submodule.span S (Set.range (Sum.elim f f')))
+    : e w ∈ Submodule.span S (Set.range f) := by
+  have h
+      : Submodule.span S (Set.range (Sum.elim f f'))
+        ≤ (Submodule.span S (Set.range f)).comap e := by
     rw [Submodule.span_le]
     rintro _ ⟨i | i, rfl⟩
     · simp only [Sum.elim_inl, SetLike.mem_coe, Submodule.mem_comap, hf]
@@ -159,9 +180,12 @@ theorem map_mem_span_elim {S : Type} [Semiring S] [Module S E] (e : E →ₗ[S] 
       exact Submodule.zero_mem _
   exact h hw
 
-theorem isVBOn_inter_range (L : Lat ξ E) (T : Set (Cpt ξ)) (g : ℕ) (e : E →ₗ[Ω] E) (he : e ∘ₗ e = e)
-    (hVB : L.IsVBOn T g ⊤) (hs : ∀ p ∈ T, ∀ v ∈ L p, e v ∈ L p) :
-    (L.inter (LinearMap.range e)).IsVBOn T (finrank Ω (LinearMap.range e)) (LinearMap.range e) := by
+theorem isVBOn_inter_range
+    (L : Lat ξ E) (T : Set (Cpt ξ)) (g : ℕ)
+    (e : E →ₗ[Ω] E) (he : e ∘ₗ e = e)
+    (hVB : L.IsVBOn T g ⊤) (hs : ∀ p ∈ T, ∀ v ∈ L p, e v ∈ L p)
+    : (L.inter (LinearMap.range e)).IsVBOn T (finrank Ω (LinearMap.range e))
+      (LinearMap.range e) := by
   intro p hp
   obtain ⟨U, hpU, b, hbs, hfr⟩ := hVB p hp
   obtain ⟨hbi, hbp⟩ := hfr p hp hpU
@@ -169,8 +193,7 @@ theorem isVBOn_inter_range (L : Lat ξ E) (T : Set (Cpt ξ)) (g : ℕ) (e : E �
   obtain ⟨r, r', f, f', hli, hsp, hsR, hfe, hfe'⟩ :=
     exists_frame_of_proj (regAt ξ p) (L p) b hbi hbs hbp e he (hs p hp)
   have hee : ∀ v, e (e v) = e v := fun v => LinearMap.congr_fun he v
-  have hfli : LinearIndependent Ω f := by
-    simpa using hli.comp _ Sum.inl_injective
+  have hfli : LinearIndependent Ω f := by simpa using hli.comp _ Sum.inl_injective
   have hV : Submodule.span Ω (Set.range f) = LinearMap.range e := by
     apply le_antisymm
     · rw [Submodule.span_le]
@@ -183,12 +206,14 @@ theorem isVBOn_inter_range (L : Lat ξ E) (T : Set (Cpt ξ)) (g : ℕ) (e : E �
     rw [hV, Fintype.card_fin] at this
     exact this.symm
   subst hr
-  obtain ⟨U₁, h₁, k₁⟩ := exists_open_mem_span p (Sum.elim f f') b (fun i => by
-    rw [← hbp, ← hsR]
-    exact Submodule.subset_span ⟨i, rfl⟩)
-  obtain ⟨U₂, h₂, k₂⟩ := exists_open_mem_span p b (Sum.elim f f') (fun i => by
-    rw [hsR, hbp]
-    exact Submodule.subset_span ⟨i, rfl⟩)
+  obtain ⟨U₁, h₁, k₁⟩ :=
+    exists_open_mem_span p (Sum.elim f f') b (fun i => by
+      rw [← hbp, ← hsR]
+      exact Submodule.subset_span ⟨i, rfl⟩)
+  obtain ⟨U₂, h₂, k₂⟩ :=
+    exists_open_mem_span p b (Sum.elim f f') (fun i => by
+      rw [hsR, hbp]
+      exact Submodule.subset_span ⟨i, rfl⟩)
   refine ⟨U ⊓ U₁ ⊓ U₂, ⟨⟨hpU, h₁⟩, h₂⟩, f, hV, fun q hq hqU => ⟨hfli, ?_⟩⟩
   obtain ⟨⟨hqU0, hqU1⟩, hqU2⟩ := hqU
   have hLq : L q = Submodule.span (regAt ξ q) (Set.range b) := (hfr q hq hqU0).2
@@ -216,7 +241,8 @@ section Field
 
 variable (F : Type) [Field F] [NumberField F]
 
-theorem injective_of_charZero {Ω : Type} [Field Ω] [CharZero Ω] (σ : 𝓞 F →+* Ω) : Function.Injective σ := by
+theorem injective_of_charZero {Ω : Type} [Field Ω] [CharZero Ω] (σ : 𝓞 F →+* Ω)
+    : Function.Injective σ := by
   rw [RingHom.injective_iff_ker_eq_bot]
   apply Ideal.eq_bot_of_comap_eq_bot (R := ℤ)
   rw [eq_bot_iff]
@@ -232,15 +258,28 @@ theorem discr_mem_differentIdeal : (((discr F : ℤ) : 𝓞 F)) ∈ differentIde
   · have : ((discr F : ℤ) : 𝓞 F) = (((discr F).natAbs : ℕ) : 𝓞 F) := by
       conv_lhs => rw [h']
       simp
-    rw [this]; exact h
+    rw [this]
+    exact h
   · have : ((discr F : ℤ) : 𝓞 F) = -(((discr F).natAbs : ℕ) : 𝓞 F) := by
       conv_lhs => rw [h']
       simp
-    rw [this]; exact neg_mem h
+    rw [this]
+    exact neg_mem h
 
 end Field
 
-theorem isVBOn_eigSp : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type) [AddCommGroup E] [Module Ω E] (F : Type) [Field F] [NumberField F] (ρ : NumberField.RingOfIntegers F →+* Module.End Ω E) (L : Lat ξ E) (T : Set (Cpt ξ)) (g : ℕ) (I : Type) [Fintype I] (σ : I → (NumberField.RingOfIntegers F →+* Ω)), IsCptGen ξ → Function.Injective σ → Fintype.card I = Module.finrank ℚ F → [CharZero Ω] → L.IsVBOn T g ⊤ → (∀ p ∈ T, ∀ a, ∀ e ∈ L p, ρ a e ∈ L p) → (∀ p ∈ T, ∀ s a, σ s a ∈ regAt ξ p) → (∀ p ∈ T, unitAt ξ p ((NumberField.discr F : ℤ) : Ω)) → (∀ s, (L.inter (eigSp ρ (σ s))).IsVBOn T (Module.finrank Ω (eigSp ρ (σ s))) (eigSp ρ (σ s))) ∧ ∀ p ∈ T, L p = ⨆ s, (L.inter (eigSp ρ (σ s))) p := by
+theorem isVBOn_eigSp
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X) (E : Type)
+        [AddCommGroup E] [Module Ω E] (F : Type) [Field F] [NumberField F]
+        (ρ : NumberField.RingOfIntegers F →+* Module.End Ω E) (L : Lat ξ E) (T : Set (Cpt ξ))
+        (g : ℕ) (I : Type) [Fintype I] (σ : I → (NumberField.RingOfIntegers F →+* Ω)),
+      IsCptGen ξ → Function.Injective σ → Fintype.card I = Module.finrank ℚ F → [CharZero Ω]
+        → L.IsVBOn T g ⊤ → (∀ p ∈ T, ∀ a, ∀ e ∈ L p, ρ a e ∈ L p)
+        → (∀ p ∈ T, ∀ s a, σ s a ∈ regAt ξ p)
+        → (∀ p ∈ T, unitAt ξ p ((NumberField.discr F : ℤ) : Ω))
+        → (∀ s,
+            (L.inter (eigSp ρ (σ s))).IsVBOn T (Module.finrank Ω (eigSp ρ (σ s))) (eigSp ρ (σ s)))
+          ∧ ∀ p ∈ T, L p = ⨆ s, (L.inter (eigSp ρ (σ s))) p := by
   intro X Ω _ ξ E _ _ F _ _ ρ L T g I _ σ _ hσ hcard _ hVB hst hreg hdisc
   classical
   let τ : I → (F →+* Ω) := fun s => IsFractionRing.lift (injective_of_charZero F (σ s))

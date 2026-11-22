@@ -12,11 +12,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTool
 
 open IsLocalRing UpperTheory.V.AlgebraTools.Conn
 
-theorem UpperTheory.V.AlgebraTools.Conn.one :
-    ∀ {R : Type} [CommRing R] [IsLocalRing R] [IsDomain R], HasBase R → ∀ (f : R) (b c : Ideal R), f ∈ maximalIdeal R →
-      (b ⊓ c).radical = (Ideal.span {f}).radical → b ≠ ⊤ → c ≠ ⊤ →
-      ringKrullDim (R ⧸ (b ⊔ c)) < ringKrullDim (R ⧸ b) → ringKrullDim (R ⧸ (b ⊔ c)) < ringKrullDim (R ⧸ c) →
-      ringKrullDim R ≤ ringKrullDim (R ⧸ (b ⊔ c)) + 2 := by
+theorem UpperTheory.V.AlgebraTools.Conn.one
+    : ∀ {R : Type} [CommRing R] [IsLocalRing R] [IsDomain R],
+      HasBase R
+        → ∀ (f : R) (b c : Ideal R),
+          f ∈ maximalIdeal R → (b ⊓ c).radical = (Ideal.span {f}).radical → b ≠ ⊤ → c ≠ ⊤
+            → ringKrullDim (R ⧸ (b ⊔ c)) < ringKrullDim (R ⧸ b)
+            → ringKrullDim (R ⧸ (b ⊔ c)) < ringKrullDim (R ⧸ c)
+            → ringKrullDim R ≤ ringKrullDim (R ⧸ (b ⊔ c)) + 2 := by
   intro R _ _ _ hB f b c hf hrad hb hc hdb hdc
   obtain ⟨A, _, _, i, hA, hinj, hfin⟩ := hB
   letI : Algebra A R := i.toAlgebra
@@ -31,7 +34,9 @@ theorem UpperTheory.V.AlgebraTools.Conn.one :
     have hbc : b ⊓ c ≤ ⊥ := by
       intro x hx
       have : x ∈ (b ⊓ c).radical := Ideal.le_radical hx
-      rw [hrad, Ideal.span_singleton_eq_bot.mpr rfl, Ideal.radical_eq_iff.mpr (Ideal.isPrime_bot).isRadical] at this
+      rw [hrad, Ideal.span_singleton_eq_bot.mpr rfl,
+          Ideal.radical_eq_iff.mpr (Ideal.isPrime_bot).isRadical]
+        at this
       exact this
     have hprod : b * c = ⊥ := le_bot_iff.mp (le_trans Ideal.mul_le_inf hbc)
     rcases Ideal.mul_eq_bot.mp hprod with h | h
@@ -55,18 +60,22 @@ theorem UpperTheory.V.AlgebraTools.Conn.one :
     intro hu
     have : IsUnit f := hu.map (Algebra.adjoin A {f}).val
     exact ((mem_maximalIdeal f).mp hf) this
-  have hdim : ringKrullDim (Algebra.adjoin A {f} ⧸ Ideal.ofList [x]) + ↑([x].length) =
-      ringKrullDim (Algebra.adjoin A {f}) := by
+  have hdim
+      : ringKrullDim (Algebra.adjoin A {f} ⧸ Ideal.ofList [x]) + ↑([x].length)
+        = ringKrullDim (Algebra.adjoin A {f}) := by
     have hsp : Ideal.ofList [x] = Ideal.span {x} := by simp [Ideal.ofList]
     rw [hsp]
     apply ringKrullDim_quotient_span_singleton_succ_eq_ringKrullDim_of_mem_jacobson
     · exact IsSMulRegular.of_ne_zero hx0
     · rw [IsLocalRing.ringJacobson_eq_maximalIdeal]
       exact hxm
-  have hmap : Ideal.map (algebraMap (Algebra.adjoin A {f}) R) (Ideal.ofList [x]) = Ideal.span {f} := by
+  have hmap
+      : Ideal.map (algebraMap (Algebra.adjoin A {f}) R) (Ideal.ofList [x]) = Ideal.span {f} := by
     simp [Ideal.ofList, Ideal.map_span]
     rfl
-  have key := cut (A := Algebra.adjoin A {f}) (R := R) hcm [x] b c (by simpa using hxm) hdim (hmap ▸ hrad) hb hc hdb hdc
+  have key :=
+    cut (A := Algebra.adjoin A {f}) (R := R) hcm [x] b c (by simpa using hxm) hdim (hmap ▸ hrad) hb
+      hc hdb hdc
   simp only [List.length_singleton, Nat.cast_one] at key
   rw [add_assoc] at key
   exact key

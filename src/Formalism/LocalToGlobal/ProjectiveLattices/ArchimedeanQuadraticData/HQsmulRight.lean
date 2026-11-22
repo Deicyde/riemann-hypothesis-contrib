@@ -24,30 +24,35 @@ theorem sgn_conj (p : ℕ) (a : Fin r) : conj (sgn p a) = sgn p a := by
   unfold sgn
   split_ifs <;> simp
 
-theorem embVec_add (τ : K →+* ℂ) (x y : Fin r → K) : embVec τ (x + y) = embVec τ x + embVec τ y := by
+theorem embVec_add (τ : K →+* ℂ) (x y : Fin r → K)
+    : embVec τ (x + y) = embVec τ x + embVec τ y := by
   ext a
   simp [embVec]
 
-theorem embVec_smul (τ : K →+* ℂ) (c : K) (x : Fin r → K) : embVec τ (c • x) = τ c • embVec τ x := by
+theorem embVec_smul (τ : K →+* ℂ) (c : K) (x : Fin r → K)
+    : embVec τ (c • x) = τ c • embVec τ x := by
   ext a
   simp [embVec]
 
-theorem embVec_qsmul (τ : K →+* ℂ) (q : ℚ) (x : Fin r → K) : embVec τ (q • x) = (q : ℂ) • embVec τ x := by
+theorem embVec_qsmul (τ : K →+* ℂ) (q : ℚ) (x : Fin r → K)
+    : embVec τ (q • x) = (q : ℂ) • embVec τ x := by
   ext a
   simp [embVec, Rat.smul_def, map_ratCast]
 
-theorem Phi_add (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ) (x y : Fin r → K) :
-    Phi σ Q (x + y) = Phi σ Q x + Phi σ Q y := by
+theorem Phi_add (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ) (x y : Fin r → K)
+    : Phi σ Q (x + y) = Phi σ Q x + Phi σ Q y := by
   ext i a
   simp [Phi, embVec_add, Matrix.mulVec_add]
 
-theorem Phi_qsmul (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ) (q : ℚ) (x : Fin r → K) :
-    Phi σ Q (q • x) = ((q : ℝ) : ℂ) • Phi σ Q x := by
+theorem Phi_qsmul (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ) (q : ℚ) (x : Fin r → K)
+    : Phi σ Q (q • x) = ((q : ℝ) : ℂ) • Phi σ Q x := by
   ext i a
   simp [Phi, embVec_qsmul, Matrix.mulVec_smul, Complex.ofReal_ratCast]
 
-theorem Phi_sum (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ) {κ : Type} (s : Finset κ)
-    (x : κ → Fin r → K) : Phi σ Q (∑ j ∈ s, x j) = ∑ j ∈ s, Phi σ Q (x j) := by
+theorem Phi_sum
+    (σ : ι → K →+* ℂ) (Q : ι → Matrix (Fin r) (Fin r) ℂ)
+    {κ : Type} (s : Finset κ) (x : κ → Fin r → K)
+    : Phi σ Q (∑ j ∈ s, x j) = ∑ j ∈ s, Phi σ Q (x j) := by
   exact map_sum (AddMonoidHom.mk' (Phi σ Q) (Phi_add σ Q)) x s
 
 section Herm
@@ -78,12 +83,12 @@ theorem h_qsmul_right (q : ℚ) (x y : Fin r → K) : S.h x (q • y) = (q : K) 
   have hq : q • y = (q : K) • y := by ext a; simp [Rat.smul_def]
   rw [hq, h_smul_right]
 
-theorem h_sum_left {κ : Type} (s : Finset κ) (x : κ → Fin r → K) (y : Fin r → K) :
-    S.h (∑ j ∈ s, x j) y = ∑ j ∈ s, S.h (x j) y := by
+theorem h_sum_left {κ : Type} (s : Finset κ) (x : κ → Fin r → K) (y : Fin r → K)
+    : S.h (∑ j ∈ s, x j) y = ∑ j ∈ s, S.h (x j) y := by
   exact map_sum (AddMonoidHom.mk' (fun x => S.h x y) (fun a b => h_add_left S a b y)) x s
 
-theorem h_sum_right {κ : Type} (s : Finset κ) (x : Fin r → K) (y : κ → Fin r → K) :
-    S.h x (∑ j ∈ s, y j) = ∑ j ∈ s, S.h x (y j) := by
+theorem h_sum_right {κ : Type} (s : Finset κ) (x : Fin r → K) (y : κ → Fin r → K)
+    : S.h x (∑ j ∈ s, y j) = ∑ j ∈ s, S.h x (y j) := by
   exact map_sum (AddMonoidHom.mk' (fun y => S.h x y) (fun a b => h_add_right S x a b)) y s
 
 end Herm

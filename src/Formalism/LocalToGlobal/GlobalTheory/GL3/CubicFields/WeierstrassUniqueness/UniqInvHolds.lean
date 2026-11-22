@@ -17,8 +17,11 @@ open Formalism.BasicNotions (D7)
 open Formalism.L2.GlobalTheoryTheory.IntegralLatticeDensity (IsLat jL Uniformization CMTransitive)
 open Formalism.MainNotions.TaylorLogMetric (lamOf)
 
-theorem uniqLat_holds (Λ Λ' : AddSubgroup ℂ) (hΛ : IsLat Λ) (hΛ' : IsLat Λ')
-    (h2 : Formalism.MainNotions.TaylorLogMetric.g2 Λ = Formalism.MainNotions.TaylorLogMetric.g2 Λ') (h3 : Formalism.MainNotions.TaylorLogMetric.g3 Λ = Formalism.MainNotions.TaylorLogMetric.g3 Λ') : Λ = Λ' := by
+theorem uniqLat_holds
+    (Λ Λ' : AddSubgroup ℂ) (hΛ : IsLat Λ) (hΛ' : IsLat Λ')
+    (h2 : Formalism.MainNotions.TaylorLogMetric.g2 Λ = Formalism.MainNotions.TaylorLogMetric.g2 Λ')
+    (h3 : Formalism.MainNotions.TaylorLogMetric.g3 Λ = Formalism.MainNotions.TaylorLogMetric.g3 Λ')
+    : Λ = Λ' := by
   obtain ⟨L, hL⟩ := exists_periodPair_of_isLat Λ hΛ
   obtain ⟨L', hL'⟩ := exists_periodPair_of_isLat Λ' hΛ'
   obtain ⟨a2, a3⟩ := g2_g3_eq_periodPair Λ L hL

@@ -7,10 +7,10 @@ public import Mathlib
 
 namespace Bl.general_b_fact_upper_bis_form
 
-theorem goal1 :
-  ∀ {n : Nat} (f : Fin n → Rat),
-  (∀ (i i' : Fin n), LT.lt.{0} i i' → LT.lt.{0} 0 (f i') → LT.lt.{0} 0 (f i)) →
-    ∀ (i : Fin n), Iff (LT.lt.{0} 0 (f i)) (LT.lt.{0} i.val (PI.FJM.nP f))  := by
+theorem goal1
+    : ∀ {n : Nat} (f : Fin n → Rat),
+      (∀ (i i' : Fin n), LT.lt.{0} i i' → LT.lt.{0} 0 (f i') → LT.lt.{0} 0 (f i))
+        → ∀ (i : Fin n), Iff (LT.lt.{0} 0 (f i)) (LT.lt.{0} i.val (PI.FJM.nP f)) := by
   intro n f hmono i
   unfold PI.FJM.nP
   constructor

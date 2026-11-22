@@ -8,12 +8,15 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.MemIwUIf
 
 @[expose] public section
 
-open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct GlobalTheory.CompanionTheory.SatPow
+open GlobalTheory.PRep Formalism.UG GlobalTheory.LFun PositivityTheory.SphericalProduct
+  GlobalTheory.CompanionTheory.SatPow
 
 namespace GlobalTheory.CompanionTheory.SatPow
 
-theorem functional_eq_zero_of_late_iterates :
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (A : V →ₗ[ℂ] V), Function.Injective A → ∀ (l : V →ₗ[ℂ] ℂ) (v : V) (j₀ : ℕ), (∀ j ≥ j₀, l ((A ^ j) v) = 0) → l v = 0 := by
+theorem functional_eq_zero_of_late_iterates
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (A : V →ₗ[ℂ] V),
+      Function.Injective A
+        → ∀ (l : V →ₗ[ℂ] ℂ) (v : V) (j₀ : ℕ), (∀ j ≥ j₀, l ((A ^ j) v) = 0) → l v = 0 := by
   intro V _ _ _ A hA l v j₀ h
   let U : Submodule ℂ V := Submodule.span ℂ (Set.range fun i : ℕ => (A ^ (i + j₀)) v)
   have hUl : U ≤ LinearMap.ker l := by

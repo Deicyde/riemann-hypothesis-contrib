@@ -17,28 +17,31 @@ open scoped Pointwise
 
 variable {K L : Type} [Field K] [NumberField K] [Field L] [NumberField L] [Algebra K L]
 
-theorem heckeIdeal_prime_pow (χ : (L ≃ₐ[K] L) →* ℂˣ) (𝔮 : HeightOneSpectrum (𝓞 K)) (f : ℕ) :
-    heckeIdeal L χ (𝔮.asIdeal ^ f) = heckeVal L χ 𝔮 ^ f := by
+theorem heckeIdeal_prime_pow (χ : (L ≃ₐ[K] L) →* ℂˣ) (𝔮 : HeightOneSpectrum (𝓞 K)) (f : ℕ)
+    : heckeIdeal L χ (𝔮.asIdeal ^ f) = heckeVal L χ 𝔮 ^ f := by
   unfold heckeIdeal
   rw [finprod_eq_single _ 𝔮]
-  · rw [Associates.mk_pow, Associates.count_pow (Associates.mk_ne_zero.mpr 𝔮.ne_bot)
-      (HeightOneSpectrum.associates_irreducible 𝔮), Associates.count_self
-      (HeightOneSpectrum.associates_irreducible 𝔮), mul_one]
+  · rw [Associates.mk_pow,
+      Associates.count_pow (Associates.mk_ne_zero.mpr 𝔮.ne_bot)
+        (HeightOneSpectrum.associates_irreducible 𝔮),
+      Associates.count_self (HeightOneSpectrum.associates_irreducible 𝔮), mul_one]
   · intro 𝔭 h𝔭
     have hne : Associates.mk 𝔭.asIdeal ≠ Associates.mk 𝔮.asIdeal := by
       intro h
       apply h𝔭
       rw [Associates.mk_eq_mk_iff_associated, associated_iff_eq] at h
       exact HeightOneSpectrum.ext h
-    rw [Associates.mk_pow, Associates.count_pow (Associates.mk_ne_zero.mpr 𝔮.ne_bot)
-      (HeightOneSpectrum.associates_irreducible 𝔭), Associates.count_eq_zero_of_ne
-      (HeightOneSpectrum.associates_irreducible 𝔭) (HeightOneSpectrum.associates_irreducible 𝔮) hne,
+    rw [Associates.mk_pow,
+      Associates.count_pow (Associates.mk_ne_zero.mpr 𝔮.ne_bot)
+        (HeightOneSpectrum.associates_irreducible 𝔭),
+      Associates.count_eq_zero_of_ne (HeightOneSpectrum.associates_irreducible 𝔭)
+        (HeightOneSpectrum.associates_irreducible 𝔮) hne,
       mul_zero, pow_zero]
 
-
 omit [NumberField K] [NumberField L] in
-theorem pow_smul_sub_mem (P : Ideal (𝓞 L)) {σ : L ≃ₐ[K] L} {q : ℕ} (h : ∀ x : 𝓞 L, σ • x - x ^ q ∈ P) (k : ℕ)
-    (x : 𝓞 L) : σ ^ k • x - x ^ q ^ k ∈ P := by
+theorem pow_smul_sub_mem
+    (P : Ideal (𝓞 L)) {σ : L ≃ₐ[K] L} {q : ℕ} (h : ∀ x : 𝓞 L, σ • x - x ^ q ∈ P) (k : ℕ) (x : 𝓞 L)
+    : σ ^ k • x - x ^ q ^ k ∈ P := by
   have h' : ∀ y : 𝓞 L, Ideal.Quotient.mk P (σ • y) = Ideal.Quotient.mk P y ^ q := fun y => by
     rw [← map_pow, Ideal.Quotient.eq]
     exact h y
@@ -48,10 +51,12 @@ theorem pow_smul_sub_mem (P : Ideal (𝓞 L)) {σ : L ≃ₐ[K] L} {q : ℕ} (h 
     rw [← Ideal.Quotient.eq] at ih ⊢
     rw [pow_succ' σ k, mul_smul, h', ih, ← map_pow, ← pow_mul, ← pow_succ]
 
-theorem exists_frob_pow_eq_one [IsGalois K L] (𝔭 : HeightOneSpectrum (𝓞 K)) (hu : UnramIn L 𝔭)
-    (P : HeightOneSpectrum (𝓞 L)) [hPo : P.asIdeal.LiesOver 𝔭.asIdeal] {f : ℕ}
-    (hf : Ideal.absNorm P.asIdeal = Ideal.absNorm 𝔭.asIdeal ^ f) :
-    ∃ σ : L ≃ₐ[K] L, IsFrob L 𝔭 σ ∧ σ ^ f = 1 := by
+theorem exists_frob_pow_eq_one
+    [IsGalois K L]
+    (𝔭 : HeightOneSpectrum (𝓞 K)) (hu : UnramIn L 𝔭)
+    (P : HeightOneSpectrum (𝓞 L)) [hPo : P.asIdeal.LiesOver 𝔭.asIdeal]
+    {f : ℕ} (hf : Ideal.absNorm P.asIdeal = Ideal.absNorm 𝔭.asIdeal ^ f)
+    : ∃ σ : L ≃ₐ[K] L, IsFrob L 𝔭 σ ∧ σ ^ f = 1 := by
   unfold UnramIn at hu
   have hq : Nat.card (𝓞 K ⧸ P.asIdeal.under (𝓞 K)) = Ideal.absNorm 𝔭.asIdeal := by
     rw [← hPo.over, Ideal.absNorm_apply, Submodule.cardQuot_apply]
@@ -76,9 +81,9 @@ theorem exists_frob_pow_eq_one [IsGalois K L] (𝔭 : HeightOneSpectrum (𝓞 K)
   apply hu
   exact ⟨P.asIdeal, P.isPrime, hPo, hfix⟩
 
-theorem exists_gen_of_ray {𝔮 I : Ideal (𝓞 K)}
-    (h : ∃ α β : 𝓞 K, RayPair 𝔮 α β ∧ I * Ideal.span {β} = Ideal.span {α}) :
-    ∃ π : 𝓞 K, I = Ideal.span {π} ∧ π - 1 ∈ 𝔮 := by
+theorem exists_gen_of_ray
+    {𝔮 I : Ideal (𝓞 K)} (h : ∃ α β : 𝓞 K, RayPair 𝔮 α β ∧ I * Ideal.span {β} = Ideal.span {α})
+    : ∃ π : 𝓞 K, I = Ideal.span {π} ∧ π - 1 ∈ 𝔮 := by
   obtain ⟨α, β, hr, hI⟩ := h
   unfold RayPair at hr
   obtain ⟨-, hβ, -, hβc, hαβ, -⟩ := hr
@@ -104,15 +109,20 @@ theorem exists_gen_of_ray {𝔮 I : Ideal (𝓞 K)}
     obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp h1
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp hy
     have e2 : π - 1 = c * (β * (π - 1)) + (π - 1) * z := by
-      calc π - 1 = (π - 1) * (c * β + z) := by rw [hyz, mul_one]
+      calc
+        π - 1
+          = (π - 1) * (c * β + z) := by rw [hyz, mul_one]
         _ = c * (β * (π - 1)) + (π - 1) * z := by ring
     rw [e2]
     exact 𝔮.add_mem (𝔮.mul_mem_left c hq) (𝔮.mul_mem_left (π - 1) hz)
 
-private theorem pow_residue_degree_eq_one_of_isFrobenius [IsGalois K L] (𝔭 : HeightOneSpectrum (𝓞 K)) (hu : UnramIn L 𝔭)
-    (Q : Ideal (𝓞 L)) [hQ : Q.IsPrime] [hQo : Q.LiesOver 𝔭.asIdeal] {f : ℕ}
-    (hQf : Ideal.absNorm Q = Ideal.absNorm 𝔭.asIdeal ^ f) (τ : L ≃ₐ[K] L)
-    (hτ : ∀ x : 𝓞 L, τ • x - x ^ Ideal.absNorm 𝔭.asIdeal ∈ Q) : τ ^ f = 1 := by
+private theorem pow_residue_degree_eq_one_of_isFrobenius
+    [IsGalois K L]
+    (𝔭 : HeightOneSpectrum (𝓞 K)) (hu : UnramIn L 𝔭)
+    (Q : Ideal (𝓞 L)) [hQ : Q.IsPrime] [hQo : Q.LiesOver 𝔭.asIdeal]
+    {f : ℕ} (hQf : Ideal.absNorm Q = Ideal.absNorm 𝔭.asIdeal ^ f)
+    (τ : L ≃ₐ[K] L) (hτ : ∀ x : 𝓞 L, τ • x - x ^ Ideal.absNorm 𝔭.asIdeal ∈ Q)
+    : τ ^ f = 1 := by
   unfold UnramIn at hu
   have hN0 : Ideal.absNorm Q ≠ 0 := by
     rw [hQf]
@@ -132,16 +142,20 @@ private theorem pow_residue_degree_eq_one_of_isFrobenius [IsGalois K L] (𝔭 : 
     exact h3
   exact hu _ ⟨Q, hQ, hQo, hfix⟩
 
-theorem containsRayField_of_ray [IsGalois K L] (n : ℕ)
+theorem containsRayField_of_ray
+    [IsGalois K L]
+    (n : ℕ)
     (hun : ∀ 𝔭 : HeightOneSpectrum (𝓞 K), ¬ 𝔭.asIdeal ∣ Ideal.span {(n : 𝓞 K)} → UnramIn L 𝔭)
-    (hart : ∀ I : Ideal (𝓞 K), I ≠ ⊥ → IsCoprime I (Ideal.span {(n : 𝓞 K)}) →
-      (∀ χ : (L ≃ₐ[K] L) →* ℂˣ, heckeIdeal L χ I = 1) →
-        ∃ α β : 𝓞 K, RayPair (Ideal.span {(n : 𝓞 K)}) α β ∧ I * Ideal.span {β} = Ideal.span {α}) :
-    GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (algebraMap K L) n := by
+    (hart : ∀ I : Ideal (𝓞 K),
+      I ≠ ⊥ → IsCoprime I (Ideal.span {(n : 𝓞 K)}) → (∀ χ : (L ≃ₐ[K] L) →* ℂˣ, heckeIdeal L χ I = 1)
+        → ∃ α β : 𝓞 K, RayPair (Ideal.span {(n : 𝓞 K)}) α β ∧ I * Ideal.span {β} = Ideal.span {α})
+    : GlobalTheory.IndefiniteRowSideFullHecke.RayFieldTheta.ContainsRayField (algebraMap K L)
+      n := by
   intro 𝔓 h𝔓
   haveI := 𝔓.isPrime
-  have hN : ((Ideal.absNorm 𝔓.asIdeal : ℕ) : 𝓞 K) ∈
-      𝔓.asIdeal.comap (RingOfIntegers.mapRingHom (algebraMap K L)) := by
+  have hN
+      : ((Ideal.absNorm 𝔓.asIdeal : ℕ) : 𝓞 K)
+        ∈ 𝔓.asIdeal.comap (RingOfIntegers.mapRingHom (algebraMap K L)) := by
     rw [Ideal.mem_comap, map_natCast]
     exact Ideal.absNorm_mem _
   have hne : 𝔓.asIdeal.comap (RingOfIntegers.mapRingHom (algebraMap K L)) ≠ ⊥ := by

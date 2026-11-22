@@ -14,11 +14,12 @@ namespace GlobalTheory.RealPar.DerivedAdjoint
 
 variable {p q : ℕ}
 
-theorem Jm_diag (p q : ℕ) :
-    Jm p q = Matrix.diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => -1)) := by
+theorem Jm_diag (p q : ℕ)
+    : Jm p q = Matrix.diagonal (Sum.elim (fun _ => (1 : ℂ)) (fun _ => -1)) := by
   unfold Jm Formalism.UG.Jpq
   ext i j
-  rcases i with i | i <;> rcases j with j | j <;> simp [Matrix.one_apply, Matrix.diagonal_apply, eq_comm] <;> split_ifs <;> simp
+  rcases i with i | i <;> rcases j with j | j
+    <;> simp [Matrix.one_apply, Matrix.diagonal_apply, eq_comm] <;> split_ifs <;> simp
 
 theorem Jm_mul_Jm (p q : ℕ) : Jm p q * Jm p q = 1 := by
   rw [Jm_diag, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
@@ -34,7 +35,8 @@ theorem Jm_conjTranspose (p q : ℕ) : (Jm p q)ᴴ = Jm p q := by
 
 theorem adjZ_adjZ (Z : Mat p q) : adjZ (adjZ Z) = Z := by
   unfold adjZ
-  simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Jm_conjTranspose, ← Matrix.mul_assoc, Jm_mul_Jm, Matrix.one_mul]
+  simp only [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Jm_conjTranspose,
+    ← Matrix.mul_assoc, Jm_mul_Jm, Matrix.one_mul]
   simp only [Matrix.mul_assoc, Jm_mul_Jm, Matrix.mul_one]
 
 theorem adjZ_add (X Y : Mat p q) : adjZ (X + Y) = adjZ X + adjZ Y := by
@@ -57,19 +59,23 @@ theorem mem_upq_of_adjZ {X : Mat p q} (h : adjZ X = -X) : X ∈ upq p q := by
     rw [← Matrix.mul_assoc, ← Matrix.mul_assoc, Jm_mul_Jm, Matrix.one_mul]
   rw [← key, h, Matrix.mul_neg, neg_add_cancel]
 
-theorem inner_map (T : GrpData p q) (πU : URep T) (g : T.G) (x y : πU.H) :
-    inner ℂ (πU.π g x) (πU.π g y) = inner ℂ x y := by
+theorem inner_map (T : GrpData p q) (πU : URep T) (g : T.G) (x y : πU.H)
+    : inner ℂ (πU.π g x) (πU.π g y) = inner ℂ x y := by
   exact (LinearIsometry.mk (πU.π g).toLinearMap (πU.isom g)).inner_map_map x y
 
-theorem derived_adjoint : ∀ (p q : ℕ) (T : GrpData p q) (πU : URep T) (M : GKMod p q) (j : M.V →ₗ[ℂ] πU.H), (∀ Y ∈ upq p q, ∀ x, HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) (j x)) (j (M.act Y x)) 0) → (∀ Z x y, inner ℂ (j (M.act Z x)) (j y) = inner ℂ (j x) (j (M.act (adjZ Z) y))) := by
+theorem derived_adjoint
+    : ∀ (p q : ℕ) (T : GrpData p q) (πU : URep T) (M : GKMod p q) (j : M.V →ₗ[ℂ] πU.H),
+      (∀ Y ∈ upq p q, ∀ x, HasDerivAt (fun t : ℝ => πU.π (T.expt (t • Y)) (j x)) (j (M.act Y x)) 0)
+        → (∀ Z x y, inner ℂ (j (M.act Z x)) (j y) = inner ℂ (j x) (j (M.act (adjZ Z) y))) := by
   intro p q T πU M j hd
 
-  have skew : ∀ Y ∈ upq p q, ∀ x y,
-      inner ℂ (j (M.act Y x)) (j y) = - inner ℂ (j x) (j (M.act Y y)) := by
+  have skew
+      : ∀ Y ∈ upq p q, ∀ x y, inner ℂ (j (M.act Y x)) (j y) = - inner ℂ (j x) (j (M.act Y y)) := by
     intro Y hY x y
     have h1 := (hd Y hY x).inner ℂ (hd Y hY y)
-    have hconst : (fun t : ℝ => inner ℂ (πU.π (T.expt (t • Y)) (j x)) (πU.π (T.expt (t • Y)) (j y)))
-        = fun _ => inner ℂ (j x) (j y) := by
+    have hconst
+        : (fun t : ℝ => inner ℂ (πU.π (T.expt (t • Y)) (j x)) (πU.π (T.expt (t • Y)) (j y)))
+          = fun _ => inner ℂ (j x) (j y) := by
       funext t
       exact inner_map T πU _ (j x) (j y)
     rw [hconst] at h1
@@ -83,8 +89,9 @@ theorem derived_adjoint : ∀ (p q : ℕ) (T : GrpData p q) (πU : URep T) (M : 
     have e : Yᴴ * Jm p q = -(Jm p q * Y) := eq_neg_of_add_eq_zero_left hY'
     unfold adjZ
     rw [Matrix.mul_assoc, e, Matrix.mul_neg, ← Matrix.mul_assoc, Jm_mul_Jm, Matrix.one_mul]
-  have base : ∀ Y ∈ upq p q, ∀ x y,
-      inner ℂ (j (M.act Y x)) (j y) = inner ℂ (j x) (j (M.act (adjZ Y) y)) := by
+  have base
+      : ∀ Y ∈ upq p q, ∀ x y,
+        inner ℂ (j (M.act Y x)) (j y) = inner ℂ (j x) (j (M.act (adjZ Y) y)) := by
     intro Y hY x y
     rw [adj_of_mem Y hY, map_neg, LinearMap.neg_apply, map_neg, inner_neg_right]
     exact skew Y hY x y
@@ -95,8 +102,7 @@ theorem derived_adjoint : ∀ (p q : ℕ) (T : GrpData p q) (πU : URep T) (M : 
   have hc : Complex.I * (-Complex.I / 2) = 1 / 2 := by
     linear_combination (-1 / 2 : ℂ) * Complex.I_sq
   have hs1 : star (1 / 2 : ℂ) = 1 / 2 := by simp
-  have hs2 : star (-Complex.I / 2) = Complex.I / 2 := by
-    apply Complex.ext <;> simp
+  have hs2 : star (-Complex.I / 2) = Complex.I / 2 := by apply Complex.ext <;> simp
   have hZ : Z = A + Complex.I • B := by
     rw [hA, hB, smul_smul, hc]
     module
@@ -110,8 +116,8 @@ theorem derived_adjoint : ∀ (p q : ℕ) (T : GrpData p q) (πU : URep T) (M : 
     module
   rw [hZ]
   simp only [map_add (f := _), map_smul, LinearMap.add_apply, LinearMap.smul_apply, inner_add_left,
-    inner_add_right, inner_smul_left, inner_smul_right, adjZ_add, adjZ_smul, base A hAm,
-    base B hBm, starRingEnd_apply]
+    inner_add_right, inner_smul_left, inner_smul_right, adjZ_add, adjZ_smul, base A hAm, base B hBm,
+    starRingEnd_apply]
 
 end GlobalTheory.RealPar.DerivedAdjoint
 

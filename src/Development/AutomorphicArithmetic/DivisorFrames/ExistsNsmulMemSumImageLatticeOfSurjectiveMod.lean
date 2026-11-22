@@ -6,12 +6,13 @@ public import Mathlib
 
 open NumberField
 
-theorem UpperTheory.exists_nsmul_mem_sum_image_lattice_of_surjective_mod :
-    ∀ (gA gB p : ℕ) (ΛA : Submodule ℤ (Fin gA → ℂ)) (ΛB : Submodule ℤ (Fin gB → ℂ))
+theorem UpperTheory.exists_nsmul_mem_sum_image_lattice_of_surjective_mod
+    : ∀ (gA gB p : ℕ) (ΛA : Submodule ℤ (Fin gA → ℂ)) (ΛB : Submodule ℤ (Fin gB → ℂ))
         (J : Fin p → (Fin gA → ℂ) →ₗ[ℂ] (Fin gB → ℂ)),
-        Submodule.span ℝ (ΛA : Set (Fin gA → ℂ)) = ⊤ → DiscreteTopology ΛB →
-        (∀ a, ∀ z ∈ ΛA, J a z ∈ ΛB) → (∀ w, ∃ v : Fin p → (Fin gA → ℂ), w - ∑ a, J a (v a) ∈ ΛB) →
-        ∀ l ∈ ΛB, ∃ (N : ℕ) (x : Fin p → (Fin gA → ℂ)), 0 < N ∧ (∀ a, x a ∈ ΛA) ∧ N • l = ∑ a, J a (x a) := by
+      Submodule.span ℝ (ΛA : Set (Fin gA → ℂ)) = ⊤ → DiscreteTopology ΛB
+        → (∀ a, ∀ z ∈ ΛA, J a z ∈ ΛB) → (∀ w, ∃ v : Fin p → (Fin gA → ℂ), w - ∑ a, J a (v a) ∈ ΛB)
+        → ∀ l ∈ ΛB, ∃ (N : ℕ) (x : Fin p → (Fin gA → ℂ)),
+          0 < N ∧ (∀ a, x a ∈ ΛA) ∧ N • l = ∑ a, J a (x a) := by
   intro gA gB p ΛA ΛB J hA hB hJ hsurj l hl
   classical
   set Φ : (Fin p → (Fin gA → ℂ)) →ₗ[ℝ] (Fin gB → ℂ) :=
@@ -83,7 +84,8 @@ theorem UpperTheory.exists_nsmul_mem_sum_image_lattice_of_surjective_mod :
   have hfin : ((ZSpan.fundamentalDomain b) ∩ (ΛB : Set (Fin gB → ℂ))).Finite :=
     Metric.finite_isBounded_inter_isClosed (isDiscrete_iff_discreteTopology.mpr ‹_›)
       (ZSpan.fundamentalDomain_isBounded b) hcl
-  have hmem : ∀ n : ℕ, ZSpan.fract b (n • l) ∈ (ZSpan.fundamentalDomain b) ∩ (ΛB : Set (Fin gB → ℂ)) := by
+  have hmem
+      : ∀ n : ℕ, ZSpan.fract b (n • l) ∈ (ZSpan.fundamentalDomain b) ∩ (ΛB : Set (Fin gB → ℂ)) := by
     intro n
     refine ⟨ZSpan.fract_mem_fundamentalDomain b _, ?_⟩
     rw [ZSpan.fract_apply]

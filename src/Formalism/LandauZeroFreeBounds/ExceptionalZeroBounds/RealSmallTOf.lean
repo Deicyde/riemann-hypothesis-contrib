@@ -98,9 +98,11 @@ theorem realCharZeroSmallHeightOfBounds : RealSmallTOf := by
   have hnn : ∀ ρ ∈ Z, 0 ≤ (m ρ : ℝ) * (1 / ((σ : ℂ) - ρ)).re := fun ρ hρ =>
     mul_nonneg (Nat.cast_nonneg _) (re_one_div_sub_zero_pos' χ hχ ρ ((hZ ρ).mp hρ).2 σ hσ1).le
 
-  have hcons : ∀ ρ : ℂ, |ρ.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ.im| + 2)) →
-      InRegion (1 / (10 * W)) q ρ → DirichletCharacter.LFunction χ ρ = 0 →
-      ρ ∈ Z ∧ 4 / 5 * T ≤ (1 / ((σ : ℂ) - ρ)).re := by
+  have hcons
+      : ∀ ρ : ℂ,
+        |ρ.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ.im| + 2)) → InRegion (1 / (10 * W)) q ρ
+          → DirichletCharacter.LFunction χ ρ = 0
+          → ρ ∈ Z ∧ 4 / 5 * T ≤ (1 / ((σ : ℂ) - ρ)).re := by
     intro ρ hi hr hz
     unfold InRegion at hr
     obtain ⟨Lρ, hLρdef⟩ : ∃ x : ℝ, x = Real.log ((q : ℝ) * (|ρ.im| + 2)) := ⟨_, rfl⟩
@@ -124,12 +126,10 @@ theorem realCharZeroSmallHeightOfBounds : RealSmallTOf := by
       refine (Complex.norm_le_abs_re_add_abs_im _).trans ?_
       have e0 : (11 / 10 : ℂ) = ((11 / 10 : ℝ) : ℂ) := by push_cast; rfl
       rw [e0, Complex.sub_re, Complex.sub_im, Complex.ofReal_re, Complex.ofReal_im, sub_zero]
-      have : |ρ.re - 11 / 10| ≤ 1 / 10 + 1 / (10 * T) := by
-        rw [abs_le]; constructor <;> linarith
+      have : |ρ.re - 11 / 10| ≤ 1 / 10 + 1 / (10 * T) := by rw [abs_le]; constructor <;> linarith
       linarith
     · rw [re_one_div_ofReal_sub]
-      have hTσ : T * (σ - ρ.re) = T * (1 - ρ.re) + 1 := by
-        rw [hσ]; field_simp; ring
+      have hTσ : T * (σ - ρ.re) = T * (1 - ρ.re) + 1 := by rw [hσ]; field_simp; ring
       have hA : 0 < T * (1 - ρ.re) := mul_pos hTpos (by linarith)
       have hB : T * (1 - ρ.re) ≤ T * (1 / (10 * T)) :=
         mul_le_mul_of_nonneg_left (by linarith) hTpos.le
@@ -143,12 +143,14 @@ theorem realCharZeroSmallHeightOfBounds : RealSmallTOf := by
     have : 0 ≤ K * L₀ := mul_nonneg hK0 hL₀pos.le
     nlinarith
 
-  have htwo : ∀ ρ₁ ρ₂ : ℂ,
-      (|ρ₁.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ₁.im| + 2)) ∧
-        InRegion (1 / (10 * W)) q ρ₁ ∧ DirichletCharacter.LFunction χ ρ₁ = 0) →
-      (|ρ₂.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ₂.im| + 2)) ∧
-        InRegion (1 / (10 * W)) q ρ₂ ∧ DirichletCharacter.LFunction χ ρ₂ = 0) →
-      ρ₁ ≠ ρ₂ → False := by
+  have htwo
+      : ∀ ρ₁ ρ₂ : ℂ,
+        (|ρ₁.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ₁.im| + 2)) ∧ InRegion (1 / (10 * W)) q ρ₁
+            ∧ DirichletCharacter.LFunction χ ρ₁ = 0)
+          → (|ρ₂.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ₂.im| + 2))
+            ∧ InRegion (1 / (10 * W)) q ρ₂ ∧ DirichletCharacter.LFunction χ ρ₂ = 0)
+          → ρ₁ ≠ ρ₂
+          → False := by
     rintro ρ₁ ρ₂ ⟨a1, b1, c1⟩ ⟨a2, b2, c2⟩ hne
     obtain ⟨h1Z, h1r⟩ := hcons ρ₁ a1 b1 c1
     obtain ⟨h2Z, h2r⟩ := hcons ρ₂ a2 b2 c2
@@ -166,9 +168,11 @@ theorem realCharZeroSmallHeightOfBounds : RealSmallTOf := by
     have hr2 : 0 ≤ (1 / ((σ : ℂ) - ρ₂)).re := by linarith
     nlinarith [mul_nonneg (sub_nonneg.mpr hm1') hr1, mul_nonneg (sub_nonneg.mpr hm2') hr2]
 
-  have hdouble : ∀ ρ : ℂ, |ρ.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ.im| + 2)) →
-      InRegion (1 / (10 * W)) q ρ → DirichletCharacter.LFunction χ ρ = 0 →
-      deriv (DirichletCharacter.LFunction χ) ρ = 0 → False := by
+  have hdouble
+      : ∀ ρ : ℂ,
+        |ρ.im| < 1 / (10 * W) / Real.log ((q : ℝ) * (|ρ.im| + 2)) → InRegion (1 / (10 * W)) q ρ
+          → DirichletCharacter.LFunction χ ρ = 0 → deriv (DirichletCharacter.LFunction χ) ρ = 0
+          → False := by
     intro ρ a b c hd
     obtain ⟨hρZ, hρr⟩ := hcons ρ a b c
     have hs := Finset.single_le_sum hnn hρZ

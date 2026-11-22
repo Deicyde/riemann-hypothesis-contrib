@@ -13,23 +13,23 @@ open MvPolynomial TensorProduct
 
 noncomputable section
 
-theorem isReduced_tensor_domain_of_formallyEtale (E L D : Type*) [Field E] [Field L] [Algebra E L]
-    [Algebra.FormallyEtale E L] [Algebra.EssFiniteType E L] [CommRing D] [IsDomain D]
-    [Algebra E D] : IsReduced (L ⊗[E] D) := by
+theorem isReduced_tensor_domain_of_formallyEtale
+    (E L D : Type*) [Field E] [Field L] [Algebra E L] [Algebra.FormallyEtale E L]
+    [Algebra.EssFiniteType E L] [CommRing D] [IsDomain D] [Algebra E D]
+    : IsReduced (L ⊗[E] D) := by
   have : IsReduced (FractionRing D ⊗[E] L) :=
     Algebra.FormallyUnramified.isReduced_of_field (FractionRing D) (FractionRing D ⊗[E] L)
   have : IsReduced (L ⊗[E] FractionRing D) :=
-    isReduced_of_injective (Algebra.TensorProduct.comm E L (FractionRing D))
-      (AlgEquiv.injective _)
+    isReduced_of_injective (Algebra.TensorProduct.comm E L (FractionRing D)) (AlgEquiv.injective _)
   exact isReduced_of_injective
     (Algebra.TensorProduct.map (AlgHom.id E L) (IsScalarTower.toAlgHom E D (FractionRing D)))
     (Module.Flat.lTensor_preserves_injective_linearMap _ (IsFractionRing.injective D _))
 
-
 open scoped IntermediateField.algebraAdjoinAdjoin in
-theorem isReduced_tensor_field_of_perfectField (K L F : Type*) [Field K] [PerfectField K]
-    [Field L] [Algebra K L] [Algebra.EssFiniteType K L] [Field F] [Algebra K F] :
-    IsReduced (L ⊗[K] F) := by
+theorem isReduced_tensor_field_of_perfectField
+    (K L F : Type*) [Field K] [PerfectField K] [Field L] [Algebra K L] [Algebra.EssFiniteType K L]
+    [Field F] [Algebra K F]
+    : IsReduced (L ⊗[K] F) := by
   classical
   obtain ⟨s, hs, hsep⟩ := exists_isTranscendenceBasis_and_isSeparable_of_perfectField K L
   let R := Algebra.adjoin K (s : Set L)
@@ -39,12 +39,14 @@ theorem isReduced_tensor_field_of_perfectField (K L F : Type*) [Field K] [Perfec
   have : IsScalarTower K R E := IsScalarTower.of_algebraMap_eq' rfl
   have : FaithfulSMul R E :=
     Subalgebra.inclusion.faithfulSMul (IntermediateField.algebra_adjoin_le_adjoin K (s : Set L))
-  have : IsFractionRing R E := IsFractionRing.of_field _ _ fun ⟨_, h⟩ => by
-    obtain ⟨x, hx, y, hy, eq⟩ := IntermediateField.mem_adjoin_iff_div.mp h
-    exact ⟨⟨x, hx⟩, ⟨y, hy⟩, Subtype.ext eq⟩
+  have : IsFractionRing R E :=
+    IsFractionRing.of_field _ _ fun ⟨_, h⟩ => by
+      obtain ⟨x, hx, y, hy, eq⟩ := IntermediateField.mem_adjoin_iff_div.mp h
+      exact ⟨⟨x, hx⟩, ⟨y, hy⟩, Subtype.ext eq⟩
 
   have eR : R ≃ₐ[K] MvPolynomial s K :=
-    (Subalgebra.equivOfEq R (Algebra.adjoin K (Set.range ((↑) : s → L))) (by simp [R])).trans hs.1.aevalEquiv.symm
+    (Subalgebra.equivOfEq R (Algebra.adjoin K (Set.range ((↑) : s → L))) (by simp [R])).trans
+      hs.1.aevalEquiv.symm
   have hRF : IsDomain (R ⊗[K] F) :=
     ((Algebra.TensorProduct.comm K R F).toRingEquiv.trans
       ((Algebra.TensorProduct.congr (AlgEquiv.refl : F ≃ₐ[K] F) eR).toRingEquiv.trans
@@ -71,11 +73,11 @@ theorem isReduced_tensor_field_of_perfectField (K L F : Type*) [Field K] [Perfec
   exact isReduced_of_injective (Algebra.TensorProduct.cancelBaseChange K E E L F).symm
     (AlgEquiv.injective _)
 
-theorem isReduced_tensor_domain_of_perfectField (K A F : Type*) [Field K] [PerfectField K]
-    [CommRing A] [IsDomain A] [Algebra K A] [Algebra.FiniteType K A] [Field F] [Algebra K F] :
-    IsReduced (F ⊗[K] A) := by
-  have : Algebra.EssFiniteType A (FractionRing A) :=
-    .of_isLocalization _ (nonZeroDivisors A)
+theorem isReduced_tensor_domain_of_perfectField
+    (K A F : Type*) [Field K] [PerfectField K] [CommRing A] [IsDomain A] [Algebra K A]
+    [Algebra.FiniteType K A] [Field F] [Algebra K F]
+    : IsReduced (F ⊗[K] A) := by
+  have : Algebra.EssFiniteType A (FractionRing A) := .of_isLocalization _ (nonZeroDivisors A)
   have : Algebra.EssFiniteType K (FractionRing A) := .comp K A _
   have := isReduced_tensor_field_of_perfectField K (FractionRing A) F
   have : IsReduced (F ⊗[K] FractionRing A) :=
@@ -84,20 +86,24 @@ theorem isReduced_tensor_domain_of_perfectField (K A F : Type*) [Field K] [Perfe
     (Algebra.TensorProduct.map (AlgHom.id K F) (IsScalarTower.toAlgHom K A (FractionRing A)))
     (Module.Flat.lTensor_preserves_injective_linearMap _ (IsFractionRing.injective A _))
 
-theorem isRadical_map_of_isPrime_of_perfectField (K F : Type*) [Field K] [PerfectField K]
-    [Field F] [Algebra K F] (σ : Type*) [Fintype σ] (Q : Ideal (MvPolynomial σ K))
-    [Q.IsPrime] : (Q.map (MvPolynomial.map (algebraMap K F))).IsRadical := by
+theorem isRadical_map_of_isPrime_of_perfectField
+    (K F : Type*) [Field K] [PerfectField K] [Field F] [Algebra K F]
+    (σ : Type*) [Fintype σ]
+    (Q : Ideal (MvPolynomial σ K)) [Q.IsPrime]
+    : (Q.map (MvPolynomial.map (algebraMap K F))).IsRadical := by
   rw [Ideal.isRadical_iff_quotient_reduced]
   let e₀ := MvPolynomial.algebraTensorAlgEquiv (σ := σ) K F
-  have hJ : Q.map (MvPolynomial.map (algebraMap K F)) =
-      (Q.map (Algebra.TensorProduct.includeRight (R := K) (A := F)).toRingHom).map
-        e₀.toRingEquiv.toRingHom := by
+  have hJ
+      : Q.map (MvPolynomial.map (algebraMap K F))
+        = (Q.map (Algebra.TensorProduct.includeRight (R := K) (A := F)).toRingHom).map
+          e₀.toRingEquiv.toRingHom := by
     rw [Ideal.map_map]
     congr 1
     refine RingHom.ext fun p => ?_
     simp [e₀, MvPolynomial.algebraTensorAlgEquiv_tmul]
-  let e : F ⊗[K] (MvPolynomial σ K ⧸ Q) ≃+*
-      MvPolynomial σ F ⧸ Q.map (MvPolynomial.map (algebraMap K F)) :=
+  let e
+      : F ⊗[K] (MvPolynomial σ K ⧸ Q)
+        ≃+* MvPolynomial σ F ⧸ Q.map (MvPolynomial.map (algebraMap K F)) :=
     (Algebra.TensorProduct.tensorQuotientEquiv (R := K) K (MvPolynomial σ K) F Q).toRingEquiv.trans
       (Ideal.quotientEquiv _ _ e₀.toRingEquiv (hJ.trans rfl))
   have := isReduced_tensor_domain_of_perfectField K (MvPolynomial σ K ⧸ Q) F
@@ -118,12 +124,14 @@ theorem PrimeComplexRadical.proof : PrimeComplexRadical.Statement := by
     let M := (nonZeroDivisors ℤ).map (C (σ := σ) (R := ℤ))
     have : IsLocalization M (MvPolynomial σ ℚ) := MvPolynomial.isLocalization _ _
     let Q := P.map (algebraMap (MvPolynomial σ ℤ) (MvPolynomial σ ℚ))
-    have hQ : Q.IsPrime := IsLocalization.isPrime_of_isPrime_disjoint M _ P hP (by
-      rw [Set.disjoint_left]
-      rintro _ ⟨n, hn, rfl⟩ hnP
-      exact hZ n (nonZeroDivisors.ne_zero hn) hnP)
-    have hmap : P.map (MvPolynomial.map (Int.castRingHom ℂ)) =
-        Q.map (MvPolynomial.map (algebraMap ℚ ℂ)) := by
+    have hQ : Q.IsPrime :=
+      IsLocalization.isPrime_of_isPrime_disjoint M _ P hP (by
+        rw [Set.disjoint_left]
+        rintro _ ⟨n, hn, rfl⟩ hnP
+        exact hZ n (nonZeroDivisors.ne_zero hn) hnP)
+    have hmap
+        : P.map (MvPolynomial.map (Int.castRingHom ℂ))
+          = Q.map (MvPolynomial.map (algebraMap ℚ ℂ)) := by
       rw [Ideal.map_map]
       congr 1
       refine RingHom.ext fun p => ?_

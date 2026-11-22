@@ -11,8 +11,9 @@ open scoped Kronecker ComplexOrder TensorProduct
 
 namespace GlobalTheory.ClassFin
 
-theorem exists_isometry_matrix_range {ι : Type} [Fintype ι] [DecidableEq ι] (W : Submodule ℂ (ι → ℂ)) :
-    ∃ (n : ℕ) (Q : Matrix ι (Fin n) ℂ), Qᴴ * Q = 1 ∧ ∀ v, v ∈ W ↔ ∃ x, v = Q *ᵥ x := by
+theorem exists_isometry_matrix_range
+    {ι : Type} [Fintype ι] [DecidableEq ι] (W : Submodule ℂ (ι → ℂ))
+    : ∃ (n : ℕ) (Q : Matrix ι (Fin n) ℂ), Qᴴ * Q = 1 ∧ ∀ v, v ∈ W ↔ ∃ x, v = Q *ᵥ x := by
   let W' : Submodule ℂ (EuclideanSpace ℂ ι) := W.comap (WithLp.linearEquiv 2 ℂ (ι → ℂ)).toLinearMap
   let b := stdOrthonormalBasis ℂ W'
   refine ⟨_, Matrix.of fun i j => (b j : EuclideanSpace ℂ ι) i, ?_, ?_⟩
@@ -34,15 +35,18 @@ theorem exists_isometry_matrix_range {ι : Type} [Fintype ι] [DecidableEq ι] (
       rw [h2, ← h]
       simp [Matrix.mulVec, dotProduct, mul_comm]
     · rintro ⟨x, rfl⟩
-      have h : (Matrix.of fun i j => (b j : EuclideanSpace ℂ ι) i) *ᵥ x
-          = ∑ j, x j • (b j : EuclideanSpace ℂ ι).ofLp := by
+      have h
+          : (Matrix.of fun i j => (b j : EuclideanSpace ℂ ι) i) *ᵥ x
+            = ∑ j, x j • (b j : EuclideanSpace ℂ ι).ofLp := by
         ext i
         simp [Matrix.mulVec, dotProduct, mul_comm]
       rw [h]
       exact W.sum_mem fun j _ => W.smul_mem _ (b j).2
 
-theorem ss_of_harm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [Fintype σ] (τ : σ ≃ σ)
-    (g : σ → Matrix ι ι ℂ), (∀ s, g (τ s) * g s = 1) → Harm g → SS (Set.range g) := by
+theorem ss_of_harm
+    : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [Fintype σ] (τ : σ ≃ σ)
+        (g : σ → Matrix ι ι ℂ),
+      (∀ s, g (τ s) * g s = 1) → Harm g → SS (Set.range g) := by
   intro ι _ _ σ _ τ g hτ hH W hW
   obtain ⟨H, hlog, hsum⟩ := hH
   obtain ⟨n, Q, hQ, hmem⟩ := exists_isometry_matrix_range W
@@ -66,10 +70,11 @@ theorem ss_of_harm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [
   have hdet : ∀ s, (Qᴴ * ((g s)ᴴ * g s) * Q).det.re = Complex.normSq (N s).det := by
     intro s
     have h : Qᴴ * ((g s)ᴴ * g s) * Q = (N s)ᴴ * N s := by
-      calc Qᴴ * ((g s)ᴴ * g s) * Q = (g s * Q)ᴴ * (g s * Q) := by
-            simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+      calc
+        Qᴴ * ((g s)ᴴ * g s) * Q
+          = (g s * Q)ᴴ * (g s * Q) := by simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
         _ = (N s)ᴴ * (Qᴴ * Q) * N s := by
-            rw [hN]; simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
+          rw [hN]; simp only [Matrix.conjTranspose_mul, Matrix.mul_assoc]
         _ = _ := by rw [hQ, Matrix.mul_one]
     rw [h, Matrix.det_mul, Matrix.det_conjTranspose, Complex.star_def,
       ← Complex.normSq_eq_conj_mul_self, Complex.ofReal_re]
@@ -79,7 +84,8 @@ theorem ss_of_harm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [
     have h : Complex.normSq (N (τ s)).det * Complex.normSq (N s).det = 1 := by
       rw [← map_mul, ← Matrix.det_mul, hNinv, Matrix.det_one, map_one]
     simp only [ha]
-    rw [← Real.log_mul (left_ne_zero_of_mul_eq_one h) (right_ne_zero_of_mul_eq_one h), h, Real.log_one]
+    rw [← Real.log_mul (left_ne_zero_of_mul_eq_one h) (right_ne_zero_of_mul_eq_one h), h,
+      Real.log_one]
   have hasum : ∑ s, a s = 0 := by
     have h : ∑ s, (a (τ s) + a s) = 0 := Finset.sum_eq_zero fun s _ => hpair s
     rw [Finset.sum_add_distrib, Equiv.sum_comp τ a] at h
@@ -87,22 +93,26 @@ theorem ss_of_harm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [
   have htsum : ∑ s, (Matrix.trace (Qᴴ * H s * Q)).re = 0 := by
     rw [← Complex.re_sum, ← Matrix.trace_sum, ← Matrix.sum_mul, ← Matrix.mul_sum, hsum]
     simp
-  have hJ := fun s => GlobalTheory.LogCompress.trace_log_le_log_det ι (Fin n) (H s) ((g s)ᴴ * g s) Q (hlog s) hQ
+  have hJ := fun s =>
+    GlobalTheory.LogCompress.trace_log_le_log_det ι (Fin n) (H s) ((g s)ᴴ * g s) Q (hlog s) hQ
   have heq : ∀ s, (Matrix.trace (Qᴴ * H s * Q)).re = a s := by
-    have h := (Finset.sum_eq_sum_iff_of_le (s := Finset.univ)
-      (f := fun s => (Matrix.trace (Qᴴ * H s * Q)).re) (g := a)
-      (fun s _ => by have := (hJ s).1; rwa [hdet] at this)).1 (by rw [htsum, hasum])
+    have h :=
+      (Finset.sum_eq_sum_iff_of_le (s := Finset.univ)
+        (f := fun s => (Matrix.trace (Qᴴ * H s * Q)).re)
+        (g := a)
+        (fun s _ => by have := (hJ s).1; rwa [hdet] at this)).1 (by rw [htsum, hasum])
     exact fun s => h s (Finset.mem_univ s)
   have hadj : ∀ s, ∃ M : Matrix (Fin n) (Fin n) ℂ, Qᴴ * g s = M * Qᴴ := by
     intro s
     obtain ⟨M, hM⟩ := (hJ s).2 (by rw [hdet]; exact heq s)
     have h1 : N s * N (τ s) = 1 := mul_eq_one_comm.1 (hNinv s)
     have h2 : (g s)ᴴ * Q = Q * (M * N (τ s)) := by
-      rw [← Matrix.mul_assoc, ← hM, Matrix.mul_assoc (g s)ᴴ, hN, Matrix.mul_assoc, Matrix.mul_assoc, h1,
-        Matrix.mul_one]
+      rw [← Matrix.mul_assoc, ← hM, Matrix.mul_assoc (g s)ᴴ, hN, Matrix.mul_assoc, Matrix.mul_assoc,
+        h1, Matrix.mul_one]
     refine ⟨(M * N (τ s))ᴴ, ?_⟩
     have h3 := congrArg Matrix.conjTranspose h2
-    rwa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.conjTranspose_mul Q] at h3
+    rwa [Matrix.conjTranspose_mul, Matrix.conjTranspose_conjTranspose, Matrix.conjTranspose_mul Q]
+      at h3
   refine ⟨LinearMap.ker (Matrix.mulVecLin Qᴴ), ?_, ?_, ?_⟩
   · rintro _ ⟨s, rfl⟩ v hv
     obtain ⟨M, hM⟩ := hadj s
@@ -111,12 +121,14 @@ theorem ss_of_harm : ∀ (ι : Type) [Fintype ι] [DecidableEq ι] (σ : Type) [
   · rw [Submodule.disjoint_def]
     intro v hv hv'
     obtain ⟨x, rfl⟩ := (hmem v).1 hv
-    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hQ, Matrix.one_mulVec] at hv'
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, hQ, Matrix.one_mulVec]
+      at hv'
     rw [hv', Matrix.mulVec_zero]
   · rw [codisjoint_iff, eq_top_iff]
     intro v _
-    refine Submodule.mem_sup.2 ⟨Q *ᵥ (Qᴴ *ᵥ v), (hmem _).2 ⟨_, rfl⟩, v - Q *ᵥ (Qᴴ *ᵥ v), ?_, by abel⟩
-    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_sub, Matrix.mulVec_mulVec (Qᴴ *ᵥ v), hQ,
-      Matrix.one_mulVec, sub_self]
+    refine Submodule.mem_sup.2
+      ⟨Q *ᵥ (Qᴴ *ᵥ v), (hmem _).2 ⟨_, rfl⟩, v - Q *ᵥ (Qᴴ *ᵥ v), ?_, by abel⟩
+    rw [LinearMap.mem_ker, Matrix.mulVecLin_apply, Matrix.mulVec_sub,
+      Matrix.mulVec_mulVec (Qᴴ *ᵥ v), hQ, Matrix.one_mulVec, sub_self]
 
 end GlobalTheory.ClassFin

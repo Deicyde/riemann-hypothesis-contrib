@@ -11,7 +11,8 @@ public import Formalism.SharpRestriction.GrowthBounds.BinomialPolynomialIdentiti
 
 namespace Formalism.MainNotions.G.ColumnFamilies
 
-theorem externalProduct_basis : ExternalProductBasis := fun R _ N r K LL B => ⟨linearIndependent_productBasis R N r K LL B, span_productBasis_eq_multihomogeneous R N r K LL B⟩
+theorem externalProduct_basis : ExternalProductBasis := fun R _ N r K LL B =>
+  ⟨linearIndependent_productBasis R N r K LL B, span_productBasis_eq_multihomogeneous R N r K LL B⟩
 
 theorem externalProductHyps (D : Formalism.BasicNotions.D7) : ExternalProductHyps := {
   p16 := externalProduct_basis
@@ -22,8 +23,11 @@ theorem externalProductHyps (D : Formalism.BasicNotions.D7) : ExternalProductHyp
   e5b := polynomialProjectors_commute_disjoint
   lowPl := restLowPl_of D (polynomialTypeSums_by_evaluation D) externalProduct_basis
   lowTan := restLowTan_of D (polynomialTypeSums_by_evaluation D) externalProduct_basis
-  sum := restJointSum }
+  sum := restJointSum
+}
 
-theorem admissible_externalProduct (D : Formalism.BasicNotions.D7) : Formalism.MainNotions.CovariantDegrees.PairedPathIndependence D := admissible_externalProduct_of_hyps D (externalProductHyps D)
+theorem admissible_externalProduct (D : Formalism.BasicNotions.D7)
+    : Formalism.MainNotions.CovariantDegrees.PairedPathIndependence D :=
+  admissible_externalProduct_of_hyps D (externalProductHyps D)
 
 end Formalism.MainNotions.G.ColumnFamilies

@@ -10,8 +10,7 @@ open Module
 
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
-noncomputable def compr (W W' : Submodule ℂ V) (hc : IsCompl W W') :
-    End ℂ V →ₗ[ℂ] End ℂ W where
+noncomputable def compr (W W' : Submodule ℂ V) (hc : IsCompl W W') : End ℂ V →ₗ[ℂ] End ℂ W where
   toFun b := (W.linearProjOfIsCompl W' hc) ∘ₗ b ∘ₗ W.subtype
   map_add' b c := by ext w; simp
   map_smul' t b := by ext w; simp
@@ -72,25 +71,28 @@ lemma adjoin_compr {l : ℕ} (a : Fin l → End ℂ V) (W W' : Submodule ℂ V) 
     · rw [compr_mul W W' hc x y hy.1]
       exact Subalgebra.mul_mem _ hx.2 hy.2
 
-theorem finrank_adjoin_le_add :
-    ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (l : ℕ)
-      (a : Fin l → Module.End ℂ V) (W W' : Submodule ℂ V), IsCompl W W' →
-      ∀ (h : ∀ i, ∀ w ∈ W, a i w ∈ W) (h' : ∀ i, ∀ w ∈ W', a i w ∈ W'),
-      Module.finrank ℂ (Algebra.adjoin ℂ (Set.range a)) ≤
-        Module.finrank ℂ (Algebra.adjoin ℂ (Set.range fun i =>
-          ((a i).restrict (h i) : Module.End ℂ W))) +
-        Module.finrank ℂ (Algebra.adjoin ℂ (Set.range fun i =>
-          ((a i).restrict (h' i) : Module.End ℂ W'))) := by
+theorem finrank_adjoin_le_add
+    : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V] (l : ℕ)
+        (a : Fin l → Module.End ℂ V) (W W' : Submodule ℂ V),
+      IsCompl W W'
+        → ∀ (h : ∀ i, ∀ w ∈ W, a i w ∈ W) (h' : ∀ i, ∀ w ∈ W', a i w ∈ W'),
+          Module.finrank ℂ (Algebra.adjoin ℂ (Set.range a))
+            ≤ Module.finrank ℂ
+                (Algebra.adjoin ℂ (Set.range fun i => ((a i).restrict (h i) : Module.End ℂ W)))
+              + Module.finrank ℂ
+                (Algebra.adjoin ℂ
+                  (Set.range fun i => ((a i).restrict (h' i) : Module.End ℂ W'))) := by
   intro V _ _ _ l a W W' hc h h'
   let AW := Algebra.adjoin ℂ (Set.range fun i => ((a i).restrict (h i) : Module.End ℂ W))
   let AW' := Algebra.adjoin ℂ (Set.range fun i => ((a i).restrict (h' i) : Module.End ℂ W'))
-  let Φ : Algebra.adjoin ℂ (Set.range a) →ₗ[ℂ] AW × AW' :=
-    { toFun := fun b => (⟨compr W W' hc b, (adjoin_compr a W W' hc h b b.2).2⟩,
-        ⟨compr W' W hc.symm b, (adjoin_compr a W' W hc.symm h' b b.2).2⟩)
-      map_add' := fun b c => by
-        ext <;> simp [map_add (f := _)]
-      map_smul' := fun t b => by
-        ext <;> simp [map_smul] }
+  let Φ : Algebra.adjoin ℂ (Set.range a) →ₗ[ℂ] AW × AW' := {
+    toFun := fun b => (
+      ⟨compr W W' hc b, (adjoin_compr a W W' hc h b b.2).2⟩,
+      ⟨compr W' W hc.symm b, (adjoin_compr a W' W hc.symm h' b b.2).2⟩
+    )
+    map_add' := fun b c => by ext <;> simp [map_add (f := _)]
+    map_smul' := fun t b => by ext <;> simp [map_smul]
+  }
   have hinj : Function.Injective Φ := by
     intro b c hbc
     have h1 := congrArg (fun p => (p.1 : Module.End ℂ W)) hbc
@@ -103,16 +105,19 @@ theorem finrank_adjoin_le_add :
     have e1 : (b : Module.End ℂ V) w = (c : Module.End ℂ V) w := by
       have e := LinearMap.congr_fun h1 ⟨w, hw⟩
       rw [compr_of_inv W W' hc _ (adjoin_compr a W W' hc h b b.2).1,
-        compr_of_inv W W' hc _ (adjoin_compr a W W' hc h c c.2).1] at e
+          compr_of_inv W W' hc _ (adjoin_compr a W W' hc h c c.2).1]
+        at e
       exact congrArg Subtype.val e
     have e2 : (b : Module.End ℂ V) w' = (c : Module.End ℂ V) w' := by
       have e := LinearMap.congr_fun h2 ⟨w', hw'⟩
       rw [compr_of_inv W' W hc.symm _ (adjoin_compr a W' W hc.symm h' b b.2).1,
-        compr_of_inv W' W hc.symm _ (adjoin_compr a W' W hc.symm h' c c.2).1] at e
+          compr_of_inv W' W hc.symm _ (adjoin_compr a W' W hc.symm h' c c.2).1]
+        at e
       exact congrArg Subtype.val e
     rw [map_add (f := _), map_add (f := _), e1, e2]
-  calc Module.finrank ℂ (Algebra.adjoin ℂ (Set.range a)) ≤ Module.finrank ℂ (AW × AW') :=
-        LinearMap.finrank_le_finrank_of_injective hinj
+  calc
+    Module.finrank ℂ (Algebra.adjoin ℂ (Set.range a))
+      ≤ Module.finrank ℂ (AW × AW') := LinearMap.finrank_le_finrank_of_injective hinj
     _ = Module.finrank ℂ AW + Module.finrank ℂ AW' := Module.finrank_prod
 
 end GlobalTheory.CompanionTheory.CommSplit

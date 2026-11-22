@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.InvSubOneMem
 
 @[expose] public section
 
-open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count GlobalTheory.FlagMeas
+open MeasureTheory NumberField Matrix Finset Formalism.MainNotions.S GlobalTheory.Count
+  GlobalTheory.FlagMeas
 
 noncomputable section
 
@@ -17,7 +18,8 @@ open Formalism.REAL GlobalTheory.GaugeSubLoc
 variable {n d : ℕ}
 
 def trForm (n : ℕ) : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] ℝ :=
-  LinearMap.mk₂ ℝ (fun X Y => ((X * Yᴴ).trace).re)
+  LinearMap.mk₂ ℝ
+    (fun X Y => ((X * Yᴴ).trace).re)
     (fun X X' Y => by rw [Matrix.add_mul, Matrix.trace_add, Complex.add_re])
     (fun c X Y => by rw [Matrix.smul_mul, Matrix.trace_smul, Complex.smul_re])
     (fun X Y Y' => by
@@ -40,37 +42,42 @@ theorem hs_eq (g : Matrix (Fin n) (Fin n) ℂ) : hs g = trForm n g g := by
   rw [Complex.star_def, Complex.mul_conj, Complex.normSq_eq_norm_sq]
   norm_cast
 
-theorem hs_nonneg (g : Matrix (Fin n) (Fin n) ℂ) : 0 ≤ hs g := by
-  unfold hs; positivity
+theorem hs_nonneg (g : Matrix (Fin n) (Fin n) ℂ) : 0 ≤ hs g := by unfold hs; positivity
 
-def coord (E : Fin d → Matrix (Fin n) (Fin n) ℂ) :
-    Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] EuclideanSpace ℝ (Fin d) where
+def coord (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+    : Matrix (Fin n) (Fin n) ℂ →ₗ[ℝ] EuclideanSpace ℝ (Fin d) where
   toFun X := WithLp.toLp 2 (fun i => trForm n X (E i))
   map_add' X Y := by ext i; simp
   map_smul' c X := by ext i; simp
 
-theorem norm_coord (E : Fin d → Matrix (Fin n) (Fin n) ℂ) (X : Matrix (Fin n) (Fin n) ℂ) :
-    ‖coord E X‖ = Real.sqrt (∑ i, trForm n X (E i) ^ 2) := by
+theorem norm_coord (E : Fin d → Matrix (Fin n) (Fin n) ℂ) (X : Matrix (Fin n) (Fin n) ℂ)
+    : ‖coord E X‖ = Real.sqrt (∑ i, trForm n X (E i) ^ 2) := by
   rw [EuclideanSpace.norm_eq]
   simp [coord]
 
-theorem trForm_sum (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
-    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0) (a : Fin d → ℝ) (k : Fin d) :
-    trForm n (∑ i, a i • E i) (E k) = a k := by
+theorem trForm_sum
+    (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0)
+    (a : Fin d → ℝ) (k : Fin d)
+    : trForm n (∑ i, a i • E i) (E k) = a k := by
   set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, LinearMap.sum_apply, hE]
+  simp [map_sum, LinearMap.sum_apply, hE]
 
-theorem hs_sum (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
-    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0) (a : Fin d → ℝ) :
-    hs (∑ i, a i • E i) = ∑ i, a i ^ 2 := by
+theorem hs_sum
+    (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0)
+    (a : Fin d → ℝ)
+    : hs (∑ i, a i • E i) = ∑ i, a i ^ 2 := by
   set_option synthInstance.maxHeartbeats 100000 in
     rw [hs_eq, map_sum (trForm n (∑ i, a i • E i))]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_smul, trForm_sum E hE, smul_eq_mul, sq]
 
-theorem bessel (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
-    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0) (X : Matrix (Fin n) (Fin n) ℂ) :
-    ‖coord E X‖ ≤ Real.sqrt (hs X) := by
+theorem bessel
+    (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0)
+    (X : Matrix (Fin n) (Fin n) ℂ)
+    : ‖coord E X‖ ≤ Real.sqrt (hs X) := by
   rw [norm_coord]
   apply Real.sqrt_le_sqrt
   set S := ∑ i, trForm n X (E i) • E i with hS
@@ -85,9 +92,11 @@ theorem bessel (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
   rw [hs_eq]
   linarith
 
-theorem norm_coord_span (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
-    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0) (X : Matrix (Fin n) (Fin n) ℂ)
-    (hX : X ∈ Submodule.span ℝ (Set.range E)) : ‖coord E X‖ = Real.sqrt (hs X) := by
+theorem norm_coord_span
+    (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0)
+    (X : Matrix (Fin n) (Fin n) ℂ) (hX : X ∈ Submodule.span ℝ (Set.range E))
+    : ‖coord E X‖ = Real.sqrt (hs X) := by
   obtain ⟨a, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℝ).1 hX
   rw [norm_coord, hs_sum E hE]
   simp only [trForm_sum E hE]
@@ -96,7 +105,9 @@ variable {ε : Fin n → Bool}
 
 theorem uMat_inv (g : UJ ε) : uMat g⁻¹ = Jm ε * (uMat g)ᴴ * Jm ε := by
   have hu : (uMat g)ᴴ * Jm ε * uMat g = Jm ε := g.2
-  calc uMat g⁻¹ = Jm ε * Jm ε * uMat g⁻¹ := by rw [Jm_mul_self, Matrix.one_mul]
+  calc
+    uMat g⁻¹
+      = Jm ε * Jm ε * uMat g⁻¹ := by rw [Jm_mul_self, Matrix.one_mul]
     _ = Jm ε * ((uMat g)ᴴ * Jm ε * uMat g) * uMat g⁻¹ := by rw [hu]
     _ = Jm ε * (uMat g)ᴴ * Jm ε * (uMat g * uMat g⁻¹) := by simp only [Matrix.mul_assoc]
     _ = _ := by rw [uMat_mul_inv, Matrix.mul_one]
@@ -122,15 +133,16 @@ theorem sub_inv_mem_lie (g : UJ ε) : uMat g - uMat g⁻¹ ∈ GlobalTheory.Gaug
   abel
 
 open scoped Matrix.Norms.Frobenius in
-theorem lower (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
-    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A)
-    (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0)
-    (hsp : ∀ X, (X ∈ A ∧ inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E)) (δ : ℝ) (hδ : δ ≤ 1)
-    (g h : UJ ε) (hg : uMat g - 1 ∈ A) (hh : uMat h - 1 ∈ A)
-    (hg' : Real.sqrt (hs (uMat g - 1)) < δ) (hh' : Real.sqrt (hs (uMat h - 1)) < δ) :
-    (1 - 3 * δ) * Real.sqrt (hs (uMat g - uMat h)) ≤ ‖coord E (uMat g - uMat h)‖ := by
-  have key : ∀ g : UJ ε, uMat g - 1 ∈ A →
-      uMat g - uMat g⁻¹ ∈ Submodule.span ℝ (Set.range E) := by
+theorem lower
+    (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ))
+    (E : Fin d → Matrix (Fin n) (Fin n) ℂ)
+    (hA : ∀ X ∈ A, ∀ Y ∈ A, X * Y ∈ A) (hE : ∀ i k, trForm n (E i) (E k) = if i = k then 1 else 0)
+    (hsp : ∀ X, (X ∈ A ∧ inG ε X) ↔ X ∈ Submodule.span ℝ (Set.range E))
+    (δ : ℝ) (hδ : δ ≤ 1)
+    (g h : UJ ε) (hg : uMat g - 1 ∈ A) (hh : uMat h - 1 ∈ A) (hg' : Real.sqrt (hs (uMat g - 1)) < δ)
+    (hh' : Real.sqrt (hs (uMat h - 1)) < δ)
+    : (1 - 3 * δ) * Real.sqrt (hs (uMat g - uMat h)) ≤ ‖coord E (uMat g - uMat h)‖ := by
+  have key : ∀ g : UJ ε, uMat g - 1 ∈ A → uMat g - uMat g⁻¹ ∈ Submodule.span ℝ (Set.range E) := by
     intro g hg
     refine (hsp _).1 ⟨?_, sub_inv_mem_lie g⟩
     have := A.sub_mem hg (inv_sub_one_mem A hA g hg)
@@ -145,9 +157,9 @@ theorem lower (A : Submodule ℝ (Matrix (Fin n) (Fin n) ℂ)) (E : Fin d → Ma
   set a := uMat g⁻¹ - 1 with ha
   set b := uMat h⁻¹ - 1 with hb
   have e2 : v = (2 : ℝ) • D + (a * D * b + a * D + D * b) := by
-    have : a * D * b + a * D + D * b = uMat g⁻¹ * D * uMat h⁻¹ - D := by
-      rw [ha, hb]; noncomm_ring
-    rw [this, e1, hvdef, hD, two_smul]; abel
+    have : a * D * b + a * D + D * b = uMat g⁻¹ * D * uMat h⁻¹ - D := by rw [ha, hb]; noncomm_ring
+    rw [this, e1, hvdef, hD, two_smul]
+    abel
   set R := a * D * b + a * D + D * b with hR
   have ha0 := norm_nonneg a
   have hb0 := norm_nonneg b

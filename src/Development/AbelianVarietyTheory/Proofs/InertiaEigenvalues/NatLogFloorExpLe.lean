@@ -5,7 +5,8 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Finr
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
+open NumberField IsDedekindDomain Formalism Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations GlobalTheory.HubLoc Module
 
 namespace GlobalTheory.HubLoc
 
@@ -38,13 +39,13 @@ private lemma natLog_le_add_two_mul_of_le_two_pow_mul_exp {l m k : ℕ} {L : ℝ
   have : ((Nat.log l m : ℝ) - k) * Real.log 2 ≤ L := by linarith
   nlinarith
 
-
 open NumberField IsDedekindDomain Module in
-theorem _root_.GlobalTheory.HubLoc.cBnum_le_thirty : ∀ (l t N : ℕ) (L : ℝ), 2 ≤ l → 1 ≤ t → 1 ≤ N →
-    1 ≤ L → (_root_.GlobalTheory.HubLoc.cBnum l ⌊2 * Real.exp L⌋₊ t N : ℝ) ≤ 30 * t * N * L := by
+theorem _root_.GlobalTheory.HubLoc.cBnum_le_thirty
+    : ∀ (l t N : ℕ) (L : ℝ),
+      2 ≤ l → 1 ≤ t → 1 ≤ N → 1 ≤ L
+        → (_root_.GlobalTheory.HubLoc.cBnum l ⌊2 * Real.exp L⌋₊ t N : ℝ) ≤ 30 * t * N * L := by
   intro l t N L hl ht hN hL
-  have hfl : ((⌊2 * Real.exp L⌋₊ : ℕ) : ℝ) ≤ 2 * Real.exp L :=
-    Nat.floor_le (by positivity)
+  have hfl : ((⌊2 * Real.exp L⌋₊ : ℕ) : ℝ) ≤ 2 * Real.exp L := Nat.floor_le (by positivity)
   have hm : ((2 * ⌊2 * Real.exp L⌋₊ : ℕ) : ℝ) ≤ 2 ^ 2 * Real.exp L := by
     push_cast
     nlinarith

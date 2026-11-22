@@ -9,18 +9,23 @@ public import Development.AutomorphicSpectrum.Proofs.BlockDecomposition.ExistsLi
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA CrystallineSemistableComparison CrystallineSemistableComparison.CH CrystallineSemistableComparison.B
+open CategoryTheory AlgebraicGeometry Polynomial DividedPowers GlobalTheory.LogCris GlobalTheory.PDA
+  CrystallineSemistableComparison CrystallineSemistableComparison.CH
+  CrystallineSemistableComparison.B
 
 namespace GlobalTheory.CompanionTheory.ThickAct
 
-theorem exists_act_of_hom {b : Base} {L : b.Fun} (q : b.Rˣ) (hq : (q : b.R) - 1 ∈ b.I) (D : Thick L)
-    {R : Type} [CommRing R] {d : ℕ} (τ : Fin d → Rˣ) (t : Fin d → D.B)
+theorem exists_act_of_hom
+    {b : Base} {L : b.Fun} (q : b.Rˣ) (hq : (q : b.R) - 1 ∈ b.I) (D : Thick L)
+    {R : Type} [CommRing R]
+    {d : ℕ} (τ : Fin d → Rˣ) (t : Fin d → D.B)
     (g : ∀ T : Thick L, R →+* T.B ⧸ T.J)
     (hcl : ∀ (T : Thick L) (c : D ⟶ T) (k : Fin d), Ideal.Quotient.mk T.J (c.φ (t k)) = g T (τ k))
-    (hex : ∀ (T : Thick L) (u : Fin d → T.B), (∀ k, Ideal.Quotient.mk T.J (u k) = g T (τ k)) →
-      ∃! c : D ⟶ T, ∀ k, c.φ (t k) = u k) :
-    ∃ A : Act (𝟭 _) (thU L q hq) d D, ∀ (T : Thick L) (a : Fin d → (thU L q hq).U T) (c : D ⟶ T) (k : Fin d),
-      (A.act a c).φ (t k) = ((a k).1 : T.B) * c.φ (t k) := by
+    (hex : ∀ (T : Thick L) (u : Fin d → T.B),
+      (∀ k, Ideal.Quotient.mk T.J (u k) = g T (τ k)) → ∃! c : D ⟶ T, ∀ k, c.φ (t k) = u k)
+    : ∃ A : Act (𝟭 _) (thU L q hq) d D,
+      ∀ (T : Thick L) (a : Fin d → (thU L q hq).U T) (c : D ⟶ T) (k : Fin d),
+        (A.act a c).φ (t k) = ((a k).1 : T.B) * c.φ (t k) := by
   classical
   have hunit : ∀ (T : Thick L) (x : T.B), IsUnit (Ideal.Quotient.mk T.J x) → IsUnit x := by
     intro T x hx
@@ -29,13 +34,16 @@ theorem exists_act_of_hom {b : Base} {L : b.Fun} (q : b.Rˣ) (hq : (q : b.R) - 1
     have hm : x * y' - 1 ∈ T.J := by
       rw [← Ideal.Quotient.eq, map_mul, map_one]
       exact hy
-    have h1 : IsUnit (1 + (x * y' - 1)) := (GlobalTheory.LogCris.CupModel.isNilpotent_of_mem T hm).isUnit_one_add
+    have h1 : IsUnit (1 + (x * y' - 1)) :=
+      (GlobalTheory.LogCris.CupModel.isNilpotent_of_mem T hm).isUnit_one_add
     rw [add_sub_cancel] at h1
     exact isUnit_of_mul_isUnit_left h1
-  have hker : ∀ (T : Thick L) (x : (thU L q hq).U T), Ideal.Quotient.mk T.J ((x.1 : T.Bˣ) : T.B) = 1 :=
+  have hker
+      : ∀ (T : Thick L) (x : (thU L q hq).U T), Ideal.Quotient.mk T.J ((x.1 : T.Bˣ) : T.B) = 1 :=
     fun T x => congrArg Units.val (MonoidHom.mem_ker.1 x.2)
-  have hlift : ∀ (T : Thick L) (a : Fin d → (thU L q hq).U T) (c : D ⟶ T) (k : Fin d),
-      Ideal.Quotient.mk T.J (((a k).1 : T.B) * c.φ (t k)) = g T (τ k) := by
+  have hlift
+      : ∀ (T : Thick L) (a : Fin d → (thU L q hq).U T) (c : D ⟶ T) (k : Fin d),
+        Ideal.Quotient.mk T.J (((a k).1 : T.B) * c.φ (t k)) = g T (τ k) := by
     intro T a c k
     rw [map_mul, hker, one_mul, hcl]
   have hu : ∀ (T : Thick L) (c₁ c₂ : D ⟶ T), (∀ k, c₁.φ (t k) = c₂.φ (t k)) → c₁ = c₂ := by
@@ -74,14 +82,18 @@ theorem exists_act_of_hom {b : Base} {L : b.Fun} (q : b.Rˣ) (hq : (q : b.R) - 1
   · intro T
     show ∀ c c' : D ⟶ T, ∃! a, act T a c = c'
     intro c c'
-    let a : Fin d → (thU L q hq).U T := fun k =>
-      ⟨(hw T c' k).unit * ((hw T c k).unit)⁻¹, by
+    let a : Fin d → (thU L q hq).U T := fun k => ⟨
+      (hw T c' k).unit * ((hw T c k).unit)⁻¹,
+      by
         rw [MonoidHom.mem_ker, map_mul, map_inv]
-        have e : Units.map (Ideal.Quotient.mk T.J).toMonoidHom (hw T c' k).unit =
-            Units.map (Ideal.Quotient.mk T.J).toMonoidHom (hw T c k).unit := by
+        have e
+            : Units.map (Ideal.Quotient.mk T.J).toMonoidHom (hw T c' k).unit
+              = Units.map (Ideal.Quotient.mk T.J).toMonoidHom (hw T c k).unit := by
           apply Units.ext
-          simp only [Units.coe_map, IsUnit.unit_spec, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe, hcl]
-        rw [e, mul_inv_cancel]⟩
+          simp only [Units.coe_map, IsUnit.unit_spec, RingHom.toMonoidHom_eq_coe, MonoidHom.coe_coe,
+            hcl]
+        rw [e, mul_inv_cancel]
+    ⟩
     refine ⟨a, ?_, ?_⟩
     · apply hu
       intro k
@@ -99,10 +111,19 @@ theorem exists_act_of_hom {b : Base} {L : b.Fun} (q : b.Rˣ) (hq : (q : b.R) - 1
   · intro T a c k
     exact hact T a c k
 
-theorem thick_act : ∀ {O : Type} [CommRing O] {F : Fn O} {d : ℕ} (s : F.Small d) {b : Base} (ht : b.t = 1) {κ : O →+* b.R ⧸ b.I} (𝓛 : Lift s.a (fun k => (s.T k : s.R)) b.R b.I κ) (δ : DividedPowers (b.I.map 𝓛.i)) (hδ : IsDPMorphism b.γ δ 𝓛.i) (hp : b.p ≠ 0) (hn : IsNilpotent (b.p : b.R)) (q : b.Rˣ) (hq : (q : b.R) - 1 ∈ b.I), ∃ A : Act (𝟭 _) (thU (F.cr b ht κ) q hq) d (liftObj s ht 𝓛 δ hδ hp hn), ∀ (T : Thick (F.cr b ht κ)) (a : Fin d → (thU (F.cr b ht κ) q hq).U T) (c : liftObj s ht 𝓛 δ hδ hp hn ⟶ T) (k : Fin d), (A.act a c).φ (𝓛.t k) = ((a k).1 : T.B) * c.φ (𝓛.t k) := by
+theorem thick_act
+    : ∀ {O : Type} [CommRing O] {F : Fn O} {d : ℕ} (s : F.Small d) {b : Base} (ht : b.t = 1)
+        {κ : O →+* b.R ⧸ b.I} (𝓛 : Lift s.a (fun k => (s.T k : s.R)) b.R b.I κ)
+        (δ : DividedPowers (b.I.map 𝓛.i)) (hδ : IsDPMorphism b.γ δ 𝓛.i) (hp : b.p ≠ 0)
+        (hn : IsNilpotent (b.p : b.R)) (q : b.Rˣ) (hq : (q : b.R) - 1 ∈ b.I),
+      ∃ A : Act (𝟭 _) (thU (F.cr b ht κ) q hq) d (liftObj s ht 𝓛 δ hδ hp hn),
+        ∀ (T : Thick (F.cr b ht κ)) (a : Fin d → (thU (F.cr b ht κ) q hq).U T)
+            (c : liftObj s ht 𝓛 δ hδ hp hn ⟶ T) (k : Fin d),
+          (A.act a c).φ (𝓛.t k) = ((a k).1 : T.B) * c.φ (𝓛.t k) := by
   intro O _ F d s b ht κ 𝓛 δ hδ hp hn q hq
   choose g hg using fun T => GlobalTheory.T.exists_lift_to_thickening s ht 𝓛 δ hδ hp hn T
   exact exists_act_of_hom q hq (liftObj s ht 𝓛 δ hδ hp hn) s.T 𝓛.t g
-    (fun T c k => (hg T).1 c (s.T k) (𝓛.t k) (𝓛.hT k).symm) (fun T u hu => (hg T).2.2 u hu)
+    (fun T c k => (hg T).1 c (s.T k) (𝓛.t k) (𝓛.hT k).symm)
+    (fun T u hu => (hg T).2.2 u hu)
 
 end GlobalTheory.CompanionTheory.ThickAct

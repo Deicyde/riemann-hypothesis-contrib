@@ -4,4 +4,5 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-noncomputable abbrev UpperTheory.Zero.LLC.IsRecT.langlandsQuotientDense := @UpperTheory.V.Z.Win.T2.lQuot_alt
+noncomputable abbrev UpperTheory.Zero.LLC.IsRecT.langlandsQuotientDense :=
+  @UpperTheory.V.Z.Win.T2.lQuot_alt

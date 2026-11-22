@@ -12,14 +12,23 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Chebota
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 open GlobalTheory.AboveL
 
 namespace GlobalTheory.DecCover
 
-theorem main : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω] (v : HeightOneSpectrum (𝓞 F)) (N : Subgroup (G F Ω)), IsOpen (N : Set (G F Ω)) → ∃ T : Finset (HeightOneSpectrum (𝓞 F)), v ∉ T ∧ ∀ g : G F Ω, ∃ u ∈ T, ∃ A' : ValuationSubring Ω, IsPlaceOver A' u ∧ ∃ x ∈ Dec (F := F) A', ∃ n ∈ N, g = x * n := by
+theorem main
+    : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [Algebra F Ω] [IsAlgClosure F Ω]
+        (v : HeightOneSpectrum (𝓞 F)) (N : Subgroup (G F Ω)),
+      IsOpen (N : Set (G F Ω))
+        → ∃ T : Finset (HeightOneSpectrum (𝓞 F)),
+          v ∉ T
+            ∧ ∀ g : G F Ω, ∃ u ∈ T, ∃ A' : ValuationSubring Ω,
+              IsPlaceOver A' u ∧ ∃ x ∈ Dec (F := F) A', ∃ n ∈ N, g = x * n := by
   intro Ω _ F _ _ _ _ v N hN
   classical
   have : IsGalois F Ω := {}
@@ -38,8 +47,11 @@ theorem main : ∀ (Ω : Type) [Field Ω] (F : Type) [Field F] [NumberField F] [
     exact h3
   have hopen : ∀ g : G F Ω, IsOpen {h : G F Ω | (σ g)⁻¹ * h ∈ N} := fun g =>
     hN.preimage (continuous_const_mul _)
-  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun g : G F Ω => {h : G F Ω | (σ g)⁻¹ * h ∈ N}) hopen
-    (fun g _ => Set.mem_iUnion.2 ⟨g, hmem g⟩)
+  obtain ⟨t, ht⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun g : G F Ω => {h : G F Ω | (σ g)⁻¹ * h ∈ N})
+      hopen
+      (fun g _ => Set.mem_iUnion.2 ⟨g, hmem g⟩)
   refine ⟨t.image u, ?_, fun g => ?_⟩
   · intro hv
     obtain ⟨i, -, hi⟩ := Finset.mem_image.1 hv

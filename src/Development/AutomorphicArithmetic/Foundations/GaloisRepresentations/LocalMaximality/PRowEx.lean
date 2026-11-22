@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.MonomialCech
 
 @[expose] public section
 
-open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1 UpperTheory.Gal.productCup_of_system
+open KaehlerDifferential GlobalTheory.CechDR GlobalTheory.PD GlobalTheory.WH GlobalTheory.W1
+  UpperTheory.Gal.productCup_of_system
 open scoped TensorProduct
 
 set_option autoImplicit false
@@ -27,7 +28,8 @@ private def den (B C : Subalgebra ℂ L) (hBC : B ≤ C) (e : B →ₐ[ℂ] ℂ)
     rintro v v' ⟨b, hb, h⟩ ⟨b', hb', h'⟩
     refine ⟨b * b', by simp [hb, hb'], ?_⟩
     have := C.add_mem (C.mul_mem (hBC b'.2) h) (C.mul_mem (hBC b.2) h')
-    rwa [show (b' : L) * (b * v) + b * (b' * v') = ((b * b' : B) : L) * (v + v') by push_cast; ring] at this
+    rwa [show (b' : L) * (b * v) + b * (b' * v') = ((b * b' : B) : L) * (v + v') by push_cast; ring]
+      at this
   algebraMap_mem' c := ⟨1, by simp, by simpa using C.algebraMap_mem c⟩
 
 private lemma smul_omB (C : Subalgebra ℂ L) (q : ℕ) {c : L} (hc : c ∈ C) {y : DR ℂ L} (hy : y ∈ omB ℂ L C q) :
@@ -86,15 +88,18 @@ private lemma pow_smul_omB (C : Subalgebra ℂ L) {β : L} (hβ : β ∈ C) : �
     rw [this]
     exact sub_mem h2 h3
 
-private def locS (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ) (M : Submodule ℂ (DR ℂ L))
-    (hM : ∀ b ∈ B, ∀ m ∈ M, (b : L) • m ∈ M) : Submodule ℂ (DR ℂ L) where
+private def locS
+    (B : Subalgebra ℂ L) (e : B →ₐ[ℂ] ℂ)
+    (M : Submodule ℂ (DR ℂ L)) (hM : ∀ b ∈ B, ∀ m ∈ M, (b : L) • m ∈ M)
+    : Submodule ℂ (DR ℂ L) where
   carrier := {v | ∃ b : B, e b ≠ 0 ∧ (b : L) • v ∈ M}
   add_mem' := by
     rintro v v' ⟨b, hb, h⟩ ⟨b', hb', h'⟩
     refine ⟨b * b', by simp [hb, hb'], ?_⟩
     have := M.add_mem (hM _ b'.2 _ h) (hM _ b.2 _ h')
     rwa [show (b' : L) • (b : L) • v + (b : L) • (b' : L) • v' = ((b * b' : B) : L) • (v + v') by
-      rw [smul_add, smul_smul, smul_smul]; push_cast; rw [mul_comm (b' : L)]] at this
+        rw [smul_add, smul_smul, smul_smul]; push_cast; rw [mul_comm (b' : L)]]
+      at this
   zero_mem' := ⟨1, by simp, by simp⟩
   smul_mem' c v := by
     rintro ⟨b, hb, h⟩
@@ -237,19 +242,26 @@ private lemma den_insert {F K K' : Type} [Field F] [Field K] [Field K'] [Algebra
 
 end UpperTheory.Gal.productCup_of_system
 
-theorem UpperTheory.Gal.productCup_of_system.rowEx_of :
-    LG → OmLoc → RYBasic → RYFT → ValBasic → WdBasic → RowEx := by
+theorem UpperTheory.Gal.productCup_of_system.rowEx_of
+    : LG → OmLoc → RYBasic → RYFT → ValBasic → WdBasic → RowEx := by
   intro hLG _ hRY hFT _ hWd F K K' _ _ _ _ _ _ _ _ _ _ _ _ _ d x j2 hY q I hI m
   obtain ⟨h0, -, hmono, hmap, hlast⟩ := hRY F K K' d x j2 hY
   have hBR : ∀ J, rB ℂ K' (xv x) I ≤ RY (xv x) j2 I J := fun J => le_sup_left
   haveI : Algebra.FiniteType ℂ (rB ℂ K' (xv x) I) := by
     have := hFT F K K' d x j2 hY I ∅ hI
     rwa [h0] at this
-  refine ex_of_loc hLG hWd (rB ℂ K' (xv x) I) _ (fun J r hr m hm => smul_omB _ q (hBR J hr) hm) (fun e => ?_) m
+  refine ex_of_loc hLG hWd (rB ℂ K' (xv x) I) _
+    (fun J r hr m hm => smul_omB _ q (hBR J hr) hm)
+    (fun e => ?_)
+    m
   obtain ⟨i, hi⟩ := hI
   have hle : rB ℂ K' (xv x) {i} ≤ rB ℂ K' (xv x) I := by
     rw [← h0, ← h0]
     exact hmono _ _ _ _ (Finset.singleton_subset_iff.2 hi) subset_rfl
   obtain ⟨j', hj'⟩ := hY.cov i (e.comp (Subalgebra.inclusion hle))
   have hloc : R2 (xv x) j2 {j'} ≤ loc (rB ℂ K' (xv x) I) e := hj'.trans (loc_mono _ _ hle e)
-  exact ⟨j', fun J => locM_le_locM _ _ _ (hBR J) (hBR _) e (den_insert x j2 I hmap hlast hBR (h0 I) e j' hloc J) q⟩
+  exact ⟨
+    j',
+    fun J =>
+      locM_le_locM _ _ _ (hBR J) (hBR _) e (den_insert x j2 I hmap hlast hBR (h0 I) e j' hloc J) q
+  ⟩

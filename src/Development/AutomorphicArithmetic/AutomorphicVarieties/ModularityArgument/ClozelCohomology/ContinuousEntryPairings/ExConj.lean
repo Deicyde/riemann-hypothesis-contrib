@@ -7,20 +7,29 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsSign
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC UpperTheory.V UpperTheory.V.Af
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp GlobalTheory.UnitaryBC
+  UpperTheory.V UpperTheory.V.Af
 
 namespace GlobalTheory.ConjElOverReal
 
-private theorem exists_ne_zero_smul_mem_of_mem_span' (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] (c : G E Ω) (hc : IsConjEl c)
-    (x : Ω) (m : ℕ) (hm : m ≠ 0) (hx : x ^ m = 1) : c x = x⁻¹ := by
+private theorem exists_ne_zero_smul_mem_of_mem_span'
+    (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω]
+    (c : G E Ω) (hc : IsConjEl c)
+    (x : Ω) (m : ℕ) (hm : m ≠ 0) (hx : x ^ m = 1)
+    : c x = x⁻¹ := by
   obtain ⟨j, hj⟩ := hc
   apply j.injective
   rw [hj, map_inv₀, Complex.inv_eq_conj]
   apply Complex.norm_eq_one_of_pow_eq_one (n := m) _ hm
   rw [← map_pow, hx, map_one]
 
-private theorem main_lemma_2 (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] [CharZero Ω] [IsAlgClosed Ω]
-    (l : ℕ) [Fact l.Prime] (c : G E Ω) (hc : IsConjEl c) : cycBar E Ω l c = -1 := by
+private theorem main_lemma_2
+    (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] [CharZero Ω] [IsAlgClosed Ω]
+    (l : ℕ) [Fact l.Prime]
+    (c : G E Ω) (hc : IsConjEl c)
+    : cycBar E Ω l c = -1 := by
   have hZ : cycZ E Ω l c = -1 := by
     unfold cycZ
     apply Units.ext
@@ -49,7 +58,17 @@ private theorem main_lemma_2 (E Ω : Type) [Field E] [Field Ω] [Algebra E Ω] [
   ext
   simp
 
-theorem main : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω], (∃ c : G (maximalRealSubfield K) Ω, IsConjEl c) ∧ ∀ (l : ℕ) [Fact l.Prime] (c : G (maximalRealSubfield K) Ω), IsConjEl c → haveI : IsAlgClosure (maximalRealSubfield K) Ω := ⟨IsAlgClosure.isAlgClosed K, haveI := IsAlgClosure.isAlgebraic (R := K) (K := Ω); Algebra.IsAlgebraic.trans (maximalRealSubfield K) K Ω⟩; cycBar (maximalRealSubfield K) Ω l c = -1 := by
+theorem main
+    : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω],
+      (∃ c : G (maximalRealSubfield K) Ω, IsConjEl c)
+        ∧ ∀ (l : ℕ) [Fact l.Prime] (c : G (maximalRealSubfield K) Ω),
+          IsConjEl c
+            → haveI : IsAlgClosure (maximalRealSubfield K) Ω := ⟨
+                IsAlgClosure.isAlgClosed K,
+                haveI := IsAlgClosure.isAlgebraic (R := K) (K := Ω)
+                Algebra.IsAlgebraic.trans (maximalRealSubfield K) K Ω
+              ⟩
+              cycBar (maximalRealSubfield K) Ω l c = -1 := by
   intro K Ω _ _ _ _ _
   haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap K Ω).injective
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed K
@@ -60,15 +79,15 @@ theorem main : ∀ (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K
   haveI : Normal ℚ Ω := IsAlgClosure.normal ℚ Ω
   let j : Ω →ₐ[ℚ] ℂ := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   letI : Algebra Ω ℂ := j.toRingHom.toAlgebra
   let cq : ℂ ≃ₐ[ℚ] ℂ := Complex.conjAe.restrictScalars ℚ
   let σ : Ω ≃ₐ[ℚ] Ω := cq.restrictNormal Ω
   have hσ : ∀ x, j (σ x) = starRingEnd ℂ (j x) := fun x => AlgEquiv.restrictNormal_commutes cq Ω x
-  have hfix : ∀ x : maximalRealSubfield K,
-      σ (algebraMap (maximalRealSubfield K) Ω x) = algebraMap (maximalRealSubfield K) Ω x := by
+  have hfix
+      : ∀ x : maximalRealSubfield K,
+        σ (algebraMap (maximalRealSubfield K) Ω x) = algebraMap (maximalRealSubfield K) Ω x := by
     intro x
     apply j.injective
     show j _ = j _

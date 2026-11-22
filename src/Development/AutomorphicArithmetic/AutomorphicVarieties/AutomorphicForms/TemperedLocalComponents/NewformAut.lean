@@ -6,19 +6,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.IdeleGenera
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial
+  GlobalTheory.GalOfCusp
 open UpperTheory.V.Af
 open scoped Matrix
 
 namespace UpperTheory.V.Af.NewformAutomorphy
 
-private theorem ss_of_tw {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) (χ : Γ →* kˣ)
-    (h : IsSSRep (tw r χ)) : IsSSRep r := by
+private theorem ss_of_tw
+    {Γ k : Type} [Group Γ] [Field k]
+    {n : ℕ} (r : Γ →* GL (Fin n) k)
+    (χ : Γ →* kˣ) (h : IsSSRep (tw r χ))
+    : IsSSRep r := by
   have key : ∀ W, IsInv (tw r χ) W ↔ IsInv r W := fun W => by
     constructor
     · intro h g v hv
       have := W.smul_mem ((χ g : k)⁻¹) (h g v hv)
-      rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at this
+      rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at
+        this
     · intro h g v hv
       rw [tw_val, Matrix.smul_mulVec]
       exact W.smul_mem _ (h g v hv)
@@ -26,8 +32,8 @@ private theorem ss_of_tw {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ �
   obtain ⟨W', hW', hc⟩ := h W ((key W).2 hW)
   exact ⟨W', (key W').1 hW', hc⟩
 
-private theorem ev_not_mem (N : ℕ) (hN : N ≠ 0) :
-    ∀ᶠ w : HeightOneSpectrum (𝓞 ℚ) in Filter.cofinite, ((N : ℕ) : 𝓞 ℚ) ∉ w.asIdeal := by
+private theorem ev_not_mem (N : ℕ) (hN : N ≠ 0)
+    : ∀ᶠ w : HeightOneSpectrum (𝓞 ℚ) in Filter.cofinite, ((N : ℕ) : 𝓞 ℚ) ∉ w.asIdeal := by
   have h0 : Ideal.span {((N : ℕ) : 𝓞 ℚ)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hN
@@ -38,9 +44,12 @@ private theorem ev_not_mem (N : ℕ) (hN : N ≠ 0) :
 private theorem normV_eq (w : HeightOneSpectrum (𝓞 ℚ)) : normV w = Ideal.absNorm w.asIdeal := by
   rw [Ideal.absNorm_apply, Submodule.cardQuot_apply]; rfl
 
-private theorem scale_charpoly {k : Type} [Field k] (φ : k →+* ℂ) (M : Matrix (Fin 2) (Fin 2) k) (c : k) (hc : c ≠ 0)
-    (B : Multiset ℂ) (h : (c • M).charpoly.map φ = (B.map fun b => X - C (φ c * b)).prod) :
-    M.charpoly.map φ = (B.map fun b => X - C b).prod := by
+private theorem scale_charpoly
+    {k : Type} [Field k]
+    (φ : k →+* ℂ) (M : Matrix (Fin 2) (Fin 2) k)
+    (c : k) (hc : c ≠ 0)
+    (B : Multiset ℂ) (h : (c • M).charpoly.map φ = (B.map fun b => X - C (φ c * b)).prod)
+    : M.charpoly.map φ = (B.map fun b => X - C b).prod := by
   have hc' : φ c ≠ 0 := by simpa using hc
   have hcard : B.card = 2 := by
     have h1 := congrArg natDegree h
@@ -53,8 +62,10 @@ private theorem scale_charpoly {k : Type} [Field k] (φ : k →+* ℂ) (M : Matr
   obtain ⟨x, y, rfl⟩ := Multiset.card_eq_two.1 hcard
   rw [Matrix.charpoly_fin_two] at h ⊢
   simp only [Multiset.insert_eq_cons, Multiset.map_cons, Multiset.map_singleton, Multiset.prod_cons,
-    Multiset.prod_singleton, Polynomial.map_add, Polynomial.map_sub, Polynomial.map_mul, Polynomial.map_pow, map_X,
-    map_C, Matrix.trace_smul, Matrix.det_smul, smul_eq_mul, map_mul, map_pow, Fintype.card_fin] at h ⊢
+      Multiset.prod_singleton, Polynomial.map_add, Polynomial.map_sub, Polynomial.map_mul,
+      Polynomial.map_pow, map_X, map_C, Matrix.trace_smul, Matrix.det_smul, smul_eq_mul, map_mul,
+      map_pow, Fintype.card_fin]
+    at h ⊢
   have e0 := congrArg (eval 0) h
   have e1 := congrArg (eval 1) h
   simp only [eval_add, eval_sub, eval_mul, eval_pow, eval_X, eval_C] at e0 e1
@@ -68,4 +79,3 @@ private theorem scale_charpoly {k : Type} [Field k] (φ : k →+* ℂ) (M : Matr
   ring
 
 end UpperTheory.V.Af.NewformAutomorphy
-

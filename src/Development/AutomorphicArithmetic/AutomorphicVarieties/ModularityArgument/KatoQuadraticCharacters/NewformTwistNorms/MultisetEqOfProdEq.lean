@@ -9,13 +9,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 @[expose] public section
 
 section
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Nf CongruenceSubgroup GlobalTheory.CuspRep Neutral.B1 Formalism.L2.Host
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual UpperTheory.V UpperTheory.V.Af
+  UpperTheory.V.Af.Nf CongruenceSubgroup GlobalTheory.CuspRep Neutral.B1 Formalism.L2.Host
 open scoped Matrix Manifold UpperHalfPlane
 
 namespace GlobalTheory.NewLevel
 
-private theorem ev_not_dvd_norm {a : ℕ} (h : a ≠ 0) :
-    ∀ᶠ w : HeightOneSpectrum (𝓞 ℚ) in Filter.cofinite, ¬ normV w ∣ a := by
+private theorem ev_not_dvd_norm {a : ℕ} (h : a ≠ 0)
+    : ∀ᶠ w : HeightOneSpectrum (𝓞 ℚ) in Filter.cofinite, ¬ normV w ∣ a := by
   have h0 : Ideal.span {(a : 𝓞 ℚ)} ≠ 0 := by simpa using h
   refine Filter.eventually_cofinite.2 ((Ideal.finite_factors h0).subset fun w hw => ?_)
   obtain ⟨c, rfl⟩ := not_not.1 hw
@@ -23,25 +24,33 @@ private theorem ev_not_dvd_norm {a : ℕ} (h : a ≠ 0) :
   rw [Nat.cast_mul, (places w).2.1]
   exact Ideal.mul_mem_right _ _ (Ideal.mem_span_singleton_self _)
 
-private theorem multiset_eq_of_prod_eq {c : ℂ} (hc : c ≠ 0) {B B' : Multiset ℂˣ}
-    (h : (B.map fun b : ℂˣ => Polynomial.X - Polynomial.C (c * (b : ℂ))).prod =
-      (B'.map fun b : ℂˣ => Polynomial.X - Polynomial.C (c * (b : ℂ))).prod) : B = B' := by
-  have e : ∀ D : Multiset ℂˣ, (D.map fun b : ℂˣ => Polynomial.X - Polynomial.C (c * (b : ℂ))).prod.roots =
-      D.map fun b : ℂˣ => c * (b : ℂ) := fun D => by
-    rw [← Polynomial.roots_multiset_prod_X_sub_C (D.map fun b : ℂˣ => c * (b : ℂ)), Multiset.map_map]
+private theorem multiset_eq_of_prod_eq
+    {c : ℂ} (hc : c ≠ 0)
+    {B B' : Multiset ℂˣ}
+    (h : (B.map fun b : ℂˣ => Polynomial.X - Polynomial.C (c * (b : ℂ))).prod
+      = (B'.map fun b : ℂˣ => Polynomial.X - Polynomial.C (c * (b : ℂ))).prod)
+    : B = B' := by
+  have e
+      : ∀ D : Multiset ℂˣ,
+        (D.map fun b : ℂˣ => Polynomial.X - Polynomial.C (c * (b : ℂ))).prod.roots
+          = D.map fun b : ℂˣ => c * (b : ℂ) := fun D => by
+    rw [← Polynomial.roots_multiset_prod_X_sub_C (D.map fun b : ℂˣ => c * (b : ℂ)),
+      Multiset.map_map]
     rfl
   have h1 := (e B).symm.trans ((congrArg Polynomial.roots h).trans (e B'))
   exact Multiset.map_injective (fun a b hab => Units.ext (mul_left_cancel₀ hc hab)) h1
 
-private theorem algSat_prod (q : ℕ) (t : ℂ) (B : Multiset ℂˣ) :
-    ((algSat 2 q B).map fun b => Polynomial.X - Polynomial.C (t * b)).prod =
-      (B.map fun b : ℂˣ => Polynomial.X -
-        Polynomial.C ((t * (((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2) : ℝ) : ℂ)) * (b : ℂ))).prod := by
+private theorem algSat_prod (q : ℕ) (t : ℂ) (B : Multiset ℂˣ)
+    : ((algSat 2 q B).map fun b => Polynomial.X - Polynomial.C (t * b)).prod
+      = (B.map fun b : ℂˣ =>
+        Polynomial.X - Polynomial.C
+          ((t * (((q : ℝ) ^ ((((2 : ℕ) : ℝ) - 1) / 2) : ℝ) : ℂ)) * (b : ℂ))).prod := by
   induction B using Multiset.induction_on with
   | empty => simp [algSat]
   | cons a B ih =>
     simp only [algSat, Multiset.map_cons, Multiset.prod_cons, Multiset.pure_def, Multiset.bind_def,
-      Multiset.cons_bind, Multiset.singleton_add] at ih ⊢
+        Multiset.cons_bind, Multiset.singleton_add]
+      at ih ⊢
     rw [ih, mul_assoc]
 
 theorem spherical_of_normTwist : Published.StrongMultOneReal → ∀ (k : ℕ), 2 ≤ k → ∀ (g : Newform k) (j : ℤ) (π π₀ : TR.CuspSub ℚ 2), (∀ᶠ w : HeightOneSpectrum (𝓞 ℚ) in Filter.cofinite, ∃ Bs, π.HasSat w Bs ∧ ((algSat 2 (normV w) Bs).map fun b => Polynomial.X - Polynomial.C ((normV w : ℂ) ^ j * b)).prod = g.heckePoly (normV w)) → (∀ q : HeightOneSpectrum (𝓞 ℚ), ¬ normV q ∣ g.M → ∃ α β : ℂˣ, π₀.HasSat q {α, β} ∧ (((normV q : ℝ) ^ (((k : ℝ) - 1) / 2) : ℝ) : ℂ) * ((α : ℂ) + β) = g.a (normV q) ∧ ((α * β : ℂˣ) : ℂ) = g.χ (normV q : ZMod g.M)) → ∀ (w : HeightOneSpectrum (𝓞 ℚ)) (Bs : Multiset ℂˣ), π.HasSat w Bs → ∃ B, π₀.HasSat w B := by

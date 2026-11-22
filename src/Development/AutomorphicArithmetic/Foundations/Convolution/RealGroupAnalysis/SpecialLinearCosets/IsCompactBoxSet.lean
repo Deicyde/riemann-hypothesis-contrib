@@ -6,8 +6,11 @@ public import GroundTheory.AutomorphicForms.GL2.GJZetaDefs
 @[expose] public section
 
 open NumberField IsDedekindDomain MeasureTheory Matrix Topology Filter
-open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global GroundTheory.Automorphic.GJMatrix
-open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H UpperTheory.ConvolutionTheory.R2.I
+open Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual GlobalTheory.CuspRep
+  GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Published GroundTheory.Global
+  GroundTheory.Automorphic.GJMatrix
+open UpperTheory.ConvolutionTheory.R2 UpperTheory.ConvolutionTheory.R2.H
+  UpperTheory.ConvolutionTheory.R2.I
 open scoped Classical
 
 section SlopeTestRemainingChoices
@@ -16,28 +19,34 @@ open GroundTheory.LocalField
 
 variable {K : Type} [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
 
-private def boxSet (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (n : ℤ) : Set (Matrix (Fin 2) (Fin 2) K) :=
+private def boxSet
+    (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (n : ℤ)
+    : Set (Matrix (Fin 2) (Fin 2) K) :=
   {m | ∀ i j, m i j ∈ valBall K n}
 
 private theorem isOpen_boxSet (n : ℤ) : IsOpen (boxSet K n) := by
-  have : boxSet K n = ⋂ i, ⋂ j, (fun X : Matrix (Fin 2) (Fin 2) K => X i j) ⁻¹'
-      (valBall K n : Set K) := by
+  have : boxSet K n
+      = ⋂ i, ⋂ j, (fun X : Matrix (Fin 2) (Fin 2) K => X i j) ⁻¹'
+        (valBall K n : Set K) := by
     ext X; simp [boxSet]
   rw [this]
-  exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j =>
-    (isOpen_valBall _).preimage ((continuous_apply j).comp (continuous_apply i))
+  exact isOpen_iInter_of_finite fun i =>
+    isOpen_iInter_of_finite fun j =>
+      (isOpen_valBall _).preimage ((continuous_apply j).comp (continuous_apply i))
 
 private theorem isCompact_boxSet (n : ℤ) : IsCompact (boxSet K n) := by
-  have : boxSet K n = Set.univ.pi fun _ : Fin 2 => Set.univ.pi fun _ : Fin 2 =>
-      (valBall K n : Set K) := by
+  have : boxSet K n
+      = Set.univ.pi fun _ : Fin 2 => Set.univ.pi fun _ : Fin 2 => (valBall K n : Set K) := by
     ext X
     exact ⟨fun h i _ j _ => h i j, fun h i j => h i trivial j trivial⟩
   rw [this]
   exact isCompact_univ_pi fun _ => isCompact_univ_pi fun _ => isCompact_valBall n
 
-private def boxGrp (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (n : ℤ) : Subgroup (Multiplicative (Matrix (Fin 2) (Fin 2) K)) where
+private def boxGrp
+    (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (n : ℤ)
+    : Subgroup (Multiplicative (Matrix (Fin 2) (Fin 2) K)) where
   carrier := Multiplicative.toAdd ⁻¹' boxSet K n
   one_mem' := fun _ _ => zero_mem _
   mul_mem' := fun ha hb i j => add_mem (ha i j) (hb i j)
@@ -60,8 +69,10 @@ private theorem lgrp_matrix : Lgrp (Multiplicative (Matrix (Fin 2) (Fin 2) K)) :
   · intro x hx
     exact hr hx
 
-private def cgrp (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
-    [IsNonarchimedeanLocalField K] (n : ℕ) : Subgroup (Matrix.SpecialLinearGroup (Fin 2) K) where
+private def cgrp
+    (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+    (n : ℕ)
+    : Subgroup (Matrix.SpecialLinearGroup (Fin 2) K) where
   carrier := {g | g.1 - 1 ∈ boxSet K ((n : ℤ) + 1)}
   one_mem' := by
     intro i j
@@ -85,7 +96,8 @@ private def cgrp (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
     have h11 := hg 1 1
     simp only [Matrix.sub_apply, Matrix.one_apply_eq] at h00 h11
     simp only [Matrix.sub_apply, Matrix.one_apply_ne (by decide : (0 : Fin 2) ≠ 1),
-      Matrix.one_apply_ne (by decide : (1 : Fin 2) ≠ 0), sub_zero] at h01 h10
+        Matrix.one_apply_ne (by decide : (1 : Fin 2) ≠ 0), sub_zero]
+      at h01 h10
     rw [e]
     fin_cases i <;> fin_cases j <;> simp
     · exact h11
@@ -93,14 +105,14 @@ private def cgrp (K : Type) [Field K] [ValuativeRel K] [TopologicalSpace K]
     · exact h10
     · exact h00
 
-private theorem isOpen_cgrp (n : ℕ) :
-    IsOpen (cgrp K n : Set (Matrix.SpecialLinearGroup (Fin 2) K)) := by
+private theorem isOpen_cgrp (n : ℕ)
+    : IsOpen (cgrp K n : Set (Matrix.SpecialLinearGroup (Fin 2) K)) := by
   have hc : Continuous fun g : Matrix.SpecialLinearGroup (Fin 2) K => g.1 - 1 :=
     continuous_subtype_val.sub continuous_const
   exact (isOpen_boxSet _).preimage hc
 
-private theorem isCompact_cgrp [T2Space K] (n : ℕ) :
-    IsCompact (cgrp K n : Set (Matrix.SpecialLinearGroup (Fin 2) K)) := by
+private theorem isCompact_cgrp [T2Space K] (n : ℕ)
+    : IsCompact (cgrp K n : Set (Matrix.SpecialLinearGroup (Fin 2) K)) := by
   refine (Subtype.isCompact_iff (p := fun A : Matrix (Fin 2) (Fin 2) K => A.det = 1)).2 ?_
   have hC : IsCompact ((fun m : Matrix (Fin 2) (Fin 2) K => m + 1) '' boxSet K ((n : ℤ) + 1)) :=
     (isCompact_boxSet _).image (continuous_id.add continuous_const)
@@ -118,9 +130,12 @@ private theorem isCompact_cgrp [T2Space K] (n : ℕ) :
 
 private theorem lgrp_sl [T2Space K] : Lgrp (Matrix.SpecialLinearGroup (Fin 2) K) := by
   intro N hN
-  obtain ⟨W, hW', hWN⟩ := (mem_nhds_subtype {A : Matrix (Fin 2) (Fin 2) K | A.det = 1} (1 : Matrix.SpecialLinearGroup (Fin 2) K) N).1 hN
+  obtain ⟨W, hW', hWN⟩ :=
+    (mem_nhds_subtype {A : Matrix (Fin 2) (Fin 2) K | A.det = 1}
+      (1 : Matrix.SpecialLinearGroup (Fin 2) K) N).1 hN
   have hW : W ∈ 𝓝 (1 : Matrix (Fin 2) (Fin 2) K) := hW'
-  have hS : (fun m : Matrix (Fin 2) (Fin 2) K => m + 1) ⁻¹' W ∈ 𝓝 (0 : Matrix (Fin 2) (Fin 2) K) := by
+  have hS
+      : (fun m : Matrix (Fin 2) (Fin 2) K => m + 1) ⁻¹' W ∈ 𝓝 (0 : Matrix (Fin 2) (Fin 2) K) := by
     have hc : Continuous fun m : Matrix (Fin 2) (Fin 2) K => m + 1 :=
       continuous_id.add continuous_const
     have := hc.tendsto (0 : Matrix (Fin 2) (Fin 2) K)
@@ -136,7 +151,8 @@ private theorem lgrp_sl [T2Space K] : Lgrp (Matrix.SpecialLinearGroup (Fin 2) K)
 
 end SlopeTestRemainingChoices
 
-theorem UpperTheory.ConvolutionTheory.R2.I.lgrp :
-    ∀ (F : Type) [Field F] [NumberField F] (v : P F), Lgrp (SL v) ∧ Lgrp (Multiplicative (M2 v)) := by
+theorem UpperTheory.ConvolutionTheory.R2.I.lgrp
+    : ∀ (F : Type) [Field F] [NumberField F] (v : P F),
+      Lgrp (SL v) ∧ Lgrp (Multiplicative (M2 v)) := by
   intro F _ _ v
   exact ⟨lgrp_sl, lgrp_matrix⟩

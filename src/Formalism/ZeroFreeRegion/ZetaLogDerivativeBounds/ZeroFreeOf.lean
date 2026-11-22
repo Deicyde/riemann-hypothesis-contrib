@@ -25,13 +25,17 @@ theorem classicalZeroFreeRegionOfBounds : ZeroFreeOf := by
   · apply hsmall s hT _ hs1
     have hc : min (1 / 200000) (c₂ * Real.log 2) / Real.log (|s.im| + 2) ≤ c₂ := by
       rw [div_le_iff₀ hLpos]
-      calc min (1 / 200000) (c₂ * Real.log 2) ≤ c₂ * Real.log 2 := min_le_right _ _
+      calc
+        min (1 / 200000) (c₂ * Real.log 2)
+          ≤ c₂ * Real.log 2 := min_le_right _ _
         _ ≤ c₂ * Real.log (|s.im| + 2) := mul_le_mul_of_nonneg_left hL hc₂.le
     linarith
   · intro hz
     have hs : s = (s.re : ℂ) + s.im * I := (Complex.re_add_im s).symm
     have hβ := ht₀ s.re s.im hT.le (by rw [← hs]; exact hz)
-    have h2 : min (1 / 200000) (c₂ * Real.log 2) / Real.log (|s.im| + 2) ≤ (1 / 200000) / Real.log (|s.im| + 2) :=
+    have h2
+        : min (1 / 200000) (c₂ * Real.log 2) / Real.log (|s.im| + 2)
+          ≤ (1 / 200000) / Real.log (|s.im| + 2) :=
       div_le_div_of_nonneg_right (min_le_left _ _) hLpos.le
     linarith
 

@@ -9,7 +9,16 @@ open MeasureTheory Topology
 
 namespace GlobalTheory.QuadFibre
 
-theorem fibOf_compl_fibre : ∀ (K V : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K] [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V] [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V) [μ.IsAddHaarMeasure] (ν : Measure K) [ν.IsAddHaarMeasure] (q : V → K), Continuous q → (∀ (c : K) (x : V), q (c • x) = c ^ 2 * q x) → ∀ (U : Set K) (s : K → K), GlobalTheory.QuadFibre.IsSqrtOn U s → ∀ t : K, GlobalTheory.QuadFibre.fibOf μ ν q U s t (q ⁻¹' {t})ᶜ = 0 := by
+theorem fibOf_compl_fibre
+    : ∀ (K V : Type) [NontriviallyNormedField K] [IsUltrametricDist K] [ProperSpace K]
+        [MeasurableSpace K] [BorelSpace K] [AddCommGroup V] [Module K V] [TopologicalSpace V]
+        [IsTopologicalAddGroup V] [ContinuousSMul K V] [LocallyCompactSpace V]
+        [SecondCountableTopology V] [T2Space V] [MeasurableSpace V] [BorelSpace V] (μ : Measure V)
+        [μ.IsAddHaarMeasure] (ν : Measure K) [ν.IsAddHaarMeasure] (q : V → K),
+      Continuous q → (∀ (c : K) (x : V), q (c • x) = c ^ 2 * q x)
+        → ∀ (U : Set K) (s : K → K),
+          GlobalTheory.QuadFibre.IsSqrtOn U s
+            → ∀ t : K, GlobalTheory.QuadFibre.fibOf μ ν q U s t (q ⁻¹' {t})ᶜ = 0 := by
   intro K V _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ μ _ ν _ q hq hh U s hs t
   obtain ⟨hUo, hUc, h1, hmul, hinv, hn, hsc, hsq⟩ := hs
   by_cases ht : t = 0
@@ -18,8 +27,7 @@ theorem fibOf_compl_fibre : ∀ (K V : Type) [NontriviallyNormedField K] [IsUltr
     have h1 : Measurable (fun x : V => s (t / q x)) :=
       hsc.measurable.comp (measurable_const.div hq.measurable)
     exact h1.smul measurable_id
-  have hA : MeasurableSet (q ⁻¹' {t})ᶜ :=
-    ((isClosed_singleton.preimage hq).measurableSet).compl
+  have hA : MeasurableSet (q ⁻¹' {t})ᶜ := ((isClosed_singleton.preimage hq).measurableSet).compl
   rw [fibOf_ne _ _ _ _ _ ht, Measure.smul_apply, Measure.map_apply hm hA,
     Measure.restrict_apply (hm hA)]
   convert smul_zero _

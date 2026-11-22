@@ -40,8 +40,9 @@ end General
 
 section Tensor
 
-variable {G H V V' U : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup V'] [Module ℂ V']
-  [AddCommGroup U] [Module ℂ U]
+variable
+  {G H V V' U : Type} [Group G] [Group H] [AddCommGroup V] [Module ℂ V] [AddCommGroup V']
+  [Module ℂ V'] [AddCommGroup U] [Module ℂ U]
 
 end Tensor
 

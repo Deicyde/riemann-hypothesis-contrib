@@ -5,26 +5,23 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
+open NumberField Matrix GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.LKTrip
+  GlobalTheory.LKGeo UpperTheory.Gal.W2.Seed
 open scoped TensorProduct
 
-theorem UpperTheory.Gal.W2.Seed.pDeltaEx :
-    DeltaEx := by
+theorem UpperTheory.Gal.W2.Seed.pDeltaEx : DeltaEx := by
   intro E _ _ _ bar hbar ω tr nm htr hnm hD M hcop t ht hgen hpos τ₀
   obtain ⟨hti, e, he, hez⟩ := hgen
   have hbω : bar ω = (tr : 𝓞 E) - ω := eq_sub_of_add_eq' htr
   have hnm' : ω * ((tr : 𝓞 E) - ω) = (nm : 𝓞 E) := by rw [← hbω]; exact hnm
   set u : 𝓞 E := 2 * ω - (tr : 𝓞 E) with hu
   set D : ℤ := tr ^ 2 - 4 * nm with hDdef
-  have huu : u * u = (D : 𝓞 E) := by
-    rw [hu, hDdef]; push_cast; linear_combination (-4 : 𝓞 E) * hnm'
+  have huu : u * u = (D : 𝓞 E) := by rw [hu, hDdef]; push_cast; linear_combination (-4 : 𝓞 E) * hnm'
   have huuE : (u : E) * (u : E) = (D : E) := by
     have := congrArg (fun x : 𝓞 E => (x : E)) huu
     simpa using this
-  have huE : (u : E) = 2 * (ω : E) - (tr : E) := by
-    rw [hu]; norm_cast
-  have h1 : (IsCMField.complexConj E) (ω : E) = (tr : E) - ω := by
-    rw [← hbar ω, hbω]; norm_cast
+  have huE : (u : E) = 2 * (ω : E) - (tr : E) := by rw [hu]; norm_cast
+  have h1 : (IsCMField.complexConj E) (ω : E) = (tr : E) - ω := by rw [← hbar ω, hbω]; norm_cast
   have hconj : (IsCMField.complexConj E) (u : E) = -(u : E) := by
     rw [huE, map_sub, map_mul, h1, map_intCast, map_ofNat]; ring
   have hτu : ∀ τ : E →+* ℂ, (τ u).re = 0 := by
@@ -65,10 +62,11 @@ theorem UpperTheory.Gal.W2.Seed.pDeltaEx :
     refine ⟨m, ?_⟩
     have hcast : (((c : 𝓞 E) * u * x : 𝓞 E) : E) = (c : E) * u * x := by norm_cast
     rw [hcast] at hm
-    rw [← hm]; congr 1; ring
+    rw [← hm]
+    congr 1
+    ring
   · have h2 : Int.gcd D (M : ℤ) = 1 := Int.isCoprime_iff_gcd_eq_one.mp hcop
-    have h3 : Nat.Coprime D.natAbs M := by
-      simpa [Int.gcd, Nat.Coprime] using h2
+    have h3 : Nat.Coprime D.natAbs M := by simpa [Int.gcd, Nat.Coprime] using h2
     exact Nat.Coprime.mul_left he h3
   · intro z hz
     obtain ⟨x, hx⟩ := hez z hz
@@ -79,7 +77,9 @@ theorem UpperTheory.Gal.W2.Seed.pDeltaEx :
     linear_combination ((D.natAbs : ℕ) : E) * hx + (t * (x : E)) * hDabs + (t * (u : E) * (u : E) * (x : E)) * hcE
   · intro τ hτ
     have hτu' : τ u = τ₀ u := by
-      rw [huE, map_sub, map_mul, map_sub, map_mul, hτ, map_intCast, map_intCast, map_ofNat, map_ofNat]
+      rw [huE, map_sub, map_mul, map_sub, map_mul, hτ, map_intCast, map_intCast, map_ofNat,
+        map_ofNat]
     rw [map_mul, map_mul, map_intCast, hτu']
-    simp only [Complex.mul_im, Complex.mul_re, Complex.intCast_re, Complex.intCast_im, hτt τ, hτu τ₀]
+    simp only [Complex.mul_im, Complex.mul_re, Complex.intCast_re, Complex.intCast_im, hτt τ,
+      hτu τ₀]
     nlinarith [mul_neg_of_pos_of_neg (hpos τ) hcs]

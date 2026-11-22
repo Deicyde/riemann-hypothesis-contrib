@@ -24,10 +24,11 @@ attribute [local instance] Over.cartesianMonoidalCategory
 
 def ZarhinStatement : Prop :=
   ∀ (C : Type) [Field C] [IsAlgClosed C] (v : Valuation C NNReal) (R : Type) [CommRing R]
-    [Algebra R C], v.Integers R →
-    ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left),
-      IsAbelianScheme A → L.IsLB → Out.RelAmple A L →
-      ∃ (P : Out.PolAV (Spec (CommRingCat.of R))) (i : A ⟶ P.A) (r : P.A ⟶ A),
-        IsMonHom i ∧ IsMonHom r ∧ i ≫ r = 𝟙 A
+      [Algebra R C],
+    v.Integers R
+      → ∀ (A : Over (Spec (CommRingCat.of R))) [GrpObj A] (L : LB A.left),
+        IsAbelianScheme A → L.IsLB → Out.RelAmple A L
+          → ∃ (P : Out.PolAV (Spec (CommRingCat.of R))) (i : A ⟶ P.A) (r : P.A ⟶ A),
+            IsMonHom i ∧ IsMonHom r ∧ i ≫ r = 𝟙 A
 
 end GlobalTheory.CompanionTheory.Ar.GR

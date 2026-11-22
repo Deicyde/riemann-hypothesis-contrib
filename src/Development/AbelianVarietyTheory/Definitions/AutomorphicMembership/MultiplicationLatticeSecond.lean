@@ -12,50 +12,70 @@ set_option maxHeartbeats 800000
 noncomputable section
 
 open AlgebraicGeometry CategoryTheory Limits NumberField TopologicalSpace
-open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts Formalism.MainNotions.BoundaryLocalData GlobalTheory.ShFam
+open ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.BasicNotions Formalism.MainNotions
+  Formalism.MainNotions.ModuliIntegralCharts Formalism.MainNotions.BoundaryLocalData
+  GlobalTheory.ShFam
 open Formalism.MainNotions.DIV.Cons (SCF intO)
 
 namespace GlobalTheory.LocM
 
 section Free
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
-  {Xo : ∀ l : Level H, Moduli Dw l} {p : ℕ} {W : ValuationSubring ℂ} {Y : LocalSystem Xo p W} {i₀ : Idx H p}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : Datum H}
+  {Xo : ∀ l : Level H, Moduli Dw l} {p : ℕ} {W : ValuationSubring ℂ}
+  {Y : LocalSystem Xo p W} {i₀ : Idx H p}
 
-def IntFrame (Z : Mdl Y i₀) {U : Z.X.Opens} (hU : IsAffineOpen U) (w : Vecs Dw (Y Z.i).t Γ(Z.X, U)) : Prop :=
-  (∀ σ, ∃ (n : ℕ) (v : Fin n → (Sp (DualNumber Γ(Z.X, U)) ⟶ (Y Z.i).t.G.left)) (e : Fin (Dw.mult σ) ↪ Fin n),
-    (∀ i, v (e i) = w σ i) ∧ (∀ i, IsTanAtG (Y Z.i).t (hU.fromSpec ≫ Z.π) (v i)) ∧
-    ∀ u, IsTanAtG (Y Z.i).t (hU.fromSpec ≫ Z.π) u → ∃! cf, IsCombAtG (Y Z.i).t (hU.fromSpec ≫ Z.π) v cf u) ∧
-  ∀ (k : Type) [Field k] (φ : Γ(Z.X, U) →+* k), Set.range (spMap φ ≫ hU.fromSpec) ⊆ Z.opn →
-    Z.FlagAt (spMap φ ≫ hU.fromSpec) (w.bc φ)
+def IntFrame (Z : Mdl Y i₀) {U : Z.X.Opens} (hU : IsAffineOpen U) (w : Vecs Dw (Y Z.i).t Γ(Z.X, U))
+    : Prop :=
+  (∀ σ,
+      ∃ (n : ℕ) (v : Fin n → (Sp (DualNumber Γ(Z.X, U)) ⟶ (Y Z.i).t.G.left))
+          (e : Fin (Dw.mult σ) ↪ Fin n),
+        (∀ i, v (e i) = w σ i) ∧ (∀ i, IsTanAtG (Y Z.i).t (hU.fromSpec ≫ Z.π) (v i))
+          ∧ ∀ u,
+            IsTanAtG (Y Z.i).t (hU.fromSpec ≫ Z.π) u
+              → ∃! cf, IsCombAtG (Y Z.i).t (hU.fromSpec ≫ Z.π) v cf u)
+    ∧ ∀ (k : Type) [Field k] (φ : Γ(Z.X, U) →+* k),
+      Set.range (spMap φ ≫ hU.fromSpec) ⊆ Z.opn → Z.FlagAt (spMap φ ≫ hU.fromSpec) (w.bc φ)
 
 def HasDR (Z : Mdl Y i₀) : Prop :=
-  (∀ σ, Z.ty σ = Finset.range (Dw.mult σ + 1)) ∧
-  ∀ x : Z.X, ∃ (U : Z.X.Opens) (hU : IsAffineOpen U) (w : Vecs Dw (Y Z.i).t Γ(Z.X, U)), x ∈ U ∧ IntFrame Z hU w
+  (∀ σ, Z.ty σ = Finset.range (Dw.mult σ + 1))
+    ∧ ∀ x : Z.X, ∃ (U : Z.X.Opens) (hU : IsAffineOpen U) (w : Vecs Dw (Y Z.i).t Γ(Z.X, U)),
+      x ∈ U ∧ IntFrame Z hU w
 
 def IsDRFlag (Z Z' : Mdl Y i₀) : Prop :=
-  Z'.i = Z.i ∧ HasDR Z' ∧ (∃ f, IsMap Z' Z f) ∧ ∀ Z'' : Mdl Y i₀, HasDR Z'' → (∃ g, IsMap Z'' Z g) → ∃ h, IsMap Z'' Z' h
+  Z'.i = Z.i ∧ HasDR Z' ∧ (∃ f, IsMap Z' Z f)
+    ∧ ∀ Z'' : Mdl Y i₀, HasDR Z'' → (∃ g, IsMap Z'' Z g) → ∃ h, IsMap Z'' Z' h
 
 def IsGrLB (Z : Mdl Y i₀) (e : ∀ σ : E →+* ℂ, Fin (Dw.mult σ) → ℤ) (L : LB Z.X) : Prop :=
-  L.IsLB ∧ ∃ (hU : ∀ i, IsAffineOpen (L.U i)) (w : ∀ i, Vecs Dw (Y Z.i).t Γ(Z.X, L.U i)), (∀ i, IntFrame Z (hU i) (w i)) ∧
-    ∀ (i i' : L.ι) (k : Type) [Field k] (φ : Γ(Z.X, L.U i) →+* k) (φ' : Γ(Z.X, L.U i') →+* k)
-      (d : ∀ σ : E →+* ℂ, Fin (Dw.mult σ) → k),
-      spMap φ ≫ (hU i).fromSpec = spMap φ' ≫ (hU i').fromSpec → Set.range (spMap φ ≫ (hU i).fromSpec) ⊆ Z.opn →
-      (∀ σ a, ∃ cf : Fin (Dw.mult σ) → k, cf a = d σ a ∧ (∀ b, a < b → cf b = 0) ∧
-        IsCombAtG (Y Z.i).t (spMap φ ≫ (hU i).fromSpec ≫ Z.π) ((w i').bc φ' σ) cf ((w i).bc φ σ a)) →
-      valR (spMap φ ≫ (hU i).fromSpec) _ (L.g i i').val = ∏ σ, ∏ a, d σ a ^ e σ a
+  L.IsLB
+    ∧ ∃ (hU : ∀ i, IsAffineOpen (L.U i)) (w : ∀ i, Vecs Dw (Y Z.i).t Γ(Z.X, L.U i)),
+      (∀ i, IntFrame Z (hU i) (w i))
+        ∧ ∀ (i i' : L.ι) (k : Type) [Field k] (φ : Γ(Z.X, L.U i) →+* k) (φ' : Γ(Z.X, L.U i') →+* k)
+            (d : ∀ σ : E →+* ℂ, Fin (Dw.mult σ) → k),
+          spMap φ ≫ (hU i).fromSpec = spMap φ' ≫ (hU i').fromSpec
+            → Set.range (spMap φ ≫ (hU i).fromSpec) ⊆ Z.opn
+            → (∀ σ a, ∃ cf : Fin (Dw.mult σ) → k,
+              cf a = d σ a ∧ (∀ b, a < b → cf b = 0)
+                ∧ IsCombAtG (Y Z.i).t (spMap φ ≫ (hU i).fromSpec ≫ Z.π) ((w i').bc φ' σ) cf
+                  ((w i).bc φ σ a))
+            → valR (spMap φ ≫ (hU i).fromSpec) _ (L.g i i').val = ∏ σ, ∏ a, d σ a ^ e σ a
 
 def Mdl.genO (Z : Mdl Y i₀) : Z.X.Opens := Z.X.basicOpen ((p : ℕ) : Γ(Z.X, ⊤))
 
-def Mdl.Pt.ev {Z : Mdl Y i₀} (y : Z.Pt) {U : Z.X.Opens} (h : ⊤ ≤ y.z ⁻¹ᵁ U) : Γ(Z.X, U) →+* ↥(intO ↥y.C.S) :=
+def Mdl.Pt.ev {Z : Mdl Y i₀} (y : Z.Pt) {U : Z.X.Opens} (h : ⊤ ≤ y.z ⁻¹ᵁ U)
+    : Γ(Z.X, U) →+* ↥(intO ↥y.C.S) :=
   (Scheme.ΓSpecIso (CommRingCat.of ↥(intO ↥y.C.S))).hom.hom.comp (y.z.appLE U ⊤ h).hom
 
 def Mdl.nrm {Z : Mdl Y i₀} (F : Z.X.Modules) (f : Γ(F, Z.genO)) (y : Z.Pt) : ℝ :=
-  sSup {r | ∃ (U : Z.X.Opens) (_ : IsAffineOpen U) (h : ⊤ ≤ y.z ⁻¹ᵁ U) (k : ℕ) (g : Γ(F, U))
-    (lam : Γ(F, U) →ₛₗ[y.ev h] ↥(intO ↥y.C.S)),
-    (F.presheaf.map (homOfLE (inf_le_left : U ⊓ Z.genO ≤ U)).op).hom g =
-      p ^ k • (F.presheaf.map (homOfLE (inf_le_right : U ⊓ Z.genO ≤ Z.genO)).op).hom f ∧
-    r = ‖((lam g : ↥(intO ↥y.C.S)) : ↥y.C.S)‖ * (p : ℝ) ^ k}
+  sSup
+    {r | ∃ (U : Z.X.Opens) (_ : IsAffineOpen U) (h : ⊤ ≤ y.z ⁻¹ᵁ U) (k : ℕ) (g : Γ(F, U))
+      (lam : Γ(F, U) →ₛₗ[y.ev h] ↥(intO ↥y.C.S)),
+      (F.presheaf.map (homOfLE (inf_le_left : U ⊓ Z.genO ≤ U)).op).hom g =
+        p ^ k • (F.presheaf.map (homOfLE (inf_le_right : U ⊓ Z.genO ≤ Z.genO)).op).hom f ∧
+      r = ‖((lam g : ↥(intO ↥y.C.S)) : ↥y.C.S)‖ * (p : ℝ) ^ k}
 
 end Free
 
@@ -68,8 +88,9 @@ structure At (S : Sig A N j) (κ : Lv A) (p : ℕ) : Type where
   B : Bases (S.sys.Y p W hp hW) ⟨κ.l, κ.c, κ.good p hp⟩
   YY : Mdl (S.sys.Y p W hp hW) ⟨κ.l, κ.c, κ.good p hp⟩
   isYY : IsDRFlag (B.X none) YY
-  hasDat : ∀ (Z : Mdl (S.sys.Y p W hp hW) ⟨κ.l, κ.c, κ.good p hp⟩) (y : Z.Pt),
-    Nonempty (DatAt (S.sys.Y p W hp hW Z.i) y.P)
+  hasDat
+    : ∀ (Z : Mdl (S.sys.Y p W hp hW) ⟨κ.l, κ.c, κ.good p hp⟩) (y : Z.Pt),
+      Nonempty (DatAt (S.sys.Y p W hp hW Z.i) y.P)
 
 variable {S : Sig A N j} {κ : Lv A} {p : ℕ}
 
@@ -95,7 +116,8 @@ abbrev Ylat {Z : a.Mdl} (y : a.Pt Z) : Type := (a.dat y).Ylat
 
 def chX {Z : a.Mdl} (y : a.Pt Z) : Type := a.Ylat y
 
-instance {Z : a.Mdl} (y : a.Pt Z) : AddCommGroup (a.chX y) := inferInstanceAs (AddCommGroup (a.Ylat y))
+instance {Z : a.Mdl} (y : a.Pt Z) : AddCommGroup (a.chX y) :=
+  inferInstanceAs (AddCommGroup (a.Ylat y))
 
 instance {Z : a.Mdl} (y : a.Pt Z) : Module (𝓞 D.host.E) (a.chX y) :=
   Module.compHom (a.Ylat y) (A.H.bar : 𝓞 D.host.E →+* 𝓞 D.host.E)
@@ -129,7 +151,8 @@ abbrev Sec {Z : a.Mdl} (F : a.Sh Z) : Type := Γ(F.toMod, Z.genO)
 def H0 {Z : a.Mdl} (F : a.Sh Z) : AddSubgroup (a.Sec F) :=
   (F.toMod.presheaf.map (homOfLE (le_top : Z.genO ≤ ⊤)).op).hom.range
 
-def nrm {Z : a.Mdl} (F : a.Sh Z) (f : a.Sec F) (y : a.Pt Z) : ℝ := GlobalTheory.LocM.Mdl.nrm F.toMod f y
+def nrm {Z : a.Mdl} (F : a.Sh Z) (f : a.Sec F) (y : a.Pt Z) : ℝ :=
+  GlobalTheory.LocM.Mdl.nrm F.toMod f y
 
 def GIso {Z : a.Mdl} (F₁ F₂ : a.Sh Z) : Type :=
   {_φ : F₁.toMod.restrict Z.genO.ι ≅ F₂.toMod.restrict Z.genO.ι // a.IsInv F₁ ∧ a.IsInv F₂}
@@ -144,23 +167,27 @@ def Corr (Z₁ Z₂ : a.Mdl) : Type := PLift (GlobalTheory.LocM.NatCorr Z₁ Z�
 
 abbrev diagCl (Z₁ Z₂ : a.Mdl) (_c : a.Corr Z₁ Z₂) : a.Mdl := GlobalTheory.LocM.natDiagCl Z₁ Z₂
 
-
 open Classical in
 def expo (_a : At S κ p) (l : PsiT D → ℕ → ℤ) (σ : D.host.E →+* ℂ) (i : Fin (S.Dw.mult σ)) : ℤ :=
   ∑ t : D.what₂.Tau, ((if σ = DV.tauEmb D t then l (D.eTau t) (i + 1) else 0) +
     if σ = conjEmb (DV.tauEmb D t) then -l (D.eTau t) (N - i) else 0)
 
-
 open Classical in
 def Lb (l : PsiT D → ℕ → ℤ) : a.Sh a.YY :=
-  if h : ∃ L, IsGrLB a.YY (a.expo l) L then a.YY.ofMod (GlobalTheory.LB.toMod h.choose) else ⟨0, 0, 0, 0, 0⟩
+  if h : ∃ L, IsGrLB a.YY (a.expo l) L then
+    a.YY.ofMod (GlobalTheory.LB.toMod h.choose)
+  else
+    ⟨0, 0, 0, 0, 0⟩
 
 namespace GIso
 
 variable {a} {Z : a.Mdl} {F₁ F₂ F₃ : a.Sh Z}
 
-def mk (φ : F₁.toMod.restrict Z.genO.ι ≅ F₂.toMod.restrict Z.genO.ι) (h₁ : a.IsInv F₁) (h₂ : a.IsInv F₂) :
-    a.GIso F₁ F₂ := ⟨φ, h₁, h₂⟩
+def mk
+    (φ : F₁.toMod.restrict Z.genO.ι ≅ F₂.toMod.restrict Z.genO.ι) (h₁ : a.IsInv F₁)
+    (h₂ : a.IsInv F₂)
+    : a.GIso F₁ F₂ :=
+  ⟨φ, h₁, h₂⟩
 
 def iso (φ : a.GIso F₁ F₂) : F₁.toMod.restrict Z.genO.ι ≅ F₂.toMod.restrict Z.genO.ι := φ.1
 
@@ -176,23 +203,31 @@ end At
 
 structure LawSt (ct : At S κ p) : Prop where
   nrm_nonneg : ∀ {Z : ct.Mdl} (F : ct.Sh Z) (f : ct.Sec F) (y : ct.Pt Z), 0 ≤ ct.nrm F f y
-  norm_le_one_of_mem_sections : ∀ {Z : ct.Mdl} (F : ct.Sh Z) (f : ct.Sec F), f ∈ ct.H0 F → ∀ y, ct.nrm F f y ≤ 1
+  norm_le_one_of_mem_sections
+    : ∀ {Z : ct.Mdl} (F : ct.Sh Z) (f : ct.Sec F), f ∈ ct.H0 F → ∀ y, ct.nrm F f y ≤ 1
   Lb_inv : ∀ l, ct.IsInv (ct.Lb l)
   isGenP_ab : ∀ {Z} (x : ct.ZP Z), ct.isGenP x → ct.abP x
   genFin : ∀ Z, Finite (ct.Gen Z)
   genNe : ∀ Z, Nonempty (ct.Gen Z)
-  phi_conj : ∀ {Z : ct.Mdl} (y : ct.Pt Z) (c c' : 𝓞 D.host.E),
-    (c' : D.host.E) = D.host.conj (c : D.host.E) → ∀ a : ct.Ylat y, ct.phi y (c' • a) = c • ct.phi y a
+  phi_conj
+    : ∀ {Z : ct.Mdl} (y : ct.Pt Z) (c c' : 𝓞 D.host.E),
+      (c' : D.host.E) = D.host.conj (c : D.host.E)
+        → ∀ a : ct.Ylat y, ct.phi y (c' • a) = c • ct.phi y a
 
 structure MotSt (ct : At S κ p) : Type 1 where
   be : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ct.Ylat y →ₗ[ℤ] ct.Ylat y →ₗ[ℤ] ℝ
   be_symm : ∀ {Z : ct.Mdl} (y : ct.Pt Z) (a b : ct.Ylat y), be y a b = be y b a
-  be_bal : ∀ {Z : ct.Mdl} (y : ct.Pt Z) (c c' : 𝓞 D.host.E), (c' : D.host.E) = D.host.conj (c : D.host.E) →
-    ∀ a b : ct.Ylat y, be y (c • a) b = be y a (c' • b)
-  be_posDef : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι ℤ (ct.Ylat y)),
-    ∀ c : ι → ℝ, c ≠ 0 → 0 < ∑ i, ∑ k, c i * c k * be y (b i) (b k)
-  yl_rank : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ∃ ρ : ℕ, Module.finrank ℤ (ct.Ylat y) = 2 * D.R.f * ρ ∧
-    (1 ≤ j → j + 1 ≤ N → ρ ≤ j ∧ ρ + j ≤ N)
+  be_bal
+    : ∀ {Z : ct.Mdl} (y : ct.Pt Z) (c c' : 𝓞 D.host.E),
+      (c' : D.host.E) = D.host.conj (c : D.host.E)
+        → ∀ a b : ct.Ylat y, be y (c • a) b = be y a (c' • b)
+  be_posDef
+    : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ∃ (ι : Type) (_ : Fintype ι) (b : Module.Basis ι ℤ (ct.Ylat y)),
+      ∀ c : ι → ℝ,
+        c ≠ 0 → 0 < ∑ i, ∑ k, c i * c k * be y (b i) (b k)
+  yl_rank
+    : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ∃ ρ : ℕ,
+      Module.finrank ℤ (ct.Ylat y) = 2 * D.R.f * ρ ∧ (1 ≤ j → j + 1 ≤ N → ρ ≤ j ∧ ρ + j ≤ N)
   psiV : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ct.Ylat y → ℝ
   tau : ∀ {Z : ct.Mdl} (y : ct.Pt Z), ct.Ylat y → ct.chX y → ((ct.fld y).C)ˣ
   tau_add_left : ∀ {Z : ct.Mdl} (y : ct.Pt Z) a a' χ, tau y (a + a') χ = tau y a χ * tau y a' χ
@@ -215,15 +250,17 @@ structure ShfSt (ct : At S κ p) : Type 1 where
   homSh : ∀ {Z}, ct.Sh Z → ct.Sh Z → ct.Sh Z
   homSh_inv : ∀ {Z} (F₁ F₂ : ct.Sh Z), ct.IsInv F₁ → ct.IsInv F₂ → ct.IsInv (homSh F₁ F₂)
   isoSec : ∀ {Z} {F₁ F₂ : ct.Sh Z}, ct.GIso F₁ F₂ → ct.Sec (homSh F₁ F₂)
-  nrm_isoSec : ∀ {Z} {F₁ F₂ : ct.Sh Z} (φ : ct.GIso F₁ F₂) (y : ct.Pt Z),
-    ct.nrm (homSh F₁ F₂) (isoSec φ) y = (p : ℝ) ^ (-(vrat φ y))
+  nrm_isoSec
+    : ∀ {Z} {F₁ F₂ : ct.Sh Z} (φ : ct.GIso F₁ F₂) (y : ct.Pt Z),
+      ct.nrm (homSh F₁ F₂) (isoSec φ) y = (p : ℝ) ^ (-(vrat φ y))
   isoSymm : ∀ {Z} {F₁ F₂ : ct.Sh Z}, ct.GIso F₁ F₂ → ct.GIso F₂ F₁
-  vrat_symm : ∀ {Z} {F₁ F₂ : ct.Sh Z} (φ : ct.GIso F₁ F₂) (y : ct.Pt Z),
-    vrat (isoSymm φ) y = -(vrat φ y)
+  vrat_symm
+    : ∀ {Z} {F₁ F₂ : ct.Sh Z} (φ : ct.GIso F₁ F₂) (y : ct.Pt Z), vrat (isoSymm φ) y = -(vrat φ y)
   oX : ct.Sh ct.Xm
   oX_inv : ct.IsInv oX
   secOf : ∀ {F : ct.Sh ct.Xm}, ct.GIso oX F → ct.Sec F
-  nrm_secOf : ∀ {F : ct.Sh ct.Xm} (φ : ct.GIso oX F) y, ct.nrm F (secOf φ) y = (p : ℝ) ^ (-(vrat φ y))
+  nrm_secOf
+    : ∀ {F : ct.Sh ct.Xm} (φ : ct.GIso oX F) y, ct.nrm F (secOf φ) y = (p : ℝ) ^ (-(vrat φ y))
 
 structure FlgSt (ct : At S κ p) : Type 1 where
   FlagData : ct.Mdl → Type
@@ -243,8 +280,10 @@ structure FrmSt (ct : At S κ p) : Type 1 where
   taut : ∀ y, PsiT D × Bool → ℕ → AddSubgroup (LieV y)
   taut_eq : ∀ y σ i, taut y σ i = (Wst y σ i).toAddSubgroup ⊓ lieL y
   nrmIn : ∀ l, ct.Sec (ct.Lb l) → ∀ y : ct.Pt ct.YY, (PsiT D × Bool → ℕ → AddSubgroup (LieV y)) → ℝ
-  nrmRef_def : ∀ l f y, nrmRef l f y =
-    nrmIn l f y (fun σ i => (Wst y σ i).toAddSubgroup ⊓ ((eig y σ).toAddSubgroup ⊓ lieL y))
+  nrmRef_def
+    : ∀ l f y,
+      nrmRef l f y
+        = nrmIn l f y (fun σ i => (Wst y σ i).toAddSubgroup ⊓ ((eig y σ).toAddSubgroup ⊓ lieL y))
   nrm_Lb_def : ∀ l f y, ct.nrm (ct.Lb l) f y = nrmIn l f y (taut y)
 
 attribute [instance] FrmSt.lvAdd FrmSt.lvMod
@@ -340,15 +379,18 @@ structure BdySt (ct : At S κ p) : Type 1 where
   [iXa : ∀ z, AddCommGroup (Xb z)]
   [iXm : ∀ z, Module (𝓞 D.host.E) (Xb z)]
   phib : ∀ z, Yb z ≃+ Xb z
-  phib_conj : ∀ z (c c' : 𝓞 D.host.E), (c' : D.host.E) = D.host.conj (c : D.host.E) →
-    ∀ a : Yb z, phib z (c' • a) = c • phib z a
+  phib_conj
+    : ∀ z (c c' : 𝓞 D.host.E),
+      (c' : D.host.E) = D.host.conj (c : D.host.E) → ∀ a : Yb z, phib z (c' • a) = c • phib z a
   taub : ∀ z, Yb z → Xb z → (FractionRing (Rl z))ˣ
   taub_add_left : ∀ z a a' χ, taub z (a + a') χ = taub z a χ * taub z a' χ
   taub_add_right : ∀ z a χ χ', taub z a (χ + χ') = taub z a χ * taub z a χ'
   taub_symm : ∀ z a b, taub z a (phib z b) = taub z b (phib z a)
   taub_smul : ∀ z (c : 𝓞 D.host.E) a χ, taub z (c • a) χ = taub z a (c • χ)
-  taub_pos : ∀ z a, ((taub z a (phib z a) : (FractionRing (Rl z))ˣ) : FractionRing (Rl z)) ∈
-    (algebraMap (Rl z) (FractionRing (Rl z))).range
+  taub_pos
+    : ∀ z a,
+      ((taub z a (phib z a) : (FractionRing (Rl z))ˣ) : FractionRing (Rl z))
+        ∈ (algebraMap (Rl z) (FractionRing (Rl z))).range
   Sg : BPt → Type
   [iSg : ∀ z, AddCommGroup (Sg z)]
   [iSk : ∀ z, Module (FractionRing (Rl z)) (Sg z)]
@@ -358,7 +400,9 @@ structure BdySt (ct : At S κ p) : Type 1 where
   fc : ∀ z, Sg z →ₗ[FractionRing (Rl z)] (Xb z → FractionRing (Rl z))
   trU : ∀ z, Yb z → Xb z → (Rl z)ˣ
 
-attribute [instance] BdySt.iRr BdySt.iRd BdySt.iRl BdySt.iRn BdySt.iRi BdySt.iRc BdySt.iYa BdySt.iYm BdySt.iXa BdySt.iXm BdySt.iSg BdySt.iSk BdySt.iSm BdySt.iSt
+attribute [instance]
+  BdySt.iRr BdySt.iRd BdySt.iRl BdySt.iRn BdySt.iRi BdySt.iRc BdySt.iYa BdySt.iYm BdySt.iXa
+  BdySt.iXm BdySt.iSg BdySt.iSk BdySt.iSm BdySt.iSt
 
 structure ThgSt (ct : At S κ p) (un : UniSt ct) : Type 1 where
   Tors : ct.Pt ct.Xm → un.Unim → ℕ → Type
@@ -385,12 +429,15 @@ structure ThgSt (ct : At S κ p) (un : UniSt ct) : Type 1 where
   act_scal : ∀ y La n a s, act y La n (scal y La n a) s = (a : (ct.fld y).C) • s
   vth : ∀ y La n, Sn y La n
   alp : ℕ → 𝓞 D.host.E
-  alp_spec : ∀ n, ModuliIntegralCharts.NHyp D p n →
-    (alp n : D.host.E) * D.host.conj (alp n : D.host.E) = (n : D.host.E) ∧
-    ((∃ mm : ℕ, n = mm ^ 2 ∧ alp n = (mm : 𝓞 D.host.E)) ∨ (alp n : D.host.E) ∈ D.host.K)
+  alp_spec
+    : ∀ n,
+      ModuliIntegralCharts.NHyp D p n
+        → (alp n : D.host.E) * D.host.conj (alp n : D.host.E) = (n : D.host.E)
+          ∧ ((∃ mm : ℕ, n = mm ^ 2 ∧ alp n = (mm : 𝓞 D.host.E)) ∨ (alp n : D.host.E) ∈ D.host.K)
   th1 : ∀ y nW, Sn y (un.latStd nW) 1
   pbAl : ∀ y nW n, Sn y (un.latStd nW) 1 →ₗ[(ct.fld y).C] Sn y (un.latStd nW) n
-  vth_def : ∀ y nW n, ModuliIntegralCharts.NHyp D p n → vth y (un.latStd nW) n = pbAl y nW n (th1 y nW)
+  vth_def
+    : ∀ y nW n, ModuliIntegralCharts.NHyp D p n → vth y (un.latStd nW) n = pbAl y nW n (th1 y nW)
 
 attribute [instance] ThgSt.atAdd ThgSt.atFin ThgSt.thGrp ThgSt.snAdd ThgSt.snMod
 
@@ -405,17 +452,24 @@ structure JetSt (ct : At S κ p) (un : UniSt ct) (tg : ThgSt ct un) : Type 1 whe
   [fbMod : ∀ y nW n χ, Module (ct.fld y).C (FB y nW n χ)]
   nB : ∀ {y nW n χ}, FB y nW n χ → ℝ
   sgc : ∀ y nW n χ, tg.Sn y (un.latStd nW) n →ₗ[(ct.fld y).C] FB y nW n χ
-  trB : ∀ y nW n (a : Fin nW → ct.Ylat y) χ,
-    FB y nW n χ ≃ₗ[(ct.fld y).C] FB y nW n (χ + n • fun i => ct.phi y (a i))
+  trB
+    : ∀ y nW n (a : Fin nW → ct.Ylat y) χ,
+      FB y nW n χ ≃ₗ[(ct.fld y).C] FB y nW n (χ + n • fun i => ct.phi y (a i))
   trB_norm : ∀ y nW n a χ σ, nB (trB y nW n a χ σ) = nB σ
   jX : ∀ y nW n DF χ, FB y nW n χ →ₗ[(ct.fld y).C] Jet y (un.latStd nW) n DF
-  intJet_free : ∀ y nW n DF, ∃ (N : ℕ) (b : Module.Basis (Fin N) (ct.fld y).C (Jet y (un.latStd nW) n DF)),
-    ∀ v, v ∈ intJet y (un.latStd nW) n DF ↔ ∀ i, ‖b.repr v i‖ ≤ 1
-  jX_int : ∀ y nW n DF χ (σ : FB y nW n χ), nB σ ≤ 1 → jX y nW n DF χ σ ∈ intJet y (un.latStd nW) n DF
-  jet_fourier : ∀ y nW n DF (s : tg.Sn y (un.latStd nW) n) (t : (ct.fld y).C), t ≠ 0 →
-    ∃ F₀ : Finset (Fin nW → ct.chX y), ∀ F : Finset (Fin nW → ct.chX y), F₀ ⊆ F →
-      ∃ v ∈ intJet y (un.latStd nW) n DF,
-        jet y (un.latStd nW) n DF s - ∑ χ ∈ F, jX y nW n DF χ (sgc y nW n χ s) = t • v
+  intJet_free
+    : ∀ y nW n DF, ∃ (N : ℕ) (b : Module.Basis (Fin N) (ct.fld y).C (Jet y (un.latStd nW) n DF)),
+      ∀ v,
+        v ∈ intJet y (un.latStd nW) n DF ↔ ∀ i, ‖b.repr v i‖ ≤ 1
+  jX_int
+    : ∀ y nW n DF χ (σ : FB y nW n χ), nB σ ≤ 1 → jX y nW n DF χ σ ∈ intJet y (un.latStd nW) n DF
+  jet_fourier
+    : ∀ y nW n DF (s : tg.Sn y (un.latStd nW) n) (t : (ct.fld y).C),
+      t ≠ 0
+        → ∃ F₀ : Finset (Fin nW → ct.chX y), ∀ F : Finset (Fin nW → ct.chX y),
+          F₀ ⊆ F
+            → ∃ v ∈ intJet y (un.latStd nW) n DF,
+              jet y (un.latStd nW) n DF s - ∑ χ ∈ F, jX y nW n DF χ (sgc y nW n χ s) = t • v
 
 attribute [instance] JetSt.jAdd JetSt.jMod JetSt.fbAdd JetSt.fbMod
 
@@ -469,16 +523,26 @@ structure HTmSt (ct : At S κ p) (sh : ShfSt ct) (hq : HTpSt ct) : Type 1 where
   HTn : ℕ → Type
   htEval : ∀ {n}, HTn n → ∀ y : ct.Pt (ct.Xn n), hq.Tp y →+ hq.OmV y
   htIdl : ∀ {n}, HTn n → ct.Idl (ct.Xn n)
-  IsHTBlowup_def : ∀ n Z', 3 ≤ n → (IsHTBlowup Z' (ct.Xn n) ↔ ∃ h : HTn n,
-    (∀ (y : ct.Pt (ct.Xn n)) (t : hq.Tp y), htEval h y t ∈ hq.om y ∧
-      ∃ v ∈ hq.om y, htEval h y t - hq.ht y t = ((p : (ct.fld y).C) ^ n) • v) ∧
-    Z' = ct.blowUp (ct.Xn n) (htIdl h))
+  IsHTBlowup_def
+    : ∀ n Z',
+      3 ≤ n
+        → (IsHTBlowup Z' (ct.Xn n)
+          ↔ ∃ h : HTn n,
+            (∀ (y : ct.Pt (ct.Xn n)) (t : hq.Tp y),
+                htEval h y t ∈ hq.om y
+                  ∧ ∃ v ∈ hq.om y, htEval h y t - hq.ht y t = ((p : (ct.fld y).C) ^ n) • v)
+              ∧ Z' = ct.blowUp (ct.Xn n) (htIdl h))
   wFib : ∀ {n}, HTn n → ∀ y : ct.Pt (ct.Xn n), PsiT D → AddSubgroup (hq.TC y)
   omSh : ∀ Z, ct.Sh Z
   omPat : ∀ {Z} (y : ct.Pt Z), AddSubgroup (hq.OmV y)
-  omPat_def : ∀ n Z', 3 ≤ n → IsHTBlowup Z' (ct.Xn n) → ∀ y : ct.Pt Z',
-    omPat y = hq.om y ⊓ (Ospan (C := (ct.fld y).C) (Set.range (hq.ht y)) ⊔
-      (hq.om y).map (DistribSMul.toAddMonoidHom (hq.OmV y) ((p : (ct.fld y).C) ^ n)))
+  omPat_def
+    : ∀ n Z',
+      3 ≤ n → IsHTBlowup Z' (ct.Xn n)
+        → ∀ y : ct.Pt Z',
+          omPat y
+            = hq.om y
+              ⊓ (Ospan (C := (ct.fld y).C) (Set.range (hq.ht y))
+                ⊔ (hq.om y).map (DistribSMul.toAddMonoidHom (hq.OmV y) ((p : (ct.fld y).C) ^ n)))
   BPt : ct.Mdl → Type
   bfld : ∀ {Z}, BPt Z → CF p
   OmB : ∀ {Z}, BPt Z → Type
@@ -501,16 +565,18 @@ structure CrDSt (ct : At S κ p) : Type 1 where
   degLdR : Crv → (PsiT D → ℕ → ℝ) → ℝ
   CrvQ : Type
   degGrQ : CrvQ → PsiT D → ℕ → ℤ
-  nefQ_def : ∀ l : PsiT D → ℕ → ℝ, nefQ l ↔
-    ∀ C : CrvQ, 0 ≤ -∑ᶠ τ, ∑ i ∈ Finset.Icc 1 N, l τ i * (degGrQ C τ i : ℝ)
+  nefQ_def
+    : ∀ l : PsiT D → ℕ → ℝ,
+      nefQ l ↔ ∀ C : CrvQ, 0 ≤ - ∑ᶠ τ, ∑ i ∈ Finset.Icc 1 N, l τ i * (degGrQ C τ i : ℝ)
   degGrD : Crv → PsiT D → ℕ → ℤ
-  degLdR_def : ∀ CC (μ : PsiT D → ℕ → ℝ), degLdR CC μ =
-    -∑ᶠ τ, ∑ i ∈ Finset.Icc 1 N, μ τ i * (degGrD CC τ i : ℝ)
+  degLdR_def
+    : ∀ CC (μ : PsiT D → ℕ → ℝ),
+      degLdR CC μ = - ∑ᶠ τ, ∑ i ∈ Finset.Icc 1 N, μ τ i * (degGrD CC τ i : ℝ)
   degLie_f : ∀ CC τ, degLie CC τ false = ∑ i ∈ Finset.Icc 1 j, degGrD CC τ i
-  degLie_alt : ∀ CC τ, degLie CC τ true = -∑ i ∈ Finset.Icc (j + 1) N, degGrD CC τ i
-  eDeg_def : DV.UnramE D p → ∀ CC, eDeg CC = -∑ᶠ τ, (degLie CC τ false + degLie CC τ true)
+  degLie_alt : ∀ CC τ, degLie CC τ true = - ∑ i ∈ Finset.Icc (j + 1) N, degGrD CC τ i
+  eDeg_def : DV.UnramE D p → ∀ CC, eDeg CC = - ∑ᶠ τ, (degLie CC τ false + degLie CC τ true)
   Pm_head : ∀ CC τ i, 1 ≤ i → i ≤ j → ∑ k ∈ Finset.Icc 1 i, degGrD CC τ k ≤ Pm CC
-  Pm_tail : ∀ CC τ i, j ≤ i → i ≤ N → -∑ k ∈ Finset.Icc (i + 1) N, degGrD CC τ k ≤ Pm CC
+  Pm_tail : ∀ CC τ i, j ≤ i → i ≤ N → - ∑ k ∈ Finset.Icc (i + 1) N, degGrD CC τ k ≤ Pm CC
 
 structure CrHSt (ct : At S κ p) (fg : FlgSt ct) : Type 1 where
   nefHT : ct.Mdl → (PsiT D → ℕ → ℝ) → Prop
@@ -526,13 +592,17 @@ structure CrHSt (ct : At S κ p) (fg : FlgSt ct) : Type 1 where
   flDim : FlCl → ℕ
   Sum1 : Type
   locus : Sum1 → FlCl
-  bdryLoci_def : ∀ Z, bdryLoci Z ↔ ∃ S : Set Sum1, S.Finite ∧
-    (∀ x : YsP Z, ysBd x → ∃ ℓ ∈ S, flMem (hFl x) (locus ℓ)) ∧
-    ∀ ℓ ∈ S, flDim (locus ℓ) + D.R.f * (N - 1) = D.R.f * (N * (N - 1) / 2)
+  bdryLoci_def
+    : ∀ Z,
+      bdryLoci Z
+        ↔ ∃ S : Set Sum1,
+          S.Finite ∧ (∀ x : YsP Z, ysBd x → ∃ ℓ ∈ S, flMem (hFl x) (locus ℓ))
+            ∧ ∀ ℓ ∈ S, flDim (locus ℓ) + D.R.f * (N - 1) = D.R.f * (N * (N - 1) / 2)
   CrvS : ct.Mdl → Type
   degGr : ∀ {Z}, CrvS Z → PsiT D → ℕ → ℤ
-  nefHT_def : ∀ Z (l : PsiT D → ℕ → ℝ), nefHT Z l ↔
-    ∀ C : CrvS Z, 0 ≤ -∑ᶠ τ, ∑ i ∈ Finset.Icc 1 N, l τ i * (degGr C τ i : ℝ)
+  nefHT_def
+    : ∀ Z (l : PsiT D → ℕ → ℝ),
+      nefHT Z l ↔ ∀ C : CrvS Z, 0 ≤ - ∑ᶠ τ, ∑ i ∈ Finset.Icc 1 N, l τ i * (degGr C τ i : ℝ)
 
 structure Stages (ct : At S κ p) : Type 1 where
   lw : LawSt ct
@@ -705,7 +775,8 @@ def ex : ModuliIntegralCharts.ExtA D st.loc where
   corr_sub := fun _ _ => ⟨fun ⟨_⟩ ⟨_⟩ => rfl⟩
   diagCl := @At.diagCl _ _ _ _ _ _ _ ct
   IvD := @TorSt.IvD _ _ _ _ _ _ _ _ st.tr
-  jIdl := fun b d => match b, d with
+  jIdl := fun b d =>
+    match b, d with
     | none, d => st.tr.jIdl none d
     | some n, d => st.tr.jIdl (some n) d
   ZP := @At.ZP _ _ _ _ _ _ _ ct
@@ -812,7 +883,8 @@ def ex : ModuliIntegralCharts.ExtA D st.loc where
 def locB : BoundaryLocalData.LocB D st.loc where
   chX := @At.chX _ _ _ _ _ _ _ ct
   xAdd := fun {Z : ct.Mdl} (y : ct.Pt Z) => (inferInstance : AddCommGroup (ct.chX (Z := Z) y))
-  xMod := fun {Z : ct.Mdl} (y : ct.Pt Z) => (inferInstance : Module (𝓞 D.host.E) (ct.chX (Z := Z) y))
+  xMod := fun {Z : ct.Mdl} (y : ct.Pt Z) =>
+    (inferInstance : Module (𝓞 D.host.E) (ct.chX (Z := Z) y))
   phi := @At.phi _ _ _ _ _ _ _ ct
   phi_conj := @LawSt.phi_conj _ _ _ _ _ _ _ _ st.lw
   tau := @MotSt.tau _ _ _ _ _ _ _ _ st.mo

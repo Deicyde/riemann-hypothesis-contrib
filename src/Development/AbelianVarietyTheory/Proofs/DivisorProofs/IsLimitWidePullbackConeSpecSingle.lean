@@ -4,13 +4,17 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.AlternatingS
 
 @[expose] public section
 
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex Simplicial TensorProduct GlobalTheory.EtC GlobalTheory.CechOne
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  Simplicial TensorProduct GlobalTheory.EtC GlobalTheory.CechOne
 
 namespace GlobalTheory.CechOne
 
-theorem isLimit_cone_one (A B : Type) [CommRing A] [CommRing B] [Algebra A B] :
-    Nonempty (IsLimit (WidePullbackCone.mk (f := fun _ : Fin (0 + 1) => GlobalTheory.CechOne.fB A B)
-      (GlobalTheory.CechOne.fB A B) (fun _ => 𝟙 _) (fun _ => Category.id_comp _))) := by
+theorem isLimit_cone_one (A B : Type) [CommRing A] [CommRing B] [Algebra A B]
+    : Nonempty (IsLimit (WidePullbackCone.mk
+      (f := fun _ : Fin (0 + 1) => GlobalTheory.CechOne.fB A B)
+      (GlobalTheory.CechOne.fB A B)
+      (fun _ => 𝟙 _)
+      (fun _ => Category.id_comp _))) := by
   refine ⟨WidePullbackCone.IsLimit.mk _ (fun t => t.π 0) ?_ ?_ ?_⟩
   · intro t
     rw [WidePullbackCone.mk_base]

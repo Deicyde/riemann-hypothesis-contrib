@@ -12,10 +12,11 @@ noncomputable section
 
 variable {E : Type} [NormedAddCommGroup E] [NormedSpace ℝ E]
 
-theorem perm_of_swaps {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W] {n : ℕ}
-    (T : ContinuousMultilinearMap ℝ (fun _ : Fin n => E) W)
-    (h : ∀ (a b : Fin n), a ≠ b → ∀ v : Fin n → E, T (v ∘ Equiv.swap a b) = T v) :
-    ∀ (σ : Equiv.Perm (Fin n)) (v : Fin n → E), T (v ∘ σ) = T v := by
+theorem perm_of_swaps
+    {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W]
+    {n : ℕ} (T : ContinuousMultilinearMap ℝ (fun _ : Fin n => E) W)
+    (h : ∀ (a b : Fin n), a ≠ b → ∀ v : Fin n → E, T (v ∘ Equiv.swap a b) = T v)
+    : ∀ (σ : Equiv.Perm (Fin n)) (v : Fin n → E), T (v ∘ σ) = T v := by
   classical
   intro σ
   induction σ using Equiv.Perm.swap_induction_on with
@@ -23,17 +24,19 @@ theorem perm_of_swaps {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W] {n :
   | swap_mul f x y hxy ih =>
     intro v
     rw [Equiv.Perm.coe_mul]
-    calc T (v ∘ (⇑(Equiv.swap x y) ∘ ⇑f)) = T ((v ∘ Equiv.swap x y) ∘ f) := rfl
+    calc
+      T (v ∘ (⇑(Equiv.swap x y) ∘ ⇑f))
+        = T ((v ∘ Equiv.swap x y) ∘ f) := rfl
       _ = T (v ∘ Equiv.swap x y) := ih _
       _ = T v := h x y hxy v
 
-theorem symm_iter : ∀ (n : ℕ) (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W] (f : E → W) (U : Set E),
-    IsOpen U → ContDiffOn ℝ ∞ f U → ∀ x ∈ U, ∀ (σ : Equiv.Perm (Fin n)) (v : Fin n → E),
-      iteratedFDeriv ℝ n f x (v ∘ σ) = iteratedFDeriv ℝ n f x v := by
+theorem symm_iter
+    : ∀ (n : ℕ) (W : Type) [NormedAddCommGroup W] [NormedSpace ℝ W] (f : E → W) (U : Set E),
+      IsOpen U → ContDiffOn ℝ ∞ f U
+        → ∀ x ∈ U, ∀ (σ : Equiv.Perm (Fin n)) (v : Fin n → E),
+          iteratedFDeriv ℝ n f x (v ∘ σ) = iteratedFDeriv ℝ n f x v := by
   have hle : ∀ k : ℕ, ((k : ℕ) : WithTop ℕ∞) ≤ ∞ := fun k => by
-    first
-    | exact WithTop.coe_le_coe.2 le_top
-    | exact_mod_cast (le_top : ((k : ℕ∞)) ≤ ⊤)
+    first | exact WithTop.coe_le_coe.2 le_top | exact_mod_cast (le_top : ((k : ℕ∞)) ≤ ⊤)
   intro n
   induction n with
   | zero =>
@@ -46,16 +49,22 @@ theorem symm_iter : ∀ (n : ℕ) (W : Type) [NormedAddCommGroup W] [NormedSpace
     rcases n with _ | m
     · exact absurd (Fin.ext (by have := a.isLt; have := b.isLt; omega)) hab
     have hfx : ContDiffAt ℝ ∞ f x := hf.contDiffAt (hU.mem_nhds hx)
-    have hmul : ∀ σ τ : Equiv.Perm (Fin (m + 1 + 1)),
-        (∀ v, iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ σ) = iteratedFDeriv ℝ (m + 1 + 1) f x v) →
-        (∀ v, iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ τ) = iteratedFDeriv ℝ (m + 1 + 1) f x v) →
-        ∀ v, iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ ⇑(σ * τ)) = iteratedFDeriv ℝ (m + 1 + 1) f x v := by
+    have hmul
+        : ∀ σ τ : Equiv.Perm (Fin (m + 1 + 1)),
+          (∀ v, iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ σ) = iteratedFDeriv ℝ (m + 1 + 1) f x v)
+            → (∀ v, iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ τ) = iteratedFDeriv ℝ (m + 1 + 1) f x v)
+            → ∀ v,
+              iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ ⇑(σ * τ))
+                = iteratedFDeriv ℝ (m + 1 + 1) f x v := by
       intro σ τ hσ hτ v
       rw [Equiv.Perm.coe_mul]
       exact (hτ (v ∘ σ)).trans (hσ v)
-    have T1 : ∀ a' b' : Fin (m + 1), a' ≠ b' → ∀ v : Fin (m + 1 + 1) → E,
-        iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ Equiv.swap a'.succ b'.succ) =
-          iteratedFDeriv ℝ (m + 1 + 1) f x v := by
+    have T1
+        : ∀ a' b' : Fin (m + 1),
+          a' ≠ b'
+            → ∀ v : Fin (m + 1 + 1) → E,
+              iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ Equiv.swap a'.succ b'.succ)
+                = iteratedFDeriv ℝ (m + 1 + 1) f x v := by
       intro a' b' _ v
       rw [iteratedFDeriv_succ_apply_left, iteratedFDeriv_succ_apply_left]
       have h0 : (v ∘ Equiv.swap a'.succ b'.succ) 0 = v 0 := by
@@ -73,17 +82,20 @@ theorem symm_iter : ∀ (n : ℕ) (W : Type) [NormedAddCommGroup W] [NormedSpace
         ← fderiv_continuousMultilinear_apply_const_apply hgd]
       rw [Filter.EventuallyEq.fderiv_eq (Filter.eventually_of_mem (hU.mem_nhds hx)
         (fun y hy => ih W f U hU hf y hy (Equiv.swap a' b') (Fin.tail v)))]
-    have T2 : ∀ v : Fin (m + 1 + 1) → E,
-        iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ Equiv.swap 0 (Fin.succ 0)) =
-          iteratedFDeriv ℝ (m + 1 + 1) f x v := by
+    have T2
+        : ∀ v : Fin (m + 1 + 1) → E,
+          iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ Equiv.swap 0 (Fin.succ 0))
+            = iteratedFDeriv ℝ (m + 1 + 1) f x v := by
       intro v
-      have hrepr : ∀ w : Fin (m + 1 + 1) → E, iteratedFDeriv ℝ (m + 1 + 1) f x w =
-          fderiv ℝ (fderiv ℝ (iteratedFDeriv ℝ m f)) x (w 0) (Fin.tail w 0) (Fin.tail (Fin.tail w)) := by
+      have hrepr
+          : ∀ w : Fin (m + 1 + 1) → E,
+            iteratedFDeriv ℝ (m + 1 + 1) f x w
+              = fderiv ℝ (fderiv ℝ (iteratedFDeriv ℝ m f)) x (w 0) (Fin.tail w 0)
+                (Fin.tail (Fin.tail w)) := by
         intro w
-        rw [iteratedFDeriv_succ_apply_left, iteratedFDeriv_succ_eq_comp_left, LinearIsometryEquiv.comp_fderiv]
-        first
-        | rfl
-        | simp [continuousMultilinearCurryLeftEquiv_symm_apply]
+        rw [iteratedFDeriv_succ_apply_left, iteratedFDeriv_succ_eq_comp_left,
+          LinearIsometryEquiv.comp_fderiv]
+        first | rfl | simp [continuousMultilinearCurryLeftEquiv_symm_apply]
       rw [hrepr, hrepr]
       have hg : ContDiffAt ℝ 2 (iteratedFDeriv ℝ m f) x :=
         hfx.iteratedFDeriv_right (by have := hle (2 + m); push_cast at this ⊢; exact this)
@@ -98,14 +110,16 @@ theorem symm_iter : ∀ (n : ℕ) (W : Type) [NormedAddCommGroup W] [NormedSpace
         rw [Equiv.swap_apply_of_ne_of_ne (Fin.succ_ne_zero _)
           (fun h => Fin.succ_ne_zero i (Fin.succ_injective _ h))]
       rw [e0, e1, e2, hs (Fin.tail v 0) (v 0)]
-    have T0 : ∀ b' : Fin (m + 1), ∀ v : Fin (m + 1 + 1) → E,
-        iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ Equiv.swap 0 b'.succ) =
-          iteratedFDeriv ℝ (m + 1 + 1) f x v := by
+    have T0
+        : ∀ b' : Fin (m + 1), ∀ v : Fin (m + 1 + 1) → E,
+          iteratedFDeriv ℝ (m + 1 + 1) f x (v ∘ Equiv.swap 0 b'.succ)
+            = iteratedFDeriv ℝ (m + 1 + 1) f x v := by
       intro b'
       by_cases hb : b' = 0
       · subst hb; exact T2
-      · have e := Equiv.swap_mul_swap_mul_swap (x := (0 : Fin (m + 1 + 1))) (y := Fin.succ 0)
-          (z := b'.succ) (Fin.succ_ne_zero 0).symm (Fin.succ_ne_zero b').symm
+      · have e :=
+          Equiv.swap_mul_swap_mul_swap (x := (0 : Fin (m + 1 + 1))) (y := Fin.succ 0) (z := b'.succ)
+            (Fin.succ_ne_zero 0).symm (Fin.succ_ne_zero b').symm
         rw [Equiv.swap_comm, ← e]
         have h1 := T1 0 b' (Ne.symm hb)
         exact hmul _ _ (hmul _ _ h1 T2) h1
@@ -121,15 +135,18 @@ theorem symm_iter : ∀ (n : ℕ) (W : Type) [NormedAddCommGroup W] [NormedSpace
 
 variable {W : Type} [NormedAddCommGroup W] [NormedSpace ℝ W]
 
-theorem poly_contDiff {j : ℕ} (m : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) W) (a : E) {n : WithTop ℕ∞} :
-    ContDiff ℝ n (fun ζ => m (fun _ => ζ - a)) := m.contDiff.comp (contDiff_pi.2 fun _ => contDiff_id.sub contDiff_const)
+theorem poly_contDiff
+    {j : ℕ} (m : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) W) (a : E) {n : WithTop ℕ∞}
+    : ContDiff ℝ n (fun ζ => m (fun _ => ζ - a)) :=
+  m.contDiff.comp (contDiff_pi.2 fun _ => contDiff_id.sub contDiff_const)
 
-theorem poly_hom {j i : ℕ} (hij : i ≠ j) (m : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) W) :
-    iteratedFDeriv ℝ i (fun ζ => m (fun _ => ζ)) 0 = 0 := by
+theorem poly_hom {j i : ℕ} (hij : i ≠ j) (m : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) W)
+    : iteratedFDeriv ℝ i (fun ζ => m (fun _ => ζ)) 0 = 0 := by
   have hg : ContDiff ℝ i (fun ζ : E => m (fun _ => ζ)) :=
     m.contDiff.comp (contDiff_pi.2 fun _ => contDiff_id)
   set L : E →L[ℝ] E := (2 : ℝ) • ContinuousLinearMap.id ℝ E with hL
-  have hcomp : (fun ζ : E => m (fun _ => ζ)) ∘ L = ((2 : ℝ) ^ j) • (fun ζ : E => m (fun _ => ζ)) := by
+  have hcomp
+      : (fun ζ : E => m (fun _ => ζ)) ∘ L = ((2 : ℝ) ^ j) • (fun ζ : E => m (fun _ => ζ)) := by
     funext ζ
     simp only [Function.comp_apply, Pi.smul_apply, hL, ContinuousLinearMap.smul_apply,
       ContinuousLinearMap.id_apply]
@@ -143,30 +160,39 @@ theorem poly_hom {j i : ℕ} (hij : i ≠ j) (m : ContinuousMultilinearMap ℝ (
     have : (2 : ℕ) ^ j = 2 ^ i := by exact_mod_cast h
     exact (Nat.pow_right_injective le_rfl this).symm
   ext v
-  have key : ((2 : ℝ) ^ j) • iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0 v =
-      ((2 : ℝ) ^ i) • iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0 v := by
+  have key
+      : ((2 : ℝ) ^ j) • iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0 v
+        = ((2 : ℝ) ^ i) • iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0 v := by
     have hv := congrArg (fun T => T v) h1
     simp only [ContinuousMultilinearMap.smul_apply,
-      ContinuousMultilinearMap.compContinuousLinearMap_apply] at hv
+        ContinuousMultilinearMap.compContinuousLinearMap_apply]
+      at hv
     rw [hv, hL]
     simp only [ContinuousLinearMap.smul_apply, ContinuousLinearMap.id_apply]
     rw [ContinuousMultilinearMap.map_smul_univ (iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0)
-      (fun _ => (2 : ℝ)) v]
+      (fun _ => (2 : ℝ))
+      v]
     simp [Finset.prod_const]
-  have h0 : ((2 : ℝ) ^ j - (2 : ℝ) ^ i) • iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0 v = 0 := by
+  have h0
+      : ((2 : ℝ) ^ j - (2 : ℝ) ^ i) • iteratedFDeriv ℝ i (fun ζ : E => m (fun _ => ζ)) 0 v = 0 := by
     rw [sub_smul, key, sub_self]
   rw [ContinuousMultilinearMap.zero_apply]
   exact (smul_eq_zero.1 h0).resolve_left (sub_ne_zero.2 hne)
 
-theorem poly_at {j i : ℕ} (m : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) W) (a : E) (v : Fin i → E) :
-    iteratedFDeriv ℝ i (fun ζ => m (fun _ => ζ - a)) a v =
-      if h : i = j then ∑ σ : Equiv.Perm (Fin j), m (fun k => (v ∘ Fin.cast h.symm) (σ k)) else 0 := by
+theorem poly_at
+    {j i : ℕ} (m : ContinuousMultilinearMap ℝ (fun _ : Fin j => E) W) (a : E) (v : Fin i → E)
+    : iteratedFDeriv ℝ i (fun ζ => m (fun _ => ζ - a)) a v
+      = if h : i = j then
+          ∑ σ : Equiv.Perm (Fin j), m (fun k => (v ∘ Fin.cast h.symm) (σ k))
+        else
+          0 := by
   by_cases h : i = j
   · subst h
     rw [dite_eq_left rfl, iteratedFDeriv_comp_sub (f := fun ζ => m fun _ => ζ), sub_self,
       ContinuousMultilinearMap.iteratedFDeriv_comp_diagonal]
     rfl
-  · rw [dite_eq_right h, iteratedFDeriv_comp_sub (f := fun ζ => m fun _ => ζ), sub_self, poly_hom h m]
+  · rw [dite_eq_right h, iteratedFDeriv_comp_sub (f := fun ζ => m fun _ => ζ), sub_self,
+      poly_hom h m]
     rfl
 
 end
@@ -180,24 +206,29 @@ open Formalism.FourierDecayAlt.P.CutMP.Gauge.GC.RadTTaylor
 theorem taylor_expansion_holds : GTCLRTaylor := by
   intro V _ _ ψ U ζ₀ N hU hζ hψ i hi
   have hle : ∀ k : ℕ, ((k : ℕ) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞) := fun k => by
-    first
-    | exact WithTop.coe_le_coe.2 le_top
-    | exact_mod_cast (le_top : ((k : ℕ∞)) ≤ ⊤)
+    first | exact WithTop.coe_le_coe.2 le_top | exact_mod_cast (le_top : ((k : ℕ∞)) ≤ ⊤)
   have hψat : ContDiffAt ℝ i ψ ζ₀ := (hψ.contDiffAt (hU.mem_nhds hζ)).of_le (hle i)
-  have hS : ContDiff ℝ i (fun ζ : ℂ => ∑ j ∈ Finset.range (N + 1),
-      ((j.factorial : ℝ)⁻¹) • iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀)) :=
+  have hS : ContDiff ℝ i (fun ζ : ℂ =>
+      ∑ j ∈ Finset.range (N + 1),
+        ((j.factorial : ℝ)⁻¹) • iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀)) :=
     ContDiff.sum fun j _ => (poly_contDiff _ _).const_smul _
   refine (iteratedFDeriv_sub_apply hψat hS.contDiffAt).trans ?_
   rw [sub_eq_zero, iteratedFDeriv_sum (fun j _ => (poly_contDiff _ _).const_smul _)]
   ext v
   rw [Finset.sum_apply, ContinuousMultilinearMap.sum_apply]
-  have hterm : ∀ j ∈ Finset.range (N + 1),
-      iteratedFDeriv ℝ i (fun ζ : ℂ => ((j.factorial : ℝ)⁻¹) • iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀)) ζ₀ v =
-        if j = i then ((i.factorial : ℝ)⁻¹) • ∑ σ : Equiv.Perm (Fin i), iteratedFDeriv ℝ i ψ ζ₀ (v ∘ σ)
-        else 0 := by
+  have hterm
+      : ∀ j ∈ Finset.range (N + 1),
+        iteratedFDeriv ℝ i
+            (fun ζ : ℂ => ((j.factorial : ℝ)⁻¹) • iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀))
+            ζ₀ v
+          = if j = i then
+              ((i.factorial : ℝ)⁻¹) • ∑ σ : Equiv.Perm (Fin i), iteratedFDeriv ℝ i ψ ζ₀ (v ∘ σ)
+            else
+              0 := by
     intro j _
-    rw [show (fun ζ : ℂ => ((j.factorial : ℝ)⁻¹) • iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀)) =
-        ((j.factorial : ℝ)⁻¹) • (fun ζ : ℂ => iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀)) from rfl,
+    rw [show (fun ζ : ℂ => ((j.factorial : ℝ)⁻¹) • iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀))
+          = ((j.factorial : ℝ)⁻¹) • (fun ζ : ℂ => iteratedFDeriv ℝ j ψ ζ₀ (fun _ => ζ - ζ₀)) from
+        rfl,
       iteratedFDeriv_const_smul_apply ((poly_contDiff _ _).contDiffAt),
       ContinuousMultilinearMap.smul_apply, poly_at]
     split_ifs with h1 h2 h2

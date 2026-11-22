@@ -17,9 +17,11 @@ open Formalism.L2.Col Formalism.HermitianLatticesTheory
 
 variable {E : Type} [Field E] [NumberField E] {n : ℕ}
 
-abbrev abv (P : HeightOneSpectrum (𝓞 E)) : AbsoluteValue E ℝ := NumberField.HeightOneSpectrum.adicAbv E P
+abbrev abv (P : HeightOneSpectrum (𝓞 E)) : AbsoluteValue E ℝ :=
+  NumberField.HeightOneSpectrum.adicAbv E P
 
-theorem abv_le_one_iff (P : HeightOneSpectrum (𝓞 E)) (a : E) : abv P a ≤ 1 ↔ P.valuation E a ≤ 1 := by
+theorem abv_le_one_iff (P : HeightOneSpectrum (𝓞 E)) (a : E)
+    : abv P a ≤ 1 ↔ P.valuation E a ≤ 1 := by
   rw [abv, NumberField.HeightOneSpectrum.adicAbv_def]
   rw [← WithZeroMulInt.toNNReal_le_one_iff (NumberField.HeightOneSpectrum.one_lt_absNorm_nnreal P)]
   exact_mod_cast Iff.rfl
@@ -28,23 +30,31 @@ theorem intAt_of_abv {P : HeightOneSpectrum (𝓞 E)} {a : E} (h : abv P a ≤ 1
   obtain ⟨r, s, hs⟩ := P.exists_primeCompl_mul_eq_of_integer a ((abv_le_one_iff P a).1 h)
   exact ⟨r, s, s.2, by rw [mul_comm]; exact hs⟩
 
-theorem intAt_sum {P : HeightOneSpectrum (𝓞 E)} {ι : Type} (s : Finset ι) (f : ι → E) (h : ∀ i ∈ s, IntAt P (f i)) :
-    IntAt P (∑ i ∈ s, f i) :=
+theorem intAt_sum
+    {P : HeightOneSpectrum (𝓞 E)} {ι : Type} (s : Finset ι) (f : ι → E) (h : ∀ i ∈ s, IntAt P (f i))
+    : IntAt P (∑ i ∈ s, f i) :=
   Finset.sum_induction f (IntAt P) (fun _ _ => IntAt.add) (by simpa using IntAt.coe P 0) h
 
-theorem mulVec_mem [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {M : Matrix (Fin n) (Fin n) E} (hM : ∀ i j, IntAt P (M i j))
-    {x : Sp E n} (hx : x ∈ stdAt E n P) : M *ᵥ x ∈ stdAt E n P := by
+theorem mulVec_mem
+    [StarRing E]
+    {P : HeightOneSpectrum (𝓞 E)} {M : Matrix (Fin n) (Fin n) E} (hM : ∀ i j, IntAt P (M i j))
+    {x : Sp E n} (hx : x ∈ stdAt E n P)
+    : M *ᵥ x ∈ stdAt E n P := by
   unfold stdAt at hx ⊢
   rw [mem_localization_standardLattice] at hx ⊢
   intro i
   exact intAt_sum Finset.univ (fun j => M i j * x j) fun j _ => (hM i j).mul (hx j)
 
-def Carries (P : HeightOneSpectrum (𝓞 E)) (N : Submodule (𝓞 E) (Sp E n)) (M : Matrix (Fin n) (Fin n) E) : Prop :=
+def Carries
+    (P : HeightOneSpectrum (𝓞 E)) (N : Submodule (𝓞 E) (Sp E n)) (M : Matrix (Fin n) (Fin n) E)
+    : Prop :=
   M.det ≠ 0 ∧ ∀ x, M *ᵥ x ∈ stdAt E n P ↔ x ∈ localization₂ P.asIdeal N
 
-theorem eventually_int {P : HeightOneSpectrum (𝓞 E)} {h : ℕ → Matrix (Fin n) (Fin n) E}
-    (hh : ∀ i j, Tendsto (fun k => abv P (h k i j - (1 : Matrix (Fin n) (Fin n) E) i j)) atTop (𝓝 0)) :
-    ∀ᶠ k in atTop, ∀ i j, IntAt P (h k i j) := by
+theorem eventually_int
+    {P : HeightOneSpectrum (𝓞 E)} {h : ℕ → Matrix (Fin n) (Fin n) E}
+    (hh
+      : ∀ i j, Tendsto (fun k => abv P (h k i j - (1 : Matrix (Fin n) (Fin n) E) i j)) atTop (𝓝 0))
+    : ∀ᶠ k in atTop, ∀ i j, IntAt P (h k i j) := by
   refine eventually_all.2 fun i => eventually_all.2 fun j => ?_
   filter_upwards [(hh i j).eventually_le_const one_pos] with k hk
   have h1 : IntAt P ((1 : Matrix (Fin n) (Fin n) E) i j) := by
@@ -54,15 +64,20 @@ theorem eventually_int {P : HeightOneSpectrum (𝓞 E)} {h : ℕ → Matrix (Fin
     · simpa using IntAt.coe P 0
   simpa using (intAt_of_abv hk).add h1
 
-theorem Carries.eventually [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {N : Submodule (𝓞 E) (Sp E n)}
-    {A : Matrix (Fin n) (Fin n) E} (hA : Carries P N A) {g : ℕ → Matrix (Fin n) (Fin n) E}
-    (hg : ∀ i j, Tendsto (fun k => abv P (g k i j - A i j)) atTop (𝓝 0)) :
-    ∀ᶠ k in atTop, Carries P N (g k) := by
+theorem Carries.eventually
+    [StarRing E]
+    {P : HeightOneSpectrum (𝓞 E)} {N : Submodule (𝓞 E) (Sp E n)} {A : Matrix (Fin n) (Fin n) E}
+    (hA : Carries P N A)
+    {g : ℕ → Matrix (Fin n) (Fin n) E}
+    (hg : ∀ i j, Tendsto (fun k => abv P (g k i j - A i j)) atTop (𝓝 0))
+    : ∀ᶠ k in atTop, Carries P N (g k) := by
   let _ : NormedField E := (abv P).toNormedField
   have hAu : IsUnit A.det := Ne.isUnit hA.1
   have t1 : Tendsto g atTop (𝓝 A) :=
-    tendsto_pi_nhds.2 fun i => tendsto_pi_nhds.2 fun j => tendsto_iff_norm_sub_tendsto_zero.2 (hg i j)
-  have tdet : Tendsto (fun k => (g k).det) atTop (𝓝 A.det) := ((continuous_id.matrix_det).tendsto _).comp t1
+    tendsto_pi_nhds.2 fun i =>
+      tendsto_pi_nhds.2 fun j => tendsto_iff_norm_sub_tendsto_zero.2 (hg i j)
+  have tdet : Tendsto (fun k => (g k).det) atTop (𝓝 A.det) :=
+    ((continuous_id.matrix_det).tendsto _).comp t1
   have hinv : ContinuousAt Inv.inv A :=
     continuousAt_matrix_inv _ (by rw [Ring.inverse_eq_inv']; exact continuousAt_inv₀ hA.1)
   have t2 : Tendsto (fun k => g k * A⁻¹) atTop (𝓝 1) := by
@@ -71,10 +86,14 @@ theorem Carries.eventually [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {N : Su
   have t3 : Tendsto (fun k => A * (g k)⁻¹) atTop (𝓝 1) := by
     have := (hinv.tendsto.comp t1).const_mul A
     rwa [mul_nonsing_inv _ hAu] at this
-  have e2 := eventually_int (P := P) (h := fun k => g k * A⁻¹) fun i j =>
-    tendsto_iff_norm_sub_tendsto_zero.1 (tendsto_pi_nhds.1 (tendsto_pi_nhds.1 t2 i) j)
-  have e3 := eventually_int (P := P) (h := fun k => A * (g k)⁻¹) fun i j =>
-    tendsto_iff_norm_sub_tendsto_zero.1 (tendsto_pi_nhds.1 (tendsto_pi_nhds.1 t3 i) j)
+  have e2 :=
+    eventually_int (P := P)
+      (h := fun k => g k * A⁻¹)
+      fun i j => tendsto_iff_norm_sub_tendsto_zero.1 (tendsto_pi_nhds.1 (tendsto_pi_nhds.1 t2 i) j)
+  have e3 :=
+    eventually_int (P := P)
+      (h := fun k => A * (g k)⁻¹)
+      fun i j => tendsto_iff_norm_sub_tendsto_zero.1 (tendsto_pi_nhds.1 (tendsto_pi_nhds.1 t3 i) j)
   filter_upwards [e2, e3, tdet.eventually_ne hA.1] with k h2 h3 hd
   refine ⟨hd, fun x => ?_⟩
   rw [← hA.2]
@@ -86,8 +105,8 @@ theorem Carries.eventually [StarRing E] {P : HeightOneSpectrum (𝓞 E)} {N : Su
     have := mulVec_mem h2 hx
     rwa [mulVec_mulVec, Matrix.mul_assoc, nonsing_inv_mul _ hAu, Matrix.mul_one] at this
 
-theorem span_of_self_dual [StarRing E] {L : Submodule (𝓞 E) (Sp E n)} (hLat : IsSdLat L) :
-    Submodule.span E (L : Set (Sp E n)) = ⊤ := by
+theorem span_of_self_dual [StarRing E] {L : Submodule (𝓞 E) (Sp E n)} (hLat : IsSdLat L)
+    : Submodule.span E (L : Set (Sp E n)) = ⊤ := by
   apply Submodule.dualAnnihilator_eq_bot_iff.mp
   apply le_antisymm ?_ bot_le
   intro f hf
@@ -106,8 +125,7 @@ theorem span_of_self_dual [StarRing E] {L : Submodule (𝓞 E) (Sp E n)} (hLat :
     have hy0 : hStd E n v y = 0 := by
       rw [hpair]
       exact (Submodule.mem_dualAnnihilator f).mp hf y (Submodule.subset_span hy)
-    have hz : hStd E n y v = 0 := by
-      simpa [hy0] using ((hStd_isSymm (E := E) (n := n)).eq v y).symm
+    have hz : hStd E n y v = 0 := by simpa [hy0] using ((hStd_isSymm (E := E) (n := n)).eq v y).symm
     simp [hz]
   have hv : v = 0 := by
     funext i
@@ -125,10 +143,14 @@ theorem span_of_self_dual [StarRing E] {L : Submodule (𝓞 E) (Sp E n)} (hLat :
   rw [Submodule.mem_bot]
   simpa [hv] using hpair.symm
 
-
-theorem exists_carries [StarRing E] (P : HeightOneSpectrum (𝓞 E)) {N : Submodule (𝓞 E) (Sp E n)}
-    (hN : Submodule.IsFullLattice E N) : ∃ A, Carries P N A := by
-  obtain ⟨b, hb⟩ := Formalism.BasicNotions.SkeletonIndexLemmas.exists_basis_locP P hN.fg (Submodule.IsFullLattice.span_eq_top (self := hN)) (n := n) (by simp)
+theorem exists_carries
+    [StarRing E]
+    (P : HeightOneSpectrum (𝓞 E))
+    {N : Submodule (𝓞 E) (Sp E n)} (hN : Submodule.IsFullLattice E N)
+    : ∃ A, Carries P N A := by
+  obtain ⟨b, hb⟩ :=
+    Formalism.BasicNotions.SkeletonIndexLemmas.exists_basis_locP P hN.fg
+      (Submodule.IsFullLattice.span_eq_top (self := hN)) (n := n) (by simp)
   let f : Sp E n ≃ₗ[E] Sp E n := b.equivFun
   have h1 : gmap f (Submodule.span (𝓞 E) (Set.range b)) = stdLat E n := by
     rw [stdLat_eq_span]
@@ -143,8 +165,9 @@ theorem exists_carries [StarRing E] (P : HeightOneSpectrum (𝓞 E)) {N : Submod
   · rw [LinearMap.toMatrix'_mulVec, ← hb, stdAt, ← h1, mem_localization_gmap]
     simp
 
-theorem exists_sep [StarRing E] (P : HeightOneSpectrum (𝓞 E)) (S : Finset (HeightOneSpectrum (𝓞 E))) (h : P ∉ S) :
-    ∃ a : 𝓞 E, (∀ Q ∈ S, a ∈ Q.asIdeal) ∧ 1 - a ∈ P.asIdeal := by
+theorem exists_sep
+    [StarRing E] (P : HeightOneSpectrum (𝓞 E)) (S : Finset (HeightOneSpectrum (𝓞 E))) (h : P ∉ S)
+    : ∃ a : 𝓞 E, (∀ Q ∈ S, a ∈ Q.asIdeal) ∧ 1 - a ∈ P.asIdeal := by
   classical
   induction S using Finset.induction_on with
   | empty => exact ⟨1, by simp, by simp⟩
@@ -162,25 +185,30 @@ theorem exists_sep [StarRing E] (P : HeightOneSpectrum (𝓞 E)) (S : Finset (He
 
 variable [StarRing E]
 
-theorem exists_idem {ST : Finset (HeightOneSpectrum (𝓞 E))} (hST : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.SplitNonConj ST)
-    {P : HeightOneSpectrum (𝓞 E)} (hP : P ∈ ST) :
-    ∃ e : ℕ → E, Tendsto (fun k => abv P (e k - 1)) atTop (𝓝 0) ∧
-      (∀ Q ∈ ST, Q ≠ P → Tendsto (fun k => abv Q (e k)) atTop (𝓝 0)) ∧
-      ∀ Q ∈ ST, Tendsto (fun k => abv Q (star (e k))) atTop (𝓝 0) := by
+theorem exists_idem
+    {ST : Finset (HeightOneSpectrum (𝓞 E))}
+    (hST : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.SplitNonConj ST)
+    {P : HeightOneSpectrum (𝓞 E)} (hP : P ∈ ST)
+    : ∃ e : ℕ → E,
+      Tendsto (fun k => abv P (e k - 1)) atTop (𝓝 0)
+        ∧ (∀ Q ∈ ST, Q ≠ P → Tendsto (fun k => abv Q (e k)) atTop (𝓝 0))
+        ∧ ∀ Q ∈ ST, Tendsto (fun k => abv Q (star (e k))) atTop (𝓝 0) := by
   classical
-  obtain ⟨a, ha, hb⟩ := exists_sep P (ST.erase P ∪ ST.image conjPrime₂) (by
-    simp only [Finset.mem_union, Finset.mem_erase, Finset.mem_image, not_or]
-    exact ⟨fun h => h.1 rfl, fun ⟨Q, hQ, h⟩ => hST Q hQ P hP h.symm⟩)
+  obtain ⟨a, ha, hb⟩ :=
+    exists_sep P (ST.erase P ∪ ST.image conjPrime₂) (by
+      simp only [Finset.mem_union, Finset.mem_erase, Finset.mem_image, not_or]
+      exact ⟨fun h => h.1 rfl, fun ⟨Q, hQ, h⟩ => hST Q hQ P hP h.symm⟩)
   have hc : IsCoprime a (1 - a) := ⟨1, 1, by ring⟩
   choose x y hxy using fun k : ℕ => (hc.pow : IsCoprime (a ^ k) ((1 - a) ^ k))
   refine ⟨fun k => ((x k * a ^ k : 𝓞 E) : E), ?_, fun Q hQ hne => ?_, fun Q hQ => ?_⟩
-  · refine (GlobalTheory.UnApprox.tendsto_abv hb fun k => -y k).congr fun k => ?_
+  · refine (GlobalTheory.UnApprox.tendsto_abv hb fun k => - y k).congr fun k => ?_
     congr 1
-    have : -y k * (1 - a) ^ k = x k * a ^ k - 1 := by linear_combination -hxy k
+    have : - y k * (1 - a) ^ k = x k * a ^ k - 1 := by linear_combination -hxy k
     rw [this]
     push_cast
     rfl
-  · exact GlobalTheory.UnApprox.tendsto_abv (ha Q (Finset.mem_union_left _ (Finset.mem_erase.2 ⟨hne, hQ⟩))) x
+  · exact GlobalTheory.UnApprox.tendsto_abv
+      (ha Q (Finset.mem_union_left _ (Finset.mem_erase.2 ⟨hne, hQ⟩))) x
   · have h1 : cO E a ∈ Q.asIdeal :=
       (mem_conjP Q a).1 (ha _ (Finset.mem_union_right _ (Finset.mem_image_of_mem _ hQ)))
     refine (GlobalTheory.UnApprox.tendsto_abv h1 fun k => cO E (x k)).congr fun k => ?_
@@ -189,10 +217,11 @@ theorem exists_idem {ST : Finset (HeightOneSpectrum (𝓞 E))} (hST : GlobalTheo
     rfl
 
 omit [StarRing E] in
-theorem tendsto_comb {ST : Finset (HeightOneSpectrum (𝓞 E))} (e : ST → ℕ → E) (Q : ST)
-    (h1 : Tendsto (fun k => abv Q.1 (e Q k - 1)) atTop (𝓝 0))
-    (h0 : ∀ P : ST, P ≠ Q → Tendsto (fun k => abv Q.1 (e P k)) atTop (𝓝 0)) (c : ST → E) :
-    Tendsto (fun k => abv Q.1 (∑ P, e P k * c P - c Q)) atTop (𝓝 0) := by
+theorem tendsto_comb
+    {ST : Finset (HeightOneSpectrum (𝓞 E))}
+    (e : ST → ℕ → E) (Q : ST) (h1 : Tendsto (fun k => abv Q.1 (e Q k - 1)) atTop (𝓝 0))
+    (h0 : ∀ P : ST, P ≠ Q → Tendsto (fun k => abv Q.1 (e P k)) atTop (𝓝 0)) (c : ST → E)
+    : Tendsto (fun k => abv Q.1 (∑ P, e P k * c P - c Q)) atTop (𝓝 0) := by
   classical
   let _ : NormedField E := (abv Q.1).toNormedField
   have t : Tendsto (fun k => ∑ P, e P k * c P) atTop (𝓝 (∑ P, (if P = Q then 1 else 0) * c P)) := by
@@ -204,22 +233,27 @@ theorem tendsto_comb {ST : Finset (HeightOneSpectrum (𝓞 E))} (e : ST → ℕ 
   simp only [ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.mem_univ, if_true] at t
   exact tendsto_iff_norm_sub_tendsto_zero.1 t
 
-theorem exists_unitary_carries {ST : Finset (HeightOneSpectrum (𝓞 E))} (hST : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.SplitNonConj ST)
-    {N : Submodule (𝓞 E) (Sp E n)} (hN : IsSdLat N) :
-    ∃ g : Matrix (Fin n) (Fin n) E, gᴴ * g = 1 ∧ ∀ P ∈ ST, Carries P N g := by
+theorem exists_unitary_carries
+    {ST : Finset (HeightOneSpectrum (𝓞 E))}
+    (hST : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.SplitNonConj ST)
+    {N : Submodule (𝓞 E) (Sp E n)} (hN : IsSdLat N)
+    : ∃ g : Matrix (Fin n) (Fin n) E, gᴴ * g = 1 ∧ ∀ P ∈ ST, Carries P N g := by
   classical
   choose e he1 he0 hes using fun P : ST => exists_idem hST P.2
-  have he0' : ∀ Q P : ST, P ≠ Q → Tendsto (fun k => abv Q.1 (e P k)) atTop (𝓝 0) :=
-    fun Q P h => he0 P Q.1 Q.2 fun h' => h (Subtype.ext h'.symm)
-  have hfull : Submodule.IsFullLattice E N :=
-    { toIsLattice := hN.1, span_eq_top := span_of_self_dual hN }
+  have he0' : ∀ Q P : ST, P ≠ Q → Tendsto (fun k => abv Q.1 (e P k)) atTop (𝓝 0) := fun Q P h =>
+    he0 P Q.1 Q.2 fun h' => h (Subtype.ext h'.symm)
+  have hfull : Submodule.IsFullLattice E N := {
+    toIsLattice := hN.1
+    span_eq_top := span_of_self_dual hN
+  }
   choose A hA using fun P : ST => exists_carries P.1 hfull
   have ev1 : ∀ᶠ k in atTop, ∀ Q : ST, Carries Q.1 N (∑ P, e P k • A P) := by
     refine eventually_all.2 fun Q => (hA Q).eventually fun i j => ?_
     simpa [Matrix.sum_apply] using tendsto_comb e Q (he1 Q) (he0' Q) fun P => A P i j
   obtain ⟨k0, hk0⟩ := ev1.exists
-  obtain ⟨g, hg, hlim⟩ := GlobalTheory.UnApprox.exists_seq (G := (1 : Matrix (Fin n) (Fin n) E)) conjTranspose_one (by simp)
-    (∑ P, e P k0 • A P) (fun k => ∑ P, e P k)
+  obtain ⟨g, hg, hlim⟩ :=
+    GlobalTheory.UnApprox.exists_seq (G := (1 : Matrix (Fin n) (Fin n) E)) conjTranspose_one
+      (by simp) (∑ P, e P k0 • A P) (fun k => ∑ P, e P k)
   have ev2 : ∀ᶠ k in atTop, ∀ Q : ST, Carries Q.1 N (g k) := by
     refine eventually_all.2 fun Q => (hk0 Q).eventually (hlim _ ?_ ?_)
     · simpa using tendsto_comb e Q (he1 Q) (he0' Q) fun _ => 1
@@ -235,7 +269,8 @@ theorem exists_unitary_carries {ST : Finset (HeightOneSpectrum (𝓞 E))} (hST :
   rw [Matrix.mul_one] at this
   exact mul_eq_one_comm.1 this
 
-theorem representativesSplit : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.RepresentativesSplit := by
+theorem representativesSplit
+    : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.RepresentativesSplit := by
   intro E _ _ _ n ST SG hST d
   obtain ⟨g, hg, hc⟩ := exists_unitary_carries hST ⟨d.2.lat, d.2.uni⟩
   let f : Sp E n ≃ₗ[E] Sp E n := Matrix.toLin'OfInv (M := gᴴ) (M' := g) hg (mul_eq_one_comm.1 hg)
@@ -250,11 +285,15 @@ theorem representativesSplit : GlobalTheory.IndefiniteRowSideFullHecke.StandardD
   change x ∈ localization₂ P.asIdeal (gmap f d.1.N) ↔ _
   rw [mem_localization_gmap, ← (hc P hP).2, ← hf, LinearEquiv.apply_symm_apply]
 
-theorem representatives : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.Representatives :=
-  GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.representatives_of_split representativesSplit
+theorem representatives
+    : GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.Representatives :=
+  GlobalTheory.IndefiniteRowSideFullHecke.StandardDeterminantUnit.representatives_of_split
+    representativesSplit
 
-theorem exists_smul_of_le {Q : HeightOneSpectrum (𝓞 E)} {M N : Submodule (𝓞 E) (Sp E n)} (hM : M.FG)
-    (h : localization₂ Q.asIdeal M ≤ localization₂ Q.asIdeal N) : ∃ a ∉ Q.asIdeal, ∀ x ∈ M, a • x ∈ N := by
+theorem exists_smul_of_le
+    {Q : HeightOneSpectrum (𝓞 E)} {M N : Submodule (𝓞 E) (Sp E n)}
+    (hM : M.FG) (h : localization₂ Q.asIdeal M ≤ localization₂ Q.asIdeal N)
+    : ∃ a ∉ Q.asIdeal, ∀ x ∈ M, a • x ∈ N := by
   classical
   obtain ⟨s, rfl⟩ := hM
   have h1 : ∀ x ∈ s, ∃ a : 𝓞 E, a ∈ Q.asIdeal.primeCompl ∧ a • x ∈ N := fun x hx =>
@@ -269,9 +308,11 @@ theorem exists_smul_of_le {Q : HeightOneSpectrum (𝓞 E)} {M N : Submodule (�
   | add x y _ _ hx hy => rw [smul_add]; exact N.add_mem hx hy
   | smul r x _ hx => rw [smul_comm]; exact N.smul_mem _ hx
 
-theorem localization_conj_le_of_le {P : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) (Sp E n)} (hfg : N.FG)
-    (hN : IsUnimodular (hStd E n) N) (hN' : IsUnimodular (hStd E n) N')
-    (h : localization₂ P.asIdeal N ≤ localization₂ P.asIdeal N') : localization₂ (conjPrime₂ P).asIdeal N' ≤ localization₂ (conjPrime₂ P).asIdeal N := by
+theorem localization_conj_le_of_le
+    {P : HeightOneSpectrum (𝓞 E)} {N N' : Submodule (𝓞 E) (Sp E n)}
+    (hfg : N.FG) (hN : IsUnimodular (hStd E n) N) (hN' : IsUnimodular (hStd E n) N')
+    (h : localization₂ P.asIdeal N ≤ localization₂ P.asIdeal N')
+    : localization₂ (conjPrime₂ P).asIdeal N' ≤ localization₂ (conjPrime₂ P).asIdeal N := by
   obtain ⟨a, ha, hs⟩ := exists_smul_of_le hfg h
   have e : dual (hStd E n) N = N := hN
   have e' : dual (hStd E n) N' = N' := hN'
@@ -284,8 +325,10 @@ theorem localization_conj_le_of_le {P : HeightOneSpectrum (𝓞 E)} {N N' : Subm
   rw [← algebraMap_smul E (cO E a) x, map_smul, algebraMap_cO]
   exact this
 
-theorem val_det_le {P : HeightOneSpectrum (𝓞 E)} {g : Sp E n →ₗ[E] Sp E n}
-    (hg : ∀ x ∈ stdAt E n P, g x ∈ stdAt E n P) : P.valuation E (LinearMap.det g) ≤ 1 := by
+theorem val_det_le
+    {P : HeightOneSpectrum (𝓞 E)} {g : Sp E n →ₗ[E] Sp E n}
+    (hg : ∀ x ∈ stdAt E n P, g x ∈ stdAt E n P)
+    : P.valuation E (LinearMap.det g) ≤ 1 := by
   have hM : ∀ i j, LinearMap.toMatrix' g i j ∈ (P.valuation E).integer := by
     intro i j
     have h1 := hg (Pi.single j 1) (le_locP P _ (by simpa using single_mem_stdLat (E := E) j 1))
@@ -296,19 +339,25 @@ theorem val_det_le {P : HeightOneSpectrum (𝓞 E)} {g : Sp E n →ₗ[E] Sp E n
     rw [Valuation.mem_integer_iff, LinearMap.toMatrix'_apply, h3]
     exact P.valuation_le_one r
   rw [← LinearMap.det_toMatrix', ← Valuation.mem_integer_iff, det_apply']
-  exact Subring.sum_mem _ fun σ _ => Subring.mul_mem _ (intCast_mem _ _) (Subring.prod_mem _ fun i _ => hM _ _)
+  exact Subring.sum_mem _ fun σ _ =>
+    Subring.mul_mem _ (intCast_mem _ _) (Subring.prod_mem _ fun i _ => hM _ _)
 
-theorem val_det_eq {P : HeightOneSpectrum (𝓞 E)} {g : Sp E n ≃ₗ[E] Sp E n}
-    (hg : ∀ x, g x ∈ stdAt E n P ↔ x ∈ stdAt E n P) :
-    P.valuation E (LinearMap.det (g : Sp E n →ₗ[E] Sp E n)) = 1 := by
+theorem val_det_eq
+    {P : HeightOneSpectrum (𝓞 E)} {g : Sp E n ≃ₗ[E] Sp E n}
+    (hg : ∀ x, g x ∈ stdAt E n P ↔ x ∈ stdAt E n P)
+    : P.valuation E (LinearMap.det (g : Sp E n →ₗ[E] Sp E n)) = 1 := by
   have h1 := val_det_le (P := P) (g := (g : Sp E n →ₗ[E] Sp E n)) fun x hx => (hg x).2 hx
-  have h2 := val_det_le (P := P) (g := (g.symm : Sp E n →ₗ[E] Sp E n)) fun x hx => (hg _).1 (by simpa using hx)
+  have h2 :=
+    val_det_le (P := P) (g := (g.symm : Sp E n →ₗ[E] Sp E n)) fun x hx =>
+      (hg _).1 (by simpa using hx)
   have h3 := congrArg (P.valuation E) (LinearEquiv.det_mul_det_symm g)
   rw [map_mul, map_one] at h3
   exact eq_one_of_one_le_mul_left h1 h2 h3.ge
 
-theorem at_conj_eq {ST SG : Finset (HeightOneSpectrum (𝓞 E))} (d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG)) {P : HeightOneSpectrum (𝓞 E)}
-    (h : d.1.at P = stdAt E n P) : d.1.at (conjPrime₂ P) = stdAt E n (conjPrime₂ P) :=
+theorem at_conj_eq
+    {ST SG : Finset (HeightOneSpectrum (𝓞 E))} (d : DecoSet (E := E) (n := n) (ST := ST) (SG := SG))
+    {P : HeightOneSpectrum (𝓞 E)} (h : d.1.at P = stdAt E n P)
+    : d.1.at (conjPrime₂ P) = stdAt E n (conjPrime₂ P) :=
   le_antisymm (localization_conj_le_of_le stdLat_lattice.fg stdLat_unimodular d.2.uni h.ge)
     (localization_conj_le_of_le d.2.lat.fg d.2.uni stdLat_unimodular h.le)
 

@@ -15,7 +15,8 @@ noncomputable section
 
 namespace Formalism.FourierDecayAlt.P.B2x4
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 section form
 variable {m : ℕ} (H : Matrix (Fin m) (Fin m) ℂ)
@@ -175,12 +176,16 @@ lemma hb_rel (k r' : ℕ) (y : Fin (2 * r' + k + 1) → ℂ) (s : ℝ) :
 theorem heisAct : HeisAct := by
   intro k r' v u b
   ext i
-  simp only [heisG, Matrix.add_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec, Pi.add_apply, Pi.sub_apply, Pi.smul_apply,
-    smul_eq_mul]
-  have h1 : ∀ (w φ : Fin (2 * (1 + r') + k + 1) → ℂ), (Matrix.vecMulVec w φ *ᵥ u) i = (∑ j, φ j * u j) * w i := by
+  simp only [heisG, Matrix.add_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec, Pi.add_apply,
+    Pi.sub_apply, Pi.smul_apply, smul_eq_mul]
+  have h1
+      : ∀ (w φ : Fin (2 * (1 + r') + k + 1) → ℂ),
+        (Matrix.vecMulVec w φ *ᵥ u) i = (∑ j, φ j * u j) * w i := by
     intro w φ
     simp only [mulVec, dotProduct, vecMulVec_apply, Finset.sum_mul]
-    apply Finset.sum_congr rfl; intro j _; ring
+    apply Finset.sum_congr rfl
+    intro j _
+    ring
   rw [h1, h1, herm_sum, herm_sum]
   simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
 
@@ -208,31 +213,36 @@ theorem heisMem : HeisMem := by
     have ha := a.isLt
     simp only [heis0]
     have hv : (eI k (1 + r') a).val = a.val := rfl
-    have hz : (if (eI k (1 + r') a).val = 2 * (1 + r') + k then (1 : ℂ) else 0) = 0 := if_neg (by omega)
+    have hz : (if (eI k (1 + r') a).val = 2 * (1 + r') + k then (1 : ℂ) else 0) = 0 :=
+      if_neg (by omega)
     rw [heisG_apply, hz, mul_zero, add_zero, goodRowsProjector_apply_eq_sum]
     by_cases hi : i.val = 0
     · have : bvec (eI k (1 + r') a) = e0 k r' := by
         unfold e0; congr 1; apply Fin.ext; simp only [eI, a0]; omega
-      rw [this, hermitian_form_base_vector_left, liftVec_last]; simp
+      rw [this, hermitian_form_base_vector_left, liftVec_last]
+      simp
     · rw [if_neg hi]; simp
   · intro i j h1 h2 h3
     simp only [heis0]
     have hz : (if j.val = 2 * (1 + r') + k then (1 : ℂ) else 0) = 0 := if_neg (by omega)
     have hz2 : (if i.val = 0 then (1 : ℂ) else 0) = 0 := if_neg (by omega)
-    rw [heisG_apply, hz, mul_zero, add_zero, goodRowsProjector_apply_eq_sum, hz2]; simp
+    rw [heisG_apply, hz, mul_zero, add_zero, goodRowsProjector_apply_eq_sum, hz2]
+    simp
 
 end Formalism.FourierDecayAlt.P.B2x4
 
 namespace Formalism.FourierDecayAlt.P
 
-open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B Formalism.FourierDecayAlt.B2
+open Formalism.REAL Formalism.QuantumDeterminants Formalism.FourierDecayAlt.B
+  Formalism.FourierDecayAlt.B2
 
 theorem conjugation_invariance_of_parts : Formalism.FourierDecayAlt.B2.AssembleConjInv := by
   intro hCC hN hW hK hU
   have raw : ConjInvRaw := by
     intro k r z μN hz hT hμ h hh
     exact hCC k r (Nset k r) (UWset k r z) μN (hN k r) (hW k r z) (hK k r z hz hT)
-      (fun a ha u hu => (hU k r z hz a ha u hu).1) hμ h hh
+      (fun a ha u hu => (hU k r z hz a ha u hu).1)
+      hμ h hh
   refine ⟨raw, ?_⟩
   intro k r Wp Wq _ _ _ _ D h₀ hh
   rcases hh with hh | hh

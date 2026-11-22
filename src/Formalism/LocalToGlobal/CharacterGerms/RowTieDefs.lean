@@ -27,17 +27,12 @@ def alongCv {σ : Type} (γ : σ → PowerSeries C) (f : MvPowerSeries σ C) : P
 abbrev JJ (I : Fin 2 → Type) : Fin 2 → Type := fun g => I (1 - g)
 
 structure RawChart (C : Type) [Field C] (d : ℕ) (I : Fin 2 → Type) (κ : Type) where
-
   lg : κ → MvPowerSeries κ C
   ex : κ → MvPowerSeries κ C
-
   h : MvPowerSeries (Fin 2 × κ) C
-
   k : ℕ
-
   u : ∀ g, I g → κ → C
   ty : ∀ g, I g → ZMod d
-
   n : ℕ
   j : ℕ
   j' : ℕ
@@ -45,10 +40,11 @@ structure RawChart (C : Type) [Field C] (d : ℕ) (I : Fin 2 → Type) (κ : Typ
 
 namespace RawChart
 
-variable {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
+variable
+  {d : ℕ} {I : Fin 2 → Type} [∀ g, Fintype (I g)] {κ : Type} [Fintype κ] (X : RawChart C d I κ)
 
-def sg (v : κ → C) : MvPowerSeries κ C :=
-  fun μ => -∑ i, v i * MvPowerSeries.coeff
+def sg (v : κ → C) : MvPowerSeries κ C := fun μ =>
+  - ∑ i, v i * MvPowerSeries.coeff
     (μ.mapDomain (fun x : κ => ((0 : Fin 2), x)) + Finsupp.single ((1 : Fin 2), i) 1) X.h
 
 def sg1 (w v : κ → C) : C := ∑ x, w x * MvPowerSeries.coeff (Finsupp.single x 1) (X.sg v)
@@ -64,36 +60,30 @@ def TySet (V : VF C) (g : Fin 2) : Set (ℕ → I g ⊕ JJ I g → C) :=
           X.sg1 (X.u g c) (X.u (1 - g) q) • tyS V.l (fun s => x s (Sum.inl c)) else 0}
 
 structure CartHyp (V : VF C) (g : Fin 2) : Prop where
-
   zero : (0 : ℕ → I g ⊕ JJ I g → C) ∈ X.TySet V g
-
   add : ∀ x y, x ∈ X.TySet V g → y ∈ X.TySet V g → x + y ∈ X.TySet V g
   neg : ∀ x, x ∈ X.TySet V g → -x ∈ X.TySet V g
-
   teich : ∀ c, V.Ge 0 c → ∀ x ∈ X.TySet V g, teich V.l c x ∈ X.TySet V g
-
   Vm : ∀ x ∈ X.TySet V g, Vpow 1 x ∈ X.TySet V g
-
   Fm : ∀ x ∈ X.TySet V g, Fs V.l x ∈ X.TySet V g
-
   sumV : ∀ y : ℕ → ℕ → I g ⊕ JJ I g → C, (∀ s, y s ∈ X.TySet V g) → sumV y ∈ X.TySet V g
-
   t2 : ∀ x ∈ X.TySet V g, ∀ s, (∀ i < s, x i = 0) → ∀ n, V.Ge 0 (x s n)
-
   t3 : ∀ ζ : JJ I g → C, (∀ q, V.Ge 0 (ζ q)) → const0 (Sum.elim 0 ζ) ∈ X.TySet V g
-
-  t4 : ∀ (a : ZMod d) (w : I g → C), (∀ c, V.Ge 0 (w c)) → (∀ c, X.tyC g (Sum.inl c) ≠ a → w c = 0) →
-    ∃ x ∈ X.TySet V g, x 0 = Sum.elim w 0 ∧ ∀ (i : ℕ) n, X.tyC g n ≠ a + i → x i n = 0
+  t4
+    : ∀ (a : ZMod d) (w : I g → C),
+      (∀ c, V.Ge 0 (w c)) → (∀ c, X.tyC g (Sum.inl c) ≠ a → w c = 0)
+        → ∃ x ∈ X.TySet V g, x 0 = Sum.elim w 0 ∧ ∀ (i : ℕ) n, X.tyC g n ≠ a + i → x i n = 0
 
 variable {X}
 
 def cart {V : VF C} {g : Fin 2} (H : X.CartHyp V g) : Cart V d (I g) (JJ I g) where
   ty := X.tyC g
-  Ty :=
-    { carrier := X.TySet V g
-      zero_mem' := H.zero
-      add_mem' := fun {x y} hx hy => H.add x y hx hy
-      neg_mem' := fun {x} hx => H.neg x hx }
+  Ty := {
+    carrier := X.TySet V g
+    zero_mem' := H.zero
+    add_mem' := fun {x y} hx hy => H.add x y hx hy
+    neg_mem' := fun {x} hx => H.neg x hx
+  }
   teich_mem := H.teich
   V_mem := H.Vm
   F_mem := H.Fm
@@ -107,7 +97,8 @@ variable (X)
 def pairK (g : Fin 2) (q : JJ I g) (c : I (1 - g)) : C := if q = c then -(X.k : C) else 0
 
 def expPt (g : Fin 2) (x : κ) : MvPowerSeries (WV I) C :=
-  MvPowerSeries.subst (fun i : κ => ∑ c : I g, X.u g c i • (MvPowerSeries.X (⟨g, c⟩ : WV I) : MvPowerSeries (WV I) C))
+  MvPowerSeries.subst
+    (fun i : κ => ∑ c : I g, X.u g c i • (MvPowerSeries.X (⟨g, c⟩ : WV I) : MvPowerSeries (WV I) C))
     (X.ex x)
 
 def hRow : MvPowerSeries (WV I) C :=
@@ -116,8 +107,8 @@ def hRow : MvPowerSeries (WV I) C :=
 def OnLf (g : Fin 2) (a a' : ZMod d) (w : WV I) : Prop :=
   (w.1 = g ∧ X.ty w.1 w.2 = a) ∨ (w.1 = 1 - g ∧ X.ty w.1 w.2 = a')
 
-def hLf (g : Fin 2) (a a' : ZMod d) : MvPowerSeries (WV I) C :=
-  fun μ => if ∀ w ∈ μ.support, X.OnLf g a a' w then MvPowerSeries.coeff μ X.hRow else 0
+def hLf (g : Fin 2) (a a' : ZMod d) : MvPowerSeries (WV I) C := fun μ =>
+  if ∀ w ∈ μ.support, X.OnLf g a a' w then MvPowerSeries.coeff μ X.hRow else 0
 
 theorem onLf_swap (a a' : ZMod d) (w : WV I) : X.OnLf 1 a' a w ↔ X.OnLf 0 a a' w := by
   unfold OnLf
@@ -129,8 +120,9 @@ theorem hLf_swap (a a' : ZMod d) : X.hLf 1 a' a = X.hLf 0 a a' := by
   funext μ
   exact if_congr (by simp only [onLf_swap]) rfl rfl
 
-theorem hLf_leaf (g : Fin 2) (a a' : ZMod d) (μ : WV I →₀ ℕ)
-    (h : MvPowerSeries.coeff μ (X.hLf g a a') ≠ 0) : ∀ w ∈ μ.support, X.OnLf g a a' w := by
+theorem hLf_leaf
+    (g : Fin 2) (a a' : ZMod d) (μ : WV I →₀ ℕ) (h : MvPowerSeries.coeff μ (X.hLf g a a') ≠ 0)
+    : ∀ w ∈ μ.support, X.OnLf g a a' w := by
   by_contra hn
   apply h
   show (if ∀ w ∈ μ.support, X.OnLf g a a' w then MvPowerSeries.coeff μ X.hRow else 0) = 0
@@ -144,8 +136,8 @@ structure RankHyp : Prop where
 def AltC : Prop := Even d ∧ ∀ a : ZMod d, (X.big 0 a ↔ Even a.val)
 
 def AxesSt : Prop :=
-  ∀ (μ : WV I →₀ ℕ), ((∀ w ∈ μ.support, w.1 = 0) ∨ (∀ w ∈ μ.support, w.1 = 1)) →
-    MvPowerSeries.coeff μ X.hRow = 0
+  ∀ (μ : WV I →₀ ℕ),
+    ((∀ w ∈ μ.support, w.1 = 0) ∨ (∀ w ∈ μ.support, w.1 = 1)) → MvPowerSeries.coeff μ X.hRow = 0
 
 section Geo
 
@@ -156,38 +148,53 @@ def IntegralGermIndependentOfSystem : Prop :=
     (∀ g, (S g).IsT (t g)) → (∀ g, (S₂ g).IsT (t₂ g)) → IntGerm V t = IntGerm V t₂
 
 def CEqSt : Prop :=
-  X.AltC → ∀ g a a', Odd (a' - a).val →
-    ∀ (S : ∀ g, Sys (cart (H g))) (t : ∀ g, I g → MvPowerSeries (I g) C), (∀ g, (S g).IsT (t g)) →
-    ∀ k : I (1 - g), X.ty (1 - g) k = a' →
-      ∃ K ∈ IntGerm V t,
-        dVar (⟨1 - g, k⟩ : WV I) (X.hLf g a a') -
-            toLeaf (fun g => cart (H g)) g a a' (∑ q : JJ I g, X.pairK g q k • upG g ((S g).ze (t g) q)) =
-          toLeaf (fun g => cart (H g)) g a a' K
+  X.AltC
+    → ∀ g a a',
+      Odd (a' - a).val
+        → ∀ (S : ∀ g, Sys (cart (H g))) (t : ∀ g, I g → MvPowerSeries (I g) C),
+          (∀ g, (S g).IsT (t g))
+            → ∀ k : I (1 - g),
+              X.ty (1 - g) k = a'
+                → ∃ K ∈ IntGerm V t,
+                  dVar (⟨1 - g, k⟩ : WV I) (X.hLf g a a') - toLeaf
+                      (fun g => cart (H g))
+                      g a a' (∑ q : JJ I g, X.pairK g q k • upG g ((S g).ze (t g) q))
+                    = toLeaf (fun g => cart (H g)) g a a' K
 
 def RankMaximalCondition : Prop :=
-  X.AltC → ∀ g a, X.big g a →
-    ∀ (w : I g → C) (x : ℕ → I g ⊕ JJ I g → C), (cart (H g)).Good a w x →
-    (∀ q, V.MM ((cart (H g)).c0' x q)) → ∀ c, V.MM (w c)
+  X.AltC
+    → ∀ g a,
+      X.big g a
+        → ∀ (w : I g → C) (x : ℕ → I g ⊕ JJ I g → C),
+          (cart (H g)).Good a w x → (∀ q, V.MM ((cart (H g)).c0' x q)) → ∀ c, V.MM (w c)
 
 def IndependenceBoundCondition : Prop :=
-  X.AltC → ∀ g a, X.big g a →
-    ∀ (N : ℕ) (w : Fin N → I g → C) (x : Fin N → ℕ → I g ⊕ JJ I g → C),
-    (∀ ν, (cart (H g)).Good a (w ν) (x ν)) → (∀ ν c, V.MM ((cart (H g)).V2 (x ν) c)) →
-    IndepMod V w → N ≤ X.j'
+  X.AltC
+    → ∀ g a,
+      X.big g a
+        → ∀ (N : ℕ) (w : Fin N → I g → C) (x : Fin N → ℕ → I g ⊕ JJ I g → C),
+          (∀ ν, (cart (H g)).Good a (w ν) (x ν)) → (∀ ν c, V.MM ((cart (H g)).V2 (x ν) c))
+            → IndepMod V w
+            → N ≤ X.j'
 
 def CHSt : Prop :=
-  ∀ g a, X.big g a → ∀ w : Fin X.n → I g → C, IsSat V w →
-    (∀ c x, X.ty g x ≠ a → w c x = 0) →
-    ∃ y : Fin X.n → I g → C, (∀ ρ x, V.Ge 0 (y ρ x)) ∧
-      (∀ (S : ∀ g, Sys (cart (H g))) (t : ∀ g, I g → MvPowerSeries (I g) C), (∀ g, (S g).IsT (t g)) →
-        ∀ ρ, upG g (mvExp (∑ x : I g, y ρ x • (MvPowerSeries.X x : MvPowerSeries (I g) C))) ∈
-          IntGerm V t) ∧
-      (X.AltC →
-        V.v (Matrix.of fun ρ c : Fin X.n => ∑ x, y ρ x * w c x).det ≤
-          (((X.n : ℝ) * gam V.l + ((X.j : ℝ) + X.j') / ((V.l : ℝ) - 1) : ℝ) : WithTop ℝ)) ∧
-      ((∀ a, X.big g a) →
-        V.v (Matrix.of fun ρ c : Fin X.n => ∑ x, y ρ x * w c x).det ≤
-          ((((X.j : ℝ) + X.j') / ((V.l : ℝ) - 1) : ℝ) : WithTop ℝ))
+  ∀ g a,
+    X.big g a
+      → ∀ w : Fin X.n → I g → C,
+        IsSat V w → (∀ c x, X.ty g x ≠ a → w c x = 0)
+          → ∃ y : Fin X.n → I g → C,
+            (∀ ρ x, V.Ge 0 (y ρ x))
+              ∧ (∀ (S : ∀ g, Sys (cart (H g))) (t : ∀ g, I g → MvPowerSeries (I g) C),
+                (∀ g, (S g).IsT (t g))
+                  → ∀ ρ,
+                    upG g (mvExp (∑ x : I g, y ρ x • (MvPowerSeries.X x : MvPowerSeries (I g) C)))
+                      ∈ IntGerm V t)
+              ∧ (X.AltC
+                → V.v (Matrix.of fun ρ c : Fin X.n => ∑ x, y ρ x * w c x).det
+                  ≤ (((X.n : ℝ) * gam V.l + ((X.j : ℝ) + X.j') / ((V.l : ℝ) - 1) : ℝ) : WithTop ℝ))
+              ∧ ((∀ a, X.big g a)
+                → V.v (Matrix.of fun ρ c : Fin X.n => ∑ x, y ρ x * w c x).det
+                  ≤ ((((X.j : ℝ) + X.j') / ((V.l : ℝ) - 1) : ℝ) : WithTop ℝ))
 
 end Geo
 

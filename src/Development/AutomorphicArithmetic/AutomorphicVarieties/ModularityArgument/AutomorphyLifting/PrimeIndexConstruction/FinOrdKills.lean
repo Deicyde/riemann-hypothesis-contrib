@@ -11,22 +11,31 @@ open UpperTheory.V.Z.Win.Birth
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
-open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.MainNotions.N IsLocalRing Polynomial
+open UpperTheory.V.Base UpperTheory.V.Alg UpperTheory.V.HV
+  UpperTheory.V.GradeZeroInterpolatingElement GlobalTheory.CuspRep GlobalTheory.HeckeGal
+  GlobalTheory.GalOfCusp UpperTheory.V.Af UpperTheory.V.Ws UpperTheory.V.Sd UpperTheory.V.Sd.S3
 open UpperTheory.V.Cu
 open scoped Matrix
 
 namespace UpperTheory.V.Cu2
 
-private theorem finOrd_kills {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
-    {l : ℕ} [Fact l.Prime] {M : ℕ} (hM : 1 ≤ M) {φ : G ℚ Ω →* (Qbar l)ˣ} (hφ : KillsMu M φ) : IsOfFinOrder φ := by
+private theorem finOrd_kills
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    {M : ℕ} (hM : 1 ≤ M)
+    {φ : G ℚ Ω →* (Qbar l)ˣ} (hφ : KillsMu M φ)
+    : IsOfFinOrder φ := by
   have ho : IsOpen (φ.ker : Set (G ℚ Ω)) := by
     have hfin : {ζ : Ω | ζ ^ M = 1}.Finite := by
       classical
       refine (Polynomial.nthRoots M (1 : Ω)).toFinset.finite_toSet.subset fun ζ hζ => ?_
       simpa [Polynomial.mem_nthRoots hM] using hζ
-    refine Subgroup.isOpen_of_mem_nhds _ (g := 1) (Filter.mem_of_superset
-      ((hfin.isOpen_biInter fun ζ _ => stabilizer_isOpen_of_isIntegral (K := ℚ) ζ).mem_nhds ?_) fun s hs => ?_)
+    refine Subgroup.isOpen_of_mem_nhds _ (g := 1)
+      (Filter.mem_of_superset
+        ((hfin.isOpen_biInter fun ζ _ => stabilizer_isOpen_of_isIntegral (K := ℚ) ζ).mem_nhds ?_)
+        fun s hs => ?_)
     · simp only [Set.mem_iInter]
       exact fun ζ _ => Subgroup.one_mem _
     · simp only [Set.mem_iInter] at hs
@@ -38,17 +47,22 @@ private theorem finOrd_kills {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure 
   rw [MonoidHom.pow_apply, ← map_pow]
   exact φ.ker.pow_index_mem s
 
-private theorem cong_iff {l : ℕ} [Fact l.Prime] {c : Coef l} (a : c.Oˣ) :
-    Cong (Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom a) 1 ↔ residue c.O a = 1 := by
-  rw [← map_one (residue c.O), ← sub_eq_zero, ← map_sub, residue_eq_zero_iff, (UpperTheory.V.Fr.sc_norm l c _).2]
+private theorem cong_iff {l : ℕ} [Fact l.Prime] {c : Coef l} (a : c.Oˣ)
+    : Cong (Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom a) 1 ↔ residue c.O a = 1 := by
+  rw [← map_one (residue c.O), ← sub_eq_zero, ← map_sub, residue_eq_zero_iff,
+    (UpperTheory.V.Fr.sc_norm l c _).2]
   rfl
 
-private theorem toB_chi {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (c : Coef l)
-    (g : G ℚ Ω) : toB (chiO ℚ Ω l c.O) g = cycBar ℚ Ω l g := by
+private theorem toB_chi
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω]
+    {l : ℕ} [Fact l.Prime]
+    (c : Coef l) (g : G ℚ Ω)
+    : toB (chiO ℚ Ω l c.O) g = cycBar ℚ Ω l g := by
   ext
   rfl
 
-theorem rhoExP (h1 : ExistsSplittingAuxiliaryCharacterForTower) (h2 : PhiFacts) (h3 : ModEx4) : RhoExP := by
+theorem rhoExP (h1 : ExistsSplittingAuxiliaryCharacterForTower) (h2 : PhiFacts) (h3 : ModEx4)
+    : RhoExP := by
   intro hP Ω _ _ _ l _ c D T₀ hctx hok hfour ι B c₀
   obtain ⟨N, w, θ, haux, hsp, hw⟩ := h1 Ω l c D T₀ hctx hfour
   obtain ⟨hcc, hev, hk⟩ := h2 Ω l c D T₀ hctx hok hfour
@@ -81,8 +95,10 @@ theorem rhoExP (h1 : ExistsSplittingAuxiliaryCharacterForTower) (h2 : PhiFacts) 
     rw [show k - 1 = D.e + (l - 1) * n by omega, Nat.add_mul_mod_self_left]
   obtain ⟨ρ, hρ, hrw⟩ := hk₀ k (by omega) (by rw [hcc', hkodd.neg_one_pow])
   obtain ⟨hsq, hdec⟩ := hk k hk1 hcong
-  have e : ∀ g, (cycBar ℚ Ω l ^ (k - 1) * toB (phi D T₀.pr)) g =
-      Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (Phi D T₀.pr k g) := by
+  have e
+      : ∀ g,
+        (cycBar ℚ Ω l ^ (k - 1) * toB (phi D T₀.pr)) g
+          = Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (Phi D T₀.pr k g) := by
     intro g
     simp only [MonoidHom.mul_apply, MonoidHom.pow_apply, Phi, map_mul, map_pow]
     rw [← toB_chi c g]
@@ -94,7 +110,26 @@ theorem rhoExP (h1 : ExistsSplittingAuxiliaryCharacterForTower) (h2 : PhiFacts) 
     rwa [Units.val_pow_eq_pow_val, map_pow] at this
   have hg1 : Raw.bar (Phi D T₀.pr k) (resQ T₀.F T₀.g0) ≠ 1 := fun h => hsq (by rw [h, one_pow])
   obtain ⟨c₁, h, ρ₁, x, hc₀, hM⟩ := h3 Ω l ι c D T₀.pr θ k hk1 ρ hρ hdec (resQ T₀.F T₀.g0) hg1 c₀
-  exact ⟨w, θ, k, ρ, c₁, h, ρ₁, x, haux.prime, hw, haux.pow, haux.mu, by omega, hcong, hρ, ⟨hI, hrw⟩, hc₀, hM⟩
+  exact ⟨
+    w,
+    θ,
+    k,
+    ρ,
+    c₁,
+    h,
+    ρ₁,
+    x,
+    haux.prime,
+    hw,
+    haux.pow,
+    haux.mu,
+    by omega,
+    hcong,
+    hρ,
+    ⟨hI, hrw⟩,
+    hc₀,
+    hM
+  ⟩
 
 end UpperTheory.V.Cu2
 

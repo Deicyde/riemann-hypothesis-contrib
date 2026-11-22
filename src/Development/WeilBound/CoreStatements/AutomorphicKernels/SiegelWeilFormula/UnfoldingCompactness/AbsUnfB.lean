@@ -11,15 +11,21 @@ open scoped ENNReal
 
 namespace PositivityTheory.SiegelWeilFormula.kunf
 
-theorem abs_integrable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
-    [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V] (lam : Measure V) [lam.IsAddHaarMeasure]
-    (Λ : AddSubgroup V) [Countable Λ] (𝓖 : Set V) (h𝓖 : IsAddFundamentalDomain Λ 𝓖 lam)
-    {Q : Type} [Countable Q] (act : Q → Λ → Q) (hact0 : ∀ q, act q 0 = q)
-    (hact : ∀ q ν ν', act (act q ν) ν' = act q (ν + ν'))
-    (A : Q → V → ℂ) (hA : ∀ q, Continuous (A q)) (hAact : ∀ q ν β, A (act q ν) β = A q (β + (ν : V)))
+theorem abs_integrable
+    {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    [SecondCountableTopology V] [MeasurableSpace V] [BorelSpace V]
+    (lam : Measure V) [lam.IsAddHaarMeasure]
+    (Λ : AddSubgroup V) [Countable Λ]
+    (𝓖 : Set V) (h𝓖 : IsAddFundamentalDomain Λ 𝓖 lam)
+    {Q : Type} [Countable Q]
+    (act : Q → Λ → Q)
+    (hact0 : ∀ q, act q 0 = q) (hact : ∀ q ν ν', act (act q ν) ν' = act q (ν + ν'))
+    (A : Q → V → ℂ)
+    (hA : ∀ q, Continuous (A q)) (hAact : ∀ q ν β, A (act q ν) β = A q (β + (ν : V)))
     (C : Set V) (hC : IsCompact C) (hcov : ∀ β, ∃ ν : Λ, β + (ν : V) ∈ C)
     (u : Q → ℝ) (hu : Summable u) (hAu : ∀ q, ∀ β ∈ C, ‖A q β‖ ≤ u q)
-    (q₀ : Q) (hinj : Function.Injective (act q₀)) : Integrable (A q₀) lam := by
+    (q₀ : Q) (hinj : Function.Injective (act q₀))
+    : Integrable (A q₀) lam := by
   have hAm : ∀ q, Measurable fun β => ‖A q β‖ₑ := fun q => (hA q).measurable.enorm
   obtain ⟨S, hS_def⟩ : ∃ S : V → ℝ≥0∞, S = fun β => ∑' q, ‖A q β‖ₑ := ⟨_, rfl⟩
   have hSm : Measurable S := by
@@ -27,9 +33,12 @@ theorem abs_integrable {V : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopol
     exact Measurable.tsum fun q => hAm q
   have hSper : ∀ (ν : Λ) β, S (β + ν) = S β := by
     intro ν β
-    let e : Q ≃ Q := ⟨fun q => act q ν, fun q => act q (-ν),
+    let e : Q ≃ Q := ⟨
+      fun q => act q ν,
+      fun q => act q (-ν),
       fun q => show act (act q ν) (-ν) = q by rw [hact, add_neg_cancel, hact0],
-      fun q => show act (act q (-ν)) ν = q by rw [hact, neg_add_cancel, hact0]⟩
+      fun q => show act (act q (-ν)) ν = q by rw [hact, neg_add_cancel, hact0]
+    ⟩
     rw [hS_def]
     simp only [← hAact]
     exact e.tsum_eq (fun q => ‖A q β‖ₑ)

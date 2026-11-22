@@ -15,17 +15,18 @@ open scoped NNReal ENNReal
 
 noncomputable section
 
-theorem ChartRatioImageNull.volume_eq_zero_of_dimH_lt {e : ℕ} {S : Set (Fin e → ℂ)}
-    (hS : dimH S < 2 * (e : ℝ≥0∞)) : volume S = 0 := by
+theorem ChartRatioImageNull.volume_eq_zero_of_dimH_lt
+    {e : ℕ} {S : Set (Fin e → ℂ)} (hS : dimH S < 2 * (e : ℝ≥0∞))
+    : volume S = 0 := by
   let E : ((Σ _ : Fin e, Fin 2) → ℝ) ≃L[ℝ] (Fin e → ℂ) :=
     (Pi.basis (fun _ : Fin e => Complex.basisOneI)).equivFun.symm.toContinuousLinearEquiv
-  have hcard : Fintype.card (Σ _ : Fin e, Fin 2) = 2 * e := by
-    simp [Fintype.card_sigma, mul_comm]
+  have hcard : Fintype.card (Σ _ : Fin e, Fin 2) = 2 * e := by simp [Fintype.card_sigma, mul_comm]
   have hT : volume (E ⁻¹' S) = 0 := by
     rw [← hausdorffMeasure_pi_real, hcard]
-    have h := hausdorffMeasure_of_dimH_lt (s := E ⁻¹' S) (d := ((2 * e : ℕ) : ℝ≥0)) (by
-      rw [ContinuousLinearEquiv.dimH_preimage]
-      simpa using hS)
+    have h :=
+      hausdorffMeasure_of_dimH_lt (s := E ⁻¹' S) (d := ((2 * e : ℕ) : ℝ≥0)) (by
+        rw [ContinuousLinearEquiv.dimH_preimage]
+        simpa using hS)
     simpa using h
   have : (Measure.map E volume).IsAddHaarMeasure := E.isAddHaarMeasure_map volume
   have hac : (volume : Measure (Fin e → ℂ)) ≪ Measure.map E volume :=
@@ -64,9 +65,10 @@ theorem ChartRatioImageNull.proof : ChartRatioImageNull.Statement := by
 
   let eqv : (Σ k, ι k) ≃ Fin (Fintype.card (Σ k, ι k)) := Fintype.equivFin _
   let J' : Ideal (MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ) := J.map (rename eqv)
-  have hdim' : ringKrullDim (MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ ⧸ J') ≤ (m : WithBot ℕ∞) := by
-    rw [← ringKrullDim_eq_of_ringEquiv
-      (Ideal.quotientEquiv J J' (renameEquiv ℂ eqv).toRingEquiv rfl)]
+  have hdim'
+      : ringKrullDim (MvPolynomial (Fin (Fintype.card (Σ k, ι k))) ℂ ⧸ J') ≤ (m : WithBot ℕ∞) := by
+    rw [← ringKrullDim_eq_of_ringEquiv (Ideal.quotientEquiv J J' (renameEquiv ℂ eqv).toRingEquiv
+      rfl)]
     exact hle
   have hV' := GroundTheory.Heights₂.Heights.ZeroLocusDimH.full _ m J' hdim'
   let L : ((Σ k, ι k) → ℂ) ≃L[ℂ] (Fin (Fintype.card (Σ k, ι k)) → ℂ) :=
@@ -76,8 +78,7 @@ theorem ChartRatioImageNull.proof : ChartRatioImageNull.Statement := by
     have hJle : J ≤ (RingHom.ker (eval (L z))).comap (rename eqv) := by
       intro p hp
       simp only [Ideal.mem_comap, RingHom.mem_ker, eval_rename]
-      have h2 : (L z) ∘ eqv = z := by
-        funext i; simp [L]
+      have h2 : (L z) ∘ eqv = z := by funext i; simp [L]
       rw [h2]
       simpa [MvPolynomial.coe_aeval_eq_eval] using hz p hp
     exact Ideal.map_le_iff_le_comap.mpr hJle hq
@@ -98,8 +99,8 @@ theorem ChartRatioImageNull.proof : ChartRatioImageNull.Statement := by
       intro i
       exact contDiff_prod (fun k _ => contDiff_apply ℂ (fun _ => ℂ) _)
     exact (LinearMap.toContinuousLinearMap Ψ).contDiff.comp h1
-  have hc : ∀ i, ContDiff ℂ ⊤ (fun z : (Σ k, ι k) → ℂ => Ψ (segre z) i) :=
-    fun i => (contDiff_apply ℂ (fun _ => ℂ) i).comp hsmooth
+  have hc : ∀ i, ContDiff ℂ ⊤ (fun z : (Σ k, ι k) → ℂ => Ψ (segre z) i) := fun i =>
+    (contDiff_apply ℂ (fun _ => ℂ) i).comp hsmooth
   have hG : ∀ z ∈ U, ContDiffAt ℂ 1 G z := by
     intro z hz
     apply contDiffAt_pi.2
@@ -111,7 +112,9 @@ theorem ChartRatioImageNull.proof : ChartRatioImageNull.Statement := by
     obtain ⟨C, t, ht, hlip⟩ := (hG z hz.2).exists_lipschitzOnWith
     exact ⟨C, t, mem_nhdsWithin_of_mem_nhds ht, hlip⟩
   apply ChartRatioImageNull.volume_eq_zero_of_dimH_lt
-  calc dimH S ≤ dimH (G '' (zeroLocus ℂ J ∩ U)) := dimH_mono hSsub
+  calc
+    dimH S
+      ≤ dimH (G '' (zeroLocus ℂ J ∩ U)) := dimH_mono hSsub
     _ ≤ dimH (zeroLocus ℂ J ∩ U) := hGdim
     _ ≤ dimH (zeroLocus ℂ J : Set ((Σ k, ι k) → ℂ)) := dimH_mono inter_subset_left
     _ ≤ 2 * (m : ℝ≥0∞) := hV

@@ -9,8 +9,8 @@ open scoped TensorProduct
 
 namespace GlobalTheory.PowerSeriesFlat
 
-theorem flat_pi (T : Type*) [CommRing T] [IsNoetherianRing T] (ι : Type*) :
-    Module.Flat T (ι → T) := by
+theorem flat_pi (T : Type*) [CommRing T] [IsNoetherianRing T] (ι : Type*)
+    : Module.Flat T (ι → T) := by
   apply Module.Flat.of_forall_isTrivialRelation
   intro l f x h
   let φ : (Fin l → T) →ₗ[T] T := Fintype.linearCombination T f
@@ -41,9 +41,9 @@ theorem flat_pi (T : Type*) [CommRing T] [IsNoetherianRing T] (ι : Type*) :
       exact Submodule.subset_span ⟨j, rfl⟩
     rwa [LinearMap.mem_ker, hφ] at hm
 
-theorem flat_mvPowerSeries :
-    ∀ (T : Type) [CommRing T] [IsNoetherianRing T] (σ : Type),
-      Module.Flat T (MvPowerSeries σ T) :=
-  fun T _ _ σ => flat_pi T (σ →₀ ℕ)
+theorem flat_mvPowerSeries
+    : ∀ (T : Type) [CommRing T] [IsNoetherianRing T] (σ : Type),
+      Module.Flat T (MvPowerSeries σ T) := fun T _ _ σ =>
+  flat_pi T (σ →₀ ℕ)
 
 end GlobalTheory.PowerSeriesFlat

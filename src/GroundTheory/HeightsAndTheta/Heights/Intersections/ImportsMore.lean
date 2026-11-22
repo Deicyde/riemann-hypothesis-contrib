@@ -13,9 +13,11 @@ noncomputable section
 
 namespace GroundTheory.Heights₂.Heights.Inter
 
-open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial MeasureTheory ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
-theorem GenericPointsCount.proof (hGood : GenericPointsAvoidBadLocus.Statement) : GenericPointsCount.Statement := by
+theorem GenericPointsCount.proof (hGood : GenericPointsAvoidBadLocus.Statement)
+    : GenericPointsCount.Statement := by
   classical
   intro K _ ι _ K' _ ι' _ κ v P' n G i Ψ hv hP' hP hΨ hi
   obtain ⟨D, a, hDa, hDP, hcount⟩ := hGood K ι K' ι' κ v P' n G i hv hP' hP hi
@@ -49,7 +51,7 @@ theorem GenericPointsCount.proof (hGood : GenericPointsAvoidBadLocus.Statement) 
     refine ⟨z', hz', rfl, ?_⟩
     obtain ⟨c, hc, hcz⟩ := hs
     have hμ : ∏ k, c k ≠ 0 := Finset.prod_ne_zero_iff.mpr fun k _ => hc k
-    rw [hcz, segre_smul, map_smul, Pi.smul_apply, smul_eq_mul, hΨ0, mul_one, smul_smul, inv_mul_cancel₀ hμ,
-      one_smul]
+    rw [hcz, segre_smul, map_smul, Pi.smul_apply, smul_eq_mul, hΨ0, mul_one, smul_smul,
+      inv_mul_cancel₀ hμ, one_smul]
 
 end GroundTheory.Heights₂.Heights.Inter

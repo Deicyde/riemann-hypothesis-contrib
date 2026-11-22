@@ -12,15 +12,18 @@ set_option linter.style.haveILetI false
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.Rg.Sw
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.Rg.Sw
 
 namespace PositivityTheory.SiegelWeilFormula.Act.ComplexParameterFamilyContinuity
 
 variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
 
-theorem incV_add {k : ℕ} (x y : Fin k → E) :
-    GlobalTheory.ThK.incV F (x + y) = GlobalTheory.ThK.incV F x + GlobalTheory.ThK.incV F y := by
+theorem incV_add {k : ℕ} (x y : Fin k → E)
+    : GlobalTheory.ThK.incV F (x + y) = GlobalTheory.ThK.incV F x + GlobalTheory.ThK.incV F y := by
   funext i
   simp [GlobalTheory.ThK.incV, map_add (f := _)]
 
@@ -28,12 +31,14 @@ theorem incV_zero {k : ℕ} : GlobalTheory.ThK.incV F (0 : Fin k → E) = 0 := b
   funext i
   simp [GlobalTheory.ThK.incV]
 
-theorem incV_neg {k : ℕ} (x : Fin k → E) : GlobalTheory.ThK.incV F (-x) = -GlobalTheory.ThK.incV F x := by
+theorem incV_neg {k : ℕ} (x : Fin k → E)
+    : GlobalTheory.ThK.incV F (-x) = - GlobalTheory.ThK.incV F x := by
   funext i
   simp [GlobalTheory.ThK.incV, map_neg]
 
-theorem mem_ratVec {k : ℕ} {v : Fin k → AE F E} :
-    v ∈ AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → _)) ↔ ∃ x, GlobalTheory.ThK.incV F x = v := by
+theorem mem_ratVec {k : ℕ} {v : Fin k → AE F E}
+    : v ∈ AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → _))
+      ↔ ∃ x, GlobalTheory.ThK.incV F x = v := by
   constructor
   · intro h
     induction h using AddSubgroup.closure_induction with
@@ -49,15 +54,19 @@ theorem mem_ratVec {k : ℕ} {v : Fin k → AE F E} :
   · rintro ⟨X, rfl⟩
     exact AddSubgroup.subset_closure ⟨X, rfl⟩
 
-theorem ratVec_cocompact (k : ℕ) : ∃ K : Set (Fin k → AE F E), IsCompact K ∧
-    ∀ v, ∃ γ ∈ AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → _)), γ + v ∈ K := by
+theorem ratVec_cocompact (k : ℕ)
+    : ∃ K : Set (Fin k → AE F E),
+      IsCompact K
+        ∧ ∀ v, ∃ γ ∈ AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → _)),
+          γ + v ∈ K := by
   obtain ⟨C, hC, hCx⟩ := kfour.exists_compact_AE (F := F) (E := E)
   refine ⟨Set.univ.pi fun _ => C, isCompact_univ_pi fun _ => hC, fun v => ?_⟩
   choose X hX using fun i => hCx (v i)
   exact ⟨GlobalTheory.ThK.incV F X, mem_ratVec.2 ⟨X, rfl⟩, fun i _ => hX i⟩
 
-theorem ratVec_discrete (k : ℕ) :
-    DiscreteTopology (AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E)))) := by
+theorem ratVec_discrete (k : ℕ)
+    : DiscreteTopology (AddSubgroup.closure (Set.range
+      (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E)))) := by
   obtain ⟨V, hV, hV0⟩ := kfour.exists_nhds_inclR (F := F) (E := E)
   have hW : (⋂ i, (fun v : Fin k → AE F E => v i) ⁻¹' V) ∈ 𝓝 (0 : Fin k → AE F E) := by
     refine Filter.iInter_mem.2 fun i => ?_
@@ -79,12 +88,15 @@ theorem ratVec_discrete (k : ℕ) :
     subst h2
     exact Set.mem_singleton_iff.2 (Subtype.ext incV_zero)
 
-theorem ratVec_countable (k : ℕ) :
-    Countable (AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E)))) := by
+theorem ratVec_countable (k : ℕ)
+    : Countable (AddSubgroup.closure (Set.range
+      (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E)))) := by
   haveI := kfour.countable_E (E := E)
-  have h : (AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E))) :
-      Set (Fin k → AE F E)).Countable := by
-    refine (Set.countable_range (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E))).mono fun v hv => ?_
+  have h
+      : (AddSubgroup.closure (Set.range (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E)))
+        : Set (Fin k → AE F E)).Countable := by
+    refine (Set.countable_range (GlobalTheory.ThK.incV F : (Fin k → E) → (Fin k → AE F E))).mono
+      fun v hv => ?_
     obtain ⟨X, rfl⟩ := mem_ratVec.1 hv
     exact ⟨X, rfl⟩
   exact h.to_subtype

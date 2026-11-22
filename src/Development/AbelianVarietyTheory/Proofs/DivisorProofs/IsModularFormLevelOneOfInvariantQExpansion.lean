@@ -15,14 +15,13 @@ open ModularForm (E₄ E₆)
 
 namespace GlobalTheory.QFam
 
-
 open scoped UpperHalfPlane MatrixGroups ModularForm Manifold BigOperators in
-theorem _root_.GlobalTheory.QFam.isMF_of_invariant_of_hasQ : ∀ (N : ℕ) (k : ℤ) (f : ℍ → ℂ)
-    (a : ℕ → ℂ), 0 < N →
-    (∀ γ : SL(2, ℤ), f ∣[k] γ = f) → _root_.GlobalTheory.QFam.HasQ N f a → _root_.ReciprocityTheory.ChartRestriction.L1.IsMF k f := by
+theorem _root_.GlobalTheory.QFam.isMF_of_invariant_of_hasQ
+    : ∀ (N : ℕ) (k : ℤ) (f : ℍ → ℂ) (a : ℕ → ℂ),
+      0 < N → (∀ γ : SL(2, ℤ), f ∣[k] γ = f) → _root_.GlobalTheory.QFam.HasQ N f a
+        → _root_.ReciprocityTheory.ChartRestriction.L1.IsMF k f := by
   intro N k f a hN hinv h
-  refine ⟨{ toFun := f, slash_action_eq' := ?_, holo' := ?_, bdd_at_cusps' := ?_ },
-    fun _ => rfl⟩
+  refine ⟨{ toFun := f, slash_action_eq' := ?_, holo' := ?_, bdd_at_cusps' := ?_ }, fun _ => rfl⟩
   · rintro _ ⟨γ, rfl⟩
     exact (ModularForm.SL_slash f γ).symm.trans (hinv γ)
   · exact h.mdifferentiable hN

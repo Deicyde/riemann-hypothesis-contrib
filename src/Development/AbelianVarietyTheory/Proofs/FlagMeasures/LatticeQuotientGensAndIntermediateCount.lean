@@ -14,17 +14,21 @@ namespace GlobalTheory.Mass.LatticeGens
 section Dedekind
 variable {R V : Type*} [CommRing R] [IsDedekindDomain R] [AddCommGroup V] [Module R V]
 
-theorem exists_gens_of_between (A : Submodule R V) (m : R) (hm : m ≠ 0) (t : Finset V) :
-    (∀ x ∈ t, m • x ∈ A) → ∀ L : Submodule R V, A ≤ L → L ≤ A ⊔ Submodule.span R (t : Set V) →
-      ∃ t' : Finset V, t'.card ≤ t.card ∧ L = A ⊔ Submodule.span R (t' : Set V) := by
+theorem exists_gens_of_between (A : Submodule R V) (m : R) (hm : m ≠ 0) (t : Finset V)
+    : (∀ x ∈ t, m • x ∈ A)
+      → ∀ L : Submodule R V,
+        A ≤ L → L ≤ A ⊔ Submodule.span R (t : Set V)
+          → ∃ t' : Finset V, t'.card ≤ t.card ∧ L = A ⊔ Submodule.span R (t' : Set V) := by
   induction t using Finset.induction_on with
   | empty =>
     intro _ L h1 h2
     exact ⟨∅, le_rfl, le_antisymm h2 (by simpa using h1)⟩
   | insert x t hx ih =>
     intro ht L h1 h2
-    obtain ⟨t', hc, ht'⟩ := ih (fun y hy => ht y (Finset.mem_insert_of_mem hy))
-      (L ⊓ (A ⊔ Submodule.span R (t : Set V))) (le_inf h1 le_sup_left) inf_le_right
+    obtain ⟨t', hc, ht'⟩ :=
+      ih
+        (fun y hy => ht y (Finset.mem_insert_of_mem hy))
+        (L ⊓ (A ⊔ Submodule.span R (t : Set V))) (le_inf h1 le_sup_left) inf_le_right
     set I : Ideal R := (A ⊔ Submodule.span R (t : Set V)).comap (LinearMap.toSpanSingleton R V x)
       with hI
     set J : Ideal R := (L ⊔ Submodule.span R (t : Set V)).comap (LinearMap.toSpanSingleton R V x)
@@ -58,17 +62,18 @@ theorem exists_gens_of_between (A : Submodule R V) (m : R) (hm : m ≠ 0) (t : F
       obtain ⟨i, hi, j, hj, rfl⟩ := Submodule.mem_sup.1 hr
       obtain ⟨k, rfl⟩ := Ideal.mem_span_singleton'.1 hj
       have hi' : i • x ∈ A ⊔ Submodule.span R (t : Set V) := hi
-      have key : a0 + ((i + k * a) • x + s0) - k • l ∈
-          L ⊓ (A ⊔ Submodule.span R (t : Set V)) := by
+      have key : a0 + ((i + k * a) • x + s0) - k • l ∈ L ⊓ (A ⊔ Submodule.span R (t : Set V)) := by
         refine ⟨sub_mem hy (L.smul_mem _ hl), ?_⟩
         have : a0 + ((i + k * a) • x + s0) - k • l = a0 + i • x + s0 + k • s := by
           rw [add_smul, mul_smul, ← hls', smul_add]; abel
         rw [this]
-        exact add_mem (add_mem (add_mem (Submodule.mem_sup_left ha0) hi')
-          (Submodule.mem_sup_right hs0)) (Submodule.mem_sup_right (Submodule.smul_mem _ _ hs))
+        exact add_mem
+          (add_mem (add_mem (Submodule.mem_sup_left ha0) hi') (Submodule.mem_sup_right hs0))
+          (Submodule.mem_sup_right (Submodule.smul_mem _ _ hs))
       rw [ht'] at key
-      have hle : A ⊔ Submodule.span R (t' : Set V) ≤
-          A ⊔ Submodule.span R ((insert l t' : Finset V) : Set V) :=
+      have hle
+          : A ⊔ Submodule.span R (t' : Set V)
+            ≤ A ⊔ Submodule.span R ((insert l t' : Finset V) : Set V) :=
         sup_le_sup_left (Submodule.span_mono (by simp)) _
       have hl' : k • l ∈ A ⊔ Submodule.span R ((insert l t' : Finset V) : Set V) :=
         Submodule.mem_sup_right (Submodule.smul_mem _ _ (Submodule.subset_span (by simp)))
@@ -83,24 +88,24 @@ end Dedekind
 section Count
 variable {R V : Type*} [CommRing R] [AddCommGroup V] [Module R V]
 
-theorem idxN_smul_mem (A B : Submodule R V) {x : V} (hx : x ∈ B) :
-    ((idxN B A : ℕ) : R) • x ∈ A := by
+theorem idxN_smul_mem (A B : Submodule R V) {x : V} (hx : x ∈ B)
+    : ((idxN B A : ℕ) : R) • x ∈ A := by
   rw [Nat.cast_smul_eq_nsmul]
   exact AddSubgroup.nsmul_relIndex_mem A.toAddSubgroup (K := B.toAddSubgroup) hx
 
 theorem card_map_mkQ (A B : Submodule R V) : Nat.card (B.map A.mkQ) = idxN B A := by
   have h := AddSubgroup.relIndex_ker (K := B.toAddSubgroup) A.mkQ.toAddMonoidHom
-  have hk : A.mkQ.toAddMonoidHom.ker = A.toAddSubgroup := by
-    ext x; simp
+  have hk : A.mkQ.toAddMonoidHom.ker = A.toAddSubgroup := by ext x; simp
   rw [hk] at h
   unfold idxN
   rw [h]
   rfl
 
-theorem encard_between_le (A B : Submodule R V) (hn : idxN B A ≠ 0) (e : ℕ)
-    (h : ∀ L, A ≤ L → L ≤ B →
-      ∃ t' : Finset V, t'.card ≤ e ∧ L = A ⊔ Submodule.span R (t' : Set V)) :
-    {L | A ≤ L ∧ L ≤ B}.encard ≤ ((idxN B A ^ e : ℕ) : ℕ∞) := by
+theorem encard_between_le
+    (A B : Submodule R V) (hn : idxN B A ≠ 0)
+    (e : ℕ)
+    (h : ∀ L, A ≤ L → L ≤ B → ∃ t' : Finset V, t'.card ≤ e ∧ L = A ⊔ Submodule.span R (t' : Set V))
+    : {L | A ≤ L ∧ L ≤ B}.encard ≤ ((idxN B A ^ e : ℕ) : ℕ∞) := by
   have hfin : Finite (B.map A.mkQ) := Nat.finite_of_card_ne_zero (by rwa [card_map_mkQ])
   let Φ : (Fin e → B.map A.mkQ) → Submodule R V := fun f =>
     (Submodule.span R (Set.range fun i => (f i : V ⧸ A))).comap A.mkQ
@@ -125,11 +130,12 @@ theorem encard_between_le (A B : Submodule R V) (hn : idxN B A ≠ 0) (e : ℕ)
         exact ⟨emb ⟨x, hx⟩, by simp only [g, emb.injective.extend_apply]⟩
     have hgB : ∀ i, g i ∈ B := fun i => h2 (by rw [ht]; exact Submodule.mem_sup_right (hg i))
     refine ⟨fun i => ⟨A.mkQ (g i), Submodule.mem_map_of_mem (hgB i)⟩, trivial, ?_⟩
-    have : (Set.range fun i => A.mkQ (g i)) = A.mkQ '' Set.range g := by
-      rw [← Set.range_comp]; rfl
+    have : (Set.range fun i => A.mkQ (g i)) = A.mkQ '' Set.range g := by rw [← Set.range_comp]; rfl
     change (Submodule.span R (Set.range fun i => A.mkQ (g i))).comap A.mkQ = L
     rw [this, ← Submodule.map_span, Submodule.comap_map_mkQ, hspan, ← ht]
-  calc {L | A ≤ L ∧ L ≤ B}.encard ≤ (Φ '' Set.univ).encard := Set.encard_le_encard hsub
+  calc
+    {L | A ≤ L ∧ L ≤ B}.encard
+      ≤ (Φ '' Set.univ).encard := Set.encard_le_encard hsub
     _ ≤ (Set.univ : Set (Fin e → B.map A.mkQ)).encard := Set.encard_image_le _ _
     _ = _ := by
       rw [Set.encard_univ, ENat.card_eq_coe_natCard, Nat.card_fun, card_map_mkQ]
@@ -137,11 +143,13 @@ theorem encard_between_le (A B : Submodule R V) (hn : idxN B A ≠ 0) (e : ℕ)
 
 end Count
 
-theorem exists_scaled_span (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V]
-    [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
-    (B : Submodule (𝓞 K) V) (hB : B.FG) :
-    ∃ (c : 𝓞 K) (t : Finset V), c ≠ 0 ∧ t.card ≤ Module.finrank K V ∧ (∀ x ∈ t, c • x ∈ B) ∧
-      B ≤ Submodule.span (𝓞 K) (t : Set V) := by
+theorem exists_scaled_span
+    (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+    [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V]
+    (B : Submodule (𝓞 K) V) (hB : B.FG)
+    : ∃ (c : 𝓞 K) (t : Finset V),
+      c ≠ 0 ∧ t.card ≤ Module.finrank K V ∧ (∀ x ∈ t, c • x ∈ B)
+        ∧ B ≤ Submodule.span (𝓞 K) (t : Set V) := by
   obtain ⟨b, hbB, hspan, hli⟩ := exists_linearIndependent K (B : Set V)
   have hbf : b.Finite := hli.setFinite
   obtain ⟨s, rfl⟩ := hbf.exists_finset_coe
@@ -176,23 +184,39 @@ theorem exists_scaled_span (K V : Type) [Field K] [NumberField K] [AddCommGroup 
     rw [Finset.coe_image, ← Submodule.map_span, ← hφ x]
     exact Submodule.mem_map_of_mem (hcG x hx)
 
-theorem gens_and_count : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V] [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (A B : Submodule (𝓞 K) V), A ≤ B → idxN B A ≠ 0 → (B.FG → ∃ t : Finset V, t.card ≤ Module.finrank K V ∧ B = A ⊔ Submodule.span (𝓞 K) (t : Set V)) ∧ ∀ (e : ℕ) (t : Finset V), t.card ≤ e → B = A ⊔ Submodule.span (𝓞 K) (t : Set V) → ({L | A ≤ L ∧ L ≤ B}.encard ≤ ((idxN B A ^ e : ℕ) : ℕ∞)) ∧ ∀ L, A ≤ L → L ≤ B → ∃ t' : Finset V, t'.card ≤ e ∧ L = A ⊔ Submodule.span (𝓞 K) (t' : Set V) := by
+theorem gens_and_count
+    : ∀ (K V : Type) [Field K] [NumberField K] [AddCommGroup V] [Module K V] [FiniteDimensional K V]
+        [Module (𝓞 K) V] [IsScalarTower (𝓞 K) K V] (A B : Submodule (𝓞 K) V),
+      A ≤ B → idxN B A ≠ 0
+        → (B.FG
+            → ∃ t : Finset V,
+              t.card ≤ Module.finrank K V ∧ B = A ⊔ Submodule.span (𝓞 K) (t : Set V))
+          ∧ ∀ (e : ℕ) (t : Finset V),
+            t.card ≤ e → B = A ⊔ Submodule.span (𝓞 K) (t : Set V)
+              → ({L | A ≤ L ∧ L ≤ B}.encard ≤ ((idxN B A ^ e : ℕ) : ℕ∞))
+                ∧ ∀ L,
+                  A ≤ L → L ≤ B
+                    → ∃ t' : Finset V, t'.card ≤ e ∧ L = A ⊔ Submodule.span (𝓞 K) (t' : Set V) := by
   intro K V _ _ _ _ _ _ _ A B hAB hn
   have hn' : ((idxN B A : ℕ) : 𝓞 K) ≠ 0 := Nat.cast_ne_zero.2 hn
   refine ⟨fun hB => ?_, fun e t hc ht => ?_⟩
   · obtain ⟨c, t, hc0, hcard, hcB, hBt⟩ := exists_scaled_span K V B hB
-    obtain ⟨t', h1, h2⟩ := exists_gens_of_between A (((idxN B A : ℕ) : 𝓞 K) * c)
-      (mul_ne_zero hn' hc0) t
-      (fun x hx => by rw [mul_smul]; exact idxN_smul_mem A B (hcB x hx)) B hAB
-      (hBt.trans le_sup_right)
+    obtain ⟨t', h1, h2⟩ :=
+      exists_gens_of_between A (((idxN B A : ℕ) : 𝓞 K) * c) (mul_ne_zero hn' hc0) t
+        (fun x hx => by rw [mul_smul]; exact idxN_smul_mem A B (hcB x hx))
+        B hAB (hBt.trans le_sup_right)
     exact ⟨t', h1.trans hcard, h2⟩
-  · have key : ∀ L, A ≤ L → L ≤ B →
-        ∃ t' : Finset V, t'.card ≤ e ∧ L = A ⊔ Submodule.span (𝓞 K) (t' : Set V) := by
+  · have key
+        : ∀ L,
+          A ≤ L → L ≤ B
+            → ∃ t' : Finset V, t'.card ≤ e ∧ L = A ⊔ Submodule.span (𝓞 K) (t' : Set V) := by
       intro L h1 h2
-      obtain ⟨t', h3, h4⟩ := exists_gens_of_between A _ hn' t
-        (fun x hx => idxN_smul_mem A B
-          (by rw [ht]; exact Submodule.mem_sup_right (Submodule.subset_span hx))) L h1
-        (h2.trans ht.le)
+      obtain ⟨t', h3, h4⟩ :=
+        exists_gens_of_between A _ hn' t
+          (fun x hx =>
+            idxN_smul_mem A B
+              (by rw [ht]; exact Submodule.mem_sup_right (Submodule.subset_span hx)))
+          L h1 (h2.trans ht.le)
       exact ⟨t', h3.trans hc, h4⟩
     exact ⟨encard_between_le A B hn e key, key⟩
 

@@ -10,8 +10,8 @@ namespace GlobalTheory
 
 theorem fractionalIdeal_exists_int_not_mem_of_count_eq_zero
     {R K : Type} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
-    (v : HeightOneSpectrum R) (I : FractionalIdeal (nonZeroDivisors R) K) :
-    I ≠ 0 → FractionalIdeal.count K v I = 0 → ∃ s : R, s ∉ v.asIdeal ∧ algebraMap R K s ∈ I := by
+    (v : HeightOneSpectrum R) (I : FractionalIdeal (nonZeroDivisors R) K)
+    : I ≠ 0 → FractionalIdeal.count K v I = 0 → ∃ s : R, s ∉ v.asIdeal ∧ algebraMap R K s ∈ I := by
   intro hI hc
   classical
   obtain ⟨a, J, ha, haJ⟩ := FractionalIdeal.exists_eq_spanSingleton_mul I
@@ -40,8 +40,8 @@ theorem fractionalIdeal_exists_int_not_mem_of_count_eq_zero
     have h2 : v.asIdeal ^ (n + 1) ∣ J := by
       rw [hJ1, pow_succ]
       exact mul_dvd_mul_left _ h
-    rw [← Associates.mk_le_mk_iff_dvd, Associates.mk_pow,
-      Associates.prime_pow_dvd_iff_le hJne hv] at h2
+    rw [← Associates.mk_le_mk_iff_dvd, Associates.mk_pow, Associates.prime_pow_dvd_iff_le hJne hv]
+      at h2
     omega
   rw [Ideal.dvd_iff_le, SetLike.not_le_iff_exists] at hnot
   obtain ⟨s, hsJ1, hsv⟩ := hnot

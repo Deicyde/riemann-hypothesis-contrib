@@ -6,7 +6,8 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsogenyFlatF
 
 @[expose] public section
 
-open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.AV GlobalTheory.AV.AbVar GlobalTheory.AV.KerPart
+open CategoryTheory AlgebraicGeometry TensorProduct GlobalTheory GlobalTheory.AV
+  GlobalTheory.AV.AbVar GlobalTheory.AV.KerPart
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.MonObj
 attribute [local instance] CategoryTheory.Over.cartesianMonoidalCategory
@@ -19,19 +20,21 @@ namespace GlobalTheory.AV.KerPart
 
 open CategoryTheory.Limits MonoidalCategory
 
-theorem one_left_eq {k : Type} [Field k] {X : Over (Sp k)} [MonObj X] (T : Over (Sp k)) :
-    (1 : T ⟶ X).left = T.hom ≫ (MonObj.one : 𝟙_ (Over (Sp k)) ⟶ X).left := by
+theorem one_left_eq {k : Type} [Field k] {X : Over (Sp k)} [MonObj X] (T : Over (Sp k))
+    : (1 : T ⟶ X).left = T.hom ≫ (MonObj.one : 𝟙_ (Over (Sp k)) ⟶ X).left := by
   rw [CategoryTheory.Hom.one_def, Over.comp_left]
   rfl
 
-theorem isoSpec_hom_comp_spec {X : Scheme.{0}} [IsAffine X] {R : CommRingCat.{0}} (g : X ⟶ Spec R) :
-    X.isoSpec.hom ≫ Spec.map ((Scheme.ΓSpecIso R).inv ≫ g.appTop) = g := by
-  rw [Spec.map_comp, Scheme.isoSpec_hom, ← Category.assoc, ← Scheme.toSpecΓ_naturality, Category.assoc,
-    toSpecΓ_SpecMap_ΓSpecIso_inv, Category.comp_id]
+theorem isoSpec_hom_comp_spec {X : Scheme.{0}} [IsAffine X] {R : CommRingCat.{0}} (g : X ⟶ Spec R)
+    : X.isoSpec.hom ≫ Spec.map ((Scheme.ΓSpecIso R).inv ≫ g.appTop) = g := by
+  rw [Spec.map_comp, Scheme.isoSpec_hom, ← Category.assoc, ← Scheme.toSpecΓ_naturality,
+    Category.assoc, toSpecΓ_SpecMap_ΓSpecIso_inv, Category.comp_id]
 
-theorem exists_kerPow_zero_finrank_eq_deg : ∀ (k : Type) [Field k] (A B : AbVar k) (f : A ⟶ B), IsIsogeny f →
-    ∃ (H : Type) (_ : CommRing H) (_ : Algebra k H) (i : ptOver k H ⟶ A.X),
-      KerPow f 0 H i ∧ Module.finrank k H = deg f := by
+theorem exists_kerPow_zero_finrank_eq_deg
+    : ∀ (k : Type) [Field k] (A B : AbVar k) (f : A ⟶ B),
+      IsIsogeny f
+        → ∃ (H : Type) (_ : CommRing H) (_ : Algebra k H) (i : ptOver k H ⟶ A.X),
+          KerPow f 0 H i ∧ Module.finrank k H = deg f := by
   intro k _ A B f hf
   obtain ⟨-, hflat, -, hrank⟩ := isogeny_flat_finrank k A B f hf
   haveI : IsFinite f.hom.left := hf.1
@@ -64,8 +67,7 @@ theorem exists_kerPow_zero_finrank_eq_deg : ∀ (k : Type) [Field k] (A B : AbVa
       apply Spec.map_injective
       rw [Spec.map_comp, hφ0, Category.assoc, hg]
       exact pullback.lift_snd _ _ _
-    let φ : H →ₐ[k] R :=
-      { φ0.hom with commutes' := fun c => congrArg (fun u => u.hom c) hc }
+    let φ : H →ₐ[k] R := { φ0.hom with commutes' := fun c => congrArg (fun u => u.hom c) hc }
     have hφ : spMap φ.toRingHom = l ≫ P.isoSpec.hom := hφ0
     refine ⟨φ, ?_, fun ψ hψ => ?_⟩
     · change spMap φ.toRingHom ≫ i.left = x.left

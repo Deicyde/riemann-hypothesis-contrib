@@ -12,7 +12,8 @@ noncomputable section
 
 namespace Formalism.L2.Geo
 
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts NumberField Formalism.MainNotions.DIV.Inh Formalism.MainNotions.DIV.Inh.LocalProvisionModel
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.ModuliIntegralCharts
+  NumberField Formalism.MainNotions.DIV.Inh Formalism.MainNotions.DIV.Inh.LocalProvisionModel
 
 def cfJunk (p : ℕ) : CF p := (nonempty_coefficient_field p).some
 
@@ -24,28 +25,36 @@ def ballC (C : Type) [NormedField C] [IsUltrametricDist C] : AddSubgroup C where
   zero_mem' := by simp
   neg_mem' := fun {a} ha => by simpa using ha
 
-theorem mem_ballC {C : Type} [NormedField C] [IsUltrametricDist C] (x : C) : x ∈ ballC C ↔ ‖x‖ ≤ 1 := Iff.rfl
+theorem mem_ballC {C : Type} [NormedField C] [IsUltrametricDist C] (x : C)
+    : x ∈ ballC C ↔ ‖x‖ ≤ 1 :=
+  Iff.rfl
 
-theorem intCast_mem_ballC {C : Type} [NormedField C] [IsUltrametricDist C] (t : ℤ) : (t : C) ∈ ballC C := by
+theorem intCast_mem_ballC {C : Type} [NormedField C] [IsUltrametricDist C] (t : ℤ)
+    : (t : C) ∈ ballC C := by
   have h1 : (1 : C) ∈ ballC C := by
     rw [mem_ballC]
     simp
   simpa using (ballC C).zsmul_mem h1 t
 
-theorem smul_mem_ballC {C : Type} [NormedField C] [IsUltrametricDist C] (a v : C) (ha : ‖a‖ ≤ 1) (hv : v ∈ ballC C) :
-    a • v ∈ ballC C := by
+theorem smul_mem_ballC
+    {C : Type} [NormedField C] [IsUltrametricDist C] (a v : C) (ha : ‖a‖ ≤ 1) (hv : v ∈ ballC C)
+    : a • v ∈ ballC C := by
   rw [mem_ballC, smul_eq_mul, norm_mul]
   exact mul_le_one₀ ha (norm_nonneg _) hv
 
-theorem span_intCast (C : Type) [Field C] : Submodule.span C (Set.range (Int.castAddHom C)) = ⊤ := by
+theorem span_intCast (C : Type) [Field C]
+    : Submodule.span C (Set.range (Int.castAddHom C)) = ⊤ := by
   rw [eq_top_iff]
   intro x _
-  have h1 : (1 : C) ∈ Submodule.span C (Set.range (Int.castAddHom C)) := Submodule.subset_span ⟨1, by simp⟩
+  have h1 : (1 : C) ∈ Submodule.span C (Set.range (Int.castAddHom C)) :=
+    Submodule.subset_span ⟨1, by simp⟩
   simpa using Submodule.smul_mem _ x h1
 
-theorem ballC_eq_inf {C : Type} [NormedField C] [IsUltrametricDist C] (a : C) :
-    ballC C = ballC C ⊓ (Ospan (C := C) (Set.range (Int.castAddHom C)) ⊔
-      (ballC C).map (DistribSMul.toAddMonoidHom C a)) := by
+theorem ballC_eq_inf {C : Type} [NormedField C] [IsUltrametricDist C] (a : C)
+    : ballC C
+      = ballC C
+        ⊓ (Ospan (C := C) (Set.range (Int.castAddHom C))
+          ⊔ (ballC C).map (DistribSMul.toAddMonoidHom C a)) := by
   refine le_antisymm (le_inf le_rfl (le_sup_of_le_left fun x hx => ?_)) inf_le_left
   exact AddSubgroup.subset_closure ⟨x, hx, 1, ⟨1, by simp⟩, by simp⟩
 
@@ -56,11 +65,9 @@ def rkB (ρ : ℕ) : Bool → ℕ
   | false => 0
   | true => min ρ 1
 
-theorem rkB_le_one (ρ : ℕ) (y : Bool) : rkB ρ y ≤ 1 := by
-  cases y <;> simp [rkB]
+theorem rkB_le_one (ρ : ℕ) (y : Bool) : rkB ρ y ≤ 1 := by cases y <;> simp [rkB]
 
-theorem rkB_le (ρ : ℕ) (y : Bool) : rkB ρ y ≤ ρ := by
-  cases y <;> simp [rkB]
+theorem rkB_le (ρ : ℕ) (y : Bool) : rkB ρ y ≤ ρ := by cases y <;> simp [rkB]
 
 theorem le_choose_two (r : ℕ) : r - 1 ≤ r * (r - 1) / 2 := by
   rcases r with _ | _ | k
@@ -70,15 +77,17 @@ theorem le_choose_two (r : ℕ) : r - 1 ≤ r * (r - 1) / 2 := by
     simp only [Nat.add_sub_cancel]
     nlinarith
 
-theorem flDim_eq (f r : ℕ) : f * (r * (r - 1) / 2) - f * (r - 1) + f * (r - 1) = f * (r * (r - 1) / 2) :=
+theorem flDim_eq (f r : ℕ)
+    : f * (r * (r - 1) / 2) - f * (r - 1) + f * (r - 1) = f * (r * (r - 1) / 2) :=
   Nat.sub_add_cancel (Nat.mul_le_mul_left _ (le_choose_two r))
 
-
 open Matrix in
-theorem pd_of_int {Y : Type} [AddCommGroup Y] (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ)
-    (hsymm : ∀ a b, β a b = β b a) (hint : ∀ a b, ∃ z : ℤ, β a b = z) (hpos : ∀ a, a ≠ 0 → 0 < β a a)
-    {n : ℕ} (b : Module.Basis (Fin n) ℤ Y) (x : Fin n → ℝ) (hx : x ≠ 0) :
-    0 < ∑ i, ∑ k, x i * x k * β (b i) (b k) := by
+theorem pd_of_int
+    {Y : Type} [AddCommGroup Y]
+    (β : Y →ₗ[ℤ] Y →ₗ[ℤ] ℝ) (hsymm : ∀ a b, β a b = β b a) (hint : ∀ a b, ∃ z : ℤ, β a b = z)
+    (hpos : ∀ a, a ≠ 0 → 0 < β a a)
+    {n : ℕ} (b : Module.Basis (Fin n) ℤ Y) (x : Fin n → ℝ) (hx : x ≠ 0)
+    : 0 < ∑ i, ∑ k, x i * x k * β (b i) (b k) := by
   classical
   choose g hg using fun i k => hint (b i) (b k)
   let G : Matrix (Fin n) (Fin n) ℤ := Matrix.of g
@@ -88,15 +97,19 @@ theorem pd_of_int {Y : Type} [AddCommGroup Y] (β : Y →ₗ[ℤ] Y →ₗ[ℤ] 
     intro x
     simp only [dotProduct, Matrix.mulVec, hGR, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by ring
-  have hz : ∀ z : Fin n → ℤ, (fun i => (z i : ℝ)) ⬝ᵥ (GR *ᵥ fun i => (z i : ℝ)) =
-      β (∑ i, z i • b i) (∑ i, z i • b i) := by
+  have hz
+      : ∀ z : Fin n → ℤ,
+        (fun i => (z i : ℝ)) ⬝ᵥ (GR *ᵥ fun i => (z i : ℝ))
+          = β (∑ i, z i • b i) (∑ i, z i • b i) := by
     intro z
     rw [← hq]
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, zsmul_eq_mul, Finset.mul_sum]
-    exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by
-      rw [hsymm (b k) (b i)]
-      ring
+      simp only [map_sum, LinearMap.sum_apply, map_smul, LinearMap.smul_apply, zsmul_eq_mul,
+        Finset.mul_sum]
+    exact Finset.sum_congr rfl fun i _ =>
+      Finset.sum_congr rfl fun k _ => by
+        rw [hsymm (b k) (b i)]
+        ring
   have hhom : ∀ (t : ℝ) (x : Fin n → ℝ), (t • x) ⬝ᵥ (GR *ᵥ (t • x)) = t ^ 2 * (x ⬝ᵥ (GR *ᵥ x)) := by
     intro t x
     rw [Matrix.mulVec_smul, smul_dotProduct, dotProduct_smul, smul_eq_mul, smul_eq_mul]
@@ -174,7 +187,8 @@ theorem finrank_pow (k : ℕ) : Module.finrank ℤ (Fin k → 𝓞 D.host.E) = k
   rw [Module.finrank_pi_fintype, Finset.sum_const, finrank_OE]
   simp
 
-def trZ (k : ℕ) (a b : Fin k → 𝓞 D.host.E) : ℤ := ∑ i, Algebra.trace ℤ (𝓞 D.host.E) (a i * cjO D (b i))
+def trZ (k : ℕ) (a b : Fin k → 𝓞 D.host.E) : ℤ :=
+  ∑ i, Algebra.trace ℤ (𝓞 D.host.E) (a i * cjO D (b i))
 
 theorem trZ_cast (k : ℕ) (a b : Fin k → 𝓞 D.host.E) : ((trZ D k a b : ℤ) : ℝ) = beK D k a b := by
   rw [beK_apply, trZ, Int.cast_sum]
@@ -184,16 +198,21 @@ theorem beK_symm (k : ℕ) (a b : Fin k → 𝓞 D.host.E) : beK D k a b = beK D
   rw [beK_apply, beK_apply]
   exact Finset.sum_congr rfl fun i _ => beO_symm D _ _
 
-theorem beK_bal (k : ℕ) (c c' : 𝓞 D.host.E) (h : (c' : D.host.E) = D.host.conj (c : D.host.E))
-    (a b : Fin k → 𝓞 D.host.E) : beK D k (c • a) b = beK D k a (c' • b) := by
+theorem beK_bal
+    (k : ℕ)
+    (c c' : 𝓞 D.host.E) (h : (c' : D.host.E) = D.host.conj (c : D.host.E))
+    (a b : Fin k → 𝓞 D.host.E)
+    : beK D k (c • a) b = beK D k a (c' • b) := by
   rw [beK_apply, beK_apply]
   exact Finset.sum_congr rfl fun i _ => beO_bal D c c' h _ _
 
-theorem trZ_add_left (k : ℕ) (a a' b : Fin k → 𝓞 D.host.E) : trZ D k (a + a') b = trZ D k a b + trZ D k a' b := by
+theorem trZ_add_left (k : ℕ) (a a' b : Fin k → 𝓞 D.host.E)
+    : trZ D k (a + a') b = trZ D k a b + trZ D k a' b := by
   apply Int.cast_injective (α := ℝ)
   rw [Int.cast_add, trZ_cast, trZ_cast, trZ_cast, map_add (f := _), LinearMap.add_apply]
 
-theorem trZ_add_right (k : ℕ) (a b b' : Fin k → 𝓞 D.host.E) : trZ D k a (b + b') = trZ D k a b + trZ D k a b' := by
+theorem trZ_add_right (k : ℕ) (a b b' : Fin k → 𝓞 D.host.E)
+    : trZ D k a (b + b') = trZ D k a b + trZ D k a b' := by
   apply Int.cast_injective (α := ℝ)
   rw [Int.cast_add, trZ_cast, trZ_cast, trZ_cast, map_add (f := _)]
 
@@ -201,8 +220,8 @@ theorem trZ_symm (k : ℕ) (a b : Fin k → 𝓞 D.host.E) : trZ D k a b = trZ D
   apply Int.cast_injective (α := ℝ)
   rw [trZ_cast, trZ_cast, beK_symm]
 
-theorem trZ_bal (k : ℕ) (c : 𝓞 D.host.E) (a b : Fin k → 𝓞 D.host.E) :
-    trZ D k (c • a) b = trZ D k a (integersConjugation D c • b) := by
+theorem trZ_bal (k : ℕ) (c : 𝓞 D.host.E) (a b : Fin k → 𝓞 D.host.E)
+    : trZ D k (c • a) b = trZ D k a (integersConjugation D c • b) := by
   apply Int.cast_injective (α := ℝ)
   rw [trZ_cast, trZ_cast, beK_bal D k c (integersConjugation D c) (integers_conjugation_coe D c)]
 
@@ -212,14 +231,13 @@ theorem trZ_self_nonneg (k : ℕ) (a : Fin k → 𝓞 D.host.E) : 0 ≤ trZ D k 
     exact Finset.sum_nonneg fun i _ => beO_nonneg D _
   exact_mod_cast h
 
-theorem trZ_zero_rank (a b : Fin 0 → 𝓞 D.host.E) : trZ D 0 a b = 0 := by
-  simp [trZ]
-
+theorem trZ_zero_rank (a b : Fin 0 → 𝓞 D.host.E) : trZ D 0 a b = 0 := by simp [trZ]
 
 open Classical in
 def pU (p : ℕ) (c : CF p) : (c.C)ˣ := if h : (p : c.C) = 0 then 1 else Units.mk0 (p : c.C) h
 
-theorem vU_pU_zpow (p : ℕ) (c : CF p) (z : ℤ) (h : 2 ≤ p ∨ z = 0) : BoundaryLocalData.vU p (pU p c ^ z) = z := by
+theorem vU_pU_zpow (p : ℕ) (c : CF p) (z : ℤ) (h : 2 ≤ p ∨ z = 0)
+    : BoundaryLocalData.vU p (pU p c ^ z) = z := by
   rcases h with h | rfl
   · have hp0 : (p : c.C) ≠ 0 := Nat.cast_ne_zero.2 (by omega)
     have h1 : ((pU p c ^ z : (c.C)ˣ) : c.C) = (p : c.C) ^ z := by simp [pU, hp0]
@@ -233,8 +251,9 @@ def u2 : (FractionRing ℤ_[2])ˣ :=
   Units.mk0 (algebraMap ℤ_[2] (FractionRing ℤ_[2]) 2)
     ((map_ne_zero_iff _ (IsFractionRing.injective ℤ_[2] (FractionRing ℤ_[2]))).2 two_ne_zero)
 
-theorem two_adic_unit_zpow_mem (z : ℤ) (hz : 0 ≤ z) :
-    ((u2 ^ z : (FractionRing ℤ_[2])ˣ) : FractionRing ℤ_[2]) ∈ (algebraMap ℤ_[2] (FractionRing ℤ_[2])).range := by
+theorem two_adic_unit_zpow_mem (z : ℤ) (hz : 0 ≤ z)
+    : ((u2 ^ z : (FractionRing ℤ_[2])ˣ) : FractionRing ℤ_[2])
+      ∈ (algebraMap ℤ_[2] (FractionRing ℤ_[2])).range := by
   obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le hz
   exact ⟨2 ^ n, by simp [u2]⟩
 
@@ -244,7 +263,8 @@ section Model
 
 variable (D : D7) (r j p : ℕ) (c : CF p) (ρ : ℕ)
 
-@[reducible] def locT : Loc D r j p where
+@[reducible]
+def locT : Loc D r j p where
   Mdl := Unit
   Xm := ()
   YY := ()
@@ -259,10 +279,19 @@ variable (D : D7) (r j p : ℕ) (c : CF p) (ρ : ℕ)
   be := fun y => beK D (rkB ρ y)
   be_symm := fun y a b => beK_symm D _ a b
   be_bal := fun y e e' h a b => beK_bal D _ e e' h a b
-  be_posDef := fun y => ⟨Fin _, inferInstance, Module.finBasis ℤ _, fun x hx => pd_of_int (beK D (rkB ρ y))
-    (fun a b => beK_symm D _ a b) (fun a a' => beK_int D (rkB ρ y) a a') (fun a h => beK_pos D _ a h) _ x hx⟩
-  yl_rank := fun y => ⟨rkB ρ y, by rw [finrank_pow]; ring, fun h1 h2 => by
-    have := rkB_le_one ρ y; omega⟩
+  be_posDef := fun y => ⟨
+    Fin _,
+    inferInstance,
+    Module.finBasis ℤ _,
+    fun x hx =>
+      pd_of_int (beK D (rkB ρ y))
+        (fun a b => beK_symm D _ a b)
+        (fun a a' => beK_int D (rkB ρ y) a a')
+        (fun a h => beK_pos D _ a h)
+        _ x hx
+  ⟩
+  yl_rank := fun y =>
+    ⟨rkB ρ y, by rw [finrank_pow]; ring, fun h1 h2 => by have := rkB_le_one ρ y; omega⟩
   Gen := fun _ => Bool
   abAt := fun η => rkB ρ η = 0
   Sh := fun _ => Unit
@@ -322,12 +351,12 @@ variable (D : D7) (r j p : ℕ) (c : CF p) (ρ : ℕ)
   ovr_surj := fun _ _ _ x => ⟨(1, x), rfl⟩
   scal := fun _ _ _ => MonoidHom.inl _ _
   scal_inj := fun _ _ _ a b h => congrArg Prod.fst h
-  scal_central := fun _ _ _ a g => by
-    ext <;> simp [mul_comm]
+  scal_central := fun _ _ _ a g => by ext <;> simp [mul_comm]
   ker_ovr := fun _ _ _ g => ⟨fun h => ⟨g.1, Prod.ext rfl h.symm⟩, fun ⟨a, h⟩ => by rw [← h]; rfl⟩
   dl := fun _ _ _ => MulEquiv.prodCongr (MulEquiv.refl _) (MulEquiv.inv _)
   dl_ovr := fun _ _ _ _ => rfl
-  dl_scal := fun _ La n a => Prod.ext rfl (inv_one : (1 : Multiplicative (AtM (2 * (D.R.f * r * La)) n))⁻¹ = 1)
+  dl_scal := fun _ La n a =>
+    Prod.ext rfl (inv_one : (1 : Multiplicative (AtM (2 * (D.R.f * r * La)) n))⁻¹ = 1)
   dl_dl := fun _ _ _ g => by
     show (g.1, (g.2⁻¹)⁻¹) = g
     rw [inv_inv]
@@ -376,13 +405,15 @@ variable (D : D7) (r j p : ℕ) (c : CF p) (ρ : ℕ)
   extA := fun _ => True
   compat := fun _ _ => True
   Crv := PsiT D → ℕ → ℤ
-  eDeg := fun d => -∑ᶠ τ, ((∑ i ∈ Finset.Icc 1 j, d τ i) + -∑ i ∈ Finset.Icc (j + 1) r, d τ i)
+  eDeg := fun d => - ∑ᶠ τ, ((∑ i ∈ Finset.Icc 1 j, d τ i) + -∑ i ∈ Finset.Icc (j + 1) r, d τ i)
   Pm := fun d => pmM D d (r + j)
   Pm_nonneg := fun d => pmM_nonneg D _ _
-  degLie := fun d τ b => if b then -∑ i ∈ Finset.Icc (j + 1) r, d τ i else ∑ i ∈ Finset.Icc 1 j, d τ i
-  degLdR := fun d μ => -∑ᶠ τ, ∑ i ∈ Finset.Icc 1 r, μ τ i * (d τ i : ℝ)
+  degLie := fun d τ b =>
+    if b then - ∑ i ∈ Finset.Icc (j + 1) r, d τ i else ∑ i ∈ Finset.Icc 1 j, d τ i
+  degLdR := fun d μ => - ∑ᶠ τ, ∑ i ∈ Finset.Icc 1 r, μ τ i * (d τ i : ℝ)
 
-@[reducible] def extT : ExtA D (locT D r j p c ρ) where
+@[reducible]
+def extT : ExtA D (locT D r j p c ρ) where
   FlagData := fun _ => Unit
   flagCl := fun _ _ => ()
   allFlags := ()
@@ -494,9 +525,11 @@ variable (D : D7) (r j p : ℕ) (c : CF p) (ρ : ℕ)
   flDim := fun _ => D.R.f * (r * (r - 1) / 2) - D.R.f * (r - 1)
   Sum1 := Unit
   locus := fun _ => ()
-  bdryLoci_def := fun _ =>
-    ⟨fun _ => ⟨Set.univ, Set.finite_univ, fun _ _ => ⟨(), trivial, trivial⟩, fun _ _ => flDim_eq D.R.f r⟩,
-      fun _ => trivial⟩
+  bdryLoci_def := fun _ => ⟨
+    fun _ =>
+      ⟨Set.univ, Set.finite_univ, fun _ _ => ⟨(), trivial, trivial⟩, fun _ _ => flDim_eq D.R.f r⟩,
+    fun _ => trivial
+  ⟩
   CrvS := fun _ => Unit
   degGr := fun _ _ _ => 0
   nefHT_def := fun _ _ => ⟨fun _ _ => by simp, fun _ => trivial⟩
@@ -508,15 +541,16 @@ variable (D : D7) (r j p : ℕ) (c : CF p) (ρ : ℕ)
   degLie_f := fun _ _ => rfl
   degLie_alt := fun _ _ => rfl
   eDeg_def := fun _ _ => rfl
-  Pm_head := fun d τ i _ h2 => le_trans (le_abs_self _)
-    (abs_le_pmM D d (r + j) τ _ (Finset.Icc_subset_Icc le_rfl (by omega)))
-  Pm_tail := fun d τ i _ _ => le_trans (neg_le_abs _)
-    (abs_le_pmM D d (r + j) τ _ (Finset.Icc_subset_Icc (by omega) (by omega)))
-
+  Pm_head := fun d τ i _ h2 =>
+    le_trans (le_abs_self _) (abs_le_pmM D d (r + j) τ _ (Finset.Icc_subset_Icc le_rfl (by omega)))
+  Pm_tail := fun d τ i _ _ =>
+    le_trans (neg_le_abs _)
+      (abs_le_pmM D d (r + j) τ _ (Finset.Icc_subset_Icc (by omega) (by omega)))
 
 open Classical in
-@[reducible] def locBT (hp : 2 ≤ p ∨ ρ = 0) (hd : ρ * (2 * D.R.f) ≤ D.R.f * r) :
-    BoundaryLocalData.LocB D (locT D r j p c ρ) where
+@[reducible]
+def locBT (hp : 2 ≤ p ∨ ρ = 0) (hd : ρ * (2 * D.R.f) ≤ D.R.f * r)
+    : BoundaryLocalData.LocB D (locT D r j p c ρ) where
   chX := fun {_} y => XT D (Fin (rkB ρ y) → 𝓞 D.host.E)
   xAdd := fun {_} _ => inferInstance
   xMod := fun {_} _ => inferInstance
@@ -615,13 +649,17 @@ open Classical in
   pbAl := fun _ _ _ => LinearMap.id
   vth_def := fun _ _ _ _ => rfl
   jX := fun _ _ _ _ _ => LinearMap.id
-  intJet_free := fun _ _ _ _ =>
-    ⟨1, Module.Basis.singleton (Fin 1) c.C, fun v =>
-      ⟨fun h i => by simpa using (mem_ballC v).1 h, fun h => (mem_ballC v).2 (by simpa using h 0)⟩⟩
+  intJet_free := fun _ _ _ _ => ⟨
+    1,
+    Module.Basis.singleton (Fin 1) c.C,
+    fun v =>
+      ⟨fun h i => by simpa using (mem_ballC v).1 h, fun h => (mem_ballC v).2 (by simpa using h 0)⟩
+  ⟩
   jX_int := fun _ _ _ _ _ _ h => h
   jet_fourier := fun y nW n DF s t _ => by
     refine ⟨{0}, fun F hF => ⟨0, zero_mem _, ?_⟩⟩
-    have h0 : (0 : Fin nW → XT D (Fin (rkB ρ y) → 𝓞 D.host.E)) ∈ F := hF (Finset.mem_singleton_self 0)
+    have h0 : (0 : Fin nW → XT D (Fin (rkB ρ y) → 𝓞 D.host.E)) ∈ F :=
+      hF (Finset.mem_singleton_self 0)
     rw [Finset.sum_eq_single_of_mem 0 h0 (fun χ _ hχ => by simp [hχ])]
     simp
 
@@ -641,14 +679,18 @@ theorem rhoJ_dim (f r p : ℕ) : rhoJ r p * (2 * f) ≤ f * r := by
   · nlinarith [h.1]
   · simp
 
-def junkLocalData (D : D7) (r j p : ℕ) : ModuliIntegralCharts.Loc D r j p := locT D r j p (cfJunk p) (rhoJ r p)
+def junkLocalData (D : D7) (r j p : ℕ) : ModuliIntegralCharts.Loc D r j p :=
+  locT D r j p (cfJunk p) (rhoJ r p)
 
-def exJunk (D : D7) (r j p : ℕ) : ModuliIntegralCharts.ExtA D (junkLocalData D r j p) := extT D r j p (cfJunk p) (rhoJ r p)
+def exJunk (D : D7) (r j p : ℕ) : ModuliIntegralCharts.ExtA D (junkLocalData D r j p) :=
+  extT D r j p (cfJunk p) (rhoJ r p)
 
 def junkLocBAll (D : D7) (r j p : ℕ) : BoundaryLocalData.LocB D (junkLocalData D r j p) :=
   locBT D r j p (cfJunk p) (rhoJ r p) (rhoJ_p r p) (rhoJ_dim D.R.f r p)
 
-def junkLocB (D : D7) (r j p : ℕ) (_hp : p.Prime) : BoundaryLocalData.LocB D (junkLocalData D r j p) := junkLocBAll D r j p
+def junkLocB (D : D7) (r j p : ℕ) (_hp : p.Prime)
+    : BoundaryLocalData.LocB D (junkLocalData D r j p) :=
+  junkLocBAll D r j p
 
 section Facts
 

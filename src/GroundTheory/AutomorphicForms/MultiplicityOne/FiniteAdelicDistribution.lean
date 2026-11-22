@@ -20,10 +20,13 @@ namespace Whittaker
 
 noncomputable section
 
-def pullL {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y) :
-    locallyConstantCompactSupport Y ℂ ℂ →ₗ[ℂ] locallyConstantCompactSupport X ℂ ℂ where
-  toFun φ := ⟨(φ : Y → ℂ) ∘ e, mem_locallyConstantCompactSupport.2
-    ⟨φ.2.1.comp_continuous e.continuous, φ.2.2.comp_homeomorph e⟩⟩
+def pullL {X Y : Type*} [TopologicalSpace X] [TopologicalSpace Y] (e : X ≃ₜ Y)
+    : locallyConstantCompactSupport Y ℂ ℂ →ₗ[ℂ] locallyConstantCompactSupport X ℂ ℂ where
+  toFun φ := ⟨
+    (φ : Y → ℂ) ∘ e,
+    mem_locallyConstantCompactSupport.2
+      ⟨φ.2.1.comp_continuous e.continuous, φ.2.2.comp_homeomorph e⟩
+  ⟩
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 

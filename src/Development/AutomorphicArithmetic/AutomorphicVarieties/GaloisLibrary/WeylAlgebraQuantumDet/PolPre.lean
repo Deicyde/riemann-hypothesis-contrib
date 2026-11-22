@@ -9,10 +9,12 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 open Matrix UpperTheory.V.Weyl
 
-theorem UpperTheory.V.Weyl.polPre :
-    ∀ (n N : ℕ), ∃ (Ξ : Pre n) (e : MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ N ≃ₗ[ℂ] (Fin Ξ.d → ℂ)),
-      ∀ (g : Matrix (Fin n) (Fin n) ℂ) (f f' : MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ N),
-        (f' : Pol n) = rtr g f → Ξ.mat g *ᵥ e f = e f' := by
+theorem UpperTheory.V.Weyl.polPre
+    : ∀ (n N : ℕ),
+      ∃ (Ξ : Pre n) (e : MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ N ≃ₗ[ℂ] (Fin Ξ.d → ℂ)),
+        ∀ (g : Matrix (Fin n) (Fin n) ℂ)
+            (f f' : MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ N),
+          (f' : Pol n) = rtr g f → Ξ.mat g *ᵥ e f = e f' := by
   intro n N
   let V := MvPolynomial.restrictTotalDegree (Fin n × Fin n) ℂ N
   have mem : ∀ (g : Matrix (Fin n) (Fin n) ℂ) (f : V), rtr g (f : Pol n) ∈ V := by
@@ -23,7 +25,8 @@ theorem UpperTheory.V.Weyl.polPre :
     LinearMap.codRestrict V ((rtr g).toLinearMap.comp V.subtype) (mem g)
   have hR : ∀ g (f : V), ((R g f : V) : Pol n) = rtr g (f : Pol n) := fun g f => rfl
   let b := Module.finBasis ℂ V
-  let M : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ :=
+  let M
+      : Matrix (Fin n) (Fin n) ℂ → Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ :=
     fun g => LinearMap.toMatrix b b (R g)
   have hR1 : R 1 = LinearMap.id := by
     ext f
@@ -34,18 +37,22 @@ theorem UpperTheory.V.Weyl.polPre :
     ext f
     rw [hR, (rtrMul n).2]
     rfl
-  let mat : Matrix (Fin n) (Fin n) ℂ →* Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ :=
-    { toFun := M
-      map_one' := by
-        show LinearMap.toMatrix b b (R 1) = 1
-        rw [hR1, LinearMap.toMatrix_id]
-      map_mul' := by
-        intro g h
-        show LinearMap.toMatrix b b (R (g * h)) = LinearMap.toMatrix b b (R g) * LinearMap.toMatrix b b (R h)
-        rw [hRm]
-        exact LinearMap.toMatrix_comp b b b (R g) (R h) }
-  have poly : ∀ i j : Fin (Module.finrank ℂ V), ∃ p : Pol n, ∀ g : Matrix (Fin n) (Fin n) ℂ,
-      mat g i j = MvPolynomial.eval (fun ab => g ab.1 ab.2) p := by
+  let mat
+      : Matrix (Fin n) (Fin n) ℂ
+        →* Matrix (Fin (Module.finrank ℂ V)) (Fin (Module.finrank ℂ V)) ℂ := {
+    toFun := M
+    map_one' := by
+      show LinearMap.toMatrix b b (R 1) = 1
+      rw [hR1, LinearMap.toMatrix_id]
+    map_mul' := by
+      intro g h
+      show LinearMap.toMatrix b b (R (g * h)) = LinearMap.toMatrix b b (R g) * LinearMap.toMatrix b b (R h)
+      rw [hRm]
+      exact LinearMap.toMatrix_comp b b b (R g) (R h)
+  }
+  have poly
+      : ∀ i j : Fin (Module.finrank ℂ V), ∃ p : Pol n, ∀ g : Matrix (Fin n) (Fin n) ℂ,
+        mat g i j = MvPolynomial.eval (fun ab => g ab.1 ab.2) p := by
     intro i j
     obtain ⟨φ, hφ⟩ := LinearMap.exists_extend (b.coord i)
     obtain ⟨p, hp⟩ := rtrPoly n ((b j : V) : Pol n) φ

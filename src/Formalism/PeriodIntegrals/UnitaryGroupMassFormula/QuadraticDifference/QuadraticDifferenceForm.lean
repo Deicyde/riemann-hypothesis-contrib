@@ -14,9 +14,12 @@ open NumberField Polynomial
 theorem quadraticDifferenceArith : Arith := by
   unfold Arith
   intro d x y hsq hd4 ⟨u, hu⟩ ⟨N, hN⟩
-  obtain ⟨M, hM⟩ : ∃ M : ℤ, (d : ℚ) * (2 * y) ^ 2 = M := ⟨4 * N - u ^ 2, by
-    push_cast
-    linear_combination 4 * hN - (2 * x + (u : ℚ)) * hu⟩
+  obtain ⟨M, hM⟩ : ∃ M : ℤ, (d : ℚ) * (2 * y) ^ 2 = M := ⟨
+    4 * N - u ^ 2,
+    by
+      push_cast
+      linear_combination 4 * hN - (2 * x + (u : ℚ)) * hu
+  ⟩
   obtain ⟨w, hw⟩ : ∃ w : ℚ, w = 2 * y := ⟨_, rfl⟩
   rw [← hw] at hM
   have h2 : w * w.den = w.num := Rat.mul_den_eq_num w
@@ -47,8 +50,8 @@ theorem quadraticDifferenceArith : Arith := by
   obtain ⟨t, ht⟩ : ∃ t : ℤ, (d : ℤ) = 4 * t + 3 := ⟨((d / 4 : ℕ) : ℤ), by omega⟩
   rw [ht] at hE
   have hpar : ∃ a : ℤ, u - v = 2 * a := by
-    rcases Int.even_or_odd' u with ⟨k, hk | hk⟩ <;> rcases Int.even_or_odd' v with ⟨m, hm | hm⟩ <;>
-      subst hk <;> subst hm
+    rcases Int.even_or_odd' u with ⟨k, hk | hk⟩ <;> rcases Int.even_or_odd' v with ⟨m, hm | hm⟩
+      <;> subst hk <;> subst hm
     · exact ⟨k - m, by ring⟩
     · exfalso
       ring_nf at hE
@@ -72,7 +75,8 @@ theorem quadratic_difference_form : Form := by
   | mem w hw =>
     rw [Set.mem_singleton_iff] at hw
     exact ⟨0, 1, by rw [hw]; simp⟩
-  | algebraMap r => exact ⟨r, 0, by simp⟩
+  | algebraMap r =>
+    exact ⟨r, 0, by simp⟩
   | add w1 w2 _ _ h1 h2 =>
     obtain ⟨x1, y1, e1⟩ := h1
     obtain ⟨x2, y2, e2⟩ := h2
@@ -81,7 +85,8 @@ theorem quadratic_difference_form : Form := by
     obtain ⟨x1, y1, e1⟩ := h1
     obtain ⟨x2, y2, e2⟩ := h2
     refine ⟨x1 * x2 - d * y1 * y2, x1 * y2 + x2 * y1, ?_⟩
-    rw [e1, e2]; push_cast
+    rw [e1, e2]
+    push_cast
     linear_combination (y1 * y2 : K) * hθ
 
 theorem quadratic_intCoeffs : IntCoeffs := by
@@ -95,7 +100,7 @@ theorem quadratic_intCoeffs : IntCoeffs := by
     have h1 : IsIntegral ℤ (algebraMap ℚ K x) := by
       rw [eq_ratCast]
       simpa using hint
-    obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp ((isIntegral_algebraMap_iff ).mp h1)
+    obtain ⟨n, hn⟩ := IsIntegrallyClosed.isIntegral_iff.mp ((isIntegral_algebraMap_iff).mp h1)
     rw [eq_intCast] at hn
     subst hn
     exact ⟨⟨2 * n, by push_cast; ring⟩, ⟨n ^ 2, by push_cast; ring⟩⟩
@@ -118,7 +123,8 @@ theorem quadratic_intCoeffs : IntCoeffs := by
     simp only [eval_add, eval_sub, eval_mul, eval_pow, eval_X, eval_C] at hr
     have hy2 : 0 < y ^ 2 := by positivity
     nlinarith [sq_nonneg (r - x), mul_pos hd hy2]
-  have hmin : p = minpoly ℚ ((x : K) + (y : K) * θ) := minpoly.eq_of_irreducible_of_monic hirr haeval hmonic
+  have hmin : p = minpoly ℚ ((x : K) + (y : K) * θ) :=
+    minpoly.eq_of_irreducible_of_monic hirr haeval hmonic
   have hg := minpoly.isIntegrallyClosed_eq_field_fractions' ℚ hint
   have hc : ∀ i, p.coeff i = ((minpoly ℤ ((x : K) + (y : K) * θ)).coeff i : ℚ) := by
     intro i
@@ -133,7 +139,10 @@ theorem quadratic_intCoeffs : IntCoeffs := by
     simp
     rw [← C_pow, ← C_pow, coeff_C, coeff_C]
     simp
-  refine ⟨⟨-(minpoly ℤ ((x : K) + (y : K) * θ)).coeff 1, ?_⟩, ⟨(minpoly ℤ ((x : K) + (y : K) * θ)).coeff 0, ?_⟩⟩
+  refine ⟨
+    ⟨- (minpoly ℤ ((x : K) + (y : K) * θ)).coeff 1, ?_⟩,
+    ⟨(minpoly ℤ ((x : K) + (y : K) * θ)).coeff 0, ?_⟩
+  ⟩
   · push_cast
     rw [← hc, h1]
     ring

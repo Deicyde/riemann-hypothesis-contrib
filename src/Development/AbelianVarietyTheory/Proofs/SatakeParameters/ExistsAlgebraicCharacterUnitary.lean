@@ -10,16 +10,20 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.IsSatVecU
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
-open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands
+  GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU GlobalTheory.CuspRep GlobalTheory.PRep
+open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.DefU
+  GlobalTheory.CuspRep GlobalTheory.PRep
 
 namespace GlobalTheory.LadicInf
 
-theorem exists_place (E : Type) [Field E] [NumberField E] (l : ℕ) [Fact l.Prime] (τ : E →+* Qbar l) :
-    ∃ (u : HeightOneSpectrum (𝓞 E)) (j : u.adicCompletion E →+* Qbar l),
-      ((l : ℕ) : 𝓞 E) ∈ u.asIdeal ∧ Continuous j ∧ j.comp (algebraMap E (u.adicCompletion E)) = τ := by
+theorem exists_place (E : Type) [Field E] [NumberField E] (l : ℕ) [Fact l.Prime] (τ : E →+* Qbar l)
+    : ∃ (u : HeightOneSpectrum (𝓞 E)) (j : u.adicCompletion E →+* Qbar l),
+      ((l : ℕ) : 𝓞 E) ∈ u.asIdeal ∧ Continuous j
+        ∧ j.comp (algebraMap E (u.adicCompletion E)) = τ := by
   obtain ⟨u, hu⟩ := GlobalTheory.LadicPlace.exists_place_of_embedding E l τ
   obtain ⟨j, hj, hjE⟩ := GlobalTheory.exists_continuous_extension_adicCompletion E l τ u hu
   refine ⟨u, j, ?_, hj, hjE⟩

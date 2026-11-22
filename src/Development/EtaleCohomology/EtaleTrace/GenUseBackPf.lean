@@ -57,25 +57,36 @@ lemma gub_cover {k : Type} [Field k] {N : ℕ} (y : Proj (homogeneousSubmodule (
 theorem GenUseBack_of : GenUseBack := by
   intro k _ X _ p N ι v hG n hn f hf x hne hloc
   obtain ⟨i, hxi⟩ := gub_cover (ι x)
-  have hXi : (MvPolynomial.X i : MvPolynomial (Fin (N + 1)) k) ∈ homogeneousSubmodule (Fin (N + 1)) k 1 :=
+  have hXi
+      : (MvPolynomial.X i : MvPolynomial (Fin (N + 1)) k)
+        ∈ homogeneousSubmodule (Fin (N + 1)) k 1 :=
     (mem_homogeneousSubmodule _ _).mpr (isHomogeneous_X k i)
-  have hxU : x ∈ ι ⁻¹ᵁ Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i) := hxi
+  have hxU : x ∈ ι ⁻¹ᵁ Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i) :=
+    hxi
   have hη := genUse_generic_mem _ x hxU
   have hvi : eval₂ (kHom p) v (MvPolynomial.X i) ≠ 0 := ((hG 1 one_pos _ hXi).1).mp hη
   have hf' : f ∈ homogeneousSubmodule (Fin (N + 1)) k (n • 1) := by
     rw [smul_eq_mul, mul_one]; exact (mem_homogeneousSubmodule _ _).mpr hf
   have key := (hG 1 one_pos _ hXi).2 n f hf' hη
-  have : Nonempty (ι ⁻¹ᵁ Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i)) := ⟨⟨x, hxU⟩⟩
-  have hγ : algebraMap _ X.functionField (X.presheaf.germ _ x hxU (ι.app _ (Proj.awayToSection _ (MvPolynomial.X i)
-      (HomogeneousLocalization.Away.mk _ hXi n f hf')))) =
-      eval₂ (kHom p) v f / eval₂ (kHom p) v (MvPolynomial.X i) ^ n := by
+  have : Nonempty
+      (ι ⁻¹ᵁ Proj.basicOpen (homogeneousSubmodule (Fin (N + 1)) k) (MvPolynomial.X i)) :=
+    ⟨⟨x, hxU⟩⟩
+  have hγ
+      : algebraMap _ X.functionField
+          (X.presheaf.germ _ x hxU
+            (ι.app _
+              (Proj.awayToSection _ (MvPolynomial.X i)
+                (HomogeneousLocalization.Away.mk _ hXi n f hf'))))
+        = eval₂ (kHom p) v f / eval₂ (kHom p) v (MvPolynomial.X i) ^ n := by
     rw [Scheme.algebraMap_germ_eq_germToFunctionField, eq_div_iff (pow_ne_zero _ hvi)]
     exact key
   have hg : ((MvPolynomial.X i : MvPolynomial (Fin (N + 1)) k) ^ n).IsHomogeneous n := by
     simpa using (isHomogeneous_X k i).pow n
   obtain ⟨δ, hδ⟩ := hloc _ hg
-  have hu : IsUnit (X.presheaf.germ _ x hxU (ι.app _ (Proj.awayToSection _ (MvPolynomial.X i)
-      (HomogeneousLocalization.Away.mk _ hXi n f hf')))) := by
+  have hu : IsUnit (X.presheaf.germ _ x hxU
+      (ι.app _
+        (Proj.awayToSection _ (MvPolynomial.X i)
+          (HomogeneousLocalization.Away.mk _ hXi n f hf')))) := by
     refine isUnit_iff_exists_inv.mpr ⟨δ, gub_stalk_inj x ?_⟩
     rw [map_mul, map_one, hγ, hδ, eval₂_pow]
     have h1 := pow_ne_zero n hvi

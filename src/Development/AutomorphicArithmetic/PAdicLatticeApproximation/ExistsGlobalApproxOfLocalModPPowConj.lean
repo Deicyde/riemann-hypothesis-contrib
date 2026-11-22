@@ -4,8 +4,11 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory GlobalTheory.PELU GlobalTheory.UPel.HT
+  GlobalTheory.UPel.HT.Gen
 open GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKGeo Polynomial
 open scoped Matrix TensorProduct Classical
 open UpperTheory.Gal.W2
@@ -61,22 +64,34 @@ private lemma stepAt {p : ℕ} [Fact p.Prime] {K : IntermediateField ℚ_[p] (Pa
     rw [Pi.add_apply, Pi.smul_apply, nsmul_eq_mul, Nat.cast_pow, mul_inv_cancel_left₀ hpK,
       Pi.sub_apply, add_sub_cancel]
 
-theorem UpperTheory.exists_global_approx_of_local_mod_p_pow_conj :
-    UpperTheory.Gal.W2.FApprox → ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (S B : ∀ w : Fin G.m, Matrix (Fin G.n) (Fin G.n) (G.Fw w)), (∀ w, (S w).det ≠ 0) → (∀ w, (B w).det ≠ 0) → ∀ (a b : Loc G) (k : ℕ), ∃ (y : Fin G.n → G.F) (a' b' : Loc G), IntL a' ∧ IntL b' ∧ (∀ w, S w *ᵥ (fun i => G.embW w (y i)) = a w + p ^ k • a' w) ∧ ∀ w, B w *ᵥ (fun i => G.embW w (IsCMField.complexConj G.F (y i))) = b w + p ^ k • b' w := by
+theorem UpperTheory.exists_global_approx_of_local_mod_p_pow_conj
+    : UpperTheory.Gal.W2.FApprox
+      → ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p)
+          (S B : ∀ w : Fin G.m, Matrix (Fin G.n) (Fin G.n) (G.Fw w)),
+        (∀ w, (S w).det ≠ 0) → (∀ w, (B w).det ≠ 0)
+          → ∀ (a b : Loc G) (k : ℕ), ∃ (y : Fin G.n → G.F) (a' b' : Loc G),
+            IntL a' ∧ IntL b' ∧ (∀ w, S w *ᵥ (fun i => G.embW w (y i)) = a w + p ^ k • a' w)
+              ∧ ∀ w,
+                B w *ᵥ (fun i => G.embW w (IsCMField.complexConj G.F (y i)))
+                  = b w + p ^ k • b' w := by
   intro hF p _ G S B hS hB a b k
   classical
   set C : ℝ := 1 + ∑ w, ∑ i, ∑ j,
     (‖(S w i j : PadicAlgCl p)‖ + ‖(B w i j : PadicAlgCl p)‖) with hCdef
-  have hnn : ∀ w i, 0 ≤ ∑ j, (‖(S w i j : PadicAlgCl p)‖ + ‖(B w i j : PadicAlgCl p)‖) :=
-    fun w i => Finset.sum_nonneg fun j _ => by positivity
+  have hnn : ∀ w i, 0 ≤ ∑ j, (‖(S w i j : PadicAlgCl p)‖ + ‖(B w i j : PadicAlgCl p)‖) := fun w i =>
+    Finset.sum_nonneg fun j _ => by positivity
   have hbig : ∀ w i, ∑ j, (‖(S w i j : PadicAlgCl p)‖ + ‖(B w i j : PadicAlgCl p)‖) ≤ C := by
     intro w i
-    have h2 := Finset.single_le_sum
-      (f := fun i' => ∑ j, (‖(S w i' j : PadicAlgCl p)‖ + ‖(B w i' j : PadicAlgCl p)‖))
-      (fun i' _ => hnn w i') (Finset.mem_univ i)
-    have h3 := Finset.single_le_sum
-      (f := fun w' => ∑ i', ∑ j, (‖(S w' i' j : PadicAlgCl p)‖ + ‖(B w' i' j : PadicAlgCl p)‖))
-      (fun w' _ => Finset.sum_nonneg fun i' _ => hnn w' i') (Finset.mem_univ w)
+    have h2 :=
+      Finset.single_le_sum
+        (f := fun i' => ∑ j, (‖(S w i' j : PadicAlgCl p)‖ + ‖(B w i' j : PadicAlgCl p)‖))
+        (fun i' _ => hnn w i')
+        (Finset.mem_univ i)
+    have h3 :=
+      Finset.single_le_sum
+        (f := fun w' => ∑ i', ∑ j, (‖(S w' i' j : PadicAlgCl p)‖ + ‖(B w' i' j : PadicAlgCl p)‖))
+        (fun w' _ => Finset.sum_nonneg fun i' _ => hnn w' i')
+        (Finset.mem_univ w)
     linarith
   have hrowS : ∀ w i, ∑ j, ‖(S w i j : PadicAlgCl p)‖ ≤ C := by
     intro w i
@@ -90,23 +105,26 @@ theorem UpperTheory.exists_global_approx_of_local_mod_p_pow_conj :
     have : 0 ≤ ∑ w, ∑ i, ∑ j, (‖(S w i j : PadicAlgCl p)‖ + ‖(B w i j : PadicAlgCl p)‖) :=
       Finset.sum_nonneg fun w _ => Finset.sum_nonneg fun i _ => hnn w i
     linarith
-  have hp0 : (0 : ℝ) < (p : ℝ) ^ k :=
-    pow_pos (Nat.cast_pos.mpr (Fact.out : p.Prime).pos) k
+  have hp0 : (0 : ℝ) < (p : ℝ) ^ k := pow_pos (Nat.cast_pos.mpr (Fact.out : p.Prime).pos) k
   set e : ℝ := ((p : ℝ) ^ k)⁻¹ / C with he_def
   have he : 0 < e := div_pos (inv_pos.mpr hp0) hCpos
-  have hCe : C * e = ((p : ℝ) ^ k)⁻¹ := by
-    rw [he_def, mul_div_cancel₀ _ hCpos.ne']
-  have hy : ∀ i : Fin G.n, ∃ x : G.F, ∀ w,
-      ‖((G.embW w x - ((S w)⁻¹ *ᵥ a w) i : G.Fw w) : PadicAlgCl p)‖ < e ∧
-      ‖((G.embW w (IsCMField.complexConj G.F x) - ((B w)⁻¹ *ᵥ b w) i : G.Fw w) :
-        PadicAlgCl p)‖ < e :=
-    fun i => hF p G (fun w => ((S w)⁻¹ *ᵥ a w) i) (fun w => ((B w)⁻¹ *ᵥ b w) i) e he
+  have hCe : C * e = ((p : ℝ) ^ k)⁻¹ := by rw [he_def, mul_div_cancel₀ _ hCpos.ne']
+  have hy
+      : ∀ i : Fin G.n, ∃ x : G.F, ∀ w,
+        ‖((G.embW w x - ((S w)⁻¹ *ᵥ a w) i : G.Fw w) : PadicAlgCl p)‖ < e
+          ∧ ‖((G.embW w (IsCMField.complexConj G.F x) - ((B w)⁻¹ *ᵥ b w) i : G.Fw w) :
+              PadicAlgCl p)‖
+            < e := fun i =>
+    hF p G (fun w => ((S w)⁻¹ *ᵥ a w) i) (fun w => ((B w)⁻¹ *ᵥ b w) i) e he
   choose y hy using hy
-  have hA : ∀ w, ∃ c : Fin G.n → G.Fw w, (∀ i, ‖(c i : PadicAlgCl p)‖ ≤ 1) ∧
-      S w *ᵥ (fun i => G.embW w (y i)) = a w + p ^ k • c :=
+  have hA
+      : ∀ w, ∃ c : Fin G.n → G.Fw w,
+        (∀ i, ‖(c i : PadicAlgCl p)‖ ≤ 1) ∧ S w *ᵥ (fun i => G.embW w (y i)) = a w + p ^ k • c :=
     fun w => stepAt (S w) (hS w) (a w) _ k e C he.le (hrowS w) hCe (fun i => (hy i w).1)
-  have hB' : ∀ w, ∃ c : Fin G.n → G.Fw w, (∀ i, ‖(c i : PadicAlgCl p)‖ ≤ 1) ∧
-      B w *ᵥ (fun i => G.embW w (IsCMField.complexConj G.F (y i))) = b w + p ^ k • c :=
+  have hB'
+      : ∀ w, ∃ c : Fin G.n → G.Fw w,
+        (∀ i, ‖(c i : PadicAlgCl p)‖ ≤ 1)
+          ∧ B w *ᵥ (fun i => G.embW w (IsCMField.complexConj G.F (y i))) = b w + p ^ k • c :=
     fun w => stepAt (B w) (hB w) (b w) _ k e C he.le (hrowB w) hCe (fun i => (hy i w).2)
   choose a' ha'1 ha'2 using hA
   choose b' hb'1 hb'2 using hB'

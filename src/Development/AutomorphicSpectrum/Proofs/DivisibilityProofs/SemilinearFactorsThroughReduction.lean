@@ -6,13 +6,15 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.Div
 
-theorem semilinear_factors_through_reduction :
-    ∀ (A O : Type) [CommRing A] [CommRing O] (θ : A →+* O), Function.Surjective θ →
-      ∀ (ξ : A), θ ξ = 0 →
-      ∀ (M D L : Type) [AddCommGroup M] [Module A M] [AddCommGroup D] [Module O D]
-        [AddCommGroup L] [Module O L] (r : M →ₛₗ[θ] D) (q : M →ₛₗ[θ] L),
-        Function.Surjective r → (∀ m, r m = 0 ↔ ∃ n, m = ξ • n) →
-        ∃ π : D →ₗ[O] L, ∀ m, π (r m) = q m := by
+theorem semilinear_factors_through_reduction
+    : ∀ (A O : Type) [CommRing A] [CommRing O] (θ : A →+* O),
+      Function.Surjective θ
+        → ∀ (ξ : A),
+          θ ξ = 0
+            → ∀ (M D L : Type) [AddCommGroup M] [Module A M] [AddCommGroup D] [Module O D]
+                [AddCommGroup L] [Module O L] (r : M →ₛₗ[θ] D) (q : M →ₛₗ[θ] L),
+              Function.Surjective r → (∀ m, r m = 0 ↔ ∃ n, m = ξ • n)
+                → ∃ π : D →ₗ[O] L, ∀ m, π (r m) = q m := by
   intro A O _ _ θ hθ ξ hξ M D L _ _ _ _ _ _ r q hr hker
   have hq : ∀ m m', r m = r m' → q m = q m' := by
     intro m m' h

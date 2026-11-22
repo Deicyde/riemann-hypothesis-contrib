@@ -16,7 +16,8 @@ open NumberField IsDedekindDomain Formalism.L2.Pj GlobalTheory.GeoTie
 
 variable {p : ℕ} [Fact p.Prime] {F : Type} [Field F] [NumberField F] (φ : F →+* ℂ_[p])
 
-theorem le_exp_neg_one_of_lt_one {x : WithZero (Multiplicative ℤ)} (hx : x < 1) : x ≤ WithZero.exp (-1) := by
+theorem le_exp_neg_one_of_lt_one {x : WithZero (Multiplicative ℤ)} (hx : x < 1)
+    : x ≤ WithZero.exp (-1) := by
   by_cases h0 : x = 0
   · rw [h0]; exact zero_le'
   · rw [← WithZero.exp_log h0] at hx ⊢
@@ -24,7 +25,8 @@ theorem le_exp_neg_one_of_lt_one {x : WithZero (Multiplicative ℤ)} (hx : x < 1
     rw [WithZero.exp_le_exp]
     omega
 
-theorem norm_lt_one_of_valuation_lt_one {x : F} (hx : (placeAt φ).valuation F x < 1) : ‖φ x‖ < 1 := by
+theorem norm_lt_one_of_valuation_lt_one {x : F} (hx : (placeAt φ).valuation F x < 1)
+    : ‖φ x‖ < 1 := by
   obtain ⟨n, d, hnd⟩ := HeightOneSpectrum.exists_primeCompl_mul_eq_of_integer (placeAt φ) x hx.le
   have hd : ‖φ ((d : 𝓞 F) : F)‖ = 1 := le_antisymm (norm_int_le_one φ _) (not_lt.1 d.2)
   have hdv : (placeAt φ).valuation F (algebraMap (𝓞 F) F (d : 𝓞 F)) ≤ 1 := by
@@ -35,25 +37,32 @@ theorem norm_lt_one_of_valuation_lt_one {x : F} (hx : (placeAt φ).valuation F x
       rw [← hnd, map_mul]
       exact (mul_le_of_le_one_right' hdv).trans_lt hx
     rwa [HeightOneSpectrum.valuation_of_algebraMap] at h0
-  have hnm : ‖φ (n : F)‖ < 1 := (mem_placeAt φ n).1 ((HeightOneSpectrum.intValuation_lt_one_iff_mem _ n).1 hn)
+  have hnm : ‖φ (n : F)‖ < 1 :=
+    (mem_placeAt φ n).1 ((HeightOneSpectrum.intValuation_lt_one_iff_mem _ n).1 hn)
   have h2 := congrArg (fun t => ‖φ t‖) hnd
   simp only [map_mul, norm_mul] at h2
   have h3 : ‖φ x‖ * ‖φ ((d : 𝓞 F) : F)‖ = ‖φ (n : F)‖ := h2
   rw [hd, mul_one] at h3
-  rw [h3]; exact hnm
+  rw [h3]
+  exact hnm
 
-theorem exists_unif_norm_gap : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (φ : F →+* ℂ_[p]),
-    ∃ ϖ : F, 0 < ‖φ ϖ‖ ∧ ‖φ ϖ‖ < 1 ∧ ∀ c : F, ‖φ c‖ < 1 → ‖φ c‖ ≤ ‖φ ϖ‖ := by
+theorem exists_unif_norm_gap
+    : ∀ (p : ℕ) [Fact p.Prime] (F : Type) [Field F] [NumberField F] (φ : F →+* ℂ_[p]), ∃ ϖ : F,
+      0 < ‖φ ϖ‖ ∧ ‖φ ϖ‖ < 1 ∧ ∀ c : F, ‖φ c‖ < 1 → ‖φ c‖ ≤ ‖φ ϖ‖ := by
   intro p _ F _ _ φ
   set v := (placeAt φ).valuation F with hv
   obtain ⟨ϖ, hϖ⟩ := HeightOneSpectrum.valuation_exists_uniformizer F (placeAt φ)
-  have hϖ1 : v ϖ < 1 := by
-    rw [hϖ, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
+  have hϖ1 : v ϖ < 1 := by rw [hϖ, ← WithZero.exp_zero, WithZero.exp_lt_exp]; norm_num
   have hϖ0 : ϖ ≠ 0 := by
     intro h
     rw [h, map_zero] at hϖ
     exact WithZero.zero_ne_coe hϖ
-  refine ⟨ϖ, norm_pos_iff.2 ((map_ne_zero φ).2 hϖ0), norm_lt_one_of_valuation_lt_one φ hϖ1, fun c hc => ?_⟩
+  refine ⟨
+    ϖ,
+    norm_pos_iff.2 ((map_ne_zero φ).2 hϖ0),
+    norm_lt_one_of_valuation_lt_one φ hϖ1,
+    fun c hc => ?_
+  ⟩
   by_cases hc0 : c = 0
   · rw [hc0, map_zero, norm_zero]; exact norm_nonneg _
   have hvc : v c < 1 := by

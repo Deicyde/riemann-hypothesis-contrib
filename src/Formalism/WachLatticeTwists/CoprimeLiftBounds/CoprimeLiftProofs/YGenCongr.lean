@@ -25,26 +25,30 @@ lemma yGen_congr {A T' G : Type*} [Ring A] [CommRing T'] [Algebra T' A] [Group G
   exact Prod.ext (Subtype.ext hy) rfl
 
 theorem qPlace : StatQPlace := by
-  intro O _ A T' G _ _ _ _ M _ _ _ _ r χ E e₁ δ ι _ D j Kc k0 Dw I γ ζ ζO n hγ hquad hζ hpow
-    htriv hγM
-  have h1 : ∀ φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M,
-      (ζO - 1) • φ (yGen r χ E e₁ δ D j Kc k0 (γ : G)) = 0 := by
+  intro O _ A T' G _ _ _ _ M _ _ _ _ r χ E e₁ δ ι _ D j Kc k0 Dw I γ ζ ζO n hγ hquad hζ hpow htriv
+    hγM
+  have h1
+      : ∀ φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M,
+        (ζO - 1) • φ (yGen r χ E e₁ δ D j Kc k0 (γ : G)) = 0 := by
     intro φ
-    have h := smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 (r (γ : G) - 1) (γ : G)
-      (qAlg A T' G r χ E (γ : G) ζ hquad hζ)
+    have h :=
+      smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 (r (γ : G) - 1) (γ : G)
+        (qAlg A T' G r χ E (γ : G) ζ hquad hζ)
     have h2 := congrArg φ h
     rw [map_smul, map_zero, sub_smul, one_smul, hγM] at h2
     rw [sub_smul, one_smul]
     exact h2
-  have hpw : ∀ (φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M) (k : ℕ),
-      φ (yGen r χ E e₁ δ D j Kc k0 ((γ : G) ^ k)) =
-        k • φ (yGen r χ E e₁ δ D j Kc k0 (γ : G)) := by
+  have hpw
+      : ∀ (φ : ColNNJ r χ E e₁ δ D j Kc k0 →ₗ[A] M) (k : ℕ),
+        φ (yGen r χ E e₁ δ D j Kc k0 ((γ : G) ^ k))
+          = k • φ (yGen r χ E e₁ δ D j Kc k0 (γ : G)) := by
     intro φ k
     induction k with
     | zero =>
-      have h0 := smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 1 ((γ : G) ^ 0) (by
-        unfold ycoc
-        simp)
+      have h0 :=
+        smul_yGen_eq_zero r χ E e₁ δ D j Kc k0 1 ((γ : G) ^ 0) (by
+          unfold ycoc
+          simp)
       rw [one_smul] at h0
       rw [h0, map_zero, zero_smul]
     | succ k ih =>
@@ -56,27 +60,29 @@ theorem qPlace : StatQPlace := by
   set ρD := resRep (uRep O (M := M) r χ) Dw with hρD
   set ρI := resRep ρD I with hρI
   let γ' : I := ⟨γ, hγ⟩
-  let ZI : Submodule O (coZ1s ρI) :=
-    { carrier := {z | (ζO - 1) • (z : I → M) γ' = 0 ∧ ∀ g : I, (z : I → M) g = n g • (z : I → M) γ'}
-      add_mem' := by
-        rintro a b ⟨ha1, ha2⟩ ⟨hb1, hb2⟩
-        refine ⟨?_, fun g => ?_⟩
-        · show (ζO - 1) • ((a : I → M) γ' + (b : I → M) γ') = 0
-          rw [smul_add, ha1, hb1, add_zero]
-        · show (a : I → M) g + (b : I → M) g = n g • ((a : I → M) γ' + (b : I → M) γ')
-          rw [ha2 g, hb2 g, smul_add]
-      zero_mem' := ⟨smul_zero _, fun g => (smul_zero _).symm⟩
-      smul_mem' := by
-        rintro c a ⟨ha1, ha2⟩
-        refine ⟨?_, fun g => ?_⟩
-        · show (ζO - 1) • (c • (a : I → M) γ') = 0
-          rw [smul_comm, ha1, smul_zero]
-        · show c • (a : I → M) g = n g • (c • (a : I → M) γ')
-          rw [ha2 g, smul_comm] }
-  let evZ : coZ1s ρI →ₗ[O] M :=
-    { toFun := fun z => (z : I → M) γ'
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let ZI : Submodule O (coZ1s ρI) := {
+    carrier := {z | (ζO - 1) • (z : I → M) γ' = 0 ∧ ∀ g : I, (z : I → M) g = n g • (z : I → M) γ'}
+    add_mem' := by
+      rintro a b ⟨ha1, ha2⟩ ⟨hb1, hb2⟩
+      refine ⟨?_, fun g => ?_⟩
+      · show (ζO - 1) • ((a : I → M) γ' + (b : I → M) γ') = 0
+        rw [smul_add, ha1, hb1, add_zero]
+      · show (a : I → M) g + (b : I → M) g = n g • ((a : I → M) γ' + (b : I → M) γ')
+        rw [ha2 g, hb2 g, smul_add]
+    zero_mem' := ⟨smul_zero _, fun g => (smul_zero _).symm⟩
+    smul_mem' := by
+      rintro c a ⟨ha1, ha2⟩
+      refine ⟨?_, fun g => ?_⟩
+      · show (ζO - 1) • (c • (a : I → M) γ') = 0
+        rw [smul_comm, ha1, smul_zero]
+      · show c • (a : I → M) g = n g • (c • (a : I → M) γ')
+        rw [ha2 g, smul_comm]
+  }
+  let evZ : coZ1s ρI →ₗ[O] M := {
+    toFun := fun z => (z : I → M) γ'
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hev : (coB1 ρI).comap (coZ1s ρI).subtype ≤ LinearMap.ker evZ := by
     rintro z ⟨v, hv⟩
     have : (z : I → M) γ' = ρI γ' v - v := (congrFun hv γ').symm
@@ -114,8 +120,13 @@ theorem qPlace : StatQPlace := by
   · refine Module.length_le_of_injective (Submodule.liftQ _ f hk1) ?_
     rw [← LinearMap.ker_eq_bot]
     exact Submodule.ker_liftQ_eq_bot _ _ _ hk2
-  · refine ⟨restrictCocycles1 ρD I (restrictCocycles1 (uRep O (M := M) r χ) Dw
-      (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)), ⟨h1 φ, fun g => ?_⟩, rfl⟩
+  · refine ⟨
+      restrictCocycles1 ρD I
+        (restrictCocycles1 (uRep O (M := M) r χ) Dw
+          (colPsi (O := O) (M := M) r χ E e₁ δ D j Kc k0 φ)),
+      ⟨h1 φ, fun g => ?_⟩,
+      rfl
+    ⟩
     show φ (yGen r χ E e₁ δ D j Kc k0 ((g : Dw) : G)) =
       n g • φ (yGen r χ E e₁ δ D j Kc k0 (γ : G))
     rw [← hpw φ (n g)]

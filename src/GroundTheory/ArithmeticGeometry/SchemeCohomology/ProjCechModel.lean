@@ -22,46 +22,49 @@ namespace ProjSpace
 
 variable {A : Type u} [CommRing A] {n : ℕ}
 
-
 variable (A n) in
 abbrev twistAb (k : ℤ) : (Opens (projectiveSpace A n).toTopCat)ᵒᵖ ⥤ AddCommGrpCat.{u} :=
   (modulesAb (twistingSheaf (grading A n) k)).obj
 
-def awayDegEquiv {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) :
-    ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k ≃+ LDeg A (Set.range i) k :=
+def awayDegEquiv {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ)
+    : ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k ≃+ LDeg A (Set.range i) k :=
   AddEquiv.ofBijective
-    ({ toFun z := ⟨awayToLaurent i z.1, (mem_LDeg_iff i k _).2 ⟨z.1, z.2, rfl⟩⟩
+    ({
+       toFun z := ⟨awayToLaurent i z.1, (mem_LDeg_iff i k _).2 ⟨z.1, z.2, rfl⟩⟩
        map_zero' := Subtype.ext (map_zero _)
-       map_add' _ _ := Subtype.ext (map_add _ _ _) } :
-      ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k →+ LDeg A (Set.range i) k)
-    ⟨fun z z' h => Subtype.ext (awayToLaurent_injective i (congrArg Subtype.val h)),
+       map_add' _ _ := Subtype.ext (map_add _ _ _)
+     }
+      : ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k →+ LDeg A (Set.range i) k)
+    ⟨
+      fun z z' h => Subtype.ext (awayToLaurent_injective i (congrArg Subtype.val h)),
       fun ℓ => by
         obtain ⟨z, hz, h⟩ := (mem_LDeg_iff i k ℓ.1).1 ℓ.2
-        exact ⟨⟨z, hz⟩, Subtype.ext h⟩⟩
+        exact ⟨⟨z, hz⟩, Subtype.ext h⟩
+    ⟩
 
 @[simp] lemma awayDegEquiv_apply {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) (z) :
     (awayDegEquiv (A := A) i k z).1 = awayToLaurent i z.1 := rfl
 
-def sectionEquiv {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) :
-    ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k ≃+
-      Γ(twistingSheaf (grading A n) k, Proj.basicOpen (grading A n) (xprod i)) :=
-  AddEquiv.ofBijective _ (ProjTwist.toSection_bijective (X_mem (i 0))
-    (xprod_mem (i ∘ Fin.succ)) (xprod_succ i) (xprod_mem i) k)
+def sectionEquiv {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ)
+    : ProjTwist.awayDeg (grading A n) (xprod_mem i) (Nat.succ_pos p) k
+      ≃+ Γ(twistingSheaf (grading A n) k, Proj.basicOpen (grading A n) (xprod i)) :=
+  AddEquiv.ofBijective _
+    (ProjTwist.toSection_bijective (X_mem (i 0)) (xprod_mem (i ∘ Fin.succ)) (xprod_succ i)
+      (xprod_mem i) k)
 
-def resEquiv {X : TopCat.{u}} (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) {V W : Opens X} (h : V = W) :
-    P.obj (op W) ≃+ P.obj (op V) where
+def resEquiv {X : TopCat.{u}} (P : (Opens X)ᵒᵖ ⥤ AddCommGrpCat.{u}) {V W : Opens X} (h : V = W)
+    : P.obj (op W) ≃+ P.obj (op V) where
   toFun := res P h.le
   invFun := res P h.ge
   left_inv x := by rw [res_res, res_refl]
   right_inv x := by rw [res_res, res_refl]
   map_add' := map_add _
 
-
 variable (A n) in
 abbrev cover : Fin (n + 1) → Opens (projectiveSpace A n).toTopCat := stdOpen A n
 
-def theta {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ) :
-    LDeg A (Set.range i) k ≃+ (twistAb A n k).obj (op (inter (cover A n) i)) :=
+def theta {p : ℕ} (i : Fin (p + 1) → Fin (n + 1)) (k : ℤ)
+    : LDeg A (Set.range i) k ≃+ (twistAb A n k).obj (op (inter (cover A n) i)) :=
   ((awayDegEquiv i k).symm.trans (sectionEquiv i k)).trans
     (resEquiv (twistAb A n k) (inter_stdOpen i))
 
@@ -93,8 +96,8 @@ lemma res_theta {p q : ℕ} {i : Fin (p + 1) → Fin (n + 1)} {i' : Fin (q + 1) 
   rw [← awayDegEquiv_apply, ← awayDegEquiv_apply, AddEquiv.apply_symm_apply,
     AddEquiv.apply_symm_apply]
 
-def lval {k : ℤ} {p : ℕ} (σ : Cochain (twistAb A n k) (cover A n) p) (i : Fin (p + 1) → Fin (n + 1)) :
-    Laurent A n :=
+def lval {k : ℤ} {p : ℕ} (σ : Cochain (twistAb A n k) (cover A n) p) (i : Fin (p + 1) → Fin (n + 1))
+    : Laurent A n :=
   ((theta i k).symm (σ i)).1
 
 lemma lval_mem {k : ℤ} {p : ℕ} (σ : Cochain (twistAb A n k) (cover A n) p)
@@ -120,9 +123,9 @@ lemma cochain_ext {k : ℤ} {p : ℕ} {σ τ : Cochain (twistAb A n k) (cover A 
     lval (0 : Cochain (twistAb A n k) (cover A n) p) i = 0 := by
   simp [lval]
 
-def ofL {k : ℤ} {p : ℕ} (f : ∀ i : Fin (p + 1) → Fin (n + 1), LDeg A (Set.range i) k) :
-    Cochain (twistAb A n k) (cover A n) p :=
-  fun i => theta i k (f i)
+def ofL {k : ℤ} {p : ℕ} (f : ∀ i : Fin (p + 1) → Fin (n + 1), LDeg A (Set.range i) k)
+    : Cochain (twistAb A n k) (cover A n) p := fun i =>
+  theta i k (f i)
 
 @[simp] lemma lval_ofL {k : ℤ} {p : ℕ} (f : ∀ i : Fin (p + 1) → Fin (n + 1), LDeg A (Set.range i) k)
     (i) : lval (ofL f) i = (f i).1 := by

@@ -9,30 +9,45 @@ public import Development.AbelianVarietyTheory.BlockTheory.ThetaLiftGeometry.Cry
 
 @[expose] public section
 
-open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
+open NumberField IsDedekindDomain GlobalTheory.HTW GlobalTheory.HTW.Rec
+  Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions
+  Formalism.BasicNotions.Loc Formalism.FrobeniusOrbits
 
 noncomputable section
 
 namespace GlobalTheory.SubWp
 
-theorem enl_loc_eq {D : D7} {i : D.nd.Loc} {w : HeightOneSpectrum (𝓞 D.host.E)}
-    {hw : w ∈ placesOver D.host.E (D.nd.l i)} (C : Enl D i w hw) {k : ℕ}
-    (M : GE D.nd →* Matrix (Fin k) (Fin k) (D.nd.O i)) (χ : GE D.nd →* (D.nd.O i)ˣ) (g : Br.G D.nbr i w hw) :
-    C.loc (twistM M χ) g =
-      (C.inc.comp (Br.toLLK (D.nbr i w hw))) (toK D.nd i ((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i)) •
-        (mapM (toK D.nd i) M (decS D.nd w (Br.iota D.nbr i w hw g))).map (C.inc.comp (Br.toLLK (D.nbr i w hw))) := by
+theorem enl_loc_eq
+    {D : D7} {i : D.nd.Loc} {w : HeightOneSpectrum (𝓞 D.host.E)}
+    {hw : w ∈ placesOver D.host.E (D.nd.l i)} (C : Enl D i w hw)
+    {k : ℕ} (M : GE D.nd →* Matrix (Fin k) (Fin k) (D.nd.O i))
+    (χ : GE D.nd →* (D.nd.O i)ˣ) (g : Br.G D.nbr i w hw)
+    : C.loc (twistM M χ) g
+      = (C.inc.comp (Br.toLLK (D.nbr i w hw))) (toK D.nd i
+          ((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i))
+        • (mapM (toK D.nd i) M (decS D.nd w (Br.iota D.nbr i w hw g))).map
+          (C.inc.comp (Br.toLLK (D.nbr i w hw))) := by
   refine Matrix.ext fun a b => ?_
-  change C.inc ((D.nbr i w hw).toLL (((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i) *
-      M (decS D.nd w (Br.iota D.nbr i w hw g)) a b)) =
-    C.inc (Br.toLLK (D.nbr i w hw) (toK D.nd i ((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i))) *
-      C.inc (Br.toLLK (D.nbr i w hw) (toK D.nd i (M (decS D.nd w (Br.iota D.nbr i w hw g)) a b)))
+  change C.inc ((D.nbr i w hw).toLL
+      (((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i)
+        * M (decS D.nd w (Br.iota D.nbr i w hw g)) a b))
+    = C.inc (Br.toLLK (D.nbr i w hw)
+        (toK D.nd i ((χ (decS D.nd w (Br.iota D.nbr i w hw g)) : (D.nd.O i)ˣ) : D.nd.O i)))
+      * C.inc (Br.toLLK (D.nbr i w hw) (toK D.nd i (M (decS D.nd w (Br.iota D.nbr i w hw g)) a b)))
   rw [Br.toLLK_alg, Br.toLLK_alg, ← map_mul, ← map_mul, ← map_mul]
   rfl
 
 end GlobalTheory.SubWp
 
 open GlobalTheory.SubWp in
-theorem GlobalTheory.subWp_sub : ∀ {D : D7} (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E)) (hw : w ∈ placesOver D.host.E (D.nd.l i)) (C : Enl D i w hw) (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i))) (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i), GlobalTheory.IndefiniteRowSideFullHecke.CrystallineAtPlaces.Splits D i r ρ π → IsSubOfSums (matRep (C.loc (WpO D.nd i ρ π))) (fun (_ : Unit) s => C.loc (rTwO D.nd i r π) s) := by
+theorem GlobalTheory.subWp_sub
+    : ∀ {D : D7} (i : D.nd.Loc) (w : HeightOneSpectrum (𝓞 D.host.E))
+        (hw : w ∈ placesOver D.host.E (D.nd.l i)) (C : Enl D i w hw)
+        (r : D.nd.X i → (GE D.nd →* GL (Fin D.R.nV) (D.nd.O i)))
+        (ρ : D.nd.X i → (GE D.nd →* GL (Fin D.R.r) (D.nd.O i))) (π : D.nd.X i),
+      GlobalTheory.IndefiniteRowSideFullHecke.CrystallineAtPlaces.Splits D i r ρ π
+        → IsSubOfSums (matRep (C.loc (WpO D.nd i ρ π)))
+          (fun (_ : Unit) s => C.loc (rTwO D.nd i r π) s) := by
   intro D i w hw C r ρ π ⟨e, he⟩
   set f : KK D.nd i →+* ↥C.LL.1 := C.inc.comp (Br.toLLK (D.nbr i w hw)) with hf
   let A : Matrix (Fin D.R.nV) (Fin D.R.r) (KK D.nd i) :=
@@ -44,7 +59,9 @@ theorem GlobalTheory.subWp_sub : ∀ {D : D7} (i : D.nd.Loc) (w : HeightOneSpect
     congr 1
     refine LinearMap.ext fun v => ?_
     simp
-  have hRA : ∀ g, mapM (toK D.nd i) (rO D.nd i r π) g * A = A * mapM (toK D.nd i) (rhoO D.nd i ρ π) g := by
+  have hRA
+      : ∀ g,
+        mapM (toK D.nd i) (rO D.nd i r π) g * A = A * mapM (toK D.nd i) (rhoO D.nd i ρ π) g := by
     intro g
     apply Matrix.toLin'.injective
     rw [Matrix.toLin'_mul, Matrix.toLin'_mul, Matrix.toLin'_toMatrix']
@@ -57,12 +74,15 @@ theorem GlobalTheory.subWp_sub : ∀ {D : D7} (i : D.nd.Loc) (w : HeightOneSpect
   refine ⟨1, fun _ => (), (LinearMap.pi fun _ => Matrix.mulVecLin (A.map f)), ?_, ?_⟩
   · intro v v' h
     have h1 := congrArg (fun z => (B.map f).mulVec (z 0)) h
-    simp only [LinearMap.pi_apply, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, ← Matrix.map_mul, hBA,
-      Matrix.map_one f (map_zero f) (map_one f), Matrix.one_mulVec] at h1
+    simp only [LinearMap.pi_apply, Matrix.mulVecLin_apply, Matrix.mulVec_mulVec, ← Matrix.map_mul,
+        hBA, Matrix.map_one f (map_zero f) (map_one f), Matrix.one_mulVec]
+      at h1
     exact h1
   · intro g v
     funext a
     simp only [LinearMap.pi_apply, Matrix.mulVecLin_apply]
-    change (A.map f).mulVec ((C.loc (WpO D.nd i ρ π) g).mulVec v) = (C.loc (rTwO D.nd i r π) g).mulVec ((A.map f).mulVec v)
-    rw [WpO, rTwO, enl_loc_eq, enl_loc_eq, Matrix.smul_mulVec, Matrix.smul_mulVec, Matrix.mulVec_smul, Matrix.mulVec_mulVec,
-      Matrix.mulVec_mulVec, ← hf, ← Matrix.map_mul, ← Matrix.map_mul, hRA]
+    change (A.map f).mulVec ((C.loc (WpO D.nd i ρ π) g).mulVec v)
+      = (C.loc (rTwO D.nd i r π) g).mulVec ((A.map f).mulVec v)
+    rw [WpO, rTwO, enl_loc_eq, enl_loc_eq, Matrix.smul_mulVec, Matrix.smul_mulVec,
+      Matrix.mulVec_smul, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, ← hf, ← Matrix.map_mul,
+      ← Matrix.map_mul, hRA]

@@ -12,12 +12,16 @@ theorem kapC_mono {p n n' d d' : ℕ} (hn : n ≤ n') (hd : d ≤ d') : kapC p n
   unfold kapC
   exact Nat.mul_le_mul (Nat.choose_le_choose 2 hn) (Nat.log_mono_right (by omega))
 
-theorem pow_smul_mem_of_le {p : ℕ} [Fact p.Prime] {σ : Type} (L : Submodule ℤ_[p] (MvPolynomial σ ℚ_[p]))
-    {k e : ℕ} (hke : k ≤ e) {y : MvPolynomial σ ℚ_[p]} (hy : ((p : ℚ_[p]) ^ k) • y ∈ L) :
-    ((p : ℚ_[p]) ^ e) • y ∈ L := by
+theorem pow_smul_mem_of_le
+    {p : ℕ} [Fact p.Prime]
+    {σ : Type} (L : Submodule ℤ_[p] (MvPolynomial σ ℚ_[p]))
+    {k e : ℕ} (hke : k ≤ e)
+    {y : MvPolynomial σ ℚ_[p]} (hy : ((p : ℚ_[p]) ^ k) • y ∈ L)
+    : ((p : ℚ_[p]) ^ e) • y ∈ L := by
   have h := L.smul_mem ((p : ℤ_[p]) ^ (e - k)) hy
   rw [← algebraMap_smul ℚ_[p] ((p : ℤ_[p]) ^ (e - k)), smul_smul] at h
-  have e2 : ((p : ℚ_[p]) ^ e) = algebraMap ℤ_[p] ℚ_[p] ((p : ℤ_[p]) ^ (e - k)) * (p : ℚ_[p]) ^ k := by
+  have e2
+      : ((p : ℚ_[p]) ^ e) = algebraMap ℤ_[p] ℚ_[p] ((p : ℤ_[p]) ^ (e - k)) * (p : ℚ_[p]) ^ k := by
     rw [map_pow, map_natCast, ← pow_add, Nat.sub_add_cancel hke]
   rw [e2]
   exact h
@@ -25,8 +29,10 @@ theorem pow_smul_mem_of_le {p : ℕ} [Fact p.Prime] {σ : Type} (L : Submodule �
 theorem dischargeP_of (h1 : ProjP) (h2 : CommP) (h3 : IntP) : DischargeP := by
   intro p _ N r LL ρ e1 he
   unfold Formalism.GM.M.HypP
-  refine ⟨fun j _ Cs _ T hT => ?_, fun j j' Cs Cs' T T' P P' hj hC _ _ hP hP' =>
-    h2 p N r LL j j' Cs Cs' T T' P P' hj hC hP hP'⟩
+  refine ⟨
+    fun j _ Cs _ T hT => ?_,
+    fun j j' Cs Cs' T T' P P' hj hC _ _ hP hP' => h2 p N r LL j j' Cs Cs' T T' P P' hj hC hP hP'
+  ⟩
   obtain ⟨P, hP, hsym⟩ := h1 p N r LL j Cs T hT
   refine ⟨P, hP, hsym, fun F hF => ?_⟩
   have hcard : Cs.card ≤ r := by simpa using Finset.card_le_univ Cs
@@ -48,8 +54,8 @@ theorem dischargeE_of (h : ExtP) : DischargeE := by
   have hk : kapC p (r - 1) LL.total ≤ e1 := (kapC_mono (Nat.sub_le r 1) le_rfl).trans he
   exact ⟨P, h1, h2, h3, h4, fun F hF hW => pow_smul_mem_of_le _ hk (h5 F hF hW)⟩
 
-theorem kapC_le_real (p : ℕ) [Fact p.Prime] (r d a : ℕ) (h : d + r ≤ p ^ 2 * (8 * a + r) ^ 2) :
-    (kapC p r d : ℝ) ≤ (r : ℝ) ^ 2 * lgV2 p a r := by
+theorem kapC_le_real (p : ℕ) [Fact p.Prime] (r d a : ℕ) (h : d + r ≤ p ^ 2 * (8 * a + r) ^ 2)
+    : (kapC p r d : ℝ) ≤ (r : ℝ) ^ 2 * lgV2 p a r := by
   rcases Nat.eq_zero_or_pos r with hr | hr
   · subst hr
     simp [kapC]
@@ -83,15 +89,19 @@ theorem kapC_le_real (p : ℕ) [Fact p.Prime] (r d a : ℕ) (h : d + r ≤ p ^ 2
   have hc : ((r.choose 2 : ℕ) : ℝ) * 2 ≤ (r : ℝ) ^ 2 := by
     have hn : r.choose 2 * 2 ≤ r ^ 2 := by
       rw [Nat.choose_two_right]
-      calc r * (r - 1) / 2 * 2 ≤ r * (r - 1) := Nat.div_mul_le_self _ _
+      calc
+        r * (r - 1) / 2 * 2
+          ≤ r * (r - 1) := Nat.div_mul_le_self _ _
         _ ≤ r ^ 2 := by
           rw [sq]
           exact Nat.mul_le_mul_left _ (Nat.sub_le _ _)
     exact_mod_cast hn
   unfold kapC
   push_cast
-  calc ((r.choose 2 : ℕ) : ℝ) * ((Nat.log p (d + r - 1) : ℕ) : ℝ)
-      ≤ ((r.choose 2 : ℕ) : ℝ) * (2 * lgV2 p a r) := mul_le_mul_of_nonneg_left hL (Nat.cast_nonneg _)
+  calc
+    ((r.choose 2 : ℕ) : ℝ) * ((Nat.log p (d + r - 1) : ℕ) : ℝ)
+        ≤ ((r.choose 2 : ℕ) : ℝ) * (2 * lgV2 p a r) :=
+      mul_le_mul_of_nonneg_left hL (Nat.cast_nonneg _)
     _ = (((r.choose 2 : ℕ) : ℝ) * 2) * lgV2 p a r := by ring
     _ ≤ (r : ℝ) ^ 2 * lgV2 p a r := mul_le_mul_of_nonneg_right hc hlg
 

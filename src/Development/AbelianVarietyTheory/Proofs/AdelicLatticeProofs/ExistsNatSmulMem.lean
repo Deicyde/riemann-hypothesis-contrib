@@ -8,8 +8,8 @@ namespace GlobalTheory.NatMulIntegral
 
 open NumberField
 
-theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (a : E) :
-    ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * a) := by
+theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (a : E)
+    : ∃ d : ℕ, 0 < d ∧ IsIntegral ℤ ((d : E) * a) := by
   have h1 : IsAlgebraic ℚ a := Algebra.IsAlgebraic.isAlgebraic a
   have h2 : IsAlgebraic ℤ a := (IsFractionRing.isAlgebraic_iff ℤ ℚ E).mpr h1
   obtain ⟨y, hy, hi⟩ := h2.exists_integral_multiple
@@ -23,16 +23,20 @@ theorem exists_nat_mul_isIntegral {E : Type} [Field E] [NumberField E] (a : E) :
     rw [hc, h', Int.cast_neg, neg_mul]
     exact hi.neg
 
-theorem nat_smul_mem {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (RingOfIntegers E) (Fin n → E)) (d : ℕ) {x : Fin n → E} (hx : x ∈ L) :
-    (d : E) • x ∈ L := by
+theorem nat_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (RingOfIntegers E) (Fin n → E))
+    (d : ℕ)
+    {x : Fin n → E} (hx : x ∈ L)
+    : (d : E) • x ∈ L := by
   rw [Nat.cast_smul_eq_nsmul]
   exact nsmul_mem hx d
 
-theorem exists_nat_smul_mem {E : Type} [Field E] [NumberField E] {n : ℕ}
-    (L : Submodule (RingOfIntegers E) (Fin n → E))
-    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (y : Fin n → E) :
-    ∃ d : ℕ, 0 < d ∧ (d : E) • y ∈ L := by
+theorem exists_nat_smul_mem
+    {E : Type} [Field E] [NumberField E]
+    {n : ℕ} (L : Submodule (RingOfIntegers E) (Fin n → E))
+    (hL : Submodule.span E (L : Set (Fin n → E)) = ⊤) (y : Fin n → E)
+    : ∃ d : ℕ, 0 < d ∧ (d : E) • y ∈ L := by
   have hy : y ∈ Submodule.span E (L : Set (Fin n → E)) := hL ▸ Submodule.mem_top
   induction hy using Submodule.span_induction with
   | mem x hx => exact ⟨1, one_pos, by simpa using hx⟩

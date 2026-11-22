@@ -6,8 +6,10 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing UpperTheory.V.Alg UpperTheory.V.CA ReciprocityTheory.CA
 
-theorem UpperTheory.V.CA.inj_dim :
-    ∀ (A B : Type) [CommRing A] [IsDomain A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B] (d : ℕ), ringKrullDim A = d → ringKrullDim B = d → Function.Injective (algebraMap A B) := by
+theorem UpperTheory.V.CA.inj_dim
+    : ∀ (A B : Type) [CommRing A] [IsDomain A] [CommRing B] [Algebra A B] [Algebra.IsIntegral A B]
+        (d : ℕ),
+      ringKrullDim A = d → ringKrullDim B = d → Function.Injective (algebraMap A B) := by
   intro A B _ _ _ _ _ d hA hB
   by_contra hni
   obtain ⟨r, hr, hr0⟩ : ∃ r : A, algebraMap A B r = 0 ∧ r ≠ 0 := by
@@ -15,10 +17,11 @@ theorem UpperTheory.V.CA.inj_dim :
     push_neg at hni
     exact hni
   have hrz : r ∈ nonZeroDivisors A := mem_nonZeroDivisors_of_ne_zero hr0
-  let g : (A ⧸ Ideal.span {r}) →+* B := Ideal.Quotient.lift (Ideal.span {r}) (algebraMap A B) (by
-    intro a ha
-    obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp ha
-    rw [map_mul, hr, mul_zero])
+  let g : (A ⧸ Ideal.span {r}) →+* B :=
+    Ideal.Quotient.lift (Ideal.span {r}) (algebraMap A B) (by
+      intro a ha
+      obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton'.mp ha
+      rw [map_mul, hr, mul_zero])
   letI : Algebra (A ⧸ Ideal.span {r}) B := g.toAlgebra
   haveI : Algebra.IsIntegral (A ⧸ Ideal.span {r}) B := by
     refine ⟨fun b => ?_⟩
@@ -28,8 +31,9 @@ theorem UpperTheory.V.CA.inj_dim :
     exact hpb
   have h1 : ringKrullDim B ≤ ringKrullDim (A ⧸ Ideal.span {r}) :=
     Order.krullDim_le_of_strictMono
-      (fun P => (⟨Ideal.comap (algebraMap (A ⧸ Ideal.span {r}) B) P.asIdeal, inferInstance⟩ :
-        PrimeSpectrum _))
+      (fun P =>
+        (⟨Ideal.comap (algebraMap (A ⧸ Ideal.span {r}) B) P.asIdeal, inferInstance⟩
+          : PrimeSpectrum _))
       (fun P Q h => Ideal.IsIntegral.comap_lt_comap h)
   have h2 := ringKrullDim_quotient_succ_le_of_nonZeroDivisor hrz
   rw [hA] at h2

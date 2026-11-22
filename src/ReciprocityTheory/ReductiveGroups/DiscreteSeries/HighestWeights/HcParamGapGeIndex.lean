@@ -14,9 +14,8 @@ open ReciprocityTheory.ChartRestriction.DS ReciprocityTheory.ChartRestriction.DS
 
 variable {n : ℕ}
 
-theorem hc_param_gap_ge_index (lam : Fin n → ℝ) (hlam : IsHCParam lam) (a b : Fin n) (hab : a ≤ b) :
-    ((b : ℕ) : ℝ) - (a : ℕ) ≤ lam a - lam b := by
-
+theorem hc_param_gap_ge_index (lam : Fin n → ℝ) (hlam : IsHCParam lam) (a b : Fin n) (hab : a ≤ b)
+    : ((b : ℕ) : ℝ) - (a : ℕ) ≤ lam a - lam b := by
   have gap : ∀ i j : Fin n, i < j → lam j + 1 ≤ lam i := by
     intro i j hij
     obtain ⟨mi, hi⟩ := hlam.2 i
@@ -28,7 +27,9 @@ theorem hc_param_gap_ge_index (lam : Fin n → ℝ) (hlam : IsHCParam lam) (a b 
       have := Int.add_one_le_of_lt h2
       exact_mod_cast this
     linarith
-  have key : ∀ k : ℕ, ∀ c : Fin n, a ≤ c → (c : ℕ) = a + k → ((c : ℕ) : ℝ) - (a : ℕ) ≤ lam a - lam c := by
+  have key
+      : ∀ k : ℕ, ∀ c : Fin n,
+        a ≤ c → (c : ℕ) = a + k → ((c : ℕ) : ℝ) - (a : ℕ) ≤ lam a - lam c := by
     intro k
     induction k with
     | zero =>
@@ -52,11 +53,13 @@ theorem hc_param_gap_ge_index (lam : Fin n → ℝ) (hlam : IsHCParam lam) (a b 
   have hab' := Fin.le_def.mp hab
   exact key ((b : ℕ) - a) b hab (by omega)
 
-theorem lowK_card_gt (ε : Fin n → Bool) (a : Fin n) :
-    (univ.filter fun b => a < b ∧ ε b ≠ ε a).card + (univ.filter fun b => a < b ∧ ε b = ε a).card
+theorem lowK_card_gt (ε : Fin n → Bool) (a : Fin n)
+    : (univ.filter fun b => a < b ∧ ε b ≠ ε a).card + (univ.filter fun b => a < b ∧ ε b = ε a).card
       = n - 1 - a := by
-  have key : ∀ s : Finset (Fin n), (s.filter (fun b => ε b ≠ ε a)).card +
-      (s.filter (fun b => ¬ (ε b ≠ ε a))).card = s.card := by
+  have key
+      : ∀ s : Finset (Fin n),
+        (s.filter (fun b => ε b ≠ ε a)).card + (s.filter (fun b => ¬(ε b ≠ ε a))).card
+          = s.card := by
     intro s
     first
     | exact Finset.card_filter_add_card_filter_not _
@@ -68,11 +71,13 @@ theorem lowK_card_gt (ε : Fin n → Bool) (a : Fin n) :
   rw [← Fin.card_Ioi a, ← key (Finset.Ioi a)]
   congr 1 <;> congr 1 <;> ext b <;> simp
 
-theorem lowK_card_lt (ε : Fin n → Bool) (a : Fin n) :
-    (univ.filter fun b => b < a ∧ ε b ≠ ε a).card + (univ.filter fun b => b < a ∧ ε b = ε a).card
+theorem lowK_card_lt (ε : Fin n → Bool) (a : Fin n)
+    : (univ.filter fun b => b < a ∧ ε b ≠ ε a).card + (univ.filter fun b => b < a ∧ ε b = ε a).card
       = a := by
-  have key : ∀ s : Finset (Fin n), (s.filter (fun b => ε b ≠ ε a)).card +
-      (s.filter (fun b => ¬ (ε b ≠ ε a))).card = s.card := by
+  have key
+      : ∀ s : Finset (Fin n),
+        (s.filter (fun b => ε b ≠ ε a)).card + (s.filter (fun b => ¬(ε b ≠ ε a))).card
+          = s.card := by
     intro s
     first
     | exact Finset.card_filter_add_card_filter_not _
@@ -84,10 +89,10 @@ theorem lowK_card_lt (ε : Fin n → Bool) (a : Fin n) :
   rw [← Fin.card_Iio a, ← key (Finset.Iio a)]
   congr 1 <;> congr 1 <;> ext b <;> simp
 
-theorem lowest_k_type_formula (ε : Fin n → Bool) (lam : Fin n → ℝ) (a : Fin n) :
-    lowK ε lam a = lam a + ((n : ℝ) - 1) / 2 - (a : ℕ)
-      - ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℝ)
-      + ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℝ) := by
+theorem lowest_k_type_formula (ε : Fin n → Bool) (lam : Fin n → ℝ) (a : Fin n)
+    : lowK ε lam a
+      = lam a + ((n : ℝ) - 1) / 2 - (a : ℕ) - ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℝ)
+        + ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℝ) := by
   have hg := lowK_card_gt ε a
   have hl := lowK_card_lt ε a
   have ha := a.isLt
@@ -101,55 +106,65 @@ theorem lowest_k_type_formula (ε : Fin n → Bool) (lam : Fin n → ℝ) (a : F
   have e2 : ((A3 : ℕ) : ℝ) + A4 = (a : ℕ) := by exact_mod_cast hl
   linarith
 
-theorem lowK_int_dom (ε : Fin n → Bool) (lam : Fin n → ℝ) (hlam : IsHCParam lam) :
-    (∀ a, ∃ m : ℤ, lowK ε lam a = m) ∧ ∀ a b, a < b → ε a = ε b → lowK ε lam b ≤ lowK ε lam a := by
+theorem lowK_int_dom (ε : Fin n → Bool) (lam : Fin n → ℝ) (hlam : IsHCParam lam)
+    : (∀ a, ∃ m : ℤ, lowK ε lam a = m)
+      ∧ ∀ a b, a < b → ε a = ε b → lowK ε lam b ≤ lowK ε lam a := by
   refine ⟨fun a => ?_, fun a b hab he => ?_⟩
   · obtain ⟨m, hm⟩ := hlam.2 a
-    refine ⟨m + (n : ℤ) - 1 - ((a : ℕ) : ℤ) - ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℤ)
-      + ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℤ), ?_⟩
+    refine ⟨
+      m + (n : ℤ) - 1 - ((a : ℕ) : ℤ) - ((univ.filter fun b => a < b ∧ ε b = ε a).card : ℤ)
+        + ((univ.filter fun b => b < a ∧ ε b = ε a).card : ℤ),
+      ?_
+    ⟩
     rw [lowest_k_type_formula]
     push_cast
     linarith
   · have hs : ε b = ε a := he.symm
     have hab' : (a : ℕ) ≤ b := le_of_lt (Fin.lt_def.mp hab)
 
-    have c1 : (univ.filter fun c => a < c ∧ ε c = ε a).card ≤
-        (univ.filter fun c => b < c ∧ ε c = ε b).card + ((b : ℕ) - a) := by
-      calc _ ≤ ((univ.filter fun c => b < c ∧ ε c = ε b) ∪ Finset.Ioc a b).card := by
-            apply Finset.card_le_card
-            intro c hc
-            simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union,
-              Finset.mem_Ioc] at hc ⊢
-            rw [hs]
-            by_cases hcb : b < c
-            · exact Or.inl ⟨hcb, hc.2⟩
-            · exact Or.inr ⟨hc.1, not_lt.mp hcb⟩
+    have c1
+        : (univ.filter fun c => a < c ∧ ε c = ε a).card
+          ≤ (univ.filter fun c => b < c ∧ ε c = ε b).card + ((b : ℕ) - a) := by
+      calc
+        _ ≤ ((univ.filter fun c => b < c ∧ ε c = ε b) ∪ Finset.Ioc a b).card := by
+          apply Finset.card_le_card
+          intro c hc
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union, Finset.mem_Ioc]
+            at hc ⊢
+          rw [hs]
+          by_cases hcb : b < c
+          · exact Or.inl ⟨hcb, hc.2⟩
+          · exact Or.inr ⟨hc.1, not_lt.mp hcb⟩
         _ ≤ _ := by
-            rw [← Fin.card_Ioc]
-            exact Finset.card_union_le _ _
-    have c2 : (univ.filter fun c => c < b ∧ ε c = ε b).card ≤
-        (univ.filter fun c => c < a ∧ ε c = ε a).card + ((b : ℕ) - a) := by
-      calc _ ≤ ((univ.filter fun c => c < a ∧ ε c = ε a) ∪ Finset.Ico a b).card := by
-            apply Finset.card_le_card
-            intro c hc
-            simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union,
-              Finset.mem_Ico] at hc ⊢
-            rw [← hs]
-            by_cases hca : c < a
-            · exact Or.inl ⟨hca, hc.2⟩
-            · exact Or.inr ⟨not_lt.mp hca, hc.1⟩
+          rw [← Fin.card_Ioc]
+          exact Finset.card_union_le _ _
+    have c2
+        : (univ.filter fun c => c < b ∧ ε c = ε b).card
+          ≤ (univ.filter fun c => c < a ∧ ε c = ε a).card + ((b : ℕ) - a) := by
+      calc
+        _ ≤ ((univ.filter fun c => c < a ∧ ε c = ε a) ∪ Finset.Ico a b).card := by
+          apply Finset.card_le_card
+          intro c hc
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union, Finset.mem_Ico]
+            at hc ⊢
+          rw [← hs]
+          by_cases hca : c < a
+          · exact Or.inl ⟨hca, hc.2⟩
+          · exact Or.inr ⟨not_lt.mp hca, hc.1⟩
         _ ≤ _ := by
-            rw [← Fin.card_Ico]
-            exact Finset.card_union_le _ _
+          rw [← Fin.card_Ico]
+          exact Finset.card_union_le _ _
     have gap := hc_param_gap_ge_index lam hlam a b hab.le
-    have c1r : (((univ.filter fun c => a < c ∧ ε c = ε a).card : ℕ) : ℝ) ≤
-        ((univ.filter fun c => b < c ∧ ε c = ε b).card : ℕ) + (((b : ℕ) : ℝ) - (a : ℕ)) := by
+    have c1r
+        : (((univ.filter fun c => a < c ∧ ε c = ε a).card : ℕ) : ℝ)
+          ≤ ((univ.filter fun c => b < c ∧ ε c = ε b).card : ℕ) + (((b : ℕ) : ℝ) - (a : ℕ)) := by
       have := c1
       rw [← Nat.cast_le (α := ℝ)] at this
       push_cast [Nat.cast_sub hab'] at this
       linarith
-    have hcard₃ : (((univ.filter fun c => c < b ∧ ε c = ε b).card : ℕ) : ℝ) ≤
-        ((univ.filter fun c => c < a ∧ ε c = ε a).card : ℕ) + (((b : ℕ) : ℝ) - (a : ℕ)) := by
+    have hcard₃
+        : (((univ.filter fun c => c < b ∧ ε c = ε b).card : ℕ) : ℝ)
+          ≤ ((univ.filter fun c => c < a ∧ ε c = ε a).card : ℕ) + (((b : ℕ) : ℝ) - (a : ℕ)) := by
       have := c2
       rw [← Nat.cast_le (α := ℝ)] at this
       push_cast [Nat.cast_sub hab'] at this

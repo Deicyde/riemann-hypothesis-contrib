@@ -8,13 +8,16 @@ open Finset Function
 
 namespace GlobalTheory
 
-theorem multilinear_vanish_of_prod_vanish_of_agree_off_finset {K : Type} [Field K] {ι : Type} [Fintype ι]
-    [DecidableEq ι] {X : ι → Type} (A : ∀ i, Submodule K (X i → K)) {M : Type} [AddCommGroup M]
-    [Module K M] (P : (∀ i, A i) →ₘₗ[K] M) (S : Finset ι) :
-    ∀ {D : Type} (s : Finset D) (c : D → K) (f : D → ∀ i, A i),
-      (∀ i ∉ S, ∀ d ∈ s, ∀ d' ∈ s, f d i = f d' i) →
-      (∀ x : ∀ i, X i, ∑ d ∈ s, c d * ∏ i, (f d i : X i → K) (x i) = 0) →
-      ∑ d ∈ s, c d • P (f d) = 0 := by
+theorem multilinear_vanish_of_prod_vanish_of_agree_off_finset
+    {K : Type} [Field K]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {X : ι → Type} (A : ∀ i, Submodule K (X i → K))
+    {M : Type} [AddCommGroup M] [Module K M]
+    (P : (∀ i, A i) →ₘₗ[K] M) (S : Finset ι)
+    : ∀ {D : Type} (s : Finset D) (c : D → K) (f : D → ∀ i, A i),
+      (∀ i ∉ S, ∀ d ∈ s, ∀ d' ∈ s, f d i = f d' i)
+        → (∀ x : ∀ i, X i, ∑ d ∈ s, c d * ∏ i, (f d i : X i → K) (x i) = 0)
+        → ∑ d ∈ s, c d • P (f d) = 0 := by
   induction S using Finset.induction_on with
   | empty =>
     intro D s c f hconst hx
@@ -25,7 +28,8 @@ theorem multilinear_vanish_of_prod_vanish_of_agree_off_finset {K : Type} [Field 
     have hsum : ∑ d ∈ s, c d • P (f d) = (∑ d ∈ s, c d) • P (f d₀) := by
       rw [Finset.sum_smul]; exact Finset.sum_congr rfl fun d hd => by rw [hf d hd]
     have hx' : ∀ x : ∀ i, X i, (∑ d ∈ s, c d) * ∏ i, (f d₀ i : X i → K) (x i) = 0 := by
-      intro x; rw [Finset.sum_mul, ← hx x]
+      intro x
+      rw [Finset.sum_mul, ← hx x]
       exact Finset.sum_congr rfl fun d hd => by rw [hf d hd]
     rw [hsum]
     by_cases hc : ∑ d ∈ s, c d = 0
@@ -70,23 +74,28 @@ theorem multilinear_vanish_of_prod_vanish_of_agree_off_finset {K : Type} [Field 
       refine Finset.sum_congr rfl fun l _ => ?_
       rw [P.map_update_smul, RingHom.id_apply, update_idem]
 
-    have hsplit : ∀ (g : ∀ i, A i) (y : ∀ i, X i), ∏ i, (g i : X i → K) (y i) =
-        (g i₀ : X i₀ → K) (y i₀) * ∏ i ∈ univ.erase i₀, (g i : X i → K) (y i) := fun g y =>
+    have hsplit
+        : ∀ (g : ∀ i, A i) (y : ∀ i, X i),
+          ∏ i, (g i : X i → K) (y i)
+            = (g i₀ : X i₀ → K) (y i₀) * ∏ i ∈ univ.erase i₀, (g i : X i → K) (y i) := fun g y =>
       (Finset.mul_prod_erase univ (fun i => (g i : X i → K) (y i)) (mem_univ i₀)).symm
-    have hupd : ∀ (g : ∀ i, A i) (v : A i₀) (y : ∀ i, X i),
-        ∏ i ∈ univ.erase i₀, (update g i₀ v i : X i → K) (y i) =
-          ∏ i ∈ univ.erase i₀, (g i : X i → K) (y i) := fun g v y =>
+    have hupd
+        : ∀ (g : ∀ i, A i) (v : A i₀) (y : ∀ i, X i),
+          ∏ i ∈ univ.erase i₀, (update g i₀ v i : X i → K) (y i)
+            = ∏ i ∈ univ.erase i₀, (g i : X i → K) (y i) := fun g v y =>
       Finset.prod_congr rfl fun i hi => by rw [update_of_ne (Finset.ne_of_mem_erase hi)]
-    have hupdx : ∀ (g : ∀ i, A i) (y : ∀ i, X i) (t : X i₀),
-        ∏ i ∈ univ.erase i₀, (g i : X i → K) (update y i₀ t i) =
-          ∏ i ∈ univ.erase i₀, (g i : X i → K) (y i) := fun g y t =>
+    have hupdx
+        : ∀ (g : ∀ i, A i) (y : ∀ i, X i) (t : X i₀),
+          ∏ i ∈ univ.erase i₀, (g i : X i → K) (update y i₀ t i)
+            = ∏ i ∈ univ.erase i₀, (g i : X i → K) (y i) := fun g y t =>
       Finset.prod_congr rfl fun i hi => by rw [update_of_ne (Finset.ne_of_mem_erase hi)]
     have hli : LinearIndependent K (fun l => ((b l : A i₀) : X i₀ → K)) :=
       b.linearIndependent.map' ((A i₀).subtype ∘ₗ W.subtype)
         (LinearMap.ker_eq_bot_of_injective (Subtype.val_injective.comp Subtype.val_injective))
 
-    have hB : ∀ (x : ∀ i, X i) (l : Fin (Module.finrank K W)),
-        ∑ d ∈ s, c d * a d l * ∏ i ∈ univ.erase i₀, (f d i : X i → K) (x i) = 0 := by
+    have hB
+        : ∀ (x : ∀ i, X i) (l : Fin (Module.finrank K W)),
+          ∑ d ∈ s, c d * a d l * ∏ i ∈ univ.erase i₀, (f d i : X i → K) (x i) = 0 := by
       intro x
       refine Fintype.linearIndependent_iff.mp hli _ ?_
       funext t
@@ -101,15 +110,15 @@ theorem multilinear_vanish_of_prod_vanish_of_agree_off_finset {K : Type} [Field 
         smul_eq_mul, Finset.sum_mul, Finset.mul_sum]
       refine Finset.sum_congr rfl fun l _ => ?_
       ring
-    have hstep : ∑ d ∈ s, c d • P (f d) =
-        ∑ l, ∑ d ∈ s, (c d * a d l) • P (update (f d) i₀ (b l)) := by
+    have hstep
+        : ∑ d ∈ s, c d • P (f d) = ∑ l, ∑ d ∈ s, (c d * a d l) • P (update (f d) i₀ (b l)) := by
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun d hd => ?_
       rw [hP d hd, Finset.smul_sum]
       simp only [mul_smul]
     rw [hstep]
-    refine Finset.sum_eq_zero fun l _ => ih s (fun d => c d * a d l)
-      (fun d => update (f d) i₀ (b l)) ?_ ?_
+    refine Finset.sum_eq_zero fun l _ =>
+      ih s (fun d => c d * a d l) (fun d => update (f d) i₀ (b l)) ?_ ?_
     · intro i hi d hd d' hd'
       by_cases h : i = i₀
       · subst h; simp
@@ -117,21 +126,27 @@ theorem multilinear_vanish_of_prod_vanish_of_agree_off_finset {K : Type} [Field 
         exact hconst i (by simp [h, hi]) d hd d' hd'
     · intro x
       have h := hB x l
-      calc ∑ d ∈ s, c d * a d l * ∏ i, (update (f d) i₀ (b l) i : X i → K) (x i)
-          = ((b l : A i₀) : X i₀ → K) (x i₀) *
-              ∑ d ∈ s, c d * a d l * ∏ i ∈ univ.erase i₀, (f d i : X i → K) (x i) := by
-            rw [Finset.mul_sum]
-            refine Finset.sum_congr rfl fun d _ => ?_
-            rw [hsplit, hupd, update_self]
-            ring
+      calc
+        ∑ d ∈ s, c d * a d l * ∏ i, (update (f d) i₀ (b l) i : X i → K) (x i)
+            = ((b l : A i₀) : X i₀ → K) (x i₀)
+              * ∑ d ∈ s, c d * a d l * ∏ i ∈ univ.erase i₀, (f d i : X i → K) (x i) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun d _ => ?_
+          rw [hsplit, hupd, update_self]
+          ring
         _ = 0 := by rw [h, mul_zero]
 
-theorem multilinear_vanish_of_prod_vanish {K : Type} [Field K] {ι : Type} [Fintype ι]
-    [DecidableEq ι] {X : ι → Type} (A : ∀ i, Submodule K (X i → K)) {M : Type} [AddCommGroup M]
-    [Module K M] (P : (∀ i, A i) →ₘₗ[K] M) {D : Type} (s : Finset D) (c : D → K)
-    (f : D → ∀ i, A i)
-    (hx : ∀ x : ∀ i, X i, ∑ d ∈ s, c d * ∏ i, (f d i : X i → K) (x i) = 0) :
-    ∑ d ∈ s, c d • P (f d) = 0 :=
-  multilinear_vanish_of_prod_vanish_of_agree_off_finset A P univ s c f (fun i hi => absurd (mem_univ i) hi) hx
+theorem multilinear_vanish_of_prod_vanish
+    {K : Type} [Field K]
+    {ι : Type} [Fintype ι] [DecidableEq ι]
+    {X : ι → Type} (A : ∀ i, Submodule K (X i → K))
+    {M : Type} [AddCommGroup M] [Module K M]
+    (P : (∀ i, A i) →ₘₗ[K] M)
+    {D : Type} (s : Finset D) (c : D → K) (f : D → ∀ i, A i)
+    (hx : ∀ x : ∀ i, X i, ∑ d ∈ s, c d * ∏ i, (f d i : X i → K) (x i) = 0)
+    : ∑ d ∈ s, c d • P (f d) = 0 :=
+  multilinear_vanish_of_prod_vanish_of_agree_off_finset A P univ s c f
+    (fun i hi => absurd (mem_univ i) hi)
+    hx
 
 end GlobalTheory

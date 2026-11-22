@@ -9,7 +9,8 @@ public import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBoun
 
 noncomputable section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology TensorProduct
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology TensorProduct
 
 namespace UpperTheory.V.Base
 
@@ -22,7 +23,8 @@ def QO : Type := O ⊗[ℤ_[l]] QZ l
 instance : AddCommGroup (QO l O) := inferInstanceAs (AddCommGroup (O ⊗[ℤ_[l]] QZ l))
 instance : Module O (QO l O) := inferInstanceAs (Module O (O ⊗[ℤ_[l]] QZ l))
 instance : Module ℤ_[l] (QO l O) := inferInstanceAs (Module ℤ_[l] (O ⊗[ℤ_[l]] QZ l))
-instance : IsScalarTower ℤ_[l] O (QO l O) := inferInstanceAs (IsScalarTower ℤ_[l] O (O ⊗[ℤ_[l]] QZ l))
+instance : IsScalarTower ℤ_[l] O (QO l O) :=
+  inferInstanceAs (IsScalarTower ℤ_[l] O (O ⊗[ℤ_[l]] QZ l))
 instance : TopologicalSpace (QO l O) := ⊥
 instance : DiscreteTopology (QO l O) := ⟨rfl⟩
 instance : IsTopologicalAddGroup (QO l O) where
@@ -35,8 +37,9 @@ theorem QO.isBaseChange : IsBaseChange O (QO.incl l O) := TensorProduct.isBaseCh
 
 def eO : ℕ∞ := Module.length O (O ⧸ Ideal.span {(l : O)})
 
-abbrev twist₂ {Γ : Type} [Group Γ] {O : Type} [CommRing O] [Algebra ℤ_[l] O] (θ : Γ →* Oˣ) :
-    Representation O Γ (QO l O) := scalRep (QO l O) θ
+abbrev twist₂ {Γ : Type} [Group Γ] {O : Type} [CommRing O] [Algebra ℤ_[l] O] (θ : Γ →* Oˣ)
+    : Representation O Γ (QO l O) :=
+  scalRep (QO l O) θ
 
 end Coeff
 
@@ -50,14 +53,16 @@ def galOf : Subgroup (G k Ω) where
   mul_mem' {a b} ha hb x := by rw [AlgEquiv.mul_apply, hb, ha]
   inv_mem' {a} ha x := a.symm_apply_eq.2 (ha x).symm
 
-theorem mem_galOf {σ : G k Ω} : σ ∈ galOf k E Ω ↔ ∀ x : E, σ (algebraMap E Ω x) = algebraMap E Ω x := Iff.rfl
+theorem mem_galOf {σ : G k Ω}
+    : σ ∈ galOf k E Ω ↔ ∀ x : E, σ (algebraMap E Ω x) = algebraMap E Ω x :=
+  Iff.rfl
 
 theorem galOf_self : galOf k k Ω = ⊤ := by
   ext σ
   exact ⟨fun _ => Subgroup.mem_top σ, fun _ => (mem_galOf k k Ω).2 fun x => σ.commutes x⟩
 
-theorem galOf_le (E' : Type) [Field E'] [Algebra E E'] [Algebra E' Ω] [IsScalarTower E E' Ω] :
-    galOf k E' Ω ≤ galOf k E Ω := by
+theorem galOf_le (E' : Type) [Field E'] [Algebra E E'] [Algebra E' Ω] [IsScalarTower E E' Ω]
+    : galOf k E' Ω ≤ galOf k E Ω := by
   intro σ hσ
   rw [mem_galOf] at hσ ⊢
   intro x
@@ -99,8 +104,9 @@ def shaFam : Set (Subgroup (G k Ω)) :=
   {D | (∃ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 ∧ D = Dec (F := k) A) ∨
     ∃ A : ValuationSubring Ω, D = Ine (F := k) A}
 
-private theorem valuation_lt_one_iff_mem_and_inv_not_mem {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (z : Ω) :
-    A.valuation z < 1 ↔ z ∈ A ∧ (z = 0 ∨ z⁻¹ ∉ A) := by
+private theorem valuation_lt_one_iff_mem_and_inv_not_mem
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (z : Ω)
+    : A.valuation z < 1 ↔ z ∈ A ∧ (z = 0 ∨ z⁻¹ ∉ A) := by
   rcases eq_or_ne z 0 with rfl | hz
   · simp
   · have h0 : 0 < A.valuation z := by
@@ -110,13 +116,15 @@ private theorem valuation_lt_one_iff_mem_and_inv_not_mem {Ω : Type} [Field Ω] 
     simp only [hz, false_or, not_le]
     exact ⟨fun h => ⟨h.le, h⟩, fun h => h.2⟩
 
-private theorem comap_valuation_lt_one_iff_selmer_transport {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (f : Ω →+* Ω) (z : Ω) :
-    (A.comap f).valuation z < 1 ↔ A.valuation (f z) < 1 := by
-  rw [valuation_lt_one_iff_mem_and_inv_not_mem, valuation_lt_one_iff_mem_and_inv_not_mem, ValuationSubring.mem_comap, ValuationSubring.mem_comap,
-    map_inv₀, map_eq_zero]
+private theorem comap_valuation_lt_one_iff_selmer_transport
+    {Ω : Type} [Field Ω] (A : ValuationSubring Ω) (f : Ω →+* Ω) (z : Ω)
+    : (A.comap f).valuation z < 1 ↔ A.valuation (f z) < 1 := by
+  rw [valuation_lt_one_iff_mem_and_inv_not_mem, valuation_lt_one_iff_mem_and_inv_not_mem,
+    ValuationSubring.mem_comap, ValuationSubring.mem_comap, map_inv₀, map_eq_zero]
 
-private theorem mem_decompositionSubgroup_iff_selmer_transport {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] (A : ValuationSubring Ω)
-    (x : G k Ω) : x ∈ ValuationSubring.decompositionSubgroup k A ↔ ∀ y : Ω, x y ∈ A ↔ y ∈ A := by
+private theorem mem_decompositionSubgroup_iff_selmer_transport
+    {k Ω : Type} [Field k] [Field Ω] [Algebra k Ω] (A : ValuationSubring Ω) (x : G k Ω)
+    : x ∈ ValuationSubring.decompositionSubgroup k A ↔ ∀ y : Ω, x y ∈ A ↔ y ∈ A := by
   simp only [ValuationSubring.decompositionSubgroup, MulAction.mem_stabilizer_iff]
   constructor
   · intro h y
@@ -149,7 +157,8 @@ theorem conjStable_shaFam : ConjStable (shaFam k Ω l) := by
   · refine ⟨Dec (F := k) (A.comap (g : Ω →+* Ω)), Or.inl ⟨_, ?_, rfl⟩, fun x => ?_⟩
     · rw [comap_valuation_lt_one_iff_selmer_transport]
       simpa using hl
-    · simp only [Dec, mem_decompositionSubgroup_iff_selmer_transport, ValuationSubring.mem_comap, RingHom.coe_coe, key]
+    · simp only [Dec, mem_decompositionSubgroup_iff_selmer_transport, ValuationSubring.mem_comap,
+        RingHom.coe_coe, key]
       constructor
       · intro h y
         exact h (g y)
@@ -157,25 +166,38 @@ theorem conjStable_shaFam : ConjStable (shaFam k Ω l) := by
         simpa using h (g.symm y)
   · refine ⟨Ine (F := k) (A.comap (g : Ω →+* Ω)), Or.inr ⟨_, rfl⟩, fun x => ?_⟩
     change x ∈ Inertia (F := k) A ↔ g⁻¹ * x * g ∈ Inertia (F := k) (A.comap (g : Ω →+* Ω))
-    simp only [Inertia, Set.mem_setOf_eq, mem_decompositionSubgroup_iff_selmer_transport, ValuationSubring.valuation_le_one_iff,
-      ValuationSubring.mem_comap, RingHom.coe_coe, comap_valuation_lt_one_iff_selmer_transport, map_sub, key]
+    simp only [Inertia, Set.mem_setOf_eq, mem_decompositionSubgroup_iff_selmer_transport,
+      ValuationSubring.valuation_le_one_iff, ValuationSubring.mem_comap, RingHom.coe_coe,
+      comap_valuation_lt_one_iff_selmer_transport, map_sub, key]
     constructor
     · rintro ⟨h1, h2⟩
       exact ⟨fun y => h1 (g y), fun y hy => h2 (g y) hy⟩
     · rintro ⟨h1, h2⟩
-      refine ⟨fun y => by simpa using h1 (g.symm y), fun y hy => by simpa using h2 (g.symm y) (by simpa using hy)⟩
+      refine ⟨
+        fun y => by simpa using h1 (g.symm y),
+        fun y hy => by simpa using h2 (g.symm y) (by simpa using hy)
+      ⟩
 
-variable {k Ω} {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M] [IsTopologicalAddGroup M]
-  [ContinuousConstSMul R M]
+variable
+  {k Ω} {R M : Type} [CommRing R] [AddCommGroup M] [Module R M] [TopologicalSpace M]
+  [IsTopologicalAddGroup M] [ContinuousConstSMul R M]
 
-abbrev ShaU (ρ : Representation R (G k Ω) M) (l : ℕ) (U : Subgroup (G k Ω)) : Submodule R (H1U ρ U) :=
+abbrev ShaU (ρ : Representation R (G k Ω) M) (l : ℕ) (U : Subgroup (G k Ω))
+    : Submodule R (H1U ρ U) :=
   LocSel ρ U (shaFam k Ω l)
 
-abbrev shaRep [DiscreteTopology M] (ρ : Representation R (G k Ω) M) (l : ℕ) (U : Subgroup (G k Ω)) [U.Normal] :
-    Representation R (G k Ω) (ShaU ρ l U) := selRep ρ U (conjStable_shaFam k Ω l)
+abbrev shaRep
+    [DiscreteTopology M] (ρ : Representation R (G k Ω) M) (l : ℕ) (U : Subgroup (G k Ω)) [U.Normal]
+    : Representation R (G k Ω) (ShaU ρ l U) :=
+  selRep ρ U (conjStable_shaFam k Ω l)
 
-abbrev shaEig [DiscreteTopology M] (ρ : Representation R (G k Ω) M) (l : ℕ) (U : Subgroup (G k Ω)) [U.Normal]
-    (W : Subgroup (G k Ω)) (ψ : W →* Rˣ) : Submodule R (ShaU ρ l U) := selEig ρ U (conjStable_shaFam k Ω l) W ψ
+abbrev shaEig
+    [DiscreteTopology M]
+    (ρ : Representation R (G k Ω) M) (l : ℕ)
+    (U : Subgroup (G k Ω)) [U.Normal]
+    (W : Subgroup (G k Ω)) (ψ : W →* Rˣ)
+    : Submodule R (ShaU ρ l U) :=
+  selEig ρ U (conjStable_shaFam k Ω l) W ψ
 
 end Sha
 
@@ -183,12 +205,12 @@ section Tower
 
 variable {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] (l : ℕ) [Fact l.Prime]
 
-
 variable (k Ω) in
 def chiO (O : Type) [CommRing O] [Algebra ℤ_[l] O] : G k Ω →* Oˣ :=
   (Units.map (algebraMap ℤ_[l] O).toMonoidHom).comp (cycZ k Ω l)
 
-def levU (U : Subgroup (G k Ω)) (n : ℕ) : Subgroup (G k Ω) := U ⊓ (KStar.TotallyRealRoots.princ l n).comap (cycZ k Ω l)
+def levU (U : Subgroup (G k Ω)) (n : ℕ) : Subgroup (G k Ω) :=
+  U ⊓ (KStar.TotallyRealRoots.princ l n).comap (cycZ k Ω l)
 
 def cycU (U : Subgroup (G k Ω)) : Subgroup (G k Ω) := U ⊓ (cycZ k Ω l).ker
 
@@ -213,13 +235,19 @@ end Tower
 
 section Infl
 
-variable (k : Type) {E Ω : Type} [Field k] [NumberField k] [Field E] [NumberField E] [Field Ω] [Algebra k E] [Algebra k Ω]
-  [Algebra E Ω] [IsScalarTower k E Ω] [IsAlgClosure E Ω] {l : ℕ} [Fact l.Prime]
+variable
+  (k : Type)
+  {E Ω : Type} [Field k] [NumberField k] [Field E] [NumberField E] [Field Ω] [Algebra k E]
+  [Algebra k Ω] [Algebra E Ω] [IsScalarTower k E Ω] [IsAlgClosure E Ω]
+  {l : ℕ} [Fact l.Prime]
 
-def Infl (D : LData E Ω l) (e : ℤ) (x : H1 (qzTw D e)) (y : H1U (LDataCardLeFinrank.qzG k Ω l e) (galOf k E Ω)) : Prop :=
+def Infl
+    (D : LData E Ω l) (e : ℤ)
+    (x : H1 (qzTw D e)) (y : H1U (LDataCardLeFinrank.qzG k Ω l e) (galOf k E Ω))
+    : Prop :=
   ∃ (z : Z1 (qzTw D e)) (z' : Z1U (LDataCardLeFinrank.qzG k Ω l e) (galOf k E Ω)),
-    x = Submodule.Quotient.mk z ∧ y = Submodule.Quotient.mk z' ∧
-      ∀ σ : G E Ω, z'.1 ⟨galEmb k E Ω σ, galEmb_mem k E Ω σ⟩ = z.1 (toGS Ω _ σ)
+    x = Submodule.Quotient.mk z ∧ y = Submodule.Quotient.mk z'
+      ∧ ∀ σ : G E Ω, z'.1 ⟨galEmb k E Ω σ, galEmb_mem k E Ω σ⟩ = z.1 (toGS Ω _ σ)
 
 end Infl
 

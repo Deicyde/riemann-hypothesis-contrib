@@ -18,33 +18,40 @@ open MeasureTheory Filter Topology ReciprocityTheory.AnForm ReciprocityTheory.An
 
 namespace GlobalTheory.CompanionTheory.Ar.Giv
 
-theorem tendsto_logPow_div_exp_add (CE : ℝ) (e : ℕ) :
-    Tendsto (fun n : ℕ => CE * Real.log (Real.exp 1 + n) ^ (e + 1) / (Real.exp 1 + n)) atTop (𝓝 0) := by
+theorem tendsto_logPow_div_exp_add (CE : ℝ) (e : ℕ)
+    : Tendsto
+      (fun n : ℕ => CE * Real.log (Real.exp 1 + n) ^ (e + 1) / (Real.exp 1 + n))
+      atTop (𝓝 0) := by
   have h := (Real.isLittleO_pow_log_id_atTop (n := e + 1)).tendsto_div_nhds_zero
   have h2 : Tendsto (fun n : ℕ => Real.exp 1 + (n : ℝ)) atTop atTop :=
     tendsto_atTop_add_const_left _ _ tendsto_natCast_atTop_atTop
   have h3 := (h.comp h2).const_mul CE
   simpa [mul_div_assoc] using h3
 
-theorem tendstoUniformlyOn_cutoff_comp {β X : Type*} (σ : β → X) (c : X → ℝ)
-    (hc : ∀ x, 0 ≤ c x ∧ c x ≤ 1) (F : ℝ → X → ℝ) (f : X → ℝ) (l : Filter ℝ) (K : Set X)
-    (E : Set β) (hE : ∀ y ∈ E, σ y ∈ K) (h : TendstoUniformlyOn F f l K) :
-    TendstoUniformlyOn (fun t y => c (σ y) * F t (σ y)) (fun y => c (σ y) * f (σ y)) l E := by
+theorem tendstoUniformlyOn_cutoff_comp
+    {β X : Type*} (σ : β → X) (c : X → ℝ) (hc : ∀ x, 0 ≤ c x ∧ c x ≤ 1) (F : ℝ → X → ℝ) (f : X → ℝ)
+    (l : Filter ℝ)
+    (K : Set X) (E : Set β) (hE : ∀ y ∈ E, σ y ∈ K)
+    (h : TendstoUniformlyOn F f l K)
+    : TendstoUniformlyOn (fun t y => c (σ y) * F t (σ y)) (fun y => c (σ y) * f (σ y)) l E := by
   rw [Metric.tendstoUniformlyOn_iff] at h ⊢
   intro ε hε
   filter_upwards [h ε hε] with t ht y hy
   have h1 := ht (σ y) (hE y hy)
   rw [Real.dist_eq] at h1 ⊢
-  calc |c (σ y) * f (σ y) - c (σ y) * F t (σ y)|
-      = c (σ y) * |f (σ y) - F t (σ y)| := by
-        rw [← mul_sub, abs_mul, abs_of_nonneg (hc _).1]
+  calc
+    |c (σ y) * f (σ y) - c (σ y) * F t (σ y)|
+      = c (σ y) * |f (σ y) - F t (σ y)| := by rw [← mul_sub, abs_mul, abs_of_nonneg (hc _).1]
     _ ≤ 1 * |f (σ y) - F t (σ y)| := mul_le_mul_of_nonneg_right (hc _).2 (abs_nonneg _)
     _ < ε := by simpa using h1
 
-theorem integrableOn_compl_of_ae_eq_nonneg {α : Type*} [MeasurableSpace α] (μ : Measure α)
-    (E : Set α) (hE : MeasurableSet E) (f T : α → ℝ) (b : ℝ) (hT : Integrable T μ)
-    (hT0 : ∀ᵐ y ∂μ, 0 ≤ T y) (hb : ∫ y, T y ∂μ ≤ b) (heq : ∀ᵐ y ∂μ, y ∉ E → f y = T y) :
-    IntegrableOn f Eᶜ μ ∧ ∫ y in Eᶜ, f y ∂μ ≤ b := by
+theorem integrableOn_compl_of_ae_eq_nonneg
+    {α : Type*} [MeasurableSpace α]
+    (μ : Measure α)
+    (E : Set α) (hE : MeasurableSet E)
+    (f T : α → ℝ) (b : ℝ) (hT : Integrable T μ) (hT0 : ∀ᵐ y ∂μ, 0 ≤ T y) (hb : ∫ y, T y ∂μ ≤ b)
+    (heq : ∀ᵐ y ∂μ, y ∉ E → f y = T y)
+    : IntegrableOn f Eᶜ μ ∧ ∫ y in Eᶜ, f y ∂μ ≤ b := by
   have h : f =ᵐ[μ.restrict Eᶜ] T := by
     rw [Filter.EventuallyEq, ae_restrict_iff' hE.compl]
     filter_upwards [heq] with y hy hyE using hy hyE

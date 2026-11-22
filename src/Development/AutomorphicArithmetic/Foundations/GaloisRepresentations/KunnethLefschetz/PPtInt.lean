@@ -12,12 +12,17 @@ open scoped TensorProduct DirectSum
 
 namespace UpperTheory.Gal.KunnethLefschetz
 
-private theorem pb_id' (l : ℕ) [Fact l.Prime] (X : Scheme.{0}) (n : ℤ) (z : V l X n) : pb l (𝟙 X) n z = z := by
+private theorem pb_id' (l : ℕ) [Fact l.Prime] (X : Scheme.{0}) (n : ℤ) (z : V l X n)
+    : pb l (𝟙 X) n z = z := by
   simp [pb, pullHQ, pullHl_id, LinearMap.baseChange_id]
 
-private theorem slice_gen {l : ℕ} [Fact l.Prime] {k : Type} [Field k] (R : Ring l) {X : Scheme.{0}} {p : X ⟶ S k}
-    (y : Pt p) {a b n : ℤ} (h : a + b = n) (u : V l X a) (v : V l X b) :
-    pb l (slice y) n (ext2 l p h u v) = cupV l X h u (pb l p b (pb l y.1 b v)) := by
+private theorem slice_gen
+    {l : ℕ} [Fact l.Prime]
+    {k : Type} [Field k]
+    (R : Ring l)
+    {X : Scheme.{0}} {p : X ⟶ S k} (y : Pt p)
+    {a b n : ℤ} (h : a + b = n) (u : V l X a) (v : V l X b)
+    : pb l (slice y) n (ext2 l p h u v) = cupV l X h u (pb l p b (pb l y.1 b v)) := by
   simp only [ext2]
   rw [R.nat (slice y) a b n h]
   have e1 : pb l (slice y) a (pb l (pullback.fst p p) a u) = u := by
@@ -35,10 +40,8 @@ theorem ptInt_holds : PtInt := by
     have h1 : IsUnit ((l : k)) := isUnit_iff_ne_zero.mpr hl
     have h2 := (h1.map (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom).map p.appTop.hom
     simpa [map_natCast] using h2
-  have hunitS : IsUnit ((l : Γ(S k, ⊤))) := by
-    simpa [map_natCast] using hunitX.map (y.1.appTop).hom
-  have key : (pb l y.1 0) ∘ₗ Λ =
-      (lam ∘ₗ pb l (slice y) (2 * d)).smulRight (oneV l (S k)) := by
+  have hunitS : IsUnit ((l : Γ(S k, ⊤))) := by simpa [map_natCast] using hunitX.map (y.1.appTop).hom
+  have key : (pb l y.1 0) ∘ₗ Λ = (lam ∘ₗ pb l (slice y) (2 * d)).smulRight (oneV l (S k)) := by
     apply LinearMap.ext_on (K.span (2 * d))
     rintro _ ⟨a, b, hab, u, v, rfl⟩
     simp only [LinearMap.comp_apply, LinearMap.smulRight_apply]

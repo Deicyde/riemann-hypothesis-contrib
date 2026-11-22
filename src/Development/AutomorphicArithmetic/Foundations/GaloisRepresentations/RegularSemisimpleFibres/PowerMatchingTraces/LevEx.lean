@@ -5,15 +5,18 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 @[expose] public section
 
 open MeasureTheory NumberField IsDedekindDomain Filter
-open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
+open GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace GroundTheory.Automorphic.AutomorphicForm
 open GroundTheory.Automorphic.CuspidalSpectrum GroundTheory.Global GroundTheory.Global.SemiLocal
-open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
+open PositivityTheory.Rg.Tf.Core PositivityTheory.Rg.Tf.Geo UpperTheory.ConvolutionTheory
+  UpperTheory.ConvolutionTheory.C UpperTheory.ConvolutionTheory.L1 Formalism.BasicNotions
+  GlobalTheory.PRep GlobalTheory.CuspRep GlobalTheory.SmGL
+  GlobalTheory.IndefiniteRowSideFullHecke.IwahoriDoubleCosets
 open Formalism.L2.Host UpperTheory.V.Published UpperTheory.CBC
 open scoped Classical
 open UpperTheory.Gal.InertialTypesAlt.G
 
-theorem UpperTheory.Gal.InertialTypesAlt.G.levEx :
-    UpperTheory.Gal.InertialTypesAlt.G.LevEx := by
+theorem UpperTheory.Gal.InertialTypesAlt.G.levEx : UpperTheory.Gal.InertialTypesAlt.G.LevEx := by
   intro G _ _ _ K f hK hN hf
   obtain ⟨hlc, hcs⟩ := hf
   have h1 : ∀ x : G, ∃ V : Subgroup G, IsOpen (V : Set G) ∧ ∀ a ∈ V, f (a * x) = f x := by
@@ -23,9 +26,10 @@ theorem UpperTheory.Gal.InertialTypesAlt.G.levEx :
     obtain ⟨V, hV, hVs⟩ := hN _ (hopen.mem_nhds (by simp))
     exact ⟨V, hV, fun a ha => by simpa using hVs (SetLike.mem_coe.2 ha)⟩
   choose V hVo hVc using h1
-  obtain ⟨t, -, hcov⟩ := hcs.isCompact.elim_nhds_subcover
-    (fun x => (fun y : G => y * x⁻¹) ⁻¹' (V x : Set G))
-    (fun x _ => ((hVo x).preimage (continuous_mul_const x⁻¹)).mem_nhds (by simp [one_mem]))
+  obtain ⟨t, -, hcov⟩ :=
+    hcs.isCompact.elim_nhds_subcover
+      (fun x => (fun y : G => y * x⁻¹) ⁻¹' (V x : Set G))
+      (fun x _ => ((hVo x).preimage (continuous_mul_const x⁻¹)).mem_nhds (by simp [one_mem]))
   have hz : ∀ y, (∀ x ∈ t, y * x⁻¹ ∉ V x) → f y = 0 := by
     intro y hy
     by_contra h

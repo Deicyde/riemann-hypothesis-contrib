@@ -24,17 +24,24 @@ def dcOfCoset (Γ W K : Subgroup G) (t : G) : K ⧸ W.subgroupOf K → DC Γ W :
     refine ⟨1, Γ.one_mem, (a : G)⁻¹ * b, by simpa using h, ?_⟩
     simp [mul_assoc])
 
-theorem dcOfCoset_mk (Γ W K : Subgroup G) (t : G) (k : K) :
-    dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K) = Quotient.mk (dcSetoid Γ W) (t * k) := rfl
+theorem dcOfCoset_mk (Γ W K : Subgroup G) (t : G) (k : K)
+    : dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K) = Quotient.mk (dcSetoid Γ W) (t * k) :=
+  rfl
 
 end GlobalTheory.UnimodMass
 
 namespace GlobalTheory.UnimodMass
 
-theorem fiber_card_mul_stabCard {G : Type} [Group G] (Γ W K : Subgroup G) (hWK : W ≤ K) (t : G)
-    (ht : Finite {γ : Γ // t⁻¹ * (γ : G) * t ∈ K}) (k : K) :
-    Nat.card {x : K ⧸ W.subgroupOf K // dcOfCoset Γ W K t x = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K)} *
-      stabCard Γ W (t * k) = stabCard Γ K t := by
+theorem fiber_card_mul_stabCard
+    {G : Type} [Group G]
+    (Γ W K : Subgroup G) (hWK : W ≤ K)
+    (t : G) (ht : Finite {γ : Γ // t⁻¹ * (γ : G) * t ∈ K})
+    (k : K)
+    : Nat.card
+          {x : K ⧸ W.subgroupOf K
+            // dcOfCoset Γ W K t x = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K)}
+        * stabCard Γ W (t * k)
+      = stabCard Γ K t := by
   classical
   set A := {γ : Γ // t⁻¹ * (γ : G) * t ∈ K}
   set B := {x : K ⧸ W.subgroupOf K // dcOfCoset Γ W K t x = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K)}
@@ -42,8 +49,10 @@ theorem fiber_card_mul_stabCard {G : Type} [Group G] (Γ W K : Subgroup G) (hWK 
   have hT : stabCard Γ W (t * k) = Nat.card T := rfl
   have hA : stabCard Γ K t = Nat.card A := rfl
   let φ : A → K := fun γ => ⟨t⁻¹ * (γ.1 : G) * t, γ.2⟩
-  have hα : ∀ γ : A, dcOfCoset Γ W K t ((φ γ * k : K) : K ⧸ W.subgroupOf K) =
-      dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K) := by
+  have hα
+      : ∀ γ : A,
+        dcOfCoset Γ W K t ((φ γ * k : K) : K ⧸ W.subgroupOf K)
+          = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K) := by
     intro γ
     rw [dcOfCoset_mk, dcOfCoset_mk]
     apply Quotient.sound
@@ -60,9 +69,12 @@ theorem fiber_card_mul_stabCard {G : Type} [Group G] (Γ W K : Subgroup G) (hWK 
       have hmem : t⁻¹ * γ⁻¹ * t ∈ K := by
         have : t⁻¹ * γ⁻¹ * t = (k' : G) * w * (k : G)⁻¹ := by
           have e' : (k : G) = t⁻¹ * γ * t * k' * w := by
-            calc (k : G) = t⁻¹ * (t * k) := by group
+            calc
+              (k : G)
+                = t⁻¹ * (t * k) := by group
               _ = _ := by rw [e]; group
-          rw [e']; group
+          rw [e']
+          group
         rw [this]
         exact K.mul_mem (K.mul_mem k'.2 (hWK hw)) (K.inv_mem k.2)
       refine ⟨⟨⟨γ⁻¹, Γ.inv_mem hγ⟩, hmem⟩, ?_⟩
@@ -70,12 +82,16 @@ theorem fiber_card_mul_stabCard {G : Type} [Group G] (Γ W K : Subgroup G) (hWK 
       show ((φ _ * k : K) : K ⧸ W.subgroupOf K) = (k' : K ⧸ W.subgroupOf K)
       rw [QuotientGroup.eq, Subgroup.mem_subgroupOf]
       have e' : (k : G) = t⁻¹ * γ * t * k' * w := by
-        calc (k : G) = t⁻¹ * (t * k) := by group
+        calc
+          (k : G)
+            = t⁻¹ * (t * k) := by group
           _ = _ := by rw [e]; group
       have : ((φ ⟨⟨γ⁻¹, Γ.inv_mem hγ⟩, hmem⟩ * k)⁻¹ * k' : K) = (w⁻¹ : G) := by
         simp only [φ, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_mk]
-        rw [e']; group
-      rw [this]; exact W.inv_mem hw
+        rw [e']
+        group
+      rw [this]
+      exact W.inv_mem hw
   have hfib : ∀ γ₀ : A, Nonempty ({γ : A // α γ = α γ₀} ≃ T) := by
     intro γ₀
     have key : ∀ γ : A, α γ = α γ₀ ↔ (t * k)⁻¹ * ((γ₀.1 : G)⁻¹ * γ.1) * (t * k) ∈ W := by
@@ -86,12 +102,17 @@ theorem fiber_card_mul_stabCard {G : Type} [Group G] (Γ W K : Subgroup G) (hWK 
       have : (((φ γ₀ * k)⁻¹ * (φ γ * k) : K) : G) = (t * k)⁻¹ * ((γ₀.1 : G)⁻¹ * γ.1) * (t * k) := by
         simp only [φ, Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_mk]; group
       rw [this]
-    refine ⟨{ toFun := fun γ => ⟨⟨(γ₀.1 : G)⁻¹ * γ.1.1, Γ.mul_mem (Γ.inv_mem γ₀.1.2) γ.1.1.2⟩, (key γ.1).1 γ.2⟩
-              invFun := fun δ => ⟨⟨⟨(γ₀.1 : G) * δ.1, Γ.mul_mem γ₀.1.2 δ.1.2⟩, ?_⟩, ?_⟩
-              left_inv := fun γ => by ext; simp
-              right_inv := fun δ => by ext; simp }⟩
-    · have h1 : t⁻¹ * ((γ₀.1 : G) * δ.1) * t =
-          (t⁻¹ * γ₀.1 * t) * ((k : G) * ((t * k)⁻¹ * δ.1 * (t * k)) * (k : G)⁻¹) := by group
+    refine ⟨{
+      toFun := fun γ =>
+        ⟨⟨(γ₀.1 : G)⁻¹ * γ.1.1, Γ.mul_mem (Γ.inv_mem γ₀.1.2) γ.1.1.2⟩, (key γ.1).1 γ.2⟩
+      invFun := fun δ => ⟨⟨⟨(γ₀.1 : G) * δ.1, Γ.mul_mem γ₀.1.2 δ.1.2⟩, ?_⟩, ?_⟩
+      left_inv := fun γ => by ext; simp
+      right_inv := fun δ => by ext; simp
+    }⟩
+    · have h1
+          : t⁻¹ * ((γ₀.1 : G) * δ.1) * t
+            = (t⁻¹ * γ₀.1 * t) * ((k : G) * ((t * k)⁻¹ * δ.1 * (t * k)) * (k : G)⁻¹) := by
+        group
       rw [h1]
       exact K.mul_mem γ₀.2 (K.mul_mem (K.mul_mem k.2 (hWK δ.2)) (K.inv_mem k.2))
     · rw [key]
@@ -99,11 +120,11 @@ theorem fiber_card_mul_stabCard {G : Type} [Group G] (Γ W K : Subgroup G) (hWK 
   have e : A ≃ B × T :=
     (Equiv.sigmaFiberEquiv α).symm.trans
       ((Equiv.sigmaCongrRight (fun b => by
-          have hb := hsurj b
-          exact Classical.choice (by
-            obtain ⟨γ₀, hγ₀⟩ := hb
-            subst hγ₀
-            exact hfib γ₀))).trans (Equiv.sigmaEquivProd B T))
+        have hb := hsurj b
+        exact Classical.choice (by
+          obtain ⟨γ₀, hγ₀⟩ := hb
+          subst hγ₀
+          exact hfib γ₀))).trans (Equiv.sigmaEquivProd B T))
   rw [hT, hA, Nat.card_congr e, Nat.card_prod]
 
 end GlobalTheory.UnimodMass
@@ -111,9 +132,11 @@ end GlobalTheory.UnimodMass
 namespace GlobalTheory.UnimodMass
 open scoped BigOperators
 
-theorem dcOfCoset_surj {G : Type} [Group G] {Γ W K : Subgroup G} (hWK : W ≤ K) (t : G)
-    (d : DC Γ W) (hd : dcMapLe hWK d = Quotient.mk (dcSetoid Γ K) t) :
-    ∃ k : K, d = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K) := by
+theorem dcOfCoset_surj
+    {G : Type} [Group G]
+    {Γ W K : Subgroup G} (hWK : W ≤ K)
+    (t : G) (d : DC Γ W) (hd : dcMapLe hWK d = Quotient.mk (dcSetoid Γ K) t)
+    : ∃ k : K, d = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K) := by
   induction d using Quotient.inductionOn with
   | h g =>
     have h2 : (dcSetoid Γ K) g t := Quotient.exact hd
@@ -124,17 +147,20 @@ theorem dcOfCoset_surj {G : Type} [Group G] {Γ W K : Subgroup G} (hWK : W ≤ K
     refine ⟨γ⁻¹, Γ.inv_mem hγ, 1, W.one_mem, ?_⟩
     simp [e, mul_assoc]
 
-theorem dcMapLe_dcOfCoset {G : Type} [Group G] {Γ W K : Subgroup G} (hWK : W ≤ K) (t : G)
-    (x : K ⧸ W.subgroupOf K) : dcMapLe hWK (dcOfCoset Γ W K t x) = Quotient.mk (dcSetoid Γ K) t := by
+theorem dcMapLe_dcOfCoset
+    {G : Type} [Group G] {Γ W K : Subgroup G} (hWK : W ≤ K) (t : G) (x : K ⧸ W.subgroupOf K)
+    : dcMapLe hWK (dcOfCoset Γ W K t x) = Quotient.mk (dcSetoid Γ K) t := by
   induction x using QuotientGroup.induction_on with
   | H k =>
     rw [dcOfCoset_mk]
     apply Quotient.sound
     exact ⟨1, Γ.one_mem, (k : G)⁻¹, K.inv_mem k.2, by simp⟩
 
-theorem mass_eq_relIndex_mul {G : Type} [Group G] (Γ W K : Subgroup G) (hWK : W ≤ K)
-    (hW : Finite (DC Γ W)) (hfin : ∀ t : G, Finite {γ : Γ // t⁻¹ * (γ : G) * t ∈ K}) :
-    W.relIndex K ≠ 0 ∧ mass Γ W = (W.relIndex K : ℚ) * mass Γ K := by
+theorem mass_eq_relIndex_mul
+    {G : Type} [Group G]
+    (Γ W K : Subgroup G)
+    (hWK : W ≤ K) (hW : Finite (DC Γ W)) (hfin : ∀ t : G, Finite {γ : Γ // t⁻¹ * (γ : G) * t ∈ K})
+    : W.relIndex K ≠ 0 ∧ mass Γ W = (W.relIndex K : ℚ) * mass Γ K := by
   classical
   haveI := hW
   haveI : Finite (DC Γ K) := finite_dc_of_le hWK
@@ -147,34 +173,42 @@ theorem mass_eq_relIndex_mul {G : Type} [Group G] (Γ W K : Subgroup G) (hWK : W
       | H k =>
         have h1 := fiber_card_mul_stabCard Γ W K hWK 1 (hfin 1) k
         have h2 := stabCard_pos (Γ := Γ) (K := K) 1 (hfin 1)
-        have h3 : 0 < Nat.card {x : K ⧸ W.subgroupOf K //
-            dcOfCoset Γ W K 1 x = dcOfCoset Γ W K 1 (k : K ⧸ W.subgroupOf K)} := by
-          rcases Nat.eq_zero_or_pos (Nat.card {x : K ⧸ W.subgroupOf K //
-            dcOfCoset Γ W K 1 x = dcOfCoset Γ W K 1 (k : K ⧸ W.subgroupOf K)}) with h | h
+        have h3
+            : 0
+              < Nat.card
+                {x : K ⧸ W.subgroupOf K
+                  // dcOfCoset Γ W K 1 x = dcOfCoset Γ W K 1 (k : K ⧸ W.subgroupOf K)} := by
+          rcases Nat.eq_zero_or_pos (Nat.card
+              {x : K ⧸ W.subgroupOf K
+                // dcOfCoset Γ W K 1 x = dcOfCoset Γ W K 1 (k : K ⧸ W.subgroupOf K)})
+            with h | h
           · rw [h, zero_mul] at h1; omega
           · exact h
         exact (Nat.card_pos_iff.1 h3).2
     · push_neg at hne
-      exact Finite.of_injective (β := Empty) (fun x => (hne x.1 x.2).elim) (fun x => (hne x.1 x.2).elim)
+      exact
+        Finite.of_injective (β := Empty) (fun x => (hne x.1 x.2).elim) (fun x => (hne x.1 x.2).elim)
   haveI : Finite (K ⧸ W.subgroupOf K) :=
     Finite.of_equiv _ (Equiv.sigmaFiberEquiv (dcOfCoset Γ W K 1))
   have hidx : W.relIndex K = Nat.card (K ⧸ W.subgroupOf K) := rfl
-  have hne0 : W.relIndex K ≠ 0 := by
-    rw [hidx]; exact Nat.card_ne_zero.2 ⟨⟨(1 : K)⟩, inferInstance⟩
+  have hne0 : W.relIndex K ≠ 0 := by rw [hidx]; exact Nat.card_ne_zero.2 ⟨⟨(1 : K)⟩, inferInstance⟩
   refine ⟨hne0, ?_⟩
   haveI := Fintype.ofFinite (DC Γ W)
   haveI := Fintype.ofFinite (DC Γ K)
   haveI := Fintype.ofFinite (K ⧸ W.subgroupOf K)
 
-  have hfib : ∀ c : DC Γ K,
-      ∑ d ∈ Finset.univ.filter (fun d => dcMapLe hWK d = c), ((stabCard Γ W d.out : ℕ) : ℚ)⁻¹ =
-        (W.relIndex K : ℚ) * ((stabCard Γ K c.out : ℕ) : ℚ)⁻¹ := by
+  have hfib
+      : ∀ c : DC Γ K,
+        ∑ d ∈ Finset.univ.filter (fun d => dcMapLe hWK d = c), ((stabCard Γ W d.out : ℕ) : ℚ)⁻¹
+          = (W.relIndex K : ℚ) * ((stabCard Γ K c.out : ℕ) : ℚ)⁻¹ := by
     intro c
     set t := c.out with htdef
     have hct : c = Quotient.mk (dcSetoid Γ K) t := (Quotient.out_eq c).symm
     have hsK : (0 : ℚ) < stabCard Γ K t := by exact_mod_cast stabCard_pos t (hfin t)
-    have hcard : (W.relIndex K : ℚ) = ∑ d ∈ Finset.univ.filter (fun d => dcMapLe hWK d = c),
-        ((Finset.univ.filter (fun x => dcOfCoset Γ W K t x = d)).card : ℚ) := by
+    have hcard
+        : (W.relIndex K : ℚ)
+          = ∑ d ∈ Finset.univ.filter (fun d => dcMapLe hWK d = c),
+            ((Finset.univ.filter (fun x => dcOfCoset Γ W K t x = d)).card : ℚ) := by
       rw [hidx, Nat.card_eq_fintype_card, ← Finset.card_univ]
       rw [Finset.card_eq_sum_card_fiberwise (f := dcOfCoset Γ W K t)
         (t := Finset.univ.filter (fun d => dcMapLe hWK d = c))]
@@ -193,8 +227,13 @@ theorem mass_eq_relIndex_mul {G : Type} [Group G] (Γ W K : Subgroup G) (hWK : W
       rcases Nat.eq_zero_or_pos (stabCard Γ W (t * k)) with h | h
       · rw [h, mul_zero] at h1; omega
       · exact_mod_cast h
-    have h1' : (Nat.card {x : K ⧸ W.subgroupOf K // dcOfCoset Γ W K t x =
-        dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K)} : ℚ) * stabCard Γ W (t * k) = stabCard Γ K t := by
+    have h1'
+        : (Nat.card
+                {x : K ⧸ W.subgroupOf K
+                  // dcOfCoset Γ W K t x = dcOfCoset Γ W K t (k : K ⧸ W.subgroupOf K)}
+              : ℚ)
+            * stabCard Γ W (t * k)
+          = stabCard Γ K t := by
       exact_mod_cast h1
     field_simp
     linarith [h1']

@@ -6,8 +6,7 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 open scoped MatrixGroups
 
-theorem UpperTheory.V.Af.Rs.rowRep :
-    UpperTheory.V.Af.Rs.RowRep := by
+theorem UpperTheory.V.Af.Rs.rowRep : UpperTheory.V.Af.Rs.RowRep := by
   intro x
   set g := (x 0).gcd (x 1) with hg
   rcases Nat.eq_zero_or_pos g with h0 | hpos
@@ -17,8 +16,10 @@ theorem UpperTheory.V.Af.Rs.rowRep :
     fin_cases i <;> simp [h0', h1']
   · have hc : IsCoprime (x 0 / (g : ℤ)) (x 1 / (g : ℤ)) :=
       Int.isCoprime_iff_gcd_eq_one.mpr (Int.gcd_div_gcd_div_gcd hpos)
-    obtain ⟨γ, -, hγ⟩ := ModularGroup.bottom_row_surj (R := ℤ)
-      (show ![x 0 / (g : ℤ), x 1 / (g : ℤ)] ∈ {cd : Fin 2 → ℤ | IsCoprime (cd 0) (cd 1)} by simpa using hc)
+    obtain ⟨γ, -, hγ⟩ :=
+      ModularGroup.bottom_row_surj (R := ℤ)
+        (show ![x 0 / (g : ℤ), x 1 / (g : ℤ)] ∈ {cd : Fin 2 → ℤ | IsCoprime (cd 0) (cd 1)} by
+          simpa using hc)
     refine ⟨g, γ, ?_⟩
     funext i
     have hi := congrFun hγ i

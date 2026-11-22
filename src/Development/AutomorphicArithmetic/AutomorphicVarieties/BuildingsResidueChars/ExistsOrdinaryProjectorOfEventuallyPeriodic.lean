@@ -4,9 +4,11 @@ public import Mathlib
 
 @[expose] public section
 
-private theorem UpperTheory.pow_preserves_submodule {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U) (n : ℕ) :
-    ∀ f ∈ U, (T ^ n) f ∈ U := by
+private theorem UpperTheory.pow_preserves_submodule
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U)
+    (n : ℕ)
+    : ∀ f ∈ U, (T ^ n) f ∈ U := by
   induction n with
   | zero =>
     intro f hf
@@ -16,22 +18,27 @@ private theorem UpperTheory.pow_preserves_submodule {A M : Type} [CommRing A] [A
     rw [pow_succ, Module.End.mul_apply]
     exact ih _ (hT f hf)
 
-private theorem UpperTheory.periodic_difference_shift {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U) (f : M) (a q : ℕ)
-    (h : (T ^ (a + q)) f - (T ^ a) f ∈ U) (m : ℕ) (hm : a ≤ m) :
-    (T ^ (m + q)) f - (T ^ m) f ∈ U := by
+private theorem UpperTheory.periodic_difference_shift
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U)
+    (f : M) (a q : ℕ) (h : (T ^ (a + q)) f - (T ^ a) f ∈ U)
+    (m : ℕ) (hm : a ≤ m)
+    : (T ^ (m + q)) f - (T ^ m) f ∈ U := by
   obtain ⟨r, rfl⟩ := Nat.exists_eq_add_of_le hm
   have h' := UpperTheory.pow_preserves_submodule U T hT r _ h
   have e : (T ^ r) ((T ^ (a + q)) f - (T ^ a) f) = (T ^ (a + r + q)) f - (T ^ (a + r)) f := by
-    rw [show a + r + q = r + (a + q) by ring, show a + r = r + a by ring,
-      pow_add T r (a + q), pow_add T r a, Module.End.mul_apply, Module.End.mul_apply, map_sub]
+    rw [show a + r + q = r + (a + q) by ring, show a + r = r + a by ring, pow_add T r (a + q),
+      pow_add T r a, Module.End.mul_apply, Module.End.mul_apply, map_sub]
   rw [e] at h'
   exact h'
 
-private theorem UpperTheory.periodic_difference_mul_period {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U) (f : M) (a q : ℕ)
-    (h : (T ^ (a + q)) f - (T ^ a) f ∈ U) (m : ℕ) (hm : a ≤ m) (c : ℕ) :
-    (T ^ (m + q * c)) f - (T ^ m) f ∈ U := by
+private theorem UpperTheory.periodic_difference_mul_period
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U)
+    (f : M) (a q : ℕ) (h : (T ^ (a + q)) f - (T ^ a) f ∈ U)
+    (m : ℕ) (hm : a ≤ m)
+    (c : ℕ)
+    : (T ^ (m + q * c)) f - (T ^ m) f ∈ U := by
   induction c with
   | zero => simp
   | succ c ih =>
@@ -42,10 +49,11 @@ private theorem UpperTheory.periodic_difference_mul_period {A M : Type} [CommRin
     rw [sub_add_sub_cancel] at hs
     exact hs
 
-private theorem UpperTheory.factorial_powers_cauchy {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
-    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U) (f : M) (a p : ℕ)
-    (h : (T ^ (a + (p + 1))) f - (T ^ a) f ∈ U) :
-    ∃ J : ℕ, ∀ i j, J ≤ i → J ≤ j → (T ^ i.factorial) f - (T ^ j.factorial) f ∈ U := by
+private theorem UpperTheory.factorial_powers_cauchy
+    {A M : Type} [CommRing A] [AddCommGroup M] [Module A M]
+    (U : Submodule A M) (T : Module.End A M) (hT : ∀ f ∈ U, T f ∈ U)
+    (f : M) (a p : ℕ) (h : (T ^ (a + (p + 1))) f - (T ^ a) f ∈ U)
+    : ∃ J : ℕ, ∀ i j, J ≤ i → J ≤ j → (T ^ i.factorial) f - (T ^ j.factorial) f ∈ U := by
   obtain ⟨N, hN⟩ : ∃ N, N = a * (p + 1) := ⟨_, rfl⟩
   have haN : a ≤ N := by
     rw [hN]
@@ -67,11 +75,19 @@ private theorem UpperTheory.factorial_powers_cauchy {A M : Type} [CommRing A] [A
   have hs := U.sub_mem (hbase i hi) (hbase j hj)
   rwa [sub_sub_sub_cancel_right] at hs
 
-theorem UpperTheory.exists_ordinaryProjector_of_eventually_periodic :
-    ∀ (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (V : ℕ → Submodule A M) (T : Module.End A M), Antitone V → (∀ k, ∀ f ∈ V k, T f ∈ V k) → (∀ f, (∀ k, f ∈ V k) → f = 0) → (∀ a : ℕ → M, (∀ k, a (k + 1) - a k ∈ V k) → ∃ L, ∀ k, L - a k ∈ V k) → (∀ f k, ∃ a p : ℕ, (T ^ (a + (p + 1))) f - (T ^ a) f ∈ V k) → ∃ e : Module.End A M, ∀ f k, (∃ J : ℕ, ∀ j, J ≤ j → (T ^ j.factorial) f - e f ∈ V k) ∧ (∃ n : ℕ, (T ^ (n + 1)) (e f) - e f ∈ V k) ∧ (f ∈ V k → e f ∈ V k) ∧ ((∃ n : ℕ, (T ^ (n + 1)) f - f ∈ V k) → e f - f ∈ V k) := by
+theorem UpperTheory.exists_ordinaryProjector_of_eventually_periodic
+    : ∀ (A M : Type) [CommRing A] [AddCommGroup M] [Module A M] (V : ℕ → Submodule A M)
+        (T : Module.End A M),
+      Antitone V → (∀ k, ∀ f ∈ V k, T f ∈ V k) → (∀ f, (∀ k, f ∈ V k) → f = 0)
+        → (∀ a : ℕ → M, (∀ k, a (k + 1) - a k ∈ V k) → ∃ L, ∀ k, L - a k ∈ V k)
+        → (∀ f k, ∃ a p : ℕ, (T ^ (a + (p + 1))) f - (T ^ a) f ∈ V k)
+        → ∃ e : Module.End A M, ∀ f k,
+          (∃ J : ℕ, ∀ j, J ≤ j → (T ^ j.factorial) f - e f ∈ V k)
+            ∧ (∃ n : ℕ, (T ^ (n + 1)) (e f) - e f ∈ V k) ∧ (f ∈ V k → e f ∈ V k)
+            ∧ ((∃ n : ℕ, (T ^ (n + 1)) f - f ∈ V k) → e f - f ∈ V k) := by
   intro A M _ _ _ V T hV hT hsep hcomp hper
-  have hJ : ∀ f k, ∃ J : ℕ, ∀ i j, J ≤ i → J ≤ j →
-      (T ^ i.factorial) f - (T ^ j.factorial) f ∈ V k := by
+  have hJ
+      : ∀ f k, ∃ J : ℕ, ∀ i j, J ≤ i → J ≤ j → (T ^ i.factorial) f - (T ^ j.factorial) f ∈ V k := by
     intro f k
     obtain ⟨a, p, h⟩ := hper f k
     exact UpperTheory.factorial_powers_cauchy (V k) T (hT k) f a p h
@@ -102,7 +118,8 @@ theorem UpperTheory.exists_ordinaryProjector_of_eventually_periodic :
       intro k
       obtain ⟨J1, h1⟩ := hx k
       obtain ⟨J2, h2⟩ := hy k
-      have hs := (V k).sub_mem (h2 (max J1 J2) (le_max_right _ _)) (h1 (max J1 J2) (le_max_left _ _))
+      have hs :=
+        (V k).sub_mem (h2 (max J1 J2) (le_max_right _ _)) (h1 (max J1 J2) (le_max_left _ _))
       rwa [sub_sub_sub_cancel_left] at hs
     exact sub_eq_zero.mp hxy
   have hPadd : ∀ f g x y, P f x → P g y → P (f + g) (x + y) := by
@@ -110,8 +127,8 @@ theorem UpperTheory.exists_ordinaryProjector_of_eventually_periodic :
     obtain ⟨J1, h1⟩ := hx k
     obtain ⟨J2, h2⟩ := hy k
     refine ⟨max J1 J2, fun j hj => ?_⟩
-    have hs := (V k).add_mem (h1 j (le_trans (le_max_left _ _) hj))
-      (h2 j (le_trans (le_max_right _ _) hj))
+    have hs :=
+      (V k).add_mem (h1 j (le_trans (le_max_left _ _) hj)) (h2 j (le_trans (le_max_right _ _) hj))
     rw [map_add (f := _)]
     convert hs using 1
     abel
@@ -121,10 +138,11 @@ theorem UpperTheory.exists_ordinaryProjector_of_eventually_periodic :
     refine ⟨J1, fun j hj => ?_⟩
     have hs := (V k).smul_mem c (h1 j hj)
     rwa [smul_sub, ← map_smul] at hs
-  let e : Module.End A M :=
-    { toFun := L
-      map_add' := fun f g => huniq (f + g) _ _ (hPL _) (hPadd f g _ _ (hPL f) (hPL g))
-      map_smul' := fun c f => huniq (c • f) _ _ (hPL _) (hPsmul c f _ (hPL f)) }
+  let e : Module.End A M := {
+    toFun := L
+    map_add' := fun f g => huniq (f + g) _ _ (hPL _) (hPadd f g _ _ (hPL f) (hPL g))
+    map_smul' := fun c f => huniq (c • f) _ _ (hPL _) (hPsmul c f _ (hPL f))
+  }
   refine ⟨e, fun f k => ⟨hPL f k, ?_, ?_, ?_⟩⟩
   · obtain ⟨a, p, h⟩ := hper f k
     obtain ⟨J1, h1⟩ := hPL f k

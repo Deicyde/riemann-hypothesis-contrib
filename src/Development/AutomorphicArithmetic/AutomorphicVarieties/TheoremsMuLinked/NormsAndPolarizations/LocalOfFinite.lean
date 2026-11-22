@@ -10,10 +10,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
+open IsLocalRing Matrix NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal UpperTheory.V
+  UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.Pa UpperTheory.V.HV UpperTheory.V.Th
+  UpperTheory.V.Th.Nm GlobalTheory.GalOfCusp
 
-private theorem local_of_finite {R S : Type} [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S]
-    [Finite (ResidueField S)] (f : R →+* S) : IsLocalHom f := by
+private theorem local_of_finite
+    {R S : Type} [CommRing R] [IsLocalRing R] [CommRing S] [IsLocalRing S] [Finite (ResidueField S)]
+    (f : R →+* S)
+    : IsLocalHom f := by
   classical
   constructor
   intro a ha
@@ -29,12 +33,19 @@ private theorem local_of_finite {R S : Type} [CommRing R] [IsLocalRing R] [CommR
   have hg : g a = 0 := by
     rw [← RingHom.mem_ker, hker]
     exact hm
-  have hfa : f a ∈ maximalIdeal S := by
-    simpa [g, residue_eq_zero_iff] using hg
+  have hfa : f a ∈ maximalIdeal S := by simpa [g, residue_eq_zero_iff] using hg
   exact hfa ha
 
-theorem UpperTheory.V.Th.Nm.redOf :
-    ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (F : GFrame l) (c c' : Coef l) (h : c.O ≤ c'.O) (r : Resid F c.O n) (r' : Resid F c'.O n) (R : Type) [CommRing R] [Algebra c.O R] [IsCO c.O R] (p : Pair r R) (x : R →ₐ[c.O] Qbar l) (ρ₀ : F.G₀ →* GL (Fin n) c'.O) (ψ₀ : ∀ v, Fin n → F.Gv v →* c'.Oˣ), RPush h r r' → (∀ b, x b ∈ c'.O) → p.D.map (x : R →+* Qbar l) = GDet.ofRep (mat (pushRep (algebraMap c'.O (Qbar l)) ρ₀)) → (∀ v i, pushCh (algebraMap c'.O (Qbar l)) (ψ₀ v i) = pushCh (x : R →+* Qbar l) (p.ψ v i)) → (GDet.ofRep (mat ρ₀)).map (res c'.O c'.O : c'.O →+* ResidueField c'.O) = r'.Dbar ∧ ∀ v i, r'.IsPsi v i (ψ₀ v i) := by
+theorem UpperTheory.V.Th.Nm.redOf
+    : ∀ {l : ℕ} [Fact l.Prime] {n : ℕ} (F : GFrame l) (c c' : Coef l) (h : c.O ≤ c'.O)
+        (r : Resid F c.O n) (r' : Resid F c'.O n) (R : Type) [CommRing R] [Algebra c.O R]
+        [IsCO c.O R] (p : Pair r R) (x : R →ₐ[c.O] Qbar l) (ρ₀ : F.G₀ →* GL (Fin n) c'.O)
+        (ψ₀ : ∀ v, Fin n → F.Gv v →* c'.Oˣ),
+      RPush h r r' → (∀ b, x b ∈ c'.O)
+        → p.D.map (x : R →+* Qbar l) = GDet.ofRep (mat (pushRep (algebraMap c'.O (Qbar l)) ρ₀))
+        → (∀ v i, pushCh (algebraMap c'.O (Qbar l)) (ψ₀ v i) = pushCh (x : R →+* Qbar l) (p.ψ v i))
+        → (GDet.ofRep (mat ρ₀)).map (res c'.O c'.O : c'.O →+* ResidueField c'.O) = r'.Dbar
+          ∧ ∀ v i, r'.IsPsi v i (ψ₀ v i) := by
   intro l _ n F c c' h r r' R _ _ _ p x ρ₀ ψ₀ hpush hx hD hψ
   haveI : Module.Finite ℤ_[l] c'.O := c'.fin
   haveI : Finite (ResidueField c'.O) := (abelian₂.dvr_finite l c'.O).2.1
@@ -65,7 +76,8 @@ theorem UpperTheory.V.Th.Nm.redOf :
       simp [UpperTheory.V.Alg.res, (IsLocalRing.residue_eq_zero_iff _).2 ha]
     have hm1 : residue c'.O (y (z - algebraMap c.O R a)) = 0 :=
       (IsLocalRing.residue_eq_zero_iff _).2 (hym _ ha)
-    rw [hz, map_add (f := _), map_add (f := _), map_add (f := _), hm1, hm0, hyalg, AlgHom.commutes, ← hf]
+    rw [hz, map_add (f := _), map_add (f := _), map_add (f := _), hm1, hm0, hyalg, AlgHom.commutes,
+      ← hf]
     simp [ResidueField.algebraMap_eq]
   have hresid : ∀ w : c'.O, res c'.O c'.O w = residue c'.O w := by
     intro w
@@ -109,9 +121,9 @@ theorem UpperTheory.V.Th.Nm.redOf :
         rw [← Ideal.map_le_iff_le_comap, Ideal.map_pow]
         exact Ideal.pow_right_mono (Ideal.map_le_iff_le_comap.2 hym) N
       have hc := (p.psi v i).cont N
-      have : (fun g => Ideal.Quotient.mk (maximalIdeal c'.O ^ N) ((ψ₀ v i g : c'.Oˣ) : c'.O)) =
-          (Ideal.quotientMap (maximalIdeal c'.O ^ N) y hle) ∘
-            (fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) ((p.ψ v i g : Rˣ) : R)) := by
+      have : (fun g => Ideal.Quotient.mk (maximalIdeal c'.O ^ N) ((ψ₀ v i g : c'.Oˣ) : c'.O))
+          = (Ideal.quotientMap (maximalIdeal c'.O ^ N) y hle)
+            ∘ (fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) ((p.ψ v i g : Rˣ) : R)) := by
         funext g
         simp [hψy, Ideal.quotientMap_mk]
       rw [this]

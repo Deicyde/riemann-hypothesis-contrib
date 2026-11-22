@@ -10,12 +10,12 @@ open scoped SchwartzMap Uniformity
 
 namespace GlobalTheory
 
-theorem schwartz_family_uniform_bound : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V]
-    [FiniteDimensional ℝ V] (I : Type)
-    (lam : I → SchwartzMap V ℂ →L[ℂ] ℂ) (w : I → ℝ), (∀ i, 0 ≤ w i) →
-    (∀ f, ∃ (N : ℕ) (C : ℝ), ∀ i, ‖lam i f‖ ≤ C * w i ^ N) →
-    ∃ (N : ℕ) (C : ℝ) (T : Finset (ℕ × ℕ)), ∀ i f,
-      ‖lam i f‖ ≤ C * (T.sup (schwartzSeminormFamily ℂ V ℂ)) f * w i ^ N := by
+theorem schwartz_family_uniform_bound
+    : ∀ (V : Type) [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V] (I : Type)
+        (lam : I → SchwartzMap V ℂ →L[ℂ] ℂ) (w : I → ℝ),
+      (∀ i, 0 ≤ w i) → (∀ f, ∃ (N : ℕ) (C : ℝ), ∀ i, ‖lam i f‖ ≤ C * w i ^ N)
+        → ∃ (N : ℕ) (C : ℝ) (T : Finset (ℕ × ℕ)), ∀ i f,
+          ‖lam i f‖ ≤ C * (T.sup (schwartzSeminormFamily ℂ V ℂ)) f * w i ^ N := by
   intro V _ _ _ I lam w hw hb
   haveI : (𝓤 𝓢(V, ℂ)).IsCountablyGenerated := IsUniformAddGroup.uniformity_countably_generated
   haveI : CompleteSpace 𝓢(V, ℂ) := SchwartzComplete.completeSpace
@@ -30,8 +30,8 @@ theorem schwartz_family_uniform_bound : ∀ (V : Type) [NormedAddCommGroup V] [N
     refine Set.eq_univ_of_forall fun f => ?_
     obtain ⟨N, C, hC⟩ := hb f
     obtain ⟨M, hM⟩ := exists_nat_ge C
-    exact Set.mem_iUnion.2 ⟨(N, M), fun i =>
-      (hC i).trans (mul_le_mul_of_nonneg_right hM (pow_nonneg (hw i) _))⟩
+    exact Set.mem_iUnion.2
+      ⟨(N, M), fun i => (hC i).trans (mul_le_mul_of_nonneg_right hM (pow_nonneg (hw i) _))⟩
   obtain ⟨p, f₀, hf₀⟩ := nonempty_interior_of_iUnion_of_closed hS hU
   have hn : interior (S p) ∈ 𝓝 f₀ := isOpen_interior.mem_nhds hf₀
   have hn' : (fun g => f₀ + g) ⁻¹' interior (S p) ∈ 𝓝 (0 : 𝓢(V, ℂ)) := by
@@ -47,7 +47,9 @@ theorem schwartz_family_uniform_bound : ∀ (V : Type) [NormedAddCommGroup V] [N
     have h2 : f₀ ∈ S p := interior_subset hf₀
     have h3 : lam i g = lam i (f₀ + g) - lam i f₀ := by simp
     rw [h3]
-    calc ‖lam i (f₀ + g) - lam i f₀‖ ≤ ‖lam i (f₀ + g)‖ + ‖lam i f₀‖ := norm_sub_le _ _
+    calc
+      ‖lam i (f₀ + g) - lam i f₀‖
+        ≤ ‖lam i (f₀ + g)‖ + ‖lam i f₀‖ := norm_sub_le _ _
       _ ≤ (p.2 : ℝ) * w i ^ p.1 + (p.2 : ℝ) * w i ^ p.1 := add_le_add (h1 i) (h2 i)
       _ = 2 * (p.2 : ℝ) * w i ^ p.1 := by ring
   refine ⟨p.1, 2 * (p.2 : ℝ) / ε, T, fun i f => ?_⟩
@@ -63,25 +65,31 @@ theorem schwartz_family_uniform_bound : ∀ (V : Type) [NormedAddCommGroup V] [N
       rw [Complex.norm_real, Real.norm_of_nonneg (div_pos hε htpos).le]
     have hg : q (((ε / t : ℝ) : ℂ) • f) < ε := by
       rw [map_smul_eq_mul, hc]
-      calc ε / t * q f < ε / t * t := mul_lt_mul_of_pos_left ht (div_pos hε htpos)
+      calc
+        ε / t * q f
+          < ε / t * t := mul_lt_mul_of_pos_left ht (div_pos hε htpos)
         _ = ε := by field_simp
     have h := hball _ hg i
     rw [map_smul, norm_smul, hc] at h
-    rw [hA, show t * (2 * (p.2 : ℝ) * w i ^ p.1 / ε) = (t / ε) * (2 * (p.2 : ℝ) * w i ^ p.1) by ring]
-    have : ‖lam i f‖ = (t / ε) * (ε / t * ‖lam i f‖) := by
-      field_simp
+    rw [hA,
+      show t * (2 * (p.2 : ℝ) * w i ^ p.1 / ε) = (t / ε) * (2 * (p.2 : ℝ) * w i ^ p.1) by ring]
+    have : ‖lam i f‖ = (t / ε) * (ε / t * ‖lam i f‖) := by field_simp
     rw [this]
     exact mul_le_mul_of_nonneg_left h (div_pos htpos hε).le
   have hfin : ‖lam i f‖ ≤ q f * A := by
     rcases hA0.lt_or_eq with hApos | hAz
     · refine le_of_forall_gt_imp_ge_of_dense fun a ha => ?_
       have : q f < a / A := (lt_div_iff₀ hApos).2 ha
-      calc ‖lam i f‖ ≤ a / A * A := hscale _ this
+      calc
+        ‖lam i f‖
+          ≤ a / A * A := hscale _ this
         _ = a := by field_simp
     · rw [← hAz, mul_zero]
       have := hscale (q f + 1) (by linarith)
       rwa [← hAz, mul_zero] at this
-  calc ‖lam i f‖ ≤ q f * A := hfin
+  calc
+    ‖lam i f‖
+      ≤ q f * A := hfin
     _ = 2 * (p.2 : ℝ) / ε * q f * w i ^ p.1 := by rw [hA]; ring
 
 end GlobalTheory

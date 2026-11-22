@@ -12,29 +12,45 @@ public import Development.WeilBound.ThetaLifts.LatticeBasics.ContinuousFlat
 noncomputable section
 
 open scoped TensorProduct NNReal Matrix Pointwise
-open NumberField IsDedekindDomain MeasureTheory Filter Topology Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
-open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl PositivityTheory.SiegelWeilFormula
+open NumberField IsDedekindDomain MeasureTheory Filter Topology
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+  GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels GlobalTheory.ThK.Dbl
+  PositivityTheory.SiegelWeilFormula
 
 namespace PositivityTheory.SiegelWeilFormula.Khead
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {σ : E →ₐ[F] E}
 
-theorem hgt_mul_right {n : ℕ} {Y : Spc F E n} {K : Subgroup (G2 σ Y)} {a : G2 σ Y → ℝ} (h : IsHgt K a) (x c : G2 σ Y) :
-    ∃ k ∈ K, a (x * c) = a x * a (k * c) := by
+theorem hgt_mul_right
+    {n : ℕ} {Y : Spc F E n} {K : Subgroup (G2 σ Y)} {a : G2 σ Y → ℝ} (h : IsHgt K a) (x c : G2 σ Y)
+    : ∃ k ∈ K, a (x * c) = a x * a (k * c) := by
   obtain ⟨p, t, hp, k, hk, rfl⟩ := h.iwa x
   refine ⟨k, hk, ?_⟩
   rw [mul_assoc, h.mul hp, h.val p t hp k hk]
 
-theorem majorant (d : SD σ) (hS : d.Strong) {s₁ : ℂ} {f : d.G → ℂ} (hf : IsSec d.K d.χ s₁ f) :
-    ∃ t : ℝ, ∀ z : ℂ, t < z.re → ∀ C : Set d.G, IsCompact C →
-      ∃ u : GlobalTheory.Eis.Cosets (par2 σ d.Y) (rat2 σ d.Y) → ℝ, Summable u ∧
-        ∀ g ∈ C, ∀ q, ‖GlobalTheory.Eis.term (par2 σ d.Y) (rat2 σ d.Y) (fun x => ((d.Ht x : ℝ) : ℂ) ^ (z - s₁) * f x) g q‖ ≤ u q := by
+theorem majorant (d : SD σ) (hS : d.Strong) {s₁ : ℂ} {f : d.G → ℂ} (hf : IsSec d.K d.χ s₁ f)
+    : ∃ t : ℝ, ∀ z : ℂ,
+      t < z.re
+        → ∀ C : Set d.G,
+          IsCompact C
+            → ∃ u : GlobalTheory.Eis.Cosets (par2 σ d.Y) (rat2 σ d.Y) → ℝ,
+              Summable u
+                ∧ ∀ g ∈ C, ∀ q,
+                  ‖GlobalTheory.Eis.term (par2 σ d.Y) (rat2 σ d.Y) (fun x => ((d.Ht x : ℝ) : ℂ) ^ (z - s₁) * f x) g q‖
+                    ≤ u q := by
   obtain ⟨r', s', hY⟩ := hS
-  have hKc : IsCompact (d.K : Set d.G) := GlobalTheory.T.isCompact_standard_maximal F E σ d.B d.n d.Y r' s' d.ok.good d.ok.hn hY d.b d.K d.a
-    d.ok.frame d.ok.stdK d.ok.hgt
-  obtain ⟨hac, hpos⟩ := GlobalTheory.T.height_function_continuous_pos' F E σ d.B d.n d.Y r' s' d.ok.good d.ok.hn hY d.b d.K d.a d.ok.frame d.ok.stdK d.ok.hgt
+  have hKc : IsCompact (d.K : Set d.G) :=
+    GlobalTheory.T.isCompact_standard_maximal F E σ d.B d.n d.Y r' s' d.ok.good d.ok.hn hY d.b d.K
+      d.a d.ok.frame d.ok.stdK d.ok.hgt
+  obtain ⟨hac, hpos⟩ :=
+    GlobalTheory.T.height_function_continuous_pos' F E σ d.B d.n d.Y r' s' d.ok.good d.ok.hn hY d.b
+      d.K d.a d.ok.frame d.ok.stdK d.ok.hgt
   obtain ⟨C0, hC0⟩ := GlobalTheory.T.flat_section_growth_bound d.K d.a hKc d.ok.hgt hpos d.χ s₁ f hf
-  obtain ⟨σ₀, hσ⟩ := GlobalTheory.T.eisenstein_series_convergent F E σ d.B d.n d.Y r' s' d.ok.good d.ok.hn hY d.b d.K d.a d.ok.frame d.ok.stdK d.ok.hgt
+  obtain ⟨σ₀, hσ⟩ :=
+    GlobalTheory.T.eisenstein_series_convergent F E σ d.B d.n d.Y r' s' d.ok.good d.ok.hn hY d.b d.K
+      d.a d.ok.frame d.ok.stdK d.ok.hgt
   refine ⟨σ₀ - (d.n : ℝ) / 2, fun z hz C hC => ?_⟩
   set σ' : ℝ := z.re + (d.n : ℝ) / 2 with hσ'
   have h1 : σ₀ < σ' := by linarith
@@ -62,18 +78,24 @@ theorem majorant (d : SD σ) (hS : d.Strong) {s₁ : ℂ} {f : d.G → ℂ} (hf 
     rw [e, Real.mul_rpow (hpos x).le r0.le, mul_comm]
     exact mul_le_mul_of_nonneg_right hb (Real.rpow_nonneg (hpos x).le _)
   obtain ⟨_, _, hsum⟩ := hσ σ' h1
-  refine ⟨fun q => |C0| * (|M| ^ σ' + (|M'|⁻¹) ^ σ') * d.a ((Quotient.out q).1 * 1) ^ σ', (hsum 1).1.mul_left _,
-    fun g hg q => ?_⟩
-  have hΦ : (fun x => ((d.Ht x : ℝ) : ℂ) ^ (z - s₁) * f x) = flat d.a f s₁ z := funext fun y => by
-    simp only [SD.Ht, flat]
-    rw [Real.coe_toNNReal _ (hpos y).le]
+  refine ⟨
+    fun q => |C0| * (|M| ^ σ' + (|M'|⁻¹) ^ σ') * d.a ((Quotient.out q).1 * 1) ^ σ',
+    (hsum 1).1.mul_left _,
+    fun g hg q => ?_
+  ⟩
+  have hΦ : (fun x => ((d.Ht x : ℝ) : ℂ) ^ (z - s₁) * f x) = flat d.a f s₁ z :=
+    funext fun y => by
+      simp only [SD.Ht, flat]
+      rw [Real.coe_toNNReal _ (hpos y).le]
   rw [hΦ]
   show ‖flat d.a f s₁ z ((Quotient.out q).1 * g)‖ ≤ _
   simp only [mul_one]
-  calc _ ≤ C0 * d.a ((Quotient.out q).1 * g) ^ σ' := hC0 z _
-    _ ≤ |C0| * d.a ((Quotient.out q).1 * g) ^ σ' := mul_le_mul_of_nonneg_right (le_abs_self _) (Real.rpow_nonneg (hpos _).le _)
+  calc
+    _ ≤ C0 * d.a ((Quotient.out q).1 * g) ^ σ' := hC0 z _
+    _ ≤ |C0| * d.a ((Quotient.out q).1 * g) ^ σ' :=
+      mul_le_mul_of_nonneg_right (le_abs_self _) (Real.rpow_nonneg (hpos _).le _)
     _ ≤ |C0| * ((|M| ^ σ' + (|M'|⁻¹) ^ σ') * d.a (Quotient.out q).1 ^ σ') :=
-        mul_le_mul_of_nonneg_left (hr _ g hg) (abs_nonneg _)
+      mul_le_mul_of_nonneg_left (hr _ g hg) (abs_nonneg _)
     _ = _ := by ring
 
 end PositivityTheory.SiegelWeilFormula.Khead

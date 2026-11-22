@@ -10,8 +10,10 @@ open Module
 
 variable {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
 
-private theorem smt_unit {s ρ : ℕ} (E : Matrix (Fin s) (Fin ρ) O) (C : Matrix (Fin ρ) (Fin s) O)
-    (hE : ∀ i j, E i j ∈ IsLocalRing.maximalIdeal O) : IsUnit (1 - E * C).det := by
+private theorem smt_unit
+    {s ρ : ℕ} (E : Matrix (Fin s) (Fin ρ) O) (C : Matrix (Fin ρ) (Fin s) O)
+    (hE : ∀ i j, E i j ∈ IsLocalRing.maximalIdeal O)
+    : IsUnit (1 - E * C).det := by
   rw [← IsLocalRing.residue_ne_zero_iff_isUnit, RingHom.map_det]
   have hE0 : E.map (IsLocalRing.residue O) = 0 := by
     ext i j
@@ -21,22 +23,31 @@ private theorem smt_unit {s ρ : ℕ} (E : Matrix (Fin s) (Fin ρ) O) (C : Matri
   rw [h, Matrix.det_one]
   exact one_ne_zero
 
-private theorem smt_block {s ρ : ℕ} (z1 z2 : O) (E : Matrix (Fin s) (Fin ρ) O)
-    (C : Matrix (Fin ρ) (Fin s) O) (hE : ∀ i j, E i j ∈ IsLocalRing.maximalIdeal O) :
-    ∃ M : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O,
+private theorem smt_block
+    {s ρ : ℕ}
+    (z1 z2 : O)
+    (E : Matrix (Fin s) (Fin ρ) O)
+    (C : Matrix (Fin ρ) (Fin s) O) (hE : ∀ i j, E i j ∈ IsLocalRing.maximalIdeal O)
+    : ∃ M : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O,
       Matrix.fromBlocks (z1 • (1 : Matrix (Fin s) (Fin s) O)) ((z1 * z2) • E) C
-        (z2 • (1 : Matrix (Fin ρ) (Fin ρ) O)) * M =
-      (z1 * z2) • (1 : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O) := by
+            (z2 • (1 : Matrix (Fin ρ) (Fin ρ) O))
+          * M
+        = (z1 * z2) • (1 : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O) := by
   have hU := smt_unit E C hE
   have hV : IsUnit (1 - C * E).det := by rw [Matrix.det_one_sub_mul_comm]; exact hU
   have hUi : (1 - E * C) * (1 - E * C)⁻¹ = 1 := Matrix.mul_nonsing_inv _ hU
   have hVi : (1 - C * E) * (1 - C * E)⁻¹ = 1 := Matrix.mul_nonsing_inv _ hV
-  refine ⟨Matrix.fromBlocks (z2 • (1 - E * C)⁻¹) (-(z1 * z2) • (E * (1 - C * E)⁻¹))
-    (-(C * (1 - E * C)⁻¹)) (z1 • (1 - C * E)⁻¹), ?_⟩
+  refine ⟨
+    Matrix.fromBlocks (z2 • (1 - E * C)⁻¹) (-(z1 * z2) • (E * (1 - C * E)⁻¹)) (-(C * (1 - E * C)⁻¹))
+      (z1 • (1 - C * E)⁻¹),
+    ?_
+  ⟩
   rw [Matrix.fromBlocks_multiply, ← Matrix.fromBlocks_one, Matrix.fromBlocks_smul, smul_zero,
     Matrix.fromBlocks_inj]
   refine ⟨?_, ?_, ?_, ?_⟩
-  · have e : (z1 * z2) • (1 : Matrix (Fin s) (Fin s) O) = (z1 * z2) • ((1 - E * C) * (1 - E * C)⁻¹) := by
+  · have e
+        : (z1 * z2) • (1 : Matrix (Fin s) (Fin s) O)
+          = (z1 * z2) • ((1 - E * C) * (1 - E * C)⁻¹) := by
       rw [hUi]
     rw [e]
     simp only [Matrix.sub_mul, Matrix.one_mul, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_neg,
@@ -48,25 +59,41 @@ private theorem smt_block {s ρ : ℕ} (z1 z2 : O) (E : Matrix (Fin s) (Fin ρ) 
   · simp only [Matrix.one_mul, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_neg, Matrix.neg_mul,
       Matrix.mul_assoc, smul_smul]
     module
-  · have e : (z1 * z2) • (1 : Matrix (Fin ρ) (Fin ρ) O) = (z1 * z2) • ((1 - C * E) * (1 - C * E)⁻¹) := by
+  · have e
+        : (z1 * z2) • (1 : Matrix (Fin ρ) (Fin ρ) O)
+          = (z1 * z2) • ((1 - C * E) * (1 - C * E)⁻¹) := by
       rw [hVi]
     rw [e]
     simp only [Matrix.sub_mul, Matrix.one_mul, Matrix.smul_mul, Matrix.mul_smul, Matrix.mul_neg,
       Matrix.neg_mul, Matrix.mul_assoc, smul_smul, neg_smul]
     module
 
-theorem lemmaSMat {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] (σ ρ : ℕ) (z1 z2 : O) (h1 : z1 ≠ 0) (h2 : z2 ≠ 0) (N : Matrix (Fin σ) (Fin ρ) O) (B : Matrix (Fin ρ) (Fin σ) O) :
-  ∃ (r s : ℕ), r + s = σ ∧
-    (∃ (P : Matrix (Fin r) (Fin σ) O) (Q : Matrix (Fin ρ) (Fin r) O), P * N * Q = (z1 * z2) • (1 : Matrix (Fin r) (Fin r) O)) ∧
-    (∃ (P' : Matrix (Fin s) (Fin σ) O) (P'' : Matrix (Fin σ) (Fin s) O) (M : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O), P' * P'' = 1 ∧
-      Matrix.fromBlocks (z1 • (1 : Matrix (Fin s) (Fin s) O)) (P' * N) (B * P'') (z2 • (1 : Matrix (Fin ρ) (Fin ρ) O)) * M = (z1 * z2) • (1 : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O)) := by
+theorem lemmaSMat
+    {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+    (σ ρ : ℕ)
+    (z1 z2 : O) (h1 : z1 ≠ 0) (h2 : z2 ≠ 0)
+    (N : Matrix (Fin σ) (Fin ρ) O) (B : Matrix (Fin ρ) (Fin σ) O)
+    : ∃ (r s : ℕ),
+      r + s = σ
+        ∧ (∃ (P : Matrix (Fin r) (Fin σ) O) (Q : Matrix (Fin ρ) (Fin r) O),
+          P * N * Q = (z1 * z2) • (1 : Matrix (Fin r) (Fin r) O))
+        ∧ (∃ (P' : Matrix (Fin s) (Fin σ) O) (P'' : Matrix (Fin σ) (Fin s) O)
+            (M : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O),
+          P' * P'' = 1
+            ∧ Matrix.fromBlocks (z1 • (1 : Matrix (Fin s) (Fin s) O)) (P' * N) (B * P'')
+                  (z2 • (1 : Matrix (Fin ρ) (Fin ρ) O))
+                * M
+              = (z1 * z2) • (1 : Matrix (Fin s ⊕ Fin ρ) (Fin s ⊕ Fin ρ) O)) := by
   classical
   have hz0 : z1 * z2 ≠ 0 := mul_ne_zero h1 h2
-  have key : ∀ (n : ℕ) (N : Matrix (Fin n) (Fin ρ) O), ∃ (r s : ℕ), r + s = n ∧
-      (∃ (P : Matrix (Fin r) (Fin n) O) (Q : Matrix (Fin ρ) (Fin r) O),
-        P * N * Q = (z1 * z2) • (1 : Matrix (Fin r) (Fin r) O)) ∧
-      (∃ (P' : Matrix (Fin s) (Fin n) O) (P'' : Matrix (Fin n) (Fin s) O), P' * P'' = 1 ∧
-        ∀ i j, ∃ e ∈ IsLocalRing.maximalIdeal O, (P' * N) i j = z1 * z2 * e) := by
+  have key
+      : ∀ (n : ℕ) (N : Matrix (Fin n) (Fin ρ) O), ∃ (r s : ℕ),
+        r + s = n
+          ∧ (∃ (P : Matrix (Fin r) (Fin n) O) (Q : Matrix (Fin ρ) (Fin r) O),
+            P * N * Q = (z1 * z2) • (1 : Matrix (Fin r) (Fin r) O))
+          ∧ (∃ (P' : Matrix (Fin s) (Fin n) O) (P'' : Matrix (Fin n) (Fin s) O),
+            P' * P'' = 1
+              ∧ ∀ i j, ∃ e ∈ IsLocalRing.maximalIdeal O, (P' * N) i j = z1 * z2 * e) := by
     intro n
     induction n with
     | zero =>
@@ -82,14 +109,17 @@ theorem lemmaSMat {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing 
         · intro i j; rw [Matrix.one_mul]; exact hall i j
       obtain ⟨ia, hia⟩ := not_forall.mp hall
       obtain ⟨ja, hna⟩ := not_forall.mp hia
-      obtain ⟨⟨i0, j0⟩, -, hmin⟩ := Finset.exists_min_image (Finset.univ : Finset (Fin (n + 1) × Fin ρ))
-        (fun p => IsDiscreteValuationRing.addVal O (N p.1 p.2)) ⟨(ia, ja), Finset.mem_univ _⟩
+      obtain ⟨⟨i0, j0⟩, -, hmin⟩ :=
+        Finset.exists_min_image (Finset.univ : Finset (Fin (n + 1) × Fin ρ))
+          (fun p => IsDiscreteValuationRing.addVal O (N p.1 p.2))
+          ⟨(ia, ja), Finset.mem_univ _⟩
       have hdiv : ∀ p : Fin (n + 1) × Fin ρ, N i0 j0 ∣ N p.1 p.2 := fun p =>
         (IsDiscreteValuationRing.addVal_le_iff_dvd).mp (hmin p (Finset.mem_univ _))
       have haz : N i0 j0 ∣ z1 * z2 := by
         by_contra hnd
         rcases le_total (IsDiscreteValuationRing.addVal O (N i0 j0))
-            (IsDiscreteValuationRing.addVal O (z1 * z2)) with h | h
+            (IsDiscreteValuationRing.addVal O (z1 * z2))
+          with h | h
         · exact hnd ((IsDiscreteValuationRing.addVal_le_iff_dvd).mp h)
         · obtain ⟨e, he⟩ := (IsDiscreteValuationRing.addVal_le_iff_dvd).mp h
           have hem : e ∈ IsLocalRing.maximalIdeal O := by
@@ -102,17 +132,19 @@ theorem lemmaSMat {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing 
       obtain ⟨t, ht⟩ := haz
       choose f hf using hdiv
       have hf' : ∀ i l, N i l = N i0 j0 * f (i, l) := fun i l => hf (i, l)
-      have ha0 : N i0 j0 ≠ 0 := by
-        intro h0; apply hz0; rw [ht, h0, zero_mul]
+      have ha0 : N i0 j0 ≠ 0 := by intro h0; apply hz0; rw [ht, h0, zero_mul]
       have hf00 : f (i0, j0) = 1 := by
         apply mul_left_cancel₀ ha0
-        rw [mul_one]; exact (hf' i0 j0).symm
+        rw [mul_one]
+        exact (hf' i0 j0).symm
       let N1 : Matrix (Fin n) (Fin ρ) O :=
         Matrix.of fun k l => N (i0.succAbove k) l - f (i0.succAbove k, j0) * N i0 l
       obtain ⟨r1, s1, hrs, ⟨P1, Q1, hPQ⟩, ⟨P1', P1'', hP1, hgood⟩⟩ := ih N1
-      let S : Matrix (Fin n) (Fin (n + 1)) O := Matrix.of fun k i =>
-        (if i = i0.succAbove k then 1 else 0) - (if i = i0 then f (i0.succAbove k, j0) else 0)
-      let Em : Matrix (Fin (n + 1)) (Fin n) O := Matrix.of fun i k => if i = i0.succAbove k then 1 else 0
+      let S : Matrix (Fin n) (Fin (n + 1)) O :=
+        Matrix.of fun k i =>
+          (if i = i0.succAbove k then 1 else 0) - (if i = i0 then f (i0.succAbove k, j0) else 0)
+      let Em : Matrix (Fin (n + 1)) (Fin n) O :=
+        Matrix.of fun i k => if i = i0.succAbove k then 1 else 0
       let Ei : Matrix (Fin 1) (Fin (n + 1)) O := Matrix.of fun _ i => if i = i0 then t else 0
       let ej : Matrix (Fin ρ) (Fin 1) O := Matrix.of fun l _ => if l = j0 then 1 else 0
       let dd : Matrix (Fin 1) (Fin ρ) O := Matrix.of fun _ l => f (i0, l)
@@ -124,23 +156,28 @@ theorem lemmaSMat {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing 
         ext k k'
         have hne : i0 ≠ i0.succAbove k' := Fin.ne_succAbove i0 k'
         have hne' : i0.succAbove k' ≠ i0 := Fin.succAbove_ne i0 k'
-        simp only [S, Em, Matrix.mul_apply, Matrix.of_apply, sub_mul, Finset.sum_sub_distrib, ite_mul,
-          one_mul, zero_mul, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ, if_true, Matrix.one_apply]
+        simp only [S, Em, Matrix.mul_apply, Matrix.of_apply, sub_mul, Finset.sum_sub_distrib,
+          ite_mul, one_mul, zero_mul, Finset.sum_ite_eq', Finset.sum_ite_eq, Finset.mem_univ,
+          if_true, Matrix.one_apply]
         simp [hne, hne', Fin.succAbove_right_inj]
       have hrow : Ei * N = (z1 * z2) • dd := by
         ext i l
         simp [Ei, dd, Matrix.mul_apply, ite_mul]
-        rw [hf' i0 l, ht]; ring
+        rw [hf' i0 l, ht]
+        ring
       have hdd : dd * ej = 1 := by
         ext i j
-        fin_cases i; fin_cases j
+        fin_cases i
+        fin_cases j
         simp [dd, ej, Matrix.mul_apply, hf00]
       have hN1e : N1 * ej = 0 := by
         ext k j
         simp [N1, ej, Matrix.mul_apply]
-        rw [hf' (i0.succAbove k) j0]; ring
-      have hblocks : Matrix.fromRows Ei (P1 * S) * N * Matrix.fromCols ej Q1' =
-          (z1 * z2) • (1 : Matrix (Fin 1 ⊕ Fin r1) (Fin 1 ⊕ Fin r1) O) := by
+        rw [hf' (i0.succAbove k) j0]
+        ring
+      have hblocks
+          : Matrix.fromRows Ei (P1 * S) * N * Matrix.fromCols ej Q1'
+            = (z1 * z2) • (1 : Matrix (Fin 1 ⊕ Fin r1) (Fin 1 ⊕ Fin r1) O) := by
         rw [Matrix.fromRows_mul, Matrix.fromRows_mul_fromCols, ← Matrix.fromBlocks_one,
           Matrix.fromBlocks_smul, smul_zero, smul_zero, Matrix.fromBlocks_inj]
         refine ⟨?_, ?_, ?_, ?_⟩
@@ -150,8 +187,17 @@ theorem lemmaSMat {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing 
         · rw [Matrix.mul_assoc P1 S N, hSN, Matrix.mul_assoc, hN1e, Matrix.mul_zero]
         · rw [Matrix.mul_assoc P1 S N, hSN, Matrix.mul_sub, ← Matrix.mul_assoc (P1 * N1) ej,
             Matrix.mul_assoc P1 N1 ej, hN1e, Matrix.mul_zero, Matrix.zero_mul, sub_zero, hPQ]
-      refine ⟨1 + r1, s1, by omega, ⟨(Matrix.fromRows Ei (P1 * S)).submatrix finSumFinEquiv.symm id,
-        (Matrix.fromCols ej Q1').submatrix id finSumFinEquiv.symm, ?_⟩, ⟨P1' * S, Em * P1'', ?_, ?_⟩⟩
+      refine ⟨
+        1 + r1,
+        s1,
+        by omega,
+        ⟨
+          (Matrix.fromRows Ei (P1 * S)).submatrix finSumFinEquiv.symm id,
+          (Matrix.fromCols ej Q1').submatrix id finSumFinEquiv.symm,
+          ?_
+        ⟩,
+        ⟨P1' * S, Em * P1'', ?_, ?_⟩
+      ⟩
       · rw [← Matrix.submatrix_id_id N, ← Matrix.submatrix_mul _ _ _ _ _ Function.bijective_id,
           ← Matrix.submatrix_mul _ _ _ _ _ Function.bijective_id, hblocks]
         ext i j

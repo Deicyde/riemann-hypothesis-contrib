@@ -5,18 +5,18 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.PointsNonemp
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 namespace GlobalTheory
 
-
 open Matrix NumberField in
 open scoped TensorProduct Classical in
-theorem _root_.GlobalTheory.finite_monic_coeff_bdd_mul_isIntegral (K : Type) [Field K] [NumberField K]
-    (d D : ℕ) (B : ℝ) (hD : 0 < D) :
-    {P : Polynomial K | P.Monic ∧ P.natDegree ≤ d ∧ ∀ k, IsIntegral ℤ ((D : K) * P.coeff k) ∧
-      ∀ φ : K →+* ℂ, ‖φ (P.coeff k)‖ ≤ B}.Finite := by
+theorem _root_.GlobalTheory.finite_monic_coeff_bdd_mul_isIntegral
+    (K : Type) [Field K] [NumberField K] (d D : ℕ) (B : ℝ) (hD : 0 < D)
+    : {P : Polynomial K | P.Monic ∧ P.natDegree ≤ d ∧ ∀ k, IsIntegral ℤ ((D : K) * P.coeff k) ∧
+        ∀ φ : K →+* ℂ, ‖φ (P.coeff k)‖ ≤ B}.Finite := by
   have hT : {c : K | IsIntegral ℤ ((D : K) * c) ∧ ∀ φ : K →+* ℂ, ‖φ c‖ ≤ B}.Finite := by
     have h := NumberField.Embeddings.finite_of_norm_le K ℂ ((D : ℝ) * B)
     refine (h.image fun x => x / (D : K)).subset ?_
@@ -30,7 +30,8 @@ theorem _root_.GlobalTheory.finite_monic_coeff_bdd_mul_isIntegral (K : Type) [Fi
       {c : K | IsIntegral ℤ ((D : K) * c) ∧ ∀ φ : K →+* ℂ, ‖φ c‖ ≤ B}).Finite :=
     Set.Finite.pi fun _ => hT
   refine Set.Finite.of_finite_image
-    (f := fun P : Polynomial K => fun i : Fin (d + 1) => P.coeff i) (hF.subset ?_) ?_
+    (f := fun P : Polynomial K => fun i : Fin (d + 1) => P.coeff i)
+    (hF.subset ?_) ?_
   · rintro _ ⟨P, hP, rfl⟩ i -
     exact ⟨(hP.2.2 i).1, (hP.2.2 i).2⟩
   · intro P hP Q hQ hPQ

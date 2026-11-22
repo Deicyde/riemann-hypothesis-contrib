@@ -13,17 +13,17 @@ noncomputable section
 
 namespace GlobalTheory.GLq.LabelDet
 
-open GlobalTheory.GLq GlobalTheory.GLp Formalism.MainNotions.ArithmeticCylinders Formalism.CyclotomicNorms Polynomial
+open GlobalTheory.GLq GlobalTheory.GLp Formalism.MainNotions.ArithmeticCylinders
+  Formalism.CyclotomicNorms Polynomial
 open scoped Classical ComplexOrder
 
 variable {g : ℕ} [hg : Fact g.Prime]
 
-
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.isIrr_hom {G : Type} [Group G] [Fintype G] (φ : G →* ℂˣ) :
-    _root_.GlobalTheory.GLq.IsIrr (fun x : G => ((φ x : ℂˣ) : ℂ)) := by
+theorem _root_.GlobalTheory.GLq.LabelDet.isIrr_hom {G : Type} [Group G] [Fintype G] (φ : G →* ℂˣ)
+    : _root_.GlobalTheory.GLq.IsIrr (fun x : G => ((φ x : ℂˣ) : ℂ)) := by
   have hchar : ∀ x : G, (FDRep.of (_root_.GlobalTheory.GLp.Model.chRep φ)).character x = φ x := by
     intro x
     have : _root_.GlobalTheory.GLp.Model.chRep φ x = (φ x : ℂ) • LinearMap.id := by
@@ -36,30 +36,32 @@ theorem _root_.GlobalTheory.GLq.LabelDet.isIrr_hom {G : Type} [Group G] [Fintype
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.theta_gen_pow (L : _root_.GlobalTheory.GLq.LabelDatum g) {x : _root_.Formalism.CyclotomicNorms.Fbar g}
-    (hx : x ^ (g ^ 1 - 1) = 1) (n : ℕ) :
-    _root_.GlobalTheory.GLq.thetaOf L 1 x (L.gen 1 ^ n) =
-      L.teich x ^ n :=
+theorem _root_.GlobalTheory.GLq.LabelDet.theta_gen_pow
+    (L : _root_.GlobalTheory.GLq.LabelDatum g)
+    {x : _root_.Formalism.CyclotomicNorms.Fbar g} (hx : x ^ (g ^ 1 - 1) = 1)
+    (n : ℕ)
+    : _root_.GlobalTheory.GLq.thetaOf L 1 x (L.gen 1 ^ n) = L.teich x ^ n :=
   _root_.GlobalTheory.GLq.Model.thetaOf_gen_pow L one_pos hx n
-
 
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.gen_one_mem (L : _root_.GlobalTheory.GLq.LabelDatum g) :
-    ∃ u : (ZMod g)ˣ, algebraMap (ZMod g) (_root_.Formalism.CyclotomicNorms.Fbar g) u = L.gen 1 := by
+theorem _root_.GlobalTheory.GLq.LabelDet.gen_one_mem (L : _root_.GlobalTheory.GLq.LabelDatum g)
+    : ∃ u : (ZMod g)ˣ,
+      algebraMap (ZMod g) (_root_.Formalism.CyclotomicNorms.Fbar g) u = L.gen 1 := by
   obtain ⟨u, hu, -⟩ := _root_.GlobalTheory.GLp.Model.exists_gen L
   exact ⟨u, hu⟩
 
-
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.det_inPar (a b : ℕ) (M : _root_.GlobalTheory.GLq.Mt g (a + b))
-    (h : _root_.GlobalTheory.GLq.InPar a M) :
-    M.det = (_root_.GlobalTheory.GLq.tl a M).det * (_root_.GlobalTheory.GLq.br a b M).det := by
-  have key : M.submatrix finSumFinEquiv finSumFinEquiv = Matrix.fromBlocks (_root_.GlobalTheory.GLq.tl a M)
-      (M.submatrix (Fin.castAdd b) (Fin.natAdd a)) 0 (_root_.GlobalTheory.GLq.br a b M) := by
+theorem _root_.GlobalTheory.GLq.LabelDet.det_inPar
+    (a b : ℕ) (M : _root_.GlobalTheory.GLq.Mt g (a + b)) (h : _root_.GlobalTheory.GLq.InPar a M)
+    : M.det = (_root_.GlobalTheory.GLq.tl a M).det * (_root_.GlobalTheory.GLq.br a b M).det := by
+  have key
+      : M.submatrix finSumFinEquiv finSumFinEquiv
+        = Matrix.fromBlocks (_root_.GlobalTheory.GLq.tl a M)
+          (M.submatrix (Fin.castAdd b) (Fin.natAdd a)) 0 (_root_.GlobalTheory.GLq.br a b M) := by
     ext (i | i) (j | j)
     · show M (Fin.castAdd b i) (Fin.castAdd b j) = _root_.Formalism.MainNotions.ArithmeticCylinders.entN M i j
       have hi := i.isLt
@@ -69,14 +71,17 @@ theorem _root_.GlobalTheory.GLq.LabelDet.det_inPar (a b : ℕ) (M : _root_.Globa
       rfl
     · simp
     · exact h _ _ (by simp) (by simp)
-    · simp [_root_.GlobalTheory.GLq.br, _root_.Formalism.MainNotions.ArithmeticCylinders.entN, Fin.natAdd]
+    · simp [_root_.GlobalTheory.GLq.br, _root_.Formalism.MainNotions.ArithmeticCylinders.entN,
+        Fin.natAdd]
   rw [← Matrix.det_submatrix_equiv_self finSumFinEquiv M, key, Matrix.det_fromBlocks_zero₂₁]
 
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.det_toG {n : ℕ} (M : _root_.GlobalTheory.GLq.Mt g n) (h : M.det ≠ 0) :
-    ((Matrix.GeneralLinearGroup.det (_root_.GlobalTheory.GLq.toG M) : (ZMod g)ˣ) : ZMod g) = M.det := by
+theorem _root_.GlobalTheory.GLq.LabelDet.det_toG
+    {n : ℕ} (M : _root_.GlobalTheory.GLq.Mt g n) (h : M.det ≠ 0)
+    : ((Matrix.GeneralLinearGroup.det (_root_.GlobalTheory.GLq.toG M) : (ZMod g)ˣ) : ZMod g)
+      = M.det := by
   unfold _root_.GlobalTheory.GLq.toG
   rw [dite_eq_left ((Matrix.isUnit_iff_isUnit_det M).mpr (isUnit_iff_ne_zero.mpr h))]
   simp [Matrix.GeneralLinearGroup.val_det_apply]
@@ -84,26 +89,28 @@ theorem _root_.GlobalTheory.GLq.LabelDet.det_toG {n : ℕ} (M : _root_.GlobalThe
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.det_par (a b : ℕ) (p : _root_.GlobalTheory.GLq.Gn g (a + b))
-    (h : _root_.GlobalTheory.GLq.InPar a (p : _root_.GlobalTheory.GLq.Mt g (a + b))) :
-    Matrix.GeneralLinearGroup.det p =
-      Matrix.GeneralLinearGroup.det (_root_.GlobalTheory.GLq.toG (_root_.GlobalTheory.GLq.tl a
-        (p : _root_.GlobalTheory.GLq.Mt g (a + b)))) *
-      Matrix.GeneralLinearGroup.det (_root_.GlobalTheory.GLq.toG (_root_.GlobalTheory.GLq.br a b
-        (p : _root_.GlobalTheory.GLq.Mt g (a + b)))) := by
+theorem _root_.GlobalTheory.GLq.LabelDet.det_par
+    (a b : ℕ) (p : _root_.GlobalTheory.GLq.Gn g (a + b))
+    (h : _root_.GlobalTheory.GLq.InPar a (p : _root_.GlobalTheory.GLq.Mt g (a + b)))
+    : Matrix.GeneralLinearGroup.det p
+      = Matrix.GeneralLinearGroup.det (_root_.GlobalTheory.GLq.toG (_root_.GlobalTheory.GLq.tl a
+          (p : _root_.GlobalTheory.GLq.Mt g (a + b))))
+        * Matrix.GeneralLinearGroup.det (_root_.GlobalTheory.GLq.toG (_root_.GlobalTheory.GLq.br a b
+          (p : _root_.GlobalTheory.GLq.Mt g (a + b)))) := by
   have hdet := _root_.GlobalTheory.GLq.LabelDet.det_inPar a b _ h
   have hp := (Matrix.GeneralLinearGroup.det p).ne_zero
   rw [Matrix.GeneralLinearGroup.val_det_apply] at hp
   rw [hdet] at hp
   obtain ⟨h1, h2⟩ := mul_ne_zero_iff.mp hp
   apply Units.ext
-  rw [Units.val_mul, _root_.GlobalTheory.GLq.LabelDet.det_toG _ h1, _root_.GlobalTheory.GLq.LabelDet.det_toG _ h2,
-    Matrix.GeneralLinearGroup.val_det_apply, ← hdet]
+  rw [Units.val_mul, _root_.GlobalTheory.GLq.LabelDet.det_toG _ h1,
+    _root_.GlobalTheory.GLq.LabelDet.det_toG _ h2, Matrix.GeneralLinearGroup.val_det_apply, ← hdet]
 
 open Polynomial in
 open scoped Classical ComplexOrder in
 variable {g : ℕ} [hg : Fact g.Prime] in
-theorem _root_.GlobalTheory.GLq.LabelDet.toG_one {n : ℕ} : _root_.GlobalTheory.GLq.toG (1 : _root_.GlobalTheory.GLq.Mt g n) = 1 := by
+theorem _root_.GlobalTheory.GLq.LabelDet.toG_one {n : ℕ}
+    : _root_.GlobalTheory.GLq.toG (1 : _root_.GlobalTheory.GLq.Mt g n) = 1 := by
   unfold _root_.GlobalTheory.GLq.toG
   rw [dite_eq_left isUnit_one]
   exact Units.ext (by simp)

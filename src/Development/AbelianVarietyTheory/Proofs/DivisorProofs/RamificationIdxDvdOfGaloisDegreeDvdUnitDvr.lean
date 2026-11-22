@@ -9,8 +9,10 @@ open scoped TensorProduct
 
 namespace GlobalTheory.RamGalDVR
 
-theorem isSeparable_of_natCast_finrank_ne_zero' {F E : Type*} [Field F] [Field E] [Algebra F E]
-    [FiniteDimensional F E] (h : (Module.finrank F E : F) ≠ 0) : Algebra.IsSeparable F E := by
+theorem isSeparable_of_natCast_finrank_ne_zero'
+    {F E : Type*} [Field F] [Field E] [Algebra F E] [FiniteDimensional F E]
+    (h : (Module.finrank F E : F) ≠ 0)
+    : Algebra.IsSeparable F E := by
   refine ⟨fun x => ?_⟩
   have hint : IsIntegral F x := IsIntegral.of_finite F x
   have hdvd := minpoly.degree_dvd hint
@@ -31,20 +33,24 @@ theorem isSeparable_of_natCast_finrank_ne_zero' {F E : Type*} [Field F] [Field E
   obtain ⟨c, hc'⟩ := hdvd
   exact h (by rw [hc', Nat.cast_mul, hn0, zero_mul])
 
-theorem isSeparable_of_isField {F E : Type*} [CommRing F] [CommRing E] [Algebra F E]
-    [Module.Finite F E] (hF : IsField F) (hE : IsField E)
-    (h : (Module.finrank F E : F) ≠ 0) : Algebra.IsSeparable F E := by
+theorem isSeparable_of_isField
+    {F E : Type*} [CommRing F] [CommRing E] [Algebra F E] [Module.Finite F E]
+    (hF : IsField F) (hE : IsField E) (h : (Module.finrank F E : F) ≠ 0)
+    : Algebra.IsSeparable F E := by
   letI := hF.toField
   letI := hE.toField
   exact @isSeparable_of_natCast_finrank_ne_zero' F E _ _ ‹Algebra F E› ‹Module.Finite F E› h
 
-theorem ramGal : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S] [Field K] [Algebra S K]
-    [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
-    [FiniteDimensional K L] [IsGalois K L] (q : ℕ), 0 < q → IsUnit (q : S) →
-    Module.finrank K L ∣ q →
-    (∀ P : Ideal (integralClosure S L), P.IsMaximal → P.ramificationIdx S ∣ q) ∧
-    (∀ P : Ideal (integralClosure S L), P.IsMaximal → ∀ [P.LiesOver (maximalIdeal S)],
-      Algebra.IsSeparable (S ⧸ maximalIdeal S) (integralClosure S L ⧸ P)) := by
+theorem ramGal
+    : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuationRing S] [Field K] [Algebra S K]
+        [IsFractionRing S K] [Field L] [Algebra K L] [Algebra S L] [IsScalarTower S K L]
+        [FiniteDimensional K L] [IsGalois K L] (q : ℕ),
+      0 < q → IsUnit (q : S) → Module.finrank K L ∣ q
+        → (∀ P : Ideal (integralClosure S L), P.IsMaximal → P.ramificationIdx S ∣ q)
+          ∧ (∀ P : Ideal (integralClosure S L),
+            P.IsMaximal
+              → ∀ [P.LiesOver (maximalIdeal S)],
+                Algebra.IsSeparable (S ⧸ maximalIdeal S) (integralClosure S L ⧸ P)) := by
   intro S K L _ _ _ _ _ _ _ _ _ _ _ _ q _ hq hdeg
   set B := integralClosure S L
   have : IsFractionRing B L := integralClosure.isFractionRing_of_finite_extension K L
@@ -56,10 +62,13 @@ theorem ramGal : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuati
   have : FaithfulSMul S B :=
     (faithfulSMul_iff_algebraMap_injective S _).2 (fun a b h => hinj (congrArg Subtype.val h))
   have : Module.Flat S B :=
-    Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.2 (Submodule.isTorsionFree_iff_torsion_eq_bot.1 inferInstance)
-  have hfund := Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (maximalIdeal S) B (L ≃ₐ[K] L)
+    Module.Flat.flat_iff_torsion_eq_bot_of_isBezout.2 (Submodule.isTorsionFree_iff_torsion_eq_bot.1
+      inferInstance)
+  have hfund :=
+    Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (maximalIdeal S) B (L ≃ₐ[K] L)
   rw [IsGalois.card_aut_eq_finrank] at hfund
-  have hef : Ideal.ramificationIdxIn (maximalIdeal S) B * Ideal.inertiaDegIn (maximalIdeal S) B ∣ q :=
+  have hef
+      : Ideal.ramificationIdxIn (maximalIdeal S) B * Ideal.inertiaDegIn (maximalIdeal S) B ∣ q :=
     (Dvd.intro_left _ hfund).trans hdeg
   have hlies : ∀ P : Ideal B, P.IsMaximal → P.LiesOver (maximalIdeal S) := by
     intro P hP
@@ -79,7 +88,8 @@ theorem ramGal : ∀ (S K L : Type) [CommRing S] [IsDomain S] [IsDiscreteValuati
     have : Module.Finite S (B ⧸ P) := inferInstance
     have : Module.Finite (S ⧸ maximalIdeal S) (B ⧸ P) :=
       Module.Finite.of_restrictScalars_finite S _ _
-    refine isSeparable_of_isField ((Ideal.Quotient.maximal_ideal_iff_isField_quotient _).1 inferInstance)
+    refine isSeparable_of_isField
+      ((Ideal.Quotient.maximal_ideal_iff_isField_quotient _).1 inferInstance)
       ((Ideal.Quotient.maximal_ideal_iff_isField_quotient _).1 hP) ?_
     obtain ⟨c, hc⟩ := hf
     intro h0

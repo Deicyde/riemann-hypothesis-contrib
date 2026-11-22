@@ -17,7 +17,8 @@ public import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StepLevelTLat
 
 noncomputable section
 
-open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix GlobalTheory.St.G
+open Formalism.BasicNotions Formalism.UG Formalism.L2.Forms NumberField IsDedekindDomain Matrix
+  GlobalTheory.St.G
 open scoped TensorProduct
 
 namespace GlobalTheory.St.G.LvlZero
@@ -26,10 +27,11 @@ section SlopeTestRemainingChoices
 
 variable {F : Type} [Field F] [NumberField F]
 
-
 omit [NumberField F] in
-theorem not_both_mem {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q) (v : HeightOneSpectrum (𝓞 F))
-    (h1 : (p : 𝓞 F) ∈ v.asIdeal) (h2 : (q : 𝓞 F) ∈ v.asIdeal) : False := by
+theorem not_both_mem
+    {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q)
+    (v : HeightOneSpectrum (𝓞 F)) (h1 : (p : 𝓞 F) ∈ v.asIdeal) (h2 : (q : 𝓞 F) ∈ v.asIdeal)
+    : False := by
   have hc : IsCoprime (p : ℤ) (q : ℤ) :=
     Nat.isCoprime_iff_coprime.mpr ((Nat.coprime_primes hp hq).mpr hpq)
   obtain ⟨a, b, hab⟩ := hc
@@ -42,7 +44,8 @@ theorem not_both_mem {p q : ℕ} (hp : p.Prime) (hq : q.Prime) (hpq : p ≠ q) (
     exact v.asIdeal.add_mem (v.asIdeal.mul_mem_left _ h1) (v.asIdeal.mul_mem_left _ h2)
   exact v.isPrime.ne_top ((Ideal.eq_top_iff_one _).mpr h1')
 
-theorem finite_mem {p : ℕ} (hp : p ≠ 0) : {v : HeightOneSpectrum (𝓞 F) | (p : 𝓞 F) ∈ v.asIdeal}.Finite := by
+theorem finite_mem {p : ℕ} (hp : p ≠ 0)
+    : {v : HeightOneSpectrum (𝓞 F) | (p : 𝓞 F) ∈ v.asIdeal}.Finite := by
   have hI : Ideal.span {(p : 𝓞 F)} ≠ 0 := by
     rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
     exact_mod_cast hp
@@ -54,19 +57,19 @@ theorem finite_mem {p : ℕ} (hp : p ≠ 0) : {v : HeightOneSpectrum (𝓞 F) | 
 
 variable {E : Type} [Field E] [NumberField E] [Algebra F E] {n : ℕ}
 
-
 omit [NumberField E] in
-theorem prVec_sub_one_mulVec (v : HeightOneSpectrum (𝓞 F)) (y : GL (Fin n) (E ⊗[F] Ad F))
-    (x : Fin n → E ⊗[F] Ad F) :
-    prVec v ((y.1 - 1) *ᵥ x) = ((bc (prV (E := E) v) y).1 - 1) *ᵥ prVec v x := by
+theorem prVec_sub_one_mulVec
+    (v : HeightOneSpectrum (𝓞 F)) (y : GL (Fin n) (E ⊗[F] Ad F)) (x : Fin n → E ⊗[F] Ad F)
+    : prVec v ((y.1 - 1) *ᵥ x) = ((bc (prV (E := E) v) y).1 - 1) *ᵥ prVec v x := by
   rw [Matrix.sub_mulVec, Matrix.sub_mulVec, Matrix.one_mulVec, Matrix.one_mulVec,
     ← GlobalTheory.St.G.Carry.prVec_mulVec]
   funext i
   simp only [prVec, Pi.sub_apply, map_sub]
 
-theorem mem_hat_of_loc {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L) (v : HeightOneSpectrum (𝓞 F))
-    (x : Fin n → E ⊗[F] v.adicCompletion F) (hx : x ∈ loc v L) :
-    (fun i => Formalism.UG.P.afsplitIE v (x i)) ∈ hat F L := by
+theorem mem_hat_of_loc
+    {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L)
+    (v : HeightOneSpectrum (𝓞 F)) (x : Fin n → E ⊗[F] v.adicCompletion F) (hx : x ∈ loc v L)
+    : (fun i => Formalism.UG.P.afsplitIE v (x i)) ∈ hat F L := by
   rw [GlobalTheory.T.mem_adelicSpanOfLattice_iff_forall_place F E n L hL]
   intro w
   by_cases hw : w = v
@@ -75,36 +78,64 @@ theorem mem_hat_of_loc {L : Submodule (𝓞 E) (Fin n → E)} (hL : IsLat L) (v 
 
 end SlopeTestRemainingChoices
 
-
 set_option maxHeartbeats 2000000 in
-theorem level_conj_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E] (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHerm (cm.sig : E →+* E) J → J.det ≠ 0 → ∀ (T f t k a sk fc : ℕ) (gp : Fin 2 → ℕ) (S : StepLevel F E cm.sig J T f {v : HeightOneSpectrum (𝓞 F) | (gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal}) (G : GLoc F E cm.sig gp) (Gl : GLev S G a t 0 sk fc false), k = n → a = n → sk = n → fc = n → T.Prime → (∀ i, (gp i).Prime) → gp 0 ≠ gp 1 → (∀ i, T ≠ gp i) → (∀ i, SplitsIn E (gp i)) → SplitsIn E T → Module.finrank ℚ E = 2 * f → ∀ (Fr : AdFrame cm.sig J (hat F S.Lb) (gp 0 * gp 1) k), ∃ κ : UPts cm.sig J (Ad F), κ.1 ∈ stabGL (hat F S.Lb) ∧ ∀ y : UPts cm.sig J (Ad F), (Fr.InK y.1 ↔ ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL _ _) ∈ S.U) ∧ ∀ hy : ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL _ _) ∈ S.U, Fr.chi y.1 = ((S.chi ⟨_, hy⟩ : ℂˣ) : ℂ) := by
-  intro F E _ _ _ _ _ _ cm n J hJ hdet T f t k a sk fc gp S G Gl hk ha hsk hfc hT hgp hne hTg hsplit hsplitT hdeg Fr
+theorem level_conj_frame
+    : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [StarRing E] [Algebra F E]
+        (cm : CMData F E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E),
+      IsHerm (cm.sig : E →+* E) J → J.det ≠ 0
+        → ∀ (T f t k a sk fc : ℕ) (gp : Fin 2 → ℕ)
+            (S : StepLevel F E cm.sig J T f
+              {v : HeightOneSpectrum (𝓞 F) | (gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal})
+            (G : GLoc F E cm.sig gp) (Gl : GLev S G a t 0 sk fc false),
+          k = n → a = n → sk = n → fc = n → T.Prime → (∀ i, (gp i).Prime) → gp 0 ≠ gp 1
+            → (∀ i, T ≠ gp i) → (∀ i, SplitsIn E (gp i)) → SplitsIn E T → Module.finrank ℚ E = 2 * f
+            → ∀ (Fr : AdFrame cm.sig J (hat F S.Lb) (gp 0 * gp 1) k), ∃ κ : UPts cm.sig J (Ad F),
+              κ.1 ∈ stabGL (hat F S.Lb)
+                ∧ ∀ y : UPts cm.sig J (Ad F),
+                  (Fr.InK y.1 ↔ ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL _ _) ∈ S.U)
+                    ∧ ∀ hy : ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL _ _) ∈ S.U,
+                      Fr.chi y.1 = ((S.chi ⟨_, hy⟩ : ℂˣ) : ℂ) := by
+  intro F E _ _ _ _ _ _ cm n J hJ hdet T f t k a sk fc gp S G Gl hk ha hsk hfc hT hgp hne hTg hsplit
+    hsplitT hdeg Fr
   classical
   have hL : IsLat S.Lb := ⟨S.Lb_fin, S.Lb_span⟩
   have hTL : TLat cm.sig J T f S.Lb := GlobalTheory.St.G.stepLevel_tLat F E n cm.sig J T f _ S
   have hD := GlobalTheory.T.dual_lattice_local_characterization F E cm n J hJ hdet S.Lb hL
   have hLD : IsLat (dualL cm.sig J S.Lb) := hD.1
-  have hsd : ∀ v : HeightOneSpectrum (𝓞 F), (T : 𝓞 F) ∉ v.asIdeal →
-      ∀ x, x ∈ loc v (dualL cm.sig J S.Lb) ↔ x ∈ loc v S.Lb := by
+  have hsd
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        (T : 𝓞 F) ∉ v.asIdeal → ∀ x, x ∈ loc v (dualL cm.sig J S.Lb) ↔ x ∈ loc v S.Lb := by
     intro v hv x
     rw [hD.2.1 v x]
-    exact (GlobalTheory.T.isLocallySelfDual_of_hermitianLatticeOfLevel F E cm n J hJ hdet T f S.Lb hTL v hv x).symm
-  have hlevI : ∀ v (g : GL (Fin n) (E ⊗[F] v.adicCompletion F)), g ∈ levelVL cm.sig J v S.Lb ↔
-      g ∈ UPts cm.sig J (v.adicCompletion F) ∧ g ∈ stabGL (loc v S.Lb) := fun v g => Iff.rfl
-  have hQauto : ∀ v : HeightOneSpectrum (𝓞 F), (T : 𝓞 F) ∉ v.asIdeal →
-      ∀ g : GL (Fin n) (E ⊗[F] v.adicCompletion F), g ∈ stabGL (loc v S.Lb) →
-      ∀ x ∈ loc v (dualL cm.sig J S.Lb), (g.1 - 1) *ᵥ x ∈ loc v S.Lb := by
+    exact (GlobalTheory.T.isLocallySelfDual_of_hermitianLatticeOfLevel F E cm n J hJ hdet T f S.Lb
+      hTL v hv x).symm
+  have hlevI
+      : ∀ v (g : GL (Fin n) (E ⊗[F] v.adicCompletion F)),
+        g ∈ levelVL cm.sig J v S.Lb
+          ↔ g ∈ UPts cm.sig J (v.adicCompletion F) ∧ g ∈ stabGL (loc v S.Lb) := fun v g =>
+    Iff.rfl
+  have hQauto
+      : ∀ v : HeightOneSpectrum (𝓞 F),
+        (T : 𝓞 F) ∉ v.asIdeal
+          → ∀ g : GL (Fin n) (E ⊗[F] v.adicCompletion F),
+            g ∈ stabGL (loc v S.Lb)
+              → ∀ x ∈ loc v (dualL cm.sig J S.Lb), (g.1 - 1) *ᵥ x ∈ loc v S.Lb := by
     intro v hv g hg x hx
     rw [hsd v hv] at hx
     rw [Matrix.sub_mulVec, Matrix.one_mulVec]
     exact Submodule.sub_mem _ ((hg x).mp hx) hx
 
   have gm := fun (i : Fin 2) (v : HeightOneSpectrum (𝓞 F)) (hv : (gp i : 𝓞 F) ∈ v.asIdeal) =>
-    GlobalTheory.T.local_level_character_match_at_type_prime F E cm n J hJ hdet T f t k a sk fc gp S G Gl hk ha hsk hfc hT hgp hne hTg hsplit Fr i v hv
+    GlobalTheory.T.local_level_character_match_at_type_prime F E cm n J hJ hdet T f t k a sk fc gp S
+      G Gl hk ha hsk hfc hT hgp hne hTg hsplit Fr i v hv
   choose κl hκl hκs using gm
   let hf : ∀ v : HeightOneSpectrum (𝓞 F), GL (Fin n) (E ⊗[F] v.adicCompletion F) := fun v =>
-    if h0 : (gp 0 : 𝓞 F) ∈ v.asIdeal then κl 0 v h0
-    else if h1 : (gp 1 : 𝓞 F) ∈ v.asIdeal then κl 1 v h1 else 1
+    if h0 : (gp 0 : 𝓞 F) ∈ v.asIdeal then
+      κl 0 v h0
+    else if h1 : (gp 1 : 𝓞 F) ∈ v.asIdeal then
+      κl 1 v h1
+    else
+      1
   have hf_g : ∀ i v (h : (gp i : 𝓞 F) ∈ v.asIdeal), hf v = κl i v h := by
     intro i v h
     obtain rfl | rfl : i = 0 ∨ i = 1 := by fin_cases i <;> simp
@@ -120,39 +151,53 @@ theorem level_conj_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
     · rw [hf_g 0 v h0]; exact hκl 0 v h0
     by_cases h1 : (gp 1 : 𝓞 F) ∈ v.asIdeal
     · rw [hf_g 1 v h1]; exact hκl 1 v h1
-    rw [hf_one v h0 h1]; exact Subgroup.one_mem _
+    rw [hf_one v h0 h1]
+    exact Subgroup.one_mem _
   have hfin : {v | hf v ≠ 1}.Finite := by
     refine ((finite_mem (hgp 0).ne_zero).union (finite_mem (hgp 1).ne_zero)).subset ?_
     intro v hv
     by_contra hc
     simp only [Set.mem_union, Set.mem_ofPred_eq, not_or] at hc
     exact hv (hf_one v hc.1 hc.2)
-  obtain ⟨x0, hx0, hx0v⟩ := GlobalTheory.T.exists_adelic_unitary_of_finite_support F E n cm.sig J hf (fun v => ((hlevI v _).mp (hf_lev v)).1) hfin
+  obtain ⟨x0, hx0, hx0v⟩ :=
+    GlobalTheory.T.exists_adelic_unitary_of_finite_support F E n cm.sig J hf
+      (fun v => ((hlevI v _).mp (hf_lev v)).1)
+      hfin
   let κ : UPts cm.sig J (Ad F) := ⟨x0, hx0⟩
   have hκv : ∀ v, bc (prV (E := E) v) (κ : GL (Fin n) (E ⊗[F] Ad F)) = hf v := hx0v
   refine ⟨κ, ?_, ?_⟩
-  · exact (GlobalTheory.T.adelicLattice_carry_iff_forall_place F E n S.Lb S.Lb hL hL x0).mpr (fun v x => by
-      rw [hx0v v]; exact ((hlevI v _).mp (hf_lev v)).2 x)
+  · exact (GlobalTheory.T.adelicLattice_carry_iff_forall_place F E n S.Lb S.Lb hL hL x0).mpr
+      (fun v x => by rw [hx0v v]; exact ((hlevI v _).mp (hf_lev v)).2 x)
   intro y
-  have hbcUP : ∀ v, bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ UPts cm.sig J (v.adicCompletion F) :=
+  have hbcUP
+      : ∀ v,
+        bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ UPts cm.sig J (v.adicCompletion F) :=
     fun v => Formalism.UG.P.afsplit_bc_mem cm.sig J v _ y.2
-  have hwv : ∀ v, bc (prV (E := E) v) ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL (Fin n) (E ⊗[F] Ad F)) =
-      (hf v)⁻¹ * bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) * hf v := by
+  have hwv
+      : ∀ v,
+        bc (prV (E := E) v) ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL (Fin n) (E ⊗[F] Ad F))
+          = (hf v)⁻¹ * bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) * hf v := by
     intro v
     simp only [Subgroup.coe_mul, Subgroup.coe_inv, map_mul, map_inv, hκv]
-  have hconj : ∀ v, (hf v)⁻¹ * bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) * hf v ∈ levelVL cm.sig J v S.Lb →
-      bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ levelVL cm.sig J v S.Lb := by
+  have hconj
+      : ∀ v,
+        (hf v)⁻¹ * bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) * hf v
+            ∈ levelVL cm.sig J v S.Lb
+          → bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ levelVL cm.sig J v S.Lb := by
     intro v h
-    have := (levelVL cm.sig J v S.Lb).mul_mem ((levelVL cm.sig J v S.Lb).mul_mem (hf_lev v) h)
-      ((levelVL cm.sig J v S.Lb).inv_mem (hf_lev v))
+    have :=
+      (levelVL cm.sig J v S.Lb).mul_mem ((levelVL cm.sig J v S.Lb).mul_mem (hf_lev v) h)
+        ((levelVL cm.sig J v S.Lb).inv_mem (hf_lev v))
     simpa [mul_assoc] using this
 
-  have hA : (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (hat F S.Lb) ↔
-      ∀ v, bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb) :=
+  have hA
+      : (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (hat F S.Lb)
+        ↔ ∀ v, bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb) :=
     GlobalTheory.T.adelicLattice_carry_iff_forall_place F E n S.Lb S.Lb hL hL y
-  have hB : (∀ x, (∀ z ∈ hat F S.Lb, hR cm.sig J (Ad F) z x ∈ OAd F E) → (y.1.1 - 1) *ᵥ x ∈ hat F S.Lb) ↔
-      ∀ v, ∀ x ∈ loc v (dualL cm.sig J S.Lb),
-        ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb := by
+  have hB
+      : (∀ x, (∀ z ∈ hat F S.Lb, hR cm.sig J (Ad F) z x ∈ OAd F E) → (y.1.1 - 1) *ᵥ x ∈ hat F S.Lb)
+        ↔ ∀ v, ∀ x ∈ loc v (dualL cm.sig J S.Lb),
+          ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb := by
     constructor
     · intro h v x hx
       have hx' := mem_hat_of_loc hLD v x hx
@@ -168,12 +213,16 @@ theorem level_conj_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       rw [prVec_sub_one_mulVec]
       exact h v _ (hx' v)
   have hIL := fun (hs : (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (hat F S.Lb)) =>
-    GlobalTheory.T.adelicLatticeFrame_condition_character_local F E cm n J hJ hdet k gp S.Lb Fr hgp hne hL S.Lb_int y.1 hs
-  have hK : Fr.InK y.1 ↔ ∀ v, bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb) ∧
-      (∀ x ∈ loc v (dualL cm.sig J S.Lb),
-        ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb) ∧
-      ((gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal →
-        Fr.LocK S.Lb v (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)))) := by
+    GlobalTheory.T.adelicLatticeFrame_condition_character_local F E cm n J hJ hdet k gp S.Lb Fr hgp
+      hne hL S.Lb_int y.1 hs
+  have hK
+      : Fr.InK y.1
+        ↔ ∀ v,
+          bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb)
+            ∧ (∀ x ∈ loc v (dualL cm.sig J S.Lb),
+              ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb)
+            ∧ ((gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal
+              → Fr.LocK S.Lb v (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)))) := by
     unfold AdFrame.InK
     constructor
     · rintro ⟨hs, hq, hc⟩
@@ -193,12 +242,15 @@ theorem level_conj_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       obtain rfl | rfl : i = 0 ∨ i = 1 := by fin_cases i <;> simp
       · exact Or.inl hv
       · exact Or.inr hv
-  have hloc : ∀ v, bc (prV (E := E) v) ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL (Fin n) (E ⊗[F] Ad F)) ∈ S.Uloc v ↔
-      (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb) ∧
-      (∀ x ∈ loc v (dualL cm.sig J S.Lb),
-        ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb) ∧
-      ((gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal →
-        Fr.LocK S.Lb v (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))))) := by
+  have hloc
+      : ∀ v,
+        bc (prV (E := E) v) ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL (Fin n) (E ⊗[F] Ad F))
+            ∈ S.Uloc v
+          ↔ (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb)
+            ∧ (∀ x ∈ loc v (dualL cm.sig J S.Lb),
+              ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb)
+            ∧ ((gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal
+              → Fr.LocK S.Lb v (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))))) := by
     intro v
     rw [hwv v]
     by_cases hb : (gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal
@@ -219,7 +271,9 @@ theorem level_conj_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
       have h1 : (gp 1 : 𝓞 F) ∉ v.asIdeal := fun h => hb (Or.inr h)
       rw [hf_one v h0 h1, inv_one, one_mul, mul_one]
       by_cases hTv : (T : 𝓞 F) ∈ v.asIdeal
-      · have fu := GlobalTheory.T.trivial_on_dual_quotient_iff_mem_localUnitary F E cm n J hJ hdet T f _ S hT hsplitT hdeg v hTv
+      · have fu :=
+          GlobalTheory.T.trivial_on_dual_quotient_iff_mem_localUnitary F E cm n J hJ hdet T f _ S hT
+            hsplitT hdeg v hTv
         constructor
         · intro hu
           have hl := S.Uloc_lev v hu
@@ -235,12 +289,14 @@ theorem level_conj_frame : ∀ (F E : Type) [Field F] [NumberField F] [Field E] 
           exact ⟨hl'.2, hQauto v hTv _ hl'.2, fun h => absurd h hb⟩
         · rintro ⟨hs, -, -⟩
           exact (hlevI v _).mpr ⟨hbcUP v, hs⟩
-  have hU : ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL (Fin n) (E ⊗[F] Ad F)) ∈ S.U ↔
-      ∀ v, bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb) ∧
-      (∀ x ∈ loc v (dualL cm.sig J S.Lb),
-        ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb) ∧
-      ((gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal →
-        Fr.LocK S.Lb v (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)))) := by
+  have hU
+      : ((κ⁻¹ * y * κ : UPts cm.sig J (Ad F)) : GL (Fin n) (E ⊗[F] Ad F)) ∈ S.U
+        ↔ ∀ v,
+          bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)) ∈ stabGL (loc v S.Lb)
+            ∧ (∀ x ∈ loc v (dualL cm.sig J S.Lb),
+              ((bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F))).1 - 1) *ᵥ x ∈ loc v S.Lb)
+            ∧ ((gp 0 : 𝓞 F) ∈ v.asIdeal ∨ (gp 1 : 𝓞 F) ∈ v.asIdeal
+              → Fr.LocK S.Lb v (bc (prV (E := E) v) (y : GL (Fin n) (E ⊗[F] Ad F)))) := by
     rw [S.U_eq]
     constructor
     · rintro ⟨-, h⟩ v

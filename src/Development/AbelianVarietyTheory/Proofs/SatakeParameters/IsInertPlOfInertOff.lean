@@ -26,8 +26,8 @@ theorem unram (D : D7) : Algebra.Unramified (𝓞 D.host.F) (𝓞 D.host.E) := b
   exact Formalism.L2.Pj.unramBridge_holds D.host.E fun P hP => by
     obtain ⟨θ, t, ht, hθ⟩ := D.sp.cm.cmUnram.2.2 P hP
     refine ⟨θ, ?_⟩
-    have : RingOfIntegers.mapRingEquiv
-        (IsCMField.complexConj D.host.E : D.host.E ≃+* D.host.E) θ = t :=
+    have : RingOfIntegers.mapRingEquiv (IsCMField.complexConj D.host.E : D.host.E ≃+* D.host.E) θ
+        = t :=
       RingOfIntegers.ext ht.symm
     rwa [this]
 

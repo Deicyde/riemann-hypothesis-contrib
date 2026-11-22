@@ -5,9 +5,13 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.ExistsMonoFa
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.AnForm.R
-open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory IsLocalRing
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  ReciprocityTheory.AnForm.R
+open GlobalTheory.Toroidal GlobalTheory.Models GlobalTheory.LN GlobalTheory.ShFam GlobalTheory.LocM
+  GlobalTheory.PolFan GlobalTheory.ZH GlobalTheory.Poinc
 open scoped CategoryTheory.Obj
 open GlobalTheory.UPoinc
 open GlobalTheory
@@ -15,8 +19,9 @@ open Classical
 
 namespace GlobalTheory
 
-theorem isClosed_singleton_of_isFinite : ∀ (X Z : Scheme.{0}) (f : X ⟶ Z), IsFinite f → ∀ x : X,
-    IsClosed ({f x} : Set Z) → IsClosed ({x} : Set X) := by
+theorem isClosed_singleton_of_isFinite
+    : ∀ (X Z : Scheme.{0}) (f : X ⟶ Z),
+      IsFinite f → ∀ x : X, IsClosed ({f x} : Set Z) → IsClosed ({x} : Set X) := by
   intro X Z f hf x hx
   rw [← closure_subset_iff_isClosed]
   intro w hw

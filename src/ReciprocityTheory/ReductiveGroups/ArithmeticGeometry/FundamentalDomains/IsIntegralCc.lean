@@ -96,8 +96,8 @@ noncomputable def inhab : Data E 1 := by
       fin_cases i
       simp [e1, Algebra.smul_def, ha]
   have hfin := stab_finite (E := E)
-  exact
-  { Ψ := Finset.univ.filter fun τ : E →+* ℂ => 0 < (τ κ).im
+  exact {
+    Ψ := Finset.univ.filter fun τ : E →+* ℂ => 0 < (τ κ).im
     cmType := by
       intro τ
       have h1 := im_ne_zero hκ hκ0 τ
@@ -109,7 +109,8 @@ noncomputable def inhab : Data E 1 := by
     Gm := 1
     Gm_herm := by
       intro a b
-      fin_cases a; fin_cases b
+      fin_cases a
+      fin_cases b
       simp [cc_one]
     Gm_det := by simp
     p0 := 1
@@ -118,15 +119,15 @@ noncomputable def inhab : Data E 1 := by
       intro τ
       refine ⟨1, by simp, ?_⟩
       ext a b
-      fin_cases a; fin_cases b
+      fin_cases a
+      fin_cases b
       simp [gram, hermC, col, sgn, Matrix.one_apply]
     Λ := Λ
     Λ_fg := Submodule.fg_span_singleton _
     Λ_span := by
       rw [eq_top_iff]
       intro x _
-      have hx : x = x 0 • (e1 : Fin 1 → E) := by
-        funext i; fin_cases i; simp [e1]
+      have hx : x = x 0 • (e1 : Fin 1 → E) := by funext i; fin_cases i; simp [e1]
       rw [hx]
       refine Submodule.smul_mem _ _ (Submodule.subset_span ?_)
       exact Submodule.subset_span (Set.mem_singleton _)
@@ -153,7 +154,9 @@ noncomputable def inhab : Data E 1 := by
       obtain ⟨hh, hl⟩ := hγ
       have hmem : Matrix.mulVec (γ : Matrix (Fin 1) (Fin 1) E) e1 ∈ Λ :=
         (hl e1).mp (Submodule.subset_span (Set.mem_singleton _))
-      have hv : Matrix.mulVec (γ : Matrix (Fin 1) (Fin 1) E) e1 0 = (γ : Matrix (Fin 1) (Fin 1) E) 0 0 := by
+      have hv
+          : Matrix.mulVec (γ : Matrix (Fin 1) (Fin 1) E) e1 0
+            = (γ : Matrix (Fin 1) (Fin 1) E) 0 0 := by
         simp [Matrix.mulVec, dotProduct, e1]
       obtain ⟨a, ha⟩ := (memΛ _).mp hmem
       rw [hv] at ha
@@ -196,10 +199,11 @@ noncomputable def inhab : Data E 1 := by
         · exact cc_eq_zero h
       refine ⟨1, Subgroup.one_mem _, ?_⟩
       ext a b
-      fin_cases a; fin_cases b
-      simp [transvMat, hξ] }
+      fin_cases a
+      fin_cases b
+      simp [transvMat, hξ]
+  }
 
-theorem nonempty_data : Nonempty (Data E 1) :=
-  ⟨inhab⟩
+theorem nonempty_data : Nonempty (Data E 1) := ⟨inhab⟩
 
 end ReciprocityTheory.ChartRestriction.G.FD

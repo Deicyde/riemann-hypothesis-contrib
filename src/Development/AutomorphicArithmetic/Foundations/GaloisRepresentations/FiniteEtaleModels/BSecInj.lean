@@ -6,15 +6,23 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsDedekindDomain
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsDedekindDomain
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen
+  GlobalTheory.UPel.HT.EtLev GlobalTheory.LKTrip GlobalTheory.LKGeo
 open UpperTheory.Gal.Int.Geo
 open UpperTheory.Gal.crystallineComparison.Mod (Std TjD KerAt Pulled UKer)
 open scoped TensorProduct
 open UpperTheory.Gal.FiniteEtaleModels
 
-theorem UpperTheory.Gal.FiniteEtaleModels.secInjG_of :
-    UpperTheory.Gal.crystallineComparison.Mod.PulledEx → UpperTheory.Gal.crystallineComparison.Mod.PulledRead → UpperTheory.Gal.crystallineComparison.Mod.PullKer → UpperTheory.Gal.crystallineComparison.Mod.KerFromU → UpperTheory.Gal.crystallineComparison.Mod.IsoOfKer → SecInjG := by
+theorem UpperTheory.Gal.FiniteEtaleModels.secInjG_of
+    : UpperTheory.Gal.crystallineComparison.Mod.PulledEx
+      → UpperTheory.Gal.crystallineComparison.Mod.PulledRead
+      → UpperTheory.Gal.crystallineComparison.Mod.PullKer
+      → UpperTheory.Gal.crystallineComparison.Mod.KerFromU
+      → UpperTheory.Gal.crystallineComparison.Mod.IsoOfKer
+      → SecInjG := by
   intro hPE hPR hPK hKU hIK p _ D R _ b N hN hNp hm r w j e hw hu hj he M T K _ _ _ x y y' hy hy' hK
   have hpK0 : IsUnit ((p : ℕ) : K) := by
     refine IsUnit.mk0 _ ?_
@@ -22,18 +30,21 @@ theorem UpperTheory.Gal.FiniteEtaleModels.secInjG_of :
   have hpK : IsUnit ((p : ℕ) : Γ(Sp K, ⊤)) := by
     have := hpK0.map (Scheme.ΓSpecIso (CommRingCat.of K)).inv.hom
     simpa using this
-  obtain ⟨o₁, ⟨m₁⟩⟩ := GlobalTheory.T.exists_harrisTaylorObject_pullback p D R b N M.X (Sp K) M.s x M.univ
+  obtain ⟨o₁, ⟨m₁⟩⟩ :=
+    GlobalTheory.T.exists_harrisTaylorObject_pullback p D R b N M.X (Sp K) M.s x M.univ
   obtain ⟨P⟩ := hPE p D R b N hN hNp M r w j (p ^ e) T (Sp K) x (x ≫ M.s) rfl o₁ m₁ y hy
   obtain ⟨P'⟩ := hPE p D R b N hN hNp M r w j (p ^ e) T (Sp K) x (x ≫ M.s) rfl o₁ m₁ y' hy'
   have hc : ∃ e', p ^ e = p ^ e' ∧ (0 < j → 0 < e') := ⟨e, rfl, he⟩
-  have kernel_imp (z z' : Sp K ⟶ T.Y) (hz : z ≫ T.s = x) (hz' : z' ≫ T.s = x)
-      (hpoint : ∀ a : Over.mk x ⟶ M.univ.A,
-        ES.KilledBy M.univ w a → KerAt T z a.left → KerAt T z' a.left)
-      (Q : Pulled T m₁ z) (Q' : Pulled T m₁ z') (U : Over (Sp K)) (g : U ⟶ o₁.A)
-      (hg : UKer r o₁ Q.ψ U g) : UKer r o₁ Q'.ψ U g := by
+  have kernel_imp
+      (z z' : Sp K ⟶ T.Y) (hz : z ≫ T.s = x) (hz' : z' ≫ T.s = x)
+      (hpoint
+        : ∀ a : Over.mk x ⟶ M.univ.A, ES.KilledBy M.univ w a → KerAt T z a.left → KerAt T z' a.left)
+      (Q : Pulled T m₁ z) (Q' : Pulled T m₁ z')
+      (U : Over (Sp K)) (g : U ⟶ o₁.A) (hg : UKer r o₁ Q.ψ U g)
+      : UKer r o₁ Q'.ψ U g := by
     obtain ⟨S, -, i, -, -, hfin, het, -, -, hiff⟩ :=
-      ES.KerUPart.exists_kerUPart p D R b N hN hNp hm r w j (p ^ e)
-        hw hu hj hc (Sp K) (x ≫ M.s) hpK o₁ Q.o' Q.ψ Q.isog Q.tj
+      ES.KerUPart.exists_kerUPart p D R b N hN hNp hm r w j (p ^ e) hw hu hj hc (Sp K) (x ≫ M.s) hpK
+        o₁ Q.o' Q.ψ Q.isog Q.tj
     refine ⟨?_, hg.2⟩
     obtain ⟨v, rfl⟩ := (hiff U g).1 hg
     suffices hi : i ≫ Q'.ψ = 1 by
@@ -41,8 +52,7 @@ theorem UpperTheory.Gal.FiniteEtaleModels.secInjG_of :
       simp
     have : IsReduced S.left := by
       have : IsAffine S.left := isAffine_of_isAffineHom S.hom
-      have hE : (Scheme.Hom.appTop S.hom).hom.Etale :=
-        HasRingHomProperty.appTop @Etale S.hom het
+      have hE : (Scheme.Hom.appTop S.hom).hom.Etale := HasRingHomProperty.appTop @Etale S.hom het
       have hF : IsField Γ(Sp K, ⊤) :=
         MulEquiv.isField (Field.toIsField K)
           (Scheme.ΓSpecIso (CommRingCat.of K)).commRingCatIsoToRingEquiv.toMulEquiv
@@ -71,12 +81,15 @@ theorem UpperTheory.Gal.FiniteEtaleModels.secInjG_of :
         rw [Category.assoc, m₁.cart.1.w, ← Category.assoc, Over.w a]
         exact Category.id_comp x
       let a₀ : Over.mk x ⟶ M.univ.A := Over.homMk (a.left ≫ m₁.φ) hbase
-      have htransport := (hPK p D R b N M.X (Sp K) M.s (x ≫ M.s) x M.univ M.univ o₁ o₁ m₁ m₁
-        (𝟙 _) (𝟙 _) (by simp)).1 (𝟙_ (Over (Sp K))) (Over.mk x) rfl a a₀ (by
-          rw [eqToHom_refl, Category.id_comp]
-          rfl)
+      have htransport :=
+        (hPK p D R b N M.X (Sp K) M.s (x ≫ M.s) x M.univ M.univ o₁ o₁ m₁ m₁ (𝟙 _) (𝟙 _) (by simp)).1
+          (𝟙_ (Over (Sp K))) (Over.mk x) rfl a a₀
+          (by
+            rw [eqToHom_refl, Category.id_comp]
+            rfl)
       have hzero : a ≫ Q'.ψ = 1 := hR'.2 (hpoint a₀ ((htransport.2.2 w).1 hkw) (hR.1 ha.1))
-      have hclosed : aK.left (IsLocalRing.closedPoint K) = pt := pointOfClosedPoint_apply S.hom pt hpt _
+      have hclosed : aK.left (IsLocalRing.closedPoint K) = pt :=
+        pointOfClosedPoint_apply S.hom pt hpt _
       have heq : aK ≫ (i ≫ Q'.ψ) = aK ≫ (1 : S ⟶ Q'.o'.A) := by
         rw [← Category.assoc, show aK ≫ i = a from rfl, hzero]
         simp
@@ -89,14 +102,18 @@ theorem UpperTheory.Gal.FiniteEtaleModels.secInjG_of :
     intro U g
     constructor
     · exact hKU p D R b N r w hw.ne_top hu K (x ≫ M.s) (p ^ e) o₁ P.o' P'.o' P.ψ P'.ψ P.isog P'.isog
-        (fun U g => ⟨k1 U g, k2 U g⟩) U g
+        (fun U g => ⟨k1 U g, k2 U g⟩)
+        U g
     · exact hKU p D R b N r w hw.ne_top hu K (x ≫ M.s) (p ^ e) o₁ P'.o' P.o' P'.ψ P.ψ P'.isog P.isog
-        (fun U g => ⟨k2 U g, k1 U g⟩) U g
+        (fun U g => ⟨k2 U g, k1 U g⟩)
+        U g
   obtain ⟨m, hm'⟩ := hIK p D R b N K (x ≫ M.s) (p ^ e) o₁ P.o' P'.o' P.ψ P'.ψ P.isog P'.isog hker
   obtain ⟨m'', hm''⟩ := GlobalTheory.HTQuotRigid.objMap_comp_φ m P'.m'
   have hU := T.univ (Sp K) x o₁ P.o' m₁ P.ψ hpK P.isog P.tj
-  have fix : ∀ (f : Sp K ⟶ T.Y) (_ : f = y') (n : GlobalTheory.UPel.HT.ObjMap P.o' T.o' f),
-      ∃ n' : GlobalTheory.UPel.HT.ObjMap P.o' T.o' y', n'.φ = n.φ := by
+  have fix
+      : ∀ (f : Sp K ⟶ T.Y) (_ : f = y') (n : GlobalTheory.UPel.HT.ObjMap P.o' T.o' f),
+        ∃ n' : GlobalTheory.UPel.HT.ObjMap P.o' T.o' y',
+          n'.φ = n.φ := by
     rintro f rfl n
     exact ⟨n, rfl⟩
   obtain ⟨n', hn'⟩ := fix _ (Category.id_comp y') m''

@@ -14,17 +14,17 @@ set_option synthInstance.maxSize 1000
 
 namespace GlobalTheory.CompanionTheory.RgEisFin
 
-open PositivityTheory.RgEis PositivityTheory.RgEis.TF GroundTheory.Global GroundTheory.Automorphic GroundTheory.Global.IdeleGroup
+open PositivityTheory.RgEis PositivityTheory.RgEis.TF GroundTheory.Global GroundTheory.Automorphic
+  GroundTheory.Global.IdeleGroup
 
 variable {k : Type} [Field k] [NumberField k]
 
 theorem natC_mem (M : ℕ) : (M : FiniteAdeleRing (𝓞 k) k) ∈ OH k := _root_.natCast_mem (OH k) M
 
-theorem inM_zero (M : ℕ) : InM M (0 : FiniteAdeleRing (𝓞 k) k) :=
-  ⟨0, zero_mem _, by simp⟩
+theorem inM_zero (M : ℕ) : InM M (0 : FiniteAdeleRing (𝓞 k) k) := ⟨0, zero_mem _, by simp⟩
 
-theorem inM_add {M : ℕ} {x y : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) (hy : InM M y) :
-    InM M (x + y) := by
+theorem inM_add {M : ℕ} {x y : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) (hy : InM M y)
+    : InM M (x + y) := by
   obtain ⟨a, ha, rfl⟩ := hx
   obtain ⟨b, hb, rfl⟩ := hy
   exact ⟨a + b, add_mem ha hb, by ring⟩
@@ -33,18 +33,18 @@ theorem inM_neg {M : ℕ} {x : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) : InM 
   obtain ⟨a, ha, rfl⟩ := hx
   exact ⟨-a, neg_mem ha, by ring⟩
 
-theorem inM_sub {M : ℕ} {x y : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) (hy : InM M y) :
-    InM M (x - y) := by
+theorem inM_sub {M : ℕ} {x y : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) (hy : InM M y)
+    : InM M (x - y) := by
   rw [sub_eq_add_neg]
   exact inM_add hx (inM_neg hy)
 
-theorem inM_mul {M : ℕ} {a x : FiniteAdeleRing (𝓞 k) k} (ha : a ∈ OH k) (hx : InM M x) :
-    InM M (a * x) := by
+theorem inM_mul {M : ℕ} {a x : FiniteAdeleRing (𝓞 k) k} (ha : a ∈ OH k) (hx : InM M x)
+    : InM M (a * x) := by
   obtain ⟨b, hb, rfl⟩ := hx
   exact ⟨a * b, mul_mem ha hb, by ring⟩
 
-theorem inM_dvd {M₀ M : ℕ} (h : M₀ ∣ M) {x : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) :
-    InM M₀ x := by
+theorem inM_dvd {M₀ M : ℕ} (h : M₀ ∣ M) {x : FiniteAdeleRing (𝓞 k) k} (hx : InM M x)
+    : InM M₀ x := by
   obtain ⟨c, rfl⟩ := h
   obtain ⟨b, hb, rfl⟩ := hx
   exact ⟨(c : FiniteAdeleRing (𝓞 k) k) * b, mul_mem (natC_mem c) hb, by push_cast; ring⟩
@@ -53,14 +53,14 @@ theorem mem_of_inM {M : ℕ} {x : FiniteAdeleRing (𝓞 k) k} (hx : InM M x) : x
   obtain ⟨b, hb, rfl⟩ := hx
   exact mul_mem (natC_mem M) hb
 
-theorem unit_mem {u : (FiniteAdeleRing (𝓞 k) k)ˣ} (hu : u ∈ finiteIntegralUnits k) :
-    (u : FiniteAdeleRing (𝓞 k) k) ∈ OH k :=
-  fun v => ((mem_finiteIntegralUnits k).1 hu v).1
+theorem unit_mem {u : (FiniteAdeleRing (𝓞 k) k)ˣ} (hu : u ∈ finiteIntegralUnits k)
+    : (u : FiniteAdeleRing (𝓞 k) k) ∈ OH k := fun v =>
+  ((mem_finiteIntegralUnits k).1 hu v).1
 
 def val (ω : HeckeCharacter k) (u : (FiniteAdeleRing (𝓞 k) k)ˣ) : ℂ := (ω.toIdele (ofFinite u) : ℂ)
 
-theorem val_mul (ω : HeckeCharacter k) (u u' : (FiniteAdeleRing (𝓞 k) k)ˣ) :
-    val ω (u * u') = val ω u * val ω u' := by
+theorem val_mul (ω : HeckeCharacter k) (u u' : (FiniteAdeleRing (𝓞 k) k)ˣ)
+    : val ω (u * u') = val ω u * val ω u' := by
   simp [val, map_mul]
 
 theorem val_ne_zero (ω : HeckeCharacter k) (u : (FiniteAdeleRing (𝓞 k) k)ˣ) : val ω u ≠ 0 :=
@@ -69,39 +69,44 @@ theorem val_ne_zero (ω : HeckeCharacter k) (u : (FiniteAdeleRing (𝓞 k) k)ˣ)
 theorem norm_val (ω : HeckeCharacter k) (u : (FiniteAdeleRing (𝓞 k) k)ˣ) : ‖val ω u‖ = 1 :=
   Circle.norm_coe _
 
-theorem val_eq_of_inM {ω : HeckeCharacter k} {M₀ : ℕ}
-    (hc : ∀ u ∈ finiteIntegralUnits k, InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - 1) →
-      ω.toIdele (ofFinite u) = 1)
-    {u u' : (FiniteAdeleRing (𝓞 k) k)ˣ} (hu : u ∈ finiteIntegralUnits k)
-    (hu' : u' ∈ finiteIntegralUnits k)
-    (h : InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - (u' : FiniteAdeleRing (𝓞 k) k))) :
-    val ω u = val ω u' := by
+theorem val_eq_of_inM
+    {ω : HeckeCharacter k} {M₀ : ℕ}
+    (hc : ∀ u ∈ finiteIntegralUnits k,
+      InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - 1) → ω.toIdele (ofFinite u) = 1)
+    {u u' : (FiniteAdeleRing (𝓞 k) k)ˣ}
+    (hu : u ∈ finiteIntegralUnits k) (hu' : u' ∈ finiteIntegralUnits k)
+    (h : InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - (u' : FiniteAdeleRing (𝓞 k) k)))
+    : val ω u = val ω u' := by
   have hw : u * u'⁻¹ ∈ finiteIntegralUnits k := mul_mem hu (inv_mem hu')
   have h1 : InM M₀ (((u * u'⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) - 1) := by
-    have e : ((u * u'⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) - 1 =
-        ((u'⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) *
-          ((u : FiniteAdeleRing (𝓞 k) k) - (u' : FiniteAdeleRing (𝓞 k) k)) := by
+    have e
+        : ((u * u'⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) - 1
+          = ((u'⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k)
+            * ((u : FiniteAdeleRing (𝓞 k) k) - (u' : FiniteAdeleRing (𝓞 k) k)) := by
       rw [mul_sub, Units.val_mul, mul_comm, Units.inv_mul]
     rw [e]
     exact inM_mul (unit_mem (inv_mem hu')) h
   have h2 : val ω (u * u'⁻¹) = 1 := by simp only [val]; rw [hc _ hw h1]; simp
-  have h3 : val ω (u * u'⁻¹) * val ω u' = val ω u := by
-    rw [← val_mul, inv_mul_cancel_right]
+  have h3 : val ω (u * u'⁻¹) * val ω u' = val ω u := by rw [← val_mul, inv_mul_cancel_right]
   rw [← h3, h2, one_mul]
 
 def chi (ω : HeckeCharacter k) (M : ℕ) (a : FiniteAdeleRing (𝓞 k) k) : ℂ :=
   if h : ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k)) then
-    val ω h.choose else 0
+    val ω h.choose
+  else
+    0
 
 structure Lvl (ω : HeckeCharacter k) (M₀ M : ℕ) : Prop where
   dvd : M₀ ∣ M
-  cond : ∀ u ∈ finiteIntegralUnits k, InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - 1) →
-    ω.toIdele (ofFinite u) = 1
+  cond
+    : ∀ u ∈ finiteIntegralUnits k,
+      InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - 1) → ω.toIdele (ofFinite u) = 1
 
-theorem chi_eq {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
+theorem chi_eq
+    {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
     {a : FiniteAdeleRing (𝓞 k) k} {u : (FiniteAdeleRing (𝓞 k) k)ˣ}
-    (hu : u ∈ finiteIntegralUnits k) (h : InM M (a - (u : FiniteAdeleRing (𝓞 k) k))) :
-    chi ω M a = val ω u := by
+    (hu : u ∈ finiteIntegralUnits k) (h : InM M (a - (u : FiniteAdeleRing (𝓞 k) k)))
+    : chi ω M a = val ω u := by
   have hex : ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k)) := ⟨u, hu, h⟩
   rw [chi, dite_eq_left hex]
   obtain ⟨h1, h2⟩ := hex.choose_spec
@@ -109,26 +114,30 @@ theorem chi_eq {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
   have := inM_sub h h2
   rwa [sub_sub_sub_cancel_left] at this
 
-theorem chi_eq_zero {ω : HeckeCharacter k} {M : ℕ} {a : FiniteAdeleRing (𝓞 k) k}
-    (h : ¬ ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k))) :
-    chi ω M a = 0 := by
+theorem chi_eq_zero
+    {ω : HeckeCharacter k} {M : ℕ} {a : FiniteAdeleRing (𝓞 k) k}
+    (h : ¬ ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k)))
+    : chi ω M a = 0 := by
   rw [chi, dite_eq_right h]
 
-theorem exists_of_chi_ne_zero {ω : HeckeCharacter k} {M : ℕ} {a : FiniteAdeleRing (𝓞 k) k}
-    (h : chi ω M a ≠ 0) :
-    ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k)) := by
+theorem exists_of_chi_ne_zero
+    {ω : HeckeCharacter k} {M : ℕ} {a : FiniteAdeleRing (𝓞 k) k} (h : chi ω M a ≠ 0)
+    : ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k)) := by
   by_contra hn
   exact h (chi_eq_zero hn)
 
-theorem mem_of_chi_ne_zero {ω : HeckeCharacter k} {M : ℕ} {a : FiniteAdeleRing (𝓞 k) k}
-    (h : chi ω M a ≠ 0) : a ∈ OH k := by
+theorem mem_of_chi_ne_zero
+    {ω : HeckeCharacter k} {M : ℕ} {a : FiniteAdeleRing (𝓞 k) k} (h : chi ω M a ≠ 0)
+    : a ∈ OH k := by
   obtain ⟨u, hu, hM⟩ := exists_of_chi_ne_zero h
   have := add_mem (mem_of_inM hM) (unit_mem hu)
   rwa [sub_add_cancel] at this
 
-theorem chi_add {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
-    (a : FiniteAdeleRing (𝓞 k) k) {h : FiniteAdeleRing (𝓞 k) k} (hh : InM M h) :
-    chi ω M (a + h) = chi ω M a := by
+theorem chi_add
+    {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
+    (a : FiniteAdeleRing (𝓞 k) k)
+    {h : FiniteAdeleRing (𝓞 k) k} (hh : InM M h)
+    : chi ω M (a + h) = chi ω M a := by
   by_cases hex : ∃ u ∈ finiteIntegralUnits k, InM M (a - (u : FiniteAdeleRing (𝓞 k) k))
   · obtain ⟨u, hu, hM⟩ := hex
     rw [chi_eq hL hu hM, chi_eq hL hu (a := a + h)]
@@ -141,17 +150,21 @@ theorem chi_add {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
     have e : a + h - (u : FiniteAdeleRing (𝓞 k) k) - h = a - u := by ring
     rwa [e] at this
 
-theorem lift {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (hM : M ≠ 0) (hU : LiftUnit)
-    {a b : FiniteAdeleRing (𝓞 k) k} (ha : a ∈ OH k) (hb : b ∈ OH k) (h : chi ω M (a * b) ≠ 0) :
-    chi ω M a ≠ 0 := by
+theorem lift
+    {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (hM : M ≠ 0)
+    (hU : LiftUnit)
+    {a b : FiniteAdeleRing (𝓞 k) k} (ha : a ∈ OH k) (hb : b ∈ OH k) (h : chi ω M (a * b) ≠ 0)
+    : chi ω M a ≠ 0 := by
   obtain ⟨u, hu, hu'⟩ := exists_of_chi_ne_zero h
   obtain ⟨u₁, h1, h2⟩ := hU k M hM a ha b hb u hu hu'
   rw [chi_eq hL h1 h2]
   exact val_ne_zero ω u₁
 
-theorem chi_mul {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (hM : M ≠ 0) (hU : LiftUnit)
-    {a b : FiniteAdeleRing (𝓞 k) k} (ha : a ∈ OH k) (hb : b ∈ OH k) :
-    chi ω M (a * b) = chi ω M a * chi ω M b := by
+theorem chi_mul
+    {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (hM : M ≠ 0)
+    (hU : LiftUnit)
+    {a b : FiniteAdeleRing (𝓞 k) k} (ha : a ∈ OH k) (hb : b ∈ OH k)
+    : chi ω M (a * b) = chi ω M a * chi ω M b := by
   by_cases h1 : chi ω M a = 0
   · rw [h1, zero_mul]
     by_contra hn
@@ -165,17 +178,20 @@ theorem chi_mul {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (hM 
   obtain ⟨w, hw, hw'⟩ := exists_of_chi_ne_zero h2
   rw [chi_eq hL hu hu', chi_eq hL hw hw', ← val_mul]
   refine chi_eq hL (mul_mem hu hw) ?_
-  have e : a * b - ((u * w : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) =
-      a * (b - (w : FiniteAdeleRing (𝓞 k) k)) +
-        (w : FiniteAdeleRing (𝓞 k) k) * (a - (u : FiniteAdeleRing (𝓞 k) k)) := by
+  have e
+      : a * b - ((u * w : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k)
+        = a * (b - (w : FiniteAdeleRing (𝓞 k) k))
+          + (w : FiniteAdeleRing (𝓞 k) k) * (a - (u : FiniteAdeleRing (𝓞 k) k)) := by
     rw [Units.val_mul]; ring
   rw [e]
   exact inM_add (inM_mul ha hw') (inM_mul (unit_mem hw) hu')
 
-theorem mem_schwartzBruhat {ι : Type} [Fintype ι] {M : ℕ}
-    (hO : IsOpen {x : FiniteAdeleRing (𝓞 k) k | InM M x}) {f : (ι → FiniteAdeleRing (𝓞 k) k) → ℂ}
-    (hinv : ∀ x h, (∀ j, InM M (h j)) → f (x + h) = f x)
-    (hs : ∀ x, f x ≠ 0 → ∀ j, x j ∈ OH k) : f ∈ GJMatrix.finiteSchwartzBruhatPi k := by
+theorem mem_schwartzBruhat
+    {ι : Type} [Fintype ι]
+    {M : ℕ} (hO : IsOpen {x : FiniteAdeleRing (𝓞 k) k | InM M x})
+    {f : (ι → FiniteAdeleRing (𝓞 k) k) → ℂ}
+    (hinv : ∀ x h, (∀ j, InM M (h j)) → f (x + h) = f x) (hs : ∀ x, f x ≠ 0 → ∀ j, x j ∈ OH k)
+    : f ∈ GJMatrix.finiteSchwartzBruhatPi k := by
   refine (GJMatrix.mem_finiteSchwartzBruhatPi k).2 ⟨?_, ?_⟩
   · refine (IsLocallyConstant.iff_exists_open f).2 fun x => ?_
     refine ⟨Set.pi Set.univ fun j => {y | InM M (y - x j)}, ?_, ?_, ?_⟩
@@ -195,12 +211,15 @@ theorem mem_schwartzBruhat {ι : Type} [Fintype ι] {M : ℕ}
 def gFun {ι : Type} (ω : HeckeCharacter k) (M : ℕ) (i₀ : ι) (x : ι → FiniteAdeleRing (𝓞 k) k) : ℂ :=
   if (∀ j, x j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (x j)) then chi ω M (x i₀) else 0
 
-theorem gFun_add {ι : Type} {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (i₀ : ι)
-    (x h : ι → FiniteAdeleRing (𝓞 k) k) (hh : ∀ j, InM M (h j)) :
-    gFun ω M i₀ (x + h) = gFun ω M i₀ x := by
-  have e : ((∀ j, (x + h) j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M ((x + h) j))) ↔
-      ((∀ j, x j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (x j))) := by
-    refine and_congr (forall_congr' fun j => ?_) (forall_congr' fun j => imp_congr_right fun _ => ?_)
+theorem gFun_add
+    {ι : Type} {ω : HeckeCharacter k} {M₀ M : ℕ}
+    (hL : Lvl ω M₀ M) (i₀ : ι) (x h : ι → FiniteAdeleRing (𝓞 k) k) (hh : ∀ j, InM M (h j))
+    : gFun ω M i₀ (x + h) = gFun ω M i₀ x := by
+  have e
+      : ((∀ j, (x + h) j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M ((x + h) j)))
+        ↔ ((∀ j, x j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (x j))) := by
+    refine and_congr (forall_congr' fun j => ?_)
+      (forall_congr' fun j => imp_congr_right fun _ => ?_)
     · refine ⟨fun H => ?_, fun H => add_mem H (mem_of_inM (hh j))⟩
       have := sub_mem H (mem_of_inM (hh j))
       simpa using this
@@ -213,39 +232,52 @@ theorem gFun_add {ι : Type} {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω
   · exact chi_add hL _ (hh i₀)
   · rfl
 
-theorem gFun_supp {ι : Type} {ω : HeckeCharacter k} {M : ℕ} {i₀ : ι}
-    {x : ι → FiniteAdeleRing (𝓞 k) k} (h : gFun ω M i₀ x ≠ 0) :
-    (∀ j, x j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (x j)) ∧ chi ω M (x i₀) ≠ 0 := by
+theorem gFun_supp
+    {ι : Type} {ω : HeckeCharacter k} {M : ℕ} {i₀ : ι} {x : ι → FiniteAdeleRing (𝓞 k) k}
+    (h : gFun ω M i₀ x ≠ 0)
+    : (∀ j, x j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (x j)) ∧ chi ω M (x i₀) ≠ 0 := by
   unfold gFun at h
   split_ifs at h with hc
   · exact ⟨hc.1, hc.2, h⟩
   · exact absurd rfl h
 
-theorem inM_mul_iff {M : ℕ} {t y : FiniteAdeleRing (𝓞 k) k} {u : (FiniteAdeleRing (𝓞 k) k)ˣ}
+theorem inM_mul_iff
+    {M : ℕ} {t y : FiniteAdeleRing (𝓞 k) k} {u : (FiniteAdeleRing (𝓞 k) k)ˣ}
     (hu : u ∈ finiteIntegralUnits k) (ht : InM M (t - (u : FiniteAdeleRing (𝓞 k) k)))
-    (hy : y ∈ OH k) (ht' : t ∈ OH k) : InM M (t * y) ↔ InM M y := by
+    (hy : y ∈ OH k) (ht' : t ∈ OH k)
+    : InM M (t * y) ↔ InM M y := by
   refine ⟨fun H => ?_, inM_mul ht'⟩
   have h1 : InM M (t * y - y * (t - (u : FiniteAdeleRing (𝓞 k) k))) := inM_sub H (inM_mul hy ht)
   have h2 := inM_mul (unit_mem (inv_mem hu)) h1
-  have e : ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k) *
-      (t * y - y * (t - (u : FiniteAdeleRing (𝓞 k) k))) = y := by
-    have : t * y - y * (t - (u : FiniteAdeleRing (𝓞 k) k)) = (u : FiniteAdeleRing (𝓞 k) k) * y := by ring
+  have e
+      : ((u⁻¹ : (FiniteAdeleRing (𝓞 k) k)ˣ) : FiniteAdeleRing (𝓞 k) k)
+          * (t * y - y * (t - (u : FiniteAdeleRing (𝓞 k) k)))
+        = y := by
+    have : t * y - y * (t - (u : FiniteAdeleRing (𝓞 k) k)) = (u : FiniteAdeleRing (𝓞 k) k) * y := by
+      ring
     rw [this, Units.inv_mul_cancel_left]
   rwa [e] at h2
 
-theorem mem_of_prim {ι : Type} [Fintype ι] {v : ι → FiniteAdeleRing (𝓞 k) k} (hv : Prim v)
-    {t : FiniteAdeleRing (𝓞 k) k} (h : ∀ j, t * v j ∈ OH k) : t ∈ OH k := by
+theorem mem_of_prim
+    {ι : Type} [Fintype ι]
+    {v : ι → FiniteAdeleRing (𝓞 k) k} (hv : Prim v)
+    {t : FiniteAdeleRing (𝓞 k) k} (h : ∀ j, t * v j ∈ OH k)
+    : t ∈ OH k := by
   obtain ⟨c, hc, hs⟩ := hv.2
   have e : t = ∑ j, c j * (t * v j) := by
-    calc t = t * ∑ j, c j * v j := by rw [hs, mul_one]
+    calc
+      t = t * ∑ j, c j * v j := by rw [hs, mul_one]
       _ = _ := by rw [Finset.mul_sum]; exact Finset.sum_congr rfl fun j _ => by ring
   rw [e]
   exact sum_mem fun j _ => mul_mem (hc j) (h j)
 
-theorem gFun_smul {ι : Type} [Fintype ι] {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M)
-    (hM : M ≠ 0) (hU : LiftUnit) (i₀ : ι) {v : ι → FiniteAdeleRing (𝓞 k) k} (hv : Prim v)
-    (t : FiniteAdeleRing (𝓞 k) k) :
-    gFun ω M i₀ (t • v) = chi ω M t * gFun ω M i₀ v := by
+theorem gFun_smul
+    {ι : Type} [Fintype ι]
+    {ω : HeckeCharacter k} {M₀ M : ℕ} (hL : Lvl ω M₀ M) (hM : M ≠ 0)
+    (hU : LiftUnit) (i₀ : ι)
+    {v : ι → FiniteAdeleRing (𝓞 k) k} (hv : Prim v)
+    (t : FiniteAdeleRing (𝓞 k) k)
+    : gFun ω M i₀ (t • v) = chi ω M t * gFun ω M i₀ v := by
   by_cases h0 : chi ω M t = 0
   · rw [h0, zero_mul]
     by_contra hn
@@ -254,9 +286,11 @@ theorem gFun_smul {ι : Type} [Fintype ι] {ω : HeckeCharacter k} {M₀ M : ℕ
     exact lift hL hM hU ht (hv.1 i₀) h3 h0
   have ht := mem_of_chi_ne_zero h0
   obtain ⟨u, hu, hu'⟩ := exists_of_chi_ne_zero h0
-  have e : ((∀ j, (t • v) j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M ((t • v) j))) ↔
-      ((∀ j, v j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (v j))) := by
-    refine and_congr ?_ (forall_congr' fun j => imp_congr_right fun _ => inM_mul_iff hu hu' (hv.1 j) ht)
+  have e
+      : ((∀ j, (t • v) j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M ((t • v) j)))
+        ↔ ((∀ j, v j ∈ OH k) ∧ (∀ j, j ≠ i₀ → InM M (v j))) := by
+    refine and_congr ?_
+      (forall_congr' fun j => imp_congr_right fun _ => inM_mul_iff hu hu' (hv.1 j) ht)
     exact ⟨fun _ => hv.1, fun _ j => mul_mem ht (hv.1 j)⟩
   unfold gFun
   simp only [e]
@@ -311,8 +345,7 @@ theorem finFun (hC : CondM) (hU : LiftUnit) (hT : InMTop) : FinFun := by
     right
     obtain ⟨h1, h2, h3⟩ := gFun_supp h0
     obtain ⟨u, hu, hu'⟩ := exists_of_chi_ne_zero h3
-    have hval : gFun ω M i₀ v = chi ω M (v i₀) := by
-      unfold gFun; rw [if_pos ⟨h1, h2⟩]
+    have hval : gFun ω M i₀ v = chi ω M (v i₀) := by unfold gFun; rw [if_pos ⟨h1, h2⟩]
     rw [hval, chi_eq hL hu hu']
     have e : (u : FiniteAdeleRing (𝓞 k) k) - 1 = (v i₀ - 1) - (v i₀ - u) := by ring
     have h4 : InM M₀ ((u : FiniteAdeleRing (𝓞 k) k) - 1) := by

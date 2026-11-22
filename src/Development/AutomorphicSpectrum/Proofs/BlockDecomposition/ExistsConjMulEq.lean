@@ -6,14 +6,16 @@ public import Mathlib
 
 namespace GlobalTheory.CompanionTheory.FFNorm
 
-theorem exists_conj_mul_eq : ∀ (κ : Type) [Field κ] [Finite κ] (τ : κ →+* κ), (∀ x, τ (τ x) = x) →
-    (∃ x, τ x ≠ x) → ∀ c : κ, τ c = c → ∃ s : κ, τ s * s = c := by
+theorem exists_conj_mul_eq
+    : ∀ (κ : Type) [Field κ] [Finite κ] (τ : κ →+* κ),
+      (∀ x, τ (τ x) = x) → (∃ x, τ x ≠ x) → ∀ c : κ, τ c = c → ∃ s : κ, τ s * s = c := by
   intro κ _ _ τ hinv hne c hc
   classical
   let F : Subfield κ := RingHom.eqLocusField τ (RingHom.id κ)
   have hF : ∀ y : F, τ (y : κ) = y := fun y => y.2
-  let σ : κ ≃ₐ[F] κ := AlgEquiv.ofRingEquiv (f := RingEquiv.ofRingHom τ τ
-      (RingHom.ext hinv) (RingHom.ext hinv)) (fun y => hF y)
+  let σ : κ ≃ₐ[F] κ :=
+    AlgEquiv.ofRingEquiv (f := RingEquiv.ofRingHom τ τ (RingHom.ext hinv) (RingHom.ext hinv))
+      (fun y => hF y)
   have hσ : ∀ x, σ x = τ x := fun x => rfl
   have hσ1 : σ ≠ 1 := by
     obtain ⟨x, hx⟩ := hne

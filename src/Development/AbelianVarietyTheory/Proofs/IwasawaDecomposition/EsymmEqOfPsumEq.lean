@@ -8,10 +8,12 @@ namespace GlobalTheory.EsymmOfPowerSums
 
 open MvPolynomial
 
-theorem esymm_eq_of_psum_eq {d : ℕ} (a b : Fin d → ℂ)
-    (h : ∀ k : ℕ, 1 ≤ k → k ≤ d → ∑ i : Fin d, a i ^ k = ∑ i : Fin d, b i ^ k) :
-    ∀ k ≤ d, (MvPolynomial.aeval a : MvPolynomial (Fin d) ℂ → ℂ) (MvPolynomial.esymm (Fin d) ℂ k)
-      = (MvPolynomial.aeval b : MvPolynomial (Fin d) ℂ → ℂ) (MvPolynomial.esymm (Fin d) ℂ k) := by
+theorem esymm_eq_of_psum_eq
+    {d : ℕ}
+    (a b : Fin d → ℂ) (h : ∀ k : ℕ, 1 ≤ k → k ≤ d → ∑ i : Fin d, a i ^ k = ∑ i : Fin d, b i ^ k)
+    : ∀ k ≤ d,
+      (MvPolynomial.aeval a : MvPolynomial (Fin d) ℂ → ℂ) (MvPolynomial.esymm (Fin d) ℂ k)
+        = (MvPolynomial.aeval b : MvPolynomial (Fin d) ℂ → ℂ) (MvPolynomial.esymm (Fin d) ℂ k) := by
   intro k
   induction k using Nat.strong_induction_on with
   | _ k ih =>

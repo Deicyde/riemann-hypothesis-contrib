@@ -11,8 +11,11 @@ noncomputable section
 
 namespace PI.AprimeInfW.MuB
 
-open MeasureTheory Topology Filter Metric NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
-  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal Formalism.MainNotions.S Formalism.L2.SG.AdBridge
+open MeasureTheory Topology Filter Metric NumberField Formalism.BasicNotions
+  Formalism.L2.SG.HidaSetting Formalism.L2.SG.RealObj
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets Formalism.L2.SG.Pf.NcReal Formalism.MainNotions.S
+  Formalism.L2.SG.AdBridge
 open scoped TensorProduct Matrix ComplexConjugate
 
 open Classical
@@ -21,27 +24,33 @@ variable {D : D7} (X : HidaSetting D)
 
 abbrev BrI : Type := InfinitePlace X.B.I.F × Fin X.B.I.n × Fin (D.R.rS + 1 + D.R.rS) × Bool
 
-theorem reimV_apply {V : Type} {n m : ℕ} (M : V → Matrix (Fin n) (Fin m) ℂ) (p : V × Fin n × Fin m × Bool) :
-    reimV M p = if p.2.2.2 then (M p.1 p.2.1 p.2.2.1).re else (M p.1 p.2.1 p.2.2.1).im := rfl
+theorem reimV_apply
+    {V : Type} {n m : ℕ} (M : V → Matrix (Fin n) (Fin m) ℂ) (p : V × Fin n × Fin m × Bool)
+    : reimV M p = if p.2.2.2 then (M p.1 p.2.1 p.2.2.1).re else (M p.1 p.2.1 p.2.2.1).im :=
+  rfl
 
-theorem reimV_addB {V : Type} {n m : ℕ} (A B : V → Matrix (Fin n) (Fin m) ℂ) :
-    reimV (A + B) = reimV A + reimV B := by
+theorem reimV_addB {V : Type} {n m : ℕ} (A B : V → Matrix (Fin n) (Fin m) ℂ)
+    : reimV (A + B) = reimV A + reimV B := by
   ext p
   by_cases h : p.2.2.2 <;> simp [reimV, h]
 
 def bAdd : EuclideanSpace ℝ (KapI X) →+ EuclideanSpace ℝ (BrI X) :=
-  AddMonoidHom.mk' (fun x => reimV (fun v => betaV X v ((tupCoord X).symm x))) fun x y => by
-    rw [← reimV_addB]
-    congr 1
-    funext v
-    rw [tupCoord_symm_add, betaV_add]
-    rfl
+  AddMonoidHom.mk'
+    (fun x => reimV (fun v => betaV X v ((tupCoord X).symm x)))
+    fun x y => by
+      rw [← reimV_addB]
+      congr 1
+      funext v
+      rw [tupCoord_symm_add, betaV_add]
+      rfl
 
-theorem continuous_betaV (v : InfinitePlace X.B.I.F) (i : Fin X.B.I.n) (b : Fin (D.R.rS + 1 + D.R.rS)) :
-    Continuous fun Y : TupI X => betaV X v Y i b := by
+theorem continuous_betaV
+    (v : InfinitePlace X.B.I.F) (i : Fin X.B.I.n) (b : Fin (D.R.rS + 1 + D.R.rS))
+    : Continuous fun Y : TupI X => betaV X v Y i b := by
   simp only [betaV, Matrix.of_apply, Matrix.mulVec, dotProduct]
-  exact continuous_finsetSum _ fun j _ => continuous_const.mul
-    ((continuous_thetaInf X v).comp ((continuous_apply j).comp (continuous_apply b)))
+  exact continuous_finsetSum _ fun j _ =>
+    continuous_const.mul ((continuous_thetaInf X v).comp
+      ((continuous_apply j).comp (continuous_apply b)))
 
 theorem continuous_bAdd : Continuous (bAdd X) := by
   show Continuous fun x => reimV (fun v => betaV X v ((tupCoord X).symm x))
@@ -54,22 +63,25 @@ theorem continuous_bAdd : Continuous (bAdd X) := by
 def bL : EuclideanSpace ℝ (KapI X) →L[ℝ] EuclideanSpace ℝ (BrI X) :=
   (bAdd X).toRealLinearMap (continuous_bAdd X)
 
-theorem bL_apply (x : EuclideanSpace ℝ (KapI X)) : bL X x = reimV (fun v => betaV X v ((tupCoord X).symm x)) :=
+theorem bL_apply (x : EuclideanSpace ℝ (KapI X))
+    : bL X x = reimV (fun v => betaV X v ((tupCoord X).symm x)) :=
   rfl
 
 def qD (p : BrI X) : ℝ := 2 * (if X.B.I.ε p.1 p.2.1 then 1 else -1)
 
-theorem betaI_q (x y : EuclideanSpace ℝ (KapI X)) : betaI X x y = ∑ p : BrI X, qD X p * bL X x p * bL X y p := by
+theorem betaI_q (x y : EuclideanSpace ℝ (KapI X))
+    : betaI X x y = ∑ p : BrI X, qD X p * bL X x p * bL X y p := by
   rw [betaI_bridge]
-  simp only [Fintype.sum_prod_type, Fintype.sum_bool, bL_apply, reimV_apply, qD, if_true, Bool.false_eq_true,
-    if_false]
+  simp only [Fintype.sum_prod_type, Fintype.sum_bool, bL_apply, reimV_apply, qD, if_true,
+    Bool.false_eq_true, if_false]
   refine Finset.sum_congr rfl fun v _ => ?_
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun b _ => ?_
   ring
 
-theorem card_cbi : Fintype.card
-    (Module.Free.ChooseBasisIndex (Ainf X.B.I.F) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E)) = 2 := by
+theorem card_cbi
+    : Fintype.card (Module.Free.ChooseBasisIndex (Ainf X.B.I.F) (Ainf X.B.I.F ⊗[X.B.I.F] X.B.I.E))
+      = 2 := by
   haveI : FiniteDimensional X.B.I.F X.B.I.E := fd_of X
   rw [← Module.finrank_eq_card_chooseBasisIndex, Module.finrank_baseChange, X.B.I.cm.deg2]
 
@@ -85,19 +97,22 @@ def U : EuclideanSpace ℝ (BrI X) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (KapI X) :=
 def fK : EuclideanSpace ℝ (KapI X) →ₗ[ℝ] EuclideanSpace ℝ (KapI X) :=
   (U X).toLinearEquiv.toLinearMap ∘ₗ (bL X).toLinearMap
 
-theorem fK_apply (x : EuclideanSpace ℝ (KapI X)) (k : KapI X) : fK X x k = bL X x ((eI X).symm k) := by
+theorem fK_apply (x : EuclideanSpace ℝ (KapI X)) (k : KapI X)
+    : fK X x k = bL X x ((eI X).symm k) := by
   simp [fK, U, Equiv.piCongrLeft'_apply]
-
 
 open Classical in
 def Bq : Matrix (KapI X) (KapI X) ℝ := fun k l => bL X (EuclideanSpace.single l 1) ((eI X).symm k)
 
 open Classical in
-theorem toMatrix_fK : LinearMap.toMatrix (EuclideanSpace.basisFun (KapI X) ℝ).toBasis
-    (EuclideanSpace.basisFun (KapI X) ℝ).toBasis (fK X) = Bq X := by
+theorem toMatrix_fK
+    : LinearMap.toMatrix (EuclideanSpace.basisFun (KapI X) ℝ).toBasis
+        (EuclideanSpace.basisFun (KapI X) ℝ).toBasis (fK X)
+      = Bq X := by
   ext k l
-  rw [LinearMap.toMatrix_apply, OrthonormalBasis.coe_toBasis_repr_apply, EuclideanSpace.basisFun_repr,
-    OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply, fK_apply]
+  rw [LinearMap.toMatrix_apply, OrthonormalBasis.coe_toBasis_repr_apply,
+    EuclideanSpace.basisFun_repr, OrthonormalBasis.coe_toBasis, EuclideanSpace.basisFun_apply,
+    fK_apply]
   rfl
 
 theorem det_fK : LinearMap.det (fK X) = (Bq X).det := by
@@ -119,25 +134,33 @@ theorem det_matI : (matI X).det = (Bq X).det ^ 2 * ∏ p : BrI X, qD X p := by
     (eI X).symm.prod_comp (fun p => qD X p)]
   ring
 
-theorem abs_prod_qD : |∏ p : BrI X, qD X p| =
-    ((2 : ℝ) ^ (X.B.I.n * (D.R.rS + 1 + D.R.rS) * Fintype.card (InfinitePlace X.B.I.F))) ^ 2 := by
+theorem abs_prod_qD
+    : |∏ p : BrI X, qD X p|
+      = ((2 : ℝ) ^ (X.B.I.n * (D.R.rS + 1 + D.R.rS) * Fintype.card (InfinitePlace X.B.I.F)))
+        ^ 2 := by
   rw [Finset.abs_prod]
   have h : ∀ p : BrI X, |qD X p| = 2 := by
     intro p
     unfold qD
     split_ifs <;> norm_num
-  simp only [h, Finset.prod_const, Finset.card_univ, Fintype.card_prod, Fintype.card_bool, Fintype.card_fin]
+  simp only [h, Finset.prod_const, Finset.card_univ, Fintype.card_prod, Fintype.card_bool,
+    Fintype.card_fin]
   rw [← pow_mul]
   congr 1
   ring
 
-theorem sqrt_matI (hd : (matI X).det ≠ 0) :
-    (Bq X).det ≠ 0 ∧ Real.sqrt |(matI X).det| =
-      |(Bq X).det| * 2 ^ (X.B.I.n * (D.R.rS + 1 + D.R.rS) * Fintype.card (InfinitePlace X.B.I.F)) := by
+theorem sqrt_matI (hd : (matI X).det ≠ 0)
+    : (Bq X).det ≠ 0
+      ∧ Real.sqrt |(matI X).det|
+        = |(Bq X).det|
+          * 2 ^ (X.B.I.n * (D.R.rS + 1 + D.R.rS) * Fintype.card (InfinitePlace X.B.I.F)) := by
   have hdm := det_matI X
   refine ⟨fun h0 => hd (by rw [hdm, h0]; ring), ?_⟩
   rw [hdm, abs_mul, abs_prod_qD, abs_pow, sq_abs]
-  have hnn : 0 ≤ |(Bq X).det| * (2 : ℝ) ^ (X.B.I.n * (D.R.rS + 1 + D.R.rS) * Fintype.card (InfinitePlace X.B.I.F)) :=
+  have hnn
+      : 0
+        ≤ |(Bq X).det|
+          * (2 : ℝ) ^ (X.B.I.n * (D.R.rS + 1 + D.R.rS) * Fintype.card (InfinitePlace X.B.I.F)) :=
     mul_nonneg (abs_nonneg _) (pow_nonneg (by norm_num) _)
   rw [← Real.sqrt_sq hnn, mul_pow, sq_abs]
 
@@ -145,7 +168,9 @@ end PI.AprimeInfW.MuB
 
 namespace PI.AprimeInfW
 
-open MeasureTheory NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.TypedSets
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub
+  Formalism.L2.SG.TypedSets
 open Classical
 
 theorem muBridge_holds : MuBridge := by
@@ -153,20 +178,23 @@ theorem muBridge_holds : MuBridge := by
   have hd : (matI X).det ≠ 0 := matNDH_holds X u' ψ hT μinf νinf fibInf hP
   obtain ⟨hB0, hsq⟩ := MuB.sqrt_matI X hd
   have hfd : LinearMap.det (MuB.fK X) ≠ 0 := by rw [MuB.det_fK]; exact hB0
-  have hfun : (fun Y => reimV (fun v => betaV X v Y)) = (MuB.U X).symm ∘ (MuB.fK X) ∘ (tupCoord X) := by
+  have hfun
+      : (fun Y => reimV (fun v => betaV X v Y)) = (MuB.U X).symm ∘ (MuB.fK X) ∘ (tupCoord X) := by
     funext Y
     simp [MuB.fK, MuB.bL_apply]
   have hUm : Measurable (MuB.U X).symm := (MuB.U X).symm.continuous.measurable
-  have hfKm : Measurable (MuB.fK X) := (LinearMap.continuous_of_finiteDimensional (MuB.fK X)).measurable
+  have hfKm : Measurable (MuB.fK X) :=
+    (LinearMap.continuous_of_finiteDimensional (MuB.fK X)).measurable
   have htm : Measurable (tupCoord X) := (tupCoord X).continuous.measurable
-  have e1 : μinf.map ((MuB.U X).symm ∘ (MuB.fK X) ∘ (tupCoord X)) =
-      ((μinf.map (tupCoord X)).map (MuB.fK X)).map (MuB.U X).symm := by
+  have e1
+      : μinf.map ((MuB.U X).symm ∘ (MuB.fK X) ∘ (tupCoord X))
+        = ((μinf.map (tupCoord X)).map (MuB.fK X)).map (MuB.U X).symm := by
     rw [Measure.map_map hUm hfKm, Measure.map_map (hUm.comp hfKm) htm]
     rfl
   rw [hfun, e1, densMu_holds X u' ψ hT μinf νinf fibInf hP, Measure.map_smul,
     Measure.map_linearMap_addHaar_eq_smul_addHaar volume hfd, Measure.map_smul, Measure.map_smul,
-    ((MuB.U X).symm.measurePreserving).map_eq, smul_smul, ← ENNReal.ofReal_mul (Real.sqrt_nonneg _), hsq,
-    MuB.det_fK]
+    ((MuB.U X).symm.measurePreserving).map_eq, smul_smul, ← ENNReal.ofReal_mul (Real.sqrt_nonneg _),
+    hsq, MuB.det_fK]
   congr 2
   have ha : |(MuB.Bq X).det| ≠ 0 := abs_ne_zero.2 hB0
   rw [abs_inv]

@@ -27,14 +27,16 @@ section Alg
 variable {V : Type} [AddCommGroup V] [Module ℂ V]
 
 def U (E : Fin n → Fin n → Module.End ℂ V) (k : ℕ) : Submodule ℂ (Module.End ℂ V) :=
-  Submodule.span ℂ {x | ∃ l : List (Fin n × Fin n), l.length ≤ k ∧ x = (l.map fun p => E p.1 p.2).prod}
+  Submodule.span ℂ
+    {x | ∃ l : List (Fin n × Fin n), l.length ≤ k ∧ x = (l.map fun p => E p.1 p.2).prod}
 
 def Z (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (a b : Fin n) : Module.End ℂ V :=
   casimirK ε E * E a b - E a b * casimirK ε E
 
 def Mm (E : Fin n → Fin n → Module.End ℂ V) : Matrix (Fin n) (Fin n) (Module.End ℂ V) := Matrix.of E
 
-def Md (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) : Matrix (Fin n) (Fin n) (Module.End ℂ V) :=
+def Md (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V)
+    : Matrix (Fin n) (Fin n) (Module.End ℂ V) :=
   Matrix.of fun a b => adjSign ε a b • E a b
 
 def Eig (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (μ : ℝ) (v : V) : Prop :=
@@ -53,8 +55,10 @@ structure Mod (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) :
   span : Submodule.span ℂ {v | ∃ μ : ℝ, Eig ε E μ v} = ⊤
   fin : ∀ R : ℝ, FiniteDimensional ℂ (Submodule.span ℂ {v | ∃ μ : ℝ, μ ≤ R ∧ Eig ε E μ v})
 
-structure EigBasis (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) {ι : Type} (b : Module.Basis ι ℂ V)
-    (μ : ι → ℝ) : Prop where
+structure EigBasis
+    (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V)
+    {ι : Type} (b : Module.Basis ι ℂ V) (μ : ι → ℝ)
+    : Prop where
   on : Orthonormal ℂ b
   eig : ∀ i, Eig ε E (μ i) (b i)
   nonneg : ∀ i, 0 ≤ μ i
@@ -63,19 +67,28 @@ structure EigBasis (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ
 def fc {ι : Type} (b : Module.Basis ι ℂ V) (μ : ι → ℝ) (φ : ℝ → ℝ) : Module.End ℂ V :=
   b.constr ℂ fun i => ((φ (μ i) : ℝ) : ℂ) • b i
 
-def beta (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (A : Module.End ℂ V) (v w : V) : ℂ :=
+def beta (ε : Fin n → Bool) (E : Fin n → Fin n → Module.End ℂ V) (A : Module.End ℂ V) (v w : V)
+    : ℂ :=
   ∑ p ∈ nc ε, inner ℂ (E p.1 p.2 v) (A (E p.1 p.2 w))
 
 def MaxPr : Prop :=
   ∀ (n : ℕ) (ε : Fin n → Bool) (V : Type) [NormedAddCommGroup V] [InnerProductSpace ℂ V]
-    (E : Fin n → Fin n → Module.End ℂ V), Mod ε E → ∀ N : ℕ,
-    ∃ (m : ℕ) (K : ℝ) (I₀ : Finset V), 0 ≤ K ∧
-      ∀ F : V →ₗ[ℂ] (Matrix (Fin n) (Fin n) ℂ → ℂ), (∀ v, ContinuousOn (F v) (UJset ε)) →
-        (∀ X, inP ε X → ∀ v, ∀ g ∈ UJset ε,
-          HasDerivAt (fun t : ℝ => F v (g * NormedSpace.exp (t • X))) (F (actM E X v) g) 0) →
-        (∀ v, ∃ C : ℝ, ∀ g ∈ UJset ε, ‖F v g‖ ≤ C * (1 + hs2 g) ^ N) →
-        ∀ B : ℝ, 0 ≤ B → (∀ e ∈ I₀, ∀ g ∈ UJset ε, ‖F e g‖ ≤ B * (1 + hs2 g) ^ N) →
-          ∀ v, ‖F v 1‖ ≤ K * B * ‖((1 + casimirK ε E) ^ m) v‖
+      (E : Fin n → Fin n → Module.End ℂ V),
+    Mod ε E
+      → ∀ N : ℕ, ∃ (m : ℕ) (K : ℝ) (I₀ : Finset V),
+        0 ≤ K
+          ∧ ∀ F : V →ₗ[ℂ] (Matrix (Fin n) (Fin n) ℂ → ℂ),
+            (∀ v, ContinuousOn (F v) (UJset ε))
+              → (∀ X,
+                inP ε X
+                  → ∀ v, ∀ g ∈ UJset ε,
+                    HasDerivAt
+                      (fun t : ℝ => F v (g * NormedSpace.exp (t • X)))
+                      (F (actM E X v) g) 0)
+              → (∀ v, ∃ C : ℝ, ∀ g ∈ UJset ε, ‖F v g‖ ≤ C * (1 + hs2 g) ^ N)
+              → ∀ B : ℝ,
+                0 ≤ B → (∀ e ∈ I₀, ∀ g ∈ UJset ε, ‖F e g‖ ≤ B * (1 + hs2 g) ^ N)
+                  → ∀ v, ‖F v 1‖ ≤ K * B * ‖((1 + casimirK ε E) ^ m) v‖
 
 end PositivityTheory.CW
 

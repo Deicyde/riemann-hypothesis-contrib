@@ -9,8 +9,10 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IntegrableOn
 
 set_option autoImplicit false
 open CategoryTheory AlgebraicGeometry Limits TopologicalSpace MvPolynomial MeasureTheory
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
-open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.ProjSpace GlobalTheory.CxPts
+  GlobalTheory.Cartier GlobalTheory.ArInt GlobalTheory.Points GlobalTheory.ChartGlue
 open GroundTheory.Arith.SchemeCoh GroundTheory.Arith.SchemeCoh.ProjSpace
 open ReciprocityTheory.AnForm ReciprocityTheory.AnForm.M
 open GlobalTheory.CompanionTheory.MPDict GlobalTheory.CompanionTheory.MixZ
@@ -18,17 +20,22 @@ open ReciprocityTheory.ChartRestriction.G.Geo (mcPts IsMultiHomog SameOrbit)
 
 namespace GlobalTheory.CompanionTheory.MixZ.PullDens
 
-
 open Filter Topology in
-theorem locDens_pullback_eq : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} {q : X ⟶ Sp k} {σ : k →+* ℂ} {D : ℕ} {T : Type}
-    [TopologicalSpace T] (A : FinHolAtlas D T) (F : T → GlobalTheory.CxPts q σ) (hF : Continuous F),
-    (∀ (W : X.Opens) (f : Γ(X, W)), A.HoloOn (F ⁻¹' ptsIn q σ W) (ev q σ W f ∘ F)) →
-    ∀ {B : LB X} (φ : GlobalTheory.Weight q σ B), φ.IsCInf → ∀ (c : GlobalTheory.AlgChart q σ D) (j : Fin A.n) (u : Fin D → ℂ),
-      u ∈ (A.chart j).target → F ((A.chart j).symm u) ∈ c.e.source →
-      AnalyticAt ℂ (c.finChart ∘ F ∘ (A.chart j).symm) u ∧
-      locDens A (fun _ => φ.locPot.pullback F hF) j u =
-        ‖LinearMap.det (fderiv ℂ (c.finChart ∘ F ∘ (A.chart j).symm) u :
-          (Fin D → ℂ) →ₗ[ℂ] (Fin D → ℂ))‖ ^ 2 * c.chernDens φ (F ((A.chart j).symm u)) := by
+theorem locDens_pullback_eq
+    : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} {q : X ⟶ Sp k} {σ : k →+* ℂ} {D : ℕ} {T : Type}
+        [TopologicalSpace T] (A : FinHolAtlas D T) (F : T → GlobalTheory.CxPts q σ)
+        (hF : Continuous F),
+      (∀ (W : X.Opens) (f : Γ(X, W)), A.HoloOn (F ⁻¹' ptsIn q σ W) (ev q σ W f ∘ F))
+        → ∀ {B : LB X} (φ : GlobalTheory.Weight q σ B),
+          φ.IsCInf
+            → ∀ (c : GlobalTheory.AlgChart q σ D) (j : Fin A.n) (u : Fin D → ℂ),
+              u ∈ (A.chart j).target → F ((A.chart j).symm u) ∈ c.e.source
+                → AnalyticAt ℂ (c.finChart ∘ F ∘ (A.chart j).symm) u
+                  ∧ locDens A (fun _ => φ.locPot.pullback F hF) j u
+                    = ‖LinearMap.det (fderiv ℂ (c.finChart ∘ F ∘ (A.chart j).symm) u :
+                        (Fin D → ℂ) →ₗ[ℂ] (Fin D → ℂ))‖
+                        ^ 2
+                      * c.chernDens φ (F ((A.chart j).symm u)) := by
   intro k _ X q σ D T _ A F hF hH B φ h c j u hu hsrc
   have hcont : ContinuousAt (F ∘ (A.chart j).symm) u :=
     hF.continuousAt.comp ((A.chart j).continuousAt_symm hu)
@@ -52,8 +59,11 @@ theorem locDens_pullback_eq : ∀ {k : Type} [CommRing k] {X : Scheme.{0}} {q : 
   rw [hr] at hd
   have hψ : ContDiffAt ℝ 2 (fun w => φ.locPot.φ y₀ (c.finChart.symm w)) (G u) :=
     (hd.comp (G u) (GlobalTheory.FinChart.toV D).contDiff.contDiffAt).div_const 2
-  have hcomp := ReciprocityTheory.AnForm.A.maDens_comp (fun _ w => φ.locPot.φ y₀ (c.finChart.symm w)) G u hG
-    (fun _ => hψ)
+  have hcomp :=
+    ReciprocityTheory.AnForm.A.maDens_comp
+      (fun _ w => φ.locPot.φ y₀ (c.finChart.symm w))
+      G u hG
+      (fun _ => hψ)
   rw [ReciprocityTheory.AnForm.A.det_jacC, Complex.normSq_eq_norm_sq, hma] at hcomp
   rw [mul_comm, ← hcomp]
   unfold locDens

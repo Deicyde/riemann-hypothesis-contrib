@@ -13,11 +13,15 @@ noncomputable section
 
 namespace GlobalTheory.EtaValuationTest
 
-open Formalism.MainNotions Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.ModuliIntegralCharts.H1
+open Formalism.MainNotions Formalism.BasicNotions NumberField IsDedekindDomain
+  Formalism.MainNotions.ModuliIntegralCharts.H1
 
-variable {D : Formalism.BasicNotions.D7} {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
+variable
+  {D : Formalism.BasicNotions.D7}
+  {B : WeightFamilies.Prov D} {P : ModuliIntegralCharts.Prov D} {j : ℕ}
 
-theorem phiC_nonneg (X : WeightAlgebra.PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la) : 0 ≤ X.phiC la y := by
+theorem phiC_nonneg (X : WeightAlgebra.PJ D B P j) (la : HeightOneSpectrum (𝓞 B.KO)) (y : X.Pt la)
+    : 0 ≤ X.phiC la y := by
   unfold WeightAlgebra.PJ.phiC
   split_ifs
   · refine mul_nonneg (Nat.cast_nonneg _) (Real.sInf_nonneg ?_)
@@ -35,19 +39,24 @@ theorem phiC_nonneg (X : WeightAlgebra.PJ D B P j) (la : HeightOneSpectrum (𝓞
           simpa using this
         simp [this]
       · have h1 := hb _ hc
-        have h2 : (P.loc X.dat (WeightAlgebra.resCh la)).be (X.pt66 la y) a a =
-            ∑ i, ∑ k, ((b.repr a i : ℤ) : ℝ) * ((b.repr a k : ℤ) : ℝ) *
-              (P.loc X.dat (WeightAlgebra.resCh la)).be (X.pt66 la y) (b i) (b k) := by
+        have h2
+            : (P.loc X.dat (WeightAlgebra.resCh la)).be (X.pt66 la y) a a
+              = ∑ i, ∑ k, ((b.repr a i : ℤ) : ℝ) * ((b.repr a k : ℤ) : ℝ) *
+                  (P.loc X.dat (WeightAlgebra.resCh la)).be (X.pt66 la y) (b i) (b k) := by
           conv_lhs => rw [← b.sum_repr a]
           set_option synthInstance.maxHeartbeats 100000 in
-            simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul, Finset.mul_sum]
+            simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply, zsmul_eq_mul,
+              Finset.mul_sum]
           rw [Finset.sum_comm]
           exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun k _ => by ring
-        rw [h2]; exact h1.le
+        rw [h2]
+        exact h1.le
   · exact le_rfl
 
-theorem mem_Mlat (X : WeightAlgebra.PJ D B P j) (i : ℕ) (η : B.Cusp j (Formalism.L2.Pj.wEt D j i)) (h : EtVal X i η) :
-    η ∈ B.Mlat j _ := by
+theorem mem_Mlat
+    (X : WeightAlgebra.PJ D B P j) (i : ℕ)
+    (η : B.Cusp j (Formalism.L2.Pj.wEt D j i)) (h : EtVal X i η)
+    : η ∈ B.Mlat j _ := by
   refine (X.Mlat_eq _ η).2 fun la y => le_trans ?_ (h la y)
   exact EReal.coe_nonneg.2 (mul_nonneg (by positivity) (phiC_nonneg X la y))
 

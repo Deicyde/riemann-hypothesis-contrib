@@ -41,8 +41,10 @@ theorem cutoffContinuous : CutCont := by
     have h0' : χ x = 0 := by simpa using h0
     simp [cut, h0']
   have hcont : ContinuousOn (cut χ u) U := hχ'.continuousOn.mul hu
-  exact ⟨hcont.continuous_of_tsupport_subset hU (hsub.trans hχt),
-    IsCompact.of_isClosed_subset hχc (isClosed_tsupport _) hsub⟩
+  exact ⟨
+    hcont.continuous_of_tsupport_subset hU (hsub.trans hχt),
+    IsCompact.of_isClosed_subset hχc (isClosed_tsupport _) hsub
+  ⟩
 
 theorem smoothOfLocallySmooth : LocalGlobal := by
   intro d U f _ h x hx

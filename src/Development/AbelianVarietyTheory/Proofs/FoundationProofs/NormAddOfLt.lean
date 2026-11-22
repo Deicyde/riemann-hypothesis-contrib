@@ -279,20 +279,60 @@ lemma chord {A B x₁ x₂ y₁ y₂ l : K} {M : ℝ} (hA : ‖A‖ ≤ 1) (hB :
 
 end aux
 
-theorem large_add : (let d1 : {K : Type} → [inst : NormedField K] → {W : WeierstrassCurve.Affine K} → ℝ → WeierstrassCurve.Affine.Point W → Prop := @(fun {K : Type} [NormedField K] {W : WeierstrassCurve.Affine K} (M : ℝ) (x : WeierstrassCurve.Affine.Point W) ↦ match x with | WeierstrassCurve.Affine.Point.zero => True | WeierstrassCurve.Affine.Point.some x y h => M ≤ ‖x‖); let d2 : {K : Type} → [inst : NormedField K] → {W : WeierstrassCurve.Affine K} → WeierstrassCurve.Affine.Point W → K := @(fun {K : Type} [NormedField K] {W : WeierstrassCurve.Affine K} (x : WeierstrassCurve.Affine.Point W) ↦ match x with | WeierstrassCurve.Affine.Point.zero => (0 : K) | WeierstrassCurve.Affine.Point.some x y h => x / y); ∀ {K : Type} [inst : NormedField K] [IsUltrametricDist K] [inst_2 : DecidableEq K] {A B : K} {M : ℝ}, ‖A‖ ≤ (1 : ℝ) → ‖B‖ ≤ (1 : ℝ) → (1 : ℝ) < M → ∀ (P Q : WeierstrassCurve.Affine.Point (WeierstrassCurve.toAffine { a₁ := (0 : K), a₂ := (0 : K), a₃ := (0 : K), a₄ := A, a₆ := B : WeierstrassCurve K })), d1 M P → d1 M Q → d1 M (P + Q) ∧ ‖d2 (P + Q) - d2 P - d2 Q‖ ≤ M⁻¹) := by
+theorem large_add
+    : (let d1
+           : {K : Type} → [inst : NormedField K] → {W : WeierstrassCurve.Affine K} → ℝ
+             → WeierstrassCurve.Affine.Point W
+             → Prop :=
+         @(fun {K : Type} [NormedField K] {W : WeierstrassCurve.Affine K} (M : ℝ)
+             (x : WeierstrassCurve.Affine.Point W) ↦
+           match x with
+           | WeierstrassCurve.Affine.Point.zero => True
+           | WeierstrassCurve.Affine.Point.some x y h => M ≤ ‖x‖)
+       let d2
+           : {K : Type} → [inst : NormedField K] → {W : WeierstrassCurve.Affine K}
+             → WeierstrassCurve.Affine.Point W
+             → K :=
+         @(fun {K : Type} [NormedField K] {W : WeierstrassCurve.Affine K}
+             (x : WeierstrassCurve.Affine.Point W) ↦
+           match x with
+           | WeierstrassCurve.Affine.Point.zero => (0 : K)
+           | WeierstrassCurve.Affine.Point.some x y h => x / y)
+       ∀ {K : Type} [inst : NormedField K] [IsUltrametricDist K] [inst_2 : DecidableEq K] {A B : K}
+           {M : ℝ},
+         ‖A‖ ≤ (1 : ℝ) → ‖B‖ ≤ (1 : ℝ) → (1 : ℝ) < M
+           → ∀ (P Q : WeierstrassCurve.Affine.Point (WeierstrassCurve.toAffine {
+               a₁ := (0 : K)
+               a₂ := (0 : K)
+               a₃ := (0 : K)
+               a₄ := A
+               a₆ := B
+               : WeierstrassCurve K
+             })),
+             d1 M P → d1 M Q → d1 M (P + Q) ∧ ‖d2 (P + Q) - d2 P - d2 Q‖ ≤ M⁻¹) := by
   intro d1 d2 K _ _ _ A B M hA hB hM P Q hP hQ
   have hMi0 : 0 ≤ M⁻¹ := inv_nonneg.mpr (by linarith)
-  have z2 : d2 (0 : WeierstrassCurve.Affine.Point (WeierstrassCurve.toAffine
-    { a₁ := (0 : K), a₂ := (0 : K), a₃ := (0 : K), a₄ := A, a₆ := B : WeierstrassCurve K })) = 0 :=
+  have z2
+      : d2
+          (0 : WeierstrassCurve.Affine.Point (WeierstrassCurve.toAffine {
+            a₁ := (0 : K)
+            a₂ := (0 : K)
+            a₃ := (0 : K)
+            a₄ := A
+            a₆ := B
+            : WeierstrassCurve K
+          }))
+        = 0 :=
     rfl
   rcases P with _ | ⟨x₁, y₁, h₁⟩
   · change d1 M (0 + Q) ∧ ‖d2 (0 + Q) - 0 - d2 Q‖ ≤ M⁻¹
     rw [zero_add]
     exact ⟨hQ, by simpa using hMi0⟩
   rcases Q with _ | ⟨x₂, y₂, h₂⟩
-  · change d1 M (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁ + 0) ∧
-      ‖d2 (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁ + 0) -
-        d2 (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁) - 0‖ ≤ M⁻¹
+  · change d1 M (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁ + 0)
+      ∧ ‖d2 (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁ + 0) -
+          d2 (WeierstrassCurve.Affine.Point.some x₁ y₁ h₁) - 0‖
+        ≤ M⁻¹
     rw [add_zero]
     exact ⟨hP, by simpa using hMi0⟩
   have hx₁ : M ≤ ‖x₁‖ := hP
@@ -303,8 +343,17 @@ theorem large_add : (let d1 : {K : Type} → [inst : NormedField K] → {W : Wei
   have c₂ : y₂ ^ 2 = x₂ ^ 3 + A * x₂ + B := by
     have := (WeierstrassCurve.Affine.equation_iff _ _).mp h₂.1
     simpa using this
-  by_cases hxy : x₁ = x₂ ∧ y₁ = (WeierstrassCurve.toAffine
-    { a₁ := (0 : K), a₂ := (0 : K), a₃ := (0 : K), a₄ := A, a₆ := B : WeierstrassCurve K }).negY x₂ y₂
+  by_cases hxy
+    : x₁ = x₂
+      ∧ y₁
+        = (WeierstrassCurve.toAffine {
+          a₁ := (0 : K)
+          a₂ := (0 : K)
+          a₃ := (0 : K)
+          a₄ := A
+          a₆ := B
+          : WeierstrassCurve K
+        }).negY x₂ y₂
   · rw [WeierstrassCurve.Affine.Point.add_of_Y_eq hxy.1 hxy.2, z2]
     refine ⟨trivial, ?_⟩
     change ‖0 - x₁ / y₁ - x₂ / y₂‖ ≤ M⁻¹
@@ -312,25 +361,35 @@ theorem large_add : (let d1 : {K : Type} → [inst : NormedField K] → {W : Wei
     rw [hxy.1, hy, div_neg]
     simpa using hMi0
   · rw [WeierstrassCurve.Affine.Point.add_some hxy]
-    have key := chord (l := (WeierstrassCurve.toAffine
-      { a₁ := (0 : K), a₂ := (0 : K), a₃ := (0 : K), a₄ := A, a₆ := B : WeierstrassCurve K }).slope
-        x₁ x₂ y₁ y₂) hA hB hM hx₁ hx₂ c₁ c₂ (by
-      by_cases hx : x₁ = x₂
-      · right
-        have hy := fun h => hxy ⟨hx, h⟩
-        have hyy := WeierstrassCurve.Affine.Y_eq_of_Y_ne h₁.1 h₂.1 hx hy
-        have h2 : 2 * y₁ ≠ 0 := by
-          intro h
-          apply hy
-          simp only [WeierstrassCurve.Affine.negY, zero_mul, sub_zero]
-          linear_combination h - hyy
-        refine ⟨hx, hyy, h2, ?_⟩
-        rw [WeierstrassCurve.Affine.slope_of_Y_ne hx hy]
-        simp only [WeierstrassCurve.Affine.negY, zero_mul, mul_zero, sub_zero, add_zero]
-        rw [show y₁ - -y₁ = 2 * y₁ by ring, div_mul_cancel₀ _ h2]
-      · left
-        refine ⟨hx, ?_⟩
-        rw [WeierstrassCurve.Affine.slope_of_X_ne hx, div_mul_cancel₀ _ (sub_ne_zero.mpr hx)])
+    have key :=
+      chord
+        (l :=
+          (WeierstrassCurve.toAffine {
+            a₁ := (0 : K)
+            a₂ := (0 : K)
+            a₃ := (0 : K)
+            a₄ := A
+            a₆ := B
+            : WeierstrassCurve K
+          }).slope x₁ x₂ y₁ y₂)
+        hA hB hM hx₁ hx₂ c₁ c₂
+        (by
+          by_cases hx : x₁ = x₂
+          · right
+            have hy := fun h => hxy ⟨hx, h⟩
+            have hyy := WeierstrassCurve.Affine.Y_eq_of_Y_ne h₁.1 h₂.1 hx hy
+            have h2 : 2 * y₁ ≠ 0 := by
+              intro h
+              apply hy
+              simp only [WeierstrassCurve.Affine.negY, zero_mul, sub_zero]
+              linear_combination h - hyy
+            refine ⟨hx, hyy, h2, ?_⟩
+            rw [WeierstrassCurve.Affine.slope_of_Y_ne hx hy]
+            simp only [WeierstrassCurve.Affine.negY, zero_mul, mul_zero, sub_zero, add_zero]
+            rw [show y₁ - -y₁ = 2 * y₁ by ring, div_mul_cancel₀ _ h2]
+          · left
+            refine ⟨hx, ?_⟩
+            rw [WeierstrassCurve.Affine.slope_of_X_ne hx, div_mul_cancel₀ _ (sub_ne_zero.mpr hx)])
     simp only [d1, d2, WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negY,
       WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, zero_mul, sub_zero, add_zero]
     exact key

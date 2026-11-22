@@ -5,18 +5,24 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibra
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base UpperTheory.V.Kum
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.GaloisCohomology UpperTheory.V UpperTheory.V.LDataCardLeFinrank UpperTheory.V.Base
+  UpperTheory.V.Kum
 open Pointwise
 
-private theorem UpperTheory.V.Kum.coc_conj_triv {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
-    (ρ : Representation R Γ M) (f : Γ → M) (hf : ∀ g h, f (g * h) = f g + ρ g (f h)) (g h k : Γ)
-    (e : k * g = g * h) (hk : ∀ m, ρ k m = m) : f k = ρ g (f h) := by
+private theorem UpperTheory.V.Kum.coc_conj_triv
+    {R Γ M : Type} [CommRing R] [Group Γ] [AddCommGroup M] [Module R M]
+    (ρ : Representation R Γ M) (f : Γ → M) (hf : ∀ g h, f (g * h) = f g + ρ g (f h))
+    (g h k : Γ) (e : k * g = g * h) (hk : ∀ m, ρ k m = m)
+    : f k = ρ g (f h) := by
   have h1 := hf k g
   rw [e, hf, hk, add_comm] at h1
   exact (add_right_cancel h1).symm
 
-theorem UpperTheory.V.Kum.resInfMem :
-    ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime] (D : LData F Ω l) (e : ℤ), (Sha D e).map (resInf D e) ≤ EqHom l (Uinf F Ω l) (qzG F Ω l e) := by
+theorem UpperTheory.V.Kum.resInfMem
+    : ∀ (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ)
+        [Fact l.Prime] (D : LData F Ω l) (e : ℤ),
+      (Sha D e).map (resInf D e) ≤ EqHom l (Uinf F Ω l) (qzG F Ω l e) := by
   intro F Ω _ _ _ _ _ l _ D e
   intro y hy
   obtain ⟨x, hx, rfl⟩ := Submodule.mem_map.mp hy
@@ -26,15 +32,19 @@ theorem UpperTheory.V.Kum.resInfMem :
   have htriv : ∀ g : G F Ω, cycZ F Ω l g = 1 → ∀ m, qzTw D e (toGS Ω _ g) m = m := fun g hg m => by
     rw [qzTw_apply, hchi, hg, one_zpow, Units.val_one, one_smul]
   have hz : ∀ a b, z.1 (a * b) = z.1 a + qzTw D e a (z.1 b) := z.2.2
-  have hconj : ∀ g h k : G F Ω, k * g = g * h → cycZ F Ω l k = 1 →
-      z.1 (toGS Ω _ k) = qzTw D e (toGS Ω _ g) (z.1 (toGS Ω _ h)) := fun g h k e1 hk =>
+  have hconj
+      : ∀ g h k : G F Ω,
+        k * g = g * h → cycZ F Ω l k = 1
+          → z.1 (toGS Ω _ k) = qzTw D e (toGS Ω _ g) (z.1 (toGS Ω _ h)) := fun g h k e1 hk =>
     coc_conj_triv _ _ hz _ _ _ (by rw [← map_mul, ← map_mul, e1]) (htriv k hk)
   have h1 : z.1 1 = 0 := by
     have := hz 1 1
     rw [one_mul, map_one] at this
     exact left_eq_add.1 this
-  have hdec : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ u : Uinf F Ω l, u.1 ∈ Dec (F := F) A →
-      z.1 (toGS Ω _ u.1) = 0 := by
+  have hdec
+      : ∀ A : ValuationSubring Ω,
+        A.valuation (l : Ω) < 1
+          → ∀ u : Uinf F Ω l, u.1 ∈ Dec (F := F) A → z.1 (toGS Ω _ u.1) = 0 := by
     intro A hA u hu
     obtain ⟨v, hv⟩ := p2 A (p3 A l (Fact.out : l.Prime).ne_zero hA)
     have hvS : v ∈ D.S := by

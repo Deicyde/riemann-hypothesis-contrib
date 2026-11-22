@@ -24,7 +24,8 @@ public import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ExistsFo
 
 @[expose] public section
 
-open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB GlobalTheory.JetSer
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ
+  ReciprocityTheory.ChartRestriction.G.TB GlobalTheory.JetSer
 
 namespace GlobalTheory.JetRoad
 
@@ -34,8 +35,9 @@ theorem rosIdSt : RosIdSt := by
   have b := GlobalTheory.rosatiGen_one_mul_star S G h2 h3 Lr c O act u hu T z J hJ
   exact ⟨a.1, a.2.1, b.1, b.2.1, a.2.2, b.2.2⟩
 
-theorem jetRoad : JetAlgSt ∧ RepSt ∧ LawSt ∧ MapSt ∧ DLinSt ∧ ActSt ∧ TwoChartSt ∧ SerSt ∧
-    SerExSt ∧ FBOfSt ∧ HMulSt ∧ GermExSt ∧ IntTransSt ∧ ChartBCSt := by
+theorem jetRoad
+    : JetAlgSt ∧ RepSt ∧ LawSt ∧ MapSt ∧ DLinSt ∧ ActSt ∧ TwoChartSt ∧ SerSt ∧ SerExSt ∧ FBOfSt
+      ∧ HMulSt ∧ GermExSt ∧ IntTransSt ∧ ChartBCSt := by
   have hJ : JetAlgSt := jetAlg
   have hR : RepSt := repSt_of_jetAlgSt hJ
   have hL : LawSt := lawSt_of hJ hR
@@ -45,11 +47,22 @@ theorem jetRoad : JetAlgSt ∧ RepSt ∧ LawSt ∧ MapSt ∧ DLinSt ∧ ActSt �
   have hT : TwoChartSt := twoChart_of_rep_map hJ hR hM
   have hS : SerSt := serSt_of_jetAlgSt hJ
   have hE : SerExSt := serEx hJ hR hS
-  exact ⟨hJ, hR, hL, hM, hD, hA, hT, hS, hE,
+  exact ⟨
+    hJ,
+    hR,
+    hL,
+    hM,
+    hD,
+    hA,
+    hT,
+    hS,
+    hE,
     FBOf.fbOf hJ hR hL hM hA hS hE valSer rosIdSt,
     FrameChange.hMul hJ hR hT hS hE,
     GlobalTheory.GermExist.germ_exists_unique hJ hR hS hE,
-    IntTrans.intTrans GlobalTheory.canonGauge_independence_all.2.2.2 GlobalTheory.exists_formalBiext_map,
-    GlobalTheory.ChartBaseChange.chartBaseChange hJ hS⟩
+    IntTrans.intTrans GlobalTheory.canonGauge_independence_all.2.2.2
+      GlobalTheory.exists_formalBiext_map,
+    GlobalTheory.ChartBaseChange.chartBaseChange hJ hS
+  ⟩
 
 end GlobalTheory.JetRoad

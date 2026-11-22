@@ -4,12 +4,17 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.PatchingMod
 
 @[expose] public section
 
-open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools UpperTheory.V.CA UpperTheory.V.Pa Polynomial
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.W UpperTheory.V.AlgebraTools
+  UpperTheory.V.CA UpperTheory.V.Pa Polynomial
 open scoped TensorProduct
 
 section
-variable {l : ℕ} [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R]
-  [Algebra O R] (n : ℕ)
+variable
+  {l : ℕ} [Fact l.Prime]
+  (F : GFrame l)
+  (O : Type) [CommRing O] [Algebra ℤ_[l] O]
+  (R : Type) [CommRing R] [Algebra O R]
+  (n : ℕ)
 
 private theorem star_closure_conj_cont : Continuous F.conj := by
   apply Continuous.subtype_mk
@@ -17,13 +22,17 @@ private theorem star_closure_conj_cont : Continuous F.conj := by
 
 end
 
-private theorem exists_unit_valuation_le_subset_nhds {l : ℕ} [Fact l.Prime] (F : GFrame l) (N : ℕ) (H : OpenNormalSubgroup F.G₀) :
-    ∃ H' : OpenNormalSubgroup F.G₀, ∀ h ∈ H', (F.conj h)⁻¹ ∈ H ∧ ((F.ε h : ℤ_[l]) - 1) ∈ Ideal.span {(l : ℤ_[l]) ^ N} := by
+private theorem exists_unit_valuation_le_subset_nhds
+    {l : ℕ} [Fact l.Prime] (F : GFrame l) (N : ℕ) (H : OpenNormalSubgroup F.G₀)
+    : ∃ H' : OpenNormalSubgroup F.G₀, ∀ h ∈ H',
+      (F.conj h)⁻¹ ∈ H ∧ ((F.ε h : ℤ_[l]) - 1) ∈ Ideal.span {(l : ℤ_[l]) ^ N} := by
   let φ : F.G₀ →* (ZMod (l ^ N))ˣ :=
-    (Units.map (PadicInt.toZModPow N : ℤ_[l] →+* ZMod (l ^ N)).toMonoidHom).comp (F.ε.comp F.η.ker.subtype)
+    (Units.map (PadicInt.toZModPow N : ℤ_[l] →+* ZMod (l ^ N)).toMonoidHom).comp
+      (F.ε.comp F.η.ker.subtype)
   have hK : ∀ h : F.G₀, h ∈ φ.ker ↔ ((F.ε h : ℤ_[l]) - 1) ∈ Ideal.span {(l : ℤ_[l]) ^ N} := by
     intro h
-    rw [← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, map_one, sub_eq_zero, MonoidHom.mem_ker, Units.ext_iff]
+    rw [← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub, map_one, sub_eq_zero, MonoidHom.mem_ker,
+      Units.ext_iff]
     rfl
   let S0 : Subgroup F.G₀ := φ.ker ⊓ Subgroup.comap F.conj (H : Subgroup F.G₀)
   have hN : S0.Normal := by
@@ -34,7 +43,9 @@ private theorem exists_unit_valuation_le_subset_nhds {l : ℕ} [Fact l.Prime] (F
   have hopen : IsOpen (S0 : Set F.G₀) := by
     apply Subgroup.isOpen_of_mem_nhds S0 (g := 1)
     apply Filter.inter_mem
-    · have hb : (fun g : F.G₀ => ((F.ε g : ℤ_[l]ˣ) : ℤ_[l])) ⁻¹' Metric.ball 1 ((l : ℝ) ^ (-(N : ℤ))) ∈ nhds (1 : F.G₀) := by
+    · have hb
+          : (fun g : F.G₀ => ((F.ε g : ℤ_[l]ˣ) : ℤ_[l])) ⁻¹' Metric.ball 1 ((l : ℝ) ^ (-(N : ℤ)))
+            ∈ nhds (1 : F.G₀) := by
         apply hcont.continuousAt.preimage_mem_nhds
         have h1 : ((F.ε ((1 : F.G₀) : F.Γ) : ℤ_[l]ˣ) : ℤ_[l]) = 1 := by simp
         rw [h1]
@@ -56,13 +67,16 @@ private theorem exists_unit_valuation_le_subset_nhds {l : ℕ} [Fact l.Prime] (F
   have hh' : h ∈ S0 := hh
   refine ⟨inv_mem hh'.2, (hK h).1 hh'.1⟩
 
-theorem UpperTheory.V.Pa.star_closure :
-    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) (n : ℕ) (O : Type) [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R] [Algebra O R] (I : Ideal R) (S : Set (MonoidAlgebra R F.G₀)), (l : R) ∈ I → (∀ z ∈ S, F.star O R n z ∈ TwoSidedIdeal.span S) → ∀ y ∈ closureIdeal I S, F.star O R n y ∈ closureIdeal I S := by
+theorem UpperTheory.V.Pa.star_closure
+    : ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) (n : ℕ) (O : Type) [CommRing O] [Algebra ℤ_[l] O]
+        (R : Type) [CommRing R] [Algebra O R] (I : Ideal R) (S : Set (MonoidAlgebra R F.G₀)),
+      (l : R) ∈ I → (∀ z ∈ S, F.star O R n z ∈ TwoSidedIdeal.span S)
+        → ∀ y ∈ closureIdeal I S, F.star O R n y ∈ closureIdeal I S := by
   intro l _ F n O _ _ R _ _ I S hl hS y hy
   have hadd : ∀ y z, F.star O R n (y + z) = F.star O R n y + F.star O R n z := by
     intro y z
     simp [GFrame.star, map_add (f := _)]
-  have hneg : ∀ y, F.star O R n (-y) = -F.star O R n y := by
+  have hneg : ∀ y, F.star O R n (-y) = - F.star O R n y := by
     intro y
     simp [GFrame.star, map_neg]
   have hsub : ∀ y z, F.star O R n (y - z) = F.star O R n y - F.star O R n z := by
@@ -72,8 +86,10 @@ theorem UpperTheory.V.Pa.star_closure :
   have hmul : ∀ y z, F.star O R n (y * z) = F.star O R n z * F.star O R n y := by
     intro y z
     simp [GFrame.star, map_mul]
-  have hsingle : ∀ (g : F.G₀) (b : R), F.star O R n (MonoidAlgebra.single g b) =
-      MonoidAlgebra.single (F.conj g)⁻¹ (b * ((F.eps O R g ^ (1 - (n : ℤ)) : Rˣ) : R)) := by
+  have hsingle
+      : ∀ (g : F.G₀) (b : R),
+        F.star O R n (MonoidAlgebra.single g b)
+          = MonoidAlgebra.single (F.conj g)⁻¹ (b * ((F.eps O R g ^ (1 - (n : ℤ)) : Rˣ) : R)) := by
     intro g b
     simp [GFrame.star, GFrame.starOp, MonoidAlgebra.lift_single]
   have h1 : F.star O R n 1 = 1 := by simp [GFrame.star, map_one]
@@ -96,12 +112,15 @@ theorem UpperTheory.V.Pa.star_closure :
   have heps : ∀ h ∈ H', ((F.eps O R h : Rˣ) : R) - 1 ∈ I ^ N := by
     intro h hh
     obtain ⟨t, ht⟩ := Ideal.mem_span_singleton'.1 (hH' h hh).2
-    have hv : ((F.eps O R h : Rˣ) : R) = algebraMap O R (algebraMap ℤ_[l] O ((F.ε h : ℤ_[l]ˣ) : ℤ_[l])) := by
+    have hv
+        : ((F.eps O R h : Rˣ) : R)
+          = algebraMap O R (algebraMap ℤ_[l] O ((F.ε h : ℤ_[l]ˣ) : ℤ_[l])) := by
       simp [GFrame.eps, pushCh]
     rw [hv, eq_add_of_sub_eq' ht.symm]
     simp only [map_add (f := _), map_mul, map_pow, map_natCast, map_one, add_sub_cancel_left]
     exact Ideal.mul_mem_left _ _ (Ideal.pow_mem_pow hl N)
-  refine TwoSidedIdeal.span_induction (p := fun x _ => F.star O R n x ∈ T) ?_ ?_ ?_ ?_ ?_ ?_ (hy N H')
+  refine
+    TwoSidedIdeal.span_induction (p := fun x _ => F.star O R n x ∈ T) ?_ ?_ ?_ ?_ ?_ ?_ (hy N H')
   · rintro x ((hx | ⟨a, ha, rfl⟩) | ⟨h, hh, rfl⟩)
     · exact hST (hS x hx)
     · rw [hsingle]
@@ -111,9 +130,10 @@ theorem UpperTheory.V.Pa.star_closure :
       rw [map_zpow] at hu
       rw [hsub, hsingle, one_mul, h1]
       set u : R := ((F.eps O R h ^ (1 - (n : ℤ)) : Rˣ) : R)
-      have hsplit : MonoidAlgebra.single (F.conj h)⁻¹ u - 1 =
-          MonoidAlgebra.single (F.conj h)⁻¹ (1 : R) * MonoidAlgebra.single 1 (u - 1) +
-            (MonoidAlgebra.single (F.conj h)⁻¹ (1 : R) - 1) := by
+      have hsplit
+          : MonoidAlgebra.single (F.conj h)⁻¹ u - 1
+            = MonoidAlgebra.single (F.conj h)⁻¹ (1 : R) * MonoidAlgebra.single 1 (u - 1)
+              + (MonoidAlgebra.single (F.conj h)⁻¹ (1 : R) - 1) := by
         rw [MonoidAlgebra.single_mul_single, mul_one, one_mul, MonoidAlgebra.single_sub]
         abel
       rw [hsplit]

@@ -16,28 +16,36 @@ section Local
 
 variable (A : Subalgebra S Ω) {k : ℕ} (f c : Fin k → Ω)
 
-theorem exists_sum_mul_pow_eq_one (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A) (hs : ∑ l, c l * f l = 1)
-    (n : ℕ) : ∃ d : Fin k → Ω, (∀ l, d l ∈ A) ∧ ∑ l, d l * f l ^ n = 1 := by
+theorem exists_sum_mul_pow_eq_one
+    (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A) (hs : ∑ l, c l * f l = 1) (n : ℕ)
+    : ∃ d : Fin k → Ω, (∀ l, d l ∈ A) ∧ ∑ l, d l * f l ^ n = 1 := by
   let f' : Fin k → A := fun l => ⟨f l, hf l⟩
   have htop : Ideal.span (Set.range f') = ⊤ := by
     rw [Ideal.eq_top_iff_one, Ideal.span, Submodule.mem_span_range_iff_exists_fun]
     refine ⟨fun l => ⟨c l, hc l⟩, Subtype.ext ?_⟩
     simpa [f'] using hs
   have h1 := Ideal.span_pow_eq_top _ htop n
-  rw [← Set.range_comp, Ideal.eq_top_iff_one, Ideal.span, Submodule.mem_span_range_iff_exists_fun] at h1
+  rw [← Set.range_comp, Ideal.eq_top_iff_one, Ideal.span, Submodule.mem_span_range_iff_exists_fun]
+    at h1
   obtain ⟨d, hd⟩ := h1
   refine ⟨fun l => d l, fun l => (d l).2, ?_⟩
   have := congrArg Subtype.val hd
   simpa [f'] using this
 
-theorem mem_of_forall_pow_mul_mem (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A) (hs : ∑ l, c l * f l = 1)
-    (P : Submodule A Ω) {z : Ω} (hz : ∀ l, ∃ m : ℕ, f l ^ m * z ∈ P) : z ∈ P := by
+theorem mem_of_forall_pow_mul_mem
+    (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A) (hs : ∑ l, c l * f l = 1)
+    (P : Submodule A Ω)
+    {z : Ω} (hz : ∀ l, ∃ m : ℕ, f l ^ m * z ∈ P)
+    : z ∈ P := by
   choose m hm using hz
   obtain ⟨d, hd, hsum⟩ := exists_sum_mul_pow_eq_one A f c hf hc hs (Finset.univ.sup m)
-  have key : z = ∑ l, (⟨d l * f l ^ (Finset.univ.sup m - m l), mul_mem (hd l) (pow_mem (hf l) _)⟩ : A) •
-      (f l ^ m l * z) := by
+  have key
+      : z
+        = ∑ l, (⟨d l * f l ^ (Finset.univ.sup m - m l), mul_mem (hd l) (pow_mem (hf l) _)⟩ : A) •
+          (f l ^ m l * z) := by
     simp only [Subalgebra.smul_def, smul_eq_mul]
-    calc z = (∑ l, d l * f l ^ Finset.univ.sup m) * z := by rw [hsum, one_mul]
+    calc
+      z = (∑ l, d l * f l ^ Finset.univ.sup m) * z := by rw [hsum, one_mul]
       _ = _ := by
         rw [Finset.sum_mul]
         refine Finset.sum_congr rfl fun l _ => ?_
@@ -46,10 +54,11 @@ theorem mem_of_forall_pow_mul_mem (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A
   rw [key]
   exact sum_mem fun l _ => P.smul_mem _ (hm l)
 
-theorem fg_and_invertible_of_frame (L : Submodule A Ω) (b : Fin k → Ω)
+theorem fg_and_invertible_of_frame
+    (L : Submodule A Ω) (b : Fin k → Ω)
     (hf : ∀ l, f l ∈ A) (hc : ∀ l, c l ∈ A) (hs : ∑ l, c l * f l = 1) (hb : ∀ l, b l ≠ 0)
-    (hL : ∀ l e, (∃ n : ℕ, f l ^ n * e ∈ L) ↔ ∃ a : Ω, (∃ n : ℕ, f l ^ n * a ∈ A) ∧ e = a * b l) :
-    L.FG ∧ ∃ L' : Submodule A Ω, L * L' = 1 := by
+    (hL : ∀ l e, (∃ n : ℕ, f l ^ n * e ∈ L) ↔ ∃ a : Ω, (∃ n : ℕ, f l ^ n * a ∈ A) ∧ e = a * b l)
+    : L.FG ∧ ∃ L' : Submodule A Ω, L * L' = 1 := by
   have hgen : ∀ l, ∃ n : ℕ, f l ^ n * b l ∈ L := fun l =>
     (hL l (b l)).2 ⟨1, ⟨0, by rw [pow_zero, one_mul]; exact one_mem A⟩, (one_mul _).symm⟩
   choose n hn using hgen
@@ -95,12 +104,15 @@ theorem fg_and_invertible_of_frame (L : Submodule A Ω) (b : Fin k → Ω)
       | mem z hz =>
         obtain ⟨s, rfl⟩ := hz
         rw [Submodule.mem_one]
-        refine ⟨⟨f l ^ (K - M s) * (f l ^ M s * (g s / b l)), mul_mem (pow_mem (hf l) _) (hM s)⟩, ?_⟩
+        refine
+          ⟨⟨f l ^ (K - M s) * (f l ^ M s * (g s / b l)), mul_mem (pow_mem (hf l) _) (hM s)⟩, ?_⟩
         change f l ^ (K - M s) * (f l ^ M s * (g s / b l)) = f l ^ K / b l * g s
         rw [← mul_assoc, ← pow_add, Nat.sub_add_cancel (Finset.le_sup (Finset.mem_univ s))]
         ring
-      | zero => rw [mul_zero]; exact zero_mem _
-      | add u v _ _ hu hv => rw [mul_add]; exact add_mem hu hv
+      | zero =>
+        rw [mul_zero]; exact zero_mem _
+      | add u v _ _ hu hv =>
+        rw [mul_add]; exact add_mem hu hv
       | smul a u _ hu =>
         have : f l ^ K / b l * (a • u) = a • (f l ^ K / b l * u) := by
           rw [Subalgebra.smul_def, Subalgebra.smul_def, smul_eq_mul, smul_eq_mul]
@@ -120,8 +132,8 @@ section Lift
 
 variable {A B : Subalgebra S Ω}
 
-theorem span_span_of_le (hAB : A ≤ B) (T : Set Ω) :
-    Submodule.span B (Submodule.span A T : Set Ω) = Submodule.span B T := by
+theorem span_span_of_le (hAB : A ≤ B) (T : Set Ω)
+    : Submodule.span B (Submodule.span A T : Set Ω) = Submodule.span B T := by
   apply le_antisymm
   · rw [Submodule.span_le]
     intro z hz
@@ -132,14 +144,14 @@ theorem span_span_of_le (hAB : A ≤ B) (T : Set Ω) :
     | smul a u _ hu => exact Submodule.smul_mem _ (⟨a, hAB a.2⟩ : B) hu
   · exact Submodule.span_mono Submodule.subset_span
 
-theorem fg_span_of_le (hAB : A ≤ B) {L : Submodule A Ω} (hL : L.FG) :
-    (Submodule.span B (L : Set Ω)).FG := by
+theorem fg_span_of_le (hAB : A ≤ B) {L : Submodule A Ω} (hL : L.FG)
+    : (Submodule.span B (L : Set Ω)).FG := by
   obtain ⟨T, rfl⟩ := hL
   rw [span_span_of_le hAB]
   exact Submodule.fg_span T.finite_toSet
 
-theorem mul_span_eq_one_of_le (hAB : A ≤ B) {L L' : Submodule A Ω} (h : L * L' = 1) :
-    Submodule.span B (L : Set Ω) * Submodule.span B (L' : Set Ω) = 1 := by
+theorem mul_span_eq_one_of_le (hAB : A ≤ B) {L L' : Submodule A Ω} (h : L * L' = 1)
+    : Submodule.span B (L : Set Ω) * Submodule.span B (L' : Set Ω) = 1 := by
   rw [Submodule.span_mul_span]
   apply le_antisymm
   · rw [Submodule.span_le]

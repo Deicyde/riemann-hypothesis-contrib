@@ -4,11 +4,17 @@ public import Development.AutomorphicArithmetic.Foundations.Convolution.PowerSum
 
 @[expose] public section
 
-open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction GroundTheory.Automorphic.RightCosetSpace
-open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum UpperTheory.ConvolutionTheory.C
+open MeasureTheory NumberField GroundTheory.Automorphic GroundTheory.Automorphic.Reduction
+  GroundTheory.Automorphic.RightCosetSpace
+open GroundTheory.Automorphic.AutomorphicForm GroundTheory.Automorphic.CuspidalSpectrum
+  UpperTheory.ConvolutionTheory.C
 
-theorem UpperTheory.prj_eigIn_of_eigenvector_prj :
-    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (W : Submodule ℂ H) (A : H →L[ℂ] H), IsClosed (W : Set H) → IsSelfAdjoint A → ∀ (v : H) (μ x : ℝ), A (prj W v) = (μ : ℂ) • prj W v → prj (eigIn W A x) v = if x = μ then prj W v else 0 := by
+theorem UpperTheory.prj_eigIn_of_eigenvector_prj
+    : ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+        (W : Submodule ℂ H) (A : H →L[ℂ] H),
+      IsClosed (W : Set H) → IsSelfAdjoint A
+        → ∀ (v : H) (μ x : ℝ),
+          A (prj W v) = (μ : ℂ) • prj W v → prj (eigIn W A x) v = if x = μ then prj W v else 0 := by
   intro H _ _ _ W A hW hA v μ x hv
   have hWc : W.topologicalClosure = W := hW.submodule_topologicalClosure_eq
   have hPW : prj W v ∈ W := by
@@ -21,11 +27,11 @@ theorem UpperTheory.prj_eigIn_of_eigenvector_prj :
   have hmem : ∀ w, w ∈ eigIn W A x ↔ w ∈ W ∧ A w = (x : ℂ) • w := by
     intro w
     simp [eigIn, Module.End.mem_eigenspace_iff]
-  have key : ∀ u ∈ eigIn W A x, (∀ w ∈ eigIn W A x, inner ℂ w (v - u) = 0) →
-      prj (eigIn W A x) v = u := by
+  have key
+      : ∀ u ∈ eigIn W A x,
+        (∀ w ∈ eigIn W A x, inner ℂ w (v - u) = 0) → prj (eigIn W A x) v = u := by
     intro u hu h
-    refine Submodule.eq_starProjection_of_mem_orthogonal
-      ((eigIn W A x).le_topologicalClosure hu) ?_
+    refine Submodule.eq_starProjection_of_mem_orthogonal ((eigIn W A x).le_topologicalClosure hu) ?_
     rw [Submodule.orthogonal_closure]
     exact fun w hw => h w hw
   split_ifs with hx
@@ -33,8 +39,7 @@ theorem UpperTheory.prj_eigIn_of_eigenvector_prj :
     exact key _ ((hmem _).2 ⟨hPW, hv⟩) fun w hw => hperp w ((hmem w).1 hw).1
   · refine key 0 (Submodule.zero_mem _) fun w hw => ?_
     obtain ⟨hwW, hwA⟩ := (hmem w).1 hw
-    have h1 : inner ℂ (A w) (prj W v) = inner ℂ w (A (prj W v)) :=
-      hA.isSymmetric w (prj W v)
+    have h1 : inner ℂ (A w) (prj W v) = inner ℂ w (A (prj W v)) := hA.isSymmetric w (prj W v)
     rw [hwA, hv, inner_smul_left, inner_smul_right, Complex.conj_ofReal] at h1
     have h2 : inner ℂ w (prj W v) = 0 := by
       by_contra h0

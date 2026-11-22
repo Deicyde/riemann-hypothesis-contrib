@@ -18,9 +18,9 @@ def FaceClosed {I : Type*} (S : ∀ n, Set (Fin n → I)) : Prop :=
   ∀ n (t : Fin (n + 1) → I), t ∈ S (n + 1) → ∀ j : Fin (n + 1), t ∘ j.succAbove ∈ S n
 
 def Acyc {I : Type*} (S : ∀ n, Set (Fin n → I)) : Prop :=
-  (∀ c ∈ Finsupp.supported ℤ ℤ (S 0), ∃ b ∈ Finsupp.supported ℤ ℤ (S 1), bd I 0 b = c) ∧
-  ∀ n, ∀ c ∈ Finsupp.supported ℤ ℤ (S (n + 1)), bd I n c = 0 →
-    ∃ b ∈ Finsupp.supported ℤ ℤ (S (n + 2)), bd I (n + 1) b = c
+  (∀ c ∈ Finsupp.supported ℤ ℤ (S 0), ∃ b ∈ Finsupp.supported ℤ ℤ (S 1), bd I 0 b = c)
+    ∧ ∀ n, ∀ c ∈ Finsupp.supported ℤ ℤ (S (n + 1)),
+      bd I n c = 0 → ∃ b ∈ Finsupp.supported ℤ ℤ (S (n + 2)), bd I (n + 1) b = c
 
 def nerve {I F : Type*} (X : Set F) (A : I → Set F) (n : ℕ) : Set (Fin n → I) :=
   {t | ∃ x ∈ X, ∀ j, x ∈ A (t j)}
@@ -46,8 +46,7 @@ abbrev Vert (q : Y → E →L[ℝ] ℝ) := {h : E // IsVert q h}
 
 def posDual (T : Set E) : Set (E →L[ℝ] ℝ) := {x | ∀ k ∈ T, k ≠ 0 → 0 < x k}
 
-def normalCone (q : Y → E →L[ℝ] ℝ) (h : E) : Set (E →L[ℝ] ℝ) :=
-  {x | ∀ h' ∈ poly q, x h ≤ x h'}
+def normalCone (q : Y → E →L[ℝ] ℝ) (h : E) : Set (E →L[ℝ] ℝ) := {x | ∀ h' ∈ poly q, x h ≤ x h'}
 
 def simp (q : Y → E →L[ℝ] ℝ) (T : Set E) (n : ℕ) : Set (Fin n → Vert q) :=
   nerve (posDual T) (fun v : Vert q => normalCone q v.1) n

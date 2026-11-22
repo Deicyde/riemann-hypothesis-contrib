@@ -18,15 +18,18 @@ noncomputable section
 
 namespace ModelTwistGenerated
 
-variable {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] {K : Type} [Fintype K] {ι : K → Type}
+variable
+  {S : Type} [CommRing S] {Ω : Type} [Field Ω] [Algebra S Ω] {K : Type} [Fintype K] {ι : K → Type}
 
-theorem secOver_mul (y : (Σ k, ι k) → Ω) {β γ : K → ℤ} {a b : Ω} (ha : a ∈ secOver S y β)
-    (hb : b ∈ secOver S y γ) : a * b ∈ secOver S y (β + γ) := by
+theorem secOver_mul
+    (y : (Σ k, ι k) → Ω) {β γ : K → ℤ} {a b : Ω} (ha : a ∈ secOver S y β) (hb : b ∈ secOver S y γ)
+    : a * b ∈ secOver S y (β + γ) := by
   simp only [secOver, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mulRight_apply,
-    Subalgebra.mem_toSubmodule] at ha hb ⊢
+      Subalgebra.mem_toSubmodule]
+    at ha hb ⊢
   intro c hc
-  have : a * b * ∏ k, y ⟨k, c k⟩ ^ (-(β + γ) k) =
-      (a * ∏ k, y ⟨k, c k⟩ ^ (-β k)) * (b * ∏ k, y ⟨k, c k⟩ ^ (-γ k)) := by
+  have : a * b * ∏ k, y ⟨k, c k⟩ ^ (-(β + γ) k)
+      = (a * ∏ k, y ⟨k, c k⟩ ^ (-β k)) * (b * ∏ k, y ⟨k, c k⟩ ^ (-γ k)) := by
     rw [mul_mul_mul_comm, ← Finset.prod_mul_distrib]
     congr 1
     refine Finset.prod_congr rfl fun k _ => ?_
@@ -40,8 +43,8 @@ theorem one_mem_secOver (y : (Σ k, ι k) → Ω) : (1 : Ω) ∈ secOver S y 0 :
   simp only [Pi.zero_apply, neg_zero, zpow_zero, Finset.prod_const_one, mul_one]
   exact Subalgebra.one_mem _
 
-theorem pow_mem_secOver (y : (Σ k, ι k) → Ω) {δ : K → ℤ} {a : Ω} (ha : a ∈ secOver S y δ) (m : ℕ) :
-    a ^ m ∈ secOver S y ((m : ℤ) • δ) := by
+theorem pow_mem_secOver (y : (Σ k, ι k) → Ω) {δ : K → ℤ} {a : Ω} (ha : a ∈ secOver S y δ) (m : ℕ)
+    : a ^ m ∈ secOver S y ((m : ℤ) • δ) := by
   induction m with
   | zero => simpa using one_mem_secOver (S := S) y
   | succ m ih =>
@@ -53,8 +56,8 @@ theorem pow_mem_secOver (y : (Σ k, ι k) → Ω) {δ : K → ℤ} {a : Ω} (ha 
 
 variable [DecidableEq K]
 
-theorem coord_mem_secOver (y : (Σ k, ι k) → Ω) (k₀ : K) (i : ι k₀) :
-    y ⟨k₀, i⟩ ∈ secOver S y (IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := by
+theorem coord_mem_secOver (y : (Σ k, ι k) → Ω) (k₀ : K) (i : ι k₀)
+    : y ⟨k₀, i⟩ ∈ secOver S y (IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := by
   simp only [secOver, Submodule.mem_iInf, Submodule.mem_comap, LinearMap.mulRight_apply,
     Subalgebra.mem_toSubmodule, IndefiniteRowSideFullHecke.Kleiman2.baseDeg]
   intro c _
@@ -62,10 +65,10 @@ theorem coord_mem_secOver (y : (Σ k, ι k) → Ω) (k₀ : K) (i : ι k₀) :
   rw [Pi.single_eq_same, zpow_neg_one, ← div_eq_mul_inv]
   exact Algebra.subset_adjoin ⟨⟨k₀, i⟩, rfl⟩
 
-theorem prod_coord_mem_secOver (y : (Σ k, ι k) → Ω) (k₀ : K) {N : ℕ} (e : ι k₀ ≃ Fin (N + 1))
-    (s : Finset (Fin (N + 1))) :
-    ∏ j ∈ s, (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm) j ∈
-      secOver S y ((s.card : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := by
+theorem prod_coord_mem_secOver
+    (y : (Σ k, ι k) → Ω) (k₀ : K) {N : ℕ} (e : ι k₀ ≃ Fin (N + 1)) (s : Finset (Fin (N + 1)))
+    : ∏ j ∈ s, (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm) j
+      ∈ secOver S y ((s.card : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := by
   induction s using Finset.induction_on with
   | empty => simpa using one_mem_secOver (S := S) y
   | insert j s hj ih =>
@@ -75,13 +78,18 @@ theorem prod_coord_mem_secOver (y : (Σ k, ι k) → Ω) (k₀ : K) {N : ℕ} (e
 
 variable {N : ℕ} {y : (Σ k, ι k) → Ω} {k₀ : K} (e : ι k₀ ≃ Fin (N + 1))
 
-theorem twist_sub_eq_chartSecOver (β : K → ℤ)
+theorem twist_sub_eq_chartSecOver
+    (β : K → ℤ)
     (Q : Kleiman.LineBundle S (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm))
-    (hQ : ∀ c : ℤ, (Q.twist (Kleiman.twistSys S (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm) c)).secs =
-      secOver S y (β + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀))
-    (c : ℕ) (I : Kleiman.Chart (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm)) :
-    ((Q.twist (Kleiman.twistSys S (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm) (c : ℤ))).sub I : Set Ω) =
-      chartSecOver S y k₀ e (β + (c : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) I := by
+    (hQ : ∀ c : ℤ,
+      (Q.twist (Kleiman.twistSys S (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm)
+          c)).secs
+        = secOver S y (β + c • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀))
+    (c : ℕ) (I : Kleiman.Chart (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm))
+    : ((Q.twist (Kleiman.twistSys S (IndefiniteRowSideFullHecke.Kleiman2.blockVec y k₀ ∘ e.symm)
+          (c : ℤ))).sub I
+        : Set Ω)
+      = chartSecOver S y k₀ e (β + (c : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) I := by
   have hsubQ : (Q.sub I : Set Ω) = chartSecOver S y k₀ e β I := by
     refine Set.ext fun t => ?_
     rw [SetLike.mem_coe, mem_sub_iff_gam]
@@ -94,8 +102,9 @@ theorem twist_sub_eq_chartSecOver (β : K → ℤ)
   have hxI : Kleiman.xProd I = X i * ∏ j ∈ I.1.erase i, X j := (Finset.mul_prod_erase I.1 _ hi).symm
   have hxic : X i ^ c ∈ secOver S y ((c : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) :=
     pow_mem_secOver y (coord_mem_secOver y k₀ (e.symm i)) c
-  have hP : (∏ j ∈ I.1.erase i, X j) ^ c ∈
-      secOver S y ((c : ℤ) • (((I.1.erase i).card : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀)) :=
+  have hP
+      : (∏ j ∈ I.1.erase i, X j) ^ c ∈ secOver S y
+        ((c : ℤ) • (((I.1.erase i).card : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀)) :=
     pow_mem_secOver y (prod_coord_mem_secOver y k₀ e _) c
   ext t
   rw [SetLike.mem_coe, twist_sub_eq_mul]
@@ -115,8 +124,8 @@ theorem twist_sub_eq_chartSecOver (β : K → ℤ)
     · rw [← SetLike.mem_coe, hsubQ]
       refine ⟨n + c, ?_⟩
       have h := secOver_mul y hP hn
-      rw [show Kleiman.xProd I ^ (n + c) * ((X i ^ c)⁻¹ * t) =
-          (∏ j ∈ I.1.erase i, X j) ^ c * (Kleiman.xProd I ^ n * t) by
+      rw [show Kleiman.xProd I ^ (n + c) * ((X i ^ c)⁻¹ * t)
+          = (∏ j ∈ I.1.erase i, X j) ^ c * (Kleiman.xProd I ^ n * t) by
         rw [hxI]; field_simp; ring]
       convert h using 2
       funext k
@@ -129,9 +138,9 @@ theorem twist_sub_eq_chartSecOver (β : K → ℤ)
 
 end ModelTwistGenerated
 
-
 open ModelTwistGenerated in
-theorem ModelTwistGenerated.proof (hCG : ChartSecGen.Statement) : ModelTwistGenerated.Statement := by
+theorem ModelTwistGenerated.proof (hCG : ChartSecGen.Statement)
+    : ModelTwistGenerated.Statement := by
   classical
   intro S _ K _ _ ι _ Ω _ _ y k₀ hS hM β
   obtain ⟨i₀, -⟩ := hM.1 k₀
@@ -146,8 +155,9 @@ theorem ModelTwistGenerated.proof (hCG : ChartSecGen.Statement) : ModelTwistGene
   lift c to ℕ using le_trans (le_max_right _ _) hc with m
   set L := Q.twist (Kleiman.twistSys S x (m : ℤ)) with hL
   have hgen : L.Generated := hc₀ m (le_trans (le_max_left _ _) hc)
-  have hfin : ∀ I : Kleiman.Chart x, ∃ T : Finset Ω, (T : Set Ω) ⊆ L.secs ∧
-      Submodule.span (Kleiman.chartRing S x I) (T : Set Ω) = L.sub I := by
+  have hfin
+      : ∀ I : Kleiman.Chart x, ∃ T : Finset Ω,
+        (T : Set Ω) ⊆ L.secs ∧ Submodule.span (Kleiman.chartRing S x I) (T : Set Ω) = L.sub I := by
     intro I
     obtain ⟨i, hi⟩ := I.2.1
     have hfg : (L.sub I).FG := by
@@ -172,7 +182,9 @@ theorem ModelTwistGenerated.proof (hCG : ChartSecGen.Statement) : ModelTwistGene
       exact Submodule.span_mono hUsub
     · rw [← hTspan I]
       exact Submodule.span_mono fun z hz => Finset.mem_biUnion.mpr ⟨I, Finset.mem_univ _, hz⟩
-  have hsecs : L.secs = secOver S y (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := hQ m
+  have hsecs
+      : L.secs = secOver S y (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) :=
+    hQ m
   let η : Fin U.card → Ω := fun j => (U.equivFin.symm j : Ω)
   have hrange : Set.range η = (U : Set Ω) := by
     ext z
@@ -181,7 +193,8 @@ theorem ModelTwistGenerated.proof (hCG : ChartSecGen.Statement) : ModelTwistGene
       exact (U.equivFin.symm j).2
     · intro hz
       exact ⟨U.equivFin ⟨z, hz⟩, by simp [η]⟩
-  have hη : ∀ j, η j ∈ secOver S y (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := by
+  have hη
+      : ∀ j, η j ∈ secOver S y (β + (m : ℤ) • IndefiniteRowSideFullHecke.Kleiman2.baseDeg k₀) := by
     intro j
     rw [← hsecs]
     exact hUsub (U.equivFin.symm j).2

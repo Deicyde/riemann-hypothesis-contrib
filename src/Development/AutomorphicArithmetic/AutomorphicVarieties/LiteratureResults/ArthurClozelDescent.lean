@@ -8,14 +8,14 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Automorphic
 
 noncomputable section
 
-open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual Formalism.MainNotions.N GlobalTheory.CuspRep UpperTheory.V.Published
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual
+  Formalism.MainNotions.N GlobalTheory.CuspRep UpperTheory.V.Published
 
 namespace UpperTheory.V.Lit
 
 section Defs
 
 variable {E : Type} [Field E] [NumberField E] [IsTotallyReal E] {a : ℕ}
-
 
 omit [IsTotallyReal E] in
 def IsAdExt (σ : E →+* E) (s : AdeleRing (𝓞 E) E →+* AdeleRing (𝓞 E) E) : Prop :=

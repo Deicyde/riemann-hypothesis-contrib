@@ -7,16 +7,18 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Patch
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.HermitianLatticesTheory Formalism.L2.Col GlobalTheory.InertExchange
+open NumberField IsDedekindDomain Formalism.HermitianLatticesTheory Formalism.L2.Col
+  GlobalTheory.InertExchange
 open Classical
 
 namespace GlobalTheory.InertExchange
 
 variable {E : Type} [Field E] [NumberField E] [StarRing E] {n : ℕ}
 
-theorem patchAt_commens (A B : Submodule (𝓞 E) (Sp E n)) (hA : Submodule.IsFullLattice E A)
-    (hB : Submodule.IsFullLattice E B) :
-    ∃ d : 𝓞 E, d ≠ 0 ∧ (∀ x ∈ A, d • x ∈ B) ∧ (∀ x ∈ B, d • x ∈ A) := by
+theorem patchAt_commens
+    (A B : Submodule (𝓞 E) (Sp E n))
+    (hA : Submodule.IsFullLattice E A) (hB : Submodule.IsFullLattice E B)
+    : ∃ d : 𝓞 E, d ≠ 0 ∧ (∀ x ∈ A, d • x ∈ B) ∧ (∀ x ∈ B, d • x ∈ A) := by
   obtain ⟨a, ha, hA1, hA2⟩ := Formalism.L2.DIV.lc_sandwich A hA
   obtain ⟨b, hb, hB1, hB2⟩ := Formalism.L2.DIV.lc_sandwich B hB
   refine ⟨a * b, mul_ne_zero ha hb, fun x hx => ?_, fun x hx => ?_⟩
@@ -25,13 +27,18 @@ theorem patchAt_commens (A B : Submodule (𝓞 E) (Sp E n)) (hA : Submodule.IsFu
   · rw [mul_smul]
     exact hA2 _ (hB1 x hx)
 
-theorem patchAt_isLattice_locP (P : HeightOneSpectrum (𝓞 E)) (A B : Submodule (𝓞 E) (Sp E n)) :
-    Submodule.IsFullLattice E A → Submodule.IsFullLattice E B → Submodule.IsLattice E (patchAt P A B) ∧
-      ∀ Q : HeightOneSpectrum (𝓞 E), localization₂ Q.asIdeal (patchAt P A B) = localization₂ Q.asIdeal (if Q = P then A else B) := by
+theorem patchAt_isLattice_locP (P : HeightOneSpectrum (𝓞 E)) (A B : Submodule (𝓞 E) (Sp E n))
+    : Submodule.IsFullLattice E A → Submodule.IsFullLattice E B
+      → Submodule.IsLattice E (patchAt P A B)
+        ∧ ∀ Q : HeightOneSpectrum (𝓞 E),
+          localization₂ Q.asIdeal (patchAt P A B)
+            = localization₂ Q.asIdeal (if Q = P then A else B) := by
   intro hA hB
   obtain ⟨d, hd, hAB, hBA⟩ := patchAt_commens A B hA hB
-  let Λ : HeightOneSpectrum (𝓞 E) → Submodule (𝓞 E) (Sp E n) := fun Q => localization₂ Q.asIdeal (if Q = P then A else B)
-  have hcl : ∀ Q, localization₂ Q.asIdeal (Λ Q) = Λ Q := fun Q => Formalism.L2.DIV.localized_localized Q _
+  let Λ : HeightOneSpectrum (𝓞 E) → Submodule (𝓞 E) (Sp E n) := fun Q =>
+    localization₂ Q.asIdeal (if Q = P then A else B)
+  have hcl : ∀ Q, localization₂ Q.asIdeal (Λ Q) = Λ Q := fun Q =>
+    Formalism.L2.DIV.localized_localized Q _
   have h1 : ∀ Q, ∀ x ∈ Λ Q, d • x ∈ localization₂ Q.asIdeal B := by
     intro Q x hx
     by_cases hQ : Q = P

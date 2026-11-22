@@ -17,27 +17,44 @@ public import Development.AbelianVarietyTheory.Proofs.GlobalInterpolation.ThetaS
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
-open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
+open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.L2.Theta Formalism.IndefR Formalism.IndefR.Datum Formalism.IndefR.Links Formalism.L2.DIV
+open IsDedekindDomain NumberField Matrix GlobalTheory.ChiGrid GlobalTheory.FunObj
+  GlobalTheory.RowTest GlobalTheory.RowClaim GlobalTheory.TestLat GlobalTheory.SumSize
 open Formalism.DivisionValues (vw lw)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 open GlobalTheory.KJInf Formalism.L2.Ker MvPolynomial in
-private theorem jet_smul_subst {ι : Type} [Fintype ι] {a b : ℕ} (c : ℂ) (ℓ : FP ι a b →ₗ[ℂ] ℂ)
-    (g : ι → Matrix (Fin a) (Fin a) ℂ) (h : ι → Matrix (Fin b) (Fin b) ℂ) (n : ι → ℕ) (P : PY ι a) :
-    jetMap (fun m => c * ℓ (mvZ g h (monomial m 1))) n P =
-      (c * ∏ τ, (g τ).det ^ n τ) • lft h (jetMap (fun m => ℓ (monomial m 1)) n (lft g P)) := by
-  have h1 : ∀ (J : (DVar ι a b →₀ ℕ) → ℂ) Q, jetLin (fun m => c * J m) Q = c • jetLin J Q := fun J Q => by
-    refine LinearMap.congr_fun (f := jetLin (fun m => c * J m)) (g := c • jetLin J) ((basisMonomials _ ℂ).ext fun m => ?_) Q
+private theorem jet_smul_subst
+    {ι : Type} [Fintype ι]
+    {a b : ℕ}
+    (c : ℂ) (ℓ : FP ι a b →ₗ[ℂ] ℂ) (g : ι → Matrix (Fin a) (Fin a) ℂ)
+    (h : ι → Matrix (Fin b) (Fin b) ℂ) (n : ι → ℕ) (P : PY ι a)
+    : jetMap (fun m => c * ℓ (mvZ g h (monomial m 1))) n P
+      = (c * ∏ τ, (g τ).det ^ n τ) • lft h (jetMap (fun m => ℓ (monomial m 1)) n (lft g P)) := by
+  have h1
+      : ∀ (J : (DVar ι a b →₀ ℕ) → ℂ) Q,
+        jetLin (fun m => c * J m) Q = c • jetLin J Q := fun J Q => by
+    refine LinearMap.congr_fun (f := jetLin (fun m => c * J m)) (g := c • jetLin J)
+      ((basisMonomials _ ℂ).ext fun m => ?_) Q
     rw [coe_basisMonomials]
-    simp only [LinearMap.smul_apply, GlobalTheory.KerT.RatLaw.jetLin_monomial, smul_monomial, smul_eq_mul]
-  have h2 : ∀ (J : (DVar ι a b →₀ ℕ) → ℂ), jetMap (fun m => c * J m) n P = c • jetMap J n P := fun J => by
+    simp only [LinearMap.smul_apply, GlobalTheory.KerT.RatLaw.jetLin_monomial, smul_monomial,
+      smul_eq_mul]
+  have h2
+      : ∀ (J : (DVar ι a b →₀ ℕ) → ℂ),
+        jetMap (fun m => c * J m) n P = c • jetMap J n P := fun J => by
     simp only [jetMap, LinearMap.comp_apply, h1]
   have h3 : GlobalTheory.KerT.RatLaw.tabFn (fun m => ℓ (monomial m 1)) = ℓ := by
     refine (basisMonomials _ ℂ).ext fun m => ?_
     rw [coe_basisMonomials]
     exact GlobalTheory.KerT.RatLaw.tabFn_monomial _ m
-  rw [h2, GlobalTheory.KerT.RatLaw.jetMap_subst (J := fun m => ℓ (monomial m 1)) g h (fun m => by rw [h3]; rfl), smul_smul]
+  rw [h2,
+    GlobalTheory.KerT.RatLaw.jetMap_subst
+      (J := fun m => ℓ (monomial m 1))
+      g h
+      (fun m => by rw [h3]; rfl),
+    smul_smul]
   rfl
 
 open GlobalTheory.KJInf GlobalTheory.SeeSaw GlobalTheory.RowHoweAvg GlobalTheory.FockReal GlobalTheory.DefStep MvPolynomial in

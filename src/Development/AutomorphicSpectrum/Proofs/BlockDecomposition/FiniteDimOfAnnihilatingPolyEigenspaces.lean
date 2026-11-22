@@ -11,12 +11,12 @@ namespace GlobalTheory.CompanionTheory.LinAlg
 
 open Polynomial
 
-theorem finiteDimensional_of_roots_of_eigenspaces {M : Type} [AddCommGroup M] [Module ℂ M]
-    (T : Module.End ℂ M) (s : Multiset ℂ) :
-    ∀ V : Submodule ℂ M, (∀ v ∈ V, T v ∈ V) →
-      (∀ v ∈ V, aeval T ((s.map fun a => (X - C a : ℂ[X])).prod) v = 0) →
-      (∀ c : ℂ, FiniteDimensional ℂ (Submodule.span ℂ {v | v ∈ V ∧ T v = c • v})) →
-      FiniteDimensional ℂ V := by
+theorem finiteDimensional_of_roots_of_eigenspaces
+    {M : Type} [AddCommGroup M] [Module ℂ M] (T : Module.End ℂ M) (s : Multiset ℂ)
+    : ∀ V : Submodule ℂ M,
+      (∀ v ∈ V, T v ∈ V) → (∀ v ∈ V, aeval T ((s.map fun a => (X - C a : ℂ[X])).prod) v = 0)
+        → (∀ c : ℂ, FiniteDimensional ℂ (Submodule.span ℂ {v | v ∈ V ∧ T v = c • v}))
+        → FiniteDimensional ℂ V := by
   induction s using Multiset.induction_on with
   | empty =>
     intro V _ hker _
@@ -40,18 +40,16 @@ theorem finiteDimensional_of_roots_of_eigenspaces {M : Type} [AddCommGroup M] [M
       rintro w ⟨v, hv, rfl⟩
       refine ⟨T v, hV v hv, ?_⟩
       simp [hfv, map_sub, map_smul]
-    have hW2 : ∀ w ∈ V.map f,
-        aeval T ((s.map fun b => (X - C b : ℂ[X])).prod) w = 0 := by
+    have hW2 : ∀ w ∈ V.map f, aeval T ((s.map fun b => (X - C b : ℂ[X])).prod) w = 0 := by
       rintro w ⟨v, hv, rfl⟩
       have h := hker v hv
       rw [Multiset.map_cons, Multiset.prod_cons, mul_comm, map_mul] at h
       exact h
-    have hW3 : ∀ c : ℂ, FiniteDimensional ℂ
-        (Submodule.span ℂ {v | v ∈ V.map f ∧ T v = c • v}) := by
+    have hW3 : ∀ c : ℂ, FiniteDimensional ℂ (Submodule.span ℂ {v | v ∈ V.map f ∧ T v = c • v}) := by
       intro c
       haveI := hfin c
-      have hsub : {v | v ∈ V.map f ∧ T v = c • v} ⊆ {v | v ∈ V ∧ T v = c • v} :=
-        fun v hv => ⟨hWV v hv.1, hv.2⟩
+      have hsub : {v | v ∈ V.map f ∧ T v = c • v} ⊆ {v | v ∈ V ∧ T v = c • v} := fun v hv =>
+        ⟨hWV v hv.1, hv.2⟩
       exact Submodule.finiteDimensional_of_le (Submodule.span_mono hsub)
     have hWfin : FiniteDimensional ℂ (V.map f) := ih (V.map f) hW1 hW2 hW3
     apply Module.Finite.iff_fg.mpr
@@ -68,18 +66,19 @@ theorem finiteDimensional_of_roots_of_eigenspaces {M : Type} [AddCommGroup M] [M
       haveI := Submodule.finiteDimensional_of_le hle
       exact Module.Finite.iff_fg.mp inferInstance
 
-theorem finiteDimensional_of_polynomial_of_eigenspaces :
-    ∀ (M : Type) [AddCommGroup M] [Module ℂ M] (T : Module.End ℂ M) (V : Submodule ℂ M),
-      (∀ v ∈ V, T v ∈ V) → ∀ p : Polynomial ℂ, p ≠ 0 →
-      (∀ v ∈ V, Polynomial.aeval T p v = 0) →
-      (∀ c : ℂ, FiniteDimensional ℂ (Submodule.span ℂ {v | v ∈ V ∧ T v = c • v})) →
-      FiniteDimensional ℂ V := by
+theorem finiteDimensional_of_polynomial_of_eigenspaces
+    : ∀ (M : Type) [AddCommGroup M] [Module ℂ M] (T : Module.End ℂ M) (V : Submodule ℂ M),
+      (∀ v ∈ V, T v ∈ V)
+        → ∀ p : Polynomial ℂ,
+          p ≠ 0 → (∀ v ∈ V, Polynomial.aeval T p v = 0)
+            → (∀ c : ℂ, FiniteDimensional ℂ (Submodule.span ℂ {v | v ∈ V ∧ T v = c • v}))
+            → FiniteDimensional ℂ V := by
   intro M _ _ T V hV p hp hker hfin
   have hsplit : p = C p.leadingCoeff * (p.roots.map fun a => (X - C a : ℂ[X])).prod := by
     first
-      | exact Polynomial.eq_prod_roots_of_splits_id (IsAlgClosed.splits p)
-      | exact (Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C
-          (IsAlgClosed.card_roots_eq_natDegree (k := ℂ))).symm
+    | exact Polynomial.eq_prod_roots_of_splits_id (IsAlgClosed.splits p)
+    | exact (Polynomial.C_leadingCoeff_mul_prod_multiset_X_sub_C
+        (IsAlgClosed.card_roots_eq_natDegree (k := ℂ))).symm
   refine finiteDimensional_of_roots_of_eigenspaces T p.roots V hV ?_ hfin
   intro v hv
   have h := hker v hv

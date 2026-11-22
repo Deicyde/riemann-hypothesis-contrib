@@ -9,7 +9,8 @@ set_option autoImplicit false
 
 noncomputable section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh GlobalTheory.CompanionTheory.GE GlobalTheory.CompanionTheory.GE.Step
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry GroundTheory.Arith.SchemeCoh
+  GlobalTheory.CompanionTheory.GE GlobalTheory.CompanionTheory.GE.Step
 
 namespace GlobalTheory.CompanionTheory.GE.Step
 
@@ -37,15 +38,30 @@ lemma smul_mem_twPow {A : Type} [CommRing A] (I : Ideal A) {X : Scheme.{0}} [X.O
   rw [pow_succ', Ideal.map_mul, mul_smul]
   exact Submodule.smul_mem_smul hmem hm'
 
-theorem lifts_succ : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}} [X.Over (Spec (.of A))] (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X) {P : X.Modules} (S : ℕ → Subobject P) (hS : ClosedSys I P S) {k : ℕ} (g : Fin k → A), (∀ i, g i ∈ I) → ∀ (hr : ∀ i, MapsDown S (toFunctions (X := X) (A := A) ⊤ (g i))) (n : ℤ) (e : ℕ), Submodule.span Γ(X, ⊤) (⋃ i, Set.range ((GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (grT (anti hS) (hr i) e)).app ⊤)) = ⊤ → Lifts I H hS n e → Lifts I H hS n (e + 1) := by
+theorem lifts_succ
+    : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{0}}
+        [X.Over (Spec (.of A))] (H : ReciprocityTheory.ChartRestriction.G.Semi.LB X) {P : X.Modules}
+        (S : ℕ → Subobject P) (hS : ClosedSys I P S) {k : ℕ} (g : Fin k → A),
+      (∀ i, g i ∈ I)
+        → ∀ (hr : ∀ i, MapsDown S (toFunctions (X := X) (A := A) ⊤ (g i))) (n : ℤ) (e : ℕ),
+          Submodule.span Γ(X, ⊤)
+                (⋃ i, Set.range ((GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (grT (anti hS) (hr i) e)).app ⊤))
+              = ⊤
+            → Lifts I H hS n e
+            → Lifts I H hS n (e + 1) := by
   intro A _ _ I X _ H P S hS k g hg hr n e hspan hL y
-  have hy : y ∈ Submodule.span Γ(X, ⊤) (⋃ i, Set.range
-      ((GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (grT (anti hS) (hr i) e)).app ⊤)) := by
+  have hy
+      : y ∈ Submodule.span Γ(X, ⊤)
+        (⋃ i, Set.range
+          ((GlobalTheory.Twist.map (GlobalTheory.lbZPow H n) (grT (anti hS) (hr i) e)).app ⊤)) := by
     rw [hspan]; trivial
-  have hsub : ∀ m : ℕ, ∀ a b : Γ(GlobalTheory.twistZ P H n, ⊤), a ∈ twPow I H n P m → b ∈ twPow I H n P m →
-      a + b ∈ twPow I H n P m := fun m a b ha hb =>
-    Submodule.add_mem (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ m) •
-      ⊤ : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤)) ha hb
+  have hsub
+      : ∀ m : ℕ, ∀ a b : Γ(GlobalTheory.twistZ P H n, ⊤),
+        a ∈ twPow I H n P m → b ∈ twPow I H n P m → a + b ∈ twPow I H n P m := fun m a b ha hb =>
+    Submodule.add_mem
+      (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ m) • ⊤
+        : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤))
+      ha hb
   induction hy using Submodule.span_induction with
   | mem y hy =>
     obtain ⟨i, y', rfl⟩ := Set.mem_iUnion.1 hy
@@ -58,8 +74,9 @@ theorem lifts_succ : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal
   | zero =>
     refine ⟨0, map_zero _, ?_⟩
     rw [map_zero]
-    exact Submodule.zero_mem (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ (e + 1)) •
-      ⊤ : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤))
+    exact Submodule.zero_mem
+      (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ (e + 1)) • ⊤
+        : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤))
   | add x y _ _ hx hy =>
     obtain ⟨c₁, rfl, h₁⟩ := hx
     obtain ⟨c₂, rfl, h₂⟩ := hy
@@ -70,7 +87,9 @@ theorem lifts_succ : ∀ {A : Type} [CommRing A] [IsNoetherianRing A] (I : Ideal
     obtain ⟨c, rfl, h⟩ := hx
     refine ⟨a • c, Scheme.Modules.Hom.app_smul _ _ _, ?_⟩
     rw [Scheme.Modules.Hom.app_smul]
-    exact Submodule.smul_mem (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ (e + 1)) •
-      ⊤ : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤)) a h
+    exact Submodule.smul_mem
+      (Ideal.map (toFunctions (X := X) (A := A) ⊤) (I ^ (e + 1)) • ⊤
+        : Submodule Γ(X, ⊤) Γ(GlobalTheory.twistZ P H n, ⊤))
+      a h
 
 end GlobalTheory.CompanionTheory.GE.Step

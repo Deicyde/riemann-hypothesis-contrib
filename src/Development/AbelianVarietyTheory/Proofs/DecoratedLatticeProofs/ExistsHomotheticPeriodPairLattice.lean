@@ -14,11 +14,15 @@ open PowerSeries GlobalTheory.Honda Formalism.L2.Th1.CM
 
 namespace GlobalTheory
 
-theorem homotheticLattice : ∀ (L : PeriodPair) (c : ℂ), c ≠ 0 → ∃ L' : PeriodPair,
-    (∀ z, z ∈ L'.lattice ↔ c * z ∈ L.lattice) ∧ L'.g₂ = c ^ 4 * L.g₂ ∧ L'.g₃ = c ^ 6 * L.g₃ ∧
-    (∀ z, L'.weierstrassP z = c ^ 2 * L.weierstrassP (c * z) ∧
-      L'.derivWeierstrassP z = c ^ 3 * L.derivWeierstrassP (c * z)) ∧
-    ∀ d, HasCMBy d L → HasCMBy d L' := by
+theorem homotheticLattice
+    : ∀ (L : PeriodPair) (c : ℂ),
+      c ≠ 0
+        → ∃ L' : PeriodPair,
+          (∀ z, z ∈ L'.lattice ↔ c * z ∈ L.lattice) ∧ L'.g₂ = c ^ 4 * L.g₂ ∧ L'.g₃ = c ^ 6 * L.g₃
+            ∧ (∀ z,
+              L'.weierstrassP z = c ^ 2 * L.weierstrassP (c * z)
+                ∧ L'.derivWeierstrassP z = c ^ 3 * L.derivWeierstrassP (c * z))
+            ∧ ∀ d, HasCMBy d L → HasCMBy d L' := by
   intro L c hc
   have hc' : c⁻¹ ≠ 0 := inv_ne_zero hc
   obtain ⟨hmem, -, -, hwp, -, -, -, -, -, hg2, hg3⟩ := Formalism.L2.Th1.F.homogeneity L c⁻¹ hc'

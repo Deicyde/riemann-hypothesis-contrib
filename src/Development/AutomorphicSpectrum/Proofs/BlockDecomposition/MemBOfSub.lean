@@ -30,17 +30,20 @@ theorem cls_surj (K : Cx.{w} R) (n : ℕ) (c : K.H n) : ∃ x hx, K.cls x hx = c
   obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ c
   exact ⟨z.1, z.2, rfl⟩
 
-theorem cls_eq_zero (K : Cx.{w} R) {n : ℕ} (x : K.X n) (hx : K.d n x = 0) : K.cls x hx = 0 ↔ x ∈ K.B n := by
+theorem cls_eq_zero (K : Cx.{w} R) {n : ℕ} (x : K.X n) (hx : K.d n x = 0)
+    : K.cls x hx = 0 ↔ x ∈ K.B n := by
   unfold Cx.cls
   rw [Submodule.Quotient.mk_eq_zero]
   rfl
 
-theorem cls_congr (K : Cx.{w} R) {n : ℕ} {x y : K.X n} (e : x = y) (hx : K.d n x = 0) (hy : K.d n y = 0) :
-    K.cls x hx = K.cls y hy := by
+theorem cls_congr
+    (K : Cx.{w} R) {n : ℕ} {x y : K.X n} (e : x = y) (hx : K.d n x = 0) (hy : K.d n y = 0)
+    : K.cls x hx = K.cls y hy := by
   subst e
   rfl
 
-theorem mem_B_of_sub {n : ℕ} (h : Subsingleton (K.H n)) (x : K.X n) (hx : K.d n x = 0) : x ∈ K.B n :=
+theorem mem_B_of_sub {n : ℕ} (h : Subsingleton (K.H n)) (x : K.X n) (hx : K.d n x = 0)
+    : x ∈ K.B n :=
   (cls_eq_zero K x hx).1 (Subsingleton.elim _ _)
 
 theorem sub_of_mem_B {n : ℕ} (h : ∀ x, K.d n x = 0 → x ∈ K.B n) : Subsingleton (K.H n) := by
@@ -60,14 +63,17 @@ structure NH (t : AD K L) where
 def AD.ofH (h : ∀ n, K.X n →ₗ[R] L.X n) : AD K L where
   r n := (L.d n).comp (h n) - (h (n + 1)).comp (K.d n)
   anti n x := by
-    change L.d (n + 1) (L.d n (h n x) - h (n + 1) (K.d n x)) +
-      (L.d (n + 1) (h (n + 1) (K.d n x)) - h (n + 2) (K.d (n + 1) (K.d n x))) = 0
+    change L.d (n + 1) (L.d n (h n x) - h (n + 1) (K.d n x))
+        + (L.d (n + 1) (h (n + 1) (K.d n x)) - h (n + 2) (K.d (n + 1) (K.d n x)))
+      = 0
     rw [map_sub, L.dd, K.dd, map_zero]
     abel
 
 def cone (t : AD K L) : Cx.{w} R where
   X n := L.X n × K.X n
-  d n := ((L.d n).comp (LinearMap.fst R _ _) + (t.r n).comp (LinearMap.snd R _ _)).prod ((K.d n).comp (LinearMap.snd R _ _))
+  d n :=
+    ((L.d n).comp (LinearMap.fst R _ _) + (t.r n).comp (LinearMap.snd R _ _)).prod
+      ((K.d n).comp (LinearMap.snd R _ _))
   dd n x := by
     refine Prod.ext ?_ (K.dd n x.2)
     change L.d (n + 1) (L.d n x.1 + t.r n x.2) + t.r (n + 1) (K.d n x.2) = 0
@@ -94,8 +100,9 @@ def sec {t : AD K L} (u : NH t) : Cx.Hom K (cone t) (RingHom.id R) where
     rw [← u.eq n x, map_neg]
     abel
 
-theorem cone_one (t : AD K L) (u : NH t) (j : ℕ) (hL : Subsingleton (L.H j)) (hK : Subsingleton (K.H j)) :
-    Subsingleton ((cone t).H j) := by
+theorem cone_one
+    (t : AD K L) (u : NH t) (j : ℕ) (hL : Subsingleton (L.H j)) (hK : Subsingleton (K.H j))
+    : Subsingleton ((cone t).H j) := by
   refine sub_of_mem_B fun z hz => ?_
   obtain ⟨b, x⟩ := z
   have h1 : L.d j b + t.r j x = 0 := congrArg Prod.fst hz
@@ -123,8 +130,9 @@ theorem cone_one (t : AD K L) (u : NH t) (j : ℕ) (hL : Subsingleton (L.H j)) (
     rw [← u.eq j y, map_sub, hc]
     abel
 
-theorem kill (t : AD K L) (j : ℕ) (hs : Function.Surjective ((pr t).mapH j)) (x : K.X j) (hx : K.d j x = 0) :
-    t.r j x ∈ L.B (j + 1) := by
+theorem kill
+    (t : AD K L) (j : ℕ) (hs : Function.Surjective ((pr t).mapH j)) (x : K.X j) (hx : K.d j x = 0)
+    : t.r j x ∈ L.B (j + 1) := by
   obtain ⟨c, hc⟩ := hs (K.cls x hx)
   obtain ⟨⟨b, y⟩, hz, rfl⟩ := cls_surj _ _ c
   have h1 : L.d j b + t.r j y = 0 := congrArg Prod.fst hz
@@ -154,15 +162,18 @@ theorem pr_inc (t : AD K L) (c : ℕ) (z : L.H c) : (pr t).mapH c ((inc t).mapH 
   obtain ⟨b, hb, rfl⟩ := cls_surj L c z
   exact (cls_eq_zero K _ _).2 (Submodule.zero_mem _)
 
-theorem pr_secM (t : AD K L) (u : NH t) (c : ℕ) (l : K.H c →ₗ[R] L.H c) (y : K.H c) :
-    (pr t).mapH c (secM t u c l y) = y := by
+theorem pr_secM (t : AD K L) (u : NH t) (c : ℕ) (l : K.H c →ₗ[R] L.H c) (y : K.H c)
+    : (pr t).mapH c (secM t u c l y) = y := by
   obtain ⟨x, hx, rfl⟩ := cls_surj K c y
   change (pr t).mapH c ((sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx))) = _
   rw [map_add (f := _), pr_inc, add_zero]
   rfl
 
-theorem secM_eq (t : AD K L) (u u' : NH t) (c : ℕ) (l l' : K.H c →ₗ[R] L.H c)
-    (h : ∀ x hx hz, L.cls (u.h c x - u'.h c x) hz = l (K.cls x hx) - l' (K.cls x hx)) : secM t u c l = secM t u' c l' := by
+theorem secM_eq
+    (t : AD K L) (u u' : NH t)
+    (c : ℕ) (l l' : K.H c →ₗ[R] L.H c)
+    (h : ∀ x hx hz, L.cls (u.h c x - u'.h c x) hz = l (K.cls x hx) - l' (K.cls x hx))
+    : secM t u c l = secM t u' c l' := by
   refine LinearMap.ext fun y => ?_
   obtain ⟨x, hx, rfl⟩ := cls_surj K c y
   have hz : L.d c (u.h c x - u'.h c x) = 0 := by
@@ -170,11 +181,15 @@ theorem secM_eq (t : AD K L) (u u' : NH t) (c : ℕ) (l l' : K.H c →ₗ[R] L.H
     have e' := u'.eq c x
     rw [hx, map_zero, sub_zero] at e e'
     rw [map_sub, e, e', sub_self]
-  change (sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx)) =
-    (sec u').mapH c (K.cls x hx) + (inc t).mapH c (l' (K.cls x hx))
-  have e2 : (inc t).mapH c (l (K.cls x hx)) - (inc t).mapH c (l' (K.cls x hx)) =
-      (inc t).mapH c (L.cls _ hz) := by rw [← map_sub, h x hx hz]
-  have e1 : (sec u).mapH c (K.cls x hx) - (sec u').mapH c (K.cls x hx) + (inc t).mapH c (L.cls _ hz) = 0 := by
+  change (sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx))
+    = (sec u').mapH c (K.cls x hx) + (inc t).mapH c (l' (K.cls x hx))
+  have e2
+      : (inc t).mapH c (l (K.cls x hx)) - (inc t).mapH c (l' (K.cls x hx))
+        = (inc t).mapH c (L.cls _ hz) := by
+    rw [← map_sub, h x hx hz]
+  have e1
+      : (sec u).mapH c (K.cls x hx) - (sec u').mapH c (K.cls x hx) + (inc t).mapH c (L.cls _ hz)
+        = 0 := by
     have hw : ((sec u).f c x - (sec u').f c x + (inc t).f c (u.h c x - u'.h c x)) = 0 := by
       refine Prod.ext ?_ ?_
       · change -(u.h c x) - -(u'.h c x) + (u.h c x - u'.h c x) = 0
@@ -185,39 +200,50 @@ theorem secM_eq (t : AD K L) (u u' : NH t) (c : ℕ) (l l' : K.H c →ₗ[R] L.H
       intro v hv e
       subst e
       exact ((cls_eq_zero _ _ _).2 (Submodule.zero_mem _))
-    have hv : (cone t).d c ((sec u).f c x - (sec u').f c x + (inc t).f c (u.h c x - u'.h c x)) = 0 := by rw [hw, map_zero]
+    have hv
+        : (cone t).d c ((sec u).f c x - (sec u').f c x + (inc t).f c (u.h c x - u'.h c x)) = 0 := by
+      rw [hw, map_zero]
     exact hc _ hv hw
   rw [← sub_eq_zero]
-  have e3 : (sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx)) -
-      ((sec u').mapH c (K.cls x hx) + (inc t).mapH c (l' (K.cls x hx))) =
-      ((sec u).mapH c (K.cls x hx) - (sec u').mapH c (K.cls x hx) + (inc t).mapH c (L.cls _ hz)) +
-      ((inc t).mapH c (l (K.cls x hx)) - (inc t).mapH c (l' (K.cls x hx)) - (inc t).mapH c (L.cls _ hz)) := by abel
+  have e3
+      : (sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx))
+          - ((sec u').mapH c (K.cls x hx) + (inc t).mapH c (l' (K.cls x hx)))
+        = ((sec u).mapH c (K.cls x hx) - (sec u').mapH c (K.cls x hx) + (inc t).mapH c (L.cls _ hz))
+          + ((inc t).mapH c (l (K.cls x hx)) - (inc t).mapH c (l' (K.cls x hx))
+            - (inc t).mapH c (L.cls _ hz)) := by
+    abel
   rw [e3, e1, e2, sub_self, add_zero]
 
 variable {K' L' : Cx.{w} R}
 
-def coneHom (t : AD K L) (t' : AD K' L') (f : Cx.Hom K K' (RingHom.id R)) (g : Cx.Hom L L' (RingHom.id R))
-    (hc : ∀ n x, t'.r n (f.f n x) = g.f (n + 1) (t.r n x)) : Cx.Hom (cone t) (cone t') (RingHom.id R) where
+def coneHom
+    (t : AD K L) (t' : AD K' L') (f : Cx.Hom K K' (RingHom.id R)) (g : Cx.Hom L L' (RingHom.id R))
+    (hc : ∀ n x, t'.r n (f.f n x) = g.f (n + 1) (t.r n x))
+    : Cx.Hom (cone t) (cone t') (RingHom.id R) where
   f n := (g.f n).prodMap (f.f n)
   comm n x := by
     refine Prod.ext ?_ (f.comm n x.2)
     change L'.d n (g.f n x.1) + t'.r n (f.f n x.2) = g.f (n + 1) (L.d n x.1 + t.r n x.2)
     rw [hc, g.comm, map_add (f := _)]
 
-theorem secM_nat (t : AD K L) (t' : AD K' L') (f : Cx.Hom K K' (RingHom.id R)) (g : Cx.Hom L L' (RingHom.id R))
-    (hc : ∀ n x, t'.r n (f.f n x) = g.f (n + 1) (t.r n x)) (u : NH t) (u' : NH t') (c : ℕ) (l : K.H c →ₗ[R] L.H c)
-    (l' : K'.H c →ₗ[R] L'.H c) (hu : ∀ x, u'.h c (f.f c x) = g.f c (u.h c x))
-    (hl : ∀ y, l' (f.mapH c y) = g.mapH c (l y)) (y : K.H c) :
-    secM t' u' c l' (f.mapH c y) = (coneHom t t' f g hc).mapH c (secM t u c l y) := by
-  have hi : ∀ z : L.H c, (inc t').mapH c (g.mapH c z) = (coneHom t t' f g hc).mapH c ((inc t).mapH c z) := by
+theorem secM_nat
+    (t : AD K L) (t' : AD K' L') (f : Cx.Hom K K' (RingHom.id R)) (g : Cx.Hom L L' (RingHom.id R))
+    (hc : ∀ n x, t'.r n (f.f n x) = g.f (n + 1) (t.r n x))
+    (u : NH t) (u' : NH t') (c : ℕ) (l : K.H c →ₗ[R] L.H c) (l' : K'.H c →ₗ[R] L'.H c)
+    (hu : ∀ x, u'.h c (f.f c x) = g.f c (u.h c x)) (hl : ∀ y, l' (f.mapH c y) = g.mapH c (l y))
+    (y : K.H c)
+    : secM t' u' c l' (f.mapH c y) = (coneHom t t' f g hc).mapH c (secM t u c l y) := by
+  have hi
+      : ∀ z : L.H c,
+        (inc t').mapH c (g.mapH c z) = (coneHom t t' f g hc).mapH c ((inc t).mapH c z) := by
     intro z
     obtain ⟨b, hb, rfl⟩ := cls_surj L c z
     have e : (inc t').f c (g.f c b) = (coneHom t t' f g hc).f c ((inc t).f c b) :=
       Prod.ext rfl (by change 0 = f.f c 0; rw [map_zero])
     exact cls_congr _ e _ _
   obtain ⟨x, hx, rfl⟩ := cls_surj K c y
-  change (sec u').mapH c (f.mapH c (K.cls x hx)) + (inc t').mapH c (l' (f.mapH c (K.cls x hx))) =
-    (coneHom t t' f g hc).mapH c ((sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx)))
+  change (sec u').mapH c (f.mapH c (K.cls x hx)) + (inc t').mapH c (l' (f.mapH c (K.cls x hx)))
+    = (coneHom t t' f g hc).mapH c ((sec u).mapH c (K.cls x hx) + (inc t).mapH c (l (K.cls x hx)))
   rw [map_add (f := _), hl, hi]
   congr 1
   have e : (sec u').f c (f.f c x) = (coneHom t t' f g hc).f c ((sec u).f c x) :=
@@ -251,7 +277,7 @@ def sh (A : Cx.{w} R) : Cx.{w} R where
     cases n with
     | zero => exact map_zero (shD A 1)
     | succ n =>
-      change -(A.d (n + 1)) (-(A.d n x)) = 0
+      change - (A.d (n + 1)) (-(A.d n x)) = 0
       rw [map_neg, A.dd, neg_zero, neg_zero]
 
 variable {A A' : Cx.{w} R}
@@ -269,7 +295,8 @@ def shF (φ : Cx.Hom A A' (RingHom.id R)) : Cx.Hom (sh A) (sh A') (RingHom.id R)
       change -(A'.d n (φ.f n x)) = φ.f (n + 1) (-(A.d n x))
       rw [map_neg, φ.comm]
 
-theorem sh_mem_B {n : ℕ} (x : A.X n) (h : x ∈ A.B n) : (show (sh A).X (n + 1) from x) ∈ (sh A).B (n + 1) := by
+theorem sh_mem_B {n : ℕ} (x : A.X n) (h : x ∈ A.B n)
+    : (show (sh A).X (n + 1) from x) ∈ (sh A).B (n + 1) := by
   cases n with
   | zero =>
     have e : x = 0 := h
@@ -281,7 +308,8 @@ theorem sh_mem_B {n : ℕ} (x : A.X n) (h : x ∈ A.B n) : (show (sh A).X (n + 1
     change -(A.d n (-y)) = A.d n y
     rw [map_neg, neg_neg]
 
-theorem mem_B_sh {n : ℕ} (x : (sh A).X (n + 1)) (h : x ∈ (sh A).B (n + 1)) : (show A.X n from x) ∈ A.B n := by
+theorem mem_B_sh {n : ℕ} (x : (sh A).X (n + 1)) (h : x ∈ (sh A).B (n + 1))
+    : (show A.X n from x) ∈ A.B n := by
   cases n with
   | zero =>
     obtain ⟨y, rfl⟩ := h
@@ -292,18 +320,20 @@ theorem mem_B_sh {n : ℕ} (x : (sh A).X (n + 1)) (h : x ∈ (sh A).B (n + 1)) :
     change A.d n (-y) = -(A.d n y)
     rw [map_neg]
 
-theorem sh_cocycle {n : ℕ} (x : (sh A).X (n + 1)) (h : (sh A).d (n + 1) x = 0) : A.d n (show A.X n from x) = 0 :=
+theorem sh_cocycle {n : ℕ} (x : (sh A).X (n + 1)) (h : (sh A).d (n + 1) x = 0)
+    : A.d n (show A.X n from x) = 0 :=
   neg_eq_zero.1 h
 
 def eZ (A : Cx.{w} R) (n : ℕ) : (sh A).Z (n + 1) →ₗ[R] A.Z n :=
-  LinearMap.codRestrict (A.Z n) ((show (sh A).X (n + 1) →ₗ[R] A.X n from LinearMap.id).comp ((sh A).Z (n + 1)).subtype)
+  LinearMap.codRestrict (A.Z n)
+    ((show (sh A).X (n + 1) →ₗ[R] A.X n from LinearMap.id).comp ((sh A).Z (n + 1)).subtype)
     fun z => sh_cocycle z.1 z.2
 
 def eH (A : Cx.{w} R) (n : ℕ) : (sh A).H (n + 1) →ₗ[R] A.H n :=
   Submodule.mapQ _ _ (eZ A n) fun z hz => mem_B_sh z.1 hz
 
-theorem eH_shF (φ : Cx.Hom A A' (RingHom.id R)) (n : ℕ) (y : (sh A).H (n + 1)) :
-    eH A' n ((shF φ).mapH (n + 1) y) = φ.mapH n (eH A n y) := by
+theorem eH_shF (φ : Cx.Hom A A' (RingHom.id R)) (n : ℕ) (y : (sh A).H (n + 1))
+    : eH A' n ((shF φ).mapH (n + 1) y) = φ.mapH n (eH A n y) := by
   obtain ⟨x, hx, rfl⟩ := cls_surj _ _ y
   rfl
 
@@ -324,7 +354,8 @@ def shRf (ρ : ∀ n, A.X n →ₗ[R] B.X (n + 2)) : ∀ n, shX A n →ₗ[R] B.
   | 0 => 0
   | n + 1 => ρ n
 
-def shR (ρ : ∀ n, A.X n →ₗ[R] B.X (n + 2)) (hρ : ∀ n x, B.d (n + 2) (ρ n x) = ρ (n + 1) (A.d n x)) : AD (sh A) B where
+def shR (ρ : ∀ n, A.X n →ₗ[R] B.X (n + 2)) (hρ : ∀ n x, B.d (n + 2) (ρ n x) = ρ (n + 1) (A.d n x))
+    : AD (sh A) B where
   r := shRf ρ
   anti n x := by
     cases n with
@@ -339,9 +370,11 @@ def shHf (η : ∀ n, A.X n →ₗ[R] B.X (n + 1)) : ∀ n, shX A n →ₗ[R] B.
   | 0 => 0
   | n + 1 => η n
 
-def shN (ρ : ∀ n, A.X n →ₗ[R] B.X (n + 2)) (hρ : ∀ n x, B.d (n + 2) (ρ n x) = ρ (n + 1) (A.d n x))
-    (η : ∀ n, A.X n →ₗ[R] B.X (n + 1)) (hη : ∀ n x, B.d (n + 1) (η n x) + η (n + 1) (A.d n x) = ρ n x) :
-    NH (shR ρ hρ) where
+def shN
+    (ρ : ∀ n, A.X n →ₗ[R] B.X (n + 2)) (hρ : ∀ n x, B.d (n + 2) (ρ n x) = ρ (n + 1) (A.d n x))
+    (η : ∀ n, A.X n →ₗ[R] B.X (n + 1))
+    (hη : ∀ n x, B.d (n + 1) (η n x) + η (n + 1) (A.d n x) = ρ n x)
+    : NH (shR ρ hρ) where
   h := shHf η
   eq n x := by
     cases n with
@@ -358,13 +391,16 @@ section Sys
 
 variable {ι : Type} [DecidableEq ι]
 
-theorem cech_d (P : PM.{w} R ι) (n : ℕ) (x : P.cech.X n) (i : Fin (n + 2) → ι) :
-    P.cech.d n x i = ∑ k : Fin (n + 2), (-1 : ℤ) ^ (k : ℕ) • P.res (ent_comp i k.succAbove) (x (i ∘ k.succAbove)) := by
-  simp [Cos.d, LinearMap.sum_apply, Finset.sum_apply]
+theorem cech_d (P : PM.{w} R ι) (n : ℕ) (x : P.cech.X n) (i : Fin (n + 2) → ι)
+    : P.cech.d n x i
+      = ∑ k : Fin (n + 2), (-1 : ℤ) ^ (k : ℕ) • P.res (ent_comp i k.succAbove) (x (i ∘ k.succAbove)) :=
+  by simp [Cos.d, LinearMap.sum_apply, Finset.sum_apply]
 
-theorem cech_nat (P Q : PM.{w} R ι) (f : ∀ S, P.M S →ₗ[R] Q.M S)
-    (hf : ∀ {S T : Finset ι} (h : S ⊆ T) x, f T (P.res h x) = Q.res h (f S x)) (n : ℕ) (x : P.cech.X n) :
-    Q.cech.d n (fun i => f _ (x i)) = fun i => f _ (P.cech.d n x i) := by
+theorem cech_nat
+    (P Q : PM.{w} R ι) (f : ∀ S, P.M S →ₗ[R] Q.M S)
+    (hf : ∀ {S T : Finset ι} (h : S ⊆ T) x, f T (P.res h x) = Q.res h (f S x))
+    (n : ℕ) (x : P.cech.X n)
+    : Q.cech.d n (fun i => f _ (x i)) = fun i => f _ (P.cech.d n x i) := by
   funext i
   set_option synthInstance.maxHeartbeats 100000 in
     rw [cech_d, cech_d, map_sum]
@@ -377,28 +413,31 @@ def prodP (P Q : PM.{w} R ι) : PM.{w} R ι where
   res_id S h x := Prod.ext (P.res_id S h x.1) (Q.res_id S h x.2)
   res_comp h h' x := Prod.ext (P.res_comp h h' x.1) (Q.res_comp h h' x.2)
 
-theorem d_fst (P Q : PM.{w} R ι) (n : ℕ) (z : (prodP P Q).cech.X n) :
-    P.cech.d n (fun i => (z i).1) = fun i => ((prodP P Q).cech.d n z i).1 :=
+theorem d_fst (P Q : PM.{w} R ι) (n : ℕ) (z : (prodP P Q).cech.X n)
+    : P.cech.d n (fun i => (z i).1) = fun i => ((prodP P Q).cech.d n z i).1 :=
   cech_nat (prodP P Q) P (fun S => LinearMap.fst R _ _) (fun h x => rfl) n z
 
-theorem d_snd (P Q : PM.{w} R ι) (n : ℕ) (z : (prodP P Q).cech.X n) :
-    Q.cech.d n (fun i => (z i).2) = fun i => ((prodP P Q).cech.d n z i).2 :=
+theorem d_snd (P Q : PM.{w} R ι) (n : ℕ) (z : (prodP P Q).cech.X n)
+    : Q.cech.d n (fun i => (z i).2) = fun i => ((prodP P Q).cech.d n z i).2 :=
   cech_nat (prodP P Q) Q (fun S => LinearMap.snd R _ _) (fun h x => rfl) n z
 
-theorem d_pair (P Q : PM.{w} R ι) (n : ℕ) (x : P.cech.X n) (y : Q.cech.X n) :
-    (prodP P Q).cech.d n (fun i => (x i, y i)) = fun i => (P.cech.d n x i, Q.cech.d n y i) := by
+theorem d_pair (P Q : PM.{w} R ι) (n : ℕ) (x : P.cech.X n) (y : Q.cech.X n)
+    : (prodP P Q).cech.d n (fun i => (x i, y i)) = fun i => (P.cech.d n x i, Q.cech.d n y i) := by
   funext i
-  exact Prod.ext (congrFun (d_fst P Q n (fun i => (x i, y i))) i).symm (congrFun (d_snd P Q n (fun i => (x i, y i))) i).symm
+  exact Prod.ext (congrFun (d_fst P Q n (fun i => (x i, y i))) i).symm
+    (congrFun (d_snd P Q n (fun i => (x i, y i))) i).symm
 
-theorem d_zero (P Q : PM.{w} R ι) (n : ℕ) (z : (prodP P Q).cech.X n) (h : (prodP P Q).cech.d n z = 0) :
-    P.cech.d n (fun i => (z i).1) = 0 ∧ Q.cech.d n (fun i => (z i).2) = 0 := by
+theorem d_zero
+    (P Q : PM.{w} R ι) (n : ℕ) (z : (prodP P Q).cech.X n) (h : (prodP P Q).cech.d n z = 0)
+    : P.cech.d n (fun i => (z i).1) = 0 ∧ Q.cech.d n (fun i => (z i).2) = 0 := by
   rw [d_fst, d_snd, h]
   exact ⟨rfl, rfl⟩
 
 theorem prod_Ex {P Q : PM.{w} R ι} (hP : P.Ex) (hQ : Q.Ex) : (prodP P Q).Ex := by
   obtain ⟨a1, a2, a3, a4⟩ := hP
   obtain ⟨b1, b2, b3, b4⟩ := hQ
-  have aug : ∀ x : P.M ∅ × Q.M ∅, (prodP P Q).aug x = fun i => (P.aug x.1 i, Q.aug x.2 i) := fun _ => rfl
+  have aug : ∀ x : P.M ∅ × Q.M ∅, (prodP P Q).aug x = fun i => (P.aug x.1 i, Q.aug x.2 i) :=
+    fun _ => rfl
   refine ⟨fun x => ?_, fun x hx => ?_, fun y hy => ?_, fun n y hy => ?_⟩
   · change (prodP P Q).cech.d 0 ((prodP P Q).aug x) = 0
     rw [aug, d_pair]
@@ -428,8 +467,12 @@ theorem Ex_of_sub (P : PM.{w} R ι) (h : ∀ S, Subsingleton (P.M S)) : P.Ex := 
   have h2 : ∀ n, Subsingleton (P.cech.cx.X n) := fun n =>
     show Subsingleton (∀ i : Fin (n + 1) → ι, P.M (ent i)) from inferInstance
   have h3 := h ∅
-  exact ⟨fun x => (h2 _).elim _ _, fun x _ => Subsingleton.elim _ _, fun y _ => ⟨0, (h2 _).elim _ _⟩,
-    fun n y _ => ⟨0, (h2 _).elim _ _⟩⟩
+  exact ⟨
+    fun x => (h2 _).elim _ _,
+    fun x _ => Subsingleton.elim _ _,
+    fun y _ => ⟨0, (h2 _).elim _ _⟩,
+    fun n y _ => ⟨0, (h2 _).elim _ _⟩
+  ⟩
 
 def shSy (A : Sy.{w} R ι) : Sy.{w} R ι where
   K S := sh (A.K S)
@@ -457,8 +500,8 @@ variable {A B : Sy.{w} R ι}
 
 def Dat.ad (D : Dat A B) (S : Finset ι) : AD (sh (A.K S)) (B.K S) := shR (D.ρ S) (D.hρ S)
 
-theorem Dat.compat (D : Dat A B) {S T : Finset ι} (h : S ⊆ T) (n : ℕ) (x : (sh (A.K S)).X n) :
-    (D.ad T).r n ((shF (A.res h)).f n x) = (B.res h).f (n + 1) ((D.ad S).r n x) := by
+theorem Dat.compat (D : Dat A B) {S T : Finset ι} (h : S ⊆ T) (n : ℕ) (x : (sh (A.K S)).X n)
+    : (D.ad T).r n ((shF (A.res h)).f n x) = (B.res h).f (n + 1) ((D.ad S).r n x) := by
   cases n with
   | zero => exact (map_zero ((B.res h).f 1)).symm
   | succ n => exact D.hn h n x
@@ -483,11 +526,14 @@ theorem coneKillOf : ConeKillOf := by
   unfold ConeKill
   intro R _ ι _ A B a hA hB oA oB ρ η hρ hρn hηn hη lam hlamn hlam n x hx
   let D : Dat A B := ⟨ρ, hρ, hρn⟩
-  let N : ∀ (α : ι) (S : Finset ι), α ∈ S → NH (D.ad S) := fun α S hS => shN (ρ S) (hρ S) (η α S hS) (hη α S hS)
+  let N : ∀ (α : ι) (S : Finset ι), α ∈ S → NH (D.ad S) := fun α S hS =>
+    shN (ρ S) (hρ S) (η α S hS) (hη α S hS)
   let l : ∀ (α : ι) (S : Finset ι), α ∈ S → ((sh (A.K S)).H (a + 1) →ₗ[R] (B.K S).H (a + 1)) :=
     fun α S hS => (lam α S hS).comp (eH (A.K S) a)
-  have hind : ∀ (S : Finset ι) (α α' : ι) (hS : α ∈ S) (hS' : α' ∈ S),
-      secM (D.ad S) (N α S hS) (a + 1) (l α S hS) = secM (D.ad S) (N α' S hS') (a + 1) (l α' S hS') := by
+  have hind
+      : ∀ (S : Finset ι) (α α' : ι) (hS : α ∈ S) (hS' : α' ∈ S),
+        secM (D.ad S) (N α S hS) (a + 1) (l α S hS)
+          = secM (D.ad S) (N α' S hS') (a + 1) (l α' S hS') := by
     intro S α α' hS hS'
     exact secM_eq _ _ _ _ _ _ fun x hx hz => hlam α α' S hS hS' x (sh_cocycle x hx) hz
   let σ : ∀ S : Finset ι, S.Nonempty → (((shSy A).K S).H (a + 1) →ₗ[R] (D.sy.K S).H (a + 1)) :=
@@ -496,18 +542,23 @@ theorem coneKillOf : ConeKillOf := by
   have oneC : D.sy.One (a + 1) := fun S hS j hj =>
     cone_one (D.ad S) (N _ S hS.choose_spec) j (oB S hS j hj) (oneS S hS j hj)
   have hsec : ∀ S hS x, (D.m.φ S).mapH (a + 1) (σ S hS x) = x := fun S hS x => pr_secM _ _ _ _ x
-  have hnat : ∀ {S T : Finset ι} (h : S ⊆ T) hS hT x,
-      σ T hT (((shSy A).res h).mapH (a + 1) x) = (D.sy.res h).mapH (a + 1) (σ S hS x) := by
+  have hnat
+      : ∀ {S T : Finset ι} (h : S ⊆ T) hS hT x,
+        σ T hT (((shSy A).res h).mapH (a + 1) x) = (D.sy.res h).mapH (a + 1) (σ S hS x) := by
     intro S T h hS hT x
     have hα := hS.choose_spec
     have e := hind T hT.choose hS.choose hT.choose_spec (h hα)
     refine (congrArg (fun f => f (((shSy A).res h).mapH (a + 1) x)) e).trans ?_
-    refine secM_nat (D.ad S) (D.ad T) (shF (A.res h)) (B.res h) (D.compat h) (N _ S hα) (N _ T (h hα)) (a + 1) (l _ S hα)
-      (l _ T (h hα)) (fun x => hηn _ h hα a x) (fun y => ?_) x
+    refine secM_nat (D.ad S) (D.ad T) (shF (A.res h)) (B.res h) (D.compat h) (N _ S hα)
+      (N _ T (h hα)) (a + 1) (l _ S hα) (l _ T (h hα))
+      (fun x => hηn _ h hα a x)
+      (fun y => ?_)
+      x
     change lam _ T _ (eH (A.K T) a ((shF (A.res h)).mapH (a + 1) y)) = _
     rw [eH_shF]
     exact hlamn _ h hα _
-  have surj := hs R ι D.sy (shSy A) D.m (a + 1) (D.desc hA hB) (shSy_desc hA) oneC oneS σ hsec hnat (n + 1)
+  have surj :=
+    hs R ι D.sy (shSy A) D.m (a + 1) (D.desc hA hB) (shSy_desc hA) oneC oneS σ hsec hnat (n + 1)
   refine kill (D.ad ∅) (n + 1) surj x ?_
   change -((A.K ∅).d n x) = 0
   rw [hx, neg_zero]

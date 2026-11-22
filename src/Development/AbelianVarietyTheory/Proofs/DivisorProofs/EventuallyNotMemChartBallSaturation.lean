@@ -11,21 +11,22 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.GramChartSub
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.FD ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
+open NumberField ReciprocityTheory.ChartRestriction.G.FD
+  ReciprocityTheory.ChartRestriction.G.AR.Inst ReciprocityTheory.ChartRestriction.G.AR.Up
+  ReciprocityTheory.L2DbarEstimates MeasureTheory Topology
 open scoped ContDiff ENNReal Matrix
 
 namespace GlobalTheory.SaturationClosed
 
 variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ}
 
-
 omit [NumberField E] [IsCMField E] in
 def adjEnt {Ψ : Finset (E →+* ℂ)} (k w : Frame Ψ r) (τ : Ψ) (a c : Fin r) : ℂ :=
   (Matrix.adjugate (mat k τ) * mat w τ) a c
 
 omit [NumberField E] [IsCMField E] in
-theorem lact_lact {Ψ : Finset (E →+* ℂ)} (a b : GL (Fin r) E) (x : Frame Ψ r) :
-    lact a (lact b x) = lact (a * b) x := by
+theorem lact_lact {Ψ : Finset (E →+* ℂ)} (a b : GL (Fin r) E) (x : Frame Ψ r)
+    : lact a (lact b x) = lact (a * b) x := by
   funext τ
   show ((a : Matrix (Fin r) (Fin r) E).map τ.1 * ((b : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ) :
     Matrix (Fin r) (Fin r) ℂ) = (((a * b : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ)
@@ -35,22 +36,27 @@ omit [NumberField E] [IsCMField E] in
 theorem lact_one {Ψ : Finset (E →+* ℂ)} (x : Frame Ψ r) : lact (1 : GL (Fin r) E) x = x := by
   funext τ
   show (((1 : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ : Matrix (Fin r) (Fin r) ℂ) = x τ
-  rw [Units.val_one, Matrix.map_one _ (map_zero τ.1) (map_one τ.1), Matrix.one_mul]; rfl
-
+  rw [Units.val_one, Matrix.map_one _ (map_zero τ.1) (map_one τ.1), Matrix.one_mul]
+  rfl
 
 omit [NumberField E] [IsCMField E] in
-theorem adjEnt_rmul {Ψ : Finset (E →+* ℂ)} (k b : Frame Ψ r) (hb : b ∈ Bor Ψ r) (τ : Ψ) (a c : Fin r)
-    (hca : c < a) : adjEnt k (rmul k b) τ a c = 0 := by
+theorem adjEnt_rmul
+    {Ψ : Finset (E →+* ℂ)} (k b : Frame Ψ r) (hb : b ∈ Bor Ψ r) (τ : Ψ) (a c : Fin r) (hca : c < a)
+    : adjEnt k (rmul k b) τ a c = 0 := by
   have h1 : mat (rmul k b) τ = mat k τ * mat b τ := rfl
   rw [adjEnt, h1, ← Matrix.mul_assoc, Matrix.adjugate_mul]
   simp [Matrix.smul_mul, mat, (hb τ).2 a c hca]
 
-
 omit [NumberField E] [IsCMField E] in
-theorem exists_of_adjEnt {Ψ : Finset (E →+* ℂ)} (k w : Frame Ψ r) (hk : ∀ τ, (mat k τ).det ≠ 0)
-    (hw : ∀ τ, (mat w τ).det ≠ 0) (h0 : ∀ τ a c, c < a → adjEnt k w τ a c = 0) :
-    ∃ b ∈ Bor Ψ r, w = rmul k b := by
-  refine ⟨fun τ => ((mat k τ)⁻¹ * mat w τ : Matrix (Fin r) (Fin r) ℂ), fun τ => ⟨?_, fun a c hca => ?_⟩, ?_⟩
+theorem exists_of_adjEnt
+    {Ψ : Finset (E →+* ℂ)} (k w : Frame Ψ r) (hk : ∀ τ, (mat k τ).det ≠ 0)
+    (hw : ∀ τ, (mat w τ).det ≠ 0) (h0 : ∀ τ a c, c < a → adjEnt k w τ a c = 0)
+    : ∃ b ∈ Bor Ψ r, w = rmul k b := by
+  refine ⟨
+    fun τ => ((mat k τ)⁻¹ * mat w τ : Matrix (Fin r) (Fin r) ℂ),
+    fun τ => ⟨?_, fun a c hca => ?_⟩,
+    ?_
+  ⟩
   · show ((mat k τ)⁻¹ * mat w τ).det ≠ 0
     rw [Matrix.det_mul, Matrix.det_nonsing_inv, Ring.inverse_eq_inv']
     exact mul_ne_zero (inv_ne_zero (hk τ)) (hw τ)
@@ -64,33 +70,42 @@ theorem exists_of_adjEnt {Ψ : Finset (E →+* ℂ)} (k w : Frame Ψ r) (hk : �
     rw [Matrix.mul_nonsing_inv_cancel_left _ _ (isUnit_iff_ne_zero.2 (hk τ))]
 
 omit [NumberField E] [IsCMField E] in
-theorem continuous_mat {α : Type} [TopologicalSpace α] {Ψ : Finset (E →+* ℂ)} {f : α → Frame Ψ r}
-    (hf : Continuous f) (τ : Ψ) : Continuous fun p => mat (f p) τ :=
+theorem continuous_mat
+    {α : Type} [TopologicalSpace α]
+    {Ψ : Finset (E →+* ℂ)} {f : α → Frame Ψ r} (hf : Continuous f) (τ : Ψ)
+    : Continuous fun p => mat (f p) τ :=
   (continuous_apply τ).comp hf
 
 omit [NumberField E] [IsCMField E] in
-theorem continuous_lact {Ψ : Finset (E →+* ℂ)} (γ : GL (Fin r) E) :
-    Continuous (lact (Ψ := Ψ) γ) := by
+theorem continuous_lact {Ψ : Finset (E →+* ℂ)} (γ : GL (Fin r) E)
+    : Continuous (lact (Ψ := Ψ) γ) := by
   refine continuous_pi fun τ => ?_
   exact continuous_const.matrix_mul (continuous_mat continuous_id τ)
 
 omit [NumberField E] [IsCMField E] in
-theorem continuous_adjEnt {α : Type} [TopologicalSpace α] {Ψ : Finset (E →+* ℂ)} {f g : α → Frame Ψ r}
-    (hf : Continuous f) (hg : Continuous g) (τ : Ψ) (a c : Fin r) :
-    Continuous fun p => adjEnt (f p) (g p) τ a c :=
+theorem continuous_adjEnt
+    {α : Type} [TopologicalSpace α]
+    {Ψ : Finset (E →+* ℂ)} {f g : α → Frame Ψ r} (hf : Continuous f) (hg : Continuous g) (τ : Ψ)
+    (a c : Fin r)
+    : Continuous fun p => adjEnt (f p) (g p) τ a c :=
   (((continuous_mat hf τ).matrix_adjugate).matrix_mul (continuous_mat hg τ)).matrix_elem a c
 
-theorem eventually_not_mem_saturation : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ)
-    (X : Data E r) (x : Frame X.Ψ r) (ρ : ℝ), (∀ z : V (nd X), ‖z‖ ≤ ρ → z ∈ OmF X x) →
-    ∀ y ∈ X.dom, (¬ ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, ∃ z : V (nd X), ‖z‖ ≤ ρ ∧
-      y = lact γ (rmul (cpt X x z) b)) →
-    ∀ᶠ y' in 𝓝 y, ¬ ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, ∃ z : V (nd X), ‖z‖ ≤ ρ ∧
-      y' = lact γ (rmul (cpt X x z) b) := by
+theorem eventually_not_mem_saturation
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (x : Frame X.Ψ r)
+        (ρ : ℝ),
+      (∀ z : V (nd X), ‖z‖ ≤ ρ → z ∈ OmF X x)
+        → ∀ y ∈ X.dom,
+          (¬ ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, ∃ z : V (nd X), ‖z‖ ≤ ρ ∧ y = lact γ (rmul (cpt X x z) b))
+            → ∀ᶠ y' in 𝓝 y, ¬ ∃ γ ∈ X.Γ, ∃ b ∈ Bor X.Ψ r, ∃ z : V (nd X), ‖z‖ ≤ ρ ∧
+                y' = lact γ (rmul (cpt X x z) b) := by
   intro E _ _ _ r X x ρ hΩ y hy hny
-  have hcpt : Continuous (cpt X x) := (GlobalTheory.InterpCompare.differentiable_chart X x).continuous
+  have hcpt : Continuous (cpt X x) :=
+    (GlobalTheory.InterpCompare.differentiable_chart X x).continuous
   have hK : IsCompact (Metric.closedBall (0 : V (nd X)) ρ) := isCompact_closedBall 0 ρ
-  have key : ∀ z ∈ Metric.closedBall (0 : V (nd X)) ρ, ∀ᶠ p : Frame X.Ψ r × V (nd X) in 𝓝 (y, z),
-      ∀ γ ∈ X.Γ, ∀ b ∈ Bor X.Ψ r, p.1 ≠ lact γ (rmul (cpt X x p.2) b) := by
+  have key
+      : ∀ z ∈ Metric.closedBall (0 : V (nd X)) ρ,
+        ∀ᶠ p : Frame X.Ψ r × V (nd X) in 𝓝 (y, z),
+          ∀ γ ∈ X.Γ, ∀ b ∈ Bor X.Ψ r, p.1 ≠ lact γ (rmul (cpt X x p.2) b) := by
     intro z hz
     have hz' : ‖z‖ ≤ ρ := by simpa using hz
     have hk : cpt X x z ∈ X.dom := hΩ z hz'
@@ -98,18 +113,22 @@ theorem eventually_not_mem_saturation : ∀ (E : Type) [Field E] [NumberField E]
     have h1 : ∀ᶠ p : Frame X.Ψ r × V (nd X) in 𝓝 (y, z), p.1 ∈ U ∧ cpt X x p.2 ∈ U' := by
       refine Filter.Eventually.and (continuous_fst.continuousAt.preimage_mem_nhds hU) ?_
       exact (hcpt.comp continuous_snd).continuousAt.preimage_mem_nhds hU'
-    have h2 : ∀ᶠ p : Frame X.Ψ r × V (nd X) in 𝓝 (y, z),
-        ∀ δ ∈ {γ : GL (Fin r) E | γ ∈ X.Γ ∧ ∃ u ∈ U, ∃ u' ∈ U', ∃ b ∈ Bor X.Ψ r, lact γ u = rmul u' b},
-          ∃ τ : X.Ψ, ∃ a c : Fin r, c < a ∧ adjEnt (cpt X x p.2) (lact δ p.1) τ a c ≠ 0 := by
+    have h2
+        : ∀ᶠ p : Frame X.Ψ r × V (nd X) in 𝓝 (y, z),
+          ∀ δ ∈ {γ : GL (Fin r) E | γ ∈ X.Γ ∧ ∃ u ∈ U, ∃ u' ∈ U', ∃ b ∈ Bor X.Ψ r, lact γ u = rmul u' b},
+            ∃ τ : X.Ψ, ∃ a c : Fin r, c < a ∧ adjEnt (cpt X x p.2) (lact δ p.1) τ a c ≠ 0 := by
       refine (Filter.eventually_all_finite hfin).2 fun δ hδ => ?_
-      have hopen : IsOpen {p : Frame X.Ψ r × V (nd X) |
-          ∃ τ : X.Ψ, ∃ a c : Fin r, c < a ∧ adjEnt (cpt X x p.2) (lact δ p.1) τ a c ≠ 0} := by
+      have hopen : IsOpen
+          {p : Frame X.Ψ r × V (nd X) |
+            ∃ τ : X.Ψ, ∃ a c : Fin r, c < a ∧ adjEnt (cpt X x p.2) (lact δ p.1) τ a c ≠ 0} := by
         simp only [Set.setOf_exists]
         refine isOpen_iUnion fun τ => isOpen_iUnion fun a => isOpen_iUnion fun c => ?_
         by_cases hca : c < a
         · simp only [hca, true_and]
-          exact isOpen_ne_fun (continuous_adjEnt (hcpt.comp continuous_snd)
-            ((continuous_lact δ).comp continuous_fst) τ a c) continuous_const
+          exact isOpen_ne_fun
+            (continuous_adjEnt (hcpt.comp continuous_snd) ((continuous_lact δ).comp continuous_fst)
+              τ a c)
+            continuous_const
         · simp [hca]
       refine hopen.mem_nhds ?_
       by_contra hcon
@@ -128,9 +147,12 @@ theorem eventually_not_mem_saturation : ∀ (E : Type) [Field E] [NumberField E]
       rw [← hwb, lact_lact, inv_mul_cancel, lact_one]
     filter_upwards [h1, h2] with p hp1 hp2
     intro γ hγ b hb he
-    have hδ : γ⁻¹ ∈ {γ : GL (Fin r) E | γ ∈ X.Γ ∧ ∃ u ∈ U, ∃ u' ∈ U', ∃ b ∈ Bor X.Ψ r, lact γ u = rmul u' b} := by
-      refine ⟨X.Γ.inv_mem hγ, p.1, hp1.1, cpt X x p.2, hp1.2, b, hb, ?_⟩
-      rw [he, lact_lact, inv_mul_cancel, lact_one]
+    have hδ
+        : γ⁻¹
+          ∈ {γ : GL (Fin r) E | γ ∈ X.Γ ∧ ∃ u ∈ U, ∃ u' ∈ U', ∃ b ∈ Bor X.Ψ r, lact γ u = rmul u' b} :=
+      by
+        refine ⟨X.Γ.inv_mem hγ, p.1, hp1.1, cpt X x p.2, hp1.2, b, hb, ?_⟩
+        rw [he, lact_lact, inv_mul_cancel, lact_one]
     obtain ⟨τ, a, c, hca, hne⟩ := hp2 _ hδ
     apply hne
     rw [he, lact_lact, inv_mul_cancel, lact_one]

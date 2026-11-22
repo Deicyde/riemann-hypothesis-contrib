@@ -7,10 +7,14 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal UpperTheory.Gal.Int.Geo
 
-private theorem exists_linearIndep_levels_span_eq_of_monotone {k : Type} [Field k] {V : Type*} [AddCommGroup V] [Module k V]
-    (W : ℕ → Submodule k V) (hW : Monotone W) (h0 : W 0 = ⊥) (n : ℕ) :
-    ∃ (s : Set V) (lev : V → ℕ), LinearIndepOn k id s ∧ (∀ x ∈ s, lev x < n) ∧
-      ∀ i ≤ n, Submodule.span k {x | x ∈ s ∧ lev x < i} = W i := by
+private theorem exists_linearIndep_levels_span_eq_of_monotone
+    {k : Type} [Field k]
+    {V : Type*} [AddCommGroup V] [Module k V]
+    (W : ℕ → Submodule k V) (hW : Monotone W) (h0 : W 0 = ⊥)
+    (n : ℕ)
+    : ∃ (s : Set V) (lev : V → ℕ),
+      LinearIndepOn k id s ∧ (∀ x ∈ s, lev x < n)
+        ∧ ∀ i ≤ n, Submodule.span k {x | x ∈ s ∧ lev x < i} = W i := by
   induction n with
   | zero =>
     refine ⟨∅, fun _ => 0, linearIndepOn_empty k id, by simp, ?_⟩
@@ -62,8 +66,7 @@ private theorem exists_linearIndep_levels_span_eq_of_monotone {k : Type} [Field 
         · intro y hy
           exact htb hy
 
-theorem UpperTheory.Gal.Int.Geo.flagBasis_of :
-    FlagBasis := by
+theorem UpperTheory.Gal.Int.Geo.flagBasis_of : FlagBasis := by
   intro k _ d m W hW h0 hm
   obtain ⟨s, lev, hs, hlev, hspan⟩ := exists_linearIndep_levels_span_eq_of_monotone W hW h0 m
   have hall : ∀ i, Submodule.span k {x | x ∈ s ∧ lev x < i} = W i := by
@@ -95,11 +98,12 @@ theorem UpperTheory.Gal.Int.Geo.flagBasis_of :
     simp only [b, Module.Basis.reindex_apply]
     exact Module.Basis.mk_apply _ _ _
   let L := b.equivFun.symm
-  let P : GL (Fin d) k :=
-    ⟨LinearMap.toMatrix' (L : (Fin d → k) →ₗ[k] (Fin d → k)),
-      LinearMap.toMatrix' (L.symm : (Fin d → k) →ₗ[k] (Fin d → k)),
-      by rw [← LinearMap.toMatrix'_comp, LinearEquiv.comp_symm, LinearMap.toMatrix'_id],
-      by rw [← LinearMap.toMatrix'_comp, LinearEquiv.symm_comp, LinearMap.toMatrix'_id]⟩
+  let P : GL (Fin d) k := ⟨
+    LinearMap.toMatrix' (L : (Fin d → k) →ₗ[k] (Fin d → k)),
+    LinearMap.toMatrix' (L.symm : (Fin d → k) →ₗ[k] (Fin d → k)),
+    by rw [← LinearMap.toMatrix'_comp, LinearEquiv.comp_symm, LinearMap.toMatrix'_id],
+    by rw [← LinearMap.toMatrix'_comp, LinearEquiv.symm_comp, LinearMap.toMatrix'_id]
+  ⟩
   refine ⟨P, fun j => lev (e.symm j), ?_⟩
   intro i v
   have hPv : (↑P : Matrix (Fin d) (Fin d) k).mulVec v = L v := LinearMap.toMatrix'_mulVec _ v

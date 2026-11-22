@@ -99,8 +99,9 @@ end GlobalTheory.ThetaWeberRoad.OddDeriv
 
 namespace GlobalTheory.ThetaWeberRoad.OddDeriv
 
-theorem hasDerivAt_mul_of_eq_zero {F R : ℂ → ℂ} {F' : ℂ} (hF : HasDerivAt F F' 0) (hF0 : F 0 = 0)
-    (hR : ContinuousAt R 0) : HasDerivAt (fun z => F z * R z) (F' * R 0) 0 := by
+theorem hasDerivAt_mul_of_eq_zero
+    {F R : ℂ → ℂ} {F' : ℂ} (hF : HasDerivAt F F' 0) (hF0 : F 0 = 0) (hR : ContinuousAt R 0)
+    : HasDerivAt (fun z => F z * R z) (F' * R 0) 0 := by
   rw [hasDerivAt_iff_tendsto_slope] at hF ⊢
   have hR' : Tendsto R (𝓝[≠] (0 : ℂ)) (𝓝 (R 0)) := hR.tendsto.mono_left nhdsWithin_le_nhds
   refine (hF.mul hR').congr' ?_
@@ -108,9 +109,10 @@ theorem hasDerivAt_mul_of_eq_zero {F R : ℂ → ℂ} {F' : ℂ} (hF : HasDerivA
   simp only [slope_def_field, hF0, sub_zero, zero_mul]
   ring
 
-theorem hasDerivAt_oddTheta_zero :
-    TripleProduct → ∀ τ : UpperHalfPlane,
-      HasDerivAt (oddTheta τ) (-2 * (Real.pi : ℂ) * ModularForm.eta (τ : ℂ) ^ 3) 0 := by
+theorem hasDerivAt_oddTheta_zero
+    : TripleProduct
+      → ∀ τ : UpperHalfPlane,
+        HasDerivAt (oddTheta τ) (-2 * (Real.pi : ℂ) * ModularForm.eta (τ : ℂ) ^ 3) 0 := by
   intro hT τ
   set F : ℂ → ℂ := fun z => cexp (π * I * (τ : ℂ) / 4 + π * I * (z + 1 / 2)) *
     (1 - cexp (-(2 * π * I * z))) with hFdef
@@ -122,15 +124,21 @@ theorem hasDerivAt_oddTheta_zero :
     rw [jacobiTheta₂_shift hT]
     ring
   have hF0 : F 0 = 0 := by simp [F]
-  have h1 : HasDerivAt (fun z : ℂ => cexp (π * I * (τ : ℂ) / 4 + π * I * (z + 1 / 2)))
+  have h1 : HasDerivAt
+      (fun z : ℂ => cexp (π * I * (τ : ℂ) / 4 + π * I * (z + 1 / 2)))
       (cexp (π * I * (τ : ℂ) / 4 + π * I * (0 + 1 / 2)) * (π * I * 1)) 0 :=
     ((((hasDerivAt_id (0 : ℂ)).add_const (1 / 2)).const_mul (π * I)).const_add _).cexp
-  have h2 : HasDerivAt (fun z : ℂ => 1 - cexp (-(2 * π * I * z)))
+  have h2 : HasDerivAt
+      (fun z : ℂ => 1 - cexp (-(2 * π * I * z)))
       (-(cexp (-(2 * π * I * 0)) * -(2 * π * I * 1))) 0 :=
     (((hasDerivAt_id (0 : ℂ)).const_mul (2 * π * I)).neg.cexp).const_sub 1
-  have hF : HasDerivAt F (cexp (π * I * (τ : ℂ) / 4 + π * I * (0 + 1 / 2)) * (π * I * 1) *
-      (1 - cexp (-(2 * π * I * 0))) + cexp (π * I * (τ : ℂ) / 4 + π * I * (0 + 1 / 2)) *
-      (-(cexp (-(2 * π * I * 0)) * -(2 * π * I * 1)))) 0 := h1.mul h2
+  have hF : HasDerivAt F
+      (cexp (π * I * (τ : ℂ) / 4 + π * I * (0 + 1 / 2)) * (π * I * 1)
+          * (1 - cexp (-(2 * π * I * 0)))
+        + cexp (π * I * (τ : ℂ) / 4 + π * I * (0 + 1 / 2))
+          * (-(cexp (-(2 * π * I * 0)) * -(2 * π * I * 1))))
+      0 :=
+    h1.mul h2
   have hR : ContinuousAt R 0 := by
     have hu : Continuous fun z : ℂ => cexp (2 * π * I * z) := by fun_prop
     have hv : Continuous fun z : ℂ => cexp (-(2 * π * I * z)) := by fun_prop
@@ -139,11 +147,12 @@ theorem hasDerivAt_oddTheta_zero :
   rw [hfun]
   have key := hasDerivAt_mul_of_eq_zero hF hF0 hR
   convert key using 1
-  have hT1 : tailProd τ 1 = ∏' n : ℕ, (1 - ModularForm.eta_q n (τ : ℂ)) := by
-    simp [tailProd]
+  have hT1 : tailProd τ 1 = ∏' n : ℕ, (1 - ModularForm.eta_q n (τ : ℂ)) := by simp [tailProd]
   have hq : (Function.Periodic.qParam 24 (τ : ℂ)) ^ 3 = cexp (π * I * (τ : ℂ) / 4) := by
     rw [Function.Periodic.qParam, ← Complex.exp_nat_mul]
-    congr 1; push_cast; ring
+    congr 1
+    push_cast
+    ring
   have hI : cexp (π * I * (τ : ℂ) / 4 + π * I * (0 + 1 / 2)) = cexp (π * I * (τ : ℂ) / 4) * I := by
     rw [Complex.exp_add]
     congr 1

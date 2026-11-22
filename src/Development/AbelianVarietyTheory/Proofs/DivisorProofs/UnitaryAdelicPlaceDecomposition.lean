@@ -6,19 +6,22 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DiscreteSeri
 
 @[expose] public section
 
-open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU GlobalTheory.LFun
+open GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels NumberField IsDedekindDomain
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes GlobalTheory.WeilM GlobalTheory.AdelicU
+  GlobalTheory.LFun
 
 noncomputable section
 
 namespace GlobalTheory.UnitaryPlaceSplit
 
-theorem mix_mul {S A : Type} [CommRing S] [Ring A] [Algebra S A] {e : S} (he : e * e = e) (x y z w : A) :
-    (e • x + (1 - e) • y) * (e • z + (1 - e) • w) = e • (x * z) + (1 - e) • (y * w) := by
+theorem mix_mul
+    {S A : Type} [CommRing S] [Ring A] [Algebra S A] {e : S} (he : e * e = e) (x y z w : A)
+    : (e • x + (1 - e) • y) * (e • z + (1 - e) • w) = e • (x * z) + (1 - e) • (y * w) := by
   have h0 : e * (1 - e) = 0 := by rw [mul_sub, mul_one, he, sub_self]
   have h0' : (1 - e) * e = 0 := by rw [mul_comm, h0]
   have h1 : (1 - e) * (1 - e) = 1 - e := by rw [sub_mul, one_mul, h0, sub_zero]
-  simp only [add_mul, mul_add, smul_mul_assoc, mul_smul_comm, smul_add, smul_smul, he, h0, h0', h1, zero_smul, add_zero,
-    zero_add]
+  simp only [add_mul, mul_add, smul_mul_assoc, mul_smul_comm, smul_add, smul_smul, he, h0, h0', h1,
+    zero_smul, add_zero, zero_add]
 
 variable {F : Type} [Field F] [NumberField F]
 
@@ -31,7 +34,8 @@ theorem idemAt_mul_self (v : Pl (F := F)) : idemAt v * idemAt v = idemAt v := by
   change singleFin v 1 * singleFin v 1 = singleFin v 1
   rw [← singleFin_mul, one_mul]
 
-theorem mul_idemAt_of_evFin (v : Pl (F := F)) {u : AF F} (hu : evFin F v u = 0) : u * idemAt v = 0 := by
+theorem mul_idemAt_of_evFin (v : Pl (F := F)) {u : AF F} (hu : evFin F v u = 0)
+    : u * idemAt v = 0 := by
   refine Prod.ext (show u.1 * (0 : Ainf F) = 0 from mul_zero _) ?_
   change u.2 * singleFin v 1 = 0
   refine af_ext fun w => ?_
@@ -50,10 +54,14 @@ namespace GlobalTheory.UnitaryPlaceSplit
 
 open Matrix
 
-theorem exists_split_at (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-    (σ : E →ₐ[F] E) (n : ℕ) (J : Matrix (Fin n) (Fin n) E) (v : Pl (F := F)) (g : UA σ J) :
-    ∃ g₁ g₂ : UA σ J, g = g₁ * g₂ ∧ At (evFin F v) (mat g₁ - 1) ∧
-      ∀ u : AF F, At (evFin F v) u → u • (mat g₂ - 1) = 0 := by
+theorem exists_split_at
+    (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+    (σ : E →ₐ[F] E)
+    (n : ℕ) (J : Matrix (Fin n) (Fin n) E)
+    (v : Pl (F := F)) (g : UA σ J)
+    : ∃ g₁ g₂ : UA σ J,
+      g = g₁ * g₂ ∧ At (evFin F v) (mat g₁ - 1)
+        ∧ ∀ u : AF F, At (evFin F v) u → u • (mat g₂ - 1) = 0 := by
   have hee : idemAt v * idemAt v = idemAt v := idemAt_mul_self v
   set e : AF F := idemAt v with he_def
   set G : Matrix (Fin n) (Fin n) (AE F E) := ((g.1 : GL (Fin n) (AE F E)) : Matrix (Fin n) (Fin n) (AE F E))
@@ -74,8 +82,10 @@ theorem exists_split_at (F E : Type) [Field F] [NumberField F] [Field E] [Number
     have hg : Gᵀ * incM F J * G.map (cA σ) = incM F J := g.2
     have hT : Mᵀ = e • Gᵀ + (1 - e) • (1 : Matrix (Fin n) (Fin n) (AE F E)) := by
       rw [hM, transpose_add, transpose_smul, transpose_smul, transpose_one]
-    have hc : M.map (cA σ) = e • G.map (cA σ) + (1 - e) • (1 : Matrix (Fin n) (Fin n) (AE F E)) := by
-      rw [← AlgHom.mapMatrix_apply, hM, map_add (f := _), map_smul, map_smul, map_one, AlgHom.mapMatrix_apply]
+    have hc
+        : M.map (cA σ) = e • G.map (cA σ) + (1 - e) • (1 : Matrix (Fin n) (Fin n) (AE F E)) := by
+      rw [← AlgHom.mapMatrix_apply, hM, map_add (f := _), map_smul, map_smul, map_one,
+        AlgHom.mapMatrix_apply]
     rw [hT, hc, split (incM F J), mix_mul hee, mix_mul hee, hg, one_mul, mul_one]
   let g₁ : UA σ J := ⟨g1gl, hmem⟩
   have hm1 : mat g₁ - 1 = e • (G - 1) := by
@@ -85,11 +95,13 @@ theorem exists_split_at (F E : Type) [Field F] [NumberField F] [Field E] [Number
   have hm2 : mat (g₁⁻¹ * g) - 1 = (1 - e) • (G - 1) := by
     change N * G - 1 = _
     conv_lhs => rw [split G]
-    rw [hN, mix_mul hee, hGiG, one_mul, smul_sub, sub_smul (1 : AF F) e (1 : Matrix (Fin n) (Fin n) (AE F E)), one_smul]
+    rw [hN, mix_mul hee, hGiG, one_mul, smul_sub,
+      sub_smul (1 : AF F) e (1 : Matrix (Fin n) (Fin n) (AE F E)), one_smul]
     abel
   refine ⟨g₁, g₁⁻¹ * g, (mul_inv_cancel_left g₁ g).symm, fun u hu => ?_, fun u hu => ?_⟩
   · rw [hm1, smul_smul, mul_idemAt_of_evFin v hu, zero_smul]
-  · have h1 : (1 - e) • u = 0 := hu (1 - e) (by rw [map_sub, map_one, he_def, evFin_idemAt, sub_self])
+  · have h1 : (1 - e) • u = 0 :=
+      hu (1 - e) (by rw [map_sub, map_one, he_def, evFin_idemAt, sub_self])
     rw [hm2, smul_smul, mul_comm, ← smul_eq_mul, h1, zero_smul]
 
 end GlobalTheory.UnitaryPlaceSplit

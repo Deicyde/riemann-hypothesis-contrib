@@ -13,24 +13,33 @@ namespace PI.VolStabS
 
 open MeasureTheory Topology Set
 
-theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddCommGroup V]
-    [TopologicalSpace V] [IsTopologicalAddGroup V] [MeasurableSpace V] [BorelSpace V]
-    [AddCommGroup X] [TopologicalSpace X] [IsTopologicalAddGroup X] [T2Space X]
-    [MeasurableSpace X] [BorelSpace X] (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure]
-    [ν.IsAddHaarMeasure] (f : V → Y) (ι : X → Y) (hι : Function.Injective ι) (G : V → X)
-    (hG : Continuous G) (hfG : ∀ v, f v = ι (G v)) (y : V) (Λ : ℕ → AddSubgroup V)
-    (H : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set V)) (hΛc : ∀ n, IsCompact (Λ n : Set V))
-    (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X)) (hHc : ∀ n, IsCompact (H n : Set X))
-    (hHb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N) (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n)
-    (hyp : ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1)) :
-    ∃ g : X → ℝ, Continuous g ∧ ∀ S : Set X, IsCompact S →
-      ∫ v in f ⁻¹' (ι '' S), {z | z - y ∈ Λ 0}.indicator (fun _ => (1 : ℝ)) v ∂μ =
-        ∫ b in S, g b ∂ν := by
+theorem densCos_of_filt
+    (hP1 : HenselCount) (hP2 : CosDens)
+    {V X Y : Type} [AddCommGroup V] [TopologicalSpace V] [IsTopologicalAddGroup V]
+    [MeasurableSpace V] [BorelSpace V] [AddCommGroup X] [TopologicalSpace X]
+    [IsTopologicalAddGroup X] [T2Space X] [MeasurableSpace X] [BorelSpace X]
+    (μ : Measure V) (ν : Measure X) [μ.IsAddHaarMeasure] [ν.IsAddHaarMeasure]
+    (f : V → Y)
+    (ι : X → Y) (hι : Function.Injective ι)
+    (G : V → X) (hG : Continuous G) (hfG : ∀ v, f v = ι (G v))
+    (y : V)
+    (Λ : ℕ → AddSubgroup V) (H : ℕ → AddSubgroup X) (hΛo : ∀ n, IsOpen (Λ n : Set V))
+    (hΛc : ∀ n, IsCompact (Λ n : Set V)) (hΛa : Antitone Λ) (hHo : ∀ n, IsOpen (H n : Set X))
+    (hHc : ∀ n, IsCompact (H n : Set X)) (hHb : ∀ N ∈ 𝓝 (0 : X), ∃ n, (H n : Set X) ⊆ N)
+    (D : V →+ X) (hD : ∀ n, (Λ n).map D = H n)
+    (hyp : ∀ n, ∀ Z ∈ Λ 0, ∀ W ∈ Λ n, G (y + Z + W) - G (y + Z) - D W ∈ H (n + 1))
+    : ∃ g : X → ℝ,
+      Continuous g
+        ∧ ∀ S : Set X,
+          IsCompact S
+            → ∫ v in f ⁻¹' (ι '' S), {z | z - y ∈ Λ 0}.indicator (fun _ => (1 : ℝ)) v ∂μ
+              = ∫ b in S, g b ∂ν := by
   have hHa : Antitone H := fun m n hmn => by
     rw [← hD, ← hD]
     exact AddSubgroup.map_mono (hΛa hmn)
   set Q : Set V := {z | z - y ∈ Λ 0} with hQ
-  have hQm : MeasurableSet Q := ((hΛo 0).preimage (continuous_id.sub continuous_const)).measurableSet
+  have hQm : MeasurableSet Q :=
+    ((hΛo 0).preimage (continuous_id.sub continuous_const)).measurableSet
   have hQf : μ Q ≠ ⊤ := (isCompact_cos (Λ 0) (hΛc 0) y).measure_lt_top.ne
   set C : Set X := {z | z - G y ∈ H 0} with hC
   have hCo : IsOpen C := (hHo 0).preimage (continuous_id.sub continuous_const)
@@ -40,14 +49,13 @@ theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddC
   set m : Measure X := (μ.restrict Q).map G with hm
   have : IsFiniteMeasure (μ.restrict Q) := ⟨by rw [Measure.restrict_apply_univ]; exact hQf.lt_top⟩
   have : IsFiniteMeasure m := by rw [hm]; infer_instance
-  have hcos_m : ∀ (h : X) (n : ℕ), m {z | z - h ∈ H n} =
-      μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} := by
+  have hcos_m : ∀ (h : X) (n : ℕ), m {z | z - h ∈ H n} = μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} := by
     intro h n
     have hmeas : MeasurableSet {z : X | z - h ∈ H n} :=
       ((hHo n).preimage (continuous_id.sub continuous_const)).measurableSet
     rw [hm, Measure.map_apply hGm hmeas, Measure.restrict_apply (hGm hmeas)]
-    have : G ⁻¹' {z | z - h ∈ H n} ∩ Q =
-        (fun X => -y + X) ⁻¹' {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} := by
+    have : G ⁻¹' {z | z - h ∈ H n} ∩ Q
+        = (fun X => -y + X) ⁻¹' {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} := by
       ext X
       simp only [mem_inter_iff, mem_preimage, mem_setOf_eq, hQ, neg_add_eq_sub]
       rw [add_sub_cancel]
@@ -66,14 +74,16 @@ theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddC
     intro n h hh
     have e := hP1 V X μ ν inferInstance inferInstance Λ H hΛo hΛc hΛa hHo hHc D hD G y hyp n h hh
     rw [hcos_m, hcos_ν]
-    calc μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n}
-        = μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} * (ν (H 0) * (ν (H 0))⁻¹) := by
-          rw [ENNReal.mul_inv_cancel hH0 hH0t, mul_one]
+    calc
+      μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n}
+          = μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} * (ν (H 0) * (ν (H 0))⁻¹) := by
+        rw [ENNReal.mul_inv_cancel hH0 hH0t, mul_one]
       _ = μ {Z | Z ∈ Λ 0 ∧ G (y + Z) - h ∈ H n} * ν (H 0) * (ν (H 0))⁻¹ := (mul_assoc _ _ _).symm
       _ = μ (Λ 0) * ν (H n) * (ν (H 0))⁻¹ := by rw [e]
       _ = κ * ν (H n) := by rw [hκ]; ring
   have hCc : m Cᶜ = 0 := by
-    rw [hm, Measure.map_apply hGm hCo.measurableSet.compl, Measure.restrict_apply (hGm hCo.measurableSet.compl)]
+    rw [hm, Measure.map_apply hGm hCo.measurableSet.compl,
+      Measure.restrict_apply (hGm hCo.measurableSet.compl)]
     have : G ⁻¹' Cᶜ ∩ Q = ∅ := by
       ext X
       simp only [mem_inter_iff, mem_preimage, mem_compl_iff, hC, hQ, mem_setOf_eq,
@@ -92,18 +102,23 @@ theorem densCos_of_filt (hP1 : HenselCount) (hP2 : CosDens) {V X Y : Type} [AddC
     intro b
     by_cases hb : b ∈ C
     · exact ⟨C, hCo, hb, fun b' hb' => by rw [indicator_of_mem hb', indicator_of_mem hb]⟩
-    · exact ⟨Cᶜ, hCcl.isOpen_compl, hb, fun b' hb' => by
-        rw [indicator_of_notMem hb', indicator_of_notMem hb]⟩
-  refine ⟨fun b => κ.toReal * C.indicator (fun _ => (1 : ℝ)) b, continuous_const.mul hgc,
-    fun S hS => ?_⟩
+    · exact ⟨
+        Cᶜ,
+        hCcl.isOpen_compl,
+        hb,
+        fun b' hb' => by rw [indicator_of_notMem hb', indicator_of_notMem hb]
+      ⟩
+  refine
+    ⟨fun b => κ.toReal * C.indicator (fun _ => (1 : ℝ)) b, continuous_const.mul hgc, fun S hS => ?_⟩
   have hSm : MeasurableSet S := hS.isClosed.measurableSet
   have hP : f ⁻¹' (ι '' S) = G ⁻¹' S := by
     ext X
     simp only [mem_preimage, mem_image, hfG]
     exact ⟨fun ⟨s, hs, e⟩ => hι e ▸ hs, fun h => ⟨G X, h, rfl⟩⟩
-  rw [hP, integral_indicator_const _ hQm, integral_const_mul, integral_indicator_const _ hCo.measurableSet,
-    Measure.real, Measure.real, Measure.restrict_apply hQm, Measure.restrict_apply hCo.measurableSet,
-    smul_eq_mul, smul_eq_mul, mul_one, mul_one, ← ENNReal.toReal_mul]
+  rw [hP, integral_indicator_const _ hQm, integral_const_mul,
+    integral_indicator_const _ hCo.measurableSet, Measure.real, Measure.real,
+    Measure.restrict_apply hQm, Measure.restrict_apply hCo.measurableSet, smul_eq_mul, smul_eq_mul,
+    mul_one, mul_one, ← ENNReal.toReal_mul]
   congr 1
   have e := key S hS
   rw [hm, Measure.map_apply hGm hSm, Measure.restrict_apply (hGm hSm)] at e

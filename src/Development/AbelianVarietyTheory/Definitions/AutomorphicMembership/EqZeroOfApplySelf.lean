@@ -13,7 +13,8 @@ namespace GlobalTheory.LocM.TorCheck
 
 variable {O : Type} [CommRing O] {X : Type} [AddCommGroup X] [Module O X] [Module.Finite O X]
 
-theorem minVal_eval (B : X → X → ℝ) : (InvFun.minVal O).eval X B = sInf {x | (∃ y, B y y = x) ∧ x ≠ B 0 0} := by
+theorem minVal_eval (B : X → X → ℝ)
+    : (InvFun.minVal O).eval X B = sInf {x | (∃ y, B y y = x) ∧ x ≠ B 0 0} := by
   obtain ⟨n, r, hr⟩ := Module.Finite.exists_fin' O X
   rw [InvFun.eval_eq _ hr]
   change sInf _ = _
@@ -24,8 +25,8 @@ theorem minVal_eval (B : X → X → ℝ) : (InvFun.minVal O).eval X B = sInf {x
 
 theorem minVal_linearOn (γ : LinearMap.BilinForm ℤ X) : (InvFun.minVal O).LinearOn ![γ] := by
   intro c hc
-  simp only [Fin.sum_univ_one, Matrix.cons_val_zero, InvFun.evalZ, minVal_eval, map_zero, Int.cast_zero, mul_zero,
-    LinearMap.zero_apply]
+  simp only [Fin.sum_univ_one, Matrix.cons_val_zero, InvFun.evalZ, minVal_eval, map_zero,
+    Int.cast_zero, mul_zero, LinearMap.zero_apply]
   rcases (hc 0).eq_or_lt with h | h
   · rw [← h]
     simp only [zero_mul]

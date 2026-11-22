@@ -18,15 +18,15 @@ noncomputable section
 
 def DualTopSubLattice.Statement : Prop :=
   ∀ (K : Type) [Field K] [NumberField K] (i : ℕ) (F F' : HermLattice K i) (T T' : Type) [Fintype T]
-    [DecidableEq T] [Fintype T'] [DecidableEq T'] (b : Module.Basis T ℤ (dualLattice F))
-    (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b)))
-    (b' : Module.Basis T' ℤ (dualLattice F'))
-    (hb' : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b'))) (II : IntersectionSystem),
-    1 ≤ i → IsIntersectionSystem II → F'.lattice ≤ F.lattice →
-    II Unit (dualBlocks T') (dualIdeal b') i (fun _ => dualLine F'.withStdMetric b' hb') =
-      II Unit (dualBlocks T) (dualIdeal b) i (fun _ => dualLine F.withStdMetric b hb) +
-        (F.withStdMetric.degree - F'.withStdMetric.degree) *
-          geomDeg (grassIdeal 1 1 (i - 1)) (fsMulti (plBlocks 1 1 (i - 1))) (1 * 1 * (i - 1))
+      [DecidableEq T] [Fintype T'] [DecidableEq T'] (b : Module.Basis T ℤ (dualLattice F))
+      (hb : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b)))
+      (b' : Module.Basis T' ℤ (dualLattice F'))
+      (hb' : Function.Bijective (Matrix.mulVecLin (dualEmbMatrix b'))) (II : IntersectionSystem),
+    1 ≤ i → IsIntersectionSystem II → F'.lattice ≤ F.lattice
+      → II Unit (dualBlocks T') (dualIdeal b') i (fun _ => dualLine F'.withStdMetric b' hb')
+        = II Unit (dualBlocks T) (dualIdeal b) i (fun _ => dualLine F.withStdMetric b hb)
+          + (F.withStdMetric.degree - F'.withStdMetric.degree)
+            * geomDeg (grassIdeal 1 1 (i - 1)) (fsMulti (plBlocks 1 1 (i - 1))) (1 * 1 * (i - 1))
 
 def twoVecExample : Fin 1 → ℚ := fun _ => 2
 
@@ -46,8 +46,8 @@ def HermLattice.twiceStandardExample : HermLattice ℚ 1 where
   posDef := fun _ => Matrix.PosDef.one
   conj := fun _ => by simp
 
-theorem twiceStandardExample_le :
-    HermLattice.twiceStandardExample.lattice ≤ (HermLattice.standard ℚ 1).lattice := by
+theorem twiceStandardExample_le
+    : HermLattice.twiceStandardExample.lattice ≤ (HermLattice.standard ℚ 1).lattice := by
   show Submodule.span (𝓞 ℚ) {twoVecExample} ≤ _
   rw [Submodule.span_le, Set.singleton_subset_iff]
   have h : twoVecExample = (2 : 𝓞 ℚ) • (Pi.single 0 1 : Fin 1 → ℚ) := by

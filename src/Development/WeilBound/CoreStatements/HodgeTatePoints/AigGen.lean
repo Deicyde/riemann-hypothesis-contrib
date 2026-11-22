@@ -15,13 +15,16 @@ public import GroundTheory.HeightsAndTheta.Heights.Intersections.PAdjoinIndepRel
 
 @[expose] public section
 
-open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
+open MvPolynomial ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.AI.I1 ReciprocityTheory.ChartRestriction.G.AI.I4
 
 namespace PositivityTheory.HtPt.Aig
 
 theorem coordFibreDeg : GroundTheory.Heights₂.Heights.Targets.CoordFibreDeg.Statement :=
-  GroundTheory.Heights₂.Heights.Targets.CoordFibreDeg.proof GroundTheory.Heights₂.Heights.Targets.FibreMultiHomog.proof
-    (GroundTheory.Heights₂.Heights.Targets.GenFibreChartDeg.proof GroundTheory.Heights₂.Heights.Inter.ChartScalingIndep.proof
+  GroundTheory.Heights₂.Heights.Targets.CoordFibreDeg.proof
+    GroundTheory.Heights₂.Heights.Targets.FibreMultiHomog.proof
+    (GroundTheory.Heights₂.Heights.Targets.GenFibreChartDeg.proof
+      GroundTheory.Heights₂.Heights.Inter.ChartScalingIndep.proof
       GroundTheory.Heights₂.Heights.Inter.AdjoinIndepRelfinrank.proof)
     GroundTheory.Heights₂.Heights.Targets.CoordRatioDeg.proof
 
@@ -45,7 +48,6 @@ theorem genDeg_of_coord (hPF : PFCoordStatement) (hFD : FibreDimStatement) : Gen
   rw [hPF I hI K ι K' ι' κ v Ω y d L L' hv hP' hP hL hLL', h0,
     coordFibreDeg K ι K' ι' κ v Ω y d G i hv hP' hP hi, Int.cast_natCast]
 
-theorem genDeg : PFCoordStatement → FibreDimStatement → GenDegStatement :=
-  genDeg_of_coord
+theorem genDeg : PFCoordStatement → FibreDimStatement → GenDegStatement := genDeg_of_coord
 
 end PositivityTheory.HtPt.Aig

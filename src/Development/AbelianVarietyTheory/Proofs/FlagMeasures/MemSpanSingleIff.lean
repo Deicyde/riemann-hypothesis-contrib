@@ -14,16 +14,17 @@ open scoped Pointwise ENNReal Classical
 
 namespace GlobalTheory.HL.Glue
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
-
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {sig : E →ₐ[F] E}
 
 open ValuativeRel NumberField IsDedekindDomain in
 open scoped Pointwise ENNReal Classical in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.HL.Glue.mem_span_single_iff {R : Type} [CommRing R] (O : Subring R) (n : ℕ)
-    (v : Fin n → R) :
-    v ∈ Submodule.span O (Set.range fun i => (Pi.single i 1 : Fin n → R)) ↔ ∀ i, v i ∈ O := by
+theorem _root_.GlobalTheory.HL.Glue.mem_span_single_iff
+    {R : Type} [CommRing R] (O : Subring R) (n : ℕ) (v : Fin n → R)
+    : v ∈ Submodule.span O (Set.range fun i => (Pi.single i 1 : Fin n → R)) ↔ ∀ i, v i ∈ O := by
   constructor
   · intro hv
     induction hv using Submodule.span_induction with
@@ -43,14 +44,15 @@ theorem _root_.GlobalTheory.HL.Glue.mem_span_single_iff {R : Type} [CommRing R] 
     rw [hsum]
     exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨i, rfl⟩)
 
-
 open ValuativeRel NumberField IsDedekindDomain in
 open scoped Pointwise ENNReal Classical in
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
   {sig : E →ₐ[F] E} in
-theorem _root_.GlobalTheory.HL.Glue.ιE_mem (A : _root_.GlobalTheory.HL.Places F E sig)
-    (p : HeightOneSpectrum (𝓞 F)) (x : E) (hx : IsIntegral ℤ x) :
-    (A.loc p).ιE x ∈ (A.L p).O := by
+theorem _root_.GlobalTheory.HL.Glue.ιE_mem
+    (A : _root_.GlobalTheory.HL.Places F E sig) (p : HeightOneSpectrum (𝓞 F))
+    (x : E) (hx : IsIntegral ℤ x)
+    : (A.loc p).ιE x ∈ (A.L p).O := by
   rw [_root_.Formalism.MainNotions.S.Loc.LocE.O_def]
   exact (hx.map (A.loc p).ιE.toIntAlgHom).tower_top
 

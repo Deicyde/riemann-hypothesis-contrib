@@ -15,12 +15,14 @@ namespace ReciprocityTheory.ChartRestriction.G.TB.LogPf
 variable {k : Type} [CommRing k] [Algebra ℚ k] {τ : Type} [Fintype τ] [DecidableEq τ]
 
 def prim (ω : τ → MvPowerSeries τ k) : MvPowerSeries τ k := fun m =>
-  algebraMap ℚ k ((m.degree : ℚ)⁻¹) *
-    ∑ w, if m w = 0 then 0 else coeff (m - Finsupp.single w 1) (ω w)
+  algebraMap ℚ k ((m.degree : ℚ)⁻¹)
+    * ∑ w, if m w = 0 then 0 else coeff (m - Finsupp.single w 1) (ω w)
 
-theorem coeff_prim (ω : τ → MvPowerSeries τ k) (m : τ →₀ ℕ) :
-    coeff m (prim ω) = algebraMap ℚ k ((m.degree : ℚ)⁻¹) *
-      ∑ w, if m w = 0 then 0 else coeff (m - Finsupp.single w 1) (ω w) := rfl
+theorem coeff_prim (ω : τ → MvPowerSeries τ k) (m : τ →₀ ℕ)
+    : coeff m (prim ω)
+      = algebraMap ℚ k ((m.degree : ℚ)⁻¹)
+        * ∑ w, if m w = 0 then 0 else coeff (m - Finsupp.single w 1) (ω w) :=
+  rfl
 
 theorem constantCoeff_prim (ω : τ → MvPowerSeries τ k) : constantCoeff (prim ω) = 0 := by
   rw [← coeff_zero_eq_constantCoeff_apply, coeff_prim]
@@ -31,13 +33,17 @@ theorem degree_eq_sum (n : τ →₀ ℕ) : n.degree = ∑ w, n w := by
   unfold Finsupp.degree
   exact Finset.sum_subset (Finset.subset_univ _) (fun i _ hi => by simpa using hi)
 
-theorem pderiv_prim (ω : τ → MvPowerSeries τ k)
-    (hω : ∀ a c, pderiv (R := k) c (ω a) = pderiv (R := k) a (ω c)) (v : τ) : pderiv (R := k) v (prim ω) = ω v := by
+theorem pderiv_prim
+    (ω : τ → MvPowerSeries τ k) (hω : ∀ a c, pderiv (R := k) c (ω a) = pderiv (R := k) a (ω c))
+    (v : τ)
+    : pderiv (R := k) v (prim ω) = ω v := by
   ext m
   rw [coeff_pderiv, coeff_prim]
   set n := m + Finsupp.single v 1 with hn
-  have key : ∀ w, (if n w = 0 then 0 else coeff (n - Finsupp.single w 1) (ω w)) * ((m v : k) + 1)
-      = (n w : k) * coeff m (ω v) := by
+  have key
+      : ∀ w,
+        (if n w = 0 then 0 else coeff (n - Finsupp.single w 1) (ω w)) * ((m v : k) + 1)
+          = (n w : k) * coeff m (ω v) := by
     intro w
     by_cases hw : w = v
     · subst hw
@@ -51,7 +57,8 @@ theorem pderiv_prim (ω : τ → MvPowerSeries τ k)
       · rw [if_pos (by rw [h1, hm]), h1, hm]
         simp
       · rw [if_neg (by rw [h1]; exact hm), h1]
-        have hle : Finsupp.single w 1 ≤ m := Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hm)
+        have hle : Finsupp.single w 1 ≤ m :=
+          Finsupp.single_le_iff.mpr (Nat.one_le_iff_ne_zero.mpr hm)
         have hc := congrArg (coeff (m - Finsupp.single w 1)) (hω w v)
         rw [coeff_pderiv, coeff_pderiv] at hc
         have e1 : m - Finsupp.single w 1 + Finsupp.single v 1 = n - Finsupp.single w 1 := by
@@ -66,8 +73,9 @@ theorem pderiv_prim (ω : τ → MvPowerSeries τ k)
         rw [e1, e2, e3, e4] at hc
         rw [hc]
         ring
-  have hsum : (∑ w, if n w = 0 then 0 else coeff (n - Finsupp.single w 1) (ω w)) * ((m v : k) + 1)
-      = (n.degree : k) * coeff m (ω v) := by
+  have hsum
+      : (∑ w, if n w = 0 then 0 else coeff (n - Finsupp.single w 1) (ω w)) * ((m v : k) + 1)
+        = (n.degree : k) * coeff m (ω v) := by
     rw [Finset.sum_mul, Finset.sum_congr rfl (fun w _ => key w), ← Finset.sum_mul, degree_eq_sum,
       Nat.cast_sum]
   have hnv : n v = m v + 1 := by simp [hn]

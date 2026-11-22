@@ -8,18 +8,20 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ConjugateRe
 
 open UpperTheory.V.Cj.A UpperTheory.V.Lit.Geo
 
-private theorem contDiffOn_finsum_locally_finite_smul {V A I : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup A]
-    [NormedSpace ℝ A] (Y : Set V) (φ : I → V → ℝ) (w : I → V → A)
+private theorem contDiffOn_finsum_locally_finite_smul
+    {V A I : Type} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup A] [NormedSpace ℝ A]
+    (Y : Set V) (φ : I → V → ℝ) (w : I → V → A)
     (hφ : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (φ i) Y)
     (hw : ∀ i, ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (w i) Y)
-    (hfin : ∀ p ∈ Y, ∃ N ∈ nhds p, {i | ∃ x ∈ N, φ i x ≠ 0}.Finite) :
-    ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun p => ∑ᶠ i, φ i p • w i p) Y := by
+    (hfin : ∀ p ∈ Y, ∃ N ∈ nhds p, {i | ∃ x ∈ N, φ i x ≠ 0}.Finite)
+    : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun p => ∑ᶠ i, φ i p • w i p) Y := by
   apply contDiffOn_of_locally_contDiffOn
   intro p hp
   obtain ⟨N, hN, hNf⟩ := hfin p hp
   obtain ⟨U, hUN, hUo, hpU⟩ := mem_nhds_iff.mp hN
   refine ⟨U, hUo, hpU, ?_⟩
-  have hsum : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun p => ∑ i ∈ hNf.toFinset, φ i p • w i p) (Y ∩ U) :=
+  have hsum
+      : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fun p => ∑ i ∈ hNf.toFinset, φ i p • w i p) (Y ∩ U) :=
     ContDiffOn.sum (fun i _ => ((hφ i).smul (hw i)).mono Set.inter_subset_left)
   refine hsum.congr ?_
   intro y hy
@@ -31,37 +33,52 @@ private theorem contDiffOn_finsum_locally_finite_smul {V A I : Type} [NormedAddC
   apply hi
   simp [h0]
 
-theorem UpperTheory.V.Cj.A.bwdStep :
-    BwdStep := by
+theorem UpperTheory.V.Cj.A.bwdStep : BwdStep := by
   intro Γ V S I _ _ _ _ d G φ hφ C F hC q k u hu hhd hvan
   have hfinY : ∀ s, ∀ p ∈ G.Y, {i | φ i s p ≠ 0}.Finite := by
     intro s p hp
     obtain ⟨N, hN, hf⟩ := hφ.locFin s p hp
     exact hf.subset (fun i hi => ⟨p, mem_of_mem_nhds hN, hi⟩)
-  have hsupp : ∀ (c : I → ↥(G.Om q)) (s : S) (p : V), Function.HasFiniteSupport
-      (fun i => φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p) := by
+  have hsupp
+      : ∀ (c : I → ↥(G.Om q)) (s : S) (p : V),
+        Function.HasFiniteSupport (fun i =>
+          φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p) := by
     intro c s p
     by_cases hp : p ∈ G.Y
     · refine (hfinY s p hp).subset ?_
       intro i hi h0
       apply hi
       simp [h0]
-    · have hz : (fun i => φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p) = 0 := by
+    · have hz
+          : (fun i => φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p)
+            = 0 := by
         funext i
         rw [((c i).2 s).2 p hp, smul_zero]
         rfl
       rw [hz]
       exact Set.finite_empty.subset (fun i hi => hi rfl)
-  have hex : ∀ c : I → ↥(G.Om q), ∃ w : ↥(G.Om q), ∀ s p,
-      (w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p
-        = ∑ᶠ i, φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p := by
+  have hex
+      : ∀ c : I → ↥(G.Om q), ∃ w : ↥(G.Om q), ∀ s p,
+        (w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p
+          = ∑ᶠ i, φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p := by
     intro c
-    refine ⟨⟨fun s p => ∑ᶠ i, φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p, ?_⟩,
-      fun s p => rfl⟩
+    refine ⟨
+      ⟨
+        fun s p => ∑ᶠ i, φ i s p • ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p,
+        ?_
+      ⟩,
+      fun s p => rfl
+    ⟩
     intro s
-    refine ⟨contDiffOn_finsum_locally_finite_smul G.Y (fun i => φ i s)
-      (fun i => ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s)
-      (fun i => hφ.smooth i s) (fun i => ((c i).2 s).1) (hφ.locFin s), ?_⟩
+    refine ⟨
+      contDiffOn_finsum_locally_finite_smul G.Y
+        (fun i => φ i s)
+        (fun i => ((c i : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s)
+        (fun i => hφ.smooth i s)
+        (fun i => ((c i).2 s).1)
+        (hφ.locFin s),
+      ?_
+    ⟩
     intro p hp
     apply finsum_eq_zero_of_forall_eq_zero
     intro i
@@ -74,7 +91,8 @@ theorem UpperTheory.V.Cj.A.bwdStep :
       rw [← Equiv.Perm.mul_apply, ← map_mul, mul_inv_cancel, map_one, Equiv.Perm.one_apply]
     have hρ : ∀ v, G.ρ γ (G.ρ γ⁻¹ v) = v := by
       intro v
-      rw [← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel, map_one, ContinuousLinearMap.one_apply]
+      rw [← ContinuousLinearMap.mul_apply, ← map_mul, mul_inv_cancel, map_one,
+        ContinuousLinearMap.one_apply]
     apply Subtype.ext
     funext s p
     show _ = G.tr q γ (((Sm fun i => u (i :: x)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) (G.σ γ⁻¹ s) (G.ρ γ⁻¹ p))
@@ -92,21 +110,25 @@ theorem UpperTheory.V.Cj.A.bwdStep :
   · intro x hx
     apply Subtype.ext
     funext s p
-    let ev : ↥(G.Om q) →+ V [⋀^Fin q]→L[ℝ] (Fin d → ℂ) :=
-      { toFun := fun w => (w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p, map_zero' := rfl,
-        map_add' := fun _ _ => rfl }
+    let ev : ↥(G.Om q) →+ V [⋀^Fin q]→L[ℝ] (Fin d → ℂ) := {
+      toFun := fun w => (w : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p
+      map_zero' := rfl
+      map_add' := fun _ _ => rfl
+    }
     change ev (hd (fun y => Sm fun i => u (i :: y)) x) = ev (u x)
     rw [← hdFacts.2.2.2.1 I _ _ ev (fun y => Sm fun i => u (i :: y)) x]
     have hinner : ∀ i, hd (fun y => ev (u (i :: y))) x = ev (u x) := by
       intro i
       have h2 := hdFacts.2.1 I _ u i x
       rw [hhd (i :: x) (by simp [hx]), eq_comm, sub_eq_zero] at h2
-      calc hd (fun y => ev (u (i :: y))) x = ev (hd (fun y => u (i :: y)) x) :=
-            hdFacts.2.2.2.1 I _ _ ev (fun y => u (i :: y)) x
+      calc
+        hd (fun y => ev (u (i :: y))) x
+          = ev (hd (fun y => u (i :: y)) x) := hdFacts.2.2.2.1 I _ _ ev (fun y => u (i :: y)) x
         _ = ev (u x) := by rw [← h2]
     by_cases hp : p ∈ G.Y
-    · have hrw : (fun y => ev (Sm fun i => u (i :: y)))
-          = fun y => ∑ i ∈ (hfinY s p hp).toFinset, φ i s p • ev (u (i :: y)) := by
+    · have hrw
+          : (fun y => ev (Sm fun i => u (i :: y)))
+            = fun y => ∑ i ∈ (hfinY s p hp).toFinset, φ i s p • ev (u (i :: y)) := by
         funext y
         show ((Sm fun i => u (i :: y) : ↥(G.Om q)) : S → V → V [⋀^Fin q]→L[ℝ] (Fin d → ℂ)) s p = _
         rw [hSm]
@@ -118,8 +140,9 @@ theorem UpperTheory.V.Cj.A.bwdStep :
         apply hi
         simp [h0]
       rw [hrw]
-      have hsplit : hd (fun y => ∑ i ∈ (hfinY s p hp).toFinset, φ i s p • ev (u (i :: y))) x
-          = ∑ i ∈ (hfinY s p hp).toFinset, φ i s p • hd (fun y => ev (u (i :: y))) x := by
+      have hsplit
+          : hd (fun y => ∑ i ∈ (hfinY s p hp).toFinset, φ i s p • ev (u (i :: y))) x
+            = ∑ i ∈ (hfinY s p hp).toFinset, φ i s p • hd (fun y => ev (u (i :: y))) x := by
         simp only [UpperTheory.V.Lit.Geo.hd, Finset.smul_sum]
         rw [Finset.sum_comm]
         apply Finset.sum_congr rfl

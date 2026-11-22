@@ -13,14 +13,16 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalPr
 @[expose] public section
 
 noncomputable section
-open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
+open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex
+  GlobalTheory.EtC
 
 namespace GlobalTheory.EtC.SuppAcyc
 
 variable {R : Type} [CommRing R]
 
-theorem map_comp {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}} (a : Sec F U) :
-    Sec.map (φ ≫ ψ) a = Sec.map ψ (Sec.map φ a) := rfl
+theorem map_comp {F G H : Shv R} (φ : F ⟶ G) (ψ : G ⟶ H) {U : Scheme.{0}} (a : Sec F U)
+    : Sec.map (φ ≫ ψ) a = Sec.map ψ (Sec.map φ a) :=
+  rfl
 
 theorem map_zero' {F G : Shv R} (φ : F ⟶ G) {U : Scheme.{0}} : Sec.map φ (0 : Sec F U) = 0 :=
   map_zero (φ.hom.app (op U)).hom
@@ -28,23 +30,32 @@ theorem map_zero' {F G : Shv R} (φ : F ⟶ G) {U : Scheme.{0}} : Sec.map φ (0 
 theorem res_zero' {F : Shv R} {V U : Scheme.{0}} (g : V ⟶ U) : Sec.res g (0 : Sec F U) = 0 :=
   map_zero (F.obj.map g.op).hom
 
-theorem cpush_zero (K I J : Cx R) (n : ℤ) (x : CohomologyClass K I n) : cpush K (0 : I ⟶ J) n x = 0 := by
+theorem cpush_zero (K I J : Cx R) (n : ℤ) (x : CohomologyClass K I n)
+    : cpush K (0 : I ⟶ J) n x = 0 := by
   obtain ⟨x, rfl⟩ := x.mk_surjective
   rw [cpush, cpost_mk]
   have : zcomp x (Cocycle.ofHom (0 : I ⟶ J)) (add_zero n) = 0 := Cocycle.ext (by simp [zcomp])
   rw [this]
   exact CohomologyClass.mk_zero _ _ _
 
-theorem delta_comp_ofHom {K I J : Cx R} {n : ℤ} (a : Cochain K I n) (f : I ⟶ J) :
-    δ n (n + 1) (a.comp (Cochain.ofHom f) (add_zero n)) = (δ n (n + 1) a).comp (Cochain.ofHom f) (add_zero _) := by
+theorem delta_comp_ofHom {K I J : Cx R} {n : ℤ} (a : Cochain K I n) (f : I ⟶ J)
+    : δ n (n + 1) (a.comp (Cochain.ofHom f) (add_zero n))
+      = (δ n (n + 1) a).comp (Cochain.ofHom f) (add_zero _) := by
   rw [δ_comp _ _ (add_zero n) (n + 1) 1 (n + 1) rfl rfl (zero_add 1)]
   simp
 
 end GlobalTheory.EtC.SuppAcyc
 
-
 open GlobalTheory.EtC.SuppAcyc in
-theorem GlobalTheory.EtC.subsingleton_of_locExact_supp : ∀ (R : Type) [CommRing R] (E : Spc) (C : Cx R) [C.IsKInjective], (∀ (U : Scheme.{0}), Nonempty (Sx E 0 U) → ∀ (n : ℤ) (b : Sec (C.X n) U), Sec.map (C.d n (n + 1)) b = 0 → Loc U fun V g => ∃ a : Sec (C.X (n - 1)) V, Sec.map (C.d (n - 1) n) a = Sec.res g b) → ∀ n, Subsingleton (CohomologyClass ((chains R).obj E) C n) := by
+theorem GlobalTheory.EtC.subsingleton_of_locExact_supp
+    : ∀ (R : Type) [CommRing R] (E : Spc) (C : Cx R) [C.IsKInjective],
+      (∀ (U : Scheme.{0}),
+          Nonempty (Sx E 0 U)
+            → ∀ (n : ℤ) (b : Sec (C.X n) U),
+              Sec.map (C.d n (n + 1)) b = 0
+                → Loc U fun V g =>
+                  ∃ a : Sec (C.X (n - 1)) V, Sec.map (C.d (n - 1) n) a = Sec.res g b)
+        → ∀ n, Subsingleton (CohomologyClass ((chains R).obj E) C n) := by
   intro R _ E C _ hC n
   let Z : Scheme.{0} → Prop := fun U => Nonempty (Sx E 0 U)
   have hZ : ∀ (V U : Scheme.{0}) (_ : V ⟶ U), Z U → Z V := fun V U g ⟨x⟩ => ⟨Sx.res g x⟩
@@ -55,7 +66,8 @@ theorem GlobalTheory.EtC.subsingleton_of_locExact_supp : ∀ (R : Type) [CommRin
 
   have hD : D.Acyclic := by
     intro k
-    rw [HomologicalComplex.exactAt_iff' D (k - 1) k (k + 1) (by simp) (by simp), GlobalTheory.T.etaleSheaf_shortComplex_exact_iff_locally]
+    rw [HomologicalComplex.exactAt_iff' D (k - 1) k (k + 1) (by simp) (by simp),
+      GlobalTheory.T.etaleSheaf_shortComplex_exact_iff_locally]
     intro U (b : Sec (D.X k) U) hb
     change Sec.map (D.d k (k + 1)) b = 0 at hb
     have hc : Sec.map (C.d k (k + 1)) (Sec.map (ι.f k) b) = 0 := by
@@ -79,29 +91,35 @@ theorem GlobalTheory.EtC.subsingleton_of_locExact_supp : ∀ (R : Type) [CommRin
   have hnull : Nonempty (Homotopy ι 0) := IsKInjective.nonempty_homotopy_zero ι hD
   have hpush : cpush ((chains R).obj E) ι n = cpush _ (0 : D ⟶ C) n :=
     ((GlobalTheory.EtC.ZcFun.main R).2.2.2.2 ι 0 hnull ((chains R).obj E) n).2
-  have hbasic :
-      ∀ {I : Cx R} {n : ℤ},
-      (∀ (α β : Cochain ((chains R).obj E) I n) p s h U x,
-        ev (α + β) p s h U x = ev α p s h U x + ev β p s h U x ∧
-        ev (α - β) p s h U x = ev α p s h U x - ev β p s h U x ∧
-        ev (0 : Cochain ((chains R).obj E) I n) p s h U x = 0 ∧
-        ∀ c : ℤ, ev (c • α) p s h U x = c • ev α p s h U x) ∧
-      (∀ (α : Cochain ((chains R).obj E) I n) p s h (V U : Scheme.{0}) (g : V ⟶ U) (x : Sx E p U),
-        Sec.res g (ev α p s h U x) = ev α p s h V (x.res g)) ∧
-      (∀ α β : Cochain ((chains R).obj E) I n,
-        (∀ p s h U x, ev α p s h U x = ev β p s h U x) → α = β) ∧
-      (∀ {E' : Spc} (f : E' ⟶ E) (α : Cochain ((chains R).obj E) I n) p s h U (x : Sx E' p U),
-        ev ((Cochain.ofHom ((chains R).map f)).comp α (zero_add n)) p s h U x = ev α p s h U (x.map f)) ∧
-      ∀ {J : Cx R} (m : I ⟶ J) (α : Cochain ((chains R).obj E) I n) p s h U x,
-        ev (α.comp (Cochain.ofHom m) (add_zero n)) p s h U x = Sec.map (m.f s) (ev α p s h U x) := by
+  have hbasic
+      : ∀ {I : Cx R} {n : ℤ},
+        (∀ (α β : Cochain ((chains R).obj E) I n) p s h U x,
+            ev (α + β) p s h U x = ev α p s h U x + ev β p s h U x
+              ∧ ev (α - β) p s h U x = ev α p s h U x - ev β p s h U x
+              ∧ ev (0 : Cochain ((chains R).obj E) I n) p s h U x = 0
+              ∧ ∀ c : ℤ, ev (c • α) p s h U x = c • ev α p s h U x)
+          ∧ (∀ (α : Cochain ((chains R).obj E) I n) p s h (V U : Scheme.{0}) (g : V ⟶ U)
+              (x : Sx E p U),
+            Sec.res g (ev α p s h U x) = ev α p s h V (x.res g))
+          ∧ (∀ α β : Cochain ((chains R).obj E) I n,
+            (∀ p s h U x, ev α p s h U x = ev β p s h U x) → α = β)
+          ∧ (∀ {E' : Spc} (f : E' ⟶ E) (α : Cochain ((chains R).obj E) I n) p s h U (x : Sx E' p U),
+            ev ((Cochain.ofHom ((chains R).map f)).comp α (zero_add n)) p s h U x
+              = ev α p s h U (x.map f))
+          ∧ ∀ {J : Cx R} (m : I ⟶ J) (α : Cochain ((chains R).obj E) I n) p s h U x,
+            ev (α.comp (Cochain.ofHom m) (add_zero n)) p s h U x
+              = Sec.map (m.f s) (ev α p s h U x) := by
     intro I n
-    have ev_eq {F : Spc} {J : Cx R} (α : Cochain ((chains R).obj F) J n)
-        (p : ℕ) (s : ℤ) (h : -(p : ℤ) + n = s) (U : Scheme.{0}) (x : Sx F p U) :
-        ev α p s h U x = Sec.map ((chainsXIso R F p).inv ≫ α.v _ _ h) (freeGen R _ U x) := rfl
+    have ev_eq
+        {F : Spc} {J : Cx R} (α : Cochain ((chains R).obj F) J n)
+        (p : ℕ) (s : ℤ) (h : -(p : ℤ) + n = s)
+        (U : Scheme.{0}) (x : Sx F p U)
+        : ev α p s h U x = Sec.map ((chainsXIso R F p).inv ≫ α.v _ _ h) (freeGen R _ U x) :=
+      rfl
     refine ⟨?_, ?_, ?_, ?_, ?_⟩
     · intro α β p s h U x
-      have hadd (a b : Cochain ((chains R).obj E) I n) :
-          ev (a + b) p s h U x = ev a p s h U x + ev b p s h U x := by
+      have hadd (a b : Cochain ((chains R).obj E) I n)
+          : ev (a + b) p s h U x = ev a p s h U x + ev b p s h U x := by
         simp [ev, Cochain.add_v]
       let eval : Cochain ((chains R).obj E) I n →+ Sec (I.X s) U :=
         AddMonoidHom.mk' (fun a => ev a p s h U x) hadd
@@ -117,15 +135,15 @@ theorem GlobalTheory.EtC.subsingleton_of_locExact_supp : ∀ (R : Type) [CommRin
         exact CupSpec.free_ext _ _ (fun U x => H k s hs U x)
       · exact (CupSpec.isZero_chains E p (by omega)).eq_of_src _ _
     · intro E' f α p s h U x
-      rw [ev_eq, ev_eq, Cochain.zero_cochain_comp_v, Cochain.ofHom_v,
-        ← Category.assoc, CupSpec.chains_map, Category.assoc]
+      rw [ev_eq, ev_eq, Cochain.zero_cochain_comp_v, Cochain.ofHom_v, ← Category.assoc,
+        CupSpec.chains_map, Category.assoc]
       change Sec.map ((chainsXIso R E p).inv ≫ α.v _ _ h)
-        (Sec.map ((free R).map _) (freeGen R _ U x)) = _
+          (Sec.map ((free R).map _) (freeGen R _ U x))
+        = _
       rw [CupSpec.freeGen_map]
       rfl
     · intro J m α p s h U x
-      rw [ev_eq, ev_eq, Cochain.comp_zero_cochain_v, Cochain.ofHom_v,
-        ← Category.assoc]
+      rw [ev_eq, ev_eq, Cochain.comp_zero_cochain_v, Cochain.ofHom_v, ← Category.assoc]
       rfl
   obtain ⟨-, hnat, hdet, -, -⟩ := hbasic (I := C) (n := n)
   obtain ⟨-, -, -, -, hpost⟩ := hbasic (I := D) (n := n)
@@ -139,17 +157,21 @@ theorem GlobalTheory.EtC.subsingleton_of_locExact_supp : ∀ (R : Type) [CommRin
       ⟨Sx.along x (SimplexCategory.const (SimplexCategory.mk 0) (SimplexCategory.mk p) 0)⟩
     let v : ∀ (p : ℕ) (s : ℤ), -(p : ℤ) + n = s → ∀ U : Scheme.{0}, Sx E p U → Sec (D.X s) U :=
       fun p s h U x => Classical.choose (hin s U (ev α.1 p s h U x) (hv p U x))
-    have hvspec : ∀ p s h U x, Sec.map (ι.f s) (v p s h U x) = ev α.1 p s h U x :=
-      fun p s h U x => Classical.choose_spec (hin s U (ev α.1 p s h U x) (hv p U x))
-    have hvnat : ∀ p s h (V U : Scheme.{0}) (g : V ⟶ U) (x : Sx E p U), Sec.res g (v p s h U x) = v p s h V (x.res g) := by
+    have hvspec : ∀ p s h U x, Sec.map (ι.f s) (v p s h U x) = ev α.1 p s h U x := fun p s h U x =>
+      Classical.choose_spec (hin s U (ev α.1 p s h U x) (hv p U x))
+    have hvnat
+        : ∀ p s h (V U : Scheme.{0}) (g : V ⟶ U) (x : Sx E p U),
+          Sec.res g (v p s h U x) = v p s h V (x.res g) := by
       intro p s h V U g x
       apply hinj s V
       rw [← SuppSub.res_map, hvspec, hvspec, (hnat α.1 p s h V U g x)]
     have hex : ∃ α : Cochain ((chains R).obj E) D n, ∀ p s h U x, ev α p s h U x = v p s h U x := by
-      have components : ∀ (i j : ℤ) (hij : i + n = j), ∃ φ : ((chains R).obj E).X i ⟶ D.X j,
-          ∀ (p : ℕ) (hp : i = -(p : ℤ)) U x,
-            Sec.map ((chainsXIso R E p).inv ≫ eqToHom (congrArg ((chains R).obj E).X hp.symm) ≫ φ)
-              (freeGen R _ U x) = v p j (hp ▸ hij) U x := by
+      have components
+          : ∀ (i j : ℤ) (hij : i + n = j), ∃ φ : ((chains R).obj E).X i ⟶ D.X j,
+            ∀ (p : ℕ) (hp : i = -(p : ℤ)) U x,
+              Sec.map ((chainsXIso R E p).inv ≫ eqToHom (congrArg ((chains R).obj E).X hp.symm) ≫ φ)
+                  (freeGen R _ U x)
+                = v p j (hp ▸ hij) U x := by
         intro i j hij
         by_cases hi : i ≤ 0
         · obtain ⟨k, rfl⟩ : ∃ k : ℕ, i = -(k : ℤ) := ⟨(-i).toNat, by omega⟩
@@ -173,8 +195,8 @@ theorem GlobalTheory.EtC.subsingleton_of_locExact_supp : ∀ (R : Type) [CommRin
       apply hdetD
       intro p s h U x
       apply hinj s U
-      rw [← hpost1, ← delta_comp_ofHom, hcomp, (Cocycle.mem_iff n (n + 1) rfl α.1).1 α.2, (haddC1 0 0 p s h U x).2.2.1,
-        (haddD1 0 0 p s h U x).2.2.1, map_zero']
+      rw [← hpost1, ← delta_comp_ofHom, hcomp, (Cocycle.mem_iff n (n + 1) rfl α.1).1 α.2,
+        (haddC1 0 0 p s h U x).2.2.1, (haddD1 0 0 p s h U x).2.2.1, map_zero']
     let β : Cocycle ((chains R).obj E) D n := Cocycle.mk α' (n + 1) rfl hcoc
     have hαβ : α = zcomp β (Cocycle.ofHom ι) (add_zero n) := Cocycle.ext hcomp.symm
     rw [hαβ, ← cpost_mk, ← cpush, hpush, cpush_zero]

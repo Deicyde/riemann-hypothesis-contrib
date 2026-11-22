@@ -24,7 +24,8 @@ theorem LeafCmpNb_pf : LeafCmpNb := by
     have : (Spec.map (CommRingCat.ofHom l)) t ∈ W :=
       hsub (by
         have h1 : PrimeSpectrum.comap l t ∈ Set.range (PrimeSpectrum.comap l) := ⟨t, rfl⟩
-        rw [hr] at h1; exact h1)
+        rw [hr] at h1
+        exact h1)
     exact this
   let u := IsOpenImmersion.lift w₀ _ H
   refine ⟨Localization.Away g, inferInstance, l, (Spec.preimage u).hom, ?_, ?_, ?_⟩

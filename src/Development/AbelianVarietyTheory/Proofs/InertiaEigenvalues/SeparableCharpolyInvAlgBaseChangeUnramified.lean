@@ -12,9 +12,12 @@ namespace GlobalTheory.UnitLemma.Unr
 
 open GlobalTheory.UnitLemma Polynomial
 
-theorem charpoly_overExt_separable : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E), IsUnrExt K K' d φ →
-    ∀ (B : InvAlg K) (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e)
-      (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)), B.P.Separable → (overExt φ B ψ hψ hσ).P.Separable := by
+theorem charpoly_overExt_separable
+    : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K'.E),
+      IsUnrExt K K' d φ
+        → ∀ (B : InvAlg K) (ψ : K'.E →+* B.A) (hψ : ∀ e, ψ (φ e) = algebraMap K.E B.A e)
+            (hσ : ∀ e, B.σ (ψ e) = ψ (K'.c e)),
+          B.P.Separable → (overExt φ B ψ hψ hσ).P.Separable := by
   intro K K' d φ _ B ψ hψ hσ hsep
 
   obtain ⟨e, he⟩ := exists_basis_pow_of_separable K B hsep
@@ -36,10 +39,12 @@ theorem charpoly_overExt_separable : ∀ (K K' : UQ) (d : ℕ) (φ : K.E →+* K
     change (y : B'.A) ∈ Algebra.adjoin K'.E {B'.g}
     have : (y : B'.A) = ∑ i, algebraMap K'.E B'.A (φ (e.repr y i)) * B'.g ^ (i : ℕ) := by
       refine hy.trans (Finset.sum_congr rfl fun i _ => ?_)
-      rw [hmap, hψ, he, Algebra.smul_def]; rfl
+      rw [hmap, hψ, he, Algebra.smul_def]
+      rfl
     rw [this]
-    exact Subalgebra.sum_mem _ fun i _ => Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _)
-      (Subalgebra.pow_mem _ (Algebra.subset_adjoin (Set.mem_singleton _)) _)
+    exact Subalgebra.sum_mem _ fun i _ =>
+      Subalgebra.mul_mem _ (Subalgebra.algebraMap_mem _ _)
+        (Subalgebra.pow_mem _ (Algebra.subset_adjoin (Set.mem_singleton _)) _)
   let pb := PowerBasis.ofAdjoinEqTop hint htop
   have hchar : B'.P = minpoly K'.E B'.g := by
     have h1 := charpoly_leftMulMatrix pb

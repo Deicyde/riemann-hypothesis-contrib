@@ -16,7 +16,12 @@ set_option synthInstance.maxHeartbeats 200000
 
 section
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -26,7 +31,20 @@ set_option maxHeartbeats 1000000
 open GlobalTheory.LevCmp
 open GlobalTheory.TwistChoice (Reading ReadsAt)
 namespace GlobalTheory.LevCmp.ParaPlace
-theorem locComp_of_isRc_classMapD_cenLoc : _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists, AllSt fun _ B _ T w P x => ∀ (l : _root_.GlobalTheory.HeightCounting.Up.ThirdIntermediateLevel hL x) (v : B.places.Pl) (i : (Dof x).ntw.Tw) (b : Bool) (ψ : G (Dof x).host.E (Dof x).nd.Om →* ((Dof x).ntw.Ok i (T.k v))ˣ) (hA : NX.AdmTw (Dof x) i (T.k v) (QOf P v) ψ) (j : Fin (Dof x).R.m), TwistedAt (Dof x) v → (Dof x).ntw.l i = B.places.resChar v → IntegralHeckeForms.TwOK i (T.k v) (QOf P v) ψ → ∀ u ∈ qPl (Dof x) (eta (D := Dof x) (cfOf x) w.I.xi v j), ∃ P' : PlE (Dof x).host, (P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).QP ∨ P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).DP) ∧ ((cell (D := Dof x) l.b.Bs.exp b hA j).sp P').v = u := by
+theorem locComp_of_isRc_classMapD_cenLoc
+    : _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt
+      → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists,
+        AllSt fun _ B _ T w P x =>
+          ∀ (l : _root_.GlobalTheory.HeightCounting.Up.ThirdIntermediateLevel hL x)
+              (v : B.places.Pl) (i : (Dof x).ntw.Tw) (b : Bool)
+              (ψ : G (Dof x).host.E (Dof x).nd.Om →* ((Dof x).ntw.Ok i (T.k v))ˣ)
+              (hA : NX.AdmTw (Dof x) i (T.k v) (QOf P v) ψ) (j : Fin (Dof x).R.m),
+            TwistedAt (Dof x) v → (Dof x).ntw.l i = B.places.resChar v
+              → IntegralHeckeForms.TwOK i (T.k v) (QOf P v) ψ
+              → ∀ u ∈ qPl (Dof x) (eta (D := Dof x) (cfOf x) w.I.xi v j), ∃ P' : PlE (Dof x).host,
+                (P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).QP
+                    ∨ P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).DP)
+                  ∧ ((cell (D := Dof x) l.b.Bs.exp b hA j).sp P').v = u := by
   intro _ hL
   refine GlobalTheory.Mem.Top.Bl.StepW.of_all ?_
   intro K B f T w _ _ _ P x l v i b ψ hA j htw hl hok
@@ -34,16 +52,17 @@ theorem locComp_of_isRc_classMapD_cenLoc : _root_.GlobalTheory.HeightCounting.Up
   have h2 := P.q.mu.tw v
   intro u hu
   obtain ⟨hg, w', hw'u, hun⟩ := hu
-  have hmu : ((cfOf x).mu0 j).UnrAt w' :=
-    ((cfOf x).isMu0 j).unr w' fun k hk => hg ⟨w', hw'u, k, hk⟩
+  have hmu : ((cfOf x).mu0 j).UnrAt w' := ((cfOf x).isMu0 j).unr w' fun k hk => hg ⟨w', hw'u, k, hk⟩
   have hxi : ¬ (T.xiTw f v).UnrAt w' := by
     intro hx
     rw [← h2] at hx
     exact hun (unr_mul hmu hx)
   unfold TwDat.xiTw at hxi
   set M := cell (D := Dof x) l.b.Bs.exp b hA j
-  have fin : ∀ P' : PlE (Dof x).host, (P' ∈ M.QP ∨ P' ∈ M.DP) → (w' = P' ∨ IsConjPl (Dof x).host w' P') →
-      ∃ P' : PlE (Dof x).host, (P' ∈ M.QP ∨ P' ∈ M.DP) ∧ (M.sp P').v = u := by
+  have fin
+      : ∀ P' : PlE (Dof x).host,
+        (P' ∈ M.QP ∨ P' ∈ M.DP) → (w' = P' ∨ IsConjPl (Dof x).host w' P')
+          → ∃ P' : PlE (Dof x).host, (P' ∈ M.QP ∨ P' ∈ M.DP) ∧ (M.sp P').v = u := by
     intro P' hP' hc
     refine ⟨P', hP', ?_⟩
     have hw := M.sp_w P' (hP'.elim Or.inl (fun h => Or.inr (Or.inl h)))
@@ -59,7 +78,8 @@ theorem locComp_of_isRc_classMapD_cenLoc : _root_.GlobalTheory.HeightCounting.Up
     have hd := fun h => hxi (unr_mul h hψ)
     have hp : w' ∈ (Dof x).ntw.pD i := by
       rw [← Finset.mem_coe, (Dof x).ntw.pD_eq i, hl]
-      change w' ∈ placesOver B.host.E (if B.places.resChar v = B.host.pde then B.host.pde' else B.host.pde)
+      change w'
+        ∈ placesOver B.host.E (if B.places.resChar v = B.host.pde then B.host.pde' else B.host.pde)
       split_ifs at hd ⊢
       · by_contra ho; exact hd (f.isDel'.unr w' ho)
       · by_contra ho; exact hd (f.isDel.unr w' ho)
@@ -68,7 +88,12 @@ theorem locComp_of_isRc_classMapD_cenLoc : _root_.GlobalTheory.HeightCounting.Up
 end GlobalTheory.LevCmp.ParaPlace
 end
 section
-open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2 Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting GlobalTheory.HeightCounting.Up
+open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N Formalism.L2
+  Formalism.L2.Host Formalism.L2.NT Formalism.IndefR.NX Formalism.ConjugateSelfDual
+  ReciprocityTheory.Gal ReciprocityTheory.Aut NumberField IsDedekindDomain GlobalTheory.Mem
+  GlobalTheory.Mem.Col2 GlobalTheory.Mem.Top GlobalTheory.Mem.Top.GroupRetwisting
+  GlobalTheory.Mem.Top.Bl GlobalTheory.Mem.R3 GlobalTheory.Mem.R3.Rw GlobalTheory.HeightCounting
+  GlobalTheory.HeightCounting.Up
 open Formalism.AUTREP (GAf)
 open Neutral.B1 (Ideles)
 open GlobalTheory.HeckeGal (Gab IsGlobalArtin)
@@ -78,7 +103,26 @@ set_option maxHeartbeats 1000000
 open GlobalTheory.LevCmp
 open GlobalTheory.TwistChoice (Reading ReadsAt)
 set_option maxHeartbeats 1000000 in
-theorem _root_.GlobalTheory.T.conductor_level_le_at_twisted_place_of_twOK : _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists, AllSt fun _ B _ T w P x => ∀ (l : _root_.GlobalTheory.HeightCounting.Up.ThirdIntermediateLevel hL x) (v : B.places.Pl) (i : (Dof x).ntw.Tw) (b : Bool) (ψ : G (Dof x).host.E (Dof x).nd.Om →* ((Dof x).ntw.Ok i (T.k v))ˣ) (hA : NX.AdmTw (Dof x) i (T.k v) (QOf P v) ψ) (j : Fin (Dof x).R.m), TwistedAt (Dof x) v → (Dof x).ntw.l i = B.places.resChar v → IntegralHeckeForms.TwOK i (T.k v) (QOf P v) ψ → ∀ u ∈ qPl (Dof x) (eta (D := Dof x) (cfOf x) w.I.xi v j), ∃ P' : PlE (Dof x).host, (P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).QP ∨ P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).DP) ∧ ((cell (D := Dof x) l.b.Bs.exp b hA j).sp P').v = u := by
-  first | exact @_root_.GlobalTheory.LevCmp.ParaPlace.locComp_of_isRc_classMapD_cenLoc | exact _root_.GlobalTheory.LevCmp.ParaPlace.locComp_of_isRc_classMapD_cenLoc | (intros; apply _root_.GlobalTheory.LevCmp.ParaPlace.locComp_of_isRc_classMapD_cenLoc <;> assumption)
+theorem _root_.GlobalTheory.T.conductor_level_le_at_twisted_place_of_twOK
+    : _root_.GlobalTheory.HeightCounting.Up.PublishedInputsThirdLayerAlt
+      → ∀ hL : _root_.UpperTheory.Zero.LLC.RecTExists,
+        AllSt fun _ B _ T w P x =>
+          ∀ (l : _root_.GlobalTheory.HeightCounting.Up.ThirdIntermediateLevel hL x)
+              (v : B.places.Pl) (i : (Dof x).ntw.Tw) (b : Bool)
+              (ψ : G (Dof x).host.E (Dof x).nd.Om →* ((Dof x).ntw.Ok i (T.k v))ˣ)
+              (hA : NX.AdmTw (Dof x) i (T.k v) (QOf P v) ψ) (j : Fin (Dof x).R.m),
+            TwistedAt (Dof x) v → (Dof x).ntw.l i = B.places.resChar v
+              → IntegralHeckeForms.TwOK i (T.k v) (QOf P v) ψ
+              → ∀ u ∈ qPl (Dof x) (eta (D := Dof x) (cfOf x) w.I.xi v j), ∃ P' : PlE (Dof x).host,
+                (P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).QP
+                    ∨ P' ∈ (cell (D := Dof x) l.b.Bs.exp b hA j).DP)
+                  ∧ ((cell (D := Dof x) l.b.Bs.exp b hA j).sp P').v = u := by
+  first
+  | exact @_root_.GlobalTheory.LevCmp.ParaPlace.locComp_of_isRc_classMapD_cenLoc
+  | exact _root_.GlobalTheory.LevCmp.ParaPlace.locComp_of_isRc_classMapD_cenLoc
+  | (
+      intros
+      apply _root_.GlobalTheory.LevCmp.ParaPlace.locComp_of_isRc_classMapD_cenLoc <;> assumption
+    )
 end
 end

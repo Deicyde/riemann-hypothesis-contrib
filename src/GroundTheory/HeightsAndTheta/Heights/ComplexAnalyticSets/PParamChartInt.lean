@@ -20,10 +20,11 @@ open scoped ContDiff
 
 noncomputable section
 
-theorem ParamChartInt.proof (hCA : ChartIntCountAdd.Statement) (hPI : ParamPieceInt.Statement)
+theorem ParamChartInt.proof
+    (hCA : ChartIntCountAdd.Statement) (hPI : ParamPieceInt.Statement)
     (hCN : ParamCritNull.Statement) (hOR : ParamOffRegularZero.Statement)
-    (hRP : RegularInjectivePieces.Statement) (hDI : ParamDensIntegrable.Statement) :
-    ParamChartInt.Statement := by
+    (hRP : RegularInjectivePieces.Statement) (hDI : ParamDensIntegrable.Statement)
+    : ParamChartInt.Statement := by
   intro n d W A σ r r' N hW hdim hA hσ hinj hN hrr hprop hcov f φ hf hfc hfN hφ
   classical
   set F : (Fin d → ℂ) → ℝ := fun w => f (σ w) * ReciprocityTheory.AnForm.maDens (fun k => φ k ∘ σ) w with hF
@@ -42,7 +43,8 @@ theorem ParamChartInt.proof (hCA : ChartIntCountAdd.Statement) (hPI : ParamPiece
       LinearMap.det (fderiv ℂ g w : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) ≠ 0} with hReg
   obtain ⟨P, hPm, hPd, hPU, hPinj⟩ := hRP d Ω g hΩo hgd
   have hPReg : ⋃ i, P i = Reg := by
-    rw [hPU]; ext w
+    rw [hPU]
+    ext w
     simp only [hΩ, Reg, Set.mem_ofPred_eq, Set.mem_inter_iff, Set.mem_preimage, and_assoc]
   have hPsub : ∀ i, P i ⊆ Reg := fun i => hPReg ▸ Set.subset_iUnion P i
   have hRegB : Reg ⊆ Metric.ball 0 r := fun w hw => hw.1
@@ -88,7 +90,8 @@ theorem ParamChartInt.proof (hCA : ChartIntCountAdd.Statement) (hPI : ParamPiece
   have h0 : chartInt W A ((E 0).indicator f) φ = 0 := hOR n d W A σ r N hσ hcov f φ hfN
   have hi : ∀ j, chartInt W A ((E (j + 1)).indicator f) φ = ∫ w in P j, F w := fun j =>
     hPI n d W A σ r r' N hσ hinj hN hrr hprop hcov f φ (P j) hφ (hPm j) (hPB j)
-      (fun w hw => ⟨(hPsub j hw).2.1, (hPsub j hw).2.2⟩) (hPinj j)
+      (fun w hw => ⟨(hPsub j hw).2.1, (hPsub j hw).2.2⟩)
+      (hPinj j)
   have hL : HasSum (fun j => ∫ w in P j, F w) (chartInt W A f φ) := by
     have h1 := (hasSum_nat_add_iff' 1).2 hsum
     rw [Finset.sum_range_one, h0, sub_zero] at h1
@@ -105,8 +108,9 @@ theorem ParamChartInt.proof (hCA : ChartIntCountAdd.Statement) (hPI : ParamPiece
   have hB : ∫ w in Metric.ball 0 r, F w = ∫ w in Reg, F w := by
     refine setIntegral_eq_of_subset_of_ae_sdiff_eq_zero
       Metric.isOpen_ball.measurableSet.nullMeasurableSet hRegB ?_
-    have hae : ∀ᵐ w ∂(volume : Measure (Fin d → ℂ)), w ∉ {w | w ∈ Metric.ball (0 : Fin d → ℂ) r ∧
-        σ w ∈ N ∧ LinearMap.det (fderiv ℂ g w : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) = 0} :=
+    have hae
+        : ∀ᵐ w ∂(volume : Measure (Fin d → ℂ)), w ∉ {w | w ∈ Metric.ball (0 : Fin d → ℂ) r ∧
+          σ w ∈ N ∧ LinearMap.det (fderiv ℂ g w : (Fin d → ℂ) →ₗ[ℂ] Fin d → ℂ) = 0} :=
       measure_eq_zero_iff_ae_notMem.1 hnull
     filter_upwards [hae] with w hw hwd
     obtain ⟨hwB, hwR⟩ := hwd

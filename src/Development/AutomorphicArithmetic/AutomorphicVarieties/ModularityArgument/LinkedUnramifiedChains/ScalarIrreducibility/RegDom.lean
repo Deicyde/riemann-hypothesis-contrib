@@ -5,12 +5,15 @@ public import GroundTheory.ArithmeticGeometry.SchemeCohomology.RegularUFD
 
 @[expose] public section
 
-open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
+open NumberField Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.GalOfCusp
+  IsLocalRing UpperTheory.V UpperTheory.V.HV UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Af
+  UpperTheory.V.Pr UpperTheory.V.Alg UpperTheory.V.J
 
-private theorem exists_der (O T : Type) [CommRing O] [CommRing T] [IsLocalRing T] [Algebra O T]
-    [Algebra.FormallySmooth O (ResidueField T)] :
-    ∃ r : Derivation O T (maximalIdeal T).Cotangent,
-      ∀ (t : T) (ht : t ∈ maximalIdeal T), r t = - (maximalIdeal T).toCotangent ⟨t, ht⟩ := by
+private theorem exists_der
+    (O T : Type) [CommRing O] [CommRing T] [IsLocalRing T] [Algebra O T]
+    [Algebra.FormallySmooth O (ResidueField T)]
+    : ∃ r : Derivation O T (maximalIdeal T).Cotangent, ∀ (t : T) (ht : t ∈ maximalIdeal T),
+      r t = - (maximalIdeal T).toCotangent ⟨t, ht⟩ := by
   set m := maximalIdeal T with hm
   let g : (T ⧸ m ^ 2) →ₐ[O] ResidueField T :=
     Ideal.Quotient.liftₐ (m ^ 2) (IsScalarTower.toAlgHom O T (ResidueField T)) (fun a ha => by
@@ -43,8 +46,9 @@ private theorem exists_der (O T : Type) [CommRing O] [CommRing T] [IsLocalRing T
   have hs : ∀ x, g (s x) = x := fun x =>
     Algebra.FormallySmooth.liftOfSurjective_apply (AlgHom.id O _) g hsurj hnil x
   let f : T →ₐ[O] (T ⧸ m ^ 2) := s.comp (IsScalarTower.toAlgHom O T (ResidueField T))
-  have e : (Ideal.Quotient.mkₐ O m.cotangentIdeal).comp f =
-      IsScalarTower.toAlgHom O T ((T ⧸ m ^ 2) ⧸ m.cotangentIdeal) := by
+  have e
+      : (Ideal.Quotient.mkₐ O m.cotangentIdeal).comp f
+        = IsScalarTower.toAlgHom O T ((T ⧸ m ^ 2) ⧸ m.cotangentIdeal) := by
     ext t
     show Ideal.Quotient.mk m.cotangentIdeal (f t) = Ideal.Quotient.mk m.cotangentIdeal (Ideal.Quotient.mk (m ^ 2) t)
     rw [Ideal.Quotient.eq, ← hker, RingHom.mem_ker]
@@ -55,7 +59,7 @@ private theorem exists_der (O T : Type) [CommRing O] [CommRing T] [IsLocalRing T
   have hf : f t = 0 := by
     show s (residue T t) = 0
     rw [(residue_eq_zero_iff t).2 ht, map_zero]
-  have hd : d t = - ⟨Ideal.Quotient.mk (m ^ 2) t, hmem t ht⟩ := by
+  have hd : d t = -⟨Ideal.Quotient.mk (m ^ 2) t, hmem t ht⟩ := by
     apply Subtype.ext
     show f t - Ideal.Quotient.mk (m ^ 2) t = _
     rw [hf, zero_sub]
@@ -65,9 +69,10 @@ private theorem exists_der (O T : Type) [CommRing O] [CommRing T] [IsLocalRing T
   congr 1
   exact m.cotangentEquivIdeal_symm_apply t ht
 
-private theorem formally_smooth_of_char_zero_field (O E k : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E]
-    [Field k] [CharZero k] [Algebra O k] [Algebra E k] [IsScalarTower O E k] [Algebra.IsAlgebraic O k] :
-    Algebra.FormallySmooth O k := by
+private theorem formally_smooth_of_char_zero_field
+    (O E k : Type) [CommRing O] [IsDomain O] [Field E] [Algebra O E] [IsFractionRing O E] [Field k]
+    [CharZero k] [Algebra O k] [Algebra E k] [IsScalarTower O E k] [Algebra.IsAlgebraic O k]
+    : Algebra.FormallySmooth O k := by
   haveI : Algebra.IsAlgebraic E k := (IsFractionRing.comap_isAlgebraic_iff (A := O) (K := E) (C := k)).1 inferInstance
   haveI : CharZero E := (algebraMap E k).charZero
   haveI : Algebra.IsSeparable E k := Algebra.IsAlgebraic.isSeparable_of_perfectField
@@ -76,9 +81,11 @@ private theorem formally_smooth_of_char_zero_field (O E k : Type) [CommRing O] [
   haveI : Algebra.FormallyEtale O k := Algebra.FormallyEtale.comp O E k
   exact inferInstance
 
-private theorem formallySmooth_res (O K k : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [FaithfulSMul O K]
-    [CharZero K] [Algebra.IsAlgebraic O K] [Field k] [Algebra O k] (ι : k →+* K)
-    (hι : ∀ a, ι (algebraMap O k a) = algebraMap O K a) : Algebra.FormallySmooth O k := by
+private theorem formallySmooth_res
+    (O K k : Type) [CommRing O] [IsDomain O] [Field K] [Algebra O K] [FaithfulSMul O K] [CharZero K]
+    [Algebra.IsAlgebraic O K] [Field k] [Algebra O k]
+    (ι : k →+* K) (hι : ∀ a, ι (algebraMap O k a) = algebraMap O K a)
+    : Algebra.FormallySmooth O k := by
   letI : Algebra k K := ι.toAlgebra
   haveI : IsScalarTower O k K := IsScalarTower.of_algebraMap_eq fun a => (hι a).symm
   haveI : CharZero k := ι.charZero
@@ -92,7 +99,8 @@ private theorem formallySmooth_res (O K k : Type) [CommRing O] [IsDomain O] [Fie
   haveI : IsScalarTower O (FractionRing O) k := FractionRing.isScalarTower_liftAlgebra O k
   exact formally_smooth_of_char_zero_field O (FractionRing O) k
 
-private theorem algebraic_coef (l : ℕ) [Fact l.Prime] (c : Coef l) : Algebra.IsAlgebraic c.O (Qbar l) := by
+private theorem algebraic_coef (l : ℕ) [Fact l.Prime] (c : Coef l)
+    : Algebra.IsAlgebraic c.O (Qbar l) := by
   haveI : Algebra.IsAlgebraic ℤ_[l] (Qbar l) :=
     (IsFractionRing.comap_isAlgebraic_iff (A := ℤ_[l]) (K := ℚ_[l]) (C := Qbar l)).2 inferInstance
   refine Algebra.IsAlgebraic.extendScalars (R := ℤ_[l]) ?_
@@ -104,16 +112,19 @@ private theorem algebraic_coef (l : ℕ) [Fact l.Prime] (c : Coef l) : Algebra.I
 
 section Pt
 
-variable {O A K T : Type} [CommRing O] [CommRing A] [Field K] [Algebra O A] [Algebra O K]
+variable
+  {O A K T : Type} [CommRing O] [CommRing A] [Field K] [Algebra O A] [Algebra O K]
   (ξ : A →ₐ[O] K) [(RingHom.ker ξ).IsPrime] [CommRing T] [IsLocalRing T] [Algebra A T]
   [IsLocalization.AtPrime T (RingHom.ker ξ)]
 
 include ξ in
-private theorem exists_frac (t : T) : ∃ (a u : A), u ∉ RingHom.ker ξ ∧ algebraMap A T u * t = algebraMap A T a := by
+private theorem exists_frac (t : T)
+    : ∃ (a u : A), u ∉ RingHom.ker ξ ∧ algebraMap A T u * t = algebraMap A T a := by
   obtain ⟨a, u, rfl⟩ := IsLocalization.exists_mk'_eq (RingHom.ker ξ).primeCompl t
   exact ⟨a, u, u.2, IsLocalization.mk'_spec' T a u⟩
 
-private theorem exists_res : ∃ ι : ResidueField T →+* K, ∀ a, ι (residue T (algebraMap A T a)) = ξ a := by
+private theorem exists_res
+    : ∃ ι : ResidueField T →+* K, ∀ a, ι (residue T (algebraMap A T a)) = ξ a := by
   have hu : ∀ y : (RingHom.ker ξ).primeCompl, IsUnit ((ξ : A →+* K) y) := fun y =>
     isUnit_iff_ne_zero.2 fun h => y.2 (RingHom.mem_ker.2 h)
   let ξ' : T →+* K := IsLocalization.lift (M := (RingHom.ker ξ).primeCompl) (g := (ξ : A →+* K)) hu
@@ -130,37 +141,46 @@ private theorem exists_res : ∃ ι : ResidueField T →+* K, ∀ a, ι (residue
     exact isUnit_of_mul_isUnit_right h3⟩
   exact ⟨ResidueField.lift ξ', fun a => by rw [ResidueField.lift_residue_apply, hξ]⟩
 
-private theorem rank_ge [Algebra O T] [IsScalarTower O A T] [IsNoetherianRing T]
-    [Algebra.FormallySmooth O (ResidueField T)] :
-    ((Module.finrank (ResidueField T) (CotangentSpace T) : ℕ) : Cardinal) ≤ Module.rank K (PtDer ξ K) := by
+private theorem rank_ge
+    [Algebra O T] [IsScalarTower O A T] [IsNoetherianRing T]
+    [Algebra.FormallySmooth O (ResidueField T)]
+    : ((Module.finrank (ResidueField T) (CotangentSpace T) : ℕ) : Cardinal)
+      ≤ Module.rank K (PtDer ξ K) := by
   obtain ⟨ι, hι⟩ := exists_res (T := T) ξ
   obtain ⟨r, hr⟩ := exists_der O T
   letI : Algebra (ResidueField T) K := ι.toAlgebra
-  have hact : ∀ (x : A) (φ : CotangentSpace T →ₗ[ResidueField T] K) (c : CotangentSpace T),
-      φ (algebraMap A T x • c) = ξ x * φ c := fun x φ c => by
-    have h1 : algebraMap A T x • c = residue T (algebraMap A T x) • c := (algebraMap_smul _ _ c).symm
+  have hact
+      : ∀ (x : A) (φ : CotangentSpace T →ₗ[ResidueField T] K) (c : CotangentSpace T),
+        φ (algebraMap A T x • c) = ξ x * φ c := fun x φ c => by
+    have h1 : algebraMap A T x • c = residue T (algebraMap A T x) • c :=
+      (algebraMap_smul _ _ c).symm
     rw [h1, φ.map_smul, Algebra.smul_def]
     show ι _ * _ = _
     rw [hι]
-  let Dl : (CotangentSpace T →ₗ[ResidueField T] K) → (A →ₗ[O] K) := fun φ =>
-    { toFun := fun x => φ (r (algebraMap A T x))
-      map_add' := fun x y => by simp only [map_add (f := _)]
-      map_smul' := fun a x => by
-        have h1 : algebraMap A T (a • x) = a • algebraMap A T x :=
-          map_smul (IsScalarTower.toAlgHom O A T) a x
-        have h2 : a • r (algebraMap A T x) = algebraMap A T (algebraMap O A a) • r (algebraMap A T x) := by
-          rw [← IsScalarTower.algebraMap_apply, algebraMap_smul]
-        rw [h1, r.map_smul, h2, hact, AlgHom.commutes, Algebra.smul_def, RingHom.id_apply] }
+  let Dl : (CotangentSpace T →ₗ[ResidueField T] K) → (A →ₗ[O] K) := fun φ => {
+    toFun := fun x => φ (r (algebraMap A T x))
+    map_add' := fun x y => by simp only [map_add (f := _)]
+    map_smul' := fun a x => by
+      have h1 : algebraMap A T (a • x) = a • algebraMap A T x :=
+        map_smul (IsScalarTower.toAlgHom O A T) a x
+      have h2
+          : a • r (algebraMap A T x)
+            = algebraMap A T (algebraMap O A a) • r (algebraMap A T x) := by
+        rw [← IsScalarTower.algebraMap_apply, algebraMap_smul]
+      rw [h1, r.map_smul, h2, hact, AlgHom.commutes, Algebra.smul_def, RingHom.id_apply]
+  }
   have hDl : ∀ φ, Dl φ ∈ PtDer ξ K := fun φ f g => by
     show φ (r (algebraMap A T (f * g))) = ξ f • φ (r (algebraMap A T g)) + ξ g • φ (r (algebraMap A T f))
     rw [map_mul, r.leibniz, map_add (f := _), hact, hact]
     rfl
-  let Ψ : (CotangentSpace T →ₗ[ResidueField T] K) →ₗ[K] PtDer ξ K :=
-    { toFun := fun φ => ⟨Dl φ, hDl φ⟩
-      map_add' := fun _ _ => rfl
-      map_smul' := fun _ _ => rfl }
+  let Ψ : (CotangentSpace T →ₗ[ResidueField T] K) →ₗ[K] PtDer ξ K := {
+    toFun := fun φ => ⟨Dl φ, hDl φ⟩
+    map_add' := fun _ _ => rfl
+    map_smul' := fun _ _ => rfl
+  }
   have hinj : Function.Injective Ψ := by
-    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
+    set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in
+      rw [injective_iff_map_eq_zero]
     intro φ h0
     have h1 : ∀ x, φ (r (algebraMap A T x)) = 0 := fun x =>
       congrArg (fun D : PtDer ξ K => (D : A →ₗ[O] K) x) h0
@@ -180,15 +200,18 @@ private theorem rank_ge [Algebra O T] [IsScalarTower O A T] [IsNoetherianRing T]
     exact (mul_eq_zero.1 h4).resolve_left fun h0 => hu (RingHom.mem_ker.2 h0)
   haveI : Module.Free (ResidueField T) (CotangentSpace T) := Module.Free.of_divisionRing _ _
   let b := Module.finBasis (ResidueField T) (CotangentSpace T)
-  have h5 := LinearMap.rank_le_of_injective (Ψ ∘ₗ (b.constr K).toLinearMap)
-    (hinj.comp (b.constr K).injective)
+  have h5 :=
+    LinearMap.rank_le_of_injective (Ψ ∘ₗ (b.constr K).toLinearMap)
+      (hinj.comp (b.constr K).injective)
   rwa [rank_fin_fun] at h5
 
 end Pt
 
-theorem UpperTheory.V.J.regDom :
-    ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (A : Type) [CommRing A] [IsNoetherianRing A] [Algebra c.O A] (ξ : A →ₐ[c.O] Qbar l) (d : ℕ) [(RingHom.ker ξ).IsPrime],
-        Module.rank (Qbar l) (PtDer ξ (Qbar l)) ≤ d → (d : ℕ∞) ≤ (RingHom.ker ξ).height → IsDomain (Localization.AtPrime (RingHom.ker ξ)) := by
+theorem UpperTheory.V.J.regDom
+    : ∀ (l : ℕ) [Fact l.Prime] (c : Coef l) (A : Type) [CommRing A] [IsNoetherianRing A]
+        [Algebra c.O A] (ξ : A →ₐ[c.O] Qbar l) (d : ℕ) [(RingHom.ker ξ).IsPrime],
+      Module.rank (Qbar l) (PtDer ξ (Qbar l)) ≤ d → (d : ℕ∞) ≤ (RingHom.ker ξ).height
+        → IsDomain (Localization.AtPrime (RingHom.ker ξ)) := by
   intro l _ c A _ _ _ ξ d _ h1 h2
   haveI : IsNoetherianRing (Localization.AtPrime (RingHom.ker ξ)) :=
     IsLocalization.isNoetherianRing (RingHom.ker ξ).primeCompl _ inferInstance
@@ -199,8 +222,11 @@ theorem UpperTheory.V.J.regDom :
       have := hι (algebraMap c.O A a)
       rwa [AlgHom.commutes, ← IsScalarTower.algebraMap_apply] at this
   have h3 := (rank_ge (T := Localization.AtPrime (RingHom.ker ξ)) ξ).trans h1
-  have h4 : Module.finrank (ResidueField (Localization.AtPrime (RingHom.ker ξ)))
-      (CotangentSpace (Localization.AtPrime (RingHom.ker ξ))) ≤ d := by exact_mod_cast h3
+  have h4
+      : Module.finrank (ResidueField (Localization.AtPrime (RingHom.ker ξ)))
+          (CotangentSpace (Localization.AtPrime (RingHom.ker ξ)))
+        ≤ d := by
+    exact_mod_cast h3
   haveI : IsRegularLocalRing (Localization.AtPrime (RingHom.ker ξ)) := by
     apply IsRegularLocalRing.of_spanFinrank_maximalIdeal_le
     rw [spanFinrank_maximalIdeal_eq_finrank_cotangentSpace,

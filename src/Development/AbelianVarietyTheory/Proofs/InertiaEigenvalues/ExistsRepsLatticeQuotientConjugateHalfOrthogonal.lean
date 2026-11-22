@@ -6,9 +6,12 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.Exist
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
 open Formalism.L2.Theta Formalism.L2.DIV Formalism.L2.Indef
-open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx Formalism.IndefR.Links
+open Formalism.IndefR.Lev Formalism.IndefR.Mult Formalism.IndefR.Datum Formalism.IndefR.Cx
+  Formalism.IndefR.Links
 open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift
@@ -31,20 +34,46 @@ theorem symplO_nsmul_swap (k : ℕ) (x y : WO S T) : symplO S T (k • x) y = sy
   | zero => simp only [zero_smul, symplO_zero_left, symplO_zero_right]
   | succ n ih => rw [succ_nsmul, succ_nsmul, symplO_add_left, symplO_add_right, ih]
 
-theorem reps_orth : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D), IsStdChar D ψ (-1) → ∀ (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)), IsSelfDualC S ΛS → IsSelfDualC T ΛT → ∀ a : AE D, a * a = a → infPart D a = 0 → ∀ k : ℕ, 0 < k → ∃ Y : Finset (WO S T), Y.Nonempty ∧ (∀ y ∈ Y, IsHalf (cA D a) y ∧ k • y ∈ latH S T ΛS ΛT) ∧ (∀ y', IsHalf (cA D a) y' → k • y' ∈ latH S T ΛS ΛT → ∃! y, y ∈ Y ∧ ∃ u ∈ latH S T ΛS ΛT, IsHalf (cA D a) u ∧ y' - y = k • u) ∧ ∀ x, IsHalf a x → k • x ∈ latH S T ΛS ΛT → ((∃ u ∈ latH S T ΛS ΛT, IsHalf a u ∧ x = k • u) → ∀ y ∈ Y, ψ (symplO S T x y) = 1) ∧ ((¬ ∃ u ∈ latH S T ΛS ΛT, IsHalf a u ∧ x = k • u) → ∑ y ∈ Y, ψ (symplO S T x y) = 0) := by
+theorem reps_orth
+    : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
+      IsStdChar D ψ (-1)
+        → ∀ (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
+            (ΛT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
+          IsSelfDualC S ΛS → IsSelfDualC T ΛT
+            → ∀ a : AE D,
+              a * a = a → infPart D a = 0
+                → ∀ k : ℕ,
+                  0 < k
+                    → ∃ Y : Finset (WO S T),
+                      Y.Nonempty ∧ (∀ y ∈ Y, IsHalf (cA D a) y ∧ k • y ∈ latH S T ΛS ΛT)
+                        ∧ (∀ y',
+                          IsHalf (cA D a) y' → k • y' ∈ latH S T ΛS ΛT
+                            → ∃! y, y ∈ Y ∧ ∃ u ∈ latH S T ΛS ΛT, IsHalf (cA D a) u ∧ y' - y = k • u)
+                        ∧ ∀ x,
+                          IsHalf a x → k • x ∈ latH S T ΛS ΛT
+                            → ((∃ u ∈ latH S T ΛS ΛT, IsHalf a u ∧ x = k • u)
+                                → ∀ y ∈ Y, ψ (symplO S T x y) = 1)
+                              ∧ ((¬ ∃ u ∈ latH S T ΛS ΛT, IsHalf a u ∧ x = k • u)
+                                → ∑ y ∈ Y, ψ (symplO S T x y) = 0) := by
   intro D ψ S T hψ ΛS ΛT hS hT a ha hinf k hk
   classical
-  have hdual : ∀ u : WO S T, u.map (infPart D) = 0 →
-      (u ∈ latH S T ΛS ΛT ↔ ∀ u' ∈ latH S T ΛS ΛT, ψ (symplO S T u u') = 1) :=
+  have hdual
+      : ∀ u : WO S T,
+        u.map (infPart D) = 0
+          → (u ∈ latH S T ΛS ΛT ↔ ∀ u' ∈ latH S T ΛS ΛT, ψ (symplO S T u u') = 1) :=
     (GlobalTheory.LatVac.latO_selfDual_approx_sign D ψ S T _ _ hψ hS hT).1
-  have hfin : ∀ m : ℕ, 0 < m → ∃ R : Set (WO S T), R.Finite ∧
-      ∀ t ∈ latH S T ΛS ΛT, ∃ r ∈ R, ∃ u ∈ latH S T ΛS ΛT, t = r + m • u :=
+  have hfin
+      : ∀ m : ℕ,
+        0 < m
+          → ∃ R : Set (WO S T),
+            R.Finite ∧ ∀ t ∈ latH S T ΛS ΛT, ∃ r ∈ R, ∃ u ∈ latH S T ΛS ΛT, t = r + m • u :=
     GlobalTheory.LatFinMod.latO_finite_mod D S T _ _ hS.1.fg hT.1.fg fun _ => True
   have hsm : ∀ {b : AE D}, b * b = b → ∀ u ∈ latH S T ΛS ΛT, b • u ∈ latH S T ΛS ΛT ⊓ half S T b :=
-    fun {b} hb u hu =>
-    ⟨GlobalTheory.LatticeStable.smul_mem_latO D S T _ _ _ b
-      (GlobalTheory.AdIdem.idempotent_mem_intAE D _ (by rw [← RingHom.map_mul, hb])) u hu,
-      (mem_half S T).2 (by rw [smul_smul, hb])⟩
+    fun {b} hb u hu => ⟨
+      GlobalTheory.LatticeStable.smul_mem_latO D S T _ _ _ b
+        (GlobalTheory.AdIdem.idempotent_mem_intAE D _ (by rw [← RingHom.map_mul, hb])) u hu,
+      (mem_half S T).2 (by rw [smul_smul, hb])
+    ⟩
   generalize latH S T ΛS ΛT = Λ at *
   have hc : cA D a * cA D a = cA D a := by rw [← RingHom.map_mul, ha]
   generalize hcdef : cA D a = c at *
@@ -54,8 +83,7 @@ theorem reps_orth : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
 
   let M : AddSubgroup (WO S T) := half S T c ⊓ Λ.comap (nsmulAddMonoidHom k)
   let N : AddSubgroup (WO S T) := (Λ ⊓ half S T c).map (nsmulAddMonoidHom k)
-  have hM : ∀ y, y ∈ M ↔ IsHalf c y ∧ k • y ∈ Λ := fun y => by
-    rw [isHalf_iff]; rfl
+  have hM : ∀ y, y ∈ M ↔ IsHalf c y ∧ k • y ∈ Λ := fun y => by rw [isHalf_iff]; rfl
   have hN : ∀ n, n ∈ N ↔ ∃ u ∈ Λ, IsHalf c u ∧ n = k • u := fun n => by
     constructor
     · rintro ⟨u, hu, rfl⟩
@@ -71,8 +99,10 @@ theorem reps_orth : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
   obtain ⟨R2, hR2, hR2'⟩ := hfin (k * k) (Nat.mul_pos hk hk)
   have hP : ((fun t : WO S T => k • t) ⁻¹' ((fun r => c • r) '' R2)).Finite :=
     (hR2.image _).preimage tf.injOn
-  have hcover : ∀ y : M, ∃ z : M, (z : WO S T) ∈ (fun t : WO S T => k • t) ⁻¹' ((fun r => c • r) '' R2) ∧
-      (z : M ⧸ N') = y := by
+  have hcover
+      : ∀ y : M, ∃ z : M,
+        (z : WO S T) ∈ (fun t : WO S T => k • t) ⁻¹' ((fun r => c • r) '' R2)
+          ∧ (z : M ⧸ N') = y := by
     rintro ⟨y, hy⟩
     obtain ⟨hyc, hyk⟩ := (hM y).1 hy
     obtain ⟨r, hr, u, hu, hru⟩ := hR2' _ hyk
@@ -129,9 +159,10 @@ theorem reps_orth : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
     obtain ⟨q, -, rfl⟩ := Finset.mem_image.1 hy
     rw [symplO_nsmul_swap]
     exact (hdual u (hxfin hua)).1 hu _ ((hM _).1 (hrepM q)).2
-  ·
-    have hconst : ∀ y₁ y₂ : M, (y₁ : M ⧸ N') = y₂ →
-        ψ (symplO S T x (y₂ : WO S T)) = ψ (symplO S T x (y₁ : WO S T)) := fun y₁ y₂ h => by
+  · have hconst
+        : ∀ y₁ y₂ : M,
+          (y₁ : M ⧸ N') = y₂
+            → ψ (symplO S T x (y₂ : WO S T)) = ψ (symplO S T x (y₁ : WO S T)) := fun y₁ y₂ h => by
       obtain ⟨u, hu, -, hu'⟩ := (hN _).1 ((hq _ _).1 h)
       have e : (y₂ : WO S T) = y₁ + k • u := by rw [← hu']; abel
       rw [e, symplO_add_right, AddChar.map_add_eq_mul, ← symplO_nsmul_swap,
@@ -151,16 +182,20 @@ theorem reps_orth : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (S T : HSp D),
       rw [← hx', symplO_nsmul_swap, hy₀, ← hcdef, ← symplO_smul, (mem_half S T).1 hx'h]
       exact hψl
 
-    have hsum : ∑ y ∈ Finset.univ.image rep, ψ (symplO S T x y) = ∑ q : M ⧸ N', ψ (symplO S T x (rep q)) :=
+    have hsum
+        : ∑ y ∈ Finset.univ.image rep, ψ (symplO S T x y)
+          = ∑ q : M ⧸ N', ψ (symplO S T x (rep q)) :=
       Finset.sum_image fun q₁ _ q₂ _ h => hrepinj h
     rw [hsum]
-    have hshift : ∑ q : M ⧸ N', ψ (symplO S T x (rep q)) =
-        (∑ q : M ⧸ N', ψ (symplO S T x (rep q))) * ψ (symplO S T x y₀) := by
+    have hshift
+        : ∑ q : M ⧸ N', ψ (symplO S T x (rep q))
+          = (∑ q : M ⧸ N', ψ (symplO S T x (rep q))) * ψ (symplO S T x y₀) := by
       rw [Finset.sum_mul]
       refine (Fintype.sum_equiv (Equiv.addRight ((⟨y₀, hy₀M⟩ : M) : M ⧸ N')) _ _ fun q => ?_).symm
       rw [← AddChar.map_add_eq_mul, ← symplO_add_right]
-      have := hconst (⟨rep q, hrepM q⟩ + ⟨y₀, hy₀M⟩) ⟨rep (q + ((⟨y₀, hy₀M⟩ : M) : M ⧸ N')), hrepM _⟩
-        (by rw [hrep, QuotientAddGroup.mk_add, hrep])
+      have :=
+        hconst (⟨rep q, hrepM q⟩ + ⟨y₀, hy₀M⟩) ⟨rep (q + ((⟨y₀, hy₀M⟩ : M) : M ⧸ N')), hrepM _⟩
+          (by rw [hrep, QuotientAddGroup.mk_add, hrep])
       simpa using this.symm
     have h0 : (∑ q : M ⧸ N', ψ (symplO S T x (rep q))) * (ψ (symplO S T x y₀) - 1) = 0 := by
       rw [mul_sub, mul_one, ← hshift, sub_self]

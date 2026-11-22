@@ -8,20 +8,21 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 open UpperTheory.Gal.LocalSmoothExtension
 
 open GlobalTheory.UPel.HT GlobalTheory.UPel.HT.Gen UpperTheory.Gal.Int.Geo in
-theorem UpperTheory.Gal.LocalSmoothExtension.kSHodge_of :
-    HodgeEig → KSBc → SpecConj → MemOp → FnDecomp → OccOf → UpperTheory.Gal.Int.Geo.KSHodge := by
+theorem UpperTheory.Gal.LocalSmoothExtension.kSHodge_of
+    : HodgeEig → KSBc → SpecConj → MemOp → FnDecomp → OccOf → UpperTheory.Gal.Int.Geo.KSHodge := by
   intro hE hB hS hM hF hO p _ D G L sc lam anti
   obtain ⟨k, hk⟩ := hE p D G L sc lam anti
   refine ⟨k, ?_⟩
   intro R _ _ gb T N J g θ f hf hs τ hρ ht σ i₀ h hh i
-  let gb' : GBase D.toG ℂ :=
-    { ρ := D.ρc
-      ρ_root := D.toG.ρc_root
-      t := fun i => (D.toG.tau i).comp (algebraMap _ _)
-      t_ω := fun i => D.toG.tau_ω i
-      comax := fun i j hij => by
-        have ha : D.toG.a = 1 := sc.a1
-        exact absurd (Fin.ext (by have := i.2; have := j.2; omega)) hij }
+  let gb' : GBase D.toG ℂ := {
+    ρ := D.ρc
+    ρ_root := D.toG.ρc_root
+    t := fun i => (D.toG.tau i).comp (algebraMap _ _)
+    t_ω := fun i => D.toG.tau_ω i
+    comax := fun i j hij => by
+      have ha : D.toG.a = 1 := sc.a1
+      exact absurd (Fin.ext (by have := i.2; have := j.2; omega)) hij
+  }
   have hstd : StdC D gb' := ⟨rfl, fun _ _ => rfl⟩
   obtain ⟨⟨X', lev', c1, c2, c3, c4, c5, c6⟩, hX, hl⟩ :=
     hB p D G L R gb k T τ gb' hρ.symm (fun i c => (ht i c).symm)
@@ -47,6 +48,11 @@ theorem UpperTheory.Gal.LocalSmoothExtension.kSHodge_of :
       rw [(a1 k hk y).2]
     · exact fun h0 => hy (by show σ (f y) = 0; rw [h0, map_zero])
     · exact fun h0 => hy (by show σ (f y.out) = 0; rw [h0, map_zero])
-  obtain ⟨b, x, hx, hx'⟩ := hk gb' hstd ⟨_, T.lev, c1, c2, c3, c4, c5, c6⟩ N σ i₀ h hh J (fun j => (g j).fn)
-    (fun j => σ (θ j)) (fun y => σ (f y)) (fun j => (hM p D G L R gb k T N J g j).1) hfn' h1 i
+  obtain ⟨b, x, hx, hx'⟩ :=
+    hk gb' hstd ⟨_, T.lev, c1, c2, c3, c4, c5, c6⟩ N σ i₀ h hh J
+      (fun j => (g j).fn)
+      (fun j => σ (θ j))
+      (fun y => σ (f y))
+      (fun j => (hM p D G L R gb k T N J g j).1)
+      hfn' h1 i
   exact hO p D G L R gb k T N J g τ _ (h i) b x hx hx'

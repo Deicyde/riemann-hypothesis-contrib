@@ -18,17 +18,19 @@ theorem CombDetDescFactorial.proof : CombDetDescFactorial.Statement := by
   rw [vandermondeOf_eq_det]
 
   set v : Fin m → ℚ := fun i => (l i : ℚ)
-  have hA : (Matrix.of fun i j : Fin m => ((l i).descFactorial (stair m j) : ℚ)) =
-      (Matrix.of fun i j : Fin m => (descPochhammer ℚ (j : ℕ)).eval (v i)).submatrix
-        id Fin.revPerm := by
+  have hA
+      : (Matrix.of fun i j : Fin m => ((l i).descFactorial (stair m j) : ℚ))
+        = (Matrix.of fun i j : Fin m => (descPochhammer ℚ (j : ℕ)).eval (v i)).submatrix id
+          Fin.revPerm := by
     ext i j
     simp only [Matrix.submatrix_apply, Matrix.of_apply, id, Fin.revPerm_apply, v,
       descPochhammer_eval_eq_descFactorial, stair]
     rw [Fin.val_rev]
     congr 2
     omega
-  have hB : (Matrix.of fun i j : Fin m => v i ^ (m - 1 - (j : ℕ))) =
-      (Matrix.vandermonde v).submatrix id Fin.revPerm := by
+  have hB
+      : (Matrix.of fun i j : Fin m => v i ^ (m - 1 - (j : ℕ)))
+        = (Matrix.vandermonde v).submatrix id Fin.revPerm := by
     ext i j
     simp only [Matrix.submatrix_apply, Matrix.of_apply, id, Fin.revPerm_apply, Fin.val_rev,
       Matrix.vandermonde_apply]

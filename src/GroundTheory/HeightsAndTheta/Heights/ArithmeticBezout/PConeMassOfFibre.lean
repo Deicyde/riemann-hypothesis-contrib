@@ -24,9 +24,9 @@ def coordPlaneSubst (m k : ℕ) : Fin (m + k) → MvPolynomial (Fin m) ℂ :=
 def coordPlaneIdeal (m k : ℕ) : Ideal (MvPolynomial (Fin (m + k)) ℂ) :=
   RingHom.ker (aeval (coordPlaneSubst m k))
 
-theorem homogeneousComponent_aeval_coordPlaneSubst (m k d : ℕ) (f : MvPolynomial (Fin (m + k)) ℂ) :
-    homogeneousComponent d (aeval (coordPlaneSubst m k) f) =
-      aeval (coordPlaneSubst m k) (homogeneousComponent d f) := by
+theorem homogeneousComponent_aeval_coordPlaneSubst (m k d : ℕ) (f : MvPolynomial (Fin (m + k)) ℂ)
+    : homogeneousComponent d (aeval (coordPlaneSubst m k) f)
+      = aeval (coordPlaneSubst m k) (homogeneousComponent d f) := by
   have hg : ∀ i, (coordPlaneSubst m k i).IsHomogeneous 1 := by
     intro i
     refine Fin.addCases (fun i => ?_) (fun i => ?_) i
@@ -34,8 +34,10 @@ theorem homogeneousComponent_aeval_coordPlaneSubst (m k d : ℕ) (f : MvPolynomi
       exact isHomogeneous_X ℂ i
     · simp only [coordPlaneSubst, Fin.append_right]
       exact isHomogeneous_zero _ _ _
-  have hterm : ∀ e, homogeneousComponent d (aeval (coordPlaneSubst m k) (homogeneousComponent e f)) =
-      if e = d then aeval (coordPlaneSubst m k) (homogeneousComponent e f) else 0 := by
+  have hterm
+      : ∀ e,
+        homogeneousComponent d (aeval (coordPlaneSubst m k) (homogeneousComponent e f))
+          = if e = d then aeval (coordPlaneSubst m k) (homogeneousComponent e f) else 0 := by
     intro e
     have he := (homogeneousComponent_isHomogeneous e f).aeval _ hg
     rw [one_mul] at he
@@ -51,8 +53,8 @@ theorem homogeneousComponent_aeval_coordPlaneSubst (m k d : ℕ) (f : MvPolynomi
   · rw [Finset.mem_range, not_lt] at hd
     rw [homogeneousComponent_eq_zero _ _ (by omega), map_zero]
 
-theorem isProjPrime_coordPlaneIdeal {m : ℕ} (hm : 0 < m) (k : ℕ) :
-    IsProjPrime (coordPlaneIdeal m k) := by
+theorem isProjPrime_coordPlaneIdeal {m : ℕ} (hm : 0 < m) (k : ℕ)
+    : IsProjPrime (coordPlaneIdeal m k) := by
   refine ⟨RingHom.ker_isPrime (aeval (coordPlaneSubst m k)), ?_, ?_⟩
   · intro f hf d
     rw [coordPlaneIdeal, RingHom.mem_ker] at hf ⊢
@@ -61,18 +63,17 @@ theorem isProjPrime_coordPlaneIdeal {m : ℕ} (hm : 0 < m) (k : ℕ) :
     rw [coordPlaneIdeal, RingHom.mem_ker, aeval_X, coordPlaneSubst, Fin.append_left]
     exact X_ne_zero _
 
-theorem pointOf_std {n : ℕ} (y : EuclideanSpace ℂ (Fin n)) :
-    (HermNorm.std n).pointOf y = fun i => y i := by
+theorem pointOf_std {n : ℕ} (y : EuclideanSpace ℂ (Fin n))
+    : (HermNorm.std n).pointOf y = fun i => y i := by
   simp [HermNorm.pointOf, HermNorm.std]
 
-theorem mem_coneSet_coordPlaneIdeal {m k : ℕ} (y : EuclideanSpace ℂ (Fin (m + k))) :
-    y ∈ coneSet (HermNorm.std (m + k)) (coordPlaneIdeal m k) ↔
-      ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0 := by
+theorem mem_coneSet_coordPlaneIdeal {m k : ℕ} (y : EuclideanSpace ℂ (Fin (m + k)))
+    : y ∈ coneSet (HermNorm.std (m + k)) (coordPlaneIdeal m k)
+      ↔ ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0 := by
   simp only [coneSet, Set.mem_ofPred_eq, pointOf_std]
   constructor
   · intro hy j hj
-    obtain ⟨i, rfl⟩ : ∃ i : Fin k, j = Fin.natAdd m i :=
-      ⟨⟨j - m, by omega⟩, by ext; simp; omega⟩
+    obtain ⟨i, rfl⟩ : ∃ i : Fin k, j = Fin.natAdd m i := ⟨⟨j - m, by omega⟩, by ext; simp; omega⟩
     have hX : (X (Fin.natAdd m i) : MvPolynomial (Fin (m + k)) ℂ) ∈ coordPlaneIdeal m k := by
       rw [coordPlaneIdeal, RingHom.mem_ker, aeval_X, coordPlaneSubst, Fin.append_right]
     simpa using hy _ hX
@@ -84,22 +85,24 @@ theorem mem_coneSet_coordPlaneIdeal {m k : ℕ} (y : EuclideanSpace ℂ (Fin (m 
       refine Fin.addCases (fun i => ?_) (fun i => ?_) j
       · simp [coordPlaneSubst, x]
       · simp [coordPlaneSubst, hy (Fin.natAdd m i) (by simp)]
-    have hev : eval (fun j => eval x (coordPlaneSubst m k j)) q =
-        eval x (aeval (coordPlaneSubst m k) q) := by
+    have hev
+        : eval (fun j => eval x (coordPlaneSubst m k j)) q
+          = eval x (aeval (coordPlaneSubst m k) q) := by
       rw [← coe_aeval_eq_eval, ← coe_aeval_eq_eval, aeval_eq_bind₁]
       exact (aeval_bind₁ x (coordPlaneSubst m k) q).symm
     rw [hyx, hev, hq, map_zero]
 
-theorem eq_zeroExt_of {m k : ℕ} {y : EuclideanSpace ℂ (Fin (m + k))}
-    (hy : ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0) :
-    y = zeroExt m k (WithLp.toLp 2 fun i => y (Fin.castAdd k i)) := by
+theorem eq_zeroExt_of
+    {m k : ℕ} {y : EuclideanSpace ℂ (Fin (m + k))} (hy : ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0)
+    : y = zeroExt m k (WithLp.toLp 2 fun i => y (Fin.castAdd k i)) := by
   ext j
   refine Fin.addCases (fun i => ?_) (fun i => ?_) j
   · simp [zeroExt]
   · simp [zeroExt, hy (Fin.natAdd m i) (by simp)]
 
-theorem zeroExt_apply_of_le {m k : ℕ} (x : EuclideanSpace ℂ (Fin m)) (j : Fin (m + k))
-    (hj : m ≤ (j : ℕ)) : zeroExt m k x j = 0 := by
+theorem zeroExt_apply_of_le
+    {m k : ℕ} (x : EuclideanSpace ℂ (Fin m)) (j : Fin (m + k)) (hj : m ≤ (j : ℕ))
+    : zeroExt m k x j = 0 := by
   revert hj
   refine Fin.addCases (fun i => ?_) (fun i => ?_) j
   · intro hi
@@ -111,18 +114,20 @@ theorem zeroExt_apply_of_le {m k : ℕ} (x : EuclideanSpace ℂ (Fin m)) (j : Fi
 def coordPlaneBlock {m k : ℕ} (π : Fin m → Fin (m + k) → ℂ) : Matrix (Fin m) (Fin m) ℂ :=
   Matrix.of fun i j => π i (Fin.castAdd k j)
 
-theorem linProj_zeroExt {m k : ℕ} (π : Fin m → Fin (m + k) → ℂ) (x : EuclideanSpace ℂ (Fin m)) :
-    linProj π (zeroExt m k x) = WithLp.toLp 2 ((coordPlaneBlock π).mulVec fun i => x i) := by
+theorem linProj_zeroExt {m k : ℕ} (π : Fin m → Fin (m + k) → ℂ) (x : EuclideanSpace ℂ (Fin m))
+    : linProj π (zeroExt m k x) = WithLp.toLp 2 ((coordPlaneBlock π).mulVec fun i => x i) := by
   ext i
   simp [linProj, zeroExt, Fin.sum_univ_add, coordPlaneBlock, Matrix.mulVec, dotProduct]
 
-theorem fibreCount_coordPlaneIdeal {m k : ℕ} (π : Fin m → Fin (m + k) → ℂ)
-    (hπ : (coordPlaneBlock π).det ≠ 0) (w : EuclideanSpace ℂ (Fin m)) :
-    fibreCount (HermNorm.std (m + k)) (coordPlaneIdeal m k) π w = 1 := by
+theorem fibreCount_coordPlaneIdeal
+    {m k : ℕ}
+    (π : Fin m → Fin (m + k) → ℂ) (hπ : (coordPlaneBlock π).det ≠ 0) (w : EuclideanSpace ℂ (Fin m))
+    : fibreCount (HermNorm.std (m + k)) (coordPlaneIdeal m k) π w = 1 := by
   have hB : IsUnit (coordPlaneBlock π).det := Ne.isUnit hπ
   set x₀ : EuclideanSpace ℂ (Fin m) := WithLp.toLp 2 ((coordPlaneBlock π)⁻¹.mulVec fun i => w i)
-  have hfib : {y | y ∈ coneSet (HermNorm.std (m + k)) (coordPlaneIdeal m k) ∧ linProj π y = w} =
-      {zeroExt m k x₀} := by
+  have hfib
+      : {y | y ∈ coneSet (HermNorm.std (m + k)) (coordPlaneIdeal m k) ∧ linProj π y = w}
+        = {zeroExt m k x₀} := by
     ext y
     simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff, mem_coneSet_coordPlaneIdeal]
     constructor
@@ -130,7 +135,8 @@ theorem fibreCount_coordPlaneIdeal {m k : ℕ} (π : Fin m → Fin (m + k) → �
       rw [eq_zeroExt_of hy] at hπy ⊢
       congr 1
       rw [linProj_zeroExt] at hπy
-      have h2 := congrArg (fun v : EuclideanSpace ℂ (Fin m) => (coordPlaneBlock π)⁻¹.mulVec fun i => v i) hπy
+      have h2 :=
+        congrArg (fun v : EuclideanSpace ℂ (Fin m) => (coordPlaneBlock π)⁻¹.mulVec fun i => v i) hπy
       simp only [Matrix.mulVec_mulVec, Matrix.nonsing_inv_mul _ hB, Matrix.one_mulVec] at h2
       ext i
       simp only [x₀]
@@ -145,8 +151,8 @@ theorem fibreCount_coordPlaneIdeal {m k : ℕ} (π : Fin m → Fin (m + k) → �
 def coordPlaneDetPoly (m k : ℕ) : MvPolynomial (Fin m × Fin (m + k)) ℂ :=
   (Matrix.of fun i j : Fin m => (X (i, Fin.castAdd k j) : MvPolynomial (Fin m × Fin (m + k)) ℂ)).det
 
-theorem eval_coordPlaneDetPoly {m k : ℕ} (u : Fin m × Fin (m + k) → ℂ) :
-    eval u (coordPlaneDetPoly m k) = (coordPlaneBlock (Function.curry u)).det := by
+theorem eval_coordPlaneDetPoly {m k : ℕ} (u : Fin m × Fin (m + k) → ℂ)
+    : eval u (coordPlaneDetPoly m k) = (coordPlaneBlock (Function.curry u)).det := by
   rw [coordPlaneDetPoly, RingHom.map_det]
   congr 1
   ext i j
@@ -154,33 +160,37 @@ theorem eval_coordPlaneDetPoly {m k : ℕ} (u : Fin m × Fin (m + k) → ℂ) :
 
 theorem coordPlaneDetPoly_ne_zero (m k : ℕ) : coordPlaneDetPoly m k ≠ 0 := by
   intro h0
-  have h1 := eval_coordPlaneDetPoly (m := m) (k := k)
-    (fun ij => if ij.2 = Fin.castAdd k ij.1 then 1 else 0)
-  have hone : coordPlaneBlock (Function.curry fun ij : Fin m × Fin (m + k) =>
-      if ij.2 = Fin.castAdd k ij.1 then (1 : ℂ) else 0) = 1 := by
+  have h1 :=
+    eval_coordPlaneDetPoly (m := m) (k := k) (fun ij => if ij.2 = Fin.castAdd k ij.1 then 1 else 0)
+  have hone
+      : coordPlaneBlock (Function.curry fun ij : Fin m × Fin (m + k) =>
+          if ij.2 = Fin.castAdd k ij.1 then (1 : ℂ) else 0)
+        = 1 := by
     ext i j
     simp [coordPlaneBlock, Function.curry, Matrix.one_apply, eq_comm]
   rw [h0, map_zero, hone, Matrix.det_one] at h1
   exact zero_ne_one h1
 
-theorem measurePreserving_curry_matrix (m n : ℕ) :
-    MeasurePreserving (MeasurableEquiv.curry (Fin m) (Fin n) ℂ)
-      (volume : Measure (Fin m × Fin n → ℂ)) (Measure.pi fun _ : Fin m => (volume : Measure (Fin n → ℂ))) := by
+theorem measurePreserving_curry_matrix (m n : ℕ)
+    : MeasurePreserving (MeasurableEquiv.curry (Fin m) (Fin n) ℂ)
+      (volume : Measure (Fin m × Fin n → ℂ))
+      (Measure.pi fun _ : Fin m => (volume : Measure (Fin n → ℂ))) := by
   refine ⟨(MeasurableEquiv.curry _ _ _).measurable, ?_⟩
   rw [MeasurableEquiv.map_apply_eq_iff_map_symm_apply_eq]
   show Measure.pi (fun _ : Fin m × Fin n => (volume : Measure ℂ)) = _
   refine Measure.pi_eq fun s hs => ?_
   rw [MeasurableEquiv.map_apply, MeasurableEquiv.coe_curry_symm]
-  have hset : Function.uncurry ⁻¹' Set.univ.pi s =
-      Set.univ.pi fun i : Fin m => Set.univ.pi fun j : Fin n => s (i, j) := by
+  have hset
+      : Function.uncurry ⁻¹' Set.univ.pi s
+        = Set.univ.pi fun i : Fin m => Set.univ.pi fun j : Fin n => s (i, j) := by
     ext x
     simp
   rw [hset, Measure.pi_pi]
   simp_rw [volume_pi, Measure.pi_pi]
   rw [Fintype.prod_prod_type]
 
-theorem ae_coordPlaneBlock_det_ne_zero (m k : ℕ) :
-    ∀ᵐ π : Fin m → Fin (m + k) → ℂ, (coordPlaneBlock π).det ≠ 0 := by
+theorem ae_coordPlaneBlock_det_ne_zero (m k : ℕ)
+    : ∀ᵐ π : Fin m → Fin (m + k) → ℂ, (coordPlaneBlock π).det ≠ 0 := by
   have hcover : (⋃ r : ℕ, LogInt.polydisc (Fin m × Fin (m + k)) r) = Set.univ := by
     refine Set.eq_univ_of_forall fun u => ?_
     obtain ⟨r, hr⟩ := exists_nat_ge (∑ ij, ‖u ij‖)
@@ -199,18 +209,20 @@ theorem ae_coordPlaneBlock_det_ne_zero (m k : ℕ) :
   filter_upwards [hpoly] with u hu
   rwa [eval_coordPlaneDetPoly] at hu
 
-theorem lintegral_matGauss_of_ae_eq {m n : ℕ} (c : ℕ)
-    (N : (Fin m → Fin n → ℂ) → EuclideanSpace ℂ (Fin m) → ℕ∞)
-    (hN : ∀ᵐ π : Fin m → Fin n → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin m), N π w = c) :
-    ∫⁻ π : Fin m → Fin n → ℂ, matGauss π *
-        ∫⁻ w in Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1, (N π w : ℝ≥0∞) =
-      (c : ℝ≥0∞) * ∫⁻ π : Fin m → Fin n → ℂ, matGauss π *
-        volume (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1) := by
+theorem lintegral_matGauss_of_ae_eq
+    {m n : ℕ} (c : ℕ) (N : (Fin m → Fin n → ℂ) → EuclideanSpace ℂ (Fin m) → ℕ∞)
+    (hN : ∀ᵐ π : Fin m → Fin n → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin m), N π w = c)
+    : ∫⁻ π : Fin m → Fin n → ℂ, matGauss π *
+          ∫⁻ w in Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1, (N π w : ℝ≥0∞)
+      = (c : ℝ≥0∞)
+        * ∫⁻ π : Fin m → Fin n → ℂ, matGauss π *
+          volume (Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1) := by
   rw [← lintegral_const_mul' _ _ (ENNReal.natCast_ne_top c)]
   refine lintegral_congr_ae ?_
   filter_upwards [hN] with π hπ
-  have hin : ∫⁻ w in Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1, (N π w : ℝ≥0∞) =
-      ∫⁻ _ in Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1, (c : ℝ≥0∞) := by
+  have hin
+      : ∫⁻ w in Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1, (N π w : ℝ≥0∞)
+        = ∫⁻ _ in Metric.ball (0 : EuclideanSpace ℂ (Fin m)) 1, (c : ℝ≥0∞) := by
     refine lintegral_congr_ae (ae_restrict_of_ae ?_)
     filter_upwards [hπ] with w hw
     rw [hw]
@@ -218,12 +230,12 @@ theorem lintegral_matGauss_of_ae_eq {m n : ℕ} (c : ℕ)
   rw [hin, setLIntegral_const]
   ring
 
-theorem coneMass_of_fibre_zero {n δ : ℕ} (h : HermNorm n) (J : Ideal (MvPolynomial (Fin n) ℂ))
-    (hJ : IsProjPrime J)
-    (hfib : ∀ᵐ π : Fin 0 → Fin n → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin 0), fibreCount h J π w = δ) :
-    Measure.hausdorffMeasure ((2 * 0 : ℕ) : ℝ)
-        {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ q ∈ J, eval (h.pointOf y) q = 0} =
-      (δ : ℝ≥0∞) * Measure.hausdorffMeasure ((2 * 0 : ℕ) : ℝ)
+theorem coneMass_of_fibre_zero
+    {n δ : ℕ} (h : HermNorm n) (J : Ideal (MvPolynomial (Fin n) ℂ)) (hJ : IsProjPrime J)
+    (hfib : ∀ᵐ π : Fin 0 → Fin n → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin 0), fibreCount h J π w = δ)
+    : Measure.hausdorffMeasure ((2 * 0 : ℕ) : ℝ)
+        {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ q ∈ J, eval (h.pointOf y) q = 0}
+      = (δ : ℝ≥0∞) * Measure.hausdorffMeasure ((2 * 0 : ℕ) : ℝ)
         {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, 0 ≤ (j : ℕ) → y j = 0} := by
   have : (volume : Measure (Fin 0 → Fin n → ℂ)).IsAddHaarMeasure := Measure.pi.isAddHaarMeasure _
   have : (ae (volume : Measure (Fin 0 → Fin n → ℂ))).NeBot := ae_neBot.2 (NeZero.ne _)
@@ -252,8 +264,9 @@ theorem coneMass_of_fibre_zero {n δ : ℕ} (h : HermNorm n) (J : Ideal (MvPolyn
     have htop := (hinf.mono hsub').encard_eq
     rw [hC] at htop
     exact ENat.natCast_ne_top δ htop
-  have hset1 : {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ q ∈ J, eval (h.pointOf y) q = 0} =
-      coneSet h J := by
+  have hset1
+      : {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ q ∈ J, eval (h.pointOf y) q = 0}
+        = coneSet h J := by
     ext y
     constructor
     · exact fun hy => hy.2
@@ -261,8 +274,8 @@ theorem coneMass_of_fibre_zero {n δ : ℕ} (h : HermNorm n) (J : Ideal (MvPolyn
       refine ⟨?_, hy⟩
       rw [Set.mem_singleton_iff.1 (hsub hy)]
       simp
-  have hset2 : {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, 0 ≤ (j : ℕ) → y j = 0} =
-      {0} := by
+  have hset2
+      : {y : EuclideanSpace ℂ (Fin n) | ‖y‖ < 1 ∧ ∀ j : Fin n, 0 ≤ (j : ℕ) → y j = 0} = {0} := by
     ext y
     simp only [Set.mem_ofPred_eq, Set.mem_singleton_iff, zero_le, forall_const]
     constructor
@@ -296,27 +309,31 @@ theorem ConeMassOfFibre.proof (hA : ConeFibreAverage.Statement) : ConeMassOfFibr
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le hmn
   obtain ⟨K, hK0, hKtop, hK⟩ := hA (m + k) m
   have hdet := ae_coordPlaneBlock_det_ne_zero m k
-  have hL1 : ∀ᵐ π : Fin m → Fin (m + k) → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin m),
-      fibreCount (HermNorm.std (m + k)) (coordPlaneIdeal m k) π w = (1 : ℕ) := by
+  have hL1
+      : ∀ᵐ π : Fin m → Fin (m + k) → ℂ, ∀ᵐ w : EuclideanSpace ℂ (Fin m),
+        fibreCount (HermNorm.std (m + k)) (coordPlaneIdeal m k) π w = (1 : ℕ) := by
     filter_upwards [hdet] with π hπ
     exact Filter.Eventually.of_forall fun w => by
       rw [fibreCount_coordPlaneIdeal π hπ w]
       rfl
-  have hC := hK h J hJ (by
-    filter_upwards [hfib] with π hπ
-    filter_upwards [hπ] with w hw
-    rw [hw]
-    exact ENat.natCast_ne_top δ)
-  have hL := hK (HermNorm.std (m + k)) (coordPlaneIdeal m k) (isProjPrime_coordPlaneIdeal hm k) (by
-    filter_upwards [hL1] with π hπ
-    filter_upwards [hπ] with w hw
-    rw [hw]
-    exact ENat.natCast_ne_top 1)
+  have hC :=
+    hK h J hJ (by
+      filter_upwards [hfib] with π hπ
+      filter_upwards [hπ] with w hw
+      rw [hw]
+      exact ENat.natCast_ne_top δ)
+  have hL :=
+    hK (HermNorm.std (m + k)) (coordPlaneIdeal m k) (isProjPrime_coordPlaneIdeal hm k) (by
+      filter_upwards [hL1] with π hπ
+      filter_upwards [hπ] with w hw
+      rw [hw]
+      exact ENat.natCast_ne_top 1)
   rw [lintegral_matGauss_of_ae_eq δ _ hfib] at hC
   rw [lintegral_matGauss_of_ae_eq 1 _ hL1, Nat.cast_one, one_mul] at hL
-  have hLset : {y : EuclideanSpace ℂ (Fin (m + k)) | ‖y‖ < 1 ∧
-      y ∈ coneSet (HermNorm.std (m + k)) (coordPlaneIdeal m k)} =
-      {y | ‖y‖ < 1 ∧ ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0} := by
+  have hLset
+      : {y : EuclideanSpace ℂ (Fin (m + k)) | ‖y‖ < 1 ∧
+          y ∈ coneSet (HermNorm.std (m + k)) (coordPlaneIdeal m k)}
+        = {y | ‖y‖ < 1 ∧ ∀ j : Fin (m + k), m ≤ (j : ℕ) → y j = 0} := by
     ext y
     simp only [Set.mem_ofPred_eq, mem_coneSet_coordPlaneIdeal]
   rw [hLset] at hL

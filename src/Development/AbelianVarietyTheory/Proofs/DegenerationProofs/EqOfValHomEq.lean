@@ -8,7 +8,8 @@ public import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsU
 
 open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
 open scoped CategoryTheory.Obj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.ZH
 attribute [local instance] SplitExt.free SplitExt.finite MvPolynomial.gradedAlgebra
 
 noncomputable section
@@ -17,8 +18,10 @@ open GlobalTheory.ZH.CrdCalc
 
 variable {R : Type} [CommRing R] {X : Scheme.{0}}
 
-theorem eq_of_valHom_eq (x x' : Sp R ⟶ X) (U : X.Opens) (hU : IsAffineOpen U) (h : ⊤ ≤ x ⁻¹ᵁ U)
-    (h' : ⊤ ≤ x' ⁻¹ᵁ U) (e : valHom x U h = valHom x' U h') : x = x' := by
+theorem eq_of_valHom_eq
+    (x x' : Sp R ⟶ X) (U : X.Opens)
+    (hU : IsAffineOpen U) (h : ⊤ ≤ x ⁻¹ᵁ U) (h' : ⊤ ≤ x' ⁻¹ᵁ U) (e : valHom x U h = valHom x' U h')
+    : x = x' := by
   have e₁ : x.appLE U ⊤ h = x'.appLE U ⊤ h' := by
     rw [← cancel_mono (Scheme.ΓSpecIso (CommRingCat.of R)).hom]
     exact CommRingCat.hom_ext e
@@ -27,14 +30,20 @@ theorem eq_of_valHom_eq (x x' : Sp R ⟶ X) (U : X.Opens) (hU : IsAffineOpen U) 
   rw [e₁, a', IsAffineOpen.fromSpec_top] at a
   exact ((cancel_epi _).1 a).symm
 
-theorem valHom_constFn {k : Type} [CommRing k] (p : X ⟶ Sp k) (x : Sp R ⟶ X) (U : X.Opens)
-    (h : ⊤ ≤ x ⁻¹ᵁ U) (a : k) :
-    valHom x U h (constFn p U a) = (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom
-      (((x ≫ p).appLE ⊤ ⊤ le_top).hom ((Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom a)) := by
+theorem valHom_constFn
+    {k : Type} [CommRing k] (p : X ⟶ Sp k) (x : Sp R ⟶ X) (U : X.Opens) (h : ⊤ ≤ x ⁻¹ᵁ U) (a : k)
+    : valHom x U h (constFn p U a)
+      = (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom
+        (((x ≫ p).appLE ⊤ ⊤ le_top).hom ((Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom a)) := by
   rw [← Scheme.Hom.appLE_comp_appLE x p ⊤ U ⊤ le_top h]
   rfl
 
-theorem eq_of_crd_eq : (∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (H : LB X) (J : Type) (s : J → H.Sec) (J₀ : Set J), H.IsLB → ImmBy p H s J₀ → ∀ (R : Type) [CommRing R] [IsLocalRing R] (x x' : Sp R ⟶ X) (v : J → R), x ≫ p = x' ≫ p → Crd H s x v → Crd H s x' v → x = x') := by
+theorem eq_of_crd_eq
+    : (∀ (k : Type) [CommRing k] (X : Scheme.{0}) (p : X ⟶ Sp k) (H : LB X) (J : Type)
+        (s : J → H.Sec) (J₀ : Set J),
+      H.IsLB → ImmBy p H s J₀
+        → ∀ (R : Type) [CommRing R] [IsLocalRing R] (x x' : Sp R ⟶ X) (v : J → R),
+          x ≫ p = x' ≫ p → Crd H s x v → Crd H s x' v → x = x') := by
   intro k _ X p H J s J₀ _ hI R _ _ x x' v hp hx hx'
   have hm : x (IsLocalRing.closedPoint R) ∈ ⨆ i ∈ J₀, Out.nonzeroLocus (s i) := by
     rw [hI.1]; trivial

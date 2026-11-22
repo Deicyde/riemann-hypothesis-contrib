@@ -5,12 +5,16 @@ public import Development.AbelianVarietyTheory.Proofs.IwasawaDecomposition.EqZer
 
 @[expose] public section
 
-open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
+open NumberField ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.Toroidal
+  GlobalTheory.LocM GlobalTheory.TorRef GlobalTheory.PolFan
 
 namespace GlobalTheory.PolFan
 
-theorem isPrim_eq_one_of_smul_eq : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Module O X] (β : LinearMap.BilinForm ℤ X) (hβ : β ∈ balForms bar X), IsPrim bar (⟨β, hβ⟩ : balForms bar X) →
-  ∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = β → k = 1 := by
+theorem isPrim_eq_one_of_smul_eq
+    : ∀ {O : Type} [CommRing O] (bar : O → O) {X : Type} [AddCommGroup X] [Module O X]
+        (β : LinearMap.BilinForm ℤ X) (hβ : β ∈ balForms bar X),
+      IsPrim bar (⟨β, hβ⟩ : balForms bar X)
+        → ∀ (k : ℕ) (β' : LinearMap.BilinForm ℤ X), (k : ℤ) • β' = β → k = 1 := by
   intro O _ bar X _ _ β hβ hp k β' hk
   rcases Nat.eq_zero_or_pos k with rfl | hpos
   · exfalso

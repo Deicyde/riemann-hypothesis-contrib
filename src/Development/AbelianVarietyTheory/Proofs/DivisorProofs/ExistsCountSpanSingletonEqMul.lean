@@ -8,10 +8,11 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory.RootIdeal
 
-theorem exists_pow_eq_spanSingleton (K : Type) [Field K] [NumberField K]
-    (J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (hJ : J ≠ 0) :
-    ∃ (h : ℕ) (x : K), 0 < h ∧ x ≠ 0 ∧
-      FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) x = J ^ h := by
+theorem exists_pow_eq_spanSingleton
+    (K : Type) [Field K] [NumberField K]
+    (J : FractionalIdeal (nonZeroDivisors (𝓞 K)) K) (hJ : J ≠ 0)
+    : ∃ (h : ℕ) (x : K),
+      0 < h ∧ x ≠ 0 ∧ FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) x = J ^ h := by
   classical
   let u : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ := Units.mk0 J hJ
   have hpos : 0 < orderOf (ClassGroup.mk K u) := orderOf_pos _
@@ -19,11 +20,14 @@ theorem exists_pow_eq_spanSingleton (K : Type) [Field K] [NumberField K]
     rw [map_pow, pow_orderOf_eq_one]
   rw [ClassGroup.mk_eq_one_iff] at h1
   obtain ⟨x, hx⟩ := h1.principal
-  have hJh : ((u ^ orderOf (ClassGroup.mk K u) : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ) :
-      FractionalIdeal (nonZeroDivisors (𝓞 K)) K) = J ^ orderOf (ClassGroup.mk K u) := by
+  have hJh
+      : ((u ^ orderOf (ClassGroup.mk K u) : (FractionalIdeal (nonZeroDivisors (𝓞 K)) K)ˣ)
+          : FractionalIdeal (nonZeroDivisors (𝓞 K)) K)
+        = J ^ orderOf (ClassGroup.mk K u) := by
     simp [u]
-  have key : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) x =
-      J ^ orderOf (ClassGroup.mk K u) := by
+  have key
+      : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) x
+        = J ^ orderOf (ClassGroup.mk K u) := by
     rw [← hJh]
     apply FractionalIdeal.coeToSubmodule_injective
     dsimp only
@@ -33,11 +37,14 @@ theorem exists_pow_eq_spanSingleton (K : Type) [Field K] [NumberField K]
   rw [FractionalIdeal.spanSingleton_zero] at key
   exact pow_ne_zero _ hJ key.symm
 
-theorem exists_count_spanSingleton_eq_mul (K : Type) [Field K] [NumberField K]
-    (r : HeightOneSpectrum (𝓞 K) →₀ ℚ) :
-    ∃ (n : ℕ) (x : K), 0 < n ∧ x ≠ 0 ∧ ∀ v : HeightOneSpectrum (𝓞 K),
-      ((FractionalIdeal.count K v
-        (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) x) : ℤ) : ℚ) = n * r v := by
+theorem exists_count_spanSingleton_eq_mul
+    (K : Type) [Field K] [NumberField K] (r : HeightOneSpectrum (𝓞 K) →₀ ℚ)
+    : ∃ (n : ℕ) (x : K),
+      0 < n ∧ x ≠ 0
+        ∧ ∀ v : HeightOneSpectrum (𝓞 K),
+          ((FractionalIdeal.count K v (FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 K)) x) : ℤ)
+              : ℚ)
+            = n * r v := by
   classical
   set d : ℕ := ∏ v ∈ r.support, (r v).den with hd
   have hdpos : 0 < d := Finset.prod_pos (fun v _ => (r v).pos)

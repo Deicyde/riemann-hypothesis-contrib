@@ -27,50 +27,66 @@ def FinAt (P : Ideal (𝓞 E)) (p i : ℕ) : Prop :=
   HkFin (K := c.F) (fun S _ _ => FrPt Xo c S) (fun Ω _ _ _ y => hkKer (Xo := Xo) P p i Ω y)
 
 def TotalAt (P : Ideal (𝓞 E)) (p i : ℕ) : Prop :=
-  HkTotal (K := c.F) (fun S _ _ => FrPt Xo c S) (fun Ω _ _ _ y => hkKer (Xo := Xo) P p i Ω y)
+  HkTotal (K := c.F)
+    (fun S _ _ => FrPt Xo c S)
+    (fun Ω _ _ _ y => hkKer (Xo := Xo) P p i Ω y)
     (fun Ω _ _ _ y C z => hkRelFr P p i (hkTr Xo c p) Ω y C z)
 
 def FunAt (P : Ideal (𝓞 E)) (p i : ℕ) : Prop :=
-  HkFun (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z)
+  HkFun (K := c.F)
+    (fun S _ _ => FrPt Xo c S)
+    (fun φ y z => FrMap φ y z)
     (fun Ω _ _ _ y => hkKer (Xo := Xo) P p i Ω y)
     (fun Ω _ _ _ y C z => hkRelFr P p i (hkTr Xo c p) Ω y C z)
 
 def DetectAt (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) : Prop :=
-  PtsDetect (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (fun t y y' => FrBor t y y')
+  PtsDetect (K := c.F)
+    (fun S _ _ => FrPt Xo c S)
+    (fun φ y z => FrMap φ y z)
+    (fun t y y' => FrBor t y y')
     (ex Dw a n)
 
 end Local
 
 def HeckeFinite : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
-    (Xo : Moduli Dw l) (c : Coeff l) (P : Ideal (𝓞 E)) (p i : ℕ), IsHeckePrime l P p → FinAt Xo c P p i
+      (Xo : Moduli Dw l) (c : Coeff l) (P : Ideal (𝓞 E)) (p i : ℕ),
+    IsHeckePrime l P p → FinAt Xo c P p i
 
 def HeckeTotal : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
-    (Xo : Moduli Dw l) (c : Coeff l) (P : Ideal (𝓞 E)) (p i : ℕ), IsHeckePrime l P p → TotalAt Xo c P p i
+      (Xo : Moduli Dw l) (c : Coeff l) (P : Ideal (𝓞 E)) (p i : ℕ),
+    IsHeckePrime l P p → TotalAt Xo c P p i
 
 def HeckeSingleValued : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
-    (Xo : Moduli Dw l) (c : Coeff l) (P : Ideal (𝓞 E)) (p i : ℕ), IsHeckePrime l P p → FunAt Xo c P p i
+      (Xo : Moduli Dw l) (c : Coeff l) (P : Ideal (𝓞 E)) (p i : ℕ),
+    IsHeckePrime l P p → FunAt Xo c P p i
 
 def PointsDetect : Prop :=
   ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
-    (Xo : Moduli Dw l) (c : Coeff l) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), DetectAt Xo c a n
+      (Xo : Moduli Dw l) (c : Coeff l) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ),
+    DetectAt Xo c a n
 
 def HeckePointLaws : Prop := HeckeFinite ∧ HeckeTotal ∧ HeckeSingleValued ∧ PointsDetect
 
 section Basic₂
 
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
-
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
 
 set_option autoImplicit false in
 open AlgebraicGeometry CategoryTheory NumberField in
-variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E} {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
+variable
+  {E : Type} [Field E] [NumberField E] [IsCMField E]
+  {H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E}
+  {Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H}
   {l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H} in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.HeckePrimeDetection.isHeckePrime_iff {P : Ideal (𝓞 E)} {p : ℕ} :
-    _root_.GlobalTheory.IndefiniteRowSideFullHecke.HeckePrimeDetection.IsHeckePrime l P p ↔ P.IsMaximal ∧ P ⊔ P.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤ ∧
-      p.Prime ∧ (p : 𝓞 E) ∈ P ∧ ¬ p ∣ l.M' := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.HeckePrimeDetection.isHeckePrime_iff
+    {P : Ideal (𝓞 E)} {p : ℕ}
+    : _root_.GlobalTheory.IndefiniteRowSideFullHecke.HeckePrimeDetection.IsHeckePrime l P p
+      ↔ P.IsMaximal ∧ P ⊔ P.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤ ∧ p.Prime ∧ (p : 𝓞 E) ∈ P
+        ∧ ¬ p ∣ l.M' := by
   unfold _root_.GlobalTheory.IndefiniteRowSideFullHecke.HeckePrimeDetection.IsHeckePrime
   constructor
   · rintro ⟨hmax, hsplit, hM, hp, hpP⟩

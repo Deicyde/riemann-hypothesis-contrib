@@ -6,8 +6,11 @@ public import Development.AbelianVarietyTheory.Proofs.RingsOfIntegers.IndexRange
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField IsLocalRing
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField IsLocalRing
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor
+  Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
 open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ GlobalTheory.PtTie IsDedekindDomain
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.PlaceInt
@@ -17,7 +20,16 @@ noncomputable section
 
 namespace GlobalTheory.LatticeIndex
 
-theorem intersected_trivAt_integral : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (c : Coeff l) (n : ℕ) (Λ : GenLat E n) (ℓ : ℕ), ℓ.Prime → Λ.TrivAt ℓ → ∀ la : HeightOneSpectrum (𝓞 c.F), (ℓ : 𝓞 c.F) ∈ la.asIdeal → ∀ s : c.F, Submodule.span (𝓞 c.F) {s} * ∏ τ : E →+* ℂ, idealAt c Λ.Ln τ ^ Dw.mult τ ≤ ∏ τ : E →+* ℂ, idealAt c Λ.La τ ^ Dw.mult τ → la.valuation c.F s ≤ 1 := by
+theorem intersected_trivAt_integral
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H)
+        (c : Coeff l) (n : ℕ) (Λ : GenLat E n) (ℓ : ℕ),
+      ℓ.Prime → Λ.TrivAt ℓ
+        → ∀ la : HeightOneSpectrum (𝓞 c.F),
+          (ℓ : 𝓞 c.F) ∈ la.asIdeal
+            → ∀ s : c.F,
+              Submodule.span (𝓞 c.F) {s} * ∏ τ : E →+* ℂ, idealAt c Λ.Ln τ ^ Dw.mult τ
+                  ≤ ∏ τ : E →+* ℂ, idealAt c Λ.La τ ^ Dw.mult τ
+                → la.valuation c.F s ≤ 1 := by
   intro E _ _ _ H Dw l c n Λ ℓ hℓ hT la hla s hs
   obtain ⟨k, hk, hkLa, hkstd⟩ := hT
   set w := la.valuation c.F with hwdef
@@ -33,17 +45,23 @@ theorem intersected_trivAt_integral : ∀ (E : Type) [Field E] [NumberField E] [
         exact la.asIdeal.add_mem (la.asIdeal.mul_mem_left _ hm) (la.asIdeal.mul_mem_left _ hla)
       exact la.isPrime.ne_top ((Ideal.eq_top_iff_one _).2 this)
   have hkv : ∀ τ : E →+* ℂ, w (embF c τ (k : E)) = 1 := fun τ => by rw [map_natCast]; exact hk1
-  have hsm : ∀ v : Fin n → Fin n → E,
-      (Matrix.of fun i j => ((k : 𝓞 E) • v j) i) = (k : E) • Matrix.of fun i j => v j i := by
+  have hsm
+      : ∀ v : Fin n → Fin n → E,
+        (Matrix.of fun i j => ((k : 𝓞 E) • v j) i) = (k : E) • Matrix.of fun i j => v j i := by
     intro v; ext i j; simp [Algebra.smul_def]
-  have hdetk : ∀ v : Fin n → Fin n → E,
-      Matrix.det (Matrix.of fun i j => ((k : 𝓞 E) • v j) i) = (k : E) ^ n * Matrix.det (Matrix.of fun i j => v j i) := by
+  have hdetk
+      : ∀ v : Fin n → Fin n → E,
+        Matrix.det (Matrix.of fun i j => ((k : 𝓞 E) • v j) i)
+          = (k : E) ^ n * Matrix.det (Matrix.of fun i j => v j i) := by
     intro v; rw [hsm, Matrix.det_smul, Fintype.card_fin]
 
-  have hei : ∀ i : Fin n, (k : 𝓞 E) • (Pi.single i 1 : Fin n → E) ∈ Λ.Ln := fun i =>
-    ⟨hkstd (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) (single_std i)),
-      Submodule.smul_mem _ _ (single_std i)⟩
-  have hdete : Matrix.det (Matrix.of fun i j => ((k : 𝓞 E) • (Pi.single j 1 : Fin n → E)) i) = (k : E) ^ n := by
+  have hei : ∀ i : Fin n, (k : 𝓞 E) • (Pi.single i 1 : Fin n → E) ∈ Λ.Ln := fun i => ⟨
+    hkstd (Submodule.smul_mem_smul (Ideal.mem_span_singleton_self _) (single_std i)),
+    Submodule.smul_mem _ _ (single_std i)
+  ⟩
+  have hdete
+      : Matrix.det (Matrix.of fun i j => ((k : 𝓞 E) • (Pi.single j 1 : Fin n → E)) i)
+        = (k : E) ^ n := by
     rw [hdetk, det_single, _root_.mul_one]
   have hLa : ∀ τ : E →+* ℂ, HasMax w (idealAt c Λ.La τ) 1 := fun τ => by
     refine hasMax_span hw ?_ ⟨_, ⟨_, ⟨_, fun i => (hei i).1, rfl⟩, rfl⟩, ?_⟩

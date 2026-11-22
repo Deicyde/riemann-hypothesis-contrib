@@ -5,12 +5,13 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.WeaklyAdmissibleFiltrations
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+  Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N
+  Formalism.WeaklyAdmissibleFiltrations
 open GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.GalOfCusp TensorProduct Module
 open UpperTheory.Gal.crystallineComparison
 
-theorem UpperTheory.Gal.crystallineComparison.detCo_of :
-    CoFacts := by
+theorem UpperTheory.Gal.crystallineComparison.detCo_of : CoFacts := by
   intro F L B _ _ _ _ _ a
   refine ⟨fun x y => ?_, ?_, ?_, ?_, ?_⟩
   · funext i

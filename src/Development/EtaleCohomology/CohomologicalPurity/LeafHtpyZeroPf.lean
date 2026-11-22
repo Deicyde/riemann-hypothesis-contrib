@@ -9,7 +9,8 @@ open CategoryTheory Limits AlgebraicGeometry Opposite GlobalTheory.EtC
 
 namespace LateralTheory.CohomologicalPurity.Thom.HtpyZeroPf
 
-theorem eqv_of_iso {R : Type} [CommRing R] {E E' : Spc} (f : E ⟶ E') [IsIso f] (F : Shv R) : Eqv R f F := by
+theorem eqv_of_iso {R : Type} [CommRing R] {E E' : Spc} (f : E ⟶ E') [IsIso f] (F : Shv R)
+    : Eqv R f F := by
   intro n
   refine Function.bijective_iff_has_inverse.2 ⟨pull R (inv f) F n, fun x => ?_, fun x => ?_⟩
   · rw [← pull_comp, IsIso.inv_hom_id, pull_id]
@@ -37,8 +38,9 @@ theorem LeafHtpyZero_of : LeafHtpyZero := by
   have : IsEmpty (off A ⊥).toScheme := inferInstanceAs (IsEmpty (off A ⊥))
   have : IsEmpty (off (Polynomial A) ((⊥ : Ideal A).map Polynomial.C)).toScheme :=
     inferInstanceAs (IsEmpty (off (Polynomial A) ((⊥ : Ideal A).map Polynomial.C)))
-  have := HtpyZeroPf.isIso_of_empty
-    ((Spec.map (CommRingCat.ofHom (Polynomial.C : A →+* Polynomial A))).resLE _ _ h)
+  have :=
+    HtpyZeroPf.isIso_of_empty
+      ((Spec.map (CommRingCat.ofHom (Polynomial.C : A →+* Polynomial A))).resLE _ _ h)
   exact HtpyZeroPf.eqv_of_iso _ _
 
 end LateralTheory.CohomologicalPurity.Thom

@@ -4,4 +4,6 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-theorem GlobalTheory.HeightCounting.CGTrueT.galEx : type_of% (@GlobalTheory.HeightCounting.CGTrueT.galEx_alt) := @GlobalTheory.HeightCounting.CGTrueT.galEx_alt
+theorem GlobalTheory.HeightCounting.CGTrueT.galEx
+    : type_of% (@GlobalTheory.HeightCounting.CGTrueT.galEx_alt) :=
+  @GlobalTheory.HeightCounting.CGTrueT.galEx_alt

@@ -16,8 +16,9 @@ open Formalism.GradedWeylDivisibility
 def wlocal_E {R : Type} [CommRing R] {r : ℕ} (a b : Fin r) (c : R) : Matrix (Fin r) (Fin r) R :=
   fun i j => (if i = j then 1 else 0) + (if i = a ∧ j = b then c else 0)
 
-def wlocal_L {R : Type} [CommRing R] {r : ℕ} (k : Fin r) (c : Fin r → R) : Matrix (Fin r) (Fin r) R :=
-  fun i j => (if i = j then 1 else 0) + (if i ≠ k ∧ j = k then c i else 0)
+def wlocal_L {R : Type} [CommRing R] {r : ℕ} (k : Fin r) (c : Fin r → R)
+    : Matrix (Fin r) (Fin r) R := fun i j =>
+  (if i = j then 1 else 0) + (if i ≠ k ∧ j = k then c i else 0)
 
 section
 
@@ -267,9 +268,12 @@ private lemma mul_mul_mul_eq_one_of_inverses {r : ℕ} {N M A B : Matrix (Fin r)
     (hBA : B * A = 1) : N * B * (A * M) = 1 := by
   rw [Matrix.mul_assoc, ← Matrix.mul_assoc B A M, hBA, Matrix.one_mul, h]
 
-theorem wlocal_main {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
-    ∀ d k : ℕ, k + d = r → ∀ M N : Matrix (Fin r) (Fin r) R, N * M = 1 →
-      (∀ i j : Fin r, j.val < k → M i j = if i = j then 1 else 0) → wlocal_Good hn ν M := by
+theorem wlocal_main {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ)
+    : ∀ d k : ℕ,
+      k + d = r
+        → ∀ M N : Matrix (Fin r) (Fin r) R,
+          N * M = 1 → (∀ i j : Fin r, j.val < k → M i j = if i = j then 1 else 0)
+            → wlocal_Good hn ν M := by
   intro d
   induction d with
   | zero =>
@@ -283,15 +287,19 @@ theorem wlocal_main {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
     intro k hk M N hNM hstd
     have hkr : k < r := by omega
     obtain ⟨kk, hkk⟩ : ∃ kk : Fin r, kk.val = k := ⟨⟨k, hkr⟩, rfl⟩
-    have cont : ∀ P P' : Matrix (Fin r) (Fin r) R, P' * P = 1 → wlocal_Good hn ν P' →
-        IsUnit ((P * M) kk kk) →
-        (∀ l j : Fin r, j.val < k → (P * M) l j = if l = j then 1 else 0) → wlocal_Good hn ν M := by
+    have cont
+        : ∀ P P' : Matrix (Fin r) (Fin r) R,
+          P' * P = 1 → wlocal_Good hn ν P' → IsUnit ((P * M) kk kk)
+            → (∀ l j : Fin r, j.val < k → (P * M) l j = if l = j then 1 else 0)
+            → wlocal_Good hn ν M := by
       intro P P' hPP hP' hunit hstd1
       obtain ⟨u, hu⟩ := hunit
       obtain ⟨M1, hM1⟩ : ∃ M1, M1 = P * M := ⟨_, rfl⟩
       rw [← hM1] at hu hstd1
       obtain ⟨M2, hM2⟩ : ∃ M2, M2 = wlocal_E kk kk ((↑u⁻¹ : R) - 1) * M1 := ⟨_, rfl⟩
-      have h2 : ∀ l j : Fin r, M2 l j = M1 l j + (if l = kk then ((↑u⁻¹ : R) - 1) * M1 kk j else 0) := by
+      have h2
+          : ∀ l j : Fin r,
+            M2 l j = M1 l j + (if l = kk then ((↑u⁻¹ : R) - 1) * M1 kk j else 0) := by
         intro l j
         rw [hM2, wlocal_E_mul_apply]
       have h2kk : M2 kk kk = 1 := by
@@ -342,14 +350,17 @@ theorem wlocal_main {r n : ℕ} (hn : n ≤ r) (ν : Fin n → ℕ) :
       have hN2 : N * P' * wlocal_E kk kk ((u : R) - 1) * M2 = 1 := by
         rw [hM2]
         exact mul_mul_mul_eq_one_of_inverses hN1 hEE
-      have hN3 : N * P' * wlocal_E kk kk ((u : R) - 1) * wlocal_L kk (fun l => M2 l kk) * M3 = 1 := by
+      have hN3
+          : N * P' * wlocal_E kk kk ((u : R) - 1) * wlocal_L kk (fun l => M2 l kk) * M3 = 1 := by
         rw [hM3]
         exact mul_mul_mul_eq_one_of_inverses hN2 hLL
       have hM3g : wlocal_Good hn ν M3 := ih (k + 1) (by omega) M3 _ hN3 h3std
       have hM2g : wlocal_Good hn ν M2 :=
-        wlocal_good_of_factor (wlocal_good_L hn ν kk (fun l => M2 l kk)) hLL (by rw [← hM3]; exact hM3g)
+        wlocal_good_of_factor (wlocal_good_L hn ν kk (fun l => M2 l kk)) hLL
+          (by rw [← hM3]; exact hM3g)
       have hM1g : wlocal_Good hn ν M1 :=
-        wlocal_good_of_factor (wlocal_good_E hn ν kk kk ((u : R) - 1)) hEE (by rw [← hM2]; exact hM2g)
+        wlocal_good_of_factor (wlocal_good_E hn ν kk kk ((u : R) - 1)) hEE
+          (by rw [← hM2]; exact hM2g)
       exact wlocal_good_of_factor hP' hPP (by rw [← hM1]; exact hM1g)
     by_cases hu0 : IsUnit (M kk kk)
     · refine cont 1 1 (Matrix.one_mul 1) (wlocal_good_one hn ν) ?_ ?_
@@ -379,7 +390,9 @@ end
 
 theorem wlocal_local : Formalism.UG.WeylGLStableLocal := by
   intro R _ _ r n hn ν g f hf
-  exact wlocal_main hn ν r 0 (by omega) _ _ (Units.mul_inv g) (fun i j hj => absurd hj (Nat.not_lt_zero _)) f hf
+  exact wlocal_main hn ν r 0 (by omega) _ _ (Units.mul_inv g)
+    (fun i j hj => absurd hj (Nat.not_lt_zero _))
+    f hf
 
 section
 
@@ -544,23 +557,26 @@ end
 
 theorem wlocal_global : Formalism.UG.WeylGLStable := by
   intro R _ r n hn ν g f hf
-  obtain ⟨J, hJdef⟩ : ∃ J : Ideal R,
-      J = Submodule.comap (LinearMap.toSpanSingleton R _ (dwAct R r n g f)) (weyl R r n hn ν) := ⟨_, rfl⟩
+  obtain ⟨J, hJdef⟩
+      : ∃ J : Ideal R,
+        J = Submodule.comap (LinearMap.toSpanSingleton R _ (dwAct R r n g f)) (weyl R r n hn ν) :=
+    ⟨_, rfl⟩
   have hJ : J = ⊤ := by
     by_contra hne
     obtain ⟨P, hPmax, hJP⟩ := Ideal.exists_le_maximal J hne
     haveI := hPmax.isPrime
     have hf' := wlocal_map_weyl (algebraMap R (Localization.AtPrime P)) hn ν f hf
-    have hloc := wlocal_local (Localization.AtPrime P) r n hn ν
-      (Units.map (algebraMap R (Localization.AtPrime P)).mapMatrix.toMonoidHom g) _ hf'
-    have hg : ((Units.map (algebraMap R (Localization.AtPrime P)).mapMatrix.toMonoidHom g)⁻¹ :
-        GL (Fin r) (Localization.AtPrime P)).val =
-        (g⁻¹ : GL (Fin r) R).val.map (algebraMap R (Localization.AtPrime P)) := by
-      first
-      | rfl
-      | simp [Units.coe_map_inv, RingHom.mapMatrix_apply]
-    have hmem : map (algebraMap R (Localization.AtPrime P)) (dwAct R r n g f) ∈
-        weyl (Localization.AtPrime P) r n hn ν := by
+    have hloc :=
+      wlocal_local (Localization.AtPrime P) r n hn ν
+        (Units.map (algebraMap R (Localization.AtPrime P)).mapMatrix.toMonoidHom g) _ hf'
+    have hg
+        : ((Units.map (algebraMap R (Localization.AtPrime P)).mapMatrix.toMonoidHom g)⁻¹
+            : GL (Fin r) (Localization.AtPrime P)).val
+          = (g⁻¹ : GL (Fin r) R).val.map (algebraMap R (Localization.AtPrime P)) := by
+      first | rfl | simp [Units.coe_map_inv, RingHom.mapMatrix_apply]
+    have hmem
+        : map (algebraMap R (Localization.AtPrime P)) (dwAct R r n g f)
+          ∈ weyl (Localization.AtPrime P) r n hn ν := by
       unfold dwAct at hloc ⊢
       rw [hg, ← wlocal_map_rowAct] at hloc
       exact hloc

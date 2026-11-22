@@ -10,23 +10,28 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory
 
-theorem exists_smul_apply_eq_of_eq_on_invariants {G B D : Type*} [Group G] [Finite G] [CommRing B]
-    [CommRing D] [IsDomain D] [MulSemiringAction G B] (x y : B →+* D)
-    (h : ∀ b, (∀ g : G, g • b = b) → x b = y b) (b : B) : ∃ g : G, y b = x (g • b) := by
+theorem exists_smul_apply_eq_of_eq_on_invariants
+    {G B D : Type*}
+    [Group G] [Finite G] [CommRing B] [CommRing D] [IsDomain D] [MulSemiringAction G B]
+    (x y : B →+* D) (h : ∀ b, (∀ g : G, g • b = b) → x b = y b)
+    (b : B)
+    : ∃ g : G, y b = x (g • b) := by
   classical
   have := Fintype.ofFinite G
   set P : Polynomial B := ∏ g : G, (Polynomial.X - Polynomial.C (g • b)) with hP
   have hinvP : ∀ k : G, k • P = P := by
     intro k
     rw [hP, Finset.smul_prod']
-    exact Fintype.prod_bijective (k • ·) (MulAction.bijective k) _ _ (fun g => by
-      rw [smul_sub, Polynomial.smul_X, Polynomial.smul_C, smul_smul, smul_eq_mul])
+    exact Fintype.prod_bijective (k • ·) (MulAction.bijective k) _ _
+      (fun g => by rw [smul_sub, Polynomial.smul_X, Polynomial.smul_C, smul_smul, smul_eq_mul])
   have hmap : P.map x = P.map y := by
     ext n
     rw [Polynomial.coeff_map, Polynomial.coeff_map]
@@ -43,9 +48,11 @@ theorem exists_smul_apply_eq_of_eq_on_invariants {G B D : Type*} [Group G] [Fini
   obtain ⟨g, -, hg⟩ := Finset.prod_eq_zero_iff.mp h0
   exact ⟨g, sub_eq_zero.mp hg⟩
 
-theorem exists_smul_eq_of_eq_on_invariants {G B D : Type*} [Group G] [Finite G] [CommRing B]
-    [CommRing D] [IsDomain D] [MulSemiringAction G B] (x y : B →+* D)
-    (h : ∀ b, (∀ g : G, g • b = b) → x b = y b) : ∃ g : G, ∀ b, y b = x (g • b) := by
+theorem exists_smul_eq_of_eq_on_invariants
+    {G B D : Type*}
+    [Group G] [Finite G] [CommRing B] [CommRing D] [IsDomain D] [MulSemiringAction G B]
+    (x y : B →+* D) (h : ∀ b, (∀ g : G, g • b = b) → x b = y b)
+    : ∃ g : G, ∀ b, y b = x (g • b) := by
   classical
   by_contra hne
   push Not at hne
@@ -56,44 +63,53 @@ theorem exists_smul_eq_of_eq_on_invariants {G B D : Type*} [Group G] [Finite G] 
   have hcoef : ∀ g, p.coeff (e g) = c g := by
     intro g
     simp only [p, Polynomial.finsetSum_coeff, Polynomial.coeff_C_mul_X_pow]
-    rw [Finset.sum_eq_single g (fun g' _ hg' => if_neg (fun hh => hg' (e.injective (Fin.ext hh)).symm))
-      (by simp), if_pos rfl]
-  have hyp : ∀ q : Polynomial B, (∀ g : G, g • q = q) →
-      Polynomial.mapRingHom x q = Polynomial.mapRingHom y q := by
+    rw [Finset.sum_eq_single g
+        (fun g' _ hg' => if_neg (fun hh => hg' (e.injective (Fin.ext hh)).symm))
+        (by simp),
+      if_pos rfl]
+  have hyp
+      : ∀ q : Polynomial B,
+        (∀ g : G, g • q = q) → Polynomial.mapRingHom x q = Polynomial.mapRingHom y q := by
     intro q hq
     ext n
     simp only [Polynomial.coe_mapRingHom, Polynomial.coeff_map]
     apply h
     intro g
     rw [← Polynomial.coeff_smul, hq]
-  obtain ⟨g, hg⟩ := exists_smul_apply_eq_of_eq_on_invariants (G := G)
-    (Polynomial.mapRingHom x) (Polynomial.mapRingHom y) hyp p
+  obtain ⟨g, hg⟩ :=
+    exists_smul_apply_eq_of_eq_on_invariants (G := G) (Polynomial.mapRingHom x)
+      (Polynomial.mapRingHom y) hyp p
   have hgc := congrArg (fun q => q.coeff (e g)) hg
   simp only [Polynomial.coe_mapRingHom, Polynomial.coeff_map, Polynomial.coeff_smul, hcoef] at hgc
   exact hc g hgc
 
-theorem exists_aut_of_comp_eq_of_invariant {G : Type*} [Group G] [Finite G] {X X' T : Scheme.{0}}
-    (ρ : G →* Aut X) (π : X ⟶ X') [IsAffineHom π] (hπ : ∀ g, (ρ g).asIso.hom ≫ π = π)
+theorem exists_aut_of_comp_eq_of_invariant
+    {G : Type*} [Group G] [Finite G]
+    {X X' T : Scheme.{0}} (ρ : G →* Aut X) (π : X ⟶ X') [IsAffineHom π]
+    (hπ : ∀ g, (ρ g).asIso.hom ≫ π = π)
     {W : X'.Opens} (hW : IsAffineOpen W)
     (hinv : ∀ s : Γ(X, π ⁻¹ᵁ W), IsInvariantSection ρ _ s → s ∈ Set.range (π.app W))
-    [IsAffine T] [IsIntegral T] (x y : T ⟶ X) (hxy : x ≫ π = y ≫ π)
-    (hx : ⊤ ≤ x ⁻¹ᵁ π ⁻¹ᵁ W) : ∃ g, y = x ≫ (ρ g).asIso.hom := by
+    [IsAffine T] [IsIntegral T]
+    (x y : T ⟶ X) (hxy : x ≫ π = y ≫ π) (hx : ⊤ ≤ x ⁻¹ᵁ π ⁻¹ᵁ W)
+    : ∃ g, y = x ≫ (ρ g).asIso.hom := by
   have hU : ∀ g, π ⁻¹ᵁ W ≤ (ρ g).asIso.hom ⁻¹ᵁ π ⁻¹ᵁ W := fun g => by
     show _ ≤ ((ρ g).asIso.hom ≫ π) ⁻¹ᵁ W
     rw [hπ g]
   let _ := sectionsAction ρ _ hU
-  have hact : ∀ (g : G) (s : Γ(X, π ⁻¹ᵁ W)),
-      g • s = (ρ g⁻¹).asIso.hom.appLE _ _ (hU g⁻¹) s := fun g s => rfl
+  have hact : ∀ (g : G) (s : Γ(X, π ⁻¹ᵁ W)), g • s = (ρ g⁻¹).asIso.hom.appLE _ _ (hU g⁻¹) s :=
+    fun g s => rfl
   have hy : ⊤ ≤ y ⁻¹ᵁ π ⁻¹ᵁ W := by
     show ⊤ ≤ (y ≫ π) ⁻¹ᵁ W
     rw [← hxy]
     exact hx
-  have key : ∀ (f f' : T ⟶ X') (_ : f = f') (h1 : ⊤ ≤ f ⁻¹ᵁ W) (h2 : ⊤ ≤ f' ⁻¹ᵁ W),
-      f.appLE W ⊤ h1 = f'.appLE W ⊤ h2 := by
+  have key
+      : ∀ (f f' : T ⟶ X') (_ : f = f') (h1 : ⊤ ≤ f ⁻¹ᵁ W) (h2 : ⊤ ≤ f' ⁻¹ᵁ W),
+        f.appLE W ⊤ h1 = f'.appLE W ⊤ h2 := by
     rintro f f' rfl h1 h2
     rfl
-  have hagree : ∀ s : Γ(X, π ⁻¹ᵁ W), (∀ g : G, g • s = s) →
-      (x.appLE (π ⁻¹ᵁ W) ⊤ hx).hom s = (y.appLE (π ⁻¹ᵁ W) ⊤ hy).hom s := by
+  have hagree
+      : ∀ s : Γ(X, π ⁻¹ᵁ W),
+        (∀ g : G, g • s = s) → (x.appLE (π ⁻¹ᵁ W) ⊤ hx).hom s = (y.appLE (π ⁻¹ᵁ W) ⊤ hy).hom s := by
     intro s hs
     have hinv' : IsInvariantSection ρ _ s := by
       intro g
@@ -124,18 +140,21 @@ theorem exists_aut_of_comp_eq_of_invariant {G : Type*} [Group G] [Finite G] {X X
   rw [IsAffineOpen.fromSpec_top] at h1 h2
   exact (cancel_epi _).1 (h1.symm.trans h2)
 
-theorem isIntegralHom_of_invariant {G : Type*} [Group G] [Finite G] {X X' : Scheme.{0}}
-    (ρ : G →* Aut X) (π : X ⟶ X') [IsAffineHom π] (hπ : ∀ g, (ρ g).asIso.hom ≫ π = π)
-    (hinv : ∀ W : X'.Opens, IsAffineOpen W → ∀ s : Γ(X, π ⁻¹ᵁ W),
-      IsInvariantSection ρ _ s → s ∈ Set.range (π.app W)) : IsIntegralHom π := by
+theorem isIntegralHom_of_invariant
+    {G : Type*} [Group G] [Finite G]
+    {X X' : Scheme.{0}} (ρ : G →* Aut X) (π : X ⟶ X') [IsAffineHom π]
+    (hπ : ∀ g, (ρ g).asIso.hom ≫ π = π)
+    (hinv : ∀ W : X'.Opens,
+      IsAffineOpen W → ∀ s : Γ(X, π ⁻¹ᵁ W), IsInvariantSection ρ _ s → s ∈ Set.range (π.app W))
+    : IsIntegralHom π := by
   rw [isIntegralHom_iff]
   refine ⟨inferInstance, fun W hW => ?_⟩
   have hU : ∀ g, π ⁻¹ᵁ W ≤ (ρ g).asIso.hom ⁻¹ᵁ π ⁻¹ᵁ W := fun g => by
     show _ ≤ ((ρ g).asIso.hom ≫ π) ⁻¹ᵁ W
     rw [hπ g]
   let _ := sectionsAction ρ _ hU
-  have hact : ∀ (g : G) (s : Γ(X, π ⁻¹ᵁ W)),
-      g • s = (ρ g⁻¹).asIso.hom.appLE _ _ (hU g⁻¹) s := fun g s => rfl
+  have hact : ∀ (g : G) (s : Γ(X, π ⁻¹ᵁ W)), g • s = (ρ g⁻¹).asIso.hom.appLE _ _ (hU g⁻¹) s :=
+    fun g s => rfl
   classical
   have := Fintype.ofFinite G
   intro s
@@ -146,8 +165,8 @@ theorem isIntegralHom_of_invariant {G : Type*} [Group G] [Finite G] {X X' : Sche
   have hinvP : ∀ k : G, k • P = P := by
     intro k
     rw [hP, Finset.smul_prod']
-    exact Fintype.prod_bijective (k • ·) (MulAction.bijective k) _ _ (fun g => by
-      rw [smul_sub, Polynomial.smul_X, Polynomial.smul_C, smul_smul, smul_eq_mul])
+    exact Fintype.prod_bijective (k • ·) (MulAction.bijective k) _ _
+      (fun g => by rw [smul_sub, Polynomial.smul_X, Polynomial.smul_C, smul_smul, smul_eq_mul])
   have hlift : P ∈ Polynomial.lifts (π.app W).hom := by
     rw [Polynomial.lifts_iff_coeff_lifts]
     intro n
@@ -165,23 +184,34 @@ theorem isIntegralHom_of_invariant {G : Type*} [Group G] [Finite G] {X X' : Sche
   rw [← Polynomial.eval_map, hq, hP, Polynomial.eval_prod]
   exact Finset.prod_eq_zero (Finset.mem_univ 1) (by simp)
 
-theorem quotient_isIntegral_surjective_orbits :
-    ∀ (Γ : Type) [Group Γ] [Finite Γ] (X X' : Scheme.{0}) (ρ : Γ →* Aut X) (π : X ⟶ X'), (IsAffineHom π ∧ (∀ g, (ρ g).asIso.hom ≫ π = π) ∧ ∀ V : X'.Opens, Function.Injective (π.app V).hom ∧ ∀ f : Γ(X, π ⁻¹ᵁ V), (∀ g (h : π ⁻¹ᵁ V ≤ (ρ g).asIso.hom ⁻¹ᵁ (π ⁻¹ᵁ V)), ((ρ g).asIso.hom.appLE _ _ h).hom f = f) → f ∈ Set.range (π.app V).hom) → IsIntegralHom π ∧ Surjective π ∧ (∀ x y : X, π x = π y → ∃ g, y = (ρ g).asIso.hom x) ∧ (∀ (k : Type) [Field k] (x y : Sp k ⟶ X), x ≫ π = y ≫ π → ∃ g, y = x ≫ (ρ g).asIso.hom) ∧ ∀ U : X.Opens, (∀ g, (ρ g).asIso.hom ⁻¹ᵁ U = U) → ∃ V : X'.Opens, π ⁻¹ᵁ V = U := by
+theorem quotient_isIntegral_surjective_orbits
+    : ∀ (Γ : Type) [Group Γ] [Finite Γ] (X X' : Scheme.{0}) (ρ : Γ →* Aut X) (π : X ⟶ X'),
+      (IsAffineHom π ∧ (∀ g, (ρ g).asIso.hom ≫ π = π)
+          ∧ ∀ V : X'.Opens,
+            Function.Injective (π.app V).hom
+              ∧ ∀ f : Γ(X, π ⁻¹ᵁ V),
+                (∀ g (h : π ⁻¹ᵁ V ≤ (ρ g).asIso.hom ⁻¹ᵁ (π ⁻¹ᵁ V)),
+                    ((ρ g).asIso.hom.appLE _ _ h).hom f = f)
+                  → f ∈ Set.range (π.app V).hom)
+        → IsIntegralHom π ∧ Surjective π ∧ (∀ x y : X, π x = π y → ∃ g, y = (ρ g).asIso.hom x)
+          ∧ (∀ (k : Type) [Field k] (x y : Sp k ⟶ X), x ≫ π = y ≫ π → ∃ g, y = x ≫ (ρ g).asIso.hom)
+          ∧ ∀ U : X.Opens, (∀ g, (ρ g).asIso.hom ⁻¹ᵁ U = U) → ∃ V : X'.Opens, π ⁻¹ᵁ V = U := by
   intro Γ _ _ X X' ρ π ⟨hAff, hπ, hV⟩
-  have hinvAll : ∀ W : X'.Opens, IsAffineOpen W → ∀ s : Γ(X, π ⁻¹ᵁ W),
-      IsInvariantSection ρ _ s → s ∈ Set.range (π.app W) := by
+  have hinvAll
+      : ∀ W : X'.Opens,
+        IsAffineOpen W
+          → ∀ s : Γ(X, π ⁻¹ᵁ W), IsInvariantSection ρ _ s → s ∈ Set.range (π.app W) := by
     intro W _ s hs
     apply (hV W).2 s
     intro g h
     obtain ⟨h', e⟩ := hs g
     exact e
   have hInt : IsIntegralHom π := isIntegralHom_of_invariant ρ π hπ hinvAll
-  have hfield : ∀ (k : Type) [Field k] (x y : Sp k ⟶ X), x ≫ π = y ≫ π →
-      ∃ g, y = x ≫ (ρ g).asIso.hom := by
+  have hfield
+      : ∀ (k : Type) [Field k] (x y : Sp k ⟶ X), x ≫ π = y ≫ π → ∃ g, y = x ≫ (ρ g).asIso.hom := by
     intro k _ x y hxy
     let p₀ : Sp k := ⟨⊥, Ideal.isPrime_bot⟩
-    obtain ⟨W, hW, hmem, -⟩ :=
-      exists_isAffineOpen_mem_and_subset (x := (x ≫ π) p₀) (U := ⊤) trivial
+    obtain ⟨W, hW, hmem, -⟩ := exists_isAffineOpen_mem_and_subset (x := (x ≫ π) p₀) (U := ⊤) trivial
     refine exists_aut_of_comp_eq_of_invariant ρ π hπ hW (hinvAll W hW) x y hxy ?_
     intro p _
     have hp : p = p₀ := Subsingleton.elim _ _
@@ -190,8 +220,9 @@ theorem quotient_isIntegral_surjective_orbits :
   have hpts : ∀ x y : X, π x = π y → ∃ g, y = (ρ g).asIso.hom x := by
     intro x y hxy
     obtain ⟨z, hz1, hz2⟩ := Scheme.Pullback.exists_preimage_pullback x y hxy
-    have hab : (Scheme.fromSpecResidueField _ z ≫ pullback.fst π π) ≫ π =
-        (Scheme.fromSpecResidueField _ z ≫ pullback.snd π π) ≫ π := by
+    have hab
+        : (Scheme.fromSpecResidueField _ z ≫ pullback.fst π π) ≫ π
+          = (Scheme.fromSpecResidueField _ z ≫ pullback.snd π π) ≫ π := by
       rw [Category.assoc, Category.assoc, pullback.condition]
     obtain ⟨g, hg⟩ := hfield ((pullback π π).residueField z) _ _ hab
     refine ⟨g, ?_⟩

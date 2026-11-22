@@ -90,17 +90,25 @@ theorem geometry_smoothness_holds : GeomSmooth := by
   have hdi : Sm (fun g => -((Zhat k r z z' g).det)⁻¹) U := ((s_det (s_Zhat z z' sU)).inv hd0).neg
   have hL : Sm (fun g => Lm k r z z' g) U := by
     unfold Lm
-    exact contDiffOn_const.add (ContDiffOn.sum fun c _ => ContDiffOn.sum fun a _ =>
-      s_msmul (hdi.mul (s_adj (s_Zhat z z' sU) c a)) (s_mmul contDiffOn_const sU))
+    exact contDiffOn_const.add (ContDiffOn.sum fun c _ =>
+      ContDiffOn.sum fun a _ =>
+        s_msmul (hdi.mul (s_adj (s_Zhat z z' sU) c a)) (s_mmul contDiffOn_const sU))
   have hP : Sm (fun g => Phi k r z z' g) U := by
     unfold Phi
     exact s_mmul (s_mmul contDiffOn_const sU) hL
-  have hio : Sm (fun g => Phi k r z z' g *
-      (Pm k r z' - Rk k r (unitH k r (omS k r z z' g)) (unitH k r (omS k r z z' g)) * Pm k r z')) U :=
+  have hio : Sm
+      (fun g =>
+        Phi k r z z' g
+          * (Pm k r z'
+            - Rk k r (unitH k r (omS k r z z' g)) (unitH k r (omS k r z z' g)) * Pm k r z'))
+      U :=
     s_mmul hP (contDiffOn_const.sub (s_mmul (smooth_hermitian_rank_two hnuS hnuS) contDiffOn_const))
-  refine ⟨fun g₀ hg₀ => ⟨U, fun g => nuG z z' g, hU, hmem g₀ hg₀, hnu, fun g _ _ => rfl⟩,
-    fun g₀ hg₀ => ⟨U, fun g => unitH k r (omS k r z z' g), hU, hmem g₀ hg₀, hnuS, fun g _ hgV => ?_⟩,
-    fun g₀ hg₀ => ⟨U, _, hU, hmem g₀ hg₀, hio, fun g _ hgV => ?_⟩⟩
+  refine ⟨
+    fun g₀ hg₀ => ⟨U, fun g => nuG z z' g, hU, hmem g₀ hg₀, hnu, fun g _ _ => rfl⟩,
+    fun g₀ hg₀ =>
+      ⟨U, fun g => unitH k r (omS k r z z' g), hU, hmem g₀ hg₀, hnuS, fun g _ hgV => ?_⟩,
+    fun g₀ hg₀ => ⟨U, _, hU, hmem g₀ hg₀, hio, fun g _ hgV => ?_⟩
+  ⟩
   · show unitH k r (omW' k r z z' g) = _
     rw [omS_eq z z' hgV]
   · show Phi k r z z' g * (Pm k r z' - Rk k r (unitH k r (omW' k r z z' g)) (unitH k r (omW' k r z z' g)) *

@@ -13,15 +13,18 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeo
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open scoped CategoryTheory.Obj TensorProduct Pointwise
 
 namespace GlobalTheory.SemiAbelianDescent
 
-theorem exists_section {Z : Scheme.{0}} {Ω : Type} [Field Ω] [IsAlgClosed Ω]
-    (f : Z ⟶ Spec (CommRingCat.of Ω)) [IsIntegralHom f] [Surjective f] :
-    ∃ s : Spec (CommRingCat.of Ω) ⟶ Z, s ≫ f = 𝟙 _ := by
+theorem exists_section
+    {Z : Scheme.{0}} {Ω : Type} [Field Ω] [IsAlgClosed Ω]
+    (f : Z ⟶ Spec (CommRingCat.of Ω)) [IsIntegralHom f] [Surjective f]
+    : ∃ s : Spec (CommRingCat.of Ω) ⟶ Z, s ≫ f = 𝟙 _ := by
   have : IsAffine Z := isAffine_of_isAffineHom f
   have : Nonempty Z := ⟨(f.surjective (Nonempty.some inferInstance)).choose⟩
   obtain ⟨z, -, hz⟩ := (isClosed_univ (X := Z)).exists_closed_singleton Set.univ_nonempty
@@ -34,22 +37,26 @@ theorem exists_section {Z : Scheme.{0}} {Ω : Type} [Field Ω] [IsAlgClosed Ω]
     rw [← IsIntegralHom.SpecMap_iff, Spec.map_preimage]
     infer_instance
   refine ⟨Spec.map (inv (Spec.preimage g)) ≫ Z.fromSpecResidueField z, ?_⟩
-  calc (Spec.map (inv (Spec.preimage g)) ≫ Z.fromSpecResidueField z) ≫ f
-      = Spec.map (inv (Spec.preimage g)) ≫ Spec.map (Spec.preimage g) := by
-        rw [Category.assoc, Spec.map_preimage]
+  calc
+    (Spec.map (inv (Spec.preimage g)) ≫ Z.fromSpecResidueField z) ≫ f
+        = Spec.map (inv (Spec.preimage g)) ≫ Spec.map (Spec.preimage g) := by
+      rw [Category.assoc, Spec.map_preimage]
     _ = 𝟙 _ := by rw [← Spec.map_comp, IsIso.hom_inv_id, Spec.map_id]
 
-theorem exists_lift {X X' : Scheme.{0}} (π : X ⟶ X') [IsIntegralHom π] [Surjective π]
-    {Ω : Type} [Field Ω] [IsAlgClosed Ω] (p : Spec (CommRingCat.of Ω) ⟶ X') :
-    ∃ q : Spec (CommRingCat.of Ω) ⟶ X, q ≫ π = p := by
+theorem exists_lift
+    {X X' : Scheme.{0}} (π : X ⟶ X') [IsIntegralHom π] [Surjective π]
+    {Ω : Type} [Field Ω] [IsAlgClosed Ω]
+    (p : Spec (CommRingCat.of Ω) ⟶ X')
+    : ∃ q : Spec (CommRingCat.of Ω) ⟶ X, q ≫ π = p := by
   obtain ⟨s, hs⟩ := exists_section (pullback.snd π p)
   refine ⟨s ≫ pullback.fst π p, ?_⟩
   rw [Category.assoc, pullback.condition, ← Category.assoc, hs, Category.id_comp]
 
-private theorem isClosed_range_diagonal_of_surjective_universallyClosed {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S) [Surjective j]
-    {P : Scheme.{0}} (m : P ⟶ Limits.pullback f f) [UniversallyClosed m] (d : X ⟶ P)
-    (hd : IsClosed (Set.range d)) (hc : d ≫ m = j ≫ pullback.diagonal f) :
-    IsClosed (Set.range (pullback.diagonal f)) := by
+private theorem isClosed_range_diagonal_of_surjective_universallyClosed
+    {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S) [Surjective j]
+    {P : Scheme.{0}} (m : P ⟶ Limits.pullback f f) [UniversallyClosed m]
+    (d : X ⟶ P) (hd : IsClosed (Set.range d)) (hc : d ≫ m = j ≫ pullback.diagonal f)
+    : IsClosed (Set.range (pullback.diagonal f)) := by
   have key : Set.range (pullback.diagonal f) = m '' Set.range d := by
     ext z
     constructor
@@ -61,17 +68,23 @@ private theorem isClosed_range_diagonal_of_surjective_universallyClosed {X Y S :
   rw [key]
   exact m.isClosedMap _ hd
 
-theorem isSeparated_of_comp {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S)
-    [Surjective j] [UniversallyClosed j] [IsSeparated (j ≫ f)] : IsSeparated f := by
-  have hm := MorphismProperty.pullbackMap (P := @UniversallyClosed) (f := j ≫ f) (g := j ≫ f)
-    (f' := f) (g' := f) (i₁ := j) (i₂ := j) ‹UniversallyClosed j› ‹UniversallyClosed j› rfl rfl
-  have hcl := isClosed_range_diagonal_of_surjective_universallyClosed j f
-    (pullback.map (j ≫ f) (j ≫ f) f f j j (𝟙 _) (Category.comp_id _) (Category.comp_id _)) (pullback.diagonal (j ≫ f))
-    (pullback.diagonal (j ≫ f)).isClosedEmbedding.isClosed_range (pullback.comp_diagonal j f).symm
+theorem isSeparated_of_comp
+    {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S)
+    [Surjective j] [UniversallyClosed j] [IsSeparated (j ≫ f)]
+    : IsSeparated f := by
+  have hm :=
+    MorphismProperty.pullbackMap (P := @UniversallyClosed) (f := j ≫ f) (g := j ≫ f) (f' := f)
+      (g' := f) (i₁ := j) (i₂ := j) ‹UniversallyClosed j› ‹UniversallyClosed j› rfl rfl
+  have hcl :=
+    isClosed_range_diagonal_of_surjective_universallyClosed j f
+      (pullback.map (j ≫ f) (j ≫ f) f f j j (𝟙 _) (Category.comp_id _) (Category.comp_id _))
+      (pullback.diagonal (j ≫ f)) (pullback.diagonal (j ≫ f)).isClosedEmbedding.isClosed_range
+      (pullback.comp_diagonal j f).symm
   exact ⟨IsClosedImmersion.of_isPreimmersion _ hcl⟩
 
-theorem quasiCompact_of_comp {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S)
-    [Surjective j] [QuasiCompact (j ≫ f)] : QuasiCompact f := by
+theorem quasiCompact_of_comp
+    {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S) [Surjective j] [QuasiCompact (j ≫ f)]
+    : QuasiCompact f := by
   refine ⟨fun U hU hU' => ?_⟩
   have h := (QuasiCompact.isCompact_preimage (f := j ≫ f) U hU hU').image j.continuous
   convert h using 1
@@ -83,9 +96,10 @@ theorem quasiCompact_of_comp {X Y S : Scheme.{0}} (j : X ⟶ Y) (f : Y ⟶ S)
   · rintro ⟨y, hy, rfl⟩
     simpa using hy
 
-theorem geometricallyConnected_of_isPullback {X X' Y Y' : Scheme.{0}} {π : X ⟶ X'} [IsIntegralHom π]
-    [Surjective π] {f : Y ⟶ X} {f' : Y' ⟶ X'} {φ : Y ⟶ Y'} (h : IsPullback φ f f' π)
-    [GeometricallyConnected f] : GeometricallyConnected f' := by
+theorem geometricallyConnected_of_isPullback
+    {X X' Y Y' : Scheme.{0}} {π : X ⟶ X'} [IsIntegralHom π] [Surjective π]
+    {f : Y ⟶ X} {f' : Y' ⟶ X'} {φ : Y ⟶ Y'} (h : IsPullback φ f f' π) [GeometricallyConnected f]
+    : GeometricallyConnected f' := by
   refine ⟨geometrically_iff_of_isClosedUnderIsomorphisms.mpr fun K _ y => ?_⟩
   let ιK : Spec (CommRingCat.of (AlgebraicClosure K)) ⟶ Spec (CommRingCat.of K) :=
     Spec.map (CommRingCat.ofHom (algebraMap K (AlgebraicClosure K)))
@@ -93,15 +107,21 @@ theorem geometricallyConnected_of_isPullback {X X' Y Y' : Scheme.{0}} {π : X �
   have hA : ConnectedSpace ↥(pullback f q) :=
     GeometricallyConnected.geometrically_connectedSpace _ _ _ (.of_hasPullback _ _)
   have hιK : Surjective ιK := ⟨fun x => ⟨Nonempty.some inferInstance, Subsingleton.elim _ _⟩⟩
-  let M := (IsPullback.paste_horiz (IsPullback.of_hasPullback f q) h).isoPullback.hom ≫
-    (pullback.congrHom rfl hq).hom ≫ (pullbackLeftPullbackSndIso f' y ιK).inv ≫
-      pullback.fst (pullback.snd f' y) ιK
+  let M :=
+    (IsPullback.paste_horiz (IsPullback.of_hasPullback f q) h).isoPullback.hom
+      ≫ (pullback.congrHom rfl hq).hom ≫ (pullbackLeftPullbackSndIso f' y ιK).inv
+      ≫ pullback.fst (pullback.snd f' y) ιK
   have hM : Surjective M := by dsimp only [M]; infer_instance
   exact M.surjective.connectedSpace M.continuous
 
-theorem isSemiAbelian_descends {X X' : Scheme.{0}} {π : X ⟶ X'} {G : Over X} [GrpObj G] {G' : Over X'}
-    [GrpObj G'] [IsCommMonObj G'] {φ : G.left ⟶ G'.left} [IsIntegralHom π] [Surjective π]
-    (h : IsGrpPullback G G' π φ) [Smooth G'.hom] (hG : IsSemiAbelian G) : IsSemiAbelian G' := by
+theorem isSemiAbelian_descends
+    {X X' : Scheme.{0}} {π : X ⟶ X'} {G : Over X} [GrpObj G]
+    {G' : Over X'} [GrpObj G'] [IsCommMonObj G']
+    {φ : G.left ⟶ G'.left} [IsIntegralHom π] [Surjective π]
+    (h : IsGrpPullback G G' π φ)
+    [Smooth G'.hom]
+    (hG : IsSemiAbelian G)
+    : IsSemiAbelian G' := by
   obtain ⟨hc, hsm, hsep, hqc, hgc, hfib⟩ := hG
   have hpb : IsPullback φ G.hom G'.hom π := h.1
   have hφi : IsIntegralHom φ := MorphismProperty.of_isPullback hpb.flip ‹IsIntegralHom π›
@@ -124,7 +144,13 @@ theorem isSemiAbelian_descends {X X' : Scheme.{0}} {π : X ⟶ X'} {G : Over X} 
   obtain ⟨e, he, -⟩ := grpPullback_iso (h2.congr hq rfl) h3
   exact ⟨torusExtOfIso e T⟩
 
-theorem main : ∀ (X X' : Scheme.{0}) (π : X ⟶ X') (G : Over X) [GrpObj G] (G' : Over X') [GrpObj G'] [IsCommMonObj G'] (φ : G.left ⟶ G'.left), IsIntegralHom π → Surjective π → IsGrpPullback G G' π φ → Smooth G'.hom → IsSemiAbelian G → IsSemiAbelian G' ∧ ((∃ U : X.Opens, (U : Set X) = abLocus G ∧ IsProper (G.hom ∣_ U)) → (∃ U : X'.Opens, (U : Set X') = abLocus G' ∧ IsProper (G'.hom ∣_ U))) := by
+theorem main
+    : ∀ (X X' : Scheme.{0}) (π : X ⟶ X') (G : Over X) [GrpObj G] (G' : Over X') [GrpObj G']
+        [IsCommMonObj G'] (φ : G.left ⟶ G'.left),
+      IsIntegralHom π → Surjective π → IsGrpPullback G G' π φ → Smooth G'.hom → IsSemiAbelian G
+        → IsSemiAbelian G'
+          ∧ ((∃ U : X.Opens, (U : Set X) = abLocus G ∧ IsProper (G.hom ∣_ U))
+            → (∃ U : X'.Opens, (U : Set X') = abLocus G' ∧ IsProper (G'.hom ∣_ U))) := by
   intro X X' π G _ G' _ _ φ hi hs h hsm hG
   have hG' : IsSemiAbelian G' := isSemiAbelian_descends h hG
   refine ⟨hG', ?_⟩

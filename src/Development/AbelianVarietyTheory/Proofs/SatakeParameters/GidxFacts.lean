@@ -12,14 +12,19 @@ public import Formalism.LocalToGlobal.GlobalTheory.BaseLatticeSelfDual
 
 @[expose] public section
 
-open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat Formalism.MainNotions.G.CmpJ Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
+open Formalism.BasicNotions NumberField IsDedekindDomain Formalism.MainNotions.G
+  Formalism.MainNotions.FormalGroupSystem Formalism.L2.G.Pend Formalism.MainNotions Formalism.L2.Ker
+  Formalism.L2.PairingIndexBounds.F Formalism.L2.KerInert Formalism.UG Formalism.MainNotions.G.KAat
+  Formalism.MainNotions.G.CmpJ Formalism.L2.G Formalism.L2.G.Cmp Formalism.L2.Forms
+  Formalism.L2.KerInert.SecondKernelInstances GlobalTheory.TwU GlobalTheory.TwV
 open scoped TensorProduct Matrix
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.TwU.XdInert
 
-theorem gidx_facts : ∀ (D : D7) (T p : ℕ), GIdx D.host T p →
-    5 ≤ p ∧ GL3Theta.InertK D p ∧ Nat.Coprime T p ∧ ∀ i, p ≠ D.host.g i := by
+theorem gidx_facts
+    : ∀ (D : D7) (T p : ℕ),
+      GIdx D.host T p → 5 ≤ p ∧ GL3Theta.InertK D p ∧ Nat.Coprime T p ∧ ∀ i, p ≠ D.host.g i := by
   intro D T p h
   obtain ⟨hp, h5, hc, hn, hl, hT⟩ := h
   refine ⟨h5, ?_, ?_, ?_⟩

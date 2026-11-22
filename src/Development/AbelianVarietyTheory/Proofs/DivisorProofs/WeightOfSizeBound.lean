@@ -24,7 +24,8 @@ section Arith
 
 variable {D : D7}
 
-theorem rankV_lt_gap {i j : ℕ} (hi : i < D.R.m) (hj : j < D.R.m) : rankV D (i + 1) (j + 1) < gap D 1 := by
+theorem rankV_lt_gap {i j : ℕ} (hi : i < D.R.m) (hj : j < D.R.m)
+    : rankV D (i + 1) (j + 1) < gap D 1 := by
   have h1 : (j + 1) * D.R.t ≤ D.R.m * D.R.t := Nat.mul_le_mul_right _ hj
   have h2 : (i + 1) * sLen D ≤ D.R.m * sLen D := Nat.mul_le_mul_right _ hi
   have h3 : rankV D (i + 1) (j + 1) ≤ bigN D := by
@@ -37,8 +38,11 @@ theorem rankV_lt_gap {i j : ℕ} (hi : i < D.R.m) (hj : j < D.R.m) : rankV D (i 
   have h5 : bigN D ≤ bigN D ^ 3 := Nat.le_self_pow (by norm_num) _
   omega
 
-theorem numE_bounds {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L) (τ : D.what₂.Tau) {j : ℕ} (hj : j < D.R.m) :
-    0 ≤ (num D 1 τ).e (j + 1) ∧ ((num D 1 τ).e (j + 1) : ℝ) ≤ 4 * L.sc.b := by
+theorem numE_bounds
+    {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L)
+    (τ : D.what₂.Tau)
+    {j : ℕ} (hj : j < D.R.m)
+    : 0 ≤ (num D 1 τ).e (j + 1) ∧ ((num D 1 τ).e (j + 1) : ℝ) ≤ 4 * L.sc.b := by
   obtain ⟨-, -, -, -, -, -, -, -, -, -, -, -, hbe, -⟩ := hs
   have e1 : (D.hc τ).e ⟨j, hj⟩ = ((num D 1 τ).e (j + 1) : ℚ) :=
     (GridData.ofHCParam_spec (D.hc τ) (sLen D) (gap D 1) (cen D 1 τ)).2.2 ⟨j, hj⟩
@@ -50,8 +54,11 @@ theorem numE_bounds {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFull
   have : (0 : ℚ) ≤ ((num D 1 τ).e (j + 1) : ℚ) := by linarith
   exact_mod_cast this
 
-theorem cen_bounds {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L) (τ : D.what₂.Tau) {i : ℕ} (h1 : 1 ≤ i)
-    (h2 : i ≤ D.R.m) : 0 ≤ cen D 1 τ i ∧ (cen D 1 τ i : ℝ) ≤ L.sc.b := by
+theorem cen_bounds
+    {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L)
+    (τ : D.what₂.Tau)
+    {i : ℕ} (h1 : 1 ≤ i) (h2 : i ≤ D.R.m)
+    : 0 ≤ cen D 1 τ i ∧ (cen D 1 τ i : ℝ) ≤ L.sc.b := by
   obtain ⟨-, -, -, -, -, -, -, -, -, -, -, hgap, -, -⟩ := hs
   set G0 := GridData.ofHCParam (D.hc τ) (sLen D) (gap D 1) 0 with hG0
   have hk := D.R.m_add_three_le_k
@@ -59,46 +66,60 @@ theorem cen_bounds {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullH
     (GridData.ofHCParam_spec (D.hc τ) (sLen D) (gap D 1) 0).1 ⟨0, by omega⟩
   obtain ⟨v0, v1⟩ := L.cloud_v τ ⟨0, by omega⟩
   rw [ev] at v0 v1
-  have hmid : G0.mid i = (G0.v 2 : ℚ) + 1 / 2 + ((D.R.m : ℚ) + 1 - i) * (gap D 1 : ℚ) + (gap D 1 : ℚ) / 2 :=
+  have hmid
+      : G0.mid i
+        = (G0.v 2 : ℚ) + 1 / 2 + ((D.R.m : ℚ) + 1 - i) * (gap D 1 : ℚ) + (gap D 1 : ℚ) / 2 :=
     G0.mid_eq h1
   have hc : cen D 1 τ i = ⌊G0.mid i⌋ := rfl
   have hS := L.Sc_pos
   have hi1 : (1 : ℝ) ≤ i := by exact_mod_cast h1
   have hi2 : (i : ℝ) ≤ D.R.m := by exact_mod_cast h2
   have hγ : (0 : ℝ) ≤ gap D 1 := by positivity
-  have hmR : ((G0.mid i : ℚ) : ℝ) = (G0.v 2 : ℝ) + 1 / 2 + ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) + (gap D 1 : ℝ) / 2 := by
+  have hmR
+      : ((G0.mid i : ℚ) : ℝ)
+        = (G0.v 2 : ℝ) + 1 / 2 + ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) + (gap D 1 : ℝ) / 2 := by
     rw [hmid]; push_cast; ring
   have v0' : (0 : ℝ) ≤ (G0.v 2 : ℝ) := by exact_mod_cast v0
   have v1' : (G0.v 2 : ℝ) ≤ L.Sc := by exact_mod_cast v1
   have m0 : (0 : ℝ) ≤ ((G0.mid i : ℚ) : ℝ) := by
-    rw [hmR]; have : (0 : ℝ) ≤ ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) := mul_nonneg (by linarith) hγ
+    rw [hmR]
+    have : (0 : ℝ) ≤ ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) := mul_nonneg (by linarith) hγ
     linarith
   have m1 : ((G0.mid i : ℚ) : ℝ) ≤ L.sc.b := by
     rw [hmR]
-    have : ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) + (gap D 1 : ℝ) / 2 ≤ ((D.R.m : ℝ) + 1) * gap D 1 := by nlinarith
+    have : ((D.R.m : ℝ) + 1 - i) * (gap D 1 : ℝ) + (gap D 1 : ℝ) / 2
+        ≤ ((D.R.m : ℝ) + 1) * gap D 1 := by
+      nlinarith
     linarith
   have m0q : (0 : ℚ) ≤ G0.mid i := by exact_mod_cast m0
   refine ⟨hc ▸ Int.floor_nonneg.2 m0q, ?_⟩
-  have hf : ((⌊G0.mid i⌋ : ℚ) : ℝ) ≤ ((G0.mid i : ℚ) : ℝ) := by exact_mod_cast Int.floor_le (G0.mid i)
+  have hf : ((⌊G0.mid i⌋ : ℚ) : ℝ) ≤ ((G0.mid i : ℚ) : ℝ) := by
+    exact_mod_cast Int.floor_le (G0.mid i)
   rw [hc]
   push_cast at hf ⊢
   linarith
 
-theorem gap_le_b {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L) : (gap D 1 : ℝ) ≤ L.sc.b ∧ 675 ≤ L.sc.b := by
+theorem gap_le_b
+    {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L)
+    : (gap D 1 : ℝ) ≤ L.sc.b ∧ 675 ≤ L.sc.b := by
   obtain ⟨-, -, -, hm, -, -, -, -, -, -, -, hgap, -, -⟩ := hs
   have hS := L.Sc_pos
   have h4 := (isLeast_gap D 1).1.2.1
-  have h15 : 15 ≤ gap D 1 := by have : 6 ≤ sLen D := by unfold sLen; omega
-                                omega
+  have h15 : 15 ≤ gap D 1 := by
+    have : 6 ≤ sLen D := by unfold sLen; omega
+    omega
   have hγ : (15 : ℝ) ≤ gap D 1 := by exact_mod_cast h15
   have hm' : (44 : ℝ) ≤ D.R.m := by exact_mod_cast hm
   constructor <;> nlinarith
 
-theorem maxWt_le {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L) :
-    1 ≤ (maxWt D 1 : ℝ) ∧ (maxWt D 1 : ℝ) ≤ 10 * L.sc.b ∧ 675 ≤ L.sc.b := by
+theorem maxWt_le
+    {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHecke.LevelPlusSubgroup.SizeRows L)
+    : 1 ≤ (maxWt D 1 : ℝ) ∧ (maxWt D 1 : ℝ) ≤ 10 * L.sc.b ∧ 675 ≤ L.sc.b := by
   obtain ⟨hγb, hb⟩ := gap_le_b hs
-  have key : ∀ x : Fin D.R.m × Fin D.R.m × D.what₂.Tau,
-      max (wtA D 1 x.1 x.2.1 x.2.2).natAbs (wtA' D 1 x.1 x.2.1 x.2.2).natAbs ≤ ⌊10 * L.sc.b⌋₊ := by
+  have key
+      : ∀ x : Fin D.R.m × Fin D.R.m × D.what₂.Tau,
+        max (wtA D 1 x.1 x.2.1 x.2.2).natAbs (wtA' D 1 x.1 x.2.1 x.2.2).natAbs
+          ≤ ⌊10 * L.sc.b⌋₊ := by
     rintro ⟨i, j, τ⟩
     have hr := rankV_lt_gap (D := D) i.2 j.2
     have hij : rankV D i j ≤ rankV D (i + 1) (j + 1) := by unfold rankV; gcongr <;> omega
@@ -113,7 +134,8 @@ theorem maxWt_le {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHec
         rw [abs_le]
         unfold wtA
         constructor <;> omega
-      have hA' : |((wtA D 1 i j τ : ℤ) : ℝ)| ≤ 2 * ((num D 1 τ).e (j + 1) : ℝ) + 1 + (gap D 1 : ℝ) := by
+      have hA'
+          : |((wtA D 1 i j τ : ℤ) : ℝ)| ≤ 2 * ((num D 1 τ).e (j + 1) : ℝ) + 1 + (gap D 1 : ℝ) := by
         exact_mod_cast hA
       rw [Nat.cast_natAbs, Int.cast_abs]
       linarith
@@ -121,7 +143,8 @@ theorem maxWt_le {L : SizeData₂ D} (hs : GlobalTheory.IndefiniteRowSideFullHec
         rw [abs_le]
         unfold wtA'
         constructor <;> omega
-      have hA' : |((wtA' D 1 i j τ : ℤ) : ℝ)| ≤ 2 * (cen D 1 τ (D.R.m - i) : ℝ) + 1 + (gap D 1 : ℝ) := by
+      have hA'
+          : |((wtA' D 1 i j τ : ℤ) : ℝ)| ≤ 2 * (cen D 1 τ (D.R.m - i) : ℝ) + 1 + (gap D 1 : ℝ) := by
         exact_mod_cast hA
       rw [Nat.cast_natAbs, Int.cast_abs]
       linarith

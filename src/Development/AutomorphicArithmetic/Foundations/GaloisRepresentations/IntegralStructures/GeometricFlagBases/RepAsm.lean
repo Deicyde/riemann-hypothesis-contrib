@@ -7,15 +7,19 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 noncomputable section
 
-open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et TensorProduct Polynomial
+open CategoryTheory Limits AlgebraicGeometry NumberField GlobalTheory.EtC GlobalTheory.Et
+  TensorProduct Polynomial
 open GlobalTheory.GalV (HTower Htot hop galV galTot)
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N
 
 namespace UpperTheory.Gal.Int.Geo
 
-theorem repEx_of (h1 : GrEx) (h2 : ContGL) (h3 : MatEx) (h4 : MatConj) (h5 : PieceStab) (h6 : HtotFin) (h7 : ExtCont)
-    (h8 : TotCont) (h9 : KunnethLefschetz.ProjBC) : RepEx := by
+theorem repEx_of
+    (h1 : GrEx) (h2 : ContGL) (h3 : MatEx) (h4 : MatConj) (h5 : PieceStab) (h6 : HtotFin)
+    (h7 : ExtCont) (h8 : TotCont) (h9 : KunnethLefschetz.ProjBC)
+    : RepEx := by
   intro E Ω _ _ _ _ _ l _ H θ hnice
   obtain ⟨hsm, hproj, hfet⟩ := hnice
   have hlE : (l : E) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : Nat.Prime l).ne_zero
@@ -23,7 +27,8 @@ theorem repEx_of (h1 : GrEx) (h2 : ContGL) (h3 : MatEx) (h4 : MatConj) (h5 : Pie
   haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed E
   have hlΩ : (l : Ω) ≠ 0 := Nat.cast_ne_zero.mpr (Fact.out : Nat.Prime l).ne_zero
   haveI : Smooth H.q := hsm
-  have hsm' : Smooth (pullback.snd H.q (Spec.map (CommRingCat.ofHom (algebraMap E Ω)))) := inferInstance
+  have hsm' : Smooth (pullback.snd H.q (Spec.map (CommRingCat.ofHom (algebraMap E Ω)))) :=
+    inferInstance
   have hproj' := h9.1 E Ω (algebraMap E Ω) H.q hproj
   haveI hfin : FiniteDimensional ℚ_[l] (Htot l (sch.obj (H.geomZ Ω))) := h6 l Ω hlΩ _ hsm' hproj'
   let U := piece l H Ω (Qbar l) θ
@@ -43,8 +48,9 @@ theorem repEx_of (h1 : GrEx) (h2 : ContGL) (h3 : MatEx) (h4 : MatConj) (h5 : Pie
   have hcont0 : ∀ i j, Continuous fun g => (ρ₀ g).val i j := by
     intro i j
     obtain ⟨μ, hμij⟩ := hμ i j
-    have hE := h7 (Gal(Ω/E)) ℚ_[l] (Qbar l) (continuous_algebraMap ℚ_[l] (Qbar l)) _
-      (galTot l Ω H.q) hT (b j : _) μ
+    have hE :=
+      h7 (Gal(Ω/E)) ℚ_[l] (Qbar l) (continuous_algebraMap ℚ_[l] (Qbar l)) _ (galTot l Ω H.q) hT
+        (b j : _) μ
     refine hE.congr fun g => ?_
     rw [hμij g]
     rfl

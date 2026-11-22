@@ -21,32 +21,38 @@ open Formalism.HermitianLatticesTheory
 
 section General
 
-variable {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K]
-  [IsFractionRing R K] [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
+variable
+  {R K V : Type*} [CommRing R] [IsDedekindDomain R] [Field K] [Algebra R K] [IsFractionRing R K]
+  [AddCommGroup V] [Module K V] [Module R V] [IsScalarTower R K V]
 
-theorem lg (hR : ¬ IsField R) (A : Submodule R V) (x : V)
-    (hx : ∀ w : HeightOneSpectrum R, x ∈ localization₂ w.asIdeal A) : x ∈ A := by
-  let I : Ideal R :=
-    { carrier := {r | r • x ∈ A}
-      add_mem' := fun {a b} ha hb => by
-        simp only [Set.mem_setOf_eq, add_smul] at *
-        exact A.add_mem ha hb
-      zero_mem' := by simp
-      smul_mem' := fun c r hr => by
-        simp only [Set.mem_setOf_eq, smul_eq_mul, mul_smul] at *
-        exact A.smul_mem c hr }
+theorem lg
+    (hR : ¬ IsField R)
+    (A : Submodule R V) (x : V) (hx : ∀ w : HeightOneSpectrum R, x ∈ localization₂ w.asIdeal A)
+    : x ∈ A := by
+  let I : Ideal R := {
+    carrier := {r | r • x ∈ A}
+    add_mem' := fun {a b} ha hb => by
+      simp only [Set.mem_setOf_eq, add_smul] at *
+      exact A.add_mem ha hb
+    zero_mem' := by simp
+    smul_mem' := fun c r hr => by
+      simp only [Set.mem_setOf_eq, smul_eq_mul, mul_smul] at *
+      exact A.smul_mem c hr
+  }
   by_contra hxA
-  have hI : I ≠ ⊤ := fun h => hxA (by
-    have h1 : (1 : R) ∈ I := h ▸ Submodule.mem_top
-    simpa [I] using h1)
+  have hI : I ≠ ⊤ := fun h =>
+    hxA (by
+      have h1 : (1 : R) ∈ I := h ▸ Submodule.mem_top
+      simpa [I] using h1)
   obtain ⟨M, hM, hIM⟩ := Ideal.exists_le_maximal I hI
   have hM0 : M ≠ ⊥ := fun h => hR (Ring.isField_iff_maximal_bot.2 (h ▸ hM))
   let w : HeightOneSpectrum R := ⟨M, hM.isPrime, hM0⟩
   obtain ⟨s, hs, hsx⟩ := hx w
   exact hs (hIM hsx)
 
-theorem sep (w : HeightOneSpectrum R) (c : R) (hc : c ≠ 0) :
-    ∃ s, s ∉ w.asIdeal ∧ ∀ w' : HeightOneSpectrum R, w' ≠ w → ∃ t, t ∉ w'.asIdeal ∧ c ∣ t * s := by
+theorem sep (w : HeightOneSpectrum R) (c : R) (hc : c ≠ 0)
+    : ∃ s,
+      s ∉ w.asIdeal ∧ ∀ w' : HeightOneSpectrum R, w' ≠ w → ∃ t, t ∉ w'.asIdeal ∧ c ∣ t * s := by
   have hfin : FiniteMultiplicity w.asIdeal (Ideal.span {c}) :=
     FiniteMultiplicity.of_not_isUnit (by rw [Ideal.isUnit_iff]; exact w.isPrime.ne_top)
       (by simpa using hc)
@@ -65,19 +71,23 @@ theorem sep (w : HeightOneSpectrum R) (c : R) (hc : c ≠ 0) :
     exact Ideal.mul_mem_mul ht hsJ
   exact Ideal.mem_span_singleton.mp this
 
-theorem denom (A B : Submodule R V) (hA : A.FG) (hB : Submodule.span K (B : Set V) = ⊤) :
-    ∃ d : R, d ≠ 0 ∧ ∀ x ∈ A, d • x ∈ B := by
-  obtain ⟨d, hd, h⟩ := indexBasic_denom (nonZeroDivisors R) A B hA
-    (by rw [indexBasic_locS_top (K := K) B hB]; exact le_top)
+theorem denom (A B : Submodule R V) (hA : A.FG) (hB : Submodule.span K (B : Set V) = ⊤)
+    : ∃ d : R, d ≠ 0 ∧ ∀ x ∈ A, d • x ∈ B := by
+  obtain ⟨d, hd, h⟩ :=
+    indexBasic_denom (nonZeroDivisors R) A B hA
+      (by rw [indexBasic_locS_top (K := K) B hB]; exact le_top)
   exact ⟨d, nonZeroDivisors.ne_zero hd, h⟩
 
-theorem glue_spec (hR : ¬ IsField R) (L0 : Submodule R V) (L : HeightOneSpectrum R → Submodule R V)
+theorem glue_spec
+    (hR : ¬ IsField R)
+    (L0 : Submodule R V) (L : HeightOneSpectrum R → Submodule R V)
     (h0 : Submodule.IsFullLattice K L0) (hL : ∀ w, Submodule.IsFullLattice K (L w))
-    (hfin : {w : HeightOneSpectrum R | localization₂ w.asIdeal (L w) ≠ localization₂ w.asIdeal L0}.Finite) :
-    Submodule.IsFullLattice K (⨅ w : HeightOneSpectrum R, localization₂ w.asIdeal (L w)) ∧
-      ∀ w : HeightOneSpectrum R,
-        localization₂ w.asIdeal (⨅ w : HeightOneSpectrum R, localization₂ w.asIdeal (L w)) =
-          localization₂ w.asIdeal (L w) := by
+    (hfin
+      : {w : HeightOneSpectrum R | localization₂ w.asIdeal (L w) ≠ localization₂ w.asIdeal L0}.Finite)
+    : Submodule.IsFullLattice K (⨅ w : HeightOneSpectrum R, localization₂ w.asIdeal (L w))
+      ∧ ∀ w : HeightOneSpectrum R,
+        localization₂ w.asIdeal (⨅ w : HeightOneSpectrum R, localization₂ w.asIdeal (L w))
+          = localization₂ w.asIdeal (L w) := by
   classical
   set G : Submodule R V := ⨅ w : HeightOneSpectrum R, localization₂ w.asIdeal (L w) with hG
   have hGmem : ∀ x, x ∈ G ↔ ∀ w : HeightOneSpectrum R, x ∈ localization₂ w.asIdeal (L w) := by
@@ -127,12 +137,10 @@ theorem glue_spec (hR : ¬ IsField R) (L0 : Submodule R V) (L : HeightOneSpectru
   obtain ⟨b, hb0, hb⟩ := hB
   have hinvsmul : ∀ (r : R), r ≠ 0 → ∀ y : V, (algebraMap R K r)⁻¹ • (r • y) = y := by
     intro r hr y
-    have : algebraMap R K r ≠ 0 := by
-      simpa using (IsFractionRing.injective R K).ne hr
+    have : algebraMap R K r ≠ 0 := by simpa using (IsFractionRing.injective R K).ne hr
     rw [← algebraMap_smul K r y, smul_smul, inv_mul_cancel₀ this, one_smul]
   refine ⟨{ toIsLattice := ⟨?_, ?_⟩, span_eq_top := ?_ }, ?_⟩
-  ·
-    have hN : IsNoetherian R L0 :=
+  · have hN : IsNoetherian R L0 :=
       isNoetherian_of_fg_of_noetherian L0 (Submodule.IsLattice.fg (self := h0.toIsLattice))
     have hle : G.map (LinearMap.lsmul R V b) ≤ L0 := by
       rintro _ ⟨x, hx, rfl⟩
@@ -142,8 +150,7 @@ theorem glue_spec (hR : ¬ IsField R) (L0 : Submodule R V) (L : HeightOneSpectru
     intro x y hxy
     have hxy' : b • x = b • y := hxy
     rw [← hinvsmul b hb0 x, ← hinvsmul b hb0 y, hxy']
-  ·
-    intro s hs hli
+  · intro s hs hli
     exact (LinearIndependent.iff_fractionRing _ _).mp hli
   · have haK : algebraMap R K a ≠ 0 := by
       simpa only [map_zero] using (IsFractionRing.injective R K).ne ha0
@@ -155,7 +162,9 @@ theorem glue_spec (hR : ¬ IsField R) (L0 : Submodule R V) (L : HeightOneSpectru
   · intro w
     apply le_antisymm
     · have h1 : G ≤ localization₂ w.asIdeal (L w) := iInf_le _ w
-      calc localization₂ w.asIdeal G ≤ localization₂ w.asIdeal (localization₂ w.asIdeal (L w)) := locBasic_locS_mono _ h1
+      calc
+        localization₂ w.asIdeal G
+          ≤ localization₂ w.asIdeal (localization₂ w.asIdeal (L w)) := locBasic_locS_mono _ h1
         _ = localization₂ w.asIdeal (L w) := locBasic_locS_idem _ _
     · have h1 : L w ≤ localization₂ w.asIdeal G := by
         intro x hx
@@ -180,10 +189,15 @@ theorem glue_spec (hR : ¬ IsField R) (L0 : Submodule R V) (L : HeightOneSpectru
           have h2 : t • (s • x) ∈ localization₂ w'.asIdeal (L w') := by
             rw [smul_smul, hu, mul_comm, mul_smul]
             exact (localization₂ w'.asIdeal (L w')).smul_mem u ((hGmem _).mp hcx w')
-          have h3 : s • x ∈ localization₂ w'.asIdeal (localization₂ w'.asIdeal (L w')) := ⟨t, ht, h2⟩
-          rwa [show localization₂ w'.asIdeal (localization₂ w'.asIdeal (L w')) = localization₂ w'.asIdeal (L w') from
-            locBasic_locS_idem _ _] at h3
-      calc localization₂ w.asIdeal (L w) ≤ localization₂ w.asIdeal (localization₂ w.asIdeal G) := locBasic_locS_mono _ h1
+          have h3 : s • x ∈ localization₂ w'.asIdeal (localization₂ w'.asIdeal (L w')) :=
+            ⟨t, ht, h2⟩
+          rwa [show localization₂ w'.asIdeal (localization₂ w'.asIdeal (L w'))
+                = localization₂ w'.asIdeal (L w') from
+              locBasic_locS_idem _ _]
+            at h3
+      calc
+        localization₂ w.asIdeal (L w)
+          ≤ localization₂ w.asIdeal (localization₂ w.asIdeal G) := locBasic_locS_mono _ h1
         _ = localization₂ w.asIdeal G := locBasic_locS_idem _ _
 
 end General
@@ -192,12 +206,15 @@ section NF
 
 variable {K : Type} [Field K] [NumberField K]
 
-theorem glueLat_spec {D : ℕ} (L0 : Submodule (𝓞 K) (Fin D → K))
-    (L : HeightOneSpectrum (𝓞 K) → Submodule (𝓞 K) (Fin D → K))
+theorem glueLat_spec
+    {D : ℕ}
+    (L0 : Submodule (𝓞 K) (Fin D → K)) (L : HeightOneSpectrum (𝓞 K) → Submodule (𝓞 K) (Fin D → K))
     (h0 : Submodule.IsFullLattice K L0) (hL : ∀ w, Submodule.IsFullLattice K (L w))
-    (hfin : {w : HeightOneSpectrum (𝓞 K) | localization₂ w.asIdeal (L w) ≠ localization₂ w.asIdeal L0}.Finite) :
-    Submodule.IsFullLattice K (glueLat L) ∧
-      ∀ w : HeightOneSpectrum (𝓞 K), localization₂ w.asIdeal (glueLat L) = localization₂ w.asIdeal (L w) :=
+    (hfin
+      : {w : HeightOneSpectrum (𝓞 K) | localization₂ w.asIdeal (L w) ≠ localization₂ w.asIdeal L0}.Finite)
+    : Submodule.IsFullLattice K (glueLat L)
+      ∧ ∀ w : HeightOneSpectrum (𝓞 K),
+        localization₂ w.asIdeal (glueLat L) = localization₂ w.asIdeal (L w) :=
   glue_spec (NumberField.RingOfIntegers.not_isField K) L0 L h0 hL hfin
 
 end NF
@@ -206,8 +223,8 @@ section Star
 
 variable {K : Type} [Field K] [NumberField K] [StarRing K]
 
-theorem conjIdeal_eq (w : HeightOneSpectrum (𝓞 K)) :
-    conjIdeal (K := K) w.asIdeal = (conjPl w).asIdeal := by
+theorem conjIdeal_eq (w : HeightOneSpectrum (𝓞 K))
+    : conjIdeal (K := K) w.asIdeal = (conjPl w).asIdeal := by
   show Ideal.span _ = Ideal.map (cO K) w.asIdeal
   unfold Ideal.map
   congr 1
@@ -218,12 +235,13 @@ theorem conjIdeal_eq (w : HeightOneSpectrum (𝓞 K)) :
   · rintro ⟨s, hs, rfl⟩
     exact ⟨s, hs, rfl⟩
 
-theorem matLat_lattice' {n D : ℕ} (P : Matrix (Fin D) (Fin n) K)
-    (hP : Function.Surjective P.mulVec) (M : Submodule (𝓞 K) (Fin n → K))
-    (hM : Submodule.IsLattice K M) : Submodule.IsLattice K (matLat P M) := by
+theorem matLat_lattice'
+    {n D : ℕ} (P : Matrix (Fin D) (Fin n) K) (hP : Function.Surjective P.mulVec)
+    (M : Submodule (𝓞 K) (Fin n → K)) (hM : Submodule.IsLattice K M)
+    : Submodule.IsLattice K (matLat P M) := by
   refine ⟨(Submodule.IsLattice.fg (self := hM)).map _, ?_⟩
-  have : ((matLat P M : Submodule (𝓞 K) (Fin D → K)) : Set (Fin D → K)) =
-      (Matrix.mulVecLin P) '' (M : Set (Fin n → K)) := by
+  have : ((matLat P M : Submodule (𝓞 K) (Fin D → K)) : Set (Fin D → K))
+      = (Matrix.mulVecLin P) '' (M : Set (Fin n → K)) := by
     rw [matLat, Submodule.map_coe]
     rfl
   exact fun _ _ hli => (LinearIndependent.iff_fractionRing _ _).mp hli
@@ -234,14 +252,16 @@ end GluingInclusion
 
 open GluingInclusion Formalism.HermitianLatticesTheory
 
-theorem lattice_gluing (K : Type) [Field K] [NumberField K] (D : ℕ)
-    (L0 : Submodule (𝓞 K) (Fin D → K))
+theorem lattice_gluing
+    (K : Type) [Field K] [NumberField K]
+    (D : ℕ) (L0 : Submodule (𝓞 K) (Fin D → K))
     (L : HeightOneSpectrum (𝓞 K) → Submodule (𝓞 K) (Fin D → K))
     (h0 : Submodule.IsFullLattice K L0) (hL : ∀ w, Submodule.IsFullLattice K (L w))
-    (hfin : {w : HeightOneSpectrum (𝓞 K) |
-      localization₂ w.asIdeal (L w) ≠ localization₂ w.asIdeal L0}.Finite) :
-    Submodule.IsFullLattice K (glueLat L) ∧
-      ∀ w : HeightOneSpectrum (𝓞 K),
+    (hfin
+      : {w : HeightOneSpectrum (𝓞 K) |
+        localization₂ w.asIdeal (L w) ≠ localization₂ w.asIdeal L0}.Finite)
+    : Submodule.IsFullLattice K (glueLat L)
+      ∧ ∀ w : HeightOneSpectrum (𝓞 K),
         localization₂ w.asIdeal (glueLat L) = localization₂ w.asIdeal (L w) :=
   glueLat_spec L0 L h0 hL hfin
 

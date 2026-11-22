@@ -7,25 +7,29 @@ public import GroundTheory.Brauer.DoubleCentralizer
 
 @[expose] public section
 
-open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid GlobalTheory.LKCount GlobalTheory.LKCx
+open Matrix NumberField GlobalTheory.LKTrip GlobalTheory.LKRes GlobalTheory.LKMid
+  GlobalTheory.LKCount GlobalTheory.LKCx
 open scoped TensorProduct Classical
 
 namespace GlobalTheory.CentIrr
 
-noncomputable def rootHom (F C : Type) [Field F] [Ring C] [Algebra F C] (y : C) :
-    AdjoinRoot (minpoly F y) →ₐ[F] C :=
+noncomputable def rootHom (F C : Type) [Field F] [Ring C] [Algebra F C] (y : C)
+    : AdjoinRoot (minpoly F y) →ₐ[F] C :=
   Ideal.Quotient.liftₐ (Ideal.span {minpoly F y}) (Polynomial.aeval y) (fun a ha => by
     obtain ⟨c, rfl⟩ := Ideal.mem_span_singleton.mp ha
     rw [map_mul, minpoly.aeval, zero_mul])
 
-theorem rootHom_root (F C : Type) [Field F] [Ring C] [Algebra F C] (y : C) :
-    rootHom F C y (AdjoinRoot.root (minpoly F y)) = y := by
+theorem rootHom_root (F C : Type) [Field F] [Ring C] [Algebra F C] (y : C)
+    : rootHom F C y (AdjoinRoot.root (minpoly F y)) = y := by
   exact Polynomial.aeval_X y
 
-theorem commute_iff_mem_adjoin (F C : Type) [Field F] [Ring C] [Algebra F C] [FiniteDimensional F C]
-    [Algebra.IsCentral F C] [IsSimpleRing C] (n : ℕ) (hn : 0 < n) (hC : Module.finrank F C = n ^ 2)
-    (y : C) (hirr : Irreducible (minpoly F y)) (hdeg : (minpoly F y).natDegree = n) (z : C) :
-    Commute z y ↔ z ∈ Algebra.adjoin F ({y} : Set C) := by
+theorem commute_iff_mem_adjoin
+    (F C : Type) [Field F] [Ring C] [Algebra F C] [FiniteDimensional F C] [Algebra.IsCentral F C]
+    [IsSimpleRing C]
+    (n : ℕ) (hn : 0 < n) (hC : Module.finrank F C = n ^ 2)
+    (y : C) (hirr : Irreducible (minpoly F y)) (hdeg : (minpoly F y).natDegree = n)
+    (z : C)
+    : Commute z y ↔ z ∈ Algebra.adjoin F ({y} : Set C) := by
   set B := Algebra.adjoin F ({y} : Set C) with hBdef
   have hcommB : ∀ {u v : C}, u ∈ B → v ∈ B → u * v = v * u := by
     intro u v hu hv
@@ -46,7 +50,8 @@ theorem commute_iff_mem_adjoin (F C : Type) [Field F] [Ring C] [Algebra F C] [Fi
   have hne : minpoly F y ≠ 0 := hirr.ne_zero
   have hEdim : Module.finrank F (AdjoinRoot (minpoly F y)) = n := by
     rw [(AdjoinRoot.powerBasis hne).finrank, AdjoinRoot.powerBasis_dim, hdeg]
-  let eB : AdjoinRoot (minpoly F y) ≃ₐ[F] B := (AlgEquiv.ofInjective j hj).trans (Subalgebra.equivOfEq _ _ hrange)
+  let eB : AdjoinRoot (minpoly F y) ≃ₐ[F] B :=
+    (AlgEquiv.ofInjective j hj).trans (Subalgebra.equivOfEq _ _ hrange)
   haveI : IsSimpleRing B := IsSimpleRing.of_ringEquiv eB.toRingEquiv inferInstance
   have hBdim : Module.finrank F B = n := by rw [← eB.toLinearEquiv.finrank_eq, hEdim]
   set Z := Subalgebra.centralizer F (B : Set C)
@@ -59,8 +64,9 @@ theorem commute_iff_mem_adjoin (F C : Type) [Field F] [Ring C] [Algebra F C] [Fi
   have hdim : Module.finrank F B = Module.finrank F Z := by
     apply Nat.eq_of_mul_eq_mul_left (show 0 < Module.finrank F B by rw [hBdim]; exact hn)
     rw [h1, hC, hBdim, sq]
-  have hEq : B = Z := Subalgebra.toSubmodule_injective
-    (Submodule.eq_of_le_of_finrank_eq (Subalgebra.toSubmodule.monotone hBZ) hdim)
+  have hEq : B = Z :=
+    Subalgebra.toSubmodule_injective (Submodule.eq_of_le_of_finrank_eq
+      (Subalgebra.toSubmodule.monotone hBZ) hdim)
   constructor
   · intro hz
     have hzZ : z ∈ Z := by
@@ -72,15 +78,18 @@ theorem commute_iff_mem_adjoin (F C : Type) [Field F] [Ring C] [Algebra F C] [Fi
       rw [SetLike.mem_coe, Subalgebra.mem_centralizer_iff]
       intro g hg
       rw [Set.mem_singleton_iff] at hg
-      rw [hg]; exact hz.eq.symm
-    rw [hEq]; exact hzZ
+      rw [hg]
+      exact hz.eq.symm
+    rw [hEq]
+    exact hzZ
   · intro hz
     exact (hcommB hz (Algebra.self_mem_adjoin_singleton F y) : _)
 
-theorem centralizer_unit_eq_field : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (y₀ : G.Cˣ),
-    Irreducible (minpoly G.F (y₀ : G.C)) → (minpoly G.F (y₀ : G.C)).natDegree = G.n →
-    ∃ (E : Type) (_ : Field E) (_ : NumberField E) (_ : Algebra G.F E) (j : E →ₐ[G.F] G.C),
-      Function.Injective j ∧ ∀ z : G.C, Commute z (y₀ : G.C) ↔ ∃ e, j e = z := by
+theorem centralizer_unit_eq_field
+    : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p) (y₀ : G.Cˣ),
+      Irreducible (minpoly G.F (y₀ : G.C)) → (minpoly G.F (y₀ : G.C)).natDegree = G.n
+        → ∃ (E : Type) (_ : Field E) (_ : NumberField E) (_ : Algebra G.F E) (j : E →ₐ[G.F] G.C),
+          Function.Injective j ∧ ∀ z : G.C, Commute z (y₀ : G.C) ↔ ∃ e, j e = z := by
   intro p _ G y₀ hirr hdeg
   haveI : Fact (Irreducible (minpoly G.F (y₀ : G.C))) := ⟨hirr⟩
   let j : AdjoinRoot (minpoly G.F (y₀ : G.C)) →ₐ[G.F] G.C := rootHom G.F G.C (y₀ : G.C)
@@ -95,8 +104,15 @@ theorem centralizer_unit_eq_field : ∀ (p : ℕ) [Fact p.Prime] (G : HTGroup p)
   have hrange : j.range = Algebra.adjoin G.F ({(y₀ : G.C)} : Set G.C) := by
     rw [← Algebra.map_top, ← AdjoinRoot.adjoinRoot_eq_top, AlgHom.map_adjoin, Set.image_singleton]
     rw [rootHom_root]
-  refine ⟨AdjoinRoot (minpoly G.F (y₀ : G.C)), inferInstance, inferInstance, inferInstance, j,
-    j.toRingHom.injective, fun z => ?_⟩
+  refine ⟨
+    AdjoinRoot (minpoly G.F (y₀ : G.C)),
+    inferInstance,
+    inferInstance,
+    inferInstance,
+    j,
+    j.toRingHom.injective,
+    fun z => ?_
+  ⟩
   rw [commute_iff_mem_adjoin G.F G.C G.n G.n_pos G.rankC _ hirr hdeg z, ← hrange]
   rfl
 

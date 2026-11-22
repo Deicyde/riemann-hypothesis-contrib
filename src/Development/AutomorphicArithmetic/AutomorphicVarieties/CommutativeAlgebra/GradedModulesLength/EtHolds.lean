@@ -6,22 +6,25 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.Commutative
 
 open IsLocalRing Filter Formalism.MainNotions.V.Pf.V2.Calc UpperTheory.V.Alg UpperTheory.V.Alg.M
 
-private theorem et_point (E K C : Type) [Field E] [Field K] [Algebra E K] [IsAlgClosed K] [CommRing C] [Algebra E C]
-    [Algebra.FiniteType E C] (m : Ideal C) [m.IsMaximal] :
-    ∃ ι : (C ⧸ m) →ₐ[E] K, Function.Injective ι := by
+private theorem et_point
+    (E K C : Type) [Field E] [Field K] [Algebra E K] [IsAlgClosed K] [CommRing C] [Algebra E C]
+    [Algebra.FiniteType E C]
+    (m : Ideal C) [m.IsMaximal]
+    : ∃ ι : (C ⧸ m) →ₐ[E] K, Function.Injective ι := by
   letI : Field (C ⧸ m) := Ideal.Quotient.field m
   haveI : Module.Finite E (C ⧸ m) := finite_of_finite_type_of_isJacobsonRing E (C ⧸ m)
   let ι : (C ⧸ m) →ₐ[E] K := (by
     refine @_root_.IsAlgClosed.lift _ _ _ _ _ _ _ _ _ _ _ ?_ ?_ ?_
-    solve_by_elim* (maxDepth := 2) only [*,
-      @_root_.DivisionSemiring.to_moduleIsTorsionFree,
+    solve_by_elim* (maxDepth := 2) only [*, @_root_.DivisionSemiring.to_moduleIsTorsionFree,
       @_root_.Algebra.IsIntegral.isAlgebraic, @_root_.inferInstance])
   exact ⟨ι, ι.toRingHom.injective⟩
 
-private theorem et_unram (O K C : Type) [CommRing O] [Field K] [Algebra O K] [CommRing C] [Algebra O C]
-    [Algebra.FiniteType O C]
+private theorem et_unram
+    (O K C : Type)
+    [CommRing O] [Field K] [Algebra O K] [CommRing C] [Algebra O C] [Algebra.FiniteType O C]
     (hp : ∀ m : Ideal C, m.IsMaximal → ∃ ι : (C ⧸ m) →ₐ[O] K, Function.Injective ι)
-    (hD : ∀ ξ : C →ₐ[O] K, PtDer ξ K = ⊥) : Algebra.FormallyUnramified O C := by
+    (hD : ∀ ξ : C →ₐ[O] K, PtDer ξ K = ⊥)
+    : Algebra.FormallyUnramified O C := by
   have key : ∀ m : Ideal C, m.IsMaximal → (⊤ : Submodule C Ω[C⁄O]) ≤ m • ⊤ := by
     intro m hm x _
     by_contra hx
@@ -29,8 +32,9 @@ private theorem et_unram (O K C : Type) [CommRing O] [Field K] [Algebra O K] [Co
     obtain ⟨ι, hι⟩ := hp m hm
     have hq : Submodule.Quotient.mk (p := m • (⊤ : Submodule C Ω[C⁄O])) x ≠ 0 := by
       rwa [Ne, Submodule.Quotient.mk_eq_zero]
-    obtain ⟨φ, hφ⟩ : ∃ φ : Module.Dual (C ⧸ m) (Ω[C⁄O] ⧸ m • (⊤ : Submodule C Ω[C⁄O])),
-        φ (Submodule.Quotient.mk x) ≠ 0 := by
+    obtain ⟨φ, hφ⟩
+        : ∃ φ : Module.Dual (C ⧸ m) (Ω[C⁄O] ⧸ m • (⊤ : Submodule C Ω[C⁄O])),
+          φ (Submodule.Quotient.mk x) ≠ 0 := by
       by_contra hall
       push_neg at hall
       exact hq ((Module.forall_dual_apply_eq_zero_iff (C ⧸ m) _).mp hall)
@@ -41,8 +45,8 @@ private theorem et_unram (O K C : Type) [CommRing O] [Field K] [Algebra O K] [Co
     have hL : L ∈ PtDer ξ K := by
       intro a b
       show ι (D (a * b)) = ι (Ideal.Quotient.mk m a) • ι (D b) + ι (Ideal.Quotient.mk m b) • ι (D a)
-      rw [Derivation.leibniz, Algebra.smul_def, Algebra.smul_def, map_add (f := _), map_mul, map_mul,
-        smul_eq_mul, smul_eq_mul]
+      rw [Derivation.leibniz, Algebra.smul_def, Algebra.smul_def, map_add (f := _), map_mul,
+        map_mul, smul_eq_mul, smul_eq_mul]
       rfl
     rw [hD ξ, Submodule.mem_bot] at hL
     have hDz : ∀ c, D c = 0 := by
@@ -76,14 +80,16 @@ private theorem et_unram (O K C : Type) [CommRing O] [Field K] [Algebra O K] [Co
     exact Module.mem_annihilator.mp h1 n
   exact ⟨⟨fun a b => (h0 a).trans (h0 b).symm⟩⟩
 
-theorem UpperTheory.V.Alg.M.et_holds :
-    ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
-      (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K]
-      (C : Type) [CommRing C] [Algebra O C] [Algebra.FiniteType O C], (∀ c : O, c ≠ 0 → IsUnit (algebraMap O C c)) →
-      (∀ ξ : C →ₐ[O] K, PtDer ξ K = ⊥) → Finite (C →ₐ[O] K) ∧ ∀ h : C, (∀ ξ : C →ₐ[O] K, ξ h = 0) → h = 0 := by
+theorem UpperTheory.V.Alg.M.et_holds
+    : ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
+        [IsAdicComplete (maximalIdeal O) O] [CharZero O] (K : Type) [Field K] [Algebra O K]
+        [IsAlgClosed K] [FaithfulSMul O K] (C : Type) [CommRing C] [Algebra O C]
+        [Algebra.FiniteType O C],
+      (∀ c : O, c ≠ 0 → IsUnit (algebraMap O C c)) → (∀ ξ : C →ₐ[O] K, PtDer ξ K = ⊥)
+        → Finite (C →ₐ[O] K) ∧ ∀ h : C, (∀ ξ : C →ₐ[O] K, ξ h = 0) → h = 0 := by
   intro O _ _ _ _ _ K _ _ _ _ C _ _ _ hunit hD
-  have huC : ∀ y : nonZeroDivisors O, IsUnit (algebraMap O C y) :=
-    fun y => hunit y (nonZeroDivisors.ne_zero y.2)
+  have huC : ∀ y : nonZeroDivisors O, IsUnit (algebraMap O C y) := fun y =>
+    hunit y (nonZeroDivisors.ne_zero y.2)
   have hinjK : Function.Injective (algebraMap O K) := FaithfulSMul.algebraMap_injective O K
   have huK : ∀ y : nonZeroDivisors O, IsUnit (algebraMap O K y) := by
     intro y
@@ -110,18 +116,23 @@ theorem UpperTheory.V.Alg.M.et_holds :
   haveI : Module.Finite (FractionRing O) C := Algebra.FormallyUnramified.finite_of_free (FractionRing O) C
   haveI : IsReduced C := Algebra.FormallyUnramified.isReduced_of_field (FractionRing O) C
   refine ⟨?_, ?_⟩
-  · have hcompat : ∀ ξ : C →ₐ[O] K, ∀ r : FractionRing O,
-        ξ (algebraMap (FractionRing O) C r) = algebraMap (FractionRing O) K r := by
+  · have hcompat
+        : ∀ ξ : C →ₐ[O] K, ∀ r : FractionRing O,
+          ξ (algebraMap (FractionRing O) C r) = algebraMap (FractionRing O) K r := by
       intro ξ r
-      have hc : ξ.toRingHom.comp (algebraMap (FractionRing O) C) = algebraMap (FractionRing O) K := by
+      have hc
+          : ξ.toRingHom.comp (algebraMap (FractionRing O) C) = algebraMap (FractionRing O) K := by
         apply IsLocalization.ringHom_ext (nonZeroDivisors O)
         apply RingHom.ext
         intro a
-        rw [RingHom.comp_apply, RingHom.comp_apply, RingHom.comp_apply, ← IsScalarTower.algebraMap_apply,
-          ← IsScalarTower.algebraMap_apply]
+        rw [RingHom.comp_apply, RingHom.comp_apply, RingHom.comp_apply,
+          ← IsScalarTower.algebraMap_apply, ← IsScalarTower.algebraMap_apply]
         exact ξ.commutes a
       exact RingHom.congr_fun hc r
-    let up : (C →ₐ[O] K) → (C →ₐ[FractionRing O] K) := fun ξ => { ξ.toRingHom with commutes' := hcompat ξ }
+    let up : (C →ₐ[O] K) → (C →ₐ[FractionRing O] K) := fun ξ => {
+      ξ.toRingHom with
+      commutes' := hcompat ξ
+    }
     have hup : Function.Injective up := by
       intro ξ₁ ξ₂ h
       ext c

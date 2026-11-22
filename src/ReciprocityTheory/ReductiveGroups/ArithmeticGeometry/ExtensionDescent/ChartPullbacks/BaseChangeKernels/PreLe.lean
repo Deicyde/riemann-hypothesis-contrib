@@ -46,8 +46,8 @@ lemma pre_le (j : (pullExt f E).ChartIdx) :
   simp only [Scheme.Hom.comp_apply] at e₁
   exact (congrArg (· ∈ E.chart (jj f E j)) e₁).mp h1
 
-def uB (j : (pullExt f E).ChartIdx) (k : Module.Free.ChooseBasisIndex ℤ E.X) :
-    Γ(((Over.pullback f).obj G).left, (qB f d.q).left ⁻¹ᵁ (pullExt f E).chart j)ˣ :=
+def uB (j : (pullExt f E).ChartIdx) (k : Module.Free.ChooseBasisIndex ℤ E.X)
+    : Γ(((Over.pullback f).obj G).left, (qB f d.q).left ⁻¹ᵁ (pullExt f E).chart j)ˣ :=
   res (pre_le f E d j) (pullU (pullback.fst G.hom f) _ (d.u (jj f E j) k))
 
 end ReciprocityTheory.ChartRestriction.G.Out.GtBCPf

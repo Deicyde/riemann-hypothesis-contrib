@@ -91,27 +91,30 @@ lemma exists_lift_red {x y : B.G Dp.D} {x₀ y₀ : B.G R} (hx : B.map Dp.π x =
   rw [h1, hl]
 
 def HtC (N : ℕ) (y : B.G R) (x : B.G Dp.D) (E : (Dp.D : Type u)) : Prop :=
-  ∃ v : B.P Dp.D x (B.map Dp.σ y), HEq (B.pmap Dp.π v) (B.zero1 y) ∧
-    HEq (B.nsmul1 v N) (B.zero1 (B.map Dp.σ y)) ∧
-    ∃ c : (Dp.D : Type u)ˣ, (c : (Dp.D : Type u)) = 1 - E ∧
-      HEq (B.nsmul2 v N) (B.smul c (B.zero2 x))
+  ∃ v : B.P Dp.D x (B.map Dp.σ y),
+    HEq (B.pmap Dp.π v) (B.zero1 y) ∧ HEq (B.nsmul1 v N) (B.zero1 (B.map Dp.σ y))
+      ∧ ∃ c : (Dp.D : Type u)ˣ,
+        (c : (Dp.D : Type u)) = 1 - E ∧ HEq (B.nsmul2 v N) (B.smul c (B.zero2 x))
 
 lemma HtC_congr {N : ℕ} {y : B.G R} {x x' : B.G Dp.D} {E E' : (Dp.D : Type u)} (hx : x = x')
     (hE : E = E') : B.HtC Dp N y x E → B.HtC Dp N y x' E' := by
   subst hx hE
   exact id
 
-theorem ht_gen (hB2 : HighestWeightVectorUniformBounds B) (N : ℕ) (hN : (N : (R : Type u)) = 0) (y : B.G R)
-    (h : B.gg →ₗ[R₀] R) (hh : B.IsHeight Dp N y h) (Y : B.gg ⊗[R₀] Dp.π.ker)
-    (w₀ : B.P Dp.D (B.tg Dp.π Dp.sqZero Y) (B.map Dp.σ y))
-    (hu : HEq (B.pmap Dp.π w₀) (B.zero1 y)) :
-    HEq (B.nsmul1 w₀ N) (B.zero1 (B.map Dp.σ y)) ∧
-    ∃ c : (Dp.D : Type u)ˣ,
-      (c : (Dp.D : Type u)) = 1 - evalT (Dp.σ.1.toLinearMap ∘ₗ h) Dp.π.ker Y ∧
-      HEq (B.nsmul2 w₀ N) (B.smul c (B.zero2 (B.tg Dp.π Dp.sqZero Y))) := by
-
-  have pmap_heq : ∀ {S : LAlg R₀} (f : LHom Dp.D S) {a a' b b' : B.G Dp.D} (ha : a = a') (hb : b = b')
-      {w : B.P Dp.D a b} {w' : B.P Dp.D a' b'}, HEq w w' → HEq (B.pmap f w) (B.pmap f w') := by
+theorem ht_gen
+    (hB2 : HighestWeightVectorUniformBounds B)
+    (N : ℕ) (hN : (N : (R : Type u)) = 0)
+    (y : B.G R) (h : B.gg →ₗ[R₀] R) (hh : B.IsHeight Dp N y h)
+    (Y : B.gg ⊗[R₀] Dp.π.ker) (w₀ : B.P Dp.D (B.tg Dp.π Dp.sqZero Y) (B.map Dp.σ y))
+    (hu : HEq (B.pmap Dp.π w₀) (B.zero1 y))
+    : HEq (B.nsmul1 w₀ N) (B.zero1 (B.map Dp.σ y))
+      ∧ ∃ c : (Dp.D : Type u)ˣ,
+        (c : (Dp.D : Type u)) = 1 - evalT (Dp.σ.1.toLinearMap ∘ₗ h) Dp.π.ker Y
+          ∧ HEq (B.nsmul2 w₀ N) (B.smul c (B.zero2 (B.tg Dp.π Dp.sqZero Y))) := by
+  have pmap_heq
+      : ∀ {S : LAlg R₀} (f : LHom Dp.D S) {a a' b b' : B.G Dp.D} (ha : a = a') (hb : b = b')
+          {w : B.P Dp.D a b} {w' : B.P Dp.D a' b'},
+        HEq w w' → HEq (B.pmap f w) (B.pmap f w') := by
     intro S f a a' b b' ha hb w w' hw
     subst ha hb
     rw [eq_of_heq hw]
@@ -123,13 +126,15 @@ theorem ht_gen (hB2 : HighestWeightVectorUniformBounds B) (N : ℕ) (hN : (N : (
     intro a b b' e w
     subst e
     rfl
-  have tr1s : ∀ {a a' b : B.G Dp.D} (e : a = a') (l : (Dp.D : Type u)ˣ) (w : B.P Dp.D a b),
-      B.tr1 e (B.smul l w) = B.smul l (B.tr1 e w) := by
+  have tr1s
+      : ∀ {a a' b : B.G Dp.D} (e : a = a') (l : (Dp.D : Type u)ˣ) (w : B.P Dp.D a b),
+        B.tr1 e (B.smul l w) = B.smul l (B.tr1 e w) := by
     intro a a' b e l w
     subst e
     rfl
-  have tr2s : ∀ {a b b' : B.G Dp.D} (e : b = b') (l : (Dp.D : Type u)ˣ) (w : B.P Dp.D a b),
-      B.tr2 e (B.smul l w) = B.smul l (B.tr2 e w) := by
+  have tr2s
+      : ∀ {a b b' : B.G Dp.D} (e : b = b') (l : (Dp.D : Type u)ˣ) (w : B.P Dp.D a b),
+        B.tr2 e (B.smul l w) = B.smul l (B.tr2 e w) := by
     intro a b b' e l w
     subst e
     rfl
@@ -137,20 +142,22 @@ theorem ht_gen (hB2 : HighestWeightVectorUniformBounds B) (N : ℕ) (hN : (N : (
     rw [← B.map_comp]
     have : Dp.π.comp Dp.σ = LHom.id R := Subtype.ext (AlgHom.ext fun r => Dp.sect r)
     rw [this, B.map_id]
-  have hker : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker, B.map Dp.π (B.tg Dp.π Dp.sqZero Y') = 0 :=
-    fun Y' => (B.tg_ker _ _ _).mpr ⟨Y', rfl⟩
+  have hker : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker, B.map Dp.π (B.tg Dp.π Dp.sqZero Y') = 0 := fun Y' =>
+    (B.tg_ker _ _ _).mpr ⟨Y', rfl⟩
   have hNx : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker, N • B.tg Dp.π Dp.sqZero Y' = 0 := by
     intro Y'
     rw [← map_nsmul, B.nsmul_tensor_eq_zero (Dp.natCast_D hN) _ Y', map_zero]
   have hNy : N • B.map Dp.σ y = 0 := by
     obtain ⟨z, ⟨_, hy', _⟩, _⟩ := hh 0
     exact hy'
-  have hEmem : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker,
-      evalT (Dp.σ.1.toLinearMap ∘ₗ h) Dp.π.ker Y' ∈ RingHom.ker Dp.π.1 :=
-    fun Y' => evalT_mem _ (RingHom.ker Dp.π.1) Y'
+  have hEmem
+      : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker,
+        evalT (Dp.σ.1.toLinearMap ∘ₗ h) Dp.π.ker Y' ∈ RingHom.ker Dp.π.1 := fun Y' =>
+    evalT_mem _ (RingHom.ker Dp.π.1) Y'
 
-  have claim : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker,
-      B.HtC Dp N y (B.tg Dp.π Dp.sqZero Y') (evalT (Dp.σ.1.toLinearMap ∘ₗ h) Dp.π.ker Y') := by
+  have claim
+      : ∀ Y' : B.gg ⊗[R₀] Dp.π.ker,
+        B.HtC Dp N y (B.tg Dp.π Dp.sqZero Y') (evalT (Dp.σ.1.toLinearMap ∘ₗ h) Dp.π.ker Y') := by
     intro Y'
     induction Y' using TensorProduct.induction_on with
     | zero =>
@@ -172,15 +179,16 @@ theorem ht_gen (hB2 : HighestWeightVectorUniformBounds B) (N : ℕ) (hN : (N : (
       have hl1 : l₁ = (m ^ N)⁻¹ := eq_inv_of_mul_eq_one_right hml
       have e2' : B.tr2 hy1 (B.nsmul2 u' N) = B.smul (m ^ N * l₂) (B.zero2 _) := by
         rw [← hm, B.nsmul2_smul, tr2s, e2, ← B.mul_smul]
-      have hc0 : m ^ N * l₂ = z⁻¹ := by
-        rw [hz, hl1, div_eq_mul_inv, mul_inv, inv_inv, inv_inv]
+      have hc0 : m ^ N * l₂ = z⁻¹ := by rw [hz, hl1, div_eq_mul_inv, mul_inv, inv_inv, inv_inv]
       have hzinv : ((z⁻¹ : (Dp.D : Type u)ˣ) : (Dp.D : Type u)) = 1 - Dp.σ.1 (h g) * Dp.η := by
         have hmul : (z : (Dp.D : Type u)) * (1 - Dp.σ.1 (h g) * Dp.η) = 1 := by
           rw [hzv]
           linear_combination -(Dp.σ.1 (h g) * Dp.σ.1 (h g)) * Dp.η_sq
-        calc ((z⁻¹ : (Dp.D : Type u)ˣ) : (Dp.D : Type u))
-            = ((z⁻¹ : (Dp.D : Type u)ˣ) : (Dp.D : Type u)) * ((z : (Dp.D : Type u)) * (1 - Dp.σ.1 (h g) * Dp.η)) := by
-              rw [hmul, mul_one]
+        calc
+          ((z⁻¹ : (Dp.D : Type u)ˣ) : (Dp.D : Type u))
+              = ((z⁻¹ : (Dp.D : Type u)ˣ) : (Dp.D : Type u))
+                * ((z : (Dp.D : Type u)) * (1 - Dp.σ.1 (h g) * Dp.η)) := by
+            rw [hmul, mul_one]
           _ = 1 - Dp.σ.1 (h g) * Dp.η := by rw [← mul_assoc, Units.inv_mul, one_mul]
 
       set r : (R : Type u) := Dp.κ (k : (Dp.D : Type u)) with hr
@@ -201,8 +209,7 @@ theorem ht_gen (hB2 : HighestWeightVectorUniformBounds B) (N : ℕ) (hN : (N : (
         have h2 : Dp.π.1 a = 0 := ha
         rw [← h2]
         exact h1
-      have hfy : B.map f (B.map Dp.σ y) = B.map Dp.σ y := by
-        rw [← B.map_comp, Dp.fr_comp_σ]
+      have hfy : B.map f (B.map Dp.σ y) = B.map Dp.σ y := by rw [← B.map_comp, Dp.fr_comp_σ]
       have hfx : B.map f (B.tg Dp.π Dp.sqZero (g ⊗ₜ Dp.ηk)) = B.tg Dp.π Dp.sqZero (g ⊗ₜ k) := by
         rw [← B.tg_nat Dp.π Dp.π Dp.sqZero Dp.sqZero f hfk, LinearMap.lTensor_tmul]
         congr 2
@@ -210,27 +217,35 @@ theorem ht_gen (hB2 : HighestWeightVectorUniformBounds B) (N : ℕ) (hN : (N : (
         show f.1 Dp.η = (k : (Dp.D : Type u))
         rw [hk, Dp.fr_η]
       have hxk : B.map Dp.π (B.tg Dp.π Dp.sqZero (g ⊗ₜ Dp.ηk)) = 0 := hker _
-      refine ⟨B.tr2 hfy (B.tr1 hfx (B.pmap f u')), ?_, ?_, Units.map (f.1 : (Dp.D : Type u) →* (Dp.D : Type u)) z⁻¹, ?_, ?_⟩
-      ·
-        have h1 : HEq (B.pmap Dp.π (B.tr2 hfy (B.tr1 hfx (B.pmap f u')))) (B.pmap Dp.π (B.pmap f u')) :=
+      refine ⟨
+        B.tr2 hfy (B.tr1 hfx (B.pmap f u')),
+        ?_,
+        ?_,
+        Units.map (f.1 : (Dp.D : Type u) →* (Dp.D : Type u)) z⁻¹,
+        ?_,
+        ?_
+      ⟩
+      · have h1
+            : HEq (B.pmap Dp.π (B.tr2 hfy (B.tr1 hfx (B.pmap f u')))) (B.pmap Dp.π (B.pmap f u')) :=
           pmap_heq Dp.π hfx.symm hfy.symm ((tr2h hfy _).trans (tr1h hfx _))
         refine h1.trans ((B.pmap_comp f Dp.π u').symm.trans ?_)
         exact (B.pmap_congr_hom (Dp.π_comp_fr r) u').trans hu'
-      ·
-        have h1 : HEq (B.nsmul1 (B.tr2 hfy (B.tr1 hfx (B.pmap f u'))) N) (B.nsmul1 (B.pmap f u') N) :=
+      · have h1
+            : HEq (B.nsmul1 (B.tr2 hfy (B.tr1 hfx (B.pmap f u'))) N) (B.nsmul1 (B.pmap f u') N) :=
           B.nsmul1_hcongr hfx.symm hfy.symm N ((tr2h hfy _).trans (tr1h hfx _))
         refine h1.trans ((B.pmap_nsmul1 f u' N).symm.trans ?_)
         refine (pmap_heq f hx1 rfl hB1).trans ((B.zeroFst_nat f _).trans ?_)
         rw [hfy]
-      ·
-        rw [Units.coe_map, MonoidHom.coe_coe, hzinv, evalT_tmul, map_sub, map_one, map_mul, hfσ, Dp.fr_η, hk]
+      · rw [Units.coe_map, MonoidHom.coe_coe, hzinv, evalT_tmul, map_sub, map_one, map_mul, hfσ,
+          Dp.fr_η, hk]
         try simp only [LinearMap.coe_comp, Function.comp_apply, AlgHom.toLinearMap_apply]
         try ring
-      ·
-        have h1 : HEq (B.nsmul2 (B.tr2 hfy (B.tr1 hfx (B.pmap f u'))) N) (B.nsmul2 (B.pmap f u') N) :=
+      · have h1
+            : HEq (B.nsmul2 (B.tr2 hfy (B.tr1 hfx (B.pmap f u'))) N) (B.nsmul2 (B.pmap f u') N) :=
           B.nsmul2_hcongr hfx.symm hfy.symm N ((tr2h hfy _).trans (tr1h hfx _))
         refine h1.trans ((B.pmap_nsmul2 f u' N).symm.trans ?_)
-        have h2 : HEq (B.nsmul2 u' N) (B.smul z⁻¹ (B.zero2 (B.tg Dp.π Dp.sqZero (g ⊗ₜ Dp.ηk)))) := by
+        have h2
+            : HEq (B.nsmul2 u' N) (B.smul z⁻¹ (B.zero2 (B.tg Dp.π Dp.sqZero (g ⊗ₜ Dp.ηk)))) := by
           rw [← hc0, ← e2']
           exact (tr2h hy1 _).symm
         refine (pmap_heq f rfl hy1 h2).trans ?_

@@ -12,23 +12,27 @@ open CategoryTheory Limits AlgebraicGeometry Opposite LateralTheory.E.E4
 
 namespace LateralTheory.E.LeafStalkValuationPf
 
-theorem valuationRing_of_dimLE (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] [IsDomain R]
-    [IsIntegrallyClosed R] (hd : ringKrullDim R ≤ 1) : ValuationRing R := by
+theorem valuationRing_of_dimLE
+    (R : Type) [CommRing R] [IsNoetherianRing R] [IsLocalRing R] [IsDomain R] [IsIntegrallyClosed R]
+    (hd : ringKrullDim R ≤ 1)
+    : ValuationRing R := by
   have h1 : Ring.KrullDimLE 1 R := (Ring.krullDimLE_iff).2 (by exact_mod_cast hd)
   have key : ∀ P : Ideal R, P ≠ ⊥ → P.IsPrime → P = IsLocalRing.maximalIdeal R := by
     intro P hP hPp
     rcases (Ring.krullDimLE_one_iff.mp h1) P hPp with hmin | hmax
-    · exfalso; apply hP
+    · exfalso
+      apply hP
       have hb : (⊥ : Ideal R).IsPrime := Ideal.isPrime_bot
       exact le_antisymm (hmin.2 ⟨hb, bot_le⟩ bot_le) bot_le
     · exact IsLocalRing.eq_maximalIdeal hmax
   exact ((tfae_of_isNoetherianRing_of_isLocalRing_of_isDomain (R := R)).out 4 2).mp
-    (⟨inferInstance, key⟩ : IsIntegrallyClosed R ∧ ∀ P : Ideal R, P ≠ ⊥ → P.IsPrime → P = IsLocalRing.maximalIdeal R)
+    (⟨inferInstance, key⟩
+      : IsIntegrallyClosed R ∧ ∀ P : Ideal R, P ≠ ⊥ → P.IsPrime → P = IsLocalRing.maximalIdeal R)
 
-theorem stalk_facts (Ω : Type) [Field Ω] {C : Scheme.{0}} [IsIntegral C] (c : C ⟶ Sp Ω)
-    (hc : IsCurve c) (y : C) :
-    IsNoetherianRing (C.presheaf.stalk y) ∧ IsIntegrallyClosed (C.presheaf.stalk y) ∧
-      ringKrullDim (C.presheaf.stalk y) ≤ 1 := by
+theorem stalk_facts
+    (Ω : Type) [Field Ω] {C : Scheme.{0}} [IsIntegral C] (c : C ⟶ Sp Ω) (hc : IsCurve c) (y : C)
+    : IsNoetherianRing (C.presheaf.stalk y) ∧ IsIntegrallyClosed (C.presheaf.stalk y)
+      ∧ ringKrullDim (C.presheaf.stalk y) ≤ 1 := by
   obtain ⟨-, hp, hs⟩ := hc
   have : Smooth c := SmoothOfRelativeDimension.smooth (n := 1) c
   have : LocallyOfFiniteType c := inferInstance

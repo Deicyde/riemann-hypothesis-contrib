@@ -7,8 +7,11 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.IsCharacter
 
 @[expose] public section
 
-open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic GlobalTheory.AbDual GlobalTheory.DualCon
+open CategoryTheory CategoryTheory.Limits AlgebraicGeometry MonoidalCategory
+  CartesianMonoidalCategory MonObj
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GlobalTheory.AbLaw GlobalTheory.CechPic
+  GlobalTheory.AbDual GlobalTheory.DualCon
 open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.CharKer
@@ -20,7 +23,11 @@ variable {S : Scheme.{0}}
 theorem comp_one_hom {X Y M : Over S} [GrpObj M] (u : Y ⟶ X) : u ≫ (1 : X ⟶ M) = 1 := by
   rw [Hom.one_def, Hom.one_def, ← Category.assoc, toUnit_unique (u ≫ toUnit X) (toUnit Y)]
 
-theorem pmap_isPullback_actMap : ∀ (S : Scheme.{0}) (A A' N T : Over S) [GrpObj A] [GrpObj A'] [GrpObj N] (i : N ⟶ A) (q : A ⟶ A'), IsMonHom i → IsMonHom q → IsPullback i (toUnit N) q η[A'] → IsPullback (prMap A N T) (actMap i T) (pmap q T) (pmap q T) := by
+theorem pmap_isPullback_actMap
+    : ∀ (S : Scheme.{0}) (A A' N T : Over S) [GrpObj A] [GrpObj A'] [GrpObj N] (i : N ⟶ A)
+        (q : A ⟶ A'),
+      IsMonHom i → IsMonHom q → IsPullback i (toUnit N) q η[A']
+        → IsPullback (prMap A N T) (actMap i T) (pmap q T) (pmap q T) := by
   intro S A A' N T _ _ _ i q hi hq hker
   have hiq : i ≫ q = 1 := by rw [hker.w, Hom.one_def]
   have hpf : pmap q T ≫ fst A' T = fst A T ≫ q := by simp [pmap]
@@ -32,7 +39,9 @@ theorem pmap_isPullback_actMap : ∀ (S : Scheme.{0}) (A A' N T : Over S) [GrpOb
       simp only [comp_one_hom, _root_.mul_one]
     · rw [Category.assoc, Category.assoc, hps]
       simp [prMap, actMap]
-  have hfs : ∀ s : PullbackCone (pmap q T) (pmap q T), (s.fst ≫ fst A T) ≫ q = (s.snd ≫ fst A T) ≫ q := by
+  have hfs
+      : ∀ s : PullbackCone (pmap q T) (pmap q T),
+        (s.fst ≫ fst A T) ≫ q = (s.snd ≫ fst A T) ≫ q := by
     intro s
     have h := congrArg (· ≫ fst A' T) s.condition
     simp only [Category.assoc, hpf] at h
@@ -41,19 +50,26 @@ theorem pmap_isPullback_actMap : ∀ (S : Scheme.{0}) (A A' N T : Over S) [GrpOb
     intro s
     have h := congrArg (· ≫ snd A' T) s.condition
     simpa only [Category.assoc, hps] using h
-  have hk : ∀ s : PullbackCone (pmap q T) (pmap q T),
-      ((s.fst ≫ fst A T)⁻¹ * (s.snd ≫ fst A T)) ≫ q = toUnit s.pt ≫ η[A'] := by
+  have hk
+      : ∀ s : PullbackCone (pmap q T) (pmap q T),
+        ((s.fst ≫ fst A T)⁻¹ * (s.snd ≫ fst A T)) ≫ q = toUnit s.pt ≫ η[A'] := by
     intro s
     rw [mul_comp, GrpObj.inv_comp, hfs s, _root_.inv_mul_cancel, Hom.one_def]
-  refine ⟨⟨hc⟩, ⟨PullbackCone.IsLimit.mk hc
-    (fun s => lift (s.fst ≫ fst A T)
-      (lift (hker.lift ((s.fst ≫ fst A T)⁻¹ * (s.snd ≫ fst A T)) (toUnit _) (hk s)) (s.fst ≫ snd A T)))
-    ?_ ?_ ?_⟩⟩
+  refine ⟨
+    ⟨hc⟩,
+    ⟨PullbackCone.IsLimit.mk hc
+      (fun s =>
+        lift (s.fst ≫ fst A T)
+          (lift (hker.lift ((s.fst ≫ fst A T)⁻¹ * (s.snd ≫ fst A T)) (toUnit _) (hk s))
+            (s.fst ≫ snd A T)))
+      ?_ ?_ ?_⟩
+  ⟩
   · intro s
     apply CartesianMonoidalCategory.hom_ext <;> simp [prMap]
   · intro s
     apply CartesianMonoidalCategory.hom_ext
-    · simp only [actMap, Category.assoc, lift_fst, comp_mul, lift_fst_assoc, lift_snd_assoc, hker.lift_fst]
+    · simp only [actMap, Category.assoc, lift_fst, comp_mul, lift_fst_assoc, lift_snd_assoc,
+        hker.lift_fst]
       exact _root_.mul_inv_cancel_left _ _
     · simp [actMap, hss]
   · intro s m h1 h2

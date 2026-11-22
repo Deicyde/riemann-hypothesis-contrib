@@ -13,7 +13,17 @@ open NumberField ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRes
 
 namespace GlobalTheory
 
-theorem isBddSec_of_integral : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r), ∀ (la : Wt X.Ψ r) (N k m : ℕ) (w : Fin N → Frame X.Ψ r → ℂ) (cf : ℕ → MvPolynomial (Fin N) ℂ) (g : Frame X.Ψ r → ℂ), (∀ i, X.IsBddSec la (w i)) → (∀ i < m, (cf i).IsHomogeneous ((m - i) * k)) → X.IsSec (k • la) g → (∀ x ∈ X.dom, g x * g x ^ m + ∑ i ∈ Finset.range m, (g x * MvPolynomial.eval (fun s => w s x) (cf i)) * g x ^ i = 0) → X.IsBddSec (k • la) g := by
+theorem isBddSec_of_integral
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r),
+      ∀ (la : Wt X.Ψ r) (N k m : ℕ) (w : Fin N → Frame X.Ψ r → ℂ) (cf : ℕ → MvPolynomial (Fin N) ℂ)
+          (g : Frame X.Ψ r → ℂ),
+        (∀ i, X.IsBddSec la (w i)) → (∀ i < m, (cf i).IsHomogeneous ((m - i) * k))
+          → X.IsSec (k • la) g
+          → (∀ x ∈ X.dom,
+            g x * g x ^ m
+                + ∑ i ∈ Finset.range m, (g x * MvPolynomial.eval (fun s => w s x) (cf i)) * g x ^ i
+              = 0)
+          → X.IsBddSec (k • la) g := by
   intro E _ _ _ r X la N k m w cf g hw hcf hg heq
   refine ⟨hg, ?_⟩
   choose B hB using fun i => (hw i).2
@@ -31,8 +41,8 @@ theorem isBddSec_of_integral : ∀ (E : Type) [Field E] [NumberField E] [IsCMFie
       (Finset.single_le_sum (f := fun i => |B i|) (fun _ _ => abs_nonneg _) (Finset.mem_univ i))
   show ‖g x‖ * X.nfac _ x ≤ _
   rw [IntegralCusp.nfac_nsmul X la (k • la) k (fun τ i => by simp), ← hν]
-  calc _ ≤ C * ‖fun i => w i x‖ ^ k * ν ^ k :=
-        mul_le_mul_of_nonneg_right h2 (by positivity)
+  calc
+    _ ≤ C * ‖fun i => w i x‖ ^ k * ν ^ k := mul_le_mul_of_nonneg_right h2 (by positivity)
     _ = C * (‖fun i => w i x‖ * ν) ^ k := by ring
     _ ≤ _ := by gcongr
 

@@ -23,13 +23,38 @@ def fcOf (p t : ℝ) (o : Out) (M N : ℝ) : FC where
   full := o.full
   GK := ⟨M, N, N, N, N, N, N, N, N, N, N, 5, 4, 1, N⟩
   cX := ⟨1, ⟨12, 3, M⟩⟩
-  P := ⟨N, N, N, N⁻¹, 10, N, N, o.CLw, o.Cj0, N, o.cw, N, N, N, N, N, N, o.CetaF, N, o.CYL, o.Cpde, o.CccK, M⟩
+  P := ⟨
+    N,
+    N,
+    N,
+    N⁻¹,
+    10,
+    N,
+    N,
+    o.CLw,
+    o.Cj0,
+    N,
+    o.cw,
+    N,
+    N,
+    N,
+    N,
+    N,
+    N,
+    o.CetaF,
+    N,
+    o.CYL,
+    o.Cpde,
+    o.CccK,
+    M
+  ⟩
   T := ⟨p, o.eP, o.Cp, N, o.cTO, N, N⟩
 
-theorem exists_large (K : TransportedAlt) (out : ℝ → ℝ → Out) :
-    ∃ (C : FC) (CH : ℝ), 0 ≤ CH ∧ C.out = out C.T.CP C.Ct ∧ C.GK.Nonneg ∧ 1 ≤ C.Cr ∧ C.Large K CH ∧ C.P.CF = CH ∧
-      C.GK.Pr1 = 1 ∧ C.GK.dl1 = 5 ∧ C.GK.dl2 = 4 ∧ C.cX.Ce = 1 ∧ C.cX.err.c6 = 12 ∧ C.cX.err.dig = 3 ∧ C.Cr = 1 ∧
-      C.P.CnW = 10 ∧ C.Ct = 401 := by
+theorem exists_large (K : TransportedAlt) (out : ℝ → ℝ → Out)
+    : ∃ (C : FC) (CH : ℝ),
+      0 ≤ CH ∧ C.out = out C.T.CP C.Ct ∧ C.GK.Nonneg ∧ 1 ≤ C.Cr ∧ C.Large K CH ∧ C.P.CF = CH
+        ∧ C.GK.Pr1 = 1 ∧ C.GK.dl1 = 5 ∧ C.GK.dl2 = 4 ∧ C.cX.Ce = 1 ∧ C.cX.err.c6 = 12
+        ∧ C.cX.err.dig = 3 ∧ C.Cr = 1 ∧ C.P.CnW = 10 ∧ C.Ct = 401 := by
   set p := K.pre with hp
   set t : ℝ := 401 with ht
   set o := out p t with ho
@@ -38,9 +63,41 @@ theorem exists_large (K : TransportedAlt) (out : ℝ → ℝ → Out) :
   have hM1 : 1 ≤ M := le_max_right _ _
   have hM0 : 0 ≤ M := le_trans zero_le_one hM1
   have hN0 : 0 ≤ N := le_trans zero_le_one (le_max_right _ _)
-  refine ⟨fcOf p t o M N, M, hM0, rfl, ⟨hM0, hN0, hN0, hN0, hN0, hN0, hN0, hN0, hN0, hN0, hN0, by show (0 : ℝ) ≤ 5; norm_num, by show (0 : ℝ) ≤ 4; norm_num,
-      by show (0 : ℝ) ≤ 1; norm_num, hN0⟩,
-    le_refl _, ⟨?_, trivial, ?_, ?_⟩, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  refine ⟨
+    fcOf p t o M N,
+    M,
+    hM0,
+    rfl,
+    ⟨
+      hM0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      hN0,
+      by show (0 : ℝ) ≤ 5; norm_num,
+      by show (0 : ℝ) ≤ 4; norm_num,
+      by show (0 : ℝ) ≤ 1; norm_num,
+      hN0
+    ⟩,
+    le_refl _,
+    ⟨?_, trivial, ?_, ?_⟩,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl,
+    rfl
+  ⟩
   · intro c hc
     have hc' : c = p := by
       simp only [FC.cPre, fcOf, List.mem_cons, List.not_mem_nil, or_false] at hc

@@ -20,21 +20,31 @@ variable (F : Type) [Field F] [NumberField F]
 open scoped TensorProduct in
 open NumberField IsDedekindDomain in
 variable (F : Type) [Field F] [NumberField F] in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.psiV_zero (ψ : AddChar (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) ℂ) (v : HeightOneSpectrum (𝓞 F)) :
-    _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v 0 = 1 := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.psiV_zero
+    (ψ : AddChar (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) ℂ)
+    (v : HeightOneSpectrum (𝓞 F))
+    : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v 0 = 1 := by
   classical
-  unfold _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.singleV
+  unfold _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV
+    _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA
+    _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.singleV
   rw [RestrictedProduct.single_zero]
   exact AddChar.map_zero_eq_one ψ
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain in
 variable (F : Type) [Field F] [NumberField F] in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.psiV_add (ψ : AddChar (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) ℂ) (v : HeightOneSpectrum (𝓞 F))
-    (x y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v) :
-    _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v (x + y) = _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v x * _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v y := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.psiV_add
+    (ψ : AddChar (_root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF F) ℂ)
+    (v : HeightOneSpectrum (𝓞 F))
+    (x y : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Fv F v)
+    : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v (x + y)
+      = _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v x
+        * _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV F ψ v y := by
   classical
-  unfold _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.singleV
+  unfold _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.psiV
+    _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.pairA
+    _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.singleV
   refine Eq.trans ?_ (ψ.map_add_eq_mul _ _)
   congr 1
   refine Prod.ext (add_zero 0).symm ?_
@@ -83,16 +93,13 @@ def absInf (a : Fˣ) : ℝ := ∏ w : InfinitePlace F, w (a : F)
 def diffV (v : HeightOneSpectrum (𝓞 F)) : Ideal (v.adicCompletionIntegers F) :=
   (differentIdeal ℤ (𝓞 F)).map (algebraMap (𝓞 F) (v.adicCompletionIntegers F))
 
-def normDiffV (v : HeightOneSpectrum (𝓞 F)) : ℕ :=
-  Nat.card (v.adicCompletionIntegers F ⧸ diffV F v)
+def normDiffV (v : HeightOneSpectrum (𝓞 F)) : ℕ := Nat.card (v.adicCompletionIntegers F ⧸ diffV F v)
 
 variable (E : Type) [Field E] [Algebra F E]
 
-
 open scoped Classical in
 open Classical in
-def eta (v : HeightOneSpectrum (𝓞 F)) : ℝ :=
-  if IsField (Fv F v ⊗[F] E) then -1 else 1
+def eta (v : HeightOneSpectrum (𝓞 F)) : ℝ := if IsField (Fv F v ⊗[F] E) then -1 else 1
 
 def eulerInv (M : ℕ) (v : HeightOneSpectrum (𝓞 F)) : ℝ :=
   1 - eta F E v ^ M * (resCard F v : ℝ) ^ (-(M : ℤ))
@@ -107,54 +114,59 @@ section Statements
 variable (F : Type) [Field F] [NumberField F]
 
 def CharsAreTwists : Prop :=
-  (∃ ψ₀, IsStdChar F ψ₀) ∧
-  ∀ ψ₀, IsStdChar F ψ₀ → ∀ ψ, IsCharAF F ψ → ∃! a : Fˣ, IsTwist F ψ ψ₀ a
+  (∃ ψ₀, IsStdChar F ψ₀) ∧ ∀ ψ₀, IsStdChar F ψ₀ → ∀ ψ, IsCharAF F ψ → ∃! a : Fˣ, IsTwist F ψ ψ₀ a
 
 def DifferentProduct : Prop :=
-  (∀ ψ₀, IsStdChar F ψ₀ → ∀ v : HeightOneSpectrum (𝓞 F),
-    (∀ t : Fv F v, t ∈ psiDual F ψ₀ v ↔
-      ∀ d ∈ diffV F v, t * (d : Fv F v) ∈ v.adicCompletionIntegers F) ∧
-    nIdx F ψ₀ v = (normDiffV F v : ℝ)) ∧
-  (∀ v, normDiffV F v ≠ 0) ∧
-  (Function.mulSupport (normDiffV F)).Finite ∧
-  ((∏ᶠ v, normDiffV F v : ℕ) : ℤ) = |discr F|
+  (∀ ψ₀,
+      IsStdChar F ψ₀
+        → ∀ v : HeightOneSpectrum (𝓞 F),
+          (∀ t : Fv F v,
+              t ∈ psiDual F ψ₀ v ↔ ∀ d ∈ diffV F v, t * (d : Fv F v) ∈ v.adicCompletionIntegers F)
+            ∧ nIdx F ψ₀ v = (normDiffV F v : ℝ))
+    ∧ (∀ v, normDiffV F v ≠ 0) ∧ (Function.mulSupport (normDiffV F)).Finite
+    ∧ ((∏ᶠ v, normDiffV F v : ℕ) : ℤ) = |discr F|
 
 variable (E : Type) [Field E] [NumberField E] [Algebra F E] [StarRing E]
 
-def dF : ℝ := (2 * Formalism.HermitianLatticesTheory.vInv E) ^ Formalism.HermitianLatticesTheory.fDeg E
+def dF : ℝ :=
+  (2 * Formalism.HermitianLatticesTheory.vInv E) ^ Formalism.HermitianLatticesTheory.fDeg E
 
 def LValue (M : ℕ) : Prop :=
-  Multipliable (fun P : {P : Ideal (𝓞 E) // P.IsMaximal} => Formalism.HermitianLatticesTheory.eulerFac E M P.1) ∧
-  0 < Formalism.HermitianLatticesTheory.lValEta E M ∧
-  HasProd (fun v => (eulerInv F E M v)⁻¹) (Formalism.HermitianLatticesTheory.lValEta E M)
+  Multipliable (fun P : {P : Ideal (𝓞 E) // P.IsMaximal} =>
+      Formalism.HermitianLatticesTheory.eulerFac E M P.1)
+    ∧ 0 < Formalism.HermitianLatticesTheory.lValEta E M
+    ∧ HasProd (fun v => (eulerInv F E M v)⁻¹) (Formalism.HermitianLatticesTheory.lValEta E M)
 
 def DensityProduct (ψ : AddChar (AF F) ℂ) (a : Fˣ) (M : ℕ) : Prop :=
-  (∀ v, IndexFinite F ψ v) ∧
-  (∀ v, 0 < locDens F E ψ M v) ∧
-  Summable (fun v => |locDens F E ψ M v - 1|) ∧
-  Multipliable (locDens F E ψ M) ∧
-  0 < ∏' v, locDens F E ψ M v ∧
-  absInf F a ^ ((M : ℝ) - 1 / 2) * ∏' v, locDens F E ψ M v =
-    dF E ^ ((1 : ℝ) / 2 - (M : ℝ)) / Formalism.HermitianLatticesTheory.lValEta E M
+  (∀ v, IndexFinite F ψ v) ∧ (∀ v, 0 < locDens F E ψ M v)
+    ∧ Summable (fun v => |locDens F E ψ M v - 1|) ∧ Multipliable (locDens F E ψ M)
+    ∧ 0 < ∏' v, locDens F E ψ M v
+    ∧ absInf F a ^ ((M : ℝ) - 1 / 2) * ∏' v, locDens F E ψ M v
+      = dF E ^ ((1 : ℝ) / 2 - (M : ℝ)) / Formalism.HermitianLatticesTheory.lValEta E M
 
 end Statements
 
 def EulerProductOfDensities : Prop :=
   ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
-    (σ : E →ₐ[F] E), IsCMExt F E σ → Formalism.HermitianLatticesTheory.IsCMUnram E →
-    CharsAreTwists F ∧ DifferentProduct F ∧ ((|discr F| : ℤ) : ℝ) = dF E ∧
-    ∀ M : ℕ, 2 ≤ M →
-      LValue F E M ∧
-      ∀ ψ, IsCharAF F ψ →
-        (∃ a : Fˣ, ScalesInf F ψ a) ∧ ∀ a : Fˣ, ScalesInf F ψ a → DensityProduct F E ψ a M
-
+      (σ : E →ₐ[F] E),
+    IsCMExt F E σ → Formalism.HermitianLatticesTheory.IsCMUnram E
+      → CharsAreTwists F ∧ DifferentProduct F ∧ ((|discr F| : ℤ) : ℝ) = dF E
+        ∧ ∀ M : ℕ,
+          2 ≤ M
+            → LValue F E M
+              ∧ ∀ ψ,
+                IsCharAF F ψ
+                  → (∃ a : Fˣ, ScalesInf F ψ a)
+                    ∧ ∀ a : Fˣ, ScalesInf F ψ a → DensityProduct F E ψ a M
 
 open scoped TensorProduct in
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.star_eq_sigma {F E : Type} [Field F] [NumberField F] [Field E]
-    [NumberField E] [Algebra F E] [StarRing E] (σ : E →ₐ[F] E) (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
-    (hu : _root_.Formalism.HermitianLatticesTheory.IsCMUnram E) (x : E) :
-    star x = σ x := by
+theorem _root_.GlobalTheory.IndefiniteRowSideFullHecke.LocalAdditiveCharacterDual.star_eq_sigma
+    {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] [StarRing E]
+    (σ : E →ₐ[F] E)
+    (h : _root_.Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCMExt F E σ)
+    (hu : _root_.Formalism.HermitianLatticesTheory.IsCMUnram E) (x : E)
+    : star x = σ x := by
   obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
   apply τ.injective
   rw [h.2.2.2 τ x, hu.2.1 τ x]

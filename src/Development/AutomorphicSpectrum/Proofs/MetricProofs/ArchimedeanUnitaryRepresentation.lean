@@ -9,7 +9,10 @@ public import Development.AutomorphicSpectrum.Proofs.MetricProofs.IntEmbInjectiv
 
 @[expose] public section
 
-open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
+open NumberField Matrix MeasureTheory Filter Topology GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Cusp ReciprocityTheory.ChartRestriction.G.Geo
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor GroundTheory.Heights₂.Heights.FiniteCovolume
+  GroundTheory.Automorphic GlobalTheory.CompanionTheory.Ar.Cusp.Dict
 open scoped ENNReal InnerProductSpace
 open scoped ComplexOrder
 
@@ -17,9 +20,11 @@ noncomputable section
 
 namespace GlobalTheory.CompanionTheory.Ar.Cusp.Dict.TmBasic
 
-theorem conj_unitary {ι : Type} [Fintype ι] (M G : Matrix ι ι ℂ)
-    (h : (M.map (starRingEnd ℂ))ᵀ * G.map (starRingEnd ℂ) * M = G.map (starRingEnd ℂ)) :
-    (M.map (starRingEnd ℂ))ᴴ * G * M.map (starRingEnd ℂ) = G := by
+theorem conj_unitary
+    {ι : Type} [Fintype ι]
+    (M G : Matrix ι ι ℂ)
+    (h : (M.map (starRingEnd ℂ))ᵀ * G.map (starRingEnd ℂ) * M = G.map (starRingEnd ℂ))
+    : (M.map (starRingEnd ℂ))ᴴ * G * M.map (starRingEnd ℂ) = G := by
   have h2 := congrArg (fun X : Matrix ι ι ℂ => X.map (starRingEnd ℂ)) h
   simp only [Matrix.map_mul] at h2
   have e1 : (G.map (starRingEnd ℂ)).map (starRingEnd ℂ) = G := by ext i k; simp
@@ -28,7 +33,12 @@ theorem conj_unitary {ι : Type} [Fintype ι] (M G : Matrix ι ι ℂ)
   rw [e1, e2] at h2
   exact h2
 
-theorem tm_basic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ) (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (C : LatEmb F), (∀ (a b : C.Arch) τ, C.tm (a * b) τ = C.tm a τ * C.tm b τ) ∧ (∀ τ, C.tm 1 τ = 1) ∧ (∀ (a : C.Arch) τ, (C.tm a τ)ᴴ * C.gr τ * C.tm a τ = C.gr τ) ∧ ∀ τ, Continuous fun a : C.Arch => C.tm a τ := by
+theorem tm_basic
+    : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : Type) [Fintype Ψ] (j j' n g : ℕ)
+        (Λ : Type) [AddCommGroup Λ] [Module (𝓞 E) Λ] (F : UnivFam E Ψ j j' n g Λ) (C : LatEmb F),
+      (∀ (a b : C.Arch) τ, C.tm (a * b) τ = C.tm a τ * C.tm b τ) ∧ (∀ τ, C.tm 1 τ = 1)
+        ∧ (∀ (a : C.Arch) τ, (C.tm a τ)ᴴ * C.gr τ * C.tm a τ = C.gr τ)
+        ∧ ∀ τ, Continuous fun a : C.Arch => C.tm a τ := by
   intro E _ _ _ Ψ _ j j' n g Λ _ _ F C
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro a b τ
@@ -47,9 +57,10 @@ theorem tm_basic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : 
     by_cases h0 : (plc F τ).embedding = embOf (F.σ τ)
     · rw [if_pos h0]
       rw [gramAt, h0] at hm
-      have e : ((a.1 (plc F τ) : GL (Fin (j + j')) ℂ) : Matrix (Fin (j + j')) (Fin (j + j')) ℂ)ᴴ =
-          (((a.1 (plc F τ) : GL (Fin (j + j')) ℂ) : Matrix (Fin (j + j')) (Fin (j + j')) ℂ).map
-            (starRingEnd ℂ))ᵀ := by
+      have e
+          : ((a.1 (plc F τ) : GL (Fin (j + j')) ℂ) : Matrix (Fin (j + j')) (Fin (j + j')) ℂ)ᴴ
+            = (((a.1 (plc F τ) : GL (Fin (j + j')) ℂ) : Matrix (Fin (j + j')) (Fin (j + j')) ℂ).map
+              (starRingEnd ℂ))ᵀ := by
         ext i k; simp [Matrix.conjTranspose_apply]
       rw [e]
       exact hm
@@ -57,8 +68,10 @@ theorem tm_basic : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (Ψ : 
         (InfinitePlace.embedding_mk_eq (embOf (F.σ τ))).resolve_left h0
       rw [if_neg h0]
       apply conj_unitary
-      have e : gramAt C.h (Pi.basisFun E (Fin (j + j'))) (plc F τ) =
-          ((gram C.h.toSesq (Pi.basisFun E (Fin (j + j')))).map (embOf (F.σ τ))).map (starRingEnd ℂ) := by
+      have e
+          : gramAt C.h (Pi.basisFun E (Fin (j + j'))) (plc F τ)
+            = ((gram C.h.toSesq (Pi.basisFun E (Fin (j + j')))).map (embOf (F.σ τ))).map
+              (starRingEnd ℂ) := by
         rw [gramAt, h']
         ext i k
         simp [ComplexEmbedding.conjugate_coe_eq]

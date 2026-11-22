@@ -22,7 +22,7 @@ structure HidaSetting (n : ℕ) (ε : Fin n → Bool) where
 
 attribute [instance] HidaSetting.ng HidaSetting.ips HidaSetting.cs
 
-def Rs {n : ℕ} {ε : Fin n → Bool} {E : Type*} (h : UJ ε) (F : UJ ε → E) : UJ ε → E :=
-  fun g => F (g * h)
+def Rs {n : ℕ} {ε : Fin n → Bool} {E : Type*} (h : UJ ε) (F : UJ ε → E) : UJ ε → E := fun g =>
+  F (g * h)
 
 end Formalism.REAL

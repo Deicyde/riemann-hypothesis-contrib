@@ -4,8 +4,10 @@ public import Mathlib
 
 @[expose] public section
 
-theorem UpperTheory.exists_good_without_bad :
-    ∀ {P : Type} [DecidableEq P] (Good : Finset P → Prop) (bad : P → Prop), (∀ (S : Finset P) (w : P), Good S → w ∈ S → bad w → Good (S.erase w)) → ∀ S : Finset P, Good S → ∃ T : Finset P, Good T ∧ ∀ w ∈ T, ¬ bad w := by
+theorem UpperTheory.exists_good_without_bad
+    : ∀ {P : Type} [DecidableEq P] (Good : Finset P → Prop) (bad : P → Prop),
+      (∀ (S : Finset P) (w : P), Good S → w ∈ S → bad w → Good (S.erase w))
+        → ∀ S : Finset P, Good S → ∃ T : Finset P, Good T ∧ ∀ w ∈ T, ¬ bad w := by
   intro P _ Good bad h S
   induction S using Finset.strongInduction with
   | H S ih =>

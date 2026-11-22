@@ -12,25 +12,27 @@ namespace GroundTheory.Heights₂.Heights.IndefiniteRowSideFullHecke.ComplexSets
 
 open IsLocalRing RingTheory.Sequence Pointwise
 
-def quotSMulTopQuotIdealSMulTopEquiv {B M : Type} [CommRing B] [AddCommGroup M] [Module B M]
-    (I : Ideal B) (y : B) :
-    QuotSMulTop y (M ⧸ (I • ⊤ : Submodule B M)) ≃ₗ[B]
-      (QuotSMulTop y M ⧸ (I • ⊤ : Submodule B (QuotSMulTop y M))) :=
+def quotSMulTopQuotIdealSMulTopEquiv
+    {B M : Type} [CommRing B] [AddCommGroup M] [Module B M] (I : Ideal B) (y : B)
+    : QuotSMulTop y (M ⧸ (I • ⊤ : Submodule B M)) ≃ₗ[B]
+        (QuotSMulTop y M ⧸ (I • ⊤ : Submodule B (QuotSMulTop y M))) :=
   (Submodule.quotEquivOfEq ((y • (⊤ : Submodule B M)).map (I • (⊤ : Submodule B M)).mkQ) (y • ⊤)
-      (by rw [Submodule.map_pointwise_smul, Submodule.map_top, Submodule.range_mkQ])).symm ≪≫ₗ
-    Submodule.quotientQuotientEquivQuotientSup (I • ⊤) (y • ⊤) ≪≫ₗ
-    Submodule.quotEquivOfEq _ _ (sup_comm _ _) ≪≫ₗ
-    (Submodule.quotientQuotientEquivQuotientSup (y • ⊤) (I • ⊤)).symm ≪≫ₗ
-    Submodule.quotEquivOfEq _ _ (by rw [Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ])
+      (by rw [Submodule.map_pointwise_smul, Submodule.map_top, Submodule.range_mkQ])).symm
+    ≪≫ₗ Submodule.quotientQuotientEquivQuotientSup (I • ⊤) (y • ⊤)
+    ≪≫ₗ Submodule.quotEquivOfEq _ _ (sup_comm _ _)
+    ≪≫ₗ (Submodule.quotientQuotientEquivQuotientSup (y • ⊤) (I • ⊤)).symm
+    ≪≫ₗ Submodule.quotEquivOfEq _ _
+      (by rw [Submodule.map_smul'', Submodule.map_top, Submodule.range_mkQ])
 
-theorem FlatLocalRegularElement.iterate (h : FlatLocalRegularElement.Statement)
+theorem FlatLocalRegularElement.iterate
+    (h : FlatLocalRegularElement.Statement)
     {A B : Type} [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B] [Algebra A B]
     (hA : IsNoetherianRing A) (hB : IsNoetherianRing B) (hl : IsLocalHom (algebraMap A B))
     (ys : List B) (hys : ∀ y ∈ ys, y ∈ maximalIdeal B)
     (M : Type) [AddCommGroup M] [Module A M] [Module B M] [IsScalarTower A B M]
     (hfin : Module.Finite B M) (hflat : Module.Flat A M)
-    (hreg : IsWeaklyRegular (M ⧸ ((maximalIdeal A).map (algebraMap A B) • (⊤ : Submodule B M))) ys) :
-    IsWeaklyRegular M ys ∧ Module.Flat A (M ⧸ (Ideal.ofList ys • (⊤ : Submodule B M))) := by
+    (hreg : IsWeaklyRegular (M ⧸ ((maximalIdeal A).map (algebraMap A B) • (⊤ : Submodule B M))) ys)
+    : IsWeaklyRegular M ys ∧ Module.Flat A (M ⧸ (Ideal.ofList ys • (⊤ : Submodule B M))) := by
   induction ys generalizing M with
   | nil =>
     refine ⟨IsWeaklyRegular.nil B M, ?_⟩
@@ -41,15 +43,20 @@ theorem FlatLocalRegularElement.iterate (h : FlatLocalRegularElement.Statement)
     rw [isWeaklyRegular_cons_iff] at hreg
     obtain ⟨hyM, hflat'⟩ := h A B hA hB hl M hfin hflat y (hys y List.mem_cons_self) hreg.1
     have hfin' : Module.Finite B (QuotSMulTop y M) := inferInstance
-    obtain ⟨h1, h2⟩ := ih (fun z hz => hys z (List.mem_cons_of_mem _ hz)) (QuotSMulTop y M) hfin' hflat'
-      (((quotSMulTopQuotIdealSMulTopEquiv _ y).isWeaklyRegular_congr ys).mp hreg.2)
+    obtain ⟨h1, h2⟩ :=
+      ih
+        (fun z hz => hys z (List.mem_cons_of_mem _ hz))
+        (QuotSMulTop y M) hfin' hflat'
+        (((quotSMulTopQuotIdealSMulTopEquiv _ y).isWeaklyRegular_congr ys).mp hreg.2)
     refine ⟨(isWeaklyRegular_cons_iff M y ys).mpr ⟨hyM, h1⟩, ?_⟩
-    have : Module.Flat A (QuotSMulTop y M ⧸ (Ideal.ofList ys • (⊤ : Submodule B (QuotSMulTop y M)))) := h2
+    have : Module.Flat A
+        (QuotSMulTop y M ⧸ (Ideal.ofList ys • (⊤ : Submodule B (QuotSMulTop y M)))) :=
+      h2
     exact Module.Flat.of_linearEquiv
       ((Submodule.quotOfListConsSMulTopEquivQuotSMulTopInner M y ys).restrictScalars A)
 
-theorem FlatLocalRegularSequence.proof (h : FlatLocalRegularElement.Statement) :
-    FlatLocalRegularSequence.Statement := by
+theorem FlatLocalRegularSequence.proof (h : FlatLocalRegularElement.Statement)
+    : FlatLocalRegularSequence.Statement := by
   intro A B _ _ _ _ _ hA hB hl hflat rs ys hrs hreg hys hfib
   set I := (maximalIdeal A).map (algebraMap A B) with hI
   have hfib' : IsWeaklyRegular (B ⧸ (I • ⊤ : Submodule B B)) ys := by

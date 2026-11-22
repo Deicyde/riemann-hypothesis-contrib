@@ -13,15 +13,17 @@ theorem resBridge : ResBridgeStatement := by
   haveI := R.compact
   haveI := R.t2
 
-  have key := pushForward_null R.A (fun j => potOf R (L j))
-    (fun j => potOf_isPotential R (L j) (hL j)) (brQ R Ψ) (brBad R Ψ)
-    (brBad_null R Ψ hP hΨ)
-    (fun x hx j hj => by
-      by_contra h
-      apply hx
-      simp only [brBad, Set.mem_union, Set.mem_setOf_eq]
-      exact Or.inr ⟨j, hj, h⟩)
-    (brFib_finite (R := R) (Ψ := Ψ) hP hΨ) _ (brIntegrable R L A s hP hL hA hs)
+  have key :=
+    pushForward_null R.A
+      (fun j => potOf R (L j))
+      (fun j => potOf_isPotential R (L j) (hL j))
+      (brQ R Ψ) (brBad R Ψ) (brBad_null R Ψ hP hΨ)
+      (fun x hx j hj => by
+        by_contra h
+        apply hx
+        simp only [brBad, Set.mem_union, Set.mem_setOf_eq]
+        exact Or.inr ⟨j, hj, h⟩)
+      (brFib_finite (R := R) (Ψ := Ψ) hP hΨ) _ (brIntegrable R L A s hP hL hA hs)
   rw [key]
   unfold ptsIntegralAt
 

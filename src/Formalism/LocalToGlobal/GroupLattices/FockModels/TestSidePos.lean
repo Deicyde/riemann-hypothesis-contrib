@@ -12,11 +12,13 @@ namespace Formalism.L2.G.Model
 
 open Formalism.MainNotions.G Formalism.GradedWeylDivisibility Formalism.MainNotions.G.LatticeSystems
 
-private theorem exists_twistVec_smul_eq_smul_twistVec {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
-    [Field Qq] [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
-    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O}
-    (h : HidaSetting p n' W Qq O Kf ι σ j w) {k : ℕ} (s : ℕ) (a : W) (x : Fin k → Qq) :
-    ∃ b : O, twistVec ι σ s (a • x) = b • twistVec ι σ s x := by
+private theorem exists_twistVec_smul_eq_smul_twistVec
+    {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+    [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    {k : ℕ}
+    (s : ℕ) (a : W) (x : Fin k → Qq)
+    : ∃ b : O, twistVec ι σ s (a • x) = b • twistVec ι σ s x := by
   have hσ : ∀ (t : ℕ) (x : W), ∃ y : W, (σ ^ t) (algebraMap W Qq x) = algebraMap W Qq y := by
     intro t
     induction t with
@@ -35,12 +37,14 @@ private theorem exists_twistVec_smul_eq_smul_twistVec {p n' : ℕ} {W Qq O Kf : 
   funext i
   simp only [twistVec, Pi.smul_apply, Algebra.smul_def, map_mul, hy, h.ι_comp]
 
-private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W]
-    [Field Qq] [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
-    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O}
-    (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Edge W Qq (m + 1))
-    (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq) (hgb : IsEdgeBasis p r e g) (s : ℕ) :
-    LeAt p ι σ w s e = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) := by
+private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis
+    {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+    [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
+    {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O} (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m r : ℕ) (e : Edge W Qq (m + 1)) (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq)
+    (hgb : IsEdgeBasis p r e g)
+    (s : ℕ)
+    : LeAt p ι σ w s e = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) := by
   obtain ⟨_, hsrc, htgt⟩ := hgb
   haveI := h.frac_alt
   have hpW : (p : W) ≠ 0 := h.p_unif.ne_zero
@@ -56,7 +60,8 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
     apply hpK
     rw [hpw, h0]
     ring
-  have tadd : ∀ x y : Fin (m + 1) → Qq, twistVec ι σ s (x + y) = twistVec ι σ s x + twistVec ι σ s y := by
+  have tadd
+      : ∀ x y : Fin (m + 1) → Qq, twistVec ι σ s (x + y) = twistVec ι σ s x + twistVec ι σ s y := by
     intro x y
     funext i
     simp [twistVec]
@@ -67,8 +72,10 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
     intro c
     funext i
     simp [twistVec, la_tw, RingHom.mapMatrix_apply]
-  have Rcol : ∀ c : Fin (m + 1), (fun i => (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) i c) =
-      (if c.val < r then (algebraMap O Kf w)⁻¹ else 1) • fun i => la_tw ι σ s g i c := by
+  have Rcol
+      : ∀ c : Fin (m + 1),
+        (fun i => (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) i c)
+          = (if c.val < r then (algebraMap O Kf w)⁻¹ else 1) • fun i => la_tw ι σ s g i c := by
     intro c
     funext i
     unfold lb_D
@@ -81,8 +88,7 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
   have Tadd : ∀ x y, T (x + y) = T x + T y := by
     intro x y
     simp only [hT, smul_add, tadd]
-  have Tzero : T 0 = 0 := by
-    simp only [hT, smul_zero, tzero]
+  have Tzero : T 0 = 0 := by simp only [hT, smul_zero, tzero]
   have Tsmul : ∀ (a : W) (x : Fin (m + 1) → Qq), ∃ b : O, T (a • x) = b • T x := by
     intro a x
     obtain ⟨b, hb⟩ := exists_twistVec_smul_eq_smul_twistVec h s a ((p : W) • x)
@@ -90,14 +96,19 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
     simp only [hT]
     rw [smul_comm (p : W) a x, hb]
     exact smul_comm _ _ _
-  have key : ∀ c : Fin (m + 1),
-      T (fun i => (g * Matrix.diagonal fun c : Fin (m + 1) => if c.val < r then ((p : Qq))⁻¹ else 1) i c) =
-        (if c.val < r then (algebraMap O Kf w)⁻¹ else algebraMap O Kf w) • fun i => la_tw ι σ s g i c := by
+  have key
+      : ∀ c : Fin (m + 1),
+        T (fun i =>
+            (g * Matrix.diagonal fun c : Fin (m + 1) => if c.val < r then ((p : Qq))⁻¹ else 1) i c)
+          = (if c.val < r then (algebraMap O Kf w)⁻¹ else algebraMap O Kf w)
+            • fun i => la_tw ι σ s g i c := by
     clear Tadd Tzero Tsmul Rcol tcol tadd tzero hsrc htgt hpW hpQ
     intro c
     funext i
-    have e1 : (g * Matrix.diagonal fun c : Fin (m + 1) => if c.val < r then ((p : Qq))⁻¹ else 1) i c =
-        g i c * (if c.val < r then ((p : Qq))⁻¹ else 1) := Matrix.mul_diagonal _ _ _ _
+    have e1
+        : (g * Matrix.diagonal fun c : Fin (m + 1) => if c.val < r then ((p : Qq))⁻¹ else 1) i c
+          = g i c * (if c.val < r then ((p : Qq))⁻¹ else 1) :=
+      Matrix.mul_diagonal _ _ _ _
     simp only [hT, Pi.smul_apply, smul_eq_mul, twistVec, e1]
     simp only [Algebra.smul_def, map_natCast, map_mul]
     split_ifs with hc
@@ -118,8 +129,10 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
       | mem x hx =>
         obtain ⟨c, rfl⟩ := hx
         exact Submodule.subset_span ⟨c, (tcol c).symm⟩
-      | zero => rw [tzero]; exact Submodule.zero_mem _
-      | add x y _ _ hx hy => rw [tadd]; exact Submodule.add_mem _ hx hy
+      | zero =>
+        rw [tzero]; exact Submodule.zero_mem _
+      | add x y _ _ hx hy =>
+        rw [tadd]; exact Submodule.add_mem _ hx hy
       | smul a x _ hx =>
         obtain ⟨b, hb⟩ := exists_twistVec_smul_eq_smul_twistVec h s a x
         rw [hb]
@@ -134,15 +147,17 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
     · rw [Submodule.span_le]
       rintro _ ⟨c, rfl⟩
       by_cases hc : c.val < r
-      · have hA : (fun i => la_tw ι σ s g i c) =
-            w • (fun i => (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) i c) := by
+      · have hA
+            : (fun i => la_tw ι σ s g i c)
+              = w • (fun i => (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) i c) := by
           rw [Rcol c, if_pos hc, ← algebraMap_smul Kf w, smul_smul, mul_inv_cancel₀ hw0, one_smul]
         rw [SetLike.mem_coe]
         beta_reduce
         rw [hA]
         exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨c, rfl⟩)
-      · have hA : (fun i => la_tw ι σ s g i c) =
-            (fun i => (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) i c) := by
+      · have hA
+            : (fun i => la_tw ι σ s g i c)
+              = (fun i => (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) i c) := by
           rw [Rcol c, if_neg hc, one_smul]
         rw [SetLike.mem_coe]
         beta_reduce
@@ -163,8 +178,10 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
           refine Submodule.smul_mem _ _ (Submodule.subset_span ⟨c, ?_⟩)
           beta_reduce
           rw [Rcol c, if_neg hc, one_smul]
-      | zero => rw [Tzero]; exact Submodule.zero_mem _
-      | add x y _ _ hx hy => rw [Tadd]; exact Submodule.add_mem _ hx hy
+      | zero =>
+        rw [Tzero]; exact Submodule.zero_mem _
+      | add x y _ _ hx hy =>
+        rw [Tadd]; exact Submodule.add_mem _ hx hy
       | smul a x _ hx =>
         obtain ⟨b, hb⟩ := Tsmul a x
         rw [hb]
@@ -183,17 +200,22 @@ private theorem leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis {p n' : ℕ} {W Qq O
       exact Submodule.mem_sup_left (Submodule.subset_span ⟨c, rfl⟩)
 
 section
-variable {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
+variable
+  {p n' : ℕ} {W Qq O Kf : Type} [CommRing W] [IsDomain W] [IsDiscreteValuationRing W] [Field Qq]
   [Algebra W Qq] [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Field Kf] [Algebra O Kf]
   {ι : Qq →+* Kf} {σ : Qq ≃+* Qq} {j : W →+* O} {w : O}
 
-theorem leAt_of_basis (h : HidaSetting p n' W Qq O Kf ι σ j w) (m r : ℕ) (e : Edge W Qq (m + 1))
-    (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq) (hgb : IsEdgeBasis p r e g) (s : ℕ) :
-    LeAt p ι σ w s e = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) := by
+theorem leAt_of_basis
+    (h : HidaSetting p n' W Qq O Kf ι σ j w)
+    (m r : ℕ) (e : Edge W Qq (m + 1)) (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Qq)
+    (hgb : IsEdgeBasis p r e g)
+    (s : ℕ)
+    : LeAt p ι σ w s e = colSpan O (la_tw ι σ s g * lb_D (m + 1) r (algebraMap O Kf w)) := by
   exact leAt_eq_colSpan_la_tw_mul_lb_D_of_edgeBasis h m r e g hgb s
 
-theorem extO_colSpan (h : HidaSetting p n' W Qq O Kf ι σ j w) {k : ℕ} (g : Matrix (Fin k) (Fin k) Qq) (s : ℕ) :
-    extO O ι σ s (colSpan W g) = colSpan O (la_tw ι σ s g) := by
+theorem extO_colSpan
+    (h : HidaSetting p n' W Qq O Kf ι σ j w) {k : ℕ} (g : Matrix (Fin k) (Fin k) Qq) (s : ℕ)
+    : extO O ι σ s (colSpan W g) = colSpan O (la_tw ι σ s g) := by
   have hσ : ∀ (t : ℕ) (x : W), ∃ y : W, (σ ^ t) (algebraMap W Qq x) = algebraMap W Qq y := by
     intro t
     induction t with
@@ -214,7 +236,8 @@ theorem extO_colSpan (h : HidaSetting p n' W Qq O Kf ι σ j w) {k : ℕ} (g : M
   have tzero : twistVec ι σ s (0 : Fin k → Qq) = 0 := by
     funext i
     simp [twistVec]
-  have tsmul : ∀ (a : W) (x : Fin k → Qq), ∃ b : O, twistVec ι σ s (a • x) = b • twistVec ι σ s x := by
+  have tsmul
+      : ∀ (a : W) (x : Fin k → Qq), ∃ b : O, twistVec ι σ s (a • x) = b • twistVec ι σ s x := by
     intro a x
     obtain ⟨y, hy⟩ := hσ s a
     refine ⟨j y, ?_⟩
@@ -234,8 +257,10 @@ theorem extO_colSpan (h : HidaSetting p n' W Qq O Kf ι σ j w) {k : ℕ} (g : M
     | mem x hx =>
       obtain ⟨c, rfl⟩ := hx
       exact Submodule.subset_span ⟨c, (tcol c).symm⟩
-    | zero => rw [tzero]; exact Submodule.zero_mem _
-    | add x y _ _ hx hy => rw [tadd]; exact Submodule.add_mem _ hx hy
+    | zero =>
+      rw [tzero]; exact Submodule.zero_mem _
+    | add x y _ _ hx hy =>
+      rw [tadd]; exact Submodule.add_mem _ hx hy
     | smul a x _ hx =>
       obtain ⟨b, hb⟩ := tsmul a x
       rw [hb]
@@ -249,12 +274,13 @@ end
 section
 variable {Qq Kf : Type} [Field Qq] [Field Kf] (ι : Qq →+* Kf) (σ : Qq ≃+* Qq) (s : ℕ) {k : ℕ}
 
-theorem tw_mul (A B : Matrix (Fin k) (Fin k) Qq) : la_tw ι σ s (A * B) = la_tw ι σ s A * la_tw ι σ s B := by
+theorem tw_mul (A B : Matrix (Fin k) (Fin k) Qq)
+    : la_tw ι σ s (A * B) = la_tw ι σ s A * la_tw ι σ s B := by
   unfold la_tw
   exact map_mul _ A B
 
-theorem tw_invT (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det) :
-    la_tw ι σ s (g⁻¹).transpose = ((la_tw ι σ s g)⁻¹).transpose := by
+theorem tw_invT (g : Matrix (Fin k) (Fin k) Qq) (hg : IsUnit g.det)
+    : la_tw ι σ s (g⁻¹).transpose = ((la_tw ι σ s g)⁻¹).transpose := by
   have key : la_tw ι σ s g⁻¹ = (la_tw ι σ s g)⁻¹ := by
     symm
     apply Matrix.inv_eq_left_inv
@@ -281,34 +307,42 @@ theorem dE_sq_D (r : ℕ) (c : Kf) (hc : c ≠ 0) : dE k r (c ^ 2) * lb_D k r c 
 
 end
 
-theorem det_invT_zpow {Kf : Type} [Field Kf] {k : ℕ} (M : Matrix (Fin k) (Fin k) Kf) (hM : IsUnit M.det) (e : ℤ) :
-    M.det ^ e * ((M⁻¹).transpose).det ^ e = 1 := by
-  rw [Matrix.det_transpose, Matrix.det_nonsing_inv, ← mul_zpow, Ring.mul_inverse_cancel _ hM, one_zpow]
+theorem det_invT_zpow
+    {Kf : Type} [Field Kf] {k : ℕ} (M : Matrix (Fin k) (Fin k) Kf) (hM : IsUnit M.det) (e : ℤ)
+    : M.det ^ e * ((M⁻¹).transpose).det ^ e = 1 := by
+  rw [Matrix.det_transpose, Matrix.det_nonsing_inv, ← mul_zpow, Ring.mul_inverse_cancel _ hM,
+    one_zpow]
 
-theorem posCore_of_form {O Kf : Type} [CommRing O] [IsDomain O] [Field Kf] [Algebra O Kf]
-    (hinj : Function.Injective (algebraMap O Kf)) (p m : ℕ) (lam : Fin (m + 1) → ℤ) (N : ℕ)
-    (B : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf →ₗ[Kf] MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf →ₗ[Kf] Kf)
-    (ha : ∀ (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Kf) (P Q : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf),
-        B (rowAct Kf g P) Q = B P (rowAct Kf g.transpose Q))
+theorem posCore_of_form
+    {O Kf : Type} [CommRing O] [IsDomain O] [Field Kf] [Algebra O Kf]
+    (hinj : Function.Injective (algebraMap O Kf))
+    (p m : ℕ) (lam : Fin (m + 1) → ℤ)
+    (N : ℕ)
+    (B
+      : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf →ₗ[Kf] MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf →ₗ[Kf] Kf)
+    (ha : ∀ (g : Matrix (Fin (m + 1)) (Fin (m + 1)) Kf)
+        (P Q : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf),
+      B (rowAct Kf g P) Q = B P (rowAct Kf g.transpose Q))
     (hb : ∀ Q ∈ dualWeyl Kf (m + 1) (m + 1) (nuOf lam),
-        (∀ P ∈ dualWeyl Kf (m + 1) (m + 1) (nuOf lam), B P Q = 0) → Q = 0)
+      (∀ P ∈ dualWeyl Kf (m + 1) (m + 1) (nuOf lam), B P Q = 0) → Q = 0)
     (hc : ∀ Q ∈ dualWeyl Kf (m + 1) (m + 1) (nuOf lam),
-        (∀ P ∈ nabO O Kf m (nuOf lam), B P Q ∈ Set.range (algebraMap O Kf)) → Q ∈ nabO O Kf m (nuOf lam))
+      (∀ P ∈ nabO O Kf m (nuOf lam), B P Q ∈ Set.range (algebraMap O Kf))
+        → Q ∈ nabO O Kf m (nuOf lam))
     (hdd : ∀ Q ∈ nabO O Kf m (nuOf lam), ∀ P ∈ nabO O Kf m (nuOf lam),
-        B P (((p : Kf) ^ N) • Q) ∈ Set.range (algebraMap O Kf)) :
-    ∃ β, PosCore O Kf p m lam N β := by
+      B P (((p : Kf) ^ N) • Q) ∈ Set.range (algebraMap O Kf))
+    : ∃ β, PosCore O Kf p m lam N β := by
   classical
   set V := dualWeyl Kf (m + 1) (m + 1) (nuOf lam) with hV
   obtain ⟨Z0, -⟩ := latBasis (O := O) hinj m lam 1 (by simp)
-  have hfinI : Finite ↥(ssIdx (m + 1) (m + 1) (nuOf lam)) := (sSIdxFinite (m + 1) (m + 1) (nuOf lam)).to_subtype
+  have hfinI : Finite ↥(ssIdx (m + 1) (m + 1) (nuOf lam)) :=
+    (sSIdxFinite (m + 1) (m + 1) (nuOf lam)).to_subtype
   have hfd : FiniteDimensional Kf V := Module.Finite.of_basis Z0
   let β0 : V →ₗ[Kf] Module.Dual Kf V :=
-    LinearMap.mk₂ Kf (fun (Q P : V) => B (P : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf) Q)
-      (by intro Q Q' P; simp)
-      (by intro c Q P; simp)
-      (by intro Q P P'; simp)
-      (by intro c Q P; simp)
-  have hβ0 : ∀ Q P : V, β0 Q P = B (P : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf) Q := fun _ _ => rfl
+    LinearMap.mk₂ Kf
+      (fun (Q P : V) => B (P : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf) Q)
+      (by intro Q Q' P; simp) (by intro c Q P; simp) (by intro Q P P'; simp) (by intro c Q P; simp)
+  have hβ0 : ∀ Q P : V, β0 Q P = B (P : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf) Q := fun _ _ =>
+    rfl
   have hinjβ : Function.Injective β0 := by
     rw [← LinearMap.ker_eq_bot, LinearMap.ker_eq_bot']
     intro Q hQ
@@ -317,18 +351,26 @@ theorem posCore_of_form {O Kf : Type} [CommRing O] [IsDomain O] [Field Kf] [Alge
     intro P hP
     have := congrArg (fun f => f ⟨P, hP⟩) hQ
     exact this
-  let β : V ≃ₗ[Kf] Module.Dual Kf V := LinearMap.linearEquivOfInjective β0 hinjβ Subspace.dual_finrank_eq.symm
-  have hβ : ∀ Q P : V, β Q P = B (P : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf) Q := fun _ _ => rfl
+  let β : V ≃ₗ[Kf] Module.Dual Kf V :=
+    LinearMap.linearEquivOfInjective β0 hinjβ Subspace.dual_finrank_eq.symm
+  have hβ : ∀ Q P : V, β Q P = B (P : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf) Q := fun _ _ =>
+    rfl
   set e : ℤ := lam (Fin.last m) with he
-  have key : ∀ (M : Matrix (Fin (m + 1)) (Fin (m + 1)) Kf), IsUnit M.det →
-      ∀ P Q : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf,
-      B (M.det ^ e • rowAct Kf M P) (((M⁻¹).transpose).det ^ e • rowAct Kf (M⁻¹).transpose Q) = B P Q := by
+  have key
+      : ∀ (M : Matrix (Fin (m + 1)) (Fin (m + 1)) Kf),
+        IsUnit M.det
+          → ∀ P Q : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf,
+            B (M.det ^ e • rowAct Kf M P) (((M⁻¹).transpose).det ^ e • rowAct Kf (M⁻¹).transpose Q)
+              = B P Q := by
     intro M hM P Q
-    rw [map_smul, map_smul, LinearMap.smul_apply, smul_smul, smul_eq_mul, mul_comm (((M⁻¹).transpose).det ^ e),
-      det_invT_zpow M hM e, one_mul, ← ha, ldlat_rowAct_inv_right rowActMul M hM]
-  have mem_iff : ∀ (M : Matrix (Fin (m + 1)) (Fin (m + 1)) Kf), IsUnit M.det →
-      ∀ F : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf,
-      F ∈ nablaLTw O Kf m lam M ↔ M.det ^ e • rowAct Kf M F ∈ nabO O Kf m (nuOf lam) :=
+    rw [map_smul, map_smul, LinearMap.smul_apply, smul_smul, smul_eq_mul,
+      mul_comm (((M⁻¹).transpose).det ^ e), det_invT_zpow M hM e, one_mul, ← ha,
+      ldlat_rowAct_inv_right rowActMul M hM]
+  have mem_iff
+      : ∀ (M : Matrix (Fin (m + 1)) (Fin (m + 1)) Kf),
+        IsUnit M.det
+          → ∀ F : MvPolynomial (Fin (m + 1) × Fin (m + 1)) Kf,
+            F ∈ nablaLTw O Kf m lam M ↔ M.det ^ e • rowAct Kf M F ∈ nabO O Kf m (nuOf lam) :=
     fun M hM F => nablaLTwMem O Kf m lam M hM F
   refine ⟨β, ⟨?_, ?_⟩⟩
   · intro M hM Q hQ
@@ -340,8 +382,7 @@ theorem posCore_of_form {O Kf : Type} [CommRing O] [IsDomain O] [Field Kf] [Alge
       have h1 : M.det ^ e • rowAct Kf M P = P0 := by
         rw [hP, map_smul, smul_smul, ← zpow_add₀ hM.ne_zero, add_neg_cancel, zpow_zero, one_smul,
           ldlat_rowAct_inv_left rowActMul M hM]
-      have h2 : P ∈ nablaLTw O Kf m lam M := by
-        rw [mem_iff M hM, h1]; exact hP0
+      have h2 : P ∈ nablaLTw O Kf m lam M := by rw [mem_iff M hM, h1]; exact hP0
       have h3 := hQ ⟨P, la_nablaLTw_le m lam M hM P h2⟩ h2
       rw [hβ, ← key M hM, h1] at h3
       exact h3

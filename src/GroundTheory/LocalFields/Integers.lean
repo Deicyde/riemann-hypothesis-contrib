@@ -14,8 +14,9 @@ open ValuativeRel
 
 section Algebraic
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [Field L] [ValuativeRel L]
-  [Algebra K L] [ValuativeExtension K L]
+variable
+  (K L : Type*)
+  [Field K] [ValuativeRel K] [Field L] [ValuativeRel L] [Algebra K L] [ValuativeExtension K L]
 
 abbrev ramificationIndex : ℕ := (IsLocalRing.maximalIdeal 𝒪[L]).ramificationIdx 𝒪[K]
 
@@ -25,9 +26,10 @@ end Algebraic
 
 section Topological
 
-variable (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
-  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-  [Algebra K L] [ValuativeExtension K L]
+variable
+  (K L : Type*) [Field K] [ValuativeRel K] [TopologicalSpace K] [IsNonarchimedeanLocalField K]
+  [Field L] [ValuativeRel L] [TopologicalSpace L] [IsNonarchimedeanLocalField L] [Algebra K L]
+  [ValuativeExtension K L]
 
 instance t2Space : T2Space L := by
   let := IsTopologicalAddGroup.rightUniformSpace L
@@ -36,8 +38,11 @@ instance t2Space : T2Space L := by
 
 variable [FiniteDimensional K L]
 
-theorem exists_basis_coord_bound : ∃ a : K, a ≠ 0 ∧ ∀ x : L, valuation L x ≤ 1 →
-    ∀ i, valuation K ((Module.finBasis K L).repr x i / a) ≤ 1 := by
+theorem exists_basis_coord_bound
+    : ∃ a : K,
+      a ≠ 0
+        ∧ ∀ x : L,
+          valuation L x ≤ 1 → ∀ i, valuation K ((Module.finBasis K L).repr x i / a) ≤ 1 := by
   let := normedField K
   have := normedField_completeSpace K
   let b := Module.finBasis K L
@@ -86,7 +91,6 @@ theorem free_integer : Module.Free 𝒪[K] 𝒪[L] := Module.free_of_finite_type
 
 instance : Module.Free 𝒪[K] 𝒪[L] := free_integer K L
 
-
 omit [TopologicalSpace K] [IsNonarchimedeanLocalField K] [TopologicalSpace L]
   [IsNonarchimedeanLocalField L] [FiniteDimensional K L] in
 theorem finrank_integer : Module.finrank 𝒪[K] 𝒪[L] = Module.finrank K L :=
@@ -110,8 +114,8 @@ instance isIntegralClosure : IsIntegralClosure 𝒪[L] 𝒪[K] L where
 
 theorem isDiscreteValuationRing : IsDiscreteValuationRing 𝒪[L] := inferInstance
 
-theorem primesOver_eq : (IsLocalRing.maximalIdeal 𝒪[K]).primesOver 𝒪[L] =
-    {IsLocalRing.maximalIdeal 𝒪[L]} := by
+theorem primesOver_eq
+    : (IsLocalRing.maximalIdeal 𝒪[K]).primesOver 𝒪[L] = {IsLocalRing.maximalIdeal 𝒪[L]} := by
   ext P
   constructor
   · rintro ⟨hP, hl⟩
@@ -124,8 +128,9 @@ instance uniquePrimesOver : Unique ((IsLocalRing.maximalIdeal 𝒪[K]).primesOve
   default := ⟨IsLocalRing.maximalIdeal 𝒪[L], inferInstance, inferInstance⟩
   uniq P := Subtype.ext (Set.mem_singleton_iff.1 ((Set.ext_iff.1 (primesOver_eq K L) P.1).1 P.2))
 
-theorem ramificationIndex_mul_residueDegree :
-    ramificationIndex K L * ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) = Module.finrank K L := by
+theorem ramificationIndex_mul_residueDegree
+    : ramificationIndex K L * ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K]))
+      = Module.finrank K L := by
   let : Fintype ((IsLocalRing.maximalIdeal 𝒪[K]).primesOver 𝒪[L]) := Fintype.ofFinite _
   have := Ideal.sum_ramification_inertia_eq_finrank (IsLocalRing.maximalIdeal 𝒪[K]) 𝒪[L]
   rw [Fintype.sum_unique, finrank_integer] at this
@@ -134,13 +139,13 @@ theorem ramificationIndex_mul_residueDegree :
 theorem maximalIdeal_ne_bot : IsLocalRing.maximalIdeal 𝒪[K] ≠ ⊥ :=
   IsDiscreteValuationRing.not_a_field _
 
-theorem map_maximalIdeal :
-    (IsLocalRing.maximalIdeal 𝒪[K]).map (algebraMap 𝒪[K] 𝒪[L]) =
-      IsLocalRing.maximalIdeal 𝒪[L] ^ ramificationIndex K L := by
+theorem map_maximalIdeal
+    : (IsLocalRing.maximalIdeal 𝒪[K]).map (algebraMap 𝒪[K] 𝒪[L])
+      = IsLocalRing.maximalIdeal 𝒪[L] ^ ramificationIndex K L := by
   have hne : (IsLocalRing.maximalIdeal 𝒪[K]).map (algebraMap 𝒪[K] 𝒪[L]) ≠ ⊥ :=
     Ideal.map_ne_bot_of_ne_bot (maximalIdeal_ne_bot K)
-  obtain ⟨n, hn⟩ := exists_maximalIdeal_pow_eq_of_principal 𝒪[L]
-    (IsPrincipalIdealRing.principal _) _ hne
+  obtain ⟨n, hn⟩ :=
+    exists_maximalIdeal_pow_eq_of_principal 𝒪[L] (IsPrincipalIdealRing.principal _) _ hne
   have hL : IsLocalRing.maximalIdeal 𝒪[L] ≠ ⊥ := IsDiscreteValuationRing.not_a_field _
   have h : (IsLocalRing.maximalIdeal 𝒪[K]).ramificationIdx' (IsLocalRing.maximalIdeal 𝒪[L]) = n :=
     Ideal.ramificationIdx'_spec hn.le (by
@@ -151,20 +156,23 @@ theorem map_maximalIdeal :
 
 theorem ramificationIndex_pos : 0 < ramificationIndex K L := Ideal.ramificationIdx_pos _ _
 
-theorem residueDegree_pos : 0 < ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) := Ideal.inertiaDeg_pos _ _
+theorem residueDegree_pos : 0 < ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) :=
+  Ideal.inertiaDeg_pos _ _
 
-theorem residueDegree_eq_finrank : ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) = Module.finrank 𝓀[K] 𝓀[L] :=
+theorem residueDegree_eq_finrank
+    : ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) = Module.finrank 𝓀[K] 𝓀[L] :=
   Ideal.inertiaDeg_eq_of_isMaximal (IsLocalRing.maximalIdeal 𝒪[K]) (IsLocalRing.maximalIdeal 𝒪[L])
 
 end Topological
 
 section Tower
 
-variable (K L M : Type*) [Field K] [ValuativeRel K] [Field L] [ValuativeRel L]
-  [Field M] [ValuativeRel M] [Algebra K L] [Algebra L M] [Algebra K M] [IsScalarTower K L M]
+variable
+  (K L M : Type*) [Field K] [ValuativeRel K] [Field L] [ValuativeRel L] [Field M] [ValuativeRel M]
+  [Algebra K L] [Algebra L M] [Algebra K M] [IsScalarTower K L M]
 
-theorem valuativeExtension_trans [ValuativeExtension K L] [ValuativeExtension L M] :
-    ValuativeExtension K M where
+theorem valuativeExtension_trans [ValuativeExtension K L] [ValuativeExtension L M]
+    : ValuativeExtension K M where
   vle_iff_vle {a b} := by
     rw [IsScalarTower.algebraMap_apply K L M, IsScalarTower.algebraMap_apply K L M,
       ValuativeExtension.vle_iff_vle, ValuativeExtension.vle_iff_vle]
@@ -172,16 +180,18 @@ theorem valuativeExtension_trans [ValuativeExtension K L] [ValuativeExtension L 
 variable [ValuativeExtension K L] [ValuativeExtension L M] [ValuativeExtension K M]
 
 instance isScalarTower_integer : IsScalarTower 𝒪[K] 𝒪[L] 𝒪[M] :=
-  IsScalarTower.of_algebraMap_eq fun x =>
-    Subtype.ext (IsScalarTower.algebraMap_apply K L M (x : K))
+  IsScalarTower.of_algebraMap_eq fun x => Subtype.ext (IsScalarTower.algebraMap_apply K L M (x : K))
 
-theorem residueDegree_tower :
-    ((IsLocalRing.maximalIdeal 𝒪[M]).inertiaDeg (𝒪[K])) = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K])) * ((IsLocalRing.maximalIdeal 𝒪[M]).inertiaDeg (𝒪[L])) :=
+theorem residueDegree_tower
+    : ((IsLocalRing.maximalIdeal 𝒪[M]).inertiaDeg (𝒪[K]))
+      = ((IsLocalRing.maximalIdeal 𝒪[L]).inertiaDeg (𝒪[K]))
+        * ((IsLocalRing.maximalIdeal 𝒪[M]).inertiaDeg (𝒪[L])) :=
   Ideal.inertiaDeg_tower _ _
 
-theorem ramificationIndex_tower [TopologicalSpace L] [IsNonarchimedeanLocalField L]
-    [TopologicalSpace M] [IsNonarchimedeanLocalField M] [FiniteDimensional L M] :
-    ramificationIndex K M = ramificationIndex K L * ramificationIndex L M :=
+theorem ramificationIndex_tower
+    [TopologicalSpace L] [IsNonarchimedeanLocalField L] [TopologicalSpace M]
+    [IsNonarchimedeanLocalField M] [FiniteDimensional L M]
+    : ramificationIndex K M = ramificationIndex K L * ramificationIndex L M :=
   Ideal.ramificationIdx_tower _ _
 
 end Tower

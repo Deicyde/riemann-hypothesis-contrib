@@ -13,8 +13,11 @@ noncomputable section
 
 namespace GlobalTheory.IndefiniteRowSideFullHecke.DeltaDatumCombinedCoefficient
 
-open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
-open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj GlobalTheory.IndefiniteRowSideFullHecke.LevelSpanSeparation
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj
+  NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi
+  ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj
+  GlobalTheory.IndefiniteRowSideFullHecke.LevelSpanSeparation
 
 attribute [local instance] Over.cartesianMonoidalCategory
 
@@ -64,17 +67,22 @@ structure DeltaChar {l : Level H} (a : IsAuxiliarySplitSquarefreeLevel l) (F : T
   loc : MulChar (𝓞 E ⧸ a.named) F
   ideal : Ideal (𝓞 E) →*₀ F
   ideal_zero : ∀ 𝔞, 𝔞 ⊔ a.pId ≠ ⊤ → ideal 𝔞 = 0
-  principal : ∀ α : 𝓞 E, α ≠ 0 → Ideal.span {α} ⊔ a.pId = ⊤ →
-    ideal (Ideal.span {α}) * loc (Ideal.Quotient.mk _ α) = loc (Ideal.Quotient.mk _ (H.bar α))
-  real : ∀ 𝔟 : Ideal (𝓞 (maximalRealSubfield E)), 𝔟 ≠ ⊥ →
-    𝔟.map (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) ⊔ a.pId = ⊤ →
-    ideal (𝔟.map (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))) = 1
+  principal
+    : ∀ α : 𝓞 E,
+      α ≠ 0 → Ideal.span {α} ⊔ a.pId = ⊤
+        → ideal (Ideal.span {α}) * loc (Ideal.Quotient.mk _ α) = loc (Ideal.Quotient.mk _ (H.bar α))
+  real
+    : ∀ 𝔟 : Ideal (𝓞 (maximalRealSubfield E)),
+      𝔟 ≠ ⊥ → 𝔟.map (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E)) ⊔ a.pId = ⊤
+        → ideal (𝔟.map (algebraMap (𝓞 (maximalRealSubfield E)) (𝓞 E))) = 1
 
 def IsDetMod (D : Datum H) (I : Ideal (𝓞 E)) (k : D.La →ₗ[𝓞 E] D.La) (d : 𝓞 E ⧸ I) : Prop :=
-  ∀ (φ : D.La [⋀^Fin (D.p + D.q)]→ₗ[𝓞 E] (𝓞 E ⧸ I)) (x : Fin (D.p + D.q) → D.La), φ (fun i => k (x i)) = d * φ x
+  ∀ (φ : D.La [⋀^Fin (D.p + D.q)]→ₗ[𝓞 E] (𝓞 E ⧸ I)) (x : Fin (D.p + D.q) → D.La),
+    φ (fun i => k (x i)) = d * φ x
 
 def indexIdeal {D D' : Datum H} (β₀ : D'.La →ₗ[𝓞 E] D.La) : Ideal (𝓞 E) :=
-  Ideal.span {z | ∃ (φ : D.La [⋀^Fin (D.p + D.q)]→ₗ[𝓞 E] 𝓞 E) (x : Fin (D.p + D.q) → D'.La), z = φ fun i => β₀ (x i)}
+  Ideal.span
+    {z | ∃ (φ : D.La [⋀^Fin (D.p + D.q)]→ₗ[𝓞 E] 𝓞 E) (x : Fin (D.p + D.q) → D'.La), z = φ fun i => β₀ (x i)}
 
 section Datum
 
@@ -98,18 +106,23 @@ section Cover
 
 variable {D : Datum H} {l : Level H}
 
-def IsLevelMap (Xo : Moduli D l) (a : IsAuxiliarySplitSquarefreeLevel l) (Xo₂ : Moduli D a.l₂) (r : Xo₂.X ⟶ Xo.X)
-    (m : SABMap Xo₂.univ.t Xo.univ.t r) : Prop :=
-  r ≫ Xo.s = Xo₂.s ≫ spMap (IntermediateField.inclusion a.KA_le).toRingHom ∧
-    (∀ x, (Xo₂.univ.eta x ^ a.p).left ≫ m.φ = r ≫ (Xo.univ.eta x).left) ∧
-    ∀ x, (Xo₂.univ.etaA x).left ≫ m.φ = r ≫ (Xo.univ.etaA x).left
+def IsLevelMap
+    (Xo : Moduli D l) (a : IsAuxiliarySplitSquarefreeLevel l)
+    (Xo₂ : Moduli D a.l₂) (r : Xo₂.X ⟶ Xo.X) (m : SABMap Xo₂.univ.t Xo.univ.t r)
+    : Prop :=
+  r ≫ Xo.s = Xo₂.s ≫ spMap (IntermediateField.inclusion a.KA_le).toRingHom
+    ∧ (∀ x, (Xo₂.univ.eta x ^ a.p).left ≫ m.φ = r ≫ (Xo.univ.eta x).left)
+    ∧ ∀ x, (Xo₂.univ.etaA x).left ≫ m.φ = r ≫ (Xo.univ.etaA x).left
 
-def IsBundleIso {S S' : Scheme.{0}} {t' : SAB H S'} {t : SAB H S} {f : S' ⟶ S} (m : SABMap t' t f)
-    (w : LB.Iso t'.PP.L (t.PP.L.pull m.φ)) : Prop :=
-  w.IsGen ∧
-    LB.Gen.Maps (LB.linCombIso w (K := PUnit) (fun _ => eSec t'.G) (fun _ => 1)) t'.PP.rig
-      (m.cm.rigPull t.PP.L t.PP.rig) ∧
-    LB.Gen.Maps (LB.linCombIso w (thφ t'.G (x3 t'.G)) thε) t'.cub.t (m.cm.thetaPull t.PP.L t.cub.t)
+def IsBundleIso
+    {S S' : Scheme.{0}} {t' : SAB H S'} {t : SAB H S} {f : S' ⟶ S}
+    (m : SABMap t' t f) (w : LB.Iso t'.PP.L (t.PP.L.pull m.φ))
+    : Prop :=
+  w.IsGen
+    ∧ LB.Gen.Maps (LB.linCombIso w (K := PUnit) (fun _ => eSec t'.G) (fun _ => 1)) t'.PP.rig
+      (m.cm.rigPull t.PP.L t.PP.rig)
+    ∧ LB.Gen.Maps (LB.linCombIso w (thφ t'.G (x3 t'.G)) thε) t'.cub.t
+      (m.cm.thetaPull t.PP.L t.cub.t)
 
 structure Cover (Xo : Moduli D l) (c : Coeff l) (a : IsAuxiliarySplitSquarefreeLevel l) where
   Xo₂ : Moduli D a.l₂
@@ -127,50 +140,66 @@ namespace Cover
 
 def incl : c.F →+* C.c₂.F := (IntermediateField.inclusion C.field_eq.le).toRingHom
 
-def IsGroupMap {S S' : Type} [CommRing S] [CommRing S'] (φ : S →+* S') (x₂ : Sp S' ⟶ C.Xo₂.X) (x : Sp S ⟶ Xo.X)
-    (pm : Gx x₂ ⟶ Gx x) : Prop :=
-  pm ≫ (snd (Over.mk x) Xo.univ.t.G).left = (snd (Over.mk x₂) C.Xo₂.univ.t.G).left ≫ C.m.φ ∧
-    pm ≫ (fst (Over.mk x) Xo.univ.t.G).left = (fst (Over.mk x₂) C.Xo₂.univ.t.G).left ≫ spMap φ
+def IsGroupMap
+    {S S' : Type} [CommRing S] [CommRing S']
+    (φ : S →+* S')
+    (x₂ : Sp S' ⟶ C.Xo₂.X) (x : Sp S ⟶ Xo.X) (pm : Gx x₂ ⟶ Gx x)
+    : Prop :=
+  pm ≫ (snd (Over.mk x) Xo.univ.t.G).left = (snd (Over.mk x₂) C.Xo₂.univ.t.G).left ≫ C.m.φ
+    ∧ pm ≫ (fst (Over.mk x) Xo.univ.t.G).left = (fst (Over.mk x₂) C.Xo₂.univ.t.G).left ≫ spMap φ
 
-def SecOver {S S' : Type} [CommRing S] [CommRing S'] {x₂ : Sp S' ⟶ C.Xo₂.X} {x : Sp S ⟶ Xo.X} (pm : Gx x₂ ⟶ Gx x)
+def SecOver
+    {S S' : Type} [CommRing S] [CommRing S']
+    {x₂ : Sp S' ⟶ C.Xo₂.X} {x : Sp S ⟶ Xo.X} (pm : Gx x₂ ⟶ Gx x)
     (k : ℤ) (F₂ : LB.Sec (Out.LPow C.Xo₂.univ.t.G C.Xo₂.univ.t.PP.L k (Over.mk x₂)))
-    (F : LB.Sec (Out.LPow Xo.univ.t.G Xo.univ.t.PP.L k (Over.mk x))) : Prop :=
+    (F : LB.Sec (Out.LPow Xo.univ.t.G Xo.univ.t.PP.L k (Over.mk x)))
+    : Prop :=
   ∀ (i : Xo.univ.t.PP.L.ι) (j : C.Xo₂.univ.t.PP.L.ι) (W : (Gx x₂).Opens)
-    (h₁ : W ≤ pm ⁻¹ᵁ (Out.LPow Xo.univ.t.G Xo.univ.t.PP.L k (Over.mk x)).U fun _ => i)
-    (h₂ : W ≤ (Out.LPow C.Xo₂.univ.t.G C.Xo₂.univ.t.PP.L k (Over.mk x₂)).U fun _ => j)
-    (h₃ : W ≤ (snd (Over.mk x₂) C.Xo₂.univ.t.G).left ⁻¹ᵁ
-      (LB.div (Xo.univ.t.PP.L.pull C.m.φ) C.Xo₂.univ.t.PP.L).U (fun _ => i, j)),
-    (pm.appLE _ W h₁).hom (F.f fun _ => i) =
-      ((res h₃ (pullU (snd (Over.mk x₂) C.Xo₂.univ.t.G).left _ (C.w.s (fun _ => i, j))) ^ k : Γ(Gx x₂, W)ˣ) :
-        Γ(Gx x₂, W)) * ((Gx x₂).presheaf.map (homOfLE h₂).op).hom (F₂.f fun _ => j)
+      (h₁ : W ≤ pm ⁻¹ᵁ (Out.LPow Xo.univ.t.G Xo.univ.t.PP.L k (Over.mk x)).U fun _ => i)
+      (h₂ : W ≤ (Out.LPow C.Xo₂.univ.t.G C.Xo₂.univ.t.PP.L k (Over.mk x₂)).U fun _ => j)
+      (h₃ : W
+        ≤ (snd (Over.mk x₂) C.Xo₂.univ.t.G).left
+          ⁻¹ᵁ (LB.div (Xo.univ.t.PP.L.pull C.m.φ) C.Xo₂.univ.t.PP.L).U (fun _ => i, j)),
+    (pm.appLE _ W h₁).hom (F.f fun _ => i)
+      = ((res h₃ (pullU (snd (Over.mk x₂) C.Xo₂.univ.t.G).left _ (C.w.s (fun _ => i, j))) ^ k
+            : Γ(Gx x₂, W)ˣ)
+          : Γ(Gx x₂, W))
+        * ((Gx x₂).presheaf.map (homOfLE h₂).op).hom (F₂.f fun _ => j)
 
-def LiesOver {S S' : Type} [CommRing S] [Algebra c.F S] [CommRing S'] [Algebra C.c₂.F S'] (φ : S →+* S')
-    (y₂ : FrPt C.Xo₂ C.c₂ S') (y : FrPt Xo c S) : Prop :=
-  φ.comp (algebraMap c.F S) = (algebraMap C.c₂.F S').comp C.incl ∧
-    y₂.x ≫ C.r = spMap φ ≫ y.x ∧
-    (∀ τ i, y₂.u τ i ≫ C.m.φ = spMap (dualMap φ) ≫ y.u τ i) ∧
-    ∃ pm : Gx y₂.x ⟶ Gx y.x, C.IsGroupMap φ y₂.x y.x pm ∧ C.SecOver pm 1 y₂.s y.s
+def LiesOver
+    {S S' : Type} [CommRing S] [Algebra c.F S] [CommRing S'] [Algebra C.c₂.F S']
+    (φ : S →+* S') (y₂ : FrPt C.Xo₂ C.c₂ S') (y : FrPt Xo c S)
+    : Prop :=
+  φ.comp (algebraMap c.F S) = (algebraMap C.c₂.F S').comp C.incl ∧ y₂.x ≫ C.r = spMap φ ≫ y.x
+    ∧ (∀ τ i, y₂.u τ i ≫ C.m.φ = spMap (dualMap φ) ≫ y.u τ i)
+    ∧ ∃ pm : Gx y₂.x ⟶ Gx y.x, C.IsGroupMap φ y₂.x y.x pm ∧ C.SecOver pm 1 y₂.s y.s
 
 def NabOver (nab : NabV Xo c) (nab₂ : NabV C.Xo₂ C.c₂) : Prop :=
-  ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra C.c₂.F S] (y₂ : FrPt C.Xo₂ C.c₂ S) (y : FrPt Xo c S),
-    C.LiesOver (RingHom.id S) y₂ y → ∀ pm : Gx y₂.x ⟶ Gx y.x, C.IsGroupMap (RingHom.id S) y₂.x y.x pm →
-    ∀ (k : ℤ) (F₂ : LB.Sec (Out.LPow C.Xo₂.univ.t.G C.Xo₂.univ.t.PP.L k (Over.mk y₂.x)))
-      (F : LB.Sec (Out.LPow Xo.univ.t.G Xo.univ.t.PP.L k (Over.mk y.x))), C.SecOver pm k F₂ F →
-      ∀ α, nab₂ y₂ k F₂ α = nab y k F α
+  ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra C.c₂.F S] (y₂ : FrPt C.Xo₂ C.c₂ S)
+      (y : FrPt Xo c S),
+    C.LiesOver (RingHom.id S) y₂ y
+      → ∀ pm : Gx y₂.x ⟶ Gx y.x,
+        C.IsGroupMap (RingHom.id S) y₂.x y.x pm
+          → ∀ (k : ℤ) (F₂ : LB.Sec (Out.LPow C.Xo₂.univ.t.G C.Xo₂.univ.t.PP.L k (Over.mk y₂.x)))
+              (F : LB.Sec (Out.LPow Xo.univ.t.G Xo.univ.t.PP.L k (Over.mk y.x))),
+            C.SecOver pm k F₂ F → ∀ α, nab₂ y₂ k F₂ α = nab y k F α
 
 end Cover
 
 def fnAt {X : Scheme.{0}} {S : Type} [CommRing S] (y : Sp S ⟶ X) (f : Γ(X, ⊤)) : S :=
   (Scheme.ΓSpecIso (CommRingCat.of S)).hom.hom (y.appTop.hom f)
 
-def basePt {Xo : Moduli D l} {c : Coeff l} {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) :
-    Sp S ⟶ Xo.XF c :=
+def basePt {Xo : Moduli D l} {c : Coeff l} {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S)
+    : Sp S ⟶ Xo.XF c :=
   pullback.lift y.x (spMap (algebraMap c.F S)) (by
     rw [y.x_over, sOf]
     simp only [spMap, ← Spec.map_comp, ← CommRingCat.ofHom_comp])
 
-structure IsPresentation (a : IsAuxiliarySplitSquarefreeLevel l) (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ)
-    (β₀ : D'.La →ₗ[𝓞 E] D.La) (𝔞 : Ideal (𝓞 E)) (d : 𝓞 E ⧸ a.named) : Prop where
+structure IsPresentation
+    (a : IsAuxiliarySplitSquarefreeLevel l)
+    (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La)
+    (m : ℕ) (β₀ : D'.La →ₗ[𝓞 E] D.La) (𝔞 : Ideal (𝓞 E)) (d : 𝓞 E ⧸ a.named)
+    : Prop where
   pos : 0 < m
   coprime : m.Coprime a.p
   isom : ∀ x y, D.EF (β₀ x) (β₀ y) = (m : ℤ) ^ 2 * D'.EF x y
@@ -180,14 +209,17 @@ structure IsPresentation (a : IsAuxiliarySplitSquarefreeLevel l) (D' : Datum H) 
   det : IsDetMod D a.named (β₀ ∘ₗ t) d
 
 def IsDeltaDet (δ : DeltaChar a C.c₂.F) (f : Γ(C.Xo₂.XF C.c₂, ⊤)) : Prop :=
-  ∀ (g : ℕ) (ty : Fin g → (E →+* ℂ)), IsTypeFn H D.p D.q ty →
-    ∀ (U : FamilyUnif C.Xo₂ (KA a.l₂).val.toRingHom ty) (i : Fin U.n) (P : (U.Di i).La →+ (Fin g → ℂ)),
-      IsPeriod (U.Di i) ty P → ∀ y : Sp ℂ ⟶ C.Xo₂.XF C.c₂, y ≫ pullback.fst _ _ = U.u i P →
-      y ≫ pullback.snd _ _ = spMap C.c₂.F.val.toRingHom →
-      ∀ (m : ℕ) (β₀ : (U.Di i).La →ₗ[𝓞 E] D.La) (𝔞 : Ideal (𝓞 E)) (d : 𝓞 E ⧸ a.named),
-        IsPresentation a (U.Di i) (U.t i) m β₀ 𝔞 d →
-        fnAt y f * ((δ.loc ((m : 𝓞 E ⧸ a.named) ^ (D.p + D.q)) : C.c₂.F) : ℂ) =
-          ((δ.loc d * δ.ideal 𝔞 : C.c₂.F) : ℂ)
+  ∀ (g : ℕ) (ty : Fin g → (E →+* ℂ)),
+    IsTypeFn H D.p D.q ty
+      → ∀ (U : FamilyUnif C.Xo₂ (KA a.l₂).val.toRingHom ty) (i : Fin U.n)
+          (P : (U.Di i).La →+ (Fin g → ℂ)),
+        IsPeriod (U.Di i) ty P
+          → ∀ y : Sp ℂ ⟶ C.Xo₂.XF C.c₂,
+            y ≫ pullback.fst _ _ = U.u i P → y ≫ pullback.snd _ _ = spMap C.c₂.F.val.toRingHom
+              → ∀ (m : ℕ) (β₀ : (U.Di i).La →ₗ[𝓞 E] D.La) (𝔞 : Ideal (𝓞 E)) (d : 𝓞 E ⧸ a.named),
+                IsPresentation a (U.Di i) (U.t i) m β₀ 𝔞 d
+                  → fnAt y f * ((δ.loc ((m : 𝓞 E ⧸ a.named) ^ (D.p + D.q)) : C.c₂.F) : ℂ)
+                    = ((δ.loc d * δ.ideal 𝔞 : C.c₂.F) : ℂ)
 
 end Cover
 
@@ -228,7 +260,6 @@ end Delta
 section Trivial
 
 variable {D : Datum H} {l : Level H}
-
 
 end Trivial
 

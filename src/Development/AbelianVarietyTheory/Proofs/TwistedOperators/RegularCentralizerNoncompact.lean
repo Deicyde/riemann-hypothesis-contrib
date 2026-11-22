@@ -16,9 +16,12 @@ public import Development.AbelianVarietyTheory.Proofs.FoundationProofs.HasOrbInt
 @[expose] public section
 
 open MeasureTheory Set Filter NumberField IsDedekindDomain
-open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
+open GlobalTheory.AdelicU GlobalTheory.OpTrace GlobalTheory.Orb GlobalTheory.AutomorphicL2Unitary
+  GlobalTheory.AutMult Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.IndefR.Mult
-open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion EllipticPart TraceEq)
+open GlobalTheory.IndefiniteRowSideFullHecke.PlusPolynomialRoots
+  (IsTestData PPol Tor Phi PhiOK PhiReal ellKernel Gap NoFixed IsLatticeConj GeomExpansion
+    EllipticPart TraceEq)
 open GlobalTheory.PRep (IsAdmissible)
 open GlobalTheory.TrMult
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
@@ -32,15 +35,17 @@ open GlobalTheory.AdelicU
 
 section General
 
-variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
-  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+variable
+  {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E]
+  (σ : E →ₐ[F] E)
+  {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
 
 variable {σ J}
 
-theorem isMulCommutative_cent_projArch_ratEmb {γ : GRat σ J} (hγ : IsRegSS γ.1.1) (w : InfinitePlace F) :
-    IsMulCommutative (Orb.cent (projArch σ J w (ratEmb σ J γ))) :=
+theorem isMulCommutative_cent_projArch_ratEmb
+    {γ : GRat σ J} (hγ : IsRegSS γ.1.1) (w : InfinitePlace F)
+    : IsMulCommutative (Orb.cent (projArch σ J w (ratEmb σ J γ))) :=
   Orb.isMulCommutative_cent_HA (isRegSS_projArch_ratEmb hγ w)
-
 
 end General
 
@@ -49,6 +54,5 @@ end GlobalTheory.ArchVanish
 end
 
 namespace GlobalTheory.ArchVanish
-
 
 end GlobalTheory.ArchVanish

@@ -8,14 +8,18 @@ public import Development.AutomorphicSpectrum.Proofs.AlgebraProofs.MemRangeOfInt
 
 @[expose] public section
 
-open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Flat
+open AlgebraicGeometry CategoryTheory Limits GlobalTheory.CompanionTheory.Ar
+  GlobalTheory.CompanionTheory.Ar.Flat
 
 namespace GlobalTheory.CompanionTheory.Ar.Flat
 
-theorem exists_point_of_prime {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec (CommRingCat.of Ω) ⟶ X}
-    (h : IsCptGen ξ) (p : Cpt ξ) (P : Ideal (regAt ξ p)) (hP : P.IsPrime) :
-    ∃ q : Cpt ξ, q.1 ⤳ p.1 ∧ ringKrullDim (X.presheaf.stalk q.1) = (P.height : WithBot ℕ∞) ∧
-      ∀ a ∈ regAt ξ q, ∃ s t : regAt ξ p, s ∉ P ∧ a * s = t := by
+theorem exists_point_of_prime
+    {X : Scheme.{0}} {Ω : Type} [Field Ω]
+    {ξ : Spec (CommRingCat.of Ω) ⟶ X}
+    (h : IsCptGen ξ) (p : Cpt ξ) (P : Ideal (regAt ξ p)) (hP : P.IsPrime)
+    : ∃ q : Cpt ξ,
+      q.1 ⤳ p.1 ∧ ringKrullDim (X.presheaf.stalk q.1) = (P.height : WithBot ℕ∞)
+        ∧ ∀ a ∈ regAt ξ q, ∃ s t : regAt ξ p, s ∉ P ∧ a * s = t := by
   obtain ⟨U, hU, hp, -⟩ := exists_isAffineOpen_mem_and_subset (X := X) (x := p.1) (U := ⊤) trivial
   have hg : genPt ξ ∈ U := p.2.mem_open U.2 hp
   let e := RegAtRing.stalkEquiv h p
@@ -47,13 +51,13 @@ theorem exists_point_of_prime {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec
       have locG := hU.isLocalization_stalk ⟨genPt ξ, hg⟩
       have hnu : ¬ IsUnit (algebraMap Γ(X, U) (X.presheaf.stalk (genPt ξ)) r) := by
         rw [← IsLocalization.AtPrime.under_maximalIdeal (X.presheaf.stalk (genPt ξ))
-          (hU.primeIdealOf ⟨genPt ξ, hg⟩).asIdeal] at hr
+            (hU.primeIdealOf ⟨genPt ξ, hg⟩).asIdeal]
+          at hr
         exact (IsLocalRing.mem_maximalIdeal _).1 hr
-      have hz : (Scheme.stalkClosedPointTo ξ).hom
-          (X.presheaf.germ U (genPt ξ) hg r) = 0 := by
+      have hz : (Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ U (genPt ξ) hg r) = 0 := by
         by_contra hne
-        obtain ⟨w, hw⟩ := h.bij.2 ((Scheme.stalkClosedPointTo ξ).hom
-          (X.presheaf.germ U (genPt ξ) hg r))⁻¹
+        obtain ⟨w, hw⟩ :=
+          h.bij.2 ((Scheme.stalkClosedPointTo ξ).hom (X.presheaf.germ U (genPt ξ) hg r))⁻¹
         apply hnu
         refine IsUnit.of_mul_eq_one w (h.bij.1 ?_)
         erw [map_mul, hw, map_one]
@@ -80,22 +84,27 @@ theorem exists_point_of_prime {X : Scheme.{0}} {Ω : Type} [Field Ω] {ξ : Spec
     change ringKrullDim (X.presheaf.stalk (hU.fromSpec y)) = _
     rw [h1, h2, h3]
   · rintro _ ⟨x, rfl⟩
-    obtain ⟨⟨r, t⟩, he⟩ := IsLocalization.surj y.asIdeal.primeCompl
-      (S := X.presheaf.stalk (hU.fromSpec y)) x
-    have he' : x * (X.presheaf.germ U (hU.fromSpec y) hyU).hom t.1 =
-        (X.presheaf.germ U (hU.fromSpec y) hyU).hom r := he
+    obtain ⟨⟨r, t⟩, he⟩ :=
+      IsLocalization.surj y.asIdeal.primeCompl (S := X.presheaf.stalk (hU.fromSpec y)) x
+    have he'
+        : x * (X.presheaf.germ U (hU.fromSpec y) hyU).hom t.1
+          = (X.presheaf.germ U (hU.fromSpec y) hyU).hom r :=
+      he
     have hgt := RegAtMono.genMap_germ_eq ξ p ⟨hU.fromSpec y, hgy⟩ hsp U hp hyU
     refine ⟨e ((X.presheaf.germ U p.1 hp).hom t.1), e ((X.presheaf.germ U p.1 hp).hom r), ?_, ?_⟩
     · exact t.2
-    · change genMap ξ ⟨hU.fromSpec y, hgy⟩ x * genMap ξ p ((X.presheaf.germ U p.1 hp).hom t.1) =
-        genMap ξ p ((X.presheaf.germ U p.1 hp).hom r)
+    · change genMap ξ ⟨hU.fromSpec y, hgy⟩ x * genMap ξ p ((X.presheaf.germ U p.1 hp).hom t.1)
+        = genMap ξ p ((X.presheaf.germ U p.1 hp).hom r)
       rw [← hgt, ← hgt, ← map_mul]
       exact congrArg _ he'
 
-theorem mem_regAt_of_codim_one : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
-    [IsLocallyNoetherian X], IsCptGen ξ → NormalCpt ξ → ∀ (p : Cpt ξ) (a : Ω),
-    (∀ q : Cpt ξ, q.1 ⤳ p.1 → ringKrullDim (X.presheaf.stalk q.1) = 1 → a ∈ regAt ξ q) →
-    a ∈ regAt ξ p := by
+theorem mem_regAt_of_codim_one
+    : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ : Spec (CommRingCat.of Ω) ⟶ X)
+        [IsLocallyNoetherian X],
+      IsCptGen ξ → NormalCpt ξ
+        → ∀ (p : Cpt ξ) (a : Ω),
+          (∀ q : Cpt ξ, q.1 ⤳ p.1 → ringKrullDim (X.presheaf.stalk q.1) = 1 → a ∈ regAt ξ q)
+            → a ∈ regAt ξ p := by
   intro X Ω _ ξ _ h hn p a ha
   obtain ⟨hfr, hno, -⟩ := RegAtRing.regAt_ring X Ω ξ h p
   have : IsFractionRing (regAt ξ p) Ω := hfr
@@ -106,16 +115,15 @@ theorem mem_regAt_of_codim_one : ∀ (X : Scheme.{0}) (Ω : Type) [Field Ω] (ξ
     exact ⟨⟨x, hn p x hx⟩, rfl⟩
   obtain ⟨t, d, hd, rfl⟩ := IsFractionRing.div_surjective (A := regAt ξ p) a
   have hd0 : d ≠ 0 := nonZeroDivisors.ne_zero hd
-  have hd1 : algebraMap (regAt ξ p) Ω d ≠ 0 := by
-    simpa using hd0
-  obtain ⟨b, hb⟩ := mem_range_of_integral_at_heightOne_over (regAt ξ p) Ω d
-    (algebraMap (regAt ξ p) Ω t / algebraMap (regAt ξ p) Ω d) hd0
-    ⟨1, t, by field_simp⟩
-    (fun P hP h1 _ => by
-      obtain ⟨q, hq, hdim, hiff⟩ := exists_point_of_prime h p P hP
-      have hmem := ha q hq (by rw [hdim]; simp [h1])
-      obtain ⟨s, u, hs, hsu⟩ := hiff _ hmem
-      exact ⟨u, s, hs, by rw [mul_comm]; exact hsu.symm⟩)
+  have hd1 : algebraMap (regAt ξ p) Ω d ≠ 0 := by simpa using hd0
+  obtain ⟨b, hb⟩ :=
+    mem_range_of_integral_at_heightOne_over (regAt ξ p) Ω d
+      (algebraMap (regAt ξ p) Ω t / algebraMap (regAt ξ p) Ω d) hd0 ⟨1, t, by field_simp⟩
+      (fun P hP h1 _ => by
+        obtain ⟨q, hq, hdim, hiff⟩ := exists_point_of_prime h p P hP
+        have hmem := ha q hq (by rw [hdim]; simp [h1])
+        obtain ⟨s, u, hs, hsu⟩ := hiff _ hmem
+        exact ⟨u, s, hs, by rw [mul_comm]; exact hsu.symm⟩)
   rw [← hb]
   exact b.2
 

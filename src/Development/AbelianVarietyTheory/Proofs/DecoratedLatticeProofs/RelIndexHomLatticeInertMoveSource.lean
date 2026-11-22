@@ -17,8 +17,11 @@ public import Development.AbelianVarietyTheory.Proofs.TwistedOperators.MemIntMat
 
 @[expose] public section
 
-open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
-open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links Formalism.IndefR.Mult Formalism.IndefR.Datum
+open Formalism.BasicNotions Formalism.BasicNotions.TH
+  Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice
+  Formalism.MainNotions.S MeasureTheory IsDedekindDomain NumberField Matrix
+open Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Links
+  Formalism.IndefR.Mult Formalism.IndefR.Datum
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 open GlobalTheory.ChainOnto GlobalTheory.LFun GlobalTheory.AdelicU GlobalTheory.PRep
 open GlobalTheory.FinZeta (Gv embV Kv VacFin IsLocKer KerU)
@@ -26,53 +29,76 @@ open GlobalTheory.SphTheta (IsStd CayleyRule intMat liftPar)
 open Formalism.UG (IsUnifV qV IsUnramInv GU KU IsInertAt Hecke IsCommensurated Tj SatU ordL Ov)
 open Formalism.MainNotions.SchurIrreducible (IsSplit)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-open GlobalTheory.FinZeta GlobalTheory.AdelicScalar GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
+open GlobalTheory.FinZeta GlobalTheory.AdelicScalar
+  GlobalTheory.IndefiniteRowSideFullHecke.TwistedLevelValues GlobalTheory.LiftRows
 open Formalism.IndefR.Lev (levG levChi IsBaseFrame)
 
 noncomputable section
 
 namespace GlobalTheory.InertHomIdx
 
-def rmul {L : Type} [Ring L] {m n : ℕ} (g : Matrix (Fin n) (Fin n) L) :
-    Matrix (Fin m) (Fin n) L →+ Matrix (Fin m) (Fin n) L where
+def rmul {L : Type} [Ring L] {m n : ℕ} (g : Matrix (Fin n) (Fin n) L)
+    : Matrix (Fin m) (Fin n) L →+ Matrix (Fin m) (Fin n) L where
   toFun X := X * g
   map_zero' := Matrix.zero_mul g
   map_add' X Y := Matrix.add_mul X Y g
 
-theorem rmul_apply {L : Type} [Ring L] {m n : ℕ} (g : Matrix (Fin n) (Fin n) L) (X : Matrix (Fin m) (Fin n) L) :
-    rmul g X = X * g := rfl
+theorem rmul_apply
+    {L : Type} [Ring L] {m n : ℕ} (g : Matrix (Fin n) (Fin n) L) (X : Matrix (Fin m) (Fin n) L)
+    : rmul g X = X * g :=
+  rfl
 
 end GlobalTheory.InertHomIdx
 
-
 open GlobalTheory.FinWeilO in
-theorem GlobalTheory.InertHomIdx.heisenbergRelativeIndex_inert_move_source (D : D7) (S T : HSp D) (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E)) (h : w.under (𝓞 D.host.F) = v) (hi : IsInertAt D.host.F D.host.E v w) (g : Gv S v) : GlobalTheory.FinWeil.idx (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)) ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).map (GlobalTheory.FinWeilO.rhoF S T (embV S v g, 1))) = ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).toAddSubgroup.map (GlobalTheory.InertHomIdx.matW S T w)).relIndex (((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).toAddSubgroup.map (GlobalTheory.InertHomIdx.matW S T w)).map (GlobalTheory.InertHomIdx.rmul (locMat D.sp.cm.sig S.gram h g)⁻¹.1)) := by
+theorem GlobalTheory.InertHomIdx.heisenbergRelativeIndex_inert_move_source
+    (D : D7) (S T : HSp D) (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E))
+    (h : w.under (𝓞 D.host.F) = v) (hi : IsInertAt D.host.F D.host.E v w) (g : Gv S v)
+    : GlobalTheory.FinWeil.idx (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T))
+        ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).map
+          (GlobalTheory.FinWeilO.rhoF S T (embV S v g, 1)))
+      = ((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).toAddSubgroup.map
+          (GlobalTheory.InertHomIdx.matW S T w)).relIndex
+        (((GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).toAddSubgroup.map
+            (GlobalTheory.InertHomIdx.matW S T w)).map
+          (GlobalTheory.InertHomIdx.rmul (locMat D.sp.cm.sig S.gram h g)⁻¹.1)) := by
   obtain ⟨ε, hns, hp⟩ := GlobalTheory.WeilAtPlace.exists_nonSplit_of_inert hi h
   have hε : IsPlaceIdem D v ε := hns.1
-  have hη : IsPlaceIdem D v (pairA D.host.F 0 (singleV D.host.F v 1)) :=
-    ⟨_, rfl, GlobalTheory.SplitIdem.evalV_singleV_same _ _ _, fun _ hw => GlobalTheory.SplitIdem.evalV_singleV_ne _ _ _ hw⟩
+  have hη : IsPlaceIdem D v (pairA D.host.F 0 (singleV D.host.F v 1)) := ⟨
+    _,
+    rfl,
+    GlobalTheory.SplitIdem.evalV_singleV_same _ _ _,
+    fun _ hw => GlobalTheory.SplitIdem.evalV_singleV_ne _ _ _ hw
+  ⟩
   have hk : GlobalTheory.WeilParts.SuppPl ε S (embV S v g) := by
     rw [GlobalTheory.PlaceDatum.placeIdem_eq hε hη]
     exact GlobalTheory.PlaceTensor.suppPl_emb S v g
-  have hg : GlobalTheory.WeilParts.SuppPl ε T (1 : GA D T) := fun i j => by rw [mt_one, sub_self]; simp
+  have hg : GlobalTheory.WeilParts.SuppPl ε T (1 : GA D T) := fun i j => by
+    rw [mt_one, sub_self]; simp
   have hoff := smul_actO (off_smul_mt_place hk) (off_smul_mt_place hg)
-  have hmat : (mt S (embV S v g⁻¹)).map (GlobalTheory.InertHomIdx.compW D w) = (locMat D.sp.cm.sig S.gram h g)⁻¹.1 := by
+  have hmat
+      : (mt S (embV S v g⁻¹)).map (GlobalTheory.InertHomIdx.compW D w)
+        = (locMat D.sp.cm.sig S.gram h g)⁻¹.1 := by
     have e := finMat_map_compAt D.sp.cm.sig S.gram h (embV S v g⁻¹)
     rw [proj_emb_self] at e
     rw [← map_inv]
     exact e
-  refine GlobalTheory.InertHomIdx.relIndex_map_of_proj (latF S T (frameLat S) (frameLat T)).toAddSubgroup
-    (rhoF S T (embV S v g, 1)).toAddMonoidHom (mulF S T (algebraMap (AF D.host.F) (AE D) ε)).toAddMonoidHom
-    (GlobalTheory.InertHomIdx.matW S T w) (GlobalTheory.InertHomIdx.rmul (locMat D.sp.cm.sig S.gram h g)⁻¹.1) ?_ ?_ ?_ ?_
+  refine GlobalTheory.InertHomIdx.relIndex_map_of_proj
+    (latF S T (frameLat S) (frameLat T)).toAddSubgroup (rhoF S T (embV S v g, 1)).toAddMonoidHom
+    (mulF S T (algebraMap (AF D.host.F) (AE D) ε)).toAddMonoidHom
+    (GlobalTheory.InertHomIdx.matW S T w)
+    (GlobalTheory.InertHomIdx.rmul (locMat D.sp.cm.sig S.gram h g)⁻¹.1) ?_ ?_ ?_ ?_
   · intro x
     show (actO S T (embV S v g) 1 x).map (GlobalTheory.InertHomIdx.compW D w) = (x : WO S T).map (GlobalTheory.InertHomIdx.compW D w) * (locMat D.sp.cm.sig S.gram h g)⁻¹.1
     rw [actO, mt_one, Matrix.one_mul, ← map_inv, Matrix.map_mul, hmat]
   · intro x hx
     refine XF.ext (Matrix.ext fun i j => ?_)
-    have h0 : GlobalTheory.InertHomIdx.compW D w ((x : WO S T) i j) = 0 := congrFun (congrFun hx i) j
+    have h0 : GlobalTheory.InertHomIdx.compW D w ((x : WO S T) i j) = 0 :=
+      congrFun (congrFun hx i) j
     show algebraMap (AF D.host.F) (AE D) ε * (x : WO S T) i j = 0
     refine GlobalTheory.PlaceIdem.parts_inj D _ _ ?_ ?_
-    · rw [RingHom.map_mul, GlobalTheory.WeilAtPlace.isPrimeIdem_infPart hp, zero_mul, RingHom.map_zero]
+    · rw [RingHom.map_mul, GlobalTheory.WeilAtPlace.isPrimeIdem_infPart hp, zero_mul,
+        RingHom.map_zero]
     · rw [RingHom.map_mul, finPart_of_isPrimeIdem hp, singleAt_mul, RingHom.map_zero]
       have h1 : compAt D.host.F w (finPart D ((x : WO S T) i j)) = 0 := h0
       rw [h1, mul_zero, ← singleAt_zero]
@@ -86,8 +112,21 @@ theorem GlobalTheory.InertHomIdx.heisenbergRelativeIndex_inert_move_source (D : 
 
 namespace GlobalTheory.InertHomLattice
 
-theorem mem_map_latF_iff_frames (D : D7) (S T : HSp D) (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E)) (hv : w.under (𝓞 D.host.F) = v) (hw : IsInertAt D.host.F D.host.E v w) (c : w.adicCompletion D.host.E →+* w.adicCompletion D.host.E) (hc : IsConjAt D.sp.cm.sig hv c) (a : GL (Fin T.rank) (w.adicCompletion D.host.E)) (ha : IsFrameAt w (frameLat T) a) (aS : GL (Fin S.rank) (w.adicCompletion D.host.E)) (haS : IsFrameAt w (frameLat S) aS) : ∃ (c₀ : w.adicCompletion D.host.E) (b : GL (Fin S.rank) (w.adicCompletion D.host.E)), c₀ ≠ 0 ∧ (b⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 = Formalism.UG.cT c aS.1 * S.gram.map (algebraMap D.host.E (w.adicCompletion D.host.E)) ∧ ∀ X : Matrix (Fin T.rank) (Fin S.rank) (w.adicCompletion D.host.E), X ∈ (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).toAddSubgroup.map (GlobalTheory.InertHomIdx.matW S T w) ↔ c₀ • ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 * X * b.1) ∈ GlobalTheory.InertHomIdx.intMat (w.adicCompletion D.host.E) T.rank S.rank := by
-
+theorem mem_map_latF_iff_frames
+    (D : D7) (S T : HSp D) (v : HeightOneSpectrum (𝓞 D.host.F)) (w : HeightOneSpectrum (𝓞 D.host.E))
+    (hv : w.under (𝓞 D.host.F) = v) (hw : IsInertAt D.host.F D.host.E v w)
+    (c : w.adicCompletion D.host.E →+* w.adicCompletion D.host.E) (hc : IsConjAt D.sp.cm.sig hv c)
+    (a : GL (Fin T.rank) (w.adicCompletion D.host.E)) (ha : IsFrameAt w (frameLat T) a)
+    (aS : GL (Fin S.rank) (w.adicCompletion D.host.E)) (haS : IsFrameAt w (frameLat S) aS)
+    : ∃ (c₀ : w.adicCompletion D.host.E) (b : GL (Fin S.rank) (w.adicCompletion D.host.E)),
+      c₀ ≠ 0
+        ∧ (b⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1
+          = Formalism.UG.cT c aS.1 * S.gram.map (algebraMap D.host.E (w.adicCompletion D.host.E))
+        ∧ ∀ X : Matrix (Fin T.rank) (Fin S.rank) (w.adicCompletion D.host.E),
+          X ∈ (GlobalTheory.FinWeilO.latF S T (frameLat S) (frameLat T)).toAddSubgroup.map
+              (GlobalTheory.InertHomIdx.matW S T w)
+            ↔ c₀ • ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 * X * b.1)
+              ∈ GlobalTheory.InertHomIdx.intMat (w.adicCompletion D.host.E) T.rank S.rank := by
   obtain ⟨a₀, ha₀, h0, hgen⟩ := exists_gen (D := D) w
   set π := algebraMap D.host.E (w.adicCompletion D.host.E) with hπ
   set G : Matrix (Fin S.rank) (Fin S.rank) (w.adicCompletion D.host.E) := S.gram.map π with hG
@@ -95,98 +134,153 @@ theorem mem_map_latF_iff_frames (D : D7) (S T : HSp D) (v : HeightOneSpectrum (�
   have hBu : IsUnit B.det := by
     rw [hB, Matrix.det_mul, isUnit_iff_ne_zero]
     refine mul_ne_zero ?_ ?_
-    · rw [Formalism.UG.cT, Matrix.det_transpose, show (aS.1.map c).det = c aS.1.det from (RingHom.map_det c aS.1).symm]
-      exact (map_ne_zero c).2 (Matrix.det_ne_zero_of_left_inverse (B := (aS⁻¹).1) (by
-        rw [← Units.val_mul, inv_mul_cancel, Units.val_one]))
+    · rw [Formalism.UG.cT, Matrix.det_transpose,
+        show (aS.1.map c).det = c aS.1.det from (RingHom.map_det c aS.1).symm]
+      exact (map_ne_zero c).2
+        (Matrix.det_ne_zero_of_left_inverse (B := (aS⁻¹).1)
+          (by rw [← Units.val_mul, inv_mul_cancel, Units.val_one]))
     · rw [hG, show (S.gram.map π).det = π S.gram.det from (RingHom.map_det π S.gram).symm]
       exact ((GlobalTheory.LatVac.gram_det_isUnit S).map π).ne_zero
-  refine ⟨(π a₀)⁻¹, (Matrix.nonsingInvUnit B hBu)⁻¹, inv_ne_zero h0, by rw [inv_inv]; rfl, fun X => ⟨fun h => ?_, fun h => ?_⟩⟩
+  refine ⟨
+    (π a₀)⁻¹,
+    (Matrix.nonsingInvUnit B hBu)⁻¹,
+    inv_ne_zero h0,
+    by rw [inv_inv]; rfl,
+    fun X => ⟨fun h => ?_, fun h => ?_⟩
+  ⟩
   · obtain ⟨x, hx, rfl⟩ := AddSubgroup.mem_map.1 h
     rw [GlobalTheory.InertHomIdx.matW_apply]
     have hx' : (x : WO S T) ∈ latO S T (frameLat S) (frameLat T) fun _ => True := hx
-    have hb : ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 = B⁻¹ := rfl
-    let Φ : WO S T →+ Matrix (Fin T.rank) (Fin S.rank) (w.adicCompletion D.host.E) := AddMonoidHom.mk'
-      (fun u => (π a₀)⁻¹ • ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *
-        u.map (GlobalTheory.InertHomIdx.compW D w) * ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1))
-      fun u u' => by simp only [Matrix.map_add _ (map_add _), Matrix.mul_add, Matrix.add_mul, smul_add]
-    suffices hle : latO S T (frameLat S) (frameLat T) (fun _ => True) ≤
-        (GlobalTheory.InertHomIdx.intMat (w.adicCompletion D.host.E) T.rank S.rank).comap Φ from hle hx'
+    have hb
+        : ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 = B⁻¹ :=
+      rfl
+    let Φ : WO S T →+ Matrix (Fin T.rank) (Fin S.rank) (w.adicCompletion D.host.E) :=
+      AddMonoidHom.mk'
+        (fun u =>
+          (π a₀)⁻¹
+            • ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1
+              * u.map (GlobalTheory.InertHomIdx.compW D w)
+              * ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1))
+        fun u u' => by
+          simp only [Matrix.map_add _ (map_add _), Matrix.mul_add, Matrix.add_mul, smul_add]
+    suffices hle
+        : latO S T (frameLat S) (frameLat T) (fun _ => True)
+          ≤ (GlobalTheory.InertHomIdx.intMat (w.adicCompletion D.host.E) T.rank S.rank).comap Φ from
+      hle hx'
     refine (AddSubgroup.closure_le _).2 ?_
     rintro _ ⟨α, hα, -, a1, ha1, s, hs, t, ht, rfl⟩
     set lam := GlobalTheory.AdeleBaseChange.locMap D.host.F w (α (w.under (𝓞 D.host.F))) with hlam
-    have hlamO : lam ∈ Formalism.UG.Ov D.host.E w := GlobalTheory.AdeleBaseChange.locMap_int w _ (hα _)
-    have hmap : (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F]
-        (a1 * t i * ∑ k, star (s k) * S.gram k j) : WO S T).map (GlobalTheory.InertHomIdx.compW D w) =
-        (lam * π a1) • Matrix.vecMulVec (fun i => π (t i)) ((fun k => c (π (s k))) ᵥ* G) := by
+    have hlamO : lam ∈ Formalism.UG.Ov D.host.E w :=
+      GlobalTheory.AdeleBaseChange.locMap_int w _ (hα _)
+    have hmap
+        : (Matrix.of fun i j =>
+              pairA D.host.F 0 α ⊗ₜ[D.host.F]
+                (a1 * t i * ∑ k, star (s k) * S.gram k j)
+            : WO S T).map (GlobalTheory.InertHomIdx.compW D w)
+          = (lam * π a1) • Matrix.vecMulVec (fun i => π (t i)) ((fun k => c (π (s k))) ᵥ* G) := by
       ext i j
-      have e1 : GlobalTheory.InertHomIdx.compW D w (pairA D.host.F 0 α ⊗ₜ[D.host.F]
-          (a1 * t i * ∑ k, star (s k) * S.gram k j)) =
-          lam * π (a1 * t i * ∑ k, star (s k) * S.gram k j) := compAt_tmul w α _
-      rw [Matrix.map_apply, Matrix.of_apply, e1, Matrix.smul_apply, smul_eq_mul, Matrix.vecMulVec_apply]
+      have e1
+          : GlobalTheory.InertHomIdx.compW D w
+              (pairA D.host.F 0 α ⊗ₜ[D.host.F]
+                (a1 * t i * ∑ k, star (s k) * S.gram k j))
+            = lam * π (a1 * t i * ∑ k, star (s k) * S.gram k j) :=
+        compAt_tmul w α _
+      rw [Matrix.map_apply, Matrix.of_apply, e1, Matrix.smul_apply, smul_eq_mul,
+        Matrix.vecMulVec_apply]
       have hconj : ∀ y, c (π y) = π (star y) := fun y => InertChart.conj_algebraMap hc y
       set_option synthInstance.maxHeartbeats 100000 in
         simp only [map_mul, map_sum, Matrix.vecMul, dotProduct, hG, Matrix.map_apply, hconj]
       ring_nf
-    have hy : ∀ p, ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun i => π (t i)) p ∈ Formalism.UG.Ov D.host.E w := by
+    have hy
+        : ∀ p,
+          ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun i => π (t i)) p
+            ∈ Formalism.UG.Ov D.host.E w := by
       refine (ha _).2 ?_
       rw [Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
       exact Submodule.subset_span ⟨t, ht, rfl⟩
     set z := (aS⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun k => π (s k) with hz
     have hzO : ∀ k, z k ∈ Formalism.UG.Ov D.host.E w := by
       refine (haS _).2 ?_
-      rw [hz, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
+      rw [hz, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mulVec]
       exact Submodule.subset_span ⟨s, hs, rfl⟩
     have hsz : (fun k => π (s k)) = aS.1 *ᵥ z := by
-      rw [hz, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one, Matrix.one_mulVec]
+      rw [hz, Matrix.mulVec_mulVec, ← Units.val_mul, mul_inv_cancel, Units.val_one,
+        Matrix.one_mulVec]
     have hcs : (fun k => c (π (s k))) = (fun k => c (z k)) ᵥ* Formalism.UG.cT c aS.1 := by
       funext k
-      rw [Formalism.UG.cT, Matrix.vecMul_transpose, show c (π (s k)) = c ((fun k => π (s k)) k) from rfl, hsz]
+      rw [Formalism.UG.cT, Matrix.vecMul_transpose,
+        show c (π (s k)) = c ((fun k => π (s k)) k) from rfl, hsz]
       exact RingHom.map_mulVec c aS.1 z k
-    have hr : ((fun k => c (π (s k))) ᵥ* G) ᵥ* ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 =
-        fun k => c (z k) := by
-      rw [hb, hcs, Matrix.vecMul_vecMul, Matrix.vecMul_vecMul, ← Matrix.mul_assoc, ← hB, Matrix.mul_nonsing_inv B hBu, Matrix.vecMul_one]
+    have hr
+        : ((fun k => c (π (s k))) ᵥ* G)
+            ᵥ* ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1
+          = fun k => c (z k) := by
+      rw [hb, hcs, Matrix.vecMul_vecMul, Matrix.vecMul_vecMul, ← Matrix.mul_assoc, ← hB,
+        Matrix.mul_nonsing_inv B hBu, Matrix.vecMul_one]
     intro p q
     show ((π a₀)⁻¹ • ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 * (Matrix.of fun i j => pairA D.host.F 0 α ⊗ₜ[D.host.F]
         (a1 * t i * ∑ k, star (s k) * S.gram k j) : WO S T).map (GlobalTheory.InertHomIdx.compW D w) *
         ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 :
         Matrix (Fin T.rank) (Fin S.rank) (w.adicCompletion D.host.E))) p q ∈ _
-    rw [hmap, Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply, Matrix.smul_apply, smul_eq_mul, smul_eq_mul,
-      mul_vecMulVec_mul_apply, hr]
+    rw [hmap, Matrix.mul_smul, Matrix.smul_mul, Matrix.smul_apply, Matrix.smul_apply, smul_eq_mul,
+      smul_eq_mul, mul_vecMulVec_mul_apply, hr]
     have h1 := hgen a1 ha1
     have h2 := InertChart.conj_mem hw hc (hzO q)
-    rw [intL_iff, show (π a₀)⁻¹ * (lam * π a1 * (((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun i => π (t i)) p * c (z q))) =
-      lam * ((π a₀)⁻¹ * π a1) * ((((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun i => π (t i)) p) * c (z q)) by ring]
+    rw [intL_iff,
+      show (π a₀)⁻¹
+            * (lam * π a1
+              * (((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun i => π (t i)) p
+                * c (z q)))
+          = lam * ((π a₀)⁻¹ * π a1)
+            * ((((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 *ᵥ fun i => π (t i)) p)
+              * c (z q)) by
+        ring]
     exact mul_mem (mul_mem hlamO h1) (mul_mem (hy p) h2)
   · set Y := (π a₀)⁻¹ • ((a⁻¹ : GL (Fin T.rank) (w.adicCompletion D.host.E)).1 * X *
         ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1) with hY
-    have hb : ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 = B⁻¹ := rfl
+    have hb
+        : ((Matrix.nonsingInvUnit B hBu)⁻¹ : GL (Fin S.rank) (w.adicCompletion D.host.E)).1 = B⁻¹ :=
+      rfl
     have hX : X = π a₀ • (a.1 * Y * B) := by
       rw [hY, hb, Matrix.mul_smul, Matrix.smul_mul, smul_smul, mul_inv_cancel₀ h0, one_smul]
       simp only [Matrix.mul_assoc]
-      rw [Matrix.nonsing_inv_mul B hBu, Matrix.mul_one, ← Matrix.mul_assoc, ← Units.val_mul, mul_inv_cancel,
-        Units.val_one, Matrix.one_mul]
-    have hsingle : ∀ {n : ℕ} (i : Fin n) (k : Fin n), (Pi.single i 1 : Fin n → w.adicCompletion D.host.E) k ∈ Formalism.UG.Ov D.host.E w := by
+      rw [Matrix.nonsing_inv_mul B hBu, Matrix.mul_one, ← Matrix.mul_assoc, ← Units.val_mul,
+        mul_inv_cancel, Units.val_one, Matrix.one_mul]
+    have hsingle
+        : ∀ {n : ℕ} (i : Fin n) (k : Fin n),
+          (Pi.single i 1 : Fin n → w.adicCompletion D.host.E) k ∈ Formalism.UG.Ov D.host.E w := by
       intro n i k
       rw [Pi.single_apply]
       split_ifs
       · exact one_mem _
       · exact zero_mem _
-    have htI : ∀ i, (fun k => singleAt D.host.F w (a.1 k i)) ∈ Formalism.L2.NTheta.LamHat T := fun i => by
+    have htI
+        : ∀ i,
+          (fun k => singleAt D.host.F w (a.1 k i)) ∈ Formalism.L2.NTheta.LamHat T := fun i => by
       have := (ha (Pi.single i 1)).1 (hsingle i)
       rw [Matrix.mulVec_single_one] at this
       exact singleAt_mem_lamHat this
-    have hsJ : ∀ j, (fun k => singleAt D.host.F w (aS.1 k j)) ∈ Formalism.L2.NTheta.LamHat S := fun j => by
+    have hsJ
+        : ∀ j,
+          (fun k => singleAt D.host.F w (aS.1 k j)) ∈ Formalism.L2.NTheta.LamHat S := fun j => by
       have := (haS (Pi.single j 1)).1 (hsingle j)
       rw [Matrix.mulVec_single_one] at this
       exact singleAt_mem_lamHat this
-    have hu : (∑ i, ∑ j, GlobalTheory.LatticeStable.liftFin D (singleAt D.host.F w (Y i j)) •
-        GlobalTheory.SplitHomLattice.rk S T a₀ (fun k => singleAt D.host.F w (aS.1 k j))
-          (fun k => singleAt D.host.F w (a.1 k i)) : WO S T) ∈ latO S T (L0c D S) (L0c D T) fun _ => True :=
-      sum_mem fun i _ => sum_mem fun j _ => GlobalTheory.LatticeStable.smul_mem_latO D S T _ _ _ _
-        (by rw [GlobalTheory.SplitHomLattice.finPart_liftFin]; exact singleAt_mem_intAE (h i j)) _
-        (GlobalTheory.SplitHomLattice.rk_mem S T ha₀ (hsJ j) (htI i))
+    have hu
+        : (∑ i, ∑ j, GlobalTheory.LatticeStable.liftFin D (singleAt D.host.F w (Y i j)) •
+              GlobalTheory.SplitHomLattice.rk S T a₀ (fun k => singleAt D.host.F w (aS.1 k j))
+                (fun k => singleAt D.host.F w (a.1 k i))
+            : WO S T)
+          ∈ latO S T (L0c D S) (L0c D T) fun _ => True :=
+      sum_mem fun i _ =>
+        sum_mem fun j _ =>
+          GlobalTheory.LatticeStable.smul_mem_latO D S T _ _ _ _
+            (by rw [GlobalTheory.SplitHomLattice.finPart_liftFin]; exact singleAt_mem_intAE (h i j))
+            _ (GlobalTheory.SplitHomLattice.rk_mem S T ha₀ (hsJ j) (htI i))
     rw [hermitianSpaceBaseLattice_eq_frameLattice, hermitianSpaceBaseLattice_eq_frameLattice] at hu
-    refine AddSubgroup.mem_map.2 ⟨GlobalTheory.FinWeilO.XF.mk _ (GlobalTheory.SplitScalar.latO_fin hu), hu, ?_⟩
+    refine AddSubgroup.mem_map.2
+      ⟨GlobalTheory.FinWeilO.XF.mk _ (GlobalTheory.SplitScalar.latO_fin hu), hu, ?_⟩
     rw [GlobalTheory.InertHomIdx.matW_apply, GlobalTheory.FinWeilO.XF.coe_mk]
     exact (map_compW_sum S T hv hc a₀ Y a.1 aS.1).trans hX.symm
 
@@ -194,28 +288,39 @@ end GlobalTheory.InertHomLattice
 
 namespace GlobalTheory.InertHomIdx
 
-theorem relIndex_intMat_rmul_cT {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))] (c : L →+* L)
-    (hcc : ∀ x, c (c x) = x) (hcv : ∀ x, Valued.v (c x) = Valued.v x) (m n : ℕ) (k : Matrix (Fin n) (Fin n) L) :
-    (intMat L m n).relIndex ((intMat L m n).map (rmul (Formalism.UG.cT c k))) =
-      (intMat L n m).relIndex ((intMat L n m).map (lmul k)) := by
-  let ψ : Matrix (Fin m) (Fin n) L →+ Matrix (Fin n) (Fin m) L :=
-    { toFun := fun Y => Formalism.UG.cT c Y
-      map_zero' := by ext i j; simp [Formalism.UG.cT]
-      map_add' := fun X Y => by ext i j; simp [Formalism.UG.cT] }
+theorem relIndex_intMat_rmul_cT
+    {L : Type} [Field L] [Valued L (WithZero (Multiplicative ℤ))]
+    (c : L →+* L) (hcc : ∀ x, c (c x) = x) (hcv : ∀ x, Valued.v (c x) = Valued.v x)
+    (m n : ℕ) (k : Matrix (Fin n) (Fin n) L)
+    : (intMat L m n).relIndex ((intMat L m n).map (rmul (Formalism.UG.cT c k)))
+      = (intMat L n m).relIndex ((intMat L n m).map (lmul k)) := by
+  let ψ : Matrix (Fin m) (Fin n) L →+ Matrix (Fin n) (Fin m) L := {
+    toFun := fun Y => Formalism.UG.cT c Y
+    map_zero' := by ext i j; simp [Formalism.UG.cT]
+    map_add' := fun X Y => by ext i j; simp [Formalism.UG.cT]
+  }
   have hψ : Function.Injective ψ := by
     intro X Y hXY
     ext i j
     have := congrFun (congrFun hXY j) i
-    simp only [ψ, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply] at this
+    simp only [ψ, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Formalism.UG.cT, Matrix.transpose_apply,
+        Matrix.map_apply]
+      at this
     have := congrArg c this
     rwa [hcc, hcc] at this
   have hint : ∀ x : L, c x ∈ Formalism.UG.intL L ↔ x ∈ Formalism.UG.intL L := fun x => by
     show Valued.v (c x) ≤ 1 ↔ Valued.v x ≤ 1
     rw [hcv]
-  have h1 : ∀ {p r : ℕ}, (intMat L p r).map
-      ({ toFun := fun Y => Formalism.UG.cT c Y
-         map_zero' := by ext i j; simp [Formalism.UG.cT]
-         map_add' := fun X Y => by ext i j; simp [Formalism.UG.cT] } : Matrix (Fin p) (Fin r) L →+ Matrix (Fin r) (Fin p) L) = intMat L r p := by
+  have h1
+      : ∀ {p r : ℕ},
+        (intMat L p r).map
+            ({
+               toFun := fun Y => Formalism.UG.cT c Y
+               map_zero' := by ext i j; simp [Formalism.UG.cT]
+               map_add' := fun X Y => by ext i j; simp [Formalism.UG.cT]
+             }
+              : Matrix (Fin p) (Fin r) L →+ Matrix (Fin r) (Fin p) L)
+          = intMat L r p := by
     intro p r
     ext Y
     constructor
@@ -229,10 +334,12 @@ theorem relIndex_intMat_rmul_cT {L : Type} [Field L] [Valued L (WithZero (Multip
     refine AddMonoidHom.ext fun X => ?_
     ext i j
     set_option synthInstance.maxHeartbeats 100000 in
-      simp only [ψ, AddMonoidHom.coe_comp, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Function.comp_apply, rmul_apply, lmul_apply,
-      Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply, Matrix.mul_apply, map_sum, map_mul, hcc]
+      simp only [ψ, AddMonoidHom.coe_comp, AddMonoidHom.coe_mk, ZeroHom.coe_mk, Function.comp_apply,
+        rmul_apply, lmul_apply, Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply,
+        Matrix.mul_apply, map_sum, map_mul, hcc]
     exact Finset.sum_congr rfl fun l _ => mul_comm _ _
-  rw [← AddSubgroup.relIndex_map_map_of_injective _ _ hψ, AddSubgroup.map_map, hcomm, ← AddSubgroup.map_map]
+  rw [← AddSubgroup.relIndex_map_map_of_injective _ _ hψ, AddSubgroup.map_map, hcomm,
+    ← AddSubgroup.map_map]
   exact congrArg₂ _ (h1) (congrArg _ h1)
 
 end GlobalTheory.InertHomIdx

@@ -8,20 +8,23 @@ open NumberField IsDedekindDomain
 
 namespace GlobalTheory
 
-
 open NumberField IsDedekindDomain in
-theorem _root_.GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified :
-    ∀ (E : Type) [Field E] [NumberField E],
-      (∀ P : HeightOneSpectrum (𝓞 E),
-        (Ideal.absNorm P.asIdeal).Prime ↔ P.asIdeal.inertiaDeg ℤ = 1) ∧
-      {P : HeightOneSpectrum (𝓞 E) | P.asIdeal.ramificationIdx ℤ ≠ 1}.Finite := by
+theorem _root_.GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramified
+    : ∀ (E : Type) [Field E] [NumberField E],
+      (∀ P : HeightOneSpectrum (𝓞 E), (Ideal.absNorm P.asIdeal).Prime ↔ P.asIdeal.inertiaDeg ℤ = 1)
+        ∧ {P : HeightOneSpectrum (𝓞 E) | P.asIdeal.ramificationIdx ℤ ≠ 1}.Finite := by
   intro E _ _
-  have key : ∀ P : HeightOneSpectrum (𝓞 E), (Ideal.absNorm (P.asIdeal.under ℤ)).Prime ∧
-      Ideal.absNorm P.asIdeal = Ideal.absNorm (P.asIdeal.under ℤ) ^ P.asIdeal.inertiaDeg ℤ := by
+  have key
+      : ∀ P : HeightOneSpectrum (𝓞 E),
+        (Ideal.absNorm (P.asIdeal.under ℤ)).Prime
+          ∧ Ideal.absNorm P.asIdeal
+            = Ideal.absNorm (P.asIdeal.under ℤ) ^ P.asIdeal.inertiaDeg ℤ := by
     intro P
     haveI : NeZero P.asIdeal := ⟨P.ne_bot⟩
-    exact ⟨Nat.absNorm_under_prime P.asIdeal,
-      (Ideal.absNorm_pow_inertiaDeg (P.asIdeal.under ℤ) P.asIdeal).symm⟩
+    exact ⟨
+      Nat.absNorm_under_prime P.asIdeal,
+      (Ideal.absNorm_pow_inertiaDeg (P.asIdeal.under ℤ) P.asIdeal).symm
+    ⟩
   refine ⟨fun P => ?_, ?_⟩
   · obtain ⟨hq, hN⟩ := key P
     rw [hN]
@@ -64,8 +67,9 @@ theorem _root_.GlobalTheory.absNorm_prime_iff_inertiaDeg_eq_one_and_finite_ramif
       have h := Ideal.absNorm_dvd_absNorm_of_le hle
       rw [Ideal.absNorm_span_singleton, hnorm, Int.natAbs_pow, Int.natAbs_natCast] at h
       exact h
-    calc Ideal.absNorm P.asIdeal ≤ q ^ Module.finrank ℤ (𝓞 E) :=
-          Nat.le_of_dvd (pow_pos hq.pos _) hdvd
+    calc
+      Ideal.absNorm P.asIdeal
+        ≤ q ^ Module.finrank ℤ (𝓞 E) := Nat.le_of_dvd (pow_pos hq.pos _) hdvd
       _ ≤ d ^ Module.finrank ℤ (𝓞 E) := Nat.pow_le_pow_left hqle _
 
 end GlobalTheory

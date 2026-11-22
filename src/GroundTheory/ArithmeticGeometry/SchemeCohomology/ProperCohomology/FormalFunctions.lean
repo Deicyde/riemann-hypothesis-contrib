@@ -17,16 +17,18 @@ open AlgebraicGeometry CategoryTheory TopologicalSpace
 
 universe c236Ext c236Scheme
 
-private noncomputable def H.linearMapV436 {X : Scheme.{c236Scheme}}
+private noncomputable def H.linearMapV436
+    {X : Scheme.{c236Scheme}}
     [HasExt.{c236Ext} (Sheaf (Opens.grothendieckTopology X.toTopCat) AddCommGrpCat.{c236Scheme})]
     (A : Type*) [CommRing A] [Algebra A Γ(X, ⊤)]
-    {F G : X.Modules} (φ : F ⟶ G) (n : ℕ) :
-    Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
+    {F G : X.Modules} (φ : F ⟶ G)
+    (n : ℕ)
+    : Sheaf.H.{c236Ext} (modulesAb F) n →ₗ[A] Sheaf.H.{c236Ext} (modulesAb G) n where
   toFun := Sheaf.H.map.{c236Ext} (modulesAbMap φ) n
   map_add' := map_add _
   map_smul' a x := by
-    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x) =
-      a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
+    change Sheaf.H.map.{c236Ext} (modulesAbMap φ) n (a • x)
+      = a • Sheaf.H.map.{c236Ext} (modulesAbMap φ) n x
     rw [H.smul_def, H.smul_def, ← Sheaf.H.map_comp_apply, ← Sheaf.H.map_comp_apply,
       ← modulesAbMap_comp, ← modulesAbMap_comp, smulHom_comp]
 
@@ -40,22 +42,28 @@ noncomputable section
 
 attribute [local instance] algebraOfOver
 
-theorem exists_finite_affineCover (X : Scheme.{u}) [CompactSpace X] [X.IsSeparated] :
-    ∃ (ι : Type u) (_ : Finite ι) (𝔘 : ι → X.Opens), iSup 𝔘 = ⊤ ∧
-      ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a)) := by
-  obtain ⟨s, hs⟩ := isCompact_univ.elim_finite_subcover (fun V : X.affineOpens => (V : Set X))
-    (fun V => V.1.isOpen) (fun x _ => by
-      obtain ⟨_, ⟨V, hV, rfl⟩, hx, -⟩ :=
-        X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
-      exact Set.mem_iUnion.2 ⟨⟨V, hV⟩, hx⟩)
+theorem exists_finite_affineCover (X : Scheme.{u}) [CompactSpace X] [X.IsSeparated]
+    : ∃ (ι : Type u) (_ : Finite ι) (𝔘 : ι → X.Opens),
+      iSup 𝔘 = ⊤ ∧ ∀ (m : ℕ) (t : Fin (m + 1) → ι), IsAffineOpen (⨅ a, 𝔘 (t a)) := by
+  obtain ⟨s, hs⟩ :=
+    isCompact_univ.elim_finite_subcover
+      (fun V : X.affineOpens => (V : Set X))
+      (fun V => V.1.isOpen)
+      (fun x _ => by
+        obtain ⟨_, ⟨V, hV, rfl⟩, hx, -⟩ :=
+          X.isBasis_affineOpens.exists_subset_of_mem_open (Set.mem_univ x) isOpen_univ
+        exact Set.mem_iUnion.2 ⟨⟨V, hV⟩, hx⟩)
   refine ⟨s, inferInstance, fun V => V.1.1, ?_, fun m t => IsAffineOpen.iInf fun a => (t a).1.2⟩
   apply le_antisymm le_top
   intro x _
   obtain ⟨V, hV, hx⟩ := Set.mem_iUnion₂.1 (hs (Set.mem_univ x))
   exact Opens.mem_iSup.2 ⟨⟨V, hV⟩, hx⟩
 
-variable {A : Type u} [CommRing A] [IsNoetherianRing A] (I : Ideal A) {X : Scheme.{u}}
-  [X.Over (Spec (.of A))] {F : X.Modules}
+variable
+  {A : Type u} [CommRing A] [IsNoetherianRing A]
+  (I : Ideal A)
+  {X : Scheme.{u}} [X.Over (Spec (.of A))]
+  {F : X.Modules}
 
 lemma isSeparated_of_over [IsSeparated (X ↘ Spec (.of A))] : X.IsSeparated := by
   refine ⟨?_⟩
@@ -140,11 +148,13 @@ lemma exists_towerComp_formalτQ_eq_zero (q : ℕ) :
     (cechHMap 𝔘 (modulesAbMap (transMap I F n c)).hom (q + 1) yČ) = 0
   rw [hc n yČ hι, map_zero]
 
-
 include hF in
-theorem formalFunctions_mem_range (q : ℕ) {x : ∀ n, Sheaf.H.{u} (modulesAb (quotPow I F n)) q}
-    (hx : x ∈ towerLimit (E := fun m => Sheaf.H.{u} (modulesAb (quotPow I F m)) q)
-      (formalτE I F q)) (n : ℕ) : x n ∈ LinearMap.range (formalβ I F q n) := by
+theorem formalFunctions_mem_range
+    (q : ℕ)
+    {x : ∀ n, Sheaf.H.{u} (modulesAb (quotPow I F n)) q}
+    (hx : x ∈ towerLimit (E := fun m => Sheaf.H.{u} (modulesAb (quotPow I F m)) q) (formalτE I F q))
+    (n : ℕ)
+    : x n ∈ LinearMap.range (formalβ I F q n) := by
   obtain ⟨c, hc⟩ := exists_towerComp_formalτQ_eq_zero I hF q
   exact mem_range_formalβ_of_mem_towerLimit hc hx n
 
