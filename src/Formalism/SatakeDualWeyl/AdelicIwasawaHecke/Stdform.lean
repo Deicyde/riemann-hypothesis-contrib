@@ -146,8 +146,8 @@ theorem stdform_hform_map (σ : E →ₐ[F] E) (τ : E →+* ℂ)
     (hσ : τ.comp (σ : E →+* E) = (starRingEnd ℂ).comp τ) (J : Matrix n n E) (x : n → E) :
     τ (hform (σ : E →+* E) J x x) =
       ∑ i, ∑ j, starRingEnd ℂ (τ (x i)) * (J.map τ) i j * τ (x j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul, Matrix.map_apply, AlgHom.coe_toRingHom, stdform_conj σ τ hσ]
+
+  simp only [hform, map_sum, map_mul, Matrix.map_apply, AlgHom.coe_toRingHom, stdform_conj σ τ hσ]
 
 theorem stdform_hform_fixed (σ : E →ₐ[F] E) (τ : E →+* ℂ)
     (hσ : τ.comp (σ : E →+* E) = (starRingEnd ℂ).comp τ) (J : Matrix n n E)
@@ -157,8 +157,8 @@ theorem stdform_hform_fixed (σ : E →ₐ[F] E) (τ : E →+* ℂ)
   have hJ' : ∀ i j, σ (J i j) = J j i := fun i j => by
     have h := congrFun (congrFun hJ j) i
     simpa [cT] using h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul, AlgHom.coe_toRingHom, stdform_invol σ τ hσ, hJ']
+
+  simp only [hform, map_sum, map_mul, AlgHom.coe_toRingHom, stdform_invol σ τ hσ, hJ']
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring

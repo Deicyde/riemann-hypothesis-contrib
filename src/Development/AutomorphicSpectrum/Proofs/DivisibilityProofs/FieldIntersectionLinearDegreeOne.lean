@@ -42,10 +42,10 @@ theorem eq_sum_single (c : σ → F) : c = ∑ p, c p • (Pi.single p (1 : F) :
 
 theorem eval_linForm (l : (σ → F) →ₗ[F] F) (c : σ → F) :
     eval (fun q => l (Pi.single q 1)) (linForm c) = l c := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [eq_sum_single c, map_sum]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply, map_sum]
+
+  conv_rhs => rw [eq_sum_single c, map_sum]
+
+  rw [linForm_apply, map_sum]
   refine Finset.sum_congr rfl fun p _ => ?_
   simp [smul_eval]
 
@@ -107,11 +107,11 @@ def toY : MvPolynomial σ F →ₐ[F] MvPolynomial (Fin (Module.finrank F ((σ �
   aeval fun p => linForm ((qb U).equivFun (U.mkQ (Pi.single p 1)))
 
 theorem toY_linForm (c : σ → F) : toY U (linForm c) = linForm ((qb U).equivFun (U.mkQ c)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply c, map_sum]
+
+  rw [linForm_apply c, map_sum]
   conv_rhs => rw [eq_sum_single c]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, toY, aeval_X]
+
+  simp only [map_sum, map_smul, toY, aeval_X]
 
 theorem toY_kill : ∀ a ∈ lin U, toY U a = 0 := by
   intro a ha
@@ -135,8 +135,8 @@ def fromY : MvPolynomial (Fin (Module.finrank F ((σ → F) ⧸ U))) F →ₐ[F]
 
 theorem fromY_linForm (w : Fin (Module.finrank F ((σ → F) ⧸ U)) → F) :
     fromY U (linForm w) = Ideal.Quotient.mkₐ F (lin U) (linForm (∑ t, w t • sec U t)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [linForm_apply w, map_sum, map_sum, map_sum]
+
+  rw [linForm_apply w, map_sum, map_sum, map_sum]
   refine Finset.sum_congr rfl fun t _ => ?_
   simp only [map_smul, fromY, aeval_X]
 
@@ -163,8 +163,8 @@ def quotEquiv :
       rw [Ideal.Quotient.eq, ← linForm_single (F := F) p, ← map_sub]
       refine linForm_mem ((Submodule.Quotient.eq U).1 ?_)
       change U.mkQ _ = U.mkQ _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [map_smul, mkQ_sec]
       exact (qb U).sum_equivFun _)
 

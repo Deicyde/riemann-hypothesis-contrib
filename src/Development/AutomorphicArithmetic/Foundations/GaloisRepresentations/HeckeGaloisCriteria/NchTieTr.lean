@@ -14,7 +14,7 @@ open Formalism.BasicNotions Formalism.MainNotions NumberField
 
 variable {D : D7} (Λ : CutD D)
 
-set_option maxHeartbeats 1600000
+
 
 @[reducible] def nchTr (x : NChoice D) : NChoice (cut D Λ) := { x with }
 

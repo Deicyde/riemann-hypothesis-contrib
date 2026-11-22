@@ -25,8 +25,8 @@ theorem trace_fst_eq_zero (z : AE D) (hz : infPart D z = 0) :
     rw [← Formalism.IndefR.PHeisTh.repr_fst]
     have : Algebra.TensorProduct.map (fstA D.host.F) (AlgHom.id D.host.F D.host.E) z = 0 := hz
     rw [this, map_zero]; rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (Formalism.IndefR.PHeisFC.bA D.host.F D.host.E).sum_repr z, map_sum, map_sum]
+
+  rw [← (Formalism.IndefR.PHeisFC.bA D.host.F D.host.E).sum_repr z, map_sum, map_sum]
   refine Finset.sum_eq_zero fun k _ => ?_
   rw [map_smul, smul_eq_mul, map_mul]
   have : (Formalism.IndefR.PHeisFC.bA D.host.F D.host.E).repr z k = Formalism.IndefR.PHeisFC.cE D.host.F D.host.E z k := rfl
@@ -39,8 +39,8 @@ theorem trace_snd_eq_zero (z : AE D) (hz : finPart D z = 0) :
     rw [← Formalism.IndefR.PHeisTh.repr_snd]
     have : Algebra.TensorProduct.map (sndA D.host.F) (AlgHom.id D.host.F D.host.E) z = 0 := hz
     rw [this, map_zero]; rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← (Formalism.IndefR.PHeisFC.bA D.host.F D.host.E).sum_repr z, map_sum, map_sum]
+
+  rw [← (Formalism.IndefR.PHeisFC.bA D.host.F D.host.E).sum_repr z, map_sum, map_sum]
   refine Finset.sum_eq_zero fun k _ => ?_
   rw [map_smul, smul_eq_mul, map_mul]
   have : (Formalism.IndefR.PHeisFC.bA D.host.F D.host.E).repr z k = Formalism.IndefR.PHeisFC.cE D.host.F D.host.E z k := rfl
@@ -48,27 +48,27 @@ theorem trace_snd_eq_zero (z : AE D) (hz : finPart D z = 0) :
 
 variable (S T : HSp D)
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem infPart_hO (u w : MO S T) (hu : u.map (infPart D) = 0) : infPart D (hO S T u w) = 0 := by
   have h0 : ∀ d a, infPart D (u d a) = 0 := fun d a => congrFun (congrFun hu d) a
   unfold hO
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum (infPart D), map_mul (infPart D), h0, mul_zero, Finset.sum_const_zero]
 
-set_option synthInstance.maxHeartbeats 400000 in
+  simp only [map_sum (infPart D), map_mul (infPart D), h0, mul_zero, Finset.sum_const_zero]
+
+
 theorem finPart_hO (u w : MO S T) (hu : u.map (finPart D) = 0) : finPart D (hO S T u w) = 0 := by
   have h0 : ∀ d a, finPart D (u d a) = 0 := fun d a => congrFun (congrFun hu d) a
   unfold hO
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum (finPart D), map_mul (finPart D), h0, mul_zero, Finset.sum_const_zero]
 
-set_option synthInstance.maxHeartbeats 200000 in
+  simp only [map_sum (finPart D), map_mul (finPart D), h0, mul_zero, Finset.sum_const_zero]
+
+
 theorem symplO_fst_eq_zero (u w : MO S T) (hu : u.map (infPart D) = 0) : fstA D.host.F (symplO S T u w) = 0 := by
   unfold symplO
   refine trace_fst_eq_zero _ ?_
   rw [map_mul (infPart D), infPart_hO S T u w hu, mul_zero]
 
-set_option synthInstance.maxHeartbeats 200000 in
+
 theorem symplO_snd_eq_zero (u w : MO S T) (hu : u.map (finPart D) = 0) : sndA D.host.F (symplO S T u w) = 0 := by
   unfold symplO
   refine trace_snd_eq_zero _ ?_

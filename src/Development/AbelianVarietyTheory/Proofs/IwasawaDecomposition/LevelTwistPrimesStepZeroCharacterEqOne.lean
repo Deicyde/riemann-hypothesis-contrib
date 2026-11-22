@@ -470,11 +470,11 @@ theorem supSum_inv {κ : Type} [CommRing κ] {n a : ℕ} (S : Finset ℕ) {g : G
 
 theorem lamJ_zero {κ L : Type} [CommRing κ] [Field L] (ρ : κ →+* L) (ψ : AddChar L ℂ) (χ : ℕ → MulChar L ℂ) {n : ℕ} (k m t : ℕ)
     (A : Matrix (Fin n) (Fin n) κ) : Formalism.L2.Forms.lamJ ψ χ k t 0 k (A.map ρ) = ψ (ρ (supSum k (SX k m 0) A)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Formalism.L2.Forms.lamJ, Finset.range_zero, Finset.prod_empty, mul_one, supSum, map_sum ρ]
+
+  rw [Formalism.L2.Forms.lamJ, Finset.range_zero, Finset.prod_empty, mul_one, supSum, map_sum ρ]
   refine congrArg ψ (Finset.sum_congr rfl fun x _ => ?_)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum ρ]
+
+  rw [map_sum ρ]
   refine Finset.sum_congr rfl fun y _ => ?_
   rw [apply_ite ρ, map_zero]
   refine if_congr (and_congr_right fun h1 => and_congr_right fun h2 => ?_) rfl rfl
@@ -530,7 +530,7 @@ theorem mem_Uloc (hI : I.Ok) (hG : G.piG = X.piG) (i : Fin 2) (v : HeightOneSpec
       exact one_mem _
 
 
-set_option maxHeartbeats 800000 in
+
 include hR in
 theorem chi_prod (hI : I.Ok) (x : S.U) : ∃ h : GLG (E := B.host.E) (n := B.R.N 0) (SG := (B.primes X).vGs),
     (∀ w, h w ∈ uniUT (B.R.N 0) (𝓞 B.host.E ⧸ w.1.asIdeal) B.R.k []) ∧ (∀ w : (B.primes X).vGs, IsRed w.1 x.1 ((h w)⁻¹).1) ∧
@@ -550,7 +550,7 @@ theorem chi_prod (hI : I.Ok) (x : S.U) : ∃ h : GLG (E := B.host.E) (n := B.R.N
   have e : h w = A w := Units.ext (h2 w)
   exact e ▸ hA' w
 
-set_option maxHeartbeats 800000 in
+
 include hR in
 theorem exists_glev (hI : I.Ok) (hG : G.piG = X.piG)
     (hψ : ∀ j v h (w : {w // w ∈ (B.primes X).vGs}), w.1.under (𝓞 B.host.F) = v → ∀ n : ℕ,

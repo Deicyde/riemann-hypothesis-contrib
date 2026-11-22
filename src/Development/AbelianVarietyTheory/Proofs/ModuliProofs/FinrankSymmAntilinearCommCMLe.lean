@@ -54,13 +54,13 @@ theorem exists_sum_eigen {E : Type} [Field E] [NumberField E] {V : Type} [AddCom
       · subst h; simp [canonicalEmbedding.apply_at]
       · simp [Pi.single_eq_of_ne h]
     rw [← Module.End.mul_apply, ← h2, this, map_smul, LinearMap.smul_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [← LinearMap.sum_apply, ← map_sum, Finset.univ_sum_single]
-      have := h1 1
-      have e : Φ 1 = 1 := by simpa using this
-      change v = Φ 1 v
-      rw [e]
-      rfl
+
+  · rw [← LinearMap.sum_apply, ← map_sum, Finset.univ_sum_single]
+    have := h1 1
+    have e : Φ 1 = 1 := by simpa using this
+    change v = Φ 1 v
+    rw [e]
+    rfl
 
 theorem conj_eq_neg {z : ℂ} {d : ℕ} (h : z ^ 2 = -(d : ℂ)) (hd : 0 < d) : starRingEnd ℂ z = -z := by
   have hre := congrArg Complex.re h

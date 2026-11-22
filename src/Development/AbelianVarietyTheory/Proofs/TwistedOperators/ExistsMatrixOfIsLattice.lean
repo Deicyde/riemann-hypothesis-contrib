@@ -101,8 +101,8 @@ variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchim
 
 theorem dot_sec {n : Type} [Fintype n] (π : n → D.host.E) (y : n → k) :
     (fun i => incA D (π i)) ⬝ᵥ (fun i => p.sec (y i)) = p.sec ((fun i => p.pr (incA D (π i))) ⬝ᵥ y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, map_sum]
+
+  simp only [dotProduct, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [mul_comm, GlobalTheory.FinPl.FrameLat.sec_mul_right, mul_comm]
 
@@ -299,7 +299,7 @@ theorem pr_mem_of_valuation_le {w : HeightOneSpectrum (𝓞 D.host.E)} (hw : For
   exact hn
 
 
-set_option maxHeartbeats 800000 in
+
 theorem sec_mem_idV_iff {w : HeightOneSpectrum (𝓞 D.host.E)} (hw : Formalism.L2.NTheta.IsIdemAt p.e w) {ϖ : 𝒪[k]}
     (hϖ : Irreducible ϖ) {I : FI D} (hI : I ≠ 0) {n : ℕ} (hn : FractionalIdeal.count D.host.E w I = n) (t : k) :
     p.sec t ∈ idV I p.v ↔ ∃ z : 𝒪[k], t = (ϖ : k) ^ n * z := by

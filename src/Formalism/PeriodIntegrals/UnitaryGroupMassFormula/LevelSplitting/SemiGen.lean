@@ -66,8 +66,8 @@ structure Hyp : Prop where
 variable {D}
 
 theorem h_symm (H : D.Hyp) (x y : n → A) : D.h y x = D.σA (D.h x y) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [h, hform, map_sum, map_mul, H.σσ, H.herm]
+
+  simp only [h, hform, map_sum, map_mul, H.σσ, H.herm]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 

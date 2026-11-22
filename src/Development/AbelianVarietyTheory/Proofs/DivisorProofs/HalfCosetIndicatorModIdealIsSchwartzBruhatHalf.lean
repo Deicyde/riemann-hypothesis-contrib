@@ -20,10 +20,10 @@ open scoped Pointwise
 
 namespace GlobalTheory.BotSmallDict
 
-set_option synthInstance.maxHeartbeats 400000
 
 
-set_option maxHeartbeats 1000000 in
+
+
 theorem cosetFn_isSBHalf : ∀ {D : D7} (S T : HSp D) (LS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E))
     (LT : Submodule (𝓞 D.host.E) (Fin T.rank → D.host.E)),
     Submodule.IsFullLattice D.host.E LS → Submodule.IsFullLattice D.host.E LT → ∀ (a : Formalism.L2.Theta.AE D), infPart D a = 0 →

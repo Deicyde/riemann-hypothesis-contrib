@@ -57,15 +57,15 @@ variable {u : ι → L'} {J : M →ₗ[L] M'} {π : ι → M' →ₗ[L] M}
 
 theorem IsCoord.sum (h : IsCoord u J π) (m : ι → M) (k : ι) :
     π k (∑ l, u l • J (m l)) = m k := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [map_sum, h.2]
+
+  simp [map_sum, h.2]
 
 theorem IsCoord.comm (h : IsCoord u J π) (hN : IsCoord u JN πN) (f : N →ₗ[L] M)
     (f' : N' →ₗ[L'] M') (hf : ∀ y, f' (JN y) = J (f y)) (k : ι) (x : N') :
     π k (f' x) = f (πN k x) := by
   conv_lhs => rw [← hN.1 x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum f', map_smul, hf]
+
+  simp only [map_sum f', map_smul, hf]
   exact h.sum _ k
 
 theorem IsCoord.rel_ker (h : IsCoord u J π) (hN : IsCoord u JN πN) (f : N →ₗ[L] M)
@@ -87,8 +87,8 @@ theorem IsCoord.rel_range (h : IsCoord u J π) (hN : IsCoord u JN πN) (f : N �
   · intro hx
     choose y hy using hx
     refine ⟨∑ k, u k • JN (y k), ?_⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, hf, hy]
+
+    simp only [map_sum, map_smul, hf, hy]
     exact h.1 x
 
 omit [Algebra L L'] [Fintype ι] [DecidableEq ι] in

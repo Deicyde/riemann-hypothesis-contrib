@@ -55,7 +55,7 @@ theorem seg_map_inv {K : Type} [Field K] [NumberField K] (w : HeightOneSpectrum 
   ring
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem transferOn_isSplit : ∀ D : D7, TransferOn D fun v => IsSplit (E := D.host.E) v := by
   intro D ψ S T χS χT om hW t ht v hv hunr w h U hU f hf X _ _ ρ x B hx X' _ _ ρ' b hb hne
   obtain ⟨eS, heS⟩ := (GlobalTheory.T.exists_unitaryCharts_allFinitePlaces_frameLattice D S v w h).1 hv
@@ -132,8 +132,8 @@ theorem transferOn_isSplit : ∀ D : D7, TransferOn D fun v => IsSplit (E := D.h
   have hT : heckeVec πU (KGL w (n := T.rank)) (fun g => Tj ℂ T.rank (Ov D.host.E w) ϖ k g⁻¹) f =
       ∑ j ∈ Finset.range (S.rank + 1), cf j • heckeVec σU (KGL w (n := S.rank)) (Tj ℂ S.rank (Ov D.host.E w) ϖ j) f := by
     apply U.injective_subtype
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, hH', map_sum]
+
+    rw [e1, hH', map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, e2 j]
   have hmove : ∀ j ∈ Finset.range (S.rank + 1), b (heckeVec σU (KGL w (n := S.rank)) (Tj ℂ S.rank (Ov D.host.E w) ϖ j) f) x =
@@ -148,8 +148,8 @@ theorem transferOn_isSplit : ∀ D : D7, TransferOn D fun v => IsSplit (E := D.h
       = b (heckeVec πU (KGL w (n := T.rank)) (fun g => Tj ℂ T.rank (Ov D.host.E w) ϖ k g⁻¹) f) x :=
         (map_heckeVec hcT hInvT (b.flip x) hequiv f).symm
     _ = ∑ j ∈ Finset.range (S.rank + 1), cf j • satEig (qV D.host.E w) S.rank (B.map (·⁻¹)) j • b f x := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [hT, map_sum, LinearMap.sum_apply]
+
+        rw [hT, map_sum, LinearMap.sum_apply]
         refine Finset.sum_congr rfl fun j hj => ?_
         rw [map_smul, LinearMap.smul_apply, hmove j hj]
     _ = satEig (qV D.host.E w) T.rank ((stepPar χS χT t (fun _ => B) w).map (·⁻¹)) k • b f x := by

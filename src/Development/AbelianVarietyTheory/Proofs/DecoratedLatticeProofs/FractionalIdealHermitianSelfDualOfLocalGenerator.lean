@@ -101,8 +101,8 @@ theorem one_eq_sum (T : Finset (Pl D)) :
   have key : ∀ w, evalV D.host.F w (1 : Af D.host.F) =
       evalV D.host.F w (∑ v ∈ T, ePl D (· = v) + ePl D (· ∉ T)) := by
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_one, map_add (f := _), map_sum]
+
+    rw [map_one, map_add (f := _), map_sum]
     simp only [evalV_ePl]
     by_cases hw : w ∈ T <;> simp [hw]
   exact RestrictedProduct.ext _ _ fun w => key w

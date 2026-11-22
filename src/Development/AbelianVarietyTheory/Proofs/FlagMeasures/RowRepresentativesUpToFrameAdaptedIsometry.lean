@@ -41,8 +41,8 @@ theorem hT_e_chg (v : S.V) (b : Fin r) : S.hT (e b) (chg e f f' σ v) = S.hT (e 
 
 include hff hef in
 theorem hT_f_chg (v : S.V) (b : Fin r) : S.hT (f b) (chg e f f' σ v) = S.hT (f' b) v := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [chg_apply, map_add (f := _), map_add (f := _), hT_f_pY hff, hT_f_pj hff hef, pX_apply, map_sum]
+
+  rw [chg_apply, map_add (f := _), map_add (f := _), hT_f_pY hff, hT_f_pj hff hef, pX_apply, map_sum]
   simp [map_smul, hfe' hef]
 
 include hee hff hef in

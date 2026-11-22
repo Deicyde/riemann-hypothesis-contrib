@@ -12,7 +12,7 @@ open GlobalTheory.HeightCounting GlobalTheory.Mem.R3.Tr
 
 noncomputable section
 namespace GlobalTheory.LayerMove
-set_option maxHeartbeats 4000000
+
 variable {D : D7} (m : Mv D) {hL : GlobalTheory.Published.LocalLanglandsGL}
 
 def Mv.sideA {cf : CharFrame D} {jE : D.host.E →+* Qb} (A : SideA D cf jE) : SideA m.D (m.cf cf) jE := @_root_.GlobalTheory.HeightCounting.SideA.mk (_) (_) (_)

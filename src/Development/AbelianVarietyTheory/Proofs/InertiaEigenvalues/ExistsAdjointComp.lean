@@ -34,7 +34,7 @@ open scoped TensorProduct InnerProductSpace
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.DownLift GlobalTheory.Hk3 Formalism.IndefR
 
-set_option maxHeartbeats 4000000
+
 
 namespace GlobalTheory.DownLift.Sat
 
@@ -99,8 +99,8 @@ theorem actL_comp {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)} {L : LevDat D.h
 theorem sum_fix {G E E' : Type} [Group G] [Fintype G] [AddCommGroup E] [Module ℂ E] [AddCommGroup E'] [Module ℂ E']
     (ρ : Representation ℂ G E) (ρ' : Representation ℂ G E') (f : E →ₗ[ℂ] E') (hf : GlobalTheory.IndefiniteRowSideFullHecke.TranslateRepresentations.Commutes ρ ρ' f)
     (c : G → ℂ) (x : E) (hx : (∑ g, c g • ρ g) x = x) : ∑ g, c g • ρ' g (f x) = f x := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← hx, LinearMap.sum_apply, map_sum]
+
+  conv_rhs => rw [← hx, LinearMap.sum_apply, map_sum]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [LinearMap.smul_apply, map_smul, hf g x]
 
@@ -116,8 +116,8 @@ theorem gaL_fix {V : HSp D} {β : GL (Fin V.rank) (Lev.EAf D)} {L : LevDat D.hos
   have e3 : (fun x => l (c.ext (M.e u) x)) = ∑ g, a g • fun x => l (c.ext (M.e (π g u)) x) := by
     conv_lhs => rw [← hu]
     funext x
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+
+    simp only [map_sum, map_smul, Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
   rw [e2]
   simp only [e1]
   exact e3.symm

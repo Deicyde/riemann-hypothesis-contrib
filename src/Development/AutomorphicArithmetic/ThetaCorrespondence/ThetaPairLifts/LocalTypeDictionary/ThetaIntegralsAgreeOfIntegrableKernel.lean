@@ -60,8 +60,8 @@ theorem thetaIntegral_eq_zero_of_finiteRelation (hP : _root_.GlobalTheory.FunPr.
     have e : ∑ i, c i • (g i : WO W₁ X → ℂ) = ∑ i, c i • (ωB (u i, 1) (Ψi i) - Ψi i) := by simp only [hg]
     rw [← e, hsum]
   have eW : wop ωB z Ψ = ∑ i, c i • (ωB (u' i, 1) (wop ωB z (Ψi i)) - wop ωB z (Ψi i)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [eΨ, map_sum]
+
+    rw [eΨ, map_sum]
     simp only [map_smul, map_sub, hcomm]
   have hJ : thetaInt ωB ν₁ 𝓕₁ (wop ωB z Ψ) = 0 := by
     have hi : ∀ i ∈ (Finset.univ : Finset (Fin n)),
@@ -117,7 +117,7 @@ open GlobalTheory.SqTop
 open GlobalTheory.ConstRatio (NegIdx Factor)
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.thetaIntegrals_agree_of_convergence : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching →
     ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D), IsStdChar D ψ (-1) → IsInfFam θ →
     ∀ (W W₁ X : HSp D) (A : GlobalTheory.ChainFr.Fr W) (A₁ : GlobalTheory.ChainFr.Fr W₁) (B : GlobalTheory.ChainFr.Fr X) (α β : (AE D)ˣ →* Circle),

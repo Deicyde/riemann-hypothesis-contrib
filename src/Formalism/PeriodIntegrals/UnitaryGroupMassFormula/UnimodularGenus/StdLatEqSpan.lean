@@ -16,8 +16,8 @@ theorem hStd_apply (E : Type) [Field E] [StarRing E] (n : ℕ) (x y : Sp E n) :
 
 theorem hStd_isSymm (E : Type) [Field E] [StarRing E] (n : ℕ) : (hStd E n).IsSymm := by
   refine LinearMap.isSymm_def.mpr fun x y => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hStd_apply, hStd_apply, map_sum]
+
+  rw [hStd_apply, hStd_apply, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [starRingEnd_apply, star_mul, star_star, mul_comm]
 

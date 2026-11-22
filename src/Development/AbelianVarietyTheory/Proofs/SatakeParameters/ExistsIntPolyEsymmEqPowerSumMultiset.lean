@@ -35,8 +35,8 @@ theorem exists_intPoly_psum_eq : ∀ a n : ℕ, 1 ≤ n → ∃ P : MvPolynomial
     funext i
     simp [aeval_esymm_eq_multiset_esymm, hsf]
   rw [lhs, ← key]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [psum, map_sum]
+
+  rw [psum, map_sum]
   simp only [map_pow, aeval_X]
   conv_rhs => rw [← hsf]
   simp [Multiset.map_map, Finset.sum_eq_multiset_sum]

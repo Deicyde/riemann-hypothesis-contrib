@@ -61,9 +61,9 @@ variable [IsCMField E]
 theorem eq_zero_of_sum_conj (v : Fin n → E) (h : ∑ j, IsCMField.complexConj E (v j) * v j = 0) : v = 0 := by
   obtain ⟨φ⟩ : Nonempty (E →+* ℂ) := inferInstance
   have h1 := congrArg φ h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, IsCMField.complexEmbedding_complexConj, map_zero,
-    Complex.conj_mul'] at h1
+
+  simp only [map_sum, map_mul, IsCMField.complexEmbedding_complexConj, map_zero,
+  Complex.conj_mul'] at h1
   have h2 : ∑ j, ‖φ (v j)‖ ^ 2 = 0 := by exact_mod_cast h1
   rw [Finset.sum_eq_zero_iff_of_nonneg fun _ _ => by positivity] at h2
   funext j
@@ -89,8 +89,8 @@ private theorem span_eq_top_of_unimod (Λ : GenLat E n) (h : Λ.Unimod) :
   let v : Fin n → E := fun j => IsCMField.complexConj E (f (Pi.single j 1))
   have hpair : ∀ w : Fin n → E, ∑ j, IsCMField.complexConj E (v j) * w j = f w := by
     intro w
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [pi_eq_sum_univ' w, map_sum]
+
+    conv_rhs => rw [pi_eq_sum_univ' w, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_smul, smul_eq_mul, mul_comm]
     simp only [v, IsCMField.complexConj_apply_apply]

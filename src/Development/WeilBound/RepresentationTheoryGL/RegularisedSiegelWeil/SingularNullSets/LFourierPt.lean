@@ -40,7 +40,7 @@ namespace PositivityTheory.Rg.Rsw.L
 
 open LFourierPt
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem fourierPt : FourierPt := by
   intro D n ψ hψ lam 𝓖 hC f hf hper hco
   obtain ⟨hlam, hFD, -⟩ := hC

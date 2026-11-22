@@ -29,8 +29,8 @@ theorem eigSp_ext :
   have hP'apply : ∀ w, P' w = ∑ m, i (σ (c m)) • ρ' (a m) w := fun w => by
     simp [P', LinearMap.sum_apply]
   have hscal : ∑ m, i (σ (c m)) * i (σ (a m)) = ((NumberField.discr F : ℤ) : Ω') := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_intCast (i.comp σ), ← hsum, map_sum]
+
+    rw [← map_intCast (i.comp σ), ← hsum, map_sum]
     simp [map_mul]
   have hP'eig : ∀ w ∈ eigSp ρ' (i.comp σ), P' w = ((NumberField.discr F : ℤ) : Ω') • w := by
     intro w hw
@@ -41,8 +41,8 @@ theorem eigSp_ext :
       _ = _ := by rw [← Finset.sum_smul, hscal]
   have hP'j : ∀ e, P' (j e) = j (∑ m, σ (c m) • ρ (a m) e) := by
     intro e
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hP'apply, map_sum]
+
+    rw [hP'apply, map_sum]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [hcomp, hj.1]
   have hPe : ∀ e, ∑ m, σ (c m) • ρ (a m) e ∈ eigSp ρ σ := fun e =>

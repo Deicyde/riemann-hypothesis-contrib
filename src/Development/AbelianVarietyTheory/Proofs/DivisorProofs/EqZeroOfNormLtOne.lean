@@ -89,8 +89,8 @@ omit [NumberField E] in
 theorem re_form (hφ : ∀ (φ : E →+* ℂ) (a : E), φ (star a) = starRingEnd ℂ (φ a)) {n : ℕ} (x : Fin n → E)
     (τ : E →+* ℂ) : (τ (Formalism.MainNotions.StandardLattice.stdForm E n x x)).re = ∑ i, Complex.normSq (τ (x i)) := by
   change (τ (∑ i, star (x i) * x i)).re = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Complex.re_sum]
+
+  rw [map_sum, Complex.re_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, hφ, ← Complex.normSq_eq_conj_mul_self, Complex.ofReal_re]
 
@@ -114,8 +114,8 @@ theorem isSymm_std (n : ℕ) : (Formalism.MainNotions.StandardLattice.stdForm E 
   constructor
   intro x y
   change starRingEnd _ (∑ i, star (x i) * y i) = ∑ i, star (y i) * x i
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [starRingEnd_apply, star_mul, star_star]
 

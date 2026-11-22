@@ -27,8 +27,8 @@ open Formalism.IndefR.FWT GlobalTheory.OntoChain GlobalTheory.RealIndexBound Glo
 open Formalism.L2.Theta GlobalTheory.ExportSeries GlobalTheory.ConjTwist
 open Formalism.L2.Host (embLL0)
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp

@@ -165,9 +165,9 @@ theorem renum_omE (l l' : Ln p q r s) (f : Pol p q r s) :
 theorem renum_omAct (Z : Mat (p * r + q * s) (p * s + q * r)) (f : Pol p q r s) :
     renum p q r s (omAct p q r s (Matrix.reindex (lineEquiv p q r s).symm (lineEquiv p q r s).symm Z) f) =
       oscAct _ _ Z (renum p q r s f) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [omAct_apply, oscAct_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, renum_omE,
-    Matrix.reindex_apply, Equiv.symm_symm, Matrix.submatrix_apply]
+
+  simp only [omAct_apply, oscAct_apply, LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul, renum_omE,
+  Matrix.reindex_apply, Equiv.symm_symm, Matrix.submatrix_apply]
   rw [← (lineEquiv p q r s).sum_comp]
   exact Finset.sum_congr rfl fun l _ => (lineEquiv p q r s).sum_comp
     fun b => Z (lineEquiv p q r s l) b • unitOp (lineEquiv p q r s l) b (renum p q r s f)

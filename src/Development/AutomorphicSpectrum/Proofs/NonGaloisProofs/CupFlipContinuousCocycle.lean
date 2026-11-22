@@ -30,8 +30,8 @@ theorem continuous_act (A : GRep G Qp LL O) : Continuous fun p : G × A.V => A.�
       fun p => ∑ i, (b.repr p.2 i) • A.ρ p.1 (b i) := by
     funext p
     have h := congrArg (A.ρ p.1) (b.sum_repr p.2)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h
+
+    rw [map_sum] at h
     simp only [map_smul] at h
     exact h.symm
   rw [e]

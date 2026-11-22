@@ -95,8 +95,8 @@ theorem actM_sE (E₁ : Fin n → Fin n → Module.End ℂ D₁) (E₂ : Fin n �
   have h : ∀ a b, X a b • sE E₁ E₂ a b = liftL (X a b • (E₁ a b, E₂ a b)) := by
     intro a b; rw [map_smul]; rfl
   unfold actM
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [h, ← map_sum]
+
+  simp only [h, ← map_sum]
   rw [liftL_apply]
   congr 1
   · simp [Prod.fst_sum]
@@ -107,8 +107,8 @@ theorem casimir_sE (E₁ : Fin n → Fin n → Module.End ℂ D₁) (E₂ : Fin 
   have h : ∀ a b, sE E₁ E₂ a b * sE E₁ E₂ b a = liftL (E₁ a b * E₁ b a, E₂ a b * E₂ b a) := by
     intro a b; rw [liftL_apply]; exact (lift_mul _ _ _ _).symm
   unfold casimir
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [h, ← map_sum]
+
+  simp only [h, ← map_sum]
   rw [liftL_apply]
   congr 1
   · simp [Prod.fst_sum]

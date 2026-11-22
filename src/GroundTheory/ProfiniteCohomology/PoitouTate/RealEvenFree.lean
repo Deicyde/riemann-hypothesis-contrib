@@ -143,7 +143,7 @@ variable [Fintype S] {N : ℕ} [NeZero N]
   (hS : ∀ v : HeightOneSpectrum (𝓞 K.1), ((N : ℕ) : 𝓞 K.1) ∈ v.asIdeal → v ∈ S) (hev : Even N)
 
 
-set_option maxHeartbeats 1000000 in
+
 include hS in
 theorem surjective_of_localToCompact_two [hne : Nonempty S]
     (t : tateCompactCohomologyRes (gsFinFamily S ιs) (gsRealFamily S ιr) (gsRoots S N) 3 →+ ZMod N)

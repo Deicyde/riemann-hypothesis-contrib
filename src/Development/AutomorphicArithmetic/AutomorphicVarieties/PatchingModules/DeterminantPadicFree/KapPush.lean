@@ -33,9 +33,9 @@ theorem UpperTheory.V.Pa.Det.kapPush :
       convert cB i _ hcB using 1
       funext g
       ext r s : 1
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Finset.sum_apply, Pi.smul_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply,
-        smul_eq_mul, map_sum]
+
+      simp only [Finset.sum_apply, Pi.smul_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply,
+      smul_eq_mul, map_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [mul_comm (c a), hp, mul_comm]
     funext a
@@ -69,10 +69,10 @@ theorem UpperTheory.V.Pa.Det.kapPush :
     convert hm using 1
     funext g
     ext r t : 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_apply, Pi.smul_apply, Pi.sub_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply,
-      Matrix.sub_apply, smul_eq_mul, map_sum, map_sub, mul_sub, Finset.sum_sub_distrib, key, Finset.sum_mul,
-      Finset.mul_sum]
+
+    simp only [Finset.sum_apply, Pi.smul_apply, Pi.sub_apply, Matrix.map_apply, Matrix.sum_apply, Matrix.smul_apply,
+    Matrix.sub_apply, smul_eq_mul, map_sum, map_sub, mul_sub, Finset.sum_sub_distrib, key, Finset.sum_mul,
+    Finset.mul_sum]
     congr 1
     rw [Finset.sum_comm]
     simp only [map_mul, mul_assoc]

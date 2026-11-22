@@ -64,14 +64,14 @@ theorem GlobalTheory.BKGal.JumpDR.BasisGlue.exists_basis {R W : Type} [CommRing 
     constructor
     · rintro ⟨d, hd⟩
       refine ⟨d, hinj (β₀ + β) ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hd, map_sum]
+
+      rw [hd, map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hcomm, hf i]
     · rintro ⟨d, rfl⟩
       refine ⟨d, ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [hcomm, hf i]
   refine ⟨fun i => ginv^[β] (g i), h1, h2, ?_⟩

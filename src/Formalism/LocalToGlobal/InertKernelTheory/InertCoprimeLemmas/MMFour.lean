@@ -79,8 +79,8 @@ theorem atLogVA_hasSubst {r NN NN' : ℕ} (v : Fin r → (D.what₂.Tau × Fin N
     MvPowerSeries.HasSubst (atLogVA lam Λ C wq v) := by
   apply MvPowerSeries.hasSubst_of_constantCoeff_zero
   intro k
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [atLogVA, map_sum, map_mul]
+
+  simp only [atLogVA, map_sum, map_mul]
   refine Finset.sum_eq_zero fun i _ => ?_
   rw [cc_psubst' (MvPowerSeries.constantCoeff_X i) (cc_flog _ wq), mul_zero]
 
@@ -101,8 +101,8 @@ theorem atLogVA_blk {r : ℕ} (v : Fin r → (D.what₂.Tau × Fin m' × Fin m �
     atLogVA lam Λ C wq v₄ (blkIdx D eR eC I J k) =
       MvPowerSeries.rename (idxK r I J) (atLogVA lam Λ C wq v k) := by
   classical
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [atLogVA, map_sum, map_mul, AlgHom.commutes]
+
+  simp only [atLogVA, map_sum, map_mul, AlgHom.commutes]
   rw [sum_eIdx, Finset.sum_eq_single (I, J)]
   · refine Finset.sum_congr rfl fun k' _ => ?_
     rw [rename_psubst _ (MvPowerSeries.constantCoeff_X k'), MvPowerSeries.rename_X, hv₄, if_pos rfl]

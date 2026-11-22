@@ -77,7 +77,7 @@ private theorem locTri_adelicR (a : ℕ) (w : HeightOneSpectrum (𝓞 F)) (u : G
     rw [hoff i j (ne_of_gt h), hlow i j h, map_zero, map_zero]
   · intro j
     exact cornerGL_apply_diag_loctri _ _ (cornerGL_apply_diag_loctri _ _ (hdiag j))
-  set_option synthInstance.maxHeartbeats 100000 in
+
   · rw [map_sum, map_sum]
     refine Finset.sum_congr rfl fun p hp => ?_
     have hp' : (p.2 : ℕ) = p.1 + 1 := (Finset.mem_filter.mp hp).2

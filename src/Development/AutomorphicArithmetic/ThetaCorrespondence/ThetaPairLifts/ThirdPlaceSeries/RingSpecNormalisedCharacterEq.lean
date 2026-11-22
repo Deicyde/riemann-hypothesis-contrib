@@ -10,14 +10,14 @@ public import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.CGTr
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
 namespace GlobalTheory.HeightCounting
 section
 open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.N NumberField IsDedekindDomain Formalism.L2 Formalism.L2.NT
-set_option synthInstance.maxHeartbeats 400000 in
+
 structure NAllCAlt (D : D7) (C : NChoice D) where
   gal : _root_.Formalism.L2.NGalTiedAlt D
   n : _root_.GlobalTheory.HeightCounting.NTiedGPlaceholder D

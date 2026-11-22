@@ -58,9 +58,9 @@ theorem cT_diagonal (σ : A →+* A) (u : Fin n → A) :
 theorem comp_mulVec (σ : A →+* A) (M : Matrix (Fin n) (Fin n) A) (x : Fin n → A) :
     (fun i => σ ((M *ᵥ x) i)) = (fun i => σ (x i)) ᵥ* Formalism.UG.cT σ M := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, Matrix.vecMul, dotProduct, map_sum, map_mul, Formalism.UG.cT, Matrix.transpose_apply,
-    Matrix.map_apply, mul_comm]
+
+  simp only [Matrix.mulVec, Matrix.vecMul, dotProduct, map_sum, map_mul, Formalism.UG.cT, Matrix.transpose_apply,
+  Matrix.map_apply, mul_comm]
 
 theorem smul_congr_left {ε : A} {M N : Matrix (Fin n) (Fin n) A} (X : Matrix (Fin n) (Fin n) A)
     (h : ε • M = ε • N) : ε • (X * M) = ε • (X * N) := by
@@ -142,7 +142,7 @@ section Dual
 variable {A : Type} [CommRing A] {n : ℕ}
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem dv_conj (σ : A →+* A) (hσ : ∀ x, σ (σ x) = x) {J Ji : Matrix (Fin n) (Fin n) A} (hJ : J * Ji = 1)
     (hJh : Formalism.UG.cT σ J = J) {I : AddSubgroup A} (hI : ∀ x ∈ I, ∀ y ∈ I, x * y ∈ I)
     (hIσ : ∀ x ∈ I, σ x ∈ I) (hI1 : (1 : A) ∈ I) {Λ : (Fin n → A) → Prop}

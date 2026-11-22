@@ -63,7 +63,7 @@ namespace PositivityTheory.Rg.Sw.Glob
 
 attribute [local irreducible] famC
 
-set_option maxHeartbeats 1000000 in
+
 open DilAH DilCH DilEH DilH in
 theorem gIdil_of' (hWTC : GlobalTheory.Published.WeilThetaConvergence) (hDecA : DecompAway) (hAway : AwayAct) (hLF : LocFact)
     (hGL : GaussLaw) (hAI : AwayIn) (hLL2 : LocalL2Isometry) (hSF : SchFP) (hLNe : LNe) (hDC : DCalc) : GIdil := by

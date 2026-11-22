@@ -16,7 +16,7 @@ open PositivityTheory.PfBern.Frob (FrobeniusReciprocity IsUnimod eqv eqvF transl
 
 variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
 
-set_option maxHeartbeats 1000000 in
+
 theorem sliceVan_of_frob' [CharZero k] (hFr : FrobeniusReciprocity) (hU : Unimod (k := k)) : SliceVan (k := k) := by
   intro n Z hZ s hs hss hV F P hFc hFB hFinv hP ξ hsupp hinv f hf
   have hCR : CR (adj Z s) := CRAdj.cr_adj Z hZ s hs hss

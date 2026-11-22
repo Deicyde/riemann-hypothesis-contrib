@@ -107,8 +107,8 @@ theorem exists_char_form {G V : Type} [AddCommGroup G] [AddCommGroup V] [Module 
   have hmem : ρ u f - χ u • f ∈ S := by
     refine ⟨∑ i ∈ Finset.range (N * N₀), x u ^ i * algebraMap ℂ A (χ u) ^ (N * N₀ - 1 - i), ?_, ?_⟩
     · have h1 : c (x u) = χ u := rfl
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul, map_pow, AlgHom.commutes, h1, Algebra.algebraMap_self, RingHom.id_apply]
+
+      simp only [map_sum, map_mul, map_pow, AlgHom.commutes, h1, Algebra.algebraMap_self, RingHom.id_apply]
       rw [geom_sum₂_self]
       exact mul_ne_zero (Nat.cast_ne_zero.2 hM.ne') (pow_ne_zero _ hz0)
     · have h2 : ρ u f - χ u • f = π (x u - algebraMap ℂ A (χ u)) f := by
@@ -278,7 +278,7 @@ theorem exists_hO_eq (S T : HSp D) (i : Fin T.rank) (j : Fin S.rank) (e : D.host
 end Heis
 
 
-set_option maxHeartbeats 1000000 in
+
 open GlobalTheory.IdemModTwo in
 theorem eq_zero_of_invariant_forms : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1) → ∀ (S T : HSp D) (e : AE D), IsSplitIdem D e → ∀ g, IsThetaFunO ψ S T g → (∀ ℓ : (WO S T → ℂ) →ₗ[ℂ] ℂ, (∀ u, IsHalf (cA D e) u → ∀ f, IsThetaFunO ψ S T f → ℓ (heisO ψ S T u f) = ℓ f) → ∀ t, IsHalf e t → ℓ (heisO ψ S T t g) = 0) → g = 0 := by
   intro D ψ hψ S T e hε g hg H
@@ -348,8 +348,8 @@ theorem eq_zero_of_invariant_forms : ∀ (D : D7) (ψ : AddChar (AF D.host.F) �
         mul_inv_cancel₀ (GlobalTheory.DualPairCompare.embedding_xi_zero_ne_zero D), map_one, one_mul, map_mul (cA D), cA_fj]
       exact GlobalTheory.SplitAnnihilator.trace_split he' _ _
     have h2 : symplO S T (J y) t = ∑ p, ι (a p * y p) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Finset.sum_congr rfl fun p _ => h1 p, ← map_sum]
+
+      rw [← Finset.sum_congr rfl fun p _ => h1 p, ← map_sum]
       rfl
     conv_lhs => rw [← Finset.univ_sum_single y]
     rw [h2]

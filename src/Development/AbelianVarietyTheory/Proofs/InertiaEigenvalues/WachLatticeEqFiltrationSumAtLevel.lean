@@ -156,8 +156,8 @@ theorem Rep.conv (anti : Antitone Fil) (exh : ∀ b, ∃ a, b ∈ Fil a)
         ι (PowerSeries.coeff k e) * (t ^ k * (t ^ r * p (f ((r : ℤ) - a)))) := by
     rw [← Finset.sum_range_diag_flip]
     refine Finset.sum_congr rfl fun q _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [conv_eq_sum e f a hf, map_sum, Finset.mul_sum]
+
+    rw [conv_eq_sum e f a hf, map_sum, Finset.mul_sum]
     refine Finset.sum_congr rfl fun j hj => ?_
     have : j ≤ q := Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)
     rw [hp, ← mul_assoc (t ^ j), ← pow_add, Nat.add_sub_cancel' this]
@@ -382,8 +382,8 @@ theorem sum_tmul_mem_filV (a : ℤ) (y : Fin n → BdR) (hy : ∀ α, y α ∈ P
 
 theorem crd_sum_tmul (y : Fin n → BdR) (α : Fin n) :
     crd T ι (bV.coord α) (∑ β, bV β ⊗ₜ[Qp] y β) = y α := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single α]
+
+  rw [map_sum, Finset.sum_eq_single α]
   · simp [crd_tmul]
   · intro β _ hβ
     simp [crd_tmul, hβ]
@@ -425,7 +425,7 @@ theorem finrank_le [IsFractionRing O LL] [Nontrivial O] :
 end Coord
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem lat_eq_fil : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : FonOf D.loc D.locA HW) (Cm : CmpOf D.loc D.locA HW F) (l : ℕ) [Fact l.Prime] (K : FinExt l) (s : ℕ) (LL : FinExt l) (h : Good K s LL), let _W := (HW l).W K s LL h; let _E := ((F l).E K s LL h).tie; let C := Cm l; ∀ T : Lt K LL, IsCrys ((D.loc l).PD K) T.ρ → ∀ (i : Let K) (ζ : ↥LL.1) τ, Pt (HW l) h i ζ τ → ∀ f : ℤ → T.V ⊗[ℚ_[l]] (D.loc l).R.B, f ∈ Lat C h T i ζ ↔ (∃ m : ℤ, ∀ k < m, f k = 0) ∧ ∀ k : ℤ, f k ∈ Di (HW l) h T i ∧ ιV ((D.loc l).PD K) (LL := ↥LL.1) (V := T.V) (f k) ∈ FilAt ((D.loc l).PD K) T τ (-k) := by
   intro D HW F Cm l _ K s LL h W E C T hT i ζ τ hpt f
   obtain ⟨hprim, hτ, ι, hcomp⟩ := (@GlobalTheory.NL.Points.points D HW l _ K s LL h).2.1 i ζ τ hpt
@@ -471,14 +471,14 @@ theorem lat_eq_fil : ∀ (D : Formalism.BasicNotions.D7) (HW : HWOf D.loc) (F : 
     · obtain ⟨m, b, x, hb, hx⟩ := hΨs _ (sum_tmul_mem_filV _ T bV 0 z hz)
       refine ⟨m, b, x, hb, fun α => ?_⟩
       have := crd_compKer T ι (bV.coord α) hx
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, crd_sum_tmul, map_sum, sub_eq_zero] at this
+
+      rw [map_sub, crd_sum_tmul, map_sum, sub_eq_zero] at this
       simpa only [crd_mulVR] using this
     · obtain ⟨c, hc⟩ := hΨr x a ha
       refine ⟨c, fun M => ?_⟩
       have := crd_sup _ T ι hι (bV.coord α) _ (hc M)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sub, map_sum] at this
+
+      rw [map_sub, map_sum] at this
       simp only [crd_mulVR] at this
       exact this
     · by_cases hr : r = k

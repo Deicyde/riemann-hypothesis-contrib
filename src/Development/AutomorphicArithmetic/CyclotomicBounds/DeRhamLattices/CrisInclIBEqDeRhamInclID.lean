@@ -12,8 +12,8 @@ open Formalism Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.Weakl
 open scoped Formalism.Per
 open GlobalTheory.BKGal.HatVal
 open scoped GlobalTheory.BKGal.HatVal
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 theorem _root_.UpperTheory.KN.crisIncl_iB_eq_deRhamIncl_iD :
     ∀ (l : ℕ) [Fact l.Prime] (a e : ℕ) [NeZero a] [NeZero e] (O K : Type) [CommRing O] [Algebra ℤ_[l] O] [Module.Free ℤ_[l] O] [Module.Finite ℤ_[l] O] [NormedField K] [IsUltrametricDist K] [Algebra O K] [IsUnitBall O K] [NormedAlgebra ℚ_[l] K] [TameDescentExponentData K l e a] [CompleteSpace K] (t : Wq l a →ₐ[ℤ_[l]] O) (ϖ : PiSys l e) (C : GlobalTheory.MemLoc.Core l) (f : ZMod a → invL l (S O K e)),
@@ -24,8 +24,8 @@ theorem _root_.UpperTheory.KN.crisIncl_iB_eq_deRhamIncl_iD :
     refine GlobalTheory.BKReal.TwoMaps.iSD_eq_iHat_of_hat l a e O K t ϖ (f τ) _ ?_
     rw [GlobalTheory.GalStep.hatR_of_mem (O := O) hm]
     exact hat_coe_Rpi l e ⟨_, hm⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [PiSys.iB, PiSys.iD, glue_apply, glue_apply, map_sum, map_sum]
+
+  rw [PiSys.iB, PiSys.iD, glue_apply, glue_apply, map_sum, map_sum]
   refine Finset.sum_congr rfl fun τ _ => ?_
   have hI : iotaO O C (idem (constB t) τ) = dRO l O (idem (constD t) τ) :=
     iotaO_toB C (constA t (Pi.single τ 1))

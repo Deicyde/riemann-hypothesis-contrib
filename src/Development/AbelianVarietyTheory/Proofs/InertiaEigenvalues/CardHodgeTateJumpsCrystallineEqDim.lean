@@ -17,7 +17,7 @@ public import Formalism.SharpRestriction.LevelLetterCocycles.QuotientImageDivisi
 @[expose] public section
 
 open GlobalTheory.AdmLoc GlobalTheory.TopSteps Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions
-set_option synthInstance.maxHeartbeats 400000
+
 open ReciprocityTheory.Def (Z1 B1 H1)
 open TensorProduct
 

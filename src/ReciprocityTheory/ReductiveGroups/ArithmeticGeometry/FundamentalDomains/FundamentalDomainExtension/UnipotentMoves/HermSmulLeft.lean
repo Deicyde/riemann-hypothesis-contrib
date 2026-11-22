@@ -69,8 +69,8 @@ theorem sExt : SExt E := by
   have hdE : algebraMap (𝓞 E) E (d : 𝓞 E) ≠ 0 :=
     IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors d.2
   have hFμ : F μ = ∑ i, c i * f (g i) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hsum, map_sum]
+
+    rw [← hsum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_smul, hFs _ (g i).2, smul_eq_mul]
   have hdμ : algebraMap (𝓞 E) E (d : 𝓞 E) • μ = ∑ i, algebraMap (𝓞 E) E (a i) • (g i : Fin r → E) := by
@@ -87,8 +87,8 @@ theorem sExt : SExt E := by
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [algebra_compatible_smul E (a i)]
     have h2 := congrArg fL h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum] at h2
+
+    rw [map_sum] at h2
     change f _ = _ at h2
     rw [h2]
     refine Finset.sum_congr rfl fun i _ => ?_

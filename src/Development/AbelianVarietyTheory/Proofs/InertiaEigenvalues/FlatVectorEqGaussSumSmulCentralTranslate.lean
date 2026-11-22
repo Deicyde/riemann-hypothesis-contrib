@@ -27,8 +27,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ConjTwist GlobalTheory.GalTw ReciprocityTheory.ChartRestriction.G.Geo.Tor
 open Classical
 
-set_option maxHeartbeats 4000000
-set_option synthInstance.maxHeartbeats 400000
+
+
 
 namespace GlobalTheory.FlatForm
 
@@ -187,8 +187,8 @@ theorem om_model_eq_dilate : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 
     congr 1
     funext _
     have hs : incA D (star (ϖ : D.host.E)) = cA D (incA D (ϖ : D.host.E)) := rfl
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_add_distrib, ← Finset.sum_mul, ← Finset.sum_mul, ← map_sum, ← hsum, hs]
+
+    rw [Finset.sum_add_distrib, ← Finset.sum_mul, ← Finset.sum_mul, ← map_sum, ← hsum, hs]
     ring
   have hK := GlobalTheory.OnCmp.kerDat_tuple (i := i) hC.lev hC.thP t
   have heQ' : IsIdemSum eQ (R.Q t) := by rw [hQt]; exact heQ

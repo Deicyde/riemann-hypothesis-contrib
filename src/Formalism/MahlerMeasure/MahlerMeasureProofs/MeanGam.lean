@@ -24,8 +24,8 @@ lemma binMatK_map (F L : Type) [Field F] [Field L] (φ : F →+* L) {n : ℕ} (d
     (c : Fin n → Fin n → ℕ → F) :
     binMatK L del (fun i j k => φ (c i j k)) = (binMatK F del c).map (Polynomial.map φ) := by
   funext i j
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [binMatK, Matrix.map_apply, Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_C, binK_map]
+
+  simp only [binMatK, Matrix.map_apply, Polynomial.map_sum, Polynomial.map_mul, Polynomial.map_C, binK_map]
 
 lemma binMatK_eval_nat (F : Type) [Field F] [CharZero F] {n : ℕ} (del : ℕ)
     (c : Fin n → Fin n → ℕ → F) (i j : Fin n) (t : ℕ) :

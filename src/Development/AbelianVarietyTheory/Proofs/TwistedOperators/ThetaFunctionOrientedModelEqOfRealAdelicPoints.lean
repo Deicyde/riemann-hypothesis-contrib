@@ -34,7 +34,7 @@ theorem pairA_alg (u v : D.host.F) :
       0 * (algebraMap D.host.F (AF D.host.F) (u - v)).2
     rw [h2, zero_mul, add_zero]
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem alg_smul_tmul (p : AF D.host.F) (w : D.host.F) (e : D.host.E) :
     (p * algebraMap D.host.F (AF D.host.F) w) • ((1 : AF D.host.F) ⊗ₜ[D.host.F] e : AE D) = p ⊗ₜ[D.host.F] (w • e) := by
   rw [TensorProduct.smul_tmul', smul_eq_mul, mul_one, mul_comm, ← Algebra.smul_def, TensorProduct.smul_tmul]
@@ -60,9 +60,9 @@ theorem denseRange_rat_add_real : DenseRange (fun p : D.host.E × D.host.E =>
   simp only [Function.comp_apply, Pi.map_apply, Φ, Bt, Algebra.TensorProduct.basis_apply, pairA_alg, add_smul,
     Finset.sum_add_distrib, alg_smul_tmul, alg_smul_tmul_one]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    · simp only [incA, inclR, map_sum]
-      exact Finset.sum_congr rfl fun k _ => rfl
+
+  · simp only [incA, inclR, map_sum]
+    exact Finset.sum_congr rfl fun k _ => rfl
   · rw [TensorProduct.tmul_sum]
 
 end GlobalTheory.ThetaUniqReal

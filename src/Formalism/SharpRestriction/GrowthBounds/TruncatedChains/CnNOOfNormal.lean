@@ -79,7 +79,7 @@ theorem cn_posR_braid (l1 l2 : List (Fin n × Fin n)) (x1 x2 y1 y2 z1 z2 : Fin n
   · exact Or.inr (Or.inr (Or.inr ⟨fun hh => e1 (hu _ _ hh), fun hh => e2 (hu _ _ hh),
       fun hh => e3 (hu _ _ hh), h3, h4⟩))
 
-set_option maxHeartbeats 1600000 in
+
 theorem cn_ar_swap {p P Q R P' Q' R' x y z a b c d : ℕ} (hxy : x < y) (hyz : y < z) (h1 : a ≠ c) (h2 : a ≠ d)
     (h3 : b ≠ c) (h4 : b ≠ d) (o : (P < Q ∧ Q < R) ∨ (R < Q ∧ Q < P))
     (p1 : (x = a ∧ y = b ∧ P = p ∧ P' = p + 1) ∨ (x = c ∧ y = d ∧ P = p + 1 ∧ P' = p) ∨
@@ -92,7 +92,7 @@ theorem cn_ar_swap {p P Q R P' Q' R' x y z a b c d : ℕ} (hxy : x < y) (hyz : y
   rcases p1 with h1' | h1' | h1' <;> rcases p2 with h2' | h2' | h2' <;>
     rcases p3 with h3' | h3' | h3' <;> rcases o with o | o <;> omega
 
-set_option maxHeartbeats 3200000 in
+
 theorem cn_ar_braid' {p P Q R P' Q' R' x y z a b c : ℕ} (hxy : x < y) (hyz : y < z) (hab : a < b) (hbc : b < c)
     (o : (P < Q ∧ Q < R) ∨ (R < Q ∧ Q < P))
     (p1 : (x = b ∧ y = c ∧ P = p ∧ P' = p + 2) ∨ (x = a ∧ y = c ∧ P = p + 1 ∧ P' = p + 1) ∨

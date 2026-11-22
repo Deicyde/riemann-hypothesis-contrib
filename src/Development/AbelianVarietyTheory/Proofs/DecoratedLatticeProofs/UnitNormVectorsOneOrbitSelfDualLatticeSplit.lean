@@ -29,8 +29,8 @@ theorem hermAt_mulVec (S : HSp D) {k : ℕ} (a : Mx D S.rank k) (x : Fin S.rank 
     hermAt S x (a *ᵥ y) = (fun i => cA D (y i)) ⬝ᵥ ((adj a ⬝ gA S) *ᵥ x) := by
   have h : (fun i => cA D ((a *ᵥ y) i)) = (fun i => cA D (y i)) ᵥ* adj a := by
     funext i
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, Matrix.vecMul, dotProduct, map_sum, map_mul]
+
+    simp only [Matrix.mulVec, Matrix.vecMul, dotProduct, map_sum, map_mul]
     exact Finset.sum_congr rfl fun j _ => mul_comm _ _
   rw [hermAt_eq, h, ← Matrix.mulVec_mulVec, Matrix.dotProduct_mulVec _ (adj a)]
 

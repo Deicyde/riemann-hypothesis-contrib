@@ -18,7 +18,7 @@ open GlobalTheory.PRep GlobalTheory.SplitWeil GlobalTheory.SmGL GlobalTheory.Loc
 
 namespace GlobalTheory.CompanionTheory.CellBij
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 open scoped TensorProduct
 

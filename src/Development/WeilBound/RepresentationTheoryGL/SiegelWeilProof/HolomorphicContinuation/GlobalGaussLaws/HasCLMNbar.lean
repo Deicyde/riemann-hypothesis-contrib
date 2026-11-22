@@ -96,8 +96,8 @@ theorem hasCLM_n (hU : UnipTau) (hC : Cx D n V ψ χ θ μ ω H l s ν τ ε fr 
 
   have gramX_herm (ε : Fin V.rank → Bool) (u : (Fin V.rank → Fin n → ℂ)) : (gramX ε u)ᴴ = gramX ε u := by
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
+
+    simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
 
   have trace_real (ε : Fin V.rank → Bool) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) (u : (Fin V.rank → Fin n → ℂ)) :
       (((b * gramX ε u).trace.re : ℝ) : ℂ) = (b * gramX ε u).trace := by
@@ -110,8 +110,8 @@ theorem hasCLM_n (hU : UnipTau) (hC : Cx D n V ψ χ θ μ ω H l s ν τ ε fr 
     have hP : (fun u : (Fin V.rank → Fin n → ℂ) => (b * gramX ε u).trace) =
         fun u => evX (∑ i, ∑ j, MvPolynomial.C (b i j) * Qp ε j i) u := by
       funext u
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
+
+      simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
     have hT : (fun u : (Fin V.rank → Fin n → ℂ) => (b * gramX ε u).trace).HasTemperateGrowth := by
       rw [hP]
       exact hasTemperateGrowth_evX _
@@ -231,8 +231,8 @@ theorem hasCLM_nbar (hU : UnipTau) (hW : WEx) (hS : SchOps) (hF : FTfact) (hl0 :
 
   have gramX_herm (ε : Fin V.rank → Bool) (u : (Fin V.rank → Fin n → ℂ)) : (gramX ε u)ᴴ = gramX ε u := by
     ext i j
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
+
+    simp [Matrix.conjTranspose_apply, gramX, Qp, Qb, evX, map_sum, mul_comm]
 
   have trace_real (ε : Fin V.rank → Bool) (b : Matrix (Fin n) (Fin n) ℂ) (hb : bᴴ = b) (u : (Fin V.rank → Fin n → ℂ)) :
       (((b * gramX ε u).trace.re : ℝ) : ℂ) = (b * gramX ε u).trace := by
@@ -245,8 +245,8 @@ theorem hasCLM_nbar (hU : UnipTau) (hW : WEx) (hS : SchOps) (hF : FTfact) (hl0 :
     have hP : (fun u : (Fin V.rank → Fin n → ℂ) => (b * gramX ε u).trace) =
         fun u => evX (∑ i, ∑ j, MvPolynomial.C (b i j) * Qp ε j i) u := by
       funext u
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
+
+      simp [evX, gramX, Matrix.trace, Matrix.mul_apply, map_sum]
     have hT : (fun u : (Fin V.rank → Fin n → ℂ) => (b * gramX ε u).trace).HasTemperateGrowth := by
       rw [hP]
       exact hasTemperateGrowth_evX _

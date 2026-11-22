@@ -22,8 +22,8 @@ variable {C : Type} [Field C] {v : AddValuation C (WithTop ℝ)}
 
 theorem subst_sum_smul {σ τ ι : Type} [Fintype ι] {a : σ → MvPowerSeries τ C} (ha : HasSubst a) (m : ι → C)
     (f : ι → MvPowerSeries σ C) : subst a (∑ i, m i • f i) = ∑ i, m i • (subst a (f i) : MvPowerSeries τ C) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← substAlgHom_apply ha, map_sum]
+
+  rw [← substAlgHom_apply ha, map_sum]
   simp only [map_smul, substAlgHom_apply]
 
 theorem isIntHom_comp {d d' d'' : ℕ} {G : LogFGL v d} {G' : LogFGL v d'} {G'' : LogFGL v d''}

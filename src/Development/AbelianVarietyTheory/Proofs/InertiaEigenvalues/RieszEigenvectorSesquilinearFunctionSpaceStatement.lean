@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.DecoratedLatticeProofs.Her
 
 @[expose] public section
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.riesz_eigenvector_sesquilinear_function_space : ∀ (X : Type) (C : Submodule ℂ (X → ℂ)), FiniteDimensional ℂ C →
     ∀ (ip Φ : (X → ℂ) → (X → ℂ) → ℂ),
     (∀ (a : ℂ) (f f' g : X → ℂ), f ∈ C → f' ∈ C → g ∈ C → ip (a • f + f') g = star a * ip f g + ip f' g) →

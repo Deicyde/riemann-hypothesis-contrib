@@ -28,12 +28,12 @@ theorem ker_map {σ τ : Type} (k : Type) [Field k] [Algebra ℚ k] (g : σ → 
     let F : _ → MvPolynomial σ ℚ := fun i => ∑ m ∈ f.support, monomial m (b.repr (AddMonoidAlgebra.coeff f m) i)
     have hf' : f = ∑ i ∈ T, C (b i) * map (algebraMap ℚ k) (F i) := by
       conv_lhs => rw [f.as_sum]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [F, map_sum, Finset.mul_sum, map_monomial, C_mul_monomial]
+
+      simp only [F, map_sum, Finset.mul_sum, map_monomial, C_mul_monomial]
       rw [Finset.sum_comm]
       refine Finset.sum_congr rfl fun m hm => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum (monomial m)]
+
+      rw [← map_sum (monomial m)]
       congr 1
       conv_lhs => rw [← b.linearCombination_repr (AddMonoidAlgebra.coeff f m), Finsupp.linearCombination_apply,
         Finsupp.sum_of_support_subset _ (Finset.subset_biUnion_of_mem (fun m => (b.repr (AddMonoidAlgebra.coeff f m)).support) hm)
@@ -41,8 +41,8 @@ theorem ker_map {σ τ : Type} (k : Type) [Field k] [Algebra ℚ k] (g : σ → 
       exact Finset.sum_congr rfl fun i _ => by rw [Algebra.smul_def, mul_comm]
     have h0 : ∑ i ∈ T, C (b i) * map (algebraMap ℚ k) (aeval g (F i)) = 0 := by
       rw [RingHom.mem_ker, hf'] at hf
-      set_option synthInstance.maxHeartbeats 100000 in
-        simpa only [map_sum, map_mul, hc, aeval_C, algebraMap_eq] using hf
+
+      simpa only [map_sum, map_mul, hc, aeval_C, algebraMap_eq] using hf
     have h1 : ∀ i ∈ T, aeval g (F i) = 0 := fun i hi => by
       ext m
       have := congrArg (AddMonoidAlgebra.coeff · m) h0

@@ -6,7 +6,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 noncomputable section
@@ -43,8 +43,8 @@ theorem mem_latW_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) {W :
       have hz'' : form σ W.J x y = 0 := by
         simpa only [form, y, sigma_sigma hB.cm] using hz'
       have hs : σ (form σ W.J y x) = (-1 : E) * form σ W.J x y := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, hσ, hW.skew, Finset.mul_sum]
+
+        simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, hσ, hW.skew, Finset.mul_sum]
         rw [Finset.sum_comm]
         exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
       rw [hz'', mul_zero] at hs
@@ -84,8 +84,8 @@ theorem mem_latW_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) {W :
       simp only [trF_incV, ← hu]
       ext j
       conv_lhs => rw [hid x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [incV, Finset.sum_apply, Pi.smul_apply, map_sum, algebraMap_smul]
+
+      simp only [incV, Finset.sum_apply, Pi.smul_apply, map_sum, algebraMap_smul]
       exact Finset.sum_congr rfl fun i _ =>
         map_smul (Algebra.TensorProduct.includeRight : E →ₐ[F] AF F ⊗[F] E) _ _
     | zero => simp
@@ -140,8 +140,8 @@ theorem mem_latAtV_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) {X
       have hz'' : form σ X.J x y = 0 := by
         simpa only [form, y, sigma_sigma hB.cm] using hz'
       have hs : σ (form σ X.J y x) = (1 : E) * form σ X.J x y := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, hσ, hX.herm, Finset.mul_sum]
+
+        simp only [form, dotProduct, Matrix.mulVec, map_sum, map_mul, hσ, hX.herm, Finset.mul_sum]
         rw [Finset.sum_comm]
         exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
       rw [hz'', mul_zero] at hs
@@ -167,8 +167,8 @@ theorem mem_latAtV_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) {X
   have huL : ∀ i, u i ∈ X.L := fun i => (hX.dual _).2 fun x hx => by
     obtain ⟨c, hc⟩ := hf i x hx
     have e : form σ X.J (u i) x = σ (f i x) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [form_eq, hu, LinearMap.pi_apply_eq_sum_univ (f i) x, map_sum]
+
+      rw [form_eq, hu, LinearMap.pi_apply_eq_sum_univ (f i) x, map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [smul_eq_mul, map_mul, mul_comm]
       have : (fun j => if k = j then (1 : E) else 0) = Pi.single k 1 := funext fun j => by
@@ -181,8 +181,8 @@ theorem mem_latAtV_k {B : Base F E} (hB : _root_.UpperTheory.TP.W.GoodK σ B) {X
     have e : ∀ k, ∑ i, incV (F := F) (g i) p * incV (a i) k = (1 : Matrix (Fin n) (Fin n) (AE F E)) p k := fun k => by
       have := congrFun (hid (Pi.single k 1)) p
       simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at this
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [incV, ← map_mul, ← map_sum, mul_comm (g _ p), a, ← this, Pi.single_apply, Matrix.one_apply]
+
+      simp only [incV, ← map_mul, ← map_sum, mul_comm (g _ p), a, ← this, Pi.single_apply, Matrix.one_apply]
       split_ifs <;> simp
     simp only [Matrix.sum_apply, Matrix.vecMulVec_apply, Matrix.vecMul, dotProduct, Finset.mul_sum, ← mul_assoc]
     rw [Finset.sum_comm]

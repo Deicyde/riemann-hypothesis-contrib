@@ -235,8 +235,8 @@ theorem exists_forms_sub_sum_mem {I : Ideal (MvPolynomial σ R)}
     exact (decomposition.decompose'_apply _ _).symm.trans
       (this.trans (congrArg _ (decomposition.decompose'_apply _ _)))
   have h2 := congrArg (homogeneousComponent d) hab
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_add (f := _), map_sum, homogeneousComponent_eq_self hp] at h2
+
+  rw [map_add (f := _), map_sum, homogeneousComponent_eq_self hp] at h2
   simp only [h1] at h2
   rw [← h2, add_sub_cancel_right]
   exact homogeneousComponent_mem_of_mem hI ha d
@@ -278,8 +278,8 @@ theorem finite_aeval_of_forms_eq_sum [Finite σ] (π : MvPolynomial σ R →ₐ[
   rw [Finset.coe_image, eq_top_iff]
   intro y _
   obtain ⟨p, rfl⟩ := hπ y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← sum_homogeneousComponent p, map_sum]
+
+  rw [← sum_homogeneousComponent p, map_sum]
   exact M.sum_mem fun i _ => hall i _ (homogeneousComponent_isHomogeneous _ _)
 
 end AnyBase

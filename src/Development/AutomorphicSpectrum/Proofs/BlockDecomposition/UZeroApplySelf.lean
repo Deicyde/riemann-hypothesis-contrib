@@ -278,8 +278,8 @@ theorem lincomb_eq (l : I p d →₀ D) :
   rfl
 
 theorem φ_sum (l : I p d →₀ D) : φ t (∑ i ∈ l.support, single i.1 (l i)) = l := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   conv_rhs => rw [← Finsupp.sum_single l]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [φ_single, fr_of_I, T_of_I, mul_one]

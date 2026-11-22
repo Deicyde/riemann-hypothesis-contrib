@@ -15,9 +15,9 @@ theorem wact_rowAct_mul (R : Type) [CommRing R] (r n : ℕ) (A B : Matrix (Fin r
     Formalism.GradedWeylDivisibility.rowAct R (n := n) (A * B) = (Formalism.GradedWeylDivisibility.rowAct R (n := n) B).comp (Formalism.GradedWeylDivisibility.rowAct R A) := by
   apply MvPolynomial.algHom_ext
   rintro ⟨i, j⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Formalism.GradedWeylDivisibility.rowAct, AlgHom.comp_apply, aeval_X, map_sum, map_mul, aeval_C, algebraMap_eq,
-    Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum, mul_assoc]
+
+  simp only [Formalism.GradedWeylDivisibility.rowAct, AlgHom.comp_apply, aeval_X, map_sum, map_mul, aeval_C, algebraMap_eq,
+  Matrix.mul_apply, Finset.sum_mul, Finset.mul_sum, mul_assoc]
   first
   | exact Finset.sum_comm
   | (rw [Finset.sum_comm])
@@ -52,8 +52,8 @@ private theorem isWeightedHomogeneous_algHom_apply {σ R M : Type*} [CommRing R]
     (φ : MvPolynomial σ R →ₐ[R] MvPolynomial σ R)
     (hφ : ∀ v, IsWeightedHomogeneous w (φ (X v)) (w v)) (f : MvPolynomial σ R) (m : M)
     (hf : IsWeightedHomogeneous w f m) : IsWeightedHomogeneous w (φ f) m := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← mem_weightedHomogeneousSubmodule, f.as_sum, map_sum]
+
+  rw [← mem_weightedHomogeneousSubmodule, f.as_sum, map_sum]
   refine Submodule.sum_mem _ fun d hd => ?_
   rw [mem_weightedHomogeneousSubmodule]
   have hdw : Finsupp.weight w d = m := hf (mem_support_iff.mp hd)
@@ -99,9 +99,9 @@ theorem dual_weyl_module_stable : Formalism.UG.DwStable := by
       rintro ⟨i, k⟩
       by_cases hkj : k = j
       · subst hkj
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.rowAct, Formalism.GradedWeylDivisibility.colAddGen, aeval_X, map_sum, map_mul,
-          aeval_C, map_add, if_true, Option.elim, algebraMap_eq]
+
+        simp only [AlgHom.comp_apply, Formalism.GradedWeylDivisibility.rowAct, Formalism.GradedWeylDivisibility.colAddGen, aeval_X, map_sum, map_mul,
+        aeval_C, map_add, if_true, Option.elim, algebraMap_eq]
         rw [Finset.mul_sum, ← Finset.sum_add_distrib]
         apply Finset.sum_congr rfl
         intro b _

@@ -8,7 +8,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ArithmeticInt
 @[expose] public section
 
 open MvPolynomial NumberField ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.AI.I2 GlobalTheory.CompanionTheory.Ar.Flat
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.unit_section_divisor_eq : ∀ (K : Type) [Fintype K] (ι : K → Type) [∀ k, Fintype (ι k)] (P : Ideal (MRing ι)) (f g : MRing ι), IsUnitSec P f g → divSupp P f = divSupp P g ∧ (∀ W ∈ divSupp P f, multAt (P ⊔ Ideal.span {f}) W = multAt (P ⊔ Ideal.span {g}) W) ∧ ∀ (n : ℕ) (L : Fin n → HermLine ι), vertR P L f = vertR P L g := by
   intro K _ ι _ P f g h
   have length_localizedModule_quot_eq {R : Type} [CommRing R] (W : Ideal R) [W.IsPrime] {J₁ J₂ : Ideal R}

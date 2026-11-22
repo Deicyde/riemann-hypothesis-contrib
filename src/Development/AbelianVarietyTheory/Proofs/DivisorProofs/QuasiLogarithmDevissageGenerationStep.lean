@@ -286,8 +286,8 @@ theorem step_generation : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing 
     rw [this, coeff_map, map_add (coeff α), map_add Θ, coeff_map, hΘ, add_comm]
     congr 1
     unfold comb
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, coeff_smul, map_mul, hΘ, hγ, coeff_map]
+
+    simp only [map_sum, coeff_smul, map_mul, hΘ, hγ, coeff_map]
   have hup : (fun i => map Θ (up Q μ i)) = up C fun i => map θ (μ i) := by
     funext i
     ext α
@@ -296,9 +296,9 @@ theorem step_generation : ∀ (p : ℕ) [Fact p.Prime] (B O Q : Type) [CommRing 
       f + (-algebraMap B Q n) • (comb γ e + map (algebraMap B Q) s) := by
     ext α
     unfold comb
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sub, map_add (f := _), map_sum, coeff_smul, coeff_map, map_mul, mul_add, Finset.mul_sum,
-      neg_mul, mul_assoc, Finset.sum_neg_distrib]
+
+    simp only [map_sub, map_add (f := _), map_sum, coeff_smul, coeff_map, map_mul, mul_add, Finset.mul_sum,
+    neg_mul, mul_assoc, Finset.sum_neg_distrib]
     ring
   refine ⟨fun i => n * γ i, map (algebraMap B Q) (n • s), fun i => Ideal.mul_mem_right _ _ hnN,
     fun α => ⟨n * coeff α s, Ideal.mul_mem_right _ _ hnN, by rw [coeff_map, coeff_smul]⟩, ?_⟩

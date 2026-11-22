@@ -524,8 +524,8 @@ theorem card_frames_le : ∀ (D : D7) (u u' : D.what₂.Word) (F0 : Fb D u) (Λ 
     refine Finset.sum_congr rfl fun a' _ => ?_
     have : (hS D).hT ((lf D F0).fl.e a') (frame (G w₀) b + ∑ a, x₀ a b • F0.e a) =
         (Y'.map (algebraMap (𝓞 D.host.E) D.host.E)) a' b := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hYZ, map_add (f := _), map_sum]
+
+      rw [hYZ, map_add (f := _), map_sum]
       have : ∀ a, (hS D).hT ((lf D F0).fl.e a') (x₀ a b • F0.e a) = 0 := fun a => by
         rw [map_smul, show (hS D).hT ((lf D F0).fl.e a') (F0.e a) = 0 from F0.e_iso a' a, smul_zero]
       simp only [this, Finset.sum_const_zero, add_zero]

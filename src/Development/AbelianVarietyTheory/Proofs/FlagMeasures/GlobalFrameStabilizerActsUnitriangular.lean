@@ -39,8 +39,8 @@ theorem descend {E R : Type} [Field E] [CommRing R] [Nontrivial R] (ι : E →+*
     have hk := congrFun hv k
     rw [Finsupp.linearCombination_apply, Finsupp.sum_fintype _ _ (by simp)] at hk ⊢
     simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul] at hk ⊢
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hg1 (v k), ← hk, map_sum]
+
+    rw [← hg1 (v k), ← hk, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [hgm, Finsupp.mapRange_apply, mul_comm]
 

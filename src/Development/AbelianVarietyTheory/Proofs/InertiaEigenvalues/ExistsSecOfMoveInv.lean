@@ -215,15 +215,15 @@ theorem sum_values_eq [StarRing (𝓞 E)] (nab : NabV Xo c) (hnab : IsNab Xo c n
         (Finset.univ.biUnion fun t => (P t).support) (Finset.subset_biUnion_of_mem (fun t => (P t).support) (Finset.mem_univ t)))
   apply hf.injective
   change φ _ = φ _
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul φ, hu _ _ _ (hv _), hu _ _ _ (hv' _), Finset.mul_sum _ _ (φ _)]
+
+  simp only [map_sum, map_mul φ, hu _ _ _ (hv _), hu _ _ _ (hv' _), Finset.mul_sum _ _ (φ _)]
   rw [Finset.sum_comm, Finset.sum_comm (s := (Finset.univ : Finset T))]
   refine Finset.sum_congr rfl fun q _ => ?_
   rw [Finset.sum_comm, Finset.sum_comm (s := (Finset.univ : Finset T))]
   refine Finset.sum_congr rfl fun mo _ => ?_
   have e := congrArg φ (h q mo)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul φ, φ.commutes] at e
+
+  simp only [map_sum, map_mul φ, φ.commutes] at e
   simp only [← _root_.mul_assoc (φ _), ← Finset.sum_mul, e]
 
 def SumInv (d : DeltaDat Xo c n) {T : Type} [Fintype T] (cs : T → Rul d.Xo₂ d.c₂)

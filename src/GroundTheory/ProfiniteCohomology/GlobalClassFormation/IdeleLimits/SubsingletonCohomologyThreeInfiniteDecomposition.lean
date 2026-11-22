@@ -72,7 +72,7 @@ theorem isCyclic_infiniteDecomposition : IsCyclic (MulAction.stabilizer Gal(L/K)
 
 
 include v in
-set_option maxHeartbeats 1000000 in
+
 theorem subsingleton_cohomology_three_infiniteDecomposition :
     Subsingleton (cohomology (Rep.ofMulDistribMulAction (MulAction.stabilizer Gal(L/K) w)
       (w.Completion)ˣ) 3) := by

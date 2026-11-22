@@ -24,19 +24,19 @@ variable {K : Ctx} {B : Base} {f : Fr B.toPre} {T : TwDat B}
 variable (w : ColW B f T) (Z : w.Lt) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ)
 
 
-set_option maxHeartbeats 8000000 in
+
 def nchTTr {Wt : Set B.places.Pl} {nch : NChoice (w.D Z)} (n : NchT w Z Wt nch) :
     NchT w (setDivZ Z N h) Wt { nch with } :=
   { n with tp := { n.tp with }, tie := { n.tie with }, chrPsi := n.chrPsi }
 
 
-set_option maxHeartbeats 8000000 in
+
 def kerTr {Gt : GatTies (w.D Z)} {cmp : LatCmp (w.D Z)} {Gy : G.LatInst (w.D Z)} (k : KerFam (w.D Z) Gt cmp (w.tw Z) Gy) :
     KerFam (w.D (setDivZ Z N h)) { Gt with } { cmp with } (w.tw (setDivZ Z N h)) { Gy with } :=
   fun u v g => { k u v g with }
 
 
-set_option maxHeartbeats 8000000 in
+
 def columnLocalDataTransportDivision (c : ColumnDataSplitPrimes K w Z)
     (hR : let t := DivTr.colTTr w Z N h c.toColT
           IsRecG K.s (w.D (setDivZ Z N h)) t.Gt t.cmp t.g.herm t.g.forms) :

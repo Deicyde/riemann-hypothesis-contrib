@@ -1148,7 +1148,7 @@ theorem resS_sigS_selector (hc : CMData F E) {T : Finset (Pl E)} {c : intAf F E}
   · exact fun QQ hQ => (resS_sigS_eq_zero_iff hc (isConjPl_conjPl QQ).symm c).2 (hc2 _ hQ)
 
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_unitary_lift (hc : CMData F E) (G : GL (Fin n) (intAf F E))
     (hGh : cT (sigS hc) (G : Matrix (Fin n) (Fin n) (intAf F E)) = (G : Matrix (Fin n) (Fin n) (intAf F E)))
     (T : Finset (Pl E)) (hT : IsSplitSet T) (y : ∀ PP : ↥T, GL (Fin n) (kP PP.1)) :
@@ -1272,15 +1272,15 @@ theorem fr_li {S V V' V'' : Type} [CommRing S] [Algebra R S] [AddCommGroup V] [M
     exact hgI _ (hg' j hjs)
   refine ⟨fun i => algebraMap R S (g' i), ?_, j, hjs, hgI⟩
   have eq : f (∑ i ∈ s, g' i • b i) = 0 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← smul_zero a, ← eq, Finset.smul_sum]
+
+    rw [map_sum, ← smul_zero a, ← eq, Finset.smul_sum]
     refine Finset.sum_congr rfl ?_
     intro i hi
     rw [map_smul, ← IsScalarTower.algebraMap_smul K, hg' i hi, ← smul_assoc,
       smul_eq_mul, Function.comp_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [IsScalarTower.algebraMap_smul, ← map_smul, ← map_sum,
-    (f.map_eq_zero_iff hf).mp eq, map_zero, (· ∘ ·)]
+
+  simp only [IsScalarTower.algebraMap_smul, ← map_smul, ← map_sum,
+  (f.map_eq_zero_iff hf).mp eq, map_zero, (· ∘ ·)]
 
 theorem fr_gen_mod (P : Ideal R) [hP : P.IsMaximal] {n : ℕ} (L : Submodule R (Fin n → K)) (hfg : L.FG) :
     ∃ g : Fin n → (Fin n → K), (∀ i, g i ∈ L) ∧ L ≤ Submodule.span R (Set.range g) ⊔ P • L := by
@@ -1317,8 +1317,8 @@ theorem fr_gen_mod (P : Ideal R) [hP : P.IsMaximal] {n : ℕ} (L : Submodule R (
       show Submodule.mkQ (P • (⊤ : Submodule R ↥L)) ⟨x, hx⟩ =
         Submodule.mkQ (P • (⊤ : Submodule R ↥L)) (∑ j, r j • ct j)
       conv_lhs => rw [← h1]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [← hr j, map_smul, hlift]
       rfl
@@ -1560,8 +1560,8 @@ theorem fr_glue (L : Submodule (𝓞 E) (Fin n → E)) (B C : Matrix (Fin n) (Fi
       intro i
       obtain ⟨a, ha⟩ := hdL l hl
       have e1 : (C' *ᵥ fun i => ιA (l i)) i = ιA ((C *ᵥ l) i) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [Matrix.mulVec, dotProduct, hC', Matrix.map_apply, map_sum, map_mul]
+
+        simp only [Matrix.mulVec, dotProduct, hC', Matrix.map_apply, map_sum, map_mul]
       have e2 : algebraMap (𝓞 E) E d * (C *ᵥ l) i = algebraMap (𝓞 E) E (a i) := by
         have h3 : C *ᵥ (d • l) = fun j => algebraMap (𝓞 E) E (a j) := by
           rw [ha, Matrix.mulVec_mulVec, hCB, Matrix.one_mulVec]

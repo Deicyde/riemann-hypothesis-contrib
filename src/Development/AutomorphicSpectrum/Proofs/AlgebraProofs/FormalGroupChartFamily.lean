@@ -82,12 +82,12 @@ private theorem ptOf_act {R₀ : Type} [CommRing R₀] (p : ℕ) [Fact p.Prime] 
     | empty => simp
     | insert b s hb ih =>
       rw [Finset.sum_insert hb, Finset.sum_insert hb, GlobalTheory.TateMatrices.val_add_smul _ _ x hx, ih]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ptOf, red, map_sum, map_nsmul, hf]
+
+  simp only [ptOf, red, map_sum, map_nsmul, hf]
   have hred : ∀ k, PadicInt.toZMod ((M *ᵥ t) k) = ∑ j, PadicInt.toZMod (M k j) * PadicInt.toZMod (t j) := by
     intro k
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
+
+    simp [Matrix.mulVec, dotProduct, map_sum, map_mul]
   simp only [hred]
   simp_rw [Finset.smul_sum]
   rw [Finset.sum_comm]

@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.DivisorProofs.EtaleLocalPr
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex GlobalTheory.EtC
 
-set_option maxHeartbeats 1000000
+
 noncomputable section
 
 namespace GlobalTheory.TwSec

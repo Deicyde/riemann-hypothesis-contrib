@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.DivisorBase.OneMeasur
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

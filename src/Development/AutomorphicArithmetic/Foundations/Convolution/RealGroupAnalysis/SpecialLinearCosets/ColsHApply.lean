@@ -41,8 +41,8 @@ private theorem ifnSum {G : Type} [CommGroup G] [TopologicalSpace G] [IsTopologi
     funext x
     rw [h x, Submodule.coe_sum, Finset.sum_apply]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, map_sum, Finset.sum_mul]
+
+  rw [e, map_sum, Finset.sum_mul]
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [map_smul, smul_eq_mul, hL g⁻¹ a' _ fun _ => rfl]
 

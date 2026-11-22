@@ -47,7 +47,7 @@ theorem valLe_perturb {O Kf : Type} [CommRing O] [IsDomain O] [IsLocalRing O] [F
   rw [ha', mul_mul_mul_comm, IsUnit.mul_val_inv, mul_one, hab]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem restFlat_of (D : Formalism.BasicNotions.D7) (CLa Ck Crk Cdeg CLa' CD Csz CH CE C6 C18 : ℝ)
     (hXi : RestXi D CLa Ck Crk Cdeg CH CE C6 C18) (hRe : RestReal D CLa Ck Crk Cdeg) :
     RestFlat D CLa Ck Crk Cdeg CLa' CD Csz CH CE C6 C18 := by
@@ -137,9 +137,9 @@ theorem restFlat_of (D : Formalism.BasicNotions.D7) (CLa Ck Crk Cdeg CLa' CD Csz
       rw [LinearMap.sum_apply]
     rw [e1]
     simp only [t4, Finset.sum_add_distrib]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_sum, ← Finset.sum_div, ← Finset.mul_sum, ← fock_sum_right, hx1, kapR_alg, map_add (f := _), ← map_sum,
-      ← Finset.mul_sum]
+
+    rw [← map_sum, ← Finset.sum_div, ← Finset.mul_sum, ← fock_sum_right, hx1, kapR_alg, map_add (f := _), ← map_sum,
+    ← Finset.mul_sum]
   rw [hbe]
   exact valLe_perturb p w hSet.2.1.not_isUnit hSet.1.w_sq DX _ h2D aa bb _ hab
 

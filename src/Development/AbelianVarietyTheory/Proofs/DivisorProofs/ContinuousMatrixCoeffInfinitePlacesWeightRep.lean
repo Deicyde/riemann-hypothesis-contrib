@@ -33,12 +33,12 @@ theorem continuous_coef_piTensorMap {X ι : Type} [TopologicalSpace X] [Fintype 
       ∑ k, ∑ k', B.repr u k * (B.repr (PiTensorProduct.map (f g) (B k)) k' * ℓ (B k')) := by
     intro g
     conv_lhs => rw [← B.sum_repr u]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul]
+
+    simp only [map_sum, map_smul, smul_eq_mul]
     refine Finset.sum_congr rfl fun k _ => ?_
     conv_lhs => rw [← B.sum_repr (PiTensorProduct.map (f g) (B k))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul, Finset.mul_sum]
+
+    simp only [map_sum, map_smul, smul_eq_mul, Finset.mul_sum]
   simp_rw [h]
   exact continuous_finsetSum _ fun k _ => continuous_finsetSum _ fun k' _ =>
     continuous_const.mul ((key k k').mul continuous_const)

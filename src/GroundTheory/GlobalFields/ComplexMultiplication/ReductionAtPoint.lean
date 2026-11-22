@@ -175,7 +175,7 @@ theorem reduceFF_genericPoint_add_constMap (R : (W.baseChange K).toAffine.Point)
   rw [map_add (f := _), reduceFF_genericPoint, reduceFF_constMap]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem reduceIsogeny_app_add_constMap (φ : Isogeny (W.baseChange K) (W'.baseChange K))
     (R : (W.baseChange K).toAffine.Point) (S : (W'.baseChange K).toAffine.Point)
     (h : φ.app (genericPoint (W.baseChange K) +

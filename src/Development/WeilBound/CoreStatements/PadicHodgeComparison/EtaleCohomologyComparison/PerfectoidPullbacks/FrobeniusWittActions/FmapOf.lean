@@ -7,7 +7,7 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 set_option backward.isDefEq.respectTransparency false
-set_option maxHeartbeats 1000000
+
 
 noncomputable section
 
@@ -136,7 +136,7 @@ theorem tmul_eq_smul (r : Res l K) (M : Model l K) (j : ℕ) (a : AW r) (y : LW 
 theorem inv_aux {R : Type} [CommRing R] {v L X Y : R} (hv : v * L = 1) (e : ℕ) (h1 : Y = L ^ e * X) : X = v ^ e * Y := by
   rw [h1, ← mul_assoc, ← mul_pow, hv, one_pow, one_mul]
 
-set_option maxHeartbeats 4000000 in
+
 theorem psiF_fac (r : Res l K) {N : ℕ} (F : Fac r N) {C₀ : Type} [CommRing C₀] (c : Acris l →+* C₀) (k : Wc.K₀ l r.k →+* C₀)
     (hk : ∀ w, k (algebraMap (WittVector l r.k) (Wc.K₀ l r.k) w) = c (r.w w)) (hl : IsUnit (c l)) (ι : C₀ →+* (per l K).B) (hιc : ∀ a, ι (c a) = (per l K).i a) (hR : (per l K).Facts)
     (hσw : ∀ g w, (per l K).σA g (r.w w) = r.w w) (M : Model l K) (hM : M.Sm) (j : ℕ) {m : ℕ}

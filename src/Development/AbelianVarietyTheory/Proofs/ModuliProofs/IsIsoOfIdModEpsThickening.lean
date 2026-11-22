@@ -33,7 +33,7 @@ theorem ker_fst_eq_span (K : Type) [Field K] :
     show (DualNumber.eps * y).fst = 0
     simp
 
-set_option maxHeartbeats 1000000 in
+
 private theorem exists_eq_eps_mul_of_flat_of_eps_mul_eq_zero {K : Type} [Field K] {C : Type} [CommRing C] (a : DualNumber K →+* C)
     (ha : a.Flat) (c : C) (hc : a DualNumber.eps * c = 0) :
     ∃ d : C, c = a DualNumber.eps * d := by

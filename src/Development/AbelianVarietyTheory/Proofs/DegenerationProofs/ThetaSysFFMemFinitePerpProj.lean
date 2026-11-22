@@ -22,9 +22,9 @@ theorem exists_eStd_eq (g n : ℕ) (f : (Fin g ⊕ Fin g → ZMod n) →ₗ[ZMod
     ∃ b, ∀ y, eStd g n b y = f y := by
   refine ⟨Sum.elim (fun i => f (Pi.single (.inr i) 1)) (fun i => -f (Pi.single (.inl i) 1)),
     fun y => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [← Finset.univ_sum_single y, map_sum, Fintype.sum_sum_type,
-    ← Finset.sum_add_distrib]
+
+  conv_rhs => rw [← Finset.univ_sum_single y, map_sum, Fintype.sum_sum_type,
+  ← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl fun i _ => ?_
   have h : ∀ j, f (Pi.single j (y j)) = y j * f (Pi.single j 1) := fun j => by
     rw [← smul_eq_mul, ← map_smul, ← Pi.single_smul, smul_eq_mul, _root_.mul_one]

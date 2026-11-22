@@ -26,8 +26,8 @@ open Formalism.RepresentationBoundsCohomology.T2 (vhEInChi)
 open ReciprocityTheory.ChartRestriction.T2 (IsCycOn)
 open ReciprocityTheory.Gal (H1)
 
-set_option maxHeartbeats 8000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem realDisplayAllK_of (ℓ : ℕ) [Fact ℓ.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [Algebra ℤ_[ℓ] O] [Module.Finite ℤ_[ℓ] O]
     [TopologicalSpace O] [TopologicalSpace (FractionRing O)]

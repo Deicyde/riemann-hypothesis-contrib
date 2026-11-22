@@ -29,8 +29,8 @@ theorem mvPowerSeries_mem_map_C_of_coeff_mem {σ R : Type} [CommRing R] (I : Ide
   let G : R → MvPowerSeries σ R := fun a n => c n a
   have : g = ∑ a ∈ s, G a * MvPowerSeries.C a := by
     ext n
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← hc n]
+
+    rw [map_sum, ← hc n]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [MvPowerSeries.coeff_mul_C]
     rfl

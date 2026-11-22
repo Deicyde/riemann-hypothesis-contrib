@@ -65,7 +65,7 @@ end GlobalTheory.Mem.R3.Rw.GoodSideLattices
 namespace GlobalTheory.Mem.R3.Rw.GoodSideLattices
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem reading_level_zero_of_side_data {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 I0 T : Type} {A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m}
     {Ks : Type} [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3)
     (cG : G0 R.Pg D.R.r ≃* G0g D.nd) (hP : Pins R F cG) (hH : Holds R F) (X0 : BaseLevelRowSide D)
@@ -155,12 +155,12 @@ theorem RRset_reRow {D : D7} {EE : Type} [NormedAddCommGroup EE] [InnerProductSp
 variable {B : Base} {f : Fr B.toPre} {T : TwDat B} {w : ColW B f T} {Z₀ : w.Lt} {hX : B.fields.Ok} {Wt : Set B.places.Pl}
   {z₀ : Dat (w.st Z₀) w.I hX T Wt} {q : RowPk w z₀} {o : q.Over}
 
-set_option maxHeartbeats 1000000 in
+
 theorem RRset_side (s s' : Side0 o) (μ : (w.D o.Z).what₂.Tup) : s.p0.s.RRset μ = s'.p0.s.RRset μ :=
   RRset_reRow s'.p0.s s.cen s.tie s.RR s.frames s.jEE s.basis s.norm μ
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem eq_of_stdIso (m : Moved o) (eR : Gc B w.px ≃* G0g (w.D o.Z).nd) (hR : StdIso (w.st o.Z) w.px eR) :
     m.z.R.eG.trans m.z.cG = eR := by
   obtain ⟨plg, iso, h1, h2⟩ := hR
@@ -170,7 +170,7 @@ theorem eq_of_stdIso (m : Moved o) (eR : Gc B w.px ≃* G0g (w.D o.Z).nd) (hR : 
     (h2 g kv) (k2 g kv)).symm
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_side (hF : o.Fits) (m : Moved o) {n : ℕ} (c : Module.Basis (Fin n) ℂ (q.p.ch false).EE.T)
     (Xo : InfinitePlace B.LL → Matrix (Fin n) (Fin n) ℂ) (hXo : ∀ v, IsUnit (Xo v).det) {ι : Type}
     (P : ι → HeightOneSpectrum (𝓞 B.LL)) (S : ι → Set (q.p.ch false).EE.T) :
@@ -203,7 +203,7 @@ def Good (m : Moved o) (s : Side0 o) : Prop :=
       (∀ v, v ≠ InfinitePlace.mk B.embLL → ∀ x x', Formalism.HermitianLatticesTheory.majAt s.RR.b s.RR.X v x x' =
         Formalism.HermitianLatticesTheory.majAt (Pi.basisFun B.LL (Fin n)) Xo v (ε x) (ε x')) ∧ s.p0.s.RRDef
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_good (hF : o.Fits) (m : Moved o) : ∃ s : Side0 o, Good m s := by
   obtain ⟨n, c, Xo, h⟩ := rrT_exists (w.st o.Z).toD7 (Gc B w.px) (PlS B w.px) (PlI B w.px) (TupU w.I (usedOf w.I T Wt))
     (famR (w.st o.Z) w.I hX (usedOf w.I T Wt) m.z.Xg m.z.tr) m.z.core.Q.c.F m.z.R m.z.F m.z.cG m.z.pins m.intersectionNumber_baseChange m.y false
@@ -216,7 +216,7 @@ theorem exists_good (hF : o.Fits) (m : Moved o) : ∃ s : Side0 o, Good m s := b
   rw [RRset_side s s']
   exact Iff.rfl
 
-set_option maxHeartbeats 1000000 in
+
 theorem read_of_good (hF : o.Fits) (m : Moved o) (s : Side0 o) (hs : Good m s) (Y : Read m.z.R.toRealDat m.z.F.lv2 s.p0)
     (hIsh : ∀ x, HEq (Y.Ish.jE x).1 ((m.t.ch true).jE x)) (hIz : ∀ x, HEq (Y.Iz.jE x).1 ((m.t.ch false).jE x)) :
     Nonempty (RationalReadingWithoutCongruence m.z.R m.z.F s.p0 Y) :=
@@ -232,7 +232,7 @@ end GlobalTheory.Mem.R3.Rw.GoodSideLattices
 namespace GlobalTheory.Mem.R3.Rw
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem exists_side_reading_level_zero : ∀ (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z₀ : w.Lt) (hX : B.fields.Ok) (Wt : Set B.places.Pl) (z₀ : Dat (w.st Z₀) w.I hX T Wt), ∀ (q : RowPk w z₀) (o : q.Over), Inputs (w.D o.Z) → o.Fits → ∀ m : Moved o, ∃ s : Side0 o, ∀ Y : Read m.z.R.toRealDat m.z.F.lv2 s.p0, Y.tupT = m.y.tupT → (∀ x, HEq (Y.Ish.jE x).1 ((m.t.ch true).jE x)) → (∀ x, HEq (Y.Iz.jE x).1 ((m.t.ch false).jE x)) → (∀ i x, HEq (Y.mj.eW i x) (m.t.lf.eW i x)) → Nonempty (RationalReadingWithoutCongruence m.z.R m.z.F s.p0 Y) :=
   fun _ _ _ _ _ _ _ _ _ _ _ hF m =>
     (GoodSideLattices.exists_good hF m).imp fun s hs Y _ h1 h2 _ => GoodSideLattices.read_of_good hF m s hs Y h1 h2

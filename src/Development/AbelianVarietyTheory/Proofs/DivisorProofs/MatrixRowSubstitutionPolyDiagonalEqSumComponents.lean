@@ -49,13 +49,13 @@ theorem rowSubst_diagonal_eq_sum_components : ∀ (O : Type) [CommRing O] (N : �
   have hL : rowSubst O N R (Matrix.diagonal d) f = ∑ m ∈ f.support,
       monomial m (algebraMap O R (AddMonoidAlgebra.coeff f m) * ∏ a, d a ^ Finsupp.weight (rowW N N) m a) := by
     conv_lhs => rw [f.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     simp_rw [mono]
   rw [hL]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [weightedHomogeneousComponent_apply, map_sum, map_monomial, Finset.smul_sum, smul_monomial, smul_eq_mul,
-    Finset.sum_filter]
+
+  simp_rw [weightedHomogeneousComponent_apply, map_sum, map_monomial, Finset.smul_sum, smul_monomial, smul_eq_mul,
+  Finset.sum_filter]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun m hm => ?_
   rw [Finset.sum_ite_eq, if_pos, mul_comm]

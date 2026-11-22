@@ -39,8 +39,8 @@ private theorem avg_abs {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] (
       ∀ u : K, ρ u (avg N v) = avg N v := by
     intro N _ _ v hv u
     letI : Fintype (K ⧸ N) := Subgroup.fintypeQuotientOfFiniteIndex
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hform N v, map_smul, map_sum]
+
+    rw [hform N v, map_smul, map_sum]
     congr 1
     have hq : ∀ q : K ⧸ N, ρ u (ρ q.out v) = ρ ((u • q).out) v := by
       intro q
@@ -85,8 +85,8 @@ private theorem avg_abs {K V : Type} [Group K] [AddCommGroup V] [Module ℂ V] (
       (∀ u, Commute T (ρ u)) → ∀ v, T (avg N v) = avg N (T v) := by
     intro N _ T hT v
     letI : Fintype (K ⧸ N) := Subgroup.fintypeQuotientOfFiniteIndex
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hform N v, hform N (T v), map_smul, map_sum]
+
+    rw [hform N v, hform N (T v), map_smul, map_sum]
     congr 1
     refine Finset.sum_congr rfl fun q _ => ?_
     rw [← Module.End.mul_apply, (hT q.out).eq, Module.End.mul_apply]

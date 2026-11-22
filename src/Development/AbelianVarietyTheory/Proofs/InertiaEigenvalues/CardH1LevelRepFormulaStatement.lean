@@ -12,7 +12,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.LevRepZ
 @[expose] public section
 
 open ReciprocityTheory.Gal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.card_H1_level_rep_formula : ∀ {O : Type} [CommRing O] {G : Type} [Group G] [TopologicalSpace G]
     {M : Type} [AddCommGroup M] [Module O M] (ρ : Representation O G M) (ϖ : O) (n : ℕ),
     (∀ m : M, ∃ m' : M, ϖ • m' = m) → (∀ m : M, IsLocallyConstant (fun g => ρ g m)) →

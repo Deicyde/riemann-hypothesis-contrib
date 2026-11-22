@@ -55,8 +55,8 @@ theorem contraction_compactWordAction (ε : Fin n → Bool) (E : Fin n → Fin n
     obtain ⟨w, c⟩ := p
     have key := lc_adLW E hE a b (v : M) w
     rw [Finsupp.linearCombination_apply, Finsupp.sum] at key
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Cone.compactWordAction_single, dite_eq_left hab, map_add (f := _), map_sum, sT_single, Pi.add_apply, Finset.sum_apply]
+
+    rw [Cone.compactWordAction_single, dite_eq_left hab, map_add (f := _), map_sum, sT_single, Pi.add_apply, Finset.sum_apply]
     simp only [map_smul, sT_single, Pi.smul_apply]
     by_cases hd : d = c
     · subst hd
@@ -132,8 +132,8 @@ theorem lift_highestWeightVector {M : Type*} [NormedAddCommGroup M] [InnerProduc
     Module.Finite.equiv (Finsupp.supportedEquivFinsupp (M := V) (R := ℂ) S).symm
   have hS : IsKStableSub ε (sA ε E V hV) (Finsupp.supported V ℂ S) := by
     intro a b hab y hy
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finsupp.sum_single y, Finsupp.sum, map_sum]
+
+    rw [← Finsupp.sum_single y, Finsupp.sum, map_sum]
     refine Submodule.sum_mem _ fun p hp => ?_
     have hpS : p.1.length ≤ R := hy hp
     rw [sA_single']
@@ -150,15 +150,15 @@ theorem lift_highestWeightVector {M : Type*} [NormedAddCommGroup M] [InnerProduc
     { inner := fun x y => Cone.ipK V x y
       conj_inner_symm := fun x y => Cone.ipK_symm x y
       re_inner_nonneg := fun x => by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [Cone.ipK_apply, map_sum]; exact sum_nonneg fun p _ => inner_self_nonneg
+
+        rw [Cone.ipK_apply, map_sum]; exact sum_nonneg fun p _ => inner_self_nonneg
       add_left := fun x y z => by rw [map_add (f := _), LinearMap.add_apply]
       smul_left := fun x y r => by rw [map_smulₛₗ, LinearMap.smul_apply, smul_eq_mul]
       definite := fun x hx => by
         have h1 := congrArg RCLike.re hx
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [Cone.ipK_apply, map_sum, map_zero,
-          sum_eq_zero_iff_of_nonneg fun p _ => inner_self_nonneg] at h1
+
+        rw [Cone.ipK_apply, map_sum, map_zero,
+        sum_eq_zero_iff_of_nonneg fun p _ => inner_self_nonneg] at h1
         ext1 p
         by_cases hp : p ∈ x.support
         · have h2 := h1 p hp

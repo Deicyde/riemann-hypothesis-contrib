@@ -10,7 +10,7 @@ public import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDesc
 
 open AlgebraicGeometry CategoryTheory CategoryTheory.Limits NumberField
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.L2.Pj.QAt GlobalTheory.ArcQ GlobalTheory.Frames
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isFramedPoint_of_arc_baseChange :
     Out.Laws → Out.Laws2 →
     ∀ (E : Type) [Field E] [NumberField E] [IsCMField E]

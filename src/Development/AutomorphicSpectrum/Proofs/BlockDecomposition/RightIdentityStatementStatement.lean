@@ -7,6 +7,6 @@ public import Development.WeilBound.RepresentationTheoryGL.RegularisedSiegelWeil
 @[expose] public section
 
 open PositivityTheory.Rg.Rsw
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.right_identity_statement : RightId := by
   first | exact @GlobalTheory.CompanionTheory.Dblock.rightId | exact GlobalTheory.CompanionTheory.Dblock.rightId | (intros; apply GlobalTheory.CompanionTheory.Dblock.rightId <;> assumption)

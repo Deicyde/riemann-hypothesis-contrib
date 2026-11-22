@@ -27,8 +27,8 @@ open scoped TensorProduct
 
 namespace MainStatements.Tam.T2
 
-set_option maxHeartbeats 1600000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem tube_disj (D : D7) (V : HSp D) (θ : InfFam D) (A : Frames V) (rp : GA D V →* (∀ ρ, Upq V ρ))
     (Ψ : Finset (D.host.E →+* ℂ)) (Gm : Matrix (Fin V.rank) (Fin V.rank) D.host.E) (σ : D.what₂.Tau ≃ Ψ)
     (π : (∀ ρ, Upq V ρ) → realSU Ψ Gm) (M : ℕ) (ι : Type) (X : ι → Data D.host.E V.rank) (g : ι → GA D V)

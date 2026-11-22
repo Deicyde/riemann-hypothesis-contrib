@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Foundations.NotCoboun
 
 open GlobalTheory.AlmostEt GlobalTheory.K5
 open scoped NNReal
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.exists_galoisInvariant_valuation_integers_eq_integral :
     ∀ (p : ℕ) [Fact p.Prime] (Ω : Type) [Field Ω] [Algebra (O0 p) Ω],
       IsClo p Ω → ∃ v : Valuation Ω ℝ≥0,

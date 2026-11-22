@@ -69,8 +69,8 @@ theorem phi_f (i : ι) : phi X f f' (f i : Fin r → E) = f' i := by
 
 theorem phi_zsum (n : ι → ℤ) :
     phi X f f' (∑ i, n i • (f i : Fin r → E)) = ∑ i, n i • (f' i : Fin r → E) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_zsmul, phi_f]
 
@@ -112,8 +112,8 @@ theorem phi_smul (h : ty X f = ty X f') (α : E) (v : Fin r → E) :
     intro i
     have hα := (NumberField.integralBasis E).sum_repr α
     rw [← hα]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finset.sum_smul, map_sum, smul_assoc, map_smul, NumberField.integralBasis_apply]
+
+    simp only [Finset.sum_smul, map_sum, smul_assoc, map_smul, NumberField.integralBasis_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     congr 1
     exact phi_omega X h k i

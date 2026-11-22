@@ -86,9 +86,9 @@ theorem zhatL_chg {T T' : D.host.E} {F F₂ : LFlag (D.sp.Y 0) D.R.rS T} {F₁ F
   have e3 : F₃.fl.fvec b = ∑ d, A' d b • F₁.fl.fvec d := h₃ b
   simp only [ZhatL, Zhat, brS, Matrix.mul_apply, Matrix.conjTranspose_apply]
   rw [e2, e3]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
-    Finset.sum_mul, Finset.mul_sum]
+
+  simp only [map_sum, map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+  Finset.sum_mul, Finset.mul_sum]
   refine Finset.sum_congr rfl fun d _ => Finset.sum_congr rfl fun c _ => ?_
   simp only [RingHom.id_apply, starRingEnd_apply]
   ring

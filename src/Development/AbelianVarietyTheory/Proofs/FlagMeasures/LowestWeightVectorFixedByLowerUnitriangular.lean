@@ -186,8 +186,8 @@ lemma deriv_nil {ε : Fin n → Bool} {D : Matrix (Fin n) (Fin n) ℂ →ₗ[ℂ
     {N : Matrix (Fin n) (Fin n) ℂ} (hN : Nil ε N) : D N w = 0 := by
   obtain ⟨hN1, hN2⟩ := id hN
   rw [Matrix.matrix_eq_sum_single N]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, ContinuousLinearMap.sum_apply]
+
+  simp only [map_sum, ContinuousLinearMap.sum_apply]
   refine Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun j _ => ?_
   rw [pi_single_eq_re_smul_add_im_smul, map_smul, ContinuousLinearMap.smul_apply]
   by_cases h0 : N i j = 0

@@ -92,8 +92,8 @@ theorem bejj_sum_left (j : Fin G.T.t → ℕ) (jp : ℕ) {ι : Type} (s : Finset
     bejj p (r := r) G j jp (∑ i ∈ s, f i) v = ∑ i ∈ s, bejj p (r := r) G j jp (f i) v := by
   classical
   unfold bejj
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, ← Finset.sum_div]
+
+  rw [map_sum, ← Finset.sum_div]
   congr 1
   set S := (∑ i ∈ s, G.phiAll p (r := r) j jp (f i)).support ∪
     s.biUnion (fun i => (G.phiAll p (r := r) j jp (f i)).support) with hS

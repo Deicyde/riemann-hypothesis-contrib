@@ -38,8 +38,8 @@ open Matrix
 noncomputable section
 namespace GlobalTheory.LatExpand
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 variable {D : D7}
 

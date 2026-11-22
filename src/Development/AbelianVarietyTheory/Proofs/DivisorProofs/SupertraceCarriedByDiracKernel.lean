@@ -15,7 +15,7 @@ namespace GlobalTheory.PsCo.PcEF
 
 open GlobalTheory.PsCo.PcEG
 
-set_option maxHeartbeats 1000000 in
+
 theorem supertrace_carriedBy_diracKernel : StrKer := by
   intro n ε H _ _ σ D E hσ hD Y _ hY hG hK
   classical

@@ -33,9 +33,9 @@ private theorem UpperTheory.ConvolutionTheory.FX.lin_push {ι ι' : Type} [Finty
     (v : ι → ℝ) :
     lin (Matrix.vecMul v (Matrix.of fun i j => if δ i = j then (1 : ℝ) else 0)) = rename δ (lin v) := by
   unfold lin
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, map_sum, map_mul, rename_C, rename_X,
-    Complex.ofReal_sum, Finset.sum_mul]
+
+  simp only [Matrix.vecMul, dotProduct, Matrix.of_apply, map_sum, map_mul, rename_C, rename_X,
+  Complex.ofReal_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_eq_single (δ i)]
@@ -73,7 +73,7 @@ theorem UpperTheory.ConvolutionTheory.FX.piece_ren :
   | zero => rw [map_zero, h0, h0', map_zero]
   | add f g hf hg => rw [map_add (f := _), ha, ha', map_add (f := _), hf, hg]
   | single v p =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [UpperTheory.ConvolutionTheory.FX.ren_single, hs, hs', map_sum]
+
+    rw [UpperTheory.ConvolutionTheory.FX.ren_single, hs, hs', map_sum]
     refine Finset.sum_congr rfl fun b _ => ?_
     rw [map_mul, map_mul, map_pow, rename_C, UpperTheory.ConvolutionTheory.FX.lin_push, rename_homogeneousComponent]

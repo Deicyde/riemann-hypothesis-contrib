@@ -10,7 +10,7 @@ open GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalT
 open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterminantRing Pair)
 open UpperTheory.V.HV (Coef)
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 open UpperTheory.V.Z UpperTheory.V.Z.Ord
 
 private theorem finite_over_l (L : Type) [Field L] [NumberField L] (l : ℕ) [hl : Fact l.Prime] :

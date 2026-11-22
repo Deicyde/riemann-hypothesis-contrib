@@ -36,8 +36,8 @@ private def entM (c : mixedSpace K ≃+* (ι → ℂ)) (n : ℕ) :
   map_mul' X Y := by
     funext i
     ext a b
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp [Matrix.mul_apply, map_sum, Finset.sum_apply]
+
+    simp [Matrix.mul_apply, map_sum, Finset.sum_apply]
   map_add' X Y := by
     funext i
     ext a b

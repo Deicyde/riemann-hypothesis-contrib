@@ -75,8 +75,8 @@ theorem frame_of_stableEig : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
       show Z.ρ a (j (ft τ)) = _
       rw [hint, hft1, j.map_smulₛₗ]
       show (genMap (Z.ξ₀ ≫ Y.j) p) (κ _) • _ = Z.inc _ • _
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← hκ]; rfl, by rw [← map_sum, hft2, hw]⟩
+
+      rw [← hκ]; rfl, by rw [← map_sum, hft2, hw]⟩
     have e2 := huq (fun τ => if τ = σ then e' else 0) ⟨fun τ a => by
       by_cases h : τ = σ
       · subst h
@@ -88,8 +88,8 @@ theorem frame_of_stableEig : ∀ (E : Type) [Field E] [NumberField E] [IsCMField
       (mem_eigSp_iff_forall _ _ _).2 fun a => hft1 σ a
     rw [← hfs] at hmem
     obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun _).1 hmem
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← e3, ← ha, map_sum]
+
+    rw [← e3, ← ha, map_sum]
     refine Submodule.sum_mem _ fun i _ => ?_
     rw [j.map_smulₛₗ]
     exact Submodule.smul_mem _ (⟨genMap (Z.ξ₀ ≫ Y.j) p (a i), _, rfl⟩ : regAt (Z.ξ₀ ≫ Y.j) p)

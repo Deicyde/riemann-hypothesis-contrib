@@ -63,10 +63,10 @@ theorem fockInner_algHom_of_linear (F : MvPolynomial σ ℂ →ₐ[ℂ] MvPolyno
     simp [constantCoeff_eq]
   | add P P' hP hP' => rw [map_add (f := _), fockInner_add_left, fockInner_add_left, hP, hP']
   | mul_X P k hP =>
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mul_comm P, fockInner_X_mul_left, pderiv_algHom_of_linear G _ hG, map_mul, hF,
-      Finset.sum_mul, ← fockInnerₛₗ_apply, ← fockInnerₛₗ_apply, map_sum, map_sum,
-      LinearMap.sum_apply]
+
+    rw [mul_comm P, fockInner_X_mul_left, pderiv_algHom_of_linear G _ hG, map_mul, hF,
+    Finset.sum_mul, ← fockInnerₛₗ_apply, ← fockInnerₛₗ_apply, map_sum, map_sum,
+    LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [fockInnerₛₗ_apply, fockInnerₛₗ_apply, smul_mul_assoc, fockInner_smul_left,
       fockInner_smul_right, fockInner_X_mul_left, hP]
@@ -104,11 +104,11 @@ theorem exists_fockInner_sub_eq_zero {σ : Type*} (W : Submodule ℂ (MvPolynomi
     LinearMap.pi fun i => (fockInnerₛₗ σ ℂ).flip (b i)
   have hL (P) (h : L P = 0) (w) (hw : w ∈ W) : fockInner P w = 0 := by
     have := congrArg W.subtype (b.sum_repr ⟨w, hw⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Submodule.subtype_apply] at this
+
+    rw [map_sum, Submodule.subtype_apply] at this
     change _ = w at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← this, ← fockInnerₛₗ_apply, map_sum]
+
+    rw [← this, ← fockInnerₛₗ_apply, map_sum]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [map_smul, fockInnerₛₗ_apply, fockInner_smul_right]
     exact mul_eq_zero_of_right _ (congrFun h i)

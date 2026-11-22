@@ -20,7 +20,7 @@ open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Datum Level Moduli Coeff)
 open GlobalTheory.BigTop GlobalTheory.BigOn.Exp GlobalTheory.BigOn.Exp.SerBase
 
 set_option autoImplicit false
-set_option maxHeartbeats 800000
+
 noncomputable section
 open Classical
 

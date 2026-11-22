@@ -19,7 +19,7 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open GlobalTheory.SingleDatum GlobalTheory.CoverRead GlobalTheory.IndefiniteRowSideFullHecke.RationalRayLevels
 open scoped TensorProduct Classical
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
+
 open GlobalTheory.LevelSeries
 
 noncomputable section
@@ -63,7 +63,7 @@ theorem sum_mem_ratForms {D : D7} {T : CoreJ D} {j : ℕ} {σ : T.Q.c.F →+* �
       rw [RingHom.id_apply, smul_comm]
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem untwRatS : UntwRatS := by
   intro D G _ _ Pl0 T0 A T _ R F κ v₀ hL hLev hG hFam hMod hTh hTie i hV hFP hstd gramR c0R c0L hFT u hu
   obtain ⟨c0, hc0, -⟩ := GlobalTheory.RationalValuesObj.existsUnique_c0BC R i D.what₂.embLL (RingHom.id ℂ) rfl (c0L i)

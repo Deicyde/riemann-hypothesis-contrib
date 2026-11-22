@@ -18,7 +18,7 @@ section Fwd
 variable {F : Type} [Field F] [ValuativeRel F] [TopologicalSpace F]
 variable {E : Type} [CommRing E] [Algebra F E] [TopologicalSpace E] [MeasurableSpace E]
 
-set_option maxHeartbeats 800000 in
+
 theorem glueFwd_of (M : Model F E) (r n : ℕ) (hM : M.OK) (hC : CorrIso M r n) (hE : GlueEta M r) :
     GlueFwd M r n := by
   intro V _ _ H hn t₁ f₂ f₂' φ φ' hT Λ₂ hG₂ hTh

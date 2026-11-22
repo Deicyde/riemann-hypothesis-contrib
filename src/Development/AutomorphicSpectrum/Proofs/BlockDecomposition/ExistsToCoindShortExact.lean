@@ -88,7 +88,7 @@ theorem nonempty_iso {R : Type} [CommRing R] {P : Type} [SemilatticeInf P] {κ :
   exact ⟨_, Q, toCoind G, p, w, nerveCx_shortExact _ h, cechOf_shortExact e _ h,
     fun n ↦ ⟨GlobalTheory.T.coinduced_nerve_acyclic _ n, GlobalTheory.T.coinduced_cech_acyclic e he.2 _ n⟩⟩
 
-set_option maxHeartbeats 1000000 in
+
 theorem cmpSt_of_cxSt : CxSt → CmpSt := by
   intro _ R _ X s _ P _ _ S
   letI := GlobalTheory.algebraΓOfHom s

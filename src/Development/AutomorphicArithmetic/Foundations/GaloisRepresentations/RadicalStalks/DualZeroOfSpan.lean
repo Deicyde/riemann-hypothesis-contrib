@@ -91,7 +91,7 @@ private theorem alg_eq (a : k) :
     algebraMap k (DualNumber k) a = TrivSqZeroExt.inl a + TrivSqZeroExt.inr 0 := by
   ext <;> simp [TrivSqZeroExt.algebraMap_eq_inl]
 
-set_option maxHeartbeats 1600000 in
+
 private theorem core (hk : (p : k) = 0) (hT : (p : DualNumber k) = 0)
     (h : IsGrpPullback A₀ A' (epsRed k) i) (hBC : (constMor A₀).IsBC)
     (e₀ g₀ : A₀ ⟶ A₀) (e' g' : A' ⟶ A') [IsMonHom e₀] [IsMonHom g₀] [IsMonHom e'] [IsMonHom g']

@@ -6,7 +6,7 @@ public import Development.AutomorphicSpectrum.Proofs.GeometryProofs.PrimitiveDer
 @[expose] public section
 
 open scoped TensorProduct
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.primitive_derivation_pairing : ∀ (k : Type) [Field k] [IsAlgClosed k] (p : ℕ) [Fact p.Prime] [CharP k p]
     (A : Type) [CommRing A] [HopfAlgebra k A] [Coalgebra.IsCocomm k A] [Module.Finite k A]
     (P : Submodule k A) (W : Submodule k (A →ₗ[k] k)),

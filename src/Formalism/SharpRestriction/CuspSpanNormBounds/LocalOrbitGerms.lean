@@ -1548,7 +1548,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -1578,7 +1578,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -1608,7 +1608,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 
@@ -1635,7 +1635,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 
@@ -1660,7 +1660,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -1683,7 +1683,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -1707,7 +1707,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -1731,7 +1731,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 
@@ -1755,7 +1755,7 @@ end Formalism.MainNotions.LocalOrbitGerms
 
 end
 
-set_option maxHeartbeats 800000
+
 
 noncomputable section
 

@@ -100,8 +100,8 @@ theorem corrD : CorrD := by
       exact h (g * c i t) x (i.removeNth X))
   rw [Geo.dOm_apply _ w _ hp]
   simp only [hL1] at key
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [key, dCo_apply, map_sum, Finset.sum_apply, Matrix.mulVec_sum]
+
+  rw [key, dCo_apply, map_sum, Finset.sum_apply, Matrix.mulVec_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_zsmul, Pi.smul_apply, Matrix.mulVec_smul]
 

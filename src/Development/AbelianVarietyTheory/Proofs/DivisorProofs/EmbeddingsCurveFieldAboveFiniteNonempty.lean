@@ -33,8 +33,8 @@ theorem fld_finiteDimensional (D : D7) (hI : GlobalTheory.NormSum.Inp D) (δ t0 
       · exact hdata.2.2
       · exact hwp)
   have hσ : ∀ y, D.what₂.embLL y ∈ M := fun y => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← b.sum_repr y, map_sum]
+
+    rw [← b.sum_repr y, map_sum]
     refine sum_mem fun i _ => ?_
     rw [map_rat_smul]
     exact M.smul_mem (hM _ (Or.inl ⟨i, rfl⟩))

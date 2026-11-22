@@ -137,9 +137,9 @@ theorem be_mat {α β γ δ : Type*} [Fintype β] [Fintype γ] (u : β → Vsp R
     rw [← hG k k']
     simp only [be, map_smul, smul_eq_mul]
   unfold be
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul,
-    Matrix.mul_apply, map_mul, smul_eq_mul, Algebra.smul_def, Finset.mul_sum, Finset.sum_mul]
+
+  simp only [LinearMap.sum_apply, LinearMap.smul_apply, map_sum, map_smul,
+  Matrix.mul_apply, map_mul, smul_eq_mul, Algebra.smul_def, Finset.mul_sum, Finset.sum_mul]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun k' _ => Finset.sum_congr rfl fun k _ => ?_
   rw [← hG' k k']

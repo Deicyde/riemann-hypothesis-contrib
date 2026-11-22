@@ -224,8 +224,8 @@ variable {G : Type} [Group G] {Qp K₀ K : Type} [Field Qp] [Field K₀] [Field 
 
 private theorem coord_sum (c : Fin d → BdR) (i : Fin d) :
     (TensorProduct.lid Qp BdR) (LinearMap.rTensor BdR (e.coord i) (∑ j, e j ⊗ₜ[Qp] c j)) = c i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, LinearMap.rTensor_tmul, TensorProduct.lid_tmul, Basis.coord_apply, Basis.repr_self]
+
+  simp only [map_sum, LinearMap.rTensor_tmul, TensorProduct.lid_tmul, Basis.coord_apply, Basis.repr_self]
   rw [Finset.sum_eq_single i]
   · simp
   · intro j _ hj
@@ -255,8 +255,8 @@ private theorem sum_mem_DdR (c : Fin d → BdR)
   simp only [DdR, Submodule.mem_iInf, LinearMap.mem_ker, LinearMap.sub_apply, LinearMap.id_apply, sub_eq_zero]
   intro g
   conv_rhs => rw [← h g]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, Matrix.mulVec, dotProduct, tmul_sum, Matrix.map_apply, LinearMap.toMatrix_apply]
+
+  simp only [map_sum, Matrix.mulVec, dotProduct, tmul_sum, Matrix.map_apply, LinearMap.toMatrix_apply]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
   change ρ g (e j) ⊗ₜ[Qp] PD.actdR g (c j) = _
@@ -389,9 +389,9 @@ private theorem genMat {Q B G V : Type} [Field Q] [CommRing B] [IsDomain B] [Alg
     ext j
     have := congrFun hc0 j
     simp only [Matrix.mulVec, dotProduct, A, Basis.toMatrix_apply, Pi.zero_apply] at this
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-      smul_eq_mul, map_zero, Finsupp.zero_apply]
+
+    simp only [map_sum, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul, map_zero, Finsupp.zero_apply]
     rw [← this]
     exact Finset.sum_congr rfl fun k _ => mul_comm _ _
   have hs : ∀ g (b : B) (x : B ⊗[Q] V), TensorProduct.map (a g).toLinearMap (r g) (b • x) =
@@ -405,9 +405,9 @@ private theorem genMat {Q B G V : Type} [Field Q] [CommRing B] [IsDomain B] [Alg
       ∑ j, algebraMap Q B (v.repr (r g (v j)) k) * a g (e.repr x j) := by
     intro g x k
     conv_lhs => rw [← e.sum_repr x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, hs, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
-      smul_eq_mul]
+
+    simp only [map_sum, hs, map_smul, Finsupp.coe_finsetSum, Finset.sum_apply, Finsupp.smul_apply,
+    smul_eq_mul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [mul_comm]
     congr 1
@@ -696,16 +696,16 @@ private theorem coeff_mem_fil0_of_invertible_period (P : LocPrime l) (K : FinExt
   · refine a1 (M.map (E k)) (fun g => ?_) i j
     ext i j
     conv_rhs => rw [← hMg g]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, hE1, hE2]
+
+    simp only [Matrix.mul_apply, Matrix.map_apply, map_sum, hE1, hE2]
   · refine a2 (M'.map (E k)) (fun g => ?_) i j
     have h3 : M'.map (actSt P (g : GQ l)) = _ := inv_law (actSt P (g : GQ l) : Bst P →+* Bst P) hM (hMg g)
     ext i j
     have h4 := congrArg (E k) (congrFun (congrFun h3 i) j)
     rw [Matrix.map_apply, hE2] at h4
     rw [Matrix.map_apply, Matrix.map_apply, h4]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, Matrix.map_apply, map_sum]
+
+    simp only [Matrix.mul_apply, Matrix.map_apply, map_sum]
     exact Finset.sum_congr rfl fun x _ => by rw [mul_comm, hE1, mul_comm]
 
 end Mats
@@ -739,8 +739,8 @@ private theorem evaluation_zero_galois_action_fil1 (P : LocPrime l) (K : FinExt 
   rw [e, coeff_zero_eq_eval_zero, eval_comp, eval_add, eval_X, eval_C, zero_add, eval_eq_sum_range,
     Finset.sum_range_succ', map_add, pow_zero, mul_one, coeff_map]
   erw [add_sub_cancel_right]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Submodule.sum_mem _ fun k _ => ?_
   rw [coeff_map, pow_succ, ← mul_assoc, map_mul, map_mul, map_pow]
   have h2 : P.ιB (P.actQ (g : GQ l) (p.coeff (k + 1))) ∈ fil0 P K := by

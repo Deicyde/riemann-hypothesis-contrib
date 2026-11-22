@@ -211,7 +211,7 @@ end Generic
 variable {D : D7}
 
 
-set_option maxHeartbeats 800000 in
+
 open GlobalTheory.IdemSupport GlobalTheory.LevSplit in
 theorem exists_idem_set {T : Set (Pl D.host.E)} (hT : OnePlaceOver T) :
     ∃ p : Formalism.L2.Herm.intAf D.host.F D.host.E, p * p = p ∧
@@ -291,7 +291,7 @@ theorem sigR_sigR (z : EAf D) : Formalism.UG.sigR D.sp.cm.sig (Formalism.L2.Herm
   | tmul a b => simp [Formalism.UG.sigR, CMData.sig]
   | add x y hx hy => rw [map_add (f := _), map_add (f := _), hx, hy]
 
-set_option maxHeartbeats 800000 in
+
 theorem exists_latIsom (V V' : HSp D) (h : V.rank = V'.rank)
     (Λ : Submodule (𝓞 D.host.E) (Fin V.rank → D.host.E)) (Λ' : Submodule (𝓞 D.host.E) (Fin V'.rank → D.host.E))
     (β : GL (Fin V.rank) (EAf D)) (β' : GL (Fin V'.rank) (EAf D)) (N N' : ℕ)

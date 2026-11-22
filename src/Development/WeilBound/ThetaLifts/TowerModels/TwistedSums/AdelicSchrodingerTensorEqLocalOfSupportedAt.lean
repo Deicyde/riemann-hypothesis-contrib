@@ -60,8 +60,8 @@ theorem schr_tens_of_at : ∀ {F : Type} [Field F] [NumberField F] (ψ : AddChar
     refine (invOf_eq_right_inv ?_).symm
     have h : GlobalTheory.AdelicU.evFin F v (2 * ⅟(2 : AF F)) = 1 := by rw [mul_invOf_self, map_one]
     rwa [map_mul, map_ofNat] at h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dotProduct, map_add (f := _), map_mul, map_sum, hinv, Pi.add_apply]
+
+  simp only [dotProduct, map_add (f := _), map_mul, map_sum, hinv, Pi.add_apply]
   simp only [mul_comm (⅟(2 : Fv F v))]
   rw [show (fun i => GlobalTheory.AdelicU.evFin F v (x i) + GlobalTheory.AdelicU.evFin F v (w.1 i)) =
     (fun i => GlobalTheory.AdelicU.evFin F v (x i)) + (fun i => GlobalTheory.AdelicU.evFin F v (w.1 i)) from rfl]

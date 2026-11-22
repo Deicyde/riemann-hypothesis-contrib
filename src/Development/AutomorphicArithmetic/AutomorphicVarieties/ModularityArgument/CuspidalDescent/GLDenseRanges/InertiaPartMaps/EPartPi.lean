@@ -18,7 +18,7 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.V.Z.Desc.V0
 
@@ -287,7 +287,7 @@ end U
 
 end UpperTheory.V.Z.Desc.V0
 
-set_option maxHeartbeats 1600000 in
+
 open UpperTheory.V.Z.Desc.V0 in
 theorem UpperTheory.V.Z.Desc.V0.yDimE :
     UpperTheory.V.Z.J.D.Flath → EigBoxE → UpperTheory.V.Z.J.D.SecS → YDimE := by

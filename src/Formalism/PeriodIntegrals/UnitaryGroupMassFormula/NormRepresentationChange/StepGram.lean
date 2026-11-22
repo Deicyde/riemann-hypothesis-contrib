@@ -26,14 +26,14 @@ theorem stepGram (D : D7) : StepGram D := by
   have hL : ∑ c, star (N c a) * (VS D).hT (G.fl.fvec c) (G₂.fl.fvec b) =
       (VS D).hT (n (G.fl.fvec a)) (G₂.fl.fvec b) := by
     rw [hN a]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
-      smul_eq_mul, starRingEnd_apply]
+
+    simp only [map_sum, LinearMap.sum_apply, LinearMap.map_smulₛₗ, LinearMap.smul_apply,
+    smul_eq_mul, starRingEnd_apply]
   have hR : ∑ c, (VS D).hT (G.fl.fvec a) (G₁.fl.fvec c) * M c b =
       (VS D).hT (G.fl.fvec a) (m (G₁.fl.fvec b)) := by
     rw [hM b]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, smul_eq_mul]
+
+    simp only [map_sum, map_smul, smul_eq_mul]
     exact Finset.sum_congr rfl fun c _ => mul_comm _ _
   change ∑ c, star (N c a) * (VS D).hT (G.fl.fvec c) (G₂.fl.fvec b) =
     ∑ c, (VS D).hT (G.fl.fvec a) (G₁.fl.fvec c) * M c b

@@ -92,7 +92,7 @@ theorem near_closed_abstract {A E S R : Type} [CommRing A] [CommRing E] [CommRin
   rw [key, map_sub]
   linear_combination h0
 
-set_option maxHeartbeats 1000000 in
+
 private theorem ioE_closed_lemma (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (K : FinExt l)
     (s : ℕ) (LL : FinExt l) (h : Good K s LL) (W : Wach P K LL) (E : EtSit P AI K s LL h W) (x : RW LL)
     (hx : ∀ m, ∃ e, NearPi AI LL s m (x - E.tie.ioE e)) : ∃ e r, x - E.tie.ioE e = (l : RW LL) * r := by

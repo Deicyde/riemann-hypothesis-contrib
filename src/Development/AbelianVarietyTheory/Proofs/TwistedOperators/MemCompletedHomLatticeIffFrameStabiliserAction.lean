@@ -12,8 +12,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Matrix GlobalTheory.AdelicLatMove
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 noncomputable section
 

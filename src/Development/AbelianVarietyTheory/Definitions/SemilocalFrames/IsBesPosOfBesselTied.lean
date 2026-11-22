@@ -136,18 +136,18 @@ end Comparison₂
 theorem kap_symm_tPt (L A : HSp D) (c : D.host.E) (a : Fin A.rank → AE D) (i : Fin L.rank) (k : Fin A.rank) :
     (kap L A).symm (tPt L A c a) i k = incA D (-(c * L.hD (L.frame i) (lineVec L))) * a k := by
   have : L.hD (L.frame i) (lineVec L) = ∑ m, L.gram m i := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [HSpace.hD, lineVec, map_sum, LinearMap.sum_apply, HSpace.gram]
+
+    simp only [HSpace.hD, lineVec, map_sum, LinearMap.sum_apply, HSpace.gram]
   rw [this, WeilTieCompare.kap_symm_apply]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mul_apply, Matrix.transpose_apply, gramA, Matrix.map_apply, tPt, Matrix.of_apply, map_neg, map_mul,
-    map_sum, Finset.mul_sum, neg_mul, Finset.sum_mul, mul_neg, Finset.sum_neg_distrib]
+
+  simp only [Matrix.mul_apply, Matrix.transpose_apply, gramA, Matrix.map_apply, tPt, Matrix.of_apply, map_neg, map_mul,
+  map_sum, Finset.mul_sum, neg_mul, Finset.sum_mul, mul_neg, Finset.sum_neg_distrib]
   congr 1
   exact Finset.sum_congr rfl fun m _ => by ring
 
 theorem lineNorm_eq (L : HSp D) : lineNorm L = ∑ i, ∑ k, L.gram k i := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [lineNorm, HSpace.hD, lineVec, map_sum, LinearMap.sum_apply, HSpace.gram]
+
+  simp only [lineNorm, HSpace.hD, lineVec, map_sum, LinearMap.sum_apply, HSpace.gram]
 
 theorem tPt_zero (L A : HSp D) (c : D.host.E) : tPt L A c 0 = 0 := by
   ext i k; simp [tPt]
@@ -173,8 +173,8 @@ variable {L A B : HSp D} {ι : A.V →ₗ[D.host.E] B.V} (d : FJDat L A B ι)
 
 theorem hD_fTop (y : B.V) (h : ∀ i, B.hD (d.f i) y = 0) : B.hD d.fTop y = 0 := by
   unfold HSpace.hD at h ⊢
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [fTop, map_sum]
+
+  rw [fTop, map_sum]
   exact Finset.sum_eq_zero fun i _ => by split_ifs <;> simp [h]
 
 theorem jac_of_fix (ψ : AddChar (AF D.host.F) ℂ) (n : GA D B) (hn : actV B n d.fTop = vecA B d.fTop)
@@ -210,8 +210,8 @@ theorem isAniso_of_posDef {V : HSp D} (hs : V.SigOK) (hp : V.IsPosDef) : IsAniso
   have h3 : ∀ a : D.host.E, D.host.φ₀ (star a) = starRingEnd ℂ (D.host.φ₀ a) :=
     NumberField.IsCMField.complexEmbedding_complexConj D.host.E D.host.φ₀
   have h4 := congrArg (fun a => (D.host.φ₀ a).re) ((BesselCompare.hT_co V v v).symm.trans hv)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, h3, map_zero, Complex.zero_re] at h4
+
+  simp only [map_sum, map_mul, h3, map_zero, Complex.zero_re] at h4
   exact h2.ne' h4
 
 section Realises

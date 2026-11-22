@@ -15,8 +15,8 @@ theorem UpperTheory.V.Af.Rn.hermOf :
   refine Br.hermEx ℚ 2 one_le_two π fun φ hφ => ?_
   classical
   have hX : TR.lie ℚ 2 (TR.oneL ℚ 2) = ∑ i, TR.lieS ℚ 2 i i 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [TR.lieS_apply, ← map_sum]
+
+    simp only [TR.lieS_apply, ← map_sum]
     exact congrArg _ (Matrix.sum_single_one (m := Fin 2) (α := TR.Rinf ℚ)).symm
   have h1 : ∀ i, TR.lieS ℚ 2 i i 1 = TR.Eop Rat.infinitePlace i i := fun i => by
     rw [TR.Eop_eq]

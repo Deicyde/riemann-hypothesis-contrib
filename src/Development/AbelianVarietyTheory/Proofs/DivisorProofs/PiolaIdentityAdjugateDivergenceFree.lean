@@ -26,8 +26,8 @@ theorem derivation_prod {ι : Type} [DecidableEq ι] (D : Derivation K R R) (f :
 theorem derivation_det {ι : Type} [Fintype ι] [DecidableEq ι] (D : Derivation K R R)
     (A : Matrix ι ι R) :
     D A.det = ∑ k, (A.updateRow k fun l => D (A k l)).det := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [det_apply, map_sum]
+
+  simp only [det_apply, map_sum]
   rw [sum_comm]
   refine sum_congr rfl fun σ _ => ?_
   rcases Int.units_eq_one_or (Equiv.Perm.sign σ) with h | h <;>

@@ -153,8 +153,8 @@ theorem jac_lg_mul_jacEntry (G : LogFGL v d) (a k : Fin d) :
   simp only [pderiv_X, Pi.single_apply, reduceCtorEq, ite_false, mul_zero, Finset.sum_const_zero,
     zero_add, Sum.inr.injEq, mul_ite, mul_one, Finset.sum_ite_eq', Finset.mem_univ, ite_true] at h
   have h2 := congrArg (subst (substSecondBlockZero (C := C) d)) h
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [subst_substSecondBlockZero_secondBlock G, ← coe_substAlgHom (hasSubst_substSecondBlockZero d), map_sum] at h2
+
+  rw [subst_substSecondBlockZero_secondBlock G, ← coe_substAlgHom (hasSubst_substSecondBlockZero d), map_sum] at h2
   simp only [map_mul, coe_substAlgHom] at h2
   simp only [subst_comp_subst_apply (hasSubst_of_constantCoeff_zero G.F_const) (hasSubst_substSecondBlockZero d), formalGroupLaw_subst_secondBlock_zero,
     subst_self, id] at h2
@@ -184,8 +184,8 @@ theorem pderiv_expOf (G : LogFGL v d) (l k : Fin d) :
   have hJN : J * N = 1 := by
     refine Matrix.ext fun a k => ?_
     have h := congrArg (subst (expOf G)) (jac_lg_mul_jacEntry G a k)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← coe_substAlgHom hE, map_sum] at h
+
+    rw [← coe_substAlgHom hE, map_sum] at h
     simp only [map_mul, coe_substAlgHom] at h
     simp only [J, N, Matrix.mul_apply, Matrix.of_apply, Matrix.one_apply, h]
     split_ifs
@@ -211,8 +211,8 @@ theorem exists_integral_invariant_derivation : ∀ (C : Type) [Field C] [CharZer
   rw [mul_comm, ← coeff_pderiv, hchain hE0]
   simp only [pderiv_expOf]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← substAlgHom_apply hE, map_sum]
+
+  rw [← substAlgHom_apply hE, map_sum]
   simp only [map_mul, substAlgHom_apply]
   exact Finset.sum_congr rfl fun l _ => mul_comm _ _
 

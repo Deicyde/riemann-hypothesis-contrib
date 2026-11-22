@@ -10,7 +10,7 @@ set_option maxSynthPendingDepth 1
 
 noncomputable section
 
-set_option maxHeartbeats 4000000
+
 
 namespace GroundTheory.PAdicHodge
 

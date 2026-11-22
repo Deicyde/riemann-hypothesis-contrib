@@ -67,8 +67,8 @@ theorem hform_swap (x y : Fin I.n → I.E) :
     intro i j
     have h := congrFun (congrFun I.J_herm j) i
     simpa [Formalism.UG.cT, Matrix.transpose_apply, Matrix.map_apply] using h
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [hform, map_sum, map_mul, starRingEnd_self_apply, hJ]
+
+  simp only [hform, map_sum, map_mul, starRingEnd_self_apply, hJ]
   rw [Finset.sum_comm]
   exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
 
@@ -144,8 +144,8 @@ theorem hform_cT {p : Type} [Fintype p] (B : Matrix (Fin I.n) p I.E) (u v : p �
   rw [hform_eq_dot, hform_eq_dot, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, dotProduct_mulVec]
   congr 1
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [Formalism.UG.cT, vecMul, mulVec, dotProduct, map_sum, mul_comm]
+
+  simp [Formalism.UG.cT, vecMul, mulVec, dotProduct, map_sum, mul_comm]
 
 theorem Frame.hform_J' (fr : Frame I S) (x y : Fin fr.k → I.E) :
     hform (starRingEnd I.E) fr.J' x y =

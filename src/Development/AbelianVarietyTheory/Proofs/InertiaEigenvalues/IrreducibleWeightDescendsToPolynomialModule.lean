@@ -24,8 +24,8 @@ open Formalism.AUTREP (GAf)
 open GlobalTheory.FormInner (frameEquiv)
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 noncomputable section
 
 namespace GlobalTheory.WtDescent
@@ -73,8 +73,8 @@ theorem weight_descends : ∀ (L : Type) [Field L] [NumberField L] [IsCMField L]
     have hx : mapVV e lam x = bC.equivFun.symm (fun i => e (bK.repr x i)) := by
       rw [Module.Basis.equivFun_symm_apply]
       conv_lhs => rw [← bK.sum_repr x]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun k _ => ?_
       rw [LinearMap.map_smulₛₗ, hbC]
     rw [hx, ← Module.Basis.equivFun_apply, LinearEquiv.apply_symm_apply]

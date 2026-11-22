@@ -81,8 +81,8 @@ theorem swap_dz (a : Fin n) : swap (dz a) = dzb a ∧ swap (dzb a) = dz a := by
 
 theorem pull_dz (L : V n →L[ℂ] V m) (a : Fin m) : pull L (dz a) = ∑ b, L (coordVec b) a • dz b ∧
     pull L (dzb a) = ∑ b, conj (L (coordVec b) a) • dzb b := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dz, dzb, ← map_smul, ← map_sum]
+
+  simp only [dz, dzb, ← map_smul, ← map_sum]
   constructor <;> refine (ExteriorAlgebra.map_apply_ι _ _).trans (congrArg _ (funext ?_)) <;> rintro (b | b) <;>
     simp [Pi.single_apply, Finset.sum_apply]
 

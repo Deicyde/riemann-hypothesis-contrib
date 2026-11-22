@@ -42,8 +42,8 @@ theorem exists_gen_ind (O O' : Type) [CommRing O] [IsDomain O] [IsDiscreteValuat
   choose b hb using fun a => Ideal.Quotient.mk_surjective (B a)
   have hs : ∀ (s : Finset _) (r : _ → O), Ideal.Quotient.mk J (∑ a ∈ s, algebraMap O O' (r a) * b a) =
       ∑ a ∈ s, Ideal.Quotient.mk I (r a) • B a := fun s r => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [map_mul, hb, Algebra.smul_def]
     rfl
@@ -166,21 +166,21 @@ theorem sum_p' {x : A'} {t : Finset ι} (ht : ∀ a ∉ t, S.p a x = 0) :
 
 theorem p_sum (s : Finset ι) (m : ι → A) {a : ι} (ha : a ∈ s) :
     S.p a (∑ a' ∈ s, b a' • S.inc (m a')) = m a := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single_of_mem a ha fun a' _ h => S.p_ne _ _ _ h.symm, S.p_same]
+
+  rw [map_sum, Finset.sum_eq_single_of_mem a ha fun a' _ h => S.p_ne _ _ _ h.symm, S.p_same]
 
 theorem p_sum_not (s : Finset ι) (m : ι → A) {a : ι} (ha : a ∉ s) :
     S.p a (∑ a' ∈ s, b a' • S.inc (m a')) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_eq_zero fun a' h => S.p_ne _ _ _ fun e => ha (e ▸ h)
 
 theorem p_comm (u : A →+ A) (u' : A' →ₗ[O'] A') (h : ∀ x, S.inc (u x) = u' (S.inc x)) (a : ι) (x : A') :
     S.p a (u' x) = u (S.p a x) := by
   obtain ⟨s, hs, hx⟩ := S.sum_p x
   conv_lhs => rw [← hx]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum u', map_smul, ← h]
+
+  simp only [map_sum u', map_smul, ← h]
   by_cases ha : a ∈ s
   · exact S.p_sum s (fun a => u (S.p a x)) ha
   · rw [S.p_sum_not s (fun a => u (S.p a x)) ha, hs a ha, map_zero]
@@ -224,8 +224,8 @@ theorem length_eq (hb : Gen O b) : Module.length O' A' = Module.length O' (O' �
       exact ⟨m + m', by rw [Finsupp.sum_add_index' (by simp) (by simp [TensorProduct.tmul_add])]⟩
   refine (LinearEquiv.ofBijective F ⟨(injective_iff_map_eq_zero _).2 fun t h => ?_, fun x => ?_⟩).length_eq.symm
   · obtain ⟨m, rfl⟩ := hl t
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Finsupp.sum, map_sum, hF] at h
+
+    simp only [Finsupp.sum, map_sum, hF] at h
     refine Finset.sum_eq_zero fun a ha => ?_
     rw [← S.p_sum m.support m ha, h, map_zero]
     exact TensorProduct.tmul_zero _ _
@@ -387,8 +387,8 @@ def Comp.h1 : Comp O b (H1 ρ) (H1 ρ') where
     · rw [mapH_mk, show mapZ (S.p a) (S.p_rep hi a) z = 0 from Subtype.ext (funext (h0 a ha))]
       rfl
     · simp only [mapH_mk, ← Submodule.Quotient.mk_smul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← Submodule.mkQ_apply, ← map_sum]
+
+      simp only [← Submodule.mkQ_apply, ← map_sum]
       refine congrArg _ (Subtype.ext (funext fun g => ?_))
       rw [← S.sum_p' fun a ha => h0 a ha g, Submodule.coe_sum, Finset.sum_apply]
       rfl
@@ -496,8 +496,8 @@ theorem exists_comp_kog {ι : Type} {b : ι → O'} (hb : Gen O b) (hb' : Ind O 
   · rw [eq_top_iff]
     intro x _
     obtain ⟨v, rfl⟩ := Submodule.mkQ_surjective _ x
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.univ_sum_single v, map_sum]
+
+    rw [← Finset.univ_sum_single v, map_sum]
     exact sum_mem fun j _ => AddSubgroup.subset_closure ⟨j, _, rfl⟩
   · rintro _ ⟨j, y, rfl⟩
     obtain ⟨d, hd, c, hc⟩ := exists_denom (O := O) y
@@ -505,8 +505,8 @@ theorem exists_comp_kog {ι : Type} {b : ι → O'} (hb : Gen O b) (hb' : Ind O 
     refine ⟨s, fun a => Submodule.Quotient.mk
       (Pi.single j (algebraMap O (FractionRing O) (r a) / algebraMap O (FractionRing O) d)), ?_⟩
     simp only [LinearMap.toAddMonoidHom_coe, pushKO_mk, ← Submodule.Quotient.mk_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← Submodule.mkQ_apply, ← map_sum]
+
+    simp only [← Submodule.mkQ_apply, ← map_sum]
     refine (Submodule.Quotient.eq _).2 ⟨Pi.single j c', funext fun i => ?_⟩
     have h0 : algebraMap O' (FractionRing O') (algebraMap O O' d) ≠ 0 := by
       simpa [map_eq_zero_iff _ hg] using hd
@@ -516,8 +516,8 @@ theorem exists_comp_kog {ι : Type} {b : ι → O'} (hb : Gen O b) (hb' : Ind O 
         Pi.sub_apply, Finset.sum_apply, Pi.smul_apply, map_div₀, fracMap_alg]
       simp only [Algebra.smul_def]
       refine mul_left_cancel₀ h0 ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [mul_sub, hc, map_add (f := _), map_mul, map_sum, Finset.mul_sum, eq_sub_iff_add_eq, add_comm]
+
+      rw [mul_sub, hc, map_add (f := _), map_mul, map_sum, Finset.mul_sum, eq_sub_iff_add_eq, add_comm]
       congr 1
       refine Finset.sum_congr rfl fun a _ => ?_
       rw [map_mul]
@@ -534,8 +534,8 @@ theorem exists_comp_kog {ι : Type} {b : ι → O'} (hb : Gen O b) (hb' : Ind O 
       exact ⟨r, fun j => (congrFun hr j).trans (Algebra.smul_def d (v a j))⟩
     choose! r hr using this
     simp only [← hv, LinearMap.toAddMonoidHom_coe, pushKO_mk, ← Submodule.Quotient.mk_smul] at hm
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← Submodule.mkQ_apply, ← map_sum] at hm
+
+    simp only [← Submodule.mkQ_apply, ← map_sum] at hm
     obtain ⟨u, hu⟩ := (Submodule.Quotient.mk_eq_zero _).1 hm
     have h1 : ∀ j, d ∣ r a j := fun j => by
       refine hb' d hd s (fun a => r a j) ⟨u j, IsFractionRing.injective O' (FractionRing O') ?_⟩ a ha
@@ -543,8 +543,8 @@ theorem exists_comp_kog {ι : Type} {b : ι → O'} (hb : Gen O b) (hb' : Ind O 
       simp only [LinearMap.compLeft_apply, Function.comp_apply, Algebra.linearMap_apply,
         Finset.sum_apply, Pi.smul_apply] at h2
       simp only [Algebra.smul_def] at h2
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_mul, h2, map_sum, Finset.mul_sum]
+
+      rw [map_mul, h2, map_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun a ha => ?_
       rw [map_mul, ← fracMap_alg _ hg, hr a ha, map_mul, fracMap_alg]
       ring

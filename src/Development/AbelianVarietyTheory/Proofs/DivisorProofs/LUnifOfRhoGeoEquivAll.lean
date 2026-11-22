@@ -134,8 +134,8 @@ theorem indep_span (F : FormsL L K WL W G) (h : F.IsKsForm) (e : C ≃ₗ[K] F.W
     have h4 := extB_indep σ h3 (hx.map' B.equivFun.toLinearMap B.equivFun.ker)
     convert h4 using 2 with k
     conv_lhs => rw [← B.sum_repr (x k)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smulₛₗ]
+
+    simp only [map_sum, map_smulₛₗ]
     rfl
   · rw [eq_top_iff, ← h2, Submodule.span_le]
     rintro _ ⟨f, rfl⟩
@@ -152,8 +152,8 @@ theorem rhoIs_of_form (F : FormsL L K WL W G) (h : F.IsKsForm) (e : C ≃ₗ[K] 
   obtain ⟨n, b, B, hB⟩ := exists_bases F h e
   intro g x
   rw [← B.sum_repr x]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smulₛₗ, Finset.smul_sum, RingHom.id_apply, hB, hf]
+
+  simp only [map_sum, map_smulₛₗ, Finset.smul_sum, RingHom.id_apply, hB, hf]
   exact Finset.sum_congr rfl fun k _ => smul_comm _ _ _
 
 theorem injective_of_indep {σ : L →+* ℂ} (j : WL →ₛₗ[σ] W σ)

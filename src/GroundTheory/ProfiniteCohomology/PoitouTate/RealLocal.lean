@@ -35,8 +35,8 @@ theorem cohomologyMap_normClass {B B' : Rep k F} [IsDiscreteRep B] [IsDiscreteRe
   apply cochainOf_injective
   funext σ
   change f.hom ((∑ g, B.ρ g) m) = (∑ g, B'.ρ g) (f.hom m)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
+
+  rw [LinearMap.sum_apply, LinearMap.sum_apply, map_sum]
   exact Finset.sum_congr rfl fun g _ => Rep.hom_comm_apply f g m
 
 end NormClassMap
@@ -228,7 +228,7 @@ variable (M : Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S)) [IsDis
 variable [NeZero n] (hD : Nonempty (gsRoots S n ≃+ ZMod n)) (hM : ∀ m : M, n • m = 0)
 
 
-set_option maxHeartbeats 400000 in
+
 include hD hM in
 theorem surjective_gsRealPairing_zero (w : {v : InfinitePlace K.1 // v.IsReal}) :
     Function.Surjective
@@ -254,7 +254,7 @@ theorem surjective_gsRealPairing_zero (w : {v : InfinitePlace K.1 // v.IsReal}) 
   exact ⟨ξ, AddMonoidHom.ext fun η => (ptLocalPairing_apply _ _ _ _ _ _ _ _).trans (hξ η)⟩
 
 
-set_option maxHeartbeats 400000 in
+
 include hD hM in
 theorem exists_gsRealPairing_two (w : {v : InfinitePlace K.1 // v.IsReal})
     (χ : cohomology (Rep.res (gsRealFamily S ιr w).toMonoidHom (dualRep (gsRoots S n) M)) 0 →+ QZ)

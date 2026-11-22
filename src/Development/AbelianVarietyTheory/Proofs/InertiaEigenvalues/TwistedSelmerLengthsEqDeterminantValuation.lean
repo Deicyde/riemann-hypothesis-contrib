@@ -190,7 +190,7 @@ def intSet : Set (H1 ((Trep i s k ψ).comp (DecV N v).subtype)) :=
       (∀ g a, (z : ↥(DecV N v) → Fin D.R.r → KmodO (X.Ok i k)) g a = phiK X i k (y g a) • b) ∧
       x = Submodule.Quotient.mk z}
 
-set_option maxHeartbeats 1000000 in
+
 theorem bk_le : bk bkP i s k ψ v ≤ Submodule.span (X.Ok i k) (intSet bkP i s k ψ v hv) := by
   rw [bk, dite_eq_left hv]
   refine Submodule.span_mono ?_
@@ -225,7 +225,7 @@ theorem bk_le : bk bkP i s k ψ v ≤ Submodule.span (X.Ok i k) (intSet bkP i s 
   rw [h4, ← h2]
   ring
 
-set_option maxHeartbeats 1000000 in
+
 theorem le_bk (hψ : ∀ σ ∈ DecV N v, ψ σ = 1) :
     Submodule.span (X.Ok i k) (intSet bkP i s k ψ v hv) ≤ bk bkP i s k ψ v := by
   rw [bk, dite_eq_left hv]
@@ -253,9 +253,9 @@ theorem le_bk (hψ : ∀ σ ∈ DecV N v, ψ σ = 1) :
         one_smul]
       beta_reduce
       rw [GlobalTheory.BKIntegralToRational.cocycle_of_crys _ _ hf g h j]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [← Submodule.mkQ_apply, map_add (f := _), map_sum, map_mul, add_div, Finset.sum_div, mul_div_assoc,
-        ← LinearMap.map_smul, Algebra.smul_def]⟩
+
+      simp only [← Submodule.mkQ_apply, map_add (f := _), map_sum, map_mul, add_div, Finset.sum_div, mul_div_assoc,
+      ← LinearMap.map_smul, Algebra.smul_def]⟩
   have hzz : z = x • z' := by
     apply Subtype.ext
     funext g j
@@ -331,7 +331,7 @@ theorem lamChar_delInv (d : ι → (GE N →* Multiplicative (ZMod (X.l i ^ M)))
 end Char
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem length_selT {Λ : Type} [CommRing Λ] [Algebra (X.O0 i) Λ] [Module Λ (KmodO (X.Ok i k))] (χ : Λ →+* X.Ok i k)
     (hχ : ∀ (c : Λ) (b : KmodO (X.Ok i k)), c • b = χ c • b) (hχ0 : ∀ c, χ (algebraMap (X.O0 i) Λ c) = phiK X i k c)
     (κ : GE N →* Λˣ) (hκ : ∀ g, χ (κ g : Λˣ) = (((ψ g)⁻¹ : (X.Ok i k)ˣ) : X.Ok i k))

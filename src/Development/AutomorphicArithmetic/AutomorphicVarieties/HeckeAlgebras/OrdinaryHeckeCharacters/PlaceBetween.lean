@@ -14,7 +14,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 private theorem w_under {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
     [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (v : Plc (Lp L)) : (s.w v).under (𝓞 (Lp L)) = v := by
@@ -161,8 +161,8 @@ private theorem cont_multi {ι X : Type} [Finite ι] [TopologicalSpace X] {M : �
     funext x
     have h1 : (fun i => y i x) = fun i => ∑ j, (b i).coord j (y i x) • b i j :=
       funext fun i => ((b i).sum_repr (y i x)).symm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, m.map_sum]
+
+    rw [h1, m.map_sum]
     exact Finset.sum_congr rfl fun r _ => m.map_smul_univ _ _
   rw [e]
   exact continuous_finsetSum _ fun r _ => (continuous_finsetProd _ fun i _ => hy i _).smul continuous_const

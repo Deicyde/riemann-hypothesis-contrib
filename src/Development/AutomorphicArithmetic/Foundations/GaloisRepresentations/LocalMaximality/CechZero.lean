@@ -84,6 +84,6 @@ theorem UpperTheory.Gal.productCup_of_system.zId_of :
   ext J
   simp only [Pi.sub_apply, Pi.add_apply, Finset.sum_apply, Pi.smul_apply]
   rw [← key J]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_apply, map_sub, LinearMap.sub_apply, Finset.sum_sub_distrib, map_sum, LinearMap.sum_apply]
+
+  simp only [Finset.sum_apply, map_sub, LinearMap.sub_apply, Finset.sum_sub_distrib, map_sum, LinearMap.sum_apply]
   abel

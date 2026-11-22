@@ -76,9 +76,9 @@ theorem hasComplement_of_basis (W : HSpace E) {n : ℕ} (b : Module.Basis (Fin (
   have key : ∀ i v, W.hT (b i) v = sgn (neg i) * b.repr v i := by
     intro i v
     conv_lhs => rw [← b.sum_repr v]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_eq_single i (fun j _ hj => by rw [map_smul, hb, if_neg hj.symm, smul_zero])
-      (by simp), map_smul, hb, if_pos rfl, smul_eq_mul, mul_comm]
+
+    rw [map_sum, Finset.sum_eq_single i (fun j _ hj => by rw [map_smul, hb, if_neg hj.symm, smul_zero])
+    (by simp), map_smul, hb, if_pos rfl, smul_eq_mul, mul_comm]
   have hperp : ∀ v, v ∈ perp W (b k) ↔ b.repr v k = 0 := by
     intro v
     change W.hT (b k) v = 0 ↔ _
@@ -130,8 +130,8 @@ theorem hasComplement_of_basis (W : HSpace E) {n : ℕ} (b : Module.Basis (Fin (
   · change ∀ x y : Fin n → E, W.hT (ι x) (ι y) = diagForm n (fun i => neg (k.succAbove i)) x y
     intro x y
     conv_lhs => rw [hι x]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [diagForm_apply, map_sum, LinearMap.sum_apply]
+
+    rw [diagForm_apply, map_sum, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [LinearMap.map_smulₛₗ, LinearMap.smul_apply, key, hιs, smul_eq_mul, mul_assoc]
     rfl

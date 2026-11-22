@@ -65,8 +65,8 @@ theorem cmap_glAct {N r : ℕ} (LL : ChainLetters N) (j : ℕ) (c d : Fin r) (y 
   unfold Formalism.MainNotions.G.glAct Formalism.GM.M.glAct
   rw [LinearMap.sum_apply, LinearMap.sum_apply]
   show cmapHom f _ = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   show cmap f _ = _
   by_cases hi : (i : ℕ) < j

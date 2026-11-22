@@ -39,7 +39,7 @@ theorem ts_continuous_nU : Continuous (nU : Matrix (Fin n) (Fin n) ℂ → M2 n)
   unfold nU
   exact Continuous.matrix_fromBlocks continuous_const continuous_id continuous_const continuous_const
 
-set_option maxHeartbeats 1000000 in
+
 theorem twoSided : TwoSided := by
   intro n H F Γ hF hΓ hcl hperm ψ hψc hψs hvan h a b ha hb
   have : FirstCountableTopology (M2 n) :=

@@ -93,8 +93,8 @@ theorem const_lg (G : FGLaw S d) {n : ℕ} (j : Fin n) (i : Fin d) :
   exact ReciprocityTheory.ChartRestriction.G.TB.LogPf.constantCoeff_prim _
 
 theorem const_bilL (G : FGLaw S d) (cc : Fin d → Fin d → S) : MvPowerSeries.constantCoeff (bilL G cc) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Formalism.MainNotions.ModuliIntegralCharts.H1.CIndFrFix.bilL, map_sum]
+
+  simp only [Formalism.MainNotions.ModuliIntegralCharts.H1.CIndFrFix.bilL, map_sum]
   refine Finset.sum_eq_zero fun i _ => Finset.sum_eq_zero fun l _ => ?_
   have h0 : MvPowerSeries.constantCoeff (lg G (0 : Fin 2) i * lg G (1 : Fin 2) l) = 0 := by
     rw [map_mul, const_lg, zero_mul]
@@ -279,7 +279,7 @@ theorem corr_pull_scale {Y Z : Scheme.{0}} {K : Type} [Fintype K] (φ : K → (Y
     · exact pull_res_lemma h inf_le_right hA inf_le_right (h1 j') (t'.s j')
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem germ_order {S : Type} [CommRing S] [Algebra c.F S] [Algebra ℚ S] [StarRing (𝓞 E)] (y : FrPt Xo c S)
     (C : ChartAt Xo c y) (e' : ∀ m, FrTy y C.d C.x m) (cc : ℕ → Fin C.d → Fin C.d → S)
     (he : ∀ m, ∃ u : (Jet S (Fin 2 × Fin C.d) m)ˣ,

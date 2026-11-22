@@ -64,8 +64,8 @@ theorem one_group {σ : Type} [Fintype σ] (t t₂ φ φ₂ : σ → MvPowerSeri
   have hcoeff : ∀ (ψ : σ → MvPowerSeries σ C) j μ,
       MvPowerSeries.coeff μ (∑ k, N j k • ψ k) = ∑ k, N j k * MvPowerSeries.coeff μ (ψ k) := by
     intro ψ j μ
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, MvPowerSeries.coeff_smul]
+
+    simp only [map_sum, MvPowerSeries.coeff_smul]
   have hcc : ∀ (ψ : σ → MvPowerSeries σ C), (∀ k, MvPowerSeries.constantCoeff (ψ k) = 0) →
       ∀ j, MvPowerSeries.constantCoeff (∑ k, N j k • ψ k) = 0 := by
     intro ψ hψ j
@@ -90,8 +90,8 @@ theorem one_group {σ : Type} [Fintype σ] (t t₂ φ φ₂ : σ → MvPowerSeri
   have hlin : ∀ (a : σ → MvPowerSeries σ C), MvPowerSeries.HasSubst a → ∀ j,
       MvPowerSeries.subst a (∑ k, N j k • φ k) = ∑ k, N j k • MvPowerSeries.subst a (φ k) := by
     intro a ha j
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← MvPowerSeries.coe_substAlgHom ha, map_sum, MvPowerSeries.coe_substAlgHom ha]
+
+    rw [← MvPowerSeries.coe_substAlgHom ha, map_sum, MvPowerSeries.coe_substAlgHom ha]
     exact Finset.sum_congr rfl fun k _ => MvPowerSeries.subst_smul ha _ _
 
   have hφh : ∀ k, MvPowerSeries.subst h (φ k) = φ₂ k := by

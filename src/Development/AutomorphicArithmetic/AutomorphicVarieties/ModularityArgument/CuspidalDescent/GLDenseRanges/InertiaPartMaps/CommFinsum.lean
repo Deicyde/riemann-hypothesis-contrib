@@ -15,7 +15,7 @@ open scoped Matrix TensorProduct
 
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 namespace UpperTheory.V.Z.Desc.V0
 
@@ -230,8 +230,8 @@ theorem UpperTheory.V.Z.Desc.V0.eEx :
   have hcomm : ∀ i f, E (H.op A i f) = H.op A i (E f) := by
     intro i f
     show opE ρ a (H.op A i f) = H.op A i (opE ρ a f)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [opE_eq, opE_eq, map_sum]
+
+    rw [opE_eq, opE_eq, map_sum]
     refine Finset.sum_congr rfl fun g hg => ?_
     rw [map_zsmul]
     congr 1

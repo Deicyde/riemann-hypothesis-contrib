@@ -57,15 +57,15 @@ theorem gram_det (h : IsCMExt F E σ) (hJ : IsHermND σ J) : (gram σ b J).det �
       ← Finset.mul_sum] at this
     have h2 := (mul_eq_zero.1 this).resolve_left (by norm_num)
     rw [← h2]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mulVec, dotProduct, y, Finset.mul_sum, map_sum, mul_smul_comm, map_smul,
-      smul_eq_mul]
+
+    simp only [Matrix.mulVec, dotProduct, y, Finset.mul_sum, map_sum, mul_smul_comm, map_smul,
+    smul_eq_mul]
     exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun l _ => mul_comm _ _
   have h2 : J *ᵥ y = 0 := by
     funext i
     refine (traceForm_nondegenerate F E).1 _ fun z => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Algebra.traceForm_apply, ← invol σ h z, ← b.sum_repr (σ z), map_sum, Finset.mul_sum, map_sum]
+
+    rw [Algebra.traceForm_apply, ← invol σ h z, ← b.sum_repr (σ z), map_sum, Finset.mul_sum, map_sum]
     refine Finset.sum_eq_zero fun k _ => ?_
     rw [Algebra.smul_def, map_mul σ, σ.commutes, ← Algebra.smul_def, mul_smul_comm, map_smul,
       mul_comm, h1, smul_zero]
@@ -88,10 +88,10 @@ theorem qR_eq (x : Fin M → R ⊗[F] E) :
   simp only [hc]
   have hs : ∀ (r : R) (e : E), sigR R σ (r ⊗ₜ[F] e) = r ⊗ₜ[F] σ e := fun _ _ => rfl
   have hi : ∀ e : E, inclR (F := F) R e = (1 : R) ⊗ₜ[F] e := fun _ => rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [qR, hR, Formalism.UG.hform, JR, Matrix.map_apply, hx, map_sum, hs, hi, Finset.sum_mul,
-    Finset.mul_sum, Algebra.TensorProduct.tmul_mul_tmul, qloc_trace_tmul, dotProduct, Matrix.mulVec,
-    Fintype.sum_prod_type, gram, map_mul]
+
+  simp only [qR, hR, Formalism.UG.hform, JR, Matrix.map_apply, hx, map_sum, hs, hi, Finset.sum_mul,
+  Finset.mul_sum, Algebra.TensorProduct.tmul_mul_tmul, qloc_trace_tmul, dotProduct, Matrix.mulVec,
+  Fintype.sum_prod_type, gram, map_mul]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_comm (s := Finset.univ (α := Fin d)) (t := Finset.univ (α := Fin M))]
   refine Finset.sum_congr rfl fun j _ => ?_
@@ -360,8 +360,8 @@ theorem local_bound (hσ : IsCMExt F E σ) (hJ : IsHermND σ J) (hM : 1 ≤ M)
       simp [dotProduct, Matrix.mulVec]
     have e2 : qR (Fv F v) σ J (X 0) = O.subtype (y ⬝ᵥ S₀ *ᵥ y) := by
       rw [q_coord σ b, ← hS₀]
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [dotProduct, Matrix.mulVec, map_sum, map_mul, hy, Matrix.map_apply]
+
+      simp only [dotProduct, Matrix.mulVec, map_sum, map_mul, hy, Matrix.map_apply]
       rfl
     rw [e1, e2, residue_eq_iff]
     rfl

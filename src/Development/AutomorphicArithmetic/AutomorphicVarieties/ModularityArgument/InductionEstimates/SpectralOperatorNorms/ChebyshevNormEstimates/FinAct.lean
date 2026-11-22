@@ -100,9 +100,9 @@ theorem act_of {H V : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [No
     exact h1.trans (by simp)
   refine ⟨Finsupp.onFinset T (fun t => if t ∈ T then U t else 0) fun t ht => by_contra fun hn => ht (if_neg hn), 0,
     ⟨continuous_const, HasCompactSupport.zero⟩, fun x => ?_, fun z => ?_⟩
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [Finsupp.onFinset_sum (g := fun (t : ℝ) (c : V →L[ℂ] V) => c.compLpL 2 volume (sh V t x)) _ fun t => h0 _, hc, add_zero, h, map_sum]
-      exact Finset.sum_congr rfl fun t ht => by rw [if_pos ht]
+
+  · rw [Finsupp.onFinset_sum (g := fun (t : ℝ) (c : V →L[ℂ] V) => c.compLpL 2 volume (sh V t x)) _ fun t => h0 _, hc, add_zero, h, map_sum]
+    exact Finset.sum_congr rfl fun t ht => by rw [if_pos ht]
   · rw [Finsupp.onFinset_sum (g := fun (t : ℝ) (c : V →L[ℂ] V) => Complex.exp (z * t) • c) _ fun t => smul_zero _]
     simp only [symb, Pi.zero_apply, smul_zero, integral_zero, add_zero]
     exact Finset.sum_congr rfl fun t ht => by rw [if_pos ht]

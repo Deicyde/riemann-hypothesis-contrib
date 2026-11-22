@@ -327,7 +327,7 @@ private theorem exists_entry_ne_zero_of_triangular_mul {Γ Γ' k : Type} [Group 
 private theorem mul_inv_mul_mul_inv_eq {Γ : Type} [CommGroup Γ] (a b c : Γ) : a * b⁻¹ * (c * a⁻¹) = c * b⁻¹ := by
   rw [mul_comm c, ← mul_assoc, mul_assoc a, mul_comm b⁻¹ a⁻¹, ← mul_assoc, mul_inv_cancel, one_mul, mul_comm]
 
-set_option maxHeartbeats 1000000 in
+
 open UpperTheory.V.Ws.OvF in
 theorem UpperTheory.V.Ws.overFacts :
     ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} (D : Raw Ω c), D.Good → ∀ (T T' : Tower D) (hT : T.Le T'), T.Fit → ∀ (k : Type) [Field k] (a : c.O →+* k), (∀ x ∈ maximalIdeal c.O, a x = 0) → ∀ (W W' : Finset ℕ) (s t : PD T.ι (G T.F Ω) k) (s' t' : PD T'.ι (G T'.F Ω) k),

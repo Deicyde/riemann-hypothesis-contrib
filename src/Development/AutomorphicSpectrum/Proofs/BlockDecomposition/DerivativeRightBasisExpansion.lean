@@ -93,8 +93,8 @@ theorem frame_eq {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] (D : CLof
     exact Finset.sum_congr rfl fun p _ => Matrix.mul_smul _ _ _
   simp only [sum_apply, ContinuousLinearMap.smulRight_apply]
   conv_lhs => rw [h0]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   exact Finset.sum_congr rfl fun p _ => D.map_smul _ _
 
 theorem frame :

@@ -42,11 +42,11 @@ theorem cdom_antisymm {ε : Fin n → Bool} {μ Λ : Fin n → ℝ} (h₁ : Form
           exact_mod_cast (hc a b h0).1
         exact mul_nonpos_of_nonneg_of_nonpos (Nat.cast_nonneg _) (sub_nonpos.mpr hab.le)
     have hLe : L (y - x) = ∑ a, ∑ b, (c a b : ℝ) * (((a : ℕ) : ℝ) - ((b : ℕ) : ℝ)) := by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [he, map_sum]
+
+      rw [he, map_sum]
       refine Finset.sum_congr rfl fun a _ => ?_
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_congr rfl fun b _ => ?_
       rw [map_smul, hLr, smul_eq_mul]
     refine ⟨?_, fun h0 => ?_⟩

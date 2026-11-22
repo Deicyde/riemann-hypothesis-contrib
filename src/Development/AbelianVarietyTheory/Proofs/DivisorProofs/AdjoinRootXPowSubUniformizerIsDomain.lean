@@ -5,8 +5,8 @@ public import Mathlib
 @[expose] public section
 
 open IsLocalRing
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory
 

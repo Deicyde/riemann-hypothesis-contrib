@@ -72,8 +72,8 @@ private theorem UpperTheory.standard_section_integral_unit {D : D7} (S T : HSp D
     · exact absurd rfl hx
   · exact absurd rfl hx
 
-set_option synthInstance.maxHeartbeats 200000 in
-set_option maxHeartbeats 1000000 in
+
+
 private theorem UpperTheory.integral_unit_det_both {D : D7} {e : AE D} {Z : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e Z) {m n : ℕ}
     (N : Matrix (Fin m) (Fin n) (Lev.EAf D)) (γ : GL (Fin n) (Lev.EAf D)) (hI : IsIntM N)
     (hI' : IsIntM (HMul.hMul N (γ⁻¹ : GL (Fin n) (Lev.EAf D)).val)) (y y' : (AE D)ˣ)
@@ -90,7 +90,7 @@ private theorem UpperTheory.integral_unit_det_both {D : D7} {e : AE D} {Z : Fins
     rw [← UpperTheory.upperRows_mul_right]
     exact hB
 
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.finiteComponent_mem_stabilizer_of_standardSection_ne_zero :
     ∀ (D : D7) (S T : HSp D) (ΛS : Submodule (𝓞 D.host.E) (Fin S.rank → D.host.E)) (βS : GL (Fin S.rank) (Lev.EAf D)) (βT : GL (Fin T.rank) (Lev.EAf D)) (ν : (AE D)ˣ →* Circle) (e : AE D) (Z : Finset (Formalism.L2.DIV.Pl D.host.E)) (I : Ideal (𝓞 D.host.E)),
       IsSelfDualC S ΛS → Formalism.L2.DIV.IsFrame βS ΛS → S.rank ≤ T.rank → IsIdemSum e Z → ∀ g : GA D S,
