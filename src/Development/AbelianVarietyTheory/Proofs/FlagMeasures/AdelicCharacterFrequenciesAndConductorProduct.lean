@@ -39,8 +39,8 @@ theorem exists_freq {ι : Type} [Fintype ι] (f : (ι → ℝ) → ℂ) (hf : Co
   refine ⟨fun v => (L (Pi.single v 1)).im / (2 * Real.pi), fun y => ?_⟩
   rw [← hG', ← hL]
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_lhs => rw [pi_eq_sum_univ' y, map_sum]
+
+  conv_lhs => rw [pi_eq_sum_univ' y, map_sum]
   push_cast
   rw [Finset.mul_sum]
   refine Finset.sum_congr rfl fun v _ => ?_

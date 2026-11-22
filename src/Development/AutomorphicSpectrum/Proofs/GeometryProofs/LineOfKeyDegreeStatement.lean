@@ -13,6 +13,6 @@ open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalC
 open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Geo ReciprocityTheory.ChartRestriction.G.Geo.Tor ReciprocityTheory.ChartRestriction.G.Semi
 open GroundTheory.Heights₂.Heights TensorProduct
 open GlobalTheory.CompanionTheory.Ar GlobalTheory.CompanionTheory.Ar.Sl
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.line_of_key_degree : KeyDegSt → LineSt := by
   first | exact @GlobalTheory.CompanionTheory.Ar.Sl.LineProof.line_of_key | exact GlobalTheory.CompanionTheory.Ar.Sl.LineProof.line_of_key | (intros; apply GlobalTheory.CompanionTheory.Ar.Sl.LineProof.line_of_key <;> assumption)

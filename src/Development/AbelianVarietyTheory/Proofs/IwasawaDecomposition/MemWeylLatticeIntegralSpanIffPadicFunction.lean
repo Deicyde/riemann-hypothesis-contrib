@@ -60,8 +60,8 @@ theorem mem_vlIntSpan_iff {K : Type} [Field K] (σ : K →+* ℂ) (Pl : Rows.Pla
         exact Submodule.subset_span ⟨f, hf, rfl⟩
       obtain ⟨z, hz⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 hx
       refine ⟨fun i => r * (z i : K), fun i => mul_mem hr (intCast_mem _ _), ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [ten_int_map, ← hz, map_sum, Finset.smul_sum]
+
+      rw [ten_int_map, ← hz, map_sum, Finset.smul_sum]
       refine Finset.sum_congr rfl fun i _ => ?_
       rw [map_zsmul, map_mul, map_intCast, mul_smul, Int.cast_smul_eq_zsmul]
     | zero => exact ⟨0, fun _ => zero_mem _, by simp⟩
@@ -115,8 +115,8 @@ theorem mem_delW_iff {p : ℕ} [Fact p.Prime] (lam : ι → DomWeight n) (Z : ZB
         exact mul_le_one₀ hr (norm_nonneg _) (IsUltrametricDist.norm_intCast_le_one _ _)
       · funext y
         rw [prod_eval_eq_evM, ← hz]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [evM, map_sum, map_zsmul, zsmul_eq_mul, map_mul, map_intCast, Finset.mul_sum]
+
+        simp only [evM, map_sum, map_zsmul, zsmul_eq_mul, map_mul, map_intCast, Finset.mul_sum]
         refine Finset.sum_congr rfl fun i _ => ?_
         ring
     | zero => exact ⟨0, fun _ => by simp, by funext y; simp⟩
@@ -189,8 +189,8 @@ theorem map_mem_vlIntSpan_iff_delW : ∀ {K ι : Type} [Field K] [NumberField K]
   have hmap : ∀ (L : Type) [Field L] (s : K →+* L), MvPolynomial.map s G =
       ∑ i, s (c i) • MvPolynomial.map (Int.castRingHom L) (Z.bZ i) := by
     intro L _ s
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hc, map_sum]
+
+    rw [← hc, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [MvPolynomial.smul_eq_C_mul, map_mul, MvPolynomial.map_C, MvPolynomial.map_map, ← MvPolynomial.smul_eq_C_mul]
     have h : s.comp (Int.castRingHom K) = Int.castRingHom L := RingHom.ext_int _ _
@@ -215,8 +215,8 @@ theorem map_mem_vlIntSpan_iff_delW : ∀ {K ι : Type} [Field K] [NumberField K]
       apply MvPolynomial.funext
       intro x
       have h1 := congrFun he (fun τ a b => x (τ, a, b))
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [MvPolynomial.smul_eval]
       exact h1
     rw [hmap ℂ_[p] φ] at hpoly

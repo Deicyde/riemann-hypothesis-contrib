@@ -27,8 +27,8 @@ theorem exists_inverse_mem {k K : Type} [Field k] [Field K] [Algebra k K] (F : I
   have e := congrArg (fun x => (π x : K)) (h a l)
   have e' : ∀ i, π (c a i * r i l) = (⟨r i l, hr i l⟩ : F) * π (c a i) := fun i => by
     rw [mul_comm (c a i)]; exact map_smul π (⟨r i l, hr i l⟩ : F) (c a i)
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, e', apply_ite π, h1, map_zero] at e
+
+  simp only [map_sum, e', apply_ite π, h1, map_zero] at e
   rw [IntermediateField.coe_sum] at e
   refine Eq.trans (Finset.sum_congr rfl fun i _ => mul_comm _ _) (e.trans ?_)
   split_ifs <;> rfl
@@ -103,7 +103,7 @@ theorem exists_no_common_zero (hA : AnFin A) (hN : 2 ≤ N) {n : ℕ} {α : Fin 
     exact hρ' β t ht v
   refine hne ((Conv.ev_eq_of_hasSum hw ⟨_, hm⟩ (AnArc.hasSum_coeff_FSum hT ht hw v)).symm.trans ?_)
   rw [e]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, hz, mul_zero, Finset.sum_const_zero]
+
+  simp only [map_sum, map_mul, hz, mul_zero, Finset.sum_const_zero]
 
 end GlobalTheory.SpanFrame

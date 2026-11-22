@@ -45,11 +45,11 @@ theorem split_components :
       exact (he _).trans hh
   · intro x y
     unfold hR hform
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Prod.fst_sum]
+
+    rw [map_sum, Prod.fst_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Prod.fst_sum]
+
+    rw [map_sum, Prod.fst_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, map_mul, hsig]
     rfl

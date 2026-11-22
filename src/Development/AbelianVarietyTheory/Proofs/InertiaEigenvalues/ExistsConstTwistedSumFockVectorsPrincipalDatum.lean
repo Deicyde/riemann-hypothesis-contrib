@@ -13,7 +13,7 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.Special
 open Formalism.BasicNotions Formalism.BasicNotions.TH Formalism.MainNotions Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.MainNotions.StandardLattice Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR Formalism.IndefR.Datum IsDedekindDomain NumberField GlobalTheory.ExportSeries
 open scoped TensorProduct
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1600000
+
 
 noncomputable section
 
@@ -302,8 +302,8 @@ theorem vec_sum {B : Base S T} (hB : B.Good) (hS : S.SigOK) {ψ : Twist D Circle
     funext x
     rw [datum_sum B hQ g hk inj surj x, Finset.sum_apply]
     rfl
-  set_option synthInstance.maxHeartbeats 100000 in
-    conv_rhs => rw [Base.vecFlat, Base.vecAt, Frame.vec, e, map_sum]
+
+  conv_rhs => rw [Base.vecFlat, Base.vecAt, Frame.vec, e, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [om_princ_move hB hS hψ hQ hω (hg i) (parLev_St (lev_le_parLev (hk i))), smul_smul, map_smul, mul_one, Units.val_mul]
 

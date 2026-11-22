@@ -71,8 +71,8 @@ theorem toBcris_hom {P : PhiMod O K l e a ι} {Q : PhiMod O K l e a κ} (F : BK.
       le_away _ _ (A_le_S l e (Subtype.prop _))⟩) * ϖ.iB t K (coordL P _ m j)
   swap
   · exact Finset.sum_congr rfl fun j _ => by rw [hA]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [← map_mul, ← map_sum]
+
+  simp only [← map_mul, ← map_sum]
   congr 1
   funext τ
   apply Subtype.ext

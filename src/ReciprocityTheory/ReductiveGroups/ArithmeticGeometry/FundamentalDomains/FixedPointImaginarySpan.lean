@@ -137,8 +137,8 @@ theorem exists_basis (hg : 0 < g) : ∃ ω, X.IsLZBasis g ω := by
             refine Finset.sum_congr rfl fun j _ => ?_
             rw [heR, Int.cast_smul_eq_zsmul]
         _ = ∑ j, (n j : ℂ) • th (eR j) := by
-            set_option synthInstance.maxHeartbeats 100000 in
-              rw [map_sum]
+
+            rw [map_sum]
             refine Finset.sum_congr rfl fun j _ => ?_
             rw [map_smul, hc]
             rfl

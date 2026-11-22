@@ -139,7 +139,7 @@ theorem key_law (a b : ℂˣ) (hL : unrChar k a = unrChar k b * absPow k 1) (t :
   rw [e]
   linear_combination -((unrChar k b t : ℂ) * (absPow k (1 / 2) t : ℂ)) * e2
 
-set_option maxHeartbeats 1000000 in
+
 theorem linked (a b : ℂˣ) (hL : unrChar k a = unrChar k b * absPow k 1) :
     ∃ T : (iP (k := k) ![a, b]).IntertwiningMap (iP (k := k) ![b, a]), KInj k T := by
   set χ : kˣ →* ℂˣ := unrChar k b * absPow k (1 / 2) with hχdef

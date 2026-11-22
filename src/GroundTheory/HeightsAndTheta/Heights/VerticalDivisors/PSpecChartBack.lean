@@ -90,19 +90,19 @@ theorem G'_kills (hσ : ∀ s ∈ (parPrime e n v).primeCompl, σ e I j s ∉ Q 
       Ideal.Quotient.eq_zero_iff_mem.mpr hg, map_zero, map_zero, map_zero]
   · rw [Ideal.span_le, Set.range_subset_iff]
     intro i
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [SetLike.mem_coe, RingHom.mem_ker, secForm, linForm, map_sum]
+
+    rw [SetLike.mem_coe, RingHom.mem_ker, secForm, linForm, map_sum]
     simp only [map_mul, G', eval₂Hom_C, eval₂Hom_X', ρ_parY]
     have h := congrArg (algebraMap (Poly e I j) (Localization.AtPrime (Q e I j W))) (sum_val_inl e I j i)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [map_sum, map_mul, map_zero] using h
+
+    simpa only [map_sum, map_mul, map_zero] using h
   · rw [Ideal.span_le, Set.singleton_subset_iff]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [SetLike.mem_coe, RingHom.mem_ker, chartForm, linForm, map_sub, map_sum, map_one]
+
+    rw [SetLike.mem_coe, RingHom.mem_ker, chartForm, linForm, map_sub, map_sum, map_one]
     simp only [map_mul, G', eval₂Hom_C, eval₂Hom_X', ρ_parY]
     have h := congrArg (algebraMap (Poly e I j) (Localization.AtPrime (Q e I j W))) (sum_val_inr e I j)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simpa only [map_sum, map_mul, map_sub, map_one, map_zero] using h
+
+    simpa only [map_sum, map_mul, map_sub, map_one, map_zero] using h
 
 def G (hσ : ∀ s ∈ (parPrime e n v).primeCompl, σ e I j s ∉ Q e I j W) :
     SecB e I v →+* Localization.AtPrime (Q e I j W) :=

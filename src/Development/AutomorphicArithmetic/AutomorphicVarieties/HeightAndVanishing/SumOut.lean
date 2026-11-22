@@ -49,7 +49,7 @@ private theorem final_le (M t : ℝ) (a b : ℕ) (hM : 2 ≤ M) (ht : t ≤ M) :
   rw [e4]
   nlinarith
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.V.HV.sumOut :
     CountI → CountZ → CountII → CountIII → SumOut := by
   classical

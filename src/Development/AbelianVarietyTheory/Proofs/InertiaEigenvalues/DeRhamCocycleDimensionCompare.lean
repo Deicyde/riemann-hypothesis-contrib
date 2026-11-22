@@ -59,7 +59,7 @@ theorem goodO_Zl (l : ℕ) [Fact l.Prime] : GoodO (Qp := ℚ_[l]) ℚ_[l] ℤ_[l
   exact (PadicInt.isOpenEmbedding_coe (p := l)).isOpen_range
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem orth_of_cont (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P) (hT : LocTied l P AI)
     (K : FinExt l) (V : Type) [AddCommGroup V] [Module ℚ_[l] V] [FiniteDimensional ℚ_[l] V]
     [TopologicalSpace V] [IsModuleTopology ℚ_[l] V] [ContinuousAdd V] [ContinuousConstSMul ℚ_[l] V]
@@ -141,9 +141,9 @@ theorem orth_of_cont (l : ℕ) [Fact l.Prime] (P : LocPrime l) (AI : LocAinf l P
         (actVB (P.PD K) (charRep (cycLL (P.PD K) ℚ_[l])) g⁻¹ we) = we := by
       rw [← actVB_mul, mul_inv_cancel, actVB_one]
     rw [ek]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [F, map_sub, e3, e4, map_neg, ec, map_sum, LinearMap.sum_apply,
-      map_smul, LinearMap.smul_apply]
+
+    simp only [F, map_sub, e3, e4, map_neg, ec, map_sum, LinearMap.sum_apply,
+    map_smul, LinearMap.smul_apply]
     abel
   have hk : Continuous k :=
     GlobalTheory.FundCont.contCore_tied l P AI hT K ℚ_[l] ℤ_[l] (goodO_Zl l)

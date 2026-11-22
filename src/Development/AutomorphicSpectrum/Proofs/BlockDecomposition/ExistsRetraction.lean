@@ -48,8 +48,8 @@ theorem cov_root : ∀ (p : ℕ) [Fact p.Prime] (A : Type) [CommRing A] (r : ℕ
     refine ⟨fun j => ρ (s j), fun t => ?_⟩
     have h := sub_eq_zero.mp ((Ideal.mem_bot).mp (hs' t))
     have h2 := congrArg ρ h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hρa] at h2
+
+    rw [map_sum, hρa] at h2
     simpa using h2
   · rw [Polynomial.aeval_algHom_apply]
     have : Polynomial.aeval (AdjoinRoot.root P) P = 0 := by

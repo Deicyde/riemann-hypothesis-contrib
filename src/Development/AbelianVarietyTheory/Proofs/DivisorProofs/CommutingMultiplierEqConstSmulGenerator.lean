@@ -29,8 +29,8 @@ theorem commuting_multiplier_eq_const_smul_generator
         rd ((Module.finBasis K U j : U) : A) := by
     intro U _ f
     conv_lhs => rw [← (Module.finBasis K U).sum_repr f]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, hsemi]
+
+    simp only [Submodule.coe_sum, Submodule.coe_smul, map_sum, hsemi]
   set bV := Module.finBasis K V with hbV
   set bV' := Module.finBasis K V' with hbV'
   let gV : Fin (Module.finrank K V) → R := fun j => ⟨rd (bV j : A), hV _ (bV j).2⟩
@@ -73,15 +73,15 @@ theorem commuting_multiplier_eq_const_smul_generator
       apply Subtype.ext
       simp only [Submodule.coe_sum, Submodule.coe_smul, bW_apply]
       exact eqV f
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [e1, map_sum]
+
+    rw [e1, map_sum]
     simp only [map_smul, Tc, Module.Basis.constr_basis]
     apply Subtype.ext; apply Subtype.ext
     simp only [Submodule.coe_sum, Submodule.coe_smul, AddSubmonoidClass.coe_finsetSum,
       SetLike.val_smul, img]
     conv_rhs => rw [← bV.sum_repr f]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul, hsemi]
+
+    simp only [map_sum, map_smul, Submodule.coe_sum, Submodule.coe_smul, hsemi]
   have Tc_basis : ∀ i, Tc (bW i) = img i := fun i => by
     simp only [Tc, Module.Basis.constr_basis]
   haveI : FiniteDimensional ℂ W := Module.Finite.of_basis bW

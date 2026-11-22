@@ -6,7 +6,7 @@ public import Development.AbelianVarietyTheory.Proofs.SatakeParameters.MultiProd
 @[expose] public section
 
 open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.SplitRead GlobalTheory.ProdReorder
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

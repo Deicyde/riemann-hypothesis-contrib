@@ -43,8 +43,8 @@ end Gen
 
 variable {D : D7} {u : D.what₂.Word}
 
-set_option maxHeartbeats 8000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 theorem ptLat_holds (T : Forms0 D u) : PtLatF T := by
   intro v c w1 w3 s1 s3 hz1 hz3 hs1 hs3 y hy1 hy3
   have hTne : (((D.mem u).A.T : ℕ) : D.host.E) ≠ 0 := by exact_mod_cast (D.mem u).A.T_prime.ne_zero

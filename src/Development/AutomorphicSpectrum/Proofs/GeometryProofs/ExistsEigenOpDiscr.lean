@@ -31,8 +31,8 @@ private theorem exists_discr_dual_basis_of_discr_ne_zero {ι : Type} [Fintype ι
   have htrω : ∀ z : 𝓞 E, ∀ k, Algebra.trace ℤ (𝓞 E) (z * ω k) = ∑ j, ω.repr z j * T j k := by
     intro z k
     conv_lhs => rw [← ω.sum_repr z]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_mul, map_sum]
+
+    rw [Finset.sum_mul, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [smul_mul_assoc, map_zsmul, smul_eq_mul, hT, Algebra.traceMatrix_apply,
       Algebra.traceForm_apply]
@@ -42,8 +42,8 @@ private theorem exists_discr_dual_basis_of_discr_ne_zero {ι : Type} [Fintype ι
     intro z i
     calc Algebra.trace ℤ (𝓞 E) (z * b i)
         = ∑ k, T.adjugate i k * Algebra.trace ℤ (𝓞 E) (z * ω k) := by
-          set_option synthInstance.maxHeartbeats 100000 in
-            simp only [hb, Finset.mul_sum, map_sum]
+
+          simp only [hb, Finset.mul_sum, map_sum]
           refine Finset.sum_congr rfl fun k _ => ?_
           rw [mul_left_comm, e1]
       _ = ∑ k, T.adjugate i k * ∑ j, ω.repr z j * T j k := by simp only [htrω]
@@ -61,8 +61,8 @@ private theorem exists_discr_dual_basis_of_discr_ne_zero {ι : Type} [Fintype ι
     intro s hs
     have hb0 : ∀ i, Algebra.trace ℤ (𝓞 E) (s * b i) = 0 := by
       intro i
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [hb, Finset.mul_sum, map_sum]
+
+      simp only [hb, Finset.mul_sum, map_sum]
       refine Finset.sum_eq_zero fun k _ => ?_
       rw [mul_left_comm, e1, hs, mul_zero]
     have hr : ∀ i, ω.repr s i = 0 := fun i => by
@@ -79,8 +79,8 @@ private theorem exists_discr_dual_basis_of_discr_ne_zero {ι : Type} [Fintype ι
   · apply sub_eq_zero.mp
     apply hnd
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [sub_mul, map_sub, Finset.sum_mul, map_sum, e1, htr (ω l)]
+
+    rw [sub_mul, map_sub, Finset.sum_mul, map_sum, e1, htr (ω l)]
     have h : ∀ i, Algebra.trace ℤ (𝓞 E) (ω i * b i * ω l) =
         Algebra.discr ℤ ω * ω.repr (ω l * ω i) i := fun i => by
       rw [mul_right_comm, hDB, mul_comm (ω i)]
@@ -89,8 +89,8 @@ private theorem exists_discr_dual_basis_of_discr_ne_zero {ι : Type} [Fintype ι
     apply sub_eq_zero.mp
     apply hnd
     intro l
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [sub_mul, map_sub, Finset.sum_mul, map_sum]
+
+    rw [sub_mul, map_sub, Finset.sum_mul, map_sum]
     have h1 : Algebra.trace ℤ (𝓞 E) (x * b i * ω l) = Algebra.discr ℤ ω * ω.repr (x * ω l) i := by
       rw [mul_right_comm, hDB]
     have h2 : ∀ j, Algebra.trace ℤ (𝓞 E) (((ω.repr (x * ω j) i : ℤ) : 𝓞 E) * b j * ω l) =
@@ -128,17 +128,17 @@ theorem exists_eigen_op_discr (E : Type) [Field E] [NumberField E] :
       LinearMap.id_apply]
     obtain ⟨m, hma, hmb⟩ := hm x
     have L : ∀ i, ρ x (ρ (a i) v) = ∑ j, (m i j : R) • ρ (a j) v := fun i => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← Module.End.mul_apply, ← map_mul, hma i, map_sum, LinearMap.sum_apply]
+
+      rw [← Module.End.mul_apply, ← map_mul, hma i, map_sum, LinearMap.sum_apply]
       refine Finset.sum_congr rfl fun j _ => ?_
       rw [map_mul, map_intCast, Module.End.mul_apply, Module.End.intCast_apply,
         Int.cast_smul_eq_zsmul]
     have Rr : ∀ j, σ x * σ (b j) = ∑ i, (m i j : R) * σ (b i) := fun j => by
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_mul, hmb j, map_sum]
+
+      rw [← map_mul, hmb j, map_sum]
       simp [map_mul, map_intCast]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.smul_sum]
+
+    rw [map_sum, Finset.smul_sum]
     simp only [map_smul, L, Finset.smul_sum, smul_smul, Rr, Finset.sum_smul]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun i _ => ?_
@@ -151,8 +151,8 @@ theorem exists_eigen_op_discr (E : Type) [Field E] [NumberField E] :
       simpa using h
     simp only [hv', smul_smul, ← Finset.sum_smul]
     congr 1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← map_intCast σ, ← hsum, map_sum]
+
+    rw [← map_intCast σ, ← hsum, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [map_mul, mul_comm]
 

@@ -143,8 +143,8 @@ theorem exists_flag_frame (τ : Ψ) {z : (Σ k, ι k) → L} (hz : IsPt y z) {F 
       rw [← this]
       exact Finset.sum_congr rfl fun I _ => by ring)
     have h2 := congrArg (valO hz) h1
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one] at h2
+
+    rw [map_sum, map_one] at h2
     obtain ⟨I, -, hI⟩ := Finset.exists_ne_zero_of_sum_ne_zero (h2.trans_ne one_ne_zero)
     rw [map_mul] at hI
     have h3 := hasVal_valO hz ⟨_, hO I⟩

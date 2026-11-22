@@ -14,7 +14,7 @@ noncomputable section
 
 open CategoryTheory Limits AlgebraicGeometry TensorProduct
 
-set_option maxHeartbeats 1000000
+
 
 namespace CrystallineSemistableComparison.HT
 

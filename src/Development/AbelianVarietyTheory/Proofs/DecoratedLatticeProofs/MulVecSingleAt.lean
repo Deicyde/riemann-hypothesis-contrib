@@ -220,7 +220,7 @@ theorem last_row (hψ : ∃ s, psiE ψ s ≠ 1) (hz : z ≠ 0) (hz' : z' ≠ 0) 
   rw [psiBes_one, psiBes_one, e1, e2] at h
   exact h.symm
 
-set_option maxHeartbeats 1000000 in
+
 theorem keeps (hψ : ∃ s, psiE ψ s ≠ 1) (hz' : z' ≠ 0) (hZ : d.j0 *ᵥ ratV z = d'.j0 *ᵥ ratV z')
     (hN : flagN d = flagN d') (hc : ∀ n ∈ flagN d, psiBes ψ d 1 z n = psiBes ψ d' 1 z' n) :
     Keeps (d'.pX ⬝ d.jX) (d.pX ⬝ d'.jX) := by

@@ -23,8 +23,8 @@ open GlobalTheory.RawLift
 open GlobalTheory.BadPlace
 open Classical
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1000000
+
+
 
 namespace GlobalTheory.LocDisj
 

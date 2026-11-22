@@ -45,7 +45,7 @@ theorem exists_etale_coords_of_opens {k : Type} [CommRing k] {X : Scheme.{0}} (p
   convert h3 using 1
   ext <;> simp
 
-set_option maxHeartbeats 1000000 in
+
 private theorem exists_algChart_mem_source {R K : Type} [CommRing R] [IsDomain R] [Field K] [Algebra R K]
     [IsFractionRing R K] {D : ℕ} {X Y : Scheme.{0}} {p : X ⟶ Sp R} {q : Y ⟶ Sp K} {j : Y ⟶ X}
     (h : IsPullback j q p (spMap (algebraMap R K))) [LocallyOfFinitePresentation p]

@@ -8,7 +8,7 @@ public import Development.AbelianVarietyTheory.Definitions.GlobalTwisting.LowerT
 
 open NumberField IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Col Formalism.L2.DIV Formalism.L2.Ker Formalism.UG Formalism.L2.Forms GlobalTheory.Mem GlobalTheory.Mem.Chr GlobalTheory.Mem.Col2 GlobalTheory.Mem.Col2.TC Matrix
 attribute [local instance] GlobalTheory.Mem.Col2.starE Formalism.BasicNotions.Host.cmStar
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms :
     ∀ {B : Base} {X : PreX B.toPre} (I : TC B X), ColIn.Ok I →
       ∀ (l : TC.Laws I) (Z : TC.Later B (TC.cols I l)) (l0 : TC.Law0 I l)
@@ -51,8 +51,8 @@ theorem _root_.GlobalTheory.T.evaluationMap_trueChain_forms_to_forms :
         rw [LinearMap.map_smulₛₗ, LinearMap.map_smulₛₗ, hy, LinearMap.map_smul, LinearMap.map_smul]
     have ptMem : ∀ y, M.ptEmb y ∈ M.ptC := by
       intro y
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← M.ptEmb_basis.2, ← M.ptLat.b.sum_repr y, map_sum]
+
+      rw [← M.ptEmb_basis.2, ← M.ptLat.b.sum_repr y, map_sum]
       refine Submodule.sum_mem _ fun c _ => ?_
       rw [LinearMap.map_smulₛₗ]
       exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨c, rfl⟩)

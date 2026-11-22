@@ -45,7 +45,7 @@ variable {f μ} {R : RealDat3 D (A3.comap id (f μ)) Ks} (mu : HeightOneSpectrum
   (tw : Finset (HeightOneSpectrum (𝓞 D.what₂.LL))) {P0 : Subgroup G} {ψ0 : P0 →* D.what₂.LLˣ} {P1 : Subgroup G} {ψ1 : P1 →* D.what₂.LLˣ}
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem isInert (h : R.IsInert) : (dat3 f μ R mu tw).IsInert := by
   exact ⟨⟨h.tie.plI_inj, fun t Q => h.tie.okI (f t) Q⟩, h.onto, fun t => h.hR (f t), fun i t => h.hL i (f t), h.SF⟩
 
@@ -96,7 +96,7 @@ theorem isTup (hf : Function.Injective f) (h : R.IsTup) (n : NewTup R mu tw) : (
 
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem keep {cG : G0 R.Pg D.R.r ≃* G0g D.nd} (h : Keep (A3 := A3.comap id (f μ)) R.toRealDat (bare3 _ P0 ψ0 P1 ψ1).lv2 cG) :
     Keep (A3 := A3.comap f μ) (dat3 f μ R mu tw).toRealDat (bare3 _ P0 ψ0 P1 ψ1).lv2 cG := by
   constructor

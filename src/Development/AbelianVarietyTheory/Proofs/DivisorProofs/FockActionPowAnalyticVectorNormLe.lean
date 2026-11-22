@@ -115,8 +115,8 @@ theorem omAct_bound (h : IsFockIP ι) (Y : Matrix (Ln p q r s) (Ln p q r s) ℂ)
   · set_option synthInstance.maxHeartbeats 100000 in
       rw [map_sum, Finset.sum_mul]
     refine norm_sum_le_of_le _ fun l _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_mul]
+
+    rw [map_sum, Finset.sum_mul]
     refine norm_sum_le_of_le _ fun l' _ => ?_
     rw [map_smul, norm_smul]
     exact mul_le_mul_of_nonneg_left (omE_bound h l l' d P hP).2 (norm_nonneg _)

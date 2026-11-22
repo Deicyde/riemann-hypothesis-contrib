@@ -28,7 +28,7 @@ theorem two_zpow_eq_one {F : Type} [Field F] [CharZero F] {m : ℤ} (h : (2:F) ^
     rw [map_zpow₀, map_ofNat, h, map_one]
   exact (zpow_right_strictMono₀ one_lt_two).injective h2
 
-set_option maxHeartbeats 1000000 in
+
 theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : SeparatingPoints) :
     SplitRankUpper := by
   intro F E _ _ _ _ n _ _ σ J γ hR hPl hPC k K _ _ he s hA
@@ -67,9 +67,9 @@ theorem splitRankUpper (hL : SubtorusLaurent) (hM : CharacterMonomial) (hP : Sep
     intro i
     refine hM F (AlgebraicClosure F) s ((ψ i : _ →+* AlgebraicClosure F).toMonoidHom.comp uu) S
       (fun a => ψ i (ρ (C a))) (fun t => ?_)
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [MonoidHom.coe_comp, Function.comp_apply, RingHom.toMonoidHom_eq_coe,
-      MonoidHom.coe_coe, RingHom.coe_coe, huu, hC t, map_sum, map_smul]
+
+    simp only [MonoidHom.coe_comp, Function.comp_apply, RingHom.toMonoidHom_eq_coe,
+    MonoidHom.coe_coe, RingHom.coe_coe, huu, hC t, map_sum, map_smul]
   choose a ha using hmono
   have hconj : ∀ i t, ψ i (uu t) * ψ i (lConj σ J (γ : Matrix n n E) F (uu t)) = 1 := by
     intro i t; rw [← map_mul, huu, hnorm, map_one]

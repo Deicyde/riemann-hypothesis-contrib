@@ -70,7 +70,7 @@ theorem local_form_integral_on_lattice (Λ : Submodule (𝓞 D.host.E) (VS D).V)
 
 end S1
 
-set_option maxHeartbeats 1000000 in
+
 theorem local_self_dual_holds : LocSelfDual := by
   intro D δ M hA L p
   have hAp := hA p
@@ -187,8 +187,8 @@ theorem local_self_dual_holds : LocSelfDual := by
         obtain ⟨v, rfl⟩ := hw
         have e : ∀ i, (L.H p).h (L.bc p v) (L.bc p (μ i)) = (D.s.atP p).ιE ((VS D).hT (μ i) v) := fun i => hform _ _
         simp only [e, ← L.bc_smul p]
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [← map_sum, ← hV v]
+
+        rw [← map_sum, ← hV v]
       | zero => simp [local_form_zero_left]
       | add w w' _ _ h1 h2 =>
         simp only [(L.H p).h_add_left, add_smul, Finset.sum_add_distrib]

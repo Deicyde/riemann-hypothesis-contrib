@@ -171,8 +171,8 @@ theorem colEl_comm_avg' (hψ : Continuous ψ) (hπ : IsSmooth π) (ξ : Fin (m +
     {A : AddSubgroup (Fin (m + 1) → k)} (hA : IsLat A) (a : Fin (m + 1) → k) (v : V) :
     π (colEl k m N h a) (avg ψ h π ξ A v) = avg ψ h π ξ A (π (colEl k m N h a) v) := by
   obtain ⟨p, hp, hpw⟩ := exists_avgData₂ h π ψ hψ hπ ξ hA v (π (colEl k m N h a) v)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [avg_eq h π ψ hp, avg_eq h π ψ hpw, map_smul, map_sum]
+
+  rw [avg_eq h π ψ hp, avg_eq h π ψ hpw, map_smul, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun t _ => ?_
   have e : π (colEl k m N h a) (π (colEl k m N h t) v) = π (colEl k m N h t) (π (colEl k m N h a) v) := by
@@ -285,9 +285,9 @@ theorem form_avg (hψ : Continuous ψ) (hπ : IsSmooth π) (B : V →ₗ[ℂ] V 
   rw [Finset.card_image_of_injective _ neg_injective, Finset.sum_image (fun x _ y _ hxy => neg_injective hxy)] at key
   have hc : (p.2.card : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (transversal_nonempty hp6).card_pos.ne'
   have key' := smul_right_injective ℂ hc key
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_smul, map_smulₛₗ, map_sum, LinearMap.smul_apply, LinearMap.sum_apply,
-    smul_eq_mul, map_inv₀, map_natCast, starRingEnd_self_apply]
+
+  simp only [map_smul, map_smulₛₗ, map_sum, LinearMap.smul_apply, LinearMap.sum_apply,
+  smul_eq_mul, map_inv₀, map_natCast, starRingEnd_self_apply]
   congr 1
   refine (Finset.sum_congr rfl fun t _ => ?_).trans key'.symm
   show _ = ((ψ (ξ ⬝ᵥ (-t)) : Circle) : ℂ) * B v (π (colEl k m N h (-t)) w)
@@ -358,9 +358,9 @@ theorem avg_conj (hψ : Continuous ψ) (hπ : IsSmooth π) (g : GL (Fin (m + 1))
           (a - (g : Matrix (Fin (m + 1)) (Fin (m + 1)) k) *ᵥ s') ∈ p.1 at ht'
         rw [Matrix.mulVec_sub, hgg'] at ht'
         rw [hu s' ⟨hs'', ht'⟩]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [avg_eq h π ψ hq, avg_eq h π ψ hp, Finset.card_image_of_injective _ hinj,
-    Finset.sum_image (fun x _ y _ hxy => hinj hxy), map_smul, map_sum]
+
+  rw [avg_eq h π ψ hq, avg_eq h π ψ hp, Finset.card_image_of_injective _ hinj,
+  Finset.sum_image (fun x _ y _ hxy => hinj hxy), map_smul, map_sum]
   congr 1
   refine Finset.sum_congr rfl fun s _ => ?_
   rw [map_smul, hcomm, Matrix.dotProduct_mulVec]

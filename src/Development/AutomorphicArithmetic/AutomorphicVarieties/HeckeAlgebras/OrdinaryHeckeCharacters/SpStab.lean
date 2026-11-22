@@ -62,8 +62,8 @@ private theorem spStab_comm (τ : X.Ub →* GL (Fin m) A) (u : X.Ub) (b : Gp) (f
 private theorem spStab_commU (τ : X.Ub →* GL (Fin m) A) (u : X.Ub) {a : Gp} (ha : a ∈ X.I.P) (f : X.Fn A m) :
     X.ra τ u (X.U A m a f) = X.U A m a (X.ra τ u f) := by
   obtain ⟨ι, s, b, h⟩ := spStab_U X (A := A) (m := m) ha
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [h, h, map_sum]
+
+  rw [h, h, map_sum]
   exact Finset.sum_congr rfl fun i _ => spStab_comm X τ u _ f
 
 variable [IsLocalRing A]
@@ -193,8 +193,8 @@ theorem UpperTheory.V.Hi.spStab :
         | succ j ih =>
           rw [pow_succ', Module.End.mul_apply, Module.End.mul_apply, ← ih, spStab_commU X τ u X.I.z_mem]
       refine ⟨n, ?_⟩
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hdc, map_sum, ← Finset.sum_sub_distrib]
+
+      rw [hdc, map_sum, ← Finset.sum_sub_distrib]
       refine Submodule.sum_mem _ fun q _ => ?_
       rw [← key, ← map_sub]
       exact spStab_valra X τ k _ _ hn

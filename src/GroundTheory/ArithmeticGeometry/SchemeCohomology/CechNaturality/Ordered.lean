@@ -81,17 +81,17 @@ lemma cev_d {m n : ℕ} (σ : Cochain P U m) (i : Fin (n + 1) → ι) {c : Chain
     (hc : c ∈ Finsupp.supported ℤ ℤ (leSet U i)) :
     cev P U (d P U m σ) i c = cev P U σ i (bd m c) := by
   refine eq_of_supported (cev P U (d P U m σ) i) ((cev P U σ i).comp (bd m)) (fun j hj z => ?_) hc
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AddMonoidHom.comp_apply, cev_single, cval_of_le P U _ i j (mem_leSet.1 hj), d_apply, map_sum,
-    Finset.smul_sum, bd_single, map_sum]
+
+  rw [AddMonoidHom.comp_apply, cev_single, cval_of_le P U _ i j (mem_leSet.1 hj), d_apply, map_sum,
+  Finset.smul_sum, bd_single, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [map_zsmul, res_res, cev_single]
   rw [cval_of_le P U σ i _ ((mem_leSet.1 hj).trans (inter_le_comp U j k.succAbove)), smul_comm]
 
 lemma lin_bd_single {m n : ℕ} (f : (Fin (m + 1) → ι) → Chain ι n) (i : Fin (m + 2) → ι) :
     lin f (bd m (Finsupp.single i 1)) = ∑ k : Fin (m + 2), ((-1 : ℤ) ^ (k : ℕ)) • f (i ∘ k.succAbove) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [bd_single, map_sum]
+
+  rw [bd_single, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, lin_single, one_smul]
 
@@ -191,9 +191,9 @@ lemma cevO_od {m n : ℕ} (τ : OCochain P U m) (i : Fin (n + 1) → ι) {c : Ch
   refine eq_of_supported (cevO P U (od P U m τ) i) ((cevO P U τ i).comp (bd m))
     (fun j hj z => ?_) hc
   obtain ⟨hjm, hjle⟩ := mem_oleSet.1 hj
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [AddMonoidHom.comp_apply, cevO_single, cvalO_of P U _ i j hjm hjle, od_apply, map_sum,
-    Finset.smul_sum, bd_single, map_sum]
+
+  rw [AddMonoidHom.comp_apply, cevO_single, cvalO_of P U _ i j hjm hjle, od_apply, map_sum,
+  Finset.smul_sum, bd_single, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   simp only [map_zsmul, res_res, cevO_single]
   rw [cvalO_of P U τ i _ (hjm.comp (Fin.strictMono_succAbove k))
@@ -264,9 +264,9 @@ theorem d_fromOrd (n : ℕ) (τ : OCochain P U n) :
       change bd (n + 1) (ocone (minIdx i) x) = x
       exact key
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [d_apply, fromOrd_apply, cevO_od P U τ i (rho_mem_oleSet U (n + 1) i), bd_rho, lin_bd_single,
-    map_sum]
+
+  rw [d_apply, fromOrd_apply, cevO_od P U τ i (rho_mem_oleSet U (n + 1) i), bd_rho, lin_bd_single,
+  map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_zsmul, fromOrd_apply, res_cevO P U τ (inter_le_comp U i k.succAbove)
     (rho_mem_oleSet U n _)]
@@ -349,8 +349,8 @@ theorem d_hstar_add (n : ℕ) (σ : Cochain P U (n + 1)) :
   have hm : hmt (n + 1) i ∈ Finsupp.supported ℤ ℤ (leSet U i) :=
     Finsupp.supported_mono (rangeIn_subset_leSet U i) (hmt_mem (n + 1) i)
   have hsum : d P U n (hstar P U n σ) i = cev P U σ i (lin (hmt n) (bd n (Finsupp.single i 1))) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [d_apply, lin_bd_single, map_sum]
+
+    rw [d_apply, lin_bd_single, map_sum]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [map_zsmul, hstar_apply, res_cev P U σ (inter_le_comp U i k.succAbove)
       (Finsupp.supported_mono (rangeIn_subset_leSet U _) (hmt_mem n _))]

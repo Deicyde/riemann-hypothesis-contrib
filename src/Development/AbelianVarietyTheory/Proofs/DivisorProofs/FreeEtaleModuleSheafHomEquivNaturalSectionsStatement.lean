@@ -9,7 +9,7 @@ public import Development.AbelianVarietyTheory.Definitions.Divisors.DivisorSuppo
 
 open CategoryTheory Limits AlgebraicGeometry Opposite CochainComplex CochainComplex.HomComplex TensorProduct GlobalTheory.EtC
 open GlobalTheory.EtC.FreeHom in
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.freeEtaleModuleSheaf_hom_equiv_natural_sections :
     ∀ (R : Type) [CommRing R] (P : PSh) (G : Shv R),
       (∀ s s' : (free R).obj P ⟶ G, (∀ U x, val s U x = val s' U x) → s = s') ∧

@@ -8,7 +8,7 @@ public import ReciprocityTheory.ReductiveGroups.TraceFormulas.LatDefs
 
 open ReciprocityTheory.Gal Formalism.RepresentationBoundsCohomology.LOC ReciprocityTheory.ChartRestriction.T2
 open Formalism.NG (KO)
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.isFGTop_p_pow_inverse_lattice : ∀ {p : ℕ} {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O]
     [TopologicalSpace O] [TopologicalSpace (FractionRing O)]
     [IsTopologicalAddGroup (FractionRing O)] [ContinuousSMul O (FractionRing O)],

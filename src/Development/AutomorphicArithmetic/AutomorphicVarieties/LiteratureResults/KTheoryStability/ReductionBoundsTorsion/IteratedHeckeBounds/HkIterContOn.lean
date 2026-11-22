@@ -40,8 +40,8 @@ theorem mn_map (S : Subgroup G) {E E' : Type} [AddCommGroup E] [Module ℝ E] [A
   · rw [mn_zero h, mn_zero h, map_zero]
   · haveI := fin_of_ne h
     letI := Fintype.ofFinite (Quotient (QuotientGroup.rightRel S))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [mn_fin, mn_fin, map_smul, map_sum]
+
+    rw [mn_fin, mn_fin, map_smul, map_sum]
 
 theorem mn_integral (S : Subgroup G) {X E : Type} [MeasurableSpace X] {μ : Measure X} [NormedAddCommGroup E]
     [NormedSpace ℝ E] (e : Quotient (QuotientGroup.rightRel S) → X → E) (he : ∀ c, Integrable (e c) μ) :
@@ -116,9 +116,9 @@ theorem intS_eq {q : ℕ} (ω : Form (HS L N) q) (y : Fin (q + 1) → HS L N) :
 
 theorem intS_pb {q : ℕ} (g : Gp L N) (ω : Form (HS L N) q) (y : Fin (q + 1) → HS L N) :
     intS (pb g ω) y = intS ω fun j => actL g (y j) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [intS, pb, ContinuousAlternatingMap.compContinuousLinearMap_apply, Function.comp_def, map_add (f := _), map_sum,
-    map_smul, map_sub]
+
+  simp only [intS, pb, ContinuousAlternatingMap.compContinuousLinearMap_apply, Function.comp_def, map_add (f := _), map_sum,
+  map_smul, map_sub]
 
 theorem intP_pb {q : ℕ} (g : Gp L N) (ω : Form (HS L N) q) (y : Fin (q + 1) → Pos L N) :
     intP (pb g ω) y = intP ω fun j => g • y j :=
@@ -153,7 +153,7 @@ private theorem pt_mem_Pos_of_mem_sx {q : ℕ} (y : Fin (q + 1) → Pos L N) {t 
     ← Finset.sum_smul, sub_smul, one_smul]
   abel
 
-set_option maxHeartbeats 1000000 in
+
 theorem intP_integ {q : ℕ} {ω : Form (HS L N) q} (hω : ContinuousOn ω (Pos L N)) (y : Fin (q + 1) → Pos L N) :
     IntegrableOn (fun t => ω (pt (fun j => (y j).1) t) fun j => (y j.succ).1 - (y 0).1) (sx q) := by
   refine ContinuousOn.integrableOn_compact (isCompact_sx q) ?_
@@ -170,7 +170,7 @@ theorem intP_sub {q : ℕ} {ω ω' : Form (HS L N) q} (hω : ContinuousOn ω (Po
   simp only [intP, intS_eq, Pi.sub_apply, ContinuousAlternatingMap.sub_apply]
   exact integral_sub (intP_integ hω y) (intP_integ hω' y)
 
-set_option maxHeartbeats 1000000 in
+
 theorem intP_inv {q : ℕ} {ω : Form (HS L N) q} {g : Gp L N} (hω : FInv ω g) (y : Fin (q + 1) → Pos L N) :
     intP ω (fun j => g • y j) = intP ω y := by
   rw [← intP_pb]
@@ -217,7 +217,7 @@ theorem Hk_contOn {k : ℕ} (q : GK L N) {ω : Form (HS L N) k} (hω : Continuou
     ContinuousOn (Hk q ω) (Pos L N) :=
   mn_contOn (Sg q) _ fun c => pb_contOn _ hω
 
-set_option maxHeartbeats 1000000 in
+
 theorem intP_Hk {k : ℕ} (q : GK L N) {ω : Form (HS L N) k} (hω : ContinuousOn ω (Pos L N))
     (y : Fin (k + 1) → Pos L N) :
     intP (Hk q ω) y = mn (Sg q) fun c => intP (pb (toP L N (q * toK L N (Quotient.out c))) ω) y := by
@@ -230,7 +230,7 @@ theorem intP_Hk {k : ℕ} (q : GK L N) {ω : Form (HS L N) k} (hω : ContinuousO
   simp only [intP, intS_eq, key]
   exact mn_integral (Sg q) _ fun c => intP_integ (pb_contOn _ hω) y
 
-set_option maxHeartbeats 1000000 in
+
 theorem Hk_good {k : ℕ} (q : GK L N) {ω : Form (HS L N) (k + 1)} (hω : Good ω) : Good (Hk q ω) := by
   refine ⟨Hk_contOn q hω.1, ?_⟩
   have h1 : intP (Hk q ω) = fun y => mn (Sg q) fun c => intP (pb (toP L N (q * toK L N (Quotient.out c))) ω) y :=

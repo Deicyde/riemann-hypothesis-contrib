@@ -7,7 +7,7 @@ public import Development.AbelianVarietyTheory.BlockTheory.NonGaloisCusps.ImageP
 @[expose] public section
 
 open PowerSeries Filter Topology GlobalTheory.BK GlobalTheory.FilDiv
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.mem_eisensteinFiltration_eq_eisenstein_pow_mul_disc : ∀ (O K : Type) [CommRing O] [NormedField K] [IsUltrametricDist K] [CompleteSpace K] [Algebra O K] [IsUnitBall O K] (l e : ℕ) [Fact l.Prime] [NormedAlgebra ℚ_[l] K] [NeZero e] (j : ℕ), ∀ φ : S O K e, φ ∈ Fil O K l e j → ∃ q ∈ Rpi (O := O) (K := K) l e, (φ : K⟦X⟧) = E K l e ^ j * q := by
   intro O K _ _ _ _ _ _ l e _ _ _ j φ hφ
   have filPre_divisible : ∀ {g : S O K e}, g ∈ FilPre O K l e j →

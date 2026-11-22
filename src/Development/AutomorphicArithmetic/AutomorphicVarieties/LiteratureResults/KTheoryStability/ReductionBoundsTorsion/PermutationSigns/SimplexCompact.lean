@@ -260,9 +260,9 @@ theorem intP_inv {q : ℕ} {ω : Form (HS L N) q} (hω : ∀ g, FInv ω g) (g : 
   unfold FInv at hF
   have h1 := hF _ hmem
   rw [← h1]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, map_add (f := _), map_sum, map_sub, map_smul,
-    Function.comp_def]
+
+  simp only [ContinuousAlternatingMap.compContinuousLinearMap_apply, map_add (f := _), map_sum, map_sub, map_smul,
+  Function.comp_def]
 
 def evL {G H Y : Type} [Group G] [Group H] [MulAction H Y] (ρ : G →* H) {m : ℕ}
     (F : (Fin (m + 1) → Y) → ℝ) (y : Y) : Chn G m →ₗ[ℝ] ℝ :=

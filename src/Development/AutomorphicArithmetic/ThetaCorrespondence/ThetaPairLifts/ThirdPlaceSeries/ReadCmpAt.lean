@@ -8,7 +8,7 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
@@ -21,8 +21,8 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMas
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open GlobalTheory.BigOn.Exp.SerBase
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 namespace GlobalTheory.BigOn.Exp
 section GenericCmp
@@ -34,7 +34,7 @@ variable (rd : M →ₛₗ[eK] (G → ℂ)) (eL : L →+* ℂ)
 end GenericCmp
 end GlobalTheory.BigOn.Exp
 namespace GlobalTheory.BigOn.Exp.SerBase
-set_option maxHeartbeats 4000000 in
+
 theorem readCmpAt_alt : _root_.GlobalTheory.BigOn.Exp.SerBase.ReadComparisonAt := by
   unfold _root_.GlobalTheory.BigOn.Exp.SerBase.ReadComparisonAt
   refine _root_.GlobalTheory.BigOn.Exp.TwistConditions.of_forall fun Fm x hx i p hr hm w _ j => ?_

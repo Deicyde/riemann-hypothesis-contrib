@@ -22,8 +22,8 @@ namespace GlobalTheory.StdUnn.RealPar
 
 variable {D : D7}
 
-set_option synthInstance.maxHeartbeats 200000
-set_option maxHeartbeats 1000000
+
+
 
 theorem finPart_cA_eq (z : AE D) :
     finPart D (cA D z) = Algebra.TensorProduct.map (AlgHom.id D.host.F (Af D.host.F)) D.sp.cm.sig (finPart D z) := by

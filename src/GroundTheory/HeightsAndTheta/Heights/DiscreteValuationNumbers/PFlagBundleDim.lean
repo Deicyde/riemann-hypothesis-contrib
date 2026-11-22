@@ -60,8 +60,8 @@ theorem FlagBundleDim.proof (hspan : TwistedDualGensSpan.Statement)
   have hGH : ∀ l m, (Matrix.of G * H) l m = φ l (v (ι' m)) := by
     intro l m
     conv_rhs => rw [← w.sum_repr (v (ι' m))]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, hsum]
+
+    rw [map_sum, hsum]
     · simp [Matrix.mul_apply, hG, hH, mul_comm]
     · intro j hj
       have hm := m.isLt
@@ -82,8 +82,8 @@ theorem FlagBundleDim.proof (hspan : TwistedDualGensSpan.Statement)
       | mem x hx =>
         obtain ⟨l, rfl⟩ := hx
         have := congrFun hg l
-        set_option synthInstance.maxHeartbeats 100000 in
-          simpa [hG, map_sum, Finset.sum_apply, mul_comm] using this
+
+        simpa [hG, map_sum, Finset.sum_apply, mul_comm] using this
       | zero => simp
       | add x z _ _ hx hz => rw [LinearMap.add_apply, hx, hz, add_zero]
       | smul r x _ hx => rw [LinearMap.smul_apply, hx, smul_zero]

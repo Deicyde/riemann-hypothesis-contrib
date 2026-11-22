@@ -14,8 +14,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.MainNotions.DIV.Cons
 open Formalism.IndefR.FWT GlobalTheory.BigTop GlobalTheory.OntoChain GlobalTheory.RealIndexBound GlobalTheory.OnTies GlobalTheory.SeriesTie
 open GlobalTheory.BigOn GlobalTheory.BigOn.Exp Formalism.L2.Theta GlobalTheory.ExportSeries
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp
@@ -52,8 +52,8 @@ theorem conj_sum_zero (D : D7) (Γ : Type) [Group Γ] [Fintype Γ] (Pl0 I0 T : T
     exact this
   have hg : ∀ k, evW YS v₀ j (g k).val = ∑ a, σ (bK.repr (g k) a) • φ a := fun k => by
     conv_lhs => rw [← bK.sum_repr (g k)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Submodule.coe_sum, map_sum]
+
+    rw [Submodule.coe_sum, map_sum]
     refine Finset.sum_congr rfl fun a _ => ?_
     rw [Submodule.coe_smul, ← algebraMap_smul D.what₂.LL, evW_smul, hbK]
   have hexp : ∀ d : Fin n → ℂ, ∑ k, d k • evW YS v₀ j (g k).val =
@@ -65,8 +65,8 @@ theorem conj_sum_zero (D : D7) (Γ : Type) [Group Γ] [Fintype Γ] (Pl0 I0 T : T
   rw [hexp]
   refine Finset.sum_eq_zero fun a _ => ?_
   have : ∑ k, τ (c k) * σ (bK.repr (g k) a) = τ (∑ k, c k * σ (bK.repr (g k) a)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_congr rfl fun k _ => by rw [map_mul, hσ]
   rw [this, hz a, map_zero, zero_smul]
 

@@ -33,8 +33,8 @@ theorem oFamily_of_image : ∀ (E : Type) [Field E] [NumberField E] (g : ℕ) (�
   have hyI : ∀ a, ((y a : W) : Λ) ∈ I := fun a => hyJ a
   have hsum : ∀ c : Fin r → 𝓞 E, per (∑ i, c i • y i) = ∑ i, ρ (c i) (v i) := by
     intro c
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [hact, hyv]
   refine ⟨y, hyI, hyv, ?_, ?_⟩

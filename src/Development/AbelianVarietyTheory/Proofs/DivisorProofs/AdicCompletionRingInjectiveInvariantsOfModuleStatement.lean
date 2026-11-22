@@ -13,7 +13,7 @@ open scoped CategoryTheory.Obj
 attribute [local instance] Over.cartesianMonoidalCategory
 open GlobalTheory.Mum
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.adicCompletion_ring_injective_invariants_of_module : ∀ (A B : Type) [CommRing A] [CommRing B] [Algebra A B] (J : Ideal A) (Γ : Type) (g : Γ → (B →ₐ[A] B)),
     Function.Injective (AdicCompletion.map J (Algebra.linearMap A B)) →
     (∀ y, y ∈ LinearMap.range (AdicCompletion.map J (Algebra.linearMap A B)) ↔

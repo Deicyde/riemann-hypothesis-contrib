@@ -49,7 +49,7 @@ theorem uni_map {A : Type} [CommRing A] {n : Type} [Fintype n] (s : A →+* A) (
   subst hJ hM'
   rw [← cT_map s φ h, ← Matrix.map_mul, ← Matrix.map_mul, hM]
 
-set_option maxHeartbeats 800000 in
+
 theorem archM_unitary (V : HSp D) {τ : D.host.E →+* ℂ} {θ : Ainf D.host.F ⊗[D.host.F] D.host.E →+* ℂ}
     (h : Formalism.MainNotions.StandardLattice.IsInfEmb τ θ) (g : GA D V) :
     (archM V θ g).conjTranspose * V.gram.map τ * archM V θ g = V.gram.map τ := by

@@ -27,8 +27,8 @@ open Formalism.BasicNotions Formalism.MainNotions Formalism.BasicNotions.TH Form
 open scoped TensorProduct Classical ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.AdTh.MovedDatum
 
@@ -105,8 +105,8 @@ theorem core (ψ : AddChar (AF D.host.F) ℂ) (V W : HSp D) (L₁ L' : AddSubgro
 theorem idem_div_mem {e : AE D} {P : Finset (Formalism.L2.DIV.Pl D.host.E)} (he : IsIdemSum e P) (s : 𝓞 D.host.E)
     (hs : ∀ PP ∈ P, s ∉ PP.asIdeal) : finPart D (e * incA D (s : D.host.E)⁻¹) ∈ intAE D := by
   obtain ⟨⟨es, hes, rfl⟩, -⟩ := he
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Finset.sum_mul, map_sum]
+
+  rw [Finset.sum_mul, map_sum]
   refine sum_mem fun PP hPP => ?_
   by_contra h
   exact hs PP hPP (((hes PP hPP).2 s fun h0 => hs PP hPP (h0 ▸ zero_mem _)).2 h)
@@ -202,8 +202,8 @@ theorem finPart_moved (V W : HSp D) (k : GA D W) (ρ : Matrix (Fin W.rank) (Fin 
     (fun a => finPart D ((Formalism.L2.Theta.mt W k * GlobalTheory.LatVac.finTens (D := D) 1 ρ) a b)) =
       (finHom W k).1 *ᵥ finVec W (fun a => ρ a b) := by
   funext a
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [Matrix.mul_apply, map_sum]
+
+  rw [Matrix.mul_apply, map_sum]
   exact Finset.sum_congr rfl fun c _ => RingHom.map_mul _ _ _
 
 theorem smul_moved (V W : HSp D) (k : GA D W) (ρ : Matrix (Fin W.rank) (Fin V.rank) D.host.E) (s : D.host.E) :

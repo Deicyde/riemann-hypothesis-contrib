@@ -88,8 +88,8 @@ theorem hC_self_im (v : Fin r → ℂ) : (hermC τ G v v).im = 0 := by
     | (simp only [cc]; exact (NumberField.IsCMField.complexEmbedding_complexConj τ (G a b)).symm)
     | (simp [cc])
   have hc : conj (hermC τ G v v) = hermC τ G v v := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hermC, map_sum, map_mul, Complex.conj_conj]
+
+    simp only [hermC, map_sum, map_mul, Complex.conj_conj]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
     rw [hτ]
@@ -122,8 +122,8 @@ theorem gs_exists {n : ℕ} (p : ℕ) (Y : Fin n → Fin r → ℂ) (hind : Line
     | (simp [cc])
   have csym : ∀ u w, conj (hermC τ G u w) = hermC τ G w u := by
     intro u w
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hermC, map_sum, map_mul, Complex.conj_conj]
+
+    simp only [hermC, map_sum, map_mul, Complex.conj_conj]
     rw [Finset.sum_comm]
     refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
     rw [hτ]

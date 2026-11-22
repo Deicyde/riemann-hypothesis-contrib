@@ -100,11 +100,11 @@ theorem coeff_eq_zero : ∀ (V : Type) [AddCommGroup V] [Module ℂ V] (I : V �
       I (∑ i, z i • U (t i) v) (U r (∑ i, z i • U (t i) v))
         = ∑ i, ∑ j, star (z i) * z j * φ (r + (t j - t i)) := by
     intro k t z r
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum (U r), map_sum I, LinearMap.sum_apply]
+
+    rw [map_sum (U r), map_sum I, LinearMap.sum_apply]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     have : I (U (t i) v) (U r (U (t j) v)) = φ (r + (t j - t i)) := by
       simp only [hφ]

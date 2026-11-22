@@ -218,7 +218,7 @@ variable {X0 : Scheme.{0}} {S : Type} [CommRing S] {x0 : Sp S ⟶ X0} {G : Over 
   {j : JetPts G x0 d}
 
 
-set_option maxHeartbeats 800000 in
+
 theorem param_of_dif_bijective (hG : Smooth G.hom)
     (ht : ∀ m, homAt x0 (jetTrunc : Jet S (Fin d) (m + 1) →ₐ[S] Jet S (Fin d) m) ≫ j (m + 1) = j m)
     (h0 : ∀ m, homAt x0 (jetAug : Jet S (Fin d) m →ₐ[S] S) ≫ j m = 1)
@@ -247,8 +247,8 @@ theorem param_of_dif_bijective (hG : Smooth G.hom)
   have pr : ∀ c : Fin d → S, P _ (Chart.prodPts c v) = tv (dif x0 (j 1) (h0 1) c) := fun c => by
     have e : c = ∑ i, c i • (Pi.single i 1 : Fin d → S) := by
       funext k; simp [Pi.single_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      conv_rhs => rw [e, map_sum]
+
+    conv_rhs => rw [e, map_sum]
     simp only [map_smul]
     rw [tv_comb, Chart.prodPts, List.prod_ofFn, map_prod]
     refine Finset.prod_congr rfl fun i _ => ?_
@@ -334,8 +334,8 @@ theorem tan_iff (h0 : algMap x0 (jetAug : Jet S (Fin d) 1 →ₐ[S] S) ≫ j 1 =
     refine Eq.trans ?_ (tv_dif x0 _ _ _).symm
     rw [← tan_jIn, ← hcomp]; rfl
   have e₂ : ∑ i, c i • dif x0 (j 1) h0 (Pi.single i 1) = dif x0 (j 1) h0 c := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [← map_smul, ← map_sum]
+
+    simp only [← map_smul, ← map_sum]
     congr 1
     funext k; simp [Pi.single_apply]
   simp only [e₁]

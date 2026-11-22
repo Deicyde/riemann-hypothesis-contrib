@@ -78,8 +78,8 @@ theorem actsD_zero_of_neg {F E : Type} [Field F] [NumberField F] [Field E] [Numb
             (RingHom.fst (InfiniteAdeleRing F) (FiniteAdeleRing (𝓞 F) F))
         have hevH : ∀ a : AF F, evI F a = evH a := fun a => rfl
         rw [hform, hevH]
-        set_option synthInstance.maxHeartbeats 100000 in
-          simp only [dotProduct, map_sub, map_sum, map_mul, a₁, a₂, b₁, b₂, hevH]
+
+        simp only [dotProduct, map_sub, map_sum, map_mul, a₁, a₂, b₁, b₂, hevH]
       change Algebra.trace ℝ (mixedEmbedding.mixedSpace F)
         (evI F (GlobalTheory.WeilM.symp (cA σ) (-1) (incM F X.J) (incM F W.J) u u')) < 0 at hneg
       rw [hev, map_sub] at hneg

@@ -173,7 +173,7 @@ private theorem cl4 (g : SA B.Δ) (d : ParN (Lp L) 2) : A.IsElD g d ↔ OnS S (B
 
 end Main
 
-set_option maxHeartbeats 2000000 in
+
 theorem levG : LevG := by
   intro L _ _ _ B hB T S VL A hA hF
   refine ⟨?_, ?_, ?_, ?_, fun w h n ψ d _ => expo_map (T w h).i (T w h).abs ψ d⟩

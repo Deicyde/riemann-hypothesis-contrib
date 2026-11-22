@@ -27,7 +27,7 @@ private theorem tailMap_pr {X : Scheme.{0}} (A : Over X) (k : ℕ) (j : Fin k) :
     tailMap A k ≫ GlobalTheory.KS.pr A j = GlobalTheory.KS.pr A j.succ := by
   simp [tailMap, GlobalTheory.KS.pr]
 
-set_option maxHeartbeats 400000 in
+
 private theorem pow_succ_isPullback {X : Scheme.{0}} (A : Over X) (k : ℕ) :
     IsPullback (GlobalTheory.KS.pr A (0 : Fin (k + 1))).left (tailMap A k).left A.hom (GlobalTheory.KS.pow A k).hom := by
   refine Over.isPullback_of_binaryFan_isLimit (BinaryFan.mk (GlobalTheory.KS.pr A (0 : Fin (k + 1))) (tailMap A k)) ?_

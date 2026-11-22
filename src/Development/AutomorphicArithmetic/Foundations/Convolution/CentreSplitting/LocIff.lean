@@ -54,7 +54,7 @@ private theorem proj_range {G H X Y : Type} [Group G] [TopologicalSpace G] [IsTo
       (by rintro _ ⟨y, hy, rfl⟩; exact Submodule.mem_map_of_mem (mem_fixedVectors.2 hy)) h2 h1
     exact ⟨y, congrArg Subtype.val hy⟩
 
-set_option maxHeartbeats 800000 in
+
 open PositivityTheory.Rg.Rs.C3.Fl in
 theorem UpperTheory.ConvolutionTheory.Dp.locIff :
     UpperTheory.ConvolutionTheory.Dp.LocIff := by

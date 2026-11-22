@@ -33,8 +33,8 @@ theorem eig_frob : ∀ (K : Type) [Field K] (p : ℕ) [Fact p.Prime] [CharP K p]
       rfl
     have hsum : ∀ ι (f : Fin d → K), (β.repr (∑ j, f j) ι : K) = ∑ j, (β.repr (f j) ι : K) := by
       intro ι f
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp [map_sum, Finsupp.finsetSum_apply]
+
+      simp [map_sum, Finsupp.finsetSum_apply]
     let z : _ → Fin d → K := fun ι j => (β.repr (y j) ι : K)
     have hz : ∀ ι a r, ∑ j, ρ a r j ^ p * z ι j = χ a ^ p * z ι r := by
       intro ι a r
@@ -97,13 +97,13 @@ theorem eig_dual : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I �
   set W' := eig (fun a => Matrix.toLin' (ρ a).transpose) (fun a => algebraMap k K (χ s a)) with hW'
   set E : Matrix (Fin d) (Fin d) K := ∑ j, algebraMap k K (c j) • ρ (b j) with hE
   have hlin : Matrix.toLin' E = ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hE, map_sum]
+
+    rw [hE, map_sum]
     simp only [map_smul]
   have hlinT : Matrix.toLin' E.transpose =
       ∑ j, algebraMap k K (c j) • Matrix.toLin' (ρ (b j)).transpose := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hE, Matrix.transpose_sum, map_sum]
+
+    rw [hE, Matrix.transpose_sum, map_sum]
     simp only [Matrix.transpose_smul, map_smul]
   have heE : ∀ x, e s x = E.mulVec x := by
     intro x
@@ -116,9 +116,9 @@ theorem eig_dual : ∀ (K : Type) [Field K] (C : ACurve K) (d : ℕ) (L : C.I �
     intro y hy
     simp only [hW', mem_eig, Matrix.toLin'_apply] at hy
     rw [← Matrix.toLin'_apply, hlinT, LinearMap.sum_apply]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.smul_apply, Matrix.toLin'_apply, hy, smul_smul, ← map_mul,
-      ← Finset.sum_smul, ← map_sum]
+
+    simp only [LinearMap.smul_apply, Matrix.toLin'_apply, hy, smul_smul, ← map_mul,
+    ← Finset.sum_smul, ← map_sum]
     rw [hc s, if_pos rfl, map_one, one_smul]
   have hETW : ∀ z, E.transpose.mulVec z ∈ W' := by
     intro z

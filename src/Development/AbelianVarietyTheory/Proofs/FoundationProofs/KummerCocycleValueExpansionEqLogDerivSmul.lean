@@ -84,7 +84,7 @@ theorem d_psi {T : Tower p Ω} {L : ℕ} {ψ : O0 p →+* Ω} (hψ : IsReb T L �
   GlobalTheory.T.smul_kaehlerD_reparametrization_eq p Ω T L ψ hψ b x y qL hx hy hq
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem geo_cob : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∃ c : ℕ, ∀ (Ω : Type) [Field Ω] [Algebra (O0 p) Ω], IsClo p Ω → ∀ (T : GlobalTheory.K5.Tower p Ω) (L n : ℕ), n ≤ L → 1 ≤ n → ∀ (ψ : O0 p →+* Ω), IsReb T L ψ → ∀ (cw : ℤ → Ω) (w w' r : Ω), Ev ψ cw w w' → w ≠ 0 → IsInt (p := p) w⁻¹ → r ^ (p ^ n) = w →
   ∀ a lq : Gal p Ω → ZMod (p ^ n), IsKum T n (Ggeo p Ω ⊓ Gn T L) r a → IsKum T n (Ggeo p Ω ⊓ Gn T L) (T.qq (L + n)) lq →
   Cob1 n (Ggeo p Ω ⊓ Gn T L) (fun g => (p : Ω) ^ c * ((a g).val : Ω) - (p : Ω) ^ c * (w' / w) * ((lq g).val : Ω)) := by
@@ -167,9 +167,9 @@ theorem geo_cob : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∃ c : ℕ, ∀ (Ω
     rw [Derivation.leibniz]
     linear_combination (norm := module) (eS t * qLi) • h - (eS t * hqL) • D (AS t)
   have hd : D wS = (w'S * qLi) • D qL + ∑ t, AS t • D (eS t) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hwS, map_sum, Finset.sum_congr rfl (fun t _ => hterm t), Finset.sum_add_distrib,
-      ← Finset.sum_smul, hw'S, Finset.sum_mul]
+
+    rw [hwS, map_sum, Finset.sum_congr rfl (fun t _ => hterm t), Finset.sum_add_distrib,
+    ← Finset.sum_smul, hw'S, Finset.sum_mul]
   let η := (1 * r' ^ (p ^ n - 1)) • D r' - (w'S * qLi * qN ^ (p ^ n - 1)) • D qN -
     ∑ t, (AS t * yS t ^ (p ^ n - 1)) • D (yS t)
   have hE : ((p ^ n : ℕ) : integralClosure (O0 p) Ω) • ∑ t, (AS t * yS t ^ (p ^ n - 1)) • D (yS t) =
@@ -209,13 +209,13 @@ theorem geo_cob : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∃ c : ℕ, ∀ (Ω
     rw [← e0, map_pow, hgL.2]
   have hgqinv : g (algebraMap (O0 p) Ω qinv) = algebraMap (O0 p) Ω qinv := AlgEquiv.commutes g qinv
   have hgw : g w = w := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hwe, map_sum]
+
+    rw [hwe, map_sum]
     refine Finset.sum_congr rfl fun t _ => ?_
     rw [map_mul, hgeo _ (he t).2, psi_fix hψ hgL.2]
   have hgw' : g w' = w' := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hw'e, map_sum]
+
+    rw [hw'e, map_sum]
     refine Finset.sum_congr rfl fun t _ => ?_
     rw [map_mul, hgeo _ (he t).2, psi_fix hψ hgL.2]
   let gS := (g.toAlgHom).mapIntegralClosure
@@ -243,8 +243,8 @@ theorem geo_cob : ∀ (p : ℕ) [Fact p.Prime], p ≠ 2 → ∃ c : ℕ, ∀ (Ω
   let Aval : integralClosure (O0 p) Ω := ((a g).val : integralClosure (O0 p) Ω) -
     w'S * wiS * ((lq g).val : integralClosure (O0 p) Ω)
   have hσE : σ (∑ t, (AS t * yS t ^ (p ^ n - 1)) • D (yS t)) = ∑ t, (AS t * yS t ^ (p ^ n - 1)) • D (yS t) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun t _ => ?_
     rw [hσ, map_mul, map_pow, hgAS, hgyS]
   have hση : σ η = η + (wS * zi * Aval) • D z := by

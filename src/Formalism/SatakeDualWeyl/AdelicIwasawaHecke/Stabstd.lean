@@ -27,8 +27,8 @@ theorem map_mulVec_mem_stdLat (M : Matrix n n R) (x : n → A)
   intro i
   refine ⟨(M *ᵥ y) i, ?_⟩
 
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
+
+  simp only [Matrix.mulVec, dotProduct, Matrix.map_apply, map_sum, map_mul]
 
 theorem entries_mem_of_mem_stabGL (h : GL n A)
     (hh : h ∈ Formalism.UG.stabGL (stdLat (n := n) (A := A) R))

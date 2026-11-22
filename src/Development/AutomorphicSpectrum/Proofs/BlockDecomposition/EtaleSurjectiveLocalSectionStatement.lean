@@ -7,7 +7,7 @@ public import Development.WeilBound.CoreStatements.PadicHodgeComparison.EtaleCoh
 @[expose] public section
 
 open CategoryTheory AlgebraicGeometry CrystallineSemistableComparison CrystallineSemistableComparison.R
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.etale_surjective_local_section : ∀ {S : Type} [CommRing S],
     Aic (S := S) → Loc (S := S) →
     ∀ (Y : Scheme.{0}) (f : Y ⟶ Spec (CommRingCat.of S)), Etale f → Surjective f →

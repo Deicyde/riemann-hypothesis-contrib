@@ -94,8 +94,8 @@ theorem dirD_X (z w : J → ℂ) (n : J) : dirD z w (X n) = w n := by
 
 theorem dirD_sum (z w : J → ℂ) {α : Type} (s : Finset α) (f : α → MvPolynomial J ℂ) :
     dirD z w (∑ a ∈ s, f a) = ∑ a ∈ s, dirD z w (f a) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [dirD, map_sum, Finset.sum_mul]
+
+  simp only [dirD, map_sum, Finset.sum_mul]
   exact Finset.sum_comm
 
 theorem dirD_subC (M : J → J → ℤ) (z w : J → ℂ) (h : MvPolynomial J ℂ) :
@@ -173,8 +173,8 @@ theorem subZ_mem_coordIdeal_iff {Ω : Type} [Field Ω] [CharZero Ω] [DecidableE
 
 theorem matActC_conjPt (A : Matrix J J ℚ) (z : J → ℂ) : matActC A (conjPt z) = conjPt (matActC A z) := by
   funext i
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [matActC, conjPt, map_sum, map_mul]
+
+  simp [matActC, conjPt, map_sum, map_mul]
 
 theorem contDiff_matActC {k : WithTop ℕ∞} (A : Matrix J J ℚ) : ContDiff ℝ k (matActC A) := by
   refine contDiff_pi.2 fun i => ?_

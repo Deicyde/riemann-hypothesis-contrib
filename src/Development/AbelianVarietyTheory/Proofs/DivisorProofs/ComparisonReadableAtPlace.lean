@@ -16,8 +16,8 @@ open Formalism.BasicNotions.TH Formalism.MainNotions.GlobalTheoryTheory.GenusMas
 open GlobalTheory.IndefiniteRowSideFullHecke.ToricLatticeDenominators (FmExt eExt incl)
 open GlobalTheory.BigOn.Exp.SerBase
 open scoped TensorProduct
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 
 namespace GlobalTheory.BigOn.Exp
@@ -64,8 +64,8 @@ theorem readExt_eq_smul_of_read
   have hsm : ∀ (d : O) (x : L ⊗[O] M), R (d • x) = eL (algebraMap O L d) • R x := fun d x => by
     rw [← algebraMap_smul L d x, hR, readExt_smul]
   have hsum : ∀ c : _ → L, R (∑ k, c k ⊗ₜ v k) = ∑ k, eL (c k) • rd (v k) := fun c => by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     rfl
   obtain ⟨d, hd, c, es⟩ := exists_smul_eq_sum_finBasis s
   obtain ⟨d', hd', c', et⟩ := exists_smul_eq_sum_finBasis t

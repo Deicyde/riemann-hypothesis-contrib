@@ -79,7 +79,7 @@ private theorem num_poly (u Y t b g c v : ℝ) (hu : 2 ≤ u) (hY : 1 / 2 ≤ Y)
     exact mul_le_mul_of_nonneg_right (by linarith) h4Y
   linarith
 
-set_option maxHeartbeats 800000 in
+
 private theorem num_down (C : ℝ) (hC : 0 ≤ C) (E n D n' D' d w : ℕ) (hE : 1 ≤ E) (hn : 1 ≤ n) (hD : 1 ≤ D)
     (hD' : 1 ≤ D') (h1 : n' = d * n) (hn' : 1 ≤ n') (h2 : d ≤ (n + 1) * (4 * E + 4)) (hw : w ≤ 2 * n')
     (h3 : D' ≤ D ^ d * w ^ n') : kBound C E n' D' ≤ kBound (5 * C + 11) E n D := by
@@ -211,7 +211,7 @@ private theorem gens_le (L : Type) [Field L] [NumberField L] :
   push_cast
   linarith
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.V.ZK.sNum :
     UpperTheory.V.ZK.SNum := by
   unfold UpperTheory.V.ZK.SNum

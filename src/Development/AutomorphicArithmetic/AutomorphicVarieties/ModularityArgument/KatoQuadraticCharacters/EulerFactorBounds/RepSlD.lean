@@ -77,8 +77,8 @@ theorem UpperTheory.V.Z.Kato.Nb.sXiMul :
   · intro a a' b b' hab u
     simp only [Pi.add_apply, Pi.sub_apply]
     unfold Xi
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_sub_distrib, ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib, map_sum]
+
+    rw [← Finset.sum_sub_distrib, ← Finset.sum_add_distrib, ← Finset.sum_sub_distrib, map_sum]
     apply Finset.sum_eq_zero
     intro m hm
     rw [← smul_sub, ← smul_add, ← smul_sub, map_smul,
@@ -87,15 +87,15 @@ theorem UpperTheory.V.Z.Kato.Nb.sXiMul :
     simp only [Pi.sub_apply, Pi.smul_apply]
     unfold Xi
     beta_reduce
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.smul_sum, ← Finset.sum_sub_distrib, map_sum]
+
+    rw [Finset.smul_sum, ← Finset.sum_sub_distrib, map_sum]
     apply Finset.sum_eq_zero
     intro m _
     rw [smul_comm (k : ℤ_[l]), ← smul_sub, map_smul, term_pow, smul_zero]
   · intro a u
     unfold Xi
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← Finset.sum_sub_distrib, map_sum]
+
+    rw [← Finset.sum_sub_distrib, map_sum]
     apply Finset.sum_eq_zero
     intro m _
     rw [← smul_sub, map_smul, term_red, smul_zero]

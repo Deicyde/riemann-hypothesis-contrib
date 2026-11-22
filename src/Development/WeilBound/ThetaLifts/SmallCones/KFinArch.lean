@@ -30,9 +30,9 @@ theorem exists_at_inf (h : IsCMExt F E σ) (τ : ∀ w : InfinitePlace F, EmbOve
       have : s * sgI w a = 0 := Prod.ext (show s.1 * _ = 0 by rw [h1, zero_mul]) (show s.2 * 0 = 0 from mul_zero _)
       rw [TensorProduct.map_tmul, TensorProduct.smul_tmul', smul_eq_mul, this, TensorProduct.zero_tmul]
     | add x y hx hy => rw [map_add (f := _), smul_add, hx, hy, add_zero]
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [piInf, RingHom.comp_apply, map_sum, Finset.sum_eq_single w (fun u _ hu => compInf_sgI_ne hu.symm _)
-      (fun h => absurd (Finset.mem_univ w) h), compInf_sgI_self, hb]
+
+  · rw [piInf, RingHom.comp_apply, map_sum, Finset.sum_eq_single w (fun u _ hu => compInf_sgI_ne hu.symm _)
+    (fun h => absurd (Finset.mem_univ w) h), compInf_sgI_self, hb]
 
 theorem exists_mat_inf (h : IsCMExt F E σ) (τ : ∀ w : InfinitePlace F, EmbOver E w) (z : InfinitePlace F → Matrix (Fin n) (Fin d) ℂ) :
     ∃ u : Matrix (Fin n) (Fin d) (AE F E), At (evI F) u ∧ ∀ w, u.map (piInf (τ w)) = z w := by
@@ -56,9 +56,9 @@ theorem lamF_inj (κ : Type) [Fintype κ] : Function.Injective (lamF F κ) := by
   have h1 : linForm l (Pi.single i (mixedEmbedding F ((integralBasis F).traceDual j))) = 0 := DFunLike.congr_fun h _
   rw [linForm_apply, Finset.sum_eq_single i (fun b _ hb => by simp [hb]) (by simp), Pi.single_eq_same, mul_comm,
     ← (mixedEmbedding.latticeBasis F).sum_repr (l i)] at h1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, mixedEmbedding.latticeBasis_apply, ← map_mul, GlobalTheory.LatVacArith.trace_mixedEmbedding,
-    Module.Basis.trace_mul_traceDual] at h1
+
+  simp only [Finset.sum_mul, smul_mul_assoc, map_sum, map_smul, mixedEmbedding.latticeBasis_apply, ← map_mul, GlobalTheory.LatVacArith.trace_mixedEmbedding,
+  Module.Basis.trace_mul_traceDual] at h1
   simpa [apply_ite] using h1
 
 variable (M : Model σ X W) {ψ : AddChar (AF F) ℂ}

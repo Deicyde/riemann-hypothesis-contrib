@@ -46,8 +46,8 @@ theorem sum_cc (h : RLaw X V) {τ : Type} {a b : κ → MvPowerSeries τ C}
 theorem lin_cc (h : RLaw X V) (M : Matrix κ κ C) {τ : Type} {a : κ → MvPowerSeries τ C}
     (ha : ∀ s, constantCoeff (a s) = 0) (x : κ) :
     constantCoeff (∑ y, M x y • subst a (X.lg y)) = 0 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum]
+
+  rw [map_sum]
   refine Finset.sum_eq_zero fun y _ => ?_
   rw [smul_eq_C_mul, map_mul, cc_subst ha, lg_cc h, mul_zero]
 
@@ -100,8 +100,8 @@ theorem subst_endP_X (h : RLaw X V) (M : Matrix κ κ C) {ρ : Type}
     (hasSubst_of_constantCoeff_zero (lin_cc h M (fun s => constantCoeff_X s))) hS]
   congr 1
   funext y
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coe_substAlgHom hS, map_sum]
+
+  rw [← coe_substAlgHom hS, map_sum]
   refine Finset.sum_congr rfl fun z _ => ?_
   rw [coe_substAlgHom hS, subst_smul hS, subst_self]
   rfl

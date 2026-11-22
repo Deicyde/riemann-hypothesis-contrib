@@ -42,8 +42,8 @@ theorem hhat_conj (x y : Fin I.n → I.E ⊗[I.F] Af I.F) : sg I (hhat I x y) = 
     rw [← starRingEnd_apply]
     simpa [Formalism.UG.cT] using this
   unfold hhat Formalism.UG.hform
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, sg_sg, hJ]
+
+  simp only [map_sum, map_mul, sg_sg, hJ]
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
   ring

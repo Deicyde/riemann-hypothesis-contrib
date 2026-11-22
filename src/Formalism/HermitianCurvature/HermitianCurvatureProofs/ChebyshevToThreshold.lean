@@ -23,8 +23,8 @@ theorem pull {α X : Type} [DecidableEq X] (η : α → X) (F : Finset α) (k : 
         a x * conj (a y) * k (η x) (η y) := by
     intro u v
     simp only [hb]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_mul_sum, Finset.sum_mul]
+
+    rw [map_sum, Finset.sum_mul_sum, Finset.sum_mul]
     refine Finset.sum_congr rfl (fun x hx => ?_)
     rw [Finset.sum_mul]
     refine Finset.sum_congr rfl (fun y hy => ?_)

@@ -341,12 +341,12 @@ theorem exists_int_multiple {κ : Type} (F : MvPolynomial κ K) :
   choose y hy using hy
   refine ⟨algebraMap (𝓞 K) K b, ∑ s ∈ F.support, MvPolynomial.monomial s (y s), ?_, ?_⟩
   · exact IsFractionRing.to_map_ne_zero_of_mem_nonZeroDivisors b.2
-  set_option synthInstance.maxHeartbeats 100000 in
-    · rw [map_sum]
-      simp only [MvPolynomial.map_monomial, hy]
-      conv_rhs => rw [MvPolynomial.as_sum F]
-      rw [Finset.mul_sum]
-      refine Finset.sum_congr rfl fun s _ => ?_
-      rw [MvPolynomial.C_mul_monomial, Algebra.smul_def]
+
+  · rw [map_sum]
+    simp only [MvPolynomial.map_monomial, hy]
+    conv_rhs => rw [MvPolynomial.as_sum F]
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun s _ => ?_
+    rw [MvPolynomial.C_mul_monomial, Algebra.smul_def]
 
 end ReciprocityTheory.ChartRestriction.G.T0.SatakeVectors

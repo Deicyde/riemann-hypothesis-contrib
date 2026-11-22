@@ -30,8 +30,8 @@ theorem expv_apply {ι : Type} [DecidableEq ι] {n : ℕ} (c : Fin n → ι) (i 
   simp
 
 theorem weight_expv {ι : Type} {n : ℕ} (c : Fin n → ι) : Finsupp.weight 1 (expv c) = n := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [expv, map_sum, Finsupp.weight_apply, Finsupp.sum_single_index]
+
+  simp [expv, map_sum, Finsupp.weight_apply, Finsupp.sum_single_index]
 
 theorem exists_perm_of_expv_eq {ι : Type} {n : ℕ} {c c' : Fin n → ι} (h : expv c = expv c') :
     ∃ e : Equiv.Perm (Fin n), ∀ a, c' a = c (e a) := by
@@ -131,8 +131,8 @@ theorem exists_linear_of_multiadditive : ∀ (k : Type) [CommRing k] (X : Scheme
   refine ⟨Φ, fun n => ?_, fun P e he hP => ?_⟩
   · rw [hF]
     simp only [lin]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.prod_univ_sum, Fintype.piFinset_univ, map_sum]
+
+    rw [Finset.prod_univ_sum, Fintype.piFinset_univ, map_sum]
     refine Finset.sum_congr rfl fun c _ => ?_
     rw [Finset.prod_mul_distrib, ← map_prod, prod_X_eq, C_mul', map_smul, hΦ, hφ, smul_eq_mul]
   · set_option synthInstance.maxHeartbeats 100000 in

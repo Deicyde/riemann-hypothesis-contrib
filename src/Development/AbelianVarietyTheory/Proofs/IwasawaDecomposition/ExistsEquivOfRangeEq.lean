@@ -30,8 +30,8 @@ theorem semi_injective_of_basis {ι : Type} [Fintype ι] (b : Basis ι K U) (g :
     (h : LinearIndependent ℂ fun i => g (b i)) : Function.Injective g := by
   set_option backward.isDefEq.respectTransparency.instanceSearchTypes false in rw [injective_iff_map_eq_zero]
   intro x hx
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← b.sum_repr x, map_sum] at hx
+
+  rw [← b.sum_repr x, map_sum] at hx
   simp only [map_smulₛₗ] at hx
   have := Fintype.linearIndependent_iff.1 h (fun i => σ (b.repr x i)) hx
   refine b.repr.injective (Finsupp.ext fun i => σ.injective ?_)

@@ -77,8 +77,8 @@ theorem partA_of (h1 : AbsTrans) (h2 : SuppFwd) (h3 : SuppBwd) (h4 : LevCorr) : 
   have hτ : ∀ γ v, τ ((geo ho U Ξ).ξ γ *ᵥ v) = (geo ho U Ξ').ξ γ *ᵥ τ v := fun γ v => by
     ext i
     change σ (∑ j, ratC Ξ γ.1 (Fin.cast h.symm i) j * v j) = ∑ j, ratC Ξ' γ.1 i j * σ (v (Fin.cast h.symm j))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, ← (finCongr h).sum_comp]
+
+    rw [map_sum, ← (finCongr h).sum_comp]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_mul, ← hσ]
     rfl

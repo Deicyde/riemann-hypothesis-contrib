@@ -63,7 +63,7 @@ theorem chiKs_of_pins : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T 
   exact ⟨y, D.what₂.embLL.injective (hy.trans ((Units.coe_prod _ _).trans (hP.char.base.grp.chiW i g).symm))⟩
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem exists_oLat_good : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0 T : Type) (A3 : FamIn3 D.what₂.LL G Pl0 I0 (List ℕ) T D.R.m) (Ks : Type) [Field Ks] [NumberField Ks] [Algebra Ks D.what₂.LL] (R : RealDat3 D A3 Ks) (F : Face3 D A3) (cG : G0 R.Pg D.R.r ≃* G0g D.nd), (∀ o : D.what₂.O, ∃ k : Ks, algebraMap Ks D.what₂.LL k = D.what₂.OtoLL o) → Inputs D → Pins R F cG → Holds R F → ∀ (i : Fin D.R.m) (M : Type) [AddCommGroup M] [Module ℂ M] [FiniteDimensional ℂ M] (E : M →ₗ[ℂ] (R.toRealDat.HW i (sg0 D A3.A)).H), Function.Injective E → LinearMap.range E = (R.toRealDat.Wat i (sg0 D A3.A) (R.toRealDat.levL F.lv2 false (sg0 D A3.A))).comap (R.toRealDat.HW i (sg0 D A3.A)).e → ∃ L : Rows.OLat D.what₂.O (D.what₂.embLL.comp D.what₂.OtoLL) M, ∀ x, x ∈ L.carrier ↔ ∃ v ∈ (R.toRealDat.FW i).MK, v ∈ (R.toRealDat.FW i).Wgood F.lv2.P0 F.lv2.ψ0⁻¹ (fun g => (idemOf A3.A.X).coeff g) ∧ E x = (R.toRealDat.FW i).j (sg0 D A3.A) v := by
   intro D G _ _ Pl0 I0 T A3 Ks _ _ _ R F cG hO _ hP hH i M _ _ _ E hinj hrange
   classical
@@ -98,11 +98,11 @@ theorem exists_oLat_good : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0
         R.toRealDat.bL F.lv2 false i k = y := by
       have h := congrArg (R.toRealDat.WL F.lv2 false i).subtype
         ((Module.finBasis D.what₂.LL (R.toRealDat.WL F.lv2 false i)).sum_repr ⟨y, hyW⟩)
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum] at h
+
+      rw [map_sum] at h
       exact h
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← hs, map_sum]
+
+    rw [← hs, map_sum]
     refine Submodule.sum_mem _ fun k _ => ?_
     rw [map_smulₛₗ, ← GlobalTheory.Mem.LiftTheta.goodForm_single]
     exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨k, rfl⟩)
@@ -154,8 +154,8 @@ theorem exists_oLat_good : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0
       exact hC _ (Module.finBasis D.what₂.LL (R.toRealDat.WL F.lv2 false i) k).2
   refine ⟨⟨T0.image g, hgen⟩, fun x => ⟨?_, ?_⟩⟩
   · rintro ⟨c, rfl⟩
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_induction _
       (fun w => ∃ v ∈ (R.FW i).MK, v ∈ (R.FW i).Wgood F.lv2.P0 F.lv2.ψ0⁻¹ (fun g => (idemOf A3.A.X).coeff g) ∧
         w = (R.FW i).j (sg0 D A3.A) v) ?_ ?_ ?_
@@ -182,16 +182,16 @@ theorem exists_oLat_good : ∀ (D : D7) (G : Type) [Group G] [Fintype G] (Pl0 I0
     obtain ⟨n, -, hn⟩ := Submodule.mem_span_finset.1 ((hT v).2 ⟨hv1, hv2⟩)
     have hx : x = ∑ t ∈ T0, ((n t : ℤ) : ℂ) • g t := by
       apply hinj
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [hxv, ← hn, map_sum, map_sum]
+
+      rw [hxv, ← hn, map_sum, map_sum]
       refine Finset.sum_congr rfl fun t ht => ?_
       rw [map_zsmul, map_smul, hg t ht, Int.cast_smul_eq_zsmul]
     refine ⟨fun y => ∑ t ∈ T0 with g t = y, (n t : D.what₂.O), ?_⟩
     rw [hx]
     symm
     refine Finset.sum_image' _ fun t _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, Finset.sum_smul]
+
+    rw [map_sum, Finset.sum_smul]
     refine Finset.sum_congr rfl fun t' ht' => ?_
     rw [(Finset.mem_filter.1 ht').2, map_intCast]
 

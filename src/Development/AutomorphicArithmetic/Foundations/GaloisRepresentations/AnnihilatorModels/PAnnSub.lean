@@ -21,7 +21,7 @@ private theorem algebraTensorModule_map_map_id_right_comm_of_comm {F L U V B : T
   | tmul a b => simp [h]
   | add x y hx hy => simp only [map_add (f := _), hx, hy]
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.crystallineComparison.annSub_of :
     AnnSub := by
   intro F G B _ _ _ _ σ ψ L _ _ U V _ _ _ _ _ _ _ _ ρU ρ i hI hi q n TU T hT hAnn
@@ -46,8 +46,8 @@ theorem UpperTheory.Gal.crystallineComparison.annSub_of :
     intro g
     exact (algebraTensorModule_map_map_id_right_comm_of_comm i (ρU g) (ρ g) (σ g) (hI g) x).trans (congrArg M (hx g))
   apply hM_inj
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_zero, ← hAnn (M x) hmx, map_sum]
+
+  rw [map_zero, ← hAnn (M x) hmx, map_sum]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [LinearMap.map_smul_of_tower]
   congr 1

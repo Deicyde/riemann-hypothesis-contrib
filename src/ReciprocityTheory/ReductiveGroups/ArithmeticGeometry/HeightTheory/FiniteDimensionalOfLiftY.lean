@@ -45,7 +45,7 @@ theorem toFracY_injective : Function.Injective (toFracY A σ) := by
   exact MvPolynomial.map_injective _ (IsFractionRing.injective A (FractionRing A))
     (IsFractionRing.injective _ _ h')
 
-set_option synthInstance.maxHeartbeats 400000 in
+
 theorem isFractionRing_toFracY :
     @IsFractionRing (MvPolynomial σ A) _ (FractionRing (MvPolynomial σ (FractionRing A))) _
       (toFracY A σ).toAlgebra := by
@@ -124,9 +124,9 @@ private theorem linearIndependent_algebraMap_C_fractionRing
     rw [_root_.map_mul, ← liftY_algebraMap, ha j, _root_.map_mul, hmap, mul_assoc]
   have hsum : ∑ j, MvPolynomial.map (algebraMap L E) (a j) * MvPolynomial.C (e j) = 0 := by
     apply IsFractionRing.injective (MvPolynomial σ E) (FractionRing (MvPolynomial σ E))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [_root_.map_zero, _root_.map_sum, Finset.sum_congr rfl (fun j _ => key j), ← Finset.mul_sum,
-      hg', mul_zero]
+
+    rw [_root_.map_zero, _root_.map_sum, Finset.sum_congr rfl (fun j _ => key j), ← Finset.mul_sum,
+    hg', mul_zero]
   have hcoeff : ∀ m j, AddMonoidAlgebra.coeff (a j) m = 0 := by
     intro m
     have hsum' : ∑ j, MvPolynomial.C (e j) * MvPolynomial.map (algebraMap L E) (a j) = 0 := by

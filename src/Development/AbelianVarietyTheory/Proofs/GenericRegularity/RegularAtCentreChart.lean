@@ -71,7 +71,7 @@ theorem vr_of_over {V : Type} [CommRing V] [IsDomain V] [IsDiscreteValuationRing
   field_simp
   linarith
 
-set_option maxHeartbeats 1000000 in
+
 theorem combined_place {la : HeightOneSpectrum (𝓞 c.F)}
     (S : SCharts Xo c la) {m : ℕ} (ws : Fin m → Rul Xo c) (hF : S.FamW ws)
     {aL nL} (hws : ∀ k, ws k ∈ sec Xo c aL nL)
@@ -141,7 +141,7 @@ theorem combined_place {la : HeightOneSpectrum (𝓞 c.F)}
     _ ≤ ((nu + c' * t : ℝ) : EReal) := EReal.coe_le_coe_iff.2 hlim
     _ = (nu : EReal) + (c' : EReal) * v et := by rw [ht, EReal.coe_add, EReal.coe_mul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem combined_trivial {la : HeightOneSpectrum (𝓞 c.F)}
     (S : SCharts Xo c la) (hQ : S.CovQ) {m : ℕ} (ws : Fin m → Rul Xo c) (hF : S.FamW ws)
     {aL nL} (hws : ∀ k, ws k ∈ sec Xo c aL nL)
@@ -213,7 +213,7 @@ theorem combined_trivial {la : HeightOneSpectrum (𝓞 c.F)}
     _ ≤ ((c' * t : ℝ) : EReal) := EReal.coe_le_coe_iff.2 hlim
     _ = (c' : EReal) * q et := by rw [ht, EReal.coe_mul]
 
-set_option maxHeartbeats 1000000 in
+
 theorem family_place {la : HeightOneSpectrum (𝓞 c.F)}
     (S : SCharts Xo c la) {m : ℕ} (ws : Fin m → Rul Xo c) (hF : S.FamW ws)
     {aL nL} (hws : ∀ k, ws k ∈ sec Xo c aL nL) (nu : ℝ)

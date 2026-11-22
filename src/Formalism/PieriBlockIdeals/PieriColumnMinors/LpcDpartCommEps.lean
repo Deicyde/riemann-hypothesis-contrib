@@ -226,8 +226,8 @@ theorem lpc_formMod {K P M : Type} {q : ℕ} [Field K] [LinearOrder K] [IsStrict
     · exact (h.pos _ h0).le
   · intro a b x y
     unfold Dpart
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [LinearMap.add_apply, map_add (f := _), LinearMap.sum_apply, map_sum, lpc_form_unitY]
+
+    simp only [LinearMap.add_apply, map_add (f := _), LinearMap.sum_apply, map_sum, lpc_form_unitY]
     congr 1
     rw [lpc_form_apply, lpc_form_apply]
     exact Finset.sum_congr rfl fun g _ => h.adj a b _ _

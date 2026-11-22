@@ -27,8 +27,8 @@ theorem th_expK_zero {ι : Type} : expK (0 : MvPowerSeries ι K) = 1 := by
 
 theorem th_subst_expSum {σ τ : Type} {a : σ → MvPowerSeries τ K} (ha : MvPowerSeries.HasSubst a)
     (f : MvPowerSeries σ K) (M : ℕ) : MvPowerSeries.subst a (expSum f M) = expSum (MvPowerSeries.subst a f) M := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [expSum, expSum, ← MvPowerSeries.coe_substAlgHom ha, map_sum]
+
+  rw [expSum, expSum, ← MvPowerSeries.coe_substAlgHom ha, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_mul, map_pow, MvPowerSeries.coe_substAlgHom ha, MvPowerSeries.subst_C]
 
@@ -53,8 +53,8 @@ theorem th_subst_expK {σ τ : Type} [Finite σ] (a : σ → MvPowerSeries τ K)
 theorem th_map_expK {ι K2 : Type} [Field K2] (φ : K →+* K2) (f : MvPowerSeries ι K) :
     MvPowerSeries.map φ (expK f) = expK (MvPowerSeries.map φ f) := by
   ext n
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [MvPowerSeries.coeff_map, coeff_expK, coeff_expK, map_sum]
+
+  rw [MvPowerSeries.coeff_map, coeff_expK, coeff_expK, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [map_mul, map_inv₀, map_natCast, ← map_pow, MvPowerSeries.coeff_map]
 

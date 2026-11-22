@@ -97,8 +97,8 @@ theorem eulH_gen (ε : Fin m → Bool) (H : Matrix (Fin n) (Fin n) ℂ) (k : Boo
   have : eulH H (gen ε k) = ∑ l, C (H l k.2.2) * gen ε (k.1, k.2.1, l) + ∑ l, C (star (H l k.2.1)) * gen ε (k.1, l, k.2.2) := by
     obtain ⟨b, i, j⟩ := k
     rw [eulH_eq]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [gen, Qb, map_sum, Derivation.leibniz, smul_eq_mul, eulD_X_false, eulD_X_true, Finset.mul_sum]
+
+    simp only [gen, Qb, map_sum, Derivation.leibniz, smul_eq_mul, eulD_X_false, eulD_X_true, Finset.mul_sum]
     rw [Finset.sum_add_distrib]
     congr 1
     · rw [Finset.sum_comm]

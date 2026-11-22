@@ -10,8 +10,8 @@ public import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ZlTower
 
 open Formalism.WeaklyAdmissibleFiltrations Formalism.BasicNotions Formalism.BasicNotions.Loc TensorProduct GlobalTheory.NL Formalism.MainNotions.DeltaInvariantLattices GlobalTheory.WeakClosed
 open scoped Topology PowerSeries.WithPiTopology
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 1600000
+
+
 
 namespace GlobalTheory.WeakClosed
 
@@ -20,10 +20,10 @@ theorem tailDecomp {O : Type} [CommRing O] {n : ℕ} (k : ℕ) (a : LetA O n) :
       (letπ : LetA O n) ^ k * (fun i => PowerSeries.mk fun m => PowerSeries.coeff (m + k) (a i)) := by
   funext i
   ext m
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Pi.add_apply, Finset.sum_apply, Pi.mul_apply, Pi.pow_apply, letπ, map_add (f := _), map_sum,
-    PowerSeries.coeff_C_mul_X_pow, PowerSeries.coeff_X_pow_mul', PowerSeries.coeff_mk,
-    Finset.sum_ite_eq, Finset.mem_range]
+
+  simp only [Pi.add_apply, Finset.sum_apply, Pi.mul_apply, Pi.pow_apply, letπ, map_add (f := _), map_sum,
+  PowerSeries.coeff_C_mul_X_pow, PowerSeries.coeff_X_pow_mul', PowerSeries.coeff_mk,
+  Finset.sum_ite_eq, Finset.mem_range]
   by_cases hk : m < k
   · simp [hk, Nat.not_le.2 hk]
   · simp [hk, Nat.le_of_not_lt hk, Nat.sub_add_cancel (Nat.le_of_not_lt hk)]
@@ -57,8 +57,8 @@ theorem continuous_of_tail {O : Type} [CommRing O] [TopologicalSpace O] {n : ℕ
   have hΦ : ∀ b, Φ b = (∑ j ∈ Finset.range k, mono j b) + Φ (letπ ^ k * tl b) := by
     intro b
     conv_lhs => rw [tailDecomp k b]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_add (f := _), map_sum]
+
+    rw [map_add (f := _), map_sum]
   have : Φ a - Φ a₀ = S a + Φ (letπ ^ k * (tl a - tl a₀)) := by
     rw [hΦ a, hΦ a₀, mul_sub, map_sub]
     simp only [S, Finset.sum_sub_distrib]

@@ -72,8 +72,8 @@ theorem proj_model {V : HSp D} {S : D.what₂.Tau → SPar} (M : DSModel V S) {X
     (hy : e y' = postOn M (∑ g, c g • L g) (e y)) (hw : ph • y = w) : ph • y' = ∑ g, c g • ρ g w := by
   have h1 : y' = ∑ g, c g • ρ g y := by
     apply he
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hy, map_sum]
+
+    rw [hy, map_sum]
     simp only [map_smul, hρ]
     ext v x
     simp [postOn, LinearMap.sum_apply, Finset.sum_apply]
@@ -89,8 +89,8 @@ theorem eq_of_reps {V : HSp D} {S : D.what₂.Tau → SPar} {θ} {M : DSModel V 
   refine GlobalTheory.PhaseRational.eq_of_out
     (GlobalTheory.PhaseRational.mult_leftInv (hr.le (LinearMap.mem_range_self e _)) v)
     (GlobalTheory.PhaseRational.mult_leftInv (hr.le (LinearMap.mem_range_self e _)) v) (fun q => ?_) g
-  set_option synthInstance.maxHeartbeats 100000 in
-    simpa [map_sum, Finset.sum_apply] using h q
+
+  simpa [map_sum, Finset.sum_apply] using h q
 
 end GlobalTheory.GalLift.BaseId
 

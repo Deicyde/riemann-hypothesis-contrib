@@ -4,7 +4,7 @@ public import Formalism.DoubleCosetMeasures.Statement
 
 @[expose] public section
 
-set_option maxHeartbeats 400000
+
 
 noncomputable section
 

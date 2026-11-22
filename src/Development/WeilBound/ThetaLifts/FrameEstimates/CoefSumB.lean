@@ -40,8 +40,8 @@ theorem ratH_apply (ξ : κ → F) : ratH F κ ξ = fun i => algebraMap F (AF F)
 variable [Fintype κ]
 
 theorem ratH_dot (ξ η : κ → F) : ratH F κ ξ ⬝ᵥ ratH F κ η = algebraMap F (AF F) (ξ ⬝ᵥ η) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [ratH_apply, dotProduct, map_sum, map_mul]
+
+  simp [ratH_apply, dotProduct, map_sum, map_mul]
 
 theorem dot_single (i : κ) [DecidableEq κ] (u : κ → AF F) (a : F) :
     u ⬝ᵥ ratH F κ (Pi.single i a) = algebraMap F (AF F) a * u i := by

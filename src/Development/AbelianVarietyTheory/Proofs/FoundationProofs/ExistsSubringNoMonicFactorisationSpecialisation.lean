@@ -16,8 +16,8 @@ noncomputable def monicOf {R : Type} [CommRing R] {d m : ℕ} (v : Fin d × Fin 
 theorem map_monicOf {R S : Type} [CommRing R] [CommRing S] (f : R →+* S) {d m : ℕ}
     (v : Fin d × Fin (m + 1) → R) :
     (monicOf v).map (mapRingHom f) = monicOf (fun x => f (v x)) := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp [monicOf, Polynomial.map_sum]
+
+  simp [monicOf, Polynomial.map_sum]
 
 theorem coeff_monicOf {R : Type} [CommRing R] {d m : ℕ} (v : Fin d × Fin (m + 1) → R) :
     (monicOf v).coeff d = 1 := by
@@ -116,8 +116,8 @@ theorem descend {F : Type} [CommRing F] (Φ : F[X][X]) (a b m : ℕ)
   choose q hq using hl
   have h1 : ∑ e ∈ c.support, q e * eqn Ψ a b m e = 1 := by
     apply MvPolynomial.map_injective R.subtype Subtype.val_injective
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, map_one, ← hc, Finsupp.sum]
+
+    rw [map_sum, map_one, ← hc, Finsupp.sum]
     refine Finset.sum_congr rfl fun e he => ?_
     rw [map_mul, hq e he, map_eqn, hΨ, smul_eq_mul]
   rw [← h1]

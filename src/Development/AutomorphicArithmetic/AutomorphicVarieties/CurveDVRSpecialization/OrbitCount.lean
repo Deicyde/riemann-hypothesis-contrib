@@ -116,7 +116,7 @@ private theorem val_smul {Ω : Type} [Field Ω] [CharZero Ω] (g : G ℚ Ω) (B 
   rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem, AlgEquiv.smul_def, map_inv₀, map_natCast]
   exact h
 
-set_option maxHeartbeats 400000 in
+
 theorem UpperTheory.V.Pr.degEq :
     UpperTheory.V.Pr.DegEq := by
   unfold UpperTheory.V.Pr.DegEq

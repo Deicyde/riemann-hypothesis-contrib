@@ -7,7 +7,7 @@ public import Development.AutomorphicArithmetic.Foundations.GaloisRepresentation
 
 open UpperTheory.Gal.LocalSmoothExtension
 
-set_option maxHeartbeats 1000000 in
+
 open AlgebraicGeometry CategoryTheory Limits GlobalTheory.HodgeCoh in
 theorem UpperTheory.Gal.LocalSmoothExtension.occOf_of :
     MemOp → UpperTheory.Gal.G3.HodgeGood → UpperTheory.Gal.G3.HodgeTr → UpperTheory.Gal.G3.BcGood.{0} → UpperTheory.Gal.G3.OpBc.{0} → UpperTheory.Gal.G3.OpTr.{0} → UpperTheory.Gal.G3.BcSplits → OccOf := by

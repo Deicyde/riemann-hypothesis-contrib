@@ -197,9 +197,9 @@ lemma MR_mul (M M' : Matrix (Fin n) (Fin n) (Module.End ℂ V)) (i j : ℕ) (hM 
   · rw [Matrix.mul_apply]
     exact Submodule.sum_mem _ fun c _ => h.mul _ _ _ (hM a c) _ (hM' c b)
   · refine Matrix.ext fun a b => Subtype.ext ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Matrix.mul_apply, MR, AddSubmonoidClass.coe_finsetSum, Subalgebra.coe_mul, coe_L, CX_mul, map_sum,
-      Finset.sum_mul]
+
+    simp only [Matrix.mul_apply, MR, AddSubmonoidClass.coe_finsetSum, Subalgebra.coe_mul, coe_L, CX_mul, map_sum,
+    Finset.sum_mul]
 
 lemma MR_pow (M : Matrix (Fin n) (Fin n) (Module.End ℂ V)) (j : ℕ) (hM : ∀ a b, M a b ∈ U E j) (k : ℕ) :
     ∃ hk : ∀ a b, (M ^ (k + 1)) a b ∈ U E (j * (k + 1)), MR h M j hM ^ (k + 1) = MR h (M ^ (k + 1)) (j * (k + 1)) hk := by
@@ -239,8 +239,8 @@ lemma trace_MR (M : Matrix (Fin n) (Fin n) (Module.End ℂ V)) (j : ℕ) (hM : �
   have : L h j M.trace hT = ∑ i, MR h M j hM i i := by
     apply Subtype.ext
     simp [MR, Matrix.trace, Finset.sum_mul]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, map_sum]
+
+  rw [this, map_sum]
   rfl
 
 include h in

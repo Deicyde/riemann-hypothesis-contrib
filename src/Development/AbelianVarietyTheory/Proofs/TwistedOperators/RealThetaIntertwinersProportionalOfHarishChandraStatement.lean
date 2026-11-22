@@ -18,6 +18,6 @@ open MeasureTheory Matrix
 open scoped TensorProduct InnerProductSpace ComplexConjugate
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.ArchRec
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.realThetaIntertwiners_proportional_of_harishChandra : GlobalTheory.Published.DiscreteSeriesCover → GlobalTheory.Published.HarishChandraModules → ∀ D : D7, GlobalTheory.Chain.ItLine D := by
   first | exact @GlobalTheory.ArchRec.itLine_of_hypotheses | exact GlobalTheory.ArchRec.itLine_of_hypotheses | (intros; apply GlobalTheory.ArchRec.itLine_of_hypotheses <;> assumption)

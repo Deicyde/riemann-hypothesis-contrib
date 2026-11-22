@@ -144,15 +144,15 @@ theorem covers_of_root {O K : Type} [CommRing O] [Algebra ℤ_[l] O] [Module.Fre
         ∑ j, algebraMap O K (o j) • (fun σ => (toAc t K (x j) σ : K⟦X⟧)) := by
       funext σ
       simp [Finset.sum_apply, algebraMap_smul]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [h1, map_sum]
+
+    rw [h1, map_sum]
     simp only [map_smul, Finset.sum_apply, Pi.smul_apply]
     simp [algebraMap_smul]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [toAc_rescale t γ _ hroot]
   subst hf
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, PiSys.iTot_toAc, galOA_tmul, galA_ev ϖ hunr z hz]
+
+  simp only [map_sum, map_smul, PiSys.iTot_toAc, galOA_tmul, galA_ev ϖ hunr z hz]
 
 end GlobalTheory.BKGal.CoverBridge
 

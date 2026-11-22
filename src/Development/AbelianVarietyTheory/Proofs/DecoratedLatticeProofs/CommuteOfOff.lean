@@ -156,7 +156,7 @@ theorem levGAt_eq (hTw : TC.IsTw I) (a : I.ι) (j : ℕ) (hj : j < B.R.m) (b : I
   rw [h1, h2]
 
 
-set_option maxHeartbeats 2000000 in
+
 theorem mem_lev_iff (hI : I.Ok) (hTw : TC.IsTw I) (hPr : (B.primes X).Ok) (u : B.Word) (a : I.ι) (j : ℕ) (hj : j + 1 = B.R.m)
     [NeZero (B.R.N j)] {Ch : Type} {chOf : (I.stp u a j).Cl → Ch}
     {Lb : Ch → Submodule (𝓞 B.host.E) (Fin (B.R.N j) → B.host.E)} {U : Ch → Subgroup (TC.GA B (B.R.N j))} {chi : ∀ β, U β →* ℂˣ}

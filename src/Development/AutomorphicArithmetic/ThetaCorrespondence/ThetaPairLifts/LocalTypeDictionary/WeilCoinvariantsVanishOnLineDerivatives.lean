@@ -66,8 +66,8 @@ theorem coinvariants_kill_line_derivative : _root_.GlobalTheory.FunPr.ThetaLocal
         refine ⟨_, ⟨G, z, hG', rfl⟩, fun g => ?_⟩
         have := h (g, 1) z
         simpa only [MonoidHom.inl_apply, Prod.mk_mul_mk, mul_one] using this
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hsum, map_sum]
+
+  rw [hsum, map_sum]
   exact Finset.sum_eq_zero fun τ _ => hk τ
 end GlobalTheory.CoinvLine
 end
@@ -81,7 +81,7 @@ open GlobalTheory.Grid GlobalTheory.Doubling GlobalTheory.ChainFr GlobalTheory.I
 open scoped TensorProduct GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels
 attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open GlobalTheory.SquareComm GlobalTheory.SquareAgree
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.weil_coinvariants_vanish_on_line_derivatives : _root_.GlobalTheory.FunPr.ThetaLocalInputs → ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ) (θ : InfFam D) (W W₁ X : HSp D) (A : Fr W) (A₁ : Fr W₁)
     (B : Fr X) (α β : (AE D)ˣ →* Circle) (ωA : WRep W X) (ωB : WRep W₁ X) (Pi : ModuleCat.{0} ℂ)
     (rf : GA D X → Module.End ℂ Pi) (rl : D.what₂.Tau → Matrix (Fin X.rank) (Fin X.rank) ℂ → Module.End ℂ Pi)

@@ -101,8 +101,8 @@ theorem sB_frame (h : IsCMExt F E σ) (hfr : Framed τ JA JB a b A C) {u u' : Ma
     (c w) (c' w)
   simp only [← hc, ← hc', Matrix.map_apply] at e2
   rw [← e2, hTens, neg_one_mul, map_neg, neg_re]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_mul, piInf_cA h]
+
+  simp only [map_sum, map_mul, piInf_cA h]
   ring
 
 theorem fock_data (h : IsCMExt F E σ) (hfr : Framed τ JA JB a b A C) {Φ : Tens F P Q R S →ₗ[ℂ] SInf F κ}
@@ -166,9 +166,9 @@ theorem fock_data (h : IsCMExt F E σ) (hfr : Framed τ JA JB a b A C) {Φ : Ten
     rw [Fintype.sum_prod_type, sumPl, LinearMap.sum_apply, Finset.smul_sum]
     refine Finset.sum_congr rfl fun w _ => ?_
     rw [atL_eq, ← fock_eq (hu w)]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_smul, map_sum, map_add (f := _), atL_mul, LinearMap.smul_apply, LinearMap.sum_apply, LinearMap.add_apply,
-      Module.End.mul_apply]
+
+    simp only [map_smul, map_sum, map_add (f := _), atL_mul, LinearMap.smul_apply, LinearMap.sum_apply, LinearMap.add_apply,
+    Module.End.mul_apply]
 
 theorem sumPl_add (Φ : Tens F P Q R S →ₗ[ℂ] SInf F κ) (L : InfinitePlace F → Module.End ℂ (Formalism.BasicNotions.TH.Pol P Q R S))
     (s : InfinitePlace F → ℂ) (T : Tens F P Q R S) :

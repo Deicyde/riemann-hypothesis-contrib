@@ -53,8 +53,8 @@ theorem idem_smul_mem_latO {D : D7} {S T : HSp D} {ΛS : Submodule (𝓞 D.host.
     rw [← Matrix.mul_apply, hY, Matrix.mul_assoc, Units.mul_inv, Matrix.mul_one, Matrix.map_apply]
   have hsum : (∑ j, rankOne S T (a : D.host.E) (s j) fun i => Y i j) i l =
       incA D (a : D.host.E) * x i l * finEmb D 1 := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Matrix.sum_apply, ← finEmb_mul, mul_one, map_mul, toEAf_incA, ← hYZ, Finset.mul_sum, map_sum]
+
+    rw [Matrix.sum_apply, ← finEmb_mul, mul_one, map_mul, toEAf_incA, ← hYZ, Finset.mul_sum, map_sum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [rankOne, Matrix.of_apply, hs' j l, mul_assoc]
   have h1 : e * finEmb D 1 = e := GlobalTheory.PlaceDatum.mul_pair_one (GlobalTheory.SplitScalar.infPart_splitIdem he.1)

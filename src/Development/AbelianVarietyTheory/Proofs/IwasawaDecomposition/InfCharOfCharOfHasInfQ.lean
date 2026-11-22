@@ -177,8 +177,8 @@ theorem ofU_unr_iff {χ : HChar D.host.E} (h : χ.IsUnitary) (w) :
   exact (unr_symm T w _).trans (locPar_unr_iff hL χ (D.nd.plOm.2 w))
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def trueK {η : HChar D.host.E} (hη : IsEtaT D.host η) : CGK D.naut :=
   haveI := host_isCMField D.host
   have L := ParLaws.laws hL hF D.host D.nd.Om D.nd.plOm
@@ -221,8 +221,8 @@ def trueK {η : HChar D.host.E} (hη : IsEtaT D.host η) : CGK D.naut :=
       rw [← ha, ← hb, ← Units.val_mul, ← mul_inv, val_split hη hw hc, inv_one, Units.val_one] }
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def trueCG (hE : IsEmpty D.nd.Loc) {η : HChar D.host.E} (hη : IsEtaT D.host η) :
     CGTrue hL (setCG D hE (trueK hL hF T hη)) (wdCG hE _ T) where
   e := fun _ => ⟨Subtype.val, Subtype.val_injective⟩
@@ -288,8 +288,8 @@ theorem exists_ofU {R : Ranks} {H : Formalism.BasicNotions.Host R} (σ : HostCGu
   ⟨_, _, eq_ofU σ⟩
 
 
-set_option maxHeartbeats 2000000 in
-set_option synthInstance.maxHeartbeats 400000 in
+
+
 def trueSide (hE : IsEmpty D.nd.Loc) (cf : CharFrame D) (hP : ∀ k v, cf.P.Div k (D.naut.plGw k v)) :
     CharSide (setCG D hE (trueK hL hF T cf.isEta)) (cfCG hE _ cf) :=
   haveI := host_isCMField D.host

@@ -12,7 +12,7 @@ open NumberField IsDedekindDomain Matrix PI.UnitaryGroupMassFormula.AdIndexEq PI
 open scoped TensorProduct
 open Formalism.MainNotions.S PI.ScRefExists
 
-set_option maxHeartbeats 1000000 in
+
 theorem split_unitary_projection_compatibility : BridgeB := by
   intro I g r k e f z Rf _hH v _hv _hsum p1 hp1 T hT
   have hε : ∀ w ∈ LL I v, PI.FinKW.psiV I v Rf.ew • w ∈ LL I v := fun w hw =>

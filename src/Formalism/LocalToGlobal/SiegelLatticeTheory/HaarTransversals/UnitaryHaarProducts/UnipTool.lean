@@ -248,8 +248,8 @@ theorem cay_map {K' : Type*} [CommRing K'] [Invertible (2 : K')] (f : K →+* K'
     ext a b
     simp [h2]
   unfold cay geo
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [hm, hm, map_add (f := _), map_one, map_mul, map_sum]
+
+  rw [hm, hm, map_add (f := _), map_one, map_mul, map_sum]
   simp only [map_pow, hs]
 
 theorem cay_continuous (N : ℕ) {ι' : Type*} [Fintype ι'] [DecidableEq ι'] :

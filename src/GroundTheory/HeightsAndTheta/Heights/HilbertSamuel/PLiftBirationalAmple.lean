@@ -83,8 +83,8 @@ theorem chartLat_var [DecidableEq K] (p : Σ k, ι k) : y p ∈ chartLat y (Pi.s
 open Classical in
 theorem chartLat_form {g : MRing ι} {d : K → ℕ} (hg : IsMultiHomog g d) :
     aeval y g ∈ chartLat y (fun k => (d k : ℤ)) 1 := by
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [g.as_sum, map_sum]
+
+  rw [g.as_sum, map_sum]
   refine AddSubgroup.sum_mem _ fun m hm => ?_
   rw [aeval_monomial, Finsupp.prod_fintype _ _ (fun _ => pow_zero _), algebraMap_int_eq, eq_intCast,
     ← zsmul_eq_mul]

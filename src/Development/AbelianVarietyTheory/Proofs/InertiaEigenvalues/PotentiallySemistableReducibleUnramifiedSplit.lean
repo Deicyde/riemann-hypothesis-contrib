@@ -75,8 +75,8 @@ theorem isRat_of (hρ : IsRat r ρ) : IsRat r ρ' := by
       rw [h g]
       simp only [Matrix.mul_apply, Finset.sum_mul]
       change algebraMap ↥(MaximalUnramifiedExtension l) (Om l) _ = _
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum, map_mul]
+
+      simp only [map_sum, map_mul]
       rfl
     rw [e]
     refine continuous_finsetSum _ fun k _ => continuous_finsetSum _ fun k' _ => ?_

@@ -97,7 +97,7 @@ section Plus
 local notation "𝔹" => BDeRhamPlus 𝒪 p
 local notation "θdR" => IsPerfectoidField.thetaBDeRhamPlusField (K := ℂ_[p]) p
 
-set_option maxHeartbeats 1600000 in
+
 theorem phiPlus_eq_of_mul_eq {y : (BCrisPlus ℂ_[p] p)} {a : ACris ℂ_[p] p} {k m : ℕ}
     (hy : y * (p : (BCrisPlus ℂ_[p] p)) ^ k = algebraMap (ACris ℂ_[p] p) (BCrisPlus ℂ_[p] p) a)
     (ha : phi (K := ℂ_[p]) (p := p) a = (p : ACris ℂ_[p] p) ^ m * a) :
@@ -108,7 +108,7 @@ theorem phiPlus_eq_of_mul_eq {y : (BCrisPlus ℂ_[p] p)} {a : ACris ℂ_[p] p} {
   exact (isUnit_p_bCrisPlus.pow k).mul_right_cancel (by rw [h]; ring)
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_phiPlus_eq_theta_eq (c : ℂ_[p]) :
     ∃ y : (BCrisPlus ℂ_[p] p), phiPlus ℂ_[p] p y = (p : (BCrisPlus ℂ_[p] p)) * y ∧ θdR (iotaPlus ℂ_[p] p y) = c := by
   obtain ⟨N, hN⟩ : ∃ N : ℕ, ‖(p : ℂ_[p]) ^ N * c‖ ≤ 1 := by
@@ -137,7 +137,7 @@ theorem exists_phiPlus_eq_theta_eq (c : ℂ_[p]) :
   ring
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem exists_phiPlus_eq_pow_theta_eq {m : ℕ} (hm : 1 ≤ m) (c : ℂ_[p]) :
     ∃ y : (BCrisPlus ℂ_[p] p), phiPlus ℂ_[p] p y = (p : (BCrisPlus ℂ_[p] p)) ^ m * y ∧ θdR (iotaPlus ℂ_[p] p y) = c := by
   obtain ⟨k, rfl⟩ : ∃ k, m = k + 1 := ⟨m - 1, by omega⟩
@@ -153,11 +153,11 @@ variable {ε : PreTilt (normInteger ℂ_[p]) p} (hε : PreTilt.untilt ε = 1)
 
 abbrev periodTPlus : (BCrisPlus ℂ_[p] p) := algebraMap (ACris ℂ_[p] p) (BCrisPlus ℂ_[p] p) (periodT hε)
 
-set_option maxHeartbeats 1600000 in
+
 theorem phiPlus_periodTPlus : phiPlus ℂ_[p] p (periodTPlus hε) = (p : (BCrisPlus ℂ_[p] p)) * periodTPlus hε := by
   rw [periodTPlus, phiPlus_algebraMap, phi_periodT_eq_mul, map_mul, map_natCast]
 
-set_option maxHeartbeats 1600000 in
+
 theorem iotaPlus_periodTPlus : iotaPlus ℂ_[p] p (periodTPlus hε) = fontaineT ε hε := by
   rw [periodTPlus, iotaPlus_algebraMap]
   exact iota_periodT hε
@@ -170,7 +170,7 @@ theorem mem_span_fontaineT_of_theta_eq_zero {r : 𝔹} (hr : θdR r = 0) :
   exact hr
 
 
-set_option maxHeartbeats 1600000 in
+
 include hζ in
 theorem exists_phiPlus_eq_pow_iotaPlus_sub_mem {m n : ℕ} (hnm : n ≤ m) (w : 𝔹) :
     ∃ y : (BCrisPlus ℂ_[p] p), phiPlus ℂ_[p] p y = (p : (BCrisPlus ℂ_[p] p)) ^ m * y ∧

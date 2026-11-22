@@ -165,7 +165,7 @@ theorem gsOddTrace_apply (z : tateCompactCohomologyRes (gsFinFamily S ιs) (gsRe
   rfl
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem gsOddTrace_localToCompact
     (ξ : ptTLocal (gsFinFamily S ιs) (gsRealFamily S ιr) (gsRoots S N) 2) :
     zmodToQZ N (gsOddTrace S ιr ιs hS hodd ((ptTLocalToCompact (gsFinFamily S ιs) (gsRealFamily S ιr)
@@ -191,7 +191,7 @@ theorem gsOddTrace_localToCompact
     _ = _ := congrArg (∑ v, gsLocalInvRootsQZ S ιs N v (ξ.1 v) + ·) h2.symm
 
 
-set_option maxHeartbeats 1000000 in
+
 include hS in
 theorem bijective_tateCompactDualityMap_gs_of_odd (M : Rep.{0} (ULift.{0} ℤ) (galUnramifiedOutside K.1 ℚ̄ S))
     [IsDiscreteRep M] [Finite M] (hM : ∀ m : M, N • m = 0) {r s : ℕ} (h : r + s = 3) (hs : 1 ≤ s) :

@@ -29,8 +29,8 @@ namespace PositivityTheory.Rg.Rsw.L
 open LFixTh
 
 open Classical in
-set_option synthInstance.maxHeartbeats 400000 in
-set_option maxHeartbeats 2000000 in
+
+
 theorem fixTh : IdemEx → GenG → GenK → FixTh := by
   intro _ hG hK D ρ p m ψ hψ χ hχ θ _ b₀ hb₀
   obtain ⟨S₁, hS₁⟩ := hK D p

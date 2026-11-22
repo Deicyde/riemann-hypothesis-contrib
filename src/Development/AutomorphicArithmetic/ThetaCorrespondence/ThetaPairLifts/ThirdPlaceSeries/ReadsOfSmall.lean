@@ -7,12 +7,12 @@ public import Development.AutomorphicArithmetic.ThetaCorrespondence.ThetaPairLif
 
 @[expose] public section
 
-set_option synthInstance.maxHeartbeats 200000
+
 
 section
 set_option autoImplicit false
-set_option maxHeartbeats 400000
-set_option synthInstance.maxHeartbeats 200000
+
+
 noncomputable section
 open NumberField IsDedekindDomain
 open scoped TensorProduct

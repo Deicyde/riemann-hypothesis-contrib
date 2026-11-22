@@ -16,8 +16,8 @@ attribute [local instance] Formalism.BasicNotions.Host.cmStar
 open Formalism.IndefR.Lev Formalism.L2.DIV Formalism.IndefR.Mult
 open scoped TensorProduct
 
-set_option synthInstance.maxHeartbeats 400000
-set_option maxHeartbeats 800000
+
+
 
 namespace GlobalTheory.SeriesTie.HkRat
 

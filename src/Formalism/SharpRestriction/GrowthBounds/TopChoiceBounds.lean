@@ -2484,7 +2484,7 @@ theorem bt_48' {y : ℝ} (h : 48 ≤ y) : 48 * y ^ 2 ≤ y ^ 3 := by
   exact mul_le_mul_of_nonneg_right h (by positivity)
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem bt_H_of (L : SizeData₂ D) (K : Consts) (hK : K.Nonneg) (Ce : ℝ) (hCe : 0 < Ce) (hsz : SizesAt L)
     (hA : ∀ de x : ℝ, 0 < de → de ≤ 1 → 3 ≤ x →
       (goodG' (rG L.sc) de (hG L.sc) x : ℝ) ≤ Ce * Real.log x / de ∧

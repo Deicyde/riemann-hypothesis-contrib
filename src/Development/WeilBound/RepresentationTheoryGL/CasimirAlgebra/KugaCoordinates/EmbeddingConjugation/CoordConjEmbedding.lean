@@ -41,8 +41,8 @@ theorem coord_conj_embedding [_root_.NumberField.IsTotallyComplex E] (w : Infini
     exact this
   have hc : c = ∑ v, (Pi.single v (c v) : Cinf E) := (Finset.univ_sum_single c).symm
   conv_lhs => rw [hc]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.sum_eq_single w (fun v _ hv => h0 v hv _) (by simp), hs, coord_atEmb]
+
+  rw [map_sum, Finset.sum_eq_single w (fun v _ hv => h0 v hv _) (by simp), hs, coord_atEmb]
 
 theorem sum_emb [_root_.NumberField.IsTotallyComplex E] {R : Type*} [AddCommMonoid R] (f : (E →+* ℂ) → R) :
     ∑ τ, f τ = ∑ w : InfinitePlace E, (f w.embedding + f (ComplexEmbedding.conjugate w.embedding)) := by
@@ -93,11 +93,11 @@ theorem cxExpand_holds : CxExpand := by
     simp only [map_add (f := _), map_mul, Complex.conj_ofReal, Complex.conj_I]
     match_scalars <;> apply Complex.ext <;> simp <;> ring
   have hX : φ X = ∑ i, ∑ j, ψ i j (X i j) := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [show φ X = Φ (Matrix.of X) from rfl, Matrix.matrix_eq_sum_single (Matrix.of X), map_sum]
+
+    rw [show φ X = Φ (Matrix.of X) from rfl, Matrix.matrix_eq_sum_single (Matrix.of X), map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     rfl
   rw [hX]
   symm
@@ -105,9 +105,9 @@ theorem cxExpand_holds : CxExpand := by
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j _ => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [sum_emb (fun τ => coord τ (X i j) • cx τ φ i j), Finset.sum_congr rfl fun w _ => key w i j (X i j), ← map_sum,
-    Finset.univ_sum_single]
+
+  rw [sum_emb (fun τ => coord τ (X i j) • cx τ φ i j), Finset.sum_congr rfl fun w _ => key w i j (X i j), ← map_sum,
+  Finset.univ_sum_single]
 
 end PositivityTheory.Rg.Cz.J
 

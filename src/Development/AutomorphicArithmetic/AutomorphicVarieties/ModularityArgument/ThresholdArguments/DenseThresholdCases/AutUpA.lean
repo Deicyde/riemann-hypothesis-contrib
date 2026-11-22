@@ -20,8 +20,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open UpperTheory.GalN.V
@@ -96,7 +96,7 @@ end UpperTheory.V.Th.End3
 attribute [-instance] UpperTheory.V.Pr.IsCD.toIsDomain UpperTheory.V.Pr.IsCD.toIsDiscreteValuationRing
 attribute [local instance 10000] IsDiscreteValuationRing.toIsLocalRing
 open UpperTheory.V.Z.Win
-set_option maxHeartbeats 400000 in
+
 open UpperTheory.V.U3 UpperTheory.V.Base UpperTheory.V.Th.End3 in
 theorem UpperTheory.V.Z.Win.Dn.rigEnd3_alt :
     _root_.UpperTheory.V.Af.HypothesesH' → _root_.UpperTheory.V.Th.AdjointLiftingTheorem → _root_.UpperTheory.V.Th.RigEnd3Alt := by

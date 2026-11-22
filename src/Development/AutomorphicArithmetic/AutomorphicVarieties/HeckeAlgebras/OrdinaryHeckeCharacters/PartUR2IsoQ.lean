@@ -18,7 +18,7 @@ open UpperTheory.V.W (Plc Lp HidaSetting Vl Resid LamObj UniversalOrdinaryDeterm
 open UpperTheory.V.HV (Coef)
 open scoped TensorProduct
 attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
-set_option synthInstance.maxHeartbeats 200000
+
 
 private theorem raF_big {Γ Ga Gp : Type} [Group Γ] [Group Ga] [Group Gp] (X : Frame Γ Ga Gp) {d m : ℕ}
     (τ : X.Ub →* GL (Fin m) ℂ) (ξ : Gp →* GL (Fin d) ℂ) (U : Subgroup X.Ub) (x : X.Ub) (hx : ∀ u ∈ U, Commute u x)

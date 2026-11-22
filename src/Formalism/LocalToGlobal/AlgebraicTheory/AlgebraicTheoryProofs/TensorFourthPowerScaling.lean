@@ -213,8 +213,8 @@ private theorem sum_inverse_mul_sum_eq_ite_frameM {n ν J : Type} [Fintype n] [D
     intro u
     have h : ∑ w, g u w • g.symm (Pi.single w 1) = u := by
       simp_rw [← LinearEquiv.map_smul]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [← map_sum]
+
+      rw [← map_sum]
       have : ∑ w, g u w • (Pi.single w (1 : ℂ) : Fin 4 × n → ℂ) = g u := by
         ext z
         simp [Finset.sum_apply, Pi.single_apply]
@@ -232,8 +232,8 @@ private theorem sum_inverse_mul_sum_eq_ite_frameM {n ν J : Type} [Fintype n] [D
     rw [map_mul]
     field_simp
   rw [Finset.sum_congr rfl (fun w _ => step w), Finset.sum_comm]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp_rw [← Finset.mul_sum, ← map_sum, key]
+
+  simp_rw [← Finset.mul_sum, ← map_sum, key]
   unfold frameM
   split_ifs with hab
   · subst hab
@@ -244,8 +244,8 @@ private theorem jetsIntegral_sum_C_mul {p : ℕ} [Fact p.Prime] {X κ : Type} [F
     (f : κ → MvPowerSeries X ℂ_[p]) (hr : ∀ k, ‖r k‖ ≤ 1) (hf : ∀ k, JetsIntegral (f k)) :
     JetsIntegral (∑ k, MvPowerSeries.C (r k) * f k) := by
   intro e
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_sum, Finset.mul_sum]
+
+  rw [map_sum, Finset.mul_sum]
   apply IsUltrametricDist.norm_sum_le_of_forall_le_of_nonneg zero_le_one
   intro k _
   rw [MvPowerSeries.coeff_C_mul]

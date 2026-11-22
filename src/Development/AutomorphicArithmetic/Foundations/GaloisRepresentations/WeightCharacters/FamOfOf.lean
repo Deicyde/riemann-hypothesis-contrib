@@ -10,7 +10,7 @@ open GlobalTheory.GalCut GlobalTheory.UnitaryBC GlobalTheory.Cong GlobalTheory.D
 open UpperTheory.Gal.Gen (IsLevel fixedBy)
 open UpperTheory.Gal.Wt
 
-set_option maxHeartbeats 800000 in
+
 theorem UpperTheory.Gal.Wt.famOf_of : ExpBasic → PevExp → SqExp → TopUp → WExp → FamOfA → FamOf := by
   intro hB hP hS hT hW hA E _ _ _ a τ C hC n hn W Q _ f hf P
   obtain ⟨hLe, hGe, hmono, -, hconst, -⟩ := hB

@@ -10,7 +10,7 @@ public import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership
 
 open Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Formalism.ConjugateSelfDual ReciprocityTheory.Gal NumberField IsDedekindDomain GlobalTheory.TripleGal GlobalTheory.Pst
 
-set_option maxHeartbeats 1000000 in
+
 theorem _root_.GlobalTheory.T.deRham_jumps_of_continuous_lAdic_char :
     ∀ (D : D7) (T : GlobalTheory.RowTie.WDTie D.nd D.naut) (W : GlobalTheory.HeightCounting.WDSide D T)
       (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (μ : G D.host.E D.nd.Om →* (Qbar l)ˣ),

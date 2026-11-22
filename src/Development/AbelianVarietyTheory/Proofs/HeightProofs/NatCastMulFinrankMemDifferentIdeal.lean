@@ -17,9 +17,9 @@ variable (K L : Type) [Field K] [NumberField K] [Field L] [NumberField L] [Algeb
 theorem algebraMap_intTrace_eq_sum (x : 𝓞 L) :
     algebraMap (𝓞 K) (𝓞 L) (Algebra.intTrace (𝓞 K) (𝓞 L) x) = ∑ σ : L ≃ₐ[K] L, σ • x := by
   apply FaithfulSMul.algebraMap_injective (𝓞 L) L
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 K) K L,
-    Algebra.algebraMap_intTrace (L := L), trace_eq_sum_automorphisms, map_sum]
+
+  rw [← IsScalarTower.algebraMap_apply, IsScalarTower.algebraMap_apply (𝓞 K) K L,
+  Algebra.algebraMap_intTrace (L := L), trace_eq_sum_automorphisms, map_sum]
   rfl
 
 theorem not_dvd_of_inertia (P : Ideal (𝓞 L)) [P.IsPrime] (hP : P ≠ ⊥)

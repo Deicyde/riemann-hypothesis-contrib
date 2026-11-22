@@ -63,8 +63,8 @@ theorem bcVV_span {K : Type} [Field K] (φ : K →+* ℂ) (lam : ι → DomWeigh
   rintro _ ⟨i, rfl⟩
   obtain ⟨F, hF, e⟩ := GlobalTheory.Proof.TensorMapDescent.bVVfun_desc φ lam i
   have : bVV ℂ lam i = bcVV φ lam ⟨F, hF⟩ := Subtype.ext ((bVV_coe ℂ lam i).trans e)
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [this, ← (bVV K lam).sum_repr ⟨F, hF⟩, map_sum]
+
+  rw [this, ← (bVV K lam).sum_repr ⟨F, hF⟩, map_sum]
   refine Submodule.sum_mem _ fun j _ => ?_
   rw [map_smulₛₗ]
   exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
@@ -95,8 +95,8 @@ theorem continuous_actP {X : Type} [TopologicalSpace X] (lam : ι → DomWeight 
     intro x
     rw [key]
     conv_lhs => rw [P.as_sum]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_sum, map_monomial]
+
+    simp only [map_sum, map_monomial]
     refine Finset.sum_congr rfl fun m _ => ?_
     rw [← smul_eq_mul, ← map_smul, smul_monomial, smul_eq_mul, mul_one]
     rfl

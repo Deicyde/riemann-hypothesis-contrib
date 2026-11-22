@@ -98,15 +98,15 @@ theorem E_nabla (B : FB R d O) (h : PS k 2 d) (hax : ev (n := 1) ![0, pt k d 0] 
   have hb : HasSubst (bE k h) := hasSubst_of_constantCoeff_zero hc
   have hfm : subst (bE k h) (fm k h u) = 0 := by
     unfold fm
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [← coe_substAlgHom hb, map_sum]
+
+    rw [← coe_substAlgHom hb, map_sum]
     refine Finset.sum_eq_zero fun i _ => ?_
     rw [map_mul, map_sub, coe_substAlgHom hb, subst_X hb, E_liftX k h hax]
     simp [bE]
   change subst (bE k h) (Dx k B u G + ∑ i, liftX k (Dof (B.FK k) u (sgOf k h i)) * pderiv (R := k) (Sum.inr i) G +
     ∑ i, C ((0 : Fin d → k) i) * pderiv (R := k) (Sum.inr i) G - (C (m : k) * fm k h u) * G) = _
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coe_substAlgHom hb, map_sub, map_add, map_add, map_mul, map_mul, coe_substAlgHom hb, hfm]
+
+  rw [← coe_substAlgHom hb, map_sub, map_add, map_add, map_mul, map_mul, coe_substAlgHom hb, hfm]
   simp only [mul_zero, zero_mul, sub_zero]
   unfold Dx
   simp only [← coe_substAlgHom hb]
@@ -207,8 +207,8 @@ theorem E_nabla (B : FB R d O) (h : PS k 2 d) (hax : ev (n := 1) ![0, pt k d 0] 
   have Low_finset_sum {τ : Type} {N : ℕ} {ι : Type} (S : Finset ι) (F : ι → MvPowerSeries τ k)
       (h : ∀ i ∈ S, Low N (F i)) : Low N (∑ i ∈ S, F i) := by
     intro d hd
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     exact Finset.sum_eq_zero fun i hi => h i hi d hd
   have pderiv_subst {σ τ : Type} [Fintype σ] {a : σ → MvPowerSeries τ k} (ha : ∀ s, constantCoeff (a s) = 0)
       (f : MvPowerSeries σ k) (t : τ) :
@@ -282,8 +282,8 @@ theorem E_nablaPoly (B : FB R d O) (h : PS k 2 d) (hax : ev (n := 1) ![0, pt k d
     subst (bE k h) (nablaPoly k B h m u P G) = DpolyOf (B.FK k) u P (subst (bE k h) G) := by
   have hb : HasSubst (bE k h) := hasSubst_lemma (bE_const k h hax)
   unfold nablaPoly DpolyOf DmonOf
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [← coe_substAlgHom hb, map_sum]
+
+  rw [← coe_substAlgHom hb, map_sum]
   refine Finset.sum_congr rfl (fun n _ => ?_)
   rw [map_mul, coe_substAlgHom hb, mvPowerSeries_subst_C hb, E_foldr B h hax m u n]
 

@@ -129,7 +129,7 @@ theorem sub_idem_mem {P P' : Pl D → Prop} {a : AE D} (ha : a ∈ idAt D (fun p
   · rw [RingHom.map_sub, RingHom.map_mul, hw w (fun h => h.elim hpw hw'), mul_zero, sub_zero]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem split_latO (ψ : AddChar (AF D.host.F) ℂ) (hψ : IsStdChar D ψ (-1)) {S T : HSp D} {LS : Lat S} {LT : Lat T}
     (hLS : IsSelfDualC S LS) (hLT : IsSelfDualC T LT) {P P' : Pl D → Prop} (hd : ∀ p, P p → ¬ P' p) {u : WO S T}
     (hu : u ∈ latO S T (LS : Set _) (LT : Set _) (fun p => P p ∨ P' p)) :
@@ -203,8 +203,8 @@ theorem main : ∀ (D : D7) (ψ : AddChar (AF D.host.F) ℂ), IsStdChar D ψ (-1
     · rw [hcomm e he u (latO_mxAt hu), hf.2.2 e' he' u hu hh]
   · intro χS χT om hom e he g hg h hh f hf
     unfold comb
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum]
+
+    rw [map_sum]
     refine Finset.sum_congr rfl fun u hu => ?_
     rw [map_smul, hom.om_heis g h u f hf, actO_off hg hh (he u hu)]
   · intro e e' he he'

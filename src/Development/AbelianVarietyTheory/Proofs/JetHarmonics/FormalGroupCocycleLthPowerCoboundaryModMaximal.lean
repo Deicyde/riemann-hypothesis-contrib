@@ -242,8 +242,8 @@ theorem coeff_one_subst {κ : Type} [Fintype κ] {γ : κ → PowerSeries C}
     intro g
     rw [← coeff_zero_eq_constantCoeff_apply, coeff_pderiv]
     simp [PowerSeries.coeff]
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [e, GlobalTheory.FormalCalc.pderiv_subst (a := γ) (hasSubst_of_constantCoeff_zero hγ), map_sum]
+
+  rw [e, GlobalTheory.FormalCalc.pderiv_subst (a := γ) (hasSubst_of_constantCoeff_zero hγ), map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_mul, cc_subst (a := γ) hγ, e, mul_comm, ← coeff_zero_eq_constantCoeff_apply (pderiv (R := C) i f), coeff_pderiv]
   simp
@@ -265,8 +265,8 @@ theorem coeff_option_exp {σ : Type} {F : MvPowerSeries (Option σ) C} (hc : con
     PowerSeries.coeff n (optionEquivLeft σ C (mvExp F)) =
       ∑ k ∈ Finset.range (n + 1), ((k.factorial : C))⁻¹ • PowerSeries.coeff n (optionEquivLeft σ C F ^ k) := by
   ext x
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [coeff_coeff_optionEquivLeft, map_sum]
+
+  rw [coeff_coeff_optionEquivLeft, map_sum]
   show (∑ k ∈ Finset.range ((x.optionElim n).degree + 1), coeff (x.optionElim n) (F ^ k) / (k.factorial : C)) = _
   have hle : n ≤ (x.optionElim n).degree := by
     simpa using Finsupp.le_degree none (x.optionElim n)

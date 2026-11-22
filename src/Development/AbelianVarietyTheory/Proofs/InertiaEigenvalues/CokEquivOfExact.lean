@@ -30,8 +30,8 @@ theorem mk_eq_sum (Φ : Matrix (Fin a) (Fin a) R) (y : Fin a → R) :
     ext j
     simp [Finset.sum_apply, Pi.single_apply]
   conv_lhs => rw [hy]
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [map_sum, map_smul, univ]
+
+  simp only [map_sum, map_smul, univ]
 
 theorem univ_ker (Φ : Matrix (Fin a) (Fin a) R) : matAct Φ (univ Φ) = 0 := by
   funext i
@@ -51,8 +51,8 @@ theorem map_ker {B B' : Type} [AddCommGroup B] [Module R B] [AddCommGroup B'] [M
   rw [matAct_apply', Pi.zero_apply] at h
   rw [matAct_apply', Pi.zero_apply]
   calc ∑ j, Φ i j • f (u j) = f (∑ j, Φ i j • u j) := by
-        set_option synthInstance.maxHeartbeats 100000 in
-          rw [map_sum]
+
+        rw [map_sum]
         simp only [map_smul]
     _ = 0 := by rw [h, map_zero]
 
@@ -88,8 +88,8 @@ theorem hom_ext {B : Type} [AddCommGroup B] [Module R B]
     (h : ∀ c, f (univ Φ c) = g (univ Φ c)) : f = g := by
   apply Submodule.linearMap_qext
   refine LinearMap.ext fun y => ?_
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [LinearMap.comp_apply, mk_eq_sum, map_sum, map_smul, h]
+
+  simp only [LinearMap.comp_apply, mk_eq_sum, map_sum, map_smul, h]
 
 end
 

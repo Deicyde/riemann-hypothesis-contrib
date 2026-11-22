@@ -51,7 +51,7 @@ private theorem alpha_res {F F' Ω : Type} [Field F] [NumberField F] [Field F'] 
   push_cast
   ring
 
-set_option maxHeartbeats 1000000 in
+
 private theorem eig_res {F F' Ω : Type} [Field F] [NumberField F] [Field F'] [NumberField F'] [Field Ω]
     [Algebra F Ω] [Algebra F' Ω] [IsAlgClosure F Ω] [IsAlgClosure F' Ω]
     {l : ℕ} [Fact l.Prime] (P : LocPrime l) (ι : Om l ≃+* ℂ)
@@ -101,7 +101,7 @@ end SlopeTestRemainingChoices
 
 open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.WeilDeligne GlobalTheory.Pst
   GlobalTheory.WeilRestrict GlobalTheory.TripleGal UpperTheory.V in
-set_option maxHeartbeats 1000000 in
+
 theorem UpperTheory.Lit.CharWD.chRes :
     ChRes := by
   intro F F' Ω _ _ _ _ _ _ _ _ _ _ _ l _ A w w' ι h h' O _ _ _ Bw hj

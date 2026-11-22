@@ -76,8 +76,8 @@ theorem second_shift_slice_operator : GTSSLSliceSS := by
   refine ⟨?_, ?_⟩
   · have hdec : (d.SS l).1 = ∑ a, ∑ b, (Pj d a * d.SS l * Pj d b).1 := by
       have h := congrArg (fstA _) (decomp d (d.SS l))
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum] at h
+
+      simp only [map_sum] at h
       exact h
     rw [hdec]
     refine sliceLoc_sum _ _ fun a _ => sliceLoc_sum _ _ fun b _ => ?_
@@ -103,8 +103,8 @@ theorem second_shift_slice_operator : GTSSLSliceSS := by
       exact sliceLoc_zero
   · have hdec : (star (d.SS l)).1 = ∑ a, ∑ b, (Pj d a * star (d.SS l) * Pj d b).1 := by
       have h := congrArg (fstA _) (decomp d (star (d.SS l)))
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [map_sum] at h
+
+      simp only [map_sum] at h
       exact h
     rw [hdec]
     refine sliceLoc_sum _ _ fun a _ => sliceLoc_sum _ _ fun b _ => ?_

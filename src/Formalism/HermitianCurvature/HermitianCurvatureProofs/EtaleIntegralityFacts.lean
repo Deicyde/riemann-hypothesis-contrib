@@ -2036,7 +2036,7 @@ theorem arith (a b m : ℕ) {ε A : ℝ} (hε0 : 0 < ε) (hε : ε ≤ 1 / (2 * 
       mul_le_mul_of_nonneg_left (by linarith) hε0.le
     nlinarith
 
-set_option maxHeartbeats 1000000 in
+
 theorem ampLimit : AmpLimit := by
   obtain ⟨a, b, hcore⟩ := core'
   refine ⟨4 * (a + b) + 1, ?_⟩

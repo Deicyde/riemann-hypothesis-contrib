@@ -13,8 +13,8 @@ public import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityA
 
 @[expose] public section
 
-set_option maxHeartbeats 800000
-set_option synthInstance.maxHeartbeats 200000
+
+
 
 section
 open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel
@@ -113,8 +113,8 @@ theorem UpperTheory.V.Z.Win.RR.ordAway_of_alt (hX : ExRS) (hGd : GdOf) :
     let Q := MulAction.orbit K (a : Γ ⧸ K)
     rcases finite_or_infinite Q with hfinite | hinfinite
     · let _ := Fintype.ofFinite Q
-      set_option synthInstance.maxHeartbeats 100000 in
-        simp only [Hi.dc, finsum_eq_sum_of_fintype, LinearMap.sum_apply, map_sum, hT]
+
+      simp only [Hi.dc, finsum_eq_sum_of_fintype, LinearMap.sum_apply, map_sum, hT]
     · have sum_eq_zero {W : Type} [AddCommGroup W] [Module ℂ W]
           (ρ : Representation ℂ Γ W) (y : W) (hy : y ≠ 0) :
           (∑ᶠ q : Q, ρ (q : Γ ⧸ K).out) = 0 := by

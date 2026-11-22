@@ -135,7 +135,7 @@ theorem subsingleton_cohomology_three_gsRoots : Subsingleton (cohomology (gsRoot
 variable [Fintype S]
 
 
-set_option maxHeartbeats 1600000 in
+
 theorem zmodToQZ_gsCompactInv_localToCompact (h3 : Subsingleton (cohomology (gsRoots S n) 3))
     (ξ : ∀ v : S, cohomology (Rep.res (gsFinFamily S ιs v).toMonoidHom (gsRoots S n)) 2) :
     zmodToQZ n (gsCompactInv S ιs n hK h3

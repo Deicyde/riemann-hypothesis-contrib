@@ -122,9 +122,9 @@ theorem lift_cong {g : GL (Fin n) (AfE F E)} {p : DecoF E n ST SG Q} (h : IsPtOf
     exact CharValCompare.val_of_notMem hs
   have e : adAt F w.1 (Col2.pullV g (s • f (Pi.single j 1)) i) =
       algebraMap E (w.1.adicCompletion E) (algebraMap (𝓞 E) E s) * (locM w.1 g⁻¹ * ratM w.1 f) i j := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [Col2.pullV, Matrix.mulVec, dotProduct, map_sum, map_mul, adAt_inclE, Matrix.mul_apply, Finset.mul_sum, Pi.smul_apply,
-      Algebra.smul_def]
+
+    simp only [Col2.pullV, Matrix.mulVec, dotProduct, map_sum, map_mul, adAt_inclE, Matrix.mul_apply, Finset.mul_sum, Pi.smul_apply,
+    Algebra.smul_def]
     exact Finset.sum_congr rfl fun l _ => by rw [mul_left_comm]; rfl
   have h6 := Valuation.map_add_lt _ h2 h4
   rw [e, map_sub, map_sub, sub_add_sub_cancel, map_mul, map_mul, ← mul_sub, map_mul, h5, one_mul] at h6
@@ -308,8 +308,8 @@ theorem lt_of_congAt {B : Base} {a b : ℕ} {P : HeightOneSpectrum (𝓞 B.host.
   intro r s
   refine lt_of_le_of_lt (le_of_eq_of_le ?_ (hx r s)) hv
   congr 1
-  set_option synthInstance.maxHeartbeats 100000 in
-    simp only [Matrix.sub_apply, Matrix.mul_apply, map_sub, map_sum, map_mul, Matrix.map_apply, adAt_inclE, ColAd.locM, homM]
+
+  simp only [Matrix.sub_apply, Matrix.mul_apply, map_sub, map_sum, map_mul, Matrix.map_apply, adAt_inclE, ColAd.locM, homM]
 
 end Cong
 

@@ -17,7 +17,7 @@ open GlobalTheory.RowEx
 noncomputable section
 open Finset GlobalTheory.FunObj.SqNum
 namespace GlobalTheory.RowClaim
-set_option maxHeartbeats 1600000 in
+
 theorem twisted_local_factor_ratio_holds : _root_.GlobalTheory.FunPr.ThetaLocalInputs → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.ThetaIntegralsAgree → GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.LocalMatching → ConstK →
     GlobalTheory.SqTop.LNe → GlobalTheory.SqTop.TriEx → GlobalTheory.SqTop.Tower → RatioK := by
   intro hP hTA hLM hC hLN hTX hTW

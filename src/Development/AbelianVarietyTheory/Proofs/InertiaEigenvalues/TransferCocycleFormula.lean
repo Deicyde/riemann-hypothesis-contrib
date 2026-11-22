@@ -48,9 +48,9 @@ theorem transfer_cocycle_formula :
     show ∑ q : G ⧸ H, ρ ((a * b) • q).out (f (((a * b) • q).out⁻¹ * (a * b) * q.out))
       = ∑ q : G ⧸ H, ρ (a • q).out (f ((a • q).out⁻¹ * a * q.out))
         + ρ a (∑ q : G ⧸ H, ρ (b • q).out (f ((b • q).out⁻¹ * b * q.out)))
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_add_distrib, map_sum,
-      reidx b (fun q => ρ (a • q).out (f ((a • q).out⁻¹ * a * q.out)))]
+
+    rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_add_distrib, map_sum,
+    reidx b (fun q => ρ (a • q).out (f ((a • q).out⁻¹ * a * q.out)))]
   · intro f x hf g
     have key : ∀ q : G ⧸ H, ρ (g • q).out (f ((g • q).out⁻¹ * g * q.out))
         = ρ g (ρ q.out x) - ρ (g • q).out x := by
@@ -59,9 +59,9 @@ theorem transfer_cocycle_formula :
       congr 2
       group
     show ∑ q : G ⧸ H, ρ (g • q).out (f ((g • q).out⁻¹ * g * q.out)) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_sub_distrib, map_sum,
-      reidx g (fun q => ρ q.out x)]
+
+    rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_sub_distrib, map_sum,
+    reidx g (fun q => ρ q.out x)]
   · intro f hf g
     have f1 : f 1 = 0 := by
       have := hf 1 1
@@ -78,10 +78,10 @@ theorem transfer_cocycle_formula :
       rw [mul_assoc, hf, map_add (f := _), finv, rmul, mul_inv_cancel, map_one, one_apply_eq_self, hf]
       abel
     show ∑ q : G ⧸ H, ρ (g • q).out (f ((g • q).out⁻¹ * g * q.out)) = _
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_sub_distrib, Finset.sum_add_distrib,
-      map_sum, reidx g (fun q => f q.out), Finset.sum_const, Finset.card_univ,
-      Subgroup.index_eq_card, Nat.card_eq_fintype_card]
+
+    rw [Finset.sum_congr rfl (fun q _ => key q), Finset.sum_sub_distrib, Finset.sum_add_distrib,
+    map_sum, reidx g (fun q => f q.out), Finset.sum_const, Finset.card_univ,
+    Subgroup.index_eq_card, Nat.card_eq_fintype_card]
     abel
 
 end GlobalTheory

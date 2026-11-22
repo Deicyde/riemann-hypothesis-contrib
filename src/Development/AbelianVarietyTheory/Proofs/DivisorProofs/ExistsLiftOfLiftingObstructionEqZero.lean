@@ -16,7 +16,7 @@ open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.G
 attribute [local instance] Over.cartesianMonoidalCategory
 
 set_option autoImplicit false
-set_option maxHeartbeats 400000
+
 
 namespace GlobalTheory.AbCoh
 

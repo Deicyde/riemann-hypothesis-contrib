@@ -68,8 +68,8 @@ theorem det_gram_ne_zero {K : GlobalTheory.UnitLemma.UQ} (B : GlobalTheory.UnitL
   set y := ∑ i, v i • b i with hy
   have hlin : ∀ z, B.herm β y z = ∑ i, v i * B.herm β (b i) z := by
     intro z
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [GlobalTheory.UnitLemma.InvAlg.herm, hy, Finset.mul_sum, Finset.sum_mul, map_sum]
+
+    simp only [GlobalTheory.UnitLemma.InvAlg.herm, hy, Finset.mul_sum, Finset.sum_mul, map_sum]
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [mul_smul_comm, smul_mul_assoc, map_smul, smul_eq_mul]
   have hj : ∀ j, B.herm β y (b j) = 0 := by
@@ -84,11 +84,11 @@ theorem det_gram_ne_zero {K : GlobalTheory.UnitLemma.UQ} (B : GlobalTheory.UnitL
     intro z
     have hz : z = ∑ j, K.c (b.repr (B.σ z) j) • B.σ (b j) := by
       conv_lhs => rw [← B.σ_σ z, ← b.sum_repr (B.σ z)]
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       simp only [hsemi]
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [hz, Finset.mul_sum, map_sum]
+
+    rw [hz, Finset.mul_sum, map_sum]
     refine Finset.sum_eq_zero fun j _ => ?_
     rw [mul_smul_comm, map_smul, smul_eq_mul]
     have := hj j

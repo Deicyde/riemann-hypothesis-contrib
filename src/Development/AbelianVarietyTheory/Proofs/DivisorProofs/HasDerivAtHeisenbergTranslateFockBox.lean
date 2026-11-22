@@ -31,7 +31,7 @@ theorem sum_two {α : Type} (a b : α) (F : α → ℂ) :
     Finsupp.sum_single_index (zero_mul _), one_mul, one_mul]
 
 
-set_option maxHeartbeats 1000000 in
+
 theorem hasDerivAt_box : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {G : GridData L sc} {μ₀ : T} (hL : L.Is μ₀) (W : G.Weil) (B : Frames G) (ρ : RealMatch W) (t : T) (i j : Fin D.R.m) (M : Vol G)
     (e : Num G i j) (Bs : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Base D.host.F D.host.E) (Γ : GlobalTheory.IndefiniteRowSideFullHecke.UnitaryConjugation.Geo G i j) (X : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Chars D.host.F D.host.E)
     (om : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep D.sp.cm.sig Γ.V Γ.W) (om' : _root_.GlobalTheory.IndefiniteRowSideFullHecke.WeilTensorModels.Rep D.sp.cm.sig Γ.V' Γ.W) (h : IsTripleOf W M t i j e Bs Γ X), IsTriple Bs Γ X om om' → ∀ n Φ τ τ', HasFlip B t ρ i j n Φ τ τ' →
@@ -106,8 +106,8 @@ theorem hasDerivAt_box : ∀ {D : D7} {T : Type} {L : LevCh D T} {sc : Consts} {
     convert hd using 1
     have e : GlobalTheory.ChainFr.ptF W.ψ W.θ A' B' f ((∑ σ, Δ σ) Q) = ∑ σ, GlobalTheory.ChainFr.ptF W.ψ W.θ A' B' f (Δ σ Q) := by
       unfold GlobalTheory.ChainFr.ptF
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [LinearMap.sum_apply, map_sum]
+
+      rw [LinearMap.sum_apply, map_sum]
     rw [e, Finset.sum_apply]
     exact Finset.sum_congr rfl fun σ _ => by rw [hΔ σ f hf Q]
 

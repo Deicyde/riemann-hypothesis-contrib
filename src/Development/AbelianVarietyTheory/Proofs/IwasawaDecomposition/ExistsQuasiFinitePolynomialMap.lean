@@ -208,8 +208,8 @@ theorem shear_leadingCoeff_isUnit (fne : f ≠ 0) :
       using degreeOf_t_ne_of_ne f _ _ h1 vin (fun heq ↦ h2 (Finset.mem_singleton.mpr heq))
   have hcoeff : (finSuccEquiv k n (T (h v + ∑ x ∈ f.support \ {v}, h x))).leadingCoeff =
       (finSuccEquiv k n (T (h v))).leadingCoeff := by
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [map_add (f := _), map_sum]
+
+    simp only [map_add (f := _), map_sum]
     rw [add_comm]
     apply Polynomial.leadingCoeff_add_of_degree_lt <| (lt_of_le_of_lt <| Polynomial.degree_sum_le _ _) ?_
     have h2 : h v ≠ 0 := by simpa [h] using mem_support_iff.mp vin

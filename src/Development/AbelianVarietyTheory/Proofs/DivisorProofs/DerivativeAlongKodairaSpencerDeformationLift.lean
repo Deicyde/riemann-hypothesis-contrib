@@ -18,7 +18,7 @@ open scoped Classical
 open GlobalTheory.Frames
 
 set_option autoImplicit false
-set_option synthInstance.maxHeartbeats 400000
+
 
 noncomputable section
 

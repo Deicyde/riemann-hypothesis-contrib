@@ -211,8 +211,8 @@ theorem loc_act (hMA : MultAlg) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ :
       intro j
       show along v g₀ (Φ j) g = _
       rw [← unitOf_val hg, along_val]
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [hF, e2, e3, map_sum, map_smul]
+
+    simp only [hF, e2, e3, map_sum, map_smul]
     have e4 : ∀ i, M.ρ u⁻¹ (b i) = ∑ j, ent M (M.ρ u⁻¹) j i • b j := fun i => (b.sum_repr' _).symm
     simp only [e4, Finset.smul_sum, smul_smul, Finset.sum_smul]
     rw [Finset.sum_comm]
@@ -238,8 +238,8 @@ theorem loc_act (hMA : MultAlg) [MeasurableSpace (G n)] [BorelSpace (G n)] (μ :
   have e5 : ∀ y : G n, inner ℂ (b l) (k y.val (F (1 * y.val))) =
       ∑ j, ent M (k y.val) l j * Φ j (g₀ * infP n (Pi.mulSingle v y)) := by
     intro y
-    set_option synthInstance.maxHeartbeats 100000 in
-      simp only [one_mul, hF, map_sum, map_smul, inner_sum, inner_smul_right]
+
+    simp only [one_mul, hF, map_sum, map_smul, inner_sum, inner_smul_right]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [mul_comm]
     simp only [ent, hb, hφdef, along_val]

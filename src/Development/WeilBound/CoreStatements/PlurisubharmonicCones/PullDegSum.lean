@@ -60,7 +60,7 @@ theorem pullDeg_sum {K K' I : Type} [Fintype I] {κ : K → K'} (hκ : Function.
     simp only [hκ.extend_apply, Finset.sum_apply]
   · simp only [Function.extend_apply' _ _ _ hx, Pi.zero_apply, Finset.sum_const_zero]
 
-set_option maxHeartbeats 1000000 in
+
 theorem common (h₁ : LevelFree) (h₂ : MuHodge) : Common := by
   intro hG E _ _ _ _ H D Xo l c Y S RM Sys Fx oR II K _ J _ Ω _ _ W _ _ Dc Hd S₀ Or B hS hdisc hvR hR4 hp hbg hsm hgood hgen
   classical

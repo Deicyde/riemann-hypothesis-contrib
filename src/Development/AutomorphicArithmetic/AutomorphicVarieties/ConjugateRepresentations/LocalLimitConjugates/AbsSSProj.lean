@@ -123,8 +123,8 @@ theorem UpperTheory.V.Cj.H.absSS :
     have hsN : (∑ x ∈ hfin.toFinset, x) ∈ N := Submodule.sum_mem _ fun x hx => (hSN x hx).1
     have hsfix : ∀ u ∈ U, ρ u (∑ x ∈ hfin.toFinset, x) = ∑ x ∈ hfin.toFinset, x := by
       intro u hu
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       refine Finset.sum_nbij' (fun x => ρ u x) (fun x => ρ u⁻¹ x) ?_ ?_ ?_ ?_ (fun _ _ => rfl)
       · intro x hx
         obtain ⟨g, hg, rfl⟩ := (hmemS x).1 hx
@@ -139,9 +139,9 @@ theorem UpperTheory.V.Cj.H.absSS :
     have hsF : (∑ x ∈ hfin.toFinset, x) ∈ Submodule.span ℂ {x | x ∈ M ∧ ∀ u ∈ U, ρ u x = x} :=
       Submodule.subset_span ⟨hNM hsN, hsfix⟩
     have hzero := hb _ (Submodule.mem_inf.2 ⟨hsN, hsF⟩)
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_sum, LinearMap.sum_apply, Finset.sum_congr rfl fun x hx => (hSN x hx).2,
-      Finset.sum_const, nsmul_eq_mul] at hzero
+
+    rw [map_sum, LinearMap.sum_apply, Finset.sum_congr rfl fun x hx => (hSN x hx).2,
+    Finset.sum_const, nsmul_eq_mul] at hzero
     have hcard : (hfin.toFinset.card : ℂ) ≠ 0 := by
       have : n ∈ hfin.toFinset := (hmemS n).2 ⟨1, U.one_mem, by simp⟩
       exact_mod_cast (Finset.card_pos.2 ⟨n, this⟩).ne'

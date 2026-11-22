@@ -118,7 +118,7 @@ theorem exists_polyChart (K F V : Type) [Field K] [Field F] [Algebra K F] [Finit
   ⟨FractionRing (MvPolynomial V F), inferInstance, inferInstance, inferInstance, inferInstance, _,
     GlobalTheory.polyChart_smooth_fraction_lift K F V⟩
 
-set_option maxHeartbeats 400000 in
+
 theorem exists_cell_algebra (K O A T : Type) [Field K] [CommRing O] [IsDomain O] [Algebra O K] [IsFractionRing O K]
     [CommRing A] [IsDomain A] [Finite T] (α : O →+* A) (hft : α.FiniteType) (hinj : Function.Injective α)
     (es : Finset A) (hes : ∀ e ∈ es, e ≠ 0) (hne : es.Nonempty) (n : ℕ) (r : T → ℕ)
@@ -377,8 +377,8 @@ theorem exists_cell_algebra (K O A T : Type) [Field K] [CommRing O] [IsDomain O]
         rw [AddSubmonoidClass.coe_finsetSum]
         exact h0
       have h2 := congrArg ψ h1
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum ψ, map_mul ψ ⟨g (α (N τ)), _⟩, hψA] at h2
+
+      rw [map_sum ψ, map_mul ψ ⟨g (α (N τ)), _⟩, hψA] at h2
       refine Eq.trans (Finset.sum_congr rfl fun j _ => ?_) h2
       rw [map_mul ψ, hψA]
       rfl

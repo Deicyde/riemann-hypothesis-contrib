@@ -50,8 +50,8 @@ theorem annDrop : AnnDrop := by
   have hz : ∑ j : Fin (n + 1), ((-1) ^ (j : ℕ) * (q : ℤ) ^ ((j : ℕ).choose 2)) •
       TensorProduct.map (A j) (ψ.toLinearMap ^ (f * (n - j))) (Φ x) = 0 := by
     apply hinj
-    set_option synthInstance.maxHeartbeats 100000 in
-      rw [map_zero, map_sum, ← hsum]
+
+    rw [map_zero, map_sum, ← hsum]
     refine Finset.sum_congr rfl fun j _ => ?_
     rw [map_zsmul]
     congr 1
@@ -60,8 +60,8 @@ theorem annDrop : AnnDrop := by
     congr 3
     ring
   apply Φ.injective
-  set_option synthInstance.maxHeartbeats 100000 in
-    rw [map_zero, map_sum, Finset.sum_range, ← hz]
+
+  rw [map_zero, map_sum, Finset.sum_range, ← hz]
   refine Finset.sum_congr rfl fun j _ => ?_
   rw [map_zsmul]
   congr 1

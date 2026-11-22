@@ -171,7 +171,7 @@ private theorem exists_end_coe_eq_of_linear_on_submodule {X : Type*} (M : Submod
      map_add' := fun g h => Subtype.ext (hadd g g.2 h h.2)
      map_smul' := fun c g => Subtype.ext (hsmul c g g.2) }, fun _ => rfl⟩
 
-set_option maxHeartbeats 4000000 in
+
 private theorem laws_lemma_7 {D : D7} {V W : HSp D} {ψ : AddChar (AF D.host.F) ℂ} {θ : InfFam D} (hψ : IsStdChar D ψ (-1)) (hθ : IsInfFam θ)
     (τ : D.what₂.Tau) {s B : Mn V.rank} {s' B' : Mn W.rank} {ε : Fin V.rank → ℝ} {ε' : Fin W.rank → ℝ}
     (hε : ∀ a, ε a = 1 ∨ ε a = -1) (hε' : ∀ a, ε' a = 1 ∨ ε' a = -1) (hB : IsUnit B.det)
@@ -444,8 +444,8 @@ private theorem laws_lemma_7 {D : D7} {V W : HSp D} {ψ : AddChar (AF D.host.F) 
     have lin : GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f Q = ∑ β ∈ Q.support, Q.coeff β • GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt ψ θ V W τ s s' B B' f (MvPolynomial.monomial β 1) := by
       conv_lhs => rw [Q.as_sum]
       unfold GlobalTheory.IndefiniteRowSideFullHecke.ThetaSourceAction.ptAt Formalism.IndefR.Datum.pureTensorL
-      set_option synthInstance.maxHeartbeats 100000 in
-        rw [map_sum]
+
+      rw [map_sum]
       apply Finset.sum_congr rfl
       intro β _
       rw [← map_smul, MvPolynomial.smul_monomial, smul_eq_mul, mul_one]
