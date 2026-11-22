@@ -1,0 +1,32 @@
+name: Preserve current import dependents in PR 75
+on:
+  push:
+    branches: [maintenance/rebase-75-import-repair]
+    paths:
+      - tools/pr-rebase/**
+      - .github/workflows/rebase-75-import-repair.yml
+permissions:
+  contents: write
+jobs:
+  remaining:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          persist-credentials: false
+          sparse-checkout: |
+            tools/pr-rebase
+      - name: Replay explicit resolutions and refreshed heads
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BATCH: remaining
+        run: python3 tools/pr-rebase/rebase_open_prs.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: remaining-rebase-reports
+          path: ${{ runner.temp }}/rh-rebase-*/results/
+          if-no-files-found: warn
